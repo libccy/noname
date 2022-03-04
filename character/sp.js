@@ -17,7 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_wanglang:['wanglang'],
 				sp_tongque:["sp_fuwan","sp_fuhuanghou","sp_jiben"],
 				sp_zhongdan:["cuiyan","huangfusong"],
-				sp_guozhan2:["mateng","tianfeng","sp_dongzhuo","jiangfei","liqueguosi","lvfan","cuimao","jiling","zhangren","zongyu"],
+				sp_guozhan2:["mateng","tianfeng","sp_dongzhuo","liqueguosi","lvfan","cuimao","jiling","zhangren","zongyu"],
 				//sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
@@ -132,7 +132,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianfeng:['male','qun',3,['sijian','suishi']],
 			yuejin:['male','wei',4,['xiaoguo']],
 			sp_dongzhuo:['male','qun',5,['hengzheng']],
-			jiangfei:['male','shu',3,['reshengxi','shoucheng']],
+			//jiangfei:['male','shu',3,['reshengxi','shoucheng']],
 			//jiangqing:['male','wu',4,['shangyi','zniaoxiang']],
 			hetaihou:['female','qun',3,['zhendu','qiluan']],
 			//kongrong:['male','qun',3,['lirang','mingshi']],
@@ -405,7 +405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhuangshu_basic:{
-				//fullskin:true,
+				fullskin:true,
 				vanish:true,
 				derivation:'fengfangnv',
 				type:'equip',
@@ -424,7 +424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				loseDelay:false,
 			},
 			zhuangshu_trick:{
-				//fullskin:true,
+				fullskin:true,
 				vanish:true,
 				derivation:'fengfangnv',
 				type:'equip',
@@ -443,7 +443,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				loseDelay:false,
 			},
 			zhuangshu_equip:{
-				//fullskin:true,
+				fullskin:true,
 				vanish:true,
 				derivation:'fengfangnv',
 				type:'equip',
@@ -569,15 +569,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				intro:{content:'已声明【$】'},
-				group:'olxianlve_use',
+				group:['olxianlve_use','olxianlve_count'],
 				subSkill:{
+					count:{
+						trigger:{global:'useCard1'},
+						silent:true,
+						forced:true,
+						popup:false,
+						firstDo:true,
+						filter:function(event,player){
+							return event.player!=player&&event.card.name==player.storage.olxianlve;
+						},
+						content:function(){
+							if(!trigger.olxianlve_map) trigger.olxianlve_map={};
+							trigger.olxianlve_map[player.playerid]=true;
+						},
+					},
 					use:{
 						audio:'olxianlve',
 						trigger:{global:'useCardAfter'},
 						forced:true,
 						locked:false,
+						usable:1,
 						filter:function(event,player){
-							return event.player!=player&&event.card.name==player.storage.olxianlve;
+							return event.player!=player&&event.olxianlve_map&&event.olxianlve_map[player.playerid]&&event.card.name==player.storage.olxianlve;
 						},
 						content:function(){
 							'step 0'
@@ -757,7 +772,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseToDiscard('he',get.prompt2('zhuangshu',trigger.player),function(card){
+					player.chooseToDiscard('he',get.prompt('zhuangshu',trigger.player),'弃置一张牌，并根据此牌的类型，按如下关系将一张宝物牌置入该角色的装备区：{<基本牌,【琼梳】>，<锦囊牌，【犀梳】>，<装备牌，【金梳】>}。',function(card){
 						var type=get.type2(card);
 						return type=='basic'||type=='trick'||type=='equip';
 					}).set('ai',function(card){
@@ -789,6 +804,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.player.equip(card);
 						}
 					}
+				},
+				group:'zhuangshu_gameStart',
+				subSkill:{
+					gameStart:{
+						trigger:{global:'phaseBefore'},
+						direct:true,
+						filter:function(event,player){
+							return game.phaseNumber==0;
+						},
+						content:function(){
+							'step 0'
+							player.chooseButton([get.prompt('zhuangshu'),[['zhuangshu_basic','zhuangshu_trick','zhuangshu_equip'],'vcard']]).set('filterButton',function(button){
+								return !game.hasPlayer(function(current){
+									return current.getEquip(button.link[2]);
+								})
+							});
+							'step 1'
+							if(result.bool){
+								player.logSkill('zhuangshu');
+								var name=result.links[0][2],card=game.createCard(name,lib.card[name].suit,12);
+								player.$gain2(card,false);
+								game.delayx();
+								player.equip(card);
+							}
+						},
+					},
 				},
 			},
 			chuiti:{
@@ -825,7 +866,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhuangshu_basic:{
 				equipSkill:true,
-				usable:1,
+				trigger:{player:'damageBegin2'},
+				direct:true,
+				filter:function(event,player){
+					var equip=player.getEquip('zhuangshu_basic');
+					return event.num<=player.countCards('he',function(card){
+						return card!=equip;
+					})
+				},
+				content:function(){
+					'step 0'
+					player.chooseToDiscard('he',trigger.num,get.prompt('zhuangshu_basic'),'弃置'+get.cnNumber(trigger.num)+'张牌并防止伤害',function(card,player){
+						return card!=player.getEquip('zhuangshu_basic');
+					}).set('ai',function(card){
+						var player=_status.event.player;
+						return 4+player.getUseValue(card)-get.value(card,player);
+					});
+					'step 1'
+					if(result.bool) trigger.cancel();
+				},
+				/*usable:1,
 				trigger:{player:'useCard2'},
 				direct:true,
 				filter:function(event,player){
@@ -863,7 +923,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.logSkill('zhuangshu_basic',targets);
 					trigger.targets.addArray(targets);
 					trigger.directHit.addArray(targets);
-				},
+				},*/
 			},
 			zhuangshu_trick:{
 				trigger:{player:['phaseJudgeBefore']},
@@ -4624,12 +4684,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					target.storage.xiongsuan_restore=result.control;
-					target.addTempSkill('xiongsuan_restore','phaseZhunbeiBegin');
+					target.addTempSkill('xiongsuan_restore');
 				},
 				subSkill:{
 					restore:{
 						trigger:{global:'phaseAfter'},
 						silent:true,
+						charlotte:true,
 						content:function(){
 							player.restoreSkill(player.storage.xiongsuan_restore);
 						}
@@ -4665,92 +4726,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			diancai:{
 				audio:2,
-				trigger:{global:'phaseUseEnd'},
-				filter:function(event,player){
-					if(_status.currentPhase==player) return false;
-					var num=0;
-					player.getHistory('lose',function(evt){
-						if(evt.cards2&&evt.getParent('phaseUse')==event) num+=evt.cards2.length;
-					});
-					return num>=player.hp;
-				},
-				content:function(){
-					'step 0'
-					var num=player.maxHp-player.countCards('h');
-					if(num>0){
-						player.draw(num);
-					}
-				},
 			},
 			diaodu:{
 				audio:2,
-				group:"diaodu_use",
-				subfrequent:['use'],
-				subSkill:{
-					use:{
-						trigger:{
-							player:"useCard",
-						},
-						audio:"diaodu",
-						frequent:true,
-						prompt:'是否发动【调度】摸一张牌？',
-						filter:function (event,player){
-							return get.type(event.card)=='equip'
-						},
-						content:function (){
-							player.draw('nodelay');
-						},
-						ai:{
-							reverseEquip:true,
-							effect:{
-								target:function (card,player,target,current){
-									if(player==target&&get.type(card)=='equip') return [1,3];
-								},
-							},
-						},
-					},
-				},
-				trigger:{
-					player:"phaseUseBegin",
-				},
-				filter:function (event,player){
-					return game.hasPlayer(function(current){
-						return current!=player&&current.countGainableCards(player,'e')>0;
-					});
-				},
-				direct:true,
-				content:function (){
-					'step 0'
-					player.chooseTarget(get.prompt2('diaodu'),function(card,player,current){
-						return current!=player&&current.countGainableCards(player,'e')>0;
-					}).ai=function(target){
-						var num=get.attitude(_status.event.player,target);
-						if(target.isDamaged()&&target.getEquip('baiyin')&&num>0) return 2*num
-						return -num;
-					};
-					'step 1'
-					if(result.bool){
-						event.target1=result.targets[0];
-						player.logSkill('diaodu',event.target1);
-						player.line(event.target1,'diaodu');
-						player.gainPlayerCard(event.target1,'e',true);
-					}
-					else event.finish();
-					'step 2'
-					if(result.bool){
-						event.card=result.cards[0];
-						player.chooseTarget('是否将'+get.translation(event.card)+'交给一名其他角色？',function(card,player,current){
-							return current!=player&&current!=event.target1;
-						});
-					}
-					else event.finish();
-					'step 3'
-					if(result.bool){
-						var target=result.targets[0];
-						player.line(target,'green');
-						target.gain(card,player,'give');
-					}
-				},
 			},
 			zhengbi:{
 				audio:2,
@@ -16629,12 +16607,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldingcuo_info:'每回合限一次。当你受到或造成伤害后，你可摸两张牌。若这两张牌颜色不同，则你弃置一张手牌。',
 			fengfangnv:'冯方女',
 			zhuangshu:'妆梳',
-			zhuangshu_info:'一名角色的回合开始时，若其宝物区为空，则你可以弃置一张牌，并根据此牌的类型，按如下关系将一张宝物牌置入该角色的装备区：{<基本牌,【琼梳】>，<锦囊牌，【犀梳】>，<装备牌，【金梳】>}。',
+			zhuangshu_info:'①游戏开始时，你可将{【琼梳】，【犀梳】，【金梳】}中的一张牌置于装备区。②一名角色的回合开始时，若其宝物区为空，则你可以弃置一张牌，并根据此牌的类型，按如下关系将一张宝物牌置入该角色的装备区：{<基本牌,【琼梳】>，<锦囊牌，【犀梳】>，<装备牌，【金梳】>}。',
 			chuiti:'垂涕',
 			chuiti_info:'每回合限一次。当你或拥有〖妆梳〗牌角色的牌因弃置而进入弃牌堆后，你可使用其中的一张牌。',
 			zhuangshu_basic:'琼梳',
 			zhuangshu_basic_bg:'琼',
-			zhuangshu_basic_info:'每回合限一次。当你使用【杀】或普通锦囊牌选择唯一目标后，你可为此牌增加一名体力值/手牌数相同的额外目标（无距离限制），且该目标不可响应此牌。当此牌不因交换装备或移动至其他装备区而离开你的装备区后，销毁之。',
+			zhuangshu_basic_info:'当你受到伤害时，你可以弃置X张牌并防止此伤害（X为伤害值）。当此牌不因交换装备或移动至其他装备区而离开你的装备区后，销毁之。',
 			zhuangshu_trick:'犀梳',
 			zhuangshu_trick_bg:'犀',
 			zhuangshu_trick_info:'判定阶段开始前，你可选择：①跳过此阶段。②跳过本回合的弃牌阶段。当此牌不因交换装备或移动至其他装备区而离开你的装备区后，销毁之。',
@@ -16643,7 +16621,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuangshu_equip_info:'锁定技。出牌阶段结束时，你将手牌摸至手牌上限（至多摸五张）。当此牌不因交换装备或移动至其他装备区而离开你的装备区后，销毁之。',
 			ol_dongzhao:'董昭',
 			olxianlve:'先略',
-			olxianlve_info:'①主公的回合开始时，你可声明并记录一个锦囊牌的名称并移除先前的记录。②其他角色使用〖先略〗记录过的锦囊牌后，你可摸两张牌并可以分配给任意其他角色，然后你可声明并记录一个锦囊牌的名称并移除先前的记录。',
+			olxianlve_info:'①主公的回合开始时，你可声明并记录一个锦囊牌的名称并移除先前的记录。②每回合限一次，其他角色使用〖先略〗记录过的锦囊牌后，你可摸两张牌并可以分配给任意其他角色，然后你可声明并记录一个锦囊牌的名称并移除先前的记录。',
 			olzaowang:'造王',
 			olzaowang2:'造王',
 			olzaowang_info:'限定技。出牌阶段，你可以令一名角色加1点体力上限，回复1点体力并摸三张牌，且获得如下效果：主公死亡时，若其身份为忠臣，则其和主公交换身份牌；其死亡时，若其身份为反贼且伤害来源的身份为主公或忠臣，则以主忠胜利结束本局游戏。',

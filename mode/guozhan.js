@@ -1532,7 +1532,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(num>0) player.draw(num);
 					'step 4'
 					if(trigger.player.isIn()){
-						var target=trigger.player,tao=(lib.filter.cardEnabled({name:'tao',isCard:true},player)&&lib.filter.targetEnabled2({name:'tao',isCard:true},player,target)),sha=game.filterPlayer(function(current){
+						var target=trigger.player,tao=(lib.filter.cardEnabled({name:'tao',isCard:true},player,'forceEnable')&&lib.filter.targetEnabled2({name:'tao',isCard:true},player,target)),sha=game.filterPlayer(function(current){
 							return current!=target&&current!=player&&target.canUse({name:'sha',nature:'thunder',isCard:true},current,false);
 						});
 						if(sha.length){
@@ -5367,7 +5367,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.targets=result.targets;
 					event.players=game.filterPlayer(function(current){
 						if(current==player) return false;
-						return current.isFriendOf(player)||current.isUnseen();
+						return current.isFriendOf(player)||(player.identity!='ye'&&current.isUnseen());
 					}).sort(lib.sort.seat);
 					event.num=0;
 					event.filterName=function(name){
@@ -8324,12 +8324,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					target.storage.gzxiongsuan_restore=result.control;
-					target.addTempSkill('gzxiongsuan_restore','phaseZhunbeiBegin');
+					target.addTempSkill('gzxiongsuan_restore');
 				},
 				subSkill:{
 					restore:{
 						trigger:{global:'phaseAfter'},
 						silent:true,
+						charlotte:true,
 						content:function(){
 							player.restoreSkill(player.storage.gzxiongsuan_restore);
 						}
@@ -10197,23 +10198,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					'step 6'
 					if(result.bool){
-						game.broadcastAll(function(player,target){
-							player.say('加入');
-							player.identity='ye';
-							player.setIdentity('ye');
-							player.storage.yexinjia_friend=target;
-						},target,source);
-						target.markSkill('yexinjia_friend');
-						source.removeMark('yexinjia_mark',1);
-						target.drawTo(4);
-						target.recover();
+						target.chat('加入');
+						if(!_status.yexinjia_list) _status.yexinjia_list=['夏','商','周','秦','汉','隋','唐','宋','辽','金','元','明'];
+						source.chooseControl(_status.yexinjia_list).set('prompt','请选择自己所属的野心家势力的标识').set('ai',()=>(_status.yexinjia_list?_status.yexinjia_list.randomGet():0));
 					}
 					else{
 						target.chat('拒绝');
 						game.delay(1.5);
 						if(targets.length) event.goto(5);
+						else event.goto(8);
 					}
 					'step 7'
+					game.broadcastAll(function(player,target,text){
+						player.identity='ye';
+						source.setIdentity(text,'ye');
+						player.setIdentity(text,'ye');
+						player.storage.yexinjia_friend=target;
+					},target,source,result.control);
+					_status.yexinjia_list.remove(result.control);
+					target.markSkill('yexinjia_friend');
+					source.removeMark('yexinjia_mark',1);
+					target.drawTo(4);
+					target.recover();
+					'step 8'
 					if(event.targets2.length) event.goto(3);
 					else delete _status.showYexings;
 				});

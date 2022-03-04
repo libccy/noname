@@ -3704,6 +3704,30 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    						},
    					},
    				},
+   				{
+   					name:'雒城之战',
+   					place:[true,false,false,true],
+   					character:['liubei','re_wuyi','zhangren','pangtong'],
+   					lib:{
+   						character:{
+   							liubei:['male','shu',4,['rezhijian','jijiu','reyingzi'],[]],
+   							re_wuyi:['male','qun',4,['weijing','rerende'],[]],
+   							zhangren:['male','qun',4,['shefu','gnsheque'],[]],
+   							pangtong:['male','shu',3,['dujin'],[]],
+   						},
+   						translate:{
+   							liubei:'雒城刘备',
+   							re_wuyi:'雒城吴懿',
+   							zhangren:'雒城张任',
+   							pangtong:'雒城庞统',
+   							rezhijian:'厚恩',
+   							zhijian:'厚恩',
+   							jijiu:'驰援',
+   							reyingzi:'征令',
+   							rerende:'遣军',
+   						},
+   					},
+   				},
    			];
    			if(_status.keyVerified) list=[
    					{

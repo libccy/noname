@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.112.1',
+	'v1.9.112.2',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -4279,6 +4279,9 @@ window.noname_asset_list=[
 	'image/card/yitianjian.png',
 	'image/card/yonglv.png',
 	'image/card/zhanxiang.png',
+	'image/card/zhuangshu_basic.png',
+	'image/card/zhuangshu_trick.png',
+	'image/card/zhuangshu_equip.png',
 	
 	'image/character/shenpei.jpg',
 	'image/character/re_menghuo.jpg',
@@ -4787,6 +4790,14 @@ window.noname_asset_list=[
 	'image/character/xin_yufan.jpg',
 	'image/character/xinchang.jpg',
 	'image/character/xuangongzhu.jpg',
+	'image/character/liucheng.jpg',
+	'image/character/re_chendeng.jpg',
+	'image/character/re_xiahoushi.jpg',
+	'image/character/sp_huangfusong.jpg',
+	'image/character/sp_lvfan.jpg',
+	'image/character/sp_yangwan.jpg',
+	'image/character/xin_jushou.jpg',
+	'image/character/yj_huangzhong.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

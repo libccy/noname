@@ -491,6 +491,7 @@ window.noname_character_rank={
 		're_xunchen',
 		'sp_cuiyan',
 		'ol_dongzhao',
+		'xin_jushou',
 	],
 	bp:[
 		'chess_diaochan',
@@ -731,6 +732,8 @@ window.noname_character_rank={
 		'tw_re_caohong',
 		'tw_mayunlu',
 		'tw_hucheer',
+		'sp_lvfan',
+		're_chendeng',
 	],
 	b:[
 		'diy_feishi',
@@ -939,6 +942,10 @@ window.noname_character_rank={
 		'sp_jiangqing',
 		'tw_hejin',
 		'xuangongzhu',
+		'sp_huangfusong',
+		'yj_huangzhong',
+		're_xiahoushi',
+		'sp_yangwan',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1092,6 +1099,7 @@ window.noname_character_rank={
 		'xin_sunluban',
 		'ol_bianfuren',
 		'sp_ol_zhanghe',
+		'liucheng',
 	],
 	c:[
 		'xiahoudun',
@@ -1454,6 +1462,7 @@ window.noname_character_rank={
 			'db_wenyang',
 			'qiaozhou',
 			'lvlingqi',
+			'xin_jushou',
 			'key_kano',
 			'key_haruko',
 			'key_akiko',
@@ -1816,6 +1825,9 @@ window.noname_character_rank={
 			'tw_mayunlu',
 			'tw_re_caohong',
 			'tw_hucheer',
+			'sp_yangwan',
+			're_xiahoushi',
+			're_chendeng',
 		],
 		junk:[
 			'sunshao',

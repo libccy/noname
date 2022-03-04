@@ -196,7 +196,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						case 'equip2':
 							target.draw();
 							break;
-						case 'equip3':
+						case 'equip3': case 'equip4': case 'equip6':
 							target.recover();
 							break;
 					}
@@ -384,7 +384,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=targets[0],evt=event.getParent();
 					evt._target=target;
 					var list=game.filterPlayer(function(current){
-						return current!=player&&current!=target&&current.hp<=target.hp;
+						return current!=player&&current!=target&&current.hp<=player.hp;
 					});
 					if(!list.length){
 						player.loseHp();
@@ -400,7 +400,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.chooseCard('he','是否交给'+get.translation(player)+'一张牌？').set('ai',function(card){
 						if(_status.event.goon) return 7-get.value(card);
 						return 0;
-					}).set('goon',get.attitude(target,player)>0||Math.random()<num/(1+targets.length));
+					}).set('goon',get.attitude(target,player)>0);
 					'step 1'
 					if(result.bool){
 						player.gain(result.cards,target,'giveAuto');
@@ -424,11 +424,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=event.getParent()._target;
 						event.target=target;
 						event.num=num;
-						var bool1=target.canUse('sha',player,false),bool2=target.canUse('juedou',player,false);
-						if(bool1&&bool2) target.chooseControl('sha','juedou').set('prompt','谋诛：视为对'+get.translation(player)+'使用一张…').set('prompt2','（伤害值基数：'+num+'）').set('ai',function(){
-							var player=_status.event.player,target=_status.event.getParent().player;
-							if(!target.hasShan()&&get.effect(target,{name:'sha'},player,player)>0) return 'sha';
-							if(get.effect(target,{name:'juedou'},player,player)>0) return 'juedou';
+						var bool1=player.canUse('sha',target,false),bool2=player.canUse('juedou',target,false);
+						if(bool1&&bool2) target.chooseControl('sha','juedou').set('prompt','谋诛：视为被'+get.translation(player)+'使用一张…').set('prompt2','（伤害值基数：'+num+'）').set('ai',function(){
+							var target=_status.event.player,player=_status.event.getParent().player;
+							if(target.hasShan()||get.effect(target,{name:'sha'},player,target)>0) return 'sha';
+							if(get.effect(target,{name:'juedou'},player,target)>0) return 'juedou';
 							return 'sha';
 						});
 						else if(bool1) event._result={control:'sha'};
@@ -436,10 +436,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else event.finish();
 					}
 					'step 1'
-					if(result.control&&lib.card[result.control]) target.useCard({
+					if(result.control&&lib.card[result.control]) player.useCard({
 						name:result.control,
 						isCard:true,
-					},false,player).baseDamage=num;
+					},false,target).baseDamage=num;
 				},
 			},
 			twyanhuo:{
@@ -2148,7 +2148,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twdaoji_info:'出牌阶段限一次，你可以弃置一张非基本牌并选择一名攻击范围内的角色，获得其一张牌。若你以此法获得的牌为：基本牌，你摸一张牌；装备牌，你使用此牌并对其造成1点伤害。',
 			tw_hejin:'TW何进',
 			twmouzhu:'谋诛',
-			twmouzhu_info:'出牌阶段限一次，你可以选择一名其他角色A。你令除A外所有体力值小于等于A的其他角色依次选择是否交给你一张牌。若你以此法获得的牌数X：等于0，你和所有进行选择的角色依次失去1点体力。大于0，你令A选择视为对你使用一张伤害值基数为X的【杀】或【决斗】。',
+			twmouzhu_info:'出牌阶段限一次，你可以选择一名其他角色A。你令除A外所有体力值小于等于你的其他角色依次选择是否交给你一张牌。若你以此法获得的牌数X：等于0，你和所有进行选择的角色依次失去1点体力。大于0，你令A选择由你视为对其使用一张伤害值基数为X的【杀】或【决斗】。',
 			twyanhuo:'延祸',
 			twyanhuo_info:'当你死亡时，你可以选择一项：①令一名其他角色弃置X张牌。②令X名其他角色依次弃置一张牌。（X为你的牌数）',
 			tw_mayunlu:'TW马云禄',

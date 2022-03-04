@@ -9628,7 +9628,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_chujiangwang:'楚江王·厉温',
 			boss_bingfeng:'冰封',
 			boss_bingfeng_info:'锁定技，你死亡时，若杀死你的角色武将牌是正面朝上， 你令其翻面。',
-			boss_songdiwang:'余懃',
+			boss_songdiwang:'宋帝王·余懃',
 			boss_heisheng:'黑绳',
 			boss_heisheng_info:'锁定技，你死亡时，横置所有场上角色。',
 			boss_shengfu:'绳缚',

@@ -56,6 +56,7 @@
 		characterReplace:{},
 		dynamicTranslate:{},
 		cardPack:{},
+		skin:{},
 		onresize:[],
 		onphase:[],
 		onwash:[],
@@ -10363,6 +10364,13 @@
 			group_qun_bg:"群",
 			group_key_bg:"键",
 			group_jin_bg:"晋",
+			zhengsu:'整肃',
+			zhengsu_leijin:'擂进',
+			zhengsu_bianzhen:'变阵',
+			zhengsu_mingzhi:'鸣止',
+			zhengsu_leijin_info:'回合内所有于出牌阶段使用的牌点数递增且不少于三张。',
+			zhengsu_bianzhen_info:'回合内所有于出牌阶段使用的牌花色相同且不少于两张。',
+			zhengsu_mingzhi_info:'回合内所有于弃牌阶段弃置的牌花色均不相同且不少于两张。',
 		},
 		element:{
 			content:{
@@ -12244,7 +12252,10 @@
 					if(!event.cancelled&&!event.nojudge) player.judge(event.card).set('type','phase');
 					"step 3"
 					var name=event.card.viewAs||event.card.name;
-					if(event.cancelled&&!event.direct){
+					if(event.excluded){
+						delete event.excluded;
+					}
+					else if(event.cancelled&&!event.direct){
 						if(lib.card[name].cancel){
 							var next=game.createEvent(name+'Cancel');
 							next.setContent(lib.card[name].cancel);
@@ -14842,21 +14853,21 @@
 						else{
 							player.stat[player.stat.length-1].card[card.name]++;
 						}
-						if(event.skill){
-							if(player.stat[player.stat.length-1].skill[event.skill]==undefined){
-								player.stat[player.stat.length-1].skill[event.skill]=1;
+					}
+					if(event.skill){
+						if(player.stat[player.stat.length-1].skill[event.skill]==undefined){
+							player.stat[player.stat.length-1].skill[event.skill]=1;
+						}
+						else{
+							player.stat[player.stat.length-1].skill[event.skill]++;
+						}
+						var sourceSkill=get.info(event.skill).sourceSkill;
+						if(sourceSkill){
+							if(player.stat[player.stat.length-1].skill[sourceSkill]==undefined){
+								player.stat[player.stat.length-1].skill[sourceSkill]=1;
 							}
 							else{
-								player.stat[player.stat.length-1].skill[event.skill]++;
-							}
-							var sourceSkill=get.info(event.skill).sourceSkill;
-							if(sourceSkill){
-								if(player.stat[player.stat.length-1].skill[sourceSkill]==undefined){
-									player.stat[player.stat.length-1].skill[sourceSkill]=1;
-								}
-								else{
-									player.stat[player.stat.length-1].skill[sourceSkill]++;
-								}
+								player.stat[player.stat.length-1].skill[sourceSkill]++;
 							}
 						}
 					}
@@ -18236,7 +18247,7 @@
 					}
 					if(i=='ghujia'||((!this.marks[i].querySelector('.image')||this.storage[i+'_markcount'])&&
 						lib.skill[i]&&lib.skill[i].intro&&!lib.skill[i].intro.nocount&&
-						(this.storage[i]||lib.skill[i].intro.markcount))){
+						(this.storage[i]||this.storage[i+'_markcount']||lib.skill[i].intro.markcount))){
 						this.marks[i].classList.add('overflowmark')
 						var num=0;
 						if(typeof lib.skill[i].intro.markcount=='function'){
@@ -18834,7 +18845,7 @@
 					},this,time);
 					return this;
 				},
-				setIdentity:function(identity){
+				setIdentity:function(identity,nature){
 					if(!identity) identity=this.identity;
 					if(get.is.jun(this)){
 						this.node.identity.firstChild.innerHTML='君';
@@ -18842,7 +18853,7 @@
 					else{
 						this.node.identity.firstChild.innerHTML=get.translation(identity);
 					}
-					this.node.identity.dataset.color=identity;
+					this.node.identity.dataset.color=nature||identity;
 					return this;
 				},
 				insertPhase:function(skill,insert){
@@ -25992,6 +26003,9 @@
 				type:"equip",
 				subtype:"equip5",
 			},
+			zhengsu_leijin:{},
+			zhengsu_mingzhi:{},
+			zhengsu_bianzhen:{},
 			disable_judge:{},
 			group_wei:{fullskin:true},
 			group_shu:{fullskin:true},
@@ -26534,6 +26548,180 @@
 			}
 		},
 		skill:{
+			zhengsu:{
+				trigger:{player:'phaseDiscardEnd'},
+				forced:true,
+				charlotte:true,
+				filter:function(event,player){
+					return (player.storage.zhengsu_leijin||player.storage.zhengsu_bianzhen||player.storage.zhengsu_mingzhi);
+				},
+				content:function(){
+					player.chooseDrawRecover(2,'整肃奖励：摸两张牌或回复1点体力');
+				},
+				subSkill:{
+					leijin:{
+						mark:true,
+						trigger:{player:'useCard1'},
+						lastDo:true,
+						charlotte:true,
+						forced:true,
+						popup:false,
+						onremove:true,
+						filter:function(event,player){
+							return player.isPhaseUsing()&&player.storage.zhengsu_leijin!==false;
+						},
+						content:function(){
+							var list=player.getHistory('useCard',function(evt){
+								return evt.isPhaseUsing(player);
+							});
+							var goon=true;
+							for(var i=0;i<list.length;i++){
+								var num=get.number(list[i].card);
+								if(typeof num!='number'){
+									goon=false;
+									break;
+								}
+								if(i>0){
+									var num2=get.number(list[i-1].card);
+									if(typeof num2!='number'||num2>=num){
+										goon=false;
+										break;
+									}
+								}
+							}
+							if(!goon){
+								game.broadcastAll(function(player){
+									player.storage.zhengsu_leijin=false;
+									if(player.marks.zhengsu_leijin) player.marks.zhengsu_leijin.firstChild.innerHTML='╳';
+									delete player.storage.zhengsu_leijin_markcount;
+								},player);
+							}
+							else{
+								if(list.length>2){
+									game.broadcastAll(function(player,num){
+										if(player.marks.zhengsu_leijin) player.marks.zhengsu_leijin.firstChild.innerHTML='○';
+										player.storage.zhengsu_leijin=true;
+										player.storage.zhengsu_leijin_markcount=num;
+									},player,num);
+								}
+								else game.broadcastAll(function(player,num){
+									player.storage.zhengsu_leijin_markcount=num;
+								},player,num);
+							}
+							player.markSkill('zhengsu_leijin');
+						},
+						intro:{
+							content:'<li>条件：回合内所有于出牌阶段使用的牌点数递增且不少于三张。',
+						},
+					},
+					bianzhen:{
+						mark:true,
+						trigger:{player:'useCard1'},
+						firstDo:true,
+						charlotte:true,
+						forced:true,
+						popup:false,
+						onremove:true,
+						filter:function(event,player){
+							return player.isPhaseUsing()&&player.storage.zhengsu_bianzhen!==false;
+						},
+						content:function(){
+							var list=player.getHistory('useCard',function(evt){
+								return evt.isPhaseUsing();
+							});
+							var goon=true,suit=get.suit(list[0].card,false);
+							if(suit=='none'){
+								goon=false;
+							}
+							else{
+								for(var i=1;i<list.length;i++){
+									if(get.suit(list[i])!=suit){
+										goon=false;
+										break;
+									}
+								}
+							}
+							if(!goon){
+								game.broadcastAll(function(player){
+									player.storage.zhengsu_bianzhen=false;
+									if(player.marks.zhengsu_bianzhen) player.marks.zhengsu_bianzhen.firstChild.innerHTML='╳';
+								},player);
+							}
+							else{
+								if(list.length>1){
+									game.broadcastAll(function(player){
+										if(player.marks.zhengsu_bianzhen) player.marks.zhengsu_bianzhen.firstChild.innerHTML='○';
+										player.storage.zhengsu_bianzhen=true;
+									},player);
+								}
+								else game.broadcastAll(function(player,suit){
+									if(player.marks.zhengsu_bianzhen) player.marks.zhengsu_bianzhen.firstChild.innerHTML=get.translation(suit);
+								},player,suit);
+							}
+							player.markSkill('zhengsu_bianzhen');
+						},
+						intro:{
+							content:'<li>条件：回合内所有于出牌阶段使用的牌花色相同且不少于两张。',
+						},
+					},
+					mingzhi:{
+						mark:true,
+						trigger:{player:'loseAfter'},
+						firstDo:true,
+						charlotte:true,
+						forced:true,
+						popup:false,
+						onremove:true,
+						filter:function(event,player){
+							if(player.storage.zhengsu_mingzhi===false||event.type!='discard') return false;
+							var evt=event.getParent('phaseDiscard');
+							return evt&&evt.player==player;
+						},
+						content:function(){
+							var goon=true,list=[];
+							player.getHistory('lose',function(event){
+								if(!goon||event.type!='discard') return false;
+								var evt=event.getParent('phaseDiscard');
+								if(evt&&evt.player==player){
+									for(var i of event.cards2){
+										var suit=get.suit(i,player);
+										if(list.contains(suit)){
+											goon=false;
+											break;
+										}
+										else list.push(suit);
+									}
+								}
+							});
+							if(!goon){
+								game.broadcastAll(function(player){
+									player.storage.zhengsu_mingzhi=false;
+									if(player.marks.zhengsu_mingzhi) player.marks.zhengsu_mingzhi.firstChild.innerHTML='╳';
+									delete player.storage.zhengsu_mingzhi_list;
+								},player);
+							}
+							else{
+								if(list.length>1){
+									game.broadcastAll(function(player,list){
+										if(player.marks.zhengsu_mingzhi) player.marks.zhengsu_mingzhi.firstChild.innerHTML='○';
+										player.storage.zhengsu_mingzhi=true;
+										player.storage.zhengsu_mingzhi_list=list;
+										player.storage.zhengsu_mingzhi_markcount=list.length;
+									},player,list);
+								}
+								else game.broadcastAll(function(player,list){
+									player.storage.zhengsu_mingzhi_list=list;
+									player.storage.zhengsu_mingzhi_markcount=list.length;
+								},player,list);
+							}
+							player.markSkill('zhengsu_mingzhi');
+						},
+						intro:{
+							content:'<li>条件：回合内所有于弃牌阶段弃置的牌花色均不相同且不少于两张。',
+						},
+					},
+				},
+			},
 			renku:{
 				intro:{
 					markcount:function(){
@@ -48311,8 +48499,8 @@
 					if(typeof get.info(event.skill).viewAs=='function') event.result.card=get.info(event.skill).viewAs(event.result.cards,event.player);
 					else event.result.card=get.copy(get.info(event.skill).viewAs);
 					if(event.result.cards.length==1&&event.result.card){
-						event.result.card.suit=get.suit(event.result.cards[0]);
-						event.result.card.number=get.number(event.result.cards[0]);
+						if(!event.result.card.suit) event.result.card.suit=get.suit(event.result.cards[0]);
+						if(!event.result.card.number) event.result.card.number=get.number(event.result.cards[0]);
 					}
 					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
 						event.skillDialog.close();

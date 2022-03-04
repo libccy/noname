@@ -196,6 +196,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//孙体
 			xinzhaofu:{
+				mark:false,
+				init:function(player){
+					if(player.hasZhuSkill('xinzhaofu')){
+						player.markSkill('xinzhaofu');
+						player.storage.xinzhaofu=false;
+					}
+				},
 				audio:'zhaofu',
 				enable:'phaseUse',
 				usable:1,
@@ -12203,7 +12210,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunluban:['re_sunluban','xin_sunluban','sunluban'],
 			zhuhuan:['zhuhuan','old_zhuhuan'],
 			caoxiu:['re_caoxiu','caoxiu','old_caoxiu'],
-			//xiahoushi:['xiahoushi','sp_xiahoushi'],
+			xiahoushi:['re_xiahoushi','xiahoushi'],
 			zhangyi:['re_zhangyi','zhangyi'],
 			quancong:['re_quancong','quancong','old_quancong'],
 			sunxiu:['re_sunxiu','sunxiu'],
@@ -12218,6 +12225,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guanping:['re_guanping','guanping'],
 			caifuren:['xin_caifuren','re_caifuren','caifuren'],
 			guyong:['re_guyong','xin_guyong','guyong'],
+			yj_jushou:['xin_jushou','yj_jushou'],
 		},
 		translate:{
 			old_huaxiong:'华雄',
@@ -12574,7 +12582,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shibei:'矢北',
 			shibei_info:'锁定技，当你受到伤害后：若此伤害是你本回合第一次受到的伤害，则你回复1点体力；否则你失去1点体力。',
 			jianying:'渐营',
-			jianying_info:'当你于出牌阶段内使用与此阶段你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌',
+			jianying_info:'当你于出牌阶段内使用与此阶段你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌。',
 			xinenyuan:'恩怨',
 			xinenyuan2:'恩怨',
 			xinenyuan_info:'当你获得一名其他角色两张或更多的牌后，你可以令其摸一张牌；当你受到1点伤害后，你可以令伤害来源选择一项：1、将一张手牌交给你；2、失去1点体力。',

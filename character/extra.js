@@ -353,6 +353,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'target',
 				content:function(){
 					trigger.directHit.add(trigger.target);
+					if(player.getHistory('gain',function(evt){
+						return evt.getParent(2).name=='scfuhai';
+					}).length<2) player.draw();
 				},
 				group:['scfuhai_die'],
 				ai:{
@@ -447,13 +450,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianzuo:{
 				audio:2,
 				trigger:{
-					global:'gameStart',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return !lib.inpile.contains('qizhengxiangsheng');
+					return (event.name!='phase'||game.phaseNumber==0)&&!lib.inpile.contains('qizhengxiangsheng');
 				},
 				content:function(){
 					game.addGlobalSkill('tianzuo_global');
@@ -4864,7 +4867,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yingba:'英霸',
 			yingba_info:'①出牌阶段限一次，你可令一名体力上限大于1的其他角色减少1点体力上限并获得“平定”标记，然后你减少1点体力上限。②你对拥有“平定”标记的角色使用牌没有距离限制。③拥有“平定”标记的角色的手牌上限+X（X为其“平定”数）。',
 			scfuhai:'覆海',
-			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。②拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
+			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。若你本回合内以此法获得的牌数小于2，则你摸一张牌。②拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
 			pinghe:'冯河',
 			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
 			

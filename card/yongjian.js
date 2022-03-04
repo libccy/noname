@@ -348,6 +348,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				equipSkill:true,
 				filter:function(event,player){
+					if(player.hasSkillTag('unequip2')) return false;
+					if(event.player.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return false;
 					return event.card.name=='sha'&&player.hasSex('male');
 				},
 				content:function(){
@@ -373,7 +379,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				trigger:{player:['damageBegin3','loseHpBegin']},
 				filter:function(event,player){
-					if(event.name=='damage') return event.card&&get.type2(event.card)=='trick';
+					if(player.hasSkillTag('unequip2')) return false;
+					if(event.name=='damage'){
+						if(event.source&&event.source.hasSkillTag('unequip',false,{
+							name:event.card?event.card.name:null,
+							target:player,
+							card:event.card
+						})) return false;
+						return event.card&&get.type2(event.card)=='trick';
+					}
 					return event.type=='du';
 				},
 				content:function(){

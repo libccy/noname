@@ -486,7 +486,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(player==game.zhu){
 							player.addSkill(game.zhuSkill);
 						}
-						else player.addSkill(['binglin_shaxue','binglin_neihong']);
+						else player.addSkill('binglin_neihong');
 					}
 					game.zhu.hp++;
 					game.zhu.maxHp++;
@@ -1809,10 +1809,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			zhuSkill_xiangyang:'襄阳',
 			zhuSkill_xiangyang_info:'回合结束时，你可获得一个额外的出牌阶段或摸牌阶段。',
 			zhuSkill_jiangling:'江陵',
-			zhuSkill_jiangling_info:'当你使用【杀】或普通锦囊牌选择唯一目标时，你可为此牌增加一个目标（该目标不可响应此牌）。',
+			zhuSkill_jiangling0:'江陵',
+			zhuSkill_jiangling1:'江陵',
+			zhuSkill_jiangling_info:'出牌阶段开始时，你可选择一项：①本阶段内使用【杀】或普通锦囊牌选择唯一目标时可增加一个目标。②本阶段内使用【杀】或普通锦囊牌无次数限制。',
 			zhuSkill_fancheng:'樊城',
-			zhuSkill_fancheng2:'樊城',
-			zhuSkill_fancheng_info:'限定技，出牌阶段，你可摸X张牌获得如下效果直到回合结束：每回合限X次，当你造成伤害时，此伤害+1（X为游戏轮数）。',
+			zhuSkill_fancheng0:'樊城',
+			zhuSkill_fancheng1:'樊城',
+			zhuSkill_fancheng_info:'限定技，出牌阶段，你可选择获得一项效果直到游戏结束：①因执行【杀】的效果而对其他角色造成的伤害+1。②对其他角色造成的渠道不为【杀】的伤害+1。',
 			binglin_shaxue:'歃血',
 			binglin_shaxue_info:'锁定技，每局游戏限三次，当你受到队友造成的伤害时，你防止此伤害。',
 			binglin_neihong:'内讧',
@@ -1952,6 +1955,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			zhuSkill_jiangling:{
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				charlotte:true,
+				content:function(){
+					'step 0'
+					player.chooseControl('加目标','多刀','取消').set('prompt',get.prompt2('zhuSkill_jiangling')).set('ai',()=>(3-game.countPlayer()));
+					'step 1'
+					if(result.index<2){
+						player.logSkill('zhuSkill_jiangling');
+						player.addTempSkill('zhuSkill_jiangling'+result.index,'phaseUseAfter');
+					game.log(player,'选择了','#y'+result.control,'的效果');
+					}
+				},
+			},
+			zhuSkill_jiangling0:{
 				trigger:{player:'useCard2'},
 				direct:true,
 				charlotte:true,
@@ -1994,10 +2012,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.logSkill('zhuSkill_jiangling',event.targets);
 						if(trigger.targets.contains(event.targets[0])) trigger.targets.removeArray(event.targets);
 						else{
-							trigger.directHit.addArray(event.targets);
+							//trigger.directHit.addArray(event.targets);
 							trigger.targets.addArray(event.targets);
 						}
 					}
+				},
+			},
+			zhuSkill_jiangling1:{
+				charlotte:true,
+				mod:{
+					cardUsable:function(card,player){
+						if(card.name=='sha'||get.type(card)=='trick') return Infinity;
+					},
 				},
 			},
 			zhuSkill_fancheng:{
@@ -2007,24 +2033,47 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'gray',
 				content:function(){
-					player.draw(game.roundNumber);
+					'step 0'
 					player.awakenSkill('zhuSkill_fancheng');
-					player.addTempSkill('zhuSkill_fancheng2');
+					player.chooseControl('杀','其他').set('prompt','选择要强化的伤害').set('ai',()=>get.rand(0,1));
+					'step 1'
+					player.addSkill('zhuSkill_fancheng'+result.index);
+					game.log(player,'本局游戏内',result.index?'#g杀以外':'#y杀','的伤害+1');
+				},
+				ai:{
+					order:100,
+					result:{player:100},
 				},
 			},
-			zhuSkill_fancheng2:{
+			zhuSkill_fancheng0:{
 				trigger:{source:'damageBegin2'},
 				forced:true,
 				charlotte:true,
-				onremove:true,
 				filter:function(event,player){
-					return player.countMark('zhuSkill_fancheng2')<game.roundNumber;
+					return event.player!=player&&event.card&&event.card.name=='sha'&&event.getParent().name=='sha';
 				},
 				logTarget:'player',
 				content:function(){
 					trigger.num++;
-					player.addMark('zhuSkill_fancheng2',1,false);
 				},
+				mark:true,
+				marktext:'殺',
+				intro:{content:'因执行【杀】的效果对其他角色造成的伤害+1'},
+			},
+			zhuSkill_fancheng1:{
+				trigger:{source:'damageBegin2'},
+				forced:true,
+				charlotte:true,
+				filter:function(event,player){
+					return event.player!=player&&(!event.card||event.card.name!='sha');
+				},
+				logTarget:'player',
+				content:function(){
+					trigger.num++;
+				},
+				mark:true,
+				marktext:'谋',
+				intro:{content:'不因【杀】对其他角色造成的伤害+1'},
 			},
 			binglin_shaxue:{
 				init:function(player,skill){
