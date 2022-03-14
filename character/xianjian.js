@@ -3,7 +3,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'xianjian',
 		character:{
-			pal_lixiaoyao:['male','qun',4,['tianjian','yufeng']],
+			pal_lixiaoyao:['male','qun',4,['tianjian','xjyufeng']],
 			pal_zhaoliner:['female','wei',3,['huimeng','tianshe']],
 			pal_linyueru:['female','wei',3,['guiyuan','qijian']],
 			pal_anu:['female','wu',3,['lingdi','anwugu']],
@@ -37,7 +37,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			pal_xiahoujinxuan:['male','shu',3,['xuanmo','danqing']],
 			pal_muchanglan:['female','wu',3,['feixia','lueying']],
-			pal_xia:['female','shu',3,['zongyu','fanling']],
+			pal_xia:['female','shu',3,['xjzongyu','fanling']],
 			pal_jiangcheng:['male','qun',4,['yanzhan','fenshi']],
 
 			pal_yuejinzhao:['male','wei',4,['ywuhun','yingfeng']],
@@ -92,7 +92,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'water',
 				unique:true,
 				filter:function(event,player){
-					return game.roundNumber>=3&&player.countUsed()>player.hp;
+					return game.roundNumber>=3&&player.getHistory('useCard').length>player.hp;
 				},
 				content:function(){
 					'step 0'
@@ -229,13 +229,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					switch(player.countUsed()){
 						case 2:skill='yanzhan';break;
 						case 3:skill='tianjian';break;
-						case 4:skill='yufeng';break;
+						case 4:skill='xjyufeng';break;
 					}
 					if(skill&&!player.hasSkill(skill)){
 						player.addTempSkill(skill);
 						player.popup(skill);
 						game.log(player,'获得了','【'+get.translation(skill)+'】');
-						if(skill=='yufeng'){
+						if(skill=='xjyufeng'){
 							var nh=player.countCards('h');
 							if(nh<2){
 								player.draw(2-nh);
@@ -243,7 +243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!player.storage.counttrigger){
 									player.storage.counttrigger={};
 								}
-								player.storage.counttrigger.yufeng=1;
+								player.storage.counttrigger.xjyufeng=1;
 							}
 						}
 					}
@@ -1338,7 +1338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.3
 				}
 			},
-			zongyu:{
+			xjzongyu:{
 				enable:'phaseUse',
 				usable:1,
 				filterCard:{color:'black'},
@@ -1838,7 +1838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			yufeng:{
+			xjyufeng:{
 				trigger:{player:'loseEnd'},
 				forced:true,
 				usable:2,
@@ -2360,10 +2360,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhangmu:{
-				trigger:{player:'chooseToRespondBegin'},
+				trigger:{player:['chooseToRespondBegin','chooseToUseBegin']},
 				filter:function(event,player){
 					if(event.responded) return false;
-					if(!event.filterCard({name:'shan'})) return false;
+					if(!event.filterCard({name:'shan'},player,event)) return false;
 					return player.countCards('h','shan')>0;
 				},
 				direct:true,
@@ -2388,6 +2388,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					respondShan:true,
 					effect:{
 						target:function(card,player,target,effect){
 							if(get.tag(card,'respondShan')&&effect<0){
@@ -2756,7 +2757,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			feixu:{
-				trigger:{global:'respond'},
+				trigger:{global:['useCard','respond']},
 				filter:function(event,player){
 					return event.card&&event.card.name=='shan';
 				},
@@ -3716,7 +3717,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var max=Math.min(ui.cardPile.childNodes.length,lib.skill.longxi.max);
 					for(var i=0;i<max;i++){
 						var card=ui.cardPile.childNodes[i];
-						if(trigger.filterCard(card,player)){
+						if(trigger.filterCard(card,player,trigger)){
 							cards.push(card);
 						}
 					}
@@ -3727,6 +3728,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					respondSha:true,
+					respondShan:true,
 					effect:{
 						target:function(card,player,target,effect){
 							if(get.tag(card,'respondShan')) return 0.7;
@@ -4219,8 +4222,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yingfeng_info:'锁定技，每当你使用一张杀结算完毕后，你随机对一名不是此杀目标的敌方角色使用一张杀',
 			fenglue:'风掠',
 			fenglue_info:'你可以放弃出牌阶段，改为指定一名其他角色并选择任意张手牌，依次对该角色使用，若如此做，此阶段内该角色每受到一点伤害，你在结算后摸一张牌',
-			zongyu:'纵雨',
-			zongyu_info:'出牌阶段限一次，你可以弃置一张黑色手牌，视为使用一张飞镖，随机指定两名敌方角色为目标',
+			xjzongyu:'纵雨',
+			xjzongyu_info:'出牌阶段限一次，你可以弃置一张黑色手牌，视为使用一张飞镖，随机指定两名敌方角色为目标',
 			fanling:'返灵',
 			fanling_info:'锁定技，每当一名角色失去体力，你回复一点体力，每回合只能发动一次',
 			huahu:'化狐',
@@ -4365,8 +4368,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianjian:'天剑',
 			tianjian_info:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用，受到伤害的角色随机弃置一张牌',
 			tianjian_info_alter:'出牌阶段限一次，你可以将一张杀当作万箭齐发使用',
-			yufeng:'御风',
-			yufeng_info:'锁定技，当你失去手牌后，若手牌数少于2，你将手牌数补至2（每回合最多发动两次）',
+			xjyufeng:'御风',
+			xjyufeng_info:'锁定技，当你失去手牌后，若手牌数少于2，你将手牌数补至2（每回合最多发动两次）',
 			huimeng:'回梦',
 			huimeng_info:'每当你回复一点体力，可以摸两张牌',
 			tianshe:'天蛇',

@@ -158,9 +158,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							trigger.target=player.storage.mhuanyi_target[0];
-							trigger.untrigger();
-							trigger.trigger('useCardToBefore');
-							trigger.trigger(trigger.card.name+'Before');
 							player.removeSkill('mhuanyi_target');
 						}
 					},
@@ -183,7 +180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:5.5,
 				round:1,
 				filter:function(event,player){
-					if(get.type(event.card)=='trick'&&event.cards.length==1&&event.cards[0]==event.card){
+					if(get.type(event.card)=='trick'&&event.card.isCard){
 						if(event.player==player) return false;
 						if(!player.countCards('he',{suit:get.suit(event.card)})) return false;
 						return true;
@@ -205,7 +202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						trigger.cancel();
-						player.chooseUseTarget(trigger.card);
+						player.chooseUseTarget(true,trigger.card);
 					}
 				}
 			},

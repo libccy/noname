@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			hs_jaina:['female','wei',3,['huopu','aoshu','bingjia']],
 			hs_lrexxar:['male','shu',4,['yushou']],
-			hs_wuther:['male','qun',4,['fengxian','jieming']],
+			hs_wuther:['male','qun',4,['fengxian','rejieming']],
 			hs_jgarrosh:['male','shu',4,['zhanhou','qiangxi']],
 			hs_malfurion:['male','wu',4,['jihuo']],
 			hs_guldan:['male','wei',3,['moxie','fuhua','hongxi']],
@@ -91,7 +91,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_kazhakusi:['male','shu',3,['lianjin']],
 			// hs_lazi:['male','wei',3,[]],
 			hs_shaku:['male','wei',3,['shouji']],
-			hs_laxiao:['male','shu',3,['guimou','yingxi','longyi']],
+			hs_laxiao:['male','shu',3,['guimou','yingxi','hlongyi']],
 			// hs_xiangyaqishi:['male','wei',3,[]],
 			// hs_fenjie:['male','shu',3,['guimou','yingxi']],
 			hs_mojinbaozi:['male','wei',3,['jingcu','shengzhang']],
@@ -313,7 +313,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						priority:-1,
 						filter:function(event,player){
-							return event.card==player.storage.wxuying;
+							return event.cards.contains(player.storage.wxuying);
 						},
 						content:function(){
 							if(_status.currentPhase==player){
@@ -476,7 +476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			oldhuanjue:{
-				trigger:{global:'useCard'},
+				trigger:{global:'useCard1'},
 				usable:1,
 				filter:function(event,player){
 					if(event.targets.length!=1) return false;
@@ -536,9 +536,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.card=card;
 						game.log(player,'将',trigger.card,'变为',card);
 						// if(!event.isMine()) game.delayx();
-						trigger.untrigger();
-						trigger.card=card;
+						trigger.card=get.autoViewAs(card);
 						trigger.cards=[card];
+						game.cardsGotoOrdering(card).relatedEvent=trigger;
 					}
 					else{
 						event.finish();
@@ -552,8 +552,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(trigger.player,'green');
 					}
 					game.delayx(0.5);
-					'step 3'
-					trigger.trigger('useCard');
 				},
 				ai:{
 					threaten:0.1
@@ -1381,6 +1379,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.discard(cards);
 					if(event.position=='e'){
 						var name=cards[0].name;
+						if(name.indexOf('hstianqi_')!=0) return;
 						for(var i=0;i<player.storage.hstianqi.length;i++){
 							if(player.storage.hstianqi[i].name==name){
 								return;
@@ -2287,7 +2286,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToBegin'},
 				forced:true,
 				filter:function(event,player){
-					return get.type(event.card,'trick')=='trick'&&event.player==player&&event.cards[0]&&event.cards[0]==event.card;
+					return player==event.player&&get.type(event.card,'trick')=='trick'&&event.card.isCard;
 				},
 				content:function(){
 					'step 0'
@@ -2946,7 +2945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			longyi:{
+			hlongyi:{
 				mod:{
 					ignoredHandcard:function(card,player){
 						if(get.color(card)=='black'){
@@ -5222,7 +5221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						usable:3,
 						filter:function(event,player){
 							if(_status.currentPhase!=player) return false;
-							return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card);
+							return (get.type(event.card)=='trick'&&event.card.isCard);
 						},
 						content:function(){
 							player.draw();
@@ -5265,7 +5264,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						frequent:true,
 						filter:function(event,player){
 							if(_status.currentPhase!=player) return false;
-							return (get.type(event.card)=='trick'&&event.cards[0]&&event.cards[0]==event.card);
+							return (get.type(event.card)=='trick'&&event.card.isCard);
 						},
 						content:function(){
 							player.draw();
@@ -6204,7 +6203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				direct:true,
 				filter:function(event){
-					return get.type(event.card,'trick')=='trick'&&event.cards[0]&&event.cards[0]==event.card;
+					return get.type(event.card,'trick')=='trick'&&event.card.isCard;
 				},
 				content:function(){
 					"step 0"
@@ -6996,7 +6995,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qiaodong:{
-				enable:['chooseToRespond'],
+				enable:['chooseToUse','chooseToRespond'],
 				filterCard:{type:'equip'},
 				filter:function(event,player){
 					return player.countCards('he',{type:'equip'})>0;
@@ -7204,7 +7203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			huanjue:{
-				trigger:{player:'useCard'},
+				trigger:{player:'useCard1'},
 				frequent:true,
 				filter:function(event,player){
 					if(event._huanjue) return false;
@@ -7288,9 +7287,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.card=card;
 						game.log(player,'将',trigger.card,'变为',card);
 						// if(!event.isMine()) game.delayx();
-						trigger.untrigger();
-						trigger.card=card;
+						trigger.card=get.autoViewAs(card);
 						trigger.cards=[card];
+						game.cardsGotoOrdering(card).relatedEvent=trigger;
 						trigger._huanjue=true;
 					}
 					else{
@@ -7313,7 +7312,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						stat[trigger.card.name]++;
 					}
-					trigger.trigger('useCard');
 				},
 				draw:function(){
 					player.draw();
@@ -7397,10 +7395,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						);
 						event.card=card;
 						game.log(player,'将',trigger.card,'变为',card);
-						// if(!event.isMine()) game.delayx();
-						trigger.untrigger();
-						trigger.card=card;
+						trigger.card=get.autoViewAs(card);
 						trigger.cards=[card];
+						game.cardsGotoOrdering(card);
 					}
 					else{
 						event.finish();
@@ -7415,7 +7412,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					game.delayx(0.5);
 					'step 3'
-					trigger.trigger('useCard');
 					trigger.insertAfter(lib.skill.huanjue.draw,{player:trigger.player});
 				},
 				draw:function(){
@@ -7720,6 +7716,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					respondShan:true,
 					effect:{
 						target:function(card){
 							if(get.tag(card,'respondShan')) return 0.4;
@@ -8028,6 +8025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				position:'he',
 				filter:function(event,player){
+					if(player.storage.tuteng_awake) return true;
 					var rand=['tuteng1','tuteng2','tuteng3','tuteng4'];
 					for(var i=0;i<rand.length;i++){
 						if(!player.hasSkill(rand[i])) return true;
@@ -8468,7 +8466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					target.chooseCard('h',true,'重铸一张手牌');
 					'step 1'
-					if(result.bool){
+					if(result.bool&&result.cards.length){
 						target.$throw(result.cards);
 						target.lose(result.cards,ui.discardPile);
 						var type=get.type(result.cards[0],'trick');
@@ -9794,8 +9792,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			moxie_info:'锁定技，你失去毒时不流失体力；你使用毒时摸两张牌；结束阶段，你将一张随机手牌转化为毒',
 			gfuhun:'附魂',
 			gfuhun_info:'结束阶段，若你未翻面，你可以和一名其他角色拼点，若你赢，你将武将牌翻至背面，该角色进入混乱状态直到下一回合结束',
-			longyi:'龙裔',
-			longyi_info:'锁定技，你的黑色牌不占用手牌上限',
+			hlongyi:'龙裔',
+			hlongyi_info:'锁定技，你的黑色牌不占用手牌上限',
 			zhongji:'重击',
 			zhongji_info:'每当你即将造成伤害，可弃置一张黑色手牌令伤害+1',
 			fuwen:'符文',

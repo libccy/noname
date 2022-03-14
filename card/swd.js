@@ -494,6 +494,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:true,
 				type:'jiguan',
 				usable:1,
+				updateUsable:'phaseUse',
 				forceUsable:true,
 				wuxieable:true,
 				selectTarget:-1,
@@ -3506,10 +3507,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
-					return target!=player&&target.countCards('h');
+					return player.canCompare(target);
 				},
 				filter:function(event,player){
-					return player.countCards('h')?true:false;
+					return player.countCards('h')&&game.hasPlayer(function(current){
+						return player.canCompare(current);
+					});
 				},
 				content:function(){
 					"step 0"

@@ -357,7 +357,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(ui.deckcontrol){
 						ui.deckcontrol.show();
 						setTimeout(function(){
-							ui.deckcontrol.style.transition='';
+							if(ui.deckcontrol) ui.deckcontrol.style.transition='';
 						},500);
 					}
 				};
@@ -496,7 +496,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			var info=[];
 			for(var i=0;i<players.length;i++){
 				info.push({
-					name:players[i].name,
+					name:players[i].name1,
 					name2:players[i].name2,
 					count:players[i].actcount
 				});
@@ -908,6 +908,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							_status.friendCount.innerHTML='友军: '+get.cnNumber(0);
 							game.over(false);
 						}
+					}
+					else if(game.enemy.isDead()){
+						if(!_status.enemylist.length){
+							_status.enemyCount.innerHTML='敌军: '+get.cnNumber(0);
+							game.over(true);
+						}
+					}
+				},
+				dieAfter2:function(source){
+					var dead=this;
+					if(game.me.isDead()){
+						if(!_status.mylist.length){
+							_status.friendCount.innerHTML='友军: '+get.cnNumber(0);
+							game.over(false);
+						}
 						else{
 							game.pause();
 							_status.deadfriend.push(this);
@@ -937,7 +952,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								ui.arena.appendChild(player);
 
 								game.addVideo('stoneSwap',null,{
-									name:player.name,
+									name:player.name1,
 									name2:player.name2,
 									position:player.dataset.position,
 									actcount:player.actcount,
@@ -997,7 +1012,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								ui.arena.appendChild(player);
 
 								game.addVideo('stoneSwap',null,{
-									name:player.name,
+									name:player.name1,
 									name2:player.name2,
 									position:player.dataset.position,
 									actcount:player.actcount,
@@ -1036,7 +1051,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					setTimeout(function(){
 						dead.delete();
 					},500);
-				}
+				},
 			}
 		},
 		beastList:['stone_misha','stone_leiouke','stone_huofu','stone_caoyuanshi','stone_jiewangzhu',
@@ -1207,7 +1222,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				stone_fennuxiaoji:['male','qun',1,['stone_fennuxiaoji1'],['minskin','stone'],[1,2]],
 				stone_juxingchanchu:['male','qun',2,['stone_juxingchanchu1'],['minskin','stone'],[2,1]],
-				stone_wuyi:['male','qun',1,['jijiu'],['minskin','stone'],[2,2]],
+				stone_wuyi:['male','qun',1,['jijiu'],['minskin','stone','die_audio'],[2,2]],
 				stone_langren:['male','qun',1,['stone_qianxing'],['minskin','stone'],[1,2]],
 				stone_shishigui:['male','qun',2,['stone_shishigui1'],['minskin','stone'],[2,1]],
 
@@ -9108,57 +9123,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			stonesha:{
 				unique:true,
-				enable:['chooseToUse','chooseToRespond'],
-				filterCard:{type:'equip'},
-				viewAs:{name:'sha'},
-				nopop:true,
-				check:function(){return 1},
-				filter:function(event,player){
-					return player.countCards('h',{type:'equip'})>0;
-				},
-				viewAsFilter:function(player){
-					return player.countCards('h',{type:'equip'})>0;
-				},
-				ai:{
-					skillTagFilter:function(player){
-						return player.countCards('h',{type:'equip'})>0;
+				mod:{
+					cardname:function(card){
+						if(lib.card[card.name].type=='equip') return 'sha';
 					},
-					respondSha:true,
-					order:4,
-					useful:-1,
-					value:-1
-				}
+				},
 			},
 			stoneshan:{
 				unique:true,
-				enable:['chooseToRespond'],
-				viewAs:{name:'shan'},
-				filterCard:{type:['stonecharacter','stonecard']},
 				mod:{
-					cardEnabled:function(card){
-						if(get.type(card)=='stonecard') return false;
-					},
-					cardSavable:function(card){
-						if(get.type(card)=='stonecard') return false;
+					cardname:function(card){
+						if(lib.card[card.name].type.indexOf('stone')==0) return 'shan';
 					},
 				},
-				nopop:true,
-				check:function(){return 1},
-				filter:function(event,player){
-					return player.countCards('h',{type:['stonecharacter','stonecard']})>0;
-				},
-				viewAsFilter:function(player){
-					return player.countCards('h',{type:['stonecharacter','stonecard']})>0;
-				},
-				ai:{
-					skillTagFilter:function(player){
-						return player.countCards('h',{type:['stonecharacter','stonecard']})>0;
-					},
-					respondShan:true,
-					order:4,
-					useful:-1,
-					value:-1
-				}
 			},
 			stonedraw:{
 				trigger:{player:'phaseDrawBegin'},

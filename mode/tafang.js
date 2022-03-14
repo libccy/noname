@@ -5,6 +5,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		canvasUpdates2:[],
 		start:function(){
 			"step 0"
+			_status.gameDrawed=true;
 			lib.init.css(lib.assetURL+'layout/mode','chess');
 			lib.init.css(lib.assetURL+'layout/mode','tafang');
 			game.loadMode('chess');
@@ -261,14 +262,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			player:{
-				dieAfter:function(source){
+				dieAfter2:function(){
 					var player=this;
-					if(_status.friends){
-						_status.friends.remove(this);
-					}
-					if(_status.enemies){
-						_status.enemies.remove(this);
-					}
 					delete lib.posmap[player.dataset.position];
 					setTimeout(function(){
 						player.delete();
@@ -279,6 +274,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.phasequeue.splice(i,1);
 							break;
 						}
+					}
+				},
+				dieAfter:function(source){
+					var player=this;
+					if(_status.friends){
+						_status.friends.remove(this);
+					}
+					if(_status.enemies){
+						_status.enemies.remove(this);
 					}
 					if(player==game.me){
 						for(var i=0;i<game.players.length;i++){

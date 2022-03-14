@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yxs',
 		character:{
 			yxs_qinqiong:["male","wei",4,["yxs_fanji","yxs_menshen"],[]],
-			yxs_wuzetian:['female','wu',4,['nvquan','qiandu','weiyi']],
+			yxs_wuzetian:['female','wu',4,['nvquan','qiandu','yxsweiyi']],
 			yxs_caocao:['male','wei',4,['zhulu','xieling']],
 			yxs_mozi:['male','qun',3,['jieyong','feigong','jianai']],
 			yxs_bole:['male','wu',3,['bolehuiyan','xiangma']],
@@ -466,10 +466,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zbudao:{
 				trigger:{player:'phaseDrawBegin'},
-				check:function(event,player){
-					if(player.hasFriend()) return true;
-					return false;
-				},
+				//check:function(event,player){
+				//	if(player.hasFriend()) return true;
+				//	return false;
+				//},
 				content:function(){
 					trigger.num++;
 					player.addTempSkill('zbudao2','phaseDrawAfter');
@@ -508,8 +508,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return att-4;
 						},
-						forced:true,
-						prompt:'请选择要送人的卡牌'
+						//forced:true,
+						prompt:'将获得的一张牌交给一名其他角色，或点取消'
 					});
 					"step 1"
 					if(result.bool){
@@ -521,7 +521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			taiji:{
-				trigger:{player:'respond'},
+				trigger:{player:['useCard','respond']},
 				filter:function(event,player){
 					return event.card.name=='shan'&&player.hasSha();
 				},
@@ -1414,14 +1414,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jimin:{
-				enable:['chooseToRespond'],
+				enable:['chooseToRespond','chooseToUse'],
 				filterCard:true,
 				viewAs:{name:'shan'},
 				viewAsFilter:function(player){
 					if(!player.countCards('h')) return false;
 					if(player.countCards('e')) return false;
 				},
-				prompt:'将一张手牌当闪打出',
+				prompt:'将一张手牌当闪使用或打出',
 				check:function(){return 1},
 				ai:{
 					respondShan:true,
@@ -1646,7 +1646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			tuqiang:{
-				trigger:{player:'respond'},
+				trigger:{player:['respond','useCard']},
 				filter:function(event,player){
 					return event.card&&event.card.name=='shan';
 				},
@@ -1951,26 +1951,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fengyan:{
-				trigger:{global:'judgeAfter'},
+				trigger:{global:'cardsDiscardAfter'},
 				frequent:true,
 				filter:function(event,player){
-					if(event.player==player) return false;
-					if(event.player.sex!='male') return false;
-					if(event.result.card.parentNode.id!='discardPile') return false;
-					return (get.color(event.result.card)=='red');
+					var evt=event.getParent().relatedEvent;
+					if(!evt||evt.name!='judge') return;
+					if(evt.player.sex!='male') return false;
+					if(get.position(event.cards[0],true)!='d') return false;
+					return (get.color(event.cards[0])=='red');
 				},
 				content:function(){
-					player.gain(trigger.result.card);
-					player.$gain2(trigger.result.card);
+					player.gain(trigger.cards,'gain2');
 				}
 			},
 			fengyi:{
 				enable:'phaseUse',
 				usable:1,
 				filterCard:true,
-				filterTarget:function(card,player,target){
-					return player!=target;
-				},
+				filterTarget:true,
 				check:function(card){
 					return 8-get.value(card);
 				},
@@ -2304,7 +2302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiangma:{
 				inherit:'yicong'
 			},
-			weiyi:{
+			yxsweiyi:{
 				trigger:{player:'damageEnd'},
 				filter:function(event,player){
 					return (event.source&&event.source.countCards('he'));
@@ -2534,20 +2532,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				direct:true,
 				filter:function(event,player){
-					if(get.position(event.card)!='d') return false;
+					if(event.cards.filterInD().length==0) return false;
 					if(player.hasSkill('jieyong2')) return false;
 					return player.countCards('he',{color:'black'})>0;
 				},
 				content:function(){
 					"step 0"
-					var next=player.chooseToDiscard('he','是否弃置一张黑色牌并收回'+get.translation(trigger.card)+'？',{color:'black'});
+					var next=player.chooseToDiscard('he','是否弃置一张黑色牌并收回'+get.translation(trigger.cards.filterInD())+'？',{color:'black'});
 					next.ai=function(card){
 						return get.value(trigger.card)-get.value(card);
 					}
 					next.logSkill='jieyong';
 					"step 1"
 					if(result.bool){
-						player.gain(trigger.card,'gain2');
+						player.gain(trigger.cards.filterInD(),'gain2','log');
 						player.addTempSkill('jieyong2',['phaseAfter','phaseBegin']);
 					}
 				},
@@ -2579,22 +2577,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					return _status.currentPhase!=player&&event.player!=player&&get.type(event.card)=='trick'&&
-						get.position(event.card)=='d'&&!player.hasSkill('zhulu2')&&
-						get.itemtype(event.card)=='card'&&player.countCards('he',{suit:get.suit(event.card)})>0;
+						event.cards.filterInD().length>0&&!player.hasSkill('zhulu2')&&
+						player.countCards('he',{suit:get.suit(event.card)})>0;
 				},
 				content:function(){
 					"step 0"
 					var val=get.value(trigger.card);
 					var suit=get.suit(trigger.card);
 					var next=player.chooseToDiscard('he','逐鹿：是否弃置一张'+get.translation(suit)+
-						'牌并获得'+get.translation(trigger.card)+'？',{suit:suit});
+						'牌并获得'+get.translation(trigger.cards.filterInD())+'？',{suit:suit});
 					next.ai=function(card){
 						return val-get.value(card);
 					};
 					next.logSkill='zhulu';
 					"step 1"
 					if(result.bool){
-						player.gain(trigger.card,'gain2');
+						player.gain(trigger.cards.filterInD(),'log','gain2');
 						player.addTempSkill('zhulu2');
 					}
 				},
@@ -2777,6 +2775,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							next.set('openskilldialog','妙笔：将一张手牌当'+get.translation(card)+'使用');
 							next.set('norestore',true);
 							next.set('_backupevent','miaobix');
+							next.set('custom',{
+								add:{},
+								replace:{window:function(){}}
+							});
 							next.backup('miaobix');
 						}
 					}
@@ -3072,8 +3074,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fanpu_info:'出牌阶段限一次，你可以移去3枚统领标记并视为对攻击范围内的至多3名角色使用一张杀',
 			fenghuo:'烽火',
 			fenghuo_info:'你可以将一张装备区内的牌当作南蛮入侵使用',
-			weiyi:'威仪',
-			weiyi_info:'每当你受到一次伤害，可以令伤害来源弃置两张牌',
+			yxsweiyi:'威仪',
+			yxsweiyi_info:'每当你受到一次伤害，可以令伤害来源弃置两张牌',
 			xieling:'挟令',
 			xieling_info:'出牌阶段，弃掉两张手牌，将任意一名角色装备区或判定区的牌移动到另一名角色对应的区域',
 			baye:'霸业',
@@ -3108,12 +3110,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nichang2:'霓裳',
 			nichang_info:'摸牌时，你可以选择不摸牌，并在结束阶段展示手牌，每少一种花色摸一张牌',
 			fengyan:'丰艳',
-			fengyan_info:'你可以获得其他男性角色的红色判定牌',
+			fengyan_info:'你可以获得其他男性角色的红色判定牌。',
 			zhulu:'逐鹿',
 			zhulu_info:'回合外，当有普通锦囊牌结算完毕后，你可以立即弃掉一张相同花色手牌或装备区的牌，获得这张锦囊牌。',
 			jieyong:'节用',
 			jieyong2:'节用',
-			jieyong_info:'你使用的卡牌进入弃牌堆后，你可以弃置一张黑色牌并重新获得之（每回合限一次）',
+			jieyong_info:'你使用的卡牌结算完成后，你可以弃置一张黑色牌并重新获得之。（每回合限一次）',
 			shangtong:'尚同',
 			shangtong_info:'每当你令其他角色恢复1点血量或掉1点血量时，你可以摸1张牌（摸牌上限为4）',
 			feiming:'非命',
@@ -3126,8 +3128,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yxswushuang_info:'出牌阶段，你使用【杀】时可同时打出两张【杀】，则该【杀】具有以下效果之一：1，伤害+1；2，额外指定两个目标',
 			xiaoyong:'骁勇',
 			xiaoyong_info:'你可以将黑色手牌当作【杀】来使用',
-			qinzheng:'亲征',
-			qinzheng_info:'出牌阶段，你对其他角色造成伤害时，可以令场上任意角色摸一张牌。',
+			yxsqinzheng:'亲征',
+			yxsqinzheng_info:'出牌阶段，你对其他角色造成伤害时，可以令场上任意角色摸一张牌。',
 			juma:'拒马',
 			juma_info:'你与其他角色的距离始终视为1。',
 		},

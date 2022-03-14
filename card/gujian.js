@@ -223,13 +223,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				//range:{global:1},
 				content:function(){
-					target.$gain2(cards);
+					if(target==targets[0]&&cards.length) target.$gain2(cards);
 					target.storage.mapodoufu=card;
 					target.storage.mapodoufu_markcount=2;
 					target.addSkill('mapodoufu');
 				},
 				ai:{
-					order:2,
+					order:1,
 					value:5,
 					result:{
 						target:function(player,target){
@@ -870,13 +870,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 0;
 					},
 					result:{
-						player:function(player,target){
-							return game.countPlayer(function(current){
-								if(current==target||(get.distance(target,current,'pure')==1&&current.countCards('he'))){
-									return -get.sgn(get.attitude(player,current));
-								}
-							});
-						}
+						target:-1,
 					}
 				}
 			},
@@ -933,13 +927,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						multineg:1,
 					},
 					result:{
-						player:function(player,target){
-							return game.countPlayer(function(current){
-								if(current==target||(get.distance(target,current,'pure')==1)){
-									return get.sgn(get.effect(current,{name:'chiyuxi'},player,player));
-								}
-							});
-						}
+						target:function(player,target){
+							if(target.hasSkillTag('nofire')) return 0;
+							if(player.hasUnknown(2)) return 0;
+							var nh=target.countCards('h');
+							if(lib.config.mode=='identity'){
+								if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
+							}
+							if(nh==0) return -2;
+							if(nh==1) return -1.7
+							return -1.5;
+						},
 					}
 				}
 			},
@@ -1491,10 +1489,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			mapodoufu:{
 				mark:'card',
-				trigger:{player:'phaseEnd'},
+				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				popup:false,
 				nopop:true,
+				forceLoad:true,
 				intro:{
 					content:function(storage,player){
 						return '结束阶段，你随机弃置一名随机敌人的一张随机牌（剩余'+player.storage.mapodoufu_markcount+'回合）'

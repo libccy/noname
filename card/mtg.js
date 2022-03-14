@@ -96,6 +96,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'land',
 				fullborder:'wood',
 				enable:function(card,player){
+					if(!lib.cardPack.mode_derivation||!lib.cardPack.mode_derivation.length) return false;
 					return !player.hasSkill('land_used');
 				},
 				notarget:true,
@@ -574,7 +575,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			mtg_linzhongjianta_skill:{
 				enable:'chooseToUse',
-				filterCard:true,
+				filterCard:function(card){
+					return get.type(card)=='basic';
+				},
 				usable:1,
 				viewAs:{name:'sha'},
 				viewAsFilter:function(player){

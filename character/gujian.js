@@ -100,7 +100,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.player.hasUseTarget(button.link[2]);
 					});
 					'step 1'
-					player.chooseUseTarget(result.links[0][2]);
+					player.chooseUseTarget(true,result.links[0][2]);
 				},
 				ai:{
 					order:5,
@@ -137,7 +137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.player.hasUseTarget(button.link[2]);
 					});
 					'step 1'
-					player.chooseUseTarget(result.links[0][2]);
+					player.chooseUseTarget(true,result.links[0][2]);
 				},
 				ai:{
 					order:5,
@@ -163,7 +163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.player.hasUseTarget(button.link[2]);
 					});
 					'step 1'
-					player.chooseUseTarget(result.links[0][2]);
+					player.chooseUseTarget(true,result.links[0][2]);
 				},
 				ai:{
 					order:5,
@@ -198,7 +198,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.player.hasUseTarget(button.link[2]);
 					});
 					'step 1'
-					player.chooseUseTarget(result.links[0][2]);
+					player.chooseUseTarget(true,result.links[0][2]);
 				},
 				ai:{
 					order:5,
@@ -331,7 +331,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xuanzhen:{
-				trigger:{global:'useCard'},
+				trigger:{global:'useCard1'},
 				round:1,
 				filter:function(event,player){
 					if(event.targets.length!=1) return false;
@@ -391,9 +391,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.card=card;
 						game.log(player,'将',trigger.card,'变为',card);
 						// if(!event.isMine()) game.delayx();
-						trigger.untrigger();
-						trigger.card=card;
+						trigger.card=get.autoViewAs(card);
 						trigger.cards=[card];
+						game.cardsGotoOrdering(card).relatedEvent=trigger;
 					}
 					else{
 						event.finish();
@@ -407,8 +407,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(trigger.player,'green');
 					}
 					game.delayx(0.5);
-					'step 3'
-					trigger.trigger('useCard');
 				},
 				ai:{
 					threaten:function(player,target){
@@ -985,8 +983,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCard','respond']},
 				forced:true,
 				filter:function(event,player){
-					if(get.is.converted(event)) return false;
-					if(event.card.zhenying_link) return false;
+					if(!event.card.isCard) return false;
+					if(event.cards[0]&&event.cards[0].zhenying_link) return false;
 					if(get.color(event.card)!='black') return false;
 					if(['delay','equip'].contains(get.type(event.card))) return false;
 					return true;
@@ -1008,7 +1006,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							if(get.is.converted(event)) return false;
 							if(!player.countCards('he')) return false;
-							if(event.card.zhenying_link) return true;
+							if(event.cards[0]&&event.cards[0].zhenying_link) return true;
 							return false;
 						},
 						popup:false,
@@ -1052,6 +1050,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<list.length;i++){
 							var info=lib.skill[list[i]];
 							if(!info) continue;
+							if(info.shaRelated) return true;
 							if(info.trigger){
 								for(var j in info.trigger){
 									if(j=='player'||j=='global'){
@@ -1333,7 +1332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(result.bool){
-						player.chooseUseTarget(result.links[0][2]);
+						player.chooseUseTarget(true,result.links[0][2]);
 					}
 				},
 				ai:{

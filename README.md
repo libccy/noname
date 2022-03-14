@@ -1,2 +1,3 @@
-百度网盘分流 https://pan.baidu.com/s/1XFowtaE98MFXW3wCALrtfQ   
-提取码:74y2
+GitHub： https://github.com/libccy/noname/releases/tag/SSS
+
+Coding： https://nakamurayuri.coding.net/p/noname/d/noname/git/releases/SSS
