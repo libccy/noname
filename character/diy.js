@@ -72,6 +72,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kotomi:['female','key',3,['kotomi_qinji','kotomi_chuanxiang']],
 			key_mia:['female','key',3,['mia_shihui','mia_qianmeng']],
 			key_kano:['female','key',3,['kano_liezhen','kano_poyu']],
+			db_key_liyingxia:['female','shu',3,['liyingxia_sanli','liyingxia_zhenjun','liyingxia_wumai'],['doublegroup:shu:key']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -196,7 +197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu"],
 				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
 				diy_noname:['noname'],
-				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano"],
+				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano","db_key_liyingxia"],
 				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang'],
 			},
 		},
@@ -217,6 +218,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanghu:'羊祜（221年－278年12月27日），字叔子，泰山郡南城县人。西晋时期杰出的战略家、政治家、文学家，曹魏上党太守羊衜的儿子，名儒蔡邕的女儿蔡文姬的外甥。出身“泰山羊氏”，博学能文，清廉正直。曹魏时期，接受公车征辟，出任中书郎，迁给事黄门侍郎。姐姐嫁给大将军司马师，投靠司马氏家族，仕途平步青云。魏元帝曹奂即位，出任秘书监、相国从事中郎、中领军，统领御林军，兼管内外政事，册封钜平县子，迁。西晋建立后，迁中军将军、散骑常侍、郎中令，册封钜平侯。泰始五年（269年），出任车骑将军、荆州都督，加任开府仪同三司坐镇襄阳，屯田兴学，以德怀柔，深得军民之心；扩充军备，训练士兵，全力准备灭亡孙吴，累迁征南大将军，册封南城侯。咸宁四年，去世，临终前举荐杜预接任职务，获赠侍中、太傅，谥号为“成”。唐宋时期，配享武庙。',
 		},
 		characterTitle:{
+			db_key_liyingxia:'#rヘブンバーンズレッド',
 			key_kano:'#bAIR',
 			key_mia:'#bLoopers',
 			key_kotomi:'#gClannad',
@@ -505,6 +507,110 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			liyingxia_sanli:{
+				trigger:{target:'useCardToTargeted'},
+				forced:true,
+				filter:function(event,player){
+					if(event.player==player||event.player!=_status.currentPhase) return false;
+					var index=event.player.getHistory('useCard',function(evt){
+						return evt.targets.contains(player);
+					}).indexOf(event.getParent());
+					if(index==2) return event.player.isAlive()&&player.countCards('he')>0;
+					return index<2&&index>-1;
+				},
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					var index=event.player.getHistory('useCard',function(evt){
+						return evt.targets.contains(player);
+					}).indexOf(trigger.getParent());
+					if(index==2){
+						player.chooseCard('he',true,'三礼：交给'+get.translation(trigger.player)+'一张牌');
+					}
+					else{
+						player.draw();
+						event.finish();
+					}
+					'step 1'
+					if(result.bool){
+						trigger.player.gain(result.cards,player,'giveAuto');
+					}
+				},
+			},
+			liyingxia_zhenjun:{
+				trigger:{player:'phaseJieshuBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.group=='key'&&player.hasHistory('useCard',function(evt){
+						return evt.card.name=='sha'||(get.type(evt.card)=='trick'&&get.tag(evt.card,'damage')>0);
+					});
+				},
+				content:function(){
+					'step 0'
+					var num=player.getHistory('useCard',function(evt){
+						return evt.card.name=='sha'||(get.type(evt.card)=='trick'&&get.tag(evt.card,'damage')>0);
+					}).length;
+					player.chooseTarget(get.prompt('liyingxia_zhenjun'),[1,num],'令至多'+get.cnNumber(num)+'名角色各摸一张牌').set('ai',(serafu)=>get.attitude(_status.event.player,serafu));
+					'step 1'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.logSkill('liyingxia_zhenjun',targets);
+						game.asyncDraw(targets);
+						for(var i of targets) i.addTempSkill('liyingxia_zhenjun_enhance',{player:player==i?'phaseJieshuBegin':'phaseAfter'});
+					}
+					else event.finish();
+					'step 2'
+					game.delayx();
+				},
+				subSkill:{
+					enhance:{
+						trigger:{source:'damageBegin1'},
+						forced:true,
+						charlotte:true,
+						mark:true,
+						filter:(event,player)=>(player==_status.currentPhase),
+						intro:{content:'下回合首次造成的伤害+1'},
+						content:function(){
+							trigger.num++;
+							player.removeSkill(event.name);
+						},
+					},
+				},
+			},
+			liyingxia_wumai:{
+				trigger:{global:'roundStart'},
+				direct:true,
+				filter:function(event,player){
+					return player.group=='shu'&&(player.getStorage('liyingxia_wumai').length<4||game.hasPlayer((current)=>current.isDamaged()));
+				},
+				content:function(){
+					'step 0'
+					var list=lib.skill.liyingxia_wumai.derivation.slice(0);
+					list.removeArray(player.getStorage('liyingxia_wumai'));
+					if(list.length){
+						player.chooseControl(list,'cancel2').set('prompt',get.prompt('liyingxia_wumai')).set('prompt2','获得一个技能直到本轮结束');
+					}
+					else{
+						event.num=Math.min(3,game.countPlayer((current)=>current.isDamaged()));
+						player.chooseBool(get.prompt('liyingxia_wumai')+'（可摸'+get.cnNumber(event.num)+'张牌）')
+						event.goto(2);
+					}
+					'step 1'
+					if(result.control!='cancel2'){
+						player.logSkill('liyingxia_wumai');
+						player.markAuto('liyingxia_wumai',[result.control]);
+						player.addTempSkill(result.control,'roundStart');
+						game.log(player,'获得了技能','#g【'+get.translation(result.control)+'】')
+					}
+					event.finish();
+					'step 2'
+					if(result.bool){
+						player.logSkill('liyingxia_wumai');
+						player.draw(num);
+					}
+				},
+				derivation:['bazhen','rejizhi','reguanxing','youlong'],
+			},
 			kano_liezhen:{
 				trigger:{player:'phaseJieshuBegin'},
 				filter:function(event,player){
@@ -695,10 +801,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								var target=result.targets[0];
 								player.logSkill('mia_qianmeng_fail',target);
-								var num=player.storage.mia_qianmeng.number,cards=[];
+								var num=player.storage.mia_qianmeng.number,suit=player.storage.mia_qianmeng.suit,cards=[];
 								for(var i=0;i<ui.cardPile.childNodes.length;i++){
 									var card=ui.cardPile.childNodes[i];
-									if(card.number==num) cards.push(card);
+									if(card.number==num&&card.suit==suit) cards.push(card);
 								}
 								if(cards.length) target.gain(cards,'gain2');
 							}
@@ -2391,7 +2497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(event.filterCard({name:name,isCard:true},player,event)){
 								list.push([type,'',name]);
 								if(name=='sha'){
-									for(var j of lib.inpile_nature) list.push([type,'',i,j]);
+									for(var j of lib.inpile_nature) list.push([type,'',name,j]);
 								}
 							}
 						}
@@ -15147,6 +15253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kotomi:'一之濑琴美',
 			key_mia:'藤川米娅',
 			key_kano:'雾岛佳乃',
+			db_key_liyingxia:'李映夏',
 			lucia_duqu:'毒躯',
 			lucia_duqu_info:'锁定技，①当你对其他角色造成伤害或受到其他角色的伤害时，你和对方各获得一张花色点数随机的【毒】。<br>②当你因【毒】失去体力时，你改为回复等量的体力。<br>③当你处于濒死状态时，你可以使用一张【毒】（每回合限一次）。',
 			lucia_zhenren:'振刃',
@@ -15487,7 +15594,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mia_shihui:'时迴',
 			mia_shihui_info:'锁定技，摸牌阶段，你改为摸X+1张牌（X为你上回合弃置的牌数）；结束阶段，你弃置一张牌并回复1点体力。',
 			mia_qianmeng:'潜梦',
-			mia_qianmeng_info:'使命技。①游戏开始时，你摸一张牌，然后将一张牌置于牌堆的正中央。②使命：当有角色获得“潜梦”牌时，其将此牌交给你。你将体力值回复至上限，失去〖时迴〗并获得〖风发〗。③失败：当你死亡时，你可令一名角色获得牌堆中所有与“潜梦”牌点数相同的牌。',
+			mia_qianmeng_info:'使命技。①游戏开始时，你摸一张牌，然后将一张牌置于牌堆的正中央。②使命：当有角色获得“潜梦”牌时，其将此牌交给你。你将体力值回复至上限，失去〖时迴〗并获得〖风发〗。③失败：当你死亡时，你可令一名角色获得牌堆中所有与“潜梦”牌花色点数相同的牌。',
 			mia_fengfa:'风发',
 			mia_fengfa_info:'锁定技。摸牌阶段，你多摸X张牌（X为你上回合使用过的牌数）。',
 			kano_liezhen:'列阵',
@@ -15496,6 +15603,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kano_paibingbuzhen_info:'出牌阶段，对至多三名角色使用。目标角色摸一张牌，然后将一张牌置入仁库。若仁库中的牌类型或颜色均相同，则你摸一张牌。',
 			kano_poyu:'破羽',
 			kano_poyu_info:'当你成为【杀】或伤害性锦囊牌的目标后，若仁库中有牌，你可判定。然后你可从仁库中移去一张与此牌类型或花色相同的牌，令此牌对你无效。',
+			liyingxia_sanli:'三礼',
+			liyingxia_sanli_info:'锁定技。其他角色于其回合内前两次使用牌指定你为目标后，你摸一张牌；第三次使用牌指定你为目标后，你交给其一张牌。',
+			liyingxia_zhenjun:'振军',
+			liyingxia_zhenjun_info:'键势力技。结束阶段，你可以令至多X名角色各摸一张牌，且这些角色于自己的下个回合内第一次造成的伤害+1（X为你本回合内使用【杀】和伤害性锦囊牌的次数）。',
+			liyingxia_wumai:'武脉',
+			liyingxia_wumai_info:'蜀势力技。一轮游戏开始时，你可以选择获得其中一个未选择过的技能直到本轮结束：〖八阵〗/〖集智〗/〖观星〗/〖游龙〗。若均已选择过，则你可以摸X张牌（X为场上已受伤的角色数且至多为3）。',
 
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',

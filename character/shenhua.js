@@ -4851,6 +4851,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{name:'jiu'},
 				viewAsFilter:function(player){
 					if(!player.countCards('hs',{suit:'spade'})) return false;
+					return true;
 				},
 				prompt:'将一张黑桃手牌当酒使用',
 				check:function(card){

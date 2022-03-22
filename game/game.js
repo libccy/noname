@@ -13772,10 +13772,7 @@
 								_status.event._aiexclude.length=0;
 							}
 							else{
-								get.card(true).aiexclude();
-								game.uncheck();
-								event.redo();
-								game.resume();
+								ui.click.cancel();
 							}
 						}
 						else{
@@ -15909,7 +15906,6 @@
 					else if(event.position==ui.cardPile){
 						game.updateRoundNumber();
 					}
-					if(event.toRenku) _status.renku.addArray(cards);
 					event.hs=hs;
 					event.es=es;
 					event.js=js;
@@ -15960,6 +15956,9 @@
 					event.goto(2);
 					"step 4"
 					if(event.toRenku){
+						_status.renku.addArray(cards.filter(function(card){
+							return !card.destroyed;
+						}));
 						if(_status.renku.length>6){
 							var cards=_status.renku.splice(0,_status.renku.length-6);
 							game.log(cards,'从仁库进入了弃牌堆');
@@ -17068,7 +17067,7 @@
 					for(var i=0;i<skills.length;i++){
 						var ifo=get.info(skills[i]);
 						if(ifo.viewAs&&typeof ifo.viewAs!='function'&&ifo.viewAs.name==name){
-							if(!ifo.viewAsFilter||ifo.viewAsFilter(player)){
+							if(!ifo.viewAsFilter||ifo.viewAsFilter(player)!==false){
 								return true;
 							}
 						}

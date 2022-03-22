@@ -10456,9 +10456,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				if(!sides.length) return;
 				else if(sides.length>1){
-					if(sides.length==2){
-						if(map[sides[0]].length==1) map[sides[0]][0].showGiveup();
-						if(map[sides[1]].length==1) map[sides[1]][0].showGiveup();
+					if(!hiddens.length&&sides.length==2){
+						if(map[sides[0]].length==1&&!map[sides[1]].filter(function(i){
+							return i.identity!='ye'&&i.isUnseen(0);
+						}).length) map[sides[0]][0].showGiveup();
+						if(map[sides[1]].length==1&&!map[sides[0]].filter(function(i){
+							return i.identity!='ye'&&i.isUnseen(0);
+						}).length) map[sides[1]][0].showGiveup();
 					}
 				}
 				else{

@@ -40,7 +40,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pal_xia:['female','shu',3,['xjzongyu','fanling']],
 			pal_jiangcheng:['male','qun',4,['yanzhan','fenshi']],
 
-			pal_yuejinzhao:['male','wei',4,['ywuhun','yingfeng']],
+			pal_yuejinzhao:['male','wei',4,['ywuhun','xjyingfeng']],
 			pal_yueqi:['female','wei',3,['tianwu','liguang','shiying']],
 			pal_mingxiu:['female','shu',3,['linghuo','guijin','chengxin']],
 			pal_xianqing:['male','qun',4,['xtanxi','xiaoyue']],
@@ -1012,11 +1012,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			yingfeng:{
+			xjyingfeng:{
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
-					if(event.parent.name=='yingfeng') return false;
+					if(event.parent.name=='xjyingfeng') return false;
 					var enemies=player.getEnemies();
 					return game.hasPlayer(function(current){
 						return enemies.contains(current)&&!event.targets.contains(current)&&player.canUse('sha',current,false);
@@ -4218,8 +4218,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			feichen_info:'',
 			tanhua:'昙华',
 			tanhua_info:'锁定技，你回复体力的效果改为摸两张牌；当你进入濒死状态时，你回复一点体力并失去此技能',
-			yingfeng:'影锋',
-			yingfeng_info:'锁定技，每当你使用一张杀结算完毕后，你随机对一名不是此杀目标的敌方角色使用一张杀',
+			xjyingfeng:'影锋',
+			xjyingfeng_info:'锁定技，每当你使用一张杀结算完毕后，你随机对一名不是此杀目标的敌方角色使用一张杀',
 			fenglue:'风掠',
 			fenglue_info:'你可以放弃出牌阶段，改为指定一名其他角色并选择任意张手牌，依次对该角色使用，若如此做，此阶段内该角色每受到一点伤害，你在结算后摸一张牌',
 			xjzongyu:'纵雨',

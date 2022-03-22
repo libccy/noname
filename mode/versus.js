@@ -4172,7 +4172,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			're_zhouyu','re_daqiao','sunshangxiang','sunjian','re_xiaoqiao','sunce','re_luxun','zhugejin',
 			'dingfeng','lingtong','guyong','xusheng','yufan','handang','panzhangmazhong','zhugeke',
 			'zumao','xuezong','re_huatuo','lvbu','diaochan','re_pangde','jiaxu','chengong',
-			're_gongsunzan','caifuren','gongsunyuan','yj_jushou','sp_liuqi','quyi','caiyong','key_yuzuru'
+			're_gongsunzan','caifuren','gongsunyuan','yj_jushou','sp_liuqi','quyi','caiyong','key_yuzuru',
+			'ol_lisu','zhanghuyuechen','xujing','zhoufang','re_taishici','ol_zhurong',
 		],
 		choiceFour:[
 			'sunquan','zhenji','re_diaochan','zhugeliang','sunshangxiang','re_huangyueying',

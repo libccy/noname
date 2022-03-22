@@ -104,7 +104,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							if(trigger.delay===false) game.delayx();
-							player.storage.qimei_draw.draw();
+							var evt1=trigger.getl(player);
+							if((trigger.name=='gain'&&player==trigger.player)||(evt1&&evt1.hs&&evt1.hs.length)) player.storage.qimei_draw.draw();
+							var evt2=trigger.getl(player.storage.qimei_draw);
+							if((trigger.name=='gain'&&player==player.storage.qimei_draw)||evt2&&evt2.hs&&evt2.hs.length) player.draw();
 						},
 						group:'qimei_hp',
 						onremove:true,
@@ -128,7 +131,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							game.delayx();
-							player.storage.qimei_draw.draw();
+							(player==trigger.player?player.storage.qimei_draw:player).draw();
 						},
 					},
 				},
@@ -2923,7 +2926,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gaoling:'高陵',
 			gaoling_info:'隐匿技。当你于回合外明置此武将牌时，你可以令一名角色回复1点体力。',
 			qimei:'齐眉',
-			qimei_info:'准备阶段，你可以选择一名其他角色。你获得如下效果直到下回合开始：①每回合限一次，当你或其获得牌/失去手牌后，若你与其手牌数相等，则其摸一张牌。②每回合限一次，当你或其的体力值变化后，若你与其体力值相等，则其摸一张牌。',
+			qimei_info:'准备阶段，你可以选择一名其他角色。你获得如下效果直到下回合开始：①每回合限一次，当你或其获得牌/失去手牌后，若你与其手牌数相等，则另一名角色摸一张牌。②每回合限一次，当你或其的体力值变化后，若你与其体力值相等，则另一名角色摸一张牌。',
 			ybzhuiji:'追姬',
 			ybzhuiji_info:'出牌阶段开始时，你可选择一项：①摸两张牌，并于出牌阶段结束时失去1点体力；②回复1点体力，并于出牌阶段结束时弃置两张牌。',
 

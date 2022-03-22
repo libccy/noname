@@ -26,7 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			shen_sunce:['male','shen','1/6',['yingba','scfuhai','pinghe'],['wu']],
 			shen_xunyu:['male','shen',3,['tianzuo','lingce','dinghan'],['wei']],
-			shen_taishici:['male','shen',4,['dulie','tspowei','dangmo'],['wu']],
+			shen_taishici:['male','shen',4,['dulie','tspowei'],['wu']],
 			shen_guojia:['male','shen',3,['reshuishi','stianyi','resghuishi'],['wei']],
 			shen_diaochan:['female','shen',3,['meihun','huoxin'],['qun']],
 			shen_guanyu:['male','shen',5,['new_wuhun','wushen'],['shu']],
@@ -93,7 +93,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					game.delayx();
 				},
-				onremove:function(){
+				onremove:function(player){
 					player.removeGaintag('hina_shenshi');
 				},
 				group:'hina_shenshi_yingbian',
@@ -467,8 +467,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll(function(){lib.inpile.add('qizhengxiangsheng')});
 					game.updateRoundNumber();
 				},
-				group:'tianzuo_rewrite',
+				group:'tianzuo_remove',
 				subSkill:{
+					remove:{
+						audio:2,
+						trigger:{target:'useCardToBefore'},
+						forced:true,
+						priority:15,
+						filter:function(event,player){
+							return event.card&&event.card.name=='qizhengxiangsheng';
+						},
+						content:function(){
+							trigger.cancel();
+						},
+						ai:{
+							target:function(card,player,target){
+								if(card&&card.name=='qizhengxiangsheng') return 'zerotarget';
+							},
+						},
+					},
 					global:{
 						trigger:{player:'useCardToPlayered'},
 						forced:true,
@@ -618,109 +635,158 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dulie:{
 				audio:2,
-				trigger:{
-					global:'phaseBefore',
-					player:'enterGame',
-				},
+				trigger:{target:'useCardToTarget'},
 				forced:true,
+				logTarget:'player',
 				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0)&&game.players.length>1&&game.hasPlayer(function(current){
-						return current!=player&&!current.hasMark('dulie');
-					});
-				},
-				logTarget:function(event,player){
-					return game.filterPlayer(function(current){
-						return current!=player&&!current.hasMark('dulie');
-					});
+					return event.card.name=='sha'&&event.player.hp>player.hp;
 				},
 				content:function(){
 					'step 0'
-					var targets=game.filterPlayer(function(current){
-						return current!=player&&!current.hasMark('dulie');
-					}).sortBySeat();
-					for(var i of targets) i.addMark('dulie',1);
-					game.delayx();
+					player.judge(function(result){
+						if(get.suit(result)=='heart') return 2;
+						return -1;
+					}).judge2=function(result){
+						return result.bool;
+					};
+					'step 1'
+					if(result.bool){
+						trigger.targets.remove(player);
+						trigger.getParent().triggeredTargets2.remove(player);
+						trigger.untrigger();
+					}
 				},
-				mod:{
-					targetInRange:function(card,player,target){
-						if(card.name=='sha'&&!target.hasMark('dulie')) return true;
+				ai:{
+					effect:{
+						target:function(card,player,target,current,isLink){
+							if(card.name=='sha'&&!isLink&&player.hp>target.hp) return 0.5;
+						},
 					},
 				},
 				marktext:'围',
 				intro:{
-					name:'笃烈/破阵 (围)',
+					name:'破围(围)',
 					name2:'围',
 					content:'mark',
-				},
-				group:'dulie_sha',
-				subSkill:{
-					sha:{
-						audio:'dulie',
-						trigger:{target:'useCardToTarget'},
-						forced:true,
-						logTarget:'player',
-						filter:function(event,player){
-							return event.card.name=='sha'&&event.player.isIn()&&!event.player.hasMark('dulie');
-						},
-						content:function(){
-							'step 0'
-							player.judge(function(result){
-								if(get.suit(result)=='heart') return 2;
-								return -1;
-							}).judge2=function(result){
-								return result.bool;
-							};
-							'step 1'
-							if(result.bool){
-								trigger.targets.remove(player);
-								trigger.getParent().triggeredTargets2.remove(player);
-								trigger.untrigger();
-							}
-						},
-						ai:{
-							effect:{
-								target:function(card,player,target,current,isLink){
-									if(card.name=='sha'&&!isLink&&!player.hasMark('dulie')) return 0.5;
-								},
-							},
-						},
-					},
 				},
 			},
 			tspowei:{
 				audio:2,
 				dutySkill:true,
 				forced:true,
-				trigger:{source:'damageBegin2'},
+				trigger:{global:'damageEnd'},
 				logTarget:'player',
 				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&event.player&&
-					event.player.isIn()&&event.player.hasMark('dulie');
+					return event.player&&event.player.isIn()&&event.player.hasMark('dulie');
 				},
 				content:function(){
-					trigger.cancel();
 					trigger.player.removeMark('dulie',trigger.player.countMark('dulie'));
 				},
 				derivation:'shenzhu',
-				group:['tspowei_achieve','tspowei_fail'],
-				ai:{
-					combo:'dulie',
-					effect:{
-						player:function(card,player,target){
-							if(card.name=='sha'&&target.hasMark('dulie')&&get.attitude(player,target)>=0) return [1,1,0,0];
-							if(get.tag(card,'damage')&&_status.event.type=='respondShan'&&_status.event.getParent().name=='sha'&&target.hasMark('dulie')&&get.attitude(target,player)>=0) return [1,1,0,0];
+				group:['tspowei_init','tspowei_move','tspowei_achieve','tspowei_fail','tspowei_use'],
+				subSkill:{
+					use:{
+						audio:'tspowei',
+						trigger:{global:'phaseBegin'},
+						direct:true,
+						filter:function(event,player){
+							return event.player!=player&&event.player.hasMark('dulie')&&
+								(player.countCards('h')>0||player.hp>=event.player.hp&&event.player.countCards('h')>0);
+						},
+						content:function(){
+							'step 0'
+							var list=[],target=trigger.player,choiceList=[
+								'弃置一张牌并对其造成1点伤害',
+								'获得其一张手牌',
+							];
+							event.target=target;
+							if(player.hasCard(function(card){
+								return lib.filter.cardDiscardable(card,player,'tspowei_use');
+							},'h')) list.push('选项一');
+							else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
+							if(player.hp>=target.hp&&target.countCards('h')>0) list.push('选项二');
+							else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+							player.chooseControl(list,'cancel2').set('prompt',get.prompt('tspowei',target)).set('choiceList',choiceList).set('ai',function(){
+								var evt=_status.event.getParent();
+								if(evt.player.hasCard(function(card){
+									return lib.filter.cardDiscardable(card,evt.player,'tspowei_use')&&get.value(card,evt.player)<7;
+								},'h')&&get.damageEffect(evt.target,evt.player,evt.player)>0) return '选项一';
+								if(evt.player.hp>=evt.target.hp&&evt.target.countCards('h')>0&&get.attitude(evt.player,evt.target)<=0&&!evt.target.hasSkillTag('noh')) return '选项二';
+								return 'cancel2';
+							});
+							'step 1'
+							if(result.control!='cancel2'){
+								if(result.control=='选项二'){
+									player.logSkill('tspowei',target);
+									player.gainPlayerCard(target,'h',true);
+									event.goto(3);
+								}
+							}
+							else event.finish();
+							'step 2'
+							player.chooseToDiscard('h',true).logSkill=['tspowei_use',target];
+							target.damage();
+							'step 3'
+							player.addTempSkill('tspowei_inRange');
+						},
+						ai:{expose:0.2},
+					},
+					inRange:{
+						charlotte:true,
+						mod:{
+							inRangeOf:function(from,to){
+								if(from==_status.currentPhase) return true;
+							},
 						},
 					},
-				},
-				subSkill:{
+					init:{
+						audio:'tspowei',
+						trigger:{
+							global:'phaseBefore',
+							player:'enterGame',
+						},
+						forced:true,
+						filter:function(event,player){
+							return event.name!='phase'||game.phaseNumber==0;
+						},
+						logTarget:function(event,player){
+							return game.filterPlayer((current)=>current!=player&&!current.hasMark('dulie'));
+						},
+						content:function(){
+							var list=game.filterPlayer((current)=>current!=player&&!current.hasMark('dulie')).sortBySeat();
+							for(var i of list) i.addMark('dulie',1,false);
+						},
+					},
+					move:{
+						audio:'tspowei',
+						trigger:{player:'phaseBegin'},
+						forced:true,
+						filter:function(event,player){
+							return game.hasPlayer((current)=>current!=player&&current.hasMark('dulie'));
+						},
+						content:function(){
+							var list=game.filterPlayer((current)=>current!=player&&current.hasMark('dulie')).sortBySeat();
+							var map={};
+							for(var i of list){
+								var num=i.countMark('dulie');
+								i.removeMark('dulie',num);
+								map[i.playerid]=num;
+							}
+							for(var i of list){
+								var next=i.next;
+								if(next==player) next=next.next;
+								next.addMark('dulie',map[i.playerid]);
+							}
+						},
+					},
 					achieve:{
 						audio:'tspowei1',
-						trigger:{player:'useCardAfter'},
+						trigger:{player:'phaseBegin'},
 						forced:true,
 						skillAnimation:true,
 						animationColor:'metal',
 						filter:function(event,player){
-							return event.card.name=='sha'&&!game.hasPlayer(function(current){
+							return !game.hasPlayer(function(current){
 								return current.hasMark('dulie');
 							});
 						},
@@ -750,30 +816,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tspowei2:{audio:true},
 			shenzhu:{
 				audio:2,
-				mod:{
-					cardUsable:function(card){
-						if(card.name=='sha') return Infinity;
-					},
-				},
 				trigger:{player:'useCardAfter'},
 				forced:true,
 				filter:function(event,player){
 					return event.card.name=='sha'&&event.card.isCard&&event.cards.length==1;
 				},
 				content:function(){
-					player.draw();
-					//player.addTempSkill('shenzhu_less');
-					//player.addMark('shenzhu_less',1,false);
+					'step 0'
+					player.chooseControl().set('choiceList',[
+						'摸一张牌，且本回合使用【杀】的次数上限+1',
+						'摸三张牌，且本回合不能再使用【杀】',
+					]).set('ai',()=>_status.event.player.hasSha()?0:1);
+					'step 1'
+					if(result.index==0){
+						player.draw();
+						player.addTempSkill('shenzhu_more');
+						player.addMark('shenzhu_more',1,false);
+					}
+					else{
+						player.draw(3);
+						player.addTempSkill('shenzhu_less');
+					}
 				},
 				subSkill:{
-					less:{
-						onremove:true,
+					more:{
 						charlotte:true,
-						intro:{content:'手牌上限-#'},
+						onremove:true,
 						mod:{
-							maxHandcard:function(player,num){
-								return num-player.countMark('shenzhu_less');
+							cardUsable:function(card,player,num){
+								if(card.name=='sha') return num+player.countMark('shenzhu_more');
 							},
+						},
+					},
+					less:{
+						charlotte:true,
+						mod:{
+							cardEnabled:function(card){
+								if(card.name=='sha') return false;
+							}
 						},
 					},
 				},
@@ -4843,11 +4923,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sghuishi_info:'限定技，出牌阶段，你可以选择一名其他角色：若其有未发动过的觉醒技，则你令其发动这些觉醒技时无视原有条件；否则其摸四张牌。然后你减2点体力上限。',
 			shen_taishici:'神太史慈',
 			dulie:'笃烈',
-			dulie_info:'锁定技。①游戏开始时，你令所有其他角色获得“围”。②你对没有“围”的角色使用【杀】无距离限制。③当你成为【杀】的目标时，若使用者没有“围”，则你进行判定。若结果为红桃，则取消此目标。',
+			dulie_info:'锁定技。当你成为【杀】的目标时，若使用者的体力值大于你，则你进行判定。若结果为红桃，则取消此目标。',
 			tspowei:'破围',
-			tspowei_info:'使命技。①当你因使用【杀】而对有“围”的角色造成伤害时，你防止此伤害并移去该角色的“围”。②使命：当你使用【杀】结算完成后，若场上没有“围”，则你获得技能〖神著〗。③失败：当你进入濒死状态时，你将体力值回复至1点，然后弃置装备区的所有牌。',
+			tspowei_info:'使命技。①游戏开始时，你令所有其他角色获得一个“围”。②一名角色受到伤害后，若其有“围”，则其移去“围”。③回合开始时，你选择所有有“围”的角色。这些角色失去“围”，然后这些角色的第一个不为你的下家获得等量的“围”。④一名其他角色的回合开始时，若其有围，则你可以选择一项：⒈弃置一张手牌并对其造成1点伤害。⒉若其体力值不大于你，则你获得其一张手牌。选择完成后，你视为在其攻击范围内直到回合结束。⑤使命：当你使用【杀】结算完成后，若场上没有“围”，则你获得技能〖神著〗。⑥失败：当你进入濒死状态时，你将体力值回复至1点，然后弃置装备区的所有牌。',
 			shenzhu:'神著',
-			shenzhu_info:'你使用【杀】无次数限制。当你使用有对应实体牌的非转化【杀】结算结束后，你摸一张牌。',
+			shenzhu_info:'锁定技，当你使用有对应实体牌的非转化【杀】结算结束后，你选择一项：①摸一张牌，且本回合使用【杀】的次数上限+1。②摸三张牌，且本回合不能再使用【杀】。',
 			dangmo:'荡魔',
 			dangmo_info:'当你于出牌阶段内使用第一张【杀】选择目标后，你可以为此牌增加至多Y-1个目标（Y为你的体力值）。',
 			reshuishi:'慧识',
@@ -4858,7 +4938,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qizhengxiangsheng_info:'出牌阶段，对一名其他角色使用。你将目标角色标记为“奇兵”或“正兵”（对其他角色不可见）。然后目标角色可以打出一张【杀】或【闪】。若其是“奇兵”且未打出【杀】，则你对其造成1点伤害；若其是“正兵”且未打出【闪】，则你获得其一张牌。',
 			shen_xunyu:'神荀彧',
 			tianzuo:'天佐',
-			tianzuo_info:'①游戏开始时，你将8张【奇正相生】加入牌堆。②当一名角色成为【奇正相生】的目标后，你可观看其手牌，然后可以更改其标记。',
+			tianzuo_info:'锁定技。①游戏开始时，你将8张【奇正相生】加入牌堆。②【奇正相生】对你无效。',
 			lingce:'灵策',
 			lingce_info:'锁定技。当有【奇正相生】或智囊或〖定汉①〗记录过的锦囊牌被使用时，若此牌不为转化牌且对应实体牌数量为1，则你摸一张牌。',
 			dinghan:'定汉',

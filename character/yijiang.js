@@ -10286,8 +10286,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.3
 				}
 			},
-			wuyan:{
-				audio:2,
+			wuyan:{audio:2},
+			xswuyan:{
+				audio:'wuyan',
 				trigger:{target:'useCardToBefore',player:'useCardToBefore'},
 				forced:true,
 				priority:15,
@@ -11797,6 +11798,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				forced:true,
 				audio:2,
+				audioname:['xin_jushou'],
 				check:function(event,player){
 				 return player.getHistory('damage',function(evt){
 						return evt!=event
@@ -12213,7 +12215,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiahoushi:['re_xiahoushi','xiahoushi'],
 			zhangyi:['re_zhangyi','zhangyi'],
 			quancong:['re_quancong','quancong','old_quancong'],
-			sunxiu:['re_sunxiu','sunxiu'],
+			sunxiu:['re_sunxiu','xin_sunxiu','sunxiu'],
 			zhuzhi:['zhuzhi','old_zhuzhi'],
 			liuyu:['liuyu','ol_liuyu'],
 			zhangrang:['zhangrang','ol_zhangrang','junk_zhangrang'],
@@ -12631,7 +12633,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjunxing:'峻刑',
 			xinjunxing_info:'出牌阶段限一次，你可以弃置至少一张手牌并选择一名其他角色，该角色需弃置一张与你弃置的牌类别均不同的手牌，否则其先将其武将牌翻面，然后将手牌摸至四张。',
 
-			wuyan:'无言',
+			xswuyan:'无言',
 			xinwuyan:'无言',
 			jujian:'举荐',
 			xinjujian:'举荐',
@@ -12748,7 +12750,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldrenxin_info:'其他角色进入濒死状态时，你可以将所有手牌交给该角色并翻面，然后该角色回复1点体力。',
 			jingce_info:'出牌阶段结束时，若你本回合使用的牌数量大于或等于你的当前体力值，你可以摸两张牌。',
 			xinjingce_info:'结束阶段，若你本回合使用的牌数量大于或等于你的当前体力值，你可以摸两张牌。',
-			wuyan_info:'锁定技，你使用的普通锦囊牌对其他角色无效；其他角色使用的普通锦囊牌对你无效。',
+			xswuyan_info:'锁定技，你使用的普通锦囊牌对其他角色无效；其他角色使用的普通锦囊牌对你无效。',
 			xinwuyan_info:'锁定技，当你使用锦囊牌造成伤害时，你防止此伤害；锁定技，当你受到锦囊牌对你造成的伤害时，你防止此伤害。',
 			jujian_info:'出牌阶段限一次，你可以弃至多三张牌，然后令一名其他角色摸等量的牌。若你以此法弃牌不少于三张且均为同一类别，你回复1点体力。',
 			xinjujian_info:'结束阶段开始时，你可以弃置一张非基本牌并选择一名其他角色，令其选择一项：1.摸两张牌；2.回复1点体力；3.将其武将牌翻转至正面朝上并重置之。',

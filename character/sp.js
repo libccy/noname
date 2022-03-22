@@ -10,20 +10,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun"],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan'],
-				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng"],
+				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan"],
 				sp_liesi:['mizhu'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv'],
 				sp_wanglang:['wanglang'],
 				sp_tongque:["sp_fuwan","sp_fuhuanghou","sp_jiben"],
 				sp_zhongdan:["cuiyan","huangfusong"],
-				sp_guozhan2:["mateng","tianfeng","sp_dongzhuo","liqueguosi","lvfan","cuimao","jiling","zhangren","zongyu"],
+				sp_guozhan2:["mateng","tianfeng","sp_dongzhuo","liqueguosi","jiling","zhangren","zongyu"],
 				//sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
 		},
 		characterFilter:{},
 		character:{
+			wuyan:['male','wu',4,['lanjiang']],
 			sp_ol_zhanghe:['male','qun',4,['spolzhouxuan']],
 			ol_dongzhao:['male','wei',3,['olxianlve','olzaowang']],
 			fengfangnv:['female','qun',3,['zhuangshu','chuiti']],
@@ -138,9 +139,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kongrong:['male','qun',3,['lirang','mingshi']],
 			dingfeng:['male','wu',4,['reduanbing','refenxun']],
 			shamoke:['male','shu',4,['gzjili']],
-			liqueguosi:['male','qun',4,['xiongsuan']],
-			lvfan:['male','wu',3,['diaodu','diancai']],
-			cuimao:['male','wei',3,['zhengbi','fengying']],
+			//liqueguosi:['male','qun',4,['xiongsuan']],
+			//cuimao:['male','wei',3,['zhengbi','fengying']],
 
 			jiling:['male','qun',4,['shuangren']],
 			zangba:['male','wei',4,['rehengjiang']],
@@ -156,6 +156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			wuyan:'吴国及西晋初年将领。初任通江县吏，后得到大司马陆抗的提拔重用，逐渐升至建平太守。',
 			fengfangnv:'冯方之女，司隶人，袁术妻妾。在史书中被记载为天姿国色的美人。钱大昭在《三国志辨疑》中认为冯方当为冯芳误字，冯方女实为是西园八校尉之一的冯芳的女儿。然而，在曹丕《典论》、《九州春秋》等书籍都有提及她，皆作冯方女字样，并无一书写作冯芳女或是明提是冯芳之女。最关键的一点是，冯芳是荆州西陵县人，她女儿不可能是司隶籍，冯芳也没担任过任何与司隶有关的官职。同时期名字为“○女”的并不少见，如施绩女儿施淑女，曹植女儿曹行女，夏侯令女等。',
 			zuofen:'左芬（约253年－300年4月23日），出土墓志作左棻，字兰芝，齐国临淄（今山东临淄）人，西晋诗人。少好学，善属文。为晋武帝贵人。今存诗、赋、颂、赞、诔等20余篇，大都为应诏而作，《离思赋》最著名。原有集，已失传。',
 			duxi:'杜袭（生卒年不详），字子绪，颍川郡定陵县（今河南省襄城县）人。三国时期魏国重臣，东汉末年颍川“四大名士”之一，济阴太守杜根的孙子。建安初年，投奔司空曹操，历任西鄂县令、议郎、丞相军咨祭酒、魏王侍中、丞相长史、驸马都尉。魏文帝时期，出任督军粮御史、尚书，累封武平亭侯。魏明帝时期，担任大将军曹真和司马懿的军师，抵御蜀国进攻，拜太中大夫，受封平阳乡侯。卒于任上，获赠少府，谥号为定。',
@@ -206,7 +207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shamoke:'沙摩柯（？－222年），东汉末三国时期五溪蛮首领。汉章武元年（221年）初，为报关羽被东吴杀害之仇，刘备亲自领兵攻孙权，以金锦爵赏诱沙摩柯助战。章武二年（222年），吴大都督陆逊以火攻破刘备，率诸军齐击，汉军四十多个营寨被攻破，沙摩柯在大乱中匹马奔逃，被乱军杀死。',
 			lvfan:'吕范（？－228年），字子衡。汝南郡细阳县（今安徽太和）人。汉末至三国时期吴国重臣。吕范年轻为汝南县吏，后避难寿春，结识孙策。此后随孙策、孙权征伐四方，对稳固孙氏在江东的统治做出了杰出的贡献，孙权将其比之于东汉开国元勋吴汉。吴国建立后，吕范累官至前将军、假节、扬州牧，封南昌侯。黄武七年（228年），吕范被拜为大司马，未得授官，便已病逝。孙权悲痛不已，遣使赠其大司马印绶。孙权还都建业后，以太牢礼祭祀吕范。',
 			liqueguosi:"请分别参考武将【李傕】和【郭汜】各自的介绍。",
-			cuimao:"关于【崔琰】的内容，请查看武将【崔琰】的介绍。<br>毛玠（？—216年），字孝先，陈留平丘（今河南封丘）人。东汉末年大臣。年少时为县吏，以清廉公正著称。因战乱而打算到荆州避乱，但中途知道刘表政令不严明，因而改往鲁阳。后来投靠曹操，提出“奉天子以令不臣，脩耕植，畜军资”的战略规划，得到曹操的欣赏。<br>毛玠与崔琰主持选举，所举用的都是清廉正直之士。而毛玠为人廉洁，激起天下廉洁之风，一改朝中奢华风气。曹操大为赞赏，曹丕也亲自去拜访他。<br>曹操获封魏公后，毛玠改任尚书仆射，再典选举。又密谏曹操应该立嫡长子曹丕为魏国太子。崔琰被杀后，毛玠十分不快。后来有人诬告毛玠，曹操大怒，将毛玠收于狱中。及后在桓阶、和洽营救下，只被免职，不久逝世于家中。曹操在他死后赐他棺材和钱帛。",
+			maojie:"毛玠（？—216年），字孝先，陈留平丘（今河南封丘）人。东汉末年大臣。年少时为县吏，以清廉公正著称。因战乱而打算到荆州避乱，但中途知道刘表政令不严明，因而改往鲁阳。后来投靠曹操，提出“奉天子以令不臣，脩耕植，畜军资”的战略规划，得到曹操的欣赏。<br>毛玠与崔琰主持选举，所举用的都是清廉正直之士。而毛玠为人廉洁，激起天下廉洁之风，一改朝中奢华风气。曹操大为赞赏，曹丕也亲自去拜访他。<br>曹操获封魏公后，毛玠改任尚书仆射，再典选举。又密谏曹操应该立嫡长子曹丕为魏国太子。崔琰被杀后，毛玠十分不快。后来有人诬告毛玠，曹操大怒，将毛玠收于狱中。及后在桓阶、和洽营救下，只被免职，不久逝世于家中。曹操在他死后赐他棺材和钱帛。",
 			
 			huangfusong:'字义真。安定郡朝那县（今宁夏彭阳）人。于黄巾起义时，以中郎将身份讨伐黄巾，用火攻大破张梁、张宝。后接替董卓进攻张梁，连胜七阵。掘张角墓，拜左车骑将军、冀州牧，因拒绝贿赂宦官而被免职。 董卓死，王允命其与吕布等共至郿坞抄籍董卓家产、人口，皇甫嵩将坞中所藏良家子女，尽行释放。',
 			zangba:'其父臧戒，有二子臧艾与臧舜。年少时曾召集数人将获罪的父亲救出，此后四处流亡。后来成为陶谦麾下的骑都尉，负责募兵抵抗黄巾军。与孙观、尹礼等人拥兵驻屯于开阳，自成一股独立势力，后跟随吕布。吕布战败后，投降了曹操。后与袁绍、孙权等的战役里战功赫赫，官至镇东将军。',
@@ -216,7 +217,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ganfuren:'刘备起兵后，于沛城娶甘氏为妾。后来，甘夫人随刘备到荆州，生了阿斗(也就是后主刘禅)。223年四月，刘备病死于白帝城，追谥甘夫人为“昭烈皇后”。',
 			jiangfei:'请分别查阅【蒋琬】和【费袆】各自的介绍。',
 			mifuren:'刘备夫人。徐州别驾糜竺之妹。长坂兵败，她怀抱年仅两岁的刘禅在乱军中走散，被赵云发现；但麋夫人因为赵云只有一匹马，不肯上马，在将阿斗托付给赵云后投井而亡。',
-			chendong:'陈武，东吴将领，孙策攻打刘繇，陈武前来相助，孙策非常喜爱陈武，拜为校尉，使作先锋。陈武以十数骑兵力杀敌五十余人。后于赤壁等战役屡立功勋。董袭献上严白虎的人头来降孙策。赤壁之战，董袭受周瑜命，分兵去汉阳，合肥会战时接应太史慈，逍遥津支援孙权。濡须口之战时，董袭在船上督战，船覆董袭坚守殉职。',
+			chendong:'陈武，东吴将领，孙策攻打刘繇，陈武前来相助，孙策非常喜爱陈武，拜为校尉，使作先锋。陈武以十数骑兵力杀敌五十余人。后于赤壁等战役屡立功勋。董袭献上严虎的人头来降孙策。赤壁之战，董袭受周瑜命，分兵去汉阳，合肥会战时接应太史慈，逍遥津支援孙权。濡须口之战时，董袭在船上督战，船覆董袭坚守殉职。',
 			jiangqing:'擅长弓术。与周泰原为活跃于长江一带的江贼，孙策脱离袁术下江东自立门户时，和周泰一起率众投靠。 孙策攻刘繇，并引出城中麾下的陈横、薛礼、张英三名将领，陈横后被蒋钦一箭射杀，后与韩当等将乘舟过江，乱箭射杀敌军。曾在赤壁之战与周泰，还有擅使长枪的韩当率领水军在三江口踏江破敌。',
 			kongrong:'字文举，鲁国人，东汉文学家，“建安七子”之首。献帝即位后任北军中侯、虎贲中郎将、北海相，时称孔北海后因触怒曹操，为曹操所杀。能诗善文。',
 			mateng:'字寿成，扶风茂陵人，东汉末年征西将军，割据西凉一带的军阀，伏波将军马援的后代，官至卫尉，封爵槐里乡侯。因其子马超谋反，而被杀，夷灭三族。',
@@ -464,6 +465,62 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//吾彦
+			lanjiang:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				content:function(){
+					'step 0'
+					var ph=player.countCards('h');
+					var targets=game.filterPlayer((current)=>(current==player||current.countCards('h')>=ph)).sortBySeat();
+					player.line(targets,'green');
+					event.targets=targets;
+					event.num=0;
+					'step 1'
+					var target=targets[num];
+					event.num++;
+					if(target.isIn()){
+						event.target=target;
+						target.chooseBool('是否令'+(player==target?'自己':get.translation(player))+'摸一张牌？').set('ai',()=>get.attitude(_status.event.player,_status.event.getParent().player)>0);
+					}
+					else{
+						event.goto(event.num<targets.length?1:3);
+					}
+					'step 2'
+					if(result.bool){
+						target.line(player);
+						player.draw();
+					}
+					if(num<targets.length) event.goto(1);
+					'step 3'
+					player.chooseTarget('是否对一名手牌数等于自己的目标角色造成1点伤害？',function(card,player,target){
+						return _status.event.getParent().targets.contains(target)&&target.countCards('h')==player.countCards('h');
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						return get.damageEffect(target,player,player);
+					});
+					'step 4'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.damage();
+					}
+					else event.finish();
+					'step 5'
+					player.chooseTarget('是否令一名手牌数小于自己的目标角色摸一张牌？',function(card,player,target){
+						return _status.event.getParent().targets.contains(target)&&target.countCards('h')<player.countCards('h');
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						return get.attitude(player,target);
+					});
+					'step 6'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target);
+						target.draw();
+					}
+				},
+			},
 			//新SP张郃
 			spolzhouxuan:{
 				audio:2,
@@ -2195,7 +2252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.addIndex++;
 					if(game.hasPlayer((current)=>lib.skill.guanxu.filterTarget(null,player,current))) choiceList.push('发动一次〖观虚〗');
 					player.chooseControl('cancel2').set('prompt',get.prompt('yashi')).set('choiceList',choiceList).set('ai',function(){
-						var player=_status.event.player,source=_status.event.getTrigger().source,index=_status.event.getParent().index;
+						var player=_status.event.player,source=_status.event.getTrigger().source,index=_status.event.getParent().addIndex;
 						if(game.hasPlayer(function(current){
 							return current!=player&&current.countCards('h')>3&&get.attitude(player,current)<0;
 						})) return 1-index;
@@ -2210,7 +2267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(result.index+event.addIndex==0){
 							var target=trigger.source;
 							player.logSkill('yashi',target);
-							target.removeSkill('fengyin');
+							//target.removeSkill('fengyin');
 							target.addTempSkill('fengyin',{player:'phaseBegin'});
 							event.finish();
 						}
@@ -4318,6 +4375,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAs:{name:'sha'},
 				filterCard:{color:'black'},
 				position:'hes',
+				selectCard:1,
 				check:function(card){return 5-get.value(card)},
 			},
 			cuorui:{
@@ -4648,81 +4706,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xiongsuan:{
-				limited:true,
-				enable:'phaseUse',
-				filterCard:true,
-				filter:function(event,player){
-					return player.countCards('h');
-				},
-				check:function(card){
-					return 7-get.value(card);
-				},
-				filterTarget:true,
-				content:function(){
-					'step 0'
-					player.awakenSkill('xiongsuan');
-					target.damage('nocard');
-					'step 1'
-					player.draw(3);
-					var list=[];
-					var skills=target.getOriginalSkills();
-					for(var i=0;i<skills.length;i++){
-						if(lib.skill[skills[i]].limited&&target.awakenedSkills.contains(skills[i])){
-							list.push(skills[i]);
-						}
-					}
-					if(list.length==1){
-						target.storage.xiongsuan_restore=list[0];
-						target.addTempSkill('xiongsuan_restore','phaseZhunbeiBegin');
-						event.finish();
-					}
-					else if(list.length>1){
-						player.chooseControl(list).set('prompt','选择一个限定技在回合结束后重置之');
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
-					target.storage.xiongsuan_restore=result.control;
-					target.addTempSkill('xiongsuan_restore');
-				},
-				subSkill:{
-					restore:{
-						trigger:{global:'phaseAfter'},
-						silent:true,
-						charlotte:true,
-						content:function(){
-							player.restoreSkill(player.storage.xiongsuan_restore);
-						}
-					}
-				},
-				ai:{
-					order:4,
-					damage:true,
-					result:{
-						target:function(player,target){
-							if(target.hp>1){
-								var skills=target.getOriginalSkills();
-								for(var i=0;i<skills.length;i++){
-									if(lib.skill[skills[i]].limited&&target.awakenedSkills.contains(skills[i])){
-										return 8;
-									}
-								}
-							}
-							if(target!=player) return 0;
-							if(get.damageEffect(target,player,player)>=0) return 10;
-							if(target.hp>=4) return 5;
-							if(target.hp==3){
-								if(player.countCards('h')<=2&&game.hasPlayer(function(current){
-									return current.hp<=1&&get.attitude(player,current)<0;
-								})){
-									return 3;
-								}
-							}
-							return 0;
-						}
-					}
-				}
+				audio:2,
 			},
 			diancai:{
 				audio:2,
@@ -4732,146 +4716,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhengbi:{
 				audio:2,
-				trigger:{player:'phaseUseBegin'},
-				filter:function(event,player){
-					//if(event.player!=player) return false;
-					return game.hasPlayer(function(current){return current!=player&&current.isHealthy()})||player.countCards('h',{type:'basic'});
-				},
-				content:function(){
-					'step 0'
-					var choices=[];
-					if(game.hasPlayer(function(current){return current.isHealthy()})) choices.push('选择一名未受伤的角色');
-					if(player.countCards('h',{type:'basic'})) choices.push('交给一名角色一张基本牌');
-					player.chooseControl(choices,ui.create.dialog('征辟</br></br><div class="center text">选择一项</div>','hidden')).set('ai',function(){
-						if(choices.length>1){
-							return 1;
-						}
-						return 0;
-					});
-					'step 1'
-					if(result.control=='选择一名未受伤的角色') player.chooseTarget('征辟</br></br><div class="center text">选择一名未受伤的角色，你对其使用牌没有次数和距离限制直到回合结束</div>',function(card,player,target){
-						return target!=player&&target.isHealthy();
-					},true);
-					else player.chooseCardTarget({
-						prompt:'征辟</br></br><div class="center text">交给一名其他角色一张基本牌，然后该角色交给你一张非基本牌或两张基本牌</div>',
-						position:'h',
-						filterCard:function(card){return get.type(card)=='basic'},
-						filterTarget:function(card,player,target){
-							return target!=player;
-						},
-						ai1:function(card){return 7-get.value(card)},
-						//ai2:function(card,player,target){}
-					}).set('forced',true);
-					'step 2'
-					event.target=result.targets[0];
-					player.line(result.targets,'green');
-					if(result.cards.length){
-						event.cards=result.cards;
-						result.targets[0].gain(result.cards,player,'give');
-					}
-					else{
-						player.storage.zhengbi_eff1=result.targets[0];
-						player.addTempSkill('zhengbi_eff1');
-						event.finish();
-					}
-					'step 3'
-					var choices=[];
-					if(target.countCards('he',{type:['trick','delay','equip']})) choices.push('一张非基本牌');
-					if(target.countCards('h',{type:'basic'})>1) choices.push('两张基本牌');
-					if(choices.length) target.chooseControl(choices,ui.create.dialog('征辟</br></br><div class="center text">交给'+get.translation(player)+'</div>')).set('ai',function(event,player){
-						if(choices.length>1){
-							if(player.countCards('he',{type:['trick','delay','equip']},function(card){return get.value(card)<7})) return 0;
-							return 1;
-						}
-						return 0;
-					});
-					else{
-						if(target.countCards('h')){
-							var cards=target.getCards('h');
-							player.gain(cards,target,'giveAuto');
-							event.finish();
-						}
-						else event.finish();
-					}
-					'step 4'
-					var check=(result.control=='一张非基本牌');
-					target.chooseCard('he',(check?1:2),{type:(check?['trick','delay','equip']:'basic')},true);
-					'step 5'
-					if(result.cards){
-						player.gain(result.cards,target,'giveAuto');
-					}
-				},
-				subSkill:{
-					eff1:{
-						sub:true,
-						mod:{
-							targetInRange:function (card,player,target){
-								if(target==player.storage.zhengbi_eff1) return true;
-							},
-							cardUsableTarget:function (card,player,target){
-								if(player.storage.zhengbi_eff1==target) return true;
-							},
-						},
-						onremove:true,
-					},
-					eff2:{sub:true},
-				}
 			},
 			fengying:{
 				audio:2,
-				limited:true,
-				enable:'phaseUse',
-				position:'h',
-				filterCard:true,
-				selectCard:-1,
-				filter:function(event,player){
-					return !player.storage.fengying&&player.countCards('h')>0;
-				},
-				filterTarget:function(card,player,target){
-					return target==player;
-				},
-				selectTarget:-1,
-				discard:false,
-				lose:false,
-				content:function(){
-					'step 0'
-					player.awakenSkill('fengying');
-					player.storage.fengying=true;
-					player.insertPhase();
-					var evt=_status.event.getParent('phaseUse');
-					if(evt&&evt.name=='phaseUse'){
-						evt.skipped=true;
-					}
-					'step 1'
-					var cards=player.getCards('h');
-					player.discard(cards);
-					player.chooseTarget('请选择至多'+cards.length+'名角色，令这些角色将手牌摸至手牌上限。',[1,cards.length],function(card,player,target){
-						return target.countCards('h')<Math.min(target.maxHp,5);
-					}).set('ai',function(target){
-						var att=get.attitude(_status.event.player,target);
-						if(att>2){
-							return Math.min(5,target.maxHp)-target.countCards('h');
-						}
-						return att/3;
-					});
-					'step 2'
-					if(result.bool){
-						var list=result.targets;
-						list.sort(lib.sort.seat);
-						player.line(list,'thunder');
-						game.asyncDraw(list,function(current){
-							return current.maxHp-current.countCards('h');
-						});
-					}
-				},
-				skillAnimation:'epic',
-				animationColor:'gray',
-				ai:{
-					order:0.1,
-					result:{
-						player:0,
-					}
-				},
 			},
 			//新服曹笨
 			xinshanjia:{
@@ -15892,7 +15739,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsp_huangyueying:'SP黄月英',
 			guansuo:'关索',
 			tadun:'蹋顿',
-			yanbaihu:'严白虎',
+			yanbaihu:'严虎',
 			wanglang:'王朗',
 			caochun:'曹纯',
 			dongbai:'OL董白',
@@ -16628,6 +16475,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_ol_zhanghe:'SP张郃',
 			spolzhouxuan:'周旋',
 			spolzhouxuan_info:'①弃牌阶段开始时，你可将任意张手牌置于武将牌上，称为“旋”（上限为5）。②当你使用牌时，你将一张“旋”置入弃牌堆并摸一张牌（若你的手牌数不为全场唯一最多则改为摸X张牌，X为“旋”数）。③出牌阶段结束时，你将所有“旋”置入弃牌堆。',
+			wuyan:'吾彦',
+			lanjiang:'澜疆',
+			lanjiang_info:'结束阶段，你可以选择令所有手牌数不小于你的角色。这些角色依次选择是否令你摸一张牌。然后你可以对其中一名手牌数等于你的角色造成1点伤害，随后可以对其中一名手牌数小于你的角色摸一张牌。',
 			
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
