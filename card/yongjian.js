@@ -443,7 +443,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			g_du:{
 				trigger:{
 					player:['loseAfter','compare'],
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 					target:'compare',
 				},
 				cardSkill:true,

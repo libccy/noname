@@ -82,7 +82,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"old_guhuo":{
 				group:["old_guhuo_guess","old_guhuo_respond","old_guhuo_wuxie"],
 				enable:"chooseToUse",
-				filter:function (event,player){
+				filter:function(event,player){
 					if(!player.countCards('hs')) return false;
 					var list=['sha','tao','shan','jiu','taoyuan','wugu','juedou','huogong','jiedao','tiesuo','guohe','shunshou','wuzhong','wanjian','nanman'];
 					if(get.mode()=='guozhan'){
@@ -94,7 +94,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				chooseButton:{
-					dialog:function (){
+					dialog:function(){
 						var list=[];
 						for(var i=0;i<lib.inpile.length;i++){
 							var name=lib.inpile[i];
@@ -110,14 +110,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return ui.create.dialog('蛊惑',[list,'vcard']);
 					},
-					filter:function (button,player){
+					filter:function(button,player){
 						var evt=_status.event.getParent();
 						if(evt&&evt.filterCard){
 							return evt.filterCard({name:button.link[2]},player,evt);
 						}
 						return true;
 					},
-					backup:function (links,player){
+					backup:function(links,player){
 						return {
 							filterCard:true,
 							selectCard:1,
@@ -125,7 +125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							viewAs:{name:links[0][2],nature:links[0][3]},
 						}
 					},
-					prompt:function (links,player){
+					prompt:function(links,player){
 						return '将一张手牌当'+get.translation(links[0][2])+'使用';
 					},
 				},
@@ -136,13 +136,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:"useCardBefore",
 				},
-				filter:function (event,player){
+				filter:function(event,player){
 					return event.skill=="old_guhuo_backup"||event.skill=="old_guhuo_wuxie";
 				},
 				forced:true,
 				direct:true,
 				priority:15,
-				content:function (){
+				content:function(){
 					'step 0'
 					player.logSkill('old_guhuo_guess');
 					player.popup(trigger.card.name,'metal');
@@ -206,14 +206,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:"chooseToRespondBegin",
 				},
-				filter:function (event,player){
+				filter:function(event,player){
 					if(event.responded) return false;
 					if(!event.filterCard({name:'shan'})&&!event.filterCard({name:'sha'})) return false;
 					if(!player.countCards('h')) return false;
 					return true;
 				},
 				direct:true,
-				content:function (){
+				content:function(){
 					'step 0'
 					if(trigger.filterCard({name:'shan'})&&lib.filter.cardRespondable({name:'shan'},player,trigger)) event.name='shan';
 					else event.name='sha';
@@ -294,7 +294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				enable:"chooseToUse",
 				filterCard:true,
-				viewAsFilter:function (player){
+				viewAsFilter:function(player){
 					return player.countCards('hs')>0;
 				},
 				viewAs:{
@@ -315,14 +315,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				enable:"phaseUse",
 				usable:2,
-				filterTarget:function (card,player,target){
+				filterTarget:function(card,player,target){
 					if(player==target) return false;
 					var pos='he';
 					if(player.hasSkill('old_zuilun_h')) pos='e';
 					if(player.hasSkill('old_zuilun_e')) pos='h';
 					return target.countGainableCards(player,pos)>0;
 				},
-				content:function (){
+				content:function(){
 					'step 0'
 					var pos='he';
 					if(player.hasSkill('old_zuilun_h')) pos='e';
@@ -349,35 +349,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			"old_jijun":{
+			old_jijun:{
 				marktext:"方",
 				audio:"xinfu_jijun",
 				intro:{
-					content:"cards",
+					content:"expansion",
+					markcount:'expansion',
+				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
 				},
 				enable:"phaseUse",
 				filterCard:true,
 				selectCard:[1,Infinity],
-				filter:function (event,player){
+				filter:function(event,player){
 					return player.countCards('h')>0;
 				},
-				check:function (card){
+				check:function(card){
 					var player=_status.event.player;
-					if(player.storage.old_jijun&&(36-player.storage.old_jijun.length)<=player.countCards('h')) return 1;
+					if((36-player.getExpansions('old_jijun').length)<=player.countCards('h')) return 1;
 					return 5-get.value(card);
 				},
 				discard:false,
 				lose:false,
-				content:function (){
-					player.lose(cards,ui.special,'toStorage');
-					player.$give(cards,player);
-					if(!player.storage.old_jijun) player.storage.old_jijun=[];
-					player.storage.old_jijun.addArray(cards);
-					player.markSkill('old_jijun');
+				content:function(){
+					player.addToExpansion(cards,player,'give').gaintag.add('old_jijun');
 				},
-						   ai:{order:1,result:{player:1}},
+				ai:{order:1,result:{player:1}},
 			},
-			"old_fangtong":{
+			old_fangtong:{
 				trigger:{
 					player:"phaseJieshuBegin",
 				},
@@ -385,12 +386,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				skillAnimation:true,
 				animationColor:'metal',
-				filter:function (event,player){
-					return (player.storage.old_jijun&&player.storage.old_jijun.length>35);
+				filter:function(event,player){
+					return (player.getExpansions('old_jijun').length>35);
 				},
-				content:function (){
+				content:function(){
 					var bool=false;
-					if(player==game.me) bool=true;
+					if(player==game.me||player.isFriendOf(game.me)) bool=true;
 					else switch(get.mode()){
 						case 'identity':{
 							game.showIdentity();
@@ -400,25 +401,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(['zhu','zhong','mingzhong'].contains(id2)) bool=true;
 								break;
 							}
-						   else if(id1=='fan'){
+						 else if(id1=='fan'){
 								if(id2=='fan') bool=true;
 								break;
 							}
 							break;
 						}
-						case 'guozhan':{
-							if(game.me.isFriendOf(player)) bool=true;
-							break;
-						}
-						case 'versus':{
-							if(player.side==game.me.side) bool=true;
-							break;
-						}
-						case 'boss':{
-							if(player.side==game.me.side) bool=true;
-							break;
-						}
-						default:{}
 					}
 					game.over(bool);
 				},

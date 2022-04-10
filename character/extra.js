@@ -307,7 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 				},
 				locked:false,
-				global:'yingba_mark',
+				//global:'yingba_mark',
 				mod:{
 					targetInRange:function(card,player,target){
 						if(target.hasMark('yingba_mark')) return true;
@@ -1229,7 +1229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			boss_juejing2:{
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				forced:true,
 				filter:function(event,player){
@@ -1720,7 +1720,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
-					return event.player.isAlive()&&player.getStorage('chuyuan').length<player.maxHp;
+					return event.player.isAlive()&&player.getExpansions('chuyuan').length<player.maxHp;
 				},
 				logTarget:'player',
 				locked:false,
@@ -1731,20 +1731,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!trigger.player.countCards('h')) event.finish();
 					else trigger.player.chooseCard('h',true,'选择一张牌置于'+get.translation(player)+'的武将牌上作为「储」');
 					'step 2'
-					trigger.player.lose(result.cards,ui.special,'visible','toStorage');
-					trigger.player.$give(result.cards,player,false);
-					game.log(trigger.player,'选择了',result.cards);
-					player.markAuto('chuyuan',result.cards);
+					player.addToExpansion(result.cards,trigger.player,'give').gaintag.add('chuyuan');
 				},
-				//mod:{
-				//	maxHandcard:function(player,num){
-				//		return num+player.getStorage('chuyuan').length;
-				//	},
-				//},
 				intro:{
-					content:'cards',
-					onunmark:'throw',
+					content:'expansion',
+					markcount:'expansion',
 				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				ai:{combo:'dengji'},
 			},
 			dengji:{
 				audio:2,
@@ -1756,15 +1753,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'water',
 				filter:function(event,player){
-					return player.getStorage('chuyuan').length>=3;
+					return player.getExpansions('chuyuan').length>=3;
 				},
 				content:function(){
 					player.awakenSkill(event.name);
 					player.addSkill('tianxing');
 					player.addSkill('new_rejianxiong');
 					player.loseMaxHp();
-					player.gain(player.storage.chuyuan,'gain2','fromStorage');
-					player.unmarkAuto('chuyuan',player.storage.chuyuan);
+					player.gain(player.getExpansions('chuyuan'),'gain2','fromStorage');
 				},
 			},
 			tianxing:{
@@ -1776,14 +1772,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'thunder',
 				filter:function(event,player){
-					return player.getStorage('chuyuan').length>=3;
+					return player.getExpansions('chuyuan').length>=3;
 				},
 				content:function(){
 					'step 0'
 					player.awakenSkill(event.name);
 					player.loseMaxHp();
-					player.gain(player.storage.chuyuan,'gain2','fromStorage');
-					player.unmarkAuto('chuyuan',player.storage.chuyuan);
+					player.gain(player.getExpansions('chuyuan'),'gain2','fromStorage');
+					"step 1"
 					player.removeSkill('chuyuan');
 					player.chooseControl('rerende','rezhiheng','olluanji','caopi_xingdong').set('prompt','选择获得一个技能').set('ai',function(){
 						var player=_status.event.player;
@@ -1792,7 +1788,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!player.hasSkill('caopi_xingdong')) return 'caopi_xingdong';
 						return 'rerende';
 					});
-					'step 1'
+					'step 2'
 					player.addSkillLog(result.control);
 				},
 			},
@@ -3069,9 +3065,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.markAuto('qixing',game.cardsGotoSpecial(get.cards(7)).cards);
+					player.addToExpansion(get.cards(7),'gain2').gaintag.add('qixing');
 					"step 1"
-					var cards=player.getStorage('qixing');
+					var cards=player.getExpansions('qixing');
 					if(!cards.length||!player.countCards('h')){
 						event.finish();
 						return;
@@ -3087,34 +3083,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('processAI',function(list){
 						var player=_status.event.player,cards=list[0][1].concat(list[1][1]).sort(function(a,b){
 							return get.useful(a)-get.useful(b);
-						}),cards2=cards.splice(0,player.storage.qixing.length);
+						}),cards2=cards.splice(0,player.getExpansions('qixing').length);
 						return [cards2,cards];
 					});
 					"step 2"
 					if(result.bool){
 						var pushs=result.moved[0],gains=result.moved[1];
-						pushs.removeArray(player.storage.qixing);
+						pushs.removeArray(player.getExpansions('qixing'));
 						gains.removeArray(player.getCards('h'));
 						if(!pushs.length||pushs.length!=gains.length) return;
-						player.lose(pushs,ui.special,'toStorage');
+						player.addToExpansion(pushs,player,'giveAuto').gaintag.add('qixing');
 						game.log(player,'将',pushs,'作为“星”置于武将牌上');
-						player.gain(gains,'gain2','log','fromStorage');
-						player.storage.qixing.addArray(pushs);
-						player.storage.qixing.removeArray(gains);
-						player.markSkill('qixing');
+						player.gain(gains,'gain2');
 					}
 				},
-				mark:true,
 				intro:{
-					onunmark:function(storage,player){
-						if(storage&&storage.length){
-							player.$throw(storage,1000);
-							game.cardsDiscard(storage);
-							game.log(storage,'被置入了弃牌堆');
-						 storage.length=0;
-						}
-					},
+					markcount:'expansion',
 					mark:function(dialog,content,player){
+						var content=player.getExpansions('qixing');
 						if(content&&content.length){
 							if(player==game.me||player.isUnderControl()){
 								dialog.addAuto(content);
@@ -3125,6 +3111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					content:function(content,player){
+						var content=player.getExpansions('qixing');
 						if(content&&content.length){
 							if(player==game.me||player.isUnderControl()){
 								return get.translation(content);
@@ -3134,16 +3121,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				group:['qixing2'],
+				ai:{combo:'dawu'},
 			},
 			qixing2:{
 				trigger:{player:'phaseDrawAfter'},
 				direct:true,
 				filter:function(event,player){
-					return player.storage.qixing&&player.storage.qixing.length;
+					return player.getExpansions('qixing').length>0&&player.countCards('h')>0;
 				},
 				content:function(){
 					"step 0"
-					var cards=player.getStorage('qixing');
+					var cards=player.getExpansions('qixing');
 					if(!cards.length||!player.countCards('h')){
 						event.finish();
 						return;
@@ -3159,38 +3147,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('processAI',function(list){
 						var player=_status.event.player,cards=list[0][1].concat(list[1][1]).sort(function(a,b){
 							return get.value(a)-get.value(b);
-						}),cards2=cards.splice(0,player.storage.qixing.length);
+						}),cards2=cards.splice(0,player.getExpansions('qixing').length);
 						return [cards2,cards];
 					});
 					"step 1"
 					if(result.bool){
 						var pushs=result.moved[0],gains=result.moved[1];
-						pushs.removeArray(player.storage.qixing);
+						pushs.removeArray(player.getExpansions('qixing'));
 						gains.removeArray(player.getCards('h'));
 						if(!pushs.length||pushs.length!=gains.length) return;
 						player.logSkill('qixing2');
-						player.lose(pushs,ui.special,'toStorage');
+						player.addToExpansion(pushs,player,'giveAuto').gaintag.add('qixing');
 						game.log(player,'将',pushs,'作为“星”置于武将牌上');
-						player.gain(gains,'gain2','log','fromStorage');
-						player.storage.qixing.addArray(pushs);
-						player.storage.qixing.removeArray(gains);
-						player.markSkill('qixing');
+						player.gain(gains,'gain2');
 					}
-				}
+				},
 			},
 			dawu:{
-				unique:true,
 				trigger:{player:'phaseJieshuBegin'},
-				//priority:1,
 				direct:true,
 				filter:function(event,player){
-					return player.storage.qixing&&player.storage.qixing.length;
+					return player.getExpansions('qixing').length;
 				},
 				audio:2,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('dawu'),'选择角色获得大雾标记',
-					[1,Math.min(game.countPlayer(),player.storage.qixing.length)]).set('ai',function(target){
+					var num=Math.min(game.countPlayer(),player.getExpansions('qixing').length);
+					player.chooseTarget(get.prompt('dawu'),'令至多'+get.cnNumber(num)+'名角色获得“大雾”标记',
+					[1,num]).set('ai',function(target){
 						if(target.isMin()) return 0;
 						if(target.hasSkill('biantian2')) return 0;
 						var att=get.attitude(player,target);
@@ -3201,34 +3185,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 0;
 						}
 						return -1;
-					}).set('allUse',player.storage.qixing.length>=game.countPlayer(function(current){
+					}).set('allUse',player.getExpansions('qixing').length>=game.countPlayer(function(current){
 						return get.attitude(player,current)>4;
 					})*2);
 					"step 1"
 					if(result.bool){
+						player.logSkill('dawu',result.targets,'thunder');
 						var length=result.targets.length;
 						for(var i=0;i<length;i++){
 							result.targets[i].addSkill('dawu2');
 						}
-						player.logSkill('dawu',result.targets,'thunder');
-						player.chooseCardButton('弃置'+get.cnNumber(length)+'枚星',length,player.storage.qixing,true);
+						player.chooseCardButton('选择弃置'+get.cnNumber(length)+'张“星”',length,player.getExpansions('qixing'),true);
 						player.addSkill('dawu3');
 					}
 					else{
 						event.finish();
 					}
 					"step 2"
-					for(var i=0;i<result.links.length;i++){
-						player.storage.qixing.remove(result.links[i]);
-					}
-					if(player.storage.qixing.length==0){
-						player.unmarkSkill('qixing');
-					}
-					player.$throw(result.links,1000);
-					game.delayx();
-					game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
-					game.cardsDiscard(result.links);
+					player.loseToDiscardpile(result.links);
 				},
+				ai:{combo:'qixing'},
 			},
 			dawu2:{
 				trigger:{player:'damageBegin4'},
@@ -3253,7 +3229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				intro:{
 					markcount:()=>1,
-					content:'共有1个标记'
+					content:'共有1个标记',
 				}
 			},
 			dawu3:{
@@ -3278,11 +3254,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
-					return player.storage.qixing&&player.storage.qixing.length;
+					return player.getExpansions('qixing').length;
 				},
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('kuangfeng'),'选择一名角色获得“狂风”标记').ai=function(target){
+					player.chooseTarget(get.prompt('kuangfeng'),'令一名角色获得“狂风”标记').ai=function(target){
 						return -1;
 					}
 					"step 1"
@@ -3292,25 +3268,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							result.targets[i].addSkill('kuangfeng2');
 						}
 						player.logSkill('kuangfeng',result.targets,'fire');
-						player.chooseCardButton('弃置'+get.cnNumber(length)+'枚星',length,player.storage.qixing,true);
+						player.chooseCardButton('弃置'+get.cnNumber(length)+'枚星',length,player.getExpansions('qixing'),true);
 						player.addSkill('dawu3');
 					}
 					else{
 						event.finish();
 					}
 					"step 2"
-					for(var i=0;i<result.links.length;i++){
-						player.storage.qixing.remove(result.links[i]);
-					}
-					if(player.storage.qixing.length==0){
-						player.unmarkSkill('qixing');
-					}
-					player.$throw(result.links,1000);
-					game.delayx();
-					game.addVideo('storage',player,['qixing',get.cardsInfo(player.storage.qixing),'cards']);
-					game.cardsDiscard(result.links);
-					game.log(player,'将',result.links,'置入了弃牌堆')
+					player.loseToDiscardpile(result.links);
 				},
+				ai:{combo:'qixing'},
 			},
 			kuangfeng2:{
 				trigger:{player:'damageBegin3'},
@@ -4945,7 +4912,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dinghan_info:'①当你成为未记录过的锦囊牌的目标时，你记录此牌名并取消之。②准备阶段，你可在〖定汉①〗的记录中添加或减少一种锦囊牌的牌名。',
 			shen_sunce:'神孙策',
 			yingba:'英霸',
-			yingba_info:'①出牌阶段限一次，你可令一名体力上限大于1的其他角色减少1点体力上限并获得“平定”标记，然后你减少1点体力上限。②你对拥有“平定”标记的角色使用牌没有距离限制。③拥有“平定”标记的角色的手牌上限+X（X为其“平定”数）。',
+			yingba_info:'①出牌阶段限一次，你可令一名体力上限大于1的其他角色减少1点体力上限并获得“平定”标记，然后你减少1点体力上限。②你对拥有“平定”标记的角色使用牌没有距离限制。',
 			scfuhai:'覆海',
 			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。若你本回合内以此法获得的牌数小于2，则你摸一张牌。②拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
 			pinghe:'冯河',

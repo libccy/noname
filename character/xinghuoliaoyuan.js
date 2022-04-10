@@ -48,7 +48,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					return player.countCards('he')>0&&!game.hasPlayer(function(current){
-						return current.storage.xinyingshi_cards&&current.storage.xinyingshi_cards.length>0;
+						return current.getExpansions('xinyingshi_cards').length>0;
 					});
 				},
 				content:function(){
@@ -74,16 +74,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0],cards=result.cards;
 						player.logSkill('xinyingshi',target);
-						player.lose(cards,ui.special,'toStorage');
-						player.$give(cards,target,false);
 						target.addSkill('xinyingshi_cards');
-						target.markAuto('xinyingshi_cards',cards);
+						target.addToExpansion(player,'give',cards).gaintag.add('xinyingshi_cards');
 						target.storage.xinyingshi_source=player;
-						game.log(player,'将',cards,'置于了',target,'的武将牌上');
 					}
-					else event.finish();
-					'step 2'
-					game.delay(0,get.delayx(650,650));
 				},
 				subSkill:{
 					cards:{
@@ -92,17 +86,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						filter:function(event,player){
 							return event.source&&event.source.isIn()&&event.card&&event.getParent().type=='card'&&
-							player.storage.xinyingshi_cards&&player.storage.xinyingshi_cards.length;
+							player.getExpansions('xinyingshi_cards').length;
 						},
 						logTarget:'source',
 						content:function(){
 							'step 0'
 							event.target=trigger.source;
-							event.target.chooseButton(['应势：请选择你的赏金',player.storage.xinyingshi_cards]);
+							event.target.chooseButton(['应势：请选择你的赏金',player.getExpansions('xinyingshi_cards')]);
 							'step 1'
 							if(result.bool){
 								var cards=[result.links[0]];
-								player.unmarkAuto('xinyingshi_cards',cards);
 								for(var i=0;i<ui.cardPile.childNodes.length;i++){
 									var card=ui.cardPile.childNodes[i];
 									if(card.number==cards[0].number&&card.suit==cards[0].suit) cards.push(card);
@@ -116,34 +109,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								game.delay(0,get.delayx(500,500));
 								target.gain(cards);
-								if(!player.storage.xinyingshi_cards||!player.storage.xinyingshi_cards.length) player.removeSkill('xinyingshi_cards');
 							}
-							else event.finish();
 							'step 2'
-							game.delay(0,get.delayx(150,150));
+							if(!player.getExpansions('xinyingshi_cards').length) player.removeSkill('xinyingshi_cards');
 						},
 						marktext:'酬',
 						intro:{
-							content:'cards',
-							onunmark:function(storage,player){
-								if(storage&&storage.length){
-									var source=player.storage.xinyingshi_source;
-									if(source&&source.isIn()){
-										source.logSkill('xinyingshi',player);
-										player.$give(storage,source);
-										game.delayx(0,get.delayx(500,500));
-										source.gain(storage);
-									}
-									else{
-										game.cardsDiscard(storage);
-										player.$throw(storage,1000);
-									}
-								}
-								delete player.storage.xinyingshi_source;
-								delete player.storage.xinyingshi_cards;
-							},
+							content:'expansion',
+							markcount:'expansion',
 						},
 						ai:{threaten:3},
+						group:'xinyingshi_regain',
+						onremove:function(player,skill){
+							var cards=player.getExpansions(skill);
+							if(cards.length) player.loseToDiscardpile(cards);
+							delete player.storage.xinyingshi_source;
+						},
+					},
+					regain:{
+						trigger:{player:'die'},
+						forced:true,
+						charlotte:true,
+						forceDie:true,
+						filter:function(event,player){
+							return player.storage.xinyingshi_source&&player.storage.xinyingshi_source.isIn()&&player.getExpansions('xinyingshi_cards').length>0;
+						},
+						content:function(){
+							player.storage.xinyingshi_source.gain(player.getExpansions('xinyingshi_cards'),player,'give');
+						},
 					},
 				},
 			},
@@ -546,7 +539,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'qinguo_use',
 						trigger:{
 							player:'loseAfter',
-							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 						},
 						prompt:'是否发动【勤国】回复1点体力？',
 						filter:function (event,player){
@@ -562,7 +555,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			"xinfu_jijun":{
+			xinfu_jijun:{
 				ai:{
 					reverseEquip:true,
 					effect:{
@@ -584,46 +577,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				callback:function(){
-					game.cardsGotoSpecial(card);
-					player.storage.xinfu_jijun.push(card);
-					var node=event.judgeResult.node;
-					node.moveDelete(player);
-					game.broadcast(function(cardid,player){
-						var node=lib.cardOL[cardid];
-						if(node){
-							node.moveDelete(player);
-						}
-					},node.cardid,player);
-					game.addVideo('gain2',player,get.cardsInfo([node]));
-					player.markSkill('xinfu_jijun');
-					game.addVideo('storage',player,['xinfu_jijun',get.cardsInfo(player.storage.xinfu_jijun),'cards']);
-					//event.trigger("addCardToStorage");
+					player.addToExpansion(card,'gain2').gaintag.add('xinfu_jijun');
 				},
 				content:function (){
 					player.judge(function(card){
 						return 1;
 					}).callback=lib.skill.xinfu_jijun.callback;
 				},
-				init:function (player){
-					if(!player.storage.xinfu_jijun) player.storage.xinfu_jijun=[];
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
 				},
 				intro:{
-					content:'cards',
-					onunmark:function(storage,player){
-						if(storage&&storage.length){
-							player.$throw(storage,1000);
-							game.cardsDiscard(storage);
-							game.log(storage,'被置入了弃牌堆');
-						 storage.length=0;
-						}
-					},
-					mark:function (dialog,content,player){
+					content:'expansion',
+					markcount:'expansion',
+					mark:function(dialog,content,player){
+						var content=player.getExpansions('xinfu_jijun');
 						if(content&&content.length){
 							dialog.addAuto(content);
 							if(player==game.me||player.isUnderControl()){
 								var list=lib.skill.xinfu_fangtong.getAuto(player);
 								if(list.length>0){
-									dialog.addText('<li>推荐方案：'+get.translation(list));
+									dialog.addText('<li>推荐方案：'+get.translation(list[0])+'+ '+get.translation(list.slice(1)));
 								}
 							}
 						}
@@ -631,53 +606,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				marktext:"方",
 			},
-			"xinfu_fangtong":{
-				getAuto:function (player){
+			xinfu_fangtong:{
+				getAuto:function(player){
 					var hs=player.getCards('he');
-					var ss=player.storage.xinfu_jijun;
-					var bool=false;
-					for(var i=0;i<hs.length;i++){
-						var num=36-hs[i].number;
-						for(var j=0;j<ss.length;j++){
-							if(ss[j]==num){var k=-1;bool=true;break}
-							for(var k=j+1;k<ss.length;k++){
-								if(ss[j].number+ss[k].number==num){var l=-1;bool=true;break}
-								for(var l=k+1;l<ss.length;l++){
-									if(ss[j].number+ss[k].number+ss[l].number==num){var m=-1;bool=true;break}
-									for(var m=l+1;m<ss.length;m++){
-										if(ss[j].number+ss[k].number+ss[l].number+ss[m].number==num){var n=-1;bool=true;break}
-										for(var n=m+1;n<ss.length;n++){
-											if(ss[j].number+ss[k].number+ss[l].number+ss[m].number+ss[n].number==num){var o=-1;bool=true;break}
-											for(var o=n+1;o<ss.length;o++){
-												if(ss[j].number+ss[k].number+ss[l].number+ss[m].number+ss[n].number+ss[o].number==num){var p=-1;bool=true;break}
-												for(var p=o+1;p<ss.length;p++){
-													if(ss[j].number+ss[k].number+ss[l].number+ss[m].number+ss[n].number+ss[o].number+ss[p].number==num){bool=true;break}
-												}
-												if(bool) break;
-											}
-											if(bool) break;
-										}
-										if(bool) break;
-									}
-									if(bool) break;
-								}
-								if(bool) break;
+					var ss=player.getExpansions('xinfu_jijun');
+					var bool=false,max=Math.pow(2,ss.length),index,i;
+					for(i=0;i<hs.length;i++){
+						for(var j=1;j<max;j++){
+							var num=get.number(hs[i]);
+							index=j.toString(2);
+							while(index.length<ss.length){
+								index=('0'+index);
 							}
-							if(bool) break;
+							for(var k=0;k<ss.length;k++){
+								if(index[k]=='1') num+=get.number(ss[k]);
+							}
+							if(num==36){
+								bool=true;
+								break;
+							}
 						}
 						if(bool) break;
 					}
 					if(!bool) return [];
-					var list=[i,j,k,l,m,n,o,p];
-					for(var q=0;q<list.length;q++){
-						if(list[q]==-1){
-							list=list.slice(0,q);
-							break;
-						}
-						else if(q==0){
-							list[q]=hs[i];
-						}
-						else list[q]=ss[list[q]];
+					var list=[hs[i]];
+					for(var k=0;k<ss.length;k++){
+						if(index[k]=='1') list.push(ss[k]);
 					}
 					return list;
 				},
@@ -686,7 +640,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseJieshuBegin",
 				},
 				filter:function (event,player){
-					return player.storage.xinfu_jijun&&player.storage.xinfu_jijun.length&&player.countCards('he');
+					return player.countCards('he')>0&&player.getExpansions('xinfu_jijun').length>0;
 				},
 				direct:true,
 				skillAnimation:true,
@@ -694,10 +648,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					'step 0'
 					var info=['是否发动【方统】？'];
-					if(player.storage.xinfu_jijun){
-						info.push('<div class="text center">'+get.translation(player)+'的“方”</div>');
-						info.push(player.storage.xinfu_jijun);
-					}
+					info.push('<div class="text center">'+get.translation(player)+'的“方”</div>');
+					info.push(player.getExpansions('xinfu_jijun'));
 					if(player.countCards('h')){
 						info.push('<div class="text center">'+get.translation(player)+'的手牌区</div>');
 						info.push(player.getCards('h'));
@@ -708,7 +660,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var next=player.chooseButton();
 					next.set('createDialog',info);
-					next.set('selectButton',function (){
+					next.set('selectButton',function(){
 						var num=0;
 						for(var i=0;i<ui.selected.buttons.length;i++){
 							num+=get.number(ui.selected.buttons[i]);
@@ -717,11 +669,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.selected.buttons.length+2;
 					});
 					next.set('filterButton',function(button){
-						var player=_status.event.player;
+						var player=_status.event.player,cards=player.getExpansions('xinfu_jijun');
 						if(ui.selected.buttons.length){
-							if(!player.storage.xinfu_jijun.contains(button.link)) return false;
+							if(!cards.contains(button.link)) return false;
 						}
-						else if(player.storage.xinfu_jijun.contains(button.link)) return false;
+						else if(cards.contains(button.link)) return false;
 						var num=0;
 						for(var i=0;i<ui.selected.buttons.length;i++){
 							num+=get.number(ui.selected.buttons[i]);
@@ -736,6 +688,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								links:_status.event.autolist,
 							}
 						}
+						return {bool:false};
 					});
 					next.set('complexSelect',true);
 					'step 1'
@@ -744,14 +697,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var tothrow=[];
 						var cards=result.links.slice(0);
 						for(var i=0;i<cards.length;i++){
-							if(player.storage.xinfu_jijun.contains(cards[i])){
-								player.storage.xinfu_jijun.remove(cards[i]);
+							if(get.position(cards[i])=='x'){
 								tothrow.push(cards[i]);
-							}else{
-								player.discard(cards[i]);
+							}
+							else{
+								player.discard(cards[i]).delay=false;
 							}
 						}
-						player.$throw(tothrow);
+						player.loseToDiscardpile(tothrow);
 						player.chooseTarget('选择一个目标并对其造成3点雷电伤害',true,function(card,player,target){
 							return target!=player;
 						}).set('ai',function(target){

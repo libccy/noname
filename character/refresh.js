@@ -1115,10 +1115,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.goto(4);
 					'step 3'
 					if(result.bool&&result.cards&&result.cards.length){
-						var card=result.cards[0];
-						player.lose(card,ui.special,'toStorage');
-						player.markAuto('xinquanji',result.cards);
-						game.log(player,'将',card,'置于了武将牌上');
+						player.addToExpansion(result.cards,'giveAuto',player).gaintag.add('xinquanji');
 					}
 					'step 4'
 					if(event.count>0){
@@ -1132,13 +1129,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				locked:false,
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
 				intro:{
-					content:'cards',
-					onunmark:'throw',
+					content:'expansion',
+					markcount:'expansion',
 				},
 				mod:{
 					maxHandcard:function(player,num){
-						return num+player.getStorage('xinquanji').length;
+						return num+player.getExpansions('xinquanji').length;
 					},
 				},
 				ai:{
@@ -1168,7 +1169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'thunder',
 				filter:function(event,player){
-					return player.getStorage('xinquanji').length>2;
+					return player.getExpansions('xinquanji').length>2;
 				},
 				content:function(){
 					player.awakenSkill('xinzili');
@@ -1182,7 +1183,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.getStorage('xinquanji').length>0&&(!player.hasSkill('xinpaiyi_0')||!player.hasSkill('xinpaiyi_1'))
+					return player.getExpansions('xinquanji').length>0&&(!player.hasSkill('xinpaiyi_0')||!player.hasSkill('xinpaiyi_1'))
 				},
 				chooseButton:{
 					check:function(button){
@@ -1218,7 +1219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							dialog.buttons.add(td);
 						}
 						dialog.content.appendChild(table);
-						dialog.add(player.storage.xinquanji);
+						dialog.add(player.getExpansions('xinquanji'));
 						return dialog;
 					},
 					select:2,
@@ -1234,7 +1235,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					prompt:function(links,player){
 						if(typeof links[0]=='object') links.reverse();
-						var num=get.cnNumber(Math.max(1,player.storage.xinquanji.length-1)),card=get.translation(links[1]);
+						var num=get.cnNumber(Math.max(1,player.getExpansions('xinquanji').length-1)),card=get.translation(links[1]);
 						if(links[0]==0) return '移去'+card+'并令一名角色摸'+num+'张牌';
 						return '移去'+card+'并对至多'+num+'名角色造成1点伤害';
 					},
@@ -1256,13 +1257,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							player.addTempSkill('xinpaiyi_0','phaseUseEnd');
 							var card=lib.skill.xinpaiyi_backup.card;
-							player.unmarkAuto('xinquanji',[card]);
-							game.log(card,'进入了弃牌堆');
-							player.$throw(card,1000);
-							game.delayx();
-							game.cardsDiscard(card);
+							player.loseToDiscardpile(card);
 							'step 1'
-							target.draw(Math.max(1,player.getStorage('xinquanji').length));
+							target.draw(Math.max(1,player.getExpansions('xinquanji').length));
 						},
 						ai:{
 							result:{
@@ -1283,18 +1280,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						multitarget:true,
 						multiline:true,
 						selectTarget:function(){
-							return [1,Math.max(1,_status.event.player.storage.xinquanji.length-1)];
+							return [1,Math.max(1,_status.event.player.getExpansions('xinquanji').length-1)];
 						},
 						content:function(){
 							'step 0'
 							targets.sortBySeat();
 							player.addTempSkill('xinpaiyi_1','phaseUseEnd');
 							var card=lib.skill.xinpaiyi_backup.card;
-							player.unmarkAuto('xinquanji',[card]);
-							game.log(card,'进入了弃牌堆');
-							player.$throw(card,1000);
-							game.delayx();
-							game.cardsDiscard(card);
+							player.loseToDiscardpile(card);
 							'step 1'
 							for(var i of targets) i.damage();
 						},
@@ -1911,7 +1904,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				audioname:['re_chengpu'],
 				check:function(event,player){
-					return (event.baseDamage>1||player.getHistory('useCard').indexOf(event)==0)&&(player.hp>1||player.getStorage('rechunlao').length)&&game.hasPlayer(function(current){
+					return (event.baseDamage>1||player.getHistory('useCard').indexOf(event)==0)&&(player.hp>1||player.getExpansions('rechunlao').length)&&game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&player.canUse(event.card,current)
 						&&get.attitude(player,current)<0&&!current.hasShan()
 						&&get.effect(current,{name:'sha',nature:'fire'},player,player)>0;
@@ -1980,11 +1973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var cards=trigger.cards.filterInD();
-					player.markAuto('rechunlao',cards);
-					player.$gain2(cards,false);
-					game.log(player,'将',cards,'放在了武将牌上');
-					game.cardsGotoSpecial(cards);
-					game.delay();
+					player.addToExpansion('gain2',cards).gaintag.add('rechunlao');
 				},
 			},
 			rezhongyong:{
@@ -2127,19 +2116,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						var cs=result.cards;
-						player.lose(cs,ui.special,'toStorage');
-						player.markAuto('gzquanji',cs);
-						game.log(player,'将',cs,'放在了武将牌上');
+						player.addToExpansion(cs,player,'give').gaintag.add('gzquanji');
 					}
 				},
 				intro:{
-					content:'cards',
-					onunmark:'throw',
+					content:'expansion',
+					markcount:'expansion',
+				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
 				},
 				locked:false,
 				mod:{
 					maxHandcard:function(player,num){
-						return num+player.getStorage('gzquanji').length;
+						return num+player.getExpansions('gzquanji').length;
 					},
 				},
 			},
@@ -2148,11 +2139,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return player.getStorage('gzquanji').length>0&&!player.hasSkill('gzquanji2');
+					return player.getExpansions('gzquanji').length>0&&!player.hasSkill('gzquanji2');
 				},
 				chooseButton:{
 					dialog:function(event,player){
-						return ui.create.dialog('排异',player.storage.gzquanji,'hidden')
+						return ui.create.dialog('排异',player.getExpansions('gzquanji'),'hidden')
 					},
 					backup:function(links,player){
 						return {
@@ -2167,7 +2158,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								order:10,
 								result:{
 									target:function(player,target){
-	  							var num=player.getStorage('gzquanji').length-1;
+	  							var num=player.getExpansions('gzquanji').length-1;
 	  							if(num==0){
 	  								if(target.countCards('h')>player.countCards('h')) return get.damageEffect(target,player,target);
 	  								return 0;
@@ -2185,25 +2176,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				contentx:function(){
 					"step 0"
 					var card=lib.skill.gzpaiyi_backup.card;
-					game.cardsDiscard(card);
-					player.$throw(card);
-					player.storage.gzquanji.remove(card);
-					game.log(card,'进入了弃牌堆');
-					if(!player.storage.gzquanji.length){
-						player.unmarkSkill('gzquanji');
-					}
-					else{
-						player.markSkill('gzquanji');
-					}
-					player.syncStorage('gzquanji');
-					game.delayx();
+					player.loseToDiscardpile(card);
+					player.addTempSkill('gzquanji2');
 					"step 1"
-					var num=player.getStorage('gzquanji').length;
+					var num=player.getExpansions('gzquanji').length;
 					if(num) target.draw(Math.min(7,num));
 					"step 2"
 					if(target.countCards('h')>player.countCards('h')){
 						target.damage();
-						player.addTempSkill('gzquanji2');
 					}
 				},
 				ai:{
@@ -2401,15 +2381,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.logSkill('residi');
-						var cards=result.cards;
-						player.markAuto('residi',cards);
-						game.log(player,'将',cards[0],'放在了武将牌上');
-						player.lose(cards,ui.special,'toStorage');
+						player.addToExpansion(result.cards,'give',player).gaintag.add('residi');
 					}
 				},
 				intro:{
-					content:'cards',
-					onunmark:true,
+					content:'expansion',
+					markcount:'expansion',
+				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
 				},
 				group:'residi_push',
 				ai:{notemp:true},
@@ -2418,11 +2399,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
-					return event.player!=player&&player.getStorage('residi').length>0;
+					return event.player!=player&&player.getExpansions('residi').length>0;
 				},
 				content:function(){
 					'step 0'
-					player.chooseButton([get.prompt('residi',trigger.player),player.getStorage('residi')]).set('ai',function(button){
+					player.chooseButton([get.prompt('residi',trigger.player),player.getExpansions('residi')]).set('ai',function(button){
 						var player=_status.event.player;
 						var target=_status.event.getTrigger().player;
 						if(get.attitude(player,target)>-1) return 0;
@@ -2446,10 +2427,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var card=result.links[0];
 						var target=trigger.player;
 						player.logSkill('residi',target);
-						player.unmarkAuto('residi',result.links);
-						player.$throw(card,1000);
-						game.log(player,'将',card,'置入了弃牌堆');
-						game.cardsDiscard(card);
+						player.loseToDiscardpile(card);
 						var color=get.color(card,false);
 						if(!target.storage.residi2) target.storage.residi2=[];
 						target.storage.residi2.add(color);
@@ -3159,7 +3137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['boss_lvbu3','re_heqi','xin_lingtong'],
 				trigger:{
 					player:['loseAfter','phaseDiscardEnd'],
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
@@ -3263,10 +3241,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzaoxian:{
 				inherit:'zaoxian',
 				content:function(){
+					player.awakenSkill('olzaoxian');
 					player.loseMaxHp();
 					player.addSkill('jixi');
-					player.storage.olzaoxian=true;
-					player.awakenSkill('olzaoxian');
 					player.insertPhase();
 				}
 			},
@@ -3927,9 +3904,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=trigger.target;
 						player.logSkill('decadepojun',trigger.target);
 						target.addSkill('decadepojun2');
-						target.markAuto('decadepojun2',result.cards);
-						target.lose(result.cards,ui.special,'toStorage');
-						game.log(target,'失去了'+get.cnNumber(result.cards.length)+'张牌');;
+						target.addToExpansion(result.cards,'giveAuto',target).gaintag.add('decadepojun2');
 					}
 					else event.finish();
 					'step 2'
@@ -3950,11 +3925,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(draw)	event.draw=true;
 					'step 3'
 					if(event.equip&&result.links&&result.links.length){
-						trigger.target.unmarkAuto('decadepojun2',result.links);
-						trigger.target.$throw(result.links,1000);
-						game.log(player,'将',result.links,'置入了弃牌堆');
-						game.cardsDiscard(result.links);
-						if(!event.draw) game.delayx();
+						trigger.target.loseToDiscardpile(result.links);
 					}
 					if(event.draw) player.draw();
 				},
@@ -3970,24 +3941,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			decadepojun2:{
-				init:function(player,skill){
-					if(!player.storage[skill]) player.storage[skill]=[];
-				},
 				trigger:{global:'phaseEnd'},
 				forced:true,
 				popup:false,
 				charlotte:true,
 				filter:function(event,player){
-					return player.storage.decadepojun2&&player.storage.decadepojun2.length>0;
+					return player.getExpansions('decadepojun2').length>0;
 				},
 				content:function(){
-					game.log(player,'收回了'+get.cnNumber(player.gain(player.storage.decadepojun2,'draw','fromStorage').cards.length)+'张〖破军〗牌');
-					player.storage.decadepojun2.length=0;
+					'step 0'
+					var cards=player.getExpansions('decadepojun2');
+					player.gain(cards,'draw');
+					game.log(player,'收回了'+get.cnNumber(cards.length)+'张“破军”牌');
+					'step 1'
 					player.removeSkill('decadepojun2');
 				},
 				intro:{
-					onunmark:'throw',
-					content:'cardCount',
+					markcount:'expansion',
+					mark:function(dialog,storage,player){
+						var cards=player.getExpansions('decadepojun2');
+						if(player.isUnderControl(true)) dialog.addAuto(cards);
+						else return '共有'+get.cnNumber(cards.length)+'张牌';
+					},
 				},
 			},
 			hanzhan:{
@@ -4511,7 +4486,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['boss_lvbu3','re_heqi','re_lingtong'],
 				trigger:{
 					player:['loseAfter','phaseDiscardEnd'],
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
@@ -4699,18 +4674,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				audio:2,
 				filter:function(event,player){
-					return player.countCards('h')>0&&(_status.connectMode||player.countCards('h','sha')>0)&&!player.getStorage('rechunlao').length;
+					return player.countCards('h')>0&&(_status.connectMode||player.countCards('h','sha')>0)&&!player.getExpansions('rechunlao').length;
 				},
 				intro:{
-					content:'cards',
-					onunmark:function(storage,player){
-						if(storage&&storage.length){
-							player.$throw(storage,1000);
-							game.cardsDiscard(storage);
-							game.log(storage,'被置入了弃牌堆');
-						 storage.length=0;
-						}
-					},
+					content:'expansion',
+					markcount:'expansion',
+				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
 				},
 				content:function(){
 					'step 0'
@@ -4720,9 +4692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.logSkill('rechunlao');
-						player.markAuto('rechunlao',result.cards);
-						player.lose(result.cards,ui.special,'toStorage');
-						player.$give(result.cards,player,false);
+						player.addToExpansion('gain2',result.cards).gaintag.add('rechunlao');
 					}
 				},
 				ai:{
@@ -4733,7 +4703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rechunlao2:{
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return event.type=='dying'&&event.dying&&event.dying.hp<=0&&player.getStorage('rechunlao').length>0;
+					return event.type=='dying'&&event.dying&&event.dying.hp<=0&&player.getExpansions('rechunlao').length>0;
 				},
 				filterTarget:function(card,player,target){
 					return target==_status.event.dying;
@@ -4743,22 +4713,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				content:function(){
 					"step 0"
-					player.chooseCardButton(get.translation('rechunlao'),player.storage.rechunlao,true);
+					player.chooseCardButton(get.translation('rechunlao'),player.getExpansions('rechunlao'),true);
 					"step 1"
 					if(result.bool){
 						player.logSkill('rechunlao');
-						player.$throw(result.links);
-						player.storage.rechunlao.remove(result.links[0]);
-						game.cardsDiscard(result.links[0]);
-						player.syncStorage('rechunlao')
 						event.type='dying';
+						player.loseToDiscardpile(result.links);
 						target.useCard({name:'jiu',isCard:true},target);
-						if(!player.storage.rechunlao.length){
-							player.unmarkSkill('rechunlao');
-						}
-						else{
-							player.markSkill('rechunlao');
-						}
 						var nature=get.nature(result.links[0]);
 						if(nature=='fire') player.recover();
 						if(nature=='thunder') player.draw(2);
@@ -4767,7 +4728,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:6,
 					skillTagFilter:function(player){
-						return player.getStorage('rechunlao').length>0;
+						return player.getExpansions('rechunlao').length>0;
 					},
 					save:true,
 					result:{
@@ -5546,12 +5507,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var target=trigger.target;
-						player.logSkill('repojun',trigger.target);
+						player.logSkill('repojun',target);
 						target.addSkill('repojun2');
-						target.storage.repojun2.addArray(result.cards);
-						target.lose(result.cards,ui.special,'toStorage');
-						game.log(target,'失去了'+get.cnNumber(result.cards.length)+'张牌');
-						target.markSkill('repojun2');
+						target.addToExpansion('giveAuto',result.cards,target).gaintag.add('repojun2');
 					}
 				},
 				ai:{
@@ -5581,24 +5539,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			repojun2:{
-				init:function(player,skill){
-					if(!player.storage[skill]) player.storage[skill]=[];
-				},
 				trigger:{global:'phaseEnd'},
 				forced:true,
 				popup:false,
 				charlotte:true,
 				filter:function(event,player){
-					return player.storage.repojun2&&player.storage.repojun2.length>0;
+					return player.getExpansions('repojun2').length>0;
 				},
 				content:function(){
-					game.log(player,'收回了'+get.cnNumber(player.gain(player.storage.repojun2,'draw','fromStorage').cards.length)+'张〖破军〗牌');
-					player.storage.repojun2.length=0;
+					'step 0'
+					var cards=player.getExpansions('repojun2');
+					player.gain(cards,'draw');
+					game.log(player,'收回了'+get.cnNumber(cards.length)+'张“破军”牌');
+					'step 1'
 					player.removeSkill('repojun2');
 				},
 				intro:{
-					onunmark:'throw',
-					content:'cardCount',
+					markcount:'expansion',
+					mark:function(dialog,storage,player){
+						var cards=player.getExpansions('repojun2');
+						if(player.isUnderControl(true)) dialog.addAuto(cards);
+						else return '共有'+get.cnNumber(cards.length)+'张牌';
+					},
 				},
 			},
 			reganlu:{
@@ -8845,27 +8807,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			reqianxun:{
-				init:function(player){
-					if(!player.storage.reqianxun2) player.storage.reqianxun2=[];
-				},
 				audio:2,
-				trigger:{target:'useCardToBegin',player:'judgeBefore'},
+				trigger:{
+					target:'useCardToBegin',
+					player:'judgeBefore',
+				},
 				filter:function(event,player){
 					if(player.countCards('h')==0) return false;
-					if(event.parent.name=='phaseJudge'){
-						if(lib.skill.reqianxun.trigger.player=='judgeBefore'){
-							return true;
-						}
-						return event.result&&event.result.judge!=0;
+					if(event.getParent().name=='phaseJudge'){
+						return true;
 					}
 					if(event.name=='judge') return false;
 					if(event.targets&&event.targets.length>1) return false;
 					if(event.card&&get.type(event.card)=='trick'&&event.player!=player) return true;
 				},
 				content:function(){
-					player.storage.reqianxun2=player.storage.reqianxun2.concat(player.getCards('h'));
-					game.addVideo('storage',player,['reqianxun2',get.cardsInfo(player.storage.reqianxun2),'cards']);
-					player.lose(player.getCards('h'),ui.special,'toStorage');
+					var cards=player.getCards('h');
+					player.addToExpansion(cards,'giveAuto',player).gaintag.add('reqianxun2');
 					player.addSkill('reqianxun2');
 				},
 				ai:{
@@ -8893,29 +8851,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:false,
 				content:function(){
-					player.gain(player.storage.reqianxun2,'fromStorage','draw');
-					player.storage.reqianxun2.length=0;
+					var cards=player.getExpansions('reqianxun2');
+					if(cards.length) player.gain(cards,'draw');
 					player.removeSkill('reqianxun2');
-					game.addVideo('storage',player,['reqianxun2',get.cardsInfo(player.storage.reqianxun2),'cards']);
 				},
-				mark:true,
 				intro:{
-					content:'cardCount',
-					onunmark:function(storage,player){
-						if(storage&&storage.length){
-							player.$throw(storage,1000);
-							game.cardsDiscard(storage);
-							game.log(storage,'被置入了弃牌堆');
-							player.storage.reqianxun2.length=0;
-						}
+					mark:function(dialog,storage,player){
+						var cards=player.getExpansions('reqianxun2');
+						if(player.isUnderControl(true)) dialog.addAuto(cards);
+						else return '共有'+get.cnNumber(cards.length)+'张牌';
 					},
+					markcount:'expansion',
 				}
 			},
 			relianying:{
 				audio:2,
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				direct:true,
 				filter:function(event,player){
@@ -9924,7 +9877,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				frequent:true,
 				filter:function(event,player){
@@ -9940,40 +9893,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				callback:function(){
 					'step 0'
-						if(event.judgeResult.suit=='heart'){
-							player.gain(card,'gain2');
-							event.finish();
-						}
-						else if(get.mode()=='guozhan'){
-							player.chooseBool('是否将'+get.translation(card)+'作为【田】置于武将牌上？').set('frequentSkill','retuntian').ai=function(){
-								return true;
-							};
-						}
-						else event.directbool=true;
-						'step 1'
-						if(!result.bool&&!event.directbool){
-							//game.cardsDiscard(card);
-							return;
+					if(event.judgeResult.suit=='heart'){
+						player.gain(card,'gain2');
+						event.finish();
+					}
+					else if(get.mode()=='guozhan'){
+						player.chooseBool('是否将'+get.translation(card)+'作为【田】置于武将牌上？').set('frequentSkill','retuntian').ai=function(){
+							return true;
 						};
-						event.node=event.judgeResult.node;
-						//event.trigger("addCardToStorage");
-						//event.card.fix();
-						player.storage.tuntian.push(event.card);
-						//event.card.goto(ui.special);
-						game.cardsGotoSpecial(card);
-						event.node.moveDelete(player);
-						game.broadcast(function(cardid,player){
-							var node=lib.cardOL[cardid];
-							if(node){
-								node.moveDelete(player);
-							}
-						},event.node.cardid,player);
-						game.addVideo('gain2',player,get.cardsInfo([event.node]));
-						player.markSkill('tuntian');
-						game.addVideo('storage',player,['tuntian',get.cardsInfo(player.storage.tuntian),'cards']);
-				},
-				init:function(player){
-					if(!player.storage.tuntian) player.storage.tuntian=[];
+					}
+					else event.directbool=true;
+					'step 1'
+					if(!result.bool&&!event.directbool){
+						//game.cardsDiscard(card);
+						return;
+					};
+					player.addToExpansion(card,'gain2').gaintag.add('tuntian');
 				},
 				group:'tuntian_dist',
 				locked:false,

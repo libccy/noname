@@ -1016,12 +1016,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.countCards('he')>0;
 				},
-				toStorage:true,
 				discard:false,
+				lose:false,
 				content:function(){
 					player.awakenSkill('zhongyi');
 					player.addTempSkill('zhongyi2','roundStart');
-					player.markAuto('zhongyi2',cards);
+					player.addToExpansion(player,'give',cards).gaintag.add('zhongyi2');
 				},
 			},
 			zhongyi2:{
@@ -1033,7 +1033,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.getParent().name=='sha'&&event.source&&event.source.isFriendOf(player);
 				},
 				content:function(){trigger.num++},
-				intro:{content:'cards',onunmark:'throw'},
+				intro:{content:'expansion',markcount:'expansion'},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
 			},
 			paoxiao:{
 				audio:2,
@@ -1789,7 +1793,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				frequent:true,
 				filter:function(event,player){
@@ -1820,7 +1824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['sp_sunshangxiang','re_sunshangxiang'],
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				frequent:true,
 				filter:function(event,player){

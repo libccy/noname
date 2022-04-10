@@ -85,7 +85,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'qimei',
 						charlotte:true,
 						forced:true,
-						trigger:{global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','loseAfter','gainAfter']},
+						trigger:{global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','loseAfter','gainAfter','addToExpansionAfter']},
 						logTarget:function(event,player){
 							return player.storage.qimei_draw;
 						},
@@ -300,7 +300,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.card.name=='sha'&&event.card.isCard&&event.getParent(2).name!='maihuo_effect'&&
 					event.cards.filterInD().length>0&&event.targets.length==1&&
-					event.player.isIn()&&(!event.player.storage.maihuo_effect||!event.player.storage.maihuo_effect.length);
+					event.player.isIn()&&(!event.player.getExpansions('maihuo_effect').length);
 				},
 				prompt2:function(event){
 					return '令'+get.translation(event.card)+'暂时对你无效';
@@ -311,8 +311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.excluded.add(player);
 					var target=trigger.player,cards=trigger.cards.filterInD();
-					game.cardsGotoSpecial(cards);
-					target.markAuto('maihuo_effect',cards);
+					target.addToExpansion('gain2',cards).gaintag.add('maihuo_effect');
 					target.storage.maihuo_target=player;
 					target.addSkill('maihuo_effect')
 				},
@@ -323,24 +322,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						charlotte:true,
 						filter:function(event,player){
-							return player.storage.maihuo_effect&&player.storage.maihuo_effect.length>0;
+							return player.getExpansions('maihuo_effect').length>0;
 						},
 						content:function(){
-							var card=player.storage.maihuo_effect[0];
+							'step 0'
+							var cards=player.getExpansions('maihuo_effect'),card=cards[0];
 							if(card.name!='sha') card=get.autoViewAs({
 								name:'sha',
 								isCard:true,
-							},player.storage.maihuo_effect);
+							},cards);
 							var target=player.storage.maihuo_target;
 							if(target.isIn()&&player.canUse(card,target,null,true)){
-								player.useCard(card,target,player.storage.maihuo_effect);
-								delete player.storage.maihuo_effect;
+								player.useCard(card,target,cards);
 							}
+							else event.finish();
+							'step 1'
 							player.removeSkill('maihuo_effect');
 						},
 						intro:{
-							content:'cards',
-							onunmark:'throw',
+							content:'expansion',
+							markcount:'expansion',
+						},
+						onremove:function(player,skill){
+							var cards=player.getExpansions(skill);
+							if(cards.length) player.loseToDiscardpile(cards);
 						},
 						ai:{threaten:1.05},
 					},
@@ -1024,7 +1029,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'zhongyun',
 				trigger:{
 					player:['loseAfter','gainAfter'],
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				forced:true,
 				filter:function(event,player){
@@ -1169,7 +1174,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'chexuan',
 						trigger:{
 							player:'loseAfter',
-							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 						},
 						frequent:true,
 						filter:function(event,player){
@@ -1333,13 +1338,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'source',
 				content:function(){
 					'step 0'
-					var cards=player.getStorage('qiaoyan');
+					var cards=player.getExpansions('qiaoyan');
 					if(cards.length){
 						var source=trigger.source;
-						player.$give(cards,source,false);
-						source.gain(cards,'log');
-						player.unmarkAuto('qiaoyan',cards);
-						event.goto(3);
+						source.gain(cards,player,'give');
+						event.finish();
 					}
 					else{
 						trigger.cancel();
@@ -1353,17 +1356,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool&&result.cards&&result.cards.length){
 						var cards=result.cards;
-						player.lose(cards,ui.special,'visible','toStorage');
-						player.$give(cards,player,false);
-						player.markAuto('qiaoyan',cards);
-						game.log(player,'将',cards,'放在了武将牌上');
+						player.addToExpansion(cards,player,'give').gaintag.add('qiaoyan');
 					}
 					event.finish();
-					'step 3'
-					game.delayx();
 				},
 				marktext:'珠',
-				intro:{content:'cards',onunmark:'throw'},
+				intro:{content:'expansion',markcount:'expansion'},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
 				ai:{
 					filterDamage:true,
 					skillTagFilter:function(player,tag,arg){
@@ -1380,11 +1382,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				locked:true,
 				filter:function(event,player){
-					return player.storage.qiaoyan&&player.storage.qiaoyan.length>0;
+					return player.getExpansions('qiaoyan').length>0;
 				},
 				content:function(){
 					'step 0'
-					event.cards=player.storage.qiaoyan;
+					event.cards=player.getExpansions('qiaoyan');
 					player.chooseTarget(true,'请选择【献珠】的目标','令一名角色获得'+get.translation(event.cards)+'。若该角色不为你自己，则你令其视为对其攻击范围内的另一名角色使用【杀】').set('ai',function(target){
 						var player=_status.event.player;
 						var eff=get.sgn(get.attitude(player,target))*get.value(_status.event.getParent().cards[0],target);
@@ -1400,13 +1402,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.logSkill('xianzhu',target);
-						player.$give(cards,target,false);
-						target.gain(cards,'log');
-						player.unmarkAuto('qiaoyan',cards);
+						target.gain(cards,player,'give');
 					}
 					else event.finish();
 					'step 2'
-					game.delayx();
 					if(player!=target&&target.isIn()&&player.isIn()&&game.hasPlayer(function(current){
 						return current!=target&&target.inRange(current)&&target.canUse('sha',current);
 					})){
@@ -2175,7 +2174,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				global:'zhaoran3',
 				trigger:{
 					player:'loseAfter',
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				forced:true,
 				charlotte:true,

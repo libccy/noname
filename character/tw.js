@@ -790,7 +790,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				trigger:{
 					player:['loseAfter','gainAfter'],
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
@@ -1550,7 +1550,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						cards:cards,
 					});
 					'step 2'
-					target.removeSkill('twrangyi');
+					target.removeSkill('twrangyi2');
 					if(!result.bool) target.damage('nocard');
 				},
 				ai:{
@@ -1573,6 +1573,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				filter:function(event,player){
 					var evt=event.getParent(2);
 					return evt.name=='twrangyi'&&evt.player.isAlive()&&player.countCards('h',function(card){
@@ -1583,6 +1584,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=player.getCards('h',function(card){
 						return card.hasGaintag('twrangyi');
 					});
+					game.delayx();
 					trigger.getParent(2).player.gain(cards,player,'giveAuto');
 				},
 				onremove:function(player){
