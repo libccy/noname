@@ -59,9 +59,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var evtx=event.getParent();
 					event.targets=targets.filter(function(target){
-						return target.getHistory('lose',function(evt){
-							return evt.getParent(3).name==''&&evt.getParent(4)==evtx;
-						})
+						return target.hasHistory('lose',function(evt){
+							return evt.getParent(3).name=='dz_mantianguohai'&&evt.getParent(4)==evtx;
+						});
 					});
 					if(!event.targets.length||!player.countCards('he')) event.finish();
 					'step 1'

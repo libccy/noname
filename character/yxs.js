@@ -393,6 +393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 8-get.value(card);
 				},
 				discard:false,
+				lose:false,
 				filter:function(event,player){
 					if(player.countCards('h',{suit:'heart'})){
 						return true;

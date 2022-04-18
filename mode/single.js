@@ -355,12 +355,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).set('dialog',event.videoId);
 					"step 4"
 					game.me.init(result.links[0]);
+					_status.characterlist.remove(result.links[0]);
 					game.addRecentCharacter(result.links[0]);
 					game.me.chooseButton(true).set('ai',function(button){
 						return Math.random();
 					}).set('dialog',event.videoId);
 					"step 5"
 					game.me.next.init(result.links[0]);
+					_status.characterlist.remove(result.links[0]);
 					game.addRecentCharacter(result.links[0]);
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
@@ -583,6 +585,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					game.broadcastAll(function(player,character,id){
 						player.init(character);
+						_status.characterlist.remove(character);
 						if(player==game.me) game.addRecentCharacter(character);
 					},game.zhu,result.links[0]);
 					game.fan.chooseButton(true).set('ai',function(button){
@@ -596,6 +599,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							dialog.close();
 						}
 						player.init(character);
+						_status.characterlist.remove(character);
 						if(player==game.me) game.addRecentCharacter(character);
 						setTimeout(function(){
 							ui.arena.classList.remove('choose-character');

@@ -2763,9 +2763,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			moxie:{
-				trigger:{player:'duBegin'},
+				trigger:{player:'loseHpBegin'},
 				forced:true,
+				filter:(event)=>event.type=='du',
 				content:function(){
+					trigger.cancel();
 					player.draw(2);
 				},
 				ai:{
@@ -9789,7 +9791,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuhua2:'腐化',
 			fuhua_info:'出牌阶段，你可以将一张毒交给一名没有魔血技能的其他角色，该角色选择一项：1. 获得技能魔血，此后每个结束阶段需交给你一张手牌；2. 视为你对其使用一张决斗',
 			moxie:'魔血',
-			moxie_info:'锁定技，你失去毒时不流失体力；你使用毒时摸两张牌；结束阶段，你将一张随机手牌转化为毒',
+			moxie_info:'锁定技，当你因【毒】失去体力时，你改为摸两张牌；结束阶段，你将一张随机手牌转化为毒。',
 			gfuhun:'附魂',
 			gfuhun_info:'结束阶段，若你未翻面，你可以和一名其他角色拼点，若你赢，你将武将牌翻至背面，该角色进入混乱状态直到下一回合结束',
 			hlongyi:'龙裔',

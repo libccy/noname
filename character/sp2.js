@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
-			re_sunyi:['male','wu',4,['syjiqiao','syxiongyi'],['unseen']],
+			re_sunyi:['male','wu',5,['syjiqiao','syxiongyi']],
 			re_pangdegong:['male','qun',3,['heqia','yinyi']],
 			wangtao:['female','shu',3,['huguan','yaopei']],
 			wangyue:['female','shu',3,['huguan','mingluan']],
@@ -158,7 +158,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							var cards=player.getExpansions('syjiqiao')
-							player.chooseButton(['激峭：选择获得一张牌',cards],true);
+							player.chooseButton(['激峭：选择获得一张牌',cards],true).set('ai',function(button){
+								var player=_status.event.player;
+								var color=get.color(button.link),cards=player.getExpansions('syjiqiao');
+								var num1=cards.filter((card)=>get.color(card)==color),num2=cards.length-num1;
+								if(num1>=num2) return get.value(button.link);
+								return 0;
+							});
 							'step 1'
 							if(result.bool){
 								player.gain(result.links,'gain2');
@@ -209,6 +215,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(hp>0) player.recover(hp);
 				},
 				ai:{
+					order:1,
 					save:true,
 					skillTagFilter:function(player,arg,target){
 						return player==target;
@@ -4063,7 +4070,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseUseEnd'},
 				forced:true,
 				filter:function(event,player){
-					if(player==event.player) return false;
+					if(player==event.player||!player.countCards('he')) return false;
 					var map={};
 					var list=event.player.getHistory('useCard',function(evt){
 						var evt2=evt.getParent('phaseUse');
@@ -4075,10 +4082,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else return true;
 					}
 				},
-				frequent:true,
-				logTarget:'player',
+				direct:true,
 				content:function(){
-					player.draw();
+					'step 0'
+					player.chooseToDiscard('he',get.prompt('langmie'),'弃置一张牌并摸两张牌').set('ai',(card)=>8-get.value(card)).logSkill='langmie';
+					'step 1'
+					if(result.bool) player.draw(2);
 				},
 				group:'langmie_damage',
 			},
@@ -4842,6 +4851,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
+				zhuanhuanji:true,
 				filter:function(event,player){
 					if(player.storage.bazhan){
 						return game.hasPlayer(function(current){
@@ -12554,7 +12564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanwei:'段煨',
 			langmie:'狼灭',
 			langmie_damage:'狼灭',
-			langmie_info:'其他角色的出牌阶段结束时，若其本阶段内使用过的牌中有类型相同的牌，则你可以摸一张牌；其他角色的结束阶段开始时，若其本回合内造成的伤害大于1，则你可以弃置一张牌并对其造成1点伤害。',
+			langmie_info:'其他角色的出牌阶段结束时，若其本阶段内使用过的牌中有类型相同的牌，则你可以弃置一张牌并摸两张牌；其他角色的结束阶段开始时，若其本回合内造成的伤害大于1，则你可以弃置一张牌并对其造成1点伤害。',
 			zhangheng:'张横',
 			dangzai:'挡灾',
 			dangzai_info:'出牌阶段开始时，你可将一名其他角色判定区内的一张牌移动至你的判定区内。',

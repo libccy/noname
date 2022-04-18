@@ -2847,7 +2847,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							cards.sort(function(a,b){
 								return get.useful(a)-get.useful(b);
 							});
-							cards2=cards.splice(0,player.storage.bizhuan.length);
+							cards2=cards.splice(0,player.getExpansions('bizhuan').length);
 						}
 						return [cards2,cards];
 					});
@@ -5558,7 +5558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['xin_chengpu'],
 				filter:function(event,player){
-					return player.countCards('h')>0&&(_status.connectMode||player.countCards('h','sha')>0)&&!player.getExpansion('chunlao').length;
+					return player.countCards('h')>0&&(_status.connectMode||player.countCards('h','sha')>0)&&!player.getExpansions('chunlao').length;
 				},
 				intro:{
 					content:'expansion',
@@ -9128,8 +9128,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					player.logSkill('rechanhui',event.target);
-					event.target.chooseCard('交给'+get.translation(player)+'一张手牌，或成为'+
-					get.translation(trigger.card)+'的额外目标').set('ai',function(card){
+					event.target.chooseCard('交给'+get.translation(player)+'一张牌，或成为'+
+					get.translation(trigger.card)+'的额外目标','he').set('ai',function(card){
 						return 5-get.value(card);
 					});
 					"step 3"

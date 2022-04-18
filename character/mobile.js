@@ -6781,12 +6781,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			muzhen1:{},
 			muzhen2:{},
+			sheyi2:{charlotte:true},
 			sheyi:{
 				audio:2,
 				trigger:{global:'damageBegin4'},
 				direct:true,
 				filter:function(event,player){
-					return player!=event.player&&event.player.hp<player.hp&&player.countCards('he')>=Math.max(1,player.hp);
+					return !player.hasSkill('sheyi2')&&player!=event.player&&event.player.hp<player.hp&&player.countCards('he')>=Math.max(1,player.hp);
 				},
 				content:function(){
 					'step 0'
@@ -6806,6 +6807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=trigger.player;
 						player.logSkill('sheyi',target);
+						player.addTempSkill('sheyi2','roundStart');
 						target.gain(result.cards,player,'giveAuto');
 						trigger.cancel();
 					}
@@ -16013,7 +16015,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejieyue_info:'结束阶段开始时，你可以将一张牌交给一名其他角色。然后其选择一项：令你摸三张牌：或其保留一张手牌和装备区的牌，然后弃置其余的牌。',
 			caizhenji:'蔡贞姬',
 			sheyi:'舍裔',
-			sheyi_info:'当有体力值小于你的其他角色受到伤害时，你可以交给其至少X张牌并防止此伤害（X为你的体力值）。',
+			sheyi_info:'每轮限一次。当有体力值小于你的其他角色受到伤害时，你可以交给其至少X张牌并防止此伤害（X为你的体力值）。',
 			tianyin:'天音',
 			tianyin_info:'锁定技，结束阶段开始时，你从牌堆中获得每种本回合未使用过的类型的牌各一张。',
 			xiangchong:'向宠',
@@ -16205,7 +16207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yiyong_info:'当你受到其他角色造成的渠道为【杀】的伤害后，若你的装备区内有武器牌，则你可以获得此【杀】对应的所有实体牌，然后将这些牌当做【杀】对伤害来源使用（无距离限制）。若其装备区内没有武器牌，则此伤害+1。',
 			shanxie:'擅械',
 			shanxie_info:'①出牌阶段限一次，你可选择一项：⒈从牌堆中获得一张武器牌。⒉获得其装备区内的一张武器牌并使用，然后其将一张手牌当做【杀】对你使用。②当其他角色使用【闪】响应你使用的【杀】时，若此【闪】没有点数或点数不大于你攻击范围的二倍，则你令此【闪】无效。',
-			sunyi:'孙翊',
+			sunyi:'手杀孙翊',
 			zaoli:'躁厉',
 			zaoli_info:'锁定技。①你不能于回合内使用你手牌中不为本回合获得的牌。②当你使用或打出手牌时，你获得一个“厉”（至多4个）。③回合开始时，若你有“厉”，则你移去所有“厉”并弃置任意张牌，然后摸X+Y张牌。若X大于2，你失去1点体力（X为你移去的标记数，Y为你弃置的牌数）。',
 			sp_gaolan:'手杀高览',

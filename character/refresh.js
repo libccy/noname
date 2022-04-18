@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_standard:["re_caocao","re_simayi","re_guojia","re_lidian","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_xushu","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong",'re_gongsunzan'],
 				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','ol_weiyan','ol_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
-				refresh_lin:['re_menghuo','ol_sunjian','re_caopi','re_xuhuang','ol_dongzhuo','ol_zhurong','re_jiaxu','ol_lusu'],
+				refresh_lin:['re_menghuo','ol_sunjian','re_caopi','ol_xuhuang','ol_dongzhuo','ol_zhurong','re_jiaxu','ol_lusu'],
 				refresh_shan:['ol_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai'],
 				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua'],
 				refresh_yijiang2:['old_madai','re_wangyi','guanzhang','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
@@ -68,7 +68,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhangyi:['male','shu',5,['rewurong','reshizhi']],
 			re_wuguotai:['female','wu',3,['reganlu','buyi']],
 			re_gaoshun:['male','qun',4,['rexianzhen','rejinjiu']],
-			re_caocao:['male','wei',4,['new_rejianxiong','hujia'],['zhu']],
+			re_caocao:['male','wei',4,['new_rejianxiong','rehujia'],['zhu']],
 			re_simayi:['male','wei',3,['refankui','reguicai']],
 			re_guojia:['male','wei',3,['tiandu','new_reyiji']],
 			re_lidian:['male','wei',3,['xunxun','wangxi']],
@@ -108,7 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_xiaoqiao:['female','wu',3,['oltianxiang','olhongyan','piaoling']],
 			zhoutai:['male','wu',4,['buqu','fenji']],
 			ol_pangde:['male','qun',4,['mashu','rejianchu']],
-			re_xuhuang:['male','wei',4,['duanliang','jiezi']],
+			ol_xuhuang:['male','wei',4,['olduanliang','oljiezi']],
 			ol_sp_zhugeliang:["male","shu",3,["bazhen","rehuoji","rekanpo","cangzhuo"],[]],
 			re_xunyu:["male","wei",3,["quhu","rejieming"],[]],
 			re_dianwei:["male","wei",4,["reqiangxi"],[]],
@@ -141,6 +141,123 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			//徐晃
+			olduanliang:{
+				audio:2,
+				enable:'chooseToUse',
+				filterCard:function(card){
+					 return (get.type2(card)!='trick'&&get.color(card)=='black');
+				},
+				filter:function(event,player){
+					return player.hasCard((card)=>(get.type2(card)!='trick'&&get.color(card)=='black'),'hes');
+				},
+				position:'hes',
+				viewAs:{name:'bingliang'},
+				prompt:'将一张黑色非锦囊牌当做兵粮寸断使用',
+				check:function(card){return 6-get.value(card)},
+				ai:{
+					order:9
+				},
+				mod:{
+					targetInRange:function(card,player,target){
+						if(card.name=='bingliang'&&!player.getStat('damage')) return true;
+					},
+				},
+			},
+			oljiezi:{
+				audio:2,
+				trigger:{global:['phaseDrawSkipped','phaseDrawCancelled']},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('oljiezi'),'你可选择一名角色。若该角色：手牌数为全场最少且没有“辎”，则其获得一枚“辎”。否则其摸一张牌。').set('ai',function(target){
+						var att=get.attitude(_status.event.player,target);
+						if(!target.hasMark('oljiezi')&&target.isMinHandcard()) att*=2;
+						return att;
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('oljiezi',target);
+						if(!target.hasMark('oljiezi')&&target.isMinHandcard()) target.addMark('oljiezi',1);
+						else target.draw();
+					}
+				},
+				marktext:'辎',
+				intro:{
+					name2:'辎',
+					content:'mark',
+					onunmark:true,
+				},
+				group:'oljiezi_extra',
+				subSkill:{
+					extra:{
+						audio:'oljiezi',
+						trigger:{global:'phaseDrawAfter'},
+						forced:true,
+						filter:function(event,player){
+							return event.player.hasMark('oljiezi');
+						},
+						logTarget:'player',
+						content:function(){
+							var next=trigger.player.phaseDraw();
+							event.next.remove(next);
+							trigger.getParent().next.add(next);
+							trigger.player.removeMark('oljiezi',trigger.player.countMark('oljiezi'));
+						},
+					},
+				},
+			},
+			//界护驾
+			rehujia:{
+				audio:'hujia',
+				inherit:'hujia',
+				filter:function(event,player){
+					if(event.responded) return false;
+					if(player.storage.hujiaing) return false;
+					if(!player.hasZhuSkill('rehujia')) return false;
+					if(!event.filterCard({name:'shan'},player,event)) return false;
+					return game.hasPlayer(function(current){
+						return current!=player&&current.group=='wei';
+					});
+				},
+				ai:{
+					respondShan:true,
+					skillTagFilter:function(player){
+						if(player.storage.hujiaing) return false;
+						if(!player.hasZhuSkill('rehujia')) return false;
+						return game.hasPlayer(function(current){
+							return current!=player&&current.group=='wei';
+						});
+					},
+				},
+				group:'rehujia_draw',
+				subSkill:{
+					draw:{
+						trigger:{global:['useCard','respond']},
+						usable:1,
+						direct:true,
+						filter:function(event,player){
+							return event.card.name=='shan'&&event.player!=player&&event.player.group=='wei'&&event.player.isIn()&&
+								event.player!=_status.currentPhase&&player.hasZhuSkill('rehujia');
+						},
+						content:function(){
+							'step 0'
+							trigger.player.chooseBool('护驾：是否令'+get.translation(player)+'摸一张牌？').set('ai',function(){
+								var evt=_status.event;
+								return get.attitude(evt.player,evt.getParent().player)>0;
+							});
+							'step 1'
+							if(result.bool){
+								player.logSkill('rehujia');
+								trigger.player.line(player,'fire');
+								player.draw();
+							}
+							else player.storage.counttrigger.rehujia_draw--;
+						},
+					},
+				},
+			},
 			//夏侯氏
 			reqiaoshi:{
 				audio:2,
@@ -2158,16 +2275,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								order:10,
 								result:{
 									target:function(player,target){
-	  							var num=player.getExpansions('gzquanji').length-1;
-	  							if(num==0){
-	  								if(target.countCards('h')>player.countCards('h')) return get.damageEffect(target,player,target);
-	  								return 0;
-	  							}
-	  							if(target!=player) return 0;
-	  							if(player.needsToDiscard()&&!player.getEquip('zhuge')&&!player.hasSkill('new_paoxiao')) return 0;
-	  							return 1;
-	  						}
-	  					},
+										var num=player.getExpansions('gzquanji').length-1;
+										if(num==0){
+											if(target.countCards('h')>player.countCards('h')) return get.damageEffect(target,player,target);
+											return 0;
+										}
+										if(target!=player) return 0;
+										if(player.needsToDiscard()&&!player.getEquip('zhuge')&&!player.hasSkill('new_paoxiao')) return 0;
+										return 1;
+									}
+								},
 							},
 						}
 					},
@@ -2667,7 +2784,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'reenyuan',
 				trigger:{player:'gainEnd'},
 				filter:function(event,player){
-					if(!event.source||event.source==player||!event.source.isIn()) return false;
+					if(!event.source||event.source==player||!event.source.isIn()||event.cards.length<2) return false;
 					var evt=event.getl(event.source);
 					return evt&&evt.cards2&&evt.cards2.length>1;
 				},
@@ -3757,11 +3874,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.count=trigger.num;
 					'step 1'
 					event.count--;
-					trigger.source.chooseBool('是否对'+get.translation(player)+'发动【暴虐】？').set('choice',get.attitude(trigger.source,player)>0);
+					player.chooseBool('是否发动【暴虐】？').set('choice',get.attitude(player,player)>0);
 					'step 2'
 					if(result.bool){
-						player.logSkill('olbaonue');
-						trigger.source.line(player,'green')
+						player.logSkill('olbaonue',trigger.source);
 						player.judge(function(card){
 							if(get.suit(card)=='spade') return 4;
 							return 0;
@@ -5848,6 +5964,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olhunzi:{
 				audio:2,
+				audioname:['re_sunyi'],
 				inherit:'hunzi',
 				content:function(){
 					player.loseMaxHp();
@@ -10607,7 +10724,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezongshi_info:'锁定技，你的手牌上限+X（X为势力数）。准备阶段，若你的手牌数大于体力值，则你本回合内使用【杀】无次数限制。',
 			ol_dongzhuo:'界董卓',
 			olbaonue:'暴虐',
-			olbaonue_info:'主公技，其他群雄角色造成1点伤害后，其可进行判定，若为♠，你回复1点体力并获得判定牌。',
+			olbaonue_info:'主公技，其他群雄角色造成1点伤害后，你可进行判定，若为♠，你回复1点体力并获得判定牌。',
 			re_panzhangmazhong:'界潘璋马忠',
 			re_hanhaoshihuan:'界韩浩史涣',
 			re_bulianshi:'界步练师',
@@ -10778,6 +10895,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyanyu:'燕语',
 			reyanyu2:'燕语',
 			reyanyu_info:'①出牌阶段，你可以重铸【杀】。②出牌阶段结束时，你可以令一名男性角色摸X张牌（X为你本阶段内发动过〖燕语①〗的次数且至多为3）。',
+			rehujia:'护驾',
+			rehujia_info:'主公技。①当你需要使用或打出一张【闪】时，你可以令其他魏势力角色选择是否打出一张【闪】。若有角色响应，则你视为使用或打出了一张【闪】。②每回合限一次。当有魏势力角色于回合外使用或打出【闪】时，其可以令你摸一张牌。',
+			ol_xuhuang:'界徐晃',
+			olduanliang:'断粮',
+			olduanliang_info:'你可以将一张黑色非锦囊牌当做【兵粮寸断】使用。若你于当前回合内未造成过伤害，则你使用【兵粮寸断】无距离限制。',
+			oljiezi:'截辎',
+			oljiezi_info:'①当有角色跳过摸牌阶段后，你可选择一名角色。若该角色：手牌数为全场最少且没有“辎”，则其获得一枚“辎”。否则其摸一张牌。②一名角色的摸牌阶段结束时，若其有“辎”，则你移去其“辎”，然后令其获得一个额外的摸牌阶段。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

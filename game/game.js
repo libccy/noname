@@ -11044,13 +11044,13 @@
 					}
 				 var evt=event.relatedEvent||event.getParent();
 					if(!evt.orderingCards) evt.orderingCards=[];
-					if(!event.noOrdering&&!event.cardsOrdered){
-						event.cardsOrdered=true;
+					if(!evt.noOrdering&&!evt.cardsOrdered){
+						evt.cardsOrdered=true;
 						var next=game.createEvent('orderingDiscard',false,evt.getParent());
 						next.relatedEvent=evt;
 						next.setContent('orderingDiscard');
 					}
-					if(!event.noOrdering) evt.orderingCards.addArray(cards);
+					if(!evt.noOrdering) evt.orderingCards.addArray(cards);
 				},
 				cardsGotoSpecial:function(){
 					game.getGlobalHistory().cardMove.push(event);
@@ -16029,15 +16029,14 @@
 					if(event.position==ui.ordering){
 						var evt=event.relatedEvent||event.getParent();
 						if(!evt.orderingCards)	evt.orderingCards=[];
-						if(!event.noOrdering&&!event.cardsOrdered){
-							event.cardsOrdered=true;
+						if(!evt.noOrdering&&!evt.cardsOrdered){
+							evt.cardsOrdered=true;
 							var next=game.createEvent('orderingDiscard',false,evt.getParent());
 							next.relatedEvent=evt;
 							next.setContent('orderingDiscard');
 						}
-						if(!event.noOrdering){
+						if(!evt.noOrdering){
 							evt.orderingCards.addArray(cards);
-							evt.orderingCards.addArray(ss);
 						}
 					}
 					else if(event.position==ui.cardPile){
@@ -16760,8 +16759,14 @@
 						if(player.getTopCards) cardj=player.getTopCards()[0];
 						else cardj=get.cards()[0];
 					}
-					var nextj=game.cardsGotoOrdering(cardj);
-					if(event.position!=ui.discardPile) nextj.noOrdering=true;
+					var owner=get.owner(cardj);
+					if(owner){
+						owner.lose(cardj,'visible',ui.ordering);
+					}
+					else{
+						var nextj=game.cardsGotoOrdering(cardj);
+						if(event.position!=ui.discardPile) nextj.noOrdering=true;
+					}
 					player.judging.unshift(cardj);
 					game.addVideo('judge1',player,[get.cardInfo(player.judging[0]),judgestr,event.videoId]);
 					game.broadcastAll(function(player,card,str,id,cardid){

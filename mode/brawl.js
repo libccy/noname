@@ -1155,7 +1155,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=[
 						['re_yuanshao','re_lidian'],
 						['zhangliao','sunquan'],
-						['xin_fazheng','lvfan'],
+						['xin_fazheng','sp_lvfan'],
 						['sunjian','lvbu'],
 						['jin_simashi','re_weiyan'],
 						['guanyu','sunce'],

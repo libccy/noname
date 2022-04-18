@@ -1149,6 +1149,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				intro:{
 					name:'诏书',
 					mark:function(dialog,content,player){
+						var content=player.getExpansions('zhaoshu_skill');
 						dialog.add(content);
 						dialog.addText('<br><li>与你势力相同的角色的出牌阶段限一次，其可以将一张手牌（小势力角色改为至多两张）置于【诏书】上，称为“应”。<br><li>出牌阶段限一次，若你的“应”中包含至少四种花色，则你可以发动“锦囊召唤”，将所有“应”置入弃牌堆，然后随机获得一张未加入游戏的势力锦囊牌。',false);
 						var cards=player.getExpansions('zhaoshu_cards');

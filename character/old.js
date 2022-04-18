@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			old:{
 				old_standard:['ol_yuanshu'],
-				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao","pangde"],
+				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao","pangde","xuhuang"],
 				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong"],
 				old_yijiang1:["masu","xushu","xin_yujin","old_xusheng","old_lingtong","fazheng"],
 				old_yijiang2:["old_zhonghui"],
@@ -19,6 +19,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			xuhuang:['male','wei',4,['gzduanliang']],
 			junk_simayi:['male','jin',3,['buchen','smyyingshi','xiongzhi','quanbian'],['hiddenSkill']],
 			fazheng:['male','shu',3,['enyuan','xuanhuo']],
 			ol_yuanshu:['male','qun',4,['wangzun','tongji']],

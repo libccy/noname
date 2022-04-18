@@ -8217,7 +8217,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(list.length==1){
 						target.storage.gzxiongsuan_restore=list[0];
-						target.addTempSkill('gzxiongsuan_restore','phaseZhunbeiBegin');
+						target.addTempSkill('gzxiongsuan_restore');
 						event.finish();
 					}
 					else if(list.length>1){
@@ -8232,9 +8232,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					restore:{
-						trigger:{global:'phaseAfter'},
-						silent:true,
+						trigger:{global:'phaseEnd'},
+						forced:true,
+						popup:false,
 						charlotte:true,
+						onremove:true,
 						content:function(){
 							player.restoreSkill(player.storage.gzxiongsuan_restore);
 						}

@@ -96,6 +96,7 @@ window.noname_character_rank={
 		'guansuo',
 		'yuantanyuanshang',
 		'dongyun',
+		're_sunyi',
 		'shen_xunyu',
 		'shen_guojia',
 		'key_kamome',
@@ -741,6 +742,8 @@ window.noname_character_rank={
 		'wangyue',
 		'xin_sunxiu',
 		'sp_maojie',
+		'ol_xuhuang',
+		'ol_zhuling',
 	],
 	b:[
 		'diy_feishi',
@@ -954,6 +957,8 @@ window.noname_character_rank={
 		're_xiahoushi',
 		'sp_yangwan',
 		'wangtao',
+		'tianyu',
+		'fanjiangzhangda',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1283,6 +1288,7 @@ window.noname_character_rank={
 			'ol_dingyuan',
 			'wujing',
 			'yangwan',
+			're_sunyi',
 			'shen_guojia',
 			'shen_taishici',
 			'shen_xunyu',
@@ -1844,6 +1850,8 @@ window.noname_character_rank={
 			'wuyan',
 			'sp_maojie',
 			'sp_zhujun',
+			'ol_chendeng',
+			'ol_xuhuang',
 		],
 		junk:[
 			'sunshao',
@@ -1863,6 +1871,8 @@ window.noname_character_rank={
 			're_chenqun',
 			'sp_ol_zhanghe',
 			'key_youta',
+			'sp_xujing',
+			'fanjiangzhangda',
 		],
 	}
 };

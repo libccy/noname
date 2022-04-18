@@ -3945,6 +3945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_longnu":{
 				mark:true,
 				locked:true,
+				zhuanhuanji:true,
 				marktext:'龙',
 				intro:{
 					content:function(storage,player,skill){
