@@ -4915,6 +4915,7 @@ window.noname_asset_list=[
 	'image/character/ol_zhuling.jpg',
 	'image/character/re_sunyi.jpg',
 	'image/character/tianyu.jpg',
+	'image/character/fanjiangzhangda.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',
