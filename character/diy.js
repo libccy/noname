@@ -97,9 +97,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_zhangwei:['female','shu',3,['nsqiyue','nsxuezhu']],
 			diy_wenyang:['male','wei','4/6',['lvli','choujue']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
-			// diy_hanlong:['male','wei',4,['siji','ciqiu']],
+			diy_hanlong:['male','wei',4,['siji','ciqiu']],
 			diy_feishi:['male','shu',3,['nsshuaiyan','moshou']],
-			diy_liuyan:['male','shu',3,['juedao','geju']],
+			diy_liuyan:['male','qun',3,['juedao','geju']],
 			// diy_luxun:['male','wu',3,['shaoying','zonghuo']],
 			diy_yuji:['male','qun',3,['diyguhuo','diychanyuan']],
 			// diy_zhouyu:['male','wu',3,['jieyan','honglian']],
@@ -195,7 +195,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"ns_chentai","ns_huangwudie","ns_sunyi","ns_zhangning","ns_yanghu"],
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu"],
-				diy_default:["diy_feishi","diy_liuyan","diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","diy_liufu","diy_xizhenxihong","diy_liuzan","diy_zaozhirenjun","diy_yangyi","diy_tianyu"],
+				diy_xushi:["diy_feishi","diy_hanlong","diy_liufu","diy_liuyan","diy_liuzan","diy_tianyu","diy_xizhenxihong","diy_yangyi","diy_zaozhirenjun"],
+				diy_default:["diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji"],
 				diy_noname:['noname'],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano","db_key_liyingxia"],
 				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang'],
@@ -203,6 +204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterIntro:{
 			noname:'无名杀的吉祥物。<br>画师：空城<br>技能设计：李木子',
+			diy_hanlong:'韩龙，魏国刺客。他孤身一人深入到了长城外的敌人领地，成功刺杀了敌方首领轲比能，瓦解了鲜卑民族，曹魏边境因此获得了几十年的安稳。',
 			ns_zhangwei:'血骑教习·张葳，三国杀集换式卡牌游戏《阵面对决》中的帝畿系列卡牌。游卡桌游官方原创的三国时期女性角色。',
 			diy_feishi:'字公举，生卒年不详，益州犍为郡南安县（今四川省乐山市）人。刘璋占据益州时，以费诗为绵竹县县令。刘备进攻刘璋夺取益州，费诗举城而降，后受拜督军从事，转任牂牁郡太守，再为州前部司马。',
 			diy_lukang:'字幼节，吴郡吴县（今江苏苏州）人。三国时期吴国名将，丞相陆逊次子。',
@@ -14874,40 +14876,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			ciqiu:{
-				unique:true,
-				trigger:{source:'damageBegin'},
+				trigger:{source:"damageBegin1"},
 				forced:true,
-				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&event.player.hp==event.player.maxHp&&event.notLink();
+				filter:function(event){
+					return event.card&&event.card.name=='sha'&&event.player.isHealthy();
 				},
 				content:function(){
+					"step 0"
 					trigger.num++;
-					trigger._ciqiu3=true;
-				},
-				group:['ciqiu2']
-			},
-			ciqiu2:{
-				trigger:{global:'dying'},
-				priority:9,
-				filter:function(event,player){
-					return event.player!=player&&event.parent._ciqiu3&&event.parent.source==player;
-				},
-				check:function(event,player){
-					return get.attitude(player,event.player)<0;
-				},
-				forced:true,
-				logTarget:'player',
-				content:function(){
-					'step 0'
-					trigger.player.die();
-					player.removeSkill('ciqiu2');
-					'step 1'
-					if(!trigger.player.isAlive()){
-						trigger.cancel(true);
+					if(trigger.num>=trigger.player.hp){
+						trigger.player.addTempSkill('ciqiu_dying');
+						player.removeSkill('ciqiu')
 					}
-				}
+				},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(card.name=='sha'&&target.isHealthy()&&get.attitude(player,target)>0){
+							return [1,-2];
+							}
+						},
+					},
+				},
 			},
-			ciqiu3:{},
+			ciqiu_dying:{
+				trigger:{player:"dyingBegin"},
+				forced:true,
+				silent:true,
+				firstDo:true,
+				content:function(){
+					player.die();
+				},
+				popup:false,
+			},
 			juedao:{
 				enable:'phaseUse',
 				filter:function(event,player){
@@ -15928,8 +15929,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			siji:'伺机',
 			ciqiu:'刺酋',
-			ciqiu2:'刺酋',
-			ciqiu3:'刺酋',
+			ciqiu_dying:'刺酋',
 			diy_liuyan:'刘焉',
 			juedao:'绝道',
 			geju:'割据',
@@ -15991,6 +15991,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junk_zhangrang_ab:'张让',
 			old_jiakui_ab:'贾逵',
 			diy_tieba:'吧友设计',
+			diy_xushi:'玩点论杀·虚实篇',
 			diy_default:'常规',
 			diy_noname:'无名专属',
 			diy_key:'论外',

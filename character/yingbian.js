@@ -335,10 +335,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target.isIn()&&player.canUse(card,target,null,true)){
 								player.useCard(card,target,cards);
 							}
-							else event.finish();
 							'step 1'
 							player.removeSkill('maihuo_effect');
 						},
+						marktext:'祸',
 						intro:{
 							content:'expansion',
 							markcount:'expansion',
@@ -354,11 +354,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						locked:false,
 						filter:function(event,player){
-							return event.player.hasSkill('maihuo_effect')&&event.player.storage.maihuo_effect&&event.player.storage.maihuo_effect.length>0;
+							return event.player.hasSkill('maihuo_effect')&&event.player.getExpansions('maihuo_effect').length>0;
 						},
 						content:function(){
 							trigger.player.removeSkill('maihuo_effect');
-							game.delayx();
 						},
 					},
 				},
@@ -2915,7 +2914,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wanyi:'婉嫕',
 			wanyi_info:'每回合每项限一次。出牌阶段，你可以将一张具有应变效果的牌当做【逐近弃远】/【出其不意】/【水淹七军】/【洞烛先机】使用。',
 			maihuo:'埋祸',
-			maihuo_info:'①当你成为其他角色使用【杀】的目标后，若此【杀】不为转化牌且有对应的实体牌且其武将牌上没有“祸”且你是此牌的唯一目标，则你可以令此牌对你无效，并将此【杀】置于其武将牌上，称为“祸”。②一名其他角色的出牌阶段开始时，若其武将牌上有“祸”，则其对你使用此“祸”（有距离限制且计入次数限制）。③当你对有“祸”的其他角色造成伤害后，你移去其“祸”。',
+			maihuo_info:'①当你成为其他角色使用【杀】的目标后，若此【杀】不为转化牌且有对应的实体牌且其武将牌上没有“祸”且你是此牌的唯一目标，则你可以令此牌对你无效，并将此【杀】置于其武将牌上，称为“祸”。②一名其他角色的出牌阶段开始时，若其武将牌上有“祸”，则其对你使用此“祸”（有距离限制且计入次数限制，若你不是此牌的合法目标，则改为将此“祸”置入弃牌堆）。③当你对有“祸”的其他角色造成伤害后，你移去其“祸”。',
 			xinchang:'辛敞',
 			canmou:'参谋',
 			canmou_info:'一名角色使用普通锦囊牌指定第一个目标时，若其手牌数为全场唯一最多，则你可以为此牌增加一个额外目标。',

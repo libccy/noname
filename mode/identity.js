@@ -1180,11 +1180,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									_status.tempNoButton=false;
 								},500);
 								var link=this.link;
-								if(game.zhu.name){
+								if(game.zhu){
 									if(link!='random'){
 										_status.event.parent.fixedseat=get.distance(game.me,game.zhu,'absolute');
 									}
-									game.zhu.uninit();
+									if(game.zhu.name) game.zhu.uninit();
 									delete game.zhu.isZhu;
 									delete game.zhu.identityShown;
 								}

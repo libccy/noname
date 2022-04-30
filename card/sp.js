@@ -251,11 +251,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				singleCard:true,
 				type:'trick',
-				selectTarget:2,
 				complexTarget:true,
 				multitarget:true,
 				targetprompt:['给一张牌','得两张牌'],
 				filterTarget:function(card,player,target){
+					return target!=player;
+				},
+				filterAddedTarget:function(card,player,target){
 					return target!=player;
 				},
 				content:function(){

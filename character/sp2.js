@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			zhaoyan:['female','wu',3,['jinhui','qingman']],
 			re_sunyi:['male','wu',5,['syjiqiao','syxiongyi']],
 			re_pangdegong:['male','qun',3,['heqia','yinyi']],
 			wangtao:['female','shu',3,['huguan','yaopei']],
@@ -115,7 +116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_shengun:["puyuan","guanlu","gexuan","xushao"],
 				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie'],
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou","xinping","hanmeng"],
-				sp_caizijiaren:['re_dongbai','re_sunluyu','huaxin','luyusheng','re_xunchen','heyan'],
+				sp_caizijiaren:['re_dongbai','re_sunluyu','huaxin','luyusheng','re_xunchen','heyan','zhaoyan'],
 				sp_huangjin:['liuhong','zhujun','re_hansui'],
 				sp_qihuan:['liubian','zhaozhong','re_hejin'],
 				sp_fadong:['ol_dingyuan','wangrong','re_quyi','hanfu'],
@@ -129,12 +130,153 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//赵嫣
+			jinhui:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				content:function(){
+					'step 0'
+					var cards=[];
+					while(cards.length<3){
+						var card=get.cardPile2(function(card){
+							for(var i of cards){
+								if(i.name==card.name) return false;
+							}
+							var info=get.info(card,false);
+							if(info.ai&&info.ai.tag&&info.ai.tag.damage) return false;
+							return !info.notarget&&(info.toself||info.singleCard||!info.selectTarget||info.selectTarget==1);
+						});
+						if(card) cards.push(card);
+						else break;
+					}
+					if(!cards.length) event.finish();
+					else{
+						player.showCards(cards,get.translation(player)+'发动了【锦绘】');
+						event.cards=cards;
+						game.cardsGotoOrdering(cards);
+						if(game.hasPlayer((current)=>(current!=player))) player.chooseTarget('选择【锦绘】的目标',true,lib.filter.notMe).set('ai',function(target){
+							var player=_status.event.player,cards=_status.event.getParent().cards.slice(0);
+							var max_effect=0,max_effect_player=0;
+							for(var i of cards){
+								var targetx=lib.skill.jinhui.getUsableTarget(i,target,player);
+								if(targetx){
+									var effect2=get.effect(targetx,i,target,target);
+									var effect3=get.effect(targetx,i,target,player);
+									if(effect2>max_effect){
+										max_effect=effect2;
+										max_effect_player=effect3;
+									}
+								}
+							}
+							return max_effect_player;
+						});
+						else event.finish();
+					}
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.line(target,'green');
+						var cards=cards.filter(function(card){
+							return lib.skill.jinhui.getUsableTarget(card,target,player);
+						});
+						if(cards.length){
+							if(cards.length==1) event._result={bool:true,links:cards};
+							else target.chooseButton(['选择按“锦绘”规则使用一张牌',cards],true).set('ai',function(button){
+								var player=_status.event.player,target=_status.event.getParent().player,card=button.link;
+								var targetx=lib.skill.jinhui.getUsableTarget(card,player,target);
+								var effect=get.effect(targetx,card,player,player),cards=_status.event.getParent().cards.slice(0);
+								var effect2=0,effect3=0;
+								cards.remove(button.link);
+								for(var i of cards){
+									var targetx=lib.skill.jinhui.getUsableTarget(i,target,player);
+									if(targetx){
+										effect2+=get.effect(targetx,i,target,target);
+										effect3+=get.effect(targetx,i,target,player);
+									}
+								}
+								if(effect2>0) effect+=effect3;
+								return effect;
+							});
+						}
+						else event.goto(3);
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var card=result.links[0];
+						event.cards.remove(card);
+						var targetx=lib.skill.jinhui.getUsableTarget(card,target,player);
+						target.useCard(card,targetx,false,'noai');
+					}
+					'step 3'
+					var cards=cards.filter(function(card){
+						return lib.skill.jinhui.getUsableTarget(card,player,target);
+					});
+					var effect=0;
+					for(var i of cards){
+						effect+=get.effect(lib.skill.jinhui.getUsableTarget(i,player,target),i,player,player)
+					}
+					if(cards.length){
+						player.chooseBool('是否按“锦绘规则使用以下牌？”',get.translation(cards)).set('goon',effect>0).set('ai',()=>_status.event.goon);
+					}
+					else event.finish();
+					'step 4'
+					if(!result.bool) event.finish();
+					'step 5'
+					for(var card of cards){
+						var targetx=lib.skill.jinhui.getUsableTarget(card,player,target);
+						if(targetx){
+							player.useCard(card,targetx,false,'noai');
+							cards.remove(card);
+							if(cards.length) event.redo();
+							break;
+						}
+					}
+				},
+				getUsableTarget:function(card,player,target){
+					var info=get.info(card,false);
+					if(info.toself) return player.canUse(card,player,false)?player:false;
+					return (target.isIn&&player.canUse(card,target,false))?target:false;
+				},
+				ai:{
+					order:5,
+					result:{player:1},
+				},
+			},
+			qingman:{
+				audio:2,
+				trigger:{global:'phaseEnd'},
+				forced:true,
+				logTarget:'player',
+				filter:function(event,player){
+					if(!event.player.isAlive()) return false;
+					var num=player.countCards('h');
+					if(num>=5) return false;
+					var num2=0;
+					for(var i=1;i<=5;i++){
+					 if(event.player.isEmpty(i)) num2++;
+					}
+					return num<num2;
+				},
+				content:function(){
+					var num2=0;
+					for(var i=1;i<=5;i++){
+					 if(trigger.player.isEmpty(i)) num2++;
+					}
+					player.drawTo(num2);
+				},
+			},
 			//孙翊
 			syjiqiao:{
 				audio:2,
 				trigger:{player:'phaseUseBegin'},
 				content:function(){
 					var cards=get.cards(player.maxHp);
+					cards.sort(function(a,b){
+						return get.color(b).length-get.color(a).length;
+					});
 					player.addToExpansion(cards,'gain2').gaintag.add('syjiqiao');
 					player.addTempSkill('syjiqiao_gain','phaseUseAfter');
 				},
@@ -158,7 +300,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							var cards=player.getExpansions('syjiqiao')
-							player.chooseButton(['激峭：选择获得一张牌',cards],true).set('ai',function(button){
+							var dialog=['激峭：选择获得一张牌']
+							var reds=[],blacks=[];
+							for(var i of cards) (get.color(i)=='red'?reds:blacks).push(i);
+							if(reds.length>0){
+								dialog.push('<div class="text center">红色牌</div>');
+								dialog.push(reds);
+							}
+							if(blacks.length>0){
+								dialog.push('<div class="text center">黑色牌</div>');
+								dialog.push(blacks);
+							};
+							player.chooseButton(dialog,true).set('ai',function(button){
 								var player=_status.event.player;
 								var color=get.color(button.link),cards=player.getExpansions('syjiqiao');
 								var num1=cards.filter((card)=>get.color(card)==color),num2=cards.length-num1;
@@ -1545,7 +1698,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:1,
 					},
 				},
-				derivation:['releiji','rebiyue','new_retuxi','mingce','zhiyan','nhyinbing','nhhuoqi','nhguizhu','nhxianshou','nhlundao','nhguanyue','nhyanzheng'],
+				derivation:['releiji','rebiyue','new_retuxi','mingce','xinzhiyan','nhyinbing','nhhuoqi','nhguizhu','nhxianshou','nhlundao','nhguanyue','nhyanzheng'],
 				subSkill:{
 					clear:{
 						onremove:function(player){
@@ -4112,31 +4265,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//牛金
 			recuorui:{
 				audio:'cuorui',
-				trigger:{player:'phaseBegin'},
+				enable:'phaseUse',
+				limited:true,
 				skillAnimation:true,
 				animationColor:'thunder',
 				filter:function(event,player){
-					return player.phaseNumber==1&&player.hp>0&&game.hasPlayer(function(current){
+					return player.hp>0&&game.hasPlayer(function(current){
 						return current!=player&&current.countGainableCards(player,'h')>0;
 					})
 				},
-				direct:true,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countGainableCards(player,'h')>0;
+				},
+				selectTarget:function(){
+					return [1,_status.event.player.hp];
+				},
 				content:function(){
-					'step 0'
-					player.chooseTarget([1,player.hp],get.prompt('recuorui'),'获得至多'+get.cnNumber(player.hp)+'名角色的各一张手牌',function(card,player,current){
-						return current!=player&&current.countGainableCards(player,'h')>0;
-					}).set('ai',function(target){
-						var att=get.attitude(_status.event.player,target);
-						if(target.hasSkill('tuntian')) return att/10;
-						return 1-att;
-					});
-					'step 1'
-					if(result.bool){
-						var targets=result.targets;
-						player.logSkill('recuorui',targets);
-						targets.sortBySeat();
-						player.gainMultiple(targets);
-					}
+					if(num==0) player.awakenSkill('recuorui');
+					player.gainPlayerCard(target,true,'h');
 				},
 			},
 			reliewei:{
@@ -4144,13 +4290,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'dying'},
 				frequent:true,
 				filter:function(event,player){
-					var evt=event.getParent();
-					return evt&&evt.name=='damage'&&evt.source==player&&player.getHistory('custom',function(evt){
-						return evt&&evt.reliewei==true;
-					}).length<player.hp;
+					return player==_status.currentPhase;
 				},
 				content:function(){
-					player.getHistory('custom').push({reliewei:true});
 					player.draw();
 				},
 			},
@@ -4838,9 +4980,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToTargeted'},
 				forced:true,
 				filter:function(event,player){
-					if(player==_status.currentPhase||event.targets.length!=1||player.countCards('h')) return false;
-					var type=get.type(event.card);
-					return ((type=='basic'||type=='trick')&&get.tag(event.card,'damage')>0);
+					if(player==_status.currentPhase||player.countCards('h')) return false;
+					return event.card.name=='sha'||get.type(event.card,false)=='trick';
 				},
 				content:function(){
 					player.draw(2);
@@ -10269,7 +10410,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//管辂和葛玄
 			gxlianhua:{
-				derivation:['reyingzi','reguanxing','zhiyan','gongxin'],
+				derivation:['reyingzi','reguanxing','xinzhiyan','gongxin'],
 				audio:2,
 				init:function(player,skill){
 					if(!player.storage[skill]) player.storage[skill]={
@@ -10324,7 +10465,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else if(red<black){
 								cards=['shunshou'];
-								skill='zhiyan';
+								skill='xinzhiyan';
 							}
 							else{
 								cards=['sha','juedou'];
@@ -12035,6 +12176,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caojinyu:'金乡公主，本姓曹氏，名字不详，沛国谯县（今安徽省亳州市）人。魏武帝曹操的女儿，母为杜夫人。适婚的时候，嫁给曹操的养子何晏。高平陵之变，何晏作为大将军曹爽的党羽，遭到太傅司马懿处死。在何晏母亲尹夫人苦苦哀求下，何晏的儿子得以保全。',
 			wangtao:'王桃是在《花关索传》中登场的虚拟人物，盗贼王令公的两个女儿之一，王悦的姐姐，与妹妹都是关索之妻。姐妹俩原为卢塘寨山贼，以武艺与美貌而闻名，被众多男性求婚却皆不与理睬。她们在关索回西川认父途中与关索交手时不敌，因意气投合而一齐下嫁。虽为架空之人物，但四川省内有记述夫妻三人共同守护葭萌关一事，民间亦流传如夫妻三人曾共同参与诸葛亮之南蛮征伐等轶事。',
 			wangyue:'王悦是在《花关索传》中登场的虚拟人物，盗贼王令公的两个女儿之一，王桃的妹妹，与姐姐都是关索之妻。姐妹俩原为卢塘寨山贼，以武艺与美貌而闻名，被众多男性求婚却皆不与理睬。她们在关索回西川认父途中与关索交手时不敌，因意气投合而一齐下嫁。虽为架空之人物，但四川省内有记述夫妻三人共同守护葭萌关一事，民间亦流传如夫妻三人曾共同参与诸葛亮之南蛮征伐等轶事。',
+			zhaoyan:'赵嫣，生卒年不详。东吴方士（一说是丞相）赵达之妹，吴大帝孙权之妃，人称赵夫人。她心灵手巧，多才多艺，有“三绝”之称。孙权曾经想要找擅长绘画之人绘制山川地势军阵之图。赵达举荐了自己的妹妹。赵嫣认为水墨容易褪色，不方便在军旅之中保存。自己擅长刺绣，可以在锦帛上绣出孙权所需之图。待制作完成后献于孙权，只见方帛锦绣之上有五岳河海城邑行阵之形，孙权大为赞叹。时人谓之“针绝”。除刺绣之外，赵嫣还擅长绘画织锦，她能用彩丝织成云霞龙蛇之锦，大则盈尺，小则方寸，宫中谓之“机绝”。孙权在昭阳宫居住之时，饱受暑气之扰，以紫绡制成帷帐缓解暑气。赵嫣认为此物不足为贵，她削下自己的头发剖为细丝，以郁夷国出产的神胶连接，花了数月功夫将其制成一顶幔帐，打开之后薄如蝉翼，轻赛寒烟。放下帐帷能笼罩一丈之地，帐内清风自生暑意顿消。收起来则可纳入枕中，携带方便。时人谓之“丝绝”。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -12124,6 +12266,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pangdegong:['re_pangdegong','pangdegong'],
 			zhujun:['sp_zhujun','zhujun'],
 			sunyi:['re_sunyi','sunyi'],
+			tw_liuhong:['tw_liuhong','liuhong'],
 		},
 		translate:{
 			lijue:"李傕",
@@ -12520,7 +12663,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangzhong:'殃众',
 			yangzhong_info:'当你造成或受到伤害后，若受伤角色和伤害来源均存活，则伤害来源可弃置两张牌，然后令受伤角色失去1点体力。',
 			huangkong:'惶恐',
-			huangkong_info:'锁定技，当你于回合外成为【杀】或伤害类锦囊牌的唯一目标后，若你没有手牌，则你摸两张牌。',
+			huangkong_info:'锁定技，当你于回合外成为【杀】或普通锦囊牌的目标后，若你没有手牌，则你摸两张牌。',
 			re_taoqian:'陶谦',
 			reyixiang:'义襄',
 			reyixiang_info:'锁定技，其他角色于其出牌阶段内使用的第一张牌对你的伤害-1；其使用的第二张牌若为黑色，则对你无效。',
@@ -12558,9 +12701,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangu_info:'锁定技，准备阶段，若你的体力上限大于1且没有手牌/装备区内没有牌，则你减1点体力上限，然后从牌堆中获得三张类型不同的牌。',
 			re_niujin:'牛金',
 			recuorui:'摧锐',
-			recuorui_info:'你的第一个回合开始时，你可以依次获得至多X名角色的各一张手牌（X为你的体力值）。',
+			recuorui_info:'限定技，出牌阶段，你可以依次获得至多X名角色的各一张手牌（X为你的体力值）。',
 			reliewei:'裂围',
-			reliewei_info:'每回合限X次（X为你的体力值），当有其他角色因你造成伤害而进入濒死状态时，你可以摸一张牌。',
+			reliewei_info:'当有角色于你的回合内进入濒死状态时，你可以摸一张牌。',
 			duanwei:'段煨',
 			langmie:'狼灭',
 			langmie_damage:'狼灭',
@@ -12756,9 +12899,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yinyi_info:'锁定技。每回合限一次，当你受到非属性伤害时，若你的手牌数和体力值与伤害来源均不相同，则你防止此伤害。',
 			re_sunyi:'孙翊',
 			syjiqiao:'激峭',
-			syjiqiao_info:'出牌阶段开始时，你可将牌堆顶的X张牌置于你的武将牌上（X为你的体力上限）。当你于此出牌阶段内使用的牌结算结束后，你可以获得其中的一张牌，然后若剩余牌中红色牌和黑色牌的数量：不相等，你失去1点体力；相等，你摸一张牌。出牌阶段结束时，你将这些牌置入弃牌堆。',
+			syjiqiao_info:'出牌阶段开始时，你可将牌堆顶的X张牌置于你的武将牌上（X为你的体力上限）。当你于此出牌阶段内使用的牌结算结束后，你可以获得其中的一张牌，然后若剩余牌中红色牌和黑色牌的数量：不相等，你失去1点体力；相等，你回复1点体力。出牌阶段结束时，你将这些牌置入弃牌堆。',
 			syxiongyi:'凶疑',
 			syxiongyi_info:'限定技。当你处于濒死状态时，若剩余武将牌堆中：有“徐氏”，则你将体力值回复至3点，并将此武将牌替换为“徐氏”；没有“徐氏”，则你将体力值回复至1点并获得〖魂姿〗。',
+			zhaoyan:'赵嫣',
+			jinhui:'锦绘',
+			jinhui_info:'出牌阶段限一次，你可以随机展示牌堆中的三张不具有“伤害”标签且使用目标范围为“自己”或“一名角色”的牌，然后选择一名其他角色。该角色选择并按如下“锦绘”规则使用其中一张，然后你可以依次按如下“锦绘”规则使用其余两张：若此牌的使用目标为“自己”，则对自己使用该牌，否则对对方使用该牌（无距离限制且不计入次数限制）。',
+			qingman:'轻幔',
+			qingman_info:'锁定技。一名角色的回合结束时，你将手牌摸至X张（X为其装备区中空栏的数量）。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

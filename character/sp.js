@@ -2527,7 +2527,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else event._result={control:target.name1};
 					}
-					else event.goto(4);
+					else event.finish();
 					'step 4'
 					target.reinit(result.control,'guansuo');
 					if(_status.characterlist){
@@ -5250,7 +5250,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var num=Math.max(1,player.getDamagedHp());
 					player.chooseTarget('是否发动【誓仇】，令至多'+num+'名其他角色也成为此【杀】的目标？',[1,num],function(card,player,target){
-						return target!=player&&!trigger.targets.contains(target)&&player.canUse({name:'sha'},target);
+						var evt=_status.event.getTrigger();
+						return target!=player&&!evt.targets.contains(target)&&lib.filter.targetEnabled2(evt.card,player,target)&&lib.filter.targetInRange(evt.card,player,target);
 					}).ai=function(target){
 						return get.effect(target,{name:'sha'},_status.event.player);
 					};
@@ -11085,19 +11086,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					recover:{
 						audio:'yishe',
 						trigger:{
-							player:['loseAfter','gainAfter'],
+							player:['loseAfter'],
 							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 						},
 						filter:function(event,player){
+							if(player.isHealthy()) return false;
 							var evt=event.getl(player);
 							if(!evt||!evt.xs||!evt.xs.length||player.getExpansions('yishe').length>0) return false;
-							for(var i in evt.gaintag_map){
-								if(evt.gaintag_map[i].contains('yishe')) return true;
+							if(event.name=='lose'){
+								for(var i in event.gaintag_map){
+									if(event.gaintag_map[i].contains('yishe')) return true;
+								}
+								return false;
 							}
-							return false;
+							return player.hasHistory('lose',function(evt){
+								if(event!=evt.getParent()) return false;
+								for(var i in evt.gaintag_map){
+									if(evt.gaintag_map[i].contains('yishe')) return true;
+								}
+								return false;
+							});
 						},
 						forced:true,
-						popup:false,
 						content:function(){
 							player.recover();
 						},
@@ -15884,6 +15894,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_dongzhao:['ol_dongzhao','tw_dongzhao'],
 			mayunlu:['tw_mayunlu','mayunlu'],
 			zhuling:['ol_zhuling','zhuling'],
+			zangba:['tw_zangba','zangba'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",

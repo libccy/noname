@@ -81,7 +81,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_mifuren:['female','shu',3,['xinguixiu','qingyu']],
 			sp_xinpi:['male','wei',3,['spyinju','spchijie']],
 			nanhualaoxian:['male','qun',3,['yufeng','tianshu']],
-			feiyi:['male','shu',3,['mjshengxi','mjkuanji']],
+			feiyi:['male','shu',3,['mjshengxi','fyjianyu']],
 			sp_bianfuren:['female','wei',3,['spwanwei','spyuejian']],
 			sp_duyu:['male','qun',4,['spwuku','spsanchen']],
 			luotong:['male','wu',4,['qinzheng']],
@@ -1242,6 +1242,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sptaoluan:{
 				audio:2,
 				trigger:{global:'judgeEnd'},
+				usable:1,
 				filter:function(event,player){
 					return event.result&&event.result.suit=='spade';
 				},
@@ -3157,6 +3158,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.storage.jueyong) player.storage.jueyong=[[],[]];
 					player.storage.jueyong[0].push(card);
 					player.storage.jueyong[1].push(trigger.player);
+					game.delayx();
 				},
 				onremove:function(player,skill){
 					var cards=player.getExpansions(skill);
@@ -3165,9 +3167,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				intro:{
 					markcount:function(storage){
+						if(!storage) return 0;
 						return storage[0].length;
 					},
 					mark:function(dialog,storage,player){
+						if(!storage) return;
 						dialog.addAuto(storage[0]);
 						dialog.addText(get.translation(storage[1]));
 					},
@@ -5150,12 +5154,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					targets.sortBySeat();
 					for(var i of targets) i.addMark('luanchou',1);
 				},
-				global:'gonghuan',
+				global:['gonghuan','gonghuan_clear'],
 				derivation:'gonghuan',
 				marktext:'姻',
 				intro:{
 					name:'共患',
-					content:'锁定技。每回合限一次，一名其他角色受到伤害时，若其拥有“姻”标记且其体力值小于你，则你将伤害转移给自己。',
+					content:'锁定技。每回合限一次，一名其他角色受到伤害时，若其拥有“姻”标记且其体力值小于你，则你将伤害转移给自己。此伤害结算结束后，若你与其体力值相等，则你与其移去“姻”标记。',
+					onunmark:true,
 				},
 				ai:{
 					order:10,
@@ -5182,6 +5187,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				content:function(){
+					trigger._gonghuan_player=trigger.player;
 					trigger.player=player;
 				},
 				ai:{
@@ -5201,6 +5207,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								delete _status.luanchou_judging;
 								return eff;
 							}
+						},
+					},
+				},
+				subSkill:{
+					clear:{
+						trigger:{player:'damageEnd'},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return event._gonghuan_player&&player.hp==event._gonghuan_player.hp;
+						},
+						content:function(){
+							player.removeMark('luanchou',player.countMark('luanchou'));
+							trigger._gonghuan_player.removeMark('luanchou',trigger._gonghuan_player.countMark('luanchou'));
 						},
 					},
 				},
@@ -5446,19 +5466,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(player==event.player) return false;
 					if(_status.renku.length) return true;
-					return event.player.countCards('h')>1&&event.player.countCards('h')!=event.player.hp;
+					return event.player.countCards('h')>event.player.hp;
 				},
 				direct:true,
 				content:function(){
 					'step 0'
 					var target=trigger.player;
 					event.target=target;
-					var num=Math.min(9,Math.abs(target.hp-target.countCards('h')));
+					var num=Math.max(0,target.countCards('h')-target.hp);
 					var choiceList=['令其从仁库中获得一张牌','令其将'+get.cnNumber(num)+'张手牌置入仁库'];
 					var choices=[];
 					if(_status.renku.length) choices.push('选项一');
 					else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
-					if(target.countCards('h')>1&&target.countCards('h')!=target.hp){
+					if(target.countCards('h')>target.hp){
 						event.num=num;
 						choices.push('选项二');
 					}
@@ -5471,7 +5491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(_status.renku.length>0) return '选项一';
 							return 0;
 						}
-						if(target.countCards('h')>1&&target.countCards('h')!=target.hp) return '选项二';
+						if(target.countCards('h')>target.hp) return '选项二';
 						return 'cancel2';
 					});
 					'step 1'
@@ -6792,7 +6812,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var num=Math.max(1,player.hp),target=trigger.player;
-					player.chooseCard('he',get.prompt('sheyi',target),'交给其至少'+get.cnNumber(num)+'张牌，防止即将受到的伤害（'+trigger.num+'点）',[num,player.countCards('h')]).set('goon',function(){
+					player.chooseCard('he',get.prompt('sheyi',target),'交给其至少'+get.cnNumber(num)+'张牌，防止即将受到的伤害（'+trigger.num+'点）',[num,player.countCards('he')]).set('goon',function(){
 						if(get.attitude(player,target)<0) return false;
 						if(trigger.num<target.hp&&get.damageEffect(target,trigger.source,player,trigger.nature)>=0)	return false;
 						if(trigger.num<2&&target.hp>trigger.num) return 6/Math.sqrt(num);
@@ -16069,7 +16089,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liaoyi:'疗疫',
 			liaoyi_info:'其他角色的回合开始时，若其：①手牌数小于体力值且仁库内牌数大于等于X，则你可令其从仁库中获得X张牌；②手牌数大于体力值，则你可以令其将X张牌置于仁库中（X为其手牌数与体力值之差且至多为4）。',
 			xinliaoyi:'疗疫',
-			xinliaoyi_info:'其他角色的回合开始时，你可选择一项：①令其从仁库中获得一张牌。②若其手牌数大于1，则令其将X张手牌置入仁库（X为其手牌数与体力值之差且至多为9）。',
+			xinliaoyi_info:'其他角色的回合开始时，你可选择一项：①令其从仁库中获得一张牌。②若其手牌数大于体力值，则令其将X张手牌置入仁库（X为其手牌数与体力值之差）。',
 			binglun:'病论',
 			binglun_info:'出牌阶段限一次，你可以将仁库中的一张牌置于弃牌堆并选择一名角色。该角色选择一项：①摸一张牌。②于其下回合结束时回复1点体力。',
 			sp_zhangwen:'手杀张温',
@@ -16090,7 +16110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luanchou:'鸾俦',
 			luanchou_info:'出牌阶段限一次，你可令两名角色获得“姻”标记并清除原有标记。拥有“姻”标记的角色视为拥有技能〖共患〗。',
 			gonghuan:'共患',
-			gonghuan_info:'锁定技。每回合限一次，一名其他角色受到伤害时，若其拥有“姻”标记且其体力值小于你，则你将伤害转移给自己。',
+			gonghuan_info:'锁定技。每回合限一次，一名其他角色受到伤害时，若其拥有“姻”标记且其体力值小于你，则你将伤害转移给自己。此伤害结算结束后，若你与其体力值相等，则你与其移去“姻”标记。',
 			sp_yanghu:'羊祜',
 			mingfa:'明伐',
 			mingfa_info:'①结束阶段，你可展示一张牌并记录为“明伐”。②出牌阶段开始时，若“明伐”牌在你的手牌区或装备区，则你可以使用“明伐”牌与一名其他角色拼点。若你赢：你获得对方一张牌并从牌堆中获得一张点数等于“明伐”牌牌面点数-1的牌。若你没赢：你本回合不能使用牌指定其他角色为目标。③你的拼点牌亮出后，你令此牌的点数+2。',
@@ -16283,7 +16303,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spshiji:'势击',
 			spshiji_info:'当你对其他角色造成属性伤害时，若你的手牌数不为全场唯一最多，则你可以观看其手牌。你令其弃置其中的所有红色牌，然后摸等量的牌。',
 			sptaoluan:'讨乱',
-			sptaoluan_info:'一名角色的判定牌生效后，若判定结果的花色为♠，则你可以终止导致此判定发生的上级事件。然后选择一项：①获得判定牌对应的实体牌。②视为对判定角色使用一张火【杀】（无距离和次数限制）',
+			sptaoluan_info:'每回合限一次。一名角色的判定牌生效后，若判定结果的花色为♠，则你可以终止导致此判定发生的上级事件。然后选择一项：①获得判定牌对应的实体牌。②视为对判定角色使用一张火【杀】（无距离和次数限制）',
 			sp_yangwan:'杨婉',
 			spmingxuan:'瞑昡',
 			spmingxuan_info:'锁定技。出牌阶段开始时，你须选择至多X张牌（X为未选择过选项①的角色），将这些牌随机交给这些角色中的等量角色。然后这些角色依次选择一项：①对你使用一张【杀】。②交给你一张牌，然后你摸一张牌。',

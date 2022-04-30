@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			yijiang:{
 				yijiang_2011:['caozhi','yujin','zhangchunhua','xin_fazheng','xin_masu','xin_xushu','xusheng','lingtong','wuguotai','chengong','gaoshun'],
-				yijiang_2012:['old_wangyi','xunyou','zhonghui','madai','liaohua','old_guanzhang','bulianshi','handang','chengpu','liubiao','old_huaxiong','caozhang'],
+				yijiang_2012:['old_wangyi','xunyou','zhonghui','old_madai','liaohua','old_guanzhang','bulianshi','handang','chengpu','liubiao','old_huaxiong','caozhang'],
 				yijiang_2013:['manchong','guohuai','caochong','guanping','liufeng','jianyong','yufan','panzhangmazhong','zhuran','xin_liru','fuhuanghou'],
 				yijiang_2014:['hanhaoshihuan','chenqun','caozhen','zhangsong','wuyi','zhoucang','zhuhuan','guyong','sunluban','yj_jushou','caifuren'],
 				yijiang_2015:['caoxiu','caorui','zhongyao','xiahoushi','liuchen','zhangyi','zhuzhi','quancong','sunxiu','gongsunyuan','guotufengji'],
@@ -39,7 +39,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuhuanghou:['female','qun',3,['qiuyuan','zhuikong']],
 			zhonghui:['male','wei',4,['quanji','zili']],
 			jianyong:['male','shu',3,['qiaoshui','jyzongshi']],
-			madai:['male','shu',4,['mashu','oldqianxi']],
+			old_madai:['male','shu',4,['mashu','qianxi']],
 			liufeng:['male','shu',4,['xiansi']],
 			manchong:['male','wei',3,['junxing','yuce']],
 			chenqun:['male','wei',3,['pindi','faen']],
@@ -963,14 +963,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				limited:true,
 				enable:'chooseToUse',
-				init:function(player){
-					player.storage.xinfuli=false;
-				},
 				mark:true,
 				filter:function(event,player){
 					if(event.type!='dying') return false;
 					if(player!=event.dying) return false;
-					if(player.storage.xinfuli) return false;
 					return true;
 				},
 				content:function(){
@@ -4406,7 +4402,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							name:button.link[2],
 							nature:button.link[3],
 							storage:{
-								nowuxie:true,
 								jiaozhao:player,
 							}
 						};
@@ -4417,7 +4412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var nature=result.links[0][3];
 					var fakecard={
 						name:chosen,
-						storage:{nowuxie:true,jiaozhao:player},
+						storage:{jiaozhao:player},
 					};
 					if(nature) fakecard.nature=nature;
 					event.target.showCards(game.createCard({
@@ -9298,7 +9293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								result:{
 									target:function(player,target){
 	  							if(player!=target) return 0;
-	  							if(player.hasSkill('requanji')||(player.countCards('h')+2<=player.hp+player.storage.quanji.length)) return 1;
+	  							if(player.hasSkill('requanji')||(player.countCards('h')+2<=player.hp+player.getExpansions('quanji').length)) return 1;
 	  							return 0;
 	  						}
 	  					},
@@ -9335,10 +9330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return !player.storage.xianzhou&&player.countCards('e')>0;
-				},
-				init:function(player){
-					player.storage.xianzhou=false;
+					return player.countCards('e')>0;
 				},
 				filterTarget:function(card,player,target){
 					return player!=target;
@@ -9351,7 +9343,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=player.getCards('e');
 					target.gain(cards,player,'give');
 					event.num=cards.length;
-					player.storage.xianzhou=true;
 					game.delay();
 					"step 1"
 					target.chooseTarget([1,event.num],'令'+get.translation(player)+'回复'+
@@ -12071,7 +12062,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyi:['wangyi','old_wangyi'],
 			caozhang:['re_caozhang','xin_caozhang','caozhang'],
 			guanzhang:['guanzhang','old_guanzhang'],
-			madai:['old_madai','madai'],
+			madai:['re_madai','old_madai','madai'],
 			liaohua:['xin_liaohua','re_liaohua','liaohua'],
 			bulianshi:['re_bulianshi','bulianshi','old_bulianshi'],
 			handang:['xin_handang','re_handang','handang'],
@@ -12140,7 +12131,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangsong:'张松',
 			guyong:'顾雍',
 			jianyong:'简雍',
-			madai:'马岱',
+			old_madai:'马岱',
+			gz_madai:'马岱',
 			xin_xushu:'徐庶',
 			manchong:'满宠',
 			liufeng:'刘封',

@@ -10,14 +10,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_lin:['re_menghuo','ol_sunjian','re_caopi','ol_xuhuang','ol_dongzhuo','ol_zhurong','re_jiaxu','ol_lusu'],
 				refresh_shan:['ol_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai'],
 				refresh_yijiang1:['re_wuguotai','re_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua'],
-				refresh_yijiang2:['old_madai','re_wangyi','guanzhang','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
+				refresh_yijiang2:['re_madai','re_wangyi','guanzhang','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','re_liru','re_manchong','re_fuhuanghou','re_guanping'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','re_chenqun','re_caifuren','re_guyong','xin_jushou'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi'],
+				refresh_yijiang6:['re_guohuanghou'],
 			},
 		},
 		connect:true,
 		character:{
+			re_guohuanghou:['female','wei',3,['rejiaozhao','redanxin']],
 			re_xiahoushi:['female','shu',3,['reqiaoshi','reyanyu']],
 			xin_jushou:['male','qun',3,['xinjianying','shibei']],
 			ol_lusu:['male','wu',3,['olhaoshi','oldimeng']],
@@ -48,7 +50,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_hanhaoshihuan:['male','wei',4,['reshenduan','reyonglve']],
 			re_panzhangmazhong:['male','wu',4,['reduodao','reanjian']],
 			re_wangyi:['female','wei',4,['zhenlie','miji']],
-			old_madai:['male','shu',4,['mashu','qianxi']],
+			re_madai:['male','shu',4,['mashu','reqianxi']],
 			guanzhang:['male','shu',4,['fuhun']],
 			xin_xusheng:['male','wu',4,['decadepojun']],
 			re_taishici:['male','wu',4,['tianyi','hanzhan']],
@@ -141,6 +143,286 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			rejiaozhao:{
+				audio:2,
+				enable:'phaseUse',
+				group:'rejiaozhao_base',
+				mod:{
+					targetEnabled:function(card,player,target){
+						if(player==target&&card.storage&&card.storage.rejiaozhao) return false;
+					},
+				},
+				filter:function(event,player){
+					return (player.hasMark('redanxin')&&player.countCards('h')&&player.getStorage('rejiaozhao_clear').length<player.countMark('redanxin'));
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[],storage=player.getStorage('rejiaozhao_clear');
+						for(var name of lib.inpile){
+							var type=get.type(name);
+							if((type=='basic'||type=='trick')&&!storage.contains(type)){
+								list.push([type,'',name]);
+								if(name=='sha'){
+									for(var nature of lib.inpile_nature) list.push([type,'',name,nature]);
+								}
+							}
+						}
+						return ui.create.dialog('惮心',[list,'vcard']);
+					},
+					filter:function(button,player){
+						var card={name:button.link[2],nature:button.link[3]};
+						if(player.countMark('redanxin')<2) card.storage={rejiaozhao:true};
+						var evt=_status.event.getParent();
+						return evt.filterCard(card,player,evt);
+					},
+					check:function(button){
+						var card={name:button.link[2],nature:button.link[3]},player=_status.event.player;
+						if(player.countMark('redanxin')<2) card.storage={rejiaozhao:true};
+						return player.getUseValue(card,null,true);
+					},
+					backup:function(links,player){
+						var next={
+							audio:'redanxin',
+							viewAs:{name:links[0][2],nature:links[0][3]},
+							filterCard:true,
+							position:'h',
+							popname:true,
+							ai1:(card)=>8-get.value(card),
+							onuse:function(result,player){
+								player.addTempSkill('rejiaozhao_clear','phaseUseAfter');
+								player.markAuto('rejiaozhao_clear',[get.type(result.card)])
+							},
+						}
+						if(player.countMark('redanxin')<2) next.viewAs.storage={rejiaozhao:true};
+						return next;
+					},
+					prompt:function(links){
+						return '将一张手牌当做'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+'使用';
+					},
+				},
+				ai:{
+					order:6,
+					result:{
+						player:1
+					}
+				},
+				derivation:['rejiaozhao_lv2','rejiaozhao_lv3'],
+				subSkill:{
+					clear:{onremove:true},
+					base:{
+						audio:'rejiaozhao',
+						enable:'phaseUse',
+						usable:1,
+						filter:function(event,player){
+							if(player.hasMark('redanxin')) return false;
+							return player.countCards('h')>0&&game.hasPlayer((current)=>current!=player);
+						},
+						filterCard:true,
+						position:'h',
+						discard:false,
+						lose:false,
+						check:function(card){
+							return 1/Math.max(1,_status.event.player.getUseValue(card));
+						},
+						prompt:'出牌阶段限一次。你可以展示一张手牌，并令一名距离你最近的角色选择一种基本牌或普通锦囊牌的牌名。你可将此牌当做其声明的牌使用直到此阶段结束（你不是此牌的合法目标）。',
+						content:function(){
+							'step 0'
+							player.showCards(cards);
+							'step 1'
+							var targets=game.filterPlayer();
+							targets.remove(player);
+							targets.sort(function(a,b){
+								return Math.max(1,get.distance(player,a))-Math.max(1,get.distance(player,b));
+							});
+							var distance=Math.max(1,get.distance(player,targets[0]));
+							for(var i=1;i<targets.length;i++){
+								if(Math.max(1,get.distance(player,targets[i]))>distance){
+									targets.splice(i);break;
+								}
+							}
+							player.chooseTarget('请选择【矫诏】的目标',true,function(card,player,target){
+								return _status.event.targets.contains(target);
+							}).set('ai',function(target){
+								return get.attitude(_status.event.player,target);
+							}).set('targets',targets);
+							'step 2'
+							if(!result.bool){
+								event.finish();
+								return;
+							}
+							var target=result.targets[0];
+							event.target=target;
+							var list=[];
+							for(var i=0;i<lib.inpile.length;i++){
+								var name=lib.inpile[i];
+								if(name=='sha'){
+									list.push(['基本','','sha']);
+									for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
+								}
+								else if(get.type(name)=='basic') list.push(['基本','',name]);
+								else if(get.type(name)=='trick') list.push(['锦囊','',name]);
+							}
+							target.chooseButton(['矫诏',[list,'vcard']],true).set('ai',function(button){
+								var player=_status.event.getParent().player,card={
+									name:button.link[2],
+									nature:button.link[3],
+									storage:{
+										rejiaozhao:true,
+									}
+								};
+								return player.getUseValue(card,null,true)*_status.event.att;
+							}).set('att',get.attitude(event.target,player)>0?1:-1);
+							'step 3'
+							var chosen=result.links[0][2];
+							var nature=result.links[0][3];
+							var fakecard={
+								name:chosen,
+								storage:{rejiaozhao:true},
+							};
+							if(nature) fakecard.nature=nature;
+							event.target.showCards(game.createCard({
+								name:chosen,
+								nature:nature,
+								suit:cards[0].suit,
+								number:cards[0].number,
+							}),get.translation(event.target)+'声明了'+get.translation(chosen));
+							player.storage.rejiaozhao_viewas=fakecard;
+							cards[0].addGaintag('rejiaozhao')
+							player.addTempSkill('rejiaozhao_viewas','phaseUseEnd');
+						},
+						ai:{
+							order:9,
+							result:{
+								player:1,
+							}
+						},
+					},
+					backup:{audio:'rejiaozhao'},
+					viewas:{
+						enable:'phaseUse',
+						mod:{
+							targetEnabled:function(card,player,target){
+								if(player==target&&card.storage&&card.storage.rejiaozhao) return false;
+							},
+						},
+						filter:function(event,player){
+							if(!player.storage.rejiaozhao_viewas) return false;
+							var cards=player.getCards('h',function(card){
+								return card.hasGaintag('rejiaozhao');
+							});
+							if(!cards.length) return false;
+							if(!game.checkMod(cards[0],player,'unchanged','cardEnabled2',player)) return false;
+							var card=get.autoViewAs(player.storage.rejiaozhao_viewas,cards);
+							return event.filterCard(card,player,event);
+						},
+						viewAs:function(cards,player){
+							return player.storage.rejiaozhao_viewas;
+						},
+						filterCard:function(card){
+							return card.hasGaintag('rejiaozhao');
+						},
+						selectCard:-1,
+						position:'h',
+						popname:true,
+						prompt:function(){
+							return '将“矫诏”牌当做'+get.translation(_status.event.player.storage.rejiaozhao_viewas)+'使用';
+						},
+						onremove:function(player){
+							player.removeGaintag('rejiaozhao');
+							delete player.storage.rejiaozhao_viewas;
+						},
+						ai:{order:8},
+					},
+				},
+			},
+			redanxin:{
+				audio:2,
+				trigger:{player:'damageEnd'},
+				frequent:true,
+				content:function(){
+					player.draw();
+					if(player.countMark('redanxin')<2) player.addMark('redanxin',1,false);
+				},
+				intro:{content:'当前升级等级。：Lv#'},
+			},
+			//马岱
+			reqianxi:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				frequent:true,
+				content:function(){
+					'step 0'
+					player.draw();
+					'step 1'
+					if(player.hasCard((card)=>lib.filter.cardDiscardable(card,player,'reqianxi'),'he')) player.chooseToDiscard('he',true);
+					else event.finish();
+					'step 2'
+					if(result.bool&&game.hasPlayer((current)=>current!=player&&get.distance(player,current)<=1)){
+						var color=get.color(result.cards[0],player);
+						event.color=color;
+						color=get.translation(color);
+						player.chooseTarget(true,'选择【潜袭】的目标','令其本回合不能使用或打出'+color+'牌，且'+color+'防具失效，且回复体力时，你摸两张牌',function(card,player,target){
+							return target!=player&&get.distance(player,target)<=1;
+						}).set('ai',function(target){
+							return -get.attitude(_status.event.player,target)*Math.sqrt(1+target.countCards('he'));
+						});
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.storage.reqianxi_effect=[event.color,player];
+						target.addTempSkill('reqianxi_effect');
+					}
+				},
+				subSkill:{
+					effect:{
+						mark:true,
+						intro:{
+							markcount:()=>0,
+							content:function(storage,player){
+								var color=get.translation(storage[0]),source=get.translation(storage[1]);
+								return '本回合不能使用或打出'+color+'牌，且'+color+'防具失效，且回复体力时，'+source+'摸两张牌';
+							},
+						},
+						charlotte:true,
+						onremove:true,
+						mod:{
+							cardEnabled2:function(card,player){
+								if(get.itemtype(card)=='card'&&get.color(card)==player.getStorage('reqianxi_effect')[0]) return false;
+							},
+						},
+						trigger:{player:'recoverEnd'},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return player.storage.reqianxi_effect&&player.storage.reqianxi_effect[1].isIn();
+						},
+						content:function(){
+							var target=player.storage.reqianxi_effect[1];
+							target.logSkill('reqianxi',player);
+							target.draw(2);
+						},
+						ai:{
+							unequip2:true,
+							skillTagFilter:function(player){
+								var evt=_status.event,color=player.getStorage('reqianxi_effect')[0];
+								if(evt.name=='lose'&&evt.loseEquip){
+									var card=evt.cards[evt.num];
+									if(card&&get.subtype(card,false)=='equip2'&&get.color(card)==color) return true;
+									return false;
+								}
+								else{
+									var equip=player.getEquip(2);
+									if(equip&&get.color(equip)==color) return true;
+									return false;
+								}
+							},
+						},
+					},
+				},
+			},
 			//徐晃
 			olduanliang:{
 				audio:2,
@@ -1305,7 +1587,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				chooseButton:{
 					check:function(button){
 						if(typeof button.link=='object') return 1;
-						var player=_status.event.player,num=player.storage.xinquanji.length-1;
+						var player=_status.event.player,num=player.getExpansions('xinquanji').length-1;
 						if(button.link==1){
 							if(game.countPlayer(function(current){
 								return get.damageEffect(current,player,player)>0;
@@ -2254,9 +2536,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzpaiyi:{
 				audio:2,
 				enable:'phaseUse',
-				usable:1,
+				usable:2,
 				filter:function(event,player){
-					return player.getExpansions('gzquanji').length>0&&!player.hasSkill('gzquanji2');
+					return player.getExpansions('gzquanji').length>0;
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -2275,11 +2557,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								order:10,
 								result:{
 									target:function(player,target){
-										var num=player.getExpansions('gzquanji').length-1;
-										if(num==0){
-											if(target.countCards('h')>player.countCards('h')) return get.damageEffect(target,player,target);
-											return 0;
-										}
 										if(target!=player) return 0;
 										if(player.needsToDiscard()&&!player.getEquip('zhuge')&&!player.hasSkill('new_paoxiao')) return 0;
 										return 1;
@@ -2294,10 +2571,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					var card=lib.skill.gzpaiyi_backup.card;
 					player.loseToDiscardpile(card);
-					player.addTempSkill('gzquanji2');
 					"step 1"
-					var num=player.getExpansions('gzquanji').length;
-					if(num) target.draw(Math.min(7,num));
+					target.draw(2);
 					"step 2"
 					if(target.countCards('h')>player.countCards('h')){
 						target.damage();
@@ -10713,7 +10988,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadepojun:'破军',
 			decadepojun2:'破军',
 			decadepojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上（X为其体力值）。若这些牌中：有装备牌，你将这些装备牌中的一张置于弃牌堆；有锦囊牌，你摸一张牌。其于回合结束时获得其武将牌上的这些牌。',
-			old_madai:'界马岱',
 			re_wangyi:'界王异',
 			wangyi:'王异',
 			guanzhang:'界关兴张苞',
@@ -10807,7 +11081,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzquanji_info:'当你受到伤害后或当你使用牌指定唯一目标并对其造成伤害后，你可以摸一张牌，然后你将一张牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
 			gzpaiyi:'排异',
 			gzpaiyi_backup:'排异',
-			gzpaiyi_info:'出牌阶段限一次。你可以移去一张“权”，然后选择一名角色并令其摸X张牌（X为“权”的数量且至多为7），若其手牌数不小于你，则你对其造成1点伤害。',
+			gzpaiyi_info:'出牌阶段限两次。你可以移去一张“权”，然后选择一名角色并令其摸两张牌。若其手牌数大于你，则你对其造成1点伤害。',
 			ol_zhurong:'界祝融',
 			changbiao:'长标',
 			changbiao_info:'出牌阶段限一次，你可以将任意张手牌当做【杀】使用（无距离限制）。若你因此【杀】对目标角色造成过伤害，则你于出牌阶段结束时摸X张牌（X为此【杀】对应的实体牌数量）。',
@@ -10902,6 +11176,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olduanliang_info:'你可以将一张黑色非锦囊牌当做【兵粮寸断】使用。若你于当前回合内未造成过伤害，则你使用【兵粮寸断】无距离限制。',
 			oljiezi:'截辎',
 			oljiezi_info:'①当有角色跳过摸牌阶段后，你可选择一名角色。若该角色：手牌数为全场最少且没有“辎”，则其获得一枚“辎”。否则其摸一张牌。②一名角色的摸牌阶段结束时，若其有“辎”，则你移去其“辎”，然后令其获得一个额外的摸牌阶段。',
+			re_madai:'界马岱',
+			reqianxi:'潜袭',
+			reqianxi_info:'准备阶段开始时，你可摸一张牌，然后弃置一张牌并选择一名距离为1的其他角色。该角色于本回合内：{不能使用或打出与此牌颜色相同的牌，且其装备区内与此牌颜色相同的防具牌无效，且当其回复体力时，你摸两张牌。}',
+			re_guohuanghou:'界郭皇后',
+			rejiaozhao:'矫诏',
+			rejiaozhao_info:'出牌阶段限一次。你可以展示一张手牌，并令一名距离你最近的角色选择一种基本牌或普通锦囊牌的牌名。你可将此牌当做其声明的牌使用直到此阶段结束（你不是此牌的合法目标）。',
+			rejiaozhao_lv2:'矫诏·升级 Lv.1',
+			rejiaozhao_lv2_info:'出牌阶段限一次。你可以将一张手牌当做一张基本牌或普通锦囊牌使用（你不是此牌的合法目标）。',
+			rejiaozhao_lv3:'矫诏·升级 Lv.2',
+			rejiaozhao_lv3_info:'出牌阶段每种类型各限一次。你可以将一张手牌当做一张基本牌或普通锦囊牌使用（你不是此牌的合法目标）。',
+			redanxin:'殚心',
+			redanxin_info:'当你受到伤害后，你可以摸一张牌并升级〖矫诏〗。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
@@ -10913,6 +11199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refresh_yijiang3:'界限突破·将3',
 			refresh_yijiang4:'界限突破·将4',
 			refresh_yijiang5:'界限突破·将5',
+			refresh_yijiang6:'界限突破·原6',
 		},
 	};
 });

@@ -11422,6 +11422,37 @@
 					'step 2'
 					game.delay();
 				},
+				addExtraTarget:function(){
+					"step 0"
+					event.num=0;
+					"step 1"
+					var target=targets[num],info=get.info(card);
+					if(target==event.target&&event.addedTarget){
+						event.addedTargets[num]=event.addedTarget;
+						event._result={bool:false};
+					}
+					else if(game.hasPlayer(function(current){
+						return info.filterAddedTarget(card,player,current,target)
+					})){
+						var next=player.chooseTarget(get.translation(event.card)+'：选择'+get.translation(targets[num])+'对应的指向目标',function(card,player,target){
+							var card=get.card(),info=get.info(card);
+							return info.filterAddedTarget(card,player,target,_status.event.preTarget)
+						},true);
+						next.set('_get_card',card);
+						next.set('preTarget',targets[num]);
+					}
+					else{
+						event.addedTargets[num]=false;
+						event._result={bool:false};
+					}
+					"step 2"
+					if(result.bool){
+						event.addedTargets[num]=result.targets[0];
+						player.line2([targets[num],result.targets[0]]);
+					}
+					event.num++;
+					if(event.num<targets.length) event.goto(1);
+				},
 				reverseOrder:function(){
 					"step 0"
 					game.delay();
@@ -11530,18 +11561,25 @@
 				},
 				phaseLoop:function(){
 					"step 0"
+					var num=1,current=player;
+					while(current.getSeatNum()==0){
+						current.setSeatNum(num);
+						current=current.next;
+						num++;
+					}
+					"step 1"
 					for(var i=0;i<lib.onphase.length;i++){
 						lib.onphase[i]();
 					}
 					player.phase();
-					"step 1"
+					"step 2"
 					if(!game.players.contains(event.player.next)){
 						event.player=game.findNext(event.player.next);
 					}
 					else{
 						event.player=event.player.next;
 					}
-					event.goto(0);
+					event.goto(1);
 				},
 				loadPackage:function(){
 					'step 0'
@@ -15070,6 +15108,19 @@
 						next.type='precard';
 						if(event.forceDie) next.forceDie=true;
 					}
+					else if(info.singleCard&&info.filterAddedTarget&&event.addedTargets&&event.addedTargets.length<targets.length){
+						var next=game.createEvent(card.name+'ContentBefore');
+						next.setContent('addExtraTarget');
+						next.target=target;
+						next.targets=targets;
+						next.card=card;
+						next.cards=cards;
+						next.player=player;
+						next.type='precard';
+						next.addedTarget=event.addedTarget;
+						next.addedTargets=event.addedTargets;
+						if(event.forceDie) next.forceDie=true;
+					}
 					"step 10"
 					if(event.all_excluded) return;
 					var info=get.info(card,false);
@@ -15107,7 +15158,7 @@
 					if(event.forceDie) next.forceDie=true;
 					if(event.addedTargets){
 						next.addedTargets=event.addedTargets;
-						next.addedTarget=event.addedTarget;
+						next.addedTarget=event.addedTargets[num];
 						next._targets=event._targets;
 					}
 					if(info.targetDelay===false){
@@ -15238,7 +15289,7 @@
 						str+='</span>'
 					}
 					str+='发动了';
-					if(!info.direct){
+					if(!info.direct&&info.log!==false){
 						game.log(player,str,'【'+get.skillTranslation(skill,player)+'】');
 						if(info.logv!==false) game.logv(player,skill,targets);
 						player.trySkillAnimate(skill,skill,checkShow);
@@ -16511,9 +16562,9 @@
 							}
 						}
 						if(_status.characterlist){
-							if(lib.character[player.name]) _status.characterlist.add(player.name);
-							if(lib.character[player.name1]) _status.characterlist.add(player.name1);
-							if(lib.character[player.name2]) _status.characterlist.add(player.name2);
+							if(lib.character[player.name]&&player.name.indexOf('gz_shibing')!=0) _status.characterlist.add(player.name);
+							if(lib.character[player.name1]&&player.name1.indexOf('gz_shibing')!=0) _status.characterlist.add(player.name1);
+							if(lib.character[player.name2]&&player.name2.indexOf('gz_shibing')!=0) _status.characterlist.add(player.name2);
 						}
 						event.cards=player.getCards('hejsx');
 						if(event.cards.length){
@@ -16943,6 +16994,15 @@
 			},
 			player:{
 				//新函数
+				setSeatNum:function(num){
+					game.broadcastAll(function(player,num){
+						player.seatNum=num;
+					},this,num);
+				},
+				getSeatNum:function(){
+					if(typeof this.seatNum=='number') return this.seatNum;
+					return 0;
+				},
 				hasSex:function(sex){
 					if(this.sex=='unknown') return false;
 					if(this.sex=='double') return true;
@@ -18121,6 +18181,7 @@
 						phaseNumber:this.phaseNumber,
 						unseen:this.isUnseen(0),
 						unseen2:this.isUnseen(1),
+						seatNum:this.seatNum,
 					}
 					for(var i=0;i<state.judges.length;i++){
 						state.views[i]=state.judges[i].viewAs;
@@ -26563,15 +26624,17 @@
 			targetEnabledx:function(card,player,target){
 				if(!card) return false;
 				if(_status.event.addCount_extra&&!lib.filter.cardUsable2(card,player)&&!game.checkMod(card,player,target,false,'cardUsableTarget',player)) return false;
+				var info=get.info(card);
+				if(info.singleCard&&info.filterAddedTarget&&ui.selected.targets.length) return info.filterAddedTarget(card,player,target,ui.selected.targets[ui.selected.targets.length-1]);
 				return lib.filter.targetEnabled.apply(this,arguments);
 			},
 			targetEnabled:function(card,player,target){
 				if(!card) return false;
 				var info=get.info(card);
 				var filter=info.filterTarget;
-				var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player);
-				if(mod==false) return false;
 				if(!info.singleCard||ui.selected.targets.length==0){
+					var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player);
+					if(mod==false) return false;
 					var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target);
 					if(mod!='unchanged') return mod;
 				}
@@ -26664,19 +26727,21 @@
 			selectCard:function(){
 				return [1,1];
 			},
-			selectTarget:function(){
-				var card=get.card(),player=get.player();
+			selectTarget:function(card,player){
+				if(!card) card=get.card();
+				if(!player) player=get.player();
 				if(card==undefined) return;
-				var range;
-				var select=get.copy(get.info(card).selectTarget);
+				var range,info=get.info(card);
+				var select=get.copy(info.selectTarget);
 				if(select==undefined){
-					if(get.info(card).filterTarget==undefined) return[0,0];
+					if(info.filterTarget==undefined) return [0,0];
 					range=[1,1];
 				}
 				else if(typeof select=='number') range=[select,select];
 				else if(get.itemtype(select)=='select') range=select;
 				else if(typeof select=='function') range=select(card,player);
 				game.checkMod(card,player,range,'selectTarget',player);
+				if(info.singleCard) return [range[0]*2,range[1]*2];
 				return range;
 			},
 			judge:function(card,player,target){
@@ -28504,7 +28569,8 @@
 							player.hujia=info.hujia;
 							player.sex=info.sex;
 							player.side=info.side;
-							player.phaseNumber=info.phaseNumber,
+							player.phaseNumber=info.phaseNumber;
+							player.seatNum=info.seatNum;
 							player.setNickname();
 							if(info.dead){
 								player.classList.add('dead');
@@ -33760,7 +33826,7 @@
 				}
 				if((skillinfo&&skillinfo.viewAs&&typeof skillinfo.viewAs!='function')||!_status.event.skill){
 					var cardinfo=get.info(get.card());
-					if(cardinfo&&cardinfo.multitarget&&!cardinfo.multiline){
+					if(cardinfo&&(cardinfo.multitarget||cardinfo.complexSelect)&&!cardinfo.multiline){
 						_status.multitarget=true;
 					}
 				}

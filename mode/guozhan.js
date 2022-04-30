@@ -7769,7 +7769,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				audio:"qice_backup",
 				filter:function(event,player){
-					return player.countCards('h')>0
+					var hs=player.getCards('h');
+					if(!hs.length) return false;
+					for(var i=0;i<hs.length;i++){
+						var mod2=game.checkMod(hs[i],player,'unchanged','cardEnabled2',player);
+					if(mod2===false) return false;
+					}
+					return true;
 				},
 				group:'gzqice_change',
 				subSkill:{
