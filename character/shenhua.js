@@ -3372,6 +3372,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					dialog:function(event,player){
 						return ui.create.dialog('急袭',player.getExpansions('tuntian'),'hidden');
 					},
+					filter:function(button,player){
+						var card=button.link;
+						if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) return false;
+						var evt=_status.event.getParent();
+						return evt.filterCard(get.autoViewAs({name:'shunshou'},[card]),player,evt)
+					},
 					backup:function(links,player){
 						var skill=_status.event.buttoned;
 						return {
@@ -6031,8 +6037,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				locked:false,
 				mod:{
-					attackFrom:function(from,to,distance){
-						if(get.zhu(from,'shouyue')) return distance-1;
+					attackRange:function(player,distance){
+						if(get.zhu(player,'shouyue')) return distance+1;
 					}
 				},
 				ai:{

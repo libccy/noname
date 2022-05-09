@@ -81,7 +81,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				updateUsable:'phaseUse',
 				global:'icesha_skill',
-				range:{attack:1},
+				range:function(card,player,target){
+					return player.inRange(target);
+				},
 				selectTarget:1,
 				cardPrompt:function(card){
 					if(card.nature=='stab') return '出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，且在此之后需弃置一张手牌（没有则不弃）。否则你对其造成1点伤害。';

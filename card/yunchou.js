@@ -265,10 +265,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				filterTarget:function(card,player,target){
 					if(target==player) return false;
-					if(!ui.selected.targets.length) return target.countCards('h')>0&&game.hasPlayer(function(current){
+					return target.countCards('h')>0&&game.hasPlayer(function(current){
 						return target.canCompare(current);
 					});
 					return ui.selected.targets[0].canCompare(target);
+				},
+				filterAddedTarget:function(card,player,target,preTarget){
+					return target!=player&&preTarget.canCompare(target);
 				},
 				enable:function(){
 					return game.countPlayer()>2;
@@ -287,6 +290,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				complexSelect:true,
 				content:function(){
 					'step 0'
+					if(!event.addedTarget||!target.canCompare(event.addedTarget)){
+						event.finish();
+						return;
+					}
 					target.chooseToCompare(event.addedTarget);
 					'step 1'
 					if(!result.tie){
@@ -308,7 +315,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.discardPlayerCard(player);
 					target.line(player);
 				},
-				selectTarget:2,
 				ai:{
 					order:5,
 					value:[7,1],

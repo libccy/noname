@@ -29,6 +29,7 @@ window.noname_character_rank={
 		'ns_zhangwei',
 		'wanglang',
 		'caojinyu',
+		'zhangmancheng',
 		'key_mio',
 		'key_midori',
 		'key_yuri',
@@ -498,6 +499,8 @@ window.noname_character_rank={
 		'sp_zhujun',
 		're_guohuanghou',
 		'tw_liuhong',
+		're_zhangbao',
+		're_dengzhi',
 	],
 	bp:[
 		'chess_diaochan',
@@ -747,6 +750,11 @@ window.noname_character_rank={
 		'ol_xuhuang',
 		'ol_zhuling',
 		'tw_zangba',
+		're_miheng',
+		'fengxi',
+		'tw_chengpu',
+		'key_satomi',
+		'key_erika',
 	],
 	b:[
 		'diy_feishi',
@@ -966,6 +974,7 @@ window.noname_character_rank={
 		'zhaoyan',
 		'huojun',
 		'tw_caocao',
+		'xin_wuguotai',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1301,6 +1310,7 @@ window.noname_character_rank={
 			'shen_xunyu',
 			'tw_gexuan',
 			'fengfangnv',
+			'zhangmancheng',
 			'key_tomoya',
 			'key_masato',
 			'key_shiorimiyuki',
@@ -1319,6 +1329,8 @@ window.noname_character_rank={
 			'key_tenzen',
 			'key_kotarou',
 			'key_kyou',
+			'key_erika',
+			'key_satomi',
 			'noname',
 		],
 		epic:[
@@ -1864,6 +1876,8 @@ window.noname_character_rank={
 			're_guohuanghou',
 			'tw_huojun',
 			'zhaoyan',
+			're_miheng',
+			'tw_chengpu',
 		],
 		junk:[
 			'sunshao',

@@ -17,7 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_sunben:["re_sunben"],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian","re_dengai","re_jiangwei","re_zhurong"],
-				mobile_yijiang1:["re_xusheng","re_lingtong","ol_yujin"],
+				mobile_yijiang1:["re_xusheng","re_lingtong","ol_yujin","re_wuguotai"],
 				mobile_yijiang2:["old_bulianshi","xin_liaohua","xin_caozhang","re_liubiao","re_handang","xin_chengpu","xin_gongsunzan","re_zhonghui"],
 				mobile_yijiang3:["xin_jianyong","xin_zhuran","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou","re_yufan"],
 				mobile_yijiang4:["xin_zhoucang","xin_caifuren","xin_guyong","xin_sunluban","xin_caozhen"],
@@ -27,6 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			re_wuguotai:['female','wu',3,['reganlu','buyi']],
 			xin_sunxiu:['male','wu',3,['mobileyanzhu','mobilexingxue','zhaofu'],['zhu']],
 			sp_maojie:['male','wei',3,['bingqing','yingfeng']],
 			sp_zhujun:['male','qun',4,['yangjie','zjjuxiang','houfeng']],
@@ -606,6 +607,62 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			reganlu:{
+				enable:'phaseUse',
+				usable:1,
+				audio:2,
+				selectTarget:2,
+				delay:0,
+				filterTarget:function(card,player,target){
+					if(target.isMin()) return false;
+					if(ui.selected.targets.length==0) return true;
+					if(ui.selected.targets[0].countCards('e')==0&&target.countCards('e')==0) return false;
+					return target==player||ui.selected.targets[0]==player||Math.abs(ui.selected.targets[0].countCards('e')-target.countCards('e'))<=player.maxHp-player.hp;
+				},
+				multitarget:true,
+				multiline:true,
+				content:function(){
+					targets[0].swapEquip(targets[1]);
+				},
+				ai:{
+					order:10,
+					threaten:function(player,target){
+						return 0.8*Math.max(1+target.maxHp-target.hp);
+					},
+					result:{
+						target:function(player,target){
+							var list1=[];
+							var list2=[];
+							var num=player.maxHp-player.hp;
+							var players=game.filterPlayer();
+							for(var i=0;i<players.length;i++){
+								if(get.attitude(player,players[i])>0) list1.push(players[i]);
+								else if(get.attitude(player,players[i])<0) list2.push(players[i]);
+							}
+							list1.sort(function(a,b){
+								return a.countCards('e')-b.countCards('e');
+							});
+							list2.sort(function(a,b){
+								return b.countCards('e')-a.countCards('e');
+							});
+							var delta;
+							for(var i=0;i<list1.length;i++){
+								for(var j=0;j<list2.length;j++){
+									delta=list2[j].countCards('e')-list1[i].countCards('e');
+									if(delta<=0) continue;
+									if(delta<=num||list1[i]==player||list2[j]==player){
+										if(target==list1[i]||target==list2[j]){
+											return get.attitude(player,target);
+										}
+										return 0;
+									}
+								}
+							}
+							return 0;
+						}
+					},
+				}
+			},
 			//孙休
 			mobilexingxue:{
 				audio:2,
@@ -1276,7 +1333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				forced:true,
-				zhuanhuanji:true,
+				zhuanhuanji:'number',
 				filter:function(event,player){
 					return (player.countMark('spshidi')%2)==['phaseJieshu','phaseZhunbei'].indexOf(event.name);
 				},
@@ -3238,6 +3295,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw(3).gaintag=['poxiang'];
 					player.addTempSkill('poxiang_mark')
 					'step 1'
+					var cards=player.getExpansions('jueyong');
+					if(cards.length) player.loseToDiscardpile(cards);
 					player.unmarkSkill('jueyong');
 					player.loseHp();
 					'step 2'
@@ -4281,7 +4340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					unequip:true,
 					respondSha:true,
 					skillTagFilter:function(player,tag,arg){
-						if(tag=='unequip') return arg.card&&arg.card.storage&&arg.card.storage.dbchongjian;
+						if(tag=='unequip') return player.group=='wu'&&arg.card&&arg.card.storage&&arg.card.storage.dbchongjian;
 						return player.group=='wu'&&arg=='use'&&player.hasCard(function(card){
 							return get.type(card)=='equip';
 						},'hes');
@@ -11281,7 +11340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:'relihuo',
 				filter:function(event,player){
-					return event.getParent(2).relihuo==true;
+					return event.getParent(2).relihuo==true&&event.player.isLinked();
 				},
 				content:function(){
 					trigger.num++;
@@ -16205,7 +16264,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehuaibi_info:'主公技，锁定技，你的手牌上限+X（X为你因〖邀虎〗选择势力的角色数量)。',
 			simafu:'司马孚',
 			xunde:'勋德',
-			xunde_info:'一名角色受到伤害后，若你至其的距离为1，则你可判定。若判定结果：大于5，你令该角色获得判定牌；小于7，你令伤害来源弃置一张牌。',
+			xunde_info:'一名角色受到伤害后，若你至其的距离不大于1，则你可判定。若判定结果：大于5，你令该角色获得判定牌；小于7，你令伤害来源弃置一张牌。',
 			chenjie:'臣节',
 			chenjie_info:'一名角色的判定牌生效前，你可打出一张花色相同的牌。系统将你打出的牌作为新判定牌，将原判定牌置入弃牌堆。然后你摸两张牌。',
 			mayuanyi:'马元义',
@@ -16331,6 +16390,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mobileyanzhu_info:'出牌阶段限一次，你可以令一名有牌的其他角色选择一项：①你获得其装备区里所有的牌，然后你失去技能〖宴诛〗。②你获得其一张牌。',
 			mobilexingxue:'兴学',
 			mobilexingxue_info:'结束阶段开始时，你可以令至多X名角色依次摸一张牌并将一张牌置于牌堆顶（X为你的体力值，若你未拥有〖宴诛〗，则将X改为你的体力上限，且其可以改为将一张牌交给一名其他目标角色）。',
+			re_wuguotai:'手杀吴国太',
+			reganlu:'甘露',
+			reganlu_info:'出牌阶段限一次，你可以选择装备区牌数之差的绝对值不大于X的两名角色或包含你在内的两名角色，然后交换这两名角色装备区内的牌。（X为你已损失的体力值）',
+			taoqian:'手杀陶谦',
+			miheng:'手杀祢衡',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',

@@ -1368,7 +1368,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					filterDamage:true,
 					skillTagFilter:function(player,tag,arg){
-						if(!player.getStorage('qiaoyan').length) return false;
+						if(!player.getExpansions('qiaoyan').length) return false;
 						if(arg&&arg.player){
 							if(arg.player.hasSkillTag('jueqing',false,player)) return false;
 						}

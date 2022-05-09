@@ -5,13 +5,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			tw:{
-				tw_mobile:['nashime','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu','tw_huojun','tw_caocao'],
-				tw_mobile2:['tw_beimihu','tw_gexuan','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong'],
+				tw_mobile:['nashime','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu','tw_huojun','tw_caocao','tw_zhangmancheng'],
+				tw_mobile2:['tw_beimihu','tw_gexuan','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_chengpu'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
 				tw_english:['kaisa'],
 			},
 		},
 		character:{
+			tw_chengpu:['male','wu',4,['twlihuo','twchunlao']],
+			tw_zhangmancheng:['male','qun',4,['twfengji','twyiju','twbudao']],
 			tw_caocao:['male','qun',4,['twlingfa']],
 			tw_liuhong:['male','qun',4,['twyujue','twgezhi','twfengqi'],['zhu']],
 			tw_huojun:['male','shu',4,['twsidai','twjieyu']],
@@ -46,6 +48,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wuban:'吴班，字元雄，生卒年不详，兖州陈留郡（治今河南省开封市）人。三国时期蜀汉将领。为领军，随刘备参加伐吴之战，后又随蜀汉丞相诸葛亮参加北伐曹魏的战争，并于公元231年（建兴九年）的北伐中大破司马懿。官至骠骑将军，封绵竹侯。吴班以豪爽侠义著称于当时，又因族妹吴氏是蜀汉穆皇后，在蜀汉将领中有较高的地位。',
 			yuejiu:'乐就（？－197），在袁术为攻徐州而大兴七军之际，以督战官之身份担任联络之役。但是，袁术军不幸战败，其也在寿春被曹操军逮捕并遭到斩首。',
 			huojun:'霍峻（178年—217年），字仲邈，南郡枝江（今湖北枝江）人，东汉末年刘备麾下名将。其兄霍笃曾在故乡聚部众数百人。后霍笃逝世，刘表以霍峻继承其部曲。208年（建安十三年），刘表病逝，霍峻便率部曲归降刘备，并被任为中郎将。后随刘备入蜀，刘备从葭萌还袭刘璋，留霍峻守葭萌城。张鲁遣将杨帛劝降霍峻，霍峻严词拒绝，杨帛退去。后刘璋将扶禁、向存等率万余人由阆水上，攻围霍峻，城中兵不过数百人，霍峻坚守一年，伺机将其击破。刘备定蜀，嘉霍峻之功，于是分广汉为梓潼郡，以峻为梓潼太守、裨将军。三年后去世，还葬成都。刘备亲率群僚临会吊祭，留宿墓上，当时的人都为他感到荣幸。',
+			zhangmancheng:'张曼成（？—184年6月），东汉末年黄巾之乱时南阳黄巾军首领，杀郡守褚贡，一度占据宛城数月，后为秦颉所杀。',
 		},
 		card:{
 			dz_mantianguohai:{
@@ -159,6 +162,600 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			twlihuo:{
+				trigger:{player:'useCard1'},
+				filter:function(event,player){
+					if(event.card.name=='sha'&&!event.card.nature) return true;
+					return false;
+				},
+				audio:'lihuo',
+				prompt2:function(event){
+					return '将'+get.translation(event.card)+'改为火属性';
+				},
+				audioname:['re_chengpu'],
+				check:function(event,player){
+					return game.hasPlayer(function(current){
+						return !event.targets.contains(current)&&player.canUse(event.card,current)&&get.effect(current,{name:'sha',nature:'fire',cards:event.cards.slice(0)},player,player)>0;
+					});
+				},
+				content:function(){
+					trigger.card.nature='fire';
+					trigger.card.twlihuo_buffed=true;
+				},
+				group:['twlihuo2','twlihuo3'],
+				ai:{
+					fireAttack:true,
+				},
+			},
+			twlihuo2:{
+				trigger:{player:'useCard2'},
+				filter:function(event,player){
+					if(event.card.name!='sha'||event.card.nature!='fire') return false;
+					return game.hasPlayer(function(current){
+						return !event.targets.contains(current)&&player.canUse(event.card,current);
+					});
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('twlihuo'),'为'+get.translation(trigger.card)+'增加一个目标',function(card,player,target){
+						return !_status.event.sourcex.contains(target)&&player.canUse(_status.event.card,target);
+					}).set('sourcex',trigger.targets).set('card',trigger.card).set('ai',function(target){
+						var player=_status.event.player;
+						return get.effect(target,_status.event.card,player,player);
+					});
+					'step 1'
+					if(result.bool){
+						if(!event.isMine()&&!_status.connectMode) game.delayx();
+						event.target=result.targets[0];
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					player.logSkill('twlihuo',event.target);
+					trigger.targets.push(event.target);
+				},
+			},
+			twlihuo3:{
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					return event.card.twlihuo_buffed=true&&player.getHistory('sourceDamage',function(evt){
+						return evt.card==event.card&&evt._dyinged;
+					}).length>0;
+				},
+				forced:true,
+				audio:'lihuo',
+				audioname:['re_chengpu'],
+				content:function(){
+					player.loseHp();
+				}
+			},
+			twchunlao:{
+				audio:'chunlao',
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.countCards('hej')>0;
+					})&&!game.hasPlayer(function(current){
+						return current.getExpansions('twchunlao').length>0;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('twchunlao'),'将一名角色区域内的一张牌作为“醇”置于其武将牌上',function(card,player,target){
+						return target.countCards('hej')>0;
+					}).set('ai',function(target){
+						return (get.attitude(_status.event.player,target))*(player==target?1:2);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('twchunlao',target);
+						player.choosePlayerCard(target,'hej',true);
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						target.addToExpansion(result.cards,target,'give').gaintag.add('twchunlao');
+					}
+				},
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+				group:['twchunlao_sha','twchunlao_dying'],
+				subSkill:{
+					sha:{
+						trigger:{global:'useCard'},
+						direct:true,
+						filter:function(event,player){
+							return event.player!=player&&event.card.name=='sha'&&event.player.countCards('he')>0&&event.player.getExpansions('twchunlao').length>0;
+						},
+						content:function(){
+							'step 0'
+							event.target=trigger.player;
+							event.target.chooseCard('he','醇醪：是否交给'+get.translation(player)+'一张牌，令'+get.translation(trigger.card)+'的伤害值基数+1？').set('ai',function(card){
+								if(!_status.event.goon) return 3.5-get.value(card);
+								return 7-get.value(card);
+							}).set('goon',function(){
+								if(get.attitude(target,player)<0) return false;
+								var d1=true;
+								if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false;
+								for(var target of trigger.targets){
+									if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
+										target:target,
+										card:trigger.card,
+									},true)){
+										if(!target.hasSkill('gangzhi')) d1=false;
+										if(!target.hasSkillTag('filterDamage',null,{
+											player:trigger.player,
+											card:trigger.card,
+										})&&get.attitude(player,target)<0) return true;
+									}
+								}
+								return d1;
+							}());
+							if(!event.target.isUnderControl(true)&&!event.target.isOnline()) game.delayx();
+							'step 1'
+							if(result.bool){
+								target.logSkill('twchunlao',player);
+								if(!target.hasSkill('twchunlao')) game.trySkillAudio('twchunlao',player);
+								player.gain(result.cards,target,'giveAuto');
+								trigger.baseDamage++;
+							}
+						},
+					},
+					dying:{
+						audio:'chunlao',
+						trigger:{global:'dying'},
+						logTarget:'player',
+						filter:function(event,player){
+							return event.player.getExpansions('twchunlao').length>0;
+						},
+						prompt2:(event,player)=>('移去'+get.translation(event.player)+'武将牌上的“醇”并摸一张牌，然后令其回复1点体力'),
+						check:function(event,player){
+							return get.attitude(player,event.player)>0;
+						},
+						content:function(){
+							var target=trigger.player,cards=target.getExpansions('twchunlao');
+							if(cards.length) target.loseToDiscardpile(cards);
+							player.draw();
+							target.recover();
+						},
+					},
+				},
+			},
+			//张曼成
+			twfengji:{
+				audio:2,
+				mahouSkill:true,
+				trigger:{player:'phaseUseBegin'},
+				filter:function(event,player){
+					return !player.getExpansions('twfengji').length&&!player.hasSkill('twfengji_mahou')&&player.countCards('he');
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseCard('he',get.prompt2('twfengji')).set('ai',function(card){
+						var name=card.name,num=0;
+						for(var i=0;i<ui.cardPile.childNodes.length;i++){
+							if(ui.cardPile.childNodes[i].name==name) num++;
+						}
+						if(num<2) return false;
+						return 8-get.value(card);
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('twfengji');
+						player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('twfengji');
+						player.chooseControl('1回合','2回合','3回合').set('prompt','请选择施法时长').set('ai',function(){
+							var player=_status.event.player;
+							var safe=Math.min(player.getHandcardLimit(),player.countCards('h','shan'));
+							if(safe<Math.min(3,game.countPlayer())){
+								var next=player.next;
+								while(next!=player&&get.attitude(next,player)>0){
+									safe++;
+									next=next.next;
+								}
+							}
+							return Math.max(2,Math.min(safe,3,game.countPlayer()))-1;
+						});
+					}
+					else event.finish();
+					'step 2'
+					player.storage.twfengji_mahou=[result.index+1,result.index+1];
+					player.addTempSkill('twfengji_mahou',{player:'die'});
+				},
+				marktext:'示',
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+				subSkill:{
+					mahou:{
+						trigger:{global:'phaseEnd'},
+						forced:true,
+						popup:false,
+						charlotte:true,
+						content:function(){
+							var list=player.storage.twfengji_mahou;
+							list[1]--;
+							if(list[1]==0){
+								game.log(player,'的“蜂集”魔法生效');
+								player.logSkill('twfengji');
+								var cards=player.getExpansions('twfengji');
+								if(cards.length){
+									var cards2=[],num=list[0];
+									for(var card of cards){
+										for(var i=0;i<num;i++){
+											var card2=get.cardPile2(function(cardx){
+												return cardx.name==card.name&&!cards2.contains(cardx);
+											});
+											if(card2) cards2.push(card2);
+											else break;
+										}
+									}
+									game.delayx();
+									if(cards2.length) player.gain(cards2,'gain2');
+									player.loseToDiscardpile(cards);
+								}
+								player.removeSkill('twfengji_mahou');
+							}
+							else{
+								game.log(player,'的“蜂集”魔法剩余','#g'+(list[1])+'回合');
+								player.markSkill('twfengji_mahou');
+							}
+						},
+						ai:{threaten:2.5},
+						mark:true,
+						onremove:true,
+						//该图标为灵魂宝石
+						marktext:'♗',
+						intro:{
+							name:'施法：蜂集',
+							markcount:function(storage){
+								if(storage) return storage[1];
+								return 0;
+							},
+							content:function(storage){
+								if(storage){
+								 return '经过'+storage[1]+'个“回合结束时”后，若有“示”，则从牌堆中获得'+storage[0]+'张和“示”名称相同的牌';
+								}
+								return '未指定施法效果';
+							},
+						},
+					},
+				},
+			},
+			twyiju:{
+				audio:2,
+				locked:false,
+				mod:{
+					attackRangeBase:function(player,num){
+						if(player.getExpansions('twfengji').length) return player.hp;
+					},
+					cardUsable:function(card,player,num){
+						if(card.name=='sha'&&player.getExpansions('twfengji').length) return num-1+player.hp;
+					},
+				},
+				trigger:{player:'damageBegin3'},
+				filter:function(event,player){
+					return player.getExpansions('twfengji').length>0;
+				},
+				forced:true,
+				content:function(){
+					trigger.num++;
+					var cards=player.getExpansions('twfengji');
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				ai:{
+					halfneg:true,
+					combo:'twfengji',
+				},
+			},
+			twbudao:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				derivation:['twzhouhu','twharvestinori','twzuhuo'],
+				limited:true,
+				skillAnimation:true,
+				animationColor:'metal',
+				check:function(event,player){
+					return !player.hasUnknown()||!player.hasFriend();
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('twbudao');
+					player.loseMaxHp();
+					player.recover();
+					player.chooseControl(lib.skill.twbudao.derivation).set('prompt','选择获得一个技能').set('ai',function(){
+						return 'twharvestinori';
+					});
+					'step 1'
+					var skill=result.control;
+					player.addSkillLog(skill);
+					event.twbudao_skill=skill;
+					player.chooseTarget(lib.filter.notMe,'是否令一名其他角色也获得【'+get.translation(skill)+'】？').set('ai',function(target){
+						var player=_status.event.player;
+						if(player.identity=='nei') return 0;
+						return get.attitude(player,target)-6;
+					});
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.line(target,'green');
+						target.addSkillLog(event.twbudao_skill);
+						var cards=target.getCards('he');
+						if(!cards.length) event.finish();
+						else if(cards.length==1) event._result={bool:true,cards:cards};
+						else target.chooseCard('he',true,'交给'+get.translation(player)+'一张牌作为学费');
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool) player.gain(result.cards,target,'giveAuto');
+				},
+			},
+			twzhouhu:{
+				audio:2,
+				mahouSkill:true,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return !player.hasSkill('twzhouhu_mahou')&&player.countCards('h',lib.skill.twzhouhu.filterCard)>0;
+				},
+				filterCard:{color:'red'},
+				check:function(card){
+					if(_status.event.player.isHealthy()) return 0;
+					return 7-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					player.chooseControl('1回合','2回合','3回合').set('prompt','请选择施法时长').set('ai',function(){
+						var player=_status.event.player;
+						var safe=1;
+						if(safe<Math.min(3,game.countPlayer(),player.getDamagedHp())){
+							var next=player.next;
+							while(next!=player&&get.attitude(next,player)>0){
+								safe++;
+								next=next.next;
+							}
+						}
+						return Math.max(1,Math.min(safe,3,game.countPlayer(),player.getDamagedHp()))-1;
+					});
+					'step 1'
+					player.storage.twzhouhu_mahou=[result.index+1,result.index+1];
+					player.addTempSkill('twzhouhu_mahou',{player:'die'});
+				},
+				ai:{
+					order:2,
+					result:{
+						player:1,
+					},
+				},
+				subSkill:{
+					mahou:{
+						trigger:{global:'phaseEnd'},
+						forced:true,
+						popup:false,
+						charlotte:true,
+						content:function(){
+							var list=player.storage.twzhouhu_mahou;
+							list[1]--;
+							if(list[1]==0){
+								game.log(player,'的“咒护”魔法生效');
+								player.logSkill('twzhouhu');
+								var num=list[0];
+								player.recover(num);
+								player.removeSkill('twzhouhu_mahou');
+							}
+							else{
+								game.log(player,'的“咒护”魔法剩余','#g'+(list[1])+'回合');
+								player.markSkill('twzhouhu_mahou');
+							}
+						},
+						mark:true,
+						onremove:true,
+						marktext:'♗',
+						intro:{
+							name:'施法：咒护',
+							markcount:function(storage){
+								if(storage) return storage[1];
+								return 0;
+							},
+							content:function(storage){
+								if(storage){
+								 return '经过'+storage[1]+'个“回合结束时”后，回复'+storage[0]+'点体力';
+								}
+								return '未指定施法效果';
+							},
+						},
+					},
+				},
+			},
+			twharvestinori:{
+				audio:2,
+				mahouSkill:true,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return !player.hasSkill('twharvestinori_mahou')&&player.countCards('h',lib.skill.twharvestinori.filterCard)>0;
+				},
+				filterCard:{color:'black'},
+				check:function(card){
+					return 8-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					player.chooseControl('1回合','2回合','3回合').set('prompt','请选择施法时长').set('ai',function(){
+						var player=_status.event.player;
+						var safe=player.hp;
+						if(safe<Math.min(3,game.countPlayer())){
+							var next=player.next;
+							while(next!=player&&get.attitude(next,player)>0){
+								safe++;
+								next=next.next;
+							}
+						}
+						return Math.max(1,Math.min(safe,3,game.countPlayer()))-1;
+					});
+					'step 1'
+					player.storage.twharvestinori_mahou=[result.index+1,result.index+1];
+					player.addTempSkill('twharvestinori_mahou',{player:'die'});
+				},
+				ai:{
+					order:8,
+					result:{
+						player:1,
+					},
+				},
+				subSkill:{
+					mahou:{
+						trigger:{global:'phaseEnd'},
+						forced:true,
+						popup:false,
+						charlotte:true,
+						content:function(){
+							var list=player.storage.twharvestinori_mahou;
+							list[1]--;
+							if(list[1]==0){
+								game.log(player,'的“丰祈”魔法生效');
+								player.logSkill('twharvestinori');
+								var num=list[0]*2;
+								player.draw(num);
+								player.removeSkill('twharvestinori_mahou');
+							}
+							else{
+								game.log(player,'的“丰祈”魔法剩余','#g'+(list[1])+'回合');
+								player.markSkill('twharvestinori_mahou');
+							}
+						},
+						mark:true,
+						onremove:true,
+						marktext:'♗',
+						intro:{
+							name:'施法：丰祈',
+							markcount:function(storage){
+								if(storage) return storage[1];
+								return 0;
+							},
+							content:function(storage){
+								if(storage){
+								 return '经过'+storage[1]+'个“回合结束时”后，摸'+storage[0]*2+'张牌';
+								}
+								return '未指定施法效果';
+							},
+						},
+					},
+				},
+			},
+			twzuhuo:{
+				audio:2,
+				mahouSkill:true,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return !player.hasSkill('twzuhuo_mahou')&&player.countCards('he',lib.skill.twzuhuo.filterCard)>0;
+				},
+				filterCard:function(card){
+					return get.type(card)!='basic';
+				},
+				position:'he',
+				check:function(card){
+					return 7-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					player.chooseControl('1回合','2回合','3回合').set('prompt','请选择施法时长').set('ai',function(){
+						var player=_status.event.player;
+						var safe=Math.min(player.getHandcardLimit(),player.countCards('h','shan'));
+						if(safe<Math.min(3,game.countPlayer())){
+							var next=player.next;
+							while(next!=player&&get.attitude(next,player)>0){
+								safe++;
+								next=next.next;
+							}
+						}
+						return Math.max(2,Math.min(safe,3,game.countPlayer()))-1;
+					});
+					'step 1'
+					player.storage.twzuhuo_mahou=[result.index+1,result.index+1];
+					player.addTempSkill('twzuhuo_mahou',{player:'die'});
+				},
+				ai:{
+					order:2,
+					result:{
+						player:1,
+					},
+				},
+				subSkill:{
+					mahou:{
+						trigger:{global:'phaseEnd'},
+						forced:true,
+						popup:false,
+						charlotte:true,
+						content:function(){
+							var list=player.storage.twzuhuo_mahou;
+							list[1]--;
+							if(list[1]==0){
+								game.log(player,'的“阻祸”魔法生效');
+								player.logSkill('twzuhuo');
+								var num=list[0];
+								player.addSkill('twzuhuo_effect');
+								player.addMark('twzuhuo_effect',num,false);
+								player.removeSkill('twzuhuo_mahou');
+							}
+							else{
+								game.log(player,'的“阻祸”魔法剩余','#g'+(list[1])+'回合');
+								player.markSkill('twzuhuo_mahou');
+							}
+						},
+						mark:true,
+						onremove:true,
+						marktext:'♗',
+						intro:{
+							name:'施法：阻祸',
+							markcount:function(storage){
+								if(storage) return storage[1];
+								return 0;
+							},
+							content:function(storage){
+								if(storage){
+								 return '经过'+storage[1]+'个“回合结束时”后，获得'+storage[0]+'层“防止一次伤害”的效果';
+								}
+								return '未指定施法效果';
+							},
+						},
+					},
+					effect:{
+						charlotte:true,
+						onremove:true,
+						trigger:{player:'damageBegin2'},
+						forced:true,
+						filter:function(event,player){
+							return player.hasMark('twzuhuo_effect');
+						},
+						content:function(){
+							trigger.cancel();
+							player.removeMark('twzuhuo_effect',1,false);
+							if(!player.countMark('twzuhuo_effect')) player.removeSkill('twzuhuo_effect');
+						},
+						marktext:'阻︎',
+						intro:{
+							onremove:true,
+							content:'防止接下来的#次伤害',
+						},
+					},
+				},
+			},
+			//群曹操
 			twlingfa:{
 				audio:2,
 				trigger:{global:'roundStart'},
@@ -2929,6 +3526,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twlingfa_info:'①第一轮游戏开始时，你可选择获得如下效果直到本轮结束：其他角色使用【杀】时，若其有牌，则其需弃置一张牌，否则受到你造成的1点伤害。②第二轮游戏开始时，你可选择获得如下效果直到本轮结束：其他角色使用【桃】结算结束后，若其有牌，则其需交给你一张牌，否则受到你造成的1点伤害。③第三轮游戏开始时，你失去〖令法〗并获得〖治暗〗。',
 			twzhian:'治暗',
 			twzhian_info:'每回合限一次。一名角色使用装备牌或延时锦囊牌后，你可选择：⒈弃置位于场上的此牌。⒉弃置一张手牌并获得位于场上的此牌。⒊对其造成1点伤害。',
+			tw_zhangmancheng:'张曼成',
+			twfengji:'蜂集',
+			twfengji_info:'出牌阶段开始时，若你没有“示”，则你可以将一张牌作为“示”置于武将牌上并施法：从牌堆中获得X张与“示”牌名相同的牌，然后移去“示”。',
+			twyiju:'蚁聚',
+			twyiju_info:'非锁定技。若你的武将牌上有“示”，则：①你使用【杀】的次数上限和攻击范围的基数改为你的体力值。②当你受到伤害时，你移去“示”，且令此伤害+1。',
+			twbudao:'布道',
+			twbudao_info:'限定技。准备阶段，你可减1点体力上限，回复1点体力并选择获得一个“施法”技能。然后你可以令一名其他角色也获得此技能并交给你一张牌。',
+			twzhouhu:'咒护',
+			twzhouhu_info:'出牌阶段限一次。你可以弃置一张红色手牌并施法：回复1点体力。',
+			twharvestinori:'丰祈',
+			twharvestinori_info:'出牌阶段限一次。你可以弃置一张黑色手牌并施法：摸2X张牌。',
+			twzuhuo:'阻祸',
+			twzuhuo_info:'出牌阶段限一次。你可以弃置一张非基本牌并施法：防止你受到的下X次伤害。',
+			tw_chengpu:'程普',
+			twlihuo:'疠火',
+			twlihuo2:'疠火',
+			twlihuo3:'疠火',
+			twlihuo_info:'①当你声明使用普【杀】时，你可以将此【杀】改为火【杀】。此牌使用结算结束后，若有角色因此【杀】造成的伤害进入过濒死状态，则你失去1点体力。②当你使用火【杀】选择目标后，你可为此牌增加一个目标。',
+			twchunlao:'醇醪',
+			twchunlao_info:'①准备阶段，若场上没有“醇”，则你可将一名角色区域内的一张牌置于其武将牌上，称为“醇”。②一名角色使用【杀】时，若其有“醇”，则你可以交给你一张牌，令此【杀】的伤害值基数+1。③一名角色进入濒死状态时，若其有“醇”，则你可以移去“醇”并摸一张牌，然后令其回复1点体力。',
 			
 			tw_mobile:'移动版·海外服',
 			tw_mobile2:'海外服异构',

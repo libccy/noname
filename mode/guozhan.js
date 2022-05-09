@@ -510,7 +510,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_luyusheng:['female','wu',3,['zhente','zhiwei']],
 				gz_zongyu:['male','shu',3,['zyqiao','chengshang']],
 				gz_miheng:['male','qun',3,['gzrekuangcai','gzshejian'],['gzskin']],
-				gz_fengxi:['male','wu',3,['yusui','boyan']],
+				gz_fengxi:['male','wu',3,['gzyusui','gzboyan'],['gzskin']],
 				gz_dengzhi:['male','shu',3,['gzjianliang','gzweimeng'],['gzskin']],
 				gz_re_nanhualaoxian:['male','qun',4,['gzgongxiu','gzjinghe']],
 				gz_zhouyi:['female','wu',3,['gzzhukou','gzduannian','gzlianyou']],
@@ -1831,8 +1831,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//冯熙
-			yusui:{
-				audio:2,
+			gzyusui:{
+				audio:'yusui',
 				trigger:{target:'useCardToTargeted'},
 				filter:function(event,player){
 					return event.player!=player&&event.player.isIn()&&event.player.isEnemyOf(player)&&get.color(event.card)=='black';
@@ -1867,11 +1867,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else target.loseHp(target.hp-player.hp);
 				},
 			},
-			boyan:{
+			gzboyan:{
+				audio:'boyan',
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return game.hasPlayer((target)=>lib.skill.boyan.filterTarget(null,player,target));
+					return game.hasPlayer((target)=>lib.skill.gzboyan.filterTarget(null,player,target));
 				},
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('h')<target.maxHp;
@@ -1880,7 +1881,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					target.draw(Math.min(5,target.maxHp-target.countCards('h')));
 					'step 1'
-					target.addTempSkill('boyan_block');
+					target.addTempSkill('gzboyan_block');
 					'step 2'
 					if(target.isIn()) player.chooseBool('纵横：是否令'+get.translation(target)+'获得【驳言】？').set('ai',function(){
 						var evt=_status.event.getParent();
@@ -1889,18 +1890,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 3'
 					if(result.bool){
-						target.addTempSkill('boyan_zongheng',{player:'phaseEnd'});
+						target.addTempSkill('gzboyan_zongheng',{player:'phaseEnd'});
 						game.log(player,'发起了','#y纵横','，令',target,'获得了技能','#g【驳言】');
 					}
 				},
-				derivation:'boyan_zongheng',
+				derivation:'gzboyan_zongheng',
 				subSkill:{
 					zongheng:{
 						enable:'phaseUse',
 						usable:1,
 						filterTarget:lib.filter.notMe,
 						content:function(){
-							target.addTempSkill('boyan_block');
+							target.addTempSkill('gzboyan_block');
 						},
 						ai:{
 							order:4,
@@ -1931,7 +1932,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							if(get.attitude(player,target)>0) return Math.min(5,target.maxHp-target.countCards('h'));
 							if(target.maxHp-target.countCards('h')==1&&target.countCards('h','shan')&&!target.hasSkillTag('respondShan',true,null,true)&&player.countCards('h',function(card){
-								return get.tag(card,'respondShan')&&get.effect(target,card,player,player)>0&&player.getUseValue(card)>0;
+								return get.tag(card,'respondShan')&&get.effect(target,card,player,player)>0&&player.getUseValue(card,null,true)>0;
 							})) return -2;
 						},
 					},
@@ -3083,12 +3084,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzrekuangcai:{
 				audio:'gzkuangcai',
 				forced:true,
+				preHidden:true,
 				trigger:{player:'phaseDiscardBegin'},
 				filter:function(event,player){
-					return player.getHistory('useCard').length&&!player.getHistory('sourceDamage').length;
+					return !player.getHistory('useCard').length||!player.getHistory('sourceDamage').length;
 				},
 				content:function(){
-					player.addTempSkill('gzrekuangcai_less');
+					if(!player.getHistory('useCard').length) player.addTempSkill('gzrekuangcai_more');
+					else player.addTempSkill('gzrekuangcai_less');
 				},
 				mod:{
 					targetInRange:function(card,player){
@@ -3103,6 +3106,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						mod:{
 							maxHandcard:function(player,num){
 								return num-1;
+							},
+						},
+						charlotte:true,
+					},
+					more:{
+						mod:{
+							maxHandcard:function(player,num){
+								return num+1;
 							},
 						},
 						charlotte:true,
@@ -3227,8 +3238,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				content:function(){
-					player.discard(player.getCards('h'));
-					trigger.player.damage();
+					'step 0'
+					var cards=player.getCards('h');
+					event.num=cards.length;
+					player.discard(cards);
+					'step 1'
+					var target=trigger.player,str=get.translation(target);
+					event.target=target;
+					if(!target.isIn()) event.finish();
+					else if(!target.hasCard(function(card){
+						return lib.filter.canBeDiscarded(card,player,target);
+					},'he')) event._result={index:1};
+					else player.chooseControl().set('choiceList',[
+						'弃置'+str+'的'+get.cnNumber(num)+'张牌',
+						'对'+str+'造成1点伤害',
+					]).set('ai',()=>1);
+					'step 2'
+					if(result.index==0) player.discardPlayerCard(target,num,true,'he');
+					else target.damage();
 				},
 			},
 			gzpozhen:{
@@ -11038,12 +11065,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			qingyin_info:'限定技，出牌阶段，你可令所有己方角色将体力值回满，然后移除此武将牌。',
 			gzlianpian:'联翩',
 			gzlianpian_info:'①结束阶段开始时，若你于此回合内弃置过所有角色的牌数之和大于你的体力值，你可令一名与你势力相同的角色将手牌补至X张（X为其体力上限）。②其他角色的结束阶段开始时，若其于此回合内弃置过所有角色的牌数之和大于你的体力值，其可选择：1.弃置你的一张牌；2.令你回复1点体力。',
-			yusui:'玉碎',
-			yusui_info:'当你成为其他势力的角色使用黑色牌的目标后，你可以失去1点体力，然后选择一项：①令其弃置X张手牌（X为其体力上限）；②令其失去Y点体力（Y为其的体力值减去你的体力值，不为正时不可选择）',
-			boyan:'驳言',
-			boyan_info:'出牌阶段限一次，你可令一名其他角色将手牌摸至体力上限（至多摸五张），然后其本回合不能使用或打出手牌。',
-			boyan_zongheng:'驳言·纵横',
-			boyan_zongheng_info:'出牌阶段限一次，你可令一名其他角色本回合不能使用或打出手牌。',
+			gzyusui:'玉碎',
+			gzyusui_info:'当你成为其他势力的角色使用黑色牌的目标后，你可以失去1点体力，然后选择一项：①令其弃置X张手牌（X为其体力上限）；②令其失去Y点体力（Y为其的体力值减去你的体力值，不为正时不可选择）',
+			gzboyan:'驳言',
+			gzboyan_info:'出牌阶段限一次，你可令一名其他角色将手牌摸至体力上限（至多摸五张），然后其本回合不能使用或打出手牌。',
+			gzboyan_zongheng:'驳言·纵横',
+			gzboyan_zongheng_info:'出牌阶段限一次，你可令一名其他角色本回合不能使用或打出手牌。',
 			gzjinfa:'矜伐',
 			gzjinfa_info:'出牌阶段限一次，你可弃置一张牌并令一名其他角色选择一项：①交给你一张装备牌，若你以此法获得了♠牌，则其视为对你使用一张【杀】。②你获得其一张牌。',
 			gzduwu:'黩武',
@@ -11082,11 +11109,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzlixia:'礼下',
 			gzlixia_info:'与你势力不同的角色的准备阶段开始时，其可弃置你装备区内的一张牌，然后其选择一项：①弃置两张手牌。②失去1点体力。③令你摸两张牌。',
 			gzrekuangcai:'狂才',
-			gzrekuangcai_info:'锁定技，你于回合内使用牌无距离和次数限制；弃牌阶段开始时，若你本回合内使用过牌但未造成过伤害，则你的手牌上限-1。',
+			gzrekuangcai_info:'锁定技，你于回合内使用牌无距离和次数限制；弃牌阶段开始时，若你本回合内：未使用过牌，则你本回合的手牌上限+1；使用过牌但未造成过伤害，则你本回合的手牌上限-1。',
 			gzkuangcai:'狂才',
 			gzkuangcai_info:'锁定技，你的回合内，你使用牌无距离和次数限制，无视防具且不能被【无懈可击】响应；弃牌阶段开始时，若你本回合使用过牌但没造成伤害，本回合你的手牌上限-2；若你本回合造成的伤害点数不小于你使用的牌数，你将手牌摸至体力上限且本回合手牌上限+2。',
 			gzshejian:'舌箭',
-			gzshejian_info:'当你成为其他角色使用牌的唯一目标后，你可以弃置所有手牌。若如此做，你对其造成1点伤害。',
+			gzshejian_info:'当你成为其他角色使用牌的唯一目标后，你可以弃置所有手牌。若如此做，你选择一项：⒈弃置其等量的牌。⒉对其造成1点伤害。',
 			gzzhidao:'雉盗',
 			gzzhidao2:'雉盗',
 			gzzhidao_info:'锁定技，出牌阶段开始时，你选择一名其他角色，然后直到此回合结束，你与其的距离视为1且你不能使用牌指定除你与其外的角色为目标；当你于出牌阶段内首次对其造成伤害后，你获得其区域内的一张牌。',

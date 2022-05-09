@@ -155,6 +155,7 @@ window.noname_source_list=[
 	'theme/style/hp/image/round2.png',
 	'theme/style/hp/image/round3.png',
 	'theme/style/hp/image/round4.png',
+	'theme/style/hp/image/shield.png',
 	'theme/style/hp/image/xinglass1.png',
 	'theme/style/hp/image/xinglass2.png',
 	'theme/style/hp/image/xinglass3.png',

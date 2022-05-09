@@ -74,7 +74,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangxiu:['male','wei',3,['jilei','danlao']],
 			chenlin:['male','wei',3,['bifa','songci']],
 			caohong:['male','wei',4,['yuanhu']],
-			xiahouba:['male','shu',4,['baobian']],
+			xiahouba:['male','shu',4,['rebaobian']],
 			yuanshu:['male','qun',4,['yongsi','weidi']],
 			sp_diaochan:['female','qun',3,['lihun','rebiyue']],
 			sp_zhaoyun:['male','qun',3,['ollongdan','chongzhen']],
@@ -478,6 +478,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//十周年夏侯霸
+			rebaobian:{
+				audio:2,
+				trigger:{player:'damageEnd'},
+				filter:function(event,player){
+					for(var i of lib.skill.rebaobian.derivation){
+						if(!player.hasSkill(i,null,null,false)) return true;
+					}
+					return false;
+				},
+				forced:true,
+				content:function(){
+					for(var i of lib.skill.rebaobian.derivation){
+						if(!player.hasSkill(i,null,null,false)){
+							player.addSkillLog(i);
+							break;
+						}
+					}
+				},
+				ai:{
+					maixie:true,
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'damage')&&!target.hasSkill('oltiaoxin',null,null,false)){
+								if(!target.hasFriend()) return;
+								if(target.hp>=4) return [0,1];
+							}
+						}
+					}
+				},
+				derivation:['oltiaoxin','new_repaoxiao','xinshensu'],
+			},
 			//范强张达
 			yuanchou:{
 				audio:2,
@@ -3779,16 +3811,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 5.1-get.value(card);
 				},
 				filterCard:{color:'black'},
-				filterTarget:function(card,player,target){
-					if(target.hp<=player.hp) return false;
-					return lib.filter.filterTarget.apply(this,arguments);
-				},
 				position:'hes',
 				audio:'niluan',
 				viewAsFilter:function(player){
-					return player.countCards('hes',lib.skill.spniluan.filterCard)>0&&game.hasPlayer(function(current){
-						return current.hp>player.hp&&player.canUse('sha',current);
-					});
+					return player.countCards('hes',lib.skill.spniluan.filterCard)>0;
 				},
 				group:'spniluan_clear',
 			},
@@ -3820,12 +3846,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 7-get.value(card);
 				},
 				filterTarget:function(card,player,target){
-					if(target.countCards('h')<=player.countCards('h')) return false;
+					if(target.countCards('h')<player.countCards('h')) return false;
 					return lib.filter.filterTarget.apply(this,arguments);
 				},
 				viewAsFilter:function(player){
 					return player.countCards('hes',lib.skill.spweiwu.filterCard)>0&&game.hasPlayer(function(current){
-						return current.countCards('h')>player.countCards('h')&&player.canUse('shunshou',current);
+						return current.countCards('h')>=player.countCards('h')&&player.canUse('shunshou',current);
 					});
 				},
 			},
@@ -14116,7 +14142,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					player.removeSkill('bifa2');
 				},
+				marktext:'檄',
 				intro:{
+					markcount:1,
 					name:'笔伐',
 					content:'已成为〖笔伐〗的目标',
 				},
@@ -15888,13 +15916,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huaxin:['ol_huaxin','huaxin','sp_huaxin'],
 			xujing:['xujing','sp_xujing'],
 			zhaoxiang:['zhaoxiang','tw_zhaoxiang'],
-			dengzhi:['ol_dengzhi','dengzhi'],
+			dengzhi:['ol_dengzhi','re_dengzhi','dengzhi'],
 			wangrong:['wangrong','ol_wangrong'],
 			zongyu:['sp_zongyu','zongyu'],
 			ol_dongzhao:['ol_dongzhao','tw_dongzhao'],
 			mayunlu:['tw_mayunlu','mayunlu'],
 			zhuling:['ol_zhuling','zhuling'],
 			zangba:['tw_zangba','zangba'],
+			zhangbao:['zhangbao','re_zhangbao'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -16001,7 +16030,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugedan:'诸葛诞',
 			sp_machao:'SP马超',
 			sp_jiangwei:'SP姜维',
-			zhangbao:'张宝',
+			zhangbao:'OL张宝',
 			yangxiou:'杨修',
 			shixie:'士燮',
 			mayunlu:'马云騄',
@@ -16037,8 +16066,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dongyun:'董允',
 			mazhong:'马忠',
 			huangfusong:'皇甫嵩',
-			miheng:'祢衡',
-			taoqian:'陶谦',
 			wangyun:'王允',
 			sunqian:'孙乾',
 			xizhicai:'戏志才',
@@ -16595,6 +16622,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yongsi_info:'锁定技，摸牌阶段，你多摸X张牌。弃牌阶段开始时，你弃置X张牌。（X为场上势力数）',
 			yicong_info:'锁定技，当你的体力值大于2时，你计算与其他角色的距离时-1；当你的体力值不大于2时，其他角色计算与你的距离时+1。',
 			baobian_info:'锁定技，若你的体力值为3或更少，你视为拥有技能〖挑衅〗；若你的体力值为2或更少；你视为拥有技能〖咆哮〗；若你的体力值为1，你视为拥有技能〖神速〗。',
+			rebaobian:'豹变',
+			rebaobian_info:'锁定技。当你受到伤害后，你获得以下技能中第一个未拥有的技能：〖挑衅〗/〖咆哮〗/〖神速〗。',
 			bingzhao:'秉诏',
 			bingzhao_info:'主公技，游戏开始时，你选择一个其他势力。当你对该势力的角色发动〖骨疽〗时，其可令你额外摸一张牌。',
 			sunshao:'孙邵',
@@ -16628,9 +16657,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shanzhuan:'擅专',
 			shanzhuan_info:'当你对其他角色造成伤害后，若其判定区没有牌，则你你可以将其的一张牌置于其的判定区。若此牌不为延时锦囊牌且此牌为：红色，此牌视为【乐不思蜀】；黑色，此牌视为【兵粮寸断】。回合结束时，若你本回合内未造成伤害，你可摸一张牌。',
 			spniluan:'逆乱',
-			spniluan_info:'出牌阶段，你可以将一张黑色牌当做【杀】对体力值大于你的角色使用。此【杀】使用结算完成后，若你未因此【杀】造成过伤害，则你令此【杀】不计入使用次数。',
+			spniluan_info:'出牌阶段，你可以将一张黑色牌当做【杀】使用。此【杀】使用结算完成后，若你未因此【杀】造成过伤害，则你令此【杀】不计入使用次数。',
 			spweiwu:'违忤',
-			spweiwu_info:'出牌阶段限一次，你可以将一张红色牌当做【顺手牵羊】对手牌数大于你的角色使用。',
+			spweiwu_info:'出牌阶段限一次，你可以将一张红色牌当做【顺手牵羊】对手牌数不小于你的角色使用。',
 			spmouzhu:'谋诛',
 			spmouzhu_backup:'谋诛',
 			spmouzhu_info:'出牌阶段限一次，你可以从“距离为1”或“体力值等于你”中选择一个条件，然后令此时所有满足条件的角色依次进行以下结算：交给你一张手牌，然后若其手牌数小于你，则其视为对你使用一张【杀】或【决斗】。',
@@ -16717,7 +16746,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuwei_info:'每回合限一次。当你的牌被其他角色弃置或获得后，你可从牌堆中获得一张与此牌名称相同的牌（若没有则改为摸一张牌）。',
 			yuejian:'约俭',
 			yuejian_info:'每回合限两次。当其他角色对你使用的牌A结算结束后，你可展示所有手牌。若牌A有花色且你的手牌中没有同花色的牌，则你获得牌A对应的所有实体牌。',
-			ol_dengzhi:'邓芝',
+			ol_dengzhi:'OL邓芝',
 			olxiuhao:'修好',
 			olxiuhao_info:'每回合限一次。当你受到其他角色造成的伤害时，或对其他角色造成伤害时，你可防止此伤害，然后令伤害来源摸两张牌。',
 			olsujian:'素俭',

@@ -9095,10 +9095,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardToPlayer'},
 				filter:function(event,player){
-					if(_status.currentPhase!=player||player.hasSkill('rechanhui2')) return false;
+					if(player.hasSkill('rechanhui2')) return false;
 					if(event.targets.length>1) return false;
 					var card=event.card;
-					if(card.name=='sha'||get.type(card)=='trick'&&get.color(card)=='black') return true;
+					if(card.name=='sha'||get.type(card)=='trick') return true;
 					return false;
 				},
 				direct:true,
@@ -9141,14 +9141,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			rechanhui2:{},
+			rechanhui2:{charlotte:true},
+			rejiaojin2:{charlotte:true},
 			rejiaojin:{
 				audio:2,
 				trigger:{target:'useCardToTargeted'},
 				filter:function(event,player){
-					return (event.card.name=='sha'||get.type(event.card)=='trick')&&event.player&&event.player.hasSex('male')&&player.countCards('he',function(card){
+					return (event.card.name=='sha'||get.type(event.card)=='trick')&&event.player!=player&&player.countCards('he',function(card){
 						return _status.connectMode||get.type(card)=='equip';
-					});
+					})&&!player.hasSkill('rejiaojin2');
 				},
 				direct:true,
 				content:function(){
@@ -9164,12 +9165,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					next.set('val',get.value(trigger.cards.filterInD()));
 					next.set('goon2',get.effect(player,trigger.card,trigger.player,player)<0)
-					next.logSkill='rejiaojin';
+					next.logSkill=['rejiaojin',trigger.player];
 					"step 1"
 					if(result.bool){
 						var cards=trigger.cards.filterInD();
 						if(cards.length) player.gain(cards,'gain2','log');
 						trigger.excluded.push(player);
+						if(trigger.player.hasSex('female')) player.addTempSkill('rejiaojin2')
 					}
 				}
 			},
@@ -12055,18 +12057,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fazheng:['re_fazheng','xin_fazheng','fazheng'],
 			masu:['xin_masu','re_masu','masu'],
 			xusheng:['xin_xusheng','re_xusheng','xusheng','old_xusheng'],
-			wuguotai:['re_wuguotai','wuguotai'],
+			wuguotai:['xin_wuguotai','re_wuguotai','wuguotai'],
 			lingtong:['xin_lingtong','re_lingtong','lingtong','old_lingtong'],
 			gaoshun:['gaoshun','re_gaoshun'],
 			zhonghui:['re_zhonghui','xin_zhonghui','zhonghui','old_zhonghui'],
-			wangyi:['wangyi','old_wangyi'],
+			wangyi:['re_wangyi','wangyi','old_wangyi'],
 			caozhang:['re_caozhang','xin_caozhang','caozhang'],
 			guanzhang:['guanzhang','old_guanzhang'],
 			madai:['re_madai','old_madai','madai'],
 			liaohua:['xin_liaohua','re_liaohua','liaohua'],
 			bulianshi:['re_bulianshi','bulianshi','old_bulianshi'],
 			handang:['xin_handang','re_handang','handang'],
-			chengpu:['re_chengpu','ns_chengpu','chengpu','xin_chengpu'],
+			chengpu:['re_chengpu','tw_chengpu','ns_chengpu','chengpu','xin_chengpu'],
 			liubiao:['re_liubiao','xin_liubiao','liubiao'],
 			manchong:['re_manchong','manchong'],
 			caochong:['caochong','old_caochong'],
@@ -12100,6 +12102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caifuren:['xin_caifuren','re_caifuren','caifuren'],
 			guyong:['re_guyong','xin_guyong','guyong'],
 			yj_jushou:['xin_jushou','yj_jushou'],
+			guohuanghou:['re_guohuanghou','guohuanghou'],
 		},
 		translate:{
 			old_huaxiong:'华雄',
@@ -12475,11 +12478,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chanhui:'谮毁',
 			chanhui_info:'出牌阶段限一次，当你使用【杀】或黑色普通锦囊牌指定唯一目标时，你可令可以成为此牌目标的另一名其他角色选择一项：交给你一张牌并成为此牌的使用者；或成为此牌的额外目标。',
 			rechanhui:'谮毁',
-			rechanhui_info:'出牌阶段，当你使用【杀】或黑色普通锦囊牌指定唯一目标时，你可令可以成为此牌目标（无距离限制）的另一名其他角色选择一项：交给你一张牌并成为此牌的使用者；或成为此牌的额外目标且你本回合内不能再次发动〖谮毁〗。',
+			rechanhui_info:'当你使用【杀】或普通锦囊牌指定唯一目标时，你可令可以成为此牌目标（无距离限制）的另一名其他角色选择一项：交给你一张牌并成为此牌的使用者；或成为此牌的额外目标且你本回合内不能再次发动〖谮毁〗。',
 			jiaojin:'骄矜',
 			jiaojin_info:'当你受到男性角色造成的伤害时，你可以弃置一张装备牌，令此伤害-1。',
 			rejiaojin:'骄矜',
-			rejiaojin_info:'当你成为男性角色使用的【杀】或普通锦囊牌的目标后，你可以弃置一张装备牌，令此牌对你无效并获得此牌对应的所有实体牌。',
+			rejiaojin_info:'当你成为其他角色使用【杀】或普通锦囊牌的目标后，你可以弃置一张装备牌，令此牌对你无效并获得此牌对应的所有实体牌。若此牌的使用者为女性角色，则你令〖骄矜〗失效直到回合结束。',
 			shenxing:'慎行',
 			shenxing_info:'出牌阶段，你可以弃置两张牌，然后摸一张牌。',
 			bingyi:'秉壹',
