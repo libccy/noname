@@ -1265,6 +1265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				locked:false,
+				limited:true,
 				skillAnimation:true,
 				animationColor:'fire',
 				filter:function(event,player){
@@ -2103,13 +2104,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twqueshi:{
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return !player.isDisabled(1);
+					return (event.name!='phase'||game.phaseNumber==0)&&!player.isDisabled(1);
 				},
 				content:function(){
 					if(!lib.inpile.contains('meiyingqiang')){
@@ -2319,7 +2320,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'loseHpAfter'},
 				forced:true,
 				filter:function(event,player){
-					return player!=event.player&&player.hp>=event.player.hp||player.isDamaged();
+					return player!=event.player&&(player.hp>=event.player.hp||player.isDamaged());
 				},
 				logTarget:'player',
 				content:function(){
@@ -2413,8 +2414,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twmiaolve:{
 				audio:2,
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
+				},
+				filter:function(event,player){
+					return event.name!='phase'||game.phaseNumber==0;
 				},
 				forced:true,
 				locked:false,
@@ -2827,13 +2831,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twsidao:{
 				audio:2,
 				trigger:{
-					global:'gameDrawAfter',
+					global:'phaseBefore',
 					player:'enterGame',
 				},
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return !player.storage.twsidao;
+					return (event.name!='phase'||game.phaseNumber==0)&&!player.storage.twsidao;
 				},
 				content:function(){
 					'step 0'
@@ -3363,10 +3367,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chijie:{
 				audio:true,
 				forbid:['guozhan'],
-				trigger:{global:'gameDrawAfter'},
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
 				direct:true,
 				filter:function(event,player){
-					return game.hasPlayer(function(current){
+					return (event.name!='phase'||game.phaseNumber==0)&&game.hasPlayer(function(current){
 						return current.group!=player.group;
 					});
 				},
@@ -3545,7 +3552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twlihuo3:'疠火',
 			twlihuo_info:'①当你声明使用普【杀】时，你可以将此【杀】改为火【杀】。此牌使用结算结束后，若有角色因此【杀】造成的伤害进入过濒死状态，则你失去1点体力。②当你使用火【杀】选择目标后，你可为此牌增加一个目标。',
 			twchunlao:'醇醪',
-			twchunlao_info:'①准备阶段，若场上没有“醇”，则你可将一名角色区域内的一张牌置于其武将牌上，称为“醇”。②一名角色使用【杀】时，若其有“醇”，则你可以交给你一张牌，令此【杀】的伤害值基数+1。③一名角色进入濒死状态时，若其有“醇”，则你可以移去“醇”并摸一张牌，然后令其回复1点体力。',
+			twchunlao_info:'①准备阶段，若场上没有“醇”，则你可将一名角色区域内的一张牌置于其武将牌上，称为“醇”。②一名角色使用【杀】时，若其有“醇”，则其可以交给你一张牌，令此【杀】的伤害值基数+1。③一名角色进入濒死状态时，若其有“醇”，则你可以移去“醇”并摸一张牌，然后令其回复1点体力。',
 			
 			tw_mobile:'移动版·海外服',
 			tw_mobile2:'海外服异构',

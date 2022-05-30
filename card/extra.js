@@ -899,6 +899,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					return eff>=0;
 				},
+				prompt2:function(event,player){
+					return '将'+get.translation(event.card)+'改为火属性';
+				},
 				content:function(){
 					trigger.card.nature='fire';
 					if(get.itemtype(trigger.card)=='card'){

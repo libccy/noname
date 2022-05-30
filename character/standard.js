@@ -5,12 +5,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			standard:{
-				standard_2008:["caocao","simayi","xiahoudun","zhangliao","xuzhu","guojia","zhenji","liubei","guanyu","zhangfei","zhugeliang","zhaoyun","machao","huangyueying","sunquan","ganning","lvmeng","huanggai","zhouyu","daqiao","luxun","sunshangxiang","huatuo","lvbu","diaochan",],
-				standard_2013:["huaxiong","re_yuanshu"],
+				standard_2008:["caocao","simayi","xiahoudun","zhangliao","xuzhu","guojia","zhenji","liubei","guanyu","zhangfei","zhugeliang","zhaoyun","machao","huangyueying","sunquan","ganning","lvmeng","huanggai","zhouyu","daqiao","luxun","sunshangxiang","huatuo","lvbu","diaochan","re_lidian"],
+				standard_2013:["huaxiong","re_yuanshu","re_xushu"],
 				standard_2019:["gongsunzan","xf_yiji"],
 			},
 		},
 		character:{
+			re_lidian:['male','wei',3,['xunxun','wangxi']],
+			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			caocao:['male','wei',4,['jianxiong','hujia'],['zhu']],
 			simayi:['male','wei',3,['fankui','guicai']],
 			xiahoudun:['male','wei',4,['ganglie']],
@@ -993,7 +995,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				prompt:'将一张红色牌当杀使用或打出',
-				check:function(card){return 4-get.value(card)},
+				check:function(card){
+					var val=get.value(card);
+					if(_status.event.name=='chooseToRespond') return 1/Math.max(0.1,val);
+					return 5-val;
+				},
 				ai:{
 					skillTagFilter:function(player){
 						if(get.zhu(player,'shouyue')){
@@ -2625,6 +2631,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rewangzun_info:'锁定技，一名其他角色的准备阶段开始时，若其体力值大于你，你摸一张牌。然后若其身份为主公/主帅/君主/地主且明置，则你摸一张牌，且其本回合的手牌上限-1。',
 			retongji:'同疾',
 			retongji_info:'攻击范围内包含你的角色成为【杀】的目标时，若你不是此【杀】的使用者或目标，其可弃置一张牌，然后将此【杀】转移给你。',
+			re_xushu:'徐庶',
+			re_lidian:'李典',
 			
 			standard_2008:"2008版标准包",
 			standard_2013:"2013版标准包",

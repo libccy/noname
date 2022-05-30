@@ -5559,9 +5559,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'hhudun_hujia',
 				subSkill:{
 					hujia:{
-						trigger:{player:'damageZero'},
+						trigger:{player:'damageEnd'},
 						filter:function(event){
-							return event.hujia;
+							return event.hujia==event.num;
 						},
 						forced:true,
 						content:function(){

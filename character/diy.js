@@ -4563,9 +4563,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var info=lib.card[to.storage.kud_qiaoshou_equip2];
 						if(info&&info.distance&&info.distance.globalTo) return distance+info.distance.globalTo;
 					},
-					attackFrom:function(from,to,distance){
+					attackRange:function(from,distance){
 						var info=lib.card[from.storage.kud_qiaoshou_equip2];
-						if(info&&info.distance&&info.distance.attackFrom) return distance+info.distance.attackFrom;
+						if(info&&info.distance&&info.distance.attackFrom) return distance-info.distance.attackFrom;
 					},
 					attackTo:function(from,to,distance){
 						var info=lib.card[to.storage.kud_qiaoshou_equip2];
@@ -6922,8 +6922,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rin_baoqiu:{
 				mod:{
-					attackFrom:function(rin,riki,ball){
-						return ball-2;
+					attackRange:function(rin,ball){
+						return ball+2;
 					},
 				},
 				trigger:{player:'useCardToPlayered'},
@@ -7121,8 +7121,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					markcount:'expansion',
 				},
 				mod:{
-					attackFrom:function(from,to,num){
-						return num-from.getExpansions('shiina_qingshen').length;
+					attackRange:function(from,num){
+						return num+from.getExpansions('shiina_qingshen').length;
 					},
 					maxHandcard:function(from,num){
 						return num+from.getExpansions('shiina_qingshen').length;
@@ -15900,7 +15900,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsfuge:'覆戈',
 			nsfuge_info:'你的回合结束后，你可以执行一个额外的回合，此回合的摸牌阶段，你于摸牌阶段额外摸X张牌（X为你已损失的体力值）；若如此做，直到洗牌前，你不能再发动此技能',
 			nstanbing:'谈兵',
-			nstanbing_info:'摸牌阶段开始时，你可弃置一张牌，然后摸X张牌(X为你弃置牌的名称字数)，若如此做，本回合你不可使用或打出【杀】',
+			nstanbing_info:'摸牌阶段开始时，你可弃置一张手牌，然后摸X张牌(X为你弃置牌的名称字数)，若如此做，本回合你不可使用或打出【杀】',
 			nsxinzhan:'心战',
 			nsxinzhan_info:'出牌阶段限一次，你可将任意张手牌交给一名其他角色，若如此做，该角色失去X点体力(X为你交给其的牌张数的一半，向下取整)，若你给的牌达到六张，则改为该角色失去一点体力上限',
 			nsfuhuo:'符火',

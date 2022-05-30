@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yingbian',
 		connect:true,
 		character:{
+			jin_yanghu:['male','jin',4,['huaiyuan','chongxin','dezhang']],
 			xuangongzhu:['female','jin',3,['gaoling','qimei','ybzhuiji'],['hiddenSkill']],
 			xinchang:['male','jin',3,['canmou','congjian']],
 			yangzhi:['female','jin',3,['wanyi','maihuo']],
@@ -29,12 +30,277 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yingbian:{
 				yingbian_pack1:['jin_simayi','jin_zhangchunhua','ol_lisu','simazhou','cheliji','ol_huaxin'],
 				yingbian_pack2:['jin_simashi','jin_xiahouhui','zhanghuyuechen','shibao','jin_yanghuiyu'],
-				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan','xuangongzhu'],
+				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan','xuangongzhu','jin_yanghu'],
 				yingbian_pack4:['zhongyan','xinchang'],
 				yingbian_pack5:['yangyan','yangzhi'],
 			},
 		},
 		skill:{
+			huaiyuan:{
+				audio:2,
+				trigger:{
+					player:'loseAfter',
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+				},
+				filter:function(event,player){
+					var evt=event.getl(player);
+					if(!evt||!evt.hs||!evt.hs.length) return false;
+					if(event.name=='lose'){
+						for(var i in event.gaintag_map){
+							if(event.gaintag_map[i].contains('huaiyuanx')) return true;
+						}
+						return false;
+					}
+					return player.hasHistory('lose',function(evt){
+						if(event!=evt.getParent()) return false;
+						for(var i in evt.gaintag_map){
+							if(evt.gaintag_map[i].contains('huaiyuanx')) return true;
+						}
+						return false;
+					});
+				},
+				forced:true,
+				content:function(){
+					'step 0'
+					var num=0;
+					if(trigger.name=='lose'){
+						for(var i in trigger.gaintag_map){
+							if(trigger.gaintag_map[i].contains('huaiyuanx')) num++;
+						};
+					}
+					else player.getHistory('lose',function(evt){
+						if(trigger!=evt.getParent()) return false;
+						for(var i in evt.gaintag_map){
+							if(evt.gaintag_map[i].contains('huaiyuanx')) num++;
+						}
+						return false;
+					});
+					event.count=num;
+					'step 1'
+					event.count--;
+					player.chooseTarget(true,'请选择【怀远】的目标','令一名角色执行一项：⒈其的手牌上限+1。⒉其的攻击范围+1。⒊其摸一张牌。').set('ai',function(target){
+						var player=_status.event.player,att=get.attitude(player,target);
+						if(att<=0) return 0;
+						if(target.hasValueTarget({name:'sha'},false)&&!target.hasValueTarget({name:'sha'})) att*=2.2;
+						if(target.needsToDiscard()) att*=1.3;
+						return att*Math.sqrt(Math.max(1,4-target.countCards('h')));
+					});
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.line(target,'green');
+						var str=get.translation(target)
+						player.chooseControl().set('choiceList',[
+							'令'+str+'的手牌上限+1',
+							'令'+str+'的攻击范围+1',
+							'令'+str+'摸一张牌',
+						]).set('ai',function(){
+							var player=_status.event.player,target=_status.event.getParent().target;if(target.hasValueTarget({name:'sha'},false)&&!target.hasValueTarget({name:'sha'})) return 1;
+							if(target.needsToDiscard()) return 0;
+							return 2;
+						});
+					}
+					else event.finish();
+					'step 3'
+					if(result.index==2) target.draw();
+					else{
+						target.addSkill('huaiyuan_effect'+result.index);
+						target.addMark('huaiyuan_effect'+result.index,1,false);
+						game.log(target,'的','#g'+['手牌上限','攻击范围'][result.index],'+1')
+						game.delayx();
+					}
+					if(event.count>0) event.goto(1);
+				},
+				group:['huaiyuan_init','huaiyuan_die'],
+				subSkill:{
+					init:{
+						trigger:{
+							global:'phaseBefore',
+							player:'enterGame',
+						},
+						forced:true,
+						locked:false,
+						filter:function(event,player){
+						 return (event.name!='phase'||game.phaseNumber==0)&&player.countCards('h')>0;
+						},
+						content:function(){
+							var hs=player.getCards('h');
+							if(hs.length) player.addGaintag(hs,'huaiyuanx');
+						},
+					},
+					die:{
+						trigger:{player:'die'},
+						direct:true,
+						forceDie:true,
+						skillAnimation:true,
+						animationColor:'water',
+						filter:function(event,player){
+							return player.hasMark('huaiyuan_effect0')||player.hasMark('huaiyuan_effect1');
+						},
+						content:function(){
+							'step 0'
+							var str='令一名其他角色',num1=player.countMark('huaiyuan_effect0'),num2=player.countMark('huaiyuan_effect1');
+							if(num1>0){
+								str+='手牌上限+';
+								str+=num1;
+								if(num2>0) str+='且';
+							}
+							if(num2>0){
+								str+='攻击范围+';
+								str+=num2;
+							}
+							player.chooseTarget(lib.filter.notMe,get.prompt('huaiyuan'),str).set('forceDie',true).set('ai',function(target){
+								return get.attitude(_status.event.player,target)+114514;
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.logSkill('huaiyuan_die',target);
+								var num1=player.countMark('huaiyuan_effect0'),num2=player.countMark('huaiyuan_effect1');
+								if(num1>0){
+									target.addSkill('huaiyuan_effect0');
+									target.addMark('huaiyuan_effect0',num1,false);
+								}
+								if(num2>0){
+									target.addSkill('huaiyuan_effect1');
+									target.addMark('huaiyuan_effect1',num1,false);
+								}
+								game.delayx();
+							}
+						},
+					},
+					effect0:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							maxHandcard:function(player,num){
+								return num+player.countMark('huaiyuan_effect0');
+							},
+						},
+						marktext:'怀',
+						intro:{content:'手牌上限+#'},
+					},
+					effect1:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							attackRange:function(player,num){
+								return num+player.countMark('huaiyuan_effect1');
+							},
+						},
+						marktext:'远',
+						intro:{content:'攻击范围+#'},
+					},
+				},
+			},
+			chongxin:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('h')>0&&game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h')>0;
+					});
+				},
+				filterCard:true,
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h')>0;
+				},
+				check:function(card){
+					return 6-get.value(card);
+				},
+				discard:false,
+				lose:false,
+				delay:false,
+				content:function(){
+					'step 0'
+					player.loseToDiscardpile(cards);
+					player.draw();
+					'step 1'
+					if(target.countCards('h')>0){
+						target.chooseCard('h',true,'请重铸一张手牌');
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						target.loseToDiscardpile(result.cards);
+						target.draw();
+					}
+				},
+				ai:{
+					order:6,
+					result:{
+						player:1,
+						target:function(player,target){
+							return 0.5*Math.sqrt(Math.min(3,target.countCards('h')));
+						},
+					},
+				},
+			},
+			dezhang:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				derivation:'weishu',
+				juexingji:true,
+				forced:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				filter:function(event,player){
+					return !player.hasCard(function(card){
+						return card.hasGaintag('huaiyuanx');
+					},'h');
+				},
+				content:function(){
+					player.awakenSkill('dezhang');
+					player.loseMaxHp();
+					player.addSkill('weishu');
+				},
+			},
+			weishu:{
+				audio:2,
+				trigger:{player:'gainAfter'},
+				forced:true,
+				filter:function(event,player){
+					return event.getParent().name=='draw'&&event.getParent(2).name!='weishu'&&event.getParent('phaseDraw').player!=player;
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(true,'请选择【卫戍】的目标','令一名角色摸一张牌').set('ai',function(target){
+						return get.attitude(_status.event.player,target)*Math.sqrt(Math.max(1,4-target.countCards('h')));
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.draw();
+					}
+				},
+				group:'weishu_discard',
+				subSkill:{
+					discard:{
+						trigger:{player:'loseAfter'},
+						forced:true,
+						filter:function(event,player){
+							return event.type=='discard'&&event.getParent(3).name!='weishu_discard'&&event.getParent('phaseDiscard').player!=player&&game.hasPlayer((target)=>(target!=player&&target.countDiscardableCards(player,'he')>0));
+						},
+						content:function(){
+							'step 0'
+							player.chooseTarget(true,'请选择【卫戍】的目标','弃置一名其他角色的一张牌',function(card,player,target){
+								return target!=player&&target.countDiscardableCards(player,'he')>0;
+							}).set('ai',function(target){
+								var player=_status.event.player;
+								return get.effect(target,{name:'guohe_copy2'},player,player);
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.line(target,'green');
+								player.discardPlayerCard(target,'he',true);
+							}
+						},
+					},
+				},
+			},
 			gaoling:{
 				audio:2,
 				trigger:{player:'showCharacterAfter'},
@@ -2764,7 +3030,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jin_simazhao:['jin_wangyuanji'],
 			jin_simashi:['jin_xiahouhui','jin_yanghuiyu'],
 		},
-		characterReplace:{},
+		characterReplace:{
+			yanghu:['jin_yanghu','sp_yanghu'],
+		},
 		translate:{
 			jin_zhangchunhua:'晋张春华',
 			jin_zhangchunhua_ab:'张春华',
@@ -2927,6 +3195,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qimei_info:'准备阶段，你可以选择一名其他角色。你获得如下效果直到下回合开始：①每回合限一次，当你或其获得牌/失去手牌后，若你与其手牌数相等，则另一名角色摸一张牌。②每回合限一次，当你或其的体力值变化后，若你与其体力值相等，则另一名角色摸一张牌。',
 			ybzhuiji:'追姬',
 			ybzhuiji_info:'出牌阶段开始时，你可选择一项：①摸两张牌，并于出牌阶段结束时失去1点体力；②回复1点体力，并于出牌阶段结束时弃置两张牌。',
+			jin_yanghu:'羊祜',
+			huaiyuan:'怀远',
+			huaiyuanx:'绥',
+			huaiyuan_info:'①游戏开始时，你将你的手牌标记为“绥”。②当你失去一张“绥”后，你令一名角色执行一项：⒈其的手牌上限+1。⒉其的攻击范围+1。⒊其摸一张牌。③当你死亡时，你可令一名其他角色的手牌上限+X，且攻击范围+Y（X和Y为你自己被执行过〖怀远②〗的选项一和选项二的次数）。',
+			chongxin:'崇信',
+			chongxin_info:'出牌阶段限一次，你可重铸一张牌，且令一名有手牌的其他角色也重铸一张牌。',
+			dezhang:'德彰',
+			dezhang_info:'觉醒技。准备阶段，若你没有“绥”，则你减1点体力上限并获得〖卫戍〗。',
+			weishu:'卫戍',
+			weishu_info:'锁定技。①当你于摸牌阶段外不因〖卫戊①〗而摸牌后，你令一名角色摸一张牌。②当你于弃牌阶段外不因〖卫戊②〗而弃置牌后，你弃置一名其他角色的一张牌。',
 
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',

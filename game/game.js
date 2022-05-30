@@ -13039,10 +13039,17 @@
 							lose_list:lose_list,
 						}).setContent('chooseToCompareLose');
 					}
+					event.lose_list=lose_list;
+					event.getNum=function(card){
+						for(var i of event.lose_list){
+							if(i[1].contains&&i[1].contains(card)) return get.number(card,i[0]);
+						}
+						return get.number(card,false);
+					}
 					event.cardlist=cards;
 					event.cards=cards;
 					event.card1=result[0].cards[0];
-					event.num1=event.card1.number;
+					event.num1=event.getNum(event.card1);
 					event.iwhile=0;
 					event.result={
 						player:event.card1,
@@ -13057,7 +13064,7 @@
 						event.target.animate('target');
 						player.animate('target');
 						event.card2=event.cardlist[event.iwhile];
-						event.num2=event.card2.number;
+						event.num2=event.getNum(event.card2);
 						game.log(event.target,'的拼点牌为',event.card2);
 						player.line(event.target);
 						player.$compare(event.card1,event.target,event.card2);
@@ -13236,8 +13243,14 @@
 					player.$compare(event.card1,target,event.card2);
 					game.log(player,'的拼点牌为',event.card1);
 					game.log(target,'的拼点牌为',event.card2);
-					event.num1=event.card1.number;
-					event.num2=event.card2.number;
+					var getNum=function(card){
+						for(var i of event.lose_list){
+							if(i[1]==card) return get.number(card,i[0]);
+						}
+						return get.number(card,false);
+					}
+					event.num1=getNum(event.card1);
+					event.num2=getNum(event.card2);
 					event.trigger('compare');
 					game.delay(0,1500);
 					"step 6"
@@ -18415,7 +18428,7 @@
 						if(str) game.log(this,'移去了',get.cnNumber(num),'个','#g【'+str+'】');
 					}
 					this.syncStorage(i);
-					this[this.storage[i]?'markSkill':'unmarkSkill'](i);
+					this[(this.storage[i]||(lib.skill[i]&&lib.skill[i].mark))?'markSkill':'unmarkSkill'](i);
 				},
 				addMark:function(i,num,log){
 					if(typeof num!='number'||!num) num=1;
@@ -51950,7 +51963,15 @@
 			}
 		},
 		number:function(card,player){
-			//啥时候狗卡出相关技能我再完善
+			//狗卡你是真敢出啊
+			if(player!==false){
+				var number=card.number;
+				var owner=player||get.owner(card);
+				if(owner){
+					return game.checkMod(card,owner,number,'cardnumber',owner);
+				}
+				return number;
+			}
 			if(typeof card.number=='number') return card.number;
 			else if(card.cards&&card.cards.length==1) return get.number(card.cards[0]);
 			return null;
@@ -54373,28 +54394,30 @@
 				}
 				result2+=temp02;
 				result1+=temp01;
-				if(get.attitude(player,target)<0){
-					result2*=Math.sqrt(threaten);
-				}
-				else{
-					result2*=Math.sqrt(Math.sqrt(threaten));
-				}
-				if(target.hp==1) result2*=2.5;
-				if(target.hp==2) result2*=1.8;
-				if(target.countCards('h')==0){
-					if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
-						result2*=1.7;
+				if(typeof card=='object'&&!result.ignoreStatus){
+					if(get.attitude(player,target)<0){
+						result2*=Math.sqrt(threaten);
 					}
 					else{
-						result2*=1.5;
+						result2*=Math.sqrt(Math.sqrt(threaten));
 					}
+					if(target.hp==1) result2*=2.5;
+					if(target.hp==2) result2*=1.8;
+					if(target.countCards('h')==0){
+						if(get.tag(card,'respondSha')||get.tag(card,'respondShan')){
+							result2*=1.7;
+						}
+						else{
+							result2*=1.5;
+						}
+					}
+					if(target.countCards('h')==1) result2*=1.3;
+					if(target.countCards('h')==2) result2*=1.1;
+					if(target.countCards('h')>3) result2*=0.5;
+					if(target.hp==4) result2*=0.9;
+					if(target.hp==5) result2*=0.8;
+					if(target.hp>5) result2*=0.6;
 				}
-				if(target.countCards('h')==1) result2*=1.3;
-				if(target.countCards('h')==2) result2*=1.1;
-				if(target.countCards('h')>3) result2*=0.5;
-				if(target.hp==4) result2*=0.9;
-				if(target.hp==5) result2*=0.8;
-				if(target.hp>5) result2*=0.6;
 			}
 			else{
 				result2+=temp02;
@@ -54543,7 +54566,7 @@
 				}
 				result2+=temp02;
 				result1+=temp01;
-				if(typeof card=='object'){
+				if(typeof card=='object'&&!result.ignoreStatus){
 						if(get.attitude(player,target)<0){
 						result2*=Math.sqrt(threaten);
 					}
@@ -54774,7 +54797,7 @@
 						cards[ix].classList.add('selected');
 						ui.selected.cards.add(cards[ix]);
 						game.check();
-						if(ui.selected.cards.length>=range[ix]){
+						if(ui.selected.cards.length>=range[0]){
 							ok=true;
 						}
 						if(ui.selected.cards.length==range[1]){
