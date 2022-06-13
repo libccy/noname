@@ -3946,7 +3946,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				locked:true,
 				zhuanhuanji:true,
-				marktext:'龙',
+				marktext:'☯',
 				intro:{
 					content:function(storage,player,skill){
 						if(player.storage.nzry_longnu==true) return '锁定技，出牌阶段开始时，你减1点体力上限并摸一张牌，然后本阶段内你的锦囊牌均视为雷杀且无使用次数限制';
@@ -3960,7 +3960,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					'step 0'
-					if(player.storage.nzry_longnu==true){
+					player.changeZhuanhuanji('nzry_longnu');
+					if(player.storage.nzry_longnu!=true){
 						player.loseMaxHp();
 					}
 					else{
@@ -3968,12 +3969,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.draw();
 					'step 1'
-					if(player.storage.nzry_longnu==true){
-						player.storage.nzry_longnu=false;
+					if(player.storage.nzry_longnu!=true){
 						player.addTempSkill('nzry_longnu_2','phaseUseAfter');
 					}
 					else{
-						player.storage.nzry_longnu=true;
 						player.addTempSkill('nzry_longnu_1','phaseUseAfter');
 					};
 				},

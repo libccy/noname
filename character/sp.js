@@ -1881,6 +1881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCard'},
 				direct:true,
+				usable:1,
 				filter:function(event,player){
 					if(event.olfengzi_buff||!event.targets.length||!player.isPhaseUsing()||player.hasSkill('olfengzi_buff')) return false;
 					var type=get.type(event.card,false);
@@ -1902,6 +1903,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('olfengzi_buff','phaseUseAfter');
 						trigger.olfengzi_buff=player;
 					}
+					else player.storage.counttrigger.olfengzi--;
 				},
 				subSkill:{
 					buff:{
@@ -1916,6 +1918,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							trigger.getParent().targets=trigger.getParent().targets.concat(trigger.targets);
 							trigger.getParent().triggeredTargets4=trigger.getParent().triggeredTargets4.concat(trigger.targets);
+						},
+						onremove:function(player){
+							delete player.storage.counttrigger.olfengji;
 						},
 					},
 				},
@@ -3558,6 +3563,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['key_sakuya'],
 				zhuanhuanji:true,
+				marktext:'☯',
+				mark:true,
+				intro:{
+					content:function(storage,player){
+						return storage?'每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的基本牌。':'每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的普通锦囊牌。';
+					},
+				},
 				init:function(player){
 					player.storage.youlong=false;
 					if(!player.storage.youlong2) player.storage.youlong2=[];
@@ -3685,7 +3697,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.disableEquip(lib.skill.youlong_backup.equip);
 								delete event.result.skill;
 								player.addTempSkill('youlong_'+(player.storage.youlong||false),'roundStart');
-								player.storage.youlong=!player.storage.youlong;
+								player.changeZhuanhuanji('youlong');
 								player.storage.youlong2.add(event.result.card.name);
 							},
 						}
@@ -3713,8 +3725,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			youlong_true:{},
-			youlong_false:{},
+			youlong_true:{charlotte:true},
+			youlong_false:{charlotte:true},
 			luanfeng:{
 				audio:2,
 				audioname:['key_sakuya'],
@@ -6516,7 +6528,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseHp();
 				}
 			},
-			jingong3:{},
+			jingong3:{charlotte:true},
 			weikui:{
 				audio:'kuiwei',
 				enable:'phaseUse',
@@ -10098,6 +10110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				audio:2,
+				preHidden:true,
 				filter:function(event,player){
 					return player.countCards('he',{type:'basic'})<player.countCards('he');
 				},
@@ -10108,7 +10121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.type(card)!='basic';
 					}).set('ai',function(card){
 						return 6-get.value(card);
-					});
+					}).setHiddenSkill('yinbing');
 					"step 1"
 					if(result.bool){
 						player.logSkill('yinbing');
@@ -10632,9 +10645,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				subSkill:{
-					fan:{},
-					zhong:{},
-					nei:{}
+					fan:{charlotte:true},
+					zhong:{charlotte:true},
+					nei:{charlotte:true}
 				},
 				ai:{
 					combo:'jieyuan'
@@ -11133,7 +11146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'hs',
 				popname:true,
 			},
-			chenqing2:{},
+			chenqing2:{charlotte:true},
 			ranshang:{
 				audio:2,
 				trigger:{player:'damageEnd'},
@@ -11390,7 +11403,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			fengpo3:{},
+			fengpo3:{charlotte:true},
 			biluan:{
 				audio:2,
 				trigger:{player:'phaseDrawBegin1'},
@@ -11927,11 +11940,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jilei:{
 				trigger:{player:'damageEnd'},
-				//priority:9,
 				audio:2,
 				direct:true,
 				filter:function(event){
-					return event&&event.source;
+					return event.source&&event.source.isIn();
 				},
 				content:function(){
 					'step 0'
@@ -11979,9 +11991,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.storage.jilei2.contains(get.type(card,'trick'))) return false;
 					},
 					cardEnabled:function(card,player){
-						if(player.storage.jilei2.contains(get.type(card,'trick'))) return false;
-					},
-					cardUsable:function(card,player){
 						if(player.storage.jilei2.contains(get.type(card,'trick'))) return false;
 					},
 					cardRespondable:function(card,player){
@@ -12794,7 +12803,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.5
 				}
 			},
-			shenxian2:{},
+			shenxian2:{charlotte:true},
 			qiangwu:{
 				audio:2,
 				enable:'phaseUse',
@@ -13182,6 +13191,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.isLinked();
 				},
 				preHidden:true,
+				prompt:'是否发动【奋命】？',
+				logTarget:function(event,player){
+					return game.filterPlayer(function(current){
+						if(current.isLinked()&&current.countCards('he')){
+							return true;
+						}
+					});
+				},
 				content:function(){
 					"step 0"
 					event.targets=game.filterPlayer(function(current){
@@ -14118,7 +14135,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.3
 				}
 			},
-			duwu2:{},
+			duwu2:{charlotte:true},
 			duwu3:{
 				trigger:{global:'dyingAfter'},
 				forced:true,
@@ -16886,7 +16903,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oljuanxia_info:'结束阶段，你可选择一名其他角色，并依次视为对其使用至多两种单目标普通锦囊牌。然后其下回合结束时，可视为对你使用等量的【杀】。',
 			oldingcuo:'定措',
 			oldingcuo_info:'每回合限一次。当你受到或造成伤害后，你可摸两张牌。若这两张牌颜色不同，则你弃置一张手牌。',
-			fengfangnv:'冯方女',
+			fengfangnv:'OL冯妤',
 			zhuangshu:'妆梳',
 			zhuangshu_info:'①游戏开始时，你可将{【琼梳】，【犀梳】，【金梳】}中的一张牌置于装备区。②一名角色的回合开始时，若其宝物区为空，则你可以弃置一张牌，并根据此牌的类型，按如下关系将一张宝物牌置入该角色的装备区：{<基本牌,【琼梳】>，<锦囊牌，【犀梳】>，<装备牌，【金梳】>}。',
 			chuiti:'垂涕',

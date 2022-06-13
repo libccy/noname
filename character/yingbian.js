@@ -1001,7 +1001,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var j of lib.character[i][3]){
 							if(j=='bolan') continue;
 							var skill=lib.skill[j];
-							if(!skill||skill.zhuSkill) continue;
+							if(!skill||skill.zhuSkill||skill.dutySkill) continue;
 							if(skill.init||skill.ai&&(skill.ai.combo||skill.ai.notemp||skill.ai.neg)) continue;
 							var info=lib.translate[j+'_info'];
 							if(info&&info.indexOf('出牌阶段限一次')!=-1) skills.add(j);

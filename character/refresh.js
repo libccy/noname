@@ -221,6 +221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						check:function(event,player){
 							return game.countPlayer(function(current){
+								if(target==player||target.countGainableCards(player,'h')==0) return false;
 								var att=get.attitude(player,current);
 								if(current.hasSkill('tuntian')) return att>0;
 								return att<1;
@@ -252,7 +253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.cancel();
 							if(game.hasPlayer((current)=>current.countGainableCards(player,'h')>0)){
 								player.chooseTarget('是否获得至多两名其他角色的各一张手牌？',[1,2],function(card,player,target){
-									return target.countGainableCards(player,'h')>0;
+									return target!=player&&target.countGainableCards(player,'h')>0;
 								}).set('ai',function(target){
 									var att=get.attitude(_status.event.player,target);
 									if(target.hasSkill('tuntian')) return att/10;

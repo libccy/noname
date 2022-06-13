@@ -5,13 +5,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			tw:{
-				tw_mobile:['nashime','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu','tw_huojun','tw_caocao','tw_zhangmancheng'],
-				tw_mobile2:['tw_beimihu','tw_gexuan','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_chengpu'],
+				tw_mobile:['nashime','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu','tw_huojun','tw_caocao','tw_zhangmancheng','tw_caozhao'],
+				tw_mobile2:['tw_beimihu','tw_gexuan','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_chengpu','tw_guohuai'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
 				tw_english:['kaisa'],
 			},
 		},
 		character:{
+			tw_caozhao:['male','wei',4,['twfuzuan','twchongqi']],
+			tw_guohuai:["male","wei",4,["twjingce","yuzhang"]],
 			tw_chengpu:['male','wu',4,['twlihuo','twchunlao']],
 			tw_zhangmancheng:['male','qun',4,['twfengji','twyiju','twbudao']],
 			tw_caocao:['male','qun',4,['twlingfa']],
@@ -49,6 +51,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuejiu:'乐就（？－197），在袁术为攻徐州而大兴七军之际，以督战官之身份担任联络之役。但是，袁术军不幸战败，其也在寿春被曹操军逮捕并遭到斩首。',
 			huojun:'霍峻（178年—217年），字仲邈，南郡枝江（今湖北枝江）人，东汉末年刘备麾下名将。其兄霍笃曾在故乡聚部众数百人。后霍笃逝世，刘表以霍峻继承其部曲。208年（建安十三年），刘表病逝，霍峻便率部曲归降刘备，并被任为中郎将。后随刘备入蜀，刘备从葭萌还袭刘璋，留霍峻守葭萌城。张鲁遣将杨帛劝降霍峻，霍峻严词拒绝，杨帛退去。后刘璋将扶禁、向存等率万余人由阆水上，攻围霍峻，城中兵不过数百人，霍峻坚守一年，伺机将其击破。刘备定蜀，嘉霍峻之功，于是分广汉为梓潼郡，以峻为梓潼太守、裨将军。三年后去世，还葬成都。刘备亲率群僚临会吊祭，留宿墓上，当时的人都为他感到荣幸。',
 			zhangmancheng:'张曼成（？—184年6月），东汉末年黄巾之乱时南阳黄巾军首领，杀郡守褚贡，一度占据宛城数月，后为秦颉所杀。',
+			caozhao:'曹肇（？-244年），字长思，沛国谯县（今安徽亳州）人。三国时期魏国大臣，大司马曹休之子。容貌俊美，有当世才度，深得魏明帝宠信，官至散骑常侍、屯骑校尉。魏明帝临死，与燕王曹宇等托付后事。不果，以长平侯归第。正始五年（244年）卒，追赠为卫将军。',
 		},
 		card:{
 			dz_mantianguohai:{
@@ -162,6 +165,265 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//曹肇
+			twfuzuan:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current.getSkills(null,false,false).filter(function(i){
+							var info=get.info(i);
+							return info&&info.zhuanhuanji;
+						}).length>0;
+					});
+				},
+				filterTarget:function(card,player,target){
+					return target.getSkills(null,false,false).filter(function(i){
+						var info=get.info(i);
+						return info&&info.zhuanhuanji;
+					}).length>0;
+				},
+				content:function(){
+					'step 0'
+					var list=target.getSkills(null,false,false).filter(function(i){
+						var info=get.info(i);
+						return info&&info.zhuanhuanji;
+					});
+					if(list.length==1){
+						event._result={control:list[0]};
+					}
+					else player.chooseControl(list).set('prompt','选择变更'+get.translation(target)+'一个技能的状态').set('choice',list.contains('twfeifu')?'twfeifu':0).set('ai',()=>_status.event.choice);
+					'step 1'
+					var skill=result.control;
+					target.changeZhuanhuanji(skill);
+					target.popup(skill,'wood');
+					game.log(target,'的','#g【'+get.translation(skill)+'】','发生了状态变更');
+					game.delayx();
+				},
+				ai:{
+					order:8,
+					result:{
+						target:function(player,target){
+							if(!target.hasSkill('twfeifu')) return 0;
+							return target.storage.twfeifu?-1:1;
+						},
+					},
+				},
+				group:'twfuzuan_damage',
+				subSkill:{
+					damage:{
+						audio:'twfuzuan',
+						trigger:{
+							player:'damageEnd',
+							source:'damageSource',
+						},
+						direct:true,
+						filter:function(event,player){
+							return game.hasPlayer(function(current){
+								return current.getSkills(null,false,false).filter(function(i){
+									var info=get.info(i);
+									return info&&info.zhuanhuanji;
+								}).length>0;
+							});
+						},
+						content:function(){
+						 'step 0'
+						 player.chooseTarget(lib.skill.twfuzuan.filterTarget,get.prompt('twfuzuan'),'变更一名角色的一个转换技的状态').set('ai',function(target){
+						 	var player=_status.event.player;
+						 	return get.effect(target,'twfuzuan',player,player);
+						 });
+						 'step 1'
+						 if(result.bool){
+						  var target=result.targets[0];
+						  player.logSkill('twfuzuan',target);
+						  var next=game.createEvent('twfuzuan');
+						  next.player=player;
+						  next.target=target;
+						  next.setContent(lib.skill.twfuzuan.content);
+						 }
+						},
+					},
+				},
+			},
+			twchongqi:{
+				audio:2,
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
+				forced:true,
+				filter:function(event,player){
+					return event.name!='phase'||game.phaseNumber==0;
+				},
+				logTarget:()=>game.filterPlayer().sortBySeat(),
+				content:function(){
+					'step 0'
+					game.countPlayer(function(current){
+						current.addSkill('twfeifu');
+					});
+					game.log(player,'令所有其他角色获得了技能','#g【非服】')
+					game.delayx();
+					'step 1'
+					player.chooseTarget('是否减1点体力上限，并令一名其他角色获得技能【复纂】？',lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player;
+						if(player.hasUnknown()&&!target.isZhu) return 0;
+						if(player.getEnemies().contains(target)) return 0;
+						return get.attitude(player,target);
+					});
+					'step 2'
+					if(result.bool){
+						player.loseMaxHp();
+						var target=result.targets[0];
+						player.line(target,'fire');
+						target.addSkillLog('twfuzuan');
+						game.delayx();
+					}
+				},
+				derivation:'twfeifu',
+			},
+			twfeifu:{
+				audio:2,
+				trigger:{
+					player:'useCardToPlayered',
+					target:'useCardToTargeted',
+				},
+				zhuanhuanji:true,
+				forced:true,
+				mark:true,
+				marktext:'☯',
+				intro:{
+					content:function(storage,player){
+						return (storage?'当你使用【杀】指定唯一目标后':'当你成为【杀】的唯一目标后')+'目标角色须交给使用者一张牌。若此牌为装备牌，则使用者可使用此牌。';
+					},
+				},
+				filter:function(event,player,name){
+					return event.card.name=='sha'&&event.targets.length==1
+						&&event.player.isIn()&&event.target.countCards('he')>0&&
+						(name=='useCardToPlayered')==Boolean(player.storage.twfeifu);
+				},
+				logTarget:function(event,player){
+					return player.storage.twfeifu?event.target:event.player;
+				},
+				content:function(){
+					'step 0'
+					player.changeZhuanhuanji('twfeifu');
+					trigger.target.chooseCard('he',true,'交给'+get.translation(trigger.player)+'一张牌','若选择装备牌，则其可以使用此牌');
+					'step 1'
+					if(result.bool){
+						var card=result.cards[0];
+						event.card=card;
+						trigger.player.gain(card,trigger.target,'giveAuto');
+					}
+					else event.finish();
+					'step 2'
+					var target=trigger.player;
+					if(target.getCards('h').contains(card)&&get.type(card,target)=='equip'&&target.hasUseTarget(card)) target.chooseUseTarget(card,'nopopup');
+				},
+			},
+			//Powered by @污言噫对
+			twjingce:{
+				marktext:"策",
+				intro:{
+					name:"策",
+					content:"mark",
+				},
+				audio:2,
+				trigger:{player:"useCard"},
+				filter:function(event,player){
+					var evt=event.getParent('phaseUse');
+					if(!evt||evt.player!=player) return false;
+					var history=player.getHistory('useCard',function(evtx){
+						return evtx.getParent('phaseUse')==evt;
+					});
+					return history&&history.indexOf(event)==player.hp-1;
+				},
+				frequent:true,
+				content:function(){
+					'step 0'
+					player.draw(player.hp);
+					'step 1'
+					if(player.getHistory('sourceDamage').length||player.getHistory('gain',function(evt){
+						return evt.getParent('phaseUse')==trigger.getParent('phaseUse')&&evt.getParent().name=='draw';
+					}).length>1) player.addMark('twjingce',1);
+				},
+			},
+			yuzhang:{
+				audio:2,
+				trigger:{
+					player:"damageEnd",
+				},
+				filter:function(event,player){
+					return event.source&&player.hasMark('twjingce');
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var choiceList=['令'+get.translation(trigger.source)+'本回合不能再使用或打出牌'];
+					if (trigger.source.countCards('h')) choiceList.push('令'+get.translation(trigger.source)+'弃置'+get.cnNumber(trigger.source.hp)+'张牌');
+					player.chooseControl('cancel2').set('prompt2',get.prompt2('yuzhang')).set('choiceList',choiceList).set('ai',function(){
+						var player=_status.event.player,source=_status.event.source;
+						if(get.attitude(player,event.source)>0) return 'cancel2';
+						if(source.hasSkillTag('noh')||source.hasSkillTag('noe')||source.countCards('h')>=2*source.hp) return 0;
+						if(source.hp>1&&source.countCards('h')>1) return 1;
+						return 'cancel2';
+					}).set('source',trigger.source);
+					'step 1'
+					if(result.control!='cancel2'){
+						player.removeMark('twjingce',1);
+						if(result.index==0) trigger.source.addTempSkill('yuzhang_dontuse');
+						else trigger.source.chooseToDiscard('he',trigger.source.hp,true);
+					}
+				},
+				group:"yuzhang_skip",
+				subSkill:{
+					skip:{
+						trigger:{
+							player:["phaseJudgeBefore","phaseDrawBefore","phaseUseBefore","phaseDiscardBefore"],
+						},
+						filter:function(event,player){
+							return player.hasMark('twjingce');
+						},
+						"prompt2":function(event,player){
+							var str='弃置一枚“策”并跳过'
+							if(event.name=='phaseJudge') str+='判定';
+							if(event.name=='phaseDraw') str+='摸牌';
+							if(event.name=='phaseUse') str+='出牌';
+							if(event.name=='phaseDiscard') str+='弃牌';
+							str+='阶段';
+							return str;
+						},
+						check:function(event,player){
+							if(event.name=='phaseDiscard') return player.needsToDiscard();
+							return event.name=='phaseJudge';
+						},
+						content:function(){
+							player.removeMark('twjingce',1);
+							trigger.cancel();
+						},
+						sub:true,
+					},
+					dontuse:{
+						charlotte:true,
+						mark:true,
+						mod:{
+							cardEnabled:function(card){
+								return false;
+							},
+							cardRespondable:function(card){
+								return false;
+							},
+							cardSavable:function(card){
+								return false;
+							},
+						},
+						intro:{
+							content:"不能使用或打出牌",
+						},
+						sub:true,
+					},
+				},
+			},
 			twlihuo:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
@@ -1617,6 +1879,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twjuezhu:{
 				audio:2,
+				limited:true,
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -1979,6 +2242,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twmoukui:{
 				trigger:{player:'useCardToPlayered'},
 				direct:true,
+				preHidden:true,
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha';
 				},
@@ -1992,7 +2256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'摸一张牌',
 						'弃置'+get.translation(trigger.target)+'的一张牌',
 						'背水！依次执行以上两项。然后若此【杀】未令其进入濒死状态，则其弃置你的一张牌。',
-					]).set('prompt',get.prompt('twmoukui',trigger.target));
+					]).set('prompt',get.prompt('twmoukui',trigger.target)).setHiddenSkill('twmoukui');
 					'step 1'
 					if(result.control!='cancel2'){
 						var target=trigger.target;
@@ -3553,6 +3817,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twlihuo_info:'①当你声明使用普【杀】时，你可以将此【杀】改为火【杀】。此牌使用结算结束后，若有角色因此【杀】造成的伤害进入过濒死状态，则你失去1点体力。②当你使用火【杀】选择目标后，你可为此牌增加一个目标。',
 			twchunlao:'醇醪',
 			twchunlao_info:'①准备阶段，若场上没有“醇”，则你可将一名角色区域内的一张牌置于其武将牌上，称为“醇”。②一名角色使用【杀】时，若其有“醇”，则其可以交给你一张牌，令此【杀】的伤害值基数+1。③一名角色进入濒死状态时，若其有“醇”，则你可以移去“醇”并摸一张牌，然后令其回复1点体力。',
+			tw_guohuai:'TW郭淮',
+			twjingce:"精策",
+			twjingce_info:"当你于出牌阶段使用第X张牌时，你可以摸X张牌（X为你的体力值）。若此阶段你此前摸过牌或本回合造成过伤害，你获得一枚“策”标记。",
+			yuzhang:"御嶂",
+			yuzhang_info:"你可以弃置一枚“策”标记，然后跳过一个阶段。当你受到伤害后，你可弃置一枚“策”标记，然后选择一项：⒈令伤害来源弃置X张牌（X为其体力值）；⒉令伤害来源本回合不能再使用或打出牌。",
+			tw_caozhao:'曹肇',
+			twfuzuan:'复纂',
+			twfuzuan_info:'出牌阶段限一次/当你受到伤害后/当你对其他角色造成伤害后，你可选择一名拥有转换技的角色，变更其的一个转换技的的状态。',
+			twchongqi:'宠齐',
+			twchongqi_info:'锁定技。游戏开始时，你令所有角色获得〖非服〗。然后你可减1点体力上限，令一名其他角色获得〖复纂〗。',
+			twfeifu:'非服',
+			twfeifu_info:'转换技。阴：当你成为【杀】的唯一目标后；阳：当你使用【杀】指定唯一目标后；目标角色须交给使用者一张牌。若此牌为装备牌，则使用者可使用此牌。',
 			
 			tw_mobile:'移动版·海外服',
 			tw_mobile2:'海外服异构',

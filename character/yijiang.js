@@ -12066,7 +12066,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liubiao:['re_liubiao','xin_liubiao','liubiao'],
 			manchong:['re_manchong','manchong'],
 			caochong:['caochong','old_caochong'],
-			guohuai:['guohuai','re_guohuai','xin_guohuai','ol_guohuai'],
+			guohuai:['guohuai','tw_guohuai','re_guohuai','xin_guohuai','ol_guohuai'],
 			jianyong:['re_jianyong','xin_jianyong','jianyong'],
 			panzhangmazhong:['xin_panzhangmazhong','re_panzhangmazhong','panzhangmazhong'],
 			yufan:['xin_yufan','re_yufan','yufan'],

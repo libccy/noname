@@ -1048,6 +1048,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.isPhaseUsing()&&(event.card.name=='sha'||get.type(event.card)=='trick');
 				},
+				preHidden:true,
 				check:function(event,player){
 					if(['wuzhong','kaihua','dongzhuxianji'].contains(event.card.name)) return false;
 					player._wanglie_temp=true;
@@ -1233,21 +1234,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 	
-			"nzry_juzhan":{
+			nzry_juzhan:{
 				audio:"nzry_juzhan_1",
 				mark:true,
 				locked:false,
 				zhuanhuanji:true,
-				marktext:'拒',
+				marktext:'☯',
 				intro:{
 					content:function(storage,player,skill){
-						if(player.storage.nzry_juzhan1==true) return '当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌';
+						if(player.storage.nzry_juzhan==true) return '当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌';
 						return '当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌';
-					},
-				},
-				mod:{
-					targetEnabled:function(card,player,target){
-						if(player.storage.nzry_juzhan==true) return false;
 					},
 				},
 				group:["nzry_juzhan_1","nzry_juzhan_2"],
@@ -1259,14 +1255,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						prompt2:'当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。',
 						filter:function(event,player){
-							return event.card.name=='sha'&&(player.storage.nzry_juzhan1==false||player.storage.nzry_juzhan1==undefined);
+							return event.card.name=='sha'&&!player.storage.nzry_juzhan;
 						},
 						logTarget:'player',
 						content:function(){
+							'step 0'
 							game.asyncDraw([player,trigger.player]);
 							trigger.player.addTempSkill('nzry_juzhany');
-							player.storage.nzry_juzhan1=true;
+							player.changeZhuanhuanji('nzry_juzhan');
 							player.addTempSkill('nzry_juzhanx');
+							'step 1'
+							game.delayx();
 						},
 					},
 					'2':{
@@ -1276,7 +1275,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						prompt2:'当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌',
 						filter:function(event,player){
-							return event.card.name=='sha'&&event.player.countGainableCards(player,'he')>0&&player.storage.nzry_juzhan1==true;
+							return event.card.name=='sha'&&event.player.countGainableCards(player,'he')>0&&player.storage.nzry_juzhan==true;
 						},
 						check:function(event,player){
 							return event.player.countCards('he')>0&&event.targets&&event.targets.length==1;
@@ -1284,7 +1283,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						logTarget:'target',
 						content:function(){
 							player.gainPlayerCard(trigger.targets[0],'he',true);
-							player.storage.nzry_juzhan1=false;
+							player.changeZhuanhuanji('nzry_juzhan');
 							trigger.target.addTempSkill('nzry_juzhanx');
 							player.addTempSkill('nzry_juzhany');
 						},
@@ -1718,11 +1717,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			"nzry_chenglve":{
+			nzry_chenglve:{
 				mark:true,
 				locked:false,
 				zhuanhuanji:true,
-				marktext:'成',
+				marktext:'☯',
 				intro:{
 					content:function(storage,player,skill){
 						var str=player.storage.nzry_chenglve?'出牌阶段限一次，你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制':'出牌阶段限一次，你可以摸一张牌，然后弃置两张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制';
@@ -1739,14 +1738,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(player.storage.nzry_chenglve==true){
-						player.storage.nzry_chenglve=false;
 						player.draw(2);
 						player.chooseToDiscard('h',true);
-					}else{
-						player.storage.nzry_chenglve=true;
+					}
+					else{
 						player.draw();
 						player.chooseToDiscard('h',2,true);
-					};
+					}
+					player.changeZhuanhuanji('nzry_chenglve')
 					'step 1'
 					if(result.bool){
 						player.storage.nzry_chenglve1=[];
@@ -1761,7 +1760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:2.7,
 					result:{
 						player:function(player){
-							if((player.storage.nzry_chenglve==undefined||player.storage.nzry_chenglve==false)&&player.countCards('h')<3) return 0;
+							if(!player.storage.nzry_chenglve&&player.countCards('h')<3) return 0;
 							return 1;
 						},
 					},
@@ -1960,6 +1959,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				locked:false,
 				zhuanhuanji:true,
+				marktext:'☯',
 				intro:{
 					content:function(storage,player,skill){
 						if(player.storage.nzry_zhenliang==true) return '当你于回合外使用或打出的牌结算完成后，若此牌与“任”颜色相同，则你可以令一名角色摸一张牌。';
@@ -1973,7 +1973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:2,
 						enable:'phaseUse',
 						filter:function(event,player){
-							if(player.storage.nzry_zhenliang==true) return false;
+							if(player.storage.nzry_zhenliang) return false;
 							var storage=player.getExpansions('nzry_mingren');
 							if(!storage.length) return false;
 							var color=get.color(storage[0]);
@@ -1995,7 +1995,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 6.5-get.value(card);
 						},
 						content:function(){
-							player.storage.nzry_zhenliang=true;
+							player.changeZhuanhuanji('nzry_zhenliang');
 							target.damage('nocard');
 						},
 						ai:{
@@ -2013,7 +2013,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player:['useCardAfter','respondAfter'],
 						},
 						filter:function(event,player){
-							if(_status.currentPhase==player||player.storage.nzry_zhenliang!=true) return false;
+							if(_status.currentPhase==player||!player.storage.nzry_zhenliang) return false;
 							var card=player.getExpansions('nzry_mingren')[0];
 							return card&&get.color(event.card)==get.color(card);
 						},
@@ -2027,7 +2027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 							"step 1"
 							if(result.bool){
-								player.storage.nzry_zhenliang=false;
+								player.changeZhuanhuanji('nzry_zhenliang');
 								player.logSkill('nzry_zhenliang',result.targets);
 								result.targets[0].draw();
 							}
@@ -2066,7 +2066,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'nzry_shenshi_1',
 				locked:false,
 				zhuanhuanji:true,
-				marktext:'审',
+				marktext:'☯',
 				intro:{
 					content:function(storage,player,skill){
 						if(player.storage.nzry_shenshi==true) return '其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张';
@@ -2099,7 +2099,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							'step 0'
-							player.storage.nzry_shenshi=true;
+							player.changeZhuanhuanji('nzry_shenshi');
 							target.gain(cards,player,'giveAuto');
 							target.damage('nocard');
 							'step 1'
@@ -2139,11 +2139,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						check:function(event,player){
 							return event.source&&event.source.countCards('h')<=2&&player.countCards('h')<4;
 						},
+						logTarget:'source',
+						prompt2:'其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张',
 						content:function(){
 							"step 0"
-							player.storage.nzry_shenshi=false;
+							player.changeZhuanhuanji('nzry_shenshi');
 							player.viewHandcards(trigger.source);
-							player.chooseCard('he',true).set('ai',function(card){
+							player.chooseCard('he',true,'交给'+get.translation(trigger.source)+'一张牌').set('ai',function(card){
 								return 5-get.value(card);
 							});
 							"step 1"

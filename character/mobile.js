@@ -212,7 +212,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hujinding:'胡金定，女，传说中关羽之妻。关索之母，配偶关羽，出处《花关索传》和元代《三国志评话》民间传说人物。',
 		},
 		characterTitle:{
-			chunyuqiong:'#b对决限定武将',
+			sp_jianggan:'#b对决限定武将',
 		},
 		card:{
 			binglinchengxiax:{
@@ -1549,7 +1549,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (player.countMark('spshidi')%2)==['phaseJieshu','phaseZhunbei'].indexOf(event.name);
 				},
 				content:function(){
-					player.addMark('spshidi',1,false);
+					player.changeZhuanhuanji('spshidi');
 				},
 				mod:{
 					globalFrom:function(from,to,distance){
@@ -6098,7 +6098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(cards[i].name=='sha'){
 							cards[i].fix();
 							ui.cardPile.insertBefore(cards[i],ui.cardPile.firstChild);
-							cards.splice(i++,1);
+							cards.splice(i,1);
 						}
 					}
 					if(cards.length){
@@ -15769,8 +15769,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				][player.countMark('shhlianhua')];
 			},
 			spshidi:function(player){
-				if(player.countMark('spshidi')%2==0) return '转换技，锁定技。①准备阶段或结束阶段开始时，若你发动此分支的累计次数为奇数/偶数，则你获得一个“☯”。<span class="bluetext">②若你的“☯”数为偶数，则你至其他角色的距离-1，且你使用的黑色【杀】不可被响应。</span>③若你的“☯”数为奇数，则其他角色至你的距离+1，且你不可响应红色【杀】。';
-				return '转换技，锁定技。①准备阶段或结束阶段开始时，若你发动此分支的累计次数为奇数/偶数，则你获得一个“☯”。②若你的“☯”数为偶数，则你至其他角色的距离-1，且你使用的黑色【杀】不可被响应。<span class="bluetext">③若你的“☯”数为奇数，则其他角色至你的距离+1，且你不可响应红色【杀】。</span>';
+				if(player.countMark('spshidi')%2==0) return '转换技，锁定技。①准备阶段/结束阶段开始时，若你发动此分支的累计次数为奇数/偶数，则你获得一个“☯”。<span class="bluetext">②若你的“☯”数为偶数，则你至其他角色的距离-1，且你使用的黑色【杀】不可被响应。</span>③若你的“☯”数为奇数，则其他角色至你的距离+1，且你不可响应红色【杀】。';
+				return '转换技，锁定技。①准备阶段/结束阶段开始时，若你发动此分支的累计次数为奇数/偶数，则你获得一个“☯”。②若你的“☯”数为偶数，则你至其他角色的距离-1，且你使用的黑色【杀】不可被响应。<span class="bluetext">③若你的“☯”数为奇数，则其他角色至你的距离+1，且你不可响应红色【杀】。</span>';
 			},
 		},
 		perfectPair:{
@@ -16224,7 +16224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spmiewu2:'灭吴',
 			spmiewu_backup:'灭吴',
 			spmiewu_info:'每回合限一次。你可弃置一枚“武库”并将一张牌当做任意基本牌或锦囊牌使用，然后摸一张牌。',
-			sp_bianfuren:'卞夫人',
+			sp_bianfuren:'手杀卞夫人',
 			spwanwei:'挽危',
 			spwanwei_info:'每轮累计限一次。①出牌阶段，你可选择一名其他角色。②当有其他角色处于濒死状态时。你可令该角色回复X+1点体力（至少回复至1），然后你失去X点体力。（X为你的体力值）',
 			spyuejian:'约俭',
@@ -16565,7 +16565,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spyanji_info:'出牌阶段开始时，你可以进行“整肃”。',
 			yj_huangzhong:'☆黄忠',
 			spshidi:'势敌',
-			spshidi_info:'转换技，锁定技。①准备阶段或结束阶段开始时，若你发动此分支的累计次数为奇数/偶数，则你获得一个“☯”。②若你的“☯”数为偶数，则你至其他角色的距离-1，且你使用的黑色【杀】不可被响应。③若你的“☯”数为奇数，则其他角色至你的距离+1，且你不可响应红色【杀】。',
+			spshidi_info:'转换技，锁定技。①准备阶段/结束阶段开始时，若你发动此分支的累计次数为奇数/偶数，则你获得一个“☯”。②若你的“☯”数为偶数，则你至其他角色的距离-1，且你使用的黑色【杀】不可被响应。③若你的“☯”数为奇数，则其他角色至你的距离+1，且你不可响应红色【杀】。',
 			spyishi:'义释',
 			spyishi_info:'当你对装备区有牌的其他角色造成伤害时，你可令此伤害-1，然后获得其装备区内的一张牌。',
 			spqishe:'骑射',
