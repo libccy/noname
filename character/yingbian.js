@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yingbian',
 		connect:true,
 		character:{
-			jin_yanghu:['male','jin',4,['huaiyuan','chongxin','dezhang']],
+			jin_jiachong:['male','jin',3,['xiongshu','jianhui']],
 			xuangongzhu:['female','jin',3,['gaoling','qimei','ybzhuiji'],['hiddenSkill']],
 			xinchang:['male','jin',3,['canmou','congjian']],
 			yangzhi:['female','jin',3,['wanyi','maihuo']],
@@ -30,12 +30,126 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yingbian:{
 				yingbian_pack1:['jin_simayi','jin_zhangchunhua','ol_lisu','simazhou','cheliji','ol_huaxin'],
 				yingbian_pack2:['jin_simashi','jin_xiahouhui','zhanghuyuechen','shibao','jin_yanghuiyu'],
-				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan','xuangongzhu','jin_yanghu'],
+				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan','xuangongzhu','jin_jiachong'],
 				yingbian_pack4:['zhongyan','xinchang'],
 				yingbian_pack5:['yangyan','yangzhi'],
 			},
 		},
 		skill:{
+			xiongshu:{
+				audio:2,
+				trigger:{global:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player!=event.player&&event.player.countCards('he')>0&&player.countCards('he')>player.countMark('xiongshu_count');
+				},
+				content:function(){
+					'step 0'
+					event.target=trigger.player;
+					var num=1+player.countMark('xiongshu_count');
+					player.chooseToDiscard('he',num,get.prompt('xiongshu',trigger.player),'弃置'+get.cnNumber(num)+'张牌并展示其一张牌').set('goon',get.attitude(player,event.target)<0).set('ai',function(card){
+						if(!_status.event.goon) return 0;
+						return 6-_status.event.player.countMark('xiongshu_count')-get.value(card);
+					}).logSkill=['xiongshu',trigger.player];
+					'step 1'
+					if(result.bool){
+						player.addTempSkill('xiongshu_count','roundStart');
+						player.addMark('xiongshu_count',1,false);
+					}
+					if(result.bool&&target.countCards('he')>0){
+						player.choosePlayerCard(target,true,'he');
+					}
+					else event.finish();
+					'step 2'
+					var card=result.cards[0],name=get.name(card),str=get.translation(target);
+					player.showCards(card,get.translation(player)+'对'+str+'发动了【凶竖】');
+					player.addTempSkill('xiongshu_effect','phaseUseAfter');
+					player.storage.xiongshu_effect=[card,name];
+					if(Math.random()<0.5){
+						target.storage.xiongshu_ai=name;
+						target.addTempSkill('xiongshu_ai','phaseUseAfter');
+					}
+					player.chooseControl('会使用','不会使用').set('prompt','预测：'+str+'是否会使用'+get.translation(name)+'？').set('choice',function(){
+						if(!target.hasValueTarget(card)) return 1;
+						return Math.random()<0.5?0:1;
+					}()).set('ai',()=>_status.event.choice);
+					'step 3'
+					player.storage.xiongshu_effect[2]=(result.index==0);
+				},
+				ai:{expose:0.35},
+				subSkill:{
+					ai:{
+						charlotte:true,
+						onremove:true,
+						ai:{
+							effect:{
+								player:function(card,player,target){
+									if(card.name==player.storage.xiongshu_ai) return 'zeroplayertarget';
+								},
+							},
+						},
+					},
+					count:{
+						charlotte:true,
+						onremove:true,
+					},
+					effect:{
+						trigger:{global:'phaseUseEnd'},
+						forced:true,
+						charlotte:true,
+						onremove:true,
+						filter:function(event,player){
+							var info=player.storage.xiongshu_effect;
+							return Array.isArray(info)&&event.player.isIn();
+						},
+						logTarget:'player',
+						content:function(){
+							var target=trigger.player;
+							var info=player.storage.xiongshu_effect;
+							if(target.hasHistory('useCard',function(evt){
+								return evt.card.name==info[1]&&evt.getParent('phaseUse')==trigger;
+							})==info[2]) target.damage();
+							else if(target.getCards('he').contains(card)) player.gain(card,target,'give');
+						},
+					},
+				},
+			},
+			jianhui:{
+				audio:2,
+				getLastPlayer:function(evt,player){
+					var history=player.getAllHistory('damage');
+					if(!history.length) return null;
+					var i=history.indexOf(evt);
+					if(i==-1) i=history.length-1;
+					else i--;
+					for(i;i>=0;i--){
+						if(history[i].source) return history[i].source;
+					}
+					return null;
+				},
+				trigger:{player:'damageEnd'},
+				forced:true,
+				filter:function(event,player){
+					return event.source&&event.source.isIn()&&event.source==lib.skill.jianhui.getLastPlayer(event,player)&&event.source.countCards('he')>0;
+				},
+				content:function(){
+					trigger.source.chooseToDiscard('he',true);
+				},
+				group:'jianhui_draw',
+				subSkill:{
+					draw:{
+						trigger:{source:'damageSource'},
+						forced:true,
+						logTarget:'player',
+						filter:function(event,player){
+							return event.player==lib.skill.jianhui.getLastPlayer(event,player);
+						},
+						content:function(){
+							player.draw();
+						},
+					},
+				},
+			},
 			huaiyuan:{
 				audio:2,
 				trigger:{
@@ -3032,6 +3146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			yanghu:['jin_yanghu','sp_yanghu'],
+			jiachong:['jin_jiachong','jiachong'],
 		},
 		translate:{
 			jin_zhangchunhua:'晋张春华',
@@ -3205,6 +3320,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dezhang_info:'觉醒技。准备阶段，若你没有“绥”，则你减1点体力上限并获得〖卫戍〗。',
 			weishu:'卫戍',
 			weishu_info:'锁定技。①当你于摸牌阶段外不因〖卫戊①〗而摸牌后，你令一名角色摸一张牌。②当你于弃牌阶段外不因〖卫戊②〗而弃置牌后，你弃置一名其他角色的一张牌。',
+			jin_jiachong:'贾充',
+			xiongshu:'凶竖',
+			xiongshu_info:'其他角色的出牌阶段开始时，你可弃置X张牌（X为你本轮内已发动过此技能的次数+1）并展示其一张牌，然后你预测“其本阶段内是否会使用与展示牌牌名相同的牌”。此阶段结束时，若你的预测正确，则你对其造成1点伤害；否则你获得展示牌。',
+			jianhui:'奸回',
+			jianhui_info:'锁定技。当你造成伤害后，若受伤角色为A，则你摸一张牌；当你受到伤害后，若伤害来源为A，则A弃置一张牌。（A为除本次伤害外最近一次对你造成过伤害的角色）',
 
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',

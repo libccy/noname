@@ -1666,10 +1666,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'useCardAfter'
 				},
 				filter:function(event,player){
-					if(event.card.name!='sha') return false;
+					if(event.card.name!='sha'||player.group!='wu') return false;
 					if(player.hasSkill('nzry_lijun2')) return false;
-					if(player.group!='wu') return false;
-					if(_status.currentPhase!=player) return false;
+					if(!player.isPhaseUsing()) return false;
 					if(!game.hasPlayer(function(target){
 						return player!=target&&target.hasZhuSkill('nzry_lijun',player);
 					})) return false;
@@ -7432,7 +7431,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinshensu:'神速',
 			xinshensu_info:'你可以选择一至三项：1. 跳过判定阶段和摸牌阶段；2. 跳过出牌阶段并弃置一张装备牌；3. 跳过弃牌阶段并将你的武将牌翻面。你每选择一项，视为你对一名其他角色使用一张没有距离限制的【杀】',
 			yinghun:'英魂',
-			yinghun_info:'准备阶段开始时，若你已受伤，你可令一名其他角色执行一项：摸X张牌，然后弃置一张牌；或摸一张牌，然后弃置X张牌（X为你已损失的体力值）',
+			yinghun_info:'准备阶段开始时，你可令一名其他角色执行一项：摸X张牌，然后弃置一张牌；或摸一张牌，然后弃置X张牌（X为你已损失的体力值）',
 			gzyinghun:'英魂',
 			gzyinghun_info:'准备阶段开始时，若你已受伤，你可令一名其他角色执行一项：摸X张牌，然后弃置一张牌；或摸一张牌，然后弃置X张牌（X为你已损失的体力值）',
 
@@ -7543,7 +7542,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huoshou_info:'锁定技，【南蛮入侵】对你无效；你视为所有【南蛮入侵】的伤害来源。',
 			zaiqi_info:'摸牌阶段，若你已受伤，则你可以改为展示牌堆顶的X张牌（X为你已损失的体力值），并回复X点体力（X为其中♥牌的数目）。然后你将这些♥牌置入弃牌堆，并获得其余的牌。',
 			zaiqixx_info:'摸牌阶段，若你已受伤，则你可以改为展示牌堆顶的X张牌（X为你已损失的体力值+1），并回复X点体力（X为其中♥牌的数目）。然后你将这些♥牌置入弃牌堆，并获得其余的牌。',
-			juxiang_info:'锁定技，【南蛮入侵】对你无效。其他角色使用的【南蛮入侵】结算后进入弃牌堆时，你获得之。',
+			juxiang_info:'锁定技。①【南蛮入侵】对你无效。②其他角色使用的【南蛮入侵】结算结束后，你获得此牌对应的所有实体牌。',
 			lieren_info:'当你使用【杀】造成伤害后，可与受到该伤害的角色进行拼点；若你赢，你获得对方的一张牌。',
 			xingshang_info:'当有角色死亡后，你可以获得该角色的所有牌。',
 			fangzhu_info:'当你受到伤害后，你可令一名其他角色摸X张牌（X为你已损失的体力值），然后该角色将武将牌翻面。',

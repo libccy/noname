@@ -764,6 +764,10 @@ window.noname_character_rank={
 		're_zhanghe',
 		'wufan',
 		'yanfuren',
+		'tw_wangcan',
+		'tw_wangchang',
+		'jin_jiachong',
+		'licaiwei',
 	],
 	b:[
 		'diy_feishi',
@@ -985,6 +989,7 @@ window.noname_character_rank={
 		'tw_caocao',
 		'xin_wuguotai',
 		'dc_xushu',
+		'dc_jiben',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1142,6 +1147,7 @@ window.noname_character_rank={
 		'peixiu',
 		'haomeng',
 		'mamidi',
+		'tw_wujing',
 	],
 	c:[
 		'xiahoudun',
@@ -1897,6 +1903,10 @@ window.noname_character_rank={
 			'jin_yanghu',
 			'qinghegongzhu',
 			'tw_guohuai',
+			'tw_wangcan',
+			'tw_wangchang',
+			'licaiwei',
+			'jin_jiachongp',
 		],
 		junk:[
 			'sunshao',

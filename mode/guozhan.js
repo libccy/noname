@@ -1075,7 +1075,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).setHiddenSkill('gzshensu').set('goon',player.needsToDiscard()).set('ai',function(target){
 						var player=_status.event.player;
 						if(!_status.event.goon||player.hp<=target.hp) return false;
-						return get.effect(target,{name:'',isCard:true},player,player);
+						return get.effect(target,{name:'sha',isCard:true},player,player);
 					});
 					'step 1'
 					if(result.bool){
@@ -11913,7 +11913,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzxiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌；2.受到你对其造成的1点伤害。',
 
 			gzdangxian:'当先',
-			gzdangxian_info:'锁定技。当你首次明置此武将牌时，你获得一枚“”标记。回合开始时，你获得一个额外的出牌阶段。',
+			gzdangxian_info:'锁定技。当你首次明置此武将牌时，你获得一枚“先驱”标记。回合开始时，你获得一个额外的出牌阶段。',
 			gzhuanshi:'缓释',
 			gzhuanshi_info:'一名己方角色的判定牌生效前，你可打出一张牌代替之。',
 			gzhongyuan:'弘援',

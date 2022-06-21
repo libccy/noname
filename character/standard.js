@@ -89,7 +89,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			machao:['madai','mayunlu'],
 			zhangliao:['zangba'],
 			ganning:['lingtong','xf_sufei'],
-			guanyu:['zhangfei'],
+			guanyu:['zhangfei','liaohua'],
 		},
 		skill:{
 			rewangzun:{

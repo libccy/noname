@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			sp:{
 				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu"],
-				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng'],
+				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu'],
 				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun"],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan'],
@@ -28,6 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			jin_yanghu:['male','jin',4,['huaiyuan','chongxin','dezhang']],
 			qinghegongzhu:['female','wei',3,['zengou','qhzhangji']],
 			fanjiangzhangda:['male','wu',4,['yuanchou','juesheng']],
 			tianyu:['male','wei',4,['saodi','zhuitao']],
@@ -294,7 +295,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterTitle:{},
 		perfectPair:{
 			yuejin:['re_lidian'],
-			zhugejin:['zhugeke'],
+			zhugejin:['zhugeke','sunquan'],
 			guanyinping:['guanyu'],
 			zhangxingcai:['liushan'],
 			fuwan:['fuhuanghou'],
@@ -1647,13 +1648,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.target=target;
 							if(target.isIn()&&player.canUse('sha',target,false)) player.chooseBool('狷狭：是否视为对'+get.translation(target)+'依次使用'+get.cnNumber(player.storage.oljuanxia_counter[target.playerid])+'张【杀】？').set('goon',get.effect(target,{name:'sha'},player,player)>0).set('ai',()=>_status.event.goon);
 							'step 2'
-							if(result.bool){
-								for(var i=0;i<player.storage.oljuanxia_counter[target.playerid];i++){
-									player.useCard({name:'sha',isCard:true},target,false);
-								}
-							}
 							event.num++;
-							if(event.num<targets.length) event.goto(1);
+							if(result.bool) event.count=player.storage.oljuanxia_counter[target.playerid];
+							else if(event.num<targets.length) event.goto(1);
+							else event.finish();
+							'step 3'
+							event.count--;
+							if(player.canUse('sha',target,false)) player.useCard({name:'sha',isCard:true},target,false);
+							if(event.count>0) event.redo();
+							else if(event.num<targets.length) event.goto(1);
 						},
 					},
 				},
@@ -13775,7 +13778,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.contains(event.player)||event.player.isIn()) return false;
 					return event.nature=='fire';
 				},
 				logTarget:'player',
@@ -16056,6 +16059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zangba:['tw_zangba','zangba'],
 			zhangbao:['zhangbao','re_zhangbao'],
 			jianggan:['jianggan','sp_jianggan'],
+			dc_jiben:['dc_jiben','sp_jiben'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -16690,7 +16694,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			weizhong:'威重',
 			weizhong_info:'锁定技，当你的体力上限增加或减少时，你摸一张牌。若你的手牌数为全场最少，则你改为摸两张牌。',
 			taichen_info:'出牌阶段限一次，你可以失去1点体力，视为对一名角色使用一张【杀】。（不计入出牌阶段的使用次数限制）',
-			naman_info:'当其他角色打出的【杀】进入弃牌堆时，你可以获得之。',
+			naman_info:'当其他角色打出的【杀】结算结束后，你可以获得此牌对应的所有实体牌。',
 			xiemu_info:'出牌阶段限一次，你可以弃置一张【杀】并选择一个势力。若如此做，直到你的下回合开始时，当你成为该势力的其他角色使用的黑色牌的目标后，你摸两张牌。',
 			oldxiemu_info:'当你成为其他角色使用的黑色牌的目标后，你可以弃置一张【杀】，然后摸两张牌。',
 			spmengjin_info:'当你使用【杀】指定目标后，你可以弃置目标角色的一张牌。',
@@ -16835,7 +16839,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spcangni_info:'弃牌阶段开始时，你可以回复1点体力或摸两张牌，然后将你的武将牌翻面；其他角色的回合内，当你获得（每回合限一次）/失去一次牌时，若你的武将牌背面朝上，你可以令该角色摸/弃置一张牌。',
 			spmixin:'密信',
 			spmixin_info:'出牌阶段限一次，你可以将一张手牌交给一名其他角色，该角色须对你选择的另一名角色使用一张无距离限制的【杀】，否则你选择的角色观看其手牌并获得其中一张。',
-			sp_jiben:'吉本',
+			sp_jiben:'SP吉本',
 			spduanzhi:'断指',
 			spduanzhi_info:'当你成为其他角色使用的牌的目标后，你可以弃置其至多两张牌，然后失去1点体力。',
 			spduyi:'毒医',
@@ -16897,7 +16901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaosong:'诏颂',
 			zhaosong_info:'一名其他角色的摸牌阶段结束时，若其没有因〖诏颂〗而获得的标记，则你可令其正面向上交给你一张手牌。根据此牌的类型，该角色获得对应的标记和效果：<br>锦囊牌：“诔”标记。当拥有者进入濒死状态时，其可弃置所有“诔”，将体力回复至1点并摸1张牌。<br>装备牌：“赋”标记。拥有者的出牌阶段开始时，其可弃置所有“赋”，弃置一名角色区域内的至多两张牌，然后可令其摸一张牌。<br>基本牌：“颂”标记。当使用者使用仅指定一个目标的【杀】时，其可弃置“颂”，为此【杀】增加至多两个目标。',
 			lisi:'离思',
-			lisi_info:'每当你于回合外使用牌的置入弃牌堆时，你可将其交给一名手牌数不大于你的其他角色。',
+			lisi_info:'当你于回合外使用的牌结算结束后，你可将其交给一名手牌数不大于你的其他角色。',
 			ol_yangyi:'杨仪',
 			oljuanxia:'狷狭',
 			oljuanxia_info:'结束阶段，你可选择一名其他角色，并依次视为对其使用至多两种单目标普通锦囊牌。然后其下回合结束时，可视为对你使用等量的【杀】。',

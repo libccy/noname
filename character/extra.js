@@ -44,7 +44,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_ganning:["male","shen","3/6",["drlt_poxi","drlt_jieying"],["wu"]],
 			ol_zhangliao:['male','shen',4,['olduorui','olzhiti'],['wei']],
 			shen_caopi:['male','shen',5,['chuyuan','dengji'],['wei']],
-			shen_zhenji:['female','shen',4,['shenfu','qixian'],['wei']],
+			shen_zhenji:['female','shen',3,['shenfu','qixian'],['wei']],
 			boss_zhaoyun:['male','shen',1,['boss_juejing','xinlonghun','zhanjiang'],['shu']],
 		},
 		characterIntro:{

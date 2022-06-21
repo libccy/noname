@@ -737,7 +737,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				content:function(){
 					'step 0'
-					var index=event.player.getHistory('useCard',function(evt){
+					var index=trigger.player.getHistory('useCard',function(evt){
 						return evt.targets.contains(player);
 					}).indexOf(trigger.getParent());
 					if(index==2){
@@ -757,15 +757,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
-					return player.group=='key'&&player.hasHistory('useCard',function(evt){
-						return evt.card.name=='sha'||(get.type(evt.card)=='trick'&&get.tag(evt.card,'damage')>0);
-					});
+					return player.group=='key';
 				},
 				content:function(){
 					'step 0'
 					var num=player.getHistory('useCard',function(evt){
 						return evt.card.name=='sha'||(get.type(evt.card)=='trick'&&get.tag(evt.card,'damage')>0);
-					}).length;
+					}).length+1;
 					player.chooseTarget(get.prompt('liyingxia_zhenjun'),[1,num],'令至多'+get.cnNumber(num)+'名角色各摸一张牌').set('ai',(serafu)=>get.attitude(_status.event.player,serafu));
 					'step 1'
 					if(result.bool){
@@ -15707,7 +15705,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liyingxia_sanli:'三礼',
 			liyingxia_sanli_info:'锁定技。其他角色于其回合内前两次使用牌指定你为目标后，你摸一张牌；第三次使用牌指定你为目标后，你交给其一张牌。',
 			liyingxia_zhenjun:'振军',
-			liyingxia_zhenjun_info:'键势力技。结束阶段，你可以令至多X名角色各摸一张牌，且这些角色于自己的下个回合内第一次造成的伤害+1（X为你本回合内使用【杀】和伤害性锦囊牌的次数）。',
+			liyingxia_zhenjun_info:'键势力技。结束阶段，你可以令至多X+1名角色各摸一张牌，且这些角色于自己的下个回合内第一次造成的伤害+1（X为你本回合内使用【杀】和伤害性锦囊牌的次数）。',
 			liyingxia_wumai:'武脉',
 			liyingxia_wumai_info:'蜀势力技。一轮游戏开始时，你可以选择获得其中一个未选择过的技能直到本轮结束：〖八阵〗/〖集智〗/〖观星〗/〖游龙〗。若均已选择过，则你可以摸X张牌（X为场上已受伤的角色数且至多为3）。',
 			erika_shisong:'识诵',

@@ -8931,14 +8931,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.getParent().filterCard({name:button.link[2]},player,_status.event.getParent());
 					},
 					check:function(button){
-						var player=_status.event.player;
-						if(player.countCards('hs',button.link[2])>0) return 0;
-						if(['wugu','zhulu_card'].contains(button.link[2])) return 0;
-						var effect=player.getUseValue(button.link[2]);
-						if(effect>0) return effect;
-						return 0;
-					},
-					check:function(button){
 						if(_status.event.getParent().type!='phase') return 1;
 						var player=_status.event.player;
 						if(['wugu','zhulu_card','yiyi','lulitongxin','lianjunshengyan','diaohulishan'].contains(button.link[2])) return 0;
@@ -15789,7 +15781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sufei:['sp_sufei','xf_sufei'],
 			jiakui:['jiakui','old_jiakui'],
 			shenpei:['shenpei','sp_shenpei'],
-			wangcan:['wangcan','sp_wangcan'],
+			wangcan:['tw_wangcan','wangcan','sp_wangcan'],
 			sunshao:['sp_sunshao','sunshao'],
 			xunchen:['re_xunchen','xunchen','sp_xunchen'],
 			xinpi:['xinpi','sp_xinpi'],
@@ -15800,6 +15792,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huaman:['huaman','sp_huaman'],
 			gaolan:['gaolan','sp_gaolan'],
 			cuiyan:['sp_cuiyan','cuiyan'],
+			wujing:['tw_wujing','wujing'],
 		},
 		translate:{
 			liuzan:'手杀留赞',
@@ -15985,7 +15978,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqianxin:'遣信',
 			reqianxin_info:'出牌阶段限一次，你可将至多两张手牌随机交给等量的其他角色，称为「信」。这些角色的准备阶段开始时，若其手牌中有「信」，则其选择一项：令你摸两张牌，本回合手牌上限-2。',
 			rebiaozhao:"表召",
-			"rebiaozhao_info":"结束阶段，你可以将一张牌置于武将牌上，称为「表」。当有一张与「表」点数相同的牌进入弃牌堆时，你将「表」置入弃牌堆并失去1点体力。准备阶段，若你的武将牌上有「表」，则你移去「表」并选择一名角色，该角色回复1点体力并摸三张牌。",
+			"rebiaozhao_info":"结束阶段，你可以将一张牌置于武将牌上，称为「表」。当有一张与「表」点数相同的牌进入弃牌堆后，你将「表」置入弃牌堆并失去1点体力。准备阶段，若你的武将牌上有「表」，则你移去「表」并选择一名角色，该角色回复1点体力并摸三张牌。",
 			"rebiaozhao2":"表召",
 			"rebiaozhao2_info":"",
 			"rebiaozhao3":"表召",
@@ -16064,7 +16057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhengjing_info:'出牌阶段，你可以整理卡牌。然后，你将整理出的卡牌中的至少一张作为“经”置于一名角色的武将牌上，然后获得其余的牌。该角色的准备阶段获得这些牌，且跳过此回合的判定和摸牌阶段。',
 			zhengjing2:'整经',
 			
-			mobile_yijiang:'武将设计征集大赛',
+			mobile_yijiang:'将星独具',
 			yj_zhanghe:'☆张郃',
 			yj_zhangliao:'☆张辽',
 			yj_xuhuang:'☆徐晃',

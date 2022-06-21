@@ -1,10 +1,10 @@
 window.noname_update={
-	version:'1.9.114.1',
-	update:'1.9.113.5',
+	version:'1.9.114.2',
+	update:'1.9.114.1',
 	changeLog:[
-		'转换技机制优化',
-		'十周年郝萌、马日磾、冯妤、吴范',
-		'海外服曹肇、郭淮',
+		'OL贾充',
+		'十周年李采薇、吉本',
+		'海外服吴景、王粲、王昶',
 		'bug修复',
 	],
 	files:[
@@ -30,7 +30,7 @@ window.noname_update={
         //'character/hearth.js',
 		'character/mobile.js',
 		//'character/mtg.js',
-		//'character/offline.js',
+		'character/offline.js',
 		//'character/old.js',
 		//'character/ow.js',
 		'character/rank.js',
@@ -38,7 +38,7 @@ window.noname_update={
 		'character/shenhua.js',
 		'character/sp.js',
 		'character/sp2.js',
-		//'character/standard.js',
+		'character/standard.js',
 		'character/tw.js',
 		//'character/swd.js',
 		//'character/xianjian.js',
