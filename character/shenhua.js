@@ -7301,7 +7301,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunce:['re_sunben','re_sunce','sunce'],
 			zhangzhang:['re_zhangzhang','zhangzhang'],
 			zuoci:['re_zuoci','zuoci'],
-			caiwenji:['re_caiwenji','caiwenji'],
+			caiwenji:['ol_caiwenji','re_caiwenji','caiwenji'],
 			xuyou:['sp_xuyou','xuyou'],
 			guanqiujian:['guanqiujian','re_guanqiujian','old_guanqiujian'],
 			chendao:['chendao','ns_chendao'],

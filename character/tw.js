@@ -6,12 +6,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			tw:{
 				tw_mobile:['nashime','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu','tw_huojun','tw_caocao','tw_zhangmancheng','tw_caozhao','tw_wangchang'],
-				tw_mobile2:['tw_beimihu','tw_gexuan','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_chengpu','tw_guohuai','tw_wujing','tw_wangcan'],
+				tw_mobile2:['tw_beimihu','tw_gexuan','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_chengpu','tw_guohuai','tw_wujing','tw_wangcan','old_quancong'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
 				tw_english:['kaisa'],
 			},
 		},
 		character:{
+			old_quancong:['male','wu',4,['zhenshan']],
 			tw_wujing:['male','wu',4,['twfenghan','twcongji']],
 			tw_wangcan:['male','wei',3,['twdianyi','twyingji','twshanghe']],
 			tw_wangchang:['male','wei',3,['twkaiji','twshepan']],
@@ -169,6 +170,141 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//全琮
+			zhenshan:{
+				audio:2,
+				enable:['chooseToUse','chooseToRespond'],
+				filter:function(event,player){
+					if(event.type=='wuxie') return false;
+					var nh=player.countCards('h');
+					if(!game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h')<nh;
+					})){
+						return false;
+					}
+					for(var i of lib.inpile){
+						if(get.type(i)!='basic') continue;
+						var card={name:i,isCard:true};
+						if(event.filterCard(card,player,event)) return true;
+						if(i=='sha'){
+							for(var j of lib.inpile_nature){
+								card.nature=j;
+								if(event.filterCard(card,player,event)) return true;
+							}
+						}
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[];for(var i of lib.inpile){
+						if(get.type(i)!='basic') continue;
+						var card={name:i,isCard:true};
+						if(event.filterCard(card,player,event)) list.push(['基本','',i]);
+						if(i=='sha'){
+							for(var j of lib.inpile_nature){
+								card.nature=j;
+								if(event.filterCard(card,player,event)) list.push(['基本','',i,j]);
+							}
+						}
+					}
+						return ui.create.dialog('振赡',[list,'vcard'],'hidden');
+					},
+					check:function(button){
+						var player=_status.event.player;
+						var card={name:button.link[2],nature:button.link[3]};
+						if(card.name=='jiu') return 0;
+						if(game.hasPlayer(function(current){
+							return get.effect(current,card,player,player)>0;
+						})){
+							if(card.name=='sha'){
+								var eff=player.getUseValue(card);
+								if(eff>0) return 2.9+eff/10;
+								return 0;
+							}
+							else if(card.name=='tao'||card.name=='shan'){
+								return 4;
+							}
+						}
+						return 0;
+					},
+					backup:function(links,player){
+						return {
+							filterCard:function(){return false},
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+								isCard:true,
+							},
+							selectCard:-1,
+							precontent:function(){
+								'step 0'
+								player.chooseTarget('选择一名手牌数小于你的角色交换手牌',function(card,player,target){
+									return target!=player&&target.countCards('h')<player.countCards('h')
+								},true).set('ai',function(target){
+									return get.attitude(player,target)*Math.sqrt(target.countCards('h')+1);
+								});
+								'step 1'
+								if(result.bool){
+									player.logSkill('zhenshan',result.targets);
+									player.swapHandcards(result.targets[0]);
+									delete event.result.skill;
+								}
+								else event.finish();
+								'step 2'
+								game.delayx();
+							},
+						}
+					},
+					prompt:function(links,player){
+						return '选择【'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'】的目标';
+					}
+				},
+				ai:{
+					order:function(){
+						var player=_status.event.player;
+						var event=_status.event;
+						var nh=player.countCards('h');
+						if(game.hasPlayer(function(current){
+							return get.attitude(player,current)>0&&current.countCards('h')<nh;
+						})){
+							if(event.type=='dying'){
+								if(event.filterCard({name:'tao'},player,event)){
+									return 0.5;
+								}
+							}
+							else{
+								if(event.filterCard({name:'tao'},player,event)||event.filterCard({name:'shan'},player,event)){
+									return 4;
+								}
+								if(event.filterCard({name:'sha'},player,event)){
+									return 2.9;
+								}
+							}
+						}
+						return 0;
+					},
+					save:true,
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter:function(player,tag,arg){
+						var nh=player.countCards('h');
+						return game.hasPlayer(function(current){
+							return current!=player&&current.countCards('h')<nh;
+						});
+					},
+					result:{
+						player:function(player){
+							if(_status.event.type=='dying'){
+								return get.attitude(player,_status.event.dying);
+							}
+							else{
+								return 1;
+							}
+						}
+					}
+				}
+			},
 			//吴景
 			twfenghan:{
 				audio:2,
@@ -872,7 +1008,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'useCard'},
 						direct:true,
 						filter:function(event,player){
-							return event.player!=player&&event.card.name=='sha'&&event.player.countCards('he')>0&&event.player.getExpansions('twchunlao').length>0;
+							return event.card.name=='sha'&&event.player.countCards('he')>0&&event.player.getExpansions('twchunlao').length>0;
 						},
 						content:function(){
 							'step 0'
@@ -903,7 +1039,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								target.logSkill('twchunlao',player);
 								if(!target.hasSkill('twchunlao')) game.trySkillAudio('twchunlao',player);
-								player.gain(result.cards,target,'giveAuto');
+								if(player!=target) player.gain(result.cards,target,'giveAuto');
 								trigger.baseDamage++;
 							}
 						},
@@ -4185,6 +4321,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twfenghan_info:'每回合限一次。当你使用【杀】或伤害类锦囊牌指定第一个目标后，你可令至多X名角色各摸一张牌（X为此牌的目标数）。',
 			twcongji:'从击',
 			twcongji_info:'当你的红色牌于回合外因弃置而进入弃牌堆后，你可令一名其他角色获得这些牌。',
+			old_quancong:'TW全琮',
+			zhenshan:'振赡',
+			zhenshan_info:'当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌，视为使用或打出此牌。',
 			
 			tw_mobile:'移动版·海外服',
 			tw_mobile2:'海外服异构',

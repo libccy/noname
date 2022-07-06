@@ -6013,7 +6013,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						button=result.links[0];
 					}
 					if(button){
-						player.loseToDiscardpile('sidi');
+						player.loseToDiscardpile(button);
 						trigger.player.addTempSkill('sidi3');
 						trigger.player.addMark('sidi3',1,false);
 					}

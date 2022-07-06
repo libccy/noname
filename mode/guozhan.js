@@ -3954,23 +3954,39 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return lib.skill.gzxingzhao.getNum()>0;
 						},
 						content:function(){
-							"step 0"
-							event.cards=get.cards(4);
-							player.chooseCardButton(event.cards,2,'选择两张牌置于牌堆顶',true).set('ai',ai.get.buttonValue);
-							"step 1"
-							if(result.bool){
-								var choice=[];
-								for(var i=0;i<result.links.length;i++){
-									choice.push(result.links[i]);
-									cards.remove(result.links[i]);
-								}
-								for(var i=0;i<cards.length;i++){
-									ui.cardPile.appendChild(cards[i]);
-								}
-								while(choice.length){
-									ui.cardPile.insertBefore(choice.pop(),ui.cardPile.firstChild);
-								}
+							'step 0'
+							var cards=get.cards(4);
+							game.cardsGotoOrdering(cards);
+							var next=player.chooseToMove('恂恂：将两张牌置于牌堆顶',true);
+							next.set('list',[
+								['牌堆顶',cards],
+								['牌堆底'],
+							]);
+							next.set('filterMove',function(from,to,moved){
+								if(to==1&&moved[1].length>=2) return false;
+								return true;
+							});
+							next.set('filterOk',function(moved){
+								return moved[1].length==2;
+							});
+							next.set('processAI',function(list){
+								var cards=list[0][1].slice(0).sort(function(a,b){
+									return get.value(b)-get.value(a);
+								});
+								return [cards,cards.splice(2)];
+							})
+							'step 1'
+							var top=result.moved[0];
+							var bottom=result.moved[1];
+							top.reverse();
+							for(var i=0;i<top.length;i++){
+								ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
 							}
+							for(i=0;i<bottom.length;i++){
+								ui.cardPile.appendChild(bottom[i]);
+							}
+							game.updateRoundNumber();
+							game.delayx();
 						},
 					},
 					use:{
@@ -11475,6 +11491,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			junling6_bg:'令',
 			junling6_info:'若被执行，执行者选择一张手牌和一张装备区内牌（若有），然后弃置其余的牌。',
 
+			gz_miheng:'祢衡',
 			gzshensu:'神速',
 			gzshensu_info:'①判定阶段开始时，你可跳过此阶段和摸牌阶段，视为使用一张【杀】（无距离限制）。②出牌阶段开始时，你可跳过此阶段并弃置一张装备牌，视为使用一张【杀】（无距离限制）。③弃牌开始时，你可跳过此阶段并失去1点体力，视为使用一张【杀】（无距离限制）。',
 			gzwushuang:'无双',

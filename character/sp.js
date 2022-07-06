@@ -11238,6 +11238,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool) player.addToExpansion(result.cards,player,'give').gaintag.add('yishe');
 				},
 				group:'yishe_recover',
+				ai:{combo:'bushi'},
 				subSkill:{
 					recover:{
 						audio:'yishe',
@@ -11292,7 +11293,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 3'
 					if(event.count>0&&player.getExpansions('yishe').length) event.goto(1);
-				}
+				},
+				ai:{combo:'yishe'},
 			},
 			midao:{
 				audio:2,
@@ -11352,6 +11354,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					combo:'yishe',
 					rejudge:true,
 					tag:{
 						rejudge:0.6
@@ -12827,9 +12830,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qiangwu3:{
 				mod:{
-					aiOrder:function(player,card,num){
-						if(card.name=='sha'&&get.number(card)>player.storage.qiangwu) return num+2;
-					},
 					targetInRange:function(card,player){
 						if(_status.currentPhase==player&&card.name=='sha'&&get.number(card)<player.storage.qiangwu) return true;
 					},
@@ -13778,7 +13778,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)||event.player.isIn()) return false;
+					if(event._notrigger.contains(event.player)||!event.player.isIn()) return false;
 					return event.nature=='fire';
 				},
 				logTarget:'player',
@@ -14467,7 +14467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				position:'he',
 				content:function(){
-					player.gain(target.getCards('h'),target,'giveAuto');
+					player.gainPlayerCard(target,true,'',target.countCards('h'));
 					player.turnOver();
 					player.addSkill('lihun2');
 					player.storage.lihun=target;
@@ -16055,11 +16055,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zongyu:['sp_zongyu','zongyu'],
 			ol_dongzhao:['ol_dongzhao','tw_dongzhao'],
 			mayunlu:['tw_mayunlu','mayunlu'],
-			zhuling:['ol_zhuling','zhuling'],
+			zhuling:['ol_zhuling','dc_zhuling','zhuling'],
 			zangba:['tw_zangba','zangba'],
 			zhangbao:['zhangbao','re_zhangbao'],
 			jianggan:['jianggan','sp_jianggan'],
 			dc_jiben:['dc_jiben','sp_jiben'],
+			yangyi:['ol_yangyi','yangyi'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -16712,7 +16713,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mingshi_info:'当你受到伤害时，若伤害来源的体力值大于你，你可以弃置一张黑色手牌，令伤害值-1。',
 			lirang_info:'当你的牌因弃置而置入弃牌堆后，你可以将其中的任意张牌交给其他角色。',
 			moukui_info:'当你使用【杀】指定目标后，你可以选择一项：摸一张牌，或弃置其一张牌。若如此做，当此【杀】被【闪】抵消时，目标角色弃置你的一张牌。 ',
-			qiangwu_info:'出牌阶段，你可以进行判定。若如此做，直到回合结束，你使用点数小于判定结果的【杀】时不受距离限制，且你使用点数大于判定结果的【杀】时不计入出牌阶段的使用次数限制。',
+			qiangwu_info:'出牌阶段，你可以进行判定。若如此做，直到回合结束，你使用点数小于判定结果的【杀】时不受距离限制，且你使用点数大于判定结果的【杀】时无使用次数限制。',
 			shenxian_info:'每名角色的回合限一次，你的回合外，当有其他角色因弃置而失去基本牌时，你可以摸一张牌。',
 			oldshenxian_info:'你的回合外，每当有其他角色因弃置而失去基本牌时，你可以摸一张牌。',
 			qiluan_info:'一名角色的回合结束时，你可以摸3X+Y张牌。（X为你本回合内杀死过的角色数，Y为本回合内其他角色杀死过的角色数）',
@@ -16933,7 +16934,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wuyan:'吾彦',
 			lanjiang:'澜疆',
 			lanjiang_info:'结束阶段，你可以选择令所有手牌数不小于你的角色。这些角色依次选择是否令你摸一张牌。然后你可以对其中一名手牌数等于你的角色造成1点伤害，随后可以对其中一名手牌数小于你的角色摸一张牌。',
-			ol_zhuling:'朱灵',
+			ol_zhuling:'OL朱灵',
 			jixian:'急陷',
 			jixian_info:'摸牌阶段结束时，你可以选择一名满足以下至少一项条件的角色：⒈装备区内有防具牌；⒉拥有的普通技能数大于你；⒊体力值等于体力上限。你视为对其使用一张【杀】，然后摸X张牌（X为其于此【杀】结算前满足的条件数）；若此【杀】未造成伤害，则你失去1点体力。',
 			ol_chendeng:'OL陈登',

@@ -7646,6 +7646,7 @@
 							}
 						}
 						for(var i=0;i<lib.config.extensions.length;i++){
+							if(window.bannedExtensions.contains(lib.config.extensions[i])) continue;
 							var extcontent=localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]);
 							if(extcontent){
 								_status.evaluatingExtension=true;
@@ -7665,6 +7666,7 @@
 					else{
 						if(lib.config.mode!='connect'||(!localStorage.getItem(lib.configprefix+'directstart')&&show_splash)){
 							for(var i=0;i<lib.config.extensions.length;i++){
+								if(window.bannedExtensions.contains(lib.config.extensions[i])) continue;
 								game.import('extension',{name:lib.config.extensions[i]});
 							}
 						}
@@ -10791,7 +10793,12 @@
 					if(info.notarget||range[1]<=-1){
 						if(!info.notarget&&range[1]<=-1){
 							for(var i=0;i<targets.length;i++){
-								if(!player.canUse(card,targets[i],event.nodistance?false:null,event.addCount===false?null:true)){
+								if(event.filterTarget){
+									if(!event.filterTarget(card,player,targets[i])){
+										targets.splice(i--,1);
+									}
+								}
+								else if(!player.canUse(card,targets[i],event.nodistance?false:null,event.addCount===false?null:true)){
 									targets.splice(i--,1);
 								}
 							}
@@ -10806,6 +10813,7 @@
 						else event.targets2=[];
 						if(event.forced){
 							event._result={bool:true};
+							return;
 						}
 						else{
 							var next=player.chooseBool();
@@ -10822,9 +10830,23 @@
 						}
 					}
 					else{
+						if(event.filterTarget){
+							var targets=game.filterPlayer(function(current){
+								return event.filterTarget(card,player,current);
+							});
+							if(targets.length<range[0]){
+								event._result={bool:false};
+								return;
+							}
+							else if(!info.complexTarget&&targets.length==range[0]&&range[0]==range[1]){
+								event.targets2=targets;
+								event._result={bool:true};
+								return;
+							}
+						}
 						var next=player.chooseTarget();
 						next.set('_get_card',card);
-						next.set('filterTarget',function(card,player,target){
+						next.set('filterTarget',event.filterTarget||function(card,player,target){
 							if(!_status.event.targets.contains(target)) return false;
 							if(!_status.event.nodistance&&!lib.filter.targetInRange(card,player,target)) return false;
 							return lib.filter.targetEnabledx(card,player,target);
@@ -15555,6 +15577,23 @@
 								// }
 							}
 						},player,card);
+					}
+					if(event.skill){
+						if(player.stat[player.stat.length-1].skill[event.skill]==undefined){
+							player.stat[player.stat.length-1].skill[event.skill]=1;
+						}
+						else{
+							player.stat[player.stat.length-1].skill[event.skill]++;
+						}
+						var sourceSkill=get.info(event.skill).sourceSkill;
+						if(sourceSkill){
+							if(player.stat[player.stat.length-1].skill[sourceSkill]==undefined){
+								player.stat[player.stat.length-1].skill[sourceSkill]=1;
+							}
+							else{
+								player.stat[player.stat.length-1].skill[sourceSkill]++;
+							}
+						}
 					}
 					if(cards.length&&(cards.length>1||cards[0].name!=card.name)){
 						game.log(player,'打出了',card,'（',cards,'）');
@@ -20830,10 +20869,15 @@
 					if(next.source==undefined&&!nosource) next.source=event.player;
 					if(next.source&&next.source.isDead()) delete next.source;
 					if(next.num==undefined) next.num=1;
+					next.original_num=next.num;
+					next.change_history=[];
 					if(next.nature=='poison') delete next._triggered;
 					next.setContent('damage');
 					next.filterStop=function(){
 						if(this.source&&this.source.isDead()) delete this.source;
+						var num=this.original_num;
+						for(var i of this.change_history) num+=i;
+						if(num!=this.num) this.change_history.push(this.num-num);
 						if(this.num<=0){
 							delete this.filterStop;
 							this.trigger('damageZero');
@@ -36382,6 +36426,7 @@
 		roundNumber:0,
 		shuffleNumber:0,
 	};
+	window['b'+'ann'+'e'+'dE'+'x'+'ten'+'s'+'i'+'o'+'ns']=[];
 	var ui={
 		updates:[],
 		thrown:[],

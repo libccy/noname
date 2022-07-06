@@ -13,6 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_yin:['shen_liubei','shen_luxun'],
 				extra_lei:['shen_ganning','shen_zhangliao'],
 				extra_key:['key_kagari','key_shiki','db_key_hina'],
+				extra_decade:['shen_jiangwei'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji'],
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
@@ -20,6 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			shen_jiangwei:['male','shen',4,['jiufa','tianren','pingxiang'],['shen']],
 			key_kagari:['female','shen',3,['kagari_zongsi'],['key']],
 			key_shiki:['female','shen','3/5',['shiki_omusubi'],['key']],
 			db_key_hina:['female','key',3,['hina_shenshi','hina_xingzhi'],['doublegroup:key:shen']],
@@ -63,6 +65,193 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			jiufa:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				frequent:true,
+				filter:function(event,player){
+					return event.jiufa_counted&&player.getStorage('jiufa').length>=9;
+				},
+				content:function(){
+					'step 0'
+					player.unmarkSkill('jiufa');
+					event.cards=get.cards(9);
+					event.cards.sort(function(a,b){
+						return get.number(b)-get.number(a);
+					})
+					game.cardsGotoOrdering(event.cards);
+					event.videoId=lib.status.videoId++;
+					game.broadcastAll(function(player,id,cards){
+						var str;
+						if(player==game.me&&!_status.auto){
+							str='九伐：选择任意张点数相同的牌';
+						}
+						else{
+							str='九伐';
+						}
+						var dialog=ui.create.dialog(str,cards);
+						dialog.videoId=id;
+					},player,event.videoId,event.cards);
+					event.time=get.utc();
+					game.addVideo('showCards',player,['涉猎',get.cardsInfo(event.cards)]);
+					game.addVideo('delay',null,2);
+					"step 1"
+					var next=player.chooseButton([1,9],true);
+					next.set('dialog',event.videoId);
+					next.set('filterButton',function(button){
+						if(!ui.selected.buttons.length) return true;
+						return get.number(ui.selected.buttons[0].link)==get.number(button.link);
+					});
+					next.set('ai',function(button){
+						return get.value(button.link,_status.event.player)*_status.event.getParent().cards.filter(function(i){
+							return get.number(i)==get.number(button.link);
+						}).length;
+					});
+					"step 2"
+					if(result.bool&&result.links){
+						event.cards2=result.links;
+					}
+					else{
+						event.finish();
+					}
+					var time=1000-(get.utc()-event.time);
+					if(time>0){
+						game.delay(0,time);
+					}
+					"step 3"
+					game.broadcastAll('closeDialog',event.videoId);
+					var cards2=event.cards2;
+					player.gain(cards2,'log','gain2');
+				},
+				marktext:'⑨',
+				intro:{
+					content:'已记录牌名：$',
+					onunmark:true,
+				},
+				group:'jiufa_count',
+				subSkill:{
+					count:{
+						trigger:{player:'useCard1'},
+						forced:true,
+						charlotte:true,
+						popup:false,
+						firstDo:true,
+						filter:function(event,player){
+							return !player.getStorage('jiufa').contains(event.card.name);
+						},
+						content:function(){
+							trigger.jiufa_counted=true;
+							player.markAuto('jiufa',[trigger.card.name]);
+						},
+					},
+				},
+			},
+			tianren:{
+				audio:2,
+				trigger:{global:['loseAfter','cardsDiscardAfter']},
+				forced:true,
+				filter:function(event,player){
+					if(event.name=='lose'){
+						if(event.position!=ui.discardPile) return false;
+					}
+					else{
+						var evt=event.getParent();
+						if(evt.relatedEvent&&evt.relatedEvent.name=='useCard') return false;
+					}
+					for(var i of event.cards){
+						var owner=false;
+						if(event.hs&&event.hs.contains(i)) owner=event.player;
+						var type=get.type(i,null,owner);
+						if(type=='basic'||type=='trick') return true;
+					}
+					return false;
+				},
+				content:function(){
+					var num=0;
+					for(var i of trigger.cards){
+						var owner=false;
+						if(trigger.hs&&trigger.hs.contains(i)) owner=trigger.player;
+						var type=get.type(i,null,owner);
+						if(type=='basic'||type=='trick') num++;
+					}
+					player.addMark('tianren',num);
+				},
+				group:'tianren_maxHp',
+				intro:{content:'mark'},
+				subSkill:{
+					maxHp:{
+						trigger:{player:['tianrenAfter','gainMaxHpAfter','loseMaxHpAfter']},
+						forced:true,
+						filter:function(event,player){
+							return player.countMark('tianren')>=player.maxHp;
+						},
+						content:function(){
+							player.removeMark('tianren',player.maxHp);
+							player.gainMaxHp();
+							player.draw(2);
+						},
+					},
+				},
+			},
+			pingxiang:{
+				audio:2,
+				enable:'phaseUse',
+				limited:true,
+				skillAnimation:true,
+				animationColor:'ice',
+				filter:function(event,player){
+					return player.maxHp>9;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('pingxiang');
+					player.loseMaxHp(9);
+					event.num=0;
+					'step 1'
+					event.num++;
+					player.chooseUseTarget({
+						name:'sha',
+						nature:'fire',
+						isCard:true,
+					},'请选择火【杀】的目标（'+(event.num==9?'⑨':event.num)+'/9）',false);
+					'step 2'
+					if(result.bool&&event.num<9) event.goto(1);
+					else{
+						player.removeSkill('jiufa');
+						player.addSkill('pingxiang_effect');
+					}
+				},
+				ai:{
+					order:function(){
+						return get.order({
+							name:'sha',
+							nature:'fire',
+							isCard:true,
+						});
+					},
+					result:{
+						player:function(player){
+							if(player.hasValueTarget({
+								name:'sha',
+								nature:'fire',
+								isCard:true,
+							})) return 1;
+							return 0;
+						},
+					},
+				},
+				subSkill:{
+					effect:{
+						marktext:'襄',
+						intro:{content:'手牌上限基数改为体力上限'},
+						mod:{
+							maxHandcardBase:function(player){
+								return player.maxHp;
+							},
+						},
+					},
+				},
+			},
 			hina_shenshi:{
 				groupSkill:true,
 				trigger:{player:['phaseUseBegin','phaseUseEnd']},
@@ -4917,6 +5106,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。若你本回合内以此法获得的牌数小于2，则你摸一张牌。②拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
 			pinghe:'冯河',
 			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
+			shen_jiangwei:'神姜维',
+			jiufa:'九伐',
+			jiufa_info:'①当你声明使用牌时，你记录此牌的牌名。②当你使用牌结算结束后，若你的〖九伐〗记录中包含至少⑨种不同的牌名，则你可以展示牌堆顶的⑨张牌，选择并获得其中任意张点数相同的牌，清除所有的记录，将其余牌置入弃牌堆。',
+			tianren:'天任',
+			tianren_info:'锁定技。①当有一张基本牌或普通锦囊牌不因使用而进入弃牌堆后，你获得一枚“天任”标记。②当你获得“天任”标记或体力上限变化后，若你的“天任”数不小于X，则你移去X枚“天任”，加1点体力上限并摸两张牌（X为你的体力上限）。',
+			pingxiang:'平襄',
+			pingxiang_info:'限定技。出牌阶段，若你的体力上限大于⑨，则你可减⑨点体力上限，视为使用至多⑨张火【杀】，然后失去〖九伐〗，并将手牌上限基数改为体力上限直到游戏结束。',
 			
 			key_kagari:'篝',
 			kagari_zongsi:'纵丝',
@@ -4944,6 +5140,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			extra_mobilezhi:'始计篇·智',
 			extra_mobilexin:'始计篇·信',
 			extra_offline:'神话再临·线下',
+			extra_decade:'十周年服神将',
 		},
 	};
 });

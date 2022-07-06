@@ -8,7 +8,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_feng:['caoren','ol_xiahouyuan','re_huangzhong','ol_weiyan','ol_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji'],
 				refresh_huo:["ol_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
 				refresh_lin:['re_menghuo','ol_sunjian','re_caopi','ol_xuhuang','ol_dongzhuo','ol_zhurong','re_jiaxu','ol_lusu'],
-				refresh_shan:['ol_jiangwei','re_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai','re_zhanghe'],
+				refresh_shan:['ol_jiangwei','ol_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai','re_zhanghe'],
 				refresh_yijiang1:['xin_wuguotai','xin_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua','dc_xushu'],
 				refresh_yijiang2:['re_madai','re_wangyi','guanzhang','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','re_liru','re_manchong','re_fuhuanghou','re_guanping'],
@@ -121,7 +121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sunjian:['male','wu','4/5',['gzyinghun','wulie']],
 			re_caopi:['male','wei',3,['rexingshang','refangzhu','songwei'],['zhu']],
 			ol_jiangwei:['male','shu',4,['oltiaoxin','olzhiji']],
-			re_caiwenji:['female','qun',3,['rebeige','duanchang']],
+			ol_caiwenji:['female','qun',3,['olbeige','duanchang']],
 			ol_liushan:['male','shu',3,['xiangle','olfangquan','olruoyu'],['zhu']],
 			re_zhangzhang:['male','wu',3,['rezhijian','guzheng']],
 			
@@ -143,6 +143,101 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			//OL界蔡文姬
+			olbeige:{
+				audio:'beige',
+				audioname:['ol_caiwenji'],
+				trigger:{global:'damageEnd'},
+				logTarget:'player',
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha'&&event.player.isIn()&&player.countCards('he')>0;
+				},
+				check:function(event,player){
+					if(event.player.hasSkill('xinleiji')) return get.attitude(player,event.player)>0;
+					return true;
+				},
+				prompt2:'令其进行判定，然后你可根据判定结果，弃置一张牌并令其执行对应效果。',
+				content:function(){
+					'step 0'
+					event.target=trigger.player;
+					event.source=trigger.source;
+					trigger.player.judge();
+					'step 1'
+					event.judgeResult=get.copy(result);
+					var str='是否弃置一张牌',strt=get.translation(target),strs=get.translation(source),goon=0;
+					switch(result.suit){
+						case 'heart':
+							if(target.isIn()&&target.isDamaged()){
+								str+=('，令'+strt+'回复1点体力');
+								goon=get.recoverEffect(target,player,player);
+							}
+							break;
+						case 'diamond':
+							if(target.isIn()){
+								str+=('，令'+strt+'摸两张牌');
+								goon=get.effect(target,{name:'wuzhong'},player,player);
+							}
+							break;
+						case 'spade':
+							if(source&&source.isIn()){
+								str+=('，令'+strs+'翻'+(source.isTurnedOver()?'回正':'')+'面');
+								goon=get.attitude(player,source)*(source.isTurnedOver()?2:-2);
+							}
+							break;
+						case 'club':
+							if(source&&source.isIn()){
+								str+=('，令'+strs+'弃置两张牌');
+								var cards=source.getCards('he').sort(function(a,b){
+									return get.value(a,source)-get.value(b,source);
+								}).slice(0,2);
+								for(var i of cards) goon+=get.value(i,source);
+								goon*=(-get.sgn(get.attitude(player,source)));
+							}
+							break;
+					}
+					str+='？';
+					var str2=('若弃置点数为'+get.strNumber(result.number)+'的牌则收回自己弃置的牌');
+					if(get.position(result.card,true)=='d'){
+						str2+=('；若弃置花色为'+get.translation(result.suit)+'的牌则获得'+get.translation(result.card));
+					}
+					player.chooseToDiscard('he',str,str2).set('goon',goon).set('ai',function(card){
+						var goon=_status.event.goon;
+						var player=_status.event.player;
+						var result=_status.event.getParent().judgeResult;
+						var eff=Math.min(7,goon);
+						if(eff<=0) return 0;
+						if(get.suit(card,player)==result.suit) eff+=get.value(result.card,player);
+						if(get.number(card,player)==result.number) return eff;
+						return eff-get.value(card);
+					});
+					'step 2'
+					if(result.bool){
+						event.card=result.cards[0];
+						switch(event.judgeResult.suit){
+							case 'heart':
+								if(target.isIn()&&target.isDamaged()) target.recover();
+								break;
+							case 'diamond':
+								if(target.isIn()) target.draw(2);
+								break;
+							case 'spade':
+								if(source&&source.isIn()) source.turnOver();
+								player.addExpose(0.1);
+								break;
+							case 'club':
+								if(source&&source.isIn()&&source.countCards('he')>0) source.chooseToDiscard(2,'he',true);
+								player.addExpose(0.1);
+								break;
+						}
+					}
+					else event.finish();
+					'step 3'
+					var gains=[];
+					if(get.position(event.judgeResult.card,true)=='d'&&get.suit(card,player)==event.judgeResult.suit) gains.push(event.judgeResult.card);
+					if(get.position(card,true)=='d'&&get.number(card,player)==event.judgeResult.number) gains.push(card);
+					if(gains.length) player.gain(gains,'gain2');
+				},
+			},
 			//OL界张郃
 			reqiaobian:{
 				audio:2,
@@ -159,8 +254,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addMark('reqiaobian',2);
 					game.delayx();
 				},
-				mark:true,
+				marktext:'变',
 				intro:{
+					name2:'变',
 					content:function(storage,player){
 						var str='共有'+(storage||0)+'个标记';
 						if(player.storage.reqiaobian_jieshu){
@@ -1508,8 +1604,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						if(list.length&&game.hasPlayer((current)=>(current!=player))){
 							var next=player.chooseButton(['是否将一张锦囊牌交给一名其他角色？',list]).set('ai',function(button){
-								return get.value(button.link,'raw');
-							});
+								if(_status.event.goon) return Math.max(0.1,get.value(button.link,'raw'));
+								return 0;
+							}).set('goon',game.hasPlayer(function(current){
+								return current!=player&&get.attitude(player,current)>0&&!current.hasSkillTag('nogain');
+							}));
 							if(!result.moved[1].length) next.set('forced',true);
 						}
 						else event.finish();
@@ -1521,7 +1620,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.card=card;
 						player.chooseTarget(lib.filter.notMe,true,'令一名其他角色获得'+get.translation(card)).set('card',card).set('ai',function(target){
 							var card=_status.event.card,player=_status.event.player;
-							var eff=get.value(card,target)*get.attitude(player,target);
+							var eff=Math.max(0.1,get.value(card,target))*get.attitude(player,target);
 							if(target.hasSkill('nogain')) eff/=10;
 							return eff;
 						});
@@ -8464,11 +8563,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function (){
 					"step 0"
-					target.chooseCard(true).ai=function(card){
+					if(!target.countCards('h')){
+						event.finish();
+						return;
+					}
+					else target.chooseCard(true,'h').set('ai',function(card){
 						var player=_status.event.player;
 						if((player.hasShan()||player.hp<3)&&get.color(card)=='black') return 0.5;
 						return Math.max(1,20-get.value(card));
-					};
+					});
 					"step 1"
 					target.showCards(result.cards);
 					event.card2=result.cards[0];
@@ -11515,7 +11618,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezaiqi:'再起',
 			rezaiqi_info:'结束阶段开始时，你可以令至多X名角色选择一项：1.摸一张牌，2.令你回复1点体力（X为本回合进入弃牌堆的红色牌数）',
 			ol_jiangwei:'界姜维',
-			re_caiwenji:'界蔡琰',
+			ol_caiwenji:'界蔡琰',
 			re_baosanniang:'手杀鲍三娘',
 			retuntian:'屯田',
 			rebeige:'悲歌',
@@ -11526,6 +11629,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhangzhang:'界张昭张纮',
 			rehunzi:'魂姿',
 			rehunzi_info:'觉醒技，准备阶段，若你的体力值不大于2，你减1点体力上限，并获得技能〖英姿〗和〖英魂〗。',
+			rezhijian:'直谏',
 			rezhijian_info:'出牌阶段，你可以将手牌中的一张装备牌置于一名其他角色装备区里（不得替换原装备），然后摸一张牌。当你使用装备牌时，你可以摸一张牌。',
 			refangquan:'放权',
 			refangquan_info:'你可跳过你的出牌阶段，若如此做，你本回合的手牌上限为你的体力上限，且回合结束时，你可以弃置一张手牌并令一名其他角色进行一个额外的回合。',
@@ -11819,7 +11923,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinbuyi_info:'一名角色进入濒死状态时，你可展示其一张手牌。若此牌不为基本牌，则其弃置此牌并回复1点体力。若其以此法弃置的牌移动前为其的唯一一张手牌，则其摸一张牌。',
 			decadexianzhen:'陷阵',
 			decadexianzhen2:'陷阵',
-			decadexianzhen_info:'每回合限一次。出牌阶段，你可以和一名其他角色拼点。若你赢：本回合你无视该角色的防具，且对其使用牌没有次数和距离限制，且本回合使用【杀】或普通锦囊牌选择唯一目标后，可以令其也成为此牌的目标，且本回合对其使用牌造成伤害时，此伤害+1（每种牌名每回合限一次）；若你没赢：你本回合内不能使用【杀】，且【杀】不计入手牌上限。',
+			decadexianzhen_info:'每回合限一次。出牌阶段，你可以和一名其他角色拼点。若你赢：本回合你无视该角色的防具，且对其使用牌没有次数和距离限制，且本回合对其使用牌造成伤害时，此伤害+1（每种牌名每回合限一次）；若你没赢：你本回合内不能使用【杀】，且【杀】不计入手牌上限。',
 			decadejinjiu:'禁酒',
 			decadejinjiu_info:'锁定技。你的【酒】的牌名均视为【杀】且点数视为K；你的回合内，其他角色不能使用【酒】。',
 			dc_xushu:'界徐庶',
@@ -11832,6 +11936,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhanghe:'界张郃',
 			reqiaobian:'巧变',
 			reqiaobian_info:'①游戏开始时，你获得两枚“变”。②判定阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段。③摸牌阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段，然后可以获得至多两名其他角色的各一张手牌。④出牌阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段，然后你可以移动场上的一张牌。⑤弃牌阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段。⑥结束阶段，若你的〖巧变⑥〗记录中不包含你的手牌数，则你获得一枚“变”并记录你的手牌数。',
+			olbeige:'悲歌',
+			olbeige_info:'当有角色受到渠道为【杀】的伤害后，若你有牌，你可令其进行判定。然后你可弃置一张牌，根据判定结果执行以下的一个选项：♥，其回复1点体力；♦，其摸两张牌；♣，伤害来源弃置两张牌️；♠，伤害来源将武将牌翻面。若你弃置的牌与判定结果：点数相同，则你获得你弃置的牌；花色相同，则你获得判定牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
