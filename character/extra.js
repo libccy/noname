@@ -84,7 +84,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll(function(player,id,cards){
 						var str;
 						if(player==game.me&&!_status.auto){
-							str='九伐：选择任意张点数相同的牌';
+							str='九伐：选择任意张点数满足条件的牌';
 						}
 						else{
 							str='九伐';
@@ -96,23 +96,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addVideo('showCards',player,['涉猎',get.cardsInfo(event.cards)]);
 					game.addVideo('delay',null,2);
 					"step 1"
-					var next=player.chooseButton([1,9],true);
+					var next=player.chooseButton([0,9],true);
 					next.set('dialog',event.videoId);
 					next.set('filterButton',function(button){
-						if(!ui.selected.buttons.length) return true;
-						return get.number(ui.selected.buttons[0].link)==get.number(button.link);
+						var num=get.number(button.link),cards=_status.event.getParent().cards;
+						for(var i of ui.selected.buttons){
+							if(get.number(i.link)==num) return false;
+						}
+						for(var i of cards){
+							if(i!=button.link&&get.number(i)==num) return true;
+						}
+						return false;
 					});
 					next.set('ai',function(button){
-						return get.value(button.link,_status.event.player)*_status.event.getParent().cards.filter(function(i){
-							return get.number(i)==get.number(button.link);
-						}).length;
+						return get.value(button.link,_status.event.player)
 					});
 					"step 2"
-					if(result.bool&&result.links){
+					if(result.bool&&result.links&&result.links.length){
 						event.cards2=result.links;
-					}
-					else{
-						event.finish();
 					}
 					var time=1000-(get.utc()-event.time);
 					if(time>0){
@@ -121,7 +122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					game.broadcastAll('closeDialog',event.videoId);
 					var cards2=event.cards2;
-					player.gain(cards2,'log','gain2');
+					if(cards2&&cards2.length) player.gain(cards2,'log','gain2');
 				},
 				marktext:'⑨',
 				intro:{
@@ -5108,7 +5109,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
 			shen_jiangwei:'神姜维',
 			jiufa:'九伐',
-			jiufa_info:'①当你声明使用牌时，你记录此牌的牌名。②当你使用牌结算结束后，若你的〖九伐〗记录中包含至少⑨种不同的牌名，则你可以展示牌堆顶的⑨张牌，选择并获得其中任意张点数相同的牌，清除所有的记录，将其余牌置入弃牌堆。',
+			jiufa_info:'①当你声明使用牌时，你记录此牌的牌名。②当你使用牌结算结束后，若你的〖九伐〗记录中包含至少⑨种不同的牌名，则你可以展示牌堆顶的⑨张牌，选择并获得其中任意张点数各不相同且{这九张牌中存在未被选择且和已选择的牌点数相同}的牌，清除所有的记录，将其余牌置入弃牌堆。',
 			tianren:'天任',
 			tianren_info:'锁定技。①当有一张基本牌或普通锦囊牌不因使用而进入弃牌堆后，你获得一枚“天任”标记。②当你获得“天任”标记或体力上限变化后，若你的“天任”数不小于X，则你移去X枚“天任”，加1点体力上限并摸两张牌（X为你的体力上限）。',
 			pingxiang:'平襄',
