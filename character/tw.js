@@ -5,13 +5,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			tw:{
-				tw_mobile:['nashime','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu','tw_huojun','tw_caocao','tw_zhangmancheng','tw_caozhao','tw_wangchang'],
-				tw_mobile2:['tw_beimihu','tw_gexuan','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_chengpu','tw_guohuai','tw_wujing','tw_wangcan','old_quancong'],
+				tw_mobile:['nashime','tw_dongzhao','jiachong','duosidawang','wuban','yuejiu','tw_huojun','tw_caocao','tw_zhangmancheng','tw_caozhao','tw_wangchang','tw_puyangxing'],
+				tw_mobile2:['tw_beimihu','tw_gexuan','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_chengpu','tw_guohuai','tw_wujing','tw_wangcan','old_quancong','tw_tianyu'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
 				tw_english:['kaisa'],
 			},
 		},
 		character:{
+			tw_puyangxing:['male','wu',3,['twzhengjian','twzhongchi']],
+			tw_tianyu:['male','wei',4,['twzhenxi','twyangshi']],
 			old_quancong:['male','wu',4,['zhenshan']],
 			tw_wujing:['male','wu',4,['twfenghan','twcongji']],
 			tw_wangcan:['male','wei',3,['twdianyi','twyingji','twshanghe']],
@@ -57,6 +59,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangmancheng:'张曼成（？—184年6月），东汉末年黄巾之乱时南阳黄巾军首领，杀郡守褚贡，一度占据宛城数月，后为秦颉所杀。',
 			caozhao:'曹肇（？-244年），字长思，沛国谯县（今安徽亳州）人。三国时期魏国大臣，大司马曹休之子。容貌俊美，有当世才度，深得魏明帝宠信，官至散骑常侍、屯骑校尉。魏明帝临死，与燕王曹宇等托付后事。不果，以长平侯归第。正始五年（244年）卒，追赠为卫将军。',
 			wangchang:'王昶（2世纪－259年），字文舒，太原郡晋阳县（今山西太原）人。三国时期曹魏将领，东汉代郡太守王泽之子。出身太原王氏，少有名气，进入曹丕幕府，授太子文学。曹丕即位后，拜散骑侍郎，迁兖州刺史，撰写《治论》、《兵书》，作为朝廷提供施政参考。魏明帝曹叡即位后，升任扬烈将军，封关内侯。齐王曹芳即位，迁徐州刺史，拜征南将军。太傅司马懿掌权后，深得器重，奏请伐吴，在江陵取得重大胜利，升任征南大将军、开府仪同三司，晋爵京陵侯。正元年间（255年），参与平定“淮南三乱”有功，迁骠骑大将军，守司空。甘露四年（259年），去世，赠司徒，谥号为穆。',
+			puyangxing:'濮阳兴（？-264年），字子元，陈留（治今河南开封）人，三国时期东吴大臣，吴景帝孙休末年至末帝孙皓初年任丞相。孙权时为上虞县令，后升任尚书左曹、五官中郎将、会稽太守。孙休即位，征召为太常卫将军、平军国事，封外黄侯。永安三年（260年），力主建丹杨湖田，事倍功半，百姓大怨。后升任丞相。永安七年（264年），孙休去世，濮阳兴与张布迎立孙皓。担任侍郎，兼任青州牧。同年被万彧谮毁，流放广州，途中被孙皓派人追杀，并夷三族。',
 		},
 		card:{
 			dz_mantianguohai:{
@@ -170,6 +173,412 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//濮阳兴
+			twzhengjian:{
+				audio:2,
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
+				forced:true,
+				locked:false,
+				filter:function(event,player){
+					if(event.name=='phase'&&game.phaseNumber!=0) return false;
+					return !player.hasSkill('twzhengjian_eff0')&&!player.hasSkill('twzhengjian_eff1')
+				},
+				content:function(){
+					'step 0'
+					player.chooseControl().set('prompt','征建：请选择一种效果').set('choiceList',[
+						'令“出牌阶段内未使用过非基本牌”的其他角色受到惩罚',
+						'令“出牌阶段内未获得过牌”的其他角色受到惩罚',
+					]);
+					'step 1'
+					player.addSkill('twzhengjian_eff'+result.index);
+					game.log(player,'获得了','#g【征建】','的','#y效果'+get.cnNumber(result.index+1,true)).set('ai',()=>Math.random()<=0.5?0:1);
+					game.delayx();
+				},
+				onremove:true,
+				subSkill:{
+					eff0:{
+						audio:'twzhengjian',
+						trigger:{global:'phaseUseEnd'},
+						forced:true,
+						charlotte:true,
+						marktext:'建',
+						mark:true,
+						filter:function(event,player){
+							if(event.player==player||event._twzhengjian||!event.player.isIn()) return false;
+							if(event.player.hasHistory('useCard',function(evt){
+								return evt.getParent('phaseUse')==event&&get.type(evt.card)!='basic';
+							})) return false;
+							return player.storage.twzhengjian||event.player.countCards('he')>0;
+						},
+						logTarget:'player',
+						content:function(){
+							'step 0'
+							trigger._twzhengjian=true;
+							var target=trigger.player;
+							event.target=target;
+							if(player.storage.twzhengjian){
+								player.chooseBool('征建：是否对'+get.translation(target)+'造成1点伤害？').set('ai',()=>_status.event.goon).set('goon',get.damageEffect(target,player,player)>0);
+							}
+							else{
+								target.chooseCard('he',true,'交给'+get.translation(player)+'一张牌');
+							}
+							'step 1'
+							if(result.bool){
+								if(result.cards&&result.cards.length){
+									player.gain(result.cards,target,'giveAuto').type='twzhengjian';
+								}
+								else target.damage();
+							}
+							player.chooseBool('是否变更【征建】的效果？');
+							'step 2'
+							if(result.bool){
+								player.removeSkill('twzhengjian_eff0');
+								player.addSkill('twzhengjian_eff1');
+								game.log(player,'将','#g【征建】','的效果变更为','#y效果二');
+							}
+						},
+						intro:{
+							content:function(storage,player){
+								if(player.storage.twzhengjian) return '其他角色的出牌阶段结束时，若其本阶段内未使用过非基本牌，则你可对其造成1点伤害，然后你可失去此效果并获得〖征建〗的效果二。';
+								return '其他角色的出牌阶段结束时，若其本阶段内未使用过非基本牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果二。';
+							},
+						},
+					},
+					eff1:{
+						audio:'twzhengjian',
+						trigger:{global:'phaseUseEnd'},
+						forced:true,
+						charlotte:true,
+						marktext:'征',
+						mark:true,
+						filter:function(event,player){
+							if(event.player==player||event._twzhengjian||!event.player.isIn()) return false;
+							if(event.player.hasHistory('gain',function(evt){
+								return evt.getParent('phaseUse')==event;
+							})) return false;
+							return player.storage.twzhengjian||event.player.countCards('he')>0;
+						},
+						logTarget:'player',
+						content:function(){
+							'step 0'
+							trigger._twzhengjian=true;
+							var target=trigger.player;
+							event.target=target;
+							if(player.storage.twzhengjian){
+								player.chooseBool('征建：是否对'+get.translation(target)+'造成1点伤害？');
+							}
+							else{
+								target.chooseCard('he',true,'交给'+get.translation(player)+'一张牌');
+							}
+							'step 1'
+							if(result.bool){
+								if(result.cards&&result.cards.length){
+									player.gain(result.cards,target,'giveAuto').type='twzhengjian';
+								}
+								else target.damage();
+							}
+							player.chooseBool('是否变更【征建】的效果？').set('ai',()=>Math.random()>0.5);
+							'step 2'
+							if(result.bool){
+								player.removeSkill('twzhengjian_eff1');
+								player.addSkill('twzhengjian_eff0');
+								game.log(player,'将','#g【征建】','的效果变更为','#y效果一');
+							}
+						},
+						intro:{
+							content:function(storage,player){
+								if(player.storage.twzhengjian) return '其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则你可对其造成1点伤害，然后你可失去此效果并获得〖征建〗的效果二。';
+								return '其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果二。';
+							},
+						},
+					},
+				},
+			},
+			twzhongchi:{
+				audio:2,
+				trigger:{player:'gainAfter'},
+				forced:true,
+				skillAnimation:true,
+				animationColor:'wood',
+				filter:function(event,player){
+					if(player.storage.twzhengjian||!player.hasSkill('twzhengjian',null,null,false)) return false;
+					var num1=game.countPlayer2();
+					var list=[];
+					player.getAllHistory('gain',function(evt){
+						if(evt.type=='twzhengjian') list.add(evt.source);
+					});
+					return list.length>=Math.ceil(num1/2);
+				},
+				content:function(){
+					player.storage.twzhengjian=true;
+					player.addSkill('twzhongchi_effect');
+					game.delayx();
+				},
+				subSkill:{
+					effect:{
+						mark:true,
+						marktext:'斥',
+						intro:{content:'受到渠道为【杀】的伤害+1'},
+						trigger:{player:'damageBegin1'},
+						forced:true,
+						filter:function(event,player){
+							return event.card&&event.card.name=='sha';
+						},
+						content:function(){
+							trigger.num++;
+						},
+					},
+				},
+			},
+			//田豫
+			twzhenxi:{
+				audio:2,
+				trigger:{player:'useCardToPlayered'},
+				direct:true,
+				filter:function(event,player){
+					var target=event.target;
+					return event.card.name=='sha'&&(target.countCards('h')>0||target.hasCard(function(card){
+						return game.hasPlayer(function(current){
+							return current!=target&&current.canEquip(card);
+						})
+					},'e')||target.hasCard(function(card){
+						return game.hasPlayer(function(current){
+							return current!=target&&current.canAddJudge(card);
+						})
+					},'j'));
+				},
+				usable:1,
+				content:function(){
+					'step 0'
+					var target=trigger.target;
+					event.target=target;
+					var str=get.translation(target);
+					var list=[
+						'弃置'+str+'的'+get.cnNumber(get.distance(player,target))+'张手牌',
+						'将'+str+'装备区或判定区内的一张牌移动到另一名角色的对应区域内',
+					];
+					var choices=[];
+					if(target.countCards('h')>0) choices.push('选项一');
+					else list[0]='<span style="opacity:0.5">'+list[0]+'</span>';
+					if(target.hasCard(function(card){
+						return game.hasPlayer(function(current){
+							return current!=target&&current.canEquip(card);
+						})
+					},'e')||target.hasCard(function(card){
+						return game.hasPlayer(function(current){
+							return current!=target&&current.canAddJudge(card);
+						})
+					},'j')) choices.push('选项二');
+					else list[1]='<span style="opacity:0.5">'+list[1]+'</span>';
+					if(choices.length==2&&(target.hp>player.hp||target.isMaxHp())) choices.push('全部执行');
+					choices.push('cancel2');
+					player.chooseControl(choices).set('choiceList',list).set('prompt',get.prompt('twzhenxi',target)).set('ai',function(){
+						var player=_status.event.player,target=_status.event.getTrigger().target;
+						var eff1=0,eff2=0;
+						var choices=_status.event.controls.slice(0);
+						if(choices.contains('选项一')){
+							eff1=-get.distance(player,target)*get.attitude(player,target);
+						}
+						if(choices.contains('选项二')){
+							var equip=0,judge=0,att=get.attitude(player,target);
+							var es=target.getCards('e'),js=target.getCards('j');
+							for(var i of es){
+								var val=get.value(i);
+								if(att>0){
+									if(val<=Math.min(0,equip)&&game.hasPlayer(function(current){
+										return current!=target&&current.isEmpty(get.subtype(i))&&get.effect(current,i,player,player)>0;
+									})) equip=val;
+								}
+								else{
+									if(val>Math.max(0,equip)&&game.hasPlayer(function(current){
+										return current!=target&&current.isEmpty(get.subtype(i))&&get.effect(current,i,player,player)>0;
+									})) equip=val;
+								}
+							}
+							for(var i of js){
+								var card={name:i.viewAs||i.name};
+								var effect=get.effect(target,card,player,player);
+								if(effect<0){
+									game.countPlayer(function(current){
+										if(current!=target&&current.canAddJudge(i)){
+											var eff=get.effect(current,card,player,player);
+											judge=Math.max(eff,judge);
+										}
+									});
+								}
+							}
+							eff2=Math.max(-equip*att,judge);
+						}
+						if(eff1>0){
+							if(eff2>0){
+								if(choices.contains('全部执行')) return '全部执行';
+								else if(eff2>=eff1) return '选项二';
+							}
+							return '选项一';
+						}
+						else if(eff2>0) return '选项二';
+						return 'cancel2';
+					});
+					'step 1'
+					if(result.control=='cancel2'){
+						event.finish();
+						return;
+					}
+					player.logSkill('twzhenxi',target);
+					event.control=result.control;
+					if(event.control!='选项二') player.discardPlayerCard(target,true,'h',get.distance(player,target));
+					if(event.control=='选项一') event.finish();
+					'step 2'
+					if(event.control!='选项一'&&(target.hasCard(function(card){
+						return game.hasPlayer(function(current){
+							return current!=target&&current.canEquip(card);
+						})
+					},'e')||target.hasCard(function(card){
+						return game.hasPlayer(function(current){
+							return current!=target&&current.canAddJudge(card);
+						})
+					},'j'))){
+						player.chooseTarget(true,'将'+get.translation(target)+'区域内的一张牌移动给另一名角色',function(card,player,target){
+							var source=_status.event.preTarget;
+							if(source==target) return false;
+							return source.hasCard(function(card){
+								return target.canEquip(card);
+							},'e')||source.hasCard(function(card){
+								return target.canAddJudge(card);
+							},'j');
+						}).set('preTarget',target).set('ai',function(target){
+							var player=_status.event.player,source=_status.event.preTarget;
+							var att=get.attitude(player,source);
+							var es=source.getCards('e',function(card){
+								return target.canEquip(card);
+							}),js=source.getCards('j',function(card){
+								return target.canAddJudge(card);
+							});
+							var eff=0;
+							for(var i of es){
+								var val=get.value(i,source);
+								if(att>0?val<=0:val>0){
+									eff=Math.max(eff,get.effect(target,i,player,player));
+								}
+							}
+							for(var i of js){
+								var card={name:i.viewAs||i.name};
+								if(get.effect(source,card,player,player)<0){
+									eff=Math.max(eff,get.effect(target,card,player,player));
+								}
+							}
+							return eff;
+						});
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool){
+						var target2=result.targets[0];
+						event.target2=target2;
+						player.choosePlayerCard('ej',true,function(button){
+							var player=_status.event.player;
+							var targets0=_status.event.targets0;
+							var targets1=_status.event.targets1;
+							if(get.attitude(player,targets0)>0&&get.attitude(player,targets1)<0){
+								if(get.position(button.link)=='j') return 12;
+								if(get.value(button.link,targets0)<0&&get.effect(targets1,button.link,player,targets1)>0) return 10;
+								return 0;
+							}
+							else{
+								if(get.position(button.link)=='j') return -10;
+								return get.value(button.link)*get.effect(targets1,button.link,player,targets1);
+							}
+						},target).set('targets0',target).set('targets1',target2).set('filterButton',function(button){
+							var targets1=_status.event.targets1;
+							if(get.position(button.link)=='j'){
+								return targets1.canAddJudge(button.link);
+							}
+							else{
+								return targets1.isEmpty(get.subtype(button.link));
+							}
+						}).set('ai',function(button){
+							var player=_status.event.player,target=_status.event.targets1,source=_status.event.targets[0];
+							var att=get.attitude(player,source);
+							if(get.position(card)=='e'){
+								var val=get.value(card);
+								if(att>0?val>0:val<=0) return 0;
+								return get.effect(target,card,player,player);
+							}
+							var cardx={name:card.viewAs||card.name};
+							if(get.effect(source,cardx,player,player)>=0) return 0;
+							return get.effect(target,cardx,player,player)
+						});
+					}
+					else{
+						event.finish();
+					}
+					'step 4'
+					if(result.bool&&result.links.length){
+						var link=result.links[0];
+						if(get.position(link)=='e'){
+							event.target2.equip(link);
+						}
+						else if(link.viewAs){
+							event.target2.addJudge({name:link.viewAs},[link]);
+						}
+						else{
+							event.target2.addJudge(link);
+						}
+						target.$give(link,event.target2,false);
+						game.log(target,'的',link,'被移动给了',event.target2);
+						game.delay();
+					}
+				},
+				ai:{
+					unequip_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						if(!arg||!arg.name||arg.name!='sha') return false;
+						if(player.storage.counttrigger&&player.storage.counttrigger.twzhenxi) return false;
+						if(!arg.target) return false;
+						var card=target.getEquip(2);
+						return card&&get.value(card)>0&&game.hasPlayer(function(current){
+							return current!=arg.target&&current.canEquip(card)&&get.effect(current,card,player,player)>0;
+						})
+					},
+				},
+			},
+			twyangshi:{
+				audio:2,
+				trigger:{player:'damageEnd'},
+				forced:true,
+				content:function(){
+					if(game.hasPlayer(function(current){
+						return current!=player&&!player.inRange(current);
+					})){
+						player.addSkill('twyangshi_distance');
+						player.addMark('twyangshi_distance',1,false);
+					}
+					else{
+						var card=get.cardPile2(function(card){
+							return card.name=='sha';
+						});
+						if(card) player.gain(card,'gain2');
+						else game.log('但是牌堆里已经没有杀了！');
+					}
+				},
+				subSkill:{
+					distance:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							attackRange:function(player,num){
+								return num+player.countMark('twyangshi_distance');
+							},
+						},
+						intro:{
+							content:'攻击范围+#',
+						},
+					},
+				},
+			},
 			//全琮
 			zhenshan:{
 				audio:2,
@@ -4324,6 +4733,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_quancong:'TW全琮',
 			zhenshan:'振赡',
 			zhenshan_info:'当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌，视为使用或打出此牌。',
+			tw_tianyu:'TW田豫',
+			twzhenxi:'震袭',
+			twzhenxi_info:'每回合限一次。当你使用【杀】指定目标后，你可选择一项：⒈弃置其X张手牌（X为你至其的距离）；⒉将其装备区或判定区内的一张牌移动到另一名角色的装备区或判定区内。若其体力值大于你或其体力值为全场最高，则你可以改为依次执行以上两项。',
+			twyangshi:'扬师',
+			twyangshi_info:'锁定技。当你受到伤害后，若场上有不在你攻击范围内的其他角色，则你令攻击范围+1；若没有，则你从牌堆中获得一张【杀】。',
+			tw_puyangxing:'TW濮阳兴',
+			twzhengjian:'征建',
+			twzhengjian_info:'游戏开始时，你可选择获得一项效果：⒈其他角色的出牌阶段结束时，若其本阶段内未使用过非基本牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果二。⒉其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果二。',
+			twzhongchi:'众斥',
+			twzhongchi_info:'锁定技，限定技。当你因〖征建〗而获得牌后，若已经有至少X名角色因〖征建〗而交给你过牌（X为游戏人数的一半且向上取整），则你于本局游戏内受到渠道为【杀】的伤害+1，且你将〖征建〗中的“其须交给你一张牌”改为“你可对其造成1点伤害”。',
 			
 			tw_mobile:'移动版·海外服',
 			tw_mobile2:'海外服异构',

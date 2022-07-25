@@ -168,6 +168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_jiakui:['male','wei',4,['tongqu','xinwanlan']],
 			ol_guohuai:['male','wei',3,['rejingce']],
 			junk_zhangrang:['male','qun',3,['junktaoluan']],
+			old_bulianshi:['female','wu',3,['anxu','zhuiyi']],
 		},
 		characterFilter:{
 			key_jojiro:function(mode){
@@ -201,7 +202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_default:["diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji"],
 				diy_noname:['noname'],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano","db_key_liyingxia","key_erika","key_satomi"],
-				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang'],
+				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','old_bulianshi'],
 			},
 		},
 		characterIntro:{
@@ -10037,7 +10038,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				content:function(){
 					'step 0'
-					var cards=player.getStorage('nsjiquan_mark');
+					var cards=player.getExpansions('nsjiquan_mark');
 					if(cards.length==1) event._result={
 						bool:true,
 						links:cards.slice(0),
@@ -16108,6 +16109,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_guohuai_ab:'郭淮',
 			junk_zhangrang_ab:'张让',
 			old_jiakui_ab:'贾逵',
+			old_bulianshi_ab:'步练师',
+			old_bulianshi:'RE步练师',
 			diy_tieba:'吧友设计',
 			diy_xushi:'玩点论杀·虚实篇',
 			diy_default:'常规',

@@ -10,7 +10,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_lin:['re_menghuo','ol_sunjian','re_caopi','ol_xuhuang','ol_dongzhuo','ol_zhurong','re_jiaxu','ol_lusu'],
 				refresh_shan:['ol_jiangwei','ol_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai','re_zhanghe'],
 				refresh_yijiang1:['xin_wuguotai','xin_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua','dc_xushu'],
-				refresh_yijiang2:['re_madai','re_wangyi','guanzhang','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','re_bulianshi','xin_liubiao'],
+				refresh_yijiang2:['re_madai','re_wangyi','guanzhang','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','re_liru','re_manchong','re_fuhuanghou','re_guanping'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','re_chenqun','re_caifuren','re_guyong','xin_jushou'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi'],
@@ -49,7 +49,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_manchong:['male','wei',3,['rejunxing','yuce']],
 			re_liru:['male','qun',3,['rejuece','remieji','xinfencheng']],
 			xin_yufan:['male','wu',3,['xinzhiyan','xinzongxuan']],
-			re_bulianshi:['female','wu',3,['reanxu','zhuiyi']],
+			dc_bulianshi:['female','wu',3,['dcanxu','dczhuiyi']],
 			re_hanhaoshihuan:['male','wei',4,['reshenduan','reyonglve']],
 			re_panzhangmazhong:['male','wu',4,['reduodao','reanjian']],
 			re_wangyi:['female','wei',4,['zhenlie','miji']],
@@ -143,6 +143,110 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			//十周年步练师
+			dcanxu:{
+				enable:'phaseUse',
+				usable:1,
+				multitarget:true,
+				audio:2,
+				filterTarget:function(card,player,target){
+					if(player==target) return false;
+					var num=target.countCards('h');
+					if(ui.selected.targets.length){
+						return num<ui.selected.targets[0].countCards('h');
+					}
+					var players=game.filterPlayer();
+					for(var i=0;i<players.length;i++){
+						if(num>players[i].countCards('h')) return true;
+					}
+					return false;
+				},
+				selectTarget:2,
+				content:function(){
+					'step 0'
+					var gainner,giver;
+					if(targets[0].countCards('h')<targets[1].countCards('h')){
+						gainner=targets[0];
+						giver=targets[1];
+					}
+					else{
+						gainner=targets[1];
+						giver=targets[0];
+					}
+					gainner.gainPlayerCard(giver,true,'h','visibleMove');
+					event.gainner=gainner;
+					event.giver=giver;
+					'step 1'
+					if(result.cards){
+						var card=result.cards[0];
+						if(event.gainner.getCards('h').contains(card)&&get.suit(card,event.gainner)!='spade') player.draw()
+					}
+					if(event.gainner.countCards('h')==event.giver.countCards('h')) player.recover();
+				},
+				ai:{
+					order:10.5,
+					threaten:2.3,
+					result:{
+						target:function(player,target){
+							var num=target.countCards('h');
+							var att=get.attitude(player,target);
+							if(ui.selected.targets.length==0){
+								if(att>0) return -1;
+								var players=game.filterPlayer();
+								for(var i=0;i<players.length;i++){
+									var num2=players[i].countCards('h');
+									var att2=get.attitude(player,players[i]);
+									if(num2<num){
+										if(att2>0) return -3;
+										return -1;
+									}
+								}
+								return 0;
+							}
+							else{
+								return 1;
+							}
+						},
+						player:1,
+					}
+				}
+			},
+			dczhuiyi:{
+				audio:2,
+				trigger:{player:'die'},
+				direct:true,
+				skillAnimation:true,
+				animationColor:'wood',
+				forceDie:true,
+				content:function(){
+					"step 0"
+					player.chooseTarget(get.prompt2('dczhuiyi'),function(card,player,target){
+						return player!=target&&_status.event.sourcex!=target;
+					}).set('forceDie',true).set('ai',function(target){
+						var num=get.attitude(_status.event.player,target);
+						if(num>0){
+							if(target.hp==1){
+								num+=2;
+							}
+							if(target.hp<target.maxHp){
+								num+=2;
+							}
+						}
+						return num;
+					}).set('sourcex',trigger.source);
+					"step 1"
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('dczhuiyi',target);
+						player.line(target,'green');
+						target.recover();
+						target.draw(game.countPlayer());
+					}
+				},
+				ai:{
+					expose:0.5,
+				}
+			},
 			//OL界蔡文姬
 			olbeige:{
 				audio:'beige',
@@ -1647,7 +1751,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						event.target=result.targets[0];
-						player.logSkill('zhiyan',result.targets);
+						player.logSkill('xinzhiyan',result.targets);
 						event.bool=false;
 						event.target.draw('visible');
 					}
@@ -1869,7 +1973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							var targets=game.filterPlayer(function(target){
-								return !game.hasPlayer(function(current){
+								return target!=player&&!game.hasPlayer(function(current){
 									return current!=player&&current!=target&&current.countCards('h')<target.countCards('h');
 								});
 							}),num=Math.floor(player.countCards('h')/2);
@@ -4823,73 +4927,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					threaten:0.8
 				}
-			},
-			reanxu:{
-				audio:2,
-				enable:'phaseUse',
-				usable:1,
-				filter:function(event,player){
-					return game.countPlayer()>2&&game.hasPlayer(function(current){
-						return current!=player&&current.countCards('he');
-					});
-				},
-				selectTarget:2,
-				filterTarget:function(card,player,target){
-					if(target==player) return false;
-					if(!ui.selected.targets.length) return target.countCards('he')>0;
-					return target!=ui.selected.targets[0]&&ui.selected.targets[0].countGainableCards(target,'he')>0;
-				},
-				multitarget:true,
-				targetprompt:['被拿牌','得到牌'],
-				content:function(){
-					'step 0'
-					targets[1].gainPlayerCard(targets[0],'he',true);
-					'step 1'
-					if(targets[0].getHistory('lose',function(evt){
-						return evt.getParent(3)==event&&!evt.es.length;
-					}).length) player.draw();
-					'step 2'
-					if(targets[0].isIn()&&targets[1].isIn()&&
-						targets[0].countCards('h')!=targets[1].countCards('h')){
-						event.target=targets[targets[0].countCards('h')>targets[1].countCards('h')?1:0];
-						player.chooseBool('是否令'+get.translation(event.target)+'摸一张牌？').set('ai',function(){
-							var evt=_status.event.getParent();
-							return get.attitude(evt.player,evt.target)>0;
-						})
-					}
-					else event.finish();
-					'step 3'
-					if(result.bool) target.draw();
-				},
-				ai:{
-					expose:0.2,
-					threaten:2,
-					order:9,
-					result:{
-						player:function(player,target){
-							if(ui.selected.targets.length) return 0.01;
-							return target.countCards('e')?0:0.5;
-						},
-						target:function(player,target){
-							if(ui.selected.targets.length){
-								player=target;
-								target=ui.selected.targets[0];
-								if(get.attitude(player,target)>1){
-									return 0;
-								}
-								return target.countCards('h')-player.countCards('h')>(target.countCards('e')?2:1)?2:1;
-							}
-							else{
-								if(get.attitude(player,target)<=0) return (target.countCards('he',function(card){
-									return card.name=='tengjia'||get.value(card)>0;
-								})>0)?-1.5:1.5;
-								return (target.countCards('he',function(card){
-									return card.name!='tengjia'&&get.value(card)<=0;
-								})>0)?1.5:-1.5
-							}
-						},
-					},
-				},
 			},
 			rezongshi:{
 				audio:2,
@@ -11729,9 +11766,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olbaonue_info:'主公技，其他群雄角色造成1点伤害后，你可进行判定，若为♠，你回复1点体力并获得判定牌。',
 			re_panzhangmazhong:'界潘璋马忠',
 			re_hanhaoshihuan:'界韩浩史涣',
-			re_bulianshi:'界步练师',
-			reanxu:'安恤',
-			reanxu_info:'出牌阶段限一次，你可以选择两名其他角色，令其中一名角色获得另一名角色的一张牌。若以此法移动的牌不来自装备区，则你摸一张牌。然后你可以令二者中手牌数较少的一名角色摸一张牌。',
 			xinyicong:'义从',
 			xinyicong_info:'锁定技，你计算与其他角色的距离时-X，其他角色计算与你的距离时+Y。（X为你的体力值-1，Y为你的已损失体力值-1）',
 			oltianxiang:'天香',
@@ -11938,6 +11972,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqiaobian_info:'①游戏开始时，你获得两枚“变”。②判定阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段。③摸牌阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段，然后可以获得至多两名其他角色的各一张手牌。④出牌阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段，然后你可以移动场上的一张牌。⑤弃牌阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段。⑥结束阶段，若你的〖巧变⑥〗记录中不包含你的手牌数，则你获得一枚“变”并记录你的手牌数。',
 			olbeige:'悲歌',
 			olbeige_info:'当有角色受到渠道为【杀】的伤害后，若你有牌，你可令其进行判定。然后你可弃置一张牌，根据判定结果执行以下的一个选项：♥，其回复1点体力；♦，其摸两张牌；♣，伤害来源弃置两张牌️；♠，伤害来源将武将牌翻面。若你弃置的牌与判定结果：点数相同，则你获得你弃置的牌；花色相同，则你获得判定牌。',
+			dc_bulianshi:'界步练师',
+			dcanxu:'安恤',
+			dcanxu_info:'出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之。然后若此牌不为黑桃，则你摸一张牌；若这两名角色手牌数相等，则你回复1点体力。',
+			dczhuiyi:'追忆',
+			dczhuiyi_info:'当你死亡时，你可以令一名不为击杀者的其他角色摸X张牌（X为存活角色数），然后其回复1点体力。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

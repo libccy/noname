@@ -9437,7 +9437,7 @@
 				str+='})';
 				return str;
 			},
-			parse:function(func){
+			parsex:function(func){
 				var str=func.toString();
 				str=str.slice(str.indexOf('{')+1);
 				if(str.indexOf('step 0')==-1){
@@ -17120,7 +17120,7 @@
 					if(get.itemtype(cards)=='card') cards=[cards];
 					game.addVideo('addGaintag',this,[get.cardsInfo(cards),tag]);
 					game.broadcastAll(function(player,cards,tag){
-						var hs=player.getCards('h');
+						var hs=player.getCards('hejsx');
 						for(var i of cards){
 							if(hs.contains(i)) i.addGaintag(tag);
 						}
@@ -20400,7 +20400,7 @@
 						if(typeof arguments[i]=='number'){
 							num=arguments[i];
 						}
-						else if(get.itemtype(arguments[i])=='select'){
+						else if(get.itemtype(arguments[i])=='position'){
 							position=arguments[i];
 						}
 						else if(get.itemtype(arguments[i])=='player'){
@@ -25559,11 +25559,11 @@
 				},
 				setContent:function(name){
 					if(typeof name=='function'){
-						this.content=lib.init.parse(name);
+						this.content=lib.init.parsex(name);
 					}
 					else{
 						if(!lib.element.content[name]._parsed){
-							lib.element.content[name]=lib.init.parse(lib.element.content[name]);
+							lib.element.content[name]=lib.init.parsex(lib.element.content[name]);
 							lib.element.content[name]._parsed=true;
 						}
 						this.content=lib.element.content[name];

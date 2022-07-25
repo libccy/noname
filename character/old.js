@@ -14,11 +14,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang5:["old_caoxiu","old_zhuzhi"],
 				old_yijiang67:["ol_zhangrang","ol_liuyu"],
 				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","ol_maliang","old_wangyun"],
-				old_yingbian:['junk_simayi'],
+				old_yingbian:['junk_simayi','old_yangyan','old_yangzhi'],
 				old_mobile:["old_caochun","old_majun"],
 			},
 		},
 		character:{
+			old_yangzhi:['female','jin',3,['wanyi','maihuo']],
+			old_yangyan:['female','jin',3,['xuanbei','xianwan']],
 			madai:['male','shu',4,['mashu','oldqianxi']],
 			xuhuang:['male','wei',4,['gzduanliang']],
 			junk_simayi:['male','jin',3,['buchen','smyyingshi','xiongzhi','quanbian'],['hiddenSkill']],
@@ -615,6 +617,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junk_simayi:'旧晋司马懿',
 			junk_simayi_ab:'司马懿',
 			madai:'旧马岱',
+			old_yangzhi:'旧杨芷',
+			old_yangyan:'旧杨艳',
 			
 			old_standard:'标准包',
 			old_shenhua:'神话再临',

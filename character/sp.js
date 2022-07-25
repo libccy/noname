@@ -5,14 +5,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu"],
+				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan"],
 				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu'],
 				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun"],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan'],
 				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","fanjiangzhangda"],
 				sp_liesi:['mizhu'],
-				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe'],
+				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv'],
 				sp_wanglang:['wanglang'],
 				sp_tongque:["sp_fuwan","sp_fuhuanghou","sp_jiben"],
@@ -28,6 +28,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			tengfanglan:['female','wu',3,['luochong','aichen']],
+			sp_menghuo:['male','qun',4,['spmanwang']],
 			jin_yanghu:['male','jin',4,['huaiyuan','chongxin','dezhang']],
 			qinghegongzhu:['female','wei',3,['zengou','qhzhangji']],
 			fanjiangzhangda:['male','wu',4,['yuanchou','juesheng']],
@@ -166,6 +168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			tengfanglan:'滕芳兰，生卒年不详，北海剧县（今山东省寿光市）人，太常滕胤的族女，滕牧的女儿，吴末帝孙皓的皇后。永安元年（258年），孙皓为乌程侯时被聘为妃。元兴元年（264年），孙皓登基后被立为皇后。孙吴灭亡后，随孙皓迁居洛阳。',
 			qinghegongzhu:'清河长公主，沛国谯县人，曹操长女（按其与曹操长子曹昂同出于刘夫人，而刘夫人又早死，故其年龄应长于曹丕等其他曹操诸子女，又按长公主亦有年最长之意，故应为曹操之长女）。母刘夫人，得到曹操喜爱。清河公主后来下嫁夏侯楙。曹操初欲嫁丁仪，曹丕劝其嫁与夏侯楙。后与小叔子设计欲谋害丈夫，未果。',
 			fanjiangzhangda:'范强，在明朝小说《三国演义》里叫做范疆。二人均为张飞手下部将。蜀汉章武元年，刘备伐吴，张飞率军从阆中前往江州，出发前，范强和张达杀死张飞，带着张飞的首级投奔了东吴。',
 			tianyu:'田豫（171年～252年），字国让，渔阳雍奴（今天津市武清区）人。三国时期曹魏将领。初从刘备，因母亲年老回乡，后跟随公孙瓒，公孙瓒败亡，劝说鲜于辅加入曹操。曹操攻略河北时，田豫正式得到曹操任用，历任颖阴、郎陵令、弋阳太守等。后来田豫常年镇守曹魏北疆，从征代郡乌桓、斩骨进、破轲比能，多有功勋；也曾参与对孙吴的作战，在成山斩杀周贺，于新城击败孙权。官至太中大夫，封长乐亭侯。有一子田彭祖。',
@@ -481,6 +484,298 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//滕芳兰
+			luochong:{
+				audio:2,
+				trigger:{player:['phaseZhunbeiBegin','damageEnd']},
+				direct:true,
+				filter:function(event,player){
+					var storage1=player.getStorage('luochong_round'),storage2=player.getStorage('luochong');
+					for(var i=0;i<4;i++){
+						if(!storage1.contains(i)&&!storage2.contains(i)&&(i!=2||game.hasPlayer(function(current){
+							return current!=player&&current.hasCard(function(card){
+								return lib.filter.canBeDiscarded(card,player,current);
+							},'he')
+						}))) return true;
+					}
+					return false;
+				},
+				onremove:true,
+				content:function(){
+					'step 0'
+					var list=[];
+					var choiceList=[
+						'令一名角色回复1点体力。',
+						'令一名其他角色失去1点体力。',
+						'弃置一名其他角色的至多两张牌。',
+						'令一名角色摸两张牌。',
+					];
+					var storage1=player.getStorage('luochong_round'),storage2=player.getStorage('luochong');
+					for(var i=0;i<4;i++){
+						if(storage2.contains(i)){
+							choiceList[i]=('<span style="text-decoration: line-through; opacity:0.5; ">'+choiceList[i]+'</span>');
+						}
+						else if(storage1.contains(i)||(i==2&&!game.hasPlayer(function(current){
+							return current!=player&&current.hasCard(function(card){
+								return lib.filter.canBeDiscarded(card,player,current);
+							},'he')
+						}))){
+							choiceList[i]=('<span style="opacity:0.5;">'+choiceList[i]+'</span>');
+						}
+						else list.push('选项'+get.cnNumber(i+1,true))
+					}
+					list.push('cancel2');
+					player.chooseControl(list).set('prompt',get.prompt('luochong')).set('choiceList',choiceList).set('ai',function(){
+						var player=_status.event.player;
+						var list=_status.event.controls.slice(0);
+						var gett=function(choice){
+							if(choice=='cancel2') return 0.1;
+							var max=0,func={
+								选项一:function(current){
+									if(current.isDamaged()) max=Math.max(max,get.recoverEffect(current,player,player));
+								},
+								选项二:function(target){
+									max=Math.max(max,get.effect(target,{name:'losehp'},player,player));
+								},
+								选项三:function(target){
+									var num=target.countDiscardableCards(player,'he');
+									if(num>0) max=Math.max(max,Math.sqrt(Math.min(2,num))*get.effect(target,{name:'guohe_copy2'},player,player));
+								},
+								选项四:function(target){
+									max=Math.max(max,get.effect(target,{name:'wuzhong'},player,player));
+								},
+							}[choice];
+							game.countPlayer(func);
+							return max;
+						};
+						return list.sort(function(a,b){
+							return gett(b)-gett(a);
+						})[0];
+					});
+					'step 1'
+					if(result.control!='cancel2'){
+						var index=['选项一','选项二','选项三','选项四'].indexOf(result.control);
+						event.index=index;
+						var list=[
+							['选择一名角色，令其回复1点体力',function(target){
+								var player=_status.event.player;
+								return get.recoverEffect(target,player,player);
+							}],
+							['选择一名其他角色，令其失去1点体力',function(target){
+								return get.effect(target,{name:'losehp'},player,player);
+							},lib.filter.notMe],
+							['选择一名其他角色，弃置其至多两张牌',function(target){
+								var player=_status.event.player;
+								return get.effect(target,{name:'guohe_copy2'},player,player)*Math.sqrt(Math.min(2,target.countCards('he')));
+							},function(card,player,target){
+								return target!=player&&target.hasCard(function(card){
+									return lib.filter.canBeDiscarded(card,player,target);
+								},'he');
+							}],
+							['选择一名角色，令其摸两张牌',function(target){
+								var player=_status.event.player;
+								return get.effect(target,{name:'wuzhong'},player,player);
+							}]
+						][index];
+						var next=player.chooseTarget(list[0],true);
+						next.set('ai',list[1]);
+						if(list.length>2) next.set('filterTarget',list[2]);
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('luochong',target);
+						if(player!=target) player.addExpose(0.2);
+						player.addTempSkill('luochong_round','roundStart');
+						player.markAuto('luochong_round',[event.index]);
+						switch(event.index){
+							case 0:
+								target.recover();
+								break;
+							case 1:
+								target.loseHp();
+								break;
+							case 2:
+								player.discardPlayerCard(target,true,'he',[1,2]);
+								break;
+							case 3:
+								target.draw(2);
+								break;
+						}
+					}
+				},
+				subSkill:{
+					round:{
+						charlotte:true,
+						onremove:true,
+					},
+				},
+			},
+			aichen:{
+				audio:2,
+				trigger:{player:'dying'},
+				forced:true,
+				filter:function(event,player){
+					return player.hasSkill('luochong',null,null,false)&&player.getStorage('luochong').length<3;
+				},
+				content:function(){
+					'step 0'
+					var num=1-player.hp;
+					if(num>0) player.recover(num);
+					'step 1'
+					var list=[];
+					var choiceList=[
+						'令一名角色回复1点体力。',
+						'令一名其他角色失去1点体力。',
+						'弃置一名其他角色的至多两张牌。',
+						'令一名角色摸两张牌。',
+					];
+					var storage2=player.getStorage('luochong');
+					for(var i=0;i<4;i++){
+						if(storage2.contains(i)){
+							choiceList[i]=('<span style="text-decoration: line-through; opacity:0.5; ">'+choiceList[i]+'</span>');
+						}
+						else list.push('选项'+get.cnNumber(i+1,true))
+					}
+					player.chooseControl(list).set('prompt','哀尘：选择移去一个〖落宠〗的选项').set('choiceList',choiceList).set('ai',function(){
+						var controls=_status.event.controls.slice(0);
+						var list=['选项三','选项四','选项二','选项一'];
+						for(var i of list){
+							if(controls.contains(i)) return i;
+						}
+						return 0;
+					});
+					'step 2'
+					var index=['选项一','选项二','选项三','选项四'].indexOf(result.control);
+					player.markAuto('luochong',[index]);
+					game.log(player,'移去了','#g【落宠】','的','#y'+[
+						'令一名角色回复1点体力。',
+						'令一名其他角色失去1点体力。',
+						'弃置一名其他角色的至多两张牌。',
+						'令一名角色摸两张牌。',
+					][index],'的选项');
+				},
+			},
+			//SP孟获
+			spmanwang:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				filterCard:true,
+				position:'he',
+				selectCard:[1,Infinity],
+				check:function(card){
+					var player=_status.event.player;
+					var max=Math.min(player.isDamaged()?3:2,4-player.countMark('spmanwang'));
+					if(!max&&!player.hasSkill('sppanqin')) return 0;
+					if(max==0&&ui.selected.length>0) return 0;
+					return 7-ui.selected.cards.length-get.value(card);
+				},
+				content:function(){
+					var num=Math.min(cards.length,4-player.countMark('spmanwang'));
+					if(num>=1) player.addSkill('sppanqin');
+					if(num>=2) player.draw();
+					if(num>=3) player.recover();
+					if(num>=4){
+						player.draw(2);
+						player.removeSkill('sppanqin');
+					}
+				},
+				intro:{content:'已经移去过#个选项'},
+				ai:{
+					order:2,
+					result:{
+						player:function(player,target){
+							if(player.getUseValue({name:'nanman'})<=0) return 0;
+							if(player.getStat('skill').spmanwang&&player.hasSkill('sppanqin')) return 0;
+							return 1;
+						},
+					},
+				},
+			},
+			sppanqin:{
+				audio:2,
+				trigger:{player:['phaseUseEnd','phaseDiscardEnd']},
+				filter:function(event,player){
+					var cards=[],bool=true;
+					player.getHistory('lose',function(evt){
+						if(!bool||evt.type!='discard'||evt.getParent(event.name)!=event) return false;
+						for(var i of evt.cards2){
+							if(get.position(i,true)=='d'){
+								cards.add(i);
+								if(!game.checkMod(i,player,'unchanged','cardEnabled2',player)) bool=false;
+							}
+						}
+					});
+					if(!bool||!cards.length) return false;
+					return player.hasUseTarget(get.autoViewAs({name:'nanman'},cards));
+				},
+				prompt2:function(event,player){
+					var cards=[];
+					player.getHistory('lose',function(evt){
+						if(evt.type!='discard'||evt.getParent(event.name)!=event) return false;
+						for(var i of evt.cards2){
+							if(get.position(i,true)=='d'){
+								cards.add(i);
+							}
+						}
+					});
+					return '将'+get.translation(cards)+'（共计'+get.cnNumber(cards.length)+'张牌）当做【南蛮入侵】使用'
+				},
+				check:function(event,player){
+					var cards=[],bool=true;
+					player.getHistory('lose',function(evt){
+						if(!bool||evt.type!='discard'||evt.getParent(event.name)!=event) return false;
+						for(var i of evt.cards2){
+							if(get.position(i,true)=='d'){
+								cards.add(i);
+								if(!game.checkMod(i,player,'unchanged','cardEnabled2',player)) bool=false;
+							}
+						}
+					});
+					if(!bool||!cards.length) return false;
+					return player.hasValueTarget(get.autoViewAs({name:'nanman'},cards));
+				},
+				content:function(){
+					'step 0'
+					var cards=[];
+					player.getHistory('lose',function(evt){
+						if(evt.type!='discard'||evt.getParent(trigger.name)!=trigger) return false;
+						for(var i of evt.cards2){
+							if(get.position(i,true)=='d'){
+								cards.add(i);
+							}
+						}
+					});
+					player.chooseUseTarget(true,{name:'nanman'},cards);
+					'step 1'
+					if(player.countMark('spmanwang')>=4) return;
+					var evt=player.getHistory('useCard',function(evt){
+						return evt.card.name=='nanman'&&evt.getParent(2)==event;
+					})[0];
+					if(evt&&evt.cards.length<=evt.targets.length&&player.hasSkill('spmanwang',null,null,false)){
+						player.addMark('spmanwang',1,false);
+						switch(player.countMark('spmanwang')){
+							case 1:
+								player.draw(2);
+								player.removeSkill('sppanqin');
+								break;
+							case 2:
+								player.recover();
+								break;
+							case 3:
+								player.draw();
+								break;
+							case 4:
+								player.addSkill('sppanqin');
+								break;
+						}
+					}
+				},
+			},
 			//清河公主
 			zengou:{
 				audio:2,
@@ -989,7 +1284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target.isHealthy()) num++;
 					if(target.getEquip(2)) num++;
 					var countSkill=function(player){
-						return player.getSkills(null,null,false).filter(function(skill){
+						return player.getSkills(null,false,false).filter(function(skill){
 							var info=get.info(skill);
 							if(!info||info.charlotte) return false;
 							if(info.zhuSkill) return player.hasZhuSkill(skill);
@@ -1840,17 +2135,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.removeSkill('zhaosong_equip');
 								player.discardPlayerCard(target,true,'hej',[1,2]);
 							}
-							else event.finish();
-							'step 2'
-							if(target.isIn()){
-								player.chooseBool('是否令'+get.translation(target)+'摸一张牌？').set('ai',function(){
-									var evt=_status.event.getParent();
-									return get.attitude(evt.player,evt.target)>0;
-								});
-							}
-							else event.finish();
-							'step 3'
-							if(result.bool) target.draw();
 						},
 					},
 				},
@@ -14467,7 +14751,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				position:'he',
 				content:function(){
-					player.gainPlayerCard(target,true,'',target.countCards('h'));
+					player.gainPlayerCard(target,true,'h',target.countCards('h'));
 					player.turnOver();
 					player.addSkill('lihun2');
 					player.storage.lihun=target;
@@ -16026,6 +16310,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.youlong) return '转换技，阴，每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的普通锦囊牌；<span class="bluetext">阳，每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的基本牌。</span>';
 				return '转换技，<span class="bluetext">阴，每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的普通锦囊牌；</span>阳，每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的基本牌。';
 			},
+			luochong:function(player){
+				var storage=player.getStorage('luochong');
+				var str='准备阶段开始时/当你受到伤害后，你可选择本轮内未选择过的一项：'
+				var choiceList=[
+					'⒈令一名角色回复1点体力。',
+					'⒉令一名其他角色失去1点体力。',
+					'⒊弃置一名其他角色的至多两张牌。',
+					'⒋令一名角色摸两张牌。'
+				];
+				for(var i=0;i<4;i++){
+					if(storage.contains(i)){
+						choiceList[i]=('<span style="text-decoration: line-through;">'+choiceList[i]+'</span>');
+					}
+					str+=choiceList[i];
+				}
+				return str;
+			},
+			spmanwang:function(player){
+				var num=4-player.countMark('spmanwang');
+				var str='出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：';
+				var list=[
+					'⒈获得〖叛侵〗。',
+					'⒉摸一张牌。',
+					'⒊回复1点体力。',
+					'⒋摸两张牌并失去〖叛侵〗。',
+				];
+				for(var i=0;i<4;i++){
+					if(i==num){
+						str+='<span style="text-decoration: line-through;">';
+					}
+					str+=list[i];
+				}
+				if(num<4) str+='</span>';
+				return str;
+			},
 		},
 		characterReplace:{
 			caoshuang:['caoshuang','ns_caoshuang'],
@@ -16061,6 +16380,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jianggan:['jianggan','sp_jianggan'],
 			dc_jiben:['dc_jiben','sp_jiben'],
 			yangyi:['ol_yangyi','yangyi'],
+			tianyu:['tw_tianyu','tianyu'],
+			huangchengyan:['huangchengyan','dc_huangchengyan'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -16900,7 +17221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olfusong_info:'当你死亡时，你可以选择一名体力上限大于你的其他角色。其选择获得〖吉占〗或〖丰姿〗。',
 			zuofen:'左棻',
 			zhaosong:'诏颂',
-			zhaosong_info:'一名其他角色的摸牌阶段结束时，若其没有因〖诏颂〗而获得的标记，则你可令其正面向上交给你一张手牌。根据此牌的类型，该角色获得对应的标记和效果：<br>锦囊牌：“诔”标记。当拥有者进入濒死状态时，其可弃置所有“诔”，将体力回复至1点并摸1张牌。<br>装备牌：“赋”标记。拥有者的出牌阶段开始时，其可弃置所有“赋”，弃置一名角色区域内的至多两张牌，然后可令其摸一张牌。<br>基本牌：“颂”标记。当使用者使用仅指定一个目标的【杀】时，其可弃置“颂”，为此【杀】增加至多两个目标。',
+			zhaosong_info:'一名其他角色的摸牌阶段结束时，若其没有因〖诏颂〗而获得的标记，则你可令其正面向上交给你一张手牌。根据此牌的类型，该角色获得对应的标记和效果：<br>锦囊牌：“诔”标记。当拥有者进入濒死状态时，其可弃置所有“诔”，将体力回复至1点并摸1张牌。<br>装备牌：“赋”标记。拥有者的出牌阶段开始时，其可弃置所有“赋”，弃置一名角色区域内的至多两张牌。<br>基本牌：“颂”标记。当使用者使用仅指定一个目标的【杀】时，其可弃置“颂”，为此【杀】增加至多两个目标。',
 			lisi:'离思',
 			lisi_info:'当你于回合外使用的牌结算结束后，你可将其交给一名手牌数不大于你的其他角色。',
 			ol_yangyi:'杨仪',
@@ -16956,6 +17277,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zengou_info:'当有角色使用【闪】时，若其在你的攻击范围内，则你可以弃置一张非基本牌或失去1点体力，然后取消此【闪】的目标并获得其对应的实体牌。',
 			qhzhangji:'长姬',
 			qhzhangji_info:'一名角色的回合结束时，若你本回合内：造成过伤害，则你可以令其摸两张牌；受到过伤害，则你可以令其弃置两张牌。',
+			sp_menghuo:'SP孟获',
+			spmanwang:'蛮王',
+			spmanwang_info:'出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：⒈获得〖叛侵〗。⒉摸一张牌。⒊回复1点体力。⒋摸两张牌并失去〖叛侵〗。',
+			sppanqin:'叛侵',
+			sppanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项。',
+			tengfanglan:'滕芳兰',
+			luochong:'落宠',
+			luochong_info:'准备阶段开始时/当你受到伤害后，你可选择本轮内未选择过的一项：⒈令一名角色回复1点体力。⒉令一名其他角色失去1点体力。⒊弃置一名其他角色的至多两张牌。⒋令一名角色摸两张牌。',
+			aichen:'哀尘',
+			aichen_info:'锁定技。当你进入濒死状态时，若〖落宠〗中的剩余选项数大于1，则你将体力回复至1点，然后选择移去〖落宠〗中的一个选项。',
 			
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

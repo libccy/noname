@@ -14,6 +14,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			losehp:{
+				ai:{
+					result:{
+						target:-1.5
+					},
+					tag:{
+						losehp:1
+					}
+				}
+			},
 			recover:{
 				ai:{
 					result:{
