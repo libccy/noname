@@ -10569,7 +10569,7 @@
 								break;
 							}
 						};
-						document.addEventListener(lib.config.touchscreen?'touchend':'click',click);
+						document.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',click);
 						
 						game.pause();
 						game.countChoose();
