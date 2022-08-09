@@ -1895,7 +1895,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 6'
 					if(result.index==0) target.draw();
-					else target.chooseToDiscard('he',true);
+					else target.chooseToDiscard('h',true);
 					'step 7'
 					if(target.hp==target.countCards('h')) event.goto(4);
 				},

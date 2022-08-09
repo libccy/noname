@@ -1086,7 +1086,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			mode_stone:{
 				stone_tutengyongshi:['male','wei',4,['shaman_jili'],['minskin','stone'],[4,2,'shaman']],
 				stone_xuejuren:['male','wei',2,['shaman_xueju'],['minskin','stone'],[1,1,'shaman']],
-				stone_tuyuansu:['male','qun',5,['chaofeng'],['minskin','stone'],[5,4,'shaman']],
+				stone_tuyuansu:['male','qun',5,['lschaofeng'],['minskin','stone'],[5,4,'shaman']],
 				stone_huoyuansu:['male','shu',3,['shaman_huoxi'],['minskin','stone'],[4,3,'shaman']],
 				stone_fachao:['male','wei',3,['shaman_tuteng','shaman_fachao'],['minskin','stone'],[3,0,'shaman']],
 				stone_huoshe:['male','shu',3,['shaman_tuteng','shaman_huoshe'],['minskin','stone'],[3,0,'shaman']],
@@ -1099,13 +1099,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				stone_kuangyedoushi:['male','wu',3,['druid_nuhuo'],['minskin','stone'],[4,2,'druid']],
 				stone_conglinshouwei:['male','wu',3,['druid_huwei'],['minskin','stone'],[4,2,'druid']],
-				stone_baohuzhishu:['male','qun',6,['chaofeng'],['minskin','stone'],[6,4,'druid']],
+				stone_baohuzhishu:['male','qun',6,['lschaofeng'],['minskin','stone'],[6,4,'druid']],
 				stone_liebao:['male','wei',3,['stone_chongfeng'],['minskin','stone'],[3,2,'druid']],
-				stone_zongxiong:['male','shu',4,['chaofeng'],['minskin','stone'],[4,2,'druid']],
+				stone_zongxiong:['male','shu',4,['lschaofeng'],['minskin','stone'],[4,2,'druid']],
 				stone_baoqishi:['female','wei',2,['druid_chengzhang'],['minskin','stone'],[2,2,'druid']],
 				stone_renyaqishi:['female','wei',1,['druid_renya'],['minskin','stone'],[1,1,'druid']],
 				stone_huangyeqishi:['male','wei',4,['druid_chicheng'],['minskin','stone'],[5,2,'druid']],
-				stone_huoshanxiemu:['male','wei',3,['druid_juhuo','chaofeng'],['minskin','stone'],[5,6,'druid']],
+				stone_huoshanxiemu:['male','wei',3,['druid_juhuo','lschaofeng'],['minskin','stone'],[5,6,'druid']],
 				stone_conglinxiaoshou:['male','wei',3,['druid_yuehuo'],['minskin','stone'],[4,4,'druid']],
 				stone_lindishuyao:['female','wei',3,['druid_yeyou'],['minskin','stone'],[3,3,'druid']],
 				stone_xunmenglong:['male','wei',2,['druid_qicheng'],['minskin','stone'],[3,3,'druid']],
@@ -1113,7 +1113,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_caoyuanshi:['male','qun',5,['hunter_nuhou'],['minskin','stone'],[5,2,'hunter']],
 				stone_leiouke:['male','shu',2,['hunter_zhanhuo'],['minskin','stone'],[3,1,'hunter']],
 				stone_huofu:['male','qun',2,['stone_chongfeng'],['minskin','stone'],[3,4,'hunter']],
-				stone_misha:['male','shu',3,['chaofeng'],['minskin','stone'],[3,3,'hunter']],
+				stone_misha:['male','shu',3,['lschaofeng'],['minskin','stone'],[3,3,'hunter']],
 				stone_jiewangzhu:['male','wu',1,['hunter_jiewang'],['minskin','stone'],[1,2,'hunter']],
 				stone_xunshoushi:['male','qun',2,['hunter_xunshou'],['minskin','stone'],[4,3,'hunter']],
 				stone_senlinlang:['male','qun',1,['hunter_qunxi'],['minskin','stone'],[1,2,'hunter']],
@@ -1154,7 +1154,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_xiaogui:['male','qun',1,[],['minskin','stone','stonehidden'],[1,1]],
 				stone_kongjuzhanma:['male','qun',1,['warlock_yongsheng'],['minskin','stone'],[3,1,'warlock']],
 				stone_morishouwei:['male','qun',4,['stone_chongfeng','warlock_zaihuo'],['minskin','stone'],[4,4,'warlock']],
-				stone_xukongxingzhe:['male','qun',2,['chaofeng'],['minskin','stone'],[1,1,'warlock']],
+				stone_xukongxingzhe:['male','qun',2,['lschaofeng'],['minskin','stone'],[1,1,'warlock']],
 				stone_diyuhuo:['male','qun',4,['warlock_yuhuo'],['minskin','stone'],[5,4,'warlock']],
 				stone_diyuhuox:['male','qun',2,[],['minskin','stone','stonehidden'],[2,2,'warlock']],
 				stone_heishitanfan:['male','qun',2,['warlock_anyu'],['minskin','stone'],[2,2,'warlock']],
@@ -1169,10 +1169,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_zhujiashi:['male','qun',2,['warrior_zhujia'],['minskin','stone'],[2,1,'warrior']],
 				stone_jiangong:['male','qun',2,['warrior_jiangong'],['minskin','stone'],[2,2,'warrior']],
 				stone_chidunshinv:['female','qun',4,['warrior_tidun'],['minskin','stone'],[5,4,'warrior']],
-				stone_yuanhou:['male','qun',2,['chaofeng'],['minskin','stone'],[2,3,'warrior']],
+				stone_yuanhou:['male','qun',2,['lschaofeng'],['minskin','stone'],[2,3,'warrior']],
 				stone_heiyaoyaoshou:['male','qun',4,['warrior_heiyao'],['minskin','stone'],[5,4,'warrior']],
 				stone_honglongyongshi:['male','qun',2,['warrior_fenyong'],['minskin','stone'],[2,3,'warrior']],
-				stone_peilianshi:['male','qun',2,['chaofeng','warrior_peilian'],['minskin','stone'],[2,2,'warrior']],
+				stone_peilianshi:['male','qun',2,['lschaofeng','warrior_peilian'],['minskin','stone'],[2,2,'warrior']],
 				stone_jingyingweishi:['male','qun',3,['stone_chongfeng'],['minskin','stone'],[4,3,'warrior']],
 				stone_mengmaren:['male','qun',3,['warrior_chuanci'],['minskin','stone'],[4,4,'warrior']],
 				stone_zhifuzhe:['male','qun',2,['warrior_zhifu'],['minskin','stone'],[3,1,'warrior']],
@@ -1237,18 +1237,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_shumiao:['none','wu',1,[],['minskin','stone','stonehidden'],[1,1]],
 				stone_shuren:['none','wu',2,['stone_chongfeng','stone_zibao'],['minskin','stone','stonehidden'],[2,2]],
 				stone_shurenx:['none','wu',2,[],['minskin','stone','stonehidden'],[2,2]],
-				stone_shurenxx:['none','wu',2,['chaofeng'],['minskin','stone','stonehidden'],[2,2]],
-				stone_youlinglang:['none','qun',2,['chaofeng'],['minskin','stone','stonehidden'],[2,2]],
+				stone_shurenxx:['none','wu',2,['lschaofeng'],['minskin','stone','stonehidden'],[2,2]],
+				stone_youlinglang:['none','qun',2,['lschaofeng'],['minskin','stone','stonehidden'],[2,2]],
 				stone_xiaojingling:['none','qun',1,['xuying'],['minskin','stone','stonehidden'],[1,1]],
 				stone_zhumo:['none','qun',2,[],['minskin','stone','stonehidden'],[2,2]],
-				stone_jingxiang:['none','qun',2,['stone_jingxiang','chaofeng'],['minskin','stone','stonehidden'],[2,0]],
+				stone_jingxiang:['none','qun',2,['stone_jingxiang','lschaofeng'],['minskin','stone','stonehidden'],[2,0]],
 				stone_shengguanghuwei:['female','qun',2,['priest_shengguang'],['minskin','stone','stonehidden'],[1,1]],
 				stone_liegou:['none','qun',1,['stone_chongfeng'],['minskin','stone','stonehidden'],[1,2]],
 				stone_mianyang:['none','qun',1,['mage_mianyang'],['minskin','stone','stonehidden'],[1,0]],
 				stone_qingwa:['none','wu',1,['shaman_qingwa'],['minskin','stone','stonehidden'],[1,0]],
-				stone_shengjiachong:['none','qun',1,['chaofeng'],['minskin','stone','stonehidden'],[1,1]],
+				stone_shengjiachong:['none','qun',1,['lschaofeng'],['minskin','stone','stonehidden'],[1,1]],
 
-				stone_tuteng1:['none','qun',2,['shaman_tuteng','chaofeng'],['minskin','stone','stonehidden'],[2,0]],
+				stone_tuteng1:['none','qun',2,['shaman_tuteng','lschaofeng'],['minskin','stone','stonehidden'],[2,0]],
 				stone_tuteng2:['none','qun',2,['shaman_tuteng','shaman_zhuore'],['minskin','stone','stonehidden'],[2,0]],
 				stone_tuteng3:['none','qun',2,['shaman_tuteng','shaman_fali'],['minskin','stone','stonehidden'],[2,0]],
 				stone_tuteng4:['none','qun',2,['shaman_tuteng','shaman_zhiliao'],['minskin','stone','stonehidden'],[2,0]],
@@ -1260,7 +1260,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_nuoziduomu:['male','qun',4,['stone_shixu'],['minskin','stone','stonehidden','stonelegend'],[6,4]],
 				stone_maligousi:['male','qun',4,['stone_mowang'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
 
-				stone_aolajier:['male','qun',4,['stone_chongfeng','shaman_fengnu','paladin_hudun','chaofeng'],['minskin','stone','stonehidden','stonelegend_shaman'],[6,4]],
+				stone_aolajier:['male','qun',4,['stone_chongfeng','shaman_fengnu','paladin_hudun','lschaofeng'],['minskin','stone','stonehidden','stonelegend_shaman'],[6,4]],
 				stone_andongni:['male','qun',4,['stone_zhiyin'],['minskin','stone','stonehidden','stonelegend_mage'],[6,4]],
 				stone_jialakesi:['male','qun',6,['stone_bianshen'],['minskin','stone','stonehidden','stonelegend_warlock'],[6,0]],
 				stone_jialakesix:['male','qun',6,['stone_lianyu'],['modeimage','stonehidden','stonespecial']],
@@ -1268,7 +1268,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_geluomashi:['male','qun',4,['stone_chongfeng','stone_jinu'],['minskin','stone','stonehidden','stonelegend_warrior'],[6,4]],
 				stone_aidewen:['male','qun',3,['stone_lianji'],['minskin','stone','stonehidden','stonelegend_rogue'],[6,3]],
 				stone_sainaliusi:['male','qun',3,['stone_shenyu'],['minskin','stone','stonehidden','stonelegend_druid'],[6,3]],
-				stone_fuding:['male','qun',3,['paladin_hudun','chaofeng','stone_fuchou'],['minskin','stone','stonehidden','stonelegend_paladin'],[6,3]],
+				stone_fuding:['male','qun',3,['paladin_hudun','lschaofeng','stone_fuchou'],['minskin','stone','stonehidden','stonelegend_paladin'],[6,3]],
 				stone_weilun:['male','qun',4,['stone_shenyou'],['minskin','stone','stonehidden','stonelegend_priest'],[6,6]],
 			}
 		},
@@ -1688,7 +1688,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		get:{
 			rawAttitude:function(from,to){
 				var num;
-				if(to.isMin()&&!to.hasSkill('chaofeng')){
+				if(to.isMin()&&!to.hasSkill('lschaofeng')){
 					num=5;
 				}
 				else{
@@ -5338,14 +5338,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stoneact:1,
 				filterTarget:function(card,player,target){
 					return target.isMin()&&target.side==player.side&&
-					(!target.hasSkill('chaofeng')||target.hp<target.maxHp);
+					(!target.hasSkill('lschaofeng')||target.hp<target.maxHp);
 				},
 				content:function(){
 					if(target.hp<target.maxHp){
 						target.recover(target.maxHp-target.hp);
 					}
-					target.addSkill('chaofeng');
-					target.markSkill('chaofeng');
+					target.addSkill('lschaofeng');
+					target.markSkill('lschaofeng');
 					game.log(target,'获得了嘲讽');
 					target.popup('嘲讽');
 				},
@@ -5976,7 +5976,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					for(var i=0;i<game.players.length;i++){
 						if(game.players[i]!=player&&game.players[i].isMin()&&
-						!game.players[i].hasSkill('chaofeng')) return true;
+						!game.players[i].hasSkill('lschaofeng')) return true;
 					}
 					return false;
 				},
@@ -5984,7 +5984,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					event.chooser=player.getLeader();
 					event.chooser.chooseTarget('陪练：令一名随从获得嘲讽',function(card,playerx,target){
-						return player!=target&&target.isMin()&&!target.hasSkill('chaofeng');
+						return player!=target&&target.isMin()&&!target.hasSkill('lschaofeng');
 					}).ai=function(target){
 						return get.attitude(event.chooser,target)*target.hp;
 					};
@@ -5992,7 +5992,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						event.chooser.line(result.targets[0]);
-						result.targets[0].addSkill('chaofeng');
+						result.targets[0].addSkill('lschaofeng');
 					}
 				}
 			},
@@ -7267,7 +7267,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.draw();
-					player.addSkill('chaofeng');
+					player.addSkill('lschaofeng');
 				}
 			},
 			priest_guangyao:{
@@ -7881,7 +7881,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						result.targets[0].hp++;
 						result.targets[0].update();
 						result.targets[0].draw(2);
-						result.targets[0].addSkill('chaofeng');
+						result.targets[0].addSkill('lschaofeng');
 					}
 				}
 			},
@@ -8617,19 +8617,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			chaofeng:{
+			lschaofeng:{
 				mark:true,
 				intro:{
 					content:'已获得嘲讽'
 				}
 			},
-			_chaofeng:{
+			_lschaofeng:{
 				mod:{
 					targetEnabled:function(card,player,target){
-						if(target.hasSkill('chaofeng')) return;
+						if(target.hasSkill('lschaofeng')) return;
 						if(card.name=='sha'){
 							for(var i=0;i<game.players.length;i++){
-								if(game.players[i].side==target.side&&game.players[i].hasSkill('chaofeng')){
+								if(game.players[i].side==target.side&&game.players[i].hasSkill('lschaofeng')){
 									return false;
 								}
 							}
@@ -10152,8 +10152,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_morizaihuo_info:'令场上所有随从立即死亡，回复两点体力',
 			spell_zhiliaozhichu:'治疗之触',
 			spell_zhiliaozhichu_info:'令目标随从恢复所有体力值并获得嘲讽',
-			chaofeng:'嘲讽',
-			chaofeng_info:'同阵营的无嘲讽角色不以能成为杀的目标',
+			lschaofeng:'嘲讽',
+			lschaofeng_info:'同阵营的无嘲讽角色不以能成为杀的目标',
 			spell_wangzhezhufu:'王者祝福',
 			spell_wangzhezhufu_info:'令一名随从增加两点体力和体力上限并摸两张牌',
 			spell_diyulieyan:'地狱烈焰',

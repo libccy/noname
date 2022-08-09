@@ -20,7 +20,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:-1.5
 					},
 					tag:{
-						losehp:1
+						loseHp:1
 					}
 				}
 			},

@@ -8500,7 +8500,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function (card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
-							if(get.tag(card,'damage')&&player!=target) return [1,0.6];
+							if(get.tag(card,'damage')&&player!=target){
+								var cards=card.cards,evt=_status.event;
+								if(evt.player==target&&card.name=='damage'&&evt.getParent().type=='card') cards=evt.getParent().cards.filterInD();
+								if(target.hp<=1) return;
+								if(get.itemtype(cards)!='cards') return;
+								for(var i of cards){
+									if(get.name(i,target)=='tao') return [1,5];
+								}
+								if(get.value(cards,target)>=(6+player.getDamagedHp())) return [1,3];
+								return [1,0.6];
+							}
 						},
 					},
 				},
@@ -10586,21 +10596,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:8,
 					result:{
 						player:function(player){
-							if(player.hp<=2) return player.countCards('h')==0?1:0;
-							if(player.countCards('h',{name:'sha',color:'red'})) return 1;
-							return player.countCards('h')<=player.hp?1:0;
+							return get.effect(player,{name:'losehp'},player,player);
 						}
 					},
-					effect:function(card,player,target){
-						if(get.tag(card,'damage')){
-							if(player.hasSkillTag('jueqing',false,target)) return [1,1];
-							return 1.2;
-						}
-						if(get.tag(card,'loseHp')){
-							if(player.hp<=1) return;
-							return [0,0];
-						}
-					}
 				}
 			},
 			zhaxiang:{
@@ -10620,7 +10618,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					maihp:true
+					maihp:true,
+					effect:function(card,player,target){
+						if(get.tag(card,'damage')){
+							if(player.hasSkillTag('jueqing',false,target)) return [1,1];
+							return 1.2;
+						}
+						if(get.tag(card,'loseHp')){
+							if(target.hp<=1) return;
+							var using=target.isPhaseUsing();
+							if(target.hp<=2) return [1,player.countCards('h')<=1&&using?3:0];
+							if(using&&target.countCards('h',{name:'sha',color:'red'})) return [1,3];
+							return [1,(target.countCards('h')<=target.hp||using&&game.hasPlayer(function(current){
+								return current!=player&&get.attitude(player,current)<0&&player.inRange(current);
+							}))?3:2]
+						}
+					}
 				}
 			},
 			zhaxiang2:{

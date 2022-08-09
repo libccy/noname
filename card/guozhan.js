@@ -1256,9 +1256,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				trigger:{player:'linkBefore'},
 				forced:true,
-				//priority:20,
 				filter:function(event,player){
-					return !player.isMajor()&&!player.isLinked();
+					return player.isNotMajor()&&!player.isLinked();
 				},
 				content:function(){
 					trigger.cancel();

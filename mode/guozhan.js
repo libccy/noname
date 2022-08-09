@@ -405,7 +405,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_zhugeke:['male','wu',3,['aocai','gzduwu'],['gzskin']],
 				gz_wenqin:['male','wei',4,['gzjinfa'],['doublegroup:wei:wu','gzskin']],
 				gz_xf_sufei:['male','wu',4,['gzlianpian'],['doublegroup:wu:qun','gzskin']],
-				gz_liuba:['male','shu',3,['tongduo','qingyin'],['gzskin']],
+				gz_liuba:['male','shu',3,['gztongduo','qingyin'],['gzskin']],
 				gz_pengyang:['male','shu',3,['daming','xiaoni'],['doublegroup:shu:qun','gzskin']],
 				gz_zhuling:['male','wei',4,['gzjuejue','gzfangyuan'],['gzskin']],
 
@@ -1330,7 +1330,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(lib.filter.notMe,get.prompt('gzlianyou'),'令一名其他角色获得〖兴火〗').set('forceDie',true).set('ai',function(target){
-						return 10+(get.attitude(_status.event.player,target)*target.hasSkillTag('fireAttack',null,null,true)?2:1)
+						return 10+(get.attitude(_status.event.player,target)*(target.hasSkillTag('fireAttack',null,null,true)?2:1));
 					});
 					'step 1'
 					if(result.bool){
@@ -2232,13 +2232,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//刘巴
-			tongduo:{
+			gztongduo:{
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				direct:true,
 				preHidden:true,
 				filter:function(event,player){
-					if(player!=event.player&&!player.hasSkill('tongduo')||!event.player.isFriendOf(player)) return false;
+					if(player!=event.player&&!player.hasSkill('gztongduo')||!event.player.isFriendOf(player)) return false;
 					return event.player.getHistory('lose',function(evt){
 						return evt.type=='discard'&&evt.cards2.length>0&&evt.getParent('phaseDiscard').player==event.player;
 					}).length>0;
@@ -2252,10 +2252,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					num=Math.min(3,num);
 					event.num=num;
 					var next=trigger.player.chooseBool('是否发动【统度】摸'+get.cnNumber(num)+'张牌？');
-					if(player==trigger.player) next.setHiddenSkill('tongduo');
+					if(player==trigger.player) next.setHiddenSkill('gztongduo');
 					'step 1'
 					if(result.bool){
-						player.logSkill('tongduo',trigger.player);
+						player.logSkill('gztongduo',trigger.player);
 						trigger.player.draw(num);
 					}
 				},
@@ -4145,7 +4145,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('gzwenji'),function(card,player,target){
-						return target!=player&&target.countCards('he');
+						return target!=player&&target.countCards('he')>0;
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(target.identity=='unknown'&&att<=0) return 20;
@@ -11581,8 +11581,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			daming_info:'一名己方角色A的出牌阶段开始时，你可弃置一张锦囊牌，横置一名角色并摸X张牌（X为拥有横置角色的势力数）。然后你选择一项：①视为对A使用一张【桃】；②令A视为对由你选择的另一名角色使用一张雷【杀】。',
 			xiaoni:'嚣逆',
 			xiaoni_info:'锁定技，当你使用牌时，或成为其他角色使用牌的目标后，若场上存在其他己方角色且这些角色的手牌数均不大于你，则目标角色/你不可响应此牌。',
-			tongduo:'统度',
-			tongduo_info:'己方角色的结束阶段开始时，其可以摸X张牌（X为其本回合弃牌阶段弃置的牌数且至多为3）。 ',
+			gztongduo:'统度',
+			gztongduo_info:'己方角色的结束阶段开始时，其可以摸X张牌（X为其本回合弃牌阶段弃置的牌数且至多为3）。 ',
 			qingyin:'清隐',
 			qingyin_info:'限定技，出牌阶段，你可令所有己方角色将体力值回满，然后移除此武将牌。',
 			gzlianpian:'联翩',
@@ -12880,7 +12880,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					game.addVideo('showCharacter',this,num);
-					if(this.identity=='unknown'||(this.identity!='ye'&&(num==0||num==2)&&lib.character[this.name1][1]=='ye')){
+					if(this.identity=='unknown'||((num==0||num==2)&&lib.character[this.name1][1]=='ye')){
 						this.group=this.getGuozhanGroup(num);
 						this._group=this.group;
 						if((num==0||num==2)&&lib.character[this.name1][1]=='ye'){

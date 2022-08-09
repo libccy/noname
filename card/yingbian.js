@@ -402,7 +402,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:true,
 				filter:function(event,player){
-					if(event.targets.length<2||(event.card.name!='sha'&&(get.type(event.card)!='trick'||get.color(event.card)!='black'))) return false;
+					if(event.targets.length<2) return false;
+					if(event.card.name!='sha'){
+						var type=get.type(event.card);
+						if(type!='trick') return false;
+						if(get.color(event.card)!='black'&&!get.tag(event.card,'damage')) return false;
+					}
 					if(player.hasSkillTag('unequip2')) return false;
 					if(event.player.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
@@ -747,7 +752,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						player:function(card,player,target){
-							if(typeof card!='object'||!target||get.name(card)!='sha'&&(get.type(card)!='trick'||get.color(card)!='black')) return;
+							if(typeof card!='object'||!target||get.name(card)!='sha'&&(get.type(card)!='trick'||(get.color(card)!='black'&&!get.tag(card,'damage')))) return;
 							var info=get.info(card);
 							var targets=[];
 							targets.addArray(ui.selected.targets);
@@ -809,7 +814,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			wutiesuolian_info:'锁定技，当你使用【杀】指定目标后，若其未横置，则其横置。',
 			heiguangkai:'黑光铠',
 			heiguangkai_skill:'黑光铠',
-			heiguangkai_info:'锁定技，当你成为【杀】或黑色普通锦囊牌的目标后，若此牌的目标数大于1，则你令此牌对你无效。',
+			heiguangkai_info:'锁定技，当你成为【杀】或伤害类锦囊牌或黑色普通锦囊牌的目标后，若此牌的目标数大于1，则你令此牌对你无效。',
 			tongque:'铜雀',
 			tongque_skill:'铜雀',
 			tongque_info:'锁定技，你于一回合内使用的第一张带有【应变】效果的牌无视条件直接生效。',

@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			tw_puyangxing:['male','wu',3,['twzhengjian','twzhongchi']],
+			tw_puyangxing:['male','wu',4,['twzhengjian','twzhongchi']],
 			tw_tianyu:['male','wei',4,['twzhenxi','twyangshi']],
 			old_quancong:['male','wu',4,['zhenshan']],
 			tw_wujing:['male','wu',4,['twfenghan','twcongji']],
@@ -191,10 +191,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseControl().set('prompt','征建：请选择一种效果').set('choiceList',[
 						'令“出牌阶段内未使用过非基本牌”的其他角色受到惩罚',
 						'令“出牌阶段内未获得过牌”的其他角色受到惩罚',
-					]);
+					]).set('ai',()=>Math.random()<=0.5?0:1);
 					'step 1'
 					player.addSkill('twzhengjian_eff'+result.index);
-					game.log(player,'获得了','#g【征建】','的','#y效果'+get.cnNumber(result.index+1,true)).set('ai',()=>Math.random()<=0.5?0:1);
+					game.log(player,'获得了','#g【征建】','的','#y效果'+get.cnNumber(result.index+1,true));
 					game.delayx();
 				},
 				onremove:true,
@@ -538,7 +538,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!arg||!arg.name||arg.name!='sha') return false;
 						if(player.storage.counttrigger&&player.storage.counttrigger.twzhenxi) return false;
 						if(!arg.target) return false;
-						var card=target.getEquip(2);
+						var card=arg.target.getEquip(2);
 						return card&&get.value(card)>0&&game.hasPlayer(function(current){
 							return current!=arg.target&&current.canEquip(card)&&get.effect(current,card,player,player)>0;
 						})
@@ -1190,7 +1190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.changeZhuanhuanji('twfeifu');
-					trigger.target.chooseCard('he',true,'交给'+get.translation(trigger.player)+'一张牌','若选择装备牌，则其可以使用此牌');
+					trigger.target.chooseCard('he',true,'非服：交给'+get.translation(trigger.player)+'一张牌','若选择装备牌，则其可以使用此牌');
 					'step 1'
 					if(result.bool){
 						var card=result.cards[0];

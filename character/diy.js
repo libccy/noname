@@ -82,7 +82,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_nao:['female','key',3,['nao_duyin','nao_wanxin','nao_shouqing']],
 			key_yuuki:['female','key',3,['yuuki_yicha']],
 			key_kotarou:['male','key',3,['kotarou_rewrite','kotarou_aurora']],
-			key_tenzen:['male','key',4,['tenzen_yixing','tenzen_lingyu']],
+			key_tenzen:['male','key',4,['tenzen_fenghuan','tenzen_retianquan']],
 			key_kyouko:['female','key',3,['kyouko_rongzhu','kyouko_gongmian']],
 			key_kyou:['female','key',3,['kyou_zhidian','kyou_duanfa']],
 			
@@ -514,6 +514,106 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			tenzen_fenghuan:{
+				trigger:{global:'useCardAfter'},
+				direct:true,
+				filter:function(event,player){
+					if(player==event.player||event.targets.length!=1||event.targets[0]!=player||!event.player.isIn()||
+						(event.card.name!='sha'&&(get.type(event.card,null,false)!='trick'||!get.tag(event.card,'damage')))) return false;
+					if(!player.canUse({
+						name:event.card.name,
+						nature:event.card.nature,
+						isCard:true,
+					},event.player,false)) return false;
+					var num=get.number(event.card);
+					if(typeof num!='number') return false;
+					num*=2;
+					var hs=player.getCards('he');
+					for(var i of hs){
+						num-=get.number(i);
+						if(num<=0) return true;
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var num=get.number(trigger.card)*2;
+					var card={
+						name:trigger.card.name,
+						nature:trigger.card.nature,
+						isCard:true,
+					};
+					player.chooseToDiscard('he',get.prompt('tenzen_fenghuan',trigger.player),'弃置任意张点数之和不小于'+num+'的牌，然后视为对其使用一张'+get.translation(card)).set('selectCard',function(){
+						var cards=ui.selected.cards,num=_status.event.cardNumber;
+						for(var i of cards){
+							num-=get.number(i);
+							if(num<=0) return [cards.length,cards.length+1];
+						}
+						return [cards.length+1,cards.length+1];
+					}).set('cardNumber',num).set('logSkill',['tenzen_fenghuan',trigger.player]);
+					'step 1'
+					if(result.bool){
+						var card={
+							name:trigger.card.name,
+							nature:trigger.card.nature,
+							isCard:true,
+						},target=trigger.player;
+						if(target.isIn()&&player.canUse(card,target,false)) player.useCard(card,target,false);
+					}
+				},
+			},
+			tenzen_retianquan:{
+				trigger:{player:'useCardToPlayered'},
+				filter:function(event,player){
+					return event.card.name=='sha'&&(player.hp>0||player.countCards('he')>0);
+				},
+				logTarget:'target',
+				usable:1,
+				check:function(event,player){
+					return get.attitude(player,event.target)<0;
+				},
+				prompt2:'你可失去1点体力或弃置一张牌，展示牌堆顶的三张牌（若你的体力值小于体力上限的50%，则改为展示五张牌）。每有一张基本牌，其所需使用的【闪】的数量便+1。然后若此牌造成过伤害，则你获得展示牌中的所有非基本牌。',
+				content:function(){
+					'step 0'
+					player.chooseToDiscard('弃置一张牌，或点「取消」失去一点体力','he');
+					'step 1'
+					if(!result.bool) player.loseHp();
+					'step 2'
+					var cards=get.cards(player.hp<=player.maxHp/2?5:3);
+					player.showCards(cards,get.translation(player)+'发动了【天全】');
+					game.cardsGotoOrdering(cards).relatedEvent=trigger.getParent();
+					var num=cards.filter(function(card){
+						return get.type(card,false)=='basic';
+					}).length;
+					if(num){
+						if(trigger.card.name=='sha'){
+							var id=trigger.target.playerid;
+							var map=trigger.getParent().customArgs;
+							if(!map[id]) map[id]={};
+							if(typeof map[id].shanRequired=='number'){
+								map[id].shanRequired+=num;
+							}
+							else{
+								map[id].shanRequired=1+num;
+							}
+						}
+					}
+					if(num<5){
+						var next=game.createEvent('tenzen_retianqua_gain');
+						next.cards=cards;
+						next.player=player;
+						event.next.remove(next);
+						trigger.getParent().after.push(next);
+						next.setContent(function(){
+							if(player.getHistory('sourceDamage',function(evt){
+								return evt.card==event.parent.card;
+							}).length>0) player.gain(cards.filter(function(card){
+								return get.type(card,false)!='basic';
+							}),'gain2');
+						});
+					}
+				},
+			},
 			satomi_luodao:{
 				trigger:{player:'useCardToPlayered'},
 				logTarget:'target',
@@ -15719,6 +15819,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			satomi_daohai:'稻海',
 			satomi_daohai_info:'结束阶段，若你本回合内弃置过牌，则你可以视为使用一张【五谷丰登】。然后你可以将你于此【五谷丰登】中获得的牌当做【乐不思蜀】使用。',
 			satomi_daohai_append:'<span style="font-family: yuanli">五穀豊穣、刈り入れ時だね！</span>',
+			tenzen_fenghuan:'封还',
+			tenzen_fenghuan_info:'其他角色使用的【杀】或伤害性锦囊牌结算结束后，若你是此牌的唯一目标，则你可以弃置任意张点数之和大于等于此牌点数两倍的牌，然后视为对其使用一张名称相同的牌。',
+			tenzen_retianquan:'天全',
+			tenzen_retianquan_info:'每回合限一次。当你使用【杀】指定目标后，你可失去1点体力或弃置一张牌，然后展示牌堆顶的三张牌（若你的体力值小于体力上限的50%，则改为展示五张牌）。这些牌中每有一张基本牌，响应此牌所需的【闪】的数量便+1。此牌结算结束后，若此牌造成过伤害，则你获得展示牌中的所有非基本牌。',
 
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',

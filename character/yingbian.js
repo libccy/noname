@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yingbian',
 		connect:true,
 		character:{
+			wangxiang:['male','jin',3,['bingxin']],
 			jin_guohuai:['female','jin',3,['zhefu','yidu']],
 			jin_jiachong:['male','jin',3,['xiongshu','jianhui']],
 			xuangongzhu:['female','jin',3,['gaoling','qimei','ybzhuiji'],['hiddenSkill']],
@@ -32,11 +33,122 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				yingbian_pack1:['jin_simayi','jin_zhangchunhua','ol_lisu','simazhou','cheliji','ol_huaxin'],
 				yingbian_pack2:['jin_simashi','jin_xiahouhui','zhanghuyuechen','shibao','jin_yanghuiyu'],
 				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan','xuangongzhu'],
-				yingbian_pack4:['zhongyan','xinchang','jin_jiachong','jin_guohuai'],
+				yingbian_pack4:['zhongyan','xinchang','jin_jiachong','jin_guohuai','wangxiang'],
 				yingbian_pack5:['yangyan','yangzhi'],
 			},
 		},
 		skill:{
+			bingxin:{
+				audio:2,
+				enable:'chooseToUse',
+				hiddenCard:function(player,name){
+					if(get.type(name)=='basic'&&lib.inpile.contains(name)&&!player.getStorage('bingxin_count').contains(name)) return true;
+				},
+				filter:function(event,player){
+					if(event.type=='wuxie') return false;
+					var hs=player.getCards('h');
+					if(hs.length!=Math.max(0,player.hp)) return false;
+					if(hs.length>1){
+						var color=get.color(hs[0],player);
+						for(var i=1;i<hs.length;i++){
+							if(get.color(hs[i],player)!=color) return false;
+						}
+					}
+					var storage=player.storage.bingxin_count
+					for(var i of lib.inpile){
+						if(get.type(i)!='basic') continue;
+						if(storage&&storage.contains(i)) continue;
+						var card={name:i,isCard:true};
+						if(event.filterCard(card,player,event)) return true;
+						if(i=='sha'){
+							for(var j of lib.inpile_nature){
+								card.nature=j;
+								if(event.filterCard(card,player,event)) return true;
+							}
+						}
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[];
+						var storage=player.storage.bingxin_count;
+						for(var i of lib.inpile){
+							if(get.type(i)!='basic') continue;
+							if(storage&&storage.contains(i)) continue;
+							var card={name:i,isCard:true};
+							if(event.filterCard(card,player,event)) list.push(['基本','',i]);
+							if(i=='sha'){
+								for(var j of lib.inpile_nature){
+									card.nature=j;
+									if(event.filterCard(card,player,event)) list.push(['基本','',i,j]);
+								}
+							}
+						}
+						return ui.create.dialog('冰心',[list,'vcard'],'hidden')
+					},
+					check:function(button){
+						if(button.link[2]=='shan') return 3;
+						var player=_status.event.player;
+						if(button.link[2]=='jiu'){
+							if(player.getUseValue({name:'jiu'})<=0) return 0;
+							if(player.countCards('h','sha')) return player.getUseValue({name:'jiu'});
+							return 0;
+						}
+						return player.getUseValue({name:button.link[2],nature:button.link[3]})/4;
+					},
+					backup:function(links,player){
+						return {
+							selectCard:-1,
+							filterCard:()=>false,
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+								isCard:true,
+							},
+							precontent:function(){
+								player.logSkill('bingxin');
+								player.draw();
+								delete event.result.skill;
+								var name=event.result.card.name;
+								player.addTempSkill('bingxin_count');
+								player.markAuto('bingxin_count',[name]);
+							},
+						}
+					},
+					prompt:function(links,player){
+						var name=links[0][2];
+						var nature=links[0][3];
+						return '摸一张并视为使用'+(get.translation(nature)||'')+get.translation(name);
+					},
+				},
+				ai:{
+					order:function(item,player){
+						return 10;
+					},
+					respondShan:true,
+					respondSha:true,
+					skillTagFilter:function(player,tag){
+						var hs=player.getCards('h');
+						if(hs.length!=Math.max(0,hs.length)) return false;
+						if(hs.length>1){
+							var color=get.color(hs[0],player);
+							for(var i=1;i<hs.length;i++){
+								if(get.color(hs[i],player)!=color) return false;
+							}
+						}
+						var storage=player.storage.bingxin_count;
+						if(storage&&storage.contains('s'+tag.slice(8))) return false;
+					},
+					result:{
+						player:function(player){
+							if(_status.event.dying) return get.attitude(player,_status.event.dying);
+							return 1;
+						}
+					}
+				},
+				subSkill:{count:{charlotte:true,onremove:true}},
+			},
 			zhefu:{
 				audio:2,
 				trigger:{player:['useCard','respond']},
@@ -3366,6 +3478,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinchang:'辛敞（生卒年不详），字泰雍，陇西人氏，是曹魏时代官员。卫尉辛毗之子，辛宪英之弟。',
 			xuangongzhu:'高陵宣公主（？—？）司马氏，晋宣帝司马懿第二女。司马氏下嫁杜预。其侄司马炎登基时，司马氏已经去世。泰始年间（265年—274年）追赠高陵公主。',
 			jin_guohuai:'郭槐（237年-296年），字媛韶，太原阳曲（今山西太原）人，魏晋权臣贾充的妻子。父亲是曹魏城阳郡太守郭配，伯父是曹魏名将郭淮。出身太原郭氏。二十一岁时，嫁贾充作继室，生二女二子，长女贾南风，次女贾午，一子贾黎民。贾南风是西晋惠帝司马衷皇后，干预国政，专权误国，直接导致“八王之乱”和西晋亡国。',
+			wangxiang:'王祥（184年，一作180年－268年4月30日），字休徵。琅邪临沂（今山东省临沂市西孝友村）人。三国曹魏及西晋时大臣。王祥于东汉末隐居二十年，在曹魏，先后任县令、大司农、司空、太尉等职，封爵睢陵侯。西晋建立，拜太保，进封睢陵公。泰始四年四月戊戌日（268年4月30日）去世，年八十五（一作八十九），谥号“元”。有《训子孙遗令》一文传世。王祥侍奉后母朱氏极孝，为传统文化中二十四孝之一“卧冰求鲤”的主人翁。',
 		},
 		characterTitle:{},
 		perfectPair:{},
@@ -3568,6 +3681,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhefu_info:'当你于回合外使用或打出基本牌后，你可令一名有手牌的其他角色选择一项：⒈弃置一张名称相同的基本牌。⒉受到你造成的1点伤害。',
 			yidu:'遗毒',
 			yidu_info:'当你使用的【杀】或伤害性锦囊牌结算结束后，若此牌目标数为1且你未造成过渠道为此牌的伤害，则你可以展示目标角色的至多三张手牌。若这些牌颜色均相同，则其弃置这些牌。',
+			wangxiang:'王祥',
+			bingxin:'冰心',
+			bingxin_info:'每种牌名每回合限一次。当你需要使用基本牌时，若你的手牌数等于体力值且这些牌的颜色均相同，则你可以摸一张牌，视为使用一张基本牌。',
 
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',

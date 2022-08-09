@@ -1373,7 +1373,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 6-get.value(card);
 							});
 						}else{
-							event.target.chooseToDiscard(1,'e',true);
+							event.target.chooseToDiscard(1,'he',true,{type:'equip'});
 							event.finish();
 						};
 					}else{
@@ -7363,7 +7363,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_zhenglun":"整论",
 			"nzry_zhenglun_info":"若你没有“橘”，你可以跳过摸牌阶段然后获得一个“橘”",
 			"nzry_feijun":"飞军",
-			"nzry_feijun_info":"出牌阶段限一次，你可以弃置一张牌，然后选择一项：令一名手牌数大于你的角色交给你一张牌；或令一名装备区里牌数大于你的角色弃置一张装备牌",
+			"nzry_feijun_info":"出牌阶段限一次。你可以弃置一张牌，然后选择一项：⒈令一名手牌数大于你的角色交给你一张牌；⒉令一名装备区里牌数大于你的角色弃置一张装备牌。",
 			"nzry_binglve":"兵略",
 			"nzry_binglve_info":"锁定技，当你发动“飞军”时，若目标与你之前指定的目标均不相同，则你摸两张牌",
 			"nzry_juzhan1":"拒战",

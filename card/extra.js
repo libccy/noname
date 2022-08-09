@@ -1015,7 +1015,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["club",11,"tiesuo"],
 			["club",12,"tiesuo"],
 			["club",13,"tiesuo"],
-			["heart",13,"wuxie"],
+			["heart",1,"wuxie"],
 			["heart",13,"wuxie"],
 			["spade",13,"wuxie"],
 			["spade",10,"bingliang"],
