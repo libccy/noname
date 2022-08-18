@@ -3161,7 +3161,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					if(!lib.character.stone_misha){
-						lib.character.stone_misha=['male','shu',3,['lslschaofeng'],['minskin','stone','mode:stone'],[3,3,'hunter']];
+						lib.character.stone_misha=['male','shu',3,['lschaofeng'],['minskin','stone','mode:stone'],[3,3,'hunter']];
 					}
 					if(!lib.character.stone_huofu){
 						lib.character.stone_huofu=['male','qun',2,['stone_chongfeng'],['minskin','stone','mode:stone'],[3,4,'hunter']];

@@ -384,19 +384,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					equipValue:4
 				}
 			},
-			yuheng:{
+			yuheng:{fullskin:true},
+			gjyuheng:{
 				fullskin:true,
+				cardimage:'yuheng',
 				type:'equip',
 				subtype:'equip5',
 				nopower:true,
 				nomod:true,
 				unique:true,
-				skills:['yuheng_skill'],
+				skills:['gjyuheng_skill'],
 				ai:{
 					equipValue:6
 				}
 			},
-			yuheng_plus:{
+			gjyuheng_plus:{
 				fullskin:true,
 				type:'equip',
 				subtype:'equip5',
@@ -405,12 +407,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				nomod:true,
 				epic:true,
 				cardimage:'yuheng',
-				skills:['yuheng_plus_skill'],
+				skills:['gjyuheng_plus_skill'],
 				ai:{
 					equipValue:7
 				}
 			},
-			yuheng_pro:{
+			gjyuheng_pro:{
 				fullskin:true,
 				type:'equip',
 				subtype:'equip5',
@@ -419,7 +421,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				nomod:true,
 				legend:true,
 				cardimage:'yuheng',
-				skills:['yuheng_pro_skill'],
+				skills:['gjyuheng_pro_skill'],
 				ai:{
 					equipValue:8
 				}
@@ -1591,7 +1593,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			yuheng_skill:{
+			gjyuheng_skill:{
 				enable:'phaseUse',
 				usable:1,
 				filterCard:{suit:'spade'},
@@ -1621,17 +1623,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						current[0].give(current[1].randomGet(),player,true);
 					}
 					'step 1'
-					var card=player.getEquip('yuheng');
+					var card=player.getEquip('gjyuheng');
 					if(card){
-						if(typeof card.storage.yuheng!='number'){
-							card.storage.yuheng=1;
+						if(typeof card.storage.gjyuheng!='number'){
+							card.storage.gjyuheng=1;
 						}
 						else{
-							card.storage.yuheng++;
+							card.storage.gjyuheng++;
 						}
-						if(card.storage.yuheng>=3){
-							card.init([card.suit,card.number,'yuheng_plus',card.nature]);
-							player.addTempSkill('yuheng_plus_temp');
+						if(card.storage.gjyuheng>=3){
+							card.init([card.suit,card.number,'gjyuheng_plus',card.nature]);
+							player.addTempSkill('gjyuheng_plus_temp');
 						}
 					}
 				},
@@ -1642,8 +1644,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			yuheng_plus_temp:{},
-			yuheng_plus_skill:{
+			gjyuheng_plus_temp:{},
+			gjyuheng_plus_skill:{
 				enable:'phaseUse',
 				usable:1,
 				filterCard:{color:'black'},
@@ -1651,7 +1653,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return 8-get.value(card);
 				},
 				filter:function(event,player){
-					// if(player.hasSkill('yuheng_plus_temp')) return false;
+					// if(player.hasSkill('gjyuheng_plus_temp')) return false;
 					if(!player.countCards('h',{color:'black'})) return false;
 					var enemies=player.getEnemies();
 					for(var i=0;i<enemies.length;i++){
@@ -1674,16 +1676,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						current[0].give(current[1].randomGet(),player,true);
 					}
 					'step 1'
-					var card=player.getEquip('yuheng_plus');
+					var card=player.getEquip('gjyuheng_plus');
 					if(card){
-						if(typeof card.storage.yuheng!='number'){
-							card.storage.yuheng=1;
+						if(typeof card.storage.gjyuheng!='number'){
+							card.storage.gjyuheng=1;
 						}
 						else{
-							card.storage.yuheng++;
+							card.storage.gjyuheng++;
 						}
-						if(card.storage.yuheng>=7){
-							card.init([card.suit,card.number,'yuheng_pro',card.nature]);
+						if(card.storage.gjyuheng>=7){
+							card.init([card.suit,card.number,'gjyuheng_pro',card.nature]);
 						}
 					}
 				},
@@ -1694,7 +1696,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			yuheng_pro_skill:{
+			gjyuheng_pro_skill:{
 				enable:'phaseUse',
 				filterCard:{color:'black'},
 				check:function(card){
@@ -1723,17 +1725,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						current[0].give(current[1].randomGet(),player,true);
 					}
 					'step 1'
-					var card=player.getEquip('yuheng');
+					var card=player.getEquip('gjyuheng');
 					if(card){
-						if(typeof card.storage.yuheng!='number'){
-							card.storage.yuheng=1;
+						if(typeof card.storage.gjyuheng!='number'){
+							card.storage.gjyuheng=1;
 						}
 						else{
-							card.storage.yuheng++;
+							card.storage.gjyuheng++;
 						}
-						if(card.storage.yuheng>=3){
-							card.init([card.suit,card.number,'yuheng_plus',card.nature]);
-							player.addTempSkill('yuheng_plus_temp');
+						if(card.storage.gjyuheng>=3){
+							card.init([card.suit,card.number,'gjyuheng_plus',card.nature]);
+							player.addTempSkill('gjyuheng_plus_temp');
 						}
 					}
 				},
@@ -1825,18 +1827,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yunvyuanshen_info:'出牌阶段对一名角色使用，目标在下一次进入濒死状态时回复一点体力',
 			ziyangdan:'紫阳丹',
 			ziyangdan_info:'出牌阶段对一名角色使用，目标获得3点护甲，此后每个准备阶段失去1点护甲，直到首次失去所有护甲或累计以此法失去3点护甲',
-			yuheng:'玉衡',
-			yuheng_plus:'玉衡',
-			yuheng_pro:'玉衡',
-			yuheng_skill:'玉衡',
-			yuheng_plus_skill:'玉衡',
-			yuheng_pro_skill:'玉衡',
-			yuheng_info:'出牌阶段限一次，若敌方角色有黑桃手牌，你可以弃置一张黑桃手牌，然后获得一名随机敌方角色的一张随机黑桃手牌（此牌在本局游戏中第三次和第七次发动效果后，分别自动获得一次强化）',
-			yuheng_plus_info:'由普通玉衡强化得到，将玉衡技能描述中的“弃置一张黑桃手牌”改为“弃置一张黑色手牌”',
-			yuheng_pro_info:'由普通玉衡二次强化得到，将玉横技能描述中的“弃置一张黑桃手牌”改为“弃置一张黑色手牌”，并去掉使用次数限制',
-			yuheng_skill_info:'出牌阶段限一次，若敌方角色有黑桃手牌，你可以弃置一张黑桃手牌，然后获得一名随机敌方角色的一张随机黑桃手牌',
-			yuheng_plus_skill_info:'出牌阶段限一次，若敌方角色有黑桃手牌，你可以弃置一张黑色手牌，然后获得一名随机敌方角色的一张随机黑桃手牌',
-			yuheng_pro_skill_info:'出牌阶段限，若敌方角色有黑桃手牌，你可以弃置一张黑色手牌，然后获得一名随机敌方角色的一张随机黑桃手牌',
+			gjyuheng:'玉衡',
+			gjyuheng_plus:'玉衡',
+			gjyuheng_pro:'玉衡',
+			gjyuheng_skill:'玉衡',
+			gjyuheng_plus_skill:'玉衡',
+			gjyuheng_pro_skill:'玉衡',
+			gjyuheng_info:'出牌阶段限一次，若敌方角色有黑桃手牌，你可以弃置一张黑桃手牌，然后获得一名随机敌方角色的一张随机黑桃手牌（此牌在本局游戏中第三次和第七次发动效果后，分别自动获得一次强化）',
+			gjyuheng_plus_info:'由普通玉衡强化得到，将玉衡技能描述中的“弃置一张黑桃手牌”改为“弃置一张黑色手牌”',
+			gjyuheng_pro_info:'由普通玉衡二次强化得到，将玉横技能描述中的“弃置一张黑桃手牌”改为“弃置一张黑色手牌”，并去掉使用次数限制',
+			gjyuheng_skill_info:'出牌阶段限一次，若敌方角色有黑桃手牌，你可以弃置一张黑桃手牌，然后获得一名随机敌方角色的一张随机黑桃手牌',
+			gjyuheng_plus_skill_info:'出牌阶段限一次，若敌方角色有黑桃手牌，你可以弃置一张黑色手牌，然后获得一名随机敌方角色的一张随机黑桃手牌',
+			gjyuheng_pro_skill_info:'出牌阶段限，若敌方角色有黑桃手牌，你可以弃置一张黑色手牌，然后获得一名随机敌方角色的一张随机黑桃手牌',
 			shujinsan:'舒筋散',
 			shujinsan_info:'出牌阶段对任意角色使用，目标可弃置任意张牌，并摸等量的牌',
 			mutoumianju:'木头面具',
@@ -1888,7 +1890,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['heart',4,'mapodoufu'],
 			['spade',8,'yuanbaorou'],
 
-			['spade',7,'yuheng'],
+			['spade',7,'gjyuheng'],
 			['club',4,'mutoumianju'],
 			['spade',2,'heilonglinpian'],
 			['spade',1,'mianlijinzhen'],

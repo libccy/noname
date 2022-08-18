@@ -37,7 +37,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yxs_fuermosi:['male','wei',3,['yanyi','jiean']],
 			yxs_guiguzi:['male','qun',3,['baihe','yinyang','xiushen']],
 			yxs_xiaoqiao:['female','wu',3,['chujia','zhijie']],
-			yxs_luzhishen:['male','wei',4,['dili','kuangchan']],
+			yxs_luzhishen:['male','wei',4,['yxsdili','kuangchan']],
 			yxs_zhaoyong:['male','shu',3,['zyhufu','hanbei']],
 			yxs_yangguang:['male','qun',3,['shiqin','yaoyi']],
 			yxs_tangbohu:['male','qun',3,['luobi','fengliu']],
@@ -812,7 +812,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 8-get.value(card);
 				}
 			},
-			dili:{
+			yxsdili:{
 				trigger:{player:'phaseDrawBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -2983,9 +2983,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanbei_info:'锁定技，你的装备区有马时，你的杀不可闪避',
 			kuangchan:'狂禅',
 			kuangchan_info:'锁定技，你做主公时，不增加体力上限',
-			dili:'底力',
-			// dili_info:'锁定技，摸牌阶段，你额外摸X张牌，X为你已损失的体力值',
-			dili_info:'锁定技，摸牌阶段，你额外摸X张牌，X为你已损失的体力值的一半，向上取整且最多为2',
+			yxsdili:'底力',
+			// yxsdili_info:'锁定技，摸牌阶段，你额外摸X张牌，X为你已损失的体力值',
+			yxsdili_info:'锁定技，摸牌阶段，你额外摸X张牌，X为你已损失的体力值的一半，向上取整且最多为2',
 			chujia:'初嫁',
 			chujia_info:'出牌阶段限一次，你可以弃置两张相同颜色的手牌，指定任意一名角色摸X张牌。(X为该角色已损失的体力值) ',
 			zhijie:'知节',

@@ -550,7 +550,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(num<=0) return [cards.length,cards.length+1];
 						}
 						return [cards.length+1,cards.length+1];
-					}).set('cardNumber',num).set('logSkill',['tenzen_fenghuan',trigger.player]);
+					}).set('cardNumber',num).set('logSkill',['tenzen_fenghuan',trigger.player]).set('effect',get.effect(trigger.player,card,player,player)).set('ai',function(card){
+						var eff=_status.event.effect;
+						if(eff<=0) return 0;
+						for(var i of ui.selected.cards) eff-=get.value(i)/Math.sqrt(get.number(i)/3);
+						return eff-get.value(card)/Math.sqrt(get.number(card)/3);
+					});
 					'step 1'
 					if(result.bool){
 						var card={
@@ -565,17 +570,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tenzen_retianquan:{
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
-					return event.card.name=='sha'&&(player.hp>0||player.countCards('he')>0);
+					return event.card.name=='sha'&&(player.hp>0||player.hasCard(function(card){
+						return lib.filter.cardDiscardable(card,player,'tenzen_retianquan');
+					},'he'));
 				},
 				logTarget:'target',
 				usable:1,
 				check:function(event,player){
-					return get.attitude(player,event.target)<0;
+					if(get.attitude(player,event.target)>=0) return false;
+					if(player.hp>player.maxHp/2) return true;
+					if(player.hasCard(function(card){
+						return lib.filter.cardDiscardable(card,player,'tenzen_retianquan')&&get.value(card)<6;
+					},'he')) return true;
+					return true;
 				},
 				prompt2:'你可失去1点体力或弃置一张牌，展示牌堆顶的三张牌（若你的体力值小于体力上限的50%，则改为展示五张牌）。每有一张基本牌，其所需使用的【闪】的数量便+1。然后若此牌造成过伤害，则你获得展示牌中的所有非基本牌。',
 				content:function(){
 					'step 0'
-					player.chooseToDiscard('弃置一张牌，或点「取消」失去一点体力','he');
+					player.chooseToDiscard('弃置一张牌，或点「取消」失去一点体力','he').set('goon',(player.hp>player.maxHp/2)).set('ai',function(card){
+						var val=get.value(card);
+						if(_status.event.goon) return 0.1-val;
+						return 6-val;
+					});
 					'step 1'
 					if(!result.bool) player.loseHp();
 					'step 2'

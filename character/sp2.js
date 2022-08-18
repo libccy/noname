@@ -526,8 +526,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					if(player.countCards('he')>0){
-						player.chooseCard('he',[1,Math.min(player.countCards('h'),event.num)],'请选择要展示的牌').set('ai',()=>1+Math.random());
+					if(player.countCards('h')>0){
+						player.chooseCard('h',[1,Math.min(player.countCards('h'),event.num)],'请选择要展示的牌').set('ai',()=>1+Math.random());
 					}
 					else event.finish();
 					'step 3'
@@ -5177,7 +5177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						cards.push(card);
 					}
 					if(!cards.length){
-						player.draw();
+						player.draw(6);
 						event.finish();
 					}
 					else if(cards.length==1){
@@ -5882,7 +5882,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var num=Math.min(game.countPlayer()-1,Math.max(1,player.getDamagedHp()));
-					player.chooseTarget([1,num],get.prompt('rehuoshui'),'令至多'+get.cnNumber(num)+'名角色的非锁定技失效直到回合结束',lib.filter.notMe).set('ai',function(target){
+					var str;
+					if(num>1){
+						str='选择至多'+get.cnNumber(num)+'名其他角色。';
+						var list=['第一名角色的非锁定技失效直到回合结束','；第二名角色交给你一张手牌','；第三名及之后角色弃置装备区内的所有牌'];
+						for(var i=0;i<Math.min(3,num);i++){
+							str+=list[i];
+						}
+						str+='。';
+					}
+					else str='令一名其他角色的非锁定技本回合内失效';
+					player.chooseTarget([1,num],get.prompt('rehuoshui'),str,lib.filter.notMe).set('ai',function(target){
 						var att=-get.attitude(_status.event.player,target);
 						if(att<=0) return 0;
 						if(target.hasSkillTag('maixie')||target.hasSkill('maixie_hp')||target.hasSkill('maixie_defed')) att*=3;
@@ -5890,11 +5900,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						var targets=result.targets.sortBySeat();
+						var targets=result.targets;
 						player.logSkill('rehuoshui',targets);
-						for(var i of targets) i.addTempSkill('fengyin');
-						game.delayx();
+						event.targets=targets;
+						targets[0].addTempSkill('fengyin');
+						if(targets.length<2) event.goto(5);
 					}
+					else event.finish();
+					'step 2'
+					if(targets[1].countCards('h')==0) event.goto(targets.length>2?4:5);
+					else targets[1].chooseCard('h',true,'交给'+get.translation(player)+'一张手牌');
+					'step 3'
+					if(result.bool){
+						player.gain(result.cards,targets[1],'giveAuto');
+					}
+					if(targets.length<3) event.goto(5);
+					'step 4'
+					var num=targets[2].countCards('e');
+					if(num>0) targets[2].chooseToDiscard('e',true,num);
+					'step 5'
+					game.delayx();
 				},
 			},
 			reqingcheng:{
@@ -13128,7 +13153,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return !player.hasSkill('songshu_reflectionblue')&&player.countCards('h')>0;
+					return !player.hasSkill('songshu_reflectionblue',null,null,false)&&player.countCards('h')>0;
 				},
 				filterTarget:function(card,player,target){
 					return target!=player&&player.canCompare(target);
@@ -13138,13 +13163,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseToCompare(target).set('small',get.attitude(player,target)>0);
 					'step 1'
 					if(!result.bool){
+						player.draw(2,'nodelay');
 						target.draw(2);
-						player.addTempSkill('songshu_reflectionblue');
+						player.addTempSkill('songshu_reflectionblue','phaseUseAfter');
+					}
+					else{
+						target.addTempSkill('songshu_ai');
 					}
 				},
+				ai:{
+					basic:{
+						order:1
+					},
+					expose:0.2,
+					result:{
+						target:function(player,target){
+							if(target.hasSkill('songshu_ai',null,null,false)) return 0;
+							var maxnum=0;
+							var cards2=target.getCards('h');
+							for(var i=0;i<cards2.length;i++){
+								if(get.number(cards2[i])>maxnum){
+									maxnum=get.number(cards2[i]);
+								}
+							}
+							if(maxnum>10) maxnum=10;
+							if(maxnum<5&&cards2.length>1) maxnum=5;
+							var cards=player.getCards('h');
+							for(var i=0;i<cards.length;i++){
+								if(get.number(cards[i])<maxnum) return 1;
+							}
+							return 0;
+						}
+					}
+				}
 			},
-			songshu_reflectionblue:{
-			},
+			songshu_ai:{charlotte:true},
+			songshu_reflectionblue:{charlotte:true},
 			sibian:{
 				audio:2,
 				trigger:{player:'phaseDrawBegin1'},
@@ -13167,12 +13221,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(mx.contains(cards[i].number)) gains.addArray(cards.splice(i--,1));
 					}
 					player.gain(gains,'gain2');
-					if(cards.length!=2||Math.abs(gains[0].number-gains[1].number)>=game.players.length) event._result={bool:false};
-					else player.chooseTarget('是否令一名手牌数最少的角色获得'+get.translation(cards),function(card,player,target){
+					if(cards.length>0) player.chooseTarget('是否令一名手牌数最少的角色获得'+get.translation(cards),function(card,player,target){
 						return target.isMinHandcard();
-					}).ai=function(target){
+					}).set('ai',function(target){
 						return get.attitude(_status.event.player,target);
-					}
+					});
+					else event.finish();
 					'step 2'
 					if(result.bool){
 						var target=result.targets[0];
@@ -15398,9 +15452,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pyzhuren_shandian_info:'当你使用【杀】指定目标后，可令其进行判定，若结果为：黑桃，其受到3点雷属性伤害；梅花，其受到1点雷属性伤害，你回复1点体力并摸一张牌。',
 			
 			songshu:'颂蜀',
-			songshu_info:'出牌阶段，你可以和其他角色拼点。若你没赢，其摸两张牌，且你本阶段内不能再发动〖颂蜀〗',
+			songshu_info:'出牌阶段，你可以和其他角色拼点。若你没赢，你与其各摸两张牌，且你本阶段内不能再发动〖颂蜀〗。',
 			sibian:'思辩',
-			sibian_info:'摸牌阶段，你可以放弃摸牌，改为亮出牌堆顶的四张牌，然后获得其中所有点数最大与点数最小的牌。若获得的牌是两张且点数之差小于存活人数，则你可以将剩余的牌交给手牌数最少的角色。',
+			sibian_info:'摸牌阶段，你可以放弃摸牌，改为亮出牌堆顶的四张牌，然后获得其中所有点数最大与点数最小的牌，且可以将剩余的牌交给手牌数最少的角色。',
 			lslixun:'利熏',
 			lslixun_fate:'利熏',
 			lslixun_info:'锁定技，当你受到伤害时，你防止此伤害，然后获得等同于伤害值的“珠”标记。出牌阶段开始时，你进行判定，若结果点数小于“珠”的数量，你弃置等同于“珠”数量的手牌（若弃牌的牌数不够，则失去剩余数量的体力值）。',
@@ -15772,7 +15826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiwei_info_guozhan:'你明置此武将牌时，选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。该角色死亡时，若你的两个武将牌均明置，你暗置此武将牌。 ',
 			re_zoushi:'邹氏',
 			rehuoshui:'祸水',
-			rehuoshui_info:'准备阶段，你可以令至多X名角色的非锁定技无效直到回合结束（X为你已损失的体力值且至少为1）。',
+			rehuoshui_info:'准备阶段，你可以选择至多X名角色（X为你已损失的体力值且至少为1）。你令这些角色中第一名角色的非锁定技失效直到回合结束；第二名角色交给你一张手牌；第三名及之后角色弃置装备区内的所有牌。',
 			reqingcheng:'倾城',
 			reqingcheng_info:'出牌阶段限一次，你可以与一名手牌数小于你的男性角色交换手牌。',
 			re_panshu:'潘淑',
@@ -15804,7 +15858,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexingluan:'兴乱',
 			rexingluan_info:'出牌阶段限一次，当你使用的仅指定一个目标的牌结算完成后，你可以获得场上一张与此牌点数相同的牌，或获得牌堆中随机一张点数与此牌相同的牌。',
 			xinxingluan:'兴乱',
-			xinxingluan_info:'出牌阶段限一次。当你使用牌结算结束后，你可选择一项：①观看牌堆中的两张点数为6的牌并获得其中一张（没有则改为摸一张牌）；②令一名其他角色弃置一张点数为6的牌或交给你一张牌；③获得场上的一张点数为6的牌。',
+			xinxingluan_info:'出牌阶段限一次。当你使用牌结算结束后，你可选择一项：①观看牌堆中的两张点数为6的牌并获得其中一张（没有则改为摸六张牌）；②令一名其他角色弃置一张点数为6的牌或交给你一张牌；③获得场上的一张点数为6的牌。',
 			zhouyi:'周夷',
 			zhukou:'逐寇',
 			zhukou_info:'①当你于一名角色的出牌阶段第一次造成伤害后，你可以摸X张牌（X为本回合你已使用的牌数）。②你的结束阶段，若你本回合没有造成伤害，你可以对两名其他角色各造成1点伤害。',
@@ -16012,7 +16066,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyinshi_info:'锁定技。①每回合限一次，当你受到伤害时，若此伤害的渠道不为有颜色的牌，则你防止此伤害。②当有因〖八卦阵〗发起的判定的判定牌生效时，你获得此判定牌。',
 			tenggongzhu:'滕公主',
 			xingchong:'幸宠',
-			xingchong_info:'一轮游戏开始时，你可声明两个自然数X和Y，且(X+Y)≤min(5, 你的体力上限)。你摸X张牌并展示Y张牌。若如此做，当你于本轮内失去一张以此法展示的牌后，你摸两张牌。',
+			xingchong_info:'一轮游戏开始时，你可声明两个自然数X和Y，且(X+Y)≤min(5, 你的体力上限)。你摸X张牌并展示Y张手牌。若如此做，当你于本轮内失去一张以此法展示的牌后，你摸两张牌。',
 			liunian:'流年',
 			liunian_info:'锁定技。牌堆第一次洗牌后，你于回合结束时加1点体力上限；牌堆第二次洗牌后，你于本回合结束时回复1点体力，且本局游戏内的手牌上限+10。',
 			zhangyao:'张媱',

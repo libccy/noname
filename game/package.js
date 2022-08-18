@@ -10,6 +10,7 @@ window.noname_package={
 		sp2:'系列专属',
 		extra:'神将',		
 		mobile:'移动版',
+		sb:'谋攻篇',
 		offline:'线下武将',
 		old:'怀旧',
 		diy:'DIY',

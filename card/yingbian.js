@@ -278,7 +278,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(player.countCards('he',function(cardx){
 						return cardx!=card;
 					})>0){
-						player.logSkill('tianjitu');
+						player.logSkill('tianjitu_skill');
 						player.chooseToDiscard(true,function(card){
 							return card!=_status.event.card;
 						},'he').set('card',card);
@@ -293,7 +293,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					next.player=player;
 					next.setContent(function(){
 						if(player.countCards('h')<5){
-							player.logSkill('tianjitu');
+							player.logSkill('tianjitu_skill');
 							player.drawTo(5);
 						}
 					});

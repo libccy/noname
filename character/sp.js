@@ -592,12 +592,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skills:['zhuangshu_basic'],
 				forceDie:true,
 				onLose:function(){
-					if((!event.getParent(2)||event.getParent(2).name!='swapEquip')&&(event.getParent().type!='equip'||event.getParent().swapEquip)){
-						card.fix();
-						card.remove();
-						card.destroyed=true;
-						game.log(card,'被销毁了');
-					}
+					card.fix();
+					card.remove();
+					card.destroyed=true;
+					game.log(card,'被销毁了');
 				},
 				equipDelay:false,
 				loseDelay:false,
@@ -612,12 +610,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forceDie:true,
 				skills:['zhuangshu_trick'],
 				onLose:function(){
-					if((!event.getParent(2)||event.getParent(2).name!='swapEquip')&&(event.getParent().type!='equip'||event.getParent().swapEquip)){
-						card.fix();
-						card.remove();
-						card.destroyed=true;
-						game.log(card,'被销毁了');
-					}
+					card.fix();
+					card.remove();
+					card.destroyed=true;
+					game.log(card,'被销毁了');
 				},
 				equipDelay:false,
 				loseDelay:false,
@@ -633,12 +629,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forceDie:true,
 				inherit:'zhuangshu_basic',
 				onLose:function(){
-					if((!event.getParent(2)||event.getParent(2).name!='swapEquip')&&(event.getParent().type!='equip'||event.getParent().swapEquip)){
-						card.fix();
-						card.remove();
-						card.destroyed=true;
-						game.log(card,'被销毁了');
-					}
+					card.fix();
+					card.remove();
+					card.destroyed=true;
+					game.log(card,'被销毁了');
 				},
 				equipDelay:false,
 				loseDelay:false,
@@ -826,7 +820,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(subtype!='equip1'&&subtype!='equip2') subtype='others';
 					var card_map={
 						equip1:['wushuangfangtianji','guilongzhanyuedao','chixueqingfeng','bintieshuangji','wutiesuolian','wuxinghelingshan'],
-						equip2:['linglongshimandai','hongmianbaihuapao','qimenbazhen','guofengyupao','huxinjing','heiguangkai'],
+						equip2:['linglongshimandai','hongmianbaihuapao','qimenbagua','guofengyupao','huxinjing','heiguangkai'],
 						others:['shufazijinguan','xuwangzhimian','tianjitu','taigongyinfu','sanlve','zhaogujing'],
 					};
 					if(!_status.olshengong_map) _status.olshengong_map={};
@@ -909,7 +903,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									cards.push(i);
 								}
 							}
-							game.cardsGotoOrdering(cards);
+							game.cardsGotoSpecial(cards);
 							game.log(cards,'被移出了游戏');
 							player.addTempSkill('olshengong_draw');
 							player.addMark('olshengong_draw',cards.length,false);
@@ -943,7 +937,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					trigger.num--;
 					player.chooseControl('equip1','equip2','equip6','equip5').set('prompt','选择获得一种副类别的装备牌').set('ai',function(card){
 						if(player.isEmpty(2)) return 'equip2';
 						if(player.isEmpty(5)) return 'equip5';
@@ -956,7 +949,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(result.control=='equip6') return (type=='equip3'||type=='equip4');
 						return type==result.control;
 					});
-					if(card) player.gain(card,'gain2');
+					if(card){
+						trigger.num--;
+						player.gain(card,'gain2');
+					}
 				},
 				group:'olqisi_init',
 				subSkill:{
@@ -1228,10 +1224,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hp>0;
 				},
 				prompt2:function(event,player){
-					var prompt='失去1点体力，然后'
+					var prompt='失去1点体力，然后';
 					var cards=event.cards.filterInD();
-					if(cards.length) prompt+=('获得'+get.translations(cards)+'、');
-					prompt+='摸一张牌、本回合使用【杀】的次数上限+1'
+					if(cards.length) prompt+=('获得'+get.translation(cards)+'、');
+					prompt+='摸一张牌、本回合使用【杀】的次数上限+1';
 					return prompt;
 				},
 				check:function(event,player){
@@ -13803,6 +13799,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					trigger.player.storage.rezhoufu2_markcount++;
 					if(trigger.player.storage.rezhoufu2_markcount>=2){
+						delete trigger.player.storage.rezhoufu2_markcount;
 						var cards=trigger.player.getExpansions('rezhoufu2');
 						player.gain(cards,trigger.player);
 					}
@@ -18495,7 +18492,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guofengyupao_info:'锁定技，你不是其他角色使用普通锦囊牌的合法目标。',
 			shufazijinguan:'束发紫金冠',
 			shufazijinguan_skill:"束发紫金冠",
-			shufazijinguan_skill_info:"准备阶段，你可以对一名其他角色造成1点伤害。",
+			shufazijinguan_info:"准备阶段，你可以对一名其他角色造成1点伤害。",
 			sanlve:'三略',
 			sanlve_skill:'三略',
 			sanlve_info:'锁定技。你的攻击范围+1。你的手牌上限+1。你使用【杀】的次数上限+1。',

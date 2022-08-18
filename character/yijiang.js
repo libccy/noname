@@ -11684,14 +11684,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['xin_jushou'],
 				check:function(event,player){
-				 return player.getHistory('damage',function(evt){
-						return evt!=event
-					}).length==0;
+				 return player.getHistory('damage').indexOf(event)==0;
 				},
 				content:function(){
-					if(player.getHistory('damage',function(evt){
-						return evt!=trigger
-					}).length>0){
+					if(player.getHistory('damage').indexOf(trigger)>0){
 						player.loseHp();
 					}
 					else{
@@ -12091,7 +12087,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guanping:['re_guanping','guanping'],
 			caifuren:['xin_caifuren','re_caifuren','caifuren'],
 			guyong:['re_guyong','xin_guyong','guyong'],
-			yj_jushou:['xin_jushou','yj_jushou'],
+			yj_jushou:['re_jushou','xin_jushou','yj_jushou'],
 			guohuanghou:['re_guohuanghou','guohuanghou'],
 		},
 		translate:{

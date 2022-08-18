@@ -12,19 +12,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang1:['xin_wuguotai','xin_gaoshun','re_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua','dc_xushu'],
 				refresh_yijiang2:['re_madai','re_wangyi','guanzhang','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','re_liru','re_manchong','re_fuhuanghou','re_guanping'],
-				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','re_chenqun','re_caifuren','re_guyong','xin_jushou'],
+				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','re_chenqun','re_caifuren','re_guyong','re_jushou'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi'],
 				refresh_yijiang6:['re_guohuanghou'],
 			},
 		},
 		connect:true,
 		character:{
+			re_jushou:['male','qun',3,['dcjianying','dcshibei']],
 			re_zhanghe:['male','wei',4,['reqiaobian']],
 			dc_xushu:['male','shu',4,['rezhuhai','xsqianxin']],
 			xin_gaoshun:['male','qun',4,['decadexianzhen','decadejinjiu']],
 			re_guohuanghou:['female','wei',3,['rejiaozhao','redanxin']],
 			re_xiahoushi:['female','shu',3,['reqiaoshi','reyanyu']],
-			xin_jushou:['male','qun',3,['xinjianying','shibei']],
 			ol_lusu:['male','wu',3,['olhaoshi','oldimeng']],
 			re_jiaxu:['male','qun',3,['rewansha','luanwu','reweimu']],
 			re_guyong:['male','wu',3,['reshenxing','rebingyi']],
@@ -143,6 +143,114 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['zhaoyun','sp_zhugeliang'],
 		},
 		skill:{
+			//十周年沮授
+			dcshibei:{
+				trigger:{player:'damageEnd'},
+				forced:true,
+				audio:2,
+				check:function(event,player){
+				 return player.getHistory('damage').indexOf(event)==0;
+				},
+				filter:function(event,player){
+					var index=player.getHistory('damage').indexOf(event);
+					return index==0||index==1;
+				},
+				content:function(){
+					if(player.getHistory('damage').indexOf(trigger)>0){
+						player.loseHp();
+					}
+					else{
+						player.recover();
+					}
+				},
+				subSkill:{
+					damaged:{},
+					ai:{}
+				},
+				ai:{
+					maixie_defend:true,
+					threaten:0.9,
+					effect:{
+						target:function(card,player,target){
+							if(player.hasSkillTag('jueqing')) return;
+							if(target.hujia) return;
+							if(player._shibei_tmp) return;
+							if(target.hasSkill('shibei_ai')) return;
+							if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
+							if(get.tag(card,'damage')){
+								if(target.getHistory('damage').length>0){
+									return [1,-2];
+								}
+								else{
+									if(get.attitude(player,target)>0&&target.hp>1){
+										return 0;
+									}
+									if(get.attitude(player,target)<0&&!player.hasSkillTag('damageBonus')){
+										if(card.name=='sha') return;
+										var sha=false;
+										player._shibei_tmp=true;
+										var num=player.countCards('h',function(card){
+											if(card.name=='sha'){
+												if(sha){
+													return false;
+												}
+												else{
+													sha=true;
+												}
+											}
+											return get.tag(card,'damage')&&player.canUse(card,target)&&get.effect(target,card,player,player)>0;
+										});
+										delete player._shibei_tmp;
+										if(player.hasSkillTag('damage')){
+											num++;
+										}
+										if(num<2){
+											var enemies=player.getEnemies();
+											if(enemies.length==1&&enemies[0]==target&&player.needsToDiscard()){
+												return;
+											}
+											return 0;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			dcjianying:{
+				audio:2,
+				locked:false,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(typeof card=='object'&&player.isPhaseUsing()){
+							var evt=lib.skill.dcjianying.getLastUsed(player);
+							if(evt&&evt.card&&(get.suit(evt.card)&&get.suit(evt.card)==get.suit(card)||evt.card.number&&evt.card.number==get.number(card))){
+								return num+10;
+							}
+						}
+					},
+				},
+				trigger:{player:'useCard'},
+				frequent:true,
+				getLastUsed:function(player,event){
+					var history=player.getAllHistory('useCard');
+					var index;
+					if(event) index=history.indexOf(event)-1;
+					else index=history.length-2;
+					if(index>=0) return history[index];
+					return false;
+				},
+				filter:function(event,player){
+					var evt=lib.skill.dcjianying.getLastUsed(player,event);
+					if(!evt||!evt.card) return false;
+					return get.suit(evt.card)!='none'&&get.suit(evt.card)==get.suit(event.card)||
+						typeof get.number(evt.card,false)=='number'&&get.number(evt.card,false)==get.number(event.card);
+				},
+				content:function(){
+					player.draw();
+				},
+			},
 			//十周年步练师
 			dcanxu:{
 				enable:'phaseUse',
@@ -1513,100 +1621,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						result.targets[0].draw(event.num);
 					}
 				}
-			},
-			//沮授
-			xinjianying:{
-				audio:'jianying',
-				audioname:['xin_jushou'],
-				subfrequent:['draw'],
-				group:['xinjianying_draw'],
-				enable:'phaseUse',
-				usable:1,
-				filter:function(event,player){
-					if(!player.countCards('he')) return false;
-					for(var i of lib.inpile){
-						if(i!='du'&&get.type(i,false)=='basic'){
-							if(event.filterCard({name:i},player,event)) return true;
-							if(i=='sha'){
-								for(var j of lib.inpile_nature){
-									if(event.filterCard({name:i,nature:j},player,event)) return true;
-								}
-							}
-						}
-					}
-					return false;
-				},
-				onChooseToUse:function(event){
-					if(event.type=='phase'&&!game.online){
-						var last=event.player.getLastUsed();
-						if(last&&last.getParent('phaseUse')==event.getParent()){
-							var suit=get.suit(last.card,false);
-							if(suit!='none') event.set('xinjianying_suit',suit);
-						}
-					}
-				},
-				chooseButton:{
-					dialog:function(event,player){
-						var list=[];
-						var suit=event.xinjianying_suit||'',str=get.translation(suit);
-						for(var i of lib.inpile){
-							if(i!='du'&&get.type(i,false)=='basic'){
-								if(event.filterCard({name:i},player,event)) list.push(['基本',str,i]);
-								if(i=='sha'){
-									for(var j of lib.inpile_nature){
-										if(event.filterCard({name:i,nature:j},player,event)) list.push(['基本',str,i,j]);
-									}
-								}
-							}
-						}
-						return ui.create.dialog('渐营',[list,'vcard']);
-					},
-					check:function(button){
-						if(button.link[2]=='jiu') return 0;
-						return _status.event.player.getUseValue({name:button.link[2],nature:button.link[3]});
-					},
-					backup:function(links,player){
-						var next={
-							audio:'jianying',
-							audioname:['xin_jushou'],
-							filterCard:true,
-							popname:true,
-							position:'he',
-							viewAs:{
-								name:links[0][2],
-								nature:links[0][3],
-							},
-							ai1:function(card){
-								return 7-_status.event.player.getUseValue(card,null,true);
-							},
-							precontent:function(){
-								event.getParent().addCount=false;
-								var evtx=event.getParent(2);
-								if(player.hasHistory('useCard',function(evt){
-									return evt.skill=='xinjianying_backup'&&evt.getParent(2)==evtx;
-								})){
-									alert('检测到您安装了十周年UI等具有出牌特效的扩展。该扩展会导致【渐营】出现无视次数限制发动的bug。为避免无限循环，即将重启游戏。请卸载相关扩展以解决此问题。');
-									game.reload();
-								}
-							},
-						};
-						if(_status.event.xinjianying_suit) next.viewAs.suit=_status.event.xinjianying_suit;
-						return next;
-					},
-					prompt:function(links){
-						return '将一张牌当做'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+(_status.event.xinjianying_suit?('('+get.translation(_status.event.xinjianying_suit)+')'):'')+'使用';
-					},
-				},
-				ai:{
-					order:function(item,player){
-						if(_status.event.xinjianying_suit) return 16;
-						return 3;
-					},
-					result:{player:1},
-				},
-				subSkill:{
-					draw:{inherit:'jianying'},
-				},
 			},
 			//虞翻
 			xinzongxuan:{
@@ -8930,6 +8944,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				//priority:1,
 				audio:2,
+				audioname:['sb_huaxiong'],
 				filter:function (event){
 					return event.card&&event.card.name=='sha'&&(get.color(event.card)!='red'||event.source&&event.source.isAlive());
 				},
@@ -11551,7 +11566,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_reqingnang":"青囊",
 			"new_reqingnang_info":"出牌阶段，你可以弃置一张手牌，令一名本回合内未成为过〖青囊〗的目标的角色回复一点体力。若你弃置的是黑色牌，则你本回合内不能再发动〖青囊〗。",
 			"new_reyaowu":"耀武",
-			"new_reyaowu_info":"锁定技，当一名角色使用【杀】对你造成伤害时，若此杀为红色，该角色回复1点体力或摸一张牌。否则则你摸一张牌。",
+			"new_reyaowu_info":"锁定技，当一名角色使用【杀】对你造成伤害时，若此杀为红色，该角色回复1点体力或摸一张牌。否则你摸一张牌。",
 			reyaowu:'耀武',
 			reyaowu_info:'锁定技，当你受到牌造成的伤害时，若此牌为红色，则伤害来源摸一张牌；否则你摸一张牌。',
 			reqingguo:'倾国',
@@ -11935,9 +11950,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinzongxuan_info:'当你的牌因弃置而进入弃牌堆后，你可将其中的任意张牌置于牌堆顶。若剩余的牌中有锦囊牌，则你可以令一名其他角色获得其中的一张。',
 			xinzhiyan:'直言',
 			xinzhiyan_info:'结束阶段开始时，你可令一名角色摸一张牌（正面朝上移动）。若此牌为基本牌，则你摸一张牌。若此牌为装备牌，则其回复1点体力并使用此装备牌。',
-			xin_jushou:'界沮授',
-			xinjianying:'渐营',
-			xinjianying_info:'锁定技。①当你于出牌阶段内使用与此阶段你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌。②出牌阶段限一次，你可以将一张牌当做任意基本牌使用（不计入次数限制）。若你于此阶段内使用的上一张牌有花色，则此牌的花色视为上一张牌的花色。',
 			re_xiahoushi:'界夏侯氏',
 			reqiaoshi:'樵拾',
 			reqiaoshi_info:'其他角色的结束阶段开始时，若你的手牌数与其相等，则你可以与其各摸一张牌。若这两张牌花色相同，则你可以重复此步骤。',
@@ -11990,6 +12002,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcanxu_info:'出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之。然后若此牌不为黑桃，则你摸一张牌；若这两名角色手牌数相等，则你回复1点体力。',
 			dczhuiyi:'追忆',
 			dczhuiyi_info:'当你死亡时，你可以令一名不为击杀者的其他角色摸X张牌（X为存活角色数），然后其回复1点体力。',
+			re_jushou:'界沮授',
+			dcshibei:'矢北',
+			dcshibei_info:'锁定技，当你于一回合内第一次受到伤害后，你回复1点体力；当你于一回合内第二次受到伤害后，你失去1点体力。',
+			dcjianying:'渐营',
+			dcjianying_info:'当你使用与你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
