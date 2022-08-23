@@ -42257,7 +42257,17 @@
 								});
 							}
 							else{
-								lib.init.js(extensionURL.replace(/raw\.githubusercontent\.com/,'rawgit.com')+'catalog.js',null,loaded,function(){
+								lib.init.req(extensionURL.replace(/raw\.githubusercontent\.com/,'rawgit.com')+'catalog.js',function(){
+									try{
+										eval(this.responseText);
+									}
+									catch(e){
+										delete window.extension;
+										loading.innerHTML='连接失败';
+										return;
+									}
+									loaded();
+								},function(){
 									delete window.extension;
 									loading.innerHTML='连接失败';
 								});
