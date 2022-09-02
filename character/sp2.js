@@ -4,6 +4,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			dc_yanghu:['male','wei',3,['dcdeshao','dcmingfa']],
+			dc_huangzu:['male','qun',4,['dcjinggong','dcxiaojuan']],
 			caimaozhangyun:['male','wei',4,['lianzhou','jinglan']],
 			yanrou:['male','wei',4,['choutao','xiangshu']],
 			zhangyao:['female','wu',3,['yuanyu','xiyan']],
@@ -151,10 +153,224 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_xuzhou:['re_taoqian','caosong','zhangmiao','qiuliju'],
 				sp_zhongyuan:['re_hucheer','re_zoushi','caoanmin','re_dongcheng'],
 				sp_xiaohu:['haomeng','yanfuren'],
-				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','caobuxing','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng','ruanyu','re_dongzhao','yangwan','re_panshu','dufuren','zhouyi','caojinyu','re_sunyi','re_zhangbao','re_fengfangnv','mamidi','dc_jiben','licaiwei','dc_luotong','dc_zhuling','tengyin','dc_gaolan','guanning','caomao','laiyinger','dc_huangchengyan','tenggongzhu','yanrou','caimaozhangyun','zhangyao'],
+				sp_decade:['wulan','leitong','huaman','wangshuang','wenyang','re_liuzan','caobuxing','re_maliang','xin_baosanniang','re_xinxianying','dongxie','guozhao','fanyufeng','ruanyu','re_dongzhao','yangwan','re_panshu','dufuren','zhouyi','caojinyu','re_sunyi','re_zhangbao','re_fengfangnv','mamidi','dc_jiben','licaiwei','dc_luotong','dc_zhuling','tengyin','dc_gaolan','guanning','caomao','laiyinger','dc_huangchengyan','tenggongzhu','yanrou','caimaozhangyun','zhangyao','dc_huangzu'],
 			}
 		},
 		skill:{
+			//羊祜
+			dcdeshao:{
+				audio:2,
+				usable:2,
+				trigger:{target:'useCardToTargeted'},
+				filter:function(event,player){
+					return player!=event.player&&get.color(event.card)=='black';
+				},
+				logTarget:'player',
+				check:function(event,player){
+					var eff=get.effect(player,{name:'wuzhong'},player,player)/2;
+					if(player.countCards('h')+1<=event.player.countCards('h')&&event.player.countCards('he')>0) eff+=get.effect(event.player,{name:'guohe_copy2'},player,player);
+					return eff;
+				},
+				content:function(){
+					'step 0'
+					player.draw();
+					'step 1' 
+					var target=trigger.player;
+					if(player.countCards('h')<=target.countCards('h')&&target.countCards('he')>0){
+						player.discardPlayerCard(target,true,'he');
+						player.addExpose(0.2);
+					}
+				},
+			},
+			dcmingfa:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				direct:true,
+				filter:function(event,player){
+					return player.isPhaseUsing()&&(event.card.name=='sha'||get.type(event.card)=='trick')&&event.cards.filterInD().length>0&&!player.getExpansions('dcmingfa').length;
+				},
+				content:function(){
+					'step 0'
+					var str,cards=trigger.cards.filterInD(),card=trigger.card;
+					if(cards.length==1&&card.name==cards[0].name&&(card.nature||false)==(cards[0].nature||false)) str=get.translation(cards[0]);
+					else str=(get.translation(trigger.card)+'（'+get.translation(cards)+'）');
+					var cardx={
+						name:trigger.card.name,
+						nature:trigger.card.nature,
+						isCard:true,
+					};
+					player.chooseTarget(lib.filter.notMe,get.prompt('dcmingfa'),'将'+str+'作为“明伐”牌置于武将牌上，并选择一名其他角色。该角色下回合结束时对其执行〖明伐〗的后续效果。').set('card',cardx).set('goon',function(){
+						var getMax=function(card){
+							return Math.max.apply(Math,game.filterPlayer(function(current){
+								return current!=player&&lib.filter.targetEnabled2(card,player,current);
+							}).map(function(i){
+								return get.effect(i,card,player,player)*Math.sqrt(Math.min(i.getHandcardLimit(),1+i.countCards('h')));
+							}).concat([0]));
+						}
+						var eff1=getMax(cardx);
+						if(player.hasCard(function(card){
+							if((card.name!='sha'&&get.type(card)!='trick')||!player.hasValueTarget(card,null,true)) return false;
+							return getMax({
+								name:get.name(card),
+								nature:get.nature(card),
+								isCard:true,
+							})>=eff1;
+						},'hs')) return false;
+						return true;
+					}()).set('ai',function(target){
+						if(!_status.event.goon) return 0;
+						var player=_status.event.player,card=_status.event.card;
+						if(!lib.filter.targetEnabled2(card,player,target)) return 0;
+						return get.effect(target,card,player,player)*Math.sqrt(Math.min(target.getHandcardLimit(),1+target.countCards('h')));
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('dcmingfa',target);
+						var card={
+							name:trigger.card.name,
+							nature:trigger.card.nature,
+							isCard:true,
+						};
+						player.storage.dcmingfa_info=[card,target];
+						player.addToExpansion(trigger.cards.filterInD(),'gain2').gaintag.add('dcmingfa');
+					}
+				},
+				group:'dcmingfa_use',
+				ai:{expose:0.2},
+				intro:{
+					mark:function(dialog,storage,player){
+						var cards=player.getExpansions('dcmingfa');
+						if(!cards.length) return '没有“明伐”牌';
+						else dialog.add(cards);
+						var info=player.storage.dcmingfa_info;
+						if(info){
+							dialog.addText('记录牌：'+get.translation(info[0])+'<br>记录目标：'+get.translation(info[1]));
+						}
+					},
+					content:'expansion',
+				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+					delete player.storage.dcmingfa_info;
+				},
+				subSkill:{
+					use:{
+						audio:'dcmingfa',
+						trigger:{global:['phaseEnd','die']},
+						forced:true,
+						filter:function(event,player){
+							if(!player.storage.dcmingfa_info||!player.getExpansions('dcmingfa').length) return false;
+							return event.player==player.storage.dcmingfa_info[1];
+						},
+						content:function(){
+							'step 0'
+							var target=trigger.player;
+							event.target=target;
+							var card=player.storage.dcmingfa_info[0];
+							delete player.storage.dcmingfa_info;
+							event.card=card;
+							event.count=Math.min(5,target.countCards('h'));
+							if(event.count<=0) event.goto(2);
+							'step 1'
+							event.count--;
+							if(target.isIn()&&lib.filter.targetEnabled2(card,player,target)){
+								player.useCard(get.copy(card),target);
+								if(event.count>0) event.redo();
+							}
+							'step 2'
+							var cards=player.getExpansions('dcmingfa');
+							if(cards.length>0) player.loseToDiscardpile(cards);
+						},
+					},
+				},
+			},
+			//黄祖
+			dcjinggong:{
+				audio:2,
+				enable:'chooseToUse',
+				mod:{
+					targetInRange:function(card){
+						if(card.storage&&card.storage.dcjinggong) return true;
+					},
+				},
+				viewAsFilter:function(player){
+					return player.hasCard(function(card){
+						return get.type(card)=='equip';
+					},'ehs');
+				},
+				position:'hes',
+				filterCard:{type:'equip'},
+				viewAs:{
+					name:'sha',
+					storage:{dcjinggong:true},
+				},
+				check:function(card){
+					return 6-get.value(card);
+				},
+				ai:{
+					respondSha:true,
+					skillTagFilter:function(player){
+						return player.hasCard(function(card){
+							return get.type(card)=='equip';
+						},'ehs');
+					},
+				},
+				group:'dcjinggong_base',
+				subSkill:{
+					base:{
+						trigger:{player:'useCard1'},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						filter:function(event,player){
+							return event.skill=='dcjinggong'&&event.targets.length>0;
+						},
+						content:function(){
+							trigger.baseDamage=get.distance(player,trigger.targets[0]);
+						},
+					},
+				},
+			},
+			dcxiaojuan:{
+				audio:2,
+				trigger:{player:'useCardToPlayered'},
+				logTarget:'target',
+				filter:function(event,player){
+					return event.targets.length==1&&player!=event.target&&event.target.countCards('h')>1;
+				},
+				check:function(event,player){
+					var target=event.target;
+					if(get.attitude(player,target)>=0) return false;
+					if(get.color(event.card)=='none') return true;
+					return Math.floor(target.countCards('h')/2)>=Math.floor(player.countCards('h')/2);
+				},
+				content:function(){
+					'step 0'
+					var target=trigger.target;
+					event.target=target;
+					var num=Math.floor(target.countCards('h')/2);
+					if(num>0) player.discardPlayerCard(target,'h',num,true);
+					else event.finish();
+					'step 1'
+					var color=get.color(trigger.card);
+					if(result.bool&&color!='none'&&player.countCards('h')>1){
+						var bool=false;
+						for(var i of result.cards){
+							if(get.color(i,target)==color){
+								bool=true;
+								break;
+							}
+						}
+						if(!bool) event.finish();
+					}
+					else event.finish();
+					'step 2'
+					var num=Math.floor(player.countCards('h')/2);
+					if(num>0) player.chooseToDiscard('h',num,true);
+				},
+			},
 			//蔡瑁张允
 			lianzhou:{
 				audio:2,
@@ -5170,7 +5386,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var cards=[];
 					while(cards.length<2){
-						var card=get.cardPile(function(card){
+						var card=get.cardPile2(function(card){
 							return !cards.contains(card)&&get.number(card)==6;
 						});
 						if(!card) break;
@@ -9371,6 +9587,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.goto(4);
 					'step 3'
 					target.reinit(result.control,'guansuo');
+					if(target.name=='guansuo'&&target.group!='shu') target.changeGroup('shu');
 					if(_status.characterlist){
 						_status.characterlist.add(result.control);
 						_status.characterlist.remove('guansuo');
@@ -16084,6 +16301,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lianzhou_info:'锁定技。准备阶段，你横置你的武将牌。然后你可横置任意名体力值等于你的角色。',
 			jinglan:'惊澜',
 			jinglan_info:'锁定技。当你造成伤害后，若你的手牌数：大于体力值，你弃置三张手牌；等于体力值，你弃置一张手牌并回复1点体力；小于体力值，你受到1点无来源火焰伤害并摸四张牌。',
+			dc_huangzu:'黄祖',
+			dcjinggong:'精弓',
+			dcjinggong_info:'你可以将一张装备牌当做无距离限制的【杀】使用。当你声明使用此【杀】时，你将此杀的伤害值基数改为X（X为你至此【杀】第一个目标角色的距离且至多为3）。',
+			dcxiaojuan:'骁隽',
+			dcxiaojuan_info:'当你使用牌指定其他角色为唯一目标后，你可以弃置其一半的手牌（向下取整）。若这些牌中有与你使用牌花色相同的牌，则你弃置一半的手牌（向下取整）。',
+			dc_yanghu:'羊祜',
+			dcdeshao:'德劭',
+			dcdeshao_info:'每回合限两次。当你成为其他角色使用的黑色牌的目标后，你可以摸一张牌，然后若其手牌数不小于你，则你弃置其一张牌。',
+			dcmingfa:'明伐',
+			dcmingfa_info:'①出牌阶段限一次。当你使用【杀】或普通锦囊牌结算结束后，若你的武将牌上没有“明伐”牌，则你可以将此牌作为“明伐”牌置于武将牌上并选择一名其他角色，记录该角色和此牌的名称。②一名角色的回合结束时，若其是你〖明伐①〗记录的角色，则你视为对其依次使用X张〖明伐①〗记录的牌，然后移去“明伐”牌（X为其手牌数且至多为5）。③一名角色死亡时，若其是你〖明伐①〗记录的角色，则你移去“移去”牌。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

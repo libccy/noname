@@ -247,16 +247,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target==player){
 								if(typeof _status.event.filterCard=='function'&&
 									_status.event.filterCard({name:'huogong'},player,_status.event)){
-									return -1.5;
+									return -1.15;
 								}
 								if(_status.event.skill){
 									var viewAs=get.info(_status.event.skill).viewAs;
-									if(viewAs=='huogong') return -1.5;
-									if(viewAs&&viewAs.name=='huogong') return -1.5;
+									if(viewAs=='huogong') return -1.15;
+									if(viewAs&&viewAs.name=='huogong') return -1.15;
 								}
 								return 0;
 							}
-							return -1.5;
+							return -1.15;
 						}
 					},
 					tag:{

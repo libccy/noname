@@ -95,6 +95,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_chentai:['male','wei',4,['nsweiyuan','nsjuxian']],
 			ns_zhangning:['female','qun',3,['nsfuzhou','nsguidao','nstaiping']],
 			ns_yanghu:['male','jin',3,['nsbizhao','nsqingde','nsyidi'],['hiddenSkill']],
+			ns_zanghong:['male','qun',4,['nsshimeng']],
+			ns_ruanji:['male','wei',3,['nsshizui','nsxiaoye']],
 			
 			ns_zhangwei:['female','shu',3,['nsqiyue','nsxuezhu']],
 			diy_wenyang:['male','wei','4/6',['lvli','choujue']],
@@ -196,6 +198,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
 				diy_yijiang2:["key_yuuki","key_tenzen","key_kyouko","key_kotarou","key_kyou",
 				"ns_chentai","ns_huangwudie","ns_sunyi","ns_zhangning","ns_yanghu"],
+				diy_yijiang3:['ns_ruanji','ns_zanghong'],
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu"],
 				diy_xushi:["diy_feishi","diy_hanlong","diy_liufu","diy_liuyan","diy_liuzan","diy_tianyu","diy_xizhenxihong","diy_yangyi","diy_zaozhirenjun"],
@@ -307,6 +310,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_sunyi:'#g无民氏4251',
 			ns_zhangning:'#g如颍隋行1314',
 			ns_yanghu:'#ginCenv',
+			ns_ruanji:'#g伯约的崛起',
+			ns_zanghong:'#g阿七',
 			
 			ns_luyusheng:'#g猫咪大院 - 魚と水',
 			ns_caimao:'#gP尔号玩家◆',
@@ -514,6 +519,141 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			//阮籍
+			nsshizui:{
+				trigger:{target:'useCardToTargeted'},
+				usable:1,
+				direct:true,
+				filter:function(event,player){
+					var type=get.type(event.card,null,false);
+					return (type=='basic'||type=='trick')&&player.countCards('he')>0&&player.hasUseTarget({name:'jiu'},null,true);
+				},
+				content:function(){
+					'step 0'
+					var suit=get.suit(trigger.card),cards=trigger.cards.filterInD();
+					var str='弃置一张牌并视为使用一张【酒】';
+					if(lib.suit.contains(suit)) str+=('；若弃置'+get.translation(suit)+'牌，则'+get.translation(trigger.card)+'对你无效');
+					if(cards.length) str+=('；若弃置♣牌则获得'+get.translation(cards));
+					str+='。';
+					var next=player.chooseToDiscard('he',get.prompt('nsshizui'),str);
+					next.set('val1',cards.length?get.value(cards,player):0);
+					next.set('val2',-get.effect(player,trigger.card,trigger.player,player));
+					next.set('suit',suit);
+					next.set('ai',function(card){
+						var base=2,suit=get.suit(card);
+						if(suit=='club') base+=_status.event.val1;
+						if(suit==_status.event.suit) base+=_status.event.val2;
+						return base-get.value(card);
+					}).logSkill='nsshizui';
+					'step 1'
+					if(result.bool){
+						event.suit1=get.suit(result.cards[0],player);
+						player.chooseUseTarget('jiu',true);
+					}
+					else{
+						player.storage.counttrigger.nsshizui--;
+						event.finish();
+					}
+					'step 2'
+					var suit1=event.suit1,suit2=get.suit(trigger.card,false);
+					if(suit1==suit2&&lib.suit.contains(suit1)) trigger.excluded.add(player);
+					if(suit1=='club'){
+						var cards=trigger.cards.filterInD();
+						if(cards.length>0) player.gain(cards,'gain2');
+					}
+				},
+			},
+			nsxiaoye:{
+				trigger:{global:'phaseJieshuBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.hasHistory('useCard',function(evt){
+						return evt.card.name=='jiu';
+					})&&event.player.hasHistory('useCard',function(evt){
+						return (evt.card.name=='sha'||get.type(evt.card)=='trick')&&player.hasUseTarget({
+							name:evt.card.name,
+							nature:evt.card.nature,
+							isCard:true,
+						});
+					})
+				},
+				content:function(){
+					'step 0'
+					var list=[];
+					trigger.player.getHistory('useCard',function(evt){
+						if(evt.card.name!='sha'&&get.type(evt.card)!='trick') return;
+						if(evt.card.name=='sha'&&evt.card.nature) list.add('sha:'+evt.card.nature);
+						else list.add(evt.card.name);
+					});
+					for(var i=0;i<list.length;i++){
+						if(list[i].indexOf('sha:')==0) list[i]=['基本','','sha',list[i].slice(4)];
+						else list[i]=[get.type(list[i]),'',list[i]];
+					}
+					player.chooseButton([get.prompt('nsxiaoye'),[list,'vcard']]).set('filterButton',function(button){
+						return player.hasUseTarget({name:button.link[2],nature:button.link[3],isCard:true});
+					}).set('ai',function(button){
+						return player.getUseValue({name:button.link[2],nature:button.link[3],isCard:true});
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('nsxiaoye');
+						player.chooseUseTarget(true,{name:result.links[0][2],nature:result.links[0][3],isCard:true});
+					}
+				},
+			},
+			//臧洪
+			nsshimeng:{
+				enable:'phaseUse',
+				usable:1,
+				selectTarget:[1,Infinity],
+				filterTarget:true,
+				contentBefore:function(){
+					event.getParent()._nsshimeng_count=[0,0];
+				},
+				content:function(){
+					'step 0'
+					if(!target.isIn()){
+						event.finish();
+						return;
+					}
+					target.chooseToUse('使用一张【杀】，或摸一张牌',function(card,player){
+						if(get.name(card)!='sha') return false;
+						return lib.filter.cardEnabled.apply(this,arguments);
+					}).set('addCount',false);
+					'step 1'
+					if(result.bool){
+						event.getParent()._nsshimeng_count[0]++;
+					}
+					else{
+						event.getParent()._nsshimeng_count[1]++;
+						target.draw();
+					}
+				},
+				contentAfter:function(){
+					var list=event.getParent()._nsshimeng_count;
+					if(list[0]<list[1]){
+						player.changeHujia(1);
+						player.loseHp();
+					}
+				},
+				ai:{
+					order:3.05,
+					result:{
+						player:function(player,target){
+							var att=get.attitude(player,target);
+							if(att<=0) return 0;
+							if(player.hp>1||player.countCards('hs',['tao','jiu'])) return 1;
+							if(!ui.selected.targets.length){
+								if(target!=player) return 0;
+								if(player.hasSha()) return 1;
+								return 0;
+							}
+							if(ui.selected.targets.length>1&&!target.hasSha()) return 0;
+							return 1;
+						},
+					},
+				},
+			},
 			tenzen_fenghuan:{
 				trigger:{global:'useCardAfter'},
 				direct:true,
@@ -16216,6 +16356,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			moshou_info:'锁定技，你不能成为乐不思蜀和兵粮寸断的目标。',
 			xicai_info:'你可以立即获得对你造成伤害的牌',
 			diyjianxiong_info:'锁定技，在身份局中，在你回合内死亡的角色均视为反贼，国战中，在你回合内死亡的角色若与你势力相同则随机改为另一个势力',
+			
+			ns_zanghong:'臧洪',
+			nsshimeng:'誓盟',
+			nsshimeng_info:'出牌阶段限一次，你可以选择任意名角色。这些角色依次选择一项：⒈摸一张牌。⒉使用一张【杀】。然后若选择前者角色数大于选择后者的角色数，则你获得1点护甲并失去1点体力。',
+			ns_ruanji:'阮籍',
+			nsshizui:'酾醉',
+			nsshizui_info:'每回合限一次。当你成为基本牌或普通锦囊牌的目标后，你可以弃置一张牌，然后视为使用一张【酒】。若你弃置的牌与其使用的牌花色相同，则此牌对你无效；若你弃置的牌为♣，则你获得其使用的牌。',
+			nsxiaoye:'啸野',
+			nsxiaoye_info:'一名角色的结束阶段开始时，若你于当前回合內使用过【酒】，则你可以视为使用一张其于本回合内使用过的【杀】或普通锦囊牌。',
+			
 			junk_zhangrang:'四花张让',
 			junktaoluan:'滔乱',
 			junktaoluan3:'滔乱',
@@ -16238,6 +16388,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_key:'论外',
 			diy_yijiang:'设计比赛2020',
 			diy_yijiang2:'设计比赛2021',
+			diy_yijiang3:'设计比赛2022',
 			diy_fakenews:'假新闻',
 			diy_trashbin:'垃圾桶',
 			old_jiakui:'贾逵重制',

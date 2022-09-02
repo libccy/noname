@@ -2390,7 +2390,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.target=result.targets[0];
 						player.line(event.target,'green');
-						player.give(event.card,event.target);
+						player.give(card,event.target,true);
 					}
 					else ui.cardPile.appendChild(event.card);
 					game.updateRoundNumber();
@@ -2455,7 +2455,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huatuo:['re_huatuo','old_huatuo','huatuo'],
 			huaxiong:['re_huaxiong','old_huaxiong','huaxiong','ol_huaxiong'],
 			yuanshu:['yl_yuanshu','yuanshu','re_yuanshu','old_yuanshu','ol_yuanshu'],
-			gongsunzan:['re_gongsunzan','xin_gongsunzan','sp_gongsunzan','gongsunzan'],
+			gongsunzan:['dc_gongsunzan','re_gongsunzan','xin_gongsunzan','gongsunzan'],
 		},
 		translate:{
 			caocao:'曹操',
@@ -2475,7 +2475,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangliao:'张辽',
 			xuzhu:'许褚',
 			guojia:'郭嘉',
-			zhenji:'甄姬',
+			zhenji:'甄宓',
 			liubei:'刘备',
 			guanyu:'关羽',
 			zhangfei:'张飞',

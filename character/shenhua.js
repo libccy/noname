@@ -516,7 +516,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else{
-						var prompt='罪论：将'+get.cnNumber(num)+'牌置于牌堆顶';
+						var prompt='罪论：将'+get.cnNumber(num)+'张牌置于牌堆顶';
 						if(num<3) prompt+='并获得其余的牌';
 						var next=player.chooseToMove(prompt,true);
 						if(num<3){
@@ -1703,7 +1703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								list.push(trigger.cards[i]);
 							}
 						}
-						player.give(list,zhu);
+						zhu.gain(list,'gain2');
 						zhu.chooseBool().set('ai',function(){
 							if(get.attitude(zhu,player)>0) return true;
 							return false;
@@ -7252,7 +7252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		card:{},
 		dynamicTranslate:{
 			nzry_juzhan:function(player){
-				if(player.storage.nzry_juzhan1==true) return '转换技，阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。<span class="bluetext">阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。</span>';
+				if(player.storage.nzry_juzhan==true) return '转换技，阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。<span class="bluetext">阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。</span>';
 				return '转换技，<span class="bluetext">阴：当你成为其他角色【杀】的目标后，你可以与其各摸一张牌，然后其本回合内不能再对你使用牌。</span>阳：当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌。';
 			},
 			nzry_zhenliang:function(player){

@@ -44,7 +44,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			manchong:['male','wei',3,['junxing','yuce']],
 			chenqun:['male','wei',3,['pindi','faen']],
 			sunluban:['female','wu',3,['chanhui','jiaojin']],
-			guyong:['male','wu',3,['shenxing','bingyi']],
+			guyong:['male','wu',3,['shenxing','olbingyi']],
 			caifuren:['female','qun',3,['qieting','xianzhou']],
 			yj_jushou:['male','qun',3,['jianying','shibei']],
 			zhangsong:['male','shu',3,['qiangzhi','xiantu']],
@@ -194,6 +194,53 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhonghui:['jiangwei'],
 		},
 		skill:{
+			//顾雍
+			olbingyi:{
+				audio:'bingyi',
+				trigger:{player:'loseAfter'},
+				filter:function(event,player){
+					return event.type=='discard'&&player.countCards('h')>0&&!player.hasSkill('olbingyi_blocker',null,null,false);
+				},
+				prompt2:function(event,player){
+					var str='展示所有手牌，然后',hs=player.getCards('h');
+					var color=get.color(hs);
+					if(color=='none') return str+'无事发生';
+					str+=('令至多'+get.cnNumber(hs.length)+'名其他角色和自己各摸一张牌');
+					return str;
+				},
+				check:function(event,player){
+					var color=get.color(player.getCards('h'));
+					return color!='none';
+				},
+				content:function(){
+					'step 0'
+					player.addTempSkill('olbingyi_blocker',['phaseZhunbeiAfter','phaseJudgeAfter','phaseDrawAfter','phaseUseAfter','phaseDiscardAfter','phaseJieshuAfter']);
+					player.showHandcards(get.translation(player)+'发动了【秉壹】');
+					if(get.color(player.getCards('h'))=='none') event.finish();
+					'step 1'
+					var num=player.countCards('h');
+					player.chooseTarget([1,num],'令至多'+get.cnNumber(num)+'名角色也各摸一张牌',lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player;
+						var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+						if(target.hasSkillTag('nogain')) att/=10;
+						return att;
+					});
+					'step 2'
+					var targets=[player];
+					if(result.bool){
+						targets.addArray(result.targets);
+						player.line(targets,'green');
+						game.asyncDraw(targets.sortBySeat());
+					}
+					else{
+						player.draw();
+						event.finish();
+					}
+					'step 3'
+					game.delayx();
+				},
+				subSkill:{blocker:{charlotte:true}},
+			},
 			//孙体
 			xinzhaofu:{
 				mark:false,
@@ -8744,14 +8791,50 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				selectCard:2,
 				prompt:'弃置两张牌并摸一张牌',
-				check:function(card){return 4-get.useful(card)},
+				check:function(card){
+					var player=_status.event.player;
+					if(!player.hasSkill('olbingyi')||player.hasSkill('olbingyi_blocker',null,null,false)) return 4-get.value(card);
+					var red=0,black=0,hs=player.getCards('h');
+					for(var i of hs){
+						if(ui.selected.cards.contains(i)) continue;
+						var color=get.color(i,player);
+						if(color=='red') red++;
+						if(color=='black') black++;
+					}
+					if(red>2&&black>2) return 4-get.value(card);
+					if(red==0||black==0) return 8-get.value(card);
+					var color=get.color(red);
+					if(black<=red) return ((color=='black'&&get.position(card)=='h')?8:4)-get.value(card);
+					return ((color=='red'&&get.position(card)=='h'?8:4))-get.value(card);
+				},
 				content:function(){
 					player.draw();
 				},
 				ai:{
-					order:1,
+					order:9,
 					result:{
-						player:1
+						player:function(player,target){
+							if(!ui.selected.cards.length) return 1;
+							if(!player.hasSkill('olbingyi')||player.hasSkill('olbingyi_blocker',null,null,false)) return 1;
+							var red=0,black=0,hs=player.getCards('h');
+							for(var i of hs){
+								if(ui.selected.cards.contains(i)) continue;
+								var color=get.color(i);
+								if(color=='red') red++;
+								if(color=='black') black++;
+							}
+							var val=0;
+							for(var i of ui.selected.cards) val+=get.value(i,player);
+							if(red==0||black==0){
+								if(red+black==0) return 0;
+								var num=Math.min(red+black,game.countPlayer(function(current){
+									return current!=player&&get.attitude(player,current)>0&&!current.hasSkillTag('nogain');
+								}))+1;
+								if(num*7>val) return 1;
+							}
+							if(val<8) return 1;
+							return 0;
+						},
 					},
 				},
 			},
@@ -12086,9 +12169,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guotufengji:['re_guotufengji','guotufengji'],
 			guanping:['re_guanping','guanping'],
 			caifuren:['xin_caifuren','re_caifuren','caifuren'],
-			guyong:['re_guyong','xin_guyong','guyong'],
+			guyong:['guyong','re_guyong','xin_guyong'],
 			yj_jushou:['re_jushou','xin_jushou','yj_jushou'],
 			guohuanghou:['re_guohuanghou','guohuanghou'],
+			liuchen:['re_liuchen','liuchen'],
 		},
 		translate:{
 			old_huaxiong:'华雄',
@@ -12111,7 +12195,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caochong:'曹冲',
 			bulianshi:'步练师',
 			handang:'韩当',
-			fuhuanghou:'伏皇后',
+			fuhuanghou:'伏寿',
 			caifuren:'蔡夫人',
 			zhonghui:'钟会',
 			old_zhonghui:'旧钟会',
@@ -12668,6 +12752,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinkuangbi_info:'出牌阶段限一次。你可以令一名其他角色交给你至多三张牌（不计入你本回合的手牌上限）。然后其于其的下回合开始时摸等量的牌。',
 			xinzhaofu:'诏缚',
 			xinzhaofu_info:'主公技，限定技。出牌阶段，你可选择至多两名其他角色。这两名角色视为在所有其他吴势力角色的攻击范围内。',
+			olbingyi:'秉壹',
+			olbingyi_info:'每阶段限一次。当你因弃置而失去牌后，你可以展示所有手牌。若这些牌的颜色均相同，则你可以与至多X名其他角色各摸一张牌（X为你的手牌数）。',
 			
 			yijiang_2011:'一将成名2011',
 			yijiang_2012:'一将成名2012',

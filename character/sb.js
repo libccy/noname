@@ -89,6 +89,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						equipSkill:false,
 						inherit:'qinggang_skill',
 						charlotte:true,
+						nopop:true,
 						mod:{
 							targetInRange:function(card){
 								if(card.name=='sha') return true;

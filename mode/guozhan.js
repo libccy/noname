@@ -363,7 +363,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_single:['gz_re_xushu','gz_yanbaihu','gz_wujing','gz_dongzhao','gz_huangzu','gz_zhugeke','gz_liuba','gz_zhuling'],
 				guozhan_double:['gz_tangzi','gz_liuqi','gz_mengda','gz_mifangfushiren','gz_zhanglu','gz_shixie','gz_xuyou','gz_xiahouba','gz_panjun','gz_xf_sufei','gz_wenqin','gz_pengyang'],
 				guozhan_yexinjia:['gz_zhonghui','gz_simazhao','gz_gongsunyuan','gz_sunchen'],
-				guozhan_zongheng:['gz_huaxin','gz_luyusheng','gz_zongyu','gz_miheng','gz_fengxi','gz_dengzhi','gz_re_xunchen'],
+				guozhan_zongheng:['gz_huaxin','gz_luyusheng','gz_zongyu','gz_miheng','gz_fengxi','gz_dengzhi','gz_re_xunchen','gz_dc_yanghu'],
 				guozhan_others:["gz_lingcao","gz_lifeng","gz_beimihu","gz_jianggan","gz_key_ushio","gz_sp_duyu","gz_re_nanhualaoxian","gz_zhouyi","gz_lvlingqi","gz_liaohua","gz_zhugejin","gz_yangxiu","gz_chendao","gz_fuwan","gz_zumao"],
 			}
 		},
@@ -519,6 +519,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_zhouyi:['female','wu',3,['gzzhukou','gzduannian','gzlianyou']],
 				gz_re_xunchen:['male','qun',3,['gzfenglve','gzanyong']],
 				gz_lvlingqi:['female','qun',4,['guowu','gzshenwei','gzzhuangrong']],
+				gz_dc_yanghu:['male','wei',3,['gzdeshao','gzmingfa']],
 				
 				gz_cuimao:['male','wei',3,['gzzhengbi','gzfengying'],[]],
 				gz_yujin:['male','wei',4,['gzjieyue'],['gzskin']],
@@ -555,6 +556,75 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//十周年羊祜
+			gzdeshao:{
+				audio:'dcdeshao',
+				trigger:{target:'useCardToTargeted'},
+				preHidden:true,
+				countUnseen:function(player){
+					var num=0;
+					if(player.isUnseen(0)) num++;
+					if(player.isUnseen(1)) num++;
+					return num;
+				},
+				filter:function(event,player){
+					if(player==event.player||event.targets.length!=1||get.color(event.card)!='black') return false;
+					if(lib.skill.gzdeshao.countUnseen(event.player)<lib.skill.gzdeshao.countUnseen(player)||!event.player.countCards('he')) return false;
+					return player.getHistory('useSkill',function(evt){
+						return evt.skill=='gzdeshao';
+					}).length<player.hp;
+				},
+				check:function(event,player){
+					return get.effect(event.player,{name:'guohe_copy2'},player,player)>0;
+				},
+				logTarget:'player',
+				content:function(){
+					player.discardPlayerCard(trigger.player,true,'he');
+				},
+			},
+			gzmingfa:{
+				audio:'dcmingfa',
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return player!=target&&target.isEnemyOf(player);
+				},
+				content:function(){
+					player.markAuto('gzmingfa',targets);
+					game.delayx();
+				},
+				onremove:true,
+				ai:{
+					order:1,
+					result:{target:-1},
+				},
+				group:'gzmingfa_effect',
+				subSkill:{
+					effect:{
+						audio:'dcmingfa',
+						trigger:{global:'phaseEnd'},
+						forced:true,
+						filter:function(event,player){
+							return player.getStorage('gzmingfa').contains(event.player);
+						},
+						logTarget:'player',
+						content:function(){
+							var target=trigger.player;
+							player.unmarkAuto('gzmingfa',[target]);
+							if(target.isIn()){
+								var num=player.countCards('h')-target.countCards('h');
+								if(num>0){
+									target.damage();
+									player.gainPlayerCard(target,true,'h');
+								}
+								else if(num<0){
+									player.draw(Math.min(5,-num));
+								}
+							}
+						},
+					},
+				},
+			},
 			//海外服国战
 			//杨修
 			gzdanlao:{
@@ -567,6 +637,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzjilei:{
 				inherit:'jilei',
+				preHidden:true,
 				content:function(){
 					'step 0'
 					player.chooseControl('basic','trick','equip','cancel2',function(){
@@ -9086,223 +9157,90 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ai:{
 					threaten:2,
 				},
-				group:['zhangwu_gain','zhangwu_clear','zhangwu_count1','zhangwu_count2','zhangwu_count3'],
-				subSkill:{
-					gain:{
-						audio:'zhangwu',
-						trigger:{global:['discardAfter','respondAfter','useCardAfter','equipAfter',
-							'judgeAfter','useSkillAfter','phaseDrawBegin','phaseAfter']},
-						forced:true,
-						filter:function(event,player){
-							if(player.storage.zhangwu){
-								for(var i=0;i<player.storage.zhangwu.length;i++){
-									if(get.owner(player.storage.zhangwu[i])==player) continue;
-									var position=get.position(player.storage.zhangwu[i]);
-									if(position&&position!='s'&&position!='c'){
-										return true;
-									}
-								}
-							}
-							if(event.name=='equip'&&player!=event.player&&event.card.name=='feilongduofeng') return true;
-							//if(game.hasPlayer(function(current){
-							//	return current!=player&&current.getEquip('feilongduofeng');
-							//})){
-							//	return true;
-							//}
-							if(['discard','respond','useCard'].contains(event.name)&&event.cards){
-								for(var i=0;i<event.cards.length;i++){
-									if(event.cards[i].name=='feilongduofeng'&&get.position(event.cards[i])=='d'){
-										return true;
-									}
-								}
-							}
-							for(var i=0;i<ui.discardPile.childElementCount;i++){
-								if(ui.discardPile.childNodes[i].name=='feilongduofeng') return true;
+				trigger:{
+					global:['loseAfter','cardsDiscardAfter','equipAfter'],
+				},
+				forced:true,
+				filter:function(event,player){
+					if(event.name=='equip'){
+						if(player==event.player) return false;
+						if(event.card.name=='feilongduofeng'&&event.player.getCards('e').contains(event.card)) return true;
+						return event.player.hasHistory('lose',function(evt){
+							if(evt.position!=ui.discardPile||evt.getParent().name!='equip') return false;
+							for(var i of evt.cards){
+								if(i.name=='feilongduofeng'&&get.position(i,true)=='d') return true;
 							}
 							return false;
-						},
-						content:function(){
-							'step 0'
-							if(trigger.name=='equip'||trigger.name=='respond'||trigger.delay==false) game.delay();
-							'step 1'
-							var list=[];
-							/*game.countPlayer(function(current){
-								if(current!=player){
-									var es=current.getEquip('feilongduofeng');
-									if(es){
-										list.add(es);
-									}
-								}
-							});*/
-							if(trigger.name=='equip'&&player!=trigger.player) list.add(trigger.card);
-							if(['discard','respond','useCard'].contains(trigger.name)&&trigger.cards){
-								for(var i=0;i<trigger.cards.length;i++){
-									if(trigger.cards[i].name=='feilongduofeng'&&get.position(trigger.cards[i])=='d'){
-										trigger.cards[i].fix();
-										list.add(trigger.cards[i]);
-										ui.special.appendChild(trigger.cards[i]);
-									}
-								}
+						})
+					}
+					if(event.name=='lose'&&(event.position!=ui.discardPile||event.getParent().name=='equip')) return false;
+					for(var i of event.cards){
+						if(i.name=='feilongduofeng'&&get.position(i,true)=='d') return true;
+					}
+					return false;
+				},
+				logTarget:function(event,player){
+					if(event.name=='equip'&&event.card.name=='feilongduofeng'&&event.player.getCards('e').contains(event.card)) return event.player;
+					return [];
+				},
+				content:function(){
+					game.delayx();
+					var cards=[];
+					if(trigger.name=='equip'){
+						if(trigger.card.name=='feilongduofeng'&&trigger.player.getCards('e').contains(trigger.card)) cards.push(trigger.card);
+						trigger.player.getHistory('lose',function(evt){
+							if(evt.position!=ui.discardPile||evt.getParent()!=trigger) return false;
+							for(var i of evt.cards){
+								if(i.name=='feilongduofeng'&&get.position(i,true)=='d') cards.push(i);
 							}
-							for(var i=0;i<ui.discardPile.childElementCount;i++){
-								if(ui.discardPile.childNodes[i].name=='feilongduofeng'){
-									list.add(ui.discardPile.childNodes[i]);
-									ui.special.appendChild(ui.discardPile.childNodes[i]);
-								}
-							}
-							var list2=[];
-							if(player.storage.zhangwu){
-								for(var i=0;i<list.length;i++){
-									if(player.storage.zhangwu.contains(list[i])){
-										player.storage.zhangwu.remove(list[i]);
-										list2.add(list[i]);
-										list.splice(i--,1);
-									}
-								}
-								for(var i=0;i<player.storage.zhangwu.length;i++){
-									if(get.owner(player.storage.zhangwu[i])==player) continue;
-									var position=get.position(player.storage.zhangwu[i]);
-									if(position&&position!='s'&&position!='c'){
-										list2.add(player.storage.zhangwu[i]);
-									}
-								}
-							}
-							if(list.length){
-								player.gain(list);
-								var owner=get.owner(list[0]);
-								if(trigger.name!='respond'&&owner){
-									player.line(owner,'green');
-									owner.$give(list,player);
-								}
-								else{
-									player.$gain2(list,true);
-								}
-								event.delay=true;
-							}
-							if(list2.length){
-								player.showCards(get.translation(player)+'发动了【章武】',list2);
-								for(var i=0;i<list2.length;i++){
-									var owner=get.owner(list2[i]);
-									if(owner){
-										owner.lose(list2[i],ui.special);
-										event.delay=true;
-									}
-								}
-								event.list2=list2;
-							}
-							'step 2'
-							if(event.delay){
-								game.delay();
-							}
-							'step 3'
-							if(event.list2&&event.list2.length){
-								for(var i=0;i<event.list2.length;i++){
-									event.list2[i].fix();
-									ui.cardPile.appendChild(event.list2[i]);
-								}
-								game.log(player,'将',event.list2,'置于牌堆底');
-								player.draw(2);
-							}
-						}
-					},
-					count1:{
-						trigger:{player:'loseAfter'},
-						silent:true,
-						filter:function(event,player){
-							if(event.type!='gain'&&event.type!='equip') return true;
-							if(event.parent.player==player) return true;
 							return false;
-						},
-						content:function(){
-							if(!player.storage.zhangwu){
-								player.storage.zhangwu=[];
-							}
-							for(var i=0;i<trigger.stockcards.length;i++){
-								if(trigger.stockcards[i].name=='feilongduofeng'){
-									player.storage.zhangwu.add(trigger.stockcards[i]);
-								}
-							}
-						}
-					},
-					count2:{
-						audio:'zhangwu',
-						trigger:{player:'loseAfter'},
-						forced:true,
-						filter:function(event,player){
-							if(lib.skill.zhangwu_count1.filter(event,player)){
-								return false;
-							}
-							for(var i=0;i<event.stockcards.length;i++){
-								if(event.stockcards[i].name=='feilongduofeng'){
-									return true;
-								}
-							}
-						},
-						content:function(){
-							'step 0'
-							var list=[];
-							for(var i=0;i<trigger.stockcards.length;i++){
-								if(trigger.stockcards[i].name=='feilongduofeng'){
-									list.add(trigger.stockcards[i]);
-								}
-							}
-							if(list.length){
-								if(trigger.type=='gain'){
-									for(var i=0;i<list.length;i++){
-										trigger.parent.cards.remove(list[i]);
-									}
-								}
-								else if(trigger.type=='equip'){
-									trigger.parent.cancelled=true;
-								}
-								player.showCards(get.translation(player)+'发动了【章武】',list);
-								event.list=list;
-							}
-							else{
-								event.finish();
-							}
-							'step 1'
-							for(var i=0;i<event.list.length;i++){
-								event.list[i].fix();
-								ui.cardPile.appendChild(event.list[i]);
-							}
-							game.log(player,'将',event.list,'置于牌堆底');
-							player.draw(2);
-						}
-					},
-					count3:{
-						audio:'zhangwu',
-						trigger:{global:'equipBefore'},
-						forced:true,
-						filter:function(event,player){
-							return event.card&&event.card.name=='feilongduofeng'&&event.player!=player&&
-								player.storage.zhangwu&&player.storage.zhangwu.contains(event.card);
-						},
-						content:function(){
-							'step 0'
-							trigger.cancel();
-							trigger.card.fix();
-							player.showCards(get.translation(player)+'发动了【章武】',[trigger.card]);
-							var owner=get.owner(trigger.card);
-							if(owner){
-								owner.lose(trigger.card,ui.special);
-							}
-							player.storage.zhangwu.remove(trigger.card);
-							'step 1'
-							trigger.card.fix();
-							ui.cardPile.appendChild(trigger.card);
-							game.log(player,'将',trigger.card,'置于牌堆底');
-							player.draw(2);
-						}
-					},
-					clear:{
-						trigger:{global:'phaseAfter'},
-						silent:true,
-						content:function(){
-							delete player.storage.zhangwu;
+						})
+					};
+					if(trigger.name=='lose'){
+						for(var i of trigger.cards){
+							if(i.name=='feilongduofeng'&&get.position(i,true)=='d') cards.push(i);
 						}
 					}
-				}
+					var owner=get.owner(cards[0]);
+					if(owner) player.gain(cards,'give',owner);
+					else player.gain(cards,'gain2');
+				},
+				group:'zhangwu_draw',
+				subSkill:{
+					draw:{
+						audio:'zhangwu',
+						trigger:{
+							player:'loseEnd',
+							global:['equipEnd','addJudgeEnd','gainEnd','loseAsyncEnd','addToExpansionEnd'],
+						},
+						filter:function(event,player){
+							if(event.name=='lose'&&event.getParent().name=='useCard') return false;
+							var evt=event.getl(player);
+							return evt&&evt.player==player&&evt.cards2.filter(function(i){
+								return i.name=='feilongduofeng'&&get.owner(i)!=player;
+							}).length>0;
+						},
+						forced:true,
+						content:function(){
+							'step 0'
+							var cards=[],evt=trigger.getl(player);
+							cards.addArray(evt.cards2.filter(function(i){
+								return i.name=='feilongduofeng'&&get.owner(i)!=player;
+							}));
+							player.showCards(cards,get.translation(player)+'发动了【章武】');
+							for(var i of cards){
+								var owner=get.owner(i);
+								if(owner) owner.lose(i,ui.cardPile)._triggered=null;
+								else{
+									i.fix();
+									ui.cardPile.appendChild(i);
+								}
+							}
+							'step 1'
+							player.draw(2);
+						},
+					},
+				},
 			},
 			shouyue:{
 				unique:true,
@@ -10411,6 +10349,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								list[i].setIdentity();
 							}
 						},yelist,player.group);
+						game.tryResult();
 					}
 					else event.finish();
 					'step 2'
@@ -11652,6 +11591,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			quanjin_info:'出牌阶段限一次，你可将一张手牌交给一名本回合内受到过伤害其他角色，然后令其执行一项“军令”。若其执行，则你摸一张牌。若其不执行，则你将手牌摸至与全场最多相等（至多摸五张）。',
 			zaoyun:'凿运',
 			zaoyun_info:'出牌阶段限一次，你可以弃置X张牌并选择一名距离为X+1的敌方角色。你对其造成1点伤害且至其的距离视为1至回合结束。',
+			gzdeshao:'德劭',
+			gzdeshao_info:'每回合限X次（X为你的体力值）。其他角色使用黑色牌指定你为唯一目标后，若其暗置的武将牌数大于等于你，则你可以弃置其一张牌。',
+			gzmingfa:'明伐',
+			gzmingfa_info:'出牌阶段限一次，你可以选择一名敌方角色。该角色的下个回合结束时，若其手牌数：小于你，你对其造成1点伤害并获得其一张手牌；大于你，你摸X张牌（X为你与其的手牌数之差且至多为5）。',
 
 			gz_cuimao:'崔琰毛玠',
 			gzzhengbi:'征辟',
@@ -11847,7 +11790,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			wuhujiangdaqi_bg:'旗',
 			wuhujiangdaqi_info:'存活的蜀势力角色的技能按以下规则改动：<br><strong>武圣</strong>：将“红色牌”改为“任意牌”<br><strong>咆哮</strong>：增加描述“你使用的【杀】无视其他角色的防具”<br><strong>龙胆</strong>：增加描述“你发动〖龙胆〗使用或打出牌时摸一张牌”<br><strong>烈弓</strong>：增加描述“你的攻击范围+1”<br><strong>铁骑</strong>：将“一张明置的武将牌”改为“所有明置的武将牌”',
 			zhangwu:'章武',
-			zhangwu_info:'锁定技。当【飞龙夺凤】进入弃牌堆或其他角色的装备区时，你获得之。当你失去【飞龙夺风】时，展示之，然后将此牌置于牌堆底并摸两张牌',
+			zhangwu_info:'锁定技。当【飞龙夺凤】进入弃牌堆或其他角色的装备区后，你获得之。当你不因使用而失去【飞龙夺风】时，你展示此牌，将此牌置于牌堆底并摸两张牌',
 			shouyue:'授钺',
 			shouyue_info:'君主技。只要此武将牌处于明置状态，你便拥有“五虎将大旗”。',
 			jizhao:'激诏',
