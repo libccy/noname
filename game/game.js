@@ -7652,7 +7652,7 @@
 							}
 						}
 						for(var i=0;i<lib.config.extensions.length;i++){
-							if(window.bannedExtensions.contains(lib.config.extensions[i])) continue;
+							//if(window.bannedExtensions.contains(lib.config.extensions[i])) continue;
 							var extcontent=localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]);
 							if(extcontent){
 								_status.evaluatingExtension=true;
@@ -7664,17 +7664,15 @@
 								}
 								_status.evaluatingExtension=false;
 							}
-							else if(lib.config.mode!='connect'||(!localStorage.getItem(lib.configprefix+'directstart')&&show_splash)){
+							else {
 								extensionlist.push(lib.config.extensions[i]);
 							}
 						}
 					}
 					else{
-						if(lib.config.mode!='connect'||(!localStorage.getItem(lib.configprefix+'directstart')&&show_splash)){
-							for(var i=0;i<lib.config.extensions.length;i++){
-								if(window.bannedExtensions.contains(lib.config.extensions[i])) continue;
-								game.import('extension',{name:lib.config.extensions[i]});
-							}
+						for(var i=0;i<lib.config.extensions.length;i++){
+							//if(window.bannedExtensions.contains(lib.config.extensions[i])) continue;
+							game.import('extension',{name:lib.config.extensions[i]});
 						}
 					}
 					var loadPack=function(){
@@ -7737,7 +7735,7 @@
 					var styleLoaded=function(){
 						styleToLoad--;
 						if(styleToLoad==0){
-							if(extensionlist.length&&(lib.config.mode!='connect'||show_splash)){
+							if(extensionlist.length){
 								var extToLoad=extensionlist.length;
 								var extLoaded=function(){
 									extToLoad--;
@@ -9014,32 +9012,26 @@
 						clickedNode=true;
 						lib.config.mode=this.link;
 						game.saveConfig('mode',this.link);
-						if(this.link=='connect'){
-							localStorage.setItem(lib.configprefix+'directstart',true);
-							game.reload();
+						if(game.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)!==-1){
+							game.layout='mobile';
+							ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
 						}
-						else{
-							if(game.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)!==-1){
-								game.layout='mobile';
+						else if(game.layout=='mobile'&&lib.config.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)===-1){
+							game.layout=lib.config.layout;
+							if(game.layout=='default'){
+								ui.css.layout.href='';
+							}
+							else{
 								ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
 							}
-							else if(game.layout=='mobile'&&lib.config.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)===-1){
-								game.layout=lib.config.layout;
-								if(game.layout=='default'){
-									ui.css.layout.href='';
-								}
-								else{
-									ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
-								}
-							}
-							splash.delete(1000);
-							delete window.inSplash;
-							window.resetGameTimeout=setTimeout(lib.init.reset,5000);
-	
-							this.listenTransition(function(){
-								lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
-							},500);
 						}
+						splash.delete(1000);
+						delete window.inSplash;
+						window.resetGameTimeout=setTimeout(lib.init.reset,5000);
+
+						this.listenTransition(function(){
+							lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
+						},500);
 					}
 					var downNode=function(){
 						this.classList.add('glow');
