@@ -1,0 +1,2 @@
+"FurryKill/extension.js","FurryKill/furrykill_anliang.jpg","FurryKill/furrykill_heibai.jpg","FurryKill/furrykill_shifeng.jpg","FurryKill/furrykill_sword.jpg","FurryKill/furrykill_xiaoba.jpg",
+"FurryKill/furrykill_xuankai.jpg","FurryKill/outputAllFileName.js","FurryKill/furrykill_yongshi.jpg",
