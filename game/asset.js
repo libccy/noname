@@ -1,5 +1,14 @@
 window.noname_asset_list=[
-	'v1.9.115.1',
+	'v1.9.115.1.1',
+
+	"extension/FurryKill/furrykill_anliang.jpg",
+	"extension/FurryKill/furrykill_heibai.jpg",
+	"extension/FurryKill/furrykill_shifeng.jpg",
+	"extension/FurryKill/furrykill_sword.jpg",
+	"extension/FurryKill/furrykill_xiaoba.jpg",
+	"extension/FurryKill/furrykill_xuankai.jpg",
+	"extension/FurryKill/furrykill_yongshi.jpg",
+
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',

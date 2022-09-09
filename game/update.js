@@ -5,8 +5,10 @@ window.noname_update={
 		'阮籍、臧洪入选稿公布',
 		'十周年界公孙瓒、界杜畿、界刘谌、黄祖、羊祜',
 		'技能调整与bug修复',
+		'furrykill部分追加',
 	],
 	files:[
+		'extension/FurryKill/extension.js',
 		//'card/extra.js',
 		//'card/gujian.js',
 		//'card/guozhan.js',
