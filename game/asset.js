@@ -8,6 +8,7 @@ window.noname_asset_list=[
 	"extension/FurryKill/furrykill_xiaoba.jpg",
 	"extension/FurryKill/furrykill_xuankai.jpg",
 	"extension/FurryKill/furrykill_yongshi.jpg",
+	"extension/FurryKill/furrykill_guoguo.jpg",
 
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',

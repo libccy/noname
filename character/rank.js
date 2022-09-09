@@ -1257,6 +1257,7 @@ window.noname_character_rank={
 	],
 	rarity:{
 		legend:[
+			"furrykill_shifeng",
 			'swd_muyun',
 			'swd_zhaoyun',
 			'swd_septem',

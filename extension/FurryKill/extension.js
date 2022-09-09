@@ -8,7 +8,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
     },
   }
   return {
-    name: "FurryKill", content: function (config, pack) {
+    name: "FurryKill", editable: false, content: function (config, pack) {
       var f = function (英文名) { if (config[英文名]) { for (var i in lib.characterPack[英文名]) { if (lib.character[i][4].indexOf("forbidai") < 0) lib.character[i][4].push("forbidai"); } } };
       f("FurryKill");
       lib.dynamicTranslate["furrykill_qianlie"] = dynamicTranslate.furrykill_qianlie
@@ -74,6 +74,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 ["furrykill_lvbing", "furrykill_hanren", "furrykill_ruiyan"],
                 ["hiddenSkill", "des:珀瞳"],
               ],
+              furrykill_guoguo: [
+                "male",
+                "furrykill_cat",
+                4,
+                ["furrykill_fuyun", "furrykill_changlong", "furrykill_qifu"],
+                ["des:招财游侠"],
+              ],
             },
             translate: {
               furrykill_shifeng: "时风",
@@ -83,6 +90,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_heibai: "黑白",
               furrykill_xiaoba: "小巴",
               furrykill_anliang: "安谅",
+              furrykill_guoguo: "果果",
             },
           },
           characterTitle: {
@@ -767,7 +775,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                       }
                       'step 2';
                       var shuangType = get.type(event.usedShuang);
-                      if(shuangType == 'delay') shuangType = 'trick';
+                      if (shuangType == 'delay') shuangType = 'trick';
                       event.target2.storage.furrykill_hanren2 = shuangType;
                       'step 3';
                       event.target2.addTempSkill("furrykill_hanren2");
@@ -783,7 +791,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 charlotte: true,
                 filter: function (event, player) {
                   var usedType = get.type(event.card);
-                  if(usedType == 'delay') usedType = 'trick';
+                  if (usedType == 'delay') usedType = 'trick';
                   return usedType == player.storage.furrykill_hanren2;
                 },
                 content: function () {
@@ -827,6 +835,91 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 },
               },
 
+              furrykill_fuyun: {
+                locked: true,
+                forced: true,
+                trigger: { player: 'phaseBegin' },
+                content: function () {
+                  player.addTempSkill("furrykill_fuyun_1")
+                },
+                subSkill: {
+                  1: {
+                    locked: true,
+                    forced: true,
+                    mod: {
+                      suit: function (card, suit) {
+                        if (suit == 'spade') return 'heart';
+                      },
+                    },
+                    sub: true,
+                  }
+                }
+              },
+
+              furrykill_changlong: {
+                mod: {
+                  selectTarget: function (card, player, range) {
+                    if (get.suit(card) == 'heart' && range[1] != -1) range[1]++;
+                  },
+                },
+              },
+
+              furrykill_qifu: {
+                unique: true,
+                juexingji: true,
+                forced: true,
+                trigger: { player: 'phaseZhunbeiBegin' },
+                skillAnimation: true,
+                animationColor: 'thunder',
+                init: function (player) {
+                  if (!player.storage.furrykill_qifu) player.storage.furrykill_qifu = 0;
+                },
+                intro: {
+                  content: '已祈福#次'
+                },
+                filter: function (event, player) {
+                  return player.hasSkill('furrykill_changlong') && player.storage.furrykill_qifu >= 7;
+                },
+                content: function () {
+                  player.awakenSkill('furrykill_qifu');
+                  player.loseMaxHp();
+                  player.removeSkill('furrykill_changlong');
+                  player.removeSkill('furrykill_qifu_1');
+                  player.addSkill('furrykill_zhaocai');
+                },
+                group: ["furrykill_qifu_1"],
+                subSkill: {
+                  1: {
+                    forced: true,
+                    trigger: { player: "useCard" },
+                    filter: function (event, player) {
+                      return event.card && get.suit(event.card) == 'heart';
+                    },
+                    content: function () {
+                      player.storage.furrykill_qifu++;
+                      player.markSkill('furrykill_qifu');
+                    },
+                  }
+                }
+              },
+
+              furrykill_zhaocai: {
+                enable: 'phaseUse',
+                filterTarget: function (card, player, target) {
+                  return target != player;
+                },
+                filter: function (event, player) {
+                  return player.countCards('he', { suit: 'heart' });
+                },
+                filterCard: function (card) {
+                  return get.suit(card) == 'heart';
+                },
+                position: 'he',
+                content: function () {
+                  target.draw(2);
+                },
+              },
+
             },
             dynamicTranslate: dynamicTranslate,
             translate: {
@@ -863,6 +956,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_hanren_info: "结束阶段，你可以将一张牌置于武将牌上，称为霜。其他角色的出牌阶段开始时，你可以弃置一张霜，然后该角色若使用了与此霜类别相同的牌，则本阶段不能再使用牌。",
               furrykill_ruiyan: "锐眼",
               furrykill_ruiyan_info: "出牌阶段限一次，你可以观看一名其他角色的手牌，若其中包含至少两种类别的牌，你选择其中一张获得；否则其获得你的一张牌。",
+              furrykill_fuyun: "福运",
+              furrykill_fuyun_info: "锁定技，你的回合内，你的♠牌均视为♥花色。",
+              furrykill_changlong: "昌隆",
+              furrykill_changlong_info: "你使用的♥牌可以额外指定一个目标。",
+              furrykill_qifu: "祈福",
+              furrykill_qifu_info: "觉醒技，准备阶段，若你本局游戏使用的♥牌数量不少于7，你减少一点体力上限，失去昌隆，然后获得招财。",
+              furrykill_zhaocai: "招财",
+              furrykill_zhaocai_info: "出牌阶段，你可以弃置一张♥牌，令一名其他角色摸两张牌。",
             },
           },
         }, "FurryKill");

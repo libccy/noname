@@ -1,13 +1,12 @@
 window.noname_update={
-	version:'1.9.115.1.1',
+	version:'1.9.115.1.2',
 	update:'1.9.115',
 	changeLog:[
 		'阮籍、臧洪入选稿公布',
 		'十周年界公孙瓒、界杜畿、界刘谌、黄祖、羊祜',
 		'技能调整与bug修复',
 		'furrykill：',
-		'安谅',
-		'削弱黑白，调整勇士、轩恺',
+		'果果'
 	],
 	files:[
 		'extension/FurryKill/extension.js',
@@ -36,7 +35,7 @@ window.noname_update={
 		//'character/offline.js',
 		//'character/old.js',
 		//'character/ow.js',
-		// 'character/rank.js',
+		 'character/rank.js',
 		// 'character/refresh.js',
 		// 'character/sb.js',
 		// 'character/shenhua.js',
