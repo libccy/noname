@@ -766,7 +766,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         event.finish();
                       }
                       'step 2';
-                      event.target2.storage.furrykill_hanren2 = get.type(event.usedShuang);
+                      var shuangType = get.type(event.usedShuang);
+                      if(shuangType == 'delay') shuangType = 'trick';
+                      event.target2.storage.furrykill_hanren2 = shuangType;
                       'step 3';
                       event.target2.addTempSkill("furrykill_hanren2");
                       game.log(player, '对', event.target2, '发动了【寒刃】，弃置的【霜】为', event.usedShuang);
@@ -780,7 +782,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 direct: true,
                 charlotte: true,
                 filter: function (event, player) {
-                  return get.type(event.card) == player.storage.furrykill_hanren2;
+                  var usedType = get.type(event.card);
+                  if(usedType == 'delay') usedType = 'trick';
+                  return usedType == player.storage.furrykill_hanren2;
                 },
                 content: function () {
                   'step 0';
@@ -866,25 +870,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
     }, help: {}, config: {
       "FurryKill": { "name": "将FurryKill设为禁用", "init": false },
     }, package: {
-      character: {
-        character: {
-        },
-        translate: {
-        },
-      },
-      card: {
-        card: {
-        },
-        translate: {
-        },
-        list: [],
-      },
-      skill: {
-        skill: {
-        },
-        translate: {
-        },
-      },
       intro: `
 				<span style='font-weight: bold;'>小动物的三国杀</span>
 			`,
@@ -892,6 +877,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       diskURL: "",
       forumURL: "",
       version: "1.0",
-    }, files: { "character": [], "card": [], "skill": [] }
+    },
   }
 })
