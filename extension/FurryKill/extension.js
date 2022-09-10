@@ -877,7 +877,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 },
                 content: function () {
                   'step 0'
-                  var prompt2 = '为' + get.translation(trigger.card) + '增加一个目标'
+                  var prompt2 = '为' + get.translation(trigger.card) + '额外指定一个目标'
                   player.chooseTarget(get.prompt('furrykill_changlong'), function (card, player, target) {
                     var player = _status.event.source;
                     return !_status.event.targets.contains(target) && lib.filter.targetInRange(_status.event.card,player,target) && lib.filter.targetEnabled2(_status.event.card, player, target);
