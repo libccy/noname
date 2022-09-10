@@ -857,11 +857,50 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               },
 
               furrykill_changlong: {
-                mod: {
-                  selectTarget: function (card, player, range) {
-                    if (get.suit(card) == 'heart' && range[1] != -1) range[1]++;
-                  },
+                trigger: { player: 'useCardToTarget' },
+                direct:true,
+                filter: function (event, player) {
+                  var card = event.card;
+                  var info = get.info(card);
+                  if (get.suit(card) != 'heart') return false;
+                  if (!event.isFirstTarget) return false;
+                  if (info.allowMultiple==false) return false;
+                  console.log(info.allowMultiple);
+                  if (event.targets && !info.multitarget) {
+                    if (game.hasPlayer(function (current) {
+                      return !event.targets.contains(current) && lib.filter.targetInRange(event.card,player,current) && lib.filter.targetEnabled2(event.card, event.player, current);
+                    })) {
+                      return true;
+                    }
+                  }
+                  return false;
                 },
+                content: function () {
+                  'step 0'
+                  var prompt2 = '为' + get.translation(trigger.card) + '增加一个目标'
+                  player.chooseTarget(get.prompt('furrykill_changlong'), function (card, player, target) {
+                    var player = _status.event.source;
+                    return !_status.event.targets.contains(target) && lib.filter.targetInRange(_status.event.card,player,target) && lib.filter.targetEnabled2(_status.event.card, player, target);
+                  }).set('prompt2', prompt2).set('ai', function (target) {
+                    var trigger = _status.event.getTrigger();
+                    var player = _status.event.source;
+                    return get.effect(target, trigger.card, player, _status.event.player);
+                  }).set('targets', trigger.targets).set('card', trigger.card).set('source', trigger.player);
+                  'step 1'
+                  if (result.bool) {
+                    if (!event.isMine() && !event.isOnline()) game.delayx();
+                    event.targets = result.targets;
+                  }
+                  else {
+                    event.finish();
+                  }
+                  'step 2'
+                  if (event.targets) {
+                    player.logSkill('furrykill_changlong', event.targets);
+                    trigger.targets.addArray(event.targets);
+                    game.log(event.targets, '也成为了', trigger.card, '的目标');
+                  }
+                }
               },
 
               furrykill_qifu: {
