@@ -1064,7 +1064,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                       if (result.bool) {
                         var length = result.targets.length;
                         for (let i = 0; i < length; i++) {
-                          result.targets[i].link();
+                          result.targets[i].link(true);
                         }
                         player.logSkill('furrykill_lianfu', result.targets);
                       }
@@ -1111,7 +1111,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                   player.drawTo(player.maxHp);
                   "step 1"
                   game.countPlayer(function(current){
-                    current.link();
+                    current.link(true);
                   });
                   game.log(player,'横置了所有角色')
                   game.delayx();
@@ -1181,7 +1181,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.4",
+      version: "1.9.115.1.5",
     },
   }
 })
