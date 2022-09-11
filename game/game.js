@@ -17761,6 +17761,7 @@
 						skills=[];
 						this.classList.add(_status.video?'unseen_v':'unseen');
 						this.name='unknown';
+                        if(this.group != 'jin') this.group='unknown';
 						if(!this.node.name_seat&&!_status.video){
 							this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(get.translation(this.name)),this);
 							this.node.name_seat.dataset.nature=get.groupnature(this.group);
