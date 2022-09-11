@@ -1,12 +1,13 @@
 window.noname_update={
-	version:'1.9.115.1.3',
+	version:'1.9.115.1.4',
 	update:'1.9.115',
 	changeLog:[
 		'阮籍、臧洪入选稿公布',
 		'十周年界公孙瓒、界杜畿、界刘谌、黄祖、羊祜',
 		'技能调整与bug修复',
 		'furrykill：',
-		'重做果果的昌隆'
+		'白荼',
+		'非晋势力的隐匿在破隐前视为未知势力'
 	],
 	files:[
 		'extension/FurryKill/extension.js',
@@ -71,7 +72,7 @@ window.noname_update={
 		//'game/NoSleep.js',
 		'game/config.js',
 		//'game/package.js',
-		//'game/asset.js',
+		'game/asset.js',
 		//'game/source.js',
 		//'theme/style/hp/custom.css',
 		//'theme/style/hp/emotion.css',

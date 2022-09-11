@@ -21,6 +21,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
         game.新增势力(["furrykill_cat", "猫"], [37, 128, 237], [[37, 128, 237], [20, 60, 80]]);
         game.新增势力(["furrykill_fox", "狐"], [222, 68, 68], [[222, 68, 68], [80, 20, 20]]);
         game.新增势力(["furrykill_wolf", "狼"], [191, 191, 189], [[191, 191, 189], [60, 60, 60]]);
+        game.新增势力(["furrykill_dragon", "龙"], [191, 191, 189], [[191, 191, 189], [60, 60, 60]]);
         game.导入character("FurryKill", "FurryKill", {
           connect: true,
           character: {
@@ -81,6 +82,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 ["furrykill_fuyun", "furrykill_changlong", "furrykill_qifu"],
                 ["des:招财游侠"],
               ],
+              furrykill_baitu: [
+                "male",
+                "furrykill_dragon",
+                4,
+                ["furrykill_lianfu", "furrykill_pojia"],
+                ["des:一叶障目"],
+              ],
             },
             translate: {
               furrykill_shifeng: "时风",
@@ -91,6 +99,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_xiaoba: "小巴",
               furrykill_anliang: "安谅",
               furrykill_guoguo: "果果",
+              furrykill_baitu: "白荼",
             },
           },
           characterTitle: {
@@ -217,6 +226,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                   player.loseHp();
                   trigger.cancel();
                 },
+                ai: {
+                  threaten: 1,
+                  result: {
+                    target: function (player, target) {
+                      if (player.hp > 1) return 3.5;
+                      return 2;
+                    },
+                  },
+                  order: 4,
+                  expose: 0.4,
+                },
+
               },
 
               furrykill_zhian: {
@@ -858,17 +879,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
               furrykill_changlong: {
                 trigger: { player: 'useCardToTarget' },
-                direct:true,
+                direct: true,
                 filter: function (event, player) {
                   var card = event.card;
                   var info = get.info(card);
                   if (get.suit(card) != 'heart') return false;
                   if (!event.isFirstTarget) return false;
-                  if (info.allowMultiple==false) return false;
+                  if (info.allowMultiple == false) return false;
                   console.log(info.allowMultiple);
                   if (event.targets && !info.multitarget) {
                     if (game.hasPlayer(function (current) {
-                      return !event.targets.contains(current) && lib.filter.targetInRange(event.card,player,current) && lib.filter.targetEnabled2(event.card, event.player, current);
+                      return !event.targets.contains(current) && lib.filter.targetInRange(event.card, player, current) && lib.filter.targetEnabled2(event.card, event.player, current);
                     })) {
                       return true;
                     }
@@ -880,7 +901,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                   var prompt2 = '为' + get.translation(trigger.card) + '额外指定一个目标'
                   player.chooseTarget(get.prompt('furrykill_changlong'), function (card, player, target) {
                     var player = _status.event.source;
-                    return !_status.event.targets.contains(target) && lib.filter.targetInRange(_status.event.card,player,target) && lib.filter.targetEnabled2(_status.event.card, player, target);
+                    return !_status.event.targets.contains(target) && lib.filter.targetInRange(_status.event.card, player, target) && lib.filter.targetEnabled2(_status.event.card, player, target);
                   }).set('prompt2', prompt2).set('ai', function (target) {
                     var trigger = _status.event.getTrigger();
                     var player = _status.event.source;
@@ -959,6 +980,146 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 },
               },
 
+              furrykill_lianfu: {
+                init: function (player) {
+                  if (!player.storage.furrykill_lianfu) player.storage.furrykill_lianfu = 0;
+                },
+                group: ["furrykill_lianfu_1", "furrykill_lianfu_2"],
+                locked: true,
+                forced: true,
+                subSkill: {
+                  1: {
+                    trigger: { global: "gameStart" },
+                    forced: true,
+                    popup: false,
+                    content: function () {
+                      player.link();
+                    },
+                    sub: true,
+                  },
+                  2: {
+                    trigger: { player: 'linkBefore' },
+                    forced: true,
+                    prompt2: "你的武将牌重置时，改为你增加一点体力上限，然后选择一项",
+                    filter: function (event, player) {
+                      return player.isLinked();
+                    },
+                    content: function () {
+                      'step 0';
+                      player.gainMaxHp();
+                      var list = ["摸两张牌", "获得场上的一张牌", "于当前回合结束后横置至多两名其他角色"];
+
+                      if (!game.hasPlayer(function (current) {
+                        return current.countGainableCards(player, 'ej') > 0;
+                      })) list.remove("获得场上的一张牌");
+
+                      player.chooseControl(list, true, function () {
+                        return "摸两张牌";
+                      }).set('prompt', get.prompt2('furrykill_lianfu_2'));
+                      'step 1';
+                      if (result.control == "摸两张牌") {
+                        player.draw(2);
+                      } else if (result.control == "获得场上的一张牌") {
+                        player.chooseTarget('请选择一名角色，获得其装备区或判定区内的一张牌', true, function (card, player, target) {
+                          return target.countGainableCards(player, 'ej') > 0;
+                        }).set('ai', function (target) {
+                          var player = _status.event.player;
+                          var att = get.attitude(player, target);
+                          if (att > 0 && target.countCards('ej', function (card) {
+                            return get.position(card) == 'j' || get.value(card, target) <= 0;
+                          })) return 2 * att;
+                          else if (att < 0 && target.countCards('e', function (card) {
+                            return get.value(card, target) > 5;
+                          })) return -att;
+                          return -1;
+                        });
+                      } else {
+                        if (!player.hasSkill("furrykill_lianfu_3")) player.addSkill("furrykill_lianfu_3");
+                        player.storage.furrykill_lianfu++;
+                      }
+                      'step 2';
+                      if (result.bool) {
+                        var target = result.targets[0];
+                        player.logSkill('furrykill_lianfu', target);
+                        player.gainPlayerCard(target, 'ej', true);
+                      }
+                      trigger.cancel();
+                    },
+                    sub: true,
+                  },
+                  3: {
+                    trigger: { global: "phaseAfter" },
+                    direct: true,
+                    filter: function (event, player) {
+                      return player.storage.furrykill_lianfu > 0;
+                    },
+                    content: function () {
+                      'step 0';
+                      player.chooseTarget('链缚：横置至多两名其他角色', [0, 2], function (card, player, target) {
+                        return target != player && !target.isLinked();
+                      }).ai = function (target) {
+                        return -get.attitude(player, target);
+                      };
+                      'step 1';
+                      if (result.bool) {
+                        var length = result.targets.length;
+                        for (let i = 0; i < length; i++) {
+                          result.targets[i].link();
+                        }
+                        player.logSkill('furrykill_lianfu', result.targets);
+                      }
+                      'step 2';
+                      player.storage.furrykill_lianfu--;
+                      if (player.storage.furrykill_lianfu > 0) {
+                        event.goto(0);
+                      } else {
+                        player.removeSkill("furrykill_lianfu_3");
+                      }
+                    },
+                    sub: true,
+                  }
+                }
+              },
+
+              furrykill_pojia: {
+                skillAnimation: true,
+                animationColor: "thunder",
+                unique: true,
+                juexingji: true,
+                trigger: {
+                  player: "dying",
+                },
+                forced: true,
+                filter: function (event, player) {
+                  return !player.storage.kunfen;
+                },
+                content: function () {
+                  "step 0"
+                  player.removeSkill("furrykill_lianfu");
+                  "step 1"
+                  player.recover(Infinity);
+                  "step 2"
+                  player.addSkill('furrykill_pojia_after');
+                }
+              },
+              furrykill_pojia_after: {
+                trigger: { global: "phaseAfter" },
+                direct: true,
+                charlotte: true,
+                content: function () {
+                  "step 0"
+                  player.drawTo(player.maxHp);
+                  "step 1"
+                  game.countPlayer(function(current){
+                    current.link();
+                  });
+                  game.log(player,'横置了所有角色')
+                  game.delayx();
+                  "step 2"
+                  player.removeSkill("furrykill_pojia_after");
+                }
+              },
+
             },
             dynamicTranslate: dynamicTranslate,
             translate: {
@@ -1003,6 +1164,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_qifu_info: "觉醒技，准备阶段，若你本局游戏使用的♥牌数量不少于7，你减少一点体力上限，失去昌隆，然后获得招财。",
               furrykill_zhaocai: "招财",
               furrykill_zhaocai_info: "出牌阶段，你可以弃置一张♥牌，令一名其他角色摸两张牌。",
+              furrykill_lianfu: "链缚",
+              furrykill_lianfu_info: "锁定技，游戏开始时，你横置；你的武将牌重置时，改为你增加一点体力上限，然后选择一项:1、摸两张牌;2、获得场上的一张牌;3、于当前回合结束后横置至多两名其他角色。",
+              furrykill_pojia: "破枷",
+              furrykill_pojia_info: "觉醒技，你濒死时，恢复全部体力，失去链缚。当前回合结束后，你将手牌补至体力上限，然后横置所有角色。",
             },
           },
         }, "FurryKill");
@@ -1016,7 +1181,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.0",
+      version: "1.9.115.1.4",
     },
   }
 })
