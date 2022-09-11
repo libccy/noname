@@ -1091,7 +1091,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 },
                 forced: true,
                 filter: function (event, player) {
-                  return !player.storage.kunfen;
+                  return player.hasSkill("furrykill_lianfu");
                 },
                 content: function () {
                   "step 0"
@@ -1181,7 +1181,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.5",
+      version: "1.9.115.1.6",
     },
   }
 })
