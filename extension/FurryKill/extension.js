@@ -1142,10 +1142,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 content: function () {
                   'step 0';
                   var dice = get.number(trigger.card);
+                  var skip = player.storage.furrykill_dielang == 0;
                   var drop = dice <= player.storage.furrykill_dielang;
                   player.storage.furrykill_dielang = dice;
                   player.markSkill('furrykill_dielang');
                   if (drop) event.goto(2);
+                  if (skip) event.finish();
                   'step 1';
                   player.draw();
                   event.finish();
@@ -1333,7 +1335,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_pojia: "破枷",
               furrykill_pojia_info: "觉醒技，你濒死时，恢复全部体力，失去链缚。当前回合结束后，你将手牌补至体力上限，然后横置所有角色。",
               furrykill_dielang: "叠浪",
-              furrykill_dielang_info: "锁定技，你于出牌阶段使用牌时，若此牌点数大于你于此阶段使用的上一张牌，你摸一张牌；否则你弃置三张类别不同的牌或于此牌结算完毕后结束出牌阶段。",
+              furrykill_dielang_info: "锁定技，你于出牌阶段非第一次使用牌时，若此牌点数大于你于此阶段使用的上一张牌，你摸一张牌；否则你弃置三张类别不同的牌或于此牌结算完毕后结束出牌阶段。",
               furrykill_shouhe: "收合",
               furrykill_shouhe_info: "出牌阶段限一次，你可以将手牌中点数最小的牌当做无次数限制的雷杀使用。若此牌点数与你本阶段使用的上一张牌相差至少8点，本回合你的手牌上限+2。",
             },

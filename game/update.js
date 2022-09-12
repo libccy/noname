@@ -1,13 +1,16 @@
 window.noname_update={
-	version:'1.9.115.1.7',
+	version:'1.9.115.1.8',
 	update:'1.9.115',
 	changeLog:[
 		'阮籍、臧洪入选稿公布',
 		'十周年界公孙瓒、界杜畿、界刘谌、黄祖、羊祜',
 		'技能调整与bug修复',
 		'furrykill：',
+		'1.9.115.1.7:',
 		'伊织川',
-		'加强果果'
+		'加强果果',
+		'1.9.115.1.8:',
+		'伊织川削弱叠浪',
 	],
 	files:[
 		'extension/FurryKill/extension.js',
