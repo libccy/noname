@@ -22,6 +22,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
         game.新增势力(["furrykill_fox", "狐"], [222, 68, 68], [[222, 68, 68], [80, 20, 20]]);
         game.新增势力(["furrykill_wolf", "狼"], [191, 191, 189], [[191, 191, 189], [60, 60, 60]]);
         game.新增势力(["furrykill_dragon", "龙"], [191, 191, 189], [[191, 191, 189], [60, 60, 60]]);
+        game.新增势力(["furrykill_dog", "犬"], [68, 68, 222], [[68, 68, 222], [20, 20, 80]]);
         game.导入character("FurryKill", "FurryKill", {
           connect: true,
           character: {
@@ -89,6 +90,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 ["furrykill_lianfu", "furrykill_pojia"],
                 ["des:一叶障目"],
               ],
+              furrykill_yizhichuan: [
+                "male",
+                "furrykill_dog",
+                3,
+                ["furrykill_dielang", "furrykill_shouhe"],
+                ["des:水之魔武士"],
+              ],
             },
             translate: {
               furrykill_shifeng: "时风",
@@ -100,6 +108,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_anliang: "安谅",
               furrykill_guoguo: "果果",
               furrykill_baitu: "白荼",
+              furrykill_yizhichuan: "伊织川",
             },
           },
           characterTitle: {
@@ -889,7 +898,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                   console.log(info.allowMultiple);
                   if (event.targets && !info.multitarget) {
                     if (game.hasPlayer(function (current) {
-                      return !event.targets.contains(current) && lib.filter.targetInRange(event.card, player, current) && lib.filter.targetEnabled2(event.card, event.player, current);
+                      return !event.targets.contains(current) && lib.filter.targetEnabled2(event.card, event.player, current);
                     })) {
                       return true;
                     }
@@ -898,10 +907,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 },
                 content: function () {
                   'step 0'
-                  var prompt2 = '为' + get.translation(trigger.card) + '额外指定一个目标'
+                  var prompt2 = '为' + get.translation(trigger.card) + '额外指定一名角色成为目标'
                   player.chooseTarget(get.prompt('furrykill_changlong'), function (card, player, target) {
                     var player = _status.event.source;
-                    return !_status.event.targets.contains(target) && lib.filter.targetInRange(_status.event.card, player, target) && lib.filter.targetEnabled2(_status.event.card, player, target);
+                    return !_status.event.targets.contains(target) && lib.filter.targetEnabled2(_status.event.card, player, target);
                   }).set('prompt2', prompt2).set('ai', function (target) {
                     var trigger = _status.event.getTrigger();
                     var player = _status.event.source;
@@ -1110,13 +1119,168 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                   "step 0"
                   player.drawTo(player.maxHp);
                   "step 1"
-                  game.countPlayer(function(current){
+                  game.countPlayer(function (current) {
                     current.link(true);
                   });
-                  game.log(player,'横置了所有角色')
+                  game.log(player, '横置了所有角色')
                   game.delayx();
                   "step 2"
                   player.removeSkill("furrykill_pojia_after");
+                }
+              },
+
+              furrykill_dielang: {
+                locked: true,
+                forced:true,
+                trigger: { player: 'useCard' },
+                filter: function (event, player) {
+                  return _status.currentPhase == player;
+                },
+                intro: {
+                  content: '点数为#'
+                },
+                content: function () {
+                  'step 0';
+                  var dice = get.number(trigger.card);
+                  var drop = dice <= player.storage.furrykill_dielang;
+                  player.storage.furrykill_dielang = dice;
+                  player.markSkill('furrykill_dielang');
+                  if (drop) event.goto(2);
+                  'step 1';
+                  player.draw();
+                  event.finish();
+                  'step 2';
+                  var cards = player.getCards('he');
+                  var hasBasic = false, hasTrick = false, hasEquip = false;
+                  for (let i = 0; i < cards.length; i++) {
+                    var type = get.type(cards[i]);
+                    if (type == 'basic') {
+                      hasBasic = true;
+                    } else if (type == 'equip') {
+                      hasEquip = true;
+                    } else {
+                      hasTrick = true;
+                    }
+                    if (hasBasic && hasTrick && hasEquip) break;
+                  }
+                  var list = ['弃置三张类别不同的牌', '结束出牌阶段'];
+                  if (!hasBasic || !hasEquip || !hasTrick) {
+                    list.remove('弃置三张类别不同的牌');
+                  }
+                  player.chooseControl(list, true, function () {
+                    if (list.contains('弃置三张类别不同的牌')) return '弃置三张类别不同的牌';
+                    return '结束出牌阶段';
+                  }).set('prompt', '叠浪：弃置三张类别不同的牌或于此牌结算完毕后结束出牌阶段。');
+                  'step 3';
+                  if (result.control == '结束出牌阶段') {
+                    var evt = _status.event.getParent('phaseUse');
+                    if (evt && evt.name == 'phaseUse') {
+                      evt.skipped = true;
+                    }
+                    event.finish();
+                  }
+                  'step 4';
+                  var next = player.chooseToDiscard('叠浪：弃置三张类别不同的牌', 3, function(card){
+                    var cards = ui.selected.cards;
+                    var length = cards.length;
+                    var allow = ['basic', 'trick', 'equip'];
+                    if(length > 0) allow.remove(get.type(cards[0], 'trick'));
+                    if(length > 1) allow.remove(get.type(cards[1], 'trick'));
+                    return allow.contains(get.type(card, 'trick'));
+                  }, 'he', true);
+                  next.set('num',num);
+                  next.set('complexCard',true);
+                  next.set('ai', function (card) {
+                    return 9 - get.value(card);
+                  });
+                },
+                group: ["furrykill_dielang_1", "furrykill_dielang_2"],
+                subSkill: {
+                  1: {
+                    direct: true,
+                    charlotte: true,
+                    trigger: { player: "phaseUseBegin" },
+                    content: function () {
+                      player.storage.furrykill_dielang = 0;
+                    },
+                    sub: true,
+                  },
+                  2: {
+                    direct: true,
+                    charlotte: true,
+                    trigger: { player: "phaseUseAfter" },
+                    content: function () {
+                      player.unmarkSkill('furrykill_dielang');
+                    },
+                    sub: true,
+                  }
+                }
+              },
+
+              furrykill_shouhe: {
+                enable: "phaseUse",
+                filterCard: function (card, player) {
+                  var minDice = player.getCards('h').map((item) => {
+                    return get.number(item);
+                  }).reduce((a, b) => a < b ? a : b);
+                  console.log("min dice is" + minDice)
+                  return get.number(card) == minDice;
+                },
+                viewAs: {
+                  name: "sha",
+                  nature: "thunder",
+                  shouhe: true,
+                },
+                intro: {
+                  content: '手牌上限加#'
+                },
+                viewAsFilter: function (player) {
+                  if (!player.countCards('h')) return false;
+                },
+                prompt: "将一张点数最小的手牌当做无次数限制的雷杀使用",
+                onuse: function (result, player) {
+                  var dice = get.number(result.cards[0]);
+                  var delta = player.storage.furrykill_dielang - dice;
+                  if (delta <= -8 || delta >= 8) {
+                    player.storage.furrykill_shouhe += 2;
+                    player.markSkill('furrykill_shouhe');
+                  }
+                },
+                group:["furrykill_shouhe_1", "furrykill_shouhe_2", "furrykill_shouhe_3"],
+                subSkill: {
+                  1:{
+                    mod:{
+                      cardUsable:function(card,player){
+                        if(card.name=='sha'&&card.shouhe) return Infinity;
+                      }
+                    },
+                    sub: true,
+                  },
+                  2: {
+                    direct: true,
+                    charlotte: true,
+                    mod: {
+                      maxHandcard: function (player, num) {
+                        if(player.storage.furrykill_shouhe)
+                          return num + player.storage.furrykill_shouhe;
+                        return num;
+                      },
+                    },
+                    trigger: { player: "phaseBefore" },
+                    content: function () {
+                      player.storage.furrykill_shouhe = 0;
+                    },
+                    sub: true,
+                  },
+                  3: {
+                    direct: true,
+                    charlotte: true,
+                    trigger: { player: "phaseAfter" },
+                    content: function () {
+                      player.unmarkSkill('furrykill_shouhe');
+                    },
+                    sub: true,
+                  }
                 }
               },
 
@@ -1159,7 +1323,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_fuyun: "福运",
               furrykill_fuyun_info: "锁定技，你的回合内，你的♠牌均视为♥花色。",
               furrykill_changlong: "昌隆",
-              furrykill_changlong_info: "你使用的♥牌可以额外指定一个目标。",
+              furrykill_changlong_info: "你使用的♥牌可以额外指定一名角色成为目标。",
               furrykill_qifu: "祈福",
               furrykill_qifu_info: "觉醒技，准备阶段，若你本局游戏使用的♥牌数量不少于7，你减少一点体力上限，失去昌隆，然后获得招财。",
               furrykill_zhaocai: "招财",
@@ -1168,6 +1332,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_lianfu_info: "锁定技，游戏开始时，你横置；你的武将牌重置时，改为你增加一点体力上限，然后选择一项:1、摸两张牌;2、获得场上的一张牌;3、于当前回合结束后横置至多两名其他角色。",
               furrykill_pojia: "破枷",
               furrykill_pojia_info: "觉醒技，你濒死时，恢复全部体力，失去链缚。当前回合结束后，你将手牌补至体力上限，然后横置所有角色。",
+              furrykill_dielang: "叠浪",
+              furrykill_dielang_info: "锁定技，你于出牌阶段使用牌时，若此牌点数大于你于此阶段使用的上一张牌，你摸一张牌；否则你弃置三张类别不同的牌或于此牌结算完毕后结束出牌阶段。",
+              furrykill_shouhe: "收合",
+              furrykill_shouhe_info: "出牌阶段限一次，你可以将手牌中点数最小的牌当做无次数限制的雷杀使用。若此牌点数与你本阶段使用的上一张牌相差至少8点，本回合你的手牌上限+2。",
             },
           },
         }, "FurryKill");
@@ -1181,7 +1349,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.6",
+      version: "1.9.115.1.7",
     },
   }
 })
