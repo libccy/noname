@@ -1221,6 +1221,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
               furrykill_shouhe: {
                 enable: "phaseUse",
+                usable: 1,
                 filterCard: function (card, player) {
                   var minDice = player.getCards('h').map((item) => {
                     return get.number(item);
@@ -1351,7 +1352,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.7",
+      version: "1.9.115.1.9",
     },
   }
 })

@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'1.9.115.1.8',
+	version:'1.9.115.1.9',
 	update:'1.9.115',
 	changeLog:[
 		'阮籍、臧洪入选稿公布',
@@ -11,6 +11,8 @@ window.noname_update={
 		'加强果果',
 		'1.9.115.1.8:',
 		'伊织川削弱叠浪',
+		'1.9.115.1.9:',
+		'伊织川修复可以无限收合的bug',
 	],
 	files:[
 		'extension/FurryKill/extension.js',
