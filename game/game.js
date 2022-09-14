@@ -53431,7 +53431,7 @@
 							if(ui.throwEmotion){
 								for(var i of ui.throwEmotion) i.classList.remove('exclude');
 							}
-						},(emotion=='flower'||emotion=='egg')?5000:10000)
+						},(emotion=='flower'||emotion=='egg')?50:100)
 					};
 					var td;
 					var table=document.createElement('div');

@@ -23,6 +23,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
         game.新增势力(["furrykill_wolf", "狼"], [191, 191, 189], [[191, 191, 189], [60, 60, 60]]);
         game.新增势力(["furrykill_dragon", "龙"], [191, 191, 189], [[191, 191, 189], [60, 60, 60]]);
         game.新增势力(["furrykill_dog", "犬"], [68, 68, 222], [[68, 68, 222], [20, 20, 80]]);
+        game.新增势力(["furrykill_tiger", "虎"], [249, 206, 110], [[249, 206, 110], [80, 60, 60]]);
         game.导入character("FurryKill", "FurryKill", {
           connect: true,
           character: {
@@ -97,6 +98,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 ["furrykill_dielang", "furrykill_shouhe"],
                 ["des:水之魔武士"],
               ],
+              furrykill_xiaorui: [
+                "male",
+                "furrykill_fox",
+                4,
+                ["furrykill_yaodang", "furrykill_baolei", "furrykill_jiyong", "furrykill_yinchang"],
+                ["des:雷电杨桃"],
+              ],
+              furrykill_gudong: [
+                "male",
+                "furrykill_tiger",
+                4,
+                ["furrykill_yanmu", "furrykill_zhuiren", "furrykill_xuenu"],
+                ["hiddenSkill", "des:不存在的"],
+              ],
             },
             translate: {
               furrykill_shifeng: "时风",
@@ -109,12 +124,35 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_guoguo: "果果",
               furrykill_baitu: "白荼",
               furrykill_yizhichuan: "伊织川",
+              furrykill_xiaorui: "小瑞",
+              furrykill_gudong: "咕咚",
             },
           },
           characterTitle: {
           },
           skill: {
             skill: {
+              furrykill_yinchang: {
+                init: function (player) {
+                  if (!player.storage.furrykill_yinchang1) player.storage.furrykill_yinchang1 = false;
+                },
+                trigger: { player: "phaseUseBefore" },
+                prompt: "是否跳过出牌阶段进行吟唱？",
+                intro: {
+                  content: '马上要释放强力技能！',
+                },
+                marktext: '已吟唱',
+                filter: function (event, player) {
+                  return !player.storage.furrykill_yinchang1;
+                },
+                content: function () {
+                  player.storage.furrykill_yinchang1 = true;
+                  player.markSkill("furrykill_yinchang");
+                  game.log(trigger.player, '已吟唱');
+                  trigger.cancel();
+                },
+              },
+
               furrykill_dingchen: {
                 trigger: {
                   player: "showCharacterAfter",
@@ -1131,7 +1169,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
               furrykill_dielang: {
                 locked: true,
-                forced:true,
+                forced: true,
                 trigger: { player: 'useCard' },
                 filter: function (event, player) {
                   return _status.currentPhase == player;
@@ -1182,16 +1220,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     event.finish();
                   }
                   'step 4';
-                  var next = player.chooseToDiscard('叠浪：弃置三张类别不同的牌', 3, function(card){
+                  var next = player.chooseToDiscard('叠浪：弃置三张类别不同的牌', 3, function (card) {
                     var cards = ui.selected.cards;
                     var length = cards.length;
                     var allow = ['basic', 'trick', 'equip'];
-                    if(length > 0) allow.remove(get.type(cards[0], 'trick'));
-                    if(length > 1) allow.remove(get.type(cards[1], 'trick'));
+                    if (length > 0) allow.remove(get.type(cards[0], 'trick'));
+                    if (length > 1) allow.remove(get.type(cards[1], 'trick'));
                     return allow.contains(get.type(card, 'trick'));
                   }, 'he', true);
-                  next.set('num',num);
-                  next.set('complexCard',true);
+                  next.set('num', num);
+                  next.set('complexCard', true);
                   next.set('ai', function (card) {
                     return 9 - get.value(card);
                   });
@@ -1249,12 +1287,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     player.markSkill('furrykill_shouhe');
                   }
                 },
-                group:["furrykill_shouhe_1", "furrykill_shouhe_2", "furrykill_shouhe_3"],
+                group: ["furrykill_shouhe_1", "furrykill_shouhe_2", "furrykill_shouhe_3"],
                 subSkill: {
-                  1:{
-                    mod:{
-                      cardUsable:function(card,player){
-                        if(card.name=='sha'&&card.shouhe) return Infinity;
+                  1: {
+                    mod: {
+                      cardUsable: function (card, player) {
+                        if (card.name == 'sha' && card.shouhe) return Infinity;
                       }
                     },
                     sub: true,
@@ -1264,7 +1302,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     charlotte: true,
                     mod: {
                       maxHandcard: function (player, num) {
-                        if(player.storage.furrykill_shouhe)
+                        if (player.storage.furrykill_shouhe)
                           return num + player.storage.furrykill_shouhe;
                         return num;
                       },
@@ -1287,9 +1325,213 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 }
               },
 
+              furrykill_yaodang: {
+                trigger: {
+                  player: "loseEnd",
+                },
+                locked: true,
+                forced: true,
+                filter: function (event, player) {
+                  return event.type == 'discard'
+                    && event.getParent(3).name == 'phaseDiscard'
+                    && event.cards.filterInD('d').length > 0;
+                },
+                content: function () {
+                  player.draw();
+
+                  if (player.storage.furrykill_yinchang1) {
+                    game.log(trigger.player, '发动了吟唱效果');
+
+                    player.damage();
+
+                    player.storage.furrykill_yinchang1 = false;
+                    player.unmarkSkill('furrykill_yinchang');
+                  }
+
+                },
+              },
+
+              furrykill_baolei: {
+                trigger: {
+                  player: "phaseJieshuBegin",
+                },
+                filter: function (event, player) {
+                  return player.storage.furrykill_yinchang1;
+                },
+                content: function () {
+                  "step 0";
+                  player.chooseTarget(function (card, player, target) {
+                    return true;
+                  }, get.prompt('furrykill_baolei'), [2, 2]).ai = function (target) {
+                    return get.damageEffect(target, player, player);
+                  }
+                  "step 1";
+                  if (result.bool) {
+                    game.log(trigger.player, '发动了吟唱效果');
+
+                    event.targets = result.targets.sortBySeat();
+                    event.num = 0;
+                  } else {
+                    event.finish();
+                  }
+                  "step 2";
+                  if (event.num < event.targets.length) {
+                    event.targets[event.num].damage();
+                    event.num++;
+                  }
+                  if (event.num != event.targets.length)
+                    event.redo();
+                  "step 3";
+                  player.storage.furrykill_yinchang1 = false;
+                  player.unmarkSkill('furrykill_yinchang');
+                },
+              },
+
+              furrykill_jiyong: {
+                init: function (player) {
+                  player.storage.furrykill_jiyong = false;
+                },
+                unique: true,
+                enable: "phaseUse",
+                skillAnimation: true,
+                animationColor: "thunder",
+                limited: true,
+                filter: function (event, player) {
+                  return !player.storage.furrykill_jiyong && !player.storage.furrykill_yinchang1;
+                },
+                content: function () {
+                  player.awakenSkill('furrykill_jiyong');
+                  player.storage.furrykill_jiyong = true;
+                  player.storage.furrykill_yinchang1 = true;
+                  player.markSkill("furrykill_yinchang");
+                  game.log(player, '已吟唱');
+                },
+              },
+
+              furrykill_yanmu: {
+                trigger: {
+                  player: "showCharacterAfter",
+                },
+                forced: true,
+                hiddenSkill: true,
+                filter: function (event, player) {
+                  return event.toShow.contains('furrykill_gudong') && player != _status.currentPhase;
+                },
+                content: function () {
+                  player.addTempSkill('furrykill_yanmu2');
+                },
+              },
+              furrykill_yanmu2: {
+                mod: {
+                  targetEnabled: function (card, player, target, now) {
+                    if (card.name == 'sha' || card.name == 'juedou') return false;
+                  },
+                },
+              },
+
+              furrykill_zhuiren: {
+                popup: false,
+                trigger: {
+                  player: "useCardAfter",
+                },
+                filter: function (event, player) {
+                  var evt = event.getParent('phaseUse');
+                  if (!evt || event.player != player
+                    || get.type(event.card, 'trick') != 'trick'
+                    || !player.countCards('h')) return false;
+
+                  if (player.hasSkill("furrykill_xuenu1")) return true;
+
+                  if (player.getHistory('useCard', function (ev) {
+                    return ev.getParent('phaseUse') == evt && get.type(ev.card, 'trick') == 'trick'
+                  }).indexOf(event) == 0) return true;
+
+                  return false;
+                },
+                content: function () {
+                  var next = player.chooseToUse();
+                  next.logSkill = 'furrykill_zhuiren';
+                  next.set('openskilldialog', '追刃：将一张手牌当杀使用（此杀无距离和次数限制）');
+                  next.set('norestore', true);
+                  next.set('_backupevent', 'furrykill_zhuirenx');
+                  next.set('custom', {
+                    add: {},
+                    replace: { window: function () { } }
+                  });
+                  next.backup('furrykill_zhuirenx');
+                },
+                group: ["furrykill_zhuiren_1", "furrykill_zhuiren_draw"],
+                subSkill: {
+                  1: {
+                    mod: {
+                      cardUsable: function (card, player) {
+                        if (card.name == 'sha' && card.zhuiren) return Infinity;
+                      },
+                      targetInRange: function (card) {
+                        if (card.name == 'sha' && card.zhuiren) return true;
+                      }
+                    },
+                    sub: true,
+                  },
+                  draw: {
+                    trigger: {
+                      source: "damageAfter",
+                    },
+                    forced: true,
+                    popup: false,
+                    filter: function (event) {
+                      var evt = event.getParent('furrykill_zhuiren');
+                      return evt != {};
+                    },
+                    content: function () {
+                      player.draw();
+                    },
+                    sub: true,
+                  },
+                },
+              },
+              furrykill_zhuirenx: {
+                viewAs: { name: "sha", zhuiren: true },
+                filterCard: function (card) {
+                  return get.itemtype(card) == 'card';
+                },
+                selectCard: 1,
+                position: 'h',
+                popname: true,
+              },
+
+              furrykill_xuenu: {
+                init: function (player) {
+                  player.storage.furrykill_xuenu = false;
+                },
+                unique: true,
+                enable: "phaseUse",
+                skillAnimation: true,
+                animationColor: "orange",
+                limited: true,
+                filter: function (event, player) {
+                  return !player.storage.furrykill_xuenu;
+                },
+                content: function () {
+                  player.awakenSkill('furrykill_xuenu');
+                  player.storage.furrykill_xuenu = true;
+                  player.disableEquip('equip1');
+                  player.disableEquip('equip2');
+                  player.disableEquip('equip3');
+                  player.disableEquip('equip4');
+                  player.disableEquip('equip5');
+                  player.draw(2);
+                  player.addTempSkill('furrykill_xuenu1');
+                },
+              },
+              furrykill_xuenu1: {
+                charlotte: true,
+              }
+
             },
             dynamicTranslate: dynamicTranslate,
             translate: {
+              furrykill_yinchang: "吟唱",
               furrykill_dingchen: "定尘",
               furrykill_dingchen_info: "隐匿，你于回合外登场后，可以视为对当前回合角色使用一张杀。",
               furrykill_suixin: "碎心",
@@ -1339,6 +1581,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_dielang_info: "锁定技，你于出牌阶段非第一次使用牌时，若此牌点数大于你于此阶段使用的上一张牌，你摸一张牌；否则你弃置三张类别不同的牌或于此牌结算完毕后结束出牌阶段。",
               furrykill_shouhe: "收合",
               furrykill_shouhe_info: "出牌阶段限一次，你可以将手牌中点数最小的牌当做无次数限制的雷杀使用。若此牌点数与你本阶段使用的上一张牌相差至少8点，本回合你的手牌上限+2。",
+              furrykill_yaodang: "摇荡",
+              furrykill_yaodang_info: "锁定技，弃牌阶段你弃置牌后，摸一张牌。吟唱，你受到一点伤害。",
+              furrykill_baolei: "暴雷",
+              furrykill_baolei_info: "吟唱，结束阶段，你可以对两名角色分别造成一点雷电伤害。",
+              furrykill_jiyong: "即咏",
+              furrykill_jiyong_info: "限定技，出牌阶段，若你未吟唱，可以将吟唱状态变更为已吟唱。",
+              furrykill_yanmu: "烟幕",
+              furrykill_yanmu_info: "隐匿，你于回合外登场时，本回合你不能成为杀或决斗的目标。",
+              furrykill_zhuiren: "追刃",
+              furrykill_zhuiren_info: "你于出牌阶段使用的第一张锦囊牌结算完毕后，可以将一张手牌当作杀使用（此杀无距离和次数限制）。若此杀造成伤害，你摸一张牌。",
+              furrykill_xuenu: "血怒",
+              furrykill_xuenu_info: "限定技，出牌阶段开始时，你可以废除装备区并摸两张牌，然后在本回合中，去掉追刃描述中的“第一张”。",
             },
           },
         }, "FurryKill");
@@ -1352,7 +1606,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.9",
+      version: "1.9.115.1.10",
     },
   }
 })
