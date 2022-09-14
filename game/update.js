@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'1.9.115.1.12',
+	version:'1.9.115.1.13',
 	update:'1.9.115',
 	changeLog:[
 		'阮籍、臧洪入选稿公布',
@@ -9,6 +9,8 @@ window.noname_update={
 		'小瑞、咕咚',
 		'12:',
 		'修复bug，削弱咕咚血怒',
+		'13:',
+		'修复小瑞技能伤害不为雷电伤害的bug',
 	],
 	files:[
 		'extension/FurryKill/extension.js',

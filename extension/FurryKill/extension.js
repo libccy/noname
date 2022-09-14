@@ -1369,14 +1369,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                   if (result.bool) {
                     game.log(trigger.player, '发动了吟唱效果');
 
-                    event.targets = result.targets.sortBySeat();
+                    event.targets = result.targets;
                     event.num = 0;
                   } else {
                     event.finish();
                   }
                   "step 2";
                   if (event.num < event.targets.length) {
-                    event.targets[event.num].damage();
+                    event.targets[event.num].damage(1, 'thunder');
                     event.num++;
                   }
                   if (event.num != event.targets.length)
@@ -1606,7 +1606,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.12",
+      version: "1.9.115.1.13",
     },
   }
 })
