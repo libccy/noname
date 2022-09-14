@@ -1436,7 +1436,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 },
                 filter: function (event, player) {
                   var evt = event.getParent('phaseUse');
-                  if (!evt || event.player != player
+                  if (!evt || evt.player != player
                     || get.type(event.card, 'trick') != 'trick'
                     || !player.countCards('h')) return false;
 
@@ -1606,7 +1606,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.10",
+      version: "1.9.115.1.11",
     },
   }
 })
