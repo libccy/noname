@@ -1481,7 +1481,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     popup: false,
                     filter: function (event) {
                       var evt = event.getParent('furrykill_zhuiren');
-                      return evt != {};
+                      return evt && evt.name == "furrykill_zhuiren";
                     },
                     content: function () {
                       player.draw();
@@ -1510,7 +1510,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 animationColor: "orange",
                 limited: true,
                 filter: function (event, player) {
-                  return !player.storage.furrykill_xuenu;
+                  return !player.storage.furrykill_xuenu && !player.isHealthy();
                 },
                 content: function () {
                   player.awakenSkill('furrykill_xuenu');
@@ -1592,7 +1592,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_zhuiren: "追刃",
               furrykill_zhuiren_info: "你于出牌阶段使用的第一张锦囊牌结算完毕后，可以将一张手牌当作杀使用（此杀无距离和次数限制）。若此杀造成伤害，你摸一张牌。",
               furrykill_xuenu: "血怒",
-              furrykill_xuenu_info: "限定技，出牌阶段开始时，你可以废除装备区并摸两张牌，然后在本回合中，去掉追刃描述中的“第一张”。",
+              furrykill_xuenu_info: "限定技，出牌阶段开始时,若你已受伤，你可以废除装备区并摸两张牌，然后在本回合中，去掉追刃描述中的“第一张”。",
             },
           },
         }, "FurryKill");
@@ -1606,7 +1606,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.11",
+      version: "1.9.115.1.12",
     },
   }
 })
