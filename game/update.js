@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'1.9.115.1.15',
+	version:'1.9.115.1.16',
 	update:'1.9.115',
 	changeLog:[
 		'阮籍、臧洪入选稿公布',
