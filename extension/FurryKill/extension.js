@@ -1505,7 +1505,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                   player.storage.furrykill_xuenu = false;
                 },
                 unique: true,
-                enable: "phaseUse",
+                trigger: { player: "phaseUseBegin" },
                 skillAnimation: true,
                 animationColor: "orange",
                 limited: true,
@@ -1606,7 +1606,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.14",
+      version: "1.9.115.1.15",
     },
   }
 })
