@@ -4887,7 +4887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.current.animate('target');
 					event.current.chooseToUse('乱武：使用一张杀或失去一点体力',function(card){
 						if(get.name(card)!='sha') return false;
-						return lib.filter.filterCard.apply(this,arguments)
+						return lib.filter.cardEnabled.apply(this,arguments)
 					},function(card,player,target){
 						if(player==target) return false;
 						var dist=get.distance(player,target);
@@ -4898,10 +4898,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return false;
 							}
 						}
-						return lib.filter.filterTarget.apply(this,arguments)
+						return lib.filter.filterTarget.apply(this,arguments);
 					}).set('ai2',function(){
 						return get.effect_use.apply(this,arguments)+0.01;
-					});
+					}).set('addCount',false);
 					"step 2"
 					if(result.bool==false) event.current.loseHp();
 					event.current=event.current.next;
@@ -5256,13 +5256,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			quhu:{
 				audio:2,
-				audioname:['re_xunyu'],
+				audioname:['re_xunyu','ol_xunyu'],
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
 					if(player.countCards('h')==0) return false;
 					return game.hasPlayer(function(current){
-						return current.hp>player.hp&&current.countCards('h');
+						return current.hp>player.hp&&player.canCompare(current);
 					});
 				},
 				filterTarget:function(card,player,target){
@@ -7279,7 +7279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuji:['xin_yuji','re_yuji','yuji'],
 			zhangjiao:['re_zhangjiao','sp_zhangjiao','zhangjiao'],
 			dianwei:['dianwei','re_dianwei'],
-			xunyu:['re_xunyu','xunyu'],
+			xunyu:['ol_xunyu','re_xunyu','xunyu'],
 			sp_zhugeliang:['ol_sp_zhugeliang','re_sp_zhugeliang','sp_zhugeliang'],
 			pangtong:['ol_pangtong','re_pangtong','pangtong'],
 			re_jsp_pangtong:['re_jsp_pangtong','sp_pangtong'],

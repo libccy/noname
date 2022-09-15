@@ -1708,36 +1708,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['phaseZhunbeiBegin','damageEnd']},
 				direct:true,
 				filter:function(event,player){
-					var storage1=player.getStorage('luochong_round'),storage2=player.getStorage('luochong');
+					var storage1=player.storage.luochong_round,storage2=player.getStorage('luochong');
+					if(!storage1) storage1=[[],[]];
 					for(var i=0;i<4;i++){
-						if(!storage1.contains(i)&&!storage2.contains(i)&&(i!=2||game.hasPlayer(function(current){
-							return current!=player&&current.hasCard(function(card){
-								return lib.filter.canBeDiscarded(card,player,current);
-							},'he')
-						}))) return true;
+						if(!storage1[0].contains(i)&&!storage2.contains(i)&&game.hasPlayer(function(current){
+							return !storage1[1].contains(current)&&lib.skill.luochong.filterx[i](current);
+						})) return true;
 					}
 					return false;
 				},
+				filterx:[
+					(target)=>target.isDamaged(),
+					()=>true,
+					(target)=>target.countCards('he')>0,
+					()=>true,
+				],
 				onremove:true,
 				content:function(){
 					'step 0'
 					var list=[];
 					var choiceList=[
 						'令一名角色回复1点体力。',
-						'令一名其他角色失去1点体力。',
-						'弃置一名其他角色的至多两张牌。',
+						'令一名角色失去1点体力。',
+						'令一名角色弃置两张牌。',
 						'令一名角色摸两张牌。',
 					];
-					var storage1=player.getStorage('luochong_round'),storage2=player.getStorage('luochong');
+					var storage1=player.storage.luochong_round,storage2=player.getStorage('luochong');
+					if(!storage1) storage1=[[],[]];
 					for(var i=0;i<4;i++){
 						if(storage2.contains(i)){
 							choiceList[i]=('<span style="text-decoration: line-through; opacity:0.5; ">'+choiceList[i]+'</span>');
 						}
-						else if(storage1.contains(i)||(i==2&&!game.hasPlayer(function(current){
-							return current!=player&&current.hasCard(function(card){
-								return lib.filter.canBeDiscarded(card,player,current);
-							},'he')
-						}))){
+						else if(storage1[0].contains(i)||!game.hasPlayer(function(current){
+							return !storage1[1].contains(current)&&lib.skill.luochong.filterx[i](current);
+						})){
 							choiceList[i]=('<span style="opacity:0.5;">'+choiceList[i]+'</span>');
 						}
 						else list.push('选项'+get.cnNumber(i+1,true))
@@ -1746,6 +1750,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseControl(list).set('prompt',get.prompt('luochong')).set('choiceList',choiceList).set('ai',function(){
 						var player=_status.event.player;
 						var list=_status.event.controls.slice(0);
+						var listx=(player.storage.luochong_round||[[],[]])[1];
 						var gett=function(choice){
 							if(choice=='cancel2') return 0.1;
 							var max=0,func={
@@ -1763,7 +1768,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									max=Math.max(max,get.effect(target,{name:'wuzhong'},player,player));
 								},
 							}[choice];
-							game.countPlayer(func);
+							game.countPlayer(function(current){
+								if(!listx.contains(current)) func(current);
+							});
 							return max;
 						};
 						return list.sort(function(a,b){
@@ -1774,30 +1781,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.control!='cancel2'){
 						var index=['选项一','选项二','选项三','选项四'].indexOf(result.control);
 						event.index=index;
+						var listx=(player.storage.luochong_round||[[],[]])[1];
 						var list=[
 							['选择一名角色，令其回复1点体力',function(target){
 								var player=_status.event.player;
 								return get.recoverEffect(target,player,player);
 							}],
-							['选择一名其他角色，令其失去1点体力',function(target){
+							['选择一名角色，令其失去1点体力',function(target){
 								return get.effect(target,{name:'losehp'},player,player);
-							},lib.filter.notMe],
-							['选择一名其他角色，弃置其至多两张牌',function(target){
+							}],
+							['选择一名角色，令其弃置两张牌',function(target){
 								var player=_status.event.player;
 								return get.effect(target,{name:'guohe_copy2'},player,player)*Math.sqrt(Math.min(2,target.countCards('he')));
-							},function(card,player,target){
-								return target!=player&&target.hasCard(function(card){
-									return lib.filter.canBeDiscarded(card,player,target);
-								},'he');
 							}],
 							['选择一名角色，令其摸两张牌',function(target){
 								var player=_status.event.player;
 								return get.effect(target,{name:'wuzhong'},player,player);
 							}]
 						][index];
-						var next=player.chooseTarget(list[0],true);
+						var targets=game.filterPlayer(function(current){
+							return !listx.contains(current)&&lib.skill.luochong.filterx[event.index](current);
+						})
+						var next=player.chooseTarget(list[0],true,function(card,player,target){
+							return _status.event.targets.contains(target);
+						});
+						next.set('targets',targets);
 						next.set('ai',list[1]);
-						if(list.length>2) next.set('filterTarget',list[2]);
 					}
 					else event.finish();
 					'step 2'
@@ -1806,7 +1815,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('luochong',target);
 						if(player!=target) player.addExpose(0.2);
 						player.addTempSkill('luochong_round','roundStart');
-						player.markAuto('luochong_round',[event.index]);
+						if(!player.storage.luochong_round) player.storage.luochong_round=[[],[]];
+						player.storage.luochong_round[0].push(event.index);
+						player.storage.luochong_round[1].push(target);
 						switch(event.index){
 							case 0:
 								target.recover();
@@ -1815,7 +1826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								target.loseHp();
 								break;
 							case 2:
-								player.discardPlayerCard(target,true,'he',[1,2]);
+								target.chooseToDiscard(true,'he',2);
 								break;
 							case 3:
 								target.draw(2);
@@ -1839,14 +1850,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var num=1-player.hp;
-					if(num>0) player.recover(num);
-					'step 1'
+					//var num=1-player.hp;
+					//if(num>0) player.recover(num);
 					var list=[];
 					var choiceList=[
 						'令一名角色回复1点体力。',
-						'令一名其他角色失去1点体力。',
-						'弃置一名其他角色的至多两张牌。',
+						'令一名角色失去1点体力。',
+						'令一名角色弃置两张牌。',
 						'令一名角色摸两张牌。',
 					];
 					var storage2=player.getStorage('luochong');
@@ -1864,14 +1874,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return 0;
 					});
-					'step 2'
+					'step 1'
 					var index=['选项一','选项二','选项三','选项四'].indexOf(result.control);
 					player.markAuto('luochong',[index]);
 					game.log(player,'移去了','#g【落宠】','的','#y'+[
-						'令一名角色回复1点体力。',
-						'令一名其他角色失去1点体力。',
-						'弃置一名其他角色的至多两张牌。',
-						'令一名角色摸两张牌。',
+						'令一名角色回复1点体力',
+						'令一名角色失去1点体力',
+						'令一名角色弃置两张牌',
+						'令一名角色摸两张牌',
 					][index],'的选项');
 				},
 			},
@@ -14380,7 +14390,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseUseBegin'},
 				filter:function(event,player){
-					return /*(get.mode()!='guozhan'||event.player!=player)&&*/event.player.isAlive()&&player.countCards('h')>0;
+					return /*(get.mode()!='guozhan'||event.player!=player)&&*/event.player.isAlive()&&player.countCards('h')>0&&event.player.hasUseTarget({name:'jiu'},null,true);
 				},
 				direct:true,
 				preHidden:true,
@@ -17551,11 +17561,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			luochong:function(player){
 				var storage=player.getStorage('luochong');
-				var str='准备阶段开始时/当你受到伤害后，你可选择本轮内未选择过的一项：'
+				var str='准备阶段开始时/当你受到伤害后，你可选择本轮内未选择过的一项（每名角色每轮限选一次）：'
 				var choiceList=[
 					'⒈令一名角色回复1点体力。',
-					'⒉令一名其他角色失去1点体力。',
-					'⒊弃置一名其他角色的至多两张牌。',
+					'⒉令一名角色失去1点体力。',
+					'⒊令一名角色弃置两张牌。',
 					'⒋令一名角色摸两张牌。'
 				];
 				for(var i=0;i<4;i++){
@@ -18224,9 +18234,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fanxiang_info:'觉醒技，准备阶段开始时，若场上有已受伤且你发动过〖良助〗的选项二的角色，则你加1点体力上限并回复1点体力，失去技能〖良助〗并获得技能〖枭姬〗',
 			xunzhi_info:'准备阶段开始时，若你的上家和下家与你的体力值均不相等，你可以失去1点体力。若如此做，你本局内手牌上限+2。',
 			yawang_info:'锁定技，摸牌阶段开始时，你改为摸X张牌，然后你于本回合的出牌阶段内至多使用X张牌（X为与你体力值相等的角色数）',
-			jilei_info:'当你受到有来源的伤害后，你可以声明一种牌的类别。若如此做，你令伤害来源不能使用、打出或弃置此类别的手牌，直到其下个回合开始。',
+			jilei_info:'当你受到有来源的伤害后，你可以声明一种牌的类别。若如此做，你令伤害来源不能使用、打出或弃置此类别的手牌直到其下个回合开始。',
 			danlao:'啖酪',
-			danlao_info:'当你成为一张指定了多个目标的【杀】或普通锦囊牌的目标时，你可以摸一张牌，令此牌对你无效。',
+			danlao_info:'当你成为【杀】或普通锦囊牌的目标后，若此牌的目标数大于1，则你可以摸一张牌，令此牌对你无效。',
 			gongao:'功獒',
 			zhuiji:'追击',
 			chouhai:'仇海',
@@ -18525,9 +18535,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sppanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项。',
 			tengfanglan:'滕芳兰',
 			luochong:'落宠',
-			luochong_info:'准备阶段开始时/当你受到伤害后，你可选择本轮内未选择过的一项：⒈令一名角色回复1点体力。⒉令一名其他角色失去1点体力。⒊弃置一名其他角色的至多两张牌。⒋令一名角色摸两张牌。',
+			luochong_info:'准备阶段开始时/当你受到伤害后，你可选择本轮内未选择过的一项（每名角色每轮限选一次）：⒈令一名角色回复1点体力。⒉令一名角色失去1点体力。⒊令一名角色弃置两张牌。⒋令一名角色摸两张牌。',
 			aichen:'哀尘',
-			aichen_info:'锁定技。当你进入濒死状态时，若〖落宠〗中的剩余选项数大于1，则你将体力回复至1点，然后选择移去〖落宠〗中的一个选项。',
+			aichen_info:'锁定技。当你进入濒死状态时，若〖落宠〗中的剩余选项数大于1，则你选择移去〖落宠〗中的一个选项。',
 			weizi:'卫兹',
 			yuanzi:'援资',
 			yuanzi_info:'每轮限一次。其他角色的准备阶段开始时，你可将所有手牌交给该角色。若如此做，当该角色于本回合内造成伤害后，若其手牌数不小于你，则你摸两张牌。',

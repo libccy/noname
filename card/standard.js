@@ -717,11 +717,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result&&result.control=='顺时针'){
-						var evt=event.getParent();
+						var evt=event.getParent(),sorter=(_status.currentPhase||player);
 						evt.fixedSeat=true;
-						evt.targets.sortBySeat();
+						evt.targets.sortBySeat(sorter);
 						evt.targets.reverse();
-						if(evt.targets[evt.targets.length-1]==player){
+						if(evt.targets[evt.targets.length-1]==sorter){
 							evt.targets.unshift(evt.targets.pop());
 						}
 					}
@@ -863,14 +863,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
+							var sorter=(_status.currentPhase||player);
 							if(get.is.versus()){
-								if(target==player) return 1.5;
+								if(target==sorter) return 1.5;
 								return 1;
 							}
 							if(player.hasUnknown(2)){
 								return 0;
 							}
-							return (1-get.distance(player,target,'absolute')/game.countPlayer())*get.attitude(player,target)>0?0.5:0.7;
+							return (1-get.distance(sorter,target,'absolute')/game.countPlayer())*get.attitude(player,target)>0?0.5:0.7;
 						}
 					},
 					tag:{

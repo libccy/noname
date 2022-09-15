@@ -1439,6 +1439,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			bolan:{
 				audio:2,
+				banned:['kotomi_chuanxiang'],
 				initList:function(player){
 					var list,skills=[];
 					if(get.mode()=='guozhan'){
@@ -1458,7 +1459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var j of lib.character[i][3]){
 							if(j=='bolan') continue;
 							var skill=lib.skill[j];
-							if(!skill||skill.zhuSkill||skill.dutySkill) continue;
+							if(!skill||skill.zhuSkill||skill.dutySkill||lib.skill.bolan.banned.contains(j)) continue;
 							if(skill.init||skill.ai&&(skill.ai.combo||skill.ai.notemp||skill.ai.neg)) continue;
 							var info=lib.translate[j+'_info'];
 							if(info&&info.indexOf('出牌阶段限一次')!=-1) skills.add(j);
@@ -1517,6 +1518,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					game.broadcastAll('closeDialog',event.videoId);
 					trigger.player.addTempSkill(result.control,'phaseUseEnd');
+					trigger.player.popup(result.control,'thunder');
+					game.log(player,'为',player==trigger.player?'自己':trigger.player,'选择了技能','#g【'+get.translation(result.control)+'】')
 				},
 			},
 			yifa:{

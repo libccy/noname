@@ -175,6 +175,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.addTempSkill('sbliegong_block');
 					if(!target.storage.sbliegong_block) target.storage.sbliegong_block=[];
 					target.storage.sbliegong_block.push([evt.card,storage]);
+					lib.skill.sbliegong.updateBlocker(target);
+				},
+				updateBlocker:function(player){
+					var list=[],storage=player.storage.sbliegong_block;
+					if(storage&&storage.length){
+						for(var i of storage) list.addArray(i[1]);
+					}
+					player.storage.sbliegong_blocker=list;
 				},
 				ai:{
 					threaten:3.5,
@@ -212,15 +220,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					block:{
 						mod:{
 							cardEnabled:function(card,player){
-								if(!player.storage.sbliegong_block) return;
+								if(!player.storage.sbliegong_blocker) return;
 								var suit=get.suit(card);
 								if(suit=='none') return;
 								var evt=_status.event;
 								if(evt.name!='chooseToUse') evt=evt.getParent('chooseToUse');
 								if(!evt||!evt.respondTo||evt.respondTo[1].name!='sha') return;
-								for(var i of player.storage.sbliegong_block){
-									if(i[1].contains(suit)) return false;
-								}
+								if(player.storage.sbliegong_blocker.contains(suit)) return false;
 							},
 						},
 						trigger:{
@@ -231,7 +237,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						firstDo:true,
 						charlotte:true,
-						onremove:true,
+						onremove:function(player){
+							delete player.storage.sbliegong_block;
+							delete player.storage.sbliegong_blocker;
+						},
 						filter:function(event,player){
 							if(!event.card||!player.storage.sbliegong_block) return false;
 							for(var i of player.storage.sbliegong_block){
@@ -247,6 +256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							if(!storage.length) player.removeSkill('sbliegong_block');
+							else lib.skill.sbliegong.updateBlocker(target);
 						},
 					},
 					count:{
@@ -457,7 +467,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!card||card.name!='sha') return false;
 						var evtx=evt.getParent('useCard');
 						return evtx.card==card&&evtx.getParent()==event;
-					})) player.recover();
+					})){
+						target.draw();
+						player.recover();
+					}
 				},
 			},
 		},
@@ -466,7 +479,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spmingxuan:'瞑昡',
 			spmingxuan_info:'锁定技。出牌阶段开始时，你须选择至多X张花色各不相同的手牌（X为未选择过选项一的角色），将这些牌随机交给这些角色中的等量角色。然后这些角色依次选择一项：⒈对你使用一张【杀】。⒉交给你一张牌，然后你摸一张牌。',
 			spxianchou:'陷仇',
-			spxianchou_info:'当你受到有来源的伤害后，你可选择一名不为伤害来源的其他角色。该角色可以弃置一张牌，然后视为对伤害来源使用一张【杀】（无距离限制）。若其因此【杀】造成了伤害，则你回复1点体力。',
+			spxianchou_info:'当你受到有来源的伤害后，你可选择一名不为伤害来源的其他角色。该角色可以弃置一张牌，然后视为对伤害来源使用一张【杀】（无距离限制）。若其因此【杀】造成了伤害，则其摸一张牌，你回复1点体力。',
 			liucheng:'刘赪',
 			splveying:'掠影',
 			splveying_info:'锁定技。①每回合限两次，当你使用【杀】指定目标后，你获得一个“椎”。②当你使用的【杀】结算结束后，若你的“椎”数大于1，则你弃置两个“椎”，然后弃置所有目标角色的各一张手牌。',
