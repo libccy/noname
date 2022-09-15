@@ -1437,13 +1437,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 filter: function (event, player) {
                   var evt = event.getParent('phaseUse');
                   if (!evt || evt.player != player
-                    || get.type(event.card, 'trick') != 'trick'
+                    || get.type(event.card) != 'trick'
                     || !player.countCards('h')) return false;
 
                   if (player.hasSkill("furrykill_xuenu1")) return true;
 
                   if (player.getHistory('useCard', function (ev) {
-                    return ev.getParent('phaseUse') == evt && get.type(ev.card, 'trick') == 'trick'
+                    return ev.getParent('phaseUse') == evt && get.type(ev.card) == 'trick'
                   }).indexOf(event) == 0) return true;
 
                   return false;
@@ -1515,12 +1515,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 content: function () {
                   player.awakenSkill('furrykill_xuenu');
                   player.storage.furrykill_xuenu = true;
+                  var equipCount = player.countCards('e');
+                  player.draw(equipCount);
                   player.disableEquip('equip1');
                   player.disableEquip('equip2');
                   player.disableEquip('equip3');
                   player.disableEquip('equip4');
                   player.disableEquip('equip5');
-                  player.draw(2);
                   player.addTempSkill('furrykill_xuenu1');
                 },
               },
@@ -1590,9 +1591,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_yanmu: "烟幕",
               furrykill_yanmu_info: "隐匿，你于回合外登场时，本回合你不能成为杀或决斗的目标。",
               furrykill_zhuiren: "追刃",
-              furrykill_zhuiren_info: "你于出牌阶段使用的第一张锦囊牌结算完毕后，可以将一张手牌当作杀使用（此杀无距离和次数限制）。若此杀造成伤害，你摸一张牌。",
+              furrykill_zhuiren_info: "你于出牌阶段使用的第一张普通锦囊牌结算完毕后，可以将一张手牌当作杀使用（此杀无距离和次数限制）。若此杀造成伤害，你摸一张牌。",
               furrykill_xuenu: "血怒",
-              furrykill_xuenu_info: "限定技，出牌阶段开始时,若你已受伤，你可以废除装备区并摸两张牌，然后在本回合中，去掉追刃描述中的“第一张”。",
+              furrykill_xuenu_info: "限定技，出牌阶段开始时,若你已受伤，你可以摸等同于装备区里装备数量的牌并废除装备区，然后在本回合中，去掉追刃描述中的“第一张”。",
             },
           },
         }, "FurryKill");
@@ -1606,7 +1607,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.15",
+      version: "1.9.115.1.16",
     },
   }
 })
