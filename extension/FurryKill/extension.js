@@ -112,6 +112,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 ["furrykill_yanmu", "furrykill_zhuiren", "furrykill_xuenu"],
                 ["hiddenSkill", "des:不存在的"],
               ],
+              furrykill_qinhan: [
+                "male",
+                "furrykill_cat",
+                3,
+                ["furrykill_xunmei", "furrykill_luoxue", "furrykill_tanying"],
+                ["hiddenSkill", "des:云水"],
+              ],
+
             },
             translate: {
               furrykill_shifeng: "时风",
@@ -126,6 +134,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_yizhichuan: "伊织川",
               furrykill_xiaorui: "小瑞",
               furrykill_gudong: "咕咚",
+              furrykill_qinhan: "倾寒",
+
             },
           },
           characterTitle: {
@@ -1527,7 +1537,131 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               },
               furrykill_xuenu1: {
                 charlotte: true,
-              }
+              },
+
+              furrykill_xunmei: {
+                trigger: {
+                  player: "showCharacterAfter",
+                },
+                hiddenSkill: true,
+                filter: function (event, player) {
+                  return event.toShow.contains('furrykill_qinhan');
+                },
+                content: function () {
+                  'step 0';
+                  event.cards = game.cardsGotoOrdering(get.cards(4)).cards;
+                  player.showCards(event.cards);
+                  'step 1';
+                  for (var i = 0; i < event.cards.length; i++) {
+                    if (get.suit(event.cards[i]) != 'club') {
+                      event.cards.remove(event.cards[i])
+                      i--;
+                    }
+                  }
+                  'step 2';
+                  if (event.cards.length != 0) {
+                    player.gain(event.cards, 'gain2', 'log');
+                  }
+                },
+              },
+
+              furrykill_luoxue: {
+                init: function (player) {
+                  player.storage.furrykill_luoxue1 = null;
+                  player.storage.furrykill_luoxue = false;
+                },
+                enable: "phaseUse",
+                usable: 1,
+                filter: function (event, player) {
+                  return player.countCards('he', { suit: 'club' });
+                },
+                position: "he",
+                filterCard: {
+                  suit: "club",
+                },
+                filterTarget: function () {
+                  return true;
+                },
+                check: function (card) {
+                  return 7 - get.value(card);
+                },
+                content: function () {
+                  player.storage.furrykill_luoxue1 = target;
+                  target.damage();
+                },
+                group: ["furrykill_luoxue_1", "furrykill_luoxue_2", "furrykill_luoxue_3"],
+                subSkill: {
+                  1: {
+                    trigger: {
+                      player: "phaseJieshuBegin",
+                    },
+                    filter: function (event, player) {
+                      return player.storage.furrykill_luoxue;
+                    },
+                    content: function () {
+                      player.storage.furrykill_luoxue = false;
+                      player.insertPhase();
+                    },
+                  },
+                  2: {
+                    trigger: {
+                      global: "dieAfter",
+                    },
+                    forced: true,
+                    charlotte: true,
+                    filter: function (event, player) {
+                      return player.storage.furrykill_luoxue1 == event.player;
+                    },
+                    content: function () {
+                      player.storage.furrykill_luoxue1 = null;
+                      player.storage.furrykill_luoxue = true;
+                    },
+                  },
+                  3: {
+                    trigger: {
+                      player: "phaseJieshuAfter",
+                    },
+                    popup: false,
+                    forced: true,
+                    charlotte: true,
+                    content: function () {
+                      player.storage.furrykill_luoxue1 = null;
+                    },
+                  }
+                },
+                ai: {
+                  expose: 0.2,
+                  order: 9.1,
+                  threaten: 2,
+                  result: {
+                    target: function (player, target) {
+                      if (target.hp <= 2 && get.attitude(player, target) < 0) return 0.5;
+                      return -1;
+                    },
+                  },
+                },
+              },
+
+              furrykill_tanying: {
+                trigger: {
+                  global: "phaseUseEnd",
+                },
+                frequent: true,
+                filter: function (event, player) {
+                  if (player == event.player) return false;
+                  var cardLength = ui.discardPile.childElementCount;
+                  if (cardLength == 0) return false;
+                  var card = ui.discardPile.childNodes[cardLength - 1];
+                  console.log(get.suit(card));
+                  if (get.suit(card) != 'club') return false;
+                  return true;
+                },
+                content: function () {
+                  var cardLength = ui.discardPile.childElementCount;
+                  var card = ui.discardPile.childNodes[cardLength - 1];
+                  player.gain(card, 'gain2', 'log');
+                },
+              },
 
             },
             dynamicTranslate: dynamicTranslate,
@@ -1594,6 +1728,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_zhuiren_info: "你于出牌阶段使用的第一张普通锦囊牌结算完毕后，可以将一张手牌当作杀使用（此杀无距离和次数限制）。若此杀造成伤害，你摸一张牌。",
               furrykill_xuenu: "血怒",
               furrykill_xuenu_info: "限定技，出牌阶段开始时,若你已受伤，你可以摸等同于装备区里装备数量的牌并废除装备区，然后在本回合中，去掉追刃描述中的“第一张”。",
+              furrykill_xunmei: "寻梅",
+              furrykill_xunmei_info: "隐匿，你登场后，可以展示牌堆顶的四张牌，获得其中的♣牌，弃置其余的牌。",
+              furrykill_luoxue: "落雪",
+              furrykill_luoxue_info: "出牌阶段限一次，你可以弃置一张♣牌，对一名角色造成一点伤害。然后本回合结束后，若该角色死亡，你进行一个额外的回合。",
+              furrykill_tanying: "探樱",
+              furrykill_tanying_info: "其他角色的出牌阶段结束时，若弃牌堆顶的牌花色为♣，你可以获得之。",
             },
           },
         }, "FurryKill");
@@ -1607,7 +1747,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.1.16",
+      version: "1.9.115.2.2",
     },
   }
 })
