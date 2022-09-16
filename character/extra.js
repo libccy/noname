@@ -1866,7 +1866,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target.isMaxHandcard()) player.loseMaxHp();
 				},
 				ai:{
-					order:1,
+					order:1.2,
 					result:{
 						player:1,
 					},
@@ -1954,28 +1954,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zuoxing:{
 				audio:2,
-				trigger:{player:'phaseZhunbeiBegin'},
-				filter:function(event,player){
-					var target=player.storage.zuoxing;
-					return target&&target.isAlive()&&target.maxHp>1;
-				},
-				logTarget:function(event,player){
-					return player.storage.zuoxing;
-				},
-				check:function(event,player){
-					var target=player.storage.zuoxing;
-					if(get.attitude(player,target)<=0) return true;
-					return target.maxHp>3&&!player.hasJudge('lebu');
-				},
-				content:function(){
-					player.storage.zuoxing.loseMaxHp();
-					player.addTempSkill('zuoxing2');
-				},
-			},
-			zuoxing2:{
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
+					var target=player.storage.zuoxing;
+					if(!target||!target.isAlive()||target.maxHp<2) return false;
 					for(var i of lib.inpile){
 						if(get.type(i)=='trick'&&event.filterCard({name:i,isCard:true},player,event)) return true;
 					}
@@ -2003,6 +1986,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							popname:true,
 							precontent:function(){
 								player.logSkill('zuoxing');
+								var target=player.storage.zuoxing;
+								target.loseMaxHp();
 								//delete event.result.skill;
 							},
 						}
@@ -2017,6 +2002,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'sghuishi',
 				inherit:'sghuishi',
 				filterTarget:true,
+				prompt:function(){
+					var player=_status.event.player;
+					if(player.maxHp>=game.players.length) return '选择一名角色。若其拥有未发动过的觉醒技，则你解除其中一个觉醒技的发动限制；否则其摸四张牌。然后你减2点体力上限。';
+					return '令一名角色摸四张牌，然后你减2点体力上限。';
+				},
 				content:function(){
 					'step 0'
 					player.awakenSkill('resghuishi');
@@ -2620,7 +2610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else player.line(target,'green');
 						//targets.push(target);
-						if(!target.countCards('h')) event._result={index:1};
+						if(target.countCards('h')==0) event._result={index:0};
 						else player.chooseControl('摸一张牌','弃置一张手牌').set('prompt','选择一项令'+get.translation(target)+'执行…').set('goon',get.attitude(player,target)>0?0:1).set('ai',()=>_status.event.goon);
 						//else player.discardPlayerCard(target,'h','弃置'+get.translation(target)+'一张手牌，或点【取消】令其摸一张牌。');
 					}
@@ -6000,7 +5990,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			stianyi_info:'觉醒技，准备阶段，若场上的所有存活角色均于本局游戏内受到过伤害，则你加2点体力上限并回复1点体力，然后令一名角色获得技能〖佐幸〗。',
 			zuoxing:'佐幸',
 			zuoxing2:'佐幸',
-			zuoxing_info:'准备阶段，若令你获得〖佐幸〗的角色存活且体力上限大于1，则你可以令其减1点体力上限，然后你获得如下效果：出牌阶段限一次，你可以获得一张普通锦囊牌。',
+			zuoxing_info:'出牌阶段限一次，若令你获得〖佐幸〗的角色存活且体力上限大于1，则你可以令其减1点体力上限，并视为一张普通锦囊牌。',
 			sghuishi:'辉逝',
 			sghuishi_info:'限定技，出牌阶段，你可以选择一名其他角色：若其有未发动过的觉醒技，则你令其发动这些觉醒技时无视原有条件；否则其摸四张牌。然后你减2点体力上限。',
 			shen_taishici:'神太史慈',

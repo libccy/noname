@@ -1754,7 +1754,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:'受到的伤害-1',
 						},
-						trigger:{player:'damageBegin1'},
+						trigger:{player:'damageBegin3'},
 						forced:true,
 						content:function(){
 							trigger.num--;
@@ -6383,7 +6383,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				content:function(){
 					'step 0'
-					event.num=game.countGroup();
+					var list=[],players=game.filterPlayer();
+					for(var target of players){
+						if(target.isUnseen()) continue;
+						var add=true;
+						for(var i of list){
+							if(i.isFriendOf(target)){
+								add=false;
+								break;
+							}
+						}
+						if(add) list.add(target);
+					}
+					event.num=list.length;
 					player.draw(event.num);
 					if(event.num>2) player.turnOver();
 					'step 1'
@@ -11438,7 +11450,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzkuangfu:'狂斧',
 			gzkuangfu_info:'出牌阶段限一次。当你使用【杀】指定目标后，你可获得目标角色装备区内的一张牌。然后若此【杀】未造成伤害，则你弃置两张手牌。',
 			gzliegong:'烈弓',
-			gzliegong_info:'①你对手牌数不大于你的角色使用【杀】不受距离关系的限制。②当你使用【杀】指定目标后，若其体力值不小于你，则你可以选择一项：⒈令此【杀】对其的伤害值基数+1。⒉令其不氪响应此【杀】。',
+			gzliegong_info:'①你对手牌数不大于你的角色使用【杀】不受距离关系的限制。②当你使用【杀】指定目标后，若其体力值不小于你，则你可以选择一项：⒈令此【杀】对其的伤害值基数+1。⒉令其不可响应此【杀】。',
 			gzhongyan:'红颜',
 			gzhongyan_info:'锁定技。①你区域内的黑桃牌和黑桃判定牌的花色视为红桃。②若你的装备区内有红桃牌，则你的手牌上限+1。',
 			gztianxiang:'天香',
@@ -11595,6 +11607,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzdeshao_info:'每回合限X次（X为你的体力值）。其他角色使用黑色牌指定你为唯一目标后，若其暗置的武将牌数大于等于你，则你可以弃置其一张牌。',
 			gzmingfa:'明伐',
 			gzmingfa_info:'出牌阶段限一次，你可以选择一名敌方角色。该角色的下个回合结束时，若其手牌数：小于你，你对其造成1点伤害并获得其一张手牌；大于你，你摸X张牌（X为你与其的手牌数之差且至多为5）。',
+			gzjilei_info:'当你受到有来源的伤害后，你可以声明一种牌的类别。若如此做，你令伤害来源不能使用、打出或弃置此类别的手牌直到回合结束。',
+			gzdanlao_info:'当你成为普通锦囊牌的目标后，若此牌的目标数大于1，则你可以摸一张牌，令此牌对你无效。',
 
 			gz_cuimao:'崔琰毛玠',
 			gzzhengbi:'征辟',

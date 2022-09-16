@@ -640,7 +640,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						targets.push(player);
 						if(target.identity!='ye'){
 						game.filterPlayer(function(current){
-							return target!=current&&target.identity==current.identity&&!current.hasSkill('diaohulishan');
+							return target!=current&&target.isFriendOf(current)&&!current.hasSkill('diaohulishan');
 							},targets);
 						}
 					}
@@ -1072,7 +1072,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					equipValue:function(card,player){
 						if(player.identity=='unknown'||player.identity=='ye') return 2.5;
 						return 2+game.countPlayer(function(current){
-							return current.identity==player.identity;
+							return current.isFriendOf(player);
 						})/2;
 					},
 					basic:{
@@ -1747,11 +1747,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			g_wuliu_skill:{
 				equipSkill:true,
 				mod:{
-					attackFrom:function(from,to,distance){
-						return distance-game.countPlayer(function(current){
-							if(current==from) return false;
-							if(current.identity=='unknown'||current.identity=='ye') return false;
-							if(current.identity!=from.identity) return false;
+					attackRange:function(player,distance){
+						return distance+game.countPlayer(function(current){
+							if(current==player||!current.isFriendOf(player)) return false;
 							if(current.hasSkill('wuliu_skill')) return true;
 						});
 					}
