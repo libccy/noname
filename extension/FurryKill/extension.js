@@ -839,7 +839,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                       'step 0';
                       event.target2 = _status.currentPhase;
                       event.shuang = player.getExpansions('furrykill_hanren');
-                      player.chooseButton(['寒刃：是否弃置一张【霜】？弃置后该角色若使用了与此【霜】类别相同的牌，则本阶段不能再使用牌。', event.shuang]).set('filterButton', function (button) {
+                      player.chooseButton(['寒刃：是否交给其一张【霜】？其不能使用、打出或弃置与霜类别相同的牌，直到此回合结束。', event.shuang]).set('filterButton', function (button) {
                         return ui.selected.buttons.length == 0;
                       }).set('ai', function (button) {
                         return get.value(button.link);
@@ -847,43 +847,40 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                       'step 1';
                       if (result.bool && result.links) {
                         event.usedShuang = result.links[0];
-                        player.loseToDiscardpile(event.usedShuang);
+                        event.target2.gain(event.usedShuang, player, 'giveAuto');
                       } else {
                         event.finish();
                       }
                       'step 2';
-                      var shuangType = get.type(event.usedShuang);
-                      if (shuangType == 'delay') shuangType = 'trick';
-                      event.target2.storage.furrykill_hanren2 = shuangType;
+                      event.target2.storage.furrykill_hanren2 = get.type(event.usedShuang, 'trick');
                       'step 3';
                       event.target2.addTempSkill("furrykill_hanren2");
-                      game.log(player, '对', event.target2, '发动了【寒刃】，弃置的【霜】为', event.usedShuang);
+                      game.log(player, '对', event.target2, '发动了【寒刃】，【霜】为', event.usedShuang);
                     },
                     sub: true,
                   }
                 }
               },
               furrykill_hanren2: {
-                trigger: { player: 'useCard' },
-                direct: true,
-                charlotte: true,
-                filter: function (event, player) {
-                  var usedType = get.type(event.card);
-                  if (usedType == 'delay') usedType = 'trick';
-                  return usedType == player.storage.furrykill_hanren2;
+                mark: true,
+                charlotte:true,
+                forced:true,
+                intro: {
+                  content: "不能使用、打出或弃置与霜类别相同的牌"
                 },
-                content: function () {
-                  'step 0';
-                  player.addTempSkill("furrykill_hanren2ed", "phaseUseEnd");
-                  'step 1';
-                  game.log(player, '因为【霜】本阶段不能再使用牌');
-                }
-              },
-              furrykill_hanren2ed: {
                 mod: {
-                  cardEnabled: function (card, player) {
-                    return false;
+                  cardDiscardable: function (card, player) {
+                    if (get.type(card, 'trick') == player.storage.furrykill_hanren2) return false;
                   },
+                  cardEnabled: function (card, player) {
+                    if (get.type(card, 'trick') == player.storage.furrykill_hanren2) return false;
+                  },
+                  cardEnabled2: function (card, player) {
+                    if (get.type(card, 'trick') == player.storage.furrykill_hanren2) return false;
+                  },
+                },
+                onremove: function (player) {
+                  delete player.storage.furrykill_hanren2;
                 },
               },
 
@@ -1274,7 +1271,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                   var minDice = player.getCards('h').map((item) => {
                     return get.number(item);
                   }).reduce((a, b) => a < b ? a : b);
-                  console.log("min dice is" + minDice)
                   return get.number(card) == minDice;
                 },
                 viewAs: {
@@ -1697,7 +1693,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_lvbing: "履冰",
               furrykill_lvbing_info: "隐匿，你于其他角色的回合登场后，可以将一张牌置于武将牌上，称为霜。",
               furrykill_hanren: "寒刃",
-              furrykill_hanren_info: "结束阶段，你可以将一张牌置于武将牌上，称为霜。其他角色的出牌阶段开始时，你可以弃置一张霜，然后该角色若使用了与此霜类别相同的牌，则本阶段不能再使用牌。",
+              furrykill_hanren2: "寒刃",
+              furrykill_hanren_info: "结束阶段，你可以将一张牌置于武将牌上，称为霜。其他角色的出牌阶段开始时，你可以交给其一张霜，然后该角色不能使用、打出或弃置与霜类别相同的牌，直到此回合结束。",
               furrykill_ruiyan: "锐眼",
               furrykill_ruiyan_info: "出牌阶段限一次，你可以观看一名其他角色的手牌，若其中包含至少两种类别的牌，你选择其中一张获得；否则其获得你的一张牌。",
               furrykill_fuyun: "福运",
