@@ -1,5 +1,5 @@
 window.noname_update={
-	version:'1.9.115.2.2',
+	version:'1.9.115.2.3',
 	update:'1.9.115.1',
 	changeLog:[
 		'李密入选稿公布',
@@ -8,7 +8,8 @@ window.noname_update={
 		'移动版阮慧、马日磾、全琮i',
 		'技能调整与bug修复',
 		'furrykill:',
-		'倾寒'
+		'修改安谅、倾寒',
+		'修复伊织川跨回合叠浪的bug'
 	],
 	files:[
 		'extension/FurryKill/extension.js',
