@@ -863,8 +863,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               },
               furrykill_hanren2: {
                 mark: true,
-                charlotte:true,
-                forced:true,
+                charlotte: true,
+                forced: true,
                 intro: {
                   content: "不能使用、打出或弃置与霜类别相同的牌"
                 },
@@ -1257,6 +1257,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     charlotte: true,
                     trigger: { player: "phaseUseAfter" },
                     content: function () {
+                      player.storage.furrykill_dielang = 0;
                       player.unmarkSkill('furrykill_dielang');
                     },
                     sub: true,
@@ -1645,17 +1646,60 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 frequent: true,
                 filter: function (event, player) {
                   if (player == event.player) return false;
-                  var cardLength = ui.discardPile.childElementCount;
-                  if (cardLength == 0) return false;
-                  var card = ui.discardPile.childNodes[cardLength - 1];
-                  console.log(get.suit(card));
+
+                  var events = event.player.getHistory('useCard', function (ev) {
+                    return ev.getParent('phaseUse') == event
+                  });
+                  if (events.length == 0) return false;
+                  var card = events[events.length - 1].card;
                   if (get.suit(card) != 'club') return false;
+
+                  var filterCard = function (c) {
+                    return c.name == card.name
+                      && get.suit(c) == get.suit(card)
+                      && get.number(c) == get.number(card);
+                  };
+                  var filterPlayer = game.filterPlayer(function (current) {
+                    return current.hasCard(filterCard, 'ej');
+                  });
+
+                  if (filterPlayer.length == 0) {
+                    var fromDiscard = null;
+                    for (var i = ui.discardPile.childNodes.length - 1; i >= 0; i--) {
+                      if (filterCard(ui.discardPile.childNodes[i])) {
+                        fromDiscard = ui.discardPile.childNodes[i];
+                        break;
+                      }
+                    }
+                    if (fromDiscard == null) {
+                      return false;
+                    } else {
+                      player.storage.furrykill_tanying_fromPlayer = null;
+                      player.storage.furrykill_tanying_gainCard = fromDiscard;
+                    }
+                  } else {
+                    player.storage.furrykill_tanying_fromPlayer = filterPlayer[0];
+                    var found = null;
+                    game.findPlayer(function (current) {
+                      var ej = current.getCards('ej');
+                      for (var i = 0; i < ej.length; i++) {
+                        if (filterCard(ej[i])) {
+                          found = ej[i];
+                          return true;
+                        }
+                      }
+                    });
+                    player.storage.furrykill_tanying_gainCard = found;
+                  }
                   return true;
                 },
                 content: function () {
-                  var cardLength = ui.discardPile.childElementCount;
-                  var card = ui.discardPile.childNodes[cardLength - 1];
-                  player.gain(card, 'gain2', 'log');
+                  if (player.storage.furrykill_tanying_fromPlayer != null) {
+                    player.gain(player.storage.furrykill_tanying_gainCard,
+                      player.storage.furrykill_tanying_fromPlayer, 'gain2', 'log');
+                  } else {
+                    player.gain(player.storage.furrykill_tanying_gainCard, 'gain2', 'log');
+                  }
                 },
               },
 
@@ -1726,11 +1770,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
               furrykill_xuenu: "血怒",
               furrykill_xuenu_info: "限定技，出牌阶段开始时,若你已受伤，你可以摸等同于装备区里装备数量的牌并废除装备区，然后在本回合中，去掉追刃描述中的“第一张”。",
               furrykill_xunmei: "寻梅",
-              furrykill_xunmei_info: "隐匿，你登场后，可以展示牌堆顶的四张牌，获得其中的♣牌，弃置其余的牌。",
+              furrykill_xunmei_info: "隐匿，你登场后，可以展示牌堆顶的四张牌，获得其中的♣牌，将其余的牌置入弃牌堆。",
               furrykill_luoxue: "落雪",
               furrykill_luoxue_info: "出牌阶段限一次，你可以弃置一张♣牌，对一名角色造成一点伤害。然后本回合结束后，若该角色死亡，你进行一个额外的回合。",
               furrykill_tanying: "探樱",
-              furrykill_tanying_info: "其他角色的出牌阶段结束时，若弃牌堆顶的牌花色为♣，你可以获得之。",
+              furrykill_tanying_info: "其他角色的出牌阶段结束时，若此阶段使用的最后一张牌是♣牌且存在于场上或弃牌堆，你可以获得之。",
             },
           },
         }, "FurryKill");
