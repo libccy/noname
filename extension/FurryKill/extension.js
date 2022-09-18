@@ -1592,6 +1592,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     trigger: {
                       player: "phaseJieshuBegin",
                     },
+                    forced: true,
                     filter: function (event, player) {
                       return player.storage.furrykill_luoxue;
                     },
@@ -1788,7 +1789,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
       author: "SwordFox & XuankaiCat",
       diskURL: "",
       forumURL: "",
-      version: "1.9.115.2.3",
+      version: "1.9.115.2.1.1",
     },
   }
 })

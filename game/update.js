@@ -9,7 +9,8 @@ window.noname_update={
 		'技能调整与bug修复',
 		'furrykill:',
 		'修改安谅、倾寒',
-		'修复伊织川跨回合叠浪的bug'
+		'修复伊织川跨回合叠浪的bug',
+		'落雪的额外回合改为强制执行'
 	],
 	files:[
 		'extension/FurryKill/extension.js',
