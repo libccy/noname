@@ -1708,6 +1708,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['phaseZhunbeiBegin','damageEnd']},
 				direct:true,
 				filter:function(event,player){
+					if(event.name=='damage'){
+						var history=player.getHistory('damage');
+						if(history.indexOf(event)!=0) return false;
+					}
 					var storage1=player.storage.luochong_round,storage2=player.getStorage('luochong');
 					if(!storage1) storage1=[[],[]];
 					for(var i=0;i<4;i++){
@@ -4481,6 +4485,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								isCard:true,
 							},
 							position:'he',
+							ignoreMod:true,
 							check:function(card){
 								var player=_status.event.player,color=get.color(card,player);
 								if(player.countCards('he',{color:color})<=player.countMark('jinzhi2')||(ui.selected.cards.length&&get.color(ui.selected.cards[0],player)!=color)) return -1;
@@ -18535,7 +18540,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sppanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项。',
 			tengfanglan:'滕芳兰',
 			luochong:'落宠',
-			luochong_info:'准备阶段开始时/当你受到伤害后，你可选择本轮内未选择过的一项（每名角色每轮限选一次）：⒈令一名角色回复1点体力。⒉令一名角色失去1点体力。⒊令一名角色弃置两张牌。⒋令一名角色摸两张牌。',
+			luochong_info:'准备阶段开始时/当你于一回合内首次受到伤害后，你可选择本轮内未选择过的一项（每名角色每轮限选一次）：⒈令一名角色回复1点体力。⒉令一名角色失去1点体力。⒊令一名角色弃置两张牌。⒋令一名角色摸两张牌。',
 			aichen:'哀尘',
 			aichen_info:'锁定技。当你进入濒死状态时，若〖落宠〗中的剩余选项数大于1，则你选择移去〖落宠〗中的一个选项。',
 			weizi:'卫兹',

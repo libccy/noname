@@ -609,7 +609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=result.targets[0];
 								event.target=target;
 								player.logSkill('nstuilun_effect',target);
-								if(!target.countCards('he')) event._result={index:1};
+								if(!target.countCards('he')) event._result={index:0};
 								else player.chooseControl('摸一张牌','弃置一张牌').set('prompt','令'+get.translation(target)+'…').set('ai',function(player){
 									var evt=_status.event;
 									return get.attitude(evt.player,evt.getParent().target)>0?0:1;

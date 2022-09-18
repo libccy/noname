@@ -707,7 +707,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(!i.isIn()) return;
 								}
 							}
-							var next=player.useCard(get.copy(card),trigger.targets);
+							var next=player.useCard(get.copy(card),trigger.targets,false);
 							if(trigger.addedTarget) next.addedTarget=trigger.addedTarget;
 							if(trigger.addedTargets&&trigger.addedTargets.length) next.addedTargets=trigger.addedTargets.slice(0);
 							if(event.count>0) event.redo();

@@ -1,6 +1,6 @@
 window.noname_update={
-	version:'1.9.115.2.3',
-	update:'1.9.115.1',
+	version:'1.9.115.2.1.1',
+	update:'1.9.115.2',
 	changeLog:[
 		'李密入选稿公布',
 		'OL界荀彧',
