@@ -14173,12 +14173,21 @@
 						event.dialog.addText(event.prompt2);
 					}
 					var directh=!lib.config.unauto_choose;
+                    var mingzhi = target.storage.mingzhi;
+                    var inField = 0;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
+                            inField = -1;
 							var hs=target.getCards('h');
 							if(hs.length){
 								event.dialog.addText('手牌区');
-								hs.randomSort();
+                                if(mingzhi) {
+                                    hs = hs.filter((c) => {
+                                        return !mingzhi.contains(c);
+                                    });
+                                    event.dialog.add(mingzhi);
+                                }
+                                hs.randomSort();
 								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
 									directh=false;
@@ -14189,6 +14198,7 @@
 							}
 						}
 						else if(event.position[i]=='e'){
+                            inField++;
 							var es=target.getCards('e');
 							if(es.length){
 								event.dialog.addText('装备区');
@@ -14197,6 +14207,7 @@
 							}
 						}
 						else if(event.position[i]=='j'){
+                            inField++;
 							var js=target.getCards('j');
 							if(js.length){
 								event.dialog.addText('判定区');
@@ -14205,6 +14216,11 @@
 							}
 						}
 					}
+                    if(mingzhi && inField == 2) {
+                        event.dialog.addText('手牌区');
+                        event.dialog.add(mingzhi);
+                        directh=false;
+                    }
 					if(event.dialog.buttons.length==0){
 						event.finish();
 						return;
@@ -14295,11 +14311,23 @@
 						event.dialog.addText(event.prompt2);
 					}
 					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
+                    var mingzhi = target.storage.mingzhi;
+                    var inField = 0;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
+                            inField = -1;
 							var hs=target.getDiscardableCards(player,'h');
 							if(hs.length){
 								event.dialog.addText('手牌区');
+                                if(mingzhi) {
+                                    var mz = hs.filter((c) => {
+                                        return mingzhi.contains(c);
+                                    });
+                                    hs = hs.filter((c) => {
+                                        return !mingzhi.contains(c);
+                                    });
+                                    event.dialog.add(mz);
+                                }
 								hs.randomSort();
 								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
@@ -14311,6 +14339,7 @@
 							}
 						}
 						else if(event.position[i]=='e'){
+                            inField++;
 							var es=target.getDiscardableCards(player,'e');
 							if(es.length){
 								event.dialog.addText('装备区');
@@ -14319,6 +14348,7 @@
 							}
 						}
 						else if(event.position[i]=='j'){
+                            inField++;
 							var js=target.getDiscardableCards(player,'j');
 							if(js.length){
 								event.dialog.addText('判定区');
@@ -14327,6 +14357,15 @@
 							}
 						}
 					}
+                    if(mingzhi && inField == 2) {
+                        var mz=target.getDiscardableCards(player,'h').filter((c) => {
+                            return mingzhi.contains(c);
+                        });
+
+                        event.dialog.addText('手牌区');
+                        event.dialog.add(mz);
+                        directh=false;
+                    }
 					if(event.dialog.buttons.length==0){
 						event.finish();
 						return;
@@ -14440,11 +14479,23 @@
 						event.dialog.addText(event.prompt2);
 					}
 					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
+                    var mingzhi = target.storage.mingzhi;
+                    var inField = 0;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
+                            inField = -1;
 							var hs=target.getGainableCards(player,'h');
 							if(hs.length){
 								event.dialog.addText('手牌区');
+                                if(mingzhi) {
+                                    var mz = hs.filter((c) => {
+                                        return mingzhi.contains(c);
+                                    });
+                                    hs = hs.filter((c) => {
+                                        return !mingzhi.contains(c);
+                                    });
+                                    event.dialog.add(mz);
+                                }
 								hs.randomSort();
 								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
@@ -14456,6 +14507,7 @@
 							}
 						}
 						else if(event.position[i]=='e'){
+                            inField++;
 							var es=target.getGainableCards(player,'e');
 							if(es.length){
 								event.dialog.addText('装备区');
@@ -14464,6 +14516,7 @@
 							}
 						}
 						else if(event.position[i]=='j'){
+                            inField++;
 							var js=target.getGainableCards(player,'j');
 							if(js.length){
 								event.dialog.addText('判定区');
@@ -14472,6 +14525,15 @@
 							}
 						}
 					}
+                    if(mingzhi && inField == 2) {
+                        var mz=target.getDiscardableCards(player,'h').filter((c) => {
+                            return mingzhi.contains(c);
+                        });
+
+                        event.dialog.addText('手牌区');
+                        event.dialog.add(mz);
+                        directh=false;
+                    }
 					if(event.dialog.buttons.length==0){
 						event.dialog.close();
 						event.finish();
@@ -14486,7 +14548,7 @@
 							links:cs
 						}
 					}
-					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1]){
+					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1] && !mingzhi){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons.randomGets(select[0]),
@@ -16112,6 +16174,17 @@
 					event.stockcards=cards.slice(0);
 					for(var i=0;i<cards.length;i++){
 						if(!hej.contains(cards[i])){
+
+                            if (player.storage.mingzhi && player.storage.mingzhi.contains(cards[i])) {
+                                if (player.storage.mingzhi.length == 1) {
+                                    delete player.storage.mingzhi;
+                                    player.unmarkSkill('mingzhi');
+                                } else {
+                                    player.storage.mingzhi.remove(cards[i]);
+                                    player.syncStorage('mingzhi');
+                                }
+                            }
+
 							cards.splice(i--,1);
 							continue;
 						}
