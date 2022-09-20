@@ -145,6 +145,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
         return player.storage.mingzhi && player.storage.mingzhi.contains(card);
       }
 
+      lib.element.player.countMingzhiCard = function () {
+        if(!this.storage.mingzhi) return 0;
+        return this.storage.mingzhi.length;
+      }
+
       lib.element.player.getMingzhiCard = function () {
         var getCards = [];
         if (this.storage.mingzhi && this.storage.mingzhi.length) {
