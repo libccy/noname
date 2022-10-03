@@ -681,7 +681,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			zhanxiang:'战象',
 			zhanxiang_info:'锁定技。当你成为〖赠予〗的目标后，你将此次赠予的效果改为“将赠予牌移动至弃牌堆”。',
 			xinge:'信鸽',
-			xinge_info:'出牌阶段限一次。你可以将一张牌交给一名其他角色。',
+			xinge_info:'出牌阶段限一次。你可以将一张手牌交给一名其他角色。',
 			xinge_append:'<span class="text" style="font-family: yuanli">咕咕咕。</span>',
 			
 			_yongjian_zengyu:'赠予',

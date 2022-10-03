@@ -263,7 +263,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var mod2=game.checkMod(hs[i],player,'unchanged','cardEnabled2',player);
 					if(mod2===false) return false;
 					}
-					return true;
+					return event.filterCard(get.autoViewAs({name:'juedou'},hs))
 				},
 				viewAs:{name:'juedou'},
 				onuse:function(links,player){
@@ -3330,9 +3330,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					'step 0'
-					player.chooseTarget(get.prompt2('decadezhenjun')).ai=function(target){
+					player.chooseTarget(get.prompt2('decadezhenjun'),function(card,player,target){
+						return target.countCards('he')>0;
+					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target)*(target.countCards('e')+1);
-					};
+					});
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];

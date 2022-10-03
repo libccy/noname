@@ -16368,6 +16368,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gaolan:['dc_gaolan','gaolan','sp_gaolan'],
 			cuiyan:['sp_cuiyan','cuiyan'],
 			wujing:['tw_wujing','wujing'],
+			sunru:['dc_sunru','sunru'],
+			zhouchu:['jin_zhouchu','zhouchu'],
 		},
 		translate:{
 			liuzan:'手杀留赞',
@@ -16860,7 +16862,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xunyi2:'殉义',
 			xunyi3:'殉义',
 			xunyi_info:'游戏开始时，或当上一个拥有“殉义”效果的角色死亡后，你可以选择一名角色获得如下效果：当其/你对二者之外的角色造成伤害后，你/其摸一张牌；当其/你受到二者之外的角色造成的伤害后，你/其弃置一张牌。',
-			zhouchu:'周处',
+			zhouchu:'手杀周处',
 			xianghai:'乡害',
 			xianghai_info:'锁定技，其他角色的手牌上限-1。你手牌区的装备牌均视为【酒】。',
 			chuhai:'除害',

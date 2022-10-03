@@ -10671,9 +10671,12 @@
 							buttons.classList.add('guanxing');
 							buttons._link=i;
 							if(list[i][1]){
-								ui.create.buttons(list[i][1],'card',buttons);
+								var cardsb=ui.create.buttons(list[i][1],'card',buttons);
+								if(list[i][2]&&typeof list[i][2]=='string'){
+									for(var ij of cardsb) ij.node.gaintag.innerHTML=get.translation(list[i][2]);
+								}
 							}
-							if(list[i][2]) buttons.textPrompt=list[i][2];
+							if(list[i][2]&&typeof list[i][2]=='function') buttons.textPrompt=list[i][2];
 						}
 						event.dialog.open();
 						updateButtons();
@@ -12302,8 +12305,9 @@
 						if(lib.card[name].cancel){
 							var next=game.createEvent(name+'Cancel');
 							next.setContent(lib.card[name].cancel);
-							next.card=event.card;
 							next.cards=[event.card];
+							if(!event.card.viewAs) next.card=get.autoViewAs(event.card);
+							else next.card=get.autoViewAs({name:name},next.cards);
 							next.player=player;
 						}
 					}
@@ -12311,8 +12315,9 @@
 						var next=game.createEvent(name);
 						next.setContent(lib.card[name].effect);
 						next._result=result;
-						next.card=event.card;
 						next.cards=[event.card];
+						if(!event.card.viewAs) next.card=get.autoViewAs(event.card);
+						else next.card=get.autoViewAs({name:name},next.cards);
 						next.player=player;
 					}
 					ui.clear();
@@ -15719,6 +15724,8 @@
 					'step 1'
 					player.gain(event.cards2);
 					target.gain(event.cards1);
+					'step 2'
+					game.delayx();
 				},
 				swapHandcardsx:function(){
 					'step 0'
@@ -21375,7 +21382,10 @@
 							game.cardsDiscard(card);
 						}
 						else{
-							if(card.name!=name){
+							if(card.cards&&card.cards.length){
+								target.addJudge(name,card.cards[0]);
+							}
+							else if(card.name!=name){
 								target.addJudge(name,card);
 							}
 							else{
@@ -21579,7 +21589,7 @@
 					var checkShow=this.checkShow(name);
 					if(lib.translate[name]){
 						this.trySkillAnimate(name,popname,checkShow);
-						if(typeof targets=='object'&&targets.length){
+						if(Array.isArray(targets)&&targets.length){
 							var str;
 							if(targets[0]==this){
 								str='#b自己';
@@ -34016,7 +34026,7 @@
 						info=get.info(skills2[i]);
 						enable=false;
 						if(typeof info.enable=='function') enable=info.enable(event);
-						else if(typeof info.enable=='object') enable=info.enable.contains(event.name);
+						else if(Array.isArray(info.enable)) enable=info.enable.contains(event.name);
 						else if(info.enable=='phaseUse') enable=(event.type=='phase');
 						else if(typeof info.enable=='string') enable=(info.enable==event.name);
 						if(enable){
@@ -46692,6 +46702,7 @@
 							else{
 								ui.create.div('.name','<span style="opacity:0.6">'+(button.info[i][0]||'无名玩家'),node);
 							}
+							//show ID
 							//ui.create.div('.videostatus',node,button.info[i][5]);
 							//node.classList.add('videonodestatus');
 							if(button.info[i][3]){
@@ -52754,7 +52765,7 @@
 					if(filter.hasOwnProperty(j)){
 						if(get.itemtype(arguments[i])=='card'){
 							if(j=='name'){
-								if(typeof filter[j]=='object'){
+								if(Array.isArray(filter[j])){
 									if(filter[j].contains(get.name(arguments[i]))==false) return false;
 								}
 								else if(typeof filter[j]=='string'){
@@ -52762,7 +52773,7 @@
 								}
 							}
 							else if(j=='type'){
-								if(typeof filter[j]=='object'){
+								if(Array.isArray(filter[j])){
 									if(filter[j].contains(get.type(arguments[i]))==false) return false;
 								}
 								else if(typeof filter[j]=='string'){
@@ -52770,7 +52781,7 @@
 								}
 							}
 							else if(j=='subtype'){
-								if(typeof filter[j]=='object'){
+								if(Array.isArray(filter[j])){
 									if(filter[j].contains(get.subtype(arguments[i]))==false) return false;
 								}
 								else if(typeof filter[j]=='string'){
@@ -52778,7 +52789,7 @@
 								}
 							}
 							else if(j=='color'){
-								if(typeof filter[j]=='object'){
+								if(Array.isArray(filter[j])){
 									if(filter[j].contains(get.color(arguments[i]))==false) return false;
 								}
 								else if(typeof filter[j]=='string'){
@@ -52786,7 +52797,7 @@
 								}
 							}
 							else if(j=='suit'){
-								if(typeof filter[j]=='object'){
+								if(Array.isArray(filter[j])){
 									if(filter[j].contains(get.suit(arguments[i]))==false) return false;
 								}
 								else if(typeof filter[j]=='string'){
@@ -52794,14 +52805,14 @@
 								}
 							}
 							else if(j=='number'){
-								if(typeof filter[j]=='object'){
+								if(Array.isArray(filter[j])){
 									if(filter[j].contains(get.number(arguments[i]))==false) return false;
 								}
 								else if(typeof filter[j]=='string'){
 									if(get.number(arguments[i])!=filter[j]) return false;
 								}
 							}
-							else if(typeof filter[j]=='object'){
+							else if(Array.isArray(filter[j])){
 								if(filter[j].contains(arguments[i][j])==false) return false;
 							}
 							else if(typeof filter[j]=='string'){
@@ -53073,7 +53084,7 @@
 					return lib.translate[skill+'_info'];
 				}
 				case 'cardCount':{
-					if(typeof content=='object'&&typeof content.length=='number'){
+					if(Array.isArray(content)){
 						return '共有'+get.cnNumber(content.length)+'张牌';
 					}
 					return false;

@@ -17,10 +17,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji','shen_sunquan'],
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
+				extra_tw:['tw_shen_guanyu'],
 				extra_offline:['shen_diaochan','boss_zhaoyun'],
 			},
 		},
 		character:{
+			tw_shen_guanyu:['male','shen',4,['twwushen','twwuhun'],['shu']],
 			shen_machao:['male','shen',4,['shouli','hengwu'],['shu']],
 			shen_sunquan:['male','shen',4,['dili','yuheng'],['wei']],
 			shen_jiangwei:['male','shen',4,['jiufa','tianren','pingxiang'],['shen']],
@@ -60,6 +62,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterReplace:{
 			shen_zhangliao:['shen_zhangliao','ol_zhangliao'],
 			shen_zhaoyun:['shen_zhaoyun','boss_zhaoyun'],
+			shen_guanyu:['shen_guanyu','tw_shen_guanyu'],
 		},
 		characterFilter:{
 			shen_diaochan:function(mode){
@@ -67,6 +70,142 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			twwushen:{
+				mod:{
+					cardname:function(card,player,name){
+						if(get.suit(card)=='heart') return 'sha';
+					},
+					cardnature:function(card,player){
+						if(get.suit(card)=='heart') return false;
+					},
+					targetInRange:function(card){
+						if(get.suit(card)=='heart') return true;
+					},
+					cardUsable:function(card){
+						if(card.name=='sha'&&get.suit(card)=='heart') return Infinity;
+					}
+				},
+				audio:'wushen',
+				trigger:{player:'useCard2'},
+				forced:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&(get.suit(event.card)=='heart'||!player.hasSkill('twwushen_phase',null,null,false));
+				},
+				logTarget:function(event,player){
+					if(get.suit(event.card)=='heart'){
+						var targets=game.filterPlayer(function(current){
+							return !event.targets.contains(current)&&current.hasMark('twwuhun')&&lib.filter.targetEnabled(event.card,player,current);
+						});
+						if(targets.length){
+							return targets.sortBySeat();
+						}
+					}
+					return null;
+				},
+				content:function(){
+					if(!player.hasSkill('twwushen_phase',null,null,false)){
+						trigger.directHit.addArray(game.players);
+						player.addTempSkill('twwushen_phase',['phaseZhunbeiAfter','phaseJudgeAfter','phaseDrawAfter','phaseUseAfter','phaseDiscardAfter','phaseJieshuAfter'])
+					}
+					if(get.suit(trigger.card)=='heart'){
+						if(trigger.addCount!==false){
+							trigger.addCount=false;
+							if(player.stat[player.stat.length-1].card.sha>0){
+								player.stat[player.stat.length-1].card.sha--;
+							}
+						}
+						var targets=game.filterPlayer(function(current){
+							return !trigger.targets.contains(current)&&current.hasMark('twwuhun')&&lib.filter.targetEnabled(trigger.card,player,current);
+						});
+						if(targets.length){
+							trigger.targets.addArray(targets.sortBySeat());
+							game.log(targets,'也成为了',trigger.card,'的目标');
+						}
+					}
+				},
+				ai:{
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						return arg.card.name=='sha'&&!player.hasSkill('twwushen_phase',null,null,false);
+					},
+				},
+				subSkill:{phase:{charlotte:true}},
+				shaRelated:true,
+			},
+			twwuhun:{
+				trigger:{player:'die'},
+				forceDie:true,
+				skillAnimation:true,
+				animationColor:'soil',
+				locked:true,
+				check:function(event,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&current.hasMark('twwuhun')&&get.attitude(player,current)<0;
+					});
+				},
+				content:function(){
+					'step 0'
+					player.judge(function(card){
+						var name=get.name(card,false);
+						if(name=='tao'||name=='taoyuan') return -25;
+						return 15;
+					}).set('forceDie',true).judge2=function(result){
+						return result.bool;
+					};
+					'step 1'
+					var num=game.countPlayer(function(current){
+						return current!=player&&current.hasMark('twwuhun');
+					});
+					if(result.bool&&num>0){
+						player.chooseTarget('请选择【武魂】的目标','选择至少一名拥有“梦魇”标记的角色。令这些角色各自失去X点体力（X为其“梦魇”标记数）',true,[1,num],function(card,player,target){
+							return target!=player&&target.hasMark('twwuhun');
+						}).set('forceDie',true).set('ai',function(target){
+							return -get.attitude(_status.event.player,target);
+						});
+					}
+					else event.finish();
+					'step 2'
+					var targets=result.targets.sortBySeat();
+					player.line(targets,'fire');
+					event.targets=targets;
+					'step 3'
+					var target=targets.shift();
+					var num=target.countMark('twwuhun');
+					if(num>0) target.loseHp(num);
+					if(targets.length>0) event.redo();
+				},
+				marktext:'魇',
+				intro:{
+					name:'梦魇',
+					content:'mark',
+					onunmark:true,
+				},
+				group:'twwuhun_gain',
+				subSkill:{
+					gain:{
+						trigger:{
+							player:'damageEnd',
+							source:'damageSource',
+						},
+						forced:true,
+						filter:function(event,player,name){
+							if(event.player==event.source) return false;
+							var target=lib.skill.twwuhun_gain.logTarget(event,player);
+							if(!target||!target.isAlive()) return false;
+							return name=='damageEnd'||target.hasMark('twwuhun');
+						},
+						logTarget:function(event,player){
+							if(player==event.player) return event.source;
+							return event.player;
+						},
+						content:function(){
+							var target=lib.skill.twwuhun_gain.logTarget(trigger,player);
+							target.addMark('twwuhun',player==trigger.source?1:trigger.num);
+							game.delayx();
+						},
+					},
+				},
+			},
 			shouli:{
 				audio:2,
 				mod:{
@@ -799,7 +938,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jiufa:{
 				audio:2,
-				trigger:{player:'useCardAfter'},
+				trigger:{player:['useCardAfter','respondAfter']},
 				frequent:true,
 				filter:function(event,player){
 					return event.jiufa_counted&&player.getStorage('jiufa').length>=9;
@@ -5965,7 +6104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianxing_info:'觉醒技，准备阶段，若你武将牌上的「储」数不小于3，则你减1点体力上限并获得所有「储」，然后失去技能〖储元〗，选择获得以下技能中的一个：〖仁德〗/〖制衡〗/〖乱击〗/〖行动〗',
 			shen_zhenji:'神甄宓',
 			shenfu:'神赋',
-			shenfu_info:'回合结束时，若你的手牌数为：奇数，你可对一名其他角色造成1点伤害。若其死亡，你可重复此流程。偶数，你可选择一名角色，你令其摸一张牌或弃置一张手牌。若其手牌数等于体力值，你可重复此流程。',
+			shenfu_info:'回合结束时，若你的手牌数为：奇数，你可对一名其他角色造成1点雷属性伤害。若其死亡，你可重复此流程。偶数，你可选择一名角色，你令其摸一张牌或弃置一张手牌。若其手牌数等于体力值，你可重复此流程。',
 			qixian:'七弦',
 			qixian_info:'锁定技，你的手牌上限视为7。',
 			caopi_xingdong:'行动',
@@ -6024,7 +6163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
 			shen_jiangwei:'神姜维',
 			jiufa:'九伐',
-			jiufa_info:'①当你声明使用牌时，你记录此牌的牌名。②当你使用牌结算结束后，若你的〖九伐〗记录中包含至少⑨种不同的牌名，则你可以展示牌堆顶的⑨张牌，选择并获得其中任意张点数各不相同且{这九张牌中存在未被选择且和已选择的牌点数相同}的牌，清除所有的记录，将其余牌置入弃牌堆。',
+			jiufa_info:'①当你声明使用牌时，你记录此牌的牌名。②当你使用或打出的牌结算结束后，若你的〖九伐〗记录中包含至少⑨种不同的牌名，则你可以展示牌堆顶的⑨张牌，选择并获得其中任意张点数各不相同且{这九张牌中存在未被选择且和已选择的牌点数相同}的牌，清除所有的记录，将其余牌置入弃牌堆。',
 			tianren:'天任',
 			tianren_info:'锁定技。①当有一张基本牌或普通锦囊牌不因使用而进入弃牌堆后，你获得一枚“天任”标记。②当你获得“天任”标记或体力上限变化后，若你的“天任”数不小于X，则你移去X枚“天任”，加1点体力上限并摸两张牌（X为你的体力上限）。',
 			pingxiang:'平襄',
@@ -6082,6 +6221,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hina_shenshi_info:'神势力技。出牌阶段开始时/结束时，你可摸两张牌，然后将其中一张牌置于牌堆顶。你以此法获得的牌视为拥有全部应变效果，且可以无条件发动。',
 			hina_xingzhi:'幸凪',
 			hina_xingzhi_info:'键势力技。每回合限一次，你可以通过“助战”触发一张牌的全部应变效果，且响应助战的角色摸两张牌。',
+			tw_shen_guanyu:'TW神关羽',
+			twwushen:'武神',
+			twwushen_info:'锁定技。①你的♥手牌均视为普【杀】。②你于每阶段使用的第一张【杀】不可被响应。③你使用♥【杀】无距离和次数限制。④当你使用♥【杀】选择目标后，你令所有拥有“梦魇”标记的角色均成为此【杀】的目标。',
+			twwuhun:'武魂',
+			twwuhun_info:'锁定技。①当你受到其他角色造成的1点伤害后，你令伤害来源获得1枚“梦魇”标记。②当你对有“梦魇”标记的其他角色造成伤害后，你令其获得一枚“梦魇”标记。③当你死亡时，你可进行判定。若结果不为【桃】或【桃园结义】，则你选择至少一名拥有“梦魇”标记的角色。令这些角色各自失去X点体力（X为其“梦魇”标记数）。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
@@ -6095,6 +6239,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			extra_mobilexin:'始计篇·信',
 			extra_offline:'神话再临·线下',
 			extra_decade:'十周年服神将',
+			extra_tw:'海外服神将',
 		},
 	};
 });

@@ -98,6 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_zanghong:['male','qun',4,['nsshimeng']],
 			ns_ruanji:['male','wei',3,['nsshizui','nsxiaoye']],
 			ns_limi:['male','jin',3,['nstuilun']],
+			ns_zhonglimu:['male','wu',4,['nskuanhuai','nsdingbian']],
 			
 			ns_zhangwei:['female','shu',3,['nsqiyue','nsxuezhu']],
 			diy_wenyang:['male','wei','4/6',['lvli','choujue']],
@@ -199,7 +200,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
 				diy_yijiang2:["key_yuuki","key_tenzen","key_kyouko","key_kotarou","key_kyou",
 				"ns_chentai","ns_huangwudie","ns_sunyi","ns_zhangning","ns_yanghu"],
-				diy_yijiang3:['ns_ruanji','ns_zanghong','ns_limi'],
+				diy_yijiang3:['ns_ruanji','ns_zanghong','ns_limi','ns_zhonglimu'],
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu"],
 				diy_xushi:["diy_feishi","diy_hanlong","diy_liufu","diy_liuyan","diy_liuzan","diy_tianyu","diy_xizhenxihong","diy_yangyi","diy_zaozhirenjun"],
@@ -314,6 +315,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_ruanji:'#g伯约的崛起',
 			ns_zanghong:'#g阿七',
 			ns_limi:'#g-心若困兽-',
+			ns_zhonglimu:'#gJG赛文♠7',
 			
 			ns_luyusheng:'#g猫咪大院 - 魚と水',
 			ns_caimao:'#gP尔号玩家◆',
@@ -521,6 +523,157 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			//钟离牧
+			nskuanhuai:{
+				trigger:{player:'phaseUseBegin'},
+				content:function(){
+					'step 0'
+					var card=get.discardPile(function(card){
+						return get.type(card)!='basic';
+					});
+					if(card) player.gain(card,'gain2');
+					'step 1'
+					player.addTempSkill('nskuanhuai_blocker','phaseUseAfter');
+					player.addTempSkill('nskuanhuai_effect');
+				},
+				subSkill:{
+					blocker:{
+						charlotte:true,
+						mod:{
+							cardEnabled:function(card){
+								if(get.type(card)=='basic') return false;
+							},
+							cardSavable:function(card){
+								if(get.type(card)=='basic') return false;
+							},
+						},
+					},
+					effect:{
+						trigger:{player:'phaseDiscardEnd'},
+						charlotte:true,
+						direct:true,
+						filter:function(event,player){
+							return player.hasHistory('lose',function(evt){
+								if(evt.type!='discard'||evt.getParent('phaseDiscard')!=event) return false;
+								for(var i of evt.cards2){
+									if(get.type(i,false)=='basic'&&get.position(i,true)=='d'&&player.hasUseTarget(i)) return true;
+								}
+								return false;
+							});
+						},
+						content:function(){
+							'step 0'
+							var cards=[];
+							player.getHistory('lose',function(evt){
+								if(evt.type!='discard'||evt.getParent('phaseDiscard')!=trigger) return false;
+								for(var i of evt.cards2){
+									if(get.type(i,false)=='basic'&&get.position(i,true)=='d') cards.push(i);
+								}
+								return false;
+							});
+							event.cards=cards;
+							'step 1'
+							var cards2=event.cards.filter(function(i){
+								return get.position(i,true)=='d'&&player.hasUseTarget(i);
+							});
+							if(cards2.length){
+								player.chooseButton(['宽怀：是否使用其中一张牌？',cards2]);
+							}
+							else event.finish();
+							'step 2'
+							if(result.bool){
+								var card=result.links[0];
+								cards.remove(card);
+								player.chooseUseTarget(card,true);
+								if(cards.length>0) event.goto(1);
+							}
+						},
+					},
+				},
+			},
+			nsdingbian:{
+				trigger:{player:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					if(player!=_status.currentPhase) return false;
+					return get.type(event.card)!='basic';
+				},
+				content:function(){
+					'step 0'
+					player.addTempSkill('nsdingbian_mark');
+					player.addMark('nsdingbian_mark',1,false);
+					var storage=player.getStorage('nsdingbian_ignore');
+					var goon=false;
+					for(var i of lib.inpile){
+						if(get.type(i)=='basic'&&!storage.contains(i)){
+							goon=true;
+							break;
+						}
+					}
+					if(goon) player.chooseControl().set('choiceList',[
+						'从牌堆中获得一张基本牌',
+						'令一种基本牌于本回合内不计入手牌上限',
+					]).set('prompt','定边：请选择一项').set('ai',function(){
+						var player=_status.event.player;
+						var list=['tao','shan'],list2=player.getStorage('nsdingbian_ignore');
+						list.removeArray(list2);
+						if(!list.length) return 0;
+						var num1=player.countCards('hs',function(card){
+							return get.type(card)!='basic'&&player.hasValueTarget(card,null,true);
+						}),num2=player.getHandcardLimit();
+						if(player.countCards('h',list)<=num2-num1) return 0;
+						return 1;
+					});
+					else event._result={index:0};
+					'step 1'
+					if(result.index==0){
+						var card=get.cardPile2(function(card){
+							return get.type(card,false)=='basic';
+						});
+						if(card) player.gain(card,'gain2');
+						event.finish();
+					}
+					else{
+						var list=[],storage=player.getStorage('nsdingbian_ignore');
+						for(var i of lib.inpile){
+							if(get.type(i)=='basic'&&!storage.contains(i)){
+								list.push(i);
+							}
+						}
+						player.chooseButton(['令一种基本牌于本回合内不计入手牌上限',[list,'vcard']],true).set('ai',function(button){
+							var name=button.link[2],player=_status.event.player;
+							if(name=='sha') return 0;
+							var cards=player.getCards('h',name);
+							if(!cards.length) return 0;
+							return get.value(cards,player);
+						});
+					}
+					'step 2'
+					player.markAuto('nsdingbian_ignore',[result.links[0][2]]);
+				},
+				subSkill:{
+					mark:{
+						onremove:function(player){
+							delete player.storage.nsdingbian_mark;
+							delete player.storage.nsdingbian_ignore;
+						},
+						mod:{
+							maxHandcard:(player,num)=>num-player.countMark('nsdingbian_mark'),
+							ignoredHandcard:function(card,player){
+								if(player.getStorage('nsdingbian_ignore').contains(get.name(card,player))){
+									return true;
+								}
+							},
+							cardDiscardable:function(card,player,name){
+								if(name=='phaseDiscard'&&player.getStorage('nsdingbian_ignore').contains(get.name(card,player))){
+									return false;
+								}
+							},
+						},
+						intro:{content:'手牌上限-#'},
+					},
+				},
+			},
 			//李密
 			nstuilun:{
 				trigger:{player:'phaseJieshuBegin'},
@@ -16452,6 +16605,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_limi:'李密',
 			nstuilun:'退论',
 			nstuilun_info:'结束阶段，你可以失去任意点体力（至多失去至1点）并弃置任意张手牌（至多弃置至一张）。若如此做，你获得如下效果直到你下回合开始：其他角色的回合开始时，若你的体力值小于该角色，则你可以令一名角色回复或失去1点体力；若你的手牌数小于该角色，则你可以令一名角色摸一张牌或弃置一张牌。',
+			ns_zhonglimu:'钟离牧',
+			nskuanhuai:'宽怀',
+			nskuanhuai_info:'出牌阶段开始时，你可以从弃牌堆中获得一张非基本牌。若如此做：你本阶段内不能使用基本牌，且本回合的弃牌阶段结束时，你可以依次使用本阶段内弃置的基本牌。',
+			nsdingbian:'定边',
+			nsdingbian_info:'锁定技。当你于回合内使用锦囊牌或装备牌后，你令自己本回合的手牌上限-1且选择一项：⒈从牌堆获得一张基本牌。⒉令一种基本牌于本回合内不计入手牌上限。',
 			
 			junk_zhangrang:'四花张让',
 			junktaoluan:'滔乱',

@@ -1789,9 +1789,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(get.prompt2('zhenjun'),function(card,player,target){
 						return target.countCards('h')>target.hp; 
-					}).ai=function(target){
+					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target)*(target.countCards('e')+1);
-					};
+					});
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];

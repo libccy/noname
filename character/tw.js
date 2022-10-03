@@ -3202,7 +3202,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					event.num=player.storage.fanghun;
+					var num=Math.max(2,player.storage.fanghun);
+					num=Math.min(num,8);
+					event.num=num;
 					player.removeMark('fanghun',player.storage.fanghun);
 					player.awakenSkill('twfuhan');
 					if(_status.characterlist){
@@ -4712,7 +4714,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twchongqi_info:'锁定技。游戏开始时，你令所有角色获得〖非服〗。然后你可减1点体力上限，令一名其他角色获得〖复纂〗。',
 			twfeifu:'非服',
 			twfeifu_info:'转换技。阴：当你成为【杀】的唯一目标后；阳：当你使用【杀】指定唯一目标后；目标角色须交给使用者一张牌。若此牌为装备牌，则使用者可使用此牌。',
-			tw_wangchang:'王昶',
+			tw_wangchang:'TW王昶',
 			twkaiji:'开济',
 			twkaiji_info:'准备阶段，你可令至多X名角色各摸一张牌（X为本局游戏内进入过濒死状态的角色数+1）。若有角色以此法获得了非基本牌，则你摸一张牌。',
 			twshepan:'慑叛',
