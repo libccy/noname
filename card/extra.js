@@ -149,7 +149,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(card){
 								if(game.hasPlayer(function(current){
 									return (get.attitude(target,current)<0&&
-										target.canUse(card,current,true,true)&&
+										target.canUse(card,current,null,true)&&
 										!current.hasSkillTag('filterDamage',null,{
 											player:player,
 											card:card,
@@ -164,7 +164,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					tag:{
-						save:1
+						save:1,
+						recover:0.1,
 					}
 				}
 			},

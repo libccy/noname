@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.115.3',
+	'v1.9.116',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -4630,6 +4630,10 @@ window.noname_asset_list=[
 	'image/card/sanlve.png',
 	'image/card/zhaogujing.png',
 	'image/card/changandajian_equip1.png',
+	'image/card/lukai_club.png',
+	'image/card/lukai_diamond.png',
+	'image/card/lukai_heart.png',
+	'image/card/lukai_spade.png',
 
 	'image/card/bagua.png',
 	'image/card/baihupifeng.png',
@@ -5644,6 +5648,12 @@ window.noname_asset_list=[
 	'image/character/zhangxun.jpg',
 	'image/character/zhaoang.jpg',
 	'image/character/zhaoyǎn.jpg',
+	'image/character/caoxiancaohua.jpg',
+	'image/character/dc_liuba.jpg',
+	'image/character/key_seira.jpg',
+	'image/character/lukai.jpg',
+	'image/character/prp_zhugeliang.jpg',
+	'image/character/xiahoulingnv.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

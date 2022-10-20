@@ -35,7 +35,7 @@
     filter:grayscale(1) opacity(0.8);
     -webkit-filter:grayscale(1) opacity(0.8);
 }
-.hp:not(.text):not(.actcount):not(.treasure)>.lost{
+.hp:not(.text):not(.actcount):not(.treasure)>.shield{
     background: url('image/shield.png');
     box-shadow: none;
     border: none;

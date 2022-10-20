@@ -14673,15 +14673,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			"rw_tengjia4":{
+			rw_tengjia4:{
 				inherit:"tengjia3",
 				audio:"tengjia1",
 			},
-			"xinfu_pingcai":{
-				"wolong_card":function(){
+			xinfu_pingcai:{
+				subSkill:{backup:{}},
+				wolong_card:function(){
 					'step 0'
 					var ingame=game.hasPlayer(function(current){
-						return ['sp_zhugeliang','re_sp_zhugeliang','ol_sp_zhugeliang'].contains(current.name)||['sp_zhugeliang','re_sp_zhugeliang','ol_sp_zhugeliang'].contains(current.name2);
+						return ['sp_zhugeliang','re_sp_zhugeliang','ol_sp_zhugeliang','prp_zhugeliang'].contains(current.name)||['sp_zhugeliang','re_sp_zhugeliang','ol_sp_zhugeliang','prp_zhugeliang'].contains(current.name2);
 					})?true:false;
 					var prompt='请选择';
 					prompt+=ingame?'至多两名':'一名';
@@ -14700,7 +14701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				"fengchu_card":function(){
+				fengchu_card:function(){
 					'step 0'
 					var ingame=game.hasPlayer(function(current){
 						return ['re_pangtong','pangtong','ol_pangtong'].contains(current.name)||['re_pangtong','pangtong','ol_pangtong'].contains(current.name2);
@@ -14722,10 +14723,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				"xuanjian_card":function(){
+				xuanjian_card:function(){
 					'step 0'
 					event.ingame=game.hasPlayer(function(current){
-						return ['re_xushu','xin_xushu','xushu'].contains(current.name)||['re_xushu','xin_xushu','xushu'].contains(current.name2);
+						return ['re_xushu','xin_xushu','xushu','dc_xushu'].contains(current.name)||['re_xushu','xin_xushu','xushu','dc_xushu'].contains(current.name2);
 					})?true:false;
 					var prompt='请选择一名角色，令其回复一点体力并摸一张牌';
 					prompt+=event.ingame?'，然后你摸一张牌。':'。';
@@ -14742,7 +14743,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.ingame) player.draw();
 					}
 				},
-				"shuijing_card":function(){
+				shuijing_card:function(){
 					'step 0'
 					event.ingame=game.hasPlayer(function(current){
 						return current.name=='simahui'||current.name2=='simahui';
@@ -14850,70 +14851,264 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				enable:"phaseUse",
 				usable:1,
-				content:function(){
-					"step 0"
-					var list=["wolong","fengchu","xuanjian","shuijing"];
-					var list2=[];
-					for(var i=0;i<list.length;i++){
-						list2.push(game.createCard(list[i]+'_card','',''))
-					}
-					//list2.randomSort();
-					event.time=get.utc();
-					player.chooseButton(['请选择要擦拭的宝物',list2],true).set('ai',function(button){
+				chooseButton:{
+					dialog:function(){
+						var list=["wolong","fengchu","xuanjian","shuijing"];
+						for(var i=0;i<list.length;i++){
+							list[i]=['','',list[i]+'_card'];
+						}
+						return ui.create.dialog('评才',[list,'vcard']);
+					},
+					check:function(button){
+						var name=button.link[2];
 						var player=_status.event.player;
-						if(button.link.name=='xuanjian_card'){
+						if(name=='xuanjian_card'){
 							if(game.hasPlayer(function(current){
 								return current.isDamaged()&&current.hp<3&&get.attitude(player,current)>1;
 							})) return 1+Math.random();
 							else return 1;
 						}
-						else if(button.link.name=='wolong_card'){
+						else if(name=='wolong_card'){
 							if(game.hasPlayer(function(current){
 								return get.damageEffect(current,player,player,'fire')>0;
 							})) return 1.2+Math.random();
 							else return 0.5;
 						}
 						else return 0.6;
-					});
+					},
+					backup:function(links,player){
+						return {
+							audio:'xinfu_pingcai',
+							filterCard:()=>false,
+							selectCard:-1,
+							takara:links[0][2],
+							content:lib.skill.xinfu_pingcai.contentx,
+						}
+					},
+				},
+				contentx:function(){
+					"step 0"
+					event.pingcai_delayed=true;
+					var name=lib.skill.xinfu_pingcai_backup.takara;
+					event.cardname=name;
+					event.videoId=lib.status.videoId++;
+					if(player.isUnderControl()){
+						game.swapPlayerAuto(player);
+					}
+					var switchToAuto=function(){
+						game.pause();
+						game.countChoose();
+						setTimeout(function(){
+							_status.imchoosing=false;
+							event._result={
+								bool:true,
+							};
+							game.resume();
+						},9000);
+					};
+					var createDialog=function(player,id,name){
+						if(player==game.me) return;
+						var dialog=ui.create.dialog('forcebutton','hidden');
+						var str=get.translation(player)+'正在擦拭宝物上的灰尘…';
+						var canSkip=(!_status.connectMode);
+						if(canSkip) str+='<br>（点击宝物可以跳过等待AI操作）';
+						dialog.textPrompt=dialog.add('<div class="text center">'+str+'</div>');
+						dialog.classList.add('fixed');
+						dialog.classList.add('scroll1');
+						dialog.classList.add('scroll2');
+						dialog.classList.add('fullwidth');
+						dialog.classList.add('fullheight');
+						dialog.classList.add('noupdate');
+						dialog.videoId=id;
+						
+						var canvas2=document.createElement('canvas');
+						dialog.canvas_viewer=canvas2;
+						dialog.appendChild(canvas2);
+						canvas2.classList.add('grayscale');
+						canvas2.style.position="absolute";
+						canvas2.style.width='249px';
+						canvas2.style.height='249px';
+						canvas2.style['border-radius']='6px';
+						canvas2.style.left="calc(50% - 125px)";
+						canvas2.style.top="calc(50% - 125px)";
+						canvas2.width=249;
+						canvas2.height=249;
+						canvas2.style.border='3px solid';
+						
+						var ctx2=canvas2.getContext('2d');
+						var img=new Image();
+						img.src=lib.assetURL+'image/card/'+name+'.png';
+						img.onload=function(){
+							ctx2.drawImage(this,0,0,this.width,this.height,0,0,canvas2.width,canvas2.height);
+						}
+						if(canSkip){
+							var skip=function(){
+								if(event.pingcai_delayed){
+									delete event.pingcai_delayed;
+									event._result={
+										bool:true,
+									};
+									game.resume();
+									canvas2.removeEventListener(lib.config.touchscreen?'touchend':'click',skip);
+								}
+							};
+							canvas2.addEventListener(lib.config.touchscreen?'touchend':'click',skip);
+						}
+						dialog.open();
+					};
+					var chooseButton=function(id,name){
+						var event=_status.event;
+						_status.xinfu_pingcai_finished=false;
+						
+						var dialog=ui.create.dialog('forcebutton','hidden');
+						dialog.textPrompt=dialog.add('<div class="text center">擦拭掉宝物上的灰尘吧！</div>');
+						event.switchToAuto=function(){
+							event._result={
+								bool:_status.xinfu_pingcai_finished,
+							};
+							game.resume();
+							_status.imchoosing=false;
+							_status.xinfu_pingcai_finished=true;
+						};
+						dialog.classList.add('fixed');
+						dialog.classList.add('scroll1');
+						dialog.classList.add('scroll2');
+						dialog.classList.add('fullwidth');
+						dialog.classList.add('fullheight');
+						dialog.classList.add('noupdate');
+						dialog.videoId=id;
+						
+						var canvas=document.createElement('canvas');
+						var canvas2=document.createElement('canvas');
+						
+						dialog.appendChild(canvas2);
+						dialog.appendChild(canvas);
+						
+						canvas.style.position="absolute";
+						canvas.style.width='249px';
+						canvas.style.height='249px';
+						canvas.style['border-radius']='6px';
+						canvas.style.left="calc(50% - 125px)";
+						canvas.style.top="calc(50% - 125px)";
+						canvas.width=249;
+						canvas.height=249;
+						canvas.style.border='3px solid';
+						
+						canvas2.style.position="absolute";
+						canvas2.style.width='249px';
+						canvas2.style.height='249px';
+						canvas2.style['border-radius']='6px';
+						canvas2.style.left="calc(50% - 125px)";
+						canvas2.style.top="calc(50% - 125px)";
+						canvas2.width=249;
+						canvas2.height=249;
+						canvas2.style.border='3px solid';
+						
+						var ctx=canvas.getContext('2d');
+						var ctx2=canvas2.getContext('2d');
+						
+						var img=new Image();
+						img.src=lib.assetURL+'image/card/'+name+'.png';
+						img.onload=function(){
+							ctx2.drawImage(this,0,0,this.width,this.height,0,0,canvas2.width,canvas2.height);
+						}
+						
+						ctx.fillStyle='lightgray';
+						ctx.fillRect(0,0,canvas.width,canvas.height);
+						
+						canvas.onmousedown=function(ev){
+							//if(_status.xinfu_pingcai_finished) return;
+							canvas.onmousemove=function(e){
+								if(_status.xinfu_pingcai_finished) return;
+								ctx.beginPath();
+								ctx.clearRect(e.offsetX-16,e.offsetY-16,32,32);
+								var data=ctx.getImageData(canvas.width*0.1,canvas.height*0.1,canvas.width*0.8,canvas.height*0.8).data;
+								var sum=0;
+								for(var i=3;i<data.length;i+=4){
+									if(data[i]==0){
+										sum++;
+									}
+								}
+								if(sum>=(canvas.width*canvas.height)*0.6){
+									//ctx.clearRect(0,0,canvas.width,canvas.height);
+									if(!_status.xinfu_pingcai_finished){
+										_status.xinfu_pingcai_finished=true;
+										event.switchToAuto();
+									}
+								}
+							}
+						}
+						canvas.ontouchstart=function(ev){
+							//if(_status.xinfu_pingcai_finished) return;
+							canvas.ontouchmove=function(e){
+								if(_status.xinfu_pingcai_finished) return;
+								ctx.beginPath();
+								var rect=canvas.getBoundingClientRect();
+								var X=((e.touches[0].clientX-rect.left)/rect.width*canvas.width);
+								var Y=((e.touches[0].clientY-rect.top)/rect.height*canvas.height);
+								ctx.clearRect(X-16,Y-16,32,32);
+								var data=ctx.getImageData(canvas.width*0.1,canvas.height*0.1,canvas.width*0.8,canvas.height*0.8).data;
+								var sum=0;
+								for(var i=3;i<data.length;i+=4){
+									if(data[i]==0){
+										sum++;
+									}
+								}
+								if(sum>=(canvas.width*canvas.height)*0.6){
+									if(!_status.xinfu_pingcai_finished){
+										_status.xinfu_pingcai_finished=true;
+										event.switchToAuto();
+									}
+								}
+							}
+						}
+						canvas.onmouseup=function(ev){
+							canvas.onmousemove=null;
+						}
+						canvas.ontouchend=function(ev){
+							canvas.ontouchmove=null;
+						}
+						
+						dialog.open();
+						
+						game.pause();
+						game.countChoose();
+					};
+					//event.switchToAuto=switchToAuto;
+					game.broadcastAll(createDialog,player,event.videoId,name);
+					if(event.isMine()){
+						chooseButton(event.videoId,name);
+					}
+					else if(event.isOnline()){
+						event.player.send(chooseButton,event.videoId,name);
+						event.player.wait();
+						game.pause();
+					}
+					else{
+						switchToAuto();
+					}
 					"step 1"
-					var delay=8400-(get.utc()-event.time);
-					if(delay>0){
- 					event.delay2=true;
- 					event.dialog=ui.create.dialog(get.translation(player)+'正在擦拭宝物...'+(_status.connectMode?'':'<br>（点击屏幕可跳过等待）'));
- 					event.videoId=lib.status.videoId++;
- 					game.broadcast('createDialog',event.videoId,get.translation(player)+'正在擦拭宝物...');
- 					game.pause();
- 					event.pingcai_delayed=true;
- 					setTimeout(function(){
- 						if(event.pingcai_delayed==true){
- 							delete event.pingcai_delayed;
- 							game.resume();
- 						}
- 					},delay);
- 					if(!_status.connectMode){
- 						event.forceMine=true;
- 						event.custom.replace.window=function(){
- 							if(event.pingcai_delayed==true){
- 								delete event.forceMine;
- 								delete event.pingcai_delayed;
- 								game.resume();
- 							}
- 						}
- 					}
-					}
-					event.card=result.links[0];
+					var result=event.result||result;
+					if(!result) result={bool:false};
+					event._result=result;
+					game.broadcastAll(function(id,result,player){
+						_status.xinfu_pingcai_finished=true;
+						var dialog=get.idDialog(id);
+						if(dialog){
+							dialog.textPrompt.innerHTML='<div class="text center">'+(get.translation(player)+'擦拭宝物'+(result.bool?'成功！':'失败…'))+'</div>';
+							if(result.bool&&dialog.canvas_viewer) dialog.canvas_viewer.classList.remove('grayscale');
+						}
+						if(!_status.connectMode) delete event.pingcai_delayed;
+					},event.videoId,result,player);
+					game.delay(2.5);
 					"step 2"
-					if(event.delay2){
- 					delete event.custom.replace.window;
- 					event.dialog.close();
- 					game.addVideo('cardDialog',null,event.videoId);
- 					game.broadcast('closeDialog',event.videoId);
+ 				game.broadcastAll('closeDialog',event.videoId);
+					if(result.bool){
+						player.logSkill('pcaudio_'+event.cardname);
+						event.insert(lib.skill.xinfu_pingcai[event.cardname],{
+							player:player,
+						});
 					}
-					player.logSkill('pcaudio_'+event.card.name);
-					player.$throw(event.card);
-					event.insert(lib.skill.xinfu_pingcai[event.card.name],{
-						player:player,
-					});
 				},
 				ai:{
 					order:7,

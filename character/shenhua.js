@@ -1393,7 +1393,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:11,
 					result:{
 						player:function(player){
-							if(game.countPlayer(function(current){return (current.countCards('h')>player.countCards('h')||current.countCards('e')>player.countCards('e'))&&get.attitude(player,current)<0&&!player.storage.nzry_feijun.contains(current)})>0||game.countPlayer(function(current){return current.countCards('h')>player.countCards('h')&&get.attitude(player,current)<0})>0||(player.countCards('h')>=2&&game.countPlayer(function(current){return current.countCards('e')>player.countCards('e')&&get.attitude(player,current)<0})>0)) return 1;
+							if(game.hasPlayer(function(current){
+								return (current.countCards('h')>player.countCards('h')||current.countCards('e')>player.countCards('e'))&&get.attitude(player,current)<0&&player.getStorage('nzry_feijun').contains(current);
+							})||game.hasPlayer(function(current){
+								return current.countCards('h')>player.countCards('h')&&get.attitude(player,current)<0;
+							})||(player.countCards('h')>=2&&game.hasPlayer(function(current){
+								return current.countCards('e')>player.countCards('e')&&get.attitude(player,current)<0;
+							}))) return 1;
 						},
 					},
 				},

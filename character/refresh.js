@@ -1886,6 +1886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//徐晃
 			olduanliang:{
 				audio:2,
+				locked:false,
 				enable:'chooseToUse',
 				filterCard:function(card){
 					 return (get.type2(card)!='trick'&&get.color(card)=='black');
@@ -4203,12 +4204,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			residi2:{
 				onremove:true,
 				mod:{
-					cardEnabled2:function(card,player){
+					cardEnabled:function(card,player){
+						if(player.getStorage('residi2').contains(get.color(card,player))) return false;
+					},
+					cardRespondable:function(card,player){
+						if(player.getStorage('residi2').contains(get.color(card,player))) return false;
+					},
+					cardSavable:function(card,player){
 						if(player.getStorage('residi2').contains(get.color(card,player))) return false;
 					},
 				},
 				intro:{
-					content:'不能使用$的牌',
+					content:'不能使用或打出$牌',
 				},
 				marktext:'敌',
 			},

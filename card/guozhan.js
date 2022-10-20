@@ -1070,7 +1070,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				distance:{attackFrom:-1},
 				ai:{
 					equipValue:function(card,player){
-						if(player.identity=='unknown'||player.identity=='ye') return 2.5;
+						if(player.identity=='unknown'||player.identity=='ye') return 2;
 						return 2+game.countPlayer(function(current){
 							return current.isFriendOf(player);
 						})/2;

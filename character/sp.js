@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji"],
+				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
 				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','zhaoyǎn'],
 				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun"],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao"],
@@ -28,6 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			caoxiancaohua:['female','qun',3,['huamu','qianmeng','liangyuan','jisi']],
 			jin_zhouchu:['male','jin',4,['shanduan','yilie']],
 			zhaoyǎn:['male','wei',4,['tongxie']],
 			ol_puyuan:['male','shu',4,['olshengong','olqisi']],
@@ -172,6 +173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			caoxiancaohua:'此处为「曹宪」的相关介绍。关于「曹华」的部分请参考原本的介绍。<br>曹宪（生卒年不详），女，沛国谯县（今安徽省亳州市）人。东汉末年历史人物，汉献帝刘协嫔妃，魏武帝曹操女儿。建安十八年，嫁给汉献帝刘协，受封为贵人。黄初元年（220年），兄弟曹丕称帝后，汉献帝成为山阳公，不知所终。',
 			zhaoyǎn:'赵俨（171~245年），字伯然，颍川阳翟（今河南禹州市）。东汉末年颍川“四大名士”之一，三国时期魏国名臣。熟读经史，精明强干。建安二年，投靠大将军曹操之后，起家朗陵县令，历任司空府掾、司空主薄、都督护军、扶风太守等职。魏文帝曹丕继位后，历任魏国侍中、驸马都尉、河东太守、典农中郎将、度支尚书，封宜土亭侯。魏明帝曹睿时期，历任大司农、骠骑将军、大司空等职。正始六年，去世，时年七十五，谥号为穆。',
 			ruiji:'芮姬，芮玄之女，太子孙登妃，黄武五年卒。',
 			weizi:'卫兹（?-190年），字子许，（《三国演义》中其名为卫弘，当为误记），陈留襄邑（今河南睢县）人。曾举孝廉，先后被车骑将军何苗、司徒杨赐等召辟。中平六年（189年）十二月，曹操在陈留己吾募兵，而卫兹以家财资助曹操，使曹操顺利募得五千士兵。此后，卫兹与曹操共同讨伐董卓。初平元年（190年），卫兹在跟随曹操讨伐董卓途中，于荥阳汴水遭遇董卓军徐荣，力战终日，失利身亡。',
@@ -647,6 +649,348 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//曹宪曹华
+			huamu:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					var color=get.color(event.card);
+					if(color=='none') return false;
+					if(!player.hasHistory('lose',function(evt){
+						return evt.hs.length>0&&evt.getParent()==event;
+					})||!event.cards.filterInD('oe').length) return false;
+					var history=game.getGlobalHistory('useCard');
+					var index=history.indexOf(event);
+					if(index<1) return false;
+					var evt=history[index-1],color2=get.color(evt.card);
+					return color!=color2&&color2!='none';
+				},
+				prompt2:(event)=>'将'+get.translation(event.cards.filterInD('oe'))+'置于武将牌上',
+				check:function(event,player){
+					if(!game.hasPlayer(function(current){
+						return current.hasSkill('qianmeng',null,null,false)&&get.attitude(player,current)>0;
+					})) return false;
+					var cards=event.cards.filterInD('e');
+					if(!cards.length) return true;
+					var card=cards[0];
+					if(get.owner(card)==player){
+						if(get.value(card,player)<=0) return true;
+						var subtype=get.subtype(card);
+						if(player.hasCard('hs',function(card){
+							return get.subtype(card)==subtype&&player.canUse(card,player)&&get.effect(player,card,player,player)>0;
+						})) return true;
+					}
+					return false;
+				},
+				content:function(){
+					var cards=trigger.cards.filterInD('oe');
+					player.addToExpansion(cards,'gain2').gaintag.add('huamu');
+				},
+				ai:{
+					reverseOrder:true,
+					combo:'qianmeng',
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(typeof card=='object'){
+							var history=game.getGlobalHistory('useCard');
+							if(!history.length) return;
+							var evt=history[history.length-1];
+							if(evt&&evt.card&&get.color(evt.card)!='none'&&get.color(card)!='none'&&get.color(evt.card)!=get.color(card)){
+								return num+4;
+							}
+						}
+					},
+				},
+				marktext:'木',
+				intro:{
+					name:'灵杉&玉树',
+					markcount:function(storage,player){
+						var red=[],black=[];
+						var cards=player.getExpansions('huamu');
+						for(var i of cards){
+							var color=get.color(i,false);
+							(color=='red'?red:black).push(i);
+						}
+						return (''+black.length+'/'+red.length);
+					},
+					content:'expansion',
+					mark:function(dialog,storage,player){
+						var red=[],black=[];
+						var cards=player.getExpansions('huamu');
+						for(var i of cards){
+							var color=get.color(i,false);
+							(color=='red'?red:black).push(i);
+						}
+						if(black.length){
+							dialog.addText('灵杉');
+							dialog.addSmall(black);
+						}
+						if(red.length){
+							dialog.addText('玉树');
+							dialog.addSmall(red);
+						}
+					},
+				},
+			},
+			qianmeng:{
+				audio:2,
+				trigger:{
+					global:['loseAfter','equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+				},
+				filter:function(event,player){
+					if(event.name=='addToExpansion'){
+						if(event.gaintag.contains('huamu')){
+							var cards=event.player.getExpansions('huamu'),red=cards.filter(function(i){
+								return get.color(i,false)=='red';
+							});
+							if(cards.length==red.length||red.length==0||cards.length==red.length*2) return true;
+						}
+					}
+					if(event.name=='lose'&&event.getlx!==false){
+						for(var i in event.gaintag_map){
+							if(event.gaintag_map[i].contains('huamu')){
+								var cards=event.player.getExpansions('huamu'),red=cards.filter(function(i){
+									return get.color(i,false)=='red';
+								});
+								return (cards.length==red.length||red.length==0||cards.length==red.length/2);
+							}
+						}
+						return false;
+					}
+					return game.getGlobalHistory('cardMove',function(evt){
+						if(evt.name!='lose'||event!=evt.getParent()) return false;
+						for(var i in evt.gaintag_map){
+							if(evt.gaintag_map[i].contains('huamu')){
+								var cards=evt.player.getExpansions('huamu'),red=cards.filter(function(i){
+									return get.color(i,false)=='red';
+								});
+								return (cards.length==red.length||red.length==0||cards.length==red.length/2);
+							}
+						}
+						return false;
+					}).length>0;
+				},
+				forced:true,
+				content:function(){
+					player.draw();
+				},
+				ai:{combo:'huamu'},
+			},
+			liangyuan:{
+				enable:'chooseToUse',
+				hiddenCard:function(player,name){
+					if(name=='tao'){
+						return !player.hasSkill('liangyuan_tao',null,null,false)&&game.hasPlayer(function(current){
+							var storage=current.getExpansions('huamu');
+							return storage.length>0&&storage.filter(function(i){
+								return get.color(i,false)=='red';
+							}).length>0;
+						});
+					}
+					else if(name=='jiu'){
+						return !player.hasSkill('liangyuan_jiu',null,null,false)&&game.hasPlayer(function(current){
+							var storage=current.getExpansions('huamu');
+							return storage.length>0&&storage.filter(function(i){
+								return get.color(i,false)=='black';
+							}).length>0;
+						})
+					}
+					return false;
+				},
+				filter:function(event,player){
+					if(event.type=='wuxie') return false;
+					if(!player.hasSkill('liangyuan_tao',null,null,false)&&event.filterCard({name:'tao'},player,event)&&game.hasPlayer(function(current){
+						var storage=current.getExpansions('huamu');
+						return storage.length>0&&storage.filter(function(i){
+							return get.color(i,false)=='red';
+						}).length>0;
+					})) return true;
+					if(!player.hasSkill('liangyuan_jiu',null,null,false)&&event.filterCard({name:'jiu'},player,event)&&game.hasPlayer(function(current){
+						var storage=current.getExpansions('huamu');
+						return storage.length>0&&storage.filter(function(i){
+							return get.color(i,false)=='black';
+						}).length>0;
+					})) return true;
+					return false;
+				},
+				chooseButton:{
+					dialog:function(){
+						return ui.create.dialog('良缘',[['tao','jiu'],'vcard'],'hidden');
+					},
+					filter:function(button,player){
+						var evt=_status.event.getParent();
+						var name=button.link[2],color=(name=='tao')?'red':'black';
+						if(player.hasSkill('liangyuan_'+name,null,null,false)) return false;
+						var cards=[];
+						game.countPlayer(function(current){
+							cards.addArray(current.getExpansions('huamu').filter(function(i){
+								return get.color(i,false)==color;
+							}));
+						});
+						if(!cards.length) return false;
+						var card=get.autoViewAs({name:name},cards);
+						return evt.filterCard(card,player,evt);
+					},
+					check:function(button){
+						if(_status.event.getParent().type!='phase') return 1;
+						var player=_status.event.player;
+						var name=button.link[2],color=(name=='tao')?'red':'black';
+						var cards=[];
+						game.countPlayer(function(current){
+							cards.addArray(current.getExpansions('huamu').filter(function(i){
+								return get.color(i,false)==color;
+							}));
+						});
+						var card=get.autoViewAs({name:name},cards);
+						return player.getUseValue(card,null,true);
+					},
+					backup:function(links,player){
+						var name=links[0][2],color=(name=='tao')?'red':'black';
+						var cards=[];
+						game.countPlayer(function(current){
+							cards.addArray(current.getExpansions('huamu').filter(function(i){
+								return get.color(i,false)==color;
+							}));
+						});
+						if(!cards.length) return false;
+						var card=get.autoViewAs({name:name},cards);
+						return {
+							viewAs:card,
+							color:color,
+							selectCard:-1,
+							filterCard:()=>false,
+							precontent:function(){
+								player.addTempSkill('liangyuan_'+event.result.card.name,'roundStart');
+								player.logSkill('liangyuan');
+								var list=[],color=lib.skill.liangyuan_backup.color;
+								var cards=[];
+								game.countPlayer(function(current){
+									var cardsx=current.getExpansions('huamu').filter(function(i){
+										return get.color(i,false)==color;
+									});
+									if(cardsx.length){
+										cards.addArray(cardsx);
+										list.push([current,cardsx]);
+										current.$throw(cardsx);
+										game.log(current,'将',cardsx,'化作“'+(color==''?'':'')+'”良缘')
+									}
+								});
+								event.result.cards=cards;
+								delete event.result.skill;
+								event.result._apply_args={'throw':false};
+								game.loseAsync({
+									lose_list:list,
+								}).setContent('chooseToCompareLose');
+							},
+						}
+					},
+					prompt:function(links,player){
+						var name=links[0][2],color=(name=='tao')?'玉树':'灵杉';
+						return '将场上所有的“'+color+'”当做【'+get.translation(name)+'】使用';
+					},
+				},
+				subSkill:{
+					tao:{charlotte:true},
+					jiu:{charlotte:true},
+				},
+				ai:{
+					order:function(item,player){
+						if(!player) player=_status.event.player;
+						return get.order({name:lib.skill.liangyuan.hiddenCard(player,'jiu')?'jiu':'tao'})+4;
+					},
+					result:{
+						player:function(player){
+							if(_status.event.dying) return get.attitude(player,_status.event.dying);
+							return 1;
+						},
+					},
+					combo:'huamu',
+					threaten:3,
+				},
+			},
+			jisi:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				limited:true,
+				skillAnimation:true,
+				animationColor:'metal',
+				filter:function(event,player){
+					var skills=player.getStockSkills('一！','五！').filter(function(skill){
+						if(skill=='jisi') return false;
+						var info=get.info(skill);
+						return info&&!info.charlotte;
+					});
+					var history=player.getAllHistory('useSkill');
+					for(var i of history){
+						if(skills.contains(i.sourceSkill)||skills.contains(i.skill)) return true;
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var skills2=[];
+					var skills=player.getStockSkills('只！','因！').filter(function(skill){
+						if(skill=='jisi') return false;
+						var info=get.info(skill);
+						return info&&!info.charlotte;
+					});
+					var history=player.getAllHistory('useSkill');
+					for(var i of history){
+						if(skills.contains(i.sourceSkill)) skills2.add(i.sourceSkill);
+						if(skills.contains(i.skill)) skills2.add(i.skill);
+						if(skills.length==skills2.length) break;
+					}
+					event.skills2=skills2;
+					var str='令一名其他角色获得';
+					for(var i=0;i<skills2.length;i++){
+						str+=('〖'+get.translation(skills2[i])+'〗');
+						if(i!=skills2.length-1) str+=';';
+					}
+					if(skills2.length>1) str+='中的一个技能';
+					str+='然后你';
+					if(player.countCards('h')>0) str+='弃置所有手牌，并';
+					str+='视为对其使用一张【杀】';
+					player.chooseTarget(get.prompt('jisi'),str,lib.filter.notMe).set('ai',function(target){
+						if(!_status.event.goon) return false;
+						var att=get.attitude(player,target);
+						if(att<4) return false;
+						var eff=get.effect(target,{name:'sha',isCard:true},player,player);
+						if(eff>=0) return att+eff;
+						if(target.hp<=2) return false;
+						return att/Math.max(1,-eff);
+					}).set('goon',function(){
+						if(player.hasUnknown()||player.identity=='nei') return false;
+						var hs=player.getCards('h');
+						if(!hs.length||get.value(hs,player)<=9-player.hp) return true;
+						return false;
+					}());
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('jisi',target);
+						player.awakenSkill('jisi');
+						var list=event.skills2;
+						if(list.length==0) event._result={control:list[0]};
+						player.chooseControl(list).set('prompt','令'+get.translation(target)+'获得一个技能').set(
+							'ai',()=>_status.event.choice
+						).set('choice',list.contains('qianmeng')?'qianmeng':list.randomGet());
+					}
+					else event.finish();
+					'step 2'
+					target.addSkill(result.control);
+					'step 3'
+					var num=player.countCards('h');
+					if(num>0) player.chooseToDiscard('h',num,true);
+					'step 4'
+					if(player.canUse('sha',target,false)) player.useCard(false,target,{
+						name:'sha',
+						isCard:true,
+					},'noai')
+				},
+			},
 			//周处
 			shanduan:{
 				audio:2,
@@ -18888,7 +19232,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spfengyin_info:'其他角色的回合开始时，若其体力值不少于你，你可以交给其一张【杀】，令其跳过出牌阶段和弃牌阶段。',
 			spchizhong:'持重',
 			spchizhong_info:'锁定技，你的手牌上限等于体力上限；其他角色死亡时，你加1点体力上限。',
-			sp_fuhuanghou:'SP伏皇后',
+			sp_fuhuanghou:'SP伏寿',
 			spcangni:'藏匿',
 			spcangni_info:'弃牌阶段开始时，你可以回复1点体力或摸两张牌，然后将你的武将牌翻面；其他角色的回合内，当你获得（每回合限一次）/失去一次牌时，若你的武将牌背面朝上，你可以令该角色摸/弃置一张牌。',
 			spmixin:'密信',
@@ -19077,6 +19421,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shanduan_info:'①回合开始时，你生成数组R=[1,2,3,4]。②摸牌阶段开始时，你从数组R中选择并移除一个数字A。你本阶段的额定摸牌数改为A。③出牌阶段开始时，你从数组R中选择并移除两个数字B和C。你将你本阶段内的攻击范围基数最小值和使用【杀】的次数上限基础值改为B和C。④弃牌阶段开始时，你从数组R中选择并移除一个数字D。你令你本回合的手牌上限基数改为D。⑤当你于回合外受到伤害后，你令下回合生成的R中最小的一个数字+1。',
 			yilie:'义烈',
 			yilie_info:'每轮每种牌名限一次。你可以将两张颜色相同的手牌当做任意一种基本牌使用。',
+			caoxiancaohua:'曹宪曹华',
+			huamu:'化木',
+			huamu_info:'当你使用手牌后，若此牌和本回合内上一张被使用的牌颜色不同，则你可以将此牌对应的所有{位于处理区或装备区}的实体牌置于你的武将牌上。这些牌中的黑色牌称为“灵杉”，红色牌称为“玉树”。',
+			qianmeng:'前盟',
+			qianmeng_info:'锁定技。当有牌移动事件结算结束后，若有角色的“灵杉”和“玉树”数量发生了变化，且二者数量相等或有一项为0，则你摸一张牌',
+			liangyuan:'良缘',
+			liangyuan_info:'每轮每项各限一次。你可以将场上所有的“灵杉”/“玉树”置于处理区，然后将这些牌当做【酒】/【桃】使用。',
+			jisi:'羁肆',
+			jisi_info:'限定技。准备阶段，你可以令一名其他角色获得你武将牌上的一个已发动过的其他技能。然后你弃置所有手牌，并视为对其使用一张【杀】（无距离关系的限制）。',
 			
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

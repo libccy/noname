@@ -25,7 +25,7 @@ body {
 	overflow: hidden;
 	text-rendering: optimizeLegibility;
 	transform-origin: top left;
-	font-family: 'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei',Helvetica,Arial,sans-serif
+	font-family: 'STHeiti','SimHei','Microsoft JhengHei','Microsoft YaHei','WenQuanYi Micro Hei','Suits',Helvetica,Arial,sans-serif;
 }
 
 div {
@@ -1295,9 +1295,10 @@ body>.background.land {
 	/*overflow: hidden;*/
 }
 .card>.info {
-	right: 6px;
-	top: 9px;
+	top: 5.2px;
+	right: 7px;
 	white-space: nowrap;
+	word-spacing: -0.1em;
 }
 .card>.range {
 	bottom: 5px;
@@ -4251,13 +4252,14 @@ div[data-decoration="bronze"]::after{
 	color: rgb(255,235,59);
 }
 .card.fullskin>.info {
-	top: 8px;
-	right: 6px;
+	top: 5.2px;
+	right: 7px;
 	color: rgba(0,0,0,0.8);
+	white-space: nowrap;
 	text-shadow: none;
 }
 .card.fullskin>.info.red {
-	color: #631515;
+	color: #A82424;
 }
 
 .config>.toggle.onoff {

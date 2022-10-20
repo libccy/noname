@@ -12,10 +12,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				yijiang_2014:['hanhaoshihuan','chenqun','caozhen','zhangsong','wuyi','zhoucang','zhuhuan','guyong','sunluban','yj_jushou','caifuren'],
 				yijiang_2015:['caoxiu','caorui','zhongyao','xiahoushi','liuchen','zhangyi','zhuzhi','quancong','sunxiu','gongsunyuan','guotufengji'],
 				yijiang_2016:['guohuanghou','sunziliufang','huanghao','liyan','sundeng','cenhun','zhangrang','liuyu'],
-				yijiang_2017:['xinxianying','jikang','wuxian','qinmi','xuezong','xushi','caiyong','caojie',],
+				yijiang_2017:['xinxianying','jikang','wuxian','qinmi','xuezong','xushi','caiyong','caojie'],
+				yijiang_2022:['lukai'],
 			},
 		},
 		character:{
+			lukai:['male','wu',4,['lkbushi','lkzhongzhuang']],
 			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
 			old_guanzhang:['male','shu',4,['old_fuhun']],
 			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
@@ -99,6 +101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yujin:["male","wei",4,["yizhong"],[]],
 		},
 		characterIntro:{
+			lukai:'陆凯（198－269年），字敬风，吴郡吴县（今江苏省苏州市）人。三国时期吴国重臣，丞相陆逊的族侄，大司马陆抗的族兄。黄武年间，举孝廉出身，曾任永兴县长、诸暨县长，颇有治绩。拜建武都尉、儋耳太守，与聂友率军讨伐朱崖和儋耳，迁建武校尉。五凤二年（255年），讨斩零陵山贼陈毖，拜偏将军、巴丘督，册封都乡侯。迁武昌右部督，随军进入寿春。后拜荡魏将军，加号绥远将军。吴景帝孙休继位，拜征北将军、假节、领豫州牧。孙皓即位，迁任镇西大将军，都督巴丘，又领荆州牧，进封嘉兴侯。宝鼎元年（266年），迁左丞相。以正直及屡次劝谏孙皓而闻名。建衡元年（269年），去世，时年七十二。',
 			caozhi:'字子建，沛国谯人，三国曹魏著名文学家，建安文学代表人物。魏武帝曹操之子，魏文帝曹丕之弟，生前曾为陈王，去世后谥号“思”，因此又称陈思王。南朝宋文学家谢灵运更有“天下才有一石，曹子建独占八斗”的评价。王士祯尝论汉魏以来二千年间诗家堪称“仙才”者，曹植、李白、苏轼三人耳。',
 			gaoshun:'中国东汉末年将领，吕布帐下中郎将。史载高顺为人清白有威严，不好饮酒，所统率的部队精锐非常，号称“陷阵营”。屡进忠言于吕布，吕布虽知其忠而不能用。曹操击破吕布后，高顺被曹操所杀。',
 			chengong:'字公台，东汉末年吕布帐下谋士，东郡东武阳人。性情刚直，足智多谋，年少时与海内知名之士相互结交。192年，陈宫等人主张曹操接任兖州牧。但此后陈宫因曹操杀害边让而与曹操反目，并游说张邈等人背叛曹操迎吕布入兖州，辅助吕布攻打曹操。吕布战败后，随吕布等一同被曹操所擒，决意赴死。',
@@ -194,6 +197,184 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhonghui:['jiangwei'],
 		},
 		skill:{
+			//陆凯
+			lkbushi:{
+				audio:2,
+				getBushi:function(player){
+					if(!player.storage.lkbushi) return ['spade','heart','club','diamond'];
+					return player.storage.lkbushi;
+				},
+				onremove:true,
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				locked:false,
+				content:function(){
+					'step 0'
+					var list=lib.skill.lkbushi.getBushi(player);
+					list=list.map(function(i){
+						return ['','','lukai_'+i];
+					});
+					var next=player.chooseToMove('卜筮：是否调整〖卜筮〗的花色顺序？');
+					next.set('list',[
+						['无次数限制/使用打出摸牌<br>可弃牌无效/结束阶段获得',[list,'vcard'],function(list){
+							var list2=list.map(function(i){
+								return get.translation(i[2].slice(6));
+							});
+							return '你使用'+list2[0]+'牌时无次数限制；使用或打出'+list2[1]+'时，摸一张牌；<br>成为'+list2[2]+'牌目标后可弃一张牌无效；结束阶段获得一张'+list2[3]+'牌';
+						}],
+					]);
+					next.set('processAI',function(){
+						var player=_status.event.player;
+						var list=lib.skill.lkbushi.getBushi(player);
+						var list2=[];
+						var hs=player.getCards('hs',function(card){
+							return player.hasValueTarget(card);
+						});
+						list.sort(function(a,b){
+							return hs.filter((i)=>get.suit(i)==b).length-hs.filter((i)=>get.suit(i)==a).length;
+						});
+						list2.push(list.shift());
+						hs=player.getCards('hs','sha');
+						list.sort(function(a,b){
+							return hs.filter((i)=>get.suit(i)==b).length-hs.filter((i)=>get.suit(i)==a).length;
+						});
+						list2.unshift(list.shift());
+						list.randomSort();
+						list2.addArray(list);
+						return [list2.map((i)=>['','','lukai_'+i])]
+					});
+					'step 1'
+					if(result.bool){
+						var list=lib.skill.lkbushi.getBushi(player),list2=result.moved[0].map(function(i){
+							return i[2].slice(6);
+						});
+						for(var i=0;i<4;i++){
+							if(list[i]!=list2[i]){
+								player.logSkill('lkbushi');
+								player.storage.lkbushi=list2;
+								var str='#g';
+								for(var j=0;j<4;j++){
+									str+=get.translation(list2[j]);
+									if(j!=3) str+='/';
+								}
+								game.log(player,'将','#g【卜筮】','的花色序列改为',str);
+								game.delayx();
+								break;
+							}
+						}
+					}
+				},
+				mark:true,
+				marktext:'筮',
+				intro:{
+					content:function(storage,player){
+						var list=lib.skill.lkbushi.getBushi(player).map((i)=>get.translation(i));
+						return '①你使用'+list[0]+'牌无次数限制。②当你使用或打出'+list[1]+'牌后，你摸一张牌。③当你成为'+list[2]+'牌的目标后，你可以弃置一张牌，令此牌对你无效。④结束阶段开始时，你从牌堆或弃牌堆获得一张'+list[3]+'牌。⑤准备阶段开始时，你可调整此技能中四种花色的对应顺序。';
+					},
+				},
+				group:['lkbushi_unlimit','lkbushi_draw','lkbushi_defend','lkbushi_gain'],
+				subSkill:{
+					unlimit:{
+						mod:{
+							cardUsable:function(card,player){
+					 		var list=lib.skill.lkbushi.getBushi(player);
+								if(list[0]==get.suit(card)) return Infinity;
+							},
+						},
+						trigger:{player:'useCard1'},
+						forced:true,
+						popup:false,
+						silent:true,
+						firstDo:true,
+						filter:function(event,player){
+							if(event.addCount===false) return true;
+							var list=lib.skill.lkbushi.getBushi(player);
+							return (list[0]==get.suit(event.card));
+						},
+						content:function(){
+							trigger.addCount=false;
+							var stat=player.getStat().card,name=trigger.card.name;
+							if(stat[name]&&typeof stat[name]=='number') stat[name]--;
+						},
+					},
+					draw:{
+						audio:'lkbushi',
+						trigger:{player:['useCard','respond']},
+						forced:true,
+						locked:false,
+						filter:function(event,player){
+							var list=lib.skill.lkbushi.getBushi(player);
+							return list[1]==get.suit(event.card);
+						},
+						content:function(){
+							player.draw();
+						},
+					},
+					defend:{
+						audio:'lkbushi',
+						trigger:{target:'useCardToTargeted'},
+						direct:true,
+						filter:function(event,player){
+							var list=lib.skill.lkbushi.getBushi(player);
+							return list[2]==get.suit(event.card)&&!event.excluded.contains(player)&&player.countCards('he')>0;
+						},
+						content:function(){
+							'step 0'
+							player.chooseToDiscard('he',get.prompt('lkbushi'),'弃置一张牌，令'+get.translation(trigger.card)+'对你无效').set('ai',function(card){
+								if(_status.event.eff>=0) return false;
+								return -_status.event.eff*1.1-get.value(card);
+							}).set('eff',get.effect(player,trigger.card,trigger.player,player)).logSkill=['lkbushi_defend',trigger.player];
+							'step 1'
+							if(result.bool){
+								trigger.excluded.add(player);
+							}
+						},
+					},
+					gain:{
+						audio:'lkbushi',
+						trigger:{player:'phaseJieshuBegin'},
+						forced:true,
+						locked:false,
+						content:function(){
+							var list=lib.skill.lkbushi.getBushi(player);
+							var card=get.cardPile(function(card){
+								return get.suit(card,false)==list[3];
+							});
+							if(card) player.gain(card,'gain2');
+						},
+					},
+				},
+			},
+			lkzhongzhuang:{
+				audio:2,
+				trigger:{source:'damageBegin1'},
+				forced:true,
+				filter:function(event,player){
+					if(!event.card||event.card.name!='sha'||event.getParent().type!='card') return false;
+					var range=player.getAttackRange();
+					if(range>3) return true;
+					return range<3&&event.num>1;
+				},
+				content:function(){
+					var range=player.getAttackRange();
+					if(range>3) trigger.num++;
+					else trigger.num=1;
+				},
+				global:'lkzhongzhuang_ai',
+				subSkill:{
+					ai:{
+						ai:{
+						filterDamage:true,
+							skillTagFilter:function(player,tag,arg){
+								if(arg&&arg.card&&arg.card.name=='sha'){
+									if(arg.player&&arg.player.hasSkill('lkzhongzhuang')&&arg.player.getAttackRange()<3) return true;
+								}
+								return false;
+							},
+						},
+					},
+				},
+			},
 			//顾雍
 			olbingyi:{
 				audio:'bingyi',
@@ -3808,7 +3989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						trigger.player.addSkill('xinsidi2');
-						trigger.player.storage.xinsidi2=get.color(result.cards[0],result.cards[0].original=='h'?player:false);
+						trigger.player.markAuto('xinsidi2',[get.color(result.cards[0],result.cards[0].original=='h'?player:false)]);
 						trigger.player.storage.xinsidi4=player;
 						trigger.player.syncStorage('xinsidi2');
 					}
@@ -3843,8 +4024,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				mod:{
-					cardEnabled2:function(card,player){
-						if(get.color(card)==player.storage.xinsidi2) return false;
+					cardEnabled:function(card,player){
+						if(player.getStorage('xinsidi2').contains(get.color(card))) return false;
+					},
+					cardRespondable:function(card,player){
+						if(player.getStorage('xinsidi2').contains(get.color(card))) return false;
+					},
+					cardSavable:function(card,player){
+						if(player.getStorage('xinsidi2').contains(get.color(card))) return false;
 					},
 				},
 				intro:{
@@ -10065,6 +10252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhichi2:{
 				trigger:{target:'useCardToBefore'},
 				forced:true,
+				charlotte:true,
 				priority:15,
 				filter:function(event,player){
 					return get.type(event.card)=='trick'||event.card.name=='sha';
@@ -12092,6 +12280,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			}
 		},
+		card:{
+			lukai_spade:{fullskin:true},
+			lukai_heart:{fullskin:true},
+			lukai_diamond:{fullskin:true},
+			lukai_club:{fullskin:true},
+		},
 		dynamicTranslate:{
 			rejueqing:function(player){
 				if(player.storage.rejueqing_rewrite) return '锁定技，你即将造成的伤害均视为失去体力。';
@@ -12115,6 +12309,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			funan:function(player){
 				if(player.hasSkill('funan_jiexun')) return '其他角色使用或打出牌响应你使用的牌时，你可获得其使用或打出的牌。';
 				return '其他角色使用或打出牌响应你使用的牌时，你可令其获得你使用的牌（其本回合不能使用或打出这些牌），然后你获得其使用或打出的牌。';
+			},
+			lkbushi:function(player){
+				var list=lib.skill.lkbushi.getBushi(player).map((i)=>get.translation(i));
+				return '①你使用'+list[0]+'牌无次数限制。②当你使用或打出'+list[1]+'牌后，你摸一张牌。③当你成为'+list[2]+'牌的目标后，你可以弃置一张牌，令此牌对你无效。④结束阶段开始时，你从牌堆或弃牌堆获得一张'+list[3]+'牌。⑤准备阶段开始时，你可调整此技能中四种花色的对应顺序。';
 			},
 		},
 		characterReplace:{
@@ -12754,6 +12952,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinzhaofu_info:'主公技，限定技。出牌阶段，你可选择至多两名其他角色。这两名角色视为在所有其他吴势力角色的攻击范围内。',
 			olbingyi:'秉壹',
 			olbingyi_info:'每阶段限一次。当你因弃置而失去牌后，你可以展示所有手牌。若这些牌的颜色均相同，则你可以与至多X名其他角色各摸一张牌（X为你的手牌数）。',
+			lukai:'陆凯',
+			lukai_spade:'♠',
+			lukai_spade_bg:'♠️',
+			lukai_heart:'♥',
+			lukai_heart_bg:'♥️',
+			lukai_club:'♣',
+			lukai_club_bg:'♣',
+			lukai_diamond:'♦',
+			lukai_diamond_bg:'♦️️',
+			lkbushi:'卜筮',
+			lkbushi_info:'①你使用♠牌无次数限制。②当你使用或打出♥牌后，你摸一张牌。③当你成为♣牌的目标后，你可以弃置一张牌，令此牌对你无效。④结束阶段开始时，你从牌堆或弃牌堆获得一张♦牌。⑤准备阶段开始时，你可调整此技能中四种花色的对应顺序。',
+			lkzhongzhuang:'忠壮',
+			lkzhongzhuang_info:'锁定技。当你因执行【杀】的效果而造成伤害时，若你的攻击范围：大于3，则此伤害+1；小于3，则此伤害改为1。',
 			
 			yijiang_2011:'一将成名2011',
 			yijiang_2012:'一将成名2012',
@@ -12762,6 +12973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yijiang_2015:'一将成名2015',
 			yijiang_2016:'原创设计2016',
 			yijiang_2017:'原创设计2017',
+			yijiang_2022:'原创设计2022',
 		},
 	};
 });

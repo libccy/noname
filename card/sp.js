@@ -156,16 +156,24 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(get.suit(card)=='spade') return -6;
 					return 0;
 				},
+				cardPrompt:function(card){
+					var str='出牌阶段，对你使用。你将【浮雷】置入判定区。若判定结果为♠，则目标角色受到X点雷电伤害（X为此牌判定结果为♠的次数）。判定完成后，将此牌移动到下家的判定区里。';
+					if(card.storage&&card.storage.fulei) str+=('<br><span style="font-family:yuanli">此牌已判定命中过：'+card.storage.fulei+'次</span>');
+					return str;
+				},
 				effect:function(){
 					'step 0'
 					if(result.bool==false){
-						if(!card.storage.fulei){
-							card.storage.fulei=1;
+						var card=cards[0];
+						if(card){
+							if(!card.storage.fulei){
+								card.storage.fulei=1;
+							}
+							else{
+								card.storage.fulei++;
+							}
+							player.damage(card.storage.fulei,'thunder','nosource');
 						}
-						else{
-							card.storage.fulei++;
-						}
-						player.damage(card.storage.fulei,'thunder','nosource');
 					}
 					'step 1'
 					player.addJudgeNext(card);
@@ -608,7 +616,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			g_jinchan2_info:'当你因弃置而失去【金蝉脱壳】时，你摸一张牌',
 			jinchan_info:'当你成为其他角色使用牌的目标时，若你的手牌里只有【金蝉脱壳】，使目标锦囊牌或基本牌对你无效，你摸两张牌。当你因弃置而失去【金蝉脱壳】时，你摸一张牌。',
 			fulei:'浮雷',
-			fulei_info:'出牌阶段，对你使用。将【浮雷】放置于你的判定区里，若判定结果为黑桃，则目标角色受到X点雷电伤害（X为此锦囊判定结果为黑桃的次数）。判定完成后，将此牌移动到下家的判定区里。',
+			fulei_info:'出牌阶段，对你使用。你将【浮雷】置入判定区。若判定结果为♠，则目标角色受到X点雷电伤害（X为此牌判定结果为♠的次数）。判定完成后，将此牌移动到下家的判定区里。',
 			qibaodao:'七宝刀',
 			qibaodao_info:'攻击范围2；锁定技，你使用【杀】无视目标防具，若目标角色未损失体力值，此【杀】伤害+1',
 			qibaodao2:'七宝刀',

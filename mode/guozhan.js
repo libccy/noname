@@ -3039,7 +3039,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return player.countMark('gzsuzhi_count')<3;
 				},
 				content:function(){
-					player.addTempSkill('fankui',{player:'phaseBegin'});
+					player.addTempSkill('gzfankui',{player:'phaseBegin'});
 				},
 				group:['gzsuzhi_damage','gzsuzhi_draw','gzsuzhi_gain'],
 				preHidden:['gzsuzhi_damage','gzsuzhi_draw','gzsuzhi_gain'],
@@ -3365,7 +3365,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var evt=_status.event.getParent();
 						if(evt.name!='gzzhuhai'||!arg||!arg.target) return false;
 						if(!arg.target.getHistory('sourceDamage',function(evt){
-							return evt.player.sameIdentityAs(player);
+							return evt.player.isFriendOf(player);
 						}).length) return false;
 						return true;
 					},
@@ -3998,14 +3998,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzxingzhao:{
 				audio:2,
 				getNum:function(){
-					var num=0;
-					var list=[];
-					game.countPlayer(function(current){
-						if(current.identity=='unknown'||current.isHealthy()) return;
-						if(current.identity=='ye') num++;
-						else list.add(current.identity);
-					});
-					return num+list.length;
+					var list=[],players=game.filterPlayer();
+					for(var target of players){
+						if(target.isUnseen()||target.isHealthy()) continue;
+						var add=true;
+						for(var i of list){
+							if(i.isFriendOf(target)){
+								add=false;
+								break;
+							}
+						}
+						if(add) list.add(target);
+					}
+					return list.length;
 				},
 				mod:{
 					maxHandcard:function(player,num){
@@ -6588,7 +6593,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						filter:function(event){
 							if(event.player.isUnseen()) return false;
-							return event.getParent(2).skill=='new_luanji'&&event.player.sameIdentityAs(_status.currentPhase);
+							return event.getParent(2).skill=='new_luanji'&&event.player.isFriendOf(_status.currentPhase);
 						},
 						content:function(){
 							trigger.player.draw();
@@ -7881,8 +7886,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					if(target==player) return false;
 					if(player.isUnseen()) return target.isUnseen();
-					if(player.identity=='ye') return true;
-					return target.identity!=player.identity;
+					return !target.isFriendOf(player);
 				},
 				check:function(card){
 					if(card.name=='tao') return 0;
@@ -7975,7 +7979,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'useCardToTarget'},
 						filter:function(event,player){
 							if(!['basic','trick'].contains(get.type(event.card,'trick'))) return false;
-							return event.target&&player.sameIdentityAs(event.target)&&event.targets.length==1&&player.getExpansions('qianhuan').length;
+							return event.target&&player.isFriendOf(event.target)&&event.targets.length==1&&player.getExpansions('qianhuan').length;
 						},
 						direct:true,
 						content:function(){
@@ -8031,7 +8035,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					trigger.cancel();
 					'step 1'
-					if(player.sameIdentityAs(trigger.player)){
+					if(player.isFriendOf(trigger.player)){
 						trigger.player.mayChangeVice();
 					}
 				}
@@ -8507,7 +8511,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'yuejian',
 				preHidden:true,
 				filter:function(event,player){
-					if(player.sameIdentityAs(event.player)){
+					if(player.isFriendOf(event.player)){
 						return event.player.getHistory('useCard',function(evt){
 							if(evt.targets){
 								var targets=evt.targets.slice(0);
@@ -12434,6 +12438,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				changeViceOnline:function(){
 					'step 0'
+					player.showCharacter(2);
 					var group=lib.character[player.name1][1];
 					_status.characterlist.randomSort();
 					var name=false;
@@ -12450,16 +12455,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.toChange=name;
 					if(event.change) event.trigger('removeCharacterBefore');
 					'step 1'
-					var name=event.toChange;
-					game.log(player,'将副将变更为','#g'+get.translation(name));
-					player.viceChanged=true;
-					if(player.isUnseen(1)){
-						player.showCharacter(1,false);
+					if(event.hidden){
+						if(!player.isUnseen(1)) player.hideCharacter(1);
 					}
+					'step 2'
+					var name=event.toChange;
+					if(event.hidden) game.log(player,'替换了副将','#g'+get.translation(player.name2));
+					else game.log(player,'将副将从','#g'+get.translation(player.name2),'变更为','#g'+get.translation(name));
+					player.viceChanged=true;
 					player.reinit(player.name2,name,false);
 				},
 				changeVice:function(){
 					'step 0'
+					player.showCharacter(2);
 					if(!event.num) event.num=3;
 					var group=player.identity;
 					if(!lib.group.contains(group)) group=lib.character[player.name1][1];
@@ -12491,11 +12499,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.toChange=name;
 					if(event.change) event.trigger('removeCharacterBefore');
 					if(event.hidden){
-						if(player.isUnseen(0)) player.showCharacter(0,false);
 						if(!player.isUnseen(1)) player.hideCharacter(1);
-					}
-					else if(player.isUnseen(1)){
-						player.showCharacter(1,false);
 					}
 					'step 2'
 					var name=event.toChange;
