@@ -24,6 +24,16 @@
     bottom:150px;
     height: 40px;
 }
+#arena.choose-to-move>#control{
+    bottom: 30px;
+    transition: all 0s;
+}
+#arena.phone.choose-to-move>#control{
+    bottom: 43px;
+}
+#arena.ipad.choose-to-move>#control{
+    bottom: 45px;
+}
 #arena:not(.chess)>#me,
 #arena:not(.chess)>#mebg,
 #arena:not(.chess)>#autonode{

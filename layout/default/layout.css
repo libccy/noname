@@ -1156,7 +1156,7 @@ body>.background.land {
 	background-size:cover;
 }
 
-.popup {
+.popup:not(.guanxing) {
 	padding: 5px;
 }
 .forcehide {
@@ -1449,8 +1449,9 @@ div:not(.handcards)>.card>.info>span,
 	top: 69px;
 }
 .buttons.guanxing {
-	min-height: 110px;
+	min-height: 106px;
 	width: 90%;
+	margin: 0px;
 }
 .buttons.smallzoom {
 	display: block;
@@ -1724,7 +1725,6 @@ div:not(.handcards)>.card>.info>span,
 	height: 100%;
 	top: 0;
 }
-
 .content>table {
 	width: 100%
 }
@@ -1769,6 +1769,10 @@ div:not(.handcards)>.card>.info>span,
 .content {
 	display: block;
 	width: 100%;
+	font-size: 0px;
+}
+.content>*{
+	font-size: 16px;
 }
 .dialog:not(.popped) .content {
 	vertical-align: top;
@@ -1840,6 +1844,10 @@ div:not(.handcards)>.card>.info>span,
 	padding-top: 8px;
 	font-size: 20px;
 	display: block;
+}
+.caption.choosetomove{
+	margin: 5px;
+	padding: 0px !important;
 }
 .caption:only-child {
 	padding-bottom: 8px;
@@ -2057,6 +2065,9 @@ div:not(.handcards)>.card>.info>span,
 #control>div {
 	position: absolute;
 	left: 50%;
+}
+#arena.choose-to-move>#control{
+	top: calc(80%) !important;
 }
 /*--------角色--------*/
 .player>.avatar>.action {

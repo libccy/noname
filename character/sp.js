@@ -873,7 +873,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										cards.addArray(cardsx);
 										list.push([current,cardsx]);
 										current.$throw(cardsx);
-										game.log(current,'将',cardsx,'化作“'+(color==''?'':'')+'”良缘')
+										game.log(current,'将',cardsx,'化作“'+(color=='black'?'灵杉':'玉树')+'”良缘')
 									}
 								});
 								event.result.cards=cards;

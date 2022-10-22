@@ -1623,8 +1623,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.current&&event.current.countCards('he')){
 						if(player.hasSkill('mobileyanzhu')||event.targets2.length==1) event.current.chooseCard('选择一张牌置于牌堆顶','he',true);
 						else event.current.chooseCardTarget({
-							prompt:'选择一张牌置于牌堆顶，或交给其他目标角色',
+							prompt:'将一张牌置于牌堆顶，或交给其他目标角色',
 							filterCard:true,
+							position:'he',
 							filterTarget:function(card,player,target){
 								return target!=player&&_status.event.getParent().targets2.contains(target);
 							},
@@ -16372,7 +16373,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list2.add(get.suit(card));
 						});
 						list2.removeArray(list);
-						return list2.length;
+						return Math.max(1,list2.length);
 					}()],function(card,player){
 						return !player.countCards('s',function(cardx){
 							return cardx.hasGaintag('gnjinfan')&&get.suit(cardx,false)==get.suit(card,player);

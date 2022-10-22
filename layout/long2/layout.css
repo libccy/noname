@@ -187,13 +187,16 @@
 #arena.ipad.choose-character>.dialog{
     bottom:96px;
 }
+#arena.choose-to-move>#control,
 #arena.choose-character>#control{
     bottom: 30px;
     transition: all 0s;
 }
+#arena.phone.choose-to-move>#control,
 #arena.phone.choose-character>#control{
     bottom: 43px;
 }
+#arena.ipad.choose-to-move>#control,
 #arena.ipad.choose-character>#control{
     bottom: 45px;
 }
