@@ -1562,6 +1562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			duji:['re_duji','duji'],
+			sp_taishici:['re_sp_taishici','sp_taishici'],
 		},
 		translate:{
 			xinghuoliaoyuan:'星火燎原',

@@ -2170,20 +2170,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.goto(2);
 					}
 					'step 1'
-					target.storage.resghuishi=result.control;
-					target.markSkill('resghuishi');
+					target.storage.resghuishi_mark=result.control;
+					target.markSkill('resghuishi_mark');
 					var info=lib.skill[result.control];
-					if(info.filter&&!info.charlotte&&!info.sghuishi_filter){
-						info.sghuishi_filter=info.filter;
+					if(info.filter&&!info.charlotte&&!info.resghuishi_filter){
+						info.resghuishi_filter=info.filter;
 						info.filter=function(event,player){
-							if(player.storage.resghuishi) return true;
-							return this.sghuishi_filter.apply(this,arguments);
+							if(player.storage.resghuishi_mark) return true;
+							return this.resghuishi_filter.apply(this,arguments);
 						}
 					}
 					'step 2'
 					player.loseMaxHp(2);
 				},
-				intro:{content:'发动【$】时无视条件'},
+				intro:{content:'未发动'},
 				ai:{
 					order:0.1,
 					expose:0.2,
@@ -2202,6 +2202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				subSkill:{mark:{intro:{content:'发动【$】时无视条件'}}},
 			},
 			sghuishi:{
 				audio:2,
@@ -4127,7 +4128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.addToExpansion(get.cards(7),'gain2').gaintag.add('qixing');
+					player.addToExpansion(get.cards(7),'draw').gaintag.add('qixing');
 					"step 1"
 					var cards=player.getExpansions('qixing');
 					if(!cards.length||!player.countCards('h')){
@@ -4891,7 +4892,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addVideo('showCards',player,['涉猎',get.cardsInfo(event.cards)]);
 					game.addVideo('delay',null,2);
 					"step 1"
-					var next=player.chooseButton([0,5],true);
+					var list=[];
+					for(var i of cards) list.add(get.suit(i,false));
+					var next=player.chooseButton(list.length,true);
 					next.set('dialog',event.videoId);
 					next.set('filterButton',function(button){
 						for(var i=0;i<ui.selected.buttons.length;i++){

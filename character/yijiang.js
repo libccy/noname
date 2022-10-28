@@ -7365,67 +7365,62 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huomo:{
 				audio:2,
-				group:['huomo_count','huomo_count2','huomo_use']
-			},
-			huomo2:{},
-			huomo_count:{
-				init:function(player){
-					player.storage.huomo={};
-				},
-				trigger:{global:'phaseBefore'},
-				silent:true,
-				content:function(){
-					player.storage.huomo={};
-				}
-			},
-			huomo_count2:{
-				trigger:{player:['useCard1']},
-				silent:true,
-				firstDo:true,
-				filter:function(event){
-					return get.type(event.card)=='basic';
-				},
-				content:function(){
-					if(!player.storage.huomo) player.storage.huomo={};
-					player.storage.huomo[trigger.card.name]=true;
-				}
-			},
-			huomo_use:{
+				autoname:['huzhao'],
 				enable:'chooseToUse',
+				onChooseToUse:function(event){
+					if(game.online||event.huomo_list) return;
+					var list=lib.skill.huomo.getUsed(event.player);
+					event.set('huomo_list',list);
+				},
+				getUsed:function(player){
+					var list=[];
+					player.getHistory('useCard',function(evt){
+						if(get.type(evt.card,null,false)=='basic') list.add(evt.card.name);
+					});
+					return list;
+				},
 				hiddenCard:function(player,name){
-					return (['sha','shan','tao','jiu'].contains(name)&&(!player.storage.huomo||!player.storage.huomo[name])&&player.hasCard(function(card){
+					if(get.type(name)!='basic') return false;
+					var list=lib.skill.huomo.getUsed(player);
+					if(list.contains(name)) return false;
+					return player.hasCard(function(card){
 						return get.color(card)=='black'&&get.type(card)!='basic';
-					},'he'));
+					},'eh');
 				},
 				filter:function(event,player){
-					if(!player.storage.huomo) player.storage.huomo={};
-					if((!player.storage.huomo.sha&&event.filterCard({name:'sha'},player,event))||
-						(!player.storage.huomo.jiu&&event.filterCard({name:'jiu'},player,event))||
-						(!player.storage.huomo.shan&&event.filterCard({name:'shan'},player,event))||
-						(!player.storage.huomo.tao&&event.filterCard({name:'tao'},player,event))){
-						return player.hasCard(function(card){
-							return get.color(card)=='black'&&get.type(card)!='basic';
-						},'he');
+					if(event.type=='wuxie'||!player.hasCard(function(card){
+						return get.color(card)=='black'&&get.type(card)!='basic';
+					},'eh')) return false;
+					var list=event.huomo_list||lib.skill.huomo.getUsed(player);
+					for(var name of lib.inpile){
+						if(get.type(name)!='basic'||list.contains(name)) continue;
+						var card={name:name,isCard:true};
+						if(event.filterCard(card,player,event)) return true;
+						if(name=='sha'){
+							for(var nature of lib.inpile_nature){
+								card.nature=nature;
+								if(event.filterCard(card,player,event)) return true;
+							}
+						}
 					}
 					return false;
 				},
 				chooseButton:{
 					dialog:function(event,player){
-						var list=[];
-						if(!player.storage.huomo.sha&&event.filterCard({name:'sha'},player,event)){
-							list.push(['基本','','sha']);
-							for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
+						var vcards=[];
+						var list=event.huomo_list||lib.skill.huomo.getUsed(player);
+						for(var name of lib.inpile){
+							if(get.type(name)!='basic'||list.contains(name)) continue;
+							var card={name:name,isCard:true};
+							if(event.filterCard(card,player,event)) vcards.push(['基本','',name]);
+							if(name=='sha'){
+								for(var nature of lib.inpile_nature){
+									card.nature=nature;
+									if(event.filterCard(card,player,event)) vcards.push(['基本','',name,nature]);
+								}
+							}
 						}
-						if(!player.storage.huomo.tao&&event.filterCard({name:'tao'},player,event)){
-							list.push(['基本','','tao']);
-						}
-						if(!player.storage.huomo.shan&&event.filterCard({name:'shan'},player,event)){
-							list.push(['基本','','shan']);
-						}
-						if(!player.storage.huomo.jiu&&event.filterCard({name:'jiu'},player,event)){
-							list.push(['基本','','jiu']);
-						}
-						return ui.create.dialog('活墨',[list,'vcard'],'hidden');
+						return ui.create.dialog('活墨',[vcards,'vcard'],'hidden');
 					},
 					check:function(button){
 						var player=_status.event.player;
@@ -7486,7 +7481,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:function(){
 						var player=_status.event.player;
 						var event=_status.event;
-						if(!player.storage.huomo.jiu&&event.filterCard({name:'jiu'},player,event)&&get.effect(player,{name:'jiu'})>0){
+						var list=lib.skill.huomo.getUsed(player);
+						if(!list.contains('jiu')&&event.filterCard({name:'jiu'},player,event)&&get.effect(player,{name:'jiu'})>0){
 							return 3.1;
 						}
 						return 2.9;
@@ -7499,16 +7495,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.hasCard(function(card){
 							return get.color(card)=='black'&&get.type(card)!='basic';
 						},'he')){
-							if(!player.storage.huomo) player.storage.huomo={};
+							var list=lib.skill.huomo.getUsed(player);
 							if(tag=='respondSha'){
 								if(arg!='use') return false;
-								if(player.storage.huomo.sha) return false;
+								if(list.contains('sha')) return false;
 							}
 							else if(tag=='respondShan'){
-								if(player.storage.huomo.shan) return false;
-							}
-							else{
-								if(player.storage.huomo.tao&&player.storage.huomo.jiu) return false;
+								if(list.contains('shan')) return false;
 							}
 						}
 						else{
@@ -11820,11 +11813,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xiansi:{
 				audio:2,
+				audioname:['re_liufeng'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt2('xiansi'),[1,2],function(card,player,target){
+					player.chooseTarget(get.prompt2(event.name),[1,2],function(card,player,target){
 						return target.countCards('he')>0;
 					},function(target){
 						return -get.attitude(_status.event.player,target);
@@ -11832,7 +11826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						result.targets.sortBySeat();
-						player.logSkill('xiansi',result.targets);
+						player.logSkill(event.name,result.targets);
 						event.targets=result.targets;
 					}
 					else{
@@ -11857,31 +11851,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'expansion',
 					markcount:'expansion',
 				},
-				onremove:function(player,skill){
-					var cards=player.getExpansions(skill);
+				onremove:function(player){
+					var cards=player.getExpansions('xiansi');
 					if(cards.length) player.loseToDiscardpile(cards);
 				},
 				ai:{
 					threaten:2
 				},
-				global:'xiansi2'
+				global:'xiansi2',
+				group:'xiansix',
 			},
+			xiansix:{},
 			xiansi2:{
 				enable:'chooseToUse',
-				audio:2,
+				audio:true,
+				audioname:['re_liufeng'],
 				viewAs:{name:'sha',isCard:true},
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
-						return current.hasSkill('xiansi')&&current.getExpansions('xiansi').length>1&&event.filterTarget({name:'sha'},player,current);
+						return current.hasSkill('xiansix')&&current.getExpansions('xiansi').length>1&&event.filterTarget({name:'sha'},player,current);
 					});
 				},
 				filterTarget:function(card,player,target){
 					var bool=false;
 					var players=ui.selected.targets.slice(0);
 					for(var i=0;i<players.length;i++){
-						if(players[i].hasSkill('xiansi')&&players[i].getExpansions('xiansi').length>1) bool=true;break;
+						if(players[i].hasSkill('xiansix')&&players[i].getExpansions('xiansi').length>1) bool=true;break;
 					}
-					if(!bool&&(!target.hasSkill('xiansi')||target.getExpansions('xiansi').length<=1)) return false;
+					if(!bool&&(!target.hasSkill('xiansix')||target.getExpansions('xiansi').length<=1)) return false;
 					return _status.event._backup.filterTarget.apply(this,arguments);
 				},
 				complexSelect:true,
@@ -11896,11 +11893,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				log:false,
 				precontent:function(){
 					"step 0"
-					var targets=game.filterPlayer(function(current){
-						if(event.result.targets.contains(current)&&current.getExpansions('xiansi')){
-							return current.getExpansions('xiansi').length>1;
-						}
-						return false;
+					var targets=event.result.targets.filter(function(current){
+						return current.getExpansions('xiansi').length>1&&current.hasSkill('xiansix');
 					});
 					if(targets.length==1){
 						event.target=targets[0];
@@ -12371,6 +12365,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yj_jushou:['re_jushou','xin_jushou','yj_jushou'],
 			guohuanghou:['re_guohuanghou','guohuanghou'],
 			liuchen:['re_liuchen','liuchen'],
+			liufeng:['re_liufeng','liufeng'],
 		},
 		translate:{
 			old_huaxiong:'华雄',
@@ -12677,10 +12672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qinwang2:'勤王',
 			qinwang_info:'主公技，当你需要使用或打出一张【杀】时，你可以弃置一张牌，然后视为你发动了〖激将①〗。若有角色响应，则该角色打出【杀】时摸一张牌。',
 			huomo:'活墨',
-			huomo_use:'活墨',
-			//huomo_use_backup:'活墨',
-			huomo_info:'当你需要使用一张本回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，然后视为你使用了此基本牌',
-			huomo_use_info:'当你需要使用一张本回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，然后视为你使用了此基本牌',
+			huomo_info:'当你需要使用一张本回合内未使用过的基本牌时，你可以将一张黑色非基本牌置于牌堆顶，视为使用此基本牌。',
 			zuoding:'佐定',
 			zuoding_info:'当其他角色于其回合内使用♠牌指定目标后，若本回合内没有角色受到过伤害，则你可以令其中一名目标角色摸一张牌',
 			taoxi:'讨袭',
@@ -12740,6 +12732,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuce:'御策',
 			yuce_info:'当你受到伤害后，你可以展示一张手牌，并令伤害来源选择一项：弃置一张与此牌类型不同的手牌，或令你回复一点体力。',
 			xiansi:'陷嗣',
+			xiansix:'陷嗣',
 			xiansi_bg:'逆',
 			xiansi2:'陷嗣',
 			xiansi_info:'准备阶段开始时，你可以将一至两名角色的各一张牌置于你的武将牌上，称为“逆”；当一名角色需要对你使用【杀】时，其可以移去两张“逆”，然后视为对你使用了一张【杀】。',

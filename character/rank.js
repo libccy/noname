@@ -807,6 +807,9 @@ window.noname_character_rank={
 		'dc_liuba',
 		'key_seira',
 		'lukai',
+		'niufu',
+		're_liufeng',
+		'huzhao',
 	],
 	b:[
 		'diy_feishi',
@@ -1045,6 +1048,7 @@ window.noname_character_rank={
 		'zhaoyǎn',
 		'zhangxun',
 		'xiahoulingnv',
+		're_sp_taishici',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1278,6 +1282,7 @@ window.noname_character_rank={
 		'duanwei',
 		'wangxiang',
 		'duji',
+		'bianxi',
 	],
 	rarity:{
 		legend:[
@@ -2016,6 +2021,8 @@ window.noname_character_rank={
 			'jin_zhouchu',
 			'lukai',
 			'caoxiancaohua',
+			'huzhao',
+			're_liufeng',
 		],
 		junk:[
 			'sunshao',
@@ -2038,6 +2045,7 @@ window.noname_character_rank={
 			'wangxiang',
 			'duji',
 			'dc_liuba',
+			'bianxi',
 		],
 	}
 };

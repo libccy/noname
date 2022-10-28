@@ -4631,7 +4631,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('change_identity',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!='identity'||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							var dialog;
 							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
 							else dialog=_status.event.dialog;
@@ -4647,7 +4647,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('change_choice',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!='identity'||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
 							else if(ui.cheat&&!get.config('change_choice')){
 								ui.cheat.close();
@@ -4670,7 +4670,7 @@
 						init:false,
 						onclick:function(bool){
 							game.saveConfig('continue_game',bool,this._link.config.mode);
-							if(get.config('continue_game')){
+							if(get.config('continue_game')&&get.mode()=='identity'){
 								if(!ui.continue_game&&_status.over&&!_status.brawl&&!game.no_continue_game){
 									ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 								}
@@ -4687,7 +4687,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('dierestart',bool,this._link.config.mode);
-							if(get.config('dierestart')){
+							if(get.config('dierestart')&&get.mode()=='identity'){
 								if(!ui.restart&&game.me.isDead()&&!_status.connectMode){
 									ui.restart=ui.create.control('restart',game.reload);
 								}
@@ -4703,7 +4703,7 @@
 						init:false,
 						onclick:function(bool){
 							game.saveConfig('revive',bool,this._link.config.mode);
-							if(get.config('revive')){
+							if(get.config('revive')&&get.mode()=='identity'){
 								if(!ui.revive&&game.me.isDead()){
 									ui.revive=ui.create.control('revive',ui.click.dierevive);
 								}
@@ -5050,7 +5050,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('free_choose',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!='guozhan'||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
@@ -5069,7 +5069,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('change_identity',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!='guozhan'||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							var dialog;
 							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
 							else dialog=_status.event.dialog;
@@ -5085,7 +5085,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('change_choice',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!='guozhan'||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
 							else if(ui.cheat&&!get.config('change_choice')){
 								ui.cheat.close();
@@ -5109,7 +5109,7 @@
 						intro:'游戏结束后可选择用相同的武将再进行一局游戏',
 						onclick:function(bool){
 							game.saveConfig('continue_game',bool,this._link.config.mode);
-							if(get.config('continue_game')){
+							if(get.config('continue_game')&&get.mode()=='guozhan'){
 								if(!ui.continue_game&&_status.over&&!_status.brawl&&!game.no_continue_game){
 									ui.continue_game=ui.create.control('再战',game.reloadCurrent);
 								}
@@ -5125,7 +5125,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('dierestart',bool,this._link.config.mode);
-							if(get.config('dierestart')){
+							if(get.config('dierestart')&&get.mode()=='guozhan'){
 								if(!ui.restart&&game.me.isDead()&&!_status.connectMode){
 									ui.restart=ui.create.control('restart',game.reload);
 								}
@@ -5141,7 +5141,7 @@
 						init:false,
 						onclick:function(bool){
 							game.saveConfig('revive',bool,this._link.config.mode);
-							if(get.config('revive')){
+							if(get.config('revive')&&get.mode()=='guozhan'){
 								if(!ui.revive&&game.me.isDead()){
 									ui.revive=ui.create.control('revive',ui.click.dierevive);
 								}
@@ -7663,9 +7663,10 @@
 							if(!alerted&&window.bannedExtensions.contains(lib.config.extensions[i])){
 								alerted=true;
 								alert('读取某些扩展时出现问题。');
-							};
+							}
 							var extcontent=localStorage.getItem(lib.configprefix+'extension_'+lib.config.extensions[i]);
 							if(extcontent){
+								var backup_onload=lib.init.onload;
 								_status.evaluatingExtension=true;
 								try{
 									eval(extcontent);
@@ -7673,6 +7674,7 @@
 								catch(e){
 									console.log(e);
 								}
+								lib.init.onload=backup_onload;
 								_status.evaluatingExtension=false;
 							}
 							else if(lib.config.mode!='connect'||(!localStorage.getItem(lib.configprefix+'directstart')&&show_splash)){
@@ -7682,8 +7684,12 @@
 					}
 					else{
 						if(lib.config.mode!='connect'||(!localStorage.getItem(lib.configprefix+'directstart')&&show_splash)){
+							var alerted=false;
 							for(var i=0;i<lib.config.extensions.length;i++){
-								if(window.bannedExtensions.contains(lib.config.extensions[i])) continue;
+								if(!alerted&&window.bannedExtensions.contains(lib.config.extensions[i])){
+									alerted=true;
+									alert('读取某些扩展时出现问题。');
+								}
 								game.import('extension',{name:lib.config.extensions[i]});
 							}
 						}
@@ -19560,13 +19566,13 @@
 								var ais=lib.skill[card].check||function(){return 0};
 								return ais();
 							}
-							var addi=(get.value(card)>=8&&get.type(card)!='equip')?-10:0;
+							var addi=(get.value(card)>=8&&get.type(card)!='equip')?-6:0;
 							if(card.name=='du') addi-=3;
 							var source=_status.event.source;
 							var player=_status.event.player;
 							var getn=function(card){
-								if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13;
-								return get.number(card);
+								if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13*(event.small?-1:1);
+								return get.number(card)*(event.small?-1:1);
 							}
 							if(source&&source!=player&&get.attitude(player,source)>1){
 								return -getn(card)-get.value(card)/2+addi;
@@ -19585,12 +19591,12 @@
 							}
 							var player=get.owner(card);
 							var getn=function(card){
-								if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13;
-								return get.number(card);
+								if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13*(event.small?-1:1);
+								return get.number(card)*(event.small?-1:1);
 							}
 							var event=_status.event.getParent();
 							var to=(player==event.player?event.target:event.player);
-							var addi=(get.value(card)>=8&&get.type(card)!='equip')?-10:0;
+							var addi=(get.value(card)>=8&&get.type(card)!='equip')?-6:0;
 							if(card.name=='du') addi-=5;
 							if(player==event.player){
 								if(get.attitude(player,to)>0&&event.small){
@@ -19599,7 +19605,7 @@
 								return getn(card)-get.value(card)/2+addi;
 							}
 							else{
-								if(get.attitude(player,to)>0&&!event.small){
+								if(get.attitude(player,to)>0){
 									return -getn(card)-get.value(card)/2+addi;
 								}
 								return getn(card)-get.value(card)/2+addi;
@@ -29992,7 +29998,9 @@
 		},
 		import:function(type,content){
 			if(type=='extension'){
+				var backup_onload=lib.init.onload;
 				game.loadExtension(content);
+				lib.init.onload=backup_onload;
 			}
 			else{
 				if(!lib.imported[type]){
@@ -36640,7 +36648,7 @@
 		roundNumber:0,
 		shuffleNumber:0,
 	};
-	window['b'+'ann'+'e'+'dE'+'x'+'ten'+'s'+'i'+'o'+'ns']=['\u5047装\u65e0敌'];
+	window['b'+'ann'+'e'+'dE'+'x'+'ten'+'s'+'i'+'o'+'ns']=[];
 	var ui={
 		updates:[],
 		thrown:[],
@@ -51931,7 +51939,7 @@
 					case 'event': return get.eventInfoOL(item);
 					default:
 					if(typeof level!='number'){
-						level=5;
+						level=8;
 					}
 					if(Array.isArray(item)){
 						if(level==0){
@@ -53553,7 +53561,7 @@
 				if(lib.config.show_favourite&&lib.character[node.name]&&game.players.contains(node)&&
 					(!modepack||!modepack[node.name])&&(!simple||get.is.phoneLayout())){
 					var addFavourite=ui.create.div('.text.center.pointerdiv');
-					addFavourite.link=node.link;
+					addFavourite.link=node.name;
 					if(lib.config.favouriteCharacter.contains(node.name)){
 						addFavourite.innerHTML='移除收藏';
 					}

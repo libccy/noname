@@ -6936,6 +6936,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return (name=='neifa_basic')!=(get.type(cardx,player)=='basic')
 						}));
 						if(num>0) player.addMark(name,num,false);
+						else player.storage[name]=0;
 					}
 				},
 				ai:{
