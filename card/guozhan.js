@@ -644,7 +644,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							},targets);
 						}
 					}
-				},
+				},/*
 				contentBefore:function(){
 					if(get.mode()=='guozhan'){
 						var evt=event.getParent();
@@ -655,11 +655,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							evt.targets.push(player);
 						}
 					}
-				},
+				},*/
 				content:function(){
 					'step 0'
 					if(get.mode()!='guozhan'){
-						if(player==target) target.draw(game.players.length);
+						if(player==target) target.draw(game.filterPlayer().length);
 						else target.chooseDrawRecover(true);
 						event.finish();
 					}
@@ -1830,8 +1830,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			lulitongxin_info:'出牌阶段，对所有大势力角色或所有小势力角色使用。若目标角色：不处于“连环状态”，其横置；处于“连环状态”，其摸一张牌',
 			lulitongxin_info_versus:'出牌阶段，对所有敌方角色或所有己方角色使用。若目标角色：为敌方角色且不处于“连环状态”，其横置；为己方角色且处于“连环状态”，其摸一张牌。',
 			lianjunshengyan:'联军盛宴',
-			lianjunshengyan_info:'出牌阶段，对你和你选择的除你的势力外的一个势力的所有角色。若目标角色：为你，你选择摸Y张牌并回复X-Y点体力（X为该势力的角色数，Y∈[0,X]）；不为你，其摸一张牌，然后重置。',
-			lianjunshengyan_info_boss:'出牌阶段，对场上所有角色使用。你摸X张牌（X为目存活角色数），其他角色依次选择回复1点体力或摸一张牌。',
+			lianjunshengyan_info:'出牌阶段，对你和你选择的除你的势力外的一个势力的所有角色使用。若目标角色：为你，你选择摸Y张牌并回复X-Y点体力（X为该势力的角色数，Y∈[0,X]）；不为你，其摸一张牌，然后重置。',
+			lianjunshengyan_info_boss:'出牌阶段，对场上所有角色使用。你摸X张牌（X为存活角色数），其他角色依次选择回复1点体力或摸一张牌。',
 			chiling:'敕令',
 			chiling_info:'出牌阶段，对所有没有势力的角色使用。目标角色选择一项：1、明置一张武将牌，然后摸一张牌；2、弃置一张装备牌；3、失去1点体力。当【敕令】因判定或弃置而置入弃牌堆时，系统将之移出游戏并将【诏书】置于牌堆底，然后系统于当前回合结束后视为对所有没有势力的角色使用【敕令】。',
 			diaohulishan:'调虎离山',

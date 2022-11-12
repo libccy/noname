@@ -14900,7 +14900,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var switchToAuto=function(){
 						game.pause();
 						game.countChoose();
-						setTimeout(function(){
+						event.timeout=setTimeout(function(){
 							_status.imchoosing=false;
 							event._result={
 								bool:true,
@@ -14947,6 +14947,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var skip=function(){
 								if(event.pingcai_delayed){
 									delete event.pingcai_delayed;
+									clearTimeout(event.timeout);
 									event._result={
 										bool:true,
 									};

@@ -664,7 +664,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.updateMarks();
 				},
 			},
-			huogong2:{},
+			huogong2:{charlotte:true},
 			jiu:{
 				trigger:{player:'useCard1'},
 				filter:function(event){

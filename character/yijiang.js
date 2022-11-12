@@ -380,7 +380,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'bingyi',
 				trigger:{player:'loseAfter'},
 				filter:function(event,player){
-					return event.type=='discard'&&player.countCards('h')>0&&!player.hasSkill('olbingyi_blocker',null,null,false);
+					return event.type=='discard'&&event.cards2.length>0&&player.countCards('h')>0&&!player.hasSkill('olbingyi_blocker',null,null,false);
 				},
 				prompt2:function(event,player){
 					var str='展示所有手牌，然后',hs=player.getCards('h');
@@ -3002,6 +3002,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					markcount:'expansion',
 				},
 				frequent:true,
+				locked:false,
 				content:function(){
 					player.addToExpansion(get.cards(),'gain2').gaintag.add('bizhuan');
 				},
@@ -3912,7 +3913,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						if(event.num1<event.num1){
+						if(event.num1<event.num2){
 							return !get.owner(event.card1);
 						}
 						else{

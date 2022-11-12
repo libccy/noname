@@ -272,6 +272,7 @@ window.noname_character_rank={
 		'ol_puyuan',
 		'ns_limi',
 		'jin_zhouchu',
+		'huojun',
 		'key_misuzu',
 		'key_sunohara',
 		'key_umi',
@@ -810,6 +811,7 @@ window.noname_character_rank={
 		'niufu',
 		're_liufeng',
 		'huzhao',
+		'guanhai',
 	],
 	b:[
 		'diy_feishi',
@@ -1406,6 +1408,7 @@ window.noname_character_rank={
 			'shen_sunquan',
 			'shen_machao',
 			'tw_shen_guanyu',
+			'huojun',
 			'key_tomoya',
 			'key_masato',
 			'key_shiorimiyuki',
@@ -2023,6 +2026,7 @@ window.noname_character_rank={
 			'caoxiancaohua',
 			'huzhao',
 			're_liufeng',
+			'guanhai',
 		],
 		junk:[
 			'sunshao',

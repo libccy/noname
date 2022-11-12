@@ -4045,8 +4045,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player,name){
 					if(name=='damageEnd') return true;
 					if(!event.card) return false;
-					var evt=event.getParent();
-					return evt&&evt.card==event.card&&evt.type=='card'&&evt.targets&&evt.targets.length==1;
+					if(player.hasHistory('useSkill',function(evt){
+						return evt.skill=='gzquanji'&&evt.event.triggername==name;
+					})) return false;
+					return true;
 				},
 				content:function(){
 					'step 0'
@@ -4104,7 +4106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								result:{
 									target:function(player,target){
 										if(target!=player) return 0;
-										if(player.needsToDiscard()&&!player.getEquip('zhuge')&&!player.hasSkill('new_paoxiao')) return 0;
+										if(player.getExpansions('gzquanji').length<=1||(player.needsToDiscard()&&!player.getEquip('zhuge')&&!player.hasSkill('new_paoxiao'))) return 0;
 										return 1;
 									}
 								},
@@ -4118,7 +4120,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card=lib.skill.gzpaiyi_backup.card;
 					player.loseToDiscardpile(card);
 					"step 1"
-					target.draw(2);
+					var num=player.getExpansions('gzquanji').length;
+					if(num>0) target.draw(num);
 					"step 2"
 					if(target.countCards('h')>player.countCards('h')){
 						target.damage();
@@ -12459,10 +12462,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjiefan:'解烦',
 			xinjiefan_info:'限定技，出牌阶段，你可以选择一名角色，令攻击范围内含有该角色的所有角色依次选择一项：1.弃置一张武器牌；2.令其摸一张牌。然后若游戏轮数为1，则你于此回合结束时恢复此技能。',
 			gzquanji:'权计',
-			gzquanji_info:'当你受到伤害后或当你使用牌指定唯一目标并对其造成伤害后，你可以摸一张牌，然后你将一张牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
+			gzquanji_info:'每回合每项各限一次。当你受到伤害后或造成伤害后，你可以摸一张牌，然后你将一张牌置于武将牌上，称为“权”；你的手牌上限+X（X为“权”的数量）。',
 			gzpaiyi:'排异',
 			gzpaiyi_backup:'排异',
-			gzpaiyi_info:'出牌阶段限两次。你可以移去一张“权”，然后选择一名角色并令其摸两张牌。若其手牌数大于你，则你对其造成1点伤害。',
+			gzpaiyi_info:'出牌阶段限一次。你可以移去一张“权”并选择一名角色。令其摸X张牌（X为你的“权”数且至多为7）。然后若其手牌数大于你，则你对其造成1点伤害。',
 			ol_zhurong:'界祝融',
 			changbiao:'长标',
 			changbiao_info:'出牌阶段限一次，你可以将任意张手牌当做【杀】使用（无距离限制）。若你因此【杀】对目标角色造成过伤害，则你于出牌阶段结束时摸X张牌（X为此【杀】对应的实体牌数量）。',

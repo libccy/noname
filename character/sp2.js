@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			guanhai:['male','qun',4,['suoliang','qinbao']],
 			huzhao:['male','wei',3,['midu','xianwang']],
 			niufu:['male','qun','4/7',['dcxiaoxi','xiongrao']],
 			bianxi:['male','wei',4,['dunxi']],
@@ -178,6 +179,65 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//管亥
+			suoliang:{
+				audio:2,
+				trigger:{source:'damageSource'},
+				logTarget:'player',
+				usable:1,
+				filter:function(event,player){
+					return event.player!=player&&event.player.maxHp>0&&event.player.countCards('he')>0;
+				},
+				check:function(event,player){
+					return get.attitude(player,event.player)<=0;
+				},
+				content:function(){
+					'step 0'
+					var target=trigger.player;
+					event.target=target;
+					player.choosePlayerCard(target,true,'he',[1,target.maxHp],'选择'+get.translation(target)+'的至多'+get.cnNumber(target.maxHp)+'张牌');
+					'step 1'
+					if(result.bool){
+						var cards=result.cards.filter(function(card){
+							var suit=get.suit(card,target);
+							if(suit!='heart'&&suit!='club') return false;
+							return lib.filter.canBeGained(card,target,player)
+						});
+						if(cards.length) player.gain(cards,target,'giveAuto','bySelf');
+						else{
+							var cards=result.cards.filter(function(card){
+								return lib.filter.canBeDiscarded(card,target,player)
+							});
+							if(cards.length) target.discard(cards,'notBySelf');
+						}
+					}
+				},
+			},
+			qinbao:{
+				audio:2,
+				trigger:{player:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					return (event.card.name=='sha'||get.type(event.card,null,false)=='trick')&&game.hasPlayer(function(current){
+						return current!=player&&current.countCards('h')>=player.countCards('h');
+					});
+				},
+				content:function(){
+					var hs=player.countCards('h');
+					trigger.directHit.addArray(game.filterPlayer(function(current){
+						return current!=player&&current.countCards('h')>=hs;
+					}));
+				},
+				ai:{
+					threaten:1.4,
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						return player.countCards('h',function(card){
+							return !ui.selected.cards.contains(card);
+						})<=arg.target.countCards('h');
+					},
+				},
+			},
 			//胡昭
 			midu:{
 				audio:2,
@@ -661,9 +721,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:1,
 					result:{
-						target:function(player,target){
+						player:function(player,target){
 							var eff=get.recoverEffect(target,player,player);
-							if(target.getDamagedHp()>1) eff+=get.effect(target,{name:'wuzhong'},player,target)/2;
+							if(target.getDamagedHp()>1) eff+=get.effect(target,{name:'wuzhong'},player,player)/2;
 							return eff;
 						},
 					},
@@ -714,21 +774,54 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					gain:{
-						trigger:{global:'loseAfter'},
+						trigger:{global:['loseAfter','cardsDiscardAfter']},
 						forced:true,
-						logTarget:'player',
+						logTarget:()=>_status.currentPhase,
 						filter:function(event,player){
-							if(event.type!='discard'||event.player!=_status.currentPhase) return false;
+							var current=_status.currentPhase;
+							if(!current) return false;
+							if(event.name=='cardsDiscard'){
+								var evtx=event.getParent();
+								if(evtx.name!='orderingDiscard') return false;
+								var evtx2=(evtx.relatedEvent||evtx.getParent());
+								return current.hasHistory('lose',function(evtx3){
+									var evtx4=evtx3.relatedEvent||evtx3.getParent();
+									if(evtx2!=evtx4) return false;
+									for(var i in evtx3.gaintag_map){
+										if(evtx3.gaintag_map[i].contains('dcliuzhuan_tag')) return true;
+									}
+								});
+							}
+							if(event.player!=current||event.position!=ui.discardPile) return false;
 							for(var i in event.gaintag_map){
 								if(event.gaintag_map[i].contains('dcliuzhuan_tag')) return true;
 							}
 							return false;
 						},
 						content:function(){
-							var cards=trigger.hs.filter(function(i){
-								return trigger.gaintag_map[i.cardid]&&trigger.gaintag_map[i.cardid].contains('dcliuzhuan_tag');
+							var cards,current=_status.currentPhase;
+							if(trigger.name=='lose') cards=trigger.hs.filter(function(i){
+								return trigger.gaintag_map[i.cardid]&&trigger.gaintag_map[i.cardid].contains('dcliuzhuan_tag')&&get.position(i,true)=='d';
 							});
-							if(cards.length>0) player.gain(cards,'gain2');
+							else{
+								var evtx=trigger.getParent();;
+								var evtx2=(evtx.relatedEvent||evtx.getParent());
+								var bool=false;
+								var history=current.getHistory('lose',function(evtx3){
+									var evtx4=evtx3.relatedEvent||evtx3.getParent();
+									if(evtx2!=evtx4) return false;
+									for(var i in evtx3.gaintag_map){
+										if(evtx3.gaintag_map[i].contains('dcliuzhuan_tag')) return true;
+									}
+								});
+								cards=trigger.cards.filter(function(i){
+									for(var evt of history){
+										if(evt.gaintag_map[i.cardid]&&evt.gaintag_map[i.cardid].contains('dcliuzhuan_tag')&&get.position(i,true)=='d') return true;
+									}
+									return false;
+								});
+							}
+							if(cards&&cards.length>0) player.gain(cards,'gain2');
 						},
 					},
 					mark:{
@@ -2417,7 +2510,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 2'
 							player.addToExpansion(result.cards,target,'give').gaintag.add('yuanyu');
 							'step 3'
-							if(event.count>0&&target.countCards('he')>0&&player.hasSkill('yuanyu_damage')) event.goto(1);
+							if(event.count>0&&target.countCards('h')>0&&player.hasSkill('yuanyu_damage')) event.goto(1);
 						},
 					},
 				},
@@ -17214,6 +17307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bianxi:'小说《三国演义》里的人物。汜水关守将，并州人氏。原是黄巾余党，后投曹操，拨来守汜水关。善使流星锤。在镇国寺设下伏兵欲谋害千里寻兄的关羽，但是寺中僧人普净暗示加以解救。最后被关羽斩杀。',
 			niufu:'牛辅，东汉末年武将，东汉相国董卓的女婿。曾任中郎将，征讨白波军，不能取胜。董卓被杀时，牛辅别屯于陕地。吕布派李肃前去征讨牛辅，被牛辅击败。后来，牛辅营中有士兵半夜背叛出逃，造成内乱，牛辅以为整营皆叛，于是带着金银珠宝，独与亲信胡赤儿等五六人逾城北渡河。赤儿等人以绳索系在牛辅腰间将其从城头放下，但赤儿等因为谋财而在离地面数丈高的地方就松开了绳子使得牛辅重重摔在地上腰部受伤，而后赤儿与诸胡人将牛辅斩首，将其首级送去长安。',
 			huzhao:'胡昭（162年－250年），字孔明，颍川（治今河南禹州）人。汉末三国时期隐士、书法家。胡昭善长隶书，与钟繇、邯郸淳、卫觊、韦诞齐名。有“钟氏小巧，胡氏豪放”之说，世人并称“钟胡”。',
+			guanhai:'管亥（生卒年不详），青州黄巾军渠帅，率军侵略北海，围北海相孔融于都昌。孔融派遣太史慈突围而出，前往平原向刘备求援，刘备率军来到，击退管亥。《三国演义》中管亥在单挑中为关羽斩杀。',
 		},
 		characterTitle:{
 			wulan:'#b对决限定武将',
@@ -18172,7 +18266,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhubi_info:'当有♦牌因弃置而进入弃牌堆后，你可以令系统从牌堆/弃牌堆中检索一张【无中生有】，并将此牌置于牌堆顶。',
 			dcliuzhuan:'流转',
 			dcliuzhuan_tag:'转',
-			dcliuzhuan_info:'锁定技。①其他角色于其回合内不于摸牌阶段而获得的牌称为“转”。②你不能成为实体牌中包含“转”的牌的目标。③当有“转”因弃置而进入弃牌堆后，你获得之。',
+			dcliuzhuan_info:'锁定技。①其他角色于其回合内不于摸牌阶段而获得的牌称为“转”。②你不能成为实体牌中包含“转”的牌的目标。③当有“转”直接进入弃牌堆或经由处理区进入弃牌堆后，你获得之。',
 			xiahoulingnv:'夏侯令女',
 			fuping:'浮萍',
 			fuping_info:'①其他角色对你使用的结算结束后，若你未因此技能记录过此牌的名称且你有未废除的装备栏，则你可以废除一个装备栏，记录此牌的名称。②每回合每种牌名限一次。你可以将一张非基本牌当做〖浮萍①〗记录过的基本牌或锦囊牌使用或打出。③若你的所有装备栏均已被废除，则你使用牌无距离限制。',
@@ -18191,6 +18285,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			midu_info:'出牌阶段限一次。你可以选择一项：⒈废除任意个装备栏，并令一名角色摸等量的牌。⒉恢复一个已经被废除的装备栏，然后你获得〖活墨〗直到下回合开始。',
 			xianwang:'贤望',
 			xianwang_info:'锁定技。若你有被废除的装备栏，则其他角色至你的距离+1；若废除的装备栏数大于2，则改为距离+2。',
+			guanhai:'管亥',
+			suoliang:'索粮',
+			suoliang_info:'每回合限一次。当你对其他角色造成伤害后，你可以选择其的至多X张牌（X为其体力上限且至多为5）。若这些牌中有♥或♣牌，则你获得这些牌；否则你弃置这些牌。',
+			qinbao:'侵暴',
+			qinbao_info:'锁定技。当你使用【杀】或普通锦囊牌时，你令所有手牌数不小于你的角色不能响应此牌。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
