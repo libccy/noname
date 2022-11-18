@@ -9472,7 +9472,7 @@
 						str=str.replace(new RegExp("'step "+k+"'",'g'),"break;case "+k+":");
 						str=str.replace(new RegExp('"step '+k+'"','g'),"break;case "+k+":");
 					}
-					str=str.replace(/'step 0'|"step 0"/,'if(event.step=='+k+') {event.finish();return;}switch(step){case 0:');
+					str=str.replace(/(\/\/( *))*('step 0'|"step 0")/,`if(event.step=='${k}') {event.finish();return;}\n\tswitch(step){case 0:`);
 				}
 				return (new Function('event','step','source','player','target','targets',
 					'card','cards','skill','forced','num','trigger','result',
