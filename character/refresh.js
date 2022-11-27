@@ -4084,7 +4084,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzpaiyi:{
 				audio:2,
 				enable:'phaseUse',
-				usable:2,
+				usable:1,
 				filter:function(event,player){
 					return player.getExpansions('gzquanji').length>0;
 				},
