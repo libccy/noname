@@ -993,13 +993,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i of result.cards) list.add(get.type2(i));
 						if(list.length==result.cards.length){
 							target.draw();
-							player.getStat('skill').sanchen--;
+							player.getStat('skill').gzsanchen--;
 							player.addMark('gzsanchen',1);
 						}
 					}
 					else{
 						target.draw();
-						player.getStat('skill').sanchen--;
+						player.getStat('skill').gzsanchen--;
 						player.addMark('gzsanchen',1);
 					}
 				},
