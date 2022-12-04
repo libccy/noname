@@ -2917,7 +2917,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				multiline:true,
 				contentBefore:function(){
-					player.awakenSkill('luanwu');
+					player.awakenSkill('reluanwu');
 				},
 				content:function(){
 					"step 0"
