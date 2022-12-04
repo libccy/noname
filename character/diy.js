@@ -86,6 +86,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kyouko:['female','key',3,['kyouko_rongzhu','kyouko_gongmian']],
 			key_kyou:['female','key',3,['kyou_zhidian','kyou_duanfa']],
 			key_seira:['female','key',3,['seira_xinghui','seira_yuanying']],
+			key_kiyu:['female','key',3,['kiyu_yuling','kiyu_xianyu']],
 			
 			ns_huangchengyan:['male','shu',3,['nslongyue','nszhenyin']],
 			ns_sunchensunjun:['male','wu',5,['nsxianhai','nsxingchu']],
@@ -202,7 +203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
 				diy_yijiang2:["key_yuuki","key_tenzen","key_kyouko","key_kotarou","key_kyou",
 				"ns_chentai","ns_huangwudie","ns_sunyi","ns_zhangning","ns_yanghu"],
-				diy_yijiang3:['ns_ruanji','ns_zanghong','ns_limi','ns_zhonglimu','prp_zhugeliang','key_seira'],
+				diy_yijiang3:['ns_ruanji','ns_zanghong','ns_limi','ns_zhonglimu','prp_zhugeliang','key_seira','key_kiyu'],
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu"],
 				diy_xushi:["diy_feishi","diy_hanlong","diy_liufu","diy_liuyan","diy_liuzan","diy_tianyu","diy_xizhenxihong","diy_yangyi","diy_zaozhirenjun"],
@@ -305,6 +306,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_tenzen:'#b皋耳击',
 			key_kotarou:'#bb1154486224',
 			key_seira:'#b阿开木木W🍀',
+			key_kiyu:'#b无面◎隐者',
 			
 			ns_huangchengyan:'#g竹邀月',
 			ns_sunchensunjun:'#gVenusjeu',
@@ -527,6 +529,117 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_lucia:['key_shizuru'],
 		},
 		skill:{
+			//天宫希优
+			kiyu_yuling:{
+				mod:{
+					targetEnabled:function(card){
+						var info=get.info(card);
+						if(!info||(info.type!='trick'&&info.type!='delay')) return;
+						if(info.range) return false;
+					},
+				},
+				trigger:{target:'useCardToTargeted'},
+				forced:true,
+				charlotte:true,
+				filter:function(event,player){
+					return event.card.name=='sha'&&event.player.countCards('he')>0;
+				},
+				logTarget:'player',
+				content:function(){
+					trigger.player.chooseToDiscard('he',true,get.distance(trigger.player,player));
+				},
+				ai:{
+					threaten:0.7,
+					effect:{
+						target:function(card,player,target,current){
+							if(card.name=='sha') return 0.7;
+						},
+					},
+				},
+			},
+			kiyu_xianyu:{
+				trigger:{global:'phaseUseBegin'},
+				charlotte:true,
+				round:1,
+				filter:function(event,player){
+					return event.player.countCards('h')>0;
+				},
+				logTarget:'player',
+				check:function(event,player){
+					var target=event.player;
+					var next=target.next;
+					if(target.getSeatNum()>next.getSeatNum()) return true;
+					if(target.countCards('h')<4&&target.countCards('h',function(card){
+						return target.hasUseTarget(card,null,true);
+					})<2) return false;
+					return true;
+				},
+				content:function(){
+					'step 0'
+					var target=trigger.player,cards=target.getCards('h');
+					var next=player.chooseToMove('先预：预测'+get.translation(target)+'使用牌的顺序',true);
+					next.set('list',[
+						[get.translation(target)+'的手牌',cards]
+					]);
+					next.set('processAI',function(list){
+						var cards=list[0][1].slice(0);
+						var target=_status.event.getTrigger().player;
+						cards.sort(function(a,b){
+							return get.order(b,target)-get.order(a,target);
+						});
+						return [cards];
+					});
+					'step 1'
+					if(result.bool){
+						var list=result.moved[0];
+						player.storage.kiyu_xianyu_lastrun=list;
+						player.addTempSkill('kiyu_xianyu_lastrun',list);
+					}
+				},
+				subSkill:{
+					lastrun:{
+						trigger:{global:'phaseUseAfter'},
+						forced:true,
+						charlotte:true,
+						onremove:true,
+						content:function(){
+							var num=0,index=-1,target=trigger.player;
+							var cards=player.getStorage('kiyu_xianyu_lastrun');
+							var history=target.getHistory('useCard',function(event){
+								return event.getParent('phaseUse')==trigger;
+							});
+							for(var evt of history){
+								var goon=false;
+								for(var card of evt.cards){
+									var index2=cards.indexOf(card);
+									if(index2>index){
+										goon=true;
+										index=index2;
+									}
+								}
+								if(goon) num++;
+							}
+							if(num>0){
+								num=Math.min(3,num);
+								player.draw(num);
+								if(target.isIn()){
+									target.addTempSkill('kiyu_xianyu_effect');
+									target.addMark('kiyu_xianyu_effect',num,false);
+								}
+							}
+						},
+					},
+					effect:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							maxHandcard:function(player,num){
+								return num+player.countMark('kiyu_xianyu_effect');
+							},
+						},
+					},
+				},
+			},
 			//樱庭星罗
 			seira_xinghui:{
 				trigger:{player:'phaseZhunbeiBegin'},
@@ -6255,9 +6368,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			kyoko_juwu:{
-				trigger:{global:['loseAfter','cardsDiscardAfter']},
+				trigger:{global:['loseAfter','cardsDiscardAfter','loseAsyncAfter']},
 				direct:true,
 				filter:function(event,player){
+					if(event.name.indexOf('lose')==0&&(event.getlx===false||event.position!=ui.discardPile)) return false;
 					return player!=event.player&&player!=_status.currentPhase&&event.cards&&event.cards.filter(function(card){
 						return get.position(card,true)=='d'&&get.type(card,false)=='equip';
 					}).length>0;
@@ -7120,6 +7234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tomoya_shangxian:{
 				trigger:{player:'phaseUseBegin'},
 				mark:true,
+				locked:true,
 				intro:{
 					content:function(s){
 						return '计算与其他角色的距离时始终从'+(s?'逆':'顺')+'时针计算'
@@ -8835,14 +8950,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					if(player!=_status.currentPhase) return false;
-					if(event.name=='lose'&&event.position!=ui.discardPile) return false;
+					if(event.name.indexOf('lose')==0&&(event.getlx===false||event.position!=ui.discardPile)) return false;
 					var list=[];
 					for(var i=0;i<event.cards.length;i++){
 						var card=event.cards[i];
 						list.add(card.suit);
 					}
 					game.getGlobalHistory('cardMove',function(evt){
-						if(evt==event||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
+						if(evt==event||evt.getParent()==event||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
 						if(evt.name=='lose'&&evt.position!=ui.discardPile) return false;
 						for(var i=0;i<evt.cards.length;i++){
 							var card=evt.cards[i];
@@ -8861,7 +8976,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list2.add(suit);
 					}
 					game.getGlobalHistory('cardMove',function(evt){
-						if(evt==trigger||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
+						if(evt==trigger||evt.getParent()==trigger||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
 						if(evt.name=='lose'&&evt.position!=ui.discardPile) return false;
 						for(var i=0;i<evt.cards.length;i++){
 							var card=evt.cards[i];
@@ -9830,18 +9945,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			noname_duocai:{
 				trigger:{
-					global:"loseAfter",
+					global:["loseAfter","loseAsyncAfter"],
 				},
 				filter:function(event,player){
-					if(event.type!='discard'||event.player==player) return false;
-					return event.cards&&event.cards.filterInD('d').length>0&&!player.hasSkill('noname_duocai2');
+					if(event.type!='discard'||event.getlx===false) return false;
+					var evt=event.getl(player);
+					var cards=event.cards.slice(0);
+					if(evt&&evt.cards) cards.removeArray(evt.cards);
+					return cards.filterInD('d').length>0&&!player.hasSkill('noname_duocai2');
 				},
 				direct:true,
 				charlotte:true,
 				content:function(){
 					"step 0"
 					if(trigger.delay==false&&player!=game.me&&!player.isOnline()) game.delay();
-					var cards=trigger.cards.filterInD('d');
+					var evt=trigger.getl(player);
+					var cards=trigger.cards.slice(0);
+					cards.removeArray(evt.cards);
 					player.chooseButton([get.prompt('noname_duocai'),cards],[1,cards.length]);
 					"step 1"
 					if(result.bool){
@@ -16665,6 +16785,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			seira_yuanying_info:'出牌阶段限一次，你可选择两名角色。这两名角色成为“姻缘者”且获得〖姻缘〗直到你下次发动〖缘映〗。',
 			seira_yinyuan:'姻缘',
 			seira_yinyuan_info:'你的手牌对其他“姻缘者”可见。出牌阶段限一次，你可以获得一名其他“姻缘者”区域内的一张牌，然后其回复1点体力。',
+			key_kiyu:'露娜Q',
+			kiyu_yuling:'玉灵',
+			kiyu_yuling_info:'锁定技。你不是有距离限制的锦囊牌的合法目标；你成为【杀】的目标后，使用者需弃置X张牌（X为其至你的距离）。',
+			kiyu_xianyu:'先预',
+			kiyu_xianyu_info:'每轮限一次。一名角色的出牌阶段开始时，你可观看其手牌并预测其使用这些牌的顺序。此出牌阶段结束时，你摸X张牌，且其本回合的手牌上限+X（X为你的预测与其实际使用顺序的吻合数且至多为3）。',
 
 			noname:"小无",
 			noname_zhuyuan:"祝愿",

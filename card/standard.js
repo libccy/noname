@@ -1585,21 +1585,24 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				complexSelect:true,
 				complexTarget:true,
 				multicheck:function(){
+					var card={name:'sha',isCard:true};
 					return game.hasPlayer(function(current){
 						if(current.getEquip(1)){
 							return game.hasPlayer(function(current2){
-								return current.inRange(current2)&&current.canUse('sha',current2,false);
+								return current.inRange(current2)&&lib.filter.targetEnabled(card,current,current2);
 							})
 						}
 					});
 				},
 				filterTarget:function(card,player,target){
+					var card={name:'sha',isCard:true};
 					return player!=target&&target.getEquip(1)&&game.hasPlayer(function(current){
-						return target!=current&&target.inRange(current)&&target.canUse('sha',current,false);
+						return target!=current&&target.inRange(current)&&lib.filter.targetEnabled(card,target,current);
 					});
 				},
 				filterAddedTarget:function(card,player,target,preTarget){
-					return target!=preTarget&&preTarget.inRange(target)&&preTarget.canUse('sha',target,false);
+					var card={name:'sha',isCard:true};
+					return target!=preTarget&&preTarget.inRange(target)&&lib.filter.targetEnabled(card,preTarget,target);
 				},
 				content:function(){
 					"step 0"
@@ -2108,7 +2111,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:['damage','damageCancelled','damageZero'],
 					source:['damage','damageCancelled','damageZero'],
-					target:['shaMiss','useCardToExcluded','useCardToEnd'],
+					target:['shaMiss','useCardToExcluded','useCardToEnd','eventNeutralized'],
 					global:['useCardEnd'],
 				},
 				charlotte:true,
@@ -2128,15 +2131,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			qinglong_skill:{
 				equipSkill:true,
-				trigger:{player:'shaMiss'},
+				trigger:{player:['shaMiss','eventNeutralized']},
 				direct:true,
 				filter:function(event,player){
-					if(get.mode()=='guozhan') return false;
-					return player.canUse('sha',event.target,false)&&(player.hasSha()||_status.connectMode&&player.countCards('h'));
+					if(get.mode()=='guozhan'||!event.card||event.card.name!='sha') return false;
+					return event.target.isIn&&player.canUse('sha',event.target,false)&&(player.hasSha()||_status.connectMode&&player.countCards('h'));
 				},
 				content:function(){
 					"step 0"
-					player.chooseToUse(get.prompt('qinglong'),function(card,player,event){
+					player.chooseToUse(get.prompt('qinglong',trigger.target),function(card,player,event){
 						if(get.name(card)!='sha') return false;
 						return lib.filter.filterCard.apply(this,arguments);
 					},trigger.target,-1).set('addCount',false).logSkill='qinglong_skill';
@@ -2168,10 +2171,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			guanshi_skill:{
 				equipSkill:true,
-				trigger:{player:'shaMiss'},
+				trigger:{
+					player:['shaMiss','eventNeutralized'],
+				},
 				direct:true,
 				audio:true,
 				filter:function(event,player){
+					if(event.type!='card'||event.card.name!='sha') return false;
 					return player.countCards('he',function(card){
 						return card!=player.getEquip('guanshi');
 					})>=2&&event.target.isAlive();
@@ -2194,10 +2200,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
-						trigger.untrigger();
-						trigger.trigger('shaHit');
-						trigger._result.bool=false;
-						trigger._result.result=null;
+						if(event.triggername=='shaMiss'){
+							trigger.untrigger();
+							trigger.trigger('shaHit');
+							trigger._result.bool=false;
+							trigger._result.result=null;
+						}
+						else{
+							trigger.unneutralize();
+						}
 					}
 				},
 				ai:{
@@ -2570,7 +2581,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								trigger.cancelled=true;
 							}
 							else{
-								trigger.cancel();
+								trigger.neutralize();
 								if(event.guowuxie==true){
 									if(trigger.target.identity!='ye'&&trigger.target.identity!='unknown'){
 										trigger.getParent().excluded.addArray(game.filterPlayer(function(current){

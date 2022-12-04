@@ -1028,11 +1028,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tianren:{
 				audio:2,
-				trigger:{global:['loseAfter','cardsDiscardAfter']},
+				trigger:{global:['loseAfter','cardsDiscardAfter','loseAsyncAfter']},
 				forced:true,
 				filter:function(event,player){
-					if(event.name=='lose'){
-						if(event.position!=ui.discardPile) return false;
+					if(event.name.indexOf('lose')==0){
+						if(event.getlx===false||event.position!=ui.discardPile) return false;
 					}
 					else{
 						var evt=event.getParent();
@@ -1643,17 +1643,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dinghan:{
 				audio:2,
-				trigger:{target:'useCardToTarget'},
+				trigger:{
+					target:'useCardToTarget',
+					player:'addJudgeBefore',
+				},
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return get.type2(event.card)=='trick'&&!player.getStorage('dinghan').contains(event.card.name);
+					if(event.name=='useCardToTarget'&&get.type(event.card,null,false)!='trick') return false;
+					return !player.getStorage('dinghan').contains(event.card.name);
 				},
 				content:function(){
-					player.markAuto('dinghan',[trigger.card.name]);
-					trigger.targets.remove(player);
-					trigger.getParent().triggeredTargets2.remove(player);
-					trigger.untrigger();
+					player.markAuto('dinghan',[trigger.card.name]);if(trigger.name=='addJudge'){
+						trigger.cancel();
+						var owner=get.owner(trigger.card);
+						if(owner&&owner.getCards('hej').contains(trigger.card)) owner.lose(trigger.card,ui.discardPile);
+						else game.cardsDiscard(trigger.card);
+						game.log(trigger.card,'进入了弃牌堆');
+					}
+					else{
+						trigger.targets.remove(player);
+						trigger.getParent().triggeredTargets2.remove(player);
+						trigger.untrigger();
+					}
 				},
 				onremove:true,
 				intro:{content:'已记录牌名：$'},
@@ -3584,15 +3596,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			renjie2:{
 				audio:2,
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					global:'loseAsyncAfter',
+				},
 				forced:true,
 				filter:function(event,player){
-					if(event.type!='discard'||!event.cards2) return false;
-					var evt=event.getParent('phaseDiscard');
-					return evt&&evt.name=='phaseDiscard'&&evt.player==player;
+					if(event.type!='discard'||event.getlx===false) return false;
+					var evt=event.getParent('phaseDiscard'),evt2=event.getl(player);
+					return evt&&evt2&&evt.name=='phaseDiscard'&&evt.player==player&&evt2.cards2&&evt2.cards2.length>0;
 				},
 				content:function(){
-					player.addMark('renjie',trigger.cards2.length);
+					player.addMark('renjie',trigger.getl(player).cards2.length);
 				}
 			},
 			sbaiyin:{
@@ -5520,8 +5535,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 						};
 						if(event.list1.length&&event.list2.length){
-							target.discard(event.list2).delay=false;
-							player.discard(event.list1);
+							game.loseAsync({
+								lose_list:[
+									[player,event.list1],
+									[target,event.list2]
+								],
+							}).setContent('discardMultiple');
 						}
 						else if(event.list2.length){
 							target.discard(event.list2);
@@ -6164,7 +6183,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lingce:'灵策',
 			lingce_info:'锁定技。当有【奇正相生】或智囊或〖定汉①〗记录过的锦囊牌被使用时，若此牌不为转化牌且对应实体牌数量为1，则你摸一张牌。',
 			dinghan:'定汉',
-			dinghan_info:'①当你成为未记录过的锦囊牌的目标时，你记录此牌名并取消之。②准备阶段，你可在〖定汉①〗的记录中添加或减少一种锦囊牌的牌名。',
+			dinghan_info:'①当你成为未记录过的普通锦囊牌的目标时，或有未记录过的延时锦囊牌进入你的判定区时，你记录此牌名并取消之。②准备阶段，你可在〖定汉①〗的记录中添加或减少一种锦囊牌的牌名。',
 			shen_sunce:'神孙策',
 			yingba:'英霸',
 			yingba_info:'①出牌阶段限一次，你可令一名体力上限大于1的其他角色减少1点体力上限并获得“平定”标记，然后你减少1点体力上限。②你对拥有“平定”标记的角色使用牌没有距离限制。',

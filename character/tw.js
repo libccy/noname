@@ -752,16 +752,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'loseAfter'},
 				direct:true,
 				filter:function(event,player){
-					if(player==_status.currentPhase||event.type!='discard'||event.position!=ui.discardPile||!game.hasPlayer((current)=>current!=player)) return false;
-					for(var i of event.cards2){
+					if(player==_status.currentPhase||event.type!='discard'||event.getlx===false||!game.hasPlayer((current)=>current!=player)) return false;
+					var evt=event.getl(player);
+					for(var i of evt.cards2){
 						if(get.color(i,player)=='red'&&get.position(i,true)=='d') return true;
 					}
 					return false;
 				},
 				content:function(){
 					'step 0'
-					var cards=[];
-					for(var i of trigger.cards2){
+					var cards=[],cards2=trigger.getl(player);
+					for(var i of cards2){
 						if(get.color(i,player)=='red'&&get.position(i,true)=='d') cards.push(i);
 					}
 					player.chooseButton(['从击：选择任意张牌交给其他角色',cards],[1,cards.length]).set('goon',game.hasPlayer(function(current){

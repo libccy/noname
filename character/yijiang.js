@@ -378,9 +378,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//顾雍
 			olbingyi:{
 				audio:'bingyi',
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					global:'loseAsyncAfter',
+				},
 				filter:function(event,player){
-					return event.type=='discard'&&event.cards2.length>0&&player.countCards('h')>0&&!player.hasSkill('olbingyi_blocker',null,null,false);
+					return event.type=='discard'&&event.getl(player).cards2.length>0&&player.countCards('h')>0&&!player.hasSkill('olbingyi_blocker',null,null,false);
 				},
 				prompt2:function(event,player){
 					var str='展示所有手牌，然后',hs=player.getCards('h');
@@ -3342,6 +3345,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.translation(name);
 					}(target),capt);
 					if(event.togain.length) event.goto(5);
+					else{
+						for(var i=0;i<ui.dialogs.length;i++){
+							if(ui.dialogs[i].videoId==event.dialogID){
+								var dialog=ui.dialogs[i];
+								dialog.close();
+								_status.dieClose.remove(dialog);
+								break;
+							}
+						}
+						if(event.togain.length){
+							game.cardsDiscard(event.togain);
+						}
+						game.broadcast(function(id){
+							var dialog=get.idDialog(id);
+							if(dialog){
+								dialog.close();
+								_status.dieClose.remove(dialog);
+							}
+						},event.dialogID);
+						game.addVideo('cardDialog',null,event.dialogID);
+						event.finish();
+					}
 				}
 			},
 			fuzhu:{
@@ -5887,12 +5912,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			shenduan:{
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					global:'loseAsyncAfter',
+				},
 				filter:function(event,player){
-					if(event.type!='discard') return;
-					for(var i=0;i<event.cards2.length;i++){
-						if(get.color(event.cards2[i],event.hs.contains(event.cards2[i])?event.player:false)=='black'&&get.type(event.cards2[i])=='basic'&&
-							get.position(event.cards2[i],event.hs.contains(event.cards2[i])?event.player:false)=='d'){
+					if(event.type!='discard'||event.getlx===false) return;
+					var evt=event.getl(player);
+					for(var i=0;i<evt.cards2.length;i++){
+						if(get.color(evt.cards2[i],evt.hs.contains(evt.cards2[i])?evt.player:false)=='black'&&get.type(evt.cards2[i])=='basic'&&
+							get.position(evt.cards2[i],evt.hs.contains(evt.cards2[i])?evt.player:false)=='d'){
 							return true;
 						}
 					}
@@ -5903,10 +5932,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var cards=[];
-					for(var i=0;i<trigger.cards2.length;i++){
-						if(get.color(trigger.cards2[i],trigger.hs.contains(trigger.cards2[i])?trigger.player:false)=='black'&&get.type(trigger.cards2[i],trigger.hs.contains(trigger.cards2[i])?trigger.player:false)=='basic'&&
-							get.position(trigger.cards2[i])=='d'){
-							cards.push(trigger.cards2[i]);
+					var evt=trigger.getl(player);
+					for(var i=0;i<evt.cards2.length;i++){
+						if(get.color(evt.cards2[i],evt.hs.contains(evt.cards2[i])?evt.player:false)=='black'&&get.type(evt.cards2[i],evt.hs.contains(evt.cards2[i])?evt.player:false)=='basic'&&
+							get.position(evt.cards2[i])=='d'){
+							cards.push(evt.cards2[i]);
 						}
 					}
 					if(!cards.length){
@@ -5966,12 +5996,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reshenduan:{
 				audio:2,
-				trigger:{player:'loseAfter'},
+				trigger:{
+					global:'loseAsyncAfter',
+					player:'loseAfter',
+				},
 				filter:function(event,player){
-					if(event.type!='discard') return;
-					for(var i=0;i<event.cards2.length;i++){
-						if(get.color(event.cards2[i],player)=='black'&&['basic','equip'].contains(get.type(event.cards2[i],event.hs.contains(event.cards2[i])?event.player:false))&&
-							get.position(event.cards2[i])=='d'){
+					if(event.type!='discard'||event.getlx===false) return;
+					var evt=event.getl(player);
+					for(var i=0;i<evt.cards2.length;i++){
+						if(get.color(evt.cards2[i],player)=='black'&&['basic','equip'].contains(get.type(evt.cards2[i],evt.hs.contains(evt.cards2[i])?evt.player:false))&&
+							get.position(evt.cards2[i])=='d'){
 							return true;
 						}
 					}
@@ -5981,10 +6015,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var cards=[];
-					for(var i=0;i<trigger.cards2.length;i++){
-						if(get.color(trigger.cards2[i],player)=='black'&&['basic','equip'].contains(get.type(trigger.cards2[i],trigger.hs.contains(trigger.cards2[i])?trigger.player:false))&&
-							get.position(trigger.cards2[i])=='d'){
-							cards.push(trigger.cards2[i]);
+					var evt=trigger.getl(player);
+					for(var i=0;i<evt.cards2.length;i++){
+						if(get.color(evt.cards2[i],player)=='black'&&['basic','equip'].contains(get.type(evt.cards2[i],evt.hs.contains(evt.cards2[i])?evt.player:false))&&
+							get.position(evt.cards2[i])=='d'){
+							cards.push(evt.cards2[i]);
 						}
 					}
 					if(!cards.length){
@@ -10269,11 +10304,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zongxuan:{
 				audio:2,
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					global:'loseAsyncAfter',
+				},
 				filter:function(event,player){
-					if(event.type!='discard') return false;
-					for(var i=0;i<event.cards2.length;i++){
-						if(get.position(event.cards2[i])=='d'){
+					if(event.type!='discard'||event.getlx===false) return;
+					var evt=event.getl(player);
+					for(var i=0;i<evt.cards2.length;i++){
+						if(get.position(evt.cards2[i])=='d'){
 							return true;
 						}
 					}
@@ -10283,8 +10322,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(trigger.getParent(3).name!='phaseDiscard'||!game.hasPlayer(function(current){
 						return current.isDamaged()&&get.recoverEffect(current,player,player)>0;
 					}))
-					for(var i=0;i<trigger.cards2.length;i++){
-						if(get.position(trigger.cards2[i],true)=='d'&&get.type(trigger.cards2[i],false)=='equip'){
+					var evt=trigger.getl(player);
+					for(var i=0;i<evt.cards2.length;i++){
+						if(get.position(evt.cards2[i],true)=='d'&&get.type(evt.cards2[i],false)=='equip'){
 							return true;
 						}
 					}
@@ -10293,9 +10333,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					var cards=[];
-					for(var i=0;i<trigger.cards2.length;i++){
-						if(get.position(trigger.cards2[i],true)=='d'){
-							cards.push(trigger.cards2[i]);
+					var evt=trigger.getl(player);
+					for(var i=0;i<evt.cards2.length;i++){
+						if(get.position(evt.cards2[i],true)=='d'){
+							cards.push(evt.cards2[i]);
 						}
 					}
 					var next=player.chooseToMove('纵玄：将任意张牌置于牌堆顶',true);
@@ -10707,25 +10748,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:2,
 						trigger:{global:'loseAfter'},
 						filter:function(event,player){
-							if(event.type!='discard') return false;
-							if(event.player==player) return false;
-							for(var i=0;i<event.cards2.length;i++){
-								if(get.suit(event.cards2[i],event.player)=='club'&&get.position(event.cards2[i],true)=='d'){
+							if(event.type!='discard'||event.getlx===false) return false;
+							var cards=event.cards.slice(0);
+							var evt=event.getl(player);
+							if(evt&&evt.cards) cards.removeArray(evt.cards);
+							for(var i=0;i<cards.length;i++){
+								if(cards[i].original!='j'&&get.suit(cards[i],event.player)=='club'&&get.position(cards[i],true)=='d'){
 									return true;
 								}
 							}
 							return false;
 						},
 						direct:true,
-						//frequent:'check',
 						content:function(){
 							"step 0"
 							if(trigger.delay==false) game.delay();
 							"step 1"
-							var cards=[];
-							for(var i=0;i<trigger.cards2.length;i++){
-								if(get.suit(trigger.cards2[i],trigger.player)=='club'&&get.position(trigger.cards2[i],true)=='d'){
-									cards.push(trigger.cards2[i]);
+							var cards=[],cards2=trigger.cards.slice(0),evt=trigger.getl(player);
+							if(evt&&evt.cards) cards2.removeArray(evt.cards);
+							for(var i=0;i<cards2.length;i++){
+								if(cards2[i].original!='j'&&get.suit(cards2[i],trigger.player)=='club'&&get.position(cards2[i],true)=='d'){
+									cards.push(cards2[i]);
 								}
 							}
 							if(cards.length){
