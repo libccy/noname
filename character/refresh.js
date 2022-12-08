@@ -4107,7 +4107,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				preHidden:true,
 				filter:function(event,player,name){
-					if(name=='damageEnd') return true;
 					if(!event.card) return false;
 					if(player.hasHistory('useSkill',function(evt){
 						return evt.skill=='gzquanji'&&evt.event.triggername==name;
