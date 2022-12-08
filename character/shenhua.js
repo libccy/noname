@@ -69,7 +69,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"yl_yuanshu":["male","qun",4,["drlt_yongsi","drlt_weidi"],["zhu"]],
 			"zhangxiu":["male","qun",4,["drlt_xiongluan","drlt_congjian"],[]],
 			"chendao":["male","shu",4,["drlt_wanglie"],[]],
-			zhoufei:["female","wu",3,["liangyin","kongsheng"],[]],
+			zhoufei:["female","wu",3,["olliangyin","olkongsheng"]],
 		},
 		perfectPair:{
 			jiaxu:['liqueguosi'],
@@ -141,6 +141,250 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"chendao":"陈到，字叔至，生卒年不详，豫州汝南（今河南驻马店平舆县）人。三国时期蜀汉将领，刘备帐下白毦兵统领，名位常亚于赵云，以忠勇著称。蜀汉建兴年间，任征西将军、永安都督，封亭侯。在任期间去世。",
 		},
 		skill:{
+			//周妃
+			olliangyin:{
+				audio:'liangyin',
+				trigger:{
+					global:["loseAfter","addToExpansionAfter","cardsGotoSpecialAfter",'loseAsyncAfter'],
+				},
+				filter:function(event,player,name){
+					if(event.name=='lose'||event.name=='loseAsync') return event.getlx!==false&&event.toStorage==true;
+					if(event.name=='cardGotoSpecial') return !event.notrigger;
+					return true;
+				},
+				direct:true,
+				usable:1,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('olliangyin'),'选择一名其他角色，你与其各摸一张牌',lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player,num=player.getExpansions('olkongsheng').length-1;
+						var att=get.attitude(player,target);
+						if(att<=0) return 0;
+						if(target.countCards('h')==num&&target.isDamaged()&&get.recoverEffect(target,player,player)>0) return 3*att;
+						return att;
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('olliangyin',target);
+						game.asyncDraw([player,target].sortBySeat());
+					}
+					else event.finish();
+					'step 2'
+					game.delayx();
+					var num=player.getExpansions('olkongsheng').length;
+					var check=function(player){
+						if(!player.isIn()||player.isHealthy()) return false;
+						return player.countCards('h')==num;
+					}
+					if(check(player)||check(target)){
+						var choiceList=[
+							'令自己回复1点体力',
+							'令'+get.translation(target)+'回复1点体力',
+						];
+						var choices=[];
+						if(check(player)) choices.push('选项一');
+						else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
+						if(check(target)) choices.push('选项二');
+						else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+						choices.push('cancel2');
+						player.chooseControl(choices).set('choiceList',choiceList).set('prompt','良姻：是否令一名角色回复体力？').set('ai',function(){
+							var player=_status.event.player,target=_status.event.getParent().target;
+							var list=_status.event.controls.slice(0),eff1=0,eff2=0;
+							if(list.contains('选项一')) eff1=get.recoverEffect(player,player,player);
+							if(list.contains('选项二')) eff2=get.recoverEffect(target,player,player);
+							if(eff1>Math.max(0,eff2)) return '选项一';
+							if(eff2>0) return '选项二';
+							return 'cancel2';
+						});
+					}
+					else event.finish();
+					'step 3'
+					if(result.control=='选项一') player.recover();
+					else if(result.control=='选项二') target.recover();
+				},
+				group:'olliangyin_gain',
+				subSkill:{
+					gain:{
+						audio:'liangyin',
+						trigger:{
+							global:['loseAfter','equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+						},
+						direct:true,
+						filter:function(event,player){
+							var evt=event.getl(player);
+							return evt&&(evt.xs.length>0||evt.ss.length>0);
+						},
+						usable:1,
+						content:function(){
+							'step 0'
+							if(!player.countCards('he')||!game.hasPlayer(function(current){
+								return current!=player&&current.countCards('he')>0;
+							})) event.finish();
+							else player.chooseCardTarget({
+								prompt:get.prompt('olliangyin'),
+								prompt2:'弃置一张牌，并令一名其他角色也弃置一张牌',
+								position:'he',
+								filterCard:lib.filter.cardDiscardable,
+								filterTarget:function(card,player,target){
+									return target!=player&&target.countCards('he')>0;
+								},
+								ai1:function(card){
+									var player=_status.event.player;
+									var num=player.getExpansions('olkongsheng').length,hs=player.countCards('h');
+									if(get.position(card)!='e') hs--;
+									if(hs==num&&player.isDamaged()&&get.recoverEffect(player,player,player)>0) return 9-get.value(card);
+									return 5-get.value(card);
+								},
+								ai2:function(target){
+									var player=_status.event.player;
+									var has=target.hasCard(function(card){
+										return get.value(card,target)<=0;
+									},'e'),att=get.attitude(player,target);
+									if(!has) att=-att;
+									return att*has?2:1;
+								},
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								event.target=target;
+								player.logSkill('olliangyin_gain',target);
+								player.discard(result.cards);
+								target.chooseToDiscard('he',true);
+							}
+							else event.finish();
+							'step 2'
+							game.delayx();
+							var num=player.getExpansions('olkongsheng').length;
+							var check=function(player){
+								if(!player.isIn()||player.isHealthy()) return false;
+								return player.countCards('h')==num;
+							}
+							if(check(player)||check(target)){
+								var choiceList=[
+									'令自己回复1点体力',
+									'令'+get.translation(target)+'回复1点体力',
+								];
+								var choices=[];
+								if(check(player)) choices.push('选项一');
+								else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
+								if(check(target)) choices.push('选项二');
+								else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+								choices.push('cancel2');
+								player.chooseControl(choices).set('choiceList',choiceList).set('prompt','良姻：是否令一名角色回复体力？').set('ai',function(){
+									var player=_status.event.player,target=_status.event.getParent().target;
+									var list=_status.event.controls.slice(0),eff1=0,eff2=0;
+									if(list.contains('选项一')) eff1=get.recoverEffect(player,player,player);
+									if(list.contains('选项二')) eff2=get.recoverEffect(target,player,player);
+									if(eff1>Math.max(0,eff2)) return '选项一';
+									if(eff2>0) return '选项二';
+									return 'cancel2';
+								});
+							}
+							else event.finish();
+							'step 3'
+							if(result.control=='选项一') player.recover();
+							else if(result.control=='选项二') target.recover();
+						},
+					},
+				},
+			},
+			olkongsheng:{
+				audio:'kongsheng',
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseCard('he',[1,player.countCards('he')],get.prompt('olkongsheng'),'将任意张牌作为“箜”置于武将牌上').set('ai',function(card){
+						var player=_status.event.player,num=player.getExpansions('olkongsheng')+ui.selected.cards.length;
+						if(ui.selected.cards.length>0&&game.hasPlayer(function(current){
+							if(current.isHealthy()||get.recoverEffect(current,player,player)<=0) return false;
+							var num2=current.countCards('h',function(card){
+								if(current!=player) return true;
+								return !ui.selected.cards.contains(card);
+							})+1;
+							return num==num2;
+						})) return 0;
+						if(get.type(card,null,false)=='equip'){
+							for(var i of ui.selected.cards){
+								if(get.type(i,null,false)=='equip') return 0;
+							}
+							return 5-get.value(card);
+						}
+						if(!player.hasValueTarget(card)) return 1;
+						return 0;
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('olkongsheng');
+						player.addToExpansion(result.cards,player,'give').gaintag.add('olkongsheng');
+					}
+				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+				group:'olkongsheng_kessoku',
+				subSkill:{
+					kessoku:{
+						trigger:{player:'phaseJieshuBegin'},
+						forced:true,
+						locked:false,
+						filter:function(event,player){
+							return player.getExpansions('olkongsheng').filter(function(card){
+								return get.type(card,false)!='equip';
+							}).length>0;
+						},
+						content:function(){
+							'step 0'
+							var cards=player.getExpansions('olkongsheng').filter(function(card){
+								return get.type(card,false)!='equip';
+							});
+							if(cards.length) player.gain(cards,'gain2');
+							'step 1'
+							var cards=player.getExpansions('olkongsheng');
+							if(cards.length>0){
+								player.chooseTarget(true,'令一名角色使用以下装备牌',get.translation(cards)).set('ai',function(target){
+									var player=_status.event.player;
+									return get.effect(target,{name:'losehp'},player,player);
+								});
+							}
+							else event.finish();
+							'step 2'
+							var target=result.targets[0];
+							event.target=target;
+							player.line(target,'green');
+							'step 3'
+							var cards=player.getExpansions('olkongsheng').filter(function(i){
+								return target.hasUseTarget(i);
+							});
+							if(cards.length==1){
+								event._result={bool:true,links:cards}
+							}
+							else if(cards.length) target.chooseButton(true,['选择要使用的装备牌',cards]).set('ai',function(button){
+								return get.order(button.link);
+							});
+							else event.goto(5);
+							'step 4'
+							if(result.bool){
+								target.chooseUseTarget(result.links[0],true);
+								event.goto(3);
+							}
+							'step 5'
+							target.loseHp();
+						},
+					},
+				},
+			},
 			//新毌丘俭
 			zhengrong:{
 				trigger:{player:'useCardToPlayered'},
@@ -1275,7 +1519,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						prompt2:'当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合内不能再对其使用牌',
 						filter:function(event,player){
-							return event.card.name=='sha'&&event.player.countGainableCards(player,'he')>0&&player.storage.nzry_juzhan==true;
+							return event.card.name=='sha'&&player.storage.nzry_juzhan==true&&event.target.countGainableCards(player,'he')>0;
 						},
 						check:function(event,player){
 							return event.player.countCards('he')>0&&event.targets&&event.targets.length==1;
@@ -5473,9 +5717,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return get.damageEffect(target,player);
 						}
-					}
+					},
+					threaten:1.3,
 				},
-				threaten:1.3
 			},
 			xinqiangxi:{
 				audio:'qiangxi',
@@ -7300,7 +7544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiaoqiao:['ol_xiaoqiao','re_xiaoqiao','xiaoqiao'],
 			yuji:['xin_yuji','re_yuji','yuji'],
 			zhangjiao:['re_zhangjiao','sp_zhangjiao','zhangjiao'],
-			dianwei:['dianwei','re_dianwei'],
+			dianwei:['ol_dianwei','re_dianwei','dianwei'],
 			xunyu:['ol_xunyu','re_xunyu','xunyu'],
 			sp_zhugeliang:['ol_sp_zhugeliang','re_sp_zhugeliang','sp_zhugeliang'],
 			pangtong:['ol_pangtong','re_pangtong','pangtong'],
@@ -7721,6 +7965,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"guhuo_phase_info":"",
 			xinhongyan:'红颜',
 			xinhongyan_info:'锁定技，你的♠牌和♠判定牌的花色视为♥。一名角色的判定结果生效前，若判定结果为♥，则你将其改为一种花色。',
+			olliangyin:'良姻',
+			olliangyin_info:'当有牌发生移动后，若此移动事件是本回合内你拥有〖良姻〗期间的首个有牌移出游戏/移入游戏的事件，则你可以选择一名其他角色。你与其各摸一张牌/弃置一张牌，然后你可以选择你或其中的一名手牌数为X的角色，该角色回复1点体力（X为你的“箜”数）',
+			olkongsheng:'箜声',
+			olkongsheng_info:'①准备阶段开始时，你可以将任意张牌置于你的武将牌上，称为“箜”。②结束阶段开始时，若你有不为装备牌的“箜”，则你获得“箜”中的非装备牌，然后令一名角色依次使用“箜”中的装备牌并失去1点体力。',
 			
 			shenhua_feng:'神话再临·风',
 			shenhua_huo:'神话再临·火',

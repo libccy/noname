@@ -299,7 +299,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				notarget:true,
 				content:function(){
 					var evt2=event.getParent(3)._trigger;
-					evt2.cancel();
+					evt2.neutralize();
 					var evt=evt2.getParent();
 					var next=game.createEvent('caochuan_gain');
 					_status.event.next.remove(next);

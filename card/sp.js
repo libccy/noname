@@ -16,7 +16,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(evt.jinchan){
 						var type=get.type(evt.card,'trick');
 						if(type=='basic'||type=='trick'){
-							evt.cancel();
+							evt.neutralize();
 						}
 					}
 					player.draw(2);
@@ -544,18 +544,25 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			g_jinchan2:{
-				trigger:{player:'discardAfter'},
+				trigger:{
+					player:'loseAfter',
+					global:'loseAsyncAfter',
+				},
 				forced:true,
+				cardSkill:true,
 				filter:function(event,player){
-					for(var i=0;i<event.cards.length;i++){
-						if(event.cards[i].name=='jinchan') return true;
+					if(event.type!='discard') return false;
+					var evt=event.getl(player);
+					if(!evt||!evt.cards2||!evt.cards2.length) return false;
+					for(var i of evt.cards2){
+						if(i.name=='jinchan') return true;
 					}
 					return false;
 				},
 				content:function(){
-					var num=0;
-					for(var i=0;i<trigger.cards.length;i++){
-						if(trigger.cards[i].name=='jinchan') num++;
+					var num=0,cards=trigger.getl(player).cards2;
+					for(var i=0;i<cards.length;i++){
+						if(cards[i].name=='jinchan') num++;
 					}
 					if(num){
 						player.draw(num);
@@ -614,7 +621,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jinchan:'金蝉脱壳',
 			g_jinchan2:'金蝉脱壳',
 			g_jinchan2_info:'当你因弃置而失去【金蝉脱壳】时，你摸一张牌',
-			jinchan_info:'当你成为其他角色使用牌的目标时，若你的手牌里只有【金蝉脱壳】，使目标锦囊牌或基本牌对你无效，你摸两张牌。当你因弃置而失去【金蝉脱壳】时，你摸一张牌。',
+			jinchan_info:'其他角色使用的基本牌或普通牌对你生效时，若你的所有手牌均为【金蝉脱壳】，则你可以使用此牌。你令此牌对你无效并摸两张牌。当你因弃置而失去【金蝉脱壳】时，你摸一张牌。',
 			fulei:'浮雷',
 			fulei_info:'出牌阶段，对你使用。你将【浮雷】置入判定区。若判定结果为♠，则目标角色受到X点雷电伤害（X为此牌判定结果为♠的次数）。判定完成后，将此牌移动到下家的判定区里。',
 			qibaodao:'七宝刀',

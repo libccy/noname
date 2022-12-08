@@ -532,7 +532,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_wuguotai:['female','wu',3,['gzbuyi','ganlu'],['gzskin']],
 				gz_lukang:['male','wu',3,['keshou','zhuwei'],['gzskin']],
 				gz_yuanshu:['male','qun',4,['gzweidi','gzyongsi'],['gzskin']],
-				gz_zhangxiu:['male','qun',4,['gzfudi','congjian'],['gzskin']],
+				gz_zhangxiu:['male','qun',4,['gzfudi','gzcongjian'],['gzskin']],
 				gz_jun_caocao:['male','wei',4,['jianan','huibian','gzzongyu','wuziliangjiangdao'],[]],
 				
 				gz_jin_zhangchunhua:['female','jin',3,['gzhuishi','gzqingleng']],
@@ -5379,7 +5379,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var target=trigger.player;
 					event.target=target;
-					if(player.countDiscardableCards(target,'e')){
+					if(!player.countDiscardableCards(target,'e')){
 						player.draw();
 						event.finish();
 						return;
@@ -6270,7 +6270,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			congjian:{
+			gzcongjian:{
 				trigger:{
 					player:'damageBegin3',
 					source:'damageBegin1',
@@ -8824,6 +8824,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			gzsanyao:{
+				audio:'sanyao',
+				inherit:'sanyao',
+				filterTarget:function(card,player,target){
+					return target.hp>player.hp||target.countCards('h')>player.countCards('h');
+				},
+			},
 			gzzhiman:{
 				audio:'zhiman',
 				inherit:'zhiman',
@@ -10185,6 +10192,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					target.chooseBool(get.prompt('gzyicheng'),'摸一张牌，然后弃置一张牌').set('frequentSkill','gzyicheng');
 					'step 1'
 					if(result.bool){
+						player.logSkill('gzyicheng',target);
 						target.draw();
 						target.chooseToDiscard('he',true);
 					}
@@ -10257,7 +10265,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(get.type(card)!='equip') return true;
 							return target.isEmpty(get.subtype(card));
 						},
-						prompt:get.prompt2('huyuan'),
+						prompt:get.prompt2('gzhuyuan'),
 						ai1:function(card){
 							var player=_status.event.player;
 							if(get.type(card)!='equip') return 0;
@@ -10267,11 +10275,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player,card=ui.selected.cards[0];
 							return get.effect(target,card,player,player);
 						},
-					}).setHiddenSkill('huyuan');
+					}).setHiddenSkill('gzhuyuan');
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0],card=result.cards[0];
-						player.logSkill('huyuan',target);
+						player.logSkill('gzhuyuan',target);
 						if(get.type(card)=='equip'){
 							player.$give(card,target,false);
 							game.delayx();
@@ -10809,7 +10817,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return event.name=='addJudge'||(event.card.name!='chiling'&&get.effect(event.target,event.card,event.player,player)<0);
 				},
 				filter:function(event,player){
-					return get.type(event.card,'trick')=='trick'&&get.color(event.card)=='black';
+					if(event.name=='addJudge') return get.color(event.card)=='black';
+					return get.type(event.card,null,false)=='trick'&&get.color(event.card)=='black';
 				},
 				content:function(){
 					if(trigger.name=='addJudge'){
@@ -10842,7 +10851,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return event.name=='addJudge'||get.effect(event.target,event.card,event.player,player)<0;
 				},
 				filter:function(event,player){
-					return event.card.name=='shunshou'||event.card.name=='lebu';
+					return event.card.name==(event.name=='addJudge'?'lebu':'shunshou');
 				},
 				content:function(){
 					if(trigger.name=='addJudge'){
@@ -12543,8 +12552,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gz_zhangxiu:'张绣',
 			gzfudi:'附敌',
 			gzfudi_info:'当你受到伤害后，你可以交给伤害来源一张手牌。若如此做，你对其势力中体力值最大且不小于你的一名角色造成一点伤害。',
-			congjian:'从谏',
-			congjian_info:'锁定技，当你于回合外造成伤害，或于回合内受到伤害时，此伤害+1。',
+			gzcongjian:'从谏',
+			gzcongjian_info:'锁定技，当你于回合外造成伤害，或于回合内受到伤害时，此伤害+1。',
 			gz_jun_caocao:'君曹操',
 			jianan:'建安',
 			jianan_info:'君主技，只要此武将处于明置状态，你便拥有“五子良将纛”。',
@@ -12655,6 +12664,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			qianhuan:'千幻',
 			qianhuan_bg:'幻',
 			qianhuan_info:'当与你势力相同的一名角色受到伤害后，你可以将一张与你武将牌上花色均不同的牌置于你的武将牌上。当一名与你势力相同的角色成为基本牌或锦囊牌的唯一目标时，你可以移去一张“千幻”牌，取消之。',
+			gzsanyao_info:'出牌阶段限一次。你可以弃置一张牌，对一名手牌数或体力值大于你的角色造成1点伤害。',
 			gzzhiman:'制蛮',
 			gzzhiman_info:'当你对其他角色造成伤害时，你可以防止此伤害。若如此做，你获得其装备区或判定区里的一张牌。然后若该角色与你势力相同，该角色可以变更副将。',
 			
@@ -12774,9 +12784,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzduanchang:'断肠',
 			gzduanchang_info:'锁定技，当你死亡时，你令杀死你的角色失去一张武将牌上的所有技能。',
 			gzweimu:'帷幕',
-			gzweimu_info:'锁定技，当你成为黑色锦囊牌的目标时，取消之。',
+			gzweimu_info:'锁定技，当你成为黑色普通锦囊牌的目标时，或有黑色延时锦囊牌进入你的判定区时，取消之。',
 			gzqianxun:'谦逊',
-			gzqianxun_info:'锁定技，当你成为【顺手牵羊】或【乐不思蜀】的目标时，取消之。',
+			gzqianxun_info:'锁定技，当你成为【顺手牵羊】的目标时，或有【乐不思蜀】进入你的判定区时，取消之。',
 			gzkongcheng:'空城',
 			gzkongcheng_info:'锁定技，当你成为【杀】或【决斗】的目标时，若你没有手牌，则取消之',
 			gzxiaoji:'枭姬',
@@ -12823,7 +12833,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzzhaosong:'诏颂',
 			gzzhaosong_info:'每局游戏每项限一次。①一名角色进入濒死状态时，你可以令其回复至2点体力并摸一张牌。②出牌阶段，你可观看一名其他角色的所有暗置武将牌和手牌，然后可以获得其区域内的一张牌。③一名角色使用【杀】选择唯一目标后，你可以为此【杀】增加两个目标。',
 			gzlisi:'离思',
-			gzlisi:'一名己方角色死亡后，你可以选择〖诏颂〗中的一个已发动过的选项，令其视为未发动过。',
+			gzlisi_info:'一名己方角色死亡后，你可以选择〖诏颂〗中的一个已发动过的选项，令其视为未发动过。',
 			gzcaiyuan:'才媛',
 			gzcaiyuan_info:'锁定技。结束阶段开始时，若你的手牌数大于本回合开始时的手牌数，则你摸两张牌或回复1点体力。',
 			gzwanyi:'婉嫕',

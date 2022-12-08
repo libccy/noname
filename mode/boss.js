@@ -2169,14 +2169,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			iwasawa_crowbow:{
 				equipSkill:true,
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+				},
 				direct:true,
 				filter:function(event,player){
-					return event.hs&&event.hs.length>1&&player.isPhaseUsing();
+					var evt=event.getl(player);
+					return evt&&evt.hs&&evt.hs.length>1&&player.isPhaseUsing();
 				},
 				content:function(){
 					'step 0'
-					event.num=trigger.hs.length;
+					var evt=trigger.getl(player);
+					event.num=evt.hs.length;
 					player.chooseTarget(get.prompt('iwasawa_crowbow'),'弃置一名其他角色的'+get.cnNumber(event.num)+'张牌',function(card,player,target){
 						return player!=target&&target.countDiscardableCards(player,'he')>0;
 					}).set('ai',function(target){
@@ -2778,7 +2783,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			//孟婆:
 			"boss_shiyou":{
 				audio:true,
-    trigger:{global:'loseEnd'},
+    trigger:{global:'loseAfter'},
 				filter:function(event,player){
 					var evt=event.getParent(3);
 					return event.type=='discard'&&evt.name=='phaseDiscard'&&evt.player==event.player&&evt.player!=player&&event.cards2&&event.cards2.filterInD('d').length>0;

@@ -10653,7 +10653,6 @@
 						},event.chooseTime);
 					}
 					if(event.isMine()){
-						ui.arena.classList.add('choose-to-move');
 						delete ui.selected.guanxing_button;
 						var list=event.list,filterMove=event.filterMove,filterOk=event.filterOk;
 						_status.imchoosing=true;
@@ -10682,7 +10681,10 @@
 						event.dialog.classList.add('scroll1');
 						event.dialog.classList.add('scroll2');
 						event.dialog.classList.add('fullwidth');
-						event.dialog.classList.add('fullheight');
+						if(list.length>1){
+							ui.arena.classList.add('choose-to-move');
+							event.dialog.classList.add('fullheight');
+						}
 						
 						event.moved=[];
 						var buttonss=[];
@@ -13072,6 +13074,73 @@
 					}
 					if(event.dialog&&event.dialog.close) event.dialog.close();
 				},
+				discardMultiple:function(){
+					'step 0'
+					event.type='discard';
+					if(!event.position) event.position=ui.discardPile;
+					var cards=[];
+					event.cards=cards;
+					for(var i=0;i<event.lose_list.length;i++){
+						var next=event.lose_list[i][0].lose(event.lose_list[i][1],event.position);
+						game.log(event.lose_list[i][0],'弃置了',event.lose_list[i][1]);
+						next.type=='discard';
+						cards.addArray(event.lose_list[i][1]);
+						next.getlx=false;
+					}
+					var evt=event;
+					if(evt.animate!=false){
+						evt.discardid=lib.status.videoId++;
+						game.broadcastAll(function(list,id){
+							for(var i of list){
+								i[0].$throw(i[1],null,'nobroadcast');
+							}
+							var cardnodes=[];
+							cardnodes._discardtime=get.time();
+							for(var ix of list){
+								var card=ix[1];
+								for(var i=0;i<cards.length;i++){
+									if(cards[i].clone){
+										cardnodes.push(cards[i].clone);
+									}
+								}
+							}
+							ui.todiscard[id]=cardnodes;
+						},event.lose_list,evt.discardid);
+						if(lib.config.sync_speed&&cards[0]&&cards[0].clone){
+							if(evt.delay!=false){
+								var waitingForTransition=get.time();
+								evt.waitingForTransition=waitingForTransition;
+								cards[0].clone.listenTransition(function(){
+									if(_status.waitingForTransition==waitingForTransition&&_status.paused){
+										game.resume();
+									}
+									delete evt.waitingForTransition;
+								});
+							}
+							else if(evt.getParent().discardTransition){
+								delete evt.getParent().discardTransition;
+								var waitingForTransition=get.time();
+								evt.getParent().waitingForTransition=waitingForTransition;
+								cards[0].clone.listenTransition(function(){
+									if(_status.waitingForTransition==waitingForTransition&&_status.paused){
+										game.resume();
+									}
+									delete evt.getParent().waitingForTransition;
+								});
+							}
+						}
+					}
+					'step 1'
+					if(event.delay!=false){
+						if(event.waitingForTransition){
+							_status.waitingForTransition=event.waitingForTransition;
+							game.pause();
+						}
+						else{
+							game.delayx();
+						}
+					}
+				},
 				chooseToCompareLose:function(){
 					for(var i=0;i<event.lose_list.length;i++){
 						var next=event.lose_list[i][0].lose(event.lose_list[i][1],ui.ordering);
@@ -14707,7 +14776,7 @@
 					else{
 						game.log(player,'展示了',cards);
 					}
-					game.delayx(2);
+					game.delayx(event.delay_time||2.5);
 					game.addVideo('showCards',player,[event.str,get.cardsInfo(cards)]);
 					"step 1"
 					game.broadcast('closeDialog',event.dialogid);
@@ -16148,7 +16217,7 @@
 				lose:function(){
 					"step 0"
 					var evt=event.getParent();
-					if((evt.name!='discard'&&event.type!='discard')&&(evt.name!='loseToDiscardpile'&&event.type!='loseToDiscardpile')){
+					if((evt.name!='discard'||event.type!='discard')&&(evt.name!='loseToDiscardpile'||event.type!='loseToDiscardpile')){
 						event.delay=false;
 						return;
 					}
@@ -19599,13 +19668,17 @@
 							var player=_status.event.player;
 							var event=_status.event.getParent();
 							var getn=function(card){
-								if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13*(event.small?-1:1);
-								return get.number(card)*(event.small?-1:1);
+								if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13*(Boolean(event.small)?-1:1);
+								return get.number(card)*(Boolean(event.small)?-1:1);
 							}
-							if(source&&source!=player&&get.attitude(player,source)>1){
-								return -getn(card)-get.value(card)/2+addi;
+							if(source&&source!=player){
+								if((get.attitude(player,source)>1)==Boolean(event.small)) return -getn(card)-get.value(card)/2+addi;
+								return getn(card)-get.value(card)/2+addi;
 							}
-							return getn(card)-get.value(card)/2+addi;
+							else{
+								if(Boolean(event.small)) return -getn(card)-get.value(card)/2+addi;
+								return getn(card)-get.value(card)/2+addi;
+							}
 						}
 						next.setContent('chooseToCompareMultiple');
 					}
@@ -19619,21 +19692,21 @@
 							}
 							var player=get.owner(card);
 							var getn=function(card){
-								if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13*(event.small?-1:1);
-								return get.number(card)*(event.small?-1:1);
+								if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13;
+								return get.number(card);
 							}
 							var event=_status.event.getParent();
 							var to=(player==event.player?event.target:event.player);
 							var addi=(get.value(card)>=8&&get.type(card)!='equip')?-6:0;
 							if(card.name=='du') addi-=5;
 							if(player==event.player){
-								if(get.attitude(player,to)>0&&event.small){
+								if(Boolean(event.small)){
 									return -getn(card)-get.value(card)/2+addi;
 								}
 								return getn(card)-get.value(card)/2+addi;
 							}
 							else{
-								if(get.attitude(player,to)>0){
+								if((get.attitude(player,to)<=0)==Boolean(event.small)){
 									return -getn(card)-get.value(card)/2+addi;
 								}
 								return getn(card)-get.value(card)/2+addi;
@@ -20873,7 +20946,7 @@
 								map.cards2.addArray(evt.cards2);
 							}
 						});
-						if(map.cards.length>0||map.ss.length>0||map.xs.length>0) return map;
+						return map;
 					};
 					next.gaintag=[];
 					return next;
@@ -20940,7 +21013,7 @@
 								map.cards2.addArray(evt.cards2);
 							}
 						});
-						if(map.cards.length>0||map.ss.length>0||map.xs.length>0) return map;
+						return map;
 					};
 					next.gaintag=[];
 					return next;
@@ -20999,6 +21072,16 @@
 					next.setContent('lose');
 					next.getl=function(player){
 						if(this.getlx!==false&&this.player==player) return this;
+						return {
+							player:player,
+							hs:[],
+							es:[],
+							js:[],
+							ss:[],
+							xs:[],
+							cards:[],
+							cards2:[],
+						};
 					};
 					return next;
 				},
@@ -21389,16 +21472,24 @@
 								map.cards2.addArray(evt.cards2);
 							}
 						});
-						if(map.cards.length>0||map.ss.length>0||map.xs.length>0) return map;
+						return map;
 					};
 					return next;
 				},
 				addJudge:function(card,cards){
 					var next=game.createEvent('addJudge');
-					next.card=card;
-					next.cards=cards;
-					if(next.cards==undefined) next.cards=[card];
-					if(get.itemtype(next.cards)=='card') next.cards=[next.cards];
+					if(get.itemtype(card)=='card'){
+						next.card=card;
+						next.cards=[card];
+					}
+					else{
+						next.cards=cards;
+						if(get.itemtype(next.cards)=='card') next.cards=[next.cards];
+						if(typeof card=='string'){
+							card={name:card};
+						}
+						next.card=get.autoViewAs(card,next.cards)
+					}
 					next.player=this;
 					next.setContent('addJudge');
 					next.getl=function(player){
@@ -21424,7 +21515,7 @@
 								map.cards2.addArray(evt.cards2);
 							}
 						});
-						if(map.cards.length>0||map.ss.length>0||map.xs.length>0) return map;
+						return map;
 					};
 					return next;
 				},
@@ -22552,7 +22643,37 @@
 							this.disabledSkills[skills]=[];
 							var info=get.info(skills);
 							if(info.ondisable&&info.onremove){
-								info.onremove(this);
+								if(typeof info.onremove=='function'){
+									info.onremove(this,skill);
+								}
+								else if(typeof info.onremove=='string'){
+									if(info.onremove=='storage'){
+										delete this.storage[skill];
+									}
+									else{
+										var cards=this.storage[skill];
+										if(get.itemtype(cards)=='card'){
+											cards=[cards];
+										}
+										if(get.itemtype(cards)=='cards'){
+											if(this.onremove=='discard'){
+												this.$throw(cards);
+											}
+											if(this.onremove=='discard'||this.onremove=='lose'){
+												game.cardsDiscard(cards);
+												delete this.storage[skill];
+											}
+										}
+									}
+								}
+								else if(Array.isArray(info.onremove)){
+									for(var i=0;i<info.onremove.length;i++){
+										delete this.storage[info.onremove[i]];
+									}
+								}
+								else if(info.onremove===true){
+									delete this.storage[skill];
+								}
 							}
 						}
 						this.disabledSkills[skills].add(skill);
@@ -25765,6 +25886,18 @@
 						this.trigger(this.name+'Cancelled');
 						if(this.player&&lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name)}
 				},
+				neutralize:function(){
+					this.untrigger.call(this,arguments);
+					this.finish();
+					this._neutralized=true;
+					this.trigger('eventNeutralized');
+				},
+				unneutralize:function(){
+					this.untrigger.call(this,arguments);
+					delete this._neutralized;
+					delete this.finished;
+					if(this.type=='card'&&this.card&&this.name=='sha') this.directHit=true;
+				},
 				goto:function(step){
 					this.step=step-1;
 				},
@@ -27888,7 +28021,7 @@
 				}
 			},
 			_discard:{
-				trigger:{global:['discardAfter','loseToDiscardpileAfter']},
+				trigger:{global:['discardAfter','loseToDiscardpileAfter','loseAsyncAfter']},
 				forced:true,
 				popup:false,
 				priority:-100,
@@ -29266,7 +29399,7 @@
 						map.cards2.addArray(evt.cards2);
 					}
 				});
-				if(map.cards.length>0||map.ss.length>0||map.xs.length>0) return map;
+				return map;
 			};
 			if(arg&&get.is.object(arg)){
 				for(var i in arg) next[i]=arg[i];
@@ -51045,8 +51178,8 @@
 						isCard:true,
 						cardid:card.cardid,
 						wunature:card.wunature,
-						storage:card.storage,
-						cards:card.cards,
+						storage:get.copy(card.storage),
+						cards:get.copy(card.cards),
 					};
 					if(get.itemtype(cards)=='cards'&&!card.cards) next.cards=cards.slice(0);
 					else if(get.itemtype(card)=='card') next.cards=[card];
@@ -53490,7 +53623,9 @@
 				if(!simple||get.is.phoneLayout()){
 					var es=node.getCards('e');
 					for(var i=0;i<es.length;i++){
-						uiintro.add('<div><div class="skill">'+es[i].outerHTML+'</div><div>'+lib.translate[es[i].name+'_info']+'</div></div>');
+						var cardinfo=lib.card[es[i].name];
+						if(cardinfo&&cardinfo.cardPrompt) uiintro.add('<div><div class="skill">'+es[i].outerHTML+'</div><div>'+cardinfo.cardPrompt(es[i])+'</div></div>');
+						else uiintro.add('<div><div class="skill">'+es[i].outerHTML+'</div><div>'+lib.translate[es[i].name+'_info']+'</div></div>');
 						uiintro.content.lastChild.querySelector('.skill>.card').style.transform='';
 					}
 					var js=node.getCards('j');
