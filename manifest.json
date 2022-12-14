@@ -1,0 +1,14 @@
+{
+    "short_name": "无名杀",
+    "name": "无名杀",
+    "icon": [
+        {
+            "src": "favicon.jpeg",
+            "type": "image/jpeg",
+            "sizes": "48x48"
+        }
+    ],
+    "start_url": "index.html",
+    "display": "standalone",
+    "orientation": "landscape"
+}
