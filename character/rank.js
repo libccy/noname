@@ -532,6 +532,8 @@ window.noname_character_rank={
 		'fengfang',
 		'prp_zhugeliang',
 		'dukui',
+		'quanhuijie',
+		'yinfuren',
 	],
 	bp:[
 		'chess_diaochan',
@@ -819,6 +821,11 @@ window.noname_character_rank={
 		'zhangfen',
 		'ol_dianwei',
 		'wangyan',
+		'chengui',
+		'dc_huangquan',
+		'dc_huban',
+		'dingshangwan',
+		're_zhuhuan',
 	],
 	b:[
 		'diy_feishi',
@@ -1060,6 +1067,8 @@ window.noname_character_rank={
 		're_sp_taishici',
 		'dc_lvkuanglvxiang',
 		'dengzhong',
+		'dc_liru',
+		'kebineng',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1295,6 +1304,7 @@ window.noname_character_rank={
 		'wangxiang',
 		'duji',
 		'bianxi',
+		'junk_sunquan',
 	],
 	rarity:{
 		legend:[
@@ -1419,6 +1429,7 @@ window.noname_character_rank={
 			'shen_machao',
 			'tw_shen_guanyu',
 			'huojun',
+			'quanhuijie',
 			'key_tomoya',
 			'key_masato',
 			'key_shiorimiyuki',
@@ -2042,6 +2053,10 @@ window.noname_character_rank={
 			'guanhai',
 			'dukui',
 			'ol_dianwei',
+			'chengui',
+			'dingshangwan',
+			're_zhuhuan',
+			'yinfuren',
 		],
 		junk:[
 			'sunshao',
@@ -2065,6 +2080,7 @@ window.noname_character_rank={
 			'duji',
 			'dc_liuba',
 			'bianxi',
+			'junk_sunquan',
 		],
 	}
 };

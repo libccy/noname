@@ -63,6 +63,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhangliao:['shen_zhangliao','ol_zhangliao'],
 			shen_zhaoyun:['shen_zhaoyun','boss_zhaoyun'],
 			shen_guanyu:['shen_guanyu','tw_shen_guanyu'],
+			shen_sunquan:['shen_sunquan','junk_sunquan'],
 		},
 		characterFilter:{
 			shen_diaochan:function(mode){
@@ -4949,66 +4950,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return target!=player&&target.countCards('h');
 				},
 				content:function(){
-					"step 0"
-					event.videoId=lib.status.videoId++;
+					'step 0'
 					var cards=target.getCards('h');
-					if(player.isOnline2()){
-						player.send(function(cards,id){
-							ui.create.dialog('攻心',cards).videoId=id;
-						},cards,event.videoId);
-					}
-					event.dialog=ui.create.dialog('攻心',cards);
-					event.dialog.videoId=event.videoId;
-					if(!event.isMine()){
-						event.dialog.style.display='none';
-					}
-					player.chooseButton().set('filterButton',function(button){
-						return get.suit(button.link)=='heart';
-					}).set('dialog',event.videoId);
-					"step 1"
+					player.chooseButton(2,[
+						'攻心',
+						cards,
+						[['弃置此牌','置于牌堆顶'],'tdnodes'],
+					]).set('filterButton',function(button){
+						var type=typeof button.link;
+						if(ui.selected.buttons.length&&type==typeof ui.selected.buttons[0].link) return false;
+						return type=='string'||get.suit(button.link)=='heart';
+					});
+					'step 1'
 					if(result.bool){
-						event.card=result.links[0];
-						var func=function(card,id){
-							var dialog=get.idDialog(id);
-							if(dialog){
-								for(var i=0;i<dialog.buttons.length;i++){
-									if(dialog.buttons[i].link==card){
-										dialog.buttons[i].classList.add('selectedx');
-									}
-									else{
-										dialog.buttons[i].classList.add('unselectable');
-									}
-								}
-							}
+						if(typeof result.links[0]!='string') result.links.reverse();
+						var card=result.links[1],choice=result.links[0];
+						if(choice=='弃置此牌') target.discard(card);
+						else{
+							player.showCards(card,get.translation(player)+'对'+get.translation(target)+'发动了【攻心】');
+							target.lose(card,ui.cardPile,'visible','insert');
 						}
-						if(player.isOnline2()){
-							player.send(func,event.card,event.videoId);
-						}
-						else if(event.isMine()){
-							func(event.card,event.videoId);
-						}
-						player.chooseControl('gongxin_discard','gongxin_top');
-					}
-					else{
-						if(player.isOnline2()){
-							player.send('closeDialog',event.videoId);
-						}
-						event.dialog.close();
-						event.finish();
-					}
-					"step 2"
-					if(player.isOnline2()){
-						player.send('closeDialog',event.videoId);
-					}
-					event.dialog.close();
-					var card=event.card;
-					if(result.control=='gongxin_top'){
-						player.showCards(card,'置于牌堆顶');
-						target.lose(card,ui.cardPile,'insert','visible');
-						game.log(player,'将',event.card,'置于牌堆顶');
-					}
-					else{
-						target.discard(card);
 					}
 				},
 				ai:{

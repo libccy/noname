@@ -1083,6 +1083,8 @@ input.fileinput::-webkit-file-upload-button {
 .menubutton.blue{
 	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1));
 }
+.tdnodes.selected,
+.text.selected,
 .bluebg{
 	background-image: linear-gradient(rgba(47,101,150,1), rgba(43, 90, 132,1)) !important;
 }

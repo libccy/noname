@@ -13,10 +13,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				yijiang_2015:['caoxiu','caorui','zhongyao','xiahoushi','liuchen','zhangyi','zhuzhi','quancong','sunxiu','gongsunyuan','guotufengji'],
 				yijiang_2016:['guohuanghou','sunziliufang','huanghao','liyan','sundeng','cenhun','zhangrang','liuyu'],
 				yijiang_2017:['xinxianying','jikang','wuxian','qinmi','xuezong','xushi','caiyong','caojie'],
-				yijiang_2022:['lukai'],
+				yijiang_2022:['lukai','kebineng'],
 			},
 		},
 		character:{
+			kebineng:['male','qun',4,['kousheng']],
 			lukai:['male','wu',4,['lkbushi','lkzhongzhuang']],
 			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
 			old_guanzhang:['male','shu',4,['old_fuhun']],
@@ -101,6 +102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yujin:["male","wei",4,["yizhong"],[]],
 		},
 		characterIntro:{
+			kebineng:'轲比能（？～235年），为中国三国时期的鲜卑首领之一。轲比能出身鲜卑支部，因他作战勇敢，执法公平，不贪财物，所以被鲜卑民众推举为大人。轲比能因其部落近塞，所以他抓住有利条件积极学习汉族先进技术和文化，促进了鲜卑族的进步和北方的民族融合。轲比能统率下的部众，战守有法，战斗力相当强大。自曹操北征后向曹氏进贡表示效忠。魏文帝时，轲比能受封附义王。轲比能在进行部落统一战争时，受魏国干涉，受沉重打击，于是对魏怀贰，献书魏帝表忠，以麻痹魏庭，使之放松警惕。此后，轲比能的部众变得强盛，控弦十余万骑，为害魏国边境。每次钞略得财物，轲比能都公开透明地均平分配，所以得部众死力，各部大人都敬畏之。实力强大后，他继续部落统一战争，于是威行诸部落，建立起强大的鲜卑族政权。深感威胁的魏国幽州刺史王雄派刺客韩龙将其刺杀，其政权立刻崩溃，鲜卑民族再次陷入混战。',
 			lukai:'陆凯（198－269年），字敬风，吴郡吴县（今江苏省苏州市）人。三国时期吴国重臣，丞相陆逊的族侄，大司马陆抗的族兄。黄武年间，举孝廉出身，曾任永兴县长、诸暨县长，颇有治绩。拜建武都尉、儋耳太守，与聂友率军讨伐朱崖和儋耳，迁建武校尉。五凤二年（255年），讨斩零陵山贼陈毖，拜偏将军、巴丘督，册封都乡侯。迁武昌右部督，随军进入寿春。后拜荡魏将军，加号绥远将军。吴景帝孙休继位，拜征北将军、假节、领豫州牧。孙皓即位，迁任镇西大将军，都督巴丘，又领荆州牧，进封嘉兴侯。宝鼎元年（266年），迁左丞相。以正直及屡次劝谏孙皓而闻名。建衡元年（269年），去世，时年七十二。',
 			caozhi:'字子建，沛国谯人，三国曹魏著名文学家，建安文学代表人物。魏武帝曹操之子，魏文帝曹丕之弟，生前曾为陈王，去世后谥号“思”，因此又称陈思王。南朝宋文学家谢灵运更有“天下才有一石，曹子建独占八斗”的评价。王士祯尝论汉魏以来二千年间诗家堪称“仙才”者，曹植、李白、苏轼三人耳。',
 			gaoshun:'中国东汉末年将领，吕布帐下中郎将。史载高顺为人清白有威严，不好饮酒，所统率的部队精锐非常，号称“陷阵营”。屡进忠言于吕布，吕布虽知其忠而不能用。曹操击破吕布后，高顺被曹操所杀。',
@@ -197,6 +199,113 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhonghui:['jiangwei'],
 		},
 		skill:{
+			//轲比能
+			kousheng:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseCard('h',[1,player.countCards('h')],get.prompt('kousheng'),'你可以选择任意张手牌，这些手牌于本回合内视为无次数限制的【杀】。但当有角色受到这些【杀】的伤害后，其可以用所有手牌交换剩余的牌。').set('standard',player.getUseValue({name:'sha'},null,true)).set('ai',function(card){
+						var player=_status.event.player,standard=_status.event.standard;
+						if(standard<=0) return 0;
+						var eff=player.getUseValue(card,null,true);
+						if(eff<=standard) return standard-eff+0.1;
+						return 0;
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('kousheng');
+						player.addGaintag(result.cards,'kousheng');
+						player.addTempSkill('kousheng_effect');
+						game.delayx();
+					}
+				},
+				subSkill:{
+					effect:{
+						audio:'kousheng',
+						trigger:{player:'useCard1'},
+						forced:true,
+						charlotte:true,
+						firstDo:true,
+						filter:function(event,player){
+							if(event.card.name!='sha') return false;
+							return player.hasHistory('lose',function(evt){
+								if(evt.getParent()!=event) return false;
+								for(var i in evt.gaintag_map){
+									if(evt.gaintag_map[i].contains('kousheng')) return true;
+								}
+								return false;
+							});
+						},
+						content:function(){
+							if(!trigger.card.storage) trigger.card.storage={};
+							trigger.card.storage.kousheng=true;
+							if(trigger.addCount!==false){
+								trigger.addCount=false;
+								player.getStat('card').sha--;
+							}
+						},
+						onremove:function(player){
+							player.removeGaintag('kousheng');
+						},
+						mod:{
+							cardUsable:function(card,player,target){
+								if(card.name!='sha'||!card.cards) return;
+								for(var i of card.cards){
+									if(i.hasGaintag('kousheng')) return Infinity;
+								}
+							},
+							cardname:function(card){
+								if(card.hasGaintag('kousheng')) return 'sha';
+							},
+							cardnature:function(card){
+								if(card.hasGaintag('kousheng')) return false;
+							},
+						},
+						group:'kousheng_damage',
+					},
+					damage:{
+						audio:'kousheng',
+						trigger:{source:'damageSource'},
+						forced:true,
+						filter:function(event,player){
+							if(!event.card.storage||!event.card.storage.kousheng||event.getParent().type!='card') return false;
+							var target=event.player;
+							return target.isIn()&&player.hasCard(function(card){
+								return card.hasGaintag('kousheng');
+							},'h');
+						},
+						content:function(){
+							'step 0'
+							var target=trigger.player;
+							event.target=target;
+							var cards=player.getCards('h',function(card){
+								return card.hasGaintag('kousheng');
+							});
+							event.cards=cards;
+							var str=get.translation(player);
+							player.showCards(cards,str+'的【寇胜】牌');
+							if(target.countCards('h')>0) target.chooseBool('是否交换“寇胜”牌？','用你的所有手牌交换'+str+'的下列“寇胜”牌：'+get.translation(cards)).set('ai',function(){
+								var player=_status.event.player,target=_status.event.getParent().player;
+								if(player.hasShan()||player.countCards('hs',{name:['tao','jiu']})>0||get.attitude(player,target)>=0) return false;
+								var hs1=player.getCards('h'),hs2=_status.event.getParent().cards;
+								if(hs2.length>=player.hp) return true;
+								if(get.value(hs1,player)>=get.value(hs2,target)) return false;
+								return true;
+							});
+							else event.finish();
+							'step 1'
+							if(result.bool){
+								player.swapHandcards(target,cards,target.getCards('h'));
+							}
+						},
+					},
+				},
+			},
 			//陆凯
 			lkbushi:{
 				audio:2,
@@ -946,42 +1055,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					event.videoId=lib.status.videoId++;
-					var func=function(card,id,bool){
-						var list=[
-							'为XXX多指定一个目标',
-							'令XXX无视防具',
-							'令XXX不可被抵消',
-							'当XXX造成伤害时摸一张牌',
-						];
-						var choiceList=ui.create.dialog('【奔袭】：请选择一至两项','forcebutton');
-						choiceList.videoId=id;
-						for(var i=0;i<list.length;i++){
-							list[i]=list[i].replace(/XXX/g,card);
-							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
-							if(i==0&&!bool) str+='<div style="opacity:0.5">';
-							str+=list[i];
-							if(i==0&&!bool) str+='</div>';
-							str+='</div>';
-							var next=choiceList.add(str);
-							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-							next.firstChild.link=i;
-							for(var j in lib.element.button){
-								next[j]=lib.element.button[j];
-							}
-							choiceList.buttons.add(next.firstChild);
-						}
-						return choiceList;
-					};
-					if(player.isOnline2()){
-						player.send(func,get.translation(trigger.card),event.videoId,lib.skill.xinbenxi.filterx(trigger,player));
+					var list=[
+						'为XXX多选择一个目标',
+						'　令XXX无视防具牌　',
+						'　令XXX不可被抵消　',
+						'当XXX造成伤害时摸牌',
+					],card=get.translation(trigger.card);
+					for(var i=0;i<list.length;i++){
+						list[i]=[i,list[i].replace(/XXX/g,card)];
 					}
-					event.dialog=func(get.translation(trigger.card),event.videoId,lib.skill.xinbenxi.filterx(trigger,player));
-					if(player!=game.me||_status.auto){
-						event.dialog.style.display='none';
-					}
-					var next=player.chooseButton();
-					next.set('dialog',event.videoId);
+					var next=player.chooseButton([
+						'奔袭：请选择一至两项',
+						[list.slice(0,2),'tdnodes'],
+						[list.slice(2,4),'tdnodes'],
+					]);
 					next.set('forced',true);
 					next.set('selectButton',[1,2]);
 					next.set('filterButton',function(button){
@@ -1028,10 +1115,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					});
 					"step 1"
-					if(player.isOnline2()){
-						player.send('closeDialog',event.videoId);
-					}
-					event.dialog.close();
 					var map=[
 						function(trigger,player,event){
 							player.chooseTarget('请选择'+get.translation(trigger.card)+'的额外目标',true,function(card,player,target){
@@ -5221,6 +5304,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinjuece:{
 				audio:'juece',
+				audioname:['dc_liru'],
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -5230,7 +5314,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt('xinjuece'),'对一名没有手牌的其他角色造成1点伤害',function(card,player,target){
+					player.chooseTarget(get.prompt('xinjuece'),'对一名没有手牌的角色造成1点伤害',function(card,player,target){
 						return target.countCards('h')==0;
 					}).set('ai',function(target){
 						var player=_status.event.player;
@@ -10321,7 +10405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(trigger,player){
 					if(trigger.getParent(3).name!='phaseDiscard'||!game.hasPlayer(function(current){
 						return current.isDamaged()&&get.recoverEffect(current,player,player)>0;
-					}))
+					})) return false;
 					var evt=trigger.getl(player);
 					for(var i=0;i<evt.cards2.length;i++){
 						if(get.position(evt.cards2[i],true)=='d'&&get.type(evt.cards2[i],false)=='equip'){
@@ -12382,7 +12466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			panzhangmazhong:['xin_panzhangmazhong','re_panzhangmazhong','panzhangmazhong'],
 			yufan:['xin_yufan','re_yufan','yufan'],
 			zhuran:['re_zhuran','xin_zhuran','zhuran','old_zhuran'],
-			liru:['re_liru','xin_liru','liru'],
+			liru:['re_liru','dc_liru','xin_liru','liru'],
 			fuhuanghou:['re_fuhuanghou','xin_fuhuanghou','fuhuanghou','old_fuhuanghou'],
 			chenqun:['chenqun','re_chenqun','old_chenqun'],
 			hanhaoshihuan:['re_hanhaoshihuan','hanhaoshihuan'],
@@ -13002,6 +13086,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lkbushi_info:'①你使用♠牌无次数限制。②当你使用或打出♥牌后，你摸一张牌。③当你成为♣牌的目标后，你可以弃置一张牌，令此牌对你无效。④结束阶段开始时，你从牌堆或弃牌堆获得一张♦牌。⑤准备阶段开始时，你可调整此技能中四种花色的对应顺序。',
 			lkzhongzhuang:'忠壮',
 			lkzhongzhuang_info:'锁定技。当你因执行【杀】的效果而造成伤害时，若你的攻击范围：大于3，则此伤害+1；小于3，则此伤害改为1。',
+			kebineng:'轲比能',
+			kousheng:'寇胜',
+			kousheng_info:'①出牌阶段开始时，你可以选择任意张手牌，这些牌称为“寇胜”直到回合结束。②你的“寇胜”均视为【杀】且无次数限制。③当你因执行对应实体牌包含“寇胜”的【杀】的效果而造成伤害后，你展示所有“寇胜”牌，然后目标角色可以用所有手牌交换这些牌。',
 			
 			yijiang_2011:'一将成名2011',
 			yijiang_2012:'一将成名2012',

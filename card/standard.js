@@ -2583,11 +2583,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							else{
 								trigger.neutralize();
 								if(event.guowuxie==true){
-									if(trigger.target.identity!='ye'&&trigger.target.identity!='unknown'){
-										trigger.getParent().excluded.addArray(game.filterPlayer(function(current){
-											return current.identity==trigger.target.identity;
-										}));
-									}
+									trigger.getParent().excluded.addArray(game.filterPlayer(function(current){
+										return current.isFriendOf(trigger.target);
+									}));
 								}
 							}
 						}

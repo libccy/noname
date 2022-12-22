@@ -160,7 +160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('zhefu'),'令一名有手牌的其他角色弃置一张【'+get.translation(trigger.card.name)+'】，否则受到你造成的1点伤害。',function(card,player,target){
-						return target!=player&&target.countCards('he')>0;
+						return target!=player&&target.countCards('h')>0;
 					}).set('ai',function(target){
 						var player=_status.event.player;
 						return get.damageEffect(target,player,player)/Math.sqrt(target.countCards('h'));
@@ -369,13 +369,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
-					return player!=event.player&&event.player.countCards('he')>0&&player.countCards('he')>=player.countMark('xiongshu_count');
+					return player!=event.player&&event.player.countCards('h')>0&&player.countCards('he')>=player.countMark('xiongshu_count');
 				},
 				content:function(){
 					'step 0'
 					event.target=trigger.player;
 					var num=player.countMark('xiongshu_count');
-					if(num>0) player.chooseToDiscard('he',num,get.prompt('xiongshu',trigger.player),'弃置'+get.cnNumber(num)+'张牌并展示其一张牌').set('goon',get.attitude(player,event.target)<0).set('ai',function(card){
+					if(num>0) player.chooseToDiscard('he',num,get.prompt('xiongshu',trigger.player),'弃置'+get.cnNumber(num)+'张牌并展示其一张手牌').set('goon',get.attitude(player,event.target)<0).set('ai',function(card){
 						if(!_status.event.goon) return 0;
 						return 6-_status.event.player.countMark('xiongshu_count')-get.value(card);
 					}).logSkill=['xiongshu',trigger.player];
@@ -388,8 +388,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('xiongshu_count','roundStart');
 						player.addMark('xiongshu_count',1,false);
 					}
-					if(result.bool&&target.countCards('he')>0){
-						player.choosePlayerCard(target,true,'he');
+					if(result.bool&&target.countCards('h')>0){
+						player.choosePlayerCard(target,true,'h');
 					}
 					else event.finish();
 					'step 2'
@@ -3685,10 +3685,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dezhang:'德彰',
 			dezhang_info:'觉醒技。准备阶段，若你没有“绥”，则你减1点体力上限并获得〖卫戍〗。',
 			weishu:'卫戍',
-			weishu_info:'锁定技。①当你于摸牌阶段外不因〖卫戊①〗而摸牌后，你令一名角色摸一张牌。②当你于弃牌阶段外不因〖卫戊②〗而弃置牌后，你弃置一名其他角色的一张牌。',
+			weishu_info:'锁定技。①当你于摸牌阶段外不因〖卫戍①〗而摸牌后，你令一名角色摸一张牌。②当你于弃牌阶段外不因〖卫戍②〗而弃置牌后，你弃置一名其他角色的一张牌。',
 			jin_jiachong:'贾充',
 			xiongshu:'凶竖',
-			xiongshu_info:'其他角色的出牌阶段开始时，你可弃置X张牌（X为你本轮内此前已发动过此技能的次数，为0则不弃）并展示其一张牌，然后你预测“其本阶段内是否会使用与展示牌牌名相同的牌”。此阶段结束时，若你的预测正确，则你对其造成1点伤害；否则你获得展示牌。',
+			xiongshu_info:'其他角色的出牌阶段开始时，你可弃置X张牌（X为你本轮内此前已发动过此技能的次数，为0则不弃）并展示其一张手牌，然后你预测“其本阶段内是否会使用与展示牌牌名相同的牌”。此阶段结束时，若你的预测正确，则你对其造成1点伤害；否则你获得展示牌。',
 			jianhui:'奸回',
 			jianhui_info:'锁定技。当你造成伤害后，若受伤角色为A，则你摸一张牌；当你受到伤害后，若伤害来源为A，则A弃置一张牌。（A为除本次伤害外最近一次对你造成过伤害的角色）',
 			xinxuanbei:'选备',

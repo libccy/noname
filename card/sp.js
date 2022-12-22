@@ -596,15 +596,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				cardSkill:true,
 				unique:true,
 				trigger:{player:'phaseDrawBegin'},
-				silent:true,
+				popup:false,
+				charlotte:true,
+				forced:true,
 				content:function(){
 					trigger.num--;
 				},
 				group:'caomu_skill2'
 			},
 			caomu_skill2:{
+				cardSkill:true,
+				popup:false,
+				forced:true,
 				trigger:{player:'phaseDrawAfter'},
-				silent:true,
 				content:function(){
 					var targets=game.filterPlayer(function(current){
 						return get.distance(player,current)<=1&&player!=current;

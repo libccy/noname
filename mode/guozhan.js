@@ -993,7 +993,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i of result.cards) list.add(get.type2(i));
 						if(list.length==result.cards.length){
 							target.draw();
-							player.getStat('skill').sanchen--;
+							player.getStat('skill').gzsanchen--;
 							player.addMark('gzsanchen',1);
 						}
 					}
@@ -1630,7 +1630,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						trigger:{source:'damageBegin1'},
 						filter:function(event,player){
-							return event.card&&(event.card.name=='sha'||event.card.name=='juedou')
+							return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&event.getParent().type=='card';
 						},
 						content:function(){
 							trigger.num++;
@@ -5196,6 +5196,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var next=trigger.player.chooseBool('是否对'+get.translation(player)+'发动【米道】？','令该角色修改'+get.translation(trigger.card)+'的花色和伤害属性');
+					next.set('ai',()=>false);
 					if(player==next.player) next.setHiddenSkill(event.name);
 					'step 1'
 					if(result.bool){
@@ -5875,80 +5876,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.syncStorage('yigui');
 						player.updateMarks('yigui');
 						game.log(player,'获得了'+get.cnNumber(list.length)+'张「魂」');
-					}
-				},
-			},
-			xindiaodu:{
-				audio:"diaodu",
-				group:'xindiaodu_use',
-				frequent:true,
-				preHidden:true,
-				subSkill:{
-					temp:{},
-					use:{
-						trigger:{
-							global:"useCard",
-						},
-						filter:function(event,player){
-							return get.type(event.card)=='equip'&&event.player.isAlive()&&
-							event.player.isFriendOf(player)&&(player==event.player||player.hasSkill('xindiaodu'))&&!event.player.hasSkill('xindiaodu_temp');
-						},
-						direct:true,
-						content:function(){
-							'step 0'
-							var next=trigger.player.chooseBool('是否发动【调度】摸一张牌？');
-							if(player.hasSkill('xindiaodu')) next.set('frequentSkill','xindiaodu');
-							if(player==trigger.player) next.setHiddenSkill('xindiaodu');
-							'step 1'
-							if(result.bool){
-								player.logSkill('xindiaodu',trigger.player);
-								trigger.player.draw('nodelay');
-								trigger.player.addTempSkill('xindiaodu_temp');
-							}
-						},
-					},
-				},
-				trigger:{
-					player:"phaseUseBegin",
-				},
-				filter:function(event,player){
-					return game.hasPlayer(function(current){
-						return current.isFriendOf(player)&&current.countGainableCards(player,'e')>0;
-					});
-				},
-				direct:true,
-				content:function(){
-					'step 0'
-					player.chooseTarget(get.prompt2('xindiaodu'),function(card,player,current){
-						return current.isFriendOf(player)&&current.countGainableCards(player,'e')>0;
-					}).setHiddenSkill(event.name).ai=function(target){
-						var num=1;
-						if(target.hasSkill('gzxiaoji')) num+=2.5;
-						if(target.isDamaged()&&target.getEquip('baiyin')) num+=2.5;
-						if(target.hasSkill('xuanlve')) num+=2;
-						return num;
-					};
-					'step 1'
-					if(result.bool){
-						event.target1=result.targets[0];
-						player.logSkill('xindiaodu',event.target1);
-						player.line(event.target1,'xindiaodu');
-						player.gainPlayerCard(event.target1,'e',true);
-					}
-					else event.finish();
-					'step 2'
-					if(result.bool&&player.getCards('h').contains(result.cards[0])){
-						event.card=result.cards[0];
-						player.chooseTarget('是否将'+get.translation(event.card)+'交给一名其他角色？',function(card,player,current){
-							return current!=player&&current!=_status.event.target1&&current.isFriendOf(player);
-						}).set('target1',event.target1);
-					}
-					else event.finish();
-					'step 3'
-					if(result.bool){
-						var target=result.targets[0];
-						player.line(target,'green');
-						target.gain(card,player,'give');
 					}
 				},
 			},
@@ -12566,9 +12493,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			huibian_info:'出牌阶段限一次，你可以选择一名魏势力角色和另一名已受伤的魏势力角色。若如此做，你对前者造成一点伤害，然后其摸两张牌，然后后者回复一点体力。',
 			gzzongyu:'总御',
 			gzzongyu_info:'当【六龙骖驾】进入其他角色的装备区后，你可以将你装备区内所有坐骑牌（至少一张）与【六龙骖驾】交换位置。锁定技，当你使用坐骑牌后，若场上或弃牌堆中有【六龙骖驾】，则将【六龙骖驾】置入你的装备区。',
-					
-			xindiaodu:"调度",
-			"xindiaodu_info":"每回合限一次，与你势力相同的角色使用装备牌时，其可以摸一张牌；出牌阶段开始时，你可以获得与你势力相同的一名角色装备区内的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
+			
 			yigui:"役鬼",
 			"yigui_info":"当你首次明置此武将牌时，你将剩余武将牌堆的两张牌扣置于游戏外，称为“魂”；你可以展示一张“魂”并将其置入剩余武将牌堆，视为使用了一张本回合内未以此法使用过的基本牌或普通锦囊牌。（此牌需指定目标，且目标须为未确定势力的角色或野心家或与此“魂”势力相同的角色）",
 			"yigui_init":"役鬼",

@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian","re_dengai","re_jiangwei","re_zhurong","re_caiwenji","re_xunyu","re_dianwei"],
 				mobile_yijiang1:["re_xusheng","re_lingtong","ol_yujin","re_wuguotai","re_gaoshun"],
 				mobile_yijiang2:["xin_liaohua","xin_caozhang","re_liubiao","re_handang","xin_chengpu","xin_gongsunzan","re_zhonghui","re_bulianshi"],
-				mobile_yijiang3:["xin_jianyong","xin_zhuran","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou","re_yufan"],
+				mobile_yijiang3:["re_liru","xin_jianyong","xin_zhuran","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou","re_yufan"],
 				mobile_yijiang4:["xin_zhoucang","xin_caifuren","xin_guyong","xin_sunluban","xin_caozhen","xin_jushou"],
 				mobile_yijiang5:['xin_sunxiu','xin_quancong'],
 				mobile_yijiang67:["re_jikang"],
@@ -26,6 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			re_liru:['male','qun',3,['rejuece','remieji','xinfencheng']],
 			re_dianwei:["male","wei",4,["reqiangxi"]],
 			xin_mamidi:['male','qun',3,['chengye','buxu']],
 			ruanhui:['female','wei',3,['mingcha','jingzhong']],
@@ -643,7 +644,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
-				trigger:{global:['useCardAfter','loseAfter','cardsDiscardAfter','loseAsyncAfter']},
+				trigger:{global:['useCardAfter','loseAfter','cardsDiscardAfter','loseAsyncAfter','equipAfter']},
 				forced:true,
 				filter:function(event,player){
 					if(player==event.player) return false;
@@ -652,14 +653,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var cards=event.cards.filterInD();
 						if(!cards.length) return false;
 					}
-					else if(event.name.indexOf('lose')==0){
-						if(event.getlx===false||event.position!=ui.discardPile) return false;
-						var cards=(event.cards2||event.cards).filter(function(card){
-							if(card.original=='j'||get.position(card,true)!='d') return false;
+					else if(event.name!='cardsDiscard'){
+						var cards=event.getd(null,'cards2').filter(function(card){
+							if(get.position(card,true)!='d') return false;
 							var type=get.type(card,false);
 							return type=='delay'||type=='equip';
 						});
-						cards.removeArray(event.getl(player).cards);
+						cards.removeArray(event.getd(player,'cards2'));
 						if(!cards.length) return false;
 					}
 					else{
@@ -687,13 +687,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(trigger.name=='useCard'){
 						cards=trigger.cards.filterInD();
 					}
-					else if(trigger.name.indexOf('lose')==0){
-						cards=(trigger.cards2|trigger.cards).filter(function(card){
-							if(get.position(card,true)!='d') return false;
+					else if(trigger.name!='cardsDiscard'){
+						cards=trigger.getd().filter(function(card){
+							if(card.original=='j'||get.position(card,true)!='d') return false;
 							var type=get.type(card,false);
 							return type=='delay'||type=='equip';
 						});
-						cards.removeArray(trigger.getl(player).cards);
+						cards.removeArray(trigger.getd(player));
 					}
 					else{
 						cards=trigger.cards.filter(function(card){
@@ -3547,7 +3547,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return card==lib.skill.jibing_backup.card;
 							},
 							selectCard:-1,
-							position:'s',
+							position:'x',
 							viewAs:{name:name},
 							card:card,
 						}
@@ -3633,7 +3633,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'metal',
 				filter:function(event,player){
-					return player.getStorage('jibing').length>=game.countGroup();
+					return player.getExpansions('jibing').length>=game.countGroup();
 				},
 				content:function(){
 					player.awakenSkill('moucuan');
@@ -5967,17 +5967,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					discard:{
 						trigger:{
-							global:['loseAfter','cardsDiscardAfter','loseAsyncAfter'],
+							global:['loseAfter','cardsDiscardAfter','loseAsyncAfter','equipAfter'],
 						},
 						forced:true,
 						locked:false,
 						filter:function(event,player){
-							return player.storage.yizhu&&player.storage.yizhu.length&&(event.name=='cardsDiscard'||(event.position==ui.discardPile&&event.getlx!==false))&&event.cards.filter(function(i){
+							return player.storage.yizhu&&player.storage.yizhu.length&&event.getd().filter(function(i){
 								return player.storage.yizhu.contains(i);
 							}).length>0;
 						},
 						content:function(){
-							var list=trigger.cards.filter(function(i){
+							var list=trigger.getd().filter(function(i){
 								return player.storage.yizhu.contains(i);
 							});
 							player.unmarkAuto('yizhu',list);
@@ -13575,14 +13575,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rebiaozhao2:{
 				trigger:{
-					global:["loseAfter","cardsDiscardAfter","loseAsyncAfter"],
+					global:["loseAfter","cardsDiscardAfter","loseAsyncAfter",'equipAfter'],
 				},
 				forced:true,
 				audio:"biaozhao",
 				filter:function(event,player){
-					if(event.name.indexOf('lose')==0&&(event.getlx===false||event.position!=ui.discardPile||event.getParent(2).name=='rebiaozhao3')) return false;
-					var cards=player.getExpansions('rebiaozhao');
-					if(!cards.length) return false;
+					var cards=player.getExpansions('rebiaozhao'),cards2=event.getd();
+					if(!cards.length||!cards2.length) return false;
 					var num=get.number(cards[0]);
 					for(var i=0;i<event.cards.length;i++){
 						if(get.number(event.cards[i])==num) return true;

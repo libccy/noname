@@ -1296,25 +1296,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete player.storage.xinfu_yanyu2;
 				},
 				trigger:{
-					global:["loseAfter","cardsDiscardAfter","loseAsyncAfter"],
+					global:["loseAfter","cardsDiscardAfter","loseAsyncAfter","equipAfter"],
 				},
 				direct:true,
-				filter:function (event,player){
+				filter:function(event,player){
 					if(player.storage.xinfu_yanyu2>=3) return false;
-					if(event.name.indexOf('lose')==0&&(event.getlx===false||event.position!=ui.discardPile)) return false;
-					var type=player.storage.xinfu_yanyu;
-					var cards=event.cards;
+					var type=player.storage.xinfu_yanyu,cards=event.getd();
 					for(var i=0;i<cards.length;i++){
 						if(get.type(cards[i],'trick')==type&&get.position(cards[i],true)=='d') return true;
 					}
 					return false;
 				},
-				content:function (){
+				content:function(){
 					'step 0'
 					event.logged=false;
 					event.cards=[];
 					var type=player.storage.xinfu_yanyu;
-					var cards=trigger.cards;
+					var cards=trigger.getd();
 					for(var i=0;i<cards.length;i++){
 						if(get.type(cards[i],'trick')==type&&get.position(cards[i],true)=='d') event.cards.push(cards[i]);
 					}

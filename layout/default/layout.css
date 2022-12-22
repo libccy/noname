@@ -1448,10 +1448,13 @@ div:not(.handcards)>.card>.info>span,
 .button.card.button>.intro {
 	top: 69px;
 }
+.buttons {
+	width: 100%;
+}
 .buttons.guanxing {
 	min-height: 106px;
-	width: 90%;
 	margin: 0px;
+	width: 90%;
 }
 .buttons.smallzoom {
 	display: block;
@@ -1733,7 +1736,8 @@ div:not(.handcards)>.card>.info>span,
 	margin: 8px;
 }
 .content>.caption + .buttons:not(*:last-child){
-	margin: 0
+	margin-top: 0;
+	margin-bottom: 0;
 }
 .content>.config {
 	height: 20px;
@@ -1770,6 +1774,7 @@ div:not(.handcards)>.card>.info>span,
 	display: block;
 	width: 100%;
 	font-size: 0px;
+	overflow-x: hidden;
 }
 .content>*{
 	font-size: 16px;
@@ -3473,6 +3478,8 @@ div:not(.handcards)>.card>.info>span,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.gaintag,
 #arena.selecting:not(.video) #me .card:not(.selectable)>.addinfo,
 #arena.selecting:not(.video) .dialog:not(.noselect) .button:not(.selectable):not(.noclick):not(.replaceButton),
+#arena.selecting:not(.video) .dialog:not(.noselect) .textbutton:not(.selectable):not(.noclick):not(.replaceButton),
+#arena.selecting:not(.video) .dialog:not(.noselect) .tdnodes:not(.selectable):not(.noclick):not(.replaceButton),
 .dead,.likedead {
 	opacity: 0.6;
 }
@@ -4569,7 +4576,7 @@ div[data-decoration="bronze"]::after{
 	opacity: 1;
 }
 
-.selected:not(.player):not(.card):not(.button),.selectedx {
+.selected:not(.tdnodes):not(.text):not(.player):not(.card):not(.button),.selectedx {
 	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px,rgba(255, 0, 0, 0.4) 0 0 5px, rgba(255, 0, 0, 0.4) 0 0 12px, rgba(255, 0, 0, 0.8) 0 0 15px !important;
 }
 

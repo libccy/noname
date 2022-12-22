@@ -657,6 +657,85 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//吕范
+			xindiaodu:{
+				audio:"diaodu",
+				group:'xindiaodu_use',
+				frequent:true,
+				preHidden:true,
+				isFriendOf:function(player,target){
+					if(get.mode()=='guozhan') return player.isFriendOf(target);
+					return player.group==target.group;
+				},
+				subSkill:{
+					temp:{},
+					use:{
+						trigger:{
+							global:"useCard",
+						},
+						filter:function(event,player){
+							return get.type(event.card)=='equip'&&event.player.isAlive()&&
+							lib.skill.xindiaodu.isFriendOf(player,event.player)&&(player==event.player||player.hasSkill('xindiaodu'))&&!event.player.hasSkill('xindiaodu_temp');
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							var next=trigger.player.chooseBool('是否发动【调度】摸一张牌？');
+							if(player.hasSkill('xindiaodu')) next.set('frequentSkill','xindiaodu');
+							if(player==trigger.player) next.setHiddenSkill('xindiaodu');
+							'step 1'
+							if(result.bool){
+								player.logSkill('xindiaodu',trigger.player);
+								trigger.player.draw('nodelay');
+								trigger.player.addTempSkill('xindiaodu_temp');
+							}
+						},
+					},
+				},
+				trigger:{
+					player:"phaseUseBegin",
+				},
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return lib.skill.xindiaodu.isFriendOf(current,player)&&current.countGainableCards(player,'e')>0;
+					});
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('xindiaodu'),function(card,player,current){
+						return lib.skill.xindiaodu.isFriendOf(current,player)&&current.countGainableCards(player,'e')>0;
+					}).setHiddenSkill(event.name).ai=function(target){
+						var num=1;
+						if(target.hasSkill('gzxiaoji')) num+=2.5;
+						if(target.isDamaged()&&target.getEquip('baiyin')) num+=2.5;
+						if(target.hasSkill('xuanlve')) num+=2;
+						return num;
+					};
+					'step 1'
+					if(result.bool){
+						event.target1=result.targets[0];
+						player.logSkill('xindiaodu',event.target1);
+						player.line(event.target1,'xindiaodu');
+						player.gainPlayerCard(event.target1,'e',true);
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool&&player.getCards('h').contains(result.cards[0])){
+						event.card=result.cards[0];
+						player.chooseTarget('是否将'+get.translation(event.card)+'交给一名其他角色？',function(card,player,current){
+							return current!=player&&current!=_status.event.target1&&lib.skill.xindiaodu.isFriendOf(current,player)
+						}).set('target1',event.target1);
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.gain(card,player,'give');
+					}
+				},
+			},
 			//夏侯玄
 			olhuanfu:{
 				audio:2,
@@ -775,7 +854,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<result.length;i++){
 						var current=event.list[i],card=result[i].cards[0];
 						lose_list.push([current,result[i].cards]);
-						card.classList.remove('glow');
 						cards.push(card);
 					}
 					var type=get.type2(cards[0]);
@@ -4729,7 +4807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else event.finish();
 							'step 3'
 							event.count--;
-							if(player.canUse('sha',target,false)) player.useCard({name:'sha',isCard:true},target,false);
+							if(target.isIn()&&player.canUse('sha',target,false)) player.useCard({name:'sha',isCard:true},target,false);
 							if(event.count>0) event.redo();
 							else if(event.num<targets.length) event.goto(1);
 						},
@@ -20183,6 +20261,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olqingyi_info:'①出牌阶段限一次，你可以选择至多两名有牌的其他角色。你和这些角色同时弃置一张牌，然后若这些牌类型均相同，则你重复此流程。②结束阶段开始时，若你本回合内发动〖清议①〗弃置的牌包含两种颜色，则你获得每种颜色的牌各一张。',
 			olzeyue:'迮阅',
 			olzeyue_info:'限定技。准备阶段，你可以选择一名于你的上个回合结束后对你造成过伤害的角色A及其武将牌上的一个非锁定技B，令A的B失效。然后每轮游戏开始时，A依次视为对你使用X张【杀】（X为B失效状态下经过的完整轮数）。当你因这些【杀】受到伤害后，你令A恢复技能B。',
+			xindiaodu:"调度",
+			xindiaodu_info:"①每回合限一次，与你势力相同的角色使用装备牌时，其可以摸一张牌。②出牌阶段开始时，你可以获得与你势力相同的一名角色装备区内的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
 			
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

@@ -500,7 +500,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return targets1.isEmpty(get.subtype(button.link));
 							}
 						}).set('ai',function(button){
-							var player=_status.event.player,target=_status.event.targets1,source=_status.event.targets[0];
+							var player=_status.event.player,target=_status.event.targets1,source=_status.event.targets0;
 							var att=get.attitude(player,source);
 							if(get.position(card)=='e'){
 								var val=get.value(card);
@@ -749,7 +749,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twcongji:{
 				audio:2,
-				trigger:{player:'loseAfter'},
+				trigger:{
+					player:'loseAfter',
+					global:'loseAsyncAfter',
+				},
 				direct:true,
 				filter:function(event,player){
 					if(player==_status.currentPhase||event.type!='discard'||event.getlx===false||!game.hasPlayer((current)=>current!=player)) return false;
@@ -761,7 +764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var cards=[],cards2=trigger.getl(player);
+					var cards=[],cards2=trigger.getl(player).cards2;
 					for(var i of cards2){
 						if(get.color(i,player)=='red'&&get.position(i,true)=='d') cards.push(i);
 					}
