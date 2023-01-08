@@ -36,6 +36,7 @@
 		renku:[],
 		prehidden_skills:[],
 	};
+	//游戏的库类
 	var lib={
 		configprefix:'noname_0.9_',
 		versionOL:27,
@@ -46,7 +47,8 @@
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		mirrorURL:'https://nakamurayuri.coding.net/p/noname/d/noname/git/raw',
 		hallURL:'47.99.105.222',
-		assetURL:'',
+		assetURL:'', //资源地址，用于加载各种js、css、字体、图片、音乐等
+		cdnURL: 'http://image.pandarrr.site/noname/', //cdn地址，需要加速的资源使用这个地址
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -117,6 +119,7 @@
 				});
 			}
 		},
+		//选项菜单
 		configMenu:{
 			general:{
 				name:'通用',
@@ -3958,6 +3961,7 @@
 				}
 			}
 		},
+		//扩展菜单
 		extensionMenu:{
 			cardpile:{
 				enable:{
@@ -4272,6 +4276,7 @@
 				},
 			},
 		},
+		//模式菜单
 		mode:{
 			identity:{
 				name:'身份',
@@ -6692,6 +6697,7 @@
 			'<li>蓄力技：发动时可以增大黄色的数字。若如此做，红色数字于技能的结算过程中改为原来的两倍。'+
 			'<li>施法：若技能的拥有者未拥有等待执行的同名“施法”效果，则其可以发动“施法”技能。其须选择声明一个数字X（X∈[1, 3]），在此之后的第X个回合结束时，其执行“施法”效果，且效果中的数字X视为与技能发动者声明的X相同。'
 		},
+		//设置角色提示的监听方式，从这里往下一系列监听事件
 		setIntro:function(node,func,left){
 			if(lib.config.touchscreen){
 				if(left){
@@ -6855,6 +6861,7 @@
 				'无名杀 - 录像 - '+_status.videoToSave.name[0]+' - '+_status.videoToSave.name[1]);
 			}
 		},
+		//游戏初始化，貌似定义了一些基础方法
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
@@ -7725,9 +7732,10 @@
 							toLoad++;
 							lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
 						}
-						lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
-						lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
-						lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
+						//修改：使用cdn加载卡片及角色的js
+						lib.init.js(lib.cdnURL+'card',lib.config.all.cards,packLoaded,packLoaded);
+						lib.init.js(lib.cdnURL+'character',lib.config.all.characters,packLoaded,packLoaded);
+						lib.init.js(lib.cdnURL+'character','rank',packLoaded,packLoaded);
 						// if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
 					};
 
@@ -9460,6 +9468,7 @@
 					localStorage.removeItem(lib.configprefix+'background');
 				}
 			},
+			//将函数按step划分为不同的块，实质是将step块改写为switch块，然后根据step值来运行指定区域的函数代码
 			parsex:function(func){
 				var str=func.toString();
 				str=str.slice(str.indexOf('{')+1);
@@ -10210,6 +10219,7 @@
 				game.zhu.update();
 			},
 		},
+		//各种翻译
 		translate:{
 			flower:'鲜花',
 			egg:'鸡蛋',
@@ -10644,6 +10654,7 @@
 					var result=event.result||result;
 					event.result=result;
 				},
+				//选择并移动卡牌
 				chooseToMove:function(){
 					'step 0'
 					if(event.chooseTime&&_status.connectMode&&!game.online){
@@ -10810,6 +10821,7 @@
 				removeCharacter:function(){
 					player.$removeCharacter(event.num);
 				},
+				//选择使用目标
 				chooseUseTarget:function(){
 					'step 0'
 					if(get.is.object(card)&&!event.viewAs) card.isCard=true;
@@ -11138,6 +11150,7 @@
 						game.updateRenku();
 					}
 				},
+				//选择恢复装备栏
 				chooseToEnable:function(){
 					'step 0'
 					var list=[];
@@ -11165,6 +11178,7 @@
 					event.result={control:result.control};
 					player.enableEquip(result.control);
 				},
+				//选择废除装备栏
 				chooseToDisable:function(){
 					'step 0'
 					var list=[];
@@ -11199,6 +11213,7 @@
 					}
 					else player.disableEquip(result.control);
 				},
+				//交换装备牌
 				swapEquip:function(){
 					"step 0"
 					game.log(player,'和',target,'交换了装备区中的牌')
@@ -11248,6 +11263,7 @@
 						player.$enableEquip(event.pos);
 					};
 				},
+				//废除判定区
 				disableJudge:function(){
 					'step 0'
 					game.log(player,'废除了判定区');
@@ -11260,6 +11276,7 @@
 						player.$disableJudge();
 					},player);
 				},
+				//恢复判定区
 				enableJudge:function(){
 					if(!player.storage._disableJudge) return;
 					game.log(player,'恢复了判定区');
@@ -11559,6 +11576,7 @@
 				addJudgeCard:function(){
 					if(lib.filter.judge(card,player,target)&&cards.length&&get.position(cards[0],true)=='o') target.addJudge(card,cards);
 				},
+				//装备卡牌
 				equipCard:function(){
 					if(cards.length&&get.position(cards[0],true)=='o') target.equip(cards[0]);
 				},
@@ -12329,6 +12347,7 @@
 					"step 5"
 					player.phaseJieshu();
 				},
+				//判定阶段
 				phaseJudge:function(){
 					"step 0"
 					event.cards=player.getCards('j');
@@ -12392,6 +12411,7 @@
 					ui.clear();
 					event.goto(1);
 				},
+				//摸牌阶段
 				phaseDraw:function(){
 					"step 0"
 					event.trigger("phaseDrawBegin1");
@@ -12421,6 +12441,7 @@
 						event.cards=result;
 					}
 				},
+				//出牌阶段
 				phaseUse:function(){
 					"step 0";
 					var next=player.chooseToUse();
@@ -12457,6 +12478,7 @@
 						if(info.updateUsable=='phaseUse') stat.card[i]=0;
 					}
 				},
+				//弃牌阶段
 				phaseDiscard:function(){
 					"step 0"
 					event.num=player.needsToDiscard();
@@ -12472,6 +12494,7 @@
 					"step 2"
 					event.cards=result.cards;
 				},
+				//选择要使用的牌
 				chooseToUse:function(){
 					"step 0"
 					if(event.responded) return;
@@ -12725,6 +12748,7 @@
 						event.result.result=event._result;
 					}
 				},
+				//选择响应牌
 				chooseToRespond:function(){
 					"step 0"
 					if(event.responded){
@@ -12928,6 +12952,7 @@
 						game.stopCountChoose();
 					}
 				},
+				//选择弃牌
 				chooseToDiscard:function(){
 					"step 0"
 					if(event.autochoose()){
@@ -17274,6 +17299,7 @@
 					game.delayx();
 				},
 			},
+			//注释：角色的各项方法
 			player:{
 				//新函数
 				changeZhuanhuanji:function(skill){
@@ -19847,6 +19873,18 @@
 					next._args.add('glow_result');
 					return next;
 				},
+				/**
+				 * 选择卡牌
+				 * @param {Event} choose Event事件对象
+				 * @param {string} position 卡牌所在的区域（h:手牌区，e:装备区，j:判定区）
+				 * @param {number} selectNum 要选择的卡牌数量（固定）
+				 * @param {Array} selectRange 要选择的卡牌数量范围
+				 * @param {boolean} isForce 是否强制选择
+				 * @param {Function} filterFunc 卡牌的过滤函数
+				 * @param {object} filterCard 要过去的卡牌
+				 * @param {string} prompt 提示文本
+				 * @returns 下一个Event对象
+				 */
 				chooseCard:function(choose){
 					var next=game.createEvent('chooseCard');
 					next.player=this;
@@ -33906,6 +33944,9 @@
 							}
 						}
 						else{
+							//--测试：查看这里的event对象，以及event.content的定义
+							console.log(event);
+							console.log(event.content);
 							event.content(event,step,source,player,target,targets,
 								card,cards,skill,forced,num,trigger,result,
 								_status,lib,game,ui,get,ai);
@@ -46223,6 +46264,7 @@
 				}
 				return buttons;
 			},
+			//注释：角色对象
 			player:function(position,noclick){
 				var node=ui.create.div('.player',position);
 				node.node={

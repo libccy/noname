@@ -461,7 +461,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					check=(num>=2);
 					player.chooseTarget(get.prompt('tuxi'),'获得其他一至两名角色的各一张手牌',[1,2],function(card,player,target){
-						return target.countCards('h')>0&&player!=target;
+						return target.countCards('h')>0&&player!=target; 
 					},function(target){
 						if(!_status.event.aicheck) return 0;
 						var att=get.attitude(_status.event.player,target);
