@@ -6116,8 +6116,9 @@
 									node.editor=mirror;
 								}
 								if(!window.ace){
-									lib.init.js(lib.assetURL+'game','codemirror',aceReady);
-									lib.init.css(lib.assetURL+'layout/default','codemirror');
+									//修改：使用cdn加速
+									lib.init.js(lib.cdnURL+'game','codemirror',aceReady);
+									lib.init.css(lib.cdnURL+'layout/default','codemirror');
 								}
 								else{
 									aceReady();
@@ -7806,14 +7807,16 @@
 						}
 					};
 					if(lib.config.layout!='default'){
-						ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout',styleLoaded);
+						//修改：layout地址，使用cdn加速
+						ui.css.layout=lib.init.css(lib.cdnURL+'layout/'+layout,'layout',styleLoaded);
 					}
 					else{
 						ui.css.layout=lib.init.css();
 						styleToLoad--;
 					}
 					if(get.is.phoneLayout()){
-						ui.css.phone=lib.init.css(lib.assetURL+'layout/default','phone',styleLoaded);
+						//修改：layout地址，使用cdn加速
+						ui.css.phone=lib.init.css(lib.cdnURL+'layout/default','phone',styleLoaded);
 					}
 					else{
 						ui.css.phone=lib.init.css();
@@ -7892,8 +7895,9 @@
 					}
 				};
 
-				ui.css={menu:lib.init.css(lib.assetURL+'layout/default','menu',function(){
-					ui.css.default=lib.init.css(lib.assetURL+'layout/default','layout');
+				//修改：cdn加速
+				ui.css={menu:lib.init.css(lib.cdnURL+'layout/default','menu',function(){
+					ui.css.default=lib.init.css(lib.cdnURL+'layout/default','layout');
 					proceed2();
 				})};
 
@@ -9080,7 +9084,8 @@
 							window.resetGameTimeout=setTimeout(lib.init.reset,5000);
 	
 							this.listenTransition(function(){
-								lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
+								//修改：mode的地址，使用cdn加速
+								lib.init.js(lib.cdnURL+'mode',lib.config.mode,proceed);
 							},500);
 						}
 					}
@@ -9266,7 +9271,8 @@
 						script.src = path+'/'+file+".js";
 					}
 					if(path.indexOf('http')==0){
-						script.src+='?rand='+get.id();
+						//修改：去除rand
+						//script.src+='?rand='+get.id();
 						script.addEventListener('load',function(){
 							script.remove();
 						});
@@ -11770,7 +11776,8 @@
 				loadMode:function(){
 					'step 0'
 					window.game=game;
-					lib.init.js(lib.assetURL+'mode',event.mode,game.resume);
+					//修改：mode的地址，使用cdn加速
+					lib.init.js(lib.cdnURL+'mode',event.mode,game.resume);
 					game.pause();
 					'step 1'
 					if(!lib.config.dev) delete window.game;
@@ -34680,7 +34687,8 @@
 		},
 		loadModeAsync:function(name,callback){
 			window.game=game;
-			var script=lib.init.js(lib.assetURL+'mode',name,function(){
+			//修改：mode的地址，使用cdn加速
+			var script=lib.init.js(lib.cdnURL+'mode',name,function(){
 				if(!lib.config.dev) delete window.game;
 				script.remove();
 				var content=lib.imported.mode[name];
@@ -34703,7 +34711,8 @@
 				}
 			}
 			window.game=game;
-			var script=lib.init.js(lib.assetURL+'mode',name,function(){
+			//修改：mode的地址，使用cdn加速
+			var script=lib.init.js(lib.cdnURL+'mode',name,function(){
 				if(!lib.config.dev) delete window.game;
 				script.remove();
 				var mode=lib.imported.mode;
@@ -41408,8 +41417,9 @@
 										node.editor=mirror;
 									}
 									if(!window.CodeMirror){
-										lib.init.js(lib.assetURL+'game','codemirror',aceReady);
-										lib.init.css(lib.assetURL+'layout/default','codemirror');
+										//修改：cdn加速
+										lib.init.js(lib.cdnURL+'game','codemirror',aceReady);
+										lib.init.css(lib.cdnURL+'layout/default','codemirror');
 									}
 									else{
 										aceReady();
@@ -41860,8 +41870,9 @@
 										node.editor=mirror;
 									}
 									if(!window.ace){
-										lib.init.js(lib.assetURL+'game','codemirror',aceReady);
-										lib.init.css(lib.assetURL+'layout/default','codemirror');
+										//修改：cdn加速
+										lib.init.js(lib.cdnURL+'game','codemirror',aceReady);
+										lib.init.css(lib.cdnURL+'layout/default','codemirror');
 									}
 									else{
 										aceReady();
@@ -42254,8 +42265,9 @@
 										node.editor=mirror;
 									}
 									if(!window.ace){
-										lib.init.js(lib.assetURL+'game','codemirror',aceReady);
-										lib.init.css(lib.assetURL+'layout/default','codemirror');
+										//修改：cdn加速
+										lib.init.js(lib.cdnURL+'game','codemirror',aceReady);
+										lib.init.css(lib.cdnURL+'layout/default','codemirror');
 									}
 									else{
 										aceReady();
