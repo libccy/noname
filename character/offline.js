@@ -149,20 +149,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yjyibing:{
-				trigger:{player:'gainAfter'},
+				trigger:{
+					player:'gainAfter',
+					global:'loseAsyncAfter',
+				},
 				direct:true,
 				filter:function(event,player){
 					if(event.getParent().name=='_yongjian_zengyu') return false;
-					var evt=event.getParent('phaseDraw'),hs=player.getCards('h');
-					return (!evt||evt.player!=player)&&event.cards.filter(function(card){
+					var evt=event.getParent('phaseDraw'),hs=player.getCards('h'),cards=event.getg(player);
+					return cards.length>0&&(!evt||evt.player!=player)&&cards.filter(function(card){
 						return hs.contains(card)&&game.checkMod(card,player,'unchanged','cardEnabled2',player)!==false;
-					}).length==event.cards.length&&player.hasUseTarget({
+					}).length==cards.length&&player.hasUseTarget({
 						name:'sha',
 						cards:event.cards,
 					},false);
 				},
 				content:function(){
-					player.chooseUseTarget(get.prompt('yjyibing'),'将'+get.translation(trigger.cards)+'当做【杀】使用','sha',trigger.cards,false,'nodistance').logSkill='yjyibing';
+					var cards=trigger.getg(player);
+					player.chooseUseTarget(get.prompt('yjyibing'),'将'+get.translation(cards)+'当做【杀】使用','sha',cards,false,'nodistance').logSkill='yjyibing';
 				},
 			},
 			//龙羽飞
@@ -334,7 +338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							delete player.storage.jsprende;
 						});
 					}
-					target.gain(cards,player,'giveAuto');
+					player.give(cards,target);
 					if(typeof player.storage.jsprende!='number'){
 						player.storage.jsprende=0;
 					}
@@ -482,7 +486,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target2=result.targets[0];
 						target.line(target2,'green');
-						target2.gain(target,card,'giveAuto','bySelf');
+						target2.gain(target,card,'giveAuto').giver=player;
 					}
 					else event.finish();
 					'step 3'
@@ -1484,20 +1488,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinmanjuan:{
 				audio:'manjuan',
 				forced:true,
-				priority:15,
-				trigger:{player:'gainAfter'},
+				trigger:{
+					player:'gainAfter',
+					global:'loseAsyncAfter',
+				},
 				filter:function(event,player){
-					return event.type!='xinmanjuan';
+					var hs=player.getCards('h');
+					return event.type!='xinmanjuan'&&event.getg(player).filter(function(card){
+						return hs.contains(card);
+					}).length>0;
 				},
 				content:function(){
 					"step 0"
-					player.lose(trigger.cards,ui.discardPile,'visible');
-					player.$throw(trigger.cards,1000);
-					game.log(player,'将',trigger.cards,'置入了弃牌堆')
-					"step 1"
-					event.cards=trigger.cards.slice(0);
+					var hs=player.getCards('h'),cards=trigger.getg(player).filter(function(card){
+						return hs.contains(card);
+					});
+					event.cards=cards;
+					player.loseToDiscardpile(cards);
 					if(_status.currentPhase!=player) event.finish();
-					"step 2"
+					"step 1"
 					event.card=event.cards.shift();
 					event.togain=[];
 					var number=get.number(event.card);
@@ -1506,15 +1515,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if((!trigger.cards.contains(current))&&get.number(current)==number) event.togain.push(current);
 					}
 					if(!event.togain.length) event.goto(5);
-					"step 3"
+					"step 2"
 					player.chooseButton(['是否获得其中的一张牌？',event.togain]).ai=function(button){
 						return get.value(button.link);
 					};
-					"step 4"
+					"step 3"
 					if(result.bool){
 						player.gain(result.links[0],'gain2').type='xinmanjuan';
 					}
-					"step 5"
+					"step 4"
 					if(event.cards.length) event.goto(2);
 				},
 				ai:{
@@ -1860,7 +1869,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 5'
 					if(event.cards){
 						player.line(result.targets,'green');
-						result.targets[0].gain(event.cards,'gain2');
+						result.targets[0].gain(event.cards,'gain2').giver=player;
 						game.log(player,'将',event.cards,'交给',result.targets[0]);
 						event.finish();
 					}
@@ -2299,7 +2308,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.shichou=true;
 					player.logSkill('shichou',target);
 					player.awakenSkill('shichou');
-					target.gain(cards,player,'giveAuto');
+					player.give(cards,target);
 					player.storage.shichou_target=target;
 					player.addSkill('shichou2');
 					target.markSkillCharacter('shichou',player,'誓仇','代替'+get.translation(player)+'承受伤害直到首次进入濒死状态');

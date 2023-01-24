@@ -1938,7 +1938,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var map3=[];
 					var list1=['司','夏','诸','皇'];
 					var list2=['马','侯','葛','甫'];
-					var exclude=['界','新','大','旧','☆','神'];
+					var exclude=['界','新','大','旧','☆','神','晋','族','谋'];
 					for(var i in lib.character){
 						if(lib.filter.characterDisabled(i)) continue;
 						if(lib.character[i][1]=='key') continue;

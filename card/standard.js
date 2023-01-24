@@ -401,10 +401,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				yingbian_tags:['gain','draw'],
 				yingbian:function(event){
 					var bool=false;
-					if(get.cardtag(event.card,'yingbian_damage')){
+					if(get.cardtag(event.card,'yingbian_gain')){
 						bool=true;
 						var cardx=event.respondTo;
-						if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD('od').length) player.gain(cardx[1].cards.filterInD('od'),'gain2','log');
+						if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD('od').length) event.player.gain(cardx[1].cards.filterInD('od'),'gain2','log');
 					}
 					if(!bool||get.cardtag(event.card,'yingbian_draw')) event.player.draw();
 				},
@@ -1621,7 +1621,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(event.directfalse||result.bool==false){
 						var cards=target.getCards('e',{subtype:'equip1'});
-						if(cards.length) player.gain(cards,target,'give');
+						if(cards.length) player.gain(cards,target,'give','bySelf');
 					}
 				},
 				ai:{
@@ -1774,6 +1774,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return (lib.filter.judge(card,player,target)&&player==target);
 				},
 				selectTarget:[-1,-1],
+				toself:true,
 				judge:function(card){
 					if(get.suit(card)=='spade'&&get.number(card)>1&&get.number(card)<10) return -5;
 					return 1;
@@ -2135,7 +2136,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					if(get.mode()=='guozhan'||!event.card||event.card.name!='sha') return false;
-					return event.target.isIn&&player.canUse('sha',event.target,false)&&(player.hasSha()||_status.connectMode&&player.countCards('h'));
+					return event.target.isIn()&&player.canUse('sha',event.target,false)&&(player.hasSha()||_status.connectMode&&player.countCards('h'));
 				},
 				content:function(){
 					"step 0"
@@ -2821,15 +2822,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			renwang_bg:'盾',
 			hanbing_skill:'寒冰剑',
 			renwang_skill:'仁王盾',
-			hanbing_info:'当你使用杀造成伤害时，你可以防止此伤害，改为依次弃置目标角色的两张牌。',
-			hanbing_skill_info:'当你使用杀造成伤害时，你可以防止此伤害，改为依次弃置目标角色的两张牌。',
-			renwang_info:'锁定技，黑色的杀对你无效',
-			renwang_skill_info:'锁定技，黑色的杀对你无效',
+			hanbing_info:'当你因执行【杀】的效果而造成伤害时，若目标角色有能被弃置的牌，则你可以防止此伤害，然后依次弃置目标角色的两张牌。',
+			hanbing_skill_info:'当你因执行【杀】的效果而造成伤害时，若目标角色有能被弃置的牌，则你可以防止此伤害，然后依次弃置目标角色的两张牌。',
+			renwang_info:'锁定技，黑色【杀】对你无效',
+			renwang_skill_info:'锁定技，黑色【杀】对你无效',
 			sha_info:'出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，否则你对其造成1点伤害。',
 			shan_info:'抵消一张【杀】',
-			tao_info:'出牌阶段，对自己使用，回复一点体力。',
-			bagua_info:'当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
-			bagua_skill_info:'当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
+			tao_info:'①出牌阶段，对自己使用，目标角色一点体力。②当有角色处于濒死状态时，对该角色使用。目标角色回复1点体力。',
+			bagua_info:'当你需要使用或打出一张【闪】时，你可以进行判定。若结果为红色，则你视为使用或打出一张【闪】。',
+			bagua_skill_info:'当你需要使用或打出一张【闪】时，你可以进行判定。若结果为红色，则你视为使用或打出一张【闪】。',
 			jueying_info:'锁定技，其他角色计算与你的距离+1。',
 			dilu_info:'锁定技，其他角色计算与你的距离+1。',
 			zhuahuang_info:'锁定技，其他角色计算与你的距离+1。',

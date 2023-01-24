@@ -2236,7 +2236,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					if(result.bool&&result.cards&&result.cards.length) target.gain(result.cards,player,'giveAuto');
+					if(result.bool&&result.cards&&result.cards.length) player.give(result.cards,target);
 				},
 				ai:{
 					viewHandcard:true,

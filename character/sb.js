@@ -59,7 +59,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					if(result.bool){
-						player.gain(result.cards,target,'giveAuto');
+						target.give(result.cards,player);
 					}
 				},
 				ai:{
@@ -372,10 +372,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=player.getStorage('spmingxuan'),cards=result.cards.randomSort();
 						var targets=game.filterPlayer((current)=>(current!=player&&!list.contains(current))).randomGets(cards.length).sortBySeat();
 						player.line(targets,'green');
+						var map=[];
 						for(var i=0;i<targets.length;i++){
-							targets[i].gain(cards[i],player);
-							player.$giveAuto(cards[i],targets[i]);
+							map.push([targets[i],cards[i]]);
 						}
+						game.loseAsync({
+							gain_list:map,
+							player:player,
+							cards:cards,
+							giver:player,
+							animate:'giveAuto',
+						}).setContent('gaincardMultiple');
 						event.targets=targets;
 						event.num=0;
 					}
@@ -420,7 +427,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 5'
 					if(result.bool){
-						player.gain(result.cards,target,'giveAuto');
+						target.give(result.cards,player);
 						player.draw();
 					}
 					if(event.num<targets.length) event.goto(3);

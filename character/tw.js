@@ -34,7 +34,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_fuwan:['male','qun',4,['twmoukui']],
 			tw_zhaoxiang:['female','shu',4,['refanghun','twfuhan','twqueshi']],
 			yuejiu:['male','qun',4,['cuijin']],
-			wuban:['male','shu',4,['jintao']],
+			wuban:['male','shu',4,['jintao'],['clan:陈留吴氏']],
 			duosidawang:['male','qun','4/5',['equan','manji']],
 			jiachong:['male','qun',3,['beini','dingfa']],
 			tw_dongzhao:['male','wei',3,['twmiaolve','twyingjia']],
@@ -94,7 +94,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 2'
 					if(result.bool){
-						target.gain(result.cards,player,'giveAuto');
+						player.give(result.cards,target);
 					}
 					'step 3'
 					if(targets.length&&player.countCards('h')>0) event.goto(1);
@@ -228,7 +228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							if(result.bool){
 								if(result.cards&&result.cards.length){
-									player.gain(result.cards,target,'giveAuto').type='twzhengjian';
+									target.give(result.cards,player).type='twzhengjian';
 								}
 								else target.damage();
 							}
@@ -276,7 +276,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							if(result.bool){
 								if(result.cards&&result.cards.length){
-									player.gain(result.cards,target,'giveAuto').type='twzhengjian';
+									target.give(result.cards,player).type='twzhengjian';
 								}
 								else target.damage();
 							}
@@ -299,12 +299,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twzhongchi:{
 				audio:2,
-				trigger:{player:'gainAfter'},
+				trigger:{
+					player:'gainAfter',
+					global:'loseAsyncAfter',
+				},
 				forced:true,
 				skillAnimation:true,
 				animationColor:'wood',
 				filter:function(event,player){
-					if(player.storage.twzhengjian||!player.hasSkill('twzhengjian',null,null,false)) return false;
+					if(player.storage.twzhengjian||!player.hasSkill('twzhengjian',null,null,false)||!event.getg(player).length) return false;
 					var num1=game.countPlayer2();
 					var list=[];
 					player.getAllHistory('gain',function(evt){
@@ -941,7 +944,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 2"
 					if(result.bool&&result.cards&&result.cards.length){
-						player.gain(result.cards,event.current,'giveAuto');
+						event.current.give(result.cards,player);
 						if(!event.jiu&&get.name(result.cards[0],player)=='jiu') event.jiu=true;
 					}
 					"step 3"
@@ -1199,7 +1202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var card=result.cards[0];
 						event.card=card;
-						trigger.player.gain(card,trigger.target,'giveAuto');
+						trigger.target.give(card,trigger.player);
 					}
 					else event.finish();
 					'step 2'
@@ -1452,7 +1455,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								target.logSkill('twchunlao',player);
 								if(!target.hasSkill('twchunlao')) game.trySkillAudio('twchunlao',player);
-								if(player!=target) player.gain(result.cards,target,'giveAuto');
+								if(player!=target) target.give(result.cards,player,'giveAuto');
 								trigger.baseDamage++;
 							}
 						},
@@ -1649,7 +1652,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 3'
-					if(result.bool) player.gain(result.cards,target,'giveAuto');
+					if(result.bool) target.give(result.cards,player);
 				},
 			},
 			twzhouhu:{
@@ -1987,7 +1990,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!result.bool){
 								trigger.player.damage();
 							}
-							else player.gain(result.cards,trigger.player,'giveAuto');
+							else trigger.player.give(result.cards,player);
 						},
 						mark:true,
 						marktext:'<span style="text-decoration: line-through;">桃</span>',
@@ -2075,29 +2078,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else player.storage.counttrigger.twzhian--;
 					'step 2'
-					if(result.bool&&target.getCards('ej').contains(trigger.cards[0])) player.gain(trigger.cards,target,'give');
+					if(result.bool&&target.getCards('ej').contains(trigger.cards[0])) player.gain(trigger.cards,target,'give','bySelf');
 				},
 			},
 			twyujue:{
 				audio:2,
 				global:'twyujue_give',
-				trigger:{player:'gainAfter'},
+				trigger:{
+					player:'gainAfter',
+					global:'loseAsyncAfter',
+				},
 				direct:true,
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
+					var cards=event.getg(player);
+					if(!cards.length) return false;
 					return game.hasPlayer(function(current){
 						if(current==player) return false;
 						var evt=event.getl(current);
-						if(!evt||!evt.cards2||!evt.cards2.length) return false;
+						if(!evt||!evt.cards2||!evt.cards2.filter((card)=>cards.contains(card)).length) return false;
 						return (!current.hasSkill('twyujue_effect0'))||(!current.hasSkill('twyujue_effect1'));
 					})
 				},
 				content:function(){
 					'step 0'
+					var cards=trigger.getg(player);
 					var list=game.filterPlayer(function(current){
 						if(current==player) return false;
 						var evt=trigger.getl(current);
-						if(!evt||!evt.cards2||!evt.cards2.length) return false;
+						if(!evt||!evt.cards2||!evt.cards2.filter((card)=>cards.contains(card)).length) return false;
 						return (!current.hasSkill('twyujue_effect0'))||(!current.hasSkill('twyujue_effect1'));
 					}).sortBySeat();
 					event.targets=list;
@@ -2262,7 +2271,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					game.trySkillAudio('twyujue',target);
-					target.gain(cards,player,'give');
+					player.give(cards,target);
 					target.addTempSkill('twyujue_clear');
 					target.addMark('twyujue_clear',cards.length,false);
 				},
@@ -2892,7 +2901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('goon',get.attitude(target,player)>0);
 					'step 1'
 					if(result.bool){
-						player.gain(result.cards,target,'giveAuto');
+						target.give(result.cards,player);
 					}
 					else{
 						game.log(target,'拒绝给牌');
@@ -3090,7 +3099,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.logSkill('xinzhenjun',target);
-						target.gain(result.cards,player,'giveAuto')
+						player.give(result.cards,target)
 					}
 					else event.finish();
 					'step 2'
@@ -3281,7 +3290,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			meiyingqiang:{
 				equipSkill:true,
 				trigger:{
-					player:['loseAfter','gainAfter'],
+					player:['loseAfter'],
 					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				filter:function(event,player){
@@ -4033,7 +4042,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					event.cards=player.getCards('h');
-					target.gain(event.cards,player,'giveAuto').gaintag.add('twrangyi');
+					player.give(event.cards,target).gaintag.add('twrangyi');
 					target.addTempSkill('twrangyi2');
 					'step 1'
 					target.chooseToUse({
@@ -4080,7 +4089,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return card.hasGaintag('twrangyi');
 					});
 					game.delayx();
-					trigger.getParent(2).player.gain(cards,player,'giveAuto');
+					player.give(cards,trigger.getParent(2).player);
 				},
 				onremove:function(player){
 					player.removeGaintag('twrangyi');
@@ -4493,19 +4502,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					if(typeof player.storage.waishi!='number') player.storage.waishi=1;
 					player.storage.waishi--;
-					player.lose(cards,ui.special);
 					player.choosePlayerCard(target,true,'h',cards.length).chooseonly=true;
 					'step 1'
-					event.cards2=result.cards;
-					target.lose(event.cards2,ui.special);
+					player.swapHandcards(target,cards,result.cards);
 					'step 2'
-					player.gain(event.cards2);
-					target.gain(cards);
-					player.$give(cards.length,target);
-					target.$give(event.cards2.length,player);
-					'step 3'
-					game.delay(1.2);
-					'step 4'
 					if(target.countCards('h')>player.countCards('h')||player.group==target.group) player.draw();
 				},
 				ai:{

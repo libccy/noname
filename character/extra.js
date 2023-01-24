@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_yin:['shen_liubei','shen_luxun'],
 				extra_lei:['shen_ganning','shen_zhangliao'],
 				extra_key:['key_kagari','key_shiki','db_key_hina'],
-				extra_decade:['shen_jiangwei','shen_machao'],
+				extra_decade:['shen_jiangwei','shen_machao','shen_zhangfei'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji','shen_sunquan'],
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
@@ -22,6 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			shen_zhangfei:['male','shen',4,['shencai','xunshi'],['shu']],
 			tw_shen_guanyu:['male','shen',4,['twwushen','twwuhun'],['shu']],
 			shen_machao:['male','shen',4,['shouli','hengwu'],['shu']],
 			shen_sunquan:['male','shen',4,['dili','yuheng'],['wei']],
@@ -71,6 +72,305 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			shencai:{
+				audio:2,
+				enable:'phaseUse',
+				usable:5,
+				filter:function(event,player){
+					var count=player.getStat('skill').shencai;
+					if(count&&count>player.countMark('shencai')) return false;
+					return true;
+				},
+				filterTarget:lib.filter.notMe,
+				onremove:true,
+				prompt:'选择一名其他角色进行地狱审判',
+				content:function(){
+					var next=target.judge();
+					next.callback=lib.skill.shencai.contentx;
+				},
+				ai:{
+					order:8,
+					result:{target:-1},
+				},
+				contentx:function(){
+					var card=event.judgeResult.card;
+					var player=event.getParent(2).player;
+					var target=event.getParent(2).target;
+					var list=[],str=lib.skill.shencai.getStr(card);
+					for(var i in lib.skill.shencai.filterx){
+						if(str.indexOf(lib.skill.shencai.filterx[i])!=-1) list.push('shencai_'+i);
+					}
+					if(list.length){
+						if(get.position(card,true)=='o') player.gain(card,'gain2');
+						for(var i in lib.skill.shencai.filterx){
+							var num=target.countMark('shencai_'+i);
+							if(num>0){
+								target.removeMark('shencai_'+i,num);
+								target.removeSkill('shencai_'+i);
+							}
+						}
+						if(target.isIn()){
+							for(var i of list){
+								target.addSkill(i);
+								target.addMark(i,1);
+							}
+						}
+					}
+					else if(target.isIn()){
+						player.gainPlayerCard(target,true,'hej');
+						target.addMark('shencai_death',1);
+						target.addSkill('shencai_death');
+					}
+				},
+				filterx:{
+					losehp:'体力',
+					weapon:'武器',
+					respond:'打出',
+					distance:'距离',
+				},
+				getStr:function(node){
+					var str='',name=node.name;
+					if(lib.translate[name+'_info']){
+						if(lib.card[name].type&&lib.translate[lib.card[name].type]) str+=(''+get.translation(lib.card[name].type)+'牌|');
+						if(get.subtype(name)){
+							str+=(''+get.translation(get.subtype(name))+'|');
+						}
+						if(lib.card[name]&&lib.card[name].addinfomenu){
+							str+=(''+lib.card[name].addinfomenu+'|');
+						}
+						if(get.subtype(name)=='equip1'){
+							var added=false;
+							if(lib.card[node.name]&&lib.card[node.name].distance){
+								var dist=lib.card[node.name].distance;
+								if(dist.attackFrom){
+									added=true;
+									str+=('攻击范围：'+(-dist.attackFrom+1)+'|');
+								}
+							}
+							if(!added){
+								str+=('攻击范围：1|');
+							}
+						}
+					}
+					if(lib.card[name].cardPrompt){
+						str+=(''+lib.card[name].cardPrompt(node)+'|');
+					}
+					else if(lib.translate[name+'_info']){
+						str+=(''+lib.translate[name+'_info']+'|');
+					}
+					if(lib.card[name].yingbian_prompt&&get.is.yingbian(node)){
+						if(typeof lib.card[name].yingbian_prompt=='function') str+=('应变：'+lib.card[name].yingbian_prompt(node)+'|');
+						else str+=('应变：'+lib.card[name].yingbian_prompt+'|');
+					}
+					return str;
+				},
+				subSkill:{
+					losehp:{
+						charlotte:true,
+						marktext:'笞',
+						trigger:{player:'damageEnd'},
+						forced:true,
+						content:function(){
+							player.loseHp(trigger.num);
+						},
+						ai:{
+							effect:{
+								target:function(card,player,target,current){
+									if(get.tag(card,'damage')&&current<0) return 1.6;
+								},
+							},
+						},
+						intro:{
+							name:'神裁 - 体力',
+							name2:'笞',
+							content:'锁定技。当你受到伤害后，你失去等量的体力。',
+							onunmark:true,
+						},
+					},
+					weapon:{
+						charlotte:true,
+						marktext:'杖',
+						trigger:{target:'useCardToTargeted'},
+						forced:true,
+						filter:function(event,player){
+							return event.card.name=='sha';
+						},
+						content:function(){
+							trigger.directHit.add(player);
+							game.log(player,'不可响应',trigger.card);
+						},
+						intro:{
+							name:'神裁 - 武器',
+							name2:'杖',
+							content:'锁定技。当你成为【杀】的目标后，你不能使用牌响应此【杀】。',
+							onunmark:true,
+						},
+						global:'shencai_weapon_ai',
+					},
+					ai:{
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(player,tag,arg){
+								if(!arg||!arg.card||arg.card.name!='sha') return false;
+								if(!arg.target||!arg.target.hasSkill('shencai_weapon')) return false;
+								return true;
+							},
+						},
+					},
+					respond:{
+						charlotte:true,
+						marktext:'徒',
+						trigger:{
+							player:'loseAfter',
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+						},
+						forced:true,
+						filter:function(event,player){
+							if(!player.hasCard(function(card){
+								return lib.filter.cardDiscardable(card,player,'shencai_respond');
+							},'h')) return false;
+							var evt=event.getParent('shencai_respond');
+							if(evt&&evt.player==player) return false;
+							evt=event.getl(player);
+							return evt&&evt.hs&&evt.hs.length>0;
+						},
+						content:function(){
+							var cards=player.getCards('h',function(card){
+								return lib.filter.cardDiscardable(card,player,'shencai_respond');
+							});
+							if(cards.length>0) player.discard(cards.randomGet());
+						},
+						intro:{
+							name:'神裁 - 打出',
+							name2:'徒',
+							content:'锁定技。当你失去手牌后，你随机弃置一张手牌（不嵌套触发）。',
+							onunmark:true,
+						},
+					},
+					distance:{
+						charlotte:true,
+						marktext:'流',
+						trigger:{player:'phaseJieshuBegin'},
+						forced:true,
+						content:function(){
+							player.turnOver();
+						},
+						intro:{
+							name:'神裁 - 距离',
+							name2:'流',
+							content:'锁定技。结束阶段开始时，你翻面。',
+							onunmark:true,
+						},
+					},
+					death:{
+						charlotte:true,
+						marktext:'死',
+						mod:{
+							maxHandcard:function(player,num){
+								return num-player.countMark('shencai_death');
+							},
+						},
+						trigger:{player:'phaseEnd'},
+						forced:true,
+						filter:function(event,player){
+							return player.countMark('shencai_death')>game.countPlayer();
+						},
+						content:function(){
+							player.die();
+						},
+						intro:{
+							name:'神裁 - 死',
+							name2:'死',
+							content:'锁定技。你的角色手牌上限-#；回合结束时，若场上存活人数小于#，则你死亡。',
+							onunmark:true,
+						},
+					},
+				},
+				intro:{
+					content:'发动次数上限+#',
+				},
+			},
+			xunshi:{
+				audio:2,
+				mod:{
+					cardname:function(card){
+						if(lib.skill.xunshi.isXunshi(card)) return 'sha';
+					},
+					cardnature:function(card){
+						if(lib.skill.xunshi.isXunshi(card)) return false;
+					},
+					suit:function(card){
+						if(lib.skill.xunshi.isXunshi(card)) return 'none';
+					},
+					targetInRange:function(card){
+						if(get.color(card)=='none') return true;
+					},
+					cardUsable:function(card){
+						if(get.color(card)=='none') return Infinity;
+					},
+				},
+				isXunshi:function(card){
+					var info=lib.card[card.name];
+					if(!info||(info.type!='trick'&&info.type!='delay')) return false;
+					if(info.notarget) return false;
+					if(info.selectTarget!=undefined){
+						if(Array.isArray(info.selectTarget)){
+							if(info.selectTarget[0]<0) return !info.toself;
+							return info.selectTarget[0]!=1||info.selectTarget[1]!=1;
+						}
+						else{
+							if(info.selectTarget<0) return !info.toself;
+							return info.selectTarget!=1;
+						}
+					}
+					return false;
+				},
+				trigger:{player:'useCard2'},
+				forced:true,
+				filter:function(event,player){
+					return get.color(event.card)=='none';
+				},
+				content:function(){
+					'step 0'
+					if(player.countMark('shencai')<4&&player.hasSkill('shencai',null,null,false)) player.addMark('shencai',1,false);
+					if(trigger.addCount!==false){
+						trigger.addCount=false;
+						var stat=player.getStat().card,name=trigger.card.name;
+						if(typeof stat[name]=='number') stat[name]--;
+					}
+					var info=get.info(trigger.card);
+					if(info.allowMultiple==false) event.finish();
+					else if(trigger.targets&&!info.multitarget){
+						if(!game.hasPlayer(function(current){
+							return !trigger.targets.contains(current)&&lib.filter.targetEnabled2(trigger.card,player,current);
+						})) event.finish();
+					}
+					else event.finish();
+					'step 1'
+					var prompt2='为'+get.translation(trigger.card)+'增加任意个目标'
+					player.chooseTarget(get.prompt('xunshi'),function(card,player,target){
+						var player=_status.event.player;
+						return !_status.event.targets.contains(target)&&lib.filter.targetEnabled2(_status.event.card,player,target);
+					},[1,Infinity]).set('prompt2',prompt2).set('ai',function(target){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player;
+						return get.effect(target,trigger.card,player,player);
+					}).set('card',trigger.card).set('targets',trigger.targets);
+					'step 2'
+					if(result.bool){
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
+						event.targets=result.targets;
+					}
+					else{
+						event.finish();
+					}
+					'step 3'
+					if(event.targets){
+						player.line(event.targets,'fire');
+						trigger.targets.addArray(event.targets);
+					}
+				},
+			},
 			twwushen:{
 				mod:{
 					cardname:function(card,player,name){
@@ -529,7 +829,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var card=result.cards[0];
 						var num=get.number(card);
 						if([1,11,12,13].contains(num)){
-							if(lib.filter.canBeGained(card,player,target)) player.gain(card,target,'give');
+							if(lib.filter.canBeGained(card,player,target)) player.gain(card,target,'give','bySelf');
 						}
 						else if(lib.filter.canBeDiscarded(card,player,target)) target.discard(card);
 					}
@@ -1508,7 +1808,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						//player.logSkill('pinghe',target);
 						player.line(target,'green');
-						target.gain(result.cards,player,'giveAuto');
+						player.give(result.cards,target);
 						trigger.cancel();
 						player.loseMaxHp();
 						if(player.hasSkill('yingba')){
@@ -2369,7 +2669,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 3'
-					if(result.bool&&result.cards&&result.cards.length) player.gain(result.cards,target,'give');
+					if(result.bool&&result.cards&&result.cards.length) target.give(result.cards,player,'give');
 				},
 			},
 			//Connect Mode support after Angel Beats! -2nd beat-
@@ -2401,27 +2701,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				multitarget:true,
 				multiline:true,
 				delay:false,
+				discard:false,
+				lose:false,
 				check:function(card){
 					return 6-get.value(card);
 				},
 				targetprompt:['拼点发起人','拼点目标'],
 				content:function(){
 					'step 0'
-					player.showCards(cards);
-					'step 1'
-					var target=targets[0];
-					targets.sortBySeat();
-					if(target!=targets[0]) cards.reverse();
+					var list=[];
 					for(var i=0;i<targets.length;i++){
-						targets[i].gain(cards[i],player,'visible');
-						player.$give(cards[i],targets[i]);
+						list.push([targets[i],cards[i]]);
 					}
-					'step 2'
+					game.loseAsync({
+						gain_list:list,
+						player:player,
+						cards:cards,
+						giver:player,
+						animate:'giveAuto',
+					}).setContent('gaincardMultiple');
+					'step 1'
+					game.delayx();
 					if(targets[0].canCompare(targets[1])){
 						targets[0].chooseToCompare(targets[1]);
 					}
 					else event.finish();
-					'step 3'
+					'step 2'
 					if(result.winner!==targets[0]) targets[0].addMark('huoxin',1);
 					if(result.winner!==targets[1]) targets[1].addMark('huoxin',1);
 				},
@@ -2681,9 +2986,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:0,
 				content:function(){
 					'step 0'
-					target.gain(cards,player,'give');
+					player.give(cards,target);
 					'step 1'
-					target.chooseUseTarget(cards[0],game.filterPlayer(function(current){
+					if(!target.getCards('h').contains(cards[0])) event._result={bool:false};
+					else target.chooseUseTarget(cards[0],game.filterPlayer(function(current){
 						return current!=player;
 					}),'请使用得到的牌，或者跳过下回合的判定阶段和摸牌阶段');
 					'step 2'
@@ -5501,6 +5807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									[player,event.list1],
 									[target,event.list2]
 								],
+								discarder:player,
 							}).setContent('discardMultiple');
 						}
 						else if(event.list2.length){
@@ -6217,6 +6524,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twwushen_info:'锁定技。①你的♥手牌均视为普【杀】。②你于每阶段使用的第一张【杀】不可被响应。③你使用♥【杀】无距离和次数限制。④当你使用♥【杀】选择目标后，你令所有拥有“梦魇”标记的角色均成为此【杀】的目标。',
 			twwuhun:'武魂',
 			twwuhun_info:'锁定技。①当你受到其他角色造成的1点伤害后，你令伤害来源获得1枚“梦魇”标记。②当你对有“梦魇”标记的其他角色造成伤害后，你令其获得一枚“梦魇”标记。③当你死亡时，你可进行判定。若结果不为【桃】或【桃园结义】，则你选择至少一名拥有“梦魇”标记的角色。令这些角色各自失去X点体力（X为其“梦魇”标记数）。',
+			shen_zhangfei:'神张飞',
+			shencai:'神裁',
+			shencai_info:'①出牌阶段限一次，你可以令一名其他角色进行判定。若此判定牌：包含以下要素中的任意一个，则你获得此判定牌，其失去已有的下列效果，并获得对应的效果：{⒈体力：当其受到伤害后，其失去等量的体力、⒉武器：其不能使用牌响应杀、⒊打出：当其失去手牌后，其再随机弃置一张手牌（不嵌套触发）、⒋距离：其的结束阶段开始时，其翻面}；若均不包含，你获得其一张牌，其获得一枚“死”并获得如下效果：其的角色手牌上限-X、其的回合结束时，若X大于场上存活人数，则其死亡（X为其“死”标记数）。',
+			xunshi:'巡使',
+			xunshi_info:'锁定技。①你手牌区内所有的多目标锦囊牌均视为花色为none的普【杀】。②你使用颜色为none的牌无距离和次数限制。③当你使用无颜色的牌选择目标后，你令你的〖神裁〗的发动次数上限+1（至多为5），然后可以为此牌增加任意个目标。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',

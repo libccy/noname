@@ -75,7 +75,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					if(result.index==0) player.gain(event.show_card,target,'give');
+					if(result.index==0) player.gain(event.show_card,target,'give','bySelf');
 					else target.damage();
 				},
 				ai:{
@@ -106,18 +106,23 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(result.bool&&target.isIn()){
 						var num=result.cards.length,hs=player.getCards('h');
 						if(!hs.length) event.finish();
-						else if(hs.length<num) event._result={bool:true,cards:hs.length};
+						else if(hs.length<num) event._result={bool:true,cards:hs};
 						else player.chooseCard('h',true,num,'交给'+get.translation(target)+get.cnNumber(num)+'张牌');
 					}
 					else event.finish();
 					'step 2'
-					if(result.bool) target.gain(result.cards,player,'giveAuto');
+					if(result.bool) player.give(result.cards,target);
 				},
 				ai:{
 					order:5,
 					tag:{
 						loseCard:1,
 						gain:0.5,
+					},
+					wuxie:function(target,card,player,viewer){
+						if(get.attitude(player,target)>0&&get.attitude(viewer,player)>0){
+							return 0;
+						}
 					},
 					result:{
 						target:function(player,target){
@@ -420,8 +425,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				discard:false,
 				lose:false,
 				delay:false,
+				equipSkill:true,
 				content:function(){
-					target.gain(cards,player,'giveAuto');
+					player.give(cards,target);
 				},
 			},
 			qixingbaodao:{
@@ -555,28 +561,30 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else if(!event.given){
 						if(_status.connectMode){
-							game.broadcastAll(function(){delete _status.noclearcountdown});
-							game.stopCountChoose();
+							game.broadcastAll(function(){delete _status.noclearcountdown;game.stopCountChoose()});
 						}
 						event.finish();
 					}
 					'step 3'
 					if(_status.connectMode){
-						game.broadcastAll(function(){delete _status.noclearcountdown});
-						game.stopCountChoose();
+						game.broadcastAll(function(){delete _status.noclearcountdown;game.stopCountChoose()});
 					}
 					var logs=[];
+					var map=[],cards=[];
 					for(var i in event.given_map){
 						var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
 						logs.push(source);
-						source.gain(event.given_map[i],player,'give');
+						map.push([source,event.given_map[i]]);
+						cards.addArray(event.given_map[i]);
 					}
-					logs.sortBySeat();
-					event.next.sort(function(a,b){
-						return lib.sort.seat(a.player,b.player);
-					});
+					game.loseAsync({
+						gain_list:map,
+						player:player,
+						cards:cards,
+						giver:player,
+						animate:'giveAuto',
+					}).setContent('gaincardMultiple');
 					player.logSkill('g_du_give',logs);
-					player.removeGaintag('du_given');
 				},
 				ai:{expose:0.1},
 			},

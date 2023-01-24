@@ -152,6 +152,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return (lib.filter.judge(card,player,target)&&player==target);
 				},
 				selectTarget:[-1,-1],
+				toself:true,
 				judge:function(card){
 					if(get.suit(card)=='spade') return -6;
 					return 0;
@@ -279,8 +280,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player.chooseCard('h','将一张手牌交给'+get.translation(event.target1),true);
 					}
 					'step 1'
-					player.$giveAuto(result.cards,event.target1);
-					event.target1.gain(result.cards,player);
+					player.give(result.cards,event.target1);
 					'step 2'
 					if(!event.target1.countCards('h')){
 						event.finish();
@@ -298,8 +298,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!event.directresult){
 						event.directresult=result.cards;
 					}
-					event.target1.$giveAuto(event.directresult,event.target2);
-					event.target2.gain(event.directresult,event.target1);
+					event.target1.give(event.directresult,event.target2);
 				},
 				ai:{
 					order:2.5,

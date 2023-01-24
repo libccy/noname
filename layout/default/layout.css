@@ -1733,7 +1733,10 @@ div:not(.handcards)>.card>.info>span,
 }
 .content>div {
 	position: relative;
-	margin: 8px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	margin-left: 4px;
+	margin-right: 4px;
 }
 .content>.caption + .buttons:not(*:last-child){
 	margin-top: 0;
