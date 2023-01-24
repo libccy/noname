@@ -7097,7 +7097,10 @@
 					});
 				};
 				HTMLDivElement.prototype.setBackgroundImage=function(img){
-					this.style.backgroundImage='url("'+lib.assetURL+img+'")';
+
+					//修改：使用cnd加速图片
+					//this.style.backgroundImage='url("'+lib.assetURL+img+'")';
+					this.style.backgroundImage='url("'+lib.cdnURL+img+'")';
 				},
 				HTMLDivElement.prototype.listen=function(func){
 					if(lib.config.touchscreen){
@@ -32800,6 +32803,8 @@
 			if(_status.evaluatingExtension){
 				imgsrc='db:extension-'+extname+':'+name+'.jpg';
 			}
+
+			
 			else{
 				imgsrc='ext:'+extname+'/'+name+'.jpg';
 			}
