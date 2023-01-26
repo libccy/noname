@@ -94,6 +94,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				contentx:function(){
 					var card=event.judgeResult.card;
+					if(get.position(card,true)=='o') player.gain(card,'gain2');
 					var player=event.getParent(2).player;
 					var target=event.getParent(2).target;
 					var list=[],str=lib.skill.shencai.getStr(card);
@@ -101,7 +102,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(str.indexOf(lib.skill.shencai.filterx[i])!=-1) list.push('shencai_'+i);
 					}
 					if(list.length){
-						if(get.position(card,true)=='o') player.gain(card,'gain2');
 						for(var i in lib.skill.shencai.filterx){
 							var num=target.countMark('shencai_'+i);
 							if(num>0){
@@ -2320,7 +2320,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.line(target,'green');
-						target.gain(cards,'gain2');
+						target.gain(cards,'gain2').giver=player;
 					}
 					'step 4'
 					if(target.isMaxHandcard()) player.loseMaxHp();
@@ -6526,7 +6526,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twwuhun_info:'锁定技。①当你受到其他角色造成的1点伤害后，你令伤害来源获得1枚“梦魇”标记。②当你对有“梦魇”标记的其他角色造成伤害后，你令其获得一枚“梦魇”标记。③当你死亡时，你可进行判定。若结果不为【桃】或【桃园结义】，则你选择至少一名拥有“梦魇”标记的角色。令这些角色各自失去X点体力（X为其“梦魇”标记数）。',
 			shen_zhangfei:'神张飞',
 			shencai:'神裁',
-			shencai_info:'①出牌阶段限一次，你可以令一名其他角色进行判定。若此判定牌：包含以下要素中的任意一个，则你获得此判定牌，其失去已有的下列效果，并获得对应的效果：{⒈体力：当其受到伤害后，其失去等量的体力、⒉武器：其不能使用牌响应杀、⒊打出：当其失去手牌后，其再随机弃置一张手牌（不嵌套触发）、⒋距离：其的结束阶段开始时，其翻面}；若均不包含，你获得其一张牌，其获得一枚“死”并获得如下效果：其的角色手牌上限-X、其的回合结束时，若X大于场上存活人数，则其死亡（X为其“死”标记数）。',
+			shencai_info:'①出牌阶段限一次，你可以令一名其他角色进行判定。你获得此判定牌，然后若此判定牌：包含以下要素中的任意一个，则其失去已有的下列效果，并获得对应的效果：{⒈体力：当其受到伤害后，其失去等量的体力、⒉武器：其不能使用牌响应杀、⒊打出：当其失去手牌后，其再随机弃置一张手牌（不嵌套触发）、⒋距离：其的结束阶段开始时，其翻面}；若均不包含，你获得其一张牌，其获得一枚“死”并获得如下效果：其的角色手牌上限-X、其的回合结束时，若X大于场上存活人数，则其死亡（X为其“死”标记数）。',
 			xunshi:'巡使',
 			xunshi_info:'锁定技。①你手牌区内所有的多目标锦囊牌均视为花色为none的普【杀】。②你使用颜色为none的牌无距离和次数限制。③当你使用无颜色的牌选择目标后，你令你的〖神裁〗的发动次数上限+1（至多为5），然后可以为此牌增加任意个目标。',
 			

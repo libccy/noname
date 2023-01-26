@@ -6610,7 +6610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=trigger.player;
 						player.logSkill('spfengyin',target);
-						player.give(result.cards,true,'give');
+						player.give(result.cards,target,'give');
 						target.skip('phaseUse');
 						target.skip('phaseDiscard');
 					}

@@ -1760,16 +1760,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongyun2:{
 				audio:'zhongyun',
 				trigger:{
-					player:['loseAfter','gainAfter'],
+					player:['loseAfter'],
 					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				forced:true,
 				filter:function(event,player){
-					if(event.name!='gain'||player!=event.player){
-						var evt=event.getl(player);
-						if(!evt||!evt.hs||!evt.hs.length) return false;
-					}
-					return player.countCards('h')==player.hp;
+					var cards1=event.getl(player).hs,cards2=[];
+					if(event.getg) cards2=event.getg(player);
+					return (cards1.length>0||cards2.length>0)&&player.countCards('h')==player.hp;
 				},
 				usable:1,
 				content:function(){

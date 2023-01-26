@@ -7413,10 +7413,7 @@
 					window.el=line;
 					window.ec=column;
 					window.eo=err;
-					game.print(msg);
-					game.print(line);
-					game.print(column);
-					game.print(decodeURI(err.stack));
+					game.print(str);
 					if(!lib.config.errstop){
 						_status.withError=true;
 						game.loop();
@@ -21847,7 +21844,7 @@
 						if(this.ws&&!this.ws.closed){
 							var player=this;
 							var time=parseInt(lib.configOL.choose_timeout)*1000;
-							if(_status.event.getParent().skillHidden){
+							if(_status.event._global_timer||_status.event.getParent().skillHidden){
 								for(var i=0;i<game.players.length;i++){
 									game.players[i].showTimer(time);
 								}
@@ -52657,6 +52654,7 @@
 			return card.name;
 		},
 		suit:function(card,player){
+			if(!card) return;
 			if(Array.isArray(card)){
 				if(card.length==1) return get.suit(card[0],player);
 				return 'none';
@@ -52676,7 +52674,9 @@
 			}
 		},
 		color:function(card,player){
+			if(!card) return;
 			if(Array.isArray(card)){
+				if(!card.length) return 'none';
 				var color=get.color(card[0],player);
 				for(var i=1;i<card.length;i++){
 					if(get.color(card[i],player)!=color) return 'none';

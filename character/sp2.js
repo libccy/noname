@@ -1461,7 +1461,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 5'
 					if(result.control!='cancel2'){
 						var i=result.index;
-						targets[1-i].gain(cards[1-i],targets[i],'give');
+						targets[1-i].give(cards[1-i],targets[i],'give');
 					}
 				},
 				onremove:true,
@@ -5735,6 +5735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				trigger:{global:'recoverEnd'},
 				direct:true,
+				zhuSkill:true,
 				filter:function(event,player){
 					return player!=event.player&&event.player.group=='wei'&&event.player==_status.currentPhase&&
 					event.player.isIn()&&player.hasZhuSkill('zhushi',event.player);
@@ -11091,7 +11092,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('qljsuiren',target);
-						player.giver(player.getCards('h',function(card){
+						player.give(player.getCards('h',function(card){
 							var type=get.type(card,player);
 							return (type=='basic'||type=='trick')&&get.tag(card,'damage')>0;
 						}),target,'give');
@@ -18171,30 +18172,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:lib.filter.notMe,
 				content:function(){
 					player.awakenSkill('zhafu');
-					target.addSkill('zhafu_hf');
-					target.storage.zhafu_hf=player;
+					player.addSkill('zhafu_hf');
+					target.addMark('zhafu_hf',1);
 				},
 				subSkill:{
 					hf:{
 						trigger:{
-							player:'phaseDiscardBegin'
+							global:'phaseDiscardBegin'
 						},
 						forced:true,
-						popup:false,
 						charlotte:true,
-						onremove:true,
+						filter:function(event,player){
+							return event.player!=player&&event.player.hasMark('zhafu_hf');
+						},
 						content:function(){
 							'step 0'
-							if(player.countCards('h')<=1||player.storage.zhafu_hf.isDead()) event.finish();
+							var target=trigger.player;
+							event.target=target;
+							target.removeMark('zhafu_hf',1);
+							if(target.countCards('h')<=1) event.finish()	
 							'step 1'
-							player.storage.zhafu_hf.logSkill('zhafu_hf',player);
-							player.chooseCard('h',true,'选择保留一张手牌，将其余的手牌交给'+get.translation(player.storage.zhafu_hf)).ai=get.value;
+							target.chooseCard('h',true,'选择保留一张手牌，将其余的手牌交给'+get.translation(player)).set('ai',get.value);
 							'step 2'
-							var cards=player.getCards('h');
+							var cards=target.getCards('h');
 							cards.remove(result.cards[0]);
-							player.give(cards,player.storage.zhafu_hf);
-							'step 3'
-							player.removeSkill('zhafu_hf');
+							target.give(cards,player);
+						},
+						intro:{
+							content:'mark',
+							onunmark:true,
 						},
 					},
 				},

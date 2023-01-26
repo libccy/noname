@@ -256,7 +256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chenliuwushi:'陈留·吴氏',
 			clan_wuban:'族吴班',
 			clanzhanding:'斩钉',
-			clanzhanding_info:'你可以将任意张牌当做【杀】使用。你以此法使用的【杀】结算结束后，你令你的手牌上限-1，然后若你因此【杀】造成过伤害，则你将手牌摸至体力上限（至多摸五张），否则你令此【杀】不计入次数限制。',
+			clanzhanding_info:'你可以将任意张牌当做【杀】使用。你以此法使用的【杀】结算结束后，你令你的手牌上限-1，然后若你因此【杀】造成过伤害，则你将手牌摸至手牌上限（至多摸五张），否则你令此【杀】不计入次数限制。',
 			
 			clan_wu:'陈留·吴氏',
 		},
