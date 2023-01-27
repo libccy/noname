@@ -9465,6 +9465,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:'mark',
 				},
+				ai:{
+					combo:'spsanchen',
+					threaten:3.6,
+				},
 			},
 			spsanchen:{
 				audio:2,
@@ -9481,6 +9485,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					player.recover();
 					player.addSkillLog('spmiewu');
+				},
+				ai:{
+					combo:'wuku',
 				},
 				derivation:'spmiewu',
 			},

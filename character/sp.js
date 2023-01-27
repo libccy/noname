@@ -10525,7 +10525,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('xiashu',result.targets);
 						event.target=result.targets[0];
 						var hs=player.getCards('h');
-						player.give(hs,target);
+						player.give(hs,event.target);
 					}
 					else{
 						event.finish();
@@ -16636,8 +16636,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				audio:2,
 				filter:function(event,player){
-					return !player.isLinked()&&game.hasPlayer(function(current){
-						return current!=player&&current.isLinked();
+					return game.hasPlayer(function(current){
+						return current!=player&&!current.isLinked();
 					})
 				},
 				filterTarget:function(card,player,target){

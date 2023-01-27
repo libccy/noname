@@ -6695,7 +6695,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					game.delayx();
 					var go=false;
 					if(get.attitude(player,trigger.player)>0){
 						if(get.color(trigger.card)=='red'){
@@ -6731,6 +6730,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 						}
+					}
+					//AI停顿
+					if(go&&!event.isMine()&&!event.isOnline()&&player.hasCard(function(card){
+						return get.value(card)<6&&lib.filter.cardDiscardable(card,player,event.name);
+					},'he')){
+						game.delayx();
 					}
 					var next=player.chooseToDiscard(get.prompt('longyin'),'弃置一张牌'+(get.color(trigger.card)=='red'?'并摸一张牌':'')+'，令'+get.translation(trigger.player)+'本次使用的【杀】不计入使用次数','he');
 					next.logSkill=['longyin',trigger.player];
@@ -11720,7 +11725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
-						trigger.source(result.cards,player);
+						trigger.source.give(result.cards,player);
 					}
 					else{
 						trigger.source.loseHp();

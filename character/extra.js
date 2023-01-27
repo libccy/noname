@@ -94,9 +94,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				contentx:function(){
 					var card=event.judgeResult.card;
-					if(get.position(card,true)=='o') player.gain(card,'gain2');
 					var player=event.getParent(2).player;
 					var target=event.getParent(2).target;
+					if(get.position(card,true)=='o') player.gain(card,'gain2');
 					var list=[],str=lib.skill.shencai.getStr(card);
 					for(var i in lib.skill.shencai.filterx){
 						if(str.indexOf(lib.skill.shencai.filterx[i])!=-1) list.push('shencai_'+i);

@@ -1504,6 +1504,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return hs.contains(card);
 					});
 					event.cards=cards;
+					event.rawCards=cards.slice(0);
 					player.loseToDiscardpile(cards);
 					if(_status.currentPhase!=player) event.finish();
 					"step 1"
@@ -1512,9 +1513,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var number=get.number(event.card);
 					for(var i=0;i<ui.discardPile.childNodes.length;i++){
 						var current=ui.discardPile.childNodes[i];
-						if((!trigger.cards.contains(current))&&get.number(current)==number) event.togain.push(current);
+						if((!event.rawCards.contains(current))&&get.number(current)==number) event.togain.push(current);
 					}
-					if(!event.togain.length) event.goto(5);
+					if(!event.togain.length) event.goto(4);
 					"step 2"
 					player.chooseButton(['是否获得其中的一张牌？',event.togain]).ai=function(button){
 						return get.value(button.link);
@@ -1524,7 +1525,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.gain(result.links[0],'gain2').type='xinmanjuan';
 					}
 					"step 4"
-					if(event.cards.length) event.goto(2);
+					if(event.cards.length) event.goto(1);
 				},
 				ai:{
 					threaten:4.2,

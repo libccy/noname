@@ -10200,6 +10200,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseCardTarget({
 						filterCard:true,
+						position:'he',
 						filterTarget:function(card,player,target){
 							if(player==target) return false;
 							var card=ui.selected.cards[0];
@@ -10207,6 +10208,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return target.isEmpty(get.subtype(card));
 						},
 						prompt:get.prompt2('gzhuyuan'),
+						complexSelect:true,
 						ai1:function(card){
 							var player=_status.event.player;
 							if(get.type(card)!='equip') return 0;

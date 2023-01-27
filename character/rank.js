@@ -1288,6 +1288,7 @@ window.noname_character_rank={
 		'sp_huaxin',
 		'sp_xujing',
 		'caimaozhangyun',
+		'mushun',
 	],
 	d:[
 		'lvmeng',

@@ -5881,6 +5881,7 @@ window.noname_asset_list=[
 	'image/character/shen_zhangfei.jpg',
 	'image/character/wangwei.jpg',
 	'image/character/zhugeshang.jpg',
+	'image/character/mushun.jpg',
 	
 	'image/character/baiwuchang.jpg',
 	'image/character/baosanniang.jpg',

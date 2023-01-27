@@ -17941,7 +17941,7 @@
 					return next;
 				},
 				//原有函数
-				init:function(character,character2,skill){
+				init:function(character,character2,skill,update){
 					if(typeof character=='string'&&!lib.character[character]){
 						lib.character[character]=get.character(character);
 					}
@@ -18108,7 +18108,7 @@
 							this._inits[i](this);
 						}
 					}
-					this.update();
+					if(update!==false) this.update();
 					return this;
 				},
 				initOL:function(name,character){
@@ -21897,6 +21897,16 @@
 					lib.node.torespond={};
 					if(typeof proceed=='function') proceed();
 					else if(_status.paused&&!noresume) game.resume();
+				},
+				tempUnwait:function(result){
+					if(!lib.node.torespond.hasOwnProperty(this.playerid)){
+						return;
+					}
+					var proceed;
+					if(typeof lib.node.torespond[this.playerid]=='function'&&lib.node.torespond[this.playerid]._noname_waiting){
+						proceed=lib.node.torespond[this.playerid](result,this);
+					}
+					if(typeof proceed=='function') proceed();
 				},
 				logSkill:function(name,targets,nature,logv){
 					if(get.itemtype(targets)=='player') targets=[targets];
@@ -27027,8 +27037,10 @@
 				return true;
 			},
 			cardSavable:function(card,player,target){
-				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-				if(mod2!='unchanged') return mod2;
+				if(get.itemtype(card)=='card'){
+					var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+					if(mod2!='unchanged') return mod2;
+				}
 				var mod=game.checkMod(card,player,target,'unchanged','cardSavable',player);
 				if(mod!='unchanged') return mod;
 				var savable=get.info(card).savable;
@@ -27161,8 +27173,10 @@
 			cardEnabled:function(card,player,event){
 				if(player==undefined) player=_status.event.player;
 				if(!player) return false;
-				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-				if(mod2!='unchanged') return mod2;
+				if(get.itemtype(card)=='card'){
+					var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+					if(mod2!='unchanged') return mod2;
+				}
 				card=get.autoViewAs(card,null,player);
 				if(event==='forceEnable'){
 					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
@@ -27188,8 +27202,10 @@
 					}
 				}
 				if(player==undefined) player=_status.event.player;
-				var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-				if(mod2!='unchanged') return mod2;
+				if(get.itemtype(card)=='card'){
+					var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+					if(mod2!='unchanged') return mod2;
+				}
 				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
 				if(mod!='unchanged') return mod;
 				return true;
@@ -28537,6 +28553,13 @@
 					var player=lib.playerOL[this.id];
 					if(player){
 						player.unwait(result);
+					}
+				},
+				tempResult:function(result){
+					if(lib.node.observing.contains(this)) return;
+					var player=lib.playerOL[this.id];
+					if(player){
+						player.tempUnwait(result);
 					}
 				},
 				startGame:function(){
@@ -46270,7 +46293,7 @@
 								node.node.hp.remove();
 								node.node.group.remove();
 								node.node.intro.remove();
-								if(node.node.replaceButton) node.node.replaceButton.remove();;
+								if(node.node.replaceButton) node.node.replaceButton.remove();
 							}
 							node.node={
 								name:ui.create.div('.name',node),
@@ -49253,7 +49276,7 @@
 					this.classList.add('selected');
 					ui.selected.buttons.add(this);
 				}
-				if(custom.add.button){
+				if(custom&&custom.add&&custom.add.button){
 					custom.add.button();
 				}
 				game.check();
