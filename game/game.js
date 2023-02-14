@@ -48,7 +48,7 @@
 		mirrorURL:'https://nakamurayuri.coding.net/p/noname/d/noname/git/raw',
 		hallURL:'47.99.105.222',
 		assetURL:'', //资源地址，用于加载各种js、css、字体、图片、音乐等
-		cdnURL: 'http://image.pandarrr.site/noname/', //cdn地址，需要加速的资源使用这个地址
+		cdnURL: 'https://image.pandarrr.site/noname/', //cdn地址，需要加速的资源使用这个地址
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
