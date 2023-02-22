@@ -2642,13 +2642,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							event.wuxieresult=player;
 							event.wuxieresult2=result;
 							game.broadcast('cancel',id);
-							if(_status.event.id==id&&_status.event.name=='chooseToUse'&&_status.paused){
-								return (function(){
-									event.resultOL=_status.event.resultOL;
+							return (function(){
+								if(_status.event.id==id&&_status.event.name=='chooseToUse'&&_status.paused) event.resultOL=_status.event.resultOL;
+								if(_status.event._parent_id==id){
 									ui.click.cancel();
-									if(ui.confirm) ui.confirm.close();
-								});
-							}
+								}
+								if(_status.event.id==id){
+									if(_status.event._backup) ui.click.cancel();
+									ui.click.cancel();
+									if(ui.confirm){
+										ui.confirm.close();
+									}
+									if(_status.event.result){
+										_status.event.result.id=id;
+									}
+								}
+							});
 						}
 						else{
 							if(_status.event.id==id&&_status.event.name=='chooseToUse'&&_status.paused){
@@ -2703,6 +2712,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						game.players[i].hideTimer();
 					}
 					'step 8'
+					if(event.wuxieresult2._sendskill) lib.skill[event.wuxieresult2._sendskill[0]]=event.wuxieresult2._sendskill[1];
 					if(event.wuxieresult&&event.wuxieresult2&&event.wuxieresult2.skill){
 						var info=get.info(event.wuxieresult2.skill);
 						if(info&&info.precontent&&!game.online){

@@ -6518,7 +6518,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.line(result.targets,'green');
 					if(result.cards.length){
 						event.cards=result.cards;
-						player.give(result.cards,result.cards[0]);
+						player.give(result.cards,result.targets[0]);
 					}
 					else{
 						player.storage.gzzhengbi_eff1=result.targets[0];
@@ -10114,7 +10114,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					global:['useCardToPlayered','useCardToTargeted'],
 				},
 				preHidden:true,
-				frequent:true,
+				//frequent:true,
 				direct:true,
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;

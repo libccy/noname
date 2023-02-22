@@ -87,7 +87,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kyou:['female','key',3,['kyou_zhidian','kyou_duanfa']],
 			key_seira:['female','key',3,['seira_xinghui','seira_yuanying']],
 			key_kiyu:['female','key',3,['kiyu_yuling','kiyu_xianyu']],
-			//key_tomoyo:['female','key',4,['tomoyo_wuwei','tomoyo_yingshou']],
+			key_tomoyo:['female','key',4,['tomoyo_wuwei','tomoyo_zhengfeng']],
 			
 			ns_huangchengyan:['male','shu',3,['nslongyue','nszhenyin']],
 			ns_sunchensunjun:['male','wu',5,['nsxianhai','nsxingchu']],
@@ -205,7 +205,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"ns_huangchengyan","ns_sunchensunjun","ns_yuanxi","ns_caoshuang"],
 				diy_yijiang2:["key_yuuki","key_tenzen","key_kyouko","key_kotarou","key_kyou",
 				"ns_chentai","ns_huangwudie","ns_sunyi","ns_zhangning","ns_yanghu"],
-				diy_yijiang3:['ns_ruanji','ns_zanghong','ns_limi','ns_zhonglimu','prp_zhugeliang','key_seira','key_kiyu'],
+				diy_yijiang3:['ns_ruanji','ns_zanghong','ns_limi','ns_zhonglimu','prp_zhugeliang','key_seira','key_kiyu','key_tomoyo'],
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu"],
 				diy_xushi:["diy_feishi","diy_hanlong","diy_liufu","diy_liuyan","diy_liuzan","diy_tianyu","diy_xizhenxihong","diy_yangyi","diy_zaozhirenjun"],
@@ -547,6 +547,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var storage=player.getStorage('tomoyo_wuwei_mark');
 					return !storage.contains(get.suit(card));
 				},
+				check:function(card){
+					return 5-get.value(card);
+				},
 				onuse:function(result,player){
 					player.markAuto('tomoyo_wuwei_mark',[get.suit(result.card,false)]);
 					player.addTempSkill('tomoyo_wuwei_mark');
@@ -565,10 +568,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'useCardAfter'},
 						direct:true,
 						filter:function(event,player){
-							return player.inRangeOf(event.player)&&player.canUse('sha',event.player,false);
+							return event.card.name=='shan'&&player.inRangeOf(event.player)&&player.canUse('sha',event.player,false);
 						},
 						content:function(){
-							player.chooseToUse(get.prompt('tomoyo_wuwei',trigger.target),'对该角色使用一张【杀】',function(card,player,event){
+							player.chooseToUse('武威：是否对'+get.translation(trigger.player)+'使用一张【杀】？',function(card,player,event){
 								if(get.name(card)!='sha') return false;
 								return lib.filter.filterCard.apply(this,arguments);
 							},trigger.player,-1).set('addCount',false).logSkill='tomoyo_wuwei_combo';
@@ -576,8 +579,136 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			tomoyo_yingshou:{},
-			tomoyo_changshi:{},
+			tomoyo_zhengfeng:{
+				dutySkill:true,
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				filter:function(event,player){
+					return game.hasPlayer((current)=>player.inRange(current));
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('tomoyo_zhengfeng'),'令一名攻击范围内的角色进行判定。其于你的下回合开始前使用与判定结果颜色相同的牌时，你摸一张牌。',function(card,player,target){
+						return player.inRange(target);
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						if(player.hp<=1&&!player.countCards('h')) return 0;
+						var hs=target.countCards('h'),thr=get.threaten(target);
+						if(target.hasJudge('lebu')) return 0;
+						return Math.sqrt(1+hs)*Math.sqrt(Math.max(1,1+thr));
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('tomoyo_zhengfeng',target);
+						target.judge();
+					}
+					'step 2'
+					player.addTempSkill('tomoyo_zhengfeng_tomoyo',{player:'phaseBeginStart'});
+					player.markAuto('tomoyo_zhengfeng_tomoyo',[{
+						target:target,
+						color:result.color,
+					}]);
+				},
+				group:'tomoyo_zhengfeng_after',
+				subSkill:{
+					tomoyo:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							inRangeOf:function(source,player){
+								var list=player.getStorage('tomoyo_zhengfeng_tomoyo');
+								for(var obj of list){
+									if(obj.target==source) return true;
+								}
+							},
+						}, 
+						trigger:{global:'useCard'},
+						forced:true,
+						filter:function(event,player){
+							var color=get.color(event.card);
+							if(color=='none') return false;
+							var list=player.getStorage('tomoyo_zhengfeng_tomoyo');
+							for(var obj of list){
+								if(obj.target==event.player&&color==obj.color) return true;
+							}
+							return false;
+						},
+						content:function(){
+							player.draw();
+						},
+						intro:{
+							mark:function(dialog,students,player){
+								if(!students||!students.length) return '全校风纪良好！';
+								var str='';
+								for(var i of students){
+									if(str.length>0) str+='<br>';
+									str+=get.translation(i.target);
+									str+='：';
+									str+=get.translation(i.color);
+								}
+								dialog.addText(str);
+							},
+						},
+					},
+					after:{
+						trigger:{player:'phaseJieshuBegin'},
+						filter:function(event,player){
+							return !player.hasHistory('useSkill',function(evt){
+								return evt.skill=='tomoyo_zhengfeng';
+							});
+						},
+						prompt:'整风：是否放弃使命？',
+						prompt2:'你可以减1点体力上限并失去〖武威〗，摸两张牌并回复1点体力，然后获得技能〖长誓〗。',
+						skillAnimation:true,
+						animationColor:'gray',
+						check:function(event,player){
+							return (player.hp*1.1+player.countCards('h'))<3;
+						},
+						content:function(){
+							'step 0'
+							game.log(player,'放弃了身为学生会长的使命');
+							player.awakenSkill('tomoyo_zhengfeng');
+							player.loseMaxHp();
+							'step 1'
+							player.removeSkill('tomoyo_wuwei');
+							'step 2'
+							player.draw(2);
+							player.recover();
+							'step 3'
+							player.addSkill('tomoyo_changshi');
+						},
+					},
+				},
+			},
+			tomoyo_changshi:{
+				trigger:{
+					global:['gainAfter','loseAsyncAfter'],
+				},
+				forced:true,
+				filter:function(event,player){
+					return game.hasPlayer(function(current){
+						return current!=player&&event.getg(current).length>1&&player.inRangeOf(current);
+					});
+				},
+				content:function(){
+					player.draw();
+				},
+				group:'tomoyo_changshi_recover',
+				subSkill:{
+					recover:{
+						trigger:{global:'recoverAfter'},
+						forced:true,
+						filter:function(event,player){
+							return event.player.isAlive()&&player.inRangeOf(event.player);
+						},
+						content:function(){
+							player.changeHujia(1);
+						},
+					},
+				},
+			},
 			//天宫希优
 			kiyu_yuling:{
 				mod:{
@@ -17144,10 +17275,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_tomoyo:'坂上智代',
 			tomoyo_wuwei:'武威',
 			tomoyo_wuwei_info:'①每回合每种花色限一次。你可以将一张手牌当做【杀】使用或打出。②当有角色使用【闪】后，若你在其攻击范围内，你可以对其使用一张【杀】（无距离限制）。',
-			/*tomoyo_yingshou:'樱守',
-			tomoyo_yingshou_info:'',
+			tomoyo_zhengfeng:'整风',
+			tomoyo_zhengfeng_info:'使命技。①准备阶段，你可以令攻击范围内的一名角色进行判定。若如此做，你获得如下效果直到下回合开始：你视为在该角色的攻击范围内，且当该角色使用与判定牌颜色相同的牌时，你摸一张牌。②失败：结束阶段，若你于本回合内未发动过〖整风①〗，则你可以减1点体力上限。你失去〖武威〗，摸两张牌并回复1点体力，然后获得〖长誓〗。',
 			tomoyo_changshi:'长誓',
-			tomoyo_changshi_info:'',*/
+			tomoyo_changshi_info:'锁定技。一名攻击范围内包含你的角色回复体力后，你获得1点护甲；一名攻击范围内包含你的角色一次性获得至少两张牌后，你摸一张牌。',
 
 			noname:"小无",
 			noname_zhuyuan:"祝愿",

@@ -1909,9 +1909,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player.canEquip(card,true);
 					});
 					if(cards.length){
-						player.$give(card,player,false);
+						player.$give(cards[0],player,false);
 						game.delay(0.5);
-						player.equip(card);
+						player.equip(cards[0]);
 						event.redo();
 					}
 					'step 1'

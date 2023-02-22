@@ -13,10 +13,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				yijiang_2015:['caoxiu','caorui','zhongyao','xiahoushi','liuchen','zhangyi','zhuzhi','quancong','sunxiu','gongsunyuan','guotufengji'],
 				yijiang_2016:['guohuanghou','sunziliufang','huanghao','liyan','sundeng','cenhun','zhangrang','liuyu'],
 				yijiang_2017:['xinxianying','jikang','wuxian','qinmi','xuezong','xushi','caiyong','caojie'],
-				yijiang_2022:['lukai','kebineng','zhugeshang'],
+				yijiang_2022:['lukai','kebineng','zhugeshang','liwan'],
 			},
 		},
 		character:{
+			liwan:['female','wei',3,['liandui','biejun']],
 			zhugeshang:['male','shu',3,['sangu','yizu']],
 			kebineng:['male','qun',4,['kousheng']],
 			lukai:['male','wu',4,['lkbushi','lkzhongzhuang']],
@@ -28,7 +29,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangchunhua:['female','wei',3,['jueqing','shangshi']],
 			caozhi:['male','wei',3,['luoying','jiushi']],
 			caochong:['male','wei',3,['chengxiang','renxin']],
-			xunyou:['male','wei',3,['qice','zhiyu']],
+			xunyou:['male','wei',3,['qice','zhiyu'],['clan:颍川荀氏']],
 			xin_xushu:['male','shu',3,['xinwuyan','xinjujian']],
 			xin_masu:['male','shu',3,['olsanyao','rezhiman']],
 			zhuran:['male','wu',4,['danshou']],
@@ -103,6 +104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yujin:["male","wei",4,["yizhong"],[]],
 		},
 		characterIntro:{
+			liwan:'李婉（生卒年不详），字淑文，里居不详，贾充之妻，魏晋时期才女，约景元年间（260年前后）在世。著有《典戒》。《隋书·经籍志》载李婉有文集一卷，今失传。',
 			zhugeshang:'诸葛尚（244年2月－263年11月），琅琊阳都（今山东沂南）人，诸葛瞻长子，诸葛亮之孙。诸葛尚博览兵书且精通武艺。炎兴元年（公元263年），出任先锋，抗拒魏国大将邓艾，与其父诸葛瞻同战死于绵竹，时年十九岁。',
 			kebineng:'轲比能（？～235年），为中国三国时期的鲜卑首领之一。轲比能出身鲜卑支部，因他作战勇敢，执法公平，不贪财物，所以被鲜卑民众推举为大人。轲比能因其部落近塞，所以他抓住有利条件积极学习汉族先进技术和文化，促进了鲜卑族的进步和北方的民族融合。轲比能统率下的部众，战守有法，战斗力相当强大。自曹操北征后向曹氏进贡表示效忠。魏文帝时，轲比能受封附义王。轲比能在进行部落统一战争时，受魏国干涉，受沉重打击，于是对魏怀贰，献书魏帝表忠，以麻痹魏庭，使之放松警惕。此后，轲比能的部众变得强盛，控弦十余万骑，为害魏国边境。每次钞略得财物，轲比能都公开透明地均平分配，所以得部众死力，各部大人都敬畏之。实力强大后，他继续部落统一战争，于是威行诸部落，建立起强大的鲜卑族政权。深感威胁的魏国幽州刺史王雄派刺客韩龙将其刺杀，其政权立刻崩溃，鲜卑民族再次陷入混战。',
 			lukai:'陆凯（198－269年），字敬风，吴郡吴县（今江苏省苏州市）人。三国时期吴国重臣，丞相陆逊的族侄，大司马陆抗的族兄。黄武年间，举孝廉出身，曾任永兴县长、诸暨县长，颇有治绩。拜建武都尉、儋耳太守，与聂友率军讨伐朱崖和儋耳，迁建武校尉。五凤二年（255年），讨斩零陵山贼陈毖，拜偏将军、巴丘督，册封都乡侯。迁武昌右部督，随军进入寿春。后拜荡魏将军，加号绥远将军。吴景帝孙休继位，拜征北将军、假节、领豫州牧。孙皓即位，迁任镇西大将军，都督巴丘，又领荆州牧，进封嘉兴侯。宝鼎元年（266年），迁左丞相。以正直及屡次劝谏孙皓而闻名。建衡元年（269年），去世，时年七十二。',
@@ -201,6 +203,131 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhonghui:['jiangwei'],
 		},
 		skill:{
+			//李婉
+			liandui:{
+				audio:2,
+				trigger:{global:'useCard'},
+				filter:function(event,player){
+					var history=game.getAllGlobalHistory('useCard');
+					var index=history.indexOf(event);
+					if(index<=0) return false;
+					var previous=history[index-1].player;
+					if(event.player==player&&previous!=player&&previous.isIn()) return true;
+					if(event.player!=player&&previous==player) return true;
+					return false;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var history=game.getAllGlobalHistory('useCard');
+					var index=history.indexOf(trigger);
+					var previous=history[index-1].player;
+					var user=trigger.player,target=previous;
+					event.user=user;event.target=target;
+					if(user){
+						user.chooseBool('是否对'+get.translation(target)+'发动【联对】？','令'+get.translation(target)+'摸两张牌').set('ai',()=>_status.event.bool).set('bool',get.effect(target,{name:'wuzhong'},user,user)>0);
+					}
+					'step 1'
+					if(result.bool){
+						event.user.logSkill('liandui',target);
+						target.draw(2);
+					}
+				}
+			},
+			biejun:{
+				audio:2,
+				global:'biejun_give',
+				trigger:{player:'damageBegin4'},
+				filter:function(event,player){
+					return !player.hasSkill('biejun_used')&&player.countCards('h',card=>{
+						return card.hasGaintag('biejun');
+					})==0;
+				},
+				prompt2:'翻面并防止此伤害',
+				check:function(event,player){
+					return player.isTurnedOver()||event.num>=player.hp||get.distance(_status.currentPhase,player,'absolute')>=3;
+				},
+				content:function(){
+					player.addTempSkill('biejun_used');
+					player.turnOver();
+					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
+							if(get.tag(card,'damage')){
+								if(player.getNext()==target&&lib.skill.biejun.filter(null,target)&&target.isTurnedOver()) return [0,1];
+							}
+						}
+					}
+				},
+				subSkill:{
+					used:{charlotte:true},
+					give:{
+						audio:2,
+						enable:'phaseUse',
+						usable:1,
+						filter:function(event,player){
+							if(!player.countCards('h')) return false;
+							var targets=game.filterPlayer(function(current){
+								return current!=player&&current.hasSkill('biejun');
+							});
+							if(!targets.length) return false;
+							return true;
+						},
+						selectCard:1,
+						filterCard:true,
+						filterTarget:function(card,player,target){
+							return target.hasSkill('biejun');
+						},
+						selectTarget:function(){
+							var player=_status.event.player;
+							var targets=game.filterPlayer(function(current){
+								return current!=player&&current.hasSkill('biejun');
+							});
+							return targets.length>1?1:-1;
+						},
+						complexSelect:true,
+						prompt:function(){
+							var player=_status.event.player;
+							var targets=game.filterPlayer(function(current){
+								return current!=player&&current.hasSkill('biejun');
+							});
+							return '将一张手牌交给'+get.translation(targets)+(targets.length>1?'中的一人':'');
+						},
+						position:'h',
+						discard:false,
+						lose:false,
+						delay:false,
+						check:function(card){
+							var player=_status.event.player;
+							if(game.hasPlayer(function(current){
+								return lib.skill.biejun_give.filterTarget(null,player,current)&&get.attitude(player,current)>0;
+							})){
+								return 5-get.value(card);
+							}
+							return -get.value(card);
+						},
+						content:function(){
+							game.trySkillAudio('biejun',target);
+							player.give(cards,target).gaintag.add('biejun');
+							target.addTempSkill('biejun_tag');
+						},
+						ai:{
+							order:2,
+							result:{target:1},
+						},
+					},
+					tag:{
+						charlotte:true,
+						forced:true,
+						onremove:function(player){
+							player.removeGaintag('biejun');
+						}
+					}
+				}
+			},
 			//诸葛尚
 			sangu:{
 				audio:2,
@@ -469,7 +596,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{source:'damageSource'},
 						forced:true,
 						filter:function(event,player){
-							if(!event.card.storage||!event.card.storage.kousheng||event.getParent().type!='card') return false;
+							if(!event.card||!event.card.storage||!event.card.storage.kousheng||event.getParent().type!='card') return false;
 							var target=event.player;
 							return target.isIn()&&player.hasCard(function(card){
 								return card.hasGaintag('kousheng');
@@ -2337,11 +2464,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			fenli:{
 				audio:2,
+				audioname:['xin_zhuhuan'],
 				group:['fenli_draw','fenli_use','fenli_discard'],
 				subfrequent:['discard'],
 				subSkill:{
 					draw:{
 						audio:'fenli',
+						audioname:['xin_zhuhuan'],
 						trigger:{player:'phaseDrawBefore'},
 						prompt:'是否发动【奋励】跳过摸牌阶段？',
 						filter:function(event,player){
@@ -2359,6 +2488,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					use:{
 						audio:'fenli',
+						audioname:['xin_zhuhuan'],
 						trigger:{player:'phaseUseBefore'},
 						prompt:'是否发动【奋励】跳过出牌阶段？',
 						filter:function(event,player){
@@ -2377,6 +2507,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					discard:{
 						audio:'fenli',
+						audioname:['xin_zhuhuan'],
 						trigger:{player:'phaseDiscardBefore'},
 						prompt:'是否发动【奋励】跳过弃牌阶段？',
 						frequent:true,
@@ -10554,6 +10685,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhichi:{
 				audio:2,
 				trigger:{player:'damageEnd'},
+				audioname:['re_chengong'],
 				forced:true,
 				filter:function(event,player){
 					return _status.currentPhase!=player;
@@ -12672,13 +12804,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caozhen:['re_caozhen','xin_caozhen','caozhen','old_caozhen'],
 			wuyi:['re_wuyi','wuyi'],
 			sunluban:['re_sunluban','xin_sunluban','sunluban'],
-			zhuhuan:['re_zhuhuan','zhuhuan','old_zhuhuan'],
+			zhuhuan:['re_zhuhuan','xin_zhuhuan','zhuhuan','old_zhuhuan'],
 			caoxiu:['re_caoxiu','caoxiu','old_caoxiu'],
 			xiahoushi:['re_xiahoushi','xiahoushi'],
 			zhangyi:['re_zhangyi','zhangyi'],
 			quancong:['old_quancong','re_quancong','xin_quancong','quancong'],
 			sunxiu:['re_sunxiu','xin_sunxiu','sunxiu'],
-			zhuzhi:['zhuzhi','old_zhuzhi'],
+			zhuzhi:['zhuzhi','xin_zhuzhi','old_zhuzhi'],
 			liuyu:['dc_liuyu','liuyu','ol_liuyu'],
 			zhangrang:['zhangrang','ol_zhangrang','junk_zhangrang'],
 			jikang:['re_jikang','jikang'],
@@ -12693,6 +12825,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guohuanghou:['re_guohuanghou','guohuanghou'],
 			liuchen:['re_liuchen','liuchen'],
 			liufeng:['re_liufeng','liufeng'],
+			sundeng:['re_sundeng','sundeng'],
+			caiyong:['re_caiyong','caiyong'],
+			chengong:['re_chengong','chengong'],
 		},
 		translate:{
 			old_huaxiong:'华雄',
@@ -13293,6 +13428,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sangu_info:'出牌阶段结束时，你可以选择至多三个{【杀】或不为notarget或singleCard的普通锦囊牌}中的牌名，然后令一名其他角色记录这些牌名。该角色的下个出牌阶段开始时，其的手牌均视为其记录中的第一张牌直到此阶段结束，且当其使用或打出牌时，移除这些牌中的第一张牌。若你以此法选择过的牌名中包含你本阶段内未使用过的牌名，则你失去1点体力。',
 			yizu:'轶祖',
 			yizu_info:'锁定技。每回合限一次，当你成为【杀】或【决斗】的目标后，若你的体力值不大于使用者的体力值，则你回复1点体力。',
+			liwan:'李婉',
+			liandui:'联对',
+			liandui_info:'①当你使用牌时，若本局游戏内上一张被使用的牌的使用者不为你，你可以令其摸两张牌。②其他角色使用牌时，若本局游戏内上一张被使用的牌的使用者为你，其可以令你摸两张牌。',
+			biejun:'别君',
+			biejun_info:'①其他角色的出牌阶段限一次。其可以将一张手牌交给你。②每回合限一次。当你受到伤害时，若你手牌中没有本回合因〖别君①〗获得的牌，你可以翻面并防止此伤害。',
 			
 			yijiang_2011:'一将成名2011',
 			yijiang_2012:'一将成名2012',

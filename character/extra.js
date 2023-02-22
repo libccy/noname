@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_yin:['shen_liubei','shen_luxun'],
 				extra_lei:['shen_ganning','shen_zhangliao'],
 				extra_key:['key_kagari','key_shiki','db_key_hina'],
-				extra_decade:['shen_jiangwei','shen_machao','shen_zhangfei'],
+				extra_decade:['shen_jiangwei','shen_machao','shen_zhangfei','shen_zhangjiao'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji','shen_sunquan'],
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
@@ -22,6 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			shen_zhangjiao:['male','shen',3,['yizhao','sijun','sanshou','tianjie'],['qun']],
 			shen_zhangfei:['male','shen',4,['shencai','xunshi'],['shu']],
 			tw_shen_guanyu:['male','shen',4,['twwushen','twwuhun'],['shu']],
 			shen_machao:['male','shen',4,['shouli','hengwu'],['shu']],
@@ -72,6 +73,148 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//神张角
+			yizhao:{
+				audio:2,
+				trigger:{
+					player:['useCard','respond']
+				},
+				forced:true,
+				filter:function(event,player){
+					return typeof get.number(event.card)=='number';
+				},
+				marktext:'黄',
+				intro:{
+					name:'黄(异兆/肆军)',
+					name2:'黄',
+					content:'mark',
+					markcount:function(storage,player){
+						return storage.toString().slice(-2);
+					},
+				},
+				content:function(){
+					'step 0'
+					event.num=player.countMark('yizhao');
+					player.addMark('yizhao',get.number(trigger.card));
+					'step 1'
+					var num=Math.floor(num/10)%10,num2=Math.floor(player.countMark('yizhao')/10)%10;
+					if(num!=num2){
+						var card=get.cardPile2(card=>{
+							return get.number(card,false)==num2;
+						});
+						if(card) player.gain(card,'gain2');
+					}
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(get.number(card)+player.countMark('yizhao')%10>10) return num+10;
+					},
+				},
+				ai:{
+					threaten:1.5,
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card)=='equip'&&!get.cardtag(card,'gifts')) return [1,0.1];
+						}
+					}
+				}
+			},
+			sijun:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter:function(event,player){
+					return player.countMark('yizhao')>ui.cardPile.childNodes.length;
+				},
+				check:()=>true,
+				content:function(){
+					'step 0'
+					player.removeMark('yizhao',player.countMark('yizhao'));
+					'step 1'
+					var total=0,cards=[];
+					for(var i=0;i<36;i++){
+						var card=get.cardPile(card=>{
+							if(cards.contains(card)) return false;
+							var num=get.number(card,false);
+							if(total+num>36) return false;
+							return true;
+						});
+						if(card){
+							total+=get.number(card,false);
+							cards.push(card);
+						}
+						if(total==36) break;
+					}
+					if(cards.length) player.gain(cards,'gain2');
+				}
+			},
+			sanshou:{
+				audio:2,
+				trigger:{player:'damageBegin4'},
+				check:function(event,player){
+					return get.damageEffect(player,event.source,event.source,event.nature)<=0;
+				},
+				content:function(){
+					'step 0'
+					var cards=game.cardsGotoOrdering(get.cards(3)).cards;
+					event.cards=cards;
+					player.showCards(cards,get.translation(player)+'发动了【三首】');
+					'step 1'
+					var types=[];
+					types.addArray(game.getGlobalHistory('useCard').map(evt=>get.type2(evt.card)));
+					if(cards.filter(card=>!types.contains(get.type2(card))).length){
+						trigger.cancel();
+					}
+					game.delayx();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(card.name=='shandian'||card.name=='fulei') return [0,0.1];
+							if(!get.tag(card,'damage')) return;
+							var types=[],bool=0;
+							types.addArray(game.getGlobalHistory('useCard').map(evt=>get.type2(evt.card)));
+							if(!types.contains(get.type2(card))) bool=1;
+							if(types.length<2) return Math.min(1,0.4+(types.length+bool)*0.2);
+						}
+					}
+				},
+			},
+			tianjie:{
+				audio:2,
+				trigger:{global:'phaseEnd'},
+				direct:true,
+				filter:function(event,player){
+					return player.hasSkill('tianjie_shuffled');
+				},
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('tianjie_effect'),'选择至多三名其他角色，依次对这些角色造成X点雷电伤害（X为其手牌中【闪】的数量，至少为1）',[1,3]).set('ai',target=>{
+						var player=_status.event.player;
+						return get.damageEffect(target,player,player,'thunder')*Math.sqrt(Math.max(1,target.countCards('h','shan')));
+					});
+					'step 1'
+					if(result.bool){
+						var targets=result.targets;
+						player.logSkill('tianjie_effect',targets);
+						for(var target of targets){
+							var num=Math.max(1,target.countCards('h','shan'));
+							target.damage(num,'thunder');
+						}
+					}
+				},
+				subSkill:{
+					effect:{
+						trigger:{global:'washCard'},
+						forced:true,
+						silent:true,
+						charlotte:true,
+						content:function(){
+							player.addTempSkill('tianjie_shuffled');
+						},
+					},
+					shuffled:{charlotte:true},
+				}
+			},
 			shencai:{
 				audio:2,
 				enable:'phaseUse',
@@ -6529,6 +6672,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shencai_info:'①出牌阶段限一次，你可以令一名其他角色进行判定。你获得此判定牌，然后若此判定牌：包含以下要素中的任意一个，则其失去已有的下列效果，并获得对应的效果：{⒈体力：当其受到伤害后，其失去等量的体力、⒉武器：其不能使用牌响应杀、⒊打出：当其失去手牌后，其再随机弃置一张手牌（不嵌套触发）、⒋距离：其的结束阶段开始时，其翻面}；若均不包含，你获得其一张牌，其获得一枚“死”并获得如下效果：其的角色手牌上限-X、其的回合结束时，若X大于场上存活人数，则其死亡（X为其“死”标记数）。',
 			xunshi:'巡使',
 			xunshi_info:'锁定技。①你手牌区内所有的多目标锦囊牌均视为花色为none的普【杀】。②你使用颜色为none的牌无距离和次数限制。③当你使用无颜色的牌选择目标后，你令你的〖神裁〗的发动次数上限+1（至多为5），然后可以为此牌增加任意个目标。',
+			shen_zhangjiao:'神张角',
+			yizhao:'异兆',
+			yizhao_info:'锁定技。当你使用或打出牌后，你获得等同于此牌点数枚“黄”标记。然后若“黄”的十位数发生变化，你获得牌堆中一张点数为你“黄”的十位数的牌。',
+			sijun:'肆军',
+			sijun_info:'准备阶段，若“黄”数大于牌堆的牌数，你可以移去所有“黄”，然后随机获得任意张点数之和为36的牌。',
+			sanshou:'三首',
+			sanshou_info:'当你受到伤害时，你可以亮出牌堆顶三张牌。若其中有本回合未被使用过的牌的类型，防止此伤害。',
+			tianjie:'天劫',
+			tianjie_info:'一名角色的回合结束时，若本回合牌堆洗过牌，你可以选择至多三名其他角色。你依次对每名目标角色造成X点雷电伤害（X为其手牌中【闪】的数量，至少为1）。',
+
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',

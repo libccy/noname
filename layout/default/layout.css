@@ -1452,9 +1452,9 @@ div:not(.handcards)>.card>.info>span,
 	width: 100%;
 }
 .buttons.guanxing {
-	min-height: 106px;
+	min-height: 106px !important;
 	margin: 0px;
-	width: 90%;
+	width: 90% !important;
 }
 .buttons.smallzoom {
 	display: block;

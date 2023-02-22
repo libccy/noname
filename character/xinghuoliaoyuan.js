@@ -1529,7 +1529,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"weilu_effect2":"威虏",
 			"weilu_effect2_info":"",
 			"xinfu_zengdao":"赠刀",
-			"xinfu_zengdao_info":"限定技，出牌阶段，你可以将装备牌内的任意张牌置于一名其他角色的武将牌旁，称之为「刀」。该角色造成伤害时，其须移去一张「刀」，然后此伤害+1。",
+			"xinfu_zengdao_info":"限定技，出牌阶段，你可以将装备区内的任意张牌置于一名其他角色的武将牌旁，称之为“刀”。该角色造成伤害时，其须移去一张“刀”，然后此伤害+1。",
 			"xinfu_zengdao2":"赠刀",
 			"xinfu_zengdao2_info":"",
 			"xinfu_guanwei":"观微",

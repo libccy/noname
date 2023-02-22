@@ -889,7 +889,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					order:10,
 					result:{
-						player:1,
+						player:function(player){
+							if(_status.event.dying) return get.attitude(player,_status.event.dying)>0;
+							return 1;
+						},
 					},
 				},
 				group:['twyingji_wuxie'],

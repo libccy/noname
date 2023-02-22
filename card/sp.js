@@ -155,7 +155,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				toself:true,
 				judge:function(card){
 					if(get.suit(card)=='spade') return -6;
-					return 0;
+					return 6;
+				},
+				judge2:function(result){
+					if(result.bool==false) return true;
+					return false;
 				},
 				cardPrompt:function(card){
 					var str='出牌阶段，对你使用。你将【浮雷】置入判定区。若判定结果为♠，则目标角色受到X点雷电伤害（X为此牌判定结果为♠的次数）。判定完成后，将此牌移动到下家的判定区里。';
@@ -383,8 +387,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return (lib.filter.judge(card,player,target)&&player!=target);
 				},
 				judge:function(card){
-					if(get.suit(card)=='club') return 0;
+					if(get.suit(card)=='club') return 1;
 					return -3;
+				},
+				judge2:function(result){
+					if(result.bool==false) return true;
+					return false;
 				},
 				effect:function(){
 					if(result.bool==false){

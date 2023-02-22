@@ -775,6 +775,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				locked:false,
 				audio:2,
+				audioname:['sb_zhenji'],
 				enable:['chooseToRespond','chooseToUse'],
 				filterCard:function(card){
 					return get.color(card)=='black';
@@ -2420,10 +2421,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.name=='dying') return true;
 					if(event.giver!=player) return false;
 					if(event.name=='gain'){
-						return event.getg(event.player).length>0;
+						return event.player!=player&&event.getg(event.player).length>0;
 					}
 					return game.hasPlayer(function(current){
-						return event.getg(current).length>0;
+						return current!=player&&event.getg(current).length>0;
 					});
 				},
 				direct:true,
@@ -2431,7 +2432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					if(trigger.name!='loseAsync') event.targets=[trigger.player];
 					else event.targets=game.filterPlayer(function(current){
-						return trigger.getg(current).length>0;
+						return current!=player&&trigger.getg(current).length>0;
 					});
 					'step 1'
 					var target=event.targets.shift();
