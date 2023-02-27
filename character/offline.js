@@ -2617,7 +2617,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			suiren_info:'限定技，准备阶段开始时，你可以失去技能〖义从〗，然后加1点体力上限并回复1点体力，然后令一名角色摸三张牌。',
 			huangjinleishi:'黄巾雷使',
 			fulu:'符箓',
-			fulu_info:'当你声明使用普通【杀】时，你可以将此【杀】改为雷【杀】。',
+			fulu_info:'当你声明使用普通【杀】后，你可以将此【杀】改为雷【杀】。',
 			fuji:'助祭',
 			fuji_info:'当一名角色造成雷属性伤害时，你可以令其进行判定，若结果为黑色，此伤害+1；若结果为红色，该角色获得判定牌。',
 			sp_pangtong:'SP庞统',

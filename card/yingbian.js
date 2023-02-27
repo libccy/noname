@@ -808,7 +808,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			chuqibuyi_info:'出牌阶段，对一名有手牌的其他角色使用。你展示其一张手牌，若此牌与【出其不意】的花色不同，则你对其造成1点伤害。',
 			wuxinghelingshan:'五行鹤翎扇',
 			wuxinghelingshan_skill:'五行鹤翎扇',
-			wuxinghelingshan_info:'当你声明使用不为神属性的属性【杀】时，你可将此【杀】的属性改为不为神属性的其他属性。',
+			wuxinghelingshan_info:'当你声明使用不为神属性的属性【杀】后，你可将此【杀】的属性改为不为神属性的其他属性。',
 			wutiesuolian:'乌铁锁链',
 			wutiesuolian_skill:'乌铁锁链',
 			wutiesuolian_info:'锁定技，当你使用【杀】指定目标后，若其未横置，则其横置。',
