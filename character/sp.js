@@ -17,7 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_wanglang:['wanglang'],
 				sp_tongque:["sp_fuwan","sp_fuhuanghou","sp_jiben"],
 				sp_zhongdan:["cuiyan","huangfusong"],
-				sp_guozhan2:["mateng","tianfeng","sp_dongzhuo","liqueguosi","zhangren"],
+				sp_guozhan2:["tianfeng","sp_dongzhuo","liqueguosi","zhangren"],
 				//sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
@@ -107,7 +107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoang:['male','wei',4,['kaikang']],
 			sp_caoren:['male','wei',4,['weikui','lizhan']],
 			zhangbao:['male','qun',3,['rezhoufu','reyingbing']],
-			maliang:['male','shu',3,['zishu','xinyingyuan']],
+			maliang:['male','shu',3,['zishu','yingyuan']],
 			zhugedan:['male','wei',4,['gongao','juyi']],
 			sp_jiangwei:['male','wei',4,['kunfen','fengliang']],
 			sp_machao:['male','qun',4,['olzhuiji','ol_shichou']],
@@ -151,11 +151,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mazhong:['male','shu',4,['fuman']],
 			dongyun:['male','shu',3,['bingzheng','sheyan']],
 			kanze:['male','wu',3,['xiashu','kuanshi']],
-			heqi:['male','wu',4,['qizhou','shanxi']],
+			heqi:['male','wu',4,['olqizhou','olshanxi']],
 
 			ganfuren:['female','shu',3,['shushen','shenzhi']],
 			//mifuren:['female','shu',3,['guixiu','cunsi']],
-			mateng:['male','qun',4,['xiongyi','mashu']],
+			//mateng:['male','qun',4,['xiongyi','mashu']],
 			tianfeng:['male','qun',3,['sijian','suishi']],
 			yuejin:['male','wei',4,['xiaoguo']],
 			sp_dongzhuo:['male','qun',5,['hengzheng']],
@@ -663,6 +663,147 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			olqizhou:{
+				audio:'qizhou',
+				trigger:{
+					player:'loseAfter',
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter','phaseBefore'],
+				},
+				forced:true,
+				onremove:true,
+				filter:function(event,player){
+					if(event.name!='phase'&&(event.name!='equip'||event.player!=player)){
+						var evt=event.getl(player);
+						if(!evt||!evt.es||!evt.es.length) return false;
+					}
+					var num=player.countMark('olqizhou');
+					return lib.skill.olqizhou.getSuitNum(player)!=num;
+				},
+				content:function(){
+					lib.skill.olqizhou.applyChange(player);
+				},
+				getSuitNum:function(player){
+					var suits=[],es=player.getCards('e');
+					for(var i of es) suits.add(get.suit(i,player));
+					return Math.min(4,suits.length);
+				},
+				applyChange:function(player){
+					player.removeAdditionalSkill('olqizhou');
+					var num=lib.skill.olqizhou.getSuitNum(player);
+					player.storage.olqizhou=num;
+					if(num>0) player.addAdditionalSkill('olqizhou',lib.skill.olqizhou.derivation.slice(0,num));
+				},
+				derivation:['reduanbing','reyingzi','fenwei','lanjiang'],
+			},
+			olshanxi:{
+				audio:'shanxi',
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('e')<5&&game.hasPlayer((current)=>lib.skill.olshanxi.filterTarget(null,player,current));
+				},
+				filterTarget:function(card,player,target){
+					return (target!=player&&player.countCards('h')+target.countCards('h')>0&&!player.inRangeOf(target));
+				},
+				content:function(){
+					'step 0'
+					var cards1=player.getCards('h'),cards2=target.getCards('h');
+					var num=5-player.countCards('e');
+					var dialog=['闪袭：选择展示至多'+get.cnNumber(num)+'张牌'];
+					if(cards1.length>0){
+						dialog.push('<div class="text center">你的手牌</div>');
+						dialog.push(cards1);
+					}
+					if(cards2.length>0){
+						dialog.push('<div class="text center">'+get.translation(target)+'的手牌</div>');
+						if(player.hasSkillTag('viewHandcard',null,target,true)) dialog.push(cards2);
+						else dialog.push([cards2.randomSort(),'blank']);
+					}
+					player.chooseButton(dialog,[1,num],true).set('ai',function(button){
+						var player=_status.event.player,target=_status.event.getParent().target;
+						var card=button.link,cards=ui.selected.buttons.map(button=>button.link);
+						var hs=player.getCards('h'),discard=false;
+						for(var i of cards){
+							if(hs.contains(i)){
+								discard=true;
+								break;
+							}
+						}
+						if(hs.contains(card)){
+							if(discard||get.name(card)!='shan') return 0;
+							if(target.hasCard(card=>get.value(card,target)>5,'e')) return 2;
+							return 0;
+						}
+						if(discard&&!target.hasCard(function(cardx){
+							return cardx!=card&&!cards.contains(cardx)&&get.value(cardx,target)>0;
+						},'he')) return 0;
+						return 1+Math.random();
+					});
+					'step 1'
+					if(result.bool){
+						event.cards=result.links;
+						var list1=[],list2=[];
+						var hs=player.getCards('h');
+						for(var card of result.links){
+							if(hs.contains(card)){
+								list1.push(card);
+							}
+							else{
+								list2.push(card);
+							}
+						}
+						event.list1=list1;
+						event.list2=list2;
+						event.videoId=lib.status.videoId++;
+						game.broadcastAll(function(player,target,list1,list2,id){
+							var dialog=ui.create.dialog(player+'对'+target+'发动了【闪袭】');
+							dialog.videoId=id;
+							if(list1.length>0){
+								dialog.add('<div class="text center">'+player+'展示的牌</div>');
+								dialog.add(list1);
+							}
+							if(list2.length>0){
+								dialog.add('<div class="text center">'+target+'被展示的牌</div>');
+								dialog.add(list2);
+							}
+						},get.translation(player),get.translation(target),list1,list2,event.videoId)
+						game.delay(4);
+					}
+					else event.finish();
+					'step 2'
+					game.broadcastAll('closeDialog',event.videoId);
+					var list1=event.list1.filter((card)=>get.name(card,player)=='shan');
+					var list2=event.list2.filter((card)=>get.name(card,target)=='shan');
+					if(list1.length&&list2.length){
+						game.loseAsync({
+							lose_list:[
+								[player,list1],
+								[target,list2]
+							],
+							discarder:player,
+						}).setContent('discardMultiple');
+					}
+					else if(list2.length){
+						target.discard(list2);
+					}
+					else if(list1.length) player.discard(list1);
+					else event.finish();
+					'step 3'
+					if(target.hasCard(function(card){
+						return !cards.contains(card)&&lib.filter.canBeGained(card,player,target);
+					},'he')) player.gainPlayerCard(target,true,'he').set('filterButton',function(button){
+						return !_status.event.cards.contains(button.link);
+					}).set('cards',cards);
+				},
+				ai:{
+					order:14,
+					result:{
+						target:function(player,target){
+							return -target.countCards('h');
+						},
+					},
+				},
+			},
 			//刘巴
 			oltongduo:{
 				audio:2,
@@ -765,6 +906,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var cards=get.bottomCards(5);
 							event.cards2=cards;
 							game.cardsGotoOrdering(cards);
+							var player=trigger.player;
 							var next=player.chooseToMove('铸币：用任意“币”交换牌堆底等量张牌');
 							var hs=player.getCards('h',card=>card.hasGaintag('olzhubi_tag'));
 							next.set('filterMove',function(from,to){
@@ -788,6 +930,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								event.forceDie=true;
 								var cards=result.moved[0];
 								event.cards=cards;
+								var player=trigger.player;
 								var hs=player.getCards('h');
 								var lose=[],gain=event.cards2;
 								for(var i of cards){
@@ -20041,7 +20184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunluyu:['sunluyu','re_sunluyu'],
 			jin_simazhao:['jin_simazhao','simazhao','sp_simazhao'],
 			jin_wangyuanji:['jin_wangyuanji','wangyuanji','sp_wangyuanji'],
-			wangyun:['re_wangyun','wangyun','old_wangyun'],
+			wangyun:['re_wangyun','wangyun','dc_wangyun','old_wangyun'],
 			zhangliang:['re_zhangliang','zhangliang'],
 			lingju:['lingju','old_lingju'],
 			guansuo:['guansuo','ol_guansuo'],
@@ -20049,11 +20192,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lisu:['ol_lisu','lisu'],
 			fuwan:['fuwan','sp_fuwan','tw_fuwan'],
 			huaxin:['ol_huaxin','huaxin','sp_huaxin'],
-			xujing:['xujing','sp_xujing'],
+			xujing:['xujing','tw_sp_xujing','sp_xujing'],
 			zhaoxiang:['zhaoxiang','tw_zhaoxiang'],
-			dengzhi:['ol_dengzhi','re_dengzhi','dengzhi'],
+			dengzhi:['ol_dengzhi','re_dengzhi','tw_dengzhi','dengzhi'],
 			wangrong:['wangrong','ol_wangrong'],
-			zongyu:['sp_zongyu','zongyu'],
+			zongyu:['tw_sp_zongyu','sp_zongyu','zongyu'],
 			ol_dongzhao:['ol_dongzhao','tw_dongzhao'],
 			mayunlu:['tw_mayunlu','mayunlu'],
 			zhuling:['ol_zhuling','dc_zhuling','zhuling'],
@@ -20061,18 +20204,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangbao:['zhangbao','re_zhangbao'],
 			jianggan:['jianggan','sp_jianggan'],
 			dc_jiben:['dc_jiben','sp_jiben'],
-			yangyi:['ol_yangyi','yangyi'],
+			yangyi:['ol_yangyi','tw_yangyi','yangyi'],
 			tianyu:['tw_tianyu','tianyu'],
 			huangchengyan:['huangchengyan','dc_huangchengyan'],
 			puyuan:['puyuan','ol_puyuan'],
 			huangzu:['dc_huangzu','huangzu'],
 			huojun:['huojun','tw_huojun'],
 			zhaoyǎn:['dc_zhaoyǎn','zhaoyǎn'],
-			furong:['ol_furong','furong'],
+			furong:['ol_furong','tw_furong','furong'],
+			daxiaoqiao:['tw_daxiaoqiao','daxiaoqiao'],
+			zhugeguo:['tw_zhugeguo','zhugeguo'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
-			"xinfu_lingren_info":"每回合限一次。当你于出牌阶段使用带有「伤害」这一标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗和〖行殇〗直到下回合开始。",
+			"xinfu_lingren_info":"每回合限一次。当你于出牌阶段内使用带有「伤害」标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗和〖行殇〗直到下回合开始。",
 			"lingren_adddamage":"凌人",
 			"lingren_adddamage_info":"",
 			"lingren_jianxiong":"奸雄",
@@ -20274,8 +20419,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_meibu_info":"其他角色的出牌阶段开始时，若你在其攻击范围内，你可以弃置一张牌，令该角色于本回合内获得技能〖止息〗。若你以此法弃置的牌不是【杀】或黑色锦囊牌，则本回合其与你的距离视为1。",
 			"new_mumu":"穆穆",
 			"new_mumu_info":"出牌阶段开始时，你可以选择一项：1.弃置一名其他角色装备区里的一张牌；2.获得一名角色装备区里的一张防具牌，若如此做，你本回合不能使用【杀】。",
-			"new_zhixi":"止息",
-			"new_zhixi_info":"锁定技，出牌阶段，你至多可使用X张牌，你使用了锦囊牌后不能再使用牌（X为你的体力值）。",
+			new_zhixi:"止息",
+			new_zhixi_info:"锁定技。出牌阶段内，若你使用过锦囊牌或使用过的牌数不小于X，则你不能使用牌（X为你的体力值）。",
 			"new_mumu2":"穆穆",
 			"new_mumu2_info":"锁定技，你不能使用【杀】。",
 			new_xingwu:"星舞",
@@ -20567,7 +20712,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bushi_info:'当你受到1点伤害后，或其他角色受到你造成的1点伤害后，受到伤害的角色可以获得你的一张「米」',
 			midao_info:'一名角色的判定牌生效前，你可以打出一张「米」代替之。',
 			fengpo:'凤魄',
-			fengpo_info:'每种牌名限一次，当你于出牌阶段内第一次使用【杀】或【决斗】指定目标后，若目标角色数为1，你可以选择一项：1.摸X张牌；2.令此牌的伤害值基数+X。（X为其手牌中♦牌的数量）',
+			fengpo_info:'每种牌名各限一次。当你于出牌阶段内使用的第一张【杀】或【决斗】指定目标后，若目标角色数为1，你可以选择一项：1.摸X张牌；2.令此牌的伤害值基数+X。（X为其手牌中♦牌的数量）',
 			chenqing:'陈情',
 			chenqing_info:'每轮限一次，当一名角色处于濒死状态时，你可以令另一名其他角色摸四张牌，然后其弃置四张牌。若其以此法弃置的四张牌花色各不相同，则视为该角色对濒死的角色使用一张【桃】。',
 			mozhi:'默识',
@@ -20858,7 +21003,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			weiyi_info:'每名角色限一次。当有角色受到伤害后，你可选择：①若其体力值不小于你，则其失去1点体力。②若其体力值不大于你且其已受伤，则其回复1点体力。',
 			jinzhi:'锦织',
 			jinzhi2:'锦织',
-			jinzhi_info:'当你需要使用或打出一张基本牌时，你可弃置X张牌并摸一张牌。若你以此法弃置的牌均为同一颜色，则视为你使用或打出了此牌。（X为你于本轮内发动此技能的次数）',
+			jinzhi_info:'当你需要使用或打出一张基本牌时，你可弃置X+1张牌并摸一张牌。若你以此法弃置的牌均为同一颜色，则视为你使用或打出了此牌。（X为你于本轮内发动此技能的次数）',
 			yanxiao_card:'言笑',
 			yanxiao_global:'言笑',
 			yanxiao_card_info:'判定阶段开始时，你获得判定区内的所有牌。',
@@ -20980,7 +21125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liejie_info:'当你受到伤害后，你可以弃置至多三张牌，摸等量的牌，然后可弃置伤害来源的至多X张牌（X为你以此法弃置的红色牌的数量）。',
 			ruiji:'芮姬',
 			qiaoli:'巧力',
-			qiaoli_info:'①你可以将一张装备牌当做【决斗】使用。若此【决斗】对应的实体牌：为武器牌，当你以此法声明使用【决斗】时，你摸X张牌（X为此牌的攻击范围），且可以将其中任意张牌分配给其他角色；不为武器牌，此牌不可被响应。②结束阶段开始时，若你于本回合内发动过〖巧力①〗，则你从牌堆中获得一张装备牌。',
+			qiaoli_info:'①你可以将一张装备牌当做【决斗】使用。若此【决斗】对应的实体牌：为武器牌，当你以此法声明使用【决斗】后，你摸X张牌（X为此牌的攻击范围），且可以将其中任意张牌分配给其他角色；不为武器牌，此牌不可被响应。②结束阶段开始时，若你于本回合内发动过〖巧力①〗，则你从牌堆中获得一张装备牌。',
 			qiaoli_given:'已分配',
 			qingliang:'清靓',
 			qingliang_info:'每回合限一次。当你成为其他角色使用牌的目标时，你可展示所有手牌，然后选择一项：⒈你与其各摸一张牌，⒉取消此目标，然后弃置你手牌中一种花色的所有牌。',
@@ -21091,6 +21236,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olximo_info:'锁定技。当你发动〖笔心〗后，你移除其描述的前五个字符。若你已发动三次〖笔心〗，交换中括号中的两个数字，失去〖洗墨〗并获得〖飞白〗。',
 			olfeibai:'飞白',
 			olfeibai_info:'转换技，锁定技。阴：当你因执行你使用的非黑色牌的效果而造成伤害时，此伤害值+1；阳：当你因执行你使用的非红色牌的效果而回复体力时，此回复值+1。',
+			olqizhou:'绮冑',
+			olqizhou_info:'锁定技。每个回合开始前，或当你装备区内的牌发生变化后，你失去所有因此技能获得过的额外技能，然后根据你装备区内的花色数获得对应的技能。至少一种：〖短兵〗、至少两种：〖英姿〗、至少三种：〖奋威〗、至少四种：〖澜江〗。',
+			olshanxi:'闪袭',
+			olshanxi_info:'出牌阶段限一次。你可以选择一名攻击范围内不包含你的其他角色，展示你与其的至多X张手牌（X为你的空装备栏数）。若这些牌中有【闪】，则你弃置这些【闪】，然后获得对方的一张未展示的牌。',
 			
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

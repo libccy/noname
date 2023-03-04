@@ -15,7 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_sunquan:['male','wu',4,['sbzhiheng','sbtongye','sbjiuyuan'],['zhu']],
 			sb_huanggai:['male','wu',4,['sbkurou','sbzhaxiang']],
 			sb_zhouyu:['male','wu',3,['sbyingzi','sbfanjian']],
-			sb_caoren:['male','wei',4,['sbjushou','sbjiewei']],
+			sb_caoren:['male','wei','4/4/1',['sbjushou','sbjiewei']],
 			sb_xiahoushi:['female','shu',3,['sbqiaoshi','sbyanyu']],
 			sb_zhangjiao:['male','qun',3,['sbleiji','sbguidao','sbhuangtian'],['zhu']],
 			sb_caocao:['male','wei',4,['sbjianxiong','sbqingzheng','sbhujia'],['zhu']],
@@ -23,17 +23,342 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_ganning:['male','wu',4,['sbqixi','sbfenwei']],
 			sb_machao:['male','shu',4,['mashu','sbtieji']],
 			sb_xuhuang:['male','wei',4,['sbduanliang','sbshipo']],
+			sb_zhangfei:['male','shu',4,['sbpaoxiao','sbxieji']],
+			sb_zhaoyun:['male','shu',4,['sblongdan','sbjizhu']],
 		},
 		characterSort:{
 			sb:{
 				sb_zhi:['sb_sunquan','sb_zhouyu','sb_zhangjiao','sb_caocao','sb_zhenji'],
 				sb_shi:['sb_xuhuang','sb_machao'],
-				sb_tong:['liucheng','sp_yangwan','sb_xiahoushi'],
+				sb_tong:['liucheng','sp_yangwan','sb_xiahoushi','sb_zhangfei'],
 				sb_yu:['sb_yujin','sb_lvmeng','sb_huangzhong','sb_huanggai','sb_zhouyu','sb_caoren','sb_ganning'],
 				sb_neng:['sb_huaxiong','sb_sunshangxiang'],
 			}
 		},
 		skill:{
+			//赵云
+			sblongdan:{
+				audio:2,
+				enable:['chooseToUse','chooseToRespond'],
+				chargeSkill:true,
+				filter:function(event,player){
+					if(event.type=='wuxie'||!player.hasMark('charge')) return false;
+					var marked=player.hasSkill('sblongdan_mark',null,null,false);
+					for(var name of lib.inpile){
+						if(!marked&&name!='sha'&&name!='shan') continue;
+						if(get.type(name)!='basic') continue;
+						if(player.hasCard(lib.skill.sblongdan.getFilter(name,player),'hs')){
+							if(event.filterCard({name:name},player,event)) return true;
+							if(marked&&name=='sha'){
+								for(var nature of lib.inpile_nature){
+									if(event.filterCard({name:name,nature:nature},player,event)) return true;
+								}
+							}
+						}
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[];
+						var marked=player.hasSkill('sblongdan_mark',null,null,false);
+						for(var name of lib.inpile){
+							if(!marked&&name!='sha'&&name!='shan') continue;
+							if(get.type(name)!='basic') continue;
+							if(player.hasCard(lib.skill.sblongdan.getFilter(name,player),'hs')){
+								if(event.filterCard({name:name},player,event)) list.push(['基本','',name]);
+									if(marked&&name=='sha'){
+									for(var nature of lib.inpile_nature){
+										if(event.filterCard({name:name,nature:nature},player,event)) list.push(['基本','',name,nature])
+									}
+								}
+							}
+						}
+						return ui.create.dialog('龙胆',[list,'vcard'],'hidden');
+					},
+					check:function(button){
+						if(_status.event.getParent().type!='phase') return 1;
+						var player=_status.event.player,card={name:button.link[2],nature:button.link[3]};
+						if(card.name=='jiu'&&Math.min(player.countMark('charge'),player.countCards('h',{type:'basic'}))<2) return 0;
+						return player.getUseValue(card,null,true);
+					},
+					backup:function(links,player){
+						return {
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+							},
+							filterCard:lib.skill.sblongdan.getFilter(links[0][2],player),
+							position:'he',
+							popname:true,
+							check:function(card){
+								return 6/Math.max(1,get.value(card));
+							},
+							precontent:function(){
+								player.removeMark('charge',1);
+								player.addTempSkill('sblongdan_draw');
+							},
+						}
+					},
+					prompt:function(links,player){
+						var marked=player.hasSkill('sblongdan_mark',null,null,false);
+						var card={
+							name:links[0][2],
+							nature:links[0][3],
+							isCard:true,
+						};
+						if(marked) return '将一张基本牌当做'+get.translation(card)+'使用';
+						return '将一张'+(card.name=='sha'?'闪':'杀')+'当做'+get.translation(card)+'使用';
+					},
+				},
+				hiddenCard:function(player,name){
+					if(get.type(name)!='basic'||!player.hasSkill('charge')) return false;
+					if(!marked&&name!='sha'&&name!='shan') return false;
+					var marked=player.hasSkill('sblongdan_mark',null,null,false);
+					return player.hasCard(lib.skill.sblongdan.getFilter(name,player),'hs');
+				},
+				ai:{
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter:function(player,tag){
+						return lib.skill.sblongdan.hiddenCard(player,tag=='respondSha'?'sha':'shan')
+					},
+					order:9,
+					result:{
+						player:function(player){
+							if(_status.event.dying) return get.attitude(player,_status.event.dying);
+							return 1;
+						},
+					},
+				},
+				getFilter:function(name,player){
+					if(!player.hasSkill('sblongdan_mark',null,null,false)){
+						if(name=='sha') return {name:'shan'};
+						if(name=='shan') return {name:'sha'};
+						return (()=>false);
+					}
+					return {type:'basic'};
+				},
+				group:'sblongdan_charge',
+				onremove:function(player){
+					player.removeSkill('sblongdan_mark');
+				},
+				subSkill:{
+					backup:{audio:'sblongdan'},
+					mark:{charlotte:true},
+					draw:{
+						charlotte:true,
+						trigger:{player:'useCardAfter'},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return event.skill=='sblongdan_backup';
+						},
+						content:function(){
+							player.draw();
+						},
+					},
+					charge:{
+						audio:'sblongdan',
+						trigger:{
+							global:['phaseBefore','phaseEnd'],
+							player:'enterGame',
+						},
+						forced:true,
+						filter:function(event,player,name){
+							if(player.countMark('charge')>2) return false;
+							return (name!='phaseBefore'||game.phaseNumber==0);
+						},
+						content:function(){
+							player.addMark('charge',1);
+						},
+					},
+				},
+			},
+			sbjizhu:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(lib.filter.notMe,get.prompt('sbjizhu'),'和一名其他角色进行“协力”').set('ai',function(target){
+						return get.threaten(target)*Math.sqrt(1+target.countCards('h'))*((target.isTurnedOver()||target.hasJudge('lebu'))?0.1:1);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('sbjizhu',target);
+						player.chooseCooperationFor(target,'sbjizhu').set('ai',function(button){
+							var base=0;
+							switch(button.link){
+								case 'cooperation_damage':base=0.1;break;
+								case 'cooperation_draw':base=0.6;break;
+								case 'cooperation_discard':base=0.1;break;
+								case 'cooperation_use':base=0.6;break;
+							}
+							return base+Math.random();
+						});
+						player.addAdditionalSkill('cooperation','sbjizhu_effect');
+					}
+					else event.finish();
+					'step 2'
+					game.delayx();
+				},
+				subSkill:{
+					effect:{
+						audio:'sbjizhu',
+						charlotte:true,
+						trigger:{global:'phaseJieshuBegin'},
+						forced:true,
+						logTarget:'player',
+						filter:function(event,player){
+							return player.checkCooperationStatus(event.player,'sbjizhu')&&player.hasSkill('sblongdan',null,null,false);
+						},
+						content:function(){
+							game.log(player,'和',trigger.player,'的协力成功');
+							player.addTempSkill('sblongdan_mark',{player:'phaseJieshuBegin'});
+							game.delayx();
+						},
+					},
+				},
+				derivation:'sblongdan_shabi',
+			},
+			//张飞
+			sbpaoxiao:{
+				audio:2,
+				mod:{
+					cardUsable:function(card){
+						if(card.name=='sha') return true;
+					},
+					targetInRange:function(card,player,target){
+						if(card.name=='sha'&&player.getEquip(1)) return true;
+					},
+				},
+				trigger:{player:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					if(event.card.name!='sha') return false;
+					var evt=event.getParent('phaseUse');
+					if(!evt||evt.player!=player) return false;
+					return player.hasHistory('useCard',function(evtx){
+						return evtx!=event&&evtx.card.name=='sha'&&evtx.getParent('phaseUse')==evt;
+					},event);
+				},
+				content:function(){
+					if(!trigger.card.storage) trigger.card.storage={};
+					trigger.card.storage.sbpaoxiao=true;
+					trigger.baseDamage++;
+					trigger.directHit.addArray(game.players);
+					player.addTempSkill('sbpaoxiao_effect','phaseUseAfter');
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						trigger:{player:'useCardToPlayered'},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return event.card.storage&&event.card.storage.sbpaoxiao&&event.target.isAlive();
+						},
+						content:function(){
+							trigger.target.addTempSkill('fengyin');
+						},
+						group:'sbpaoxiao_recoil',
+					},
+					recoil:{
+						charlotte:true,
+						trigger:{source:'damageSource'},
+						forced:true,
+						filter:function(event,player){
+							return event.card&&event.card.storage&&event.card.storage.sbpaoxiao&&event.player.isAlive();
+						},
+						content:function(){
+							'step 0'
+							player.loseHp();
+							'step 1'
+							var hs=player.getCards('h',function(card){
+								return lib.filter.cardDiscardable(card,player,'sbpaoxiao_recoil');
+							});
+							if(hs.length>0) player.discard(hs.randomGet());
+						},
+					},
+				},
+			},
+			sbxieji:{
+				audio:3,
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(lib.filter.notMe,get.prompt('sbxieji'),'和一名其他角色进行“协力”').set('ai',function(target){
+						return get.threaten(target)*Math.sqrt(1+target.countCards('h'))*((target.isTurnedOver()||target.hasJudge('lebu'))?0.1:1);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('sbxieji',target);
+						//选择对方的协击条件
+						player.chooseCooperationFor(target,'sbxieji').set('ai',function(button){
+							var base=0;
+							switch(button.link){
+								case 'cooperation_damage':base=0.8;break;
+								case 'cooperation_draw':base=0.1;break;
+								case 'cooperation_discard':base=0.1;break;
+								case 'cooperation_use':base=0.1;break;
+							}
+							return base+Math.random();
+						});
+						//保证技能cooperation被移除之后 失去该技能
+						player.addAdditionalSkill('cooperation','sbxieji_effect');
+					}
+					else event.finish();
+					'step 2'
+					game.delayx();
+				},
+				subSkill:{
+					effect:{
+						audio:'sbxieji',
+						charlotte:true,
+						trigger:{global:'phaseJieshuBegin'},
+						direct:true,
+						filter:function(event,player){
+							//判断自己是否有目标为该角色 且已经完成的协力记录
+							return player.checkCooperationStatus(event.player,'sbxieji');
+						},
+						content:function(){
+							'step 0'
+							game.log(player,'和',trigger.player,'的协力成功');
+							player.chooseTarget('协击：请选择【杀】的目标','你和'+get.translation(trigger.player)+'协力成功，可以视为对至多三名其他角色使用一张【杀】，且此【杀】造成伤害时，你摸等同于伤害值的牌',[1,3],true,function(card,player,target){
+								return player.canUse('sha',target,false);
+							}).set('ai',function(target){
+								var player=_status.event.player;
+								return get.effect(target,{name:'sha'},player,player);
+							});
+							'step 1'
+							if(result.bool){
+								player.addTempSkill('sbxieji_reward','sbxieji_effectAfter');
+								player.useCard({
+									name:'sha',
+									isCard:true,
+									storage:{sbxieji:true},
+								},'sbxieji_effect',result.targets);
+							}
+						},
+					},
+					reward:{
+						charlotte:true,
+						trigger:{source:'damageSource'},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return event.card&&event.card.storage&&event.card.storage.sbxieji&&event.getParent().type=='card';
+						},
+						content:function(){
+							player.draw(trigger.num);
+						},
+					},
+				},
+			},
 			//徐晃
 			sbduanliang:{
 				audio:2,
@@ -859,6 +1184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover(trigger.num);
 						trigger.source.draw(2);
 					}
+					else player.storage.counttrigger.sbqiaoshi--;
 				},
 				ai:{
 					effect:{
@@ -2321,6 +2647,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbkeji:function (player) {
 				return '①出牌阶段' + (player.storage.sbkeji ? '' :'各') + '限一次。你可以选择一项：1.弃置一张手牌，然后获得1点护甲；2.失去1点体力，然后获得2点护甲。②你的手牌上限+X（X为你的护甲数）。③若你不为正在结算濒死流程的角色，你不能使用【桃】。';
 			},
+			sblongdan:function(player){
+				if(player.hasSkill('sblongdan_mark',null,null,false)) return '蓄力技（1/3）。①你可以消耗1点蓄力值，将一张基本牌当做任意基本牌使用或打出，然后摸一张牌。②一名角色的回合结束时，你获得1点蓄力值。';
+				return '蓄力技（1/3）。①你可以消耗1点蓄力值，将【杀】当做【闪】或将【闪】当做【杀】使用或打出，然后摸一张牌。②一名角色的回合结束时，你获得1点蓄力值。';
+			},
 		},
 		translate:{
 			sp_yangwan:'手杀杨婉',
@@ -2367,7 +2697,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbjiuyuan_info:'主公技，锁定技。①其他吴势力角色使用【桃】时，你摸一张牌。②其他吴势力角色对你使用的【桃】的回复量+1。',
 			sb_huanggai:'谋黄盖',
 			sbkurou:'苦肉',
-			sbkurou_info:'①出牌阶段开始时，你可以交给其他角色一张牌，若此牌为【桃】或【酒】，你失去2点体力，否则你失去1点体力。②当你失去1点体力后，你获得2点护甲。',
+			sbkurou_info:'①出牌阶段开始时，你可以交给其他角色一张牌，若此牌于对方手牌区内为【桃】或【酒】，你失去2点体力，否则你失去1点体力。②当你失去1点体力后，你获得2点护甲。',
 			sbzhaxiang:'诈降',
 			sbzhaxiang_info:'锁定技。①摸牌阶段，你多摸X张牌。②你每回合使用的前X张牌无距离与次数限制且不能被响应（X为你已损失的体力值）。',
 			sb_zhouyu:'谋周瑜',
@@ -2415,6 +2745,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbduanliang_info:'出牌阶段限一次。你可以与一名其他角色进行谋奕。若你赢，且你选择的选项为：“围城断粮”，若其判定区没有【兵粮寸断】，你将牌堆顶牌当【兵粮寸断】对其使用，否则你获得其一张牌；“擂鼓进军”，你视为对其使用一张【决斗】。',
 			sbshipo:'势迫',
 			sbshipo_info:'结束阶段，你可以令一名体力少于你的角色或所有判定区有【兵粮寸断】的其他角色选择一项：1.交给你一张手牌；2.受到1点伤害。所有目标角色选择完成后，你可以将任意张你以此法获得的牌交给一名其他角色。',
+			sb_zhangfei:'谋张飞',
+			sbpaoxiao:'咆哮',
+			sbpaoxiao_info:'锁定技。①你使用【杀】无距离限制。②若你的装备区内有武器牌，则你使用【杀】无距离限制。③当你于出牌阶段内使用第二张及以后【杀】时，你获得如下效果：{此【杀】不可被响应且伤害值基数+1；此【杀】指定目标后，目标角色的非锁定技于本回合内失效；此【杀】造成伤害后，若目标角色存活，则你失去1点体力并随机弃置一张手牌。}',
+			sbxieji:'协击',
+			sbxieji_info:'准备阶段开始时，你可以和一名其他角色进行协力。其的下个结束阶段开始时，若你与其协力成功，则你可以选择至多三名其他角色。你对这些角色视为使用一张【杀】，且当此【杀】因执行牌面效果造成伤害后，你摸X张牌（X为伤害值）。',
+			sb_zhaoyun:'谋赵云',
+			sblongdan:'龙胆',
+			sblongdan_info:'蓄力技（1/3）。①你可以消耗1点蓄力值，将【杀】当做【闪】或将【闪】当做【杀】使用或打出，然后摸一张牌。②一名角色的回合结束时，你获得1点蓄力值。',
+			sbjizhu:'积著',
+			sbjizhu_info:'准备阶段开始时，你可以和一名其他角色进行协力。其的下个结束阶段开始时，若你与其协力成功，则你修改〖龙胆〗直到你的下个结束阶段开始。',
+			sblongdan_shabi:'龙胆',
+			sblongdan_shabi_info:'蓄力技（1/3）。①你可以消耗1点蓄力值，将一张基本牌当做任意基本牌使用或打出，然后摸一张牌。②一名角色的回合结束时，你获得1点蓄力值。',
 
 			sb_zhi:'谋攻篇·知',
 			sb_shi:'谋攻篇·识',

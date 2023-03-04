@@ -2462,7 +2462,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiahoudun:['re_xiahoudun','xin_xiahoudun','xiahoudun'],
 			liubei:['re_liubei','liubei'],
 			guanyu:['re_guanyu','guanyu'],
-			zhangfei:['re_zhangfei','xin_zhangfei','old_zhangfei','zhangfei'],
+			zhangfei:['re_zhangfei','tw_zhangfei','xin_zhangfei','old_zhangfei','zhangfei'],
 			zhaoyun:['re_zhaoyun','old_zhaoyun','zhaoyun'],
 			sp_zhaoyun:['sp_zhaoyun','jsp_zhaoyun'],
 			machao:['re_machao','machao'],

@@ -54,7 +54,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('clansankuang',target);
 						if(num2==0) event._result={bool:false};
 						else if(num2<=num) event._result={bool:true,cards:target.getCards('he')};
-						target.chooseCard('he',true,[num,Infinity]).set('ai',get.unuseful);
+						else target.chooseCard('he',true,[num,Infinity]).set('ai',get.unuseful);
 					}else event.finish();
 					'step 2'
 					if(result.bool){
@@ -121,7 +121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					viewAs:{
-						trigger:{player:['phaseZhunbeiEnd','phaseJudgeEnd','phaseDrawEnd','phaseUseEnd','phaseDiscardEnd','phaseJieshuEnd']},
+						trigger:{global:['phaseZhunbeiEnd','phaseJudgeEnd','phaseDrawEnd','phaseUseEnd','phaseDiscardEnd','phaseJieshuEnd']},
 						filter:function(event,player){
 							return player.countCards('h',card=>card.hasGaintag('clanshenjun'))>0;
 						},
@@ -148,7 +148,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							if(result.bool){
 								var name=result.links[0][2],nature=result.links[0][3];
-								debugger;
 								var cards=player.getCards('h',card=>card.hasGaintag('clanshenjun'));
 								game.broadcastAll(function(num,card){
 									lib.skill.clanshenjun_backup.selectCard=num;
@@ -319,6 +318,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'clanfenchai',
 						forced:true,
 						trigger:{player:'judge'},
+						filter:function(event,player){
+							return player.getStorage('clanfenchai').length;
+						},
 						content:function(){}
 					}
 				},
@@ -504,11 +506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.targets[0].link(true);
 					}
 					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card));
-					if(cards.filter(card=>{
-						var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-						if(mod!='unchanged') return false;
-						return true;
-					}).length==0){
+					if(cards.length>0){
 						player.loseToDiscardpile(cards);
 						player.draw(cards.length);
 					}
@@ -857,7 +855,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanshangshen:'伤神',
 			clanshangshen_info:'当一名角色受到属性伤害后，若本回合此前没有角色或已死亡的角色受到过属性伤害，你可以进行目标角色为你的【闪电】的特殊的使用流程，然后其将手牌摸至四张。',
 			clanfenchai:'分钗',
-			clanfenchai_info:'锁定技。若你首次发动技能指定的目标角色中：存在存活角色，你的判定牌视为♥；不存在存活角色，你的判定牌视为♠。',
+			clanfenchai_info:'锁定技。若你首次发动技能指定的异性目标角色中：存在存活角色，你的判定牌视为♥；不存在存活角色，你的判定牌视为♠。',
 			
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',

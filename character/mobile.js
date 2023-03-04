@@ -19,13 +19,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_yijiang1:["re_xusheng","re_lingtong","ol_yujin","re_wuguotai","re_gaoshun"],
 				mobile_yijiang2:["xin_liaohua","xin_caozhang","re_liubiao","re_handang","xin_chengpu","xin_gongsunzan","re_zhonghui","re_bulianshi"],
 				mobile_yijiang3:["re_liru","xin_jianyong","xin_zhuran","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou","re_yufan"],
-				mobile_yijiang4:["xin_zhoucang","xin_caifuren","xin_guyong","xin_sunluban","xin_caozhen","xin_jushou","xin_wuyi","xin_zhuhuan"],
+				mobile_yijiang4:["xin_zhoucang","xin_caifuren","xin_guyong","xin_sunluban","xin_caozhen","xin_jushou","xin_wuyi","xin_zhuhuan","re_chenqun"],
 				mobile_yijiang5:['xin_sunxiu','xin_quancong','xin_zhuzhi','xin_caoxiu'],
 				mobile_yijiang67:["re_jikang"],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui"],
 			},
 		},
 		character:{
+			re_chenqun:['male','wei',3,['redingpin','refaen']],
 			xin_caoxiu:['male','wei',4,['qianju','xinqingxi']],
 			xin_zhuhuan:['male','wu',4,['fenli','xinpingkou'],['unseen']],
 			sp_pengyang:['male','shu',3,['spdaming','spxiaoni']],
@@ -40,7 +41,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ruanhui:['female','wei',3,['mingcha','jingzhong']],
 			xin_quancong:['male','wu',4,['sbyaoming']],
 			re_xunyu:["male","wei",3,["quhu","rejieming"],['clan:颍川荀氏']],
-			xin_jushou:['male','qun',3,['xinjianying','shibei']],
+			xin_jushou:['male','qun','2/3/3',['xinjianying','shibei']],
 			liuba:['male','shu',3,['duanbi','tongduo']],
 			re_bulianshi:['female','wu',3,['reanxu','zhuiyi']],
 			re_caiwenji:['female','qun',3,['rebeige','duanchang']],
@@ -715,7 +716,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.log(player,(num>0?'获得了':'减少了')+get.cnNumber(Math.abs(num))+'点“达命”值');
 				},
 				content:function(){
-					lib.skill.spdaming.change(player,1);
+					lib.skill.spdaming.change(player,2);
 				},
 				intro:{
 					name:'达命值',
@@ -1218,7 +1219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 						},
 						content:function(){
-							player.draw(2);
+							player.draw(3);
 						},
 						mod:{
 							aiOrder:function(player,card,num){
@@ -1999,9 +2000,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//全琮
 			sbyaoming:{
 				audio:2,
+				chargeSkill:true,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countMark('sbyaoming')>0;
+					return player.countMark('charge')>0;
 				},
 				filterTarget:true,
 				prompt:function(){
@@ -2012,15 +2014,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.removeMark('sbyaoming',1);
+					player.removeMark('charge',1);
 					var num=target.countCards('h'),num2=player.countCards('h');
 					if(num==num2&&target.countCards('he')>0){
+						var choice=get.attitude(player,target)>0?1:0;
 						var str=get.translation(target),choiceList=[
 							'弃置'+str+'的一张牌',
 							'令'+str+'摸一张牌',
 						];
 						if(typeof player.storage.sbyaoming_status=='number') choiceList[player.storage.sbyaoming_status]+='（上次选择）';
-						player.chooseControl().set('choiceList',choiceList);
+						var next=player.chooseControl().set('choiceList',choiceList);
+						next.set('ai_choice',choice);
+						next.set('ai',()=>_status.event.ai_choice);
 					}
 					else event._result={index:num>num2?0:1};
 					'step 1'
@@ -2029,7 +2034,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else target.draw();
 					if(typeof player.storage.sbyaoming_status=='number'&&result.index!=player.storage.sbyaoming_status){
-						player.addMark('sbyaoming',1);
+						player.addMark('charge',1);
 						delete player.storage.sbyaoming_status;
 					}
 					else{
@@ -2055,21 +2060,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				group:['sbyaoming_damage','sbyaoming_init'],
-				marktext:'名',
-				intro:{
-					name2:'名',
-					content:'mark',
-				},
 				subSkill:{
 					damage:{
 						trigger:{player:'damageEnd'},
 						direct:true,
 						content:function(){
 							'step 0'
-							var num=Math.min(trigger.num,4-player.countMark('sbyaoming_damage'));
+							var num=Math.min(trigger.num,4-player.countMark('charge'));
 							if(num>0){
 								player.logSkill('sbyaoming_damage');
-								player.addMark('sbyaoming',num);
+								player.addMark('charge',num);
 								game.delayx();
 							}
 							'step 1'
@@ -2091,10 +2091,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						locked:false,
 						filter:function(event,player){
-							return (event.name!='phase'||game.phaseNumber==0);
+							return (event.name!='phase'||game.phaseNumber==0)&&player.countMark('charge')<4;
 						},
 						content:function(){
-							player.addMark('sbyaoming',2);
+							player.addMark('charge',Math.min(2,4-player.countMark('charge')));
 						},
 					},
 				},
@@ -6897,8 +6897,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					add:{
 						trigger:{player:'compare',target:'compare'},
-						filter:function(event){
-							return !event.iwhile;
+						filter:function(event,player){
+							if(event.player==player) return !event.iwhile;
+							return true;
 						},
 						forced:true,
 						locked:false,
@@ -12164,31 +12165,49 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target:['chooseToCompareAfter','compareMultipleAfter']
 				},
 				filter:function(event,player){
-					return !event.preserve;
+					if(event.preserve) return false;
+					if(event.name=='compareMultiple') return true;
+					return !event.compareMultiple;
 				},
 				frequent:true,
 				content:function(){
 					'step 0'
 					var str='<div class="text center">牌堆顶';
 					var cards=get.cards();
-					if(player==trigger.player){
-						if(trigger.num1>trigger.num2&&get.position(trigger.card2,true)=='o'){
+					if(trigger.name=='chooseToCompare'&&trigger.compareMeanwhile){
+						var result=trigger.result;
+						var list=[[result.num1[0],result.player]];
+						list.addArray(result.num2.map(function(card,i){
+							return [card,result.targets[i]];
+						}));
+						list.sort(function(a,b){
+							return a[0]-b[0];
+						});
+						if(list[0][0]<list[1][0]&&get.position(list[0][1],true)=='o'){
 							str+='/拼点牌';
-							cards.push(trigger.card2)
-						}
-						else if(trigger.num1<trigger.num2&&get.position(trigger.card1,true)=='o'){
-							str+='/拼点牌';
-							cards.push(trigger.card1);
+							cards.push(list[0][1]);
 						}
 					}
 					else{
-						if(trigger.num1<trigger.num2&&get.position(trigger.card1,true)=='o'){
-							str+='/拼点牌';
-							cards.push(trigger.card1);
+						if(player==trigger.player){
+							if(trigger.num1>trigger.num2&&get.position(trigger.card2,true)=='o'){
+								str+='/拼点牌';
+								cards.push(trigger.card2)
+							}
+							else if(trigger.num1<trigger.num2&&get.position(trigger.card1,true)=='o'){
+								str+='/拼点牌';
+								cards.push(trigger.card1);
+							}
 						}
-						else if(trigger.num1>trigger.num2&&get.position(trigger.card2,true)=='o'){
-							str+='/拼点牌';
-							cards.push(trigger.card2);
+						else{
+							if(trigger.num1<trigger.num2&&get.position(trigger.card1,true)=='o'){
+								str+='/拼点牌';
+								cards.push(trigger.card1);
+							}
+							else if(trigger.num1>trigger.num2&&get.position(trigger.card2,true)=='o'){
+								str+='/拼点牌';
+								cards.push(trigger.card2);
+							}
 						}
 					}
 					str+='</div>';
@@ -17672,19 +17691,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shenpei:['shenpei','sp_shenpei'],
 			wangcan:['tw_wangcan','wangcan','sp_wangcan'],
 			sunshao:['sp_sunshao','sunshao'],
-			xunchen:['re_xunchen','xunchen','sp_xunchen'],
+			xunchen:['re_xunchen','xunchen','tw_xunchen','sp_xunchen'],
 			xinpi:['xinpi','sp_xinpi'],
 			duyu:['duyu','sp_duyu'],
 			zhangwen:['sp_zhangwen','zhangwen'],
-			ol_bianfuren:['ol_bianfuren','sp_bianfuren'],
+			ol_bianfuren:['ol_bianfuren','tw_bianfuren','sp_bianfuren'],
 			wangshuang:['wangshuang','sp_wangshuang'],
 			huaman:['huaman','sp_huaman'],
 			gaolan:['dc_gaolan','gaolan','sp_gaolan'],
 			cuiyan:['sp_cuiyan','cuiyan'],
 			wujing:['tw_wujing','wujing'],
 			sunru:['dc_sunru','sunru'],
-			zhouchu:['jin_zhouchu','zhouchu'],
+			zhouchu:['jin_zhouchu','zhouchu','tw_zhouchu'],
 			liuye:['dc_liuye','liuye'],
+			liuzhang:['liuzhang','tw_liuzhang'],
+			chenzhen:['tw_chenzhen','sp_chenzhen'],
+			feiyi:['tw_feiyi','feiyi'],
+			wangling:['tw_wangling','wangling'],
+			qiaogong:['tw_qiaogong','qiaogong'],
+			sp_chendong:['tw_chendong','sp_chendong'],
+			sp_jiangqing:['tw_jiangqing','sp_jiangqing'],
 		},
 		translate:{
 			liuzan:'手杀留赞',
@@ -17818,7 +17844,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongzuo:'忠佐',
 			zhongzuo_info:'一名角色的结束阶段开始时，若你于此回合内造成或受到过伤害，则你可以令一名角色摸两张牌。若该角色已受伤，则你摸一张牌。',
 			wanlan:'挽澜',
-			wanlan_info:'限定技，当一名角色进入濒死状态时，你可以弃置所有手牌并令其回复体力至1点，然后对当前回合角色造成1点伤害。',
+			wanlan_info:'限定技，当一名角色进入濒死状态时，你可以弃置所有手牌（无牌可不弃）。其回复体力至1点，然后你对当前回合角色造成1点伤害。',
 			re_jikang:"手杀嵇康",
 			old_caochun:'旧曹纯',
 			shenpei:'审配',
@@ -17976,7 +18002,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tongqu:'通渠',
 			tongqu_info:'游戏开始时，你拥有一个“渠”标记。准备阶段，你可以失去1点体力令一名没有“渠”标记的角色获得“渠”标记。有“渠”的角色摸牌阶段额外摸一张牌，然后将一张牌交给其他有“渠”的角色或弃置。若以此法给出的是装备牌则使用之。当有“渠”的角色进入濒死状态时，移除其“渠”标记。',
 			xinwanlan:'挽澜',
-			xinwanlan_info:'当一名角色受到会令其进入濒死状态的伤害时，你可以弃置装备区中的所有牌（至少一张） 防止此伤害。',
+			xinwanlan_info:'当一名角色受到伤害值不小于体力值的伤害时，你可以弃置装备区中的所有牌（至少一张） 防止此伤害。',
 			re_xusheng:'手杀徐盛',
 			re_dongzhuo:'手杀董卓',
 			rejiuchi:'酒池',
@@ -18040,7 +18066,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liyong:'厉勇',
 			liyong2:'厉勇',
 			liyong3:'厉勇',
-			liyong_info:'锁定技，若你于出牌阶段使用的【杀】被【闪】抵消，本阶段你下一张【杀】不可被响应且伤害+1，指定的目标本回合非锁定技失效，当此【杀】造成伤害后，若目标角色未死亡，你失去1点体力。',
+			liyong_info:'锁定技，若你于出牌阶段内使用的【杀】被【闪】抵消，则你获得如下效果：你本回合使用的下一张【杀】不可被响应且伤害+1，指定的目标本回合非锁定技失效，当此【杀】造成伤害后，若目标角色未死亡，你失去1点体力。',
 			gongsunkang:'公孙康',
 			juliao:'据辽',
 			juliao_info:'锁定技，其他角色计算与你的距离始终+X（X为场上势力数-1）。',
@@ -18127,7 +18153,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			heji:'合击',
 			heji_info:'当有角色使用的【决斗】或红色【杀】结算完成后，若此牌对应的目标数为1，则你可以对相同的目标使用一张【杀】或【决斗】（无距离和次数限制）。若你以此法使用的牌不为转化牌，则你从牌堆中随机获得一张红色牌。',
 			liubing:'流兵',
-			liubing_info:'锁定技。①当你声明使用【杀】时，若此牌是你本回合使用的第一张有唯一对应实体牌的【杀】，则你将此牌的花色改为♦。②其他角色于其出牌阶段内使用的非转化黑色杀结算结束后，若此【杀】未造成伤害，则你获得之。',
+			liubing_info:'锁定技。①当你声明使用【杀】后，若此牌是你本回合使用的第一张有唯一对应实体牌的【杀】，则你将此牌的花色改为♦。②其他角色于其出牌阶段内使用的非转化黑色杀结算结束后，若此【杀】未造成伤害，则你获得之。',
 			sp_mifuren:'糜夫人',
 			spcunsi:'存嗣',
 			spcunsi2:'存嗣',
@@ -18208,7 +18234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ejian_info:'锁定技，每名角色限一次。当有其他角色因〖博名〗而获得了你的牌后，若其拥有与此牌类型相同的其他牌，则你令其选择一项：①受到1点伤害。②展示所有手牌，并弃置所有与此牌类别相同的牌。',
 			xin_zhoucang:'手杀周仓',
 			mobilezhongyong:'忠勇',
-			mobilezhongyong_info:'当你于出牌阶段使用【杀】结算结束后，若没有目标角色使用【闪】响应过此【杀】，则你可获得此【杀】；否则你可选择一项：①获得目标角色使用的【闪】，然后可将此【杀】交给另一名其他角色。②将目标角色使用的【闪】交给另一名其他角色，然后你本回合使用【杀】的次数上限+1且下一张【杀】的伤害值基数+1。（你不能使用本回合因执行〖忠勇〗的效果获得的牌）',
+			mobilezhongyong_info:'当你于出牌阶段内使用的【杀】结算结束后，若没有目标角色使用【闪】响应过此【杀】，则你可获得此【杀】；否则你可选择一项：①获得目标角色使用的【闪】，然后可将此【杀】交给另一名其他角色。②将目标角色使用的【闪】交给另一名其他角色，然后你本回合使用【杀】的次数上限+1且下一张【杀】的伤害值基数+1。（你不能使用本回合因执行〖忠勇〗的效果获得的牌）',
 			mjdingyi:'定仪',
 			mjdingyi_info:'游戏开始时，你选择一个效果（相同效果不可叠加）并令全场角色获得之：①摸牌阶段额定摸牌数+1。②手牌上限+2。③攻击范围+1。④脱离濒死状态时回复1点体力。',
 			mjzuici:'罪辞',
@@ -18505,7 +18531,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejieming_info:"当你受到1点伤害后，你可以令一名角色摸两张牌。然后若其手牌数小于体力上限，则你摸一张牌。",
 			xin_quancong:'手杀全琮',
 			sbyaoming:'邀名',
-			sbyaoming_info:'①游戏开始时，你获得2枚“名”。②当你受到1点伤害后，若你的“名”少于4枚，则你获得一枚“名”。③出牌阶段或当你受到伤害后，你可以移除一枚“名”并选择一项：⒈弃置一名手牌数不小于你的角色的一张牌。⒉令一名手牌数不大于你的角色摸一张牌。若你上次发动〖邀名③〗时未获得过“名”且你选择的选项和上次不同，则你获得一枚“名”。',
+			sbyaoming_info:'蓄力技（2/4）。①当你受到1点伤害后，你可以获得1点蓄力值。②出牌阶段或当你受到伤害后，你可消耗1点蓄力值并选择一项：⒈弃置一名手牌数不小于你的角色的一张牌。⒉令一名手牌数不大于你的角色摸一张牌。若你上次发动〖邀名②〗时未获得过蓄力值且你选择的选项和上次不同，则你获得1点蓄力值。',
 			ruanhui:'阮慧',
 			mingcha:'明察',
 			mingcha_info:'摸牌阶段开始时，你亮出牌堆顶的三张牌。若这三张牌中有点数小于9的牌，则你可以放弃摸牌并获得这些牌，然后你可以获得一名其他角色的随机一张牌。',
@@ -18544,7 +18570,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hannan_info:'出牌阶段限一次。你可以与一名角色拼点，赢的角色对没赢的角色造成2点伤害。',
 			xin_wuyi:'手杀吴懿',
 			sbbenxi:'奔袭',
-			sbbenxi_info:'出牌阶段开始时，你可以弃置至少一张牌，然后你于此阶段获得如下效果：①你至其他角色距离-X；②当你使用的下一张基本牌或普通锦囊牌A选择目标后，你可以额外指定X名距离为1的角色为目标；③牌A结算结束后，若此牌造成过伤害，你摸两张牌（X为你以此法弃置的牌数）。',
+			sbbenxi_info:'出牌阶段开始时，你可以弃置至少一张牌，然后你于此阶段获得如下效果：①你至其他角色距离-X；②当你使用的下一张基本牌或普通锦囊牌A选择目标后，你可以额外指定X名距离为1的角色为目标；③牌A结算结束后，若此牌造成过伤害，你摸三张牌（X为你以此法弃置的牌数）。',
 			xin_zhuzhi:'手杀朱治',
 			sbanguo:'安国',
 			sbanguo_info:'①游戏开始时，你令一名其他角色获得1枚“安国”标记（有“安国”的角色手牌上限基数等于体力上限）。②出牌阶段开始时，你可以将一名有“安国”的角色的所有“安国”移动给一名本局游戏未获得过“安国”的其他角色。③当你受到伤害时，若有有“安国”的角色且伤害值不小于你的体力值且此伤害没有来源或来源没有“安国”，防止此伤害。④一名角色进入濒死状态时，若其有你因〖安国①〗获得的“安国”，你移去其该“安国”，令其将体力回复至1点。然后你选择一项：1.若你的体力值大于1，你失去体力至1点；2.若你的体力上限大于1，你将体力上限减至1。最后你令其获得X点护甲（X为你以此法失去的体力值或减少的体力上限）。',
@@ -18555,7 +18581,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duansuo_info:'出牌阶段限一次。你可以重置任意名处于连环状态的角色，然后对这些角色各造成1点火焰伤害。',
 			sp_pengyang:'彭羕',
 			spdaming:'达命',
-			spdaming_info:'①游戏开始时，你获得1点“达命”值。②其他角色A的出牌阶段限一次。其可以交给你一张牌，然后你选择令一名其他角色B。若B有与此牌相同类型的牌，其将一张该类型的牌交给A，你获得1点“达命”值；否则你将此牌交给A。',
+			spdaming_info:'①游戏开始时，你获得2点“达命”值。②其他角色A的出牌阶段限一次。其可以交给你一张牌，然后你选择令一名其他角色B。若B有与此牌相同类型的牌，其将一张该类型的牌交给A，你获得1点“达命”值；否则你将此牌交给A。',
 			spxiaoni:'嚣逆',
 			spxiaoni_info:'①出牌阶段限一次。若你的“达命”值大于0，你可以将一张牌当任意一种【杀】或伤害类锦囊牌使用。然后你减少等同于此牌指定目标数的“达命”值。②你的手牌上限基数为X（X为“达命”值，且至多为你的体力值，至少为0）。',
 			xin_zhuhuan:'手杀朱桓',

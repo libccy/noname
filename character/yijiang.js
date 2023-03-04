@@ -473,11 +473,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					viewas:{
 						mod:{
+							hiddenCard:function(player,name){
+								var storage=player.getStorage('sangu_effect');
+								if(storage.length) return name==storage[0];
+							},
 							cardname:function(card,player){
+								if(_status.event.name!='chooseToUse'||_status.event.skill) return;
 								var storage=player.getStorage('sangu_effect');
 								if(storage.length) return storage[0];
 							},
 							cardnature:function(card,player){
+								if(_status.event.name!='chooseToUse'||_status.event.skill) return;
 								var storage=player.getStorage('sangu_effect');
 								if(storage.length) return false;
 							},
@@ -2958,9 +2964,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					number:{
 						trigger:{player:'compare',target:'compare'},
 						filter:function(event,player){
-							if(event.iwhile) return false;
 							if(event.player==player){
-								return get.suit(event.card1)=='heart';//&&event.card1.vanishtag.contains('tianbian');
+								return !event.iwhile&&get.suit(event.card1)=='heart';//&&event.card1.vanishtag.contains('tianbian');
 							}
 							else{
 								return get.suit(event.card2)=='heart';//&&event.card2.vanishtag.contains('tianbian');
@@ -12774,7 +12779,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yujin:['yujin_yujin','ol_yujin','xin_yujin','yujin'],
 			dc_xushu:['dc_xushu','re_xushu'],
 			xushu:['xin_xushu','xushu'],
-			fazheng:['re_fazheng','xin_fazheng','fazheng'],
+			fazheng:['re_fazheng','tw_re_fazheng','xin_fazheng','fazheng'],
 			masu:['xin_masu','re_masu','masu'],
 			xusheng:['xin_xusheng','re_xusheng','xusheng','old_xusheng'],
 			wuguotai:['xin_wuguotai','re_wuguotai','wuguotai'],
@@ -12784,10 +12789,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyi:['re_wangyi','wangyi','old_wangyi'],
 			caozhang:['re_caozhang','xin_caozhang','caozhang'],
 			guanzhang:['guanzhang','old_guanzhang'],
-			madai:['re_madai','old_madai','madai'],
+			madai:['tw_madai','re_madai','old_madai','madai'],
 			liaohua:['xin_liaohua','re_liaohua','liaohua'],
 			bulianshi:['re_bulianshi','dc_bulianshi','bulianshi','old_bulianshi'],
-			handang:['xin_handang','re_handang','handang'],
+			handang:['tw_handang','xin_handang','re_handang','handang'],
 			chengpu:['re_chengpu','tw_chengpu','ns_chengpu','chengpu','xin_chengpu'],
 			liubiao:['re_liubiao','xin_liubiao','liubiao'],
 			manchong:['re_manchong','manchong'],
@@ -12799,13 +12804,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuran:['re_zhuran','xin_zhuran','zhuran','old_zhuran'],
 			liru:['re_liru','dc_liru','xin_liru','liru'],
 			fuhuanghou:['re_fuhuanghou','xin_fuhuanghou','fuhuanghou','old_fuhuanghou'],
-			chenqun:['chenqun','re_chenqun','old_chenqun'],
+			chenqun:['dc_chenqun','chenqun','re_chenqun','old_chenqun'],
 			hanhaoshihuan:['re_hanhaoshihuan','hanhaoshihuan'],
 			caozhen:['re_caozhen','xin_caozhen','caozhen','old_caozhen'],
-			wuyi:['re_wuyi','wuyi'],
+			wuyi:['re_wuyi','xin_wuyi','wuyi'],
 			sunluban:['re_sunluban','xin_sunluban','sunluban'],
 			zhuhuan:['re_zhuhuan','xin_zhuhuan','zhuhuan','old_zhuhuan'],
-			caoxiu:['re_caoxiu','caoxiu','old_caoxiu'],
+			caoxiu:['re_caoxiu','tw_caoxiu','xin_caoxiu','caoxiu','old_caoxiu'],
 			xiahoushi:['re_xiahoushi','xiahoushi'],
 			zhangyi:['re_zhangyi','zhangyi'],
 			quancong:['old_quancong','re_quancong','xin_quancong','quancong'],
@@ -12820,7 +12825,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guotufengji:['re_guotufengji','guotufengji'],
 			guanping:['re_guanping','guanping'],
 			caifuren:['xin_caifuren','re_caifuren','caifuren'],
-			guyong:['guyong','re_guyong','xin_guyong'],
+			guyong:['guyong','re_guyong','tw_guyong','xin_guyong'],
 			yj_jushou:['re_jushou','xin_jushou','yj_jushou'],
 			guohuanghou:['re_guohuanghou','guohuanghou'],
 			liuchen:['re_liuchen','liuchen'],
@@ -12828,6 +12833,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sundeng:['re_sundeng','sundeng'],
 			caiyong:['re_caiyong','caiyong'],
 			chengong:['re_chengong','chengong'],
+			xunyou:['re_xunyou','xunyou'],
+			xuezong:['tw_xuezong','xuezong'],
 		},
 		translate:{
 			old_huaxiong:'华雄',
@@ -13064,7 +13071,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chunlao2:'醇醪',
 			chunlao_info:'结束阶段开始时，若你没有“醇”，你可以将至少一张【杀】置于你的武将牌上，称为“醇”。当一名角色处于濒死状态时，你可以移去一张“醇”，视为该角色使用一张【酒】',
 			lihuo:'疠火',
-			lihuo_info:'当你声明使用普通【杀】时，你可以将此【杀】改为火【杀】。若以此法使用的【杀】造成了伤害，则此【杀】结算后你失去1点体力；你使用火【杀】选择目标后，可以额外指定一个目标。',
+			lihuo_info:'当你声明使用普通【杀】后，你可以将此【杀】改为火【杀】。若以此法使用的【杀】造成了伤害，则此【杀】结算后你失去1点体力；你使用火【杀】选择目标后，可以额外指定一个目标。',
 			shenduan:'慎断',
 			shenduan_info:'当你的黑色基本牌因弃置而进入弃牌堆后，你可以将其当做【兵粮寸断】使用（无距离限制）。',
 			yonglve:'勇略',
@@ -13089,7 +13096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xindangxian:'当先',
 			xindangxian_info:'锁定技，准备阶段，你执行一个额外的出牌阶段。此阶段开始时，你失去1点体力并从牌堆/弃牌堆中获得一张【杀】（若你已发动过〖伏枥〗，则可以不发动此效果）。',
 			longyin:'龙吟',
-			longyin_info:'当一名角色于其出牌阶段使用【杀】时，你可弃置一张牌令此【杀】不计入出牌阶段使用次数，若此【杀】为红色，你摸一张牌。',
+			longyin_info:'当一名角色于其出牌阶段内使用【杀】时，你可弃置一张牌令此【杀】不计入出牌阶段使用次数，若此【杀】为红色，你摸一张牌。',
 			zhongyong:'忠勇',
 			zhongyong_info:'当你于出牌阶段内使用的【杀】被目标角色使用的【闪】抵消时，你可以将此【闪】交给除该角色外的一名角色。若获得此【闪】的角色不是你，你可以对相同的目标再使用一张【杀】。',
 			xinzhongyong:'忠勇',
@@ -13425,7 +13432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kousheng_info:'①出牌阶段开始时，你可以选择任意张手牌，这些牌称为“寇胜”直到回合结束。②你的“寇胜”均视为【杀】且无次数限制。③当你因执行对应实体牌包含“寇胜”的【杀】的效果而造成伤害后，你展示所有“寇胜”牌，然后目标角色可以用所有手牌交换这些牌。',
 			zhugeshang:'诸葛尚',
 			sangu:'三顾',
-			sangu_info:'出牌阶段结束时，你可以选择至多三个{【杀】或不为notarget或singleCard的普通锦囊牌}中的牌名，然后令一名其他角色记录这些牌名。该角色的下个出牌阶段开始时，其的手牌均视为其记录中的第一张牌直到此阶段结束，且当其使用或打出牌时，移除这些牌中的第一张牌。若你以此法选择过的牌名中包含你本阶段内未使用过的牌名，则你失去1点体力。',
+			sangu_info:'出牌阶段结束时，你可以选择至多三个{【杀】或不为notarget或singleCard的普通锦囊牌}中的牌名，然后令一名其他角色记录这些牌名。该角色的下个出牌阶段开始时，其的手牌于其需要使用牌时均视为其记录中的第一张牌直到此阶段结束，且当其使用或打出牌时，移除这些牌中的第一张牌。若你以此法选择过的牌名中包含你本阶段内未使用过的牌名，则你失去1点体力。',
 			yizu:'轶祖',
 			yizu_info:'锁定技。每回合限一次，当你成为【杀】或【决斗】的目标后，若你的体力值不大于使用者的体力值，则你回复1点体力。',
 			liwan:'李婉',

@@ -944,7 +944,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			hualiu_info:'你的防御距离+1',
 			zhuque_bg:'扇',
 			zhuque_skill:'朱雀羽扇',
-			zhuque_info:'当你声明使用普【杀】时，你可以为此【杀】赋予火属性。',
+			zhuque_info:'当你声明使用普【杀】后，你可以为此【杀】赋予火属性。',
 			guding:'古锭刀',
 			guding_info:'锁定技，当你因执行【杀】的效果而对目标角色造成伤害时，若其没有手牌，则此伤害+1。',
 			guding_skill:'古锭刀',
