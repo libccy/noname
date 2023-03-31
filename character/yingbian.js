@@ -1444,91 +1444,137 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:true,
 			},
-			bolan:{
+            bolan:{
 				audio:2,
 				banned:['kotomi_chuanxiang'],
-				initList:function(player){
-					var list,skills=[];
-					if(get.mode()=='guozhan'){
-						list=[];
-						for(var i in lib.characterPack.mode_guozhan) list.push(i);
-					}
-					else if(_status.connectMode) list=get.charactersOL();
-					else{
-						list=[];
-						for(var i in lib.character){
-							if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
-							list.push(i);
-						}
-					}
-					for(var i of list){
-						if(i.indexOf('gz_jun')==0) continue;
-						for(var j of lib.character[i][3]){
-							if(j=='bolan') continue;
-							var skill=lib.skill[j];
+                global:'bolan_g',
+                initList:function(player){
+                    var list,skills=[];
+                    if(get.mode()=='guozhan'){
+                        list=[];
+                        for(var i in lib.characterPack.mode_guozhan) list.push(i);
+                    }
+                    else if(_status.connectMode) list=get.charactersOL();
+                    else {
+                        list=[];
+                        for(var i in lib.character){
+                            if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
+                            list.push(i);
+                        }
+                    }
+                    for(var i of list){
+                        if(i.indexOf('gz_jun')==0) continue;
+                        for(var j of lib.character[i][3]){
+                            if(j=='bolan') continue;
+                            var skill=lib.skill[j];
 							if(!skill||skill.zhuSkill||skill.dutySkill||lib.skill.bolan.banned.contains(j)) continue;
-							if(skill.init||skill.ai&&(skill.ai.combo||skill.ai.notemp||skill.ai.neg)) continue;
-							var info=lib.translate[j+'_info'];
-							if(info&&info.indexOf('出牌阶段限一次')!=-1) skills.add(j);
-						}
-					}
-					player.storage.bolan=skills;
-				},
-				trigger:{global:'phaseUseBegin'},
-				direct:true,
-				frequent:true,
+                            if(skill.init||skill.ai&&(skill.ai.combo||skill.ai.notemp||skill.ai.neg)) continue;
+                            var info=lib.translate[j+'_info'];
+                            if(info&&info.indexOf('出牌阶段限一次')!=-1) skills.add(j);
+                        }
+                    }
+                    player.storage.bolan=skills;
+                },
+                check:function(event,player){
+                    return true;
+                },
+                trigger:{player:'phaseUseBegin'},
+                frequent:true,
 				preHidden:true,
-				filter:function(event,player){
-					return player==event.player||player.hasSkill('bolan');
-				},
-				content:function(){
-					'step 0'
-					if(player==trigger.player){
-						var next=player.chooseBool(get.prompt('bolan'),'选择获得一个出牌阶段限一次的技能').setHiddenSkill(event.name);
-						if(player.hasSkill('bolan')) next.set('frequentSkill','bolan');
-					}
-					else{
-						trigger.player.chooseBool(get.prompt('bolan'),'失去1点体力，然后获得'+get.translation(player)+'选择的一个出牌阶段限一次的技能').set('ai',function(){
-							var player=_status.event.player,target=_status.event.getParent().player;
-							return player.hp>2&&get.attitude(player,target)>0;
+                content:function(){
+                    'step 0'
+                    if(player.isIn()){
+                        if(!player.storage.bolan) lib.skill.bolan.initList(player);
+                        var list=player.storage.bolan.randomGets(3);
+                        if(!list.length){
+                            event.finish();
+                            return;
+                        }
+                        player.chooseControl(list).set('choiceList',list.map(function(i){
+                            return '<div class="skill">【'+get.translation(lib.translate[i+'_ab']||get.translation(i).slice(0,2))+'】</div><div>'+get.skillInfoTranslation(i,player)+'</div>';
+                        })).set('displayIndex',false).set('prompt','博览：请选择你要获得的技能').set('ai',()=>{
+							var list=_status.event.controls.slice();
+							return list.sort((a,b)=>{
+								return get.skillRank(b,'in')-get.skillRank(a,'in');
+							})[0];
 						});
-					}
-					'step 1'
-					if(result.bool){
-						player.logSkill('bolan',trigger.player);
-						if(player!=trigger.player) trigger.player.loseHp();
-					}
-					else event.finish();
-					'step 2'
-					if(player.isIn()&&trigger.player.isIn()){
-						if(!player.storage.bolan) lib.skill.bolan.initList(player);
-						var list=player.storage.bolan.randomGets(3);
-						if(!list.length){
-							event.finish();
-							return;
-						}
-						event.videoId=lib.status.videoId++;
-						var func=function(skills,id){
-							var dialog=ui.create.dialog('forcebutton');
-							dialog.videoId=id;
-							dialog.add('博览：选择一个技能');
-							for(var i=0;i<skills.length;i++){
-								dialog.add('<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【'+get.translation(skills[i])+'】</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
-							}
-							dialog.addText(' <br> ');
-						}
-						if(player.isOnline()) player.send(func,list,event.videoId);
-						else if(player==game.me) func(list,event.videoId);
-						player.chooseControl(list);
-					}
-					else event.finish();
-					'step 3'
-					game.broadcastAll('closeDialog',event.videoId);
-					trigger.player.addTempSkill(result.control,'phaseUseEnd');
-					trigger.player.popup(result.control,'thunder');
-					game.log(player,'为',player==trigger.player?'自己':trigger.player,'选择了技能','#g【'+get.translation(result.control)+'】')
-				},
-			},
+                    }
+                    else event.finish();
+                    'step 1'
+                    player.addTempSkill(result.control,'phaseUseEnd');
+                    player.popup(result.control);
+                    game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
+                },
+                ai:{threaten:0.9},
+                subSkill:{
+                    g:{
+                        audio:'bolan',
+                        forceaudio:true,
+                        enable:'phaseUse',
+                        usable:1,
+                        prompt:'出牌阶段限一次。你可以令一名有〖博览〗的角色从三个描述中包含“出牌阶段限一次”的技能中选择一个，你获得此技能直到此阶段结束。',
+                        filter:function(event,player){
+                            return game.hasPlayer(function(current){
+                                return current!=player&&current.hasSkill('bolan');
+                            });
+                        },
+                        filterTarget:function(card,player,target){
+                            return player!=target&&target.hasSkill('bolan');
+                        },
+                        selectTarget:function(){
+                            if(game.countPlayer(current=>{
+                                return lib.skill.bolan_g.filterTarget(null,_status.event.player,current);
+                            })==1) return -1;
+                            return 1;
+                        },
+                        content:function(){
+                            'step 0'
+                            player.loseHp();
+                            if(target.isIn()&&player.isIn()){
+                                if(!target.storage.bolan) lib.skill.bolan.initList(target);
+                                var list=target.storage.bolan.randomGets(3);
+                                if(!list.length){
+                                    event.finish();
+                                    return;
+                                }
+                                target.chooseControl(list).set('choiceList',list.map(function(i){
+                                    return '<div class="skill">【'+get.translation(lib.translate[i+'_ab']||get.translation(i).slice(0,2))+'】</div><div>'+get.skillInfoTranslation(i,player)+'</div>';
+                                })).set('displayIndex',false).set('prompt','博览：请选择令'+get.translation(player)+'获得的技能').set('ai',()=>{
+									var list=_status.event.controls.slice();
+									return list.sort((a,b)=>{
+										return (get.skillRank(b,'in')-get.skillRank(a,'in'))*get.attitude(_status.event.player,_status.event.getParent().player);
+									})[0];
+								});
+                            }
+                            else event.finish();
+                            'step 1'
+                            target.line(player);
+                            player.addTempSkill(result.control,'phaseUseEnd');
+                            player.popup(result.control);
+                            game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
+                        },
+                        ai:{
+                            order:function(item,player){
+                                if(player.hp>=5||player.countCards('h')>=10) return 10;
+                                var list=game.filterPlayer(current=>lib.skill.bolan_g.filterTarget(null,player,current));
+                                for(var target of list){
+                                    if(get.attitude(target,player)>0) return 10;
+                                }
+                                return 4;
+                            },
+                            result:{
+                                player:function(player,target){
+                                    if(player.hasUnknown()) return player.hp+player.countCards('h')/4-5>0?1:0;
+                                    var tao=player.countCards('h','tao');
+                                    if(player.hp+tao>4) return 4+get.attitude(player,target);
+                                    if(player.hp+tao>3) return get.attitude(player,target)-2;
+                                    return 0;
+                                },
+                            },
+                        },
+                    }
+                }
+            },
 			yifa:{
 				audio:2,
 				trigger:{target:'useCardToTargeted'},
@@ -2234,7 +2280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			caiyuan:{
-				trigger:{player:'phaseJieshuBegin'},
+				trigger:{player:'phaseEnd'},
 				forced:true,
 				preHidden:true,
 				filter:function(event,player){
@@ -2629,9 +2675,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.addSkill('tairan2');
 					if(!player.storage.tairan2) player.storage.tairan2=0;
-					var num=Math.min(player.maxHp-player.hp,5);
+					var num=player.maxHp-player.hp;
 					if(num>0){
-						player.storage.tairan2+=num;
+						player.storage.tairan2=num;
 						player.recover(num);
 					}
 					'step 1'
@@ -3581,13 +3627,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taoyin_info:'隐匿技，当你登场后，若当前回合角色存在且不是你，则你可令该角色本回合的手牌上限-2。',
 			yimie:'夷灭',
 			yimie2:'夷灭',
-			yimie_info:'每回合限一次，当你对其他角色造成伤害时，若伤害值X小于Y，则你可失去1点体力，将伤害值改为Y。此伤害结算结束后，其回复(Y-X)点体力。（Y为其体力值）’',
+			yimie_info:'每回合限一次，当你对其他角色造成伤害时，若伤害值X小于Y，则你可失去1点体力，将伤害值改为Y。此伤害结算结束后，其回复(Y-X)点体力（Y为其体力值）。',
 			ruilve:'睿略',
 			ruilve2:'睿略',
 			ruilve_info:'主公技，其他晋势力角色的出牌阶段限一次，该角色可以将一张带有伤害标签的基本牌或锦囊牌交给你。',
 			tairan:'泰然',
 			tairan2:'泰然',
-			tairan_info:'锁定技，回合结束时，你回复Y点体力，并将手牌摸至X张。出牌阶段开始时，你失去Y点体力，弃置上次以此法获得的牌。（X为你的体力上限；Y=(X-你的体力值)且至多为5）；摸牌至多摸五张',
+			tairan_info:'锁定技，回合结束时，你将体力回复至体力上限，并将手牌摸至体力上限（称为“泰然”牌，且至多摸五张）。然后你的下一个出牌阶段开始时，你失去上一次以此法回复的体力值的体力，弃置所有“泰然”牌。',
 			gz_jin_simayi:'司马懿',
 			gz_jin_zhangchunhua:'张春华',
 			gz_jin_simazhao:'司马昭',
@@ -3608,7 +3654,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ciwei:'慈威',
 			ciwei_info:'一名角色于其回合内使用第二张牌时，若此牌为基本牌或普通锦囊牌，则你可以弃置一张牌，取消此牌的所有目标。',
 			caiyuan:'才媛',
-			caiyuan_info:'锁定技，当你扣减体力时，你获得一枚“才媛”标记直到你的下回合结束。结束阶段开始时，若你没有“才媛”标记且此回合不是你的第一个回合 ，则你摸两张牌。',
+			caiyuan_info:'锁定技，当你扣减体力时，你获得一枚“才媛”标记直到你的下回合结束。回合结束时，若你没有“才媛”标记且此回合不是你的第一个回合，则	你摸两张牌。',
 			simazhou:'司马伷',
 			caiwang:'才望',
 			caiwang_info:'当你使用或打出牌响应其他角色使用的牌，或其他角色使用或打出牌响应你使用的牌后，若这两张牌颜色相同，则你可以弃置对方的一张牌。',
@@ -3637,7 +3683,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shenpin_info:'当一名角色的判定牌生效前，你可以打出一张与判定牌颜色不同的牌代替之。',
 			zhongyan:'钟琰',
 			bolan:'博览',
-			bolan_info:'出牌阶段开始时，你可从三个描述中包含“出牌阶段限一次”的技能中选择一个获得直到此阶段结束；其他角色的出牌阶段开始时，其可以失去1点体力，令你从三个描述中包含“出牌阶段限一次”的技能中选择一个，其获得此技能直到此阶段结束。',
+			bolan_info:'①出牌阶段开始时，你可从三个描述中带有“出牌阶段限一次”的技能中选择一个，令当前回合角色获得直至此阶段结束。②其他角色出牌阶段限一次，其可以失去1点体力，令你发动一次〖博览①〗。',
 			yifa:'仪法',
 			yifa2:'仪法',
 			yifa_info:'锁定技，其他角色使用【杀】或黑色普通锦囊牌指定你为目标后，其手牌上限-1直到回合结束。',

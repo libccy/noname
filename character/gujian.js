@@ -873,6 +873,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content_phase:function(){
 					'step 0'
+					event.forceDie=true;
 					event.list=[player].concat(player.storage.lianjing_targets);
 					event.exlist=[];
 					event.list.sortBySeat();

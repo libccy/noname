@@ -619,8 +619,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(event._zengyu_denied){
-						player.$throw(cards[0],1000);
-						player.lose(cards,ui.discardPile,'visible');
+						player.loseToDiscardpile(cards);
 					}
 					else{
 						if(get.type(cards[0],false)=='equip'){

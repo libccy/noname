@@ -2142,6 +2142,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseToUse(get.prompt('qinglong',trigger.target),function(card,player,event){
 						if(get.name(card)!='sha') return false;
+						if(player.getEquip('qinglong')==card) return false;
 						return lib.filter.filterCard.apply(this,arguments);
 					},trigger.target,-1).set('addCount',false).logSkill='qinglong_skill';
 				}
@@ -2217,7 +2218,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					skillTagFilter:function(player,tag,arg){
 						if(player._guanshi_temp) return;
 						player._guanshi_temp=true;
-						var bool=(get.attitude(player,arg.target)<0&&arg.card.name=='sha'&&player.countCards('he',function(card){
+						var bool=(get.attitude(player,arg.target)<0&&arg.card&&arg.card.name=='sha'&&player.countCards('he',function(card){
 							return card!=player.getEquip('guanshi')&&card!=arg.card&&(!arg.card.cards||!arg.card.cards.contains(card))&&get.value(card)<5;
 						})>1);
 						delete player._guanshi_temp;
@@ -2576,6 +2577,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					};
 					event.settle=function(){
+						if(event.respondWuxie) event.trigger('eventNeutralized');
 						if(!event.state){
 							if(event.triggername=='phaseJudge'){
 								trigger.untrigger();
@@ -2712,7 +2714,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						game.players[i].hideTimer();
 					}
 					'step 8'
-					if(event.wuxieresult2._sendskill) lib.skill[event.wuxieresult2._sendskill[0]]=event.wuxieresult2._sendskill[1];
+					if(event.wuxieresult2&&event.wuxieresult2._sendskill) lib.skill[event.wuxieresult2._sendskill[0]]=event.wuxieresult2._sendskill[1];
 					if(event.wuxieresult&&event.wuxieresult2&&event.wuxieresult2.skill){
 						var info=get.info(event.wuxieresult2.skill);
 						if(info&&info.precontent&&!game.online){
@@ -2725,7 +2727,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 9'
 					if(event.wuxieresult){
 						var next=event.wuxieresult.useResult(event.wuxieresult2);
-						if(event.stateplayer&&event.statecard) next.respondTo=[event.stateplayer,event.statecard];
+						if(event.stateplayer&&event.statecard){
+							event.respondWuxie=true;
+							next.respondTo=[event.stateplayer,event.statecard];
+						}
 						else if(event.triggername!='phaseJudge'){
 							next.respondTo=[trigger.player,trigger.card];
 						}

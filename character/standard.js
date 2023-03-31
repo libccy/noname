@@ -86,7 +86,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhouyu:['huanggai','xiaoqiao','zhouyi'],
 			sunquan:['zhoutai'],
 			lvbu:['diaochan','lvlingqi'],
-			machao:['madai','mayunlu'],
+			machao:['madai','mayunlu','yangwan'],
 			zhangliao:['zangba'],
 			ganning:['lingtong','xf_sufei'],
 			guanyu:['zhangfei','liaohua'],
@@ -273,10 +273,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'source',
 				preHidden:true,
 				filter:function(event,player){
-					return (event.source&&event.source.countGainableCards(player,'he')&&event.num>0&&event.source!=player);
+					return (event.source&&event.source.countGainableCards(player,event.source!=player?'he':'e')&&event.num>0);
 				},
 				content:function(){
-					player.gainPlayerCard(true,trigger.source,'he');
+					player.gainPlayerCard(true,trigger.source,trigger.source!=player?'he':'e');
 				},
 				ai:{
 					maixie_defend:true,
@@ -2460,7 +2460,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangliao:['re_zhangliao','zhangliao'],
 			sp_zhangliao:['sp_zhangliao','yj_zhangliao'],
 			xiahoudun:['re_xiahoudun','xin_xiahoudun','xiahoudun'],
-			liubei:['re_liubei','liubei'],
+			liubei:['re_liubei','liubei','junk_liubei'],
 			guanyu:['re_guanyu','guanyu'],
 			zhangfei:['re_zhangfei','tw_zhangfei','xin_zhangfei','old_zhangfei','zhangfei'],
 			zhaoyun:['re_zhaoyun','old_zhaoyun','zhaoyun'],
@@ -2468,7 +2468,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			machao:['re_machao','machao'],
 			sp_machao:['sp_machao','old_machao'],
 			zhugeliang:['re_zhugeliang','zhugeliang'],
-			huangyueying:['re_huangyueying','huangyueying'],
+			huangyueying:['re_huangyueying','huangyueying','junk_huangyueying'],
 			sunquan:['re_sunquan','sunquan'],
 			zhouyu:['re_zhouyu','zhouyu'],
 			luxun:['re_luxun','luxun'],

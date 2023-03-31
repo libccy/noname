@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhangfei:['male','shen',4,['shencai','xunshi'],['shu']],
 			tw_shen_guanyu:['male','shen',4,['twwushen','twwuhun'],['shu']],
 			shen_machao:['male','shen',4,['shouli','hengwu'],['shu']],
-			shen_sunquan:['male','shen',4,['dili','yuheng'],['wei']],
+			shen_sunquan:['male','shen',4,['junkyuheng','junkdili'],['wu']],
 			shen_jiangwei:['male','shen',4,['jiufa','tianren','pingxiang'],['shen']],
 			key_kagari:['female','shen',3,['kagari_zongsi'],['key']],
 			key_shiki:['female','shen','3/5',['shiki_omusubi'],['key']],
@@ -95,7 +95,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					jingce:{
 						audio:'shelie',
-						trigger:{player:['phaseJieshu','useCard1']},
+						trigger:{player:['phaseJieshuBegin','useCard1']},
 						filter:function(event,player){
 							if(player.hasSkill('twshelie_round')||player!=_status.currentPhase) return false;
 							var list=[];
@@ -234,7 +234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					name2:'黄',
 					content:'mark',
 					markcount:function(storage,player){
-						return storage.toString().slice(-2);
+						return (storage||0).toString().slice(-2);
 					},
 				},
 				content:function(){
@@ -252,7 +252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					aiOrder:function(player,card,num){
-						if((get.number(card)+player.countMark('yizhao'))%10>10) return num+10;
+						if(Math.floor((get.number(card)+player.countMark('yizhao')%10)/10)==1) return num+10;
 					},
 				},
 				ai:{
@@ -311,7 +311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageBegin4'},
 				check:function(event,player){
-					return get.damageEffect(player,event.source,event.source,event.nature)<=0;
+					return get.damageEffect(player,event.source,player,event.nature)<=0;
 				},
 				content:function(){
 					'step 0'
@@ -1993,11 +1993,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					combo:'scfuhai',
 					threaten:3,
-					order:2,
+					order:9,
 					result:{
+						player:function(player,target){
+							if(player.maxHp==1) return -2.5;
+							return -0.25;
+						},
 						target:function(player,target){
 							if(target.isHealthy()) return -2;
-							return -1;
+							if(!target.hasMark('yingba_mark')) return -1;
+							return -0.2;
 						},
 					},
 				},
@@ -2084,6 +2089,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					maxHandcardBase:function(player){
 						return player.getDamagedHp();
 					},
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'recover')&&_status.event.type=='phase'&&!player.needsToDiscard()) return 0.2;
+						}
+					}
 				},
 				trigger:{player:'damageBegin2'},
 				forced:true,
@@ -2584,10 +2596,66 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.targets.addArray(targets);
 				},
 			},
+			// reshuishi:{
+			// 	audio:'shuishi',
+			// 	enable:'phaseUse',
+			// 	usable:1,
+			// 	filter:function(event,player){
+			// 		return player.maxHp<10;
+			// 	},
+			// 	content:function(){
+			// 		'step 0'
+			// 		event.cards=[];
+			// 		event.suits=[];
+			// 		'step 1'
+			// 		player.judge(function(result){
+			// 			var evt=_status.event.getParent('reshuishi');
+			// 			if(evt&&evt.suits&&evt.suits.contains(get.suit(result))) return 0;
+			// 			return 1;
+			// 		}).set('callback',function(){
+			// 			event.getParent().orderingCards.remove(event.judgeResult.card);
+			// 		}).judge2=function(result){
+			// 			return result.bool?true:false;
+			// 		};
+			// 		'step 2'
+			// 		event.cards.push(result.card);
+			// 		if(result.bool&&player.maxHp<10){
+			// 			event.suits.push(result.suit);
+			// 			player.gainMaxHp();
+			// 			event.goto(1);
+			// 		}
+			// 		else{
+			// 			cards=cards.filterInD();
+			// 			if(cards.length) player.chooseTarget('将'+get.translation(cards)+'交给一名角色',true).set('ai',function(target){
+			// 				var player=_status.event.player;
+			// 				var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+			// 				if(target.hasSkillTag('nogain')) att/=10;
+			// 				return att;
+			// 			});
+			// 			else event.finish();
+			// 		}
+			// 		'step 3'
+			// 		if(result.bool){
+			// 			var target=result.targets[0];
+			// 			event.target=target;
+			// 			player.line(target,'green');
+			// 			target.gain(cards,'gain2').giver=player;
+			// 		}
+			// 		'step 4'
+			// 		if(target.isMaxHandcard()) player.loseMaxHp();
+			// 	},
+			// 	ai:{
+			// 		order:1.2,
+			// 		result:{
+			// 			player:1,
+			// 		},
+			// 	},
+			// },
 			reshuishi:{
 				audio:'shuishi',
 				enable:'phaseUse',
 				usable:1,
+				frequent:true,
 				filter:function(event,player){
 					return player.maxHp<10;
 				},
@@ -2600,28 +2668,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var evt=_status.event.getParent('reshuishi');
 						if(evt&&evt.suits&&evt.suits.contains(get.suit(result))) return 0;
 						return 1;
-					}).set('callback',function(){
-						event.getParent().orderingCards.remove(event.judgeResult.card);
-					}).judge2=function(result){
+					}).set('callback',lib.skill.reshuishi.callback).judge2=function(result){
 						return result.bool?true:false;
 					};
 					'step 2'
-					event.cards.push(result.card);
-					if(result.bool&&player.maxHp<10){
-						event.suits.push(result.suit);
-						player.gainMaxHp();
-						event.goto(1);
-					}
-					else{
-						cards=cards.filterInD();
-						if(cards.length) player.chooseTarget('将'+get.translation(cards)+'交给一名角色',true).set('ai',function(target){
-							var player=_status.event.player;
-							var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
-							if(target.hasSkillTag('nogain')) att/=10;
-							return att;
-						});
-						else event.finish();
-					}
+					var cards=cards.filterInD();
+					if(cards.length) player.chooseTarget('将'+get.translation(cards)+'交给一名角色',true).set('ai',function(target){
+						var player=_status.event.player;
+						var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+						if(target.hasSkillTag('nogain')) att/=10;
+						return att;
+					});
+					else event.finish();
 					'step 3'
 					if(result.bool){
 						var target=result.targets[0];
@@ -2629,11 +2687,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target,'green');
 						target.gain(cards,'gain2').giver=player;
 					}
+					else event.finish();
 					'step 4'
 					if(target.isMaxHandcard()) player.loseMaxHp();
 				},
+				callback:function(){
+					'step 0'
+					var evt=event.getParent(2);
+					event.getParent().orderingCards.remove(event.judgeResult.card);
+					evt.cards.push(event.judgeResult.card);
+					if(event.getParent().result.bool&&player.maxHp<10){
+						evt.suits.push(event.getParent().result.suit);
+						player.gainMaxHp();
+						player.chooseBool('是否继续发动【慧识】？').set('frequentSkill','reshuishi');
+					}
+					else event._result={bool:false};
+					'step 1'
+					if(result.bool) event.getParent(2).redo();
+				},
 				ai:{
-					order:1.2,
+					order:9,
 					result:{
 						player:1,
 					},
@@ -3928,8 +4001,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hasMark('baonu')){
 						player.chooseControlList([
 							'移去一枚【暴怒】标记',
-							'失去一点体力'
+							'失去1点体力'
 						],true).set('ai',function(event,player){
+							if(get.effect(player,{name:'losehp'},player,player)>=0) return 1;
 							if(player.storage.baonu>6) return 0;
 							if(player.hp+player.num('h','tao')>3) return 1;
 							return 0;
@@ -6747,7 +6821,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dangmo:'荡魔',
 			dangmo_info:'当你于出牌阶段内使用第一张【杀】选择目标后，你可以为此牌增加至多Y-1个目标（Y为你的体力值）。',
 			reshuishi:'慧识',
-			reshuishi_info:'出牌阶段限一次，若你的体力上限小于10，你可进行判定牌不置入弃牌堆的判定。若判定结果与本次发动技能时的其他判定结果的花色均不相同且你的体力上限小于10，则你加1点体力上限并重复此流程。然后你将所有位于处理区的判定牌交给一名角色。若其手牌数为全场最多，则你减1点体力上限。',
+			reshuishi_info:'出牌阶段限一次。若你的体力上限小于10，你可进行判定牌不置入弃牌堆的判定。若判定结果与本次发动技能时的其他判定结果的花色均不相同且你的体力上限小于10，则你加1点体力上限，且可以重复此流程。然后你将所有位于处理区的判定牌交给一名角色。若其手牌数为全场最多，则你减1点体力上限。',
 			resghuishi:'辉逝',
 			resghuishi_info:'限定技，出牌阶段，你可选择一名角色。若你的体力上限不小于存活人数且其有未发动的觉醒技，则你令其中一个技能无视发动条件；否则其摸四张牌。然后你减2点体力上限。',
 			qizhengxiangsheng:'奇正相生',

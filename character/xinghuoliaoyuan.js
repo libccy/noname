@@ -1479,9 +1479,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterReplace:{
-			duji:['re_duji','duji'],
+			duji:['re_duji','duji','ns_duji'],
 			sp_taishici:['re_sp_taishici','sp_taishici'],
 			mazhong:['mazhong','re_mazhong'],
+			wenpin:['re_wenpin','wenpin'],
 		},
 		translate:{
 			xinghuoliaoyuan:'星火燎原',

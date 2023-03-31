@@ -6684,9 +6684,9 @@
 			'<li>发现：从三张随机亮出的牌中选择一张，若无特殊说明，则获得此牌。'+
 			'<li>蓄能技：发动时可以增大黄色的数字。若如此做，红色数字于技能的结算过程中改为原来的两倍。'+
 			'<li>施法：若技能的拥有者未拥有等待执行的同名“施法”效果，则其可以发动“施法”技能。其须选择声明一个数字X（X∈[1, 3]），在此之后的第X个回合结束时，其执行“施法”效果，且效果中的数字X视为与技能发动者声明的X相同。'+
-            '<li>共同拼点：一种特殊的拼点结算。发起者与被指定的拼点目标同时亮出拼点牌，进行一次决算：其中拼点牌点数唯一最大的角色赢，其他角色均没赢；若没有点数唯一最大的拼点牌，则所有角色拼点均没赢。'+
-            '<li>强令：若一名角色拥有带有“强令”的技能，则该技能的发动时机为“出牌阶段开始时”。若技能拥有者发动该技能，其须发布“强令”给一名其他角色，并在对应技能的时间节点加以判断目标角色是否成功完成该强令所要求的任务条件。成功或失败则会根据技能效果执行不同结算流程。'+
-            '<li>摧坚：若一名角色拥有带有“摧坚”的技能，则该技能的发动时机为“当你使用伤害牌指定第一个目标后”。你可以对其中一个目标发动“摧坚”技能，然后执行后续效果。其中，后续效果里的X等于该目标的非charlotte技能的数量。'
+			'<li>共同拼点：一种特殊的拼点结算。发起者与被指定的拼点目标同时亮出拼点牌，进行一次决算：其中拼点牌点数唯一最大的角色赢，其他角色均没赢；若没有点数唯一最大的拼点牌，则所有角色拼点均没赢。'+
+			'<li>强令：若一名角色拥有带有“强令”的技能，则该技能的发动时机为“出牌阶段开始时”。若技能拥有者发动该技能，其须发布“强令”给一名其他角色，并在对应技能的时间节点加以判断目标角色是否成功完成该强令所要求的任务条件。成功或失败则会根据技能效果执行不同结算流程。'+
+			'<li>摧坚：若一名角色拥有带有“摧坚”的技能，则该技能的发动时机为“当你使用伤害牌指定第一个目标后”。你可以对其中一个目标发动“摧坚”技能，然后执行后续效果。其中，后续效果里的X等于该目标的非charlotte技能的数量。'
 		},
 		setIntro:function(node,func,left){
 			if(lib.config.touchscreen){
@@ -13389,7 +13389,7 @@
 						next.num1=event.num1;
 						next.num2=event.num2;
 						next.setContent(event.callback);
-                        event.compareMultiple=true;
+						event.compareMultiple=true;
 					}
 					"step 6"
 					game.broadcastAll(ui.clear);
@@ -17270,6 +17270,7 @@
 					game.addVideo('judge2',null,event.videoId);
 					ui.arena.classList.remove('thrownhighlight');
 					game.log(player,'的判定结果为',event.result.card);
+					event.trigger('judgeFixing');
 					if(event.callback){
 						var next=game.createEvent('judgeCallback',false);
 						next.player=player;
@@ -20806,6 +20807,7 @@
 					next.drawDeck==undefined&&!next.player.isMin()&&next.num>1){
 						next.drawDeck=1;
 					}
+					next.result=[];
 					return next;
 				},
 				randomDiscard:function(){
@@ -21458,7 +21460,7 @@
 					return next;
 				},
 
-				changeHujia:function(num,type){
+				changeHujia:function(num,type,limit){
 					var next=game.createEvent('changeHujia');
 					if(typeof num!='number'){
 						num=1;
@@ -21467,6 +21469,12 @@
 					next.player=this;
 					if(type) next.type=type;
 					next.setContent('changeHujia');
+					if(limit===true) limit=5;
+					if(typeof limit=='number'&&this.hujia+num>parseInt(limit)){
+						var numx=parseInt(limit)-this.hujia;
+						if(numx>0) next.num=numx;
+						else _status.event.next.remove(next);
+					}
 					return next;
 				},
 				getBuff:function(){
@@ -26145,11 +26153,12 @@
 						this.trigger(this.name+'Cancelled');
 						if(this.player&&lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name)}
 				},
-				neutralize:function(){
+				neutralize:function(event){
 					this.untrigger.call(this,arguments);
 					this.finish();
 					this._neutralized=true;
 					this.trigger('eventNeutralized');
+					this._neutralize_event=event||_status.event;
 				},
 				unneutralize:function(){
 					this.untrigger.call(this,arguments);
@@ -28549,7 +28558,7 @@
 				popup:false,
 				firstDo:true,
 				content:function(){
-					if(player.isTurnedOver()){
+					if(player.isTurnedOver()&&!trigger._noTurnOver){
 						trigger.cancel();
 						player.turnOver();
 						player.phaseSkipped=true;
@@ -28683,7 +28692,18 @@
 								event=event||_status.event;
 								return lib.filter.cardSavable(card,player,event.dying);
 							},
-							filterTarget:trigger.player,
+							filterTarget:function(card,player,target){
+								if(target!=_status.event.dying) return false;
+								if(!card) return false;
+								var info=get.info(card);
+								if(!info.singleCard||ui.selected.targets.length==0){
+									var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player);
+									if(mod==false) return false;
+									var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target);
+									if(mod!='unchanged') return mod;
+								}
+								return true;
+							},
 							prompt:str,
 							prompt2:str2,
 							ai1:function(card){
@@ -29573,7 +29593,9 @@
 						}
 						if(mode.game){
 							game.getIdentityList=mode.game.getIdentityList;
+							game.getIdentityList2=mode.game.getIdentityList2;
 							game.updateState=mode.game.updateState;
+							game.showIdentity=mode.game.showIdentity;
 						}
 						if(mode.element&&mode.element.player){
 							for(var i in mode.element.player){
