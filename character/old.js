@@ -7,20 +7,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			old:{
 				old_standard:['ol_yuanshu'],
-				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao","pangde","xuhuang",'junk_sunquan',"huangzhong","new_caoren"],
-				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong"],
+				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao","pangde","xuhuang",'junk_sunquan',"huangzhong","new_caoren",'old_chendao'],
+				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong",'old_re_lidian'],
 				old_yijiang1:["masu","xushu","xin_yujin","old_xusheng","old_lingtong","fazheng",'old_gaoshun'],
-				old_yijiang2:["old_zhonghui","madai",'old_handang','old_liubiao','oldre_liubiao'],
+				old_yijiang2:["old_zhonghui","madai",'old_handang','old_liubiao','oldre_liubiao','old_guanzhang'],
 				old_yijiang3:["liru","old_zhuran","old_fuhuanghou","old_caochong"],
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan",'old_caorui'],
 				old_yijiang5:["old_caoxiu","old_zhuzhi"],
-				old_yijiang67:["ol_zhangrang","ol_liuyu",'old_huanghao'],
+				old_yijiang67:["ol_zhangrang","ol_liuyu",'old_huanghao','old_liyan'],
 				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","old_wangyun",'ol_wanglang','old_dingfeng'],
 				old_yingbian:['junk_simayi','old_yangyan','old_yangzhi'],
 				old_mobile:["old_caochun",'old_majun'],
 			},
 		},
 		character:{
+			old_chendao:['male','shu',4,['drlt_wanglie']],
+			old_liyan:['male','shu',3,['duliang','fulin']],
+			old_re_lidian:['male','wei',3,['xunxun','wangxi']],
+			old_guanzhang:['male','shu',4,['old_fuhun']],
 			new_caoren:['male','wei',4,['jushou']],
 			huangzhong:['male','shu',4,['liegong']],
 			junk_sunquan:['male','shen',4,['dili','yuheng'],['wei']],
@@ -581,9 +585,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.lose(card,ui.ordering).relatedEvent=trigger;
 					trigger.throw=false;
 					trigger.skill='old_guhuo_backup';
-					game.log(player,'声明',trigger.targets&&trigger.targets.length?'对':'',trigger.targets,'使用',trigger.card);
+					game.log(player,'声明',trigger.targets&&trigger.targets.length?'对':'',trigger.targets||'',trigger.name=='useCard'?'使用':'打出',trigger.card);
 					event.prompt=get.translation(player)+'声明'+(trigger.targets&&trigger.targets.length?'对'+get.translation(trigger.targets):'')+
-						'使用'+(get.translation(trigger.card.nature)||'')+get.translation(trigger.card.name)+'，是否质疑？';
+						(trigger.name=='useCard'?'使用':'打出')+(get.translation(trigger.card.nature)||'')+get.translation(trigger.card.name)+'，是否质疑？';
 					event.targets=game.filterPlayer(i=>i!=player&&i.hp>0).sortBySeat(_status.currentPhase);
 
 					game.broadcastAll(function(card,player){
@@ -1022,8 +1026,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_dingfeng:'旧丁奉',
 			junk_sunquan:'改版神孙权',
 			junk_sunquan_ab:'神孙权',
-			new_caoren:'13版曹仁',
+			new_caoren:'旧曹仁',
 			new_caoren_ab:'旧曹仁',
+			old_re_lidian:'旧李典',
+			old_liyan:'旧李严',
+			old_chendao:'旧陈到',
 			
 			old_standard:'标准包',
 			old_shenhua:'神话再临',

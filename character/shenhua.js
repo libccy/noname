@@ -67,7 +67,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"lukang":["male","wu",4,["drlt_qianjie","drlt_jueyan","drlt_poshi"],[]],
 			"yl_yuanshu":["male","qun",4,["drlt_yongsi","drlt_weidi"],["zhu"]],
 			"zhangxiu":["male","qun",4,["drlt_xiongluan","drlt_congjian"],[]],
-			"chendao":["male","shu",4,["drlt_wanglie"],[]],
+			"chendao":["male","shu",4,["dcwanglie"],[]],
 			zhoufei:["female","wu",3,["olliangyin","olkongsheng"]],
 		},
 		perfectPair:{
@@ -141,6 +141,113 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"chendao":"陈到，字叔至，生卒年不详，豫州汝南（今河南驻马店平舆县）人。三国时期蜀汉将领，刘备帐下白毦兵统领，名位常亚于赵云，以忠勇著称。蜀汉建兴年间，任征西将军、永安都督，封亭侯。在任期间去世。",
 		},
 		skill:{
+			//新杀小加强 陈到
+			dcwanglie:{
+				audio:'drlt_wanglie',
+				locked:false,
+				mod:{
+					targetInRange:function(card,player,target){
+						if(player.hasSkill('dcwanglie_effect',null,null,false)) return true;
+					},
+				},
+				trigger:{
+					player:"useCard",
+				},
+				filter:function(event,player){
+					return player.isPhaseUsing()&&(event.card.name=='sha'||get.type(event.card)=='trick');
+				},
+				preHidden:true,
+				check:function(event,player){
+					if(player.hasSkill('dcwanglie2',null,null,false)) return true;
+					if(['wuzhong','kaihua','dongzhuxianji'].contains(event.card.name)) return false;
+					player._wanglie_temp=true;
+					var eff=0;
+					for(var i of event.targets){
+						eff+=get.effect(i,event.card,player,player);
+					}
+					delete player._wanglie_temp;
+					if(eff<0) return true;
+					if(!player.countCards('h',function(card){
+						return player.hasValueTarget(card,null,true);
+					})) return true;
+					if(get.tag(event.card,'damage')&&!player.needsToDiscard()&&!player.countCards('h',function(card){
+						return get.tag(card,'damage')&&player.hasValueTarget(card,null,true);
+					})) return true;
+					return false;
+				},
+				prompt2:function(event){
+					return '令'+get.translation(event.card)+'不能被响应，然后本阶段你使用牌只能指定自己为目标'
+				},
+				group:'dcwanglie_startup',
+				content:function(){
+					trigger.nowuxie=true;
+					trigger.directHit.addArray(game.players);
+					player.addTempSkill('dcwanglie2','phaseUseAfter');
+				},
+				subSkill:{
+					startup:{
+						trigger:{player:'phaseUseBegin'},
+						forced:true,
+						popup:false,
+						content:function(){
+							player.addTempSkill('dcwanglie_effect','phaseUseAfter');
+						},
+					},
+					effect:{
+						forced:true,
+						charlotte:true,
+						firstDo:true,
+						popup:false,
+						trigger:{player:'useCard1'},
+						filter:function(event,player){
+							return event.targets.some(target=>target!=player);
+						},
+						content:function(){
+							player.addMark('dcwanglie_effect',1,false);
+							if(player.countMark('dcwanglie_effect')>=2) player.removeSkill('dcwanglie_effect');
+						},
+						onremove:true,
+					},
+				},
+				ai:{
+					//pretao:true,
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						//if(tag=='pretao') return true;
+						if(player._wanglie_temp) return false;
+						player._wanglie_temp=true;
+						var bool=function(){
+							if(['wuzhong','kaihua','dongzhuxianji'].contains(arg.card.name)) return false;
+							if(get.attitude(player,arg.target)>0||!player.isPhaseUsing()) return false;
+							var cards=player.getCards('h',function(card){
+								return card!=arg.card&&(!arg.card.cards||!arg.card.cards.contains(card));
+							});
+							var sha=player.getCardUsable('sha');
+							if(arg.card.name=='sha') sha--;
+							cards=cards.filter(function(card){
+								if(card.name=='sha'&&sha<=0) return false;
+								return player.hasValueTarget(card,null,true);
+							});
+							if(!cards.length) return true;
+							if(!get.tag(arg.card,'damage')) return false;
+							if(!player.needsToDiscard()&&!cards.filter(function(card){
+								return get.tag(card,'damage');
+							}).length) return true;
+							return false;
+						}();
+						delete player._wanglie_temp;
+						return bool;
+					},
+				},
+			},
+			dcwanglie2:{
+				charlotte:true,
+				mod:{
+					playerEnabled:function(card,player,target){
+						if(player!=target) return false;
+					}
+				},
+			},
 			//周妃
 			olliangyin:{
 				audio:'liangyin',
@@ -566,7 +673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result&&result.links&&result.links.length){
 						player.line(player,trigger.player);
 						player.logSkill('drlt_zhenrong');
-						player.addToExpansion(result.links,trigger.player,'give','log').gaintag.add('drlt_zhengrong');
+						player.addToExpansion(result.links,trigger.player,'give','log').gaintag.add('drlt_zhenrong');
 					};
 				},
 			},
@@ -582,12 +689,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				juexingji:true,
 				derivation:['drlt_qingce'],
 				filter:function(event,player){
-					return player.getExpansions('drlt_zhengrong').length>=3&&game.dead.length>0;
+					return player.getExpansions('drlt_zhenrong').length>=3&&game.dead.length>0;
 				},
 				content:function(){
 					'step 0'
 					player.awakenSkill('drlt_hongju');
-					var cards=player.getExpansions('drlt_zhengrong');
+					var cards=player.getExpansions('drlt_zhenrong');
 					if(!cards.length||!player.countCards('h')){
 						event.goto(2);
 						return;
@@ -603,16 +710,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('processAI',function(list){
 						var player=_status.event.player,cards=list[0][1].concat(list[1][1]).sort(function(a,b){
 							return get.value(a)-get.value(b);
-						}),cards2=cards.splice(0,player.getExpansions('drlt_zhengrong').length);
+						}),cards2=cards.splice(0,player.getExpansions('drlt_zhenrong').length);
 						return [cards2,cards];
 					});
 					'step 1'
 					if(result.bool){
 						var pushs=result.moved[0],gains=result.moved[1];
-						pushs.removeArray(player.getExpansions('drlt_zhengrong'));
+						pushs.removeArray(player.getExpansions('drlt_zhenrong'));
 						gains.removeArray(player.getCards('h'));
 						if(!pushs.length||pushs.length!=gains.length) return;
-						player.addToExpansion(pushs).gaintag.add('drlt_zhengrong');
+						player.addToExpansion(pushs).gaintag.add('drlt_zhenrong');
 						player.gain(gains,'gain2','log');
 					}
 					'step 2'
@@ -7425,8 +7532,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					// player.line(trigger.targets,trigger.card.nature);
 					trigger.throw=false;
 					trigger.skill='xinfu_guhuo_backup';
+					game.log(player,'声明',trigger.targets&&trigger.targets.length?'对':'',trigger.targets||'',trigger.name=='useCard'?'使用':'打出',trigger.card);
 					event.prompt=get.translation(player)+'声明'+(trigger.targets&&trigger.targets.length?'对'+get.translation(trigger.targets):'')+
-						'使用'+(get.translation(trigger.card.nature)||'')+get.translation(trigger.card.name)+'，是否质疑？';
+						(trigger.name=='useCard'?'使用':'打出')+(get.translation(trigger.card.nature)||'')+get.translation(trigger.card.name)+'，是否质疑？';
 					event.targets=game.filterPlayer(function(current){
 						return current!=player&&!current.hasSkill('chanyuan');
 					}).sortBySeat(_status.currentPhase);
@@ -7599,13 +7707,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_yuanshao:['ol_yuanshao','re_yuanshao','xin_yuanshao'],
 			pangde:['ol_pangde','re_pangde','pangde'],
 			yanwen:['re_yanwen','yanwen'],
-			caopi:['caopi','re_caopi'],
+			caopi:['caopi','re_caopi','ps_caopi'],
 			xuhuang:['ol_xuhuang','re_xuhuang','xuhuang'],
 			menghuo:['re_menghuo','menghuo'],
 			zhurong:['re_zhurong','ol_zhurong','zhurong'],
 			sunjian:['ol_sunjian','re_sunjian','sunjian'],
-			jiaxu:['re_jiaxu','jiaxu','ns_jiaxu'],
-			dongzhuo:['ol_dongzhuo','sp_dongzhuo','re_dongzhuo','dongzhuo'],
+			jiaxu:['re_jiaxu','jiaxu','ns_jiaxu','ps_jiaxu'],
+			dongzhuo:['ol_dongzhuo','sp_dongzhuo','re_dongzhuo','dongzhuo','yj_dongzhuo'],
 			dengai:['re_dengai','ol_dengai','dengai'],
 			sp_ol_zhanghe:['sp_ol_zhanghe','yj_zhanghe','sp_zhanghe'],
 			jiangwei:['ol_jiangwei','re_jiangwei','jiangwei'],
@@ -7614,9 +7722,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangzhang:['re_zhangzhang','zhangzhang'],
 			zuoci:['re_zuoci','zuoci'],
 			caiwenji:['ol_caiwenji','re_caiwenji','caiwenji'],
-			xuyou:['sp_xuyou','xuyou'],
+			xuyou:['sp_xuyou','xuyou','yj_xuyou'],
 			guanqiujian:['guanqiujian','tw_guanqiujian','re_guanqiujian','old_guanqiujian'],
-			chendao:['chendao','ns_chendao'],
+			chendao:['chendao','old_chendao','ns_chendao'],
 			zhugezhan:['zhugezhan','old_zhugezhan'],
 			ol_lusu:['ol_lusu','re_lusu'],
 			zhanghe:['re_zhanghe','zhanghe'],
@@ -7714,10 +7822,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_zhenggu":"镇骨",
 			drlt_zhenggu2:"镇骨",
 			"drlt_zhenggu_info":"结束阶段，你可以选择一名其他角色，你的回合结束后和该角色的下个回合结束时，其将手牌摸至或弃至X张。（X为你的手牌数且至多为5）",
-			"drlt_zhenrong":"徵荣",
-			"drlt_zhenrong_info":"当你对其他角色造成伤害后，若其手牌比你多，你可以将其一张牌置于你的武将牌上，称为“荣”",
+			"drlt_zhenrong":"征荣",
+			"drlt_zhenrong_info":"当你对其他角色造成伤害后，若其手牌比你多，你可以将其一张牌置于你的武将牌上，称为“荣”。",
 			"drlt_hongju":"鸿举",
-			"drlt_hongju_info":"觉醒技，准备阶段，若“荣”的数量大于或等于3且场上有角色死亡，则你可以用任意张手牌替换等量的“荣”，然后扣减一点体力上限并获得技能“清侧”",
+			"drlt_hongju_info":"觉醒技，准备阶段，若“荣”的数量大于或等于3且场上有角色死亡，则你可以用任意张手牌替换等量的“荣”，然后减1点体力上限并获得〖清侧〗。",
 			"drlt_qingce":"清侧",
 			"drlt_qingce_info":"出牌阶段，你可以移去一张“荣”，然后弃置一名角色装备区或判定区内的一张牌。",
 			
@@ -8016,6 +8124,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olliangyin_info:'当有牌发生移动后，若此移动事件是本回合内你拥有〖良姻〗期间的首个有牌移出游戏/移入游戏的事件，则你可以选择一名其他角色。你与其各摸一张牌/弃置一张牌，然后你可以选择你或其中的一名手牌数为X的角色，该角色回复1点体力（X为你的“箜”数）',
 			olkongsheng:'箜声',
 			olkongsheng_info:'①准备阶段开始时，你可以将任意张牌置于你的武将牌上，称为“箜”。②结束阶段开始时，若你有不为装备牌的“箜”，则你获得“箜”中的非装备牌，然后令一名角色依次使用“箜”中的装备牌并失去1点体力。',
+			dcwanglie:"往烈",
+			dcwanglie_info:"①出牌阶段，你对其他角色使用的前两张牌无距离限制。②当你于出牌阶段内使用牌时，你可以令此牌不能被响应，然后你于本阶段内不能使用牌指定其他角色为目标。",
 			
 			shenhua_feng:'神话再临·风',
 			shenhua_huo:'神话再临·火',

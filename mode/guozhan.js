@@ -928,7 +928,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.junling=result.junling;
 					event.targets=result.targets;
 					event.num=0;
-					player.carryOutJunling(player,event.junling,targets);
+					player.carryOutJunling(player,event.junling,event.targets);
 					'step 2'
 					if(num<event.players.length) event.current=event.players[num];
 					if(event.current&&event.current.isAlive()){
@@ -944,7 +944,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else event.goto(4);
 					'step 3'
 					if(result.index==0){
-						event.current.carryOutJunling(player,event.junling,targets);
+						event.current.carryOutJunling(player,event.junling,event.targets);
 					}
 					else{
 						event.current.addTempSkill('diaohulishan');
@@ -1440,21 +1440,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.goto(3);
 					}
 					'step 2'
-					if(trigger.player.countCards('e')){
-						trigger.player.chooseControl(list).set('prompt','追妒：请选择一项').set('choiceList',[
+					if(trigger.player.countCards('e')>0){
+						trigger.player.chooseControl().set('prompt','追妒：请选择一项').set('choiceList',[
 							'令'+get.translation(trigger.player)+'此次对你造成的伤害+1',
 							'弃置装备区里的所有牌',
 						]).set('ai',function(){
-							var list=_status.event.list;
-							if(list.length>1) return '选项二';
-							return list[0];
+							var player=_status.event.player,cards=player.getCards('e');
+							if(player.hp<=2) return 1;
+							if(get.value(cards)<=7) return 1;
+							return 0;
 						}).set('list',list);
 					}
 					else event._result={control:'选项一'};
 					'step 3'
 					player.line(trigger.player);
 					if(result.control!='选项二') trigger.num++;
-					if(result.control!='选项一') trigger.player.discard(trigger.player.getCards('e'));
+					if(result.control!='选项一') trigger.player.chooseToDiscard(trigger.player.countCards('e'),true,'e');
 				},
 			},
 			gzshigong:{
@@ -3013,7 +3014,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
-				filter:(event)=>!event.numFixed&&player.isMaxHp(),
+				filter:(event,player)=>!event.numFixed&&player.isMaxHp(),
 				preHidden:true,
 				content:function(){
 					trigger.num+=2;

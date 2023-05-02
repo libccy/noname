@@ -592,10 +592,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				forceLoad:true,
 				filter:function(event,player){
-					return player.hasCard((card)=>lib.skill._yongjian_zengyu.filterCard(card),'h');
+					return player.hasCard((card)=>lib.skill._yongjian_zengyu.filterCard(card,player),'he');
 				},
-				filterCard:function(card){
-					return get.cardtag(card,'gifts');
+				filterCard:function(card,player){
+					var mod=game.checkMod(card,player,'unchanged','cardZengyuable',player);
+					if(mod!='unchanged') return mod;
+					return get.position(card)=='h'&&get.cardtag(card,'gifts');
 				},
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
@@ -605,6 +607,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					return true;
 				},
+				position:'he',
 				discard:false,
 				lose:false,
 				delay:false,
@@ -613,7 +616,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(get.cardtag(card,'gifts')&&get.type(card,false)=='equip'&&game.hasPlayer(function(current){
 						return current!=player&&current.canEquip(card,true)&&!current.hasSkillTag('refuseGifts')&&get.effect(current,card,player,player)>0;
 					})) return 2;
-					if(!player.needsToDiscard()) return 0;
+					if(!player.needsToDiscard()&&get.position(card)=='h') return 0;
 					return 1+Math.random();
 				},
 				content:function(){

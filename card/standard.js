@@ -2136,7 +2136,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					if(get.mode()=='guozhan'||!event.card||event.card.name!='sha') return false;
-					return event.target.isIn()&&player.canUse('sha',event.target,false)&&(player.hasSha()||_status.connectMode&&player.countCards('h'));
+					return event.target.isIn()&&player.canUse('sha',event.target,false)&&(player.hasSha()||_status.connectMode&&player.countCards('hs'));
 				},
 				content:function(){
 					"step 0"

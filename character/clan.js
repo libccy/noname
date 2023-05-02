@@ -284,7 +284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(num<=1) event._result={bool:false};
 								else{
 									var pos=player==trigger.player?'e':'he';
-									trigger.player.chooseCard('连和：交给'+get.translation(player)+get.cnNumber(num-1)+'张牌，或点“取消”令其摸'+get.cnNumber(num+1)+'张牌',true,num-1,pos).set('ai',card=>{
+									trigger.player.chooseCard('连和：交给'+get.translation(player)+get.cnNumber(num-1)+'张牌，或点“取消”令其摸'+get.cnNumber(num+1)+'张牌',num-1,pos).set('ai',card=>{
 										if(_status.event.draw) return 0;
 										return 5-get.value(card);
 									}).set('draw',get.attitude(trigger.player,player)>=0);
@@ -420,7 +420,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget('三恇：选择一名其他角色','令其交给你至少X张牌，然后其获得'+get.translation(trigger.cards.filterInD('ejod'))+'（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）',true,lib.filter.notMe).set('ai',target=>{
-						var att=get.attitude(player,target);
+						var att=get.attitude(player,target),num=lib.skill.clansankuang.getNum(target);
+						if(num==0) return att;
 						if(_status.event.goon) return -att;
 						return -Math.sqrt(Math.abs(att))-lib.skill.clansankuang.getNum(target);
 					}).set('goon',Math.max.apply(Math,trigger.cards.map(i=>get.value(i)))<=5||trigger.cards.filterInD('ejod').length==0)
@@ -429,7 +430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0],num=lib.skill.clansankuang.getNum(target),num2=target.countCards('he');
 						event.target=target;
 						player.logSkill('clansankuang',target);
-						if(num2==0) event._result={bool:false};
+						if(num==0||num2==0) event._result={bool:false};
 						else if(num2<=num) event._result={bool:true,cards:target.getCards('he')};
 						else target.chooseCard('he',true,[num,Infinity]).set('ai',get.unuseful);
 					}else event.finish();
@@ -440,7 +441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delayx();
 					}
 					'step 3'
-					if(trigger.cards.filterInD('ej').length) target.gain(trigger.cards.filterInD('ej'),get.owner(trigger.cards.filterInD('ej')[0]),'giveAuto','bySelf');
+					if(trigger.cards.filterInD('ej').length) target.gain(trigger.cards.filterInD('ejod'),get.owner(trigger.cards.filterInD('ej')[0]),'giveAuto','bySelf');
 					else if(trigger.cards.filterInD('od').length) target.gain(trigger.cards.filterInD('od'),'gain2','bySelf');
 				},
 				ai:{
@@ -548,7 +549,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.itemtype(card)=='card';
 						},
 						position:'hes',
-						filterTarget:lib.filter.targetEnabled,
+						filterTarget:lib.filter.filterTarget,
 						check:(card)=>6-get.value(card),
 						log:false,
 						precontent:function(){

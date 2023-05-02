@@ -10,7 +10,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_lin:['re_menghuo','ol_sunjian','re_caopi','ol_xuhuang','ol_dongzhuo','ol_zhurong','re_jiaxu','ol_lusu'],
 				refresh_shan:['ol_jiangwei','ol_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai','re_zhanghe'],
 				refresh_yijiang1:['xin_wuguotai','xin_gaoshun','dc_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua','dc_xushu','re_chengong'],
-				refresh_yijiang2:['re_madai','re_wangyi','guanzhang','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao','re_xunyou','re_guanzhang'],
+				refresh_yijiang2:['re_madai','re_wangyi','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao','re_xunyou','re_guanzhang'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','dc_liru','re_manchong','re_fuhuanghou','re_guanping','re_liufeng'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','dc_chenqun','re_caifuren','re_guyong','re_jushou','re_zhuhuan'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen'],
@@ -23,7 +23,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_caozhi:['male','wei',3,['reluoying','dcjiushi']],
 			ol_huangzhong:['male','shu',4,['xinliegong','remoshi']],
 			re_wenpin:['male','wei',5,['rezhenwei'],['unseen']],
-			re_guanzhang:['male','shu',4,['fuhun','retongxin'],['unseen']],
+			re_guanzhang:['male','shu',4,['fuhun','retongxin']],
 			re_mazhong:['male','shu',4,['refuman']],
 			dc_chenqun:['male','wei',3,['repindi','refaen']],
 			re_sundeng:['male','wu',4,['rekuangbi']],
@@ -72,7 +72,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_panzhangmazhong:['male','wu',4,['reduodao','reanjian']],
 			re_wangyi:['female','wei',4,['zhenlie','miji']],
 			re_madai:['male','shu',4,['mashu','reqianxi']],
-			guanzhang:['male','shu',4,['fuhun']],
 			xin_xusheng:['male','wu',4,['decadepojun']],
 			re_taishici:['male','wu',4,['tianyi','hanzhan']],
 			re_masu:['male','shu',3,['resanyao','rezhiman']],
@@ -158,9 +157,65 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//新李典
+			xinwangxi:{
+				audio:'wangxi',
+				trigger:{player:'damageEnd',source:'damageSource'},
+				filter:function(event){
+					if(event._notrigger.contains(event.player)) return false;
+					return event.num&&event.source&&event.player&&
+					event.player.isAlive()&&event.source.isAlive()&&event.source!=event.player;
+				},
+				check:function(event,player){
+					if(player.isPhaseUsing()) return true;
+					if(event.player==player) return get.attitude(player,event.source)>-5;
+					return get.attitude(player,event.player)>-5;
+				},
+				logTarget:function(event,player){
+					if(event.player==player) return event.source;
+					return event.player;
+				},
+				preHidden:true,
+				content:function(){
+					'step 0'
+					event.count=trigger.num;
+					event.target=lib.skill.xinwangxi.logTarget(trigger,player);
+					'step 1'
+					player.draw(2);
+					event.count--;
+					'step 2'
+					var cards=player.countCards('he');
+					if(cards.length>0&&target.isAlive()){
+						if(cards.length==1) event._result={bool:true,cards:cards};
+						else player.chooseCard('he','忘隙：交给'+get.translation(target)+'一张牌',true);
+					}
+					else event.goto(5);
+					'step 3'
+					if(result.bool){
+						player.give(result.cards,target);
+					}
+					'step 4'
+					game.delayx();
+					'step 5'
+					if(event.count&&target.isAlive()){
+						player.chooseBool(get.prompt2('xinwangxi',target));
+					}
+					else event.finish();
+					'step 6'
+					if(result.bool){
+						player.logSkill('xinwangxi',target);
+						event.goto(1);
+					}
+				},
+				ai:{
+					maixie:true,
+					maixie_hp:true
+				}
+			},
 			//OL界火诸葛
 			olhuoji:{
 				audio:'rehuoji',
+				audioname:['ol_sp_zhugeliang'],
 				trigger:{player:'huogongBegin'},
 				forced:true,
 				locked:false,
@@ -207,6 +262,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{viewAs:{inherit:'rehuoji',audio:'rehuoji'}}
 			},
 			olkanpo:{
+				audio:'rekanpo',
+				audioname:['ol_sp_zhugeliang'],
 				trigger:{player:'useCard'},
 				forced:true,
 				locked:false,
@@ -7584,7 +7641,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olpaoxiao:{
 				audio:"paoxiao",
-				audioname:['re_zhangfei','guanzhang','xiahouba'],
+				audioname:['re_zhangfei','guanzhang','xiahouba','re_guanzhang'],
 				trigger:{player:'shaMiss'},
 				forced:true,
 				content:function(){
@@ -10532,7 +10589,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				locked:false,
 				audio:"wusheng",
-				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo'],
+				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo','re_guanzhang'],
 				enable:["chooseToRespond","chooseToUse"],
 				filterCard:function(card,player){
 					if(get.zhu(player,'shouyue')) return true;
@@ -13724,7 +13781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadepojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上（X为其体力值）。若这些牌中：有装备牌，你将这些装备牌中的一张置于弃牌堆；有锦囊牌，你摸一张牌。其于回合结束时获得其武将牌上的这些牌。',
 			re_wangyi:'界王异',
 			wangyi:'王异',
-			guanzhang:'界关兴张苞',
+			guanzhang:'关兴张苞',
 			rezishou:'自守',
 			rezishou2:'自守',
 			rezishou_info:'摸牌阶段，你可以多摸X张牌（X为存活势力数）。若如此做，本回合你对其他角色造成伤害时，防止此伤害。',
@@ -13850,7 +13907,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relongyin:'龙吟',
 			relongyin_info:'当一名角色于其出牌阶段内使用【杀】时，你可弃置一张牌令此【杀】不计入出牌阶段使用次数。若此【杀】为红色，则你摸一张牌；若你以此法弃置的牌与此【杀】点数相同，则你重置“竭忠”。',
 			jiezhong:'竭忠',
-			jiezhong_info:'限定技，出牌阶段开始时，你可以将手牌补至手牌上限（至多摸五张）。',
+			jiezhong_info:'限定技，出牌阶段开始时，你可以将手牌补至体力上限（至多摸五张）。',
 			re_caifuren:'界蔡夫人',
 			reqieting:'窃听',
 			reqieting_info:'其他角色的回合结束时，若其本回合内未造成过伤害，则你可将其装备区内的一张牌置于你的装备区内；若其本回合内未对其他角色使用过牌，则你可摸一张牌。',
@@ -14032,6 +14089,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olhuoji_info:'①你可以将一张红色牌当【火攻】使用。②你使用【火攻】的作用效果改为“目标角色随机展示一张手牌A，然后你可以弃置一张与A颜色相同的牌，对目标造成1点火属性伤害”。',
 			olkanpo:'看破',
 			olkanpo_info:'①你可以将一张黑色牌当【无懈可击】使用。②你使用的【无懈可击】不可被响应。',
+			xinwangxi:'忘隙',
+			xinwangxi_info:'当你对其他角色造成1点伤害后，或受到其他角色造成的1点伤害后，你可以摸两张牌，然后交给其一张牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

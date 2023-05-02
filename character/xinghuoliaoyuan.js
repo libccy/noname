@@ -371,7 +371,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					var cards=event.getg(player);
-					if(!cards.length) return false;
+					if(!cards||!cards.length) return false;
 					var namelist=[];
 					var namedlist=[];
 					for(var i=0;i<cards.length;i++){
@@ -379,7 +379,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var hs=player.getCards('h');
 					for(var j=0;j<hs.length;j++){
-						if(namelist.contains(get.name(hs[j]))&&!event.cards.contains(hs[j])) return true;
+						if(namelist.contains(get.name(hs[j]))&&!cards.contains(hs[j])) return true;
 					}
 					return false;
 				},

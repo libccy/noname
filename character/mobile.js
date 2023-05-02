@@ -186,7 +186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 		},
 		characterIntro:{
-			fuqian:'傅金[qiān] ( ? ~263年），义阳（治今湖北省枣阳市)人，蜀汉将领傅彤之子，三国时期蜀汉名将。金长于谋略，并颇有胆勇，姜维甚爱之。傅金官至关中都督。魏国攻伐蜀汉时，傅金和蒋舒防守阳安关，兵败战死。',
+			fuqian:'傅佥[qiān] ( ? ~263年），义阳（治今湖北省枣阳市)人，蜀汉将领傅彤之子，三国时期蜀汉名将。金长于谋略，并颇有胆勇，姜维甚爱之。傅佥官至关中都督。魏国攻伐蜀汉时，傅佥和蒋舒防守阳安关，兵败战死。',
 			wangjun:'王濬（207年～286年），字士治，小名阿童，弘农郡湖县（今河南省灵宝市阌乡）人。西晋时期名将。王濬出身世家，博学多闻，容颜英俊，多谋善战。举秀才出身，起家河东郡从事。泰始八年（272年），担任广汉太守，平定益州叛乱，迁益州刺史。利用长江上游地势之利，修造战船，组建强大的水军。上书晋武帝，促成晋灭吴之战。咸宁六年（280年），率兵顺流而下，熔毁横江铁链，攻克丹阳郡，率先攻取石头城，接受吴末帝孙皓投降，完成西晋统一大业。凭借功勋，拜辅国将军、步兵校尉，册封襄阳侯。为避猜忌，纵情享受，累迁特进、抚军大将军、开府仪同三司、散骑常侍、后军将军等。太康六年十二月（286年1月18日），王濬去世，享年八十岁，谥号为“武”，安葬于柏谷山。',
 			yangfu:'杨阜（172年—244年），字义山，汉天水冀县（今甘谷县东南）人。三国时期曹魏名臣。汉献帝建安初年，任凉州从事，旋拜安定长史；韦康任刺史后辟为别驾，改任州参军；后因讨马超有功，赐爵关内侯。曹操征汉中时，杨阜担任益州刺史，回来后又担任武都太守。魏明帝时，由将作大匠改少府。杨阜不但卓识远见，而且刚正不阿，敢于直言，对朝廷弊政多有诤谏，六次进言谏魏明帝应勤政爱民，魏明帝对他颇有敬畏之心。杨阜勤政廉洁，在宫内担任少府时，专管宝器、珍膳、衣物等，而他死后则家无馀财。皇帝让杨阜的孙子杨豹继任了少府之职。原甘谷县文昌宫西侧有杨氏家祠，内悬“两代尚书”匾额。',
 			ruanhui:'阮氏女，是指三国时期曹魏名士许允之妻阮氏，陈留尉氏人。阮氏女是中国古代四大丑女之一，貌丑而见识非凡。她出身士族之家，是卫尉阮共（字伯彦）之女、阮侃（字德如）之妹。嫁与许允后生有二子：许奇，官至司隶校尉；许猛，官至幽州刺史。',
@@ -1303,8 +1303,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						onremove:true,
 						filter:function(event,player){
-							return player.getStorage('sbbenxi_effect3').contains(event.card)&&event.player.hasHistory('sourceDamage',evt=>{
-								return event.card==evt.card;
+							return player.getStorage('sbbenxi_effect3').contains(event.card)&&game.hasPlayer2(current=>{
+								return current.hasHistory('damage',evt=>{
+									return event.card==evt.card;
+								});
 							});
 						},
 						content:function(){
@@ -15687,7 +15689,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:"phaseUseBegin",
 				},
-				locked:false,
 				direct:true,
 				filter:function(event,player){
 					var es=player.getCards('e');
@@ -15705,10 +15706,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.remove(player.storage.xinfu_qianchong[i]);
 					}
 					if(list.length>1){
-					player.chooseControl(list).set('ai',function(){
+						player.chooseControl(list).set('ai',function(){
 							return list[0];
-						}
-			).set('prompt',get.prompt('xinfu_qianchong')).set('prompt2',get.translation('xinfu_qianchong_info'));
+						}).set('prompt',get.prompt('xinfu_qianchong')).set('prompt2',get.translation('xinfu_qianchong_info'));
 					}
 					else event.finish();
 					'step 1'
@@ -15801,8 +15801,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					return num>0&&num<=player.hp
 				},
-				locked:true,
-				frequent:true,
+				forced:true,
 				content:function(){
 					'step 0'
 					var num=0;
@@ -17818,12 +17817,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			feiyi:['tw_feiyi','feiyi'],
 			wangling:['tw_wangling','wangling'],
 			qiaogong:['tw_qiaogong','qiaogong'],
-			sp_chendong:['tw_chendong','sp_chendong'],
-			sp_jiangqing:['tw_jiangqing','sp_jiangqing'],
+			sp_chendong:['tw_chendong','sp_chendong','chendong'],
+			sp_jiangqing:['tw_jiangqing','sp_jiangqing','jiangqing'],
             zhaotongzhaoguang:['dc_zhaotongzhaoguang','zhaotongzhaoguang'],
             yangbiao:['yangbiao','dc_yangbiao'],
 			qiaozhou:['yj_qiaozhou','qiaozhou'],
 			sunhanhua:['dc_qiaozhou','sunhanhua'],
+			sp_duyu:['sp_duyu','pk_sp_duyu'],
+			kongrong:['sp_kongrong','kongrong'],
 		},
 		translate:{
 			liuzan:'手杀留赞',
@@ -17869,7 +17870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"qc_mingzhe":"明哲",
 			"qc_mingzhe_info":"",
 			"xinfu_shangjian":"尚俭",
-			"xinfu_shangjian_info":"锁定技。一名角色的结束阶段开始时，若你于此回合内失去了X张或更少的牌，则你可以摸等量的牌（X为你的体力值）。",
+			"xinfu_shangjian_info":"锁定技。一名角色的结束阶段开始时，若你于此回合内失去了X张或更少的牌，则你摸等量的牌（X为你的体力值）。",
 			"rw_bagua_skill":"先天八卦阵",
 			"rw_bagua_skill_info":"当你需要使用或打出一张【闪】时，你可以进行判定，若判定结果不为黑桃，视为你使用或打出了一张【闪】。",
 			"rw_baiyin_skill":"照月狮子盔",
@@ -18626,6 +18627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spdaoshu:'盗书',
 			spdaoshu_info:'每轮限一次。一名敌方角色的出牌阶段开始时，若其有手牌，则你可以令其视为使用一张【酒】。其须声明一个基本牌的牌名，然后你判断其手牌区内是否有该牌名的牌。若你判断正确，则你随机获得其五张手牌，否则你不能响应其使用的牌直到回合结束。',
 			spdaizui:'戴罪',
+			spdaizui2:'戴罪',
 			spdaizui_info:'限定技。当你受到伤害值不小于体力值的伤害时，你可防止此伤害并将此伤害渠道对应的所有实体牌置于伤害来源的武将牌上，称为“释”。本回合结束时，其获得所有“释”。',
 			re_caiwenji:'手杀蔡琰',
 			re_bulianshi:'手杀步练师',

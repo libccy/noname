@@ -4280,6 +4280,7 @@
 					update:function(config,map){
 						if(config.connect_identity_mode=='zhong'){
 							map.connect_player_number.hide();
+							map.connect_limit_zhu.hide();
 							map.connect_enhance_zhu.hide();
 							map.connect_double_nei.hide();
 							map.connect_zhong_card.show();
@@ -4288,6 +4289,7 @@
 						}
 						else if(config.connect_identity_mode=='purple'){
 							map.connect_player_number.hide();
+							map.connect_limit_zhu.hide();
 							map.connect_enhance_zhu.hide();
 							map.connect_double_nei.hide();
 							map.connect_zhong_card.hide();
@@ -4297,6 +4299,7 @@
 						else{
 							map.connect_double_character.show();
 							map.connect_player_number.show();
+							map.connect_limit_zhu.show();
 							map.connect_enhance_zhu.show();
 							if(config.connect_player_number!='2'){
 								map.connect_double_nei.show();
@@ -4340,6 +4343,18 @@
 						},
 						frequent:true,
 						restart:true,
+					},
+					connect_limit_zhu:{
+						name:'常备主候选武将数',
+						init:'group',
+						restart:true,
+						item:{
+							off:'不限制',
+							group:'按势力筛选',
+							'4':'四',
+							'6':'六',
+							'8':'八',
+						},
 					},
 					connect_zhong_card:{
 						name:'明忠卡牌替换',
@@ -4398,6 +4413,7 @@
 							map.double_nei.hide();
 							map.auto_identity.hide();
 							map.choice_zhu.hide();
+							map.limit_zhu.hide();
 							map.choice_zhong.hide();
 							map.choice_nei.hide();
 							map.choice_fan.hide();
@@ -4426,6 +4442,7 @@
 							map.double_nei.hide();
 							map.auto_identity.hide();
 							map.choice_zhu.hide();
+							map.limit_zhu.hide();
 							map.choice_zhong.hide();
 							map.choice_nei.hide();
 							map.choice_fan.hide();
@@ -4455,6 +4472,7 @@
 								map.double_nei.hide();
 							}
 							map.choice_zhu.show();
+							map.limit_zhu.show();
 							map.choice_zhong.show();
 							map.choice_nei.show();
 							map.choice_fan.show();
@@ -4785,6 +4803,18 @@
 							'6':'六',
 							'8':'八',
 							'10':'十',
+						},
+					},
+					limit_zhu:{
+						name:'常备主候选武将数',
+						init:'group',
+						restart:true,
+						item:{
+							off:'不限制',
+							group:'按势力筛选',
+							'4':'四',
+							'6':'六',
+							'8':'八',
 						},
 					},
 					choice_zhong:{
@@ -19853,7 +19883,7 @@
 								var ais=lib.skill[card].check||function(){return 0};
 								return ais();
 							}
-							var addi=(get.value(card)>=8&&get.type(card)!='equip')?-6:0;
+							var addi=(get.value(card)>=8&&get.type(card)!='equip')?-3:0;
 							if(card.name=='du') addi-=3;
 							var source=_status.event.source;
 							var player=_status.event.player;
@@ -19863,7 +19893,11 @@
 								return get.number(card)*(Boolean(event.small)?-1:1);
 							}
 							if(source&&source!=player){
-								if((get.attitude(player,source)>1)==Boolean(event.small)) return -getn(card)-get.value(card)/2+addi;
+								if(get.attitude(player,source)>1){
+									if(Boolean(event.small)) return getn(card)-get.value(card)/2+addi;
+									return -getn(card)-get.value(card)/2+addi;
+								}
+								if(Boolean(event.small)) return -getn(card)-get.value(card)/2+addi;
 								return getn(card)-get.value(card)/2+addi;
 							}
 							else{
@@ -21152,7 +21186,7 @@
 						return map;
 					};
 					next.getg=function(player){
-						if(this.getlx===false||player!=this.player) return [];
+						if(this.getlx===false||player!=this.player||!this.cards) return [];
 						return this.cards.slice(0);
 					}
 					next.gaintag=[];
@@ -50700,7 +50734,7 @@
 				}
 			},
 			pause:function(){
-				if(_status.paused2||_status.pausing||_status.nopause) return;
+				if(_status.paused2||_status.pausing||_status.nopause||!ui.pause) return;
 				if(!_status.video){
 					if(ui.pause.classList.contains('hidden')) return;
 					if(!_status.gameStarted) return;
@@ -52761,15 +52795,16 @@
 			}
 			return func;
 		},
-		eventInfoOL:function(item,level){
+		eventInfoOL:function(item,level,nomore){
 			if(Object.prototype.toString.call(item)=='[object Object]'){
 				var item2={};
 				for(var i in item){
 					if(i=='_trigger'){
-						if(level!==false) item2[i]=get.eventInfoOL(item[i],false);
+						if(nomore===false) continue;
+						else item2[i]=get.eventInfoOL(item[i],null,false);
 					}
 					else if(lib.element.event[i]||i=='content'||get.itemtype(item[i])=='event') continue;
-					else item2[i]=get.stringifiedResult(item[i],level-1);
+					else item2[i]=get.stringifiedResult(item[i],null,false);
 				}
 				return '_noname_event:'+JSON.stringify(item2);
 			}
@@ -52791,7 +52826,7 @@
 			}
 			return evt||item;
 		},
-		stringifiedResult:function(item,level){
+		stringifiedResult:function(item,level,nomore){
 			if(!item) return item;
 			if(typeof item=='function'){
 				return get.funcInfoOL(item);
@@ -52802,7 +52837,9 @@
 					case 'cards': return get.cardsInfoOL(item);
 					case 'player': return get.playerInfoOL(item);
 					case 'players': return get.playersInfoOL(item);
-					case 'event': return get.eventInfoOL(item);
+					case 'event': 
+						if(nomore===false) return '';
+						return get.eventInfoOL(item);
 					default:
 					if(typeof level!='number'){
 						level=8;
@@ -52813,7 +52850,7 @@
 						}
 						var item2=[];
 						for(var i=0;i<item.length;i++){
-							item2.push(get.stringifiedResult(item[i],level-1));
+							item2.push(get.stringifiedResult(item[i],level-1,nomore));
 						}
 						return item2;
 					}
@@ -52823,7 +52860,7 @@
 						}
 						var item2={};
 						for(var i in item){
-							item2[i]=get.stringifiedResult(item[i],level-1);
+							item2[i]=get.stringifiedResult(item[i],level-1,nomore);
 						}
 						return item2;
 					}
