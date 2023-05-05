@@ -2059,7 +2059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player,name){
 					if(name=='damageEnd') return true;
 					var evt=event.getParent();
-					return evt.card&&evt.card.name=='sha'&&evt.type=='card'&&evt.targets.length==1;
+					return evt.card&&evt.type=='card'&&evt.targets.length==1;
 				},
 				content:function(){
 					'step 0'
@@ -6025,6 +6025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zyquanji:'权计',
 			zyquanji_info:'①当你受到伤害后或使用牌对唯一目标造成伤害后，你可以摸一张牌并将一张牌置于武将上，称为“权”。②你的手牌上限+X（X为“权”数）。',
 			zypaiyi:'排异',
+			zypaiyi_backup:'排异',
 			zypaiyi_info:'出牌阶段限一次。你可以移去一张“权”并令一名角色摸X张牌（X为“权”数，且至多为7），然后若其手牌数大于你，你对其造成1点伤害。',
 			pe_mengda:'战役篇孟达',
 			pe_mengda_ab:'孟达',

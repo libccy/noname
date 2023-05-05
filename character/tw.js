@@ -11893,7 +11893,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCard'},
 				direct:true,
 				filter:function(event,player){
-					return event.card.name=='sha'&&(event.player==player||player.inRange(event.player))&&player.countCards('h')>0;
+					return event.card.name=='sha'&&(event.player==player||player.inRange(event.player))&&player.countCards('he')>0;
 				},
 				content:function(){
 					'step 0'

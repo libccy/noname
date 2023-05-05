@@ -1444,137 +1444,137 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:true,
 			},
-            bolan:{
+			bolan:{
 				audio:2,
 				banned:['kotomi_chuanxiang'],
-                global:'bolan_g',
-                initList:function(player){
-                    var list,skills=[];
-                    if(get.mode()=='guozhan'){
-                        list=[];
-                        for(var i in lib.characterPack.mode_guozhan) list.push(i);
-                    }
-                    else if(_status.connectMode) list=get.charactersOL();
-                    else {
-                        list=[];
-                        for(var i in lib.character){
-                            if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
-                            list.push(i);
-                        }
-                    }
-                    for(var i of list){
-                        if(i.indexOf('gz_jun')==0) continue;
-                        for(var j of lib.character[i][3]){
-                            if(j=='bolan') continue;
-                            var skill=lib.skill[j];
-							if(!skill||skill.zhuSkill||skill.dutySkill||lib.skill.bolan.banned.contains(j)) continue;
-                            if(skill.init||skill.ai&&(skill.ai.combo||skill.ai.notemp||skill.ai.neg)) continue;
-                            var info=lib.translate[j+'_info'];
-                            if(info&&info.indexOf('出牌阶段限一次')!=-1) skills.add(j);
-                        }
-                    }
-                    player.storage.bolan=skills;
-                },
-                check:function(event,player){
-                    return true;
-                },
-                trigger:{player:'phaseUseBegin'},
-                frequent:true,
+				global:'bolan_g',
+				initList:function(player){
+					var list,skills=[];
+					if(get.mode()=='guozhan'){
+						list=[];
+						for(var i in lib.characterPack.mode_guozhan) list.push(i);
+					}
+					else if(_status.connectMode) list=get.charactersOL();
+					else {
+						list=[];
+						for(var i in lib.character){
+							if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
+							list.push(i);
+						}
+					}
+					for(var i of list){
+						if(i.indexOf('gz_jun')==0) continue;
+						for(var j of lib.character[i][3]){
+							if(j=='bolan') continue;
+							var skill=lib.skill[j];
+							if(!skill||skill.juexingji||info.hiddenSkill||skill.zhuSkill||skill.dutySkill||info.chargeSkill||lib.skill.bolan.banned.contains(j)) continue;
+							if(skill.init||skill.ai&&(skill.ai.combo||skill.ai.notemp||skill.ai.neg)) continue;
+							var info=lib.translate[j+'_info'];
+							if(info&&info.indexOf('出牌阶段限一次')!=-1) skills.add(j);
+						}
+					}
+					player.storage.bolan=skills;
+				},
+				check:function(event,player){
+					return true;
+				},
+				trigger:{player:'phaseUseBegin'},
+				frequent:true,
 				preHidden:true,
-                content:function(){
-                    'step 0'
-                    if(player.isIn()){
-                        if(!player.storage.bolan) lib.skill.bolan.initList(player);
-                        var list=player.storage.bolan.randomGets(3);
-                        if(!list.length){
-                            event.finish();
-                            return;
-                        }
-                        player.chooseControl(list).set('choiceList',list.map(function(i){
-                            return '<div class="skill">【'+get.translation(lib.translate[i+'_ab']||get.translation(i).slice(0,2))+'】</div><div>'+get.skillInfoTranslation(i,player)+'</div>';
-                        })).set('displayIndex',false).set('prompt','博览：请选择你要获得的技能').set('ai',()=>{
+				content:function(){
+					'step 0'
+					if(player.isIn()){
+						if(!player.storage.bolan) lib.skill.bolan.initList(player);
+						var list=player.storage.bolan.randomGets(3);
+						if(!list.length){
+							event.finish();
+							return;
+						}
+						player.chooseControl(list).set('choiceList',list.map(function(i){
+							return '<div class="skill">【'+get.translation(lib.translate[i+'_ab']||get.translation(i).slice(0,2))+'】</div><div>'+get.skillInfoTranslation(i,player)+'</div>';
+						})).set('displayIndex',false).set('prompt','博览：请选择你要获得的技能').set('ai',()=>{
 							var list=_status.event.controls.slice();
 							return list.sort((a,b)=>{
 								return get.skillRank(b,'in')-get.skillRank(a,'in');
 							})[0];
 						});
-                    }
-                    else event.finish();
-                    'step 1'
-                    player.addTempSkill(result.control,'phaseUseEnd');
-                    player.popup(result.control);
-                    game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
-                },
-                ai:{threaten:0.9},
-                subSkill:{
-                    g:{
-                        audio:'bolan',
-                        forceaudio:true,
-                        enable:'phaseUse',
-                        usable:1,
-                        prompt:'出牌阶段限一次。你可以令一名有〖博览〗的角色从三个描述中包含“出牌阶段限一次”的技能中选择一个，你获得此技能直到此阶段结束。',
-                        filter:function(event,player){
-                            return game.hasPlayer(function(current){
-                                return current!=player&&current.hasSkill('bolan');
-                            });
-                        },
-                        filterTarget:function(card,player,target){
-                            return player!=target&&target.hasSkill('bolan');
-                        },
-                        selectTarget:function(){
-                            if(game.countPlayer(current=>{
-                                return lib.skill.bolan_g.filterTarget(null,_status.event.player,current);
-                            })==1) return -1;
-                            return 1;
-                        },
-                        content:function(){
-                            'step 0'
-                            player.loseHp();
-                            if(target.isIn()&&player.isIn()){
-                                if(!target.storage.bolan) lib.skill.bolan.initList(target);
-                                var list=target.storage.bolan.randomGets(3);
-                                if(!list.length){
-                                    event.finish();
-                                    return;
-                                }
-                                target.chooseControl(list).set('choiceList',list.map(function(i){
-                                    return '<div class="skill">【'+get.translation(lib.translate[i+'_ab']||get.translation(i).slice(0,2))+'】</div><div>'+get.skillInfoTranslation(i,player)+'</div>';
-                                })).set('displayIndex',false).set('prompt','博览：请选择令'+get.translation(player)+'获得的技能').set('ai',()=>{
+					}
+					else event.finish();
+					'step 1'
+					player.addTempSkill(result.control,'phaseUseEnd');
+					player.popup(result.control);
+					game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
+				},
+				ai:{threaten:0.9},
+				subSkill:{
+					g:{
+						audio:'bolan',
+						forceaudio:true,
+						enable:'phaseUse',
+						usable:1,
+						prompt:'出牌阶段限一次。你可以令一名有〖博览〗的角色从三个描述中包含“出牌阶段限一次”的技能中选择一个，你获得此技能直到此阶段结束。',
+						filter:function(event,player){
+							return game.hasPlayer(function(current){
+								return current!=player&&current.hasSkill('bolan');
+							});
+						},
+						filterTarget:function(card,player,target){
+							return player!=target&&target.hasSkill('bolan');
+						},
+						selectTarget:function(){
+							if(game.countPlayer(current=>{
+								return lib.skill.bolan_g.filterTarget(null,_status.event.player,current);
+							})==1) return -1;
+							return 1;
+						},
+						content:function(){
+							'step 0'
+							player.loseHp();
+							if(target.isIn()&&player.isIn()){
+								if(!target.storage.bolan) lib.skill.bolan.initList(target);
+								var list=target.storage.bolan.randomGets(3);
+								if(!list.length){
+									event.finish();
+									return;
+								}
+								target.chooseControl(list).set('choiceList',list.map(function(i){
+									return '<div class="skill">【'+get.translation(lib.translate[i+'_ab']||get.translation(i).slice(0,2))+'】</div><div>'+get.skillInfoTranslation(i,player)+'</div>';
+								})).set('displayIndex',false).set('prompt','博览：请选择令'+get.translation(player)+'获得的技能').set('ai',()=>{
 									var list=_status.event.controls.slice();
 									return list.sort((a,b)=>{
 										return (get.skillRank(b,'in')-get.skillRank(a,'in'))*get.attitude(_status.event.player,_status.event.getParent().player);
 									})[0];
 								});
-                            }
-                            else event.finish();
-                            'step 1'
-                            target.line(player);
-                            player.addTempSkill(result.control,'phaseUseEnd');
-                            player.popup(result.control);
-                            game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
-                        },
-                        ai:{
-                            order:function(item,player){
-                                if(player.hp>=5||player.countCards('h')>=10) return 10;
-                                var list=game.filterPlayer(current=>lib.skill.bolan_g.filterTarget(null,player,current));
-                                for(var target of list){
-                                    if(get.attitude(target,player)>0) return 10;
-                                }
-                                return 4;
-                            },
-                            result:{
-                                player:function(player,target){
-                                    if(player.hasUnknown()) return player.hp+player.countCards('h')/4-5>0?1:0;
-                                    var tao=player.countCards('h','tao');
-                                    if(player.hp+tao>4) return 4+get.attitude(player,target);
-                                    if(player.hp+tao>3) return get.attitude(player,target)-2;
-                                    return 0;
-                                },
-                            },
-                        },
-                    }
-                }
-            },
+							}
+							else event.finish();
+							'step 1'
+							target.line(player);
+							player.addTempSkill(result.control,'phaseUseEnd');
+							player.popup(result.control);
+							game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
+						},
+						ai:{
+							order:function(item,player){
+								if(player.hp>=5||player.countCards('h')>=10) return 10;
+								var list=game.filterPlayer(current=>lib.skill.bolan_g.filterTarget(null,player,current));
+								for(var target of list){
+									if(get.attitude(target,player)>0) return 10;
+								}
+								return 4;
+							},
+							result:{
+								player:function(player,target){
+									if(player.hasUnknown()) return player.hp+player.countCards('h')/4-5>0?1:0;
+									var tao=player.countCards('h','tao');
+									if(player.hp+tao>4) return 4+get.attitude(player,target);
+									if(player.hp+tao>3) return get.attitude(player,target)-2;
+									return 0;
+								},
+							},
+						},
+					}
+				}
+			},
 			yifa:{
 				audio:2,
 				trigger:{target:'useCardToTargeted'},
@@ -3551,6 +3551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jin_simayi:['jin_zhangchunhua','shibao','duyu'],
 			jin_simazhao:['jin_wangyuanji'],
 			jin_simashi:['jin_xiahouhui','jin_yanghuiyu'],
+			xuangongzhu:['duyu'],
 		},
 		characterReplace:{
 			yanghu:['dc_yanghu','jin_yanghu','sp_yanghu'],

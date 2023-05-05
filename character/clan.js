@@ -627,7 +627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
-					if(!event.nature) return false;
+					if(!event.nature||!event.player.isIn()) return false;
 					return game.countPlayer2(current=>{
 						return current.hasHistory('damage',evt=>{
 							return evt.nature&&evt!=event;

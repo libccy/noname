@@ -262,7 +262,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				frequent:true,
 				filter:function(event,player,name){
-					if(player==_status.currentPhase) return (name=='logSkill'&&event.skill=='dcliying');
+					if(player==_status.currentPhase) return (name=='logSkill'&&event.skill=='dcliying'&&player.getExpansions('dcwangyuan').length<game.countPlayer());
+					if(name=='logSkill') return false;
 					if(player.getExpansions('dcwangyuan').length>=game.countPlayer()) return false;
 					if(event.name=='gain'&&event.player==player) return false;
 					var evt=event.getl(player);
@@ -2107,7 +2108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//滕芳兰
 			dcluochong:{
 				audio:2,
-				trigger:{player:'roundStart'},
+				trigger:{global:'roundStart'},
 				filter:function(event,player){
 					return game.hasPlayer(current=>current.countDiscardableCards(player,'hej')>0);
 				},
@@ -2117,7 +2118,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=4-player.countMark('dcluochong');
 					var dialog=[];
 					dialog.push('###'+get.prompt('dcluochong')+'###<div class="text center">弃置任意名角色区域内共计至多'+get.cnNumber(num)+'张牌</div>');
-					game.countPlayer(target=>{
+					game.filterPlayer().sortBySeat().forEach(target=>{
 						if(target.countDiscardableCards(player,'hej')<=0) return false;
 						var name=(target==player?'你':get.translation(target));
 						if(target.countCards('h')){
@@ -2167,7 +2168,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				ai:{threaten:2.5},
+				ai:{
+					threaten:2.5,
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card)=='delay'&&current<0){
+								var current=_status.currentPhase;
+								if(current.getSeatNum()>target.getSeatNum()) return 'zerotarget';
+							}
+						},
+					},
+				},
 			},
 			dcaichen:{
 				audio:2,
@@ -5322,6 +5333,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						forced:true,
 						nopop:true,
+						lastDo:true,
+						trigger:{player:'gainEnd'},
+						filter:function(event,player){
+							return player.countCards('h')>player.hp;
+						},
+						content:function(){
+							trigger._dctongguan_gangying=true;
+						},
 					},
 					duomou:{
 						marktext:'谋',
@@ -5365,7 +5384,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var target=event.player;
 					if((target.hasSkill('dctongguan_gangying')&&(target.hasHistory('gain',function(evt){
-						return target.countCards('h')>target.hp;
+						return evt._dctongguan_gangying==true;
 					})||game.getGlobalHistory('changeHp',function(evt){
 						return evt.player==target&&(evt.getParent().name=='recover'||target.countCards('h')>target.hp);
 					}).length>0)) ||
@@ -5377,13 +5396,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.getGlobalHistory('cardMove',evt=>{
 						if(guojue&&renzhi) return;
 						var evtx=evt.getParent();
-						if(evtx.name=='gain'&&evtx.source&&evtx.source!=target&&evtx.player==target ||
-							evtx.name=='discard'&&evtx.getParent().player==target&&evtx.player!=target){
-							guojue=true;
+						if(!guojue){
+							if(evtx.name=='gain'&&evtx.source&&evtx.source!=target&&evtx.player==target ||
+								evtx.name=='discard'&&evtx.getParent().player==target&&evtx.player!=target){
+								guojue=true;
+							}
 						}
-						if(evtx.name=='gain'&&evtx.giver==target&&evtx.getg(evtx.player).length ||
-							evtx.name=='loseAsync'&&evtx.giver==target&&game.hasPlayer(current=>evtx.getg(current).length)){
-							renzhi=true;
+						if(!renzhi){
+							if(evtx.name=='gain'&&evtx.giver==target&&evtx.getg(evtx.player).length ||
+								evtx.name=='loseAsync'&&evtx.giver==target&&game.hasPlayer(current=>evtx.getg(current).length)){
+								renzhi=true;
+							}
 						}
 					});
 					return target.hasSkill('dctongguan_guojue')&&guojue||target.hasSkill('dctongguan_renzhi')&&renzhi;
@@ -5391,7 +5414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				rules:[
 					(target)=>target.getHistory('sourceDamage').length,
 					(target)=>target.hasHistory('gain',function(evt){
-						return target.countCards('h')>target.hp;
+						return evt._dctongguan_gangying;
 					})||game.getGlobalHistory('changeHp',function(evt){
 						return evt.player==target&&evt.getParent().name=='recover';
 					}).length>0||target.countCards('h')>target.hp,
@@ -5407,13 +5430,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.getGlobalHistory('cardMove',evt=>{
 						if(guojue||renzhi) return;
 						var evtx=evt.getParent();
-						if(evtx.name=='gain'&&evtx.source&&evtx.source!=target&&evtx.player==target ||
-							evtx.name=='discard'&&evtx.getParent().player==target&&evtx.player!=target){
-							guojue=true;
+						if(!guojue){
+							if(evtx.name=='gain'&&evtx.source&&evtx.source!=target&&evtx.player==target ||
+								evtx.name=='discard'&&evtx.getParent().player==target&&evtx.player!=target){
+								guojue=true;
+							}
 						}
-						if(evtx.name=='gain'&&evtx.giver==target&&evtx.getg(evtx.player).length ||
-							evtx.name=='loseAsync'&&evtx.giver==target&&game.hasPlayer(current=>evtx.getg(current).length)){
-							renzhi=true;
+						if(!renzhi){
+							if(evtx.name=='gain'&&evtx.giver==target&&evtx.getg(evtx.player).length ||
+								evtx.name=='loseAsync'&&evtx.giver==target&&game.hasPlayer(current=>evtx.getg(current).length)){
+								renzhi=true;
+							}
 						}
 					});
 					event.guojue=guojue; event.renzhi=renzhi;
@@ -5437,7 +5464,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delayx();
 					event.goto(1);
 					'step 4'
-					player.chooseTarget('梦解：令一名角色回复1点体力',true).set('ai',target=>get.recoverEffect(target,player,player));
+					if(game.hasPlayer(target=>target!=player&&target.isDamaged())) player.chooseTarget('梦解：令一名角色回复1点体力',true,function(card,player,target){
+						return target!=player&&target.isDamaged();
+					}).set('ai',target=>get.recoverEffect(target,player,player));
+					else event._result={bool:false};
 					'step 5'
 					if(result.bool){
 						player.logSkill('dcmengjie',result.targets[0]);
@@ -5452,9 +5482,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delayx();
 					event.goto(1);
 					'step 8'
-					player.chooseTarget('梦解：弃置一名角色区域内至多两张牌',true,(card,player,target)=>{
+					if(game.hasPlayer(target=>target.countDiscardableCards(player,'hej'))) player.chooseTarget('梦解：弃置一名角色区域内至多两张牌',true,(card,player,target)=>{
 						return target.countDiscardableCards(player,'hej');
 					}).set('ai',target=>get.effect(target,{name:'guohe'},player,target));
+					else event._result={bool:false};
 					'step 9'
 					if(result.bool){
 						player.logSkill('dcmengjie',result.targets[0]);
@@ -5643,7 +5674,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCard'},
 				direct:true,
 				filter:function(event,player){
-					return event.card.name=='sha'&&(event.player==player||player.inRange(event.player))&&player.countCards('h')>0;
+					return event.card.name=='sha'&&(event.player==player||player.inRange(event.player))&&player.countCards('he')>0;
 				},
 				content:function(){
 					'step 0'
@@ -7711,7 +7742,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					content:function(storage,player){
 						var list=lib.skill.dchuishu.getList(player);
-						return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得一张锦囊牌。';
+						return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等量的锦囊牌。';
 					},
 				},
 				subSkill:{
@@ -7752,6 +7783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return get.type2(card)=='trick'&&!cards.contains(card);
 								});
 								if(card) cards.push(card);
+								else break;
 							}
 							if(cards.length) player.gain(cards,'gain2');
 						},
@@ -7783,7 +7815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(list[i]==min) choices.push(exps[i]+min+']');
 					}
 					if(choices.length==1) event._result={control:choices[0]};
-					else player.chooseControl(choices).set('prompt','易数：令〖慧淑〗的一个数值-1').set('prompt2','摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做，你弃置['+list[1]+']张手牌；且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得一张锦囊牌。');
+					else player.chooseControl(choices).set('prompt','易数：令〖慧淑〗的一个数值-1').set('prompt2','摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做，你弃置['+list[1]+']张手牌；且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等量的锦囊牌。');
 					'step 1'
 					var result=result.control.slice(0,result.control.indexOf('['));
 					var exps=['摸牌数','弃牌数','目标牌数'];
@@ -7803,7 +7835,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(list[i]==min) choices.push(exps[i]+min+']');
 					}
 					if(choices.length==1) event._result={control:choices[0]};
-					else player.chooseControl(choices).set('prompt','易数：令〖慧淑〗的一个数值+2').set('prompt2','摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做，你弃置['+list[1]+']张手牌；且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得一张锦囊牌。');
+					else player.chooseControl(choices).set('prompt','易数：令〖慧淑〗的一个数值+2').set('prompt2','摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做，你弃置['+list[1]+']张手牌；且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等量的锦囊牌。');
 					'step 3'
 					var result=result.control.slice(0,result.control.indexOf('['));
 					var exps=['摸牌数','弃牌数','目标牌数'];
@@ -26290,7 +26322,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liupi:'刘辟[pì]，东汉末年黄巾起义军将领。黄巾军将领。黄巾之乱后，与龚都一起率军盘踞在汝南。欲追随刘备，将汝南让给刘备。《三国演义》中，在与曹操的部将高览交战时，为保护刘备而战死。',
 			zhenghun:'郑浑（生卒年不详），字文公。开封（今河南省开封市）人。汉末及三国时期曹魏大臣，东汉名儒郑众曾孙、名士郑泰之弟。郑浑早年避乱淮南，后转投豫章太守华歆。又被曹操辟为掾属，历任下蔡县长、邵陵县令，任内颇有政绩，深得民心。任左冯翊时，击杀扰乱郡县的梁兴，又击败作乱的山贼。历任上党太守、京兆尹、丞相掾属等职。曹丕称帝后，拜侍御史，加驸马都尉。先后任阳平、沛郡太守，任内兴修水利，使农田常年丰收，被百姓称为“郑陂”。后转任山阳和魏郡太守。魏明帝曹叡听闻郑浑的事迹之后，下诏将其政绩布告天下。官至将作大匠。卒年不详。',
 			furongfuqian:'傅肜[róng]（？－222年），义阳（今湖北枣阳）人，三国时蜀汉将领。刘备攻伐吴国时，傅肜为别督。后刘备被陆逊击败，傅肜率部断后，奋战至死。死前怒斥道：“吴狗！何有汉将军降者！”<br>傅佥[qiān] ( ? ~263年），义阳（治今湖北省枣阳市)人，蜀汉将领傅彤之子，三国时期蜀汉名将。金长于谋略，并颇有胆勇，姜维甚爱之。傅佥官至关中都督。魏国攻伐蜀汉时，傅佥和蒋舒防守阳安关，兵败战死。',
-			zhengxuan:'郑玄（127年－200年），字康成。北海郡高密县（今山东省高密市）人。东汉末年儒家学者、经学大师。郑玄曾入太学攻《京氏易》、《公羊春秋》及《三统历》、《九章算术》，又从张恭祖学《古文尚书》、《周礼》和《左传》等，最后从马融学古文经。游学归里之后，复客耕东莱，聚徒授课，弟子达数千人，家贫好学，终为大儒。党锢之祸起，遭禁锢，杜门注疏，潜心著述。晚年守节不仕，却遭逼迫从军，最终病逝于元城，年七十四。郑玄治学以古文经学为主，兼采今文经学。他遍注儒家经典，以毕生精力整理古代文化遗产，使经学进入了一个“小统一时代”。著有《天文七政论》、《中侯》等书，共百万余言，世称“郑学”，为汉代经学的集大成者。唐贞观年间，列郑玄于二十二“先师”之列，配享孔庙。宋代时被追封为高密伯。后人建有郑公祠以纪念。<br>',
 			qinlang:'秦朗（生卒年不详），字元明，小字阿蘇（一作阿鳔），新兴（治今山西忻州）云中人。三国时期曹魏将领，官至骁骑将军、给事中，曾率兵讨伐鲜卑轲比能和步度根的叛军。',
 			xianglang:'向朗（约167年—247年），字巨达。襄阳郡宜城县（今湖北宜城）人，三国时期蜀汉官员、藏书家、学者。向朗早年师从于司马徽，并被荆州牧刘表任命为临沮县长。后随刘备入蜀，历任巴西、牂牁、房陵太守，并拜步兵校尉，领丞相长史，随丞相诸葛亮北伐。因包庇马谡被免职，后为光禄勋，转左将军、特进，封显明亭侯。曾代理丞相册封张皇后及太子刘璿。晚年专心研究典籍，诱导青年学习，家中藏书丰富，受到举国尊重。延熙十年（247年），向朗去世。《全三国文》收录有一篇《遗言戒子》',
 			yanghong:'杨弘，东汉末年袁术部将。袁术死后，杨弘等将其众欲归孙策，后庐江太守刘勋截击，转归于勋。',
@@ -26405,7 +26436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dchuishu:function(player){
 				var list=lib.skill.dchuishu.getList(player);
-				return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得一张锦囊牌。';
+				return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中随机获得等量的锦囊牌。';
 			},
 			dcshoutan:function(player){
 				if(player.storage.dcshoutan) return '转换技。出牌阶段限一次，阴：你可以弃置一张不为黑色的手牌。<span class="bluetext">阳：你可以弃置一张黑色手牌。</span>';

@@ -5955,7 +5955,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'dying'},
 				forced:true,
 				filter:function(event,player){
-					return _status.renku.length>4;
+					return _status.renku.length>3;
 				},
 				logTarget:'player',
 				content:function(){
@@ -18453,7 +18453,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuanqing:'渊清',
 			yuanqing_info:'锁定技，出牌阶段结束时，你随机将弃牌堆中你本阶段使用过的牌类型的各一张牌置于仁库中。', 
 			shuchen:'疏陈',
-			shuchen_info:'锁定技，当有角色进入濒死状态时，若仁库中的牌数大于四，则你获得仁库中的所有牌，然后其回复1点体力。',
+			shuchen_info:'锁定技，当有角色进入濒死状态时，若仁库中的牌数大于三，则你获得仁库中的所有牌，然后其回复1点体力。',
 			rechuhai:'除害',
 			rechuhai_info:'使命技。①出牌阶段限一次，你可以摸一张牌，然后和一名其他角色拼点。若你赢，则你观看其手牌，并从牌堆/弃牌堆中获得其手牌中包含的类型的牌各一张，且当你于此阶段内对其造成伤害后，你将牌堆/弃牌堆中的一张装备牌置于你的一个空置装备栏内。②当你因发动〖除害①〗而展示拼点牌时，你令此牌的点数+X（X=(4-你装备区的牌数)）。③使命：当有装备牌进入你的装备区后，若你的装备区内有至少三张牌，则你将体力值回复至上限，失去〖乡害〗并获得〖彰名〗。④失败：当你因发动〖除害①〗发起的拼点没赢时，若你的最终点数不大于6，则你触发使命失败分支。',
 			zhangming:'彰名',

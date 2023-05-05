@@ -184,7 +184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw(2);
 					event.count--;
 					'step 2'
-					var cards=player.countCards('he');
+					var cards=player.getCards('he');
 					if(cards.length>0&&target.isAlive()){
 						if(cards.length==1) event._result={bool:true,cards:cards};
 						else player.chooseCard('he','忘隙：交给'+get.translation(target)+'一张牌',true);
@@ -6932,6 +6932,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.judge(function(card){
 							if(get.suit(card)=='spade') return 4;
 							return 0;
+						}).set('callback',function(){
+							if(event.judgeResult.suit=='spade'){
+								player.recover();
+								if(get.position(event.judgeResult.card)=='d') player.gain(result.card,'gain2','log')
+							}
 						}).judge2=function(result){
 							return result.bool?true:false;
 						};
@@ -6940,10 +6945,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 3'
-					if(result.suit=='spade'){
-						player.recover();
-						if(get.position(result.card)=='d') player.gain(result.card,'gain2','log')
-					}
 					if(event.count) event.goto(1);
 				}
 			},

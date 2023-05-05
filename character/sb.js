@@ -965,6 +965,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							player.addTempSkill('sbrende_given','phaseUseAfter');
 							player.markAuto('sbrende_given',[target]);
+							player.markAuto('sbrende_givenx',[target]);
 							player.give(cards,target);
 							var num=Math.min(lib.skill.sbrende.maxNum-player.countMark('sbrende'),cards.length);
 							if(num>0) player.addMark('sbrende',num);
@@ -1009,7 +1010,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				skillAnimation:'epic',
-				animationColor:'legend',
+				animationColor:'orange',
 				limited:true,
 				filter:function(event,player){
 					if(game.roundNumber<=1) return false;
@@ -1018,14 +1019,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					if(target==player) return false;
-					return game.hasPlayer2(current=>{
-						return current.hasAllHistory('useSkill',evt=>{
-							if(evt.skill!='sbrende_give') return false;
-							var targets=evt.targets;
-							if(targets.contains(target)) return true;
-							return false;
-						});
-					})
+					return player.getStorage('sbrende_givenx').contains(target);
 				},
 				selectTarget:-1,
 				multiline:true,
@@ -3895,7 +3889,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbrende:'仁德',
 			sbrende_info:'①出牌阶段每名角色限一次。你可以将任意张牌交给一名其他角色，然后你获得等量“仁望”标记（至多为8）。②每回合限一次。你可以移去2枚“仁望”，视为使用或打出一张基本牌。③出牌阶段开始时，你获得2枚“仁望”。',
 			sbzhangwu:'章武',
-			sbzhangwu_info:'限定技。出牌阶段，你可以令所有于本局游戏成为过〖仁德①〗目标的其他角色依次交给你X张牌，然后你回复3点体力并失去〖仁德〗（X为游戏轮数-1，且至多为3）。',
+			sbzhangwu_info:'限定技。出牌阶段，你可以令所有于本局游戏成为过〖仁德②〗目标的其他角色依次交给你X张牌，然后你回复3点体力并失去〖仁德〗（X为游戏轮数-1，且至多为3）。',
 			sbjijiang:'激将',
 			sbjijiang_info:'主公技。出牌阶段结束时，你可以选择一名体力值不小于你的其他蜀势力角色A和一名在A攻击范围内的角色B。A选择一项：1.视为对B使用一张【杀】；2.下一个出牌阶段开始前，跳过此阶段。',
 			sb_jiangwei:'谋姜维',
