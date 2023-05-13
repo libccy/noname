@@ -435,7 +435,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var cards=[];
-					for(var card of ui.cardPile.childNodes){
+					for(var i=0;i<ui.cardPile.childNodes.length;i++){
+						var card=ui.cardPile.childNodes[i];
 						if(card.name!='sha') cards.push(card);
 						if(cards.length>=5) break;
 					}
@@ -976,7 +977,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						charlotte:true,
 						filter:function(event,player){
-							return player.getStorage('sangu_effect').length>0;
+							return event.cards.length>0&&player.getStorage('sangu_effect').length>0;
 						},
 						content:function(){
 							if(!trigger.card.storage) trigger.card.storage={};
@@ -1283,17 +1284,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			lkzhongzhuang:{
 				audio:2,
-				trigger:{source:'damageBegin1'},
+				trigger:{source:['damageBegin1','damageBegin4']},
 				forced:true,
-				filter:function(event,player){
+				filter:function(event,player,name){
 					if(!event.card||event.card.name!='sha'||event.getParent().type!='card') return false;
 					var range=player.getAttackRange();
-					if(range>3) return true;
+					if(name=='damageBegin1') return range>3;
 					return range<3&&event.num>1;
 				},
 				content:function(){
-					var range=player.getAttackRange();
-					if(range>3) trigger.num++;
+					if(event.triggername=='damageBegin1') trigger.num++;
 					else trigger.num=1;
 				},
 				global:'lkzhongzhuang_ai',
@@ -14148,13 +14148,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lkbushi:'卜筮',
 			lkbushi_info:'①你使用♠牌无次数限制。②当你使用或打出♥牌后，你摸一张牌。③当你成为♣牌的目标后，你可以弃置一张牌，令此牌对你无效。④结束阶段开始时，你从牌堆或弃牌堆获得一张♦牌。⑤准备阶段开始时，你可调整此技能中四种花色的对应顺序。',
 			lkzhongzhuang:'忠壮',
-			lkzhongzhuang_info:'锁定技。当你因执行【杀】的效果而造成伤害时，若你的攻击范围：大于3，则此伤害+1；小于3，则此伤害改为1。',
+			lkzhongzhuang_info:'锁定技。①当你因执行【杀】的效果而造成伤害时，若你的攻击范围大于3，则此伤害+1。②当一名角色受到你因执行【杀】的效果而造成的伤害时，若你的攻击范围小于3，则此伤害改为1。',
 			kebineng:'轲比能',
 			kousheng:'寇旌',
 			kousheng_info:'①出牌阶段开始时，你可以选择任意张手牌，这些牌称为“寇旌”直到回合结束。②你的“寇旌”均视为【杀】且无次数限制。③当你因执行对应实体牌包含“寇旌”的【杀】的效果而造成伤害后，你展示所有“寇旌”牌，然后目标角色可以用所有手牌交换这些牌。',
 			zhugeshang:'诸葛尚',
 			sangu:'三顾',
-			sangu_info:'结束阶段，你可以选择至多三个{【杀】或不为notarget或singleCard的普通锦囊牌}中的牌名，然后令一名其他角色记录这些牌名。该角色的下个出牌阶段开始时，其的手牌于其需要使用牌时均视为其记录中的第一张牌直到此阶段结束，且当其使用或打出牌时，移除这些牌中的第一张牌。若你以此法选择过的牌名均为你本回合内使用过的牌名，则防止你因其以此法使用牌造成的伤害。',
+			sangu_info:'结束阶段，你可以选择至多三个{【杀】或不为notarget或singleCard的普通锦囊牌}中的牌名，然后令一名其他角色记录这些牌名。该角色的下个出牌阶段开始时，其的手牌于其需要使用牌时均视为其记录中的第一张牌直到此阶段结束，且当其使用或打出有对应实体牌的牌时，移除这些牌中的第一张牌。若你以此法选择过的牌名均为你本回合内使用过的牌名，则防止你因其以此法使用牌造成的伤害。',
 			yizu:'轶祖',
 			yizu_info:'锁定技。每回合限一次，当你成为【杀】或【决斗】的目标后，若你的体力值不大于使用者的体力值，则你回复1点体力。',
 			liwan:'李婉',

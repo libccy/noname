@@ -15,7 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_shijiyan:['sp_cuiyan','sp_zhangchangpu','sp_jiangwan','sp_jiangqing','sp_lvfan','sp_huangfusong','sp_zhujun','liuba'],
 				mobile_sunben:["re_sunben"],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
-				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian","re_dengai","re_jiangwei","re_zhurong","re_caiwenji","re_xunyu","re_dianwei","xin_zhoutai"],
+				mobile_shenhua:["re_pangtong","re_guanqiujian","xin_yuanshao","re_liushan","re_dongzhuo","re_sp_zhugeliang","re_sunjian","re_dengai","re_jiangwei","re_zhurong","re_caiwenji","re_xunyu","re_dianwei","xin_zhoutai","re_yanwen"],
 				mobile_yijiang1:["re_xusheng","re_lingtong","ol_yujin","re_wuguotai","re_gaoshun",'re_caozhi'],
 				mobile_yijiang2:["xin_liaohua","xin_caozhang","re_liubiao","re_handang","xin_chengpu","xin_gongsunzan","re_zhonghui","re_bulianshi"],
 				mobile_yijiang3:["re_liru","xin_jianyong","xin_zhuran","xin_guohuai","xin_panzhangmazhong","xin_fuhuanghou","re_yufan"],
@@ -26,6 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			re_yanwen:["male","qun",4,["reshuangxiong"]],
 			xin_zhoutai:['male','wu',4,['buqu','new_fenji']],
 			re_caozhi:['male','wei',3,['reluoying','rejiushi','chengzhang']],
 			yj_weiyan:['male','qun',5,['mbguli','mbaosi']],
@@ -18228,7 +18229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duoji:'夺冀',
 			duoji_info:'限定技，出牌阶段，你可弃置两张手牌并选择一名装备区有牌的其他角色。你获得其装备区里的所有牌。',
 			re_handang:'手杀韩当',
-			luotong:'骆统',
+			luotong:'手杀骆统',
 			qinzheng:'勤政',
 			qinzheng_info:'锁定技，当你使用或打出牌时，若你本局游戏内使用或打出过的牌数和：为3的倍数，你从牌堆中获得一张【杀】或【闪】；为5的倍数，你从牌堆中获得一张【桃】或【酒】；为8的倍数，你从牌堆中获得一张【决斗】或【无中生有】（可获得对应的衍生替换牌）。',
 			sp_duyu:'手杀杜预',
@@ -18711,6 +18712,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbaosi:'骜肆',
 			mbaosi_info:'锁定技。当你于出牌阶段对一名攻击范围内的角色造成伤害后，你于此阶段对其使用牌无次数限制。',
 			xin_zhoutai:'手杀周泰',
+			re_yanwen:"手杀颜良文丑",
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua:'手杀异构·神话再临',

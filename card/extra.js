@@ -190,6 +190,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return get.value(card);
 					};
 					"step 1"
+					target.showCards(result.cards).setContent(function(){});
 					event.dialog=ui.create.dialog(get.translation(target)+'展示的手牌',result.cards);
 					event.videoId=lib.status.videoId++;
 

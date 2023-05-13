@@ -28,9 +28,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			wangguan:['male','wei',3,['olmiuyan','olshilu']],
 			ol_zhangyì:['male','shu',4,['oldianjun','olkangrui']],
 			ol_zhujun:['male','qun',4,['olcuipo']],
-			maxiumatie:['male','qun',4,['mashu','olkenshang']],
+			maxiumatie:['male','qun',4,['mashu','rekenshang']],
 			dongtuna:['male','qun',4,['oljianman']],
 			zhanghua:['male','jin',3,['olbihun','oljianhe','olchuanwu']],
 			quhuang:['male','wu',3,['olqiejian','olnishou']],
@@ -183,6 +184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			wangguan:'《三国演义》中虚构人物，历史上不曾记载。在114回出场，曾为邓艾手下参谋，献反间计与邓艾，被姜维识破，兵败自投江而死。',
 			maxiumatie:'马休（？－212年），马铁（？－212年）。两人均为扶风茂陵（今陕西兴平）人，马腾之子，马超之弟。马腾遭韩遂进攻，乃携马休、马铁等入京受职。马休被封为奉车都尉，马铁被封为骑都尉。后在邺城居住。因兄马超反，两人被曹操夷灭。',
 			dongtuna:'董荼那，小说《三国演义》及其衍生作品中的角色，南蛮王孟获属下大将，第二洞元帅；与阿会喃等人一起担任孟获的援军出征，但是被俘虏，又被诸葛亮释放，再次出战时，被唾骂不知羞耻，面红耳赤的退军。后同阿会喃共同绑架孟获献于蜀军，却被诸葛亮在其二人与孟获的重要性间权衡后出卖了他们，放走了孟获，使其为孟获所杀。',
 			zhanghua:'张华（232年－300年），字茂先。范阳郡方城县（今河北固安）人。西晋时期政治家、文学家、藏书家，西汉留侯张良的十六世孙。张华出身范阳张氏，自少贫苦，因才学过人而受同乡名臣卢钦、刘放、阮籍等人的赞赏。在曹魏时，他历任太常博士、河南尹丞、佐著作郎、中书郎等职。西晋建立后，拜黄门侍郎，封关内侯，逐渐受到晋武帝的重用。后拜中书令，加散骑常侍，与大将杜预坚决支持武帝伐吴，于战时任度支尚书。吴国灭亡后，以功进封广武县侯。其后遭到排挤，出镇幽州，政绩卓然。之后返朝任太常，终武帝之世未得参与政事。晋惠帝继位后，累官至司空，封壮武郡公，被皇后贾南风委以朝政。张华尽忠辅佐，使天下仍然保持相对安宁。永康元年（300年），♯♯司马伦发动政变，张华惨遭杀害，年六十九。太安二年（303年），获得♯♯，追复官爵。张华工于诗赋，词藻华丽，又雅爱书籍，精于目录学，编纂有中国第一部博物学著作《博物志》；还曾与荀勖等人依照刘向《别录》整理典籍。《宣和书谱》载有其草书《得书帖》及行书《闻时帖》。《隋书·经籍志》有《张华集》十卷，今已佚。明人张溥辑有《张茂先集》。',
@@ -669,6 +671,175 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//王瓘
+			olmiuyan:{
+				audio:2,
+				enable:'chooseToUse',
+				viewAsFilter:function(player){
+					return !player.hasSkill('olmiuyan_blocker')&&player.hasCard(card=>get.color(card)=='black','hes')
+				},
+				viewAs:{name:'huogong'},
+				filterCard:{color:'black'},
+				position:'hes',
+				check:function(card){
+					var player=_status.event.player,suits=lib.suit.slice(0);
+					if(player.countCards('h')>4&&player.hasCard(function(card){
+						suits.remove(get.suit(card));
+						return suits.length==0;
+					},'h')) return 8-get.value(card);
+					return 4-get.value(card);
+				},
+				promptfunc:function(){
+					if(_status.event.player.storage.olmiuyan) return '转换技。你可以将一张黑色牌当做【火攻】使用。若此牌未造成伤害，则你令此技能失效直到本轮结束。';
+					return '转换技。你可以将一张黑色牌当做【火攻】使用。若此牌造成了伤害，则你获得此阶段内所有被展示过的牌。';
+				},
+				precontent:function(){
+					player.changeZhuanhuanji('olmiuyan');
+					var card=event.result.card;
+					if(!card.storage) card.storage={};
+					if(player.storage.olmiuyan){
+						card.storage.olmiuyan_gain=true;
+						player.addTempSkill('olmiuyan_gain');
+					}
+					else{
+						card.storage.olmiuyan_remove=true;
+						player.addTempSkill('olmiuyan_remove');
+					}
+				},
+				init:function(player){
+					player.addSkill('olmiuyan_counter');
+				},
+				onremove:function(player){
+					player.removeSkill('olmiuyan_counter');
+				},
+				zhuanhuanji:true,
+				mark:true,
+				marktext:'☯',
+				ai:{
+					order:function(item,player){
+						if(player.storage.olmiuyan) return 1;
+						return 8;
+					},
+				},
+				intro:{
+					content:function(storage){
+						if(storage) return '转换技。你可以将一张黑色牌当做【火攻】使用。然后若此牌未造成伤害，则你令此技能失效直到本轮结束。';
+						return '转换技。你可以将一张黑色牌当做【火攻】使用。然后若此牌造成了伤害，则你获得此阶段内所有被展示过的牌。';
+					},
+				},
+				subSkill:{
+					counter:{
+						trigger:{global:['showCardsEnd','phaseZhunbeiBefore','phaseJudgeBefore','phaseDrawBefore','phaseUseBefore','phaseDiscardBefore','phaseJieshuBefore']},
+						forced:true,
+						charlotte:true,
+						popup:false,
+						firstDo:true,
+						filter:function(event,player){
+							if(event.name=='showCards') return get.itemtype(event.cards)=='cards';
+							return true;
+						},
+						content:function(){
+							if(trigger.name=='showCards'){
+								game.broadcastAll(function(cards){
+									cards.forEach(card=>card.addGaintag('olmiuyan_tag'));
+								},trigger.cards);
+							}
+							else game.players.forEach(current=>current.removeGaintag('olmiuyan_tag'));
+						},
+					},
+					gain:{
+						trigger:{player:'useCardAfter'},
+						forced:true,
+						charlotte:true,
+						filter:function(event,player){
+							return event.card.storage&&event.card.storage.olmiuyan_gain&&player.hasHistory('sourceDamage',function(evt){
+								return evt.card==event.card;
+							})&&game.hasPlayer(function(current){
+								return current!=player&&current.hasCard(card=>card.hasGaintag('olmiuyan_tag'))
+							});
+						},
+						logTarget:function(event,player){
+							return game.filterPlayer(function(current){
+								return current!=player&&current.hasCard(card=>card.hasGaintag('olmiuyan_tag'))
+							});
+						},
+						content:function(){
+							var cards=[],players=game.filterPlayer(current=>current!=player).sortBySeat();
+							players.forEach(current=>{
+								var cardsx=current.getCards('h',function(card){
+									return card.hasGaintag('olmiuyan_tag');
+								});
+								if(cardsx.length) cards.addArray(cardsx);
+							});
+							player.gain(cards,'give');
+						},
+					},
+					remove:{
+						trigger:{player:'useCardAfter'},
+						forced:true,
+						charlotte:true,
+						filter:function(event,player){
+							return event.card.storage&&event.card.storage.olmiuyan_remove&&!player.hasHistory('sourceDamage',function(evt){
+								return evt.card==event.card;
+							});
+						},
+						content:function(){
+							player.addTempSkill('olmiuyan_blocker','roundStart');
+							game.log(player,'的','#g【谬焰】','失效了');
+						},
+					},
+					blocker:{charlotte:true},
+				},
+			},
+			olshilu:{
+				audio:2,
+				trigger:{player:'damageEnd'},
+				forced:true,
+				filter:function(event,player){
+					return player.hp>0;
+				},
+				content:function(){
+					'step 0'
+					player.draw(Math.min(5,player.hp));
+					'step 1'
+					var targets=game.filterPlayer(current=>current!=player&&current.countCards('h')>0&&player.inRange(current));
+					if(targets.length>0){
+						if(targets.length==1) event._result={bool:true,targets:targets}
+						else player.chooseTarget(true,'请选择一名攻击范围内的角色','然后你选择该角色的一张手牌，令此牌视为【杀】',function(card,player,target){
+							return target!=player&&target.countCards('h')>0&&player.inRange(target);
+						}).set('ai',function(target){
+							return -get.attitude(_status.event.player,target);
+						});
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.line(target,'green');
+						player.choosePlayerCard(target,true,'h');
+					}
+					'step 3'
+					if(result.bool){
+						target.addSkill('olshilu_viewas');
+						target.showCards(result.cards);
+						target.addGaintag(result.cards,'olshilu');
+					}
+				},
+				ai:{
+					maixie:true,
+				},
+				subSkill:{
+					viewas:{
+						mod:{
+							cardname:function(card){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('olshilu')) return 'sha';
+							},
+						},
+						charlotte:true,
+					},
+				},
+			},
 			//张翼
 			oldianjun:{
 				audio:2,
@@ -782,6 +953,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//朱儁
 			olcuipo:{
 				audio:2,
+				trigger:{player:'useCard'},
+				forced:true,
+				filter:function(event,player){
+					return lib.skill.dcweidang.getLength(event.card)==player.getHistory('useCard').indexOf(event)+1;
+				},
+				content:function(){
+					var card=trigger.card;
+					if(card.name=='sha'||get.type(card)=='trick'&&get.tag(card,'damage')>0) trigger.baseDamage++;
+					else player.draw();
+				},
+				/*
 				trigger:{source:'damageBegin1'},
 				forced:true,
 				filter:function(event,player){
@@ -791,14 +973,97 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.num++;
-				},
+				},*/
 				mod:{
 					aiOrder:function(player,card,num){
-						if(typeof card=='object'&&get.tag(card,'damage')&&lib.skill.dcweidang.getLength(card)==player.getHistory('useCard').length+1) return num+10;
+						if(typeof card=='object'&&lib.skill.dcweidang.getLength(card)==player.getHistory('useCard').length+1) return num+10;
 					},
 				}
 			},
 			//马休马铁
+			rekenshang:{
+				audio:'olkenshang',
+				enable:'chooseToUse',
+				filterCard:true,
+				selectCard:[2,Infinity],
+				viewAsFilter:function(player){
+					return player.countCards('hes')>1;
+				},
+				check:function(card){
+					return 0;
+				},
+				position:'hes',
+				viewAs:{
+					name:'sha',
+					storage:{olkenshang:true}
+				},
+				onuse:function(links,player){
+					player.addTempSkill('rekenshang_effect');
+				},
+				ai:{
+					order:1,
+					respondSha:true,
+					skillTagFilter:player=>player.countCards('hes')>1,
+				},
+				subSkill:{
+					effect:{
+						audio:'olkenshang',
+						trigger:{player:'useCard2'},
+						charlotte:true,
+						group:'rekenshang_after',
+						direct:true,
+						filter:function(event,player){
+							return event.card.storage&&event.card.storage.olkenshang&&game.countPlayer(function(current){
+								return current!=player&&lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
+							})>=event.cards.length;
+						},
+						content:function(){
+							'step 0'
+							player.chooseTarget(
+								trigger.cards.length,
+								'是否更改'+get.translation(trigger.card)+'的目标？',
+								'选择'+get.cnNumber(trigger.cards.length)+'名角色作为'+get.translation(trigger.card)+'的目标，覆盖原先存在的目标',
+								function(card,player,target){
+									var evt=_status.event.getTrigger();
+									return target!=player&&lib.filter.targetEnabled2(evt.card,player,target)&&lib.filter.targetInRange(evt.card,player,target);
+							}).set('ai',function(target){
+									var evt=_status.event.getTrigger();
+								return get.effect(target,evt.card,evt.player,evt.player);
+							});
+							'step 1'
+							if(result.bool){
+								if(player!=event.player&&!player.isOnline()) game.delayx();
+							}
+							else event.finish();
+							'step 2'
+							var targets=result.targets;
+							player.logSkill('rekenshang_effect',targets);
+							trigger.targets.length=0;
+							trigger.targets.addArray(targets);
+							game.log(targets,'成为了',trigger.card,'的新目标');
+						},
+					},
+					after:{
+						audio:'olkenshang',
+						trigger:{player:'useCardAfter'},
+						forced:true,
+						charlotte:true,
+						filter:function(event,player){
+							if(event.card.name!='sha'||!event.card.storage||!event.card.storage.olkenshang) return false;
+							var num=0;
+							game.countPlayer2(current=>{
+								current.getHistory('damage',evt=>{
+									if(evt.card==event.card) num+=evt.num;
+								})
+							});
+							return num<event.cards.length;
+						},
+						content:function(){
+							player.draw();
+						},
+					}
+				},
+			},
 			olkenshang:{
 				audio:2,
 				enable:'phaseUse',
@@ -987,32 +1252,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//张华
 			olbihun:{
 				audio:2,
-				trigger:{player:'useCardToTarget'},
+				trigger:{player:'useCardToPlayer'},
 				forced:true,
 				filter:function(event,player){
-					if(event.target==player) return false;
-					return player.countCards('h')>player.getHandcardLimit();
+					return event.isFirstTarget&&player.countCards('h')>player.getHandcardLimit()&&event.targets.some(target=>target!=player);
 				},
-				group:'olbihun_give',
+				//group:'olbihun_give',
 				content:function(){
-					'step 0'
-					if(trigger.isFirstTarget&&trigger.targets.length==1){
-						trigger.getParent()._olbihun=trigger.targets[0];
+					if(trigger.targets.length==1){
+						var cards=trigger.cards.filterInD();
+						if(cards.length){
+							game.delayx();
+							trigger.targets[0].gain(cards,'gain2');
+						}
 					}
-					trigger.targets.remove(trigger.target);
-					trigger.getParent().triggeredTargets2.remove(trigger.target);
-					trigger.untrigger();
+					var targets=trigger.targets.filter(target=>target!=player);
+					trigger.targets.removeArray(targets);
+					trigger.getParent().triggeredTargets1.removeArray(targets);
 				},
 				ai:{
 					threaten:0.8,
 					halfneg:true,
 					effect:{
 						player:function(card,player,target){
-							if(player!=target&&player.countCards('h')>player.getHandcardLimit()) return [0,0.5];
+							if((!card.isCard||!card.cards)&&get.itemtype(card)!='card') return;
+							if(target&&player!=target&&player.countCards('h')>player.getHandcardLimit()) return [0,0,0,0.5];
 						},
 					},
 				},
-				subSkill:{
+				/*subSkill:{
 					give:{
 						trigger:{player:'useCardAfter'},
 						filter:function(event,player){
@@ -1024,7 +1292,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger._olbihun.gain(trigger.cards.filterInD(),'gain2');
 						}
 					}
-				}
+				}*/
 			},
 			olchuanwu:{
 				audio:2,
@@ -1033,6 +1301,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource',
 				},
 				forced:true,
+				filter:function(event,player){
+					return player.getAttackRange()>0;
+				},
 				content:function(){
 					var skills=game.filterSkills(player.getStockSkills(true,true),player);
 					var num=Math.min(player.getAttackRange(),skills.length);
@@ -6473,7 +6744,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var name of lib.inpile){
 							var info=lib.card[name];
 							if(!info||info.type!='trick'||info.notarget||(info.selectTarget&&info.selectTarget!=1)) continue;
-							if(!player.canUse(name,target)) continue;
+							if(!player.canUse(name,target,false)) continue;
 							var eff=get.effect(target,{name:name},player,player)
 							if(eff>0) list.push(eff);
 						}
@@ -6502,7 +6773,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					var list=event.list.filter(function(name){
-						return player.canUse(name,target);
+						return player.canUse(name,target,false);
 					});
 					if(list.length){
 						var next=player.chooseButton(['视为对'+get.translation(target)+'使用一张牌',[list,'vcard']]).set('ai',function(button){
@@ -6957,13 +7228,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				phaseDiscard:function(){
 					'step 0'
 					game.log(player,'进入了弃牌阶段');
-					event.num=player.needsToDiscard();
-					if(event.num<=0) event.finish();
-					else{
+					game.broadcastAll(function(player){
 						if(lib.config.show_phase_prompt){
-							player.popup('弃牌阶段');
+							player.popup('弃牌阶段',null,false);
 						}
-					}
+					},player);
 					event.trigger('phaseDiscard');
 					'step 1'
 					var cards=lib.skill.olsujian.update(player);
@@ -9669,43 +9938,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//许靖
 			yuxu:{
 				audio:2,
-				trigger:{player:'useCardEnd'},
+				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					if(event!=player.getLastUsed()) return false;
-					var	evt=event.getParent('phaseUse');
+					var evt=event.getParent('phaseUse');
 					if(!evt||evt.player!=player) return false;
-					var history=player.getHistory('useCard',function(evtt){
-						return evtt.getParent('phaseUse')==evt;
-					});
-					var index=history.indexOf(event);
-					if(index==0) return true;
-					return history[index-1].yuxu!=true&&player.countCards('he')>0;
+					return true;
 				},
-				content:function(){
-					trigger.yuxu=true;
-					player.addTempSkill('yuxu2');
-					player.draw();
-				},
-			},
-			yuxu2:{
-				trigger:{player:'useCardEnd'},
 				direct:true,
-				charlotte:true,
-				locked:true,
-				filter:function(event,player){
-					if(event!=player.getLastUsed()) return false;
-					var	evt=event.getParent('phaseUse');
-					if(!evt||evt.player!=player) return false;
-					var history=player.getHistory('useCard',function(evtt){
-						return evtt.getParent('phaseUse')==evt;
-					});
-					var index=history.indexOf(event);
-					if(index<1) return false;
-					return history[index-1].yuxu==true&&player.countCards('he')>0;
-				},
 				content:function(){
+					'step 0'
+					var draw=!player.hasMark('yuxu_used');
+					if(draw) player.chooseBool(get.prompt2('yuxu')).set('ai',()=>1);
+					else event.goto(2);
+					'step 1'
+					if(result.bool){
+						player.logSkill('yuxu');
+						player.draw();
+						player.addMark('yuxu_used',1,false);
+						player.addTempSkill('yuxu_used','phaseUse');
+					}
+					event.finish();
+					'step 2'
+					player.logSkill('yuxu');
+					player.removeMark('yuxu_used',player.countMark('yuxu_used'),false);
 					player.chooseToDiscard('he',true);
 				},
+				subSkill:{
+					used:{
+						charlotte:true,
+						onremove:true
+					}
+				}
 			},
 			xjshijian:{
 				audio:2,
@@ -19864,7 +20127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.tag(event.card,'damage')) return true;
 					return false;
 				},
-				content:function (){
+				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('xinfu_lingren'),'选择一名目标角色并猜测其手牌构成',function(card,player,target){
 						return _status.event.targets.contains(target);
@@ -19881,12 +20144,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trick:false,
 							equip:false,
 						}
-						player.chooseBool('是否押基本牌？').ai=function(event,player){
-							var rand=0.95;
-							if(!target.countCards('h',{type:['basic']})) rand=0.05;
-							if(!target.countCards('h')) rand=0;
-							return Math.random()<rand?true:false;
-						};
+						player.chooseButton(['凌人：猜测其有哪些类别的手牌',[['basic','trick','equip'],'vcard']],[0,3],true).set('ai',function(button){
+							switch(button.link[2]){
+								case 'basic':
+									var rand=0.95;
+									if(!target.countCards('h',{type:['basic']})) rand=0.05;
+									if(!target.countCards('h')) rand=0;
+									return Math.random()<rand?true:false;
+								case 'trick':
+									var rand=0.9;
+									if(!target.countCards('h',{type:['trick','delay']})) rand=0.1;
+									if(!target.countCards('h')) rand=0;
+									return Math.random()<rand?true:false;
+								case 'equip':
+									var rand=0.75;
+									if(!target.countCards('h',{type:['equip']})) rand=0.25;
+									if(!target.countCards('h')) rand=0;
+									return Math.random()<rand?true:false;
+							}
+						})
 					}
 					else{
 						player.storage.counttrigger.xinfu_lingren--;
@@ -19894,44 +20170,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(result.bool){
-						event.choice.basic=true;
+						var choices=result.links.map(i=>i[2]);
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
+						var list=[];
+						event.num=0;
+						['basic','trick','equip'].forEach(type=>{
+							if(choices.contains(type)==target.hasCard({type:type},'h')) event.num++;
+						})
 					}
-					player.chooseBool('是否押锦囊牌？').ai=function(event,player){
-						var rand=0.9;
-							if(!target.countCards('h',{type:['trick','delay']})) rand=0.1;
-							if(!target.countCards('h')) rand=0;
-							return Math.random()<rand?true:false;
-					};
 					'step 3'
-					if(result.bool){
-						event.choice.trick=true;
-					}
-					player.chooseBool('是否押装备牌？').ai=function(event,player){
-						var rand=0.75;
-							if(!target.countCards('h',{type:['equip']})) rand=0.25;
-							if(!target.countCards('h')) rand=0;
-							return Math.random()<rand?true:false;
-					};
-					'step 4'
-					if(result.bool){
-						event.choice.equip=true;
-					}
-					game.delay();
-					var reality={
-						basic:false,
-						trick:false,
-						equip:false,
-					}
-					var he=target.getCards('h');
-					for(var i=0;i<he.length;i++){
-						reality[get.type(he[i],'trick')]=true;
-					}
-					event.num=0;
-					var tl=['basic','trick','equip'];
-					for(var i=0;i<tl.length;i++){
-						if(event.choice[tl[i]]==reality[tl[i]]) event.num++;
-					}
-					'step 5'
 					player.popup('猜对'+get.cnNumber(event.num)+'项');
 					game.log(player,'猜对了'+get.cnNumber(event.num)+'项');
 					if(event.num>0){
@@ -19965,8 +20212,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				popup:false,
 				forced:true,
+				charlotte:true,
 				content:function (){
-						trigger.num++;
+					trigger.num++;
 				},
 			},
 			"lingren_jianxiong":{
@@ -21133,6 +21381,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.olfeibai) return '转换技，锁定技。阴：当你因执行你使用的非黑色牌的效果而造成伤害时，此伤害值+1；<span class="bluetext">阳：当你因执行你使用的非红色牌的效果而回复体力时，此回复值+1。</span>';
 				return '转换技，锁定技。<span class="bluetext">阴：当你因执行你使用的非黑色牌的效果而造成伤害时，此伤害值+1；</span>阳：当你因执行你使用的非红色牌的效果而回复体力时，此回复值+1。'
 			},
+			olmiuyan:function(player){
+				if(player.storage.olmiuyan) return '转换技。你可以将一张黑色牌当做【火攻】使用。然后若此技能：处于阳状态且此牌造成了伤害，则你获得此阶段内所有被展示过的牌；<span class="bluetext">处于阴状态且未造成伤害，则你令此技能失效直到本轮结束。</span>';
+				return '转换技。你可以将一张黑色牌当做【火攻】使用。然后若此技能：<span class="bluetext">处于阳状态且此牌造成了伤害，则你获得此阶段内所有被展示过的牌；</span>处于阴状态且未造成伤害，则你令此技能失效直到本轮结束。';
+			},
 		},
 		characterReplace:{
 			caoshuang:['caoshuang','ns_caoshuang'],
@@ -21360,7 +21612,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			neifa_info:'出牌阶段开始时，你可以摸两张牌或获得场上的一张牌，然后弃置一张牌。若弃置的牌是基本牌，本回合你不能使用锦囊和装备牌，且【杀】的使用次数+X且目标+1；若弃置的不是基本牌，本回合你不能使用基本牌，且使用普通锦囊牌选择目标时可以增加或减少一个目标，前两次使用装备牌时摸X张牌（X为你发动〖内伐〗弃牌后手牌中因〖内伐〗而不能使用的牌的数量且最多为5）。',
 			neifa_use:'内伐',
 			yuxu:'誉虚',
-			yuxu_info:'当你于出牌阶段内使用的牌结算完成时，你可以摸一张牌。若如此做，当你于出牌阶段内使用的下一张牌结算完成时，你不能发动〖誉虚〗，且需弃置一张牌。',
+			yuxu_info:'当你于出牌阶段内使用的牌结算结束后，若你此前于此阶段发动过〖誉虚〗的次数为：偶数，你可以摸一张牌；奇数，你弃置一张牌。',
 			yuxu2:'誉虚(弃牌)',
 			xjshijian:'实荐',
 			xjshijian_info:'一名其他角色于其回合内使用的第二张牌结算完成后，你可弃置一张牌并令其获得技能〖誉虚〗直到回合结束。',
@@ -21379,7 +21631,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			weicheng:'伪诚',
 			weicheng_info:'当其他角色获得你的手牌后，若你的手牌数小于体力值，你可以摸一张牌。',
 			daoshu:'盗书',
-			daoshu_info:'出牌阶段，你可以选择一个花色并获得一名其他角色的一张手牌。若此牌花色与你选择的相同，则你对其造成1点伤害。否则你须交给其一张与此牌花色不同的手牌（没有则展示手牌），且本阶段内不能再发动〖盗书〗',
+			daoshu_info:'出牌阶段限一次。你可以选择一个花色并获得一名其他角色的一张手牌。若此牌花色与你选择的相同，则你对其造成1点伤害且你〖盗书〗于此阶段内可使用的次数上限+1。否则你须交给其一张与此牌花色不同的手牌（没有则展示手牌）。',
 
 			xinshanjia:"缮甲",
 			xinshanjia_info:"出牌阶段开始时，你可以摸三张牌，然后弃置3-X张牌(X为你本局游戏内不因使用而失去过的装备牌的数目且至多为3)。若你没有以此法弃置基本牌或锦囊牌，则你可以视为使用了一张无距离限制且不计入出牌阶段使用次数的【杀】。",
@@ -22218,7 +22470,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olnishou_info:'锁定技。当你装备区里的牌进入弃牌堆后，你选择一项：1.将这些牌中第一张能当【闪电】对你使用的牌当【闪电】使用；2.本阶段结束时，你与一名手牌数最少的角色交换手牌。',
 			zhanghua:'张华',
 			olbihun:'弼昏',
-			olbihun_info:'锁定技。当你使用牌指定一名角色为目标时：若其为第一个目标且此牌目标数为1，你令其获得此牌；若其不为你且你的手牌数大于手牌上限，取消此目标。',
+			olbihun_info:'锁定技。当你使用牌指定其他角色为目标时：若其不为你且你的手牌数大于手牌上限，取消此目标；若此牌目标数为1，则其获得此牌。',
 			olchuanwu:'穿屋',
 			olchuanwu_info:'锁定技。当你造成或受到伤害后，你令武将牌上的前X个未失效的技能失效直到回合结束。然后你摸等同于你此次失效的技能数张牌（X为你的攻击范围）。',
 			oljianhe:'剑合',
@@ -22229,14 +22481,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			maxiumatie:'马休马铁',
 			olkenshang:'垦伤',
 			olkenshang_info:'你可以将任意张牌当【杀】使用，然后你可以将此牌目标改为所有你攻击范围外的角色。此牌结算结束后，若此牌对应的实体牌数大于X，你摸X张牌（X为此牌造成过的伤害值），否则你失去一个技能。',
+			rekenshang:'垦伤',
+			rekenshang_info:'你可以将至少两张牌当【杀】使用，然后你可以将此牌目标改为等量名角色。此牌结算结束后，若此牌对应的实体牌数大于X，你摸X张牌（X为此牌造成过的伤害值）。',
 			ol_zhujun:'OL朱儁',
 			olcuipo:'摧破',
-			olcuipo_info:'锁定技。当你于回合内造成伤害时，若此伤害的渠道为你于此回合使用的第X张牌且受伤角色为此牌的目标，你令此伤害+1（X为此牌牌名的字数）。',
+			olcuipo_info:'锁定技。当你使用牌时，若此牌是你本回合使用的第X张牌（X为此牌牌名的字数），则：{若此牌为【杀】或伤害类锦囊牌，则此牌的伤害值基数+1，否则你摸一张牌}。',
 			ol_zhangyì:'OL张翼',
 			oldianjun:'殿军',
 			oldianjun_info:'锁定技。回合结束时，你受到1点无来源伤害，然后执行一个额外的出牌阶段。',
 			olkangrui:'亢锐',
 			olkangrui_info:'当一名角色于其回合内首次受到伤害后，你可以摸一张牌并选择一项：1.令其回复1点体力；2.令其于本回合下次造成的伤害+1，然后当其于本回合造成伤害后，其本回合手牌上限基数为0。',
+			wangguan:'王瓘',
+			olmiuyan:'谬焰',
+			olmiuyan_tag:'invisible',
+			olmiuyan_info:'转换技。你可以将一张黑色牌当做【火攻】使用。然后若此技能：处于阳状态且此牌造成了伤害，则你获得此阶段内所有被展示过的手牌；处于阴状态且未造成伤害，则你令此技能失效直到本轮结束。',
+			olshilu:'失路',
+			olshilu_info:'锁定技。当你受到伤害后，你摸X张牌（X为你的体力值且至多为5）。然后你展示攻击范围内一名角色的一张手牌，令此牌的牌名视为【杀】。',
 			
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

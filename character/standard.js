@@ -2484,7 +2484,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huaxiong:['re_huaxiong','old_huaxiong','huaxiong','ol_huaxiong'],
 			yuanshu:['yl_yuanshu','yuanshu','re_yuanshu','old_yuanshu','ol_yuanshu'],
 			gongsunzan:['dc_gongsunzan','re_gongsunzan','xin_gongsunzan','gongsunzan'],
-			re_lidian:['re_lidian','old_re_lidian'],
+			re_lidian:['re_lidian','old_re_lidian','junk_lidian'],
 		},
 		translate:{
 			caocao:'曹操',

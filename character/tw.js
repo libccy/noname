@@ -8817,6 +8817,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).set('ai',function(button){
 							var player=_status.event.player,target=_status.event.targets1,source=_status.event.targets0;
 							var att=get.attitude(player,source);
+							var card=button.link;
 							if(get.position(card)=='e'){
 								var val=get.value(card);
 								if(att>0?val>0:val<=0) return 0;
