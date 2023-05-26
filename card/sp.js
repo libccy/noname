@@ -152,9 +152,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return (lib.filter.judge(card,player,target)&&player==target);
 				},
 				selectTarget:[-1,-1],
+				toself:true,
 				judge:function(card){
 					if(get.suit(card)=='spade') return -6;
-					return 0;
+					return 6;
+				},
+				judge2:function(result){
+					if(result.bool==false) return true;
+					return false;
 				},
 				cardPrompt:function(card){
 					var str='出牌阶段，对你使用。你将【浮雷】置入判定区。若判定结果为♠，则目标角色受到X点雷电伤害（X为此牌判定结果为♠的次数）。判定完成后，将此牌移动到下家的判定区里。';
@@ -279,8 +284,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player.chooseCard('h','将一张手牌交给'+get.translation(event.target1),true);
 					}
 					'step 1'
-					player.$giveAuto(result.cards,event.target1);
-					event.target1.gain(result.cards,player);
+					player.give(result.cards,event.target1);
 					'step 2'
 					if(!event.target1.countCards('h')){
 						event.finish();
@@ -298,8 +302,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!event.directresult){
 						event.directresult=result.cards;
 					}
-					event.target1.$giveAuto(event.directresult,event.target2);
-					event.target2.gain(event.directresult,event.target1);
+					event.target1.give(event.directresult,event.target2);
 				},
 				ai:{
 					order:2.5,
@@ -384,8 +387,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return (lib.filter.judge(card,player,target)&&player!=target);
 				},
 				judge:function(card){
-					if(get.suit(card)=='club') return 0;
+					if(get.suit(card)=='club') return 1;
 					return -3;
+				},
+				judge2:function(result){
+					if(result.bool==false) return true;
+					return false;
 				},
 				effect:function(){
 					if(result.bool==false){
@@ -596,15 +603,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				cardSkill:true,
 				unique:true,
 				trigger:{player:'phaseDrawBegin'},
-				silent:true,
+				popup:false,
+				charlotte:true,
+				forced:true,
 				content:function(){
 					trigger.num--;
 				},
 				group:'caomu_skill2'
 			},
 			caomu_skill2:{
+				cardSkill:true,
+				popup:false,
+				forced:true,
 				trigger:{player:'phaseDrawAfter'},
-				silent:true,
 				content:function(){
 					var targets=game.filterPlayer(function(current){
 						return get.distance(player,current)<=1&&player!=current;

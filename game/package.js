@@ -7,6 +7,7 @@ window.noname_package={
 		yijiang:'一将成名',
 		sp:'璀璨星河',
 		yingbian:'文德武备',
+		clan:'门阀士族',
 		sp2:'系列专属',
 		extra:'神将',		
 		mobile:'移动版',

@@ -401,10 +401,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				yingbian_tags:['gain','draw'],
 				yingbian:function(event){
 					var bool=false;
-					if(get.cardtag(event.card,'yingbian_damage')){
+					if(get.cardtag(event.card,'yingbian_gain')){
 						bool=true;
 						var cardx=event.respondTo;
-						if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD('od').length) player.gain(cardx[1].cards.filterInD('od'),'gain2','log');
+						if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD('od').length) event.player.gain(cardx[1].cards.filterInD('od'),'gain2','log');
 					}
 					if(!bool||get.cardtag(event.card,'yingbian_draw')) event.player.draw();
 				},
@@ -1621,7 +1621,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(event.directfalse||result.bool==false){
 						var cards=target.getCards('e',{subtype:'equip1'});
-						if(cards.length) player.gain(cards,target,'give');
+						if(cards.length) player.gain(cards,target,'give','bySelf');
 					}
 				},
 				ai:{
@@ -1774,6 +1774,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return (lib.filter.judge(card,player,target)&&player==target);
 				},
 				selectTarget:[-1,-1],
+				toself:true,
 				judge:function(card){
 					if(get.suit(card)=='spade'&&get.number(card)>1&&get.number(card)<10) return -5;
 					return 1;
@@ -2135,12 +2136,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					if(get.mode()=='guozhan'||!event.card||event.card.name!='sha') return false;
-					return event.target.isIn&&player.canUse('sha',event.target,false)&&(player.hasSha()||_status.connectMode&&player.countCards('h'));
+					return event.target.isIn()&&player.canUse('sha',event.target,false)&&(player.hasSha()||_status.connectMode&&player.countCards('hs'));
 				},
 				content:function(){
 					"step 0"
 					player.chooseToUse(get.prompt('qinglong',trigger.target),function(card,player,event){
 						if(get.name(card)!='sha') return false;
+						if(player.getEquip('qinglong')==card) return false;
 						return lib.filter.filterCard.apply(this,arguments);
 					},trigger.target,-1).set('addCount',false).logSkill='qinglong_skill';
 				}
@@ -2216,7 +2218,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					skillTagFilter:function(player,tag,arg){
 						if(player._guanshi_temp) return;
 						player._guanshi_temp=true;
-						var bool=(get.attitude(player,arg.target)<0&&arg.card.name=='sha'&&player.countCards('he',function(card){
+						var bool=(get.attitude(player,arg.target)<0&&arg.card&&arg.card.name=='sha'&&player.countCards('he',function(card){
 							return card!=player.getEquip('guanshi')&&card!=arg.card&&(!arg.card.cards||!arg.card.cards.contains(card))&&get.value(card)<5;
 						})>1);
 						delete player._guanshi_temp;
@@ -2575,6 +2577,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					};
 					event.settle=function(){
+						if(event.respondWuxie) event.trigger('eventNeutralized');
 						if(!event.state){
 							if(event.triggername=='phaseJudge'){
 								trigger.untrigger();
@@ -2583,11 +2586,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							else{
 								trigger.neutralize();
 								if(event.guowuxie==true){
-									if(trigger.target.identity!='ye'&&trigger.target.identity!='unknown'){
-										trigger.getParent().excluded.addArray(game.filterPlayer(function(current){
-											return current.identity==trigger.target.identity;
-										}));
-									}
+									trigger.getParent().excluded.addArray(game.filterPlayer(function(current){
+										return current.isFriendOf(trigger.target);
+									}));
 								}
 							}
 						}
@@ -2643,13 +2644,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							event.wuxieresult=player;
 							event.wuxieresult2=result;
 							game.broadcast('cancel',id);
-							if(_status.event.id==id&&_status.event.name=='chooseToUse'&&_status.paused){
-								return (function(){
-									event.resultOL=_status.event.resultOL;
+							return (function(){
+								if(_status.event.id==id&&_status.event.name=='chooseToUse'&&_status.paused) event.resultOL=_status.event.resultOL;
+								if(_status.event._parent_id==id){
 									ui.click.cancel();
-									if(ui.confirm) ui.confirm.close();
-								});
-							}
+								}
+								if(_status.event.id==id){
+									if(_status.event._backup) ui.click.cancel();
+									ui.click.cancel();
+									if(ui.confirm){
+										ui.confirm.close();
+									}
+									if(_status.event.result){
+										_status.event.result.id=id;
+									}
+								}
+							});
 						}
 						else{
 							if(_status.event.id==id&&_status.event.name=='chooseToUse'&&_status.paused){
@@ -2704,6 +2714,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						game.players[i].hideTimer();
 					}
 					'step 8'
+					if(event.wuxieresult2&&event.wuxieresult2._sendskill) lib.skill[event.wuxieresult2._sendskill[0]]=event.wuxieresult2._sendskill[1];
 					if(event.wuxieresult&&event.wuxieresult2&&event.wuxieresult2.skill){
 						var info=get.info(event.wuxieresult2.skill);
 						if(info&&info.precontent&&!game.online){
@@ -2716,7 +2727,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 9'
 					if(event.wuxieresult){
 						var next=event.wuxieresult.useResult(event.wuxieresult2);
-						if(event.stateplayer&&event.statecard) next.respondTo=[event.stateplayer,event.statecard];
+						if(event.stateplayer&&event.statecard){
+							event.respondWuxie=true;
+							next.respondTo=[event.stateplayer,event.statecard];
+						}
 						else if(event.triggername!='phaseJudge'){
 							next.respondTo=[trigger.player,trigger.card];
 						}
@@ -2823,15 +2837,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			renwang_bg:'盾',
 			hanbing_skill:'寒冰剑',
 			renwang_skill:'仁王盾',
-			hanbing_info:'当你使用杀造成伤害时，你可以防止此伤害，改为依次弃置目标角色的两张牌。',
-			hanbing_skill_info:'当你使用杀造成伤害时，你可以防止此伤害，改为依次弃置目标角色的两张牌。',
-			renwang_info:'锁定技，黑色的杀对你无效',
-			renwang_skill_info:'锁定技，黑色的杀对你无效',
+			hanbing_info:'当你因执行【杀】的效果而造成伤害时，若目标角色有能被弃置的牌，则你可以防止此伤害，然后依次弃置目标角色的两张牌。',
+			hanbing_skill_info:'当你因执行【杀】的效果而造成伤害时，若目标角色有能被弃置的牌，则你可以防止此伤害，然后依次弃置目标角色的两张牌。',
+			renwang_info:'锁定技，黑色【杀】对你无效',
+			renwang_skill_info:'锁定技，黑色【杀】对你无效',
 			sha_info:'出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，否则你对其造成1点伤害。',
 			shan_info:'抵消一张【杀】',
-			tao_info:'出牌阶段，对自己使用，回复一点体力。',
-			bagua_info:'当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
-			bagua_skill_info:'当你需要使用或打出一张【闪】时，你可以进行一次判定，若判定结果为红色，视为你使用或打出了一张【闪】。',
+			tao_info:'①出牌阶段，对自己使用，目标角色回复1点体力。②当有角色处于濒死状态时，对该角色使用。目标角色回复1点体力。',
+			bagua_info:'当你需要使用或打出一张【闪】时，你可以进行判定。若结果为红色，则你视为使用或打出一张【闪】。',
+			bagua_skill_info:'当你需要使用或打出一张【闪】时，你可以进行判定。若结果为红色，则你视为使用或打出一张【闪】。',
 			jueying_info:'锁定技，其他角色计算与你的距离+1。',
 			dilu_info:'锁定技，其他角色计算与你的距离+1。',
 			zhuahuang_info:'锁定技，其他角色计算与你的距离+1。',
