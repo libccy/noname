@@ -47,7 +47,7 @@
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		mirrorURL:'https://nakamurayuri.coding.net/p/noname/d/noname/git/raw',
 		hallURL:'47.99.105.222',
-		assetURL:'', //资源地址，用于加载各种js、css、字体、图片、音乐等
+		assetURL:'https://pandarrr.site/noname/', //资源地址，用于加载各种js、css、字体、图片、音乐等
 		cdnURL: 'https://image.pandarrr.site/noname/', //cdn地址，需要加速的资源使用这个地址
 		changeLog:[],
 		updates:[],
@@ -104,6 +104,10 @@
 				return list.contains(name)?capt:null;
 			}
 		},
+		/**
+		 * 
+		 * @param {HTMLElement} node 
+		 */
 		listenEnd:function(node){
 			if(!node._listeningEnd){
 				node._listeningEnd=true;
@@ -4280,6 +4284,7 @@
 		mode:{
 			identity:{
 				name:'身份',
+				//connect与config有很多相似的代码，貌似一个是联机的菜单设置一个是单机的菜单设置
 				connect:{
 					update:function(config,map){
 						if(config.connect_identity_mode=='zhong'){
@@ -6864,6 +6869,7 @@
 		},
 		//游戏初始化，貌似定义了一些基础方法
 		init:{
+			//游戏的入口在这里
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
 					var dirsplit=__dirname.split('/');
@@ -7096,6 +7102,7 @@
 						node.style.backgroundSize="cover";
 					});
 				};
+				//设置角色的图片
 				HTMLDivElement.prototype.setBackgroundImage=function(img){
 
 					//修改：使用cnd加速图片
@@ -7376,6 +7383,7 @@
 						// }
 					}
 				};
+				//资源（包括图片）加载后立即执行
 				window.onload=function(){
 					if(lib.device){
 						var script=document.createElement('script');
@@ -7720,6 +7728,7 @@
 							if(toLoad==0){
 								if(_status.windowLoaded){
 									delete _status.windowLoaded;
+									//资源加载后貌似在这里继续往下
 									lib.init.onload();
 								}
 								else{
@@ -8272,6 +8281,7 @@
 				if(localStorage.getItem(lib.configprefix+'nodb')){
 					window.nodb=true;
 				}
+				//在有indexedDB的环境中，先请求indexedDB，然后执行proceed
 				if(window.indexedDB&&!window.nodb){
 					var request = window.indexedDB.open(lib.configprefix+'data',4);
 					request.onupgradeneeded=function(e){
@@ -10418,6 +10428,7 @@
 			zhengsu_mingzhi_info:'回合内所有于弃牌阶段弃置的牌花色均不相同且不少于两张。',
 		},
 		element:{
+			//各种预设事件的内容
 			content:{
 				emptyEvent:function(){
 					event.trigger(event.name);
@@ -25919,6 +25930,7 @@
 					_status.event.excludeButton.add(this);
 				}
 			},
+			//事件定义
 			event:{
 				changeToZero:function(){
 					this.num=0;
@@ -26287,6 +26299,7 @@
 						}
 					}
 				},
+				//触发事件
 				trigger:function(name){
 					if(_status.video) return;
 					if((this.name==='gain'||this.name==='lose')&&!_status.gameDrawed) return;
@@ -32774,6 +32787,7 @@
 			next._trigger=event;
 			next.setContent('createTrigger');
 		},
+		//创建事件
 		createEvent:function(name,trigger,triggerevent){
 			var next={
 				name:name,
@@ -33819,6 +33833,7 @@
 				setTimeout(game.reload,15000)
 			}
 		},
+		//游戏循环
 		loop:function(){
 			var event=_status.event;
 			var step=event.step;
@@ -35787,6 +35802,7 @@
 			}
 			return arg[arg.length-1];
 		},
+		//绘制棋盘
 		prepareArena:function(num){
 			_status.prepareArena=true;
 			game.showHistory(false);
@@ -46281,7 +46297,7 @@
 				}
 				return buttons;
 			},
-			//注释：角色对象
+			//注释：绘制角色对象
 			player:function(position,noclick){
 				var node=ui.create.div('.player',position);
 				node.node={
