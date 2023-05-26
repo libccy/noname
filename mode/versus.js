@@ -1428,6 +1428,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ui.arena.classList.remove('choose-character');
 					},500);
 
+					game.addGlobalSkill('versus_viewHandcard');
 					if(get.config('two_phaseswap')){
 						game.addGlobalSkill('autoswap');
 						if(lib.config.show_handcardbutton){
@@ -3149,34 +3150,230 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						list.push(i);
 						list4.push(i);
 					}
-					var choose=[];
+					var choose={};
 					event.list=list;
 					_status.characterlist=list4;
+					//推荐队友选将
+					//给所有人生成对话框
 					for(var i=0;i<game.players.length;i++){
-						choose.push([game.players[i],['选择角色',[list.randomRemove(7),'characterx']],true]);
+						choose[game.players[i].playerid]=list.randomRemove(6);
 					}
-					game.me.chooseButtonOL(choose,function(player,result){
-						if(game.online||player==game.me) player.init(result.links[0]);
-					});
-					'step 1'
-					for(var i in result){
-						if(result[i]=='ai'){
-							var name=event.list.randomRemove();
-							if(lib.characterReplace[name]&&lib.characterReplace[name].length) name=lib.characterReplace[name].randomGet();
-							result[i]=name;
+					game._characterChoice=choose;
+					event._choiceMap={};
+					event.videoId=lib.status.videoId++;
+					game.broadcastAll(function(id,choice){
+						game._characterChoice=choice;
+						game._characterDialogID=id;
+						var dialog=ui.create.dialog('请选择武将');
+						dialog.videoId=id;
+						var players,friends;
+						var player=game.me;
+						for(var i in choice){
+							var current=lib.playerOL[i];
+							if(current==player) players=choice[i];
+							else if(current.side==player.side) friends=choice[i];
+						}
+						dialog.addText('你的选将框');
+						var buttons=ui.create.div('.buttons',dialog.content);
+						dialog.players=ui.create.buttons(players,'characterx',buttons)
+						dialog.buttons=dialog.buttons.concat(dialog.players);
+						dialog.addText('队友的选将框（点击可为其推荐武将）');
+						buttons=ui.create.div('.buttons',dialog.content);
+						dialog.friends=ui.create.buttons(friends,'characterx',buttons)
+						dialog.buttons=dialog.buttons.concat(dialog.friends);
+					},event.videoId,choose);
+					//发送选择事件
+					var send=function(){
+						var next=game.me.chooseButton([1,2],true);
+						next.set('dialog',game._characterDialogID);
+						next.set('callback',function(player,result){
+							player.init(result.links[0],null,null,false);
+							var button=game._playerChoice;
+							button.classList.remove('glow2');
+							button.classList.add('selected');
+							delete game._playerChoice;
+						});
+						//托管选择
+						next.set('ai',function(button){
+							if(ui.selected.buttons.length) return 0;
+							var dialog=get.idDialog(game._characterDialogID);
+							if(dialog.friends&&dialog.friends.contains(button)) return 0;
+							if(dialog.classList.contains('glow2')) return 1+Math.random();
+							return 0.5+Math.random();
+						});
+						//修改点击按钮后的反应
+						next.set('custom',{replace:{
+							button:function(button){
+								var dialog=get.idDialog(game._characterDialogID);
+								var origin=button._link,choice=button.link;
+								//选择按钮时自动取消选择上一个按钮
+								if(dialog.players.contains(button)){
+									if(!button.classList.contains('selected')){
+										button.classList.add('selected');
+										ui.selected.buttons.add(button);
+										game._playerChoice=button;
+										for(var other of dialog.players){
+											if(other!=button&&other.classList.contains('selected')){
+												other.classList.remove('selected');
+												ui.selected.buttons.remove(other);
+											}
+										}
+									}
+									game.check();
+								}
+								else{
+									//给队友推荐选将
+									if(game._friendConfirmed) return;
+									if(button==dialog._recommending) return;
+									dialog._recommending=button;
+									button.classList.add('glow2');
+									for(var other of dialog.friends){
+										if(other!=button&&other.classList.contains('glow2')){
+											other.classList.remove('glow2');
+										}
+									}
+									//将最小发送延时间隔设置为0.5秒 避免通过频繁点击进行炸服
+									if(dialog.delay) return;
+									if(game.online) game.send('tempResult',origin);
+									else game.me.tempUnwait(origin);
+									dialog.delay=setTimeout(function(){
+										delete dialog.delay;
+										if(game._friendConfirmed) return;
+										var recommend=dialog._recommending._link;
+										if(recommend!=origin){
+											if(game.online) game.send('tempResult',recommend);
+											else game.me.tempUnwait(recommend);
+										}
+									},500);
+								}
+							}
+						},add:{}});
+						if(game.online) game.resume();
+					}
+					//推荐选将后的回传函数
+					event.recommend=function(player,choice){
+						if(player.name1||game._characterDialogID==undefined) return;
+						var dialog=get.idDialog(game._characterDialogID);
+						if(dialog){
+							for(var button of dialog.players){
+								if(button._link==choice) button.classList.add('glow2');
+								else if(button.classList.contains('glow2')) button.classList.remove('glow2');
+							}
+						}
+					}
+					//确认选将后的回传函数
+					event.confirm=function(player,choice){
+						if(!player.name1) player.init(choice,null,null,false);
+						game._friendConfirmed=true;
+						if(game._characterDialogID==undefined) return;
+						var dialog=get.idDialog(game._characterDialogID);
+						if(!dialog) return;
+						for(var button of dialog.friends){
+							button.classList.remove('glow2');
+							if(button.link==choice||(lib.characterReplace[button._link]&&lib.characterReplace[button._link].contains(choice))) button.classList.add('selected');
+						}
+					}
+					//处理result
+					var sendback=function(result,player){
+						var type=typeof result;
+						var friend=game.findPlayer(function(current){
+							return current!=player&&current.side==player.side;
+						});
+						//处理推荐选将
+						if(type=='string'){
+							if(friend==game.me) event.recommend(friend,result);
+							else if(friend.isOnline()) friend.send(event.recommend,friend,result);
+							else friend._aiChoice=result;
+						}
+						//处理确认选将
+						else if(result&&type=='object'){
+							var choice=result.links[0];
+							event._choiceMap[player.playerid]=choice;
+							if(friend==game.me) event.confirm(player,choice);
+							else if(friend.isOnline()) friend.send(event.confirm,player,choice);
+						}
+					}
+					event.sendback=sendback;
+					
+					//发送
+					event.ai_targets=[];
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].isOnline()){
+							event.withol=true;
+							game.players[i].send(send);
+							game.players[i].wait(sendback);
+						}
+						else if(game.players[i]==game.me){
+							event.withme=true;
+							send();
+							game.me.wait(sendback);
 						}
 						else{
-							result[i]=result[i].links[0];
+							event.ai_targets.push(game.players[i]);
+							game.players[i].showTimer();
+						}
+					}
+					//模拟AI思考后选择
+					if(event.ai_targets.length){
+						event.ai_targets.randomSort();
+						setTimeout(function(){
+							event.interval=setInterval(function(){
+								var target=event.ai_targets.shift();
+								var list=game._characterChoice[target.playerid];
+								var choice;
+								//AI必选玩家推荐角色
+								if(target._aiChoice&&list.contains(target._aiChoice)) choice=target._aiChoice;
+								else choice=list.randomGet();
+								if(lib.characterReplace[choice]) choice=lib.characterReplace[choice].randomGet();
+								event.sendback({
+									result:bool,
+									links:[choice],
+								},target);
+								target.hideTimer();
+								if(!event.ai_targets.length){
+									clearInterval(event.interval);
+									if(event.withai) game.resume();
+								}
+							},1000);
+						},6000)
+					}
+					'step 1'
+					if(event.withme){
+						game.me.unwait(result);
+					}
+					'step 2'
+					if(event.withol&&!event.resultOL){
+						game.pause();
+					}
+					'step 3'
+					if(event.ai_targets.length>0){
+						event.withai=true;
+						game.pause();
+					}
+					'step 4'
+					game.broadcastAll(function(id){
+						var dialog=get.idDialog(id);
+						if(dialog){
+							dialog.close();
+							clearInterval(dialog.delay);
+						}
+					},event.videoId);
+					var result=event._choiceMap;
+					for(var i in lib.playerOL){
+						if(!lib.character[result[i]]){
+							result[i]=game._characterChoice[i].randomGet();
 						}
 						_status.characterlist.remove(result[i]);
 						if(!lib.playerOL[i].name1){
 							lib.playerOL[i].init(result[i]);
 						}
+						lib.playerOL[i].update();
 					}
 					game.broadcast(function(result){
 						for(var i in result){
 							if(!lib.playerOL[i].name1){
 								lib.playerOL[i].init(result[i]);
+								lib.playerOL[i].update();
 							}
 						}
 						setTimeout(function(){
@@ -3185,7 +3382,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},result);
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
-					},500)
+					},500);
+					game.addGlobalSkill('versus_viewHandcard');
 				});
 			},
 			chooseCharacterOL1:function(){
@@ -4366,6 +4564,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shishengshibai_info:'锁定技，一名角色使用牌时，若此牌是整局游戏使用的第整十张牌且此牌不为延时锦囊牌或装备牌，则此牌所有目标角色再次成为此牌的目标角色。',
 		},
 		skill:{
+			versus_viewHandcard:{
+				ai:{
+					viewHandcard:true,
+					skillTagFilter:function(player,tag,target){
+						return player.side==target.side;
+					},
+				},
+			},
 			huoshaowuchao:{
 				trigger:{global:'damageBefore'},
 				silent:true,
@@ -6781,6 +6987,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(!friend){
 								game.over(this.side!=game.me.side);
 							}
+							else friend.showGiveup();
 						}
 						else if(_status.mode=='4v4'||_status.mode=='guandu'){
 							if(this.identity=='zhu'){
@@ -6867,6 +7074,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(!friend){
 									game.over(this.side!=me.side);
 								}
+								else friend.showGiveup();
 							}
 							return;
 						}
