@@ -238,7 +238,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.addVideo('init',null,info);
 
 			game.gameDraw(game.zhu,function(player){
-				if(_status.mode=='dianjiang' || _status.mode=='normal') return player==game.fan?4:3;
+				if(_status.mode=='dianjiang') return 4;
+				if(_status.mode=='normal') return player==game.zhu?3:4;
 				if(_status.mode=='changban') return player==game.fan?5:4;
 				if(player.hasSkill('cuorui')){
 					player.logSkill('cuorui');
