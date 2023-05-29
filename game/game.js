@@ -24256,7 +24256,7 @@
 					if(this.countCards('hs','shan')) return true;
 					if(this.countCards('hs','hufu')) return true;
 					if(this.hasSkillTag('respondShan',true,null,true)) return true;
-					return this.hasUsableCard('sha');
+					return this.hasUsableCard('shan');
 				},
 				mayHaveShan:function(){
 					return this.hasShan();
