@@ -18,6 +18,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				if(lib.node&&window.require){
 					ui.startServer=ui.create.system('启动服务器',function(e){
+						ui.click.shortcut(false);
 						e.stopPropagation();
 						ui.click.connectMenu();
 					},true);
