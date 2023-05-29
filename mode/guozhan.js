@@ -1250,7 +1250,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzzhenxi:{
 				audio:'twzhenxi',
 				trigger:{player:'useCardToPlayered'},
-				logTarget:'target',
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
 					if(event.target.countCards('he')||player.hasCard(function(card){
@@ -1266,49 +1265,55 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
+					var target=trigger.target;
+					event.target=target;
 					var list=[],choiceList=[
-						'弃置'+get.translation(trigger.target)+'一张牌',
-						'将一张♦非锦囊牌当做【乐不思蜀】或♣非锦囊牌当做【兵粮寸断】对'+get.translation(trigger.target)+'使用',
+						'弃置'+get.translation(target)+'一张牌',
+						'将一张♦非锦囊牌当做【乐不思蜀】或♣非锦囊牌当做【兵粮寸断】对'+get.translation(target)+'使用',
 						'背水！若其有暗置的武将牌且你的武将牌均明置，你依次执行上述两项'
 					];
-					if(trigger.target.countDiscardableCards(player,'he')) list.push('选项一');
+					if(target.countDiscardableCards(player,'he')) list.push('选项一');
 					else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
 					if(player.countCards('he',function(card){
-						return get.suit(card)=='diamond'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'lebu'},[card]),trigger.target);
+						return get.suit(card)=='diamond'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'lebu'},[card]),target);
 					})||(player.countCards('he',function(card){
-						return get.suit(card)=='club'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'bingliang'},[card]),trigger.target);
+						return get.suit(card)=='club'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'bingliang'},[card]),target);
 					}))) list.push('选项二');
 					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
-					if(trigger.target.isUnseen(2)&&!player.isUnseen(2)) list.push('背水！');
+					if(target.isUnseen(2)&&!player.isUnseen(2)) list.push('背水！');
 					else choiceList[2]='<span style="opacity:0.5">'+choiceList[2]+'</span>';
-					player.chooseControl(list,'cancel2').set('prompt',get.prompt('gzzhenxi',trigger.target)).set('choiceList',choiceList).set('ai',function(){
+					player.chooseControl(list,'cancel2').set('prompt',get.prompt('gzzhenxi',target)).set('choiceList',choiceList).set('ai',function(){
 						var player=_status.event.player,trigger=_status.event.getTrigger(),list=_status.event.list;
 						if(get.attitude(player,trigger.target)>0) return 'cancel2';
 						if(list.contains('背水！')) return '背水！';
 						if(list.contains('选项二')) return '选项二';
 						return '选项一';
-					}).set('list',list);
+					}).set('list',list).set('hiddenSkill','gzzhenxi');
 					'step 1'
 					if(result.control=='cancel2'){
 						event.finish();
 						return;
 					}
-					if(result.control!='选项二'&&trigger.target.countDiscardableCards(player,'he')) player.discardPlayerCard(trigger.target,'he',true);
-					if(result.control!='选项一'&&player.countCards('he',function(card){
-						return get.suit(card)=='diamond'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'lebu'},[card]),trigger.target);
-					})||(player.countCards('he',function(card){
-						return get.suit(card)=='club'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'bingliang'},[card]),trigger.target,false);
-					}))){
+					player.logSkill('gzzhenxi',target);
+					event.choice=result.control;
+					if(event.choice!='选项二'&&target.countDiscardableCards(player,'he')) player.discardPlayerCard(target,'he',true);
+					'step 2'
+					if(event.choice!='选项一'&&!player.isUnseen(2)&&target.isUnseen(2)&&
+					player.hasCard(function(card){
+						return get.suit(card)=='diamond'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'lebu'},[card]),target);
+					},'he')||(player.hasCard(function(card){
+						return get.suit(card)=='club'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'bingliang'},[card]),target,false);
+					},'he'))){
 						var next=game.createEvent('gzzhenxi_use');
 						next.player=player;
-						next.target=trigger.target;
+						next.target=target;
 						next.setContent(lib.skill.gzzhenxi.contentx);
 					}
 				},
 				ai:{unequip_ai:true},
 				contentx:function(){
 					'step 0'
-					player.chooseCardTarget({
+					player.chooseCard({
 						position:'hes',
 						forced:true,
 						prompt:'震袭',
@@ -1316,15 +1321,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						filterCard:function(card,player){
 							if(get.itemtype(card)!='card'||get.type2(card)=='trick'||!['diamond','club'].contains(get.suit(card))) return false;
 							var cardx={name:get.suit(card)=='diamond'?'lebu':'bingliang'};
-							if(!player.canUse(get.autoViewAs(cardx,[card]),_status.event.getParent().player,false)) return false;
-							return lib.filter.filterCard.apply(this,arguments);
-						},
-						filterTarget:function(card,player,target){
-							var source=_status.event.target;
-							if(target!=source&&!ui.selected.targets.contains(source)) return false;
-							var cardx={name:get.suit(card)=='diamond'?'lebu':'bingliang'};
-							card=get.autoViewAs(cardx,[card]);
-							return lib.filter.filterTarget.apply(this,arguments);
+							return player.canUse(get.autoViewAs(cardx,[card]),_status.event.getParent().target,false);
 						},
 					});
 					'step 1'
@@ -1428,9 +1425,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.player)<0;
 				},
 				usable:1,
+				logTarget:'player',
 				content:function(){
 					'step 0'
-					if(trigger.player.hasSex('female')&&trigger.player.countCards('e')) player.chooseToDiscard('he','追妒：是否弃置一张牌并令其执行两项？').set('ai',function(card){
+					var target=trigger.player;
+					event.target=target;
+					if(target.hasSex('female')&&target.countCards('e')>0) player.chooseToDiscard('he','追妒：是否弃置一张牌并令其执行两项？').set('ai',function(card){
 						return 8-get.value(card);
 					});
 					else event.goto(2);
@@ -1440,8 +1440,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.goto(3);
 					}
 					'step 2'
-					if(trigger.player.countCards('e')>0){
-						trigger.player.chooseControl().set('prompt','追妒：请选择一项').set('choiceList',[
+					if(target.countCards('e')>0){
+						target.chooseControl().set('prompt','追妒：请选择一项').set('choiceList',[
 							'令'+get.translation(trigger.player)+'此次对你造成的伤害+1',
 							'弃置装备区里的所有牌',
 						]).set('ai',function(){
@@ -1449,13 +1449,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(player.hp<=2) return 1;
 							if(get.value(cards)<=7) return 1;
 							return 0;
-						}).set('list',list);
+						});
 					}
 					else event._result={control:'选项一'};
 					'step 3'
-					player.line(trigger.player);
+					player.line(target);
 					if(result.control!='选项二') trigger.num++;
-					if(result.control!='选项一') trigger.player.chooseToDiscard(trigger.player.countCards('e'),true,'e');
+					if(result.control!='选项一') target.chooseToDiscard(target.countCards('e'),true,'e');
 				},
 			},
 			gzshigong:{
@@ -7309,6 +7309,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forceunique:true,
 				group:'wuziliangjiangdao',
 				derivation:'wuziliangjiangdao',
+				lordSkill:true,
 				global:'g_jianan',
 			},
 			g_jianan:{
@@ -10042,6 +10043,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			jiahe:{
 				unique:true,
 				forceunique:true,
+				lordSkill:true,
 				audio:2,
 				derivation:'yuanjiangfenghuotu',
 				mark:true,
@@ -10848,6 +10850,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				derivation:'huangjintianbingfu',
 				unique:true,
 				forceunique:true,
+				lordSkill:true,
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -11097,6 +11100,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				group:'wuhujiangdaqi',
 				derivation:'wuhujiangdaqi',
 				mark:true,
+				lordSkill:true,
 			},
 			wuhujiangdaqi:{
 				unique:true,

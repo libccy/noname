@@ -1,4 +1,5 @@
 window.noname_source_list=[
+	'LICENSE',
 	'card/extra.js',
 	'card/gujian.js',
 	'card/guozhan.js',

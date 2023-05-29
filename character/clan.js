@@ -59,6 +59,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						filterTarget:function(card,player,target){
 							return target.hasSkill('clanlianzhu')&&!target.hasSkill('clanlianzhu_targeted')&&(!target.storage.clanlianzhu||target.storage.clanlianzhu&&game.hasPlayer(current=>{
+								if(current==player||current==target) return false;
 								return current.inRangeOf(player)||current.inRangeOf(target);
 							}));
 						},
@@ -73,7 +74,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!target.storage.clanlianzhu){
 								return ui.selected.cards.length==1;
 							}
-							return true;
+							return ui.selected.cards.length==0;
 						},
 						position:'he',
 						discard:false,
@@ -86,6 +87,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(target.hasSkill('clanlianzhu')&&!target.hasSkill('clanlianzhu_targeted')){
 									if(target.storage.clanlianzhu){
 										if(game.hasPlayer(current=>{
+											if(current==player||current==target) return false;
 											return current.inRangeOf(player)||current.inRangeOf(target);
 										})) kita.add(target);
 									}
@@ -1408,8 +1410,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		dynamicTranslate:{
 			clanlianzhu:function(player){
-				if(player.storage.clanlianzhu) return '转换技。每名其他角色Ａ的出牌阶段限一次。阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1；<span class="bluetext">阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1</span>。';
-				return '转换技。每名其他角色Ａ的出牌阶段限一次。<span class="bluetext">阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1</span>；阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1。';
+				if(player.storage.clanlianzhu) return '转换技。每名角色Ａ的出牌阶段限一次。阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1；<span class="bluetext">阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1</span>。';
+				return '转换技。每名角色Ａ的出牌阶段限一次。<span class="bluetext">阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1</span>；阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1。';
 			},
 		},
 		translate:{
@@ -1464,7 +1466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanhuanjia_info:'出牌阶段结束时，你可以与一名角色拼点。赢的角色可以使用一张拼点牌。然后若此牌：未造成过伤害，你获得另一张拼点牌；造成过伤害，你失去一个技能。',
 			clan_wukuang:'族吴匡',
 			clanlianzhu:'联诛',
-			clanlianzhu_info:'转换技。每名其他角色Ａ的出牌阶段限一次。阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1；阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1。',
+			clanlianzhu_info:'转换技。每名角色Ａ的出牌阶段限一次。阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1；阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1。',
 			
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',

@@ -1257,7 +1257,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:["useCardAfter","respond"],
 				},
 				filter:function (event,player){
-					if(get.itemtype(event.cards)!='cards'||player==_status.currentPhase) return false;
+					if(get.itemtype(event.cards)!='cards') return false;
 					for(var i=0;i<event.cards.length;i++){
 						if(event.cards[i].isInPile()){
 							return true;
@@ -1269,7 +1269,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					'step 0'
 					player.chooseTarget(get.prompt2('xinfu_xunxian'),function(card,player,target){
-						return target!=player&&target.countCards('h')>player.countCards('h');
+						if(target==player) return false;
+						return target.countCards('h')>player.countCards('h')||Math.max(0,target.hp)>Math.max(0,player.hp);
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(att<3) return 0;
@@ -1483,6 +1484,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_taishici:['re_sp_taishici','sp_taishici'],
 			mazhong:['mazhong','re_mazhong'],
 			wenpin:['re_wenpin','wenpin'],
+			liuyan:['jsrg_liuyan','liuyan'],
 		},
 		translate:{
 			xinghuoliaoyuan:'星火燎原',
@@ -1553,7 +1555,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_guanchao":"观潮",
 			"xinfu_guanchao_info":"出牌阶段开始时，你可以选择获得一项效果直到回合结束：1.当你使用牌时，若你此阶段使用过的所有牌的点数为递增，你摸一张牌；2.当你使用牌时，若你此阶段使用过的所有牌的点数为递减，你摸一张牌。",
 			"xinfu_xunxian":"逊贤",
-			"xinfu_xunxian_info":"每名其他角色的回合限一次，当你使用或打出的牌结算完成后，你可以将其对应的所有实体牌交给一名手牌数大于你的角色。",
+			"xinfu_xunxian_info":"每回合限一次。当你使用或打出的牌结算完成后，你可以将其对应的所有实体牌交给一名手牌数或体力值大于你的角色。",
 			"xinfu_kannan":"戡难",
 			"xinfu_kannan_info":"出牌阶段限X次，你可以与一名本回合内未成为过〖戡难〗目标的角色拼点。若你赢，你使用的下一张【杀】的伤害值基数+1，且你本回合内不能再发动〖戡难〗。若你没赢，其使用的下一张【杀】的伤害值基数+1。（X为你的体力值）。",
 			"kannan_eff":"戡难",

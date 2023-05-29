@@ -28,21 +28,365 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_liubei:['male','shu',4,['sbrende','sbzhangwu','sbjijiang'],['zhu']],
 			sb_jiangwei:['male','shu','4/4/1',['sbtiaoxin','sbzhiji']],
 			sb_fazheng:['male','shu',3,['sbxuanhuo','sbenyuan']],
-			sb_chengong:['male','qun',3,['sbmingce','sbzhichi'],['unseen']],
-			sb_diaochan:['female','qun',3,['sblijian','sbbiyue'],['unseen']],
-			sb_yuanshao:['male','qun',4,['sbluanji','sbxueyi'],['zhu','unseen']],
-			sb_pangtong:['male','shu',3,['sblianhuan','sbniepan'],['unseen']],
+			sb_chengong:['male','qun',3,['sbmingce','sbzhichi']],
+			sb_diaochan:['female','qun',3,['sblijian','sbbiyue']],
+			sb_yuanshao:['male','qun',4,['sbluanji','sbxueyi'],['zhu']],
+			sb_pangtong:['male','shu',3,['sblianhuan','sbniepan']],
+			sb_sunce:['male','wu','2/4',['sbjiang','sbhunzi','sbzhiba'],['zhu','unseen']],
+			sb_daqiao:['female','wu',3,['sbguose','sbliuli'],['unseen']],
+			sb_liubiao:['male','qun',3,['sbzishou','sbzongshi'],['unseen']],
 		},
 		characterSort:{
 			sb:{
-				sb_zhi:['sb_sunquan','sb_zhouyu','sb_zhangjiao','sb_caocao','sb_zhenji','sb_liubei'],
+				sb_zhi:['sb_sunquan','sb_zhouyu','sb_zhangjiao','sb_caocao','sb_zhenji','sb_liubei','sb_daqiao','sb_liubiao'],
 				sb_shi:['sb_xuhuang','sb_machao','sb_fazheng','sb_chengong','sb_pangtong'],
-				sb_tong:['liucheng','sp_yangwan','sb_xiahoushi','sb_zhangfei','sb_zhaoyun'],
+				sb_tong:['liucheng','sp_yangwan','sb_xiahoushi','sb_zhangfei','sb_zhaoyun','sb_sunce'],
 				sb_yu:['sb_yujin','sb_lvmeng','sb_huangzhong','sb_huanggai','sb_zhouyu','sb_caoren','sb_ganning'],
 				sb_neng:['sb_huaxiong','sb_sunshangxiang','sb_jiangwei','sb_diaochan','sb_yuanshao'],
 			}
 		},
 		skill:{
+			//阿笨
+			sbjiang:{
+				audio:2,
+				trigger:{
+					player:'useCardToPlayered',
+					target:'useCardToTargeted',
+				},
+				shaRelated:true,
+				filter:function(event,player){
+					if(!(event.card.name=='juedou'||(event.card.name=='sha'&&get.color(event.card)=='red'))) return false;
+					return true;
+				},
+				frequent:true,
+				onremove:true,
+				group:['sbjiang_add','sbjiang_qiben'],
+				content:function(){
+					player.draw();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(card.name=='sha'&&get.color(card)=='red') return [1,0.6];
+						},
+						player:function(card,player,target){
+							if(card.name=='sha'&&get.color(card)=='red') return [1,1];
+						}
+					}
+				},
+				subSkill:{
+					add:{
+						audio:'sbjiang',
+						trigger:{player:'useCard2'},
+						direct:true,
+						filter:function(event,player){
+							if(event.card.name!='juedou') return false;
+							var info=get.info(event.card);
+							if(info.allowMultiple==false) return false;
+							if(event.targets&&!info.multitarget){
+								if(game.hasPlayer(function(current){
+									return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
+								})){
+									return true;
+								}
+							}
+							return false;
+						},
+						content:function(){
+							'step 0'
+							var prompt2='为'+get.translation(trigger.card)+'额外指定一个目标，然后失去1点体力';
+							player.chooseTarget(get.prompt('sbjiang_add'),function(card,player,target){
+								var player=_status.event.player;
+								if(_status.event.targets.contains(target)) return false;
+								return lib.filter.targetEnabled2(_status.event.card,player,target);
+							}).set('prompt2',prompt2).set('ai',function(target){
+								var trigger=_status.event.getTrigger();
+								var player=_status.event.player;
+								var eff=get.effect(target,trigger.card,player,player);
+								if(player.hasZhuSkill('sbzhiba')&&!player.hasMark('sbjiang')) return eff;
+								if(eff+get.effect(player,{name:'losehp'},player)/8>0) return eff;
+								return 0;
+							}).set('targets',trigger.targets).set('card',trigger.card);
+							'step 1'
+							if(result.bool){
+								if(!event.isMine()&&!event.isOnline()) game.delayx();
+								event.targets=result.targets;
+							}
+							else{
+								event.finish();
+							}
+							'step 2'
+							if(event.targets){
+								player.logSkill('sbjiang_add',event.targets);
+								trigger.targets.addArray(event.targets);
+								player.loseHp();
+							}
+						}
+					},
+					qiben:{
+						audio:'sbjiang',
+						enable:'phaseUse',
+						viewAs:{name:'juedou'},
+						filterCard:true,
+						position:'h',
+						selectCard:-1,
+						prompt:function(){
+							var player=_status.event.player;
+							var limit=(player.hasMark('sbjiang')?(game.countPlayer(current=>{
+								return current.group=='wu'&&current!=player;
+							})+1):1);
+							return '出牌阶段限'+get.cnNumber(limit)+'次。你可以将所有手牌当【决斗】使用';
+						},
+						filter:function(event,player){
+							var limit=player.hasMark('sbjiang')?(game.countPlayer(current=>{
+								return current.group=='wu'&&current!=player;
+							})+1):1;
+							if((player.getStat('skill').sbjiang_qiben||0)>=limit) return false;
+							var hs=player.getCards('h');
+							if(!hs.length) return false;
+							for(var i=0;i<hs.length;i++){
+								var mod2=game.checkMod(hs[i],player,'unchanged','cardEnabled2',player);
+								if(mod2===false) return false;
+							}
+							return event.filterCard(get.autoViewAs({name:'juedou'},hs));
+						},
+					}
+				},
+			},
+			sbhunzi:{
+				audio:2,
+				trigger:{player:'dyingAfter'},
+				juexingji:true,
+				forced:true,
+				skillAnimation:true,
+				animationColor:'wood',
+				derivation:['sbyingzi','gzyinghun'],
+				content:function(){
+					'step 0'
+					player.awakenSkill('sbhunzi');
+					player.loseMaxHp();
+					'step 1'
+					player.changeHujia(2,null,true);
+					'step 2'
+					player.draw(3);
+					'step 3'
+					player.addSkillLog('sbyingzi');
+					player.addSkillLog('gzyinghun');
+				},
+				ai:{
+					threaten:function(player,target){
+						if(target.hp==1) return 2;
+						return 0.5;
+					},
+					maixie:true,
+					effect:{
+						target:function(card,player,target){
+							if(!target.hasFriend()||target.hp>1) return;
+							if(get.tag(card,'damage')==1&&(target.hasZhuSkill('sbzhiba')||player.countCards('hs','tao')+target.countCards('hs',['tao','jiu'])>0)&&
+							!target.isTurnedOver()&&_status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
+						}
+					}
+				}
+			},
+			sbzhiba:{
+				audio:2,
+				trigger:{player:'dying'},
+				filter:function(event,player){
+					if(!player.hasZhuSkill('sbzhiba')) return false;
+					return player.hp<=0;
+				},
+				zhuSkill:true,
+				limited:true,
+				skillAnimation:true,
+				animationColor:'wood',
+				content:function(){
+					'step 0'
+					player.awakenSkill('sbzhiba');
+					var num=game.countPlayer(current=>current.group=='wu');
+					if(num>0) player.recover(num);
+					player.addMark('sbjiang',1,false);
+					event.targets=game.filterPlayer(current=>{
+						return current.group=='wu'&&current!=player;
+					}).sortBySeat(_status.currentPhase);
+					player.addTempSkill('sbzhiba_draw');
+					'step 1'
+					var target=targets.shift();
+					target.damage('nosource');
+					if(targets.length) event.redo();
+				},
+				subSkill:{
+					draw:{
+						trigger:{global:'dieAfter'},
+						filter:function(event,player){
+							return event.getParent(4).name=='sbzhiba';
+						},
+						forced:true,
+						charlotte:true,
+						content:function(){
+							player.draw(3);
+						}
+					}
+				}
+			},
+			//大乔
+			sbguose:{
+				audio:2,
+				enable:'phaseUse',
+				usable:4,
+				discard:false,
+				lose:false,
+				delay:false,
+				filter:function(event,player){
+					return player.countCards('hes',{suit:'diamond'})>0;
+				},
+				position:'hes',
+				filterCard:{suit:'diamond'},
+				selectCard:[0,1],
+				filterTarget:function(card,player,target){
+					if(!ui.selected.cards.length){
+						if(target.hasJudge('lebu')) return true;
+						return false;
+					}
+					if(player==target) return false;
+					var mod=game.checkMod(ui.selected.cards[0],player,'unchanged','cardEnabled2',player);
+					if(!mod) return false;
+					return player.canUse({name:'lebu',cards:ui.selected.cards},target);
+				},
+				check:function(card){
+					return 7-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					if(target.hasJudge('lebu')){
+						target.discard(target.getJudge('lebu'));
+					}
+					else{
+						player.useCard({name:'lebu'},target,cards).audio=false;
+					}
+					'step 1'
+					player.draw();
+					player.chooseToDiscard(true,'he','国色：请弃置一张牌');
+				},
+				ai:{
+					result:{
+						target:function(player,target){
+							if(target.hasJudge('lebu')) return -get.effect(target,{name:'lebu'},player,target);
+							return get.effect(target,{name:'lebu'},player,target);
+						}
+					},
+					order:9,
+				}
+			},
+			sbliuli:{
+				audio:2,
+				inherit:'liuli',
+				group:'sbliuli_heart',
+				subSkill:{
+					heart:{
+						trigger:{player:'logSkill'},
+						filter:function(event,player){
+							if(event.skill!='sbliuli') return false;
+							if(player.hasSkill('sbliuli_used')) return false;
+							var evt=event.log_event;
+							return player.hasHistory('lose',evtx=>{
+								return evtx.getParent(2)==evt&&get.suit(evtx.cards[0])=='heart';
+							});
+						},
+						content:function(){
+							'step 0'
+							var sourcex=trigger.log_event.getTrigger().player;
+							player.chooseTarget('流离：是否令一名不为'+get.translation(sourcex)+'的其他角色获得“流离”标记？',(card,player,target)=>{
+								return target!=player&&target!=_status.event.sourcex;
+							}).set('ai',target=>{
+								return get.attitude(_status.event.player,target);
+							}).set('sourcex',sourcex);
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.line(target,'green');
+								game.player.forEach(i=>i.removeSkill('sbliuli_dangxian'));
+								target.addSkill('sbliuli_dangxian');
+								player.addTempSkill('sbliuli_used');
+							}
+						}
+					},
+					used:{charlotte:true},
+					dangxian:{
+						trigger:{player:'phaseBegin'},
+						forced:true,
+						charlotte:true,
+						mark:true,
+						marktext:'流',
+						intro:{content:'回合开始时，执行一个额外的出牌阶段'},
+						content:function(){
+							var next=player.phaseUse();
+							event.next.remove(next);
+							trigger.next.push(next);
+							player.removeSkill('sbliuli_dangxian');
+						}
+					}
+				}
+			},
+			//刘表
+			sbzishou:{
+				audio:2,
+				trigger:{global:'phaseJieshuBegin'},
+				filter:function(event,player){
+					if(player==event.player) return false;
+					if(!event.player.countCards('he')) return false;
+					return !event.player.hasAllHistory('sourceDamage',evt=>{
+						return evt.player==player;
+					})&&!event.player.hasAllHistory('damage',evt=>{
+						return evt.source==player;
+					});
+				},
+				forced:true,
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					trigger.player.chooseCard(true,get.translation(player)+'对你发动了【自守】','交给其一张牌','he');
+					'step 1'
+					if(result.bool){
+						trigger.player.give(result.cards,player);
+					}
+				},
+				ai:{
+					threaten:3,
+				}
+			},
+			sbzongshi:{
+				audio:2,
+				trigger:{player:'damageEnd'},
+				filter:function(event,player){
+					if(!event.source||!event.source.isIn()) return false;
+					return !player.getStorage('sbzongshi').contains(event.source);
+				},
+				forced:true,
+				onremove:true,
+				logTarget:'source',
+				content:function(){
+					trigger.source.chooseToDiscard(true,trigger.source.countCards('h'));
+					player.markAuto('sbzongshi',[trigger.source]);
+				},
+				intro:{
+					content:'已扒过目标：$'
+				},
+				ai:{
+					threaten:0.5,
+					effect:{
+						target:function(card,player,target,current){
+							if(!get.tag(card,'damage')) return;
+							var cards=player.getCards('h');
+							if(!target.hasFriend()) return;
+							var value=cards.reduce((p,c)=>{
+								return p+get.value(c);
+							});
+							if(cards.length>5||value>5*cards.length) return [1,0,0,-cards.length/2];
+							return [1,0,0,-0.5];
+						}
+					}
+				}
+			},
 			//貂蝉
 			sblijian:{
 				audio:2,
@@ -66,6 +410,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target.canUse(card,targetx)) target.useCard(card,targetx);
 				},
 				ai:{
+					threaten:3,
 					order:7,
 					result:{target:-1}
 				}
@@ -246,10 +591,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(!player.needsToDiscard(-1)){
 						if(targets.length>=7){
-							if(num<2) return 0;
+							if(num<1) return 0;
 						}
 						else if(targets.length>=5){
-							if(num<1.5) return 0;
+							if(num<0.5) return 0;
 						}
 					}
 					return 6-get.value(card);
@@ -364,6 +709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							if(!trigger.card.storage) trigger.card.storage={};
 							trigger.card.storage.sblianhuan=true;
+							trigger._sblianhuan=true;
 							player.addTempSkill('sblianhuan_discard','phaseUseAfter');
 						}
 					},
@@ -402,7 +748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						content:function(){
 							'step 0'
-							player.chooseTarget(get.prompt('sblianhuan_add'),'为'+get.translation(trigger.card)+'额外指定任意个目标',function(card,player,target){
+							player.chooseTarget(get.prompt('sblianhuan_add'),'为'+get.translation(trigger.card)+'额外指定任意个目标',[1,Infinity],function(card,player,target){
 								return !_status.event.sourcex.contains(target)&&player.canUse(_status.event.card,target);
 							}).set('sourcex',trigger.targets).set('ai',function(target){
 								var player=_status.event.player;
@@ -427,7 +773,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						locked:false,
 						popup:false,
 						filter:function(event,player){
-							return event.isFirstTarget&&event.card.name=='tiesuo'&&player.storage.sblianhuan;
+							return event.isFirstTarget&&event.card.name=='tiesuo'&&player.storage.sblianhuan&&!event.getParent()._sblianhuan;
 						},
 						content:function(){
 							'step 0'
@@ -1868,7 +2214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var card=result.cards[0];
 						target.showCards(card,get.translation(target)+'【洛神】展示');
 						if(get.color(card)=='black'){
-							player.gain(card,target,'giveAuto','bySelf').gaintag.add('sbluoshen');
+							player.gain(card,target,'give','bySelf').gaintag.add('sbluoshen');
 						}
 						else if(get.color(card)=='red'){
 							target.discard(card);
@@ -2478,7 +2824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//周瑜
 			sbyingzi:{
 				audio:2,
-				audioname:['heqi','sunce','gexuan','re_sunben','re_sunce','re_heqi'],
+				audioname:['sb_sunce'],
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				getNum:function(player){
@@ -3780,6 +4126,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(!player.storage.sblianhuan) str+='③当你使用【铁索连环】时，你可以失去1点体力，然后当此牌指定第一个目标后，你随机弃置每名不处于连环状态的目标角色一张手牌。';
 				else str+='③当你使用【铁索连环】时，你可以额外指定任意名角色为目标。④当你使用【铁索连环】指定第一个目标后，你随机弃置每名不处于连环状态的目标角色一张手牌。';
 				return str;
+			},
+			sbjiang:function(player){
+				var str='①当你使用【决斗】或红色【杀】指定目标后，或当你成为【决斗】或红色【杀】的目标后，你摸一张牌。②当你使用【决斗】时，你可以额外指定一名目标，然后你失去1点体力。③出牌阶段限';
+				if(player.countMark('sbjiang')) str+='X次。你可以将所有手牌当【决斗】使用（X为场上其他吴势力角色数+1）。';
+				else str+='一次。你可以将所有手牌当【决斗】使用。';
+				return str;
 			}
 		},
 		translate:{
@@ -3926,6 +4278,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sblianhuan_lv2_info:'①出牌阶段，你可以重铸一张♣手牌。②出牌阶段限一次。你可以将一张♣手牌当【铁索连环】使用。③当你使用【铁索连环】时，你可以额外指定任意名角色为目标。④当你使用【铁索连环】指定第一个目标后，你随机弃置每名不处于连环状态的目标角色一张手牌。',
 			sbniepan:'涅槃',
 			sbniepan_info:'限定技。当你处于濒死状态时，你可以弃置区域里的所有牌，摸三张牌，将体力回复至3点，复原武将牌，然后修改〖连环〗。',
+			sb_sunce:'谋孙策',
+			sbjiang:'激昂',
+			sbjiang_info:'①当你使用【决斗】或红色【杀】指定目标后，或当你成为【决斗】或红色【杀】的目标后，你摸一张牌。②当你使用【决斗】时，你可以额外指定一名目标，然后你失去1点体力。③出牌阶段限一次。你可以将所有手牌当【决斗】使用。',
+			sbhunzi:'魂姿',
+			sbhunzi_info:'觉醒技。当你脱离濒死状态后，你减1点体力上限，获得2点护甲，摸三张牌。然后你获得〖英姿〗和〖英魂〗。',
+			sbzhiba:'制霸',
+			sbzhiba_info:'主公技，限定技。当你进入濒死状态时，你可以回复X点体力并修改〖激昂③〗为“出牌阶段限X次”（X为场上其他吴势力角色数+1）。然后其他吴势力角色依次受到1点无来源伤害，且当有角色因此死亡后，你摸三张牌。',
+			sb_daqiao:'谋大乔',
+			sbguose:'国色',
+			sbguose_info:'出牌阶段限四次。你可以选择一项：1.将一张♦牌当【乐不思蜀】使用；2.弃置场上一张【乐不思蜀】。然后你摸一张牌并弃置一张牌。',
+			sbliuli:'流离',
+			sbliuli_info:'当你成为【杀】的目标时，你可以弃置一张牌并选择你攻击范围内的一名不为此【杀】使用者的角色，将此【杀】转移给该角色。若你以此法弃置了♥牌，则你可以令一命不为此【杀】使用者的其他角色获得“流离”标记，且移去场上所有其他的“流离”（每回合限一次）。有“流离”的角色回合开始时，其移去其“流离”并执行一个额外的出牌阶段。',
+			sb_liubiao:'谋刘表',
+			sbzishou:'自守',
+			sbzishou_info:'锁定技。其他角色的结束阶段，若其与你于本局游戏内均未对对方造成过伤害，其须交给你一张牌。',
+			sbzongshi:'宗室',
+			sbzongshi_info:'锁定技。每名角色限一次。当你受到伤害后，你令伤害来源弃置所有手牌。',
 
 			sb_zhi:'谋攻篇·知',
 			sb_shi:'谋攻篇·识',

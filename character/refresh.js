@@ -13,13 +13,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang2:['re_madai','re_wangyi','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao','re_xunyou','re_guanzhang'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','dc_liru','re_manchong','re_fuhuanghou','re_guanping','re_liufeng'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','dc_chenqun','re_caifuren','re_guyong','re_jushou','re_zhuhuan'],
-				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen'],
+				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen','re_zhuzhi'],
 				refresh_yijiang6:['re_guohuanghou','re_sundeng'],
 				refresh_xinghuo:['re_duji','dc_gongsunzan','re_sp_taishici','re_caiyong','re_mazhong','re_wenpin'],
 			},
 		},
 		connect:true,
 		character:{
+			re_zhuzhi:['male','wu',4,['reanguo']],
 			dc_caozhi:['male','wei',3,['reluoying','dcjiushi']],
 			ol_huangzhong:['male','shu',4,['xinliegong','remoshi']],
 			re_wenpin:['male','wei',5,['rezhenwei'],['unseen']],
@@ -157,6 +158,86 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//朱治
+			reanguo:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:lib.filter.notMe,
+				content:function(){
+					'step 0'
+					if(target.isMinHandcard()){
+						target.draw();
+						event.h=true;
+					}
+					'step 1'
+					if(target.isMinHp()&&target.isDamaged()){
+						target.recover();
+						event.hp=true;
+					}
+					'step 2'
+					var equip=get.cardPile(function(card){
+						return get.type(card)=='equip'&&target.hasUseTarget(card);
+					});
+					if(target.isMinEquip()&&equip){
+						target.chooseUseTarget(equip,'nothrow','nopopup',true);
+						event.e=true;
+					}
+					'step 3'
+					game.updateRoundNumber();
+					if(!event.h&&player.isMinHandcard()){
+						player.draw();
+						event.h=true;
+					}
+					'step 4'
+					if(!event.hp&&player.isMinHp()&&player.isDamaged()){
+						player.recover();
+						event.hp=true;
+					}
+					'step 5'
+					if(!event.e&&player.isMinEquip()){
+						var equip=get.cardPile(function(card){
+							return get.type(card)=='equip'&&player.hasUseTarget(card);
+						});
+						if(equip){
+							player.chooseUseTarget(equip,'nothrow','nopopup',true);
+							event.e=true;
+						}
+					}
+					'step 6'
+					if(event.h&&event.hp&&event.e){
+						player.chooseCard('安国：是否重铸任意张牌？',[1,Infinity],(card,player)=>{
+							var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
+							if(mod!='unchanged') return mod;
+							return true;
+						},'he').set('ai',card=>{
+							return 6-get.value(card);
+						});
+					}
+					else event.finish();
+					'step 7'
+					if(result.bool){
+						player.loseToDiscardpile(result.cards);
+						player.draw(result.cards.length);
+					}
+				},
+				ai:{
+					threaten:1.65,
+					order:9,
+					result:{
+						player:function(player,target){
+							if(get.attitude(player,target)<=0){
+								if(target.isMinHandcard()||target.isMinEquip()||target.isMinHp()) return -1;
+							}
+							var num=0;
+							if(player.isMinHandcard()||target.isMinHandcard()) num++;
+							if(player.isMinEquip()||target.isMinEquip()) num++;
+							if((player.isMinHp()&&player.isDamaged())||(target.isMinHp()&&target.isDamaged())) num+=2.1;
+							return num;
+						}
+					}
+				}
+			},
 			//颜良文丑
 			olshuangxiong:{
 				audio:2,
@@ -1044,7 +1125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var hs=player.getCards('h');
 					if(!hs.length) return false;
-					if((player.getStat('skill').reqice||0) >= player.countMark('reqice_mark')+1) return false;
+					if((player.getStat('skill').reqice||0)>=player.countMark('reqice_mark')+1) return false;
 					for(var i=0; i<hs.length; i++){
 						var mod2=game.checkMod(hs[i],player,'unchanged','cardEnabled2',player);
 						if(mod2===false) return false;
@@ -2251,7 +2332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var history=player.getAllHistory('useCard');
 					var index;
 					if(event) index=history.indexOf(event)-1;
-					else index=history.length-2;
+					else index=history.length-1;
 					if(index>=0) return history[index];
 					return false;
 				},
@@ -14195,6 +14276,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_yanwen:'界颜良文丑',
 			olshuangxiong:'双雄',
 			olshuangxiong_info:'①摸牌阶段结束时，你可以弃置一张牌。若如此做，你本回合内可以将一张与此牌颜色不同的牌当做【决斗】使用。②结束阶段，你从弃牌堆中获得本回合内对你造成伤害的所有牌。',
+			re_zhuzhi:'界朱治',
+			reanguo:'安国',
+			reanguo_info:'出牌阶段限一次。你可以选择一名其他角色，若其：手牌数为全场最少，其摸一张牌；体力值为全场最低，其回复1点体力；装备区内牌数为全场最少，其随机使用一张装备牌。然后若该角色有未执行的效果且你满足条件，你执行之。若你与其执行了全部分支，你可以重铸任意张牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

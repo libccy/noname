@@ -10043,6 +10043,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'die'},
 				forced:true,
 				skillAnimation:true,
+				chargingSkill:true,
 				filter:function(event,player){
 					return player.hp>0;
 				},

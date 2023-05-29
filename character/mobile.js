@@ -1547,6 +1547,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'yijin',
 						trigger:{player:'phaseBegin'},
 						forced:true,
+						check:()=>false,
 						filter:function(event,player){
 							return !lib.skill.yijin.getKane(player).length;
 						},
@@ -3152,7 +3153,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseButton([get.prompt('spyanji'),[['zhengsu_leijin','zhengsu_bianzhen','zhengsu_mingzhi'],'vcard']]).set('ai',()=>Math.random());
+					player.chooseButton([get.prompt('spzhengjun'),[['zhengsu_leijin','zhengsu_bianzhen','zhengsu_mingzhi'],'vcard']]).set('ai',()=>Math.random());
 					'step 1'
 					if(result.bool){
 						player.logSkill('spzhengjun',player);
@@ -5041,6 +5042,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'yinlang',
 				trigger:{player:'phaseBegin'},
 				direct:true,
+				forced:true,
+				locked:false,
 				filter:function(event,player){
 					return !player.hasSkill('yaohu_round')&&game.hasPlayer(function(current){
 						return current.group&&current.group!='unknown';
@@ -6568,11 +6571,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					game.log(player,'移去了所有','#g【备】');
 					player.unmarkSkill('xingqi');
+					player.addTempSkill('xinzifu_limit');
+					player.addMark('xinzifu_limit',1,false);
 				},
 				ai:{
 					neg:true,
 					combo:'xingqi',
 				},
+				subSkill:{
+					limit:{
+						charlotte:true,
+						markimage:'image/card/handcard.png',
+						intro:{
+							content:function(storage,player){
+								var num=-player.countMark('xinzifu_limit');
+								return '手牌上限'+num;
+							}
+						},
+						mod:{
+							maxHandcard:function(player,num){
+								return num-player.countMark('xinzifu_limit');
+							}
+						},
+					}
+				}
 			},
 			mibei:{
 				audio:2,
@@ -17200,7 +17222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ly_piliche:{
 				trigger:{source:'damageSource'},
 				check:function(event,player){
-					return get.attitude(player,event.player)*get.value(event.player.getDiscardableCards(player,'e'),event.player)>0;
+					return get.attitude(player,event.player)*get.value(event.player.getDiscardableCards(player,'e'),event.player)<=0;
 				},
 				filter:function(event,player){
 					return player!=event.player&&event.player.countDiscardableCards(player,'e')>0;
@@ -17821,11 +17843,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_chendong:['tw_chendong','sp_chendong','chendong'],
 			sp_jiangqing:['tw_jiangqing','sp_jiangqing','jiangqing'],
             zhaotongzhaoguang:['dc_zhaotongzhaoguang','zhaotongzhaoguang'],
-            yangbiao:['yangbiao','dc_yangbiao'],
+            yangbiao:['yangbiao','dc_yangbiao','jsrg_yangbiao'],
 			qiaozhou:['yj_qiaozhou','qiaozhou'],
 			sunhanhua:['dc_qiaozhou','sunhanhua'],
 			sp_duyu:['sp_duyu','pk_sp_duyu'],
-			kongrong:['sp_kongrong','kongrong'],
+			kongrong:['sp_kongrong','jsrg_kongrong','kongrong'],
 		},
 		translate:{
 			liuzan:'手杀留赞',
