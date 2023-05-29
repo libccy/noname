@@ -239,6 +239,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 			game.gameDraw(game.zhu,function(player){
 				if(_status.mode=='dianjiang') return 4;
+				if(_status.mode=='normal') return player==game.zhu?3:4;
 				if(_status.mode=='changban') return player==game.fan?5:4;
 				if(player.hasSkill('cuorui')){
 					player.logSkill('cuorui');
@@ -834,7 +835,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},source,name,color);
 					game.log(source,'出场');
 
-					var num=source.maxHp;
+					var num=_status.mode == 'normal' ? 4 : source.maxHp;
 					if(player.hasSkill('cuorui')){
 					player.logSkill('cuorui');
 					num=2+_status.characterChoice[player.identity].length;
