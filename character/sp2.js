@@ -12380,7 +12380,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					mark:{
-						mark:'character',
+						mark:true,
 						intro:{
 							content:'已获得〖怨语〗效果',
 							onunmark:true,
