@@ -827,6 +827,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return lib.skill.oldaili.mod.aiValue.apply(this,arguments);
 					},
 				},
+				charlotte:true,
+				intro:{
+					markcount:function(storage,player){
+						return player.countCards('h',card=>card.addGaintag('oldaili_tag'));
+					},
+					mark:function(dialog,content,player){
+						var cards=player.getCards('h',card=>card.addGaintag('oldaili_tag'));
+						if(cards.length){
+							dialog.addAuto(cards);
+						}
+						else return '无展示牌';
+					},
+				},
 				subSkill:{
 					record:{
 						trigger:{player:'showCardsEnd'},
@@ -838,24 +851,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.broadcastAll(function(cards){
 								cards.forEach(card=>card.addGaintag('oldaili_tag'));
 							},trigger.cards);
-							player.addSkill('oldaili_tag');
 						}
 					},
-					tag:{
-						charlotte:true,
-						intro:{
-							markcount:function(storage,player){
-								return player.countCards('h',card=>card.addGaintag('oldaili_tag'));
-							},
-							mark:function(dialog,content,player){
-								var cards=player.getCards('h',card=>card.addGaintag('oldaili_tag'));
-								if(cards.length){
-									dialog.addAuto(cards);
-								}
-								else return '无展示牌';
-							},
-						}
-					}
 				}
 			},
 			//胡班
