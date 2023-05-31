@@ -32988,21 +32988,43 @@
 			}
 		},
 		exit:function(){
-			if(lib.device=='ios'){
-				game.saveConfig('mode');
-				if(_status){
-					if(_status.reloading) return;
-					_status.reloading=true;
+			//安卓 / ios
+			if(lib.device) {
+				if(lib.device=='ios'){
+					game.saveConfig('mode');
+					if(_status){
+						if(_status.reloading)return;
+						_status.reloading=true;
+					}
+					if(_status.video&&!_status.replayvideo) {
+						localStorage.removeItem(lib.configprefix + 'playbackmode');
+					}
+					window.location.reload();
 				}
-				if(_status.video&&!_status.replayvideo){
-					localStorage.removeItem(lib.configprefix+'playbackmode');
+				else{
+					if(navigator.app&&navigator.app.exitApp){
+						navigator.app.exitApp();
+					}
 				}
-				window.location.reload();
 			}
-			else{
-				if(navigator.app&&navigator.app.exitApp){
-					navigator.app.exitApp();
+			//electron
+			else if(typeof process=='function'){
+				var versions=window.process.versions;
+				var electronVersion=parseFloat(versions.electron);
+				var remote;
+				if(electronVersion>=14){
+					remote=require('@electron/remote');
+				}else{
+					remote=require('electron').remote;
 				}
+				var thisWindow=remote.getCurrentWindow();
+				thisWindow.destroy();
+				window.process.exit();
+			}
+			//网页版
+			else{
+				window.onbeforeunload = null;
+				window.close();
 			}
 		},
 		open:function(url){
