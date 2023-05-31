@@ -803,6 +803,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})%2==0;
 				},
 				group:'oldaili_record',
+				check:function(event,player){
+					if(get.distance(event.player,player,'absolute')==1&&!player.isTurnedOver()) return false;
+					return true;
+				},
 				content:function(){
 					player.turnOver();
 					player.draw(3,'visible').gaintag=['oldaili_tag'];
@@ -834,6 +838,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.broadcastAll(function(cards){
 								cards.forEach(card=>card.addGaintag('oldaili_tag'));
 							},trigger.cards);
+							player.addSkill('oldaili_tag');
+						}
+					},
+					tag:{
+						charlotte:true,
+						intro:{
+							markcount:function(storage,player){
+								return player.countCards('h',card=>card.addGaintag('oldaili_tag'));
+							},
+							mark:function(dialog,content,player){
+								var cards=player.getCards('h',card=>card.addGaintag('oldaili_tag'));
+								if(cards.length){
+									dialog.addAuto(cards);
+								}
+								else return '无展示牌';
+							},
 						}
 					}
 				}
