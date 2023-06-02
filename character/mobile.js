@@ -3274,6 +3274,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					globalTo:function(from,to,distance){
 						if(to.countMark('spshidi')%2==1) return distance+1;
 					},
+					aiOrder:function(player,card,num){
+						if(from.countMark('spshidi')%2==0&&card.name=='sha'&&get.color(card)=='black') return num+0.1;
+					},
 				},
 				mark:true,
 				marktext:'☯',

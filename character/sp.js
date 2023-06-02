@@ -827,13 +827,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return lib.skill.oldaili.mod.aiValue.apply(this,arguments);
 					},
 				},
-				charlotte:true,
+				mark:true,
+				marktext:'砺',
 				intro:{
 					markcount:function(storage,player){
-						return player.countCards('h',card=>card.addGaintag('oldaili_tag'));
+						return player.countCards('h',card=>card.hasGaintag('oldaili_tag'));
 					},
 					mark:function(dialog,content,player){
-						var cards=player.getCards('h',card=>card.addGaintag('oldaili_tag'));
+						var cards=player.getCards('h',card=>card.hasGaintag('oldaili_tag'));
 						if(cards.length){
 							dialog.addAuto(cards);
 						}

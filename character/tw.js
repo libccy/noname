@@ -705,6 +705,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refuseInfo:['不给','拒绝'],
 				subSkill:{
 					want:{
+						audio:'twkaizeng',
+						forceaudio:true,
 						enable:'phaseUse',
 						usable:1,
 						charlotte:true,
@@ -799,7 +801,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											target.give(cards,player);
 										}
 										else{
-											var refuseInfo=lib.skill.twkaizeng.refuseInfo;
+											var refuseInfo=lib.skill.twkaizeng.refuseInfo.slice();
 											if(get.attitude(target,player)<0) refuseInfo.push('没门');
 											target.chat(refuseInfo.randomGet());
 											event.finish();
