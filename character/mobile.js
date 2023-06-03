@@ -3274,6 +3274,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					globalTo:function(from,to,distance){
 						if(to.countMark('spshidi')%2==1) return distance+1;
 					},
+					aiOrder:function(player,card,num){
+						if(from.countMark('spshidi')%2==0&&card.name=='sha'&&get.color(card)=='black') return num+0.1;
+					},
 				},
 				mark:true,
 				marktext:'☯',
@@ -6016,7 +6019,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xingbu:{
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
-				prompt2:'展示牌堆顶的三张牌，并根据其中红色牌的数量，令一名其他角色获得一种效果',
+				prompt2:'展示牌堆顶的三张牌，并可以根据其中红色牌的数量，令一名其他角色获得一种效果',
 				check:function(event,player){
 					return game.hasPlayer(function(current){
 						return current!=player&&get.attitude(player,current)>0;
@@ -6037,7 +6040,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i of cards){
 						if(get.color(i,false)=='red') num++;
 					}
-					player.chooseTarget('选择一名其他角色获得星卜效果（'+get.cnNumber(num)+'张）',lib.filter.notMe,true).set('ai',function(target){
+					player.chooseTarget('是否选择一名其他角色获得星卜效果（'+get.cnNumber(num)+'张）？',lib.filter.notMe).set('ai',function(target){
 						var player=_status.event.player,num=_status.event.getParent().num;
 						var att=get.attitude(player,target);
 						if(num<3) att*=(-1);
@@ -18472,7 +18475,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiming:'知命',
 			zhiming_info:'准备阶段开始时或弃牌阶段结束时，你摸一张牌，然后可以将一张牌置于牌堆顶。',
 			xingbu:'星卜',
-			xingbu_info:'结束阶段，你可以展示牌堆顶的三张牌，然后根据X值（X为这三张牌中红色牌的数量），令一名其他角色获得对应的效果直到其下回合结束：①三张：其摸牌阶段多摸两张牌，使用【杀】的次数上限+1。②两张：其使用【杀】的次数上限-1，跳过弃牌阶段。③小于两张：其于准备阶段开始时弃置一张手牌。',
+			xingbu_info:'结束阶段，你可以展示牌堆顶的三张牌，然后你可以根据X值（X为这三张牌中红色牌的数量），令一名其他角色获得对应的效果直到其下回合结束：①三张：其摸牌阶段多摸两张牌，使用【杀】的次数上限+1。②两张：其使用【杀】的次数上限-1，跳过弃牌阶段。③小于两张：其于准备阶段开始时弃置一张手牌。',
 			yuanqing:'渊清',
 			yuanqing_info:'锁定技，出牌阶段结束时，你随机将弃牌堆中你本阶段使用过的牌类型的各一张牌置于仁库中。', 
 			shuchen:'疏陈',

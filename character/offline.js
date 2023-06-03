@@ -1800,7 +1800,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var targets=game.filterPlayer(current=>{
 						return !current.hasMark('jsrgzhenglve_mark');
 					});
-					if(!targets.length) event._result={bool:true};
+					if(!targets.length) event.finish();
 					else if(targets.length<=num) event._result={bool:true,targets:targets};
 					else player.chooseTarget('令'+get.cnNumber(num)+'名角色获得“猎”标记',true,num,(card,player,target)=>{
 						return !target.hasMark('jsrgzhenglve_mark');

@@ -1388,6 +1388,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.addSkill('xinzhaofu_effect');
 					target.markAuto('xinzhaofu_effect',[player]);
 				},
+				ai:{
+					order:9,
+					result:{
+						target:function(player,target){
+							var targets=game.filterPlayer(function(current){
+								return current.group=='wu'&&get.attitude(player,current)>0;
+							});
+							if(targets.length){
+								for(var targetx of targets){
+									if(!targetx.inRange(target)) return -1;
+								}
+								return -0.5;
+							}
+							return 0;
+						}
+					}
+				},
 				subSkill:{
 					effect:{
 						charlotte:true,
