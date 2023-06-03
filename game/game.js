@@ -46585,7 +46585,15 @@
 					for(var i=0;i<hs.length;i++){
 						hs[i].goto(ui.special);
 					}
-					hs.sort(function(b,a){
+					if(game.me.hasSkillTag('sortCardByNum')){
+						var getn=function(card){
+							var num=get.number(card,game.me);
+							if(num<3) return 13+num;
+							return num;
+						}
+						hs.sort((a,b)=>(getn(b)-getn(a)));
+					}
+					else hs.sort(function(b,a){
 						if(a.name!=b.name) return lib.sort.card(a.name,b.name);
 						else if(a.suit!=b.suit) return lib.suit.indexOf(a)-lib.suit.indexOf(b);
 						else return a.number-b.number;
