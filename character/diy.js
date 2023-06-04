@@ -17863,6 +17863,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			saya_nodis:'破围',
 			//〖破围〗不会因为〖铁骑〗无效
 			inari_baiwei:'摆尾',
+			inari_baiwei_draw:'摆尾',
 			inari_baiwei_info:'你可以将一张♦牌当做任意基本牌使用或打出。此牌结算完成后，你摸一张牌。',
 			//你不能以此法使用【毒】
 			inari_baiwei_backup:'摆尾',

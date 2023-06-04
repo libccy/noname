@@ -12058,13 +12058,23 @@
 						if(!fullskills.contains(event.skill)){
 							var info=get.info(event.skill);
 							var hidden=player.hiddenSkills.slice(0);
+							var invisible=player.invisibleSkills.slice(0);
 							game.expandSkills(hidden);
+							game.expandSkills(invisible);
 							if(hidden.contains(event.skill)){
 								if(!info.silent&&player.hasSkillTag('nomingzhi',false,null,true)){
 									event.finish();
 								}
 								else if(!info.direct){
 									event.trigger('triggerHidden');
+								}
+								else{
+									event.skillHidden=true;
+								}
+							}
+							else if(invisible.contains(event.skill)){
+								if(!info.direct){
+									event.trigger('triggerInvisible');
 								}
 								else{
 									event.skillHidden=true;
@@ -15799,7 +15809,7 @@
 						player.markSkill(roundname);
 					}
 					var name=event.skill;
-					var players=player.getSkills(null,false,false);
+					var players=player.getSkills(false,false,false);
 					var equips=player.getSkills('e');
 					var global=lib.skill.global.slice(0);
 					var logInfo={
@@ -15808,14 +15818,14 @@
 						event:_status.event,
 					};
 					if(info.sourceSkill){
-						logInfo.sourceSkill=name;
-						if(global.contains(name)){
+						logInfo.sourceSkill=info.sourceSkill;
+						if(global.contains(info.sourceSkill)){
 							logInfo.type='global';
 						}
-						else if(players.contains(name)){
+						else if(players.contains(info.sourceSkill)){
 							logInfo.type='player';
 						}
-						else if(equips.contains(name)){
+						else if(equips.contains(info.sourceSkill)){
 							logInfo.type='equip';
 						}
 					}
@@ -19540,6 +19550,7 @@
 						skills.add(i);
 					}
 					if(arg2) skills.addArray(this.hiddenSkills);
+					if(arg2===false||arg2=='invisible') skills.addArray(this.invisibleSkills);
 					if(arg3!==false) skills.addArray(es);
 					for(var i in this.forbiddenSkills){
 						skills.remove(i);
@@ -22294,7 +22305,7 @@
 					}
 					if(info){
 						var player=this;
-						var players=player.getSkills(null,false,false);
+						var players=player.getSkills(false,false,false);
 						var equips=player.getSkills('e');
 						var global=lib.skill.global.slice(0);
 						var logInfo={
@@ -22303,14 +22314,14 @@
 							event:_status.event,
 						};
 						if(info.sourceSkill){
-							logInfo.sourceSkill=name;
-							if(global.contains(name)){
+							logInfo.sourceSkill=info.sourceSkill;
+							if(global.contains(info.sourceSkill)){
 								logInfo.type='global';
 							}
-							else if(players.contains(name)){
+							else if(players.contains(info.sourceSkill)){
 								logInfo.type='player';
 							}
-							else if(equips.contains(name)){
+							else if(equips.contains(info.sourceSkill)){
 								logInfo.type='equip';
 							}
 						}
@@ -23011,6 +23022,41 @@
 					this.popup(skill);
 					game.log(this,'获得了技能','#g【'+get.translation(skill)+'】');
 				},
+				addInvisibleSkill:function(skill){
+					if(Array.isArray(skill)){
+						for(var i=0;i<skill.length;i++){
+							this.addInvisibleSkill(skill[i]);
+						}
+					}
+					else{
+						if(this.invisibleSkills.contains(skill)) return;
+						var info=lib.skill[skill];
+						if(!info) return;
+						this.invisibleSkills.add(skill);
+						this.addSkillTrigger(skill);
+						if(this.awakenedSkills.contains(skill)){
+							this.awakenSkill(skill);
+							return;
+						}
+					}
+				},
+				removeInvisibleSkill:function(skill){
+					if(!skill) return;
+					if(Array.isArray(skill)){
+						for(var i=0;i<skill.length;i++){
+							this.removeSkill(skill[i]);
+						}
+					}
+					else{
+						var info=lib.skill[skill];
+						if(info&&info.fixed&&arguments[1]!==true) return skill;
+						game.broadcastAll(function(player,skill){
+							player.invisibleSkills.remove(skill);
+						},this,skill);
+						if(!player.hasSkill(skill,true)) player.removeSkill(skill);
+					}
+					return skill;
+				},
 				addSkill:function(skill,checkConflict,nobroadcast,addToSkills){
 					if(Array.isArray(skill)){
 						for(var i=0;i<skill.length;i++){
@@ -23328,6 +23374,7 @@
 						game.broadcastAll(function(player,skill){
 							player.skills.remove(skill);
 							player.hiddenSkills.remove(skill);
+							player.invisibleSkills.remove(skill);
 							delete player.tempSkills[skill];
 							for(var i in player.additionalSkills){
 								player.additionalSkills[i].remove(skill);
@@ -27416,7 +27463,7 @@
 						}
 					}
 				}
-				var fullskills=game.expandSkills(player.getSkills().concat(lib.skill.global));
+				var fullskills=game.expandSkills(player.getSkills(false).concat(lib.skill.global));
 				var info=get.info(skill);
 				if((info.noHidden||get.mode()!='guozhan')&&!fullskills.contains(skill)){
 					return false;
@@ -35184,7 +35231,7 @@
 						skills2=player.getSkills(false,true,false);
 					}
 					else{
-						skills2=player.getSkills(true,true,false);
+						skills2=player.getSkills('invisible',true,false);
 					}
 					skills2=game.filterSkills(skills2.concat(lib.skill.global),player,player.getSkills('e').concat(lib.skill.global));
 					event._skillChoice=[];
@@ -35197,7 +35244,7 @@
 						else if(info.enable=='phaseUse') enable=(event.type=='phase');
 						else if(typeof info.enable=='string') enable=(info.enable==event.name);
 						if(enable){
-							if(!game.expandSkills(player.getSkills().concat(lib.skill.global)).contains(skills2[i])&&(info.noHidden||get.mode()!='guozhan'||player.hasSkillTag('nomingzhi',false,null,true))) enable=false;
+							if(!game.expandSkills(player.getSkills(false).concat(lib.skill.global)).contains(skills2[i])&&(info.noHidden||get.mode()!='guozhan'||player.hasSkillTag('nomingzhi',false,null,true))) enable=false;
 							if(info.filter&&!info.filter(event,player)) enable=false;
 							if(info.viewAs&&typeof info.viewAs!='function'&&event.filterCard&&!event.filterCard(info.viewAs,player,event)) enable=false;
 							if(info.viewAs&&typeof info.viewAs!='function'&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
@@ -47254,6 +47301,7 @@
 				node.phaseNumber=0;
 				node.skipList=[];
 				node.skills=[];
+				node.invisibleSkills=[];
 				node.initedSkills=[];
 				node.additionalSkills={};
 				node.disabledSkills={};
@@ -52741,6 +52789,7 @@
 				skills[i]={
 					skills:lib.playerOL[i].skills,
 					hiddenSkills:lib.playerOL[i].hiddenSkills,
+					invisibleSkills:lib.playerOL[i].invisibleSkills,
 					additionalSkills:lib.playerOL[i].additionalSkills,
 					disabledSkills:lib.playerOL[i].disabledSkills,
 					tempSkills:lib.playerOL[i].tempSkills,
