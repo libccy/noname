@@ -3912,8 +3912,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				delay:false,
 				line:true,
-				direct:true,
-				clearTime:true,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('xinhuangtian');
 				},
@@ -4554,7 +4552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:0.8,
 					effect:{
 						target:function(card,player,target){
-							if(get.tag(card,'damage')){
+							if(get.tag(card,'damage')&&!target.storage.xinzili){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 								if(!target.hasFriend()) return;
 								if(target.hp>=4) return [0.5,get.tag(card,'damage')*2];
@@ -5338,14 +5336,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.card.name!='sha'||event.card.nature!='fire') return false;
 					return game.hasPlayer(function(current){
-						return !event.targets.contains(current)&&player.canUse(event.card,current);
+						return !event.targets.contains(current)&&lib.filter.targetEnabled(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
 					});
 				},
 				direct:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('ollihuo'),'为'+get.translation(trigger.card)+'增加一个目标',function(card,player,target){
-						return !_status.event.sourcex.contains(target)&&player.canUse(_status.event.card,target);
+						return !_status.event.sourcex.contains(target)&&lib.filter.targetInRange(_status.event.card,player,target)&&lib.filter.targetEnabled(_status.event.card,player,target);
 					}).set('sourcex',trigger.targets).set('card',trigger.card).set('ai',function(target){
 						var player=_status.event.player;
 						return get.effect(target,_status.event.card,player,player);
@@ -6003,17 +6001,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToTarget'},
 				direct:true,
 				filter:function(event,player){
-					return event.card.name=='sha';
+					return event.card.name=='sha'&&game.hasPlayer(function(current){
+						return current!=player&&!event.targets.contains(current)&&lib.filter.targetEnabled(event.card,event.player,current);
+					});
 				},
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt2('reqiuyuan'),function(card,player,target){
-						return target!=player&&!_status.event.targets.contains(target)&&_status.event.playerx.canUse('sha',target,false);
+						var evt=_status.event.getTrigger();
+						return target!=player&&!evt.targets.contains(target)&&lib.filter.targetEnabled(evt.card,evt.player,target);
 					}).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
 						return get.effect(target,trigger.card,trigger.player,player)+0.1;
-					}).set('targets',trigger.targets).set('playerx',trigger.player);
+					});
 					"step 1"
 					if(result.bool){
 						var target=result.targets[0];
@@ -13533,7 +13534,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{source:'damageEnd'},
 				locked:true,
-				direct:true,
+				forced:true,
 				filter:function(event,player){
 					if(event.name=='chooseToUse') return player.hasCard(card=>get.suit(card)=='spade','hs');
 					return event.card&&event.card.name=='sha'&&event.getParent(2).jiu==true&&!player.hasSkill('oljiuchi_air');

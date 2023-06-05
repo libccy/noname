@@ -705,6 +705,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refuseInfo:['不给','拒绝'],
 				subSkill:{
 					want:{
+						audio:'twkaizeng',
+						forceaudio:true,
 						enable:'phaseUse',
 						usable:1,
 						charlotte:true,
@@ -761,8 +763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return {
 									audio:'twkaizeng',
 									type:result.control,
-									direct:true,
-									clearTime:true,
+									log:false,
 									delay:false,
 									filterTarget:function(card,player,target){
 										return target.hasSkill('twkaizeng');
@@ -799,7 +800,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											target.give(cards,player);
 										}
 										else{
-											var refuseInfo=lib.skill.twkaizeng.refuseInfo;
+											var refuseInfo=lib.skill.twkaizeng.refuseInfo.slice();
 											if(get.attitude(target,player)<0) refuseInfo.push('没门');
 											target.chat(refuseInfo.randomGet());
 											event.finish();
@@ -1778,17 +1779,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						enable:'phaseUse',
 						usable:1,
 						forceaudio:true,
-						filter:function(event,player){
-							var num=1;
-							game.countPlayer2(current=>{
+						onChooseToUse:function(event){
+							if(!game.online){
+								var num=1;
+								game.countPlayer2(current=>{
 								var history=current.actionHistory;
-								for(var i=history.length-1;i>=0;i--){
-									for(var evt of history[i].useSkill){
-										if(evt.skill=='twluannian_global') num++;
+									for(var i=history.length-1;i>=0;i--){
+										for(var evt of history[i].useSkill){
+											if(evt.skill=='twluannian_global') num++;
+										}
+										if(history[i].isRound) break;
 									}
-								}
-							});
-							return player.group=='qun'&&player.countCards('he')>=num&&game.hasPlayer(function(current){
+								});
+								event.set('twluannian_num',num);
+							}
+						},
+						filter:function(event,player){
+							if(!event.twluannian_num) return false;
+							return player.group=='qun'&&player.countCards('he')>=event.twluannian_num&&game.hasPlayer(function(current){
 								var target=current.storage.twxiongzheng_target;
 								return target&&target.isIn()&&current!=player&&current.hasZhuSkill('twluannian',player)
 							})
@@ -1797,31 +1805,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						position:'he',
 						prompt:function(){
 							var player=_status.event.player;
-							var num=1;
-							game.countPlayer2(current=>{
-								var history=current.actionHistory;
-								for(var i=history.length-1;i>=0;i--){
-									for(var evt of history[i].useSkill){
-										if(evt.skill=='twluannian_global') num++;
-									}
-								}
-							});
+							var num=_status.event.twluannian_num
 							var list=game.filterPlayer(function(current){
 								return current.hasZhuSkill('twluannian',player);
 							}).map(i=>i.storage.twxiongzheng_target).sortBySeat();
 							return '弃置'+get.cnNumber(num)+'张牌，对'+get.translation(list)+(list.length>1?'中的一人':'')+'造成1点伤害';
 						},
 						selectCard:function(){
-							var num=1;
-							game.countPlayer2(current=>{
-								var history=current.actionHistory;
-								for(var i=history.length-1;i>=0;i--){
-									for(var evt of history[i].useSkill){
-										if(evt.skill=='twluannian_global') num++;
-									}
-								}
-							});
-							return num;
+							return _status.event.twluannian_num;
 						},
 						complexSelect:true,
 						complexCard:true,
@@ -10262,12 +10253,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				mahouSkill:true,
 				filter:function(event,player){
-					return !player.hasSkill('twzhouzu_mahou')
+					return !player.hasSkill('twzhouzu_mahou');
 				},
 				filterTarget:function(card,player,target){
 					return player!=target;
 				},
-				direct:true,
 				line:false,
 				delay:false,
 				content:function(){

@@ -12058,7 +12058,9 @@
 						if(!fullskills.contains(event.skill)){
 							var info=get.info(event.skill);
 							var hidden=player.hiddenSkills.slice(0);
+							var invisible=player.invisibleSkills.slice(0);
 							game.expandSkills(hidden);
+							game.expandSkills(invisible);
 							if(hidden.contains(event.skill)){
 								if(!info.silent&&player.hasSkillTag('nomingzhi',false,null,true)){
 									event.finish();
@@ -12069,6 +12071,9 @@
 								else{
 									event.skillHidden=true;
 								}
+							}
+							else if(invisible.contains(event.skill)){
+								event.trigger('triggerInvisible');
 							}
 							else{
 								var keep=false;
@@ -12677,7 +12682,7 @@
 					if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(event)){
 						game.modeSwapPlayer(player);
 					}
-					var skills=player.getSkills(true);
+					var skills=player.getSkills('invisible').concat(lib.skill.global);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var info=lib.skill[skills[i]];
@@ -12932,7 +12937,7 @@
 						delete event.dialog;
 						return;
 					}
-					var skills=player.getSkills(true);
+					var skills=player.getSkills('invisible').concat(lib.skill.global);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var info=lib.skill[skills[i]];
@@ -15799,7 +15804,7 @@
 						player.markSkill(roundname);
 					}
 					var name=event.skill;
-					var players=player.getSkills(null,false,false);
+					var players=player.getSkills(false,false,false);
 					var equips=player.getSkills('e');
 					var global=lib.skill.global.slice(0);
 					var logInfo={
@@ -15808,14 +15813,14 @@
 						event:_status.event,
 					};
 					if(info.sourceSkill){
-						logInfo.sourceSkill=name;
-						if(global.contains(name)){
+						logInfo.sourceSkill=info.sourceSkill;
+						if(global.contains(info.sourceSkill)){
 							logInfo.type='global';
 						}
-						else if(players.contains(name)){
+						else if(players.contains(info.sourceSkill)){
 							logInfo.type='player';
 						}
-						else if(equips.contains(name)){
+						else if(equips.contains(info.sourceSkill)){
 							logInfo.type='equip';
 						}
 					}
@@ -17989,7 +17994,7 @@
 				hasUsableCard:function(name){
 					var player=this;
 					if(player.countCards('hs',name)) return true;
-					var skills=player.getSkills(true).concat(lib.skill.global);
+					var skills=player.getSkills('invisible').concat(lib.skill.global);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var ifo=get.info(skills[i]);
@@ -19540,6 +19545,7 @@
 						skills.add(i);
 					}
 					if(arg2) skills.addArray(this.hiddenSkills);
+					if(arg2===false||arg2=='invisible') skills.addArray(this.invisibleSkills);
 					if(arg3!==false) skills.addArray(es);
 					for(var i in this.forbiddenSkills){
 						skills.remove(i);
@@ -22294,7 +22300,7 @@
 					}
 					if(info){
 						var player=this;
-						var players=player.getSkills(null,false,false);
+						var players=player.getSkills(false,false,false);
 						var equips=player.getSkills('e');
 						var global=lib.skill.global.slice(0);
 						var logInfo={
@@ -22303,14 +22309,14 @@
 							event:_status.event,
 						};
 						if(info.sourceSkill){
-							logInfo.sourceSkill=name;
-							if(global.contains(name)){
+							logInfo.sourceSkill=info.sourceSkill;
+							if(global.contains(info.sourceSkill)){
 								logInfo.type='global';
 							}
-							else if(players.contains(name)){
+							else if(players.contains(info.sourceSkill)){
 								logInfo.type='player';
 							}
-							else if(equips.contains(name)){
+							else if(equips.contains(info.sourceSkill)){
 								logInfo.type='equip';
 							}
 						}
@@ -23011,6 +23017,41 @@
 					this.popup(skill);
 					game.log(this,'获得了技能','#g【'+get.translation(skill)+'】');
 				},
+				addInvisibleSkill:function(skill){
+					if(Array.isArray(skill)){
+						for(var i=0;i<skill.length;i++){
+							this.addInvisibleSkill(skill[i]);
+						}
+					}
+					else{
+						if(this.invisibleSkills.contains(skill)) return;
+						var info=lib.skill[skill];
+						if(!info) return;
+						this.invisibleSkills.add(skill);
+						this.addSkillTrigger(skill);
+						if(this.awakenedSkills.contains(skill)){
+							this.awakenSkill(skill);
+							return;
+						}
+					}
+				},
+				removeInvisibleSkill:function(skill){
+					if(!skill) return;
+					if(Array.isArray(skill)){
+						for(var i=0;i<skill.length;i++){
+							this.removeSkill(skill[i]);
+						}
+					}
+					else{
+						var info=lib.skill[skill];
+						if(info&&info.fixed&&arguments[1]!==true) return skill;
+						game.broadcastAll(function(player,skill){
+							player.invisibleSkills.remove(skill);
+						},this,skill);
+						if(!player.hasSkill(skill,true)) player.removeSkill(skill);
+					}
+					return skill;
+				},
 				addSkill:function(skill,checkConflict,nobroadcast,addToSkills){
 					if(Array.isArray(skill)){
 						for(var i=0;i<skill.length;i++){
@@ -23328,6 +23369,7 @@
 						game.broadcastAll(function(player,skill){
 							player.skills.remove(skill);
 							player.hiddenSkills.remove(skill);
+							player.invisibleSkills.remove(skill);
 							delete player.tempSkills[skill];
 							for(var i in player.additionalSkills){
 								player.additionalSkills[i].remove(skill);
@@ -24227,7 +24269,7 @@
 				},
 				hasWuxie:function(){
 					if(this.countCards('hs','wuxie')) return true;
-					var skills=this.getSkills(true).concat(lib.skill.global);
+					var skills=this.getSkills('invisible').concat(lib.skill.global);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var ifo=get.info(skills[i]);
@@ -26864,7 +26906,7 @@
 						}
 						if(lib.config.compatiblemode){
 							(function(){
-								var skills=player.getSkills(true).concat(lib.skill.global);
+								var skills=player.getSkills('invisible').concat(lib.skill.global);
 								game.expandSkills(skills);
 								for(var i=0;i<skills.length;i++){
 									var info=get.info(skills[i]);
@@ -27416,7 +27458,7 @@
 						}
 					}
 				}
-				var fullskills=game.expandSkills(player.getSkills().concat(lib.skill.global));
+				var fullskills=game.expandSkills(player.getSkills(false).concat(lib.skill.global));
 				var info=get.info(skill);
 				if((info.noHidden||get.mode()!='guozhan')&&!fullskills.contains(skill)){
 					return false;
@@ -32988,21 +33030,43 @@
 			}
 		},
 		exit:function(){
-			if(lib.device=='ios'){
-				game.saveConfig('mode');
-				if(_status){
-					if(_status.reloading) return;
-					_status.reloading=true;
+			//安卓 / ios
+			if(lib.device) {
+				if(lib.device=='ios'){
+					game.saveConfig('mode');
+					if(_status){
+						if(_status.reloading)return;
+						_status.reloading=true;
+					}
+					if(_status.video&&!_status.replayvideo) {
+						localStorage.removeItem(lib.configprefix + 'playbackmode');
+					}
+					window.location.reload();
 				}
-				if(_status.video&&!_status.replayvideo){
-					localStorage.removeItem(lib.configprefix+'playbackmode');
+				else{
+					if(navigator.app&&navigator.app.exitApp){
+						navigator.app.exitApp();
+					}
 				}
-				window.location.reload();
 			}
-			else{
-				if(navigator.app&&navigator.app.exitApp){
-					navigator.app.exitApp();
+			//electron
+			else if(typeof process=='function'){
+				var versions=window.process.versions;
+				var electronVersion=parseFloat(versions.electron);
+				var remote;
+				if(electronVersion>=14){
+					remote=require('@electron/remote');
+				}else{
+					remote=require('electron').remote;
 				}
+				var thisWindow=remote.getCurrentWindow();
+				thisWindow.destroy();
+				window.process.exit();
+			}
+			//网页版
+			else{
+				window.onbeforeunload = null;
+				window.close();
 			}
 		},
 		open:function(url){
@@ -35162,7 +35226,7 @@
 						skills2=player.getSkills(false,true,false);
 					}
 					else{
-						skills2=player.getSkills(true,true,false);
+						skills2=player.getSkills('invisible',true,false);
 					}
 					skills2=game.filterSkills(skills2.concat(lib.skill.global),player,player.getSkills('e').concat(lib.skill.global));
 					event._skillChoice=[];
@@ -35175,7 +35239,7 @@
 						else if(info.enable=='phaseUse') enable=(event.type=='phase');
 						else if(typeof info.enable=='string') enable=(info.enable==event.name);
 						if(enable){
-							if(!game.expandSkills(player.getSkills().concat(lib.skill.global)).contains(skills2[i])&&(info.noHidden||get.mode()!='guozhan'||player.hasSkillTag('nomingzhi',false,null,true))) enable=false;
+							if(!game.expandSkills(player.getSkills(false).concat(lib.skill.global)).contains(skills2[i])&&(info.noHidden||get.mode()!='guozhan'||player.hasSkillTag('nomingzhi',false,null,true))) enable=false;
 							if(info.filter&&!info.filter(event,player)) enable=false;
 							if(info.viewAs&&typeof info.viewAs!='function'&&event.filterCard&&!event.filterCard(info.viewAs,player,event)) enable=false;
 							if(info.viewAs&&typeof info.viewAs!='function'&&info.viewAsFilter&&info.viewAsFilter(player)==false) enable=false;
@@ -35201,7 +35265,7 @@
 					}
 				}
 				var equipskills=[];
-				var ownedskills=player.getSkills(true,false);
+				var ownedskills=player.getSkills('invisible',false);
 				game.expandSkills(ownedskills);
 				for(var i=0;i<skills.length;i++){
 					if(!ownedskills.contains(skills[i])){
@@ -46563,7 +46627,15 @@
 					for(var i=0;i<hs.length;i++){
 						hs[i].goto(ui.special);
 					}
-					hs.sort(function(b,a){
+					if(game.me.hasSkillTag('sortCardByNum')){
+						var getn=function(card){
+							var num=get.number(card,game.me);
+							if(num<3) return 13+num;
+							return num;
+						}
+						hs.sort((a,b)=>(getn(b)-getn(a)));
+					}
+					else hs.sort(function(b,a){
 						if(a.name!=b.name) return lib.sort.card(a.name,b.name);
 						else if(a.suit!=b.suit) return lib.suit.indexOf(a)-lib.suit.indexOf(b);
 						else return a.number-b.number;
@@ -47224,6 +47296,7 @@
 				node.phaseNumber=0;
 				node.skipList=[];
 				node.skills=[];
+				node.invisibleSkills=[];
 				node.initedSkills=[];
 				node.additionalSkills={};
 				node.disabledSkills={};
@@ -52711,6 +52784,7 @@
 				skills[i]={
 					skills:lib.playerOL[i].skills,
 					hiddenSkills:lib.playerOL[i].hiddenSkills,
+					invisibleSkills:lib.playerOL[i].invisibleSkills,
 					additionalSkills:lib.playerOL[i].additionalSkills,
 					disabledSkills:lib.playerOL[i].disabledSkills,
 					tempSkills:lib.playerOL[i].tempSkills,

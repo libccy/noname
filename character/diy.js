@@ -75,6 +75,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			db_key_liyingxia:['female','shu',3,['liyingxia_sanli','liyingxia_zhenjun','liyingxia_wumai'],['doublegroup:shu:key']],
 			key_erika:['female','key','3/3/2',['erika_shisong','erika_yousheng']],
 			key_satomi:['female','key',3,['satomi_luodao','satomi_daohai']],
+			key_iriya:['female','key',3,['iriya_yinji','iriya_haozhi'],['unseen']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -572,9 +573,309 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			iriya_haozhi:{
 				enable:'phaseUse',
 				filterCard:true,
-				selectCard:[1,Infinity],
+				selectCard:[2,Infinity],
+				promptfunc:()=>'出牌阶段，你可以按照斗地主牌型弃置至少两张牌，且其他角色可以依次对其进行一轮响应。最后一名进行响应的角色可以根据对应牌型执行对应效果。',
+				position:'he',
 				getType:function(cards,player){
-					var numbers=cards.map(card=>get.number(card,player));
+					var nums=cards.map(card=>{
+						var num=get.number(card,player);
+						if(num<=2) return num+13;
+						return num;
+					}).sort((a,b)=>(a-b)),len=nums.length;
+					if(len==1) return ['单张',nums[0],1];
+					if(len==2) return nums[1]==nums[0]?['对子',nums[0],1]:null;
+					var map={};
+					for(var i=0;i<len;i++){
+						var count=get.numOf(nums,nums[i]);
+						if(!map[count]) map[count]=[];
+						map[count].push(nums[i]);
+						i+=(count-1);
+					}
+					if(len==3){
+						if(map[3]) return ['三张',nums[0],1];
+						return null;
+					}
+					if(map[len]){
+						return ['炸弹',nums[0],length];
+					}
+					if(map[1]){
+						if(map[1].length==len&&len>4){
+							for(var i=0;i<map[1].length-1;i++){
+							 if(map[1][i+1]-map[1][i]!=1) return null;
+							 if(map[1][i+1]==15) return null;
+							}
+							return ['单顺',nums[0],len];
+						}
+						else if(map[1].length==2&&map[4]&&len==6){
+							return ['四带二',map[4][0],1]
+						}
+						else if(map[3]&&map[1].length==map[3].length&&len==map[1].length*4){
+							if(map[3].length==1) return ['三带一',map[3][0],1];
+							for(var i=0;i<map[3].length-1;i++){
+							 if(map[3][i+1]-map[3][i]!=1) return null;
+							}
+							return ['单带飞机',map[3][0],map[3].length];
+						}
+						return null;
+					}
+					if(map[2]){
+						if(map[2].length*2==len&&len>5){
+							for(var i=0;i<map[2].length-1;i++){
+							 if(map[2][i+1]-map[2][i]!=1) return null;
+							 if(map[2][i+1]==15) return null;
+							}
+							return ['双顺',nums[0],len];
+						}
+						else if(map[4]&&len==6){
+							return ['四带二',map[4][0],1]
+						}
+						else if(map[3]&&map[2].length==map[3].length&&len==map[2].length*5){
+							if(map[3].length==1) return ['三带二',map[3][0],1];
+							for(var i=0;i<map[3].length-1;i++){
+							 if(map[3][i+1]-map[3][i]!=1) return null;
+							 if(map[3][i+1]==15) return null;
+							}
+							return ['双带飞机',map[3][0],map[3].length];
+						}
+						return null;
+					}
+					if(map[3]){
+						if(map[3].length*3==len&&len>5){
+							for(var i=0;i<map[3].length-1;i++){
+							 if(map[3][i+1]-map[3][i]!=1) return null;
+							 if(map[3][i+1]==15) return null;
+							}
+							return ['三顺',nums[0],len];
+						}
+						return null;
+					}
+					return null;
+				},
+				filterOk:function(){
+					return Array.isArray(lib.skill.iriya_haozhi.getType(ui.selected.cards,_status.event.player));
+				},
+				content:function(){
+					'step 0'
+					var players=game.filterPlayer().sortBySeat(player.getNext());
+					event.players=players;
+					event.current=player;
+					event.current_type=lib.skill.iriya_haozhi.getType(cards,player);
+					event.current_cards=cards.slice(0);
+					if(!event.current_type) event.finish();
+					'step 1'
+					var target=event.players.shift();
+					if((target!=player||event.current!=player)&&target.isIn()&&target.countCards('h')>=Math.min(cards.length,4)){
+						event.target=target;
+						target.addTempSkill('iriya_haozhi_temp',{global:['discardBefore','chooseToDiscardEnd','phaseAfter']});
+						var trans=get.translation(event.current);
+						var cardsn=function(cards,player){
+							var getn=(card,player)=>{
+								var num=get.number(card,player);
+								if(num<=2) return num+13;
+								return num;
+							};
+							cards.sort(function(a,b){
+								var numa=getn(a,player),numb=getn(b,player);
+								if(numa!=numb) return numa-numb;
+								return lib.suit.indexOf(get.suit(a,player)-get.suit(b,player));
+							});
+							var str='';
+							for(var i of cards){
+								str+=',';
+								str+=get.strNumber(get.number(i,player));
+								str+=get.translation(get.suit(i,player));
+							}
+							return str.slice(1);
+						}(event.current_cards,event.current);
+						var next=target.chooseToDiscard(
+							'是否响应'+trans+'的'+get.translation(event.current_type[0])+'？',
+							trans+'的牌组为'+cardsn+'。您此时可以点击“整理手牌”，将手牌按点数排序。',[2,Infinity],'he');
+						next.set('type',event.current_type);
+						next.set('filterOk',function(){
+							var type=lib.skill.iriya_haozhi.getType(ui.selected.cards,_status.event.player);
+							if(!type) return false;
+							var ptype=_status.event.type;
+							if(type[0]=='炸弹'){
+								if(ptype[0]=='炸弹'){
+									if(type[2]>ptype[2]) return true;
+									return type[1]>ptype[1]&&type[2]==ptype[2];
+								}
+								return true;
+							}
+							return type[0]==ptype[0]&&type[2]==ptype[2]&&type[1]>ptype[1];
+						});
+					}
+					else if(event.players.length>0) event.redo();
+					else event.goto(3);
+					'step 2'
+					if(result.bool){
+						event.current=target;
+						event.current_type=lib.skill.iriya_haozhi.getType(result.cards.slice(0),target);
+						if(!event.current_type) event.finish();
+					}
+					if(event.players.length>0) event.goto(1);
+					'step 3'
+					var current=event.current,type=0;
+					if(!current.isIn()) return;
+					switch(event.current_type[0]){
+						case '对子':
+							type=1;break;
+						case '三张': case '三带一': case '三带二':
+							type=2;break;
+						case '单顺':
+							type=3;break;
+						case '双顺':
+							type=4;break;
+						case '三顺': case '单带飞机': case '双带飞机':
+							type=5;break;
+						case '炸弹': case'四带二':
+							type=6;break;
+					}
+					if(type==2){
+						current.addSkill('iriya_haozhi_extra');
+						current.addMark('iriya_haozhi_extra',1,false);
+					}
+					else if(type>0){
+						var next=game.createEvent('iriya_haozhi_effect',false);
+						next.player=current;
+						next.setContent(lib.skill.iriya_haozhi['content'+type]);
+					}
+				},
+				content1:function(){
+					'step 0'
+					player.chooseTarget([1,2],'是否令至多两名角色各摸一张牌？');
+					'step 1'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.line(targets);
+						game.asyncDraw(targets);
+						game.delayex();
+					}
+				},
+				content3:function(){
+					'step 0'
+					player.chooseTarget([1,2],'是否对至多两名其他角色造成1点伤害？',lib.filter.notMe);
+					'step 1'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.line(targets);
+						event.targets=targets;
+					}
+					'step 2'
+					var target=targets.shift();
+					target.damage();
+					game.delayex();
+					if(targets.length>0) event.redo();
+				},
+				content4:function(){
+					'step 0'
+					player.chooseTarget([1,2],'是否弃置至多两名其他角色的各一张牌并造成1点伤害？',lib.filter.notMe);
+					'step 1'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.line(targets);
+						event.targets=targets;
+					}
+					'step 2'
+					var target=targets.shift();
+					player.discardPlayerCard(target,true,'he');
+					target.damage();
+					game.delayex();
+					if(targets.length>0) event.redo();
+				},
+				content5:function(){
+					'step 0'
+					player.chooseTarget([1,2],'是否令至多两名其他角色翻面，弃置其的各一张牌并造成1点伤害？',lib.filter.notMe);
+					'step 1'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.line(targets);
+						event.targets=targets;
+					}
+					'step 2'
+					var target=targets.shift();
+					target.turnOver();
+					player.discardPlayerCard(target,true,'e',5);
+					player.discardPlayerCard(target,true,'h');
+					target.damage();
+					game.delayex();
+					if(targets.length>0) event.redo();
+				},
+				content6:function(){
+					'step 0'
+					player.chooseTarget([1,2],'是否令至多两名其他角色翻面，弃置其装备区内的所有牌和一张手牌，并造成1点伤害？',lib.filter.notMe);
+					'step 1'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.line(targets);
+						event.targets=targets;
+					}
+					'step 2'
+					var target=targets.shift();
+					target.turnOver();
+					player.discardPlayerCard(target,true,'he');
+					target.damage();
+					game.delayex();
+					if(targets.length>0) event.redo();
+				},
+				ai:{sortCardByNum:true},
+				subSkill:{
+					extra:{
+						charlotte:true,
+						mod:{
+							targetInRange:()=>true,
+							cardUsable:()=>Infinity,
+						},
+						trigger:{player:'useCard2'},
+						forced:true,
+						onremove:true,
+						content:function(){
+							'step 0'
+							var num=player.countMark('iriya_haozhi_extra');
+							player.removeSkill('iriya_haozhi_extra');
+							var card=trigger.card;
+							if(trigger.addCount!==false){
+								trigger.addCount=false;
+								var stat=player.getStat().card;
+								if(stat[card.name]&&stat[card.name]>0) stat[card.name]--;
+							}
+							var info=get.info(card);
+							if(info.allowMultiple==false) event.finish();
+							if(trigger.targets&&!info.multitarget){
+								if(game.hasPlayer(function(current){
+									return !trigger.targets.contains(current)&&lib.filter.targetEnabled2(card,player,current);
+								})){
+									var prompt2='为'+get.translation(card)+'增加'+(num>1?'至多':'')+get.cnNumber(num)+'个目标'
+									player.chooseTarget(get.prompt('iriya_haozhi_extra'),[1,num],function(card,player,target){
+										var player=_status.event.player;
+										return !_status.event.targets.contains(target)&&lib.filter.targetEnabled2(_status.event.card,player,target);
+									}).set('prompt2',prompt2).set('ai',function(target){
+										var trigger=_status.event.getTrigger();
+										var player=_status.event.player;
+										return get.effect(target,trigger.card,player,player);
+									}).set('card',trigger.card).set('targets',trigger.targets);
+								}
+							}
+							'step 1'
+							if(result.bool){
+								if(!event.isMine()&&!event.isOnline()) game.delayx();
+								event.targets=result.targets;
+							}
+							else{
+								event.finish();
+							}
+							'step 2'
+							if(event.targets){
+								player.logSkill('iriya_haozhi_extra',event.targets);
+								trigger.targets.addArray(event.targets);
+							}
+						},
+						intro:{content:'使用下一张牌无距离和次数限制，且可以增加#个目标'},
+					},
+					temp:{
+						ai:{sortCardByNum:true},
+						charlotte:true,
+					}
 				},
 			},
 			//远野美凪&远野小满
@@ -8498,8 +8799,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				discard:false,
 				line:true,
-				direct:true,
-				clearTime:true,
+				log:false,
 				delay:false,
 				lose:false,
 				prepare:function(cards,player,targets){
@@ -17562,6 +17862,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			saya_nodis:'破围',
 			//〖破围〗不会因为〖铁骑〗无效
 			inari_baiwei:'摆尾',
+			inari_baiwei_draw:'摆尾',
 			inari_baiwei_info:'你可以将一张♦牌当做任意基本牌使用或打出。此牌结算完成后，你摸一张牌。',
 			//你不能以此法使用【毒】
 			inari_baiwei_backup:'摆尾',
@@ -17848,13 +18149,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			iriya_yinji:'殷极',
 			iriya_yinji_info:'锁定技。出牌阶段开始时，你将手牌摸至17张。你不能直接使用以此法获得的牌。',
 			iriya_haozhi:'豪掷',
-			iriya_haozhi_info:'出牌阶段，你可以弃置至少两张牌，然后摸一张牌。根据你以此法弃置的牌，你执行对应的效果。<br>'
-			+'对子：你额外摸一张牌；'
-			+'三带：'
-			+'单顺：'
-			+'双顺：'
-			+'飞机：'
-			+'炸弹：',
+			iriya_haozhi_info:'出牌阶段，你可以按照斗地主牌型弃置至少两张牌，且其他角色可以依次对其进行一轮响应。最后一名进行响应的角色可以根据对应牌型执行对应效果。'
+			+'对子：其可以令至多两名角色各摸一张牌。'
+			+'三带：其使用的下一张牌可以多指定一个目标且无距离和次数限制。'
+			+'单顺：其可以对至多2名其他角色造成1点伤害。'
+			+'双顺：其可以弃置至多2名其他角色的一张牌并对其造成1点伤害。'
+			+'三顺/飞机：其可以令至多2名其他角色翻面，弃置其的一张牌并对其造成1点伤害。'
+			+'炸弹/四带二：其可以令至多2名其他角色翻面，弃置这些角色装备区内的所有牌和一张手牌，对这些角色造成1点伤害。',
 
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',

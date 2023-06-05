@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_hejin:['male','qun',4,['jsrgzhaobing','jsrgzhuhuan','jsrgyanhuo']],
 			jsrg_sunjian:['male','qun',4,['jsrgpingtao','jsrgjuelie']],
 			jsrg_huangfusong:['male','qun',4,['jsrgguanhuo','jsrgjuxia']],
-			jsrg_xushao:['male','qun',3,['jsrgyingmen','jsrgpingjian'],['unseen']],
+			jsrg_xushao:['male','qun',3,['sbyingmen','sbpingjian']],
 			jsrg_dongbai:['female','qun',3,['jsrgshichong','jsrglianzhu']],
 			jsrg_qiaoxuan:['male','qun',3,['jsrgjuezhi','jsrgjizhao']],
 			jsrg_yangbiao:['male','qun','3/4',['jsrgzhaohan','jsrgrangjie','jsrgyizheng']],
@@ -149,8 +149,202 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 		},
+		characterFilter:{
+			jsrg_xushao:function(mode){
+				return mode!='guozhan';
+			},
+		},
 		skill:{
 			//江山如故·起
+			sbyingmen:{
+				forbid:['guozhan'],
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
+				forced:true,
+				filter:function(event,player){
+					return event.name!='phase'||game.phaseNumber==0;
+				},
+				content:function(){
+					if(!_status.characterlist) lib.skill.pingjian.initList();
+					var characters=_status.characterlist.randomRemove(4);
+					lib.skill.sbyingmen.addVisitors(characters,player);
+					game.delayx();
+				},
+				group:'sbyingmen_reload',
+				subSkill:{
+					reload:{
+						trigger:{player:'phaseBegin'},
+						forced:true,
+						locked:false,
+						filter:function(event,player){
+							return player.getStorage('sbyingmen').length<4;
+						},
+						content:function(){
+							if(!_status.characterlist) lib.skill.pingjian.initList();
+							var characters=_status.characterlist.randomRemove(4-player.getStorage('sbyingmen').length);
+							lib.skill.sbyingmen.addVisitors(characters,player);
+							game.delayx();
+						},
+					},
+				},
+				getSkills:function(characters,player){
+					var skills=[];
+					for(var name of characters){
+						if(Array.isArray(lib.character[name])){
+							for(var skill of lib.character[name][3]){
+								var list=get.skillCategoriesOf(skill,player);
+								list.remove('锁定技');
+								if(list.length>0) continue;
+								var info=get.info(skill);
+								if(info&&(!info.unique||info.gainable)) skills.add(skill);
+							}
+						}
+					}
+					return skills;
+				},
+				addVisitors:function(characters,player){
+					player.addSkillBlocker('sbyingmen');
+					game.log(player,'将','#y'+get.translation(characters),'加入了','#g“访客”')
+					lib.skill.rehuashen.drawCharacter(player,characters);
+					player.markAuto('sbyingmen',characters)
+					var storage=player.getStorage('sbyingmen');
+					var skills=lib.skill.sbyingmen.getSkills(storage,player);
+					player.addInvisibleSkill(skills);
+				},
+				removeVisitors:function(characters,player){
+					var skills=lib.skill.sbyingmen.getSkills(characters,player);
+					var characters2=player.getStorage('sbyingmen').slice(0);
+					characters2.removeArray(characters);
+					skills.removeArray(lib.skill.sbyingmen.getSkills(characters2,player));
+					player.unmarkAuto('sbyingmen',characters);
+					_status.characterlist.addArray(characters);
+					player.removeInvisibleSkill(skills);
+				},
+				onremove:function(player,skill){
+					lib.skill.sbyingmen.removeVisitors(player.getSkills('sbyingmen'),player);
+					player.removeSkillBlocker('sbyingmen');
+				},
+				skillBlocker:function(skill,player){
+					if(!player.invisibleSkills.contains(skill)||skill=='sbpingjian'||skill=='sbpingjian') return false;
+					return !player.hasSkill('sbpingjian');
+				},
+				marktext:'客',
+				intro:{
+					name:'访客',
+					mark:function(dialog,storage,player){
+						if(!storage||!storage.length) return '当前没有“访客”';
+						dialog.addSmall([storage,'character']);
+						var skills=lib.skill.sbyingmen.getSkills(storage,player);
+						if(skills.length) dialog.addText('<li>当前可用技能：'+get.translation(skills),false);
+					},
+				},
+			},
+			sbpingjian:{
+				trigger:{player:['useSkillAfter','logSkill']},
+				forced:true,
+				filter:function(event,player){
+					var skill=event.sourceSkill||event.skill;
+					return player.invisibleSkills.contains(skill)&&lib.skill.sbyingmen.getSkills(player.getStorage('sbyingmen'),player).contains(skill);
+				},
+				content:function(){
+					'step 0'
+					var visitors=player.getStorage('sbyingmen').slice(0);
+					var drawers=visitors.filter(function(name){
+						return Array.isArray(lib.character[name])&&lib.character[name][3].contains(trigger.sourceSkill);
+					});
+					event.drawers=drawers;
+					if(visitors.length==1) event._result={bool:true,links:visitors};
+					else{
+						var dialog=['评鉴：请选择移去一张“访客”'];
+						if(drawers.length) dialog.push('<div class="text center">如果移去'+get.translation(drawers)+'，则你摸一张牌</div>');
+						dialog.push([visitors,'character']);
+						player.chooseButton(dialog,true);
+					}
+					'step 1'
+					if(result.bool){
+						lib.skill.sbyingmen.removeVisitors(result.links,player);
+						game.log(player,'移去了','#y'+get.translation(result.links[0]));
+						if(event.drawers.contains(result.links[0])) player.draw();
+					}
+				},
+				group:'sbpingjian_trigger',
+				subSkill:{
+					trigger:{
+						trigger:{player:'triggerInvisible'},
+						forced:true,
+						forceDie:true,
+						popup:false,
+						priority:10,
+						filter:function(event,player){
+							if(event.revealed) return false;
+							var skills=lib.skill.sbyingmen.getSkills(player.getStorage('sbyingmen'),player);
+							game.expandSkills(skills);
+							return skills.contains(event.skill);
+						},
+						content:function(){
+							"step 0"
+							if(get.info(trigger.skill).silent){
+								event.finish();
+							}
+							else{
+								var info=get.info(trigger.skill);
+								var event=trigger,trigger=event._trigger;
+								var str;
+								var check=info.check;
+								if(info.prompt) str=info.prompt;
+								else{
+									if(typeof info.logTarget=='string'){
+										str=get.prompt(event.skill,trigger[info.logTarget],player);
+									}
+									else if(typeof info.logTarget=='function'){
+										var logTarget=info.logTarget(trigger,player);
+										if(get.itemtype(logTarget).indexOf('player')==0) str=get.prompt(event.skill,logTarget,player);
+									}
+									else{
+										str=get.prompt(event.skill,null,player);
+									}
+								}
+								if(typeof str=='function'){str=str(trigger,player)}
+								var next=player.chooseBool('评鉴：'+str);
+								next.set('yes',!info.check||info.check(trigger,player));
+								next.set('hsskill',event.skill);
+								next.set('forceDie',true);
+								next.set('ai',function(){
+									return _status.event.yes;
+								});
+								if(typeof info.prompt2=='function'){
+									next.set('prompt2',info.prompt2(trigger,player));
+								}
+								else if(typeof info.prompt2=='string'){
+									next.set('prompt2',info.prompt2);
+								}
+								else if(info.prompt2!=false){
+									if(lib.dynamicTranslate[event.skill]) next.set('prompt2',lib.dynamicTranslate[event.skill](player,event.skill));
+									else if(lib.translate[event.skill+'_info']) next.set('prompt2',lib.translate[event.skill+'_info']);
+								}
+								if(trigger.skillwarn){
+									if(next.prompt2){
+										next.set('prompt2','<span class="thundertext">'+trigger.skillwarn+'。</span>'+next.prompt2);
+									}
+									else{
+										next.set('prompt2',trigger.skillwarn);
+									}
+								}
+							}
+							"step 1"
+							if(result.bool){
+								trigger.revealed=true;
+							}
+							else{
+								trigger.untrigger();
+								trigger.cancelled=true;
+							}
+						}
+					},
+				},
+			},
 			jsrgchaozheng:{
 				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
@@ -1800,7 +1994,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var targets=game.filterPlayer(current=>{
 						return !current.hasMark('jsrgzhenglve_mark');
 					});
-					if(!targets.length) event._result={bool:true};
+					if(!targets.length) event.finish();
 					else if(targets.length<=num) event._result={bool:true,targets:targets};
 					else player.chooseTarget('令'+get.cnNumber(num)+'名角色获得“猎”标记',true,num,(card,player,target)=>{
 						return !target.hasMark('jsrgzhenglve_mark');
@@ -8286,12 +8480,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgxundao_info:'当你的判定牌生效前，你可以令至多两名角色依次弃置一张牌，然后你选择一张以此法弃置且位于弃牌堆中的牌代替此判定牌。',
 			jsrglinghua:'灵化',
 			jsrglinghua_info:'①准备阶段，你可以进行目标角色为你的【闪电】的特殊的使用流程。若你未因此受到伤害，你可以令一名角色回复1点体力。②结束阶段，你可以进行目标角色为你且判定效果反转的【闪电】的特殊的使用流程。若你未因此受到伤害，你可以对一名角色造成1点雷电伤害。',
+			sbyingmen:'盈门',
+			sbyingmen_info:'锁定技。①游戏开始时，你将武将牌堆中随机四张武将牌置于你的武将牌上，称为“访客”。②回合开始时，若你的“访客”数小于4，你随机从武将牌堆中将“访客”补至四张。',
+			sbpingjian:'评鉴',
+			sbpingjian_info:'你可以于满足你“访客”上的一个无技能标签或仅有锁定技标签的技能条件的时机发动此技能。你发动的技能结算结束后，若此技能位于你的“访客”中，则你选择移去一张“访客”。若移去的是本次发动技能的“访客”，你摸一张牌。',
 
 			offline_star:'桌游志·SP',
 			offline_sticker:'桌游志·贴纸',
 			offline_luanwu:'文和乱武',
 			offline_yongjian:'用间篇',
 			offline_jiangshanruguqi:'江山如故·起',
+			offline_feihongyingxue:'飞鸿映雪',
 			offline_piracyE:'官盗E系列·战役篇',
 			offline_piracyS:'官盗S系列',
 			offline_piracyK:'官盗K系列',

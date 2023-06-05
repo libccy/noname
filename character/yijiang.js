@@ -1388,6 +1388,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.addSkill('xinzhaofu_effect');
 					target.markAuto('xinzhaofu_effect',[player]);
 				},
+				ai:{
+					order:9,
+					result:{
+						target:function(player,target){
+							var targets=game.filterPlayer(function(current){
+								return current.group=='wu'&&get.attitude(player,current)>0;
+							});
+							if(targets.length){
+								for(var targetx of targets){
+									if(!targetx.inRange(target)) return -1;
+								}
+								return -0.5;
+							}
+							return 0;
+						}
+					}
+				},
 				subSkill:{
 					effect:{
 						charlotte:true,
@@ -4340,7 +4357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current.hasSkill('wengua');
 					});
 				},
-				direct:true,
+				log:false,
 				delay:false,
 				filterCard:true,
 				discard:false,
@@ -10914,10 +10931,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldqiuyuan:{
 				audio:'qiuyuan',
 				inherit:'qiuyuan',
+				filter:function(event,player){
+					return event.card.name=='sha'&&game.hasPlayer(function(current){
+						return current!=player&&!event.targets.contains(current)&&current.countCards('h')>0&&lib.filter.targetEnabled(event.card,event.player,current);
+					});
+				},
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt2('oldqiuyuan'),function(card,player,target){
-						return target!=player&&!_status.event.targets.contains(target)&&_status.event.playerx.canUse('sha',target,false)&&target.countCards('h');
+						var evt=_status.event.getTrigger();
+						return target!=player&&!evt.targets.contains(target)&&lib.filter.targetEnabled(evt.card,evt.player,target)&&target.countCards('h')>0;
 					}).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
@@ -10954,12 +10977,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToTarget'},
 				direct:true,
 				filter:function(event,player){
-					return event.card.name=='sha';
+					return event.card.name=='sha'&&game.hasPlayer(function(current){
+						return current!=player&&!event.targets.contains(current)&&lib.filter.targetEnabled(event.card,event.player,current);
+					});
 				},
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt2('qiuyuan'),function(card,player,target){
-						return target!=player&&!_status.event.targets.contains(target)&&_status.event.playerx.canUse('sha',target,false);
+						var evt=_status.event.getTrigger();
+						return target!=player&&!evt.targets.contains(target)&&lib.filter.targetEnabled(evt.card,evt.player,target);
 					}).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
@@ -13047,7 +13073,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				forceaudio:true,
-				direct:true,
 				prompt:'弃置一名有【逆】的角色的两张【逆】，然后视为对包含其在内的角色使用【杀】。',
 				delay:false,
 				log:false,
