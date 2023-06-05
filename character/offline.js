@@ -8490,6 +8490,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			offline_luanwu:'文和乱武',
 			offline_yongjian:'用间篇',
 			offline_jiangshanruguqi:'江山如故·起',
+			offline_feihongyingxue:'飞鸿映雪',
 			offline_piracyE:'官盗E系列·战役篇',
 			offline_piracyS:'官盗S系列',
 			offline_piracyK:'官盗K系列',
