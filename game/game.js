@@ -12073,12 +12073,7 @@
 								}
 							}
 							else if(invisible.contains(event.skill)){
-								if(!info.direct){
-									event.trigger('triggerInvisible');
-								}
-								else{
-									event.skillHidden=true;
-								}
+								event.trigger('triggerInvisible');
 							}
 							else{
 								var keep=false;
@@ -17999,7 +17994,7 @@
 				hasUsableCard:function(name){
 					var player=this;
 					if(player.countCards('hs',name)) return true;
-					var skills=player.getSkills(true).concat(lib.skill.global);
+					var skills=player.getSkills('invisible').concat(lib.skill.global);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var ifo=get.info(skills[i]);
@@ -24274,7 +24269,7 @@
 				},
 				hasWuxie:function(){
 					if(this.countCards('hs','wuxie')) return true;
-					var skills=this.getSkills(true).concat(lib.skill.global);
+					var skills=this.getSkills('invisible').concat(lib.skill.global);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var ifo=get.info(skills[i]);
