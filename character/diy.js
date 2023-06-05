@@ -604,7 +604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							 if(map[1][i+1]-map[1][i]!=1) return null;
 							 if(map[1][i+1]==15) return null;
 							}
-							return ['顺子',nums[0],len];
+							return ['单顺',nums[0],len];
 						}
 						else if(map[1].length==2&&map[4]&&len==6){
 							return ['四带二',map[4][0],1]
