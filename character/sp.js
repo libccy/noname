@@ -13,6 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie'],
 				sp_liesi:['mizhu','weizi','ol_liuba'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
+				sp_waitforsort:['sunhong','luoxian','ol_huban','wangguan'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['wanglang'],
 				sp_tongque:["sp_fuwan","sp_fuhuanghou","sp_jiben"],
@@ -22887,6 +22888,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_guozhan:"国战",
 			sp_guozhan2:"国战移植",
 			sp_others:"其他",
+			sp_waitforsort:'等待分包',
 			sp_single:'新1v1',
 		},
 	};

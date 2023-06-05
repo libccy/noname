@@ -3912,8 +3912,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				delay:false,
 				line:true,
-				direct:true,
-				clearTime:true,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('xinhuangtian');
 				},
@@ -4554,7 +4552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:0.8,
 					effect:{
 						target:function(card,player,target){
-							if(get.tag(card,'damage')){
+							if(get.tag(card,'damage')&&!target.storage.xinzili){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 								if(!target.hasFriend()) return;
 								if(target.hp>=4) return [0.5,get.tag(card,'damage')*2];
@@ -5338,7 +5336,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.card.name!='sha'||event.card.nature!='fire') return false;
 					return game.hasPlayer(function(current){
-						return !event.targets.contains(current)&&player.canUse(event.card,current);
+						return !event.targets.contains(current)&&lib.filter.targetEnabled(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
 					});
 				},
 				direct:true,
@@ -13536,7 +13534,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{source:'damageEnd'},
 				locked:true,
-				direct:true,
+				forced:true,
 				filter:function(event,player){
 					if(event.name=='chooseToUse') return player.hasCard(card=>get.suit(card)=='spade','hs');
 					return event.card&&event.card.name=='sha'&&event.getParent(2).jiu==true&&!player.hasSkill('oljiuchi_air');

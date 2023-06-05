@@ -3886,8 +3886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return target.hasZhuSkill('zhiba',player)&&player.canCompare(target);
 				},
-				direct:true,
-				clearTime:true,
+				log:false,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('zhiba');
 				},
@@ -7356,8 +7355,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				delay:false,
 				line:true,
-				direct:true,
-				clearTime:true,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('huangtian');
 				},

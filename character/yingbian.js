@@ -819,29 +819,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'qimei',
 						charlotte:true,
 						forced:true,
+						popup:false,
 						trigger:{global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','loseAfter','gainAfter','addToExpansionAfter']},
-						logTarget:function(event,player){
-							return player.storage.qimei_draw;
-						},
 						usable:1,
 						filter:function(event,player){
 							var target=player.storage.qimei_draw;
 							if(!target||!target.isIn()) return false;
-							if(event.name!='gain'||(event.player!=player&&event.player!=target)){
-							var evt1=event.getl(player);
-								if(!evt1||!evt1.hs||!evt1.hs.length){
-									var evt2=event.getl(target);
-									if(!evt2||!evt2.hs||!evt2.hs.length) return false;
-								}
-							}
-							return player.countCards('h')==target.countCards('h');
+							if(player.countCards('h')!=target.countCards('h')) return false;
+							var hasChange=function(event,player){
+								var gain=0,lose=0;
+								if(event.getg) gain=event.getg(player).length;
+								if(event.getl) lose=event.getl(player).hs.length;
+								return gain!=lose;
+							};
+							return hasChange(event,player)||hasChange(event,target);
 						},
 						content:function(){
+							'step 0'
 							if(trigger.delay===false) game.delayx();
-							var evt1=trigger.getl(player);
-							if((trigger.name=='gain'&&player==trigger.player)||(evt1&&evt1.hs&&evt1.hs.length)) player.storage.qimei_draw.draw();
-							var evt2=trigger.getl(player.storage.qimei_draw);
-							if((trigger.name=='gain'&&player==player.storage.qimei_draw)||evt2&&evt2.hs&&evt2.hs.length) player.draw();
+							'step 1'
+							var target=player.storage.qimei_draw;
+							player.logSkill('qimei_draw',target);
+							var drawer=[];
+							var hasChange=function(event,player){
+								var gain=0,lose=0;
+								if(event.getg) gain=event.getg(player).length;
+								if(event.getl) lose=event.getl(player).hs.length;
+								return gain!=lose;
+							};
+							if(hasChange(trigger,player)) drawer.push(target);
+							if(hasChange(trigger,target)) drawer.push(player);
+							if(drawer.length==1) drawer[0].draw();
+							else{
+								game.asyncDraw(drawer.sortBySeat());
+								game.delayex();
+							}
 						},
 						group:'qimei_hp',
 						onremove:true,
@@ -2633,8 +2645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				delay:false,
 				line:true,
-				direct:true,
-				clearTime:true,
+				log:false,
 				prepare:function(cards,player,targets){
 					targets[0].logSkill('ruilve');
 				},

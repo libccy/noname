@@ -437,47 +437,49 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:function(player){
 					player.removeSkill('dcjijiao_machi');
 				},
-				filter:function(event,player){
-					var cardsx=Array.from(ui.discardPile.childNodes);
-					var history=_status.globalHistory;
-					for(var i=0;i<history.length;i++){
-						var history2=history[i]['cardMove'];
-						for(var evt of history2){
-							var cards2=[];
-							if(evt.type=='discard') cards2=evt.getl(player).cards2;
-							else{
-								var evtx=evt.getParent();
-								if(evtx.name!='orderingDiscard') continue;
-								var evtx2=evtx.relatedEvent||evtx.getParent();
-								if(evtx2&&evtx2.name=='useCard'){
-									if(!evt.getd) continue;
-									cards2=evt.getd(player);
-								}
-							}
-							if(cards2.some(i=>get.type(i)=='trick'&&cardsx.contains(i))) return true;
-						}
+				onChooseToUse:function(event){
+					if(event.dcjijiao==undefined&&!game.online){
+						var bool=lib.skill.dcjijiao.getCards(event.player,true);
+						event.set('dcjijiao',bool);
 					}
-					return false;
+				},
+				filter:function(event,player){
+					return event.dcjijiao;
 				},
 				filterTarget:true,
+				getCards:function(player,bool){
+					var cards=Array.from(ui.discardPile.childNodes);
+					var gains=cards.slice(0);
+					var history=game.getAllGlobalHistory('cardMove',function(evt){
+						if(evt.name=='lose') return evt.position==ui.discardPile;
+						return evt.name=='cardsDiscard';
+					});
+					for(var i=history.length-1;i>=0;i--){
+						var evt=history[i];
+						var cards2=evt.cards.filter(function(card){
+							return cards.contains(card);
+						});
+						if(cards2.length){
+							if(!lib.skill.dcjijiao.isUse(evt,player)){
+								gains.removeArray(cards2);
+							}
+							cards.removeArray(cards2);
+						}
+						if(!cards.length) break;
+					}
+					if(bool) return gains.some(card=>get.type2(card,false)=='trick');
+					return gains.filter(card=>get.type2(card,false)=='trick');
+				},
+				isUse:function(event,player){
+					if(event.name!='cardsDiscard') return (event.type=='discard'&&event.player==player);
+					var evtx=event.getParent();
+					if(evtx.name!='orderingDiscard') return false;
+					var evt2=(evtx.relatedEvent||evtx.getParent());
+					return (evt2.name=='useCard'&&evt2.player==player);
+				},
 				content:function(){
 					player.awakenSkill('dcjijiao');
-					var cardsx=Array.from(ui.discardPile.childNodes);
-					var cards=[];
-					game.getAllGlobalHistory('cardMove',evt=>{
-						var cards2=[];
-						if(evt.type=='discard') cards2=evt.getl(player).cards2;
-						else{
-							var evtx=evt.getParent();
-							if(evtx.name!='orderingDiscard') return;
-							var evtx2=evtx.relatedEvent||evtx.getParent();
-							if(evtx2&&evtx2.name=='useCard'){
-								if(!evt.getd) return;
-								cards2=evt.getd(player);
-							}
-						}
-						cards.addArray(cards2.filter(i=>get.type(i)=='trick'&&cardsx.contains(i)));
-					});
+					var cards=lib.skill.dcjijiao.getCards(player);
 					if(cards.length){
 						target.gain(cards,'gain2').gaintag.add('dcjijiao');
 						target.addSkill('dcjijiao_nowuxie');
@@ -513,9 +515,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						popup:false,
 						trigger:{global:'phaseAfter'},
 						content:function(){
-							player.restoreSkill('dcjijiao');
-							game.log(player,'重置了','#g【继椒】');
-							player.removeSkill('dcjijiao_machi');
+							if(player.awakenedSkills.contains('dcjijiao')){
+								player.restoreSkill('dcjijiao');
+								game.log(player,'重置了','#g【继椒】');
+								//player.removeSkill('dcjijiao_machi');
+							}
 							player.removeSkill('dcjijiao_risutoa');
 						}
 					},
@@ -539,7 +543,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.nowuxie=true;
 						},
 						onremove:function(player){
-							player.removeGaintag('kousheng');
+							player.removeGaintag('dcjijiao');
 						},
 					}
 				}
@@ -586,8 +590,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var color=event.judgeResult.color;
 					var player=event.getParent(2).player;
 					var cards=event.getParent(2).cardsx;
-					for(var card of cards){
-						if(get.color(card)==color){
+					for(var cardx of cards){
+						if(get.color(cardx)==color){
 							if(get.position(card,true)=='o') player.gain(card,'gain2');
 							return;
 						}
@@ -5689,11 +5693,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:'limited'
 				},
-				direct:true,
 				content:function(){
 					'step 0'
 					player.awakenSkill('dcyongdi');
-					player.logSkill('dcyongdi',target);
+					//player.logSkill('dcyongdi',target);
 					if(!game.hasPlayer(current=>current.maxHp<target.maxHp)){
 						target.gainMaxHp();
 					}
@@ -13362,7 +13365,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var getNum=function(current){
 						var history=current.actionHistory;
 						var num=0;
-						for(var i=history.length-1;i>=0;i--){
+						for(var i=history.length-2;i>=0;i--){
 							for(var j=0;j<history[i].useCard.length;j++){
 								if(get.type2(history[i].useCard[j].card,false)=='trick') num++;
 							}
@@ -29628,7 +29631,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclibang_info:'出牌阶段限一次。你可以弃置一张牌，正面向上获得两名其他角色的各一张牌。然后你判定，若结果与这两张牌的颜色均不同，你交给其中一名角色两张牌或失去1点体力，否则你获得判定牌并视为对其中一名角色使用一张【杀】。',
 			dcwujie:'无节',
 			dcwujie_info:'锁定技。①你使用无色牌无任何次数限制且无距离限制。②当其他角色执行杀死你的奖惩而摸牌或弃牌时，取消之。',
-
 
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

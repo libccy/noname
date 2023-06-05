@@ -75,7 +75,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			db_key_liyingxia:['female','shu',3,['liyingxia_sanli','liyingxia_zhenjun','liyingxia_wumai'],['doublegroup:shu:key']],
 			key_erika:['female','key','3/3/2',['erika_shisong','erika_yousheng']],
 			key_satomi:['female','key',3,['satomi_luodao','satomi_daohai']],
-			key_iriya:['female','key',3,['iriya_yinji','iriya_haozhi']],
+			key_iriya:['female','key',3,['iriya_yinji','iriya_haozhi'],['unseen']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -8799,8 +8799,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				discard:false,
 				line:true,
-				direct:true,
-				clearTime:true,
+				log:false,
 				delay:false,
 				lose:false,
 				prepare:function(cards,player,targets){

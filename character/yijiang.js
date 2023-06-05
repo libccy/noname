@@ -4357,7 +4357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current.hasSkill('wengua');
 					});
 				},
-				direct:true,
+				log:false,
 				delay:false,
 				filterCard:true,
 				discard:false,
@@ -13073,7 +13073,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				forceaudio:true,
-				direct:true,
 				prompt:'弃置一名有【逆】的角色的两张【逆】，然后视为对包含其在内的角色使用【杀】。',
 				delay:false,
 				log:false,

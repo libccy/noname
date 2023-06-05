@@ -12682,7 +12682,7 @@
 					if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(event)){
 						game.modeSwapPlayer(player);
 					}
-					var skills=player.getSkills(true);
+					var skills=player.getSkills('invisible').concat(lib.skill.global);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var info=lib.skill[skills[i]];
@@ -12937,7 +12937,7 @@
 						delete event.dialog;
 						return;
 					}
-					var skills=player.getSkills(true);
+					var skills=player.getSkills('invisible').concat(lib.skill.global);
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var info=lib.skill[skills[i]];
@@ -26906,7 +26906,7 @@
 						}
 						if(lib.config.compatiblemode){
 							(function(){
-								var skills=player.getSkills(true).concat(lib.skill.global);
+								var skills=player.getSkills('invisible').concat(lib.skill.global);
 								game.expandSkills(skills);
 								for(var i=0;i<skills.length;i++){
 									var info=get.info(skills[i]);
@@ -35265,7 +35265,7 @@
 					}
 				}
 				var equipskills=[];
-				var ownedskills=player.getSkills(true,false);
+				var ownedskills=player.getSkills('invisible',false);
 				game.expandSkills(ownedskills);
 				for(var i=0;i<skills.length;i++){
 					if(!ownedskills.contains(skills[i])){
