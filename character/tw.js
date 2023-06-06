@@ -2207,8 +2207,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onChooseToUse:function(event){
 					if(game.online||!event.player.hasSkill('twmouli')) return;
 					var cards=[];
-					for(var i of ui.cardPile.childNodes){
-						if(get.type(i)=='basic') cards.push(i);
+					for(var i=0;i<ui.cardPile.childNodes.length;i++){
+						var card=ui.cardPile.childNodes[i];
+						if(get.type(card)=='basic') cards.push(card);
 					}
 					event.set('twmouli',cards);
 				},
@@ -2277,8 +2278,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					skillTagFilter:function(player,tag,arg){
 						if(arg=='respond') return false;
 						var list=[];
-						for(var i of ui.cardPile.childNodes){
-							if(get.type(i,player)=='basic'&&!list.contains(i.name)) list.push(i.name);
+						for(var i=0;i<ui.cardPile.childNodes.length;i++){
+							var card=ui.cardPile.childNodes[i];
+							if(get.type(card,player)=='basic'&&!list.contains(card.name)) list.push(card.name);
 						}
 						if(tag=='respondSha') return list.contains('sha');
 						if(tag=='respondShan') return list.contains('shan');
@@ -4370,7 +4372,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hasCard((card)=>lib.filter.cardDiscardable(card,player,'tweqianxi'),'he')) player.chooseToDiscard('he',true);
 					else event.finish();
 					'step 2'
-					if(!result.bool){
+					if(!result.bool||!game.hasPlayer(target=>{
+						return player!=target&&get.distance(player,target)<=1;
+					})){
 						event.finish();
 						return;
 					}

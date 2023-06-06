@@ -11,7 +11,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','ol_puyuan','zhangzhi'],
 				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie'],
-				sp_liesi:['mizhu','weizi','ol_liuba'],
+				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
 				sp_waitforsort:['sunhong','luoxian','ol_huban','wangguan'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
@@ -29,6 +29,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			zhangshiping:['male','shu',3,['olhongji','olxinggu']],
 			sunhong:['male','wu',3,['olxianbi','olzenrun']],
 			luoxian:['male','shu',4,['oldaili']],
 			ol_huban:['male','wei',4,['olhuiyun']],
@@ -677,6 +678,168 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//张世平
+			olhongji:{
+				audio:2,
+				trigger:{global:'phaseZhunbeiBegin'},
+				filter:function(event,player){
+					if(event.player.isMinHandcard(true)&&!player.hasSkill('olhongji_min')) return true;
+					if(event.player.isMaxHandcard(true)&&!player.hasSkill('olhongji_max')) return true;
+					return false;
+				},
+				logTarget:'player',
+				check:function(event,player){
+					return get.attitude(player,event.player)>0;
+				},
+				prompt2:function(event,player){
+					if(event.player.isMinHandcard(true)){
+						return '其手牌数为全场唯一最少。你可以令其于本回合摸牌阶段结束后执行一个额外的摸牌阶段，然后本轮你不能再发动该分支。';
+					}
+					return '其手牌数为全场唯一最多。你可以令其于本回合出牌阶段结束后执行一个额外的出牌阶段，然后本轮你不能再发动该分支。';
+				},
+				content:function(){
+					var target=trigger.player;
+					if(target.isMinHandcard(true)){
+						player.addTempSkill('olhongji_min','roundStart');
+						target.addTempSkill('olhongji_draw');
+					}
+					if(target.isMaxHandcard(true)){
+						player.addTempSkill('olhongji_max','roundStart');
+						target.addTempSkill('olhongji_use');
+					}
+				},
+				ai:{expose:0.25},
+				subSkill:{
+					min:{charlotte:true},
+					max:{charlotte:true},
+					draw:{
+						trigger:{player:'phaseDrawAfter'},
+						charlotte:true,
+						forced:true,
+						popup:false,
+						content:function(){
+							var next=trigger.player.phaseDraw();
+							event.next.remove(next);
+							trigger.getParent('phase').next.push(next);
+							player.removeSkill('olhongji_draw');
+						}
+					},
+					use:{
+						trigger:{player:'phaseUseAfter'},
+						charlotte:true,
+						forced:true,
+						popup:false,
+						content:function(){
+							var next=trigger.player.phaseUse();
+							event.next.remove(next);
+							trigger.getParent('phase').next.push(next);
+							player.removeSkill('olhongji_use');
+						}
+					}
+				}
+			},
+			olxinggu:{
+				audio:2,
+				trigger:{global:'phaseBefore',player:'enterGame'},
+				forced:true,
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0);
+				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				group:'olxinggu_trade',
+				content:function(){
+					'step 0'
+					var cards=[];
+					for(var i=0;i<3;i++){
+						var card=get.cardPile2(function(card){
+							if(cards.contains(card)) return false;
+							var type=get.subtype(card);
+							return type=='equip3'||type=='equip4'||type=='equip6';
+						});
+						if(card) cards.add(card);
+						else break;
+					}
+					if(cards.length) player.addToExpansion(cards,'draw').gaintag.add('olxinggu');
+				},
+				marktext:'贾',
+				intro:{
+					markcount:'expansion',
+					mark:function(dialog,content,player){
+						var content=player.getExpansions('olxinggu');
+						if(content&&content.length){
+							if(player==game.me||player.isUnderControl()){
+								dialog.addAuto(content);
+							}
+							else{
+								return '剩余'+get.cnNumber(content.length)+'匹马';
+							}
+						}
+					}
+				},
+				subSkill:{
+					trade:{
+						audio:'olxinggu',
+						trigger:{player:'phaseJieshuBegin'},
+						filter:function(event,player){
+							return player.getExpansions('olxinggu').length;
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							var cards=player.getExpansions('olxinggu');
+							if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
+							player.chooseButton([get.prompt('olxinggu'),cards]).set('ai',button=>{
+								if(_status.event.toChoose==button.link) return 1;
+								return 0;
+							}).set('toChoose',!event.aiCancel&&cards.find(card=>{
+								return game.hasPlayer(current=>{
+									if(!lib.skill.zhijian.filterTarget(card,player,current)) return false;
+									return get.effect(current,card,player,player)>0;
+								});
+							}));
+							'step 1'
+							if(result.bool){
+								var card=result.links[0];
+								event.card=card;
+								player.chooseTarget('将'+get.translation(card)+'置入一名其他角色的装备区',lib.skill.zhijian.filterTarget).set('ai',target=>{
+									var player=_status.event.player;
+									return get.effect(target,_status.event.card,player,player);
+								}).set('card',card);
+							}
+							else{
+								if(_status.connectMode){game.broadcastAll(function(){delete _status.noclearcountdown;game.stopCountChoose()});}
+								event.finish();
+							}
+							'step 2'
+							if(result.bool){
+								var target=result.targets[0];
+								event.target=target;
+								if(_status.connectMode){game.broadcastAll(function(){delete _status.noclearcountdown;game.stopCountChoose()});}
+								player.logSkill('olxinggu',target);
+								player.$give(card,target,false);
+							}
+							else{
+								if(!event.isMine()&&!event.isOnline()) event.aiCancel=true;
+								event.goto(0);
+							}
+							'step 3'
+							target.equip(card);
+							'step 4'
+							var card=get.cardPile2(cardx=>{
+								return get.suit(cardx)=='diamond';
+							});
+							if(card) player.gain(card,'gain2');
+							else{
+								game.log('但是牌堆中并没有♦牌了！');
+								player.chat('做了个亏本买卖…');
+							}
+						}
+					}
+				}
+			},
 			//孙弘
 			olxianbi:{
 				audio:2,
@@ -1208,7 +1371,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseControl('cancel2').set('choiceList',[
 						'令'+get.translation(trigger.player)+'回复1点体力',
-						'令'+get.translation(trigger.player)+'于本回合下次造成的伤害+1，且造成伤害后本回合手牌上限为0',
+						'令'+get.translation(trigger.player)+'于本回合下次造成的伤害+1，且造成伤害时本回合手牌上限为0',
 					]).set('prompt',get.prompt('olkangrui',trigger.player)).set('ai',()=>{
 						return _status.event.choice;
 					}).set('choice',function(){
@@ -1262,7 +1425,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					nil:{
-						trigger:{source:'damageSource'},
+						trigger:{source:'damageBegin1'},
 						charlotte:true,
 						forced:true,
 						onremove:true,
@@ -22852,7 +23015,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldianjun:'殿军',
 			oldianjun_info:'锁定技。回合结束时，你受到1点无来源伤害，然后执行一个额外的出牌阶段。',
 			olkangrui:'亢锐',
-			olkangrui_info:'当一名角色于其回合内首次受到伤害后，你可以摸一张牌并选择一项：1.令其回复1点体力；2.令其于本回合下次造成的伤害+1，然后当其于本回合造成伤害后，其本回合手牌上限基数为0。',
+			olkangrui_info:'当一名角色于其回合内首次受到伤害后，你可以摸一张牌并选择一项：1.令其回复1点体力；2.令其于本回合下次造成的伤害+1，然后当其于本回合造成伤害时，其本回合手牌上限基数为0。',
 			wangguan:'王瓘',
 			olmiuyan:'谬焰',
 			olmiuyan_tag:'invisible',
@@ -22872,6 +23035,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldaili:'带砺',
 			oldaili_tag:'带砺',
 			oldaili_info:'一名角色的回合结束时，若你被展示过的手牌数为偶数，则你可以翻面，摸三张牌并展示之。',
+			zhangshiping:'张世平',
+			olhongji:'鸿济',
+			olhongji_info:'每轮每项各限一次。一名角色的准备阶段，若其手牌数为唯一最少/最多，你可以令其于本回合第一个摸牌阶段/出牌阶段后执行一个额外的摸牌阶段/出牌阶段。',
+			olxinggu:'行贾',
+			olxinggu_info:'①游戏开始时，你将牌堆中的三张坐骑牌扣置于武将牌上。②结束阶段，你可以将一张〖行贾①〗牌置于一名其他角色的装备区，然后你从牌堆获得一张♦牌。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
