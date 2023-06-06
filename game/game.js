@@ -9537,24 +9537,23 @@
 						//正则表达式
 						var reg=new RegExp(`['"]step ${k}['"]`);
 						var result=str.slice(skip).match(reg);
-						if(result == null) break;
+						if(result==null) break;
+						var insertStr;
 						if(k==0){
-							var insertStr=`switch(step){case 0:`;
-							str=str.slice(0, result.index)+insertStr+str.slice(result.index+result[0].length);
-							skip+=result.index+insertStr.length;
+							insertStr=`switch(step){case 0:`;
 						}else{
-							var insertStr=`break;case ${k}:`;
-							var copy=str;
-							copy=copy.slice(0,skip+result.index)+insertStr+copy.slice(skip+result.index+result[0].length);
-							//测试是否有错误
-							try{
-								new Function(copy);
-								str=copy;
-								skip+=result.index+insertStr.length;
-							}catch(error){
-								k--;
-								skip+=result.index+result[0].length;
-							}
+							insertStr=`break;case ${k}:`;
+						}
+						var copy=str;
+						copy=copy.slice(0,skip+result.index)+insertStr+copy.slice(skip+result.index+result[0].length);
+						//测试是否有错误
+						try{
+							new Function(copy);
+							str=copy;
+							skip+=result.index+insertStr.length;
+						}catch(error){
+							k--;
+							skip+=result.index+result[0].length;
 						}
 					}
 					str=`if(event.step==${k}){event.finish();return;}`+str;
