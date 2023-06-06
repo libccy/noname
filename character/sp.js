@@ -742,6 +742,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseBefore',player:'enterGame'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					return (event.name!='phase'||game.phaseNumber==0);
 				},
@@ -967,6 +968,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})%2==0;
 				},
 				group:'oldaili_record',
+				locked:false,
 				check:function(event,player){
 					if(get.distance(event.player,player,'absolute')==1&&!player.isTurnedOver()) return false;
 					return true;
@@ -3931,6 +3933,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huamu:{
 				audio:2,
 				trigger:{player:'useCardAfter'},
+				locked:false,
 				filter:function(event,player){
 					var color=get.color(event.card);
 					if(color=='none') return false;
@@ -9215,6 +9218,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource',
 				},
 				forced:true,
+				locked:false,
 				content:function(){
 					player.addMark('reluanzhan',1,false);
 				},
@@ -9270,6 +9274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'luanzhan',
 				trigger:{player:'useCardToPlayered'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					if(!event.isFirstTarget||(event.card.name!='sha'&&(get.color(event.card)!='black'||get.type(event.card)!='trick'))||!player.countMark('reluanzhan')) return false;
 					var info=get.info(event.card);
@@ -11223,6 +11228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.removeAdditionalSkill('new_luoyan');
 				},
 				derivation:['oltianxiang','liuli'],
+				locked:true,
 			},
 			//新孙鲁育
 			"new_meibu":{
@@ -13864,6 +13870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinyongsi:{
 				group:['xinyongsi1','xinyongsi2'],
+				locked:true,
 			},
 			xinyongsi1:{
 				audio:'yongsi1',
@@ -15696,6 +15703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xunzhi:{
 				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
+				locked:false,
 				init:function(player){
 					player.storage.xunzhi=0;
 				},
@@ -16728,7 +16736,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuhua:{
 				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				forced:true,
-				locked:false,
 				audio:2,
 				content:function(){
 					"step 0"
@@ -17456,6 +17463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guiming:{
 				unique:true,
 				zhuSkill:true,
+				locked:true,
 			},
 			canshi:{
 				audio:2,
@@ -20010,6 +20018,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yongsi:{
 				group:['yongsi1','yongsi2'],
+				locked:true,
 				ai:{
 					threaten:2.2
 				}
@@ -22653,7 +22662,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chongzhen_info:'当你因发动〖龙胆〗而使用或打出【杀】或【闪】时，你可以获得对方的一张手牌。',
 			bifa_info:'结束阶段开始时，你可以将一张手牌移出游戏并指定一名其他角色。该角色的准备阶段开始时，其观看你移出游戏的牌并选择一项：交给你一张与此牌类型相同的手牌并获得此牌；或将此牌置入弃牌堆，然后失去1点体力。',
 			songci_info:'①出牌阶段，你可以选择一名未以此法选择过的角色。若其手牌数：大于其体力值，其弃置两张牌；不大于其体力值，其摸两张牌。②弃牌阶段结束时，若你已对场上所有存活角色发动过〖颂词①〗，则你摸一张牌。',
-			yongsi_info:'锁定技，摸牌阶段，你多摸X张牌。弃牌阶段开始时，你弃置X张牌。（X为场上势力数）',
+			yongsi_info:'锁定技。①摸牌阶段，你多摸X张牌。②弃牌阶段开始时，你弃置X张牌。（X为场上势力数）',
 			yicong_info:'锁定技，当你的体力值大于2时，你计算与其他角色的距离时-1；当你的体力值不大于2时，其他角色计算与你的距离时+1。',
 			baobian_info:'锁定技，若你的体力值为3或更少，你视为拥有技能〖挑衅〗；若你的体力值为2或更少；你视为拥有技能〖咆哮〗；若你的体力值为1，你视为拥有技能〖神速〗。',
 			rebaobian:'豹变',
@@ -22802,7 +22811,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lisi_info:'当你于回合外使用的牌结算结束后，你可将其交给一名手牌数不大于你的其他角色。',
 			ol_yangyi:'杨仪',
 			oljuanxia:'狷狭',
-			oljuanxia_info:'锁定技。结束阶段，你选择一名其他角色。你依次视为对其使用至多三种单目标普通锦囊牌。然后其下回合结束时，可视为对你使用等量的【杀】。',
+			oljuanxia_info:'结束阶段，你可以选择一名其他角色。你依次视为对其使用至多三种单目标普通锦囊牌。然后其下回合结束时，可视为对你使用等量的【杀】。',
 			oldingcuo:'定措',
 			oldingcuo_info:'每回合限一次。当你受到或造成伤害后，你可摸两张牌。若这两张牌颜色不同，则你弃置一张手牌。',
 			fengfangnv:'OL冯妤',

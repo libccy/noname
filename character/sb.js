@@ -3770,6 +3770,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return str;
 				},
 				logTarget:'target',
+				locked:false,
 				check:function(event,player){
 					var target=event.target;
 					if(get.attitude(player,target)>0) return false;

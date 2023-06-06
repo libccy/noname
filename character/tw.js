@@ -3881,6 +3881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				position:'he',
 				filterCard:true,
+				locked:false,
 				filter:function(event,player){
 					return player.countCards('he');
 				},
@@ -3958,6 +3959,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				forced:true,
+				locked:false,
 				popup:false,
 				firstDo:true,
 				content:function(){
@@ -6419,6 +6421,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
+				locked:false,
 				group:['twxiawei_init','twxiawei_lose','twxiawei_unmark'],
 				content:function(){
 					'step 0'
@@ -13157,7 +13160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twtijin:'替巾',
 			twtijin_info:'当你攻击范围内的一名其他角色使用【杀】指定另一名其他角色为目标时，你可以将此【杀】的目标改为你。若如此做，此【杀】结算完成后，你弃置该角色的一张牌。',
 			twxiaolian:'孝廉',
-			twxiaolian_info:'当一名其他角色使用【杀】指定另一名其他角色为目标时，你可以将此【杀】的目标改为你。若如此做，当你受到此【杀】的伤害后，你可以将一张牌放在此【杀】原目标的武将牌旁，称之为“马”。锁定技，场上的一名角色每有一张“马”，其他角色计算与其的距离便+1。',
+			twxiaolian_info:'当一名其他角色使用【杀】指定另一名其他角色为目标时，你可以将此【杀】的目标改为你。若如此做，当你受到此【杀】的伤害后，你可以将一张牌置于此【杀】原目标的武将牌旁，称为“马”，且令其获得如下效果：其他角色计算至其的距离+X（X为其武将牌旁的“马”数）。',
 			twqijia:'弃甲',
 			twqijia_info:'出牌阶段，你可以弃置一张装备区内的牌（每种类型的装备牌限一次），然后视为对攻击范围内的一名其他角色使用了一张【杀】。',
 			twzhuchen:'诛綝',

@@ -793,6 +793,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:3,
 				trigger:{global:'phaseBefore',player:'enterGame'},
 				forced:true,
+				locked:false,
 				global:'spdaming_give',
 				filter:function(event,player){
 					return (event.name!='phase'||game.phaseNumber==0);
@@ -17623,6 +17624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gnjinfan:{
 				trigger:{player:'phaseDiscardBegin'},
 				direct:true,
+				locked:false,
 				audio:2,
 				filter:function(event,player){
 					var list=[];
@@ -18670,7 +18672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tongduo_info:'每回合限一次。当你成为其他角色使用牌的唯一目标后，你可令一名角色重铸一张牌。',
 			xin_jushou:'手杀沮授',
 			xinjianying:'渐营',
-			xinjianying_info:'锁定技。①当你于出牌阶段内使用与此阶段你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌。②出牌阶段限一次，你可以将一张牌当做任意基本牌使用（不计入次数限制）。若你于此阶段内使用的上一张牌有花色，则此牌的花色视为上一张牌的花色。',
+			xinjianying_info:'①当你于出牌阶段内使用与此阶段你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌。②出牌阶段限一次，你可以将一张牌当做任意基本牌使用（不计入次数限制）。若你于此阶段内使用的上一张牌有花色，则此牌的花色视为上一张牌的花色。',
 			re_xunyu:"手杀荀彧",
 			rejieming:"节命",
 			rejieming_info:"当你受到1点伤害后，你可以令一名角色摸两张牌。然后若其手牌数小于体力上限，则你摸一张牌。",
