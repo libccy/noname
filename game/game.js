@@ -9525,17 +9525,39 @@
 			},
 			parsex:function(func){
 				var str=func.toString();
+				//获取第一个 { 后的所有字符
 				str=str.slice(str.indexOf('{')+1);
+				//func中要写步骤的话，必须要写step 0
 				if(str.indexOf('step 0')==-1){
-					str='{if(event.step==1) {event.finish();return;}'+str;
-				}
-				else{
-					for(var k=1;k<99;k++){
-						if(str.indexOf('step '+k)==-1) break;
-						str=str.replace(new RegExp("'step "+k+"'",'g'),"break;case "+k+":");
-						str=str.replace(new RegExp('"step '+k+'"','g'),"break;case "+k+":");
+					str='{if(event.step==1) {event.finish();return;}\n'+str;
+				}else{
+					var skip=0;
+					//每层最多找99个step
+					for (var k=0;k<99;k++) {
+						//正则表达式
+						var reg=new RegExp(`['"]step ${k}['"]`);
+						var result=str.slice(skip).match(reg);
+						if(result == null) break;
+						if(k==0){
+							var insertStr=`switch(step){case 0:`;
+							str=str.slice(0, result.index)+insertStr+str.slice(result.index+result[0].length);
+							skip+=result.index+insertStr.length;
+						}else{
+							var insertStr=`break;case ${k}:`;
+							var copy=str;
+							copy=copy.slice(0,skip+result.index)+insertStr+copy.slice(skip+result.index+result[0].length);
+							//测试是否有错误
+							try{
+								new Function(copy);
+								str=copy;
+								skip+=result.index+insertStr.length;
+							}catch(error){
+								k--;
+								skip+=result.index+result[0].length;
+							}
+						}
 					}
-					str=str.replace(/'step 0'|"step 0"/,'if(event.step=='+k+') {event.finish();return;}switch(step){case 0:');
+					str=`if(event.step==${k}){event.finish();return;}`+str;
 				}
 				return (new Function('event','step','source','player','target','targets',
 					'card','cards','skill','forced','num','trigger','result',
