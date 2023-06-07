@@ -3338,6 +3338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			psliaozou:{
 				audio:2,
 				enable:'phaseUse',
+				locked:false,
 				filter:function(event,player){
 					return !player.hasSkill('psliaozou_blocker',null,null,false);
 				},
@@ -4225,6 +4226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				selectCard:-1,
 				position:'h',
+				locked:false,
 				filter:function(event,player){
 					if(player.hasSkill('pssheji_used')) return false;
 					var hs=player.getCards('h');
@@ -5410,6 +5412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
+				locked:false,
 				filter:function(event,player){
 					for(var card of ui.discardPile.childNodes){
 						if(get.type(card)=='equip') return true;
@@ -6660,6 +6663,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spyicong:{
 				trigger:{player:'phaseDiscardEnd'},
 				direct:true,
+				locked:false,
 				filter:function(event,player){
 					return player.countCards('he')>0;
 				},
@@ -6697,6 +6701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sptuji:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					return player.getExpansions('spyicong').length>0;
 				},
@@ -6924,6 +6929,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardToPlayered'},
 				silent:true,
 				firstDo:true,
+				locked:false,
 				content:function(){
 					trigger.target.addTempSkill('chixin3');
 				}
@@ -6955,7 +6961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-			chixin3:{},
+			chixin3:{charlotte:true},
 			suiren:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				skillAnimation:true,
@@ -7515,6 +7521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					return player.hasSkill('fenyong2')&&event.player.isAlive();
 				},
@@ -7573,6 +7580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'loseEnd'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					return player._mouduan_mark&&player._mouduan_mark.name=='武'&&player.countCards('h')<=2;
 				},

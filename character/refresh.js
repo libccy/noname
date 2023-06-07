@@ -3234,6 +3234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				group:'rejiaozhao_base',
+				locked:false,
 				mod:{
 					targetEnabled:function(card,player,target){
 						if(player==target&&card.storage&&card.storage.rejiaozhao) return false;
@@ -5311,6 +5312,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				audio:'lihuo',
+				locked:false,
 				prompt2:function(event){
 					return '将'+get.translation(event.card)+'改为火属性';
 				},
@@ -13267,7 +13269,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else if(get.mode()=='guozhan'){
-						player.chooseBool('是否将'+get.translation(card)+'作为【田】置于武将牌上？').set('frequentSkill','retuntian').ai=function(){
+						player.chooseBool('是否将'+get.translation(card)+'作为“田”置于武将牌上？').set('frequentSkill','retuntian').ai=function(){
 							return true;
 						};
 					}
@@ -13868,7 +13870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_baosanniang:'手杀鲍三娘',
 			retuntian:'屯田',
 			rebeige:'悲歌',
-			retuntian_info:'当你于回合外失去牌时，你可以进行一次判定。若判定结果为♥，你获得此判定牌。否则你将此牌置于你的武将牌上，称之为【田】。锁定技，你计算与其他角色的距离时-X（X为你武将牌上【田】的数目）',
+			retuntian_info:'①当你于回合外失去牌后，你可以判定。若判定结果为♥，你获得此判定牌。否则你将此牌置于你的武将牌上，称为“田”。②你计算与其他角色的距离时-X（X为你武将牌上“田”的数目）。',
 			rebeige_info:'当有角色受到【杀】造成的伤害后，你可以弃一张牌，并令其进行一次判定，若判定结果为：♥该角色回复X点体力(X为伤害点数)；♦︎该角色摸三张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
 			re_liushan:'手杀刘禅',
 			re_sunben:'界孙笨',
@@ -14004,8 +14006,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_dengai:'界邓艾',
 			oltuntian:'屯田',
 			olzaoxian:'凿险',
-			oltuntian_info:'当你于回合外失去牌后，或于回合内因弃置而失去【杀】后，你可以进行判定。若判定结果不为♥，则你将此牌置于你的武将牌上，称之为【田】。锁定技，你计算与其他角色的距离时-X（X为你武将牌上【田】的数目）',
-			olzaoxian_info:'觉醒技，准备阶段，若你武将牌上【田】的数量达到3张或更多，则你减1点体力上限，并获得技能〖急袭〗。你于当前回合结束后进行一个额外的回合。',
+			oltuntian_info:'①当你于回合外失去牌后，或于回合内因弃置而失去【杀】后，你可以判定。若判定结果不为♥，则你将此牌置于你的武将牌上，称为“田”。②你计算与其他角色的距离时-X（X为你武将牌上“田”的数目）。',
+			olzaoxian_info:'觉醒技，准备阶段，若你武将牌上“田”的数量达到3张或更多，则你减1点体力上限，并获得技能〖急袭〗。你于当前回合结束后进行一个额外的回合。',
 			re_sunxiu:'界孙休',
 			re_caoxiu:'界曹休',
 			xin_lingtong:'界凌统',

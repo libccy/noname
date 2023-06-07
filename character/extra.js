@@ -4774,6 +4774,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'enterGame',
 				},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					return (event.name!='phase'||game.phaseNumber==0);
 				},

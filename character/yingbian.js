@@ -237,6 +237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player!=event.target&&event.targets.length==1&&(event.card.name=='sha'||get.type(event.card,false)=='trick')&&event.target.countCards('he')>0;
 				},
+				locked:false,
 				logTarget:'target',
 				check:function(event,player){
 					return get.effect(event.target,{name:'guohe_copy2'},player,player)>0;
@@ -523,6 +524,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				forced:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					var num=0;
@@ -578,6 +580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['huaiyuan_init','huaiyuan_die'],
 				subSkill:{
 					init:{
+						audio:'huaiyuan',
 						trigger:{
 							global:'phaseBefore',
 							player:'enterGame',
@@ -2569,6 +2572,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taoyin:{
 				audio:2,
 				trigger:{player:'showCharacterAfter'},
+				hiddenSkill:true,
 				logTarget:function(){
 					return _status.currentPhase;
 				},
@@ -2734,6 +2738,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'showCharacterAfter'},
 				forced:true,
+				hiddenSkill:true,
 				filter:function(event,player){
 					return event.toShow&&event.toShow.contains('jin_xiahouhui');
 				},
@@ -2843,6 +2848,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'showCharacterAfter'},
 				forced:true,
+				locked:false,
+				hiddenSkill:true,
 				filter:function(event,player){
 					var target=_status.currentPhase;
 					return player!=target&&target&&target.isAlive()&&event.toShow&&event.toShow.contains('jin_simazhao');

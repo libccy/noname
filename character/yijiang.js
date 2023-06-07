@@ -7793,7 +7793,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaofu:{
 				unique:true,
 				global:'zhaofu2',
-				zhuSkill:true
+				zhuSkill:true,
+				locked:true,
 			},
 			zhaofu2:{
 				mod:{
