@@ -26,7 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_wenpin:['male','wei',5,['rezhenwei'],['unseen']],
 			re_guanzhang:['male','shu',4,['fuhun','retongxin']],
 			re_mazhong:['male','shu',4,['refuman']],
-			dc_chenqun:['male','wei',3,['repindi','dcfaen']],
+			dc_chenqun:['male','wei',3,['repindi','refaen']],
 			re_sundeng:['male','wu',4,['rekuangbi']],
 			re_caiyong:['male','qun',3,['rebizhuan','retongbo']],
 			re_chengong:['male','qun',3,['remingce','zhichi']],
@@ -3234,6 +3234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				group:'rejiaozhao_base',
+				locked:false,
 				mod:{
 					targetEnabled:function(card,player,target){
 						if(player==target&&card.storage&&card.storage.rejiaozhao) return false;
@@ -5222,22 +5223,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				filter:function(event,player){
 					if(event.name=='link') return event.player.isLinked();
-					return true;
-				},
-				check:function(event,player){
-					return get.attitude(player,event.player)>0;
-				},
-				content:function(){
-					trigger.player.draw();
-				},
-			},
-			dcfaen:{
-				audio:'refaen',
-				audioname:['dc_chenqun'],
-				trigger:{global:['turnOverAfter','linkAfter']},
-				logTarget:'player',
-				filter:function(event,player){
-					if(event.name=='link') return event.player.isLinked();
 					return !event.player.isTurnedOver();
 				},
 				check:function(event,player){
@@ -5327,6 +5312,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				audio:'lihuo',
+				locked:false,
 				prompt2:function(event){
 					return '将'+get.translation(event.card)+'改为火属性';
 				},
@@ -9612,7 +9598,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},player,list);
 				},
-				mark:true,
 				intro:{
 					onunmark:function(storage,player){
 						_status.characterlist.addArray(storage.character);
@@ -9889,7 +9874,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				popup:false,
 				firstDo:true,
-				charlotte:true,
 				filter:function(event,player){
 					return event.skill&&event.skill.indexOf('reguhuo_')==0;
 				},
@@ -13285,7 +13269,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else if(get.mode()=='guozhan'){
-						player.chooseBool('是否将'+get.translation(card)+'作为【田】置于武将牌上？').set('frequentSkill','retuntian').ai=function(){
+						player.chooseBool('是否将'+get.translation(card)+'作为“田”置于武将牌上？').set('frequentSkill','retuntian').ai=function(){
 							return true;
 						};
 					}
@@ -13886,7 +13870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_baosanniang:'手杀鲍三娘',
 			retuntian:'屯田',
 			rebeige:'悲歌',
-			retuntian_info:'当你于回合外失去牌时，你可以进行一次判定。若判定结果为♥，你获得此判定牌。否则你将此牌置于你的武将牌上，称之为【田】。锁定技，你计算与其他角色的距离时-X（X为你武将牌上【田】的数目）',
+			retuntian_info:'①当你于回合外失去牌后，你可以判定。若判定结果为♥，你获得此判定牌。否则你将此牌置于你的武将牌上，称为“田”。②你计算与其他角色的距离时-X（X为你武将牌上“田”的数目）。',
 			rebeige_info:'当有角色受到【杀】造成的伤害后，你可以弃一张牌，并令其进行一次判定，若判定结果为：♥该角色回复X点体力(X为伤害点数)；♦︎该角色摸三张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
 			re_liushan:'手杀刘禅',
 			re_sunben:'界孙笨',
@@ -14022,8 +14006,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_dengai:'界邓艾',
 			oltuntian:'屯田',
 			olzaoxian:'凿险',
-			oltuntian_info:'当你于回合外失去牌后，或于回合内因弃置而失去【杀】后，你可以进行判定。若判定结果不为♥，则你将此牌置于你的武将牌上，称之为【田】。锁定技，你计算与其他角色的距离时-X（X为你武将牌上【田】的数目）',
-			olzaoxian_info:'觉醒技，准备阶段，若你武将牌上【田】的数量达到3张或更多，则你减1点体力上限，并获得技能〖急袭〗。你于当前回合结束后进行一个额外的回合。',
+			oltuntian_info:'①当你于回合外失去牌后，或于回合内因弃置而失去【杀】后，你可以判定。若判定结果不为♥，则你将此牌置于你的武将牌上，称为“田”。②你计算与其他角色的距离时-X（X为你武将牌上“田”的数目）。',
+			olzaoxian_info:'觉醒技，准备阶段，若你武将牌上“田”的数量达到3张或更多，则你减1点体力上限，并获得技能〖急袭〗。你于当前回合结束后进行一个额外的回合。',
 			re_sunxiu:'界孙休',
 			re_caoxiu:'界曹休',
 			xin_lingtong:'界凌统',
@@ -14088,9 +14072,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			redingpin:'定品',
 			redingpin_info:'出牌阶段，你可以弃置一张本回合未使用过/弃置过的类型的牌并选择一名角色。其进行判定，若结果为：黑色，其摸X张牌（X为其体力值且至多为3）且本回合内不能再成为〖定品〗的目标；红桃，你令此次弃置的牌不计入〖定品〗弃置牌合法性的检测；方片，你将武将牌翻面。',
 			refaen:'法恩',
-			refaen_info:'一名角色翻面或横置后，你可令其摸一张牌。',
-			dcfaen:'法恩',
-			dcfaen_info:'一名角色翻至正面或横置后，你可令其摸一张牌。',
+			refaen_info:'一名角色翻至正面或横置后，你可令其摸一张牌。',
 			reshizhi:'矢志',
 			reshizhi_info:'锁定技，若你的体力值为1，则你的【闪】视为【杀】，且当你使用对应的实体牌为一张【闪】的非转化普通杀造成伤害后，你回复1点体力。',
 			re_guotufengji:'界郭图逢纪',
@@ -14131,7 +14113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rebingyi_info:'结束阶段，你可展示所有手牌。若这些牌：颜色均相同，则你可以令至多X名角色各摸一张牌（X为你的手牌数）；点数均相同，则你摸一张牌。',
 			re_jiaxu:'界贾诩',
 			rewansha:'完杀',
-			rewansha_info:'锁定技。①你的回合内，不处于濒死状态的其他角色不能使用【桃】。②当有角色于你的回合内进入濒死状态时，你令其以外的所有其他角色的非锁定技失效直到此濒死状态结算结束。',
+			rewansha_info:'锁定技。①你的回合内，不处于濒死状态的角色不能使用【桃】。②当有角色于你的回合内进入濒死状态时，你令其以外的所有其他角色的非锁定技失效直到此濒死状态结算结束。',
 			reluanwu:'乱武',
 			reluanwu_info:'限定技，出牌阶段，你可令所有其他角色依次选择一项：①对距离最近（或之一）的角色使用一张【杀】；②失去1点体力。结算完成后，你可视为使用一张【杀】（无距离限制）。',
 			reweimu:'帷幕',

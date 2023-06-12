@@ -4800,6 +4800,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.getHandcardLimit()!=player.countCards('h');
 				},
 				direct:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					var del=player.getHandcardLimit()-player.countCards('h');
@@ -5971,6 +5972,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:'phaseBefore',
 				},
 				forced:true,
+				locked:false,
 				direct:true,
 				onremove:['dcsilve','dcsilve_self'],
 				filter:function(event,player){
@@ -6265,6 +6267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'dying'},
 				usable:1,
 				forced:true,
+				locked:false,
 				derivation:'dcshouze',
 				group:['dclianzhi_connect','dclianzhi_reproach'],
 				filter:function(event,player){
@@ -6355,6 +6358,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				group:'dcfengying_record',
+				locked:false,
 				filter:function(event,player){
 					return player.storage.dcfengying&&player.storage.dcfengying.length&&player.storage.dcfengying.filter(name=>{
 						return event.filterCard({name:name},player,event);
@@ -8915,7 +8919,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'enterGame',
 				},
 				forced:true,
-				locked:true,
+				locked:false,
 				filter:function(event,player){
 					return (event.name!='phase'||game.phaseNumber==0)&&game.hasPlayer((current)=>current!=player);
 				},
@@ -9963,6 +9967,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return ui.cardPile.childNodes.length>0;
 				},
 				frequent:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					var card=false;
@@ -12636,6 +12641,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjinggong:{
 				audio:2,
 				enable:'chooseToUse',
+				locked:false,
 				mod:{
 					targetInRange:function(card){
 						if(card.storage&&card.storage.dcjinggong) return true;
@@ -15157,6 +15163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				derivation:'refenyin',
 				trigger:{global:'roundStart'},
 				forced:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					var next=player.chooseTarget('请选择【预言】的目标',true).set('animate',false).set('ai',function(){
@@ -18590,7 +18597,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer((current)=>lib.skill.reqingcheng.filterTarget(null,player,current));
 				},
 				filterTarget:function(card,player,target){
-					return target!=player&&target.hasSex('male')&&target.countCards('h')<player.countCards('h');
+					return target!=player&&target.hasSex('male')&&target.countCards('h')<=player.countCards('h');
 				},
 				content:function(){
 					player.swapHandcards(target);
@@ -21997,6 +22004,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yuwei:{
 				zhuSkill:true,
+				locked:true,
 				ai:{combo:'shiyuan'},
 			},
 			decadexushen:{
@@ -26255,6 +26263,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{global:'damageEnd'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					return event.player!=player&&event.player.isAlive()&&_status.currentPhase!=player;
 				},
@@ -26608,6 +26617,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				zhuSkill:true,
 				forced:true,
+				locked:false,
 				intro:{
 					content:function(group){
 						return '已选择了'+get.translation(group)+'势力'
@@ -28320,7 +28330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jin_yanghuiyu:['jin_yanghuiyu','yanghuiyu'],
 			chunyuqiong:['chunyuqiong','re_chunyuqiong'],
 			taoqian:['taoqian','re_taoqian'],
-			sp_liubei:['jsrg_liubei','sp_liubei'],
+			sp_liubei:['sp_liubei','jsrg_liubei','jsp_liubei'],
 			dongcheng:['re_dongcheng','dongcheng'],
 			hucheer:['tw_hucheer','re_hucheer','hucheer'],
 			dongbai:['re_dongbai','dongbai','jsrg_dongbai'],
@@ -28348,10 +28358,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caosong:['caosong','sp_caosong'],
 			re_niujin:['re_niujin','tw_niujin'],
 			haomeng:['haomeng','tw_haomeng'],
-			jiling:['dc_jiling','tw_jiling','jiling'],
+			dc_jiling:['dc_jiling','tw_jiling'],
 			zhangning:['zhangning','tw_zhangning'],
 			sp_jiaxu:['dc_sp_jiaxu','sp_jiaxu','yj_jiaxu'],
 			caoanmin:['caoanmin','ns_caoanmin'],
+			jiling:['dc_jiling','jiling'],
 			qiaorui:['qiaorui','tw_qiaorui'],
 			duanwei:['duanwei','junk_duanwei'],
 			xushao:['xushao','jsrg_xushao'],
@@ -28865,7 +28876,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehuoshui:'祸水',
 			rehuoshui_info:'准备阶段，你可以选择至多X名角色（X为你已损失的体力值且至少为1）。你令这些角色中第一名角色的非锁定技失效直到回合结束；第二名角色交给你一张手牌；第三名及之后角色弃置装备区内的所有牌。',
 			reqingcheng:'倾城',
-			reqingcheng_info:'出牌阶段限一次，你可以与一名手牌数小于你的男性角色交换手牌。',
+			reqingcheng_info:'出牌阶段限一次，你可以与一名手牌数不大于你的男性角色交换手牌。',
 			re_panshu:'潘淑',
 			zhiren:'织纴',
 			zhiren_info:'当你于你的回合内使用第一张非转化牌时，你可依次执行以下选项中的前X项：①卜算X。②可弃置场上的一张装备牌和延时锦囊牌。③回复1点体力。④摸三张牌。（X为此牌的名称的字数）',
@@ -29266,7 +29277,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dctujue_info:'限定技。当你进入濒死状态时，你可以将所有牌交给一名其他角色。然后你回复等量的体力并摸等量的牌。',
 			dc_huban:'胡班',
 			dcchongyi:'崇义',
-			dcchongyi_info:'①一名角色使用【杀】时，若此牌是其于当前出牌阶段内使用的第一张牌，则你可以令其摸两张牌，且其本回合使用【杀】的次数上限+1。②一名角色的出牌阶段结束时，若其于此阶段内使用的最后一张牌为【杀】，则你可以令其本回合的手牌上限+1。',
+			dcchongyi_info:'①一名角色使用【杀】时，若此牌是其于当前出牌阶段内使用的第一张牌，则你可以令其摸两张牌，且其本回合使用【杀】的次数上限+1。②一名角色的出牌阶段结束时，若其于此阶段内使用的第一张牌为【杀】，则你可以令其本回合的手牌上限+1。',
 			chengui:'陈珪',
 			dcyingtu:'营图',
 			dcyingtu_info:'每回合限一次。当你的上家/下家于摸牌阶段外获得牌后，你可以获得其一张牌，然后将一张牌交给你的下家/上家。若你给出的牌为装备牌，则其使用之。',

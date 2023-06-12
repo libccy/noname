@@ -506,7 +506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var winner=result.bool?player:target;
 						var cards=[];
 						game.getGlobalHistory('cardMove',evt=>{
-							if(evt.getParent(3)==event) cards.addArray(evt.cards.filterInD('d'));
+							if(evt.getParent(2)==event) cards.addArray(evt.cards.filterInD('d'));
 						});
 						event.winner=winner;
 						if(cards.length) event.cards=cards;
@@ -1108,8 +1108,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					return get.type(evt.card,null,false)=='trick'&&!get.tag(evt.card,'damage')&&event.cards.filterInD('d').length>0&&player.getHistory('useCard',evt=>{
-						return get.type(evt.card,null,false)=='trick'&&!get.tag(evt.card,'damage');
+					return player.getHistory('useCard',evt=>{
+						return get.type(evt.card)=='trick'&&!get.tag(evt.card,'damage');
 					}).indexOf(event)==0;
 				},
 				forced:true,
