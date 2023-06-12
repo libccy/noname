@@ -7472,7 +7472,7 @@
 					if(ua.indexOf('android')!=-1){
 						lib.device='android';
 					}
-					else if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1){
+					else if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('macintosh')!=-1){
 						lib.device='ios';
 					}
 					lib.assetURL=noname_inited;
@@ -33051,27 +33051,10 @@
 			}
 		},
 		exit:function(){
-			//安卓 / ios
-			if(lib.device) {
-				if(lib.device=='ios'){
-					game.saveConfig('mode');
-					if(_status){
-						if(_status.reloading)return;
-						_status.reloading=true;
-					}
-					if(_status.video&&!_status.replayvideo) {
-						localStorage.removeItem(lib.configprefix + 'playbackmode');
-					}
-					window.location.reload();
-				}
-				else{
-					if(navigator.app&&navigator.app.exitApp){
-						navigator.app.exitApp();
-					}
-				}
-			}
+			var ua=navigator.userAgent.toLowerCase();
+			var ios=ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('macintosh')!=-1;
 			//electron
-			else if(typeof process=='function'){
+			if(typeof window.process=='object'&&typeof window.require=='function'){
 				var versions=window.process.versions;
 				var electronVersion=parseFloat(versions.electron);
 				var remote;
@@ -33084,8 +33067,26 @@
 				thisWindow.destroy();
 				window.process.exit();
 			}
-			//网页版
-			else{
+			// android-cordova环境
+			else if(lib.device==='android'){
+				if(navigator.app&&navigator.app.exitApp){
+					navigator.app.exitApp();
+				}
+			}
+			//ios-cordova环境或ios浏览器环境
+			else if(lib.device==='ios'||!lib.device&&ios){
+				game.saveConfig('mode');
+				if(_status){
+					if(_status.reloading)return;
+					_status.reloading=true;
+				}
+				if(_status.video&&!_status.replayvideo) {
+					localStorage.removeItem(lib.configprefix+'playbackmode');
+				}
+				window.location.reload();
+			}
+			//非ios的网页版
+			else if(!ios){
 				window.onbeforeunload = null;
 				window.close();
 			}
