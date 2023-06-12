@@ -279,6 +279,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						priority:10,
 						filter:function(event,player){
 							if(event.revealed) return false;
+							var info=get.info(event.skill);
+							if(info.charlotte) return false;
 							var skills=lib.skill.sbyingmen.getSkills(player.getStorage('sbyingmen'),player);
 							game.expandSkills(skills);
 							return skills.contains(event.skill);
