@@ -41,7 +41,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xianglang:['male','shu',3,['dckanji','dcqianzheng'],['unseen']],
 			qinlang:['male','wei',4,['dchaochong','dcjinjin']],
 			furongfuqian:['male','shu','4/6',['dcxuewei','dcyuguan']],
-			zhenghun:['male','wei',3,['dcqiangzhi','dcpitian'],['unseen']],
+			zhenghun:['male','wei',3,['dcqiangzhi','dcpitian']],
 			dc_zhaotongzhaoguang:['male','shu',4,['yizan_use','dcqingren','dclongyuan']],
 			dc_huanghao:['male','shu',3,['dcqinqing','huisheng','dccunwei']],
 			xuelingyun:['female','wei',3,['dcxialei','dcanzhi']],
@@ -5103,10 +5103,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.type=='discard'&&event.getl(player).cards2.length>0;
 				},
 				content:function(){
-					player.addMark('dcpitian',1,false);
+					player.addMark('dcpitian_handcard',1,false);
+					player.addSkill('dcpitian_handcard');
 					game.log(player,'的手牌上限','#y+1');
 				},
-				intro:{content:'手牌上限+#'},
 				subSkill:{
 					draw:{
 						audio:'dcpitian',
@@ -5121,14 +5121,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.getHandcardLimit()-player.countCards('h')>Math.min(2,player.hp-1);
 						},
 						content:function(){
-							player.draw(Math.min(5,player.getHandcardLimit()-player.countCards('h')));
-							player.removeMark('dcpitian',player.countMark('dcpitian'),false);
+							'step 0'
+							var num=Math.min(5,player.getHandcardLimit()-player.countCards('h'));
+							if(num>0) player.draw(num);
+							'step 1'
+							player.removeMark('dcpitian_handcard',player.countMark('dcpitian_handcard'),false);
+							game.log(player,'重置了','#g【辟田】','增加的手牌上限');
 						}
-					}
-				},
-				mod:{
-					maxHandcard:function(player,num){
-						return num+player.countMark('dcpitian');
+					},
+					handcard:{
+						markimage:'image/card/handcard.png',
+						intro:{
+							content:function(storage,player){
+								return '手牌上限+'+storage;
+							}
+						},
+						charlotte:true,
+						mod:{
+							maxHandcard:function(player,num){
+								return num+player.countMark('dcpitian_handcard');
+							}
+						},
 					}
 				},
 				ai:{
@@ -15316,7 +15329,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('hs')>0;
 				},
 				selectCard:function(){
-					return [Math.max(1,ui.selected.targets.length),4];
+					return [1,4];
 				},
 				selectTarget:function(){
 					var card=get.card(),player=get.player();
@@ -15333,6 +15346,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.suit(i)==suit) return false;
 					}
 					return true;
+				},
+				filterOk:function(){
+					if(!ui.selected.targets.length) return false;
+					var card=get.card(),player=get.player();
+					if(card==undefined) return;
+					var range=[1,Math.max(1,ui.selected.cards.length)]
+					game.checkMod(card,player,range,'selectTarget',player);
+					if(range[0]<=ui.selected.targets.length&&range[1]>=ui.selected.targets.length||range[0]==-1) return true;
+					return false;
 				},
 				check:function(card){
 					var player=_status.event.player,card=get.autoViewAs({name:'sha'},ui.selected.cards.concat(card));

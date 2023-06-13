@@ -5479,6 +5479,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'soil',
 				filterTarget:true,
+				limited:true,
 				selectTarget:()=>[1,game.roundNumber],
 				contentBefore:function(){
 					'step 0'

@@ -395,13 +395,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return game.countPlayer(current=>{
 						return current!=player;
-					});
+					})>1;
 				},
 				filterCard:true,
 				selectCard:[1,Infinity],
+				position:'he',
 				filterTarget:lib.filter.notMe,
 				selectTarget:function(){
 					return ui.selected.cards.length+1;
+				},
+				filterOk:function(){
+					return ui.selected.targets.length==ui.selected.cards.length+1;
 				},
 				multiline:true,
 				content:function(){
@@ -851,12 +855,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				discard:false,
 				lose:false,
 				delay:false,
+				onremove:function(player){
+					delete player.storage.sbxuanhuo;
+					player.unmarkSkill('sbxuanhuo');
+				},
 				check:function(card){
 					return 6.5-get.value(card);
 				},
 				content:function(){
 					'step 0'
 					player.give(cards,target);
+					if(player.storage.sbxuanhuo&&player.storage.sbxuanhuo[target.playerid]) delete player.storage.sbxuanhuo[target.playerid];
 					'step 1'
 					target.addMark('sbxuanhuo_mark');
 					var history=target.getAllHistory('lose');
@@ -897,6 +906,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							return -Math.sqrt(Math.max(target.hp,1));
 						}
+					}
+				},
+				marktext:'惑',
+				intro:{
+					content:function(storage,player){
+						if(!storage||get.is.empty(storage)) return '未获得过牌';
+						var map=(_status.connectMode?lib.playerOL:game.playerMap);
+						var str='已获得过';
+						for(var i in storage){
+							str+=get.translation(map[i])+'的'+get.cnNumber(storage[i])+'张牌、';
+						}
+						return str.slice(0,-1);
 					}
 				},
 				subSkill:{
@@ -941,7 +962,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var target=targets.shift();
 							player.logSkill('sbxuanhuo',target);
 							var hs=target.getCards('h',card=>lib.filter.canBeGained(card,target,player));
-							if(hs.length) player.gain(hs.randomGet(),target,'giveAuto');
+							if(hs.length){
+								player.gain(hs.randomGet(),target,'giveAuto');
+								if(!player.storage.sbxuanhuo) player.storage.sbxuanhuo={};
+								player.storage.sbxuanhuo[target.playerid]=lib.skill.sbxuanhuo.getNum(target,'sbxuanhuo_rob')+1;
+								player.markSkill('sbxuanhuo');
+							}
 							if(targets.length>0) event.redo();
 						},
 					}
@@ -964,6 +990,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.target=target;
 					player.logSkill('sbenyuan',target);
 					target.removeMark('sbxuanhuo_mark',target.countMark('sbxuanhuo_mark'));
+					game.players.forEach(current=>{
+						var storage=current.storage.sbxuanhuo;
+						if(storage&&storage[target.playerid]) delete storage[target.playerid];
+						if(storage&&get.is.empty(storage)){
+							delete current.storage.sbxuanhuo;
+							current.unmarkSkill('sbxuanhuo');
+						}
+					});
 					var num=lib.skill.sbxuanhuo.getNum(target,player);
 					if(num>=3){
 						player.chooseCard('恩怨：交给'+get.translation(target)+'两张牌',true,2,'he');
