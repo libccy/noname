@@ -591,12 +591,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget('三恇：选择一名其他角色','令其交给你至少X张牌，然后其获得'+get.translation(trigger.cards.filterInD('ejod'))+'（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）',true,lib.filter.notMe).set('ai',target=>{
+					var cards=trigger.cards.filterInD();
+					player.chooseTarget('三恇：选择一名其他角色','令其交给你至少X张牌'+(cards.length?'，然后其获得'+get.translation(cards):'')+'（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）',true,lib.filter.notMe).set('ai',target=>{
 						var att=get.attitude(player,target),num=lib.skill.clansankuang.getNum(target);
 						if(num==0) return att;
 						if(_status.event.goon) return -att;
 						return -Math.sqrt(Math.abs(att))-lib.skill.clansankuang.getNum(target);
-					}).set('goon',Math.max.apply(Math,trigger.cards.map(i=>get.value(i)))<=5||trigger.cards.filterInD('ejod').length==0)
+					}).set('goon',Math.max.apply(Math,trigger.cards.map(i=>get.value(i)))<=5||trigger.cards.filterInD().length==0)
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0],num=lib.skill.clansankuang.getNum(target),num2=target.countCards('he');
@@ -604,7 +605,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('clansankuang',target);
 						if(num==0||num2==0) event._result={bool:false};
 						else if(num2<=num) event._result={bool:true,cards:target.getCards('he')};
-						else target.chooseCard('he',true,[num,Infinity]).set('ai',get.unuseful);
+						else target.chooseCard('he',true,[num,Infinity]).set('ai',get.unuseful).set('prompt','交给'+get.translation(player)+'至少'+get.cnNumber(num)+'张牌');
 					}else event.finish();
 					'step 2'
 					if(result.bool){
@@ -613,8 +614,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delayx();
 					}
 					'step 3'
-					if(trigger.cards.filterInD('ej').length) target.gain(trigger.cards.filterInD('ejod'),get.owner(trigger.cards.filterInD('ej')[0]),'giveAuto','bySelf');
-					else if(trigger.cards.filterInD('od').length) target.gain(trigger.cards.filterInD('od'),'gain2','bySelf');
+					if(trigger.cards.filterInD().length) target.gain(trigger.cards.filterInD(),'gain2','bySelf');
 				},
 				ai:{
 					reverseOrder:true,
@@ -661,6 +661,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var cards=player.getCards('h',trigger.card.name);
 					player.showCards(cards,get.translation(player)+'发动了【神君】');
+					player.markSkill('clanshenjun');
 					player.addGaintag(cards,'clanshenjun');
 					for(var name of lib.phaseName){
 						var evt=_status.event.getParent(name);
@@ -668,6 +669,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('clanshenjun_viewAs',name+'After');
 						break;
 					}
+				},
+				marktext:'君',
+				intro:{
+					markcount:function(storage,player){
+						return player.countCards('h',card=>card.hasGaintag('clanshenjun'));
+					},
+					mark:function(dialog,content,player){
+						var cards=player.getCards('h',card=>card.hasGaintag('clanshenjun'));
+						if(cards.length){
+							dialog.addAuto(cards);
+						}
+						else return '无展示牌';
+					},
 				},
 				subSkill:{
 					viewAs:{
@@ -737,7 +751,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event,player){
-					if(game.getGlobalHistory('changeHp',evt=>evt.player==player&&evt.getParent()==event).length!=1) return false;
+					if(game.getGlobalHistory('changeHp',evt=>evt.player==player).length!=1) return false;
 					var cards=player.getCards('h'),map={};
 					if(!cards.length) return false;
 					for(var card of cards){
@@ -1108,7 +1122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					return get.type(evt.card,null,false)=='trick'&&!get.tag(evt.card,'damage')&&event.cards.filterInD('d').length>0&&player.getHistory('useCard',evt=>{
+					return get.type(event.card,null,false)=='trick'&&!get.tag(event.card,'damage')&&event.cards.filterInD('d').length>0&&player.getHistory('useCard',evt=>{
 						return get.type(evt.card,null,false)=='trick'&&!get.tag(evt.card,'damage');
 					}).indexOf(event)==0;
 				},
@@ -1430,7 +1444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanshenjun:'神君',
 			clanshenjun_info:'当一名角色使用【杀】或普通锦囊牌时，若你手牌中有该牌名的牌，你展示之，且这些牌称为“神君”。然后本阶段结束时，你可以将等同于你“神君”数张牌当做一张“神君”牌使用。',
 			clanbalong:'八龙',
-			clanbalong_info:'锁定技。当你回复体力后或受到伤害后或失去体力后，若你手牌中唯一最多的类别为锦囊牌，你展示所有手牌并摸至角色数张。',
+			clanbalong_info:'锁定技。当你于一回合内首次{回复体力后或受到伤害后或失去体力后}，若你手牌中唯一最多的类别为锦囊牌，你展示所有手牌并摸至角色数张。',
 			clandaojie:'蹈节',
 			clandaojie_info:'宗族技，锁定技。当你每回合第一次使用非伤害类普通锦囊牌后，你须失去一个锁定技或失去1点体力，令一名颍川荀氏角色获得此牌对应的所有实体牌。',
 			clan_xuncai:'族荀采',
@@ -1442,7 +1456,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanhuanyin_info:'锁定技。当你进入濒死状态时，将手牌补至四张。',
 			clan_xunchen:'族荀谌',
 			clansankuang:'三恇',
-			clansankuang_info:'锁定技。当你每轮第一次使用一种类别的牌后，你令一名其他角色交给你至少X张牌，然后于场上或弃牌堆内或处理区内获得你使用的牌对应的所有实体牌（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）。',
+			clansankuang_info:'锁定技。当你每轮第一次使用一种类别的牌后，你令一名其他角色交给你至少X张牌，然后于处理区内获得你使用的牌对应的所有实体牌（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）。',
 			clanbeishi:'卑势',
 			clanbeishi_info:'锁定技。当一名角色失去最后的手牌后，若其是你首次发动〖三恇〗的目标角色，你回复1点体力。',
 			clan_xuncan:'族荀粲',

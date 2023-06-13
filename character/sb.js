@@ -3703,7 +3703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{expose:0.2},
 			},
 			sbjieyue:{
-				audio:2,
+				audio:4,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				content:function(){

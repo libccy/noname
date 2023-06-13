@@ -1327,17 +1327,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgrangjie:{
 				audio:'rangjie',
 				trigger:{player:'damageEnd'},
-				forced:true,
-				locked:false,
-				direct:true,
 				filter:function(event,player){
 					return player.canMoveCard();
+				},
+				check:function(event,player){
+					return player.canMoveCard(true);
 				},
 				content:function(){
 					'step 0'
 					event.num=trigger.num;
 					'step 1'
-					player.logSkill('jsrgrangjie');
 					event.num--;
 					if(player.canMoveCard()) player.moveCard(true);
 					'step 2'
@@ -1370,7 +1369,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.gain(result.links,'gain2');
 					}
-					if(event.num>0) event.goto(1);
+					'step 4'
+					if(event.num>0){
+						player.chooseBool(get.prompt2('jsrgrangjie')).set('ai',()=>_status.event.bool).set('bool',lib.skill.jsrgrangjie.check(trigger,player));
+					}
+					else event.finish();
+					'step 5'
+					if(result.bool){
+						player.logSkill('jsrgrangjie');
+						event.goto(1);
+					}
 				},
 				ai:{
 					maixie:true,
@@ -7691,7 +7699,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dahe:{
-				audio:1,
+				audio:true,
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -8250,8 +8258,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yjyongdi_info:'限定技。准备阶段，你可以令一名男性角色加1点体力上限并回复1点体力，然后若其武将牌上有主公技且其不为主公，其获得此主公技。',
 			yj_zhugedan:'用间诸葛诞',
 			yj_zhugedan_ab:'诸葛诞',
-			yj_zhenji:'用间甄姬',
-			yj_zhenji_ab:'甄姬',
+			yj_zhenji:'用间甄宓',
+			yj_zhenji_ab:'甄宓',
 			yjluoshen:'洛神',
 			yjluoshen_info:'准备阶段，你可以判定并获得判定牌，且可重复此流程直到结果的颜色不同。',
 			//线下E系列 一战成名 战役篇官盗
@@ -8441,7 +8449,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgzhaohan:'昭汉',
 			jsrgzhaohan_info:'准备阶段，若本局游戏：未洗过牌，你回复1点体力；洗过牌，你失去1点体力。',
 			jsrgrangjie:'让节',
-			jsrgrangjie_info:'当你受到1点伤害后，你移动场上的一张牌，然后你可以于弃牌堆中选择获得一张本回合进入弃牌堆且与此牌花色相同的牌。',
+			jsrgrangjie_info:'当你受到1点伤害后，你可以移动场上的一张牌，然后你可以于弃牌堆中选择获得一张本回合进入弃牌堆且与此牌花色相同的牌。',
 			jsrgyizheng:'义争',
 			jsrgyizheng_info:'出牌阶段限一次。你可以与一名手牌数大于你的角色拼点。若你：赢，其跳过下一个摸牌阶段；没赢，其可以对你造成至多2点伤害。',
 			jsrg_kongrong:'起孔融',

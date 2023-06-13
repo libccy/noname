@@ -3107,7 +3107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{expose:10},
 			},
 			houfeng:{
-				audio:2,
+				audio:3,
 				trigger:{global:'phaseUseBegin'},
 				logTarget:'player',
 				round:1,
@@ -3146,7 +3146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//手杀皇甫嵩
 			spzhengjun:{
-				audio:2,
+				audio:3,
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
