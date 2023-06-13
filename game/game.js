@@ -7472,7 +7472,7 @@
 					if(ua.indexOf('android')!=-1){
 						lib.device='android';
 					}
-					else if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1){
+					else if(ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('macintosh')!=-1){
 						lib.device='ios';
 					}
 					lib.assetURL=noname_inited;
@@ -9525,17 +9525,38 @@
 			},
 			parsex:function(func){
 				var str=func.toString();
+				//获取第一个 { 后的所有字符
 				str=str.slice(str.indexOf('{')+1);
+				//func中要写步骤的话，必须要写step 0
 				if(str.indexOf('step 0')==-1){
-					str='{if(event.step==1) {event.finish();return;}'+str;
-				}
-				else{
-					for(var k=1;k<99;k++){
-						if(str.indexOf('step '+k)==-1) break;
-						str=str.replace(new RegExp("'step "+k+"'",'g'),"break;case "+k+":");
-						str=str.replace(new RegExp('"step '+k+'"','g'),"break;case "+k+":");
+					str='{if(event.step==1) {event.finish();return;}\n'+str;
+				}else{
+					var skip=0;
+					//每层最多找99个step
+					for (var k=0;k<99;k++) {
+						//正则表达式
+						var reg=new RegExp(`['"]step ${k}['"]`);
+						var result=str.slice(skip).match(reg);
+						if(result==null) break;
+						var insertStr;
+						if(k==0){
+							insertStr=`switch(step){case 0:`;
+						}else{
+							insertStr=`break;case ${k}:`;
+						}
+						var copy=str;
+						copy=copy.slice(0,skip+result.index)+insertStr+copy.slice(skip+result.index+result[0].length);
+						//测试是否有错误
+						try{
+							new Function(copy);
+							str=copy;
+							skip+=result.index+insertStr.length;
+						}catch(error){
+							k--;
+							skip+=result.index+result[0].length;
+						}
 					}
-					str=str.replace(/'step 0'|"step 0"/,'if(event.step=='+k+') {event.finish();return;}switch(step){case 0:');
+					str=`if(event.step==${k}){event.finish();return;}`+str;
 				}
 				return (new Function('event','step','source','player','target','targets',
 					'card','cards','skill','forced','num','trigger','result',
@@ -33030,27 +33051,10 @@
 			}
 		},
 		exit:function(){
-			//安卓 / ios
-			if(lib.device) {
-				if(lib.device=='ios'){
-					game.saveConfig('mode');
-					if(_status){
-						if(_status.reloading)return;
-						_status.reloading=true;
-					}
-					if(_status.video&&!_status.replayvideo) {
-						localStorage.removeItem(lib.configprefix + 'playbackmode');
-					}
-					window.location.reload();
-				}
-				else{
-					if(navigator.app&&navigator.app.exitApp){
-						navigator.app.exitApp();
-					}
-				}
-			}
+			var ua=navigator.userAgent.toLowerCase();
+			var ios=ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('macintosh')!=-1;
 			//electron
-			else if(typeof process=='function'){
+			if(typeof window.process=='object'&&typeof window.require=='function'){
 				var versions=window.process.versions;
 				var electronVersion=parseFloat(versions.electron);
 				var remote;
@@ -33063,8 +33067,26 @@
 				thisWindow.destroy();
 				window.process.exit();
 			}
-			//网页版
-			else{
+			// android-cordova环境
+			else if(lib.device==='android'){
+				if(navigator.app&&navigator.app.exitApp){
+					navigator.app.exitApp();
+				}
+			}
+			//ios-cordova环境或ios浏览器环境
+			else if(lib.device==='ios'||!lib.device&&ios){
+				game.saveConfig('mode');
+				if(_status){
+					if(_status.reloading)return;
+					_status.reloading=true;
+				}
+				if(_status.video&&!_status.replayvideo) {
+					localStorage.removeItem(lib.configprefix+'playbackmode');
+				}
+				window.location.reload();
+			}
+			//非ios的网页版
+			else if(!ios){
 				window.onbeforeunload = null;
 				window.close();
 			}

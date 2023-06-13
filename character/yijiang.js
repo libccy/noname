@@ -1,4 +1,4 @@
-'use strict';
+2416'use strict';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'yijiang',
@@ -2413,6 +2413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCardAfter','respondAfter']},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				filter:function(event,player){
 					return event.skill=='xintaoluan_backup'||event.skill=='xintaoluan5'||event.skill=='xintaoluan4';
 				},
@@ -2457,7 +2458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			xintaoluan3:{},
+			xintaoluan3:{charlotte:true},
 			xintaoluan4:{
 				audio:'taoluan',
 				prompt:'将一张牌当做闪使用',
@@ -2554,6 +2555,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xintaoluan6:{
 				trigger:{global:'phaseAfter'},
 				silent:true,
+				charlotte:true,
 				content:function(){
 					player.storage.xintaoluan=[];
 					player.storage.xintaoluan2=0;
@@ -5084,6 +5086,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCardAfter','respondAfter']},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				filter:function(event,player){
 					return event.skill=='taoluan_backup'||event.skill=='taoluan5'||event.skill=='taoluan4';
 				},
@@ -5127,7 +5130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			taoluan3:{},
+			taoluan3:{charlotte:true},
 			taoluan4:{
 				prompt:'将一张牌当做闪使用',
 				enable:'chooseToUse',

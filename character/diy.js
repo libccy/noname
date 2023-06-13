@@ -221,7 +221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_default:["diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji"],
 				diy_noname:['noname'],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano","db_key_liyingxia","key_erika","key_satomi"],
-				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','old_bulianshi','junk_sunquan','ol_maliang','junk_liubei','junk_huangyueying','junk_lidian'],
+				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','old_bulianshi','junk_sunquan','ol_maliang','junk_liubei','junk_huangyueying','junk_lidian','junk_duanwei'],
 			},
 		},
 		characterIntro:{
@@ -731,11 +731,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						case '炸弹': case'四带二':
 							type=6;break;
 					}
-					if(type==2){
+					/*if(type==2){
 						current.addSkill('iriya_haozhi_extra');
 						current.addMark('iriya_haozhi_extra',1,false);
 					}
-					else if(type>0){
+					else */
+					if(type>0){
 						var next=game.createEvent('iriya_haozhi_effect',false);
 						next.player=current;
 						next.setContent(lib.skill.iriya_haozhi['content'+type]);
@@ -751,6 +752,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.asyncDraw(targets);
 						game.delayex();
 					}
+				},
+				content2:function(){
+					'step 0'
+					player.chooseTarget([1,3],'是否弃置至多三名角色的各一张牌？',function(card,player,target){
+						return target!=player&&target.hasCard(function(card){
+							return lib.filter.canBeDiscarded(card,player,target);
+						},'he')
+					});
+					'step 1'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						for(var target of targets){
+							player.discardPlayerCard(target,true,'he');
+						}
+					}
+					'step 2'
+					player.recover();
+					player.draw();
 				},
 				content3:function(){
 					'step 0'
@@ -12379,6 +12398,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCardAfter','respondAfter']},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				filter:function(event,player){
 					return event.skill=='junktaoluan_backup'||event.skill=='junktaoluan5'||event.skill=='junktaoluan4';
 				},
@@ -12422,6 +12442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseEnd'},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				content:function(){
 					player.loseHp();
 				},
@@ -18151,7 +18172,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			iriya_haozhi:'豪掷',
 			iriya_haozhi_info:'出牌阶段，你可以按照斗地主牌型弃置至少两张牌，且其他角色可以依次对其进行一轮响应。最后一名进行响应的角色可以根据对应牌型执行对应效果。'
 			+'对子：其可以令至多两名角色各摸一张牌。'
-			+'三带：其使用的下一张牌可以多指定一个目标且无距离和次数限制。'
+			+'三带：其可以弃置至多三名其他角色的各一张牌，然后回复1点体力并摸一张牌。'
 			+'单顺：其可以对至多2名其他角色造成1点伤害。'
 			+'双顺：其可以弃置至多2名其他角色的一张牌并对其造成1点伤害。'
 			+'三顺/飞机：其可以令至多2名其他角色翻面，弃置其的一张牌并对其造成1点伤害。'

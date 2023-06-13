@@ -567,6 +567,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				popup:false,
 				firstDo:true,
+				charlotte:true,
 				filter:function(event,player){
 					return event.skill&&event.skill.indexOf('old_guhuo_')==0;
 				},

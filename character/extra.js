@@ -4273,11 +4273,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'judge'},
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('he')>0&&player.hasMark('renjie');
+					return player.countCards('hes')>0&&player.hasMark('renjie');
 				},
 				content:function(){
 					"step 0"
-					player.chooseCard('是否弃置一枚“忍”，并发动〖鬼才〗？','he',function(card){
+					player.chooseCard('是否弃置一枚“忍”，并发动〖鬼才〗？','hes',function(card){
 						var player=_status.event.player;
 						var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
 						if(mod2!='unchanged') return mod2;
@@ -4808,8 +4808,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						gains.removeArray(player.getCards('h'));
 						if(!pushs.length||pushs.length!=gains.length) return;
 						player.addToExpansion(pushs,player,'giveAuto').gaintag.add('qixing');
-						game.log(player,'将',pushs,'作为“星”置于武将牌上');
-						player.gain(gains,'gain2');
+						//game.log(player,'将',pushs,'作为“星”置于武将牌上');
+						player.gain(gains,'draw');
 					}
 				},
 				intro:{
@@ -4874,7 +4874,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('qixing2');
 						player.addToExpansion(pushs,player,'giveAuto').gaintag.add('qixing');
 						game.log(player,'将',pushs,'作为“星”置于武将牌上');
-						player.gain(gains,'gain2');
+						player.gain(gains,'draw');
 					}
 				},
 			},

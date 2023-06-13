@@ -7530,6 +7530,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				popup:false,
 				firstDo:true,
+				charlotte:true,
 				filter:function(event,player){
 					return event.skill&&(event.skill.indexOf('guhuo_')==0||event.skill.indexOf('xinfu_guhuo_')==0);
 				},
@@ -7741,6 +7742,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugezhan:['zhugezhan','old_zhugezhan'],
 			ol_lusu:['ol_lusu','re_lusu'],
 			zhanghe:['re_zhanghe','zhanghe'],
+			yl_luzhi:['yl_luzhi','tw_yl_luzhi'],
 		},
 		translate:{
 			re_yuanshao:'袁绍',
