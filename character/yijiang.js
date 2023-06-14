@@ -569,20 +569,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:['eventNeutralized','shaMiss']},
 				filter:function(event,player){
 					if(player.hasSkill('diezhang_used')) return false;
-					if(event.type!='card'&&event.name!='_wuxie') return false;
+					if(event.type!='card') return false;
 					var evt=event._neutralize_event;
 					var user,responder;
-					if(event.name=='_wuxie'){
-						var list=game.getGlobalHistory('useCard',evtx=>evtx.getParent()==event).slice(-2);
-						if(list.length<=1) return false;
-						user=list[0].player;responder=list[1].player;
-					}
-					else if(evt&&evt.name=='_wuxie'){
-						var evtx=game.getGlobalHistory('useCard',evtx=>evtx.getParent()==evt)[0];
-						user=event.player;responder=evtx.player;
+					if(event.name=='sha'){
+						user=event.player;responder=event.target;
 					}
 					else{
-						user=event.player;responder=event.target;
+						if(evt.type!='card') return false;
+						user=event.player;
+						responder=evt.player;
 					}
 					if(!player.storage.diezhang){
 						if(user!=player||responder==player) return false;
@@ -598,16 +594,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var evt=trigger._neutralize_event;
 					var user,responder;
-					if(trigger.name=='_wuxie'){
-						var list=game.getGlobalHistory('useCard',evtx=>evtx.getParent()==trigger).slice(-2);
-						user=list[0].player;responder=list[1].player;
-					}
-					else if(evt&&evt.name=='_wuxie'){
-						var evtx=game.getGlobalHistory('useCard',evtx=>evtx.getParent()==evt)[0];
-						user=trigger.player;responder=evtx.player;
+					if(trigger.name=='sha'){
+						user=trigger.player;responder=trigger.target;
 					}
 					else{
-						user=trigger.player;responder=trigger.target;
+						user=trigger.player;
+						responder=evt.player;
 					}
 					var num=player.storage.duanwan?2:1;
 					event.num=num;
