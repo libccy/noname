@@ -12208,25 +12208,6 @@
 						event.finish();
 						return;
 					}
-					var next=game.createEvent(event.skill);
-					if(typeof info.usable=='number'){
-						player.addSkill('counttrigger');
-						if(!player.storage.counttrigger){
-							player.storage.counttrigger={};
-						}
-						if(!player.storage.counttrigger[event.skill]){
-							player.storage.counttrigger[event.skill]=1;
-						}
-						else{
-							player.storage.counttrigger[event.skill]++;
-						}
-					}
-					next.player=player;
-					next._trigger=trigger;
-					next.triggername=event.triggername;
-					next.setContent(info.content);
-					next.skillHidden=event.skillHidden;
-					if(info.forceDie) next.forceDie=true;
 					if(info.popup!=false&&!info.direct){
 						if(info.popup){
 							player.popup(info.popup);
@@ -12246,6 +12227,25 @@
 							}
 						}
 					}
+					var next=game.createEvent(event.skill);
+					if(typeof info.usable=='number'){
+						player.addSkill('counttrigger');
+						if(!player.storage.counttrigger){
+							player.storage.counttrigger={};
+						}
+						if(!player.storage.counttrigger[event.skill]){
+							player.storage.counttrigger[event.skill]=1;
+						}
+						else{
+							player.storage.counttrigger[event.skill]++;
+						}
+					}
+					next.player=player;
+					next._trigger=trigger;
+					next.triggername=event.triggername;
+					next.setContent(info.content);
+					next.skillHidden=event.skillHidden;
+					if(info.forceDie) next.forceDie=true;
 					"step 4"
 					if(player._hookTrigger){
 						for(var i=0;i<player._hookTrigger.length;i++){
@@ -15321,7 +15321,18 @@
 						},player,card);
 					}
 					if(event.animate!=false&&event.line!=false){
-						if((card.name=='wuxie'||card.name=='youdishenru')&&event.getParent().source){
+						if(card.name=='wuxie'&&event.getParent()._info_map){
+							var evtmap=event.getParent()._info_map;
+							if(evtmap._source) evtmap=evtmap._source;
+							var lining=(evtmap.multitarget?evtmap.targets:evtmap.target)||event.player;
+							if(Array.isArray(lining)&&event.getTrigger().name=='jiedao'){
+								player.line(lining[0],'green');
+							}
+							else{
+								player.line(lining,'green');
+							}
+						}
+						else if(card.name=='youdishenru'&&event.getParent().source){
 							var lining=event.getParent().sourcex||event.getParent().source2||event.getParent().source;
 							if(lining==player&&event.getParent().sourcex2){
 								lining=event.getParent().sourcex2;
@@ -15704,7 +15715,7 @@
 					}
 					//delete player.using;
 					if(document.getElementsByClassName('thrown').length){
-						if(event.delayx!==false) game.delayx();
+						if(event.delayx!==false&&get.info(event.card,false).finalDelay!==false) game.delayx();
 					}
 					else{
 						event.finish();
@@ -22393,6 +22404,7 @@
 						next.setContent('emptyEvent');
 						player.getHistory('useSkill').push(logInfo);
 						//尽可能别往这写插入结算
+						//不能用来终止技能发动！！！
 						var next2=game.createEvent('logSkillBegin',false);
 						next2.player=player;
 						next2.forceDie=true;
@@ -24298,7 +24310,7 @@
 					}
 					return false;
 				},
-				hasWuxie:function(){
+				hasWuxie:function(info){
 					if(this.countCards('hs','wuxie')) return true;
 					var skills=this.getSkills('invisible').concat(lib.skill.global);
 					game.expandSkills(skills);
@@ -24309,8 +24321,13 @@
 								return true;
 							}
 						}
+						else if(ifo.hiddenWuxie&&info){
+							if(typeof ifo.hiddenWuxie=='function'&&ifo.hiddenWuxie(this,info)){
+								return true;
+							}
+						}
 						else{
-							var hiddenCard=get.info(skills[i]).hiddenCard;
+							var hiddenCard=ifo.hiddenCard;
 							if(typeof hiddenCard=='function'&&hiddenCard(this,'wuxie')){
 								return true;
 							}

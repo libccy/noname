@@ -16698,10 +16698,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!game.hasPlayer(function(current){
 								return get.distance(target,current,'attack')>2;
 							})){
-								var usf=Math.max.apply(Math,function(current){
+								var usf=Math.max.apply(Math,game.filterPlayer().map(function(current){
 									if(target.canUse('sha',current,false)) return get.effect(current,{name:'sha'},target,player);
 									return 0;
-								});
+								}));
 								return att+usf;
 							}
 							return att;
