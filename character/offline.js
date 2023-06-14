@@ -242,7 +242,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			sbpingjian:{
-				trigger:{player:['useSkillAfter','logSkill']},
+				trigger:{player:['useSkill','logSkillBegin']},
 				forced:true,
 				filter:function(event,player){
 					var skill=event.sourceSkill||event.skill;
@@ -266,16 +266,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						lib.skill.sbyingmen.removeVisitors(result.links,player);
 						game.log(player,'移去了','#y'+get.translation(result.links[0]));
-						if(event.drawers.contains(result.links[0])) player.draw();
+						if(event.drawers.contains(result.links[0])){
+							player.addTempSkill('sbpingjian_draw');
+							player.storage.sbpingjian_draw.push(trigger.skill);
+						}
 					}
 				},
 				group:'sbpingjian_trigger',
 				subSkill:{
+					draw:{
+						charlotte:true,
+						init:function(player,skill){
+							if(!player.storage[skill]) player.storage[skill]=[];
+						},
+						onremove:true,
+						trigger:{player:['useSkillAfter','logSkill']},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return player.getStorage('sbpingjian_draw').contains(event.skill);
+						},
+						content:function(){
+							player.storage.sbpingjian_draw.remove(trigger.skill);
+							player.draw();
+							if(!player.storage.sbpingjian_draw.length) player.removeSkill('sbpingjian_draw');
+						},
+					},
 					trigger:{
 						trigger:{player:'triggerInvisible'},
 						forced:true,
 						forceDie:true,
 						popup:false,
+						charlotte:true,
 						priority:10,
 						filter:function(event,player){
 							if(event.revealed) return false;
@@ -8502,7 +8524,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbyingmen:'盈门',
 			sbyingmen_info:'锁定技。①游戏开始时，你将武将牌堆中随机四张武将牌置于你的武将牌上，称为“访客”。②回合开始时，若你的“访客”数小于4，你随机从武将牌堆中将“访客”补至四张。',
 			sbpingjian:'评鉴',
-			sbpingjian_info:'你可以于满足你“访客”上的一个无技能标签或仅有锁定技标签的技能条件的时机发动此技能。你发动的技能结算结束后，若此技能位于你的“访客”中，则你选择移去一张“访客”。若移去的是本次发动技能的“访客”，你摸一张牌。',
+			sbpingjian_info:'你可以于满足你“访客”上的一个无技能标签或仅有锁定技标签的技能条件的时机发动此技能，然后你选择移去一张“访客”。若移去的是本次发动技能的“访客”，则你于此技能结算结束时摸一张牌。',
 
 			offline_star:'桌游志·SP',
 			offline_sticker:'桌游志·贴纸',

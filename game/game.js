@@ -15886,6 +15886,7 @@
 					event.sourceSkill=logInfo.sourceSkill;
 					event.type=logInfo.type;
 					player.getHistory('useSkill').push(logInfo);
+					event.trigger('useSkill');
 					"step 1"
 					var info=get.info(event.skill);
 					if(info&&info.contentBefore){
@@ -22391,6 +22392,15 @@
 						evt.after.push(next);
 						next.setContent('emptyEvent');
 						player.getHistory('useSkill').push(logInfo);
+						//尽可能别往这写插入结算
+						var next2=game.createEvent('logSkillBegin',false);
+						next2.player=player;
+						next2.forceDie=true;
+						for(var i in logInfo){
+							if(i=='event') next2.log_event=logInfo[i];
+							else next2[i]=logInfo[i];
+						}
+						next2.setContent('emptyEvent');
 					}
 					if(this._hookTrigger){
 						for(var i=0;i<this._hookTrigger.length;i++){

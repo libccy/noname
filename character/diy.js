@@ -822,20 +822,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content6:function(){
 					'step 0'
-					player.chooseTarget([1,2],'是否令至多两名其他角色翻面，弃置其装备区内的所有牌和一张手牌，并造成1点伤害？',lib.filter.notMe);
+					player.chooseTarget('是否对一名其他角色进行核打击？','你对该角色造成1点伤害，然后该角色翻面，弃置装备区内的所有牌和四张手牌。',lib.filter.notMe);
 					'step 1'
 					if(result.bool){
-						var targets=result.targets.sortBySeat();
-						player.line(targets);
-						event.targets=targets;
+						var target=result.targets[0];
+						event.target=target;
+						player.line(target,'fire');
+						target.damage();
+						target.turnOver();
 					}
+					else event.finish();
 					'step 2'
-					var target=targets.shift();
-					target.turnOver();
-					player.discardPlayerCard(target,true,'he');
-					target.damage();
-					game.delayex();
-					if(targets.length>0) event.redo();
+					var num=target.countCards('e');
+					if(num>0) target.chooseToDiscard('e',true,num);
+					'step 3'
+					var num=target.countCards('h');
+					if(num>0) target.chooseToDiscard('h',true,Math.min(4,num));
 				},
 				ai:{sortCardByNum:true},
 				subSkill:{
@@ -18176,7 +18178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			+'单顺：其可以对至多2名其他角色造成1点伤害。'
 			+'双顺：其可以弃置至多2名其他角色的一张牌并对其造成1点伤害。'
 			+'三顺/飞机：其可以令至多2名其他角色翻面，弃置其的一张牌并对其造成1点伤害。'
-			+'炸弹/四带二：其可以令至多2名其他角色翻面，弃置这些角色装备区内的所有牌和一张手牌，对这些角色造成1点伤害。',
+			+'炸弹/四带二：其可以对一名角色造成1点伤害，然后该角色翻面，弃置装备区的所有牌和四张手牌。',
 
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',
