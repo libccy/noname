@@ -4161,7 +4161,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			duanchang:{
 				audio:2,
-				audioname:['re_caiwenji'],
+				audioname:['re_caiwenji','ol_caiwenji'],
 				forbid:['boss'],
 				trigger:{player:'die'},
 				forced:true,
@@ -6376,7 +6376,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jushou:{
-				audio:'jushou_audio',
+				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				check:function(event,player){
 					return event.player.hp+player.countCards('h')<4;
@@ -6392,9 +6392,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				subSkill:{
-					audio:{audio:2}
-				}
 			},
 			moon_jushou:{
 				audio:'xinjushou',

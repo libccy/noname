@@ -1,4 +1,4 @@
-2416'use strict';
+'use strict';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'yijiang',
@@ -2281,12 +2281,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinzongzuo:{
-				trigger:{global:'phaseBefore'},
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
 				forced:true,
-				priority:10,
 				audio:'zongzuo',
 				filter:function(event,player){
-					return game.phaseNumber==0;
+					return (event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -5774,12 +5776,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zongzuo:{
-				trigger:{global:'phaseBefore'},
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
 				forced:true,
-				priority:10,
 				audio:2,
 				filter:function(event,player){
-					return game.phaseNumber==0;
+					return (event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -9218,7 +9222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			youdi:{
-				audio:true,
+				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -12100,6 +12104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			olddanshou:{
+				audio:'danshou',
 				trigger:{source:'damageSource'},
 				//priority:9,
 				check:function(event,player){
@@ -12891,6 +12896,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			oldrenxin:{
+				audio:'renxin',
 				trigger:{global:'dying'},
 				//priority:6,
 				filter:function(event,player){
@@ -12912,7 +12918,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			renxin:{
 				trigger:{global:'damageBegin4'},
-				audio:3,
+				audio:2,
 				//priority:6,
 				filter:function(event,player){
 					return event.player!=player&&event.player.hp==1&&player.countCards('he',{type:'equip'})>0;
@@ -13055,7 +13061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiansi2:{
 				enable:'chooseToUse',
 				audio:2,
-				audioname:['re_liufeng'],
+				audioname2:{re_liufeng:'rexiansi'},
 				viewAs:{name:'sha',isCard:true},
 				filter:function(event,player){
 					return game.hasPlayer(function(current){

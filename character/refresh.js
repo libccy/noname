@@ -38,7 +38,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_liufeng:['male','shu',4,['rexiansi']],
 			ol_xunyu:['male','wei',3,['quhu','oljieming'],['clan:颍川荀氏']],
 			re_liuchen:['male','shu',4,['rezhanjue','reqinwang'],['zhu']],
-			dc_gongsunzan:['male','qun',4,['reyicong','dcqiaomeng']],
+			dc_gongsunzan:['male','qun',4,['dcyicong','dcqiaomeng']],
 			re_duji:['male','wei',3,['reandong','reyingshi']],
 			re_jushou:['male','qun',3,['dcjianying','dcshibei']],
 			re_zhanghe:['male','wei',4,['reqiaobian']],
@@ -158,6 +158,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//新服公孙瓒
+			dcyicong:{
+				trigger:{
+					player:["changeHp"],
+				},
+				audio:2,
+				forced:true,
+				filter:function(event,player){
+					return get.sgn(player.getDamagedHp()-1.5)!=get.sgn(player.getDamagedHp()-1.5+event.num);
+				},
+				content:function (){},
+				mod:{
+					globalFrom:function(from,to,current){
+						return current-1;
+					},
+					globalTo:function(from,to,current){
+						if(to.getDamagedHp()>=2) return current+1;
+					},
+				},
+				ai:{
+					threaten:0.8
+				}
+			},
 			//朱治
 			reanguo:{
 				audio:2,
@@ -11089,7 +11112,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:true,
 			},
-			"new_reqingnang":{
+			new_reqingnang:{
 				subSkill:{
 					off:{
 						sub:true,
@@ -11098,7 +11121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						sub:true,
 					},
 				},
-				audio:"qingnang",
+				audio:2,
 				enable:"phaseUse",
 				filterCard:true,
 				check:function (card){
@@ -14302,6 +14325,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhuzhi:'界朱治',
 			reanguo:'安国',
 			reanguo_info:'出牌阶段限一次。你可以选择一名其他角色，若其：手牌数为全场最少，其摸一张牌；体力值为全场最低，其回复1点体力；装备区内牌数为全场最少，其随机使用一张装备牌。然后若该角色有未执行的效果且你满足条件，你执行之。若你与其执行了全部分支，你可以重铸任意张牌。',
+			dcyicong:'义从',
+			dcyicong_info:'锁定技。①你至其他角色的距离-1。②若你已损失的体力值不小于2，则其他角色至你的距离+1。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

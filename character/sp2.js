@@ -41,7 +41,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xianglang:['male','shu',3,['dckanji','dcqianzheng'],['unseen']],
 			qinlang:['male','wei',4,['dchaochong','dcjinjin']],
 			furongfuqian:['male','shu','4/6',['dcxuewei','dcyuguan']],
-			zhenghun:['male','wei',3,['dcqiangzhi','dcpitian'],['unseen']],
+			zhenghun:['male','wei',3,['dcqiangzhi','dcpitian']],
 			dc_zhaotongzhaoguang:['male','shu',4,['yizan_use','dcqingren','dclongyuan']],
 			dc_huanghao:['male','shu',3,['dcqinqing','huisheng','dccunwei']],
 			xuelingyun:['female','wei',3,['dcxialei','dcanzhi']],
@@ -660,7 +660,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'dcwujie_inf',
 				logTarget:'player',
 				filter:function(event,player){
-					return event.getParent().name=='die'&&event.getParent().source==event.player&&event.player!=player;
+					return event.getParent().name=='die'&&event.getParent().source==event.player&&event.player!=player&&event.getParent().player==player;
 				},
 				content:function(){
 					trigger.cancel();
@@ -4117,7 +4117,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//伏完
 			dcmoukui:{
-				audio:2,
+				audio:'moukui',
 				trigger:{player:'useCardToPlayered'},
 				direct:true,
 				filter:function(event,player){
@@ -5103,10 +5103,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.type=='discard'&&event.getl(player).cards2.length>0;
 				},
 				content:function(){
-					player.addMark('dcpitian',1,false);
+					player.addMark('dcpitian_handcard',1,false);
+					player.addSkill('dcpitian_handcard');
 					game.log(player,'的手牌上限','#y+1');
 				},
-				intro:{content:'手牌上限+#'},
 				subSkill:{
 					draw:{
 						audio:'dcpitian',
@@ -5121,14 +5121,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.getHandcardLimit()-player.countCards('h')>Math.min(2,player.hp-1);
 						},
 						content:function(){
-							player.draw(Math.min(5,player.getHandcardLimit()-player.countCards('h')));
-							player.removeMark('dcpitian',player.countMark('dcpitian'),false);
+							'step 0'
+							var num=Math.min(5,player.getHandcardLimit()-player.countCards('h'));
+							if(num>0) player.draw(num);
+							'step 1'
+							player.removeMark('dcpitian_handcard',player.countMark('dcpitian_handcard'),false);
+							game.log(player,'重置了','#g【辟田】','增加的手牌上限');
 						}
-					}
-				},
-				mod:{
-					maxHandcard:function(player,num){
-						return num+player.countMark('dcpitian');
+					},
+					handcard:{
+						markimage:'image/card/handcard.png',
+						intro:{
+							content:function(storage,player){
+								return '手牌上限+'+storage;
+							}
+						},
+						charlotte:true,
+						mod:{
+							maxHandcard:function(player,num){
+								return num+player.countMark('dcpitian_handcard');
+							}
+						},
 					}
 				},
 				ai:{
@@ -7892,6 +7905,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					gain:{
 						trigger:{global:'useCardAfter'},
 						charlotte:true,
+						forced:true,
+						popup:false,
 						filter:function(event,player){
 							return event._dcchongwang;
 						},
@@ -15316,7 +15331,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('hs')>0;
 				},
 				selectCard:function(){
-					return [Math.max(1,ui.selected.targets.length),4];
+					return [1,4];
 				},
 				selectTarget:function(){
 					var card=get.card(),player=get.player();
@@ -15333,6 +15348,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.suit(i)==suit) return false;
 					}
 					return true;
+				},
+				filterOk:function(){
+					if(!ui.selected.targets.length) return false;
+					var card=get.card(),player=get.player();
+					if(card==undefined) return;
+					var range=[1,Math.max(1,ui.selected.cards.length)]
+					game.checkMod(card,player,range,'selectTarget',player);
+					if(range[0]<=ui.selected.targets.length&&range[1]>=ui.selected.targets.length||range[0]==-1) return true;
+					return false;
 				},
 				check:function(card){
 					var player=_status.event.player,card=get.autoViewAs({name:'sha'},ui.selected.cards.concat(card));
@@ -28198,6 +28222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuechen:'乐綝（195~257年），字号不详，阳平郡卫国县（今河南省清丰县）人。三国时期曹魏将领，右将军乐进的儿子。果毅坚毅，袭封广昌亭侯，累迁扬州刺史。甘露二年，为叛乱的征东大将军诸葛诞所杀，追赠卫尉。',
 			zhangjinyun:'张瑾云，张星彩的妹妹，刘禅的第二任皇后，238年正月立为皇后。景耀六年（263年），蜀汉灭亡，刘禅被俘，此后，受封为安乐公。张皇后也随之成为安乐公夫人，咸熙元年（264年），随刘禅到洛阳。',
 			duanqiaoxiao:'段巧笑，三国时代魏国魏文帝时的宫人，甚受到魏文帝的宠爱。传说她以原有的化妆品中的米粉和胡粉，再加入葵花子汁，发明了女性化妆用的脂粉。',
+			mushun:'穆顺，小说《三国演义》中的人物，男，东汉末宦官。献帝欲修书与国舅伏完，共谋图曹公。因顺为宦官中之忠义可托者，乃命顺往送书。顺藏书于发中，潜出禁宫，径至完宅，将书呈上。及完回书付顺，顺乃藏于头髻内，辞完回宫。然公闻信，先于宫门等候，顺回遇公，公喝左右，遍搜身上，并无夹带，放行。忽然风吹落其帽。公又唤回，取帽视之，遍观无物，还帽令戴。顺双手倒戴其帽。公心疑，令左右搜其头发中，搜出伏完书来。公见书大怒，执下顺于密室问之，顺不肯招。当晚将顺、完等宗族二百余口，皆斩于市。',
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',

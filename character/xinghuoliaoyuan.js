@@ -882,7 +882,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinfu_gongqing_gz_panjun:{audio:2},
 			"xinfu_gongqing":{
-				audio:true,
+				audio:2,
 				audioname2:{gz_panjun:'xinfu_gongqing_gz_panjun'},
 				trigger:{
 					player:["damageBegin3","damageBegin4"],
@@ -1302,7 +1302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			"xinfu_kannan":{
-				audio:true,
+				audio:2,
 				subSkill:{
 					phase:{
 						sub:true,
