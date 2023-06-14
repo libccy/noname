@@ -2604,7 +2604,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						});
 						if(map.card&&map.player) next.respondTo=[map.player,map.card]
 						if(game.online){
-							_status.event._resultid=id;
+							_status.event._resultid=map.id;
 							game.resume();
 						}
 						else{
@@ -2628,7 +2628,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 					event.list=list;
 					event.id=get.id();
-					map.id=id;
+					map.id=event.id;
 					list.sortBySeat(_status.currentPhase);
 					'step 2'
 					if(event.list.length==0){
