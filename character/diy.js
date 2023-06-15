@@ -75,7 +75,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			db_key_liyingxia:['female','shu',3,['liyingxia_sanli','liyingxia_zhenjun','liyingxia_wumai'],['doublegroup:shu:key']],
 			key_erika:['female','key','3/3/2',['erika_shisong','erika_yousheng']],
 			key_satomi:['female','key',3,['satomi_luodao','satomi_daohai']],
-			key_iriya:['female','key',3,['iriya_yinji','iriya_haozhi'],['unseen']],
+			key_iriya:['female','key',3,['iriya_yinji','iriya_haozhi']],
 			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
@@ -768,67 +768,99 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					'step 2'
-					player.recover();
+					//player.recover();
 					player.draw();
 				},
 				content3:function(){
 					'step 0'
-					player.chooseTarget([1,2],'是否对至多两名其他角色造成1点伤害？',lib.filter.notMe);
+					event.count=0;
 					'step 1'
-					if(result.bool){
-						var targets=result.targets.sortBySeat();
-						player.line(targets);
-						event.targets=targets;
-					}
+					var next=player.chooseTarget('是否弃置一名其他角色的一张牌？',function(card,player,target){
+						return target!=player&&target.hasCard(function(card){
+							return lib.filter.canBeDiscarded(card,player,target);
+						},'he');
+					});
+					if(event.color) next.set('prompt2','若你弃置的牌为'+get.translation(event.color)+'，则你可以重复此流程');
 					'step 2'
-					var target=targets.shift();
-					target.damage();
-					game.delayex();
-					if(targets.length>0) event.redo();
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'fire');
+						player.discardPlayerCard(target,true,'he');
+					}
+					else event.goto(4);
+					'step 3'
+					if(result.bool){
+						event.count++;
+						var card=result.cards[0],color=get.color(card,false);
+						if(!event.color){
+							event.color=color;
+							event.goto(1);
+						}
+						else if(color==event.color) event.goto(1);
+					}
+					'step 4'
+					if(event.count>0) player.draw(event.count);
 				},
 				content4:function(){
 					'step 0'
-					player.chooseTarget([1,2],'是否弃置至多两名其他角色的各一张牌并造成1点伤害？',lib.filter.notMe);
+					event.count=0;
 					'step 1'
-					if(result.bool){
-						var targets=result.targets.sortBySeat();
-						player.line(targets);
-						event.targets=targets;
-					}
+					var next=player.chooseTarget('是否获得一名其他角色的一张牌？',function(card,player,target){
+						return target!=player&&target.hasCard(function(card){
+							return lib.filter.canBeGained(card,player,target);
+						},'he');
+					});
+					if(event.color) next.set('prompt2','若你获得的牌为'+get.translation(event.color)+'，则你可以重复此流程');
 					'step 2'
-					var target=targets.shift();
-					player.discardPlayerCard(target,true,'he');
-					target.damage();
-					game.delayex();
-					if(targets.length>0) event.redo();
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'fire');
+						player.gainPlayerCard(target,true,'he');
+					}
+					else event.goto(4);
+					'step 3'
+					if(result.bool){
+						event.count++;
+						var card=result.cards[0],color=get.color(card,false);
+						if(!event.color){
+							event.color=color;
+							event.goto(1);
+						}
+						else if(color==event.color) event.goto(1);
+					}
+					'step 4'
+					if(event.count>0) player.recover(event.count);
 				},
 				content5:function(){
 					'step 0'
-					player.chooseTarget([1,2],'是否令至多两名其他角色翻面，弃置其的各一张牌并造成1点伤害？',lib.filter.notMe);
+					player.chooseTarget([1,3],'是否令至多三名其他角色翻面？',lib.filter.notMe);
 					'step 1'
 					if(result.bool){
 						var targets=result.targets.sortBySeat();
-						player.line(targets);
+						player.line(targets,'thunder');
 						event.targets=targets;
+						for(var target of targets) target.turnOver();
 					}
 					'step 2'
-					var target=targets.shift();
-					target.turnOver();
-					player.discardPlayerCard(target,true,'e',5);
-					player.discardPlayerCard(target,true,'h');
-					target.damage();
-					game.delayex();
-					if(targets.length>0) event.redo();
+					player.chooseTarget('是否对一名目标角色造成1点火属性伤害？',function(card,player,target){
+						return _status.event.getParent().targets.contains(target);
+					});
+					'step 3'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'fire');
+						target.damage('fire');
+					}
 				},
 				content6:function(){
 					'step 0'
-					player.chooseTarget('是否对一名其他角色进行核打击？','你对该角色造成1点伤害，然后该角色翻面，弃置装备区内的所有牌和四张手牌。',lib.filter.notMe);
+					player.chooseTarget('是否对一名其他角色进行核打击？','你对该角色造成2点雷属性伤害，然后该角色翻面，弃置装备区内的所有牌和四张手牌。',lib.filter.notMe);
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
 						event.target=target;
-						player.line(target,'fire');
-						target.damage();
+						player.line(target,'thunder');
+						target.damage('thunder',2);
 						target.turnOver();
 					}
 					else event.finish();
@@ -18174,11 +18206,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			iriya_haozhi:'豪掷',
 			iriya_haozhi_info:'出牌阶段，你可以按照斗地主牌型弃置至少两张牌，且其他角色可以依次对其进行一轮响应。最后一名进行响应的角色可以根据对应牌型执行对应效果。'
 			+'对子：其可以令至多两名角色各摸一张牌。'
-			+'三带：其可以弃置至多三名其他角色的各一张牌，然后回复1点体力并摸一张牌。'
-			+'单顺：其可以对至多2名其他角色造成1点伤害。'
-			+'双顺：其可以弃置至多2名其他角色的一张牌并对其造成1点伤害。'
-			+'三顺/飞机：其可以令至多2名其他角色翻面，弃置其的一张牌并对其造成1点伤害。'
-			+'炸弹/四带二：其可以对一名角色造成1点伤害，然后该角色翻面，弃置装备区的所有牌和四张手牌。',
+			+'三带：其可以弃置至多三名其他角色的各一张牌，然后摸一张牌。'
+			+'单顺：其可以弃置一名其他角色的一张牌。若其未以此法弃置过颜色相同的牌，则其可以重复此流程。然后其摸等量的牌。'
+			+'双顺：其可以获得一名其他角色的一张牌。若其未以此法弃置过颜色相同的牌，则其可以重复此流程。然后其回复等量的体力。'
+			+'三顺/飞机：其可以令至多3名其他角色翻面，然后对其中一名角色造成1点火属性伤害。'
+			+'炸弹/四带二：其可以对一名角色造成2点雷属性伤害，然后目标角色翻面，弃置装备区的所有牌和四张手牌。',
 
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',
