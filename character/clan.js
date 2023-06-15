@@ -591,13 +591,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var cards=trigger.cards.filterInD();
+					var cards=trigger.cards.filterInD('oe');
 					player.chooseTarget('三恇：选择一名其他角色','令其交给你至少X张牌'+(cards.length?'，然后其获得'+get.translation(cards):'')+'（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）',true,lib.filter.notMe).set('ai',target=>{
 						var att=get.attitude(player,target),num=lib.skill.clansankuang.getNum(target);
 						if(num==0) return att;
 						if(_status.event.goon) return -att;
 						return -Math.sqrt(Math.abs(att))-lib.skill.clansankuang.getNum(target);
-					}).set('goon',Math.max.apply(Math,trigger.cards.map(i=>get.value(i)))<=5||trigger.cards.filterInD().length==0)
+					}).set('goon',Math.max.apply(Math,trigger.cards.map(i=>get.value(i)))<=5||trigger.cards.filterInD('oe').length==0)
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0],num=lib.skill.clansankuang.getNum(target),num2=target.countCards('he');
@@ -615,6 +615,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					if(trigger.cards.filterInD().length) target.gain(trigger.cards.filterInD(),'gain2','bySelf');
+					else if(trigger.cards.filterInD('e').length) target.gain(trigger.cards.filterInD('e'),get.owner(trigger.cards.filterInD('e')[0]),'give');
 				},
 				ai:{
 					reverseOrder:true,
@@ -1456,7 +1457,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanhuanyin_info:'锁定技。当你进入濒死状态时，将手牌补至四张。',
 			clan_xunchen:'族荀谌',
 			clansankuang:'三恇',
-			clansankuang_info:'锁定技。当你每轮第一次使用一种类别的牌后，你令一名其他角色交给你至少X张牌，然后于处理区内获得你使用的牌对应的所有实体牌（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）。',
+			clansankuang_info:'锁定技。当你每轮第一次使用一种类别的牌后，你令一名其他角色交给你至少X张牌，然后于装备区或处理区内获得你使用的牌对应的所有实体牌（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）。',
 			clanbeishi:'卑势',
 			clanbeishi_info:'锁定技。当一名角色失去最后的手牌后，若其是你首次发动〖三恇〗的目标角色，你回复1点体力。',
 			clan_xuncan:'族荀粲',

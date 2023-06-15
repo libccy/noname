@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['sunhong','luoxian','ol_huban','wangguan'],
+				sp_waitforsort:['sunhong','luoxian','ol_huban','wangguan','lushi'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['wanglang'],
 				sp_tongque:["sp_fuwan","sp_fuhuanghou","sp_jiben"],
@@ -29,6 +29,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			lushi:['female','qun',3,['olzhuyan','olleijie']],
 			zhangshiping:['male','shu',3,['olhongji','olxinggu']],
 			sunhong:['male','wu',3,['olxianbi','olzenrun']],
 			luoxian:['male','shu',4,['oldaili']],
@@ -680,6 +681,148 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//卢氏
+			olzhuyan:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				init:function(player){
+					player.addSkill('olzhuyan_record');
+				},
+				zhuanhuanji:true,
+				mark:true,
+				marktext:'☯',
+				intro:{
+					content:function(storage,player,skill){
+						if(player.storage.olzhuyan) return '每名角色限一次。结束阶段，你可以令一名角色将手牌数调整至与其上个准备阶段结束后相同。';
+						return '每名角色限一次。结束阶段，你可以令一名角色将体力值调整至与其上个准备阶段结束后相同。';
+					},
+				},
+				onremove:['olzhuyan_true','olzhuyan_false'],
+				direct:true,
+				filter:function(event,player){
+					var storage=Boolean(player.storage.olzhuyan);
+					var targeted=player.getStorage('olzhuyan_'+storage);
+					return game.hasPlayer(current=>{
+						return !targeted.contains(current)&&lib.skill.olzhuyan.getNum(current,storage);
+					});
+				},
+				getNum:function(player,status){
+					if(!_status.olzhuyan||!_status.olzhuyan[player.playerid]) return 0;
+					var num=_status.olzhuyan[player.playerid][status?1:0];
+					if(status) num-=player.countCards('h');
+					else num-=player.hp;
+					return num;
+				},
+				content:function(){
+					'step 0'
+					var storage=Boolean(player.storage.olzhuyan);
+					var map={},targeted=player.getStorage('olzhuyan_'+storage);
+					var targets=game.filterPlayer(current=>{
+						return !targeted.contains(current);
+					});
+					for(var target of targets){
+						map[target.playerid]=lib.skill.olzhuyan.getNum(target,storage);
+					}
+					event.map=map;
+					player.chooseTarget(get.prompt('olzhuyan'),'令一名角色将'+(storage?'手牌数':'体力值')+'调整至与其上个准备阶段相同',(card,player,target)=>{
+						return _status.event.map[target.playerid];
+					}).set('map',map).set('targetprompt',target=>{
+						var num=_status.event.map[target.playerid];
+						if(num>0) num='+'+num;
+						return ' '+num+' ';
+					}).set('ai',target=>{
+						return _status.event.map[target.playerid]*get.attitude(_status.event.player,target);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('olzhuyan',target);
+						var storage=Boolean(player.storage.olzhuyan);
+						player.markAuto('olzhuyan_'+storage,[target]);
+						player.changeZhuanhuanji('olzhuyan');
+						var num=event.map[target.playerid];
+						if(storage){
+							if(num>0){
+								num=Math.min(5-target.countCards('h'),num);
+								if(num>0) target.draw(num);
+							}
+							else{
+								num=-num;
+								target.chooseToDiscard(num,true).set('prompt','驻颜：请弃置'+get.cnNumber(Math.abs(num))+'张手牌');
+							}
+						}
+						else{
+							if(num>0){
+								target.recover(num);
+							}
+							else{
+								num=Math.min(target.hp-1,-num);
+								target.loseHp(num);
+							}
+						}
+					}
+				},
+				subSkill:{
+					record:{
+						trigger:{global:'phaseZhunbeiAfter'},
+						lastDo:true,
+						charlotte:true,
+						forced:true,
+						popup:false,
+						forceDie:true,
+						content:function(){
+							if(!_status.olzhuyan) _status.olzhuyan={};
+							_status.olzhuyan[trigger.player.playerid]=[trigger.player.hp,trigger.player.countCards('h')];
+						},
+					}
+				}
+			},
+			olleijie:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('olleijie'),'令一名角色判定。若结果为♠2~9，其受到2点雷电伤害，否则其摸两张牌。').set('ai',target=>{
+						var player=_status.event.player,sgn=_status.event.sgn;
+						if(sgn>0){
+							return get.damageEffect(target,target,player,'thunder');
+						}
+						else if(sgn==0){
+							return get.attitude(player,target);
+						}
+						return 0;
+					}).set('sgn',function(){
+						var sgn=0;
+						game.countPlayer(current=>{
+							if(!current.hasSkillTag('rejudge')) return;
+							sgn=get.sgnAttitude(player,current);
+						});
+						return sgn;
+					}())
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('olleijie',target);
+						target.judge(card=>{
+							var number=get.number(card);
+							if(get.suit(card)=='spade'&&number>=2&&number<=9) return -4;
+							return 2;
+						}).set('judge2',result=>{
+							return result.bool===false?true:false;
+						});
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						target.draw(2);
+					}
+					else{
+						target.damage(2,'thunder');
+					}
+				}
+			},
 			//张世平
 			olhongji:{
 				audio:2,
@@ -21921,6 +22064,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.olmiuyan) return '转换技。你可以将一张黑色牌当做【火攻】使用。然后若此技能：处于阳状态且此牌造成了伤害，则你获得此阶段内所有被展示过的牌；<span class="bluetext">处于阴状态且未造成伤害，则你令此技能失效直到本轮结束。</span>';
 				return '转换技。你可以将一张黑色牌当做【火攻】使用。然后若此技能：<span class="bluetext">处于阳状态且此牌造成了伤害，则你获得此阶段内所有被展示过的牌；</span>处于阴状态且未造成伤害，则你令此技能失效直到本轮结束。';
 			},
+			olzhuyan:function(player){
+				if(player.storage.olzhuyan) return '转换技。每名角色每项各限一次。结束阶段，你可以令一名角色将以下项调整至与其上一个准备阶段结束后的对应项相同：阴：体力值；<span class="bluetext">阳：手牌数</span>（体力值至多失去至1，手牌数至多摸至5）。'
+				return '转换技。每名角色每项各限一次。结束阶段，你可以令一名角色将以下项调整至与其上一个准备阶段结束后的对应项相同：<span class="bluetext">阴：体力值</span>；阳：手牌数（体力值至多失去至1，手牌数至多摸至5）。';
+			},
 		},
 		characterReplace:{
 			caoshuang:['caoshuang','ns_caoshuang'],
@@ -23051,6 +23198,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olhongji_info:'每轮每项各限一次。一名角色的准备阶段，若其手牌数为唯一最少/最多，你可以令其于本回合第一个摸牌阶段/出牌阶段后执行一个额外的摸牌阶段/出牌阶段。',
 			olxinggu:'行贾',
 			olxinggu_info:'①游戏开始时，你将牌堆中的三张坐骑牌扣置于武将牌上。②结束阶段，你可以将一张〖行贾①〗牌置于一名其他角色的装备区，然后你从牌堆获得一张♦牌。',
+			lushi:'卢氏',
+			olzhuyan:'驻颜',
+			olzhuyan_info:'转换技。每名角色每项各限一次。结束阶段，你可以令一名角色将以下项调整至与其上一个准备阶段结束后的对应项相同：阴：体力值；阳：手牌数（体力值至多失去至1，手牌数至多摸至5）。',
+			olleijie:'雷劫',
+			olleijie_info:'准备阶段，你可以令一名角色判定，若结果为♠2~9，其受到2点雷电伤害，否则其摸两张牌。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
