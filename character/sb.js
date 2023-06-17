@@ -32,9 +32,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_diaochan:['female','qun',3,['sblijian','sbbiyue']],
 			sb_yuanshao:['male','qun',4,['sbluanji','sbxueyi'],['zhu']],
 			sb_pangtong:['male','shu',3,['sblianhuan','sbniepan']],
-			sb_sunce:['male','wu','2/4',['sbjiang','sbhunzi','sbzhiba'],['zhu','unseen']],
-			sb_daqiao:['female','wu',3,['sbguose','sbliuli'],['unseen']],
-			sb_liubiao:['male','qun',3,['sbzishou','sbzongshi'],['unseen']],
+			sb_sunce:['male','wu','2/4',['sbjiang','sbhunzi','sbzhiba'],['zhu']],
+			sb_daqiao:['female','wu',3,['sbguose','sbliuli']],
+			sb_liubiao:['male','qun',3,['sbzishou','sbzongshi']],
 		},
 		characterSort:{
 			sb:{
@@ -292,6 +292,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return evtx.getParent(2)==evt&&get.suit(evtx.cards[0])=='heart';
 							});
 						},
+						direct:true,
 						content:function(){
 							'step 0'
 							var sourcex=trigger.log_event.getTrigger().player;
@@ -304,7 +305,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								var target=result.targets[0];
 								player.line(target,'green');
-								game.player.forEach(i=>i.removeSkill('sbliuli_dangxian'));
+								game.countPlayer(i=>i.removeSkill('sbliuli_dangxian'));
 								target.addSkill('sbliuli_dangxian');
 								player.addTempSkill('sbliuli_used');
 							}
