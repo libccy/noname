@@ -256,7 +256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player,name){
 					if(event.name=='lose'||event.name=='loseAsync') return event.getlx!==false&&event.toStorage==true;
-					if(event.name=='cardGotoSpecial') return !event.notrigger;
+					if(event.name=='cardsGotoSpecial') return !event.notrigger;
 					return true;
 				},
 				direct:true,
@@ -1487,7 +1487,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						filter:function(event,player,name){
 							if(event.name=='lose'||event.name=='loseAsync') return event.getlx!==false&&event.toStorage==true;
-							if(event.name=='cardGotoSpecial') return !event.notrigger;
+							if(event.name=='cardsGotoSpecial') return !event.notrigger;
 							return true;
 						},
 						direct:true,

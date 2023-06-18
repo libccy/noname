@@ -3252,15 +3252,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
                 trigger:{player:'useCard'},
                 filter:function(event,player){
-					return !player.hasAllHistory('useCard',evt=>{
-						return event!=evt&&evt.card.name==event.card.name;
-					});
+					return !player.getStorage('dcxiuwen').contains(event.card.name);
 				},
-				forced:true,
-				locked:false,
+				frequent:true,
 				content:function(){
 					player.draw();
-					player.markAuto('dcxiuwen',player.getAllHistory('useCard').map(evt=>evt.card.name));
+					player.markAuto('dcxiuwen',[trigger.card.name]);
 				},
 				intro:{content:'已使用：$'}
             },
@@ -9670,13 +9667,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var card=result.cards[0];
 					player.line(targets[0]);
-					player.showCards(card,get.translation(player)+'对'+get.translation(targets[0])+'发动了【媵语】')
+					player.showCards(card,get.translation(player)+'对'+get.translation(targets[0])+'发动了【媵予】')
 					event.cards.push(card);
 					player.choosePlayerCard(targets[1],true,'h');
 					'step 3'
 					var card=result.cards[0];
 					player.line(targets[1]);
-					player.showCards(card,get.translation(player)+'对'+get.translation(targets[1])+'发动了【媵语】')
+					player.showCards(card,get.translation(player)+'对'+get.translation(targets[1])+'发动了【媵予】')
 					event.cards.push(card);
 					if(get.suit(cards[0],targets[0])==get.suit(cards[1],targets[1])) event.finish();
 					'step 4'
@@ -29521,10 +29518,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcligong:'离宫',
 			dcligong_info:'觉醒技。准备阶段，若〖慧淑〗的中括号内有不小于5的数字，则你加1点体力上限，回复1点体力并失去〖易数〗。系统随机检索四张吴势力的女性武将牌，然后你选择一项：⒈摸三张牌。⒉失去〖慧淑〗，然后获得这些武将牌上的任意两个非Charlotte技能。',
 			yinfuren:'尹夫人',
-			dcyingyu:'媵语',
+			dcyingyu:'媵予',
 			dcyingyu_info:'准备阶段开始时，你可以展示两名角色的各一张手牌。若这两张牌的花色不同，则你可以令一名角色获得另一名角色的展示牌。',
 			dcyongbi:'拥嬖',
-			dcyongbi_info:'限定技。出牌阶段，你可以将所有手牌交给一名其他男性角色。你将〖媵语〗的发动时机改为“准备阶段和结束阶段开始时”。然后若这些牌中包含的花色数：大于1，则你与其本局游戏的手牌上限+2；大于2，则当你或其于本局游戏内受到大于1的伤害时，此伤害-1。',
+			dcyongbi_info:'限定技。出牌阶段，你可以将所有手牌交给一名其他男性角色。你将〖媵予〗的发动时机改为“准备阶段和结束阶段开始时”。然后若这些牌中包含的花色数：大于1，则你与其本局游戏的手牌上限+2；大于2，则当你或其于本局游戏内受到大于1的伤害时，此伤害-1。',
 			dc_huangquan:'黄权',
 			dcquanjian:'劝谏',
 			dcquanjian_info:'出牌阶段每项各限一次。你可以选择一项流程并选择一名其他角色A：⒈令A对其攻击范围内的另一名角色B造成1点伤害。⒉令A将手牌数调整至体力上限（至多摸至五张），且其本回合内不能使用或打出手牌。然后A选择一项：⒈执行此流程。⒉本回合下次受到的伤害+1。',
@@ -29780,7 +29777,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqinghuang_info:'出牌阶段开始时，你可以减1点体力上限，然后你于本回合发动〖踏寂〗时额外随机执行一种效果。',
 			guānning:'关宁',
 			dcxiuwen:'修文',
-			dcxiuwen_info:'当你使用牌时，若你此前未使用过此牌名的牌，你摸一张牌。',
+			dcxiuwen_info:'当你使用牌时，若你未记录此牌牌名，你可以记录之并摸一张牌。',
 			oldlongsong:'龙颂',
 			oldlongsong_info:'出牌阶段开始时，你可以将一张手牌交给一名其他角色。然后其须选择其所有的发动时机为出牌阶段内的空闲时间点且你至多能于此阶段发动一次的技能，其于此阶段这些技能失效，你获得这些技能。',
 			dclongsong:'龙颂',

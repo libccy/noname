@@ -1185,7 +1185,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterCard:()=>false,
 				selectCard:-1,
-				prompt:'将武将牌横置并视为使用【杀】',
+				prompt:'将武将牌重置并视为使用【杀】',
 				log:false,
 				check:()=>1,
 				precontent:function(){
@@ -2861,6 +2861,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tuishi2:{
 				trigger:{global:'phaseEnd'},
 				direct:true,
+				charlotte:true,
 				filter:function(event,player){
 					var target=_status.currentPhase;
 					return target!=player&&target&&target.isAlive()&&game.hasPlayer(function(current){
@@ -3735,7 +3736,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuanbei:'选备',
 			xuanbei_info:'①游戏开始时，你从牌堆中获得两张具有应变标签的牌。②每回合限一次。当你使用的具有应变标签的牌结算结束后，你可将此牌对应的所有实体牌交给一名其他角色。',
 			xianwan:'娴婉',
-			xianwan_info:'①当你需要使用【闪】时，若你的武将牌未横置，则你可以横置武将牌并视为使用【闪】。②当你需要使用【杀】时，若你的武将牌横置，则你可以横置武将牌并视为使用【杀】。',
+			xianwan_info:'①当你需要使用【闪】时，若你的武将牌未横置，则你可以横置武将牌并视为使用【闪】。②当你需要使用【杀】时，若你的武将牌横置，则你可以重置武将牌并视为使用【杀】。',
 			yangzhi:'杨芷',
 			wanyi:'婉嫕',
 			wanyi_info:'每回合每项限一次。出牌阶段，你可以将一张具有应变效果的牌当做【逐近弃远】/【出其不意】/【水淹七军】/【洞烛先机】使用。',
