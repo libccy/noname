@@ -38452,6 +38452,9 @@
 							input.style.webkitUserSelect='text';
 						}
 						input.style.minWidth='10px';
+                        input.style.maxWidth='60%';
+						input.style.overflow='hidden';
+                        input.style.whiteSpace='nowrap';
 						input.onkeydown=function(e){
 							if(e.keyCode==13){
 								e.preventDefault();
