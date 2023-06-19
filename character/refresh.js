@@ -10817,7 +10817,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				locked:false,
 				audio:"wusheng",
-				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo','re_guanzhang'],
+				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo','re_guanzhang','dc_jsp_guanyu'],
 				enable:["chooseToRespond","chooseToUse"],
 				filterCard:function(card,player){
 					if(get.zhu(player,'shouyue')) return true;

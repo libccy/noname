@@ -32,9 +32,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_diaochan:['female','qun',3,['sblijian','sbbiyue']],
 			sb_yuanshao:['male','qun',4,['sbluanji','sbxueyi'],['zhu']],
 			sb_pangtong:['male','shu',3,['sblianhuan','sbniepan']],
-			sb_sunce:['male','wu','2/4',['sbjiang','sbhunzi','sbzhiba'],['zhu','unseen']],
-			sb_daqiao:['female','wu',3,['sbguose','sbliuli'],['unseen']],
-			sb_liubiao:['male','qun',3,['sbzishou','sbzongshi'],['unseen']],
+			sb_sunce:['male','wu','2/4',['sbjiang','sbhunzi','sbzhiba'],['zhu']],
+			sb_daqiao:['female','wu',3,['sbguose','sbliuli']],
+			sb_liubiao:['male','qun',3,['sbzishou','sbzongshi']],
 		},
 		characterSort:{
 			sb:{
@@ -292,6 +292,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return evtx.getParent(2)==evt&&get.suit(evtx.cards[0])=='heart';
 							});
 						},
+						direct:true,
 						content:function(){
 							'step 0'
 							var sourcex=trigger.log_event.getTrigger().player;
@@ -304,7 +305,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								var target=result.targets[0];
 								player.line(target,'green');
-								game.player.forEach(i=>i.removeSkill('sbliuli_dangxian'));
+								game.countPlayer(i=>i.removeSkill('sbliuli_dangxian'));
 								target.addSkill('sbliuli_dangxian');
 								player.addTempSkill('sbliuli_used');
 							}
@@ -2102,9 +2103,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.goto(1);
 					}
 					'step 5'
-					if(event.num>0&&target.countDiscardableCards(player,'hej')){
+					if(target.countDiscardableCards(player,'hej')){
 						player.line(target);
-						player.discardPlayerCard(target,event.num,true,'hej');
+						player.discardPlayerCard(target,event.num+1,true,'hej');
 					}
 				},
 				ai:{
@@ -4251,7 +4252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbluoshen_info:'准备阶段，你可以选择一名角色。从其开始按逆时针方向的X名其他角色依次执行（X为角色数的一半，向上取整）：展示一张手牌，若此牌为黑色，你获得之且此牌不计入本回合手牌上限；若此牌为红色，其弃置之。',
 			sb_ganning:'谋甘宁',
 			sbqixi:'奇袭',
-			sbqixi_info:'出牌阶段限一次。若你有手牌，你可以令一名其他角色猜测你手牌中最多的花色。若其猜对，你展示所有手牌；若其猜错，你可令其从其未选择过的花色中再次猜测，重复此流程。然后你弃置其区域内的X张牌（X为其于本次〖奇袭〗中猜错的次数）。',
+			sbqixi_info:'出牌阶段限一次。若你有手牌，你可以令一名其他角色猜测你手牌中最多的花色。若其猜对，你展示所有手牌；若其猜错，你可令其从其未选择过的花色中再次猜测，重复此流程。然后你弃置其区域内的X张牌（X为其于本次〖奇袭〗中猜错的次数+1）。',
 			sbfenwei:'奋威',
 			sbfenwei_info:'限定技。①出牌阶段，你可以将至多三张牌分别置于等量名角色的武将牌上，称为“威”，然后你摸等量牌。②当一名角色成为锦囊牌的目标时，若其有“威”，你须选择：1.令其获得其“威”；2.令其移去“威”，并取消此目标。',
 			sb_machao:'谋马超',
@@ -4259,7 +4260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbtieji_info:'当你使用【杀】指定其他角色为目标后，你可以令目标角色不能响应此【杀】，且其所有非锁定技失效直到回合结束。然后你与其进行谋弈。若你赢，且你选择的选项为：“直取敌营”，则你获得其一张牌；“扰阵疲敌”，你摸两张牌。',
 			sb_xuhuang:'谋徐晃',
 			sbduanliang:'断粮',
-			sbduanliang_info:'出牌阶段限一次。你可以与一名其他角色进行谋奕。若你赢，且你选择的选项为：“围城断粮”，若其判定区没有【兵粮寸断】，你将牌堆顶牌当【兵粮寸断】对其使用，否则你获得其一张牌；“擂鼓进军”，你视为对其使用一张【决斗】。',
+			sbduanliang_info:'出牌阶段限一次。你可以与一名其他角色进行谋弈。若你赢，且你选择的选项为：“围城断粮”，若其判定区没有【兵粮寸断】，你将牌堆顶牌当【兵粮寸断】对其使用，否则你获得其一张牌；“擂鼓进军”，你视为对其使用一张【决斗】。',
 			sbshipo:'势迫',
 			sbshipo_info:'结束阶段，你可以令一名体力少于你的角色或所有判定区有【兵粮寸断】的其他角色选择一项：1.交给你一张手牌；2.受到1点伤害。所有目标角色选择完成后，你可以将任意张你以此法获得的牌交给一名其他角色。',
 			sb_zhangfei:'谋张飞',

@@ -4,6 +4,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			taoshen:['male','qun',3,['dcnutao']],
+			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			duanqiaoxiao:['female','wei',3,['dccaizhuang','dchuayi']],
 			zhangjinyun:['female','shu',3,['dchuizhi','dcjijiao']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
@@ -30,7 +32,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_fuwan:['male','qun',4,['dcmoukui']],
 			dc_yangbiao:['male','qun',3,['dczhaohan','dcjinjie','dcjue']],
 			dc_huojun:['male','shu',4,['dcgue','dcsigong']],
-			guānning:['male','shu',3,['dcxiuwen','dclongsong'],['unseen']],
+			guānning:['male','shu',3,['dcxiuwen','dclongsong']],
 			dc_sunhanhua:['female','wu',3,['dchuiling','dcchongxu'],['unseen']],
 			dc_sunziliufang:['male','wei',3,['dcqinshen','dcweidang']],
 			dc_tengfanglan:['female','wu',3,['dcluochong','dcaichen']],
@@ -38,7 +40,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunhuan:['male','wu',4,['dcniji'],['unseen']],
 			qiaorui:['male','qun',4,['dcaishou','dcsaowei']],
 			yanghong:['male','qun',3,['dcjianji','dcyuanmo']],
-			xianglang:['male','shu',3,['dckanji','dcqianzheng'],['unseen']],
+			xianglang:['male','shu',3,['dckanji','dcqianzheng']],
 			qinlang:['male','wei',4,['dchaochong','dcjinjin']],
 			furongfuqian:['male','shu','4/6',['dcxuewei','dcyuguan']],
 			zhenghun:['male','wei',3,['dcqiangzhi','dcpitian']],
@@ -234,7 +236,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_guandu:["sp_zhanghe","xunchen","sp_shenpei","gaolan","lvkuanglvxiang","chunyuqiong","sp_xuyou","xinping","hanmeng"],
 				sp_qihuan:['zhaozhong','re_hejin','fengfang','mushun','dc_fuwan'],
 				sp_binglin:['re_niujin',"sp_mifangfushiren",'licaiwei','dc_zhaoyan','shiyi','sunlang','sunhuan','dc_mengda'],
-				sp_danqi:['dufuren','qinyilu','bianxi','dc_huban','dc_hujinding','dc_zhaoyǎn','wangwei','liyixiejing','guānning'],
+				sp_danqi:['dufuren','qinyilu','bianxi','dc_huban','dc_hujinding','dc_zhaoyǎn','wangwei','liyixiejing','guānning','dc_jsp_guanyu'],
 				sp_fenghuo:['re_nanhualaoxian','tongyuan','zhangning','re_pangdegong'],
 				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie','dc_caiyang','zhoushan'],
 				sp_caizijiaren:['re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru'],
@@ -267,6 +269,125 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//涛神
+			dcnutao:{
+				audio:2,
+				trigger:{player:'useCardToPlayer'},
+				forced:true,
+				filter:function(event,player){
+					if(get.type2(event.card)!='trick') return false;
+					return event.isFirstTarget&&event.targets.some(i=>i!=player);
+				},
+				content:function(){
+					var target=trigger.targets.filter(i=>i!=player).randomGet();
+					player.line(target,'thunder');
+					target.damage('thunder');
+				},
+				subSkill:{
+					add:{
+						audio:'dcnutao',
+						trigger:{source:'damageSource'},
+						filter:function(event,player){
+							return event.nature=='thunder'&&player.isPhaseUsing();
+						},
+						forced:true,
+						content:function(){
+							player.addTempSkill('dcnutao_sha');
+							player.addMark('dcnutao_sha',1,false);
+						}
+					},
+					sha:{
+						charlotte:true,
+						intro:{
+							content:'此阶段使用【杀】的次数上限+#',
+						},
+						mod:{
+							cardUsable:function(card,player,num){
+								if(card.name=='sha') return num+player.countMark('dcnutao_sha');
+							},
+						}
+					}
+				}
+			},
+			//魏关羽
+			dcdanji:{
+				audio:'danji',
+				skillAnimation:true,
+				animationColor:'water',
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				juexingji:true,
+				derivation:['mashu','dcnuzhan'],
+				filter:function(event,player){
+					return player.countCards('h')>player.hp;
+				},
+				content:function(){
+					'step 0'
+					player.loseMaxHp();
+					'step 1'
+					player.recover(player.maxHp-player.hp);
+					player.addSkill('mashu');
+					player.addSkill('dcnuchen');
+					player.awakenSkill('dcdanji');
+				}
+			},
+			dcnuchen:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:function(card,player,target){
+					return target.countCards('h')&&target!=player;
+				},
+				content:function(){
+					'step 0'
+					player.choosePlayerCard(target,true,'h');
+					'step 1'
+					if(result.bool){
+						var card=result.cards[0];
+						event.card=card;
+						player.showCards(card,get.translation(player)+'对'+get.translation(target)+'发动了【怒嗔】');
+					}
+					else event.finish();
+					'step 2'
+					var suit=get.suit(card);
+					var str=get.translation(suit);
+					player.chooseToDiscard('怒嗔：是否弃置至少一张'+str+'牌？','若如此做，你对其造成等量伤害；或点击“取消”，获得其所有'+str+'手牌','he',{suit:suit},[1,Infinity]).set('ai',card=>{
+						if(ui.selected.cards.length>=_status.event.num) return 0;
+						return 6-get.value(card);
+					}).set('num',function(){
+						var eff=get.damageEffect(target,player,player);
+						if(eff>0){
+							if(get.attitude(player,target)>0){
+								return 1;
+							}
+							var cards=target.getCards('h',{suit:suit});
+							if(cards.length>2||get.value(cards)>=6){
+								return 0;
+							}
+							if(!player.hasSkillTag('jueqing',false,target)&&target.hasSkillTag('filterDamage',null,{player:player})) return 1;
+							return Infinity;
+						}
+						return 0;
+					}());
+					'step 3'
+					if(result.bool){
+						target.damage(result.cards.length);
+					}
+					else{
+						var cards=target.getCards('h',{suit:get.suit(card)});
+						if(cards.length) player.gain(cards,target,'giveAuto','bySelf');
+					}
+				},
+				ai:{
+					expose:0.4,
+					order:10,
+					result:{
+						target:function(player,target){
+							return -Math.sqrt(target.countCards('h'));
+						}
+					}
+				}
+			},
 			//段巧笑
 			dccaizhuang:{
 				audio:2,
@@ -3131,20 +3252,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
                 trigger:{player:'useCard'},
                 filter:function(event,player){
-					return !player.hasAllHistory('useCard',evt=>{
-						return event!=evt&&evt.card.name==event.card.name;
-					});
+					return !player.getStorage('dcxiuwen').contains(event.card.name);
 				},
-				forced:true,
-				locked:false,
+				frequent:true,
 				content:function(){
 					player.draw();
-					player.markAuto('dec_xiuwen',player.getAllHistory('useCard').map(evt=>evt.card.name));
+					player.markAuto('dcxiuwen',[trigger.card.name]);
 				},
 				intro:{content:'已使用：$'}
             },
-            dclongsong:{
-				audio:2,
+            oldlongsong:{
+				audio:'dclongsong',
                 trigger:{player:'phaseUseBegin'},
                 direct:true,
                 filter:function(event,player){
@@ -3190,7 +3308,91 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         },
                         ai2:function(target){
                             var att=get.attitude(_status.event.player,target),trigger=_status.event.getTrigger(),player=_status.event.player;
-                            return lib.skill.dclongsong.getSkills(target,player,trigger).length*3+att/3;
+                            return lib.skill.oldlongsong.getSkills(target,player,trigger).length*3+att/3;
+                        },
+                        prompt:get.prompt2('oldlongsong')
+                    });
+                    'step 1'
+                    if(result.bool){
+                        var target=result.targets[0];
+                        player.logSkill('oldlongsong',target);
+                        event.target=target;
+                        player.line(target,'green');
+                        player.give(result.cards,target);
+                        var skills=lib.skill.oldlongsong.getSkills(target,player,trigger);
+                        if(skills.length){
+							if(!event.isMine()&&!event.isOnline()) game.delayx();
+							target.disableSkill('oldlongsong_back',skills);
+							target.markAuto('oldlongsong_back',skills);
+							target.addTempSkill('oldlongsong_back',['phaseUseAfter','phaseAfter']);
+							var str='';
+							for(var i=0; i<skills.length; i++){
+								str+='【'+get.translation(skills[i])+'】';
+								if(i!=skills.length-1) str+='、';
+							}
+							game.log(target,'的技能','#g'+str,'失效了');
+							game.log(player,'获得了技能','#g'+str);
+							player.popup(skills,'thunder');
+							for(var skill of skills){
+								player.addTempSkill(skill,['phaseUseAfter','phaseAfter']);
+							}
+                        }
+                    }
+                },
+                ai:{expose:0.2},
+                subSkill:{
+                    back:{
+                        charlotte:true,
+                        onremove:function(player,skill){
+                            var skills=player.getStorage('oldlongsong_back');
+                            for(var key of skills){
+                                game.log(player,'恢复了技能','#g【'+get.translation(key)+'】');
+                                delete player.storage[key];
+                            }
+                            player.enableSkill(skill);
+                            player.popup(skills,'thunder');
+                        }
+                    }
+                }
+            },
+            dclongsong:{
+				audio:2,
+                trigger:{player:'phaseUseBegin'},
+                direct:true,
+                filter:function(event,player){
+                    return player.countCards('h')>0;
+                },
+				getSkills:function(target){
+					return target.getSkills(null,false).filter(skill=>{
+						var str=get.skillInfoTranslation(skill,target);
+						if(str.indexOf('当你于出牌阶段')!=-1) return true;
+						var skills=game.expandSkills([skill]);
+						if(skills.some(skillx=>{
+							var info=get.info(skillx);
+							if(!info||!info.enable) return false;
+							if(info.enable!='phaseUse'&&info.enable!='chooseToUse'&&(!Array.isArray(info.enable)||!info.enable.contains('phaseUse')&&!info.enable.contains('chooseToUse'))) return false;
+							if(info.juexingji||info.hiddenSkill||info.charlotte||info.limited||info.dutySkill) return false;
+							if(info.ai&&info.ai.notemp) return false;
+							return true;
+						})) return true;
+						return false;
+					});
+				},
+                content:function(){
+                    'step 0'
+                    player.chooseCardTarget({
+                        filterCard:{color:'red'},
+                        selectCard:1,
+						position:'he',
+                        filterTarget:function(card,player,target){
+                            return player!=target;
+                        },
+                        ai1:function(card){
+                            return 6-get.value(card);
+                        },
+                        ai2:function(target){
+                            var att=get.attitude(_status.event.player,target);
+                            return lib.skill.dclongsong.getSkills(target).length*2+att/2.5;
                         },
                         prompt:get.prompt2('dclongsong')
                     });
@@ -3201,11 +3403,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         event.target=target;
                         player.line(target,'green');
                         player.give(result.cards,target);
-                        var skills=lib.skill.dclongsong.getSkills(target,player,trigger);
+                        var skills=lib.skill.dclongsong.getSkills(target);
                         if(skills.length){
 							if(!event.isMine()&&!event.isOnline()) game.delayx();
 							target.disableSkill('dclongsong_back',skills);
 							target.markAuto('dclongsong_back',skills);
+							player.addTempSkill('dclongsong_remove',['phaseUseAfter','phaseAfter']);
+							player.markAuto('dclongsong_remove',skills);
 							target.addTempSkill('dclongsong_back',['phaseUseAfter','phaseAfter']);
 							var str='';
 							for(var i=0; i<skills.length; i++){
@@ -3234,7 +3438,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             player.enableSkill(skill);
                             player.popup(skills,'thunder');
                         }
-                    }
+                    },
+					remove:{
+						trigger:{player:['useSkill','logSkillBegin']},
+						forced:true,
+						charlotte:true,
+						popup:false,
+						onremove:true,
+						filter:function(event,player){
+							var skill=event.sourceSkill||event.skill;
+							return player.getStorage('dclongsong_remove').contains(skill)&&!player.getStockSkills(false,true).contains(skill);
+						},
+						content:function(){
+							'step 0'
+							var skill=trigger.sourceSkill||trigger.skill;
+							player.removeSkill(skill);
+							player.unmarkAuto('dclongsong_remove',[skill]);
+						},
+					}
                 }
             },
 			//孙寒华
@@ -4701,6 +4922,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:2,
+				filter:function(event,player){
+					return player.countCards('h');
+				},
 				content:function(){
 					'step 0'
 					player.showHandcards();
@@ -4747,7 +4971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dcqianzheng:{
 				audio:2,
-				trigger:{target:'useCardToTarget'},
+				trigger:{target:'useCardToTargeted'},
 				usable:2,
 				direct:true,
 				filter:function(event,player){
@@ -4755,7 +4979,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseCard(get.prompt2('dcqianzheng'),2,'he',(card,player,target)=>{
+					var str='，若重铸的牌中没有'+get.translation(get.type2(trigger.card))+'牌，你于'+get.translation(trigger.cards)+'进入弃牌堆后获得之';
+					player.chooseCard(get.prompt('dcqianzheng'),'重铸两张牌'+(trigger.cards.length?str:'')+'。',2,'he',(card,player,target)=>{
 						var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
 						return mod=='unchanged';
 					}).set('ai',card=>{
@@ -4766,6 +4991,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var cards=result.cards;
+						player.logSkill('dcqianzheng');
 						player.loseToDiscardpile(cards);
 						player.draw(cards.length);
 						if(cards.every(card=>get.type2(card)!=get.type2(trigger.card))){
@@ -9441,13 +9667,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var card=result.cards[0];
 					player.line(targets[0]);
-					player.showCards(card,get.translation(player)+'对'+get.translation(targets[0])+'发动了【媵语】')
+					player.showCards(card,get.translation(player)+'对'+get.translation(targets[0])+'发动了【媵予】')
 					event.cards.push(card);
 					player.choosePlayerCard(targets[1],true,'h');
 					'step 3'
 					var card=result.cards[0];
 					player.line(targets[1]);
-					player.showCards(card,get.translation(player)+'对'+get.translation(targets[1])+'发动了【媵语】')
+					player.showCards(card,get.translation(player)+'对'+get.translation(targets[1])+'发动了【媵予】')
 					event.cards.push(card);
 					if(get.suit(cards[0],targets[0])==get.suit(cards[1],targets[1])) event.finish();
 					'step 4'
@@ -28223,6 +28449,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangjinyun:'张瑾云，张星彩的妹妹，刘禅的第二任皇后，238年正月立为皇后。景耀六年（263年），蜀汉灭亡，刘禅被俘，此后，受封为安乐公。张皇后也随之成为安乐公夫人，咸熙元年（264年），随刘禅到洛阳。',
 			duanqiaoxiao:'段巧笑，三国时代魏国魏文帝时的宫人，甚受到魏文帝的宠爱。传说她以原有的化妆品中的米粉和胡粉，再加入葵花子汁，发明了女性化妆用的脂粉。',
 			mushun:'穆顺，小说《三国演义》中的人物，男，东汉末宦官。献帝欲修书与国舅伏完，共谋图曹公。因顺为宦官中之忠义可托者，乃命顺往送书。顺藏书于发中，潜出禁宫，径至完宅，将书呈上。及完回书付顺，顺乃藏于头髻内，辞完回宫。然公闻信，先于宫门等候，顺回遇公，公喝左右，遍搜身上，并无夹带，放行。忽然风吹落其帽。公又唤回，取帽视之，遍观无物，还帽令戴。顺双手倒戴其帽。公心疑，令左右搜其头发中，搜出伏完书来。公见书大怒，执下顺于密室问之，顺不肯招。当晚将顺、完等宗族二百余口，皆斩于市。',
+			jsp_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',
@@ -28392,6 +28619,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xushao:['xushao','jsrg_xushao'],
 			huban:['dc_huban','ol_huban'],
 			mengda:['dc_mengda','pe_mengda'],
+			jsp_guanyu:['dc_jsp_guanyu','jsp_guanyu'],
 		},
 		translate:{
 			lijue:"李傕",
@@ -29290,10 +29518,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcligong:'离宫',
 			dcligong_info:'觉醒技。准备阶段，若〖慧淑〗的中括号内有不小于5的数字，则你加1点体力上限，回复1点体力并失去〖易数〗。系统随机检索四张吴势力的女性武将牌，然后你选择一项：⒈摸三张牌。⒉失去〖慧淑〗，然后获得这些武将牌上的任意两个非Charlotte技能。',
 			yinfuren:'尹夫人',
-			dcyingyu:'媵语',
+			dcyingyu:'媵予',
 			dcyingyu_info:'准备阶段开始时，你可以展示两名角色的各一张手牌。若这两张牌的花色不同，则你可以令一名角色获得另一名角色的展示牌。',
 			dcyongbi:'拥嬖',
-			dcyongbi_info:'限定技。出牌阶段，你可以将所有手牌交给一名其他男性角色。你将〖媵语〗的发动时机改为“准备阶段和结束阶段开始时”。然后若这些牌中包含的花色数：大于1，则你与其本局游戏的手牌上限+2；大于2，则当你或其于本局游戏内受到大于1的伤害时，此伤害-1。',
+			dcyongbi_info:'限定技。出牌阶段，你可以将所有手牌交给一名其他男性角色。你将〖媵予〗的发动时机改为“准备阶段和结束阶段开始时”。然后若这些牌中包含的花色数：大于1，则你与其本局游戏的手牌上限+2；大于2，则当你或其于本局游戏内受到大于1的伤害时，此伤害-1。',
 			dc_huangquan:'黄权',
 			dcquanjian:'劝谏',
 			dcquanjian_info:'出牌阶段每项各限一次。你可以选择一项流程并选择一名其他角色A：⒈令A对其攻击范围内的另一名角色B造成1点伤害。⒉令A将手牌数调整至体力上限（至多摸至五张），且其本回合内不能使用或打出手牌。然后A选择一项：⒈执行此流程。⒉本回合下次受到的伤害+1。',
@@ -29484,7 +29712,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dckanji:'勘集',
 			dckanji_info:'出牌阶段限两次。你可以展示所有手牌，若花色均不同，你摸两张牌。然后若你的手牌因此包含了四种花色，你跳过下一个弃牌阶段。',
 			dcqianzheng:'愆正',
-			dcqianzheng_info:'每回合限两次。当你成为其他角色使用【杀】或普通锦囊牌的目标时，你可以重铸两张牌。若你以此法重铸的牌中没有与指定你为目标的牌类别相同的牌，你于此牌对应的实体牌进入弃牌堆后获得此牌对应的所有实体牌。',
+			dcqianzheng_info:'每回合限两次。当你成为其他角色使用【杀】或普通锦囊牌的目标后，你可以重铸两张牌。若你以此法重铸的牌中没有与指定你为目标的牌类别相同的牌，你于此牌对应的实体牌进入弃牌堆后获得此牌对应的所有实体牌。',
 			yanghong:'杨弘',
 			dcjianji:'间计',
 			dcjianji_info:'出牌阶段限一次。你可以令至多X名座位连续的角色依次弃置一张牌。然后其中手牌数最多的角色可以视为对一名其他以此法弃置过牌的角色使用一张【杀】（X为你的攻击范围）。',
@@ -29549,9 +29777,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqinghuang_info:'出牌阶段开始时，你可以减1点体力上限，然后你于本回合发动〖踏寂〗时额外随机执行一种效果。',
 			guānning:'关宁',
 			dcxiuwen:'修文',
-			dcxiuwen_info:'当你使用牌时，若你此前未使用过此牌名的牌，你摸一张牌。',
+			dcxiuwen_info:'当你使用牌时，若你未记录此牌牌名，你可以记录之并摸一张牌。',
+			oldlongsong:'龙颂',
+			oldlongsong_info:'出牌阶段开始时，你可以将一张手牌交给一名其他角色。然后其须选择其所有的发动时机为出牌阶段内的空闲时间点且你至多能于此阶段发动一次的技能，其于此阶段这些技能失效，你获得这些技能。',
 			dclongsong:'龙颂',
-			dclongsong_info:'出牌阶段开始时，你可以将一张手牌交给一名其他角色。然后其须选择其所有的发动时机为出牌阶段内的空闲时间点且你至多能于此阶段发动一次的技能，其于此阶段这些技能失效，你获得这些技能。',
+			dclongsong_info:'出牌阶段开始时，你可以将一张红色牌交给一名其他角色。然后其须选择其所有的发动时机包含“出牌阶段”的技能，其于此阶段这些技能失效，你获得这些技能且至多可以发动一次。',
 			dc_huojun:'霍峻',
 			dcgue:'孤扼',
 			dcgue_info:'每名其他角色的回合限一次。当你需要使用或打出【杀】或【闪】时，若你有手牌，你可以展示之。若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
@@ -29665,6 +29895,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclibang_info:'出牌阶段限一次。你可以弃置一张牌，正面向上获得两名其他角色的各一张牌。然后你判定，若结果与这两张牌的颜色均不同，你交给其中一名角色两张牌或失去1点体力，否则你获得判定牌并视为对其中一名角色使用一张【杀】。',
 			dcwujie:'无节',
 			dcwujie_info:'锁定技。①你使用无色牌无任何次数限制且无距离限制。②当其他角色执行杀死你的奖惩而摸牌或弃牌时，取消之。',
+			dc_jsp_guanyu:'魏关羽',
+			dcdanji:'单骑',
+			dcdanji_info:'觉醒技。准备阶段，若你的手牌数大于体力值，你减1点体力上限，将体力回复至体力上限，然后获得〖马术〗和〖怒嗔〗。',
+			dcnuchen:'怒嗔',
+			dcnuchen_info:'出牌阶段限一次。你可以展示一名其他角色的一张手牌，然后选择一项：1.弃置任意张该花色的牌，对其造成等量伤害；2.获得该角色手牌中所有此花色的牌。',
+			taoshen:'涛神',
+			dcnutao:'怒涛',
+			dcnutao_info:'锁定技。①当你使用锦囊牌指定第一个目标时，若目标角色包含其他角色，你随机对其中一名其他目标角色造成1点雷电伤害。②当你于出牌阶段造成雷电伤害后，你于此阶段使用【杀】的次数上限+1。',
 
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

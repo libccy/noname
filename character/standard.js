@@ -1012,7 +1012,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wusheng:{
 				audio:2,
 				audioname2:{old_guanzhang:'old_fuhun'},
-				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo','re_guanzhang'],
+				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo','re_guanzhang','dc_jsp_guanyu'],
 				enable:['chooseToRespond','chooseToUse'],
 				filterCard:function(card,player){
 					if(get.zhu(player,'shouyue')) return true;
@@ -1735,7 +1735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			liuli:{
 				audio:2,
-				audioname:['re_daqiao','daxiaoqiao','sb_daqiao'],
+				audioname:['re_daqiao','daxiaoqiao'],
 				trigger:{target:'useCardToTarget'},
 				direct:true,
 				preHidden:true,

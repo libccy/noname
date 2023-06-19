@@ -828,27 +828,46 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseZhunbeiBegin'},
 				filter:function(event,player){
-					if(event.player.isMinHandcard(true)&&!player.hasSkill('olhongji_min')) return true;
-					if(event.player.isMaxHandcard(true)&&!player.hasSkill('olhongji_max')) return true;
+					if(event.player.isMinHandcard()&&!player.hasSkill('olhongji_min')) return true;
+					if(event.player.isMaxHandcard()&&!player.hasSkill('olhongji_max')) return true;
 					return false;
 				},
-				logTarget:'player',
-				check:function(event,player){
-					return get.attitude(player,event.player)>0;
-				},
-				prompt2:function(event,player){
-					if(event.player.isMinHandcard(true)){
-						return '其手牌数为全场唯一最少。你可以令其于本回合摸牌阶段结束后执行一个额外的摸牌阶段，然后本轮你不能再发动该分支。';
-					}
-					return '其手牌数为全场唯一最多。你可以令其于本回合出牌阶段结束后执行一个额外的出牌阶段，然后本轮你不能再发动该分支。';
-				},
+				direct:true,
 				content:function(){
+					'step 0'
 					var target=trigger.player;
-					if(target.isMinHandcard(true)){
+					event.target=target;
+					var bool1=target.isMinHandcard()&&!player.hasSkill('olhongji_min'),str1='其手牌数为全场最少。你可以令其于本回合摸牌阶段结束后执行一个额外的摸牌阶段，然后本轮你不能再发动该分支。';
+					var bool2=target.isMaxHandcard()&&!player.hasSkill('olhongji_max'),str2='其手牌数为全场最多。你可以令其于本回合出牌阶段结束后执行一个额外的出牌阶段，然后本轮你不能再发动该分支。';
+					if(bool1&&!bool2){
+						event.branch=0;
+						player.chooseBool(get.prompt('olhongji',target),str1).set('ai',()=>{
+							return _status.event.bool;
+						}).set('bool',get.attitude(player,trigger.player)>1);
+					}
+					else if(!bool1&&bool2){
+						event.branch=1;
+						player.chooseBool(get.prompt('olhongji',target),str2).set('ai',()=>{
+							return _status.event.bool;
+						}).set('bool',get.attitude(player,trigger.player)>1);
+					}
+					else if(bool1&&bool2){
+						player.chooseControl('摸牌阶段','出牌阶段','cancel2').set('prompt',get.prompt('olhongji',target)).set('choiceList',[
+							str1.slice(13),
+							str2.slice(13)
+						]).set('ai',()=>[0,1].randomGet());
+					}
+					'step 1'
+					var choice=-1;
+					if(event.branch==0&&result.bool||result.control=='摸牌阶段') choice=0;
+					if(event.branch==1&&result.bool||result.control=='出牌阶段') choice=1;
+					if(choice==0){
+						player.logSkill('olhongji',target);
 						player.addTempSkill('olhongji_min','roundStart');
 						target.addTempSkill('olhongji_draw');
 					}
-					if(target.isMaxHandcard(true)){
+					else if(choice==1){
+						player.logSkill('olhongji',target);
 						player.addTempSkill('olhongji_max','roundStart');
 						target.addTempSkill('olhongji_use');
 					}
@@ -16425,6 +16444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				unique:true,
 				juexingji:true,
+				derivation:['mashu','nuzhan'],
 				filter:function(event,player){
 					var zhu=get.zhu(player);
 					if(zhu&&zhu.isZhu){
@@ -22575,7 +22595,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nuzhan2:'怒斩',
 			nuzhan_info:'锁定技，你使用的由一张锦囊牌转化的【杀】不计入出牌阶段的次数限制；锁定技，你使用的由一张装备牌转化的【杀】的伤害值基数+1',
 			danji:'单骑',
-			danji_info:'觉醒技，准备阶段开始时，若你的手牌数大于你的体力值且本局游戏的主公不为刘备，你减1点体力上限，然后获得〖马术〗和〖怒斩〗',
+			danji_info:'觉醒技，准备阶段开始时，若你的手牌数大于你的体力值且本局游戏的主公不为刘备，你减1点体力上限，然后获得〖马术〗和〖怒斩〗。',
 			jieyuan:'竭缘',
 			jieyuan_more:'竭缘',
 			jieyuan_less:'竭缘',
@@ -23195,7 +23215,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldaili_info:'一名角色的回合结束时，若你被展示过的手牌数为偶数，则你可以翻面，摸三张牌并展示之。',
 			zhangshiping:'张世平',
 			olhongji:'鸿济',
-			olhongji_info:'每轮每项各限一次。一名角色的准备阶段，若其手牌数为唯一最少/最多，你可以令其于本回合第一个摸牌阶段/出牌阶段后执行一个额外的摸牌阶段/出牌阶段。',
+			olhongji_info:'每轮每项各限一次。一名角色的准备阶段，若其手牌数最少/最多，你可以令其于本回合第一个摸牌阶段/出牌阶段后执行一个额外的摸牌阶段/出牌阶段（若其条件同时满足则只能选择一项）。',
 			olxinggu:'行贾',
 			olxinggu_info:'①游戏开始时，你将牌堆中的三张坐骑牌扣置于武将牌上。②结束阶段，你可以将一张〖行贾①〗牌置于一名其他角色的装备区，然后你从牌堆获得一张♦牌。',
 			lushi:'卢氏',
