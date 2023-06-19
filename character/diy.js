@@ -566,6 +566,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(card.cards.some(card=>card.hasGaintag('iriya_yinji_tag'))) return false;
 								}
 							},
+							aiValue:function(player,card,num){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('iriya_yinji_tag')) return num/10000;
+							},
+							aiUseful:function(player,card,num){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('iriya_yinji_tag')) return num/10000;
+							},
 						},
 					},
 				},
@@ -654,6 +660,261 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterOk:function(){
 					return Array.isArray(lib.skill.iriya_haozhi.getType(ui.selected.cards,_status.event.player));
 				},
+				check:function(card){
+					var player=_status.event.player;
+					//收益都一样 多一牌不如少一牌
+					var types=['炸弹','三顺','单顺','双顺','三张','对子'];
+					var getNum=function(card,player){
+						var num=get.number(card,player);
+						if(num<=2) return num+13;
+						return num;
+					},hasEnemy=game.hasPlayer(current=>get.attitude(player,current)<0);
+					//所有手牌
+					var nums=player.getCards('he',function(card){
+						return lib.filter.cardDiscardable(card,player);
+					}).map(card=>getNum(card,player));
+					var numu=ui.selected.cards.map(card=>getNum(card,player));
+					var num=getNum(card,player);
+					if(!_status.event._iriya_haozhi_type){
+						for(var type of types){
+							switch(type){
+								case '炸弹':
+									if(!hasEnemy) break;
+									for(var i of nums){
+										if(get.numOf(nums,i)>=4){
+											_status.event._iriya_haozhi_type='炸弹';
+											break;
+										}
+									}
+									break;
+								case '三顺':
+									if(!hasEnemy) break;
+									for(var i of nums){
+										if(i<14&&get.numOf(nums,i)>=3&&get.numOf(nums,i+1)>=3){
+											_status.event._iriya_haozhi_type='三顺';
+											break;
+										}
+									}
+									break;
+								case '双顺':
+									if(!hasEnemy) break;
+									for(var i of nums){
+										if(i<13&&get.numOf(nums,i)>=2){
+											for(var j=1;j<3;j++){
+												if(get.numOf(nums,i+j)<2) break;
+												if(j==2) _status.event._iriya_haozhi_type='双顺';
+											}
+										}
+									}
+									break;
+								case '单顺':
+									if(!hasEnemy) break;
+									for(var i of nums){
+										if(i<11){
+											for(var j=1;j<5;j++){
+												if(!nums.contains(i+j)) break;
+												if(j==4) _status.event._iriya_haozhi_type='单顺';
+											}
+										}
+									}
+									break;
+								case '三张':
+									if(!hasEnemy) break;
+									for(var i of nums){
+										if(get.numOf(nums,i)>=3){
+											_status.event._iriya_haozhi_type='三张';
+											break;
+										}
+									}
+									break;
+								case '对子':
+									for(var i of nums){
+										if(get.numOf(nums,i)>=2){
+											_status.event._iriya_haozhi_type='对子';
+											break;
+										}
+									}
+									break;
+							}
+							if(_status.event._iriya_haozhi_type) break;
+						}
+						if(!_status.event._iriya_haozhi_type) _status.event._iriya_haozhi_type='要不起';
+					}
+					if(_status.event._iriya_haozhi_type=='要不起') return 0;
+					//复用响应AI
+					if(!ui.selected.cards.length){
+						var count=get.numOf(nums,num);
+						switch(_status.event._iriya_haozhi_type){
+							case '炸弹':
+								if(count>=4) return 15;
+								break;
+							case '对子':
+								if(count>1&&player.hasCard(function(cardx){
+									return cardx!=card&&getNum(cardx,player)==num&&cardx.hasGaintag('iriya_yinji_tag');
+								},'he')) return 4-get.value(card);
+								break;
+							case '三张':
+								if(count>2) return 8-get.value(card);
+								break;
+							case '单顺':
+								if(num>10) return 0;
+								for(var i=1;i<5;i++){
+									if(get.numOf(nums,num+i)<1) return 0;
+								}
+								return 9-get.value(card);
+							case '双顺':
+								if(count<2||num>12) return 0;
+								for(var i=1;i<3;i++){
+									if(get.numOf(nums,num+i)<2) return 0;
+								}
+								return 9-get.value(card);
+							case '三顺':
+								if(count<3||num>13) return 0;
+								for(var i=1;i<2;i++){
+									if(get.numOf(nums,num+i)<2) return 0;
+								}
+								return 12-get.value(card);
+						}
+						return 0;
+					}
+					else{
+						switch(_status.event._iriya_haozhi_type){
+							case '炸弹':
+								if(numu.length>=4) return 0;
+								if(num==numu[0]) return 15;
+								return 0;
+							case '对子':
+								if(numu.length>=2) return 0;
+								if(num==numu[0]) return 3-get.value(card);
+								return 0;
+							case '三张':
+								if(numu.length>=3) return 0;
+								if(num==numu[0]) return 9-get.value(card);
+								return 0;
+							case '单顺': case '双顺': case '三顺':
+								var map={
+									单顺:[5,0],
+									双顺:[3,1],
+									三顺:[2,2],
+								},len=map[_status.event._iriya_haozhi_type][0],addNum=map[_status.event._iriya_haozhi_type][1];
+								if(numu.length>=len) return 0;
+								var numt=numu[numu.length-1]+(numu.length%(1+addNum)==0?1:0);
+								if(num==numt) return 10+addNum-get.value(card);
+								return 0;
+						}
+					}
+				},
+				//响应AI
+				respondAI:function(card){
+					if(!_status.event.goon) return 0;
+					var type=_status.event.type,player=_status.event.player;
+					var getNum=function(card,player){
+						var num=get.number(card,player);
+						if(num<=2) return num+13;
+						return num;
+					},nums=player.getCards('he',function(card){
+						return lib.filter.cardDiscardable(card,player,'iriya_haozhi');
+					}).map(card=>getNum(card,player));
+					var num=getNum(card,player);
+					if(!ui.selected.cards.length){
+						var count=get.numOf(nums,num);
+						if(count>=4&&(type[0]!='炸弹'||num>type[1]||count>type[2])) return 15;
+						switch(type[0]){
+							case '对子':
+								if(count>1&&num>type[1]) return 8-get.value(card);
+								break;
+							case '三张': case '三带一': case '三带二':
+								if(count>2&&num>type[1]) return 9-get.value(card);
+								break;
+							case '单顺':
+								if(num<=type[1]||num>(15-type[2])) return 0;
+								for(var i=1;i<type[2];i++){
+									if(get.numOf(nums,num+i)<1) return 0;
+								}
+								return 10-get.value(card);
+							case '双顺':
+								if(num<=type[1]||count<2||num>(15-type[2]/2)) return 0;
+								for(var i=1;i<type[2]/2;i++){
+									if(get.numOf(nums,num+i)<2) return 0;
+								}
+								return 11-get.value(card);
+							case '三顺': case '单带飞机': case '双带飞机':
+								var size=3+['三顺','单带飞机','双带飞机'].indexOf(type[0]);
+								if(num<=type[1]||count<3||num>(15-type[2]/size)) return 0;
+								for(var i=1;i<type[2]/size;i++){
+									if(get.numOf(nums,num+i)<2) return 0;
+								}
+								return 12-get.value(card);
+						}
+						return 0;
+					}
+					else{
+						var numu=ui.selected.cards.map(card=>getNum(card,player))
+						var numx=numu[0];
+						if(num==numx){
+							var count=get.numOf(nums,numx);
+							if(count>=4&&(type[0]!='炸弹'||num>type[1]||count>type[2])&&(numu.length<(type[0]=='炸弹'?type2:4))) return 15;
+						}
+						switch(type[0]){
+							case '对子':
+								if(numu.length>=2) return 0;
+								if(num==numu[0]) return 8-get.value(card);
+								return 0;
+							case '三张':
+								if(numu.length>=3) return 0;
+								if(num==numu[0]) return 9-get.value(card);
+								return 0;
+							case '三带一':
+								if(numu.length==3||num==numu[0]) return 9-get.value(card);
+								return 0;
+							case '三带二':
+								if(numu.length>=5) return false;
+								if(numu.length==3){
+									if(num==numu[0]||get.numOf(nums,num)<2) return 0;
+								}
+								else if(numu.length==4){
+									return num==numu[3]?9-get.value(card):0;
+								}
+								if(num==numu[0]) return 9-get.value(card);
+								return 0;
+							case '单顺': case '双顺': case '三顺':
+								if(numu.length>=type[2]) return 0;
+								var addNum=['单顺','双顺','三顺'].indexOf(type[0]);
+								var numt=numu[numu.length-1]+(numu.length%(1+addNum)==0?1:0);
+								if(num==numt) return 10+addNum-get.value(card);
+								return 0;
+							case '单带飞机':
+								if(numu.length>=type[2]) return 0;
+								var len=type[2]/4*3;
+								if(numu.length<len){
+									var numt=numu[numu.length-1]+(numu.length%(3)==0?1:0);
+									if(num==numt) return 12-get.value(card);
+								}
+								else{
+									if(num>=numu[0]||num<=numu[len-1]) return 0;
+									return 12-get.value(card);
+								}
+								return 0;
+							case '双带飞机':
+								if(numu.length>=type[2]) return 0;
+								var len=type[2]/5*3;
+								if(numu.length<len){
+									var numt=numu[numu.length-1]+(numu.length%(3)==0?1:0);
+									if(num==numt) return 12-get.value(card);
+								}
+								else{
+									if((numu.length-len)%2==0){
+										if(numu.contains(num)||get.numOf(nums,num)<2) return 0;
+										return 12-get.value(card);
+									}
+									else{
+										return num==numu[numu.length-1]?12-get.value(card):0;
+									}
+								}
+								return 0;
+						}
+					}
+				},
 				content:function(){
 					'step 0'
 					var players=game.filterPlayer().sortBySeat(player.getNext());
@@ -704,6 +965,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return type[0]==ptype[0]&&type[2]==ptype[2]&&type[1]>ptype[1];
 						});
+						next.set('goon',get.attitude(target,event.current)<0);
+						next.set('ai',lib.skill.iriya_haozhi.respondAI);
 					}
 					else if(event.players.length>0) event.redo();
 					else event.goto(3);
@@ -711,7 +974,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.current=target;
 						event.current_type=lib.skill.iriya_haozhi.getType(result.cards.slice(0),target);
+						event.current_cards=result.cards.slice(0);
 						if(!event.current_type) event.finish();
+						event.current.addExpose(0.5);
 					}
 					if(event.players.length>0) event.goto(1);
 					'step 3'
@@ -744,7 +1009,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content1:function(){
 					'step 0'
-					player.chooseTarget([1,2],'是否令至多两名角色各摸一张牌？');
+					player.chooseTarget([1,2],'是否令至多两名角色各摸一张牌？').set('ai',function(target){
+						var player=_status.event.player,att=get.attitude(player,target);
+						if(target.hasSkillTag('nogain')) att/=10;
+						return att;
+					});
 					'step 1'
 					if(result.bool){
 						var targets=result.targets.sortBySeat();
@@ -759,10 +1028,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target!=player&&target.hasCard(function(card){
 							return lib.filter.canBeDiscarded(card,player,target);
 						},'he')
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						return get.effect(target,{name:'guohe_copy2'},player,player);
 					});
 					'step 1'
 					if(result.bool){
 						var targets=result.targets.sortBySeat();
+						player.line(targets,'green');
 						for(var target of targets){
 							player.discardPlayerCard(target,true,'he');
 						}
@@ -779,6 +1052,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target!=player&&target.hasCard(function(card){
 							return lib.filter.canBeDiscarded(card,player,target);
 						},'he');
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						return get.effect(target,{name:'guohe_copy2'},player,player);
 					});
 					if(event.color) next.set('prompt2','若你弃置的牌为'+get.translation(event.color)+'，则你可以重复此流程');
 					'step 2'
@@ -809,6 +1085,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target!=player&&target.hasCard(function(card){
 							return lib.filter.canBeGained(card,player,target);
 						},'he');
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						return get.effect(target,{name:'shunshou_copy2'},player,player);
 					});
 					if(event.color) next.set('prompt2','若你获得的牌为'+get.translation(event.color)+'，则你可以重复此流程');
 					'step 2'
@@ -827,13 +1106,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.goto(1);
 						}
 						else if(color==event.color) event.goto(1);
+						//player.draw();
 					}
 					'step 4'
 					if(event.count>0) player.recover(event.count);
 				},
 				content5:function(){
 					'step 0'
-					player.chooseTarget([1,3],'是否令至多三名其他角色翻面？',lib.filter.notMe);
+					player.chooseTarget([1,3],'是否令至多三名其他角色翻面？',lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player,att=get.attitude(player,target);
+						if(target.isTurnedOver()) return 10*att;
+						return -6*att;
+					});
 					'step 1'
 					if(result.bool){
 						var targets=result.targets.sortBySeat();
@@ -844,6 +1128,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					player.chooseTarget('是否对一名目标角色造成1点火属性伤害？',function(card,player,target){
 						return _status.event.getParent().targets.contains(target);
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						return get.damageEffect(target,player,player,'fire');
 					});
 					'step 3'
 					if(result.bool){
@@ -854,7 +1141,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content6:function(){
 					'step 0'
-					player.chooseTarget('是否对一名其他角色进行核打击？','你对该角色造成2点雷属性伤害，然后该角色翻面，弃置装备区内的所有牌和四张手牌。',lib.filter.notMe);
+					player.chooseTarget('是否对一名其他角色进行核打击？','你对该角色造成2点雷属性伤害，然后该角色翻面，弃置装备区内的所有牌和四张手牌。',lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player,att=get.attitude(player,target);
+						if(target.isTurnedOver()) return -6*att*Math.sqrt(2+target.countCards('he'));
+						return -att*Math.sqrt(2+target.countCards('he'));
+					});
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
@@ -871,7 +1162,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=target.countCards('h');
 					if(num>0) target.chooseToDiscard('h',true,Math.min(4,num));
 				},
-				ai:{sortCardByNum:true},
+				ai:{
+					sortCardByNum:true,
+					order:13,
+					result:{
+						player:1,
+					},
+				},
 				subSkill:{
 					extra:{
 						charlotte:true,
@@ -18208,7 +18505,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			+'对子：其可以令至多两名角色各摸一张牌。'
 			+'三带：其可以弃置至多三名其他角色的各一张牌，然后摸一张牌。'
 			+'单顺：其可以弃置一名其他角色的一张牌。若其未以此法弃置过颜色相同的牌，则其可以重复此流程。然后其摸等量的牌。'
-			+'双顺：其可以获得一名其他角色的一张牌。若其未以此法弃置过颜色相同的牌，则其可以重复此流程。然后其回复等量的体力。'
+			+'双顺：其可以获得一名其他角色的一张牌。若其未以此法获得过颜色相同的牌，则其可以重复此流程。然后其回复等量的体力。'
 			+'三顺/飞机：其可以令至多3名其他角色翻面，然后对其中一名角色造成1点火属性伤害。'
 			+'炸弹/四带二：其可以对一名角色造成2点雷属性伤害，然后目标角色翻面，弃置装备区的所有牌和四张手牌。',
 
