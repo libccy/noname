@@ -37155,7 +37155,7 @@
 		},
 		getDB:function(type,id,callback){
 			if(!lib.db){
-				callback(null);
+				if(callback) callback(null);
 				return;
 			}
 			if(!callback) return;
@@ -37192,7 +37192,7 @@
 		},
 		deleteDB:function(type,id,callback){
 			if(!lib.db){
-				callback(false);
+				if(callback) callback(false);
 				return;
 			}
 			if(lib.status.reload){
