@@ -31024,6 +31024,9 @@
 					this._changed=true;
 				}
 			};
+			audio.oncanplay=function(){
+				this.play();
+			};
 			ui.window.appendChild(audio);
 			return audio;
 		},
