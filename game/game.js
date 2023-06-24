@@ -11449,10 +11449,10 @@
 					if(event.cards[1].length) target.$give(event.cards[1],player,false);
 					"step 2"
 					for(var i=0;i<event.cards[1].length;i++){
-						player.equip(event.cards[1][i]);
+						if(get.position(event.cards[1][i],true)=='o') player.equip(event.cards[1][i]);
 					}
 					for(var i=0;i<event.cards[0].length;i++){
-						target.equip(event.cards[0][i]);
+						if(get.position(event.cards[1][i],true)=='o') target.equip(event.cards[0][i]);
 					}
 				},
 				disableEquip:function(){
@@ -13306,28 +13306,46 @@
 					'step 0'
 					event.type='gain';
 					if(event.animate=='give'||event.animate=='gain2') event.visible=true;
-					if(player&&cards) player.lose(cards,ui.special).set('type','gain').set('forceDie',true).set('getlx',false);
+					if(player&&cards){
+						event._lose=true;
+						player.lose(cards,ui.special).set('type','gain').set('forceDie',true).set('getlx',false);
+					}
 					'step 1'
 					switch(event.animate){
 						case 'draw':
 							game.delay(0,get.delayx(500,500));
 							for(var i of event.gain_list){
 								if(get.itemtype(i[1])=='card') i[1]=[i[1]];
-								i[0].$draw(i[1].length);
+								if(event._lose){
+									i[1]=i[1].filter(card=>{
+										return !cards.contains(card)||!player.getCards('hejsx').contains(card);
+									})
+								}
+								if(i[1].length>0) i[0].$draw(i[1].length);
 							}
 							break;
 						case 'gain':
 							game.delay(0,get.delayx(700,700));
 							for(var i of event.gain_list){
 								if(get.itemtype(i[1])=='card') i[1]=[i[1]];
-								i[0].$gain(i[1].length);
+								if(event._lose){
+									i[1]=i[1].filter(card=>{
+										return !cards.contains(card)||!player.getCards('hejsx').contains(card);
+									})
+								}
+								if(i[1].length>0) i[0].$gain(i[1].length);
 							}
 							break;
 						case 'gain2': case 'draw2':
 							game.delay(0,get.delayx(500,500));
 							for(var i of event.gain_list){
 								if(get.itemtype(i[1])=='card') i[1]=[i[1]];
-								i[0].$gain2(i[1]);
+								if(event._lose){
+									i[1]=i[1].filter(card=>{
+										return !cards.contains(card)||!player.getCards('hejsx').contains(card);
+									})
+								}
+								if(i[1].length>0) i[0].$gain2(i[1]);
 							}
 							break;
 						case 'give': case 'giveAuto':
@@ -13336,6 +13354,11 @@
 							game.delay(0,get.delayx(500,500));
 							for(var i of event.gain_list){
 								if(get.itemtype(i[1])=='card') i[1]=[i[1]];
+								if(event._lose){
+									i[1]=i[1].filter(card=>{
+										return !cards.contains(card)||!player.getCards('hejsx').contains(card);
+									})
+								}
 								var shown=i[1].slice(0),hidden=[];
 								if(event.animate=='giveAuto'){
 									for(var card of i[1]){
@@ -13353,11 +13376,13 @@
 							event.finish();
 					}
 					for(var i of event.gain_list){
-						var next=i[0].gain(i[1]);
-						next.getlx=false;
-						if(event.visible) next.visible=true;
-						if(event.giver) next.giver=event.giver;
-						if(event.gaintag) next.gaintag.addArray(event.gaintag);
+						if(i[1].length>0){
+							var next=i[0].gain(i[1]);
+							next.getlx=false;
+							if(event.visible) next.visible=true;
+							if(event.giver) next.giver=event.giver;
+							if(event.gaintag) next.gaintag.addArray(event.gaintag);
+						}
 					}
 					'step 2'
 					game.delayx();
@@ -16176,8 +16201,8 @@
 					'step 1'
 					game.loseAsync({
 						gain_list:[
-							[player,event.cards2],
-							[target,event.cards1]
+							[player,event.cards2.filterInD()],
+							[target,event.cards1.filterInD()]
 						],
 					}).setContent('gaincardMultiple');
 					'step 2'
@@ -16267,6 +16292,17 @@
 							}
 							else{
 								cards.splice(i--,1);
+							}
+						}
+						else if(event.losing_map){
+							for(var id in event.losing_map){
+								if(event.losing_map[id][0].contains(cards[i])){
+									var source=(_status.connectMode?lib.playerOL:game.playerMap)[id];
+									var hs=source.getCards('hejsx');
+									if(hs.contains(cards[i])){
+										cards.splice(i--,1);
+									}
+								}
 							}
 						}
 					}
@@ -16458,6 +16494,17 @@
 							}
 							else{
 								cards.splice(i--,1);
+							}
+						}
+						else if(event.losing_map){
+							for(var id in event.losing_map){
+								if(event.losing_map[id][0].contains(cards[i])){
+									var source=(_status.connectMode?lib.playerOL:game.playerMap)[id];
+									var hs=source.getCards('hejsx');
+									if(hs.contains(cards[i])){
+										cards.splice(i--,1);
+									}
+								}
 							}
 						}
 					}
@@ -17267,7 +17314,10 @@
 				equip:function(){
 					"step 0"
 					var owner=get.owner(card)
-					if(owner) owner.lose(card,ui.special,'visible').set('type','equip').set('getlx',false);
+					if(owner){
+						event.owner=owner;
+						owner.lose(card,ui.special,'visible').set('type','equip').set('getlx',false);
+					}
 					else if(get.position(card)=='c') event.updatePile=true;
 					"step 1"
 					if(event.cancelled){
@@ -17279,6 +17329,12 @@
 							delete card.destroyed;
 						}
 						else{
+							event.finish();
+							return;
+						}
+					}
+					else if(event.owner){
+						if(event.owner.getCards('hejsx').contains(card)){
 							event.finish();
 							return;
 						}
@@ -17369,6 +17425,13 @@
 							delete cards[0].destroyed;
 						}
 						else{
+							event.finish();
+							return;
+						}
+					}
+					else if(event.relatedLose){
+						var owner=event.relatedLose.player;
+						if(event.owner.getCards('hejsx').contains(card)){
 							event.finish();
 							return;
 						}
@@ -17795,7 +17858,9 @@
 						"step 0"
 						player.lose(cards,ui.special).set('getlx',false);
 						"step 1"
-						target.directgains(cards,null,event.tag)
+						var cards=event.cards.slice(0);
+						cards.removeArray(player.getCards('hejsx'));
+						if(cards.length) target.directgains(cards,null,event.tag)
 					});
 					return next;
 				},

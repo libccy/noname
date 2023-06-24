@@ -2600,6 +2600,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							source2:evtmap.targets,
 							id:map.id,
 							id2:map.id2,
+							state:state,
 							info_map:map,
 						});
 						if(map.card&&map.player) next.respondTo=[map.player,map.card]
