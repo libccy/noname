@@ -5836,14 +5836,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
-						return current!=player&&current.countDiscardableCards('hej',player)>0;
+						return current!=player&&current.countDiscardableCards(player,'hej')>0;
 					});
 				},
 				direct:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('twtanfeng'),function(card,player,target){
-						return target!=player&&target.countDiscardableCards('hej',player)>0;
+						return target!=player&&target.countDiscardableCards(player,'hej')>0;
 					}).set('ai',function(target){
 						var player=_status.event.player,num=1;
 						if(get.attitude(player,target)>0) num=3;
