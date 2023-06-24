@@ -6021,11 +6021,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				prompt2:'展示牌堆顶的三张牌，并可以根据其中红色牌的数量，令一名其他角色获得一种效果',
-				check:function(event,player){
-					return game.hasPlayer(function(current){
-						return current!=player&&get.attitude(player,current)>0;
-					});
-				},
 				content:function(){
 					'step 0'
 					var cards=get.cards(3);
@@ -10926,7 +10921,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var eff=0;
 					var target=game.findPlayer(function(current){
-						return current!=player&&!current.hasMark('spshanxi');
+						return current!=player&&current.hasMark('spshanxi');
 					});
 					if(target) eff=(-get.attitude(player,target)/Math.sqrt(Math.max(1,target.hp)));
 					player.chooseTarget(get.prompt('spshanxi'),'令一名其他角色获得“檄”',function(card,player,target){
@@ -15839,7 +15834,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"rw_bagua_skill":{
 				inherit:"bagua_skill",
-				audio:"bagua_skill",
+				audio:true,
 				content:function(){
 					"step 0"
 					player.judge('rewrite_bagua',function(card){return (get.suit(card)!='spade')?1.5:-0.5}).judge2=function(result){
@@ -15855,7 +15850,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"rw_baiyin_skill":{
 				inherit:"baiyin_skill",
-				audio:"baiyin_skill",
+				audio:true,
 			},
 			"rw_lanyinjia":{
 				inherit:"lanyinjia",
@@ -15889,7 +15884,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"rw_renwang_skill":{
 				inherit:"renwang_skill",
-				audio:"renwang_skill",
+				audio:true,
 				filter:function(event,player){
 					if(player.hasSkillTag('unequip2')) return false;
 					if(event.player.hasSkillTag('unequip',false,{
@@ -15919,14 +15914,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"rw_tengjia1":{
 				inherit:"tengjia1",
-				audio:"tengjia1",
+				audio:true,
 			},
 			"rw_tengjia2":{
 				inherit:"tengjia2",
-				audio:"tengjia1",
+				audio:true,
 			},
 			"rw_tengjia3":{
-				audio:"tengjia1",
+				audio:"rw_tengjia1",
 				inherit:"rw_minguangkai_link",
 				ai:{
 					effect:{
@@ -15940,7 +15935,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rw_tengjia4:{
 				inherit:"tengjia3",
-				audio:"tengjia1",
+				audio:"rw_tengjia1",
 			},
 			xinfu_pingcai:{
 				subSkill:{backup:{}},

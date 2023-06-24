@@ -637,6 +637,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				equipDelay:false,
 				loseDelay:false,
+				ai:{
+					equipValue:5,
+					basic:{
+						equipValue:5
+					}
+				}
 			},
 			zhuangshu_trick:{
 				fullskin:true,
@@ -688,91 +694,133 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					player.addSkill('olzhuyan_record');
 				},
-				zhuanhuanji:true,
-				mark:true,
-				marktext:'☯',
-				intro:{
-					content:function(storage,player,skill){
-						if(player.storage.olzhuyan) return '每名角色限一次。结束阶段，你可以令一名角色将手牌数调整至与其上个准备阶段结束后相同。';
-						return '每名角色限一次。结束阶段，你可以令一名角色将体力值调整至与其上个准备阶段结束后相同。';
-					},
-				},
 				onremove:['olzhuyan_true','olzhuyan_false'],
 				direct:true,
 				filter:function(event,player){
-					var storage=Boolean(player.storage.olzhuyan);
-					var targeted=player.getStorage('olzhuyan_'+storage);
-					return game.hasPlayer(current=>{
-						return !targeted.contains(current)&&lib.skill.olzhuyan.getNum(current,storage);
-					});
+					for(var bool of [true,false]){
+						var targeted=player.getStorage('olzhuyan_'+bool);
+						if(game.hasPlayer(current=>{
+							return !targeted.contains(current)&&lib.skill.olzhuyan.getNum(current,bool);
+						})) return true;
+					}
+					return false;
 				},
 				getNum:function(player,status){
 					if(!_status.olzhuyan||!_status.olzhuyan[player.playerid]) return 0;
 					var num=_status.olzhuyan[player.playerid][status?1:0];
-					if(status) num-=player.countCards('h');
-					else num-=player.hp;
+					if(status){
+						num-=player.countCards('h');
+						if(num+player.countCards('h')>5) num=5-player.countCards('h');
+					}
+					else{
+						num-=player.hp;
+						if(num+player.hp<1) num=1-player.hp;
+					}
 					return num;
 				},
 				content:function(){
 					'step 0'
-					var storage=Boolean(player.storage.olzhuyan);
-					var map={},targeted=player.getStorage('olzhuyan_'+storage);
-					var targets=game.filterPlayer(current=>{
-						return !targeted.contains(current);
-					});
-					for(var target of targets){
-						map[target.playerid]=lib.skill.olzhuyan.getNum(target,storage);
+					var map={};
+					for(var bool of [true,false]){
+						var targeted=player.getStorage('olzhuyan_'+bool);
+						game.countPlayer(current=>{
+							if(targeted.contains(current)) return false;
+							if(!map[current.playerid]) map[current.playerid]=[];
+							map[current.playerid][bool?1:0]=lib.skill.olzhuyan.getNum(current,bool);
+						});
 					}
 					event.map=map;
-					player.chooseTarget(get.prompt('olzhuyan'),'令一名角色将'+(storage?'手牌数':'体力值')+'调整至与其上个准备阶段相同',(card,player,target)=>{
-						return _status.event.map[target.playerid];
+					player.chooseTarget(get.prompt('olzhuyan'),'令一名角色将{体力值/手牌数}调整至与其上个准备阶段相同(“--”表示已对其发动过该分支)',(card,player,target)=>{
+						var list=_status.event.map[target.playerid];
+						return list&&(list[0]||list[1]);
 					}).set('map',map).set('targetprompt',target=>{
-						var num=_status.event.map[target.playerid];
-						if(num>0) num='+'+num;
-						return ' '+num+' ';
+						var list=_status.event.map[target.playerid];
+						var str='';
+						for(var i=0;i<2;i++){
+							if(list[i]===undefined) str+='--';
+							else{
+								str+=(list[i]>0?'+':'')+list[i];
+							}
+							str+='/';
+						}
+						return str.slice(0,-1);
 					}).set('ai',target=>{
-						return _status.event.map[target.playerid]*get.attitude(_status.event.player,target);
+						var list=_status.event.map[target.playerid];
+						var att=get.attitude(_status.event.player,target);
+						var v1=list[0],v2=get.sgn(list[1])*Math.sqrt(Math.abs(list[1]));
+						return Math[att>0?'max':'min'](v1,v2)*att;
 					});
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('olzhuyan',target);
-						var storage=Boolean(player.storage.olzhuyan);
-						player.markAuto('olzhuyan_'+storage,[target]);
-						player.changeZhuanhuanji('olzhuyan');
-						var num=event.map[target.playerid];
-						if(storage){
-							if(num>0){
-								num=Math.min(5-target.countCards('h'),num);
-								if(num>0) target.draw(num);
-							}
-							else{
-								num=-num;
-								target.chooseToDiscard(num,true).set('prompt','驻颜：请弃置'+get.cnNumber(Math.abs(num))+'张手牌');
-							}
+						event.target=target;
+						var list=event.map[target.playerid];
+						var choices=['体力值','手牌数'];
+						if(list[0]&&list[1]){
+							player.chooseControl(choices).set('choiceList',[
+								'令'+get.translation(target)+(list[0]>0?'回复':'失去')+Math.abs(list[0])+'点体力'+(list[0]<0?'（至多失去至1）':''),
+								'令'+get.translation(target)+(list[1]>0?'摸':'弃置')+get.cnNumber(Math.abs(list[1]))+'张'+(list[1]>0?'':'手')+'牌'+(list[1]>0?'（至多摸至5）':''),
+							]).set('prompt','驻颜：请选择一项').set('ai',()=>_status.event.choice).set('choice',function(){
+								var v1=list[0],v2=get.sgn(list[1])*Math.sqrt(Math.abs(list[1]));
+								if(get.attitude(player,target)>0){
+									return v1>v2?0:1;
+								}
+								return v1>v2?1:0;
+							}());
 						}
 						else{
-							if(num>0){
-								target.recover(num);
-							}
-							else{
-								num=Math.min(target.hp-1,-num);
-								target.loseHp(num);
-							}
+							event._result={index:list[0]?0:1};
+						}
+					}
+					else event.finish();
+					'step 2'
+					var ind=result.index;
+					player.markAuto('olzhuyan_'+Boolean(ind),[target]);
+					var num=event.map[target.playerid][ind];
+					if(ind==0){
+						if(num>0){
+							target.recover(num);
+						}
+						else{
+							num=Math.min(target.hp-1,-num);
+							target.loseHp(num);
+						}
+					}
+					else{
+						if(num>0){
+							num=Math.min(5-target.countCards('h'),num);
+							if(num>0) target.draw(num);
+						}
+						else{
+							num=-num;
+							target.chooseToDiscard(num,true).set('prompt','驻颜：请弃置'+get.cnNumber(Math.abs(num))+'张手牌');
 						}
 					}
 				},
 				subSkill:{
 					record:{
-						trigger:{global:'phaseZhunbeiAfter'},
+						trigger:{
+							global:['phaseZhunbeiAfter','phaseBefore','enterGame'],
+						},
 						lastDo:true,
 						charlotte:true,
 						forced:true,
 						popup:false,
 						forceDie:true,
+						filter:function(event,player){
+							return (event.name!='phase'||game.phaseNumber==0);
+						},
 						content:function(){
 							if(!_status.olzhuyan) _status.olzhuyan={};
-							_status.olzhuyan[trigger.player.playerid]=[trigger.player.hp,trigger.player.countCards('h')];
+							if(event.triggername=='phaseBefore'){
+								game.countPlayer(current=>{
+									_status.olzhuyan[current.playerid]=[current.hp,current.countCards('h')];
+								})
+							}
+							else{
+								_status.olzhuyan[trigger.player.playerid]=[trigger.player.hp,trigger.player.countCards('h')];
+							}
 						},
 					}
 				}
@@ -1536,7 +1584,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseControl('cancel2').set('choiceList',[
-						'令'+get.translation(trigger.player)+'回复1点体力',
+						'令'+get.translation(trigger.player)+'回复1点体力，且造成伤害时本回合手牌上限为0',
 						'令'+get.translation(trigger.player)+'于本回合下次造成的伤害+1，且造成伤害时本回合手牌上限为0',
 					]).set('prompt',get.prompt('olkangrui',trigger.player)).set('ai',()=>{
 						return _status.event.choice;
@@ -1564,11 +1612,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.control!='cancel2'){
 						player.logSkill('olkangrui',trigger.player);
 						player.draw();
-						if(result.index==0) trigger.player.recover();
+						if(result.index==0){
+							trigger.player.recover();
+							trigger.player.addTempSkill('olkangrui_nil');
+						}
 						else{
 							trigger.player.addTempSkill('olkangrui_add');
 							trigger.player.addMark('olkangrui_add',1,false);
-							trigger.player.addTempSkill('olkangrui_nil');
 						}
 					}
 				},
@@ -1587,7 +1637,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							trigger.num+=player.countMark('olkangrui_add');
-							player.removeSkill('olkangrui_add');
+							player.removeMark('olkangrui_add',player.countMark('olkangrui_add'),false);
+							player.storage.olkangrui_nil=true;
+							game.log(player,'本回合手牌上限基数为','#g0');
+						},
+						mod:{
+							maxHandcardBase:function(player,num){
+								if(player.storage.olkangrui_nil) return 0;
+							},
 						}
 					},
 					nil:{
@@ -10629,7 +10686,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('yuxu');
 						player.draw();
 						player.addMark('yuxu_used',1,false);
-						player.addTempSkill('yuxu_used','phaseUse');
+						player.addTempSkill('yuxu_used','phaseUseAfter');
 					}
 					event.finish();
 					'step 2'
@@ -22084,10 +22141,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.olmiuyan) return '转换技。你可以将一张黑色牌当做【火攻】使用。然后若此技能：处于阳状态且此牌造成了伤害，则你获得此阶段内所有被展示过的牌；<span class="bluetext">处于阴状态且未造成伤害，则你令此技能失效直到本轮结束。</span>';
 				return '转换技。你可以将一张黑色牌当做【火攻】使用。然后若此技能：<span class="bluetext">处于阳状态且此牌造成了伤害，则你获得此阶段内所有被展示过的牌；</span>处于阴状态且未造成伤害，则你令此技能失效直到本轮结束。';
 			},
-			olzhuyan:function(player){
-				if(player.storage.olzhuyan) return '转换技。每名角色每项各限一次。结束阶段，你可以令一名角色将以下项调整至与其上一个准备阶段结束后的对应项相同：阴：体力值；<span class="bluetext">阳：手牌数</span>（体力值至多失去至1，手牌数至多摸至5）。'
-				return '转换技。每名角色每项各限一次。结束阶段，你可以令一名角色将以下项调整至与其上一个准备阶段结束后的对应项相同：<span class="bluetext">阴：体力值</span>；阳：手牌数（体力值至多失去至1，手牌数至多摸至5）。';
-			},
 		},
 		characterReplace:{
 			caoshuang:['caoshuang','ns_caoshuang'],
@@ -23193,7 +23246,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldianjun:'殿军',
 			oldianjun_info:'锁定技。回合结束时，你受到1点无来源伤害，然后执行一个额外的出牌阶段。',
 			olkangrui:'亢锐',
-			olkangrui_info:'当一名角色于其回合内首次受到伤害后，你可以摸一张牌并选择一项：1.令其回复1点体力；2.令其于本回合下次造成的伤害+1，然后当其于本回合造成伤害时，其本回合手牌上限基数为0。',
+			olkangrui_info:'当一名角色于其回合内首次受到伤害后，你可以摸一张牌并选择一项：1.令其回复1点体力；2.令其于本回合下次造成的伤害+1。然后当其于本回合造成伤害时，其本回合手牌上限基数为0。',
 			wangguan:'王瓘',
 			olmiuyan:'谬焰',
 			olmiuyan_tag:'invisible',
@@ -23220,7 +23273,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olxinggu_info:'①游戏开始时，你将牌堆中的三张坐骑牌扣置于武将牌上。②结束阶段，你可以将一张〖行贾①〗牌置于一名其他角色的装备区，然后你从牌堆获得一张♦牌。',
 			lushi:'卢氏',
 			olzhuyan:'驻颜',
-			olzhuyan_info:'转换技。每名角色每项各限一次。结束阶段，你可以令一名角色将以下项调整至与其上一个准备阶段结束后的对应项相同：阴：体力值；阳：手牌数（体力值至多失去至1，手牌数至多摸至5）。',
+			olzhuyan_info:'每名角色每项各限一次。结束阶段，你可以令一名角色将以下一项调整至与其上一个准备阶段结束后相同：1.体力值；2.手牌数（体力值至多失去至1，手牌数至多摸至5；若其未执行过准备阶段则改为游戏开始时）。',
 			olleijie:'雷劫',
 			olleijie_info:'准备阶段，你可以令一名角色判定，若结果为♠2~9，其受到2点雷电伤害，否则其摸两张牌。',
 

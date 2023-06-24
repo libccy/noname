@@ -534,6 +534,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							effect:{
 								target:function(card,player,target){
 									if(!get.tag(card,'damage')) return;
+									if(target.hp>1) return;
 									var num=0;
 									game.filterPlayer(current=>{
 										if(current.getStorage('twyanshi').some(i=>target==i)){
@@ -544,6 +545,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									for(var targetx of targets){
 										num+=targetx.hp;
 									}
+									if(num>=player.hp) return 0;
 									if(num>0) return [1,0,0,0.5-1.5*num];
 								}
 							}
@@ -7846,7 +7848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'令此牌对'+get.translation(target)+'造成的伤害+'+(num-1)+'，此伤害结算完成后，其回复等量的体力值'
 						];
 						list.push('摸牌');
-						if(target.countDiscardableCards('he',player)) list.push('拆牌');
+						if(target.countDiscardableCards(player,'he')) list.push('拆牌');
 						else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
 						list.push('加伤');
 						player.chooseControl(list).set('prompt','攻阁：请选择一项（'+get.translation(target)+'对应X值：'+(num-1)+'）').set('ai',()=>_status.event.choice).set('choice',function(){
@@ -11167,7 +11169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			twhengjiang:{
-				audio:2,
+				audio:'hengjiang',
 				trigger:{player:'useCardToPlayer'},
 				filter:function(event,player){
 					return !player.hasSkill('twhengjiang2')&&event.targets.length==1&&['basic','trick'].contains(get.type(event.card,false))&&player.isPhaseUsing()&&game.hasPlayer(function(current){
@@ -11580,7 +11582,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			twdaoji:{
-				audio:2,
+				audio:'daoji',
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -12161,7 +12163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!lib.inpile.contains('dz_mantianguohai')) lib.inpile.add('dz_mantianguohai');
 					if(!_status.dz_mantianguohai_suits) _status.dz_mantianguohai_suits=lib.suit.slice(0);
 					var list=_status.dz_mantianguohai_suits.randomRemove(2).map(function(i){
-						return game.createCard2('dz_mantianguohai',i,get.rand(1,13));
+						return game.createCard2('dz_mantianguohai',i,5);
 					});
 					if(list.length) player.gain(list,'gain2','log');
 				},
@@ -12188,7 +12190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(name=='dz_mantianguohai'){
 									if(!lib.inpile.contains('dz_mantianguohai')) lib.inpile.add('dz_mantianguohai');
 									if(!_status.dz_mantianguohai_suits) _status.dz_mantianguohai_suits=lib.suit.slice(0);
-									if(_status.dz_mantianguohai_suits.length) player.gain(game.createCard2('dz_mantianguohai',_status.dz_mantianguohai_suits.randomRemove(),get.rand(1,13)),'gain2');
+									if(_status.dz_mantianguohai_suits.length) player.gain(game.createCard2('dz_mantianguohai',_status.dz_mantianguohai_suits.randomRemove(),5),'gain2');
 									else{
 										var card=get.cardPile(function(card){
 											return card.name==name;
