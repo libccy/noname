@@ -1064,6 +1064,9 @@
 							big:'105%',
 							vbig:'110%',
 							ebig:'120%',
+							eebig:'150%',
+							eeebig:'180%',
+							eeeebig:'200%',
 						},
 						onclick:function(zoom){
 							game.saveConfig('ui_zoom',zoom);
@@ -1074,6 +1077,9 @@
 								case 'big':zoom=1.05;break;
 								case 'vbig':zoom=1.1;break;
 								case 'ebig':zoom=1.2;break;
+								case 'eebig':zoom=1.5;break;
+								case 'eeebig':zoom=1.8;break;
+								case 'eeeebig':zoom=2;break;
 								default:zoom=1;
 							}
 							game.documentZoom=game.deviceZoom*zoom;
@@ -46662,6 +46668,9 @@
 					case 'big':zoom=1.05;break;
 					case 'vbig':zoom=1.1;break;
 					case 'ebig':zoom=1.2;break;
+					case 'eebig':zoom=1.5;break;
+					case 'eeebig':zoom=1.8;break;
+					case 'eeeebig':zoom=2;break;
 					default:zoom=1;
 				}
 				game.documentZoom=game.deviceZoom*zoom;
