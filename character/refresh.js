@@ -9191,15 +9191,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olxueyi:{
 				audio:2,
-				trigger:{global:'phaseBefore'},
+				trigger:{global:'phaseBefore',player:'enterGame'},
 				forced:true,
 				zhuSkill:true,
 				unique:true,
 				filter:function(event,player){
-					return !player.storage.olxueyi_inited&&player.hasZhuSkill('olxueyi');
+					return (event.name!='phase'||game.phaseNumber==0)&&player.hasZhuSkill('olxueyi');
 				},
 				content:function(){
-					player.storage.olxueyi_inited=true;
+					// player.storage.olxueyi_inited=true;
 					var num=game.countPlayer(function(current){
 						return	current.group=='qun';
 					})

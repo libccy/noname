@@ -202,13 +202,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.awakenSkill('sbzhiba');
-					var num=game.countPlayer(current=>current.group=='wu');
-					if(num>0) player.recover(num);
-					player.addMark('sbjiang',1,false);
 					event.targets=game.filterPlayer(current=>{
 						return current.group=='wu'&&current!=player;
 					}).sortBySeat(_status.currentPhase);
+					var num=event.targets.length+1;
+					if(num>0) player.recover(num);
+					player.addMark('sbjiang',1,false);
 					player.addTempSkill('sbzhiba_draw');
+					if(!event.targets.length) event.finish();
 					'step 1'
 					var target=targets.shift();
 					target.damage('nosource');
@@ -1001,7 +1002,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					var num=lib.skill.sbxuanhuo.getNum(target,player);
 					if(num>=3){
-						player.chooseCard('恩怨：交给'+get.translation(target)+'两张牌',true,2,'he');
+						var cards=player.getCards('he');
+						if(!cards.length) event._result={bool:false};
+						else if(cards.length<=2) event._result={bool:true,cards:cards};
+						else player.chooseCard('恩怨：交给'+get.translation(target)+'两张牌',true,2,'he');
 					}
 					else{
 						target.loseHp();
@@ -1402,7 +1406,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target==player) return false;
 					return player.getStorage('sbrende_givenx').contains(target);
 				},
-				selectTarget:-1,
+				selectTarget:[-1,-2],
 				multiline:true,
 				content:function(){
 					'step 0'
@@ -2510,8 +2514,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target!=player&&target.group=='wei'&&player.hasZhuSkill('sbhujia',target);
 					}).set('ai',target=>{
 						var player=_status.event.player,evt=_status.event.getTrigger();
-						return get.damageEffect(target,evt.source,player,evt.nature);
-					});
+						return get.damageEffect(target,evt.source,player,evt.nature)-_status.event.eff;
+					}).set('eff',get.damageEffect(player,trigger.source,player,trigger.nature));
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
