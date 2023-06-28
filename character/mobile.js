@@ -6798,7 +6798,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//糜夫人
 			xinguixiu:{
-				audio:'spguixiu',
+				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -6810,7 +6810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			qingyu:{
-				audio:2,
+				audio:3,
 				dutySkill:true,
 				trigger:{player:'damageBegin2'},
 				forced:true,
