@@ -846,16 +846,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						var next=game.createEvent(name);
 						next.setContent(function(){
-                            if(result.bool==false){
-                                player.damage(3,'thunder','nosource');
-                            }
-                        });
+							if(result.bool==false){
+								player.damage(3,'thunder','nosource');
+							}
+						});
 						next._result=result;
 						next.cards=[];
-                        next.card=get.autoViewAs({name:name});
+						next.card=get.autoViewAs({name:name});
 						next.player=player;
 					}
-                    'step 2'
+					'step 2'
 					trigger.player.drawTo(4);
 				},
 				ai:{expose:0.25}
@@ -917,8 +917,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					suit:function(card,suit){
 						var player=get.owner(card)||_status.event.player;
 						if(!player||!player.judging||player.judging[0]!=card) return;
-                        var storage=player.getStorage('clanfenchai');
-                        if(!storage.length) return;
+						var storage=player.getStorage('clanfenchai');
+						if(!storage.length) return;
 						return storage.filter(i=>i.isIn()).length>0?'heart':'spade';
 					}
 				}

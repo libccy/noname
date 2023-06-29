@@ -17372,7 +17372,7 @@
 							player.$throw(current);
 						}
 						event.swapped=true;
-						event.redo();
+						//event.redo();
 					}
 					"step 4"
 					if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
@@ -17437,7 +17437,7 @@
 					}
 					else if(event.relatedLose){
 						var owner=event.relatedLose.player;
-						if(event.owner.getCards('hejsx').contains(card)){
+						if(owner.getCards('hejsx').contains(card)){
 							event.finish();
 							return;
 						}

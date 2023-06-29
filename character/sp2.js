@@ -5,6 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		character:{
 			sunwukong:['male','qun',3,['dcjinjing','dccibei','dcruyi']],
+			longwang:['male','qun',3,['dclonggong','dcsitian']],
 			taoshen:['male','qun',3,['dcnutao']],
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			duanqiaoxiao:['female','wei',3,['dccaizhuang','dchuayi']],
@@ -21,7 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuechen:['male','wei',4,['dcporui','dcgonghu'],['unseen']],
 			zhangkai:['male','qun',4,['dcxiangshu']],
 			dc_ruiji:['female','wu',4,['dcwangyuan','dclingyin','dcliying']],
-			zhoushan:['male','wu',4,['dcmiyun','dcdanying']],
+			zhoushan:['male','wu',4,['dcmiyun','dcdanying'],['unseen']],
 			zerong:['male','qun',4,['dccansi','dcfozong']],
 			gaoxiang:['male','shu',4,['dcchiying'],['unseen']],
 			xielingyu:['female','wu',3,['dcyuandi','dcxinyou']],
@@ -271,6 +272,281 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//龙王
+			dclonggong:{
+				audio:2,
+				trigger:{player:'damageBegin4'},
+				usable:1,
+				filter:function(event,player){
+					return event.source&&event.source.isAlive();
+				},
+				logTarget:'source',
+				check:function(event,player){
+					return get.attitude(player,event.source)>=0||player.hp<=Math.max(2,event.num);
+				},
+				content:function(){
+					'step 0'
+					trigger.cancel();
+					'step 1'
+					var card=get.cardPile2(function(card){
+						return get.type(card,null,false)=='equip';
+					}),source=trigger.source;
+					if(card&&source&&source.isAlive()) source.gain(card,'gain2');
+				},
+				ai:{
+					filterDamage:true,
+					skillTagFilter:function(player){
+						return !player.storage.counttrigger||!player.storage.counttrigger.dclonggong;
+					},
+				},
+			},
+			dcsitian:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					var colorx=false,hs=player.getCards('he');
+					if(hs.length<2) return false;
+					for(var card of hs){
+						if(!lib.filter.cardDiscardable(card,player)) continue;
+						var color=get.color(card,player);
+						if(color=='none') continue;
+						if(!colorx) colorx=color;
+						else if(colorx!=color) return true;
+					}
+					return false;
+				},
+				filterCard:function(card,player){
+					var color=get.color(card,player);
+					if(color=='none') return false;
+					return !ui.selected.cards.length||get.color(ui.selected.cards[0])!=color;
+				},
+				selectCard:2,
+				complexCard:true,
+				prompt:'弃置两张颜色不同的牌并改变天气',
+				check:(card)=>5.5-get.value(card),
+				content:function(){
+					'step 0'
+					var list=['烈日','雷电','大浪','暴雨','大雾'].randomGets(2);
+					player.chooseButton(true,[
+						'请选择执行一个天气',
+						[list.map(i=>[
+							i,
+							'<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【'+i+'】</div><div>'+lib.skill.dcsitian.weathers[i].description+'</div></div>',
+						]),'textbutton'],
+					]).set('ai',function(button){
+						return lib.skill.dcsitian.weathers[button.link].ai(_status.event.player);
+					})
+					'step 1'
+					if(result.bool){
+						var choice=result.links[0];
+						game.log(player,'将当前天气变更为','#g'+choice);
+						var next=game.createEvent('dcsitian_weather',false);
+						next.player=player;
+						next.setContent(lib.skill.dcsitian.weathers[choice].content);
+					}
+				},
+				ai:{
+					order:8,
+					result:{
+						player:function(player){
+							var num1=0,num2=0;
+							game.countPlayer(function(current){
+								if(player==current) return;
+								var att=get.attitude(player,current);
+								if(att>0) num1++;
+								else num2++;
+							});
+							return num2-num1;
+						},
+					},
+				},
+				subSkill:{
+					dawu:{
+						trigger:{player:'useCard'},
+						forced:true,
+						charlotte:true,
+						filter:function(event,player){
+							return get.type2(event.card,false)=='trick';
+						},
+						content:function(){
+							trigger.targets.length=0;
+							trigger.all_excluded=true;
+							player.removeSkill('dcsitian_dawu');
+						},
+						mark:true,
+						marktext:'雾',
+						intro:{
+							name:'司天 - 大雾',
+							content:'使用的下一张锦囊牌无效',
+						},
+					},
+				},
+				weathers:{
+					烈日:{
+						description:'你对其他角色造成1点火属性伤害。',
+						content:function(){
+							var targets=game.filterPlayer(current=>current!=player).sortBySeat();
+							player.line(targets,'fire');
+							for(var target of targets){
+								target.damage('fire');
+							}
+						},
+						ai:function(player){
+							var effect=0;
+							game.countPlayer(function(current){
+								if(current==player) return;
+								effect+=get.damageEffect(current,player,player,'fire');
+							});
+							return effect;
+						},
+					},
+					雷电:{
+						description:'你令其他角色各进行一次判定。若结果为♠2~9，则其受到3点无来源雷属性伤害。',
+						content:function(){
+							'step 0'
+							var targets=game.filterPlayer(current=>current!=player).sortBySeat();
+							player.line(targets,'thunder');
+							event.targets=targets;
+							'step 1'
+							var target=targets.shift();
+							if(!target.isIn()){
+								if(targets.length>0) event.redo();
+								else{
+									event.finish();
+									return;
+								}
+							}
+							event.target=target;
+							event.judgestr=get.translation('shandian');
+							target.judge(lib.card.shandian.judge,event.judgestr).judge2=lib.card.shandian.judge2;
+							//game.delayx(1.5);
+							'step 2'
+							var name='shandian';
+							if(event.cancelled&&!event.direct){
+								if(lib.card[name].cancel){
+									var next=game.createEvent(name+'Cancel');
+									next.setContent(lib.card[name].cancel);
+									next.cards=[];
+									next.card=get.autoViewAs({name:name});
+									next.player=target;
+								}
+							}
+							else{
+								var next=game.createEvent(name);
+								next.setContent(function(){
+									if(result.bool==false){
+										player.damage(3,'thunder','nosource');
+									}
+								});
+								next._result=result;
+								next.cards=[];
+								next.card=get.autoViewAs({name:name});
+								next.player=target;
+							}
+							if(targets.length>0) event.goto(1);
+						},
+						ai:function(player){
+							var effect=0;
+							game.countPlayer(function(current){
+								if(current==player) return;
+								effect+=get.damageEffect(current,current,player,'thunder')/5;
+							});
+							return effect;
+						},
+					},
+					大浪:{
+						description:'你弃置其他角色装备区内的所有牌（装备区内没有牌的角色改为失去1点体力）。',
+						content:function(){
+							'step 0'
+							var targets=game.filterPlayer(current=>current!=player).sortBySeat();
+							player.line(targets,'green');
+							event.targets=targets;
+							'step 1'
+							var target=targets.shift();
+							if(target.isIn()){
+								var num=target.countCards('e');
+								if(num>0){
+								 player.discardPlayerCard(target,true,'e',num)
+								}
+								else{
+								 target.loseHp();
+								 game.delayex();
+								}
+							}
+							if(targets.length>0) event.redo();
+						},
+						ai:function(player){
+							var effect=0;
+							game.countPlayer(function(current){
+								if(current==player) return;
+								var es=current.getCards('e');
+								if(es.length>0){
+									var att=get.attitude(player,current),val=get.value(es,current);
+									effect-=Math.sqrt(att)*val;
+								}
+								else effect+=get.effect(current,{name:'losehp'},player,player);
+							});
+							return effect;
+						},
+					},
+					暴雨:{
+						description:'你弃置一名角色的所有手牌。若其没有手牌，则改为令其失去1点体力。',
+						content:function(){
+							'step 0'
+							player.chooseTarget('请选择【暴雨】的目标','令目标角色弃置所有手牌。若其没有手牌，则其改为失去1点体力。').set('ai',function(current){
+								var es=current.getCards('h'),player=_status.event.player;
+								if(es.length>0){
+									var att=get.attitude(player,current),val=get.value(es,current);
+									return -Math.sqrt(att)*val;
+								}
+								return get.effect(current,{name:'losehp'},player,player);
+							})
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.line(target,'green');
+								var num=target.countCards('h');
+								if(num>0){
+								 player.discardPlayerCard(target,true,'h',num)
+								}
+								else{
+								 target.loseHp();
+								 game.delayex();
+								}
+							}
+						},
+						ai:function(player){
+							return Math.max.apply(Math,game.filterPlayer(function(current){
+								return current!=player
+							}).map(function(current){
+								var es=current.getCards('h');
+								if(es.length>0){
+									var att=get.attitude(player,current),val=get.value(es,current);
+									return -Math.sqrt(att)*val;
+								}
+								return get.effect(current,{name:'losehp'},player,player);
+							}));
+						},
+					},
+					大雾:{
+						description:'你令所有其他角色获得如下效果：当其使用下一张锦囊牌时，取消之。',
+						content:function(){
+							var targets=game.filterPlayer(current=>current!=player).sortBySeat();
+							player.line(targets);
+							for(var target of targets) target.addSkill('dcsitian_dawu');
+						},
+						ai:function(player){
+							var effect=0;
+							game.countPlayer(function(current){
+								if(current==player||current.hasSkill('dcsitian_dawu')) return;
+								effect-=0.5*get.attitude(player,current);
+							});
+							return effect;
+						},
+					},
+				},
+			},
 			//美猴王
 			dcjinjing:{
 				locked:true,
@@ -290,9 +566,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return evt.skill=='dccibei'&&evt.targets.contains(event.player);
 					});
 				},
+				check:function(event,player){
+					var target=event.player;
+					if(get.attitude(player,target)>=0) return true;
+					return (!player.getStat('skill').ruyijingubang_skill||player.storage.ruyijingubang_skill==1);
+				},
 				content:function(){
 					trigger.cancel();
 					player.draw(5);
+				},
+				ai:{
+					threaten:4.5,
 				},
 			},
 			dcruyi:{
@@ -306,7 +590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (event.name!='phase'||game.phaseNumber==0)&&!player.isDisabled(1);
 				},
 				content:function(){
-					var card=game.createCard2('ruyijingubang','heart',9);
+					var card=game.createCard2('ruyijingubang','heart',5);
 					player.$gain2(card,false);
 					player.equip(card);
 				},
@@ -376,9 +660,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					filter:function(button,player){
 						return button.link!=player.storage.ruyijingubang_skill;
 					},
+					check:function(button){
+						if(button.link==1||button.link==3) return 1;
+						return 0;
+					},
 					backup:function(links,player){
 						return {
-							audio:'dcruyi',
 							num:links[0],
 							popup:'如意金箍棒',
 							content:function(){
@@ -401,6 +688,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					cardUsable:function(card,player,num){
 						if(player.storage.ruyijingubang_skill==1&&card.name=='sha') return Infinity;
 					},
+				},
+				ai:{
+					order:1,
+					directHit_ai:true,
+					skillTagFilter:function(player,tag,arg){
+						return player.storage.ruyijingubang_skill==3;
+					},
+					effect:{
+						player:function(card,player,target,current){
+							if(get.tag(card,'damage')>0&&player!=target){
+								if(player.getStat('skill').ruyijingubang_skill&&player.storage.ruyijingubang_skill!=1) return;
+								if(player.hasSkill('dccibei')&&!player.hasHistory('useSkill',function(evt){
+									return evt.skill=='dccibei'&&evt.targets.contains(target);
+								})){
+									return [1,3];
+								}
+							}
+						},
+					},
+					result:{
+						player:function(player){
+							if(player.storage.ruyijingubang_skill==1){
+								if(!player.hasSha()) return 1;
+								return 0;
+							}
+							else{
+								if(player.hasSha()&&player.getCardUsable('sha')<=0) return 1;
+								return 0;
+							}
+						},
+					}
 				},
 				intro:{
 					name:'如意金箍棒',
@@ -469,10 +787,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//涛神
 			dcnutao:{
-				audio:4,
+				audio:2,
 				trigger:{player:'useCardToPlayer'},
 				forced:true,
-				group:'dcnutao_add',
 				filter:function(event,player){
 					if(get.type2(event.card)!='trick') return false;
 					return event.isFirstTarget&&event.targets.some(i=>i!=player);
@@ -491,14 +808,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						content:function(){
-							player.addTempSkill('dcnutao_sha','phaseUseAfter');
+							player.addTempSkill('dcnutao_sha');
 							player.addMark('dcnutao_sha',1,false);
 						}
 					},
 					sha:{
 						charlotte:true,
-						onremove:true,
-						marktext:'涛',
 						intro:{
 							content:'此阶段使用【杀】的次数上限+#',
 						},
@@ -951,6 +1266,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						ai2:function(target){
 							var player=_status.event.player,card=ui.selected.cards[0];
+							if(val>0) return get.attitude(player,target)*2;
 							return (get.value(card,target)-2)*get.attitude(player,target);
 						},
 					});
@@ -3000,9 +3316,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
+				direct:true,
 				content:function(){
 					'step 0'
-					player.recover();
 					player.chooseTarget('残肆：选择一名其他角色',true,lib.filter.notMe).set('ai',target=>{
 						var player=_status.event.player;
 						var list=['recover','sha','juedou','huogong'];
@@ -3014,7 +3330,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						event.target=target;
-						player.line(target,'fire');
+						player.logSkill('dccansi',target);
+						player.recover();
 						target.recover();
 						event.list=['sha','juedou','huogong'];
 						player.addTempSkill('dccansi_draw');
@@ -3674,10 +3991,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var mark=false;
 					var red=0,black=0;
-					for(var i=0;i<ui.discardPile.childNodes.length;i++){
-						var color=get.color(ui.discardPile.childNodes[i]);
+					for(var card of ui.discardPile.childNodes){
+						var color=get.color(card);
 						if(color=='red') red++;
 						if(color=='black') black++;
 					}
@@ -3685,30 +4001,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(red>black){
 						player.logSkill('dchuiling');
 						player.recover();
-						event.finish();
-						if(get.color(trigger.card)=='black') mark=true;
-						event.logged=true;
-					}
-					else{
-						if(!event.isMine()&&!event.isOnline()) game.delayx();
-						player.chooseTarget(get.prompt('dchuiling'),'弃置一名角色的一张牌',(card,player,target)=>{
-							return target.countDiscardableCards(player,'he')>0;
-						}).set('ai',target=>{
-							return get.effect(target,{name:'guohe_copy2'},_status.event.player);
-						});
-						if(get.color(trigger.card)=='red') mark=true;
-					}
-					if(mark){
-						if(!event.logged) player.logSkill('dchuiling');
 						player.addMark('dchuiling',1);
-						event.logged=true;
+						event.finish();
+					}
+					else {
+						if(!event.isMine()&&!event.isOnline()) game.delayx();
+						player.chooseTarget(get.prompt('dchuiling'),'弃置一名角色区域里的一张牌',(card,player,target)=>{
+							return target.countDiscardableCards(player,'hej')>0;
+						}).set('ai',target=>{
+							return get.effect(target,{name:'guohe'},_status.event.player);
+						});
 					}
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
-						if(!event.logged) player.logSkill('dchuiling',target);
-						else player.line(target);
-						player.discardPlayerCard(target,'he',true);
+						player.logSkill('dchuiling',target);
+						player.discardPlayerCard(target,'hej',true);
 					}
 				},
 				mod:{
@@ -3717,34 +4025,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var len=ui.discardPile.childNodes.length;
 						if(!len){
 							var type=get.type(card);
-							if(type=='basic'||type=='trick'){
-								if(player.getDamagedHp()>0){
-									return num+(get.color(card)=='red'?15:10);
-								}
-								return num+10;
-							}
+							if(type=='basic'||type=='trick') return num+(get.color(card)=='red'?15:10);
 							return;
 						}
-						if(len>40) return;
+						if(len>20) return;
 						var red=0,black=0;
-						for(var i=0;i<ui.discardPile.childNodes.length;i++){
-							var color=get.color(ui.discardPile.childNodes[i]);
+						for(var card of ui.discardPile.childNodes){
+							var color=get.color(card);
 							if(color=='red') red++;
 							if(color=='black') black++;
 						}
 						if(red==black){
 							var type=get.type(card);
-							if(type=='basic'||type=='trick'){
-								if(player.getDamagedHp()>0){
-									return num+(get.color(card)=='red'?15:10);
-								}
-								return num+10;
-							}
-							return;
-						}
-						else{
-							var color=get.color(card);
-							if(color=='red'&&red<black||color=='black'&&red>black) return num+10;
+							if(type=='basic'||type=='trick') return num+(get.color(card)=='red'?15:10);
 						}
 					},
 				}
@@ -3756,11 +4049,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'wood',
 				derivation:['dctaji','dcqinghuang'],
-				filterCard:()=>false,
-				selectCard:[0,1],
-				prompt:function(){
-					return '限定技。你可以失去〖汇灵〗，增加'+_status.event.player.countMark('dchuiling')+'点体力上限，然后获得〖踏寂〗和〖清荒〗。'
-				},
 				filter:function(event,player){
 					return player.countMark('dchuiling')>=4;
 				},
@@ -3800,37 +4088,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return evt&&evt.hs&&evt.hs.length;
 				},
 				content:function(){
-					'step 0'
 					var evt=trigger.getParent();
 					var effects=[
-						['useCard',function(){
-							'step 0'
-							var targets=game.filterPlayer(current=>{
-								return current.countDiscardableCards(player,'he')&&current!=player;
-							});
-							if(!targets.length) event.finish();
-							else player.chooseTarget('踏寂：弃置其他角色一张牌',true,(card,player,target)=>{
-								return _status.event.targets.contains(target);
-							}).set('targets',targets).set('ai',target=>{
-								return get.effect(target,{name:'guohe_copy2'},_status.event.player);
-							});
-							'step 1'
-							if(result.bool){
-								var target=result.targets[0];
-								player.line(target);
-								player.discardPlayerCard(target,'he',true);
-							}
+						['useCard',()=>{
+							evt.directHit.addArray(game.players);
+							game.log(evt.card,'不可被响应');
 						}],
-						['respond',function(){
-							player.draw();
-						}],
-						['discard',function(){
-							player.recover();
-						}],
-						['other',function(){
+						['respond',()=>player.draw()],
+						['discard',()=>player.recover()],
+						['other',()=>{
 							player.addSkill('dctaji_damage');
 							player.addMark('dctaji_damage',1,false);
-							game.log(player,'下一次对其他角色造成的伤害','#g+1');
+							game.log(player,'下一次对其他角色造成的伤害+1');
 
 						}]
 					];
@@ -3844,9 +4113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var effect of effects){
 							if(effect[0]==name){
 								list.remove(name);
-								var next=game.createEvent('dctaji_'+name);
-								next.player=player;
-								next.setContent(effect[1]);
+								effect[1]();
 								break;
 							}
 						}
@@ -5224,7 +5491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:2,
 				direct:true,
 				filter:function(event,player){
-					return event.player!=player&&(get.type(event.card)=='trick'||event.card.name=='sha')&&player.countCards('he')>1;
+					return event.player!=player&&(get.type(event.card)=='trick'||event.card.name=='sha');
 				},
 				content:function(){
 					'step 0'
@@ -7744,7 +8011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delayx();
 					event.goto(1);
 					'step 4'
-					if(game.hasPlayer(target=>target!=player&&target.isDamaged())) player.chooseTarget('梦解：令一名其他角色回复1点体力',true,function(card,player,target){
+					if(game.hasPlayer(target=>target!=player&&target.isDamaged())) player.chooseTarget('梦解：令一名角色回复1点体力',true,function(card,player,target){
 						return target!=player&&target.isDamaged();
 					}).set('ai',target=>get.recoverEffect(target,player,player));
 					else event._result={bool:false};
@@ -11514,6 +11781,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								trigger.player.loseHp();
 								var evt=trigger.getParent('phaseUse');
 								if(evt&&evt.player==trigger.player) evt.skipped=true;
+								var num=trigger.player.countMark('dunxi');
+								if(num>0) trigger.player.removeMark('dunxi',num);
 							}
 						},
 					},
@@ -12774,7 +13043,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var list=game.filterPlayer(function(current){
-						return current.hasSkill('dczimu',null,null,false);
+						return current!=player&&current.hasSkill('dczimu',null,null,false);
 					});
 					if(list.length>0){
 						if(list.length==1) list[0].draw();
@@ -12788,7 +13057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.delay) game.delayx();
 				},
 				marktext:'牧',
-				intro:{content:'锁定技。当你受到伤害后，你令所有拥有〖自牧〗的角色各摸一张牌，然后你失去〖自牧〗。'},
+				intro:{content:'锁定技。当你受到伤害后，你令所有拥有〖自牧〗的其他角色各摸一张牌，然后你失去〖自牧〗。'},
 			},
 			//秦宜禄
 			piaoping:{
@@ -13168,7 +13437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.skill=='dcjinggong'&&event.targets.length>0;
 						},
 						content:function(){
-							trigger.baseDamage=Math.min(5,get.distance(player,trigger.targets[0]));
+							trigger.baseDamage=Math.min(3,get.distance(player,trigger.targets[0]));
 						},
 					},
 				},
@@ -13207,7 +13476,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					if(player.countCards('h')>0) player.chooseToDiscard('h',1,true);
+					var num=Math.floor(player.countCards('h')/2);
+					if(num>0) player.chooseToDiscard('h',num,true);
 				},
 			},
 			//蔡瑁张允
@@ -15338,14 +15608,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var hs=target.getCards('h',function(card){
 									return lib.filter.cardDiscardable(card,target,'yijiao_effect');
 								});
-								if(hs.length) target.discard(hs.randomGets(Math.ceil(Math.random()*3)));
+								if(hs.length) target.discard(hs.randomGet());
 							}
-							else if(num==num2){
-								player.draw(2);
-								target.insertPhase();
-							}
+							else if(num==num2) target.insertPhase();
 							else{
-								player.draw(3);
+								player.draw(2);
 							}
 							target.removeMark('yijiao',num);
 						},
@@ -28715,8 +28982,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanqiaoxiao:'段巧笑，三国时代魏国魏文帝时的宫人，甚受到魏文帝的宠爱。传说她以原有的化妆品中的米粉和胡粉，再加入葵花子汁，发明了女性化妆用的脂粉。',
 			mushun:'穆顺，小说《三国演义》中的人物，男，东汉末宦官。献帝欲修书与国舅伏完，共谋图曹公。因顺为宦官中之忠义可托者，乃命顺往送书。顺藏书于发中，潜出禁宫，径至完宅，将书呈上。及完回书付顺，顺乃藏于头髻内，辞完回宫。然公闻信，先于宫门等候，顺回遇公，公喝左右，遍搜身上，并无夹带，放行。忽然风吹落其帽。公又唤回，取帽视之，遍观无物，还帽令戴。顺双手倒戴其帽。公心疑，令左右搜其头发中，搜出伏完书来。公见书大怒，执下顺于密室问之，顺不肯招。当晚将顺、完等宗族二百余口，皆斩于市。',
 			jsp_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
-			taoshen:'涛神，是司掌钱塘江的神，传说其原型为春秋战国时期的吴国大臣伍子胥。伍子胥从楚国投奔吴国，为吴国立下了汗马功劳；但吴王夫差听信太宰伯嚭的谗言，逐渐疏远了伍子胥，最后还赐死了他。伍子胥含冤身亡，十分悲愤，做出了吴国灭亡的预言后自杀。暴怒的夫差下令用皮革包裹住伍子胥的尸身，在五月五日这天丢进钱塘江。百姓可怜伍子胥忠于吴王却遭受惨死，因此将五月五日这一天定为节日，以此纪念伍子胥，这也是端午节的来历之一。',
-			sunwukong:'孙悟空是中国古典小说《西游记》的主人公，也是中国神话中的民俗神祇之一，明代百回本《西游记》书中最为深入人心的形象之一。《西游记》中的孙悟空本是天地生成的一个石猴，率领群猴在花果山水帘洞过着逍遥自在的日子，后来为学习长生的法术而拜菩提祖师为师，学会了七十二变和筋斗云等绝技。后来他前往东海龙宫夺取如意金箍棒，又大闹地府勾了生死簿，惊动天庭，天庭两次派兵征讨花果山，仍然降他不得，只好请西天如来佛祖前来助阵。如来佛祖以五行山将悟空压在山下五百年。五百年后，悟空在观音菩萨的指点下拜唐僧为师，并跟随唐僧前往西天求取真经。路上唐僧又收了猪八戒、沙和尚两个徒弟，众人在途中斩妖除魔、历经磨难，终于取得真经，修成正果。',
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',
@@ -29581,7 +29846,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhengding_info:'锁定技。当你于回合外使用或打出牌响应其他角色使用的牌时，若这两张牌颜色相同，则你加1点体力上限。',
 			licaiwei:'李采薇',
 			yijiao:'异教',
-			yijiao_info:'出牌阶段限一次，你可以选择一名没有“异”标记的其他角色并声明一个整数X（X∈[1,4]），该角色获得10X个“异”标记。有“异”标记的角色的结束阶段，其移去“异”标记，且若其本回合使用牌的点数之和：1.小于“异”标记数，其随机弃置至多三张手牌；2.等于“异”标记数，你摸两张牌且该角色本回合结束后进行一个额外的回合；3.大于“异”标记数，你摸三张牌。',
+			yijiao_info:'出牌阶段限一次，你可以选择一名没有“异”标记的其他角色并声明一个整数X（X∈[1,4]），该角色获得10X个“异”标记。有“异”标记的角色的结束阶段，其移去“异”标记，且若其本回合使用牌的点数之和：1.小于“异”标记数，其随机弃置一张手牌；2.等于“异”标记数，该角色本回合结束后进行一个额外的回合；3.大于“异”标记数，你摸两张牌。',
 			qibie:'泣别',
 			qibie_info:'一名角色死亡后，若你有手牌且这些手牌均可被弃置，则你可以弃置所有手牌，然后回复1点体力并摸X+1张牌（X为你弃置的牌数）。',
 			dc_jiben:'吉本',
@@ -29655,9 +29920,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jinglan_info:'锁定技。当你造成伤害后，若你的手牌数：大于体力值，你弃置三张手牌；等于体力值，你弃置一张手牌并回复1点体力；小于体力值，你受到1点无来源火焰伤害并摸四张牌。',
 			dc_huangzu:'黄祖',
 			dcjinggong:'精弓',
-			dcjinggong_info:'你可以将一张装备牌当做无距离限制的【杀】使用。当你声明使用此【杀】后，你将此杀的伤害值基数改为X（X为你至此【杀】第一个目标角色的距离且至多为5）。',
+			dcjinggong_info:'你可以将一张装备牌当做无距离限制的【杀】使用。当你声明使用此【杀】后，你将此杀的伤害值基数改为X（X为你至此【杀】第一个目标角色的距离且至多为3）。',
 			dcxiaojuan:'骁隽',
-			dcxiaojuan_info:'当你使用牌指定其他角色为唯一目标后，你可以弃置其一半的手牌（向下取整）。若这些牌中有与你使用牌花色相同的牌，则你弃置一张手牌。',
+			dcxiaojuan_info:'当你使用牌指定其他角色为唯一目标后，你可以弃置其一半的手牌（向下取整）。若这些牌中有与你使用牌花色相同的牌，则你弃置一半的手牌（向下取整）。',
 			dc_yanghu:'羊祜',
 			dcdeshao:'德劭',
 			dcdeshao_info:'每回合限两次。当你成为其他角色使用的黑色牌的目标后，你可以摸一张牌，然后若其手牌数不小于你，则你弃置其一张牌。',
@@ -29681,7 +29946,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcpijing:'辟境',
 			dcpijing_info:'结束阶段开始时，你可以选择任意名角色。你令所有未选择的角色失去〖自牧〗，然后你和这些角色获得〖自牧〗。',
 			dczimu:'自牧',
-			dczimu_info:'锁定技。当你受到伤害后，你令所有拥有〖自牧〗的角色各摸一张牌，然后你失去〖自牧〗。',
+			dczimu_info:'锁定技。当你受到伤害后，你令所有拥有〖自牧〗的其他角色各摸一张牌，然后你失去〖自牧〗。',
 			caohua:'曹华',
 			caiyi:'彩翼',
 			caiyi_info:'转换技。结束阶段，你可令一名角色选择并执行一项，然后移除此选项。阴：⒈回复X点体力。⒉摸X张牌，⒊复原武将牌。⒋随机执行一个已经移除过的阴选项；阳：⒈受到X点伤害。⒉弃置X张牌。⒊翻面并横置。⒋随机执行一个已经移除过的阳选项。（X为该阴阳态剩余选项的数量）。',
@@ -29727,7 +29992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			weilie_info:'每局游戏限X次。出牌阶段，你可以弃置一张牌并选择一名已受伤的角色，令该角色回复1点体力。然后若其体力值小于体力上限，则其摸一张牌（X为你〖浮萍①〗中的记录数+1）。',
 			bianxi:'卞喜',
 			dunxi:'钝袭',
-			dunxi_info:'①当你使用具有伤害标签的牌结算结束后，你可以令一名不为你的目标角色获得一枚“钝”。②有“钝”的角色使用基本牌或锦囊牌指定唯一目标时，你令其移去一枚“钝”。系统随机选择一名角色，并将此牌的目标改为该角色。若该角色和原目标相同，则其失去1点体力。若其正处于出牌阶段内，则结束此阶段。',
+			dunxi_info:'①当你使用具有伤害标签的牌结算结束后，你可以令一名不为你的目标角色获得一枚“钝”。②有“钝”的角色使用基本牌或锦囊牌指定唯一目标时，你令其移去一枚“钝”。系统随机选择一名角色，并将此牌的目标改为该角色。若该角色和原目标相同，则其移去所有“钝”，失去1点体力。若其正处于出牌阶段内，则结束此阶段。',
 			niufu:'牛辅',
 			dcxiaoxi:'宵袭',
 			dcxiaoxi_info:'锁定技。出牌阶段开始时，你声明X并减X点体力上限（X∈[1,2]）。然后你选择一名攻击范围内的其他角色并选择一项：⒈获得该角色的X张牌。⒉视为对其使用X张【杀】。',
@@ -30035,11 +30300,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyouqi_faq_info:'当满足〖幽栖〗条件时，系统生成一个随机数X∈[0,1)。若X小于(1.25-0.25Y)，你获得此牌（Y为你至该角色的距离）。',
 			dc_sunhanhua:'孙寒华',
 			dchuiling:'汇灵',
-			dchuiling_info:'锁定技。当你使用牌时，若此牌颜色为弃牌堆中数量较少的颜色，你获得1枚“灵”标记。若弃牌堆中：红色牌数大于黑色牌数，你回复1点体力；黑色牌数大于红色牌数，你可以弃置一名其他角色的一张牌。',
+			dchuiling_info:'锁定技。当你使用牌时，若弃牌堆中：红色牌数大于黑色牌数，你回复1点体力并获得1枚“灵”标记；黑色牌数大于红色牌数，你可以弃置一名其他角色区域里的一张牌。',
 			dcchongxu:'冲虚',
 			dcchongxu_info:'限定技。出牌阶段，若“灵”数不小于4，你可以失去〖汇灵〗，增加等同于“灵”数的体力上限，然后获得〖踏寂〗和〖清荒〗。',
 			dctaji:'踏寂',
-			dctaji_info:'当你失去手牌后，根据你失去牌的原因执行以下效果：1.使用：你弃置其他角色一张牌；2.打出：你摸一张牌；3.弃置：你回复1点体力；4.其他：你下一次对其他角色造成伤害时，此伤害+1。',
+			dctaji_info:'当你失去手牌后，根据你失去牌的原因执行以下效果：1.使用：此牌不可被响应；2.打出：你摸一张牌；3.弃置：你回复1点体力；4.其他：你下一次对其他角色造成伤害时，此伤害+1。',
 			dcqinghuang:'清荒',
 			dcqinghuang_info:'出牌阶段开始时，你可以减1点体力上限，然后你于本回合发动〖踏寂〗时额外随机执行一种效果。',
 			guānning:'关宁',
@@ -30084,7 +30349,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcchiying_info:'出牌阶段限一次。你可以选择一名体力不大于你的角色，令其攻击范围内的其他角色依次弃置一张牌。然后若你选择的角色不为你，其获得以此法弃置的牌中所有的基本牌。',
 			zerong:'笮融',
 			dccansi:'残肆',
-			dccansi_info:'锁定技。准备阶段，你回复1点体力并选择一名其他角色，其回复1点体力，然后你视为对其依次使用以下能使用的牌：【杀】（无距离限制）、【决斗】、【火攻】。当其以此法受到1点伤害后，你摸两张牌。',
+			dccansi_info:'锁定技。准备阶段，你选择一名其他角色。你与其各回复1点体力，然后视为对其依次使用以下能使用的牌：【杀】（无距离限制）、【决斗】、【火攻】。当其以此法受到1点伤害后，你摸两张牌。',
 			dcfozong:'佛宗',
 			dcfozong_info:'锁定技。出牌阶段开始时，若你的手牌数大于7，你将X张手牌置于武将牌上（X为你的手牌数-7）。然后若你的武将牌上有至少七张牌，其他角色依次选择一项：1.获得其中的一张牌并令你回复1点体力；2.令你失去1点体力。',
 			zhoushan:'周善',
@@ -30180,8 +30445,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ruyijingubang:'如意金箍棒',
 			ruyijingubang_skill:'如意',
 			ruyijingubang_skill:'如意金箍棒',
-			ruyijingubang_effect:'如意金箍棒',
 			ruyijingubang_info:'出牌阶段限一次。你可以将此牌的实际攻击范围调整为1~4内的任意整数。你根据此牌的实际攻击范围拥有对应的效果：<br><li>⑴你使用【杀】无次数限制。<br><li>⑵你使用的【杀】伤害+1。<br><li>⑶你使用的【杀】不可被响应。<br><li>⑷你使用【杀】选择目标后，可以增加一个额外目标。',
+			longwang:'龙王',
+			dclonggong:'龙宫',
+			dclonggong_info:'每回合限一次。当你受到伤害时，你可以防止此伤害，然后令伤害来源从牌堆中获得一张装备牌。',
+			dcsitian:'司天',
+			dcsitian_info:'出牌阶段，你可以弃置两张颜色不同的手牌。系统从所有天气中随机选择两个，你观看这些天气并选择一个执行。<br><li>烈日：你对其他角色依次造成1点火属性伤害。<br><li>雷电：你令其他角色各进行一次判定。若结果为♠2~9，则其受到3点无来源雷属性伤害。<br><li>大浪：你弃置其他角色装备区内的所有牌（装备区内没有牌的角色改为失去1点体力）。<br><li>暴雨：你弃置一名角色的所有手牌。若其没有手牌，则改为令其失去1点体力。<br><li>大雾：你令所有其他角色获得如下效果：当其使用下一张锦囊牌时，取消之。',
 
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
@@ -30221,7 +30490,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_raoting:'荟萃·绕庭之鸦',
 			sp_yijun:'荟萃·异军突起',
 			sp2_yuxiu:'限定·钟灵毓秀',
-			sp2_xiyouji:'西游记',
+			sp2_xiyouji:'神话传说',
 			sp_decade:'其他新服武将',
 		},
 	};
