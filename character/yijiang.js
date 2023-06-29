@@ -10285,6 +10285,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qiangzhi:{
 				audio:2,
+				audioname:['re_zhangsong'],
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -13582,6 +13583,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caorui:['caorui','old_caorui'],
 			sunziliufang:['dc_sunziliufang','sunziliufang'],
 			liyan:['liyan','old_liyan'],
+			zhangsong:['re_zhangsong','zhangsong'],
 		},
 		translate:{
 			old_huaxiong:'华雄',

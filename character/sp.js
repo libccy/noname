@@ -180,7 +180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zangba:['male','wei',4,['rehengjiang']],
 			zhangren:['male','qun',4,['chuanxin','zfengshi']],
 
-			wangyun:['male','qun',4,['xinlianji','xinmoucheng']],
+			wangyun:['male','qun',4,['xinlianji','xinmoucheng'],['clan:太原王氏']],
 			sunqian:['male','shu',3,['qianya','shuimeng']],
 			xizhicai:['male','wei',3,['tiandu','xianfu','chouce']],
 			quyi:['male','qun',4,['fuqi','jiaozi']],
@@ -1308,26 +1308,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									target.chooseBool('是否摸一张牌？').set('ai',()=>true);
 									event.goto(5);
 								}
-								else if(cards.length){
-									if(event.index==1){
-										target.chooseToUse({
-											filterCard:function(card){
-												if(get.itemtype(card)!='card'||!card.hasGaintag('olhuiyun_tag')) return false;
-												return lib.filter.filterCard.apply(this,arguments);
-											},
-											prompt:'是否使用一张展示牌，然后重铸所有手牌？'
-										});
-									}
-									else{
-										target.chooseToUse({
-											filterCard:function(card){
-												if(get.itemtype(card)!='card'||get.position(card)!='h'&&get.position(card)!='s') return false;
-												return lib.filter.filterCard.apply(this,arguments);
-											},
-											prompt:'是否使用一张手牌，然后重铸展示牌？'
-										});
-										event.goto(4);
-									}
+								else if(event.index==1&&cards.length){
+									target.chooseToUse({
+										filterCard:function(card){
+											if(get.itemtype(card)!='card'||!card.hasGaintag('olhuiyun_tag')) return false;
+											return lib.filter.filterCard.apply(this,arguments);
+										},
+										prompt:'是否使用一张展示牌，然后重铸所有手牌？'
+									});
+								}
+								else if(event.index==2){
+									target.chooseToUse({
+										filterCard:function(card){
+											if(get.itemtype(card)!='card'||get.position(card)!='h'&&get.position(card)!='s') return false;
+											return lib.filter.filterCard.apply(this,arguments);
+										},
+										prompt:'是否使用一张手牌，然后重铸展示牌？'
+									});
+									event.goto(4);
 								}
 								else event.goto(6);
 							}
@@ -3398,7 +3396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.group==target.group;
 				},
 				subSkill:{
-					temp:{},
+					temp:{charlotte:true},
 					use:{
 						trigger:{
 							global:"useCard",
@@ -15724,6 +15722,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jiqiao:{
 				audio:2,
+				audioname:['re_jsp_huangyueying'],
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -15765,6 +15764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			linglong:{
 				audio:2,
+				audioname:['re_jsp_huangyueying'],
 				group:'linglong_bagua',
 				mod:{
 					cardUsable:function(card,player,num){
@@ -15791,6 +15791,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			linglong_bagua:{
 				audio:'linglong',
+				audioname:['re_jsp_huangyueying'],
 				inherit:'bagua_skill',
 				filter:function(event,player){
 					if(!lib.skill.bagua_skill.filter(event,player)) return false;
@@ -22189,7 +22190,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tengfanglan:['dc_tengfanglan','tengfanglan'],
 			zhangyì:['ol_zhangyì','zhangyì'],
 			yuantanyuanshang:['yuantanyuanshang','yuantanyuanxiyuanshang'],
-			ruiji:['dc_ruiji','ruiji']
+			ruiji:['dc_ruiji','ruiji'],
+			jsp_huangyueying:['jsp_huangyueying','re_jsp_huangyueying'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",

@@ -642,8 +642,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filterCard:{suit:'club'},
 				filter:function(event,player){
-					var num=(player.getStat('skill').spjungong||0);
-					return (num<player.hp||num<=player.countCards('he'))&&!player.hasSkill('spjungong_block');
+					return player.countCards('hes',{suit:'club'});
 				},
 				filterTarget:function(card,player,target){
 					if(player.hasSkill('sblianhuan_blocker')) return false;
