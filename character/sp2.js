@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+            ruanji:['male','wei',3,['dczhaowen','dcjiudun']],
             wu_zhugeliang:['male','shu','4/7',['dcjincui','dcqingshi','dczhizhe']],
 			sunwukong:['male','qun',3,['dcjinjing','dccibei','dcruyi']],
 			longwang:['male','qun',3,['dclonggong','dcsitian']],
@@ -274,6 +275,196 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//阮籍
+			dczhaowen:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				filter:function(event,player){
+					return player.countCards('h');
+				},
+				check:function(event,player){
+					return player.hasCard(card=>{
+						return get.color(card)=='black'||get.color(card)=='red'&&player.hasValueTarget(card);
+					});
+				},
+				content:function(){
+					'step 0'
+					player.showHandcards();
+					'step 1'
+					player.addTempSkill('dczhaowen_effect');
+					game.broadcastAll(function(cards){
+						cards.forEach(card=>card.addGaintag('dczhaowen_tag'));
+					},player.getCards('h'));
+				},
+				ai:{
+					threaten:3
+				},
+				subSkill:{
+					effect:{
+						audio:'dczhaowen',
+						enable:'chooseToUse',
+						charlotte:true,
+						onremove:function(player){
+							player.removeGaintag('dczhaowen_tag');
+						},
+						hiddenCard:function(player,name){
+							return get.type(name)=='trick'&&!player.getStorage('dczhaowen_viewed').contains(name)&&player.countCards('h',card=>{
+								return get.color(card)=='black'&&card.hasGaintag('dczhaowen_tag');
+							})>0;
+						},
+						filter:function(event,player){
+							if(!player.hasCard(card=>{
+								return get.color(card)=='black'&&card.hasGaintag('dczhaowen_tag');
+							})) return false;
+							var storage=player.getStorage('dczhaowen_viewed');
+							for(var i of lib.inpile){
+								if(!storage.contains(i)&&get.type(i)=='trick'&&event.filterCard({name:i},player,event)) return true;
+							}
+							return false;
+						},
+						chooseButton:{
+							dialog:function(event,player){
+								var cards=player.getCards('h',card=>{
+									return get.color(card)=='black'&&card.hasGaintag('dczhaowen_tag');
+								});
+								var storage=player.getStorage('dczhaowen_viewed');
+								var list=[];
+								for(var i of lib.inpile){
+									if(!storage.contains(i)&&get.type(i)=='trick'&&event.filterCard({name:i},player,event)){
+										list.push(['锦囊','',i]);
+									}
+								}
+								return ui.create.dialog('昭文',[list,'vcard'],'hidden');
+							},
+							check:function(button){
+								var player=_status.event.player;
+								return player.getUseValue({name:button.link[2]})+1;
+							},
+							backup:function(links,player){
+								return {
+									audio:'dczhaowen',
+									popname:true,
+									filterCard:function(card,player){
+										return get.color(card)=='black'&&card.hasGaintag('dczhaowen_tag');
+									},
+									selectCard:1,
+									position:'h',
+									viewAs:{
+										name:links[0][2],
+									},
+									onuse:function(links,player){
+										player.addTempSkill('dczhaowen_viewed');
+										player.markAuto('dczhaowen_viewed',[links.card.name]);
+									},
+								}
+							},
+							prompt:function(links,player){
+								return '将一张展示过的黑色手牌当做'+get.translation(links[0][2])+'使用';
+							},
+						},
+						group:'dczhaowen_draw',
+						mod:{
+							aiOrder:function(player,card,num){
+								var cards=[];
+								if(card.cards) cards.addArray(cards);
+								if(get.itemtype(card)=='card') cards.push(card);
+								for(var cardx of cards){
+									if(get.color(cardx)!='red') continue;
+									if(cardx.hasGaintag('dczhaowen_tag')) return num+0.2;
+								}
+							},
+						},
+						ai:{
+							order:12,
+							result:{
+								player:1,
+							},
+						},
+					},
+					draw:{
+						audio:'dczhaowen',
+						forced:true,
+						charlotte:true,
+						trigger:{player:'useCard'},
+						filter:function(event,player){
+							var cards=event.cards.filter(card=>get.color(card,player)=='red');
+							return player.hasHistory('lose',evt=>{
+								if(event!=evt.getParent()) return false;
+								for(var i in evt.gaintag_map){
+									if(evt.gaintag_map[i].contains('dczhaowen_tag')){
+										if(cards.some(card=>card.cardid==i)) return true;
+									}
+								}
+							});
+						},
+						content:function(){
+							var num=0;
+							var cards=trigger.cards.filter(card=>get.color(card,player)=='red');
+							player.getHistory('lose',evt=>{
+								if(trigger!=evt.getParent()) return false;
+								for(var i in evt.gaintag_map){
+									if(evt.gaintag_map[i].contains('dczhaowen_tag')){
+										if(cards.some(card=>card.cardid==i)) num++;
+									}
+								}
+							});
+							while(num--) player.draw();
+						},
+					},
+					viewed:{
+						onremove:true,
+						charlotte:true,
+					},
+					effect_backup:{
+						audio:'dczhaowen',
+					},
+				}
+			},
+			dcjiudun:{
+				audio:2,
+				trigger:{target:'useCardToTargeted'},
+				filter:function(event,player){
+					if(event.player==player||get.color(event.card)!='black') return false;
+					if(player.hasSkill('jiu')) return player.countCards('h',card=>{
+						return _status.connectMode||lib.filter.cardDiscardable(card,player,'dcjiudun');
+					});
+					return true;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					if(player.hasSkill('jiu')){
+						player.chooseToDiscard(get.prompt('dcjiudun'),'<div class="text center">弃置一张手牌，令'+get.translation(trigger.card)+'对你无效</div>').set('logSkill','dcjiudun').set('ai',card=>{
+							if(_status.event.goon) return 4.5+Math.max(0,3-player.hp)-get.value(card);
+							return 0;
+						}).set('goon',function(){
+							if(get.effect(player,trigger.card,trigger.player,player)<-4*Math.max(0,5-Math.sqrt(player.countCards('h')))) return true;
+							return false;
+						}());
+						event.goto(2);
+					}
+					else{
+						player.chooseBool(get.prompt('dcjiudun'),'摸一张牌，然后视为使用一张【酒】').set('ai',()=>1);
+					}
+					'step 1'
+					if(result.bool){
+						player.draw();
+						player.chooseUseTarget('jiu',true);
+					}
+					event.finish();
+					'step 2'
+					if(result.bool){
+						trigger.excluded.add(player);
+						game.log(trigger.card,'对',player,'无效');
+					}
+				},
+				ai:{
+					jiuSustain:true,
+					skillTagFilter:function(player,tag,name){
+						if(name!='phase') return false;
+					}
+				}
+			},
 			//龙王
 			dclonggong:{
 				audio:2,
@@ -30796,6 +30987,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhizhe:'智哲',
 			dczhizhe_clear:'invisible',
 			dczhizhe_info:'限定技。出牌阶段，你可以选择一张手牌并复制之。该复制牌不计入你的手牌上限，且当你使用或打出此牌结算结束后，你获得之，然后你本回合不能再使用或打出此牌。',
+			ruanji:'阮籍',
+			dczhaowen:'昭文',
+			dczhaowen_tag:'昭文',
+			dczhaowen_info:'出牌阶段开始时，你可以展示所有手牌。然后你于本回合获得如下效果：1.你可以将其中一张黑色牌当做任意一张普通锦囊牌使用（每回合每种牌名限一次）；2.当你使用其中的一张红色牌时，你摸一张牌。',
+			dcjiudun:'酒遁',
+			dcjiudun_info:'①以你为目标的【酒】（使用方法①）的作用效果改为“目标对应的角色使用的下一张【杀】的伤害基数+1”。②当你成为其他角色使用黑色牌的目标后，若你：未处于【酒】状态，你可以摸一张牌并视为使用一张【酒】；处于【酒】状态，你可以弃置一张手牌令此牌对你无效。',
 
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
