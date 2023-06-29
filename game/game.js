@@ -3848,7 +3848,7 @@
 					},
 					import_data_button:{
 						name:'<div style="white-space:nowrap;width:calc(100% - 10px)">'+
-						'<input type="file" style="width:calc(100% - 40px)">'+
+						'<input type="file" accept="*/*" style="width:calc(100% - 40px)">'+
 						'<button style="width:40px">确定</button></div>',
 						clear:true,
 					},
@@ -31083,11 +31083,11 @@
 			audio.addEventListener('ended',function(){
 				this.remove();
 			});
-			audio.onerror=function(){
+			audio.onerror=function(e){
 				if(this._changed){
 					this.remove();
 					if(onerror){
-						onerror();
+						onerror(e);
 					}
 				}
 				else{
@@ -31095,6 +31095,7 @@
 					this._changed=true;
 				}
 			};
+			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
 			audio.oncanplay=function(){
 				this.play();
 			};
@@ -31204,6 +31205,10 @@
 						this.remove();
 					}
 				}
+			};
+			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
+			audio.oncanplay=function(){
+				this.play();
 			};
 			ui.window.appendChild(audio);
 		},
@@ -44977,7 +44982,7 @@
 								importVideo.style.marginBottom='80px';
 								importVideo.style.marginLeft='13px';
 								importVideo.style.width='calc(100% - 30px)';
-								importVideo.innerHTML='<input type="file" style="width:calc(100% - 40px)">'+
+								importVideo.innerHTML='<input type="file" accept="*/*" style="width:calc(100% - 40px)">'+
 								'<button style="width:40px">确定</button>';
 								importVideo.lastChild.onclick=function(){
 									var fileToLoad = importVideo.firstChild.files[0];
