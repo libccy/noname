@@ -15722,7 +15722,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jiqiao:{
 				audio:2,
-				audioname:['re_jsp_huangyueying'],
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -15764,7 +15763,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			linglong:{
 				audio:2,
-				audioname:['re_jsp_huangyueying'],
 				group:'linglong_bagua',
 				mod:{
 					cardUsable:function(card,player,num){
@@ -15791,7 +15789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			linglong_bagua:{
 				audio:'linglong',
-				audioname:['re_jsp_huangyueying'],
+				audioname2:{re_jsp_huangyueying:'relinglong'},
 				inherit:'bagua_skill',
 				filter:function(event,player){
 					if(!lib.skill.bagua_skill.filter(event,player)) return false;

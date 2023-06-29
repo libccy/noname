@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
-			re_jsp_huangyueying:['female','qun',3,['jiqiao','relinglong']],
+			re_jsp_huangyueying:['female','qun',3,['rejiqiao','relinglong']],
 			re_zhangsong:['male','shu',3,['qiangzhi','rexiantu']],
 			re_zhuzhi:['male','wu',4,['reanguo']],
 			dc_caozhi:['male','wei',3,['reluoying','dcjiushi']],
@@ -162,23 +162,105 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			//SP黄月英
+			rejiqiao:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseToDiscard(get.prompt2('jiqiao'),[1,player.countCards('he')],'he').set('ai',function(card){
+						if(card.name=='bagua') return 10;
+						return 7-get.value(card);
+					}).set('logSkill','rejiqiao');
+					'step 1'
+					if(result.bool){
+						var num=result.cards.length;
+						for(var i of result.cards){
+							if(get.type(i,false)=='equip') num++;
+						}
+						event.cards=game.cardsGotoOrdering(get.cards(num)).cards;
+						player.showCards(event.cards);
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					var gained=[];
+					var tothrow=[];
+					for(var i=0;i<event.cards.length;i++){
+						if(get.type(event.cards[i])!='equip'){
+							gained.push(event.cards[i]);
+						}
+						else{
+							tothrow.push(event.cards[i]);
+						}
+					}
+					player.gain(gained,'gain2');
+				},
+				ai:{
+					threaten:1.6
+				}
+			},
 			relinglong:{
 				audio:2,
-				group:'linglong_bagua',
+				trigger:{
+					player:'loseAfter',
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter','phaseBefore'],
+				},
+				forced:true,
+				onremove:true,
+				derivation:'reqicai',
+				filter:function(event,player){
+					if(event.name!='phase'&&(event.name!='equip'||event.player!=player)){
+						var evt=event.getl(player);
+						if(!evt||!evt.es||!evt.es.some(i=>get.subtype(i)=='equip5')) return false;
+					}
+					var skills=player.additionalSkills['relinglong'];
+					return skills&&skills.length&&player.getEquip(5)||!(skills&&skills.length)&&!player.getEquip(5);
+				},
+				content:function(){
+					player.removeAdditionalSkill('relinglong');
+					if(!player.getEquip(5)){
+						player.addAdditionalSkill('relinglong',['reqicai']);
+					}
+				},
+				group:['linglong_bagua','relinglong_directhit'],
 				mod:{
 					maxHandcard:function(player,num){
 						if(player.getEquip(3)||player.getEquip(4)||player.getEquip(6)) return;
-						return num+1;
+						return num+2;
 					},
-					targetInRange:function(card,player,target,now){
-						if(player.getEquip(5)) return;
-						var type=get.type(card);
-						if(type=='trick'||type=='delay') return true;
-					},
-					canBeDiscarded:function (card,source,player){
-						if(player.getEquip(5)) return;
-						if(get.position(card)=='e'&&['equip2','equip5'].contains(get.subtype(card))) return false;
-					},
+				},
+				subSkill:{
+					directhit:{
+						audio:'relinglong',
+						trigger:{player:'useCard'},
+						forced:true,
+						filter:function(event,player){
+							if(event.card.name!='sha'&&get.type(event.card,false)!='trick') return false;
+							for(var i=2;i<=6;i++){
+								if(player.getEquip(i)) return false;
+							}
+							return true;
+						},
+						content:function(){
+							trigger.directHit.addArray(game.players);
+							game.log(trigger.card,'不可被响应');
+						},
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(player,tag,arg){
+								if(!arg||!arg.card||!arg.target||(arg.card.name!='sha'&&get.type(arg.card,false)!='trick')) return false;
+								for(var i=2;i<=6;i++){
+									if(player.getEquip(i)) return false;
+								}
+								return true;
+							},
+						},
+					}
 				}
 			},
 			//张松
@@ -14418,8 +14500,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexiantu_info:'其他角色的出牌阶段开始时，你可以摸两张牌，然后将两张牌交给该角色。然后此阶段结束时，若其于此阶段没有造成过伤害，你失去1点体力。',
 			re_jsp_huangyueying:'界SP黄月英',
 			re_jsp_huangyueying_ab:'黄月英',
+			rejiqiao:'机巧',
+			rejiqiao_info:'出牌阶段开始时，你可以弃置任意张牌，然后亮出牌堆顶X张牌（X为你以此法弃置的牌数与其中装备牌数之和），你获得其中所有非装备牌。',
 			relinglong:'玲珑',
-			relinglong_info:'锁定技。①若你的装备区没有防具牌，视为你装备着【八卦阵】；②若你的装备区没有坐骑牌，你的手牌上限+2。③若你的装备区没有宝物牌，则你视为拥有技能〖奇才〗。',
+			relinglong_info:'锁定技。若你的装备区：没有防具牌，视为你装备【八卦阵】；没有坐骑牌，你的手牌上限+2；没有宝物牌，你视为拥有〖奇才〗；以上均满足：你使用的【杀】或普通锦囊牌不可被响应。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
