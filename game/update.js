@@ -2,9 +2,8 @@ window.noname_update={
 	version:'1.9.122.3',
 	update:'1.9.122.2',
 	changeLog:[
-		'整合@copcap @shijian @disgrace2013的Pull Request',
-		'《江山如故·起》许劭及其配套机制',
-		'十周年孟达、段巧笑、张瑾云',
+		'整合@copcap @shijian @PBK-B的Pull Request',
+		'增加大量新武将',
 		'其他技能调整和bug修复',
 	],
 	files:[
