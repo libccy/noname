@@ -708,7 +708,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				priority:2,
 				firstDo:true,
 				charlotte:true,
-				filter:function(event){
+				filter:function(event,player){
+					if(player.hasSkillTag('jiuSustain',null,event.name)) return false;
 					if(event.name=='useCard') return (event.card&&(event.card.name=='sha'));
 					return true;
 				},

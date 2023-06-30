@@ -12,14 +12,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang1:['xin_wuguotai','xin_gaoshun','dc_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua','dc_xushu','re_chengong'],
 				refresh_yijiang2:['re_madai','re_wangyi','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao','re_xunyou','re_guanzhang'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','dc_liru','re_manchong','re_fuhuanghou','re_guanping','re_liufeng'],
-				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','dc_chenqun','re_caifuren','re_guyong','re_jushou','re_zhuhuan'],
+				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','dc_chenqun','re_caifuren','re_guyong','re_jushou','re_zhuhuan','re_zhangsong'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen','re_zhuzhi'],
 				refresh_yijiang6:['re_guohuanghou','re_sundeng'],
-				refresh_xinghuo:['re_duji','dc_gongsunzan','re_sp_taishici','re_caiyong','re_mazhong','re_wenpin'],
+				refresh_xinghuo:['re_duji','dc_gongsunzan','re_sp_taishici','re_caiyong','re_mazhong','re_wenpin','re_jsp_huangyueying'],
 			},
 		},
 		connect:true,
 		character:{
+			re_jsp_huangyueying:['female','qun',3,['rejiqiao','relinglong']],
+			re_zhangsong:['male','shu',3,['qiangzhi','rexiantu']],
 			re_zhuzhi:['male','wu',4,['reanguo']],
 			dc_caozhi:['male','wei',3,['reluoying','dcjiushi']],
 			ol_huangzhong:['male','shu',4,['xinliegong','remoshi']],
@@ -143,6 +145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_jianyong:['male','shu',3,['reqiaoshui','jyzongshi']],
 		},
 		characterIntro:{
+			jsp_huangyueying:'荆州沔南白水人，沔阳名士黄承彦之女，诸葛亮之妻，诸葛瞻之母。容貌甚丑，而有奇才：上通天文，下察地理，韬略近于诸书无所不晓，诸葛亮在南阳闻其贤而迎娶。',
 			re_gongsunzan:'群雄之一。出身贵族，因母地位卑贱，只当了郡中小吏。他貌美，声音洪亮，机智善辩。后随卢植于缑氏山中读书，粗通经传。',
 			re_lidian:'字曼成，曹操麾下将领。李典深明大义，不与人争功，崇尚学习与高贵儒雅，尊重博学之士，在军中被称为长者。李典有长者之风，官至破虏将军，三十六岁去世。魏文帝曹丕继位后追谥号为愍侯。',
 			sunben:' ',
@@ -158,6 +161,171 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//SP黄月英
+			rejiqiao:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseToDiscard(get.prompt2('jiqiao'),[1,player.countCards('he')],'he').set('ai',function(card){
+						if(card.name=='bagua') return 10;
+						return 7-get.value(card);
+					}).set('logSkill','rejiqiao');
+					'step 1'
+					if(result.bool){
+						var num=result.cards.length;
+						for(var i of result.cards){
+							if(get.type(i,false)=='equip') num++;
+						}
+						event.cards=game.cardsGotoOrdering(get.cards(num)).cards;
+						player.showCards(event.cards);
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					var gained=[];
+					var tothrow=[];
+					for(var i=0;i<event.cards.length;i++){
+						if(get.type(event.cards[i])!='equip'){
+							gained.push(event.cards[i]);
+						}
+						else{
+							tothrow.push(event.cards[i]);
+						}
+					}
+					player.gain(gained,'gain2');
+				},
+				ai:{
+					threaten:1.6
+				}
+			},
+			relinglong:{
+				audio:2,
+				trigger:{
+					player:'loseAfter',
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter','phaseBefore'],
+				},
+				forced:true,
+				onremove:true,
+				derivation:'reqicai',
+				filter:function(event,player){
+					if(event.name!='phase'&&(event.name!='equip'||event.player!=player)){
+						var evt=event.getl(player);
+						if(!evt||!evt.es||!evt.es.some(i=>get.subtype(i)=='equip5')) return false;
+					}
+					var skills=player.additionalSkills['relinglong'];
+					return skills&&skills.length&&player.getEquip(5)||!(skills&&skills.length)&&!player.getEquip(5);
+				},
+				content:function(){
+					player.removeAdditionalSkill('relinglong');
+					if(!player.getEquip(5)){
+						player.addAdditionalSkill('relinglong',['reqicai']);
+					}
+				},
+				group:['linglong_bagua','relinglong_directhit'],
+				mod:{
+					maxHandcard:function(player,num){
+						if(player.getEquip(3)||player.getEquip(4)||player.getEquip(6)) return;
+						return num+2;
+					},
+				},
+				subSkill:{
+					directhit:{
+						audio:'relinglong',
+						trigger:{player:'useCard'},
+						forced:true,
+						filter:function(event,player){
+							if(event.card.name!='sha'&&get.type(event.card,false)!='trick') return false;
+							for(var i=2;i<=6;i++){
+								if(player.getEquip(i)) return false;
+							}
+							return true;
+						},
+						content:function(){
+							trigger.directHit.addArray(game.players);
+							game.log(trigger.card,'不可被响应');
+						},
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(player,tag,arg){
+								if(!arg||!arg.card||!arg.target||(arg.card.name!='sha'&&get.type(arg.card,false)!='trick')) return false;
+								for(var i=2;i<=6;i++){
+									if(player.getEquip(i)) return false;
+								}
+								return true;
+							},
+						},
+					}
+				}
+			},
+			//张松
+			rexiantu:{
+				audio:2,
+				trigger:{global:'phaseUseBegin'},
+				filter:function(event,player){
+					return event.player!=player;
+				},
+				logTarget:'player',
+				check:function(event,player){
+					if(get.attitude(player,event.player)<5) return false;
+					if(player.maxHp-player.hp>=2) return false;
+					if(player.hp==1) return false;
+					if(player.hp==2&&player.countCards('h')<2) return false;
+					if(event.player.countCards('h')>=event.player.hp) return false;
+					return true;
+				},
+				content:function(){
+					'step 0'
+					player.draw(2);
+					'step 1'
+					var cards=player.getCards('he');
+					if(!cards.length) event.finish();
+					else if(cards.length<=2) event._result={cards:cards};
+					else player.chooseCard(2,'he',true,'交给'+get.translation(trigger.player)+'两张牌').set('ai',function(card){
+						if(ui.selected.cards.length&&card.name==ui.selected.cards[0].name) return -1;
+						if(get.tag(card,'damage')) return 1;
+						if(get.type(card)=='equip') return 1;
+						return 0;
+					});
+					'step 2'
+					player.give(result.cards,trigger.player);
+					trigger.player.addSkill('rexiantu_check');
+					trigger.player.markAuto('rexiantu_check',[player]);
+				},
+				ai:{
+					threaten:1.1,
+					expose:0.3
+				},
+				subSkill:{
+					check:{
+						charlotte:true,
+						trigger:{player:'phaseUseEnd'},
+						forced:true,
+						popup:false,
+						onremove:true,
+						filter:function(event,player){
+							return !player.getHistory('sourceDamage',evt=>{
+								return evt.getParent('phaseUse')==event;
+							}).length;
+						},
+						content:function(){
+							var targets=player.getStorage('rexiantu_check');
+							targets.sortBySeat();
+							for(var i of targets){
+								if(i.isIn()){
+									i.loseHp();
+								}
+							}
+							player.removeSkill('rexiantu_check');
+						}
+					}
+				}
+			},
 			//新服公孙瓒
 			dcyicong:{
 				trigger:{
@@ -14327,6 +14495,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reanguo_info:'出牌阶段限一次。你可以选择一名其他角色，若其：手牌数为全场最少，其摸一张牌；体力值为全场最低，其回复1点体力；装备区内牌数为全场最少，其随机使用一张装备牌。然后若该角色有未执行的效果且你满足条件，你执行之。若你与其执行了全部分支，你可以重铸任意张牌。',
 			dcyicong:'义从',
 			dcyicong_info:'锁定技。①你至其他角色的距离-1。②若你已损失的体力值不小于2，则其他角色至你的距离+1。',
+			re_zhangsong:'界张松',
+			rexiantu:'献图',
+			rexiantu_info:'其他角色的出牌阶段开始时，你可以摸两张牌，然后将两张牌交给该角色。然后此阶段结束时，若其于此阶段没有造成过伤害，你失去1点体力。',
+			re_jsp_huangyueying:'界SP黄月英',
+			re_jsp_huangyueying_ab:'黄月英',
+			rejiqiao:'机巧',
+			rejiqiao_info:'出牌阶段开始时，你可以弃置任意张牌，然后亮出牌堆顶X张牌（X为你以此法弃置的牌数与其中装备牌数之和），你获得其中所有非装备牌。',
+			relinglong:'玲珑',
+			relinglong_info:'锁定技。若你的装备区：没有防具牌，视为你装备【八卦阵】；没有坐骑牌，你的手牌上限+2；没有宝物牌，你视为拥有〖奇才〗；以上均满足：你使用的【杀】或普通锦囊牌不可被响应。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

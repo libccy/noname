@@ -97,7 +97,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_kongrong:['male','qun',3,['xinlirang','xinmingshi']],
 			zhouchu:['male','wu',4,['xianghai','rechuhai']],
 			wangfuzhaolei:['male','shu',4,['xunyi']],
-			wangling:['male','wei',4,['xingqi','xinzifu','mibei']],
+			wangling:['male','wei',4,['xingqi','xinzifu','mibei'],['clan:太原王氏']],
 			zhouqun:['male','shu',3,['tiansuan']],
 			re_zhurong:['female','shu',4,['juxiang','relieren']],
 			re_jiangwei:['male','shu',4,['retiaoxin','zhiji']],
@@ -172,7 +172,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_yuanshu:['male','qun',4,['xinyongsi','yjixi']],
 			
 			shenpei:["male","qun","2/3",["shouye","liezhi"]],
-			re_wangyun:['male','qun',3,['relianji','remoucheng']],
+			re_wangyun:['male','qun',3,['relianji','remoucheng'],['clan:太原王氏']],
 			
 			re_baosanniang:['female','shu',3,['meiyong','rexushen','rezhennan']],
 			
@@ -6798,7 +6798,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//糜夫人
 			xinguixiu:{
-				audio:'spguixiu',
+				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -6810,7 +6810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			qingyu:{
-				audio:2,
+				audio:3,
 				dutySkill:true,
 				trigger:{player:'damageBegin2'},
 				forced:true,

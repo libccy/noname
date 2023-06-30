@@ -6,14 +6,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			sp:{
 				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
-				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua'],
+				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan'],
 				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna"],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','ol_puyuan','zhangzhi'],
-				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie'],
+				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['sunhong','luoxian','ol_huban','wangguan','lushi'],
+				sp_waitforsort:['sunhong','ol_huban','lushi'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['wanglang'],
 				sp_tongque:["sp_fuwan","sp_fuhuanghou","sp_jiben"],
@@ -180,7 +180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zangba:['male','wei',4,['rehengjiang']],
 			zhangren:['male','qun',4,['chuanxin','zfengshi']],
 
-			wangyun:['male','qun',4,['xinlianji','xinmoucheng']],
+			wangyun:['male','qun',4,['xinlianji','xinmoucheng'],['clan:太原王氏']],
 			sunqian:['male','shu',3,['qianya','shuimeng']],
 			xizhicai:['male','wei',3,['tiandu','xianfu','chouce']],
 			quyi:['male','qun',4,['fuqi','jiaozi']],
@@ -1308,26 +1308,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									target.chooseBool('是否摸一张牌？').set('ai',()=>true);
 									event.goto(5);
 								}
-								else if(cards.length){
-									if(event.index==1){
-										target.chooseToUse({
-											filterCard:function(card){
-												if(get.itemtype(card)!='card'||!card.hasGaintag('olhuiyun_tag')) return false;
-												return lib.filter.filterCard.apply(this,arguments);
-											},
-											prompt:'是否使用一张展示牌，然后重铸所有手牌？'
-										});
-									}
-									else{
-										target.chooseToUse({
-											filterCard:function(card){
-												if(get.itemtype(card)!='card'||get.position(card)!='h'&&get.position(card)!='s') return false;
-												return lib.filter.filterCard.apply(this,arguments);
-											},
-											prompt:'是否使用一张手牌，然后重铸展示牌？'
-										});
-										event.goto(4);
-									}
+								else if(event.index==1&&cards.length){
+									target.chooseToUse({
+										filterCard:function(card){
+											if(get.itemtype(card)!='card'||!card.hasGaintag('olhuiyun_tag')) return false;
+											return lib.filter.filterCard.apply(this,arguments);
+										},
+										prompt:'是否使用一张展示牌，然后重铸所有手牌？'
+									});
+								}
+								else if(event.index==2){
+									target.chooseToUse({
+										filterCard:function(card){
+											if(get.itemtype(card)!='card'||get.position(card)!='h'&&get.position(card)!='s') return false;
+											return lib.filter.filterCard.apply(this,arguments);
+										},
+										prompt:'是否使用一张手牌，然后重铸展示牌？'
+									});
+									event.goto(4);
 								}
 								else event.goto(6);
 							}
@@ -3398,7 +3396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.group==target.group;
 				},
 				subSkill:{
-					temp:{},
+					temp:{charlotte:true},
 					use:{
 						trigger:{
 							global:"useCard",
@@ -14861,7 +14859,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.gainMaxHp(true);
 						target.recover();
 						var mode=get.mode();
-						if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
+						if(mode=='identity'||(mode=='versus'&&_status.mode=='four')||mode=='doudizhu'){
 							if(target.name&&lib.character[target.name]){
 								var skills=lib.character[target.name][3];
 								target.storage.zhuSkill_yongdi=[];
@@ -15791,6 +15789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			linglong_bagua:{
 				audio:'linglong',
+				audioname2:{re_jsp_huangyueying:'relinglong'},
 				inherit:'bagua_skill',
 				filter:function(event,player){
 					if(!lib.skill.bagua_skill.filter(event,player)) return false;
@@ -22189,7 +22188,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tengfanglan:['dc_tengfanglan','tengfanglan'],
 			zhangyì:['ol_zhangyì','zhangyì'],
 			yuantanyuanshang:['yuantanyuanshang','yuantanyuanxiyuanshang'],
-			ruiji:['dc_ruiji','ruiji']
+			ruiji:['dc_ruiji','ruiji'],
+			jsp_huangyueying:['jsp_huangyueying','re_jsp_huangyueying'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",

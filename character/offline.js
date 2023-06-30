@@ -28,7 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_kongrong:['male','qun',3,['jsrglirang','jsrgzhengyi']],
 			jsrg_zhujun:['male','qun',4,['jsrgfendi','jsrgjuxiang']],
 			jsrg_liubei:['male','qun',4,['jsrgjishan','jsrgzhenqiao']],
-			jsrg_wangyun:['male','qun',3,['jsrgshelun','jsrgfayi']],
+			jsrg_wangyun:['male','qun',3,['jsrgshelun','jsrgfayi'],['clan:太原王氏']],
 			jsrg_liuyan:['male','qun',3,['xinfu_limu','jsrgtushe','jsrgtongjue'],['zhu']],
 			jsrg_caocao:['male','qun',4,['jsrgzhenglve','jsrghuilie']],
 			jsrg_nanhualaoxian:['male','qun',3,['jsrgshoushu','jsrgxundao','jsrglinghua']],
@@ -62,7 +62,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pe_sunchen:['male','wu',4,['zyshilu','zyxiongnve']],
 			pe_mengda:['male','wei',4,['qiuan','liangfan']],
 			pe_zhonghui:['male','wei',4,['zyquanji','zypaiyi']],
-			pe_wangyun:['male','qun',3,['zylianji','zymoucheng']],
+			pe_wangyun:['male','qun',3,['zylianji','zymoucheng'],['clan:太原王氏']],
 			shen_jiaxu:['male','shen',3,['weimu','zybishi','zyjianbing'],['qun']],
 			yj_zhenji:['female','wei',3,['yjluoshen','qingguo']],
 			yj_jiaxu:['male','wei',3,['yjzhenlve','yjjianshu','yjyongdi']],
@@ -2927,7 +2927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['damageBegin1','damageBegin3']},
 				filter:function(event,player,name){
-					return name=='damageBegin1'&&player.inRange(event.source)||name=='damageBegin3'&&player.inRange(event.player);
+					return name=='damageBegin1'&&event.source&&event.source.isIn()&&player.inRange(event.source)||name=='damageBegin3'&&event.player&&event.player.isIn()&&player.inRange(event.player);
 				},
 				direct:true,
 				content:function(){
@@ -5097,7 +5097,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.gainMaxHp(true);
 						target.recover();
 						var mode=get.mode();
-						if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
+						if(mode=='identity'||(mode=='versus'&&_status.mode=='four')||mode=='doudizhu'){
 							if(target.name&&lib.character[target.name]){
 								var skills=lib.character[target.name][3];
 								target.storage.zhuSkill_yjyongdi=[];

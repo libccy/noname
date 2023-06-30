@@ -642,8 +642,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filterCard:{suit:'club'},
 				filter:function(event,player){
-					var num=(player.getStat('skill').spjungong||0);
-					return (num<player.hp||num<=player.countCards('he'))&&!player.hasSkill('spjungong_block');
+					return player.countCards('hes',{suit:'club'});
 				},
 				filterTarget:function(card,player,target){
 					if(player.hasSkill('sblianhuan_blocker')) return false;
@@ -1856,7 +1855,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//徐晃
 			sbduanliang:{
-				audio:2,
+				audio:1,
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:lib.filter.notMe,
@@ -1894,6 +1893,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:1,
 						target:-1
 					}
+				},
+				subSkill:{
+					true1:{audio:true},
+					true2:{audio:true},
+					false:{audio:true},
 				}
 			},
 			sbshipo:{
@@ -2014,7 +2018,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//马超
 			sbtieji:{
-				audio:2,
+				audio:1,
 				trigger:{player:'useCardToPlayered'},
 				logTarget:'target',
 				filter:function(event,player){
@@ -2050,6 +2054,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!arg.skill||!lib.skill[arg.skill]||lib.skill[arg.skill].charlotte||get.is.locked(arg.skill)||!arg.target.getSkills(true,false).contains(arg.skill)) return false;
 					},
 					directHit_ai:true,
+				},
+				subSkill:{
+					true1:{audio:true},
+					true2:{audio:true},
+					false:{audio:true},
 				}
 			},
 			//甘宁

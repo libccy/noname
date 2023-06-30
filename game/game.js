@@ -11231,6 +11231,7 @@
 							dialog.close();
 						},1000);
 					},str);
+					game.trySkillAudio(event.getParent().name+'_'+(event.result.bool?'true'+mes:'false'),player);
 					game.delay(2);
 					'step 6'
 					game.broadcastAll(function(){
