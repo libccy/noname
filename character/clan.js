@@ -43,9 +43,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 0;
 					}).set('canGive',function(){
 						if(get.attitude(target,player)>1) return true;
-						if(!player.hasSha()&&player.countCards('h')<=3) return true;
+						if(!player.hasSha()&&player.countCards('h')<=4) return true;
 						if(game.hasPlayer(current=>{
-							return player.canUse('sha',current)&&get.effect(current,{name:'sha'},player,target)<0&&!current.countCards('hs',['shan','caochuan']);
+							return player.canUse('sha',current,true,true)&&get.effect(current,{name:'sha'},player,target)<0&&!current.countCards('hs',['shan','caochuan']);
 						})) return false;
 						return true;
 					}());

@@ -2927,7 +2927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['damageBegin1','damageBegin3']},
 				filter:function(event,player,name){
-					return name=='damageBegin1'&&player.inRange(event.source)||name=='damageBegin3'&&player.inRange(event.player);
+					return name=='damageBegin1'&&event.source&&event.source.isIn()&&player.inRange(event.source)||name=='damageBegin3'&&event.player&&event.player.isIn()&&player.inRange(event.player);
 				},
 				direct:true,
 				content:function(){
