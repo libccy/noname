@@ -28,7 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_kongrong:['male','qun',3,['jsrglirang','jsrgzhengyi']],
 			jsrg_zhujun:['male','qun',4,['jsrgfendi','jsrgjuxiang']],
 			jsrg_liubei:['male','qun',4,['jsrgjishan','jsrgzhenqiao']],
-			jsrg_wangyun:['male','qun',3,['jsrgshelun','jsrgfayi']],
+			jsrg_wangyun:['male','qun',3,['jsrgshelun','jsrgfayi'],['clan:太原王氏']],
 			jsrg_liuyan:['male','qun',3,['xinfu_limu','jsrgtushe','jsrgtongjue'],['zhu']],
 			jsrg_caocao:['male','qun',4,['jsrgzhenglve','jsrghuilie']],
 			jsrg_nanhualaoxian:['male','qun',3,['jsrgshoushu','jsrgxundao','jsrglinghua']],
@@ -62,7 +62,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pe_sunchen:['male','wu',4,['zyshilu','zyxiongnve']],
 			pe_mengda:['male','wei',4,['qiuan','liangfan']],
 			pe_zhonghui:['male','wei',4,['zyquanji','zypaiyi']],
-			pe_wangyun:['male','qun',3,['zylianji','zymoucheng']],
+			pe_wangyun:['male','qun',3,['zylianji','zymoucheng'],['clan:太原王氏']],
 			shen_jiaxu:['male','shen',3,['weimu','zybishi','zyjianbing'],['qun']],
 			yj_zhenji:['female','wei',3,['yjluoshen','qingguo']],
 			yj_jiaxu:['male','wei',3,['yjzhenlve','yjjianshu','yjyongdi']],
@@ -242,7 +242,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			sbpingjian:{
-				trigger:{player:['useSkillAfter','logSkill']},
+				trigger:{player:['useSkill','logSkillBegin']},
 				forced:true,
 				filter:function(event,player){
 					var skill=event.sourceSkill||event.skill;
@@ -266,19 +266,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						lib.skill.sbyingmen.removeVisitors(result.links,player);
 						game.log(player,'移去了','#y'+get.translation(result.links[0]));
-						if(event.drawers.contains(result.links[0])) player.draw();
+						if(event.drawers.contains(result.links[0])){
+							player.addTempSkill('sbpingjian_draw');
+							player.storage.sbpingjian_draw.push(trigger.skill);
+						}
 					}
 				},
 				group:'sbpingjian_trigger',
 				subSkill:{
+					draw:{
+						charlotte:true,
+						init:function(player,skill){
+							if(!player.storage[skill]) player.storage[skill]=[];
+						},
+						onremove:true,
+						trigger:{player:['useSkillAfter','logSkill']},
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return player.getStorage('sbpingjian_draw').contains(event.skill);
+						},
+						content:function(){
+							player.storage.sbpingjian_draw.remove(trigger.skill);
+							player.draw();
+							if(!player.storage.sbpingjian_draw.length) player.removeSkill('sbpingjian_draw');
+						},
+					},
 					trigger:{
 						trigger:{player:'triggerInvisible'},
 						forced:true,
 						forceDie:true,
 						popup:false,
+						charlotte:true,
 						priority:10,
 						filter:function(event,player){
 							if(event.revealed) return false;
+							var info=get.info(event.skill);
+							if(info.charlotte) return false;
 							var skills=lib.skill.sbyingmen.getSkills(player.getStorage('sbyingmen'),player);
 							game.expandSkills(skills);
 							return skills.contains(event.skill);
@@ -1325,17 +1349,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgrangjie:{
 				audio:'rangjie',
 				trigger:{player:'damageEnd'},
-				forced:true,
-				locked:false,
-				direct:true,
 				filter:function(event,player){
 					return player.canMoveCard();
+				},
+				check:function(event,player){
+					return player.canMoveCard(true);
 				},
 				content:function(){
 					'step 0'
 					event.num=trigger.num;
 					'step 1'
-					player.logSkill('jsrgrangjie');
 					event.num--;
 					if(player.canMoveCard()) player.moveCard(true);
 					'step 2'
@@ -1368,7 +1391,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.gain(result.links,'gain2');
 					}
-					if(event.num>0) event.goto(1);
+					'step 4'
+					if(event.num>0){
+						player.chooseBool(get.prompt2('jsrgrangjie')).set('ai',()=>_status.event.bool).set('bool',lib.skill.jsrgrangjie.check(trigger,player));
+					}
+					else event.finish();
+					'step 5'
+					if(result.bool){
+						player.logSkill('jsrgrangjie');
+						event.goto(1);
+					}
 				},
 				ai:{
 					maixie:true,
@@ -2895,7 +2927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['damageBegin1','damageBegin3']},
 				filter:function(event,player,name){
-					return name=='damageBegin1'&&player.inRange(event.source)||name=='damageBegin3'&&player.inRange(event.player);
+					return name=='damageBegin1'&&event.source&&event.source.isIn()&&player.inRange(event.source)||name=='damageBegin3'&&event.player&&event.player.isIn()&&player.inRange(event.player);
 				},
 				direct:true,
 				content:function(){
@@ -3338,6 +3370,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			psliaozou:{
 				audio:2,
 				enable:'phaseUse',
+				locked:false,
 				filter:function(event,player){
 					return !player.hasSkill('psliaozou_blocker',null,null,false);
 				},
@@ -4225,6 +4258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				selectCard:-1,
 				position:'h',
+				locked:false,
 				filter:function(event,player){
 					if(player.hasSkill('pssheji_used')) return false;
 					var hs=player.getCards('h');
@@ -5063,7 +5097,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.gainMaxHp(true);
 						target.recover();
 						var mode=get.mode();
-						if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
+						if(mode=='identity'||(mode=='versus'&&_status.mode=='four')||mode=='doudizhu'){
 							if(target.name&&lib.character[target.name]){
 								var skills=lib.character[target.name][3];
 								target.storage.zhuSkill_yjyongdi=[];
@@ -5410,6 +5444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
+				locked:false,
 				filter:function(event,player){
 					for(var card of ui.discardPile.childNodes){
 						if(get.type(card)=='equip') return true;
@@ -5474,6 +5509,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'soil',
 				filterTarget:true,
+				limited:true,
 				selectTarget:()=>[1,game.roundNumber],
 				contentBefore:function(){
 					'step 0'
@@ -6660,6 +6696,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spyicong:{
 				trigger:{player:'phaseDiscardEnd'},
 				direct:true,
+				locked:false,
 				filter:function(event,player){
 					return player.countCards('he')>0;
 				},
@@ -6697,6 +6734,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sptuji:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					return player.getExpansions('spyicong').length>0;
 				},
@@ -6924,6 +6962,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardToPlayered'},
 				silent:true,
 				firstDo:true,
+				locked:false,
 				content:function(){
 					trigger.target.addTempSkill('chixin3');
 				}
@@ -6955,7 +6994,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-			chixin3:{},
+			chixin3:{charlotte:true},
 			suiren:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				skillAnimation:true,
@@ -7515,6 +7554,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					return player.hasSkill('fenyong2')&&event.player.isAlive();
 				},
@@ -7573,6 +7613,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'loseEnd'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					return player._mouduan_mark&&player._mouduan_mark.name=='武'&&player.countCards('h')<=2;
 				},
@@ -7680,7 +7721,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dahe:{
-				audio:1,
+				audio:true,
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -8239,8 +8280,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yjyongdi_info:'限定技。准备阶段，你可以令一名男性角色加1点体力上限并回复1点体力，然后若其武将牌上有主公技且其不为主公，其获得此主公技。',
 			yj_zhugedan:'用间诸葛诞',
 			yj_zhugedan_ab:'诸葛诞',
-			yj_zhenji:'用间甄姬',
-			yj_zhenji_ab:'甄姬',
+			yj_zhenji:'用间甄宓',
+			yj_zhenji_ab:'甄宓',
 			yjluoshen:'洛神',
 			yjluoshen_info:'准备阶段，你可以判定并获得判定牌，且可重复此流程直到结果的颜色不同。',
 			//线下E系列 一战成名 战役篇官盗
@@ -8430,7 +8471,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgzhaohan:'昭汉',
 			jsrgzhaohan_info:'准备阶段，若本局游戏：未洗过牌，你回复1点体力；洗过牌，你失去1点体力。',
 			jsrgrangjie:'让节',
-			jsrgrangjie_info:'当你受到1点伤害后，你移动场上的一张牌，然后你可以于弃牌堆中选择获得一张本回合进入弃牌堆且与此牌花色相同的牌。',
+			jsrgrangjie_info:'当你受到1点伤害后，你可以移动场上的一张牌，然后你可以于弃牌堆中选择获得一张本回合进入弃牌堆且与此牌花色相同的牌。',
 			jsrgyizheng:'义争',
 			jsrgyizheng_info:'出牌阶段限一次。你可以与一名手牌数大于你的角色拼点。若你：赢，其跳过下一个摸牌阶段；没赢，其可以对你造成至多2点伤害。',
 			jsrg_kongrong:'起孔融',
@@ -8483,7 +8524,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbyingmen:'盈门',
 			sbyingmen_info:'锁定技。①游戏开始时，你将武将牌堆中随机四张武将牌置于你的武将牌上，称为“访客”。②回合开始时，若你的“访客”数小于4，你随机从武将牌堆中将“访客”补至四张。',
 			sbpingjian:'评鉴',
-			sbpingjian_info:'你可以于满足你“访客”上的一个无技能标签或仅有锁定技标签的技能条件的时机发动此技能。你发动的技能结算结束后，若此技能位于你的“访客”中，则你选择移去一张“访客”。若移去的是本次发动技能的“访客”，你摸一张牌。',
+			sbpingjian_info:'你可以于满足你“访客”上的一个无技能标签或仅有锁定技标签的技能条件的时机发动此技能，然后你选择移去一张“访客”。若移去的是本次发动技能的“访客”，则你于此技能结算结束时摸一张牌。',
 
 			offline_star:'桌游志·SP',
 			offline_sticker:'桌游志·贴纸',

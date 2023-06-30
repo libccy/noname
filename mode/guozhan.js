@@ -9049,11 +9049,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt('gzjieming'),'令一名角色将手牌补至X张（X为其体力上限且至多为5）',function(card,player,target){
-						return target.countCards('h')<Math.min(target.maxHp,5);
+						return true;//target.countCards('h')<Math.min(target.maxHp,5);
 					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(att>2){
-							return Math.min(5,target.maxHp)-target.countCards('h');
+							return Math.max(0,Math.min(5,target.maxHp)-target.countCards('h'));
 						}
 						return att/3;
 					}).setHiddenSkill('gzjieming');
@@ -9061,7 +9061,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('gzjieming',result.targets);
 						for(var i=0;i<result.targets.length;i++){
-							result.targets[i].draw(Math.min(5,result.targets[i].maxHp)-result.targets[i].countCards('h'));
+							var num=Math.min(5,result.targets[i].maxHp)-result.targets[i].countCards('h');
+							if(num>0) result.targets[i].draw(num);
 						}
 					}
 				},

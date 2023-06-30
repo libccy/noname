@@ -14,15 +14,132 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_hanshao:['male','qun',3,['clanfangzhen','clanliuju','clanxumin'],['clan:颍川韩氏']],
 			clan_hanrong:['male','qun',3,['clanlianhe','clanhuanjia','clanxumin'],['clan:颍川韩氏']],
 			clan_wukuang:['male','qun',4,['clanlianzhu','clanmuyin'],['clan:陈留吴氏']],
+			clan_wangling:['male','wei',4,['clanbolong','clanzhongliu'],['clan:太原王氏']],
 		},
 		characterSort:{
 			clan:{
 				clan_wu:['clan_wuxian','clan_wuban','clan_wukuang'],
 				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				clan_han:['clan_hanshao','clan_hanrong'],
+				clan_wang:['clan_wangling'],
 			},
 		},
 		skill:{
+			//族王凌
+			clanbolong:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				filterTarget:lib.filter.notMe,
+				content:function(){
+					'step 0'
+					var num=player.countCards('h');
+					var str='是否交给其'+get.cnNumber(num)+'张牌，然后视为你对其使用一张【酒】？或者点击“取消”，令其交给你一张牌，然后其视为对你使用一张【杀】。';
+					target.chooseCard(get.translation(player)+'对你发动了【驳龙】',str,num,'he').set('ai',card=>{
+						if(_status.event.canGive) return 5-get.value(card);
+						return 0;
+					}).set('canGive',function(){
+						if(get.attitude(target,player)>1) return true;
+						if(!player.hasSha()&&player.countCards('h')<=4) return true;
+						if(game.hasPlayer(current=>{
+							return player.canUse('sha',current,true,true)&&get.effect(current,{name:'sha'},player,target)<0&&!current.countCards('hs',['shan','caochuan']);
+						})) return false;
+						return true;
+					}());
+					'step 1'
+					if(result.bool){
+						var cards=result.cards;
+						target.give(cards,player);
+						if(lib.filter.targetEnabled2({name:'jiu',isCard:true},target,player)) target.useCard({name:'jiu',isCard:true},player,false);
+						event.finish();
+					}
+					else{
+						player.chooseCard('驳龙：交给'+get.translation(target)+'一张牌',get.translation(target)+'拒绝给牌，请交给其一张牌然后视为对其使用一张【杀】',true,'he');
+					}
+					'step 2'
+					if(result.bool){
+						var cards=result.cards;
+						player.give(cards,target);
+						if(player.canUse('sha',target,false,false)) player.useCard({name:'sha',isCard:true},target,false);
+					}
+				},
+				ai:{
+					order:function(item,player){
+						return get.order({name:'jiu'})+0.01;
+					},
+					threaten:2,
+					result:{
+						target:function(player,target){
+							if(player.hasCard(card=>{
+								return get.value(card)<5&&!['shan','tao','jiu','wuxie','caochuan'].contains(get.name(card));
+							},'he')) return -1;
+							return 0;
+						},
+					}
+				}
+			},
+			clanzhongliu:{
+				audio:2,
+				trigger:{player:'useCard'},
+				forced:true,
+				clanSkill:true,
+				filter:function(event,player){
+					if(!event.cards.length) return true;
+					var cards=[];
+					game.countPlayer(current=>{
+						if(!current.hasClan('太原王氏')) return false;
+						current.getHistory('lose',evt=>{
+							if(event!=evt.getParent()) return false;
+							cards.addArray(evt.getl(current).hs);
+						});
+					})
+					return event.cards.some(card=>!cards.contains(card));
+				},
+				content:function(){
+					'step 0'
+					var skills=player.getStockSkills(true,true);
+					game.expandSkills(skills);
+					var resetSkills=[];
+					var suffixs=['used','round','block','blocker'];
+					for(var skill of skills){
+						var info=get.info(skill);
+						if(typeof info.usable=='number'){
+							if(player.hasSkill('counttrigger')&&player.storage.counttrigger[skill]&&player.storage.counttrigger[skill]>=1){
+								delete player.storage.counttrigger[skill];
+								resetSkills.add(skill);
+							}
+							if(typeof get.skillCount(skill)=='number'&&get.skillCount(skill)>=1){
+								delete player.getStat('skill')[skill];
+								resetSkills.add(skill);
+							}
+						}
+						if(info.round&&player.storage[skill+'_roundcount']){
+							delete player.storage[skill+'_roundcount'];
+							resetSkills.add(skill);
+						}
+						if(player.awakenedSkills.contains(skill)){
+							player.restoreSkill(skill);
+							resetSkills.add(skill);
+						}
+						for(var suffix of suffixs){
+							if(player.hasSkill(skill+'_'+suffix)){
+								player.removeSkill(skill+'_'+suffix);
+								resetSkills.add(skill);
+							}
+						}
+					}
+					if(resetSkills.length){
+						var str='';
+						for(var i of resetSkills){
+							str+='【'+get.translation(i)+'】、';
+						}
+						game.log(player,'重置了技能','#g'+str.slice(0,-1));
+					}
+				}
+			},
 			//族吴匡
 			clanlianzhu:{
 				audio:2,
@@ -506,7 +623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var winner=result.bool?player:target;
 						var cards=[];
 						game.getGlobalHistory('cardMove',evt=>{
-							if(evt.getParent(2)==event) cards.addArray(evt.cards.filterInD('d'));
+							if(evt.getParent(3)==event) cards.addArray(evt.cards.filterInD('d'));
 						});
 						event.winner=winner;
 						if(cards.length) event.cards=cards;
@@ -591,12 +708,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget('三恇：选择一名其他角色','令其交给你至少X张牌，然后其获得'+get.translation(trigger.cards.filterInD('ejod'))+'（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）',true,lib.filter.notMe).set('ai',target=>{
+					var cards=trigger.cards.filterInD('oe');
+					player.chooseTarget('三恇：选择一名其他角色','令其交给你至少X张牌'+(cards.length?'，然后其获得'+get.translation(cards):'')+'（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）',true,lib.filter.notMe).set('ai',target=>{
 						var att=get.attitude(player,target),num=lib.skill.clansankuang.getNum(target);
 						if(num==0) return att;
 						if(_status.event.goon) return -att;
 						return -Math.sqrt(Math.abs(att))-lib.skill.clansankuang.getNum(target);
-					}).set('goon',Math.max.apply(Math,trigger.cards.map(i=>get.value(i)))<=5||trigger.cards.filterInD('ejod').length==0)
+					}).set('goon',Math.max.apply(Math,trigger.cards.map(i=>get.value(i)))<=5||trigger.cards.filterInD('oe').length==0)
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0],num=lib.skill.clansankuang.getNum(target),num2=target.countCards('he');
@@ -604,7 +722,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('clansankuang',target);
 						if(num==0||num2==0) event._result={bool:false};
 						else if(num2<=num) event._result={bool:true,cards:target.getCards('he')};
-						else target.chooseCard('he',true,[num,Infinity]).set('ai',get.unuseful);
+						else target.chooseCard('he',true,[num,Infinity]).set('ai',get.unuseful).set('prompt','交给'+get.translation(player)+'至少'+get.cnNumber(num)+'张牌');
 					}else event.finish();
 					'step 2'
 					if(result.bool){
@@ -613,8 +731,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delayx();
 					}
 					'step 3'
-					if(trigger.cards.filterInD('ej').length) target.gain(trigger.cards.filterInD('ejod'),get.owner(trigger.cards.filterInD('ej')[0]),'giveAuto','bySelf');
-					else if(trigger.cards.filterInD('od').length) target.gain(trigger.cards.filterInD('od'),'gain2','bySelf');
+					if(trigger.cards.filterInD().length) target.gain(trigger.cards.filterInD(),'gain2','bySelf');
+					else if(trigger.cards.filterInD('e').length) target.gain(trigger.cards.filterInD('e'),get.owner(trigger.cards.filterInD('e')[0]),'give');
 				},
 				ai:{
 					reverseOrder:true,
@@ -661,6 +779,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var cards=player.getCards('h',trigger.card.name);
 					player.showCards(cards,get.translation(player)+'发动了【神君】');
+					player.markSkill('clanshenjun');
 					player.addGaintag(cards,'clanshenjun');
 					for(var name of lib.phaseName){
 						var evt=_status.event.getParent(name);
@@ -668,6 +787,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('clanshenjun_viewAs',name+'After');
 						break;
 					}
+				},
+				marktext:'君',
+				intro:{
+					markcount:function(storage,player){
+						return player.countCards('h',card=>card.hasGaintag('clanshenjun'));
+					},
+					mark:function(dialog,content,player){
+						var cards=player.getCards('h',card=>card.hasGaintag('clanshenjun'));
+						if(cards.length){
+							dialog.addAuto(cards);
+						}
+						else return '无展示牌';
+					},
 				},
 				subSkill:{
 					viewAs:{
@@ -737,7 +869,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event,player){
-					if(game.getGlobalHistory('changeHp',evt=>evt.player==player&&evt.getParent()==event).length!=1) return false;
+					if(game.getGlobalHistory('changeHp',evt=>evt.player==player).length!=1) return false;
 					var cards=player.getCards('h'),map={};
 					if(!cards.length) return false;
 					for(var card of cards){
@@ -831,16 +963,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						var next=game.createEvent(name);
 						next.setContent(function(){
-                            if(result.bool==false){
-                                player.damage(3,'thunder','nosource');
-                            }
-                        });
+							if(result.bool==false){
+								player.damage(3,'thunder','nosource');
+							}
+						});
 						next._result=result;
 						next.cards=[];
-                        next.card=get.autoViewAs({name:name});
+						next.card=get.autoViewAs({name:name});
 						next.player=player;
 					}
-                    'step 2'
+					'step 2'
 					trigger.player.drawTo(4);
 				},
 				ai:{expose:0.25}
@@ -902,8 +1034,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					suit:function(card,suit){
 						var player=get.owner(card)||_status.event.player;
 						if(!player||!player.judging||player.judging[0]!=card) return;
-                        var storage=player.getStorage('clanfenchai');
-                        if(!storage.length) return;
+						var storage=player.getStorage('clanfenchai');
+						if(!storage.length) return;
 						return storage.filter(i=>i.isIn()).length>0?'heart':'spade';
 					}
 				}
@@ -1108,8 +1240,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					return player.getHistory('useCard',evt=>{
-						return get.type(evt.card)=='trick'&&!get.tag(evt.card,'damage');
+					return get.type(event.card,null,false)=='trick'&&!get.tag(event.card,'damage')&&event.cards.filterInD('d').length>0&&player.getHistory('useCard',evt=>{
+						return get.type(evt.card,null,false)=='trick'&&!get.tag(evt.card,'damage');
 					}).indexOf(event)==0;
 				},
 				forced:true,
@@ -1430,7 +1562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanshenjun:'神君',
 			clanshenjun_info:'当一名角色使用【杀】或普通锦囊牌时，若你手牌中有该牌名的牌，你展示之，且这些牌称为“神君”。然后本阶段结束时，你可以将等同于你“神君”数张牌当做一张“神君”牌使用。',
 			clanbalong:'八龙',
-			clanbalong_info:'锁定技。当你回复体力后或受到伤害后或失去体力后，若你手牌中唯一最多的类别为锦囊牌，你展示所有手牌并摸至角色数张。',
+			clanbalong_info:'锁定技。当你于一回合内首次{回复体力后或受到伤害后或失去体力后}，若你手牌中唯一最多的类别为锦囊牌，你展示所有手牌并摸至角色数张。',
 			clandaojie:'蹈节',
 			clandaojie_info:'宗族技，锁定技。当你每回合第一次使用非伤害类普通锦囊牌后，你须失去一个锁定技或失去1点体力，令一名颍川荀氏角色获得此牌对应的所有实体牌。',
 			clan_xuncai:'族荀采',
@@ -1442,7 +1574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanhuanyin_info:'锁定技。当你进入濒死状态时，将手牌补至四张。',
 			clan_xunchen:'族荀谌',
 			clansankuang:'三恇',
-			clansankuang_info:'锁定技。当你每轮第一次使用一种类别的牌后，你令一名其他角色交给你至少X张牌，然后于场上或弃牌堆内或处理区内获得你使用的牌对应的所有实体牌（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）。',
+			clansankuang_info:'锁定技。当你每轮第一次使用一种类别的牌后，你令一名其他角色交给你至少X张牌，然后于装备区或处理区内获得你使用的牌对应的所有实体牌（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）。',
 			clanbeishi:'卑势',
 			clanbeishi_info:'锁定技。当一名角色失去最后的手牌后，若其是你首次发动〖三恇〗的目标角色，你回复1点体力。',
 			clan_xuncan:'族荀粲',
@@ -1467,10 +1599,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wukuang:'族吴匡',
 			clanlianzhu:'联诛',
 			clanlianzhu_info:'转换技。每名角色Ａ的出牌阶段限一次。阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1；阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1。',
+			clan_wangling:'族王凌',
+			clanbolong:'驳龙',
+			clanbolong_info:'出牌阶段限一次。你可以令一名其他角色选择一项：1.你交给其一张牌，然后视为对其使用一张【杀】；2.交给你等同于你手牌数的牌，然后视为对你使用一张【酒】。',
+			clanzhongliu:'中流',
+			clanzhongliu_info:'宗族技，锁定技。当你使用牌时，若此牌对应的实体牌不全为同族角色的手牌，你重置武将牌上的技能。',
 			
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
 			clan_han:'颍川·韩氏',
+			clan_wang:'太原·王氏',
 		},
 	};
 });

@@ -49,7 +49,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_zhangning:['female','qun',3,['twxingzhui','twjuchen'],[]],
 			tw_yangyi:['male','shu',3,['duoduan','twgongsun'],[]],
 			tw_dengzhi:['male','shu',3,['twjimeng','shuaiyan'],[]],
-			tw_wangling:['male','wei',4,['twmibei','twxingqi'],[]],
+			tw_wangling:['male','wei',4,['twmibei','twxingqi'],['clan:太原王氏']],
 			tw_zhugeguo:['female','shu',3,['twqirang','twyuhua'],[]],
 			tw_fanchou:['male','qun',4,['twxingluan'],[]],
 			tw_xujing:['male','shu',3,['twboming','twejian'],[]],
@@ -82,7 +82,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_quancong:['male','wu',4,['zhenshan']],
 			tw_wujing:['male','wu',4,['twfenghan','twcongji']],
 			tw_wangcan:['male','wei',3,['twdianyi','twyingji','twshanghe']],
-			tw_wangchang:['male','wei',3,['twkaiji','twshepan']],
+			tw_wangchang:['male','wei',3,['twkaiji','twshepan'],['clan:太原王氏']],
 			tw_caozhao:['male','wei',4,['twfuzuan','twchongqi']],
 			tw_guohuai:["male","wei",4,["twjingce","yuzhang"]],
 			tw_chengpu:['male','wu',4,['twlihuo','twchunlao']],
@@ -534,6 +534,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							effect:{
 								target:function(card,player,target){
 									if(!get.tag(card,'damage')) return;
+									if(target.hp>1) return;
 									var num=0;
 									game.filterPlayer(current=>{
 										if(current.getStorage('twyanshi').some(i=>target==i)){
@@ -544,6 +545,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									for(var targetx of targets){
 										num+=targetx.hp;
 									}
+									if(num>=player.hp) return 0;
 									if(num>0) return [1,0,0,0.5-1.5*num];
 								}
 							}
@@ -2207,8 +2209,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onChooseToUse:function(event){
 					if(game.online||!event.player.hasSkill('twmouli')) return;
 					var cards=[];
-					for(var i of ui.cardPile.childNodes){
-						if(get.type(i)=='basic') cards.push(i);
+					for(var i=0;i<ui.cardPile.childNodes.length;i++){
+						var card=ui.cardPile.childNodes[i];
+						if(get.type(card)=='basic') cards.push(card);
 					}
 					event.set('twmouli',cards);
 				},
@@ -2277,8 +2280,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					skillTagFilter:function(player,tag,arg){
 						if(arg=='respond') return false;
 						var list=[];
-						for(var i of ui.cardPile.childNodes){
-							if(get.type(i,player)=='basic'&&!list.contains(i.name)) list.push(i.name);
+						for(var i=0;i<ui.cardPile.childNodes.length;i++){
+							var card=ui.cardPile.childNodes[i];
+							if(get.type(card,player)=='basic'&&!list.contains(card.name)) list.push(card.name);
 						}
 						if(tag=='respondSha') return list.contains('sha');
 						if(tag=='respondShan') return list.contains('shan');
@@ -3879,6 +3883,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				position:'he',
 				filterCard:true,
+				locked:false,
 				filter:function(event,player){
 					return player.countCards('he');
 				},
@@ -3956,6 +3961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				forced:true,
+				locked:false,
 				popup:false,
 				firstDo:true,
 				content:function(){
@@ -4370,7 +4376,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.hasCard((card)=>lib.filter.cardDiscardable(card,player,'tweqianxi'),'he')) player.chooseToDiscard('he',true);
 					else event.finish();
 					'step 2'
-					if(!result.bool){
+					if(!result.bool||!game.hasPlayer(target=>{
+						return player!=target&&get.distance(player,target)<=1;
+					})){
 						event.finish();
 						return;
 					}
@@ -5828,14 +5836,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
-						return current!=player&&current.countDiscardableCards('hej',player)>0;
+						return current!=player&&current.countDiscardableCards(player,'hej')>0;
 					});
 				},
 				direct:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('twtanfeng'),function(card,player,target){
-						return target!=player&&target.countDiscardableCards('hej',player)>0;
+						return target!=player&&target.countDiscardableCards(player,'hej')>0;
 					}).set('ai',function(target){
 						var player=_status.event.player,num=1;
 						if(get.attitude(player,target)>0) num=3;
@@ -6415,6 +6423,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
+				locked:false,
 				group:['twxiawei_init','twxiawei_lose','twxiawei_unmark'],
 				content:function(){
 					'step 0'
@@ -7839,7 +7848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'令此牌对'+get.translation(target)+'造成的伤害+'+(num-1)+'，此伤害结算完成后，其回复等量的体力值'
 						];
 						list.push('摸牌');
-						if(target.countDiscardableCards('he',player)) list.push('拆牌');
+						if(target.countDiscardableCards(player,'he')) list.push('拆牌');
 						else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
 						list.push('加伤');
 						player.chooseControl(list).set('prompt','攻阁：请选择一项（'+get.translation(target)+'对应X值：'+(num-1)+'）').set('ai',()=>_status.event.choice).set('choice',function(){
@@ -11160,7 +11169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			twhengjiang:{
-				audio:2,
+				audio:'hengjiang',
 				trigger:{player:'useCardToPlayer'},
 				filter:function(event,player){
 					return !player.hasSkill('twhengjiang2')&&event.targets.length==1&&['basic','trick'].contains(get.type(event.card,false))&&player.isPhaseUsing()&&game.hasPlayer(function(current){
@@ -11573,7 +11582,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			twdaoji:{
-				audio:2,
+				audio:'daoji',
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -12154,7 +12163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!lib.inpile.contains('dz_mantianguohai')) lib.inpile.add('dz_mantianguohai');
 					if(!_status.dz_mantianguohai_suits) _status.dz_mantianguohai_suits=lib.suit.slice(0);
 					var list=_status.dz_mantianguohai_suits.randomRemove(2).map(function(i){
-						return game.createCard2('dz_mantianguohai',i,get.rand(1,13));
+						return game.createCard2('dz_mantianguohai',i,5);
 					});
 					if(list.length) player.gain(list,'gain2','log');
 				},
@@ -12181,7 +12190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(name=='dz_mantianguohai'){
 									if(!lib.inpile.contains('dz_mantianguohai')) lib.inpile.add('dz_mantianguohai');
 									if(!_status.dz_mantianguohai_suits) _status.dz_mantianguohai_suits=lib.suit.slice(0);
-									if(_status.dz_mantianguohai_suits.length) player.gain(game.createCard2('dz_mantianguohai',_status.dz_mantianguohai_suits.randomRemove(),get.rand(1,13)),'gain2');
+									if(_status.dz_mantianguohai_suits.length) player.gain(game.createCard2('dz_mantianguohai',_status.dz_mantianguohai_suits.randomRemove(),5),'gain2');
 									else{
 										var card=get.cardPile(function(card){
 											return card.name==name;
@@ -13153,7 +13162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twtijin:'替巾',
 			twtijin_info:'当你攻击范围内的一名其他角色使用【杀】指定另一名其他角色为目标时，你可以将此【杀】的目标改为你。若如此做，此【杀】结算完成后，你弃置该角色的一张牌。',
 			twxiaolian:'孝廉',
-			twxiaolian_info:'当一名其他角色使用【杀】指定另一名其他角色为目标时，你可以将此【杀】的目标改为你。若如此做，当你受到此【杀】的伤害后，你可以将一张牌放在此【杀】原目标的武将牌旁，称之为“马”。锁定技，场上的一名角色每有一张“马”，其他角色计算与其的距离便+1。',
+			twxiaolian_info:'当一名其他角色使用【杀】指定另一名其他角色为目标时，你可以将此【杀】的目标改为你。若如此做，当你受到此【杀】的伤害后，你可以将一张牌置于此【杀】原目标的武将牌旁，称为“马”，且令其获得如下效果：其他角色计算至其的距离+X（X为其武将牌旁的“马”数）。',
 			twqijia:'弃甲',
 			twqijia_info:'出牌阶段，你可以弃置一张装备区内的牌（每种类型的装备牌限一次），然后视为对攻击范围内的一名其他角色使用了一张【杀】。',
 			twzhuchen:'诛綝',
@@ -13303,7 +13312,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twchongqi:'宠齐',
 			twchongqi_info:'锁定技。游戏开始时，你令所有角色获得〖非服〗。然后你可减1点体力上限，令一名其他角色获得〖复纂〗。',
 			twfeifu:'非服',
-			twfeifu_info:'转换技。阴：当你成为【杀】的唯一目标后；阳：当你使用【杀】指定唯一目标后；目标角色须交给使用者一张牌。若此牌为装备牌，则使用者可使用此牌。',
+			twfeifu_info:'锁定技，转换技。阴：当你成为【杀】的唯一目标后；阳：当你使用【杀】指定唯一目标后；目标角色须交给使用者一张牌。若此牌为装备牌，则使用者可使用此牌。',
 			tw_wangchang:'TW王昶',
 			twkaiji:'开济',
 			twkaiji_info:'准备阶段，你可令至多X名角色各摸一张牌（X为本局游戏内进入过濒死状态的角色数+1）。若有角色以此法获得了非基本牌，则你摸一张牌。',

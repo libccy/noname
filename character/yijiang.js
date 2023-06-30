@@ -569,20 +569,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:['eventNeutralized','shaMiss']},
 				filter:function(event,player){
 					if(player.hasSkill('diezhang_used')) return false;
-					if(event.type!='card'&&event.name!='_wuxie') return false;
+					if(event.type!='card') return false;
 					var evt=event._neutralize_event;
 					var user,responder;
-					if(event.name=='_wuxie'){
-						var list=game.getGlobalHistory('useCard',evtx=>evtx.getParent()==event).slice(-2);
-						if(list.length<=1) return false;
-						user=list[0].player;responder=list[1].player;
-					}
-					else if(evt&&evt.name=='_wuxie'){
-						var evtx=game.getGlobalHistory('useCard',evtx=>evtx.getParent()==evt)[0];
-						user=event.player;responder=evtx.player;
+					if(event.name=='sha'){
+						user=event.player;responder=event.target;
 					}
 					else{
-						user=event.player;responder=event.target;
+						if(evt.type!='card') return false;
+						user=event.player;
+						responder=evt.player;
 					}
 					if(!player.storage.diezhang){
 						if(user!=player||responder==player) return false;
@@ -598,16 +594,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var evt=trigger._neutralize_event;
 					var user,responder;
-					if(trigger.name=='_wuxie'){
-						var list=game.getGlobalHistory('useCard',evtx=>evtx.getParent()==trigger).slice(-2);
-						user=list[0].player;responder=list[1].player;
-					}
-					else if(evt&&evt.name=='_wuxie'){
-						var evtx=game.getGlobalHistory('useCard',evtx=>evtx.getParent()==evt)[0];
-						user=trigger.player;responder=evtx.player;
+					if(trigger.name=='sha'){
+						user=trigger.player;responder=trigger.target;
 					}
 					else{
-						user=trigger.player;responder=trigger.target;
+						user=trigger.player;
+						responder=evt.player;
 					}
 					var num=player.storage.duanwan?2:1;
 					event.num=num;
@@ -2281,12 +2273,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinzongzuo:{
-				trigger:{global:'phaseBefore'},
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
 				forced:true,
-				priority:10,
 				audio:'zongzuo',
 				filter:function(event,player){
-					return game.phaseNumber==0;
+					return (event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -2413,6 +2407,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCardAfter','respondAfter']},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				filter:function(event,player){
 					return event.skill=='xintaoluan_backup'||event.skill=='xintaoluan5'||event.skill=='xintaoluan4';
 				},
@@ -2457,7 +2452,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			xintaoluan3:{},
+			xintaoluan3:{charlotte:true},
 			xintaoluan4:{
 				audio:'taoluan',
 				prompt:'将一张牌当做闪使用',
@@ -2554,6 +2549,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xintaoluan6:{
 				trigger:{global:'phaseAfter'},
 				silent:true,
+				charlotte:true,
 				content:function(){
 					player.storage.xintaoluan=[];
 					player.storage.xintaoluan2=0;
@@ -5084,6 +5080,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCardAfter','respondAfter']},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				filter:function(event,player){
 					return event.skill=='taoluan_backup'||event.skill=='taoluan5'||event.skill=='taoluan4';
 				},
@@ -5127,7 +5124,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			taoluan3:{},
+			taoluan3:{charlotte:true},
 			taoluan4:{
 				prompt:'将一张牌当做闪使用',
 				enable:'chooseToUse',
@@ -5771,12 +5768,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zongzuo:{
-				trigger:{global:'phaseBefore'},
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
 				forced:true,
-				priority:10,
 				audio:2,
 				filter:function(event,player){
-					return game.phaseNumber==0;
+					return (event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -7793,7 +7792,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaofu:{
 				unique:true,
 				global:'zhaofu2',
-				zhuSkill:true
+				zhuSkill:true,
+				locked:true,
 			},
 			zhaofu2:{
 				mod:{
@@ -9214,7 +9214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			youdi:{
-				audio:true,
+				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -10285,6 +10285,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qiangzhi:{
 				audio:2,
+				audioname:['re_zhangsong'],
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -12096,6 +12097,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			olddanshou:{
+				audio:'danshou',
 				trigger:{source:'damageSource'},
 				//priority:9,
 				check:function(event,player){
@@ -12887,6 +12889,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			oldrenxin:{
+				audio:'renxin',
 				trigger:{global:'dying'},
 				//priority:6,
 				filter:function(event,player){
@@ -12908,7 +12911,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			renxin:{
 				trigger:{global:'damageBegin4'},
-				audio:3,
+				audio:2,
 				//priority:6,
 				filter:function(event,player){
 					return event.player!=player&&event.player.hp==1&&player.countCards('he',{type:'equip'})>0;
@@ -13051,7 +13054,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiansi2:{
 				enable:'chooseToUse',
 				audio:2,
-				audioname:['re_liufeng'],
+				audioname2:{re_liufeng:'rexiansi'},
 				viewAs:{name:'sha',isCard:true},
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
@@ -13580,6 +13583,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caorui:['caorui','old_caorui'],
 			sunziliufang:['dc_sunziliufang','sunziliufang'],
 			liyan:['liyan','old_liyan'],
+			zhangsong:['re_zhangsong','zhangsong'],
 		},
 		translate:{
 			old_huaxiong:'华雄',

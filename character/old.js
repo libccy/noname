@@ -45,7 +45,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_yuanshu:['male','qun',4,['wangzun','tongji']],
 			pangde:['male','qun',4,['mashu','mengjin']],
 			ol_huaxiong:["male","qun",6,["new_reyaowu"]],
-			old_wangyun:['male','qun',4,['wylianji','moucheng']],
+			old_wangyun:['male','qun',4,['wylianji','moucheng'],['clan:太原王氏']],
 			xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
 			weiyan:['male','shu',4,['kuanggu']],
 			xiahouyuan:['male','wei',4,['shensu']],
@@ -567,6 +567,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				popup:false,
 				firstDo:true,
+				charlotte:true,
 				filter:function(event,player){
 					return event.skill&&event.skill.indexOf('old_guhuo_')==0;
 				},

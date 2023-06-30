@@ -12,21 +12,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang1:['xin_wuguotai','xin_gaoshun','dc_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua','dc_xushu','re_chengong'],
 				refresh_yijiang2:['re_madai','re_wangyi','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao','re_xunyou','re_guanzhang'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','dc_liru','re_manchong','re_fuhuanghou','re_guanping','re_liufeng'],
-				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','dc_chenqun','re_caifuren','re_guyong','re_jushou','re_zhuhuan'],
+				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','dc_chenqun','re_caifuren','re_guyong','re_jushou','re_zhuhuan','re_zhangsong'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen','re_zhuzhi'],
 				refresh_yijiang6:['re_guohuanghou','re_sundeng'],
-				refresh_xinghuo:['re_duji','dc_gongsunzan','re_sp_taishici','re_caiyong','re_mazhong','re_wenpin'],
+				refresh_xinghuo:['re_duji','dc_gongsunzan','re_sp_taishici','re_caiyong','re_mazhong','re_wenpin','re_jsp_huangyueying'],
 			},
 		},
 		connect:true,
 		character:{
+			re_jsp_huangyueying:['female','qun',3,['rejiqiao','relinglong']],
+			re_zhangsong:['male','shu',3,['qiangzhi','rexiantu']],
 			re_zhuzhi:['male','wu',4,['reanguo']],
 			dc_caozhi:['male','wei',3,['reluoying','dcjiushi']],
 			ol_huangzhong:['male','shu',4,['xinliegong','remoshi']],
 			re_wenpin:['male','wei',5,['rezhenwei'],['unseen']],
 			re_guanzhang:['male','shu',4,['fuhun','retongxin']],
 			re_mazhong:['male','shu',4,['refuman']],
-			dc_chenqun:['male','wei',3,['repindi','refaen']],
+			dc_chenqun:['male','wei',3,['repindi','dcfaen']],
 			re_sundeng:['male','wu',4,['rekuangbi']],
 			re_caiyong:['male','qun',3,['rebizhuan','retongbo']],
 			re_chengong:['male','qun',3,['remingce','zhichi']],
@@ -38,7 +40,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_liufeng:['male','shu',4,['rexiansi']],
 			ol_xunyu:['male','wei',3,['quhu','oljieming'],['clan:颍川荀氏']],
 			re_liuchen:['male','shu',4,['rezhanjue','reqinwang'],['zhu']],
-			dc_gongsunzan:['male','qun',4,['reyicong','dcqiaomeng']],
+			dc_gongsunzan:['male','qun',4,['dcyicong','dcqiaomeng']],
 			re_duji:['male','wei',3,['reandong','reyingshi']],
 			re_jushou:['male','qun',3,['dcjianying','dcshibei']],
 			re_zhanghe:['male','wei',4,['reqiaobian']],
@@ -143,6 +145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_jianyong:['male','shu',3,['reqiaoshui','jyzongshi']],
 		},
 		characterIntro:{
+			jsp_huangyueying:'荆州沔南白水人，沔阳名士黄承彦之女，诸葛亮之妻，诸葛瞻之母。容貌甚丑，而有奇才：上通天文，下察地理，韬略近于诸书无所不晓，诸葛亮在南阳闻其贤而迎娶。',
 			re_gongsunzan:'群雄之一。出身贵族，因母地位卑贱，只当了郡中小吏。他貌美，声音洪亮，机智善辩。后随卢植于缑氏山中读书，粗通经传。',
 			re_lidian:'字曼成，曹操麾下将领。李典深明大义，不与人争功，崇尚学习与高贵儒雅，尊重博学之士，在军中被称为长者。李典有长者之风，官至破虏将军，三十六岁去世。魏文帝曹丕继位后追谥号为愍侯。',
 			sunben:' ',
@@ -158,6 +161,194 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//SP黄月英
+			rejiqiao:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('he')>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseToDiscard(get.prompt2('jiqiao'),[1,player.countCards('he')],'he').set('ai',function(card){
+						if(card.name=='bagua') return 10;
+						return 7-get.value(card);
+					}).set('logSkill','rejiqiao');
+					'step 1'
+					if(result.bool){
+						var num=result.cards.length;
+						for(var i of result.cards){
+							if(get.type(i,false)=='equip') num++;
+						}
+						event.cards=game.cardsGotoOrdering(get.cards(num)).cards;
+						player.showCards(event.cards);
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					var gained=[];
+					var tothrow=[];
+					for(var i=0;i<event.cards.length;i++){
+						if(get.type(event.cards[i])!='equip'){
+							gained.push(event.cards[i]);
+						}
+						else{
+							tothrow.push(event.cards[i]);
+						}
+					}
+					player.gain(gained,'gain2');
+				},
+				ai:{
+					threaten:1.6
+				}
+			},
+			relinglong:{
+				audio:2,
+				trigger:{
+					player:'loseAfter',
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter','phaseBefore'],
+				},
+				forced:true,
+				onremove:true,
+				derivation:'reqicai',
+				filter:function(event,player){
+					if(event.name!='phase'&&(event.name!='equip'||event.player!=player)){
+						var evt=event.getl(player);
+						if(!evt||!evt.es||!evt.es.some(i=>get.subtype(i)=='equip5')) return false;
+					}
+					var skills=player.additionalSkills['relinglong'];
+					return skills&&skills.length&&player.getEquip(5)||!(skills&&skills.length)&&!player.getEquip(5);
+				},
+				content:function(){
+					player.removeAdditionalSkill('relinglong');
+					if(!player.getEquip(5)){
+						player.addAdditionalSkill('relinglong',['reqicai']);
+					}
+				},
+				group:['linglong_bagua','relinglong_directhit'],
+				mod:{
+					maxHandcard:function(player,num){
+						if(player.getEquip(3)||player.getEquip(4)||player.getEquip(6)) return;
+						return num+2;
+					},
+				},
+				subSkill:{
+					directhit:{
+						audio:'relinglong',
+						trigger:{player:'useCard'},
+						forced:true,
+						filter:function(event,player){
+							if(event.card.name!='sha'&&get.type(event.card,false)!='trick') return false;
+							for(var i=2;i<=6;i++){
+								if(player.getEquip(i)) return false;
+							}
+							return true;
+						},
+						content:function(){
+							trigger.directHit.addArray(game.players);
+							game.log(trigger.card,'不可被响应');
+						},
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(player,tag,arg){
+								if(!arg||!arg.card||!arg.target||(arg.card.name!='sha'&&get.type(arg.card,false)!='trick')) return false;
+								for(var i=2;i<=6;i++){
+									if(player.getEquip(i)) return false;
+								}
+								return true;
+							},
+						},
+					}
+				}
+			},
+			//张松
+			rexiantu:{
+				audio:2,
+				trigger:{global:'phaseUseBegin'},
+				filter:function(event,player){
+					return event.player!=player;
+				},
+				logTarget:'player',
+				check:function(event,player){
+					if(get.attitude(player,event.player)<5) return false;
+					if(player.maxHp-player.hp>=2) return false;
+					if(player.hp==1) return false;
+					if(player.hp==2&&player.countCards('h')<2) return false;
+					if(event.player.countCards('h')>=event.player.hp) return false;
+					return true;
+				},
+				content:function(){
+					'step 0'
+					player.draw(2);
+					'step 1'
+					var cards=player.getCards('he');
+					if(!cards.length) event.finish();
+					else if(cards.length<=2) event._result={cards:cards};
+					else player.chooseCard(2,'he',true,'交给'+get.translation(trigger.player)+'两张牌').set('ai',function(card){
+						if(ui.selected.cards.length&&card.name==ui.selected.cards[0].name) return -1;
+						if(get.tag(card,'damage')) return 1;
+						if(get.type(card)=='equip') return 1;
+						return 0;
+					});
+					'step 2'
+					player.give(result.cards,trigger.player);
+					trigger.player.addSkill('rexiantu_check');
+					trigger.player.markAuto('rexiantu_check',[player]);
+				},
+				ai:{
+					threaten:1.1,
+					expose:0.3
+				},
+				subSkill:{
+					check:{
+						charlotte:true,
+						trigger:{player:'phaseUseEnd'},
+						forced:true,
+						popup:false,
+						onremove:true,
+						filter:function(event,player){
+							return !player.getHistory('sourceDamage',evt=>{
+								return evt.getParent('phaseUse')==event;
+							}).length;
+						},
+						content:function(){
+							var targets=player.getStorage('rexiantu_check');
+							targets.sortBySeat();
+							for(var i of targets){
+								if(i.isIn()){
+									i.loseHp();
+								}
+							}
+							player.removeSkill('rexiantu_check');
+						}
+					}
+				}
+			},
+			//新服公孙瓒
+			dcyicong:{
+				trigger:{
+					player:["changeHp"],
+				},
+				audio:2,
+				forced:true,
+				filter:function(event,player){
+					return get.sgn(player.getDamagedHp()-1.5)!=get.sgn(player.getDamagedHp()-1.5+event.num);
+				},
+				content:function (){},
+				mod:{
+					globalFrom:function(from,to,current){
+						return current-1;
+					},
+					globalTo:function(from,to,current){
+						if(to.getDamagedHp()>=2) return current+1;
+					},
+				},
+				ai:{
+					threaten:0.8
+				}
+			},
 			//朱治
 			reanguo:{
 				audio:2,
@@ -3234,6 +3425,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				group:'rejiaozhao_base',
+				locked:false,
 				mod:{
 					targetEnabled:function(card,player,target){
 						if(player==target&&card.storage&&card.storage.rejiaozhao) return false;
@@ -5222,6 +5414,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				filter:function(event,player){
 					if(event.name=='link') return event.player.isLinked();
+					return true;
+				},
+				check:function(event,player){
+					return get.attitude(player,event.player)>0;
+				},
+				content:function(){
+					trigger.player.draw();
+				},
+			},
+			dcfaen:{
+				audio:'refaen',
+				audioname:['dc_chenqun'],
+				trigger:{global:['turnOverAfter','linkAfter']},
+				logTarget:'player',
+				filter:function(event,player){
+					if(event.name=='link') return event.player.isLinked();
 					return !event.player.isTurnedOver();
 				},
 				check:function(event,player){
@@ -5311,6 +5519,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				audio:'lihuo',
+				locked:false,
 				prompt2:function(event){
 					return '将'+get.translation(event.card)+'改为火属性';
 				},
@@ -9150,15 +9359,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olxueyi:{
 				audio:2,
-				trigger:{global:'phaseBefore'},
+				trigger:{global:'phaseBefore',player:'enterGame'},
 				forced:true,
 				zhuSkill:true,
 				unique:true,
 				filter:function(event,player){
-					return !player.storage.olxueyi_inited&&player.hasZhuSkill('olxueyi');
+					return (event.name!='phase'||game.phaseNumber==0)&&player.hasZhuSkill('olxueyi');
 				},
 				content:function(){
-					player.storage.olxueyi_inited=true;
+					// player.storage.olxueyi_inited=true;
 					var num=game.countPlayer(function(current){
 						return	current.group=='qun';
 					})
@@ -9596,6 +9805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},player,list);
 				},
+				mark:true,
 				intro:{
 					onunmark:function(storage,player){
 						_status.characterlist.addArray(storage.character);
@@ -9871,6 +10081,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				silent:true,
 				popup:false,
+				charlotte:true,
 				firstDo:true,
 				filter:function(event,player){
 					return event.skill&&event.skill.indexOf('reguhuo_')==0;
@@ -10774,7 +10985,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				locked:false,
 				audio:"wusheng",
-				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo','re_guanzhang'],
+				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo','re_guanzhang','dc_jsp_guanyu'],
 				enable:["chooseToRespond","chooseToUse"],
 				filterCard:function(card,player){
 					if(get.zhu(player,'shouyue')) return true;
@@ -11069,7 +11280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:true,
 			},
-			"new_reqingnang":{
+			new_reqingnang:{
 				subSkill:{
 					off:{
 						sub:true,
@@ -11078,7 +11289,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						sub:true,
 					},
 				},
-				audio:"qingnang",
+				audio:2,
 				enable:"phaseUse",
 				filterCard:true,
 				check:function (card){
@@ -13267,7 +13478,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else if(get.mode()=='guozhan'){
-						player.chooseBool('是否将'+get.translation(card)+'作为【田】置于武将牌上？').set('frequentSkill','retuntian').ai=function(){
+						player.chooseBool('是否将'+get.translation(card)+'作为“田”置于武将牌上？').set('frequentSkill','retuntian').ai=function(){
 							return true;
 						};
 					}
@@ -13868,7 +14079,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_baosanniang:'手杀鲍三娘',
 			retuntian:'屯田',
 			rebeige:'悲歌',
-			retuntian_info:'当你于回合外失去牌时，你可以进行一次判定。若判定结果为♥，你获得此判定牌。否则你将此牌置于你的武将牌上，称之为【田】。锁定技，你计算与其他角色的距离时-X（X为你武将牌上【田】的数目）',
+			retuntian_info:'①当你于回合外失去牌后，你可以判定。若判定结果为♥，你获得此判定牌。否则你将此牌置于你的武将牌上，称为“田”。②你计算与其他角色的距离时-X（X为你武将牌上“田”的数目）。',
 			rebeige_info:'当有角色受到【杀】造成的伤害后，你可以弃一张牌，并令其进行一次判定，若判定结果为：♥该角色回复X点体力(X为伤害点数)；♦︎该角色摸三张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
 			re_liushan:'手杀刘禅',
 			re_sunben:'界孙笨',
@@ -14004,8 +14215,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_dengai:'界邓艾',
 			oltuntian:'屯田',
 			olzaoxian:'凿险',
-			oltuntian_info:'当你于回合外失去牌后，或于回合内因弃置而失去【杀】后，你可以进行判定。若判定结果不为♥，则你将此牌置于你的武将牌上，称之为【田】。锁定技，你计算与其他角色的距离时-X（X为你武将牌上【田】的数目）',
-			olzaoxian_info:'觉醒技，准备阶段，若你武将牌上【田】的数量达到3张或更多，则你减1点体力上限，并获得技能〖急袭〗。你于当前回合结束后进行一个额外的回合。',
+			oltuntian_info:'①当你于回合外失去牌后，或于回合内因弃置而失去【杀】后，你可以判定。若判定结果不为♥，则你将此牌置于你的武将牌上，称为“田”。②你计算与其他角色的距离时-X（X为你武将牌上“田”的数目）。',
+			olzaoxian_info:'觉醒技，准备阶段，若你武将牌上“田”的数量达到3张或更多，则你减1点体力上限，并获得技能〖急袭〗。你于当前回合结束后进行一个额外的回合。',
 			re_sunxiu:'界孙休',
 			re_caoxiu:'界曹休',
 			xin_lingtong:'界凌统',
@@ -14070,7 +14281,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			redingpin:'定品',
 			redingpin_info:'出牌阶段，你可以弃置一张本回合未使用过/弃置过的类型的牌并选择一名角色。其进行判定，若结果为：黑色，其摸X张牌（X为其体力值且至多为3）且本回合内不能再成为〖定品〗的目标；红桃，你令此次弃置的牌不计入〖定品〗弃置牌合法性的检测；方片，你将武将牌翻面。',
 			refaen:'法恩',
-			refaen_info:'一名角色翻至正面或横置后，你可令其摸一张牌。',
+			refaen_info:'一名角色翻面或横置后，你可令其摸一张牌。',
+			dcfaen:'法恩',
+			dcfaen_info:'一名角色翻至正面或横置后，你可令其摸一张牌。',
 			reshizhi:'矢志',
 			reshizhi_info:'锁定技，若你的体力值为1，则你的【闪】视为【杀】，且当你使用对应的实体牌为一张【闪】的非转化普通杀造成伤害后，你回复1点体力。',
 			re_guotufengji:'界郭图逢纪',
@@ -14111,7 +14324,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rebingyi_info:'结束阶段，你可展示所有手牌。若这些牌：颜色均相同，则你可以令至多X名角色各摸一张牌（X为你的手牌数）；点数均相同，则你摸一张牌。',
 			re_jiaxu:'界贾诩',
 			rewansha:'完杀',
-			rewansha_info:'锁定技。①你的回合内，不处于濒死状态的角色不能使用【桃】。②当有角色于你的回合内进入濒死状态时，你令其以外的所有其他角色的非锁定技失效直到此濒死状态结算结束。',
+			rewansha_info:'锁定技。①你的回合内，不处于濒死状态的其他角色不能使用【桃】。②当有角色于你的回合内进入濒死状态时，你令其以外的所有其他角色的非锁定技失效直到此濒死状态结算结束。',
 			reluanwu:'乱武',
 			reluanwu_info:'限定技，出牌阶段，你可令所有其他角色依次选择一项：①对距离最近（或之一）的角色使用一张【杀】；②失去1点体力。结算完成后，你可视为使用一张【杀】（无距离限制）。',
 			reweimu:'帷幕',
@@ -14280,6 +14493,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhuzhi:'界朱治',
 			reanguo:'安国',
 			reanguo_info:'出牌阶段限一次。你可以选择一名其他角色，若其：手牌数为全场最少，其摸一张牌；体力值为全场最低，其回复1点体力；装备区内牌数为全场最少，其随机使用一张装备牌。然后若该角色有未执行的效果且你满足条件，你执行之。若你与其执行了全部分支，你可以重铸任意张牌。',
+			dcyicong:'义从',
+			dcyicong_info:'锁定技。①你至其他角色的距离-1。②若你已损失的体力值不小于2，则其他角色至你的距离+1。',
+			re_zhangsong:'界张松',
+			rexiantu:'献图',
+			rexiantu_info:'其他角色的出牌阶段开始时，你可以摸两张牌，然后将两张牌交给该角色。然后此阶段结束时，若其于此阶段没有造成过伤害，你失去1点体力。',
+			re_jsp_huangyueying:'界SP黄月英',
+			re_jsp_huangyueying_ab:'黄月英',
+			rejiqiao:'机巧',
+			rejiqiao_info:'出牌阶段开始时，你可以弃置任意张牌，然后亮出牌堆顶X张牌（X为你以此法弃置的牌数与其中装备牌数之和），你获得其中所有非装备牌。',
+			relinglong:'玲珑',
+			relinglong_info:'锁定技。若你的装备区：没有防具牌，视为你装备【八卦阵】；没有坐骑牌，你的手牌上限+2；没有宝物牌，你视为拥有〖奇才〗；以上均满足：你使用的【杀】或普通锦囊牌不可被响应。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
