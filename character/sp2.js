@@ -516,7 +516,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:2,
 				complexCard:true,
 				prompt:'弃置两张颜色不同的牌并改变天气',
-				check:(card)=>5.5-get.value(card),
+				check:(card)=>4.5-get.value(card),
 				content:function(){
 					'step 0'
 					var list=['烈日','雷电','大浪','暴雨','大雾'].randomGets(2);
