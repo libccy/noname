@@ -83,6 +83,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanzhongliu:{
 				audio:2,
+				audioname:['clan_wangling'],
 				trigger:{player:'useCard'},
 				forced:true,
 				clanSkill:true,
