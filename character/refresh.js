@@ -12299,7 +12299,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			reyingzi:{
 				audio:2,
-				audioname:['heqi','sunce','gexuan','re_sunben','re_sunce','re_heqi'],
+				audioname:['heqi','sunce','gexuan','re_sunben','re_sunce','re_heqi','re_sunyi'],
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				preHidden:true,
