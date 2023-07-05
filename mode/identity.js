@@ -1696,10 +1696,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else if(lib.character[name][1]=='shen'&&!lib.character[name][4].contains('hiddenSkill')&&get.config('choose_group')){
 						var list=lib.group.slice(0);
 						list.remove('shen');
+						// 神武将选择势力（若开启）可点击取消了
+						list.push('cancel2');
 						game.me.chooseControl(list).set('prompt','请选择神武将的势力');
 					}
 					"step 2"
 					event.group=result.control||false;
+					// 神武将选择势力（若开启）可点击取消了
+					if(event.group=='cancel2'){
+						event.group='shen';
+					}
 					if(event.choosed.length==2){
 						game.me.init(event.choosed[0],event.choosed[1]);
 					}
