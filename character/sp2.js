@@ -9335,6 +9335,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.classList.add('scroll1');
 						dialog.classList.add('scroll2');
 						dialog.classList.add('fullwidth');
+						dialog.classList.add('fullheight');
 						dialog.buttonss=[];
 						
 						var list=['仅展示牌的玩家','交出牌的玩家']

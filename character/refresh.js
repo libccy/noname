@@ -11054,7 +11054,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.addTempSkill('new_yijue2');
 						event.finish();
 					}
-					else{
+					else if(get.color(event.card2)=='red'){
 						player.gain(event.card2,target,'give','bySelf');
 						if(target.hp<target.maxHp){
 							player.chooseBool('是否让目标回复一点体力？').ai=function(event,player){
