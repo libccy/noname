@@ -1742,6 +1742,9 @@ div:not(.handcards)>.card>.info>span,
 	margin-top: 0;
 	margin-bottom: 0;
 }
+.content>.caption + .buttons:last-child{
+	margin-top: 0;
+}
 .content>.config {
 	height: 20px;
 	line-height: 20px;

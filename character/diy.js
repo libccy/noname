@@ -19005,5 +19005,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_duji:'画饼杜畿',
 			ns_duji_ab:'杜畿',
 		},
+		pinyins:{
+			加藤うみ:['yīng','yuán','yǔ','wèi'],
+		},
 	};
 });

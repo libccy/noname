@@ -94,6 +94,15 @@
 		hookmap:{},
 		imported:{},
 		layoutfixed:['chess','tafang','stone'],
+		pinyins:{
+			shengmu:['zh','ch','sh','b','p','m','f','d','t','l','n','g','k','h','j','q','x','r','z','c','s','y','w'],
+			special_shengmu:['j','q','x','y'],
+			feizhumu:{
+				i:['ing','iu','ie','in'],
+				u:['ui','un'],
+				ü:['üe','ün'],
+			},
+		},
 		characterDialogGroup:{
 			'收藏':function(name,capt){
 				return lib.config.favouriteCharacter.contains(name)?capt:null;
@@ -5016,9 +5025,9 @@
 							online:'Online',
 							rewrite:'Rewrite',
 							chaoming:'潮鸣',
-							randombf:'随机播放',
+							random:'随机播放',
 						},
-						init:'randombf',
+						init:'rewrite',
 						onclick:function(item){
 							game.saveConfig('aozhan_bgm',item,this._link.config.mode);
 							if(_status._aozhan==true) game.playBackgroundMusic();
@@ -14655,13 +14664,16 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
-					event.dialog.add('<div class="text center">（若对话框显示不完整，可下滑操作）</div>');
+					var expand_length=0;
 					var directh=!lib.config.unauto_choose;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getCards('h');
 							if(hs.length){
-								event.dialog.addText('手牌区');
+								expand_length+=Math.ceil(hs.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								hs.randomSort();
 								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
@@ -14675,7 +14687,10 @@
 						else if(event.position[i]=='e'){
 							var es=target.getCards('e');
 							if(es.length){
-								event.dialog.addText('装备区');
+								expand_length+=Math.ceil(es.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">装备区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(es);
 								directh=false;
 							}
@@ -14683,7 +14698,10 @@
 						else if(event.position[i]=='j'){
 							var js=target.getCards('j');
 							if(js.length){
-								event.dialog.addText('判定区');
+								expand_length+=Math.ceil(js.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(js);
 								directh=false;
 							}
@@ -14721,8 +14739,10 @@
 							event.dialog.open();
 							game.check();
 							game.pause();
-							ui.arena.classList.add('choose-player-card');
-							event.dialog.classList.add('fullheight');
+							if(expand_length>2){
+								ui.arena.classList.add('choose-player-card');
+								event.dialog.classList.add('fullheight');
+							}
 						}
 						else if(event.isOnline()){
 							event.send();
@@ -14781,13 +14801,16 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
-					event.dialog.add('<div class="text center">（若对话框显示不完整，可下滑操作）</div>');
 					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
+					var expand_length=0;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getDiscardableCards(player,'h');
 							if(hs.length){
-								event.dialog.addText('手牌区');
+								expand_length+=Math.ceil(hs.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								hs.randomSort();
 								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
@@ -14801,7 +14824,10 @@
 						else if(event.position[i]=='e'){
 							var es=target.getDiscardableCards(player,'e');
 							if(es.length){
-								event.dialog.addText('装备区');
+								expand_length+=Math.ceil(es.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">装备区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(es);
 								directh=false;
 							}
@@ -14809,7 +14835,10 @@
 						else if(event.position[i]=='j'){
 							var js=target.getDiscardableCards(player,'j');
 							if(js.length){
-								event.dialog.addText('判定区');
+								expand_length+=Math.ceil(js.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(js);
 								directh=false;
 							}
@@ -14843,8 +14872,10 @@
 							event.dialog.open();
 							game.check();
 							game.pause();
-							ui.arena.classList.add('discard-player-card');
-							event.dialog.classList.add('fullheight');
+							if(expand_length>2){
+								ui.arena.classList.add('discard-player-card');
+								event.dialog.classList.add('fullheight');
+							}
 						}
 						else if(event.isOnline()){
 							event.send();
@@ -14931,13 +14962,16 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
-					event.dialog.add('<div class="text center">（若对话框显示不完整，可下滑操作）</div>');
+					var expand_length=0;
 					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getGainableCards(player,'h');
 							if(hs.length){
-								event.dialog.addText('手牌区');
+								expand_length+=Math.ceil(hs.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								hs.randomSort();
 								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
@@ -14951,7 +14985,10 @@
 						else if(event.position[i]=='e'){
 							var es=target.getGainableCards(player,'e');
 							if(es.length){
-								event.dialog.addText('装备区');
+								expand_length+=Math.ceil(es.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">装备区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(es);
 								directh=false;
 							}
@@ -14959,7 +14996,10 @@
 						else if(event.position[i]=='j'){
 							var js=target.getGainableCards(player,'j');
 							if(js.length){
-								event.dialog.addText('判定区');
+								expand_length+=Math.ceil(js.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(js);
 								directh=false;
 							}
@@ -14994,8 +15034,10 @@
 							event.dialog.open();
 							game.check();
 							game.pause();
-							ui.arena.classList.add('gain-player-card');
-							event.dialog.classList.add('fullheight');
+							if(expand_length>2){
+								ui.arena.classList.add('gain-player-card');
+								event.dialog.classList.add('fullheight');
+							}
 						}
 						else if(event.isOnline()){
 							event.send();
@@ -31232,18 +31274,11 @@
 				ui.backgroundMusic.src='';
 			}
 			else if(_status._aozhan==true&&lib.config.mode_config.guozhan.aozhan_bgm!='disabled'){
-				if(lib.config.mode_config.guozhan.aozhan_bgm=='randombf'){
-					var list=[
-						'audio/background/aozhan_online.mp3',
-						'audio/background/aozhan_chaoming.mp3',
-						'audio/background/aozhan_rewrite.mp3'
-					];
-					var url=list.randomGet();
-					ui.backgroundMusic.src=lib.assetURL+url;
-				}else{
-					var aozhan=lib.config.mode_config.guozhan.aozhan_bgm;
-					ui.backgroundMusic.src=lib.assetURL+'audio/background/aozhan_'+aozhan+'.mp3';
+				var aozhan=lib.config.mode_config.guozhan.aozhan_bgm;
+				if(aozhan=='random'){
+					aozhan=['online','rewrite','chaoming'].randomGet();
 				}
+				ui.backgroundMusic.src=lib.assetURL+'audio/background/aozhan_'+aozhan+'.mp3';
 			}
 			else{
 				var music=lib.config.background_music;
@@ -46502,6 +46537,11 @@
 						});
 					}
 				}
+				lib.init.js(lib.assetURL+'game/pinyin','pinyin_dict_polyphone',function(){
+					lib.init.js(lib.assetURL+'game/pinyin','pinyin_dict_withtone',function(){
+						lib.init.js(lib.assetURL+'game/pinyin','pinyinUtil',function(){})
+					})
+				})
 				lib.init.js(lib.assetURL+'game','keyWords',function(){});
 				
 				lib.updateURL=lib.updateURLS[lib.config.update_link]||lib.updateURLS.coding;
@@ -51965,6 +52005,44 @@
 		},
 	};
 	var get={
+		pinyin:function(chinese,withtone){
+			const util=window.pinyinUtil;
+			if(!window.pinyinUtil) return [];
+			if(lib.pinyins&&lib.pinyins[chinese]){
+				const str=lib.pinyins[chinese];
+				if(withtone===false){
+					for(let i=0;i<str.length;i++){
+						str[i]=util.removeTone(str[i]);
+					}
+				}
+				return str;
+			}
+			return util.getPinyin(chinese,null,withtone,true);
+		},
+		yunmu:function(str){
+			//排除声母
+			for(let i of lib.pinyins.shengmu){
+				if(str.indexOf(i)==0){
+					str=str.slice(i.length);
+					if(str[0]=='u'&&lib.pinyins.special_shengmu.contains(i)) str='ü'+str.slice(1);
+					break;
+				}
+			}
+			//排除助母
+			if(str.length>0){
+				for(let i in lib.pinyins.feizhumu){
+					if(str[0]==i){
+						let goon=false;
+						for(let j of lib.pinyins.feizhumu[i]){
+							if(str.indexOf(j)==0) goon=true;
+						}
+						if(!goon) str=str.slice(1);
+						break;
+					}
+				}
+			}
+			return str;
+		},
 		skillCategoriesOf:function(skill,player){
 			var list=[],info=get.info(skill);
 			if(!info) return list;
@@ -52043,6 +52121,13 @@
 			return 0;
 		},
 		is:{
+			yayun:function(str1,str2){
+				var pinyin1=get.pinyin(str1,false),pinyin2=get.pinyin(str2,false);
+				if(!pinyin1.length||!pinyin2.length) return false;
+				var pron1=pinyin1[pinyin1.length-1],pron2=pinyin2[pinyin2.length-1];
+				if(pron1==pron2) return true;
+				return get.yunmu(pron1)==get.yunmu(pron2);
+			},
 			blocked:function(skill,player){
 				if(!player.storage.skill_blocker||!player.storage.skill_blocker.length) return false;
 				for(var i of player.storage.skill_blocker){
@@ -54908,7 +54993,7 @@
 							if(ui.throwEmotion){
 								for(var i of ui.throwEmotion) i.classList.remove('exclude');
 							}
-						},(emotion=='flower'||emotion=='egg')?5:10)
+						},(emotion=='flower'||emotion=='egg')?500:5000)
 					};
 					var td;
 					var table=document.createElement('div');
