@@ -97,11 +97,12 @@
 		pinyins:{
 			shengmu:['zh','ch','sh','b','p','m','f','d','t','l','n','g','k','h','j','q','x','r','z','c','s','y','w'],
 			special_shengmu:['j','q','x','y'],
-			feizhumu:{
+			feijiemu:{
 				i:['ing','iu','ie','in'],
 				u:['ui','un'],
 				ü:['üe','ün'],
 			},
+			zhengtirendu:['zhi','chi','shi','ri','zi','ci','si'],
 		},
 		characterDialogGroup:{
 			'收藏':function(name,capt){
@@ -52020,6 +52021,11 @@
 			return util.getPinyin(chinese,null,withtone,true);
 		},
 		yunmu:function(str){
+			//部分整体认读音节特化处理
+			const util=window.pinyinUtil;
+			if(lib.pinyins.zhengtirendu.contains(util.removeTone(str))){
+				return '-'+str[str.length-1];
+			}
 			//排除声母
 			for(let i of lib.pinyins.shengmu){
 				if(str.indexOf(i)==0){
@@ -52028,12 +52034,12 @@
 					break;
 				}
 			}
-			//排除助母
+			//排除介母
 			if(str.length>0){
-				for(let i in lib.pinyins.feizhumu){
+				for(let i in lib.pinyins.feijiemu){
 					if(str[0]==i){
 						let goon=false;
-						for(let j of lib.pinyins.feizhumu[i]){
+						for(let j of lib.pinyins.feijiemu[i]){
 							if(str.indexOf(j)==0) goon=true;
 						}
 						if(!goon) str=str.slice(1);
@@ -52122,6 +52128,7 @@
 		},
 		is:{
 			yayun:function(str1,str2){
+				if(str1==str2) return true;
 				var pinyin1=get.pinyin(str1,false),pinyin2=get.pinyin(str2,false);
 				if(!pinyin1.length||!pinyin2.length) return false;
 				var pron1=pinyin1[pinyin1.length-1],pron2=pinyin2[pinyin2.length-1];

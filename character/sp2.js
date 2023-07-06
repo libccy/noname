@@ -4,8 +4,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
-            ruanji:['male','wei',3,['dczhaowen','dcjiudun']],
-            wu_zhugeliang:['male','shu','4/7',['dcjincui','dcqingshi','dczhizhe']],
+			libai:['male','qun',2,['dclbjiuxian','dcshixian']],
+			ruanji:['male','wei',3,['dczhaowen','dcjiudun']],
+			wu_zhugeliang:['male','shu','4/7',['dcjincui','dcqingshi','dczhizhe']],
 			sunwukong:['male','qun',3,['dcjinjing','dccibei','dcruyi']],
 			longwang:['male','qun',3,['dclonggong','dcsitian']],
 			taoshen:['male','qun',3,['dcnutao']],
@@ -270,11 +271,121 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun'],
 				sp2_wumiao:['wu_zhugeliang'],
-				sp2_xiyouji:['taoshen','sunwukong','longwang'],
+				sp2_xiyouji:['taoshen','sunwukong','longwang','libai'],
 				sp_decade:['caobuxing','re_maliang','xin_baosanniang','dongxie','liuhui'],
 			}
 		},
 		skill:{
+			//李白
+			dclbjiuxian:{
+				audio:2,
+				enable:'chooseToUse',
+				locked:false,
+				viewAs:{name:'jiu'},
+				filterCard:function(card){
+					var info=get.info(card);
+					if(!info||(info.type!='trick'&&info.type!='delay')) return false;
+					if(info.notarget) return false;
+					if(info.selectTarget!=undefined){
+						if(Array.isArray(info.selectTarget)){
+							if(info.selectTarget[0]<0) return !info.toself;
+							return info.selectTarget[0]!=1||info.selectTarget[1]!=1;
+						}
+						else{
+							if(info.selectTarget<0) return !info.toself;
+							return info.selectTarget!=1;
+						}
+					}
+					return false;
+				},
+				viewAsFilter:function(player){
+					if(_status.connectMode&&player.countCards('hs')>0) return true;
+					return player.hasCard(lib.skill.dclbjiuxian.filterCard,'hs')
+				},
+				mod:{
+					cardUsable:function(card){
+						if(card.name=='jiu') return Infinity;
+					},
+				},
+			},
+			dcshixian:{
+				audio:2,
+				trigger:{player:'useCard'},
+				frequent:true,
+				direct:true,
+				filter:function(event,player){
+					if(event.card.storage&&event.card.storage.tongli) return false;
+					var history=player.getHistory('useCard',function(event){
+						return !event.card.storage||!event.card.storage.tongli;
+					}),index=history.indexOf(event);
+					if(index<1) return false;
+					var evt=history[index-1];
+					return get.is.yayun(get.translation(event.card.name),get.translation(evt.card.name));
+				},
+				filterx:function(event){
+					if(event.targets.length==0) return false;
+					var type=get.type(event.card);
+					if(type!='basic'&&type!='trick') return false;
+					return true;
+				},
+				content:function(){
+					'step 0'
+					if(lib.skill.dcshixian.filterx(trigger)){
+						player.chooseControl('cancel2').set('choiceList',[
+							'摸一张牌',
+							'令'+get.translation(trigger.card)+'额外结算一次',
+						]).set('',get.prompt('dcsitian'));
+					}
+					else{
+						player.chooseBool('是否发动【诗仙】摸一张牌？').set('frequentSkill','dcshixian');
+					}
+					'step 1'
+					if(result.control){
+						if(result.index==0){
+							player.logSkill('dcshixian');
+							player.draw();
+						}
+						else if(result.index==1){
+							player.addTempSkill('dcshixian_effect');
+							trigger.dcshixian_effect={
+								name:trigger.card.name,
+								nature:trigger.card.nature,
+								isCard:true,
+								storage:{tongli:true},
+							};
+						}
+					}
+					else if(result.bool){
+						player.logSkill('dcshixian');
+						player.draw();
+					}
+				},
+				subSkill:{
+					effect:{
+						trigger:{player:'useCardAfter'},
+						forced:true,
+						charlotte:true,
+						filter:function(event,player){
+							return event.dcshixian_effect!=undefined;
+						},
+						content:function(){
+							var card=trigger.dcshixian_effect;
+							for(var i of trigger.targets){
+								if(!i.isIn()||!player.canUse(card,i,false)) return;
+							}
+							if(trigger.addedTarget&&!trigger.addedTarget.isIn()) return;
+							if(trigger.addedTargets&&trigger.addedTargets.length){
+								for(var i of trigger.addedTargets){
+									if(!i.isIn()) return;
+								}
+							}
+							var next=player.useCard(get.copy(card),trigger.targets,false);
+							if(trigger.addedTarget) next.addedTarget=trigger.addedTarget;
+							if(trigger.addedTargets&&trigger.addedTargets.length) next.addedTargets=trigger.addedTargets.slice(0);
+						},
+					},
+				},
+			},
 			//阮籍
 			dczhaowen:{
 				audio:2,
@@ -863,11 +974,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'摸'+get.cnNumber(player.hp)+'张牌，然后〖情势〗于本回合失效'
 					];
 					if(trigger.targets&&trigger.targets.length) choices.push('选项一');
-                    else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'(无目标角色)</span>';
+					else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'(无目标角色)</span>';
 					if(game.countPlayer(i=>i!=player)) choices.push('选项二');
-                    else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
 					if(player.hp>0) choices.push('选项三');
-                    else choiceList[2]='<span style="opacity:0.5">'+choiceList[1]+'(体力值为0)</span>';
+					else choiceList[2]='<span style="opacity:0.5">'+choiceList[1]+'(体力值为0)</span>';
 					player.chooseControl(choices,'cancel2').set('choiceList',choiceList).set('prompt',get.prompt('dcqingshi')).set('ai',()=>{
 						return _status.event.choice;
 					}).set('choice',(()=>{
@@ -31023,6 +31134,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhaowen_info:'出牌阶段开始时，你可以展示所有手牌。然后你于本回合获得如下效果：1.你可以将其中一张黑色牌当做任意一张普通锦囊牌使用（每回合每种牌名限一次）；2.当你使用其中的一张红色牌时，你摸一张牌。',
 			dcjiudun:'酒遁',
 			dcjiudun_info:'①以你为目标的【酒】（使用方法①）的作用效果改为“目标对应的角色使用的下一张【杀】的伤害基数+1”。②当你成为其他角色使用黑色牌的目标后，若你：未处于【酒】状态，你可以摸一张牌并视为使用一张【酒】；处于【酒】状态，你可以弃置一张手牌令此牌对你无效。',
+			libai:'李白',
+			dclbjiuxian:'酒仙',
+			dclbjiuxian_info:'①你可以将额定目标数大于1的锦囊牌当做【酒】使用。②你使用【酒】无次数限制。',
+			dcshixian:'诗仙',
+			dcshixian_info:'当你使用一张牌时，若此牌的牌名与你本回合使用的上一张牌的牌名押韵，则你可以选择一项：⒈摸一张牌。⒉令此牌额外结算一次。',
 
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
