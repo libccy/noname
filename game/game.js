@@ -5016,8 +5016,9 @@
 							online:'Online',
 							rewrite:'Rewrite',
 							chaoming:'潮鸣',
+							randombf:'随机播放',
 						},
-						init:'rewrite',
+						init:'randombf',
 						onclick:function(item){
 							game.saveConfig('aozhan_bgm',item,this._link.config.mode);
 							if(_status._aozhan==true) game.playBackgroundMusic();
@@ -10556,6 +10557,7 @@
 						dialog.classList.add('scroll1');
 						dialog.classList.add('scroll2');
 						dialog.classList.add('fullwidth');
+						dialog.classList.add('fullheight');
 						dialog.buttonss=[];
 						
 						var list=['意见为红色的角色','意见为黑色的角色']
@@ -14653,6 +14655,7 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
+					event.dialog.add('<div class="text center">（若对话框显示不完整，可下滑操作）</div>');
 					var directh=!lib.config.unauto_choose;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
@@ -14718,6 +14721,8 @@
 							event.dialog.open();
 							game.check();
 							game.pause();
+							ui.arena.classList.add('choose-player-card');
+							event.dialog.classList.add('fullheight');
 						}
 						else if(event.isOnline()){
 							event.send();
@@ -14737,6 +14742,7 @@
 						event.result.cards=event.result.links.slice(0);
 					}
 					event.resume();
+					ui.arena.classList.remove('choose-player-card');
 				},
 				discardPlayerCard:function(){
 					"step 0"
@@ -14775,6 +14781,7 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
+					event.dialog.add('<div class="text center">（若对话框显示不完整，可下滑操作）</div>');
 					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
@@ -14836,6 +14843,8 @@
 							event.dialog.open();
 							game.check();
 							game.pause();
+							ui.arena.classList.add('discard-player-card');
+							event.dialog.classList.add('fullheight');
 						}
 						else if(event.isOnline()){
 							event.send();
@@ -14853,6 +14862,7 @@
 					event.dialog.close();
 					"step 2"
 					event.resume();
+					ui.arena.classList.remove('discard-player-card');
 					if(event.result.bool&&event.result.links&&!game.online){
 						if(event.logSkill){
 							if(typeof event.logSkill=='string'){
@@ -14921,6 +14931,7 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
+					event.dialog.add('<div class="text center">（若对话框显示不完整，可下滑操作）</div>');
 					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
@@ -14983,6 +14994,8 @@
 							event.dialog.open();
 							game.check();
 							game.pause();
+							ui.arena.classList.add('gain-player-card');
+							event.dialog.classList.add('fullheight');
 						}
 						else if(event.isOnline()){
 							event.send();
@@ -15000,6 +15013,7 @@
 					event.dialog.close();
 					"step 2"
 					event.resume();
+					ui.arena.classList.remove('gain-player-card');
 					if(game.online||!event.result.bool){
 						event.finish();
 					}
@@ -31218,8 +31232,18 @@
 				ui.backgroundMusic.src='';
 			}
 			else if(_status._aozhan==true&&lib.config.mode_config.guozhan.aozhan_bgm!='disabled'){
-				var aozhan=lib.config.mode_config.guozhan.aozhan_bgm;
-				ui.backgroundMusic.src=lib.assetURL+'audio/background/aozhan_'+aozhan+'.mp3';
+				if(lib.config.mode_config.guozhan.aozhan_bgm=='randombf'){
+					var list=[
+						'audio/background/aozhan_online.mp3',
+						'audio/background/aozhan_chaoming.mp3',
+						'audio/background/aozhan_rewrite.mp3'
+					];
+					var url=list.randomGet();
+					ui.backgroundMusic.src=lib.assetURL+url;
+				}else{
+					var aozhan=lib.config.mode_config.guozhan.aozhan_bgm;
+					ui.backgroundMusic.src=lib.assetURL+'audio/background/aozhan_'+aozhan+'.mp3';
+				}
 			}
 			else{
 				var music=lib.config.background_music;
@@ -34137,27 +34161,22 @@
 			}
 			if(game.download&&!keepfile){
 				if(lib.node&&lib.node.fs){
-					try{
-						lib.node.fs.readdir(__dirname+'/extension/'+extname,function(err,list){
-							if(err){
-								return;
-							}
-							var removeFile=function(){
-								if(list.length){
-									var filename=list.shift();
-									lib.node.fs.unlink(__dirname+'/extension/'+extname+'/'+filename,removeFile);
-								}
-								else{
-									try{
-										lib.node.fs.rmdir(__dirname+'/extension/'+extname,function(){});
+					try {
+						var deleteFolderRecursive = function(path) {
+							if (lib.node.fs.existsSync(path)) {
+								lib.node.fs.readdirSync(path).forEach(function(file, index){
+									var curPath = path + "/" + file;
+									if (lib.node.fs.lstatSync(curPath).isDirectory()) {
+										deleteFolderRecursive(curPath);
+									} else {
+										lib.node.fs.unlinkSync(curPath);
 									}
-									catch(e){}
-								}
+								});
+								lib.node.fs.rmdirSync(path);
 							}
-							removeFile();
-						});
-					}
-					catch(e){}
+						};
+						deleteFolderRecursive(__dirname+'/extension/'+extname);
+					} catch(e) {}
 				}
 				else{
 					window.resolveLocalFileSystemURL(lib.assetURL+'extension/'+extname,function(entry){
@@ -54889,7 +54908,7 @@
 							if(ui.throwEmotion){
 								for(var i of ui.throwEmotion) i.classList.remove('exclude');
 							}
-						},(emotion=='flower'||emotion=='egg')?5000:10000)
+						},(emotion=='flower'||emotion=='egg')?5:10)
 					};
 					var td;
 					var table=document.createElement('div');
