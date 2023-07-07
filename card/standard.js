@@ -2084,9 +2084,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					trigger.target.chooseToDiscard('弃置一张手牌，或令'+get.translation(player)+'摸一张牌').set('ai',function(card){
+					if(!trigger.target.countCards('h')) event._result={bool:false};
+					else trigger.target.chooseToDiscard('弃置一张手牌，或令'+get.translation(player)+'摸一张牌').set('ai',function(card){
 						var trigger=_status.event.getTrigger();
-						return -get.attitude(trigger.target,trigger.player)-get.value(card);
+						return -get.attitude(trigger.target,trigger.player)-get.value(card)-Math.max(0,4-trigger.target.hp)*2;
 					});
 					"step 1"
 					if(result.bool==false) player.draw();
