@@ -7816,12 +7816,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('type',type).set('ai',()=>-1).logSkill='olfengzi';
 					'step 1'
 					if(result.bool){
-						player.addTempSkill('olfengzi_buff','phaseUseAfter');
-						trigger.olfengzi_buff=player;
+						trigger.effectCount++;
 					}
 					else player.storage.counttrigger.olfengzi--;
 				},
-				subSkill:{
+				/*subSkill:{
 					buff:{
 						trigger:{global:'useCardToTargeted'},
 						forced:true,
@@ -7839,7 +7838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							delete player.storage.counttrigger.olfengji;
 						},
 					},
-				},
+				},*/
 			},
 			oljizhan:{
 				audio:2,

@@ -1240,7 +1240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					return get.type(event.card,null,false)=='trick'&&!get.tag(event.card,'damage')&&event.cards.filterInD('d').length>0&&player.getHistory('useCard',evt=>{
+					return get.type(event.card,null,false)=='trick'&&!get.tag(event.card,'damage')&&event.cards.filterInD().length>0&&player.getHistory('useCard',evt=>{
 						return get.type(evt.card,null,false)=='trick'&&!get.tag(evt.card,'damage');
 					}).indexOf(event)==0;
 				},

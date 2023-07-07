@@ -95,14 +95,32 @@
 		imported:{},
 		layoutfixed:['chess','tafang','stone'],
 		pinyins:{
-			shengmu:['zh','ch','sh','b','p','m','f','d','t','l','n','g','k','h','j','q','x','r','z','c','s','y','w'],
-			special_shengmu:['j','q','x','y'],
-			feijiemu:{
-				i:['ing','iu','ie','in'],
-				u:['ui','un'],
-				ü:['üe','ün'],
-			},
-			zhengtirendu:['zhi','chi','shi','ri','zi','ci','si'],
+			metadata:{
+				shengmu:['zh','ch','sh','b','p','m','f','d','t','l','n','g','k','h','j','q','x','r','z','c','s','y','w'],
+				special_shengmu:['j','q','x','y'],
+				feijiemu:{
+					i:['ing','iu','ie','in'],
+					u:['ui','un'],
+					ü:['üe','ün'],
+				},
+				zhengtirendu:['zhi','chi','shi','ri','zi','ci','si'],
+				yunjiao:{
+					'一麻':['a','ia','ua'],
+					'二波':['o','e','uo'],
+					'三皆':['ie','üe'],
+					'四开':['ai','uai'],
+					'五微':['ei','ui'],
+					'六豪':['ao','iao'],
+					'七尤':['ou','iu'],
+					'八寒':['an','ian','uan','üan'],
+					'九文':['en','in','un','ün'],
+					'十唐':['ang','iang','uang'],
+					'十一庚':['eng','ing','ong','ung'],
+					'十二齐':['i','er','ü'],
+					'十三支':['-i'],
+					'十四姑':['u'],
+				},
+			}
 		},
 		characterDialogGroup:{
 			'收藏':function(name,capt){
@@ -11471,7 +11489,7 @@
 						if(get.position(event.cards[1][i],true)=='o') player.equip(event.cards[1][i]);
 					}
 					for(var i=0;i<event.cards[0].length;i++){
-						if(get.position(event.cards[1][i],true)=='o') target.equip(event.cards[0][i]);
+						if(get.position(event.cards[0][i],true)=='o') target.equip(event.cards[0][i]);
 					}
 				},
 				disableEquip:function(){
@@ -14763,7 +14781,9 @@
 						event.result.cards=event.result.links.slice(0);
 					}
 					event.resume();
-					ui.arena.classList.remove('choose-player-card');
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-player-card');
+					},500);
 				},
 				discardPlayerCard:function(){
 					"step 0"
@@ -14894,7 +14914,9 @@
 					event.dialog.close();
 					"step 2"
 					event.resume();
-					ui.arena.classList.remove('discard-player-card');
+					setTimeout(function(){
+						ui.arena.classList.remove('discard-player-card');
+					},500);
 					if(event.result.bool&&event.result.links&&!game.online){
 						if(event.logSkill){
 							if(typeof event.logSkill=='string'){
@@ -15056,7 +15078,9 @@
 					event.dialog.close();
 					"step 2"
 					event.resume();
-					ui.arena.classList.remove('gain-player-card');
+					setTimeout(function(){
+						ui.arena.classList.remove('gain-player-card');
+					},500);
 					if(game.online||!event.result.bool){
 						event.finish();
 					}
@@ -15470,6 +15494,8 @@
 					event.directHit=[];
 					event.customArgs={default:{}};
 					if(typeof event.baseDamage!='number') event.baseDamage=get.info(card,false).baseDamage||1;
+					if(typeof event.effectCount!='number') event.effectCount=get.info(card,false).effectCount||1;
+					event.effectedCount=0;
 					if(event.oncard){
 						event.oncard(event.card,event.player);
 					}
@@ -15537,8 +15563,9 @@
 							}
 						}
 					}
-					if(card.name=='wuxie'){							game.logv(player,[card,cards],[event.getTrigger().card]);
-						}
+					if(card.name=='wuxie'){
+						game.logv(player,[card,cards],[event.getTrigger().card]);
+					}
 					else{
 						game.logv(player,[card,cards],targets);
 					}
@@ -15679,6 +15706,9 @@
 						event.redo();
 					}
 					"step 9"
+					if(event.all_excluded) return;
+					event.effectedCount++;
+					event.num=0;
 					var info=get.info(card,false);
 					if(info.contentBefore){
 						var next=game.createEvent(card.name+'ContentBefore');
@@ -15784,6 +15814,7 @@
 						event.goto(10);
 					}
 					"step 12"
+					if(event.all_excluded) return;
 					if(get.info(card,false).contentAfter){
 						var next=game.createEvent(card.name+'ContentAfter');
 						next.setContent(get.info(card,false).contentAfter);
@@ -15796,6 +15827,13 @@
 						if(event.forceDie) next.forceDie=true;
 					}
 					"step 13"
+					if(event.effectedCount<event.effectCount){
+						if(document.getElementsByClassName('thrown').length){
+							if(event.delayx!==false&&get.info(event.card,false).finalDelay!==false) game.delayx();
+						}
+						event.goto(9);
+					}
+					"step 14"
 					if(event.postAi){
 						event.player.logAi(event.targets,event.card);
 					}
@@ -15809,7 +15847,7 @@
 					else{
 						event.finish();
 					}
-					"step 14"
+					"step 15"
 					event._oncancel();
 				},
 				useSkill:function(){
@@ -28030,10 +28068,10 @@
 							return true;
 						}
 					}
-					if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
-						var tw=event.getTrigger().parent;
-						if(tw.player.isUnderControl(true)&&!tw.player.hasSkillTag('noautowuxie')&&
-							tw.targets&&tw.targets.length==1&&!tw.noai){
+					if(lib.config.wuxie_self){
+						var tw=event.info_map;
+						if(tw.player&&tw.player.isUnderControl(true)&&!tw.player.hasSkillTag('noautowuxie')&&
+							(!tw.targets||tw.targets.length<=1)&&!tw.noai){
 							return true;
 						}
 					}
@@ -46538,11 +46576,7 @@
 						});
 					}
 				}
-				lib.init.js(lib.assetURL+'game/pinyin','pinyin_dict_polyphone',function(){
-					lib.init.js(lib.assetURL+'game/pinyin','pinyin_dict_withtone',function(){
-						lib.init.js(lib.assetURL+'game/pinyin','pinyinUtil',function(){})
-					})
-				})
+				lib.init.js(lib.assetURL+'game','pinyinjs',function(){})
 				lib.init.js(lib.assetURL+'game','keyWords',function(){});
 				
 				lib.updateURL=lib.updateURLS[lib.config.update_link]||lib.updateURLS.coding;
@@ -52007,10 +52041,10 @@
 	};
 	var get={
 		pinyin:function(chinese,withtone){
-			const util=window.pinyinUtil;
-			if(!window.pinyinUtil) return [];
-			if(lib.pinyins&&lib.pinyins[chinese]){
-				const str=lib.pinyins[chinese];
+			const util=window.pinyinUtilx;
+			if(!window.pinyinUtilx) return [];
+			if(lib.pinyins.metadata&&lib.pinyins.metadata[chinese]){
+				const str=lib.pinyins.metadata[chinese];
 				if(withtone===false){
 					for(let i=0;i<str.length;i++){
 						str[i]=util.removeTone(str[i]);
@@ -52022,24 +52056,24 @@
 		},
 		yunmu:function(str){
 			//部分整体认读音节特化处理
-			const util=window.pinyinUtil;
-			if(lib.pinyins.zhengtirendu.contains(util.removeTone(str))){
+			const util=window.pinyinUtilx;
+			if(util&&lib.pinyins.metadata.zhengtirendu.contains(util.removeTone(str))){
 				return '-'+str[str.length-1];
 			}
 			//排除声母
-			for(let i of lib.pinyins.shengmu){
+			for(let i of lib.pinyins.metadata.shengmu){
 				if(str.indexOf(i)==0){
 					str=str.slice(i.length);
-					if(str[0]=='u'&&lib.pinyins.special_shengmu.contains(i)) str='ü'+str.slice(1);
+					if(str[0]=='u'&&lib.pinyins.metadata.special_shengmu.contains(i)) str='ü'+str.slice(1);
 					break;
 				}
 			}
 			//排除介母
 			if(str.length>0){
-				for(let i in lib.pinyins.feijiemu){
+				for(let i in lib.pinyins.metadata.feijiemu){
 					if(str[0]==i){
 						let goon=false;
-						for(let j of lib.pinyins.feijiemu[i]){
+						for(let j of lib.pinyins.metadata.feijiemu[i]){
 							if(str.indexOf(j)==0) goon=true;
 						}
 						if(!goon) str=str.slice(1);
@@ -52048,6 +52082,26 @@
 				}
 			}
 			return str;
+		},
+		yunjiao:function(str){
+			const util=window.pinyinUtilx;
+			if(util) str=util.removeTone(str)
+			if(lib.pinyins.metadata.zhengtirendu.contains(str)){
+				str=('-'+str[str.length-1]);
+			}
+			else{
+				for(let i of lib.pinyins.metadata.shengmu){
+					if(str.indexOf(i)==0){
+						str=str.slice(i.length);
+						if(str[0]=='u'&&lib.pinyins.metadata.special_shengmu.contains(i)) str='ü'+str.slice(1);
+						break;
+					}
+				}
+			}
+			for(let i in lib.pinyins.metadata.yunjiao){
+				if(lib.pinyins.metadata.yunjiao[i].contains(str)) return i;
+			}
+			return null;
 		},
 		skillCategoriesOf:function(skill,player){
 			var list=[],info=get.info(skill);
@@ -52133,7 +52187,7 @@
 				if(!pinyin1.length||!pinyin2.length) return false;
 				var pron1=pinyin1[pinyin1.length-1],pron2=pinyin2[pinyin2.length-1];
 				if(pron1==pron2) return true;
-				return get.yunmu(pron1)==get.yunmu(pron2);
+				return get.yunjiao(pron1)==get.yunjiao(pron2);
 			},
 			blocked:function(skill,player){
 				if(!player.storage.skill_blocker||!player.storage.skill_blocker.length) return false;

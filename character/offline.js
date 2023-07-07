@@ -1113,9 +1113,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var targets=game.filterPlayer(current=>{
 								return current.group==target.group&&current!=player;
 							});
-							return targets.reduce((p,c)=>{
+							var eff=targets.reduce((p,c)=>{
 								return p+get.effect(c,{name:'guohe'},player,player);
-							})+get.value(ui.selected.cards[0],target);
+							})
+							if(ui.selected.cards.length) eff+=get.value(ui.selected.cards[0],target);
+							return eff;
 						}
 					}
 				}

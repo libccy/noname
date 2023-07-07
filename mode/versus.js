@@ -4621,15 +4621,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				trigger:{
-					player:['useCard1','useCardToTargeted'],
+					player:'useCard1',
 				},
 				silent:true,
-				filter:function(event,player,name){
-					if(name=='useCard1') return true;
-					if(!event.parent.shishengshibai||event.targets.length!=event.parent.triggeredTargets4.length) return false;
-					if(!event.targets||!event.targets.length||['delay','equip'].contains(get.type(event.card))) return false;
-					return true;
-				},
 				content:function(){
 					if(event.triggername=='useCard1'){
 						if(!_status.shishengshibai) _status.shishengshibai=0;
@@ -4637,11 +4631,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.broadcastAll(function(num){
 							if(ui.guanduInfo) ui.guanduInfo.innerHTML='当前事件：十胜十败（'+num+'）';
 						},_status.shishengshibai);
-						if(_status.shishengshibai%10==0) trigger.shishengshibai=true;
-					}
-					else{
-						trigger.getParent().targets=trigger.getParent().targets.concat(trigger.targets);
-						trigger.getParent().triggeredTargets4=trigger.getParent().triggeredTargets4.concat(trigger.targets);
+						if(_status.shishengshibai%10==0&&trigger.targets&&trigger.targets.length>0&&!['delay','equip'].contains(get.type(trigger.card))){
+							trigger.effectCount++;
+						}
 					}
 				},
 				ai:{

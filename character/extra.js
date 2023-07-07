@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_yin:['shen_liubei','shen_luxun'],
 				extra_lei:['shen_ganning','shen_zhangliao'],
 				extra_key:['key_kagari','key_shiki','db_key_hina'],
-				extra_decade:['shen_jiangwei','shen_machao','shen_zhangfei','shen_zhangjiao'],
+				extra_decade:['shen_jiangwei','shen_machao','shen_zhangfei','shen_zhangjiao','shen_dengai'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji','shen_sunquan'],
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
@@ -22,6 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			shen_dengai:['male','shen',4,['dctuoyu','dcxianjin','dcqijing'],['wei']],
 			tw_shen_lvmeng:['male','shen',3,['twshelie','twgongxin'],['wu']],
 			shen_zhangjiao:['male','shen',3,['yizhao','sijun','sanshou','tianjie'],['qun']],
 			shen_zhangfei:['male','shen',4,['shencai','xunshi'],['shu']],
@@ -76,6 +77,251 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//神邓艾
+			dctuoyu:{
+				audio:2,
+				trigger:{player:['phaseUseBegin','phaseUseEnd']},
+				forced:true,
+				filter:function(event,player){
+					return player.countCards('h')>0&&player.getStorage('dctuoyu').length>0;
+				},
+				content:function(){
+					'step 0'
+					var hs=player.getCards('h'),tags=['dctuoyu_fengtian','dctuoyu_qingqu','dctuoyu_junshan'];
+					var storage=player.getStorage('dctuoyu');
+					var list=[
+						['未分配手牌（对话框较长，请下滑操作）',[]],
+						['丰田（伤害/回复值+1）',[]],
+						['清渠（无次数和距离限制）',[]],
+						['峻山（不可被响应）',[]],
+					];
+					for(var card of hs){
+						var added=false;
+						for(var i=0;i<tags.length;i++){
+							if(card.hasGaintag(tags[i]+'_tag')){
+								added=true;
+								list[i+1][1].push(card);
+								break;
+							}
+						}
+						if(!added) list[0][1].push(card);
+					}
+					if(storage.length==1){
+						event.finish();
+						player.addGaintag(list[0][1],storage[0]+'_tag');
+					}
+					else{
+						for(var row of list){
+							for(var i=0;i<tags.length;i++){
+								if(!storage.contains(tags[i])){
+									list[i+1][0]=get.translation(tags[i])+'（尚未激活）';
+								}
+							}
+						}
+						var next=player.chooseToMove('拓域：请分配你的手牌',true);
+						next.set('list',list);
+						next.set('filterMove',function(from,to){
+							var storage=_status.event.player.getStorage('dctuoyu'),tags=['dctuoyu_fengtian','dctuoyu_qingqu','dctuoyu_junshan'];
+							if(typeof to=='number'){
+								return storage.contains(tags[to-1]);
+							}
+							return true;
+						});
+						next.set('filterOk',function(moved){
+							return moved[0].length==0;
+						});
+					}
+					'step 1'
+					if(result.bool){
+						game.broadcastAll(function(moved,player){
+							var tags=['dctuoyu_fengtian','dctuoyu_qingqu','dctuoyu_junshan'];
+							var cards=[];
+							for(var i=moved.length-1;i>=1;i--){
+								for(var card of moved[i]){
+									cards.push(card);
+									for(var j=0;j<tags.length;j++){
+										if(i==j+1){
+											if(!card.hasGaintag(tags[j]+'_tag')) card.addGaintag(tags[j]+'_tag');
+										}
+										else{
+											if(card.hasGaintag(tags[j]+'_tag')) card.removeGaintag(tags[j]+'_tag');
+										}
+									}
+								}
+							}
+							if(player==game.me){
+								game.addVideo('lose',game.me,[get.cardsInfo(cards),[],[],[]]);
+								for(var i=0;i<cards.length;i++){
+									cards[i].goto(ui.special);
+								}
+								game.me.directgain(cards,false);
+							}
+						},result.moved,player);
+					}
+				},
+				intro:{
+					content:'已激活的副区域：$',
+				},
+				group:'dctuoyu_effect',
+				subSkill:{
+					effect:{
+						mod:{
+							targetInRange:function(card,player,target){
+								if(!card.cards) return;
+								for(var i of card.cards){
+									if(i.hasGaintag('dctuoyu_qingqu_tag')) return true;
+								}
+							},
+							cardUsable:function(card,player,num){
+								if(!card.cards) return;
+								for(var i of card.cards){
+									if(i.hasGaintag('dctuoyu_qingqu_tag')) return Infinity;
+								}
+							},
+						},
+						trigger:{player:'useCard'},
+						forced:true,
+						filter:function(event,player){
+							var tags=['dctuoyu_fengtian_tag','dctuoyu_qingqu_tag','dctuoyu_junshan_tag'],card=event.card;
+							return player.hasHistory('lose',function(evt){
+								if(evt.getParent()!=event) return false;
+								for(var i in evt.gaintag_map){
+									for(var tag of evt.gaintag_map[i]){
+										if(tags.contains(tag)) return true;
+									}
+								}
+								return false;
+							});
+						},
+						content:function(){
+							var tags=['dctuoyu_fengtian_tag','dctuoyu_qingqu_tag','dctuoyu_junshan_tag'],card=trigger.card;
+							player.hasHistory('lose',function(evt){
+								if(evt.getParent()!=trigger) return false;
+								for(var i in evt.gaintag_map){
+									tags.removeArray(evt.gaintag_map[i]);
+								}
+								return tags.length==0;
+							});
+							if(!tags.contains('dctuoyu_fengtian_tag')){
+								if(get.tag(card,'damage')>0||get.tag(card,'recover')>0){
+									trigger.baseDamage++;
+									game.log(card,'的伤害值/回复值+1');
+								}
+							}
+							if(!tags.contains('dctuoyu_qingqu_tag')){
+								if(trigger.addCount!==false){
+									trigger.addCount=false;
+									var stat=player.getStat('card');
+									if(stat[card.name]&&stat[card.name]>0) stat[card.name]--;
+									game.log(card,'不计入次数限制');
+								}
+							}
+							if(!tags.contains('dctuoyu_junshan_tag')){
+								game.log(card,'不可被响应');
+								trigger.directHit.addArray(game.filterPlayer());
+							}
+						},
+					},
+				},
+			},
+			dcxianjin:{
+				audio:2,
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				forced:true,
+				filter:function(event,player,name){
+					var key=(name=='damageEnd'?'damage':'sourceDamage');
+					return player.getAllHistory(key).indexOf(event)%2==1;
+				},
+				content:function(){
+					'step 0'
+					var tags=['dctuoyu_fengtian','dctuoyu_qingqu','dctuoyu_junshan'];
+					tags.removeArray(player.getStorage('dctuoyu'));
+					if(!tags.length){
+						player.draw(player.isMaxHandcard()?1:3);
+						event.finish();
+					}
+					else if(tags.length==1){
+						event._result={control:tags[0]};
+					}
+					else player.chooseControl(tags).set('prompt','险峻：选择激活一个副区域标签');
+					'step 1'
+					var control=result.control;
+					game.log(player,'激活了副区域','#y'+get.translation(control));
+					player.markAuto('dctuoyu',[control]);
+					player.popup(get.translation(control+'_tag'));
+					if(player.isMaxHandcard()) player.draw();
+					else player.draw(player.getStorage('dctuoyu').length)
+				},
+			},
+			dcqijing:{
+				audio:2,
+				trigger:{global:'phaseEnd'},
+				forced:true,
+				juexingji:true,
+				derivation:'dccuixin',
+				filter:function(event,player){
+					return player.getStorage('dctuoyu').length==3;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('dcqijing');
+					player.loseMaxHp();
+					'step 1'
+					if(game.countPlayer()>2){
+						player.chooseTarget(true,'请选择一名要更换座次的角色，将自己移动到该角色的上家位置',function(card,player,target){
+							return target!=player&&target!=player.next;
+						});
+					}
+					else event.goto(3);
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						game.broadcastAll(function(target1,target2){
+							game.swapSeat(target1,target2,null,true);
+						},player,target);
+					}
+					'step 3'
+					player.addSkill('dccuixin');
+					player.insertPhase();
+				},
+			},
+			dccuixin:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					if(event.skill=='dccuixin') return false;
+					if(event.targets.length==0||event.targets.length>2) return false;
+					var card={
+						name:event.card.name,
+						nature:event.card.nature,
+						isCard:true,
+					}
+					for(var target of event.targets){
+						if(!target.isIn()||target!=player.getNext()&&target!=player.getPrevious()) return false;
+						if(!player.canUse(card,target,false)) return false;
+					}
+					if(event.addedTargets&&event.addedTargets.length){
+						for(var target of event.addedTargets){
+							if(!target.isIn()) return false;
+						}
+					}
+					return true;
+				},
+				popup:false,
+				content:function(){
+					var card={
+						name:trigger.card.name,
+						nature:trigger.card.nature,
+						isCard:true,
+					};
+					var next=player.useCard(card,trigger.targets,'dccuixin');
+					if(trigger.addedTarget) next.addedTarget=trigger.addedTarget;
+					if(trigger.addedTargets) next.addedTargets=trigger.addedTargets;
+				},
+			},
 			//海外神吕蒙
 			twshelie:{
 				audio:'shelie',
@@ -6875,7 +7121,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twgongxin:'攻心',
 			twgongxin2:'攻心',
 			twgongxin_info:'出牌阶段限一次。你可以观看一名其他角色的手牌，然后你可以展示其中一张牌并选择一项：1.弃置此牌；2.将此牌置于牌堆顶。若该角色手牌中的花色数因此减少，你选择一种颜色，其于本回合不能使用或打出该颜色的牌。',
-
+			shen_dengai:'神邓艾',
+			dctuoyu:'拓域',
+			dctuoyu_fengtian:'丰田',
+			dctuoyu_qingqu:'清渠',
+			dctuoyu_junshan:'峻山',
+			dctuoyu_fengtian_tag:'<span data-nature="woodmm">丰田</span>',
+			dctuoyu_qingqu_tag:'<span data-nature="watermm">清渠</span>',
+			dctuoyu_junshan_tag:'<span data-nature="thundermm">峻山</span>',
+			dctuoyu_info:'①锁定技。当你使用拥有对应副区域标签的牌时，你令此牌获得对应效果。<br>丰田：伤害值或回复值+1；清渠：无次数和距离限制；峻山：不可被响应。②出牌阶段开始时和结束时，你给你的手牌分配对应的已激活副区域标签。',
+			dcxianjin:'险进',
+			dcxianjin_info:'锁定技。当你造成或受到伤害后，若这是你本局游戏内第偶数次造成或受到伤害，则你激活一个副区域标签并摸X张牌（X为你已激活的副区域数，若你的手牌数为全场最多则改为摸一张牌）。',
+			dcqijing:'奇径',
+			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，将座位移动至一名其他角色的下家之后，获得〖摧心〗和一个额外回合。',
+			dccuixin:'摧心',
+			dccuixin_info:'当你不因此技能使用的牌结算结束后，若此牌的目标仅包含你的上家或下家，则你可以视为对目标角色再使用一张牌名和元素相同的牌。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',

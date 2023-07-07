@@ -171,7 +171,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseToDiscard(get.prompt2('jiqiao'),[1,player.countCards('he')],'he').set('ai',function(card){
+					player.chooseToDiscard(get.prompt2('rejiqiao'),[1,player.countCards('he')],'he').set('ai',function(card){
 						if(card.name=='bagua') return 10;
 						return 7-get.value(card);
 					}).set('logSkill','rejiqiao');

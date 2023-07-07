@@ -150,6 +150,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return event.filterCard(get.autoViewAs({name:'juedou'},hs));
 						},
+						ai:{order:0.001},
 					}
 				},
 			},
@@ -2531,7 +2532,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('sbhujia',target);
 						player.addTempSkill('sbhujia_used','roundStart');
 						trigger.cancel();
-						target.damage(trigger.source,trigger.nature,trigger.num).set('card',trigger.card).set('cards',trigger.cards);
+						if(trigger.source) target.damage(trigger.source,trigger.nature,trigger.num).set('card',trigger.card).set('cards',trigger.cards);
+						else target.damage('nosource',trigger.nature,trigger.num).set('card',trigger.card).set('cards',trigger.cards);
 					}
 				},
 				ai:{
@@ -4338,7 +4340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbguose:'国色',
 			sbguose_info:'出牌阶段限四次。你可以选择一项：1.将一张♦牌当【乐不思蜀】使用；2.弃置场上一张【乐不思蜀】。然后你摸一张牌并弃置一张牌。',
 			sbliuli:'流离',
-			sbliuli_info:'当你成为【杀】的目标时，你可以弃置一张牌并选择你攻击范围内的一名不为此【杀】使用者的角色，将此【杀】转移给该角色。若你以此法弃置了♥牌，则你可以令一命不为此【杀】使用者的其他角色获得“流离”标记，且移去场上所有其他的“流离”（每回合限一次）。有“流离”的角色回合开始时，其移去其“流离”并执行一个额外的出牌阶段。',
+			sbliuli_info:'当你成为【杀】的目标时，你可以弃置一张牌并选择你攻击范围内的一名不为此【杀】使用者的角色，将此【杀】转移给该角色。若你以此法弃置了♥牌，则你可以令一名不为此【杀】使用者的其他角色获得“流离”标记，且移去场上所有其他的“流离”（每回合限一次）。有“流离”的角色回合开始时，其移去其“流离”并执行一个额外的出牌阶段。',
 			sb_liubiao:'谋刘表',
 			sbzishou:'自守',
 			sbzishou_info:'锁定技。其他角色的结束阶段，若其与你于本局游戏内均未对对方造成过伤害，其须交给你一张牌。',

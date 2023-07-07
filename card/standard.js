@@ -2453,8 +2453,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event._info_map=map;
 					var card=trigger.card;
 					var state=true;
-					if(trigger.name=='phaseJudge'&&get.itemtype(card)=='card'&&card.viewAs){
-						card=get.autoViewAs({name:card.viewAs},[card]);
+					if(trigger.name=='phaseJudge'){
+						if(get.itemtype(card)=='card'&&card.viewAs) card=get.autoViewAs({name:card.viewAs},[card]);
 						map.target=trigger.player;
 						map.isJudge=true;
 					}
@@ -2464,6 +2464,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						map.target=trigger.target;
 						map.targets=trigger.targets;
 						map.tempnowuxie=(trigger.targets&&trigger.targets.length>1&&!trigger.multitarget);
+						map.noai=Boolean(trigger.getParent().noai);
 						//如果对拼无懈，获取历史数据
 						if(card.name=='wuxie'){
 							var evt=event;
