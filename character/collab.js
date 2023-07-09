@@ -61,7 +61,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(lib.skill.dcbianzhuang.characterMap[i]==skill){
 							player.flashAvatar('dcbianzhuang',i);
 							player.popup(skill);
-							game.log(player,'“变装”为了','#g'+get.translation(i));
+							game.log(player,'“变装”为了','#b'+get.translation(i));
 							break;
 						}
 					}
