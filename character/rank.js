@@ -707,6 +707,7 @@ window.noname_character_rank={
 		'xf_tangzi',
 		'liuzan',
 		'lingcao',
+		'sunyang',
 		'sunru',
 		'lifeng',
 		'zhangyì',
@@ -912,6 +913,10 @@ window.noname_character_rank={
 		'sunhong',
 		'zhangjinyun',
 		'dc_mengda',
+		'xiaoyuehankehan',
+		'zhutiexiong',
+		'shen_dengai',
+		'libai',
 	],
 	b:[
 		'diy_feishi',
@@ -1186,7 +1191,6 @@ window.noname_character_rank={
 		'xia_xushu',
 		'clan_hanrong',
 		'clan_hanshao',
-		'dc_fuwan',
 		'ns_duji',
 		'yj_weiyan',
 		'dc_sunziliufang',
@@ -1196,6 +1200,7 @@ window.noname_character_rank={
 		'xia_xiahouzie',
 		'xielingyu',
 		'ol_yanwen',
+		'sp_mushun',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1381,6 +1386,7 @@ window.noname_character_rank={
 		'wuanguo',
 		'qiaorui',
 		'clan_wukuang',
+		'yeshiwen',
 	],
 	c:[
 		'xiahoudun',

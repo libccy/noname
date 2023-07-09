@@ -15,7 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan",'old_caorui'],
 				old_yijiang5:["old_caoxiu","old_zhuzhi"],
 				old_yijiang67:["ol_zhangrang","ol_liuyu",'old_huanghao','old_liyan'],
-				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","old_wangyun",'ol_wanglang','old_dingfeng'],
+				old_sp:["old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","old_wangyun",'ol_wanglang','old_dingfeng'],
 				old_yingbian:['junk_simayi','old_yangyan','old_yangzhi'],
 				old_mobile:["old_caochun",'old_majun'],
 			},
@@ -73,7 +73,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_lingtong:['male','wu',4,['oldxuanfeng']],
 			old_caoxiu:['male','wei',4,['taoxi']],
 			old_caozhen:['male','wei',4,['sidi']],
-			old_lingju:['female','qun',3,['jieyuan','fenxin_old']],
 			old_maliang:['male','shu',3,['xiemu','naman']],
 			old_chenqun:['male','wei',3,['dingpin','oldfaen']],
 			old_zhuhuan:['male','wu',4,['youdi']],
@@ -87,11 +86,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//ol_manchong:['male','wei',3,['yuce','junxing']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige']],
 			old_guanqiujian:["male","wei",4,["drlt_zhenrong","drlt_hongju"],[]],
-		},
-		characterFilter:{
-			old_lingju:function(mode){
-				return mode=='identity';
-			}
 		},
 		skill:{
 			oldqinqing:{
@@ -952,7 +946,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhuran:'旧朱然',
 			old_caoxiu:'旧曹休',
 			old_caozhen:'旧曹真',
-			old_lingju:'旧灵雎',
 			old_maliang:'旧马良',
 			old_chenqun:'旧陈群',
 			old_zhuhuan:'旧朱桓',

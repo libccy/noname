@@ -613,7 +613,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterFilter:{
 			simashi:function(mode){
-				return !['boss','chess','tafang','stone','versus'].contains(mode);
+				if(['boss','chess','tafang','stone'].contains(mode)) return false;
+				if(mode=='versus') return _status.mode!='three';
 			},
 			sp_jianggan:function(mode){
 				return mode!='identity'&&mode!='guozhan';
