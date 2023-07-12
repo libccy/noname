@@ -1033,7 +1033,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseControl('摸牌阶段','出牌阶段','cancel2').set('prompt',get.prompt('olhongji',target)).set('choiceList',[
 							str1.slice(13),
 							str2.slice(13)
-						]).set('ai',()=>[0,1].randomGet());
+						]).set('ai',()=>_status.event.bool).set('bool',()=>get.attitude(player,trigger.player)>1?[0,1].randomGet():'cancel2');
 					}
 					'step 1'
 					var choice=-1;

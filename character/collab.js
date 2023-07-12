@@ -106,7 +106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//小约翰可汗
 			dctongliao:{
-				audio:2,
+				audio:3,
 				trigger:{player:'phaseDrawAfter'},
 				direct:true,
 				filter:function(event,player){
@@ -176,7 +176,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			dcwudao:{
-				audio:2,
+				audio:3,
 				trigger:{player:'useCardAfter'},
 				frequent:true,
 				filter:function(event,player){
