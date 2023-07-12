@@ -6,16 +6,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			sp:{
 				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
-				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan'],
+				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong'],
 				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna"],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
-				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','ol_puyuan','zhangzhi'],
+				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','ol_puyuan','zhangzhi','lushi'],
 				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['sunhong','ol_huban','lushi'],
+				sp_waitforsort:['ol_huban'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
-				sp_wanglang:['wanglang'],
+				sp_wanglang:['ol_wanglang'],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				//sp_single:["niujin"],
@@ -28,7 +28,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			ol_liuyan:['male','qun','4/6',['olpianan','olyinji','olkuisi']],
+			ol_wanglang:['male','wei',3,['gushe','oljici']],
+			ol_liuyan:['male','qun','4/6',['olpianan','olyinji','olkuisi'],['unseen']],
 			lushi:['female','qun',3,['olzhuyan','olleijie']],
 			zhangshiping:['male','shu',3,['olhongji','olxinggu']],
 			sunhong:['male','wu',3,['olxianbi','olzenrun']],
@@ -146,7 +147,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanbaihu:['male','qun',4,['zhidao','jili']],
 			chengyu:['male','wei',3,['shefu','benyu']],
 
-			wanglang:['male','wei',3,['regushe','rejici']],
 			sp_pangde:['male','wei',4,['mashu','juesi']],
 			sp_jiaxu:['male','wei',3,['zhenlue','jianshu','yongdi']],
 
@@ -683,6 +683,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//OL新改王朗
+			oljici:{
+				audio:'jici',
+				trigger:{
+					player:'compare',
+					target:'compare',
+				},
+				filter:function(event,player){
+					if(event.player==player){
+						if(event.iwhile) return false;
+						return event.num1<=player.countMark('gushe');
+					}
+					return event.num2<=player.countMark('gushe');
+				},
+				content:function(){
+					var num=player.countMark('gushe');
+					if(player==trigger.player){
+						trigger.num1+=num;
+						if(trigger.num1>13) trigger.num1=13;
+					}
+					else{
+						trigger.num2+=num;
+						if(trigger.num2>13) trigger.num2=13;
+					}
+					game.log(player,'的拼点牌点数+'+num);
+					var stat=player.getStat().skill;
+					delete stat.gushe;
+				}
+			},
 			//OL刘老板
 			olpianan:{
 				audio:2,
@@ -21981,7 +22010,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			furong:['ol_furong','tw_furong','furong'],
 			daxiaoqiao:['tw_daxiaoqiao','daxiaoqiao'],
 			zhugeguo:['tw_zhugeguo','zhugeguo'],
-			wanglang:['wanglang','ol_wanglang'],
+			wanglang:['wanglang','ol_wanglang','old_wanglang'],
 			tengfanglan:['dc_tengfanglan','tengfanglan'],
 			zhangyì:['ol_zhangyì','zhangyì'],
 			yuantanyuanshang:['yuantanyuanshang','yuantanyuanxiyuanshang'],
@@ -23062,6 +23091,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olyinji_info:'锁定技。结束阶段，若你的体力值不为唯一最大，你选择回复1点体力或加1点体力上限。',
 			olkuisi:'窥伺',
 			olkuisi_info:'锁定技。摸牌阶段开始时，你跳过此阶段，然后观看牌堆顶的四张牌并可以使用其中任意张。若你以此法使用的牌数不为2或3，你减1点体力上限。',
+			ol_wanglang:'OL王朗',
+			oljici:'激词',
+			oljici_info:'当你的拼点牌亮出后，若点数不大于X，你可令点数+X并令〖鼓舌〗视为未发动过（X为你的“饶舌”标记数）。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

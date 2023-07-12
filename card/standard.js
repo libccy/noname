@@ -901,7 +901,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target.isHealthy();
 				},
 				content:function(){
-					target.recover();
+					target.recover(event.baseDamage||1);
 				},
 				ai:{
 					basic:{
