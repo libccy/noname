@@ -30,7 +30,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					target.recover();
+					target.recover(event.baseDamage||1);
 					'step 1'
 					if(target.hasCard(function(card){
 						return _status.connectMode||get.name(card,target)=='du';

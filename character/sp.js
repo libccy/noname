@@ -6,16 +6,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			sp:{
 				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
-				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan'],
+				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong'],
 				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna"],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
-				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','ol_puyuan','zhangzhi'],
+				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','ol_puyuan','zhangzhi','lushi'],
 				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['sunhong','ol_huban','lushi'],
+				sp_waitforsort:['ol_huban'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
-				sp_wanglang:['wanglang'],
+				sp_wanglang:['ol_wanglang'],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				//sp_single:["niujin"],
@@ -28,6 +28,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_wanglang:['male','wei',3,['gushe','oljici']],
+			ol_liuyan:['male','qun','4/6',['olpianan','olyinji','olkuisi'],['unseen']],
 			lushi:['female','qun',3,['olzhuyan','olleijie']],
 			zhangshiping:['male','shu',3,['olhongji','olxinggu']],
 			sunhong:['male','wu',3,['olxianbi','olzenrun']],
@@ -145,7 +147,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanbaihu:['male','qun',4,['zhidao','jili']],
 			chengyu:['male','wei',3,['shefu','benyu']],
 
-			wanglang:['male','wei',3,['regushe','rejici']],
 			sp_pangde:['male','wei',4,['mashu','juesi']],
 			sp_jiaxu:['male','wei',3,['zhenlue','jianshu','yongdi']],
 
@@ -682,6 +683,140 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//OL新改王朗
+			oljici:{
+				audio:'jici',
+				trigger:{
+					player:'compare',
+					target:'compare',
+				},
+				filter:function(event,player){
+					if(event.player==player){
+						if(event.iwhile) return false;
+						return event.num1<=player.countMark('gushe');
+					}
+					return event.num2<=player.countMark('gushe');
+				},
+				content:function(){
+					var num=player.countMark('gushe');
+					if(player==trigger.player){
+						trigger.num1+=num;
+						if(trigger.num1>13) trigger.num1=13;
+					}
+					else{
+						trigger.num2+=num;
+						if(trigger.num2>13) trigger.num2=13;
+					}
+					game.log(player,'的拼点牌点数+'+num);
+					var stat=player.getStat().skill;
+					delete stat.gushe;
+				}
+			},
+			//OL刘老板
+			olpianan:{
+				audio:2,
+				trigger:{
+					player:['enterGame','phaseDiscardEnd'],
+					global:'phaseBefore',
+				},
+				forced:true,
+				filter:function(event,player){
+					return event.name!='phase'||game.phaseNumber==0;
+				},
+				content:function(){
+					'step 0'
+					var hs=player.getCards('h',card=>{
+						return get.name(card)!='shan'&&lib.filter.cardDiscardable(card,player,'olpianan');
+					});
+					if(hs.length) player.discard(hs);
+					'step 1'
+					var num=player.hp-player.countCards('h');
+					if(num>0){
+						var cards=[];
+						for(var i=0;i<ui.cardPile.childNodes.length;i++){
+							var card=ui.cardPile.childNodes[i];
+							if(card.name=='shan'){
+								cards.add(card);
+								num--;
+							}
+							if(num==0) break;
+						}
+						if(num>0){
+							for(var i=0;i<ui.discardPile.childNodes.length;i++){
+								var card=ui.discardPile.childNodes[i];
+								if(card.name=='shan'){
+									cards.add(card);
+									num--;
+								}
+								if(num==0) break;
+							}
+						}
+						if(cards.length) player.gain(cards,'gain2');
+					}
+				},
+				mod:{
+					aiValue:function(player,card,num){
+						if(card.name!='shan') return;
+						if(player==_status.currentPhase) return 0;
+					},
+					aiUseful:function(){
+						return lib.skill.olpianan.mod.aiValue.apply(this,arguments);
+					},
+				},
+			},
+			olyinji:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				forced:true,
+				filter:function(event,player){
+					return !player.isMaxHp(true);
+				},
+				content:function(){
+					'step 0'
+					player.chooseControl('体力','体力上限').set('prompt','殷积：回复1点体力或加1点体力上限').set('ai',()=>{
+						var player=_status.event.player;
+						if(!player.isDamaged()||player.hp>3&&player.getDamagedHp()==1||player.maxHp<3) return 1;
+						return 0;
+					});
+					'step 1'
+					player[result.index==0?'recover':'gainMaxHp']();
+				}
+			},
+			olkuisi:{
+				audio:2,
+				trigger:{player:'phaseDrawBefore'},
+				forced:true,
+				content:function(){
+					'step 0'
+					trigger.cancel();
+					var cards=game.cardsGotoOrdering(get.cards(4)).cards;
+					event.cards=cards.slice();
+					'step 1'
+					player.chooseButton(['窥伺：是否使用其中的一张牌？',cards]).set('filterButton',button=>{
+						return _status.event.player.hasUseTarget(button.link);
+					}).set('ai',button=>{
+						var player=_status.event.player,card=button.link,cards=_status.event.getParent().cards;
+						var val=player.getUseValue(card)+0.01;
+						if(val>0&&cards.length>1||val>4&&cards.length==1&&(player.maxHp>3||player.isDamaged())) return get.order(card)+val/5;
+						return 0;
+					});
+					'step 2'
+					if(result.bool){
+						var card=result.links[0];
+						event.cards.remove(card);
+						player.$gain2(card,false);
+						game.delayx();
+						player.chooseUseTarget(true,card,false);
+					}
+					else event.goto(4);
+					'step 3'
+					if(cards.some(i=>get.position(i,true)=='o'&&player.hasUseTarget(i))) event.goto(1);
+					'step 4'
+					if(cards.length!=1&&cards.length!=2){
+						player.loseMaxHp();
+					}
+				}
+			},
 			//卢氏
 			olzhuyan:{
 				audio:2,
@@ -898,7 +1033,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseControl('摸牌阶段','出牌阶段','cancel2').set('prompt',get.prompt('olhongji',target)).set('choiceList',[
 							str1.slice(13),
 							str2.slice(13)
-						]).set('ai',()=>[0,1].randomGet());
+						]).set('ai',()=>_status.event.bool).set('bool',()=>get.attitude(player,trigger.player)>1?[0,1].randomGet():'cancel2');
 					}
 					'step 1'
 					var choice=-1;
@@ -11634,7 +11769,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shuimeng:{
-				audio:true,
+				audio:2,
 				trigger:{player:'phaseUseAfter'},
 				direct:true,
 				filter:function(event,player){
@@ -21875,7 +22010,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			furong:['ol_furong','tw_furong','furong'],
 			daxiaoqiao:['tw_daxiaoqiao','daxiaoqiao'],
 			zhugeguo:['tw_zhugeguo','zhugeguo'],
-			wanglang:['wanglang','ol_wanglang'],
+			wanglang:['wanglang','ol_wanglang','old_wanglang'],
 			tengfanglan:['dc_tengfanglan','tengfanglan'],
 			zhangyì:['ol_zhangyì','zhangyì'],
 			yuantanyuanshang:['yuantanyuanshang','yuantanyuanxiyuanshang'],
@@ -22949,6 +23084,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzhuyan_info:'每名角色每项各限一次。结束阶段，你可以令一名角色将以下一项调整至与其上一个准备阶段结束后相同：1.体力值；2.手牌数（体力值至多失去至1，手牌数至多摸至5；若其未执行过准备阶段则改为游戏开始时）。',
 			olleijie:'雷劫',
 			olleijie_info:'准备阶段，你可以令一名角色判定，若结果为♠2~9，其受到2点雷电伤害，否则其摸两张牌。',
+			ol_liuyan:'OL刘焉',
+			olpianan:'偏安',
+			olpianan_info:'锁定技。游戏开始或弃牌阶段结束时，你弃置所有不为【闪】的手牌（没有则不弃）。若你的手牌数小于体力值，你获得牌堆或弃牌堆中的前X张【闪】（X为你的体力值与手牌数的差）。',
+			olyinji:'殷积',
+			olyinji_info:'锁定技。结束阶段，若你的体力值不为唯一最大，你选择回复1点体力或加1点体力上限。',
+			olkuisi:'窥伺',
+			olkuisi_info:'锁定技。摸牌阶段开始时，你跳过此阶段，然后观看牌堆顶的四张牌并可以使用其中任意张。若你以此法使用的牌数不为2或3，你减1点体力上限。',
+			ol_wanglang:'OL王朗',
+			oljici:'激词',
+			oljici_info:'当你的拼点牌亮出后，若点数不大于X，你可令点数+X并令〖鼓舌〗视为未发动过（X为你的“饶舌”标记数）。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

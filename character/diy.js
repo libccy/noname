@@ -17751,7 +17751,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				group:'junkyuheng_remove',
-				derivation:['olbingyi','shenxing','xiashu','old_anxu','rezhiheng','xinanguo','lanjiang','xinfu_guanwei','oldimeng','xindiaodu','xingxue','jiexun','olhongyuan','xinfu_youdi'],
+				derivation:['olbingyi','shenxing','xiashu','old_anxu','rezhiheng','xinanguo','lanjiang','xinfu_guanwei','oldimeng','xindiaodu','xingxue','jiexun','olhongyuan','xinfu_youdi','bizheng'],
 				subSkill:{
 					remove:{
 						audio:'yuheng',

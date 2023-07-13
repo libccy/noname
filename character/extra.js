@@ -78,6 +78,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_dengai:function(mode){
 				if(['boss','chess','tafang','stone'].contains(mode)) return false;
 				if(mode=='versus') return _status.mode!='three';
+				return true;
 			},
 		},
 		skill:{
@@ -292,14 +293,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.skill=='dccuixin') return false;
 					if(event.targets.length==0) return false;
+					if(get.type(event.card,false)=='delay'||get.type(event.card,false)=='equip') return false;
 					var card={
 						name:event.card.name,
 						nature:event.card.nature,
 						isCard:true,
 					}
 					for(var target of event.targets){
-						if(!target.isIn()||target!=player.getNext()&&target!=player.getPrevious()) continue;
-						if(player.canUse(card,target,false)) return true;
+						var targetx;
+						if(target==player.getNext()) targetx=player.getPrevious();
+						else if(target==player.getPrevious()) targetx=player.getNext();
+						else continue;
+						if(lib.filter.targetEnabled2(card,targetx,player)) return true;
 					}
 					return false;
 				},
@@ -313,8 +318,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					event.card=card;
 					var list=trigger.targets.filter(target=>{
-						if(!target.isIn()||target!=player.getNext()&&target!=player.getPrevious()) return false;
-						return player.canUse(card,target,false);
+						var targetx;
+						if(target==player.getNext()) targetx=player.getPrevious();
+						else if(target==player.getPrevious()) targetx=player.getNext();
+						else return false;
+						if(lib.filter.targetEnabled2(card,targetx,player)) return true;
+					}).map(target=>{
+						return target==player.getPrevious()?player.getNext():player.getPrevious();
 					});
 					if(list.length==1){
 						event.target=list[0];
@@ -322,7 +332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						player.chooseTarget('摧心：是否再视为对上家或下家使用'+get.translation(card)+'？','操作提示：从上家或下家中选择一名角色作为使用目标',function(card,player,target){
-							return (target==player.getNext()||target==player.getPrevious())&&player.canUse(_status.event.getParent().card,target,false);
+							return (target==player.getNext()||target==player.getPrevious())&&lib.filter.targetEnabled2(_status.event.getParent().card,target,player);
 						})
 					}
 					'step 1'
@@ -7143,9 +7153,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcxianjin:'险进',
 			dcxianjin_info:'锁定技。当你造成或受到伤害后，若这是你本局游戏内第偶数次造成或受到伤害，则你激活一个副区域标签并摸X张牌（X为你已激活的副区域数，若你的手牌数为全场最多则改为摸一张牌）。',
 			dcqijing:'奇径',
-			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，将座位移动至一名其他角色的下家之后，获得〖摧心〗和一个额外回合。',
+			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，将座位移动至一名其他角色的上家之后，获得〖摧心〗和一个额外回合。',
 			dccuixin:'摧心',
-			dccuixin_info:'当你不因此技能使用的牌结算结束后，若此牌的目标包含你的上家或下家，则你可以视为对上家或下家再使用一张牌名和元素相同的牌。',
+			dccuixin_info:'当你不因此技能使用的基本牌或普通锦囊牌结算结束后，若此牌的目标包含你的上家或下家，则你可以视为对下家或上家再使用一张牌名和元素相同的牌。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
@@ -7158,7 +7168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			extra_mobilezhi:'始计篇·智',
 			extra_mobilexin:'始计篇·信',
 			extra_offline:'神话再临·线下',
-			extra_decade:'十周年服神将',
+			extra_decade:'神·武',
 			extra_tw:'海外服神将',
 		},
 	};

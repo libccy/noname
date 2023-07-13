@@ -185,7 +185,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.finish();
 						return;
 					}
-					target.chooseCard(true).ai=function(card){
+					else if(target.countCards('h')==1) event._result={cards:target.getCards('h')};
+					else target.chooseCard(true).ai=function(card){
 						if(_status.event.getRand()<0.5) return Math.random();
 						return get.value(card);
 					};

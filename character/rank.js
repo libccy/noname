@@ -120,6 +120,7 @@ window.noname_character_rank={
 		'key_yuuki',
 		'db_key_liyingxia',
 		'key_kiyu',
+		'wu_zhugeliang',
 	],
 	a:[
 		'diy_zaozhirenjun',
@@ -298,6 +299,7 @@ window.noname_character_rank={
 		'zerong',
 		'wangguan',
 		'duanqiaoxiao',
+		'old_wanglang',
 		'key_misuzu',
 		'key_sunohara',
 		'key_umi',
@@ -917,6 +919,8 @@ window.noname_character_rank={
 		'zhutiexiong',
 		'shen_dengai',
 		'libai',
+		'tw_gongsunfan',
+		'yue_caiwenji',
 	],
 	b:[
 		'diy_feishi',
@@ -1201,6 +1205,8 @@ window.noname_character_rank={
 		'xielingyu',
 		'ol_yanwen',
 		'sp_mushun',
+		'tw_yangang',
+		'sb_zhurong',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1387,6 +1393,7 @@ window.noname_character_rank={
 		'qiaorui',
 		'clan_wukuang',
 		'yeshiwen',
+		'qianzhao',
 	],
 	c:[
 		'xiahoudun',
