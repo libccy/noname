@@ -12,6 +12,7 @@ window.noname_package={
 		extra:'神将',		
 		mobile:'移动版',
 		sb:'谋攻篇',
+		collab:'联动卡',
 		offline:'线下武将',
 		old:'怀旧',
 		diy:'DIY',

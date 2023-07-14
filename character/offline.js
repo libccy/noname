@@ -13,10 +13,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				offline_piracyE:['shen_jiaxu','pe_wangyun','pe_zhonghui','pe_sunchen','pe_mengda','pe_wenqin','ns_caoanmin','jiangfei','chendong','jiangqing','kongrong','jiling','tianfeng','mateng'],
 				offline_piracyS:['ns_jiaxu','longyufei','ps_guanyu','ps1059_guojia','ps2070_guojia','ps2063_zhaoyun','ps2067_zhaoyun','ps1062_zhouyu','ps2080_zhouyu','ps_caozhi','ps_jin_simayi','ps_caopi','ps_simayi','ps2068_simayi','ps_machao','ps_zhugeliang','ps2066_zhugeliang','ps_jiaxu','ps_lvbu','ps_shen_machao','jsp_liubei'],
 				offline_piracyK:['pk_sp_duyu'],
+				offline_vtuber:['vtb_xiaosha','vtb_xiaoshan','vtb_xiaotao','vtb_xiaole','vtb_xiaojiu'],
 				//offline_others:[""],
 			},
 		},
 		character:{
+			vtb_xiaosha:['female','qun',4,['vtbguisha','vtbshuli']],
+			vtb_xiaoshan:['female','qun',4,['vtbshanwu','vtbxianli']],
+			vtb_xiaotao:['female','qun',4,['vtbtaoyan','vtbyanli']],
+			vtb_xiaole:['female','qun',4,['vtbleyu','vtbyuanli']],
+			vtb_xiaojiu:['female','qun',4,['vtbmeiniang','vtbyaoli']],
 			jsrg_liuhong:['male','qun',4,['jsrgchaozheng','jsrgshenchong','jsrgjulian'],['zhu']],
 			jsrg_hejin:['male','qun',4,['jsrgzhaobing','jsrgzhuhuan','jsrgyanhuo']],
 			jsrg_sunjian:['male','qun',4,['jsrgpingtao','jsrgjuelie']],
@@ -104,6 +110,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pk_sp_duyu:'杜预（222年－285年），字元凯，京兆郡杜陵县（今陕西西安）人，中国魏晋时期军事家、经学家、律学家，曹魏散骑常侍杜恕之子。杜预初仕曹魏，任尚书郎，后成为权臣司马昭的幕僚，封丰乐亭侯。西晋建立后，历任河南尹、安西军司、秦州刺史、度支尚书等职。咸宁四年（278年）接替羊祜出任镇南大将军，镇守荆州。他积极备战，支持晋武帝司马炎对孙吴作战，并在咸宁五年（279年）成为晋灭吴之战的统帅之一。战后因功进封当阳县侯，仍镇荆州。太康五年（285年），杜预被征入朝，拜司隶校尉，途中于邓县逝世，终年六十三岁。获赠征南大将军、开府仪同三司，谥号为成。杜预耽思经籍，博学多通，多有建树，时誉为“杜武库”。著有《春秋左氏传集解》及《春秋释例》等。为明朝之前唯一一个同时进入文庙和武庙之人。',
 			ps_shen_machao:'字孟起，扶风茂陵人。面如冠玉，目如流星，虎体猿臂，彪腹狼腰，声雄力猛。因衣着讲究，举止非凡，故人称“锦马超”。麾铁骑，捻金枪。',
 			qiaoxuan:'桥玄（110年－184年6月6日），一作乔玄，字公祖。梁国睢阳县（今河南省商丘市睢阳区）人。东汉时期名臣。桥玄年轻时曾任睢阳县功曹，因坚持追究陈国相羊昌的恶行而闻名。后被举为孝廉，历任洛阳左尉、齐相及上谷、汉阳太守、司徒长史、将作大匠。汉桓帝末年，出任度辽将军，击败鲜卑、南匈奴、高句丽侵扰，保境安民。汉灵帝初年，迁任河南尹、少府、大鸿胪。建宁三年（170年），迁司空。次年，拜司徒。光和元年（178年），升任太尉。桥玄有感于国势日衰，于是称病请辞，改任太中大夫。光和七年（184年），桥玄去世，年七十五。桥玄性格刚强，不阿权贵，待人谦俭，尽管屡历高官，但不因为自己处在高位而有所私请。他为官清廉，去世后连下葬的钱都没有，被时人称为名臣。',
+			xiaosha:'2021年「虚拟天团」Vtuber企划中推出的虚拟偶像之一，该企划原定培养12位虚拟偶像，然而企划由于各方面原因暴死，现虚拟偶像仅存在于各武将的皮肤中。<br>设定上为三国杀新手菜鸡，误打误撞参加了三国杀组织的《三国之星》选秀大赛，没想到一路靠着颜值和风风火火的爽快性格过关斩将吸粉无数，获得了冠军，成为官方签约的形象代言人。<br>小杀现于B站还存在<style type="text/css">#slash_bilibili:link, #slash_bilibili:visited {color:white;}</style><a id="slash_bilibili" href="https://space.bilibili.com/686179867" target="_blank">对应账号</a>，但早已荒废。',
+			xiaoshan:'2021年「虚拟天团」Vtuber企划中推出的虚拟偶像之一，该企划原定培养12位虚拟偶像，然而企划由于各方面原因暴死，现虚拟偶像仅存在于各武将的皮肤中。<br>设定上为小杀同系不同班的同学，由于本身性格比较安静，所以和风风火火的小杀有些不对盘。知道小杀也玩三国杀后，外表高冷、内心傲娇的她偷偷也去玩了游戏，立志要在游戏里碾压她。<br>小闪对应B站账号已销号。',
+			xiaotao:'2021年「虚拟天团」Vtuber企划中推出的虚拟偶像之一，该企划原定培养12位虚拟偶像，然而企划由于各方面原因暴死，现虚拟偶像仅存在于各武将的皮肤中。<br>设定上为小杀的亲妹妹，陪姐姐去拍摄代言宣传照的时候，被导演看中，觉得三国美貌姐妹花是非常好的噱头，于是一并签下。正所谓“三国姐妹花，永远不分家！”。<br>小桃对应B站账号已销号。',
+			xiaole:'2021年「虚拟天团」Vtuber企划中推出的虚拟偶像之一，该企划原定培养12位虚拟偶像，然而企划由于各方面原因暴死，现虚拟偶像仅存在于各武将的皮肤中。<br>设定上小乐家与小桃小杀家是世交，三人从小就认识。和小闪是同班同学，小乐很喜欢安静的小闪。和小酒是小杀介绍认识的，大家都是打三国杀的网友，在打游戏时候比较依赖小酒——躺赢人躺赢魂，躺赢都是人上人。<br>小乐对应B站账号已销号。',
+			xiaojiu:'2021年「虚拟天团」Vtuber企划中推出的虚拟偶像之一，该企划原定培养12位虚拟偶像，然而企划由于各方面原因暴死，现虚拟偶像仅存在于各武将的皮肤中。<br>设定上为非人类，是一只年龄成迷的神兽，真身是白泽。是小杀网上玩游戏认识的网友，爱好是喝酒，和小杀也有好酒友的关系。<br>小酒对应B站账号已销号。',
 		},
 		characterTitle:{
 			jsp_liubei:'S1019',
@@ -155,6 +166,438 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//天书乱斗虚拟偶像线下化
+			//小杀
+			vtbguisha:{
+				audio:1,
+				trigger:{global:'useCard'},
+				direct:true,
+				shaRelated:true,
+				filter:function(event,player){
+					return event.player!=player&&event.card.name=='sha'&&player.countCards('he')>0&&event.player.isPhaseUsing();
+				},
+				content:function(){
+					'step 0'
+					var go=false,d1=true;
+					if(get.attitude(player,trigger.player)>0){
+						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false
+						for(var target of trigger.targets){
+							if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
+								target:target,
+								card:trigger.card,
+							},true)){
+								if(!target.hasSkill('gangzhi')) d1=false;
+								if(target.hasSkillTag('filterDamage',null,{
+									player:trigger.player,
+									card:trigger.card,
+								})||get.attitude(player,target)>=0) d1=false;
+							}
+						}
+						if(trigger.addCount===false||!trigger.player.isPhaseUsing()) go=false;
+						else if(!trigger.player.hasSkill('paoxiao')&&
+							!trigger.player.hasSkill('tanlin3')&&
+							!trigger.player.hasSkill('zhaxiang2')&&
+							!trigger.player.hasSkill('fengnu')&&
+							!trigger.player.getEquip('zhuge')){
+							var nh=trigger.player.countCards('h');
+							if(player==trigger.player){
+								go=(player.countCards('h','sha')>0);
+							}
+							else if(nh>=4){
+								go=true;
+							}
+							else if(player.countCards('h','sha')){
+								if(nh==3){
+									go=Math.random()<0.8;
+								}
+								else if(nh==2){
+									go=Math.random()<0.5;
+								}
+							}
+							else if(nh>=3){
+								if(nh==3){
+									go=Math.random()<0.5;
+								}
+								else if(nh==2){
+									go=Math.random()<0.2;
+								}
+							}
+						}
+					}
+					go=go*Math.random()+d1*Math.random()>0.4;
+					//AI停顿
+					if(go&&!event.isMine()&&!event.isOnline()&&player.hasCard(function(card){
+						return get.value(card)<6&&lib.filter.cardDiscardable(card,player,event.name);
+					},'he')){
+						game.delayx();
+					}
+					var next=player.chooseToDiscard(get.prompt('vtbguisha'),'弃置一张牌，令'+get.translation(trigger.player)+'本次使用的【杀】不计入使用次数，且对'+get.translation(trigger.targets)+'造成的伤害+1','he');
+					next.logSkill=['vtbguisha',trigger.player];
+					next.set('ai',function(card){
+						if(_status.event.go){
+							return 6-get.value(card);
+						}
+						return 0;
+					});
+					next.set('go',go);
+					'step 1'
+					if(result.bool){
+						if(trigger.addCount!==false){
+							trigger.addCount=false;
+							trigger.player.getStat().card.sha--;
+						}
+						trigger.player.addTempSkill('vtbguisha_bonus');
+						if(!trigger.card.storage) trigger.card.storage={};
+						trigger.card.storage.vtbguisha_targets=trigger.targets;
+					}
+				},
+				ai:{
+					expose:0.2
+				},
+				subSkill:{
+					bonus:{
+						trigger:{
+							source:'damageBegin1',
+						},
+						forced:true,
+						charlotte:true,
+						onremove:true,
+						filter:function(event,player){
+							return event.card&&event.card.name=='sha'&&event.card.storage&&event.card.storage.vtbguisha_targets&&event.card.storage.vtbguisha_targets.contains(event.player);
+						},
+						content:function(){
+							trigger.num++;
+						}
+					}
+				}
+			},
+			vtbshuli:{
+				audio:1,
+				trigger:{
+					global:'damageSource',
+				},
+				usable:2,
+				filter:function(event,player){
+					return event.source!=player&&event.card&&event.card.name=='sha'&&event.source.isIn();
+				},
+				check:function(event,player){
+					return get.attitude(player,event.source)>=0||
+						get.attitude(player,event.source)>=-4&&get.distance(_status.currentPhase,player,'absolute')>get.distance(_status.currentPhase,trigger.source,'absolute')
+				},
+				content:function(){
+					'step 0'
+					var drawers=[trigger.source,player].sortBySeat(_status.currentPhase);
+					game.asyncDraw(drawers);
+				},
+			},
+			//小闪
+			vtbshanwu:{
+				audio:1,
+				trigger:{
+					global:'useCardToTarget',
+				},
+				filter:function(event,player){
+					return event.card.name=='sha'&&event.target!=player&&event.isFirstTarget&&player.hasCard(card=>{
+						return get.name(card)=='shan'||_status.connectMode;
+					});
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseToDiscard(get.prompt('vtbshanwu'),'弃置一张【闪】，取消此【杀】对'+get.translation(trigger.targets)+'的目标',{name:'shan'}).set('logSkill','vtbshanwu').set('ai',card=>{
+						if(_status.event.goon) return 6-get.value(card);
+						return 0;
+					}).set('goon',function(){
+						var effect=0;
+						for(var target of trigger.targets){
+							var eff=get.effect(target,trigger.card,trigger.player,player);
+							if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
+								target:target,
+								card:trigger.card,
+							},true)){
+								eff*=1.25;
+							}
+							if(target.hp<=2) eff*=1.1;
+							effect+=eff;
+						}
+						return effect<0;
+					}());
+					'step 1'
+					if(result.bool){
+						game.log(player,'取消了',trigger.card,'的所有目标');
+						trigger.targets.length=0;
+						trigger.getParent().triggeredTargets2.length=0;
+						trigger.untrigger();
+					}
+				},
+				ai:{
+					expose:0.2
+				}
+			},
+			vtbxianli:{
+				audio:1,
+				trigger:{
+					player:'loseAfter',
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+				},
+				usable:2,
+				filter:function(event,player){
+					if(!_status.currentPhase||!_status.currentPhase.isIn()||!_status.currentPhase.countGainableCards(player,'he')) return false;
+					var evt=event.getl(player);
+					return evt&&evt.cards2&&evt.cards2.some(card=>{
+						return get.name(card,false)=='shan';
+					});
+				},
+				check:function(event,player){
+					return get.effect(_status.currentPhase,{name:'shunshou_copy2'},player,player)>0;
+				},
+				prompt2:function(event,player){
+					return '获得'+get.translation(_status.currentPhase)+'的一张牌';
+				},
+				logTarget:()=>_status.currentPhase,
+				content:function(){
+					'step 0'
+					player.gainPlayerCard(_status.currentPhase,'he',true);
+				},
+				ai:{
+					expose:0.15,
+				}
+			},
+			//小桃
+			vtbtaoyan:{
+				audio:1,
+				trigger:{
+					player:'phaseBegin',
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					if(!_status.vtbtaoyan_count){
+						_status.vtbtaoyan_count=5;
+					}
+					player.chooseTarget(get.prompt('vtbtaoyan'),'令一或两名其他角色摸一张牌并从游戏外获得一张【桃】（♥6）',lib.filter.notMe,[1,2]).set('ai',target=>{
+						var player=_status.event.player;
+						return get.recoverEffect(target,player,player)/2+get.attitude(player,target);
+					});
+					'step 1'
+					if(result.bool){
+						var targets=result.targets.slice();
+						targets.sortBySeat();
+						player.logSkill('vtbtaoyan',targets);
+						game.broadcastAll(function(){
+							if(!lib.inpile.contains('tao')){
+								lib.inpile.add('tao');
+							}
+						});
+						player.addSkill('vtbtaoyan_remove');
+						for(var target of targets){
+							target.draw();
+							if(!_status.vtbtaoyan_count) continue;
+							if(!_status.vtbtaoyan_cards) _status.vtbtaoyan_cards=[];
+							_status.vtbtaoyan_count--;
+							var card=game.createCard('tao','heart',6);
+							_status.vtbtaoyan_cards.push(card.cardid);
+							target.gain(card,'gain2');
+						}
+					}
+				},
+				ai:{
+					expose:0.3,
+					threaten:3.2,
+				},
+				subSkill:{
+					remove:{
+						trigger:{
+							global:['loseAfter','loseAsyncAfter','cardsDiscardAfter','equipAfter'],
+						},
+						forced:true,
+						charlotte:true,
+						popup:false,
+						firstDo:true,
+						forceDie:true,
+						filter:function(event,player){
+							if(typeof _status.vtbtaoyan_count!='number') return false;
+							var cards=event.getd();
+							return cards.some(card=>{
+								return _status.vtbtaoyan_cards.contains(card.cardid);
+							});
+						},
+						content:function(){
+							var cards=trigger.getd(),remove=[];
+							for(var card of cards){
+								if(_status.vtbtaoyan_cards.contains(card.cardid)){
+									_status.vtbtaoyan_cards.remove(card.cardid);
+									remove.push(card);
+								}
+							}
+							if(remove.length){
+								remove.forEach(i=>{
+									i.remove();
+									_status.vtbtaoyan_count++;
+								});
+								game.log(remove,'被移出了游戏');
+							}
+						},
+					}
+				}
+			},
+			vtbyanli:{
+				audio:1,
+				trigger:{
+					global:'dying',
+				},
+				filter:function(event,player){
+					if(player.hasSkill('vtbyanli_used')) return false;
+					if(_status.currentPhase==player) return false;
+					return event.player.hp<=0;
+				},
+				check:function(event,player){
+					return get.recoverEffect(event.player,player,player)>0;
+				},
+				content:function(){
+					'step 0'
+					player.addTempSkill('vtbyanli_used','roundStart');
+					trigger.player.recover(1-trigger.player.hp);
+					trigger.player.draw();
+				},
+				subSkill:{
+					used:{
+						charlotte:true,
+					}
+				}
+			},
+			//小乐
+            vtbleyu:{
+                audio:1,
+                trigger:{
+                    global:'phaseBegin',
+                },
+                direct:true,
+                filter:function(event,player){
+                    return player.countCards('he')>=3;
+                },
+                content:function(){
+                    'step 0'
+                    player.chooseToDiscard(get.prompt2('vtbleyu',trigger.player),3,'he').set('ai',card=>{
+                        if(ui.selected.cards.length==2) return 10-get.value(card);
+                        if(_status.event.effect>0){
+                            return 6-get.value(card);
+                        }
+                        return 0;
+                    }).set('effect',trigger.player.hasJudge('lebu')?0:get.effect(trigger.player,{name:'lebu'},player,player)).set('logSkill',['vtbleyu',trigger.player]);
+                    'step 1'
+                    if(result.bool){
+                        trigger.player.judge(lib.card.lebu.judge).judge2=lib.card.lebu.judge2;
+                    } else event.finish();
+                    'step 2'
+                    if(!result.bool){
+                        trigger.player.skip('phaseUse');
+                    }
+                },
+                ai:{
+                    expose:0.3,
+					threaten:2.9,
+                },
+            },
+            vtbyuanli:{
+                audio:1,
+                trigger:{global:['phaseUseSkipped','phaseUseCancelled']},
+                direct:true,
+                content:function(){
+                    'step 0'
+                    player.chooseTarget(get.prompt2('vtbyuanli'),lib.filter.notMe).set('ai',target=>get.attitude(_status.event.player,target)+1);
+                    'step 1'
+                    if(result.bool){
+                        player.logSkill('vtbyuanli',result.targets[0]);
+                        game.asyncDraw([player,result.targets[0]].sortBySeat(_status.currentPhase));
+                    }
+                },
+                ai:{
+                    expose:0.1,
+                },
+            },
+            vtbmeiniang:{
+                audio:1,
+                trigger:{global:'phaseUseBegin'},
+                filter:function(event,player){
+                    return event.player!=player;
+                },
+                check:function(event,player){
+                    return get.attitude(player,event.player)>0&&event.player.getUseValue('jiu')>=0;
+                },
+                logTarget:'player',
+                content:function(){
+                    trigger.player.chooseUseTarget('jiu',true,false);
+                }
+            },
+            vtbyaoli:{
+                audio:1,
+                trigger:{global:'useCardAfter'},
+                filter:function(event,player){
+                    return event.card.name=='jiu'&&event.player!=player&&event.player.isPhaseUsing();
+                },
+                logTarget:'player',
+				check:function(event,player){
+					return get.attitude(player,event.player)>0;
+				},
+                content:function(){
+                    trigger.player.addTempSkill('vtbyaoli_effect');
+                    trigger.player.addMark('vtbyaoli_effect',1,false);
+                },
+                ai:{
+                    expose:0.15,
+                },
+                subSkill:{
+                    effect:{
+                        audio:'vtbyaoli',
+                        charlotte:true,
+                        trigger:{player:'useCard2'},
+                        forced:true,
+                        popup:false,
+                        onremove:true,
+                        nopop:true,
+                        filter:function(event,player){
+                            return event.card.name=='sha'&&player.countMark('vtbyaoli_effect')>0;
+                        },
+                        content:function(){
+                            'step 0'
+                            trigger.directHit.addArray(game.filterPlayer());
+                            var num=player.countMark('vtbyaoli_effect');
+                            if(!game.hasPlayer(current=>{
+                                return !trigger.targets.contains(current)&&lib.filter.targetEnabled2(trigger.card,player,current);
+                            })) event.finish();
+                            else player.chooseTarget('媱丽：是否为'+get.translation(trigger.card)+'额外指定'+(num>1?'至多':'')+get.cnNumber(num)+'个目标？',num==1?1:[1,num],(card,player,target)=>{
+                                return !_status.event.sourcex.contains(target)&&player.canUse(_status.event.card,target);
+                            }).set('sourcex',trigger.targets).set('ai',target=>{
+                                var player=_status.event.player;
+                                return get.effect(target,_status.event.card,player,player);
+                            }).set('card',trigger.card);
+                            'step 1'
+                            if(result.bool){
+                                if(!event.isMine()&&!event.isOnline()) game.delayx();
+                                event.targets=result.targets;
+                            }
+                            else {
+                                event.finish();
+                            }
+                            'step 2'
+                            player.logSkill('vtbyaoli_effect',event.targets);
+                            trigger.targets.addArray(event.targets);
+                            player.removeSkill('vtbyaoli_effect');
+                        },
+                        marktext:'媱',
+                        intro:{
+                            content:'下一张【杀】不可被响应且可以额外指定&个目标',
+                        },
+                        ai:{
+                            directHit_ai:true,
+                            skillTagFilter:function(player,tag,arg){
+                                return arg.card.name=='sha';
+                            },
+                        }
+                    }
+                }
+            },
 			//江山如故·起
 			sbyingmen:{
 				forbid:['guozhan'],
@@ -1113,9 +1556,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var targets=game.filterPlayer(current=>{
 								return current.group==target.group&&current!=player;
 							});
-							return targets.reduce((p,c)=>{
+							var eff=targets.reduce((p,c)=>{
 								return p+get.effect(c,{name:'guohe'},player,player);
-							})+get.value(ui.selected.cards[0],target);
+							})
+							if(ui.selected.cards.length) eff+=get.value(ui.selected.cards[0],target);
+							return eff;
 						}
 					}
 				}
@@ -8525,6 +8970,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbyingmen_info:'锁定技。①游戏开始时，你将武将牌堆中随机四张武将牌置于你的武将牌上，称为“访客”。②回合开始时，若你的“访客”数小于4，你随机从武将牌堆中将“访客”补至四张。',
 			sbpingjian:'评鉴',
 			sbpingjian_info:'你可以于满足你“访客”上的一个无技能标签或仅有锁定技标签的技能条件的时机发动此技能，然后你选择移去一张“访客”。若移去的是本次发动技能的“访客”，则你于此技能结算结束时摸一张牌。',
+			vtb_xiaosha:'小杀',
+			vtbguisha:'瑰杀',
+			vtbguisha_info:'当其他角色使用【杀】时，你可以弃置一张牌令此【杀】不计入次数，且此【杀】对目标角色造成的伤害+1。',
+			vtbshuli:'淑丽',
+			vtbshuli_info:'每回合限两次。当其他角色使用【杀】造成伤害后，你可以与其各摸一张牌。',
+			vtb_xiaoshan:'小闪',
+			vtbshanwu:'闪舞',
+			vtbshanwu_info:'当其他角色成为【杀】的第一个目标时，你可以弃置一张【闪】，然后取消此【杀】的所有目标。',
+			vtbxianli:'娴丽',
+			vtbxianli_info:'每回合限两次。当你失去牌后，若其中有【闪】，你可以获得当前回合角色的一张牌。',
+			vtb_xiaotao:'小桃',
+			vtbtaoyan:'桃宴',
+			vtbtaoyan_info:'回合开始时，你可以令至多两名其他角色摸一张牌并于游戏外获得一张【桃】（共五张且均为♥6）。',
+			vtbyanli:'妍丽',
+			vtbyanli_info:'每轮限一次。一名角色于你的回合外进入濒死状态时，你可以令其回复至1点体力，然后其摸一张牌。',
+            vtb_xiaole:'小乐',
+            vtbleyu:'乐虞',
+            vtbleyu_info:'一名角色的回合开始时，你可以弃置三张牌令其判定。若结果不为♥，其跳过本回合的出牌阶段。',
+            vtbyuanli:'媛丽',
+            vtbyuanli_info:'一名角色跳过出牌阶段后，你可以与一名其他角色各摸一张牌。',
+            vtb_xiaojiu:'小酒',
+            vtbmeiniang:'美酿',
+            vtbmeiniang_info:'其他角色的出牌阶段开始时，你可以令其视为使用一张无次数限制且不计入次数的【酒】。',
+            vtbyaoli:'媱丽',
+            vtbyaoli_info:'其他角色于其出牌阶段内使用【酒】后，你可以令其于本回合内使用的下一张【杀】不能被响应且可以额外指定一个目标。',
 
 			offline_star:'桌游志·SP',
 			offline_sticker:'桌游志·贴纸',
@@ -8534,6 +9004,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			offline_feihongyingxue:'飞鸿映雪',
 			offline_piracyE:'官盗E系列·战役篇',
 			offline_piracyS:'官盗S系列',
+			offline_vtuber:'天书乱斗·虚拟偶像',
 			offline_piracyK:'官盗K系列',
 			offline_others:'线下其他系列',
 		},

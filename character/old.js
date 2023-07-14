@@ -15,7 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan",'old_caorui'],
 				old_yijiang5:["old_caoxiu","old_zhuzhi"],
 				old_yijiang67:["ol_zhangrang","ol_liuyu",'old_huanghao','old_liyan'],
-				old_sp:["old_lingju","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","old_wangyun",'ol_wanglang','old_dingfeng'],
+				old_sp:["old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","old_wangyun",'old_dingfeng'],
 				old_yingbian:['junk_simayi','old_yangyan','old_yangzhi'],
 				old_mobile:["old_caochun",'old_majun'],
 			},
@@ -30,7 +30,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junk_sunquan:['male','shen',4,['dili','yuheng'],['wei']],
 			old_dingfeng:['male','wu',4,['fenxun','duanbing']],
 			old_huanghao:['male','shu',3,['oldqinqing','oldhuisheng']],
-			ol_wanglang:['male','wei',3,['gushe','jici']],
 			oldre_liubiao:['male','qun',3,['zishou','zongshi']],
 			old_liubiao:['male','qun',4,['oldzishou','zongshi']],
 			old_gaoshun:['male','qun',4,['xianzhen','jinjiu']],
@@ -73,7 +72,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_lingtong:['male','wu',4,['oldxuanfeng']],
 			old_caoxiu:['male','wei',4,['taoxi']],
 			old_caozhen:['male','wei',4,['sidi']],
-			old_lingju:['female','qun',3,['jieyuan','fenxin_old']],
 			old_maliang:['male','shu',3,['xiemu','naman']],
 			old_chenqun:['male','wei',3,['dingpin','oldfaen']],
 			old_zhuhuan:['male','wu',4,['youdi']],
@@ -87,11 +85,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//ol_manchong:['male','wei',3,['yuce','junxing']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige']],
 			old_guanqiujian:["male","wei",4,["drlt_zhenrong","drlt_hongju"],[]],
-		},
-		characterFilter:{
-			old_lingju:function(mode){
-				return mode=='identity';
-			}
 		},
 		skill:{
 			oldqinqing:{
@@ -952,7 +945,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhuran:'旧朱然',
 			old_caoxiu:'旧曹休',
 			old_caozhen:'旧曹真',
-			old_lingju:'旧灵雎',
 			old_maliang:'旧马良',
 			old_chenqun:'旧陈群',
 			old_zhuhuan:'旧朱桓',
@@ -1018,7 +1010,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldre_liubiao_ab:'刘表',
 			oldzishou:'自守',
 			oldzishou_info:'摸牌阶段，若你已受伤，你可令额定摸牌数+X（X为你已损失的体力值），然后跳过下一个出牌阶段。',
-			ol_wanglang:'OL王朗',
 			old_huanghao:'旧黄皓',
 			oldqinqing:'寝情',
 			oldqinqing_info:'结束阶段，你可以选择一名攻击范围内含有主公的其他角色，然后你弃置该角色的一张牌（无牌则不弃），并令其摸一张牌。若该角色的手牌数大于主公，你摸一张牌。',

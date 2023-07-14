@@ -187,15 +187,24 @@
 #arena.ipad.choose-character>.dialog{
     bottom:96px;
 }
+#arena.discard-player-card>#control,
+#arena.gain-player-card>#control,
+#arena.choose-player-card>#control,
 #arena.choose-to-move>#control,
 #arena.choose-character>#control{
     bottom: 30px;
     transition: all 0s;
 }
+#arena.phone.discard-player-card>#control,
+#arena.phone.gain-player-card>#control,
+#arena.phone.choose-player-card>#control,
 #arena.phone.choose-to-move>#control,
 #arena.phone.choose-character>#control{
     bottom: 43px;
 }
+#arena.ipad.discard-player-card>#control,
+#arena.ipad.gain-player-card>#control,
+#arena.ipad.choose-player-card>#control,
 #arena.ipad.choose-to-move>#control,
 #arena.ipad.choose-character>#control{
     bottom: 45px;

@@ -94,6 +94,34 @@
 		hookmap:{},
 		imported:{},
 		layoutfixed:['chess','tafang','stone'],
+		pinyins:{
+			metadata:{
+				shengmu:['zh','ch','sh','b','p','m','f','d','t','l','n','g','k','h','j','q','x','r','z','c','s','y','w'],
+				special_shengmu:['j','q','x','y'],
+				feijiemu:{
+					i:['ing','iu','ie','in'],
+					u:['ui','un'],
+					ü:['üe','ün'],
+				},
+				zhengtirendu:['zhi','chi','shi','ri','zi','ci','si'],
+				yunjiao:{
+					'一麻':['a','ia','ua'],
+					'二波':['o','e','uo'],
+					'三皆':['ie','üe'],
+					'四开':['ai','uai'],
+					'五微':['ei','ui'],
+					'六豪':['ao','iao'],
+					'七尤':['ou','iu'],
+					'八寒':['an','ian','uan','üan'],
+					'九文':['en','in','un','ün'],
+					'十唐':['ang','iang','uang'],
+					'十一庚':['eng','ing','ong','ung'],
+					'十二齐':['i','er','ü'],
+					'十三支':['-i'],
+					'十四姑':['u'],
+				},
+			}
+		},
 		characterDialogGroup:{
 			'收藏':function(name,capt){
 				return lib.config.favouriteCharacter.contains(name)?capt:null;
@@ -5016,6 +5044,7 @@
 							online:'Online',
 							rewrite:'Rewrite',
 							chaoming:'潮鸣',
+							random:'随机播放',
 						},
 						init:'rewrite',
 						onclick:function(item){
@@ -6726,7 +6755,11 @@
 			'<li>施法：若技能的拥有者未拥有等待执行的同名“施法”效果，则其可以发动“施法”技能。其须选择声明一个数字X（X∈[1, 3]），在此之后的第X个回合结束时，其执行“施法”效果，且效果中的数字X视为与技能发动者声明的X相同。'+
 			'<li>共同拼点：一种特殊的拼点结算。发起者与被指定的拼点目标同时亮出拼点牌，进行一次决算：其中拼点牌点数唯一最大的角色赢，其他角色均没赢；若没有点数唯一最大的拼点牌，则所有角色拼点均没赢。'+
 			'<li>强令：若一名角色拥有带有“强令”的技能，则该技能的发动时机为“出牌阶段开始时”。若技能拥有者发动该技能，其须发布“强令”给一名其他角色，并在对应技能的时间节点加以判断目标角色是否成功完成该强令所要求的任务条件。成功或失败则会根据技能效果执行不同结算流程。'+
-			'<li>摧坚：若一名角色拥有带有“摧坚”的技能，则该技能的发动时机为“当你使用伤害牌指定第一个目标后”。你可以对其中一个目标发动“摧坚”技能，然后执行后续效果。其中，后续效果里的X等于该目标的非charlotte技能的数量。'
+			'<li>摧坚：若一名角色拥有带有“摧坚”的技能，则该技能的发动时机为“当你使用伤害牌指定第一个目标后”。你可以对其中一个目标发动“摧坚”技能，然后执行后续效果。其中，后续效果里的X等于该目标的非charlotte技能的数量。'+
+			'<li>妄行：一种特殊的选项。若一名角色拥有带有“妄行”的技能，则该技能触发时，你须选择声明一个数字X（X∈{1,2,3,4}），技能后续中的X即为你选择的数字。选择完毕后，你获得如下效果：回合结束时，你选择一项：1.弃置X张牌；2.减1点体力上限。'+
+			'<li>搏击：若一名角色拥有带有“搏击”的技能，则当该搏击技能触发时，若本次技能的目标角色在你攻击范围内，且你在其攻击范围内，则你执行技能主体效果时，同时额外执行“搏击”后的额外效果。'+
+			'<li>游击：若一名角色拥有带有“游击”的技能，则当该游击技能执行至“游击”处时，若本次技能的目标角色在你的攻击范围内，且你不在其攻击范围内，则你可以执行“游击”后的额外效果。'+
+			''
 		},
 		setIntro:function(node,func,left){
 			if(lib.config.touchscreen){
@@ -10556,6 +10589,7 @@
 						dialog.classList.add('scroll1');
 						dialog.classList.add('scroll2');
 						dialog.classList.add('fullwidth');
+						dialog.classList.add('fullheight');
 						dialog.buttonss=[];
 						
 						var list=['意见为红色的角色','意见为黑色的角色']
@@ -11459,7 +11493,7 @@
 						if(get.position(event.cards[1][i],true)=='o') player.equip(event.cards[1][i]);
 					}
 					for(var i=0;i<event.cards[0].length;i++){
-						if(get.position(event.cards[1][i],true)=='o') target.equip(event.cards[0][i]);
+						if(get.position(event.cards[0][i],true)=='o') target.equip(event.cards[0][i]);
 					}
 				},
 				disableEquip:function(){
@@ -14653,12 +14687,16 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
+					var expand_length=0;
 					var directh=!lib.config.unauto_choose;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getCards('h');
 							if(hs.length){
-								event.dialog.addText('手牌区');
+								expand_length+=Math.ceil(hs.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								hs.randomSort();
 								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
@@ -14672,7 +14710,10 @@
 						else if(event.position[i]=='e'){
 							var es=target.getCards('e');
 							if(es.length){
-								event.dialog.addText('装备区');
+								expand_length+=Math.ceil(es.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">装备区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(es);
 								directh=false;
 							}
@@ -14680,7 +14721,10 @@
 						else if(event.position[i]=='j'){
 							var js=target.getCards('j');
 							if(js.length){
-								event.dialog.addText('判定区');
+								expand_length+=Math.ceil(js.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(js);
 								directh=false;
 							}
@@ -14718,6 +14762,10 @@
 							event.dialog.open();
 							game.check();
 							game.pause();
+							if(expand_length>2){
+								ui.arena.classList.add('choose-player-card');
+								event.dialog.classList.add('fullheight');
+							}
 						}
 						else if(event.isOnline()){
 							event.send();
@@ -14737,6 +14785,9 @@
 						event.result.cards=event.result.links.slice(0);
 					}
 					event.resume();
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-player-card');
+					},500);
 				},
 				discardPlayerCard:function(){
 					"step 0"
@@ -14776,11 +14827,15 @@
 						event.dialog.addText(event.prompt2);
 					}
 					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
+					var expand_length=0;
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getDiscardableCards(player,'h');
 							if(hs.length){
-								event.dialog.addText('手牌区');
+								expand_length+=Math.ceil(hs.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								hs.randomSort();
 								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
@@ -14794,7 +14849,10 @@
 						else if(event.position[i]=='e'){
 							var es=target.getDiscardableCards(player,'e');
 							if(es.length){
-								event.dialog.addText('装备区');
+								expand_length+=Math.ceil(es.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">装备区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(es);
 								directh=false;
 							}
@@ -14802,7 +14860,10 @@
 						else if(event.position[i]=='j'){
 							var js=target.getDiscardableCards(player,'j');
 							if(js.length){
-								event.dialog.addText('判定区');
+								expand_length+=Math.ceil(js.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(js);
 								directh=false;
 							}
@@ -14836,6 +14897,10 @@
 							event.dialog.open();
 							game.check();
 							game.pause();
+							if(expand_length>2){
+								ui.arena.classList.add('discard-player-card');
+								event.dialog.classList.add('fullheight');
+							}
 						}
 						else if(event.isOnline()){
 							event.send();
@@ -14853,6 +14918,9 @@
 					event.dialog.close();
 					"step 2"
 					event.resume();
+					setTimeout(function(){
+						ui.arena.classList.remove('discard-player-card');
+					},500);
 					if(event.result.bool&&event.result.links&&!game.online){
 						if(event.logSkill){
 							if(typeof event.logSkill=='string'){
@@ -14921,12 +14989,16 @@
 					if(event.prompt2){
 						event.dialog.addText(event.prompt2);
 					}
+					var expand_length=0;
 					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getGainableCards(player,'h');
 							if(hs.length){
-								event.dialog.addText('手牌区');
+								expand_length+=Math.ceil(hs.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								hs.randomSort();
 								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
 									event.dialog.add(hs);
@@ -14940,7 +15012,10 @@
 						else if(event.position[i]=='e'){
 							var es=target.getGainableCards(player,'e');
 							if(es.length){
-								event.dialog.addText('装备区');
+								expand_length+=Math.ceil(es.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">装备区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(es);
 								directh=false;
 							}
@@ -14948,7 +15023,10 @@
 						else if(event.position[i]=='j'){
 							var js=target.getGainableCards(player,'j');
 							if(js.length){
-								event.dialog.addText('判定区');
+								expand_length+=Math.ceil(js.length/6);
+								var title=event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
+								title.style.margin='0px';
+								title.style.padding='0px';
 								event.dialog.add(js);
 								directh=false;
 							}
@@ -14983,6 +15061,10 @@
 							event.dialog.open();
 							game.check();
 							game.pause();
+							if(expand_length>2){
+								ui.arena.classList.add('gain-player-card');
+								event.dialog.classList.add('fullheight');
+							}
 						}
 						else if(event.isOnline()){
 							event.send();
@@ -15000,6 +15082,9 @@
 					event.dialog.close();
 					"step 2"
 					event.resume();
+					setTimeout(function(){
+						ui.arena.classList.remove('gain-player-card');
+					},500);
 					if(game.online||!event.result.bool){
 						event.finish();
 					}
@@ -15044,6 +15129,7 @@
 						return;
 					}
 					var cards=player.getCards('h');
+					player.showCards(cards).setContent(function(){});
 					var str=get.translation(player.name)+'的手牌';
 					if(typeof event.prompt=='string'){
 						str=event.prompt;
@@ -15413,6 +15499,8 @@
 					event.directHit=[];
 					event.customArgs={default:{}};
 					if(typeof event.baseDamage!='number') event.baseDamage=get.info(card,false).baseDamage||1;
+					if(typeof event.effectCount!='number') event.effectCount=get.info(card,false).effectCount||1;
+					event.effectedCount=0;
 					if(event.oncard){
 						event.oncard(event.card,event.player);
 					}
@@ -15480,8 +15568,9 @@
 							}
 						}
 					}
-					if(card.name=='wuxie'){							game.logv(player,[card,cards],[event.getTrigger().card]);
-						}
+					if(card.name=='wuxie'){
+						game.logv(player,[card,cards],[event.getTrigger().card]);
+					}
 					else{
 						game.logv(player,[card,cards],targets);
 					}
@@ -15622,6 +15711,9 @@
 						event.redo();
 					}
 					"step 9"
+					if(event.all_excluded) return;
+					event.effectedCount++;
+					event.num=0;
 					var info=get.info(card,false);
 					if(info.contentBefore){
 						var next=game.createEvent(card.name+'ContentBefore');
@@ -15727,6 +15819,7 @@
 						event.goto(10);
 					}
 					"step 12"
+					if(event.all_excluded) return;
 					if(get.info(card,false).contentAfter){
 						var next=game.createEvent(card.name+'ContentAfter');
 						next.setContent(get.info(card,false).contentAfter);
@@ -15739,6 +15832,14 @@
 						if(event.forceDie) next.forceDie=true;
 					}
 					"step 13"
+					if(event.all_excluded) return;
+					if(event.effectedCount<event.effectCount){
+						if(document.getElementsByClassName('thrown').length){
+							if(event.delayx!==false&&get.info(event.card,false).finalDelay!==false) game.delayx();
+						}
+						event.goto(9);
+					}
+					"step 14"
 					if(event.postAi){
 						event.player.logAi(event.targets,event.card);
 					}
@@ -15752,7 +15853,7 @@
 					else{
 						event.finish();
 					}
-					"step 14"
+					"step 15"
 					event._oncancel();
 				},
 				useSkill:function(){
@@ -27973,10 +28074,10 @@
 							return true;
 						}
 					}
-					if(!_status.connectMode&&lib.config.wuxie_self&&event.getParent().state){
-						var tw=event.getTrigger().parent;
-						if(tw.player.isUnderControl(true)&&!tw.player.hasSkillTag('noautowuxie')&&
-							tw.targets&&tw.targets.length==1&&!tw.noai){
+					if(lib.config.wuxie_self){
+						var tw=event.info_map;
+						if(tw.player&&tw.player.isUnderControl(true)&&!tw.player.hasSkillTag('noautowuxie')&&
+							(!tw.targets||tw.targets.length<=1)&&!tw.noai){
 							return true;
 						}
 					}
@@ -31219,6 +31320,9 @@
 			}
 			else if(_status._aozhan==true&&lib.config.mode_config.guozhan.aozhan_bgm!='disabled'){
 				var aozhan=lib.config.mode_config.guozhan.aozhan_bgm;
+				if(aozhan=='random'){
+					aozhan=['online','rewrite','chaoming'].randomGet();
+				}
 				ui.backgroundMusic.src=lib.assetURL+'audio/background/aozhan_'+aozhan+'.mp3';
 			}
 			else{
@@ -34137,27 +34241,22 @@
 			}
 			if(game.download&&!keepfile){
 				if(lib.node&&lib.node.fs){
-					try{
-						lib.node.fs.readdir(__dirname+'/extension/'+extname,function(err,list){
-							if(err){
-								return;
-							}
-							var removeFile=function(){
-								if(list.length){
-									var filename=list.shift();
-									lib.node.fs.unlink(__dirname+'/extension/'+extname+'/'+filename,removeFile);
-								}
-								else{
-									try{
-										lib.node.fs.rmdir(__dirname+'/extension/'+extname,function(){});
+					try {
+						var deleteFolderRecursive = function(path) {
+							if (lib.node.fs.existsSync(path)) {
+								lib.node.fs.readdirSync(path).forEach(function(file, index){
+									var curPath = path + "/" + file;
+									if (lib.node.fs.lstatSync(curPath).isDirectory()) {
+										deleteFolderRecursive(curPath);
+									} else {
+										lib.node.fs.unlinkSync(curPath);
 									}
-									catch(e){}
-								}
+								});
+								lib.node.fs.rmdirSync(path);
 							}
-							removeFile();
-						});
-					}
-					catch(e){}
+						};
+						deleteFolderRecursive(__dirname+'/extension/'+extname);
+					} catch(e) {}
 				}
 				else{
 					window.resolveLocalFileSystemURL(lib.assetURL+'extension/'+extname,function(entry){
@@ -45669,9 +45768,13 @@
 					var bool2=false;
 					var bool3=(get.mode()=='guozhan'&&_status.forceKey!=true&&get.config('onlyguozhan'));
 					var bool4=false;
+					var bool5=false;
 					for(var i in lib.character){
 						if(lib.character[i][1]=='shen'){
 							bool1=true;
+						}
+						if(lib.character[i][1]=='ye'){
+							bool5=true;
 						}
 						if(bool3||lib.character[i][1]=='key'){
 							bool2=true;
@@ -45682,6 +45785,7 @@
 					if(bool1) groups.add('shen');
 					if(bool2&&!bool3) groups.add('key');
 					if(bool4) groups.add('double');
+					if(bool5) groups.add('ye');
 					var natures=['water','soil','wood','metal'];
 					var span=document.createElement('span');
 					newlined.appendChild(span);
@@ -45726,11 +45830,15 @@
 									dialog.buttons[i].classList.add('nodisplay');
 								}
 								else if(dialog.currentgroup=='double'){
-									if(dialog.buttons[i]._changeGroup||dialog.buttons[i].group=='ye') dialog.buttons[i].classList.remove('nodisplay');
+									if(dialog.buttons[i]._changeGroup) dialog.buttons[i].classList.remove('nodisplay');
+									else dialog.buttons[i].classList.add('nodisplay');
+								}
+								else if(dialog.currentgroup=='ye'){
+									if(dialog.buttons[i].group=='ye') dialog.buttons[i].classList.remove('nodisplay');
 									else dialog.buttons[i].classList.add('nodisplay');
 								}
 								else{
-									if(dialog.buttons[i]._changeGroup||dialog.buttons[i].group=='ye'||dialog.buttons[i].group!=dialog.currentgroup){
+									if(dialog.buttons[i]._changeGroup||dialog.buttons[i].group!=dialog.currentgroup){
 										dialog.buttons[i].classList.add('nodisplay');
 									}
 									else{
@@ -46483,6 +46591,7 @@
 						});
 					}
 				}
+				lib.init.js(lib.assetURL+'game','pinyinjs',function(){})
 				lib.init.js(lib.assetURL+'game','keyWords',function(){});
 				
 				lib.updateURL=lib.updateURLS[lib.config.update_link]||lib.updateURLS.coding;
@@ -51946,6 +52055,69 @@
 		},
 	};
 	var get={
+		pinyin:function(chinese,withtone){
+			const util=window.pinyinUtilx;
+			if(!window.pinyinUtilx) return [];
+			if(lib.pinyins.metadata&&lib.pinyins.metadata[chinese]){
+				const str=lib.pinyins.metadata[chinese];
+				if(withtone===false){
+					for(let i=0;i<str.length;i++){
+						str[i]=util.removeTone(str[i]);
+					}
+				}
+				return str;
+			}
+			return util.getPinyin(chinese,null,withtone,true);
+		},
+		yunmu:function(str){
+			//部分整体认读音节特化处理
+			const util=window.pinyinUtilx;
+			if(util&&lib.pinyins.metadata.zhengtirendu.contains(util.removeTone(str))){
+				return '-'+str[str.length-1];
+			}
+			//排除声母
+			for(let i of lib.pinyins.metadata.shengmu){
+				if(str.indexOf(i)==0){
+					str=str.slice(i.length);
+					if(str[0]=='u'&&lib.pinyins.metadata.special_shengmu.contains(i)) str='ü'+str.slice(1);
+					break;
+				}
+			}
+			//排除介母
+			if(str.length>0){
+				for(let i in lib.pinyins.metadata.feijiemu){
+					if(str[0]==i){
+						let goon=false;
+						for(let j of lib.pinyins.metadata.feijiemu[i]){
+							if(str.indexOf(j)==0) goon=true;
+						}
+						if(!goon) str=str.slice(1);
+						break;
+					}
+				}
+			}
+			return str;
+		},
+		yunjiao:function(str){
+			const util=window.pinyinUtilx;
+			if(util) str=util.removeTone(str)
+			if(lib.pinyins.metadata.zhengtirendu.contains(str)){
+				str=('-'+str[str.length-1]);
+			}
+			else{
+				for(let i of lib.pinyins.metadata.shengmu){
+					if(str.indexOf(i)==0){
+						str=str.slice(i.length);
+						if(str[0]=='u'&&lib.pinyins.metadata.special_shengmu.contains(i)) str='ü'+str.slice(1);
+						break;
+					}
+				}
+			}
+			for(let i in lib.pinyins.metadata.yunjiao){
+				if(lib.pinyins.metadata.yunjiao[i].contains(str)) return i;
+			}
+			return null;
+		},
 		skillCategoriesOf:function(skill,player){
 			var list=[],info=get.info(skill);
 			if(!info) return list;
@@ -52024,6 +52196,14 @@
 			return 0;
 		},
 		is:{
+			yayun:function(str1,str2){
+				if(str1==str2) return true;
+				var pinyin1=get.pinyin(str1,false),pinyin2=get.pinyin(str2,false);
+				if(!pinyin1.length||!pinyin2.length) return false;
+				var pron1=pinyin1[pinyin1.length-1],pron2=pinyin2[pinyin2.length-1];
+				if(pron1==pron2) return true;
+				return get.yunjiao(pron1)==get.yunjiao(pron2);
+			},
 			blocked:function(skill,player){
 				if(!player.storage.skill_blocker||!player.storage.skill_blocker.length) return false;
 				for(var i of player.storage.skill_blocker){
@@ -54889,7 +55069,7 @@
 							if(ui.throwEmotion){
 								for(var i of ui.throwEmotion) i.classList.remove('exclude');
 							}
-						},(emotion=='flower'||emotion=='egg')?5000:10000)
+						},(emotion=='flower'||emotion=='egg')?500:5000)
 					};
 					var td;
 					var table=document.createElement('div');

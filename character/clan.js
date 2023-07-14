@@ -37,15 +37,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var num=player.countCards('h');
-					var str='是否交给其'+get.cnNumber(num)+'张牌，然后视为你对其使用一张【酒】？或者点击“取消”，令其交给你一张牌，然后其视为对你使用一张【杀】。';
+					var str='是否交给其'+get.cnNumber(num)+'张牌，然后视为你对其使用一张【酒】？或者点击“取消”，令其交给你一张牌，然后其视为对你使用一张雷【杀】。';
 					target.chooseCard(get.translation(player)+'对你发动了【驳龙】',str,num,'he').set('ai',card=>{
-						if(_status.event.canGive) return 5-get.value(card);
+						if(_status.event.canGive) return 5+Math.max(0,3-_status.event.player.hp)/1.5-get.value(card);
 						return 0;
 					}).set('canGive',function(){
 						if(get.attitude(target,player)>1) return true;
 						if(!player.hasSha()&&player.countCards('h')<=4) return true;
+						var sha={name:'sha',nature:'thunder',isCard:true};
 						if(game.hasPlayer(current=>{
-							return player.canUse('sha',current,true,true)&&get.effect(current,{name:'sha'},player,target)<0&&!current.countCards('hs',['shan','caochuan']);
+							return player.canUse(sha,current,true,true)&&get.effect(current,sha,player,target)<0&&!current.countCards('hs',['shan','caochuan']);
 						})) return false;
 						return true;
 					}());
@@ -57,13 +58,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else{
-						player.chooseCard('驳龙：交给'+get.translation(target)+'一张牌',get.translation(target)+'拒绝给牌，请交给其一张牌然后视为对其使用一张【杀】',true,'he');
+						player.chooseCard('驳龙：交给'+get.translation(target)+'一张牌',get.translation(target)+'拒绝给牌，请交给其一张牌然后视为对其使用一张雷【杀】',true,'he');
 					}
 					'step 2'
 					if(result.bool){
 						var cards=result.cards;
 						player.give(cards,target);
-						if(player.canUse('sha',target,false,false)) player.useCard({name:'sha',isCard:true},target,false);
+						var sha={name:'sha',nature:'thunder',isCard:true};
+						if(player.canUse(sha,target,false,false)) player.useCard(sha,target,false);
 					}
 				},
 				ai:{
@@ -83,6 +85,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanzhongliu:{
 				audio:2,
+				audioname:['clan_wangling'],
 				trigger:{player:'useCard'},
 				forced:true,
 				clanSkill:true,
@@ -1240,7 +1243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					return get.type(event.card,null,false)=='trick'&&!get.tag(event.card,'damage')&&event.cards.filterInD('d').length>0&&player.getHistory('useCard',evt=>{
+					return get.type(event.card,null,false)=='trick'&&!get.tag(event.card,'damage')&&event.cards.filterInD().length>0&&player.getHistory('useCard',evt=>{
 						return get.type(evt.card,null,false)=='trick'&&!get.tag(evt.card,'damage');
 					}).indexOf(event)==0;
 				},
@@ -1601,7 +1604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanlianzhu_info:'转换技。每名角色Ａ的出牌阶段限一次。阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1；阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1。',
 			clan_wangling:'族王凌',
 			clanbolong:'驳龙',
-			clanbolong_info:'出牌阶段限一次。你可以令一名其他角色选择一项：1.你交给其一张牌，然后视为对其使用一张【杀】；2.交给你等同于你手牌数的牌，然后视为对你使用一张【酒】。',
+			clanbolong_info:'出牌阶段限一次。你可以令一名其他角色选择一项：1.你交给其一张牌，然后视为对其使用一张雷【杀】；2.交给你等同于你手牌数的牌，然后视为对你使用一张【酒】。',
 			clanzhongliu:'中流',
 			clanzhongliu_info:'宗族技，锁定技。当你使用牌时，若此牌对应的实体牌不全为同族角色的手牌，你重置武将牌上的技能。',
 			

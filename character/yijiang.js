@@ -10304,13 +10304,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
+						event.target=target;
 						player.logSkill('qiangzhi',target);
 						player.choosePlayerCard(target,'h',true);
 					}
 					else event.finish();
 					'step 2'
 					var card=result.cards[0];
-					player.showCards(card);
+					target.showCards(card,get.translation(target)+'因【强识】展示');
 					player.storage.qiangzhi_draw=get.type(card,'trick');
 					game.addVideo('storage',player,['qiangzhi_draw',player.storage.qiangzhi_draw]);
 					player.addTempSkill('qiangzhi_draw','phaseUseEnd');

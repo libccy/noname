@@ -3014,7 +3014,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
-				filter:(event,player)=>!event.numFixed&&player.isMaxHp(),
+				filter:(event,player)=>!event.numFixed&&player.isMaxHandcard(),
 				preHidden:true,
 				content:function(){
 					trigger.num+=2;

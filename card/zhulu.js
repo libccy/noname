@@ -659,12 +659,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jinhe_lose:{
 				trigger:{
 					player:['loseAfter','equipAfter'],
+					global:'loseAsyncAfter',
 				},
 				equipSkill:true,
 				forced:true,
 				filter:function(event,player){
 					if(event.getl===false) return false;
-					if(event.name=='lose'&&event.position!=ui.discardPile||!_status.jinhe||event.getParent(2).name=='jinhe_skill'&&event.getParent(2).player==player) return false;
+					if(!event.getd(player).length||!_status.jinhe||event.getParent(2).name=='jinhe_skill'&&event.getParent(2).player==player) return false;
 					var evt=event.getl(player);
 					if(!evt) return false;
 					for(var i=0;i<evt.es.length;i++){

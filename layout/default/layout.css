@@ -1742,6 +1742,9 @@ div:not(.handcards)>.card>.info>span,
 	margin-top: 0;
 	margin-bottom: 0;
 }
+.content>.caption + .buttons:last-child{
+	margin-top: 0;
+}
 .content>.config {
 	height: 20px;
 	line-height: 20px;
@@ -2074,7 +2077,10 @@ div:not(.handcards)>.card>.info>span,
 	position: absolute;
 	left: 50%;
 }
-#arena.choose-to-move>#control{
+#arena.choose-to-move>#control,
+#arena.discard-player-card>#control,
+#arena.gain-player-card>#control,
+#arena.choose-player-card>#control{
 	top: calc(80%) !important;
 }
 /*--------角色--------*/

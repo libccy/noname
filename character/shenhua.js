@@ -971,7 +971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					'1':{
-						audio:2,
+						audio:'drlt_qianjie',
 						trigger:{
 							player:'linkBegin'
 						},
@@ -7730,7 +7730,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiangwei:['ol_jiangwei','re_jiangwei','jiangwei'],
 			liushan:['ol_liushan','re_liushan','liushan'],
 			sunce:['re_sunben','re_sunce','sunce'],
-			zhangzhang:['re_zhangzhang','zhangzhang'],
+			zhangzhang:['ol_zhangzhang','re_zhangzhang','zhangzhang'],
 			zuoci:['re_zuoci','zuoci'],
 			caiwenji:['ol_caiwenji','re_caiwenji','caiwenji'],
 			xuyou:['sp_xuyou','xuyou','yj_xuyou'],
@@ -7767,7 +7767,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_jianxiang_info":"当你成为其他角色使用牌的目标时，你可令手牌数最少的一名角色摸一张牌。",
 			"nzry_shenshi1":"审时",
 			"nzry_shenshi":"审时",
-			"nzry_shenshi_info":"转换技，阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张。",
+			"nzry_shenshi_info":"转换技，阴：出牌阶段限一次，你可以将一张牌交给一名除你外手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张。",
 			"nzry_mingren":"明任",
 			"nzry_mingren_info":"游戏开始时，你摸两张牌，然后将一张手牌置于你的武将牌上，称为“任”。结束阶段，你可以用一张手牌替换“任”。",
 			"nzry_zhenliang":"贞良",
@@ -7931,7 +7931,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhanghe:'张郃',
 			dengai:'邓艾',
 			sunce:'孙策',
-			zhangzhang:'张昭张紘',
+			zhangzhang:'张昭张纮',
 			caiwenji:'蔡琰',
 			zuoci:'左慈',
 

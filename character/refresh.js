@@ -8,7 +8,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_feng:['caoren','ol_xiahouyuan','ol_weiyan','ol_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji','ol_huangzhong'],
 				refresh_huo:["ol_sp_zhugeliang","ol_xunyu","ol_dianwei","ol_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
 				refresh_lin:['re_menghuo','ol_sunjian','re_caopi','ol_xuhuang','ol_dongzhuo','ol_zhurong','re_jiaxu','ol_lusu'],
-				refresh_shan:['ol_jiangwei','ol_caiwenji','ol_liushan','re_zhangzhang','re_zuoci','re_sunce','ol_dengai','re_zhanghe'],
+				refresh_shan:['ol_jiangwei','ol_caiwenji','ol_liushan','ol_zhangzhang','re_zuoci','re_sunce','ol_dengai','re_zhanghe'],
 				refresh_yijiang1:['xin_wuguotai','xin_gaoshun','dc_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua','dc_xushu','re_chengong'],
 				refresh_yijiang2:['re_madai','re_wangyi','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao','re_xunyou','re_guanzhang'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','dc_liru','re_manchong','re_fuhuanghou','re_guanping','re_liufeng'],
@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
+			ol_zhangzhang:['male','wu',3,['olzhijian','olguzheng']],
 			re_jsp_huangyueying:['female','qun',3,['rejiqiao','relinglong']],
 			re_zhangsong:['male','shu',3,['qiangzhi','rexiantu']],
 			re_zhuzhi:['male','wu',4,['reanguo']],
@@ -139,7 +140,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_jiangwei:['male','shu',4,['oltiaoxin','olzhiji']],
 			ol_caiwenji:['female','qun',3,['olbeige','duanchang']],
 			ol_liushan:['male','shu',3,['xiangle','olfangquan','olruoyu'],['zhu']],
-			re_zhangzhang:['male','wu',3,['rezhijian','guzheng']],
 			
 			re_sunce:['male','wu',4,['oljiang','olhunzi','olzhiba'],['zhu']],
 			re_jianyong:['male','shu',3,['reqiaoshui','jyzongshi']],
@@ -161,6 +161,141 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//OL界二张
+			olzhijian:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.countCards('h',{type:'equip'})>0;
+				},
+				filterCard:function(card){
+					return get.type(card)=='equip';
+				},
+				position:'he',
+				check:function(card){
+					var player=_status.currentPhase;
+					if(player.countCards('he',{subtype:get.subtype(card)})>1){
+						return 11-get.equipValue(card);
+					}
+					return 6-get.value(card);
+				},
+				filterTarget:function(card,player,target){
+					if(target.isMin()) return false;
+					return player!=target&&target.canEquip(card,true);
+				},
+				content:function(){
+					target.equip(cards[0]);
+					player.draw();
+				},
+				discard:false,
+				prepare:function(cards,player,targets){
+					player.$give(cards,targets[0],false);
+				},
+				ai:{
+					basic:{
+						order:10
+					},
+					result:{
+						target:function(player,target){
+							var card=ui.selected.cards[0];
+							if(card) return get.effect(target,card,target,target);
+							return 0;
+						},
+					},
+					threaten:1.35
+				}
+			},
+			olguzheng:{
+				audio:2,
+				trigger:{
+					global:['loseAfter','loseAsyncAfter'],
+				},
+				filter:function(event,player){
+					if(event.type!='discard') return false;
+					if(player.hasSkill('olguzheng_used')) return false;
+					return game.hasPlayer(current=>{
+						if(current==player) return false;
+						var evt=event.getl(current);
+						if(!evt||!evt.cards2||evt.cards2.filterInD('d').length<2) return false;
+						return true;
+					});
+				},
+				checkx:function(event,player,cards){
+					if(cards.length>2||get.attitude(player,event.player)>0) return true;
+					for(var i=0;i<cards.length;i++){
+						if(get.value(cards[i],event.player,'raw')<0) return true;
+					}
+					return false;
+				},
+				direct:true,
+				preHidden:true,
+				content:function(){
+					'step 0'
+					var targets=[],cardsList=[];
+					var players=game.filterPlayer().sortBySeat(_status.currentPhase);
+					for(var current of players){
+						if(current==player) continue;
+						var cards=[];
+						var evt=trigger.getl(current);
+						if(!evt||!evt.cards2) continue;
+						var cardsx=evt.cards2.filterInD('d');
+						cards.addArray(cardsx);
+						if(cards.length){
+							targets.push(current);
+							cardsList.push(cards);
+						}
+					}
+					event.targets=targets;
+					event.cardsList=cardsList;
+					'step 1'
+					var target=targets.shift();
+					var cards=event.cardsList.shift();
+					event.target=target;
+					event.cards=cards;
+					player.chooseButton(2,[
+						get.prompt('olguzheng',target),
+						'<span class="text center">被选择的牌将成为对方收回的牌</span>',
+						cards,
+						[['获得剩余的牌','放弃剩余的牌'],'tdnodes'],
+					]).set('filterButton',function(button){
+						var type=typeof button.link;
+						if(ui.selected.buttons.length&&type==typeof ui.selected.buttons[0].link) return false;
+						return true;
+					}).set('check',lib.skill.olguzheng.checkx(trigger,player,cards)).set('ai',function(button){
+						if(typeof button.link=='string'){
+							return button.link=='获得剩余的牌'?1:0;
+						}
+						if(_status.event.check){
+							return 20-get.value(button.link,_status.event.getTrigger().player);
+						}
+						return 0;
+					}).setHiddenSkill('olguzheng');
+					'step 2'
+					if(result.bool){
+						player.logSkill('olguzheng',target);
+						player.addTempSkill('olguzheng_used',['phaseZhunbeiAfter','phaseDrawAfter','phaseJudgeAfter','phaseUseAfter','phaseDiscardAfter','phaseJieshuAfter']);
+						if(typeof result.links[0]!='string') result.links.reverse();
+						var card=result.links[1];
+						target.gain(card,'gain2');
+						if(result.links[0]!='获得剩余的牌') event.finish();
+					}
+					else event.finish();
+					'step 3'
+					var cards=cards.filterInD('d');
+					if(cards.length>0) player.gain(cards,'gain2');
+					'step 4'
+					if(event.targets.length) event.goto(1);
+				},
+				ai:{
+					threaten:1.3,
+					expose:0.2
+				},
+				subSkill:{
+					used:{
+						charlotte:true,
+					}
+				},
+			},
 			//SP黄月英
 			rejiqiao:{
 				audio:2,
@@ -171,7 +306,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseToDiscard(get.prompt2('jiqiao'),[1,player.countCards('he')],'he').set('ai',function(card){
+					player.chooseToDiscard(get.prompt2('rejiqiao'),[1,player.countCards('he')],'he').set('ai',function(card){
 						if(card.name=='bagua') return 10;
 						return 7-get.value(card);
 					}).set('logSkill','rejiqiao');
@@ -11054,7 +11189,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.addTempSkill('new_yijue2');
 						event.finish();
 					}
-					else{
+					else if(get.color(event.card2)=='red'){
 						player.gain(event.card2,target,'give','bySelf');
 						if(target.hp<target.maxHp){
 							player.chooseBool('是否让目标回复一点体力？').ai=function(event,player){
@@ -14083,7 +14218,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rebeige_info:'当有角色受到【杀】造成的伤害后，你可以弃一张牌，并令其进行一次判定，若判定结果为：♥该角色回复X点体力(X为伤害点数)；♦︎该角色摸三张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
 			re_liushan:'手杀刘禅',
 			re_sunben:'界孙笨',
-			re_zhangzhang:'界张昭张纮',
+			re_zhangzhang:'手杀张昭张纮',
 			rehunzi:'魂姿',
 			rehunzi_info:'觉醒技，准备阶段，若你的体力值不大于2，你减1点体力上限，并获得技能〖英姿〗和〖英魂〗。',
 			rezhijian:'直谏',
@@ -14504,6 +14639,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejiqiao_info:'出牌阶段开始时，你可以弃置任意张牌，然后亮出牌堆顶X张牌（X为你以此法弃置的牌数与其中装备牌数之和），你获得其中所有非装备牌。',
 			relinglong:'玲珑',
 			relinglong_info:'锁定技。若你的装备区：没有防具牌，视为你装备【八卦阵】；没有坐骑牌，你的手牌上限+2；没有宝物牌，你视为拥有〖奇才〗；以上均满足：你使用的【杀】或普通锦囊牌不可被响应。',
+			ol_zhangzhang:'界张昭张纮',
+			olzhijian:'直谏',
+			olzhijian_info:'出牌阶段，你可以将一张装备牌置于其他角色的装备区（可替换原装备），然后摸一张牌。',
+			olguzheng:'固政',
+			olguzheng_info:'每阶段限一次。当其他角色的至少两张牌因弃置而进入弃牌堆后，你可以令其获得其中一张牌，然后你可以获得剩余的牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

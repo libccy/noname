@@ -1484,7 +1484,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_taishici:['re_sp_taishici','sp_taishici'],
 			mazhong:['mazhong','re_mazhong'],
 			wenpin:['re_wenpin','wenpin'],
-			liuyan:['jsrg_liuyan','liuyan'],
+			liuyan:['jsrg_liuyan','ol_liuyan','liuyan'],
 		},
 		translate:{
 			xinghuoliaoyuan:'星火燎原',
@@ -1563,7 +1563,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_tushe":"图射",
 			"xinfu_tushe_info":"当你使用非装备牌指定目标后，若你没有基本牌，则你可以摸X张牌。（X为此牌指定的目标数）",
 			"xinfu_limu":"立牧",
-			"xinfu_limu_info":"出牌阶段限一次，你可以将一张♦牌当做【乐不思蜀】对自己使用，然后回复1点体力。只要你的判定区内有牌，你对攻击范围内的其他角色使用牌便没有次数和距离限制。",
+			"xinfu_limu_info":"出牌阶段，你可以将一张♦牌当做【乐不思蜀】对自己使用，然后回复1点体力。只要你的判定区内有牌，你对攻击范围内的其他角色使用牌便没有次数和距离限制。",
 			xinyingshi:'应势',
 			xinyingshi_info:'出牌阶段开始时，若场上所有角色的武将牌上均没有“酬”，则你可以将任意张牌置于一名角色的武将牌上，称为“酬”。若如此做：当有角色使用牌对有“酬”的角色造成伤害后，其可以获得一张“酬”，并获得牌堆中所有与“酬”花色点数均相同的牌；有“酬”的角色死亡时，你获得其所有“酬”。',
 		},
