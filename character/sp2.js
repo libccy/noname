@@ -4,6 +4,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			ganfurenmifuren:['female','shu',3,['dcchanjuan','dcxunbie']],
+			dc_ganfuren:['female','shu',3,['dcshushen','dcshenzhi'],['unseen']],
+			dc_mifuren:['female','shu',3,['dcguixiu','dccunsi'],['unseen']],
 			yue_caiwenji:['female','qun',3,['dcshuangjia','dcbeifen']],
 			wanglang:['male','wei',3,['regushe','rejici']],
 			ruanji:['male','wei',3,['dczhaowen','dcjiudun']],
@@ -19,7 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_sunchen:['male','wu',4,['dczigu','dczuowei'],['unseen']],
 			sunyu:['male','wu',3,['dcquanshou','dcshexue'],['unseen']],
 			xizheng:['male','shu',3,['dcdanyi','dcwencan'],['unseen']],
-			liuchongluojun:['male','qun',3,['dcminze','dcjini'],['unseen']],
+			liuchongluojun:['male','qun',3,['dcminze','dcjini']],
 			yuechen:['male','wei',4,['dcporui','dcgonghu'],['unseen']],
 			zhangkai:['male','qun',4,['dcxiangshu']],
 			dc_ruiji:['female','wu',4,['dcwangyuan','dclingyin','dcliying']],
@@ -262,7 +265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_huben:['wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai'],
 				sp2_shengun:["puyuan","guanlu","gexuan",'wufan','re_zhangbao','dukui','zhaozhi','zhujianping','dc_zhouxuān','zerong'],
 				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji'],
-				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu'],
+				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen'],
 				sp2_yinyu:['zhouyi','luyi'],
@@ -275,6 +278,269 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//甘糜
+			dcchanjuan:{
+				audio:2,
+				trigger:{
+					player:'useCardAfter',
+				},
+				filter:function(event,player){
+					if(event.targets.length!=1) return false;
+					if(event.card.name!='sha'&&get.type(event.card,false)!='trick') return false;
+					if(event.getParent(2).name=='dcchanjuan') return false;
+					return !player.getStorage('dcchanjuan').contains(event.card.name);
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var card={
+						name:trigger.card.name,
+						nature:trigger.card.nature,
+						isCard:true,
+					}
+					player.chooseUseTarget(card,get.prompt('dcchanjuan'),false,false).set('prompt2','再视为使用一张'+get.translation(card)).set('logSkill','dcchanjuan');
+					'step 1'
+					if(result.bool){
+						player.markAuto('dcchanjuan',[trigger.card.name]);
+						var list1=trigger.targets.slice(),list2=result.targets.slice();
+						if(list1.removeArray(list2).length==0&&list2.removeArray(list1).length==0) player.draw();
+					}
+				},
+				ai:{
+					threaten:2,
+				},
+				intro:{
+					content:'已记录牌名：$',
+				}
+			},
+			dcxunbie:{
+				audio:2,
+				trigger:{
+					player:'dying',
+				},
+				filter:function(event,player){
+					if(player.hp>0) return false;
+					var characters=['dc_ganfuren','dc_mifuren'];
+					game.countPlayer(current=>{
+						if(current.name1=='dc_ganfuren'||current.name2=='dc_ganfuren'){
+							characters.remove('dc_ganfuren');
+						}
+						if(current.name1=='dc_mifuren'||current.name2=='dc_mifuren'){
+							characters.remove('dc_mifuren');
+						}
+					});
+					return characters.length;
+				},
+				check:()=>true,
+				skillAnimation:true,
+				animationColor:'fire',
+				limited:true,
+				derivation:['dcyongjue','dcshushen','dcshenzhi','dcguixiu','dccunsi'],
+				content:function(){
+					'step 0'
+					player.awakenSkill('dcxunbie');
+					if(player.name1=='ganfurenmifuren'||player.name2=='ganfurenmifuren'){
+						var characters=['dc_ganfuren','dc_mifuren'];
+						game.countPlayer(current=>{
+							if(current.name1=='dc_ganfuren'||current.name2=='dc_ganfuren'){
+								characters.remove('dc_ganfuren');
+							}
+							if(current.name1=='dc_mifuren'||current.name2=='dc_mifuren'){
+								characters.remove('dc_mifuren');
+							}
+						});
+						if(characters.length==1) event._result={control:characters[0]};
+						else{
+							player.chooseControl(characters).set('dialog',[
+								'选择要替换成的武将',
+								[characters,'character']
+							]).set('ai',()=>[0,1].randomGet());
+						}
+					}
+					else event.goto(2);
+					'step 1'
+					var character=result.control;
+					if(!_status.characterlist){
+						lib.skill.pingjian.initList();
+					}
+					_status.characterlist.remove(character);
+					_status.characterlist.add('ganfurenmifuren');
+					player.reinit('ganfurenmifuren',character,false);
+					'step 2'
+					player.recover(1-player.hp);
+				},
+			},
+			//散装版糜夫人
+			dcguixiu:{
+				audio:2,
+				trigger:{
+					player:'phaseBegin',
+				},
+				forced:true,
+				filter:function(event,player){
+					return !player.hasMark('dcguixiu');
+				},
+				group:'dcguixiu_rec',
+				content:function(){
+					player.addMark('dcguixiu',1,false);
+					player.draw();
+				},
+				subSkill:{
+					rec:{
+						audio:'dcguixiu',
+						trigger:{
+							player:'logSkillAfter',
+						},
+						forced:true,
+						filter:function(event,player){
+							return event.skill=='dccunsi'&&player.isDamaged();
+						},
+						content:function(){
+							player.recover();
+						}
+					}
+				}
+			},
+			dccunsi:{
+				audio:2,
+				enable:'phaseUse',
+				limited:true,
+				skillAnimation:true,
+				animationColor:'orange',
+				filterTarget:true,
+				content:function(){
+					'step 0'
+					player.awakenSkill('dccunsi');
+					target.addSkillLog('dcyongjue');
+					if(target!=player) player.draw(2);
+				},
+				ai:{
+					order:10,
+					result:{
+						target:1,
+					}
+				}
+			},
+			dcyongjue:{
+				audio:2,
+				trigger:{
+					player:'useCard',
+				},
+				filter:function(event,player){
+					var evtx=event.getParent('phaseUse');
+					if(!evtx||evtx.player!=player) return false;
+					return player.getHistory('useCard',evt=>{
+						return evt.card.name=='sha'&&event.getParent('phaseUse')==evtx;
+					}).indexOf(event)==0;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var choices=['选项一'];
+					var choiceList=['令'+get.translation(trigger.card)+'不计入次数','获得此牌'];
+					if(trigger.cards.length){
+						choices.push('选项二');
+						choiceList[1]='获得'+get.translation(trigger.cards);
+					}
+					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+					choices.push('cancel2');
+					player.chooseControl(choices).set('choiceList',choiceList).set('ai',()=>{
+						return _status.event.choice;
+					}).set('choice',function(){
+						if(choices.length==3&&trigger.addCount===false) return 1;
+						if(player.getCardUsable({name:'sha'})<player.countCards('hs','sha')) return 0;
+						if(choices.length==3) return 1;
+						return 0;
+					}());
+					'step 1'
+					if(result.control=='cancel2'){
+						event.finish();
+						return;
+					}
+					player.logSkill('dcyongjue');
+					game.log(player,'选择了','#y'+result.control);
+					if(result.control=='选项一'){
+						if(trigger.addCount!==false){
+							trigger.addCount=false;
+							trigger.player.getStat().card.sha--;
+						}
+					}
+					else{
+						var cards=trigger.cards.filterInD();
+						if(cards.length) player.gain(cards,'gain2');
+					}
+				}
+			},
+			//散装版甘夫人
+			dcshushen:{
+				audio:2,
+				trigger:{
+					player:'recoverEnd',
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					event.num=trigger.num;
+					'step 1'
+					player.chooseTarget(get.prompt('dcshushen'),'选择一名其他角色，然后令其回复1点体力或令你与其各摸一张牌',lib.filter.notMe).set('ai',target=>{
+						var player=_status.event.player;
+						return get.recoverEffect(target,player,player)/2+get.attitude(player,target);
+					});
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('dcshushen',target);
+						event.num--;
+						var choices=['选项二'];
+						var choiceList=[
+							'令'+get.translation(target)+'回复1点体力',
+							'你于'+get.translation(target)+'各摸一张牌'
+						];
+						if(target.isDamaged()) choices.unshift('选项一');
+						else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
+						player.chooseControl(choice).set('choiceList',choiceList).set('prompt','淑慎：请选择一项').set('ai',()=>{
+							return _status.event.choice;
+						}).set('choice',function(){
+							if(target.hp<=2||get.recoverEffect(target,player,player)>20) return 0;
+							return '选项二';
+						}());
+					}
+					else event.finish();
+					'step 3'
+					if(result.control=='选项一'){
+						target.recover();
+					}
+					else{
+						var drawers=[player,target].sortBySeat(_status.currentPhase);
+						game.asyncDraw(drawers);
+					}
+					'step 4'
+					if(event.num>0) event.goto(1);
+				}
+			},
+			dcshenzhi:{
+				audio:2,
+				trigger:{
+					player:'phaseZhunbeiBegin',
+				},
+				filter:function(event,player){
+					return player.countCards('h')>player.hp;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseToDiscard(get.prompt('dcshenzhi'),'弃置一张手牌，然后回复1点体力').set('logSkill','dcshenzhi').set('ai',card=>{
+						var player=_status.event.player;
+						if(!player.isDamaged()) return 0;
+						return Math.min(3,10-2*player.hp)-get.value(card);
+					});
+					'step 1'
+					if(result.bool){
+						player.recover();
+					}
+				}
+			},
 			//乐蔡文姬
 			dcshuangjia:{
 				audio:2,
@@ -2227,8 +2493,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!event.targets||!event.targets.length) return false;
 					var evt=lib.skill.dcjianying.getLastUsed(player,event.getParent());
 					if(!evt||!evt.targets||!evt.targets.length||evt.targets.length!=event.targets.length) return false;
-					var targetsx=event.targets.slice().sort((a,b)=>a.seayNum-b.seayNum);
-					var targetsy=evt.targets.slice().sort((a,b)=>a.seayNum-b.seayNum);
+					var targetsx=event.targets.slice().sort((a,b)=>a.seatNum-b.seatNum);
+					var targetsy=evt.targets.slice().sort((a,b)=>a.seatNum-b.seatNum);
 					for(var i=0;i<targetsx.length;i++){
 						if(targetsx[i]!=targetsy[i]) return false;
 					}
@@ -29150,6 +29416,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mushun:'穆顺，小说《三国演义》中的人物，男，东汉末宦官。献帝欲修书与国舅伏完，共谋图曹公。因顺为宦官中之忠义可托者，乃命顺往送书。顺藏书于发中，潜出禁宫，径至完宅，将书呈上。及完回书付顺，顺乃藏于头髻内，辞完回宫。然公闻信，先于宫门等候，顺回遇公，公喝左右，遍搜身上，并无夹带，放行。忽然风吹落其帽。公又唤回，取帽视之，遍观无物，还帽令戴。顺双手倒戴其帽。公心疑，令左右搜其头发中，搜出伏完书来。公见书大怒，执下顺于密室问之，顺不肯招。当晚将顺、完等宗族二百余口，皆斩于市。',
 			jsp_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
 			ruanji:'阮籍（公元210年～263年），字嗣宗，陈留尉氏（今河南省开封市）人，三国时期魏国诗人、竹林七贤之一。阮瑀之子，门荫入仕，累迁步兵校尉，世称阮步兵。崇奉老庄之学，政治上则采取谨慎避祸的态度。景元四年（公元263年），阮籍去世，享年五十三岁。作为“正始之音”的代表，著有《咏怀八十二首》、《大人先生传》等，其著作收录在《阮籍集》中。',
+			ganfurenmifuren:'甘夫人，刘备起兵后于沛城娶之为妾。后来，甘夫人随刘备到荆州，生了阿斗(也就是后主刘禅)。223年四月，刘备病死于白帝城，追谥甘夫人为“昭烈皇后”。<br>刘备夫人。徐州别驾糜竺之妹。长坂兵败，她怀抱年仅两岁的刘禅在乱军中走散，被赵云发现；但麋夫人因为赵云只有一匹马，不肯上马，在将阿斗托付给赵云后投井而亡。'
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',
@@ -30623,6 +30890,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshuangjia_info:'锁定技。①游戏开始，你将你的手牌标记为“胡笳”。②你的“胡笳”牌不计入手牌上限。③其他角色至你的距离+X（X为你的“胡笳”数且至多为5）。',
 			dcbeifen:'悲愤',
 			dcbeifen_info:'锁定技。①当你失去牌后，若这些牌中有“胡笳”牌，你获得与你手牌中“胡笳”牌花色均不同的每种花色的牌各一张。②若你手牌中“胡笳”牌数小于不为“胡笳”牌的牌数，你使用牌无距离和次数限制。',
+			ganfurenmifuren:'甘夫人糜夫人',
+			dcchanjuan:'婵娟',
+			dcchanjuan_info:'每种牌名限一次。当你使用仅指定单一目标的【杀】或普通锦囊牌结算结束后，你可以视为使用一张名称和属性均相同的牌。若这两张牌指定的目标完全相同，你摸一张牌。',
+			dcxunbie:'殉别',
+			dcxunbie_info:'限定技。当你进入濒死状态时，你可以将此武将牌替换为“甘夫人”或“糜夫人”（不能选择已在场上的武将）。然后回复至1点体力并防止所有伤害直到当前回合结束。',
+			dc_mifuren:'糜夫人',
+			dcguixiu:'闺秀',
+			dcguixiu_info:'锁定技。①回合开始时，若你于本局游戏未发动过〖闺秀①〗，你摸两张牌。②当你发动〖存嗣〗后，你回复1点体力。',
+			dccunsi:'存嗣',
+			dccunsi_info:'限定技。出牌阶段，你可以令一名角色获得〖勇决〗。若该角色不为你，你摸两张牌。',
+			dcyongjue:'勇决',
+			dcyongjue_info:'当你于出牌阶段使用第一张【杀】时，你可以选择一项：1.令此【杀】不计入次数；2.获得此牌。',
+			dc_ganfuren:'甘夫人',
+			dcshushen:'淑慎',
+			dcshushen_info:'当你回复1点体力后，你可以选择一名其他角色并选择一项：1.令其回复1点体力；2.你与其各摸一张牌。',
+			dcshenzhi:'神智',
+			dcshenzhi_info:'准备阶段，若你的手牌数大于体力值，你可以弃置一张手牌，然后回复1点体力。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

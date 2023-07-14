@@ -921,6 +921,9 @@ window.noname_character_rank={
 		'libai',
 		'tw_gongsunfan',
 		'yue_caiwenji',
+		'vtb_xiaole',
+		'vtb_xiaojiu',
+		'ol_zhangzhang',
 	],
 	b:[
 		'diy_feishi',
@@ -1207,6 +1210,8 @@ window.noname_character_rank={
 		'sp_mushun',
 		'tw_yangang',
 		'sb_zhurong',
+		'vtb_xiaoshan',
+		'vtb_xiaotao',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1394,6 +1399,7 @@ window.noname_character_rank={
 		'clan_wukuang',
 		'yeshiwen',
 		'qianzhao',
+		'vtb_xiaosha',
 	],
 	c:[
 		'xiahoudun',

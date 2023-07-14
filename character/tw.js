@@ -298,6 +298,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						event.target=target;
+						player.logSkill('twhuiyuan',target);
 						player.choosePlayerCard(target,'h',true,'回援：展示'+get.translation(target)+'一张手牌');
 					}
 					else event.finish();
@@ -381,6 +382,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mark:true,
 						marktext:'绶',
 						intro:{
+							markcount:function(storage,player){
+								return player.countMark('twshoushou_plus')-player.countMark('twshoushou_minus');
+							},
 							content:function(storage,player){
 								var dis=player.countMark('twshoushou_plus')-player.countMark('twshoushou_minus');
 								return '其他角色至你的距离'+(dis>=0?'+':'')+dis;
