@@ -76,6 +76,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				group:'dcbianzhuang_refresh',
+				ai:{
+					order:16,
+					result:{
+						player:function(player){
+							if(player.hasValueTarget('sha',false)) return 1;
+							return 0;
+						},
+					},
+					effect:{
+						target:function(card,player,target,current){
+							if(player==target&&player.isPhaseUsing()&&get.type(card)=='equip'){
+								if(player.hasValueTarget('sha',false)&&typeof player.getStat('skill').dcbianzhuang=='number') return [1,3];
+							}
+						},
+					},
+				},
 				subSkill:{
 					refresh:{
 						trigger:{player:'useCardAfter'},
@@ -109,6 +125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:3,
 				trigger:{player:'phaseDrawAfter'},
 				direct:true,
+				locked:false,
 				filter:function(event,player){
 					return player.countCards('h')>0;
 				},
@@ -120,13 +137,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return !player.hasCard(card2=>{
 							return card!=card2&&get.number(card2,player)<num;
 						})
-					});
+					}).set('ai',function(card){
+					 var player=_status.event.player;
+					 return 1+Math.max(0,player.getUseValue(card,null,true))
+					})
 					'step 1'
 					if(result.bool){
 						player.logSkill('dctongliao');
 						player.addGaintag(result.cards,'dctongliao');
 						game.delayx();
 					}
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(get.itemtype(card)=='card'&&card.hasGaintag('dctongliao')) return num+0.6;
+					},
 				},
 				group:'dctongliao_draw',
 				subSkill:{
@@ -207,6 +232,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.directHit.addArray(game.filterPlayer());
 						},
 						intro:{content:'已经悟到了$牌'},
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(player,tag,arg){
+								if(arg&&arg.card&&player.getStorage('dcwudao_effect').contains(get.type2(arg.card))) return true;
+								return false;
+							},
+						},
 					},
 				},
 			},
@@ -271,6 +303,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				locked:false,
 				viewAs:{name:'jiu'},
+				check:card=>6.5-get.value(card),
 				filterCard:function(card){
 					var info=get.info(card);
 					if(!info||(info.type!='trick'&&info.type!='delay')) return false;
@@ -291,6 +324,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(_status.connectMode&&player.countCards('hs')>0) return true;
 					return player.hasCard(lib.skill.dclbjiuxian.filterCard,'hs')
 				},
+				ai:{
+					order:(item,player)=>get.order({name:'jiu'},player),
+				},
 				mod:{
 					cardUsable:function(card){
 						if(card.name=='jiu') return Infinity;
@@ -302,6 +338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				//frequent:true,
 				//direct:true,
+				locked:false,
 				filter:function(event,player){
 					var history=player.getAllHistory('useCard'),index=history.indexOf(event);
 					if(index<1) return false;
@@ -318,12 +355,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(lib.skill.dcshixian.filterx(event)) return '摸一张牌并令'+get.translation(event.card)+'额外结算一次？';
 					return '摸一张牌。';
 				},
+				check:function(event,player){
+					if(lib.skill.dcshixian.filterx(event)) return !get.tag(event.card,'norepeat');
+					return true;
+				},
 				content:function(){
 					player.draw();
 					if(lib.skill.dcshixian.filterx(trigger)){
 						trigger.effectCount++;
 						game.log(trigger.card,'额外结算一次');
 					}
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(typeof card=='object'&&!get.tag(card,'norepeat')){
+							var history=player.getAllHistory('useCard');
+							if(history.length>0){
+								var cardx=history[history.length-1].card;
+								if(get.is.yayun(get.translation(cardx.name),get.translation(card.name))) return num+20;
+							}
+						}
+					},
 				},
 				content_old:function(){
 					'step 0'

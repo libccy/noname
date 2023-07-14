@@ -128,6 +128,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return true;
 					});
+					next.set('processAI',function(){
+						var player=_status.event.player;
+						var storage=player.getStorage('dctuoyu'),tags=['dctuoyu_fengtian','dctuoyu_qingqu','dctuoyu_junshan'];
+						var moved=[[],[],[],[]]
+						var isEmpty=function(to){
+							return storage.contains(tags[to-1])&&moved[to].length<5;
+						}
+						var hs=player.getCards('h');
+						var hs2=hs.slice(0);
+						var usable=player.getCardUsable('sha');
+						var addTo=function(card,to){
+							if(isEmpty(to)){
+								hs2.remove(card);
+								moved[to].push(card);
+								if(get.name(card)=='sha'&&to!=2) usable--;
+							}
+						}
+						var hasRuanshizi=game.hasPlayer(function(target){
+							return target!=player&&player.canUse('sha',target,null,true)&&!target.mayHaveShan()&&get.attitude(player,target)<0&&get.effect(target,{name:'sha'},player,player)>0;
+						})
+						for(var card of hs){
+							var name=get.name(card);
+							if(name=='tao'||name=='jiu'){
+								addTo(card,1);
+							}
+							else if(name=='sha'){
+								if(hasRuanshizi&&isEmpty(1)&&usable>0) addTo(card,1);
+								else if(isEmpty(3)&&usable>0) addTo(card,3);
+								else addTo(card,2);
+							}
+							else if(get.type(name)=='trick'){
+								if(isEmpty(1)&&get.tag(card,'damage')>0&&player.hasUseTarget(card)) addTo(card,1);
+								else addTo(card,3);
+							}
+						}
+						moved[0].addArray(hs2);
+						return moved;
+					})
 					'step 1'
 					if(result.bool){
 						game.broadcastAll(function(moved,player){
@@ -272,7 +310,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(game.countPlayer()>2){
 						player.chooseTarget(true,'请选择一名要更换座次的角色，将自己移动到该角色的上家位置',function(card,player,target){
 							return target!=player&&target!=player.next;
-						});
+						}).set('ai',function(target){
+							var player=_status.event.player;
+							var current=_status.currentPhase.next;
+							var max=20,att=0;
+							while(max>0){
+								max--;
+								if(current==target) return att;
+								att-=get.attitude(player,current);
+								current=current.next;
+							}
+							return att;
+						})
 					}
 					else event.goto(3);
 					'step 2'
@@ -328,11 +377,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					if(list.length==1){
 						event.target=list[0];
-						player.chooseBool('摧心：是否再视为对'+get.translation(list[0])+'使用'+get.translation(card)+'？');
+						player.chooseBool('摧心：是否再视为对'+get.translation(list[0])+'使用'+get.translation(card)+'？').set('goon',get.effect(list[0],card,player,player)>0).set('ai',()=>_status.event.goon);
 					}
 					else{
 						player.chooseTarget('摧心：是否再视为对上家或下家使用'+get.translation(card)+'？','操作提示：从上家或下家中选择一名角色作为使用目标',function(card,player,target){
 							return (target==player.getNext()||target==player.getPrevious())&&lib.filter.targetEnabled2(_status.event.getParent().card,target,player);
+						}).set('ai',function(target){
+							var player=_status.event.player;
+							return get.effect(target,_status.event.getParent().card,player,player)
 						})
 					}
 					'step 1'
