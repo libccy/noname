@@ -513,7 +513,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player._sbzongshi_aiChecking=true;
 							var value=cards.reduce((p,c)=>{
 								return p+get.value(c);
-							});
+							},0);
 							delete player._sbzongshi_aiChecking;
 							if(cards.length>5||value>5*cards.length) return [1,0,0,-cards.length/2];
 							return [1,0,0,-0.5];

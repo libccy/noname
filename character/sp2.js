@@ -2706,7 +2706,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.chooseToUse(function(card,player,event){
 									if(get.name(card)!='sha') return false;
 									return lib.filter.filterCard.apply(this,arguments);
-								},'击逆：是否对'+get.translation(trigger.source)+'使用一张不可被响应的杀？').set('logSkill','twxiawang').set('complexSelect',true).set('filterTarget',function(card,player,target){
+								},'击逆：是否对'+get.translation(trigger.source)+'使用一张不可被响应的杀？').set('complexSelect',true).set('filterTarget',function(card,player,target){
 									if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
 									return lib.filter.targetEnabled.apply(this,arguments);
 								}).set('sourcex',trigger.source).set('oncard',()=>{
