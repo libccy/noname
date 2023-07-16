@@ -166,7 +166,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('h',{type:'equip'})>0;
+					return player.countCards('he',{type:'equip'})>0;
 				},
 				filterCard:function(card){
 					return get.type(card)=='equip';
@@ -277,6 +277,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(typeof result.links[0]!='string') result.links.reverse();
 						var card=result.links[1];
 						target.gain(card,'gain2');
+						event.cards.remove(card);
 						if(result.links[0]!='获得剩余的牌') event.finish();
 					}
 					else event.finish();

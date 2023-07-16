@@ -405,9 +405,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					var count=game.countPlayer(current=>{
+					var count=get.cnNumber(game.countPlayer(current=>{
 						return get.distance(player,current)<=1;
-					});
+					}));
 					player.chooseTarget(get.prompt('twzhiqu'),'选择一名其他角色并视为使用牌堆顶'+count+'张牌中的【杀】。若你与其均在对方的攻击范围内，你改为依次对其使用牌堆顶'+count+'张牌中的【杀】或锦囊牌。',lib.filter.notMe).set('ai',target=>{
 						var player=_status.event.player;
 						return get.effect(target,{name:'sha'},player,player)*(get.distance(player,target)==1?2:1);
@@ -427,8 +427,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(player.isIn()&&target.isIn()&&cards.length){
 						do var card=cards.shift();
-						while(get.name(card)=='sha'||event.fight&&get.type2(card)=='trick');
-						if(!card) return;
+						while(get.name(card)!='sha'&&(!event.fight||get.type2(card)!='trick')&&cards.length);
+						if(get.name(card)!='sha'&&(!event.fight||get.type2(card)!='trick')) return;
 						player.chooseUseTarget(card,true,false,'nodistance').set('filterTarget',function(card,player,target){
 							var evt=_status.event;
 							if(_status.event.name=='chooseTarget') evt=evt.getParent();
@@ -448,6 +448,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card.name=='sha'||get.type(event.card)=='trick'&&get.tag(event.card,'damage');
 				},
 				logTarget:'player',
+				check:function(event,player){
+					var att=get.attitude(event.player,player);
+					if(player.hasSkill('twzhiqu')){
+						var cnt=game.countPlayer(current=>get.distance(player,current)==2&&!player.inRange(current));
+						if(cnt>=2){
+							if(att<0) return true;
+							return false;
+						}
+						if(att<0&&cnt>=2||att>0&&!cnt) return true;
+						return false;
+					}
+					else{
+						if(att<0) return false;
+						return true;
+					}
+				},
 				content:function(){
 					'step 0'
 					var target=trigger.player;
@@ -461,7 +477,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var att=get.attitude(target,player);
 						if(att==0) return 0;
 						if(player.hasSkill('twzhiqu')){
-							var cnt=game.countPlayer(current=>get.distance(player,current)==2);
+							var cnt=game.countPlayer(current=>get.distance(player,current)==2&&!player.inRange(current));
 							if(cnt>=2){
 								if(att<0) return 1;
 								return 0;

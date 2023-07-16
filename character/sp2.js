@@ -5,8 +5,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		character:{
 			ganfurenmifuren:['female','shu',3,['dcchanjuan','dcxunbie']],
-			dc_ganfuren:['female','shu',3,['dcshushen','dcshenzhi'],['unseen']],
-			dc_mifuren:['female','shu',3,['dcguixiu','dccunsi'],['unseen']],
+			dc_ganfuren:['female','shu',3,['dcshushen','dcshenzhi']],
+			dc_mifuren:['female','shu',3,['dcguixiu','dccunsi']],
 			yue_caiwenji:['female','qun',3,['dcshuangjia','dcbeifen']],
 			wanglang:['male','wei',3,['regushe','rejici']],
 			ruanji:['male','wei',3,['dczhaowen','dcjiudun']],
@@ -286,7 +286,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(event.targets.length!=1) return false;
-					if(event.card.name!='sha'&&get.type(event.card,false)!='trick') return false;
+					if(!['basic','trick'].contains(get.type(event.card,false))) return false;
 					if(event.getParent(2).name=='dcchanjuan') return false;
 					return !player.getStorage('dcchanjuan').contains(event.card.name);
 				},
@@ -298,12 +298,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						nature:trigger.card.nature,
 						isCard:true,
 					}
-					player.chooseUseTarget(card,get.prompt('dcchanjuan'),false,false).set('prompt2','再视为使用一张'+get.translation(card)).set('logSkill','dcchanjuan');
+					player.chooseUseTarget(card,get.prompt('dcchanjuan'),false,false).set('prompt2','视为再使用一张'+get.translation(card)).set('logSkill','dcchanjuan');
 					'step 1'
 					if(result.bool){
 						player.markAuto('dcchanjuan',[trigger.card.name]);
-						var list1=trigger.targets.slice(),list2=result.targets.slice();
-						if(list1.removeArray(list2).length==0&&list2.removeArray(list1).length==0) player.draw();
+						var list1=trigger.targets,list2=result.targets;
+						if(list1.slice().removeArray(list2).length==0&&list2.slice().removeArray(list1).length==0) player.draw();
 					}
 				},
 				ai:{
@@ -368,7 +368,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.reinit('ganfurenmifuren',character,false);
 					'step 2'
 					player.recover(1-player.hp);
+					player.addTempSkill('dcxunbie_muteki');
 				},
+				subSkill:{
+					muteki:{
+						trigger:{
+							player:'damageBegin4',
+						},
+						charlotte:true,
+						forced:true,
+						content:function(){
+							trigger.cancel();
+						},
+						mark:true,
+						intro:{content:'防止本回合受到的所有伤害'},
+						ai:{
+							nofire:true,
+							nothunder:true,
+							nodamage:true,
+							effect:{
+								target:function(card,player,target,current){
+									if(get.tag(card,'damage')) return 'zeroplayertarget';
+								}
+							},
+						}
+					}
+				}
 			},
 			//散装版糜夫人
 			dcguixiu:{
@@ -377,6 +402,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'phaseBegin',
 				},
 				forced:true,
+				onremove:true,
 				filter:function(event,player){
 					return !player.hasMark('dcguixiu');
 				},
@@ -499,7 +525,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						];
 						if(target.isDamaged()) choices.unshift('选项一');
 						else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
-						player.chooseControl(choice).set('choiceList',choiceList).set('prompt','淑慎：请选择一项').set('ai',()=>{
+						player.chooseControl(choices).set('choiceList',choiceList).set('prompt','淑慎：请选择一项').set('ai',()=>{
 							return _status.event.choice;
 						}).set('choice',function(){
 							if(target.hp<=2||get.recoverEffect(target,player,player)>20) return 0;
@@ -7743,9 +7769,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
-					return !player.hasHistory('damage',evt=>{
+					return !event.nature&&!player.hasHistory('damage',evt=>{
 						return !evt.nature&&evt!=event;
-					},event)||!player.hasHistory('damage',evt=>{
+					},event)||event.nature&&!player.hasHistory('damage',evt=>{
 						return evt.nature&&evt!=event;
 					},event)&&event.source&&event.source.isIn()&&event.source.countGainableCards(player,'h');
 				},
@@ -13643,7 +13669,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(evtx.getParent('phaseUse')!=evt) return false;
 						return !evtx.card.storage||!evtx.card.storage.tongli;
 					}).length;
-					var str='视为额外使用'+get.cnNumber(num)+'张'
+					//var str='视为额外使用'+get.cnNumber(num)+'张'
+					var str='额外结算'+get.cnNumber(num)+'次'
 					if(event.card.name=='sha'&&event.card.nature) str+=get.translation(event.card.nature);
 					return (str+'【'+get.translation(event.card.name)+'】');
 				},
@@ -28419,13 +28446,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"xinfu_bijing":{
 				audio:2,
-				group:["xinfu_bijing_lose","xinfu_bijing_discard"],
 				subSkill:{
 					lose:{
 						trigger:{
 							global:"phaseDiscardBegin",
 						},
 						audio:'xinfu_bijing',
+						charlotte:true,
 						filter:function(event,player){
 							if(event.player==player) return false;
 							return player.getHistory('lose',function(evt){
@@ -28446,6 +28473,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player:"phaseZhunbeiBegin",
 						},
 						forced:true,
+						charlotte:true,
 						filter:function(event,player){
 							return player.getCards('h',function(card){
 								return card.hasGaintag('xinfu_bijing');
@@ -28478,6 +28506,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('xinfu_bijing');
 						player.addGaintag(result.cards,'xinfu_bijing');
+						player.addSkill('xinfu_bijing_lose');
+						player.addSkill('xinfu_bijing_discard');
 					}
 				},
 			},
@@ -29626,7 +29656,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_tunan":"图南",
 			"xinfu_tunan_info":"出牌阶段限一次，你可以展示牌堆顶的一张牌并选择一名其他角色，然后该角色选择一项：使用此牌（无距离限制）；或将此牌当普通【杀】使用。",
 			"xinfu_bijing":"闭境",
-			"xinfu_bijing_info":"①结束阶段，你可以选择至多两张手牌并标记为“闭境”。②其他角色的弃牌阶段开始时，若你于本回合内失去过“闭境”，其弃置两张牌。③准备阶段，你重铸所有“闭境”牌。",
+			"xinfu_bijing_info":"结束阶段，你可以选择至多两张手牌并标记为“闭境”，然后你获得如下效果：1.其他角色的弃牌阶段开始时，若你于本回合内失去过“闭境”，其弃置两张牌；2.准备阶段，你重铸所有“闭境”牌。",
 			"xinfu_zhenxing":"镇行",
 			"xinfu_zhenxing_info":"结束阶段开始时或当你受到伤害后，你可以观看牌堆顶的至多三张牌，然后你获得其中与其余牌花色均不相同的一张牌。",
 			"xinfu_qianxin":"遣信",
@@ -30366,7 +30396,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmingfa_info:'①出牌阶段限一次。当你使用【杀】或普通锦囊牌结算结束后，若你的武将牌上没有“明伐”牌，则你可以将此牌作为“明伐”牌置于武将牌上并选择一名其他角色，记录该角色和此牌的名称。②一名角色的回合结束时，若其是你〖明伐①〗记录的角色，则你视为对其依次使用X张〖明伐①〗记录的牌，然后移去“明伐”牌（X为其手牌数且至少为1，至多为5）。③一名角色死亡时，若其是你〖明伐①〗记录的角色，则你移去“明伐”牌。',
 			zhangxuan:'张嫙',
 			tongli:'同礼',
-			tongli_info:'当你于出牌阶段内不因〖同礼〗而使用基本牌或普通锦囊牌指定第一个目标后，若你手牌中的花色数和你于本阶段内不因〖同礼〗而使用过的牌数相等，则你可以于此牌结算结束后依次视为对此牌的所有目标使用X张名称和属性相同的牌（X为你手牌中的花色数）。',
+			//tongli_info:'当你于出牌阶段内不因〖同礼〗而使用基本牌或普通锦囊牌指定第一个目标后，若你手牌中的花色数和你于本阶段内不因〖同礼〗而使用过的牌数相等，则你可以于此牌结算结束后依次视为对此牌的所有目标使用X张名称和属性相同的牌（X为你手牌中的花色数）。',
+			tongli_info:'当你于出牌阶段内使用基本牌或普通锦囊牌指定第一个目标后，若你手牌中的花色数和你于本阶段内使用过的牌数相等，则你可以令此牌额外结算X次（X为你手牌中的花色数）。',
 			shezang:'奢葬',
 			shezang_info:'每轮限一次。当你或你回合内的其他角色进入濒死状态时，你可以从牌堆中获得每种花色的牌各一张。',
 			qinyilu:'秦宜禄',

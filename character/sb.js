@@ -725,6 +725,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(targets[i].hp==1){
 							eff*=1.5;
 						}
+						if(get.attitude(player,targets[i])==0||targets[i].group=='qun'){
+							eff+=0.5;
+						}
 						num+=eff;
 					}
 					if(!player.needsToDiscard(-1)){
@@ -766,6 +769,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return num+2*game.countPlayer(current=>player!=current&&current.group=='qun');
 						}
 					}
+				},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(player!=target&&target&&target.group=='qun') return [1,0.2];
+						},
+					},
 				}
 			},
 			//庞统
@@ -1614,13 +1624,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(ui.selected.targets.length){
 							var current=ui.selected.targets[0];
-							if(current.group=='shu'&&current.hp>=player.hp){
+							if(current.group=='shu'&&current.hp>=player.hp&&current!=player){
 								return -get.attitude(player,target);
 							}
 							return Math.abs(get.attitude(player,current));
 						}
 						else{
-							if(target.group=='shu'&&target.hp>=player.hp&&game.hasPlayer(current=>{
+							if(target.group=='shu'&&target.hp>=player.hp&&target!=player&&game.hasPlayer(current=>{
 								return get.attitude(player,current)<0;
 							})) return 10;
 							return 1;
@@ -1630,7 +1640,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var targets=result.targets;
 						event.targets=targets;
-						if(targets[0].group!='shu'||targets[0].hp<player.hp) targets.reverse();
+						if(targets[0].group!='shu'||targets[0].hp<player.hp||targets[0]==player) targets.reverse();
 						player.logSkill('sbjijiang',targets,false);
 						player.line2(targets);
 						var choiceList=[
@@ -3442,7 +3452,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbjiuyuan:{
 				audio:2,
-				usable:1,
 				trigger:{global:'useCard'},
 				forced:true,
 				zhuSkill:true,

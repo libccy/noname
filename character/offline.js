@@ -1854,7 +1854,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
-								if(!target.canMoveCard(true)||!target.hasFriend()) return;
+								if(target._jsrgrangjie_aiChecking) return;
+								target._jsrgrangjie_aiChecking=true;
+								var moveCard=target.canMoveCard(true);
+								delete target._jsrgrangjie_aiChecking;
+								if(!moveCard||!target.hasFriend()) return;
 								var num=1;
 								if(get.attitude(player,target)>0){
 									if(player.needsToDiscard()){
