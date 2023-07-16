@@ -314,6 +314,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							if(lib.filter.canBeDiscarded(card,target,player)){
 								target.discard(card,'notBySelf');
+								target.draw();
 							}
 						}
 					}
@@ -445,6 +446,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.isPhaseUsing()) return false;
 					if(player==event.player) return false;
+					if(!event.player.isIn()) return false;
 					return event.card.name=='sha'||get.type(event.card)=='trick'&&get.tag(event.card,'damage');
 				},
 				logTarget:'player',
@@ -4328,7 +4330,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				content:function(){
 					'step 0'
-					var forced=event.getParent(2).name=='twshuangren_end';
+					var forced=event.getParent(2).name=='twshuangren_end'&&game.hasPlayer(current=>{
+						return player.canCompare(current);
+					});
 					var str='与一名角色拼点，若你：赢，你可以视为对至多两名至其的距离不大于1的角色使用一张【杀】；没赢，其可以视为对你使用一张【杀】';
 					player.chooseTarget(forced?'双刃：选择一名角色':get.prompt('twshuangren'),str,forced,(card,player,target)=>{
 						return player.canCompare(target);

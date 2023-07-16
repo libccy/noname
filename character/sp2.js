@@ -397,7 +397,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//散装版糜夫人
 			dcguixiu:{
-				audio:2,
+				audio:'guixiu',
 				trigger:{
 					player:'phaseBegin',
 				},
@@ -413,7 +413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					rec:{
-						audio:'dcguixiu',
+						audio:'guixiu',
 						trigger:{
 							player:'logSkillAfter',
 						},
@@ -428,12 +428,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dccunsi:{
-				audio:2,
+				audio:'cunsi',
 				enable:'phaseUse',
 				limited:true,
 				skillAnimation:true,
 				animationColor:'orange',
 				filterTarget:true,
+				derivation:'dcyongjue',
 				content:function(){
 					'step 0'
 					player.awakenSkill('dccunsi');
@@ -448,7 +449,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dcyongjue:{
-				audio:2,
+				audio:'yongjue',
 				trigger:{
 					player:'useCard',
 				},
@@ -499,7 +500,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//散装版甘夫人
 			dcshushen:{
-				audio:2,
+				audio:'shushen',
 				trigger:{
 					player:'recoverEnd',
 				},
@@ -546,7 +547,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dcshenzhi:{
-				audio:2,
+				audio:'shenzhi',
 				trigger:{
 					player:'phaseZhunbeiBegin',
 				},
@@ -21813,6 +21814,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'reyixiang_card',
 				subSkill:{
 					card:{
+						audio:'yixiang',
+						audioname:['re_taoqian'],
 						trigger:{target:'useCardToTargeted'},
 						forced:true,
 						filter:function(event,player){
