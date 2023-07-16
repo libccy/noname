@@ -17949,6 +17949,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunhanhua:['dc_qiaozhou','sunhanhua'],
 			duyu:['duyu','sp_duyu','pk_sp_duyu'],
 			kongrong:['sp_kongrong','jsrg_kongrong','kongrong'],
+			mifuren:['dc_mifuren','sp_mifuren'],
 		},
 		translate:{
 			liuzan:'手杀留赞',

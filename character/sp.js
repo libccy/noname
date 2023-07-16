@@ -22016,6 +22016,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuantanyuanshang:['yuantanyuanshang','yuantanyuanxiyuanshang'],
 			ruiji:['dc_ruiji','ruiji'],
 			jsp_huangyueying:['jsp_huangyueying','re_jsp_huangyueying'],
+			ganfuren:['dc_ganfuren','ganfuren'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
