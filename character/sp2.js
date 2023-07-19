@@ -409,7 +409,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'dcguixiu_rec',
 				content:function(){
 					player.addMark('dcguixiu',1,false);
-					player.draw();
+					player.draw(2);
 				},
 				subSkill:{
 					rec:{
@@ -17154,12 +17154,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				content:function(){
+					'step 0'
 					player.awakenSkill('syxiongyi');
 					if(!_status.characterlist){
 						lib.skill.pingjian.initList();
 					}
-					var hp=1-player.hp;
-					if((player.name1=='re_sunyi'||player.name2=='re_sunyi')&&_status.characterlist.contains('xushi')){
+					event.hp=1-player.hp;
+					if(_status.characterlist.contains('xushi')){
+						if(player.name1=='re_sunyi'||player.name2=='re_sunyi') event._result={control:'re_sunyi'};
+						else if(player.name2!=undefined){
+							player.chooseControl(player.name1,player.name2).set('prompt','请选择要更换的武将牌');
+						}
+						else event._result={control:player.name1};
 						hp+=2;
 						_status.characterlist.remove('xushi');
 						_status.characterlist.add('re_sunyi');
@@ -17167,7 +17173,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						player.addSkillLog('olhunzi');
+						event.goto(2);
 					}
+					'step 1'
+					event.hp+=2;
+					var name=result.control;
+					_status.characterlist.remove('xushi');
+					_status.characterlist.add(name);
+					player.reinit(name,'xushi',false);
+					'step 2'
+					var hp=event.hp;
 					if(hp>0) player.recover(hp);
 				},
 				ai:{
@@ -30263,7 +30278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			syjiqiao:'激峭',
 			syjiqiao_info:'出牌阶段开始时，你可将牌堆顶的X张牌置于你的武将牌上（X为你的体力上限）。当你于此出牌阶段内使用的牌结算结束后，你可以获得其中的一张牌，然后若剩余牌中红色牌和黑色牌的数量：不相等，你失去1点体力；相等，你回复1点体力。出牌阶段结束时，你将这些牌置入弃牌堆。',
 			syxiongyi:'凶疑',
-			syxiongyi_info:'限定技。当你处于濒死状态时，若剩余武将牌堆中：有“徐氏”，则你将体力值回复至3点，并将此武将牌替换为“徐氏”；没有“徐氏”，则你将体力值回复至1点并获得〖魂姿〗。',
+			syxiongyi_info:'限定技。当你处于濒死状态时，若剩余武将牌堆中：有“徐氏”，则你可以将体力值回复至3点，并将此武将牌替换为“徐氏”；没有“徐氏”，则你可以将体力值回复至1点并获得〖魂姿〗。',
 			zhaoyan:'赵嫣',
 			jinhui:'锦绘',
 			jinhui_info:'出牌阶段限一次，你可以随机展示牌堆中的三张不具有“伤害”标签且使用目标范围为“自己”或“一名角色”的牌，然后选择一名其他角色。该角色选择并按如下“锦绘”规则使用其中一张，然后你可以按如下“锦绘”规则使用剩余的任意张牌：若此牌的使用目标为“自己”，则对自己使用该牌，否则对对方使用该牌（无距离限制且不计入次数限制）。',

@@ -447,6 +447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.isPhaseUsing()) return false;
 					if(player==event.player) return false;
 					if(!event.player.isIn()) return false;
+					if(!event.card) return false;
 					return event.card.name=='sha'||get.type(event.card)=='trick'&&get.tag(event.card,'damage');
 				},
 				logTarget:'player',
@@ -496,38 +497,53 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.index==0){
 						target.draw();
 						player.addTempSkill('twxianfeng_me',{player:'phaseBegin'});
+						player.addMark('twxianfeng_me',1,false);
 					}
 					else{
 						player.draw();
-						target.addTempSkill('twxianfeng_others');
-						target.markAuto('twxianfeng_others',[player]);
+						target.addSkill('twxianfeng_others');
+						if(!target.storage.twxianfeng_others) target.storage.twxianfeng_others={};
+						if(typeof target.storage.twxianfeng_others[player.playerid]!='number') target.storage.twxianfeng_others[player.playerid]=0;
+						target.storage.twxianfeng_others[player.playerid]++;
 					}
 				},
 				subSkill:{
 					me:{
 						charlotte:true,
 						mark:true,
-						intro:{content:'至其他角色的距离-1'},
+						intro:{content:'至其他角色的距离-#'},
 						mod:{
 							globalFrom:function(from,to,distance){
-								return distance-1;
+								return distance-from.countMark('twxianfeng_me');
 							}
 						}
 					},
 					others:{
 						trigger:{global:['phaseBegin','die']},
 						filter:function(event,player){
-							return player.getStorage('twxianfeng_others').contains(event.player);
+							return player.storage.twxianfeng_others&&player.storage.twxianfeng_others[event.player.playerid];
 						},
 						charlotte:true,
 						mark:true,
-						intro:{content:'至$的距离-1'},
+						forced:true,
+						intro:{
+							content:function(storage,player){
+								if(!storage) return '';
+								var str='';
+								var map=(_status.connectMode?lib.playerOL:game.playerMap);
+								for(var id of storage){
+									str+='至'+get.translation(map[id])+'的距离-'+storage[id]+'、';
+								}
+								return str.slice(0,-1);
+							}
+						},
 						content:function(){
-							player.unmarkAuto('twxianfeng_others',[trigger.player]);
+							delete player.storage.twxianfeng_others[trigger.player.playerid];
+							if(get.is.empty(player.storage.twxianfeng_others)) player.removeSkill('twxianfeng_others');
 						},
 						mod:{
 							globalFrom:function(from,to,distance){
-								if(from.getStorage('twxianfeng_others').contains(to)) return distance-1;
+								if(from.storage.twxianfeng_others&&typeof from.storage.twxianfeng_others[to.playerid]=='number') return distance-from.storage.twxianfeng_others[to.playerid];
 							}
 						}
 					},

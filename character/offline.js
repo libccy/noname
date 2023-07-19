@@ -4770,6 +4770,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player,name){
 					if(name=='damageEnd') return true;
 					var evt=event.getParent();
+					if(evt.player!=player) return false;
 					return evt.card&&evt.type=='card'&&evt.targets.length==1;
 				},
 				content:function(){

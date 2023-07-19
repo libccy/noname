@@ -8558,7 +8558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							check:function(card){
 								return 6-get.value(card);
 							},
-							position:'h',
+							position:'hs',
 							onuse:function(result,player){
 								player.addTempSkill('juguan_effect');
 							},

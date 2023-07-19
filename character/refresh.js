@@ -280,12 +280,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.cards.remove(card);
 						if(result.links[0]!='获得剩余的牌') event.finish();
 					}
+					else if(event.targets.length) event.goto(1);
 					else event.finish();
 					'step 3'
 					var cards=cards.filterInD('d');
 					if(cards.length>0) player.gain(cards,'gain2');
-					'step 4'
-					if(event.targets.length) event.goto(1);
 				},
 				ai:{
 					threaten:1.3,
