@@ -924,6 +924,7 @@ window.noname_character_rank={
 		'vtb_xiaole',
 		'vtb_xiaojiu',
 		'ol_zhangzhang',
+		'ol_mengda',
 	],
 	b:[
 		'diy_feishi',
@@ -1212,6 +1213,7 @@ window.noname_character_rank={
 		'sb_zhurong',
 		'vtb_xiaoshan',
 		'vtb_xiaotao',
+		'zhangchu',
 	],
 	bm:[
 		'diy_xizhenxihong',

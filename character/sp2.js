@@ -32,7 +32,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xielingyu:['female','wu',3,['dcyuandi','dcxinyou']],
 			yuanyin:['male','qun',3,['dcmoshou','dcyunjiu'],['unseen']],
 			dongwan:['female','qun',3,['dcshengdu','dcxianjiao'],['unseen']],
-			zhangchu:['female','qun',3,['dcjizhong','dcjucheng','dcguangshi'],['unseen']],
+			zhangchu:['female','qun',3,['dcjizhong','dcrihui','dcguangshi']],
 			peiyuanshao:['male','qun',4,['dcmoyu'],['unseen']],
 			mengjie:['male','qun',3,['dcyinlu','dcyouqi']],
 			//dc_fuwan:['male','qun',4,['dcmoukui']],
@@ -3243,7 +3243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			dcjucheng:{
+			dcrihui:{
 				audio:2,
 				trigger:{player:'useCardAfter'},
 				usable:1,
@@ -3262,9 +3262,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card={name:trigger.card.name,nature:trigger.card.nature,isCard:true};
 					event.target=target;
 					event.card=card;
-					if(target.hasMark('dcjizhong')) player.gainPlayerCard(get.prompt('dcjucheng',target),target,'hej').set('logSkill',['dcjucheng',target]);
+					if(target.hasMark('dcjizhong')) player.gainPlayerCard(get.prompt('dcrihui',target),target,'hej').set('logSkill',['dcrihui',target]);
 					else{
-						player.chooseBool(get.prompt('dcjucheng',target),'令所有有“信众”的角色依次视为对其使用一张'+get.translation(card)).set('ai',()=>{
+						player.chooseBool(get.prompt('dcrihui',target),'令所有有“信众”的角色依次视为对其使用一张'+get.translation(card)).set('ai',()=>{
 							return _status.event.bool;
 						}).set('bool',function(){
 							var eff=0;
@@ -3277,13 +3277,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(!result.bool){
-						player.storage.counttrigger.dcjucheng--;
+						player.storage.counttrigger.dcrihui--;
 						return;
 					}
 					if(target.hasMark('dcjizhong')) event.finish();
 					else{
-						player.logSkill('dcjucheng',target);
+						player.logSkill('dcrihui',target);
 						event.targets=game.filterPlayer(current=>current.hasMark('dcjizhong'));
+						event.targets.sortBySeat(_status.currentPhase);
 					}
 					'step 2'
 					var current=event.targets.shift();
@@ -10033,6 +10034,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'dcfuxue_draw',
 				subSkill:{
 					draw:{
+						audio:'dcfuxue',
 						trigger:{player:'phaseJieshuBegin'},
 						forced:true,
 						locked:false,
@@ -28146,6 +28148,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					return get.value(event.cards)+player.maxHp*2-18>0;
 				},
+				prompt2:function(event,player){
+					return '你可以减1点体力上限，然后获得'+get.translation(event.cards.filterInD())+'。';
+				},
 				filter:function(event,player){
 					return player.isPhaseUsing()&&get.type(event.card)=='trick'&&event.cards.filterInD().length>0;
 				},
@@ -29464,7 +29469,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mushun:'穆顺，小说《三国演义》中的人物，男，东汉末宦官。献帝欲修书与国舅伏完，共谋图曹公。因顺为宦官中之忠义可托者，乃命顺往送书。顺藏书于发中，潜出禁宫，径至完宅，将书呈上。及完回书付顺，顺乃藏于头髻内，辞完回宫。然公闻信，先于宫门等候，顺回遇公，公喝左右，遍搜身上，并无夹带，放行。忽然风吹落其帽。公又唤回，取帽视之，遍观无物，还帽令戴。顺双手倒戴其帽。公心疑，令左右搜其头发中，搜出伏完书来。公见书大怒，执下顺于密室问之，顺不肯招。当晚将顺、完等宗族二百余口，皆斩于市。',
 			jsp_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
 			ruanji:'阮籍（公元210年～263年），字嗣宗，陈留尉氏（今河南省开封市）人，三国时期魏国诗人、竹林七贤之一。阮瑀之子，门荫入仕，累迁步兵校尉，世称阮步兵。崇奉老庄之学，政治上则采取谨慎避祸的态度。景元四年（公元263年），阮籍去世，享年五十三岁。作为“正始之音”的代表，著有《咏怀八十二首》、《大人先生传》等，其著作收录在《阮籍集》中。',
-			ganfurenmifuren:'甘夫人，刘备起兵后于沛城娶之为妾。后来，甘夫人随刘备到荆州，生了阿斗(也就是后主刘禅)。223年四月，刘备病死于白帝城，追谥甘夫人为“昭烈皇后”。<br>刘备夫人。徐州别驾糜竺之妹。长坂兵败，她怀抱年仅两岁的刘禅在乱军中走散，被赵云发现；但麋夫人因为赵云只有一匹马，不肯上马，在将阿斗托付给赵云后投井而亡。'
+			ganfurenmifuren:'甘夫人，刘备起兵后于沛城娶之为妾。后来，甘夫人随刘备到荆州，生了阿斗(也就是后主刘禅)。223年四月，刘备病死于白帝城，追谥甘夫人为“昭烈皇后”。<br>糜夫人，刘备夫人。徐州别驾糜竺之妹。长坂兵败，她怀抱年仅两岁的刘禅在乱军中走散，被赵云发现；但麋夫人因为赵云只有一匹马，不肯上马，在将阿斗托付给赵云后投井而亡。'
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',
@@ -29633,7 +29638,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanwei:['duanwei','junk_duanwei'],
 			xushao:['xushao','jsrg_xushao'],
 			huban:['dc_huban','ol_huban'],
-			mengda:['dc_mengda','pe_mengda'],
+			mengda:['dc_mengda','ol_mengda','pe_mengda'],
 			jsp_guanyu:['dc_jsp_guanyu','jsp_guanyu'],
 			mushun:['mushun','sp_mushun'],
 		},
@@ -30812,8 +30817,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangchu:'张楚',
 			dcjizhong:'集众',
 			dcjizhong_info:'出牌阶段限一次。你可以令一名其他角色摸两张牌，然后其选择一项：1.若其没有“信众”标记，其获得“信众”标记；2.弃置三张手牌。',
-			dcjucheng:'聚逞',
-			dcjucheng_info:'每回合限一次。当你使用普通锦囊牌或黑色基本牌结算结束后，若此牌的目标数为1且目标不为你，且其：没有“信众”，所有有“信众”的角色依次视为对其使用一张与此牌牌名和属性相同的牌；有“信众”，你可以获得其区域里的一张牌。',
+			dcrihui:'日慧',
+			dcrihui_info:'每回合限一次。当你使用普通锦囊牌或黑色基本牌结算结束后，若此牌的目标数为1且目标不为你，且其：没有“信众”，则所有有“信众”的角色依次视为对其使用一张与此牌牌名和属性相同的牌；有“信众”，则你可以获得其区域里的一张牌。',
 			dcguangshi:'光噬',
 			dcguangshi_info:'锁定技。准备阶段，若所有其他角色均有“信众”，你失去1点体力并摸两张牌。',
 			dongwan:'董绾',

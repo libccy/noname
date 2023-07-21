@@ -546,7 +546,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 0;
 						},
 						ai2:function(target){
-							return -get.attitude(_status.event.player,target);
+							return -get.attitude(_status.event.player,target)+0.01;
 						},
 					});
 					'step 2'

@@ -10543,6 +10543,21 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				changeGroup:function(){
+					'step 0'
+					if(!event.group) event.group=player.group;
+					var group=event.group;
+					player.getHistory('custom').push(event);
+					if(event.broadcast!==false){
+						game.broadcast(function(player,group){
+							player.group=group;
+							player.node.name.dataset.nature=get.groupnature(group);
+						},player,group);
+					}
+					player.group=group;
+					player.node.name.dataset.nature=get.groupnature(group);
+					if(event.log!==false) game.log(player,'将势力变为了','#y'+get.translation(group+2));
+				},
 				chooseToDebate:function(){
 					'step 0'
 					event.targets=event.list.filter(function(i){
@@ -18296,16 +18311,23 @@
 					return this.maxHp-Math.max(0,this.hp);
 				},
 				changeGroup:function(group,log,broadcast){
-					var player=this;
-					if(broadcast!==false){
-						game.broadcast(function(player,group){
-							player.group=group;
-							player.node.name.dataset.nature=get.groupnature(group);
-						},player,group);
+					var next=game.createEvent('changeGroup');
+					next.player=this;
+					next.log=true;
+					for(var i=0;i<arguments.length;i++){
+						var arg=arguments[i];
+						if(lib.group.contains(arg)){
+							next.group=arg;
+						}
+						else if(typeof arg==='boolean'){
+							next.log=arg;
+						}
+						else if(arg==='nobroadcast'){
+							next.broadcast=false;
+						}
 					}
-					player.group=group;
-					player.node.name.dataset.nature=get.groupnature(group);
-					if(log!==false) game.log(this,'将势力变为了','#y'+get.translation(group+2));
+					next.setContent('changeGroup');
+					return next;
 				},
 				chooseToDuiben:function(target){
 					var next=game.createEvent('chooseToDuiben');
@@ -30175,7 +30197,7 @@
 							}
 							player.playerid=i;
 							player.nickname=info.nickname;
-							player.changeGroup(info.group,false,false);
+							player.changeGroup(info.group,false,'nobroadcast');
 							player.identity=info.identity;
 							player.identityShown=info.identityShown;
 							player.hp=info.hp;
@@ -47618,10 +47640,10 @@
 						for(var i of game.connectPlayers){
 							if(!i.nickname&&!i.classList.contains('unselectable2')) num++;
 						}
-						if(num>=lib.configOL.number-1){
-							alert('至少要有两名玩家才能开始游戏！');
-							return;
-						}
+						// if(num>=lib.configOL.number-1){
+						// 	alert('至少要有两名玩家才能开始游戏！');
+						// 	return;
+						// }
 						game.resume();
 					}
 					button.delete();

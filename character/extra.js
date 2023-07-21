@@ -1110,6 +1110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'twwuhun_gain',
 				subSkill:{
 					gain:{
+						audio:'twwuhun',
 						trigger:{
 							player:'damageEnd',
 							source:'damageSource',

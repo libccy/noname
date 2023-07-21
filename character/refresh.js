@@ -9845,9 +9845,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.rehuashen.current=event.card;
 						game.broadcastAll(function(character,player){
 							player.sex=lib.character[character][0];
-							player.group=lib.character[character][1];
-							player.node.name.dataset.nature=get.groupnature(player.group);
+							//player.group=lib.character[character][1];
+							//player.node.name.dataset.nature=get.groupnature(player.group);
 						},event.card,player);
+						player.changeGroup(lib.character[event.card][1],false);
 					}
 					var link=result.control;
 					player.storage.rehuashen.current2=link;

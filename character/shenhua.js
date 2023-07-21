@@ -4494,8 +4494,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.markSkill('huashen');
 							game.broadcastAll(function(character,player){
 								player.sex=lib.character[character][0];
-								player.group=lib.character[character][1];
-								player.node.name.dataset.nature=get.groupnature(player.group);
+								//player.group=lib.character[character][1];
+								//player.node.name.dataset.nature=get.groupnature(player.group);
 								var mark=player.marks.huashen;
 								if(mark){
 									mark.style.transition='all 0.3s';
@@ -4513,6 +4513,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									},200);
 								}
 							},character,player);
+							player.changeGroup(lib.character[character][1],false);
 						}
 						player.storage.huashen.current2=skill;
 						if(!player.additionalSkills.huashen||!player.additionalSkills.huashen.contains(skill)){
