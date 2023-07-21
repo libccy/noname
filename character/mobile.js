@@ -2360,8 +2360,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//沮授
 			xinjianying:{
-				audio:'jianying',
-				audioname:['xin_jushou'],
+				audio:2,
 				subfrequent:['draw'],
 				group:['xinjianying_draw'],
 				enable:'phaseUse',
@@ -2449,7 +2448,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{player:1},
 				},
 				subSkill:{
-					draw:{inherit:'jianying',audio:'jianying',audioname:['xin_jushou']},
+					draw:{inherit:'jianying',audio:'xinjianying'},
 				},
 			},
 			//刘巴
@@ -18822,7 +18821,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duansuo_info:'出牌阶段限一次。你可以重置任意名处于连环状态的角色，然后对这些角色各造成1点火焰伤害。',
 			sp_pengyang:'彭羕',
 			spdaming:'达命',
-			spdaming_info:'①游戏开始时，你获得2点“达命”值。②其他角色A的出牌阶段限一次。其可以交给你一张牌，然后你选择令一名其他角色B。若B有与此牌相同类型的牌，其将一张该类型的牌交给A，你获得1点“达命”值；否则你将此牌交给A。',
+			spdaming_info:'①游戏开始时，你获得2点“达命”值。②其他角色A的出牌阶段限一次。其可以交给你一张牌，然后你选择另一名其他角色B。若B有与此牌相同类型的牌，其将一张该类型的牌交给A，你获得1点“达命”值；否则你将此牌交给A。',
 			spxiaoni:'嚣逆',
 			spxiaoni_info:'①出牌阶段限一次。若你的“达命”值大于0，你可以将一张牌当任意一种【杀】或伤害类锦囊牌使用。然后你减少等同于此牌指定目标数的“达命”值。②你的手牌上限基数为X（X为“达命”值，且至多为你的体力值，至少为0）。',
 			xin_zhuhuan:'手杀朱桓',

@@ -527,15 +527,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mark:true,
 						forced:true,
 						intro:{
+							markcount:function(storage,player){
+								var max=0;
+								for(var id in storage){
+									if(storage[id]>max) max=storage[id];
+								}
+								return max;
+							},
 							content:function(storage,player){
 								if(!storage) return '';
 								var str='';
 								var map=(_status.connectMode?lib.playerOL:game.playerMap);
-								for(var id of storage){
+								for(var id in storage){
 									str+='至'+get.translation(map[id])+'的距离-'+storage[id]+'、';
 								}
 								return str.slice(0,-1);
-							}
+							},
 						},
 						content:function(){
 							delete player.storage.twxianfeng_others[trigger.player.playerid];

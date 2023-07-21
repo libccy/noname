@@ -213,6 +213,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.type!='discard') return false;
 					if(player.hasSkill('olguzheng_used')) return false;
+					var phaseName;
+					for(var name of lib.phaseName){
+						var evt=event.getParent(name);
+						if(!evt||evt.name!=name) continue;
+						phaseName=name;
+						break;
+					}
+					if(!phaseName) return false;
 					return game.hasPlayer(current=>{
 						if(current==player) return false;
 						var evt=event.getl(current);
