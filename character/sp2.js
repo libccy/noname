@@ -3278,6 +3278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(!result.bool){
 						player.storage.counttrigger.dcrihui--;
+						event.finish();
 						return;
 					}
 					if(target.hasMark('dcjizhong')) event.finish();
