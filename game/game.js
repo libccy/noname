@@ -7408,7 +7408,7 @@
 							return false;
 						}
 					});
-				}
+				}             
 				if(!Array.from){
 					Object.defineProperty(Array, "from", {
 						configurable:true,
@@ -44914,6 +44914,7 @@
 						pre.style.margin=0;
 						pre.style.padding=0;
 						pre.style.position='relative';
+						pre.style.webkitUserSelect = pre.style.userSelect = 'text';
 						lib.setScroll(pre);
 						page.appendChild(text);
 
@@ -45010,26 +45011,28 @@
 						});
 						page.appendChild(text2);
 						game.print=function(){
-							var textstr='';
-							for(var i=0;i<arguments.length;i++){
-								if(get.is.object(arguments[i])){
-									var argi=get.stringify(arguments[i]);
+							var args=[].slice.call(arguments);
+							var printResult=args.map(arg=>{
+								if(get.is.object(arg)){
+									var argi=get.stringify(arg);
 									if(argi&&argi.length<5000){
 										textstr+=argi;
 									}
 									else{
-										textstr+=arguments[i].toString();
+										textstr+=arg.toString();
 									}
+								}else{
+									var str=String(arg);
+									if (!/<[a-zA-Z]+[^>]*?\/?>.*?(?=<\/[a-zA-Z]+[^>]*?>|$)/.exec(str)) return String(arg)
+										.replace(/&/g, '&amp;')
+										.replace(/</g, '&lt;')
+										.replace(/>/g, '&gt;')
+										.replace(/"/g, '&quot;')
+										.replace(/'/g, '&#39;');
+									else return str;
 								}
-								else{
-									textstr+=arguments[i];
-								}
-								if(i<arguments.length-1){
-									textstr+=' ';
-								}
-							}
-							textstr+='<br>';
-							pre.innerHTML+=textstr;
+							}).join(' ');
+							pre.innerHTML+=printResult+'<br>';
 							text.scrollTop=text.scrollHeight;
 						}
 						if(_status.toprint){
