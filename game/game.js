@@ -7232,109 +7232,198 @@
 						return this.childNodes[row].childNodes[col];
 					}
 				};
-				Array.prototype.filterInD=function(pos){
-					if(!pos) pos='o';
-					var list=[];
-					for(var i=0;i<this.length;i++){
-						if(pos.indexOf(get.position(this[i],true))!=-1) list.push(this[i]);
+				Object.defineProperty(Array.prototype, "filterInD", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(pos){
+						if(!pos) pos='o';
+						var list=[];
+						for(var i=0;i<this.length;i++){
+							if(pos.indexOf(get.position(this[i],true))!=-1) list.push(this[i]);
+						}
+						return list;
 					}
-					return list;
-				};
-				Array.prototype.contains=function(item){
-					return this.indexOf(item)!=-1;
-				};
-				Array.prototype.add=function(){
-					for(var i=0;i<arguments.length;i++){
-						if(this.contains(arguments[i])){
+				});
+				Object.defineProperty(Array.prototype, "contains", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(item){
+						return this.indexOf(item)!=-1;
+					}
+				});
+				Object.defineProperty(Array.prototype, "add", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						for(var i=0;i<arguments.length;i++){
+							if(this.contains(arguments[i])){
+								return false;
+							}
+							this.push(arguments[i]);
+						}
+						return this;
+					}
+				});
+				Object.defineProperty(Array.prototype, "addArray", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(arr){
+						for(var i=0;i<arr.length;i++){
+							this.add(arr[i]);
+						}
+						return this;
+					}
+				});
+				Object.defineProperty(Array.prototype, "remove", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(item){
+						if(Array.isArray(item)){
+							for(var i=0;i<item.length;i++) this.remove(item[i]);
+							return;
+						}
+						var pos=this.indexOf(item);
+						if(pos==-1){
 							return false;
 						}
-						this.push(arguments[i]);
+						this.splice(pos,1);
+						return this;
 					}
-					return this;
-				};
-				Array.prototype.addArray=function(arr){
-					for(var i=0;i<arr.length;i++){
-						this.add(arr[i]);
+				});
+				Object.defineProperty(Array.prototype, "removeArray", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(arr){
+						for(var i=0;i<arr.length;i++){
+							this.remove(arr[i]);
+						}
+						return this;
 					}
-					return this;
-				};
-				Array.prototype.remove=function(item){
-					if(Array.isArray(item)){
-						for(var i=0;i<item.length;i++) this.remove(item[i]);
-						return;
+				});
+				Object.defineProperty(Array.prototype, "randomGet", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						var arr=this.slice(0);
+						for(var i=0;i<arguments.length;i++) arr.remove(arguments[i]);
+						return arr[Math.floor(Math.random()*arr.length)];
 					}
-					var pos=this.indexOf(item);
-					if(pos==-1){
-						return false;
+				});
+				Object.defineProperty(Array.prototype, "randomRemove", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(num){
+						if(typeof num=='number'){
+							var list=[];
+							for(var i=0;i<num;i++){
+								if(this.length){
+									list.push(this.randomRemove());
+								}
+								else{
+									break;
+								}
+							}
+							return list;
+						}
+						else{
+							return this.splice(Math.floor(Math.random()*this.length),1)[0];
+						}
 					}
-					this.splice(pos,1);
-					return this;
-				};
-				Array.prototype.removeArray=function(arr){
-					for(var i=0;i<arr.length;i++){
-						this.remove(arr[i]);
+				});
+				Object.defineProperty(Array.prototype, "randomSort", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						var list=[];
+						while(this.length){
+							list.push(this.randomRemove());
+						}
+						for(var i=0;i<list.length;i++){
+							this.push(list[i]);
+						}
+						return this;
 					}
-					return this;
-				};
-				Array.prototype.randomGet=function(){
-					var arr=this.slice(0);
-					for(var i=0;i<arguments.length;i++) arr.remove(arguments[i]);
-					return arr[Math.floor(Math.random()*arr.length)];
-				};
-				Array.prototype.randomRemove=function(num){
-					if(typeof num=='number'){
+				});
+				Object.defineProperty(Array.prototype, "randomGets", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(num){
+						if(num>this.length){
+							num=this.length;
+						}
+						var arr=this.slice(0);
 						var list=[];
 						for(var i=0;i<num;i++){
-							if(this.length){
-								list.push(this.randomRemove());
-							}
-							else{
-								break;
-							}
+							list.push(arr.splice(Math.floor(Math.random()*arr.length),1)[0]);
 						}
 						return list;
 					}
-					else{
-						return this.splice(Math.floor(Math.random()*this.length),1)[0];
+				});
+				Object.defineProperty(Array.prototype, "sortBySeat", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(target){
+						lib.tempSortSeat=target;
+						this.sort(lib.sort.seat);
+						delete lib.tempSortSeat;
+						return this;
 					}
-				};
-				Array.prototype.randomSort=function(){
-					var list=[];
-					while(this.length){
-						list.push(this.randomRemove());
-					}
-					for(var i=0;i<list.length;i++){
-						this.push(list[i]);
-					}
-					return this;
-				};
-				Array.prototype.randomGets=function(num){
-					if(num>this.length){
-						num=this.length;
-					}
-					var arr=this.slice(0);
-					var list=[];
-					for(var i=0;i<num;i++){
-						list.push(arr.splice(Math.floor(Math.random()*arr.length),1)[0]);
-					}
-					return list;
-				};
-				Array.prototype.sortBySeat=function(target){
-					lib.tempSortSeat=target;
-					this.sort(lib.sort.seat);
-					delete lib.tempSortSeat;
-					return this;
-				};
+				});
+				if (!('includes' in Array.prototype)) {
+					Object.defineProperty(Array.prototype, 'includes', {
+						enumerable: false,
+						configurable: true,
+						writable: true,
+						value: function (searchElement, fromIndex) {
+							if (this == null) {
+								throw new TypeError('"this" is null or not defined');
+							}
+							var o = Object(this);
+							var len = o.length >>> 0;
+							if (len === 0) {
+								return false;
+							}
+							var n = fromIndex | 0;
+							var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+							function sameValueZero(x, y) {
+								return x === y || (typeof x === 'number' && typeof y === 'number' && isNaN(x) && isNaN(y));
+							}
+							while (k < len) {
+								if (sameValueZero(o[k], searchElement)) {
+									return true;
+								}
+								k++;
+							}
+							return false;
+						}
+					});
+				}
 				if(!Array.from){
-					Array.from=function(args){
-						var list=[];
-						if(args&&args.length){
-							for(var i=0;i<args.length;i++){
-								list.push(args[i]);
+					Object.defineProperty(Array, "from", {
+						configurable:true,
+						enumerable:false,
+						writable:true,
+						value:function(args){
+							var list=[];
+							if(args&&args.length){
+								for(var i=0;i<args.length;i++){
+									list.push(args[i]);
+								}
 							}
+							return list;
 						}
-						return list;
-					}
+					});
 				}
 				window.onkeydown=function(e){
 					if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')){
