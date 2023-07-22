@@ -763,10 +763,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'将势力改为任意一个势力'
 					].map((text,ind)=>{
 						var hint='';
-						if(list.contains(ind+1)){
+						if(list2.contains(ind+1)){
 							return text;
 						}
-						else{
+						else if(!list.contains(ind+1)){
 							hint+='已被执行过且';
 						}
 						if(ind==1&&nochai&&!list2.contains(ind+1)) hint+='无有手牌角色且';
@@ -841,7 +841,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 						选项三:function(){
-							player.chooseUseTarget('sha',true,false).set('logSkill','olgoude');
+							player.chooseUseTarget('sha',true,false).set('logSkill','olgoude').set('prompt','苟得：选择【杀】的目标');
 						},
 						选项四:function(){
 							'step 0'

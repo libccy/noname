@@ -10545,6 +10545,7 @@
 				},
 				changeGroup:function(){
 					'step 0'
+					event.originGroup=player.group;
 					if(!event.group) event.group=player.group;
 					var group=event.group;
 					player.getHistory('custom').push(event);
@@ -16210,6 +16211,7 @@
 					game.log(player,'弃置了',cards);
 					event.done=player.lose(cards,event.position,'visible');
 					event.done.type='discard';
+					if(event.discarder) event.done.discarder=event.discarder;
 					"step 1"
 					event.trigger('discard');
 				},
@@ -23662,7 +23664,7 @@
 					this.addSkill(skill,checkConflict,true,true);
 
 					if(!expire){
-						expire='phaseAfter';
+						expire=['phaseAfter','phaseBefore'];
 					}
 					this.tempSkills[skill]=expire;
 
@@ -29055,6 +29057,19 @@
 				content:function(){
 					player.removeSkill('counttrigger');
 					delete player.storage.counttrigger;
+				},
+				group:'counttrigger_2',
+				subSkill:{
+					2:{
+						trigger:{global:'phaseBefore'},
+						silent:true,
+						charlotte:true,
+						priority:100,
+						content:function(){
+							player.removeSkill('counttrigger');
+							delete player.storage.counttrigger;
+						},
+					}
 				}
 			},
 			_recovercheck:{
