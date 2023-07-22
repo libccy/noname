@@ -2547,6 +2547,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 											return 0;
 										}
 									}
+									if(name=='bingliang'&&source.countCards('j')>0&&source.countCards('h')>=source.hp-1){
+										return 0;
+									}
 									var card2;
 									if(name!=card.name){
 										card2={name:name};

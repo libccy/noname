@@ -32,7 +32,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_diaochan:['female','qun',3,['sblijian','sbbiyue']],
 			sb_yuanshao:['male','qun',4,['sbluanji','sbxueyi'],['zhu']],
 			sb_pangtong:['male','shu',3,['sblianhuan','sbniepan']],
-			sb_sunce:['male','wu','2/4',['sbjiang','sbhunzi','sbzhiba'],['zhu']],
+			sb_sunce:['male','wu',4,['sbjiang','sbhunzi','sbzhiba'],['zhu']],
 			sb_daqiao:['female','wu',3,['sbguose','sbliuli']],
 			sb_liubiao:['male','qun',3,['sbzishou','sbzongshi']],
 			sb_zhurong:['female','shu',4,['sblieren','sbjuxiang'],['unseen']],
@@ -295,9 +295,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('sbhunzi');
 					player.loseMaxHp();
 					'step 1'
-					player.changeHujia(2,null,true);
+					player.changeHujia(1,null,true);
 					'step 2'
-					player.draw(3);
+					player.draw(2);
 					'step 3'
 					player.addSkillLog('sbyingzi');
 					player.addSkillLog('gzyinghun');
@@ -348,7 +348,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					draw:{
 						trigger:{global:'dieAfter'},
 						filter:function(event,player){
-							return event.getParent(4).name=='sbzhiba';
+							return event.getParent(3).name=='sbzhiba';
 						},
 						forced:true,
 						charlotte:true,
@@ -394,7 +394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.useCard({name:'lebu'},target,cards).audio=false;
 					}
 					'step 1'
-					player.draw();
+					player.draw(2);
 					player.chooseToDiscard(true,'he','国色：请弃置一张牌');
 				},
 				ai:{
@@ -725,6 +725,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(targets[i].hp==1){
 							eff*=1.5;
 						}
+						if(get.attitude(player,targets[i])==0||targets[i].group=='qun'){
+							eff+=0.5;
+						}
 						num+=eff;
 					}
 					if(!player.needsToDiscard(-1)){
@@ -766,6 +769,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return num+2*game.countPlayer(current=>player!=current&&current.group=='qun');
 						}
 					}
+				},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(player!=target&&target&&target.group=='qun') return [1,0.2];
+						},
+					},
 				}
 			},
 			//庞统
@@ -1614,13 +1624,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(ui.selected.targets.length){
 							var current=ui.selected.targets[0];
-							if(current.group=='shu'&&current.hp>=player.hp){
+							if(current.group=='shu'&&current.hp>=player.hp&&current!=player){
 								return -get.attitude(player,target);
 							}
 							return Math.abs(get.attitude(player,current));
 						}
 						else{
-							if(target.group=='shu'&&target.hp>=player.hp&&game.hasPlayer(current=>{
+							if(target.group=='shu'&&target.hp>=player.hp&&target!=player&&game.hasPlayer(current=>{
 								return get.attitude(player,current)<0;
 							})) return 10;
 							return 1;
@@ -1630,7 +1640,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var targets=result.targets;
 						event.targets=targets;
-						if(targets[0].group!='shu'||targets[0].hp<player.hp) targets.reverse();
+						if(targets[0].group!='shu'||targets[0].hp<player.hp||targets[0]==player) targets.reverse();
 						player.logSkill('sbjijiang',targets,false);
 						player.line2(targets);
 						var choiceList=[
@@ -3442,7 +3452,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbjiuyuan:{
 				audio:2,
-				usable:1,
 				trigger:{global:'useCard'},
 				forced:true,
 				zhuSkill:true,
@@ -4464,12 +4473,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbjiang:'激昂',
 			sbjiang_info:'①当你使用【决斗】或红色【杀】指定目标后，或当你成为【决斗】或红色【杀】的目标后，你摸一张牌。②当你使用【决斗】时，你可以额外指定一名目标，然后你失去1点体力。③出牌阶段限一次。你可以将所有手牌当【决斗】使用。',
 			sbhunzi:'魂姿',
-			sbhunzi_info:'觉醒技。当你脱离濒死状态后，你减1点体力上限，获得2点护甲，摸三张牌。然后你获得〖英姿〗和〖英魂〗。',
+			sbhunzi_info:'觉醒技。当你脱离濒死状态后，你减1点体力上限，获得1点护甲，摸两张牌。然后你获得〖英姿〗和〖英魂〗。',
 			sbzhiba:'制霸',
 			sbzhiba_info:'主公技，限定技。当你进入濒死状态时，你可以回复X点体力并修改〖激昂③〗为“出牌阶段限X次”（X为场上其他吴势力角色数+1）。然后其他吴势力角色依次受到1点无来源伤害，且当有角色因此死亡后，你摸三张牌。',
 			sb_daqiao:'谋大乔',
 			sbguose:'国色',
-			sbguose_info:'出牌阶段限四次。你可以选择一项：1.将一张♦牌当【乐不思蜀】使用；2.弃置场上一张【乐不思蜀】。然后你摸一张牌并弃置一张牌。',
+			sbguose_info:'出牌阶段限四次。你可以选择一项：1.将一张♦牌当【乐不思蜀】使用；2.弃置场上一张【乐不思蜀】。然后你摸两张牌并弃置一张牌。',
 			sbliuli:'流离',
 			sbliuli_info:'当你成为【杀】的目标时，你可以弃置一张牌并选择你攻击范围内的一名不为此【杀】使用者的角色，将此【杀】转移给该角色。若你以此法弃置了♥牌，则你可以令一名不为此【杀】使用者的其他角色获得“流离”标记，且移去场上所有其他的“流离”（每回合限一次）。有“流离”的角色回合开始时，其移去其“流离”并执行一个额外的出牌阶段。',
 			sb_liubiao:'谋刘表',

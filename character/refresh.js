@@ -166,7 +166,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('h',{type:'equip'})>0;
+					return player.countCards('he',{type:'equip'})>0;
 				},
 				filterCard:function(card){
 					return get.type(card)=='equip';
@@ -213,6 +213,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.type!='discard') return false;
 					if(player.hasSkill('olguzheng_used')) return false;
+					var phaseName;
+					for(var name of lib.phaseName){
+						var evt=event.getParent(name);
+						if(!evt||evt.name!=name) continue;
+						phaseName=name;
+						break;
+					}
+					if(!phaseName) return false;
 					return game.hasPlayer(current=>{
 						if(current==player) return false;
 						var evt=event.getl(current);
@@ -277,14 +285,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(typeof result.links[0]!='string') result.links.reverse();
 						var card=result.links[1];
 						target.gain(card,'gain2');
+						event.cards.remove(card);
 						if(result.links[0]!='获得剩余的牌') event.finish();
 					}
+					else if(event.targets.length) event.goto(1);
 					else event.finish();
 					'step 3'
 					var cards=cards.filterInD('d');
 					if(cards.length>0) player.gain(cards,'gain2');
-					'step 4'
-					if(event.targets.length) event.goto(1);
 				},
 				ai:{
 					threaten:1.3,
@@ -429,7 +437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 2'
 					player.give(result.cards,trigger.player);
-					trigger.player.addSkill('rexiantu_check');
+					trigger.player.addTempSkill('rexiantu_check','phaseUseAfter');
 					trigger.player.markAuto('rexiantu_check',[player]);
 				},
 				ai:{
@@ -9837,9 +9845,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.rehuashen.current=event.card;
 						game.broadcastAll(function(character,player){
 							player.sex=lib.character[character][0];
-							player.group=lib.character[character][1];
-							player.node.name.dataset.nature=get.groupnature(player.group);
+							//player.group=lib.character[character][1];
+							//player.node.name.dataset.nature=get.groupnature(player.group);
 						},event.card,player);
+						player.changeGroup(lib.character[event.card][1],false);
 					}
 					var link=result.control;
 					player.storage.rehuashen.current2=link;
@@ -12435,6 +12444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyingzi:{
 				audio:2,
 				audioname:['heqi','sunce','gexuan','re_sunben','re_sunce','re_heqi'],
+				audioname2:{re_sunyi:'reyingzi_re_sunyi'},
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				preHidden:true,

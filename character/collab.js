@@ -932,6 +932,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.line(target,'thunder');
 					target.damage('thunder');
 				},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(ui.selected.targets.length) return;
+							if(player!=target&&get.type2(card)=='trick') return [1,0,1,-2];
+						},
+					},
+				},
 				subSkill:{
 					add:{
 						audio:'dcnutao',

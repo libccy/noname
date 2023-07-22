@@ -2360,8 +2360,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//沮授
 			xinjianying:{
-				audio:'jianying',
-				audioname:['xin_jushou'],
+				audio:2,
 				subfrequent:['draw'],
 				group:['xinjianying_draw'],
 				enable:'phaseUse',
@@ -2449,7 +2448,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{player:1},
 				},
 				subSkill:{
-					draw:{inherit:'jianying',audio:'jianying',audioname:['xin_jushou']},
+					draw:{inherit:'jianying',audio:'xinjianying'},
 				},
 			},
 			//刘巴
@@ -17949,6 +17948,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunhanhua:['dc_qiaozhou','sunhanhua'],
 			duyu:['duyu','sp_duyu','pk_sp_duyu'],
 			kongrong:['sp_kongrong','jsrg_kongrong','kongrong'],
+			mifuren:['dc_mifuren','sp_mifuren'],
 		},
 		translate:{
 			liuzan:'手杀留赞',
@@ -18393,7 +18393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			heji_info:'当有角色使用的【决斗】或红色【杀】结算完成后，若此牌对应的目标数为1，则你可以对相同的目标使用一张【杀】或【决斗】（无距离和次数限制）。若你以此法使用的牌不为转化牌，则你从牌堆中随机获得一张红色牌。',
 			liubing:'流兵',
 			liubing_info:'锁定技。①当你声明使用【杀】后，若此牌是你本回合使用的第一张有唯一对应实体牌的【杀】，则你将此牌的花色改为♦。②其他角色于其出牌阶段内使用的非转化黑色杀结算结束后，若此【杀】未造成伤害，则你获得之。',
-			sp_mifuren:'糜夫人',
+			sp_mifuren:'手杀糜夫人',
 			spcunsi:'存嗣',
 			spcunsi2:'存嗣',
 			spcunsi_info:'出牌阶段限一次，你可将武将牌翻至背面并选择一名其他角色。其从牌堆或弃牌堆中获得一张【杀】，且下一张杀的伤害值基数+1。',
@@ -18821,7 +18821,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duansuo_info:'出牌阶段限一次。你可以重置任意名处于连环状态的角色，然后对这些角色各造成1点火焰伤害。',
 			sp_pengyang:'彭羕',
 			spdaming:'达命',
-			spdaming_info:'①游戏开始时，你获得2点“达命”值。②其他角色A的出牌阶段限一次。其可以交给你一张牌，然后你选择令一名其他角色B。若B有与此牌相同类型的牌，其将一张该类型的牌交给A，你获得1点“达命”值；否则你将此牌交给A。',
+			spdaming_info:'①游戏开始时，你获得2点“达命”值。②其他角色A的出牌阶段限一次。其可以交给你一张牌，然后你选择另一名其他角色B。若B有与此牌相同类型的牌，其将一张该类型的牌交给A，你获得1点“达命”值；否则你将此牌交给A。',
 			spxiaoni:'嚣逆',
 			spxiaoni_info:'①出牌阶段限一次。若你的“达命”值大于0，你可以将一张牌当任意一种【杀】或伤害类锦囊牌使用。然后你减少等同于此牌指定目标数的“达命”值。②你的手牌上限基数为X（X为“达命”值，且至多为你的体力值，至少为0）。',
 			xin_zhuhuan:'手杀朱桓',
