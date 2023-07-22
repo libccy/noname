@@ -2077,29 +2077,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=['摸一张牌'];
 					if(player.countCards('he')>1) list.push('将一张牌置于武将牌上，于回合结束后获得之');
 					player.chooseControl('cancel2').set('prompt',get.prompt('lingsheji')).set('choiceList',list).set('ai',function(){
-					 var player=_status.event.player;
-					 if(player.countCards('e',function(card){
-					  return card.name!='tengjia'&&get.value(card)<=0;
-					 })) return 1;
-					 if(!player.needsToDiscard()) return 0;
-					 return 1;
+						var player=_status.event.player;
+						if(player.countCards('e',function(card){
+							return card.name!='tengjia'&&get.value(card)<=0;
+						})) return 1;
+						if(!player.needsToDiscard()) return 0;
+						return 1;
 					});
 					'step 1'
 					if(result.control=='cancel2'){
-					 event.finish();return;
+						event.finish();return;
 					}
 					player.logSkill('lingsheji');
 					if(result.index==0){
-					 player.draw();
-					 event.finish();
+						player.draw();
+						event.finish();
 					}
 					else{
-					 player.chooseCard('he',true,function(card,player){
-					  return card!=player.getEquip(5);
-					 }).set('ai',function(card){
-					  if(get.position(card)=='e'&&get.value(card)<=0) return 10;
-					  return (get.position(card)=='h'?2:1)*-get.value(card);
-					 });
+						player.chooseCard('he',true,function(card,player){
+							return card!=player.getEquip(5);
+						}).set('ai',function(card){
+							if(get.position(card)=='e'&&get.value(card)<=0) return 10;
+							return (get.position(card)=='h'?2:1)*-get.value(card);
+						});
 					}
 					'step 2'
 					player.addSkill('lingsheji2');
@@ -2783,12 +2783,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			//孟婆:
 			"boss_shiyou":{
 				audio:true,
-    			trigger:{global:'loseAfter'},
+				trigger:{global:'loseAfter'},
 				filter:function(event,player){
 					var evt=event.getParent(3);
 					return event.type=='discard'&&evt.name=='phaseDiscard'&&evt.player==event.player&&evt.player!=player&&event.cards2&&event.cards2.filterInD('d').length>0;
 				},
-    			content:function(){
+				content:function(){
 					"step 0"
 					event.cards=trigger.cards2.filterInD('d');
 					"step 1"
@@ -3013,7 +3013,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				var list=[];
 				event.suitx=['heart','diamond','club','spade'];
 				for(var x=0;x<4;x++){
-					for(var i=1;i<14;i++){           
+					for(var i=1;i<14;i++){
 						list.add(i);
 						var judge2=(trigger.judge({
 							name:get.name(card),
@@ -3033,7 +3033,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				player.chooseControl(list).set('ai',function(){
 					return _status.event.choice;
 				}).set('choice',choice).prompt=get.prompt2(event.name);
-				'step 1'        
+				'step 1'		
 				if(result.control!='cancel2'){
 					if(!event.logged){
 						event.logged=true;
@@ -3041,9 +3041,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.log(trigger.player,'判定结果点数为','#g'+result.control);
 					player.popup(result.control,'fire');
-					if(!trigger.fixedResult) trigger.fixedResult={};           
+					if(!trigger.fixedResult) trigger.fixedResult={};
 					trigger.fixedResult.number=result.control;
-				}        
+				}		
 				player.chooseControl(event.suitx).set('ai',function(){
 					return _status.event.choice;
 				}).set('choice',event.suitchoice).prompt=get.prompt2(event.name);
@@ -3069,8 +3069,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"boss_diting":{
 				audio:true,
 				mod:{
-					globalFrom:function (from,to,distance){        
-						return distance-1;        
+					globalFrom:function (from,to,distance){		
+						return distance-1;		
 					},
 					globalTo:function (from,to,distance){
 						return distance+1;
@@ -3373,15 +3373,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(player.storage.boss_sdyl_bosslevel5) return false;
 					if(name=='damageBegin4'){
-						if(!event.card||event.card.name!='nanman') return false;      
+						if(!event.card||event.card.name!='nanman') return false;
 						return true;
 					}else if(name=='useCardAfter'){
-						if(!event.card||event.card.name!='nanman') return false;      
+						if(!event.card||event.card.name!='nanman') return false;
 						player.storage.boss_sdyl_bosslevel5=true;
 						return false;
-					}                
+					}				
 				},
-				content:function (){  
+				content:function (){
 					trigger.num++;
 				},
 			},
@@ -8643,7 +8643,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(event.respondTo[1]&&get.itemtype(event.respondTo[1])!='card') return false;
 					if(event.respondTo[1]&&['h','e','j'].contains(get.position(event.respondTo[1]))) return false;
 				},
-				filter:function(event,player){   
+				filter:function(event,player){
 					if(!player.storage.boss_jiang) return false;
 					if(!event.respondTo) return false;
 					if(get.color(event.card)!='red') return false;
@@ -8930,8 +8930,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			longfenghemingjian_info:'你使用的【雷杀】或【火杀】指定目标后，可令对方选择弃置一张牌或令你摸一张牌',
 			qicaishenlu:'七彩神鹿',
 			qicaishenlu_info:'锁定技，你计算与其他角色的距离时-1，当你造成属性伤害时，你令此伤害+1。',
-   boss_mengpohuihun:'回魂',
-   boss_mengpohuihun_info:'若场上有角色在本局游戏中因孟婆的【忘魂】失去过技能，则令其恢复该技能；此牌进入弃牌堆后，会被销毁。',
+			boss_mengpohuihun:'回魂',
+			boss_mengpohuihun_info:'若场上有角色在本局游戏中因孟婆的【忘魂】失去过技能，则令其恢复该技能；此牌进入弃牌堆后，会被销毁。',
 			honghuangzhili:'洪荒之力',
 			honghuangzhili_cbg:'洪',
 			honghuangzhili_info:'若该角色的势力是神，你获得其一张牌，其【神裔】无效直到其下家的回合（这个下家是动态变化的，会随着一个人的死或者复活而变化）开始；若该角色的势力不是神，其翻面。',
@@ -9346,7 +9346,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"boss_dayuan_info":" 当一名角色判定牌最终生效前，你可以指定该判定牌的点数和花色",
 			"boss_diting":"谛听",
 			"boss_diting_info":"锁定技，你的坐骑区被废除，你与别人计算距离时-1，别人与你计算距离时+1；你的坐骑牌均用于重铸。",
-/*			//等阶
+			/*			
+			//等阶
 			"boss_sdyl_playerlevel1":"一阶",
 			"boss_sdyl_playerlevel1_info":"",
 			"boss_sdyl_playerlevel2":"二阶",
@@ -9383,7 +9384,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_xhuanren_info:'',
 			boss_xhuanren_info_boss:'第一关：挑战秦广王。<br>第二关：挑战楚江王，宋帝王，五官王，阎罗王中的一个。<br>第三关：挑战卞城王，泰山王，都市王，平等王中的一个。<br>第四关：挑战转轮王。',
 
-   boss_newhuanren:'关卡说明',
+			boss_newhuanren:'关卡说明',
 			boss_newhuanren_info:'',
 			boss_newhuanren_info_boss:'第一关：挑战秦广王。<br>第二关：挑战楚江王，宋帝王，五官王，阎罗王中的一个。<br>第三关：挑战卞城王，泰山王，都市王，平等王中的一个。<br>第四关：挑战转轮王。<br>注：孟婆将在每局前三个阶段随机一个阶段登场<br>地藏王登场规则为，50回合内通过第三关，并且在前三关中成功击杀孟婆。<li>选陆逊左慈张春华于吉蒋费孔融自动变孙笨',
 			lingsheji:'灵蛇髻',
