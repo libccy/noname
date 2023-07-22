@@ -437,7 +437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 2'
 					player.give(result.cards,trigger.player);
-					trigger.player.addSkill('rexiantu_check');
+					trigger.player.addTempSkill('rexiantu_check','phaseUseAfter');
 					trigger.player.markAuto('rexiantu_check',[player]);
 				},
 				ai:{
@@ -12444,6 +12444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyingzi:{
 				audio:2,
 				audioname:['heqi','sunce','gexuan','re_sunben','re_sunce','re_heqi'],
+				audioname2:{re_sunyi:'reyingzi_re_sunyi'},
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				preHidden:true,

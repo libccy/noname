@@ -5085,6 +5085,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzyinghun:{
 				audio:'yinghun',
 				audioname:['re_sunjian','sunce','re_sunben','re_sunce','ol_sunjian','sb_sunce'],
+				audioname2:{re_sunyi:'gzyinghun_re_sunyi'},
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return player.getDamagedHp()>0;

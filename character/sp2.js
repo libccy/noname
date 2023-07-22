@@ -17200,6 +17200,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				derivation:['olhunzi','reyingzi','gzyinghun'],
 			},
+			gzyinghun_re_sunyi:{audio:1},
+			reyingzi_re_sunyi:{audio:1},
 			//庞德公
 			heqia:{
 				audio:2,
@@ -27424,10 +27426,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xpchijie:{
 				audio:2,
 				trigger:{
-					player:'useCardToAfter',
+					target:'useCardToAfter',
 				},
 				filter:function(event,player){
-					return !player.hasSkill('xpchijie4')&&event.player!=player;
+					var evt=event.getParent();
+					var targets=evt.targets.slice(evt.num+1);
+					return event.player!=player&&targets.length>0;
+				},
+				usable:1,
+				prompt2:function(event,player){
+					var evt=event.getParent();
+					var targets=evt.targets.slice(evt.num+1);
+					return '令'+get.translation(event.card)+'对'+get.translation(targets)+'无效';
 				},
 				check:function(event,player){
 					var evt=event.getParent();
@@ -27439,7 +27449,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return num<-1;
 				},
 				content:function(){
-					player.addTempSkill('xpchijie4');
 					var evt=trigger.getParent();
 					evt.excluded.addArray(evt.targets);
 				},
@@ -27449,17 +27458,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCardAfter'},
 				audio:'xpchijie',
 				filter:function(event,player){
-					return event.player!=player&&event.targets.contains(player)&&!player.hasSkill('xpchijie4')&&event.cards.filterInD().length>0&&!game.hasPlayer2(function(current){
+					return event.player!=player&&event.targets.contains(player)&&event.cards.filterInD().length>0&&!game.hasPlayer2(function(current){
 						return current.getHistory('damage',function(evt){
 							return evt.card==event.card;
 						}).length>0;
 					});
 				},
+				usable:1,
 				check:function(event,player){
 					return get.value(event.cards.filterInD(),player,'raw')>0;
 				},
+				prompt2:function(event,player){
+					return '获得'+get.translation(event.cards.filterInD())+'。';
+				},
 				content:function(){
-					player.addTempSkill('xpchijie4');
 					player.gain(trigger.cards.filterInD(),'log','gain2');
 				},
 			},
@@ -27476,6 +27488,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.yinju2=target;
 					player.addTempSkill('yinju2');
 				},
+				ai:{
+					result:{
+						player:function(player,target){
+							if(player.countCards('hs',function(card){
+								return get.tag(card,'damage')&&player.canUse(card,target);
+							})>=1&&target.hp<=2) return 0.1;
+							if(player.countCards('hes',function(card){
+								return player.canUse(card,target);
+							})<=2) return -100;
+							return 1;
+						},
+						target:function(player,target){
+							return target.isDamaged()?5:3;
+						},
+					}
+				}
 			},
 			yinju2:{
 				trigger:{
@@ -27503,6 +27531,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					game.delayx();
+				},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(target!=player.storage.yinju2) return;
+							if(card.name=='lebu') return;
+							return [0,0.5,0,0.5];
+						},
+					},
 				},
 			},
 			//管辂和葛玄
@@ -29779,7 +29816,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lskuizhu:'馈珠',
 			lskuizhu_info:'出牌阶段结束时，你可以选择体力值为全场最多的一名其他角色，将手牌摸至与该角色相同（最多摸至五张），然后该角色观看你的手牌，弃置任意张手牌并从观看的牌中获得等量的牌。若其获得的牌大于一张，则你选择一项：移去一个“珠”；或令其对其攻击范围内的一名角色造成1点伤害。',
 			xpchijie:'持节',
-			xpchijie_info:'每回合限一次。①当你其他角色使用的牌对你结算结束后，你可以令此牌对所有后续目标无效。②其他角色使用的牌结算完成时，若你是此牌的目标之一且此牌未造成过伤害，则你可以获得此牌对应的所有实体牌。',
+			xpchijie_info:'每回合每项各限一次。1.当其他角色使用的牌对你结算结束后，你可以令此牌对所有后续目标无效。2.其他角色使用的牌结算完成时，若你是此牌的目标之一且此牌未造成过伤害，则你可以获得此牌对应的所有实体牌。',
 			xpchijie2:'持节',
 			yinju:'引裾',
 			yinju_info:'限定技，出牌阶段，你可以选择一名其他角色。若如此做，当你于此阶段内使用牌指定其为目标后，你与其各摸一张牌；当你即将对其造成伤害时，防止此伤害，然后其回复等量的体力。',

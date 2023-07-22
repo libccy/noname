@@ -2211,16 +2211,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '选项一';
 					}).set('list',list);
 					'step 1'
-					if(result.control=='背水！'&&player!=trigger.player) player.give(player.getCards('h'),trigger.player);
-					if(result.control!='选项二'){
+					event.choice=result.control;
+					if(event.choice=='背水！'&&player!=trigger.player) player.give(player.getCards('h'),trigger.player);
+					'step 2'
+					if(event.choice!='选项二'){
 						var card=get.cardPile2(function(card){
 							return card.name=='sha';
 						});
 						if(card) trigger.player.gain(card,'gain2');
 						else game.log('但牌堆里已经没有','#y杀','了！');
-						if(result.control=='选项一') event.finish();
+						if(event.choice=='选项一') event.finish();
 					}
-					if(result.control!='选项一'){
+					'step 3'
+					if(event.choice!='选项一'){
 						if(trigger.player.countCards('h')) trigger.player.chooseCardTarget({
 							prompt:'将一张手牌交给另一名其他角色并摸两张牌',
 							filterCard:true,
@@ -2237,7 +2240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						else event.finish();
 					}
-					'step 2'
+					'step 4'
 					var target=result.targets[0];
 					trigger.player.line(target);
 					trigger.player.give(result.cards,target);
