@@ -2735,7 +2735,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(event.wuxieresult&&event.wuxieresult2&&event.wuxieresult2.skill){
 						var info=get.info(event.wuxieresult2.skill);
 						if(info&&info.precontent&&!game.online){
-							var next=game.createEvent('pre_'+event.wuxieresult2);
+							var next=game.createEvent('pre_'+event.wuxieresult2.skill);
 							next.setContent(info.precontent);
 							next.set('result',event.wuxieresult2);
 							next.set('player',event.wuxieresult);
