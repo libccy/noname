@@ -624,6 +624,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.gain(cards,'gain2');
 					}
+				},
+				ai:{
+					combo:'yizhao',
 				}
 			},
 			sanshou:{

@@ -1356,7 +1356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				delay:false,
 				skillAnimation:true,
-				animationColor:'legend',
+				animationColor:'metal',
 				check:function(card){
 					if(get.type(card)!='basic'&&get.type(card)!='trick') return 0;
 					return get.value(card)-7.5;
@@ -18435,7 +18435,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				usable:1,
-				check:()=>false,
+				check:function(event,player){
+					var hs=player.getCards('h'),cards=event.cards.filter(function(i){
+						return (hs.contains(i)&&get.color(i,player)=='red'&&lib.filter.cardDiscardable(i,player,'difa'));
+					});
+					var value=get.value(hs,player);
+					return Array.from(ui.cardPile.childNodes).some(function(card){
+						return get.type2(card,false)=='trick'&&get.value(card,player)>value;
+					});
+				},
 				content:function(){
 					'step 0'
 					var hs=player.getCards('h'),cards=trigger.cards.filter(function(i){
@@ -18451,7 +18459,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.type2(i,false)=='trick';
 					});
 					if(!list.length) event.finish();
-					else player.chooseButton(['选择获得一种锦囊牌',[list.map((i)=>['锦囊','',i]),'vcard']],true);
+					else player.chooseButton(['选择获得一种锦囊牌',[list.map((i)=>['锦囊','',i]),'vcard']],true).set('ai',function(button){
+						var card={name:button.link[2]};
+						if(!_status.event.list.contains(card.name)) return 0;
+						return _status.event.player.getUseValue(card);
+					}).set('list',Array.from(ui.cardPile.childNodes).filter(function(card){
+						return get.type2(card,false)=='trick';
+					}).map(function(card){
+						return card.name;
+					}).reduce(function(list,name){
+						if(!list.contains(name)) list.add(name);
+						return list;
+					},[]));
 					'step 2'
 					var card=get.cardPile(function(i){
 						return i.name==result.links[0][2]&&!event.cards.contains(i);

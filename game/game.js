@@ -47655,10 +47655,10 @@
 						for(var i of game.connectPlayers){
 							if(!i.nickname&&!i.classList.contains('unselectable2')) num++;
 						}
-						// if(num>=lib.configOL.number-1){
-						// 	alert('至少要有两名玩家才能开始游戏！');
-						// 	return;
-						// }
+						if(num>=lib.configOL.number-1){
+							alert('至少要有两名玩家才能开始游戏！');
+							return;
+						}
 						game.resume();
 					}
 					button.delete();
@@ -53293,17 +53293,23 @@
 					threaten=info.ai.threaten(player,player);
 				}
 			}
-			if(type=='in'){
+			if(type.indexOf('in')!=-1){
 				if(info.enable=='phaseUse') num+=0.5;
 				if(info.trigger&&info.trigger.player){
 					var list=Array.isArray(info.trigger.player)?info.trigger.player:[info.trigger.player];
 					var add=false;
 					for(var i of list){
-						for(var j of lib.phaseName){
-							if(i.indexOf[j]==0){
-								num+=0.5;
-								add=true;
-								break;
+						if(i.indexOf('phase')==0){
+							num+=0.5;
+							add=true;
+						}
+						else{
+							for(var j of lib.phaseName){
+								if(i.indexOf[j]==0){
+									num+=0.5;
+									add=true;
+									break;
+								}
 							}
 						}
 						if(add) break;
@@ -53316,12 +53322,22 @@
 					num+=Math.sqrt(threaten)-1;
 				}
 			}
-			else if(type=='out'){
+			if(type.indexOf('out')!=-1){
 				if(threaten<1){
-					num=1/Math.sqrt(threaten);
+					num*=1/Math.sqrt(threaten);
 				}
-				if(info.trigger&&(info.trigger.global||info.trigger.target||(typeof info.trigger.player=='string'&&
-				(info.trigger.player.indexOf('damage')==0||info.trigger.player.indexOf('lose')==0)))) num+=0.1;
+				if(info.trigger){
+					if(info.trigger.global){
+						var list=Array.isArray(info.trigger.global)?info.trigger.global:[info.trigger.global];
+						num+=Math.min(3,list.length)/10;
+						for(var i of list){
+							if(i.indexOf('lose')==0||i.indexOf('use')==0) num+=0.3;
+							if(i.indexOf('cardsDiscard')==0) num+=0.4;
+						}
+					}
+					if(info.trigger.target||(typeof info.trigger.player=='string'&&
+					(info.trigger.player.indexOf('damage')==0||info.trigger.player.indexOf('lose')==0))) num+=0.1;
+				}
 				if(info.ai){
 					if(info.ai.maixie||info.ai.maixie_hp||info.ai.maixie_defend){
 						num+=0.5;
