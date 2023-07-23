@@ -3625,6 +3625,12 @@
 						name:'显示分享扩展',
 						init:true,
 						unfrequent:true,
+					},
+					show_extensionimage:{
+						name:'显示扩展武将图片',
+						intro:'关闭扩展武将包仍加载扩展武将图片',
+						init:true,
+						unfrequent:true,
 					}
 				}
 			},
@@ -7098,6 +7104,12 @@
 							}
 							else if(lib.character[name]){
 								nameinfo=lib.character[name];
+							}
+							else if(lib.config.show_extensionimage){
+								if(Object.keys(lib.characterPack).some(pack => Object.keys(lib.characterPack[pack]).contains(name))){
+									var pack=Object.keys(lib.characterPack).find(pack => Object.keys(lib.characterPack[pack]).contains(name));
+									nameinfo=lib.characterPack[pack][name];
+								}
 							}
 							else if(name.indexOf('::')!=-1){
 								name=name.split('::');
