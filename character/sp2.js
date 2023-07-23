@@ -7178,7 +7178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('dcwumei',target);
 						player.addTempSkill('dcwumei_used','roundStart');
 						target.insertPhase();
-						target.addTempSkill('dcwumei_wake');
+						target.addTempSkill('dcwumei_wake','phaseAfter');
 						var targets=game.filterPlayer();
 						if(!target.storage.dcwumei_wake) target.storage.dcwumei_wake=[[],[]];
 						for(var targetx of targets){
