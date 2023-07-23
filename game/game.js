@@ -1356,6 +1356,11 @@
 						init:'off',
 						item:{
 							'off':'关闭',
+							'5000':'5秒',
+							'10000':'10秒',
+							'15000':'15秒',
+							'20000':'20秒',
+							'25000':'25秒',
 							'30000':'半分钟',
 							'60000':'一分钟',
 							'120000':'两分钟',
@@ -28758,6 +28763,21 @@
 			zhuSkill:{},
 			land_used:{},
 			unequip:{ai:{unequip:true}},
+			_change_skin_auto:{
+				trigger:{global:'gameDrawBefore'},
+				forced:true,
+				popup:false,
+				silent:true,
+				priority:1,
+				firstDo:true,
+				filter:function(event,player){
+					return player===game.me&&lib.config.change_skin_auto!='off';
+				},
+				content:function(){
+					clearTimeout(_status.skintimeout);
+					_status.skintimeout=setTimeout(ui.click.autoskin,parseInt(lib.config.change_skin_auto));
+				},
+			},
 			subplayer:{
 				trigger:{player:'dieBefore'},
 				forced:true,
@@ -46620,9 +46640,9 @@
 				if(lib.config.show_name==false){
 					ui.arena.classList.add('hide_name');
 				}
-				if(lib.config.change_skin_auto!='off'){
-					_status.skintimeout=setTimeout(ui.click.autoskin,parseInt(lib.config.change_skin_auto));
-				}
+				// if(lib.config.change_skin_auto!='off'){
+					// _status.skintimeout=setTimeout(ui.click.autoskin,parseInt(lib.config.change_skin_auto));
+				// }
 				if(lib.config.border_style&&lib.config.border_style.indexOf('dragon_')==0){
 					ui.arena.dataset.framedecoration=lib.config.border_style.slice(7);
 				}
