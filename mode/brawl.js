@@ -4093,7 +4093,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										}
 									}
 								}
-								if(info.linked) target.classList.add('linked');
+								if(info.linked) target.classList.add('linked'+(get.is.linked2(target)?'2':''));
 								if(info.turnedover) target.classList.add('turnedover');
 								if(info.position<_status.firstAct.brawlinfo.position) _status.firstAct=target;
 								var hs=[];

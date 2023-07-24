@@ -11520,7 +11520,7 @@
 							if(subtype=='equip6'&&['equip3','equip4'].contains(event.pos)) return true;
 							return false;
 						});
-						if(cards.length) player.discard(cards).delay=false;
+						if(cards.length) player.loseToDiscardpile(cards).delay=false;
 						game.log(player,'废除了',get.translation(event.pos),'栏');
 						player.$disableEquip(event.pos);
 					}
