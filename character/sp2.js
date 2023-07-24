@@ -3488,7 +3488,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.chooseToDiscard('集众：弃置三张手牌，或点击“取消”获得“信众”标记',3);
 					}
 					'step 2'
-					target.addMark('dcjizhong',1);
+					if(!result.bool){
+						target.addMark('dcjizhong',1);
+					}
 				},
 				marktext:'信',
 				intro:{
@@ -31140,7 +31142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangchu:'张楚',
 			dcjizhong:'集众',
 			dcjizhong_info:'出牌阶段限一次。你可以令一名其他角色摸两张牌，然后其选择一项：1.若其没有“信众”标记，其获得“信众”标记；2.弃置三张手牌。',
-			dcrihui:'日慧',
+			dcrihui:'日彗',
 			dcrihui_info:'每回合限一次。当你使用普通锦囊牌或黑色基本牌结算结束后，若此牌的目标数为1且目标不为你，且其：没有“信众”，则所有有“信众”的角色依次视为对其使用一张与此牌牌名和属性相同的牌；有“信众”，则你可以获得其区域里的一张牌。',
 			dcguangshi:'光噬',
 			dcguangshi_info:'锁定技。准备阶段，若所有其他角色均有“信众”，你失去1点体力并摸两张牌。',
