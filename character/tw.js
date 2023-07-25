@@ -2170,6 +2170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var num=0,numx=target.countCards('h',{name:'sha'}),targetx=target;
 							for(var i=0; i<numx; i++){
 								targetx=targetx.next;
+								if(targetx==player) targetx=targetx.next;
 							}
 							var att1=get.attitude(player,target),att2=get.attitude(player,targetx);
 							if(att1>0&&att2<0) num=0.25;

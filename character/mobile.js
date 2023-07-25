@@ -15511,7 +15511,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.loseHp();
 					switch(get.type(cards[0],'trick',cards[0].original=='h'?player:false)){
-						case 'basic':player.addTempSkill('xinzhanyi_basic');break;
+						case 'basic':player.addTempSkill('xinzhanyi_basic');player.addMark('xinzhanyi_basic1',1,false);break;
 						case 'equip':player.addTempSkill('xinzhanyi_equip');break;
 						case 'trick':player.addTempSkill('xinzhanyi_trick');player.draw(3);break;
 					}
@@ -15526,15 +15526,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinzhanyi_basic1:{
 				trigger:{player:"useCard"},
 				filter:function(event,player){
-					return event.skill=='xinzhanyi_basic_backup'&&!player.storage.xinzhanyi_basic1;
+					return get.type(event.card,false)=='basic'&&player.hasMark('xinzhanyi_basic1');
 				},
 				forced:true,
 				silent:true,
 				popup:false,
 				content:function(){
 					if(!trigger.baseDamage) trigger.baseDamage=1;
-					trigger.baseDamage++;
-					player.storage.xinzhanyi_basic1=true;
+					var num=player.countMark('xinzhanyi_basic1');
+					trigger.baseDamage+=num;
+					player.removeMark('xinzhanyi_basic1',num,false);
+					game.log(trigger.card,'的伤害值/回复值','#y+'+num);
 				},
 			},
 			xinzhanyi_basic:{
@@ -15543,31 +15545,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete p.storage[s+1];
 				},
 				hiddenCard:function(player,name){
-					return ['sha','tao','jiu'].contains(name)&&player.countCards('h',{type:'basic'})>0;
+					return get.type(name)=='basic'&&player.countCards('h',{type:'basic'})>0;
 				},
 				enable:"chooseToUse",
 				filter:function(event,player){
-					if(event.filterCard({name:'sha'},player,event)||
-						event.filterCard({name:'jiu'},player,event)||
-						event.filterCard({name:'tao'},player,event)){
-						return player.hasCard(function(card){
-							return get.type(card)=='basic';
-						},'hs');
+					if(!player.hasCard(function(card){
+						return get.type(card)=='basic';
+					},'hs')) return false;
+					for(var name of lib.inpile){
+						if(get.type(name)!='basic') continue;
+						if(event.filterCard({name:name},player,event)) return true;
 					}
 					return false;
 				},
 				chooseButton:{
 					dialog:function(event,player){
 						var list=[];
-						if(event.filterCard({name:'sha'},player,event)){
-							list.push(['基本','','sha']);
-							for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
-						}
-						if(event.filterCard({name:'tao'},player,event)){
-							list.push(['基本','','tao']);
-						}
-						if(event.filterCard({name:'jiu'},player,event)){
-							list.push(['基本','','jiu']);
+						for(var name of lib.inpile){
+							if(get.type(name)!='basic') continue;
+							if(event.filterCard({name:name},player,event)) list.push(['基本','',name]);
+							if(name!='sha') continue;
+							for(var j of lib.inpile_nature){
+								if(event.filterCard({name:name,nature:j},player,event)) list.push(['基本','','sha',j]);
+							}
 						}
 						return ui.create.dialog('战意',[list,'vcard'],'hidden');
 					},
@@ -17924,7 +17924,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunshao:['sp_sunshao','sunshao'],
 			xunchen:['re_xunchen','xunchen','tw_xunchen','sp_xunchen'],
 			xinpi:['xinpi','sp_xinpi'],
-			duyu:['duyu','sp_duyu'],
+			duyu:['duyu','dc_duyu','sp_duyu','pk_sp_duyu'],
 			zhangwen:['sp_zhangwen','zhangwen'],
 			ol_bianfuren:['ol_bianfuren','tw_bianfuren','sp_bianfuren'],
 			wangshuang:['wangshuang','sp_wangshuang'],
@@ -17946,7 +17946,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             yangbiao:['yangbiao','dc_yangbiao','jsrg_yangbiao'],
 			qiaozhou:['yj_qiaozhou','qiaozhou'],
 			sunhanhua:['dc_qiaozhou','sunhanhua'],
-			duyu:['duyu','sp_duyu','pk_sp_duyu'],
 			kongrong:['sp_kongrong','jsrg_kongrong','kongrong'],
 			mifuren:['dc_mifuren','sp_mifuren'],
 		},

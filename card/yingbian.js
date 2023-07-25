@@ -678,7 +678,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(event.zhuzhanresult){
 						var target=event.zhuzhanresult;
 						target.line(player,'green');
-						target.discard(event.zhuzhanresult2.cards);
+						target.discard(event.zhuzhanresult2.cards).discarder=target;
 						target.popup('助战','wood');
 						game.log(target,'响应了',player,'发起的助战');
 						target.addExpose(0.2);

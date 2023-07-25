@@ -178,9 +178,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var go=false,d1=true;
+					var go=false,d1=false;
 					if(get.attitude(player,trigger.player)>0){
-						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false
+						d1=true;
+						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false;
 						for(var target of trigger.targets){
 							if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
 								target:target,

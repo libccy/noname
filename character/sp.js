@@ -763,10 +763,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'将势力改为任意一个势力'
 					].map((text,ind)=>{
 						var hint='';
-						if(list.contains(ind+1)){
+						if(list2.contains(ind+1)){
 							return text;
 						}
-						else{
+						else if(!list.contains(ind+1)){
 							hint+='已被执行过且';
 						}
 						if(ind==1&&nochai&&!list2.contains(ind+1)) hint+='无有手牌角色且';
@@ -841,7 +841,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 						选项三:function(){
-							player.chooseUseTarget('sha',true,false).set('logSkill','olgoude');
+							player.chooseUseTarget('sha',true,false).set('logSkill','olgoude').set('prompt','苟得：选择【杀】的目标');
 						},
 						选项四:function(){
 							'step 0'
@@ -9994,6 +9994,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).length>0;
 				},
 				logTarget:'player',
+				check:function(event,player){
+					var list=event.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
+						var info=get.info(skill);
+						return info&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited&&!info.dutySkill;
+					});
+					var negSkill=list.some(function(skill){
+						return get.skillRank(skill,'inout')<=0;
+					});
+					var att=get.sgnAttitude(event.player,player);
+					if(!player.storage.retuogu){
+						if(negSkill&&att<0) return false;
+						return true;
+					}
+					list.sort(function(a,b){
+						return att*(get.skillRank(b,'inout')-get.skillRank(a,'inout'));
+					})[0];
+					return get.skillRank(list[0],'inout')>=get.skillRank(player.storage.retuogu,'inout');
+				},
 				content:function(){
 					'step 0'
 					var list=trigger.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
@@ -10002,7 +10020,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					if(list.length==1) event._result={control:list[0]};
 					else trigger.player.chooseControl(list).set('prompt','选择令'+get.translation(player)+'获得一个技能').set('forceDie',true).set('ai',function(){
-						return list.randomGet();
+						var att=get.sgnAttitude(_status.event.getTrigger().player,player);
+						if(att==0) return list.randomGet();
+						var listx=list.map(function(skill){
+							return [skill,get.skillRank(skill,'inout')];
+						}).sort(function(a,b){
+							return att*(b[1]-a[1]);
+						}).slice(0,2);
+						var listx2=[0];
+						if(Math.abs(listx[0][1]-listx[1][1])<=0.5&&Math.sign(listx[0][1])==Math.sign(listx[1][1])) listx2.push(1);
+						return listx[listx2.randomGet()][0];
 					});
 					'step 1'
 					if(player.storage.retuogu) player.removeSkill(player.storage.retuogu);

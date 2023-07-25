@@ -4091,7 +4091,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var list=lib.inpile.filter(function(i){
 						if(player.storage.shouxi.contains(i)) return false;
-						var type=get.type(i);
+						var type=get.type2(i);
 						if(type=='basic'||type=='trick') return true;
 						return false;
 					});
@@ -4108,6 +4108,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.vcard=result.links;
 						event.cardname=name;
 						player.storage.shouxi.add(name);
+						player.popup(name);
+						game.log(player,'声明了','#y'+get.translation(name));
 					}
 					else{
 						event.finish();
