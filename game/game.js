@@ -7106,10 +7106,8 @@
 								nameinfo=lib.character[name];
 							}
 							else if(lib.config.show_extensionimage){
-								if(Object.keys(lib.characterPack).some(pack => Object.keys(lib.characterPack[pack]).contains(name))){
-									var pack=Object.keys(lib.characterPack).find(pack => Object.keys(lib.characterPack[pack]).contains(name));
-									nameinfo=lib.characterPack[pack][name];
-								}
+								var pack=Object.keys(lib.characterPack).find(pack => Object.keys(lib.characterPack[pack]).contains(name));
+								if(pack) nameinfo=lib.characterPack[pack][name];
 							}
 							else if(name.indexOf('::')!=-1){
 								name=name.split('::');
