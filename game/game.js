@@ -28674,7 +28674,7 @@
 				},
 			},
 			_showHiddenCharacter:{
-				trigger:{player:['changeHp','phaseBeginStart','loseMaxHpBegin']},
+				trigger:{player:['changeHp','phaseBeginStart','loseMaxHpBegin','gainMaxHpBegin']},
 				firstDo:true,
 				forced:true,
 				popup:false,

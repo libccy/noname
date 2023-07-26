@@ -1483,7 +1483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var effect=player.getUseValue(button.link[2]);
 						if(player.countCards('hs',button.link[2])>0) return 0;
 						if((player.getStat('skill').reqice||0)<player.countMark('reqice_mark')+1){
-							if(['draw','gain'].some(i=>get.tag(button.link[2],i) >= 1)) return effect*2;
+							if(['draw','gain'].some(i=>get.tag(button.link[2],i) >= 1)) return effect*5;
 						}
 						if(effect>0) return effect;
 						return 0;

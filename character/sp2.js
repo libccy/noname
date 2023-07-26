@@ -4802,6 +4802,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}]
 					];
 					var name=evt.name;
+					if(trigger.name=='loseAsync') name=evt.type;
 					var list=['useCard','respond','discard','other'];
 					if(!list.contains(name)) name='other';
 					for(var i=0;i<1+player.countMark('dcqinghuang_add');i++){
@@ -4835,6 +4836,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:'下次对其他角色造成伤害时，此伤害+#',
 						}
+					}
+				}
+			},
+			dcqinghuang:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				filter:function(event,player){
+					return player.maxHp>1;
+				},
+				check:function(event,player){
+					var num1=player.countCards('h');
+					var num2=player.countCards('h',card=>player.hasValueTarget(card));
+					var num3=player.getHandcardLimit();
+					if(player.isDamaged()){
+						return num2>1||num1-num2-num3>0;
+					}
+					else{
+						return num2>2+Math.max(0,3-player.hp)||player.hp>2&&num1-num2-num3>2;
+					}
+				},
+				content:function(){
+					player.loseMaxHp();
+					player.addTempSkill('dcqinghuang_add');
+					player.addMark('dcqinghuang_add',1,false);
+				},
+				subSkill:{
+					add:{
+						charlotte:true,
+						onremove:true,
 					}
 				}
 			},
