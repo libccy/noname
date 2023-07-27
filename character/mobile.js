@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		character:{
 			re_zhangzhang:['male','wu',3,['rezhijian','guzheng']],
-			qianzhao:['male','wei',4,['mbshihe','mbzhenfu'],['unseen']],
+			qianzhao:['male','wei',4,['mbshihe','mbzhenfu']],
 			old_wanglang:['male','wei',3,['gushe','jici']],
 			re_yanwen:["male","qun",4,["reshuangxiong"]],
 			xin_zhoutai:['male','wu',4,['buqu','new_fenji']],
@@ -84,7 +84,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiaozhou:['male','shu',3,['zhiming','xingbu']],
 			db_wenyang:['male','wei',4,['dbquedi','dbzhuifeng','dbchongjian','dbchoujue'],['doublegroup:wei:wu']],
 			xin_guyong:['male','wu',3,['xinshenxing','xinbingyi']],
-			re_zhonghui:['male','wei',4,['requanji','zili']],
+			re_zhonghui:['male','wei',4,['requanji','zili'],['clan:颍川钟氏']],
 			xin_caifuren:['female','qun',3,['xinqieting','xianzhou']],
 			sp_yanghu:['male','qun',3,['mingfa','rongbei']],
 			qiaogong:['male','wu',3,['yizhu','luanchou']],

@@ -15,6 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_hanrong:['male','qun',3,['clanlianhe','clanhuanjia','clanxumin'],['clan:颍川韩氏']],
 			clan_wukuang:['male','qun',4,['clanlianzhu','clanmuyin'],['clan:陈留吴氏']],
 			clan_wangling:['male','wei',4,['clanbolong','clanzhongliu'],['clan:太原王氏']],
+			clan_zhongyan:['female','jin',3,['clanguangu','clanxiaoyong','clanbaozu'],['clan:颍川钟氏']],
 		},
 		characterSort:{
 			clan:{
@@ -25,6 +26,257 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//钟琰族钟琰
+			clanguangu:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				zhuanhuanji:true,
+				mark:true,
+				marktext:'☯',
+				intro:{
+					content:function(storage){
+						return '转换技。出牌阶段限一次，你可以观看'+(storage?'一名角色的至多四张手':'牌堆顶的至多四张')+'牌，然后可以使用其中的一张牌';
+					},
+				},
+				filter:function(event,player){
+					if(player.storage.clanguangu) return game.hasPlayer(current=>{
+						return current.countCards('h');
+					});
+					return true;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var dialog=ui.create.dialog('观骨：选择观看牌堆的牌数','hidden');
+						if(player.storage.clanguangu) dialog.forceDirect=true;
+						return dialog;
+					},
+					chooseControl:function(event,player){
+						var list=[1,2,3,4].map(i=>{
+							return get.cnNumber(i,true);
+						});
+						list.push('cancel2');
+						return list;
+					},
+					check:function(button,player){
+						var ret;
+						if(!player.hasSkill('clanxiaoyong')) ret=4;
+						else{
+							var list=[4,3,2,1];
+							player.getHistory('useCard',evt=>{
+								var len=lib.skill.dcweidang.getLength(evt.card);
+								list.remove(len);
+							});
+							if(list.length) ret=list[0];
+							else ret=4;
+						}
+						return get.cnNumber(ret,true);
+					},
+					backup:function(result,player){
+						return {
+							audio:'clanguangu',
+							filterCard:()=>false,
+							selectCard:-1,
+							filterTarget:function(card,player,target){
+								if(player.storage.clanguangu) return true;
+								return false;
+							},
+							selectTarget:function(){
+								var player=_status.event.player;
+								if(player.storage.clanguangu) return 1;
+								return -1;
+							},
+							num:result.index+1,
+							content:function(){
+								'step 0'
+								player.changeZhuanhuanji('clanguangu');
+								if(!targets.length){
+									var num=lib.skill.clanguangu_backup.num;
+									var cards=get.cards(num);
+									game.cardsGotoOrdering(cards);
+									event.cards=cards;
+									event.goto(2);
+								}
+								else{
+									var ret;
+									if(!player.hasSkill('clanxiaoyong')) ret=4;
+									else{
+										var list=[4,3,2,1];
+										player.getHistory('useCard',evt=>{
+											var len=lib.skill.dcweidang.getLength(evt.card);
+											list.remove(len);
+										});
+										if(list.length) ret=list[0];
+										else ret=4;
+									}
+									player.choosePlayerCard(target,'h',true,[1,4]).set('prompt','观骨：观看'+get.translation(target)+'的至多四张牌').set('ai',button=>{
+										if(ui.selected.buttons.length>=_status.event.num) return 0;
+										return Math.random();
+									}).set('num',ret);
+								}
+								'step 1'
+								if(result.bool){
+									event.cards=result.links;
+								}
+								else{
+									event.finish();
+								}
+								'step 2'
+								var count=cards.length;
+								event.getParent().viewedCount=count;
+								player.chooseButton(['观骨：是否使用其中一张牌？',cards]).set('filterButton',button=>{
+									var player=_status.event.player;
+									var card=button.link;
+									var cardx={
+										name:get.name(card,get.owner(card)),
+										nature:get.nature(card,get.owner(card)),
+										cards:[card],
+									}
+									return player.hasUseTarget(cardx);
+								}).set('ai',button=>{
+									var len=_status.event.len;
+									var card=button.link;
+									var fix=1;
+									if(lib.skill.dcweidang.getLength(card)==len) fix=2;
+									return fix*_status.event.player.getUseValue(card);
+								}).set('len',function(){
+									if(!player.hasSkill('clanxiaoyong')) return 0;
+									var list=[];
+									player.getHistory('useCard',evt=>{
+										var len=lib.skill.dcweidang.getLength(evt.card);
+										list.add(len);
+									});
+									if(!list.contains(count)) return count;
+									if(list.length) return list.randomGet();
+									return 4;
+								}());
+								'step 3'
+								if(result.bool){
+									var card=result.links[0];
+									cards.remove(card);
+									var cardx={
+										name:get.name(card,get.owner(card)),
+										nature:get.nature(card,get.owner(card)),
+										cards:[card],
+									}
+									var next=player.chooseUseTarget(cardx,[card],true).set('oncard',(card)=>{
+										var owner=_status.event.getParent().owner;
+										if(owner) owner.$throw(card.cards);
+									});
+									if(card.name!=cardx.name||card.nature!=cardx.nature) next.viewAs=true;
+									var owner=get.owner(card);
+									if(owner!=player&&get.position(card)=='h'){
+										next.throw=false;
+										next.set('owner',owner);
+									}
+								}
+								'step 4'
+								if(!targets.length){
+									while(cards.length) ui.cardPile.insertBefore(cards.pop().fix(),ui.cardPile.firstChild);
+									game.updateRoundNumber();
+								}
+							},
+							ai:{
+								order:10,
+								result:{
+									target:function(player,target){
+										return -Math.min(target.countCards('h'),4)/2;
+									},
+								},
+							}
+						}
+					},
+					prompt:function(result){
+						if(result.index) return '点击“确定”以观看牌堆顶牌';
+						return '观骨：选择观看牌的目标';
+					},
+				},
+				subSkill:{
+					backup:{},
+				},
+				ai:{
+					order:10,
+					result:{
+						player:1,
+					}
+				},
+			},
+			clanxiaoyong:{
+				audio:2,
+				trigger:{
+					player:'useCard',
+				},
+				filter:function(event,player){
+					if(!player.getStat().skill.clanguangu) return false;
+					var history=player.getAllHistory('useSkill',evt=>{
+						return evt.skill=='clanguangu_backup';
+					}).map(evt=>evt.event);
+					if(!history.length) return false;
+					var num=0;
+					for(var i=history.length-1;i>=0;i--){
+						var evt=history[i];
+						if(evt.viewedCount){
+							num=evt.viewedCount;
+							break;
+						}
+					}
+					if(num&&lib.skill.dcweidang.getLength(event.card)==num) return true;
+					return false;
+				},
+				forced:true,
+				content:function(){
+					'step 0'
+					delete player.getStat().skill.clanguangu;
+					game.log(player,'重置了','#g【观骨】');
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(!player.hasSkill('clanguangu')||!player.getStat().skill.clanguangu) return;
+						var history=player.getAllHistory('useSkill',evt=>{
+							return evt.skill=='clanguangu_backup';
+						}).map(evt=>evt.event);
+						if(!history.length) return;
+						var numx=0;
+						for(var i=history.length-1;i>=0;i--){
+							var evt=history[i];
+							if(evt.viewedCount){
+								numx=evt.viewedCount;
+								break;
+							}
+						}
+						if(numx==lib.skill.dcweidang.getLength(card)){
+							if(!player.hasHistory('useCard',evt=>{
+								return numx==lib.skill.dcweidang.getLength(evt.card);
+							})){
+								return num+9;
+							}
+						}
+					},
+				}
+			},
+			clanbaozu:{
+				audio:2,
+				audioname:['clan_zhongyan'],
+				trigger:{
+					gloabl:'dying',
+				},
+				clanSkill:true,
+				limited:true,
+				skillAnimation:true,
+				animationColor:'water',
+				filter:function(event,player){
+					return event.player.hasClan('颍川钟氏')&&event.player.hp<=0&&!event.player.isLinked();
+				},
+				logTarget:'player',
+				check:function(event,player){
+					return get.recoverEffect(event.player,player,player)>10;
+				},
+				content:function(){
+					'step 0'
+					trigger.player.link(true);
+					trigger.player.recover();
+				}
+			},
 			//族王凌
 			clanbolong:{
 				audio:2,
@@ -1548,6 +1800,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.clanlianzhu) return '转换技。每名角色Ａ的出牌阶段限一次。阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1；<span class="bluetext">阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1</span>。';
 				return '转换技。每名角色Ａ的出牌阶段限一次。<span class="bluetext">阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1</span>；阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1。';
 			},
+			clanguangu:function(player){
+				if(player.storage.clanguangu) return '转换技，出牌阶段限一次。阴：你可以观看牌堆顶的至多四张牌；<span class="bluetext">阳：你可以观看一名角色的至多四张手牌。</span>然后你可以使用其中的一张牌。';
+				return '转换技，出牌阶段限一次。<span class="bluetext">阴：你可以观看牌堆顶的至多四张牌；</span>阳：你可以观看一名角色的至多四张手牌。然后你可以使用其中的一张牌。';
+			},
 		},
 		translate:{
 			clan_wuxian:'族吴苋',
@@ -1607,11 +1863,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanbolong_info:'出牌阶段限一次。你可以令一名其他角色选择一项：1.你交给其一张牌，然后视为对其使用一张雷【杀】；2.交给你等同于你手牌数的牌，然后视为对你使用一张【酒】。',
 			clanzhongliu:'中流',
 			clanzhongliu_info:'宗族技，锁定技。当你使用牌时，若此牌对应的实体牌不全为同族角色的手牌，你重置武将牌上的技能。',
+			clan_zhongyan:'族钟琰',
+			clanguangu:'观骨',
+			clanguangu_info:'转换技，出牌阶段限一次。阴：你可以观看牌堆顶的至多四张牌；阳：你可以观看一名角色的至多四张手牌。然后你可以使用其中的一张牌。',
+			clanxiaoyong:'啸咏',
+			clanxiaoyong_info:'锁定技。当你于回合内首次使用字数为X的牌时，你重置〖观骨〗（X为你上次发动〖观骨〗观看的牌数）。',
+			clanbaozu:'保族',
+			clanbaozu_info:'宗族技，限定技。当一名同族角色进入濒死状态时，你可以令其横置并回复1点体力。',
 			
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
 			clan_han:'颍川·韩氏',
 			clan_wang:'太原·王氏',
+			clan_zhong:'颍川·钟氏',
 		},
 	};
 });

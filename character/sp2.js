@@ -18,9 +18,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangjinyun:['female','shu',3,['dchuizhi','dcjijiao']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
 			dc_zhangmancheng:['male','qun',4,['dclvecheng','dczhongji'],['unseen']],
-			huanfan:['male','wei',3,['dcjianzheng','dcfumou'],['unseen']],
+			huanfan:['male','wei',3,['dcjianzheng','dcfumou']],
 			mengyou:['male','qun',5,['hmmanyi','dcmanzhi'],['unseen']],
-			chentai:['male','wei',4,['dcjiuxian','dcchenyong'],['unseen']],
+			chentai:['male','wei',4,['dcctjiuxian','dcchenyong']],
 			dc_sunchen:['male','wu',4,['dczigu','dczuowei'],['unseen']],
 			sunyu:['male','wu',3,['dcquanshou','dcshexue'],['unseen']],
 			xizheng:['male','shu',3,['dcdanyi','dcwencan'],['unseen']],
@@ -41,7 +41,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_yangbiao:['male','qun',3,['dczhaohan','dcjinjie','dcjue']],
 			dc_huojun:['male','shu',4,['dcgue','dcsigong']],
 			guānning:['male','shu',3,['dcxiuwen','dclongsong']],
-			dc_sunhanhua:['female','wu',3,['dchuiling','dcchongxu'],['unseen']],
+			dc_sunhanhua:['female','wu',3,['dchuiling','dcchongxu']],
 			dc_sunziliufang:['male','wei',3,['dcqinshen','dcweidang']],
 			dc_tengfanglan:['female','wu',3,['dcluochong','dcaichen']],
 			yuantanyuanxiyuanshang:['male','qun',4,['dcneifa']],
@@ -2333,7 +2333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			//陈泰
-			dcjiuxian:{
+			dcctjiuxian:{
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
@@ -2359,18 +2359,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.draw(cards.length);
 					'step 1'
-					player.addTempSkill('dcjiuxian_help');
+					player.addTempSkill('dcctjiuxian_help');
 					player.chooseUseTarget({
 						name:'juedou',
 						isCard:true,
-						storage:{dcjiuxian:true}
+						storage:{dcctjiuxian:true}
 					},true);
 				},
 				subSkill:{
 					help:{
 						trigger:{global:'damageSource'},
 						filter:function(event,player){
-							return event.card&&event.card.storage&&event.card.storage.dcjiuxian&&event.player.isIn()&&
+							return event.card&&event.card.storage&&event.card.storage.dcctjiuxian&&event.player.isIn()&&
 								event.getParent(2).targets.contains(event.player)&&game.hasPlayer(current=>{
 									return current!=player&&event.player.inRange(current)&&current.isDamaged();
 								});
@@ -2387,7 +2387,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							if(result.bool){
 								var target=result.targets[0];
-								player.logSkill('dcjiuxian_help',target);
+								player.logSkill('dcctjiuxian_help',target);
 								target.recover(player);
 							}
 						}
@@ -4196,7 +4196,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var card={name:name,isCard:true};
 							if(event.filterCard(card,player,event)) vcards.push(['基本','',name]);
 						}
-						return ui.create.dialog('胆迎',[vcards,'vcard'],'hidden');
+						var dialog=ui.create.dialog('胆迎',[vcards,'vcard'],'hidden');
+						dialog.direct=true;
+						return dialog;
 					},
 					backup:function(links,player){
 						return {
@@ -31225,8 +31227,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmanzhi:'蛮智',
 			dcmanzhi_info:'①准备阶段，你可以选择一名其他角色并选择一项：1.令其交给你两张牌，然后其视为使用一张无距离限制的【杀】；2.获得其区域内至多两张牌，然后交给其等量的牌并摸一张牌。②结束阶段，若你的体力值与本回合准备阶段时的体力值相等，你可以执行你未于本回合执行过的〖蛮智①〗的分支。',
 			chentai:'陈泰',
-			dcjiuxian:'救陷',
-			dcjiuxian_info:'出牌阶段限一次。你可以重铸一半数量的手牌（向上取整），然后视为使用一张【决斗】。当此牌对目标角色造成伤害后，你可以令其攻击范围内的一名其他角色回复1点体力。',
+			dcctjiuxian:'救陷',
+			dcctjiuxian_info:'出牌阶段限一次。你可以重铸一半数量的手牌（向上取整），然后视为使用一张【决斗】。当此牌对目标角色造成伤害后，你可以令其攻击范围内的一名其他角色回复1点体力。',
 			dcchenyong:'沉勇',
 			dcchenyong_info:'结束阶段，你可以摸X张牌（X为本回合你使用过的牌的类型数）。',
 			dc_sunchen:'孙綝',

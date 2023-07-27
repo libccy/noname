@@ -11,7 +11,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_shan:['ol_jiangwei','ol_caiwenji','ol_liushan','ol_zhangzhang','re_zuoci','re_sunce','ol_dengai','re_zhanghe'],
 				refresh_yijiang1:['xin_wuguotai','xin_gaoshun','dc_caozhi','yujin_yujin','re_masu','xin_xusheng','re_fazheng','xin_lingtong','re_zhangchunhua','dc_xushu','re_chengong'],
 				refresh_yijiang2:['re_madai','re_wangyi','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao','re_xunyou','re_guanzhang'],
-				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','dc_liru','re_manchong','re_fuhuanghou','re_guanping','re_liufeng'],
+				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','dc_liru','re_manchong','re_fuhuanghou','re_guanping','re_liufeng','re_caochong'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','dc_chenqun','re_caifuren','re_guyong','re_jushou','re_zhuhuan','re_zhangsong'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen','re_zhuzhi'],
 				refresh_yijiang6:['re_guohuanghou','re_sundeng'],
@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
+			re_caochong:['male','wei',3,['rechengxiang','renxin']],
 			ol_zhangzhang:['male','wu',3,['olzhijian','olguzheng']],
 			re_jsp_huangyueying:['female','qun',3,['rejiqiao','relinglong']],
 			re_zhangsong:['male','shu',3,['qiangzhi','rexiantu']],
@@ -52,7 +53,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_lusu:['male','wu',3,['olhaoshi','oldimeng']],
 			re_jiaxu:['male','qun',3,['rewansha','reluanwu','reweimu']],
 			re_guyong:['male','wu',3,['reshenxing','rebingyi']],
-			xin_zhonghui:['male','wei',4,['xinquanji','xinzili']],
+			xin_zhonghui:['male','wei',4,['xinquanji','xinzili'],['clan:颍川钟氏']],
 			re_caifuren:['female','qun',3,['reqieting','rexianzhou']],
 			re_guanping:['male','shu',4,['relongyin','jiezhong']],
 			re_guotufengji:['male','qun',3,['rejigong','shifei']],
@@ -161,6 +162,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//不想突破可以不突破的界曹冲
+			rechengxiang:{
+				audio:2,
+				group:'rechengxiang_gain',
+				trigger:{
+					player:'rechengxiang_gainEnd',
+				},
+				direct:true,
+				subfrequent:['gain'],
+				filter:function(event,player){
+					return event.cards2&&event.cards2.map(card=>{
+						return get.number(card);
+					}).reduce((sum,num)=>{
+						return sum+=num;
+					},0)==13;
+				},
+				content:function(){
+					'step 0'
+					player.link(false);
+					'step 1'
+					player.turnOver(false);
+				},
+				subSkill:{
+					gain:{
+						inherit:'chengxiang',
+						audio:'rechengxiang',
+					}
+				}
+			},
 			//OL界二张
 			olzhijian:{
 				audio:2,
@@ -14655,6 +14685,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzhijian_info:'出牌阶段，你可以将一张装备牌置于其他角色的装备区（可替换原装备），然后摸一张牌。',
 			olguzheng:'固政',
 			olguzheng_info:'每阶段限一次。当其他角色的至少两张牌因弃置而进入弃牌堆后，你可以令其获得其中一张牌，然后你可以获得剩余的牌。',
+			re_caochong:'界曹冲',
+			rechengxiang:'称象',
+			rechengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌。若你获得的牌点数之和为13，你复原武将牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

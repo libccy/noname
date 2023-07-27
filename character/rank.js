@@ -582,6 +582,7 @@ window.noname_character_rank={
 		'dc_ruiji',
 		'yuantanyuanxiyuanshang',
 		'yanghong',
+		'dc_sunhanhua',
 	],
 	bp:[
 		'chess_diaochan',
@@ -926,6 +927,7 @@ window.noname_character_rank={
 		'ol_zhangzhang',
 		'ol_mengda',
 		'dc_wuban',
+		're_caochong',
 	],
 	b:[
 		'diy_feishi',
@@ -1216,6 +1218,9 @@ window.noname_character_rank={
 		'vtb_xiaotao',
 		'zhangchu',
 		'dc_duyu',
+		'chentai',
+		'clan_zhongyan',
+		'sb_zhurong',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1404,6 +1409,7 @@ window.noname_character_rank={
 		'yeshiwen',
 		'qianzhao',
 		'vtb_xiaosha',
+		'huanfan',
 	],
 	c:[
 		'xiahoudun',
@@ -1465,6 +1471,7 @@ window.noname_character_rank={
 		'old_liubiao',
 		'luoxian',
 		'ol_huban',
+		'sb_menghuo',
 	],
 	d:[
 		'lvmeng',
@@ -1505,6 +1512,7 @@ window.noname_character_rank={
 		'junk_lidian',
 		'junk_duanwei',
 		'std_panfeng',
+		'qianzhao',
 	],
 	rarity:{
 		legend:[

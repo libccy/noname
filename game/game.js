@@ -12940,19 +12940,48 @@
 								if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
 								var dialog=info.chooseButton.dialog(event,player);
 								if(info.chooseButton.chooseControl){
-									var next=player.chooseControl(info.chooseButton.chooseControl(event,player));
-									next.dialog=dialog;
-									next.set('ai',info.chooseButton.check||function(){return 0;});
-									if(event.id) next._parent_id=event.id;
-									next.type='chooseToUse_button';
+									var choices=info.chooseButton.chooseControl(event,player);
+									var choicesx=choices.slice(0);
+									choicesx.remove('cancel2');
+									if(choicesx.length==1&&dialog.direct||dialog.forceDirect){
+										event._result={
+											bool:true,
+											control:choicesx[0],
+											index:0,
+										}
+									}
+									else{
+										var next=player.chooseControl(choices);
+										next.dialog=dialog;
+										next.set('ai',info.chooseButton.check||function(){return 0;});
+										if(event.id) next._parent_id=event.id;
+										next.type='chooseToUse_button';
+									}
 								}
 								else{
-									var next=player.chooseButton(dialog);
-									next.set('ai',info.chooseButton.check||function(){return 1;});
-									next.set('filterButton',info.chooseButton.filter||function(){return true;});
-									next.set('selectButton',info.chooseButton.select||1);
-									if(event.id) next._parent_id=event.id;
-									next.type='chooseToUse_button';
+									var ai=info.chooseButton.check||function(){return 1;};
+									var filterButton=info.chooseButton.filter||function(){return true};
+									var selectButton=info.chooseButton.select||1;
+									var chooseable=[];
+									for(var i=0;i<dialog.buttons.length;i++){
+										var btn=dialog.buttons[i];
+										if(filterButton(btn)) chooseable.push(btn);
+									}
+									if(chooseable.length==1&&dialog.direct||dialog.forceDirect){
+										event._result={
+											bool:true,
+											buttons:chooseable[0],
+											links:[chooseable[0].link],
+										}
+									}
+									else{
+										var next=player.chooseButton(dialog);
+										next.set('ai',ai);
+										next.set('filterButton',filterButton);
+										next.set('selectButton',selectButton);
+										if(event.id) next._parent_id=event.id;
+										next.type='chooseToUse_button';
+									}
 								}
 								event.buttoned=event.result.skill;
 							}
@@ -13121,15 +13150,44 @@
 								if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
 								var dialog=info.chooseButton.dialog(event,player);
 								if(info.chooseButton.chooseControl){
-									var next=player.chooseControl(info.chooseButton.chooseControl(event,player));
-									next.dialog=dialog;
-									next.set('ai',info.chooseButton.check||function(){return 0;});
+									var choices=info.chooseButton.chooseControl(event,player);
+									var choicesx=choices.slice(0);
+									choicesx.remove('cancel2');
+									if(choicesx.length==1&&dialog.direct||dialog.forceDirect){
+										event._result={
+											bool:true,
+											control:choicesx[0],
+											index:0,
+										}
+									}
+									else{
+										var next=player.chooseControl(choices);
+										next.dialog=dialog;
+										next.set('ai',info.chooseButton.check||function(){return 0;});
+									}
 								}
 								else{
-									var next=player.chooseButton(dialog);
-									next.set('ai',info.chooseButton.check||function(){return 1;});
-									next.set('filterButton',info.chooseButton.filter||function(){return true;});
-									next.set('selectButton',info.chooseButton.select||1);
+									var ai=info.chooseButton.check||function(){return 1;};
+									var filterButton=info.chooseButton.filter||function(){return true};
+									var selectButton=info.chooseButton.select||1;
+									var chooseable=[];
+									for(var i=0;i<dialog.buttons.length;i++){
+										var btn=dialog.buttons[i];
+										if(filterButton(btn)) chooseable.push(btn);
+									}
+									if(chooseable.length==1&&dialog.direct||dialog.forceDirect){
+										event._result={
+											bool:true,
+											buttons:chooseable[0],
+											links:[chooseable[0].link],
+										}
+									}
+									else{
+										var next=player.chooseButton(dialog);
+										next.set('ai',ai);
+										next.set('filterButton',filterButton);
+										next.set('selectButton',selectButton);
+									}
 								}
 								event.buttoned=event.result.skill;
 							}
@@ -50668,7 +50726,7 @@
 				}
 				game.uncheck();
 				game.check();
-				if(event.skillDialog){
+				if(event.skillDialog===true){
 					var str=get.translation(skill);
 					if(info.prompt){
 						var str2;

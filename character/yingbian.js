@@ -11,7 +11,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangzhi:['female','jin',3,['xinwanyi','maihuo']],
 			yangyan:['female','jin',3,['xinxuanbei','xianwan']],
 			ol_huaxin:['male','wei',3,['caozhao','olxibing']],
-			zhongyan:['female','jin',3,['bolan','yifa']],
+			zhongyan:['female','jin',3,['bolan','yifa'],['clan:颍川钟氏']],
 			weiguan:['male','jin',3,['zhongyun','shenpin']],
 			cheliji:['male','qun',4,['chexuan','qiangshou']],
 			simazhou:['male','jin',4,['recaiwang','naxiang']],

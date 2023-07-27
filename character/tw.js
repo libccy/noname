@@ -7577,7 +7577,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.filterCard({name:'shan'},player,event)){
 							list.push(['基本','','shan']);
 						}
-						return ui.create.dialog('朝凤',[list,'vcard'],'hidden');
+						var dialog=ui.create.dialog('朝凤',[list,'vcard'],'hidden');
+						dialog.direct=true;
+						return dialog;
 					},
 					check:function(button){
 						var player=_status.event.player;
