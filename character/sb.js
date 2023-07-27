@@ -773,7 +773,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						player:function(card,player,target){
-							if(player!=target&&target&&target.group=='qun') return [1,0.2];
+							if(player!=target&&target&&target.group=='qun'&&card.name!='tao') return [1,0.1];
 						},
 					},
 				}

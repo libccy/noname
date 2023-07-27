@@ -3625,6 +3625,12 @@
 						name:'显示分享扩展',
 						init:true,
 						unfrequent:true,
+					},
+					show_extensionimage:{
+						name:'显示扩展武将图片',
+						intro:'关闭扩展武将包仍加载扩展武将图片',
+						init:true,
+						unfrequent:true,
 					}
 				}
 			},
@@ -7098,6 +7104,10 @@
 							}
 							else if(lib.character[name]){
 								nameinfo=lib.character[name];
+							}
+							else if(lib.config.show_extensionimage){
+								var pack=Object.keys(lib.characterPack).find(pack => Object.keys(lib.characterPack[pack]).contains(name));
+								if(pack) nameinfo=lib.characterPack[pack][name];
 							}
 							else if(name.indexOf('::')!=-1){
 								name=name.split('::');
@@ -10634,6 +10644,7 @@
 				},
 				changeGroup:function(){
 					'step 0'
+					event.originGroup=player.group;
 					if(!event.group) event.group=player.group;
 					var group=event.group;
 					player.getHistory('custom').push(event);
@@ -11608,7 +11619,7 @@
 							if(subtype=='equip6'&&['equip3','equip4'].contains(event.pos)) return true;
 							return false;
 						});
-						if(cards.length) player.discard(cards).delay=false;
+						if(cards.length) player.loseToDiscardpile(cards).delay=false;
 						game.log(player,'废除了',get.translation(event.pos),'栏');
 						player.$disableEquip(event.pos);
 					}
@@ -16299,6 +16310,7 @@
 					game.log(player,'弃置了',cards);
 					event.done=player.lose(cards,event.position,'visible');
 					event.done.type='discard';
+					if(event.discarder) event.done.discarder=event.discarder;
 					"step 1"
 					event.trigger('discard');
 				},
@@ -23751,7 +23763,7 @@
 					this.addSkill(skill,checkConflict,true,true);
 
 					if(!expire){
-						expire='phaseAfter';
+						expire=['phaseAfter','phaseBefore'];
 					}
 					this.tempSkills[skill]=expire;
 
@@ -29144,6 +29156,19 @@
 				content:function(){
 					player.removeSkill('counttrigger');
 					delete player.storage.counttrigger;
+				},
+				group:'counttrigger_2',
+				subSkill:{
+					2:{
+						trigger:{global:'phaseBefore'},
+						silent:true,
+						charlotte:true,
+						priority:100,
+						content:function(){
+							player.removeSkill('counttrigger');
+							delete player.storage.counttrigger;
+						},
+					}
 				}
 			},
 			_recovercheck:{
@@ -47732,10 +47757,10 @@
 						for(var i of game.connectPlayers){
 							if(!i.nickname&&!i.classList.contains('unselectable2')) num++;
 						}
-						// if(num>=lib.configOL.number-1){
-						// 	alert('至少要有两名玩家才能开始游戏！');
-						// 	return;
-						// }
+						if(num>=lib.configOL.number-1){
+							alert('至少要有两名玩家才能开始游戏！');
+							return;
+						}
 						game.resume();
 					}
 					button.delete();
@@ -53370,17 +53395,23 @@
 					threaten=info.ai.threaten(player,player);
 				}
 			}
-			if(type=='in'){
+			if(type.indexOf('in')!=-1){
 				if(info.enable=='phaseUse') num+=0.5;
 				if(info.trigger&&info.trigger.player){
 					var list=Array.isArray(info.trigger.player)?info.trigger.player:[info.trigger.player];
 					var add=false;
 					for(var i of list){
-						for(var j of lib.phaseName){
-							if(i.indexOf[j]==0){
-								num+=0.5;
-								add=true;
-								break;
+						if(i.indexOf('phase')==0){
+							num+=0.5;
+							add=true;
+						}
+						else{
+							for(var j of lib.phaseName){
+								if(i.indexOf[j]==0){
+									num+=0.5;
+									add=true;
+									break;
+								}
 							}
 						}
 						if(add) break;
@@ -53393,12 +53424,22 @@
 					num+=Math.sqrt(threaten)-1;
 				}
 			}
-			else if(type=='out'){
+			if(type.indexOf('out')!=-1){
 				if(threaten<1){
-					num=1/Math.sqrt(threaten);
+					num*=1/Math.sqrt(threaten);
 				}
-				if(info.trigger&&(info.trigger.global||info.trigger.target||(typeof info.trigger.player=='string'&&
-				(info.trigger.player.indexOf('damage')==0||info.trigger.player.indexOf('lose')==0)))) num+=0.1;
+				if(info.trigger){
+					if(info.trigger.global){
+						var list=Array.isArray(info.trigger.global)?info.trigger.global:[info.trigger.global];
+						num+=Math.min(3,list.length)/10;
+						for(var i of list){
+							if(i.indexOf('lose')==0||i.indexOf('use')==0) num+=0.3;
+							if(i.indexOf('cardsDiscard')==0) num+=0.4;
+						}
+					}
+					if(info.trigger.target||(typeof info.trigger.player=='string'&&
+					(info.trigger.player.indexOf('damage')==0||info.trigger.player.indexOf('lose')==0))) num+=0.1;
+				}
 				if(info.ai){
 					if(info.ai.maixie||info.ai.maixie_hp||info.ai.maixie_defend){
 						num+=0.5;

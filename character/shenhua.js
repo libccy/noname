@@ -3987,6 +3987,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw();
 				},
 				discard:false,
+				lose:false,
 				prepare:function(cards,player,targets){
 					player.$give(cards,targets[0],false);
 				},
