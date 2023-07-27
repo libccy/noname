@@ -16,6 +16,7 @@ window.noname_package={
 		offline:'线下武将',
 		old:'怀旧',
 		diy:'DIY',
+		ddd:'3D精选',
 		tw:'外服武将',
 		yxs:'英雄杀',
 		hearth:'炉石传说',
