@@ -1900,7 +1900,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//马日磾
 			chengye:{
-				audio:2,
+				audio:3,
 				liujing_filter:[
 					function(card){
 						return get.type(card,false)=='trick'&&get.tag(card,'damage',null,false)>0;
