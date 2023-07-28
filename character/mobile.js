@@ -715,8 +715,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				contentx:function(){
 					'step 0'
 					var list=player.getStorage('mbdanggu');
-					var first=list.randomRemove(1);
-					event.first=first[0];
+					var first=list.randomRemove(1)[0];
+					event.first=first;
 					game.broadcastAll(function(changshi){
 						if(lib.config.background_speak) game.playAudio('skill',changshi+'_enter');
 					},first);
@@ -748,7 +748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var next=player.chooseButton([
 						'党锢：请选择结党对象',
-						[first,'character'],
+						[[first],'character'],
 						'<div class="text center">可选常侍</div>',
 						[others,'character']
 					],true);
@@ -999,7 +999,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						forceDie:true,
 						content:function(){
-							player.die();
+							'step 0'
 							if(lib.skill.mbdanggu.isSingleShichangshi(player)){
 								if(!player.getStorage('mbdanggu').length){
 									game.broadcastAll(function(player){
@@ -1017,6 +1017,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									},player);
 								}
 							}
+							if(!player.getStorage('mbdanggu').length){
+								game.delay();
+							}
+							'step 1'
+							player.die();
 						},
 					},
 					return:{
