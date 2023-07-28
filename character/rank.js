@@ -300,6 +300,7 @@ window.noname_character_rank={
 		'wangguan',
 		'duanqiaoxiao',
 		'old_wanglang',
+		'shichangshi',
 		'key_misuzu',
 		'key_sunohara',
 		'key_umi',
