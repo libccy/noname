@@ -283,7 +283,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				check:function(event,player){
 					return get.attitude(player,event.source)>=0||
-						get.attitude(player,event.source)>=-4&&get.distance(_status.currentPhase,player,'absolute')>get.distance(_status.currentPhase,trigger.source,'absolute')
+						get.attitude(player,event.source)>=-4&&get.distance(_status.currentPhase,player,'absolute')>get.distance(_status.currentPhase,event.source,'absolute');
 				},
 				content:function(){
 					'step 0'
