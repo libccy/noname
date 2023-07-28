@@ -29,7 +29,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			sp_zhugeliang:['male','shu',3,['huoji','bazhen','kanpo']],
 			pangtong:['male','shu',3,['lianhuan','oldniepan']],
-			xunyu:['male','wei',3,['quhu','jieming']],
+			xunyu:['male','wei',3,['quhu','jieming'],['clan:颍川荀氏']],
 			dianwei:['male','wei',4,['qiangxix']],
 			taishici:['male','wu',4,['tianyi']],
 			yanwen:['male','qun',4,['shuangxiong']],
