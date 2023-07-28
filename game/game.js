@@ -33883,7 +33883,7 @@
 			}
 			return node;
 		},
-		linexy:function(path){
+		_linexy:function(path){
 			var from=[path[0],path[1]];
 			var to=[path[2],path[3]];
 			var total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2;
