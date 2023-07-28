@@ -67,7 +67,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pe_wenqin:['male','wei',4,['gzjinfa']],
 			pe_sunchen:['male','wu',4,['zyshilu','zyxiongnve']],
 			pe_mengda:['male','wei',4,['qiuan','liangfan']],
-			pe_zhonghui:['male','wei',4,['zyquanji','zypaiyi']],
+			pe_zhonghui:['male','wei',4,['zyquanji','zypaiyi'],['clan:颍川钟氏']],
 			pe_wangyun:['male','qun',3,['zylianji','zymoucheng'],['clan:太原王氏']],
 			shen_jiaxu:['male','shen',3,['weimu','zybishi','zyjianbing'],['qun']],
 			yj_zhenji:['female','wei',3,['yjluoshen','qingguo']],

@@ -46,7 +46,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bulianshi:['female','wu',3,['old_anxu','zhuiyi']],
 			handang:['male','wu',4,['gongji','jiefan']],
 			fuhuanghou:['female','qun',3,['qiuyuan','zhuikong']],
-			zhonghui:['male','wei',4,['quanji','zili']],
+			zhonghui:['male','wei',4,['quanji','zili'],['clan:颍川钟氏']],
 			jianyong:['male','shu',3,['qiaoshui','jyzongshi']],
 			old_madai:['male','shu',4,['mashu','qianxi']],
 			liufeng:['male','shu',4,['xiansi']],
@@ -72,7 +72,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			caorui:['male','wei',3,['huituo','mingjian','xingshuai'],['zhu']],
 			caoxiu:['male','wei',4,['qianju','qingxi']],
-			zhongyao:['male','wei',3,['huomo','zuoding']],
+			zhongyao:['male','wei',3,['huomo','zuoding'],['clan:颍川钟氏']],
 			liuchen:['male','shu',4,['zhanjue','qinwang'],['zhu']],
 			zhangyi:['male','shu',4,['wurong','shizhi']],
 			sunxiu:['male','wu',3,['yanzhu','xingxue','xinzhaofu'],['zhu']],
@@ -12835,7 +12835,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						var dialog=ui.create.dialog(str,cards);
 						dialog.videoId=id;
-					},player,event.videoId,event.cards,event.name=='chengxiang'?13:12);
+					},player,event.videoId,event.cards,event.name=='oldchengxiang'?12:13);
 					event.time=get.utc();
 					game.addVideo('showCards',player,['称象',get.cardsInfo(event.cards)]);
 					game.addVideo('delay',null,2);
@@ -12849,7 +12849,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return (num+get.number(button.link)<=_status.event.maxNum);
 					});
-					next.set('maxNum',event.name=='chengxiang'?13:12);
+					next.set('maxNum',event.name=='oldchengxiang'?12:13);
 					next.set('ai',function(button){
 						return get.value(button.link,_status.event.player);
 					});
@@ -12915,6 +12915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			renxin:{
 				trigger:{global:'damageBegin4'},
 				audio:2,
+				audioname:['re_caochong'],
 				//priority:6,
 				filter:function(event,player){
 					return event.player!=player&&event.player.hp==1&&player.countCards('he',{type:'equip'})>0;
@@ -13543,7 +13544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chengpu:['re_chengpu','tw_chengpu','ns_chengpu','chengpu','xin_chengpu'],
 			liubiao:['re_liubiao','xin_liubiao','liubiao','oldre_liubiao','old_liubiao'],
 			manchong:['re_manchong','manchong'],
-			caochong:['caochong','old_caochong'],
+			caochong:['re_caochong','caochong','old_caochong'],
 			guohuai:['guohuai','tw_guohuai','re_guohuai','xin_guohuai','ol_guohuai'],
 			jianyong:['re_jianyong','xin_jianyong','jianyong'],
 			panzhangmazhong:['xin_panzhangmazhong','re_panzhangmazhong','panzhangmazhong'],
@@ -14103,8 +14104,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiyan_info:'结束阶段，你可以令一名角色摸一张牌并展示之，若为装备牌，其使用此牌并回复一点体力。',
 			miji_info:'结束阶段，若你已受伤，则可以摸X张牌，然后可以将等量的牌交给一名其他角色（X为你已损失的体力值）。',
 			zhenlie_info:'当你成为其他角色使用【杀】或普通锦囊牌的目标后，你可以失去一点体力并令此牌对你无效，然后弃置对方一张牌。',
-			chengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌',
-			oldchengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于12的牌',
+			chengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌。',
+			oldchengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于12的牌。',
 			renxin_info:'当体力值为1的一名其他角色受到伤害时，你可以将武将牌翻面并弃置一张装备牌，然后防止此伤害。',
 			oldrenxin_info:'其他角色进入濒死状态时，你可以将所有手牌交给该角色并翻面，然后该角色回复1点体力。',
 			jingce_info:'出牌阶段结束时，若你本回合使用的牌数量大于或等于你的当前体力值，你可以摸两张牌。',

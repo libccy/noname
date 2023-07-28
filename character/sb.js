@@ -35,7 +35,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_sunce:['male','wu',4,['sbjiang','sbhunzi','sbzhiba'],['zhu']],
 			sb_daqiao:['female','wu',3,['sbguose','sbliuli']],
 			sb_liubiao:['male','qun',3,['sbzishou','sbzongshi']],
-			sb_zhurong:['female','shu',4,['sblieren','sbjuxiang'],['unseen']],
+			sb_zhurong:['female','shu',4,['sblieren','sbjuxiang']],
+			sb_menghuo:['male','shu',4,['sbhuoshou','sbzaiqi']],
 		},
 		characterSort:{
 			sb:{
@@ -43,10 +44,158 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sb_shi:['sb_xuhuang','sb_machao','sb_fazheng','sb_chengong','sb_diaochan','sb_pangtong'],
 				sb_tong:['liucheng','sp_yangwan','sb_xiahoushi','sb_zhangfei','sb_zhaoyun','sb_sunce','sb_zhurong'],
 				sb_yu:['sb_yujin','sb_lvmeng','sb_huangzhong','sb_huanggai','sb_zhouyu','sb_caoren','sb_ganning'],
-				sb_neng:['sb_huaxiong','sb_sunshangxiang','sb_jiangwei','sb_yuanshao'],
+				sb_neng:['sb_huaxiong','sb_sunshangxiang','sb_jiangwei','sb_yuanshao','sb_menghuo'],
 			}
 		},
 		skill:{
+			//萌货
+			sbhuoshou:{
+				audio:2,
+				trigger:{
+					player:'phaseUseBegin',
+				},
+				filter:function(event,player){
+					return true;
+				},
+				forced:true,
+				onremove:true,
+				group:['sbhuoshou_cancel','sbhuoshou_source','sbhuoshou_nanmaned'],
+				content:function(){
+					'step 0'
+					var card=get.discardPile(card=>{
+						return card.name=='nanman';
+					});
+					if(card){
+						player.gain(card,'gain2');
+					}
+					else{
+						game.log('但是弃牌堆里并没有','#y南蛮入侵','！');
+						player.addMark('sbhuoshou',1,false);
+						if(player.countMark('sbhuoshou')>=5&&Math.random()<0.25) player.chat('我南蛮呢');
+					}
+				},
+				subSkill:{
+					cancel:{
+						audio:'sbhuoshou',
+						trigger:{target:'useCardToBefore'},
+						forced:true,
+						priority:15,
+						filter:function(event,player){
+							return (event.card.name=='nanman');
+						},
+						content:function(){
+							trigger.cancel();
+						},
+					},
+					source:{
+						audio:'sbhuoshou',
+						trigger:{global:'useCardToPlayered'},
+						forced:true,
+						filter:function(event,player){
+							return event.isFirstTarget&&event.card&&event.card.name=='nanman'&&event.player!=player;
+						},
+						content:function(){
+							trigger.getParent().customArgs.default.customSource=player;
+						}
+					},
+					nanmaned:{
+						trigger:{
+							player:'useCard1',
+						},
+						filter:function(event,player){
+							return event.card.name=='nanman';
+						},
+						forced:true,
+						popup:false,
+						charlotte:true,
+						content:function(){
+							'step 0'
+							player.addTempSkill('sbhuoshou_ban','phaseUseAfter');
+						}
+					},
+					ban:{
+						charlotte:true,
+						intro:{
+							content:'此阶段不能再使用【南蛮入侵】',
+						}
+					},
+				},
+				mod:{
+					cardEnabled:function(card,player){
+						if(player.hasSkill('sbhuoshou_ban')&&card.name=='nanman') return false;
+					},
+				},
+				ai:{
+					threaten:1.9,
+				}
+			},
+			sbzaiqi:{
+				audio:2,
+				trigger:{
+					player:'phaseDiscardEnd',
+				},
+				chargeSkill:true,
+				filter:function(event,player){
+					return player.hasMark('charge');
+				},
+				group:'sbzaiqi_backflow',
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('sbzaiqi'),'选择任意名角色并消耗等量蓄力值，令这些角色选择一项：1.令你摸一张牌；2.弃置一张牌，然后你回复1点体力',[1,player.countMark('charge')]).set('ai',function(target){
+						var player=_status.event.player;
+						return get.attitude(player,target)+player.getDamagedHp()*3.5;
+					});
+					'step 1'
+					if(result.bool){
+						var targets=result.targets;
+						targets.sortBySeat();
+						event.targets=targets;
+						player.logSkill('sbzaiqi',targets);
+						player.removeMark('charge',targets.length);
+					}
+					else event.finish();
+					'step 2'
+					var target=targets.shift();
+					event.target=target;
+					if(!target.countCards('he')) event._result={bool:false};
+					else target.chooseToDiscard(get.translation(player)+'对你发动了【再起】','是否弃置一张牌令其回复1点体力？或者点击“取消”，令该角色摸一张牌。','he').set('ai',card=>{
+						var eff=_status.event.eff,att=_status.event.att;
+						if(eff>0&&att>0||eff<=0&&att<0) return 5.5-get.value(card);
+						return 0;
+					}).set('eff',get.recoverEffect(player,player,target)).set('att',get.attitude(target,player));
+					'step 3'
+					target.line(player);
+					if(result.bool){
+						player.recover();
+					}
+					else{
+						player.draw();
+					}
+					game.delayex();
+					if(targets.length) event.goto(2);
+				},
+				subSkill:{
+					backflow:{
+						audio:'sbzaiqi',
+						trigger:{
+							player:'enterGame',
+							source:'damageSource',
+							global:'phaseBefore',
+						},
+						usable:1,
+						forced:true,
+						locked:false,
+						filter:function(event,player){
+							if(event.name=='damage') return true;
+							return (event.name!='phase'||game.phaseNumber==0);
+						},
+						content:function(){
+							player.addMark('charge',1);
+						}
+					}
+				}
+			},
 			//祝融
 			sblieren:{
 				audio:2,
@@ -4491,6 +4640,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sblieren_info:'当你使用【杀】指定唯一目标后，你可以摸一张牌并与其拼点。若你赢，此【杀】结算结束后，你可以对另一名其他角色造成1点伤害。',
 			sbjuxiang:'巨象',
 			sbjuxiang_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】结算结束后，你获得此牌对应的所有实体牌。③结束阶段，若你未于本回合使用过【南蛮入侵】，你可以将一张游戏外的随机【南蛮入侵】（共八张）交给一名角色。',
+			sb_menghuo:'谋孟获',
+			sbhuoshou:'祸首',
+			sbhuoshou_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】指定第一个目标后，你代替其成为此牌的伤害来源。③出牌阶段开始时，你随机获得弃牌堆中的一张【南蛮入侵】。④出牌阶段，若你于此阶段使用过【南蛮入侵】，你不能使用【南蛮入侵】。',
+			sbzaiqi:'再起',
+			sbzaiqi_info:'蓄力技（1/7）。①弃牌阶段结束时，你可以消耗任意点蓄力值并选择等量名角色，然后令这些角色选择一项：1.令你摸一张牌；2.弃置一张牌，然后你回复1点体力。②每回合限一次。当你造成伤害后，你获得1点蓄力值。',
 
 			sb_zhi:'谋攻篇·知',
 			sb_shi:'谋攻篇·识',

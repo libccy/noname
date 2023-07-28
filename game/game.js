@@ -12402,6 +12402,7 @@
 					next.setContent(info.content);
 					next.skillHidden=event.skillHidden;
 					if(info.forceDie) next.forceDie=true;
+					if(event.skill=='_turnover') next.includeOut=true;
 					"step 4"
 					if(player._hookTrigger){
 						for(var i=0;i<player._hookTrigger.length;i++){
@@ -13039,19 +13040,55 @@
 								if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
 								var dialog=info.chooseButton.dialog(event,player);
 								if(info.chooseButton.chooseControl){
-									var next=player.chooseControl(info.chooseButton.chooseControl(event,player));
-									next.dialog=dialog;
-									next.set('ai',info.chooseButton.check||function(){return 0;});
-									if(event.id) next._parent_id=event.id;
-									next.type='chooseToUse_button';
+									var choices=info.chooseButton.chooseControl(event,player);
+									var choicesx=choices.slice(0);
+									choicesx.remove('cancel2');
+									if(choicesx.length==1&&dialog.direct||dialog.forceDirect){
+										event._result={
+											bool:true,
+											control:choicesx[0],
+											index:0,
+										}
+									}
+									else{
+										var next=player.chooseControl(choices);
+										next.dialog=dialog;
+										next.set('ai',info.chooseButton.check||function(){return 0;});
+										if(event.id) next._parent_id=event.id;
+										next.type='chooseToUse_button';
+									}
 								}
 								else{
-									var next=player.chooseButton(dialog);
-									next.set('ai',info.chooseButton.check||function(){return 1;});
-									next.set('filterButton',info.chooseButton.filter||function(){return true;});
-									next.set('selectButton',info.chooseButton.select||1);
-									if(event.id) next._parent_id=event.id;
-									next.type='chooseToUse_button';
+									var ai=info.chooseButton.check||function(){return 1;};
+									var filterButton=info.chooseButton.filter||function(){return true};
+									var selectButton=info.chooseButton.select||1;
+									var chooseable=[];
+									var evt=game.createEvent('emptyEvent');
+									event.next.remove(evt);
+									evt.parent=_status.event;
+									evt.player=player;
+									var tmpevt=_status.event;
+									_status.event=evt;
+									for(var i=0;i<dialog.buttons.length;i++){
+										var btn=dialog.buttons[i];
+										if(filterButton(btn,player)) chooseable.push(btn);
+									}
+									_status.event=tmpevt;
+									if(chooseable.length==1&&dialog.direct||dialog.forceDirect){
+										event._result={
+											bool:true,
+											buttons:chooseable[0],
+											links:[chooseable[0].link],
+										}
+									}
+									else{
+										var next=player.chooseButton(dialog);
+										next.set('ai',ai);
+										next.set('filterButton',filterButton);
+										next.set('selectButton',selectButton);
+										if(event.id) next._parent_id=event.id;
+										next.type='chooseToUse_button';
+									}
 								}
 								event.buttoned=event.result.skill;
 							}
@@ -13220,15 +13257,51 @@
 								if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
 								var dialog=info.chooseButton.dialog(event,player);
 								if(info.chooseButton.chooseControl){
-									var next=player.chooseControl(info.chooseButton.chooseControl(event,player));
-									next.dialog=dialog;
-									next.set('ai',info.chooseButton.check||function(){return 0;});
+									var choices=info.chooseButton.chooseControl(event,player);
+									var choicesx=choices.slice(0);
+									choicesx.remove('cancel2');
+									if(choicesx.length==1&&dialog.direct||dialog.forceDirect){
+										event._result={
+											bool:true,
+											control:choicesx[0],
+											index:0,
+										}
+									}
+									else{
+										var next=player.chooseControl(choices);
+										next.dialog=dialog;
+										next.set('ai',info.chooseButton.check||function(){return 0;});
+									}
 								}
 								else{
-									var next=player.chooseButton(dialog);
-									next.set('ai',info.chooseButton.check||function(){return 1;});
-									next.set('filterButton',info.chooseButton.filter||function(){return true;});
-									next.set('selectButton',info.chooseButton.select||1);
+									var ai=info.chooseButton.check||function(){return 1;};
+									var filterButton=info.chooseButton.filter||function(){return true};
+									var selectButton=info.chooseButton.select||1;
+									var chooseable=[];
+									var evt=game.createEvent('emptyEvent');
+									event.next.remove(evt);
+									evt.parent=_status.event;
+									evt.player=player;
+									var tmpevt=_status.event;
+									_status.event=evt;
+									for(var i=0;i<dialog.buttons.length;i++){
+										var btn=dialog.buttons[i];
+										if(filterButton(btn,player)) chooseable.push(btn);
+									}
+									_status.event=tmpevt;
+									if(chooseable.length==1&&dialog.direct||dialog.forceDirect){
+										event._result={
+											bool:true,
+											buttons:chooseable[0],
+											links:[chooseable[0].link],
+										}
+									}
+									else{
+										var next=player.chooseButton(dialog);
+										next.set('ai',ai);
+										next.set('filterButton',filterButton);
+										next.set('selectButton',selectButton);
+									}
 								}
 								event.buttoned=event.result.skill;
 							}
@@ -19232,6 +19305,7 @@
 						dead:this.isDead(),
 						linked:this.isLinked(),
 						turnedover:this.isTurnedOver(),
+						out:this.isOut(),
 						phaseNumber:this.phaseNumber,
 						unseen:this.isUnseen(0),
 						unseen2:this.isUnseen(1),
@@ -22429,6 +22503,7 @@
 					}
 					var next=game.createEvent('turnOver');
 					next.player=this;
+					next.includeOut=true;
 					next.setContent('turnOver');
 					return next;
 				},
@@ -28773,7 +28848,7 @@
 				},
 			},
 			_showHiddenCharacter:{
-				trigger:{player:['changeHp','phaseBeginStart','loseMaxHpBegin']},
+				trigger:{player:['changeHp','phaseBeginStart','loseMaxHpBegin','gainMaxHpBegin']},
 				firstDo:true,
 				forced:true,
 				popup:false,
@@ -29718,10 +29793,10 @@
 				giveup:function(player){
 					if(lib.node.observing.contains(this)||!player||!player._giveUp) return;
 					_status.event.next.length=0;
-					game.createEvent('giveup',false).setContent(function(){
+					game.createEvent('giveup',false).set('includeOut',true).setContent(function(){
 						game.log(player,'投降');
 						player.popup('投降');
-						player.die('nosource');
+						player.die('nosource').includeOut=true;
 					}).player=player;
 				},
 				auto:function(){
@@ -30302,6 +30377,7 @@
 							}
 							else{
 								player.init(info.name1,info.name2);
+								if(info.name&&info.name!=info.name1) player.name=info.name;
 							}
 							if(!info.unseen) player.classList.remove('unseen');
 							if(!info.unseen2) player.classList.remove('unseen2');
@@ -30340,6 +30416,9 @@
 							}
 							if(info.turnedover){
 								player.classList.add('turnedover');
+							}
+							if(info.out){
+								player.classList.add('out');
 							}
 							if(info.disableJudge){
 								player.$disableJudge();
@@ -34062,7 +34141,7 @@
 			}
 		},
 		createTrigger:function(name,skill,player,event){
-			if(player.isOut()||player.removed) return;
+			if((player.isOut()||player.removed)&&skill!='_turnover') return;
 			if(player.isDead()&&!lib.skill[skill].forceDie) return;
 			var next=game.createEvent('trigger',false);
 			next.skill=skill;
@@ -34070,6 +34149,7 @@
 			next.triggername=name;
 			next.forceDie=true;
 			next._trigger=event;
+			if(skill=='_turnover') next.includeOut=true;
 			next.setContent('createTrigger');
 		},
 		createEvent:function(name,trigger,triggerevent){
@@ -45460,10 +45540,10 @@
 					}
 					else{
 						_status.event.next.length=0;
-						game.createEvent('giveup',false).setContent(function(){
+						game.createEvent('giveup',false).set('includeOut',true).setContent(function(){
 							game.log(player,'投降');
 							player.popup('投降');
-							player.die('nosource');
+							player.die('nosource').includeOut=true;
 						}).player=player;
 					}
 					if(_status.paused&&_status.imchoosing&&!_status.auto){
@@ -50524,7 +50604,7 @@
 				}
 				// ui.click.skin(this,player.name);
 				game.pause2();
-				ui.click.charactercard(player.name,null,null,true,this);
+				ui.click.charactercard(player.name1||player.name,null,null,true,this);
 			},
 			avatar2:function(){
 				if(!lib.config.doubleclick_intro) return;
@@ -50770,7 +50850,7 @@
 				}
 				game.uncheck();
 				game.check();
-				if(event.skillDialog){
+				if(event.skillDialog===true){
 					var str=get.translation(skill);
 					if(info.prompt){
 						var str2;
