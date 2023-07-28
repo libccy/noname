@@ -1110,7 +1110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guanxing_fail:{},
 			guanxing:{
 				audio:2,
-				audioname:['jiangwei','re_jiangwei','re_zhugeliang'],
+				audioname:['jiangwei','re_jiangwei','re_zhugeliang','ol_jiangwei'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				frequent:true,
 				preHidden:true,

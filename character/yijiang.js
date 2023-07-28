@@ -94,7 +94,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunziliufang:['male','wei',3,['guizao','jiyu']],
 
 			xinxianying:['female','wei',3,['zhongjian','caishi']],
-			wuxian:['female','shu',3,['fumian','daiyan']],
+			wuxian:['female','shu',3,['fumian','daiyan'],['clan:陈留吴氏']],
 			xushi:['female','wu',3,['wengua','fuzhu']],
 			caojie:['female','qun',3,['shouxi','huimin']],
 

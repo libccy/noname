@@ -1041,6 +1041,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.log(trigger.player,'移回了游戏');
 							delete _status.mbmowang_return[trigger.player.playerid];
 							trigger.player.recover(trigger.player.maxHp-trigger.player.hp);
+							game.broadcastAll(function(player){
+								if(player.name1=='shichangshi'){
+									player.smoothAvatar(false);
+									player.node.avatar.setBackground(player.name1,'character');
+								}
+								if(player.name2=='shichangshi'){
+									player.smoothAvatar(true);
+									player.node.avatar2.setBackground(player.name2,'character');
+								}
+							},trigger.player);
 							'step 1'
 							event.trigger('restEnd');
 						}
@@ -19803,7 +19813,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spjianyi_info:'锁定技。其他角色的回合结束时，若弃牌堆中有于本回合内因弃置而进入弃牌堆的防具牌，则你获得其中一张。',
 			spshangyi:'尚义',
 			spshangyi_info:'出牌阶段限一次。你可以弃置一张牌并选择一名其他角色。其观看你的手牌，然后你观看其手牌并获得其中的一张。',
-			sunhanhua:'孙寒华',
+			sunhanhua:'手杀孙寒华',
 			chongxu:'冲虚',
 			chongxu_info:'出牌阶段限一次，你可以随机演奏一首音乐，并根据完成度来获得相应的分数（至多五分）。然后你可修改〖妙剑〗或〖莲华〗（消耗3分），并使用剩余的分数进行摸牌（每张2分）。',
 			chongxu_faq:'目前的曲库',
