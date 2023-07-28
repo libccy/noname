@@ -734,6 +734,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else{
 						num=game.countPlayer();
 					}
+					if(card.storage&&typeof card.storage.extraCardsNum=='number') num+=card.storage.extraCardsNum;
 					var cards=get.cards(num);
 					game.cardsGotoOrdering(cards).relatedEvent=event.getParent();
 					var dialog=ui.create.dialog('五谷丰登',cards,true);
@@ -2158,10 +2159,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.chooseToUse(get.prompt('qinglong',trigger.target),function(card,player,event){
 						if(get.name(card)!='sha') return false;
 						if(player.getEquip('qinglong')==card) return false;
-						var target=_status.event.targetx;
-						if(!lib.filter.targetEnabled(card,player,target)) return false;
 						return lib.filter.filterCard.apply(this,arguments);
-					},trigger.target,-1).set('targetx',trigger.target).set('addCount',false).logSkill='qinglong_skill';
+					},trigger.target,-1).set('addCount',false).logSkill='qinglong_skill';
 				}
 			},
 			zhangba_skill:{

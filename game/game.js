@@ -15816,6 +15816,7 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.skill=event.skill;
 						next.excluded=event.excluded;
 						next.directHit=event.directHit;
 						next.customArgs=event.customArgs;
@@ -15836,6 +15837,7 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.skill=event.skill;
 						next.excluded=event.excluded;
 						next.directHit=event.directHit;
 						next.customArgs=event.customArgs;
@@ -15869,6 +15871,7 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.skill=event.skill;
 						next.excluded=event.excluded;
 						next.directHit=event.directHit;
 						next.customArgs=event.customArgs;
@@ -15889,6 +15892,7 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.skill=event.skill;
 						next.excluded=event.excluded;
 						next.directHit=event.directHit;
 						next.customArgs=event.customArgs;
@@ -15910,6 +15914,7 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.skill=event.skill;
 						next.type='precard';
 						if(event.forceDie) next.forceDie=true;
 					}
@@ -15920,6 +15925,7 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.skill=event.skill;
 						next.type='precard';
 						if(event.forceDie) next.forceDie=true;
 					}
@@ -15931,6 +15937,7 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.skill=event.skill;
 						next.type='precard';
 						next.addedTarget=event.addedTarget;
 						next.addedTargets=event.addedTargets;
@@ -16015,6 +16022,7 @@
 						next.card=card;
 						next.cards=cards;
 						next.player=player;
+						next.skill=event.skill;
 						next.preResult=event.preResult;
 						next.type='postcard';
 						if(event.forceDie) next.forceDie=true;
@@ -23134,6 +23142,7 @@
 							if(lib.skill[name]&&lib.skill[name].markimage){
 								node.setBackgroundImage(lib.skill[name].markimage);
 								node.style['box-shadow']='none';
+								node.style['background-size']='contain';
 							}
 							else{
 								var str=lib.translate[name+'_bg'];
@@ -45143,10 +45152,10 @@
 								if(get.is.object(arg)){
 									var argi=get.stringify(arg);
 									if(argi&&argi.length<5000){
-										textstr+=argi;
+										return argi;
 									}
 									else{
-										textstr+=arg.toString();
+										return arg.toString();
 									}
 								}else{
 									var str=String(arg);

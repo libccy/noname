@@ -16476,7 +16476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'wuguRemained'},
 				direct:true,
 				filter:function(event){
-					return event.remained.length>0;
+					return event.remained.filterInD().length>0;
 				},
 				content:function(){
 					'step 0'
