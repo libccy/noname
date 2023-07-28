@@ -29208,14 +29208,16 @@
 						useCard:[],
 						changeHp:[],
 					});
-					game.countPlayer2(function(current){
+					var players=game.players.slice(0).concat(game.dead);
+					for(var i=0;i<players.length;i++){
+						var current=players[i];
 						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[],custom:[],useSkill:[]});
 						current.stat.push({card:{},skill:{}});
 						if(isRound){
 							current.getHistory().isRound=true;
 							current.getStat().isRound=true;
 						}
-					});
+					};
 					player.getHistory().isMe=true;
 					player.getStat().isMe=true;
 					if(isRound){
