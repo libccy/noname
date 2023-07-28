@@ -12014,6 +12014,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.storage.rerende2.push(target);
 					player.give(cards,target);
+					'step 1'
 					if(typeof player.storage.rerende!='number'){
 						player.storage.rerende=0;
 					}
@@ -12081,7 +12082,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.finish();
 					}
-					'step 1'
+					'step 2'
 					if(result&&result.bool&&result.links[0]){
 						var card={name:result.links[0][2],nature:result.links[0][3]};
 						player.chooseUseTarget(card,true);
