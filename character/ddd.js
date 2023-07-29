@@ -1697,6 +1697,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			dddtuoji:{
+				trigger:{global:'useCardAfter'},
+				frequent:true,
+				filter:function(event,player){
+					return event.card.storage&&event.card.storage._3dfusi_owner==player&&!player.hasCard(function(card){
+						return !card.hasGaintag('dddxujing_tag');
+					},'h');
+				},
+				content:function(){
+					player.draw(3);
+				},
+			},
 			dddchashi:{
 				trigger:{global:'phaseUseBegin'},
 				direct:true,

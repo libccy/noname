@@ -597,7 +597,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				direct:true,
 				priority:15,
-				group:'mbmowang_die',
+				group:['mbmowang_die','mbmowang_return'],
 				content:function(){
 					if(_status.mbmowang_return&&_status.mbmowang_return[player.playerid]){
 						trigger.cancel();
@@ -608,6 +608,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(lib.config.background_speak) game.playAudio('die','shichangshiRest');
 						});
 						trigger.setContent(lib.skill.mbmowang.dieContent);
+						trigger.includeOut=true;
 					}
 				},
 				dieContent:function(){
@@ -629,7 +630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.reserveOut=true;
 						game.log(player,'进入了修整状态');
 						game.log(player,'移出了游戏');
-						game.addGlobalSkill('mbmowang_return');
+						//game.addGlobalSkill('mbmowang_return');
 						if(!_status.mbmowang_return) _status.mbmowang_return={};
 						_status.mbmowang_return[player.playerid]=1;
 					}
@@ -767,10 +768,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					return:{
-						trigger:{global:'phaseBefore'},
+						trigger:{player:'phaseBefore'},
 						forced:true,
 						charlotte:true,
 						silent:true,
+						forceDie:true,
+						forceOut:true,
 						filter:function(event,player){
 							return !event._mbmowang_return&&event.player.isOut()&&_status.mbmowang_return[event.player.playerid];
 						},

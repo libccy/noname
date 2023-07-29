@@ -12162,6 +12162,7 @@
 					'step 0'
 					event.filter1=function(info){
 						if(info[1].isDead()&&!lib.skill[info[0]].forceDie) return false;
+						if(info[1].isOut()&&!lib.skill[info[0]].forceOut) return false;
 						return lib.filter.filterTrigger(trigger,info[1],event.triggername,info[0]);
 					}
 					event.filter2=function(info2){
@@ -12231,7 +12232,8 @@
 					for(var i=0;i<event.choice.length;i++){
 						controls.push(event.choice[i][0]);
 					}
-					event.current.chooseControl(controls).set('prompt','选择下一个触发的技能').set('forceDie',true).set('arrangeSkill',true);
+					event.current.chooseControl(controls)
+					.set('prompt','选择下一个触发的技能').set('forceDie',true).set('arrangeSkill',true).set('includeOut',true)
 					'step 5'
 					if(result.control){
 						for(var i=0;i<event.doing.list.length;i++){
@@ -12255,6 +12257,7 @@
 				},
 				createTrigger:function(){
 					"step 0"
+					//console.log('triggering: ' + player.name+ ' \'s skill: ' + event.skill+' in ' + event.triggername)
 					if(lib.filter.filterTrigger(trigger,player,event.triggername,event.skill)){
 						var fullskills=game.expandSkills(player.getSkills().concat(lib.skill.global));
 						if(!fullskills.contains(event.skill)){
@@ -12343,6 +12346,7 @@
 							var next=player.chooseBool(str);
 							if(event.frequentSkill) next.set('frequentSkill',event.skill);
 							next.set('forceDie',true);
+							next.set('includeOut',true);
 							next.ai=function(){
 								return !check||check(trigger,player);
 							};
@@ -12427,7 +12431,7 @@
 					next.setContent(info.content);
 					next.skillHidden=event.skillHidden;
 					if(info.forceDie) next.forceDie=true;
-					if(event.skill=='_turnover') next.includeOut=true;
+					if(info.forceOut||event.skill=='_turnover') next.includeOut=true;
 					"step 4"
 					if(player._hookTrigger){
 						for(var i=0;i<player._hookTrigger.length;i++){
@@ -16081,6 +16085,7 @@
 					"step 0"
 					var info=get.info(event.skill);
 					if(!info.noForceDie) event.forceDie=true;
+					if(!info.noForceOut) event.includeOut=true;
 					event._skill=event.skill;
 					game.trySkillAudio(event.skill,player);
 					var checkShow=player.checkShow(event.skill);
@@ -16261,6 +16266,7 @@
 						next.cards=cards;
 						next.player=player;
 						if(event.forceDie) next.forceDie=true;
+						if(event.includeOut) next.includeOut=true;
 					}
 					"step 2"
 					if(!event.skill){
@@ -16303,6 +16309,7 @@
 					}
 					next.target=targets[num];
 					if(event.forceDie) next.forceDie=true;
+					if(event.includeOut) next.includeOut=true;
 					if(next.target&&!info.multitarget){
 						if(num==0&&targets.length>1){
 							// var ttt=next.target;
@@ -16338,6 +16345,7 @@
 						next.cards=cards;
 						next.player=player;
 						if(event.forceDie) next.forceDie=true;
+						if(event.includeOut) next.includeOut=true;
 					}
 					"step 4"
 					if(player.getStat().allSkills>200){
@@ -22798,6 +22806,7 @@
 						var next=game.createEvent('logSkill',false),evt=_status.event;
 						next.player=player;
 						next.forceDie=true;
+						next.includeOut=true;
 						evt.next.remove(next);
 						if(evt.logSkill) evt=evt.getParent();
 						for(var i in logInfo){
@@ -22812,6 +22821,7 @@
 						var next2=game.createEvent('logSkillBegin',false);
 						next2.player=player;
 						next2.forceDie=true;
+						next2.includeOut=true;
 						for(var i in logInfo){
 							if(i=='event') next2.log_event=logInfo[i];
 							else next2[i]=logInfo[i];
@@ -34177,13 +34187,14 @@
 			}
 		},
 		createTrigger:function(name,skill,player,event){
-			if((player.isOut()||player.removed)&&skill!='_turnover') return;
+			//if((player.isOut()||player.removed)&&skill!='_turnover') return;
 			if(player.isDead()&&!lib.skill[skill].forceDie) return;
 			var next=game.createEvent('trigger',false);
 			next.skill=skill;
 			next.player=player;
 			next.triggername=name;
 			next.forceDie=true;
+			next.includeOut=true;
 			next._trigger=event;
 			if(skill=='_turnover') next.includeOut=true;
 			next.setContent('createTrigger');
