@@ -45141,7 +45141,7 @@
 							else{
 								if(!game.observe&&!game.online){
 									try{
-										var result=eval(text2.value);
+										var result = (new Function('_status','lib','game','ui','get','ai',`"use strict";\nreturn ${text2.value}`))(_status,lib,game,ui,get,ai);
 										game.print(result);
 									}
 									catch(e){
