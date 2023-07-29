@@ -29306,6 +29306,7 @@
 			_turnover:{
 				trigger:{player:'phaseBefore'},
 				forced:true,
+				forceOut:true,
 				priority:100,
 				popup:false,
 				firstDo:true,
@@ -34187,8 +34188,10 @@
 			}
 		},
 		createTrigger:function(name,skill,player,event){
-			//if((player.isOut()||player.removed)&&skill!='_turnover') return;
-			if(player.isDead()&&!lib.skill[skill].forceDie) return;
+			var info=get.info(skill);
+			if(!info) return false;
+			if((player.isOut()||player.removed)&&!info.forceOut) return;
+			if(player.isDead()&&!info.forceDie) return;
 			var next=game.createEvent('trigger',false);
 			next.skill=skill;
 			next.player=player;
@@ -34196,7 +34199,6 @@
 			next.forceDie=true;
 			next.includeOut=true;
 			next._trigger=event;
-			if(skill=='_turnover') next.includeOut=true;
 			next.setContent('createTrigger');
 		},
 		createEvent:function(name,trigger,triggerevent){
