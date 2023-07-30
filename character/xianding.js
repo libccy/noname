@@ -2207,7 +2207,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.recover();
-					player.chooseTarget('残肆：选择一名其他角色',true,lib.filter.notMe).set('ai',target=>{
+					if(!game.hasPlayer(current=>current!=player)) event.finish();
+					else player.chooseTarget('残肆：选择一名其他角色',true,lib.filter.notMe).set('ai',target=>{
 						var player=_status.event.player;
 						var list=['recover','sha','juedou','huogong'];
 						return list.reduce((p,c)=>{
@@ -3140,8 +3141,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else choiceList[0]='<span style="opacity:0.5; ">'+choiceList[0]+(used?'（同名牌被使用过）':'（已选择）')+'</span>';
 					if(!player.hasSkill('dczhanmeng_choice1')) list.push('选项二');
 					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'（已选择）</span>';
-					if(!player.hasSkill('dczhanmeng_choice2')) list.push('选项三');
-					else choiceList[2]='<span style="opacity:0.5">'+choiceList[2]+'（已选择）</span>';
+					var other=game.hasPlayer(current=>current!=player);
+					if(!player.hasSkill('dczhanmeng_choice2')&&other) list.push('选项三');
+					else choiceList[2]='<span style="opacity:0.5">'+choiceList[2]+(!other?'（没人啦）':'（已选择）')+'</span>';
 					list.push('cancel2');
 					player.chooseControl(list).set('prompt',get.prompt('dczhanmeng')).set('ai',()=>{
 						var choices=_status.event.controls.slice().remove('cancel2');
@@ -3375,7 +3377,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						direct:true,
 						filter:function(event,player){
-							return (event.name!='phase'||game.phaseNumber==0);
+							return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 						},
 						content:function(){
 							'step 0'
@@ -4157,7 +4159,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					} else event.redo();
 					event.nowProperty++;
 					'step 2'
-					player.chooseTarget('梦解：对一名其他角色造成1点伤害',true,lib.filter.notMe).set('ai',target=>get.damageEffect(target,player,player));
+					if(!game.hasPlayer(current=>current!=player)) event._result={bool:false};
+					else player.chooseTarget('梦解：对一名其他角色造成1点伤害',true,lib.filter.notMe).set('ai',target=>get.damageEffect(target,player,player));
 					'step 3'
 					if(result.bool){
 						player.logSkill('dcmengjie',result.targets[0]);
@@ -4196,7 +4199,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delayx();
 					event.goto(1);
 					'step 10'
-					player.chooseTarget('梦解：令一名其他角色将手牌补至上限',true,(card,player,target)=>{
+					if(!game.hasPlayer(current=>current!=player)) event._result={bool:false};
+					else player.chooseTarget('梦解：令一名其他角色将手牌补至上限',true,(card,player,target)=>{
 						return target!=player;
 					}).set('ai',target=>{
 						var att=get.attitude(_status.event.player,target);
@@ -8836,6 +8840,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				skillAnimation:true,
 				animationColor:'gray',
+				filter:function(event,player){
+					return game.hasPlayer(current=>current!=player);
+				},
 				content:function(){
 					'step 0'
 					player.chooseTarget('请选择【毒逝】的目标','选择一名其他角色，令其获得技能【毒逝】',true,lib.filter.notMe).set('forceDie',true).set('ai',function(target){
@@ -10918,7 +10925,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcxinyou_info:'出牌阶段限一次。你可以将体力回复至上限并将手牌补至体力上限。若你以此法：获得了至少两张牌，你于结束阶段失去1点体力；回复了体力，你于结束阶段弃置两张牌。',
 			zerong:'笮融',
 			dccansi:'残肆',
-			dccansi_info:'锁定技。准备阶段，你回复1点体力并选择一名其他角色，其回复1点体力，然后你视为对其依次使用以下能使用的牌：【杀】（无距离限制）、【决斗】、【火攻】。当其以此法受到1点伤害后，你摸两张牌。',
+			dccansi_info:'锁定技。准备阶段，你回复1点体力，然后选择一名其他角色，其回复1点体力，你视为对其依次使用以下能使用的牌：【杀】（无距离限制）、【决斗】、【火攻】。当其以此法受到1点伤害后，你摸两张牌。',
 			dcfozong:'佛宗',
 			dcfozong_info:'锁定技。出牌阶段开始时，若你的手牌数大于7，你将X张手牌置于武将牌上（X为你的手牌数-7）。然后若你的武将牌上有至少七张牌，其他角色依次选择一项：1.获得其中的一张牌并令你回复1点体力；2.令你失去1点体力。',
 			dc_ruiji:'芮姬',

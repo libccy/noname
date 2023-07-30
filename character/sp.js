@@ -12145,7 +12145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event){
-					return game.players.length>1&&(event.name!='phase'||game.phaseNumber==0);
+					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				audio:6,
 				content:function(){
@@ -18744,6 +18744,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:'loseAsyncAfter',
 				},
 				filter:function(event,player){
+					if(!game.hasPlayer(current=>current!=player)) return false;
 					if(event.type!='discard'||event.getlx===false) return false;
 					var evt=event.getl(player);
 					if(!evt||!evt.cards2) return false;

@@ -1195,6 +1195,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				forced:true,
 				filter:function(event,player){
+					if(!game.hasPlayer(current=>current!=player)) return false;
 					var card=event.card,type=get.type2(card);
 					for(var i=player.actionHistory.length-1; i>=0; i--){
 						var history=player.actionHistory[i].useCard;
@@ -1629,7 +1630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(cards.length) player.discard(cards);
 							}
 							'step 1'
-							if(!player.isIn()) event.finish();
+							if(!player.isIn()||!game.hasPlayer(current=>current!=player)) event.finish();
 							else player.chooseTarget('烈誓：令一名其他角色选择另一项',lib.filter.notMe,true).set('ai',target=>{
 								var player=_status.event.player,chosen=_status.event.getParent().choice,att=get.attitude(player,target);
 								if(chosen=='damage'){

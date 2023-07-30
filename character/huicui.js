@@ -1764,6 +1764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							get.translation(mark)+'】</div><div>'+lib.translate[mark+'_info']+'</div></div>'])
 					}
 					var target=game.filterPlayer(i=>i!=player)[0];
+					if(!game.hasPlayer(current=>current!=player)) target=player;
 					event.target=target;
 					player.chooseButton(['引路：令'+get.translation(target)+'获得2枚〖引路〗标记',[list,'textbutton']]).set('ai',button=>{
 						var mark=button.link;
@@ -3214,7 +3215,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				onremove:['dcsilve','dcsilve_self'],
 				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0);
+					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -4113,6 +4114,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:2,
+				filter:function(event,player){
+					return game.hasPlayer(current=>current!=player);
+				},
 				chooseButton:{
 					dialog:function(event,player){
 						var dialog=ui.create.dialog('劝谏：令一名其他角色…','hidden');
@@ -6487,7 +6491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.draw();
 					'step 1'
-					if(player.countCards('h')>0){
+					if(player.countCards('h')>0&&game.hasPlayer(current=>current!=player)){
 						var suits=lib.suit.slice(0),cards=player.getExpansions('yuanyu');
 						for(var i of cards) suits.remove(get.suit(i,false));
 						var str='选择一张手牌，作为“怨”置于武将牌上；同时选择一名其他角色，令该角色获得〖怨语〗的后续效果。'
@@ -8414,6 +8418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player,name){
 					if(player.hasSkill('zhiwei2')) return false;
+					if(!game.hasPlayer(current=>current!=player)) return false;
 					if(get.mode()=='guozhan') return event.name=='showCharacter'&&(event.toShow.contains('gz_luyusheng')||event.toShow.contains('luyusheng'));
 					return event.name!='showCharacter'&&(name!='phaseBefore'||game.phaseNumber==0);
 				},
