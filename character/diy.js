@@ -8817,7 +8817,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return result.bool;
 					};
 					'step 1'
-					if(result.bool){
+					if(result.bool&&game.hasPlayer(current=>current!=player)){
 						player.chooseTarget(lib.filter.notMe,true,'选择一名其他角色，对其造成1点雷属性伤害').set('ai',function(target){
 							var player=_status.event.player;
 							return get.damageEffect(target,player,player,'thunder');
@@ -12731,6 +12731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				charlotte:true,
 				filter:function(event,player){
+					if(!game.hasPlayer(current=>current!=player)) return false;
 					return event.skill=='junktaoluan_backup'||event.skill=='junktaoluan5'||event.skill=='junktaoluan4';
 				},
 				content:function(){

@@ -3816,7 +3816,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					event.finish();
 					'step 6'
-					player.chooseTarget('令一名其他角色弃置一张点数为6的牌，否则交给你一张牌',true,function(card,player,current){
+					if(!game.hasPlayer(current=>current!=player)) event.finish();
+					else player.chooseTarget('令一名其他角色弃置一张点数为6的牌，否则交给你一张牌',true,function(card,player,current){
 						return current!=player&&current.countCards('he')>0;
 					}).set('ai',function(target){
 						var player=_status.event.player,att=get.attitude(player,target);
@@ -4504,7 +4505,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseBegin'},
 				direct:true,
 				filter:function(event,player){
-					return player.phaseNumber==1&&!player.storage.jielie;
+					return player.phaseNumber==1&&!player.storage.jielie&&game.hasPlayer(current=>current!=player);
 				},
 				content:function(){
 					'step 0'
@@ -9648,7 +9649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event){
-					return game.players.length>1&&(event.name!='phase'||game.phaseNumber==0);
+					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'

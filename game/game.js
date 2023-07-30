@@ -22462,6 +22462,7 @@
 					}
 					if(!name) return false;
 					if(this.hasJudge(name)) return false;
+					if(this.isOut()) return false;
 					var mod=game.checkMod(card,this,this,'unchanged','targetEnabled',this);
 					if(mod!='unchanged') return mod;
 					return true;

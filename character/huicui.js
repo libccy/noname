@@ -1483,11 +1483,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return ui.discardPile.childNodes.length>0;
 				},
 				onremove:true,
+				mark:true,
 				marktext:'灵',
 				intro:{
 					name2:'灵',
-					content:'mark',
+					mark:function(dialog,storage,player){
+						dialog.addText('共有'+player.countMark(storage)+'个标记');
+						dialog.addText('注：图标的颜色代表弃牌堆中较多的颜色');
+					},
 				},
+				global:'dchuiling_hint',
 				content:function(){
 					'step 0'
 					var mark=false;
@@ -1525,6 +1530,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!event.logged) player.logSkill('dchuiling',target);
 						else player.line(target);
 						player.discardPlayerCard(target,'he',true);
+					}
+				},
+				subSkill:{
+					hint:{
+						trigger:{
+							global:['loseAfter','loseAsyncAfter','cardsDiscardAfter','equipAfter'],
+						},
+						forced:true,
+						popup:false,
+						lastDo:true,
+						forceDie:true,
+						forceOut:true,
+						filter:function(event,player){
+							if(event._dchuiling_checked) return false;
+							event._dchuiling_checked=true;
+							var cards=event.getd();
+							if(!cards.filterInD('d').length) return false;
+							return true;
+						},
+						markColor:[
+							['rgba(241, 42, 42, 0.75)', 'black'],
+							['',''],
+							['rgba(18, 4, 4, 0.75)', 'rgb(200, 200, 200)']
+						],
+						content:function(){
+							'step 0'
+							var red=0,black=0;
+							for(var i=0;i<ui.discardPile.childNodes.length;i++){
+								var color=get.color(ui.discardPile.childNodes[i]);
+								if(color=='red') red++;
+								if(color=='black') black++;
+							}
+							game.broadcastAll(function(ind){
+								var bgColor=lib.skill.dchuiling_hint.markColor[ind][0],text='<span style="color: '+lib.skill.dchuiling_hint.markColor[ind][1]+'">灵</span>';
+								for(var player of game.players){
+									if(player.marks.dchuiling){
+										player.marks.dchuiling.firstChild.style.backgroundColor=bgColor;
+										player.marks.dchuiling.firstChild.innerHTML=text;
+									}
+								}
+							},Math.sign(black-red)+1);
+						},
 					}
 				},
 				mod:{
@@ -1575,7 +1622,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:()=>false,
 				selectCard:[0,1],
 				prompt:function(){
-					return '限定技。你可以失去〖汇灵〗，增加'+_status.event.player.countMark('dchuiling')+'点体力上限，然后获得〖踏寂〗和〖清荒〗。'
+					return '限定技。你可以失去〖汇灵〗，增加'+Math.min(game.countPlayer(),_status.event.player.countMark('dchuiling'))+'点体力上限，然后获得〖踏寂〗和〖清荒〗。'
 				},
 				filter:function(event,player){
 					return player.countMark('dchuiling')>=4;
@@ -1583,7 +1630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.awakenSkill('dcchongxu');
-					player.gainMaxHp(player.countMark('dchuiling'));
+					player.gainMaxHp(Math.min(game.countPlayer(),player.countMark('dchuiling')));
 					player.removeSkill('dchuiling');
 					'step 1'
 					player.addSkillLog('dctaji');
@@ -1598,7 +1645,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						player:function(player){
-							return (player.countMark('dchuiling')>=6||player.hp<=2)?1:0;
+							var count=player.countMark('dchuiling');
+							if(count>=game.countPlayer()-1) return 1;
+							return (count>=6||player.hp<=2)?1:0;
 						}
 					}
 				}
@@ -1764,6 +1813,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							get.translation(mark)+'】</div><div>'+lib.translate[mark+'_info']+'</div></div>'])
 					}
 					var target=game.filterPlayer(i=>i!=player)[0];
+					if(!game.hasPlayer(current=>current!=player)) target=player;
 					event.target=target;
 					player.chooseButton(['引路：令'+get.translation(target)+'获得2枚〖引路〗标记',[list,'textbutton']]).set('ai',button=>{
 						var mark=button.link;
@@ -3214,7 +3264,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				onremove:['dcsilve','dcsilve_self'],
 				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0);
+					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -4113,6 +4163,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:2,
+				filter:function(event,player){
+					return game.hasPlayer(current=>current!=player);
+				},
 				chooseButton:{
 					dialog:function(event,player){
 						var dialog=ui.create.dialog('劝谏：令一名其他角色…','hidden');
@@ -6487,7 +6540,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.draw();
 					'step 1'
-					if(player.countCards('h')>0){
+					if(player.countCards('h')>0&&game.hasPlayer(current=>current!=player)){
 						var suits=lib.suit.slice(0),cards=player.getExpansions('yuanyu');
 						for(var i of cards) suits.remove(get.suit(i,false));
 						var str='选择一张手牌，作为“怨”置于武将牌上；同时选择一名其他角色，令该角色获得〖怨语〗的后续效果。'
@@ -8414,6 +8467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player,name){
 					if(player.hasSkill('zhiwei2')) return false;
+					if(!game.hasPlayer(current=>current!=player)) return false;
 					if(get.mode()=='guozhan') return event.name=='showCharacter'&&(event.toShow.contains('gz_luyusheng')||event.toShow.contains('luyusheng'));
 					return event.name!='showCharacter'&&(name!='phaseBefore'||game.phaseNumber==0);
 				},
@@ -10119,7 +10173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dchuiling:'汇灵',
 			dchuiling_info:'锁定技。当你使用牌时，若此牌颜色为弃牌堆中数量较少的颜色，你获得1枚“灵”标记。若弃牌堆中：红色牌数大于黑色牌数，你回复1点体力；黑色牌数大于红色牌数，你可以弃置一名其他角色的一张牌。',
 			dcchongxu:'冲虚',
-			dcchongxu_info:'限定技。出牌阶段，若“灵”数不小于4，你可以失去〖汇灵〗，增加等同于“灵”数的体力上限，然后获得〖踏寂〗和〖清荒〗。',
+			dcchongxu_info:'限定技。出牌阶段，若“灵”数不小于4，你可以失去〖汇灵〗，增加等同于“灵”数的体力上限（至多增加场上人数的体力上限），然后获得〖踏寂〗和〖清荒〗。',
 			dctaji:'踏寂',
 			dctaji_info:'当你失去手牌后，根据你失去牌的原因执行以下效果：1.使用：你弃置其他角色一张牌；2.打出：你摸一张牌；3.弃置：你回复1点体力；4.其他：你下一次对其他角色造成伤害时，此伤害+1。',
 			dcqinghuang:'清荒',
