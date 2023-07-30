@@ -282,8 +282,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.source!=player&&event.card&&event.card.name=='sha'&&event.source.isIn();
 				},
 				check:function(event,player){
-					return get.attitude(player,event.source)>=0||
-						get.attitude(player,event.source)>=-4&&get.distance(_status.currentPhase,player,'absolute')>get.distance(_status.currentPhase,event.source,'absolute');
+					return get.attitude(player,event.source)>=0||get.attitude(player,event.source)>=-4
+						&&get.distance(_status.currentPhase,player,'absolute')>get.distance(_status.currentPhase,event.source,'absolute');
 				},
 				content:function(){
 					'step 0'

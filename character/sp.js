@@ -2430,7 +2430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.markAuto('oljianhe_chosen',[target]);
 					'step 1'
 					var type=get.type2(cards[0]);
-					target.chooseCard(get.translation(player)+'对你发动了【剑合】','请重铸'+get.cnNumber(cards.length)+'张'+get.translation(type)+'牌，或点“取消”受到1点雷电伤害',cards.length,'he',(card,player,target)=>{
+					target.chooseCard(get.translation(player)+'对你发动了【剑合】','请重铸'+get.cnNumber(cards.length)+'张'+get.translation(type)+'牌，或点“取消”受到1点雷电伤害',cards.length,'he',(card,player)=>{
 						return get.type2(card)==_status.event.type;
 					}).set('ai',card=>{
 						if(_status.event.goon) return (get.type(card)=='equip'?15:7)-get.value(card);

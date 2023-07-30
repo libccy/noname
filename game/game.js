@@ -15838,7 +15838,10 @@
 					if(target){
 						event.triggeredTargets1.push(target);
 						var next=game.createEvent('useCardToPlayer',false);
-						if(event.triggeredTargets1.length==1) next.isFirstTarget=true;
+						if(!event.isFirstTarget1){
+							event.isFirstTarget1=true;
+							next.isFirstTarget=true;
+						}
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -15859,7 +15862,10 @@
 					if(target){
 						event.triggeredTargets2.push(target);
 						var next=game.createEvent('useCardToTarget',false);
-						if(event.triggeredTargets2.length==1) next.isFirstTarget=true;
+						if(!event.isFirstTarget2){
+							event.isFirstTarget2=true;
+							next.isFirstTarget=true;
+						}
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -15893,7 +15899,10 @@
 					if(target){
 						event.triggeredTargets3.push(target);
 						var next=game.createEvent('useCardToPlayered',false);
-						if(event.triggeredTargets3.length==1) next.isFirstTarget=true;
+						if(!event.isFirstTarget3){
+							event.isFirstTarget3=true;
+							next.isFirstTarget=true;
+						}
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -15914,7 +15923,10 @@
 					if(target){
 						event.triggeredTargets4.push(target);
 						var next=game.createEvent('useCardToTargeted',false);
-						if(event.triggeredTargets4.length==1) next.isFirstTarget=true;
+						if(!event.isFirstTarget4){
+							event.isFirstTarget4=true;
+							next.isFirstTarget=true;
+						}
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -24781,11 +24793,8 @@
 					return false;
 				},
 				canEquip:function(name,replace){
-					if(get.type(name)=='card'){
-						name=get.equiptype(name);
-					}
 					var range=get.subtype(name);
-					if(this.isDisabled(range)) return false;
+					if(!range||this.isDisabled(range)) return false;
 					if(['equip3','equip4'].contains(range)&&this.getEquip(6)) return false;
 					if(!replace&&!this.isEmpty(range)) return false;
 					return true;
@@ -46049,7 +46058,7 @@
 							bool2=true;
 						}
 						if(!bool4&&get.is.double(i)) bool4=true;
-						if(bool1&&bool2&&bool4) break;
+						if(bool1&&bool2&&bool4&&bool5) break;
 					}
 					if(bool1) groups.add('shen');
 					if(bool2&&!bool3) groups.add('key');
