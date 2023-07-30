@@ -3822,7 +3822,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				locked:false,
 				filter:function(event,player){
-					return !player.hasSkill('psliaozou_blocker',null,null,false);
+					return !player.hasSkill('psliaozou_blocker',null,null,false)&&player.getExpansions('psshiyin').length>0;
 				},
 				content:function(){
 					'step 0'
