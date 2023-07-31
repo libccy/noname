@@ -3358,7 +3358,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				frequent:true,
 				content:function(){
-					player.draw(player.getHistory('useCard').length);
+					player.draw(Math.min(player.getHistory('useCard').length,5));
 				},
 			},
 			gzduannian:{
@@ -3540,7 +3540,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						target:1,
 					},
 				},
-				derivation:['releiji','nhyinbing','nhhuoqi','nhguizhu','nhxianshou','nhlundao','nhguanyue','nhyanzheng'],
+				derivation:['leiji','nhyinbing','nhhuoqi','nhguizhu','nhxianshou','nhlundao','nhguanyue','nhyanzheng'],
 				subSkill:{
 					clear:{
 						onremove:function(player){
@@ -3748,24 +3748,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						audio:'gzxiongnve',
 						mark:true,
 						intro:{
-							content:'受到的伤害-1',
+							content:'其他角色对你造成伤害时，此伤害-1',
 						},
 						trigger:{player:'damageBegin3'},
+						filter:function(event,player){
+							return event.source&&event.source!=player;
+						},
 						forced:true,
+						logTarget:'source',
 						content:function(){
 							trigger.num--;
 						},
 						ai:{
 							effect:{
 								target:function(card,player,target){
+									if(target==player) return;
 									if(player.hasSkillTag('jueqing',false,target)) return;
 									var num=get.tag(card,'damage');
 									if(num){
 										if(num>1) return 0.5;
 										return 0;
 									}
-								}
-							}
+								},
+							},
 						},
 					},
 					end:{
@@ -4122,7 +4127,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						goon:function(){
 							var target=trigger.player;
-							if(player.canUse('tao',target)&&get.effect(target,{name:'tao',isCard:true},player,player)>0) return true;
+							if(get.recoverEffect(target,player,player)>0) return true;
 							var card={name:'sha',nature:'thunder',isCard:true};
 							if(game.hasPlayer(function(current){
 								return current!=player&&current!=target&&target.canUse(card,current,false)&&get.effect(current,card,target,player)>0;
@@ -4139,7 +4144,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								return current!=target&&current.isFriendOf(target)&&current.isLinked();
 							}))?3:1)*(-get.attitude(target,player,player)+1);
 						},
-					}).setHiddenSkill(event.name);
+					}).setHiddenSkill('daming');
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
@@ -4178,28 +4183,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(num>0) player.draw(num);
 					'step 4'
 					if(trigger.player.isIn()){
-						var target=trigger.player,tao=(lib.filter.cardEnabled({name:'tao',isCard:true},player,'forceEnable')&&lib.filter.targetEnabled2({name:'tao',isCard:true},player,target)),sha=game.filterPlayer(function(current){
+						var target=trigger.player,sha=game.filterPlayer(function(current){
 							return current!=target&&current!=player&&target.canUse({name:'sha',nature:'thunder',isCard:true},current,false);
 						});
 						if(sha.length){
 							var next=player.chooseTarget('请选择'+get.translation(target)+'使用雷【杀】的目标',function(card,player,target){
 								return _status.event.list.contains(target);
 							});
-							if(tao){
-								next.set('prompt2','或点「取消」并视为对其使用【桃】');
-								next.set('goon',get.effect(target,{name:'tao',isCard:true},player,player));
-							}
-							else{
-								next.set('forced',true);
-								next.set('goon',0);
-							}
+							next.set('prompt2','或点「取消」令其回复1点体力');
+							next.set('goon',get.recoverEffect(target,player,player));
 							next.set('list',sha);
 							next.set('ai',function(target){
 								var player=_status.event.player;
 								return get.effect(target,{name:'sha',nature:'thunder',isCard:true},_status.event.getTrigger().player,player)-_status.event.goon;
 							});
 						}
-						else if(tao) event._result={bool:false};
+						else if(target.isDamaged()) event._result={bool:false};
 						else event.finish();
 					}
 					else event.finish();
@@ -4213,7 +4212,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						trigger.player.useCard({name:'sha',nature:'thunder',isCard:true},target,false).animate=false;
 					}
-					else player.useCard({name:'tao',isCard:true},trigger.player);
+					else{
+						player.line(trigger.player);
+						trigger.player.recover();
+					}
 				},
 			},
 			xiaoni:{
@@ -5199,6 +5201,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			gzzhuosheng:{
+				audio:'zhuosheng',
 				trigger:{global:'damageEnd'},
 				logTarget:'player',
 				filter:function(event,player){
@@ -5232,6 +5235,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(get.itemtype(card)=='card'&&card.hasGaintag('gzzhuosheng2')&&get.type(card)=='basic') return num-0.1;
 					},
 				},
+				audio:'zhuosheng',
 				trigger:{player:'useCard2'},
 				direct:true,
 				filterx:function(event,player){
@@ -5289,7 +5293,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				group:['gzzhuosheng2_equip','gzzhuosheng2_silent'],
 				subSkill:{
 					equip:{
-						audio:'gzzhuosheng2',
+						audio:'zhuosheng',
 						trigger:{player:'useCard'},
 						filter:function(event,player){
 							return get.type(event.card)=='equip'&&lib.skill.gzzhuosheng2.filterx(event,player);
@@ -8086,6 +8090,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			gzxuanhuo:{
+				audio:'rexuanhuo',
 				global:'gzxuanhuo_others',
 				derivation:['fz_new_rewusheng','fz_gzpaoxiao','fz_new_longdan','fz_new_tieji','fz_liegong','fz_xinkuanggu'],
 				ai:{
@@ -8098,6 +8103,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					others:{
+						audio:'rexuanhuo',
+						forceaudio:true,
 						enable:'phaseUse',
 						usable:1,
 						filter:function(event,player){
@@ -8293,7 +8300,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			gzenyuan:{
 				locked:true,
-				audio:['enyuan',2],
+				audio:'reenyuan',
 				group:['gzenyuan_gain','gzenyuan_damage'],
 				preHidden:true,
 				ai:{
@@ -8308,6 +8315,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					gain:{
+						audio:'reenyuan',
 						trigger:{target:'useCardToTargeted'},
 						forced:true,
 						filter:function(event,player){
@@ -8315,9 +8323,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						logTarget:'player',
 						content:function(){trigger.player.draw()},
-						audio:'enyuan1',
 					},
 					damage:{
+						audio:'reenyuan',
 						trigger:{player:'damageEnd'},
 						forced:true,
 						filter:function(event,player){
@@ -8336,7 +8344,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							else trigger.source.loseHp();
 						},
-						audio:'enyuan2',
 					},
 				}
 			},
@@ -13718,7 +13725,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzzhukou:'逐寇',
 			gzzhukou_info:'当你于一名角色的出牌阶段第一次造成伤害后，你可以摸X张牌（X为本回合你已使用的牌数且至多为5）。',
 			gzduannian:'断念',
-			gzduannian_info:'出牌阶段结束时，若你有手牌你可以弃置所有手牌，然后将手牌摸至体力上限。',
+			gzduannian_info:'出牌阶段结束时，若你有手牌，你可以弃置所有手牌，然后将手牌摸至体力上限。',
 			gzlianyou:'莲佑',
 			gzlianyou_info:'你死亡时，可以选择一名其他角色。该角色获得技能“兴火”。',
 			gzxinghuo:'兴火',
@@ -13742,7 +13749,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzfangyuan:'方圆',
 			gzfangyuan_info:'阵法技，若你在一个围攻关系中：①是围攻角色，则所有围攻角色的手牌上限+1且被围攻角色手牌上限-1；②是被围攻角色，则结束阶段开始时，你视为对一名围攻角色使用【杀】。',
 			daming:'达命',
-			daming_info:'一名己方角色A的出牌阶段开始时，你可弃置一张锦囊牌，横置一名角色并摸X张牌（X为拥有横置角色的势力数）。然后你选择一项：①视为对A使用一张【桃】；②令A视为对由你选择的另一名角色使用一张雷【杀】。',
+			daming_info:'一名己方角色A的出牌阶段开始时，你可弃置一张锦囊牌，横置一名角色并摸X张牌（X为拥有横置角色的势力数）。然后你选择一项：①令A回复1点体力；②令A视为对由你选择的另一名角色使用一张雷【杀】。',
 			xiaoni:'嚣逆',
 			xiaoni_info:'锁定技，当你使用牌时，或成为其他角色使用牌的目标后，若场上存在其他己方角色且这些角色的手牌数均不大于你，则目标角色/你不可响应此牌。',
 			gztongduo:'统度',

@@ -9729,7 +9729,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olzhiba3:{},
 			rehuashen:{
-				//mode:['identity','single','doudizhu'],
 				audio:2,
 				unique:true,
 				direct:true,
@@ -9753,7 +9752,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					event.aiChoice=skills[0];
 					var choice='更换技能';
-					if(event.aiChoice==player.storage.rehuashen.current2||get.skillRank(event.aiChoice,cond)<1) choice='弃置化身';
+					if(event.aiChoice==player.storage.rehuashen.current2||get.skillRank(event.aiChoice,cond)<1) choice='制衡化身';
 					if(player.isOnline2()){
 						player.send(function(cards,id){
 							var dialog=ui.create.dialog('是否发动【化身】？',[cards,'character']);
@@ -9766,7 +9765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.dialog.style.display='none';
 					}
 					if(event.triggername=='rehuashen') event._result={control:'更换技能'};
-					else player.chooseControl('弃置化身','更换技能','cancel2').set('ai',function(){
+					else player.chooseControl('制衡化身','更换技能','cancel2').set('ai',function(){
 						return _status.event.choice;
 					}).set('choice',choice);
 					"step 1"
@@ -9784,7 +9783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(!event.logged){player.logSkill('rehuashen');event.logged=true}
 					var next=player.chooseButton(true).set('dialog',event.videoId);
-					if(event.control=='弃置化身'){
+					if(event.control=='制衡化身'){
 						next.set('selectButton',[1,2]);
 						next.set('filterButton',function(button){
 							return button.link!=_status.event.current;
@@ -9797,7 +9796,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						next.set('choice',event.aiChoice);
 					}
-					var prompt=event.control=='弃置化身'?'选择弃置至多两张化身':'选择要切换的化身';
+					var prompt=event.control=='制衡化身'?'选择制衡至多两张化身':'选择要切换的化身';
 					var func=function(id,prompt){
 						var dialog=get.idDialog(id);
 						if(dialog){
@@ -9811,7 +9810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						func(event.videoId,prompt);
 					}
 					"step 2"
-					if(result.bool&&event.control!='弃置化身'){
+					if(result.bool&&event.control!='制衡化身'){
 						event.card=result.links[0];
 						var func=function(card,id){
 							var dialog=get.idDialog(id);
@@ -9871,22 +9870,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!_status.noclearcountdown){
 						game.stopCountChoose();
 					}
-					if(event.control=='弃置化身') return;
+					if(event.control=='制衡化身') return;
 					if(player.storage.rehuashen.current!=event.card){
 						player.storage.rehuashen.current=event.card;
-						game.broadcastAll(function(character,player){
-							player.sex=lib.character[character][0];
-							//player.group=lib.character[character][1];
-							//player.node.name.dataset.nature=get.groupnature(player.group);
-						},event.card,player);
-						player.changeGroup(lib.character[event.card][1],false);
+						game.broadcastAll(function(player,sex){
+							player.sex=sex;
+							game.log(player,'将性别变为了','#y'+get.translation(sex)+'性');
+						},player,lib.character[event.card][0]);
+						player.changeGroup(lib.character[event.card][1]);
 					}
 					var link=result.control;
 					player.storage.rehuashen.current2=link;
 					if(!player.additionalSkills.rehuashen||!player.additionalSkills.rehuashen.contains(link)){
 						player.addAdditionalSkill('rehuashen',link);
 						player.flashAvatar('rehuashen',event.card);
-						game.log(player,'获得技能','#g【'+get.translation(link)+'】');
+						game.log(player,'获得了技能','#g【'+get.translation(link)+'】');
 						player.popup(link);
 						player.syncStorage('rehuashen');
 						player.updateMarks('rehuashen');
@@ -9903,31 +9901,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:['phaseBegin','phaseEnd','rehuashen'],
 				},
 				filter:function(event,player,name){
-					//if(name=='phaseBegin'&&game.phaseNumber==1) return false;
 					return player.storage.rehuashen&&player.storage.rehuashen.character.length>0;
 				},
-				banned:['lisu','sp_xiahoudun','xushao','zhoutai','old_zhoutai'],
+				banned:['lisu','sp_xiahoudun','xushao','zhoutai','old_zhoutai','shixie'],
 				addHuashen:function(player){
 					if(!player.storage.rehuashen) return;
 					if(!_status.characterlist){
-						if(_status.connectMode) var list=get.charactersOL();
-						else{
-							var list=[];
-							for(var i in lib.character){
-								if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
-								list.push(i);
-							}
-						}
-						game.countPlayer(function(current){
-							list.remove(current.name);
-							list.remove(current.name1);
-							list.remove(current.name2);
-							if(current.storage.huashen&&current.storage.huashen.owned){
-								for(var i in current.storage.huashen.owned) list.removeArray(current.storage.huashen.owned[i]);
-							}
-							if(current.storage.rehuashen&&current.storage.rehuashen.character) list.removeArray(current.storage.rehuashen.character)
-						});
-						_status.characterlist=list;
+						lib.skill.pingjian.initList();
 					}
 					_status.characterlist.randomSort();
 					var bool=false;

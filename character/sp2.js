@@ -7917,199 +7917,216 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			pingjian:{
-				audio:2,
-				trigger:{
-					player:['damageEnd','phaseJieshuBegin'],
-				},
 				initList:function(){
 					var list=[];
-					if(_status.connectMode) var list=get.charactersOL();
+					if(_status.connectMode) list=get.charactersOL();
 					else{
 						var list=[];
 						for(var i in lib.character){
-							if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
-							list.push(i);
+							if(!lib.filter.characterDisabled2(i)&&!lib.filter.characterDisabled(i)) list.push(i);
 						}
 					}
 					game.countPlayer2(function(current){
 						list.remove(current.name);
 						list.remove(current.name1);
 						list.remove(current.name2);
-						if(current.storage.rehuashen&&current.storage.rehuashen.character) list.removeArray(current.storage.rehuashen.character)
 					});
 					_status.characterlist=list;
 				},
+				init:function(player){
+					player.addSkill('pingjian_check');
+					if(!player.storage.pingjian_check) player.storage.pingjian_check={};
+				},
+				onremove:function(player){
+					player.removeSkill('pingjian_check');
+				},
+				audio:2,
+				trigger:{player:['damageEnd','phaseJieshuBegin']},
 				frequent:true,
 				content:function(){
 					'step 0'
-					if(!player.storage.pingjian) player.storage.pingjian=[];
-					event._result={bool:true};
-					'step 1'
-					if(result.bool){
-						if(!_status.characterlist){
-							lib.skill.pingjian.initList();
-						}
-						var list=[];
-						var skills=[];
-						var map=[];
-						_status.characterlist.randomSort();
-						var name2=event.triggername;
-						for(var i=0;i<_status.characterlist.length;i++){
-							var name=_status.characterlist[i];
-							if(name.indexOf('zuoci')!=-1||name.indexOf('xushao')!=-1) continue;
-							var skills2=lib.character[name][3];
-							for(var j=0;j<skills2.length;j++){
-								if(player.storage.pingjian.contains(skills2[j])) continue;
-								if(skills.contains(skills2[j])){
+					if(!_status.characterlist){
+						lib.skill.pingjian.initList();
+					}
+					var allList=_status.characterlist.slice(0);
+					game.countPlayer(function(current){
+						allList.add(current.name);
+						allList.add(current.name1);
+						allList.add(current.name2);
+					});
+					var list=[];
+					var skills=[];
+					var map=[];
+					allList.randomSort();
+					var name2=event.triggername;
+					for(var i=0;i<allList.length;i++){
+						var name=allList[i];
+						if(name.indexOf('zuoci')!=-1||name.indexOf('xushao')!=-1) continue;
+						var skills2=lib.character[name][3];
+						for(var j=0;j<skills2.length;j++){
+							if(player.getStorage('pingjian').contains(skills2[j])) continue;
+							if(skills.contains(skills2[j])){
+								list.add(name);
+								if(!map[name]) map[name]=[];
+								map[name].push(skills2[j]);
+								skills.add(skills2[j]);
+								continue;
+							}
+							var list2=[skills2[j]];
+							game.expandSkills(list2);
+							for(var k=0;k<list2.length;k++){
+								var info=lib.skill[list2[k]];
+								if(!info||!info.trigger||!info.trigger.player||info.silent||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
+								if(info.trigger.player==name2||Array.isArray(info.trigger.player)&&info.trigger.player.contains(name2)){
+									if(info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
+									if(info.init) info.init(player,list2[k]);
+									if(info.filter){
+										try{
+											var bool=info.filter(trigger,player,name2);
+											if(!bool) continue;
+										}
+										catch(e){
+											continue;
+										}
+									}
 									list.add(name);
 									if(!map[name]) map[name]=[];
 									map[name].push(skills2[j]);
 									skills.add(skills2[j]);
-									continue;
-								}
-								var list2=[skills2[j]];
-								game.expandSkills(list2);
-								for(var k=0;k<list2.length;k++){
-									var info=lib.skill[list2[k]];
-									if(!info||!info.trigger||!info.trigger.player||info.silent||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
-									if(info.trigger.player==name2||Array.isArray(info.trigger.player)&&info.trigger.player.contains(name2)){
-										if(info.init||info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
-										if(info.filter){
-											try{
-												var bool=info.filter(trigger,player,name2);
-												if(!bool) continue;
-											}
-											catch(e){
-												continue;
-											}
-										}
-										list.add(name);
-										if(!map[name]) map[name]=[];
-										map[name].push(skills2[j]);
-										skills.add(skills2[j]);
-										break;
-									}
+									break;
 								}
 							}
-							if(list.length>2) break;
 						}
-						if(!skills.length){
-							//player.draw();
-							event.finish();
-						}
-						else{
-							//skills.unshift('摸一张牌');
-							player.chooseControl(skills).set('dialog',['请选择要发动的技能',[list,'character']]).set('ai',function(){return 0});
-						}
+						if(list.length>2) break;
 					}
+					if(skills.length) player.chooseControl(skills).set('dialog',['评鉴：请选择尝试发动的技能',[list,'character']]);
 					else event.finish();
-					'step 2'
-					if(result.control=='摸一张牌'){
-						player.draw();
-						return;
+					'step 1'
+					player.markAuto('pingjian',[result.control]);
+					player.addTempSkill(result.control);
+					player.storage.pingjian_check[result.control]=(trigger.name=='damage'?trigger:'phaseJieshu');
+					if(trigger.name=='damage'){
+						var info=lib.translate[result.control+'_info'];
+						if(info&&info.indexOf('1点伤害')+info.indexOf('一点伤害')!=-2) trigger.num=1;//暂时想到的让多点伤害只执行一次的拙见
 					}
-					player.storage.pingjian.add(result.control);
-					player.addTempSkill(result.control,event.triggername=='damageEnd'?'damageAfter':'phaseJieshu');
 				},
 				group:'pingjian_use',
-				phaseUse_special:['xinfu_lingren'],
+				phaseUse_special:[],
+				ai:{threaten:5},
 			},
 			pingjian_use:{
 				audio:'pingjian',
 				enable:'phaseUse',
 				usable:1,
-				position:'he',
+				prompt:()=>lib.translate.pingjian_info,
 				content:function(){
 					'step 0'
-					if(!player.storage.pingjian) player.storage.pingjian=[];
-					event._result={bool:true};
-					'step 1'
-					if(result.bool){
-						var list=[];
-						var skills=[];
-						var map=[];
-						if(!_status.characterlist){
-							lib.skill.pingjian.initList();
-						}
-						_status.characterlist.randomSort();
-						for(var i=0;i<_status.characterlist.length;i++){
-							var name=_status.characterlist[i];
-							if(name.indexOf('zuoci')!=-1||name.indexOf('xushao')!=-1) continue;
-							var skills2=lib.character[name][3];
-							for(var j=0;j<skills2.length;j++){
-								if(player.storage.pingjian.contains(skills2[j])) continue;
-								if(skills.contains(skills2[j])||lib.skill.pingjian.phaseUse_special.contains(skills2[j])){
+					var list=[];
+					var skills=[];
+					var map=[];
+					if(!_status.characterlist){
+						lib.skill.pingjian.initList();
+					}
+					var allList=_status.characterlist.slice(0);
+					game.countPlayer(function(current){
+						allList.add(current.name);
+						allList.add(current.name1);
+						allList.add(current.name2);
+					});
+					allList.randomSort();
+					for(var i=0;i<allList.length;i++){
+						var name=allList[i];
+						if(name.indexOf('zuoci')!=-1||name.indexOf('xushao')!=-1) continue;
+						var skills2=lib.character[name][3];
+						for(var j=0;j<skills2.length;j++){
+							if(player.getStorage('pingjian').contains(skills2[j])) continue;
+							var info=lib.translate[skills2[j]+'_info'];
+							if(skills.contains(skills2[j])||(info&&info.indexOf('当你于出牌阶段')!=-1)){
+								list.add(name);
+								if(!map[name]) map[name]=[];
+								map[name].push(skills2[j]);
+								skills.add(skills2[j]);
+								continue;
+							}
+							var list2=[skills2[j]];
+							game.expandSkills(list2);
+							for(var k=0;k<list2.length;k++){
+								var info=lib.skill[list2[k]];
+								if(!info||!info.enable||info.charlotte||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
+								if((info.enable=='phaseUse'||(Array.isArray(info.enable)&&info.enable.contains('phaseUse')))||(info.enable=='chooseToUse'||(Array.isArray(info.enable)&&info.enable.contains('chooseToUse')))){
+									if(info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
+									var evt=event.getParent(2);
+									if(info.init) info.init(player,list2[k]);
+									if(info.onChooseToUse) info.onChooseToUse(evt);
+									if(info.filter){
+										try{
+											var bool=info.filter(evt,player);
+											if(!bool) continue;
+										}
+										catch(e){
+											continue;
+										}
+									}
+									if(info.viewAs&&typeof info.viewAs!='function'){
+										if(evt.filterCard&&!evt.filterCard(info.viewAs,player,evt)) continue;
+										if(info.viewAsFilter&&info.viewAsFilter(player)==false) continue;
+									}
 									list.add(name);
 									if(!map[name]) map[name]=[];
 									map[name].push(skills2[j]);
 									skills.add(skills2[j]);
-									continue;
-								}
-								var list2=[skills2[j]];
-								game.expandSkills(list2);
-								for(var k=0;k<list2.length;k++){
-									var info=lib.skill[list2[k]];
-									if(!info||!info.enable||info.viewAs||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
-									if(info.enable=='phaseUse'||Array.isArray(info.enable)&&info.enable.contains('phaseUse')){
-										if(info.init||info.onChooseToUse||info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
-										if(info.filter){
-											try{
-												var bool=info.filter(event.getParent(2),player);
-												if(!bool) continue;
-											}
-											catch(e){
-												continue;
-											}
-										}
-										list.add(name);
-										if(!map[name]) map[name]=[];
-										map[name].push(skills2[j]);
-										skills.add(skills2[j]);
-										break;
-									}
+									break;
 								}
 							}
-							if(list.length>2) break;
 						}
-						if(!skills.length){
-							//player.draw();
-							event.finish();
-						}
-						else{
-							//skills.unshift('摸一张牌');
-							player.chooseControl(skills).set('dialog',['请选择要发动的技能',[list,'character']]).set('ai',function(){return 0});
-						}
+						if(list.length>2) break;
 					}
+					if(skills.length) player.chooseControl(skills).set('dialog',['评鉴：请选择尝试发动的技能',[list,'character']]);
 					else event.finish();
-					'step 2'
-					if(result.control=='摸一张牌'){
-						player.draw();
-						return;
-					}
-					player.storage.pingjian.add(result.control);
-					player.addTempSkill(result.control,'phaseUseEnd');
-					player.addTempSkill('pingjian_temp','phaseUseEnd');
-					player.storage.pingjian_temp=result.control;
-					//event.getParent(2).goto(0);
+					'step 1'
+					player.markAuto('pingjian',[result.control]);
+					player.addTempSkill(result.control);
+					player.storage.pingjian_check[result.control]='phaseUse';
 				},
-				ai:{order:10,result:{player:1}},
+				ai:{order:12,result:{player:1}},
 			},
-			pingjian_temp:{
-				onremove:true,
-				trigger:{player:['useSkillBegin','useCard1']},
-				silent:true,
-				firstDo:true,
+			pingjian_check:{
+				charlotte:true,
+				trigger:{player:['useSkill','logSkillBegin']},
 				filter:function(event,player){
-					var info=lib.skill[event.skill];
-					if(!info) return false;
-					if(event.skill==player.storage.pingjian_temp) return true;
-					if(info.sourceSkill==player.storage.pingjian_temp||info.group==player.storage.pingjian_temp) return true;
-					if(Array.isArray(info.group)&&info.group.contains(player.storage.pingjian_temp)) return true;
-					return false;
+					if(get.info(event.skill).charlotte) return false;
+					var skill=event.sourceSkill||event.skill;
+					return player.storage.pingjian_check[skill];
 				},
+				direct:true,
+				firstDo:true,
+				priority:Infinity,
 				content:function(){
-					player.removeSkill(player.storage.pingjian_temp);
-					player.removeSkill('pingjian_temp');
+					var skill=trigger.sourceSkill||trigger.skill;
+					player.removeSkill(skill);
+					delete player.storage.pingjian_check[skill];
+				},
+				group:'pingjian_check2',
+			},
+			pingjian_check2:{
+				charlotte:true,
+				trigger:{player:['phaseUseEnd','damageEnd','phaseJieshuBegin']},
+				filter:function(event,player){
+					return Object.keys(player.storage.pingjian_check).find(function(skill){
+						if(event.name!='damage') return player.storage.pingjian_check[skill]==event.name;
+						return player.storage.pingjian_check[skill]==event;
+					});
+				},
+				direct:true,
+				lastDo:true,
+				priority:-Infinity,
+				content:function(){
+					var skills=Object.keys(player.storage.pingjian_check).filter(function(skill){
+						if(trigger.name!='damage') return player.storage.pingjian_check[skill]==trigger.name;
+						return player.storage.pingjian_check[skill]==trigger;
+					});
+					player.removeSkill(skills);
+					for(var skill of skills) delete player.storage.pingjian_check[skill];
 				},
 			},
 			//上兵伐谋
@@ -10122,8 +10139,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xugong:"许贡",
 			zhangchangpu:"张昌蒲",
 			pingjian:'评荐',
-			pingjian_info:'结束阶段开始时/当你受到伤害后/出牌阶段限一次，你可以令系统随机从剩余武将牌堆中检索出三张拥有发动时机为结束阶段开始时/当你受到伤害后/出牌阶段的技能的武将牌。然后你可以选择尝试发动其中一个技能。每个技能每局只能选择一次。',
 			pingjian_use:'评荐',
+			pingjian_info:'结束阶段开始时/当你受到伤害后/出牌阶段限一次，你可以令系统随机检索出三张拥有发动时机为结束阶段开始时/当你受到伤害后/出牌阶段的技能的武将牌。然后你可以选择尝试发动其中一个技能。每个技能每局游戏只能选择一次。',
 			
 			songshu:'颂蜀',
 			songshu_info:'出牌阶段，你可以和其他角色拼点。若你没赢，你与其各摸两张牌，且你本阶段内不能再发动〖颂蜀〗。',
