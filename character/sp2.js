@@ -7979,7 +7979,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!info||!info.trigger||!info.trigger.player||info.silent||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
 								if(info.trigger.player==name2||Array.isArray(info.trigger.player)&&info.trigger.player.contains(name2)){
 									if(info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
-									if(info.init) info.init(player,list2[k]);
+									if(info.init) continue;
 									if(info.filter){
 										try{
 											var bool=info.filter(trigger,player,name2);
@@ -8024,6 +8024,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					var skills=[];
 					var map=[];
+					var evt=event.getParent(2);
 					if(!_status.characterlist){
 						lib.skill.pingjian.initList();
 					}
@@ -8055,9 +8056,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!info||!info.enable||info.charlotte||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
 								if((info.enable=='phaseUse'||(Array.isArray(info.enable)&&info.enable.contains('phaseUse')))||(info.enable=='chooseToUse'||(Array.isArray(info.enable)&&info.enable.contains('chooseToUse')))){
 									if(info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
-									var evt=event.getParent(2);
-									if(info.init) info.init(player,list2[k]);
-									if(info.onChooseToUse) info.onChooseToUse(evt);
+									if(info.init||info.onChooseToUse) continue;
 									if(info.filter){
 										try{
 											var bool=info.filter(evt,player);
@@ -8067,9 +8066,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											continue;
 										}
 									}
-									if(info.viewAs&&typeof info.viewAs!='function'){
-										if(evt.filterCard&&!evt.filterCard(info.viewAs,player,evt)) continue;
-										if(info.viewAsFilter&&info.viewAsFilter(player)==false) continue;
+									else if(info.viewAs&&typeof info.viewAs!='function'){
+										try{
+											if(evt.filterCard&&!evt.filterCard(info.viewAs,player,evt)) continue;
+											if(info.viewAsFilter&&info.viewAsFilter(player)==false) continue;
+										}
+										catch(e){
+											continue;
+										}
 									}
 									list.add(name);
 									if(!map[name]) map[name]=[];

@@ -9752,7 +9752,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					event.aiChoice=skills[0];
 					var choice='更换技能';
-					if(event.aiChoice==player.storage.rehuashen.current2||get.skillRank(event.aiChoice,cond)<1) choice='制衡化身';
+					if(event.aiChoice==player.storage.rehuashen.current2||get.skillRank(event.aiChoice,cond)<1) choice='弃置化身';
 					if(player.isOnline2()){
 						player.send(function(cards,id){
 							var dialog=ui.create.dialog('是否发动【化身】？',[cards,'character']);
@@ -9765,7 +9765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.dialog.style.display='none';
 					}
 					if(event.triggername=='rehuashen') event._result={control:'更换技能'};
-					else player.chooseControl('制衡化身','更换技能','cancel2').set('ai',function(){
+					else player.chooseControl('弃置化身','更换技能','cancel2').set('ai',function(){
 						return _status.event.choice;
 					}).set('choice',choice);
 					"step 1"
@@ -9783,7 +9783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(!event.logged){player.logSkill('rehuashen');event.logged=true}
 					var next=player.chooseButton(true).set('dialog',event.videoId);
-					if(event.control=='制衡化身'){
+					if(event.control=='弃置化身'){
 						next.set('selectButton',[1,2]);
 						next.set('filterButton',function(button){
 							return button.link!=_status.event.current;
@@ -9796,7 +9796,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						next.set('choice',event.aiChoice);
 					}
-					var prompt=event.control=='制衡化身'?'选择制衡至多两张化身':'选择要切换的化身';
+					var prompt=event.control=='弃置化身'?'选择制衡至多两张化身':'选择要切换的化身';
 					var func=function(id,prompt){
 						var dialog=get.idDialog(id);
 						if(dialog){
@@ -9810,7 +9810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						func(event.videoId,prompt);
 					}
 					"step 2"
-					if(result.bool&&event.control!='制衡化身'){
+					if(result.bool&&event.control!='弃置化身'){
 						event.card=result.links[0];
 						var func=function(card,id){
 							var dialog=get.idDialog(id);
@@ -9858,7 +9858,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else if(event.isMine()){
 							func(event.videoId);
 						}
-						event._result={control:'更换化身'};
+						event._result={control:'弃置化身'};
 						event.goto(1);
 						return;
 					}
@@ -9870,13 +9870,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!_status.noclearcountdown){
 						game.stopCountChoose();
 					}
-					if(event.control=='制衡化身') return;
+					if(event.control=='弃置化身') return;
 					if(player.storage.rehuashen.current!=event.card){
 						player.storage.rehuashen.current=event.card;
 						game.broadcastAll(function(player,sex){
 							player.sex=sex;
-							game.log(player,'将性别变为了','#y'+get.translation(sex)+'性');
 						},player,lib.character[event.card][0]);
+						game.log(player,'将性别变为了','#y'+get.translation(lib.character[event.card][0])+'性');
 						player.changeGroup(lib.character[event.card][1]);
 					}
 					var link=result.control;

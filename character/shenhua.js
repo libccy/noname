@@ -4478,7 +4478,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.markSkill('huashen');
 							game.broadcastAll(function(character,player){
 								player.sex=lib.character[character][0];
-								game.log(player,'将性别变为了','#y'+get.translation(lib.character[character][0])+'性');
 								//player.group=lib.character[character][1];
 								//player.node.name.dataset.nature=get.groupnature(player.group);
 								var mark=player.marks.huashen;
@@ -4498,6 +4497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									},200);
 								}
 							},character,player);
+							game.log(player,'将性别变为了','#y'+get.translation(lib.character[character][0])+'性');
 							player.changeGroup(lib.character[character][1]);
 						}
 						player.storage.huashen.current2=skill;
