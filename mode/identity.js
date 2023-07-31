@@ -523,13 +523,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var loser=[];
 					var ye=game.filterPlayer(function(current){
 						return ['rYe','bYe'].contains(current.identity);
-					});
+					},null,true);
 					var red=game.filterPlayer(function(current){
 						return ['rZhu','rZhong','bNei'].contains(current.identity);
-					});
+					},null,true);
 					var blue=game.filterPlayer(function(current){
 						return ['bZhu','bZhong','rNei'].contains(current.identity);
-					})
+					},null,true)
 					game.countPlayer2(function(current){
 						switch(current.identity){
 							case 'rZhu':
@@ -553,7 +553,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								else if(game.rZhu.isDead()&&game.bZhu.isDead()) loser.push(current);
 								break;
 						}
-					});
+					},true);
 					var winner2=winner.slice(0);
 					var loser2=loser.slice(0);
 					for(var i=0;i<winner.length;i++){

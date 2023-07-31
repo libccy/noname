@@ -465,7 +465,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(this==game.boss||!game.hasPlayer(function(current){
 						return !current.side;
-					})){
+					},true)){
 						game.checkResult();
 					}
 				},

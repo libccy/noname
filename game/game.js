@@ -27295,7 +27295,7 @@
 						}
 					}
 					if(!start) return;
-					if(!game.players.contains(start)){
+					if(!game.players.contains(start)&&!game.dead.contains(start)){
 						start=game.findNext(start);
 					}
 					var list=[];
@@ -38173,28 +38173,28 @@
 				}
 			}
 		},
-		hasPlayer:function(func){
+		hasPlayer:function(func,includeOut){
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].isOut()) continue;
+				if(!includeOut&&game.players[i].isOut()) continue;
 				if(func(game.players[i])) return true;
 			}
 			return false;
 		},
-		hasPlayer2:function(func){
+		hasPlayer2:function(func,includeOut){
 			var players=game.players.slice(0).concat(game.dead);
 			for(var i=0;i<players.length;i++){
-				if(players[i].isOut()) continue;
+				if(!includeOut&&players[i].isOut()) continue;
 				if(func(players[i])) return true;
 			}
 			return false;
 		},
-		countPlayer:function(func){
+		countPlayer:function(func,includeOut){
 			var num=0;
 			if(typeof func!='function'){
 				func=lib.filter.all;
 			}
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].isOut()) continue;
+				if(!includeOut&&game.players[i].isOut()) continue;
 				var result=func(game.players[i]);
 				if(typeof result=='number'){
 					num+=result;
@@ -38205,14 +38205,14 @@
 			}
 			return num;
 		},
-		countPlayer2:function(func){
+		countPlayer2:function(func,includeOut){
 			var num=0;
 			if(typeof func!='function'){
 				func=lib.filter.all;
 			}
 			var players=game.players.slice(0).concat(game.dead);
 			for(var i=0;i<players.length;i++){
-				if(players[i].isOut()) continue;
+				if(!includeOut&&players[i].isOut()) continue;
 				var result=func(players[i]);
 				if(typeof result=='number'){
 					num+=result;
@@ -38223,7 +38223,7 @@
 			}
 			return num;
 		},
-		filterPlayer:function(func,list){
+		filterPlayer:function(func,list,includeOut){
 			if(!Array.isArray(list)){
 				list=[];
 			}
@@ -38231,14 +38231,14 @@
 				func=lib.filter.all;
 			}
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].isOut()) continue;
+				if(!includeOut&&game.players[i].isOut()) continue;
 				if(func(game.players[i])){
 					list.add(game.players[i]);
 				}
 			}
 			return list;
 		},
-		filterPlayer2:function(func,list){
+		filterPlayer2:function(func,list,includeOut){
 			if(!Array.isArray(list)){
 				list=[];
 			}
@@ -38247,26 +38247,26 @@
 			}
 			var players=game.players.slice(0).concat(game.dead);
 			for(var i=0;i<players.length;i++){
-				if(players[i].isOut()) continue;
+				if(!includeOut&&players[i].isOut()) continue;
 				if(func(players[i])){
 					list.add(players[i]);
 				}
 			}
 			return list;
 		},
-		findPlayer:function(func){
+		findPlayer:function(func,includeOut){
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].isOut()) continue;
+				if(!includeOut&&game.players[i].isOut()) continue;
 				if(func(game.players[i])){
 					return game.players[i];
 				}
 			}
 			return null;
 		},
-		findPlayer2:function(func){
+		findPlayer2:function(func,includeOut){
 			var players=game.players.slice(0).concat(game.dead);
 			for(var i=0;i<players.length;i++){
-				if(players[i].isOut()) continue;
+				if(!includeOut&&players[i].isOut()) continue;
 				if(func(players[i])){
 					return players[i];
 				}
