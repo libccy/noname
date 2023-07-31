@@ -1838,7 +1838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.gain(result.links,'gain2');
 					}
 					'step 4'
-					if(event.num>0){
+					if(event.num>0&&player.hasSkill('jsrgrangjie')){
 						player.chooseBool(get.prompt2('jsrgrangjie')).set('ai',()=>_status.event.bool).set('bool',lib.skill.jsrgrangjie.check(trigger,player));
 					}
 					else event.finish();
@@ -6840,7 +6840,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 4'
 					if(cards.length) player.gain(cards,'gain2','log');
 					'step 5'
-					if(event.count>0){
+					if(event.count>0&&player.hasSkill('spyinzhi')){
 					 player.chooseBool(get.prompt2('spyinzhi')).set('frequentSkill','spyinzhi');
 					}
 					else event.finish();
@@ -8007,7 +8007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return player.hasSkill('fenyong2')&&event.player.isAlive();
+					return player.hasSkill('fenyong2')&&event.player.isIn();
 				},
 				content:function(){
 					'step 0'
@@ -8476,7 +8476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 3'
-					if(player.storage.zhaolie.isAlive()){
+					if(player.storage.zhaolie.isIn()){
 						player.storage.zhaolie.gain(event.basic,'gain2','log');
 					}
 					else{

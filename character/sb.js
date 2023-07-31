@@ -2043,7 +2043,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						popup:false,
 						filter:function(event,player){
-							return event.card.storage&&event.card.storage.sbpaoxiao&&event.target.isAlive();
+							return event.card.storage&&event.card.storage.sbpaoxiao&&event.target.isIn();
 						},
 						content:function(){
 							trigger.target.addTempSkill('fengyin');
@@ -2055,7 +2055,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{source:'damageSource'},
 						forced:true,
 						filter:function(event,player){
-							return event.card&&event.card.storage&&event.card.storage.sbpaoxiao&&event.player.isAlive();
+							return event.card&&event.card.storage&&event.card.storage.sbpaoxiao&&event.player.isIn();
 						},
 						content:function(){
 							'step 0'

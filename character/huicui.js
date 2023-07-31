@@ -5585,7 +5585,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(storage.contains(target)){
 								storage.remove(target);
 								target.removeSkill('dcjiezhen_blocker');
-								if(target.isAlive()&&target.countGainableCards(player,'hej')>0) player.gainPlayerCard(target,'hej',true);
+								if(target.isIn()&&target.countGainableCards(player,'hej')>0) player.gainPlayerCard(target,'hej',true);
 							}
 							if(targets.length>0){
 								event.redo();
@@ -6198,7 +6198,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.finish();
 						if(cards.length) player.loseToDiscardpile(cards);
-						if(target.isAlive()&&!target.hasHistory('damage',function(evt){
+						if(target.isIn()&&!target.hasHistory('damage',function(evt){
 							return evt.getParent('lieyi')==event&&evt._dyinged;
 						})) player.loseHp();
 					}
@@ -7268,7 +7268,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				logTarget:'player',
 				filter:function(event,player){
-					if(!event.player.isAlive()) return false;
+					if(!event.player.isIn()) return false;
 					var num=player.countCards('h');
 					if(num>=5) return false;
 					var num2=0;
@@ -8759,7 +8759,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:"phaseUseBegin",
 				},
 				filter:function(event,player){
-					return event.player!=player&&event.player.isAlive()&&event.player.inRange(player)&&player.countCards('he')>0;
+					return event.player!=player&&event.player.isIn()&&event.player.inRange(player)&&player.countCards('he')>0;
 				},
 				direct:true,
 				derivation:["rezhixi"],
@@ -9525,7 +9525,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						popup:false,
 						filter:function(event,player){
-							return event.card&&event.card.cxliushi==true&&event.player.isAlive()&&event.getParent(3).name=='cxliushi';
+							return event.card&&event.card.cxliushi==true&&event.player.isIn()&&event.getParent(3).name=='cxliushi';
 						},
 						content:function(){
 							trigger.player.addMark('cxliushi2',1);

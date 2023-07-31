@@ -410,7 +410,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin4'},
 				usable:1,
 				filter:function(event,player){
-					return event.source&&event.source.isAlive();
+					return event.source&&event.source.isIn();
 				},
 				logTarget:'source',
 				check:function(event,player){
@@ -423,7 +423,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card=get.cardPile2(function(card){
 						return get.type(card,null,false)=='equip';
 					}),source=trigger.source;
-					if(card&&source&&source.isAlive()) source.gain(card,'gain2');
+					if(card&&source&&source.isIn()) source.gain(card,'gain2');
 				},
 				ai:{
 					filterDamage:true,
@@ -1139,7 +1139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.give(cards,targets[0]);
 					'step 1'
-					if(!targets[0].isAlive()||!targets[1].isAlive()){
+					if(!targets[0].isIn()||!targets[1].isIn()){
 						event.finish();
 						return;
 					}

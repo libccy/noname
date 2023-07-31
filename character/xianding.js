@@ -8646,7 +8646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card) player.chooseUseTarget(card,true).nopopup=true;
 						'step 2'
 						event.num++;
-						if(event.num<=5&&target.isAlive()&&player.countCards('e')<target.countCards('e')) event.goto(1);
+						if(event.num<=5&&target.isIn()&&player.countCards('e')<target.countCards('e')) event.goto(1);
 					},
 					ai:{
 						order:10,
@@ -8721,7 +8721,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player,name){
 					var num=(name=='damageSource'?0:1);
 					var logTarget=(name=='damageSource'?event.source:event.player);
-					return logTarget&&logTarget.isAlive()&&player.storage.rezhongjian2[num].contains(logTarget);
+					return logTarget&&logTarget.isIn()&&player.storage.rezhongjian2[num].contains(logTarget);
 				},
 				logTarget:function(event,player,name){
 					return (name=='damageSource'?event.source:event.player);
@@ -10134,7 +10134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return event.player!=player&&event.player.isAlive()&&_status.currentPhase!=player;
+					return event.player!=player&&event.player.isIn()&&_status.currentPhase!=player;
 				},
 				content:function(){
 					player.storage.gxlianhua[player.getFriends().contains(trigger.player)?'red':'black']++;

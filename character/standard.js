@@ -623,9 +623,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						giver:player,
 						animate:'draw',
 					}).setContent('gaincardMultiple');
-					if(event.count<=0) event.finish();
 					'step 6'
-					player.chooseBool(get.prompt2(event.name)).set('frequentSkill',event.name);
+					if(event.count>0&&player.hasSkill(event.name)){
+						player.chooseBool(get.prompt2(event.name)).set('frequentSkill',event.name);
+					}
+					else event.finish();
 					'step 7'
 					if(result.bool){
 						player.logSkill(event.name);

@@ -4086,7 +4086,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.storage.shouxi) player.storage.shouxi=[];
 				},
 				filter:function(event,player){
-					return event.card.name=='sha'&&event.player.isAlive();
+					return event.card.name=='sha'&&event.player.isIn();
 				},
 				content:function(){
 					'step 0'
@@ -4330,7 +4330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.useCard(card,trigger.player,false);
 					}
 					'step 2'
-					if(event.total>0&&!event.washed&&ui.cardPile.childElementCount<=player.hp*10&&trigger.player.isAlive()) event.goto(1);
+					if(event.total>0&&!event.washed&&ui.cardPile.childElementCount<=player.hp*10&&trigger.player.isIn()) event.goto(1);
 					'step 3'
 					lib.onwash.remove(lib.skill.fuzhu.onWash);
 					var cards=get.cards(ui.cardPile.childElementCount+1);
@@ -4961,7 +4961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:false,
 						content:function(){
 							"step 0"
-							if(player.storage.xinsidi4.isAlive()&&!player.getHistory('useCard',function(evt){
+							if(player.storage.xinsidi4.isIn()&&!player.getHistory('useCard',function(evt){
 								return evt.card.name=='sha';
 							}).length&&player.storage.xinsidi4.canUse({name:'sha',isCard:true},player,false)){
 								player.storage.xinsidi4.logSkill('xinsidi',player);
@@ -5915,7 +5915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(storage.length){
 								for(var i=0;i<storage[0].length;i++){
 									var target=storage[0][i],num=storage[1][i];
-									if(target&&target.isAlive()){
+									if(target&&target.isIn()){
 										player.line(target);
 										target.draw(num);
 									}
@@ -6540,7 +6540,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					return player.storage.xinxianzhen&&player.storage.xinxianzhen.isAlive()&&
+					return player.storage.xinxianzhen&&player.storage.xinxianzhen.isIn()&&
 					(event.card.name=='sha'||get.type(event.card)=='trick')&&
 					event.targets&&event.targets.length==1&&!event.targets.contains(player.storage.xinxianzhen);
 				},
@@ -6672,7 +6672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.forceDie=true;
 					trigger.after.push(next);
 					next.setContent(function(){
-						if(player.isAlive()&&player.getHistory('sourceDamage',function(evt){
+						if(player.isIn()&&player.getHistory('sourceDamage',function(evt){
 							return evt.getParent(2)==event.parent;
 						}).length>0) player.loseHp();
 						delete card.nature;
@@ -7562,7 +7562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 5'
-					if(player.isAlive()&&event.targets.length){
+					if(player.isIn()&&event.targets.length){
 						player.gainPlayerCard(event.targets.shift(),'he',true);
 					}
 					else event.finish();
@@ -7757,7 +7757,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 4'
-					if(target.isAlive()&&target.countCards('h')&&target.countCards('h')>target.hp) target.chooseCard('he',true,'将一张牌置于牌堆顶');
+					if(target.isIn()&&target.countCards('h')&&target.countCards('h')>target.hp) target.chooseCard('he',true,'将一张牌置于牌堆顶');
 					else event.goto(3);
 					'step 5'
 					if(result&&result.cards){
@@ -9156,7 +9156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					return event.player!=player&&event.player.countCards('h')==player.countCards('h')&&event.player.isAlive();
+					return event.player!=player&&event.player.countCards('h')==player.countCards('h')&&event.player.isIn();
 				},
 				check:function(event,player){
 					return get.attitude(player,event.player)>=0;
@@ -9537,7 +9537,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.current=event.players.shift();
 						event.current.animate('target');
 						player.line(event.current,'green');
-						if(event.current.countCards('he')&&target.isAlive()){
+						if(event.current.countCards('he')&&target.isIn()){
 							event.current.chooseToDiscard({subtype:'equip1'},'he','弃置一张武器牌或让'+
 							get.translation(target)+'摸一张牌').set('ai',function(card){
 								if(get.attitude(_status.event.player,_status.event.target)<0) return 7-get.value(card);
@@ -10621,7 +10621,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('quanji');
 					}
 					"step 4"
-					if(event.count>0){
+					if(event.count>0&&player.hasSkill('quanji')){
 						player.chooseBool(get.prompt2('quanji')).set('frequentSkill','quanji');
 					}
 					else event.finish();
@@ -10820,7 +10820,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseEnd'},
 				filter:function(event,player){
-					if(event.player==player||!event.player.isAlive()) return false;
+					if(event.player==player||!event.player.isIn()) return false;
 					var history=event.player.getHistory('useCard');
 					for(var i=0;i<history.length;i++){
 						if(!history[i].targets) continue;
@@ -12487,8 +12487,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				filter:function(event,player){
-					return event.source&&event.source!=player&&event.num>0&&event.source.isAlive();
+					return event.source&&event.source!=player&&event.num>0&&event.source.isIn();
 				},
+				logTarget:'source',
 				content:function(){
 					"step 0"
 					event.num=trigger.num;
@@ -12506,7 +12507,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						trigger.source.loseHp();
 					}
-					if(event.num>1){
+					if(event.num>1&&player.hasSkill('xinenyuan')&&trigger.source&&trigger.source.isIn()){
+						player.logSkill('xinenyuan',trigger.source)
 						event.num--;
 						event.goto(1);
 					}
@@ -12527,7 +12529,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				trigger:{player:'gainEnd'},
 				filter:function(event,player){
-					return event.source&&event.source.isAlive()&&event.source!=player&&event.cards.length>=2;
+					return event.source&&event.source.isIn()&&event.source!=player&&event.cards.length>=2;
 				},
 				logTarget:'source',
 				check:function(event,player){
@@ -12781,7 +12783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event){
 					if(event._notrigger.contains(event.player)) return false;
-					return event.card&&event.card.name=='sha'&&event.player.isAlive();
+					return event.card&&event.card.name=='sha'&&event.player.isIn();
 				},
 				logTarget:'player',
 				content:function(){

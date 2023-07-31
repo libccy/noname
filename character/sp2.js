@@ -3393,7 +3393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				forceDie:true,
 				filter:function(event,player){
-					return player.isDamaged()&&(event.name=='die'||player.isAlive());
+					return player.isDamaged()&&(event.name=='die'||player.isIn());
 				},
 				skillAnimation:true,
 				animationColor:'gray',
@@ -4313,7 +4313,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.addIndex=0;
 					if(trigger.cards.filterInD().length>0) list.push('获得'+get.translation(trigger.cards.filterInD()));
 					else event.addIndex++;
-					if(trigger.player.isAlive()) list.push('令'+get.translation(trigger.player)+'本回合不能使用或打出【杀】');
+					if(trigger.player.isIn()) list.push('令'+get.translation(trigger.player)+'本回合不能使用或打出【杀】');
 					player.chooseControl('cancel2').set('choiceList',list).set('prompt',get.prompt('redaoji',trigger.player)).set('ai',function(){
 						var evt=_status.event.getParent(),player=evt.player,evt2=evt._trigger;
 						if(evt.addIndex==0){
@@ -5199,7 +5199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var target=event.player,source=event.source;
 					if(player!=source&&!player.hasSkill('yangzhong')) return false;
-					if(!target||!source||!target.isAlive()||!source.isAlive()) return false;
+					if(!target||!source||!target.isIn()||!source.isIn()) return false;
 					return source.countCards('he')>1;
 				},
 				content:function(){
@@ -5355,7 +5355,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.addTempSkill('weipo3',{player:'phaseBegin'});
-					if(player.countCards('h')&&trigger.player.isAlive()){
+					if(player.countCards('h')&&trigger.player.isIn()){
 						player.chooseCard('h',true,'将一张手牌交给'+get.translation(trigger.player));
 					}
 					else event.finish();
@@ -5768,12 +5768,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'damageSource'},
 				forced:true,
 				filter:function(event,player){
-					return event.source&&event.source.isAlive()&&!player.hasSkill('xianshuai2');
+					return event.source&&event.source.isIn()&&!player.hasSkill('xianshuai2');
 				},
 				content:function(){
 					player.addTempSkill('xianshuai2','roundStart');
 					player.draw();
-					if(player==trigger.source&&trigger.player.isAlive()){
+					if(player==trigger.source&&trigger.player.isIn()){
 						player.line(trigger.player,'green');
 						trigger.player.damage();
 					}
@@ -5920,7 +5920,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.disableEquip(lib.skill.yujue_backup.position);
 					'step 1'
-					if(player.isAlive()&&game.hasPlayer(function(current){
+					if(player.isIn()&&game.hasPlayer(function(current){
 						return current!=player&&current.countCards('h');
 					})){
 						player.chooseTarget(true,'选择一名角色交给你一张牌并获得技能〖执笏〗',function(card,player,target){
@@ -6756,7 +6756,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var target=targets.shift();
 					event.target=target;
-					if(target.isAlive()) target.chooseToDiscard('he','弃置一张牌，或本回合内不能使用或打出牌').set('ai',function(card){
+					if(target.isIn()) target.chooseToDiscard('he','弃置一张牌，或本回合内不能使用或打出牌').set('ai',function(card){
 						var player=_status.event.player;
 						var source=_status.event.getTrigger().player;
 						if(get.attitude(source,player)>0) return -1;
@@ -6764,7 +6764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return -1;
 					});
 					'step 3'
-					if(target.isAlive()&&!result.bool) target.addTempSkill('xiying2');
+					if(target.isIn()&&!result.bool) target.addTempSkill('xiying2');
 					if(targets.length) event.goto(2);
 				},
 				ai:{
@@ -7262,7 +7262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'useCardToPlayered'},
 				filter:function(event,player){
-					if(!(event.isFirstTarget&&event.targets&&event.targets.length>1&&event.player.isAlive())) return false;
+					if(!(event.isFirstTarget&&event.targets&&event.targets.length>1&&event.player.isIn())) return false;
 					var enemy=0;
 					var friend=0;
 					for(var i of game.players){
@@ -7564,7 +7564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.target=trigger.player;
 					next.num=num;
 					next.setContent(function(){
-						if(target.isAlive()) player.chooseToDiscard(num,true,'he');
+						if(target.isIn()) player.chooseToDiscard(num,true,'he');
 					});
 				},
 			},
@@ -8748,7 +8748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
-					return event.player!=player&&event.player.isAlive()&&event.player.hasMark('zongkui_mark');
+					return event.player!=player&&event.player.isIn()&&event.player.hasMark('zongkui_mark');
 				},
 				content:function(){
 					'step 0'
@@ -8756,7 +8756,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.guju++;
 					player.markSkill('guju');
 					'step 1'
-					if(player.hasZhuSkill('bingzhao',trigger.player)&&trigger.player.group==player.storage.bingzhao&&trigger.player.isAlive()){
+					if(player.hasZhuSkill('bingzhao',trigger.player)&&trigger.player.group==player.storage.bingzhao&&trigger.player.isIn()){
 						trigger.player.chooseBool('是否对'+get.translation(player)+'发动【秉诏】？').ai=function(){
 							return get.attitude(trigger.player,player)>1;
 						};

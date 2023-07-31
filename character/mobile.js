@@ -3211,7 +3211,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.current.countCards('h')<event.current.maxHp){
 						player.draw();
 					}
-					if(event.count>0) event.goto(1);
+					"step 4"
+					if(event.count>0&&player.hasSkill('rejieming')) event.goto(1);
 				},
 				ai:{
 					maixie:true,
@@ -4603,7 +4604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
-					return event.player.isAlive()&&get.distance(player,event.player)<=1;
+					return event.player.isIn()&&get.distance(player,event.player)<=1;
 				},
 				logTarget:'player',
 				check:function(event,player){
@@ -5325,7 +5326,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addToExpansion(result.cards,player,'give').gaintag.add('quanji');
 					}
 					"step 4"
-					if(event.count>0){
+					if(event.count>0&&player.hasSkill('requanji')){
 						player.chooseBool(get.prompt2('requanji')).set('frequentSkill','requanji');
 					}
 					else event.finish();
@@ -6655,7 +6656,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					var target=lib.skill.taomie1.logTarget(event,player);
-					return target&&target.isAlive()&&!target.hasMark('taomie');
+					return target&&target.isIn()&&!target.hasMark('taomie');
 				},
 				check:function(event,player){
 					var target=lib.skill.taomie1.logTarget(event,player);
@@ -6765,7 +6766,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&
-					event.player.isAlive()&&event.getParent(2).liyong2==true;
+					event.player.isIn()&&event.getParent(2).liyong2==true;
 				},
 				content:function(){
 					player.loseHp();
@@ -6793,7 +6794,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
-					return player!=event.player&&event.player.isAlive()&&event.player.getHistory('useCard',function(evt){
+					return player!=event.player&&event.player.isIn()&&event.player.getHistory('useCard',function(evt){
 						if(evt.targets&&evt.targets.length){
 							var targets=evt.targets.slice(0);
 							while(targets.contains(event.player)) targets.remove(event.player);
@@ -7272,7 +7273,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=event.player.getHistory('useCard',function(evt){
 						return evt.targets.contains(player);
 					}).length;
-					return num==0||event.player.isAlive()&&num<=player.countCards('he');
+					return num==0||event.player.isIn()&&num<=player.countCards('he');
 				},
 				content:function(){
 					'step 0'
@@ -9306,7 +9307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					if(card) player.gain(card,'gain2','log');
 					'step 4'
-					if(event.count>0) event.goto(1);
+					if(event.count>0&&player.hasSkill('rangjie')) event.goto(1);
 				},
 				ai:{
 					maixie:true,
@@ -9527,7 +9528,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=1-trigger.player.hp;
 					if(num) trigger.player.recover(num);
 					'step 2'
-					if(_status.currentPhase&&_status.currentPhase.isAlive()){
+					if(_status.currentPhase&&_status.currentPhase.isIn()){
 						var next=_status.currentPhase.damage();
 						event.next.remove(next);
 						trigger.after.push(next);
@@ -12225,7 +12226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
-					return player.getExpansions('tunchu').length>0&&event.player.countCards('h')<event.player.hp&&event.player.isAlive();
+					return player.getExpansions('tunchu').length>0&&event.player.countCards('h')<event.player.hp&&event.player.isIn();
 				},
 				content:function(){
 					'step 0'
@@ -12859,7 +12860,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseZhunbeiBegin'},
 				direct:true,
 				filter:function(event,player){
-					return event.player.isAlive()&&event.player.countCards('e')>0&&
+					return event.player.isIn()&&event.player.countCards('e')>0&&
 					lib.filter.targetEnabled({name:'sha'},player,event.player)&&(player.hasSha()||_status.connectMode&&player.countCards('h')>0);
 				},
 				content:function(){

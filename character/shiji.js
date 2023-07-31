@@ -226,7 +226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'thunder',
 				filter:function(event,player){
-					return event.player!=player&&event.player.isAlive();
+					return event.player!=player&&event.player.isIn();
 				},
 				check:function(event,player){
 					return get.damageEffect(event.player,player,player)>0;
@@ -2733,7 +2733,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.count--;
 					trigger.source.chooseToDiscard('he',true);
 					'step 2'
-					if(event.count>0&&result.bool&&lib.skill.spmingshi.filter(trigger,player)) event.goto(1);
+					if(event.count>0&&result.bool&&lib.skill.spmingshi.filter(trigger,player)&&player.hasSkill('spmingshi')) event.goto(1);
 				},
 				ai:{
 					threaten:0.8,
@@ -5296,7 +5296,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				filter:function(event,player){
 					return event.player!=event.target&&event.player.hasMark('fyjianyux')&&
-					event.target.hasMark('fyjianyux')&&event.target.isAlive();
+					event.target.hasMark('fyjianyux')&&event.target.isIn();
 				},
 				logTarget:'target',
 				content:function(){

@@ -3735,7 +3735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							global:"useCard",
 						},
 						filter:function(event,player){
-							return get.type(event.card)=='equip'&&event.player.isAlive()&&
+							return get.type(event.card)=='equip'&&event.player.isIn()&&
 							lib.skill.xindiaodu.isFriendOf(player,event.player)&&(player==event.player||player.hasSkill('xindiaodu'))&&!event.player.hasSkill('xindiaodu_temp');
 						},
 						direct:true,
@@ -5249,7 +5249,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var list=player.getStorage('tongxie_effect');
 							if(!list.contains(event.player)) return false;
 							for(var i of list){
-								if(i!=event.player&&i.isAlive()&&!i.hasSkill('tongxie_count2',null,null,false)) return true;
+								if(i!=event.player&&i.isIn()&&!i.hasSkill('tongxie_count2',null,null,false)) return true;
 							}
 							return false;
 						},
@@ -5258,7 +5258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							event.targets=player.getStorage('tongxie_effect').filter(function(i){
-								return i!=trigger.player&&i.isAlive()&&!i.hasSkill('tongxie_count2',null,null,false);
+								return i!=trigger.player&&i.isIn()&&!i.hasSkill('tongxie_count2',null,null,false);
 							}).sortBySeat();
 							event.num=0;
 							'step 1'
@@ -6319,7 +6319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseZhunbeiBegin'},
 				logTarget:'player',
 				filter:function(event,player){
-					return player!=event.player&&event.player.isAlive()&&player.countCards('h')>0&&!player.hasSkill('yuanzi_round',null,null,false);
+					return player!=event.player&&event.player.isIn()&&player.countCards('h')>0&&!player.hasSkill('yuanzi_round',null,null,false);
 				},
 				check:function(event,player){
 					if(get.attitude(player,event.player)<=4) return false;
@@ -8832,7 +8832,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				usable:1,
 				filter:function(event,player){
-					return event.card.name=='sha'&&event.targets.length==1&&event.targets[0].isAlive();
+					return event.card.name=='sha'&&event.targets.length==1&&event.targets[0].isIn();
 				},
 				logTarget:'targets',
 				content:function(){
@@ -9045,14 +9045,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				direct:true,
 				filter:function(event,player){
-					if(event.source&&event.source.isAlive()) return true;
+					if(event.source&&event.source.isIn()) return true;
 					return game.hasPlayer((current)=>lib.skill.guanxu.filterTarget(null,player,current));
 				},
 				content:function(){
 					'step 0'
 					event.addIndex=0;
 					var choiceList=[];
-					if(trigger.source&&trigger.source.isAlive()){
+					if(trigger.source&&trigger.source.isIn()){
 						choiceList.push('令'+get.translation(trigger.source)+'的所有非锁定技失效');
 					}
 					else event.addIndex++;
@@ -9062,7 +9062,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(game.hasPlayer(function(current){
 							return current!=player&&current.countCards('h')>3&&get.attitude(player,current)<0;
 						})) return 1-index;
-						if(source&&source.isAlive()&&get.attitude(player,source)<0&&!source.hasSkill('fengyin')) return 0;
+						if(source&&source.isIn()&&get.attitude(player,source)<0&&!source.hasSkill('fengyin')) return 0;
 						if(game.hasPlayer(function(current){
 							return current!=player&&current.countCards('h')>0&&get.attitude(player,current)<0;
 						})) return 1-index;
@@ -11574,7 +11574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:"phaseUseBegin",
 				},
 				filter:function (event,player){
-					return event.player!=player&&event.player.isAlive()&&player.countCards('he')>0&&event.player.inRange(player);
+					return event.player!=player&&event.player.isIn()&&player.countCards('he')>0&&event.player.inRange(player);
 				},
 				direct:true,
 				derivation:["new_zhixi"],
@@ -12281,7 +12281,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					'step 4'
-					if(--event.num>0){
+					if(--event.num>0&&player.hasSkill('chouce')){
 						player.chooseBool(get.prompt2('chouce'));
 					}
 					else{
@@ -13036,7 +13036,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source.addMark('rehengjiang2',1,false);
 					player.addTempSkill('rehengjiang3');
 					"step 2"
-					if(event.count){
+					if(event.count&&player.hasSkill('rehengjiang')){
 						player.chooseBool(get.prompt2('rehengjiang',_status.currentPhase)).set('ai',function(){
 							return lib.skill.rehengjiang.check(_status.event.getTrigger(),_status.event.player);
 						})
@@ -15462,7 +15462,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var nh1=player.countCards('h');
 					var nh2=event.source.countCards('h');
 					var eh=player.countCards('e');
-					if((nh1+eh)>nh2&&event.source.isAlive()) return true;
+					if((nh1+eh)>nh2&&event.source.isIn()) return true;
 					if(nh1<Math.min(5,nh2)) return true;
 				},
 				direct:true,
@@ -15475,7 +15475,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					var bool1=false,bool2=false;
 					if(num1<Math.min(num2,5)) bool1=true;
-					if(eh>num2&&trigger.source.isAlive()) bool2=true;
+					if(eh>num2&&trigger.source.isIn()) bool2=true;
 					if(bool1&&bool2){
 						event.chosen=true;
 						player.chooseControl('cancel2').set('prompt',get.prompt('benyu',trigger.source)).set('choiceList',[
@@ -15561,7 +15561,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageSource'},
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
-					return _status.currentPhase==player&&event.player.isAlive()&&
+					return _status.currentPhase==player&&event.player.isIn()&&
 					event.player.countCards('hej')>0&&event.player!=player&&!player.hasSkill('zhidao2');
 				},
 				forced:true,
@@ -16236,7 +16236,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 4'
-					if(event.target&&event.target.isAlive()){
+					if(event.target&&event.target.isIn()){
 						var es=event.target.getCards('e');
 						if(es.length){
 							event.target.discard(es);
@@ -17358,7 +17358,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd',source:'damageEnd'},
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
-					return event.player.isAlive()&&player.getExpansions('yishe').length>0;
+					return event.player.isIn()&&player.getExpansions('yishe').length>0;
 				},
 				direct:true,
 				content:function(){
@@ -17374,7 +17374,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 3'
-					if(event.count>0&&player.getExpansions('yishe').length) event.goto(1);
+					if(event.count>0&&player.getExpansions('yishe').length&&player.hasSkill('bushi')){
+						event.goto(1);
+					}
 				},
 				ai:{combo:'yishe'},
 			},
@@ -17383,7 +17385,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'judge'},
 				direct:true,
 				filter:function(event,player){
-					return player.getExpansions('yishe').length&&event.player.isAlive();
+					return player.getExpansions('yishe').length&&event.player.isIn();
 				},
 				content:function(){
 					"step 0"
@@ -17565,7 +17567,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					return event.player.isAlive()&&event.player!=player&&get.distance(event.player,player,'attack')>1;
+					return event.player.isIn()&&event.player!=player&&get.distance(event.player,player,'attack')>1;
 				},
 				forced:true,
 				content:function(){
@@ -17655,7 +17657,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'lixia',
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					return event.player.isAlive()&&event.player!=player&&!player.inRangeOf(event.player);
+					return event.player.isIn()&&event.player!=player&&!player.inRangeOf(event.player);
 				},
 				forced:true,
 				content:function(){
@@ -18969,7 +18971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseUseBegin'},
 				filter:function(event,player){
-					return /*(get.mode()!='guozhan'||event.player!=player)&&*/event.player.isAlive()&&player.countCards('h')>0&&event.player.hasUseTarget({name:'jiu'},null,true);
+					return /*(get.mode()!='guozhan'||event.player!=player)&&*/event.player.isIn()&&player.countCards('h')>0&&event.player.hasUseTarget({name:'jiu'},null,true);
 				},
 				direct:true,
 				preHidden:true,
@@ -19132,7 +19134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					var target=event.list.shift();
 					event.target=target;
-					if(target.isAlive()&&target.countCards('h')==0){
+					if(target.isIn()&&target.countCards('h')==0){
 						player.chooseBool(get.prompt2('shoucheng',target)).set('ai',function(){
 							return get.attitude(_status.event.player,_status.event.getParent().target)>0;
 						});
@@ -19380,7 +19382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					return event.player.isAlive()&&event.player!=player&&player.countCards('h',function(card){
+					return event.player.isIn()&&event.player!=player&&player.countCards('h',function(card){
 						if(_status.connectMode) return true;
 						return get.type(card)=='basic';
 					});
@@ -20270,7 +20272,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				charlotte:true,
 				filter:function(event,player){
-					return event.player.isAlive()&&event.reason&&event.reason.getParent().name=='duwu';
+					return event.player.isIn()&&event.reason&&event.reason.getParent().name=='duwu';
 				},
 				content:function(){
 					player.loseHp();
@@ -20383,7 +20385,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					if(player.storage.bifa2[1].isAlive()&&player.countCards('h')){
+					if(player.storage.bifa2[1].isIn()&&player.countCards('h')){
 						player.chooseCard(get.translation(player.storage.bifa2[1])+'的笔伐牌为：',function(card){
 							return get.type(card,'trick')==_status.event.type;
 						}).set('ai',function(card){
@@ -21657,7 +21659,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:"damageEnd",
 				},
 				filter:function (event,player){
-					return event.lianhuanable==true&&event.player.isAlive();
+					return event.lianhuanable==true&&event.player.isIn();
 				},
 				frequent:true,
 				content:function(){
@@ -22622,7 +22624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shanjia_info:'出牌阶段开始时，你可以摸X张牌，然后弃置等量的牌。若你以此法弃置了装备区内的牌，则你可以视为使用一张【杀】。（X为你于本局游戏内使用过的装备牌数且最大为7）',
 			tuifeng:'推锋',
 			tuifeng2:'推锋',
-			tuifeng_info:'1.当你受到1点伤害后，你可以将一张牌置于武将牌上，称为“锋”。2.准备阶段开始时，若你的武将牌上有“锋”，你移去所有“锋”，摸2X张牌，然后你于此回合的出牌阶段内使用【杀】的次数上限+X。（X为你此次移去的“锋”数）',
+			tuifeng_info:'1.当你受到伤害后，你可以将至多X张牌置于武将牌上（X为伤害值），称为“锋”。2.准备阶段开始时，若你的武将牌上有“锋”，你移去所有“锋”，摸2X张牌，然后你于此回合的出牌阶段内使用【杀】的次数上限+X。（X为你此次移去的“锋”数）',
 			ziyuan:'资援',
 			ziyuan_info:'出牌阶段限一次，你可以将任意张点数之和为13的手牌交给一名其他角色，然后该角色回复1点体力。',
 			jugu:'巨贾',

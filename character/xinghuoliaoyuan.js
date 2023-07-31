@@ -725,7 +725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						logTarget:function(event,player){
 							return player.getStorage('xinfu_weilu_effect').filter(function(current){
-								return current.isAlive()&&current.hp>1;
+								return current.isIn()&&current.hp>1;
 							});
 						},
 						content:function(){
@@ -735,7 +735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.targets=targets.sortBySeat();
 							'step 1'
 							var target=targets.shift();
-							if(target.isAlive()&&target.hp>1){
+							if(target.isIn()&&target.hp>1){
 								event._delay=true;
 								var num=target.hp-1;
 								player.markAuto('xinfu_weilu_recover',[[target,num]]);
@@ -778,7 +778,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							'step 1'
 							var group=event.list.shift();
-							if(group[0].isAlive()&&group[0].isDamaged()){
+							if(group[0].isIn()&&group[0].isDamaged()){
 								group[0].recover(group[1]);
 								event._delay=true;
 							}
