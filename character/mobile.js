@@ -597,7 +597,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				direct:true,
 				priority:15,
-				group:'mbmowang_die',
+				group:['mbmowang_die','mbmowang_return'],
 				content:function(){
 					if(_status.mbmowang_return&&_status.mbmowang_return[player.playerid]){
 						trigger.cancel();
@@ -608,6 +608,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(lib.config.background_speak) game.playAudio('die','shichangshiRest');
 						});
 						trigger.setContent(lib.skill.mbmowang.dieContent);
+						trigger.includeOut=true;
 					}
 				},
 				dieContent:function(){
@@ -629,7 +630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.reserveOut=true;
 						game.log(player,'进入了修整状态');
 						game.log(player,'移出了游戏');
-						game.addGlobalSkill('mbmowang_return');
+						//game.addGlobalSkill('mbmowang_return');
 						if(!_status.mbmowang_return) _status.mbmowang_return={};
 						_status.mbmowang_return[player.playerid]=1;
 					}
@@ -767,10 +768,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					return:{
-						trigger:{global:'phaseBefore'},
+						trigger:{player:'phaseBefore'},
 						forced:true,
 						charlotte:true,
 						silent:true,
+						forceDie:true,
+						forceOut:true,
 						filter:function(event,player){
 							return !event._mbmowang_return&&event.player.isOut()&&_status.mbmowang_return[event.player.playerid];
 						},
@@ -2008,7 +2011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				group:['sbanguo_move','sbanguo_damage','sbanguo_dying'],
 				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0);
+					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
@@ -2420,6 +2423,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				group:['yijin_upstart','yijin_die'],
 				filter:function(event,player){
+					if(!game.hasPlayer(current=>current!=player)) return false;
 					return lib.skill.yijin.getKane(player).length;
 				},
 				getKane:function(player){
@@ -2688,7 +2692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return game.countPlayer()>2;
+					return game.countPlayer(current=>current!=player)>=2;
 				},
 				filterTarget:lib.filter.notMe,
 				selectTarget:2,
@@ -8076,7 +8080,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else event.finish();
 					}
 					'step 1'
-					if(result.bool){
+					if(result.bool&&game.hasPlayer(current=>current!=player)){
 						event.card=result.links[0];
 						player.chooseTarget(true,lib.filter.notMe,'选择一名其他角色获得'+get.translation(event.card)).set('ai',function(target){
 							return get.value(_status.event.getParent().card,target)*get.attitude(_status.event.player,target);
@@ -9169,7 +9173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var max=Math.min(player.hp,target.countCards('he'));
-					if(max>0){
+					if(max>0&&target.isIn()){
 						player.choosePlayerCard('he',target,true,[1,max]).set('forceAuto',true).set('prompt','将'+get.translation(target)+'的至多'+get.cnNumber(max)+'张牌置于其武将牌上');
 					}
 					else event.finish();

@@ -465,7 +465,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(this==game.boss||!game.hasPlayer(function(current){
 						return !current.side;
-					})){
+					},true)){
 						game.checkResult();
 					}
 				},
@@ -2642,7 +2642,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					'step 0'
-					var list=game.players.slice(0);
+					var list=game.filterPlayer();
 					list.remove(player);
 					if(list.length){
 						var target=list.randomGet();

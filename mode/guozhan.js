@@ -13269,10 +13269,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.choosen=[name1,name2];
 						if(get.is.double(name1,true)){
 							if(!get.is.double(name2,true)) event._result={control:lib.character[name2][1]};
-							else if(get.is.double(name1,true).removeArray(get.is.double(name2,true)).length==0||get.is.double(name2,true).removeArray(get.is.double(name1,true)).length==0) game.me.chooseControl(get.is.double(name2,true).filter(group=>get.is.double(name1,true).contains(group))).set('prompt','请选择你代表的势力').set('ai',()=>_status.event.controls.randomGet());
+							else if(get.is.double(name1,true).removeArray(get.is.double(name2,true)).length==0||get.is.double(name2,true).removeArray(get.is.double(name1,true)).length==0){
+								var listg=get.is.double(name2,true).filter(group=>get.is.double(name1,true).contains(group));
+								listg.sort((a,b)=>lib.group.indexOf(a)-lib.group.indexOf(b))
+								game.me.chooseControl(listg).set('prompt','请选择你代表的势力').set('ai',()=>_status.event.controls.randomGet());
+							}
 							else event._result={control:get.is.double(name1,true).find(group=>get.is.double(name2,true).contains(group))};
 						}
-						else if(lib.character[name1][1]=='ye'&&get.is.double(name2,true)) game.me.chooseControl(get.is.double(name2,true)).set('prompt','请选择副将代表的势力').set('ai',()=>_status.event.controls.randomGet());
+						else if(lib.character[name1][1]=='ye'&&get.is.double(name2,true)){
+							var listg=get.is.double(name2,true);
+							listg.sort((a,b)=>lib.group.indexOf(a)-lib.group.indexOf(b))
+							game.me.chooseControl(listg).set('prompt','请选择副将代表的势力').set('ai',()=>_status.event.controls.randomGet());
+						}
 					}
 					'step 2'
 					if(result&&result.control) game.me.trueIdentity=result.control;

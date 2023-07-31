@@ -1897,7 +1897,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(_status.mode=='binglin'||_status.mode=='online'||this.identity!='fan') return;
 					var player=this,target=game.findPlayer(function(current){
 						return current!=player&&current.identity=='fan';
-					});
+					},true);
 					if(target){
 						target.showGiveup();
 						target.chooseDrawRecover(2);

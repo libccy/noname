@@ -713,7 +713,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				onremove:true,
 				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0);
+					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				group:['twyanshi_hurt','twyanshi_damage'],
 				content:function(){
@@ -5019,7 +5019,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					game.delayx();
-					if(player.getExpansions('twxingwu').length<3) event.finish();
+					if(player.getExpansions('twxingwu').length<3||!game.hasPlayer(current=>current!=player)) event.finish();
 					'step 3'
 					player.chooseButton(['是否移去三张“星舞”牌并发射核弹？',player.getExpansions('twxingwu')],3).set('ai',function(button){
 						if(_status.event.goon) return 1;
@@ -8300,7 +8300,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:3,
 				trigger:{global:'phaseBefore',player:'enterGame'},
 				filter:function(event,player){
-					return event.name!='phase'||game.phaseNumber==0;
+					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				forced:true,
 				content:function(){
@@ -10710,7 +10710,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						};
 					} else event.finish();
 					'step 3'
-					if(result.bool){
+					if(result.bool&&game.hasPlayer(current=>current!=player)){
 						player.chooseTarget('选择一名其他角色，对其造成2点雷电伤害',lib.filter.notMe,true).set('ai',target=>get.damageEffect(target,player,player,'thunder'));
 					}
 					'step 4'
@@ -13294,6 +13294,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var choiceList=['令一名其他角色与你各摸一张牌','令自己下个出牌阶段可以多发动一次【外使】'];
+					event.count=0;
+					if(game.hasPlayer(current=>current!=player)){
+						choiceList.shift();
+						event.count++;
+					}
 					if(lib.skill.chijie.filter&&lib.skill.chijie.filter({},player)) choiceList.push('将自己的势力变更为场上存在的一个其他势力');
 					player.chooseControl('cancel2').set('prompt',get.prompt('renshe')).set('choiceList',choiceList).set('ai',function(){
 						if(game.hasPlayer(function(current){
@@ -13306,13 +13311,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.index=result.index;
 						player.logSkill('renshe');
-						if(event.index==0){
+						if(event.index+event.count==0){
 							player.chooseTarget('请选择一名角色，与其各摸一张牌',lib.filter.notMe,true).ai=function(target){
 								if(target.hasSkillTag('nogain')) return 0.1;
 								return get.attitude(_status.event.player,target);
 							};
 						}
-						else if(result.index==1){
+						else if(result.index+event.count==1){
 							player.storage.waishi++;
 							event.finish();
 						}

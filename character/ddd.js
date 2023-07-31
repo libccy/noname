@@ -29,10 +29,171 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ddd_liangxi:['male','wei',3,['dddtongyu']],
 			ddd_wangkanglvkai:['male','shu',4,['dddbingjian']],
 			ddd_sunliang:['male','wu',3,['ddddiedang','dddanliu','dddguiying'],['zhu']],
+			ddd_lie:['male','wu',3,['dddyeshen','dddqiaoduan']],
 		},
 		characterFilter:{},
 		characterSort:{},
+		characterTitle:{
+			ddd_handang:'#g晓ャ绝对',
+			ddd_wuzhi:'#g沸治·克里夫',
+			ddd_xujing:'#g沸治·克里夫',
+			ddd_caomao:'#gRocxu',
+			ddd_xinxianying:'#g好孩子系我',
+			ddd_xianglang:'#g会乱武的袁绍',
+			ddd_liuye:'#g好孩子系我',
+			ddd_baosanniang:'#g会乱武的袁绍',
+			ddd_wangkanglvkai:'#g扬林',
+			ddd_yujin:'#g虎鲸',
+			ddd_caoshuang:'#g辰木',
+			ddd_zhenji:'#g巴德',
+			ddd_zhaoang:'#g君腾天下',
+			ddd_xuelingyun:'#gGENTOVA07',
+			ddd_liuhong:'#g拉普拉斯',
+			ddd_xiahouxuan:'#g好孩子系我',
+			ddd_zhouchu:'#g志文',
+			ddd_kebineng:'#g晨星',
+			ddd_zhangkai:'#g拼音',
+			ddd_liuba:'#g浅水',
+			ddd_jianshuo:'#g浅水',
+			ddd_guanning:'#g虎鲸',
+			ddd_lie:'#gyyuaN',
+			ddd_liangxi:'#g先負',
+		},
 		skill:{
+			//李娥
+			dddyeshen:{
+				trigger:{global:'phaseJieshuBegin'},
+				logTarget:'player',
+				prompt2:function(event,player){
+					var num=player.countMark('dddyeshen');
+					var str='展示牌堆顶的'+get.cnNumber(3-num)+'张牌，然后其将其中的一张牌当作【铁索连环】使用或打出。';
+					if(num>=2) str+='然后你受到1点火属性伤害并重置此技能。';
+					return str;
+				},
+				check:function(event,player){
+					if(player.countMark('dddyeshen')>=2&&get.damageEffect(player,player,player,'fire')<0) return false;
+					return get.attitude(player,event.player)>0;
+				},
+				content:function(){
+					'step 0'
+					event.target=trigger.player;
+					var cards=get.bottomCards(3-player.countMark('dddyeshen'));
+					event.cards=cards;
+					game.cardsGotoOrdering(cards);
+					player.showCards(cards,get.translation(player)+'对'+get.translation(target)+'发动了【冶身】');
+					if(!cards.some(card=>get.color(card)=='black')) event.goto(4);
+					'step 1'
+					if(target.isIn()){
+						var blacks=cards.filter(card=>get.color(card)=='black');
+						if(blacks.length>1) target.chooseButton([
+							'选择一张牌当作【铁索连环】使用或打出',
+							blacks,
+						],true).set('ai',button=>get.translation(button.link.name).length);
+						else event._result={
+							bool:true,
+							links:blacks,
+						};
+					}
+					else event.goto(4);
+					'step 2'
+					if(result.bool){
+						event.links=result.links.slice(0);
+						var card=get.autoViewAs({name:'tiesuo'},result.links);
+						var maxNum=get.translation(result.links[0].name).length;
+						if(!game.hasPlayer(current=>target.canUse(card,current))){
+							event._result={bool:false};
+						}
+						else target.chooseTarget('请选择【铁索连环】的目标，或点“取消”重铸',function(card,player,target){
+							var card=_status.event.card;
+							return player.canUse(card,target);
+						},[1,Math.min(maxNum,game.countPlayer())]).set('card',card).set('ai',function(target){
+							var player=_status.event.player,card=_status.event.card;
+							return get.effect_use(target,card,player,player)
+						});
+					}
+					'step 3'
+					if(result.bool&&result.targets.length>0){
+						var card=get.autoViewAs({name:'tiesuo'},event.links);
+						target.useCard(result.targets,card,event.links);
+					}
+					else{
+						game.cardsDiscard(event.links);
+						target.draw(event.links.length);
+					}
+					'step 4'
+					for(var card of cards){
+						if(get.position(card,true)=='o') ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
+					}
+					'step 5'
+					var num=player.countMark('dddyeshen');
+					if(num<2){
+						player.addMark('dddyeshen',1,false);
+						game.log(player,'的','#g【冶身】','的亮出牌数-1');
+					}
+					else{
+						player.removeMark('dddyeshen',num,false);
+						game.log(player,'还原了','#g【冶身】','的亮出牌数');
+						player.damage('fire','nocard');
+					}
+				},
+			},
+			dddqiaoduan:{
+				trigger:{global:'linkAfter'},
+				direct:true,
+				usable:1,
+				filter:function(event,player){
+					var num=game.countPlayer(current=>current.isLinked());
+					if(event.player.isLinked()){
+						return player.countCards('he')>=num&&game.hasPlayer(current=>current.isDamaged());
+					}
+					else{
+						return num>0;
+					}
+				},
+				content:function(){
+					'step 0'
+					if(trigger.player.isLinked()){
+						var num=game.countPlayer(current=>current.isLinked());
+						player.chooseCardTarget({
+							prompt:get.prompt('dddqiaoduan'),
+							prompt2:'操作提示：选择'+get.cnNumber(num)+'张牌和一名已受伤的角色。将这些牌置于牌堆底（先选择的在上），然后该角色回复1点体力。',
+							filterCard:true,
+							selectCard:num,
+							filterTarget:(card,player,target)=>target.isDamaged(),
+							ai1:card=>5-get.value(card),
+							ai2:target=>{
+								var player=_status.event.player;
+								return get.recoverEffect(target,player,player);
+							}
+						})
+					}
+					else event.goto(2);
+					'step 1'
+					if(result.bool){
+						player.logSkill('dddqiaoduan',result.targets[0]);
+						player.loseToDiscardpile(result.cards,ui.cardPile);
+						result.targets[0].recover();
+					}
+					else player.storage.counttrigger.dddqiaoduan--;
+					event.finish();
+					'step 2'
+					var num=game.countPlayer(current=>current.isLinked());
+					player.chooseTarget(get.prompt('dddqiaoduan'),[1,num],'令至多'+get.cnNumber(num)+'名角色各摸一张牌').set('ai',function(target){
+						var player=_status.event.player;
+						var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+						if(target.hasSkillTag('nogain')) att/=10;
+						return att;
+					});
+					'step 3'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.logSkill('dddqiaoduan',targets);
+						game.asyncDraw(targets);
+						game.delayex();
+					}
+					else player.storage.counttrigger.dddqiaoduan--;
+				},
+			},
 			//孙亮
 			ddddiedang:{
 				enable:'phaseUse',
@@ -1695,6 +1856,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return lib.skill['dddfusi_global'].hiddenCard(player,name);
 					},
+				},
+			},
+			dddtuoji:{
+				trigger:{global:'useCardAfter'},
+				frequent:true,
+				filter:function(event,player){
+					return event.card.storage&&event.card.storage._3dfusi_owner==player&&!player.hasCard(function(card){
+						return !card.hasGaintag('dddxujing_tag');
+					},'h');
+				},
+				content:function(){
+					player.draw(3);
 				},
 			},
 			dddchashi:{
@@ -4034,6 +4207,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.ddddiedang) return '出牌阶段限一次，你可以弃置三张牌，然后摸一张牌；然后若你的手牌数为全场最多或最少，则你交换上述描述中的“弃置”和“摸”。'
 				return '出牌阶段限一次，你可以摸三张牌，然后弃置一张牌；然后若你的手牌数为全场最多或最少，则你交换上述描述中的“摸”和“弃置”。';
 			},
+			dddyeshen:function(player){
+				return '一名角色的结束阶段，你可以亮出牌堆底'+get.cnNumber(3-player.countMark('dddyeshen'))+'张牌，令其将其中一张黑色牌当做最大目标数为牌名字数的【铁索连环】使用或重铸，其余牌置于牌堆顶，然后此技能亮出牌数-1；若减至零张，你复原此技能并对自己造成一点火焰伤害。';
+			},
 		},
 		translate:{
 			ddd_handang:"韩当",
@@ -4158,6 +4334,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dddanliu_info:'结束阶段，你可以与一名其他角色依次观看并选择对方的一张手牌，然后交换这两张牌。若这两张牌颜色相同，则你可以逾期交换这两张牌，且：若此牌为红色，则你回复1点体力；若此牌为黑色，则其摸两张牌。',
 			dddguiying:'归萤',
 			dddguiying_info:'主公技。准备阶段，其他吴势力角色可依次展示其一张手牌，然后将其点数最大的一张牌交给你，然后其可以获得场上点数最小的一张牌。',
+			ddd_lie:'李娥',
+			dddyeshen:'冶身',
+			dddyeshen_info:'一名角色的结束阶段，你可以亮出牌堆底三张牌，令其将其中一张黑色牌当做最大目标数为牌名字数的【铁索连环】使用或重铸，其余牌置于牌堆顶，然后此技能亮出牌数-1；若减至零张，你复原此技能并对自己造成一点火焰伤害。',
+			dddqiaoduan:'巧锻',
+			dddqiaoduan_info:'每回合限一次。当有角色：重置后，你可以令至多X名角色各摸一张牌；横置后，你可以将X张牌置于牌堆底，并令一名角色回复一点体力（X为横置角色数）。',
 		},
 	};
 });

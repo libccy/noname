@@ -12162,6 +12162,7 @@
 					'step 0'
 					event.filter1=function(info){
 						if(info[1].isDead()&&!lib.skill[info[0]].forceDie) return false;
+						if(info[1].isOut()&&!lib.skill[info[0]].forceOut) return false;
 						return lib.filter.filterTrigger(trigger,info[1],event.triggername,info[0]);
 					}
 					event.filter2=function(info2){
@@ -12231,7 +12232,8 @@
 					for(var i=0;i<event.choice.length;i++){
 						controls.push(event.choice[i][0]);
 					}
-					event.current.chooseControl(controls).set('prompt','选择下一个触发的技能').set('forceDie',true).set('arrangeSkill',true);
+					event.current.chooseControl(controls)
+					.set('prompt','选择下一个触发的技能').set('forceDie',true).set('arrangeSkill',true).set('includeOut',true)
 					'step 5'
 					if(result.control){
 						for(var i=0;i<event.doing.list.length;i++){
@@ -12255,6 +12257,7 @@
 				},
 				createTrigger:function(){
 					"step 0"
+					//console.log('triggering: ' + player.name+ ' \'s skill: ' + event.skill+' in ' + event.triggername)
 					if(lib.filter.filterTrigger(trigger,player,event.triggername,event.skill)){
 						var fullskills=game.expandSkills(player.getSkills().concat(lib.skill.global));
 						if(!fullskills.contains(event.skill)){
@@ -12343,6 +12346,7 @@
 							var next=player.chooseBool(str);
 							if(event.frequentSkill) next.set('frequentSkill',event.skill);
 							next.set('forceDie',true);
+							next.set('includeOut',true);
 							next.ai=function(){
 								return !check||check(trigger,player);
 							};
@@ -12427,7 +12431,7 @@
 					next.setContent(info.content);
 					next.skillHidden=event.skillHidden;
 					if(info.forceDie) next.forceDie=true;
-					if(event.skill=='_turnover') next.includeOut=true;
+					if(info.forceOut||event.skill=='_turnover') next.includeOut=true;
 					"step 4"
 					if(player._hookTrigger){
 						for(var i=0;i<player._hookTrigger.length;i++){
@@ -15834,7 +15838,10 @@
 					if(target){
 						event.triggeredTargets1.push(target);
 						var next=game.createEvent('useCardToPlayer',false);
-						if(event.triggeredTargets1.length==1) next.isFirstTarget=true;
+						if(!event.isFirstTarget1){
+							event.isFirstTarget1=true;
+							next.isFirstTarget=true;
+						}
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -15855,7 +15862,10 @@
 					if(target){
 						event.triggeredTargets2.push(target);
 						var next=game.createEvent('useCardToTarget',false);
-						if(event.triggeredTargets2.length==1) next.isFirstTarget=true;
+						if(!event.isFirstTarget2){
+							event.isFirstTarget2=true;
+							next.isFirstTarget=true;
+						}
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -15889,7 +15899,10 @@
 					if(target){
 						event.triggeredTargets3.push(target);
 						var next=game.createEvent('useCardToPlayered',false);
-						if(event.triggeredTargets3.length==1) next.isFirstTarget=true;
+						if(!event.isFirstTarget3){
+							event.isFirstTarget3=true;
+							next.isFirstTarget=true;
+						}
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -15910,7 +15923,10 @@
 					if(target){
 						event.triggeredTargets4.push(target);
 						var next=game.createEvent('useCardToTargeted',false);
-						if(event.triggeredTargets4.length==1) next.isFirstTarget=true;
+						if(!event.isFirstTarget4){
+							event.isFirstTarget4=true;
+							next.isFirstTarget=true;
+						}
 						next.setContent('emptyEvent');
 						next.targets=targets;
 						next.target=target;
@@ -16081,6 +16097,7 @@
 					"step 0"
 					var info=get.info(event.skill);
 					if(!info.noForceDie) event.forceDie=true;
+					if(!info.noForceOut) event.includeOut=true;
 					event._skill=event.skill;
 					game.trySkillAudio(event.skill,player);
 					var checkShow=player.checkShow(event.skill);
@@ -16261,6 +16278,7 @@
 						next.cards=cards;
 						next.player=player;
 						if(event.forceDie) next.forceDie=true;
+						if(event.includeOut) next.includeOut=true;
 					}
 					"step 2"
 					if(!event.skill){
@@ -16303,6 +16321,7 @@
 					}
 					next.target=targets[num];
 					if(event.forceDie) next.forceDie=true;
+					if(event.includeOut) next.includeOut=true;
 					if(next.target&&!info.multitarget){
 						if(num==0&&targets.length>1){
 							// var ttt=next.target;
@@ -16338,6 +16357,7 @@
 						next.cards=cards;
 						next.player=player;
 						if(event.forceDie) next.forceDie=true;
+						if(event.includeOut) next.includeOut=true;
 					}
 					"step 4"
 					if(player.getStat().allSkills>200){
@@ -22454,6 +22474,7 @@
 					}
 					if(!name) return false;
 					if(this.hasJudge(name)) return false;
+					if(this.isOut()) return false;
 					var mod=game.checkMod(card,this,this,'unchanged','targetEnabled',this);
 					if(mod!='unchanged') return mod;
 					return true;
@@ -22798,6 +22819,7 @@
 						var next=game.createEvent('logSkill',false),evt=_status.event;
 						next.player=player;
 						next.forceDie=true;
+						next.includeOut=true;
 						evt.next.remove(next);
 						if(evt.logSkill) evt=evt.getParent();
 						for(var i in logInfo){
@@ -22812,6 +22834,7 @@
 						var next2=game.createEvent('logSkillBegin',false);
 						next2.player=player;
 						next2.forceDie=true;
+						next2.includeOut=true;
 						for(var i in logInfo){
 							if(i=='event') next2.log_event=logInfo[i];
 							else next2[i]=logInfo[i];
@@ -24770,11 +24793,8 @@
 					return false;
 				},
 				canEquip:function(name,replace){
-					if(get.type(name)=='card'){
-						name=get.equiptype(name);
-					}
 					var range=get.subtype(name);
-					if(this.isDisabled(range)) return false;
+					if(!range||this.isDisabled(range)) return false;
 					if(['equip3','equip4'].contains(range)&&this.getEquip(6)) return false;
 					if(!replace&&!this.isEmpty(range)) return false;
 					return true;
@@ -27275,7 +27295,7 @@
 						}
 					}
 					if(!start) return;
-					if(!game.players.contains(start)){
+					if(!game.players.contains(start)&&!game.dead.contains(start)){
 						start=game.findNext(start);
 					}
 					var list=[];
@@ -29296,6 +29316,7 @@
 			_turnover:{
 				trigger:{player:'phaseBefore'},
 				forced:true,
+				forceOut:true,
 				priority:100,
 				popup:false,
 				firstDo:true,
@@ -34177,15 +34198,17 @@
 			}
 		},
 		createTrigger:function(name,skill,player,event){
-			if((player.isOut()||player.removed)&&skill!='_turnover') return;
-			if(player.isDead()&&!lib.skill[skill].forceDie) return;
+			var info=get.info(skill);
+			if(!info) return false;
+			if((player.isOut()||player.removed)&&!info.forceOut) return;
+			if(player.isDead()&&!info.forceDie) return;
 			var next=game.createEvent('trigger',false);
 			next.skill=skill;
 			next.player=player;
 			next.triggername=name;
 			next.forceDie=true;
+			next.includeOut=true;
 			next._trigger=event;
-			if(skill=='_turnover') next.includeOut=true;
 			next.setContent('createTrigger');
 		},
 		createEvent:function(name,trigger,triggerevent){
@@ -38150,28 +38173,28 @@
 				}
 			}
 		},
-		hasPlayer:function(func){
+		hasPlayer:function(func,includeOut){
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].isOut()) continue;
+				if(!includeOut&&game.players[i].isOut()) continue;
 				if(func(game.players[i])) return true;
 			}
 			return false;
 		},
-		hasPlayer2:function(func){
+		hasPlayer2:function(func,includeOut){
 			var players=game.players.slice(0).concat(game.dead);
 			for(var i=0;i<players.length;i++){
-				if(players[i].isOut()) continue;
+				if(!includeOut&&players[i].isOut()) continue;
 				if(func(players[i])) return true;
 			}
 			return false;
 		},
-		countPlayer:function(func){
+		countPlayer:function(func,includeOut){
 			var num=0;
 			if(typeof func!='function'){
 				func=lib.filter.all;
 			}
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].isOut()) continue;
+				if(!includeOut&&game.players[i].isOut()) continue;
 				var result=func(game.players[i]);
 				if(typeof result=='number'){
 					num+=result;
@@ -38182,14 +38205,14 @@
 			}
 			return num;
 		},
-		countPlayer2:function(func){
+		countPlayer2:function(func,includeOut){
 			var num=0;
 			if(typeof func!='function'){
 				func=lib.filter.all;
 			}
 			var players=game.players.slice(0).concat(game.dead);
 			for(var i=0;i<players.length;i++){
-				if(players[i].isOut()) continue;
+				if(!includeOut&&players[i].isOut()) continue;
 				var result=func(players[i]);
 				if(typeof result=='number'){
 					num+=result;
@@ -38200,7 +38223,7 @@
 			}
 			return num;
 		},
-		filterPlayer:function(func,list){
+		filterPlayer:function(func,list,includeOut){
 			if(!Array.isArray(list)){
 				list=[];
 			}
@@ -38208,14 +38231,14 @@
 				func=lib.filter.all;
 			}
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].isOut()) continue;
+				if(!includeOut&&game.players[i].isOut()) continue;
 				if(func(game.players[i])){
 					list.add(game.players[i]);
 				}
 			}
 			return list;
 		},
-		filterPlayer2:function(func,list){
+		filterPlayer2:function(func,list,includeOut){
 			if(!Array.isArray(list)){
 				list=[];
 			}
@@ -38224,26 +38247,26 @@
 			}
 			var players=game.players.slice(0).concat(game.dead);
 			for(var i=0;i<players.length;i++){
-				if(players[i].isOut()) continue;
+				if(!includeOut&&players[i].isOut()) continue;
 				if(func(players[i])){
 					list.add(players[i]);
 				}
 			}
 			return list;
 		},
-		findPlayer:function(func){
+		findPlayer:function(func,includeOut){
 			for(var i=0;i<game.players.length;i++){
-				if(game.players[i].isOut()) continue;
+				if(!includeOut&&game.players[i].isOut()) continue;
 				if(func(game.players[i])){
 					return game.players[i];
 				}
 			}
 			return null;
 		},
-		findPlayer2:function(func){
+		findPlayer2:function(func,includeOut){
 			var players=game.players.slice(0).concat(game.dead);
 			for(var i=0;i<players.length;i++){
-				if(players[i].isOut()) continue;
+				if(!includeOut&&players[i].isOut()) continue;
 				if(func(players[i])){
 					return players[i];
 				}
@@ -46035,7 +46058,7 @@
 							bool2=true;
 						}
 						if(!bool4&&get.is.double(i)) bool4=true;
-						if(bool1&&bool2&&bool4) break;
+						if(bool1&&bool2&&bool4&&bool5) break;
 					}
 					if(bool1) groups.add('shen');
 					if(bool2&&!bool3) groups.add('key');
