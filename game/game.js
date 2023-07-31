@@ -9686,6 +9686,7 @@
 					localStorage.removeItem(lib.configprefix+'background');
 				}
 			},
+			//by 诗笺
 			parsex:function(func){
 				var str=func.toString();
 				//获取第一个 { 后的所有字符
@@ -45125,6 +45126,10 @@
 						var logs=[];
 						var logindex=-1;
 						var cheat=lib.cheat;
+						//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
+						var reg=/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/;
+						//使用new Function隔绝作用域，避免在控制台可以直接访问到runCommand等变量
+						var fun=(new Function('reg','value','_status','lib','game','ui','get','ai',`"use strict";\nreturn eval(reg.test(value)?('('+value+')'):value)`));
 						var runCommand=function(e){
 							if(text2.value&&!['up','down'].contains(text2.value)){
 								logindex=-1;
@@ -45164,7 +45169,9 @@
 							else{
 								if(!game.observe&&!game.online){
 									try{
-										var result = (new Function('_status','lib','game','ui','get','ai',`"use strict";\nreturn ${text2.value}`))(_status,lib,game,ui,get,ai);
+										var value=text2.value.trim();
+										if(value.endsWith(";")) value=value.slice(0,-1).trim();
+										var result=fun(reg,value,_status,lib,game,ui,get,ai);
 										game.print(result);
 									}
 									catch(e){
@@ -45199,14 +45206,16 @@
 						game.print=function(){
 							var args=[].slice.call(arguments);
 							var printResult=args.map(arg=>{
-								if(get.is.object(arg)){
+								if(get.is.object(arg)||typeof arg=='function'){
 									var argi=get.stringify(arg);
-									if(argi&&argi.length<5000){
-										return argi;
+									if(argi/*&&argi.length<5000*/){
+										return argi.replace(/&/g, '&amp;')
+											.replace(/</g, '&lt;')
+											.replace(/>/g, '&gt;')
+											.replace(/"/g, '&quot;')
+											.replace(/'/g, '&#39;');
 									}
-									else{
-										return arg.toString();
-									}
+									else return arg.toString();
 								}else{
 									var str=String(arg);
 									if (!/<[a-zA-Z]+[^>]*?\/?>.*?(?=<\/[a-zA-Z]+[^>]*?>|$)/.exec(str)) return String(arg)
