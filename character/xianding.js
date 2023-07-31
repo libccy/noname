@@ -1429,7 +1429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						var targets=result.targets;
-						targets.sortBySeat(_status.currentPhase);
+						targets.sortBySeat(player);
 						event.targets=targets;
 						player.logSkill('dcfumou',targets);
 						event.num--;
@@ -10944,7 +10944,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjianzheng:'谏诤',
 			dcjianzheng_info:'出牌阶段限一次。你可以观看一名其他角色的手牌，然后若其中有你可以使用的手牌，你获得并使用其中一张。若你以此法使用牌指定了其为目标，你令你与其横置，然后其观看你的手牌。',
 			dcfumou:'腹谋',
-			dcfumou_info:'当你受到伤害后，你可以令至多X名角色依次选择一项：1.移动场上的一张牌；2.弃置所有手牌并摸两张牌；3.弃置装备区里的所有牌并回复1点体力（X为你已损失的体力值）。',
+			dcfumou_info:'当你受到伤害后，你可以令至多X名角色从你开始逆时针依次选择一项：1.移动场上的一张牌；2.弃置所有手牌并摸两张牌；3.弃置装备区里的所有牌并回复1点体力（X为你已损失的体力值）。',
 			chentai:'陈泰',
 			dcctjiuxian:'救陷',
 			dcctjiuxian_info:'出牌阶段限一次。你可以重铸一半数量的手牌（向上取整），然后视为使用一张【决斗】。当此牌对目标角色造成伤害后，你可以令其攻击范围内的一名其他角色回复1点体力。',

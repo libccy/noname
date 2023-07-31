@@ -1488,7 +1488,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					name2:'灵',
 					mark:function(dialog,storage,player){
-						dialog.addText('共有'+player.countMark(storage)+'个标记');
+						dialog.addText('共有'+(storage||0)+'个标记');
 						dialog.addText('注：图标的颜色代表弃牌堆中较多的颜色');
 					},
 				},
