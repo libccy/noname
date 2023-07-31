@@ -872,7 +872,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.player=player;
 					var num=player.countCards('h');
 					if(num>=2){
-						player.chooseCard('镇荧：请将手牌弃置至至多两张',[num-2,num],true,(card,player,target)=>{
+						var cards=player.getCards('h',card=>{
+							return lib.filter.cardDiscardable(card,player,'olzhenying');
+						});
+						if(cards.length<num-2) event._result={cards:cards};
+						else player.chooseCard('镇荧：请将手牌弃置至至多两张',[num-2,num],true,(card,player,target)=>{
 							return lib.filter.cardDiscardable(card,player,'olzhenying');
 						});
 						event.goto(2);
@@ -887,7 +891,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=result.index;
 					var len=player.countCards('h');
 					if(len>num){
-						if(num==0) event._result={bool:true,cards:player.getCards('h')};
+						var cards=player.getCards('h',card=>{
+							return lib.filter.cardDiscardable(card,player,'olzhenying');
+						});
+						if(num==0||cards.length<len-num){
+							event._result={cards:cards};
+						}
 						else player.chooseCard('镇荧：请将手牌弃置至'+get.cnNumber(num)+'张',len-num,true,(card,player,target)=>{
 							return lib.filter.cardDiscardable(card,player,'olzhenying');
 						});
