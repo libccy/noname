@@ -12144,7 +12144,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'enterGame',
 				},
 				forced:true,
-				filter:function(event){
+				filter:function(event,player){
 					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				audio:6,

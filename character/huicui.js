@@ -1562,6 +1562,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(color=='red') red++;
 								if(color=='black') black++;
 							}
+							if(trigger.name.indexOf('lose')==0){
+								var cards=trigger.getd().filterInD('d');
+								for(var i=0;i<cards.length;i++){
+									var color=get.color(cards[i]);
+									if(color=='red') red++;
+									if(color=='black') black++;
+								}
+							}
 							game.broadcastAll(function(ind){
 								var bgColor=lib.skill.dchuiling_hint.markColor[ind][0],text='<span style="color: '+lib.skill.dchuiling_hint.markColor[ind][1]+'">灵</span>';
 								for(var player of game.players){
