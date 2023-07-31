@@ -4255,24 +4255,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				addHuashen:function(player){
 					if(!player.storage.huashen) return;
 					if(!_status.characterlist){
-						if(_status.connectMode) var list=get.charactersOL();
-						else{
-							var list=[];
-							for(var i in lib.character){
-								if(lib.filter.characterDisabled2(i)||lib.filter.characterDisabled(i)) continue;
-								list.push(i);
-							}
-						}
-						game.countPlayer(function(current){
-							list.remove(current.name);
-							list.remove(current.name1);
-							list.remove(current.name2);
-							if(current.storage.huashen&&current.storage.huashen.owned){
-								for(var i in current.storage.huashen.owned) list.removeArray(current.storage.huashen.owned[i]);
-							}
-							if(current.storage.rehuashen&&current.storage.rehuashen.character) list.removeArray(current.storage.rehuashen.character)
-						});
-						_status.characterlist=list;
+						lib.skill.pingjian.initList();
 					}
 					_status.characterlist.randomSort();
 					var bool=false;
@@ -4495,6 +4478,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.markSkill('huashen');
 							game.broadcastAll(function(character,player){
 								player.sex=lib.character[character][0];
+								game.log(player,'将性别变为了','#y'+get.translation(lib.character[character][0])+'性');
 								//player.group=lib.character[character][1];
 								//player.node.name.dataset.nature=get.groupnature(player.group);
 								var mark=player.marks.huashen;
@@ -4514,7 +4498,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									},200);
 								}
 							},character,player);
-							player.changeGroup(lib.character[character][1],false);
+							player.changeGroup(lib.character[character][1]);
 						}
 						player.storage.huashen.current2=skill;
 						if(!player.additionalSkills.huashen||!player.additionalSkills.huashen.contains(skill)){
