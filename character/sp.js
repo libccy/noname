@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['ol_huban','ol_mengda'],
+				sp_waitforsort:['ol_huban','ol_mengda','haopu'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['ol_wanglang'],
 				sp_zhongdan:["cuiyan","huangfusong"],
@@ -28,6 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			haopu:['male','shu',4,['olzhenying']],
 			ol_mengda:['male','shu',4,['olgoude']],
 			ol_wanglang:['male','wei',3,['gushe','oljici']],
 			ol_liuyan:['male','qun','4/6',['olpianan','olyinji','olkuisi'],['unseen']],
@@ -188,6 +189,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			haopu:'郝普，字子太，义阳（治所在今湖北枣阳东南）人。刘备入川后，郝普为零陵太守。建安二十年（215年），吴将吕蒙进攻荆州三郡，唯有郝普坚守待援。但援兵久久不至，其挚友邓玄之又被吕蒙所骗，郝普也因此上当，投降吴国。湘水划界后，郝普回归刘备。建安二十四年（219年），吕蒙再次袭击荆州，击败关羽，郝普再次投降，最终归顺吴国并官至廷尉。郝普与隐蕃亲善，隐蕃蓄谋叛变事情败露，他受到牵连，因此自杀。在刘备集团的5个荆州郡守中，郝普是唯一一个抵抗过东吴的荆州郡守。',
 			ol_zhanghe:'字儁乂，河间鄚人。三国时期魏国名将。官渡之战时，本为袁绍部将的张郃投降了曹操，并在曹操帐下多立功勋，于曹魏建立后加封为征西车骑将军。诸葛亮六出祁山之间，张郃多次抵御蜀军的进攻，于公元231年在木门道被诸葛亮设伏射死。后谥曰壮侯。为曹魏“五子良将”之一。',
 			zhangshiping:'张世平是东汉末期的中山商人，曾与苏双同路，资助刘备组织武装、建立政权。于《三国演义》第一回出场，刘关张桃园三结义时资助刘备良马五十匹，金银五百两，镔铁一千斤。刘备所使用的“双股剑”、关羽所使用的“青龙偃月刀（又名‘冷艳锯’）”、张飞所使用的“丈八点钢矛（又名‘丈八蛇矛’）”皆由这一千斤上好镔铁打造而成。',
 			luoxian:'罗宪（218年—270年），字令则，荆州襄阳（今湖北襄阳）人。西晋开国将领，巴东太守（郡府在永安白帝城）。于蜀汉灭亡后降魏，成功抵御孙吴的入侵，守住入魏国的要冲永安。后仕晋官至冠军将军、假节，封西鄂县侯。泰始六年（270年）去世，谥烈侯。',
@@ -684,6 +686,247 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//郝普
+			olzhenying:{
+				audio:2,
+				enable:'phaseUse',
+				usable:2,
+				filter:function(event,player){
+					return game.hasPlayer(current=>{
+						return lib.skill.olzhenying.filterTarget(null,player,current);
+					});
+				},
+				filterTarget:function(card,player,target){
+					return player!=target&&target.countCards('h')<=player.countCards('h');
+				},
+				content:function(){
+					'step 0'
+					var send=function(){
+						var next=game.createEvent('olzhenying_adjust',false);
+						next.setContent(lib.skill.olzhenying.contentx);
+						game.resume();
+					};
+					var sendback=function(result,player){
+						if(!result&&typeof result!=='number'){
+							result=player.getCards('h');
+							if(!result.length) result=0;
+						}
+						event.results.push([player,result]);
+					};
+					event.ai_targets=[];
+					event.results=[];
+					var players=[player,target];
+					for(var i=0;i<players.length;i++){
+						if(_status.connectMode) players[i].showTimer();
+						if(players[i].isOnline()){
+							event.withol=true;
+							players[i].send(send);
+							players[i].wait(sendback);
+						}
+						else if(players[i]==game.me){
+							event.withme=true;
+							var next=game.createEvent('olzhenying_adjust',false);
+							next.setContent(lib.skill.olzhenying.contentx);
+							if(_status.connectMode) game.me.wait(sendback);
+						}
+						else{
+							event.ai_targets.push(players[i]);
+						}
+					}
+					if(event.ai_targets.length){
+						for(var i=0;i<event.ai_targets.length;i++){
+							if(players.contains(event.ai_targets[i])){
+								var target=event.ai_targets[i];
+								var cards=target.getCards('h');
+								cards=cards.sort((a,b)=>{
+									return get.value(b)-get.value(a);
+								});
+								var beginInd=1;
+								var endInd=2;
+								var eff=get.effect(player,{name:'juedou'},target,target),eff2=get.effect(target,{name:'juedou'},player,target);
+								var att=get.attitude(player,target);
+								if(att>0||eff2>0){
+									if(cards.length<=2){
+										cards=2-cards.length;
+									}
+									else{
+										beginInd=2; endInd=2;
+									}
+								}
+								else{
+									if(get.value(cards,target)<=5&&!target.isZhu){
+										if(eff>0&&Math.random()<0.65){
+											beginInd=0; endInd=1;
+										}
+									}
+								}
+								if(typeof cards!='number'){
+									cards=cards.slice([beginInd,endInd].randomGet(),cards.length);
+								}
+								sendback(cards,target);
+								event.ai_targets.splice(i--,1);
+							}
+						}
+						if(event.ai_targets.length){
+							event.ai_targets.randomSort();
+							setTimeout(function(){
+								event.interval=setInterval(function(){
+									var target=event.ai_targets.shift();
+									var cards=target.getCards('h');
+									cards=cards.sort((a,b)=>{
+										return get.value(b)-get.value(a);
+									});
+									var beginInd=1;
+									var endInd=2;
+									var eff=get.effect(player,{name:'juedou'},target,target),eff2=get.effect(target,{name:'juedou'},player,target);
+									var att=get.attitude(player,target);
+									if(att>0||eff2>0){
+										if(cards.length<=2){
+											cards=2-cards.length;
+										}
+										else{
+											beginInd=2; endInd=2;
+										}
+									}
+									else{
+										if(get.value(cards,target)<=5&&!target.isZhu){
+											if(eff>0&&Math.random()<0.65){
+												beginInd=0; endInd=1;
+											}
+										}
+									}
+									if(typeof cards!='number'){
+										cards=cards.slice([beginInd,endInd].randomGet(),cards.length);
+									}
+									sendback(cards,target);
+									if(!event.ai_targets.length){
+										clearInterval(event.interval);
+										if(event.withai) game.resume();
+									}
+								},_status.connectMode?750:75);
+							},500);
+						}
+					}
+					'step 1'
+					if(event.withme){
+						if(_status.connectMode) game.me.unwait(result,game.me);
+						else{
+							if(!result&&typeof result!=='number'){
+								result=game.me.getCards('h');
+								if(!result.length) result=0;
+							}
+							event.results.push([game.me,result]);
+						}
+					}
+					'step 2'
+					if(event.withol&&!event.resultOL){
+						game.pause();
+					}
+					'step 3'
+					if(event.ai_targets.length>0){
+						event.withai=true;
+						game.pause();
+					}
+					'step 4'
+					if(_status.connectMode){
+						for(var i of [player,target]) i.hideTimer();
+					}
+					var lose_list=[];
+					var draw_list=[];
+					event.results.sort((a,b)=>lib.sort.seat(a[0],b[0]));
+					for(var res of event.results){
+						var target=res[0],cardsx=res[1];
+						if(!target||!cardsx) continue;
+						if(typeof cardsx==='number') draw_list.push([target,cardsx]);
+						else if(cardsx.length) lose_list.push([target,cardsx]);
+					}
+					if(lose_list.length){
+						game.loseAsync({
+							lose_list:lose_list,
+						}).setContent('discardMultiple');
+					}
+					if(draw_list.length){
+						for(var list of draw_list){
+							var target=list[0],num=list[1];
+							target.draw(num,'nodelay');
+						}
+					}
+					'step 5'
+					game.delay();
+					var num1=player.countCards('h'),num2=target.countCards('h');
+					if(num1==num2){
+						event.finish();
+						return;
+					}
+					var players=[player,target];
+					if(num2<num1) players.reverse();
+					var card={
+						name:'juedou',
+						isCard:true,
+					}
+					if(players[0].canUse(card,players[1])) players[0].useCard(card,players[1]);
+				},
+				contentx:function(){
+					'step 0'
+					var player=game.me;
+					event.player=player;
+					var num=player.countCards('h');
+					if(num>=2){
+						var cards=player.getCards('h',card=>{
+							return lib.filter.cardDiscardable(card,player,'olzhenying');
+						});
+						if(cards.length<num-2) event._result={cards:cards};
+						else player.chooseCard('镇荧：请将手牌弃置至至多两张',[num-2,num],true,(card,player,target)=>{
+							return lib.filter.cardDiscardable(card,player,'olzhenying');
+						});
+						event.goto(2);
+					}
+					else{
+						var choices=['〇','一','二'];
+						player.chooseControl(choices).set('prompt','镇荧：请选择要将手牌调整至的张数').set('ai',()=>{
+							return [0,1,2].randomGet();
+						});
+					}
+					'step 1'
+					var num=result.index;
+					var len=player.countCards('h');
+					if(len>num){
+						var cards=player.getCards('h',card=>{
+							return lib.filter.cardDiscardable(card,player,'olzhenying');
+						});
+						if(num==0||cards.length<len-num){
+							event._result={cards:cards};
+						}
+						else player.chooseCard('镇荧：请将手牌弃置至'+get.cnNumber(num)+'张',len-num,true,(card,player,target)=>{
+							return lib.filter.cardDiscardable(card,player,'olzhenying');
+						});
+					}
+					else event._result={cards:num-len};
+					'step 2'
+					if(result&&result.cards){
+						var cards=result.cards;
+					}
+					event.result=cards;
+				},
+				ai:{
+					order:function(item,player){
+						if(game.hasPlayer(current=>{
+							return current.countCards('h')<player.countCards('h');
+						})) return 3;
+						return 7;
+					},
+					result:{
+						player:function(player,target){
+							var delt=2-player.countCards('h');
+							return Math.sqrt(Math.abs(delt))*Math.sign(delt)+0.1;
+						},
+						target:function(player,target){
+							if(get.attitude(player,target)>0&&target.countCards('h')+player.countCards('h')<=3) return 1;
+							return get.sgn(get.effect(target,{name:'juedou'},player,target))*1.2;
+						}
+					}
+				},
+			},
 			//OL孟达
 			olgoude:{
 				audio:2,
@@ -23337,6 +23580,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_mengda:'OL孟达',
 			olgoude:'苟得',
 			olgoude_info:'一名角色的回合结束时，若有与你势力相同的角色执行过以下项，则你可以执行这些角色未执行过的一项：1.摸一张牌；2.弃置一名角色的一张手牌；3.使用一张无对应实体牌的【杀】；4.变更势力。',
+			haopu:'郝普',
+			olzhenying:'镇荧',
+			olzhenying_info:'出牌阶段限两次。你可以选择一名手牌数不大于你的其他角色，你与其同时将手牌摸或弃置至至多两张。然后你与其中手牌数较少的角色视为对另一名角色使用一张【决斗】。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

@@ -766,7 +766,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.useCard({name:'zhibi',isCard:true},targets[0]);
 					'step 1'
 					if(player.countCards('he')>0&&targets[1].isAlive()){
-						player.chooseCard('h',true,'交给'+get.translation(targets[1])+'一张牌');
+						player.chooseCard('he',true,'交给'+get.translation(targets[1])+'一张牌');
 					}
 					else event.finish();
 					'step 2'

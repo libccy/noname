@@ -1494,14 +1494,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var trigger=event.getParent().getTrigger();
 							var target=trigger.respondTo[0];
 							event.target=target;
-							if(!target||!target.countGainableCards(player,'he')) event._result={bool:false};
+							if(!target||!target.countGainableCards(player,player==target?'e':'he')) event._result={bool:false};
 							else player.chooseBool(get.prompt('scsanruo_effect',target),'获得该角色的一张牌').set('ai',()=>{
 								return _status.event.goon;
 							}).set('goon',get.attitude(player,target)<1);
 							'step 1'
 							if(result.bool){
 								player.logSkill('scsanruo_effect',target);
-								player.gainPlayerCard(target,'he',true);
+								player.gainPlayerCard(target,player==target?'e':'he',true);
 							}
 						}
 					},
@@ -13597,7 +13597,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			scsniqu_info:'出牌阶段限一次。你可以对一名角色造成1点火焰伤害。',
 			scs_gaowang:'高望',
 			scsanruo:'安弱',
-			scsanruo_info:'你可以将一张♥牌当【桃】、♦当火【杀】、♣牌当【闪】、♠当【无懈可击】使用。当你以此法使用或打出【杀】或【闪】时，你可以获得对方的一张牌；当你以此法使用【桃】时，你可以获得一名其他角色的一张牌；当你以此法使用【无懈可击】时，你可以获得此牌响应的普通锦囊牌的使用者的一张牌。',
+			scsanruo_info:'你可以将一张♥牌当【桃】、♦牌当火【杀】、♣牌当【闪】、♠牌当【无懈可击】使用。当你以此法使用或打出【杀】或【闪】时，你可以获得对方的一张牌；当你以此法使用【桃】时，你可以获得一名其他角色的一张牌；当你以此法使用【无懈可击】时，你可以获得此牌响应的普通锦囊牌的使用者的一张牌。',
 
 			
 			mobile_standard:'手杀异构·标准包',

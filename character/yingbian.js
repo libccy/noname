@@ -2767,7 +2767,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				filter:function(event,player){
 					var target=_status.currentPhase;
-					if(!target||!target.isIn()||event.type!='discard'||event.getlx===false||!target.isPhaseUsing()) return false;
+					if(!target||!target.isIn()||event.type!='discard'||!target.isPhaseUsing()) return false;
+					if(target==player) return false;
 					var evt=event.getl(target);
 					for(var i of evt.hs){
 						if(get.position(i,true)=='d') return true;
