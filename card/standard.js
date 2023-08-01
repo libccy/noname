@@ -734,6 +734,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else{
 						num=game.countPlayer();
 					}
+					if(card.storage&&typeof card.storage.extraCardsNum=='number') num+=card.storage.extraCardsNum;
 					var cards=get.cards(num);
 					game.cardsGotoOrdering(cards).relatedEvent=event.getParent();
 					var dialog=ui.create.dialog('五谷丰登',cards,true);
@@ -2547,6 +2548,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 											return 0;
 										}
 									}
+									if(name=='bingliang'&&source.countCards('j')>0&&source.countCards('h')>=source.hp-1){
+										return 0;
+									}
 									var card2;
 									if(name!=card.name){
 										card2={name:name};
@@ -2732,7 +2736,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(event.wuxieresult&&event.wuxieresult2&&event.wuxieresult2.skill){
 						var info=get.info(event.wuxieresult2.skill);
 						if(info&&info.precontent&&!game.online){
-							var next=game.createEvent('pre_'+event.wuxieresult2);
+							var next=game.createEvent('pre_'+event.wuxieresult2.skill);
 							next.setContent(info.precontent);
 							next.set('result',event.wuxieresult2);
 							next.set('player',event.wuxieresult);

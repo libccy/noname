@@ -66,7 +66,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_yujin:['male','wei',4,['jieyue']],
 			//lusu:['male','wu',3,['haoshi','dimeng']],
 			//yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
-			old_zhonghui:['male','wei',3,['zzhenggong','zquanji','zbaijiang']],
+			old_zhonghui:['male','wei',3,['zzhenggong','zquanji','zbaijiang'],['clan:颍川钟氏']],
 			old_xusheng:['male','wu',4,['pojun']],
 			old_zhuran:['male','wu',4,['olddanshou']],
 			old_lingtong:['male','wu',4,['oldxuanfeng']],

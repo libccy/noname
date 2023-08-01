@@ -32,10 +32,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_diaochan:['female','qun',3,['sblijian','sbbiyue']],
 			sb_yuanshao:['male','qun',4,['sbluanji','sbxueyi'],['zhu']],
 			sb_pangtong:['male','shu',3,['sblianhuan','sbniepan']],
-			sb_sunce:['male','wu','2/4',['sbjiang','sbhunzi','sbzhiba'],['zhu']],
+			sb_sunce:['male','wu',4,['sbjiang','sbhunzi','sbzhiba'],['zhu']],
 			sb_daqiao:['female','wu',3,['sbguose','sbliuli']],
 			sb_liubiao:['male','qun',3,['sbzishou','sbzongshi']],
-			sb_zhurong:['female','shu',4,['sblieren','sbjuxiang'],['unseen']],
+			sb_zhurong:['female','shu',4,['sblieren','sbjuxiang']],
+			sb_menghuo:['male','shu',4,['sbhuoshou','sbzaiqi']],
 		},
 		characterSort:{
 			sb:{
@@ -43,10 +44,158 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sb_shi:['sb_xuhuang','sb_machao','sb_fazheng','sb_chengong','sb_diaochan','sb_pangtong'],
 				sb_tong:['liucheng','sp_yangwan','sb_xiahoushi','sb_zhangfei','sb_zhaoyun','sb_sunce','sb_zhurong'],
 				sb_yu:['sb_yujin','sb_lvmeng','sb_huangzhong','sb_huanggai','sb_zhouyu','sb_caoren','sb_ganning'],
-				sb_neng:['sb_huaxiong','sb_sunshangxiang','sb_jiangwei','sb_yuanshao'],
+				sb_neng:['sb_huaxiong','sb_sunshangxiang','sb_jiangwei','sb_yuanshao','sb_menghuo'],
 			}
 		},
 		skill:{
+			//萌货
+			sbhuoshou:{
+				audio:2,
+				trigger:{
+					player:'phaseUseBegin',
+				},
+				filter:function(event,player){
+					return true;
+				},
+				forced:true,
+				onremove:true,
+				group:['sbhuoshou_cancel','sbhuoshou_source','sbhuoshou_nanmaned'],
+				content:function(){
+					'step 0'
+					var card=get.discardPile(card=>{
+						return card.name=='nanman';
+					});
+					if(card){
+						player.gain(card,'gain2');
+					}
+					else{
+						game.log('但是弃牌堆里并没有','#y南蛮入侵','！');
+						player.addMark('sbhuoshou',1,false);
+						if(player.countMark('sbhuoshou')>=5&&Math.random()<0.25) player.chat('我南蛮呢');
+					}
+				},
+				subSkill:{
+					cancel:{
+						audio:'sbhuoshou',
+						trigger:{target:'useCardToBefore'},
+						forced:true,
+						priority:15,
+						filter:function(event,player){
+							return (event.card.name=='nanman');
+						},
+						content:function(){
+							trigger.cancel();
+						},
+					},
+					source:{
+						audio:'sbhuoshou',
+						trigger:{global:'useCardToPlayered'},
+						forced:true,
+						filter:function(event,player){
+							return event.isFirstTarget&&event.card&&event.card.name=='nanman'&&event.player!=player;
+						},
+						content:function(){
+							trigger.getParent().customArgs.default.customSource=player;
+						}
+					},
+					nanmaned:{
+						trigger:{
+							player:'useCard1',
+						},
+						filter:function(event,player){
+							return event.card.name=='nanman';
+						},
+						forced:true,
+						popup:false,
+						charlotte:true,
+						content:function(){
+							'step 0'
+							player.addTempSkill('sbhuoshou_ban','phaseUseAfter');
+						}
+					},
+					ban:{
+						charlotte:true,
+						intro:{
+							content:'此阶段不能再使用【南蛮入侵】',
+						}
+					},
+				},
+				mod:{
+					cardEnabled:function(card,player){
+						if(player.hasSkill('sbhuoshou_ban')&&card.name=='nanman') return false;
+					},
+				},
+				ai:{
+					threaten:1.9,
+				}
+			},
+			sbzaiqi:{
+				audio:2,
+				trigger:{
+					player:'phaseDiscardEnd',
+				},
+				chargeSkill:true,
+				filter:function(event,player){
+					return player.hasMark('charge');
+				},
+				group:'sbzaiqi_backflow',
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('sbzaiqi'),'选择任意名角色并消耗等量蓄力值，令这些角色选择一项：1.令你摸一张牌；2.弃置一张牌，然后你回复1点体力',[1,player.countMark('charge')]).set('ai',function(target){
+						var player=_status.event.player;
+						return get.attitude(player,target)+player.getDamagedHp()*3.5;
+					});
+					'step 1'
+					if(result.bool){
+						var targets=result.targets;
+						targets.sortBySeat();
+						event.targets=targets;
+						player.logSkill('sbzaiqi',targets);
+						player.removeMark('charge',targets.length);
+					}
+					else event.finish();
+					'step 2'
+					var target=targets.shift();
+					event.target=target;
+					if(!target.countCards('he')) event._result={bool:false};
+					else target.chooseToDiscard(get.translation(player)+'对你发动了【再起】','是否弃置一张牌令其回复1点体力？或者点击“取消”，令该角色摸一张牌。','he').set('ai',card=>{
+						var eff=_status.event.eff,att=_status.event.att;
+						if(eff>0&&att>0||eff<=0&&att<0) return 5.5-get.value(card);
+						return 0;
+					}).set('eff',get.recoverEffect(player,player,target)).set('att',get.attitude(target,player));
+					'step 3'
+					target.line(player);
+					if(result.bool){
+						player.recover();
+					}
+					else{
+						player.draw();
+					}
+					game.delayex();
+					if(targets.length) event.goto(2);
+				},
+				subSkill:{
+					backflow:{
+						audio:'sbzaiqi',
+						trigger:{
+							player:'enterGame',
+							source:'damageSource',
+							global:'phaseBefore',
+						},
+						usable:1,
+						forced:true,
+						locked:false,
+						filter:function(event,player){
+							if(event.name=='damage') return true;
+							return (event.name!='phase'||game.phaseNumber==0);
+						},
+						content:function(){
+							player.addMark('charge',1);
+						}
+					}
+				}
+			},
 			//祝融
 			sblieren:{
 				audio:2,
@@ -295,9 +444,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('sbhunzi');
 					player.loseMaxHp();
 					'step 1'
-					player.changeHujia(2,null,true);
+					player.changeHujia(1,null,true);
 					'step 2'
-					player.draw(3);
+					player.draw(2);
 					'step 3'
 					player.addSkillLog('sbyingzi');
 					player.addSkillLog('gzyinghun');
@@ -348,7 +497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					draw:{
 						trigger:{global:'dieAfter'},
 						filter:function(event,player){
-							return event.getParent(4).name=='sbzhiba';
+							return event.getParent(3).name=='sbzhiba';
 						},
 						forced:true,
 						charlotte:true,
@@ -394,7 +543,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.useCard({name:'lebu'},target,cards).audio=false;
 					}
 					'step 1'
-					player.draw();
+					player.draw(2);
 					player.chooseToDiscard(true,'he','国色：请弃置一张牌');
 				},
 				ai:{
@@ -725,6 +874,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(targets[i].hp==1){
 							eff*=1.5;
 						}
+						if(get.attitude(player,targets[i])==0||targets[i].group=='qun'){
+							eff+=0.5;
+						}
 						num+=eff;
 					}
 					if(!player.needsToDiscard(-1)){
@@ -766,6 +918,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return num+2*game.countPlayer(current=>player!=current&&current.group=='qun');
 						}
 					}
+				},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(player!=target&&target&&target.group=='qun'&&card.name!='tao') return [1,0.1];
+						},
+					},
 				}
 			},
 			//庞统
@@ -1614,13 +1773,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(ui.selected.targets.length){
 							var current=ui.selected.targets[0];
-							if(current.group=='shu'&&current.hp>=player.hp){
+							if(current.group=='shu'&&current.hp>=player.hp&&current!=player){
 								return -get.attitude(player,target);
 							}
 							return Math.abs(get.attitude(player,current));
 						}
 						else{
-							if(target.group=='shu'&&target.hp>=player.hp&&game.hasPlayer(current=>{
+							if(target.group=='shu'&&target.hp>=player.hp&&target!=player&&game.hasPlayer(current=>{
 								return get.attitude(player,current)<0;
 							})) return 10;
 							return 1;
@@ -1630,7 +1789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var targets=result.targets;
 						event.targets=targets;
-						if(targets[0].group!='shu'||targets[0].hp<player.hp) targets.reverse();
+						if(targets[0].group!='shu'||targets[0].hp<player.hp||targets[0]==player) targets.reverse();
 						player.logSkill('sbjijiang',targets,false);
 						player.line2(targets);
 						var choiceList=[
@@ -1884,7 +2043,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						popup:false,
 						filter:function(event,player){
-							return event.card.storage&&event.card.storage.sbpaoxiao&&event.target.isAlive();
+							return event.card.storage&&event.card.storage.sbpaoxiao&&event.target.isIn();
 						},
 						content:function(){
 							trigger.target.addTempSkill('fengyin');
@@ -1896,7 +2055,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{source:'damageSource'},
 						forced:true,
 						filter:function(event,player){
-							return event.card&&event.card.storage&&event.card.storage.sbpaoxiao&&event.player.isAlive();
+							return event.card&&event.card.storage&&event.card.storage.sbpaoxiao&&event.player.isIn();
 						},
 						content:function(){
 							'step 0'
@@ -3442,7 +3601,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbjiuyuan:{
 				audio:2,
-				usable:1,
 				trigger:{global:'useCard'},
 				forced:true,
 				zhuSkill:true,
@@ -3568,7 +3726,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						dutySkill:true,
 						filter:function(event,player){
-							return (event.name!='phase'||game.phaseNumber==0);
+							return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 						},
 						content:function(){
 							'step 0'
@@ -4464,12 +4622,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbjiang:'激昂',
 			sbjiang_info:'①当你使用【决斗】或红色【杀】指定目标后，或当你成为【决斗】或红色【杀】的目标后，你摸一张牌。②当你使用【决斗】时，你可以额外指定一名目标，然后你失去1点体力。③出牌阶段限一次。你可以将所有手牌当【决斗】使用。',
 			sbhunzi:'魂姿',
-			sbhunzi_info:'觉醒技。当你脱离濒死状态后，你减1点体力上限，获得2点护甲，摸三张牌。然后你获得〖英姿〗和〖英魂〗。',
+			sbhunzi_info:'觉醒技。当你脱离濒死状态后，你减1点体力上限，获得1点护甲，摸两张牌。然后你获得〖英姿〗和〖英魂〗。',
 			sbzhiba:'制霸',
 			sbzhiba_info:'主公技，限定技。当你进入濒死状态时，你可以回复X点体力并修改〖激昂③〗为“出牌阶段限X次”（X为场上其他吴势力角色数+1）。然后其他吴势力角色依次受到1点无来源伤害，且当有角色因此死亡后，你摸三张牌。',
 			sb_daqiao:'谋大乔',
 			sbguose:'国色',
-			sbguose_info:'出牌阶段限四次。你可以选择一项：1.将一张♦牌当【乐不思蜀】使用；2.弃置场上一张【乐不思蜀】。然后你摸一张牌并弃置一张牌。',
+			sbguose_info:'出牌阶段限四次。你可以选择一项：1.将一张♦牌当【乐不思蜀】使用；2.弃置场上一张【乐不思蜀】。然后你摸两张牌并弃置一张牌。',
 			sbliuli:'流离',
 			sbliuli_info:'当你成为【杀】的目标时，你可以弃置一张牌并选择你攻击范围内的一名不为此【杀】使用者的角色，将此【杀】转移给该角色。若你以此法弃置了♥牌，则你可以令一名不为此【杀】使用者的其他角色获得“流离”标记，且移去场上所有其他的“流离”（每回合限一次）。有“流离”的角色回合开始时，其移去其“流离”并执行一个额外的出牌阶段。',
 			sb_liubiao:'谋刘表',
@@ -4482,6 +4640,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sblieren_info:'当你使用【杀】指定唯一目标后，你可以摸一张牌并与其拼点。若你赢，此【杀】结算结束后，你可以对另一名其他角色造成1点伤害。',
 			sbjuxiang:'巨象',
 			sbjuxiang_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】结算结束后，你获得此牌对应的所有实体牌。③结束阶段，若你未于本回合使用过【南蛮入侵】，你可以将一张游戏外的随机【南蛮入侵】（共八张）交给一名角色。',
+			sb_menghuo:'谋孟获',
+			sbhuoshou:'祸首',
+			sbhuoshou_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】指定第一个目标后，你代替其成为此牌的伤害来源。③出牌阶段开始时，你随机获得弃牌堆中的一张【南蛮入侵】。④出牌阶段，若你于此阶段使用过【南蛮入侵】，你不能使用【南蛮入侵】。',
+			sbzaiqi:'再起',
+			sbzaiqi_info:'蓄力技（1/7）。①弃牌阶段结束时，你可以消耗任意点蓄力值并选择等量名角色，然后令这些角色选择一项：1.令你摸一张牌；2.弃置一张牌，然后你回复1点体力。②每回合限一次。当你造成伤害后，你获得1点蓄力值。',
 
 			sb_zhi:'谋攻篇·知',
 			sb_shi:'谋攻篇·识',

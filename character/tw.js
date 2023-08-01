@@ -314,6 +314,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							if(lib.filter.canBeDiscarded(card,target,player)){
 								target.discard(card,'notBySelf');
+								target.draw();
 							}
 						}
 					}
@@ -405,9 +406,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					var count=game.countPlayer(current=>{
+					var count=get.cnNumber(game.countPlayer(current=>{
 						return get.distance(player,current)<=1;
-					});
+					}));
 					player.chooseTarget(get.prompt('twzhiqu'),'选择一名其他角色并视为使用牌堆顶'+count+'张牌中的【杀】。若你与其均在对方的攻击范围内，你改为依次对其使用牌堆顶'+count+'张牌中的【杀】或锦囊牌。',lib.filter.notMe).set('ai',target=>{
 						var player=_status.event.player;
 						return get.effect(target,{name:'sha'},player,player)*(get.distance(player,target)==1?2:1);
@@ -427,8 +428,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(player.isIn()&&target.isIn()&&cards.length){
 						do var card=cards.shift();
-						while(get.name(card)=='sha'||event.fight&&get.type2(card)=='trick');
-						if(!card) return;
+						while(get.name(card)!='sha'&&(!event.fight||get.type2(card)!='trick')&&cards.length);
+						if(get.name(card)!='sha'&&(!event.fight||get.type2(card)!='trick')) return;
 						player.chooseUseTarget(card,true,false,'nodistance').set('filterTarget',function(card,player,target){
 							var evt=_status.event;
 							if(_status.event.name=='chooseTarget') evt=evt.getParent();
@@ -445,9 +446,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.isPhaseUsing()) return false;
 					if(player==event.player) return false;
+					if(!event.player.isIn()) return false;
+					if(!event.card) return false;
 					return event.card.name=='sha'||get.type(event.card)=='trick'&&get.tag(event.card,'damage');
 				},
 				logTarget:'player',
+				check:function(event,player){
+					var att=get.attitude(event.player,player);
+					if(player.hasSkill('twzhiqu')){
+						var cnt=game.countPlayer(current=>get.distance(player,current)==2&&!player.inRange(current));
+						if(cnt>=2){
+							if(att<0) return true;
+							return false;
+						}
+						if(att<0&&cnt>=2||att>0&&!cnt) return true;
+						return false;
+					}
+					else{
+						if(att<0) return false;
+						return true;
+					}
+				},
 				content:function(){
 					'step 0'
 					var target=trigger.player;
@@ -461,7 +480,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var att=get.attitude(target,player);
 						if(att==0) return 0;
 						if(player.hasSkill('twzhiqu')){
-							var cnt=game.countPlayer(current=>get.distance(player,current)==2);
+							var cnt=game.countPlayer(current=>get.distance(player,current)==2&&!player.inRange(current));
 							if(cnt>=2){
 								if(att<0) return 1;
 								return 0;
@@ -478,38 +497,60 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.index==0){
 						target.draw();
 						player.addTempSkill('twxianfeng_me',{player:'phaseBegin'});
+						player.addMark('twxianfeng_me',1,false);
 					}
 					else{
 						player.draw();
-						target.addTempSkill('twxianfeng_others');
-						target.markAuto('twxianfeng_others',[player]);
+						target.addSkill('twxianfeng_others');
+						if(!target.storage.twxianfeng_others) target.storage.twxianfeng_others={};
+						if(typeof target.storage.twxianfeng_others[player.playerid]!='number') target.storage.twxianfeng_others[player.playerid]=0;
+						target.storage.twxianfeng_others[player.playerid]++;
 					}
 				},
 				subSkill:{
 					me:{
 						charlotte:true,
 						mark:true,
-						intro:{content:'至其他角色的距离-1'},
+						intro:{content:'至其他角色的距离-#'},
 						mod:{
 							globalFrom:function(from,to,distance){
-								return distance-1;
+								return distance-from.countMark('twxianfeng_me');
 							}
 						}
 					},
 					others:{
 						trigger:{global:['phaseBegin','die']},
 						filter:function(event,player){
-							return player.getStorage('twxianfeng_others').contains(event.player);
+							return player.storage.twxianfeng_others&&player.storage.twxianfeng_others[event.player.playerid];
 						},
 						charlotte:true,
 						mark:true,
-						intro:{content:'至$的距离-1'},
+						forced:true,
+						intro:{
+							markcount:function(storage,player){
+								var max=0;
+								for(var id in storage){
+									if(storage[id]>max) max=storage[id];
+								}
+								return max;
+							},
+							content:function(storage,player){
+								if(!storage) return '';
+								var str='';
+								var map=(_status.connectMode?lib.playerOL:game.playerMap);
+								for(var id in storage){
+									str+='至'+get.translation(map[id])+'的距离-'+storage[id]+'、';
+								}
+								return str.slice(0,-1);
+							},
+						},
 						content:function(){
-							player.unmarkAuto('twxianfeng_others',[trigger.player]);
+							delete player.storage.twxianfeng_others[trigger.player.playerid];
+							if(get.is.empty(player.storage.twxianfeng_others)) player.removeSkill('twxianfeng_others');
 						},
 						mod:{
 							globalFrom:function(from,to,distance){
-								if(from.getStorage('twxianfeng_others').contains(to)) return distance-1;
+								if(from.storage.twxianfeng_others&&typeof from.storage.twxianfeng_others[to.playerid]=='number') return distance-from.storage.twxianfeng_others[to.playerid];
 							}
 						}
 					},
@@ -672,7 +713,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				onremove:true,
 				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0);
+					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				group:['twyanshi_hurt','twyanshi_damage'],
 				content:function(){
@@ -2129,6 +2170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var num=0,numx=target.countCards('h',{name:'sha'}),targetx=target;
 							for(var i=0; i<numx; i++){
 								targetx=targetx.next;
+								if(targetx==player) targetx=targetx.next;
 							}
 							var att1=get.attitude(player,target),att2=get.attitude(player,targetx);
 							if(att1>0&&att2<0) num=0.25;
@@ -2142,7 +2184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
-					return event.player.isAlive()&&get.distance(player,event.player)<=1;
+					return event.player.isIn()&&get.distance(player,event.player)<=1;
 				},
 				logTarget:'player',
 				check:function(event,player){
@@ -2170,16 +2212,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '选项一';
 					}).set('list',list);
 					'step 1'
-					if(result.control=='背水！'&&player!=trigger.player) player.give(player.getCards('h'),trigger.player);
-					if(result.control!='选项二'){
+					event.choice=result.control;
+					if(event.choice=='背水！'&&player!=trigger.player) player.give(player.getCards('h'),trigger.player);
+					'step 2'
+					if(event.choice!='选项二'){
 						var card=get.cardPile2(function(card){
 							return card.name=='sha';
 						});
 						if(card) trigger.player.gain(card,'gain2');
 						else game.log('但牌堆里已经没有','#y杀','了！');
-						if(result.control=='选项一') event.finish();
+						if(event.choice=='选项一') event.finish();
 					}
-					if(result.control!='选项一'){
+					'step 3'
+					if(event.choice!='选项一'){
 						if(trigger.player.countCards('h')) trigger.player.chooseCardTarget({
 							prompt:'将一张手牌交给另一名其他角色并摸两张牌',
 							filterCard:true,
@@ -2196,7 +2241,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						else event.finish();
 					}
-					'step 2'
+					'step 4'
 					var target=result.targets[0];
 					trigger.player.line(target);
 					trigger.player.give(result.cards,target);
@@ -4312,7 +4357,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				content:function(){
 					'step 0'
-					var forced=event.getParent(2).name=='twshuangren_end';
+					var forced=event.getParent(2).name=='twshuangren_end'&&game.hasPlayer(current=>{
+						return player.canCompare(current);
+					});
 					var str='与一名角色拼点，若你：赢，你可以视为对至多两名至其的距离不大于1的角色使用一张【杀】；没赢，其可以视为对你使用一张【杀】';
 					player.chooseTarget(forced?'双刃：选择一名角色':get.prompt('twshuangren'),str,forced,(card,player,target)=>{
 						return player.canCompare(target);
@@ -4556,7 +4603,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				logTarget:'source',
 				filter:function(event,player){
-					return event.source&&event.source.isAlive();
+					return event.source&&event.source.isIn();
 				},
 				check:function(event,player){
 					var att=get.attitude(player,event.source);
@@ -4601,7 +4648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.suit(card)!='heart') player.draw();
 					'step 4'
 					var target=trigger.source;
-					if(target.isAlive()&&event.count>0) player.chooseBool(get.prompt('twenyuan',target),lib.skill.twenyuan2.prompt2).set('ai',function(){
+					if(target.isIn()&&event.count>0&&player.hasSkill('twenyuan')) player.chooseBool(get.prompt('twenyuan',target),lib.skill.twenyuan2.prompt2).set('ai',function(){
 						var evt=_status.event.getTrigger();
 						return lib.skill.twenyuan2.check(evt,evt.player);
 					});
@@ -4972,7 +5019,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					game.delayx();
-					if(player.getExpansions('twxingwu').length<3) event.finish();
+					if(player.getExpansions('twxingwu').length<3||!game.hasPlayer(current=>current!=player)) event.finish();
 					'step 3'
 					player.chooseButton(['是否移去三张“星舞”牌并发射核弹？',player.getExpansions('twxingwu')],3).set('ai',function(button){
 						if(_status.event.goon) return 1;
@@ -6664,7 +6711,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				content:function(){
 					trigger.cancel();
-					target.damage(trigger.source?trigger.source:'nosource',trigger.nature,trigger.num).set('card',trigger.card).set('cards',trigger.cards).twgonghuan=true;
+					player.damage(trigger.source?trigger.source:'nosource',trigger.nature,trigger.num).set('card',trigger.card).set('cards',trigger.cards).twgonghuan=true;
 				},
 			},
 			//桥蕤
@@ -7530,7 +7577,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.filterCard({name:'shan'},player,event)){
 							list.push(['基本','','shan']);
 						}
-						return ui.create.dialog('朝凤',[list,'vcard'],'hidden');
+						var dialog=ui.create.dialog('朝凤',[list,'vcard'],'hidden');
+						dialog.direct=true;
+						return dialog;
 					},
 					check:function(button){
 						var player=_status.event.player;
@@ -8203,7 +8252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							if(!player.countCards('he')) return false;
 							var evt=player.storage.twgongge_buff2;
-							if(evt.card==event.card&&evt.target.isAlive()&&evt.target.hp>=player.hp) return true;
+							if(evt.card==event.card&&evt.target.isIn()&&evt.target.hp>=player.hp) return true;
 							return false;
 						},
 						direct:true,
@@ -8227,7 +8276,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							if(!event.card) return false;
 							var evt=player.storage.twgongge_buff3;
-							if(evt.card==event.card&&evt.target.isAlive()&&(event.name=='useCard'||event.player==evt.target)) return true;
+							if(evt.card==event.card&&evt.target.isIn()&&(event.name=='useCard'||event.player==evt.target)) return true;
 							return false;
 						},
 						direct:true,
@@ -8235,7 +8284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							var evt=player.storage.twgongge_buff3;
 							if(trigger.name=='damage') trigger.num+=evt.num;
-							else if(evt.target.isAlive()) evt.target.recover(evt.num);
+							else if(evt.target.isIn()) evt.target.recover(evt.num);
 						},
 					},
 					buff1_mark:{
@@ -8251,7 +8300,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:3,
 				trigger:{global:'phaseBefore',player:'enterGame'},
 				filter:function(event,player){
-					return event.name!='phase'||game.phaseNumber==0;
+					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				forced:true,
 				content:function(){
@@ -10661,7 +10710,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						};
 					} else event.finish();
 					'step 3'
-					if(result.bool){
+					if(result.bool&&game.hasPlayer(current=>current!=player)){
 						player.chooseTarget('选择一名其他角色，对其造成2点雷电伤害',lib.filter.notMe,true).set('ai',target=>get.damageEffect(target,player,player,'thunder'));
 					}
 					'step 4'
@@ -12454,7 +12503,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									});
 									if(card) player.gain(card,'gain2');
 								}
-								if(event.count>0) event.goto(1);
+								if(event.count>0&&player.hasSkill('twmiaolve')) event.goto(1);
 							}
 						},
 					},
@@ -12904,7 +12953,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				filter:function(event,player){
 					var evt=event.getParent(2);
-					return evt.name=='twrangyi'&&evt.player.isAlive()&&player.countCards('h',function(card){
+					return evt.name=='twrangyi'&&evt.player.isIn()&&player.countCards('h',function(card){
 						return card.hasGaintag('twrangyi');
 					})>0;
 				},
@@ -13245,6 +13294,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var choiceList=['令一名其他角色与你各摸一张牌','令自己下个出牌阶段可以多发动一次【外使】'];
+					event.count=0;
+					if(game.hasPlayer(current=>current!=player)){
+						choiceList.shift();
+						event.count++;
+					}
 					if(lib.skill.chijie.filter&&lib.skill.chijie.filter({},player)) choiceList.push('将自己的势力变更为场上存在的一个其他势力');
 					player.chooseControl('cancel2').set('prompt',get.prompt('renshe')).set('choiceList',choiceList).set('ai',function(){
 						if(game.hasPlayer(function(current){
@@ -13257,13 +13311,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.index=result.index;
 						player.logSkill('renshe');
-						if(event.index==0){
+						if(event.index+event.count==0){
 							player.chooseTarget('请选择一名角色，与其各摸一张牌',lib.filter.notMe,true).ai=function(target){
 								if(target.hasSkillTag('nogain')) return 0.1;
 								return get.attitude(_status.event.player,target);
 							};
 						}
-						else if(result.index==1){
+						else if(result.index+event.count==1){
 							player.storage.waishi++;
 							event.finish();
 						}

@@ -67,7 +67,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pe_wenqin:['male','wei',4,['gzjinfa']],
 			pe_sunchen:['male','wu',4,['zyshilu','zyxiongnve']],
 			pe_mengda:['male','wei',4,['qiuan','liangfan']],
-			pe_zhonghui:['male','wei',4,['zyquanji','zypaiyi']],
+			pe_zhonghui:['male','wei',4,['zyquanji','zypaiyi'],['clan:颍川钟氏']],
 			pe_wangyun:['male','qun',3,['zylianji','zymoucheng'],['clan:太原王氏']],
 			shen_jiaxu:['male','shen',3,['weimu','zybishi','zyjianbing'],['qun']],
 			yj_zhenji:['female','wei',3,['yjluoshen','qingguo']],
@@ -178,9 +178,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var go=false,d1=true;
+					var go=false,d1=false;
 					if(get.attitude(player,trigger.player)>0){
-						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false
+						d1=true;
+						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false;
 						for(var target of trigger.targets){
 							if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
 								target:target,
@@ -281,8 +282,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.source!=player&&event.card&&event.card.name=='sha'&&event.source.isIn();
 				},
 				check:function(event,player){
-					return get.attitude(player,event.source)>=0||
-						get.attitude(player,event.source)>=-4&&get.distance(_status.currentPhase,player,'absolute')>get.distance(_status.currentPhase,trigger.source,'absolute')
+					return get.attitude(player,event.source)>=0||get.attitude(player,event.source)>=-4
+						&&get.distance(_status.currentPhase,player,'absolute')>get.distance(_status.currentPhase,event.source,'absolute');
 				},
 				content:function(){
 					'step 0'
@@ -1837,7 +1838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.gain(result.links,'gain2');
 					}
 					'step 4'
-					if(event.num>0){
+					if(event.num>0&&player.hasSkill('jsrgrangjie')){
 						player.chooseBool(get.prompt2('jsrgrangjie')).set('ai',()=>_status.event.bool).set('bool',lib.skill.jsrgrangjie.check(trigger,player));
 					}
 					else event.finish();
@@ -1854,7 +1855,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target){
 							if(get.tag(card,'damage')){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
-								if(!target.canMoveCard(true)||!target.hasFriend()) return;
+								if(target._jsrgrangjie_aiChecking) return;
+								target._jsrgrangjie_aiChecking=true;
+								var moveCard=target.canMoveCard(true);
+								delete target._jsrgrangjie_aiChecking;
+								if(!moveCard||!target.hasFriend()) return;
 								var num=1;
 								if(get.attitude(player,target)>0){
 									if(player.needsToDiscard()){
@@ -3817,7 +3822,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				locked:false,
 				filter:function(event,player){
-					return !player.hasSkill('psliaozou_blocker',null,null,false);
+					return !player.hasSkill('psliaozou_blocker',null,null,false)&&player.getExpansions('psshiyin').length>0;
 				},
 				content:function(){
 					'step 0'
@@ -4766,6 +4771,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player,name){
 					if(name=='damageEnd') return true;
 					var evt=event.getParent();
+					if(evt.player!=player) return false;
 					return evt.card&&evt.type=='card'&&evt.targets.length==1;
 				},
 				content:function(){
@@ -6834,7 +6840,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 4'
 					if(cards.length) player.gain(cards,'gain2','log');
 					'step 5'
-					if(event.count>0){
+					if(event.count>0&&player.hasSkill('spyinzhi')){
 					 player.chooseBool(get.prompt2('spyinzhi')).set('frequentSkill','spyinzhi');
 					}
 					else event.finish();
@@ -8001,7 +8007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return player.hasSkill('fenyong2')&&event.player.isAlive();
+					return player.hasSkill('fenyong2')&&event.player.isIn();
 				},
 				content:function(){
 					'step 0'
@@ -8470,7 +8476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 3'
-					if(player.storage.zhaolie.isAlive()){
+					if(player.storage.zhaolie.isIn()){
 						player.storage.zhaolie.gain(event.basic,'gain2','log');
 					}
 					else{

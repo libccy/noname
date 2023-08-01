@@ -362,6 +362,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return Math.random();
 					}).set('dialog',event.videoId);
 					"step 5"
+					game.broadcastAll('closeDialog',event.videoId);
 					game.me.next.init(result.links[0]);
 					_status.characterlist.remove(result.links[0]);
 					game.addRecentCharacter(result.links[0]);

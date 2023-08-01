@@ -11,7 +11,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangzhi:['female','jin',3,['xinwanyi','maihuo']],
 			yangyan:['female','jin',3,['xinxuanbei','xianwan']],
 			ol_huaxin:['male','wei',3,['caozhao','olxibing']],
-			zhongyan:['female','jin',3,['bolan','yifa']],
+			zhongyan:['female','jin',3,['bolan','yifa'],['clan:颍川钟氏']],
 			weiguan:['male','jin',3,['zhongyun','shenpin']],
 			cheliji:['male','qun',4,['chexuan','qiangshou']],
 			simazhou:['male','jin',4,['recaiwang','naxiang']],
@@ -2767,7 +2767,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				filter:function(event,player){
 					var target=_status.currentPhase;
-					if(!target||!target.isIn()||event.type!='discard'||event.getlx===false||!target.isPhaseUsing()) return false;
+					if(!target||!target.isIn()||event.type!='discard'||!target.isPhaseUsing()) return false;
+					if(target==player) return false;
 					var evt=event.getl(target);
 					for(var i of evt.hs){
 						if(get.position(i,true)=='d') return true;

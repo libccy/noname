@@ -176,7 +176,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							var cards=target.getCards('e'),js=target.getCards('j');
 							var val=get.value(cards,target);
-							for(var card of js) val-=get.effect(target,card.viewAs?{name:card.viewAs}:card,target,target)
+							for(var card of js) val-=get.effect(target,card.viewAs?{name:card.viewAs}:card,target,player);
 							return -val;
 						},
 					},
@@ -422,6 +422,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				position:'h',
 				filterTarget:lib.filter.notMe,
+				check:function(card){
+					var player=_status.event.player;
+					var val=5;
+					if(player.needsToDiscard()) val=15;
+					return val-get.value(card);
+				},
 				discard:false,
 				lose:false,
 				delay:false,
@@ -429,6 +435,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.give(cards,target);
 				},
+				ai:{
+					expose:0.1,
+					order:1,
+					result:{
+						target:function(player,target){
+							if(!ui.selected.cards.length) return 0;
+							if(get.value(ui.selected.cards[0],false,'raw')<0) return -1;
+							return 1;
+						}
+					}
+				}
 			},
 			qixingbaodao:{
 				trigger:{player:'equipAfter'},
@@ -546,7 +563,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 0;
 						},
 						ai2:function(target){
-							return -get.attitude(_status.event.player,target);
+							return -get.attitude(_status.event.player,target)+0.01;
 						},
 					});
 					'step 2'

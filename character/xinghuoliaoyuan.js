@@ -725,7 +725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						logTarget:function(event,player){
 							return player.getStorage('xinfu_weilu_effect').filter(function(current){
-								return current.isAlive()&&current.hp>1;
+								return current.isIn()&&current.hp>1;
 							});
 						},
 						content:function(){
@@ -735,7 +735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.targets=targets.sortBySeat();
 							'step 1'
 							var target=targets.shift();
-							if(target.isAlive()&&target.hp>1){
+							if(target.isIn()&&target.hp>1){
 								event._delay=true;
 								var num=target.hp-1;
 								player.markAuto('xinfu_weilu_recover',[[target,num]]);
@@ -778,7 +778,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							'step 1'
 							var group=event.list.shift();
-							if(group[0].isAlive()&&group[0].isDamaged()){
+							if(group[0].isIn()&&group[0].isDamaged()){
 								group[0].recover(group[1]);
 								event._delay=true;
 							}
@@ -836,21 +836,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			"xinfu_guanwei":{
+			xinfu_guanwei:{
 				audio:2,
 				usable:1,
 				trigger:{
 					global:"phaseUseEnd",
 				},
 				filter:function (event,player){
-					var history=event.player.getHistory('useCard',function(evt){
-						return evt.getParent('phaseUse')==event;
-					});
+					var history=event.player.getHistory('useCard');
 					var num=0;
 					var suit=false;
 					for(var i=0;i<history.length;i++){
 						var suit2=get.suit(history[i].card);
-						if(!suit2) continue;
+						if(!lib.suit.contains(suit2)) return false;
 						if(suit&&suit!=suit2) return false;
 						suit=suit2;
 						num++;
@@ -858,17 +856,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return num>1;
 				},
 				direct:true,
+				global:'xinfu_guanwei_ai',
 				content:function (){
 					'step 0'
+					var target=trigger.player;
 					player.chooseToDiscard('he',get.prompt('xinfu_guanwei',trigger.player),'弃置一张牌，令其摸两张牌并进行一个额外的出牌阶段。').set('ai',function(card){
-						if(get.attitude(_status.event.player,_status.currentPhase)<1) return 0;
+						if(get.attitude(_status.event.player,_status.event.targetx)<1) return 0;
 						return 9-get.value(card);
-					}).set('logSkill','xinfu_guanwei');
+					}).set('logSkill',['xinfu_guanwei',target]).set('targetx',target);
 					'step 1'
 					if(result.bool){
 						player.line(trigger.player,'green');
 						trigger.player.draw(2);
-					}else{
+					}
+					else{
+						player.storage.counttrigger.xinfu_guanwei--;
 						event.finish();
 					}
 					'step 2'
@@ -878,6 +880,47 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.5,
+				},
+				subSkill:{
+					ai:{
+						ai:{
+							effect:{
+								player_use:function(card,player,target){
+									if(typeof card!='object'||!player.isPhaseUsing()) return;
+									var hasPanjun=game.hasPlayer(function(current){
+										return current.hasSkill('xinfu_guanwei')&&(!current.storage.counttrigger||!current.storage.counttrigger.xinfu_guanwei)&&
+											get.attitude(current,player)>=1&&current.hasCard(function(card){
+												return get.value(card)<7||(current!=game.me&&!current.isUnderControl()&&!current.isOnline())&&get.value(card)<9;
+											},'he');
+									});
+									if(!hasPanjun) return;
+									var suitx=get.suit(card);
+									var history=player.getHistory('useCard');
+									if(!history.length){
+										var val=0;
+										if(player.hasCard(function(cardx){
+											return get.suit(cardx)==suitx&&card!=cardx&&(!card.cards||!card.cards.contains(cardx))&&player.hasValueTarget(cardx);
+										},'hs')) val=[2,0.1];
+										if(val) return val;
+										return;
+									}
+									var num=0;
+									var suit=false;
+									for(var i=0;i<history.length;i++){
+										var suit2=get.suit(history[i].card);
+										if(!lib.suit.contains(suit2)) return;
+										if(suit&&suit!=suit2) return;
+										suit=suit2;
+										num++;
+									}
+									if(suitx==suit&&num==1) return [1,0.1];
+									if(suitx!=suit&&(num>1||num<=1&&player.hasCard(function(cardx){
+										return get.suit(cardx)==suit&&player.hasValueTarget(cardx);
+									},'hs'))) return 'zeroplayertarget';
+								},
+							},
+						},
+					}
 				},
 			},
 			xinfu_gongqing_gz_panjun:{audio:2},
@@ -1537,7 +1580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_zengdao2":"赠刀",
 			"xinfu_zengdao2_info":"",
 			"xinfu_guanwei":"观微",
-			"xinfu_guanwei_info":"每回合限一次。一名角色的出牌阶段结束时，若其于出牌阶段内使用过两张以上的牌且花色均相同，则你可以弃置一张牌，令其摸两张牌并进行一个额外的出牌阶段。",
+			"xinfu_guanwei_info":"每回合限一次。一名角色的出牌阶段结束时，若其本回合使用过两张以上的牌且这些牌均有花色且花色均相同，则你可以弃置一张牌，令其摸两张牌并进行一个额外的出牌阶段。",
 			"xinfu_gongqing":"公清",
 			"xinfu_gongqing_info":"锁定技。当你受到伤害时，若伤害来源的攻击范围：<3，则你令此伤害的数值减为1。>3，你令此伤害+1。",
 			"xinfu_andong":"安东",
