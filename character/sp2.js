@@ -7950,9 +7950,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var allList=_status.characterlist.slice(0);
 					game.countPlayer(function(current){
-						allList.add(current.name);
-						allList.add(current.name1);
-						allList.add(current.name2);
+						if(current.name&&lib.character[current.name]&&current.name.indexOf('gz_shibing')!=0&&current.name.indexOf('gz_jun_')!=0) allList.add(current.name);
+						if(current.name1&&lib.character[current.name1]&&current.name1.indexOf('gz_shibing')!=0&&current.name1.indexOf('gz_jun_')!=0) allList.add(current.name1);
+						if(current.name2&&lib.character[current.name2]&&current.name2.indexOf('gz_shibing')!=0&&current.name2.indexOf('gz_jun_')!=0) allList.add(current.name2);
 					});
 					var list=[];
 					var skills=[];
@@ -8030,9 +8030,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var allList=_status.characterlist.slice(0);
 					game.countPlayer(function(current){
-						allList.add(current.name);
-						allList.add(current.name1);
-						allList.add(current.name2);
+						if(lib.character[current.name]&&current.name&&current.name.indexOf('gz_shibing')!=0&&current.name.indexOf('gz_jun_')!=0) allList.add(current.name);
+						if(lib.character[current.name1]&&current.name1&&current.name1.indexOf('gz_shibing')!=0&&current.name1.indexOf('gz_jun_')!=0) allList.add(current.name1);
+						if(lib.character[current.name2]&&current.name2&&current.name2.indexOf('gz_shibing')!=0&&current.name2.indexOf('gz_jun_')!=0) allList.add(current.name2);
 					});
 					allList.randomSort();
 					for(var i=0;i<allList.length;i++){
@@ -8041,8 +8041,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var skills2=lib.character[name][3];
 						for(var j=0;j<skills2.length;j++){
 							if(player.getStorage('pingjian').contains(skills2[j])) continue;
+							if(get.is.locked(skills2[j],player)) continue;
 							var info=lib.translate[skills2[j]+'_info'];
-							if(skills.contains(skills2[j])||(info&&info.indexOf('当你于出牌阶段')!=-1)){
+							if(skills.contains(skills2[j])||(info&&info.indexOf('当你于出牌阶段')!=-1&&info.indexOf('当你于出牌阶段外')==-1)){
 								list.add(name);
 								if(!map[name]) map[name]=[];
 								map[name].push(skills2[j]);
