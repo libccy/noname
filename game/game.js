@@ -1137,6 +1137,11 @@
 							}
 							game.documentZoom=game.deviceZoom*zoom;
 							ui.updatez();
+							if (Array.isArray(lib.onresize)) {
+								lib.onresize.forEach(fun => {
+									if (typeof fun == 'function') fun();
+								});
+							}
 						}
 					},
 					image_background:{
