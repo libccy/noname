@@ -1571,15 +1571,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return dialog;
 					},
 					filter:function(button){
-						var opts=_status.event.dialog._chosenOpt;
-						if(opts&&opts.length&&opts[0].link=='交出锦囊牌'&&typeof button.link!=typeof opts[0].link){
-							return false;
+						if(_status.event.dialog){
+							var opts=_status.event.dialog._chosenOpt;
+							if(opts&&opts.length&&opts[0].link=='交出锦囊牌'&&typeof button.link!=typeof opts[0].link){
+								return false;
+							}
+							return true;
 						}
-						return true;
+						return false;
 					},
 					select:function(){
-						var opts=_status.event.dialog._chosenOpt;
-						return opts&&opts.length&&opts[0].link=='交出锦囊牌'?0:1;
+						if(_status.event.dialog){
+							var opts=_status.event.dialog._chosenOpt;
+							return opts&&opts.length&&opts[0].link=='交出锦囊牌'?0:1;
+						}
+						return 0;
 					},
 					check:function(button){
 						if(_status.event.getParent().type!='phase') return 1;

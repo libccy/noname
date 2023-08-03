@@ -396,7 +396,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				gz_zhonghui:['male','ye',4,['gzquanji','gzpaiyi'],['gzskin']],
 				gz_simazhao:['male','ye',3,['gzzhaoxin','gzsuzhi'],['gzskin']],
-				gz_gongsunyuan:['male','ye',4,['gzrehuaiyi','gzrezisui'],['gzskin']],
+				gz_gongsunyuan:['male','ye',4,['gzhuaiyi','gzzisui'],['gzskin']],
 				gz_sunchen:['male','ye',4,['gzshilu','gzxiongnve']],
 				gz_tangzi:['male','wu',4,['gzxingzhao'],['doublegroup:wu:wei','gzskin']],
 				gz_mengda:['male','wei',4,['qiuan','liangfan'],['doublegroup:wei:shu']],
@@ -405,7 +405,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_shixie:['male','qun',3,['gzbiluan','gzrelixia'],['doublegroup:qun:wu','gzskin']],
 				gz_zhanglu:['male','qun',3,['gzrebushi','gzremidao'],['doublegroup:qun:wei','gzskin']],
 				gz_dongzhao:['male','wei',3,['quanjin','zaoyun']],
-				gz_re_xushu:['male','shu',4,['gzqiance','gzjujian'],['gzskin']],
+				gz_re_xushu:['male','shu',4,['gzzhuhai','gzpozhen','gzjiancai'],['gzskin']],
 				gz_wujing:['male','wu',4,['donggui','fengyang'],['gzskin']],
 				gz_yanbaihu:['male','qun',4,['gzzhidao','gzyjili'],['gzskin']],
 				gz_xuyou:['male','wei',3,['gzchenglve','gzshicai'],['doublegroup:wei:qun','gzskin']],
@@ -510,7 +510,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_bianfuren:['female','wei',3,['wanwei','gzyuejian']],
 				gz_xunyou:['male','wei',3,['gzqice','zhiyu'],['gzskin']],
 				gz_lingtong:['male','wu',4,['xuanlve','yongjin'],['gzskin']],
-				gz_lvfan:['male','wu',3,['gzdiaodu','gzdiancai']],
+				gz_lvfan:['male','wu',3,['xindiaodu','gzdiancai']],
 				gz_masu:['male','shu',3,['sanyao','gzzhiman'],['gzskin']],
 				gz_shamoke:['male','shu',4,['gzjili'],['gzskin']],
 				
@@ -1001,40 +1001,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				//delay:0,
 				content:function(){
 					'step 0'
-					if(!_status.gzrejinghe_tianshu){
+					if(!player.storage.gzrejinghe_tianshu){
 						var list=lib.skill.gzrejinghe.derivation.slice(0);
 						list.remove('gzrejinghe_faq');
 						var list2=list.slice(0,get.rand(0,list.length));
 						list.removeArray(list2);
 						list.addArray(list2);
-						_status.gzrejinghe_tianshu=list;
-						ui.gzretianshu=ui.create.system('天书',null,true);
-						lib.setPopped(ui.gzretianshu,function(){
-							var dialog=ui.create.dialog('hidden');
-							dialog.content.style['overflow-x']='visible';
-							var list=_status.gzrejinghe_tianshu;
-							var core=document.createElement('div');
-							var centerX=-10,centerY=80,radius=80;
-							var radian=Math.PI*2/list.length;
-							for(var i=0;i<list.length;i++){
-								var td=document.createElement('div');
-								td.innerHTML=get.translation(list[i]).slice(0,1);
-								td.style.position='absolute';
-								core.appendChild(td);
-								td.style.left=(centerX+radius*Math.sin(radian*i))+'px';
-								td.style.top=(centerY-radius*Math.cos(radian*i))+'px';
-							}
-							dialog.content.appendChild(core);
-							return dialog;
-						},250);
+						player.storage.gzrejinghe_tianshu=list;
 					}
 					else{
-						var first=_status.gzrejinghe_tianshu[0];
-						_status.gzrejinghe_tianshu.remove(first);
-						_status.gzrejinghe_tianshu.push(first);
+						var first=player.storage.gzrejinghe_tianshu[0];
+						player.storage.gzrejinghe_tianshu.remove(first);
+						player.storage.gzrejinghe_tianshu.push(first);
 					}
 					game.log(player,'转动了','#g“天书”');
-					var skill=_status.gzrejinghe_tianshu[0];
+					player.markSkill('gzrejinghe');
+					var skill=player.storage.gzrejinghe_tianshu[0];
 					event.skill=skill;
 					var cardname='gzrejinghe_'+skill;
 					lib.card[cardname]={
@@ -1066,6 +1048,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						target.popup(skill);
 						game.log(target,'获得了技能','#g【'+get.translation(skill)+'】');
 					}
+				},
+				intro:{
+					name:'写满技能的天书',
+					markcount:()=>8,
+					mark:function(dialog,storage,player){
+						dialog.content.style['overflow-x']='visible';
+						var list=player.storage.gzrejinghe_tianshu;
+						var core=document.createElement('div');
+						var centerX=-10,centerY=80,radius=80;
+						var radian=Math.PI*2/list.length;
+						for(var i=0;i<list.length;i++){
+							var td=document.createElement('div');
+							td.innerHTML=get.translation(list[i]).slice(0,1);
+							td.style.position='absolute';
+							core.appendChild(td);
+							td.style.left=(centerX+radius*Math.sin(radian*i))+'px';
+							td.style.top=(centerY-radius*Math.cos(radian*i))+'px';
+						}
+						dialog.content.appendChild(core);
+					},
 				},
 				ai:{
 					order:10,
@@ -13188,7 +13190,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 6'
 					if(result.bool){
 						target.chat('加入');
-						if(!_status.yexinjia_list) _status.yexinjia_list=['夏','商','周','秦','汉','隋','唐','宋','辽','金','元','明','清'];
+						if(!_status.yexinjia_list) _status.yexinjia_list=['夏','商','周','秦','汉','隋','唐','宋','辽','金','元','明'];
 						source.chooseControl(_status.yexinjia_list).set('prompt','请选择自己所属的野心家势力的标识').set('ai',()=>(_status.yexinjia_list?_status.yexinjia_list.randomGet():0));
 					}
 					else{
@@ -15529,28 +15531,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						this.node.identity.firstChild.innerHTML='猜';
 						this.node.identity.dataset.color='unknown';
 						this.node.identity.classList.add('guessing');
-					}
-					//南华老仙天书重连显示
-					if(_status.gzrejinghe_tianshu){
-						ui.gzretianshu=ui.create.system('天书',null,true);
-						lib.setPopped(ui.gzretianshu,function(){
-							var dialog=ui.create.dialog('hidden');
-							dialog.content.style['overflow-x']='visible';
-							var list=_status.gzrejinghe_tianshu;
-							var core=document.createElement('div');
-							var centerX=-10,centerY=80,radius=80;
-							var radian=Math.PI*2/list.length;
-							for(var i=0;i<list.length;i++){
-								var td=document.createElement('div');
-								td.innerHTML=get.translation(list[i]).slice(0,1);
-								td.style.position='absolute';
-								core.appendChild(td);
-								td.style.left=(centerX+radius*Math.sin(radian*i))+'px';
-								td.style.top=(centerY-radius*Math.cos(radian*i))+'px';
-							}
-							dialog.content.appendChild(core);
-							return dialog;
-						},250);
 					}
 				},
 				dieAfter2:function(source){

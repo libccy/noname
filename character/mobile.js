@@ -4437,20 +4437,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					filter:function(button){
 						var evt=_status.event,player=_status.event.player;
-						if(!evt.dialog._chooseButton){
-							var evt2=_status.event.getParent();
-							return evt2.filterCard(get.autoViewAs({name:evt.dialog._cardName},[button.link]),player,evt2);
+						if(evt.dialog){
+							if(!evt.dialog._chooseButton){
+								var evt2=_status.event.getParent();
+								return evt2.filterCard(get.autoViewAs({name:evt.dialog._cardName},[button.link]),player,evt2);
+							}
+							if(ui.selected.buttons.length){
+								var str=ui.selected.buttons[0].link;
+								if(typeof str!='string'||typeof button.link=='string') return false;
+								var evt2=_status.event.getParent();
+								return evt2.filterCard(get.autoViewAs({name:str},[button.link]),player,evt2);
+							}
+							return typeof button.link=='string';
 						}
-						if(ui.selected.buttons.length){
-							var str=ui.selected.buttons[0].link;
-							if(typeof str!='string'||typeof button.link=='string') return false;
-							var evt2=_status.event.getParent();
-							return evt2.filterCard(get.autoViewAs({name:str},[button.link]),player,evt2);
-						}
-						return typeof button.link=='string';
+						return false;
 					},
 					select:function(){
-						return (_status.event.dialog._chooseButton||1);
+						return _status.event.dialog?(_status.event.dialog._chooseButton||1):1;
 					},
 					backup:function(links,player){
 						var card,name;
@@ -12955,7 +12958,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaotongzhaoguang:['dc_zhaotongzhaoguang','zhaotongzhaoguang'],
             yangbiao:['yangbiao','dc_yangbiao','jsrg_yangbiao'],
 			qiaozhou:['yj_qiaozhou','qiaozhou'],
-			sunhanhua:['dc_qiaozhou','sunhanhua'],
+			sunhanhua:['dc_sunhanhua','sunhanhua'],
 		},
 		translate:{
 			liuzan:'手杀留赞',
