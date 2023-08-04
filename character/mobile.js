@@ -504,8 +504,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var names=map[first];
 							return !names.contains(changshi);
 						});
-						if(list.length==0) return others.randomGets(1);
-						return list;
+						return list.length?list:others;
 					}());
 					next.set('ai',button=>{
 						if(button.link=='scs_gaowang') return 10;
@@ -543,8 +542,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},chosen);
 						if(skills.length){
 							player.addAdditionalSkill('mbdanggu',skills);
-							game.log(player,'获得了技能','#g'+get.translation(skills));
-							player.popup(skills);
+							var str='';
+							for(var i of skills){
+								str+='【'+get.translation(i)+'】、';
+								player.popup(i);
+							}
+							str=str.slice(0,-1);
+							game.log(player,'获得了技能','#g'+str);
 						}
 					}
 				},
@@ -1492,7 +1496,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						wuxie:function(){
 							'step 0'
 							var trigger=event.getParent().getTrigger();
-							var target=trigger.respondTo[0];
+							var target=trigger.getParent(2).player;
 							event.target=target;
 							if(!target||!target.countGainableCards(player,player==target?'e':'he')) event._result={bool:false};
 							else player.chooseBool(get.prompt('scsanruo_effect',target),'获得该角色的一张牌').set('ai',()=>{
