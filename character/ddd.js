@@ -625,7 +625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target,'fire');
 						var num=target.countCards('h')-player.countCards('h');
 						if(num>0) target.chooseToDiscard('h',true,num);
-						else target.draw(Math.min(5,num));
+						else target.draw(Math.min(5,-num));
 					}
 				},
 				subSkill:{
@@ -1262,7 +1262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!evt||evt.player!=player) return false;
 							return player.getHistory('useCard',function(evtx){
 								return evtx.getParent('phaseUse')==evt;
-							},event).length==2;
+							},event).length==3;
 						},
 						forced:true,
 						charlotte:true,
@@ -1862,7 +1862,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCardAfter'},
 				frequent:true,
 				filter:function(event,player){
-					return event.card.storage&&event.card.storage._3dfusi_owner==player&&!player.hasCard(function(card){
+					return event.card.storage&&event.card.storage._dddfusi_owner==player&&!player.hasCard(function(card){
 						return !card.hasGaintag('dddxujing_tag');
 					},'h');
 				},
@@ -1927,7 +1927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var storage=player.getStorage('dddchashi');
 							if(!storage||!storage.length) return false;
 							if(event.player!=storage[1]||!event.player.isIn()) return false;
-							if(!player.getCards('h').contains(storage[0])||!storage[0].hasGaintag('dddchashi')) return false;
+							if(!player.getCards('he').contains(storage[0])||!storage[0].hasGaintag('dddchashi')) return false;
 							if(get.suit(event.card)!=get.suit(storage[0])) return false;
 							var evt=event.getParent('phaseUse');
 							if(evt.player)
@@ -2354,7 +2354,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var history=current.actionHistory;
 						for(var i=history.length-2;i>=0;i--){
 							var evts=history[i].useSkill;
-							for(evt of evts){
+							for(var evt of evts){
 								if(evt.skill=='dddfengzheng_global') return true;
 							}
 							if(history[i].isRound) break;
@@ -2367,7 +2367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var history=current.actionHistory;
 						for(var i=history.length-2;i>=0;i--){
 							var evts=history[i].useSkill;
-							for(evt of evts){
+							for(var evt of evts){
 								if(evt.skill=='dddfengzheng_global') return true;
 							}
 							if(history[i].isRound) break;
@@ -2382,7 +2382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var history=current.actionHistory;
 						for(var i=history.length-2;i>=0;i--){
 							var evts=history[i].useSkill;
-							for(evt of evts){
+							for(var evt of evts){
 								if(evt.skill=='dddfengzheng_global') return true;
 							}
 							if(history[i].isRound) break;
@@ -3108,35 +3108,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					act:{
 						trigger:{
-							global:'phaseBefore',
+							global:['phaseBefore','phaseAfter','phaseYouxueed'],
 						},
 						forced:true,
 						firstDo:true,
 						charlotte:true,
-						filter:function(event,player){
-							var seat=event.player.getSeatNum(),seatP=event.player.getPrevious().getSeatNum();
-							return !player.hasSkill('dddyouxue_acted')&&seat>=player.countMark('dddyouxue')&&(seatP>seat||seatP<player.countMark('dddyouxue'))||
-								event.player==player&&event.skill!='dddyouxue_act';
+						filter:function(event,player,name){
+							if(event.skill) return false;
+							var vseat=player.countMark('dddyouxue');
+							if(name!='phaseBefore'){
+								if(player.hasSkill('dddyouxue_acted',null,false,false)) return false;
+								var seat=event.player.getSeatNum();
+								var next=event.player.next;
+								if(!game.players.contains(next)) next=game.findNext(next);
+								var seat2=next.getSeatNum();
+								if(seat==seat2) return false;
+								if(seat<seat2) return vseat>seat&&vseat<=seat2;
+								return seat2>=vseat;
+							}
+							else{
+								return event.player==player;
+							}
 						},
 						content:function(){
-							'step 0'
-							var seat=trigger.player.getSeatNum(),seatP=trigger.player.getPrevious().getSeatNum();
-							if(trigger.player==player&&trigger.skill!='dddyouxue_act'&&(seat<player.countMark('dddyouxue')||seatP>=player.countMark('dddyouxue'))){
+							if(event.triggername=='phaseBefore'){
 								trigger.finish();
 								trigger.untrigger(true);
 								trigger._triggered=5;
-								event.finish();
-								return;
+								trigger.trigger('phaseYouxueed');
 							}
-							trigger.player.getPrevious().getHistory('custom').push({'dddyouxue':true});
-							player.insertPhase();
-							player.addTempSkill('dddyouxue_acted','roundStart');
-							if(!trigger._finished){
-								trigger.finish();
-								trigger.untrigger(true);
-								trigger._triggered=5;
-								var evt=trigger.player.insertPhase();
-								delete evt.skill;
+							else{
+								player.insertPhase('dddyouxue_act');
+								player.addTempSkill('dddyouxue_acted','roundStart');
 							}
 						}
 					},

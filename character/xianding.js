@@ -1383,7 +1383,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.goto(3);
 					'step 2'
 					if(get.position(card)=='h'&&get.owner(card)==player&&player.hasUseTarget(card)){
-						player.chooseUseTarget(card,true);
+						if(get.name(card,player)=='sha') player.chooseUseTarget(card,true,false);
+						else player.chooseUseTarget(card,true);
 					}
 					'step 3'
 					if(player.hasHistory('useCard',evt=>{
@@ -3455,9 +3456,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'dcfengying_record',
 				locked:false,
 				filter:function(event,player){
-					return player.storage.dcfengying&&player.storage.dcfengying.length&&player.storage.dcfengying.filter(name=>{
-						return event.filterCard({name:name},player,event);
-					}).length&&!player.hasSkill('dcfengying_used');
+					var mark=player.countMark('dclingfang');
+					if(mark<=0||!player.hasCard(card=>get.number(card)<=mark,'hs')) return false;
+					var storage=player.getStorage('dcfengying');
+					if(!storage.length) return false;
+					var storage2=player.getStorage('dcfengying_used')
+					return storage.some(name=>{
+						return !storage2.contains(name)&&event.filterCard({name:name},player,event);
+					});
 				},
 				hiddenCard:function(player,name){
 					var list=player.getStorage('dcfengying');

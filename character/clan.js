@@ -455,6 +455,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'useCard',
 				},
 				filter:function(event,player){
+					var len=lib.skill.dcweidang.getLength(event.card);
+					if(player.hasHistory('useCard',function(evt){
+						return evt!=event&&lib.skill.dcweidang.getLength(evt.card)==len;
+					},event)) return false;
 					if(!player.getStat().skill.clanguangu) return false;
 					var history=player.getAllHistory('useSkill',evt=>{
 						return evt.skill=='clanguangu_backup';
@@ -468,7 +472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							break;
 						}
 					}
-					if(num&&lib.skill.dcweidang.getLength(event.card)==num) return true;
+					if(num&&len==num) return true;
 					return false;
 				},
 				forced:true,
