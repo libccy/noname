@@ -2205,7 +2205,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{source:'damageBegin1'},
 						charlotte:true,
 						forced:true,
-						onremove:true,
+						onremove:['olkangrui_add','olkangrui_nil'],
 						filter:function(event,player){
 							return player.hasMark('olkangrui_add');
 						},

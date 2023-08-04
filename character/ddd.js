@@ -1262,7 +1262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!evt||evt.player!=player) return false;
 							return player.getHistory('useCard',function(evtx){
 								return evtx.getParent('phaseUse')==evt;
-							},event).length==2;
+							},event).length==3;
 						},
 						forced:true,
 						charlotte:true,
@@ -1862,7 +1862,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCardAfter'},
 				frequent:true,
 				filter:function(event,player){
-					return event.card.storage&&event.card.storage._3dfusi_owner==player&&!player.hasCard(function(card){
+					return event.card.storage&&event.card.storage._dddfusi_owner==player&&!player.hasCard(function(card){
 						return !card.hasGaintag('dddxujing_tag');
 					},'h');
 				},
