@@ -7627,6 +7627,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(!storage||!target||!storage.character.length||storage.used.contains('shan')) return false;
 					var identity=target.identity;
 					return ['unknown','ye'].contains(identity)||storage.character.some(function(i){
+						if(lib.character[i][1]=='ye') return true;
 						var double=get.is.double(i,true);
 						var groups=(double?double:[lib.character[i][1]]);
 						return groups.contains(identity);
@@ -7642,6 +7643,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var evt=_status.event.getParent('chooseToUse');
 						var target=evt.getParent().player,identity=target.identity;
 						if(['unknown','ye'].contains(identity)) return true;
+						if(lib.character[button.link][1]=='ye') return true;
 						var double=get.is.double(button.link,true);
 						var groups=(double?double:[lib.character[button.link][1]]);
 						return groups.contains(identity);
@@ -7695,6 +7697,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(!storage||!target||!storage.character.length||storage.used.contains('wuxie')) return false;
 					var identity=target.identity;
 					return ['unknown','ye'].contains(identity)||storage.character.some(function(i){
+						if(lib.character[i][1]=='ye') return true;
 						var double=get.is.double(i,true);
 						var groups=(double?double:[lib.character[i][1]]);
 						return groups.contains(identity);
@@ -7710,6 +7713,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var evt=_status.event.getParent('chooseToUse');
 						var target=evt.getParent(2).player,identity=target.identity;
 						if(['unknown','ye'].contains(identity)) return true;
+						if(lib.character[button.link][1]=='ye') return true;
 						var double=get.is.double(button.link,true);
 						var groups=(double?double:[lib.character[button.link][1]]);
 						return groups.contains(identity);
