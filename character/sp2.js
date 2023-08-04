@@ -10018,7 +10018,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return str;
 			},
 		},
-		perfectPair:{},
+		perfectPair:{
+			nanhualaoxian:['zuoci','yuji'],
+		},
 		characterReplace:{
 			lijue:['lijue','ns_lijue'],
 			fanchou:['fanchou','tw_fanchou','ns_fanchou'],
