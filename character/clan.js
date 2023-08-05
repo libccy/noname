@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wangling:['male','wei',4,['clanbolong','clanzhongliu'],['clan:太原王氏']],
 			clan_zhongyan:['female','jin',3,['clanguangu','clanxiaoyong','clanbaozu'],['clan:颍川钟氏']],
 			clan_wangyun:['male','qun',3,['clanjiexuan','clanmingjie','clanzhongliu'],['clan:太原王氏']],
+			clan_zhonghui:['male','wei','3/4',['clanyuzhi','clanxieshu','clanbaozu'],['clan:颍川钟氏']],
 		},
 		characterSort:{
 			clan:{
@@ -24,10 +25,130 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				clan_han:['clan_hanshao','clan_hanrong'],
 				clan_wang:['clan_wangling','clan_wangyun'],
-				clan_zhong:['clan_zhongyan'],
+				clan_zhong:['clan_zhongyan','clan_zhonghui'],
 			},
 		},
 		skill:{
+			//族钟会
+			clanyuzhi:{
+				mod:{
+					aiOrder:function(player,card,num){
+						if(card.name=='tao') return num/114514;
+					},
+				},
+				audio:2,
+				trigger:{global:'roundStart'},
+				direct:true,
+				locked:true,
+				content:function(){
+					'step 0'
+					var history=player.getAllHistory('gain',evt=>evt.getParent().name=='draw'&&evt.getParent(2).name=='clanyuzhi');
+					if(game.roundNumber>1&&history.length){
+						var num=history[history.length-1].cards.length;
+						if(history.length>1){
+							if(num>history[history.length-2].cards.length){
+								player.logSkill('clanyuzhi');
+								if(player.hasSkill('clanbaozu',null,false,false)) player.chooseBool('迂志：是否失去〖保族〗？','若选择“否”，则你失去1点体力').set('choice',player.awakenedSkills.contains('clanbaozu'));
+								else event._result={bool:false};
+								return;
+							}
+						}
+						var history2=player.actionHistory;
+						for(var i=history2.length-2;i>=0;i--){
+							num-=history2[i].useCard.length;
+							if(history2[i].isRound) break;
+						}
+						if(num>0){
+							player.logSkill('clanyuzhi');
+							if(player.hasSkill('clanbaozu',null,false,false)) player.chooseBool('迂志：是否失去〖保族〗？','若选择“否”，则你失去1点体力').set('choice',player.awakenedSkills.contains('clanbaozu'));
+							else event._result={bool:false};
+						}
+						else event.goto(2);
+					}
+					else event.goto(2);
+					'step 1'
+					if(result.bool){
+						player.removeSkill('clanbaozu');
+						player.popup('保族');
+						game.log(player,'失去了技能','#g【保族】');
+					}
+					else player.loseHp();
+					'step 2'
+					if(!player.countCards('h')) event.finish();
+					'step 3'
+					player.chooseCard('迂志：请展示一张手牌','摸此牌牌名字数的牌。下一轮开始时，若本轮你使用的牌数或上一轮你以此法摸的牌数小于此牌牌名字数，则你失去1点体力。',true,function(card,player){
+						var num=lib.skill.dcweidang.getLength(card);
+						return typeof num=='number'&&num>0;
+					}).set('ai',function(card){
+						if(_status.event.dying) return 1/lib.skill.dcweidang.getLength(card);//怂
+						return lib.skill.dcweidang.getLength(card);//勇
+					}).set('dying',player.hp+player.countCards('hs',{name:['tao','jiu']})<1);
+					'step 4'
+					if(result.bool){
+						player.logSkill('clanyuzhi');
+						player.showCards(result.cards,get.translation(player)+'发动了【迂志】');
+						player.draw(lib.skill.dcweidang.getLength(result.cards[0]));
+					}
+				},
+				ai:{
+					threaten:3,
+					nokeep:true,
+				},
+				mark:true,
+				marktext:'志',
+				intro:{
+					content:function(storage,player){
+						var history=player.getAllHistory('gain',evt=>evt.getParent().name=='draw'&&evt.getParent(2).name=='clanyuzhi');
+						if(!history.length) return '当前暂未立下志向';
+						var str='<li>当前志向：'+get.cnNumber(history[history.length-1].cards.length)+'张';
+						var finishZhiXiang=true;
+						if(history.length>1){
+							str+='<br><li>上次志向：'+get.cnNumber(history[history.length-2].cards.length)+'张';
+							if(history[history.length-2].cards.length<history[history.length-1].cards.length) finishZhiXiang=false;
+						}
+						var history2=player.actionHistory;
+						if(history2.length){
+							str+='<br><li>本轮出牌：';
+							var num=0;
+							for(var i=history2.length-1;i>=0;i--){
+								num+=history2[i].useCard.length;
+								if(history2[i].isRound) break;
+							}
+							str+=get.cnNumber(num)+'张';
+							if(num<history[history.length-1].cards.length) finishZhiXiang=false;
+						}
+						str+='<br>本轮志向';
+						str+=(finishZhiXiang?'已达成':'未达成');
+						return str;
+					},
+				},
+			},
+			clanxieshu:{
+				audio:2,
+				trigger:{player:'damageEnd',source:'damageSource'},
+				filter:function(event,player){
+					if(!event.card) return false;
+					var num=lib.skill.dcweidang.getLength(event.card);
+					return typeof num=='number'&&num>0&&player.countCards('he');
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var num=lib.skill.dcweidang.getLength(trigger.card),str='';
+					if(player.getDamagedHp()>0) str+=('并摸'+get.cnNumber(player.getDamagedHp())+'张牌');
+					player.chooseToDiscard(get.prompt('clanxieshu'),'弃置'+get.cnNumber(num)+'张牌'+str,'he',num).set('ai',function(card){
+						var player=_status.event.player;
+						var num=_status.event.num;
+						var num2=player.getDamagedHp();
+						if(num>num2) return 7-get.value(card);
+						if(num==num2) return lib.skill.zhiheng.check(card);
+						return 0;
+					}).set('num',num).logSkill='clanxieshu';
+					'step 1'
+					if(result.bool&&player.getDamagedHp()>0) player.draw(player.getDamagedHp());
+				},
+				ai:{threaten:3},
+			},
 			//族王允
 			clanjiexuan:{
 				audio:2,
@@ -508,10 +629,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanbaozu:{
 				audio:2,
-				audioname:['clan_zhongyan'],
-				trigger:{
-					gloabl:'dying',
-				},
+				audioname:['clan_zhongyan','clan_zhonghui'],
+				trigger:{global:'dying'},
 				clanSkill:true,
 				limited:true,
 				skillAnimation:true,
@@ -536,6 +655,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					player.awakenSkill('clanbaozu');
+					'step 1'
 					trigger.player.link(true);
 					trigger.player.recover();
 				}
@@ -2139,6 +2260,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanjiexuan_info:'限定技，转换技。阴：你可以将一张红色牌当【顺手牵羊】使用；阳：你可以将一张黑色牌当【过河拆桥】使用。',
 			clanmingjie:'铭戒',
 			clanmingjie_info:'限定技。出牌阶段，你可以选择一名角色，然后直到其下回合结束时，当你使用牌时你可以指定其为额外目标。然后其下回合结束时，你可以使用本回合使用过的黑桃牌和被抵消过的牌。',
+			clan_zhonghui:'族钟会',
+			clanyuzhi:'迂志',
+			clanyuzhi_info:'锁定技。新的一轮开始时，你依次执行以下项：①若你上一轮使用的牌数或你上上次因〖迂志〗摸的牌数小于你上次因〖迂志〗摸的牌数，你失去1点体力或失去〖保族〗。②你展示一张手牌，然后摸X张牌（X为此牌牌名字数）。',
+			clanxieshu:'挟术',
+			clanxieshu_info:'当你使用牌造成伤害后，或受到来自牌造成的伤害后，你可以弃置Y张牌并摸你已损失体力值张牌（Y为此牌牌名字数）。',
 			
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
