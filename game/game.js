@@ -13076,6 +13076,8 @@
 								var dialog=info.chooseButton.dialog(event,player);
 								if(info.chooseButton.chooseControl){
 									var next=player.chooseControl(info.chooseButton.chooseControl(event,player));
+									if(dialog.direct) next.direct=true;
+									if(dialog.forceDirect) next.forceDirect=true;
 									next.dialog=dialog;
 									next.set('ai',info.chooseButton.check||function(){return 0;});
 									if(event.id) next._parent_id=event.id;
@@ -13083,6 +13085,8 @@
 								}
 								else{
 									var next=player.chooseButton(dialog);
+									if(dialog.direct) next.direct=true;
+									if(dialog.forceDirect) next.forceDirect=true;
 									next.set('ai',info.chooseButton.check||function(){return 1;});
 									next.set('filterButton',info.chooseButton.filter||function(){return true;});
 									next.set('selectButton',info.chooseButton.select||1);
@@ -13101,6 +13105,7 @@
 					}
 					"step 3"
 					if(event.buttoned){
+						debugger
 						if(result.bool||result.control&&result.control!='cancel2'){
 							var info=get.info(event.buttoned).chooseButton;
 							lib.skill[event.buttoned+'_backup']=info.backup(info.chooseControl?result:result.links,player);
@@ -13257,11 +13262,15 @@
 								var dialog=info.chooseButton.dialog(event,player);
 								if(info.chooseButton.chooseControl){
 									var next=player.chooseControl(info.chooseButton.chooseControl(event,player));
+									if(dialog.direct) next.direct=true;
+									if(dialog.forceDirect) next.forceDirect=true;
 									next.dialog=dialog;
 									next.set('ai',info.chooseButton.check||function(){return 0;});
 								}
 								else{
 									var next=player.chooseButton(dialog);
+									if(dialog.direct) next.direct=true;
+									if(dialog.forceDirect) next.forceDirect=true;
 									next.set('ai',info.chooseButton.check||function(){return 1;});
 									next.set('filterButton',info.chooseButton.filter||function(){return true;});
 									next.set('selectButton',info.chooseButton.select||1);
@@ -14151,16 +14160,50 @@
 						event.dialog.style.display='';
 						event.dialog.open();
 					}
+					var filterButton=event.filterButton||function(){return true};
+					var selectButton=get.select(event.selectButton);
+					var buttons=event.dialog.buttons;
+					var buttonsx=[];
+					var num=0;
+					for(var i=0;i<buttons.length;i++){
+						var button=buttons[i];
+						if(filterButton(button,player)){
+							num++;
+							buttonsx.add(button);
+						}
+					}
 					if(event.isMine()){
-						game.check();
+						if(event.direct&&num==selectButton[0]||event.forceDirect){
+							var buttons=buttonsx.slice(0,num);
+							event.result={
+								bool:true,
+								button:[buttons],
+								links:get.links(buttons),
+							};
+							event.dialog.close();
+						}
+						else{
+							game.check();
+							game.pause();
+						}
 						if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
 							ui.click.cancel();
 							return;
 						}
-						game.pause();
 					}
 					else if(event.isOnline()){
-						event.send();
+						if(event.direct&&num==1||event.forceDirect){
+							var buttons=buttonsx.slice(0,num);
+							event.result={
+								bool:true,
+								button:[buttons],
+								links:get.links(buttons),
+							};
+							event.dialog.close();
+						}
+						else{
+							event.send();
+						}
 						delete event.callback;
 					}
 					else{
@@ -14642,12 +14685,34 @@
 						}
 						else{
 							if(event.seperate||lib.config.seperate_control){
-								event.controlbars=[];
-								for(var i=0;i<event.controls.length;i++){
-									event.controlbars.push(ui.create.control([event.controls[i]]));
+								var controls=event.controls.slice(0);
+								var num=0;
+								controls.remove('cancel2');
+								if(event.direct&&controls.length==1||event.forceDirect){
+									event.result={
+										control:event.controls[0].link,
+										links:get.links([event.controls[0]]),
+									};
+									return;
+								}
+								else{
+									event.controlbars=[];
+									for(var i=0;i<event.controls.length;i++){
+										event.controlbars.push(ui.create.control([event.controls[i]]));
+									}
 								}
 							}
 							else{
+								var controls=event.controls.slice(0);
+								var num=0;
+								controls.remove('cancel2');
+								if(event.direct&&controls.length==1||event.forceDirect){
+									event.result={
+										control:event.controls[0].link,
+										links:get.links([event.controls[0]]),
+									};
+									return;
+								}
 								event.controlbar=ui.create.control(event.controls);
 							}
 							if(event.dialog){
