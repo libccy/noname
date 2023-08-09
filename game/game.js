@@ -11107,8 +11107,23 @@
 						//初始化一堆变量
 						var score=0;
 						var added=timeleap.length;
+						var number_of_tracks=beatmap.number_of_tracks||6;
+						var custom_mapping=Array.isArray(beatmap.mapping);
+						var mapping=custom_mapping?beatmap.mapping.slice():beatmap.mapping;
+						var hitsound=beatmap.hitsound||'hitsound.wav';
+						if(hitsound.indexOf('ext:')==0) hitsound=lib.assetURL+'extension/'+hitsound.slice(4);
+						else hitsound=lib.assetURL+'audio/effect/'+hitsound;
+						var hitsound_audio=new Audio(hitsound);
+						hitsound_audio.volume=0.25;
 						var abs=1;
 						var node_pos=0;
+						if(custom_mapping){
+							node_pos=mapping.shift();
+						}
+						else if(mapping=='random'){
+							abs=Math.floor(Math.random()*number_of_tracks);
+							node_pos=abs;
+						}
 						var combo=0;
 						var max_combo=0;
 						var nodes=[];
@@ -11190,11 +11205,11 @@
 							node.style["border-radius"]='3px';
 							node.style.position='absolute';
 							node.style.height=Math.ceil(height/10)+'px';
-							node.style.width=Math.ceil(width/6)-10+'px';
+							node.style.width=Math.ceil(width/number_of_tracks)-10+'px';
 							node._position=get.utc();
 							event.dialog.appendChild(node);
 							
-							node.style.left=Math.ceil(width*node_pos/6+5)+'px';
+							node.style.left=Math.ceil(width*node_pos/number_of_tracks+5)+'px';
 							node.style.top='-'+(Math.ceil(height/10))+'px';
 							ui.refresh(node);
 							node.style.transition='all '+speed*110+'ms linear';
@@ -11208,14 +11223,25 @@
 								}
 							},speed*110);
 							
-							node_pos+=abs;
-							if(node_pos>5){
-								abs=-1;
-								node_pos=4;
+							if(custom_mapping){
+								node_pos=mapping.shift();
 							}
-							else if(node_pos<0){
-								abs=1;
-								node_pos=1;
+							else if(mapping=='random'){
+								while(node_pos==abs){
+									node_pos=Math.floor(Math.random()*number_of_tracks);
+								}
+								abs=node_pos;
+							}
+							else{
+								node_pos+=abs;
+								if(node_pos>number_of_tracks-1){
+									abs=-1;
+									node_pos=number_of_tracks-2;
+								}
+								else if(node_pos<0){
+									abs=1;
+									node_pos=1;
+								}
 							}
 							if(timeleap.length){
 								setTimeout(function(){
@@ -11261,6 +11287,8 @@
 								if(player.damagepopups.length) player.$damagepop();
 								combo++;
 								max_combo=Math.max(combo,max_combo);
+								hitsound_audio.currentTime=0;
+								if(hitsound_audio.paused) hitsound_audio.play();
 								break;
 							}
 						};
@@ -31007,6 +31035,7 @@
 		],
 	};
 	var game={
+		generateBeatmapTimeleap:(bpm,beats,offset)=>beats.map(value=>Math.round(value*60000/bpm+(offset||0))),
 		updateRenku:function(){
 			game.broadcast(function(renku){
 				_status.renku=renku;
