@@ -11154,6 +11154,10 @@
 							event.settleed=true;
 							//评分
 							var acc=Math.floor(score/(added*5)*100);
+							if(!Array.isArray(lib.config.choose_to_play_beatmap_accuracies)) lib.config.choose_to_play_beatmap_accuracies=[];
+							lib.config.choose_to_play_beatmap_accuracies.push(acc);
+							if(lib.config.choose_to_play_beatmap_accuracies.length>5) lib.config.choose_to_play_beatmap_accuracies.shift();
+							game.saveConfigValue("choose_to_play_beatmap_accuracies");
 							var rank;
 							if(acc==100) rank=['SS','metal'];
 							else if(acc>=94) rank=['S','orange'];
@@ -11314,7 +11318,12 @@
 						game.countChoose();
 						setTimeout(function(){
 							_status.imchoosing=false;
-							var acc=get.rand.apply(get,beatmap.aiAcc||[70,100]);
+							var choose_to_play_beatmap_accuracies=(lib.config.choose_to_play_beatmap_accuracies||[]).concat(Array.from({
+								length:6-(lib.config.choose_to_play_beatmap_accuracies||[]).length
+							},()=>get.rand(70,100)));
+							var mean=Math.round(choose_to_play_beatmap_accuracies.reduce((previousValue,currentValue)=>previousValue+currentValue)/choose_to_play_beatmap_accuracies.length);
+							var half_standard_deviation=Math.round(Math.sqrt(choose_to_play_beatmap_accuracies.reduce((previousValue,currentValue)=>previousValue+Math.pow(currentValue-mean,2),0))/2);
+							var acc=Math.min(Math.max(get.rand.apply(get,beatmap.aiAcc||[mean-half_standard_deviation-get.rand(0,half_standard_deviation),mean+half_standard_deviation+get.rand(0,half_standard_deviation)]),0),100);
 							var rank;
 							if(acc==100) rank=['SS','metal'];
 							else if(acc>=94) rank=['S','orange'];
