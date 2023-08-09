@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wangling:['male','wei',4,['clanbolong','clanzhongliu'],['clan:太原王氏']],
 			clan_zhongyan:['female','jin',3,['clanguangu','clanxiaoyong','clanbaozu'],['clan:颍川钟氏']],
 			clan_wangyun:['male','qun',3,['clanjiexuan','clanmingjie','clanzhongliu'],['clan:太原王氏']],
+			clan_zhonghui:['male','wei','3/4',['clanyuzhi','clanxieshu','clanbaozu'],['clan:颍川钟氏']],
 		},
 		characterSort:{
 			clan:{
@@ -24,10 +25,82 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				clan_han:['clan_hanshao','clan_hanrong'],
 				clan_wang:['clan_wangling','clan_wangyun'],
-				clan_zhong:['clan_zhongyan'],
+				clan_zhong:['clan_zhongyan','clan_zhonghui'],
 			},
 		},
 		skill:{
+			//族种会
+			clanyuzhi:{
+				audio:false,
+				group:['clanyuzhi_draw','clanyuzhi_detect'],
+				subSkill:{
+					draw:{
+						audio:['clanyuzhi',2],
+						trigger:{global:'roundStart'},
+						forced: true,
+						content: ()=>{
+							"step 0"
+							player.chooseCard(get.translation('clanyuzhi'),"请选择一张手牌",'h',true);
+							"step 1"
+							var card = result.cards[0];
+							var len = get.translation(card.name).length;
+							player.showCards(card);
+							player.draw(len);
+							player.storage.clanyuzhi_draw_now = len;
+						}
+					},
+					detect:{
+						audio:['clanyuzhi',2],
+						trigger:{global:'roundStart'},
+						priority: 2000,
+						firstDo: true,
+						forced: true,
+						filter:(event,player)=>{
+							var his = player.actionHistory;
+							his = his.slice(Math.max(his.length-9,1),his.length-1);
+							var cnt = 0;
+							his.forEach(h => {
+								cnt += h.useCard.length;
+							});
+							var now = player.storage.clanyuzhi_draw_now,last = player.storage.clanyuzhi_draw_last;
+							player.storage.clanyuzhi_draw_last = now;
+							return cnt <= now || (last && last <= x);
+						},
+						content:()=>{
+							"step 0"
+							if(!player.hasSkill('clanbaozu')){
+								player.loseHp();
+								event.finish();
+								return;
+							}
+							player.chooseControl().set('prompt',`${get.translation('clanyuzhi')}：请选择一项`).set('choiceList',['失去1点体力','失去宗族技']);
+							"step 1"
+							if(result.index == 0){
+								player.loseHp();
+							}
+							else{
+								player.removeSkill('clanbaozu');
+							}
+						}
+					}
+				}
+			},
+			clanxieshu:{
+				audio:2,
+				trigger:{player:'damageAfter',source:'damageAfter'},
+				filter:(event,player)=>{
+					return player.isDamaged() && event.card;
+				},
+				content:()=>{
+					"step 0"
+					var card = trigger.card,len = get.translation(card.name).length;
+					player.chooseToDiscard(len,'he');
+					"step 1"
+					if(result.bool){
+						player.draw(player.maxHp-player.hp);
+					}
+				}
+			},
 			//族王允
 			clanjiexuan:{
 				audio:2,
@@ -510,14 +583,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['clan_zhongyan'],
 				trigger:{
-					gloabl:'dying',
+					global:'dying',
 				},
 				clanSkill:true,
 				limited:true,
 				skillAnimation:true,
 				animationColor:'water',
 				filter:function(event,player){
-					return event.player.hasClan('颍川钟氏')&&event.player.hp<=0&&!event.player.isLinked();
+					return event.player.hasClan('颍川钟氏')&&event.player.hp<=0;
 				},
 				logTarget:'player',
 				check:function(event,player){
@@ -536,6 +609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					player.awakenSkill(event.name);
 					trigger.player.link(true);
 					trigger.player.recover();
 				}
@@ -2139,7 +2213,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanjiexuan_info:'限定技，转换技。阴：你可以将一张红色牌当【顺手牵羊】使用；阳：你可以将一张黑色牌当【过河拆桥】使用。',
 			clanmingjie:'铭戒',
 			clanmingjie_info:'限定技。出牌阶段，你可以选择一名角色，然后直到其下回合结束时，当你使用牌时你可以指定其为额外目标。然后其下回合结束时，你可以使用本回合使用过的黑桃牌和被抵消过的牌。',
-			
+			clan_zhonghui:'族钟会',
+			clanyuzhi:'迂志',
+			clanyuzhi_info:'锁定技，每轮开始时，你展示一张手牌并摸X张牌（X为此牌牌名字数）。每轮结束时，若你本轮使用牌数或上轮以此法摸牌数小于X，你失去1点体力或宗族技',
+			clanxieshu:'挟术',
+			clanxieshu_info:'当你造成或受到牌的伤害后，你可以弃置X张牌（X为此牌牌名字数）并摸你已损失体力值张牌',
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
 			clan_han:'颍川·韩氏',
