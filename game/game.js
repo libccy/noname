@@ -11084,7 +11084,8 @@
 					game.broadcastAll(function(player,id,beatmap){
 						if(_status.connectMode) lib.configOL.choose_timeout=(Math.ceil((beatmap.timeleap[beatmap.timeleap.length-1]+beatmap.speed*100+(beatmap.current||0))/1000)+5).toString();
 						if(player==game.me) return;
-						var str=get.translation(player)+'正在演奏《'+beatmap.name+'》...<br>';
+						var str=get.translation(player)+'正在演奏《'+beatmap.name+'》...';
+						if(!_status.connectMode) str+='<br>（点击屏幕可以跳过等待AI操作）';
 						ui.create.dialog(str).videoId=id;
 						if(ui.backgroundMusic) ui.backgroundMusic.pause();
 						if(lib.config.background_audio){
@@ -11179,6 +11180,7 @@
 								_status.imchoosing=false;
 								if(roundmenu) ui.roundmenu.style.display='';
 								if(ui.backgroundMusic) ui.backgroundMusic.play();
+								hitsound_audio.remove();
 							},1000);
 						};
 						event.dialog.open();
@@ -11316,7 +11318,7 @@
 					else{
 						game.pause();
 						game.countChoose();
-						setTimeout(function(){
+						var settle=function(){
 							_status.imchoosing=false;
 							var choose_to_play_beatmap_accuracies=(lib.config.choose_to_play_beatmap_accuracies||[]).concat(Array.from({
 								length:6-(lib.config.choose_to_play_beatmap_accuracies||[]).length
@@ -11339,7 +11341,23 @@
 							if(event.dialog) event.dialog.close();
 							if(event.control) event.control.close();
 							game.resume();
-						},beatmap.timeleap[beatmap.timeleap.length-1]+beatmap.speed*100+1000+(beatmap.current||0));
+						};
+						var song_duration=beatmap.timeleap[beatmap.timeleap.length-1]+beatmap.speed*100+1000+(beatmap.current||0);
+						var settle_timeout=setTimeout(settle,song_duration);
+						if(!_status.connectMode) {
+							var skip_timeout;
+							var skip=()=>{
+								settle();
+								Array.from(ui.window.getElementsByTagName('audio')).forEach(value=>{
+									if(value.currentSrc.indexOf(beatmap.filename.indexOf('ext:')==0?beatmap.name:beatmap.filename)>-1) value.remove();
+								});
+								document.removeEventListener(lib.config.touchscreen?'touchend':'click',skip);
+								clearTimeout(settle_timeout);
+								clearTimeout(skip_timeout);
+							};
+							document.addEventListener(lib.config.touchscreen?'touchend':'click',skip);
+							skip_timeout=setTimeout(()=>document.removeEventListener(lib.config.touchscreen?'touchend':'click',skip),song_duration);
+						}
 					}
 					'step 2'
 					game.broadcastAll(function(id,time){
