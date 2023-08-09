@@ -7465,6 +7465,25 @@
 						}
 					});
 				}
+				if(!Object.values){
+					Object.defineProperty(Object, 'values', {
+						configurable:true,
+						enumerable:false,
+						writable:true,
+						value:function(obj){
+							if(obj!== Object(obj)) {
+								throw new TypeError('Object.values called on a non-object');
+							}
+							var values=[];
+							for(var key in obj) {
+								if(obj.hasOwnProperty(key)){
+									values.push(obj[key]);
+								}
+							}
+							return values;
+						}
+					});
+				}
 				window.onkeydown=function(e){
 					if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')){
 						if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
@@ -8951,7 +8970,12 @@
 										lib[j][k].addArray(character[i][j][k]);
 									}
 									else{
-										console.log('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
+										console.log(
+											`dublicate ${j} in character ${i}:\n${k}:\nlib.${j}.${k}`,
+											lib[j][k],
+											`\ncharacter.${i}.${j}.${k}`,
+											character[i][j][k]
+										);
 									}
 								}
 							}
@@ -9048,7 +9072,14 @@
 												lib[j][k]=card[i][j][k];
 											}
 										}
-										else console.log('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
+										else{
+											console.log(
+												`dublicate ${j} in card ${i}:\n${k}:\nlib.${j}.${k}`,
+												lib[j][k],
+												`\ncard.${i}.${j}.${k}`,
+												card[i][j][k]
+											);
+										}
 										if(j=='card'&&lib[j][k].derivation){
 											if(!lib.cardPack.mode_derivation){
 												lib.cardPack.mode_derivation=[k];
@@ -9118,7 +9149,12 @@
 									}
 									else{
 										if(lib[j][k]!=undefined){
-											console.log('dublicate '+j+' in play '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+play[i][j][k]);
+											console.log(
+												`dublicate ${j} in play ${i}:\n${k}:\nlib.${j}.${k}`,
+												lib[j][k],
+												`\nplay.${i}.${j}.${k}`,
+												play[i][j][k]
+											);
 										}
 										lib[j][k]=play[i][j][k];
 									}
@@ -12104,7 +12140,12 @@
 										lib[j][k].addArray(character[i][j][k]);
 									}
 									else{
-										console.log('dublicate '+j+' in character '+i+':\n'+k+'\n'+': '+lib[j][k]+'\n'+character[i][j][k]);
+										console.log(
+											`dublicate ${j} in character ${i}:\n${k}:\nlib.${j}.${k}`,
+											lib[j][k],
+											`\ncharacter.${i}.${j}.${k}`,
+											character[i][j][k]
+										);
 									}
 								}
 							}
@@ -12131,7 +12172,14 @@
 								}
 								else{
 									if(lib[j][k]==undefined) lib[j][k]=card[i][j][k];
-									else console.log('dublicate '+j+' in card '+i+':\n'+k+'\n'+lib[j][k]+'\n'+card[i][j][k]);
+									else{
+										console.log(
+											`dublicate ${j} in card ${i}:\n${k}\nlib.${j}.${k}`,
+											lib[j][k],
+											`\ncard.${i}.${j}.${k}`,
+											card[i][j][k]
+										);
+									}
 								}
 							}
 						}
@@ -55011,7 +55059,7 @@
 			var i,translation,intro,str;
 			if(node._nointro) return;
 			if(typeof node._customintro=='function'){
-				if(node._customintro(uiintro)===false) return;
+				if(node._customintro(uiintro,evt)===false) return;
 			}
 			else if(Array.isArray(node._customintro)){
 				var caption=node._customintro[0];
