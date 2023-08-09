@@ -1704,7 +1704,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event._result={bool:false};
 					}
 					else{
-						trigger.player.chooseToDiscard(num,'弃置'+get.cnNumber(num)+'张手牌，或令杀的伤害+1').set('ai',function(card){
+						trigger.player.chooseToDiscard(num,'弃置'+get.cnNumber(num)+'张手牌，或令'+get.translation(player)+'对你造成的此伤害+1').set('ai',function(card){
 							var player=_status.event.player;
 							if(player.hp==1){
 								if(get.type(card)=='basic'){

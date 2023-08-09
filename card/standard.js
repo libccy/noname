@@ -3244,7 +3244,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			wuxie_info:'一张锦囊牌生效前，对此牌使用。抵消此牌对一名角色产生的效果，或抵消另一张【无懈可击】产生的效果。',
 			lebu_info:'出牌阶段，对一名其他角色使用。若判定结果不为红桃，跳过其出牌阶段。',
 			shandian_info:'出牌阶段，对自己使用。若判定结果为黑桃2~9，则目标角色受到3点雷电伤害。若判定不为黑桃2~9，将之移动到下家的判定区里。',
-			icesha_skill:'冰杀',
+			icesha_skill:'冰冻',
 			icesha_skill_info:'防止即将造成的伤害，改为依次弃置其两张牌。',
 			qinggang2:'破防',
 		},

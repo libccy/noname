@@ -18468,8 +18468,11 @@
 				inRangeOf:function(source){
 					return source.inRange(this);
 				},
+				getHp:function(){
+					return Math.max(0,this.hp);
+				},
 				getDamagedHp:function(){
-					return this.maxHp-Math.max(0,this.hp);
+					return this.maxHp-this.getHp();
 				},
 				changeGroup:function(group,log,broadcast){
 					var next=game.createEvent('changeGroup');
