@@ -11121,7 +11121,7 @@
 							node_pos=mapping.shift();
 						}
 						else if(mapping=='random'){
-							abs=Math.floor(Math.random()*number_of_tracks);
+							abs=get.rand(number_of_tracks);
 							node_pos=abs;
 						}
 						var combo=0;
@@ -11228,7 +11228,7 @@
 							}
 							else if(mapping=='random'){
 								while(node_pos==abs){
-									node_pos=Math.floor(Math.random()*number_of_tracks);
+									node_pos=get.rand(number_of_tracks);
 								}
 								abs=node_pos;
 							}
