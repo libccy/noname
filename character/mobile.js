@@ -6237,12 +6237,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								speed=-4;
 							}
 						};
-						document.addEventListener(lib.config.touchscreen?'touchend':'click',fly);
+						document.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',fly);
 						
 						event.settle=function(){
 							clearInterval(event.fly);
 							clearInterval(event.addPipe);
-							document.removeEventListener(lib.config.touchscreen?'touchend':'click',fly);
+							document.removeEventListener(lib.config.touchscreen?'touchstart':'mousedown',fly);
 							setTimeout(function(){
 								event.switchToAuto()
 							},1000);
@@ -8341,7 +8341,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(event.zhengjing.length){
 								var card=ui.create.card(ui.special,'noclick',true);
 								card.init(['','',event.zhengjing.shift()]);
-								card.addEventListener(lib.config.touchscreen?'touchend':'click',click);
+								card.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',click);
 								event.zhengjing_nodes.push(card);
 								card.style.position='absolute';
 								var rand1=Math.round(Math.random()*100);
