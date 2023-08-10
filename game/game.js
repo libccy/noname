@@ -11320,6 +11320,8 @@
 						game.countChoose();
 						var settle=function(){
 							_status.imchoosing=false;
+							//Algorithm: Generate the random number range using the mean and the half standard deviation of accuracies of the player's last 5 plays
+							//算法：用玩家的上5次游玩的准确率的平均数和半标准差生成随机数范围
 							var choose_to_play_beatmap_accuracies=(lib.config.choose_to_play_beatmap_accuracies||[]).concat(Array.from({
 								length:6-(lib.config.choose_to_play_beatmap_accuracies||[]).length
 							},()=>get.rand(70,100)));
