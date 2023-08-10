@@ -706,7 +706,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yonglv_info:'锁定技。其他角色至你的距离视为1。',
 			yonglv_append:'<span class="text" style="font-family: yuanli">它旁边的就是王仲宣。</span>',
 			zhanxiang:'战象',
-			zhanxiang_info:'锁定技。当你成为〖赠予〗的目标后，你将此次赠予的效果改为“将赠予牌移动至弃牌堆”。',
+			zhanxiang_info:'锁定技。①其他角色至你的距离+1。②当你成为〖赠予〗的目标后，你将此次赠予的效果改为“将赠予牌移动至弃牌堆”。',
 			xinge:'信鸽',
 			xinge_info:'出牌阶段限一次。你可以将一张手牌交给一名其他角色。',
 			xinge_append:'<span class="text" style="font-family: yuanli">咕咕咕。</span>',

@@ -11,7 +11,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangkai:['male','qun',4,['dcxiangshu']],
 			gaoxiang:['male','shu',4,['dcchiying'],['unseen']],
 			yuanyin:['male','qun',3,['dcmoshou','dcyunjiu'],['unseen']],
-			dongwan:['female','qun',3,['dcshengdu','dcxianjiao'],['unseen']],
+			dongwan:['female','qun',3,['dcshengdu','dcjieling'],['unseen']],
 			zhangchu:['female','qun',3,['dcjizhong','dcrihui','dcguangshi']],
 			peiyuanshao:['male','qun',4,['dcmoyu'],['unseen']],
 			mengjie:['male','qun',3,['dcyinlu','dcyouqi']],
@@ -1051,7 +1051,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var att=get.attitude(player,target);
 						var eff=get.effect(target,{
 							name:'sha',
-							storage:{dcxianjiao:true},
+							storage:{dcjieling:true},
 						},player,player);
 						var value=att/5;
 						if(value<0) value=-value/1.3;
@@ -1102,14 +1102,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			dcxianjiao:{
+			dcjieling:{
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
 				position:'hs',
 				viewAs:{
 					name:'sha',
-					storage:{dcxianjiao:true}
+					storage:{dcjieling:true}
 				},
 				filterCard:function(card,player){
 					if(ui.selected.cards.length){
@@ -1123,7 +1123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 6-get.value(card);
 				},
 				precontent:function(){
-					player.addTempSkill('dcxianjiao_after');
+					player.addTempSkill('dcjieling_after');
 					event.getParent().addCount=false;
 				},
 				ai:{
@@ -1134,7 +1134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				mod:{
 					targetInRange:function(card){
-						if(card.storage&&card.storage.dcxianjiao) return true;
+						if(card.storage&&card.storage.dcjieling) return true;
 					},
 				},
 				subSkill:{
@@ -1144,7 +1144,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						charlotte:true,
 						filter:function(event,player){
-							return event.card.name=='sha'&&event.card.storage&&event.card.storage.dcxianjiao;
+							return event.card.name=='sha'&&event.card.storage&&event.card.storage.dcjieling;
 						},
 						content:function(){
 							'step 0'
@@ -1152,7 +1152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return current.hasHistory('damage',evt=>evt.card==trigger.card);
 							});
 							var targets=trigger.targets.filter(i=>i.isIn());
-							player.logSkill('dcxianjiao_after',targets);
+							player.logSkill('dcjieling_after',targets);
 							if(damaged){
 								for(var target of targets){
 									target.loseHp();
@@ -10204,8 +10204,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dongwan:'董绾',
 			dcshengdu:'生妒',
 			dcshengdu_info:'回合开始时，你可以选择一名其他角色。当其于其的下个摸牌阶段获得牌后，你摸等量的牌。',
-			dcxianjiao:'献绞',
-			dcxianjiao_info:'出牌阶段限一次。你可以将两张颜色不同的手牌当无距离限制且无任何次数限制的【杀】使用。然后若此【杀】：造成了伤害，所有目标角色失去1点体力；未造成伤害，你对所有目标角色依次发动一次〖生妒〗。',
+			dcjieling:'介绫',
+			dcjieling_info:'出牌阶段限一次。你可以将两张颜色不同的手牌当无距离限制且无任何次数限制的【杀】使用。然后若此【杀】：造成了伤害，所有目标角色失去1点体力；未造成伤害，你对所有目标角色依次发动一次〖生妒〗。',
 			yuanyin:'袁胤',
 			dcmoshou:'墨守',
 			dcmoshou_info:'当你成为其他角色使用的黑色牌的目标后，你可以摸X张牌（X为你本局游戏此前发动过此技能的次数÷3的余数+1）。',
