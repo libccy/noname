@@ -13105,7 +13105,6 @@
 					}
 					"step 3"
 					if(event.buttoned){
-						debugger
 						if(result.bool||result.control&&result.control!='cancel2'){
 							var info=get.info(event.buttoned).chooseButton;
 							lib.skill[event.buttoned+'_backup']=info.backup(info.chooseControl?result:result.links,player);
