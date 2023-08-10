@@ -11179,7 +11179,7 @@
 								game.resume();
 								_status.imchoosing=false;
 								if(roundmenu) ui.roundmenu.style.display='';
-								if(ui.backgroundMusic) ui.backgroundMusic.play();
+								if(ui.backgroundMusic) ui.backgroundMusic.play().catch(()=>void 0);
 								hitsound_audio.remove();
 							},1000);
 						};
@@ -11368,7 +11368,7 @@
 						if(dialog){
 							dialog.close();
 						}
-						if(ui.backgroundMusic) ui.backgroundMusic.play();
+						if(ui.backgroundMusic) ui.backgroundMusic.play().catch(()=>void 0);
 					},event.videoId,event.time);
 					var result=event.result||result;
 					event.result=result;
