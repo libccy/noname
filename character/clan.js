@@ -17,17 +17,147 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wangling:['male','wei',4,['clanbolong','clanzhongliu'],['clan:太原王氏']],
 			clan_zhongyan:['female','jin',3,['clanguangu','clanxiaoyong','clanbaozu'],['clan:颍川钟氏']],
 			clan_wangyun:['male','qun',3,['clanjiexuan','clanmingjie','clanzhongliu'],['clan:太原王氏']],
+			clan_wanghun:['male','jin',3,['clanfuxun','clanchenya','clanzhongliu'],['clan:太原王氏']],
 		},
 		characterSort:{
 			clan:{
 				clan_wu:['clan_wuxian','clan_wuban','clan_wukuang'],
 				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				clan_han:['clan_hanshao','clan_hanrong'],
-				clan_wang:['clan_wangling','clan_wangyun'],
+				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun'],
 				clan_zhong:['clan_zhongyan'],
 			},
 		},
 		skill:{
+			//族王浑
+			clanfuxun:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filterCard:true,
+				position:'h',
+				discard:false,
+				lose:false,
+				delay:false,
+				selectCard:function(){
+					var player=_status.event.player;
+					if(ui.selected.targets.length&&!ui.selected.targets[0].countGainableCards(player,'h')) return 1;
+					return [0,1];
+				},
+				filterTarget:function(card,player,target){
+					if(player==target) return false;
+					if(!ui.selected.cards.length) return target.countGainableCards(player,'h')>0;
+					return true;
+				},
+				content:function(){
+					'step 0'
+					if(cards.length){
+						player.give(cards,target);
+					}
+					else{
+						player.gainPlayerCard(target,'h',true);
+					}
+					'step 1'
+					var evtx=event.getParent('phaseUse');
+					if(player.countCards('h')==target.countCards('h')&&evtx&&!target.hasHistory('lose',evt=>{
+						return evt.getParent(3).name!='clanfuxun'&&evt.getParent('phaseUse')==evtx&&evt.cards2.length;
+					})&&!target.hasHistory('gain',evt=>{
+						return evt.getParent().name!='clanfuxun'&&evt.getParent('phaseUse')==evtx&&evt.cards.length;
+					})&&player.countCards('he')){
+						var list=[];
+						for(var name of lib.inpile){
+							if(get.type(name)!='basic') continue;
+							if(player.hasUseTarget({name:name})) list.push(['基本','',name]);
+							if(name=='sha'){
+								for(var nature of lib.inpile_nature){
+									if(player.hasUseTarget({name:name,nature:nature})) list.push(['基本','',name,nature]);
+								}
+							}
+						}
+						if(list.length){
+							player.chooseButton(['是否将一张牌当做一种基本牌使用？',[list,'vcard']]).set('ai',button=>{
+								return _status.event.player.getUseValue({name:button.link[2],nature:button.link[3]});
+							});
+						}
+						else event.finish();
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var card={
+							name:result.links[0][2],
+							nature:result.links[0][3]
+						};
+						game.broadcastAll(function(card){
+							lib.skill.clanfuxun_backup.viewAs=card;
+						},card);
+						var next=player.chooseToUse();
+						next.set('openskilldialog','将一张牌当做'+get.translation(card)+'使用');
+						next.set('norestore',true);
+						next.set('addCount',false);
+						next.set('_backupevent','clanfuxun_backup');
+						next.set('custom',{
+							add:{},
+							replace:{window:function(){}}
+						});
+						next.backup('clanfuxun_backup');
+					}
+				},
+				subSkill:{
+					backup:{
+						filterCard:function(card){
+							return get.itemtype(card)=='card';
+						},
+						position:'hes',
+						filterTarget:lib.filter.targetEnabled,
+						selectCard:1,
+						check:(card)=>6-get.value(card),
+						log:false,
+						precontent:function(){
+							delete event.result.skill;
+						},
+					},
+				}
+			},
+			clanchenya:{
+				audio:2,
+				trigger:{
+					global:['useSkillAfter','logSkill'],
+				},
+				filter:function(event,player){
+					if(event.type!='player') return false;
+					var skill=event.sourceSkill||event.skill;
+					var info=get.info(skill);
+					if(info.charlotte) return false;
+					var translation=lib.translate[skill+'_info'];
+					if(translation&&!(/(?<!“)出牌阶段限一次/.test(translation))) return false;
+					return event.player.countCards('h')>0;
+				},
+				check:function(event,player){
+					return get.attitude(player,event.player)>0;
+				},
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					var num=trigger.player.countCards('h');
+					trigger.player.chooseCard('是否重铸任意张牌名字数为'+num+'的牌？',[1,Infinity],'he',(card,player,target)=>{
+						if(!_status.event.cards.contains(card)) return false;
+						var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
+						return mod=='unchanged';
+					}).set('ai',card=>{
+						var val=get.value(card);
+						return 6-val;
+					}).set('cards',trigger.player.getCards('he',card=>{
+						return lib.skill.dcweidang.getLength(card)==num;
+					}));
+					'step 1'
+					if(result.bool){
+						var cards=result.cards;
+						trigger.player.loseToDiscardpile(cards);
+						trigger.player.draw(cards.length);
+					}
+				}
+			},
 			//族王允
 			clanjiexuan:{
 				audio:2,
@@ -600,7 +730,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanzhongliu:{
 				audio:2,
-				audioname:['clan_wangling','clan_wangyun'],
+				audioname:['clan_wangling','clan_wangyun','clan_wanghun'],
 				trigger:{player:'useCard'},
 				forced:true,
 				clanSkill:true,
@@ -2058,6 +2188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanshao:'韩韶（生卒年不详），字仲黄，颍川舞阳（今河南省漯河市）人，东汉桓帝时出仕。任郡吏，有政绩，继而被征入司徒府。他公正廉明，尽心民事，视民苦如在己身，政绩卓著。汉永寿二年（公元156年），泰山贼公孙举率流寇数千骚扰嬴县，守令因不能拒敌安民，多受制裁，朝廷命尚书府从三府（司徒、司马、司空）属员中，选择能治理民事，又能拒寇入侵的官员，前往镇守。韩韶被封为“嬴长”到嬴县上任，他是莱芜历史上唯一的一位“嬴长”。',
 			hanrong:'韩融（127年～196年），字元长，颍川舞阳（今属河南省漯河市）人。赢长韩韶子，献帝时大臣。中平五年（188年），融与荀爽、陈纪等十四人并博士征，不至。董卓废立，融等复俱公车征。初平元年（190年）六月，融为大鸿胪，奉命与执金吾胡母班等出使关东。献帝东迁，为李傕、郭汜等所败，融为太仆，奉命至弘农与傕、汜连和，使其放遣公卿百官及宫女妇人。',
 			wukuang:'吴匡（生卒年不详），兖州陈留（今河南开封市）人。东汉末年大臣，大将军何进部将。光熹元年（公元189年），汉灵帝死后，十常侍干预朝政，大将军何进谋诛宦官，但失败被杀，吴匡联合曹操、袁绍等杀尽宦官，攻杀车骑将军何苗。兴平二年（公元195年）十月，李傕、郭汜后悔放汉献帝东归洛阳，于是联合起来追击，曹操遂起兵平乱，但在回朝后，曹操挟天子以令诸侯，实行专权，但遭到吴匡反对。',
+			wanghun:'王浑（223年～297年），字玄冲，太原郡晋阳县（今山西省太原市）人。魏晋时期名臣，曹魏司空王昶的儿子。王浑早年为大将军曹爽的掾吏，高平陵政变后，循例免官，出任怀县县令、散骑侍郎等职，袭封京陵县侯。西晋王朝建立后，加号扬烈将军，历任征虏将军、东中郎将、豫州刺史等职，积极筹划伐吴方略。咸宁五年（279年），配合镇南将军杜预灭亡吴国，迁征东大将军、左仆射、司徒公，晋爵京陵县公。晋惠帝司马衷即位，加任侍中衔。楚王司马玮发动政变，有意寻求支持，遭到严词拒绝。楚王司马玮死后，复任司徒、录尚书事。元康七年（297年），王浑去世，享年七十五岁，谥号为元。《唐会要》尊为“魏晋八君子”之一。',
 		},
 		dynamicTranslate:{
 			clanlianzhu:function(player){
@@ -2139,6 +2270,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanjiexuan_info:'限定技，转换技。阴：你可以将一张红色牌当【顺手牵羊】使用；阳：你可以将一张黑色牌当【过河拆桥】使用。',
 			clanmingjie:'铭戒',
 			clanmingjie_info:'限定技。出牌阶段，你可以选择一名角色，然后直到其下回合结束时，当你使用牌时你可以指定其为额外目标。然后其下回合结束时，你可以使用本回合使用过的黑桃牌和被抵消过的牌。',
+			clan_wanghun:'族王浑',
+			clanfuxun:'抚循',
+			clanfuxun_info:'出牌阶段限一次。你可以获得或交给一名其他角色一张手牌，然后若其手牌数与你相等且于此阶段仅以此法获得或失去过牌，你可以将一张牌当任意基本牌使用。',
+			clanchenya:'沉雅',
+			clanchenya_info:'当一名角色发动“出牌阶段限一次”的技能后，你可以令其重铸任意张牌名字数为X的牌（X为其手牌数）。',
 			
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
