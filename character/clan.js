@@ -103,6 +103,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						next.backup('clanfuxun_backup');
 					}
 				},
+				ai:{
+					order:2,
+					result:{
+						target:-1,
+					},
+				},
 				subSkill:{
 					backup:{
 						filterCard:function(card){
