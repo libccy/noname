@@ -264,16 +264,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip6',
+				subtypes:['equip3','equip4'],
 				nomod:true,
 				nopower:true,
 				unique:true,
 				distance:{
 					globalFrom:-1,
 					globalTo:+1,
-				},
-				customSwap:function(card){
-					var type=get.subtype(card,false);
-					return type=='equip3'||type=='equip4'||type=='equip6';
 				},
 				skills:['liulongcanjia'],
 				ai:{
@@ -1221,8 +1218,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			liulongcanjia:{
 				equipSkill:true,
 				mod:{
-					targetEnabled:function(card,player,target){
-						if(['equip3','equip4'].contains(get.subtype(card))) return false;
+					canBeReplaced:function(card,player){
+						return false;
 					},
 				},
 			},
@@ -1799,7 +1796,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		translate:{
 			liulongcanjia:'六龙骖驾',
-			liulongcanjia_info:'锁定技。①你计算与其他角色的距离-1，其他角色计算与你的距离+1。②当此牌进入你的装备区时，你弃置你装备区内其他坐骑牌。③你的装备区内不能置入其他坐骑牌。',
+			liulongcanjia_info:'锁定技。此牌占用1个进攻坐骑和1个防御坐骑槽位，且不可被替换。你计算与其他角色的距离-1，其他角色计算与你的距离+1。',
 			minguangkai:'明光铠',
 			minguangkai_cancel:'明光铠',
 			minguangkai_link:'明光铠',

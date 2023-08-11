@@ -727,13 +727,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					canBeGained:function(card,source,player){
-						if(player.getCards('e',card=>card.name=='ruyijingubang').contains(card)) return false;
+						if(player.getEquips('ruyijingubang').contains(card)) return false;
 					},
 					canBeDiscarded:function(card,source,player){
-						if(player.getCards('e',card=>card.name=='ruyijingubang').contains(card)) return false;
+						if(player.getEquips('ruyijingubang').contains(card)) return false;
 					},
 					canBeReplaced:function(card,player){
-						if(player.getCards('e',card=>card.name=='ruyijingubang').contains(card)) return false;
+						if(player.getEquips('ruyijingubang').contains(card)) return false;
 					},
 					cardname:function(card){
 						if(get.subtype(card,false)=='equip1') return 'sha';
@@ -742,10 +742,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.subtypes(card,false).contains('equip1')) return false;
 					},
 					cardDiscardable:function(card,player){
-						if(player.getCards('e',card=>card.name=='ruyijingubang').contains(card)) return false;
+						if(player.getEquips('ruyijingubang').contains(card)) return false;
 					},
 					cardEnabled2:function(card,player){
-						if(player.getCards('e',card=>card.name=='ruyijingubang').contains(card)) return false;
+						if(player.getEquips('ruyijingubang').contains(card)) return false;
 					},
 				},
 				group:'dcruyi_blocker',
@@ -755,12 +755,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						filter:function(event,player){
 							if(event.name=='disableEquip') return (event.slots.contains('equip1'));
-							var cards=player.getCards('e',card=>card.name=='ruyijingubang');
+							var cards=player.getEquips('ruyijingubang');
 							return event.cards.some(card=>cards.contains(card));
 						},
 						content:function(){
 							if(trigger.name=='lose'){
-								trigger.cards.remove(player.getCards('e',card=>card.name=='ruyijingubang'));
+								trigger.cards.remove(player.getEquips('ruyijingubang'));
 							}
 							else{
 								while(trigger.slots.contains('equip1')) trigger.slots.remove('equip1');

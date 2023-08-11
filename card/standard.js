@@ -1588,7 +1588,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				multicheck:function(){
 					var card={name:'sha',isCard:true};
 					return game.hasPlayer(function(current){
-						if(current.getEquip(1)){
+						if(current.getEquips(1).length>0){
 							return game.hasPlayer(function(current2){
 								return current.inRange(current2)&&lib.filter.targetEnabled(card,current,current2);
 							})
@@ -1597,7 +1597,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					var card={name:'sha',isCard:true};
-					return player!=target&&target.getEquip(1)&&game.hasPlayer(function(current){
+					return player!=target&&target.getEquips(1).length>0&&game.hasPlayer(function(current){
 						return target!=current&&target.inRange(current)&&lib.filter.targetEnabled(card,target,current);
 					});
 				},
@@ -1621,7 +1621,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(event.directfalse||result.bool==false){
-						var cards=target.getCards('e',{subtype:'equip1'});
+						var cards=target.getEquips(1);
 						if(cards.length) player.gain(cards,target,'give','bySelf');
 					}
 				},
@@ -2195,16 +2195,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				audio:true,
 				filter:function(event,player){
-					if(event.type!='card'||event.card.name!='sha') return false;
-					return player.countCards('he',function(card){
-						return card!=player.getEquip('guanshi');
-					})>=2&&event.target.isAlive();
+					if(event.type!='card'||event.card.name!='sha'||!event.target.isIn()) return false;
+					var min=2;
+					if(!player.hasSkill('guanshi_skill',null,false)) min+=get.sgn(player.getEquips('guanshi').length)
+					return player.countCards('he')>=min;
 				},
 				content:function(){
 					"step 0"
-					var next=player.chooseToDiscard(get.prompt('guanshi'),2,'he',function(card){
-						return _status.event.player.getEquip('guanshi')!=card;
-					});
+					//装备区内可能有多个贯石斧 或者玩家可能通过其他渠道获得贯石斧技能 只要留一张贯石斧不扔掉即可
+					var next=player.chooseToDiscard(get.prompt('guanshi'),2,'he',function(card,player){
+						if(_status.event.ignoreCard) return true;
+						var cards=player.getEquips('guanshi');
+						if(!cards.contains(card)) return true;
+						return cards.some(cardx=>(cardx!=card&&!ui.selected.cards.contains(cardx)));
+					}).set('ignoreCard',player.hasSkill('guanshi_skill',null,false)).set('complexCard',true)
 					next.logSkill='guanshi_skill';
 					next.set('ai',function(card){
 						var evt=_status.event.getTrigger();

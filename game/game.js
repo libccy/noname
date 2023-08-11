@@ -10597,7 +10597,7 @@
 			equip3:'防御马',
 			equip4:'攻击马',
 			equip5:'宝物',
-			equip6:'坐骑',
+			equip6:'特殊装备',
 			zero:'零',
 			one:'一',
 			two:'二',
@@ -18206,7 +18206,7 @@
 								break;
 							}
 							else if(lib.card[subtype]){
-								subtype=lib.card[subtype].subtype;
+								return this.getCards('e',card=>card.name==subtype);
 							}
 							else return [];
 						case 'number':
