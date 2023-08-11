@@ -22,6 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			shen_dianwei:['male','shen',4,['juanjia'],['wei']],
 			shen_dengai:['male','shen',4,['dctuoyu','dcxianjin','dcqijing'],['wei']],
 			tw_shen_lvmeng:['male','shen',3,['twshelie','twgongxin'],['wu']],
 			shen_zhangjiao:['male','shen',3,['yizhao','sijun','sanshou','tianjie'],['qun']],
@@ -82,6 +83,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//捐甲
+			juanjia:{
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
+				forced:true,
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0)&&player.hasEnabledSlot(2);
+				},
+				content:function(){
+					player.disableEquip(2);
+					player.expandEquip(1);
+				},
+			},
 			//神邓艾
 			dctuoyu:{
 				audio:2,
@@ -7212,6 +7228,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，将座位移动至一名其他角色的上家之后，获得〖摧心〗和一个额外回合。',
 			dccuixin:'摧心',
 			dccuixin_info:'当你不因此技能使用的基本牌或普通锦囊牌结算结束后，若此牌的目标包含你的上家或下家，则你可以视为对下家或上家再使用一张牌名和元素相同的牌。',
+			shen_dianwei:'神典韦',
+			juanjia:'捐甲',
+			juanjia_info:'锁定技。游戏开始时，你废除一个防具栏，然后获得一个额外的武器栏。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',

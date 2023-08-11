@@ -30,6 +30,7 @@ html{
 #arena.mobile.textequip:not(.chess) .player[data-position='0'] .equips{
 	background-image: none;
 	box-shadow: rgba(0, 0, 0, 0.2) -1px 0px 0px 0px;
+	overflow-y: scroll;
 }
 #arena:not(.chess).textequip .player[data-position='0'] .equips>.card{
 	background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)) !important;

@@ -853,7 +853,7 @@
 						name:'布局',
 						init:'mobile',
 						item:{
-							default:'旧版',
+							//default:'旧版',
 							newlayout:'对称',
 							mobile:'默认',
 							long:'宽屏',
@@ -2795,7 +2795,7 @@
 							}
 						}
 					},
-					textequip:{
+					/*textequip:{
 						name:'装备显示',
 						init:'image',
 						unfrequent:true,
@@ -2812,7 +2812,7 @@
 								ui.arena.classList.remove('textequip');
 							}
 						}
-					},
+					},*/
 					buttoncharacter_style:{
 						name:'选将样式',
 						init:'default',
@@ -2958,12 +2958,12 @@
 							// }
 						}
 						if(lib.config.layout=='long'||lib.config.layout=='mobile'){
-							map.textequip.show();
+							//map.textequip.show();
 							map.cardshape.show();
 							map.phonelayout.show();
 						}
 						else{
-							map.textequip.hide();
+							//map.textequip.hide();
 							if(lib.config.layout=='long2'||lib.config.layout=='nova'){
 								map.phonelayout.show();
 								map.cardshape.show();
@@ -7943,7 +7943,7 @@
 					};
 
 					var layout=lib.config.layout;
-					if(lib.layoutfixed.indexOf(lib.config.mode)!==-1){
+					if(layout=='default'||lib.layoutfixed.indexOf(lib.config.mode)!==-1){
 						layout='mobile';
 					}
 					if(layout=='phone'){
@@ -8008,13 +8008,10 @@
 							}
 						}
 					};
-					if(lib.config.layout!='default'){
-						ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout',styleLoaded);
+					if(lib.config.layout=='default'){
+						lib.config.layout='mobile';
 					}
-					else{
-						ui.css.layout=lib.init.css();
-						styleToLoad--;
-					}
+					ui.css.layout=lib.init.css(lib.assetURL+'layout/'+layout,'layout',styleLoaded);
 					if(get.is.phoneLayout()){
 						ui.css.phone=lib.init.css(lib.assetURL+'layout/default','phone',styleLoaded);
 					}
@@ -9598,6 +9595,7 @@
 				}
 			},
 			layout:function(layout,nosave){
+				if(layout=='default') layout='mobile';
 				if(!nosave) game.saveConfig('layout',layout);
 				game.layout=layout;
 				ui.arena.hide();
@@ -9635,7 +9633,8 @@
 						ui.arena.classList.remove('oblongcard');
 						ui.window.classList.remove('oblongcard');
 					}
-					if(lib.config.textequip=='text'&&(game.layout=='long'||game.layout=='mobile')){
+					//if(lib.config.textequip=='text'&&(game.layout=='long'||game.layout=='mobile')){
+					if(game.layout=='long'||game.layout=='mobile'){
 						ui.arena.classList.add('textequip');
 					}
 					else{
@@ -10709,6 +10708,231 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				//装备栏相关
+				disableEquip:function(){
+					'step 0'
+					event.cards=[];
+					event.num=0;
+					event.slotsx=[...new Set(event.slots)].sort();
+					if(!event.slots.length) event.finish();
+					'step 1'
+					var slot=event.slotsx[event.num];
+					var left=player.countEnabledSlot(slot),lose=Math.min(left,get.numOf(event.slots,slot));
+					if(lose<=0) event.goto(3);
+					else{
+						game.log(player,'废除了'+get.cnNumber(lose)+'个','#g'+get.translation(slot)+'栏');
+						if(!player.disabledSlots) player.disabledSlots={};
+						if(!player.disabledSlots[slot]) player.disabledSlots[slot]=0;
+						player.disabledSlots[slot]+=lose;
+						var cards=player.getEquips(slot).filter(card=>!event.cards.contains(card));
+						if(cards.length>0){
+							if(lose>=left){
+								event._result={bool:true,links:cards};
+							}
+							else if(cards.length>(left-lose)){
+								var source=event.source,num=(cards.length-(left-lose));
+								if(!source||!source.isIn()) source=player;
+								source.chooseButton([
+									'选择'+(player==source?'':get.translation(player))+'的'+get.cnNumber(num)+'张'+get.translation(slot)+'牌置入弃牌堆',
+									cards,
+								],true,num);
+							}
+							else event.goto(3);
+						}
+						else event.goto(3)
+					}
+					'step 2'
+					if(result.bool) event.cards.addArray(result.links);
+					'step 3'
+					event.num++;
+					if(event.num<event.slotsx.length) event.goto(1);
+					else{
+						player.$syncDisable();
+						if(cards.length>0) player.loseToDiscardpile(cards);
+					}
+				},
+				enableEquip:function(){
+					if(!event.slots.length) return;
+					var slotsx=[...new Set(event.slots)].sort();
+					for(var slot of slotsx){
+						var lost=player.countDisabled(slot),gain=Math.min(lost,get.numOf(event.slots,slot));
+						if(lost<=0) continue;
+						else{
+							game.log(player,'恢复了'+get.cnNumber(gain)+'个','#g'+get.translation(slot)+'栏');
+							if(!player.disabledSlots) player.disabledSlots={};
+							if(!player.disabledSlots[slot]) player.disabledSlots[slot]=0;
+							player.disabledSlots[slot]-=gain;
+						}
+					}
+					player.$syncDisable();
+				},
+				expandEquip:function(){
+					if(!event.slots.length) return;
+					var slotsx=[...new Set(event.slots)].sort();
+					for(var slot of slotsx){
+						var expand=get.numOf(event.slots,slot);
+						game.log(player,'获得了'+get.cnNumber(expand)+'个额外的','#g'+get.translation(slot)+'栏');
+						if(!player.expandedSlots) player.expandedSlots={};
+						if(!player.expandedSlots[slot]) player.expandedSlots[slot]=0;
+						player.expandedSlots[slot]+=expand;
+					}
+					player.$syncDisable();
+				},
+				//选择顶装备要顶的牌
+				replaceEquip:function(){
+					'step 0'
+					event.cards=[];
+					var types=get.subtypes(card,false);
+					if(types.length){
+						var info=get.info(card,false);
+						if(info.customSwap){
+							event.cards.addArray(player.getCards('e',function(card){
+								return info.customSwap(card);
+							}));
+							event.goto(4);
+						}
+						else{
+							event.num=0;
+							event.slots=types;
+							event.slotsx=[...new Set(event.slots)].sort();
+						}
+					}
+					else event.goto(4);
+					'step 1'
+					var slot=event.slotsx[event.num];
+					var left=player.countEquipableSlot(slot),lose=Math.min(left,get.numOf(event.slots,slot));
+					if(lose<=0) event.goto(3);
+					else{
+						var cards=player.getEquips(slot).filter(card=>{
+							return !event.cards.contains(card)&&lib.filter.canBeReplaced(card,player);
+						});
+						if(cards.length>0){
+							if(lose>=left){
+								event._result={bool:true,links:cards};
+							}
+							else if(cards.length>(left-lose)){
+								var source=event.source,num=(cards.length-(left-lose));
+								if(!source||!source.isIn()) source=player;
+								source.chooseButton([
+									'选择替换掉'+get.cnNumber(num)+'张'+get.translation(slot)+'牌',
+									cards,
+								],true,num);
+							}
+							else event.goto(3);
+						}
+						else event.goto(3)
+					}
+					'step 2'
+					if(result.bool) event.cards.addArray(result.links);
+					'step 3'
+					event.num++;
+					if(event.num<event.slotsx.length) event.goto(1);
+					'step 4'
+					event.result=cards;
+				},
+				//装备牌
+				equip:function(){
+					"step 0"
+					var owner=get.owner(card)
+					if(owner){
+						event.owner=owner;
+						owner.lose(card,ui.special,'visible').set('type','equip').set('getlx',false);
+					}
+					else if(get.position(card)=='c') event.updatePile=true;
+					"step 1"
+					if(event.cancelled){
+						event.finish();
+						return;
+					}
+					if(card.destroyed){
+						if(player.hasSkill(card.destroyed)){
+							delete card.destroyed;
+						}
+						else{
+							event.finish();
+							return;
+						}
+					}
+					else if(event.owner){
+						if(event.owner.getCards('hejsx').contains(card)){
+							event.finish();
+							return;
+						}
+					}
+					if(event.draw){
+						game.delay(0,300);
+						player.$draw(card);
+					}
+					"step 2"
+					if(card.clone){
+						game.broadcast(function(card,player){
+							if(card.clone){
+								card.clone.moveDelete(player);
+							}
+						},card,player);
+						card.clone.moveDelete(player);
+						game.addVideo('gain2',player,get.cardsInfo([card.clone]));
+					}
+					player.equiping=true;
+					"step 3"
+					var info=get.info(card,false);
+					var next=game.createEvent('replaceEquip');
+					next.player=player;
+					next.card=card;
+					next.setContent(info.replaceEquip||'replaceEquip')
+					"step 4"
+					var info=get.info(card,false);
+					if(get.itemtype(result)=='cards'){
+						player.lose(result,false,'visible').set('type','equip').set('getlx',false).swapEquip=true;
+						if(info.loseThrow){
+							player.$throw(current);
+						}
+						event.swapped=true;
+					}
+					"step 5"
+					//if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
+					if(player.isMin()||!player.canEquip(card)){
+						event.finish();
+						game.cardsDiscard(card);
+						delete player.equiping;
+						return;
+					}
+					var subtype=get.subtype(card);
+					if(subtype=='equip6') subtype='equip3';
+					game.broadcastAll(function(type){
+						if(lib.config.background_audio){
+							game.playAudio('effect',type);
+						}
+					},subtype);
+					player.$equip(card);
+					game.addVideo('equip',player,get.cardInfo(card));
+					game.log(player,'装备了',card);
+					if(event.updatePile) game.updateRoundNumber();
+					"step 6"
+					var info=get.info(card,false);
+					if(info.onEquip&&(!info.filterEquip||info.filterEquip(card,player))){
+						if(Array.isArray(info.onEquip)){
+							for(var i=0;i<info.onEquip.length;i++){
+								var next=game.createEvent('equip_'+card.name);
+								next.setContent(info.onEquip[i]);
+								next.player=player;
+								next.card=card;
+							}
+						}
+						else{
+							var next=game.createEvent('equip_'+card.name);
+							next.setContent(info.onEquip);
+							next.player=player;
+							next.card=card;
+						}
+						if(info.equipDelay!='false') game.delayx();
+					}
+					delete player.equiping;
+					if(event.delay){
+						game.delayx();
+					}
+				},
+				//装备栏 END
 				changeGroup:function(){
 					'step 0'
 					event.originGroup=player.group;
@@ -11591,9 +11815,8 @@
 				chooseToEnable:function(){
 					'step 0'
 					var list=[];
-					for(var i=1;i<6;i++){
-						if(!player.isDisabled(i)) continue;
-						list.push('equip'+i);
+					for(var i=1;i<=5;i++){
+						if(player.hasDisabled(i))  list.push('equip'+i);
 					}
 					if(!list.length) event.finish();
 					else if(list.length==1){
@@ -11618,11 +11841,13 @@
 				chooseToDisable:function(){
 					'step 0'
 					var list=[];
-					for(var i=1;i<7;i++){
-						if((i==3||i==4)&&event.horse) continue;
-						if(i==6&&!event.horse) continue;
-						if(player.isDisabled(i)) continue;
-						list.push('equip'+i);
+					for(var i=1;i<=5;i++){
+						if(player.hasEnabledSlot(i)) list.push('equip'+i);
+					}
+					if(event.horse){
+						if(list.contains('equip3')&&list.contains('equip4')) list.push('equip6');
+						list.remove('equip3');
+						list.remove('equip4');
 					}
 					if(!list.length) event.finish();
 					else if(list.length==1){
@@ -11630,6 +11855,7 @@
 						event._result={control:list[0]};
 					}
 					else{
+						list.sort();
 						event.list=list;
 						var next=player.chooseControl(list);
 						next.set('prompt','请选择废除一个装备栏');
@@ -11644,8 +11870,7 @@
 					'step 1'
 					event.result={control:result.control};
 					if(result.control=='equip6'){
-						player.disableEquip(3);
-						player.disableEquip(4);
+						player.disableEquip(3,4);
 					}
 					else player.disableEquip(result.control);
 				},
@@ -11677,26 +11902,6 @@
 					for(var i=0;i<event.cards[0].length;i++){
 						if(get.position(event.cards[0][i],true)=='o') target.equip(event.cards[0][i]);
 					}
-				},
-				disableEquip:function(){
-					if(!player.isDisabled(event.pos)){
-						var cards=player.getCards('e',function(card){
-							var subtype=get.subtype(card);
-							if(subtype==event.pos) return true;
-							if(subtype=='equip6'&&['equip3','equip4'].contains(event.pos)) return true;
-							return false;
-						});
-						if(cards.length) player.loseToDiscardpile(cards).delay=false;
-						game.log(player,'废除了',get.translation(event.pos),'栏');
-						player.$disableEquip(event.pos);
-					}
-				},
-				enableEquip:function(){
-					if(player.isDisabled(event.pos)){
-						player.syncStorage('_disableEquip');
-						game.log(player,'恢复了',get.translation(event.pos),'栏');
-						player.$enableEquip(event.pos);
-					};
 				},
 				disableJudge:function(){
 					'step 0'
@@ -15444,7 +15649,7 @@
 							if(target.isMin()) return false;
 							var es=from.getCards('e');
 							for(var i=0;i<es.length;i++){
-								if(target.isEmpty(get.subtype(es[i]))) return true;
+								if(target.canEquip(es[i])) return true;
 							}
 							return false;
 						}
@@ -15468,7 +15673,7 @@
 								})) return 14;
 								if(target.countCards('e',function(card){
 									return get.value(card,target)<0&&game.hasPlayer(function(current){
-										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))&&get.effect(target,card,player,player)<0;
+										return current!=target&&get.attitude(player,current)<0&&current.canEquip(card)&&get.effect(target,card,player,player)<0;
 									});
 								})>0) return 9;
 							}
@@ -15477,7 +15682,7 @@
 									if(current!=target&&get.attitude(player,current)>0){
 										var es=target.getCards('e');
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,player)>0) return true;
+											if(get.value(es[i],target)>0&&current.canEquip(es[i])&&get.effect(current,es[i],player,player)>0) return true;
 										}
 									}
 								})){
@@ -15493,7 +15698,7 @@
 							if(sgnatt!=0&&att2!=0&&sgnatt!=att2&&
 								get.sgn(get.value(es[i],ui.selected.targets[0]))==-att2&&
 								get.sgn(get.effect(target,es[i],player,target))==sgnatt&&
-								target.isEmpty(get.subtype(es[i]))){
+								target.canEquip(es[i])){
 								return Math.abs(att);
 							}
 						}
@@ -15542,7 +15747,7 @@
 								return targets1.canAddJudge(button.link);
 							}
 							else{
-								return targets1.isEmpty(get.subtype(button.link));
+								return targets1.canEquip(button.link);
 							}
 						});
 					}
@@ -17643,105 +17848,6 @@
 						source.classList.add('topcount');
 					}
 				},
-				equip:function(){
-					"step 0"
-					var owner=get.owner(card)
-					if(owner){
-						event.owner=owner;
-						owner.lose(card,ui.special,'visible').set('type','equip').set('getlx',false);
-					}
-					else if(get.position(card)=='c') event.updatePile=true;
-					"step 1"
-					if(event.cancelled){
-						event.finish();
-						return;
-					}
-					if(card.destroyed){
-						if(player.hasSkill(card.destroyed)){
-							delete card.destroyed;
-						}
-						else{
-							event.finish();
-							return;
-						}
-					}
-					else if(event.owner){
-						if(event.owner.getCards('hejsx').contains(card)){
-							event.finish();
-							return;
-						}
-					}
-					if(event.draw){
-						game.delay(0,300);
-						player.$draw(card);
-					}
-					"step 2"
-					if(card.clone){
-						game.broadcast(function(card,player){
-							if(card.clone){
-								card.clone.moveDelete(player);
-							}
-						},card,player);
-						card.clone.moveDelete(player);
-						game.addVideo('gain2',player,get.cardsInfo([card.clone]));
-					}
-					player.equiping=true;
-					"step 3"
-					var info=get.info(card,false);
-					var current=player.getCards('e',function(card){
-						if(info.customSwap) return info.customSwap(card);
-						return get.subtype(card,false)==info.subtype;
-					});
-					if(current.length){
-						player.lose(current,false,'visible').set('type','equip').set('getlx',false).swapEquip=true;
-						if(info.loseThrow){
-							player.$throw(current);
-						}
-						event.swapped=true;
-						//event.redo();
-					}
-					"step 4"
-					if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
-						event.finish();
-						game.cardsDiscard(card);
-						delete player.equiping;
-						return;
-					}
-					var subtype=get.subtype(card);
-					if(subtype=='equip6') subtype='equip3';
-					game.broadcastAll(function(type){
-						if(lib.config.background_audio){
-							game.playAudio('effect',type);
-						}
-					},subtype);
-					player.$equip(card);
-					game.addVideo('equip',player,get.cardInfo(card));
-					game.log(player,'装备了',card);
-					if(event.updatePile) game.updateRoundNumber();
-					"step 5"
-					var info=get.info(card,false);
-					if(info.onEquip&&(!info.filterEquip||info.filterEquip(card,player))){
-						if(Array.isArray(info.onEquip)){
-							for(var i=0;i<info.onEquip.length;i++){
-								var next=game.createEvent('equip_'+card.name);
-								next.setContent(info.onEquip[i]);
-								next.player=player;
-								next.card=card;
-							}
-						}
-						else{
-							var next=game.createEvent('equip_'+card.name);
-							next.setContent(info.onEquip);
-							next.player=player;
-							next.card=card;
-						}
-						if(info.equipDelay!='false') game.delayx();
-					}
-					delete player.equiping;
-					if(event.delay){
-						game.delayx();
-					}
-				},
 				addJudge:function(){
 					"step 0"
 					if(cards){
@@ -18024,6 +18130,281 @@
 			},
 			player:{
 				//新函数
+				//装备栏相关
+				//判断一名角色的某个区域是否被废除
+				//type为要判断的区域 若为空 则判断玩家是否有任意一个被废除的区域
+				hasDisabled:function(type){
+					var player=this;
+					if(type=='horse') return player.hasDisabled(3)&&player.hasDisabled(4);
+					return player.countDisabled(type)>0;
+				},
+				//判断一名角色的某个区域被废除的数量
+				//用法同上
+				countDisabled:function(type){
+					var player=this;
+					var map=(player.disabledSlots||{});
+					if(type==undefined){
+						num=0;
+						for(var i=1;i<=5;i++){
+							num+=player.countDisabled(i);
+						}
+						return num;
+					}
+					else{
+						if(typeof type=='number') type=('equip'+type);
+						var num=map[type];
+						if(typeof num=='number'&&num>0) return num;
+						return 0;
+					}
+				},
+				//判断一名角色是否有可以用于装备牌的区域（考虑金箍棒等“不可被替换装备”）
+				//用法同下
+				countEquipableSlot:function(type){
+					if(!type) return false;
+					var player=this;
+					return Math.max(0,player.countEnabledSlot(type)-player.getEquips(type).reduce(function(num,card){
+						var types=get.subtypes(card,false);
+						if(!lib.filter.canBeReplaced(card,player)) num+=get.numOf(types,type);
+						return num;
+					},0))
+				},
+				//判断一名角色是否拥有未被废除的某个区域
+				//type为要判断的区域 若为空 则判断玩家是否有任意一个未被废除的区域
+				hasEnabledSlot:function(type){
+					var player=this;
+					if(type=='horse') return player.hasEnabledSlot(3)&&player.hasEnabledSlot(4);
+					return player.countEnabledSlot(type)>0;
+				},
+				//判断一名角色的某个区域未被废除的数量
+				//用法同上
+				countEnabledSlot:function(type){
+					var player=this;
+					var map=(player.expandedSlots||{});
+					if(!type){
+						num=0;
+						for(var i=1;i<=5;i++){
+							num+=player.countEnabledSlot(i);
+						}
+						return num;
+					}
+					else{
+						if(typeof type=='number') type=('equip'+type);
+						var slots=1;
+						var num=map[type];
+						if(typeof num=='number'&&num>0) slots+=num;
+						slots-=player.countDisabled(type);
+						return slots;
+					}
+				},
+				//获取一名角色装备区内某种类型的装备牌
+				//参数可以为数字/区域字符串/实体牌/虚拟牌/牌名
+				getEquips:function(subtype){
+					var type=(typeof subtype);
+					switch(type){
+						case 'string':
+							if(subtype.indexOf('equip')==0&&parseInt(subtype.slice(5))>0){
+								break;
+							}
+							else if(lib.card[subtype]){
+								subtype=lib.card[subtype].subtype;
+							}
+							else return [];
+						case 'number':
+							subtype='equip'+subtype;
+							break;
+						case 'object':
+							subtype=get.subtype(subtype,false);
+							break;
+						default:
+							return [];
+					}
+					if(!subtype) return [];
+					return this.getCards('e',function(card){
+						return get.subtypes(card,false).contains(subtype);
+					})
+				},
+				//新的废除装备区/恢复装备区/扩展装备区
+				//参数：废除来源角色（不写默认当前事件角色），废除区域（数字/区域字符串/数组，可以写多个，重复废除）
+				disableEquip:function(){
+					var next=game.createEvent('disableEquip');
+					next.player=this;
+					next.slots=[];
+					for(var i=0;i<arguments.length;i++){
+						if(get.itemtype(arguments[i])=='player'){
+							next.source=arguments[i];
+						}
+						else if(Array.isArray(arguments[i])){
+							for(var arg of arguments[i]){
+								if(typeof arg=='string'){
+									if(arg.indexOf('equip')==0&&parseInt(arg.slice(5))>0) next.slots.push(arg);
+								}
+								else if(typeof arg=='number'){
+									next.slots.push('equip'+arg);
+								}
+							}
+						}
+						else if(typeof arguments[i]=='string'){
+							if(arguments[i].indexOf('equip')==0&&parseInt(arguments[i].slice(5))>0) next.slots.push(arguments[i]);
+						}
+						else if(typeof arguments[i]=='number'){
+							next.slots.push('equip'+arguments[i]);
+						}
+					}
+					if(!next.source) next.source=_status.event.player;
+					if(!next.slots.length){
+						_status.event.next.remove(next);
+					}
+					next.setContent('disableEquip');
+					return next;
+				},
+				enableEquip:function(){
+					var next=game.createEvent('enableEquip');
+					next.player=this;
+					next.slots=[];
+					for(var i=0;i<arguments.length;i++){
+						if(get.itemtype(arguments[i])=='player'){
+							next.source=arguments[i];
+						}
+						else if(Array.isArray(arguments[i])){
+							for(var arg of arguments[i]){
+								if(typeof arg=='string'){
+									if(arg.indexOf('equip')==0&&parseInt(arg.slice(5))>0) next.slots.push(arg);
+								}
+								else if(typeof arg=='number'){
+									next.slots.push('equip'+arg);
+								}
+							}
+						}
+						else if(typeof arguments[i]=='string'){
+							if(arguments[i].indexOf('equip')==0&&parseInt(arguments[i].slice(5))>0) next.slots.push(arguments[i]);
+						}
+						else if(typeof arguments[i]=='number'){
+							next.slots.push('equip'+arguments[i]);
+						}
+					}
+					if(!next.source) next.source=_status.event.player;
+					if(!next.slots.length){
+						_status.event.next.remove(next);
+					}
+					next.setContent('enableEquip');
+					return next;
+				},
+				expandEquip:function(){
+					var next=game.createEvent('expandEquip');
+					next.player=this;
+					next.slots=[];
+					for(var i=0;i<arguments.length;i++){
+						if(get.itemtype(arguments[i])=='player'){
+							next.source=arguments[i];
+						}
+						else if(Array.isArray(arguments[i])){
+							for(var arg of arguments[i]){
+								if(typeof arg=='string'){
+									if(arg.indexOf('equip')==0&&parseInt(arg.slice(5))>0) next.slots.push(arg);
+								}
+								else if(typeof arg=='number'){
+									next.slots.push('equip'+arg);
+								}
+							}
+						}
+						else if(typeof arguments[i]=='string'){
+							if(arguments[i].indexOf('equip')==0&&parseInt(arguments[i].slice(5))>0) next.slots.push(arguments[i]);
+						}
+						else if(typeof arguments[i]=='number'){
+							next.slots.push('equip'+arguments[i]);
+						}
+					}
+					if(!next.source) next.source=_status.event.player;
+					if(!next.slots.length){
+						_status.event.next.remove(next);
+					}
+					next.setContent('expandEquip');
+					return next;
+				},
+				//判断判定区是否被废除
+				isDisabledJudge:function(){
+					return Boolean(this.storage._disableJudge);
+				},
+				//同步装备区废除牌显示状态
+				$syncDisable:function(map){
+					var player=this;
+					var suits={equip1:'武器栏',equip2:'防具栏',equip3:'+1马栏',equip4:'-1马栏',equip5:'宝物栏'};
+					if(!map){
+						map=(player.disabledSlots||{});
+					}
+					game.broadcast(function(player,map){
+						player.disabledSlots=map;
+						player.$syncDisable(map);
+					},player,map)
+					var map2=get.copy(map);
+					var cards=Array.from(player.node.equips.childNodes);
+					for(var card of cards){
+						if(card.name.indexOf('feichu_')==0){
+							var index=card.name.slice(7);
+							if(!map2[index]) map2[index]=0;
+							map2[index]--;
+						}
+					}
+					for(var index in map2){
+						if(index.indexOf('equip')!=0||!(parseInt(index.slice(5))>0)) continue;
+						var num=map2[index];
+						if(num>0){
+							for(var i=0;i<num;i++){
+								var card=game.createCard('feichu_'+index,suits[index],'');
+								card.fix();
+								card.style.transform='';
+								card.classList.remove('drawinghidden');
+								card.classList.add('feichu');
+								delete card._transform;
+								var equipNum=get.equipNum(card);
+								var equipped=false;
+								for(var j=0;j<player.node.equips.childNodes.length;j++){
+									if(get.equipNum(player.node.equips.childNodes[j])>=equipNum){
+										player.node.equips.insertBefore(card,player.node.equips.childNodes[j]);
+										equipped=true;
+										break;
+									}
+								}
+								if(!equipped){
+									player.node.equips.appendChild(card);
+									if(_status.discarded){
+										_status.discarded.remove(card);
+									}
+								}
+							}
+						}
+						else if(num<0){
+							for(var i=0;i>num;i--){
+								var card=cards.find(card=>card.name=='feichu_'+index);
+								if(card){
+									player.node.equips.removeChild(card);
+									cards.remove(card);
+								}
+							}
+						}
+					}
+				},
+				//以下函数涉及到本次更新内容而进行修改
+				canEquip:function(name,replace){
+					var ranges=get.subtypes(name),rangex=[...new Set(ranges)],player=this;
+					for(var range of rangex){
+						var num=this.countEquipableSlot(range);
+						var num2=get.numOf(rangex,range);
+						if(!replace) num-=this.getEquips(range).filter(card=>lib.filter.canBeReplaced(card,player)).length;
+						if(num<num2) return false;
+					}
+					return true;
+				},
+				//以下函数将不再进行后续维护
+				isDisabled:function(arg){
+					return this.hasDisabled(arg)&&!this.hasEnabledSlot(arg);
+				},
+				isEmpty:function(num){
+					return this.countEnabledSlot(num)>player.getEquips(num);
+				},
+				$disableEquip:function(){},
+				$enableEquip:function(){},
+				//装备区End
 				chooseToDebate:function(){
 					var next=game.createEvent('chooseToDebate');
 					next.player=this;
@@ -18568,10 +18949,6 @@
 					next.setContent('chooseToDisable');
 					return next;
 				},
-				countDisabled:function(){
-					if(!this.storage.disableEquip) return 0;
-					return this.storage.disableEquip.length;
-				},
 				isPhaseUsing:function(notmeisok){
 					if(!notmeisok&&_status.currentPhase!=this) return false;
 					return _status.event.name=='phaseUse'||_status.event.getParent('phaseUse').name=='phaseUse';
@@ -18588,86 +18965,6 @@
 					if(!this.countCards('h')||!target.countCards('h')) return false;
 					if(this.hasSkillTag('noCompareSource')||target.hasSkillTag('noCompareTarget')) return false;
 					return true;
-				},
-				disableEquip:function(pos){
-					if(typeof pos=='number') pos='equip'+pos;
-					var next=game.createEvent('disableEquip');
-					next.player=this;
-					next.pos=pos;
-					next.source=_status.event.player;
-					next.setContent('disableEquip');
-					return next;
-				},
-				$disableEquip:function(skill){
-					game.broadcast(function(player,skill){
-						player.$disableEquip(skill);
-					},this,skill);
-					var player=this;
-					if(!player.storage.disableEquip) player.storage.disableEquip=[];
-					player.storage.disableEquip.add(skill);
-					player.storage.disableEquip.sort();
-					var pos={equip1:'武器栏',equip2:'防具栏',equip3:'+1马栏',equip4:'-1马栏',equip5:'宝物栏'}[skill];
-					if(!pos) return;
-					var card=game.createCard('feichu_'+skill,pos,'');
-					card.fix();
-					card.style.transform='';
-					card.classList.remove('drawinghidden');
-					card.classList.add('feichu');
-					delete card._transform;
-					var equipNum=get.equipNum(card);
-					var equipped=false;
-					for(var i=0;i<player.node.equips.childNodes.length;i++){
-						if(get.equipNum(player.node.equips.childNodes[i])>=equipNum){
-							player.node.equips.insertBefore(card,player.node.equips.childNodes[i]);
-							equipped=true;
-							break;
-						}
-					}
-					if(!equipped){
-						player.node.equips.appendChild(card);
-						if(_status.discarded){
-							_status.discarded.remove(card);
-						}
-					}
-					return player;
-				},
-				enableEquip:function(pos){
-					if(typeof pos=='number') pos='equip'+pos;
-					var next=game.createEvent('enableEquip');
-					next.player=this;
-					next.pos=pos;
-					next.source=_status.event.player;
-					next.setContent('enableEquip');
-					return next;
-				},
-				$enableEquip:function(skill){
-					game.broadcast(function(player,skill){
-						player.$enableEquip(skill);
-					},this,skill);
-					var player=this;
-					if(player.storage.disableEquip) player.storage.disableEquip.remove(skill);
-					for(var i=0;i<player.node.equips.childNodes.length;i++){
-						if(player.node.equips.childNodes[i].name=='feichu_'+skill){
-							player.node.equips.removeChild(player.node.equips.childNodes[i]);
-							break;
-						}
-					}
-					return player;
-				},
-				isDisabled:function(arg){
-					if(typeof arg=='number') arg='equip'+arg;
-					if(arg=='equip6'&&this.storage.disableEquip&&(this.storage.disableEquip.contains('equip3')||this.storage.disableEquip.contains('equip4'))) return true;
-					if(this.storage.disableEquip&&this.storage.disableEquip.contains(arg)) return true;
-					return false;
-				},
-				isEmpty:function(num){
-					if(num==6||num=='equip6'){
-						if(!this.isEmpty(3)||!this.isEmpty(4)) return false;
-					}
-					else if([3,4,'equip3','equip4'].contains(num)){
-						if(this.getEquip(6)) return false;
-					}
-					return !this.isDisabled(num)&&!this.getEquip(num);
 				},
 				$disableJudge:function(){
 					var player=this;
@@ -19061,7 +19358,7 @@
 					for(var i=1;i<6;i++){
 						if(this.isDisabled(i)) this.$enableEquip('equip'+i);
 					}
-					if(this.storage._disableJudge){
+					if(this.isDisabledJudge()){
 						game.broadcastAll(function(player){
 							player.storage._disableJudge=false;
 							for(var i=0;i<player.node.judges.childNodes.length;i++){
@@ -19331,8 +19628,9 @@
 						specials:this.getCards('s'),
 						expansions:this.getCards('x'),
 						expansion_gaintag:[],
-						disableJudge:this.storage._disableJudge,
-						disableEquip:this.storage.disableEquip,
+						disableJudge:this.isDisabledJudge(),
+						disabledSlots:this.disabledSlots,
+						expandedSlots:this.expandedSlots,
 						views:[],
 						position:parseInt(this.dataset.position),
 						hujia:this.hujia,
@@ -21200,7 +21498,7 @@
 										var att2=get.sgn(get.attitude(player,current2));
 										if(att==att2||att2!=get.sgn(get.effect(current2,es[i],player,current2))) return false;
 									}
-									return current!=current2&&!current2.isMin()&&current2.isEmpty(get.subtype(es[i]));
+									return current!=current2&&!current2.isMin()&&current2.canEquip(es[i]);
 								})){
 									return true;
 								}
@@ -22449,7 +22747,7 @@
 					return next;
 				},
 				canAddJudge:function(card){
-					if(this.storage._disableJudge) return false;
+					if(this.isDisabledJudge()) return false;
 					var name;
 					if(typeof card=='string'){
 						name=card;
@@ -24776,13 +25074,6 @@
 						if(this.countCards(position,name)) return true;
 					}
 					return false;
-				},
-				canEquip:function(name,replace){
-					var range=get.subtype(name);
-					if(!range||this.isDisabled(range)) return false;
-					if(['equip3','equip4'].contains(range)&&this.getEquip(6)) return false;
-					if(!replace&&!this.isEmpty(range)) return false;
-					return true;
 				},
 				getEquip:function(name){
 					var es=this.getCards('e');
@@ -27888,6 +28179,13 @@
 			all:function(){
 				return true;
 			},
+			//装备栏相关
+			canBeReplaced:function(card,player){
+				var mod=game.checkMod(card,player,'unchanged','canBeReplaced',player);
+				if(mod!='unchanged') return mod;
+				return true;
+			},
+			//装备栏 END
 			buttonIncluded:function(button){
 				return !(_status.event.excludeButton&&_status.event.excludeButton.contains(button));
 			},
@@ -29117,48 +29415,6 @@
 					}
 				},
 				group:['dualside_init','dualside_turn']
-			},
-			_disableJudge:{
-				marktext:"废",
-				intro:{
-					content:"已经废除了判定区",
-				},
-				mod:{
-					targetEnabled:function(card,player,target){
-						if(target.storage._disableJudge&&get.type(card)=='delay') return false;
-					},
-				},
-			},
-			"_disableEquip":{
-				marktext:"废",
-				intro:{
-					content:function(storage,player,skill){
-						var str='';
-						for(var i=0;i<player.storage.disableEquip.length;i++){
-							str+='、'+get.translation(player.storage.disableEquip[i])+'栏';
-						};
-						str=str.slice(1,str.length)
-						str='已经废除了'+str;
-						return str;
-					},
-				},
-				mod:{
-					targetEnabled:function(card,player,target){
-						if(target.isDisabled(get.subtype(card))) return false;
-					},
-				},
-				trigger:{
-					player:['disableEquipBefore','enableEquipBefore','enterGame'],
-					global:'gameStart',
-				},
-				forced:true,
-				popup:false,
-				filter:function(event,player){
-					return player.storage.disableEquip==undefined;
-				},
-				content:function(){
-					player.storage.disableEquip=[];
-				},
 			},
 			fengyin:{
 				init:function(player,skill){
@@ -30439,6 +30695,8 @@
 							player.side=info.side;
 							player.phaseNumber=info.phaseNumber;
 							player.seatNum=info.seatNum;
+							player.disabledSlots=info.disabledSlots;
+							player.expandedSlots=info.expandedSlots;
 							player.setNickname();
 							if(info.dead){
 								player.classList.add('dead');
@@ -30465,11 +30723,7 @@
 							if(info.disableJudge){
 								player.$disableJudge();
 							}
-							if(Array.isArray(info.disableEquip)){
-								for(var ii=0;ii<info.disableEquip.length;ii++){
-									player.$disableEquip(info.disableEquip[ii]);
-								}
-							}
+							player.$syncDisable();
 
 							player.directgain(info.handcards);
 							lib.playerOL[i]=player;
@@ -37124,7 +37378,8 @@
 					if(card.enable==undefined) card.enable=true;
 					if(card.selectTarget==undefined) card.selectTarget=-1;
 					if(card.filterTarget==undefined) card.filterTarget=function(card,player,target){
-						return target==player;
+						if(player!=target) return false;
+						return target.canEquip(card,true);
 					};
 					if(card.modTarget==undefined) card.modTarget=true;
 					if(card.allowMultiple==undefined) card.allowMultiple=false;
@@ -46828,7 +47083,8 @@
 				}
 				ui.window.dataset.radius_size=lib.config.radius_size||'default';
 				if(game.layout=='long'||game.layout=='mobile'){
-					if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
+					//if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
+					ui.arena.classList.add('textequip');
 				}
 				if(game.layout=='long'||game.layout=='long2'||game.layout=='mobile'||game.layout=='nova'){
 					if(lib.config.cardshape=='oblong'){
@@ -47818,6 +48074,8 @@
 				node.tempSkills={};
 				node.storage={};
 				node.marks={};
+				node.expandedSlots={};
+				node.disabledSlots={};
 				node.ai={friend:[],enemy:[],neutral:[],handcards:{global:[],source:[],viewed:[]}};
 				node.queueCount=0;
 				node.outCount=0;
@@ -52318,6 +52576,19 @@
 		},
 	};
 	var get={
+		//新装备栏相关
+		//获取一张装备牌实际占用的装备栏(君曹操六龙)
+		//用法同get.subtype，返回数组
+		subtypes:function(obj,player){
+			if(typeof obj=='string') obj={name:obj};
+			if(typeof obj!='object') return;
+			var name=get.name(obj,player);
+			if(!lib.card[name]) return [];
+			if(lib.card[name].subtypes) return get.copy(lib.card[name].subtypes);
+			else if(lib.card[name].subtype) return [lib.card[name].subtype];
+			return [];
+		},
+		//装备栏 END
 		pinyin:function(chinese,withtone){
 			const util=window.pinyinUtilx;
 			if(!window.pinyinUtilx) return [];

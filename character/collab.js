@@ -727,44 +727,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					canBeGained:function(card,source,player){
-						if(card==player.getEquip(1)&&card.name=='ruyijingubang') return false;
+						if(player.getCards('e',card=>card.name=='ruyijingubang').contains(card)) return false;
 					},
 					canBeDiscarded:function(card,source,player){
-						if(card==player.getEquip(1)&&card.name=='ruyijingubang') return false;
+						if(player.getCards('e',card=>card.name=='ruyijingubang').contains(card)) return false;
+					},
+					canBeReplaced:function(card,player){
+						if(player.getCards('e',card=>card.name=='ruyijingubang').contains(card)) return false;
 					},
 					cardname:function(card){
 						if(get.subtype(card,false)=='equip1') return 'sha';
 					},
 					cardnature:function(card){
-						if(get.subtype(card,false)=='equip1') return false;
-					},
-					targetEnabled:function(card){
-						if(get.subtype(card)=='equip1') return false;
+						if(get.subtypes(card,false).contains('equip1')) return false;
 					},
 					cardDiscardable:function(card,player){
-						if(card==player.getEquip(1)&&card.name=='ruyijingubang') return false;
+						if(player.getCards('e',card=>card.name=='ruyijingubang').contains(card)) return false;
 					},
 					cardEnabled2:function(card,player){
-						if(card==player.getEquip(1)&&card.name=='ruyijingubang') return false;
+						if(player.getCards('e',card=>card.name=='ruyijingubang').contains(card)) return false;
 					},
 				},
 				group:'dcruyi_blocker',
 				subSkill:{
 					blocker:{
-						trigger:{player:['loseBefore','equipBefore','disableEquipBefore']},
+						trigger:{player:['loseBefore','disableEquipBefore']},
 						forced:true,
 						filter:function(event,player){
-							if(event.name=='disableEquip') return (event.pos=='equip1');
-							var card=player.getEquip(1);
-							if(!card||card.name!='ruyijingubang') return false;
-							if(event.name=='equip'){
-								return get.subtype(event.card)=='equip1';
-							}
-							return event.cards.contains(card);
+							if(event.name=='disableEquip') return (event.slots.contains('equip1'));
+							var cards=player.getCards('e',card=>card.name=='ruyijingubang');
+							return event.cards.some(card=>cards.contains(card));
 						},
 						content:function(){
-							if(trigger.name=='lose') trigger.cards.remove(player.getEquip(1));
-							else trigger.cancel();
+							if(trigger.name=='lose'){
+								trigger.cards.remove(player.getCards('e',card=>card.name=='ruyijingubang'));
+							}
+							else{
+								while(trigger.slots.contains('equip1')) trigger.slots.remove('equip1');
+							}
 						},
 					},
 				},

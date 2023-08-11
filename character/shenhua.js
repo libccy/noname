@@ -1000,7 +1000,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return player.storage.disableEquip!=undefined&&player.storage.disableEquip.length<5;
+					return player.hasEnabledSlot(1)||player.hasEnabledSlot(2)||player.hasEnabledSlot(5)||player.hasEnabledSlot('horse');
 				},
 				content:function(){
 					'step 0'
@@ -1032,11 +1032,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:13,
 					result:{
 						player:function(player){
-							if(!player.isDisabled('equip2')) return 1;
-							if(!player.isDisabled('equip1')&&(player.countCards('h',function(card){
+							if(player.hasEnabledSlot('equip2')) return 1;
+							if(player.hasEnabledSlot('equip1')&&(player.countCards('h',function(card){
 								return get.name(card,player)=='sha'&&player.hasValueTarget(card);
 							})-player.getCardUsable('sha'))>1) return 1;
-							if(!player.isDisabled('equip5')&&player.countCards('h',function(card){
+							if(player.hasEnabledSlot('equip5')&&player.countCards('h',function(card){
 								return get.type2(card,player)=='trick'&&player.hasUseTarget(card);
 							})>1) return 1;
 							return -1;
@@ -1268,24 +1268,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'gray',
 				limited:true,
-				init:function(player){
-					player.storage.drlt_xiongluan=false;
-				},
 				filter:function(event,player){
-					if(player.storage.drlt_xiongluan) return false;
-					return true;
+					return !player.isDisabledJudge()||player.hasEnabledSlot();
 				},
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
 				content:function(){
 					player.awakenSkill('drlt_xiongluan');
-					player.storage.drlt_xiongluan=true;
-					player.disableEquip('equip1');
-					player.disableEquip('equip2');
-					player.disableEquip('equip3');
-					player.disableEquip('equip4');
-					player.disableEquip('equip5');
+					var disables=[];
+					for(var i=1;i<=5;i++){
+						for(var j=0;j<player.countEnabledSlot(i);j++){
+							disables.push(i);
+						}
+					}
+					if(disables.length>0) player.disableEquip(disables);
 					player.disableJudge();
 					player.addTempSkill('drlt_xiongluan1');
 					player.storage.drlt_xiongluan1=target;
