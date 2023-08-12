@@ -161,7 +161,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					value:function(card,player){
-						if(player.getEquip(1)==card) return 0;
+						if(player.getEquips(1).contains(card)) return 0;
 						return 4;
 					},
 					equipValue:function(card,player){
@@ -195,7 +195,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquip(1)==card) return -3;
+						if(player.getEquips(1).contains(card)) return -3;
 						return 3;
 					},
 					basic:{
@@ -229,7 +229,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquip(2)==card) return -3;
+						if(player.getEquips(2).contains(card)) return -3;
 						return 3;
 					},
 					basic:{
@@ -263,7 +263,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 1;
 					},
 					value:function(card,player){
-						if(player.getEquip(2)==card) return -2.5;
+						if(player.getEquips(2).contains(card)) return -2.5;
 						return 2.5;
 					},
 					basic:{
@@ -297,7 +297,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:9,
 					equipValue:0,
 					value:function(card,player){
-						if(player.getEquip(2)==card) return 0;
+						if(player.getEquips(2).contains(card)) return 0;
 						return 0.5;
 					},
 					basic:{

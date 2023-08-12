@@ -10736,7 +10736,7 @@
 								source.chooseButton([
 									'选择'+(player==source?'你':get.translation(player))+'的'+get.cnNumber(num)+'张'+get.translation(slot)+'牌置入弃牌堆',
 									cards,
-								],true,num).set('filterOk',function(){
+								],true,[1,num]).set('filterOk',function(){
 									var evt=_status.event;
 									return ui.selected.buttons.reduce(function(num,button){
 										return num+get.numOf(get.subtypes(button.link,false),evt.slot)
@@ -10822,7 +10822,7 @@
 								source.chooseButton([
 									'选择替换掉'+get.cnNumber(num)+'张'+get.translation(slot)+'牌',
 									cards,
-								],true,num).set('filterOk',function(){
+								],true,[1,num]).set('filterOk',function(){
 									var evt=_status.event;
 									return ui.selected.buttons.reduce(function(num,button){
 										return num+get.numOf(get.subtypes(button.link,false),evt.slot)

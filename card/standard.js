@@ -2043,17 +2043,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					cardUsable:function(card,player,num){
-						var cardx=player.getEquip('zhuge');
-						if(card.name=='sha'&&(!cardx||player.hasSkill('zhuge_skill',null,false)||(!_status.zhuge_temp&&!ui.selected.cards.contains(cardx)))){
-							if(get.is.versus()||get.is.changban()){
-								return num+3;
+						var cards=player.getEquips('zhuge')
+						if(card.name=='sha'){
+							if(!cards.length||player.hasSkill('zhuge_skill',null,false)||cards.some(card=>(card!=_status.zhuge_temp&&!ui.selected.cards.contains(card)))){
+								if(get.is.versus()||get.is.changban()){
+									return num+3;
+								}
+								return Infinity;
 							}
-							return Infinity;
 						}
 					},
 					cardEnabled2:function(card,player){
 						if(!_status.event.addCount_extra||player.hasSkill('zhuge_skill',null,false)) return;
-						if(card&&card==player.getEquip('zhuge')){
+						var cards=player.getEquips('zhuge');
+						if(card&&cards.contains(card)){
 							try{
 								var cardz=get.card();
 							}
@@ -2061,7 +2064,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								return;
 							}
 							if(!cardz||cardz.name!='sha') return;
-							_status.zhuge_temp=true;
+							_status.zhuge_temp=card;
 							var bool=lib.filter.cardUsable(get.autoViewAs({name:'sha'},ui.selected.cards.concat([card])),player);
 							delete _status.zhuge_temp;
 							if(!bool) return false;
@@ -2158,7 +2161,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseToUse(get.prompt('qinglong',trigger.target),function(card,player,event){
 						if(get.name(card)!='sha') return false;
-						if(player.getEquip('qinglong')==card) return false;
+						if(!player.hasSkill('qinglong_skill',null,false)){
+							var cards=player.getEquips('qinglong');
+							if(!cards.some(card2=>card2!=card&&!ui.selected.cards.contains(card2))) return false;
+						}
 						return lib.filter.filterCard.apply(this,arguments);
 					},trigger.target,-1).set('addCount',false).logSkill='qinglong_skill';
 				}
