@@ -3057,7 +3057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											if(get.sgn(get.value(es[i],current))!=-att||get.value(es[i],current)<5) return false;
 											var att2=get.sgn(get.attitude(player,current2));
 											if(att==att2||att2!=get.sgn(get.effect(current2,es[i],player,current2))) return false;
-											return current!=current2&&!current2.isMin()&&current2.isEmpty(get.subtype(es[i]));
+											return current!=current2&&!current2.isMin()&&current2.canEquip(es[i]);
 										})){
 											return true;
 										}
@@ -5083,7 +5083,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!target.getHistory('sourceDamage').length){
 						var cards=target.getCards('e');
 						for(var i of cards){
-							if(player.isEmpty(get.subtype(i))) return true;
+							if(player.canEquip(i)) return true;
 						}
 					}
 					return target.getHistory('useCard',function(evt){
@@ -5102,7 +5102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!target.getHistory('sourceDamage').length){
 						var cards=target.getCards('e');
 						for(var i of cards){
-							if(player.isEmpty(get.subtype(i))) list.push(i);
+							if(player.canEquip(i)) list.push(i);
 						}
 					}
 					if(list.length){
@@ -6735,7 +6735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						for(var i=0;i<es.length;i++){
 							if(game.hasPlayer(function(current2){
-								return current!=current2&&!current2.isMin()&&current2.isEmpty(get.subtype(es[i]));
+								return current!=current2&&!current2.isMin()&&current2.canEquip(es[i]);
 							})){
 								return true;
 							}
@@ -6761,7 +6761,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return !_status.event.cards.contains(card);
 							});
 							for(var i=0;i<es.length;i++){
-								if(target.isEmpty(get.subtype(es[i]))) return true;
+								if(target.canEquip(es[i])) return true;
 							}
 							return false;
 						}
@@ -6779,7 +6779,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target==player&&player.hasSkill('decadexuanfeng')){
 								if(player.countCards('e',function(card){
 									return !_status.event.cards.contains(card)&&game.hasPlayer(function(current){
-										return current!=target&&current.isEmpty(get.subtype(card))&&get.effect(current,card,player,player)<0;
+										return current!=target&&current.canEquip(card)&&get.effect(current,card,player,player)<0;
 									});
 								})>0) return 18;
 								return 7;
@@ -6787,7 +6787,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else if(att>0){
 								if(target.countCards('e',function(card){
 									return get.value(card,target)<0&&!_status.event.cards.contains(card)&&game.hasPlayer(function(current){
-										return current!=target&&current.isEmpty(get.subtype(card))&&get.effect(current,card,player,player)<0;
+										return current!=target&&current.canEquip(card)&&get.effect(current,card,player,player)<0;
 									});
 								})>0) return 9;
 							}
@@ -6798,7 +6798,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											return !_status.event.cards.contains(card);
 										});
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,current)>0) return true;
+											if(get.value(es[i],target)>0&&current.canEquip(card)&&get.effect(current,es[i],player,current)>0) return true;
 										}
 									}
 								})){
@@ -6818,7 +6818,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return get.attitude(player,current)<0&&current.countDiscardableCards(player,'he')>0&&get.damageEffect(current,player,player)>0;
 								});
 								if(bool&&player.countCards('e',function(card){
-									return !_status.event.cards.contains(card)&&target.isEmpty(get.subtype(card))&&get.effect(target,card,player,player)>0;
+									return !_status.event.cards.contains(card)&&target.canEquip(card)&&get.effect(target,card,player,player)>0;
 								})) return 2.5*Math.abs(att);
 								else if(bool) return 1/Math.max(1,Math.abs(att));
 								else return get.damageEffect(target,player,player);
@@ -6826,7 +6826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(sgnatt!=0&&att2!=0&&sgnatt!=att2&&
 								get.sgn(get.value(es[i],ui.selected.targets[0]))==-att2&&
 								get.sgn(get.effect(target,es[i],player,target))==sgnatt&&
-								target.isEmpty(get.subtype(es[i]))){
+								target.canEquip(es[i])){
 								return Math.abs(att);
 							}
 						}
@@ -6865,7 +6865,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},targets[0]).set('nojudge',event.nojudge||false).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
 							if(_status.event.cards.contains(button.link)) return false;
 							var targets1=_status.event.targets1;
-							return targets1.isEmpty(get.subtype(button.link));
+							return targets1.canEquip(button.link);
 						}).set('cards',cards);
 					}
 					else{
@@ -6900,7 +6900,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 							for(var i=0;i<friends.length;i++){
 								for(var j=1;j<=5;j++){
-									if(friends[i].isEmpty(j)){
+									if(friends[i].hasEmptySlot(j)){
 										vacancies['equip'+j]++;
 									}
 								}
@@ -7566,7 +7566,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						var filterTarget=function(card,player,target){
 							return target!=player&&target.countCards('e',function(card){
-								return player.isEmpty(get.subtype(card));
+								return player.canEquip(card);
 							});
 						}
 						if(game.hasPlayer(function(current){
@@ -7577,7 +7577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(att>0&&!target.hasSkillTag('noe')) return 0;
 							var num=0;
 							target.countCards('e',function(card){
-								if(player.isEmpty(get.subtype(card))){
+								if(player.canEquip(card)){
 									var eff=get.effect(player,card,player,player);
 									if(eff>num) num=eff;
 								}
@@ -7594,7 +7594,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target=target;
 						player.logSkill('rezishou',target);
 						player.choosePlayerCard(target,'e','将一张装备牌移至你的装备区').set('filterButton',function(button){
-							return _status.event.player.isEmpty(get.subtype(button.link));
+							return _status.event.player.canEquip(button.link);
 						});
 					}
 					else event.finish();
@@ -8325,7 +8325,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target.isMin()) return false;
 							var es=from.getCards('e');
 							for(var i=0;i<es.length;i++){
-								if(target.isEmpty(get.subtype(es[i]))) return true;
+								if(target.canEquip(es[i])) return true;
 							}
 							return false;
 						}
@@ -8341,7 +8341,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(att>0){
 								if(target.countCards('e',function(card){
 									return get.value(card,target)<0&&game.hasPlayer(function(current){
-										return current!=player&&current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))&&get.effect(current,card,player,player)>0;
+										return current!=player&&current!=target&&get.attitude(player,current)<0&&current.canEquip(card)&&get.effect(current,card,player,player)>0;
 									});
 								})>0) return 9;
 							}
@@ -8350,7 +8350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(current!=target&&current!=player&&get.attitude(player,current)>0){
 										var es=target.getCards('e');
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.effect(current,es[i],player,player)>0) return true;
+											if(get.value(es[i],target)>0&&current.canEquip(es[i])&&get.effect(current,es[i],player,player)>0) return true;
 										}
 									}
 								})){
@@ -8366,7 +8366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(sgnatt!=0&&att2!=0&&sgnatt!=att2&&
 								get.sgn(get.value(es[i],ui.selected.targets[0]))==-att2&&
 								get.sgn(get.value(es[i],target))==sgnatt&&
-								target.isEmpty(get.subtype(es[i]))){
+								target.canEquip(es[i])){
 								return Math.abs(att);
 							}
 						}
@@ -8404,7 +8404,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
 							var targets1=_status.event.targets1;
-							return targets1.isEmpty(get.subtype(button.link));
+							return targets1.canEquip(button.link);
 						});
 					}
 					else{
@@ -8433,7 +8433,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										var att2=get.sgn(get.attitude(player,current2));
 										if(att==att2||att2!=get.sgn(get.value(es[i],current2))) return false;
 									}
-									return current!=current2&&!current2.isMin()&&current2.isEmpty(get.subtype(es[i]));
+									return current!=current2&&!current2.isMin()&&current2.canEquip(es[i]);
 								})){
 									return true;
 								}
@@ -11709,7 +11709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!target.hasSex('male')) return false;
 					var card=ui.selected.cards[0];
 					if(!card) return false;
-					if(get.position(card)=='e'&&!target.isEmpty(get.subtype(card))) return false;
+					if(get.position(card)=='e'&&!target.canEquip(card)) return false;
 					return true;
 				},
 				discard:false,
@@ -11718,7 +11718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(get.position(cards[0])=='e') event._result={index:0};
-					else if(get.type(cards[0])!='equip'||!target.isEmpty(get.subtype(cards[0]))) event._result={index:1};
+					else if(get.type(cards[0])!='equip'||!target.canEquip(cards[0])) event._result={index:1};
 					else player.chooseControl().set('choiceList',[
 						'将'+get.translation(cards[0])+'置入'+get.translation(target)+'的装备区',
 						'弃置'+get.translation(cards[0]),

@@ -3447,10 +3447,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				charlotte:true,
 				filter:function(event,player){
-					return !player.isDisabled(1);
+					return player.hasEnabledSlot(1);
 				},
 				content:function(){
-					if(player.isEmpty(1)){
+					if(player.hasEmptySlot(1)){
 						var card=get.cardPile2(function(card){
 							return get.subtype(card)=='equip1'&&!get.cardtag(card,'gifts')&&player.canUse(card,player);
 						});
@@ -4176,12 +4176,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card,player){
 					if(!player) player=_status.event.player;
 					return game.hasPlayer(function(current){
-						return current!=player&&current.isEmpty(get.subtype(card,false));
+						return current!=player&&current.canEquip(card);
 					});
 				},
 				position:'e',
 				filterTarget:function(card,player,target){
-					return target!=player&&target.isEmpty(get.subtype(ui.selected.cards[0],false));
+					return target!=player&&target.canEquip(ui.selected.cards[0]);
 				},
 				check:function(card){
 					if(get.value(card)<=0) return 10;
@@ -6536,7 +6536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player==target) return false;
 					var card=ui.selected.cards[0];
 					if(get.type(card,false)=='delay') return target.canAddJudge({name:card.name});
-					return target.isEmpty(get.subtype(card,false));
+					return target.canEquip(card);
 				},
 				discard:false,
 				lose:false,
@@ -10200,16 +10200,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var list=['equip1','equip2','equip3','equip4','equip5'];
 					for(var i=0;i<list.length;i++){
-						if(player.isDisabled(list[i])||player.storage.kengo_guidui2&&player.storage.kengo_guidui2.contains(list[i])) list.splice(i--,1);
+						if(!player.hasEnabledSlot(list[i])||player.storage.kengo_guidui2&&player.storage.kengo_guidui2.contains(list[i])) list.splice(i--,1);
 					}
 					player.chooseControl(list).set('prompt','请选择废除一个装备栏').ai=function(){
-						if(list.contains('equip1')&&player.isEmpty('equip1')&&player.countCards('h',function(card){
+						if(list.contains('equip1')&&player.hasEmptySlot('equip1')&&player.countCards('h',function(card){
 							return card.name=='sha'&&player.getUseValue(card)>0
 						})) return 'equip1';
-						if(list.contains('equip3')&&player.isEmpty('equip3')) return 'equip3';
-						if(list.contains('equip4')&&player.isEmpty('equip4')) return 'equip4';
-						if(list.contains('equip5')&&player.isEmpty('equip5')) return 'equip5';
-						if(list.contains('equip2')&&player.isEmpty('equip2')) return 'equip2';
+						if(list.contains('equip3')&&player.hasEmptySlot('equip3')) return 'equip3';
+						if(list.contains('equip4')&&player.hasEmptySlot('equip4')) return 'equip4';
+						if(list.contains('equip5')&&player.hasEmptySlot('equip5')) return 'equip5';
+						if(list.contains('equip2')&&player.hasEmptySlot('equip2')) return 'equip2';
 						return list.randomGet();
 					};
 					'step 1'

@@ -1890,7 +1890,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.num=1.5;
 						'step 1'
 						var card=cards.shift();
-						if(player.isEmpty(get.subtype(card))&&Math.random()<event.num){
+						if(player.canEquip(card)&&Math.random()<event.num){
 							player.equip(card);
 							event.num=0.5;
 						}
@@ -2494,7 +2494,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				priority:-0.3,
 				equipSkill:false,
 				filter:function(event,player){
-					if(!player.isEmpty(2)) return false;
+					if(!player.hasEmptySlot(2)) return false;
 					return lib.skill.renwang_skill.filter.apply(this,arguments);
 				},
 			},
@@ -2615,7 +2615,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				priority:6,
 				audio:true,
 				filter:function(event,player){
-					if(!player.isEmpty('equip2')) return false;
+					if(!player.hasEmptySlot('equip2')) return false;
 					if(event.card.name=='nanman') return true;
 					if(event.card.name=='wanjian') return true;
 					return event.card.name=='sha'&&!get.nature(event.card);
@@ -2626,7 +2626,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
-							if(!target.isEmpty('equip2')) return;
+							if(!target.hasEmptySlot('equip2')) return;
 							if(card.name=='nanman'||card.name=='wanjian') return 'zerotarget';
 							if(card.name=='sha'){
 								var equip1=player.getEquip(1);

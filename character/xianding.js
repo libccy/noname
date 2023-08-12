@@ -8645,7 +8645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.num=1;
 						'step 1'
 						var type='equip'+num;
-						if(!player.isEmpty(type)) return;
+						if(!player.hasEmptySlot(type)) return;
 						var card=get.cardPile2(function(card){
 							return get.subtype(card,false)==type&&player.canUse(card,player);
 						});

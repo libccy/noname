@@ -5901,16 +5901,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !event.numFixed&&event.num>0;
 				},
 				check:function(event,player){
-					if(player.isEmpty(2)||player.isEmpty(5)||player.isEmpty(1)) return true;
+					if(player.hasEmptySlot(2)||player.hasEmptySlot(5)||player.hasEmptySlot(1)) return true;
 					return false;
 				},
 				prompt2:'摸牌阶段开始时，你可以少摸一张牌并声明一种装备牌的副类别，然后从牌堆或弃牌堆中获得一张该副类别的牌。',
 				content:function(){
 					'step 0'
 					player.chooseControl('equip1','equip2','equip6','equip5').set('prompt','选择获得一种副类别的装备牌').set('ai',function(card){
-						if(player.isEmpty(2)) return 'equip2';
-						if(player.isEmpty(5)) return 'equip5';
-						if(player.isEmpty(1)) return 'equip1';
+						if(player.hasEmptySlot(2)) return 'equip2';
+						if(player.hasEmptySlot(5)) return 'equip5';
+						if(player.hasEmptySlot(1)) return 'equip1';
 						return 'equip6';
 					});
 					'step 1'
@@ -7818,7 +7818,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseBegin'},
 				direct:true,
 				filter:function(event,player){
-					return event.player.isIn()&&event.player.isEmpty(5)&&player.hasCard(lib.skill.zhuangshu.filterCard,'he');
+					return event.player.isIn()&&event.player.hasEmptySlot(5)&&player.hasCard(lib.skill.zhuangshu.filterCard,'he');
 				},
 				filterCard:function(card){
 					if(_status.connectMode) return true;
@@ -7842,7 +7842,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var name='zhuangshu_'+get.type2(result.cards[0],result.cards[0].original=='h'?player:false);
-						if(lib.card[name]&&trigger.player.isIn&&trigger.player.isEmpty(5)){
+						if(lib.card[name]&&trigger.player.isIn&&trigger.player.hasEmptySlot(5)){
 							var target=game.findPlayer(function(current){
 								var equip=current.getEquip(5);
 								return equip&&equip.name==name;
@@ -11880,7 +11880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(target){
 						var player=_status.event.player;
 						var att=get.attitude(player,target)
-						if(target.getEquip(2)&&player.isEmpty(2)){
+						if(target.getEquip(2)&&player.hasEmptySlot(2)){
 							return -2*att;
 						}
 						return -att;
@@ -16154,7 +16154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				inherit:'bagua_skill',
 				filter:function(event,player){
 					if(!lib.skill.bagua_skill.filter(event,player)) return false;
-					if(!player.isEmpty(2)) return false;
+					if(!player.hasEmptySlot(2)) return false;
 					return true;
 				},
 				ai:{
@@ -20901,7 +20901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						position:'he',
 						filterTarget:function(card,player,target){
-							return target.isEmpty(get.subtype(card));
+							return target.canEquip(card);
 						},
 						ai1:function(card){
 							return 6-get.value(card);
@@ -21160,7 +21160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						event.card=result.links[0];
-						if(player.isEmpty(get.subtype(event.card))){
+						if(player.canEquip(event.card)){
 							player.chooseBool('是否将'+get.translation(event.card)+'置入自己的装备区？').ai=function(){
 								return true;
 							};
@@ -21870,7 +21870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//priority:15,
 				filter:function (event,player){
 					if(player.hasSkill('smh_huoji')||player.hasSkill('smh_lianhuan')) return false;
-					if(!player.isEmpty(2)) return false;
+					if(!player.hasEmptySlot(2)) return false;
 					if(event.nature) return true;
 					return get.type(event.card,'trick')=='trick';
 				},
@@ -21887,7 +21887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player==target&&get.subtype(card)=='equip2'){
 								if(get.equipValue(card)<=8) return 0;
 							}
-							if(!target.isEmpty(2)) return;
+							if(!target.hasEmptySlot(2)) return;
 							if(get.tag(card,'natureDamage')) return 'zerotarget';
 							if(get.type(card)=='trick'&&get.tag(card,'damage')){
 								return 'zeroplayertarget';

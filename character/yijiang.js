@@ -10835,7 +10835,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					var next;
 					if(trigger.player.hasCard(function(card){
-						return player.isEmpty(get.subtype(card));
+						return player.canEquip(card);
 					},'e')){
 						next=player.chooseControl('移动装备','draw_card','cancel2',function(event,player){
 							var source=_status.event.sourcex;
@@ -10865,7 +10865,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.control=='移动装备'){
 						player.logSkill('qieting',trigger.player);
 						player.choosePlayerCard(trigger.player,'e','将一张装备牌移至你的装备区',true).set('filterButton',function(button){
-							return _status.event.player.isEmpty(get.subtype(button.link));
+							return _status.event.player.canEquip(button.link);
 						}).set('ai',function(button){
 							return get.effect(player,button.link,player,player);
 						});

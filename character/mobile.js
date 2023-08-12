@@ -11151,99 +11151,100 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.chooseTarget(2,function(card,player,target){
 						if(ui.selected.targets.length){
 							if(!_status.event.ingame){
-								return target.isEmpty(2)?true:false;
+								var cards=ui.selected.targets[0].getEquip(2);
+								return target.canEquip(card)
 							}
 							var from=ui.selected.targets[0];
 							if(target.isMin()) return false;
 							var es=from.getCards('e');
-								for(var i=0;i<es.length;i++){
-									if(['equip3','equip4'].contains(get.subtype(es[i]))&&target.getEquip('liulongcanjia')) continue;
-									if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
-									if(target.isEmpty(get.subtype(es[i]))) return true;
-								}
+							for(var i=0;i<es.length;i++){
+								if(['equip3','equip4'].contains(get.subtype(es[i]))&&target.getEquip('liulongcanjia')) continue;
+								if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
+								if(target.canEquip(es[i])) return true;
+							}
+							return false;
+						}
+						else{
+							if(!event.ingame){
+								if(target.getEquip(2)) return true;
 								return false;
 							}
-							else{
-								if(!event.ingame){
-									if(target.getEquip(2)) return true;
-									return false;
-								}
-								return target.countCards('e')>0;
-							}
-						});
-						next.set('ingame',event.ingame)
-						next.set('ai',function(target){
-							var player=_status.event.player;
-							var att=get.attitude(player,target);
-							if(ui.selected.targets.length==0){
-								if(att<0){
-									if(game.hasPlayer(function(current){
-										if(get.attitude(player,current)>0){
-											var es=target.getCards('e');
-											for(var i=0;i<es.length;i++){
-												if(['equip3','equip4'].contains(get.subtype(es[i]))&&current.getEquip('liulongcanjia')) continue;
-												else if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
-												else if(current.isEmpty(get.subtype(es[i]))) return true;
-											}
-											return false;
+							return target.countCards('e')>0;
+						}
+					});
+					next.set('ingame',event.ingame)
+					next.set('ai',function(target){
+						var player=_status.event.player;
+						var att=get.attitude(player,target);
+						if(ui.selected.targets.length==0){
+							if(att<0){
+								if(game.hasPlayer(function(current){
+									if(get.attitude(player,current)>0){
+										var es=target.getCards('e');
+										for(var i=0;i<es.length;i++){
+											if(['equip3','equip4'].contains(get.subtype(es[i]))&&current.getEquip('liulongcanjia')) continue;
+											else if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
+											else if(current.canEquip(es[i])) return true;
 										}
-									}))	return -att;
-								}
-								return 0;
+										return false;
+									}
+								}))	return -att;
 							}
-							if(att>0){
-								var es=ui.selected.targets[0].getCards('e');
-								var i;
-								for(i=0;i<es.length;i++){
-									if(['equip3','equip4'].contains(get.subtype(es[i]))&&target.getEquip('liulongcanjia')) continue;
-									if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
-									if(target.isEmpty(get.subtype(es[i]))) break;
-								}
-								if(i==es.length) return 0;
+							return 0;
+						}
+						if(att>0){
+							var es=ui.selected.targets[0].getCards('e');
+							var i;
+							for(i=0;i<es.length;i++){
+								if(['equip3','equip4'].contains(get.subtype(es[i]))&&target.getEquip('liulongcanjia')) continue;
+								if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
+								if(target.canEquip(es[i])) break;
 							}
-							return -att*get.attitude(player,ui.selected.targets[0]);
+							if(i==es.length) return 0;
+						}
+						return -att*get.attitude(player,ui.selected.targets[0]);
+					});
+					next.set('multitarget',true);
+					next.set('targetprompt',['被移走','移动目标']);
+					next.set('prompt',prompt);
+					'step 1'
+					if(result.bool){
+						player.line2(result.targets,'green');
+						event.targets=result.targets;
+					}
+					else event.finish();
+					'step 2'
+					game.delay();
+					'step 3'
+					if(targets.length==2){
+						if(!event.ingame){
+							event._result={
+								bool:true,
+								links:[targets[0].getEquip(2)],
+							};
+						}
+						else{
+						player.choosePlayerCard('e',true,function(button){
+							return get.equipValue(button.link);
+						},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
+							var targets1=_status.event.targets1;
+								if(['equip3','equip4'].contains(get.subtype(button.link))&&targets1.getEquip('liulongcanjia')) return false;
+								if(button.link.name=='liulongcanjia'&&targets1.countCards('e',{subtype:['equip3','equip4']})>1) return false;
+								return !targets1.countCards('e',{subtype:get.subtype(button.link)});
+							
 						});
-						next.set('multitarget',true);
-						next.set('targetprompt',['被移走','移动目标']);
-						next.set('prompt',prompt);
-						'step 1'
-						if(result.bool){
-							player.line2(result.targets,'green');
-							event.targets=result.targets;
 						}
-						else event.finish();
-						'step 2'
+					}
+					else event.finish();
+					'step 4'
+					if(result.bool&&result.links.length){
+						var link=result.links[0];
+						if(get.position(link)=='e')	event.targets[1].equip(link);
+						else if(link.viewAs) event.targets[1].addJudge({name:link.viewAs},[link]);
+						else event.targets[1].addJudge(link);
+						event.targets[0].$give(link,event.targets[1],false)
 						game.delay();
-						'step 3'
-						if(targets.length==2){
-							if(!event.ingame){
-								event._result={
-									bool:true,
-									links:[targets[0].getEquip(2)],
-								};
-							}
-							else{
-							player.choosePlayerCard('e',true,function(button){
-								return get.equipValue(button.link);
-							},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
-								var targets1=_status.event.targets1;
-									if(['equip3','equip4'].contains(get.subtype(button.link))&&targets1.getEquip('liulongcanjia')) return false;
-									if(button.link.name=='liulongcanjia'&&targets1.countCards('e',{subtype:['equip3','equip4']})>1) return false;
-									return !targets1.countCards('e',{subtype:get.subtype(button.link)});
-								
-							});
-							}
-						}
-						else event.finish();
-						'step 4'
-						if(result.bool&&result.links.length){
-							var link=result.links[0];
-							if(get.position(link)=='e')	event.targets[1].equip(link);
-							else if(link.viewAs) event.targets[1].addJudge({name:link.viewAs},[link]);
-							else event.targets[1].addJudge(link);
-							event.targets[0].$give(link,event.targets[1],false)
-							game.delay();
-						}
+					}
 				},
 				audio:true,
 				enable:"phaseUse",
@@ -12440,7 +12441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target.isMin()) return false;
 							var es=from.getCards('e');
 							for(var i=0;i<es.length;i++){
-								if(target.isEmpty(get.subtype(es[i]))) return true;
+								if(target.canEquip(es[i])) return true;
 							}
 							return false;
 						}
@@ -12464,7 +12465,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								})) return 14;
 								if(target.countCards('e',function(card){
 									return get.value(card,target)<0&&game.hasPlayer(function(current){
-										return current!=target&&get.attitude(player,current)<0&&current.isEmpty(get.subtype(card))
+										return current!=target&&get.attitude(player,current)<0&&current.canEquip(card)
 									});
 								})>0) return 9;
 							}
@@ -12473,7 +12474,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(current!=target&&get.attitude(player,current)>0){
 										var es=target.getCards('e');
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.isEmpty(get.subtype(es[i]))&&get.value(es[i],current)>0) return true;
+											if(get.value(es[i],target)>0&&current.canEquip(es[i])&&get.value(es[i],current)>0) return true;
 										}
 									}
 								})){
@@ -12489,7 +12490,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(sgnatt!=0&&att2!=0&&
 								get.sgn(get.value(es[i],ui.selected.targets[0]))==-att2&&
 								get.sgn(get.value(es[i],target))==sgnatt&&
-								target.isEmpty(get.subtype(es[i]))){
+								target.canEquip(es[i])){
 								return Math.abs(att);
 							}
 						}
@@ -12538,7 +12539,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return targets1.canAddJudge(button.link);
 							}
 							else{
-								return targets1.isEmpty(get.subtype(button.link));
+								return targets1.canEquip(button.link);
 							}
 						});
 					}

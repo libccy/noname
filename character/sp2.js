@@ -1139,7 +1139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.num=target.countCards('e');
 					var subtypes=[];
 					for(var i=1;i<7;i++){
-						if(target.isEmpty(i)) subtypes.push('equip'+i);
+						if(target.hasEmptySlot(i)) subtypes.push('equip'+i);
 					}
 					if(subtypes.length){
 						subtypes.randomSort();
@@ -5890,7 +5890,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					check:function(event,player){
 						for(var i=5;i>0;i--){
-							if(player.isEmpty(i)) return ('equip'+i);
+							if(player.hasEmptySlot(i)) return ('equip'+i);
 						}
 						return 'cancel2';
 					},
@@ -8986,7 +8986,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<event.toequip.length;i++){
 							if(get.type(card)=='equip'&&get.subtype(card)==get.subtype(event.toequip[i])) bool1=false;
 						}
-						return (get.type(card)=='equip'&&!event.toequip.contains(card)&&target.isEmpty(get.subtype(card))&&bool1);
+						return (get.type(card)=='equip'&&!event.toequip.contains(card)&&target.hasEmptySlot(card)&&bool1);
 					});
 					if(equip) event.toequip.push(equip);
 					else event.num=0;

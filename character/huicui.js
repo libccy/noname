@@ -4704,9 +4704,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
-				isDisabled:function(player,pos){
-					return pos>0?player.isDisabled(pos):player.storage._disableJudge;
-				},
 				chooseButton:{
 					dialog:function(event,player){
 						var dialog=ui.create.dialog('弥笃：选择要废除或恢复的装备栏或判定区','hidden');
@@ -4714,10 +4711,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.noforcebutton=true;
 						var list1=[],list2=[];
 						for(var i=1;i<6;i++){
-							(player.isDisabled(i)?list2:list1).push(i);
+							for(var j=0;j<player.countEnabledSlot(i);j++){
+								list1.push(i);
+							}
+							if(player.isDisabled(i)) list2.push(i);
 						}
-						(player.storage._disableJudge?list2:list1).push(-1);
-						var addTable=function(list){
+						(player.isDisabledJudge()?list2:list1).push(-1);
+						var addTable=function(list,bool){
 							var table=document.createElement('div');
 							table.classList.add('add-setting');
 							table.style.margin='0';
@@ -4726,7 +4726,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var i of list){
 								var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 								td.innerHTML='<span>'+(i>0?get.translation('equip'+i)+'栏':'判定区')+'</span>';
-								td.link=i;
+								td.link=[i,bool];
 								td.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
 								for(var j in lib.element.button){
 									td[j]=lib.element.button[j];
@@ -4738,43 +4738,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(list1.length){
 							dialog.addText('未废除');
-							addTable(list1);
+							addTable(list1,true);
 						}
 						if(list2.length){
 							dialog.addText('已废除');
-							addTable(list2);
+							addTable(list2,false);
 						}
 						return dialog;
 					},
 					filter:function(button,player){
 						if(!ui.selected.buttons.length) return true;
-						if(lib.skill.midu.isDisabled(player,ui.selected.buttons[0].link)) return false;
-						return !player.isDisabled(button.link);
+						if(!ui.selected.buttons[0].link[1]) return false;
+						return button.link[1]
 					},
 					check:function(button){
 						var player=_status.event.player;
-						if(lib.skill.midu.isDisabled(player,button.link)){
-							if(button.link<=0) return -10;
+						if(!button.link[1]){
+							if(button.link[0]<=0) return -10;
 							if(player.hasCard(function(card){
-								return get.subtype(card)==('equip'+button.link);
+								return get.subtype(card)==('equip'+button.link[0]);
 							},'hs')) return 15;
 							return 10;
 						}
-						if(button.link<=0||player.isEmpty(button.link)&&!player.hasCard(function(card){
-							return get.subtype(card)==('equip'+button.link)&&player.canUse(card,player)&&get.effect(player,card,player,player)>0;
+						if(button.link[0]<=0||player.hasEmptySlot(button.link[0])&&!player.hasCard(function(card){
+							return get.subtype(card)==('equip'+button.link[0])&&player.canUse(card,player)&&get.effect(player,card,player,player)>0;
 						},'hs')) return 5;
 						return 0;
 					},
-					select:[1,6],
+					select:[1,Infinity],
 					backup:function(links,player){
-						if(lib.skill.midu.isDisabled(player,links[0])){
+						if(!links[0][1]){
 							return {
 								audio:'midu',
 								selectCard:-1,
 								selectTarget:-1,
 								filterCard:()=>false,
 								filterTarget:()=>false,
-								equip:links[0],
+								equip:links[0][0],
 								content:function(){
 									var pos=lib.skill.midu_backup.equip;
 									if(pos<=0) player.enableJudge();
@@ -4789,15 +4789,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								selectCard:-1,
 								filterCard:()=>false,
 								filterTarget:true,
-								equip:links.sort(),
+								equip:links.map(i=>i[0]).sort(),
 								content:function(){
-									var list=lib.skill.midu_backup.equip,bool=false;
-									for(var i of list){
-										if(i<=0) bool=true;
-										else player.disableEquip(i);
+									var list=lib.skill.midu_backup.equip,num=list.length,bool=false;
+									if(list.contains(-1)){
+										list.remove(-1);
+										bool=true;
 									}
+									if(list.length>0) player.disableEquip(list);
 									if(bool) player.disableJudge();
-									target.draw(list.length)
+									target.draw(num)
 								},
 								ai:{
 									tag:{
@@ -4811,7 +4812,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						if(lib.skill.midu.isDisabled(player,links[0])){
+						if(!links[0][1]){
 							return '恢复一个装备栏或判定区并获得〖活墨〗';
 						}
 						var numc=get.cnNumber(links.length);
@@ -4828,11 +4829,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xianwang:{
 				mod:{
 					globalTo:function(source,player,distance){
-						var num=player.countDisabled();
+						var num=player.countDisabledSlot();
 						if(num>0) return distance+(num>2?2:1);
 					},
 					globalFrom:function(source,player,distance){
-						var num=source.countDisabled();
+						var num=source.countDisabledSlot();
 						if(num>0) return distance-(num>2?2:1);
 					},
 				},
@@ -5513,7 +5514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var info=get.info(i);
 								return info&&!get.is.locked(i)&&!info.limited&&!info.juexingji&&!info.zhuSkill&&!info.charlotte;
 							});
-							if(!skills.length&&target.isEmpty(2)) return 1;
+							if(!skills.length&&target.hasEmptySlot(2)) return 1;
 							return -0.5*skills.length;
 						},
 					},
@@ -6458,7 +6459,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					targetInRange:function(card,player,target){
-						if(player.countDisabled()>=5) return true;
+						for(var i=1;i<=5;i++){
+							if(!player.hasDisabledSlot(i)) return false;
+						}
+						return true;
 					},
 				},
 				marktext:'萍',
@@ -6469,7 +6473,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'useCardAfter'},
 						filter:function(event,player){
 							return player!=event.player&&event.targets.contains(player)&&
-								player.countDisabled()<5&&!player.getStorage('fuping').contains(event.card.name);
+								player.hasEnabledSlot()&&!player.getStorage('fuping').contains(event.card.name);
 						},
 						logTarget:'player',
 						prompt2:(event)=>('废除一个装备栏并记录【'+get.translation(event.card.name)+'】'),
@@ -7273,14 +7277,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num>=5) return false;
 					var num2=0;
 					for(var i=1;i<=5;i++){
-					 if(event.player.isEmpty(i)) num2++;
+						num2+=event.player.countEmptySlot(i);
 					}
 					return num<num2;
 				},
 				content:function(){
 					var num2=0;
 					for(var i=1;i<=5;i++){
-					 if(trigger.player.isEmpty(i)) num2++;
+						num2+=trigger.player.countEmptySlot(i);
 					}
 					player.drawTo(num2);
 				},

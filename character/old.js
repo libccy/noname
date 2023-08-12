@@ -740,7 +740,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_fuyin:{
 				mod:{
 					targetEnabled:function(card,player,target){
-						if((card.name=='juedou'||card.name=='sha'||card.name=='huogong')&&player!=target&&player.countCards('h')>=target.countCards('h')&&target.isEmpty(2)) return false;
+						if((card.name=='juedou'||card.name=='sha'||card.name=='huogong')&&player!=target&&player.countCards('h')>=target.countCards('h')&&target.hasEmptySlot(2)) return false;
 					},
 				},
 			},

@@ -1,4 +1,5 @@
 'use strict';
+
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'shiji',
@@ -402,21 +403,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(att>0){
 							if(target.hasCard(function(card){
 								if(get.value(card,target)<=0&&game.hasPlayer(function(current){
-									return current!=target&&current.isEmpty(get.subtype(card,false))&&get.effect(current,card,player,player)>0;
+									return current!=target&&current.canEquip(card,false)&&get.effect(current,card,player,player)>0;
 								})) return true;
 								return false;
 							},'e')) return 2*att;
 							if(!target.hasCard(function(card){
-								var sub=get.subtype(card,false);
 								return game.hasPlayer(function(current){
-									return current!=target&&current.isEmpty(sub);
+									return current!=target&&current.canEquip(card);
 								})
 							},'e')) return 1;
 						}
 						else if(att<0){
 							if(target.hasCard(function(card){
 								if(get.value(card,target)>=4.5&&game.hasPlayer(function(current){
-									return current!=target&&current.isEmpty(get.subtype(card,false))&&get.effect(current,card,player,player)>0;
+									return current!=target&&current.canEquip(card)&&get.effect(current,card,player,player)>0;
 								})) return true;
 								return false;
 							},'e')) return -att;
@@ -433,9 +433,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var es=target.getCards('e',function(card){
-						var sub=get.subtype(card,false);
 						return game.hasPlayer(function(current){
-							return current!=target&&current.isEmpty(sub);
+							return current!=target&&current.canEquip(card);
 						})
 					});
 					if(es.length){
@@ -443,7 +442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else player.chooseButton(['移动'+get.translation(target)+'的一张装备牌',es],true).set('ai',function(button){
 							var player=_status.event.player,target=_status.event.getParent().target,card=button.link;
 							if(game.hasPlayer(function(current){
-								return current!=target&&current.isEmpty(get.subtype(card,false))&&get.effect(current,card,player,player)>0;
+								return current!=target&&current.canEquip(card)&&get.effect(current,card,player,player)>0;
 							})) return -get.value(card,target)*get.attitude(player,target);
 							return 0;
 						});
@@ -453,8 +452,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.card=result.links[0];
 						player.chooseTarget(true,'选择'+get.translation(event.card)+'的移动目标',function(card,player,target){
-							return target.isEmpty(_status.event.subtype);
-						}).set('subtype',get.subtype(event.card)).set('ai',function(target){
+							return target.canEquip(_status.event.card);
+						}).set('card',event.card).set('ai',function(target){
 							var evt=_status.event;
 							return get.effect(target,evt.getParent().card,evt.player,evt.player);
 						});
@@ -1999,15 +1998,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.player!=player.storage.chuhai2) return false;
 					for(var i=1;i<6;i++){
-						if(player.isEmpty(i)) return true;
+						if(player.hasEmptySlot(i)) return true;
 					}
 					return false;
 				},
 				content:function(){
 					for(var i=1;i<7;i++){
-						if(player.isEmpty(i)){
+						if(player.hasEmptySlot(i)){
 							var sub='equip'+i,card=get.cardPile(function(card){
-								return get.subtype(card,false)==sub&&!get.cardtag(card,'gifts');
+								return get.subtype(card,false)==sub&&!get.cardtag(card,'gifts')&&player.canEquip(card);
 							});
 							if(card){
 								player.$gain2(card);
@@ -2994,16 +2993,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					for(var i=1;i<6;i++){
-						if(target.isEmpty(i)) return true;
+						if(target.hasEmptySlot(i)) return true;
 					}
 					return false;
 				},
 				content:function(){
 					'step 0'
-					event.num=0;
+					event.num=1;
 					player.awakenSkill('rongbei');
 					'step 1'
-					while(!target.isEmpty(event.num)){
+					while(!target.hasEmptySlot(event.num)){
 						event.num++;
 						if(event.num>5){
 							event.finish();
@@ -4602,7 +4601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							audio:'muzhen',
 							filterTarget:[
 								function(card,player,target){
-									return target.countCards('h')>0&&target.isEmpty(ui.selected.cards[0]);
+									return target.countCards('h')>0&&target.canEquip(ui.selected.cards[0]);
 								},
 								function(card,player,target){
 									return target.countCards('e')>0;
@@ -4610,9 +4609,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							][links[0]],
 							filterCard:[
 								function(card,player){
-									if(ui.selected.targets.length) return ui.selected.targets[0].isEmpty(card);
+									if(ui.selected.targets.length) return ui.selected.targets[0].canEquip(card);
 									return game.hasPlayer(function(current){
-										return current.countCards('h')>0&&current.isEmpty(card);
+										return current.countCards('h')>0&&current.canEquip(card);
 									})
 								},
 								true,

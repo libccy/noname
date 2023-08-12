@@ -10761,7 +10761,7 @@
 					if(!event.slots.length) return;
 					var slotsx=[...new Set(event.slots)].sort();
 					for(var slot of slotsx){
-						var lost=player.countDisabled(slot),gain=Math.min(lost,get.numOf(event.slots,slot));
+						var lost=player.countDisabledSlot(slot),gain=Math.min(lost,get.numOf(event.slots,slot));
 						if(lost<=0) continue;
 						else{
 							game.log(player,'恢复了'+get.cnNumber(gain)+'个','#g'+get.translation(slot)+'栏');
@@ -11827,7 +11827,7 @@
 					'step 0'
 					var list=[];
 					for(var i=1;i<=5;i++){
-						if(player.hasDisabled(i))  list.push('equip'+i);
+						if(player.hasDisabledSlot(i))  list.push('equip'+i);
 					}
 					if(!list.length) event.finish();
 					else if(list.length==1){
@@ -18133,20 +18133,20 @@
 				//装备栏相关
 				//判断一名角色的某个区域是否被废除
 				//type为要判断的区域 若为空 则判断玩家是否有任意一个被废除的区域
-				hasDisabled:function(type){
+				hasDisabledSlot:function(type){
 					var player=this;
-					if(type=='horse') return player.hasDisabled(3)&&player.hasDisabled(4);
-					return player.countDisabled(type)>0;
+					if(type=='horse') return player.hasDisabledSlot(3)&&player.hasDisabledSlot(4);
+					return player.countDisabledSlot(type)>0;
 				},
 				//判断一名角色的某个区域被废除的数量
 				//用法同上
-				countDisabled:function(type){
+				countDisabledSlot:function(type){
 					var player=this;
 					var map=(player.disabledSlots||{});
 					if(type==undefined){
 						num=0;
 						for(var i=1;i<=5;i++){
-							num+=player.countDisabled(i);
+							num+=player.countDisabledSlot(i);
 						}
 						return num;
 					}
@@ -18157,11 +18157,28 @@
 						return 0;
 					}
 				},
+				//判断一名角色是否有某个装备栏空着
+				hasEmptySlot:function(type){
+					var player=this;
+					if(type=='horse') return player.hasEmptySlot(3)&&player.hasEmptySlot(4);
+					return player.countEmptySlot(type)>0;
+				},
+				//判断一名角色的某个装备栏空位的数量
+				countEmptySlot:function(type){
+					if(!type) return 0;
+					var player=this;
+					if(typeof type=='number') type=('equip'+type);
+					return Math.max(0,player.countEnabledSlot(type)-player.getEquips(type).reduce(function(num,card){
+						var types=get.subtypes(card,false);
+						return num+get.numOf(types,type);
+					},0))
+				},
 				//判断一名角色是否有可以用于装备牌的区域（考虑金箍棒等“不可被替换装备”）
 				//用法同下
 				countEquipableSlot:function(type){
-					if(!type) return false;
+					if(!type) return 0;
 					var player=this;
+					if(typeof type=='number') type=('equip'+type);
 					return Math.max(0,player.countEnabledSlot(type)-player.getEquips(type).reduce(function(num,card){
 						var types=get.subtypes(card,false);
 						if(!lib.filter.canBeReplaced(card,player)) num+=get.numOf(types,type);
@@ -18192,7 +18209,7 @@
 						var slots=1;
 						var num=map[type];
 						if(typeof num=='number'&&num>0) slots+=num;
-						slots-=player.countDisabled(type);
+						slots-=player.countDisabledSlot(type);
 						return slots;
 					}
 				},
@@ -18396,8 +18413,11 @@
 					return true;
 				},
 				//以下函数将不再进行后续维护
+				countDisabled:function(){
+					return this.countDisabledSlot.apply(this,arguments)
+				},
 				isDisabled:function(arg){
-					return this.hasDisabled(arg)&&!this.hasEnabledSlot(arg);
+					return this.hasDisabledSlot(arg)&&!this.hasEnabledSlot(arg);
 				},
 				isEmpty:function(num){
 					return this.countEnabledSlot(num)>this.getEquips(num);

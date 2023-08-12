@@ -3734,7 +3734,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						event.target2=result.targets[0];
 						var list=['手牌区'];
-						if(lib.card[card.name].type=='equip'&&event.target2.isEmpty(lib.card[card.name].subtype)) list.push('装备区');
+						if(lib.card[card.name].type=='equip'&&event.target2.canEquip(card)) list.push('装备区');
 						if(lib.card[card.name].type=='delay'&&!event.target2.storage._disableJudge&&!event.target2.hasJudge(card.name)) list.push('判定区');
 						if(list.length==1) event._result={control:list[0]};
 						else{
@@ -4011,7 +4011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var num=event.name=='phase'?5:3;
 					if(num==3?event.numFixed:!game.hasPlayer(function(current){
-						return current.countDisabled()<5;
+						return current.hasEnabledSlot();
 					})) return false;
 					return game.countPlayer(function(current){
 						return current.isDamaged();
@@ -4027,7 +4027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						player.chooseTarget(get.prompt('olzhiti'),'废除一名角色的一个随机装备栏',function(card,player,target){
-							return target.countDisabled()<5;
+							return target.hasEnabledSlot();
 						}).set('ai',function(target){
 							return -get.attitude(_status.event.player,target)*(target.countCards('e')+1)
 						});
@@ -4038,13 +4038,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('olzhiti',target);
 						var list=[];
 						for(var i=1;i<6;i++){
-							if(!target.isDisabled(i)) list.add((i==3||i==4)?6:i);
+							if(target.hasEnabledSlot(i)) list.add((i==3||i==4)?6:i);
 						}
 						var num=list.randomGet();
 						if(num!=6) target.disableEquip(num);
 						else{
-							target.disableEquip(3);
-							target.disableEquip(4);
+							target.disableEquip(3,4);
 						}
 					}
 				},
@@ -6401,7 +6400,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player!=event.player&&event.player.isIn()&&_status.currentPhase==player;
 				},
 				check:function(event,player){
-					if(player.countDisabled()<5&&player.isDisabled(5)) return false;
+					if(player.hasEnabledSlot()&&!player.hasEnabledSlot(5)) return false;
 					return true;
 				},
 				bannedList:[
@@ -6425,7 +6424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(func(listm[i])) list.add(listm[i]);
 					}
 					event.skills=list;
-					if(player.countDisabled()<5){
+					if(player.hasEnabledSlot()){
 						player.chooseToDisable().ai=function(event,player,list){
 							if(list.contains('equip5')) return 'equip5';
 							return list.randomGet();

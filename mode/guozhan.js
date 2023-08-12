@@ -966,7 +966,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				mod:{
 					maxHandcard:function(player,num){
-						if(!player.isEmpty(2)) return;
+						if(!player.hasEmptySlot(2)) return;
 						if(player.hasSkill('huangjintianbingfu')){
 							num+=player.getExpansions('huangjintianbingfu').length;
 						}
@@ -978,14 +978,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'tianshu',
 				inherit:'taipingyaoshu',
 				filter:function(event,player){
-					if(!player.isEmpty(2)) return false;
+					if(!player.hasEmptySlot(2)) return false;
 					return lib.skill.taipingyaoshu.filter(event,player);
 				},
 				noHidden:true,
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(!target.isEmpty(2)) return;
+							if(!target.hasEmptySlot(2)) return;
 							if(player==target&&get.subtype(card)=='equip2'){
 								if(get.equipValue(card)<=7.5) return 0;
 							}
@@ -11987,7 +11987,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(player==target) return false;
 							var card=ui.selected.cards[0];
 							if(get.type(card)!='equip') return true;
-							return target.isEmpty(get.subtype(card));
+							return target.canEquip(card);
 						},
 						prompt:get.prompt2('gzhuyuan'),
 						complexSelect:true,
@@ -12053,7 +12053,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						position:'he',
 						filterTarget:function(card,player,target){
-							return target.isEmpty(get.subtype(card));
+							return target.canEquip(card);
 						},
 						ai1:function(card){
 							return 6-get.value(card);

@@ -8483,7 +8483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function(){
 					var card=get.cardPile(function(card){
-						return get.type(card)=='equip'&&player.isEmpty(get.subtype(card));
+						return get.type(card)=='equip'&&player.canEquip(card);
 					});
 					if(card){
 						player.$gain2(card);
@@ -9013,12 +9013,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var val=get.value(i);
 								if(att>0){
 									if(val<=Math.min(0,equip)&&game.hasPlayer(function(current){
-										return current!=target&&current.isEmpty(get.subtype(i))&&get.effect(current,i,player,player)>0;
+										return current!=target&&current.canEquip(i)&&get.effect(current,i,player,player)>0;
 									})) equip=val;
 								}
 								else{
 									if(val>Math.max(0,equip)&&game.hasPlayer(function(current){
-										return current!=target&&current.isEmpty(get.subtype(i))&&get.effect(current,i,player,player)>0;
+										return current!=target&&current.canEquip(i)&&get.effect(current,i,player,player)>0;
 									})) equip=val;
 								}
 							}
@@ -9121,7 +9121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return targets1.canAddJudge(button.link);
 							}
 							else{
-								return targets1.isEmpty(get.subtype(button.link));
+								return targets1.canEquip(button.link);
 							}
 						}).set('ai',function(button){
 							var player=_status.event.player,target=_status.event.targets1,source=_status.event.targets0;
@@ -11538,7 +11538,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:{type:'equip'},
 				filterTarget:function(card,player,target){
 					var card=ui.selected.cards[0];
-					return target.isEmpty(get.subtype(card));
+					return target.canEquip(card);
 				},
 				discard:false,
 				lose:false,
