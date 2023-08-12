@@ -22,7 +22,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			shen_dianwei:['male','shen',4,['juanjia'],['wei']],
+			shen_dianwei:['male','shen',4,['juanjia','qiexie','cuijue'],['wei']],
 			shen_dengai:['male','shen',4,['dctuoyu','dcxianjin','dcqijing'],['wei']],
 			tw_shen_lvmeng:['male','shen',3,['twshelie','twgongxin'],['wu']],
 			shen_zhangjiao:['male','shen',3,['yizhao','sijun','sanshou','tianjie'],['qun']],
@@ -83,7 +83,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
-			//捐甲
+			//神典韦
 			juanjia:{
 				trigger:{
 					global:'phaseBefore',
@@ -96,6 +96,162 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.disableEquip(2);
 					player.expandEquip(1);
+				},
+			},
+			qiexie:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				filter:function(event,player){
+					return player.countEquipableSlot(1)>0;
+				},
+				content:function(){
+					'step 0'
+					if(!_status.characterlist){
+						lib.skill.pingjian.initList();
+					}
+					var list=_status.characterlist.randomGets(5);
+					if(!list.length) event.finish();
+					else{
+						var num=player.countEquipableSlot(1);
+						player.chooseButton([
+							'挈挟：选择至多'+get.cnNumber(num)+'张武将置入武器栏',
+							[list,'character'],
+						],[1,num],true)
+					}
+					'step 1'
+					if(result.bool){
+						var list=result.links;
+						game.broadcastAll(function(list){
+							for(var name of list) lib.skill.qiexie.createCard(name);
+						},list);
+						var cards=list.map(function(name){
+							var card=game.createCard('qiexie_'+name,'none',get.infoMaxHp(lib.character[name][2]));
+							return card;
+						});
+						player.addTempSkill('qiexie_blocker','qiexieAfter');
+						player.markAuto('qiexie_blocker',cards);
+						player.$gain2(cards);
+						game.delayx();
+						for(var card of cards) player.equip(card);
+					}
+				},
+				createCard:function(name){
+					if(!lib.card['qiexie_'+name]){
+						if(lib.translate[name+'_ab']) lib.translate['qiexie_'+name]=lib.translate[name+'_ab'];
+						else lib.translate['qiexie_'+name]=lib.translate[name];
+						var info=lib.character[name];
+						var card={
+							fullimage:true,
+							image:'character:'+name,
+							type:'equip',
+							subtype:'equip1',
+							enable:true,
+							selectTarget:-1,
+							filterCard:function(card,player,target){
+								if(player!=target) return false;
+								return target.canEquip(card,true);
+							},
+							modTarget:true,
+							allowMultiple:false,
+							content:lib.element.content.equipCard,
+							toself:true,
+							ai:{},
+							skills:['qiexie_destroy'],
+						}
+						var maxHp=get.infoMaxHp(info[2]);
+						if(maxHp!=1) card.distance={attackFrom:(1-maxHp)};
+						var skills=info[3].filter(function(skill){
+							var info=get.skillInfoTranslation(skill);
+							if(!info.includes('【杀】')) return false;
+							var list=get.skillCategoriesOf(skill);
+							list.remove('锁定技');
+							return list.length==0;
+						});
+						var str='锁定技。';
+						if(skills.length){
+							card.skills.addArray(skills);
+							str+='你视为拥有技能';
+							for(var skill of skills){
+								str+='〖'+get.translation(skill)+'〗';
+								str+='、';
+							}
+							str=str.slice(0,str.length-1);
+							str+='；'
+						}
+						str+='此牌离开你的装备区后，改为置入剩余武将牌牌堆。';
+						lib.translate['qiexie_'+name+'_info']=str;
+						lib.card['qiexie_'+name]=card;
+					}
+				},
+				subSkill:{
+					blocker:{
+						mod:{
+							canBeReplaced:function(card,player){
+								if(player.getStorage('qiexie_blocker').contains(card)) return false;
+							},
+						},
+						charlotte:true,
+						onremove:true,
+						trigger:{player:'equipEnd'},
+						forced:true,
+						firstDo:true,
+						priority:Infinity,
+						filter:function(event){
+							var evt=event.getParent();
+							if(evt.name!='qiexie') return false;
+							return !evt.next.some(event=>{
+								return event.name=='equip';
+							})
+						},
+						content:function(){
+							player.removeSkill('qiexie_blocker');
+						},
+					},
+					destroy:{
+						trigger:{player:'loseBegin'},
+						equipSkill:true,
+						forceDie:true,
+						charlotte:true,
+						forced:true,
+						popup:false,
+						filter:function(event,player){
+							return event.cards.some(card=>card.name.indexOf('qiexie_')==0)
+						},
+						content:function(){
+							for(var card of trigger.cards){
+								if(card.name.indexOf('qiexie_')==0){
+									card._destroy=true;
+									game.log(card,'被放回武将牌堆');
+									var name=card.name.slice(7);
+									if(lib.character[name]) _status.characterlist.add(name);
+								}
+							}
+						},
+					},
+				},
+			},
+			cuijue:{
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.countCards('he')>0&&game.hasPlayer(target=>lib.skill.cuijue.filterTarget('SB',player,target));
+				},
+				filterCard:true,
+				filterTarget:function(card,player,target){
+					if(player.getStorage('cuijue_used').contains(target)||!player.inRange(target)) return false;
+					var distance=get.distance(player,target);
+					return !game.hasPlayer(current=>(current!=target&&player.inRange(current)&&get.distance(player,current)>distance));
+				},
+				position:'he',
+				content:function(){
+					player.addTempSkill('cuijue_used','phaseUseAfter');
+					player.markAuto('cuijue_used',[target]);
+					target.damage('nocard');
+				},
+				subSkill:{
+					used:{
+						onremove:true,
+						charlotte:true,
+					},
 				},
 			},
 			//神邓艾
@@ -7231,6 +7387,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_dianwei:'神典韦',
 			juanjia:'捐甲',
 			juanjia_info:'锁定技。游戏开始时，你废除一个防具栏，然后获得一个额外的武器栏。',
+			qiexie:'挈挟',
+			qiexie_info:'锁定技。准备阶段，你在剩余武将牌堆中随机观看五张牌，选择其中的任意张，将其按照如下规则转化为武器牌置入你的武器栏：{⒈此牌不具有花色，且其攻击范围和点数等于此武将牌的体力上限。⒉此武器牌的技能为该武将牌上所有描述中包含“【杀】”且不具有锁定技以外的标签的技能。⒊此武器牌离开你的装备区时，改为放回武将牌堆。}',
+			cuijue:'摧决',
+			cuijue_info:'每回合每名角色限一次。出牌阶段，你可以弃置一张牌，然后对攻击范围内距离最远的一名其他角色造成1点伤害。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',

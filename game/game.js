@@ -10595,6 +10595,7 @@
 			equip1:'武器',
 			equip2:'防具',
 			equip3:'防御马',
+			'equip3_4':'坐骑',
 			equip4:'攻击马',
 			equip5:'宝物',
 			equip6:'特殊装备',
@@ -10733,9 +10734,14 @@
 								var source=event.source,num=(cards.length-(left-lose));
 								if(!source||!source.isIn()) source=player;
 								source.chooseButton([
-									'选择'+(player==source?'':get.translation(player))+'的'+get.cnNumber(num)+'张'+get.translation(slot)+'牌置入弃牌堆',
+									'选择'+(player==source?'你':get.translation(player))+'的'+get.cnNumber(num)+'张'+get.translation(slot)+'牌置入弃牌堆',
 									cards,
-								],true,num);
+								],true,num).set('filterOk',function(){
+									var evt=_status.event;
+									return ui.selected.buttons.reduce(function(num,button){
+										return num+get.numOf(get.subtypes(button.link,false),evt.slot)
+									},0)==evt.required;
+								}).set('required',num).set('slot',slot)
 							}
 							else event.goto(3);
 						}
@@ -10816,7 +10822,12 @@
 								source.chooseButton([
 									'选择替换掉'+get.cnNumber(num)+'张'+get.translation(slot)+'牌',
 									cards,
-								],true,num);
+								],true,num).set('filterOk',function(){
+									var evt=_status.event;
+									return ui.selected.buttons.reduce(function(num,button){
+										return num+get.numOf(get.subtypes(button.link,false),evt.slot)
+									},0)==evt.required;
+								}).set('required',num).set('slot',slot)
 							}
 							else event.goto(3);
 						}
@@ -11845,7 +11856,7 @@
 						if(player.hasEnabledSlot(i)) list.push('equip'+i);
 					}
 					if(event.horse){
-						if(list.contains('equip3')&&list.contains('equip4')) list.push('equip6');
+						if(list.contains('equip3')&&list.contains('equip4')) list.push('equip3_4');
 						list.remove('equip3');
 						list.remove('equip4');
 					}
@@ -11869,7 +11880,7 @@
 					}
 					'step 1'
 					event.result={control:result.control};
-					if(result.control=='equip6'){
+					if(result.control=='equip3_4'){
 						player.disableEquip(3,4);
 					}
 					else player.disableEquip(result.control);
@@ -11877,25 +11888,14 @@
 				swapEquip:function(){
 					"step 0"
 					game.log(player,'和',target,'交换了装备区中的牌')
-					var e1=player.getCards('e');
-					var todis1=[];
-					for(var i=0;i<e1.length;i++){
-						if(target.isDisabled(get.subtype(e1[i]))) todis1.push(e1[i]);
-					}
-					player.discard(todis1);
-					var e2=target.getCards('e');
-					var todis2=[];
-					for(var i=0;i<e2.length;i++){
-						if(player.isDisabled(get.subtype(e2[i]))) todis2.push(e2[i]);
-					}
-					target.discard(todis2);
-					"step 1"
 					event.cards=[player.getCards('e'),target.getCards('e')];
-					player.lose(event.cards[0],ui.ordering,'visible');
-					target.lose(event.cards[1],ui.ordering,'visible');
-					if(event.cards[0].length) player.$give(event.cards[0],target,false);
-					if(event.cards[1].length) target.$give(event.cards[1],player,false);
-					"step 2"
+					game.loseAsync({
+						player:player,
+						target:target,
+						cards1:event.cards[0],
+						cards2:event.cards[1],
+					}).setContent('swapHandcardsx');
+					"step 1"
 					for(var i=0;i<event.cards[1].length;i++){
 						if(get.position(event.cards[1][i],true)=='o') player.equip(event.cards[1][i]);
 					}
@@ -18400,8 +18400,9 @@
 					return this.hasDisabled(arg)&&!this.hasEnabledSlot(arg);
 				},
 				isEmpty:function(num){
-					return this.countEnabledSlot(num)>player.getEquips(num);
+					return this.countEnabledSlot(num)>this.getEquips(num);
 				},
+				//以下函数将被废弃
 				$disableEquip:function(){},
 				$enableEquip:function(){},
 				//装备区End
@@ -19355,9 +19356,9 @@
 					this.update();
 				},
 				uninit:function(){
-					for(var i=1;i<6;i++){
-						if(this.isDisabled(i)) this.$enableEquip('equip'+i);
-					}
+					this.expandedSlots={};
+					this.disabledSlots={};
+					this.$syncDisable();
 					if(this.isDisabledJudge()){
 						game.broadcastAll(function(player){
 							player.storage._disableJudge=false;
@@ -37407,7 +37408,7 @@
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;
 					}
 					if(card.ai.basic.value==undefined) card.ai.basic.value=function(card,player,index,method){
-						if(player.isDisabled(get.subtype(card))) return 0.01;
+						if(!player.canEquip(card)) return 0.01;
 						var value=0;
 						var info=get.info(card);
 						var current=player.getEquip(info.subtype);

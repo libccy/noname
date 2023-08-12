@@ -267,7 +267,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtypes:['equip3','equip4'],
 				nomod:true,
 				nopower:true,
-				unique:true,
+				//unique:true,
 				distance:{
 					globalFrom:-1,
 					globalTo:+1,
