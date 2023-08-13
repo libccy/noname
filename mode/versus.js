@@ -278,7 +278,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.players[i].setIdentity(list[i]);
 					game.players[i].node.identity.style.display='none';
 					game.players[i].getId();
-					game.players[i].node.action.innerHTML='获即<br>胜将';
+					game.players[i].node.action.innerHTML='即将<br>获胜';
 					game.players[i].node.action.style.letterSpacing='0px';
 					game.players[i].node.action.style.lineHeight='22px';
 					game.players[i].node.action.style.top='3px';

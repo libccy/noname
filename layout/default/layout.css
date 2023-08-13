@@ -387,6 +387,9 @@ table {
 	right: 7px;
 	bottom: 7px;
 	z-index: 1;
+	white-space: nowrap;
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
 }
 #splash>div>.avatar {
 	width: 86px;
@@ -1319,6 +1322,9 @@ body>.background.land {
 	top: 9px;
 	left: 6px;
 	text-align: center;
+	white-space: nowrap;
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
 }
 .card.fullimage>.name.long {
 	top: 6px;
@@ -1937,6 +1943,9 @@ div:not(.handcards)>.card>.info>span,
 	top: 22px;
 	max-height: 68px;
 	overflow: hidden;
+	white-space: nowrap;
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
 }
 .button.character>.hp {
 	left: 5px;
@@ -2170,6 +2179,9 @@ div:not(.handcards)>.card>.info>span,
 	top: 24px;
 	font-size: 20px;
 	font-family: 'xinwei';
+	white-space: nowrap;
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
 }
 .player>.name.name2 {
 	left: 81px
@@ -2201,7 +2213,7 @@ div:not(.handcards)>.card>.info>span,
 }
 
 .button.character>.name {
-	font-family: 'xinwei'
+	font-family: 'xinwei';
 }
 .player>.intro {
 	top: 87px;
@@ -2230,6 +2242,9 @@ div:not(.handcards)>.card>.info>span,
 	top:calc(50% - 50px);
     width: 100%;
     left: 0;
+	white-space: nowrap;
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
 }
 .player>.chain{
 	top: calc(50% - 10px);
@@ -2829,6 +2844,9 @@ div:not(.handcards)>.card>.info>span,
 
 .player>.name_seat {
 	opacity: 0;
+	white-space: nowrap;
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
 }
 .player:not([data-position='0']).unseen.unseen2>.name_seat,
 .player:not([data-position='0']):not(.fullskin2).unseen>.name_seat {
@@ -3765,6 +3783,9 @@ div:hover>.intro {
 #window>.choosedouble.character>.name {
 	left: 6%;
 	top: 8%;
+	white-space: nowrap;
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
 }
 
 .hrefnode{
@@ -4211,10 +4232,8 @@ div[data-decoration="bronze"]::after{
 	left: 7px;
 	/*border:1px solid #631515;*/
 	border-radius: 4px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	padding-left: 1px;
-	padding-right: 1px;
+	padding-top: 3px;
+	padding-bottom: 3px;
 	/*color:#631515;*/
 	border: 1px solid rgb(74, 29, 1);
 	color: rgb(74, 29, 1);
@@ -4454,7 +4473,6 @@ div[data-decoration="bronze"]::after{
 }
 .coin_menu .content>.caption>.coin_buy>.menubutton {
 	width: auto;
-	display: inline-block;
 	position: relative;
 	float: right;
 	padding-left: 5px;

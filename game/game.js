@@ -27023,7 +27023,6 @@
 					if(card[0]=='heart'||card[0]=='diamond'){
 						this.node.info.classList.add('red');
 					}
-					this.node.name.innerHTML='';
 					this.node.image.className='image';
 					var name=get.translation(card[2]);
 					if(card[2]=='sha'){
@@ -27047,9 +27046,7 @@
 							name='刺'+name;
 						}
 					}
-					for(var i=0;i<name.length;i++){
-						this.node.name.innerHTML+=name[i]+'<br/>';
-					}
+					this.node.name.innerHTML=name;
 					if(name.length>=5){
 						this.node.name.classList.add('long');
 						if(name.length>=7){
@@ -54254,22 +54251,7 @@
 		},
 		verticalStr:function(str,sp){
 			if(typeof str!='string') return '';
-			str=str.toUpperCase();
-			var str2='';
-			var nobreak=false;
-			for(var i=0;i<str.length;i++){
-				if(str[i]=='`'){
-					nobreak=!nobreak;continue;
-				}
-				str2+=str[i];
-				if(nobreak) continue;
-				if(sp&&str[i]=='S'&&str[i+1]=='P') continue;
-				if(/[0-9]/.test(str[i])&&/[0-9]/.test(str[i+1])) continue;
-				if(i<str.length-1){
-					str2+='<br>';
-				}
-			}
-			return str2;
+			return str.split('').filter(value=>value!='`').join('');
 		},
 		numStr:function(num,method){
 			if(num==Infinity){
