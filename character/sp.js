@@ -4623,12 +4623,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					if(event.name=='phase'&&game.phaseNumber!=0) return false;
-					return player.countDisabled()<5;
+					return player.hasEnabledSlot();
 				},
 				content:function(){
+					var list=[];
 					for(var i=1;i<6;i++){
-						if(!player.isDisabled(i)) player.disableEquip(i);
+						for(var j=0;j<player.countEnabledSlot(i);j++){
+							list.push(i);
+						}
 					}
+					player.disableEquip(list);
 					player.draw(4);
 				},
 				mod:{
@@ -4649,13 +4653,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				filter:function(event,player){
 					var es=player.countCards('e');
-					return (player.countDisabled()>0&&player.countCards('he')>0)||(!player.storage.fenrui&&game.hasPlayer(function(current){
+					return (player.hasDisabledSlot()&&player.countCards('he')>0)||(!player.storage.fenrui&&game.hasPlayer(function(current){
 						return current!=player&&current.countCards('e')<es;
 					}));
 				},
 				content:function(){
 					'step 0'
-					if(player.countDisabled()>0&&player.countCards('he')>0){
+					if(player.hasDisabledSlot()&&player.countCards('he')>0){
 						var str='弃置一张牌，恢复一个装备栏并使用一张对应装备牌';
 						player.chooseToDiscard('he',get.prompt('fenrui'),str).set('ai',function(card){
 							return 7-get.value(card);
@@ -4668,7 +4672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player;
 							var list=[2,5,1,3,4];
 							for(var i of list){
-								if(player.isDisabled(i)) return 'equip'+i;
+								if(player.hasDisabledSlot(i)) return 'equip'+i;
 							}
 						});
 					}
@@ -5816,16 +5820,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.card=card;
 					player.addSkill('olshengong_destroy');
 					player.markAuto('olshengong_destroy',[card]);
-					var subtype=get.subtype(card);
 					if(!game.hasPlayer(function(current){
-						return !current.isDisabled(subtype);
+						return current.canEquip(card);
 					})){
 						event.finish();
 						return;
 					}
 					player.chooseTarget(true,'将'+get.translation(card)+'置于一名角色的装备区内',function(card,player,target){
-						return !target.isDisabled(_status.event.subtype);
-					}).set('subtype',subtype).set('ai',function(target){
+						return target.canEquip(_status.event.card);
+					}).set('card',card).set('ai',function(target){
 						var card=_status.event.getParent().card,player=_status.event.player;
 						return get.effect(target,card,player,player);
 					});
@@ -9856,14 +9859,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.storage.youlong2) player.storage.youlong2=[];
 				},
 				hiddenCard:function(player,name){
-					if(player.storage.youlong2.contains(name)||player.countDisabled()>=5) return false;
+					if(player.storage.youlong2.contains(name)||!player.hasEnabledSlot()) return false;
 					if(player.hasSkill('youlong_'+(player.storage.youlong||false))) return false;
 					var type=get.type(name);
 					if(player.storage.youlong) return type=='basic';
 					return type=='trick';
 				},
 				filter:function(event,player){
-					if(player.storage.youlong2.contains(name)||player.countDisabled()>=5) return false;
+					if(player.storage.youlong2.contains(name)||!player.hasEnabledSlot()) return false;
 					if(player.hasSkill('youlong_'+(player.storage.youlong||false))) return false;
 					var type=player.storage.youlong?'basic':'trick';
 					for(var name of lib.inpile){
@@ -9882,7 +9885,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						table.style.width='100%';
 						table.style.position='relative';
 						for(var i=1;i<6;i++){
-							if(player.isDisabled(i)) continue;
+							if(!player.hasEnabledSlot(i)) continue;
 							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 							td.innerHTML='<span>'+get.translation('equip'+i)+'</span>';
 							td.link=i;
@@ -10038,13 +10041,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('luanfeng');
 					trigger.player.recover(3-trigger.player.hp);
 					'step 1'
-					var num=trigger.player.countDisabled();
-					if(num){
-						for(var i=1;i<6;i++){
-							if(trigger.player.isDisabled(i)) trigger.player.enableEquip(i);
+					var list=[];
+					for(var i=1;i<6;i++){
+						for(var j=0;j<player.countDisabledSlot(i);j++){
+							list.push(i);
 						}
 					}
-					trigger.player.drawTo(6-num);
+					if(list.length>0) player.enableEquip(list);
+					if(list.length<6) trigger.player.drawTo(6-list.length);
 					if(trigger.player.storage.kotarou_rewrite) trigger.player.storage.kotarou_rewrite=[];
 					if(player==trigger.player) player.storage.youlong2=[];
 				},
@@ -10298,7 +10302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				direct:true,
 				filter:function(event,player){
-					return player!=event.player&&!event.player.storage._disableJudge&&event.player.countCards('he')&&!event.player.countCards('j');
+					return player!=event.player&&!event.player.isDisabledJudge()&&event.player.countCards('he')&&!event.player.countCards('j');
 				},
 				content:function(){
 					'step 0'

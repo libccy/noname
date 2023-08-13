@@ -1915,7 +1915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!player.storage.yuheng.contains(i)) return false;
 							}
 							var type=get.subtype(event.card);
-							if(lib.card['changandajian_'+type]&&!player.isDisabled(type)) return true;
+							if(lib.card['changandajian_'+type]&&player.hasEquipableSlot(type)) return true;
 							return false;
 						},
 						content:function(){
@@ -3735,7 +3735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target2=result.targets[0];
 						var list=['手牌区'];
 						if(lib.card[card.name].type=='equip'&&event.target2.canEquip(card)) list.push('装备区');
-						if(lib.card[card.name].type=='delay'&&!event.target2.storage._disableJudge&&!event.target2.hasJudge(card.name)) list.push('判定区');
+						if(lib.card[card.name].type=='delay'&&!event.target2.isDisabledJudge()&&!event.target2.hasJudge(card.name)) list.push('判定区');
 						if(list.length==1) event._result={control:list[0]};
 						else{
 							player.chooseControl(list).set('prompt','把'+get.translation(card)+'移动到'+get.translation(event.target2)+'的...').ai=function(){return 0};

@@ -718,11 +718,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0)&&!player.isDisabled(1);
+					return (event.name!='phase'||game.phaseNumber==0)&&player.hasEquipableSlot(1);
 				},
 				content:function(){
 					var card=game.createCard2('ruyijingubang','heart',9);
 					player.$gain2(card,false);
+					game.delayx();
 					player.equip(card);
 				},
 				mod:{

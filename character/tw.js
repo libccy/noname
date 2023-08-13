@@ -4801,7 +4801,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					num=Math.min(num,5+player.countCards('h'));
 					player.drawTo(num);
-					if(!player.storage._disableJudge){
+					if(!player.isDisabledJudge()){
 						player.disableJudge();
 						event.finish();
 					}
@@ -6499,7 +6499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					game.log(player,'成功完成使命');
 					player.awakenSkill('twchuhai');
-					if(!player.storage._disableJudge) player.disableJudge();
+					if(!player.isDisabledJudge()) player.disableJudge();
 					event.current=player.next;
 					'step 1'
 					if(!event.current.countCards('he')) event.goto(3);
@@ -8412,8 +8412,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var list=_status.event.list,link=button.link;
 						if(list.contains(link)){
-							if(player.isDisabled(4)) return '攻击马';
-							if(player.isDisabled(3)) return '防御马';
+							if(player.hasDisabledSlot(4)) return '攻击马';
+							if(player.hasDisabledSlot(3)) return '防御马';
 							return '攻击马';
 						}
 						if(!list.contains(link)){
@@ -11657,7 +11657,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				filter:function(event,player){
-					return !player.isDisabled('equip3')||!player.isDisabled('equip4');
+					return player.hasEnabledSlot(3)||player.hasEnabledSlot(4);
 				},
 				skillAnimation:true,
 				animationColor:'water',
@@ -11673,8 +11673,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.target=result.targets[0];
 						var list=[];
-						if(!player.isDisabled(3)) list.push('equip3');
-						if(!player.isDisabled(4)) list.push('equip4');
+						if(player.hasEnabledSlot(3)) list.push('equip3');
+						if(!player.hasEnabledSlot(4)) list.push('equip4');
 						if(list.length==1) event._result={control:list[0]};
 						else player.chooseControl(list).set('prompt','选择废除一个坐骑栏');
 					}
@@ -11695,16 +11695,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						filter:function(event,player){
 							for(var i of player.getStorage('twjuezhu_restore')){
-								if(i[0]==event.player&&player.isDisabled(i[1])) return true;
+								if(i[0]==event.player&&player.hasEnabledSlot(i[1])) return true;
 							}
 							return false;
 						},
 						content:function(){
 							var list=[];
 							for(var i of player.getStorage('twjuezhu_restore')){
-								if(i[0]==trigger.player&&player.isDisabled(i[1])) list.add(i[1]);
+								if(i[0]==trigger.player&&player.hasEnabledSlot(i[1])) list.push(i[1]);
 							}
-							for(var i of list) player.enableEquip(i);
+							player.enableEquip(list);
 						},
 					},
 				},
@@ -12151,7 +12151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0)&&!player.isDisabled(1);
+					return (event.name!='phase'||game.phaseNumber==0)&&player.hasEquipableSlot(1);
 				},
 				content:function(){
 					if(!lib.inpile.contains('meiyingqiang')){

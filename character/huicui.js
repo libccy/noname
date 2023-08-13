@@ -4714,7 +4714,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var j=0;j<player.countEnabledSlot(i);j++){
 								list1.push(i);
 							}
-							if(player.isDisabled(i)) list2.push(i);
+							if(player.hasDisabledSlot(i)) list2.push(i);
 						}
 						(player.isDisabledJudge()?list2:list1).push(-1);
 						var addTable=function(list,bool){
@@ -6483,7 +6483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(['nanman','wanjian'].contains(event.card.name)&&!player.hasValueTarget({name:event.card.name})) return false;
 							var list=[3,5,4,1,2];
 							for(var i of list){
-								if(!player.isDisabled(i)){
+								if(player.hasEnabledSlot(i)){
 									var card=player.getEquip(i);
 									if(!card) return true;
 									if(get.value(card,player)<=0) return true;
@@ -6497,7 +6497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseToDisable().set('ai',function(event,player,list){
 								var list=[3,5,4,1,2];
 								for(var i of list){
-									if(!player.isDisabled(i)){
+									if(player.hasEnabledSlot(i)){
 										var card=player.getEquip(i);
 										if(!card) return 'equip'+i;
 										if(get.value(card,player)<=0) return 'equip'+i;

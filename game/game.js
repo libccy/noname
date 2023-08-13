@@ -18173,7 +18173,12 @@
 						return num+get.numOf(types,type);
 					},0))
 				},
-				//判断一名角色是否有可以用于装备牌的区域（考虑金箍棒等“不可被替换装备”）
+				//判断一名角色是否有可以用于装备新装备牌的区域（排除金箍棒和六龙等“不可被替换装备”）
+				//用法同下
+				hasEquipableSlot:function(type){
+					return this.countEquipableSlot(type)>0;
+				},
+				//统计一名角色有多少个可以用于装备新的装备牌的区域
 				//用法同下
 				countEquipableSlot:function(type){
 					if(!type) return 0;
@@ -18345,7 +18350,7 @@
 				//同步装备区废除牌显示状态
 				$syncDisable:function(map){
 					var player=this;
-					var suits={equip1:'武器栏',equip2:'防具栏',equip3:'+1马栏',equip4:'-1马栏',equip5:'宝物栏'};
+					var suits={equip3:'+1马栏',equip4:'-1马栏',equip6:'特殊栏'};
 					if(!map){
 						map=(player.disabledSlots||{});
 					}
@@ -18367,7 +18372,7 @@
 						var num=map2[index];
 						if(num>0){
 							for(var i=0;i<num;i++){
-								var card=game.createCard('feichu_'+index,suits[index],'');
+								var card=game.createCard('feichu_'+index,(suits[index]||(get.translation(index)+'栏')),'');
 								card.fix();
 								card.style.transform='';
 								card.classList.remove('drawinghidden');
@@ -26038,42 +26043,36 @@
 					}
 				},
 				$equip:function(card){
-					if(this.storage.disableEquip!=undefined&&this.storage.disableEquip.contains(get.subtype(card))){
-						this.gain(card,'gain2');
-						game.log(this,'装备失败');
+					game.broadcast(function(player,card){
+						player.$equip(card);
+					},this,card);
+					card.fix();
+					card.style.transform='';
+					card.classList.remove('drawinghidden');
+					delete card._transform;
+					var player=this;
+					var equipNum=get.equipNum(card);
+					var equipped=false;
+					for(var i=0;i<player.node.equips.childNodes.length;i++){
+						if(get.equipNum(player.node.equips.childNodes[i])>=equipNum){
+							player.node.equips.insertBefore(card,player.node.equips.childNodes[i]);
+							equipped=true;
+							break;
+						}
 					}
-					else{
-						game.broadcast(function(player,card){
-							player.$equip(card);
-						},this,card);
-						card.fix();
-						card.style.transform='';
-						card.classList.remove('drawinghidden');
-						delete card._transform;
-						var player=this;
-						var equipNum=get.equipNum(card);
-						var equipped=false;
-						for(var i=0;i<player.node.equips.childNodes.length;i++){
-							if(get.equipNum(player.node.equips.childNodes[i])>=equipNum){
-								player.node.equips.insertBefore(card,player.node.equips.childNodes[i]);
-								equipped=true;
-								break;
-							}
+					if(!equipped){
+						player.node.equips.appendChild(card);
+						if(_status.discarded){
+							_status.discarded.remove(card);
 						}
-						if(!equipped){
-							player.node.equips.appendChild(card);
-							if(_status.discarded){
-								_status.discarded.remove(card);
-							}
+					}
+					var info=get.info(card);
+					if(info.skills){
+						for(var i=0;i<info.skills.length;i++){
+							player.addSkillTrigger(info.skills[i]);
 						}
-						var info=get.info(card);
-						if(info.skills){
-							for(var i=0;i<info.skills.length;i++){
-								player.addSkillTrigger(info.skills[i]);
-							}
-						}
-						return player;
-					};
+					}
+					return player;
 				},
 				$gain:function(card,log,init){
 					if(init!==false){

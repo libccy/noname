@@ -4418,7 +4418,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							table.style.position='relative';
 							var list=['sha','shan'];
 							for(var i of list){
-								if(player.isDisabled(i)) continue;
 								var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 								td.innerHTML='<span>'+get.translation(i)+'</span>';
 								td.link=i;
@@ -10324,11 +10323,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					game.delay(0.5);
-					if(targets[0].isDisabled(1)) event.goto(2);
+					if(!targets[0].hasEquipableSlot(1)) event.goto(2);
 					'step 1'
 					var target=targets[0];
 					var equip1=get.cardPile2(function(card){
-						return get.subtype(card)=='equip1';
+						return get.subtype(card)=='equip1'&&target.canUse(card,target);
 					});
 					if(!equip1){
 						player.popup('连计失败');

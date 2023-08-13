@@ -4246,7 +4246,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 					}
 					else{
-						return !player.isDisabled(5);
+						return player.hasEquipableSlot(5);
 					}
 				},
 				direct:true,
@@ -5241,7 +5241,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				content:function(){
-					if(player.isDisabled(5)||player.getEquip('dagongche')){
+					if(!player.hasEquipableSlot(5)||player.getEquip('dagongche')){
 						var next=player.phaseUse();
 						event.next.remove(next);
 						trigger.getParent().next.push(next);

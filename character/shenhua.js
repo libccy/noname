@@ -1114,7 +1114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.type(card)=='equip';
 				},
 				check:function(card){
-					if(_status.event.player.isDisabled(get.subtype(card))) return 5;
+					if(!_status.event.player.canEquip(card)) return 5;
 					return 3-get.value(card);
 				},
 				content:function(){
@@ -2581,11 +2581,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('filterCard',lib.filter.cardDiscardable);
 					'step 2'
 					if(result.bool&&result.cards.length){
-						if(get.type(result.cards[0])=='equip'&&!player.isDisabled(get.subtype(result.cards[0]))){
-							player.chooseUseTarget(result.cards[0],true,'nopopup');
+						var card=result.cards[0];
+						if(get.type(card)=='equip'&&player.hasUseTarget(card)){
+							player.chooseUseTarget(card,true,'nopopup');
 						}
 						else{
-							player.discard(result.cards[0]);
+							player.discard(card);
 						}
 					}
 				},

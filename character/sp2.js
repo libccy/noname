@@ -4075,7 +4075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
-					return player.countDisabled()<5;
+					return player.hasEnabledSlot();
 				},
 				content:function(){
 					'step 0'
@@ -4108,7 +4108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var cardType=result.control;
 					event.cardType=cardType;
-					var num=player.countDisabled();
+					var num=player.countDisabledSlot();
 					if(num<5) player.draw(5-num);
 					player.chooseTarget(lib.filter.notMe,'是否令一名其他角色从牌堆中使用一张'+get.translation(cardType)+'牌？').set('ai',function(target){
 						var player=_status.event.player,type=_status.event.cardType;
@@ -4134,7 +4134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'disableEquipAfter'},
 						forced:true,
 						filter:function(event,player){
-							return player.countDisabled()>=5;
+							return !player.hasEnabledSlot();
 						},
 						content:function(){
 							player.gainMaxHp(2);
@@ -4630,7 +4630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
-					return !player.storage._disableJudge&&game.hasPlayer(function(current){
+					return !player.isDisabledJudge()&&game.hasPlayer(function(current){
 						return current!=player&&current.countCards('j',function(card){
 							return player.canAddJudge(card);
 						})>0;
@@ -5874,7 +5874,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return player.countDisabled()<5;
+					return player.hasEnabledSlot();
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -5883,7 +5883,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					chooseControl:function(event,player){
 						var list=[];
 						for(var i=1;i<6;i++){
-							if(!player.isDisabled(i)) list.push('equip'+i);
+							if(player.hasEnabledSlot(i)) list.push('equip'+i);
 						}
 						list.push('cancel2');
 						return list;
@@ -5988,7 +5988,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					player.recover();
 					'step 1'
-					if(player.countDisabled()>=5){
+					if(!player.hasEnabledSlot()){
 						player.loseMaxHp(4);
 						player.addSkill('tuxing2');
 					}

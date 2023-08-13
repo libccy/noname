@@ -1564,7 +1564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return !player.storage._disableJudge||player.countCards('h',card=>['sha','shan'].contains(get.name(card)))>0;
+					return !player.isDisabledJudge()||player.countCards('h',card=>['sha','shan'].contains(get.name(card)))>0;
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -1574,7 +1574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					filter:function(button,player){
 						var link=button.link;
-						if(link=='damage') return !player.storage._disableJudge;
+						if(link=='damage') return !player.isDisabledJudge();
 						var num=player.countCards('h',link);
 						return num>0&&num==player.getDiscardableCards(player,'h').filter(i=>get.name(i)==link).length;
 					},
@@ -1611,7 +1611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:function(item,player){
 						if(!player) return;
-						var eff=get.damageEffect(player,player,player,'fire'),disabled=!player.storage._disableJudge;
+						var eff=get.damageEffect(player,player,player,'fire'),disabled=!player.isDisabledJudge();
 						if((player.countCards('h','sha')==1||player.countCards('h','shan')==1)&&eff<0&&!disabled) return 8;
 						else if(eff>=0&&!disabled) return 5.8;
 						if(!disabled&&!player.countCards('h',card=>['sha','shan'].contains(get.name(card)))){
@@ -1639,7 +1639,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.choice=choice;
 							if(choice=='damage'){
 								player.damage('fire');
-								if(!player.storage._disableJudge) player.disableJudge();
+								if(!player.isDisabledJudge()) player.disableJudge();
 							}else{
 								var cards=player.getCards('h',choice);
 								if(cards.length) player.discard(cards);
@@ -1669,7 +1669,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										ok=false;
 									}
 									if(ind==0){
-										if(target.storage._disableJudge) ok=false;
+										if(target.isDisabledJudge()) ok=false;
 									}
 									else if(ind>0){
 										var name=ind==1?'shan':'sha';
@@ -1695,7 +1695,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							} else event.finish();
 							'step 3'
 							if(result.control=='选项一'){
-								if(!target.storage._disableJudge) target.disableJudge();
+								if(!target.isDisabledJudge()) target.disableJudge();
 								target.damage('fire');
 							}
 							else{
