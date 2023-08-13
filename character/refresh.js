@@ -9858,7 +9858,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else if(event.isMine()){
 							func(event.videoId);
 						}
-						event._result={control:'弃置化身'};
+						event._result={control:'更换技能'};
 						event.goto(1);
 						return;
 					}
