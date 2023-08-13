@@ -1,5 +1,4 @@
 'use strict';
-
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'shiji',
@@ -257,24 +256,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var name=result.links[0][2],target=trigger.player;
-						target.addTempSkill('zhengsu',{player:['phaseDiscardAfter','phaseAfter']});
+						target.addTempSkill('houfeng_share',{player:['phaseDiscardAfter','phaseAfter']});
+						target.markAuto('houfeng_share',[player]);
 						target.addTempSkill(name,{player:['phaseDiscardAfter','phaseAfter']});
 						target.popup(name,'thunder');
-						player.addTempSkill('houfeng_share');
 						game.delayx();
 					}
 				},
 				subSkill:{
 					share:{
-						trigger:{global:['drawAfter','recoverAfter']},
+						charlotte:true,
+						onremove:true,
+						trigger:{player:'phaseUseEnd'},
+						filter:function(event,player){
+							return lib.skill.zhengsu.filter(event,player);
+						},
 						forced:true,
 						popup:false,
-						charlotte:true,
-						filter:function(event,player){
-							return event.getParent(2).name=='zhengsu';
-						},
 						content:function(){
-							player.chooseDrawRecover(2,true);
+							'step 0'
+							var list=player.getStorage('houfeng_share').filter(i=>i.isIn());
+							list.unshift(player);
+							event.list=list;
+							var num1=0,num2=0;
+							for(var target of list){
+								num1+=get.effect(target,{name:'wuzhong'},player,player);
+								num2+=get.recoverEffect(target,player,player);
+							}
+							if(!list.some(i=>i.isDamaged())) result.index=0;
+							else trigger.player.chooseControl('摸两张牌','回复体力').set('prompt','整肃奖励：请选择'+get.translation(list)+'的整肃奖励').set('ai',function(){
+								return _status.event.goon?0:1;
+							}).set('goon',num1>=num2);
+							'step 1'
+							if(result.index==0) game.asyncDraw(event.list,2);
+							else{
+								for(var i of event.list) i.recover();
+							}
+							'step 2'
+							game.delayx();
 						},
 					},
 				},
@@ -317,9 +336,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							if(result.bool){
 								var target=result.targets[0];
-								player.logSkill('spzhengjun',target);
-								target.chooseDrawRecover(2,true);
+								event.target=target;
+								var num1=get.effect(target,{name:'wuzhong'},target,player);
+								var num2=get.recoverEffect(target,target,player);
+								player.line(target);
+								if(target.isHealthy()) result.index=0;
+								else player.chooseControl('摸牌','回血').set('prompt','整肃奖励：令'+get.translation(target)+'摸两张牌或回复1点体力').set('ai',function(){
+									return _status.event.goon?0:1;
+								}).set('goon',num1>=num2);
 							}
+							else event.finish();
+							'step 2'
+							if(result.index==0) target.draw(2);
+							else target.recover();
 						},
 					},
 				},
@@ -504,7 +533,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			spyanji:{
-				audio:2,
+				audio:3,
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -6435,7 +6464,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spyanji_info:'出牌阶段开始时，你可以进行“整肃”。',
 			sp_huangfusong:'手杀皇甫嵩',
 			spzhengjun:'整军',
-			spzhengjun_info:'①出牌阶段开始时，你可进行“整肃”。②当你因整肃而摸牌或回复体力后，你可令一名其他角色选择摸两张牌或回复1点体力。',
+			spzhengjun_info:'①出牌阶段开始时，你可进行“整肃”。②当你因整肃而摸牌或回复体力后，你可令一名其他角色摸两张牌或回复1点体力。',
 			spshiji:'势击',
 			spshiji_info:'当你对其他角色造成属性伤害时，若你的手牌数不为全场唯一最多，则你可以观看其手牌。你令其弃置其中的所有红色牌，然后摸等量的牌。',
 			sptaoluan:'讨乱',
@@ -6446,7 +6475,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zjjuxiang:'拒降',
 			zjjuxiang_info:'限定技。一名其他角色脱离濒死状态时，你可以对其造成1点伤害，然后摸X张牌（X为其体力上限且至多为5）。',
 			houfeng:'厚俸',
-			houfeng_info:'每轮限一次。一名其他角色的出牌阶段开始时，若其在你的攻击范围内，则你可以令其进行“整肃”。然后当其于本回合内因整肃而摸牌或回复体力后，你可选择摸两张牌或回复1点体力。',
+			houfeng_info:'每轮限一次。一名其他角色的出牌阶段开始时，若其在你的攻击范围内，则你可以令其进行“整肃”。然后当其于本回合内因整肃而摸牌或回复体力后，你获得相同的整肃奖励。',
 			liuba:'刘巴',
 			duanbi:'锻币',
 			duanbi_info:'出牌阶段限一次。若场上所有角色的手牌数之和大于角色数之和的二倍，则你可以令所有其他角色各弃置X张手牌（X为该角色手牌数的一半且向下取整且至多为3）。然后你可选择一名角色，令其随机获得三张以此法被弃置的牌。',
