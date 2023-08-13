@@ -267,7 +267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					share:{
 						charlotte:true,
 						onremove:true,
-						trigger:{player:'phaseUseEnd'},
+						trigger:{player:'phaseDiscardEnd'},
 						filter:function(event,player){
 							return lib.skill.zhengsu.filter(event,player);
 						},
