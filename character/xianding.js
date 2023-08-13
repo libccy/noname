@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
-			dc_duyu:['male','wei',3,['dcjianguo','dcdyqingshi'],['unseen']],
+			dc_duyu:['male','wei',4,['dcjianguo','dcdyqingshi']],
 			ganfurenmifuren:['female','shu',3,['dcchanjuan','dcxunbie']],
 			dc_ganfuren:['female','shu',3,['dcshushen','dcshenzhi']],
 			dc_mifuren:['female','shu',3,['dcguixiu','dccunsi']],
@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huanfan:['male','wei',3,['dcjianzheng','dcfumou']],
 			chentai:['male','wei',4,['dcctjiuxian','dcchenyong']],
 			sunyu:['male','wu',3,['dcquanshou','dcshexue'],['unseen']],
-			xizheng:['male','shu',3,['dcdanyi','dcwencan'],['unseen']],
+			xizheng:['male','shu',3,['dcdanyi','dcwencan']],
 			dc_ruiji:['female','wu',4,['dcwangyuan','dclingyin','dcliying']],
 			zerong:['male','qun',4,['dccansi','dcfozong']],
 			xielingyu:['female','wu',3,['dcyuandi','dcxinyou']],
@@ -1556,6 +1556,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						storage:{dcctjiuxian:true}
 					},true);
 				},
+				ai:{
+					order:5.5,
+					result:{player:1},
+				},
 				subSkill:{
 					help:{
 						trigger:{global:'damageSource'},
@@ -1827,12 +1831,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!event.targets||!event.targets.length) return false;
 					var evt=lib.skill.dcjianying.getLastUsed(player,event.getParent());
 					if(!evt||!evt.targets||!evt.targets.length||evt.targets.length!=event.targets.length) return false;
-					var targetsx=event.targets.slice().sort((a,b)=>a.seatNum-b.seatNum);
-					var targetsy=evt.targets.slice().sort((a,b)=>a.seatNum-b.seatNum);
-					for(var i=0;i<targetsx.length;i++){
-						if(targetsx[i]!=targetsy[i]) return false;
-					}
-					return true;
+					var targetsx=event.targets.slice();
+					var targetsy=evt.targets.slice();
+					return targetsx.slice().removeArray(targetsy).length==0&&targetsy.slice().removeArray(targetsx).length==0;
 				},
 				frequent:true,
 				locked:false,

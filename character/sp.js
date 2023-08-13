@@ -10,7 +10,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna"],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','ol_puyuan','zhangzhi','lushi'],
-				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian'],
+				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_wenqin'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
 				sp_waitforsort:['ol_huban','ol_mengda','haopu'],
@@ -28,6 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_wenqin:['male','wei',4,['olguangao','olhuiqi']],
 			haopu:['male','shu',4,['olzhenying']],
 			ol_mengda:['male','shu',4,['olgoude']],
 			ol_wanglang:['male','wei',3,['gushe','oljici']],
@@ -686,6 +687,149 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//OL文钦
+			olguangao:{
+				audio:2,
+				trigger:{
+					global:'useCard2',
+				},
+				filter:function(event,player){
+					var card=event.card;
+					if(card.name!='sha') return false;
+					if(event.player==player){
+						if(game.hasPlayer(current=>{
+							return current.isIn()&&!event.targets.contains(current)&&player.canUse(event.card,current,false);
+						})){
+							return true;
+						}
+						return false;
+					}
+					return event.player.isIn()&&!event.targets.contains(player)&&event.player.canUse(card,player);
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					if(trigger.player==player){
+						player.chooseTarget(get.prompt('olguangao'),'为'+get.translation(trigger.card)+'额外指定一个目标。然后若你手牌数为偶数，你摸一张牌并令此牌对任意目标无效。',(card,player,target)=>{
+							return !_status.event.sourcex.contains(target)&&player.canUse(_status.event.card,target,false);
+						}).set('sourcex',trigger.targets).set('ai',function(target){
+							var player=_status.event.player;
+							var eff=get.effect(target,_status.event.card,player,player);
+							if(player.countCards('h')%2==0&&player.hasSkill('olxieju')&&player.isPhaseUsing()&&!player.getStat().skill.olxieju) return 1-eff;
+							return eff;
+						}).set('card',trigger.card);
+					}
+					else{
+						trigger.player.chooseBool('是否发动'+get.translation(player)+'的【犷骜】？','令其成为'+get.translation(trigger.card)+'的额外目标。然后若其手牌数为偶数，其摸一张牌并令此牌对任意目标无效。').set('ai',()=>{
+							return _status.event.bool;
+						}).set('bool',function(){
+							var att=get.attitude(trigger.player,player);
+							var eff=get.effect(player,trigger.card,trigger.player,trigger.player);
+							if(player.countCards('h')%2==0&&att>0) return true;
+							if(eff>0) return true;
+							return false;
+						}());
+					}
+					'step 1'
+					if(result.bool){
+						var target=result.targets&&result.targets[0];
+						if(!target){
+							target=player;
+							trigger.player.logSkill('olguangao',player);
+						}
+						else{
+							player.logSkill('olguangao',target);
+						}
+						trigger.targets.add(target);
+						game.delayex();
+					}
+					else event.finish();
+					'step 2'
+					if(player.countCards('h')%2==0){
+						player.draw();
+						player.chooseTarget('犷骜：令此杀对其任意个目标无效',[1,Infinity],true,(card,player,target)=>{
+							return _status.event.targetsx.contains(target);
+						}).set('ai',target=>{
+							return 1-get.effect(target,_status.event.getTrigger().card,_status.event.player,_status.event.player);
+						}).set('targetsx',trigger.targets);
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool){
+						player.line(result.targets);
+						trigger.excluded.addArray(result.targets);
+					}
+				}
+			},
+			olhuiqi:{
+				audio:2,
+				trigger:{
+					global:'phaseEnd',
+				},
+				juexingji:true,
+				forced:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				derivation:'olxieju',
+				filter:function(event,player){
+					var targets=[];
+					game.getGlobalHistory('useCard',evt=>{
+						if(evt.targets&&evt.targets.length){
+							targets.addArray(evt.targets);
+						}
+					});
+					return targets.length==3;
+				},
+				content:function(){
+					'step 0'
+					player.awakenSkill('olhuiqi');
+					player.addSkillLog('olxieju');
+					player.insertPhase();
+				}
+			},
+			olxieju:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return event.olxieju&&event.olxieju.length;
+				},
+				onChooseToUse:function(event){
+					if(!event.olxieju&&!game.online){
+						var targets=[];
+						game.getGlobalHistory('useCard',evt=>{
+							if(evt.targets&&evt.targets.length){
+								targets.addArray(evt.targets);
+							}
+						})
+						event.set('olxieju',targets);
+					}
+				},
+				filterTarget:function(card,player,target){
+					var event=_status.event;
+					if(event.olxieju.contains(target)) return true;
+					return false;
+				},
+				selectTarget:[1,Infinity],
+				content:function(){
+					var card={
+						name:'sha',
+						isCard:true,
+					};
+					if(target.hasUseTarget(card,true)){
+						target.chooseUseTarget(card,true);
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						target:function(player,target){
+							var val=target.getUseValue({name:'sha'},true);
+							return Math.sign(val);
+						}
+					}
+				}
+			},
 			//郝普
 			olzhenying:{
 				audio:2,
@@ -22503,6 +22647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ruiji:['dc_ruiji','ruiji'],
 			jsp_huangyueying:['jsp_huangyueying','re_jsp_huangyueying'],
 			ganfuren:['dc_ganfuren','ganfuren'],
+			wenqin:['wenqin','pe_wenqin'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -23587,6 +23732,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			haopu:'郝普',
 			olzhenying:'镇荧',
 			olzhenying_info:'出牌阶段限两次。你可以选择一名手牌数不大于你的其他角色，你与其同时将手牌摸或弃置至至多两张。然后你与其中手牌数较少的角色视为对另一名角色使用一张【决斗】。',
+			ol_wenqin:'文钦',
+			olguangao:'犷骜',
+			olguangao_info:'当你/其他角色使用【杀】时，你/该角色可以额外指定一个目标/你为目标（使用者不为你则有距离限制）。然后若你的手牌数为偶数，你摸一张牌并令此牌对任意目标无效。',
+			olhuiqi:'彗企',
+			olhuiqi_info:'觉醒技。一名角色回合结束后，若仅有三名角色于此回合成为过牌的目标，你获得〖偕举〗并获得一个额外的回合。',
+			olxieju:'偕举',
+			olxieju_info:'出牌阶段限一次。你可以令任意名本回合成为过牌的目标的角色依次视为使用一张【杀】。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

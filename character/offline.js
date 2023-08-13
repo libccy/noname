@@ -2256,8 +2256,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.isFirstTarget&&event.card.name=='sha'&&player.hasEmptySlot(1);
 				},
 				content:function(){
-					trigger.getParent().targets=trigger.getParent().targets.concat(trigger.targets);
-					trigger.getParent().triggeredTargets4=trigger.getParent().triggeredTargets4.concat(trigger.targets);
+					// trigger.getParent().targets=trigger.getParent().targets.concat(trigger.targets);
+					// trigger.getParent().triggeredTargets4=trigger.getParent().triggeredTargets4.concat(trigger.targets);
+					trigger.getParent().effectCount++;
 				},
 				ai:{
 					effect:{
