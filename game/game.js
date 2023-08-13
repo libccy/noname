@@ -11084,7 +11084,8 @@
 					game.broadcastAll(function(player,id,beatmap){
 						if(_status.connectMode) lib.configOL.choose_timeout=(Math.ceil((beatmap.timeleap[beatmap.timeleap.length-1]+beatmap.speed*100+(beatmap.current||0))/1000)+5).toString();
 						if(player==game.me) return;
-						var str=get.translation(player)+'正在演奏《'+beatmap.name+'》...<br>';
+						var str=get.translation(player)+'正在演奏《'+beatmap.name+'》...';
+						if(!_status.connectMode) str+='<br>（点击屏幕可以跳过等待AI操作）';
 						ui.create.dialog(str).videoId=id;
 						if(ui.backgroundMusic) ui.backgroundMusic.pause();
 						if(lib.config.background_audio){
@@ -11107,8 +11108,23 @@
 						//初始化一堆变量
 						var score=0;
 						var added=timeleap.length;
+						var number_of_tracks=beatmap.number_of_tracks||6;
+						var custom_mapping=Array.isArray(beatmap.mapping);
+						var mapping=custom_mapping?beatmap.mapping.slice():beatmap.mapping;
+						var hitsound=beatmap.hitsound||'hitsound.wav';
+						if(hitsound.indexOf('ext:')==0) hitsound=lib.assetURL+'extension/'+hitsound.slice(4);
+						else hitsound=lib.assetURL+'audio/effect/'+hitsound;
+						var hitsound_audio=new Audio(hitsound);
+						hitsound_audio.volume=0.25;
 						var abs=1;
 						var node_pos=0;
+						if(custom_mapping){
+							node_pos=mapping.shift();
+						}
+						else if(mapping=='random'){
+							abs=get.rand(number_of_tracks);
+							node_pos=abs;
+						}
 						var combo=0;
 						var max_combo=0;
 						var nodes=[];
@@ -11139,6 +11155,10 @@
 							event.settleed=true;
 							//评分
 							var acc=Math.floor(score/(added*5)*100);
+							if(!Array.isArray(lib.config.choose_to_play_beatmap_accuracies)) lib.config.choose_to_play_beatmap_accuracies=[];
+							lib.config.choose_to_play_beatmap_accuracies.push(acc);
+							if(lib.config.choose_to_play_beatmap_accuracies.length>5) lib.config.choose_to_play_beatmap_accuracies.shift();
+							game.saveConfigValue("choose_to_play_beatmap_accuracies");
 							var rank;
 							if(acc==100) rank=['SS','metal'];
 							else if(acc>=94) rank=['S','orange'];
@@ -11159,7 +11179,8 @@
 								game.resume();
 								_status.imchoosing=false;
 								if(roundmenu) ui.roundmenu.style.display='';
-								if(ui.backgroundMusic) ui.backgroundMusic.play();
+								if(ui.backgroundMusic) ui.backgroundMusic.play().catch(()=>void 0);
+								hitsound_audio.remove();
 							},1000);
 						};
 						event.dialog.open();
@@ -11190,11 +11211,11 @@
 							node.style["border-radius"]='3px';
 							node.style.position='absolute';
 							node.style.height=Math.ceil(height/10)+'px';
-							node.style.width=Math.ceil(width/6)-10+'px';
+							node.style.width=Math.ceil(width/number_of_tracks)-10+'px';
 							node._position=get.utc();
 							event.dialog.appendChild(node);
 							
-							node.style.left=Math.ceil(width*node_pos/6+5)+'px';
+							node.style.left=Math.ceil(width*node_pos/number_of_tracks+5)+'px';
 							node.style.top='-'+(Math.ceil(height/10))+'px';
 							ui.refresh(node);
 							node.style.transition='all '+speed*110+'ms linear';
@@ -11208,14 +11229,25 @@
 								}
 							},speed*110);
 							
-							node_pos+=abs;
-							if(node_pos>5){
-								abs=-1;
-								node_pos=4;
+							if(custom_mapping){
+								node_pos=mapping.shift();
 							}
-							else if(node_pos<0){
-								abs=1;
-								node_pos=1;
+							else if(mapping=='random'){
+								while(node_pos==abs){
+									node_pos=get.rand(number_of_tracks);
+								}
+								abs=node_pos;
+							}
+							else{
+								node_pos+=abs;
+								if(node_pos>number_of_tracks-1){
+									abs=-1;
+									node_pos=number_of_tracks-2;
+								}
+								else if(node_pos<0){
+									abs=1;
+									node_pos=1;
+								}
 							}
 							if(timeleap.length){
 								setTimeout(function(){
@@ -11261,6 +11293,8 @@
 								if(player.damagepopups.length) player.$damagepop();
 								combo++;
 								max_combo=Math.max(combo,max_combo);
+								hitsound_audio.currentTime=0;
+								if(hitsound_audio.paused) hitsound_audio.play();
 								break;
 							}
 						};
@@ -11284,9 +11318,16 @@
 					else{
 						game.pause();
 						game.countChoose();
-						setTimeout(function(){
+						var settle=function(){
 							_status.imchoosing=false;
-							var acc=get.rand.apply(get,beatmap.aiAcc||[70,100]);
+							//Algorithm: Generate the random number range using the mean and the half standard deviation of accuracies of the player's last 5 plays
+							//算法：用玩家的上5次游玩的准确率的平均数和半标准差生成随机数范围
+							var choose_to_play_beatmap_accuracies=(lib.config.choose_to_play_beatmap_accuracies||[]).concat(Array.from({
+								length:6-(lib.config.choose_to_play_beatmap_accuracies||[]).length
+							},()=>get.rand(70,100)));
+							var mean=Math.round(choose_to_play_beatmap_accuracies.reduce((previousValue,currentValue)=>previousValue+currentValue)/choose_to_play_beatmap_accuracies.length);
+							var half_standard_deviation=Math.round(Math.sqrt(choose_to_play_beatmap_accuracies.reduce((previousValue,currentValue)=>previousValue+Math.pow(currentValue-mean,2),0))/2);
+							var acc=Math.min(Math.max(get.rand.apply(get,beatmap.aiAcc||[mean-half_standard_deviation-get.rand(0,half_standard_deviation),mean+half_standard_deviation+get.rand(0,half_standard_deviation)]),0),100);
 							var rank;
 							if(acc==100) rank=['SS','metal'];
 							else if(acc>=94) rank=['S','orange'];
@@ -11302,7 +11343,23 @@
 							if(event.dialog) event.dialog.close();
 							if(event.control) event.control.close();
 							game.resume();
-						},beatmap.timeleap[beatmap.timeleap.length-1]+beatmap.speed*100+1000+(beatmap.current||0));
+						};
+						var song_duration=beatmap.timeleap[beatmap.timeleap.length-1]+beatmap.speed*100+1000+(beatmap.current||0);
+						var settle_timeout=setTimeout(settle,song_duration);
+						if(!_status.connectMode) {
+							var skip_timeout;
+							var skip=()=>{
+								settle();
+								Array.from(ui.window.getElementsByTagName('audio')).forEach(value=>{
+									if(value.currentSrc.indexOf(beatmap.filename.indexOf('ext:')==0?beatmap.name:beatmap.filename)>-1) value.remove();
+								});
+								document.removeEventListener(lib.config.touchscreen?'touchend':'click',skip);
+								clearTimeout(settle_timeout);
+								clearTimeout(skip_timeout);
+							};
+							document.addEventListener(lib.config.touchscreen?'touchend':'click',skip);
+							skip_timeout=setTimeout(()=>document.removeEventListener(lib.config.touchscreen?'touchend':'click',skip),song_duration);
+						}
 					}
 					'step 2'
 					game.broadcastAll(function(id,time){
@@ -11311,7 +11368,7 @@
 						if(dialog){
 							dialog.close();
 						}
-						if(ui.backgroundMusic) ui.backgroundMusic.play();
+						if(ui.backgroundMusic) ui.backgroundMusic.play().catch(()=>void 0);
 					},event.videoId,event.time);
 					var result=event.result||result;
 					event.result=result;
@@ -31090,6 +31147,7 @@
 		],
 	};
 	var game={
+		generateBeatmapTimeleap:(bpm,beats,offset)=>beats.map(value=>Math.round(value*60000/bpm+(offset||0))),
 		updateRenku:function(){
 			game.broadcast(function(renku){
 				_status.renku=renku;
