@@ -19047,11 +19047,11 @@
 				inRangeOf:function(source){
 					return source.inRange(this);
 				},
-				getHp:function(){
-					return Math.max(0,this.hp);
+				getHp:function(raw){
+					return raw?this.hp:Math.max(0,this.hp);
 				},
-				getDamagedHp:function(){
-					return this.maxHp-this.getHp();
+				getDamagedHp:function(raw){
+					return this.maxHp-this.getHp(raw);
 				},
 				changeGroup:function(group,log,broadcast){
 					var next=game.createEvent('changeGroup');
@@ -24832,109 +24832,61 @@
 					return this.hp<this.maxHp&&!this.storage.nohp;
 				},
 				isHealthy:function(){
-					return this.hp==this.maxHp||this.storage.nohp;
+					return this.hp>=this.maxHp||this.storage.nohp;
 				},
-				isMaxHp:function(equal){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].hp>=this.hp) return false;
-						}
-						else{
-							if(game.players[i].hp>this.hp) return false;
-						}
-					}
-					return true;
+				isMaxHp:function(only,raw){
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.getHp(raw)<this.getHp(raw):value.getHp(raw)<=this.getHp(raw);
+					});
 				},
-				isMinHp:function(equal){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].hp<=this.hp) return false;
-						}
-						else{
-							if(game.players[i].hp<this.hp) return false;
-						}
-					}
-					return true;
+				isMinHp:function(only,raw){
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.getHp(raw)>this.getHp(raw):value.getHp(raw)>=this.getHp(raw);
+					});
 				},
-				isMaxCard:function(equal){
-					var nh=this.countCards('he');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('he')>=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('he')>nh) return false;
-						}
-					}
-					return true;
+				isMaxCard:function(only){
+					const numberOfCards=this.countCards('he');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('he')<numberOfCards:value.countCards('he')<=numberOfCards;
+					});
 				},
-				isMinCard:function(equal){
-					var nh=this.countCards('he');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('he')<=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('he')<nh) return false;
-						}
-					}
-					return true;
+				isMinCard:function(only){
+					const numberOfCards=this.countCards('he');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('he')>numberOfCards:value.countCards('he')>=numberOfCards;
+					});
 				},
-				isMaxHandcard:function(equal){
-					var nh=this.countCards('h');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('h')>=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('h')>nh) return false;
-						}
-					}
-					return true;
+				isMaxHandcard:function(only){
+					const numberOfHandCards=this.countCards('h');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('h')<numberOfHandCards:value.countCards('h')<=numberOfHandCards;
+					});
 				},
-				isMinHandcard:function(equal){
-					var nh=this.countCards('h');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('h')<=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('h')<nh) return false;
-						}
-					}
-					return true;
+				isMinHandcard:function(only){
+					const numberOfHandCards=this.countCards('h');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('h')>numberOfHandCards:value.countCards('h')>=numberOfHandCards;
+					});
 				},
-				isMaxEquip:function(equal){
-					var nh=this.countCards('e');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('e')>=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('e')>nh) return false;
-						}
-					}
-					return true;
+				isMaxEquip:function(only){
+					const numberOfEquipAreaCards=this.countCards('e');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('e')<numberOfEquipAreaCards:value.countCards('e')<=numberOfEquipAreaCards;
+					});
 				},
-				isMinEquip:function(equal){
-					var nh=this.countCards('e');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('e')<=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('e')<nh) return false;
-						}
-					}
-					return true;
+				isMinEquip:function(only){
+					const numberOfEquipAreaCards=this.countCards('e');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('e')>numberOfEquipAreaCards:value.countCards('e')>=numberOfEquipAreaCards;
+					});
 				},
 				isLinked:function(){
 					if(get.is.linked2(this)){

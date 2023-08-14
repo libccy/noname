@@ -6035,12 +6035,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDiscardBegin'},
 				forced:true,
 				filter:function(event,player){
-					return (player.isDamaged()||player.countCards('h')-player.hp>1);
+					return (player.getDamagedHp()>1||player.countCards('h')-player.getHp()>1);
 				},
 				content:function(){
 					var num=0;
-					if(player.isDamaged()) num++;
-					if(player.countCards('h')-player.hp>1) num++;
+					if(player.getDamagedHp()>1) num++;
+					if(player.countCards('h')-player.getHp()>1) num++;
 					player.addMark('kotori_qunxin_temp',num,false);
 					player.addTempSkill('kotori_qunxin_temp','phaseDiscardEnd');
 				},
