@@ -2016,7 +2016,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card.name=='sha') return Infinity;
 					},
 					targetInRange:function(card,player,target){
-						if(card.name=='sha'&&player.getEquip(1)) return true;
+						if(card.name=='sha'&&player.getEquips(1).length>0) return true;
 					},
 				},
 				trigger:{player:'useCard'},
@@ -4088,9 +4088,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbliegong:{
 				audio:2,
 				mod:{
-				 cardnature:function(card,player){
-				 	if(!player.getEquip(1)&&get.name(card,player)=='sha') return false;
-				 },
+					cardnature:function(card,player){
+						if(player.hasEmptySlot(1)&&get.name(card,player)=='sha') return false;
+					},
 				},
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){

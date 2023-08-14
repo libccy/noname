@@ -381,30 +381,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relinglong:{
 				audio:2,
 				trigger:{
-					player:'loseAfter',
+					player:['loseAfter','disableEquipAfter','enableEquipAfter'],
 					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter','phaseBefore'],
 				},
 				forced:true,
 				onremove:true,
 				derivation:'reqicai',
 				filter:function(event,player){
-					if(event.name!='phase'&&(event.name!='equip'||event.player!=player)){
+					if(event.name=='disableEquip'||event.name=='enableEquip'){
+						if(!event.slots.contains('equip5')) return false;
+					}
+					else if(event.name!='phase'&&(event.name!='equip'||event.player!=player)){
 						var evt=event.getl(player);
-						if(!evt||!evt.es||!evt.es.some(i=>get.subtype(i)=='equip5')) return false;
+						if(!evt||!evt.es||!evt.es.some(i=>get.subtypes(i).contains('equip5'))) return false;
 					}
 					var skills=player.additionalSkills['relinglong'];
-					return skills&&skills.length&&player.getEquip(5)||!(skills&&skills.length)&&!player.getEquip(5);
+					return (skills&&skills.length>0)!=player.hasEmptySlot(5);
 				},
 				content:function(){
 					player.removeAdditionalSkill('relinglong');
-					if(!player.getEquip(5)){
+					if(player.hasEmptySlot(5)){
 						player.addAdditionalSkill('relinglong',['reqicai']);
 					}
 				},
 				group:['linglong_bagua','relinglong_directhit'],
 				mod:{
 					maxHandcard:function(player,num){
-						if(player.getEquip(3)||player.getEquip(4)||player.getEquip(6)) return;
+						if(!player.hasEmptySlot(3)||!player.hasEmptySlot(4)) return;
 						return num+2;
 					},
 				},
@@ -415,8 +418,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						filter:function(event,player){
 							if(event.card.name!='sha'&&get.type(event.card,false)!='trick') return false;
-							for(var i=2;i<=6;i++){
-								if(player.getEquip(i)) return false;
+							for(var i=2;i<6;i++){
+								if(!player.hasEmptySlot(i)) return false;
 							}
 							return true;
 						},
@@ -428,8 +431,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							directHit_ai:true,
 							skillTagFilter:function(player,tag,arg){
 								if(!arg||!arg.card||!arg.target||(arg.card.name!='sha'&&get.type(arg.card,false)!='trick')) return false;
-								for(var i=2;i<=6;i++){
-									if(player.getEquip(i)) return false;
+								for(var i=2;i<6;i++){
+									if(!player.hasEmptySlot(i)) return false;
 								}
 								return true;
 							},
@@ -969,7 +972,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){
-					return event.player.isIn()&&event.card&&event.card.name=='sha'&&event.cards.filterInD('od').length&&event.notLink()&&[2,3,4,6].some(i=>event.player.getEquip(i));
+					return event.player.isIn()&&event.card&&event.card.name=='sha'&&event.cards.filterInD('od').length&&
+						event.notLink()&&[2,3,4].some(i=>event.player.getEquips(i).length>0);
 				},
 				group:'remoshi_retrieve',
 				content:function(){
@@ -983,23 +987,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							global:['loseAfter','equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 						},
 						filter:function(event,player){
+							var keys=['equip2','equip3','equip4'];
 							return game.hasPlayer(current=>{
 								if(event.name=='gain'&&current==player) return false;
 								var cards=current.getExpansions('remoshi_stuck');
 								if(!cards.length) return false;
 								var evt=event.getl(current);
-								if(evt&&evt.cards2&&evt.cards2.some(i=>['equip2','equip3','equip4','equip6'].contains(get.subtype(i)))) return true;
+								if(evt&&evt.cards2&&evt.cards2.some(i=>get.subtypes(i).some(slot=>keys.contains(slot)))) return true;
 							});
 						},
 						direct:true,
 						forced:true,
 						content:function(){
 							'step 0'
+							var keys=['equip2','equip3','equip4'];
 							var targets=game.filterPlayer(current=>{
 								var cards=current.getExpansions('remoshi_stuck');
 								if(!cards.length) return false;
 								var evt=trigger.getl(current);
-								if(evt&&evt.cards2&&evt.cards2.some(i=>['equip2','equip3','equip4','equip6'].contains(get.subtype(i)))) return true;
+								if(evt&&evt.cards2&&evt.cards2.some(i=>get.subtypes(i).some(slot=>keys.contains(slot)))) return true;
 							});
 							event.targets=targets;
 							'step 1'
@@ -7915,7 +7921,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			regongji:{
 				mod:{
 					attackRangeBase:function(player){
-						if(player.getEquip(3)||player.getEquip(4)||player.getEquip(6)) return Infinity;
+						if(player.getEquips(3).length>0||player.getEquips(4).length>0) return Infinity;
 					},
 				},
 				enable:'phaseUse',
@@ -14660,7 +14666,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejiqiao:'机巧',
 			rejiqiao_info:'出牌阶段开始时，你可以弃置任意张牌，然后亮出牌堆顶X张牌（X为你以此法弃置的牌数与其中装备牌数之和），你获得其中所有非装备牌。',
 			relinglong:'玲珑',
-			relinglong_info:'锁定技。若你的装备区：没有防具牌，视为你装备【八卦阵】；没有坐骑牌，你的手牌上限+2；没有宝物牌，你视为拥有〖奇才〗；以上均满足：你使用的【杀】或普通锦囊牌不可被响应。',
+			relinglong_info:'锁定技。若你的装备区：有空置的防具栏，你视为拥有〖八卦阵〗；有空置的两种坐骑栏，你的手牌上限+2；有空置的宝物栏，你视为拥有〖奇才〗；以上均满足：你使用的【杀】或普通锦囊牌不可被响应。',
 			ol_zhangzhang:'界张昭张纮',
 			olzhijian:'直谏',
 			olzhijian_info:'出牌阶段，你可以将一张装备牌置于其他角色的装备区（可替换原装备），然后摸一张牌。',

@@ -1945,7 +1945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				derivation:['cheliji_sichengliangyu','cheliji_tiejixuanyu','cheliji_feilunzhanyu'],
 				filter:function(event,player){
-					return !player.getEquip(5)&&player.countCards('he',{color:'black'})>0;
+					return !player.getEquips(5).length&&player.countCards('he',{color:'black'})>0;
 				},
 				filterCard:{color:'black'},
 				position:'he',
@@ -2011,7 +2011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiangshou:{
 				mod:{
 					globalFrom:function(player,target,distance){
-						if(player.getEquip(5)) return distance-1;
+						if(player.getEquips(5).length) return distance-1;
 					}
 				},
 			},

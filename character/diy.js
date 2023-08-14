@@ -5026,11 +5026,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					check:function(button){
 						var player=_status.event.player;
 						if(typeof button.link=='number'){
-							var card=player.getEquip(button.link);
-							if(card){
-								var val=get.value(card);
-								if(val>0) return 0;
-								return 5-val;
+							if(!player.hasEmptySlot(button.link)){
+								var card=player.getEquip(button.link);
+								if(card){
+									var val=get.value(card);
+									if(val>0) return 0;
+									return 5-val;
+								}
 							}
 							switch(button.link){
 								case 3:return 4.5;break;

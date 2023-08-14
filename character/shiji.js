@@ -1203,7 +1203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&
 						event.source&&event.source.isIn()&&player!=event.source
-						&&event.cards.filterInD().length>0&&player.getEquip(1);
+						&&event.cards.filterInD().length>0&&player.getEquips(1).length>0;
 				},
 				check:function(event,player){
 					var card={
@@ -1222,7 +1222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return hs.contains(i);
 					}).length==cards.length&&player.canUse({name:'sha',cards:cards},target,false)){
 						var next=player.useCard({name:'sha'},cards,target,false);
-						if(!target.getEquip(1)) next.baseDamage=2;
+						if(!target.getEquips(1).length) next.baseDamage=2;
 					}
 				},
 			},
@@ -1241,11 +1241,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(card) player.gain(card,'gain2');
 					else{
 						var targets=game.filterPlayer(function(current){
-							return current.getEquip(1);
+							return current.getEquips(1).length>0;
 						});
 						if(targets.length){
 							var target=targets.randomGet();
-							player.gain(target.getEquip(1),target,'give','bySelf');
+							player.gain(target.getEquips(1),target,'give','bySelf');
 						}
 					}
 				},
@@ -5170,7 +5170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					chooseControl:function(event,player){
 						var list=[];
 						for(var i=1;i<6;i++){
-							if(player.getEquip(i)) list.push('equip'+i);
+							if(player.getEquips(i).length>0) list.push('equip'+i);
 						}
 						list.push('cancel2');
 						return list;

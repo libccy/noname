@@ -5,8 +5,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			standard:{
-				standard_2008:["caocao","simayi","xiahoudun","zhangliao","xuzhu","guojia","zhenji","liubei","guanyu","zhangfei","zhugeliang","zhaoyun","machao","huangyueying","sunquan","ganning","lvmeng","huanggai","zhouyu","daqiao","luxun","sunshangxiang","huatuo","lvbu","diaochan","re_lidian"],
-				standard_2013:["huaxiong","re_yuanshu","re_xushu"],
+				standard_2008:["caocao","simayi","xiahoudun","zhangliao","xuzhu","guojia","zhenji","liubei","guanyu","zhangfei","zhugeliang","zhaoyun","machao","huangyueying","sunquan","ganning","lvmeng","huanggai","zhouyu","daqiao","luxun","sunshangxiang","huatuo","lvbu","diaochan"],
+				standard_2013:["huaxiong","re_yuanshu","re_xushu","re_lidian"],
 				standard_2019:["gongsunzan","xf_yiji"],
 				standard_2023:["std_panfeng"],
 			},
@@ -2223,8 +2223,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('zhanshen');
-					var card=player.getEquip(1);
-					if(card) player.discard(card);
+					var card=player.getEquips(1);
+					if(cards.length) player.discard(card);
 					player.loseMaxHp();
 					player.addSkill('mashu');
 					player.addSkill('shenji');

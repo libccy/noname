@@ -2952,15 +2952,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return lib.filter.filterTarget.apply(this,arguments);
 						}).set('addCount',false).set('source',player).set('prompt2','对除'+get.translation(player)+'外的一名角色使用一张【杀】，并将装备区内的武器牌交给其中一名目标角色；或点击“取消”，令'+get.translation(player)+'视为对你使用一张【杀】，并获得你装备区内的武器牌');
 					'step 2'
-					var card=targets[0].getEquip(1);
+					var card=targets[0].getEquips(1);
 					if(result.bool){
 						player.addSkill('dclianji_1');
-						if(card&&result.targets.filter(target=>target.isIn()).length>0){
+						if(card.length&&result.targets.filter(target=>target.isIn()).length>0){
 							event.card=card;
 							targets[0].chooseTarget(true,'将'+get.translation(card)+'交给一名目标角色',(card,player,target)=>{
 								return _status.event.targets.contains(target);
 							}).set('ai',function(target){
-								var card=_status.event.getParent().card;
+								var card=_status.event.getParent().card[0];
 								return (target.hasSkillTag('nogain')?0:get.attitude(_status.event.player,target))*Math.max(0.1,target.getUseValue(card));
 							}).set('targets',result.targets);
 						} else event.finish();
@@ -2975,8 +2975,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 4'
 					player.useCard({name:'sha',isCard:true},targets[0],false);
 					'step 5'
-					var card=targets[0].getEquip(1);
-					if(card) targets[0].give(card,player,'give');
+					var card=targets[0].getEquips(1);
+					if(card.length) targets[0].give(card,player,'give');
 				},
 				ai:{
 					order:4,

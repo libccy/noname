@@ -6485,7 +6485,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var i of list){
 								if(player.hasEnabledSlot(i)){
 									var card=player.getEquip(i);
-									if(!card) return true;
+									if(!card||player.hasEmptySlot(i)) return true;
 									if(get.value(card,player)<=0) return true;
 								}
 							}
@@ -6499,7 +6499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								for(var i of list){
 									if(player.hasEnabledSlot(i)){
 										var card=player.getEquip(i);
-										if(!card) return 'equip'+i;
+										if(!card||player.hasEmptySlot(i)) return 'equip'+i;
 										if(get.value(card,player)<=0) return 'equip'+i;
 									}
 								}

@@ -7594,7 +7594,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				getNum:function(player,target){
 					var num=0;
 					if(target.isHealthy()) num++;
-					if(target.getEquip(2)) num++;
+					if(target.getEquips(2).length) num++;
 					var countSkill=function(player){
 						return player.getSkills(null,false,false).filter(function(skill){
 							var info=get.info(skill);
@@ -7991,11 +7991,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var name='zhuangshu_'+get.type2(result.cards[0],result.cards[0].original=='h'?player:false);
 						if(lib.card[name]&&trigger.player.isIn&&trigger.player.hasEmptySlot(5)){
 							var target=game.findPlayer(function(current){
-								var equip=current.getEquip(5);
+								var equip=current.getEquip(name);
 								return equip&&equip.name==name;
 							});
 							if(target){
-								var card=target.getEquip(5);
+								var card=target.getEquip(name);
 								target.$give(card,trigger.player,false);
 							}
 							else{
@@ -8045,8 +8045,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.type!='discard'||event.getlx===false) return false;
 					return game.hasPlayer(function(current){
 						if(player!=current){
-							var card=current.getEquip(5);
-							if(!card||card.name.indexOf('zhuangshu_')!=0) return false;
+							var cards=current.getEquips(5);
+							if(!cards.some(card=>card.name.indexOf('zhuangshu_')==0)) return false;
 						}
 						var evt=event.getl(current);
 						if(!evt||!evt.cards2) return false;
@@ -8061,8 +8061,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=[];
 					game.countPlayer(function(current){
 						if(player!=current){
-							var card=current.getEquip(5);
-							if(!card||card.name.indexOf('zhuangshu_')!=0) return false;
+							var cards=current.getEquips(5);
+							if(!cards.some(card=>card.name.indexOf('zhuangshu_')==0)) return false;
 						}
 						var evt=trigger.getl(current);
 						for(var i of evt.cards2){
@@ -10705,17 +10705,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return lib.filter.filterTarget.apply(this,arguments);
 					}).set('sourcex',targets[1]).set('addCount',false);
 					'step 2'
-					var card=targets[0].getEquip(1);
-					if(!result.bool&&card){
-						event.card=card;
-						player.chooseTarget(true,'将'+get.translation(card)+'交给一名其他角色').set('ai',function(target){
-							var card=_status.event.getParent().card;
-							return (target.hasSkillTag('nogain')?0:get.attitude(_status.event.player,target))*Math.max(0.1,target.getUseValue(card));
+					var cards=targets[0].getEquips(1);
+					if(!result.bool&&cards.length){
+						event.cards=cards;
+						player.chooseTarget(true,'将'+get.translation(cards)+'交给一名其他角色').set('ai',function(target){
+							var card=_status.event.getParent().cards;
+							return (target.hasSkillTag('nogain')?0:get.attitude(_status.event.player,target))*Math.max(0.1,target.getUseValue(cards[0]));
 						});
 					}
 					else event.finish();
 					'step 3'
-					result.targets[0].gain(card,result.targets[0],'give').giver=player;
+					result.targets[0].gain(cards,result.targets[0],'give').giver=player;
 				},
 				ai:{
 					order:4,
@@ -12023,7 +12023,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					'step 0'
 					player.chooseTarget(get.prompt('new_mumu'),'弃置一名角色装备区内的一张牌，或者获得一名角色装备区内的防具牌',function(card,player,target){
-						if(target==player) return target.getEquip(2)!=undefined;
+						if(target==player) return target.getEquips(2).length>0;
 						return target.countCards('e')>0;
 					}).set('ai',function(target){
 						var player=_status.event.player;
@@ -12038,12 +12038,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target=result.targets[0];
 						player.logSkill('new_mumu',event.target);
 						player.line(event.target,'green');
-						var e=event.target.getEquip(2);
+						var e=event.target.getEquips(2);
 						event.e=e;
 						if(target==player) event.choice='获得一张防具牌';
-						else if(e){
+						else if(e.length>0){
 							player.chooseControl('弃置一张装备牌','获得一张防具牌').set('ai',function(){
-								if(_status.event.player.getEquip(2)){
+								if(_status.event.player.getEquips(2).length>0){
 									return '弃置一张装备牌';
 								}
 								return '获得一张防具牌';
@@ -12052,7 +12052,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							event.choice='弃置一张装备牌';
 						}
-					}else event.finish();
+					}
+					else event.finish();
 					'step 2'
 					var choice=event.choice||result.control;
 					if(choice=='弃置一张装备牌'){
@@ -12826,8 +12827,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.gain(card,'gain2');
 					}
 					'step 2'
-					var equip1=target.getEquip(1);
-					if(equip1){
+					var equip1=target.getEquips(1);
+					if(equip1.length){
 						game.delay();
 						target.give(equip1,player);
 						target.line(player);
@@ -12864,8 +12865,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.list=result.targets.slice(0);
 					}
 					'step 2'
-					var equip1=player.getEquip(1);
-					if(equip1){
+					var equip1=player.getEquips(1);
+					if(equip1.length){
 						for(var i=0;i<event.list.length;i++){
 							if(event.list[i].isDead()) event.list.splice(i--,1);
 						}
@@ -16275,20 +16276,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'linglong_bagua',
 				mod:{
 					cardUsable:function(card,player,num){
-						if(card.name=='sha'&&!player.getEquip(1)) return num+1;
+						if(card.name=='sha'&&player.hasEmptySlot(1)) return num+1;
 					},
 					maxHandcard:function(player,num){
-						if(player.getEquip(3)||player.getEquip(4)||player.getEquip(6)) return;
+						if(!player.hasEmptySlot(3)||!player.hasEmptySlot(4)) return;
 						return num+1;
 					},
 					targetInRange:function(card,player,target,now){
-						if(player.getEquip(5)) return;
+						if(!player.hasEmptySlot(5)) return;
 						var type=get.type(card);
 						if(type=='trick'||type=='delay') return true;
 					},
 					canBeDiscarded:function (card,source,player){
-						if(player.getEquip(5)) return;
-						if(get.position(card)=='e'&&['equip2','equip5'].contains(get.subtype(card))) return false;
+						if(!player.hasEmptySlot(5)) return;
+						if(get.position(card)=='e'&&get.subtypes(card).some(slot=>slot=='equip2'||slot=='equip5')) return false;
 					},
 					/*cardDiscardable:function (card,player){
 						if(player.getEquip(5)) return;
@@ -16863,15 +16864,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					if(target==player) return false;
-					return target.getEquip(1)||target.getEquip(2);
+					return target.getEquips(1).length>0||target.getEquips(2).length>0;
 				},
 				content:function(){
 					'step 0'
-					var e1=target.getEquip(1);
-					var e2=target.getEquip(2);
+					var e1=target.getEquips(1);
+					var e2=target.getEquips(2);
 					event.e1=e1;
 					event.e2=e2;
-					if(e1&&e2){
+					if(e1.length&&e2.length){
 						player.chooseControl('武器牌','防具牌').set('ai',function(){
 							if(_status.event.player.getEquip(2)){
 								return '武器牌';
@@ -16879,7 +16880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return '防具牌';
 						});
 					}
-					else if(e1){
+					else if(e1.length){
 						event.choice='武器牌';
 					}
 					else{
@@ -18868,7 +18869,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.turnOver();
 					"step 1"
 					var num=game.countPlayer(function(current){
-						return current.getEquip(1);
+						return current.getEquips(1).length;
 					});
 					player.draw(2+num);
 					player.addSkill('kuiwei2');
@@ -18887,7 +18888,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:false,
 				content:function(){
 					var num=game.countPlayer(function(current){
-						return current.getEquip(1);
+						return current.getEquips(1).length;
 					});
 					if(num>=player.countCards('he')){
 						player.discard(player.getCards('he'));

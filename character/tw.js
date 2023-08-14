@@ -5960,7 +5960,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:['enterGame','phaseZhunbeiBegin']
 				},
 				filter:function(event,player){
-					if(player.getEquip(1)) return false;
+					if(player.getEquips(1).length) return false;
 					return event.name!='phase'||game.phaseNumber==0;
 				},
 				forced:true,
@@ -6000,7 +6000,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
-					if(!player.getEquip(1)) return false;
+					if(!player.getEquips(1).length) return false;
 					return game.hasPlayer(function(current){
 						return player.inRange(current)&&player.canCompare(current);
 					});
@@ -6052,8 +6052,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else if(!result.tie){
-						var card=player.getEquip(1);
-						if(card) target.gain(card,player,'give');
+						var card=player.getEquips(1);
+						if(card.length) target.gain(card,player,'give');
 					}
 				},
 				mod:{
@@ -6073,7 +6073,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'twjianwei',
 						trigger:{player:'compare',target:'compare'},
 						filter:function(event,player){
-							if(!player.getEquip(1)||player.getAttackRange()<=0) return false;
+							if(!player.getEquips(1).length||player.getAttackRange()<=0) return false;
 							if(event.player==player) return !event.iwhile;
 							return true;
 						},
@@ -6112,8 +6112,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 2'
 							if(!result.tie){
 								if(result.bool){
-									var card=player.getEquip(1);
-									if(card) trigger.player.gain(card,player,'give');
+									var card=player.getEquips(1);
+									if(card.length) trigger.player.gain(card,player,'give');
 								}
 								else {
 									var num=0;
@@ -12160,7 +12160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var card=get.cardPile(function(card){
-							return card.name=='meiyingqiang'&&card!=player.getEquip(1);
+							return card.name=='meiyingqiang'&&!player.getEquips(1).contains(card);
 						},'field');
 						if(card) player.equip(card);
 					}

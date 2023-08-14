@@ -6504,17 +6504,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var source=event.source;
 					if(!source) return false;
-					var card=source.getEquip(1);
-					return card&&get.itemtype(card)=='card'&&lib.filter.canBeGained(card,player,source);
+					var cards=source.getEquips(1);
+					return cards.length&&cards.some(card=>lib.filter.canBeGained(card,player,source));
 				},
 				prompt2:function(event){
-					return '获得其装备区中的'+get.translation(event.source.getEquip(1));
+					var source=event.source;
+					var cards=source.getEquips(1).filter(card=>lib.filter.canBeGained(card,player,source));
+					return '获得其装备区中的'+get.translation(cards);
 				},
 				check:function(event,player){
 					return (get.attitude(player,event.source)+0.1)*get.value(event.source.getEquip(1),event.source);
 				},
 				content:function(){
-					player.gain(trigger.source.getEquip(1),trigger.source,'give','bySelf');
+					var source=trigger.source;
+					var cards=source.getEquips(1).filter(card=>lib.filter.canBeGained(card,player,source));
+					player.gain(cards,source,'give','bySelf');
 				},
 			},
 			xinanjian:{
@@ -9466,14 +9470,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					cardUsable:function(card,player,num){
-						var cardx=player.getEquip('rewrite_zhuge');
-						if(card.name=='sha'&&(!cardx||player.hasSkill('rw_zhuge_skill',null,false)||(!_status.rw_zhuge_temp&&!ui.selected.cards.contains(cardx)))){
-							return Infinity;
+						var cards=player.getEquips('rewrite_zhuge')
+						if(card.name=='sha'){
+							if(!cards.length||player.hasSkill('rw_zhuge_skill',null,false)||cards.some(card=>(card!=_status.rw_zhuge_temp&&!ui.selected.cards.contains(card)))){
+								if(get.is.versus()||get.is.changban()){
+									return num+3;
+								}
+								return Infinity;
+							}
 						}
 					},
 					cardEnabled2:function(card,player){
 						if(!_status.event.addCount_extra||player.hasSkill('rw_zhuge_skill',null,false)) return;
-						if(card&&card==player.getEquip('rewrite_zhuge')){
+						var cards=player.getEquips('rewrite_zhuge');
+						if(card&&cards.contains(card)){
 							try{
 								var cardz=get.card();
 							}
@@ -9481,7 +9491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return;
 							}
 							if(!cardz||cardz.name!='sha') return;
-							_status.rw_zhuge_temp=true;
+							_status.rw_zhuge_temp=card;
 							var bool=lib.filter.cardUsable(get.autoViewAs({name:'sha'},ui.selected.cards.concat([card])),player);
 							delete _status.rw_zhuge_temp;
 							if(!bool) return false;
@@ -11222,22 +11232,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.chooseTarget(2,function(card,player,target){
 						if(ui.selected.targets.length){
 							if(!_status.event.ingame){
-								var cards=ui.selected.targets[0].getEquip(2);
-								return target.canEquip(card)
+								var cards=ui.selected.targets[0].getEquips(2);
+								return cards.some(card=>target.canEquip(card))
 							}
 							var from=ui.selected.targets[0];
 							if(target.isMin()) return false;
 							var es=from.getCards('e');
 							for(var i=0;i<es.length;i++){
-								if(['equip3','equip4'].contains(get.subtype(es[i]))&&target.getEquip('liulongcanjia')) continue;
-								if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
 								if(target.canEquip(es[i])) return true;
 							}
 							return false;
 						}
 						else{
 							if(!event.ingame){
-								if(target.getEquip(2)) return true;
+								if(target.getEquips(2).length) return true;
 								return false;
 							}
 							return target.countCards('e')>0;
@@ -11253,9 +11261,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(get.attitude(player,current)>0){
 										var es=target.getCards('e');
 										for(var i=0;i<es.length;i++){
-											if(['equip3','equip4'].contains(get.subtype(es[i]))&&current.getEquip('liulongcanjia')) continue;
-											else if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
-											else if(current.canEquip(es[i])) return true;
+											if(current.canEquip(es[i])) return true;
 										}
 										return false;
 									}
@@ -11267,8 +11273,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var es=ui.selected.targets[0].getCards('e');
 							var i;
 							for(i=0;i<es.length;i++){
-								if(['equip3','equip4'].contains(get.subtype(es[i]))&&target.getEquip('liulongcanjia')) continue;
-								if(es[i].name=='liulongcanjia'&&target.countCards('e',{subtype:['equip3','equip4']})>1) continue;
 								if(target.canEquip(es[i])) break;
 							}
 							if(i==es.length) return 0;
@@ -11289,21 +11293,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(targets.length==2){
 						if(!event.ingame){
-							event._result={
+							var cards=targets[0].getEquips(2);
+							if(cards.length==1) event._result={
 								bool:true,
-								links:[targets[0].getEquip(2)],
-							};
+								links:cards,
+							}
+							else{
+								player.choosePlayerCard('e',true,function(button){
+									return get.equipValue(button.link);
+								},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
+									if(!get.subtypes(button.link,false).contains('equip2')) return false;
+									var targets1=_status.event.targets1;
+									return targets1.canEquip(button.link);
+								});
+							}
 						}
 						else{
-						player.choosePlayerCard('e',true,function(button){
-							return get.equipValue(button.link);
-						},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
-							var targets1=_status.event.targets1;
-								if(['equip3','equip4'].contains(get.subtype(button.link))&&targets1.getEquip('liulongcanjia')) return false;
-								if(button.link.name=='liulongcanjia'&&targets1.countCards('e',{subtype:['equip3','equip4']})>1) return false;
-								return !targets1.countCards('e',{subtype:get.subtype(button.link)});
-							
-						});
+							player.choosePlayerCard('e',true,function(button){
+								return get.equipValue(button.link);
+							},targets[0]).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
+								var targets1=_status.event.targets1;
+								return targets1.canEquip(button.link);
+							});
 						}
 					}
 					else event.finish();
@@ -12405,7 +12416,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'damageEnd'},
 						forced:true,
 						filter:function(event,player){
-							return !player.getEquip('ly_piliche');
+							return !player.getEquips('ly_piliche').length;
 						},
 						content:function(){
 							'step 0'
@@ -12419,7 +12430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							if(card) player.chooseUseTarget(card,true,'nopopup');
 							'step 3'
-							if(event.count>0&&!player.getEquip('ly_piliche')) event.goto(1);
+							if(event.count>0&&!player.getEquips('ly_piliche').length) event.goto(1);
 						},
 					},
 				},

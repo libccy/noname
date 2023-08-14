@@ -718,7 +718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0)&&player.hasEquipableSlot(1);
+					return (event.name!='phase'||game.phaseNumber==0)&&player.hasEquipableSlot(1)&&!player.getEquips('ruyijingubang').length;
 				},
 				content:function(){
 					var card=game.createCard2('ruyijingubang','heart',9);
@@ -804,10 +804,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							content:function(){
 								var num=lib.skill.ruyijingubang_skill_backup.num;
 								player.storage.ruyijingubang_skill=num;
-								var card=player.getEquip(1);
-								if(card&&card.name=='ruyijingubang'){
-									card.storage.ruyijingubang_skill=num;
-									game.log(player,'将',card,'的攻击范围改为'+num)
+								var card=player.getEquips(1);
+								for(var card of cards){
+									if(card&&card.name=='ruyijingubang'){
+										card.storage.ruyijingubang_skill=num;
+										game.log(player,'将',card,'的攻击范围改为'+num)
+									}
 								}
 								player.markSkill('ruyijingubang_skill');
 							},

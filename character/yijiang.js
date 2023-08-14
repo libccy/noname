@@ -6231,7 +6231,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var num=Math.min(game.countPlayer(function(current){
 						return player.inRange(current);
-					}),player.getEquip(1)?4:2);
+					}),player.getEquips(1).length?4:2);
 					if(trigger.target.countCards('h')<num){
 						event.directfalse=true;
 					}
@@ -6256,8 +6256,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(!event.directfalse&&result.bool){
-						var e1=player.getEquip(1);
-						if(e1){
+						var e1=player.getEquips(1);
+						if(e1.length){
 							player.discard(e1,'notBySelf');
 						}
 						event.finish();
@@ -6318,14 +6318,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.player)<0;
 				},
 				filter:function(event,player){
-					return event.getParent().name=='sha'&&player.getEquip(1);
+					return event.getParent().name=='sha'&&player.getEquips(1).length>0;
 				},
 				content:function(){
 					'step 0'
-					var num=1;
-					var info=get.info(player.getEquip(1));
-					if(info&&info.distance&&info.distance.attackFrom){
-						num-=info.distance.attackFrom;
+					var num=0,cards=player.getEquips(1);
+					for(var card of cards){
+						var numz=1;
+						var info=get.info(card,false);
+						if(info&&info.distance&&info.distance.attackFrom){
+							numz-=info.distance.attackFrom;
+						}
+						num+=numz;
 					}
 					if(trigger.player.countCards('h')<num){
 						event.directfalse=true;
@@ -6351,8 +6355,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(!event.directfalse&&result.bool){
-						var e1=player.getEquip(1);
-						if(e1){
+						var e1=player.getEquips(1);
+						if(e1.length){
 							player.discard(e1,'notBySelf');
 						}
 					}
@@ -8966,7 +8970,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var prompt='弃置一张牌'
-					if(trigger.source.getEquip(1)) prompt+=('，然后获得'+get.translation(trigger.source)+'装备区中的'+get.translation(trigger.source.getEquip(1)));
+					if(trigger.source.getEquips(1).length) prompt+=('，然后获得'+get.translation(trigger.source)+'装备区中的'+get.translation(trigger.source.getEquips(1)));
 					var next=player.chooseToDiscard('he',get.prompt('duodao',trigger.source),prompt);
 					next.logSkill=['duodao',trigger.source];
 					next.set('ai',function(card){
@@ -8977,8 +8981,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 0;
 					});
 					'step 1'
-					if(result.bool&&trigger.source.getEquip(1)){
-						player.gain(trigger.source.getEquip(1),trigger.source,'give','bySelf');
+					if(result.bool&&trigger.source.getEquips(1).length){
+						player.gain(trigger.source.getEquips(1),trigger.source,'give','bySelf');
 					}
 				},
 				ai:{
@@ -9058,27 +9062,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reduodao:{
 				trigger:{target:'useCardToTargeted'},
 				filter:function(event,player){
-					return event.card.name=='sha'&&(get.color(event.card)=='red'?event.player.getEquip(1):player.countCards('he')>0);
+					return event.card.name=='sha'&&(get.color(event.card)=='red'?event.player.getEquips(1).length>0:player.countCards('he')>0);
 				},
 				direct:true,
 				audio:2,
 				content:function(){
 					'step 0'
 					var prompt='弃置一张牌'
-					if(trigger.player.getEquip(1)) prompt+=('，然后获得'+get.translation(trigger.player)+'装备区中的'+get.translation(trigger.player.getEquip(1)));
+					if(trigger.player.getEquips(1).length) prompt+=('，然后获得'+get.translation(trigger.player)+'装备区中的'+get.translation(trigger.player.getEquips(1)));
 					var next=player.chooseToDiscard('he',get.prompt('reduodao',trigger.player),prompt);
 					next.logSkill=['reduodao',trigger.player];
 					next.set('ai',function(card){
-						if(!_status.event.getTrigger().player.getEquip(1)) return 0;
-						if(get.attitude(_status.event.player,_status.event.getTrigger().player)*get.value(_status.event.getTrigger().player.getEquip(1))<=0){
+						if(!_status.event.getTrigger().player.getEquips(1).length) return 0;
+						if(get.attitude(_status.event.player,_status.event.getTrigger().player)*get.value(_status.event.getTrigger().player.getEquips(1))<=0){
 							return 6-get.value(card);
 						}
 						return 0;
 					});
 					'step 1'
-					if(result.bool&&trigger.player.getEquip(1)){
+					if(result.bool&&trigger.player.getEquips(1).length){
 						if(!result.cards||!result.cards.length) player.logSkill('reduodao',trigger.player);
-						player.gain(trigger.player.getEquip(1),trigger.player,'give','bySelf');
+						player.gain(trigger.player.getEquips(1),trigger.player,'give','bySelf');
 					}
 				},
 			},
@@ -11827,7 +11831,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:2,
 				filter:function(event,player){
-					if(player.getEquip(2)) return false;
+					if(!player.hasEmptySlot(2)) return false;
 					return (event.card.name=='sha'&&get.color(event.card)=='black')
 				},
 				content:function(){
@@ -11836,10 +11840,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(player==target&&get.subtype(card)=='equip2'){
+							if(player==target&&get.subtypes(card).contains('equip2')){
 								if(get.equipValue(card)<=8) return 0;
 							}
-							if(target.getEquip(2)) return;
+							if(!player.hasEmptySlot(2)) return;
 							if(card.name=='sha'&&get.color(card)=='black') return 'zerotarget';
 						}
 					}

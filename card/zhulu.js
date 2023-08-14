@@ -809,7 +809,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
-					var cards=player.getEquip('wufengjian');
+					var cards=player.getEquips('wufengjian');
 					return player.hasCard(function(card){
 						return !cards.contains(card);
 					},'he');

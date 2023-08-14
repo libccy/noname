@@ -10703,6 +10703,7 @@
 			cooperation_use:'戮力',
 			cooperation_use_info:'双方累计使用至少4种花色的牌',
 			charge:'蓄力值',
+			expandedSlots:'扩展装备栏',
 		},
 		element:{
 			content:{
@@ -10782,7 +10783,7 @@
 						if(!player.expandedSlots[slot]) player.expandedSlots[slot]=0;
 						player.expandedSlots[slot]+=expand;
 					}
-					player.$syncDisable();
+					player.$syncExpand();
 				},
 				//选择顶装备要顶的牌
 				replaceEquip:function(){
@@ -18467,6 +18468,18 @@
 				//判断判定区是否被废除
 				isDisabledJudge:function(){
 					return Boolean(this.storage._disableJudge);
+				},
+				//同步显示扩展装备区状态
+				$syncExpand:function(map){
+					var player=this;
+					if(!map){
+						map=(player.expandedSlots||{});
+					}
+					game.broadcast(function(player,map){
+						player.expandedSlots=map;
+						player.$syncExpand(map);
+					},player,map);
+					player.markSkill('expandedSlots');
 				},
 				//同步装备区废除牌显示状态
 				$syncDisable:function(map){
@@ -28871,6 +28884,36 @@
 			}
 		},
 		skill:{
+			expandedSlots:{
+				markimage:'image/card/expandedSlots.png',
+				intro:{
+					markcount:function(storage,player){
+						var all=0,storage=player.expandedSlots;
+						if(!storage) return 0;
+						for(var key in storage){
+							var num=storage[key];
+							if(typeof num=='number'&&num>0){
+								all+=num;
+							}
+						}
+						return all;
+					},
+					content:function(storage,player){
+						storage=player.expandedSlots;
+						if(!storage) return '当前没有扩展装备栏';
+						var keys=Object.keys(storage).sort();
+						var str='';
+						for(var key of keys){
+							var num=storage[key];
+							if(typeof num=='number'&&num>0){
+								str+='<li>'+get.translation(key)+'栏：'+num+'个<br>'
+							}
+						}
+						if(str.length) return str.slice(0,str.length-4);
+						return '当前没有扩展装备栏';
+					},
+				},
+			},
 			charge:{
 				markimage:'image/card/charge.png',
 				intro:{
@@ -37586,8 +37629,9 @@
 			var name=arguments[arguments.length-2];
 			var skills=arguments[arguments.length-1];
 			if(skills.getSkills){
-				if(name!='cardname') skills=skills.getSkills();
-				else skills=skills.getSkills(null,false);
+				//if(name!='cardname') skills=skills.getSkills();
+				//else skills=skills.getSkills(null,false);
+				skills=skills.getSkills();
 			}
 			skills=skills.concat(lib.skill.global);
 			game.expandSkills(skills);
@@ -56709,11 +56753,14 @@
 			}
 			var value1=get.equipValue(card,target);
 			var value2=0;
-			var current=target.getEquip(card);
-			if(current&&current!=card){
-				value2=get.equipValue(current,target);
-				if(value2>0&&!target.needsToDiscard()&&!get.tag(card,'valueswap')){
-					return 0;
+			if(!player.canEquip(card)){
+				if(!player.canEquip(card,true)) return 0;
+				var current=target.getEquip(card);
+				if(current&&current!=card){
+					value2=get.equipValue(current,target);
+					if(value2>0&&!target.needsToDiscard()&&!get.tag(card,'valueswap')){
+						return 0;
+					}
 				}
 			}
 			return Math.max(0,value1-value2)/5;
