@@ -3786,7 +3786,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var suit2=get.suit(i.card);
 						if(!lib.suit.contains(suit2)) continue;
 						if(i!=event&&suit2==suit) return false;
-						list.add(suit2);
+						if(i.finished) list.add(suit2);
 					}
 					return list.length>1&&list.length<5;
 				},
@@ -3799,7 +3799,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(i.getParent('phaseUse')!=evt) continue;
 						var suit2=get.suit(i.card);
 						if(!lib.suit.contains(suit2)) continue;
-						list.add(suit2);
+						if(i.finished) list.add(suit2);
 					}
 					var prompt,filterTarget,ai;
 					switch(list.length){
@@ -13525,7 +13525,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spqishe_info:'你可以将一张装备牌当做【酒】使用。你的手牌上限+X（X为你装备区内的牌数）。',
 			sp_maojie:'毛玠',
 			bingqing:'秉清',
-			bingqing_info:'当你于出牌阶段内使用的牌结算结束后，若你于本阶段内使用的所有其他牌与此牌花色均不相同，则你可根据X的值执行对应效果：为2，你令一名角色摸两张牌；为3，你弃置一名角色区域内的一张牌；为4，你对一名其他角色造成1点伤害。（X为你本阶段内使用过的牌中包含的花色数）',
+			bingqing_info:'当你于出牌阶段内使用的牌结算结束后，若你于本阶段内使用的所有已结算结束的其他牌与此牌花色均不相同，则你可根据X的值执行对应效果：为2，你令一名角色摸两张牌；为3，你弃置一名角色区域内的一张牌；为4，你对一名其他角色造成1点伤害。（X为你本阶段内使用过的已结算结束的牌中包含的花色数）',
 			yingfeng:'迎奉',
 			yingfeng_info:'准备阶段，你可以令一名角色获得“奉”标记并移除场上所有其他的“奉”标记。有“奉”标记的角色使用牌没有距离限制。',
 			xin_sunxiu:'手杀孙休',
