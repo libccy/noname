@@ -504,8 +504,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var names=map[first];
 							return !names.contains(changshi);
 						});
-						if(list.length==0) return others.randomGets(1);
-						return list;
+						return list.length?list:others;
 					}());
 					next.set('ai',button=>{
 						if(button.link=='scs_gaowang') return 10;
@@ -1492,6 +1491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						wuxie:function(){
 							'step 0'
 							var trigger=event.getParent().getTrigger();
+							if(!trigger.respondTo){event.finish();return;}
 							var target=trigger.respondTo[0];
 							event.target=target;
 							if(!target||!target.countGainableCards(player,player==target?'e':'he')) event._result={bool:false};
