@@ -16050,7 +16050,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							name2=name2.slice(name2.indexOf('_')+1);
 						}
 					}
-					return (lib.perfectPair[name1]&&lib.perfectPair[name1].contains(name2))||(lib.perfectPair[name2]&&lib.perfectPair[name2].contains(name1));
+					var list=Object.keys(lib.perfectPair).concat(Object.values(lib.perfectPair)).flat(Infinity);
+					if(!list.contains(name1)||!list.contains(name2)) return false;
+					return (lib.perfectPair[name1]&&lib.perfectPair[name1].flat(Infinity).contains(name2))||(lib.perfectPair[name2]&&lib.perfectPair[name2].flat(Infinity).contains(name1));
 				},
 				siege:function(player){
 					if(this.identity=='unknown'||this.hasSkill('undist')) return false;

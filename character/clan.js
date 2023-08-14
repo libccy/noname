@@ -83,18 +83,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(card){
 						if(_status.event.dying&&_status.event.num>0&&lib.skill.dcweidang.getLength(card)>_status.event.num) return 1/lib.skill.dcweidang.getLength(card);//怂
 						return lib.skill.dcweidang.getLength(card);//勇
-					}).set('dying',player.hp+player.countCards('hs',{name:['tao','jiu']})<1).set('num',event.num);
+					}).set('dying',player.hp+player.countCards('hs',{name:['tao','jiu']})<1).set('num',event.num1);
 					'step 4'
 					if(result.bool){
 						player.logSkill('clanyuzhi');
 						player.showCards(result.cards,get.translation(player)+'发动了【迂志】');
 						player.draw(lib.skill.dcweidang.getLength(result.cards[0]));
+						player.storage.clanyuzhi=lib.skill.dcweidang.getLength(result.cards[0]);
+						player.markSkill('clanyuzhi');
 					}
+					else player.unmarkSkill('clanyuzhi');
 				},
 				ai:{
 					threaten:3,
 					nokeep:true,
 				},
+				onremove:true,
+				intro:{content:'本轮野心：#张'},
 			},
 			clanxieshu:{
 				audio:2,
