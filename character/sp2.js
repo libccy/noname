@@ -8005,10 +8005,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.markAuto('pingjian',[result.control]);
 					player.addTempSkill(result.control);
 					player.storage.pingjian_check[result.control]=(trigger.name=='damage'?trigger:'phaseJieshu');
-					if(trigger.name=='damage'){
-						var info=lib.translate[result.control+'_info'];
-						if(info&&info.indexOf('1点伤害')+info.indexOf('一点伤害')!=-2) trigger.num=1;//暂时想到的让多点伤害只执行一次的拙见
-					}
 				},
 				group:'pingjian_use',
 				phaseUse_special:[],
