@@ -7998,7 +7998,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							if(event.numFixed||player.isDisabled(5)) return false;
 							return !game.hasPlayer(function(current){
-								return current.getEquip('yuxi');
+								return current.getEquips('yuxi').length>0;
 							})
 						},
 						content:function(){trigger.num++},
@@ -8016,7 +8016,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return game.hasPlayer(function(current){
 								return player.canUse('zhibi',current);
 							})&&!game.hasPlayer(function(current){
-								return current.getEquip('yuxi');
+								return current.getEquips('yuxi').length>0;
 							});
 						},
 						content:function(){
@@ -8383,7 +8383,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player;
 							if(!game.hasPlayer(function(current){
 								return !current.isUnseen()&&current.getEquip('yuxi')||current.hasSkill('gzyongsi')&&!game.hasPlayer(function(current){
-									return current.getEquip('yuxi');
+									return current.getEquips('yuxi').length>0;
 								});
 							})&&game.hasPlayer(function(current){return current!=player&&current.isUnseen()})){
 								var identity;
@@ -10937,7 +10937,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:function(item,player){
 						if(player.hasSkillTag('noe')||!player.countCards('h',function(card){
-							return get.type(card)=='equip'&&player.getEquip(get.subtype(card))&&player.hasValueTarget(card);
+							return get.type(card)=='equip'&&!player.canEquip(card)&&player.hasValueTarget(card);
 						})) return 1;
 						return 10;
 					},
@@ -12868,7 +12868,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var range1=[1,player.maxHp];
 					if(player.hasSkill('dinglanyemingzhu_skill')){
 						for(var i=0;i<ui.selected.cards.length;i++){
-							if(ui.selected.cards[i]==player.getEquip(5)) return range1;
+							if(ui.selected.cards[i]==player.getEquip('dinglanyemingzhu')) return range1;
 						}
 						return [1,Infinity]
 					}
@@ -12876,7 +12876,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				filterCard:function(card,player){
 					if(ui.selected.cards.length<player.maxHp||!player.hasSkill('dinglanyemingzhu_skill')) return true;
-					return card!=player.getEquip(5);
+					return card!=player.getEquip('dinglanyemingzhu');
 				},
 				complexCard:true,
 				complexSelect:true,
