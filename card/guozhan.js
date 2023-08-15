@@ -264,16 +264,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip6',
+				subtypes:['equip3','equip4'],
 				nomod:true,
 				nopower:true,
-				unique:true,
+				//unique:true,
 				distance:{
 					globalFrom:-1,
 					globalTo:+1,
-				},
-				customSwap:function(card){
-					var type=get.subtype(card,false);
-					return type=='equip3'||type=='equip4'||type=='equip6';
 				},
 				skills:['liulongcanjia'],
 				ai:{
@@ -833,8 +830,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:"equip2",
 				skills:['huxinjing'],
 				filterTarget:function(card,player,target){
-					if(get.mode()!='guozhan') return true;
-					return player==target;
+					if(get.mode()=='guozhan'&&player!=target) return false;
+					return target.canEquip(card,true);
 				},
 				selectTarget:function(){
 					return get.mode()=='guozhan'?-1:1;
@@ -1221,8 +1218,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			liulongcanjia:{
 				equipSkill:true,
 				mod:{
-					targetEnabled:function(card,player,target){
-						if(['equip3','equip4'].contains(get.subtype(card))) return false;
+					canBeReplaced:function(card,player){
+						return false;
 					},
 				},
 			},
@@ -1282,7 +1279,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return [1,player.maxHp];
 				},
 				filterCard:function(card,player){
-					return card!=player.getEquip(5);
+					var cards=player.getEquips('dinglanyemingzhu');
+					if(cards.length) return cards.some(card2=>card2!=card&&!ui.selected.cards.contains(card2))
+					return true;
 				},
 				prompt:'出牌阶段限一次，你可以弃置至多X张牌（X为你的体力上限），然后摸等量的牌'
 			},
@@ -1729,13 +1728,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:player,
 						card:event.card
 					})) return false;
+					var cards=player.getEquips('huxinjing');
+					if(!cards.length) return false;
 					if(get.mode()!='guozhan'&&event.num>1) return true;
 					return event.num>=player.hp;
 				},
 				content:function(){
 					trigger.cancel();
-					var e2=player.getEquip('huxinjing');
-					if(e2){
+					var e2=player.getEquips('huxinjing');
+					if(e2.length){
 						player.discard(e2);
 					}
 					player.removeSkill('huxinjing');
@@ -1799,7 +1800,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		translate:{
 			liulongcanjia:'六龙骖驾',
-			liulongcanjia_info:'锁定技。①你计算与其他角色的距离-1，其他角色计算与你的距离+1。②当此牌进入你的装备区时，你弃置你装备区内其他坐骑牌。③你的装备区内不能置入其他坐骑牌。',
+			liulongcanjia_info:'锁定技。此牌占用1个进攻坐骑和1个防御坐骑槽位，且不可被替换。你计算与其他角色的距离-1，其他角色计算与你的距离+1。',
 			minguangkai:'明光铠',
 			minguangkai_cancel:'明光铠',
 			minguangkai_link:'明光铠',
@@ -1862,8 +1863,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			jingfanma_info:'你的进攻距离+1',
 			huxinjing_bg:'镜',
 			huxinjing:'护心镜',
-			huxinjing_info:'此牌可对其他角色使用。当你受到伤害时，若伤害值大于1或大于等于你的体力值，则你可以将【护心镜】置入弃牌堆，然后防止此伤害。',
-			huxinjing_info_guozhan:'当你受到伤害时，若伤害值大于等于你的体力值，则你可以将【护心镜】置入弃牌堆，然后防止此伤害。',
+			huxinjing_info:'此牌可对其他角色使用。当你受到伤害时，若伤害值大于1或大于等于你的体力值，则你可以将所有【护心镜】置入弃牌堆，然后防止此伤害。',
+			huxinjing_info_guozhan:'当你受到伤害时，若伤害值大于等于你的体力值，则你可以将所有【护心镜】置入弃牌堆，然后防止此伤害。',
 			gz_haolingtianxia:'号令天下',
 			gz_haolingtianxia_info:'出牌阶段，对一名体力值不为全场最少的角色使用。所有其他角色依次选择一项：①弃置一张牌（魏势力角色无需弃牌），视为对目标角色使用一张【杀】；②弃置目标角色的一张牌（魏势力角色改为获得其一张牌）。',
 			gz_kefuzhongyuan:'克复中原',

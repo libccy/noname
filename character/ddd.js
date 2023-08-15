@@ -3405,7 +3405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						direct:true,
 						filter:function(event,player){
-							return event.source&&event.source.isIn()&&event.source.getEquip(1);
+							return event.source&&event.source.isIn()&&event.source.getEquips(1).length>0;
 						},
 						content:function(){
 							'step 0'

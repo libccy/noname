@@ -1000,7 +1000,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return player.storage.disableEquip!=undefined&&player.storage.disableEquip.length<5;
+					return player.hasEnabledSlot(1)||player.hasEnabledSlot(2)||player.hasEnabledSlot(5)||player.hasEnabledSlot('horse');
 				},
 				content:function(){
 					'step 0'
@@ -1032,11 +1032,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:13,
 					result:{
 						player:function(player){
-							if(!player.isDisabled('equip2')) return 1;
-							if(!player.isDisabled('equip1')&&(player.countCards('h',function(card){
+							if(player.hasEnabledSlot('equip2')) return 1;
+							if(player.hasEnabledSlot('equip1')&&(player.countCards('h',function(card){
 								return get.name(card,player)=='sha'&&player.hasValueTarget(card);
 							})-player.getCardUsable('sha'))>1) return 1;
-							if(!player.isDisabled('equip5')&&player.countCards('h',function(card){
+							if(player.hasEnabledSlot('equip5')&&player.countCards('h',function(card){
 								return get.type2(card,player)=='trick'&&player.hasUseTarget(card);
 							})>1) return 1;
 							return -1;
@@ -1114,7 +1114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.type(card)=='equip';
 				},
 				check:function(card){
-					if(_status.event.player.isDisabled(get.subtype(card))) return 5;
+					if(!_status.event.player.canEquip(card)) return 5;
 					return 3-get.value(card);
 				},
 				content:function(){
@@ -1268,24 +1268,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'gray',
 				limited:true,
-				init:function(player){
-					player.storage.drlt_xiongluan=false;
-				},
 				filter:function(event,player){
-					if(player.storage.drlt_xiongluan) return false;
-					return true;
+					return !player.isDisabledJudge()||player.hasEnabledSlot();
 				},
 				filterTarget:function(card,player,target){
 					return target!=player;
 				},
 				content:function(){
 					player.awakenSkill('drlt_xiongluan');
-					player.storage.drlt_xiongluan=true;
-					player.disableEquip('equip1');
-					player.disableEquip('equip2');
-					player.disableEquip('equip3');
-					player.disableEquip('equip4');
-					player.disableEquip('equip5');
+					var disables=[];
+					for(var i=1;i<=5;i++){
+						for(var j=0;j<player.countEnabledSlot(i);j++){
+							disables.push(i);
+						}
+					}
+					if(disables.length>0) player.disableEquip(disables);
 					player.disableJudge();
 					player.addTempSkill('drlt_xiongluan1');
 					player.storage.drlt_xiongluan1=target;
@@ -2584,11 +2581,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('filterCard',lib.filter.cardDiscardable);
 					'step 2'
 					if(result.bool&&result.cards.length){
-						if(get.type(result.cards[0])=='equip'&&!player.isDisabled(get.subtype(result.cards[0]))){
-							player.chooseUseTarget(result.cards[0],true,'nopopup');
+						var card=result.cards[0];
+						if(get.type(card)=='equip'&&player.hasUseTarget(card)){
+							player.chooseUseTarget(card,true,'nopopup');
 						}
 						else{
-							player.discard(result.cards[0]);
+							player.discard(card);
 						}
 					}
 				},
@@ -3979,8 +3977,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					if(target.isMin()) return false;
-					var type=get.subtype(card);
-					return player!=target&&target.isEmpty(type);
+					return player!=target&&target.canEquip(card);
 				},
 				content:function(){
 					target.equip(cards[0]);
@@ -5421,7 +5418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				inherit:'bagua_skill',
 				filter:function(event,player){
 					if(!lib.skill.bagua_skill.filter(event,player)) return false;
-					if(!player.isEmpty(2)) return false;
+					if(!player.hasEmptySlot(2)) return false;
 					return true;
 				},
 				ai:{
@@ -5431,7 +5428,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player==target&&get.subtype(card)=='equip2'){
 								if(get.equipValue(card)<=7.5) return 0;
 							}
-							if(!target.isEmpty(2)) return;
+							if(!target.hasEmptySlot(2)) return;
 							return lib.skill.bagua_skill.ai.effect.target.apply(this,arguments);
 						}
 					}

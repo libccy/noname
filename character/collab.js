@@ -718,53 +718,54 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0)&&!player.isDisabled(1);
+					return (event.name!='phase'||game.phaseNumber==0)&&player.hasEquipableSlot(1)&&!player.getEquips('ruyijingubang').length;
 				},
 				content:function(){
 					var card=game.createCard2('ruyijingubang','heart',9);
 					player.$gain2(card,false);
+					game.delayx();
 					player.equip(card);
 				},
 				mod:{
 					canBeGained:function(card,source,player){
-						if(card==player.getEquip(1)&&card.name=='ruyijingubang') return false;
+						if(player.getEquips('ruyijingubang').contains(card)) return false;
 					},
 					canBeDiscarded:function(card,source,player){
-						if(card==player.getEquip(1)&&card.name=='ruyijingubang') return false;
+						if(player.getEquips('ruyijingubang').contains(card)) return false;
+					},
+					canBeReplaced:function(card,player){
+						if(player.getEquips('ruyijingubang').contains(card)) return false;
 					},
 					cardname:function(card){
 						if(get.subtype(card,false)=='equip1') return 'sha';
 					},
 					cardnature:function(card){
-						if(get.subtype(card,false)=='equip1') return false;
-					},
-					targetEnabled:function(card){
-						if(get.subtype(card)=='equip1') return false;
+						if(get.subtypes(card,false).contains('equip1')) return false;
 					},
 					cardDiscardable:function(card,player){
-						if(card==player.getEquip(1)&&card.name=='ruyijingubang') return false;
+						if(player.getEquips('ruyijingubang').contains(card)) return false;
 					},
 					cardEnabled2:function(card,player){
-						if(card==player.getEquip(1)&&card.name=='ruyijingubang') return false;
+						if(player.getEquips('ruyijingubang').contains(card)) return false;
 					},
 				},
 				group:'dcruyi_blocker',
 				subSkill:{
 					blocker:{
-						trigger:{player:['loseBefore','equipBefore','disableEquipBefore']},
+						trigger:{player:['loseBefore','disableEquipBefore']},
 						forced:true,
 						filter:function(event,player){
-							if(event.name=='disableEquip') return (event.pos=='equip1');
-							var card=player.getEquip(1);
-							if(!card||card.name!='ruyijingubang') return false;
-							if(event.name=='equip'){
-								return get.subtype(event.card)=='equip1';
-							}
-							return event.cards.contains(card);
+							if(event.name=='disableEquip') return (event.slots.contains('equip1'));
+							var cards=player.getEquips('ruyijingubang');
+							return event.cards.some(card=>cards.contains(card));
 						},
 						content:function(){
-							if(trigger.name=='lose') trigger.cards.remove(player.getEquip(1));
-							else trigger.cancel();
+							if(trigger.name=='lose'){
+								trigger.cards.remove(player.getEquips('ruyijingubang'));
+							}
+							else{
+								while(trigger.slots.contains('equip1')) trigger.slots.remove('equip1');
+							}
 						},
 					},
 				},
@@ -803,10 +804,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							content:function(){
 								var num=lib.skill.ruyijingubang_skill_backup.num;
 								player.storage.ruyijingubang_skill=num;
-								var card=player.getEquip(1);
-								if(card&&card.name=='ruyijingubang'){
-									card.storage.ruyijingubang_skill=num;
-									game.log(player,'将',card,'的攻击范围改为'+num)
+								var card=player.getEquips(1);
+								for(var card of cards){
+									if(card&&card.name=='ruyijingubang'){
+										card.storage.ruyijingubang_skill=num;
+										game.log(player,'将',card,'的攻击范围改为'+num)
+									}
 								}
 								player.markSkill('ruyijingubang_skill');
 							},

@@ -3447,10 +3447,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				charlotte:true,
 				filter:function(event,player){
-					return !player.isDisabled(1);
+					return player.hasEnabledSlot(1);
 				},
 				content:function(){
-					if(player.isEmpty(1)){
+					if(player.hasEmptySlot(1)){
 						var card=get.cardPile2(function(card){
 							return get.subtype(card)=='equip1'&&!get.cardtag(card,'gifts')&&player.canUse(card,player);
 						});
@@ -4176,12 +4176,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card,player){
 					if(!player) player=_status.event.player;
 					return game.hasPlayer(function(current){
-						return current!=player&&current.isEmpty(get.subtype(card,false));
+						return current!=player&&current.canEquip(card);
 					});
 				},
 				position:'e',
 				filterTarget:function(card,player,target){
-					return target!=player&&target.isEmpty(get.subtype(ui.selected.cards[0],false));
+					return target!=player&&target.canEquip(ui.selected.cards[0]);
 				},
 				check:function(card){
 					if(get.value(card)<=0) return 10;
@@ -4196,6 +4196,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 7/Math.max(1,get.value(card));
 					}
 					return 0;
+				},
+				promptfunc:function(){
+					var players=game.filterPlayer(function(current){
+						return current.hasSkill('kotomi_chuanxiang');
+					});
+					return '将一张装备牌传给其他角色，然后令'+get.translation(players)+'摸一张牌。若传给该角色，则其改为摸两张牌。'
 				},
 				prepare:'give',
 				discard:false,
@@ -4899,7 +4905,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'disableEquipAfter'},
 				forced:true,
 				filter:function(event,player){
-					return player.countDisabled()>=5&&!player._chihaya_liewu;
+					return !player.hasEnabledSlot()&&!player._chihaya_liewu;
 				},
 				skillAnimation:true,
 				animationColor:'orange',
@@ -4920,7 +4926,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.type(card)=='equip';
 				},
 				check:function(card){
-					if(_status.event.player.isDisabled(get.subtype(card))) return 5;
+					if(!_status.event.player.hasEquipableSlot(get.subtype(card))) return 5;
 					return 3-get.value(card);
 				},
 				content:function(){
@@ -4956,14 +4962,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.chihaya_youfeng=false;
 				},
 				hiddenCard:function(player,name){
-					if(player.storage.chihaya_youfeng&&player.countDisabled()>=5) return false;
+					if(player.storage.chihaya_youfeng&&!player.hasEnabledSlot()) return false;
 					if(player.hasSkill('chihaya_youfeng_'+(player.storage.chihaya_youfeng||false))) return false;
 					var type=get.type(name);
 					if(player.storage.chihaya_youfeng) return type=='basic';
 					return type=='trick';
 				},
 				filter:function(event,player){
-					if(player.storage.chihaya_youfeng&&player.countDisabled()>=5) return false;
+					if(player.storage.chihaya_youfeng&&!player.hasEnabledSlot()) return false;
 					if(player.hasSkill('chihaya_youfeng_'+(player.storage.chihaya_youfeng||false))) return false;
 					var type=player.storage.chihaya_youfeng?'basic':'trick';
 					for(var name of lib.inpile){
@@ -4982,7 +4988,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							table.style.width='100%';
 							table.style.position='relative';
 							for(var i=1;i<6;i++){
-								if(player.isDisabled(i)) continue;
+								if(!player.hasEnabledSlot(i)) continue;
 								var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 								td.innerHTML='<span>'+get.translation('equip'+i)+'</span>';
 								td.link=i;
@@ -5020,11 +5026,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					check:function(button){
 						var player=_status.event.player;
 						if(typeof button.link=='number'){
-							var card=player.getEquip(button.link);
-							if(card){
-								var val=get.value(card);
-								if(val>0) return 0;
-								return 5-val;
+							if(!player.hasEmptySlot(button.link)){
+								var card=player.getEquip(button.link);
+								if(card){
+									var val=get.value(card);
+									if(val>0) return 0;
+									return 5-val;
+								}
 							}
 							switch(button.link){
 								case 3:return 4.5;break;
@@ -5215,20 +5223,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sakuya_junbu:{
 				mod:{
 					targetInRange:function(card,player){
-						if(player.countDisabled()>=1) return true;
+						if(player.countDisabledSlot()>=1) return true;
 					},
 					cardUsable:function(card,player){
-						if(player.countDisabled()>=2) return Infinity;
+						if(player.countDisabledSlot()>=2) return Infinity;
 					},
 				},
 				trigger:{player:'useCard2'},
 				direct:true,
 				filter:function(event,player){
-					if(player.countDisabled()>=4) return true;
+					if(player.countDisabledSlot()>=4) return true;
 					return lib.skill.sakuya_junbu.filter2.apply(this,arguments);
 				},
 				filter2:function(event,player){
-					if(player.countDisabled()<3) return false;
+					if(player.countDisabledSlot()<3) return false;
 					var card=event.card;
 					var info=get.info(card);
 					if(info.allowMultiple==false) return false;
@@ -5243,7 +5251,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					if(player.countDisabled()>=4){
+					if(player.countDisabledSlot()>=4){
 						trigger.directHit.addArray(game.players);
 						if(!lib.skill.sakuya_junbu.filter2(trigger,player)){
 							event.finish();
@@ -5280,7 +5288,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						sub:true,
 						filter:function(event,player){
-							return player.countDisabled()>=5&&event.getParent().type=='card';
+							return !player.hasEnabledSlot()&&event.getParent().type=='card';
 						},
 						logTarget:'player',
 						content:function(){
@@ -6536,7 +6544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player==target) return false;
 					var card=ui.selected.cards[0];
 					if(get.type(card,false)=='delay') return target.canAddJudge({name:card.name});
-					return target.isEmpty(get.subtype(card,false));
+					return target.canEquip(card);
 				},
 				discard:false,
 				lose:false,
@@ -10178,13 +10186,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				mod:{
 					cardUsable:function(card,player,num){
-						if(card.name=='sha'&&player.isDisabled(1)) return num+1;
+						if(card.name=='sha'&&player.hasDisabledSlot(1)) return num+1;
 					},
 					globalFrom:function(from,to,distance){
-						if(from.isDisabled(4)) return distance-1;
+						if(from.hasDisabledSlot(4)) return distance-1;
 					},
 					globalTo:function(from,to,distance){
-						if(to.isDisabled(3)) return distance+1;
+						if(to.hasDisabledSlot(3)) return distance+1;
 					},
 				},
 				enable:'phaseUse',
@@ -10192,7 +10200,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var list=['equip1','equip2','equip3','equip4','equip5'];
 					for(var i=0;i<list.length;i++){
-						if(!player.isDisabled(list[i])&&(!player.storage.kengo_guidui2||!player.storage.kengo_guidui2.contains(list[i]))) return true;
+						if(player.hasEnabledSlot(list[i])&&(!player.storage.kengo_guidui2||!player.storage.kengo_guidui2.contains(list[i]))) return true;
 					}
 					return false;
 				},
@@ -10200,16 +10208,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var list=['equip1','equip2','equip3','equip4','equip5'];
 					for(var i=0;i<list.length;i++){
-						if(player.isDisabled(list[i])||player.storage.kengo_guidui2&&player.storage.kengo_guidui2.contains(list[i])) list.splice(i--,1);
+						if(!player.hasEnabledSlot(list[i])||player.storage.kengo_guidui2&&player.storage.kengo_guidui2.contains(list[i])) list.splice(i--,1);
 					}
 					player.chooseControl(list).set('prompt','请选择废除一个装备栏').ai=function(){
-						if(list.contains('equip1')&&player.isEmpty('equip1')&&player.countCards('h',function(card){
+						if(list.contains('equip1')&&player.hasEmptySlot('equip1')&&player.countCards('h',function(card){
 							return card.name=='sha'&&player.getUseValue(card)>0
 						})) return 'equip1';
-						if(list.contains('equip3')&&player.isEmpty('equip3')) return 'equip3';
-						if(list.contains('equip4')&&player.isEmpty('equip4')) return 'equip4';
-						if(list.contains('equip5')&&player.isEmpty('equip5')) return 'equip5';
-						if(list.contains('equip2')&&player.isEmpty('equip2')) return 'equip2';
+						if(list.contains('equip3')&&player.hasEmptySlot('equip3')) return 'equip3';
+						if(list.contains('equip4')&&player.hasEmptySlot('equip4')) return 'equip4';
+						if(list.contains('equip5')&&player.hasEmptySlot('equip5')) return 'equip5';
+						if(list.contains('equip2')&&player.hasEmptySlot('equip2')) return 'equip2';
 						return list.randomGet();
 					};
 					'step 1'
@@ -10226,7 +10234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardToPlayered'},
 				forced:true,
 				filter:function(event,player){
-					return event.card.name=='sha'&&player.isDisabled(1)&&event.target.countCards('he')>0;
+					return event.card.name=='sha'&&player.hasDisabledSlot(1)&&event.target.countCards('he')>0;
 				},
 				logTarget:'target',
 				content:function(){
@@ -10240,7 +10248,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'hes',
 				prompt:'将一张牌当做闪使用或打出',
 				viewAsFilter:function(player){
-					return player.isDisabled(2)&&player.countCards('hes')>0;
+					return player.hasDisabledSlot(2)&&player.countCards('hes')>0;
 				},
 				check:function(card){
 					return 1/Math.max(0.1,get.value(card));
@@ -10248,7 +10256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					respondShan:true,
 					skillTagFilter:function(player){
-						return player.isDisabled(2)&&player.countCards('he')>0;
+						return player.hasDisabledSlot(2)&&player.countCards('he')>0;
 					},
 				},
 			},
@@ -10256,17 +10264,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
-					return player.countDisabled()>0;
+					return player.countDisabledSlot()>0;
 				},
 				content:function(){
-					var list=['equip1','equip2','equip3','equip4','equip5'];
-					for(var i=0;i<list.length;i++){
-						if(!player.isDisabled(list[i])) list.splice(i--,1);
-						else player.enableEquip(list[i]);
+					var list=[];
+					for(var i=1;i<=5;i++){
+						for(var j=0;j<player.countDisabledSlot(i);j++){
+							list.push('equip'+i)
+						}
 					}
+					player.enableEquip(list);
 					if(!player.storage.kengo_guidui2) player.storage.kengo_guidui2=[];
 					player.storage.kengo_guidui2.addArray(list);
-					//player.addTempSkill('kengo_guidui2');
 				},
 			},
 			kengo_guidui2:{onremove:true},
@@ -12118,7 +12127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					var list=[];
 					for(var i=1;i<6;i++){
-						if(!trigger.source.isDisabled(i)) list.add('equip'+((i==3||i==4)?6:i));
+						if(trigger.source.hasEnabledSlot(i)) list.add('equip'+((i==3||i==4)?'3_4':i));
 					}
 					if(list.length){
 						player.chooseControl(list).set('prompt','选择废除'+get.translation(trigger.source)+'的一种装备栏').set('ai',function(){
@@ -12131,10 +12140,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.goto(2);
 					'step 1'
-					if(result.control!='equip6') trigger.source.disableEquip(result.control);
+					if(result.control!='equip3_4') trigger.source.disableEquip(result.control);
 					else{
-						trigger.source.disableEquip(3);
-						trigger.source.disableEquip(4);
+						trigger.source.disableEquip(3,4);
 					}
 					'step 2'
 					if(player.awakenedSkills.contains('nsxingchu')){
@@ -18711,7 +18719,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_xiuzheng:'修真',
 			ns_xiuzheng_info:'出牌阶段限一次，你可选择一名其他角色，然后展示牌堆顶的两张牌，若同为红色，则其受到一点火焰伤害；若同为黑色，其受到一点雷电伤害；若颜色不相同，你弃置其一张牌。然后你获得这两张展示的牌后再弃置两张牌',
 			nsanruo:'暗弱',
-			nsanruo_info:'锁定技，你手牌中的[杀]和普通锦囊牌(借刀杀人等带有指向目标的锦囊除外)均对你不可见。但你可以正常使用之',
+			nsanruo_info:'锁定技，你手牌中的【杀】和普通锦囊牌(借刀杀人等带有指向目标的锦囊除外)均对你不可见。但你可以正常使用之',
 			nsxunshan:'循善',
 			nsxunshan_info:'锁定技，你使用【暗弱】牌可以为其指定任意名合法目标（托管无效）',
 			nskaicheng:'开城',
@@ -18857,10 +18865,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			youzhan_info:'当以你距离不大于1的角色为目标的【杀】的使用结算开始时，你可以弃置一张装备牌，令该角色视为使用【诱敌深入】',
 			kangyin:'亢音',
 			kangyin2:'亢音',
-			kangyin_info:'出牌阶段限一次，你可以失去1点体力并选择一名其他角色，弃置该角色的一张牌。若此牌：为基本牌，你可以令一至X名角色各摸一张牌；不为基本牌，于此回合内：你的进攻距离+X，且你使用杀的额外目标数上限+X。（X为你已损失的体力值）',
+			kangyin_info:'出牌阶段限一次，你可以失去1点体力并选择一名其他角色，弃置该角色的一张牌。若此牌：为基本牌，你可以令一至X名角色各摸一张牌；不为基本牌，于此回合内：你的进攻距离+X，且你使用【杀】的额外目标数上限+X。（X为你已损失的体力值）',
 			zhucheng:'筑城',
 			zhucheng2:'筑城',
-			zhucheng_info:'①结束阶段开始时，若没有“筑”，你可以将牌堆顶的X张牌置于你的武将牌上〔称为“筑”〕（X为你已损失的体力值与1中的较大值），否则你可以获取所有“筑”。②当你成为杀的目标时，若有“筑”，你可以令此杀的使用者弃置X张牌（X为“筑”的数量），否则杀对你无效',
+			zhucheng_info:'①结束阶段开始时，若没有“筑”，你可以将牌堆顶的X张牌置于你的武将牌上〔称为“筑”〕（X为你已损失的体力值与1中的较大值），否则你可以获取所有“筑”。②当你成为【杀】的目标时，若有“筑”，你可以令此杀的使用者弃置X张牌（X为“筑”的数量），否则杀对你无效',
 			duoqi:'夺气',
 			duoqi_info:'当一名角色于除你之外的角色的出牌阶段内因弃置而失去牌后，你可以移去一张“筑”，并结束此出牌阶段',
 

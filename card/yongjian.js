@@ -161,7 +161,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					value:function(card,player){
-						if(player.getEquip(1)==card) return 0;
+						if(player.getEquips(1).contains(card)) return 0;
 						return 4;
 					},
 					equipValue:function(card,player){
@@ -195,7 +195,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquip(1)==card) return -3;
+						if(player.getEquips(1).contains(card)) return -3;
 						return 3;
 					},
 					basic:{
@@ -229,7 +229,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquip(2)==card) return -3;
+						if(player.getEquips(2).contains(card)) return -3;
 						return 3;
 					},
 					basic:{
@@ -263,7 +263,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 1;
 					},
 					value:function(card,player){
-						if(player.getEquip(2)==card) return -2.5;
+						if(player.getEquips(2).contains(card)) return -2.5;
 						return 2.5;
 					},
 					basic:{
@@ -297,7 +297,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:9,
 					equipValue:0,
 					value:function(card,player){
-						if(player.getEquip(2)==card) return 0;
+						if(player.getEquips(2).contains(card)) return 0;
 						return 0.5;
 					},
 					basic:{
@@ -706,7 +706,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yonglv_info:'锁定技。其他角色至你的距离视为1。',
 			yonglv_append:'<span class="text" style="font-family: yuanli">它旁边的就是王仲宣。</span>',
 			zhanxiang:'战象',
-			zhanxiang_info:'锁定技。当你成为〖赠予〗的目标后，你将此次赠予的效果改为“将赠予牌移动至弃牌堆”。',
+			zhanxiang_info:'锁定技。①其他角色至你的距离+1。②当你成为〖赠予〗的目标后，你将此次赠予的效果改为“将赠予牌移动至弃牌堆”。',
 			xinge:'信鸽',
 			xinge_info:'出牌阶段限一次。你可以将一张手牌交给一名其他角色。',
 			xinge_append:'<span class="text" style="font-family: yuanli">咕咕咕。</span>',

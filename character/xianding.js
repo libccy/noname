@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
-			dc_duyu:['male','wei',3,['dcjianguo','dcdyqingshi'],['unseen']],
+			dc_duyu:['male','wei',4,['dcjianguo','dcdyqingshi']],
 			ganfurenmifuren:['female','shu',3,['dcchanjuan','dcxunbie']],
 			dc_ganfuren:['female','shu',3,['dcshushen','dcshenzhi']],
 			dc_mifuren:['female','shu',3,['dcguixiu','dccunsi']],
@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huanfan:['male','wei',3,['dcjianzheng','dcfumou']],
 			chentai:['male','wei',4,['dcctjiuxian','dcchenyong']],
 			sunyu:['male','wu',3,['dcquanshou','dcshexue'],['unseen']],
-			xizheng:['male','shu',3,['dcdanyi','dcwencan'],['unseen']],
+			xizheng:['male','shu',3,['dcdanyi','dcwencan']],
 			dc_ruiji:['female','wu',4,['dcwangyuan','dclingyin','dcliying']],
 			zerong:['male','qun',4,['dccansi','dcfozong']],
 			xielingyu:['female','wu',3,['dcyuandi','dcxinyou']],
@@ -1556,6 +1556,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						storage:{dcctjiuxian:true}
 					},true);
 				},
+				ai:{
+					order:5.5,
+					result:{player:1},
+				},
 				subSkill:{
 					help:{
 						trigger:{global:'damageSource'},
@@ -1827,12 +1831,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!event.targets||!event.targets.length) return false;
 					var evt=lib.skill.dcjianying.getLastUsed(player,event.getParent());
 					if(!evt||!evt.targets||!evt.targets.length||evt.targets.length!=event.targets.length) return false;
-					var targetsx=event.targets.slice().sort((a,b)=>a.seatNum-b.seatNum);
-					var targetsy=evt.targets.slice().sort((a,b)=>a.seatNum-b.seatNum);
-					for(var i=0;i<targetsx.length;i++){
-						if(targetsx[i]!=targetsy[i]) return false;
-					}
-					return true;
+					var targetsx=event.targets.slice();
+					var targetsy=evt.targets.slice();
+					return targetsx.slice().removeArray(targetsy).length==0&&targetsy.slice().removeArray(targetsx).length==0;
 				},
 				frequent:true,
 				locked:false,
@@ -2951,15 +2952,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return lib.filter.filterTarget.apply(this,arguments);
 						}).set('addCount',false).set('source',player).set('prompt2','对除'+get.translation(player)+'外的一名角色使用一张【杀】，并将装备区内的武器牌交给其中一名目标角色；或点击“取消”，令'+get.translation(player)+'视为对你使用一张【杀】，并获得你装备区内的武器牌');
 					'step 2'
-					var card=targets[0].getEquip(1);
+					var card=targets[0].getEquips(1);
 					if(result.bool){
 						player.addSkill('dclianji_1');
-						if(card&&result.targets.filter(target=>target.isIn()).length>0){
+						if(card.length&&result.targets.filter(target=>target.isIn()).length>0){
 							event.card=card;
 							targets[0].chooseTarget(true,'将'+get.translation(card)+'交给一名目标角色',(card,player,target)=>{
 								return _status.event.targets.contains(target);
 							}).set('ai',function(target){
-								var card=_status.event.getParent().card;
+								var card=_status.event.getParent().card[0];
 								return (target.hasSkillTag('nogain')?0:get.attitude(_status.event.player,target))*Math.max(0.1,target.getUseValue(card));
 							}).set('targets',result.targets);
 						} else event.finish();
@@ -2974,8 +2975,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 4'
 					player.useCard({name:'sha',isCard:true},targets[0],false);
 					'step 5'
-					var card=targets[0].getEquip(1);
-					if(card) targets[0].give(card,player,'give');
+					var card=targets[0].getEquips(1);
+					if(card.length) targets[0].give(card,player,'give');
 				},
 				ai:{
 					order:4,
@@ -4246,7 +4247,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 					}
 					else{
-						return !player.isDisabled(5);
+						return player.hasEquipableSlot(5);
 					}
 				},
 				direct:true,
@@ -5241,7 +5242,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				content:function(){
-					if(player.isDisabled(5)||player.getEquip('dagongche')){
+					if(!player.hasEquipableSlot(5)||player.getEquip('dagongche')){
 						var next=player.phaseUse();
 						event.next.remove(next);
 						trigger.getParent().next.push(next);
@@ -8645,7 +8646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.num=1;
 						'step 1'
 						var type='equip'+num;
-						if(!player.isEmpty(type)) return;
+						if(!player.hasEmptySlot(type)) return;
 						var card=get.cardPile2(function(card){
 							return get.subtype(card,false)==type&&player.canUse(card,player);
 						});
@@ -10745,7 +10746,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinyingbing_info:'锁定技。每回合每名角色限一次，当你使用牌指定有“咒”的角色为目标后，你摸两张牌。',
 			wufan:'吴范',
 			tianyun:'天运',
-			tianyun_info:'①游戏的第一个回合开始前，你从牌堆中获得手牌区内没有的花色的各一张牌。②一名角色的回合开始时，若其座位号等于游戏轮数，则你可观看牌堆顶的X张牌并以任意顺序置于牌堆顶或牌堆顶。若你将所有的牌均置于了牌堆底，则你可以令一名角色摸X张牌，然后失去1点体力。（X为你手牌中包含的花色数）',
+			tianyun_info:'①游戏的第一个回合开始前，你从牌堆中获得手牌区内没有的花色的各一张牌。②一名角色的回合开始时，若其座位号等于游戏轮数，则你可观看牌堆顶的X张牌并以任意顺序置于牌堆顶或牌堆底。若你将所有的牌均置于了牌堆底，则你可以令一名角色摸X张牌，然后失去1点体力。（X为你手牌中包含的花色数）',
 			wfyuyan:'预言',
 			wfyuyan_info:'一轮游戏开始时，你选择一名角色（对其他角色不可见）：当第一次有角色于本轮内进入濒死状态时，若其是你选择的角色，则你获得〖奋音〗直到你的回合结束；当第一次有角色于本轮内造成伤害后，若其是你选择的角色，则你摸两张牌。',
 			re_fengfangnv:'冯妤',

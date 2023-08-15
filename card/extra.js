@@ -399,7 +399,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					value:function(card,player,index,method){
 						if(player.isDisabled(2)) return 0.01;
-						if(card==player.getEquip(2)){
+						if(player.getEquips('tengjia').contains(card)){
 							if(player.hasSkillTag('noDirectDamage')) return 10;
 							if(game.hasPlayer(function(current){
 								return current!=player&&get.attitude(current,player)<0&&current.hasSkillTag('fireAttack',null,null,true);
@@ -555,7 +555,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							cards.splice(i--,1);
 						}
 					}
-					var muniu=player.getEquip(5);
+					var muniu=player.getEquip('muniu');
 					if(!muniu||!cards.length){
 						for(var i=0;i<cards.length;i++){
 							cards[i].discard();
@@ -570,8 +570,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},muniu,muniu.cards);
 					game.delayx();
 					"step 2"
+					var muniu=player.getEquip('muniu');
 					var players=game.filterPlayer(function(current){
-						if(!current.getEquip(5)&&current!=player&&!current.isTurnedOver()&&
+						if(current.canEquip(muniu)&&current!=player&&!current.isTurnedOver()&&
 							get.attitude(player,current)>=3&&get.attitude(current,player)>=3){
 							return true;
 						}
@@ -579,15 +580,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					players.sort(lib.sort.seat);
 					var choice=players[0];
 					var next=player.chooseTarget('是否移动木牛流马？',function(card,player,target){
-						return !target.isMin()&&player!=target&&target.isEmpty(5);
-					});
+						return !target.isMin()&&player!=target&&target.canEquip(_status.event.muniu);
+					}).set('muniu',muniu)
 					next.set('ai',function(target){
 						return target==_status.event.choice?1:-1;
 					});
 					next.set('choice',choice);
 					"step 3"
 					if(result.bool){
-						var card=player.getEquip(5);
+						var card=player.getEquip('muniu');
 						result.targets[0].equip(card);
 						player.$give(card,result.targets[0]);
 						player.line(result.targets,'green');
@@ -618,7 +619,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				intro:{
 					content:function(storage,player){
-						var muniu=player.getEquip(5);
+						var muniu=player.getEquip('muniu');
 						if(!muniu||!muniu.cards||!muniu.cards.length) return '共有〇张牌';
 						if(player.isUnderControl(true)){
 							return get.translation(muniu.cards);
@@ -628,7 +629,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					mark:function(dialog,storage,player){
-						var muniu=player.getEquip(5);
+						var muniu=player.getEquip('muniu');
 						if(!muniu||!muniu.cards||!muniu.cards.length) return '共有〇张牌';
 						if(player.isUnderControl(true)){
 							dialog.addAuto(muniu.cards);
@@ -638,7 +639,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					markcount:function(storage,player){
-						var muniu=player.getEquip(5);
+						var muniu=player.getEquip('muniu');
 						if(muniu&&muniu.cards) return muniu.cards.length;
 						return 0;
 					}
@@ -658,7 +659,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}).length>0;
 				},
 				content:function(){
-					var muniu=player.getEquip(5);
+					var muniu=player.getEquip('muniu');
 					if(muniu&&muniu.cards){
 						muniu.cards.removeArray(trigger.ss);
 						lib.skill.muniu_skill.sync(muniu);
@@ -787,7 +788,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							//if(card.name=='nanman'||card.name=='wanjian'||card.name=='chuqibuyi') return 'zerotarget';
 							if(card.name=='nanman'||card.name=='wanjian') return 'zerotarget';
 							if(card.name=='sha'){
-								var equip1=player.getEquip(1);
+								var equip1=player.getEquip('zhuque');
 								if(equip1&&equip1.name=='zhuque') return 1.9;
 								if(!card.nature) return 'zerotarget';
 							}

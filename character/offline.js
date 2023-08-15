@@ -1577,10 +1577,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				getNum:function(target,player){
-					return target.countCards('e',card=>{
-						var subtype=get.subtype(card);
-						return player.isDisabled(subtype);
-					})
+					return target.countCards(card=>{
+						var subtype=get.subtypes(card);
+						for(var i of subtype){
+							if(player.hasDisabledSlot(i)) return true;
+						}
+						return false;
+					});
 				},
 				group:'jsrgjuezhi_disable',
 				content:function(){
@@ -1603,19 +1606,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							event.cards=trigger.getl(player).es;
 							'step 1'
-							var card=cards.shift(),subtype=get.subtype(card);
-							event.subtype=subtype;
-							if(!player.isDisabled(subtype)){
-								player.chooseBool(get.prompt('jsrgjuezhi_disable'),'废除你的'+get.translation(subtype)+'栏').set('ai',()=>1);
+							var card=cards.shift(),subtypes=get.subtypes(card).filter(slot=>player.hasEnabledSlot(slot));
+							event.subtypes=subtypes;
+							if(subtypes.length>0){
+								player.chooseBool(get.prompt('jsrgjuezhi_disable'),'废除你的'+get.translation(subtypes)+'栏').set('ai',()=>1);
 							}
 							else event._result={bool:false};
 							'step 2'
 							if(result.bool){
 								player.logSkill('jsrgjuezhi_disable');
-								var list=[];
-								if(event.subtype=='equip6') list.addArray(['3','4']);
-								else list.add(event.subtype);
-								for(var i of list) player.disableEquip(i);
+								player.disableEquip(event.subtypes);
 							}
 							if(cards.length>0) event.goto(1);
 						},
@@ -1666,7 +1666,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(current.isMin()) return false;
 						var es=target.getCards('e');
 						for(var i=0;i<es.length;i++){
-							if(current.isEmpty(get.subtype(es[i]))) return true;
+							if(current.canEquip(es[i])) return true;
 						}
 						return false;
 					});
@@ -1688,7 +1688,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(sgnatt!=0&&att2!=0&&sgnatt!=att2&&
 									get.sgn(get.value(es[i],from))==-att2&&
 									get.sgn(get.effect(target,es[i],player,target))==sgnatt&&
-									target.isEmpty(get.subtype(es[i]))){
+									target.canEquip(es[i])){
 									return Math.abs(att);
 								}
 							}
@@ -1740,7 +1740,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return targets1.canAddJudge(button.link);
 							}
 							else{
-								return targets1.isEmpty(get.subtype(button.link));
+								return targets1.canEquip(button.link);
 							}
 						});
 					}
@@ -2253,11 +2253,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				shaRelated:true,
 				filter:function(event,player){
-					return event.isFirstTarget&&event.card.name=='sha'&&!player.getEquip(1)&&!player.isDisabled(1);
+					return event.isFirstTarget&&event.card.name=='sha'&&player.hasEmptySlot(1);
 				},
 				content:function(){
-					trigger.getParent().targets=trigger.getParent().targets.concat(trigger.targets);
-					trigger.getParent().triggeredTargets4=trigger.getParent().triggeredTargets4.concat(trigger.targets);
+					// trigger.getParent().targets=trigger.getParent().targets.concat(trigger.targets);
+					// trigger.getParent().triggeredTargets4=trigger.getParent().triggeredTargets4.concat(trigger.targets);
+					trigger.getParent().effectCount++;
 				},
 				ai:{
 					effect:{
@@ -3181,7 +3182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				trigger:{target:'useCardToTargeted'},
 				filter:function(event,player){
-					if(!player.isEmpty(2)) return false;
+					if(!player.hasEmptySlot(2)) return false;
 					if(event.card.name!='sha') return false;
 					return event.nature;
 				},
@@ -4167,17 +4168,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).setContent('chooseToCompareLose');
 					'step 2'
 					var todis=[];
-					for(var i=0;i<event.e1.length;i++){
-						if(target.isDisabled(get.subtype(event.e1[i]))) todis.push(event.e1[i]);
-					}
 					for(var i=0;i<event.j1.length;i++){
-						if(target.storage._disableJudge||target.hasJudge(event.j1[i].viewAs||event.j1[i].name)) todis.push(event.j1[i]);
-					}
-					for(var i=0;i<event.e2.length;i++){
-						if(player.isDisabled(get.subtype(event.e2[i]))) todis.push(event.e2[i]);
+						if(target.isDisabledJudge()||target.hasJudge(event.j1[i].viewAs||event.j1[i].name)) todis.push(event.j1[i]);
 					}
 					for(var i=0;i<event.j2.length;i++){
-						if(player.storage._disableJudge||player.hasJudge(event.j2[i].viewAs||event.j2[i].name)) todis.push(event.j2[i]);
+						if(player.isDisabledJudge()||player.hasJudge(event.j2[i].viewAs||event.j2[i].name)) todis.push(event.j2[i]);
 					}
 					if(todis.length) game.cardsDiscard(todis);
 					'step 3'
@@ -8773,7 +8768,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zyshangyi:'尚义',
 			zyshangyi_info:'出牌阶段限一次。你可以令一名其他角色观看你的手牌，然后你观看其手牌并可以弃置其中一张牌。',
 			zymingshi:'名士',
-			zymingshi_info:'锁定技。若你的防具栏为空且未废除，属性【杀】对你无效。',
+			zymingshi_info:'锁定技。若你有空置的防具栏，属性【杀】对你无效。',
 			gzsuishi:'随势',
 			gzsuishi2:'随势',
 			gzsuishi_info:'锁定技，其他角色进入濒死状态时，若伤害来源与你势力相同，你摸一张牌；其他角色死亡时，若其与你势力相同，你失去1点体力。',
