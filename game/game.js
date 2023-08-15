@@ -54341,6 +54341,9 @@
 			else if(str2.indexOf('手杀')==0){
 				str2=str2.slice(2);
 			}
+			else if(str2.indexOf('新杀')==0){
+				str2=str2.slice(2);
+			}
 			else if(str2.indexOf('界')==0&&lib.characterPack.refresh&&lib.characterPack.refresh[str]){
 				str2=str2.slice(1);
 			}
@@ -54374,6 +54377,9 @@
 			else if(str2.indexOf('手杀')==0){
 				str2=str2.slice(2);
 			}
+			else if(str2.indexOf('新杀')==0){
+				str2=str2.slice(2);
+			}
 			return str2;
 		},
 		slimName:function(str){
@@ -54396,6 +54402,9 @@
 				str2=str2.slice(3);
 			}
 			else if(str2.indexOf('手杀')==0){
+				str2=str2.slice(2);
+			}
+			else if(str2.indexOf('新杀')==0){
 				str2=str2.slice(2);
 			}
 			return get.verticalStr(str2,true);

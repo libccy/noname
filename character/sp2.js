@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
-			dc_wangjun:['male','qun',4,['dcmianyao','dcchangqu']],
+			dc_wangjun:['male','qun',4,['dcchangqu','dctongye']],
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
 			dc_zhangmancheng:['male','qun',4,['dclvecheng','dczhongji'],['unseen']],
@@ -113,6 +113,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			//新服灭霸
+			dctongye:{
+				audio:2,
+				trigger:{player:'phaseDrawBegin2'},
+				forced:true,
+				filter:function(event,player){
+					if(game.countGroup()>1) return false;
+					return !event.numFixed;
+				},
+				content:function(){
+					trigger.num+=3;
+				},
+				mod:{
+					maxHandcard:function(player,num){
+						if(game.countGroup()>4) return num;
+						return num+3;
+					},
+					attackRange:function(player,num){
+						if(game.countGroup()>3) return num;
+						return num+3;
+					},
+					cardUsable:function(card,player,num){
+						if(card.name=='sha'){
+							if(game.countGroup()>2) return num;
+							return num+3;
+						}
+					},
+				},
+				ai:{
+					threaten:2.6,
+				},
+			},
 			dcmianyao:{
 				audio:2,
 				trigger:{
@@ -10059,8 +10090,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangqiying:"张琪瑛",
 			sp_liuqi:'刘琦',
 			xf_tangzi:"唐咨",
-			xf_huangquan:"黄权",
-			xf_sufei:"苏飞",
+			xf_huangquan:"OL黄权",
+			xf_sufei:"OL苏飞",
 			"xinfu_langxi":"狼袭",
 			"xinfu_langxi_info":"准备阶段，你可以对一名体力小于或等于你的其他角色造成0～2点随机伤害。",
 			"xinfu_yisuan":"亦算",
@@ -10521,7 +10552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunhuan:'孙桓',
 			dcniji:'逆击',
 			dcniji_info:'①当你成为非装备牌的目标后，你可以摸一张牌，称为“逆击”。②一名角色的结束阶段，若你于本回合获得的“逆击”数不小于你的体力值，你可以使用一张“逆击”。你弃置所有“逆击”。',
-			//dc_fuwan:'十周年伏完',
+			//dc_fuwan:'新杀伏完',
 			//dc_fuwan_ab:'伏完',
 			dcmoukui:'谋溃',
 			dcmoukui_info:'当你使用【杀】指定第一个目标后，你可以选择任意项：1.摸一张牌；2.弃置其中一个目标角色一张牌。若你均选择，当此【杀】被无效后或被抵消后，该角色弃置你一张牌。',
@@ -10552,6 +10583,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmianyao_info:'摸牌阶段结束时，你可以展示手牌中点数最小的一张牌并将此牌随机插入牌堆中。然后你于此回合结束时摸等同于此牌点数的牌。',
 			dcchangqu:'长驱',
 			dcchangqu_info:'出牌阶段限一次。你可以开一艘战舰（你从你的上家或下家开始选择任意名座位连续的其他角色，且起点角色获得“战舰”标记）。这些角色按照你选择的顺序依次执行：{若其有本次获得的“战舰”，其选择一项：1.交给你X张手牌，然后将“战舰”移动给你选择的下一名目标角色；2.令其下次受到的属性伤害值+X，然后横置（X为本次〖长驱〗中选项一被选择过的次数且至少为1）。}。',
+			dctongye:'统业',
+			dctongye_info:'锁定技。若场上势力数：不大于4，你的手牌上限+3；不大于3，你的攻击范围+3；不大于2，你使用【杀】的次数上限+3；不大于1，你摸牌阶段额定摸牌数+3。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

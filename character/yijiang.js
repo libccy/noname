@@ -13593,7 +13593,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangsong:['re_zhangsong','zhangsong'],
 		},
 		translate:{
-			old_huaxiong:'华雄',
+			old_huaxiong:'将华雄',
+			old_huaxiong_ab:'华雄',
 			yufan:'虞翻',
 			xushu:'旧徐庶',
 			caozhi:'曹植',
@@ -13653,7 +13654,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_yujin:'节钺于禁',
 			xin_liru:'李儒',
 			guohuanghou:'郭皇后',
-			liuyu:'刘虞',
+			liuyu:'OL刘虞',
 			sundeng:'孙登',
 			liyan:'李严',
 			sunziliufang:'孙资刘放',
