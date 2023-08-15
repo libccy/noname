@@ -61,6 +61,7 @@
 		},
 		renku:[],
 		prehidden_skills:[],
+		postReconnect:{},
 	};
 	var lib={
 		configprefix:'noname_0.9_',
@@ -18475,6 +18476,7 @@
 					if(!map){
 						map=(player.expandedSlots||{});
 					}
+					game.addVideo('$syncExpand',player,get.copy(map))
 					game.broadcast(function(player,map){
 						player.expandedSlots=map;
 						player.$syncExpand(map);
@@ -18488,6 +18490,7 @@
 					if(!map){
 						map=(player.disabledSlots||{});
 					}
+					game.addVideo('$syncDisable',player,get.copy(map))
 					game.broadcast(function(player,map){
 						player.disabledSlots=map;
 						player.$syncDisable(map);
@@ -19128,8 +19131,9 @@
 				},
 				$disableJudge:function(){
 					var player=this;
-					var card=game.createCard('disable_judge','','');
+					game.addVideo('$disableJudge',player);
 					player.storage._disableJudge=true;
+					var card=game.createCard('disable_judge','','');
 					card.fix();
 					card.classList.add('feichu');
 					card.style.transform='';
@@ -19139,6 +19143,7 @@
 				},
 				$enableJudge:function(){
 					var player=this;
+					game.addVideo('$enableJudge',player);
 					player.storage._disableJudge=false;
 					for(var i=0;i<player.node.judges.childNodes.length;i++){
 						if(player.node.judges.childNodes[i].name=='disable_judge'){
@@ -30091,7 +30096,7 @@
 						game.broadcast(function(player){
 							player.setNickname();
 						},player);
-						this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,null,_status.onreconnect,_status.cardtag);
+						this.send('reinit',lib.configOL,get.arenaState(),game.getState?game.getState():{},game.ip,null,_status.onreconnect,_status.cardtag,_status.postReconnect);
 					}
 					else if(version!=lib.versionOL){
 						this.send('denied','version');
@@ -30722,7 +30727,7 @@
 						}
 					}
 				},
-				reinit:function(config,state,state2,ip,observe,onreconnect,cardtag){
+				reinit:function(config,state,state2,ip,observe,onreconnect,cardtag,postReconnect){
 					ui.auto.show();
 					ui.pause.show();
 					game.clearConnect();
@@ -30810,7 +30815,6 @@
 							mode.onreinit();
 						}
 						_status.cardtag=get.parsedResult(cardtag);
-						state=get.parsedResult(state);
 						game.players=[];
 						game.dead=[];
 						for(var i in lib.characterPack){
@@ -30838,6 +30842,13 @@
 								ui.arena.classList.add('observe');
 							}
 						}
+						postReconnect=get.parsedResult(postReconnect);
+						for(var i in postReconnect){
+							if(Array.isArray(postReconnect[i])){
+								postReconnect[i].shift().apply(this,postReconnect[i]);
+							}
+						}
+						state=get.parsedResult(state);
 						ui.arena.setNumber(state.number);
 						_status.mode=state.mode;
 						_status.renku=state.renku;
@@ -32619,6 +32630,20 @@
 						lib[i][j]=content[i][j];
 					}
 				}
+			},
+			$syncDisable:function(player,map){
+				player.disabledSlots=map;
+				player.$syncDisable(map)
+			},
+			$syncExpand:function(player,map){
+				player.expandedSlots=map;
+				player.$syncExpand(map)
+			},
+			$disableJudge:function(player,map){
+				player.$disableJudge()
+			},
+			$enableJudge:function(player,map){
+				player.$enableJudge()
 			},
 			jiuNode:function(player,bool){
 				//Powered by 升麻

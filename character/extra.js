@@ -116,11 +116,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseButton([
 							'挈挟：选择至多'+get.cnNumber(num)+'张武将置入武器栏',
 							[list,'character'],
-						],[1,num],true)
+						],[1,num],true).set('ai',function(button){
+							var name=button.link;
+							var info=lib.character[name];
+							var skills=info[3].filter(function(skill){
+								var info=get.skillInfoTranslation(skill);
+								if(!info.includes('【杀】')) return false;
+								var list=get.skillCategoriesOf(skill);
+								list.remove('锁定技');
+								return list.length==0;
+							});
+							var eff=0.2;
+							for(var i of skills){
+								eff+=get.skillRank(i,'in');
+							}
+							return eff;
+						})
 					}
 					'step 1'
 					if(result.bool){
 						var list=result.links;
+						game.addVideo('skill',player,['qiexie',[list]])
 						game.broadcastAll(function(list){
 							for(var name of list) lib.skill.qiexie.createCard(name);
 						},list);
@@ -135,7 +151,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var card of cards) player.equip(card);
 					}
 				},
+				video:function(player,info){
+					for(var name of info[0]){
+						lib.skill.qiexie.createCard(name);
+					}
+				},
 				createCard:function(name){
+					if(!_status.postReconnect.qiexie) _status.postReconnect.qiexie=[
+						function(list){
+							for(var name of list) lib.skill.qiexie.createCard(name);
+						},[]
+					];
+					_status.postReconnect.qiexie[1].add(name)
 					if(!lib.card['qiexie_'+name]){
 						if(lib.translate[name+'_ab']) lib.translate['qiexie_'+name]=lib.translate[name+'_ab'];
 						else lib.translate['qiexie_'+name]=lib.translate[name];
@@ -242,10 +269,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !game.hasPlayer(current=>(current!=target&&player.inRange(current)&&get.distance(player,current)>distance));
 				},
 				position:'he',
+				check:card=>6-get.value(card),
 				content:function(){
 					player.addTempSkill('cuijue_used','phaseUseAfter');
 					player.markAuto('cuijue_used',[target]);
 					target.damage('nocard');
+				},
+				ai:{
+					order:2,
+					result:{
+						target:-1.5
+					},
+					tag:{
+						damage:1
+					}
 				},
 				subSkill:{
 					used:{
