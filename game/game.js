@@ -7449,16 +7449,37 @@
 							return false;
 						}
 					});
-				}             
+				}
+				if(!('flat' in Array.prototype)){
+					Object.defineProperty(Array.prototype, "flat", {
+						configurable:true,
+						enumerable:false,
+						writable:true,
+						value:function(depth){
+							if(typeof depth!='number') depth=1;
+							const arr=[];
+							for(let i=0;i<this.length;i++){
+								let obj=this[i];
+								if(depth>0&&Array.isArray(obj)){
+									arr=arr.concat(obj.flat(depth-1));
+								}
+								else{
+									arr.push(obj);
+								}
+							}
+							return arr;
+						}
+					});
+				}
 				if(!Array.from){
 					Object.defineProperty(Array, "from", {
 						configurable:true,
 						enumerable:false,
 						writable:true,
 						value:function(args){
-							var list=[];
+							const list=[];
 							if(args&&args.length){
-								for(var i=0;i<args.length;i++){
+								for(let i=0;i<args.length;i++){
 									list.push(args[i]);
 								}
 							}
@@ -18562,7 +18583,7 @@
 					return this.hasDisabledSlot(arg)&&!this.hasEnabledSlot(arg);
 				},
 				isEmpty:function(num){
-					return this.countEnabledSlot(num)>this.getEquips(num);
+					return this.countEnabledSlot(num)>this.getEquips(num).length;
 				},
 				//以下函数将被废弃
 				$disableEquip:function(){},

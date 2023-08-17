@@ -7977,6 +7977,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			kanade_mapo:{
+				audio:2,
 				derivation:'mapodoufu',
 				enable:'chooseToUse',
 				viewAs:{name:'mapodoufu'},
@@ -7999,6 +8000,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			kanade_benzhan:{
+				audio:3,
 				trigger:{global:['useCard','respond']},
 				direct:true,
 				usable:1,
@@ -10927,7 +10929,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yuri_xingdong:{
-				audio:2,
+				audio:3,
 				group:'yuri_xingdong_gain',
 				subSkill:{
 					mark:{
@@ -10938,6 +10940,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					gain:{
+						audio:2,
 						trigger:{player:'phaseUseBegin'},
 						forced:true,
 						content:function(){
@@ -11011,6 +11014,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yuri_wangxi:{
+				audio:2,
 				trigger:{global:'dieAfter'},
 				direct:true,
 				limited:true,
