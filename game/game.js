@@ -52,6 +52,7 @@
 			custom:[],
 			useCard:[],
 			changeHp:[],
+			everything:[],
 		}],
 		cardtag:{
 			yingbian_zhuzhan:[],
@@ -10544,7 +10545,7 @@
 			diamond:"♦︎",
 			spade:"♠︎",
 			club:"♣︎",
-			none:'◎',
+			none:'◈',
 			ghujia:'护甲',
 			ghujia_bg:'甲',
 			heart2:"红桃",
@@ -29795,6 +29796,7 @@
 						custom:[],
 						useCard:[],
 						changeHp:[],
+						everything:[],
 					});
 					var players=game.players.slice(0).concat(game.dead);
 					for(var i=0;i<players.length;i++){
@@ -35743,6 +35745,7 @@
 					else{
 						next.parent=event;
 						_status.event=next;
+						game.getGlobalHistory('everything').push(next);
 					}
 				}
 				else if(event.finished){
@@ -52797,6 +52800,7 @@
 		//优先度判断
 		priority:function(skill){
 			var info=get.info(skill),priority=0;
+			if(!info) return 0;
 			if(info.priority){
 				priority=info.priority*100;
 			}
@@ -55683,7 +55687,7 @@
 							}
 						}
 						else if(lib.skill[skills[i]].nobracket){
-							uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+							uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
 						}
 						else{
 							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');

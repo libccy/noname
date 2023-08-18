@@ -233,8 +233,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var skill=event.sourceSkill||event.skill;
 					var info=get.info(skill);
 					if(info.charlotte) return false;
-					var translation=lib.translate[skill+'_info'];
-					if(translation&&!(/(?<!“)出牌阶段限一次/.test(translation))) return false;
+					var translation=get.skillInfoTranslation(skill,event.player);
+					if(!translation||!(/(?<!“)出牌阶段限一次/.test(translation))) return false;
 					return event.player.countCards('h')>0;
 				},
 				check:function(event,player){

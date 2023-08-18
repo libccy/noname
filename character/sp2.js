@@ -10051,6 +10051,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mengda:['dc_mengda','ol_mengda','pe_mengda'],
 			jsp_guanyu:['dc_jsp_guanyu','jsp_guanyu'],
 			mushun:['mushun','sp_mushun'],
+			wangjun:['dc_wangjun','wangjun'],
 		},
 		translate:{
 			lijue:"李傕",

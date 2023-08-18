@@ -207,6 +207,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						str+='此牌离开你的装备区后，改为置入剩余武将牌牌堆。';
 						lib.translate['qiexie_'+name+'_info']=str;
+						var append='';
+						if(skills.length){
+							for(var skill of skills){
+								if(lib.skill[skill].nobracket){
+									append+='<div class="skilln">'+get.translation(skill)+'</div><div><span style="font-family: yuanli">'+get.skillInfoTranslation(skill)+'</span></div><br><br>';
+								}
+								else{
+									var translation=lib.translate[skill+'_ab']||get.translation(skill).slice(0,2);
+									append+='<div class="skill">【'+translation+'】</div><div><span style="font-family: yuanli">'+get.skillInfoTranslation(skill)+'</span></div><br><br>';
+								}
+							}
+							str=str.slice(0,str.length-8);
+						}
+						lib.translate['qiexie_'+name+'_append']=append;
 						lib.card['qiexie_'+name]=card;
 					}
 				},
