@@ -204,7 +204,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hujinding:'胡金定，女，传说中关羽之妻。关索之母，配偶关羽，出处《花关索传》和元代《三国志评话》民间传说人物。',
 		},
 		characterTitle:{
-			sp_jianggan:'#b对决限定武将',
 		},
 		card:{
 			ly_piliche:{
@@ -384,9 +383,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(['boss','chess','tafang','stone'].contains(mode)) return false;
 				if(mode=='versus') return _status.mode!='three';
 				return true;
-			},
-			sp_jianggan:function(mode){
-				return mode!='identity'&&mode!='guozhan';
 			},
 		},
 		skill:{
@@ -870,7 +866,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var next=player.choosePlayerCard(trigger.target,'he',[1,2],get.prompt('scschiyan',trigger.target));
+					var next=player.choosePlayerCard(trigger.target,'he',get.prompt('scschiyan',trigger.target));
 					next.set('ai',function(button){
 						if(!_status.event.goon) return 0;
 						var val=get.value(button.link);
@@ -1053,7 +1049,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.skip('phaseDraw');
 						target.addTempSkill('scsyaozhuo_skip',{player:'phaseDrawSkipped'});
 					}
-					else player.chooseToDiscard(true,'he');
+					else player.chooseToDiscard(2,true,'he');
 				},
 				subSkill:{
 					skip:{
@@ -1086,17 +1082,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function(){
 					'step 0'
-					player.draw(3);
+					player.draw(2);
 					'step 1'
 					var num=player.countCards('he');
 					if(!num) event.finish();
-					else if(num<3) event._result={index:1};
+					else if(num<2) event._result={index:1};
 					else player.chooseControl().set('choiceList',[
-						'将三张牌交给一名其他角色',
-						'弃置三张牌',
+						'将两张牌交给一名其他角色',
+						'弃置两张牌',
 					]).set('ai',function(){
 						if(game.hasPlayer(function(current){
-							return current!=player&&get.attitude(player,current)>2;
+							return current!=player&&get.attitude(player,current)>0;
 						})) return 0;
 						return 1;
 					});
@@ -1105,7 +1101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseCardTarget({
 							position:'he',
 							filterCard:true,
-							selectCard:3,
+							selectCard:2,
 							filterTarget:function(card,player,target){
 								return player!=target;
 							},
@@ -3404,78 +3400,90 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//蒋干
 			spdaoshu:{
-				audio:2,
-				trigger:{global:'phaseUseBegin'},
-				round:1,
-				filter:function(event,player){
-					return event.player.isEnemyOf(player)&&event.player.countCards('h')>0&&event.player.hasUseTarget({name:'jiu',isCard:true},null,true);
-				},
-				logTarget:'player',
-				prompt2:'令其视为使用一张【酒】。其声明一个基本牌的牌名，然后你判断其手牌区内是否有该牌名的牌。若你判断正确，则你随机获得其五张手牌，否则你不能响应其使用的牌直到回合结束。',
-				check:function(event,player){
-					var target=event.player;
-					if(target.countCards('h')<3) return false;
-					var att=get.attitude(player,target);
-					if(att>0) return false;
-					if(att==0) return !player.inRangeOf(target);
-					return true;
-				},
-				content:function(){
-					'step 0'
-					event.target=trigger.player;
-					event.target.chooseUseTarget('jiu',true);
-					'step 1'
-					if(!target.countCards('h')){
-						event.finish();
-						return;
-					}
-					var list=[];
-					for(var i of lib.inpile){
-						if(get.type(i)=='basic') list.push(i);
-					}
-					if(!list.length){
-						event.finish();
-						return;
-					}
-					target.chooseControl(list).set('prompt','请声明一种基本牌').set('ai',()=>_status.event.rand).set('rand',get.rand(0,list.length-1));
-					'step 2'
-					event.cardname=result.control;
-					target.chat('我声明'+get.translation(event.cardname));
-					game.log(target,'声明的牌名为','#y'+get.translation(event.cardname));
-					game.delayx();
-					player.chooseControl('有！','没有！').set('prompt','你觉得'+get.translation(target)+'的手牌区里有'+get.translation(event.cardname)+'吗？').set('ai',function(){
-						return _status.event.choice;
-					}).set('choice',function(){
-						var rand={
-							sha:0.273,
-							shan:0.149,
-							tao:0.074,
-							jiu:0.031,
-						}[event.cardname]||0.1;
-						return (1-Math.pow(1-rand,target.countCards('h')))>0.5?'有！':'没有！';
-					}());
-					'step 3'
-					player.chat(result.control);
-					game.log(player,'认为','#y'+result.control);
-					game.delayx();
-					'step 4'
-					var bool1=(result.index==0);
-					var bool2=(target.hasCard(function(card){
-						return get.name(card,target)==event.cardname;
-					},'h'));
-					if(bool1==bool2){
-						player.popup('判断正确','wood');
-						var cards=target.getCards('h',function(card){
-							return lib.filter.canBeGained(card,player,target);
-						}).randomGets(5);
-						if(cards.length>0) player.gain(cards,target,'giveAuto','bySelf');
-					}
-					else{
-						player.popup('判断错误','fire');
-						player.addTempSkill('spdaoshu_respond');
-					}
-				},
+				audio:3,
+				group:'spdaoshu_effect',
 				subSkill:{
+					effect:{
+						audio:'spdaoshu1',
+						trigger:{global:'phaseUseBegin'},
+						filter:function(event,player){
+							var goon=(event.player!=player&&(get.mode()=='identity'||get.mode()=='guozhan'||event.player.isEnemyOf(player)));
+							return goon&&event.player.countCards('h')>0&&event.player.hasUseTarget({name:'jiu',isCard:true},null,true);
+						},
+						round:1,
+						logTarget:'player',
+						prompt2:()=>lib.translate.spdaoshu_info,
+						check:function(event,player){
+							var target=event.player;
+							var att=get.attitude(player,target);
+							if(att>0) return false;
+							if(att==0) return !player.inRangeOf(target);
+							return true;
+						},
+						content:function(){
+							'step 0'
+							event.target=trigger.player;
+							event.target.chooseUseTarget('jiu',true);
+							'step 1'
+							if(!target.countCards('h')){
+								event.finish();
+								return;
+							}
+							var list=[];
+							for(var i of lib.inpile){
+								if(get.type(i)=='basic') list.push(i);
+							}
+							if(!list.length){
+								event.finish();
+								return;
+							}
+							target.chooseControl(list).set('prompt','请声明一种基本牌').set('ai',()=>_status.event.rand).set('rand',get.rand(0,list.length-1));
+							'step 2'
+							event.cardname=result.control;
+							target.chat('我声明'+get.translation(event.cardname));
+							game.log(target,'声明的牌名为','#y'+get.translation(event.cardname));
+							game.delayx();
+							player.chooseControl('有！','没有！').set('prompt','你觉得'+get.translation(target)+'的手牌区里有'+get.translation(event.cardname)+'吗？').set('ai',function(){
+								return _status.event.choice;
+							}).set('choice',function(){
+								var rand={
+									sha:0.273,
+									shan:0.149,
+									tao:0.074,
+									jiu:0.031,
+								}[event.cardname]||0.1;
+								return (1-Math.pow(1-rand,target.countCards('h')))>0.5?'有！':'没有！';
+							}());
+							'step 3'
+							player.chat(result.control);
+							game.log(player,'认为','#y'+result.control);
+							game.delayx();
+							'step 4'
+							var bool1=(result.index==0);
+							var bool2=(target.hasCard(function(card){
+								return get.name(card,target)==event.cardname;
+							},'h'));
+							if(bool1==bool2){
+								player.popup('判断正确','wood');
+								game.broadcastAll(function(){
+									if(lib.config.background_speak) game.playAudio('skill','spdaoshu2');
+								});
+								player.gainPlayerCard(target,'h',2,true);
+								//var cards=target.getCards('h',function(card){
+								//	return lib.filter.canBeGained(card,player,target);
+								//}).randomGets(5);
+								//if(cards.length>0) player.gain(cards,target,'giveAuto','bySelf');
+							}
+							else{
+								player.popup('判断错误','fire');
+								game.broadcastAll(function(){
+									if(lib.config.background_speak) game.playAudio('skill','spdaoshu3');
+								});
+								//player.addTempSkill('spdaoshu_respond');
+							}
+						},
+						ai:{expose:0.3},
+					},
 					respond:{
 						trigger:{global:'useCard1'},
 						forced:true,
@@ -3489,6 +3497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			spdaoshu1:{audio:true},
 			spdaizui:{
 				audio:2,
 				trigger:{player:'damageBegin2'},
@@ -13557,7 +13566,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			juezhi_info:'出牌阶段，你可以弃置至少两张牌，然后从牌堆中获得一张点数为X的牌（X为这些牌的点数和除以13后的余数，且当余数为0时X为13）。',
 			sp_jianggan:'手杀蒋干',
 			spdaoshu:'盗书',
-			spdaoshu_info:'每轮限一次。一名敌方角色的出牌阶段开始时，若其有手牌，则你可以令其视为使用一张【酒】。其须声明一个基本牌的牌名，然后你判断其手牌区内是否有该牌名的牌。若你判断正确，则你随机获得其五张手牌，否则你不能响应其使用的牌直到回合结束。',
+			spdaoshu_info:'每轮限一次。一名敌方角色的出牌阶段开始时，若其有手牌，则你可以令其视为使用一张【酒】。其须声明一个基本牌的牌名，然后你判断其手牌区内是否有该牌名的牌。若你判断正确，则你获得其两张手牌。',
+			spdaoshu_info_identity:'每轮限一次。一名其他角色的出牌阶段开始时，若其有手牌，则你可以令其视为使用一张【酒】。其须声明一个基本牌的牌名，然后你判断其手牌区内是否有该牌名的牌。若你判断正确，则你获得其两张手牌。',
+			spdaoshu_info_guozhan:'每轮限一次。一名其他角色的出牌阶段开始时，若其有手牌，则你可以令其视为使用一张【酒】。其须声明一个基本牌的牌名，然后你判断其手牌区内是否有该牌名的牌。若你判断正确，则你获得其两张手牌。',
 			spdaizui:'戴罪',
 			spdaizui2:'戴罪',
 			spdaizui_info:'限定技。当你受到伤害值不小于体力值的伤害时，你可防止此伤害并将此伤害渠道对应的所有实体牌置于伤害来源的武将牌上，称为“释”。本回合结束时，其获得所有“释”。',
@@ -13659,7 +13670,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			scstaoluan_info:'出牌阶段限一次。你可以将一张牌当任意一种基本牌或普通锦囊牌使用。',
 			scs_zhaozhong:'赵忠',
 			scschiyan:'鸱咽',
-			scschiyan_info:'①当你使用【杀】指定目标后，你可以将其的至多两张牌置于其武将牌上，然后其于当前回合结束时获得这些牌。②当你因执行【杀】的效果对一名角色造成伤害时，若该角色的手牌数和装备区内的牌数均不大于你，此伤害+1。',
+			scschiyan_info:'①当你使用【杀】指定目标后，你可以将其的一张牌置于其武将牌上，然后其于当前回合结束时获得这些牌。②当你因执行【杀】的效果对一名角色造成伤害时，若该角色的手牌数和装备区内的牌数均不大于你，此伤害+1。',
 			scs_sunzhang:'孙璋',
 			scszimou:'自谋',
 			scszimou_info:'锁定技。出牌阶段，当你使用第二/四/六张牌时，你从牌堆中获得一张【酒】/【杀】/【决斗】。',
@@ -13668,10 +13679,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			scspicai_info:'出牌阶段限一次。你可进行判定牌不置入弃牌堆的判定。若判定结果与本次发动技能时的其他判定结果的花色均不相同，则你可以重复此流程。然后你将所有位于处理区的判定牌交给一名角色。',
 			scs_xiayun:'夏恽',
 			scsyaozhuo:'谣诼',
-			scsyaozhuo_info:'出牌阶段限一次。你可以与一名角色拼点，若你赢，其跳过下一个摸牌阶段；若你没赢，你弃置一张牌。',
+			scsyaozhuo_info:'出牌阶段限一次。你可以与一名角色拼点，若你赢，其跳过下一个摸牌阶段；若你没赢，你弃置两张牌。',
 			scs_hankui:'韩悝',
 			scsxiaolu:'宵赂',
-			scsxiaolu_info:'出牌阶段限一次。你可以摸三张牌，然后选择一项：1.弃置三张牌；2.将三张牌交给一名其他角色。',
+			scsxiaolu_info:'出牌阶段限一次。你可以摸两张牌，然后选择一项：1.弃置两张牌；2.将两张牌交给一名其他角色。',
 			scs_lisong:'栗嵩',
 			scskuiji:'窥机',
 			scskuiji_info:'出牌阶段限一次。你可以观看一名其他角色的手牌，然后弃置你与其的共计四张花色各不相同的手牌。',
