@@ -1114,7 +1114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(target.hasJudge('lebu')) att/=5;
 								return att;
 							},
-							prompt:'选择三张牌，交给一名其他角色',
+							prompt:'选择两张牌，交给一名其他角色',
 							forced:true,
 						});
 					}
