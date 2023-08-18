@@ -4824,7 +4824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					content:function(storage,player){
 						var list=lib.skill.dchuishu.getList(player);
-						return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等量的锦囊牌。';
+						return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等同于本回合弃牌数的锦囊牌。';
 					},
 				},
 				subSkill:{
@@ -4858,7 +4858,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							player.removeSkill('dchuishu_effect');
 							var evt=trigger.getl(player);
-							var num=evt.cards2.length;
+							var num=0;
+							player.getHistory('lose',function(evt){
+								if(!goon||evt.type!='discard') return false;
+								num+=evt.cards2.length;
+							});
 							var cards=[];
 							for(var i=0;i<num;i++){
 								var card=get.discardPile(function(card){
@@ -4898,7 +4902,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(list[i]==min) choices.push(exps[i]+min+']');
 					}
 					if(choices.length==1) event._result={control:choices[0]};
-					else player.chooseControl(choices).set('prompt','易数：令〖慧淑〗的一个数值+2').set('prompt2','摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做，你弃置['+list[1]+']张手牌；且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等量的锦囊牌。');
+					else player.chooseControl(choices).set('prompt','易数：令〖慧淑〗的一个数值+2').set('prompt2','摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做，你弃置['+list[1]+']张手牌；且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等同于本回合弃牌数的锦囊牌。');
 					'step 1'
 					var result=result.control.slice(0,result.control.indexOf('['));
 					var exps=['摸牌数','弃牌数','目标牌数'];
@@ -4918,7 +4922,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.initial_list[i]==max) choices.push(exps[i]+list[i]+']');
 					}
 					if(choices.length==1) event._result={control:choices[0]};
-					else player.chooseControl(choices).set('prompt','易数：令〖慧淑〗的一个数值-1').set('prompt2','摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做，你弃置['+list[1]+']张手牌；且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等量的锦囊牌。');
+					else player.chooseControl(choices).set('prompt','易数：令〖慧淑〗的一个数值-1').set('prompt2','摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做，你弃置['+list[1]+']张手牌；且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等同于本回合弃牌数的锦囊牌。');
 					'step 3'
 					var result=result.control.slice(0,result.control.indexOf('['));
 					var exps=['摸牌数','弃牌数','目标牌数'];
@@ -5125,7 +5129,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.showCards(card,get.translation(player)+'发动了【泛音】')
 					}
 					'step 1'
-					if(!player.hasUseTarget(card,null,false)) event._result={index:1};
+					if(!player.hasUseTarget(card,false)) event._result={index:1};
 					else{
 						player.chooseControl().set('choiceList',[
 							'使用'+get.translation(card)+'（无距离限制）',
@@ -10576,7 +10580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dchuishu:function(player){
 				var list=lib.skill.dchuishu.getList(player);
-				return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中随机获得等量的锦囊牌。';
+				return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中随机获得等同于本回合弃牌数的锦囊牌。';
 			},
 			dcshoutan:function(player){
 				if(player.storage.dcshoutan) return '转换技。出牌阶段限一次，阴：你可以弃置一张不为黑色的手牌。<span class="bluetext">阳：你可以弃置一张黑色手牌。</span>';
@@ -10824,12 +10828,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dagongche_info:'出牌阶段开始时，你可以视为使用一张【杀】，且当此【杀】因执行效果而对目标角色造成伤害后，你弃置其一张牌。若此【大攻车】未被强化，则其他角色无法弃置你装备区内的【大攻车】。当此牌离开你的装备区后，销毁之。',
 			dukui:'杜夔',
 			dcfanyin:'泛音',
-			dcfanyin_info:'出牌阶段开始时，你可以亮出牌堆中点数最小的一张牌。然后你选择一项，并可以亮出一张点数为此牌二倍的牌且重复此流程：⒈使用此牌；⒉你于本回合内使用的下一张基本牌或普通锦囊牌选择目标后，可以增加一个目标。',
+			dcfanyin_info:'出牌阶段开始时，你可以亮出牌堆中点数最小的一张牌。然后你选择一项，并可以亮出一张点数为此牌二倍的牌且重复此流程：⒈使用此牌（无距离限制）；⒉你于本回合内使用的下一张基本牌或普通锦囊牌选择目标后，可以增加一个目标。',
 			dcpeiqi:'配器',
 			dcpeiqi_info:'当你受到伤害后，你可以移动场上的一张牌。然后若场上所有角色均在彼此的攻击范围内，则你可以再移动场上的一张牌。',
 			quanhuijie:'全惠解',
 			dchuishu:'慧淑',
-			dchuishu_info:'摸牌阶段结束时，你可以摸[3]张牌。若如此做：你弃置[1]张手牌，且当你于本回合内弃置第[2]+1张牌后，你从弃牌堆中随机获得等量的锦囊牌。',
+			dchuishu_info:'摸牌阶段结束时，你可以摸[3]张牌。若如此做：你弃置[1]张手牌，且当你于本回合内弃置第[2]+1张牌后，你从弃牌堆中随机获得等同于本回合弃牌数的锦囊牌。',
 			dcyishu:'易数',
 			dcyishu_info:'锁定技。当你不因出牌阶段而失去牌后，你令A={〖慧淑〗的中括号内最小的数字}，B={〖慧淑〗的中括号内最大的数字}。然后你令A中的一个数字+2，且B中的一个数字-1。',
 			dcligong:'离宫',

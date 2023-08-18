@@ -4816,7 +4816,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return '恢复一个装备栏或判定区并获得〖活墨〗';
 						}
 						var numc=get.cnNumber(links.length);
-						return '废除'+numc+'个装备栏或判定区并令一名角色摸'+numc+'张牌';
+						return '废除'+numc+'个区域并令一名角色摸'+numc+'张牌';
 					},
 				},
 				derivation:'huomo',

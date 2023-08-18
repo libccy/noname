@@ -500,8 +500,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						ai2:function(target){
 							var player=_status.event.player,card=ui.selected.cards[0];
+							var val=get.value(card,target);
 							if(val>0) return get.attitude(player,target)*2;
-							return (get.value(card,target)-2)*get.attitude(player,target);
+							return (val-2)*get.attitude(player,target);
 						},
 					});
 					'step 4'

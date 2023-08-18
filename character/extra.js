@@ -6551,7 +6551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return event.targets&&event.targets.contains(player)&&event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+							return event.targets&&event.targets.contains(player)&&event.turn!=player&&player.hasDisabledSlot();
 						},
 						content:function(){
 							player.chooseToEnable();
@@ -6564,7 +6564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+							return event.turn!=player&&player.hasDisabledSlot();
 						},
 						content:function(){
 							player.chooseToEnable();
@@ -6577,7 +6577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return event.result.bool==true&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+							return event.result.bool==true&&player.hasDisabledSlot();
 						},
 						content:function(){
 							'step 0'
@@ -6591,7 +6591,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return (event.targets!=undefined&&event.targets.contains(player)||event.target==player)&&event.result.bool==false&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+							return (event.targets!=undefined&&event.targets.contains(player)||event.target==player)&&event.result.bool==false&&player.hasDisabledSlot();
 						},
 						content:function(){
 							player.chooseToEnable();
@@ -6604,7 +6604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+							return player.hasDisabledSlot();
 						},
 						content:function(){
 							player.chooseToEnable();

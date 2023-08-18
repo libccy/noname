@@ -10919,7 +10919,7 @@
 					if(get.itemtype(result)=='cards'){
 						player.lose(result,false,'visible').set('type','equip').set('getlx',false).swapEquip=true;
 						if(info.loseThrow){
-							player.$throw(current);
+							player.$throw(result,1000);
 						}
 						event.swapped=true;
 					}
@@ -25163,9 +25163,8 @@
 					if(name&&typeof name=='object'){
 						name=name.viewAs||name.name;
 					}
-					var judges=this.node.judges.childNodes;
+					var judges=this.getCards('j');
 					for(var i=0;i<judges.length;i++){
-						if(judges[i].classList.contains('removing')) continue;
 						if((judges[i].viewAs||judges[i].name)==name){
 							return true;
 						}
@@ -27694,16 +27693,7 @@
 								if(filter(info.trigger[i])){bool=true;break}
 							}
 							if(!bool) return;
-							var priority=0;
-							if(info.priority){
-								priority=info.priority*100;
-							}
-							if(info.silent){
-								priority++;
-							}
-							if(info.equipSkill) priority-=25;
-							if(info.cardSkill) priority-=50;
-							if(info.ruleSkill) priority-=75;
+							var priority=get.priority(skill);
 							var toadd=[skillx,player,priority];
 							if(map.list2){
 								for(var i=0;i<map.list2.length;i++){
@@ -28758,11 +28748,7 @@
 				return range;
 			},
 			judge:function(card,player,target){
-				var judges=target.getCards('j');
-				for(var i=0;i<judges.length;i++){
-					if((judges[i].viewAs||judges[i].name)==card.name) return false;
-				}
-				return true;
+				return target.canAddJudge(card);
 			},
 			autoRespondSha:function(){
 				return !this.player.hasSha(true);
@@ -37635,7 +37621,7 @@
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;
 					}
 					if(card.ai.basic.value==undefined) card.ai.basic.value=function(card,player,index,method){
-						if(!player.canEquip(card)) return 0.01;
+						if(!player.getCards('e').contains(card)&&!player.canEquip(card,true)) return 0.01;
 						var value=0;
 						var info=get.info(card);
 						var current=player.getEquip(info.subtype);
@@ -37681,6 +37667,9 @@
 			}
 			skills=skills.concat(lib.skill.global);
 			game.expandSkills(skills);
+			skills.sort(function(a,b){
+				return get.priority(a)-get.priority(b);
+			});
 			var arg=[],i,info;
 			for(i=0;i<arguments.length-2;i++){
 				arg.push(arguments[i]);
@@ -52805,6 +52794,20 @@
 		},
 	};
 	var get={
+		//优先度判断
+		priority:function(skill){
+			var info=get.info(skill),priority=0;
+			if(info.priority){
+				priority=info.priority*100;
+			}
+			if(info.silent){
+				priority++;
+			}
+			if(info.equipSkill) priority-=25;
+			if(info.cardSkill) priority-=50;
+			if(info.ruleSkill) priority-=75;
+			return priority;
+		},
 		//新装备栏相关
 		//获取一张装备牌实际占用的装备栏(君曹操六龙)
 		//用法同get.subtype，返回数组

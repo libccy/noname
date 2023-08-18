@@ -1085,15 +1085,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				juexingji:true,
 				derivation:['drlt_huairou'],
-				init:function(player){
-					player.storage.drlt_poshi=false;
-				},
 				filter:function(event,player){
-					return !player.storage.drlt_poshi&&((player.storage.disableEquip!=undefined&&player.storage.disableEquip.length==5)||player.hp==1);
+					return !player.hasEnabledSlot()||player.hp==1;
 				},
 				content:function(){
 					"step 0"
-					player.storage.drlt_poshi=true;
 					player.awakenSkill('drlt_poshi');
 					player.loseMaxHp();
 					"step 1"
