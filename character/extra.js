@@ -274,7 +274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cuijue:{
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('he')>0&&game.hasPlayer(target=>lib.skill.cuijue.filterTarget('SB',player,target));
+					return player.countCards('he')>0;//&&game.hasPlayer(target=>lib.skill.cuijue.filterTarget('SB',player,target));
 				},
 				filterCard:true,
 				filterTarget:function(card,player,target){
