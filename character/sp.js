@@ -780,7 +780,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!event.player.isIn()) return [];
 							if(event.player.getNext().isIn()) list.push(event.player.getNext());
 							if(event.player.getPrevious().isIn()) list.push(event.player.getPrevious());
-							return list.sortBySeat();
+							return list.sortBySeat(_status.currentPhase);
 						},
 						content:function(){
 							var targets=lib.skill.oltianhou_spade.logTarget(trigger);

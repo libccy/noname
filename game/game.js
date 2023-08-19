@@ -7425,7 +7425,9 @@
 							for(let i=0;i<this.length;i++){
 								let obj=this[i];
 								if(depth>0&&Array.isArray(obj)){
-									arr=arr.concat(obj.flat(depth-1));
+									obj.flat(depth-1).forEach(function(item){
+										arr.push(item)
+									});
 								}
 								else{
 									arr.push(obj);

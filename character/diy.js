@@ -8695,6 +8695,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{expose:0.2},
 			},
 			noda_fengcheng:{
+				audio:2,
 				trigger:{
 					player:"gainAfter",
 				},
@@ -8711,6 +8712,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			noda_xunxin:{
+				audio:2,
 				enable:'phaseUse',
 				viewAs:{name:'juedou'},
 				filter:function(event,player){
