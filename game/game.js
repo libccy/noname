@@ -1295,46 +1295,9 @@
 									}
 								}
 							}
-							var animate=lib.config.image_background=='default';
 							game.saveConfig('image_background',background);
 							lib.init.background();
-							ui.background.delete();
-							ui.background=ui.create.div('.background');
-
-							if(lib.config.image_background_blur){
-								ui.background.style.filter='blur(8px)';
-								ui.background.style.webkitFilter='blur(8px)';
-								ui.background.style.transform='scale(1.05)';
-							}
-							else{
-								ui.background.style.filter='';
-								ui.background.style.webkitFilter='';
-								ui.background.style.transform='';
-							}
-
-							document.body.insertBefore(ui.background,document.body.firstChild);
-							if(animate) ui.background.animate('start');
-							if(lib.config.image_background=='default'){
-								ui.background.style.backgroundImage="none";
-							}
-							else if(lib.config.image_background.indexOf('custom_')==0){
-								ui.background.style.backgroundImage="none";
-								game.getDB('image',lib.config.image_background,function(fileToLoad){
-									if(!fileToLoad) return;
-									var fileReader = new FileReader();
-									fileReader.onload = function(fileLoadedEvent)
-									{
-										var data = fileLoadedEvent.target.result;
-										ui.background.style.backgroundImage='url('+data+')';
-									};
-									fileReader.readAsDataURL(fileToLoad, "UTF-8");
-								});
-							}
-							else{
-								ui.background.setBackgroundImage('image/background/'+lib.config.image_background+'.jpg');
-							}
-							ui.background.style.backgroundSize='cover';
-							ui.background.style.backgroundPosition='50% 50%';
+							game.updateBackground();
 						},
 					},
 					image_background_random:{
@@ -31207,6 +31170,46 @@
 		],
 	};
 	var game={
+		updateBackground:function(){
+			var background=(_status.tempBackground||lib.config.image_background);
+			ui.background.delete();
+			ui.background=ui.create.div('.background');
+
+			if(lib.config.image_background_blur){
+				ui.background.style.filter='blur(8px)';
+				ui.background.style.webkitFilter='blur(8px)';
+				ui.background.style.transform='scale(1.05)';
+			}
+			else{
+				ui.background.style.filter='';
+				ui.background.style.webkitFilter='';
+				ui.background.style.transform='';
+			}
+
+			document.body.insertBefore(ui.background,document.body.firstChild);
+			if(background=='default'){
+				ui.background.animate('start');
+				ui.background.style.backgroundImage="none";
+			}
+			else if(background.indexOf('custom_')==0){
+				ui.background.style.backgroundImage="none";
+				game.getDB('image',background,function(fileToLoad){
+					if(!fileToLoad) return;
+					var fileReader = new FileReader();
+					fileReader.onload = function(fileLoadedEvent)
+					{
+						var data = fileLoadedEvent.target.result;
+						ui.background.style.backgroundImage='url('+data+')';
+					};
+					fileReader.readAsDataURL(fileToLoad, "UTF-8");
+				});
+			}
+			else{
+				ui.background.setBackgroundImage('image/background/'+background+'.jpg');
+			}
+			ui.background.style.backgroundSize='cover';
+			ui.background.style.backgroundPosition='50% 50%';
+		},
 		generateBeatmapTimeleap:(bpm,beats,offset)=>beats.map(value=>Math.round(value*60000/bpm+(offset||0))),
 		updateRenku:function(){
 			game.broadcast(function(renku){

@@ -700,7 +700,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.cardsGotoOrdering(card);
 					'step 1'
 					if(player.countCards('he')>0){
-						player.chooseCard('he','天候：是否用一张牌交换牌堆顶的'+get.translation(card)+'?').set('promptx',[[card]])
+						player.chooseCard('he','天候：是否用一张牌交换牌堆顶的'+get.translation(card)+'?').set('promptx',[[card]]).set('ai',()=>-1)
 					}
 					else{
 						event._result={bool:false};
@@ -721,7 +721,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!lib.skill.oltianhou.derivation.contains(skill)) event.finish();
 					else{
 						event.weather_skill=skill;
-						player.chooseTarget(true,'令一名角色获得技能【'+get.translation(skill)+'】');
+						player.chooseTarget(true,'令一名角色获得技能【'+get.translation(skill)+'】').set('ai',function(target){
+							return get.attitude(_status.event.player,target);
+						});
 					}
 					'step 4'
 					if(result.bool){
@@ -729,8 +731,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target,'green');
 						target.addAdditionalSkill('oltianhou_'+player.playerid,event.weather_skill);
 						player.addTempSkill('oltianhou_expire',{player:'phaseZhunbeiBegin'});
-						game.log(target,'获得了天气技能','#g【'+get.translation(event.weather_skill)+'】')
+						game.log(target,'获得了天气技能','#g【'+get.translation(event.weather_skill)+'】');
+						game.broadcastAll(function(bg){
+							_status.tempBackground=bg;
+							game.updateBackground();
+						},event.weather_skill+'_bg');
+						game.addVideo('skill',player,['oltianhou',[true,event.weather_skill+'_bg']])
 					}
+				},
+				video:function(player,info){
+					if(info[0]){
+						_status.tempBackground=info[1];
+					}
+					else{
+						delete _status.tempBackground;
+					}
+					game.updateBackground();
 				},
 				derivation:['oltianhou_spade','oltianhou_heart','oltianhou_club','oltianhou_diamond'],
 				subSkill:{
@@ -741,6 +757,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var current of players){
 								current.removeAdditionalSkill(key);
 							}
+							game.broadcastAll(function(){
+								delete _status.tempBackground;
+								game.updateBackground();
+							});
+							game.addVideo('skill',player,['oltianhou',[false]])
 						},
 					},
 					spade:{
@@ -752,7 +773,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'damageEnd'},
 						forced:true,
 						filter:function(event){
-							return lib.skill.oltianhou.logTarget(event).length>0;
+							return event.nature=='thunder'&&lib.skill.oltianhou_spade.logTarget(event).length>0;
 						},
 						logTarget:function(event){
 							var list=[];
@@ -762,11 +783,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return list.sortBySeat();
 						},
 						content:function(){
-							var targets=lib.skill.oltianhou.logTarget(trigger);
+							var targets=lib.skill.oltianhou_spade.logTarget(trigger);
 							for(var i of targets) i.loseHp();
 							game.delayex();
 						},
 						group:'oltianhou_miehuo',
+						global:'oltianhou_spade_ai',
+					},
+					spade_ai:{
+						effect:{
+							player:function(card,player,target,current){
+								if(get.tag(card,'fireDamage')&&!player.hasSkill('oltianhou_spade')){
+									return 'zerotarget';
+								}
+								else if(get.tag(card,'thunderDamage')){
+									var list=lib.skill.oltianhou_spade.logTarget({player:target});
+									var eff=list.reduce(function(eff,current){
+										eff+=get.effect(current,{name:'losehp'},player,player)
+									},0);
+									return [1,eff];
+								}
+							},
+						},
 					},
 					miehuo:{
 						trigger:{global:'damageBegin2'},
@@ -788,7 +826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'phaseJieshuBegin'},
 						forced:true,
 						filter:function(event,player){
-							return event.player.isIn()&&event.player.isMaxHp();
+							return player!=event.player&&event.player.isIn()&&event.player.isMaxHp();
 						},
 						logTarget:'player',
 						content:function(){
@@ -804,7 +842,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'phaseJieshuBegin'},
 						forced:true,
 						filter:function(event,player){
-							return event.player.isIn()&&event.player.isMinHp();
+							return player!=event.player&&event.player.isIn()&&event.player.isMinHp();
 						},
 						logTarget:'player',
 						content:function(){
@@ -841,6 +879,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								trigger.untrigger();
 							}
 						},
+						global:'oltianhou_diamond_ai',
+					},
+					diamond_ai:{
+						effect:{
+							target:function(card,player,target,current){
+								if(card.name=='sha'&&!player.hasSkill('oltianhou_diamond')){
+									if(target!=player.getNext()&&target!=player.getPrevious()) return 0.7;
+								}
+							},
+						},
 					},
 				}
 			},
@@ -859,7 +907,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseCard('h',get.prompt('olchenshuo'),'展示一张手牌，然后展示并获得牌堆顶的牌');
+					player.chooseCard('h',get.prompt('olchenshuo'),'展示一张手牌，然后展示并获得牌堆顶的牌').set('ai',function(card){
+						if(get.type(card)=='basic') return 1+Math.random();
+						return Math.random();
+					})
 					'step 1'
 					if(result.bool){
 						player.logSkill('olchenshuo');
