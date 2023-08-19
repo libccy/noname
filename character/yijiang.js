@@ -9174,27 +9174,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('h','sha')>0;
+					return player.hasCard(card=>lib.skill.yanyu.filterCard(card,player),'h');
 				},
-				filterCard:{name:'sha'},
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆');
-				},
+				filterCard:(card,player)=>get.name(card)=='sha'&&player.canRecast(card),
 				discard:false,
-				loseTo:'discardPile',
-				visible:true,
-				delay:0.5,
+				lose:false,
+				delay:false,
 				content:function(){
-					player.draw();
+					player.recast(cards);
 				},
 				ai:{
 					basic:{
 						order:1
 					},
 					result:{
-						player:1,
-					},
+						player:1
+					}
 				},
 				group:'yanyu2'
 			},

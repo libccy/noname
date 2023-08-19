@@ -1282,16 +1282,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'twqingtao_jieshu',
 				content:function(){
 					'step 0'
-					player.chooseCard(get.prompt2('twqingtao'),'he').set('ai',function(card){
+					player.chooseCard(get.prompt2('twqingtao'),'he',lib.filter.cardRecastable).set('ai',function(card){
 						if(card.name=='jiu'||get.type(card)!='basic') return 10-get.value(card);
 						return 6-get.value(card);
 					});
 					'step 1'
 					if(result.bool){
 						player.logSkill('twqingtao');
-						player.loseToDiscardpile(result.cards);
-						player.draw();
-						if(result.cards[0].name=='jiu'||get.type(result.cards[0],false,player)!='basic') player.draw();
+						player.recast(result.cards);
+						if(get.name(result.cards[0])=='jiu'||get.type(result.cards[0],false,player)!='basic') player.draw();
 					}
 				},
 				subSkill:{
@@ -11174,14 +11173,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(!event.isMine()&&!event.isOnline()) game.delayx();
-					player.chooseCard('是否发动【革制】重铸一张牌？').set('ai',function(card){
+					player.chooseCard('是否发动【革制】重铸一张牌？',lib.filter.cardRecastable).set('ai',function(card){
 						return 5.5-get.value(card);
 					});
 					'step 1'
 					if(result.bool){
 						player.logSkill('twgezhi');
-						player.loseToDiscardpile(result.cards);
-						player.draw();
+						player.recast(result.cards);
 					}
 				},
 				group:'twgezhi_buff',

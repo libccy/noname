@@ -244,22 +244,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var num=trigger.player.countCards('h');
-					trigger.player.chooseCard('是否重铸任意张牌名字数为'+num+'的牌？',[1,Infinity],'he',(card,player,target)=>{
-						if(!_status.event.cards.contains(card)) return false;
-						var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-						return mod=='unchanged';
-					}).set('ai',card=>{
+					trigger.player.chooseCard('是否重铸任意张牌名字数为'+num+'的牌？',[1,Infinity],'he',(card,player)=>_status.event.cards.contains(card)&&player.canRecast(card)).set('ai',card=>{
 						var val=get.value(card);
 						return 6-val;
 					}).set('cards',trigger.player.getCards('he',card=>{
 						return lib.skill.dcweidang.getLength(card)==num;
 					}));
 					'step 1'
-					if(result.bool){
-						var cards=result.cards;
-						trigger.player.loseToDiscardpile(cards);
-						trigger.player.draw(cards.length);
-					}
+					if(result.bool) trigger.player.recast(result.cards);
 				}
 			},
 			//族王允
@@ -910,18 +902,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					global:{
 						enable:'phaseUse',
-						filter:function(event,player){
-							return game.hasPlayer(current=>lib.skill.clanlianzhu_global.filterTarget(null,player,current));
-						},
-						filterCard:function(card,player){
-							if(!game.hasPlayer(current=>{
-								if(!current.hasSkill('clanlianzhu')||current.hasSkill('clanlianzhu_targeted')) return false;
-								return !current.storage.clanlianzhu;
-							})) return false;
-							var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-							if(mod!='unchanged') return mod;
-							return true;
-						},
+						filter:(event,player)=>game.hasPlayer(current=>lib.skill.clanlianzhu_global.filterTarget(null,player,current)),
+						filterCard:(card,player)=>game.hasPlayer(current=>current.hasSkill('clanlianzhu')&&!current.hasSkill('clanlianzhu_targeted')&&!current.storage.clanlianzhu)&&player.canRecast(card),
 						selectCard:[0,1],
 						check:function(card){
 							return 5-get.value(card);
@@ -968,10 +950,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							bocchi.sortBySeat();
 							kita.sortBySeat();
 							var str='';
-							var getn=function(target){
-								if(player==target) return '自己';
-								return get.translation(target);
-							}
 							if(bocchi.length){
 								str+='重铸一张牌，然后令';
 								bocchi.forEach((current,i)=>{
@@ -998,19 +976,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target.storage.clanlianzhu) event.goto(4);
 							target.changeZhuanhuanji('clanlianzhu');
 							'step 1'
-							player.loseToDiscardpile(cards);
-							player.draw(cards.length);
+							player.recast(cards);
 							'step 2'
 							if(!target.countCards('he')&&!_status.connectMode) event._result={bool:false};
-							else target.chooseCard('he','联诛：是否重铸一张牌？',(card,player)=>{
-								var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-								if(mod!='unchanged') return mod;
-								return true;
-							});
+							else target.chooseCard('he','联诛：是否重铸一张牌？',lib.filter.cardRecastable);
 							'step 3'
 							if(result.bool){
-								target.loseToDiscardpile(result.cards);
-								target.draw(result.cards.length);
+								target.recast(result.cards);
 								if(get.color(cards[0])!=get.color(result.cards[0])) lib.skill.chenliuwushi.change(target,-1);
 							}
 							event.finish();
@@ -1955,25 +1927,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(player.actionHistory[i].isRound) break;
 					}
-					return event.targets&&event.targets.length==1&&(!event.targets[0].isLinked()||
-						player.getCards('h',card=>get.suit(card)==get.suit(event.card)).filter(card=>{
-							var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-							if(mod!='unchanged') return true;
-							return false;
-						}).length==0);
+					return event.targets&&event.targets.length==1&&!event.targets[0].isLinked()||
+						player.hasCard(card=>get.suit(card)==get.suit(event.card)&&player.canRecast(card),'h');
 				},
 				content:function(){
-					'step 0'
 					if(trigger.targets&&trigger.targets.length==1){
 						trigger.targets[0].link(true);
 					}
-					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card));
-					if(cards.length>0){
-						player.loseToDiscardpile(cards);
-						player.draw(cards.length);
-					}
-					'step 1'
-					player.draw();
+					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card)&&player.canRecast(card));
+					if(cards.length>0) player.recast(cards);
 				}
 			},
 			clanhuanyin:{

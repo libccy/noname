@@ -9216,16 +9216,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						charlotte:true,
 						filter:function(event,player){
-							return player.getCards('h',function(card){
-								return card.hasGaintag('xinfu_bijing');
-							}).length>0;
+							return player.hasCard(card=>card.hasGaintag('xinfu_bijing')&&player.canRecast(card),'h');
 						},
 						content:function(){
-							var cards=player.getCards('h',function(card){
-								return card.hasGaintag('xinfu_bijing');
-							});
-							player.loseToDiscardpile(cards);
-							player.draw(cards.length);
+							player.recast(player.getCards('h',card=>card.hasGaintag('xinfu_bijing')&&player.canRecast(card)));
 						},
 						sub:true,
 					},

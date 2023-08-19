@@ -4919,34 +4919,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:"phaseUse",
 				position:'he',
-				filter:function(event,player){
-					return player.countCards('he',{type:'equip'})>0;
-				},
-				filterCard:function(card){
-					return get.type(card)=='equip';
-				},
+				filter:(event,player)=>player.hasCard(card=>lib.skill.chihaya_huairou.filterCard(card,player),lib.skill.chihaya_huairou.position),
+				filterCard:(card,player)=>get.type(card)=='equip'&&player.canRecast(card),
 				check:function(card){
 					if(!_status.event.player.hasEquipableSlot(get.subtype(card))) return 5;
 					return 3-get.value(card);
 				},
 				content:function(){
-					player.draw();
+					player.recast(cards);
 				},
 				discard:false,
-				visible:true,
-				loseTo:'discardPile',
+				lose:false,
+				delay:false,
 				prompt:"将一张装备牌置入弃牌堆并摸一张牌",
-				delay:0.5,
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆');
-				},
 				ai:{
 					order:10,
 					result:{
-						player:1,
-					},
-				},
+						player:1
+					}
+				}
 			},
 			chihaya_youfeng:{
 				enable:'chooseToUse',
@@ -16588,11 +16579,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			diyjuntun:{
 				enable:'phaseUse',
-				filter:function(event,player){
-					return player.countCards('he',{type:'equip'})>0;
-				},
+				filter:(event,player)=>player.hasCard(card=>lib.skill.diyjuntun.filterCard(card,player),'he'),
 				position:'he',
-				filterCard:{type:'equip'},
+				filterCard:(card,player)=>get.type(card)=='equip'&&player.canRecast(card),
 				check:function(card){
 					var player=_status.event.player;
 					var he=player.getCards('he');
@@ -16609,23 +16598,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 0;
 				},
 				content:function(){
-					player.draw();
+					player.recast(cards);
 				},
 				discard:false,
+				lose:false,
+				delay:false,
 				prompt:'将一张装备牌置入弃牌堆并摸一张牌',
-				delay:0.5,
-				loseTo:'discardPile',
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆');
-				},
 				ai:{
 					basic:{
 						order:8.5
 					},
 					result:{
-						player:1,
-					},
+						player:1
+					}
 				}
 			},
 			choudu:{

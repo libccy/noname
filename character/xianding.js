@@ -1684,27 +1684,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
-				filterCard:function(card,player,target){
-					var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-					return mod=='unchanged';
-				},
+				filterCard:lib.filter.cardRecastable,
 				selectCard:function(){
 					return Math.ceil(_status.event.player.countCards('h')/2);
 				},
 				check:function(card){
 					return 6.5-get.value(card);
 				},
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆');
-				},
 				discard:false,
-				loseTo:'discardPile',
-				visible:true,
-				delay:0.5,
+				lose:false,
+				delay:false,
 				content:function(){
 					'step 0'
-					player.draw(cards.length);
+					player.recast(cards);
 					'step 1'
 					player.addTempSkill('dcctjiuxian_help');
 					player.chooseUseTarget({
@@ -1715,7 +1707,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:5.5,
-					result:{player:1},
+					result:{player:1}
 				},
 				subSkill:{
 					help:{

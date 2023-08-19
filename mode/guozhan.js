@@ -6457,7 +6457,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					cardEnabled2:function(card){
 						if(get.position(card)=='h') return false;
 					},
-					cardChongzhuable:function(card){
+					cardRecastable:function(card){
 						if(get.position(card)=='h') return false;
 					},
 				},

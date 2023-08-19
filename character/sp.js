@@ -2340,14 +2340,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else event.goto(6);
 							'step 3'
 							if(result.bool){
-								var hs=target.getCards('h',card=>{
-									var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-									if(mod!='unchanged') return mod;
-									return true;
-								});
+								var hs=target.getCards('h',lib.filter.cardRecastable);
 								if(hs.length){
-									target.loseToDiscardpile(hs);
-									target.draw(hs.length);
+									target.recast(hs);
 								}
 							}
 							event.goto(6);
@@ -2355,13 +2350,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								var hs=target.getCards('h',card=>{
 									if(!card.hasGaintag('olhuiyun_tag')) return false;
-									var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-									if(mod!='unchanged') return mod;
-									return true;
+									return target.canRecast(card);
 								});
 								if(hs.length){
-									target.loseToDiscardpile(hs);
-									target.draw(hs.length);
+									target.recast(hs);
 								}
 							}
 							event.goto(6);
@@ -3106,16 +3098,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var type=get.type2(cards[0]);
 					target.chooseCard(get.translation(player)+'对你发动了【剑合】','请重铸'+get.cnNumber(cards.length)+'张'+get.translation(type)+'牌，或点“取消”受到1点雷电伤害',cards.length,'he',(card,player)=>{
-						return get.type2(card)==_status.event.type;
+						return get.type2(card)==_status.event.type&&player.canRecast(card);
 					}).set('ai',card=>{
 						if(_status.event.goon) return (get.type(card)=='equip'?15:7)-get.value(card);
 						return 0;
 					}).set('type',type).set('goon',get.damageEffect(target,player,target,'thunder')<0);
 					'step 2'
 					if(result.bool){
-						var cards=result.cards;
-						target.loseToDiscardpile(cards);
-						target.draw(cards.length);
+						target.recast(result.cards);
 					}
 					else{
 						target.damage(player,'thunder');
@@ -3738,16 +3728,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					target.chooseCard('he',true,'铸币：请重铸一张牌',(card,player,target)=>{
-						var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-						if(mod!='unchanged') return mod;
-						return true;
-					});
+					target.chooseCard('he',true,'铸币：请重铸一张牌',lib.filter.cardRecastable);
 					'step 1'
 					if(result.bool){
-						var cards=result.cards;
-						target.loseToDiscardpile(cards);
-						target.draw().gaintag=['olzhubi_tag'];
+						target.recast(result.cards,null,player=>player.draw().set('log',false).gaintag=['olzhubi_tag']);
 					}
 				},
 				ai:{
@@ -4281,7 +4265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(!player.countCards('h')||player.hasSkill('olhuanshi_mark',null,null,false)) event.finish();
 					'step 3'
-					player.chooseCard('是否重铸任意张手牌？','操作提示：选择要重铸的牌并点击“确定”',[1,player.countCards('h')]).set('ai',function(card){
+					player.chooseCard('是否重铸任意张手牌？','操作提示：选择要重铸的牌并点击“确定”',[1,player.countCards('h')],lib.filter.cardRecastable).set('ai',function(card){
 						var player=_status.event.player,cards=ui.selected.cards;
 						if(!player.hasSkill('olmingzhe')) return 5-get.value(card);
 						for(var i of cards){
@@ -4292,8 +4276,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 4'
 					if(result.bool){
 						player.addTempSkill('olhuanshi_mark');
-						player.loseToDiscardpile(result.cards);
-						player.draw(result.cards.length);
+						player.recast(result.cards);
 					}
 				},
 				ai:{
@@ -6016,9 +5999,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.chooseToDiscard('he',true);
 					}
 					else{
-						var cards=target.getCards('e');
-						target.loseToDiscardpile(cards);
-						target.draw(cards.length)
+						target.recast(target.getCards('e',lib.filter.cardRecastable));
 					}
 				},
 			},
@@ -22179,33 +22160,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current.hasSkill('xinfu_jianjie');
 					})) return false;
 					if((player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0)>=3) return false;
-					return player.countCards('h',{suit:'club'})>0;
+					return player.hasCard(card=>lib.skill.smh_lianhuan1.filterCard(card,player),'h');
 				},
-				filterCard:function (card){
-					return get.suit(card)=='club';
-				},
-				check:function (card){
+				filterCard:(card,player)=>get.suit(card)=='club'&&player.canRecast(card),
+				check:function(card){
 					return -1;
 				},
-				content:function (){
-					player.draw();
+				content:function(){
+					player.recast(cards);
 				},
 				discard:false,
-				loseTo:'discardPile',
+				lose:false,
+				delay:false,
 				prompt:"将一张梅花牌置入弃牌堆并摸一张牌",
-				delay:0.5,
-				prepare:function (cards,player){
-					player.$throw(cards,1000);
-				},
 				ai:{
 					basic:{
 						order:1,
 					},
 					result:{
-						player:1,
-					},
+						player:1
+					}
 				},
-				forced:true,
+				forced:true
 			},
 			"smh_yeyan":{
 				unique:true,
