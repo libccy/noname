@@ -1119,7 +1119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 					}
 					else{
-						player.chooseToDiscard(3,true,'he');
+						player.chooseToDiscard(2,true,'he');
 						event.finish();
 					}
 					'step 3'
