@@ -7414,6 +7414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shiorimiyuki_banyin:{
+				audio:2,
 				trigger:{player:['damageEnd','recoverEnd']},
 				direct:true,
 				filter:function(event,player){
@@ -7436,6 +7437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shiorimiyuki_tingxian:{
+				audio:2,
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				content:function(){
@@ -7456,7 +7458,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('shiorimiyuki_tingxian2');
 				},
 			},
+			shiorimiyuki_tingxian1:{audio:true},
 			shiorimiyuki_tingxian2:{
+				audio:true,
 				trigger:{player:'phaseUseEnd'},
 				forced:true,
 				charlotte:true,
@@ -8744,6 +8748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			hinata_qiulve:{
+				audio:2,
 				enable:['chooseToUse','chooseToRespond'],
 				viewAsFilter:function(player){
 					return player.countCards('hes',function(card){
@@ -8794,6 +8799,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			hinata_ehou:{
+				audio:2,
 				trigger:{global:'useCardAfter'},
 				direct:true,
 				filter:function(event,player){
@@ -8820,6 +8826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			hisako_yinbao:{
+				audio:2,
 				trigger:{player:['damageEnd','recoverAfter']},
 				content:function(){
 					'step 0'
