@@ -28303,9 +28303,9 @@
 			},
 			//Check if the card is recastable
 			//检查此牌是否可重铸
-			cardRecastable:(card,player,source,strict)=>{
+			cardRecastable:(card,player,source,raw)=>{
 				if(typeof player=='undefined') player=get.owner(card);
-				return game.checkMod(card,player,source,!strict||'unchanged','cardRecastable',player);
+				return game.checkMod(card,player,source,!raw||'unchanged','cardRecastable',player);
 			},
 			//装备栏相关
 			canBeReplaced:function(card,player){
