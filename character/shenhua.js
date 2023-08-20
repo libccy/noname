@@ -5515,7 +5515,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				limited:true,
 				skillAnimation:true,
-				//animationStr:'涅盘',
 				animationColor:'fire',
 				init:function(player){
 					player.storage.niepan=false;
@@ -5574,7 +5573,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				mark:true,
 				skillAnimation:true,
-				//animationStr:'涅盘',
 				limited:true,
 				animationColor:'orange',
 				init:function(player){

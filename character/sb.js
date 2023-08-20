@@ -1093,7 +1093,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				mark:true,
 				skillAnimation:true,
-				//animationStr:'涅盘',
 				limited:true,
 				animationColor:'orange',
 				filter:function(event,player){
