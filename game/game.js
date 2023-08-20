@@ -47335,8 +47335,8 @@
 					if(window.plugins&&window.plugins.insomnia) window.plugins.insomnia.keepAwake();
 					else{
 						lib.init.js(lib.assetURL+'game','NoSleep',function(){
-						var noSleep = new NoSleep();
-						document.addEventListener(lib.config.touchscreen?'touchend':'click', function enableNoSleep() {
+							var noSleep = new NoSleep();
+							document.addEventListener(lib.config.touchscreen?'touchend':'click', function enableNoSleep() {
 								document.removeEventListener(lib.config.touchscreen?'touchend':'click', enableNoSleep, false);
 								noSleep.enable();
 								window.noSleep=noSleep;
@@ -47361,6 +47361,10 @@
 				ui.backgroundMusic.autoplay=true;
 				ui.backgroundMusic.addEventListener('ended',game.playBackgroundMusic);
 				ui.window.appendChild(ui.backgroundMusic);
+				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click', function playMusic() {
+					ui.window.removeEventListener(lib.config.touchscreen?'touchend':'click', playMusic, false);
+					if(!ui.backgroundMusic.played.length) ui.backgroundMusic.play();
+				}, false);
 				if(lib.config.cursor_style=='pointer'){
 					ui.window.classList.add('nopointer');
 				}

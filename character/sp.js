@@ -10473,16 +10473,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('luanfeng');
 					trigger.player.recover(3-trigger.player.hp);
 					'step 1'
-					var list=[];
+					var list=[],target=trigger.player;
 					for(var i=1;i<6;i++){
-						for(var j=0;j<player.countDisabledSlot(i);j++){
+						for(var j=0;j<target.countDisabledSlot(i);j++){
 							list.push(i);
 						}
 					}
-					if(list.length>0) player.enableEquip(list);
-					if(list.length<6) trigger.player.drawTo(6-list.length);
-					if(trigger.player.storage.kotarou_rewrite) trigger.player.storage.kotarou_rewrite=[];
-					if(player==trigger.player) player.storage.youlong2=[];
+					if(list.length>0) target.enableEquip(list);
+					if(list.length<6) target.drawTo(6-list.length);
+					if(target.storage.kotarou_rewrite) target.storage.kotarou_rewrite=[];
+					if(player==target) player.storage.youlong2=[];
 				},
 			},
 			//曹爽，韩遂，何进

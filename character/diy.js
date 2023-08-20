@@ -7451,12 +7451,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.control=='cancel2') return;
-					player.logSkill('shiorimiyuki_tingxian');
+					player.logSkill('shiorimiyuki_tingxian1');
 					var num=1+result.index;
 					player.draw(num).gaintag=['shiorimiyuki_tingxian'];
 					player.recover();
 					player.addTempSkill('shiorimiyuki_tingxian2');
 				},
+				group:'shiorimiyuki_tingxian1',
 			},
 			shiorimiyuki_tingxian1:{audio:true},
 			shiorimiyuki_tingxian2:{
