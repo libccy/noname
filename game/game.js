@@ -48207,7 +48207,7 @@
 				node.node={
 					avatar:ui.create.div('.avatar',node,ui.click.avatar).hide(),
 					avatar2:ui.create.div('.avatar2',node,ui.click.avatar2).hide(),
-					turnedover:ui.create.div('.turned','<div>翻<br>面<div>',node),
+					turnedover:ui.create.div('.turned','<div>'+get.verticalStr('翻面')+'<div>',node),
 					framebg:ui.create.div('.framebg',node),
 					intro:ui.create.div('.intro',node),
 					identity:ui.create.div('.identity',node),
