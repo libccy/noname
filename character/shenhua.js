@@ -4218,7 +4218,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									dialog.buttons[i].node.group.remove();
 									dialog.buttons[i].node.hp.remove();
 									dialog.buttons[i].node.intro.remove();
-									dialog.buttons[i].node.name.innerHTML='未<br>知';
+									dialog.buttons[i].node.name.innerHTML=get.verticalStr('未知');
 									dialog.buttons[i].node.name.dataset.nature='';
 									dialog.buttons[i].style.background='';
 									dialog.buttons[i]._nointro=true;
