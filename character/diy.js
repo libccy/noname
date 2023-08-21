@@ -6472,6 +6472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'abyusa_jueqing_rewrite',
 				subSkill:{
 					rewrite:{
+						audio:'abyusa_jueqing',
 						trigger:{source:'damageBefore'},
 						forced:true,
 						charlotte:true,
@@ -6518,6 +6519,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			abyusa_dunying:{
+				audio:2,
 				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				forced:true,
 				filter:function(event,player){
@@ -9476,6 +9478,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shiina_qingshen:{
+				audio:1,
 				trigger:{
 					player:'damageEnd',
 					source:'damageSource',
@@ -9522,6 +9525,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shiina_feiyan:{
+				audio:1,
 				animalList:['key_inari','key_doruji'],
 				trigger:{global:'phaseBegin'},
 				direct:true,
@@ -9555,6 +9559,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shiina_retieji:{
+				audio:1,
 				shaRelated:true,
 				trigger:{player:'useCardToPlayered'},
 				check:function(event,player){

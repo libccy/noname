@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			sunlingluan:['female','wu',3,['dclingyue','dcpandi']],
 			dc_duyu:['male','wei',4,['dcjianguo','dcdyqingshi']],
 			ganfurenmifuren:['female','shu',3,['dcchanjuan','dcxunbie']],
 			dc_ganfuren:['female','shu',3,['dcshushen','dcshenzhi']],
@@ -77,7 +78,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen'],
-				sp2_yinyu:['zhouyi','luyi'],
+				sp2_yinyu:['zhouyi','luyi','sunlingluan'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun'],
@@ -86,6 +87,162 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//孙翎鸾
+			dclingyue:{
+				audio:2,
+				trigger:{global:'damageSource'},
+				forced:true,
+				filter:function(event,player){
+					if(!event.source||!event.source.isIn()) return false;
+					var history=event.source.actionHistory;
+					for(var i=history.length-1;i>=0;i--){
+						if(i==history.length-1){
+							if(history[i].sourceDamage.indexOf(event)>0) return false;
+						}
+						else if(history[i].sourceDamage.some(evt=>evt!=event)) return false;
+						if(history[i].isRound) break;
+					}
+					return true;
+				},
+				content:function(){
+					var num=1,current=_status.currentPhase;
+					if(current&&trigger.player!=current){
+						var num=0,players=game.players.slice(0).concat(game.dead);
+						for(var target of players){
+							target.getHistory('sourceDamage',function(evt){
+								num+=evt.num;
+							});
+						}
+					}
+					player.draw(num);
+				},
+			},
+			dcpandi:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					var players=event.dcpandi;
+					if(!players||!players.length) return false;
+					var source=player.storage.dcpandi_effect;
+					return get.itemtype(source)!='player'||!source.isIn();
+				},
+				onChooseToUse:function(event){
+					if(!game.online&&event.type=='phase'){
+						var players=game.filterPlayer(function(current){
+							return current!=event.player&&current.getHistory('sourceDamage').length==0;
+						})
+						event.set('dcpandi',players)
+					}
+				},
+				filterTarget:function(card,player,target){
+					var players=_status.event.dcpandi;
+					if(!players||!players.length) return false;
+					return players.contains(target);
+				},
+				content:function(){
+					if(target.isIn()){
+						player.storage.dcpandi_effect=target;
+						player.addTempSkill('dcpandi_effect','phaseUseAfter');
+					}
+				},
+				subSkill:{
+					effect:{
+						audio:'dcpandi',
+						charlotte:true,
+						priority:Infinity,
+						onremove:true,
+						mark:'character',
+						intro:{
+							content:'下一张牌视为由$使用',
+						},
+						trigger:{player:'useCardBefore'},
+						forced:true,
+						filter:function(event,player){
+							var source=player.storage.dcpandi_effect;
+							return get.itemtype(source)=='player'&&source.isIn();
+						},
+						logTarget:(event,player)=>player.storage.dcpandi_effect,
+						content:function(){
+							trigger.player=player.storage.dcpandi_effect;
+							trigger.noai=true;
+							player.removeSkill('dcpandi_effect');
+							game.delay(0.5);
+						},
+						mod:{
+							selectCard:function(card,player,range){
+								var source=player.storage.dcpandi_effect;
+								if(!source.isIn()||get.itemtype(source)!='player'||get.itemtype(source.storage.dcpandi_effect)=='player') return;
+								var range,info=get.info(card);
+								var select=get.copy(info.selectTarget);
+								if(select==undefined){
+									if(info.filterTarget==undefined) return [0,0];
+									range=[1,1];
+								}
+								else if(typeof select=='number') range=[select,select];
+								else if(get.itemtype(select)=='select') range=select;
+								else if(typeof select=='function') range=select(card,source);
+								game.checkMod(card,source,range,'selectTarget',source);
+							},
+							cardEnabled2:function(card,player,event){
+								var source=player.storage.dcpandi_effect;
+								if(!source.isIn()||get.itemtype(source)!='player'||get.itemtype(source.storage.dcpandi_effect)=='player') return;
+								var check=game.checkMod(card,source,event,'unchanged','cardEnabled2',source);
+								return check;
+							},
+							cardEnabled:function(card,player,event){
+								var source=player.storage.dcpandi_effect;
+								if(!source.isIn()||get.itemtype(source)!='player'||get.itemtype(source.storage.dcpandi_effect)=='player') return;
+								if(event==='forceEnable'){
+									var mod=game.checkMod(card,source,event,'unchanged','cardEnabled',source);
+									if(mod!='unchanged') return mod;
+									return true;
+								}
+								else{
+									var filter=get.info(card).enable;
+									if(!filter) return;
+									var mod=game.checkMod(card,player,source,'unchanged','cardEnabled',source);
+									if(mod!='unchanged') return mod;
+									if(typeof filter=='boolean') return filter;
+									if(typeof filter=='function') return filter(card,player,event);
+								}
+							},
+							cardUsable:function(card,player,num){
+								var source=player.storage.dcpandi_effect;
+								if(!source.isIn()||get.itemtype(source)!='player'||get.itemtype(source.storage.dcpandi_effect)=='player') return;
+								var event=_status.event;
+								if(event.type=='chooseToUse_button') event=event.getParent();
+								if(source!=_status.event.player) return true;
+								if(info.updateUsable=='phaseUse'){
+									if(event.getParent().name!='phaseUse') return true;
+									if(event.getParent().player!=source) return true;
+								}
+								event.addCount_extra=true;
+								var num=info.usable;
+								if(typeof num=='function') num=num(card,source);
+								num=game.checkMod(card,source,num,event,'cardUsable',source);
+								if(typeof num!='number') return true;
+								if(source.countUsed(card)<num) return true;
+								if(game.hasPlayer(function(current){
+									return game.checkMod(card,source,current,false,'cardUsableTarget',source);
+								})){
+									return true;
+								}
+								return false;
+							},
+							playerEnabled:function(card,player,target){
+								var source=player.storage.dcpandi_effect;
+								if(!source.isIn()||get.itemtype(source)!='player'||get.itemtype(source.storage.dcpandi_effect)=='player') return;
+								return lib.filter.targetEnabledx(card,source,target);
+							},
+							targetInRange:function(card,player,target){
+								var source=player.storage.dcpandi_effect;
+								if(!source.isIn()||get.itemtype(source)!='player'||get.itemtype(source.storage.dcpandi_effect)=='player') return;
+								return lib.filter.targetInRange(card,source,target);
+							},
+						},
+					},
+				},
+			},
 			//杜预
 			dcjianguo:{
 				audio:2,
@@ -10518,7 +10675,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangjinyun:'张瑾云，张星彩的妹妹，刘禅的第二任皇后，238年正月立为皇后。景耀六年（263年），蜀汉灭亡，刘禅被俘，此后，受封为安乐公。张皇后也随之成为安乐公夫人，咸熙元年（264年），随刘禅到洛阳。',
 			duanqiaoxiao:'段巧笑，三国时代魏国魏文帝时的宫人，甚受到魏文帝的宠爱。传说她以原有的化妆品中的米粉和胡粉，再加入葵花子汁，发明了女性化妆用的脂粉。',
 			ruanji:'阮籍（公元210年～263年），字嗣宗，陈留尉氏（今河南省开封市）人，三国时期魏国诗人、竹林七贤之一。阮瑀之子，门荫入仕，累迁步兵校尉，世称阮步兵。崇奉老庄之学，政治上则采取谨慎避祸的态度。景元四年（公元263年），阮籍去世，享年五十三岁。作为“正始之音”的代表，著有《咏怀八十二首》、《大人先生传》等，其著作收录在《阮籍集》中。',
-			ganfurenmifuren:'甘夫人，刘备起兵后于沛城娶之为妾。后来，甘夫人随刘备到荆州，生了阿斗(也就是后主刘禅)。223年四月，刘备病死于白帝城，追谥甘夫人为“昭烈皇后”。<br>糜夫人，刘备夫人。徐州别驾糜竺之妹。长坂兵败，她怀抱年仅两岁的刘禅在乱军中走散，被赵云发现；但麋夫人因为赵云只有一匹马，不肯上马，在将阿斗托付给赵云后投井而亡。'
+			ganfurenmifuren:'甘夫人，刘备起兵后于沛城娶之为妾。后来，甘夫人随刘备到荆州，生了阿斗(也就是后主刘禅)。223年四月，刘备病死于白帝城，追谥甘夫人为“昭烈皇后”。<br>糜夫人，刘备夫人。徐州别驾糜竺之妹。长坂兵败，她怀抱年仅两岁的刘禅在乱军中走散，被赵云发现；但麋夫人因为赵云只有一匹马，不肯上马，在将阿斗托付给赵云后投井而亡。',
+			sunlingluan:'孙翎鸾，孙坚与妾室丁氏的女儿，孙策的妹妹，孙权、孙尚香的姐姐。孙翎年幼时曾得杜夔点化，窥得音律玄妙，丝竹八音，擅长琵琶，每次弹奏琵琶时，经常引来百鸟，称为奇观。早年孙翎鸾出游，山林巧遇葛玄，葛玄观其面相为吉，特传授修行辟谷之法，可令其身心洗涤，容颜久存。孙翎鸾有恋人名张奋，两人情投意合，可惜造化弄人，张奋病死外域，孙翎鸾倚楼盼归，日复一日、年复一年。后有五彩孔雀自东南而来，绕楼而鸣，其声如慕，孙翎鸾泪染笑靥，与孔雀耳语几句后乘翎而去。',
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',
@@ -11017,6 +11175,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjianguo_info:'出牌阶段限一次。你可以选择一名角色并选择一项：1.令其摸一张牌，然后其弃置一半的手牌；2.令其弃置一张牌，然后其摸等同于手牌数一半的牌（均向下取整）。',
 			dcdyqingshi:'倾势',
 			dcdyqingshi_info:'当你于回合内使用【杀】或普通锦囊牌指定第一个目标后，若目标角色包括其他角色且此牌为你本回合使用的第X张牌，你可以对其中一名不为你的目标角色造成1点伤害（X为你的手牌数）。',
+			sunlingluan:'孙翎鸾',
+			dclingyue:'聆乐',
+			dclingyue_info:'锁定技。一名角色于一轮内首次造成伤害后，你摸一张牌。若此时是该角色回合外，则改为摸X张牌（X为本回合全场造成的伤害值）。',
+			dcpandi:'盻睇',
+			dcpandi_info:'出牌阶段，你可以选择一名本回合内未造成过伤害的角色。你本阶段内使用的下一张牌改为以该角色为基准判断使用目标合法性，且使用者改为该角色。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',

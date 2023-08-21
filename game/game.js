@@ -28463,19 +28463,19 @@
 				if(player==undefined) player=_status.event.player;
 				if(!player) return false;
 				if(get.itemtype(card)=='card'){
-					var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+					var mod2=game.checkMod(card,player,event,'unchanged','cardEnabled2',player);
 					if(mod2!='unchanged') return mod2;
 				}
 				card=get.autoViewAs(card,null,player);
 				if(event==='forceEnable'){
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
+					var mod=game.checkMod(card,player,event,'unchanged','cardEnabled',player);
 					if(mod!='unchanged') return mod;
 					return true;
 				}
 				else{
 					var filter=get.info(card).enable;
 					if(!filter) return;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
+					var mod=game.checkMod(card,player,event,'unchanged','cardEnabled',player);
 					if(mod!='unchanged') return mod;
 					if(typeof filter=='boolean') return filter;
 					if(typeof filter=='function') return filter(card,player,event);
@@ -28492,7 +28492,7 @@
 				}
 				if(player==undefined) player=_status.event.player;
 				if(get.itemtype(card)=='card'){
-					var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+					var mod2=game.checkMod(card,player,event,'unchanged','cardEnabled2',player);
 					if(mod2!='unchanged') return mod2;
 				}
 				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
@@ -28511,7 +28511,7 @@
 				}
 				var num=info.usable;
 				if(typeof num=='function') num=num(card,player);
-				num=game.checkMod(card,player,num,'cardUsable',player);
+				num=game.checkMod(card,player,num,event,'cardUsable',player);
 				if(typeof num!='number') return true;
 				else return(player.countUsed(card)<num);
 			},
@@ -28529,7 +28529,7 @@
 				var num=info.usable;
 				if(typeof num=='function') num=num(card,player);
 				num=game.checkMod(card,player,num,'cardUsable',player);
-				if(typeof num!='number') return true;
+				if(typeof num!='number') return get.itemtype(num)=='boolean'?num:true;
 				if(player.countUsed(card)<num) return true;
 				if(game.hasPlayer(function(current){
 					return game.checkMod(card,player,current,false,'cardUsableTarget',player);
@@ -28602,7 +28602,7 @@
 				var filter=info.filterTarget;
 				if(!info.singleCard||ui.selected.targets.length==0){
 					var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player);
-					if(mod==false) return false;
+					if(mod!='unchanged') return mod;
 					var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target);
 					if(mod!='unchanged') return mod;
 				}
@@ -29773,8 +29773,10 @@
 							current.getStat().isRound=true;
 						}
 					};
-					player.getHistory().isMe=true;
-					player.getStat().isMe=true;
+					if(!player.phaseSkipped){
+						player.getHistory().isMe=true;
+						player.getStat().isMe=true;
+					}
 					if(isRound){
 						game.getGlobalHistory().isRound=true;
 					}
