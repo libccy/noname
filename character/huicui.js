@@ -629,25 +629,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt:get.prompt('dcporui'),
 						//prompt2:'弃置一张基本牌并选择一名本回合失去过牌的非当前回合的其他角色，你视为对其依次使用'+get.cnNumber(Math.max(0,player.hp)+1)+'张【杀】',
 						prompt2:get.skillInfoTranslation('dcporui',player),
-						filterCard:function(card,player){
-							if(get.type(card)!='basic') return false;
-							return lib.filter.cardDiscardable.apply(this,arguments);
-						},
+						filterCard:lib.filter.cardDiscardable,
 						selectCard:1,
-						targets:game.filterPlayer(current=>{
+						position:'he',
+						list:game.filterPlayer(current=>{
 							if(current==player||current==trigger.player) return false;
 							return current.hasHistory('lose',function(evt){
 								return evt.cards.length>0;
 							});
 						}),
 						filterTarget:function(card,player,target){
-							return _status.event.targets.contains(target);
+							return _status.event.list.map(i=>i[0]).contains(target);
 						},
 						ai1:function(card){
 							return 7-get.value(card);
 						},
 						ai2:function(target){
-							return get.effect(target,{name:'sha'},_status.event.player,_status.event.player);
+							return get.effect(target,{name:'sha'},_status.event.player,_status.event.player)*_status.event.list.find(i=>{
+								return i[0]==target;
+							})[1];
 						}
 					});
 					'step 1'
@@ -700,7 +700,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.4,
-					threaten:4.8
+					threaten:3.8,
 				}
 			},
 			dcgonghu:{
@@ -721,6 +721,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return num>1;
 					}
 					if(player.hasMark('dcgonghu_basic')) return false;
+					if(_status.currentPhase&&_status.currentPhase==player) return false;
 					var evt=event.getl(player);
 					if(!evt||!evt.cards2||!evt.cards2.some(i=>get.type2(i,player)=='basic')) return false;
 					var num=0;
@@ -3259,7 +3260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(bool1) val+=5;
 							if(bool2){
 								if(bool1) target.maxHp++;
-								val+=get.recoverEffect(target,player,player);
+								val+=Math.max(0,get.recoverEffect(target,player,player));
 								if(bool1) target.maxHp--;
 							}
 							if(bool3){
@@ -9825,9 +9826,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		perfectPair:{},
 		characterReplace:{
 			dongbai:['re_dongbai','dongbai','jsrg_dongbai'],
-			chunyuqiong:['chunyuqiong','re_chunyuqiong'],
+			chunyuqiong:['chunyuqiong','re_chunyuqiong','jsrg_chunyuqiong'],
 			kanze:['re_kanze','kanze'],
-			chendeng:['ol_chendeng','re_chendeng','chendeng'],
+			chendeng:['ol_chendeng','re_chendeng','chendeng','jsrg_chendeng'],
 			miheng:['miheng','re_miheng'],
 			liuba:['ol_liuba','dc_liuba','liuba'],
 			lvkuanglvxiang:['lvkuanglvxiang','dc_lvkuanglvxiang'],
@@ -10195,7 +10196,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqinghuang_info:'出牌阶段开始时，你可以减1点体力上限，然后你于本回合发动〖踏寂〗时额外随机执行一种效果。',
 			dc_huojun:'霍峻',
 			dcgue:'孤扼',
-			dcgue_info:'每名其他角色的回合限一次。当你需要使用或打出【杀】或【闪】时，若你有手牌，你可以展示之。若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
+			dcgue_info:'每回合限一次。当你需要使用或打出【杀】或【闪】时，若你有手牌，你可以展示之。若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
 			dcsigong:'伺攻',
 			dcsigong_info:'其他角色的回合结束时，若其于本回合内使用牌被响应过，你可以将手牌摸至或弃置至1，视为对其使用一张需使用X张【闪】抵消的【杀】，且此【杀】的伤害基数+1（X为你以此法弃置的牌数且至少为1）。当你以此法造成伤害后，该技能于本轮失效。',
 			peiyuanshao:'裴元绍',

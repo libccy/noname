@@ -18,6 +18,7 @@ window.noname_package={
 		tw:'外服武将',
 		collab:'联动卡',
 		offline:'线下武将',
+		jsrg:'江山如故',
 		old:'怀旧',
 		diy:'DIY',
 		ddd:'3D精选',

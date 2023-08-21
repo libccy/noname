@@ -13157,7 +13157,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baosanniang:['xin_baosanniang','re_baosanniang','baosanniang'],
 			heqi:['re_heqi','heqi'],
 			weiwenzhugezhi:['weiwenzhugezhi','re_weiwenzhugezhi'],
-			xugong:['xugong','re_xugong'],
+			xugong:['xugong','re_xugong','jsrg_xugong'],
 			liuzan:['re_liuzan','liuzan'],
 			sufei:['yj_sufei','sp_sufei','xf_sufei'],
 			jiakui:['jiakui','old_jiakui'],
