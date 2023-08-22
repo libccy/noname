@@ -1613,9 +1613,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var target=trigger.player;
-					target.addTempSkill('yifa2');
+					target.addTempSkill('yifa2',{player:'phaseEnd'});
 					target.addMark('yifa2',1,false);
 				},
+				ai:{threaten:0.8},
 			},
 			yifa2:{
 				charlotte:true,
@@ -3719,7 +3720,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bolan_info:'①出牌阶段开始时，你可从三个描述中带有“出牌阶段限一次”的技能中选择一个，令当前回合角色获得直至此阶段结束。②其他角色出牌阶段限一次，其可以失去1点体力，令你发动一次〖博览①〗。',
 			yifa:'仪法',
 			yifa2:'仪法',
-			yifa_info:'锁定技，其他角色使用【杀】或黑色普通锦囊牌指定你为目标后，其手牌上限-1直到回合结束。',
+			yifa_info:'锁定技，其他角色使用【杀】或黑色普通锦囊牌指定你为目标后，其手牌上限-1直到其回合结束。',
 			ol_huaxin:'OL华歆',
 			caozhao:'草诏',
 			caozhao_backup:'草诏',
