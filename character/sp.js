@@ -765,6 +765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					spade:{
+						audio:true,
 						mark:true,
 						marktext:'雨',
 						intro:{
@@ -807,6 +808,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					miehuo:{
+						audio:'oltianhou_spade',
 						trigger:{global:'damageBegin2'},
 						forced:true,
 						logTarget:'source',
@@ -818,6 +820,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					heart:{
+						audio:true,
 						mark:true,
 						marktext:'暑',
 						intro:{
@@ -834,6 +837,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					club:{
+						audio:true,
 						mark:true,
 						marktext:'霜',
 						intro:{
@@ -850,6 +854,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					diamond:{
+						audio:true,
 						mark:true,
 						marktext:'雾',
 						intro:{
@@ -1035,7 +1040,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(player.countCards('h')%2==0){
 						player.draw();
-						player.chooseTarget('犷骜：令此杀对其任意个目标无效',[1,Infinity],true,(card,player,target)=>{
+						player.chooseTarget('犷骜：令此杀对其任意个目标无效',[1,Infinity],(card,player,target)=>{
 							return _status.event.targetsx.contains(target);
 						}).set('ai',target=>{
 							return 1-get.effect(target,_status.event.getTrigger().card,_status.event.player,_status.event.player);
@@ -6240,7 +6245,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					player.chooseTarget(true,'将'+get.translation(card)+'置于一名角色的装备区内',function(card,player,target){
-						return target.canEquip(_status.event.card);
+						return target.canEquip(_status.event.card,true);
 					}).set('card',card).set('ai',function(target){
 						var card=_status.event.getParent().card,player=_status.event.player;
 						return get.effect(target,card,player,player);
@@ -23999,7 +24004,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzhenying_info:'出牌阶段限两次。你可以选择一名手牌数不大于你的其他角色，你与其同时将手牌摸或弃置至至多两张。然后你与其中手牌数较少的角色视为对另一名角色使用一张【决斗】。',
 			ol_wenqin:'文钦',
 			olguangao:'犷骜',
-			olguangao_info:'当你/其他角色使用【杀】时，你/该角色可以额外指定一个目标/你为目标（使用者不为你则有距离限制）。然后若你的手牌数为偶数，你摸一张牌并令此牌对任意目标无效。',
+			olguangao_info:'当你/其他角色使用【杀】时，你/该角色可以额外指定一个目标/你为目标（使用者不为你则有距离限制）。然后若你的手牌数为偶数，你摸一张牌并令此牌对任意目标无效（可不选）。',
 			olhuiqi:'彗企',
 			olhuiqi_info:'觉醒技。一名角色回合结束后，若仅有三名角色于此回合成为过牌的目标，你获得〖偕举〗并获得一个额外的回合。',
 			olxieju:'偕举',

@@ -147,6 +147,54 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('dcpandi_effect','phaseUseAfter');
 					}
 				},
+				ai:{
+					threaten:4,
+					order:12,
+					result:{
+						player:function(player,target){
+							return player.getCards('hs').reduce(function(eff,card){
+								return Math.max(eff,lib.skill.dcpandi.getUseValue(card,target,player)-lib.skill.dcpandi.getUseValue(card,player,player))
+							},0)
+						},
+					},
+				},
+				getUseValue:function(card,player,viewer){
+					if(typeof(card)=='string'){
+						card={name:card,isCard:true};
+					}
+					var targets=game.filterPlayer();
+					var value=[];
+					var min=0;
+					var info=get.info(card);
+					if(!info||info.notarget) return 0;
+					var range;
+					var select=get.copy(info.selectTarget);
+					if(select==undefined){
+						if(info.filterTarget==undefined) return true;
+						range=[1,1];
+					}
+					else if(typeof select=='number') range=[select,select];
+					else if(get.itemtype(select)=='select') range=select;
+					else if(typeof select=='function') range=select(card,player);
+					if(info.singleCard) range=[1,1];
+					game.checkMod(card,player,range,'selectTarget',player);
+					if(!range) return 0;
+				
+					for(var i=0;i<targets.length;i++){
+						if(player.canUse(card,targets[i],null,true)){
+							var eff=get.effect(targets[i],card,player,viewer);
+							value.push(eff);
+						}
+					}
+					value.sort(function(a,b){
+						return b-a;
+					});
+					for(var i=0;i<value.length;i++){
+						if(i==range[1]||range[1]!=-1&&value[i]<=0) break;
+						min+=value[i];
+					}
+					return min;
+				},
 				subSkill:{
 					effect:{
 						audio:'dcpandi',
@@ -169,6 +217,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.noai=true;
 							player.removeSkill('dcpandi_effect');
 							game.delay(0.5);
+						},
+						ai:{
+							order:function(card,player,target,current){
+								if(typeof card!='object') return;
+								var source=player.storage.dcpandi_effect;
+								if(!source.isIn()||get.itemtype(source)!='player'||get.itemtype(source.storage.dcpandi_effect)=='player') return;
+								return [0,get.effect_use(target,card,source,player),0,get.effect(target,card,source,target)]
+							},
 						},
 						mod:{
 							selectCard:function(card,player,range){
@@ -8705,7 +8761,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					next.set('list',list);
 					next.set('processAI',function(list){
-						var allcards=list[0][1].concat(list[1][1]),canchoose=allcards.slice(0),cards=[];
+						var allcards=list[0][1].slice(0),cards=[];
+						if(list.length>1){
+							allcards=allcards.concat(list[1][1]);
+						}
+						var canchoose=allcards.slice(0);
 						var player=_status.event.player;
 						var getv=function(button){
 							if(button.name=='sha'&&allcards.filter(function(card){

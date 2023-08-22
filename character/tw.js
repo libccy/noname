@@ -11693,14 +11693,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						filter:function(event,player){
 							for(var i of player.getStorage('twjuezhu_restore')){
-								if(i[0]==event.player&&player.hasEnabledSlot(i[1])) return true;
+								if(i[0]==event.player&&player.hasDisabledSlot(i[1])) return true;
 							}
 							return false;
 						},
 						content:function(){
 							var list=[];
 							for(var i of player.getStorage('twjuezhu_restore')){
-								if(i[0]==trigger.player&&player.hasEnabledSlot(i[1])) list.push(i[1]);
+								if(i[0]==trigger.player&&player.hasDisabledSlot(i[1])) list.push(i[1]);
 							}
 							player.enableEquip(list);
 						},

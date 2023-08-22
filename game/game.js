@@ -11854,9 +11854,12 @@
 				},
 				cardsDiscard:function(){
 					game.getGlobalHistory().cardMove.push(event);
+					var withPile=false;
 					for(var i=0;i<cards.length;i++){
+						if(get.position(cards[i],true)=='c') withPile=true;
 						cards[i].discard();
 					}
+					if(withPile) game.updateRoundNumber();
 				},
 				orderingDiscard:function(){
 					var cards=event.relatedEvent.orderingCards.slice(0);
@@ -11867,11 +11870,14 @@
 				},
 				cardsGotoOrdering:function(){
 					game.getGlobalHistory().cardMove.push(event);
+					var withPile=false;
 					for(var i=0;i<cards.length;i++){
+						if(get.position(cards[i],true)=='c') withPile=true;
 						cards[i].fix();
 						ui.ordering.appendChild(cards[i]);
 					}
-				 var evt=event.relatedEvent||event.getParent();
+					if(withPile) game.updateRoundNumber();
+					var evt=event.relatedEvent||event.getParent();
 					if(!evt.orderingCards) evt.orderingCards=[];
 					if(!evt.noOrdering&&!evt.cardsOrdered){
 						evt.cardsOrdered=true;
@@ -11883,10 +11889,13 @@
 				},
 				cardsGotoSpecial:function(){
 					game.getGlobalHistory().cardMove.push(event);
+					var withPile=false;
 					for(var i=0;i<cards.length;i++){
+						if(get.position(cards[i],true)=='c') withPile=true;
 						cards[i].fix();
 						ui.special.appendChild(cards[i]);
 					}
+					if(withPile) game.updateRoundNumber();
 					if(event.toRenku){
 						_status.renku.addArray(cards);
 						if(_status.renku.length>6){

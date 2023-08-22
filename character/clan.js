@@ -567,8 +567,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!targets.length){
 									var num=lib.skill.clanguangu_backup.num;
 									var cards=get.cards(num);
-									game.cardsGotoOrdering(cards);
-									event.cards=cards;
+									event.cards=cards.slice(0);
+									while(cards.length) ui.cardPile.insertBefore(cards.pop().fix(),ui.cardPile.firstChild);
+									game.updateRoundNumber();
 									event.goto(2);
 								}
 								else{
@@ -643,11 +644,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										next.throw=false;
 										next.set('owner',owner);
 									}
-								}
-								'step 4'
-								if(!targets.length){
-									while(cards.length) ui.cardPile.insertBefore(cards.pop().fix(),ui.cardPile.firstChild);
-									game.updateRoundNumber();
 								}
 							},
 							ai:{
