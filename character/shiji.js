@@ -2924,19 +2924,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingyu:{
 				audio:3,
 				dutySkill:true,
-				trigger:{player:'damageBegin2'},
-				forced:true,
-				filter:function(event,player){
-					return player.countCards('he',function(card){
-						return lib.filter.cardDiscardable(card,player,'qingyu');
-					})>1;
-				},
-				content:function(){
-					trigger.cancel();
-					player.chooseToDiscard(2,'he',true);
-				},
-				group:['qingyu_achieve','qingyu_fail'],
+				locked:true,
+				group:['qingyu_achieve','qingyu_fail','qingyu_defend'],
 				subSkill:{
+					defend:{
+						audio:'qingyu1',
+						trigger:{player:'damageBegin2'},
+						filter:function(event,player){
+							return player.countCards('he',function(card){
+								return lib.filter.cardDiscardable(card,player,'qingyu');
+							})>1;
+						},
+						forced:true,
+						content:function(){
+							trigger.cancel();
+							player.chooseToDiscard(2,'he',true);
+						},
+					},
 					achieve:{
 						audio:'qingyu3',
 						trigger:{player:'phaseZhunbeiBegin'},
@@ -2965,6 +2969,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				derivation:'xuancun',
 			},
+			qingyu1:{audio:true},
 			qingyu2:{audio:true},
 			qingyu3:{audio:true},
 			xuancun:{
