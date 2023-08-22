@@ -8768,7 +8768,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseCard('he',get.prompt2('duoduan')).set('ai',function(card){
+					player.chooseCard('he',get.prompt2('duoduan'),lib.filter.cardRecastable).set('ai',function(card){
 						if(_status.event.goon) return 8-get.value(card);
 						return 0;
 					}).set('goon',function(){
@@ -8780,12 +8780,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.addTempSkill('duoduan_im');
-						var card=result.cards[0];
 						player.logSkill('duoduan',trigger.player);
-						player.lose(card,ui.discardPile,'visible');
-						player.$throw(card,1000);
-						game.log(player,'将',card,'置入弃牌堆');
-						player.draw();
+						player.recast(result.cards);
 					}
 					else event.finish();
 					'step 2'
@@ -11863,31 +11859,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:"重铸一张防具牌，然后将体力回复至1点。",
 				audio:'xinfu_jingxie',
 				enable:"chooseToUse",
-				filterCard:function(card){
-					return get.subtype(card)=='equip2';
-				},
-				filter:function(event,player){
-					if(event.type=='dying'){
-						if(player!=event.dying) return false;
-						return player.countCards('he',function(card){
-							return get.subtype(card)=='equip2';
-						})>0;
-					}
-					return false;
-				},
-				check:function(){
-					return 1;
+				filterCard:(card,player)=>get.subtype(card)=='equip2'&&player.canRecast(card),
+				filter:(event,player)=>{
+					if(event.type!='dying') return false;
+					if(player!=event.dying) return false;
+					return player.hasCard(card=>lib.skill.xinfu_jingxie2.filterCard(card,player),lib.skill.xinfu_jingxie2.position);
 				},
 				position:"he",
 				discard:false,
-				loseTo:'discardPile',
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆')
-				},
+				lose:false,
+				delay:false,
 				content:function(){
 					'step 0'
-					player.draw();
+					player.recast(cards);
 					'step 1'
 					var num=1-player.hp;
 					if(num) player.recover(num);
@@ -11896,10 +11880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:0.5,
 					skillTagFilter:function(player,arg,target){
 						if(player!=target) return false;
-						return player.countCards('he',function(card){
-							if(_status.connectMode&&get.position(card)=='h') return true;
-							return get.subtype(card)=='equip2';
-						})>0;
+						return player.hasCard(card=>_status.connectMode&&get.position(card)=='h'||get.subtype(card)=='equip2'&&player.canRecast(card),'he');
 					},
 					save:true,
 					result:{
