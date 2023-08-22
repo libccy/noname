@@ -10705,16 +10705,16 @@
 				recast:()=>{
 					'step 0'
 					game.log(player,'重铸了',cards);
-					if(typeof event.recastingLose=='function') event.recastingLoseCards=event.recastingLose(player,cards);
+					if(typeof event.recastingLose=='function') event.recastingLostCards=event.recastingLose(player,cards);
 					'step 1'
 					event.trigger('recast');
 					'step 2'
 					if(typeof event.recastingGain!='function') return;
-					event.recastingGainCards=event.recastingGain(player,cards);
-					if(get.itemtype(event.recastingGainCards)=='card') event.recastingGainCards=[event.recastingGainCards];
+					event.recastingGainedCards=event.recastingGain(player,cards);
+					if(get.itemtype(event.recastingGainedCards)=='card') event.recastingGainedCards=[event.recastingGainedCards];
 					'step 3'
 					event.result=[];
-					if(get.itemtype(event.recastingGainCards)=='cards') event.result.addArray(event.recastingGainCards);
+					if(get.itemtype(event.recastingGainedCards)=='cards') event.result.addArray(event.recastingGainedCards);
 					if(get.itemtype(result.cards)=='card') event.result.push(result.cards);
 					else if(get.itemtype(result.cards)=='cards') event.result.addArray(result.cards);
 					if(get.itemtype(result)=='card') event.result.push(result);
