@@ -10705,11 +10705,20 @@
 				recast:()=>{
 					'step 0'
 					game.log(player,'重铸了',cards);
-					if(typeof event.recastingLose=='function') event.recastingLose(player,cards);
+					if(typeof event.recastingLose=='function') event.recastingLoseCards=event.recastingLose(player,cards);
 					'step 1'
 					event.trigger('recast');
 					'step 2'
-					if(typeof event.recastingGain=='function') event.recastingGain(player,cards);
+					if(typeof event.recastingGain!='function') return;
+					event.recastingGainCards=event.recastingGain(player,cards);
+					if(get.itemtype(event.recastingGainCards)=='card') event.recastingGainCards=[event.recastingGainCards];
+					'step 3'
+					event.result=[];
+					if(get.itemtype(event.recastingGainCards)=='cards') event.result.addArray(event.recastingGainCards);
+					if(get.itemtype(result.cards)=='card') event.result.push(result.cards);
+					else if(get.itemtype(result.cards)=='cards') event.result.addArray(result.cards);
+					if(get.itemtype(result)=='card') event.result.push(result);
+					else if(get.itemtype(result)=='cards') event.result.addArray(result);
 				},
 				//装备栏相关
 				disableEquip:function(){
@@ -18264,7 +18273,7 @@
 					if(get.itemtype(cards)=='card') recast.cards=[cards];
 					else if(get.itemtype(cards)=='cards'&&cards.length) recast.cards=cards;
 					else _status.event.next.remove(recast);
-					if(typeof recastingLose!='function') recastingLose=(player,cards)=>player.loseToDiscardpile(cards).log=false;
+					if(typeof recastingLose!='function') recastingLose=(player,cards)=>player.loseToDiscardpile(cards).set("log",false).cards;
 					recast.recastingLose=recastingLose;
 					if(typeof recastingGain!='function') recastingGain=(player,cards)=>player.draw(cards.length).log=false;
 					recast.recastingGain=recastingGain;
@@ -29944,12 +29953,16 @@
 				delay:false,
 				content:function(){
 					player.recast(cards,null,(player,cards)=>{
-						let numberOfCardsToDraw=cards.length;
+						var numberOfCardsToDraw=cards.length, cardsToGain=[];
 						cards.forEach(value=>{
 							if(lib.config.mode=='stone'&&_status.mode=='deck'&&!player.isMin()&&get.type(value).indexOf('stone')==0){
 								var stonecard=get.stonecard(1,player.career);
-								numberOfCardsToDraw--;
-								if(stonecard.length) player.gain(game.createCard(stonecard.randomGet()),'draw');
+								if(stonecard.length){
+									numberOfCardsToDraw-=stonecard.length;
+									var card=game.createCard(stonecard.randomGet());
+									player.gain(card,'draw');
+									cardsToGain.push(card);
+								}
 								else player.draw({
 									drawDeck:1
 								}).log=false;
@@ -29958,16 +29971,21 @@
 								var libCard=get.libCard(info=>info.subtype=='spell_silver');
 								if(!libCard.length) return;
 								numberOfCardsToDraw--;
-								player.gain(game.createCard(libCard.randomGet()),'draw');
+								var card=game.createCard(libCard.randomGet());
+								player.gain(card,'draw');
+								cardsToGain.push(card);
 							}
 							else if(get.subtype(value)=='spell_silver'){
 								var libCard=get.libCard(info=>info.subtype=='spell_bronze');
 								if(!libCard.length) return;
 								numberOfCardsToDraw--;
-								player.gain(game.createCard(libCard.randomGet()),'draw');
+								var card=game.createCard(libCard.randomGet());
+								player.gain(card,'draw');
+								cardsToGain.push(card);
 							}
 						});
 						if(numberOfCardsToDraw) player.draw(numberOfCardsToDraw).log=false;
+						return cardsToGain;
 					});
 				},
 				ai:{
