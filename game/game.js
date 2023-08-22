@@ -18278,7 +18278,7 @@
 					if(cardRecastable!='unchanged') return cardRecastable;
 					if(get.position(card)!='h') return false;
 					const info=get.info(card);
-					return typeof info.chongzhu=='function'?info.chongzhu(event,player):info.chongzhu;
+					return typeof info.chongzhu=='function'?info.chongzhu(_status.event,this):info.chongzhu;
 				},
 				//装备栏相关
 				//判断一名角色的某个区域是否被废除
