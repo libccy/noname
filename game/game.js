@@ -9750,6 +9750,7 @@
 					}
 					str=`if(event.step==${k}){event.finish();return;}`+str;
 				}
+				str=`"use strict";\n${str}`;
 				return (new Function('event','step','source','player','target','targets',
 					'card','cards','skill','forced','num','trigger','result',
 					'_status','lib','game','ui','get','ai',str));
@@ -11179,7 +11180,10 @@
 								game.resume();
 								_status.imchoosing=false;
 								if(roundmenu) ui.roundmenu.style.display='';
-								if(ui.backgroundMusic) ui.backgroundMusic.play().catch(()=>void 0);
+								if(ui.backgroundMusic){
+									var promise=ui.backgroundMusic.play();
+									if(promise) promise.catch(()=>void 0);
+								}
 								hitsound_audio.remove();
 							},1000);
 						};
@@ -11368,7 +11372,10 @@
 						if(dialog){
 							dialog.close();
 						}
-						if(ui.backgroundMusic) ui.backgroundMusic.play().catch(()=>void 0);
+						if(ui.backgroundMusic){
+							var promise=ui.backgroundMusic.play();
+							if(promise) promise.catch(()=>void 0);
+						}
 					},event.videoId,event.time);
 					var result=event.result||result;
 					event.result=result;
