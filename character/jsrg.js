@@ -1466,11 +1466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.group=='qun';
 				},
-				filterCard:function(card,player){
-					var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-					if(!mod) return false;
-					return true;
-				},
+				filterCard:lib.filter.cardRecastable,
 				check:function(card,player){
 					var val=5+['shan','tao'].contains(get.name(card))*1.5;
 					if(player.needsToDiscard()>2&&get.name(card)=='sha'&&player.countCards('hs','sha')>1) val+=0.5;
@@ -1483,8 +1479,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:false,
 				content:function(){
 					'step 0'
-					player.loseToDiscardpile(cards);
-					player.draw();
+					player.recast(cards);
 					switch(get.name(cards[0])){
 						case 'sha':
 							player.addTempSkill('jsrgzhengbing_sha');
