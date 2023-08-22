@@ -9714,9 +9714,11 @@
 					localStorage.removeItem(lib.configprefix+'background');
 				}
 			},
-			//by 诗笺
+			//by 诗笺、Tipx-L
 			parsex:function(func){
-				var str=func.toString();
+				//Remove all comments
+				//移除所有注释
+				var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\S\s]|[^"\\])*"|'(?:\\[\S\s]|[^'\\])*'|(?:\r?\n|[\S\s])[^\/"'\\\s]*)/mg,'$2').trim();
 				//获取第一个 { 后的所有字符
 				str=str.slice(str.indexOf('{')+1);
 				//func中要写步骤的话，必须要写step 0
@@ -9750,7 +9752,6 @@
 					}
 					str=`if(event.step==${k}){event.finish();return;}`+str;
 				}
-				str=`"use strict";\n${str}`;
 				return (new Function('event','step','source','player','target','targets',
 					'card','cards','skill','forced','num','trigger','result',
 					'_status','lib','game','ui','get','ai',str));
@@ -29946,7 +29947,7 @@
 						let numberOfCardsToDraw=cards.length;
 						cards.forEach(value=>{
 							if(lib.config.mode=='stone'&&_status.mode=='deck'&&!player.isMin()&&get.type(value).indexOf('stone')==0){
-								const stonecard=get.stonecard(1,player.career);
+								var stonecard=get.stonecard(1,player.career);
 								numberOfCardsToDraw--;
 								if(stonecard.length) player.gain(game.createCard(stonecard.randomGet()),'draw');
 								else player.draw({
@@ -29954,13 +29955,13 @@
 								}).log=false;
 							}
 							else if(get.subtype(value)=='spell_gold'){
-								const libCard=get.libCard(info=>info.subtype=='spell_silver');
+								var libCard=get.libCard(info=>info.subtype=='spell_silver');
 								if(!libCard.length) return;
 								numberOfCardsToDraw--;
 								player.gain(game.createCard(libCard.randomGet()),'draw');
 							}
 							else if(get.subtype(value)=='spell_silver'){
-								const libCard=get.libCard(info=>info.subtype=='spell_bronze');
+								var libCard=get.libCard(info=>info.subtype=='spell_bronze');
 								if(!libCard.length) return;
 								numberOfCardsToDraw--;
 								player.gain(game.createCard(libCard.randomGet()),'draw');

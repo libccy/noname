@@ -11190,7 +11190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						filter:function(event,player){
 							return player.getHistory('lose',function(evt){
-								return evt.getParent(2).name=='twgezhi'&&evt.getParent('phaseUse')==event;
+								return evt.getParent(3).name=='twgezhi'&&evt.getParent('phaseUse')==event;
 							}).length>1;
 						},
 						content:function(){

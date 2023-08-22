@@ -4059,18 +4059,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyanyu2:{
 				trigger:{player:'phaseUseEnd'},
 				direct:true,
-				filter:function(event,player){
-					return player.getHistory('lose',function(evt){
-						var evt2=evt.getParent();
-						return evt2.name=='useSkill'&&evt2.skill=='reyanyu'&&evt.getParent(3)==event;
-					}).length>0;
-				},
+				filter:(event,player)=>player.hasHistory('useSkill',evt=>evt.skill=='reyanyu'&&evt.event.getParent(2)==event),
 				content:function(){
 					'step 0'
-					event.num=Math.min(3,player.getHistory('lose',function(evt){
-						var evt2=evt.getParent();
-						return evt2.name=='useSkill'&&evt2.skill=='reyanyu'&&evt.getParent(3)==trigger;
-					}).length);
+					event.num=Math.min(3,player.getHistory('useSkill',evt=>evt.skill=='reyanyu'&&evt.event.getParent(2)==trigger).length);
 					player.chooseTarget(get.prompt('reyanyu'),'令一名男性角色摸'+get.cnNumber(event.num)+'张牌',function(card,player,target){
 						return target.hasSex('male')&&target!=player;
 					}).set('ai',function(target){
