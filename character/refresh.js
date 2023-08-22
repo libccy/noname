@@ -2226,7 +2226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//界荀彧
 			oljieming:{
 				audio:2,
-				trigger:{player:['damageEnd','dieAfter']},
+				trigger:{player:['damageEnd','die']},
 				direct:true,
 				forceDie:true,
 				filter:function(event,player){
@@ -14661,7 +14661,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shizhan_info:'出牌阶段限两次，你可以选择一名其他角色。该角色视为对你使用一张【决斗】。',
 			ol_xunyu:'界荀彧',
 			oljieming:'节命',
-			oljieming_info:'当你受到1点伤害后或死亡后，你可令一名角色摸X张牌。然后若其手牌数大于X，则其将手牌弃置至X张（X为其体力上限且至多为5）。',
+			oljieming_info:'当你受到1点伤害后或死亡时，你可令一名角色摸X张牌。然后若其手牌数大于X，则其将手牌弃置至X张（X为其体力上限且至多为5）。',
 			re_liufeng:'界刘封',
 			rexiansi:'陷嗣',
 			rexiansi2:'陷嗣',

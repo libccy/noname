@@ -3001,7 +3001,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						player.awakenSkill('zhongjie');
+						//player.awakenSkill('zhongjie');
 						var target=result.targets[0];
 						player.logSkill('zhongjie',target);
 						target.gainMaxHp();
@@ -3350,6 +3350,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				ai:{
+					jueqing:true,
+				}
 			},
 			nhhuoqi:{
 				enable:'phaseUse',

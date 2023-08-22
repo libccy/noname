@@ -5867,9 +5867,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(_status.event.goon) return -1;
 							var num=_status.event.maxNum;
 							if(ui.selected.cards.length>=num-1){
-								var val=get.value(player.getCards('he',function(cardx){
+								var cards=player.getCards('he',function(cardx){
 									return cardx!=card&&!ui.selected.cards.contains(cardx);
-								}));
+								});
+								var val=0;
+								for(var cardx of cards) val+=get.value(cardx);
 								if(val>=14) return 0;
 							}
 							return get.value(card);

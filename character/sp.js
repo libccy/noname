@@ -4181,7 +4181,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'huanshi',
 				trigger:{global:'judge'},
 				filter:function(event,player){
-					return player.countCards('he')>0;
+					return player.countCards('h')>0;
 				},
 				logTarget:'player',
 				prompt2:function(event,player){
@@ -23893,7 +23893,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xindiaodu:"调度",
 			xindiaodu_info:"①每回合限一次，与你势力相同的角色使用装备牌时，其可以摸一张牌。②出牌阶段开始时，你可以获得与你势力相同的一名角色装备区内的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
 			olhuanshi:'缓释',
-			olhuanshi_info:'一名角色的判定牌生效前，你可以令其观看你的牌并选择其中的一张牌，你打出此牌代替判定牌。然后你可以重铸任意张牌（每回合限重铸一次）。',
+			olhuanshi_info:'一名角色的判定牌生效前，你可以令其观看你的手牌并选择你的一张牌，你打出此牌代替判定牌。然后你可以重铸任意张牌（每回合限重铸一次）。',
 			olhongyuan:'弘援',
 			olhongyuan_info:'每阶段限一次。当你一次性获得至少两张牌以后，你可以将至多两张牌交给等量名角色。',
 			olmingzhe:'明哲',
