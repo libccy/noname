@@ -932,15 +932,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filterCard:{suit:'club'},
-				filter:function(event,player){
-					return player.countCards('hes',{suit:'club'});
-				},
+				filter:(event,player)=>player.hasCard(card=>lib.skill.sblianhuan.filterCard(card,player),lib.skill.sblianhuan.position),
 				filterTarget:function(card,player,target){
 					if(player.hasSkill('sblianhuan_blocker')) return false;
 					if(!ui.selected.cards.length) return false;
 					card=get.autoViewAs({name:'tiesuo'},[ui.selected.cards[0]]);
 					return player.canUse(card,target);
 				},
+				filterCard:(card,player)=>get.suit(card)=='club'&&(!player.hasSkill('sblianhuan_blocker')||player.canRecast(card)),
 				selectCard:1,
 				position:'hs',
 				derivation:'sblianhuan_lv2',
@@ -1094,7 +1093,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				mark:true,
 				skillAnimation:true,
-				//animationStr:'涅盘',
 				limited:true,
 				animationColor:'orange',
 				filter:function(event,player){

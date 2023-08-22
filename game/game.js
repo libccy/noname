@@ -10698,6 +10698,17 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				//Recast
+				//重铸
+				recast:()=>{
+					'step 0'
+					game.log(player,'重铸了',cards);
+					if(typeof event.recastingLose=='function') event.recastingLose(player,cards);
+					'step 1'
+					event.trigger('recast');
+					'step 2'
+					if(typeof event.recastingGain=='function') event.recastingGain(player,cards);
+				},
 				//装备栏相关
 				disableEquip:function(){
 					'step 0'
@@ -10879,7 +10890,7 @@
 					var next=game.createEvent('replaceEquip');
 					next.player=player;
 					next.card=card;
-					next.setContent(info.replaceEquip||'replaceEquip')
+					next.setContent(info.replaceEquip||'replaceEquip');
 					"step 4"
 					var info=get.info(card,false);
 					if(get.itemtype(result)=='cards'){
@@ -16739,7 +16750,7 @@
 				},
 				loseToDiscardpile:function(){
 					"step 0"
-					game.log(player,'将',cards,'置入了弃牌堆');
+					if(event.log!=false) game.log(player,'将',cards,'置入了弃牌堆');
 					event.done=player.lose(cards,event.position,'visible');
 					event.done.type='loseToDiscardpile';
 					"step 1"
@@ -17178,7 +17189,7 @@
 					}
 					if(event.animate=='draw'){
 						player.$draw(cards.length);
-						game.log(player,'将',get.cnNumber(cards.length),'张牌置于了武将牌上');
+						if(event.log) game.log(player,'将',get.cnNumber(cards.length),'张牌置于了武将牌上');
 						game.pause();
 						setTimeout(function(){
 							player.$addToExpansion(cards,null,event.gaintag);
@@ -17212,8 +17223,8 @@
 						if(event.animate=='give'){
 							for(var i in evtmap){
 								var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
-								source.$give(evtmap[i][0],player);
-								game.log(player,'将',get.cnNumber(evtmap[i][0]),'置于了武将牌上');
+								source.$give(evtmap[i][0],player,false);
+								if(event.log) game.log(player,'将',evtmap[i][0],'置于了武将牌上');
 							}
 						}
 						else{
@@ -17221,11 +17232,11 @@
 								var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
 								if(evtmap[i][1].length){
 									source.$giveAuto(evtmap[i][1],player,false);
-									game.log(player,'将',get.cnNumber(evtmap[i][1].length),'张牌置于了武将牌上');
+									if(event.log) game.log(player,'将',get.cnNumber(evtmap[i][1].length),'张牌置于了武将牌上');
 								}
 								if(evtmap[i][2].length){
 									source.$give(evtmap[i][2],player,false);
-									game.log(player,'将',get.cnNumber(evtmap[i][2]),'置于了武将牌上');
+									if(event.log) game.log(player,'将',evtmap[i][2],'置于了武将牌上');
 								}
 							}
 						}
@@ -17249,9 +17260,6 @@
 						player.$addToExpansion(cards,null,event.gaintag);
 						for(var i of event.gaintag) player.markSkill(i);
 						event.finish();
-					}
-					if(event.log){
-						game.log(player,'将',cards,'置于了武将牌上');
 					}
 					"step 4"
 					game.delayx();
@@ -18240,6 +18248,31 @@
 			},
 			player:{
 				//新函数
+				//Recast
+				//重铸
+				recast:function(cards,recastingLose,recastingGain){
+					const recast=game.createEvent('recast');
+					recast.player=this;
+					if(get.itemtype(cards)=='card') recast.cards=[cards];
+					else if(get.itemtype(cards)=='cards'&&cards.length) recast.cards=cards;
+					else _status.event.next.remove(recast);
+					if(typeof recastingLose!='function') recastingLose=(player,cards)=>player.loseToDiscardpile(cards).log=false;
+					recast.recastingLose=recastingLose;
+					if(typeof recastingGain!='function') recastingGain=(player,cards)=>player.draw(cards.length).log=false;
+					recast.recastingGain=recastingGain;
+					recast.setContent('recast');
+					recast._args=Array.from(arguments);
+					return recast;
+				},
+				//Check if the player can recast the card
+				//检查角色是否能重铸此牌
+				canRecast:function(card,source,strict){
+					const cardRecastable=lib.filter.cardRecastable(card,this,source,strict);
+					if(cardRecastable!='unchanged') return cardRecastable;
+					if(get.position(card)!='h') return false;
+					const info=get.info(card);
+					return typeof info.chongzhu=='function'?info.chongzhu(event,player):info.chongzhu;
+				},
 				//装备栏相关
 				//判断一名角色的某个区域是否被废除
 				//type为要判断的区域 若为空 则判断玩家是否有任意一个被废除的区域
@@ -19047,11 +19080,15 @@
 				inRangeOf:function(source){
 					return source.inRange(this);
 				},
-				getHp:function(){
-					return Math.max(0,this.hp);
+				//Get the player's HP not less than 0. Set “raw” to true to get the player's raw HP instead.
+				//获取角色的体力值。设置“raw”为true以获取角色的体力。
+				getHp:function(raw){
+					return raw?this.hp:Math.max(0,this.hp);
 				},
-				getDamagedHp:function(){
-					return this.maxHp-this.getHp();
+				//Set “raw” to true to get the player's raw damaged HP instead.
+				//设置“raw”为true以获取角色已损失的体力。
+				getDamagedHp:function(raw){
+					return this.maxHp-this.getHp(raw);
 				},
 				changeGroup:function(group,log,broadcast){
 					var next=game.createEvent('changeGroup');
@@ -24832,109 +24869,61 @@
 					return this.hp<this.maxHp&&!this.storage.nohp;
 				},
 				isHealthy:function(){
-					return this.hp==this.maxHp||this.storage.nohp;
+					return this.hp>=this.maxHp||this.storage.nohp;
 				},
-				isMaxHp:function(equal){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].hp>=this.hp) return false;
-						}
-						else{
-							if(game.players[i].hp>this.hp) return false;
-						}
-					}
-					return true;
+				isMaxHp:function(only,raw){
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.getHp(raw)<this.getHp(raw):value.getHp(raw)<=this.getHp(raw);
+					});
 				},
-				isMinHp:function(equal){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].hp<=this.hp) return false;
-						}
-						else{
-							if(game.players[i].hp<this.hp) return false;
-						}
-					}
-					return true;
+				isMinHp:function(only,raw){
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.getHp(raw)>this.getHp(raw):value.getHp(raw)>=this.getHp(raw);
+					});
 				},
-				isMaxCard:function(equal){
-					var nh=this.countCards('he');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('he')>=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('he')>nh) return false;
-						}
-					}
-					return true;
+				isMaxCard:function(only){
+					const numberOfCards=this.countCards('he');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('he')<numberOfCards:value.countCards('he')<=numberOfCards;
+					});
 				},
-				isMinCard:function(equal){
-					var nh=this.countCards('he');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('he')<=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('he')<nh) return false;
-						}
-					}
-					return true;
+				isMinCard:function(only){
+					const numberOfCards=this.countCards('he');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('he')>numberOfCards:value.countCards('he')>=numberOfCards;
+					});
 				},
-				isMaxHandcard:function(equal){
-					var nh=this.countCards('h');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('h')>=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('h')>nh) return false;
-						}
-					}
-					return true;
+				isMaxHandcard:function(only){
+					const numberOfHandCards=this.countCards('h');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('h')<numberOfHandCards:value.countCards('h')<=numberOfHandCards;
+					});
 				},
-				isMinHandcard:function(equal){
-					var nh=this.countCards('h');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('h')<=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('h')<nh) return false;
-						}
-					}
-					return true;
+				isMinHandcard:function(only){
+					const numberOfHandCards=this.countCards('h');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('h')>numberOfHandCards:value.countCards('h')>=numberOfHandCards;
+					});
 				},
-				isMaxEquip:function(equal){
-					var nh=this.countCards('e');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('e')>=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('e')>nh) return false;
-						}
-					}
-					return true;
+				isMaxEquip:function(only){
+					const numberOfEquipAreaCards=this.countCards('e');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('e')<numberOfEquipAreaCards:value.countCards('e')<=numberOfEquipAreaCards;
+					});
 				},
-				isMinEquip:function(equal){
-					var nh=this.countCards('e');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('e')<=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('e')<nh) return false;
-						}
-					}
-					return true;
+				isMinEquip:function(only){
+					const numberOfEquipAreaCards=this.countCards('e');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('e')>numberOfEquipAreaCards:value.countCards('e')>=numberOfEquipAreaCards;
+					});
 				},
 				isLinked:function(){
 					if(get.is.linked2(this)){
@@ -28312,6 +28301,12 @@
 			all:function(){
 				return true;
 			},
+			//Check if the card is recastable
+			//检查此牌是否可重铸
+			cardRecastable:(card,player,source,raw)=>{
+				if(typeof player=='undefined') player=get.owner(card);
+				return game.checkMod(card,player,source,!raw||'unchanged','cardRecastable',player);
+			},
 			//装备栏相关
 			canBeReplaced:function(card,player){
 				var mod=game.checkMod(card,player,'unchanged','canBeReplaced',player);
@@ -29933,78 +29928,47 @@
 				logv:false,
 				visible:true,
 				prompt:'将要重铸的牌置入弃牌堆并摸一张牌',
-				filter:function(event,player){
-					return player.hasCard(function(card){
-						return lib.skill._chongzhu.filterCard(card,player);
-					});
-				},
-				filterCard:function(card,player){
-					var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-					if(mod!='unchanged') return mod;
-					var info=get.info(card);
-					if(typeof info.chongzhu=='function'){
-						return info.chongzhu(event,player);
-					}
-					return info.chongzhu;
-				},
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆');
-				},
-				check:function(card){
-					// if(get.type(card)=='stonecharacter'&&_status.event.player.countCards('h',{type:'stonecharacter'})<=1){
-					// 	return 0;
-					// }
-					return 1;
-				},
+				filter:(event,player)=>player.hasCard(card=>lib.skill._chongzhu.filterCard(card,player),'he'),
+				position:'he',
+				filterCard:(card,player)=>player.canRecast(card,null,true),
 				discard:false,
-				loseTo:'discardPile',
-				delay:0.5,
+				lose:false,
+				delay:false,
 				content:function(){
-					"step 0"
-					if(lib.config.mode=='stone'&&_status.mode=='deck'&&
-					!player.isMin()&&get.type(cards[0]).indexOf('stone')==0){
-						var list=get.stonecard(1,player.career);
-						if(list.length){
-							player.gain(game.createCard(list.randomGet()),'draw');
-						}
-						else{
-							player.draw({drawDeck:1})
-						}
-					}
-					else if(get.subtype(cards[0])=='spell_gold'){
-						var list=get.libCard(function(info){
-							return info.subtype=='spell_silver';
+					player.recast(cards,null,(player,cards)=>{
+						let numberOfCardsToDraw=cards.length;
+						cards.forEach(value=>{
+							if(lib.config.mode=='stone'&&_status.mode=='deck'&&!player.isMin()&&get.type(value).indexOf('stone')==0){
+								const stonecard=get.stonecard(1,player.career);
+								numberOfCardsToDraw--;
+								if(stonecard.length) player.gain(game.createCard(stonecard.randomGet()),'draw');
+								else player.draw({
+									drawDeck:1
+								}).log=false;
+							}
+							else if(get.subtype(value)=='spell_gold'){
+								const libCard=get.libCard(info=>info.subtype=='spell_silver');
+								if(!libCard.length) return;
+								numberOfCardsToDraw--;
+								player.gain(game.createCard(libCard.randomGet()),'draw');
+							}
+							else if(get.subtype(value)=='spell_silver'){
+								const libCard=get.libCard(info=>info.subtype=='spell_bronze');
+								if(!libCard.length) return;
+								numberOfCardsToDraw--;
+								player.gain(game.createCard(libCard.randomGet()),'draw');
+							}
 						});
-						if(list.length){
-							player.gain(game.createCard(list.randomGet()),'draw');
-						}
-						else{
-							player.draw();
-						}
-					}
-					else if(get.subtype(cards[0])=='spell_silver'){
-						var list=get.libCard(function(info){
-							return info.subtype=='spell_bronze';
-						});
-						if(list.length){
-							player.gain(game.createCard(list.randomGet()),'draw');
-						}
-						else{
-							player.draw();
-						}
-					}
-					else{
-						player.draw();
-					}
+						if(numberOfCardsToDraw) player.draw(numberOfCardsToDraw).log=false;
+					});
 				},
 				ai:{
 					basic:{
 						order:6
 					},
 					result:{
-						player:1,
-					},
+						player:1
+					}
 				}
 			},
 			_lianhuan:{
@@ -38691,36 +38655,15 @@
 			}
 			return num;
 		},
-		filterPlayer:function(func,list,includeOut){
-			if(!Array.isArray(list)){
-				list=[];
-			}
-			if(typeof func!='function'){
-				func=lib.filter.all;
-			}
-			for(var i=0;i<game.players.length;i++){
-				if(!includeOut&&game.players[i].isOut()) continue;
-				if(func(game.players[i])){
-					list.add(game.players[i]);
-				}
-			}
-			return list;
+		filterPlayer:(func,list,includeOut)=>{
+			if(!Array.isArray(list)) list=[];
+			if(typeof func!='function') func=lib.filter.all;
+			return list.addArray(game.players.filter(value=>(includeOut||!value.isOut())&&func(value)));
 		},
-		filterPlayer2:function(func,list,includeOut){
-			if(!Array.isArray(list)){
-				list=[];
-			}
-			if(typeof func!='function'){
-				func=lib.filter.all;
-			}
-			var players=game.players.slice(0).concat(game.dead);
-			for(var i=0;i<players.length;i++){
-				if(!includeOut&&players[i].isOut()) continue;
-				if(func(players[i])){
-					list.add(players[i]);
-				}
-			}
-			return list;
+		filterPlayer2:(func,list,includeOut)=>{
+			if(!Array.isArray(list)) list=[];
+			if(typeof func!='function') func=lib.filter.all;
+			return list.addArray(game.players.concat(game.dead).filter(value=>(includeOut||!value.isOut())&&func(value)));
 		},
 		findPlayer:function(func,includeOut){
 			for(var i=0;i<game.players.length;i++){
@@ -48264,7 +48207,7 @@
 				node.node={
 					avatar:ui.create.div('.avatar',node,ui.click.avatar).hide(),
 					avatar2:ui.create.div('.avatar2',node,ui.click.avatar2).hide(),
-					turnedover:ui.create.div('.turned','<div>翻<br>面<div>',node),
+					turnedover:ui.create.div('.turned','<div>'+get.verticalStr('翻面')+'<div>',node),
 					framebg:ui.create.div('.framebg',node),
 					intro:ui.create.div('.intro',node),
 					identity:ui.create.div('.identity',node),

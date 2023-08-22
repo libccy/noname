@@ -484,12 +484,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var hs=player.getCards('h');
-					event.num=hs.length;
-					player.lose(hs,ui.discardPile);
+					player.recast(player.getCards('h',lib.filter.cardRecastable));
 					'step 1'
-					player.draw(event.num,'nodelay');
-					'step 2'
 					var targets=player.getEnemies();
 					if(targets.length){
 						player.useCard({name:'sha'},targets.randomGet(),false);
@@ -1376,29 +1372,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangfan:{
 				trigger:{player:'useCard'},
 				forced:true,
-				filter:function(event,player){
-					return get.type(event.card)!='equip'&&player.countCards('h',{color:get.color(event.card)})>0;
-				},
+				filter:(event,player)=>get.type(event.card)!='equip'&&player.hasCard(card=>get.color(card)==get.color(trigger.card)&&player.canRecast(card),'h'),
 				content:function(){
 					'step 0'
-					var cards=player.getCards('h',{suit:get.suit(trigger.card)});
-					if(!cards.length){
-						cards=player.getCards('h',{color:get.color(trigger.card)});
-					}
+					let cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card)&&player.canRecast(card));
+					if(!cards.length) cards=player.getCards('h',card=>get.color(card)==get.color(trigger.card)&&player.canRecast(card));
 					if(!cards.length){
 						event.finish();
 						return;
 					}
-					event.chosen=cards.randomGet();
-					game.delay(0.5)
-					'step 1'
-					var card=event.chosen;
-					player.lose(card,ui.discardPile);
-					player.$throw(card,1000);
-					game.delay(0.5);
-					game.log(player,'重铸了',card);
-					'step 2'
-					player.draw().log=false;
+					player.recast(cards.randomGet());
 				},
 				ai:{
 					pretao:true

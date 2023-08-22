@@ -130,9 +130,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('tongduo'),'令一名角色重铸一张牌',function(card,player,target){
-						return target.countCards('he')>0;
+						return target.hasCard(lib.filter.cardRecastable,'he');
 					}).set('ai',function(target){
-						return get.attitude(_status.event.player,target)*Math.min(3,Math.floor(target.countCards('h')/2));
+						return get.attitude(_status.event.player,target)*Math.min(3,Math.floor(target.countCards('h',lib.filter.cardRecastable)/2));
 					});
 					'step 1'
 					if(result.bool){
@@ -142,11 +142,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					if(target.countCards('he')==0) event.finish();
-					else target.chooseCard('he',true,'请重铸一张牌');
+					if(!target.hasCard(lib.filter.cardRecastable,'he')) event.finish();
+					else target.chooseCard('he',true,'请重铸一张牌',lib.filter.cardRecastable);
 					'step 3'
-					target.loseToDiscardpile(result.cards);
-					target.draw();
+					target.recast(result.cards);
 				},
 			},
 			//朱儁

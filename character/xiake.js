@@ -34,12 +34,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				position:'e',
 				filter:function(event,player){
-					return player.countCards('e')>0;
+					return player.hasCard(card=>lib.skill.rouquan.filterCard(card,player),lib.skill.rouquan.position);
 				},
-				filterCard:true,
+				filterCard:lib.filter.cardRecastable,
 				prompt:'将要重铸的牌置入弃牌堆并摸一张牌',
 				discard:false,
-				delay:0.5,
+				lose:false,
+				delay:false,
 				check:function(card,player){
 					var val=get.equipValue(card);
 					var player=_status.event.player;
@@ -51,16 +52,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 0;
 				},
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-				},
 				content:function(){
-					"step 0"
-					player.draw();
-					"step 1"
-					for(var i=0;i<cards.length;i++){
-						cards[i].discard();
-					}
+					player.recast(cards);
 				},
 				ai:{
 					order:9.5,

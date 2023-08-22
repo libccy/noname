@@ -571,10 +571,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseCard(get.prompt2('dcjini'),[1,player.maxHp-player.countMark('dcjini_counted')],(card,player,target)=>{
-						var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-						return mod=='unchanged';
-					}).set('ai',card=>{
+					player.chooseCard(get.prompt2('dcjini'),[1,player.maxHp-player.countMark('dcjini_counted')],lib.filter.cardRecastable).set('ai',card=>{
 						return 6-get.value(card);
 					});
 					'step 1'
@@ -583,8 +580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('dcjini');
 						player.addTempSkill('dcjini_counted');
 						player.addMark('dcjini_counted',cards.length,false);
-						player.loseToDiscardpile(cards);
-						player.draw(cards.length);
+						player.recast(cards);
 					}
 					else event.finish();
 					'step 2'
@@ -2557,10 +2553,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var str='，若重铸的牌中没有'+get.translation(get.type2(trigger.card))+'牌，你于'+get.translation(trigger.cards)+'进入弃牌堆后获得之';
-					player.chooseCard(get.prompt('dcqianzheng'),'重铸两张牌'+(trigger.cards.length?str:'')+'。',2,'he',(card,player,target)=>{
-						var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-						return mod=='unchanged';
-					}).set('ai',card=>{
+					player.chooseCard(get.prompt('dcqianzheng'),'重铸两张牌'+(trigger.cards.length?str:'')+'。',2,'he',lib.filter.cardRecastable).set('ai',card=>{
 						var val=get.value(card);
 						if(get.type2(card)==_status.event.type) val+=0.5;
 						return 6-val;
@@ -2569,8 +2562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var cards=result.cards;
 						player.logSkill('dcqianzheng');
-						player.loseToDiscardpile(cards);
-						player.draw(cards.length);
+						player.recast(cards);
 						if(cards.every(card=>get.type2(card)!=get.type2(trigger.card))){
 							trigger.getParent().dcqianzheng=true;
 							player.addTempSkill('dcqianzheng_gain');
@@ -3809,21 +3801,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.choosePlayerCard(target,'he',true).set('filterButton',function(button){
-						var player=_status.event.player,card=button.link;
-						if(get.owner(card)==player){
-							var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-							if(mod!='unchanged') return mod;
-						}
-						return true;
+						var card=button.link,owner=get.owner(card);
+						return !owner||owner.canRecast(card,_status.event.player);
 					}).set('ai',function(card){
 						if(get.attitude(_status.event.player,_status.event.getParent().target)>=0) return -get.buttonValue(card);
 						return get.buttonValue(card);
 					});
 					'step 1'
-					if(result.bool){
-						target.loseToDiscardpile(result.links);
-						target.draw();
-					}
+					if(result.bool) target.recast(result.links);
 				},
 				ai:{
 					expose:0.1,
@@ -6874,9 +6859,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 6'
 					if(event.goon1&&event.goon2){
 						if(player.countMark('chenjian')<2) player.addMark('chenjian',1,false);
-						var cards=player.getCards('h');
-						player.loseToDiscardpile(cards);
-						player.draw(cards.length);
+						player.recast(player.getCards('h',lib.filter.cardRecastable));
 					}
 				},
 				marktext:'见',

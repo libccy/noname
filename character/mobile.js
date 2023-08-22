@@ -11886,9 +11886,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player){
 							return 10;
-						},
-					},
-				},
+						}
+					}
+				}
 			},
 			"xinfu_qiaosi":{
 				enable:"phaseUse",

@@ -682,17 +682,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'he',
 				content:function(){
 					'step 0'
-					player.loseToDiscardpile(cards);
-					player.draw();
+					player.recast(cards);
 					'step 1'
 					if(target.countCards('he')>0){
-						target.chooseCard('he',true,'请重铸一张牌');
+						target.chooseCard('he',true,'请重铸一张牌',lib.filter.cardRecastable);
 					}
 					else event.finish();
 					'step 2'
 					if(result.bool){
-						target.loseToDiscardpile(result.cards);
-						target.draw();
+						target.recast(result.cards);
 					}
 				},
 				ai:{
