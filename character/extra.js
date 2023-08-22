@@ -207,6 +207,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						str+='此牌离开你的装备区后，改为置入剩余武将牌牌堆。';
 						lib.translate['qiexie_'+name+'_info']=str;
+						var append='';
+						if(skills.length){
+							for(var skill of skills){
+								if(lib.skill[skill].nobracket){
+									append+='<div class="skilln">'+get.translation(skill)+'</div><div><span style="font-family: yuanli">'+get.skillInfoTranslation(skill)+'</span></div><br><br>';
+								}
+								else{
+									var translation=lib.translate[skill+'_ab']||get.translation(skill).slice(0,2);
+									append+='<div class="skill">【'+translation+'】</div><div><span style="font-family: yuanli">'+get.skillInfoTranslation(skill)+'</span></div><br><br>';
+								}
+							}
+							str=str.slice(0,str.length-8);
+						}
+						lib.translate['qiexie_'+name+'_append']=append;
 						lib.card['qiexie_'+name]=card;
 					}
 				},
@@ -260,7 +274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cuijue:{
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('he')>0&&game.hasPlayer(target=>lib.skill.cuijue.filterTarget('SB',player,target));
+					return player.countCards('he')>0;//&&game.hasPlayer(target=>lib.skill.cuijue.filterTarget('SB',player,target));
 				},
 				filterCard:true,
 				filterTarget:function(card,player,target){
@@ -2921,22 +2935,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			tspowei:{
-				audio:2,
+				audio:3,
 				dutySkill:true,
-				forced:true,
-				trigger:{global:'damageEnd'},
-				logTarget:'player',
-				filter:function(event,player){
-					return event.player&&event.player.isIn()&&event.player.hasMark('dulie');
-				},
-				content:function(){
-					trigger.player.removeMark('dulie',trigger.player.countMark('dulie'));
-				},
+				locked:true,
 				derivation:'shenzhu',
-				group:['tspowei_init','tspowei_move','tspowei_achieve','tspowei_fail','tspowei_use'],
+				group:['tspowei_init','tspowei_move','tspowei_achieve','tspowei_fail','tspowei_use','tspowei_remove'],
 				subSkill:{
+					remove:{
+						audio:'tspowei3',
+						trigger:{global:'damageEnd'},
+						filter:function(event,player){
+							return event.player&&event.player.isIn()&&event.player.hasMark('dulie');
+						},
+						forced:true,
+						logTarget:'player',
+						content:function(){
+							trigger.player.removeMark('dulie',trigger.player.countMark('dulie'));
+						},
+					},
 					use:{
-						audio:'tspowei',
+						audio:'tspowei3',
 						trigger:{global:'phaseBegin'},
 						direct:true,
 						filter:function(event,player){
@@ -2990,7 +3008,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					init:{
-						audio:'tspowei',
+						audio:'tspowei3',
 						trigger:{
 							global:'phaseBefore',
 							player:'enterGame',
@@ -3008,7 +3026,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					move:{
-						audio:'tspowei',
+						audio:'tspowei3',
 						trigger:{player:'phaseBegin'},
 						forced:true,
 						filter:function(event,player){
@@ -3064,6 +3082,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tspowei1:{audio:true},
 			tspowei2:{audio:true},
+			tspowei3:{audio:true},
 			shenzhu:{
 				audio:2,
 				trigger:{player:'useCardAfter'},
@@ -4730,7 +4749,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'renjie2',
 				trigger:{player:'damageEnd'},
 				forced:true,
-				unique:true,
 				group:'renjie2',
 				notemp:true,
 				//mark:true,
@@ -6551,7 +6569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return event.targets&&event.targets.contains(player)&&event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+							return event.targets&&event.targets.contains(player)&&event.turn!=player&&player.hasDisabledSlot();
 						},
 						content:function(){
 							player.chooseToEnable();
@@ -6564,7 +6582,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return event.turn!=player&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+							return event.turn!=player&&player.hasDisabledSlot();
 						},
 						content:function(){
 							player.chooseToEnable();
@@ -6577,7 +6595,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return event.result.bool==true&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+							return event.result.bool==true&&player.hasDisabledSlot();
 						},
 						content:function(){
 							'step 0'
@@ -6591,7 +6609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return (event.targets!=undefined&&event.targets.contains(player)||event.target==player)&&event.result.bool==false&&player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+							return (event.targets!=undefined&&event.targets.contains(player)||event.target==player)&&event.result.bool==false&&player.hasDisabledSlot();
 						},
 						content:function(){
 							player.chooseToEnable();
@@ -6604,7 +6622,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return player.storage.disableEquip!=undefined&&player.storage.disableEquip.length>0;
+							return player.hasDisabledSlot();
 						},
 						content:function(){
 							player.chooseToEnable();

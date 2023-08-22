@@ -1741,8 +1741,8 @@ div:not(.handcards)>.card>.info>span,
 	position: relative;
 	margin-top: 8px;
 	margin-bottom: 8px;
-	margin-left: 4px;
-	margin-right: 4px;
+	margin-left: auto;
+	margin-right: auto;
 }
 .content>.caption + .buttons:not(*:last-child){
 	margin-top: 0;
@@ -2239,9 +2239,8 @@ div:not(.handcards)>.card>.info>span,
 	text-shadow: none;
 }
 .player>.turned>div{
-	top:calc(50% - 50px);
-    width: 100%;
-    left: 0;
+	top: calc(50% - 50px);
+    left: calc(50% - 25px);
 	white-space: nowrap;
 	writing-mode: vertical-rl;
 	-webkit-writing-mode: vertical-rl;

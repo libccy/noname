@@ -52,6 +52,7 @@
 			custom:[],
 			useCard:[],
 			changeHp:[],
+			everything:[],
 		}],
 		cardtag:{
 			yingbian_zhuzhan:[],
@@ -1294,46 +1295,9 @@
 									}
 								}
 							}
-							var animate=lib.config.image_background=='default';
 							game.saveConfig('image_background',background);
 							lib.init.background();
-							ui.background.delete();
-							ui.background=ui.create.div('.background');
-
-							if(lib.config.image_background_blur){
-								ui.background.style.filter='blur(8px)';
-								ui.background.style.webkitFilter='blur(8px)';
-								ui.background.style.transform='scale(1.05)';
-							}
-							else{
-								ui.background.style.filter='';
-								ui.background.style.webkitFilter='';
-								ui.background.style.transform='';
-							}
-
-							document.body.insertBefore(ui.background,document.body.firstChild);
-							if(animate) ui.background.animate('start');
-							if(lib.config.image_background=='default'){
-								ui.background.style.backgroundImage="none";
-							}
-							else if(lib.config.image_background.indexOf('custom_')==0){
-								ui.background.style.backgroundImage="none";
-								game.getDB('image',lib.config.image_background,function(fileToLoad){
-									if(!fileToLoad) return;
-									var fileReader = new FileReader();
-									fileReader.onload = function(fileLoadedEvent)
-									{
-										var data = fileLoadedEvent.target.result;
-										ui.background.style.backgroundImage='url('+data+')';
-									};
-									fileReader.readAsDataURL(fileToLoad, "UTF-8");
-								});
-							}
-							else{
-								ui.background.setBackgroundImage('image/background/'+lib.config.image_background+'.jpg');
-							}
-							ui.background.style.backgroundSize='cover';
-							ui.background.style.backgroundPosition='50% 50%';
+							game.updateBackground();
 						},
 					},
 					image_background_random:{
@@ -7449,16 +7413,39 @@
 							return false;
 						}
 					});
-				}             
+				}
+				if(!('flat' in Array.prototype)){
+					Object.defineProperty(Array.prototype, "flat", {
+						configurable:true,
+						enumerable:false,
+						writable:true,
+						value:function(depth){
+							if(typeof depth!='number') depth=1;
+							const arr=[];
+							for(let i=0;i<this.length;i++){
+								let obj=this[i];
+								if(depth>0&&Array.isArray(obj)){
+									obj.flat(depth-1).forEach(function(item){
+										arr.push(item)
+									});
+								}
+								else{
+									arr.push(obj);
+								}
+							}
+							return arr;
+						}
+					});
+				}
 				if(!Array.from){
 					Object.defineProperty(Array, "from", {
 						configurable:true,
 						enumerable:false,
 						writable:true,
 						value:function(args){
-							var list=[];
+							const list=[];
 							if(args&&args.length){
-								for(var i=0;i<args.length;i++){
+								for(let i=0;i<args.length;i++){
 									list.push(args[i]);
 								}
 							}
@@ -9727,9 +9714,11 @@
 					localStorage.removeItem(lib.configprefix+'background');
 				}
 			},
-			//by 诗笺
+			//by 诗笺、Tipx-L
 			parsex:function(func){
-				var str=func.toString();
+				//Remove all comments
+				//移除所有注释
+				var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\S\s]|[^"\\])*"|'(?:\\[\S\s]|[^'\\])*'|(?:\r?\n|[\S\s])[^\/"'\\\s]*)/mg,'$2').trim();
 				//获取第一个 { 后的所有字符
 				str=str.slice(str.indexOf('{')+1);
 				//func中要写步骤的话，必须要写step 0
@@ -10523,7 +10512,7 @@
 			diamond:"♦︎",
 			spade:"♠︎",
 			club:"♣︎",
-			none:'◎',
+			none:'◈',
 			ghujia:'护甲',
 			ghujia_bg:'甲',
 			heart2:"红桃",
@@ -10711,6 +10700,26 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				//Recast
+				//重铸
+				recast:()=>{
+					'step 0'
+					game.log(player,'重铸了',cards);
+					if(typeof event.recastingLose=='function') event.recastingLostCards=event.recastingLose(player,cards);
+					'step 1'
+					event.trigger('recast');
+					'step 2'
+					if(typeof event.recastingGain!='function') return;
+					event.recastingGainedCards=event.recastingGain(player,cards);
+					if(get.itemtype(event.recastingGainedCards)=='card') event.recastingGainedCards=[event.recastingGainedCards];
+					'step 3'
+					event.result=[];
+					if(get.itemtype(event.recastingGainedCards)=='cards') event.result.addArray(event.recastingGainedCards);
+					if(get.itemtype(result.cards)=='card') event.result.push(result.cards);
+					else if(get.itemtype(result.cards)=='cards') event.result.addArray(result.cards);
+					if(get.itemtype(result)=='card') event.result.push(result);
+					else if(get.itemtype(result)=='cards') event.result.addArray(result);
+				},
 				//装备栏相关
 				disableEquip:function(){
 					'step 0'
@@ -10892,13 +10901,13 @@
 					var next=game.createEvent('replaceEquip');
 					next.player=player;
 					next.card=card;
-					next.setContent(info.replaceEquip||'replaceEquip')
+					next.setContent(info.replaceEquip||'replaceEquip');
 					"step 4"
 					var info=get.info(card,false);
 					if(get.itemtype(result)=='cards'){
 						player.lose(result,false,'visible').set('type','equip').set('getlx',false).swapEquip=true;
 						if(info.loseThrow){
-							player.$throw(current);
+							player.$throw(result,1000);
 						}
 						event.swapped=true;
 					}
@@ -11181,7 +11190,10 @@
 								game.resume();
 								_status.imchoosing=false;
 								if(roundmenu) ui.roundmenu.style.display='';
-								if(ui.backgroundMusic) ui.backgroundMusic.play().catch(()=>void 0);
+								if(ui.backgroundMusic){
+									var promise=ui.backgroundMusic.play();
+									if(promise) promise.catch(()=>void 0);
+								}
 								hitsound_audio.remove();
 							},1000);
 						};
@@ -11370,7 +11382,10 @@
 						if(dialog){
 							dialog.close();
 						}
-						if(ui.backgroundMusic) ui.backgroundMusic.play().catch(()=>void 0);
+						if(ui.backgroundMusic){
+							var promise=ui.backgroundMusic.play();
+							if(promise) promise.catch(()=>void 0);
+						}
 					},event.videoId,event.time);
 					var result=event.result||result;
 					event.result=result;
@@ -11839,9 +11854,12 @@
 				},
 				cardsDiscard:function(){
 					game.getGlobalHistory().cardMove.push(event);
+					var withPile=false;
 					for(var i=0;i<cards.length;i++){
+						if(get.position(cards[i],true)=='c') withPile=true;
 						cards[i].discard();
 					}
+					if(withPile) game.updateRoundNumber();
 				},
 				orderingDiscard:function(){
 					var cards=event.relatedEvent.orderingCards.slice(0);
@@ -11852,11 +11870,14 @@
 				},
 				cardsGotoOrdering:function(){
 					game.getGlobalHistory().cardMove.push(event);
+					var withPile=false;
 					for(var i=0;i<cards.length;i++){
+						if(get.position(cards[i],true)=='c') withPile=true;
 						cards[i].fix();
 						ui.ordering.appendChild(cards[i]);
 					}
-				 var evt=event.relatedEvent||event.getParent();
+					if(withPile) game.updateRoundNumber();
+					var evt=event.relatedEvent||event.getParent();
 					if(!evt.orderingCards) evt.orderingCards=[];
 					if(!evt.noOrdering&&!evt.cardsOrdered){
 						evt.cardsOrdered=true;
@@ -11868,10 +11889,13 @@
 				},
 				cardsGotoSpecial:function(){
 					game.getGlobalHistory().cardMove.push(event);
+					var withPile=false;
 					for(var i=0;i<cards.length;i++){
+						if(get.position(cards[i],true)=='c') withPile=true;
 						cards[i].fix();
 						ui.special.appendChild(cards[i]);
 					}
+					if(withPile) game.updateRoundNumber();
 					if(event.toRenku){
 						_status.renku.addArray(cards);
 						if(_status.renku.length>6){
@@ -16752,7 +16776,7 @@
 				},
 				loseToDiscardpile:function(){
 					"step 0"
-					game.log(player,'将',cards,'置入了弃牌堆');
+					if(event.log!=false) game.log(player,'将',cards,'置入了弃牌堆');
 					event.done=player.lose(cards,event.position,'visible');
 					event.done.type='loseToDiscardpile';
 					"step 1"
@@ -17191,7 +17215,7 @@
 					}
 					if(event.animate=='draw'){
 						player.$draw(cards.length);
-						game.log(player,'将',get.cnNumber(cards.length),'张牌置于了武将牌上');
+						if(event.log) game.log(player,'将',get.cnNumber(cards.length),'张牌置于了武将牌上');
 						game.pause();
 						setTimeout(function(){
 							player.$addToExpansion(cards,null,event.gaintag);
@@ -17225,8 +17249,8 @@
 						if(event.animate=='give'){
 							for(var i in evtmap){
 								var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
-								source.$give(evtmap[i][0],player);
-								game.log(player,'将',get.cnNumber(evtmap[i][0]),'置于了武将牌上');
+								source.$give(evtmap[i][0],player,false);
+								if(event.log) game.log(player,'将',evtmap[i][0],'置于了武将牌上');
 							}
 						}
 						else{
@@ -17234,11 +17258,11 @@
 								var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
 								if(evtmap[i][1].length){
 									source.$giveAuto(evtmap[i][1],player,false);
-									game.log(player,'将',get.cnNumber(evtmap[i][1].length),'张牌置于了武将牌上');
+									if(event.log) game.log(player,'将',get.cnNumber(evtmap[i][1].length),'张牌置于了武将牌上');
 								}
 								if(evtmap[i][2].length){
 									source.$give(evtmap[i][2],player,false);
-									game.log(player,'将',get.cnNumber(evtmap[i][2]),'置于了武将牌上');
+									if(event.log) game.log(player,'将',evtmap[i][2],'置于了武将牌上');
 								}
 							}
 						}
@@ -17262,9 +17286,6 @@
 						player.$addToExpansion(cards,null,event.gaintag);
 						for(var i of event.gaintag) player.markSkill(i);
 						event.finish();
-					}
-					if(event.log){
-						game.log(player,'将',cards,'置于了武将牌上');
 					}
 					"step 4"
 					game.delayx();
@@ -18253,6 +18274,31 @@
 			},
 			player:{
 				//新函数
+				//Recast
+				//重铸
+				recast:function(cards,recastingLose,recastingGain){
+					const recast=game.createEvent('recast');
+					recast.player=this;
+					if(get.itemtype(cards)=='card') recast.cards=[cards];
+					else if(get.itemtype(cards)=='cards'&&cards.length) recast.cards=cards;
+					else _status.event.next.remove(recast);
+					if(typeof recastingLose!='function') recastingLose=(player,cards)=>player.loseToDiscardpile(cards).set("log",false).cards;
+					recast.recastingLose=recastingLose;
+					if(typeof recastingGain!='function') recastingGain=(player,cards)=>player.draw(cards.length).log=false;
+					recast.recastingGain=recastingGain;
+					recast.setContent('recast');
+					recast._args=Array.from(arguments);
+					return recast;
+				},
+				//Check if the player can recast the card
+				//检查角色是否能重铸此牌
+				canRecast:function(card,source,strict){
+					const cardRecastable=lib.filter.cardRecastable(card,this,source,strict);
+					if(cardRecastable!='unchanged') return cardRecastable;
+					if(get.position(card)!='h') return false;
+					const info=get.info(card);
+					return typeof info.chongzhu=='function'?info.chongzhu(_status.event,this):info.chongzhu;
+				},
 				//装备栏相关
 				//判断一名角色的某个区域是否被废除
 				//type为要判断的区域 若为空 则判断玩家是否有任意一个被废除的区域
@@ -18562,7 +18608,7 @@
 					return this.hasDisabledSlot(arg)&&!this.hasEnabledSlot(arg);
 				},
 				isEmpty:function(num){
-					return this.countEnabledSlot(num)>this.getEquips(num);
+					return this.countEnabledSlot(num)>this.getEquips(num).length;
 				},
 				//以下函数将被废弃
 				$disableEquip:function(){},
@@ -19060,11 +19106,15 @@
 				inRangeOf:function(source){
 					return source.inRange(this);
 				},
-				getHp:function(){
-					return Math.max(0,this.hp);
+				//Get the player's HP not less than 0. Set “raw” to true to get the player's raw HP instead.
+				//获取角色的体力值。设置“raw”为true以获取角色的体力。
+				getHp:function(raw){
+					return raw?this.hp:Math.max(0,this.hp);
 				},
-				getDamagedHp:function(){
-					return this.maxHp-this.getHp();
+				//Set “raw” to true to get the player's raw damaged HP instead.
+				//设置“raw”为true以获取角色已损失的体力。
+				getDamagedHp:function(raw){
+					return this.maxHp-this.getHp(raw);
 				},
 				changeGroup:function(group,log,broadcast){
 					var next=game.createEvent('changeGroup');
@@ -24845,109 +24895,61 @@
 					return this.hp<this.maxHp&&!this.storage.nohp;
 				},
 				isHealthy:function(){
-					return this.hp==this.maxHp||this.storage.nohp;
+					return this.hp>=this.maxHp||this.storage.nohp;
 				},
-				isMaxHp:function(equal){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].hp>=this.hp) return false;
-						}
-						else{
-							if(game.players[i].hp>this.hp) return false;
-						}
-					}
-					return true;
+				isMaxHp:function(only,raw){
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.getHp(raw)<this.getHp(raw):value.getHp(raw)<=this.getHp(raw);
+					});
 				},
-				isMinHp:function(equal){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].hp<=this.hp) return false;
-						}
-						else{
-							if(game.players[i].hp<this.hp) return false;
-						}
-					}
-					return true;
+				isMinHp:function(only,raw){
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.getHp(raw)>this.getHp(raw):value.getHp(raw)>=this.getHp(raw);
+					});
 				},
-				isMaxCard:function(equal){
-					var nh=this.countCards('he');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('he')>=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('he')>nh) return false;
-						}
-					}
-					return true;
+				isMaxCard:function(only){
+					const numberOfCards=this.countCards('he');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('he')<numberOfCards:value.countCards('he')<=numberOfCards;
+					});
 				},
-				isMinCard:function(equal){
-					var nh=this.countCards('he');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('he')<=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('he')<nh) return false;
-						}
-					}
-					return true;
+				isMinCard:function(only){
+					const numberOfCards=this.countCards('he');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('he')>numberOfCards:value.countCards('he')>=numberOfCards;
+					});
 				},
-				isMaxHandcard:function(equal){
-					var nh=this.countCards('h');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('h')>=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('h')>nh) return false;
-						}
-					}
-					return true;
+				isMaxHandcard:function(only){
+					const numberOfHandCards=this.countCards('h');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('h')<numberOfHandCards:value.countCards('h')<=numberOfHandCards;
+					});
 				},
-				isMinHandcard:function(equal){
-					var nh=this.countCards('h');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('h')<=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('h')<nh) return false;
-						}
-					}
-					return true;
+				isMinHandcard:function(only){
+					const numberOfHandCards=this.countCards('h');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('h')>numberOfHandCards:value.countCards('h')>=numberOfHandCards;
+					});
 				},
-				isMaxEquip:function(equal){
-					var nh=this.countCards('e');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('e')>=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('e')>nh) return false;
-						}
-					}
-					return true;
+				isMaxEquip:function(only){
+					const numberOfEquipAreaCards=this.countCards('e');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('e')<numberOfEquipAreaCards:value.countCards('e')<=numberOfEquipAreaCards;
+					});
 				},
-				isMinEquip:function(equal){
-					var nh=this.countCards('e');
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].isOut()||game.players[i]==this) continue;
-						if(equal){
-							if(game.players[i].countCards('e')<=nh) return false;
-						}
-						else{
-							if(game.players[i].countCards('e')<nh) return false;
-						}
-					}
-					return true;
+				isMinEquip:function(only){
+					const numberOfEquipAreaCards=this.countCards('e');
+					return game.players.every(value=>{
+						if(value.isOut()||value==this) return true;
+						return only?value.countCards('e')>numberOfEquipAreaCards:value.countCards('e')>=numberOfEquipAreaCards;
+					});
 				},
 				isLinked:function(){
 					if(get.is.linked2(this)){
@@ -25142,9 +25144,8 @@
 					if(name&&typeof name=='object'){
 						name=name.viewAs||name.name;
 					}
-					var judges=this.node.judges.childNodes;
+					var judges=this.getCards('j');
 					for(var i=0;i<judges.length;i++){
-						if(judges[i].classList.contains('removing')) continue;
 						if((judges[i].viewAs||judges[i].name)==name){
 							return true;
 						}
@@ -27673,16 +27674,7 @@
 								if(filter(info.trigger[i])){bool=true;break}
 							}
 							if(!bool) return;
-							var priority=0;
-							if(info.priority){
-								priority=info.priority*100;
-							}
-							if(info.silent){
-								priority++;
-							}
-							if(info.equipSkill) priority-=25;
-							if(info.cardSkill) priority-=50;
-							if(info.ruleSkill) priority-=75;
+							var priority=get.priority(skill);
 							var toadd=[skillx,player,priority];
 							if(map.list2){
 								for(var i=0;i<map.list2.length;i++){
@@ -28335,6 +28327,12 @@
 			all:function(){
 				return true;
 			},
+			//Check if the card is recastable
+			//检查此牌是否可重铸
+			cardRecastable:(card,player,source,raw)=>{
+				if(typeof player=='undefined') player=get.owner(card);
+				return game.checkMod(card,player,source,!raw||'unchanged','cardRecastable',player);
+			},
 			//装备栏相关
 			canBeReplaced:function(card,player){
 				var mod=game.checkMod(card,player,'unchanged','canBeReplaced',player);
@@ -28486,19 +28484,19 @@
 				if(player==undefined) player=_status.event.player;
 				if(!player) return false;
 				if(get.itemtype(card)=='card'){
-					var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+					var mod2=game.checkMod(card,player,event,'unchanged','cardEnabled2',player);
 					if(mod2!='unchanged') return mod2;
 				}
 				card=get.autoViewAs(card,null,player);
 				if(event==='forceEnable'){
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
+					var mod=game.checkMod(card,player,event,'unchanged','cardEnabled',player);
 					if(mod!='unchanged') return mod;
 					return true;
 				}
 				else{
 					var filter=get.info(card).enable;
 					if(!filter) return;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled',player);
+					var mod=game.checkMod(card,player,event,'unchanged','cardEnabled',player);
 					if(mod!='unchanged') return mod;
 					if(typeof filter=='boolean') return filter;
 					if(typeof filter=='function') return filter(card,player,event);
@@ -28515,7 +28513,7 @@
 				}
 				if(player==undefined) player=_status.event.player;
 				if(get.itemtype(card)=='card'){
-					var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+					var mod2=game.checkMod(card,player,event,'unchanged','cardEnabled2',player);
 					if(mod2!='unchanged') return mod2;
 				}
 				var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
@@ -28534,7 +28532,7 @@
 				}
 				var num=info.usable;
 				if(typeof num=='function') num=num(card,player);
-				num=game.checkMod(card,player,num,'cardUsable',player);
+				num=game.checkMod(card,player,num,event,'cardUsable',player);
 				if(typeof num!='number') return true;
 				else return(player.countUsed(card)<num);
 			},
@@ -28552,7 +28550,7 @@
 				var num=info.usable;
 				if(typeof num=='function') num=num(card,player);
 				num=game.checkMod(card,player,num,'cardUsable',player);
-				if(typeof num!='number') return true;
+				if(typeof num!='number') return get.itemtype(num)=='boolean'?num:true;
 				if(player.countUsed(card)<num) return true;
 				if(game.hasPlayer(function(current){
 					return game.checkMod(card,player,current,false,'cardUsableTarget',player);
@@ -28625,7 +28623,7 @@
 				var filter=info.filterTarget;
 				if(!info.singleCard||ui.selected.targets.length==0){
 					var mod=game.checkMod(card,player,target,'unchanged','playerEnabled',player);
-					if(mod==false) return false;
+					if(mod!='unchanged') return mod;
 					var mod=game.checkMod(card,player,target,'unchanged','targetEnabled',target);
 					if(mod!='unchanged') return mod;
 				}
@@ -28737,11 +28735,7 @@
 				return range;
 			},
 			judge:function(card,player,target){
-				var judges=target.getCards('j');
-				for(var i=0;i<judges.length;i++){
-					if((judges[i].viewAs||judges[i].name)==card.name) return false;
-				}
-				return true;
+				return target.canAddJudge(card);
 			},
 			autoRespondSha:function(){
 				return !this.player.hasSha(true);
@@ -29788,6 +29782,7 @@
 						custom:[],
 						useCard:[],
 						changeHp:[],
+						everything:[],
 					});
 					var players=game.players.slice(0).concat(game.dead);
 					for(var i=0;i<players.length;i++){
@@ -29799,8 +29794,10 @@
 							current.getStat().isRound=true;
 						}
 					};
-					player.getHistory().isMe=true;
-					player.getStat().isMe=true;
+					if(!player.phaseSkipped){
+						player.getHistory().isMe=true;
+						player.getStat().isMe=true;
+					}
 					if(isRound){
 						game.getGlobalHistory().isRound=true;
 					}
@@ -29957,78 +29954,56 @@
 				logv:false,
 				visible:true,
 				prompt:'将要重铸的牌置入弃牌堆并摸一张牌',
-				filter:function(event,player){
-					return player.hasCard(function(card){
-						return lib.skill._chongzhu.filterCard(card,player);
-					});
-				},
-				filterCard:function(card,player){
-					var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-					if(mod!='unchanged') return mod;
-					var info=get.info(card);
-					if(typeof info.chongzhu=='function'){
-						return info.chongzhu(event,player);
-					}
-					return info.chongzhu;
-				},
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆');
-				},
-				check:function(card){
-					// if(get.type(card)=='stonecharacter'&&_status.event.player.countCards('h',{type:'stonecharacter'})<=1){
-					// 	return 0;
-					// }
-					return 1;
-				},
+				filter:(event,player)=>player.hasCard(card=>lib.skill._chongzhu.filterCard(card,player),'he'),
+				position:'he',
+				filterCard:(card,player)=>player.canRecast(card,null,true),
 				discard:false,
-				loseTo:'discardPile',
-				delay:0.5,
+				lose:false,
+				delay:false,
 				content:function(){
-					"step 0"
-					if(lib.config.mode=='stone'&&_status.mode=='deck'&&
-					!player.isMin()&&get.type(cards[0]).indexOf('stone')==0){
-						var list=get.stonecard(1,player.career);
-						if(list.length){
-							player.gain(game.createCard(list.randomGet()),'draw');
-						}
-						else{
-							player.draw({drawDeck:1})
-						}
-					}
-					else if(get.subtype(cards[0])=='spell_gold'){
-						var list=get.libCard(function(info){
-							return info.subtype=='spell_silver';
+					player.recast(cards,null,(player,cards)=>{
+						var numberOfCardsToDraw=cards.length, cardsToGain=[];
+						cards.forEach(value=>{
+							if(lib.config.mode=='stone'&&_status.mode=='deck'&&!player.isMin()&&get.type(value).indexOf('stone')==0){
+								var stonecard=get.stonecard(1,player.career);
+								if(stonecard.length){
+									numberOfCardsToDraw-=stonecard.length;
+									var card=game.createCard(stonecard.randomGet());
+									player.gain(card,'draw');
+									cardsToGain.push(card);
+								}
+								else player.draw({
+									drawDeck:1
+								}).log=false;
+							}
+							else if(get.subtype(value)=='spell_gold'){
+								var libCard=get.libCard(info=>info.subtype=='spell_silver');
+								if(!libCard.length) return;
+								numberOfCardsToDraw--;
+								var card=game.createCard(libCard.randomGet());
+								player.gain(card,'draw');
+								cardsToGain.push(card);
+							}
+							else if(get.subtype(value)=='spell_silver'){
+								var libCard=get.libCard(info=>info.subtype=='spell_bronze');
+								if(!libCard.length) return;
+								numberOfCardsToDraw--;
+								var card=game.createCard(libCard.randomGet());
+								player.gain(card,'draw');
+								cardsToGain.push(card);
+							}
 						});
-						if(list.length){
-							player.gain(game.createCard(list.randomGet()),'draw');
-						}
-						else{
-							player.draw();
-						}
-					}
-					else if(get.subtype(cards[0])=='spell_silver'){
-						var list=get.libCard(function(info){
-							return info.subtype=='spell_bronze';
-						});
-						if(list.length){
-							player.gain(game.createCard(list.randomGet()),'draw');
-						}
-						else{
-							player.draw();
-						}
-					}
-					else{
-						player.draw();
-					}
+						if(numberOfCardsToDraw) player.draw(numberOfCardsToDraw).log=false;
+						return cardsToGain;
+					});
 				},
 				ai:{
 					basic:{
 						order:6
 					},
 					result:{
-						player:1,
-					},
+						player:1
+					}
 				}
 			},
 			_lianhuan:{
@@ -31198,6 +31173,46 @@
 		],
 	};
 	var game={
+		updateBackground:function(){
+			var background=(_status.tempBackground||lib.config.image_background);
+			ui.background.delete();
+			ui.background=ui.create.div('.background');
+
+			if(lib.config.image_background_blur){
+				ui.background.style.filter='blur(8px)';
+				ui.background.style.webkitFilter='blur(8px)';
+				ui.background.style.transform='scale(1.05)';
+			}
+			else{
+				ui.background.style.filter='';
+				ui.background.style.webkitFilter='';
+				ui.background.style.transform='';
+			}
+
+			document.body.insertBefore(ui.background,document.body.firstChild);
+			if(background=='default'){
+				ui.background.animate('start');
+				ui.background.style.backgroundImage="none";
+			}
+			else if(background.indexOf('custom_')==0){
+				ui.background.style.backgroundImage="none";
+				game.getDB('image',background,function(fileToLoad){
+					if(!fileToLoad) return;
+					var fileReader = new FileReader();
+					fileReader.onload = function(fileLoadedEvent)
+					{
+						var data = fileLoadedEvent.target.result;
+						ui.background.style.backgroundImage='url('+data+')';
+					};
+					fileReader.readAsDataURL(fileToLoad, "UTF-8");
+				});
+			}
+			else{
+				ui.background.setBackgroundImage('image/background/'+background+'.jpg');
+			}
+			ui.background.style.backgroundSize='cover';
+			ui.background.style.backgroundPosition='50% 50%';
+		},
 		generateBeatmapTimeleap:(bpm,beats,offset)=>beats.map(value=>Math.round(value*60000/bpm+(offset||0))),
 		updateRenku:function(){
 			game.broadcast(function(renku){
@@ -35736,6 +35751,7 @@
 					else{
 						next.parent=event;
 						_status.event=next;
+						game.getGlobalHistory('everything').push(next);
 					}
 				}
 				else if(event.finished){
@@ -37614,7 +37630,7 @@
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;
 					}
 					if(card.ai.basic.value==undefined) card.ai.basic.value=function(card,player,index,method){
-						if(!player.canEquip(card)) return 0.01;
+						if(!player.getCards('e').contains(card)&&!player.canEquip(card,true)) return 0.01;
 						var value=0;
 						var info=get.info(card);
 						var current=player.getEquip(info.subtype);
@@ -37660,6 +37676,9 @@
 			}
 			skills=skills.concat(lib.skill.global);
 			game.expandSkills(skills);
+			skills.sort(function(a,b){
+				return get.priority(a)-get.priority(b);
+			});
 			var arg=[],i,info;
 			for(i=0;i<arguments.length-2;i++){
 				arg.push(arguments[i]);
@@ -38671,36 +38690,15 @@
 			}
 			return num;
 		},
-		filterPlayer:function(func,list,includeOut){
-			if(!Array.isArray(list)){
-				list=[];
-			}
-			if(typeof func!='function'){
-				func=lib.filter.all;
-			}
-			for(var i=0;i<game.players.length;i++){
-				if(!includeOut&&game.players[i].isOut()) continue;
-				if(func(game.players[i])){
-					list.add(game.players[i]);
-				}
-			}
-			return list;
+		filterPlayer:(func,list,includeOut)=>{
+			if(!Array.isArray(list)) list=[];
+			if(typeof func!='function') func=lib.filter.all;
+			return list.addArray(game.players.filter(value=>(includeOut||!value.isOut())&&func(value)));
 		},
-		filterPlayer2:function(func,list,includeOut){
-			if(!Array.isArray(list)){
-				list=[];
-			}
-			if(typeof func!='function'){
-				func=lib.filter.all;
-			}
-			var players=game.players.slice(0).concat(game.dead);
-			for(var i=0;i<players.length;i++){
-				if(!includeOut&&players[i].isOut()) continue;
-				if(func(players[i])){
-					list.add(players[i]);
-				}
-			}
-			return list;
+		filterPlayer2:(func,list,includeOut)=>{
+			if(!Array.isArray(list)) list=[];
+			if(typeof func!='function') func=lib.filter.all;
+			return list.addArray(game.players.concat(game.dead).filter(value=>(includeOut||!value.isOut())&&func(value)));
 		},
 		findPlayer:function(func,includeOut){
 			for(var i=0;i<game.players.length;i++){
@@ -38795,7 +38793,7 @@
 					}
 					intro.innerHTML=get.translation(rarity);
 				}
-				if((button.link=='xushu'||button.link=='xin_xushu')&&button.node&&button.node.name&&button.node.group){
+				if((button.link=='xushu'||button.link=='xin_xushu'||button.link=='jsrg_guanyu')&&button.node&&button.node.name&&button.node.group){
 					if(button.classList.contains('newstyle')){
 						button.node.name.dataset.nature='watermm';
 						button.node.group.dataset.nature='water';
@@ -47317,8 +47315,8 @@
 					if(window.plugins&&window.plugins.insomnia) window.plugins.insomnia.keepAwake();
 					else{
 						lib.init.js(lib.assetURL+'game','NoSleep',function(){
-						var noSleep = new NoSleep();
-						document.addEventListener(lib.config.touchscreen?'touchend':'click', function enableNoSleep() {
+							var noSleep = new NoSleep();
+							document.addEventListener(lib.config.touchscreen?'touchend':'click', function enableNoSleep() {
 								document.removeEventListener(lib.config.touchscreen?'touchend':'click', enableNoSleep, false);
 								noSleep.enable();
 								window.noSleep=noSleep;
@@ -47343,6 +47341,10 @@
 				ui.backgroundMusic.autoplay=true;
 				ui.backgroundMusic.addEventListener('ended',game.playBackgroundMusic);
 				ui.window.appendChild(ui.backgroundMusic);
+				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click', function playMusic() {
+					ui.window.removeEventListener(lib.config.touchscreen?'touchend':'click', playMusic, false);
+					if(!ui.backgroundMusic.played.length) ui.backgroundMusic.play();
+				}, false);
 				if(lib.config.cursor_style=='pointer'){
 					ui.window.classList.add('nopointer');
 				}
@@ -48240,7 +48242,7 @@
 				node.node={
 					avatar:ui.create.div('.avatar',node,ui.click.avatar).hide(),
 					avatar2:ui.create.div('.avatar2',node,ui.click.avatar2).hide(),
-					turnedover:ui.create.div('.turned','<div>翻<br>面<div>',node),
+					turnedover:ui.create.div('.turned','<div>'+get.verticalStr('翻面')+'<div>',node),
 					framebg:ui.create.div('.framebg',node),
 					intro:ui.create.div('.intro',node),
 					identity:ui.create.div('.identity',node),
@@ -52784,6 +52786,21 @@
 		},
 	};
 	var get={
+		//优先度判断
+		priority:function(skill){
+			var info=get.info(skill),priority=0;
+			if(!info) return 0;
+			if(info.priority){
+				priority=info.priority*100;
+			}
+			if(info.silent){
+				priority++;
+			}
+			if(info.equipSkill) priority-=25;
+			if(info.cardSkill) priority-=50;
+			if(info.ruleSkill) priority-=75;
+			return priority;
+		},
 		//新装备栏相关
 		//获取一张装备牌实际占用的装备栏(君曹操六龙)
 		//用法同get.subtype，返回数组
@@ -52954,7 +52971,7 @@
 				return false;
 			},
 			double:function(name,array){
-				if(!lib.character[name]||!lib.character[name][4]||name.indexOf('gz_')!=0&&name.indexOf('db_')!=0) return false;
+				if(!lib.character[name]||!lib.character[name][4]||name.indexOf('gz_')!=0&&name.indexOf('db_')!=0&&name.indexOf('jsrg_')!=0) return false;
 				for(var i of lib.character[name][4]){
 					if(i.indexOf('doublegroup:')==0){
 						if(!array) return true;
@@ -54352,6 +54369,9 @@
 			else if(str2.indexOf('手杀')==0){
 				str2=str2.slice(2);
 			}
+			else if(str2.indexOf('新杀')==0){
+				str2=str2.slice(2);
+			}
 			else if(str2.indexOf('界')==0&&lib.characterPack.refresh&&lib.characterPack.refresh[str]){
 				str2=str2.slice(1);
 			}
@@ -54385,6 +54405,9 @@
 			else if(str2.indexOf('手杀')==0){
 				str2=str2.slice(2);
 			}
+			else if(str2.indexOf('新杀')==0){
+				str2=str2.slice(2);
+			}
 			return str2;
 		},
 		slimName:function(str){
@@ -54407,6 +54430,9 @@
 				str2=str2.slice(3);
 			}
 			else if(str2.indexOf('手杀')==0){
+				str2=str2.slice(2);
+			}
+			else if(str2.indexOf('新杀')==0){
 				str2=str2.slice(2);
 			}
 			return get.verticalStr(str2,true);
@@ -55659,7 +55685,7 @@
 							}
 						}
 						else if(lib.skill[skills[i]].nobracket){
-							uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+lib.translate[skills[i]+'_info']+'</div></div>');
+							uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
 						}
 						else{
 							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');

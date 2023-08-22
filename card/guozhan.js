@@ -1219,7 +1219,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				mod:{
 					canBeReplaced:function(card,player){
-						return false;
+						if(player.getEquips('liulongcanjia').contains(card)) return false;
 					},
 				},
 			},

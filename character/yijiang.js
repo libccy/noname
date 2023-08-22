@@ -8804,6 +8804,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			mingjian:{
+				audio:2,
+				audioname:['re_caorui'],
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -8916,6 +8918,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huituo:{
 				audio:2,
+				audioname:['re_caorui'],
 				trigger:{player:'damageEnd'},
 				direct:true,
 				content:function(){
@@ -9174,27 +9177,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('h','sha')>0;
+					return player.hasCard(card=>lib.skill.yanyu.filterCard(card,player),'h');
 				},
-				filterCard:{name:'sha'},
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆');
-				},
+				filterCard:(card,player)=>get.name(card)=='sha'&&player.canRecast(card),
 				discard:false,
-				loseTo:'discardPile',
-				visible:true,
-				delay:0.5,
+				lose:false,
+				delay:false,
 				content:function(){
-					player.draw();
+					player.recast(cards);
 				},
 				ai:{
 					basic:{
 						order:1
 					},
 					result:{
-						player:1,
-					},
+						player:1
+					}
 				},
 				group:'yanyu2'
 			},
@@ -13592,13 +13590,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xunyou:['re_xunyou','xunyou'],
 			xuezong:['tw_xuezong','xuezong'],
             huanghao:['huanghao','dc_huanghao','old_huanghao'],
-			caorui:['caorui','old_caorui'],
+			caorui:['re_caorui','caorui','old_caorui'],
 			sunziliufang:['dc_sunziliufang','sunziliufang'],
 			liyan:['liyan','old_liyan'],
 			zhangsong:['re_zhangsong','zhangsong'],
 		},
 		translate:{
-			old_huaxiong:'华雄',
+			old_huaxiong:'将华雄',
+			old_huaxiong_ab:'华雄',
 			yufan:'虞翻',
 			xushu:'旧徐庶',
 			caozhi:'曹植',
@@ -13658,7 +13657,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_yujin:'节钺于禁',
 			xin_liru:'李儒',
 			guohuanghou:'郭皇后',
-			liuyu:'刘虞',
+			liuyu:'OL刘虞',
 			sundeng:'孙登',
 			liyan:'李严',
 			sunziliufang:'孙资刘放',

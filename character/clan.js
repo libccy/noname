@@ -233,8 +233,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var skill=event.sourceSkill||event.skill;
 					var info=get.info(skill);
 					if(info.charlotte) return false;
-					var translation=lib.translate[skill+'_info'];
-					if(translation&&!(/(?<!“)出牌阶段限一次/.test(translation))) return false;
+					var translation=get.skillInfoTranslation(skill,event.player);
+					if(!translation||!(/(?<!“)出牌阶段限一次/.test(translation))) return false;
 					return event.player.countCards('h')>0;
 				},
 				check:function(event,player){
@@ -244,22 +244,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var num=trigger.player.countCards('h');
-					trigger.player.chooseCard('是否重铸任意张牌名字数为'+num+'的牌？',[1,Infinity],'he',(card,player,target)=>{
-						if(!_status.event.cards.contains(card)) return false;
-						var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-						return mod=='unchanged';
-					}).set('ai',card=>{
+					trigger.player.chooseCard('是否重铸任意张牌名字数为'+num+'的牌？',[1,Infinity],'he',(card,player)=>_status.event.cards.contains(card)&&player.canRecast(card)).set('ai',card=>{
 						var val=get.value(card);
 						return 6-val;
 					}).set('cards',trigger.player.getCards('he',card=>{
 						return lib.skill.dcweidang.getLength(card)==num;
 					}));
 					'step 1'
-					if(result.bool){
-						var cards=result.cards;
-						trigger.player.loseToDiscardpile(cards);
-						trigger.player.draw(cards.length);
-					}
+					if(result.bool) trigger.player.recast(result.cards);
 				}
 			},
 			//族王允
@@ -575,8 +567,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!targets.length){
 									var num=lib.skill.clanguangu_backup.num;
 									var cards=get.cards(num);
-									game.cardsGotoOrdering(cards);
-									event.cards=cards;
+									event.cards=cards.slice(0);
+									while(cards.length) ui.cardPile.insertBefore(cards.pop().fix(),ui.cardPile.firstChild);
+									game.updateRoundNumber();
 									event.goto(2);
 								}
 								else{
@@ -651,11 +644,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										next.throw=false;
 										next.set('owner',owner);
 									}
-								}
-								'step 4'
-								if(!targets.length){
-									while(cards.length) ui.cardPile.insertBefore(cards.pop().fix(),ui.cardPile.firstChild);
-									game.updateRoundNumber();
 								}
 							},
 							ai:{
@@ -787,7 +775,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var num=player.countCards('h');
 					var str='是否交给其'+get.cnNumber(num)+'张牌，然后视为你对其使用一张【酒】？或者点击“取消”，令其交给你一张牌，然后其视为对你使用一张雷【杀】。';
-					target.chooseCard(get.translation(player)+'对你发动了【驳龙】',str,num,'he').set('ai',card=>{
+					if(!num||target.countCards('he')<num) event._result={bool:false};
+					else target.chooseCard(get.translation(player)+'对你发动了【驳龙】',str,num,'he').set('ai',card=>{
 						if(_status.event.canGive) return 5+Math.max(0,3-_status.event.player.hp)/1.5-get.value(card);
 						return 0;
 					}).set('canGive',function(){
@@ -848,7 +837,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							cards.addArray(evt.getl(current).hs);
 						});
 					})
-					return event.cards.some(card=>!cards.contains(card));
+					if(event.cards.some(card=>!cards.contains(card))) return false;
+					return true;
 				},
 				content:function(){
 					'step 0'
@@ -910,18 +900,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					global:{
 						enable:'phaseUse',
-						filter:function(event,player){
-							return game.hasPlayer(current=>lib.skill.clanlianzhu_global.filterTarget(null,player,current));
-						},
-						filterCard:function(card,player){
-							if(!game.hasPlayer(current=>{
-								if(!current.hasSkill('clanlianzhu')||current.hasSkill('clanlianzhu_targeted')) return false;
-								return !current.storage.clanlianzhu;
-							})) return false;
-							var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-							if(mod!='unchanged') return mod;
-							return true;
-						},
+						filter:(event,player)=>game.hasPlayer(current=>lib.skill.clanlianzhu_global.filterTarget(null,player,current)),
+						filterCard:(card,player)=>game.hasPlayer(current=>current.hasSkill('clanlianzhu')&&!current.hasSkill('clanlianzhu_targeted')&&!current.storage.clanlianzhu)&&player.canRecast(card),
 						selectCard:[0,1],
 						check:function(card){
 							return 5-get.value(card);
@@ -968,10 +948,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							bocchi.sortBySeat();
 							kita.sortBySeat();
 							var str='';
-							var getn=function(target){
-								if(player==target) return '自己';
-								return get.translation(target);
-							}
 							if(bocchi.length){
 								str+='重铸一张牌，然后令';
 								bocchi.forEach((current,i)=>{
@@ -998,19 +974,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target.storage.clanlianzhu) event.goto(4);
 							target.changeZhuanhuanji('clanlianzhu');
 							'step 1'
-							player.loseToDiscardpile(cards);
-							player.draw(cards.length);
+							player.recast(cards);
 							'step 2'
 							if(!target.countCards('he')&&!_status.connectMode) event._result={bool:false};
-							else target.chooseCard('he','联诛：是否重铸一张牌？',(card,player)=>{
-								var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-								if(mod!='unchanged') return mod;
-								return true;
-							});
+							else target.chooseCard('he','联诛：是否重铸一张牌？',lib.filter.cardRecastable);
 							'step 3'
 							if(result.bool){
-								target.loseToDiscardpile(result.cards);
-								target.draw(result.cards.length);
+								target.recast(result.cards);
 								if(get.color(cards[0])!=get.color(result.cards[0])) lib.skill.chenliuwushi.change(target,-1);
 							}
 							event.finish();
@@ -1473,9 +1443,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0],num=lib.skill.clansankuang.getNum(target),num2=target.countCards('he');
 						event.target=target;
 						player.logSkill('clansankuang',target);
-						if(num==0||num2==0) event._result={bool:false};
+						if(num2==0) event._result={bool:false};
 						else if(num2<=num) event._result={bool:true,cards:target.getCards('he')};
-						else target.chooseCard('he',true,[num,Infinity]).set('ai',get.unuseful).set('prompt','交给'+get.translation(player)+'至少'+get.cnNumber(num)+'张牌');
+						else{
+							var cards=trigger.cards.filterInD('oe');
+							target.chooseCard('he',num>0,[num,Infinity]).set('ai',get.unuseful).set('prompt',num>0?
+								'是否交给'+get.translation(player)+'任意张牌'+(cards.length?'并获得'+get.translation(cards):'')+'？':
+								'交给'+get.translation(player)+'至少'+get.cnNumber(num)+'张牌');
+						}
 					}else event.finish();
 					'step 2'
 					if(result.bool){
@@ -1483,6 +1458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.give(cards,player);
 						game.delayx();
 					}
+					else event.finish();
 					'step 3'
 					if(trigger.cards.filterInD().length) target.gain(trigger.cards.filterInD(),'gain2','bySelf');
 					else if(trigger.cards.filterInD('e').length) target.gain(trigger.cards.filterInD('e'),get.owner(trigger.cards.filterInD('e')[0]),'give');
@@ -1955,25 +1931,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(player.actionHistory[i].isRound) break;
 					}
-					return event.targets&&event.targets.length==1&&(!event.targets[0].isLinked()||
-						player.getCards('h',card=>get.suit(card)==get.suit(event.card)).filter(card=>{
-							var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-							if(mod!='unchanged') return true;
-							return false;
-						}).length==0);
+					return event.targets&&event.targets.length==1&&!event.targets[0].isLinked()||
+						player.hasCard(card=>get.suit(card)==get.suit(event.card)&&player.canRecast(card),'h');
 				},
 				content:function(){
-					'step 0'
 					if(trigger.targets&&trigger.targets.length==1){
 						trigger.targets[0].link(true);
 					}
-					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card));
-					if(cards.length>0){
-						player.loseToDiscardpile(cards);
-						player.draw(cards.length);
-					}
-					'step 1'
-					player.draw();
+					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card)&&player.canRecast(card));
+					if(cards.length>0) player.recast(cards);
 				}
 			},
 			clanhuanyin:{
@@ -2361,14 +2327,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanbolong:'驳龙',
 			clanbolong_info:'出牌阶段限一次。你可以令一名其他角色选择一项：1.你交给其一张牌，然后视为对其使用一张雷【杀】；2.交给你等同于你手牌数的牌，然后视为对你使用一张【酒】。',
 			clanzhongliu:'中流',
-			clanzhongliu_info:'宗族技，锁定技。当你使用牌时，若此牌对应的实体牌不全为同族角色的手牌，你重置武将牌上的技能。',
+			clanzhongliu_info:'宗族技，锁定技。当你使用牌时，若此牌对应的实体牌均不为太原王氏角色的手牌，你重置武将牌上的技能。',
 			clan_zhongyan:'族钟琰',
 			clanguangu:'观骨',
 			clanguangu_info:'转换技，出牌阶段限一次。阴：你可以观看牌堆顶的至多四张牌；阳：你可以观看一名角色的至多四张手牌。然后你可以使用其中的一张牌。',
 			clanxiaoyong:'啸咏',
 			clanxiaoyong_info:'锁定技。当你于回合内首次使用字数为X的牌时，你重置〖观骨〗（X为你上次发动〖观骨〗观看的牌数）。',
 			clanbaozu:'保族',
-			clanbaozu_info:'宗族技，限定技。当一名同族角色进入濒死状态时，你可以令其横置并回复1点体力。',
+			clanbaozu_info:'宗族技，限定技。当一名颍川钟氏角色进入濒死状态时，你可以令其横置并回复1点体力。',
 			clan_wangyun:'族王允',
 			clanjiexuan:'解悬',
 			clanjiexuan_info:'限定技，转换技。阴：你可以将一张红色牌当【顺手牵羊】使用；阳：你可以将一张黑色牌当【过河拆桥】使用。',

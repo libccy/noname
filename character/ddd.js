@@ -117,8 +117,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.useCard(result.targets,card,event.links);
 					}
 					else{
-						game.cardsDiscard(event.links);
-						target.draw(event.links.length);
+						target.recast(event.links,(player,cards)=>game.cardsDiscard(cards).cards);
 					}
 					'step 4'
 					for(var card of cards){

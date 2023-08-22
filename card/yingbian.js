@@ -450,7 +450,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseCard('h','是否发动【太公阴符】重铸一张手牌？').set('ai',function(card){
+					player.chooseCard('h','是否发动【太公阴符】重铸一张手牌？',lib.filter.cardRecastable).set('ai',function(card){
 						return 5-get.value(card);
 					});
 					'step 1'

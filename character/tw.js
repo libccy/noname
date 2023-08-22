@@ -1282,16 +1282,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'twqingtao_jieshu',
 				content:function(){
 					'step 0'
-					player.chooseCard(get.prompt2('twqingtao'),'he').set('ai',function(card){
+					player.chooseCard(get.prompt2('twqingtao'),'he',lib.filter.cardRecastable).set('ai',function(card){
 						if(card.name=='jiu'||get.type(card)!='basic') return 10-get.value(card);
 						return 6-get.value(card);
 					});
 					'step 1'
 					if(result.bool){
 						player.logSkill('twqingtao');
-						player.loseToDiscardpile(result.cards);
-						player.draw();
-						if(result.cards[0].name=='jiu'||get.type(result.cards[0],false,player)!='basic') player.draw();
+						player.recast(result.cards);
+						if(get.name(result.cards[0])=='jiu'||get.type(result.cards[0],false,player)!='basic') player.draw();
 					}
 				},
 				subSkill:{
@@ -2410,7 +2409,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{content:'已使用牌名：$'},
 				subSkill:{
 					achieve:{
-						audio:'mibei',
+						audio:'mibei1',
 						skillAnimation:true,
 						animationColor:'water',
 					},
@@ -2428,7 +2427,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					fail:{
-						audio:'mibei',
+						audio:'mibei2',
 						trigger:{player:'phaseUseEnd'},
 						forced:true,
 						filter:function(event,player){
@@ -11174,14 +11173,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(!event.isMine()&&!event.isOnline()) game.delayx();
-					player.chooseCard('是否发动【革制】重铸一张牌？').set('ai',function(card){
+					player.chooseCard('是否发动【革制】重铸一张牌？',lib.filter.cardRecastable).set('ai',function(card){
 						return 5.5-get.value(card);
 					});
 					'step 1'
 					if(result.bool){
 						player.logSkill('twgezhi');
-						player.loseToDiscardpile(result.cards);
-						player.draw();
+						player.recast(result.cards);
 					}
 				},
 				group:'twgezhi_buff',
@@ -11192,7 +11190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						filter:function(event,player){
 							return player.getHistory('lose',function(evt){
-								return evt.getParent(2).name=='twgezhi'&&evt.getParent('phaseUse')==event;
+								return evt.getParent(3).name=='twgezhi'&&evt.getParent('phaseUse')==event;
 							}).length>1;
 						},
 						content:function(){
@@ -11695,14 +11693,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						filter:function(event,player){
 							for(var i of player.getStorage('twjuezhu_restore')){
-								if(i[0]==event.player&&player.hasEnabledSlot(i[1])) return true;
+								if(i[0]==event.player&&player.hasDisabledSlot(i[1])) return true;
 							}
 							return false;
 						},
 						content:function(){
 							var list=[];
 							for(var i of player.getStorage('twjuezhu_restore')){
-								if(i[0]==trigger.player&&player.hasEnabledSlot(i[1])) list.push(i[1]);
+								if(i[0]==trigger.player&&player.hasDisabledSlot(i[1])) list.push(i[1]);
 							}
 							player.enableEquip(list);
 						},
@@ -13564,7 +13562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twhanyu_info:'锁定技。游戏开始时，你获得牌堆中的基本牌，锦囊牌，装备牌各一张。',
 			twhengjiang:'横江',
 			twhengjiang_info:'出牌阶段限一次，当你使用基本牌或普通锦囊牌指定唯一目标后，你可将此牌的目标改为攻击范围内的所有合法目标，然后你于此牌结算结束后摸X张牌（X为因响应此牌而使用或打出过牌的角色数）。',
-			tw_huojun:'霍峻',
+			tw_huojun:'TW霍峻',
 			twsidai:'伺怠',
 			twsidai_info:'限定技。出牌阶段，你可以将手牌区内的所有基本牌当做【杀】使用（无距离和次数限制）。若此牌对应的实体牌中：包含【闪】，则目标角色成为此牌的目标后，需弃置一张基本牌，否则不可响应此牌；包含【桃】，则当目标角色受到此牌的伤害后，其减1点体力上限；包含【酒】，则当目标角色受到此牌的伤害时，此伤害×2。',
 			twjieyu:'竭御',
@@ -13869,7 +13867,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twluanchou_info:'出牌阶段限一次。你可以令两名角色获得〖共患〗直到你下次发动此技能。',
 			twgonghuan:'共患',
 			twgonghuan_info:'每回合限一次。当其他角色受到伤害时，若其拥有〖共患〗且其体力值不大于你，你可以将此伤害转移给你（不触发〖共患〗）。',
-			tw_qiaorui:'桥蕤',
+			tw_qiaorui:'TW桥蕤',
 			wangxing:'妄行',
 			twxiawei:'狭威',
 			twxiawei_info:'①游戏开始时，你将牌堆中的两张基本牌置于武将牌上，称为“威”。②回合开始时，你将所有“威”置入弃牌堆。③你可以将“威”如手牌般使用或打出。④妄行：准备阶段，你可以将牌堆顶的X+1张牌置于武将牌上，称为“威”。',

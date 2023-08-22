@@ -484,36 +484,32 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			mtg_yixialan_skill:{
 				enable:'phaseUse',
-				filter:function(event,player){
-					return player.countCards('h',{type:'basic'})>0;
-				},
-				filterCard:{type:'basic'},
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-				},
+				filter:(event,player)=>player.hasCard(card=>lib.skill.mtg_yixialan_skill.filterCard(card,player),'h'),
+				filterCard:(card,player)=>get.type(card)=='basic'&&player.canRecast(card),
 				discard:false,
-				delay:0.5,
+				lose:false,
 				check:function(card){
 					return 7-get.value(card);
 				},
 				usable:1,
 				content:function(){
-					var card=get.cardPile(function(card){
-						return get.type(card,'trick')=='trick'
+					player.recast(cards,null,(player,cards)=>{
+						var cardsToGain=[];
+						for(let repetition=0;repetition<cards.length;repetition++){
+							var card=get.cardPile(card=>get.type(card,'trick')=='trick');
+							if(card) cardsToGain.push(card);
+						}
+						if(cardsToGain.length) player.gain(cardsToGain,'draw');
+						if(cards.length-cardsToGain.length) player.draw(cards.length-cardsToGain.length).log=false;
+						return cardsToGain;
 					});
-					if(card){
-						player.gain(card,'draw');
-					}
-					else{
-						player.draw();
-					}
 				},
 				ai:{
 					mapValue:2,
 					order:1,
 					result:{
-						player:1,
-					},
+						player:1
+					}
 				}
 			},
 			mtg_shuimomuxue_skill:{

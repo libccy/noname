@@ -4919,34 +4919,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:"phaseUse",
 				position:'he',
-				filter:function(event,player){
-					return player.countCards('he',{type:'equip'})>0;
-				},
-				filterCard:function(card){
-					return get.type(card)=='equip';
-				},
+				filter:(event,player)=>player.hasCard(card=>lib.skill.chihaya_huairou.filterCard(card,player),lib.skill.chihaya_huairou.position),
+				filterCard:(card,player)=>get.type(card)=='equip'&&player.canRecast(card),
 				check:function(card){
 					if(!_status.event.player.hasEquipableSlot(get.subtype(card))) return 5;
 					return 3-get.value(card);
 				},
 				content:function(){
-					player.draw();
+					player.recast(cards);
 				},
 				discard:false,
-				visible:true,
-				loseTo:'discardPile',
+				lose:false,
+				delay:false,
 				prompt:"将一张装备牌置入弃牌堆并摸一张牌",
-				delay:0.5,
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆');
-				},
 				ai:{
 					order:10,
 					result:{
-						player:1,
-					},
-				},
+						player:1
+					}
+				}
 			},
 			chihaya_youfeng:{
 				enable:'chooseToUse',
@@ -6035,12 +6026,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseDiscardBegin'},
 				forced:true,
 				filter:function(event,player){
-					return (player.isDamaged()||player.countCards('h')-player.hp>1);
+					return (player.getDamagedHp()>1||player.countCards('h')-player.getHp()>1);
 				},
 				content:function(){
 					var num=0;
-					if(player.isDamaged()) num++;
-					if(player.countCards('h')-player.hp>1) num++;
+					if(player.getDamagedHp()>1) num++;
+					if(player.countCards('h')-player.getHp()>1) num++;
 					player.addMark('kotori_qunxin_temp',num,false);
 					player.addTempSkill('kotori_qunxin_temp','phaseDiscardEnd');
 				},
@@ -6472,6 +6463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'abyusa_jueqing_rewrite',
 				subSkill:{
 					rewrite:{
+						audio:'abyusa_jueqing',
 						trigger:{source:'damageBefore'},
 						forced:true,
 						charlotte:true,
@@ -6518,6 +6510,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			abyusa_dunying:{
+				audio:2,
 				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				forced:true,
 				filter:function(event,player){
@@ -7414,6 +7407,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shiorimiyuki_banyin:{
+				audio:2,
 				trigger:{player:['damageEnd','recoverEnd']},
 				direct:true,
 				filter:function(event,player){
@@ -7436,6 +7430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shiorimiyuki_tingxian:{
+				audio:2,
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				content:function(){
@@ -7449,14 +7444,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.control=='cancel2') return;
-					player.logSkill('shiorimiyuki_tingxian');
+					player.logSkill('shiorimiyuki_tingxian1');
 					var num=1+result.index;
 					player.draw(num).gaintag=['shiorimiyuki_tingxian'];
 					player.recover();
 					player.addTempSkill('shiorimiyuki_tingxian2');
 				},
+				group:'shiorimiyuki_tingxian1',
 			},
+			shiorimiyuki_tingxian1:{audio:true},
 			shiorimiyuki_tingxian2:{
+				audio:true,
 				trigger:{player:'phaseUseEnd'},
 				forced:true,
 				charlotte:true,
@@ -7977,6 +7975,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			kanade_mapo:{
+				audio:2,
 				derivation:'mapodoufu',
 				enable:'chooseToUse',
 				viewAs:{name:'mapodoufu'},
@@ -7999,6 +7998,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			kanade_benzhan:{
+				audio:3,
 				trigger:{global:['useCard','respond']},
 				direct:true,
 				usable:1,
@@ -8693,6 +8693,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{expose:0.2},
 			},
 			noda_fengcheng:{
+				audio:2,
 				trigger:{
 					player:"gainAfter",
 				},
@@ -8709,6 +8710,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			noda_xunxin:{
+				audio:2,
 				enable:'phaseUse',
 				viewAs:{name:'juedou'},
 				filter:function(event,player){
@@ -8740,6 +8742,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			hinata_qiulve:{
+				audio:2,
 				enable:['chooseToUse','chooseToRespond'],
 				viewAsFilter:function(player){
 					return player.countCards('hes',function(card){
@@ -8790,6 +8793,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			hinata_ehou:{
+				audio:2,
 				trigger:{global:'useCardAfter'},
 				direct:true,
 				filter:function(event,player){
@@ -8816,6 +8820,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			hisako_yinbao:{
+				audio:2,
 				trigger:{player:['damageEnd','recoverAfter']},
 				content:function(){
 					'step 0'
@@ -9464,6 +9469,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shiina_qingshen:{
+				audio:1,
 				trigger:{
 					player:'damageEnd',
 					source:'damageSource',
@@ -9510,6 +9516,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shiina_feiyan:{
+				audio:1,
 				animalList:['key_inari','key_doruji'],
 				trigger:{global:'phaseBegin'},
 				direct:true,
@@ -9543,6 +9550,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shiina_retieji:{
+				audio:1,
 				shaRelated:true,
 				trigger:{player:'useCardToPlayered'},
 				check:function(event,player){
@@ -10927,7 +10935,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yuri_xingdong:{
-				audio:2,
+				audio:3,
 				group:'yuri_xingdong_gain',
 				subSkill:{
 					mark:{
@@ -10938,6 +10946,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					gain:{
+						audio:2,
 						trigger:{player:'phaseUseBegin'},
 						forced:true,
 						content:function(){
@@ -11011,6 +11020,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yuri_wangxi:{
+				audio:2,
 				trigger:{global:'dieAfter'},
 				direct:true,
 				limited:true,
@@ -16569,11 +16579,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			diyjuntun:{
 				enable:'phaseUse',
-				filter:function(event,player){
-					return player.countCards('he',{type:'equip'})>0;
-				},
+				filter:(event,player)=>player.hasCard(card=>lib.skill.diyjuntun.filterCard(card,player),'he'),
 				position:'he',
-				filterCard:{type:'equip'},
+				filterCard:(card,player)=>get.type(card)=='equip'&&player.canRecast(card),
 				check:function(card){
 					var player=_status.event.player;
 					var he=player.getCards('he');
@@ -16590,23 +16598,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 0;
 				},
 				content:function(){
-					player.draw();
+					player.recast(cards);
 				},
 				discard:false,
+				lose:false,
+				delay:false,
 				prompt:'将一张装备牌置入弃牌堆并摸一张牌',
-				delay:0.5,
-				loseTo:'discardPile',
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆');
-				},
 				ai:{
 					basic:{
 						order:8.5
 					},
 					result:{
-						player:1,
-					},
+						player:1
+					}
 				}
 			},
 			choudu:{

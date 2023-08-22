@@ -13,13 +13,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang2:['re_madai','re_wangyi','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao','re_xunyou','re_guanzhang'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','dc_liru','re_manchong','re_fuhuanghou','re_guanping','re_liufeng','re_caochong'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','dc_chenqun','re_caifuren','re_guyong','re_jushou','re_zhuhuan','re_zhangsong'],
-				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen','re_zhuzhi'],
+				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen','re_zhuzhi','re_caorui'],
 				refresh_yijiang6:['re_guohuanghou','re_sundeng'],
 				refresh_xinghuo:['re_duji','dc_gongsunzan','re_sp_taishici','re_caiyong','re_mazhong','re_wenpin','re_jsp_huangyueying'],
 			},
 		},
 		connect:true,
 		character:{
+			re_caorui:['male','wei',3,['huituo','mingjian','rexingshuai'],['unseen','zhu']],
 			re_caochong:['male','wei',3,['rechengxiang','renxin']],
 			ol_zhangzhang:['male','wu',3,['olzhijian','olguzheng']],
 			re_jsp_huangyueying:['female','qun',3,['rejiqiao','relinglong']],
@@ -162,6 +163,95 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//堪比界曹冲的界曹叡
+			rexingshuai:{
+				audio:2,
+				skillAnimation:true,
+				animationColor:'thunder',
+				trigger:{player:'dying'},
+				zhuSkill:true,
+				filter:function(event,player){
+					if(player.hp>0) return false;
+					if(!player.hasZhuSkill('rexingshuai')) return false;
+					return game.hasPlayer(function(current){
+						return current!=player&&current.group=='wei';
+					});
+				},
+				init:function(player){
+					if(player.hasZhuSkill('rexingshuai')){
+						player.markSkill('rexingshuai');
+						player.storage.rexingshuai=false;
+					}
+				},
+				intro:{
+					content:'limited',
+				},
+				limited:true,
+				mark:false,
+				content:function(){
+					'step 0'
+					player.awakenSkill('rexingshuai');
+					var targets=game.filterPlayer();
+					targets.sortBySeat(_status.currentPhase);
+					targets.remove(player);
+					event.targets=targets;
+					event.damages=[];
+					player.addSkill('rexingshuai_restore');
+					'step 1'
+					if(event.targets.length){
+						var current=event.targets.shift();
+						if(current.group=='wei'){
+							current.chooseBool('是否令'+get.translation(player)+'回复一点体力？').set('ai',function(){
+								return get.attitude(_status.event.player,_status.event.target)>2;
+							}).set('target',player);
+							event.current=current;
+						}
+						else{
+							event.redo();
+						}
+					}
+					else{
+						event.goto(3);
+					}
+					'step 2'
+					if(result.bool){
+						event.damages.push(event.current);
+						event.current.line(player,'green');
+						game.log(event.current,'令',player,'回复一点体力');
+						player.recover();
+					}
+					if(event.targets.length){
+						event.goto(1);
+					}
+					'step 3'
+					if(event.damages.length){
+						var next=game.createEvent('rexingshuai_next');
+						event.next.remove(next);
+						trigger.after.push(next);
+						next.targets=event.damages;
+						next.setContent(function(){
+							targets.shift().damage();
+							if(targets.length) event.redo();
+						});
+					}
+				},
+				subSkill:{
+					restore:{
+						trigger:{
+							global:'dieAfter',
+						},
+						charlotte:true,
+						forced:true,
+						filter:function(event,player){
+							return event.source&&event.source.isIn()&&event.source.hasSkill('mingjian2');
+						},
+						content:function(){
+							player.restoreSkill('rexingshuai');
+							game.log(player,'重置了','#g【兴衰】');
+						}
+					},
+				}
+			},
 			//不想突破可以不突破的界曹冲
 			rechengxiang:{
 				audio:2,
@@ -574,19 +664,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 6'
 					if(event.h&&event.hp&&event.e){
-						player.chooseCard('安国：是否重铸任意张牌？',[1,Infinity],(card,player)=>{
-							var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-							if(mod!='unchanged') return mod;
-							return true;
-						},'he').set('ai',card=>{
+						player.chooseCard('安国：是否重铸任意张牌？',[1,Infinity],lib.filter.cardRecastable,'he').set('ai',card=>{
 							return 6-get.value(card);
 						});
 					}
 					else event.finish();
 					'step 7'
 					if(result.bool){
-						player.loseToDiscardpile(result.cards);
-						player.draw(result.cards.length);
+						player.recast(result.cards);
 					}
 				},
 				ai:{
@@ -2141,7 +2226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//界荀彧
 			oljieming:{
 				audio:2,
-				trigger:{player:['damageEnd','dieAfter']},
+				trigger:{player:['damageEnd','die']},
 				direct:true,
 				forceDie:true,
 				filter:function(event,player){
@@ -4042,45 +4127,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.countCards('h','sha')>0;
+					return player.hasCard(card=>lib.skill.reyanyu.filterCard(card,player),'h');
 				},
-				filterCard:{name:'sha'},
-				prepare:function(cards,player){
-					player.$throw(cards,1000);
-					game.log(player,'将',cards,'置入了弃牌堆');
-				},
+				filterCard:(card,player)=>get.name(card)=='sha'&&player.canRecast(card),
 				discard:false,
-				loseTo:'discardPile',
-				visible:true,
-				delay:0.5,
+				lose:false,
+				delay:false,
 				content:function(){
-					player.draw();
+					player.recast(cards);
 				},
 				ai:{
 					basic:{
 						order:1
 					},
 					result:{
-						player:1,
-					},
+						player:1
+					}
 				},
 				group:'reyanyu2'
 			},
 			reyanyu2:{
 				trigger:{player:'phaseUseEnd'},
 				direct:true,
-				filter:function(event,player){
-					return player.getHistory('lose',function(evt){
-						var evt2=evt.getParent();
-						return evt2.name=='useSkill'&&evt2.skill=='reyanyu'&&evt.getParent(3)==event;
-					}).length>0;
-				},
+				filter:(event,player)=>player.hasHistory('useSkill',evt=>evt.skill=='reyanyu'&&evt.event.getParent(2)==event),
 				content:function(){
 					'step 0'
-					event.num=Math.min(3,player.getHistory('lose',function(evt){
-						var evt2=evt.getParent();
-						return evt2.name=='useSkill'&&evt2.skill=='reyanyu'&&evt.getParent(3)==trigger;
-					}).length);
+					event.num=Math.min(3,player.getHistory('useSkill',evt=>evt.skill=='reyanyu'&&evt.event.getParent(2)==trigger).length);
 					player.chooseTarget(get.prompt('reyanyu'),'令一名男性角色摸'+get.cnNumber(event.num)+'张牌',function(card,player,target){
 						return target.hasSex('male')&&target!=player;
 					}).set('ai',function(target){
@@ -8878,7 +8950,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				mark:true,
 				skillAnimation:true,
-				animationStr:'涅盘',
 				limited:true,
 				animationColor:'orange',
 				init:function(player){
@@ -14582,7 +14653,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shizhan_info:'出牌阶段限两次，你可以选择一名其他角色。该角色视为对你使用一张【决斗】。',
 			ol_xunyu:'界荀彧',
 			oljieming:'节命',
-			oljieming_info:'当你受到1点伤害后或死亡后，你可令一名角色摸X张牌。然后若其手牌数大于X，则其将手牌弃置至X张（X为其体力上限且至多为5）。',
+			oljieming_info:'当你受到1点伤害后或死亡时，你可令一名角色摸X张牌。然后若其手牌数大于X，则其将手牌弃置至X张（X为其体力上限且至多为5）。',
 			re_liufeng:'界刘封',
 			rexiansi:'陷嗣',
 			rexiansi2:'陷嗣',
@@ -14675,6 +14746,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_caochong:'界曹冲',
 			rechengxiang:'称象',
 			rechengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌。若你获得的牌点数之和为13，你复原武将牌。',
+			re_caorui:'界曹叡',
+			rexingshuai:'兴衰',
+			rexingshuai_info:'主公技，限定技。当你进入濒死状态时，你可令其他魏势力角色依次选择是否令你回复1点体力。然后这些角色依次受到1点伤害。有〖明鉴〗效果的角色于其回合内杀死角色后，你重置〖兴衰〗。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

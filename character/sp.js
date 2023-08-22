@@ -9,10 +9,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong'],
 				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna"],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
-				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','ol_puyuan','zhangzhi','lushi'],
+				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','zhangzhi','lushi'],
 				sp_huben:["caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_wenqin'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
-				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
+				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo','ol_puyuan','ol_wenqin'],
 				sp_waitforsort:['ol_huban','ol_mengda','haopu'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['ol_wanglang'],
@@ -28,6 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_zhouqun:['male','shu',4,['oltianhou','olchenshuo']],
 			ol_wenqin:['male','wei',4,['olguangao','olhuiqi']],
 			haopu:['male','shu',4,['olzhenying']],
 			ol_mengda:['male','shu',4,['olgoude']],
@@ -687,6 +688,298 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//OL周群
+			oltianhou:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				content:function(){
+					'step 0'
+					var card=get.cards()[0];
+					event.card=card;
+					game.cardsGotoOrdering(card);
+					'step 1'
+					if(player.countCards('he')>0){
+						player.chooseCard('he','天候：是否用一张牌交换牌堆顶的'+get.translation(card)+'?').set('promptx',[[card]]).set('ai',()=>-1)
+					}
+					else{
+						event._result={bool:false};
+					}
+					'step 2'
+					if(result.bool){
+						player.lose(result.cards,ui.cardPile,'insert');
+						player.gain(event.card,'draw');
+					}
+					else{
+						ui.cardPile.insertBefore(event.card,ui.cardPile.firstChild);
+					}
+					'step 3'
+					var card=get.cards()[0];
+					ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
+					player.showCards(card,get.translation(player)+'发动了【天候】');
+					var suit=get.suit(card,false),skill='oltianhou_'+suit;
+					if(!lib.skill.oltianhou.derivation.contains(skill)) event.finish();
+					else{
+						event.weather_skill=skill;
+						player.chooseTarget(true,'令一名角色获得技能【'+get.translation(skill)+'】').set('ai',function(target){
+							return get.attitude(_status.event.player,target);
+						});
+					}
+					'step 4'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						target.addAdditionalSkill('oltianhou_'+player.playerid,event.weather_skill);
+						player.addTempSkill('oltianhou_expire',{player:'phaseZhunbeiBegin'});
+						game.log(target,'获得了天气技能','#g【'+get.translation(event.weather_skill)+'】');
+						game.broadcastAll(function(bg){
+							_status.tempBackground=bg;
+							game.updateBackground();
+						},event.weather_skill+'_bg');
+						game.addVideo('skill',player,['oltianhou',[true,event.weather_skill+'_bg']])
+					}
+				},
+				video:function(player,info){
+					if(info[0]){
+						_status.tempBackground=info[1];
+					}
+					else{
+						delete _status.tempBackground;
+					}
+					game.updateBackground();
+				},
+				derivation:['oltianhou_spade','oltianhou_heart','oltianhou_club','oltianhou_diamond'],
+				subSkill:{
+					expire:{
+						charlotte:true,
+						onremove:function(player){
+							var key='oltianhou_'+player.playerid,players=game.players.concat(game.dead);
+							for(var current of players){
+								current.removeAdditionalSkill(key);
+							}
+							game.broadcastAll(function(){
+								delete _status.tempBackground;
+								game.updateBackground();
+							});
+							game.addVideo('skill',player,['oltianhou',[false]])
+						},
+					},
+					spade:{
+						audio:true,
+						mark:true,
+						marktext:'雨',
+						intro:{
+							content:'锁定技。其他角色造成火属性伤害时，取消之；一名角色受到雷属性伤害后，所有与其座次相邻的角色失去1点体力。',
+						},
+						trigger:{global:'damageEnd'},
+						forced:true,
+						filter:function(event){
+							return event.nature=='thunder'&&lib.skill.oltianhou_spade.logTarget(event).length>0;
+						},
+						logTarget:function(event){
+							var list=[];
+							if(!event.player.isIn()) return [];
+							if(event.player.getNext().isIn()) list.push(event.player.getNext());
+							if(event.player.getPrevious().isIn()) list.push(event.player.getPrevious());
+							return list.sortBySeat(_status.currentPhase);
+						},
+						content:function(){
+							var targets=lib.skill.oltianhou_spade.logTarget(trigger);
+							for(var i of targets) i.loseHp();
+							game.delayex();
+						},
+						group:'oltianhou_miehuo',
+						global:'oltianhou_spade_ai',
+					},
+					spade_ai:{
+						effect:{
+							player:function(card,player,target,current){
+								if(get.tag(card,'fireDamage')&&!player.hasSkill('oltianhou_spade')){
+									return 'zerotarget';
+								}
+								else if(get.tag(card,'thunderDamage')){
+									var list=lib.skill.oltianhou_spade.logTarget({player:target});
+									var eff=list.reduce(function(eff,current){
+										eff+=get.effect(current,{name:'losehp'},player,player)
+									},0);
+									return [1,eff];
+								}
+							},
+						},
+					},
+					miehuo:{
+						audio:'oltianhou_spade',
+						trigger:{global:'damageBegin2'},
+						forced:true,
+						logTarget:'source',
+						filter:function(event,player){
+							return event.nature=='fire'&&event.source&&event.source.isIn()&&event.source!=player;
+						},
+						content:function(){
+							trigger.cancel();
+						}
+					},
+					heart:{
+						audio:true,
+						mark:true,
+						marktext:'暑',
+						intro:{
+							content:'锁定技。其他角色的结束阶段开始时，若其体力值为全场最大，则其失去1点体力。',
+						},
+						trigger:{global:'phaseJieshuBegin'},
+						forced:true,
+						filter:function(event,player){
+							return player!=event.player&&event.player.isIn()&&event.player.isMaxHp();
+						},
+						logTarget:'player',
+						content:function(){
+							trigger.player.loseHp();
+						},
+					},
+					club:{
+						audio:true,
+						mark:true,
+						marktext:'霜',
+						intro:{
+							content:'锁定技。其他角色的结束阶段开始时，若其体力值为全场最小，则其失去1点体力。',
+						},
+						trigger:{global:'phaseJieshuBegin'},
+						forced:true,
+						filter:function(event,player){
+							return player!=event.player&&event.player.isIn()&&event.player.isMinHp();
+						},
+						logTarget:'player',
+						content:function(){
+							trigger.player.loseHp();
+						},
+					},
+					diamond:{
+						audio:true,
+						mark:true,
+						marktext:'雾',
+						intro:{
+							content:'锁定技。其他角色使用【杀】指定与其座次不相邻唯一目标时，则其判定。若判定结果的点数大于此【杀】，则此【杀】对其无效。',
+						},
+						trigger:{global:'useCardToPlayer'},
+						forced:true,
+						filter:function(event,player){
+							if(event.card.name!='sha'||event.player==player||event.targets.length!=1||!event.player.isIn()) return false;
+							return event.target!=event.player.getNext()&&event.target!=event.player.getPrevious();
+						},
+						logTarget:'player',
+						content:function(){
+							'step 0'
+							var num=get.number(trigger.card);
+							event.num=num;
+							trigger.player.judge(card=>{
+								var num=get.number(card),num2=_status.event.getParent('oltianhou_diamond').num;
+								return num>num2?-4:4;
+							}).set('judge2',result=>{
+								if(result.bool==false) return true;
+								return false;
+							})
+							'step 1'
+							if(!result.bool){
+								trigger.getParent().all_excluded=true;
+								trigger.untrigger();
+							}
+						},
+						global:'oltianhou_diamond_ai',
+					},
+					diamond_ai:{
+						effect:{
+							target:function(card,player,target,current){
+								if(card.name=='sha'&&!player.hasSkill('oltianhou_diamond')){
+									if(target!=player.getNext()&&target!=player.getPrevious()) return 0.7;
+								}
+							},
+						},
+					},
+				}
+			},
+			olchenshuo:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				direct:true,
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				hasSame:function(info,card){
+					if(info.type==get.type2(card,false)) return true;
+					if(info.suit!='none'&&info.suit==get.suit(card,false)) return true;
+					if(typeof info.number=='number'&&info.number>0&&info.number==get.suit(card,false)) return true;
+					return info.length==lib.skill.dcweidang.getLength(card)
+				},
+				content:function(){
+					'step 0'
+					player.chooseCard('h',get.prompt('olchenshuo'),'展示一张手牌，然后展示并获得牌堆顶的牌').set('ai',function(card){
+						if(get.type(card)=='basic') return 1+Math.random();
+						return Math.random();
+					})
+					'step 1'
+					if(result.bool){
+						player.logSkill('olchenshuo');
+						player.showCards(result.cards,get.translation(player)+'发动了【谶说】');
+						var card=result.cards[0];
+						event.cardInfo={
+							type:get.type2(card,player),
+							suit:get.suit(card,player),
+							number:get.number(card,player),
+							length:lib.skill.dcweidang.getLength(card),
+						}
+						event.cards=[];
+						event.forceDie=true;
+						event.includeOut=true;
+					}
+					else event.finish();
+					'step 2'
+					var judgestr=get.translation(player)+'展示的第'+get.cnNumber(cards.length+1,true)+'张【谶说】牌';
+					event.videoId=lib.status.videoId++;
+					var card=get.cards()[0];
+					event.card=card;
+					cards.add(card);
+					game.cardsGotoOrdering(card);
+					game.addVideo('judge1',player,[get.cardInfo(card),judgestr,event.videoId]);
+					game.broadcastAll(function(player,card,str,id,cardid){
+						var event;
+						if(game.online){
+							event={};
+						}
+						else{
+							event=_status.event;
+						}
+						if(game.chess){
+							event.node=card.copy('thrown','center',ui.arena).animate('start');
+						}
+						else{
+							event.node=player.$throwordered(card.copy(),true);
+						}
+						if(lib.cardOL) lib.cardOL[cardid]=event.node;
+						event.node.cardid=cardid;
+						event.node.classList.add('thrownhighlight');
+						ui.arena.classList.add('thrownhighlight');
+						event.dialog=ui.create.dialog(str);
+						event.dialog.classList.add('center');
+						event.dialog.videoId=id;
+					},player,card,judgestr,event.videoId,get.id());
+					game.log(player,'展示了牌堆顶的',card);
+					game.delay(2);
+					'step 3'
+					game.broadcastAll(function(id){
+						var dialog=get.idDialog(id);
+						if(dialog){
+							dialog.close();
+						}
+						ui.arena.classList.remove('thrownhighlight');
+					},event.videoId);
+					game.addVideo('judge2',null,event.videoId);
+					if(cards.length<3&&player.isIn()&&lib.skill.olchenshuo.hasSame(event.cardInfo,card)) event.goto(2);
+					else{
+						game.broadcastAll(function(){ui.clear()});
+						player.gain(cards,'gain2');
+					}
+				},
+			},
 			//OL文钦
 			olguangao:{
 				audio:2,
@@ -747,7 +1040,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(player.countCards('h')%2==0){
 						player.draw();
-						player.chooseTarget('犷骜：令此杀对其任意个目标无效',[1,Infinity],true,(card,player,target)=>{
+						player.chooseTarget('犷骜：令此杀对其任意个目标无效',[1,Infinity],(card,player,target)=>{
 							return _status.event.targetsx.contains(target);
 						}).set('ai',target=>{
 							return 1-get.effect(target,_status.event.getTrigger().card,_status.event.player,_status.event.player);
@@ -2052,14 +2345,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else event.goto(6);
 							'step 3'
 							if(result.bool){
-								var hs=target.getCards('h',card=>{
-									var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-									if(mod!='unchanged') return mod;
-									return true;
-								});
+								var hs=target.getCards('h',lib.filter.cardRecastable);
 								if(hs.length){
-									target.loseToDiscardpile(hs);
-									target.draw(hs.length);
+									target.recast(hs);
 								}
 							}
 							event.goto(6);
@@ -2067,13 +2355,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								var hs=target.getCards('h',card=>{
 									if(!card.hasGaintag('olhuiyun_tag')) return false;
-									var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-									if(mod!='unchanged') return mod;
-									return true;
+									return target.canRecast(card);
 								});
 								if(hs.length){
-									target.loseToDiscardpile(hs);
-									target.draw(hs.length);
+									target.recast(hs);
 								}
 							}
 							event.goto(6);
@@ -2818,16 +3103,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var type=get.type2(cards[0]);
 					target.chooseCard(get.translation(player)+'对你发动了【剑合】','请重铸'+get.cnNumber(cards.length)+'张'+get.translation(type)+'牌，或点“取消”受到1点雷电伤害',cards.length,'he',(card,player)=>{
-						return get.type2(card)==_status.event.type;
+						return get.type2(card)==_status.event.type&&player.canRecast(card);
 					}).set('ai',card=>{
 						if(_status.event.goon) return (get.type(card)=='equip'?15:7)-get.value(card);
 						return 0;
 					}).set('type',type).set('goon',get.damageEffect(target,player,target,'thunder')<0);
 					'step 2'
 					if(result.bool){
-						var cards=result.cards;
-						target.loseToDiscardpile(cards);
-						target.draw(cards.length);
+						target.recast(result.cards);
 					}
 					else{
 						target.damage(player,'thunder');
@@ -3450,16 +3733,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					target.chooseCard('he',true,'铸币：请重铸一张牌',(card,player,target)=>{
-						var mod=game.checkMod(card,player,'unchanged','cardChongzhuable',player);
-						if(mod!='unchanged') return mod;
-						return true;
-					});
+					target.chooseCard('he',true,'铸币：请重铸一张牌',lib.filter.cardRecastable);
 					'step 1'
 					if(result.bool){
-						var cards=result.cards;
-						target.loseToDiscardpile(cards);
-						target.draw().gaintag=['olzhubi_tag'];
+						target.recast(result.cards,null,player=>player.draw().set('log',false).gaintag=['olzhubi_tag']);
 					}
 				},
 				ai:{
@@ -3909,7 +4186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'huanshi',
 				trigger:{global:'judge'},
 				filter:function(event,player){
-					return player.countCards('he')>0;
+					return player.countCards('h')>0;
 				},
 				logTarget:'player',
 				prompt2:function(event,player){
@@ -3993,7 +4270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(!player.countCards('h')||player.hasSkill('olhuanshi_mark',null,null,false)) event.finish();
 					'step 3'
-					player.chooseCard('是否重铸任意张手牌？','操作提示：选择要重铸的牌并点击“确定”',[1,player.countCards('h')]).set('ai',function(card){
+					player.chooseCard('是否重铸任意张手牌？','操作提示：选择要重铸的牌并点击“确定”',[1,player.countCards('h')],lib.filter.cardRecastable).set('ai',function(card){
 						var player=_status.event.player,cards=ui.selected.cards;
 						if(!player.hasSkill('olmingzhe')) return 5-get.value(card);
 						for(var i of cards){
@@ -4004,8 +4281,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 4'
 					if(result.bool){
 						player.addTempSkill('olhuanshi_mark');
-						player.loseToDiscardpile(result.cards);
-						player.draw(result.cards.length);
+						player.recast(result.cards);
 					}
 				},
 				ai:{
@@ -5728,9 +6004,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.chooseToDiscard('he',true);
 					}
 					else{
-						var cards=target.getCards('e');
-						target.loseToDiscardpile(cards);
-						target.draw(cards.length)
+						target.recast(target.getCards('e',lib.filter.cardRecastable));
 					}
 				},
 			},
@@ -5971,7 +6245,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					player.chooseTarget(true,'将'+get.translation(card)+'置于一名角色的装备区内',function(card,player,target){
-						return target.canEquip(_status.event.card);
+						return target.canEquip(_status.event.card,true);
 					}).set('card',card).set('ai',function(target){
 						var card=_status.event.getParent().card,player=_status.event.player;
 						return get.effect(target,card,player,player);
@@ -8061,8 +8335,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=[];
 					game.countPlayer(function(current){
 						if(player!=current){
-							var cards=current.getEquips(5);
-							if(!cards.some(card=>card.name.indexOf('zhuangshu_')==0)) return false;
+							var cards2=current.getEquips(5);
+							if(!cards2.some(card=>card.name.indexOf('zhuangshu_')==0)) return false;
 						}
 						var evt=trigger.getl(current);
 						for(var i of evt.cards2){
@@ -10185,16 +10459,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('luanfeng');
 					trigger.player.recover(3-trigger.player.hp);
 					'step 1'
-					var list=[];
+					var list=[],target=trigger.player;
 					for(var i=1;i<6;i++){
-						for(var j=0;j<player.countDisabledSlot(i);j++){
+						for(var j=0;j<target.countDisabledSlot(i);j++){
 							list.push(i);
 						}
 					}
-					if(list.length>0) player.enableEquip(list);
-					if(list.length<6) trigger.player.drawTo(6-list.length);
-					if(trigger.player.storage.kotarou_rewrite) trigger.player.storage.kotarou_rewrite=[];
-					if(player==trigger.player) player.storage.youlong2=[];
+					if(list.length>0) target.enableEquip(list);
+					if(list.length<6) target.drawTo(6-list.length);
+					if(target.storage.kotarou_rewrite) target.storage.kotarou_rewrite=[];
+					if(player==target) player.storage.youlong2=[];
 				},
 			},
 			//曹爽，韩遂，何进
@@ -10322,20 +10596,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
-				viewAs:{name:'shunshou'},
+				viewAs:{
+					name:'shunshou',
+					storage:{spweiwu:true},
+				},
 				filterCard:{color:'red'},
 				position:'hes',
 				check:function(card){
 					return 7-get.value(card);
 				},
-				filterTarget:function(card,player,target){
-					if(target.countCards('h')<player.countCards('h')) return false;
-					return lib.filter.filterTarget.apply(this,arguments);
-				},
-				viewAsFilter:function(player){
-					return player.countCards('hes',lib.skill.spweiwu.filterCard)>0&&game.hasPlayer(function(current){
-						return current.countCards('h')>=player.countCards('h')&&player.canUse('shunshou',current);
-					});
+				mod:{
+					targetInRange:function(card){
+						if(card.storage&&card.storage.spweiwu) return true;
+					},
 				},
 			},
 			tuogu:{
@@ -21891,33 +22164,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current.hasSkill('xinfu_jianjie');
 					})) return false;
 					if((player.getStat().skill.smh_lianhuan||0)+(player.getStat().skill.smh_lianhuan1||0)>=3) return false;
-					return player.countCards('h',{suit:'club'})>0;
+					return player.hasCard(card=>lib.skill.smh_lianhuan1.filterCard(card,player),'h');
 				},
-				filterCard:function (card){
-					return get.suit(card)=='club';
-				},
-				check:function (card){
+				filterCard:(card,player)=>get.suit(card)=='club'&&player.canRecast(card),
+				check:function(card){
 					return -1;
 				},
-				content:function (){
-					player.draw();
+				content:function(){
+					player.recast(cards);
 				},
 				discard:false,
-				loseTo:'discardPile',
+				lose:false,
+				delay:false,
 				prompt:"将一张梅花牌置入弃牌堆并摸一张牌",
-				delay:0.5,
-				prepare:function (cards,player){
-					player.$throw(cards,1000);
-				},
 				ai:{
 					basic:{
 						order:1,
 					},
 					result:{
-						player:1,
-					},
+						player:1
+					}
 				},
-				forced:true,
+				forced:true
 			},
 			"smh_yeyan":{
 				unique:true,
@@ -22649,6 +22917,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsp_huangyueying:['jsp_huangyueying','re_jsp_huangyueying'],
 			ganfuren:['dc_ganfuren','ganfuren'],
 			wenqin:['wenqin','pe_wenqin'],
+			zhouqun:['ol_zhouqun','zhouqun'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -22765,7 +23034,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_caiwenji:'SP蔡琰',
 			zhugeguo:'诸葛果',
 			lingcao:'凌操',
-			sunru:'孙茹',
+			sunru:'手杀孙茹',
 			lingju:'灵雎',
 			lifeng:'李丰',
 			jsp_guanyu:'SP关羽',
@@ -22808,8 +23077,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoying:"曹婴",
 			simahui:"司马徽",
 			baosanniang:"OL鲍三娘",
-			pangdegong:"庞德公",
-			zhaotongzhaoguang:"赵统赵广",
+			pangdegong:"手杀庞德公",
+			zhaotongzhaoguang:"手杀赵统赵广",
 			majun:"马钧",
 			simazhao:"司马昭",
 			wangyuanji:"王元姬",
@@ -23381,7 +23650,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spniluan:'逆乱',
 			spniluan_info:'出牌阶段，你可以将一张黑色牌当做【杀】使用。此【杀】使用结算完成后，若你未因此【杀】造成过伤害，则你令此【杀】不计入使用次数。',
 			spweiwu:'违忤',
-			spweiwu_info:'出牌阶段限一次，你可以将一张红色牌当做【顺手牵羊】对手牌数不小于你的角色使用。',
+			spweiwu_info:'出牌阶段限一次，你可以将一张红色牌当无距离限制的【顺手牵羊】使用。',
 			spmouzhu:'谋诛',
 			spmouzhu_backup:'谋诛',
 			spmouzhu_info:'出牌阶段限一次，你可以选择任意名“距离为1”或“体力值等于你”的其他角色，这些角色依次进行以下结算：交给你一张手牌，然后若其手牌数小于你，则其视为对你使用一张【杀】或【决斗】。',
@@ -23415,7 +23684,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chengshang:'承赏',
 			chengshang_info:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗获得过牌，则你可以从牌堆中获得所有与此牌花色点数相同的牌。',
 			chengshang_info_guozhan:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗获得过牌，则你可以从牌堆中获得所有与此牌花色点数相同的牌。',
-			panshu:'潘淑',
+			panshu:'OL潘淑',
 			weiyi:'威仪',
 			weiyi_info:'每名角色限一次。当有角色受到伤害后，你可选择：①若其体力值不小于你，则其失去1点体力。②若其体力值不大于你且其已受伤，则其回复1点体力。',
 			jinzhi:'锦织',
@@ -23428,7 +23697,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangong:'挽弓',
 			wangong2:'挽弓',
 			wangong_info:'锁定技，当你使用基本牌时，你获得如下效果：当你使用下一张牌时，若此牌为【杀】，则此牌无次数和距离限制且伤害+1。',
-			huangchengyan:'黄承彦',
+			huangchengyan:'OL黄承彦',
 			guanxu:'观虚',
 			guanxu_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可将其中一张手牌与牌堆顶5张牌中的一张交换。若如此做，你弃置其手牌中3张花色相同的牌。',
 			yashi:'雅士',
@@ -23530,7 +23799,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spmanwang_info:'出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：⒈获得〖叛侵〗。⒉摸一张牌。⒊回复1点体力。⒋摸两张牌并失去〖叛侵〗。',
 			sppanqin:'叛侵',
 			sppanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌被使用时对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项。',
-			tengfanglan:'滕芳兰',
+			tengfanglan:'OL滕芳兰',
 			luochong:'落宠',
 			luochong_info:'准备阶段开始时/当你于一回合内首次受到伤害后，你可选择本轮内未选择过的一项（每名角色每轮限选一次）：⒈令一名角色回复1点体力。⒉令一名角色失去1点体力。⒊令一名角色弃置两张牌。⒋令一名角色摸两张牌。',
 			aichen:'哀尘',
@@ -23629,7 +23898,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xindiaodu:"调度",
 			xindiaodu_info:"①每回合限一次，与你势力相同的角色使用装备牌时，其可以摸一张牌。②出牌阶段开始时，你可以获得与你势力相同的一名角色装备区内的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
 			olhuanshi:'缓释',
-			olhuanshi_info:'一名角色的判定牌生效前，你可以令其观看你的牌并选择其中的一张牌，你打出此牌代替判定牌。然后你可以重铸任意张牌（每回合限重铸一次）。',
+			olhuanshi_info:'一名角色的判定牌生效前，你可以令其观看你的手牌并选择你的一张牌，你打出此牌代替判定牌。然后你可以重铸任意张牌（每回合限重铸一次）。',
 			olhongyuan:'弘援',
 			olhongyuan_info:'每阶段限一次。当你一次性获得至少两张牌以后，你可以将至多两张牌交给等量名角色。',
 			olmingzhe:'明哲',
@@ -23637,7 +23906,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ahuinan:'阿会喃',
 			jueman:'蟨蛮',
 			jueman_info:'锁定技。一名角色的回合结束时，若本回合被使用过的基本牌数不小于2，且前两张基本牌的使用者：均不为你，你视为使用本回合被使用的第三张基本牌；有且仅有其中之一为你，你摸一张牌。',
-			ol_liuba:'刘巴',
+			ol_liuba:'OL刘巴',
 			oltongduo:'统度',
 			oltongduo_info:'准备阶段，你可以令一名角色交给你一张手牌，然后出牌阶段结束时，你将此牌置于牌堆顶。',
 			olzhubi:'铸币',
@@ -23735,11 +24004,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzhenying_info:'出牌阶段限两次。你可以选择一名手牌数不大于你的其他角色，你与其同时将手牌摸或弃置至至多两张。然后你与其中手牌数较少的角色视为对另一名角色使用一张【决斗】。',
 			ol_wenqin:'文钦',
 			olguangao:'犷骜',
-			olguangao_info:'当你/其他角色使用【杀】时，你/该角色可以额外指定一个目标/你为目标（使用者不为你则有距离限制）。然后若你的手牌数为偶数，你摸一张牌并令此牌对任意目标无效。',
+			olguangao_info:'当你/其他角色使用【杀】时，你/该角色可以额外指定一个目标/你为目标（使用者不为你则有距离限制）。然后若你的手牌数为偶数，你摸一张牌并令此牌对任意目标无效（可不选）。',
 			olhuiqi:'彗企',
 			olhuiqi_info:'觉醒技。一名角色回合结束后，若仅有三名角色于此回合成为过牌的目标，你获得〖偕举〗并获得一个额外的回合。',
 			olxieju:'偕举',
 			olxieju_info:'出牌阶段限一次。你可以令任意名本回合成为过牌的目标的角色依次视为使用一张【杀】。',
+			ol_zhouqun:'周群',
+			oltianhou:'天候',
+			oltianhou_info:'锁定技。准备阶段，你观看牌堆顶的一张牌，且可以用你的一张牌交换此牌。然后你展示牌堆顶的牌，令一名角色根据此牌的花色获得对应的技能直到你下个准备阶段开始：♠〖骤雨〗；♥〖烈暑〗；♣〖严霜〗；♦〖凝雾〗。',
+			olchenshuo:'谶说',
+			olchenshuo_info:'结束阶段，你可以展示一张手牌，然后展示牌堆顶的一张牌。若这两张牌类型/花色/点数/牌名字数中任一项相同且已展示的牌数小于3，则你重复此流程，然后获得所有所有展示牌。',
+			oltianhou_spade:'骤雨',
+			oltianhou_spade_miehuo:'骤雨',
+			oltianhou_spade_info:'锁定技。其他角色造成火属性伤害时，取消之；一名角色受到雷属性伤害后，所有与其座次相邻的角色失去1点体力。',
+			oltianhou_heart:'烈暑',
+			oltianhou_heart_info:'锁定技。其他角色的结束阶段开始时，若其体力值为全场最大，则其失去1点体力。',
+			oltianhou_club:'严霜',
+			oltianhou_club_info:'锁定技。其他角色的结束阶段开始时，若其体力值为全场最小，则其失去1点体力。',
+			oltianhou_diamond:'凝雾',
+			oltianhou_diamond_info:'锁定技。其他角色使用【杀】指定与其座次不相邻唯一目标时，则其判定。若判定结果的点数大于此【杀】，则此【杀】对其无效。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

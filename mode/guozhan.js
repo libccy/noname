@@ -6457,7 +6457,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					cardEnabled2:function(card){
 						if(get.position(card)=='h') return false;
 					},
-					cardChongzhuable:function(card){
+					cardRecastable:function(card){
 						if(get.position(card)=='h') return false;
 					},
 				},
@@ -16050,7 +16050,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							name2=name2.slice(name2.indexOf('_')+1);
 						}
 					}
-					var list=Object.keys(lib.perfectPair).concat(Object.values(lib.perfectPair)).flat(Infinity);
+					var list=Object.keys(lib.perfectPair).concat(Object.values(lib.perfectPair)).flat();
 					if(!list.contains(name1)||!list.contains(name2)) return false;
 					return (lib.perfectPair[name1]&&lib.perfectPair[name1].flat(Infinity).contains(name2))||(lib.perfectPair[name2]&&lib.perfectPair[name2].flat(Infinity).contains(name1));
 				},
