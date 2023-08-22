@@ -577,7 +577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var next=game.createEvent('mbdanggu_clique');
 							next.player=player;
 							next.setContent(lib.skill.mbdanggu.contentx);
-							player.draw(2);
+							player.draw();
 						}
 					}
 				}
@@ -13775,7 +13775,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbzhenfu_info:'结束阶段，若你本回合因弃置失去过牌，你可以令一名其他角色获得1点护甲。',
 			shichangshi:'十常侍',
 			mbdanggu:'党锢',
-			mbdanggu_info:'锁定技。①游戏开始时，你获得十张“常侍”牌，然后你进行一次结党。②当你修整结束后，你进行一次结党并摸两张牌。③若你有亮出的“常侍”牌，你视为拥有这些牌的技能。',
+			mbdanggu_info:'锁定技。①游戏开始时，你获得十张“常侍”牌，然后你进行一次结党。②当你修整结束后，你进行一次结党并摸一张牌。③若你有亮出的“常侍”牌，你视为拥有这些牌的技能。',
 			mbdanggu_faq:'关于结党',
 			mbdanggu_faq_info:'<br>系统随机选择一张未亮出过的“常侍”牌，然后选择四张未亮出过的“常侍”牌（若剩余“常侍”牌中有「高望」，则必定出现）。你观看前者，然后从后者中选择一名与前者互相认可的“常侍”牌（不认可的“常侍”牌为不可选状态），你选择这两张牌。然后若此时不为双将模式，你将这两张武将牌作为你的武将牌（不移除原有技能）；否则你获得这两张武将牌上的技能。',
 			mbmowang:'殁亡',
