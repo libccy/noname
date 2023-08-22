@@ -41,6 +41,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterIntro:{
 			qiaoxuan:'桥玄（110年－184年6月6日），一作乔玄，字公祖。梁国睢阳县（今河南省商丘市睢阳区）人。东汉时期名臣。桥玄年轻时曾任睢阳县功曹，因坚持追究陈国相羊昌的恶行而闻名。后被举为孝廉，历任洛阳左尉、齐相及上谷、汉阳太守、司徒长史、将作大匠。汉桓帝末年，出任度辽将军，击败鲜卑、南匈奴、高句丽侵扰，保境安民。汉灵帝初年，迁任河南尹、少府、大鸿胪。建宁三年（170年），迁司空。次年，拜司徒。光和元年（178年），升任太尉。桥玄有感于国势日衰，于是称病请辞，改任太中大夫。光和七年（184年），桥玄去世，年七十五。桥玄性格刚强，不阿权贵，待人谦俭，尽管屡历高官，但不因为自己处在高位而有所私请。他为官清廉，去世后连下葬的钱都没有，被时人称为名臣。',
+			jsrg_caocao:'初平元年二月，董卓徙天子都长安，焚洛阳宫室，众诸侯畏卓兵强，莫敢进。操怒斥众人:“为人臣而临此境，当举义兵以诛暴乱，大众已合，诸君何疑？此一战而天下定矣！”遂引兵汴水，遇卓将徐荣，大破之。操迎天子，攻吕布，伐袁术，安汉室，拜为征西将军。是时，袁绍兼四州之地，将攻许都。操欲扫清寰宇，兴复汉室，遂屯兵官渡。既克绍，操曰：“若天命在吾，吾为周文王矣。”',
+			jsrg_sunce:'建安五年，操、绍相拒于官渡，孙策欲阴袭许昌，迎汉帝，遂密治兵，部署诸将。未发，会为许贡门客所刺，将计就计，尽托江东于权，诈死以待天时。八月，操、绍决战，孙策亲冒矢石，斩将刈旗，得扬、豫之地。曹操败走冀、青，刘备远遁荆、益。而后历时七年，孙策三分天下已有其二，帝于洛阳，建霸王未竟之功业。权表求吴王，封为仲帝，共治天下。',
 		},
 		characterTitle:{
 		},
@@ -484,10 +486,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.line(target);
 								player.discardPlayerCard(target,'h',true,del);
 							}
-							else if(del<0){
-								player.line(target);
-								target.draw(-del);
-							}
+							// else if(del<0){
+							// 	player.line(target);
+							// 	target.draw(-del);
+							// }
 						}
 					}
 				},
@@ -1276,7 +1278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player=_status.event.getTrigger().player;
 							return this.filterTargetx.apply(this,arguments);
 						};
-						if(typeof next.selectTarget!='number'&&typeof next.selectTarget!='function'&&!Array.isArray(next.selectTarget)) next.selectTarget=-1;
+						if(typeof next.selectTarget!='number'&&typeof next.selectTarget!='function'&&get.itemtype(next.selectTarget)!='select') next.selectTarget=-1;
 					}
 					else event.finish();
 					'step 2'
@@ -1383,14 +1385,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return {
 							audio:'jsrgchengxian',
 							filterCard:function(card,player){
-								var range=lib.skill.jsrgchengxian.getNumber(card,player);
-								if(!range) return false;
-								game.checkMod(card,player,range,'selectTarget',player);
-								var cardx=lib.skill.jsrgchengxian_backup.viewAs;
-								var rangex=lib.skill.jsrgchengxian.getNumber(cardx,player);
-								if(!rangex) return false;
-								game.checkMod(cardx,player,rangex,'selectTarget',player);
-								return range[0]>=rangex[0]&&range[1]<=rangex[1]||range[1]>=rangex[0]&&range[1]<=rangex[1];
+								var num=game.countPlayer(current=>{
+									return player.canUse(card,current);
+								});
+								if(!num) return false;
+								var cardx=get.copy(lib.skill.jsrgchengxian_backup.viewAs);
+								cardx.cards=[card];
+								var num2=game.countPlayer(current=>{
+									return player.canUse(cardx,current);
+								});
+								return num==num2;
 							},
 							popname:true,
 							check:function(card){
@@ -1410,9 +1414,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						return '将一张额定目标数与'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+'相同的手牌当此牌使用';
+						return '将一张合法目标数与'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+'相同的手牌当此牌使用';
 					}
 				},
+				//理解错了，下面这个不用了
 				getNumber:function(card,player){
 					var rangex=null;
 					var info=get.info(card);
@@ -4211,7 +4216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgqingxi:'轻袭',
 			jsrgqingxi_info:'群势力技。出牌阶段每名角色限一次。你可以选择一名手牌数小于你的角色，你将手牌数弃置至与其相同，然后视为对其使用一张刺【杀】。',
 			jsrgjinmie:'烬灭',
-			jsrgjinmie_info:'魏势力技。出牌阶段限一次。你可以选择一名手牌数大于你的角色，你视为对其使用一张火【杀】。当此牌造成伤害后，你将其手牌数调整至与你相同。',
+			jsrgjinmie_info:'魏势力技。出牌阶段限一次。你可以选择一名手牌数大于你的角色，你视为对其使用一张火【杀】。当此牌造成伤害后，你将其手牌数弃置至与你相同。',
 			jsrg_lvbu:'承吕布',
 			jsrg_lvbu_ab:'吕布',
 			jsrgwuchang:'无常',
@@ -4249,7 +4254,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgjixiang:'济乡',
 			jsrgjixiang_info:'回合内每种牌名限一次。当一名其他角色需要使用或打出一张基本牌时，你可以弃置一张牌令其视为使用或打出之，然后你摸一张牌并令〖称贤〗于此阶段可发动次数上限+1。',
 			jsrgchengxian:'称贤',
-			jsrgchengxian_info:'出牌阶段限两次。你可以将一张手牌当一张本回合未以此法使用过的普通锦囊牌使用（需与以此法转化的手牌的额定目标数相同）。',
+			jsrgchengxian_info:'出牌阶段限两次。你可以将一张手牌当一张本回合未以此法使用过的普通锦囊牌使用（此转化牌须与以此法转化的手牌的合法目标数相同）。',
 			jsrg_zhangliao:'承张辽',
 			jsrg_zhangliao_ab:'张辽',
 			jsrgzhengbing:'整兵',
