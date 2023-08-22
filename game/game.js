@@ -9714,9 +9714,11 @@
 					localStorage.removeItem(lib.configprefix+'background');
 				}
 			},
-			//by 诗笺
+			//by 诗笺、Tipx-L
 			parsex:function(func){
-				var str=func.toString();
+				//Remove all comments
+				//移除所有注释
+				var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\S\s]|[^"\\])*"|'(?:\\[\S\s]|[^'\\])*'|(?:\r?\n|[\S\s])[^\/"'\\\s]*)/mg,'$2').trim();
 				//获取第一个 { 后的所有字符
 				str=str.slice(str.indexOf('{')+1);
 				//func中要写步骤的话，必须要写step 0
@@ -9750,7 +9752,6 @@
 					}
 					str=`if(event.step==${k}){event.finish();return;}`+str;
 				}
-				str=`"use strict";\n${str}`;
 				return (new Function('event','step','source','player','target','targets',
 					'card','cards','skill','forced','num','trigger','result',
 					'_status','lib','game','ui','get','ai',str));
@@ -10704,11 +10705,20 @@
 				recast:()=>{
 					'step 0'
 					game.log(player,'重铸了',cards);
-					if(typeof event.recastingLose=='function') event.recastingLose(player,cards);
+					if(typeof event.recastingLose=='function') event.recastingLostCards=event.recastingLose(player,cards);
 					'step 1'
 					event.trigger('recast');
 					'step 2'
-					if(typeof event.recastingGain=='function') event.recastingGain(player,cards);
+					if(typeof event.recastingGain!='function') return;
+					event.recastingGainedCards=event.recastingGain(player,cards);
+					if(get.itemtype(event.recastingGainedCards)=='card') event.recastingGainedCards=[event.recastingGainedCards];
+					'step 3'
+					event.result=[];
+					if(get.itemtype(event.recastingGainedCards)=='cards') event.result.addArray(event.recastingGainedCards);
+					if(get.itemtype(result.cards)=='card') event.result.push(result.cards);
+					else if(get.itemtype(result.cards)=='cards') event.result.addArray(result.cards);
+					if(get.itemtype(result)=='card') event.result.push(result);
+					else if(get.itemtype(result)=='cards') event.result.addArray(result);
 				},
 				//装备栏相关
 				disableEquip:function(){
@@ -18263,7 +18273,7 @@
 					if(get.itemtype(cards)=='card') recast.cards=[cards];
 					else if(get.itemtype(cards)=='cards'&&cards.length) recast.cards=cards;
 					else _status.event.next.remove(recast);
-					if(typeof recastingLose!='function') recastingLose=(player,cards)=>player.loseToDiscardpile(cards).log=false;
+					if(typeof recastingLose!='function') recastingLose=(player,cards)=>player.loseToDiscardpile(cards).set("log",false).cards;
 					recast.recastingLose=recastingLose;
 					if(typeof recastingGain!='function') recastingGain=(player,cards)=>player.draw(cards.length).log=false;
 					recast.recastingGain=recastingGain;
@@ -29943,30 +29953,39 @@
 				delay:false,
 				content:function(){
 					player.recast(cards,null,(player,cards)=>{
-						let numberOfCardsToDraw=cards.length;
+						var numberOfCardsToDraw=cards.length, cardsToGain=[];
 						cards.forEach(value=>{
 							if(lib.config.mode=='stone'&&_status.mode=='deck'&&!player.isMin()&&get.type(value).indexOf('stone')==0){
-								const stonecard=get.stonecard(1,player.career);
-								numberOfCardsToDraw--;
-								if(stonecard.length) player.gain(game.createCard(stonecard.randomGet()),'draw');
+								var stonecard=get.stonecard(1,player.career);
+								if(stonecard.length){
+									numberOfCardsToDraw-=stonecard.length;
+									var card=game.createCard(stonecard.randomGet());
+									player.gain(card,'draw');
+									cardsToGain.push(card);
+								}
 								else player.draw({
 									drawDeck:1
 								}).log=false;
 							}
 							else if(get.subtype(value)=='spell_gold'){
-								const libCard=get.libCard(info=>info.subtype=='spell_silver');
+								var libCard=get.libCard(info=>info.subtype=='spell_silver');
 								if(!libCard.length) return;
 								numberOfCardsToDraw--;
-								player.gain(game.createCard(libCard.randomGet()),'draw');
+								var card=game.createCard(libCard.randomGet());
+								player.gain(card,'draw');
+								cardsToGain.push(card);
 							}
 							else if(get.subtype(value)=='spell_silver'){
-								const libCard=get.libCard(info=>info.subtype=='spell_bronze');
+								var libCard=get.libCard(info=>info.subtype=='spell_bronze');
 								if(!libCard.length) return;
 								numberOfCardsToDraw--;
-								player.gain(game.createCard(libCard.randomGet()),'draw');
+								var card=game.createCard(libCard.randomGet());
+								player.gain(card,'draw');
+								cardsToGain.push(card);
 							}
 						});
 						if(numberOfCardsToDraw) player.draw(numberOfCardsToDraw).log=false;
+						return cardsToGain;
 					});
 				},
 				ai:{

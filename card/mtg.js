@@ -494,13 +494,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function(){
 					player.recast(cards,null,(player,cards)=>{
-						const cardsToGain=[];
+						var cardsToGain=[];
 						for(let repetition=0;repetition<cards.length;repetition++){
-							const card=get.cardPile(card=>get.type(card,'trick')=='trick');
+							var card=get.cardPile(card=>get.type(card,'trick')=='trick');
 							if(card) cardsToGain.push(card);
 						}
 						if(cardsToGain.length) player.gain(cardsToGain,'draw');
 						if(cards.length-cardsToGain.length) player.draw(cards.length-cardsToGain.length).log=false;
+						return cardsToGain;
 					});
 				},
 				ai:{

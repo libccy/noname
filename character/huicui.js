@@ -580,25 +580,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('dcjini');
 						player.addTempSkill('dcjini_counted');
 						player.addMark('dcjini_counted',cards.length,false);
-						player.recast(cards);
+						event.recast=player.recast(cards);
 					}
 					else event.finish();
 					'step 2'
-					if(trigger.source&&trigger.source.isIn()&&Array.isArray(result)){
-						for(var i of result){
-							if(get.name(i,player)=='sha'&&get.owner(i)==player&&get.position(i)=='h'){
-								player.chooseToUse(function(card,player,event){
-									if(get.name(card)!='sha') return false;
-									return lib.filter.filterCard.apply(this,arguments);
-								},'击逆：是否对'+get.translation(trigger.source)+'使用一张不可被响应的杀？').set('complexSelect',true).set('filterTarget',function(card,player,target){
-									if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
-									return lib.filter.targetEnabled.apply(this,arguments);
-								}).set('sourcex',trigger.source).set('oncard',()=>{
-									_status.event.directHit.addArray(game.players);
-								});
-								break;
-							}
-						}
+					if(trigger.source&&trigger.source.isIn()&&player.hasHistory('gain',evt=>evt.getParent(2)==event.recast&&evt.cards.some(value=>get.name(value)=='sha'))){
+						player.chooseToUse(function(card){
+							if(get.name(card)!='sha') return false;
+							return lib.filter.filterCard.apply(this,arguments);
+						},'击逆：是否对'+get.translation(trigger.source)+'使用一张不可被响应的杀？').set('complexSelect',true).set('filterTarget',function(card,player,target){
+							if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+							return lib.filter.targetEnabled.apply(this,arguments);
+						}).set('sourcex',trigger.source).set('oncard',()=>{
+							_status.event.directHit.addArray(game.players);
+						});
 					}
 				},
 				subSkill:{
