@@ -155,7 +155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			scs_lisong:['male','qun','',['scskuiji'],['unseen']],
 			scs_duangui:['male','qun','',['scschihe'],['unseen']],
 			scs_guosheng:['male','qun','',['scsniqu'],['unseen']],
-			scs_gaowang:['male','qun','',['scsanruo'],['unseen']],
+			scs_gaowang:['male','qun','',['scsmiaoyu'],['unseen']],
 		},
 		characterIntro:{
 			shichangshi:'十常侍，指中国东汉（公元25年—220年）灵帝时期（168年-189年）操纵政权的十二个宦官：张让、赵忠、夏恽、郭胜、孙璋、毕岚、栗嵩、段珪、高望、张恭、韩悝、宋典（在小说《三国演义》里，十常侍指的是指张让、赵忠、封谞、段珪、曹节、侯览、蹇硕、程旷、夏恽、郭胜十人），他们都任职中常侍。玩弄小皇帝于股掌之中，以至灵帝称“张常侍是我父，赵常侍是我母”。十常侍自己横征暴敛，卖官鬻爵，他们的父兄子弟遍布天下，横行乡里，祸害百姓，无官敢管。人民不堪剥削、压迫，纷纷起来反抗。当时一些比较清醒的官吏，已看出宦官集团的黑暗腐败，导致大规模农民起义的形势。郎中张钧在给皇帝的奏章中明确指出，黄巾起义是外戚宦官专权逼出来的，他说：“张角所以能兴兵作乱，万人所以乐附之者，其源皆由十常侍多放父兄、子弟、婚宗、宾客典据州郡，辜确财利，侵略百姓，百姓之怨无所告诉，故谋议不轨，聚为‘盗贼’。”后被曹操、袁绍所歼。',
@@ -413,7 +413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					['scs_lisong','scskuiji'],
 					['scs_duangui','scschihe'],
 					['scs_guosheng','scsniqu'],
-					['scs_gaowang','scsanruo']
+					['scs_gaowang','scsmiaoyu']
 				],
 				conflictMap:{
 					scs_zhangrang:[],
@@ -1500,6 +1500,142 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.gainPlayerCard(target,player==target?'e':'he',true);
 							}
 						}
+					},
+				},
+			},
+			scsmiaoyu:{
+				audio:'scsanruo',
+				enable:['chooseToUse','chooseToRespond'],
+				prompt:'将至多两张♦牌当作火【杀】，♥牌当作【桃】，♣牌当作【闪】，♠牌当作【无懈可击】使用或打出',
+				viewAs:function(cards,player){
+					var name=false;
+					var nature=null;
+					switch(get.suit(cards[0],player)){
+						case 'club':name='shan';break;
+						case 'diamond':name='sha';nature='fire';break;
+						case 'spade':name='wuxie';break;
+						case 'heart':name='tao';break;
+					}
+					//返回判断结果
+					if(name) return {name:name,nature:nature};
+					return null;
+				},
+				check:function(card){
+					if(ui.selected.cards.length) return 0;
+					var player=_status.event.player;
+					if(_status.event.type=='phase'){
+						var max=0;
+						var name2;
+						var list=['sha','tao'];
+						var map={sha:'diamond',tao:'heart'}
+						for(var i=0;i<list.length;i++){
+							var name=list[i];
+							if(player.countCards('hes',function(card){
+								return (name!='sha'||get.value(card)<5)&&get.suit(card,player)==map[name];
+							})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
+								var temp=get.order({name:name,nature:name=='sha'?'fire':null});
+								if(temp>max){
+									max=temp;
+									name2=map[name];
+								}
+							}
+						}
+						if(name2==get.suit(card,player)) return (name2=='diamond'?(5-get.value(card)):20-get.value(card));
+						return 0;
+					}
+					return 1;
+				},
+				selectCard:[1,2],
+				complexCard:true,
+				position:'hes',
+				filterCard:function(card,player,event){
+					if(ui.selected.cards.length) return get.suit(card,player)==get.suit(ui.selected.cards[0],player);
+					event=event||_status.event;
+					var filter=event._backup.filterCard;
+					var name=get.suit(card,player);
+					if(name=='club'&&filter({name:'shan',cards:[card]},player,event)) return true;
+					if(name=='diamond'&&filter({name:'sha',cards:[card],nature:'fire'},player,event)) return true;
+					if(name=='spade'&&filter({name:'wuxie',cards:[card]},player,event)) return true;
+					if(name=='heart'&&filter({name:'tao',cards:[card]},player,event)) return true;
+					return false;
+				},
+				filter:function(event,player){
+					var filter=event.filterCard;
+					if(filter({name:'sha',nature:'fire'},player,event)&&player.countCards('hes',{suit:'diamond'})) return true;
+					if(filter({name:'shan'},player,event)&&player.countCards('hes',{suit:'club'})) return true;
+					if(filter({name:'tao'},player,event)&&player.countCards('hes',{suit:'heart'})) return true;
+					if(filter({name:'wuxie'},player,event)&&player.countCards('hes',{suit:'spade'})) return true;
+					return false;
+				},
+				precontent:function(){
+					player.addTempSkill('scsmiaoyu_num');
+					player.addTempSkill('scsmiaoyu_discard');
+				},
+				ai:{
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter:function(player,tag){
+						var name;
+						switch(tag){
+							case 'respondSha':name='diamond';break;
+							case 'respondShan':name='club';break;
+							case 'save':name='heart';break;
+						}
+						if(!player.countCards('hes',{suit:name})) return false;
+					},
+					order:function(item,player){
+						if(player&&_status.event.type=='phase'){
+							var max=0;
+							var list=['sha','tao'];
+							var map={sha:'diamond',tao:'heart'}
+							for(var i=0;i<list.length;i++){
+								var name=list[i];
+								if(player.countCards('hes',function(card){
+									return (name!='sha'||get.value(card)<5)&&get.suit(card,player)==map[name];
+								})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
+									var temp=get.order({name:name,nature:name=='sha'?'fire':null});
+									if(temp>max) max=temp;
+								}
+							}
+							max/=1.1;
+							return max;
+						}
+						return 2;
+					},
+				},
+				hiddenCard:function(player,name){
+					if(name=='wuxie'&&_status.connectMode&&player.countCards('hs')>0) return true;
+					if(name=='wuxie') return player.countCards('hes',{suit:'spade'})>0;
+					if(name=='tao') return player.countCards('hes',{suit:'heart'})>0;
+				},
+				subSkill:{
+					num:{
+						charlotte:true,
+						trigger:{player:'useCard'},
+						filter:function(event){
+							return ['sha','tao'].contains(event.card.name)&&event.skill=='scsmiaoyu'&&event.cards&&event.cards.length==2;
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							trigger.baseDamage++;
+						},
+					},
+					discard:{
+						charlotte:true,
+						trigger:{player:['useCardAfter','respondAfter']},
+						autodelay:function(event){
+							return event.name=='respond'?0.5:false;
+						},
+						filter:function(event,player){
+							return ['shan','wuxie'].contains(event.card.name)&&evt.skill=='scsmiaoyu'&&event.cards&&event.cards.length==2&&_status.currentPhase&&_status.currentPhase!=player&&_status.currentPhase.countDiscardableCards(player,'he');
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							player.line(_status.currentPhase,'green');
+							player.discardPlayerCard(_status.currentPhase,'he',true);
+						},
 					},
 				},
 			},
@@ -11886,9 +12022,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player){
 							return 10;
-						}
-					}
-				}
+						},
+					},
+				},
 			},
 			"xinfu_qiaosi":{
 				enable:"phaseUse",
@@ -13676,6 +13812,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			scs_gaowang:'高望',
 			scsanruo:'安弱',
 			scsanruo_info:'你可以将一张♥牌当【桃】、♦牌当火【杀】、♣牌当【闪】、♠牌当【无懈可击】使用。当你以此法使用或打出【杀】或【闪】时，你可以获得对方的一张牌；当你以此法使用【桃】时，你可以获得一名其他角色的一张牌；当你以此法使用【无懈可击】时，你可以获得此牌响应的普通锦囊牌的使用者的一张牌。',
+			scsmiaoyu:'妙语',
+			scsmiaoyu_info:'你可以将至多两张相同花色的牌按照以下规则使用或打出：♦牌当作火【杀】，♥牌当作【桃】，♣牌当作【闪】，♠牌当作【无懈可击】。若你以此法使用了两张红色牌，则此牌回复值或伤害值+1。若你以此法使用了两张黑色牌，则你弃置当前回合角色一张牌。',
 
 			
 			mobile_standard:'手杀异构·标准包',
