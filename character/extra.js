@@ -2935,22 +2935,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			tspowei:{
-				audio:2,
+				audio:3,
 				dutySkill:true,
-				forced:true,
-				trigger:{global:'damageEnd'},
-				logTarget:'player',
-				filter:function(event,player){
-					return event.player&&event.player.isIn()&&event.player.hasMark('dulie');
-				},
-				content:function(){
-					trigger.player.removeMark('dulie',trigger.player.countMark('dulie'));
-				},
+				locked:true,
 				derivation:'shenzhu',
-				group:['tspowei_init','tspowei_move','tspowei_achieve','tspowei_fail','tspowei_use'],
+				group:['tspowei_init','tspowei_move','tspowei_achieve','tspowei_fail','tspowei_use','tspowei_remove'],
 				subSkill:{
+					remove:{
+						audio:'tspowei3',
+						trigger:{global:'damageEnd'},
+						filter:function(event,player){
+							return event.player&&event.player.isIn()&&event.player.hasMark('dulie');
+						},
+						forced:true,
+						logTarget:'player',
+						content:function(){
+							trigger.player.removeMark('dulie',trigger.player.countMark('dulie'));
+						},
+					},
 					use:{
-						audio:'tspowei',
+						audio:'tspowei3',
 						trigger:{global:'phaseBegin'},
 						direct:true,
 						filter:function(event,player){
@@ -3004,7 +3008,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					init:{
-						audio:'tspowei',
+						audio:'tspowei3',
 						trigger:{
 							global:'phaseBefore',
 							player:'enterGame',
@@ -3022,7 +3026,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					move:{
-						audio:'tspowei',
+						audio:'tspowei3',
 						trigger:{player:'phaseBegin'},
 						forced:true,
 						filter:function(event,player){
@@ -3078,6 +3082,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tspowei1:{audio:true},
 			tspowei2:{audio:true},
+			tspowei3:{audio:true},
 			shenzhu:{
 				audio:2,
 				trigger:{player:'useCardAfter'},
