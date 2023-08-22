@@ -4058,22 +4058,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var list=get.zhinangs();
-					player.chooseButton(['是否发动【生息】获得一张智囊？',[list,'vcard']]).set('ai',function(card){
-						return (Math.random()+0.5)*get.value({name:card.link[2]},_status.event.player)
+					player.chooseButton([
+						'###'+get.prompt('mjshengxi')+'###获得一张智囊或摸一张牌',
+						[list,'vcard'],
+						[['摸一张牌'],'tdnodes'],
+					]).set('ai',function(card){
+						if(card.link[2]&&get.zhinangs().contains(card.link[2])){
+							if(!get.cardPile2(function(cardx){
+								return cardx.name==card.link[2];
+							})) return 0;
+							return (Math.random()+1.5)*get.value({name:card.link[2]},_status.event.player);
+						}
+						return 1;
 					});
 					'step 1'
 					if(result.bool){
 						player.logSkill('mjshengxi');
-						var card=get.cardPile2(function(card){
-							return card.name==result.links[0][2];
-						});
-						if(card) player.gain(card,'gain2');
+						if(result.links[0]=='摸一张牌') player.draw();
+						else{
+							var card=get.cardPile2(function(card){
+								return card.name==result.links[0][2];
+							});
+							if(card) player.gain(card,'gain2');
+						}
 					}
 				},
 				group:'mjshengxi_zhunbei',
 				subfrequent:['zhunbei'],
 				subSkill:{
 					zhunbei:{
+						audio:'shengxi',
+						audioname:['feiyi'],
 						trigger:{player:'phaseZhunbeiBegin'},
 						frequent:true,
 						prompt2:'从游戏外或牌堆中获得一张【调剂盐梅】',
@@ -4118,7 +4133,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						event.card=result.links[0];
+						var card=result.links[0];
+						event.card=card;
 						player.chooseTarget('将'+get.translation(card)+'交给一名其他角色并摸一张牌',lib.filter.notMe,true).set('ai',function(target){
 							var evt=_status.event.getParent();
 							return get.attitude(evt.player,target)*get.value(evt.card,target)*(target.hasSkillTag('nogain')?0.1:1);
@@ -5382,20 +5398,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			fyjianyu:{
+				init:function(player){
+					if(!lib.skill['fyjianyu_'+player.playerid]){
+						lib.skill['fyjianyu_'+player.playerid]={
+							intro:{
+								markcount:()=>1,
+								name2:'喻',
+								content:'指定另一名有“喻”的角色为目标时，其摸一张牌',
+							},
+						};
+						lib.translate['fyjianyu_'+player.playerid]='谏喻';
+					}
+				},
+				audio:2,
 				enable:'phaseUse',
-				usable:1,
 				filter:function(event,player){
-					return !player.hasSkill('fyjianyu2')&&game.countPlayer(function(current){
-						return !current.hasMark('fyjianyux');
+					return game.countPlayer(function(current){
+						return !current.hasMark('fyjianyu_'+player.playerid);
 					})>1;
 				},
+				round:1,
 				filterTarget:function(card,player,target){
-					return !target.hasMark('fyjianyux');
+					return !target.hasMark('fyjianyu_'+player.playerid);
 				},
 				selectTarget:2,
 				content:function(){
-					player.addTempSkill('fyjianyux',{player:'phaseBegin'});
-					target.addMark('fyjianyux',1);
+					player.addTempSkill('fyjianyu_draw',{player:'phaseBegin'});
+					target.addMark('fyjianyu_'+player.playerid,1);
 				},
 				ai:{
 					order:0.1,
@@ -5411,30 +5440,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
-			},
-			fyjianyux:{
-				trigger:{global:'useCardToPlayer'},
-				forced:true,
-				charlotte:true,
-				filter:function(event,player){
-					return event.player!=event.target&&event.player.hasMark('fyjianyux')&&
-					event.target.hasMark('fyjianyux')&&event.target.isIn();
-				},
-				logTarget:'target',
-				content:function(){
-					trigger.target.draw();
-				},
-				onremove:function(){
-					game.countPlayer(function(current){
-						var num=current.countMark('fyjianyux');
-						if(num) current.removeMark('fyjianyux');
-					});
-				},
-				intro:{
-					content:'mark',
+				subSkill:{
+					draw:{
+						charlotte:true,
+						trigger:{global:'useCardToPlayer'},
+						filter:function(event,player){
+							return event.player!=event.target&&event.player.hasMark('fyjianyu_'+player.playerid)&&event.target.hasMark('fyjianyu_'+player.playerid)&&event.target.isIn();
+						},
+						forced:true,
+						logTarget:'target',
+						content:function(){
+							trigger.target.draw();
+						},
+						onremove:function(player){
+							game.countPlayer(function(current){
+								var num=current.countMark('fyjianyu_'+player.playerid);
+								if(num) current.removeMark('fyjianyu_'+player.playerid);
+							});
+						},
+					},
 				},
 			},
-			fyjianyu2:{},
 			spwanwei:{
 				audio:2,
 				enable:'chooseToUse',
@@ -6339,9 +6365,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reshengxi_info:'结束阶段，若你于本回合内未造成过伤害，则你可摸两张牌。',
 			fyjianyu:'谏喻',
 			fyjianyu_info:'每轮限一次。出牌阶段，你可选择两名角色，令这些角色获得“喻”直到你的下回合开始。当一名有“喻”的角色A使用牌指定另一名有“喻”的角色B为目标时，你令B摸一张牌。',
-			fyjianyux:'谏喻',
 			mjshengxi:'生息',
-			mjshengxi_info:'准备阶段，你可以获得一张【调剂盐梅】；结束阶段，若你本回合使用过牌且未造成伤害，则你可以获得一张智囊。',
+			mjshengxi_info:'准备阶段，你可以获得一张【调剂盐梅】；结束阶段，若你本回合使用过牌且未造成伤害，则你可以获得一张智囊或摸一张牌。',
 			mjkuanji:'宽济',
 			mjkuanji_info:'每回合限一次。当你因弃置而失去牌后，你可令一名其他角色获得其中的一张牌，然后你摸一张牌。',
 			tiaojiyanmei:'调剂盐梅',
