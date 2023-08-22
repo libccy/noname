@@ -244,6 +244,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+			},
 			//新服灭霸
 			dctongye:{
 				audio:2,
