@@ -2409,7 +2409,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{content:'已使用牌名：$'},
 				subSkill:{
 					achieve:{
-						audio:'mibei',
+						audio:'mibei1',
 						skillAnimation:true,
 						animationColor:'water',
 					},
@@ -2427,7 +2427,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					fail:{
-						audio:'mibei',
+						audio:'mibei2',
 						trigger:{player:'phaseUseEnd'},
 						forced:true,
 						filter:function(event,player){
@@ -11190,7 +11190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						filter:function(event,player){
 							return player.getHistory('lose',function(evt){
-								return evt.getParent(2).name=='twgezhi'&&evt.getParent('phaseUse')==event;
+								return evt.getParent(3).name=='twgezhi'&&evt.getParent('phaseUse')==event;
 							}).length>1;
 						},
 						content:function(){
