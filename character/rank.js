@@ -595,6 +595,7 @@ window.noname_character_rank={
 		'shen_dianwei',
 		'zhoubuyi',
 		'jsrg_sunce',
+		're_caorui',
 	],
 	bp:[
 		'chess_diaochan',
