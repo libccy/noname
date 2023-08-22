@@ -807,14 +807,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardToPlayered'},
 				usable:1,
 				filter:function(event,player){
-					return player.countCards('e')>0&&event.card.name=='sha'&&event.getParent().triggeredTargets3.length==event.targets.length;
+					return event.card.name=='sha'&&event.getParent().triggeredTargets3.length==event.targets.length;
 				},
 				check:function(event,player){
 					return event.targets.some(target=>get.effect(target,event.card,player,player)<=0);
 				},
 				content:function(){
 					'step 0'
-					var num=player.countCards('e');
+					var num=player.countCards('e')+1;
 					event.num=num;
 					player.draw(num);
 					'step 1'
@@ -843,7 +843,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var eff=get.effect(targetx,{name:'sha'},player,player);
 									delete _status._dctingxian_aiChecking;
 									if(eff<0) return true;
-								}).length<player.countCards('e')) return [0,0,0,0.5];
+								}).length<player.countCards('e')+1) return [0,0,0,0.5];
 							}
 						},
 					}
@@ -9371,7 +9371,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(num>=3){
 						str+='；始终跳过弃牌阶段';
 						}
-						if(num>=4){
+						if(num==0||num>=4){
 						str+='；造成的伤害+1';
 						}
 						return str;
@@ -9395,7 +9395,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_xingzhao2":{
 				audio:true,
 				trigger:{
-					player:"phaseDiscardBefore",
+					player:['phaseJudgeBefore','phaseDiscardBefore'],
 				},
 				forced:true,
 				filter:function(event,player){
@@ -9406,7 +9406,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.cancel();
-					game.log(player,'跳过了弃牌阶段');
+					game.log(player,'跳过了'+(trigger.name=='phaseJudge'?'判定':'弃牌')+'阶段');
 				},
 			},
 			xinfu_xingzhao3:{
@@ -9419,7 +9419,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=game.countPlayer(function(current){
 						return current.isDamaged();
 					});
-					return num>=4;
+					return num==0||num>=4;
 				},
 				content:function(){
 					trigger.num++;
@@ -9874,7 +9874,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xz_xunxun":"恂恂",
 			"xz_xunxun_info":"摸牌阶段，你可以观看牌堆顶的四张牌，然后将其中的两张牌置于牌堆顶，并将其余的牌以任意顺序置于牌堆底。",
 			"xinfu_xingzhao":"兴棹",
-			"xinfu_xingzhao_info":"锁定技。若X≥1，你视为拥有技能〖恂恂〗。若X≥2，当你使用装备牌时，你摸一张牌。若X≥3，弃牌阶段开始时，你跳过此阶段。若X≥4，当你造成伤害时，此伤害+1。（X为场上已受伤的角色数）",
+			"xinfu_xingzhao_info":"锁定技。若X≥1，你视为拥有技能〖恂恂〗。若X≥2，当你使用装备牌时，你摸一张牌。若X≥3，判定阶段或弃牌阶段开始时，你跳过此阶段。若X=0或X≥4，当你造成伤害时，此伤害+1（X为场上已受伤的角色数）。",
 			"xinfu_xingzhao2":"兴棹",
 			"xinfu_xingzhao2_info":"",
 			xinfu_xingzhao3:'兴棹',
@@ -10287,7 +10287,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczuojian_info:'出牌阶段结束时，若你于此阶段使用过的牌数不小于体力值，你可以选择一项：1.令装备区牌数多于你的角色各摸一张牌；2.弃置装备区牌数少于你的角色各一张手牌。',
 			sunlang:'孙狼',
 			dctingxian:'铤险',
-			dctingxian_info:'每回合限一次。当你使用【杀】指定最后一个目标后，你可以摸X张牌，然后令此【杀】对其中至多X个目标无效（X为你装备区的牌数）。',
+			dctingxian_info:'每回合限一次。当你使用【杀】指定最后一个目标后，你可以摸X张牌，然后令此【杀】对其中至多X个目标无效（X为你装备区的牌数+1）。',
 			dcbenshi:'奔矢',
 			dcbenshi_info:'锁定技。①你的攻击范围+1。②你的攻击范围基数不受装备区内武器牌的影响。③由你使用的【杀】的牌面信息中的“使用目标”产生的规则改为“攻击范围内的所有角色”。',
 			sunhuan:'孙桓',

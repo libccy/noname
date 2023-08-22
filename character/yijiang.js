@@ -8804,6 +8804,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			mingjian:{
+				audio:2,
+				audioname:['re_caorui'],
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -8916,6 +8918,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huituo:{
 				audio:2,
+				audioname:['re_caorui'],
 				trigger:{player:'damageEnd'},
 				direct:true,
 				content:function(){
@@ -13587,7 +13590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xunyou:['re_xunyou','xunyou'],
 			xuezong:['tw_xuezong','xuezong'],
             huanghao:['huanghao','dc_huanghao','old_huanghao'],
-			caorui:['caorui','old_caorui'],
+			caorui:['re_caorui','caorui','old_caorui'],
 			sunziliufang:['dc_sunziliufang','sunziliufang'],
 			liyan:['liyan','old_liyan'],
 			zhangsong:['re_zhangsong','zhangsong'],

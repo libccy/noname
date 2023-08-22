@@ -3472,7 +3472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					source:'damageBegin1',
 				},
-				usable:2,
+				//usable:2,
 				filter:function(event,player){
 					return player.countDiscardableCards(player,'he')>0&&player!=event.player;
 				},
@@ -10103,7 +10103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dccuijin_info:'当你或你攻击范围内的角色使用【杀】时，你可以弃置一张牌，令此【杀】的伤害基数+1。然后当此杀被目标角色抵消或无效或防止伤害后，你摸一张牌，对使用者造成1点伤害。',
 			panghui:'庞会',
 			dcyiyong:'异勇',
-			dcyiyong_info:'每回合限两次。当你对其他角色造成伤害时，若你有牌，你可以与其同时弃置至少一张牌。若你以此法弃置的牌的点数之和：不大于其，你摸X张牌；不小于其，此伤害+1（X为其以此法弃置的牌数）。',
+			dcyiyong_info:'当你对其他角色造成伤害时，若你有牌，你可以与其同时弃置至少一张牌。若你以此法弃置的牌的点数之和：不大于其，你摸X张牌；不小于其，此伤害+1（X为其以此法弃置的牌数）。',
 			chenjiao:'陈矫',
 			dcxieshoux:'协守/清严',
 			dcxieshou:'协守',

@@ -10591,20 +10591,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
-				viewAs:{name:'shunshou'},
+				viewAs:{
+					name:'shunshou',
+					storage:{spweiwu:true},
+				},
 				filterCard:{color:'red'},
 				position:'hes',
 				check:function(card){
 					return 7-get.value(card);
 				},
-				filterTarget:function(card,player,target){
-					if(target.countCards('h')<player.countCards('h')) return false;
-					return lib.filter.filterTarget.apply(this,arguments);
-				},
-				viewAsFilter:function(player){
-					return player.countCards('hes',lib.skill.spweiwu.filterCard)>0&&game.hasPlayer(function(current){
-						return current.countCards('h')>=player.countCards('h')&&player.canUse('shunshou',current);
-					});
+				mod:{
+					targetInRange:function(card){
+						if(card.storage&&card.storage.spweiwu) return true;
+					},
 				},
 			},
 			tuogu:{
@@ -23646,7 +23645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spniluan:'逆乱',
 			spniluan_info:'出牌阶段，你可以将一张黑色牌当做【杀】使用。此【杀】使用结算完成后，若你未因此【杀】造成过伤害，则你令此【杀】不计入使用次数。',
 			spweiwu:'违忤',
-			spweiwu_info:'出牌阶段限一次，你可以将一张红色牌当做【顺手牵羊】对手牌数不小于你的角色使用。',
+			spweiwu_info:'出牌阶段限一次，你可以将一张红色牌当无距离限制的【顺手牵羊】使用。',
 			spmouzhu:'谋诛',
 			spmouzhu_backup:'谋诛',
 			spmouzhu_info:'出牌阶段限一次，你可以选择任意名“距离为1”或“体力值等于你”的其他角色，这些角色依次进行以下结算：交给你一张手牌，然后若其手牌数小于你，则其视为对你使用一张【杀】或【决斗】。',
