@@ -38765,7 +38765,7 @@
 					}
 					intro.innerHTML=get.translation(rarity);
 				}
-				if((button.link=='xushu'||button.link=='xin_xushu')&&button.node&&button.node.name&&button.node.group){
+				if((button.link=='xushu'||button.link=='xin_xushu'||button.link=='jsrg_guanyu')&&button.node&&button.node.name&&button.node.group){
 					if(button.classList.contains('newstyle')){
 						button.node.name.dataset.nature='watermm';
 						button.node.group.dataset.nature='water';
@@ -52943,7 +52943,7 @@
 				return false;
 			},
 			double:function(name,array){
-				if(!lib.character[name]||!lib.character[name][4]||name.indexOf('gz_')!=0&&name.indexOf('db_')!=0) return false;
+				if(!lib.character[name]||!lib.character[name][4]||name.indexOf('gz_')!=0&&name.indexOf('db_')!=0&&name.indexOf('jsrg_')!=0) return false;
 				for(var i of lib.character[name][4]){
 					if(i.indexOf('doublegroup:')==0){
 						if(!array) return true;
@@ -54341,6 +54341,9 @@
 			else if(str2.indexOf('手杀')==0){
 				str2=str2.slice(2);
 			}
+			else if(str2.indexOf('新杀')==0){
+				str2=str2.slice(2);
+			}
 			else if(str2.indexOf('界')==0&&lib.characterPack.refresh&&lib.characterPack.refresh[str]){
 				str2=str2.slice(1);
 			}
@@ -54374,6 +54377,9 @@
 			else if(str2.indexOf('手杀')==0){
 				str2=str2.slice(2);
 			}
+			else if(str2.indexOf('新杀')==0){
+				str2=str2.slice(2);
+			}
 			return str2;
 		},
 		slimName:function(str){
@@ -54396,6 +54402,9 @@
 				str2=str2.slice(3);
 			}
 			else if(str2.indexOf('手杀')==0){
+				str2=str2.slice(2);
+			}
+			else if(str2.indexOf('新杀')==0){
 				str2=str2.slice(2);
 			}
 			return get.verticalStr(str2,true);

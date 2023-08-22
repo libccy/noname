@@ -629,25 +629,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt:get.prompt('dcporui'),
 						//prompt2:'弃置一张基本牌并选择一名本回合失去过牌的非当前回合的其他角色，你视为对其依次使用'+get.cnNumber(Math.max(0,player.hp)+1)+'张【杀】',
 						prompt2:get.skillInfoTranslation('dcporui',player),
-						filterCard:function(card,player){
-							if(get.type(card)!='basic') return false;
-							return lib.filter.cardDiscardable.apply(this,arguments);
-						},
+						filterCard:lib.filter.cardDiscardable,
 						selectCard:1,
-						targets:game.filterPlayer(current=>{
+						position:'he',
+						list:game.filterPlayer(current=>{
 							if(current==player||current==trigger.player) return false;
 							return current.hasHistory('lose',function(evt){
 								return evt.cards.length>0;
 							});
 						}),
 						filterTarget:function(card,player,target){
-							return _status.event.targets.contains(target);
+							return _status.event.list.map(i=>i[0]).contains(target);
 						},
 						ai1:function(card){
 							return 7-get.value(card);
 						},
 						ai2:function(target){
-							return get.effect(target,{name:'sha'},_status.event.player,_status.event.player);
+							return get.effect(target,{name:'sha'},_status.event.player,_status.event.player)*_status.event.list.find(i=>{
+								return i[0]==target;
+							})[1];
 						}
 					});
 					'step 1'
@@ -700,7 +700,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.4,
-					threaten:4.8
+					threaten:3.8,
 				}
 			},
 			dcgonghu:{
@@ -721,6 +721,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return num>1;
 					}
 					if(player.hasMark('dcgonghu_basic')) return false;
+					if(_status.currentPhase&&_status.currentPhase==player) return false;
 					var evt=event.getl(player);
 					if(!evt||!evt.cards2||!evt.cards2.some(i=>get.type2(i,player)=='basic')) return false;
 					var num=0;
@@ -3259,7 +3260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(bool1) val+=5;
 							if(bool2){
 								if(bool1) target.maxHp++;
-								val+=get.recoverEffect(target,player,player);
+								val+=Math.max(0,get.recoverEffect(target,player,player));
 								if(bool1) target.maxHp--;
 							}
 							if(bool3){
@@ -3471,7 +3472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					source:'damageBegin1',
 				},
-				usable:2,
+				//usable:2,
 				filter:function(event,player){
 					return player.countDiscardableCards(player,'he')>0&&player!=event.player;
 				},
@@ -9825,9 +9826,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		perfectPair:{},
 		characterReplace:{
 			dongbai:['re_dongbai','dongbai','jsrg_dongbai'],
-			chunyuqiong:['chunyuqiong','re_chunyuqiong'],
+			chunyuqiong:['chunyuqiong','re_chunyuqiong','jsrg_chunyuqiong'],
 			kanze:['re_kanze','kanze'],
-			chendeng:['ol_chendeng','re_chendeng','chendeng'],
+			chendeng:['ol_chendeng','re_chendeng','chendeng','jsrg_chendeng'],
 			miheng:['miheng','re_miheng'],
 			liuba:['ol_liuba','dc_liuba','liuba'],
 			lvkuanglvxiang:['lvkuanglvxiang','dc_lvkuanglvxiang'],
@@ -10102,7 +10103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dccuijin_info:'当你或你攻击范围内的角色使用【杀】时，你可以弃置一张牌，令此【杀】的伤害基数+1。然后当此杀被目标角色抵消或无效或防止伤害后，你摸一张牌，对使用者造成1点伤害。',
 			panghui:'庞会',
 			dcyiyong:'异勇',
-			dcyiyong_info:'每回合限两次。当你对其他角色造成伤害时，若你有牌，你可以与其同时弃置至少一张牌。若你以此法弃置的牌的点数之和：不大于其，你摸X张牌；不小于其，此伤害+1（X为其以此法弃置的牌数）。',
+			dcyiyong_info:'当你对其他角色造成伤害时，若你有牌，你可以与其同时弃置至少一张牌。若你以此法弃置的牌的点数之和：不大于其，你摸X张牌；不小于其，此伤害+1（X为其以此法弃置的牌数）。',
 			chenjiao:'陈矫',
 			dcxieshoux:'协守/清严',
 			dcxieshou:'协守',
@@ -10124,7 +10125,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liupi:'刘辟',
 			dcjuying:'踞营',
 			dcjuying_info:'出牌阶段结束时，若你于此阶段内使用【杀】的次数未达到上限，你可以选择任意项：1.下回合使用【杀】的次数上限+1；2.本回合手牌上限+2；3.摸三张牌。若你选择的项数超过了你的体力值，你弃置X张牌（X为你选择的项数减你的体力值）。',
-			dc_huanghao:'黄皓',
+			dc_huanghao:'新杀黄皓',
+			dc_huanghao_ab:'黄皓',
 			dcqinqing:'寝情',
 			dcqinqing_info:'结束阶段，你可以弃置一名攻击范围内包含一号位的其他角色一张牌。然后若其手牌数大于一号位，你摸一张牌。',
 			dccunwei:'存畏',
@@ -10163,7 +10165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuantanyuanxiyuanshang:'袁谭袁尚袁熙',
 			dcneifa:'内伐',
 			dcneifa_info:'出牌阶段开始时，你可以摸三张牌，然后弃置一张牌。若你弃置的牌类型为：基本牌，本阶段你不能使用锦囊牌，且【杀】的使用次数上限+X且可以额外指定一名目标；锦囊牌，本阶段你不能使用基本牌，且使用普通锦囊牌选择目标时可以增加或减少一个目标（X为你发动〖内伐〗弃牌后手牌中因〖内伐〗而不能使用的牌的数量且最多为5。你以此法选择的额外目标均无距离限制）。',
-			dc_sunziliufang:'孙资刘放',
+			dc_sunziliufang:'新杀孙资刘放',
 			dcqinshen:'勤慎',
 			dcqinshen_info:'弃牌阶段结束时，你可以摸X张牌（X为本回合未进入过弃牌堆的花色数）。',
 			dcweidang:'伪谠',
@@ -10194,7 +10196,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqinghuang_info:'出牌阶段开始时，你可以减1点体力上限，然后你于本回合发动〖踏寂〗时额外随机执行一种效果。',
 			dc_huojun:'霍峻',
 			dcgue:'孤扼',
-			dcgue_info:'每名其他角色的回合限一次。当你需要使用或打出【杀】或【闪】时，若你有手牌，你可以展示之。若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
+			dcgue_info:'每回合限一次。当你需要使用或打出【杀】或【闪】时，若你有手牌，你可以展示之。若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
 			dcsigong:'伺攻',
 			dcsigong_info:'其他角色的回合结束时，若其于本回合内使用牌被响应过，你可以将手牌摸至或弃置至1，视为对其使用一张需使用X张【闪】抵消的【杀】，且此【杀】的伤害基数+1（X为你以此法弃置的牌数且至少为1）。当你以此法造成伤害后，该技能于本轮失效。',
 			peiyuanshao:'裴元绍',
@@ -10240,7 +10242,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcporui:'破锐',
 			dcporui_info:'每轮限一次。其他角色的结束阶段，你可以弃置一张基本牌并选择另一名于此回合内失去过牌的其他角色，你视为对其依次使用X+1张【杀】，然后你交给其X张手牌（X为其本回合失去的牌数且至多为5）。',
 			dcgonghu:'共护',
-			dcgonghu_info:'锁定技。你的回合外：①当你失去基本牌后，若你本回合内失去基本牌的数量大于1，你将〖破锐〗改为每轮限两次。②当你造成或受到伤害后，若你本回合内造成或受到的伤害大于1，你删除〖破锐〗中的“，然后你交给其X张手牌”。③当你使用红色基本牌/红色普通锦囊牌时，若你已发动过〖共护①〗和〖共护②〗，则此牌不可被响应/可额外增加一个目标。',
+			dcgonghu_info:'锁定技。①当你于回合外失去基本牌后，若你本回合内失去基本牌的数量大于1，你将〖破锐〗改为每轮限两次。②当你于回合外造成或受到伤害后，若你本回合内造成或受到的伤害大于1，你删除〖破锐〗中的“，然后你交给其X张手牌”。③当你使用红色基本牌/红色普通锦囊牌时，若你已发动过〖共护①〗和〖共护②〗，则此牌不可被响应/可额外增加一个目标。',
 			yue_caiwenji:'乐蔡琰',
 			dcshuangjia:'霜笳',
 			dcshuangjia_tag:'胡笳',

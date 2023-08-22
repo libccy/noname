@@ -5867,9 +5867,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(_status.event.goon) return -1;
 							var num=_status.event.maxNum;
 							if(ui.selected.cards.length>=num-1){
-								var val=get.value(player.getCards('he',function(cardx){
+								var cards=player.getCards('he',function(cardx){
 									return cardx!=card&&!ui.selected.cards.contains(cardx);
-								}));
+								});
+								var val=0;
+								for(var cardx of cards) val+=get.value(cardx);
 								if(val>=14) return 0;
 							}
 							return get.value(card);
@@ -13157,7 +13159,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baosanniang:['xin_baosanniang','re_baosanniang','baosanniang'],
 			heqi:['re_heqi','heqi'],
 			weiwenzhugezhi:['weiwenzhugezhi','re_weiwenzhugezhi'],
-			xugong:['xugong','re_xugong'],
+			xugong:['xugong','re_xugong','jsrg_xugong'],
 			liuzan:['re_liuzan','liuzan'],
 			sufei:['yj_sufei','sp_sufei','xf_sufei'],
 			jiakui:['jiakui','old_jiakui'],
@@ -13332,7 +13334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezhennan:'镇南',
 			rezhennan_info:'当你成为其他角色使用的牌的目标后，若此牌的目标数大于该角色的体力值，则你可以弃置一张牌并对其造成1点伤害。',
 			
-			hujinding:'胡金定',
+			hujinding:'手杀胡金定',
 			huaizi:'怀子',
 			huaizi_info:'锁定技，你的手牌上限为你的体力上限。',
 			renshi:'仁释',
@@ -13465,7 +13467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_dongzhuo:'手杀董卓',
 			rejiuchi:'酒池',
 			rejiuchi_info:'你可以将一张黑桃手牌当做【酒】使用。锁定技，当你于回合内使用带有【酒】效果的【杀】造成伤害时，你令你的【崩坏】失效直到回合结束。',
-			furong:'傅肜',
+			furong:'手杀傅肜',
 			xuewei:'血卫',
 			xuewei_info:'准备阶段，你可以选择一名其他角色（仅自己可见）。若如此做，直到你的下回合开始前，当其第一次受到伤害时，你防止此伤害，改为由你受到等量的伤害并对伤害来源造成等量同属性的伤害。',
 			liechi:'烈斥',
@@ -13512,7 +13514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shanli_info:'觉醒技，准备阶段，若你已发动过〖败移〗且对至少两名角色发动过〖景略〗，则你减1点体力上限并选择一名角色。系统随机选择三个不为〖忘隙(仲村由理)〗的主公技，然后你选择其中一个技能，令其获得之。其将交互表情中的【拖鞋】和【酒杯】替换为【枷锁】和【玉玺】。',
 			re_lingtong:'手杀凌统',
 			re_liubiao:'手杀刘表',
-			hucheer:'胡车儿',
+			hucheer:'手杀胡车儿',
 			daoji:'盗戟',
 			daoji_info:'出牌阶段限一次，你可以弃置一张非基本牌并选择一名装备区里有牌的其他角色，你获得其装备区中的一张牌并使用之。若你以此法获得的牌是武器牌，则你使用此牌后对其造成1点伤害。',
 			xin_hansui:'手杀韩遂',
@@ -13595,7 +13597,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinshenxing_info:'出牌阶段限X次（X为你的体力值），你可以弃置两张牌，然后摸一张牌。若这两张牌颜色不同，则改为摸两张牌。',
 			xinbingyi:'秉壹',
 			xinbingyi_info:'结束阶段，你可展示所有手牌。若这些牌的颜色或类型均相同，则你可以令至多X名角色各摸一张牌（X为你的手牌数）。',
-			qiaozhou:'谯周',
+			qiaozhou:'手杀谯周',
 			zhiming:'知命',
 			zhiming_info:'准备阶段开始时或弃牌阶段结束时，你摸一张牌，然后可以将一张牌置于牌堆顶。',
 			xingbu:'星卜',
@@ -13744,7 +13746,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_zhuzhi:'手杀朱治',
 			sbanguo:'安国',
 			sbanguo_info:'①游戏开始时，你令一名其他角色获得1枚“安国”标记（有“安国”的角色手牌上限基数等于体力上限）。②出牌阶段开始时，你可以将一名有“安国”的角色的所有“安国”移动给一名本局游戏未获得过“安国”的其他角色。③当你受到伤害时，若有有“安国”的角色且伤害值不小于你的体力值且此伤害没有来源或来源没有“安国”，防止此伤害。④一名角色进入濒死状态时，若其有你因〖安国①〗获得的“安国”，你移去其该“安国”，令其将体力回复至1点。然后你选择一项：1.若你的体力值大于1，你失去体力至1点；2.若你的体力上限大于1，你将体力上限减至1。最后你令其获得X点护甲（X为你以此法失去的体力值或减少的体力上限）。',
-			wangjun:'王濬',
+			wangjun:'手杀王濬',
 			zhujian:'筑舰',
 			zhujian_info:'出牌阶段限一次。你可以令至少两名装备区里有牌的角色各摸一张牌。',
 			duansuo:'断索',

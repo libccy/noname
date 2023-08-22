@@ -4749,7 +4749,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'renjie2',
 				trigger:{player:'damageEnd'},
 				forced:true,
-				unique:true,
 				group:'renjie2',
 				notemp:true,
 				//mark:true,

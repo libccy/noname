@@ -60,7 +60,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else player.choosePlayerCard(target,'h',true);
 					'step 1'
 					if(result.bool){
-						event.show_card=result.cards[0],str=get.translation(player);
+						event.show_card=result.cards[0];
+						var str=get.translation(player);
 						player.showCards(event.show_card);
 						target.chooseControl().set('choiceList',[
 							'令'+str+'获得'+get.translation(event.show_card),
@@ -699,11 +700,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			duanjian_append:'<span class="text" style="font-family: yuanli">不要因为手快而装给自己。</span>',
 			serafuku:'水手服',
 			serafuku_info:'锁定技。当你成为【杀】的目标后，若你的性别包含男性，则你进行判定：若结果为黑色，则此牌对你的伤害值基数+1。',
-			serafuku_append:'<span class="text" style="font-family: yuanli">セーラー服だからです、<br>结论！ </span>',
+			serafuku_append:'<span class="text" style="font-family: yuanli">セーラー服だからです、<br>結論！ </span>',
 			yinfengyi:'引蜂衣',
 			yinfengyi_info:'锁定技。当你受到渠道为锦囊牌的伤害时，此伤害+1。当你因〖毒①〗而失去体力时，失去体力的量值+1。',
 			yonglv:'庸驴',
-			yonglv_info:'锁定技。其他角色至你的距离视为1。',
+			yonglv_info:'锁定技。①你至其他角色的距离-1。②其他角色至你的距离视为1。',
 			yonglv_append:'<span class="text" style="font-family: yuanli">它旁边的就是王仲宣。</span>',
 			zhanxiang:'战象',
 			zhanxiang_info:'锁定技。①其他角色至你的距离+1。②当你成为〖赠予〗的目标后，你将此次赠予的效果改为“将赠予牌移动至弃牌堆”。',

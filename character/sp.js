@@ -4181,7 +4181,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'huanshi',
 				trigger:{global:'judge'},
 				filter:function(event,player){
-					return player.countCards('he')>0;
+					return player.countCards('h')>0;
 				},
 				logTarget:'player',
 				prompt2:function(event,player){
@@ -10591,20 +10591,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
-				viewAs:{name:'shunshou'},
+				viewAs:{
+					name:'shunshou',
+					storage:{spweiwu:true},
+				},
 				filterCard:{color:'red'},
 				position:'hes',
 				check:function(card){
 					return 7-get.value(card);
 				},
-				filterTarget:function(card,player,target){
-					if(target.countCards('h')<player.countCards('h')) return false;
-					return lib.filter.filterTarget.apply(this,arguments);
-				},
-				viewAsFilter:function(player){
-					return player.countCards('hes',lib.skill.spweiwu.filterCard)>0&&game.hasPlayer(function(current){
-						return current.countCards('h')>=player.countCards('h')&&player.canUse('shunshou',current);
-					});
+				mod:{
+					targetInRange:function(card){
+						if(card.storage&&card.storage.spweiwu) return true;
+					},
 				},
 			},
 			tuogu:{
@@ -23030,7 +23029,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_caiwenji:'SP蔡琰',
 			zhugeguo:'诸葛果',
 			lingcao:'凌操',
-			sunru:'孙茹',
+			sunru:'手杀孙茹',
 			lingju:'灵雎',
 			lifeng:'李丰',
 			jsp_guanyu:'SP关羽',
@@ -23073,8 +23072,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoying:"曹婴",
 			simahui:"司马徽",
 			baosanniang:"OL鲍三娘",
-			pangdegong:"庞德公",
-			zhaotongzhaoguang:"赵统赵广",
+			pangdegong:"手杀庞德公",
+			zhaotongzhaoguang:"手杀赵统赵广",
 			majun:"马钧",
 			simazhao:"司马昭",
 			wangyuanji:"王元姬",
@@ -23646,7 +23645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spniluan:'逆乱',
 			spniluan_info:'出牌阶段，你可以将一张黑色牌当做【杀】使用。此【杀】使用结算完成后，若你未因此【杀】造成过伤害，则你令此【杀】不计入使用次数。',
 			spweiwu:'违忤',
-			spweiwu_info:'出牌阶段限一次，你可以将一张红色牌当做【顺手牵羊】对手牌数不小于你的角色使用。',
+			spweiwu_info:'出牌阶段限一次，你可以将一张红色牌当无距离限制的【顺手牵羊】使用。',
 			spmouzhu:'谋诛',
 			spmouzhu_backup:'谋诛',
 			spmouzhu_info:'出牌阶段限一次，你可以选择任意名“距离为1”或“体力值等于你”的其他角色，这些角色依次进行以下结算：交给你一张手牌，然后若其手牌数小于你，则其视为对你使用一张【杀】或【决斗】。',
@@ -23680,7 +23679,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chengshang:'承赏',
 			chengshang_info:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗获得过牌，则你可以从牌堆中获得所有与此牌花色点数相同的牌。',
 			chengshang_info_guozhan:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗获得过牌，则你可以从牌堆中获得所有与此牌花色点数相同的牌。',
-			panshu:'潘淑',
+			panshu:'OL潘淑',
 			weiyi:'威仪',
 			weiyi_info:'每名角色限一次。当有角色受到伤害后，你可选择：①若其体力值不小于你，则其失去1点体力。②若其体力值不大于你且其已受伤，则其回复1点体力。',
 			jinzhi:'锦织',
@@ -23693,7 +23692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangong:'挽弓',
 			wangong2:'挽弓',
 			wangong_info:'锁定技，当你使用基本牌时，你获得如下效果：当你使用下一张牌时，若此牌为【杀】，则此牌无次数和距离限制且伤害+1。',
-			huangchengyan:'黄承彦',
+			huangchengyan:'OL黄承彦',
 			guanxu:'观虚',
 			guanxu_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可将其中一张手牌与牌堆顶5张牌中的一张交换。若如此做，你弃置其手牌中3张花色相同的牌。',
 			yashi:'雅士',
@@ -23795,7 +23794,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spmanwang_info:'出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：⒈获得〖叛侵〗。⒉摸一张牌。⒊回复1点体力。⒋摸两张牌并失去〖叛侵〗。',
 			sppanqin:'叛侵',
 			sppanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌被使用时对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项。',
-			tengfanglan:'滕芳兰',
+			tengfanglan:'OL滕芳兰',
 			luochong:'落宠',
 			luochong_info:'准备阶段开始时/当你于一回合内首次受到伤害后，你可选择本轮内未选择过的一项（每名角色每轮限选一次）：⒈令一名角色回复1点体力。⒉令一名角色失去1点体力。⒊令一名角色弃置两张牌。⒋令一名角色摸两张牌。',
 			aichen:'哀尘',
@@ -23894,7 +23893,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xindiaodu:"调度",
 			xindiaodu_info:"①每回合限一次，与你势力相同的角色使用装备牌时，其可以摸一张牌。②出牌阶段开始时，你可以获得与你势力相同的一名角色装备区内的一张牌，然后你可以将此牌交给另一名与你势力相同的其他角色。",
 			olhuanshi:'缓释',
-			olhuanshi_info:'一名角色的判定牌生效前，你可以令其观看你的牌并选择其中的一张牌，你打出此牌代替判定牌。然后你可以重铸任意张牌（每回合限重铸一次）。',
+			olhuanshi_info:'一名角色的判定牌生效前，你可以令其观看你的手牌并选择你的一张牌，你打出此牌代替判定牌。然后你可以重铸任意张牌（每回合限重铸一次）。',
 			olhongyuan:'弘援',
 			olhongyuan_info:'每阶段限一次。当你一次性获得至少两张牌以后，你可以将至多两张牌交给等量名角色。',
 			olmingzhe:'明哲',
@@ -23902,7 +23901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ahuinan:'阿会喃',
 			jueman:'蟨蛮',
 			jueman_info:'锁定技。一名角色的回合结束时，若本回合被使用过的基本牌数不小于2，且前两张基本牌的使用者：均不为你，你视为使用本回合被使用的第三张基本牌；有且仅有其中之一为你，你摸一张牌。',
-			ol_liuba:'刘巴',
+			ol_liuba:'OL刘巴',
 			oltongduo:'统度',
 			oltongduo_info:'准备阶段，你可以令一名角色交给你一张手牌，然后出牌阶段结束时，你将此牌置于牌堆顶。',
 			olzhubi:'铸币',

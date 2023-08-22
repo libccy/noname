@@ -779,7 +779,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var num=player.countCards('h');
 					var str='是否交给其'+get.cnNumber(num)+'张牌，然后视为你对其使用一张【酒】？或者点击“取消”，令其交给你一张牌，然后其视为对你使用一张雷【杀】。';
-					target.chooseCard(get.translation(player)+'对你发动了【驳龙】',str,num,'he').set('ai',card=>{
+					if(!num||target.countCards('he')<num) event._result={bool:false};
+					else target.chooseCard(get.translation(player)+'对你发动了【驳龙】',str,num,'he').set('ai',card=>{
 						if(_status.event.canGive) return 5+Math.max(0,3-_status.event.player.hp)/1.5-get.value(card);
 						return 0;
 					}).set('canGive',function(){
@@ -840,7 +841,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							cards.addArray(evt.getl(current).hs);
 						});
 					})
-					return event.cards.some(card=>!cards.contains(card));
+					if(event.cards.some(card=>!cards.contains(card))) return false;
+					return true;
 				},
 				content:function(){
 					'step 0'
@@ -1445,9 +1447,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0],num=lib.skill.clansankuang.getNum(target),num2=target.countCards('he');
 						event.target=target;
 						player.logSkill('clansankuang',target);
-						if(num==0||num2==0) event._result={bool:false};
+						if(num2==0) event._result={bool:false};
 						else if(num2<=num) event._result={bool:true,cards:target.getCards('he')};
-						else target.chooseCard('he',true,[num,Infinity]).set('ai',get.unuseful).set('prompt','交给'+get.translation(player)+'至少'+get.cnNumber(num)+'张牌');
+						else{
+							var cards=trigger.cards.filterInD('oe');
+							target.chooseCard('he',num>0,[num,Infinity]).set('ai',get.unuseful).set('prompt',num>0?
+								'是否交给'+get.translation(player)+'任意张牌'+(cards.length?'并获得'+get.translation(cards):'')+'？':
+								'交给'+get.translation(player)+'至少'+get.cnNumber(num)+'张牌');
+						}
 					}else event.finish();
 					'step 2'
 					if(result.bool){
@@ -1455,6 +1462,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.give(cards,player);
 						game.delayx();
 					}
+					else event.finish();
 					'step 3'
 					if(trigger.cards.filterInD().length) target.gain(trigger.cards.filterInD(),'gain2','bySelf');
 					else if(trigger.cards.filterInD('e').length) target.gain(trigger.cards.filterInD('e'),get.owner(trigger.cards.filterInD('e')[0]),'give');
@@ -2323,14 +2331,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanbolong:'驳龙',
 			clanbolong_info:'出牌阶段限一次。你可以令一名其他角色选择一项：1.你交给其一张牌，然后视为对其使用一张雷【杀】；2.交给你等同于你手牌数的牌，然后视为对你使用一张【酒】。',
 			clanzhongliu:'中流',
-			clanzhongliu_info:'宗族技，锁定技。当你使用牌时，若此牌对应的实体牌不全为同族角色的手牌，你重置武将牌上的技能。',
+			clanzhongliu_info:'宗族技，锁定技。当你使用牌时，若此牌对应的实体牌均不为太原王氏角色的手牌，你重置武将牌上的技能。',
 			clan_zhongyan:'族钟琰',
 			clanguangu:'观骨',
 			clanguangu_info:'转换技，出牌阶段限一次。阴：你可以观看牌堆顶的至多四张牌；阳：你可以观看一名角色的至多四张手牌。然后你可以使用其中的一张牌。',
 			clanxiaoyong:'啸咏',
 			clanxiaoyong_info:'锁定技。当你于回合内首次使用字数为X的牌时，你重置〖观骨〗（X为你上次发动〖观骨〗观看的牌数）。',
 			clanbaozu:'保族',
-			clanbaozu_info:'宗族技，限定技。当一名同族角色进入濒死状态时，你可以令其横置并回复1点体力。',
+			clanbaozu_info:'宗族技，限定技。当一名颍川钟氏角色进入濒死状态时，你可以令其横置并回复1点体力。',
 			clan_wangyun:'族王允',
 			clanjiexuan:'解悬',
 			clanjiexuan_info:'限定技，转换技。阴：你可以将一张红色牌当【顺手牵羊】使用；阳：你可以将一张黑色牌当【过河拆桥】使用。',
