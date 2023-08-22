@@ -2932,7 +2932,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'damageBegin2'},
 						filter:function(event,player){
 							return player.countCards('he',function(card){
-								return lib.filter.cardDiscardable(card,player,'qingyu');
+								return lib.filter.cardDiscardable(card,player,'qingyu_defend');
 							})>1;
 						},
 						forced:true,
