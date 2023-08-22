@@ -1628,7 +1628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.name=='respond'?0.5:false;
 						},
 						filter:function(event,player){
-							return ['shan','wuxie'].contains(event.card.name)&&evt.skill=='scsmiaoyu'&&event.cards&&event.cards.length==2&&_status.currentPhase&&_status.currentPhase!=player&&_status.currentPhase.countDiscardableCards(player,'he');
+							return ['shan','wuxie'].contains(event.card.name)&&event.skill=='scsmiaoyu'&&event.cards&&event.cards.length==2&&_status.currentPhase&&_status.currentPhase!=player&&_status.currentPhase.countDiscardableCards(player,'he');
 						},
 						forced:true,
 						popup:false,
