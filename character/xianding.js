@@ -108,7 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var num=1,current=_status.currentPhase;
-					if(current&&trigger.player!=current){
+					if(current&&trigger.source!=current){
 						var num=0,players=game.players.slice(0).concat(game.dead);
 						for(var target of players){
 							target.getHistory('sourceDamage',function(evt){
