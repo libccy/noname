@@ -831,14 +831,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!event.cards.length) return true;
 					var cards=[];
 					game.countPlayer(current=>{
-						if(!current.hasClan('太原王氏')) return false;
+						if(!current.hasClan('太原王氏')&&current!=player) return false;
 						current.getHistory('lose',evt=>{
 							if(event!=evt.getParent()) return false;
 							cards.addArray(evt.getl(current).hs);
 						});
-					})
-					if(event.cards.some(card=>!cards.contains(card))) return false;
-					return true;
+					});
+					return !event.cards.some(card=>cards.contains(card));
 				},
 				content:function(){
 					'step 0'
