@@ -4061,18 +4061,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseButton([
 						'###'+get.prompt('mjshengxi')+'###获得一张智囊或摸一张牌',
 						[list,'vcard'],
-						[['摸一张牌'],'tdnodes'],
-					]).set('ai',function(card){
-						if(card.link[2]&&get.zhinangs().contains(card.link[2])){
+						[['摸一张牌','取消'],'tdnodes'],
+					],true).set('ai',function(card){
+						if(card.link[2]){
 							if(!get.cardPile2(function(cardx){
 								return cardx.name==card.link[2];
 							})) return 0;
 							return (Math.random()+1.5)*get.value({name:card.link[2]},_status.event.player);
 						}
-						return 1;
+						if(card.link=='摸一张牌') return 1;
+						return 0;
 					});
 					'step 1'
-					if(result.bool){
+					if(result.bool&&result.links[0]!='取消'){
 						player.logSkill('mjshengxi');
 						if(result.links[0]=='摸一张牌') player.draw();
 						else{
