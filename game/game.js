@@ -4987,6 +4987,8 @@
 						else{
 							map.junzhu.hide();
 						}
+						ui.aozhan_bgm=map.aozhan_bgm;
+						map.aozhan_bgm._link.config.updatex.call(map.aozhan_bgm,[]);
 					},
 					guozhan_mode:{
 						name:'游戏模式',
@@ -5039,6 +5041,17 @@
 						intro:'若开启此选项，所有的玩家将在挑选武将后，分发起始手牌之前，分别观看自己下家的副将。',
 					},
 					aozhan_bgm:{
+						updatex:function(){
+							this.lastChild.innerHTML=this._link.config.item[lib.config.mode_config.guozhan.aozhan_bgm];
+							if(!Array.isArray(_status.aozhanBGMToRemove)) return;
+							const menu=this._link.menu;
+							for(let i=0;i<menu.childElementCount;i++){
+								const link=menu.childNodes[i]._link;
+								if(['disabled','random'].includes(link)||!_status.aozhanBGMToRemove.includes(link)) continue;
+								_status.aozhanBGMToRemove.remove(link);
+								menu.childNodes[i].delete();
+							}
+						},
 						name:'鏖战背景音乐',
 						item:{
 							disabled:'不启用',
@@ -31173,6 +31186,41 @@
 		],
 	};
 	var game={
+		//Add a background music to the config option
+		//在设置选项中添加一首背景音乐
+		addBackgroundMusic:(link,musicName,aozhan)=>{
+			const backgroundMusicSetting=ui[aozhan?'aozhan_bgm':'background_music_setting'],menu=backgroundMusicSetting._link.menu,config=backgroundMusicSetting._link.config;
+			if(typeof musicName!='string') musicName=link;
+			if(aozhan) lib.mode.guozhan.config.aozhan_bgm.item[link]=musicName;
+			else lib.config.all.background_music.add(link);
+			config.item[link]=musicName;
+			const textMenu=ui.create.div('',musicName,menu,function(){
+				const node=this.parentNode._link,config=node._link.config;
+				node._link.current=this.link;
+				const tmpName=node.lastChild.innerHTML;
+				node.lastChild.innerHTML=config.item[this._link];
+				if(config.onclick&&config.onclick.call(node,this._link,this)===false) node.lastChild.innerHTML=tmpName;
+				if(config.update) config.update();
+			},menu.childElementCount-2);
+			textMenu._link=link;
+			config.updatex.call(backgroundMusicSetting,[]);
+		},
+		//Remove a background music from the config option
+		//从设置选项中移除一首背景音乐
+		removeBackgroundMusic:(link,aozhan)=>{
+			if(aozhan){
+				if(['disabled','random'].includes(link)) return;
+				delete lib.mode.guozhan.config.aozhan_bgm.item[link];
+				if(!Array.isArray(_status.aozhanBGMToRemove)) _status.aozhanBGMToRemove=[];
+				_status.aozhanBGMToRemove.add(link);
+			}
+			else{
+				if(['music_off','music_custom','music_random'].includes(link)) return;
+				lib.config.all.background_music.remove(link);
+			}
+			const backgroundMusicSetting=ui[aozhan?'aozhan_bgm':'background_music_setting'],config=backgroundMusicSetting._link.config;
+			config.updatex.call(backgroundMusicSetting,[]);
+		},
 		updateBackground:function(){
 			var background=(_status.tempBackground||lib.config.image_background);
 			ui.background.delete();
@@ -31190,7 +31238,10 @@
 			}
 
 			document.body.insertBefore(ui.background,document.body.firstChild);
-			if(background=='default'){
+			if(background.indexOf('ext:')==0){
+				ui.background.setBackgroundImage('extension/'+background.slice(4));
+			}
+			else if(background=='default'){
 				ui.background.animate('start');
 				ui.background.style.backgroundImage="none";
 			}
@@ -31213,6 +31264,8 @@
 			ui.background.style.backgroundSize='cover';
 			ui.background.style.backgroundPosition='50% 50%';
 		},
+		//Generate a beatmap using the given BPM, beats, and offset
+		//用给定的BPM、节拍和偏移生成谱面
 		generateBeatmapTimeleap:(bpm,beats,offset)=>beats.map(value=>Math.round(value*60000/bpm+(offset||0))),
 		updateRenku:function(){
 			game.broadcast(function(renku){
@@ -32038,14 +32091,21 @@
 				ui.backgroundMusic.src='';
 			}
 			else if(_status._aozhan==true&&lib.config.mode_config.guozhan.aozhan_bgm!='disabled'){
-				var aozhan=lib.config.mode_config.guozhan.aozhan_bgm;
-				if(aozhan=='random'){
-					aozhan=['online','rewrite','chaoming'].randomGet();
+				var aozhan=_status.tempAozhan||lib.config.mode_config.guozhan.aozhan_bgm;
+				if(Array.isArray(aozhan)){
+					aozhan=aozhan.randomGet('disabled',_status.currentAozhan)||lib.config.mode_config.guozhan.aozhan_bgm;
 				}
-				ui.backgroundMusic.src=lib.assetURL+'audio/background/aozhan_'+aozhan+'.mp3';
+				if(aozhan=='random'){
+					aozhan=Object.keys(lib.mode.guozhan.config.aozhan_bgm.item).randomGet('disabled','random',_status.currentAozhan);
+				}
+				_status.currentAozhan=aozhan;
+				ui.backgroundMusic.src=lib.assetURL+(aozhan.indexOf('ext:')==0?'extension/'+aozhan.slice(4):'audio/background/aozhan_'+aozhan+'.mp3');
 			}
 			else{
-				var music=lib.config.background_music;
+				var music=_status.tempMusic||lib.config.background_music;
+				if(Array.isArray(music)){
+					music=music.randomGet('music_off',_status.currentMusic)||lib.config.background_music;
+				}
 				if(music=='music_random'){
 					music=lib.config.all.background_music.randomGet('music_off','music_random',_status.currentMusic);
 				}
@@ -32056,7 +32116,7 @@
 					}
 				}
 				else{
-					ui.backgroundMusic.src=lib.assetURL+'audio/background/'+music+'.mp3';
+					ui.backgroundMusic.src=lib.assetURL+(music.indexOf('ext:')==0?'extension/'+music.slice(4):'audio/background/'+music+'.mp3');
 				}
 			}
 		},

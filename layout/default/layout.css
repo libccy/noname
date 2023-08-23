@@ -1738,11 +1738,12 @@ div:not(.handcards)>.card>.info>span,
 	width: 100%
 }
 .content>div {
-	position: relative;
 	margin-top: 8px;
 	margin-bottom: 8px;
-	margin-left: auto;
-	margin-right: auto;
+	margin-left: 4px;
+	margin-right: 4px;
+	position: relative;
+	width: calc(100% - 8px);
 }
 .content>.caption + .buttons:not(*:last-child){
 	margin-top: 0;
