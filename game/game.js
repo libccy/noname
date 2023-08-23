@@ -52971,7 +52971,7 @@
 				return false;
 			},
 			double:function(name,array){
-				if(!lib.character[name]||!lib.character[name][4]||name.indexOf('gz_')!=0&&name.indexOf('db_')!=0&&name.indexOf('jsrg_')!=0) return false;
+				if(!lib.character[name]||!lib.character[name][4]) return false;
 				for(var i of lib.character[name][4]){
 					if(i.indexOf('doublegroup:')==0){
 						if(!array) return true;
