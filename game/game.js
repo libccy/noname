@@ -38698,22 +38698,15 @@
 			}
 			return out;
 		},
-		expandSkills:function(skills){
-			var skills2=[];
-			for(var i=0;i<skills.length;i++){
-				var info=get.info(skills[i]);
-				if(info){
-					if(info.group) skills2=skills2.concat(info.group);
-				}
-				else{
-					console.log(skills[i]);
-				}
+		expandSkills:skills=>skills.addArray(skills.reduce((previousValue,currentValue)=>{
+			const info=get.info(currentValue);
+			if(info){
+				if(Array.isArray(info.group)) previousValue.push(...info.group);
+				else if(info.group) previousValue.push(info.group);
 			}
-			for(var i=0;i<skills2.length;i++){
-				skills.add(skills2[i]);
-			}
-			return skills;
-		},
+			else console.log(currentValue);
+			return previousValue;
+		},[])),
 		css:style=>Object.keys(style).forEach(value=>{
 			let uiStyle=ui.style[value];
 			if(!uiStyle){
