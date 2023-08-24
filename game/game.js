@@ -38756,23 +38756,15 @@
 			}
 			return num;
 		},
-		countPlayer2:function(func,includeOut){
-			var num=0;
-			if(typeof func!='function'){
-				func=lib.filter.all;
-			}
-			var players=game.players.slice(0).concat(game.dead);
-			for(var i=0;i<players.length;i++){
-				if(!includeOut&&players[i].isOut()) continue;
-				var result=func(players[i]);
-				if(typeof result=='number'){
-					num+=result;
-				}
-				else if(result){
-					num++;
-				}
-			}
-			return num;
+		countPlayer2:(func,includeOut)=>{
+			if(typeof func!='function') func=lib.filter.all;
+			return game.players.concat(game.dead).reduce((previousValue,currentValue)=>{
+				if(!includeOut&&currentValue.isOut()) return previousValue;
+				const result=func(currentValue);
+				if(typeof result=='number') previousValue+=result;
+				else if(result) previousValue++;
+				return previousValue;
+			},0);
 		},
 		filterPlayer:(func,list,includeOut)=>{
 			if(!Array.isArray(list)) list=[];
