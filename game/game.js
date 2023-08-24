@@ -38714,16 +38714,14 @@
 			}
 			return skills;
 		},
-		css:function(style){
-			for(var i in style){
-				if(ui.style[i]) ui.style[i].innerHTML=i+JSON.stringify(style[i]).replace(/"/g,"");
-				else{
-					ui.style[i]=document.createElement('style');
-					ui.style[i].innerHTML=i+JSON.stringify(style[i]).replace(/"/g,"");
-					document.head.appendChild(ui.style[i]);
-				}
+		css:style=>Object.keys(style).forEach(value=>{
+			let uiStyle=ui.style[value];
+			if(!uiStyle){
+				uiStyle=ui.style[value]=document.createElement('style');
+				document.head.appendChild(uiStyle);
 			}
-		},
+			uiStyle.innerHTML=`${value}${JSON.stringify(style[value]).replace(/"/g,"")}`;
+		}),
 		hasPlayer:(func,includeOut)=>game.players.some(value=>(includeOut||!value.isOut())&&func(value)),
 		hasPlayer2:(func,includeOut)=>game.players.concat(game.dead).some(value=>(includeOut||!value.isOut())&&func(value)),
 		countPlayer:(func,includeOut)=>{
