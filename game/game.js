@@ -38451,6 +38451,7 @@
 		saveExtensionConfig:function(extension,key,value){
 			return game.saveConfig('extension_'+extension+'_'+key,value);
 		},
+		saveExtensionConfigValue:(extension,key)=>game.saveExtensionConfig(extension,key,game.getExtensionConfig(extension,key)),
 		getExtensionConfig:(extension,key)=>lib.config[`extension_${extension}_${key}`],
 		clearModeConfig:mode=>{
 			if(_status.reloading) return;
