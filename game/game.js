@@ -38724,13 +38724,7 @@
 				}
 			}
 		},
-		hasPlayer:function(func,includeOut){
-			for(var i=0;i<game.players.length;i++){
-				if(!includeOut&&game.players[i].isOut()) continue;
-				if(func(game.players[i])) return true;
-			}
-			return false;
-		},
+		hasPlayer:(func,includeOut)=>game.players.some(value=>(includeOut||!value.isOut())&&func(value)),
 		hasPlayer2:(func,includeOut)=>game.players.concat(game.dead).some(value=>(includeOut||!value.isOut())&&func(value)),
 		countPlayer:(func,includeOut)=>{
 			if(typeof func!='function') func=lib.filter.all;
