@@ -38793,16 +38793,7 @@
 			}
 			return null;
 		},
-		findPlayer2:function(func,includeOut){
-			var players=game.players.slice(0).concat(game.dead);
-			for(var i=0;i<players.length;i++){
-				if(!includeOut&&players[i].isOut()) continue;
-				if(func(players[i])){
-					return players[i];
-				}
-			}
-			return null;
-		},
+		findPlayer2:(func,includeOut)=>game.players.concat(game.dead).find(value=>(includeOut||!value.isOut())&&func(value))||null,
 		findCards:(func,all)=>Object.keys(lib.card).filter(value=>{
 			if(!lib.translate[`${value}_info`]) return false;
 			if(lib.card[value].mode&&lib.card[value].mode.includes(lib.config.mode)==false) return false;
