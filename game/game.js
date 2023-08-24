@@ -38454,34 +38454,27 @@
 		getExtensionConfig:function(extension,key){
 			return lib.config['extension_'+extension+'_'+key];
 		},
-		clearModeConfig:function(mode){
+		clearModeConfig:mode=>{
 			if(_status.reloading) return;
-			if(!lib.db){
-				var config;
-				try{
-					config=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
-					if(!config||typeof config!='object') throw 'err'
-				}
-				catch(err){
-					config={};
-				}
-				for(var i in config){
-					if(i.substr(i.indexOf('_mode_config')+13)==mode){
-						delete config[i];
-					}
-				}
-				localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
-				localStorage.removeItem(lib.configprefix+mode);
+			if(lib.db){
+				game.getDB('config',null,config=>Object.keys(config).forEach(value=>{
+					if(value.substr(value.indexOf('_mode_config')+13)==mode) game.saveConfig(value);
+				}));
+				return;
 			}
-			else{
-				game.getDB('config',null,function(config){
-					for(var i in config){
-						if(i.substr(i.indexOf('_mode_config')+13)==mode){
-							game.saveConfig(i);
-						}
-					}
-				});
+			let config;
+			try{
+				config=JSON.parse(localStorage.getItem(`${lib.configprefix}config`));
+				if(!config||typeof config!='object') throw 'err';
 			}
+			catch(err){
+				config={};
+			}
+			Object.keys(config).forEach(value=>{
+				if(value.substr(value.indexOf('_mode_config')+13)==mode) delete config[value];
+			});
+			localStorage.setItem(`${lib.configprefix}config`,JSON.stringify(config));
+			localStorage.removeItem(`${lib.configprefix}${mode}`);
 		},
 		addPlayer:(position,character,character2)=>{
 			if(position<0||position>game.players.length+game.dead.length||position==undefined) position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
