@@ -38445,9 +38445,7 @@
 				}
 			}
 		},
-		saveConfigValue:function(key){
-			game.saveConfig(key,lib.config[key]);
-		},
+		saveConfigValue:key=>game.saveConfig(key,lib.config[key]),
 		saveExtensionConfig:(extension,key,value)=>game.saveConfig(`extension_${extension}_${key}`,value),
 		saveExtensionConfigValue:(extension,key)=>game.saveExtensionConfig(extension,key,game.getExtensionConfig(extension,key)),
 		getExtensionConfig:(extension,key)=>lib.config[`extension_${extension}_${key}`],
