@@ -38517,19 +38517,15 @@
 				event.trigger('enterGame');
 			});
 		},
-		restorePlayer:function(player){
+		restorePlayer:player=>{
 			if(game.players.contains(player)||game.dead.contains(player)) return;
-			var position=parseInt(player.dataset.position);
-			if(position<0||position>game.players.length+game.dead.length||position==undefined){
-				position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
-			}
-			var players=game.players.concat(game.dead);
+			let position=parseInt(player.dataset.position);
+			if(position<0||position>game.players.length+game.dead.length||position==undefined) position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
+			const players=game.players.concat(game.dead);
 			ui.arena.setNumber(players.length+1);
-			for(var i=0;i<players.length;i++){
-				if(parseInt(players[i].dataset.position)>=position){
-					players[i].dataset.position=parseInt(players[i].dataset.position)+1;
-				}
-			}
+			players.forEach(value=>{
+				if(parseInt(value.dataset.position)>=position) value.dataset.position=parseInt(value.dataset.position)+1;
+			});
 			game.players.push(player);
 			delete player.removed;
 			player.removeAttribute('style');
