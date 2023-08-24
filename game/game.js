@@ -38227,64 +38227,51 @@
 				};
 			}
 		},
-		save:function(key,value,mode){
+		save:(key,value,mode)=>{
 			if(_status.reloading) return;
 			mode=mode||lib.config.mode;
-			if(!lib.db){
-				var config={};
-				if(key){
-					try{
-						config=JSON.parse(localStorage.getItem(lib.configprefix+mode));
-						if(typeof config!='object') throw 'err';
-					}
-					catch(err){
-						config={};
-					}
-					if(value==undefined){
-						delete config[key];
-						if(mode==lib.config.mode) delete lib.storage[key];
-					}
-					else{
-						config[key]=value;
-						if(mode==lib.config.mode) lib.storage[key]=value;
-					}
+			if(lib.db){
+				if(!key){
+					game.putDB('data',mode,get.copy(lib.storage));
+					return;
+				}
+				if(mode==lib.config.mode){
+					if(value==undefined) delete lib.storage[key];
+					else lib.storage[key]=value;
+					lib.storage.version=lib.version;
+					game.putDB('data',mode,lib.storage);
+				}
+				else game.getDB('data',mode,config=>{
+					if(!config) config={};
+					if(value==undefined) delete config[key];
+					else config[key]=value;
 					config.version=lib.version;
-					localStorage.setItem(lib.configprefix+mode,JSON.stringify(config));
-				}
-				else{
-					localStorage.setItem(lib.configprefix+mode,JSON.stringify(lib.storage));
-				}
+					game.putDB('data',mode,config);
+				});
+				return;
+			}
+			if(!key){
+				localStorage.setItem(`${lib.configprefix}${mode}`,JSON.stringify(lib.storage));
+				return;
+			}
+			let config;
+			try{
+				config=JSON.parse(localStorage.getItem(`${lib.configprefix}${mode}`));
+				if(typeof config!='object') throw 'err';
+			}
+			catch(err){
+				config={};
+			}
+			if(value==undefined){
+				delete config[key];
+				if(mode==lib.config.mode) delete lib.storage[key];
 			}
 			else{
-				if(key){
-					if(mode==lib.config.mode){
-						if(value==undefined){
-							delete lib.storage[key];
-						}
-						else{
-							lib.storage[key]=value;
-						}
-						lib.storage.version=lib.version;
-						game.putDB('data',mode,lib.storage);
-					}
-					else{
-						game.getDB('data',mode,function(config){
-							if(!config) config={};
-							if(value==undefined){
-								delete config[key];
-							}
-							else{
-								config[key]=value;
-							}
-							config.version=lib.version;
-							game.putDB('data',mode,config);
-						});
-					}
-				}
-				else{
-					game.putDB('data',mode,get.copy(lib.storage));
-				}
+				config[key]=value;
+				if(mode==lib.config.mode) lib.storage[key]=value;
 			}
+			config.version=lib.version;
+			localStorage.setItem(`${lib.configprefix}${mode}`,JSON.stringify(config));
 		},
 		showChangeLog:()=>{
 			if(lib.version==lib.config.version&&!_status.extensionChangeLog) return;
