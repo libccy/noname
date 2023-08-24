@@ -38600,91 +38600,40 @@
 			}
 			return player2;
 		},
-		arrangePlayers:function(){
+		arrangePlayers:()=>{
 			if(game.chess&&game.me){
-				var friendCount=0;
-				var enemyCount=0;
-				var rand=Math.random()<0.5;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].side==game.me.side){
-						if(rand){
-							if(game.players[i]==game.friendZhu){
-								game.players[i]._sortCount=-2;
-							}
-							else{
-								game.players[i]._sortCount=2*friendCount;
-							}
-						}
-						else{
-							if(game.players[i]==game.friendZhu){
-								game.players[i]._sortCount=-1;
-							}
-							else{
-								game.players[i]._sortCount=2*friendCount+1;
-							}
-						}
+				let friendCount=0,enemyCount=0;
+				const rand=Math.random()<0.5,sortCount=new Map();
+				game.players.forEach(value=>{
+					if(value.side==game.me.side){
+						if(rand) if(value==game.friendZhu) sortCount.set(value,-2);
+						else sortCount.set(value,2*friendCount);
+						else if(value==game.friendZhu) sortCount.set(value,-1);
+						else sortCount.set(value,2*friendCount+1);
 						friendCount++;
+						return;
 					}
-					else{
-						if(rand){
-							if(game.players[i]==game.enemyZhu){
-								game.players[i]._sortCount=-1;
-							}
-							else{
-								game.players[i]._sortCount=2*enemyCount+1;
-							}
-						}
-						else{
-							if(game.players[i]==game.enemyZhu){
-								game.players[i]._sortCount=-2;
-							}
-							else{
-								game.players[i]._sortCount=2*enemyCount;
-							}
-						}
-						enemyCount++;
-					}
-				}
-				game.players.sort(function(a,b){
-					return a._sortCount-b._sortCount;
+					if(rand) if(value==game.enemyZhu) sortCount.set(value,-1);
+					else sortCount.set(value,2*enemyCount+1);
+					else if(value==game.enemyZhu) sortCount.set(value,-2);
+					else sortCount.set(value,2*enemyCount);
+					enemyCount++;
 				});
-				for(var i=0;i<game.players.length;i++){
-					delete game.players[i]._sortCount;
-				}
+				game.players.sort((a,b)=>sortCount.get(a)-sortCount.get(b));
 			}
-			else{
-				game.players.sort(lib.sort.position);
-			}
-			var players=game.players.concat(game.dead);
-			players.sort(lib.sort.position);
-			for(var i=0;i<players.length;i++){
-				if(i==0){
-					players[i].previousSeat=players[players.length-1];
-				}
-				else{
-					players[i].previousSeat=players[i-1];
-				}
-				if(i==players.length-1){
-					players[i].nextSeat=players[0];
-				}
-				else{
-					players[i].nextSeat=players[i+1];
-				}
-			}
-			for(var i=0;i<game.players.length;i++){
-				if(i==0){
-					game.players[i].previous=game.players[game.players.length-1];
-				}
-				else{
-					game.players[i].previous=game.players[i-1];
-				}
-				if(i==game.players.length-1){
-					game.players[i].next=game.players[0];
-				}
-				else{
-					game.players[i].next=game.players[i+1];
-				}
-			}
+			else game.players.sort(lib.sort.position);
+			game.players.concat(game.dead).sort(lib.sort.position).forEach((value,index,array)=>{
+				if(index==0) value.previousSeat=array[array.length-1];
+				else value.previousSeat=array[index-1];
+				if(index==array.length-1) value.nextSeat=array[0];
+				else value.nextSeat=array[index+1];
+			});
+			game.players.forEach((value,index,array)=>{
+				if(index==0) value.previous=array[array.length-1];
+				else value.previous=array[index-1];
+				if(index==array.length-1) value.next=array[0];
+				else value.next=array[index+1];
+			});
 		},
 		filterSkills:(skills,player,exclude)=>{
 			const out=skills.slice().removeArray(Object.keys(player.disabledSkills));
