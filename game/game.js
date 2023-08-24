@@ -38169,30 +38169,28 @@
 				return;
 			}
 			lib.status.reload++;
-			var store=lib.db.transaction([type],'readwrite').objectStore(type);
+			const store=lib.db.transaction([type],'readwrite').objectStore(type);
 			if(id){
-				store.get(id).onsuccess=function(e){
+				store.get(id).onsuccess=e=>{
 					_status.dburgent=true;
 					callback(e.target.result);
 					delete _status.dburgent;
 					game.reload2();
 				};
+				return;
 			}
-			else{
-				var obj={};
-				store.openCursor().onsuccess=function(e){
-					var cursor=e.target.result;
-					if(cursor){
-						obj[cursor.key]=cursor.value;
-						cursor.continue();
-					}
-					else{
-						_status.dburgent=true;
-						callback(obj);
-						delete _status.dburgent;
-						game.reload2();
-					}
+			const obj={};
+			store.openCursor().onsuccess=e=>{
+				const cursor=e.target.result;
+				if(cursor){
+					obj[cursor.key]=cursor.value;
+					cursor.continue();
+					return;
 				}
+				_status.dburgent=true;
+				callback(obj);
+				delete _status.dburgent;
+				game.reload2();
 			}
 		},
 		deleteDB:function(type,id,callback){
