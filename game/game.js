@@ -38573,13 +38573,13 @@
 			},500);
 			return player;
 		},
-		replacePlayer:function(player,character,character2){
+		replacePlayer:(player,character,character2)=>{
 			player.removed=true;
-			var position=parseInt(player.dataset.position);
+			const position=parseInt(player.dataset.position);
 			game.players.remove(player);
 			game.dead.remove(player);
 			player.delete();
-			var player2=ui.create.player(ui.arena).animate('start');
+			const player2=ui.create.player(ui.arena).animate('start');
 			if(character) player2.init(character,character2);
 			game.players.push(player2);
 			player2.dataset.position=position;
@@ -38587,17 +38587,19 @@
 			player2.previousSeat=player.previousSeat;
 			player2.nextSeat.previousSeat=player2;
 			player2.previousSeat.nextSeat=player2;
-			var player3=player2.nextSeat;
-			while(player3.isDead()) player3=player3.nextSeat;
+			const player3=player2.nextSeat;
+			while(player3.isDead()){
+				player3=player3.nextSeat;
+			}
 			player3.previous=player2;
 			player2.next=player3;
-			var player4=player2.previousSeat;
-			while(player4.isDead()) player4=player4.previousSeat;
+			const player4=player2.previousSeat;
+			while(player4.isDead()){
+				player4=player4.previousSeat;
+			}
 			player4.next=player2;
 			player2.previous=player4;
-			if(_status.roundStart==player){
-				_status.roundStart=player2;
-			}
+			if(_status.roundStart==player) _status.roundStart=player2;
 			return player2;
 		},
 		arrangePlayers:()=>{
