@@ -38510,12 +38510,13 @@
 			game.players.push(player);game.arrangePlayers();
 			return player;
 		},
-		triggerEnter:function(player){
-			var next=game.createEvent('enterGame',false);
+		triggerEnter:player=>{
+			const next=game.createEvent('enterGame',false);
 			next.player=player;
-			next.setContent(function(){
+			next.setContent(()=>{
 				event.trigger('enterGame');
 			});
+			return next;
 		},
 		restorePlayer:player=>{
 			if(game.players.contains(player)||game.dead.contains(player)) return;
