@@ -38803,18 +38803,12 @@
 			}
 			return null;
 		},
-		findCards:function(func,all){
-			var cards=[];
-			for(var i in lib.card){
-				if(!lib.translate[i+'_info']) continue;
-				if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
-				if(!all&&!lib.inpile.contains(i)) continue;
-				if(func(i,lib.card[i])){
-					cards.push(i);
-				}
-			}
-			return cards;
-		},
+		findCards:(func,all)=>Object.keys(lib.card).filter(value=>{
+			if(!lib.translate[`${value}_info`]) return false;
+			if(lib.card[value].mode&&lib.card[value].mode.includes(lib.config.mode)==false) return false;
+			if(!all&&!lib.inpile.includes(value)) return false;
+			return func(value,lib.card[value]);
+		}),
 		countGroup:()=>{
 			const list=lib.group.slice(0);
 			return game.countPlayer(current=>{
