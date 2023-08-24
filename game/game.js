@@ -38739,22 +38739,15 @@
 			}
 			return false;
 		},
-		countPlayer:function(func,includeOut){
-			var num=0;
-			if(typeof func!='function'){
-				func=lib.filter.all;
-			}
-			for(var i=0;i<game.players.length;i++){
-				if(!includeOut&&game.players[i].isOut()) continue;
-				var result=func(game.players[i]);
-				if(typeof result=='number'){
-					num+=result;
-				}
-				else if(result){
-					num++;
-				}
-			}
-			return num;
+		countPlayer:(func,includeOut)=>{
+			if(typeof func!='function') func=lib.filter.all;
+			return game.players.reduce((previousValue,currentValue)=>{
+				if(!includeOut&&currentValue.isOut()) return previousValue;
+				const result=func(currentValue);
+				if(typeof result=='number') previousValue+=result;
+				else if(result) previousValue++;
+				return previousValue;
+			},0);
 		},
 		countPlayer2:(func,includeOut)=>{
 			if(typeof func!='function') func=lib.filter.all;
