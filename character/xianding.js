@@ -108,7 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var num=1,current=_status.currentPhase;
-					if(current&&trigger.player!=current){
+					if(current&&trigger.source!=current){
 						var num=0,players=game.players.slice(0).concat(game.dead);
 						for(var target of players){
 							target.getHistory('sourceDamage',function(evt){
@@ -5566,7 +5566,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var evt=trigger.getl(player);
 							var num=0;
 							player.getHistory('lose',function(evt){
-								if(!goon||evt.type!='discard') return false;
+								if(evt.type!='discard') return false;
 								num+=evt.cards2.length;
 							});
 							var cards=[];
@@ -5597,52 +5597,148 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var list=lib.skill.dchuishu.getList(player);
-					event.initial_list=list.slice(0);
-					var min=list[0];
+					var min=list[0],max=list[0];
 					for(var i of list){
 						if(i<min) min=i;
+						if(i>max) max=i;
 					}
 					var exps=['摸牌数[','弃牌数[','目标牌数['];
-					var choices=[];
+					var choices_min=[],choices_max=[];
 					for(var i=0;i<list.length;i++){
-						if(list[i]==min) choices.push(exps[i]+min+']');
+						if(list[i]==min) choices_min.push(exps[i]+min+']');
+						if(list[i]==max) choices_max.push(exps[i]+max+']');
 					}
-					if(choices.length==1) event._result={control:choices[0]};
-					else player.chooseControl(choices).set('prompt','易数：令〖慧淑〗的一个数值+2').set('prompt2','摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做，你弃置['+list[1]+']张手牌；且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等同于本回合弃牌数的锦囊牌。');
+					if(choices_min.length==1&&choices_max.length==1){
+						event._result={bool:true,min:choices_min[0],max:choices_max[0]};
+					}
+					else{
+						if(player.isUnderControl()) game.swapPlayerAuto(player);
+						var switchToAuto=function(){
+							_status.imchoosing=false;
+							event._result={
+								bool:true,
+								min:choices_min[0],
+								max:choices_max[0],
+							};
+							if(event.dialog) event.dialog.close();
+							if(event.control) event.control.close();
+						};
+						var chooseButton=function(player,min,max){
+							var event=_status.event;
+							player=player||event.player;
+							var list=lib.skill.dchuishu.getList(player);
+							if(!event._result) event._result={};
+							var dialog=ui.create.dialog('###易数：请选择更改的数值###令〖慧淑〗的一个最小数值+2并令一个最大数值-1','forcebutton','hidden');
+							event.dialog=dialog;
+							dialog.addText('最小值+2');
+							var table=document.createElement('div');
+							table.classList.add('add-setting');
+							table.style.margin='0';
+							table.style.width='100%';
+							table.style.position='relative';
+							for(var i=0;i<min.length;i++){
+								var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
+								td.link=min[i];
+								table.appendChild(td);
+								td.innerHTML='<span>'+min[i]+'</span>';
+								td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+									if(_status.dragged) return;
+									if(_status.justdragged) return;
+									_status.tempNoButton=true;
+									setTimeout(function(){
+										_status.tempNoButton=false;
+									},500);
+									var link=this.link;
+									var current=this.parentNode.querySelector('.bluebg');
+									if(current) current.classList.remove('bluebg');
+									this.classList.add('bluebg');
+									event._result.min=link;
+								});
+							}
+							dialog.content.appendChild(table);
+							dialog.addText('最大值-1');
+							var table2=document.createElement('div');
+							table2.classList.add('add-setting');
+							table2.style.margin='0';
+							table2.style.width='100%';
+							table2.style.position='relative';
+							for(var i=0;i<max.length;i++){
+								var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
+								td.link=max[i];
+								table2.appendChild(td);
+								td.innerHTML='<span>'+max[i]+'</span>';
+								td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
+									if(_status.dragged) return;
+									if(_status.justdragged) return;
+									_status.tempNoButton=true;
+									setTimeout(function(){
+										_status.tempNoButton=false;
+									},500);
+									var link=this.link;
+									var current=this.parentNode.querySelector('.bluebg');
+									if(current) current.classList.remove('bluebg');
+									this.classList.add('bluebg');
+									event._result.max=link;
+								});
+							}
+							dialog.content.appendChild(table2);
+							dialog.add('　　');
+							event.dialog.open();
+							
+							event.switchToAuto=function(){
+								event._result={
+									bool:true,
+									min:min[0],
+									max:max[0],
+								};
+								event.dialog.close();
+								event.control.close();
+								game.resume();
+								_status.imchoosing=false;
+							};
+							event.control=ui.create.control('ok',function(link){
+								var result=event._result;
+								if(!result.min||!result.max) return;
+								result.bool=true;
+								event.dialog.close();
+								event.control.close();
+								game.resume();
+								_status.imchoosing=false;
+							});
+							for(var i=0;i<event.dialog.buttons.length;i++){
+								event.dialog.buttons[i].classList.add('selectable');
+							}
+							game.pause();
+							game.countChoose();
+						};
+						if(event.isMine()) chooseButton(player,choices_min,choices_max);
+						else if(event.isOnline()){
+							event.player.send(chooseButton,event.player,choices_min,choices_max);
+							event.player.wait();
+							game.pause();
+						}
+						else switchToAuto();
+					}
 					'step 1'
-					var result=result.control.slice(0,result.control.indexOf('['));
-					var exps=['摸牌数','弃牌数','目标牌数'];
-					var index=exps.indexOf(result),list=lib.skill.dchuishu.getList(player);
-					list[index]+=2;
-					game.log(player,'令','#g【慧淑】','中的','#y'+result,'+2');
-					player.storage.dchuishu=list;
+					var map=event.result||result;
+					if(map.bool){
+						var min=map.min,max=map.max;
+						min=min.slice(0,min.indexOf('['));
+						max=max.slice(0,max.indexOf('['));
+						var exps=['摸牌数','弃牌数','目标牌数'];
+						var list=lib.skill.dchuishu.getList(player);
+						list[exps.indexOf(min)]+=2;
+						list[exps.indexOf(max)]--;
+						game.log(player,'令','#g【慧淑】','中的','#y'+min,'+2');
+						game.log(player,'令','#g【慧淑】','中的','#y'+max,'-1');
+						player.storage.dchuishu=list;
+					}
+					else event.finish();
 					'step 2'
-					var list=lib.skill.dchuishu.getList(player);
-					var max=event.initial_list[0];
-					for(var i of event.initial_list){
-						if(i<max) max=i;
-					}
-					var exps=['摸牌数[','弃牌数[','目标牌数['];
-					var choices=[];
-					for(var i=0;i<list.length;i++){
-						if(event.initial_list[i]==max) choices.push(exps[i]+list[i]+']');
-					}
-					if(choices.length==1) event._result={control:choices[0]};
-					else player.chooseControl(choices).set('prompt','易数：令〖慧淑〗的一个数值-1').set('prompt2','摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做，你弃置['+list[1]+']张手牌；且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等同于本回合弃牌数的锦囊牌。');
-					'step 3'
-					var result=result.control.slice(0,result.control.indexOf('['));
-					var exps=['摸牌数','弃牌数','目标牌数'];
-					var index=exps.indexOf(result),list=lib.skill.dchuishu.getList(player);
-					list[index]--;
-					game.log(player,'令','#g【慧淑】','中的','#y'+result,'-1');
-					player.storage.dchuishu=list;
-					'step 4'
 					player.markSkill('dchuishu');
 					game.delayx();
 				},
-				ai:{
-					combo:'dchuishu',
-				},
+				ai:{combo:'dchuishu'},
 			},
 			dcligong:{
 				audio:2,
@@ -11547,7 +11643,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dchuishu:'慧淑',
 			dchuishu_info:'摸牌阶段结束时，你可以摸[3]张牌。若如此做：你弃置[1]张手牌，且当你于本回合内弃置第[2]+1张牌后，你从弃牌堆中随机获得等同于本回合弃牌数的锦囊牌。',
 			dcyishu:'易数',
-			dcyishu_info:'锁定技。当你不因出牌阶段而失去牌后，你令A={〖慧淑〗的中括号内最小的数字}，B={〖慧淑〗的中括号内最大的数字}。然后你令A中的一个数字+2，且B中的一个数字-1。',
+			dcyishu_info:'锁定技。当你不因出牌阶段而失去牌后，你同时令{〖慧淑〗的中括号内最小的一个数字+2}且{〖慧淑〗的中括号内最大的一个数字-1}。',
 			dcligong:'离宫',
 			dcligong_info:'觉醒技。准备阶段，若〖慧淑〗的中括号内有不小于5的数字，则你加1点体力上限，回复1点体力并失去〖易数〗。系统随机检索四张吴势力的女性武将牌，然后你选择一项：⒈摸三张牌。⒉失去〖慧淑〗，然后获得这些武将牌上的任意两个非Charlotte技能。',
 			dingshangwan:'丁尚涴',

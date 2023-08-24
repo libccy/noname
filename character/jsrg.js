@@ -1880,8 +1880,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				addVisitors:function(characters,player){
 					player.addSkillBlocker('sbyingmen');
-					game.log(player,'将','#y'+get.translation(characters),'加入了','#g“访客”')
-					lib.skill.rehuashen.drawCharacter(player,characters);
+					game.log(player,'将','#y'+get.translation(characters),'加入了','#g“访客”');
+					game.broadcastAll(function(player,characters){
+						player.$draw(characters.map(function(name){
+							var cardname='huashen_card_'+name;
+							lib.card[cardname]={
+								fullimage:true,
+								image:'character:'+name
+							};
+							lib.translate[cardname]=get.rawName2(name);
+							return game.createCard(cardname,' ',' ');
+						}),'nobroadcast');
+					},player,characters);
 					player.markAuto('sbyingmen',characters)
 					var storage=player.getStorage('sbyingmen');
 					var skills=lib.skill.sbyingmen.getSkills(storage,player);
