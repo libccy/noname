@@ -37810,7 +37810,7 @@
 			game.dead.length=0;
 			game.me=null;
 		},
-		clearConnect:function(){
+		clearConnect:()=>{
 			if(ui.ipnode){
 				ui.ipnode.remove();
 				delete ui.ipnode;
@@ -37836,27 +37836,24 @@
 				delete ui.startServer;
 			}
 			if(ui.rooms){
-				for(var i=0;i<ui.rooms.length;i++){
-					ui.rooms[i].remove();
-				}
+				ui.rooms.forEach(value=>value.remove());
 				delete ui.rooms;
 			}
 			if(ui.roombase){
 				ui.roombase.remove();
 				delete ui.roombase;
 			}
-			if(ui.connectEvents){
-				ui.connectEvents.remove();
-				ui.connectEventsCount.remove();
-				ui.connectClients.remove();
-				ui.connectClientsCount.remove();
-				ui.createRoomButton.remove();
-				delete ui.connectEvents;
-				delete ui.connectEventsCount;
-				delete ui.connectClients;
-				delete ui.connectClientsCount;
-				delete ui.createRoomButton;
-			}
+			if(!ui.connectEvents) return;
+			ui.connectEvents.remove();
+			ui.connectEventsCount.remove();
+			ui.connectClients.remove();
+			ui.connectClientsCount.remove();
+			ui.createRoomButton.remove();
+			delete ui.connectEvents;
+			delete ui.connectEventsCount;
+			delete ui.connectClients;
+			delete ui.connectClientsCount;
+			delete ui.createRoomButton;
 		},
 		log:function(){
 			let str='',str2='',logvid=null;
