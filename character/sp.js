@@ -18118,9 +18118,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(event.targets.length!=1||!['sha','juedou'].contains(event.card.name)) return false;
-					return player.getHistory('useCard',function(evt){
-						return evt.card.name==event.card.name;
-					}).indexOf(event.getParent())==0;
+					var evtx=event.getParent();
+					return !player.hasHistory('useCard',function(evt){
+						return evt!=evtx&&evt.card.name==event.card.name;
+					},evtx)
 				},
 				direct:true,
 				content:function(){

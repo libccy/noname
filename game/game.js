@@ -24523,25 +24523,31 @@
 					if(!key) return this.actionHistory[this.actionHistory.length-1];
 					if(!filter) return this.actionHistory[this.actionHistory.length-1][key];
 					else{
-						var history=this.getHistory(key).slice(0);
-						if(last) history=history.slice(0,history.indexOf(last)+1);
-						for(var i=0;i<history.length;i++){
-							if(!filter(history[i])) history.splice(i--,1);
+						const history=this.getHistory(key);
+						if(last){
+							const lastIndex=history.indexOf(last);
+							return history.filter(function(event,index){
+								if(index>lastIndex) return false;
+								return filter(event);
+							})
 						}
-						return history;
+						return history.filter(filter);
 					}
 				},
 				hasHistory:function(key,filter,last){
-					var history=this.getHistory(key).slice(0);
-					if(last) history=history.slice(0,history.indexOf(last)+1);
-					for(var i=0;i<history.length;i++){
-						if(filter(history[i])) return true;
+					const history=this.getHistory(key);
+					if(last){
+						const lastIndex=history.indexOf(last);
+						return history.some(function(event,index){
+							if(index>lastIndex) return false;
+							return filter(event);
+						})
 					}
-					return false;
+					return history.some(filter);
 				},
 				getLastHistory:function(key,filter,last){
-					var history=false;
-					for(var i=this.actionHistory.length-1;i>=0;i--){
+					let history=false;
+					for(let i=this.actionHistory.length-1;i>=0;i--){
 						if(this.actionHistory[i].isMe){
 							history=this.actionHistory[i];break;
 						}
@@ -24550,42 +24556,52 @@
 					if(!key) return history;
 					if(!filter) return history[key];
 					else{
-						history=history.slice(0);
-						if(last) history=history.slice(0,history.indexOf(last)+1);
-						for(var i=0;i<history.length;i++){
-							if(!filter(history[i])) history.splice(i--,1);
+						if(last){
+							const lastIndex=history.indexOf(last);
+							return history.filter(function(event,index){
+								if(index>lastIndex) return false;
+								return filter(event);
+							})
 						}
-						return history;
+						return history.filter(filter);
 					}
 				},
 				getAllHistory:function(key,filter,last){
-					var list=[];
-					var all=this.actionHistory;
-					for(var j=0;j<all.length;j++){
+					const history=[];
+					const all=this.actionHistory;
+					for(let j=0;j<all.length;j++){
 						if(!key||!all[j][key]){
-							list.push(all[j]);
+							history.push(all[j]);
 						}
 						else{
-							if(!filter) list.addArray(all[j][key]);
-							else{
-								var history=all[j][key].slice(0);
-								if(last) history=history.slice(0,history.indexOf(last)+1);
-								for(var i=0;i<history.length;i++){
-									if(filter(history[i])) list.push(history[i]);
-								}
-							}
+							history.push(...all[j][key]);
 						}
 					}
-					return list;
+					if(filter){
+						if(last){
+							const lastIndex=history.indexOf(last);
+							return history.filter(function(event,index){
+								if(index>lastIndex) return false;
+								return filter(event);
+							});
+						}
+						return history.filter(filter);
+					}
+					return history;
 				},
 				hasAllHistory:function(key,filter,last){
-					var list=[];
-					var all=this.actionHistory;
-					for(var j=0;j<all.length;j++){
-						var history=all[j][key].slice(0);
-						if(last) history=history.slice(0,history.indexOf(last)+1);
-						for(var i=0;i<history.length;i++){
-							if(filter(history[i])) return true;
+					const all=this.actionHistory;
+					for(let j=0;j<all.length;j++){
+						let history=all[j][key];
+						if(last){
+							const lastIndex=history.indexOf(last);
+							if(history.some(function(event,index){
+								if(index>lastIndex) return false;
+								return filter(event);
+							})) return true;
+						}
+						else{
+							if(history.some(filter)) return true;
 						}
 					}
 					return false;
@@ -31337,35 +31353,43 @@
 			if(get.mode()!='chess'&&rank.junk.contains(name)) return 'junk';
 			return 'common';
 		},
-		getGlobalHistory:function(key,filter){
+		getGlobalHistory:function(key,filter,last){
 			if(!key) return _status.globalHistory[_status.globalHistory.length-1];
 			if(!filter) return _status.globalHistory[_status.globalHistory.length-1][key];
 			else{
-				var history=game.getGlobalHistory(key).slice(0);
-				for(var i=0;i<history.length;i++){
-					if(!filter(history[i])) history.splice(i--,1);
+				const history=game.getGlobalHistory(key);
+				if(last){
+					const lastIndex=history.indexOf(last);
+					return history.filter(function(event,index){
+						if(index>lastIndex) return false;
+						return filter(event);
+					})
 				}
-				return history;
+				return history.filter(filter);
 			}
 		},
-		getAllGlobalHistory:function(key,filter){
-			var list=[];
-			var all=_status.globalHistory;
+		getAllGlobalHistory:function(key,filter,last){
+			const history=[];
+			const all=_status.globalHistory;
 			for(var j=0;j<all.length;j++){
 				if(!key||!all[j][key]){
-					list.push(all[j]);
+					history.push(all[j]);
 				}
 				else{
-					if(!filter) list.addArray(all[j][key]);
-					else{
-						var history=all[j][key].slice(0);
-						for(var i=0;i<history.length;i++){
-							if(filter(history[i])) list.push(history[i]);
-						}
-					}
+					list.push(...all[j][key]);
 				}
 			}
-			return list;
+			if(filter){
+				if(last){
+					const lastIndex=history.indexOf(last);
+					return history.filter(function(event,index){
+						if(index>lastIndex) return false;
+						return filter(event);
+					});
+				}
+				return history.filter(filter);
+			}
+			return history;
 		},
 		cardsDiscard:function(cards){
 			var type=get.itemtype(cards);
@@ -38853,13 +38877,13 @@
 					}
 					intro.innerHTML=get.translation(rarity);
 				}
-				if((button.link=='xushu'||button.link=='xin_xushu'||button.link=='jsrg_guanyu')&&button.node&&button.node.name&&button.node.group){
+				/*if((button.link=='xushu'||button.link=='xin_xushu'||button.link=='jsrg_guanyu')&&button.node&&button.node.name&&button.node.group){
 					if(button.classList.contains('newstyle')){
 						button.node.name.dataset.nature='watermm';
 						button.node.group.dataset.nature='water';
 					}
 					else button.node.group.style.backgroundColor=get.translation('weiColor');
-				}
+				}*/
 			},
 			div:function(){
 				var str,innerHTML,position,position2,style,divposition,listen;
@@ -48076,7 +48100,7 @@
 					node._link=item;
 					if(_status.noReplaceCharacter&&type=='characterx') type='character';
 					if(type=='characterx'){
-						if(lib.characterReplace[item]&&lib.characterReplace[item].length) item=lib.characterReplace[item][0];
+						if(lib.characterReplace[item]&&lib.characterReplace[item].length) item=lib.characterReplace[item].randomGet();
 					}
 					node.link=item;
 					if(type=='character'||type=='characterx'){
@@ -48111,12 +48135,14 @@
 								if(lib.config.buttoncharacter_style=='simple'){
 									node.node.group.style.display='none';
 								}
-								node.node.name.dataset.nature=get.groupnature(infoitem[1]);
-								node.node.group.dataset.nature=get.groupnature(infoitem[1],'raw');
 								node.classList.add('newstyle');
 								if(double&&double.length){
 									node.node.name.dataset.nature=get.groupnature(double[0]);
 									node.node.group.dataset.nature=get.groupnature(double[double.length==2?1:0]);
+								}
+								else{
+									node.node.name.dataset.nature=get.groupnature(get.bordergroup(infoitem));
+									node.node.group.dataset.nature=get.groupnature(get.bordergroup(infoitem),'raw');
 								}
 								ui.create.div(node.node.hp);
 								var hp=get.infoHp(infoitem[2]),maxHp=get.infoMaxHp(infoitem[2]),hujia=get.infoHujia(infoitem[2]);
@@ -48186,7 +48212,7 @@
 									node.node.group.innerHTML=str;
 								}
 								else node.node.group.innerHTML='<div>'+get.translation(infoitem[1])+'</div>';
-								node.node.group.style.backgroundColor=get.translation(infoitem[1]+'Color');
+								node.node.group.style.backgroundColor=get.translation(get.bordergroup(infoitem)+'Color');
 							}
 							else{
 								node.node.group.style.display='none';
@@ -53484,6 +53510,20 @@
 			}
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
 			return '暂无武将介绍';
+		},
+		bordergroup:function(info){
+			if(!Array.isArray(info)){
+				info=lib.character[info];
+				if(!info) return '';
+			}
+			if(Array.isArray(info[4])){
+				for(let str of info[4]){
+					if(typeof str=='string'&&str.indexOf('border:')==0){
+						return str.slice(7);
+					}
+				}
+			}
+			return info[1];
 		},
 		groupnature:function(group,method){
 			var nature=lib.groupnature[group];

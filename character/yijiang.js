@@ -34,7 +34,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caozhi:['male','wei',3,['luoying','jiushi']],
 			caochong:['male','wei',3,['chengxiang','renxin']],
 			xunyou:['male','wei',3,['qice','zhiyu'],['clan:颍川荀氏']],
-			xin_xushu:['male','shu',3,['xinwuyan','xinjujian']],
+			xin_xushu:['male','shu',3,['xinwuyan','xinjujian'],['border:wei']],
 			xin_masu:['male','shu',3,['olsanyao','rezhiman']],
 			zhuran:['male','wu',4,['danshou']],
 			xusheng:['male','wu',4,['xinpojun']],

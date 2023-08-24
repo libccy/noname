@@ -32,7 +32,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_lvbu:['male','qun',5,['jsrgwuchang','jsrgqingjiao','jsrgchengxu'],['doublegroup:qun:shu']],
 			jsrg_zhanghe:['male','wei',4,['jsrgqiongtu','jsrgxianzhu'],['doublegroup:qun:wei']],
 			jsrg_zoushi:['female','qun',3,['jsrgguyin','jsrgzhangdeng']],
-			jsrg_guanyu:['male','shu',5,['jsrgguanjue','jsrgnianen']],
+			jsrg_guanyu:['male','shu',5,['jsrgguanjue','jsrgnianen'],['border:wei']],
 			jsrg_chendeng:['male','qun',3,['jsrglunshi','jsrgguitu']],
 			jsrg_zhenji:['female','qun',3,['jsrgjixiang','jsrgchengxian']],
 			jsrg_zhangliao:['male','qun',4,['jsrgzhengbing','jsrgtuwei'],['doublegroup:qun:wei']],
