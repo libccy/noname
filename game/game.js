@@ -38538,20 +38538,16 @@
 			game.arrangePlayers();
 			return player;
 		},
-		removePlayer:function(player){
-			if(_status.roundStart==player){
-				_status.roundStart=player.next||player.getNext()||game.players[0];
-			}
-			var players=game.players.concat(game.dead);
-			player.style.left=player.getLeft()+'px';
-			player.style.top=player.getTop()+'px';
+		removePlayer:player=>{
+			if(_status.roundStart==player) _status.roundStart=player.next||player.getNext()||game.players[0];
+			const players=game.players.concat(game.dead);
+			player.style.left=`${player.getLeft()}px`;
+			player.style.top=`${player.getTop()}px`;
 			if(player==undefined) player=game.dead[0]||game.me.next;
-			var position=parseInt(player.dataset.position);
-			for(var i=0;i<players.length;i++){
-				if(parseInt(players[i].dataset.position)>position){
-					players[i].dataset.position=parseInt(players[i].dataset.position)-1;
-				}
-			}
+			const position=parseInt(player.dataset.position);
+			players.forEach(value=>{
+				if(parseInt(value.dataset.position)>position) value.dataset.position=parseInt(value.dataset.position)-1;
+			});
 			if(player.isAlive()){
 				player.next.previous=player.previous;
 				player.previous.next=player.next;
@@ -38568,9 +38564,7 @@
 				ui.auto.hide();
 				ui.wuxie.hide();
 			}
-			setTimeout(function(){
-				player.removeAttribute('style');
-			},500);
+			setTimeout(()=>player.removeAttribute('style'),500);
 			return player;
 		},
 		replacePlayer:(player,character,character2)=>{
