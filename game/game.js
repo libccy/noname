@@ -38815,13 +38815,12 @@
 			}
 			return cards;
 		},
-		countGroup:function(){
-			var list=lib.group.slice(0);
-			return game.countPlayer(function(current){
-				if(list.contains(current.group)){
-					list.remove(current.group);
-					return true;
-				}
+		countGroup:()=>{
+			const list=lib.group.slice(0);
+			return game.countPlayer(current=>{
+				if(!list.includes(current.group)) return false;
+				list.remove(current.group);
+				return true;
 			});
 		},
 		players:[],
