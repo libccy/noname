@@ -38731,14 +38731,7 @@
 			}
 			return false;
 		},
-		hasPlayer2:function(func,includeOut){
-			var players=game.players.slice(0).concat(game.dead);
-			for(var i=0;i<players.length;i++){
-				if(!includeOut&&players[i].isOut()) continue;
-				if(func(players[i])) return true;
-			}
-			return false;
-		},
+		hasPlayer2:(func,includeOut)=>game.players.concat(game.dead).some(value=>(includeOut||!value.isOut())&&func(value)),
 		countPlayer:(func,includeOut)=>{
 			if(typeof func!='function') func=lib.filter.all;
 			return game.players.reduce((previousValue,currentValue)=>{
