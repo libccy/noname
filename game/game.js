@@ -38784,15 +38784,7 @@
 			if(typeof func!='function') func=lib.filter.all;
 			return list.addArray(game.players.concat(game.dead).filter(value=>(includeOut||!value.isOut())&&func(value)));
 		},
-		findPlayer:function(func,includeOut){
-			for(var i=0;i<game.players.length;i++){
-				if(!includeOut&&game.players[i].isOut()) continue;
-				if(func(game.players[i])){
-					return game.players[i];
-				}
-			}
-			return null;
-		},
+		findPlayer:(func,includeOut)=>game.players.find(value=>(includeOut||!value.isOut())&&func(value))||null,
 		findPlayer2:(func,includeOut)=>game.players.concat(game.dead).find(value=>(includeOut||!value.isOut())&&func(value))||null,
 		findCards:(func,all)=>Object.keys(lib.card).filter(value=>{
 			if(!lib.translate[`${value}_info`]) return false;
