@@ -38387,63 +38387,34 @@
 				}
 			}
 		},
-		saveConfig:function(key,value,local,callback){
+		saveConfig:(key,value,local,callback)=>{
 			if(_status.reloading) return;
 			if(local){
-				var localmode;
-				if(typeof local=='string'){
-					localmode=local;
-				}
-				else{
-					localmode=lib.config.mode;
-				}
-				if(!lib.config.mode_config[localmode]){
-					lib.config.mode_config[localmode]={};
-				}
-				if(value==undefined){
-					delete lib.config.mode_config[localmode][key];
-				}
-				else{
-					lib.config.mode_config[localmode][key]=value;
-				}
-				key+='_mode_config_'+localmode;
+				const localmode=typeof local=='string'?local:lib.config.mode;
+				if(!lib.config.mode_config[localmode]) lib.config.mode_config[localmode]={};
+				if(value==undefined) delete lib.config.mode_config[localmode][key];
+				else lib.config.mode_config[localmode][key]=value;
+				key+=`_mode_config_${localmode}`;
 			}
-			else{
-				if(value==undefined){
-					delete lib.config[key];
-				}
-				else{
-					lib.config[key]=value;
-				}
+			else if(value==undefined) delete lib.config[key];
+			else lib.config[key]=value;
+			if(lib.db){
+				if(value==undefined) game.deleteDB('config',key,callback);
+				else game.putDB('config',key,value,callback);
+				return;
 			}
-			if(!lib.db){
-				var config;
-				try{
-					config=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
-					if(!config||typeof config!='object') throw 'err'
-				}
-				catch(err){
-					config={};
-				}
-				if(value===undefined){
-					delete config[key];
-				}
-				else{
-					config[key]=value;
-				}
-				localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
-				if(callback){
-					callback();
-				}
+			let config;
+			try{
+				config=JSON.parse(localStorage.getItem(`${lib.configprefix}config`));
+				if(!config||typeof config!='object') throw 'err';
 			}
-			else{
-				if(value==undefined){
-					game.deleteDB('config',key,callback);
-				}
-				else{
-					game.putDB('config',key,value,callback);
-				}
+			catch(err){
+				config={};
 			}
+			if(value===undefined) delete config[key];
+			else config[key]=value;
+			localStorage.setItem(`${lib.configprefix}config`,JSON.stringify(config));
+			if(callback) callback();
 		},
 		saveConfigValue:key=>game.saveConfig(key,lib.config[key]),
 		saveExtensionConfig:(extension,key,value)=>game.saveConfig(`extension_${extension}_${key}`,value),
