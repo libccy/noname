@@ -37776,7 +37776,7 @@
 			}
 			return arg[arg.length-1];
 		},
-		prepareArena:function(num){
+		prepareArena:num=>{
 			_status.prepareArena=true;
 			game.showHistory(false);
 			ui.create.players(num);
