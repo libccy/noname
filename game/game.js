@@ -37784,22 +37784,18 @@
 			ui.create.cardsAsync();
 			game.finishCards();
 		},
-		clearArena:function(){
+		clearArena:()=>{
 			ui.control.innerHTML='';
 			ui.arenalog.innerHTML='';
-			var nodes=[];
-			for(var i=0;i<ui.arena.childNodes.length;i++){
-				nodes.push(ui.arena.childNodes[i]);
-			}
-			for(var i=0;i<nodes.length;i++){
-				if(nodes[i]==ui.canvas) continue;
-				if(nodes[i]==ui.control) continue;
-				if(nodes[i]==ui.arenalog) continue;
-				if(nodes[i]==ui.roundmenu) continue;
-				if(nodes[i]==ui.timer) continue;
-				if(nodes[i]==ui.autonode) continue;
-				nodes[i].remove();
-			}
+			Array.from(ui.arena.childNodes).forEach(value=>{
+				if(value==ui.canvas) return;
+				if(value==ui.control) return;
+				if(value==ui.arenalog) return;
+				if(value==ui.roundmenu) return;
+				if(value==ui.timer) return;
+				if(value==ui.autonode) return;
+				value.remove();
+			});
 			ui.sidebar.innerHTML='';
 			ui.cardPile.innerHTML='';
 			ui.discardPile.innerHTML='';
