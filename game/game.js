@@ -38483,18 +38483,14 @@
 				});
 			}
 		},
-		addPlayer:function(position,character,character2){
-			if(position<0||position>game.players.length+game.dead.length||position==undefined){
-				position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
-			}
-			var players=game.players.concat(game.dead);
+		addPlayer:(position,character,character2)=>{
+			if(position<0||position>game.players.length+game.dead.length||position==undefined) position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
+			const players=game.players.concat(game.dead);
 			ui.arena.setNumber(players.length+1);
-			for(var i=0;i<players.length;i++){
-				if(parseInt(players[i].dataset.position)>=position){
-					players[i].dataset.position=parseInt(players[i].dataset.position)+1;
-				}
-			}
-			var player=ui.create.player(ui.arena).animate('start');
+			players.forEach(value=>{
+				if(parseInt(value.dataset.position)>=position) value.dataset.position=parseInt(value.dataset.position)+1;
+			});
+			const player=ui.create.player(ui.arena).animate('start');
 			if(character) player.init(character,character2);
 			game.players.push(player);
 			player.dataset.position=position;
