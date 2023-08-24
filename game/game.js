@@ -38686,17 +38686,10 @@
 				}
 			}
 		},
-		filterSkills:function(skills,player,exclude){
-			var out=skills.slice(0);
-			for(var i in player.disabledSkills){
-				out.remove(i);
-			}
-			if(player.storage.skill_blocker&&player.storage.skill_blocker.length){
-				for(var i=0;i<out.length;i++){
-					if((!exclude||!exclude.contains(out[i]))&&get.is.blocked(out[i],player)) out.splice(i--,1);
-				}
-			}
-			return out;
+		filterSkills:(skills,player,exclude)=>{
+			const out=skills.slice().removeArray(Object.keys(player.disabledSkills));
+			if(!player.storage.skill_blocker||!player.storage.skill_blocker.length) return out;
+			return out.filter(value=>exclude&&exclude.includes(value)||!get.is.blocked(value,player));
 		},
 		expandSkills:skills=>skills.addArray(skills.reduce((previousValue,currentValue)=>{
 			const info=get.info(currentValue);
