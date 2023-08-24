@@ -28627,7 +28627,7 @@
 					if(!lib.filter.cardUsable2(card,player)&&!game.checkMod(card,player,target,false,'cardUsableTarget',player)) return false;
 				}
 				var info=get.info(card);
-				if(info.singleCard&&info.filterAddedTarget&&ui.selected.targets.length) return info.filterAddedTarget(card,player,target,ui.selected.targets[ui.selected.targets.length-1]);
+				if(info.singleCard&&info.filterAddedTarget&&ui.selected.targets.length) return Boolean(info.filterAddedTarget(card,player,target,ui.selected.targets[ui.selected.targets.length-1]));
 				return lib.filter.targetEnabled.apply(this,arguments);
 			},
 			targetEnabled:function(card,player,target){
@@ -28641,7 +28641,7 @@
 					if(mod!='unchanged') return mod;
 				}
 				if(typeof filter=='boolean') return filter;
-				if(typeof filter=='function') return filter(card,player,target);
+				if(typeof filter=='function') return Boolean(filter(card,player,target));
 			},
 			targetEnabled2:function(card,player,target){
 				if(lib.filter.targetEnabled(card,player,target)) return true;
@@ -28652,7 +28652,7 @@
 
 				var filter=get.info(card).modTarget;
 				if(typeof filter=='boolean') return filter;
-				if(typeof filter=='function') return filter(card,player,target);
+				if(typeof filter=='function') return Boolean(filter(card,player,target));
 				return false;
 			},
 			targetEnabled3:function(card,player,target){
