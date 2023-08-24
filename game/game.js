@@ -37751,29 +37751,19 @@
 			}
 		},
 		checkMod:function(){
-			var name=arguments[arguments.length-2];
-			var skills=arguments[arguments.length-1];
-			if(skills.getSkills){
-				//if(name!='cardname') skills=skills.getSkills();
-				//else skills=skills.getSkills(null,false);
-				skills=skills.getSkills();
-			}
+			const argumentArray=Array.from(arguments),name=argumentArray[argumentArray.length-2];
+			let skills=argumentArray[argumentArray.length-1];
+			if(skills.getSkills) skills=skills.getSkills();
 			skills=skills.concat(lib.skill.global);
 			game.expandSkills(skills);
-			skills.sort(function(a,b){
-				return get.priority(a)-get.priority(b);
+			skills.sort((a,b)=>get.priority(a)-get.priority(b));
+			const arg=argumentArray.slice(0,-2);
+			skills.forEach(value=>{
+				const info=get.info(value);
+				if(!info||!info.mod||!info.mod[name]) return;
+				const result=info.mod[name].apply(this,arg);
+				if(typeof arg[arg.length-1]!='object'&&result!=undefined) arg[arg.length-1]=result;
 			});
-			var arg=[],i,info;
-			for(i=0;i<arguments.length-2;i++){
-				arg.push(arguments[i]);
-			}
-			for(i=0;i<skills.length;i++){
-				info=get.info(skills[i]);
-				if(info&&info.mod&&info.mod[name]){
-					var result=info.mod[name].apply(this,arg);
-					if(typeof arg[arg.length-1]!='object'&&result!=undefined) arg[arg.length-1]=result;
-				}
-			}
 			return arg[arg.length-1];
 		},
 		prepareArena:num=>{
