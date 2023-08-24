@@ -38501,13 +38501,14 @@
 			game.arrangePlayers();
 			return player;
 		},
-		addFellow:function(position,character,animation){
+		addFellow:(position,character,animation)=>{
 			game.addVideo('addFellow',null,[position,character,animation]);
-			var player=ui.create.player(ui.arena).animate(animation||'start');
+			const player=ui.create.player(ui.arena).animate(animation||'start');
 			player.dataset.position=position||game.players.length+game.dead.length;
 			player.getId();
 			if(character) player.init(character);
-			game.players.push(player);game.arrangePlayers();
+			game.players.push(player);
+			game.arrangePlayers();
 			return player;
 		},
 		triggerEnter:player=>{
