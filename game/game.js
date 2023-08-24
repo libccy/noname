@@ -38451,9 +38451,7 @@
 		saveExtensionConfig:function(extension,key,value){
 			return game.saveConfig('extension_'+extension+'_'+key,value);
 		},
-		getExtensionConfig:function(extension,key){
-			return lib.config['extension_'+extension+'_'+key];
-		},
+		getExtensionConfig:(extension,key)=>lib.config[`extension_${extension}_${key}`],
 		clearModeConfig:mode=>{
 			if(_status.reloading) return;
 			if(lib.db){
