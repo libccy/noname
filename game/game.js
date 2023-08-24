@@ -38286,95 +38286,66 @@
 				}
 			}
 		},
-		showChangeLog:function(){
-			if(lib.version!=lib.config.version||_status.extensionChangeLog){
-				var ul=document.createElement('ul');
-				ul.style.textAlign='left';
-				var caption;
-				var players=null,cards=null;
-				if(lib.version!=lib.config.version){
-					for(var i=0;i<lib.changeLog.length;i++){
-						if(lib.changeLog[i].indexOf('players://')==0){
-							try{
-								players=JSON.parse(lib.changeLog[i].slice(10));
-							}
-							catch(e){
-								players=null;
-							}
-						}
-						else if(lib.changeLog[i].indexOf('cards://')==0){
-							try{
-								cards=JSON.parse(lib.changeLog[i].slice(8));
-							}
-							catch(e){
-								cards=null;
-							}
-						}
-						else{
-							var li=document.createElement('li');
-							li.innerHTML=lib.changeLog[i];
-							ul.appendChild(li);
-						}
-					}
-					caption=lib.version+'更新内容';
+		showChangeLog:()=>{
+			if(lib.version==lib.config.version&&!_status.extensionChangeLog) return;
+			const ul=document.createElement('ul');
+			ul.style.textAlign='left';
+			const caption=lib.version==lib.config.version?'扩展更新':`${lib.version}更新内容`;
+			let players=null,cards=null;
+			if(lib.version!=lib.config.version) lib.changeLog.forEach(value=>{
+				if(value.indexOf('players://')==0) try{
+					players=JSON.parse(value.slice(10)).filter(value=>lib.character[value]);
+				}
+				catch(e){
+					players=null;
+				}
+				else if(value.indexOf('cards://')==0) try{
+					cards=JSON.parse(value.slice(8)).filter(value=>lib.card[value]);
+				}
+				catch(e){
+					cards=null;
 				}
 				else{
-					caption='扩展更新';
-				}
-				game.saveConfig('version',lib.version);
-				for(var i in _status.extensionChangeLog){
-					var li=document.createElement('li');
-					li.innerHTML=i+'：'+_status.extensionChangeLog[i];
+					const li=document.createElement('li');
+					li.innerHTML=value;
 					ul.appendChild(li);
 				}
-				var dialog=ui.create.dialog(caption,'hidden');
-				var lic=ui.create.div(dialog.content);
-				lic.style.display='block';
-				ul.style.display='inline-block';
-				ul.style.marginLeft='-40px';
-				lic.appendChild(ul);
-				if(players){
-					for(var i=0;i<players.length;i++){
-						if(!lib.character[players[i]]){
-							players.splice(i--,1);
-						}
-					}
-					if(players.length){
-						dialog.addSmall([players,'character']);
-						dialog.classList.add('forcebutton');
-						dialog.classList.add('withbg');
-					}
-				}
-				if(cards){
-					for(var i=0;i<cards.length;i++){
-						if(!lib.card[cards[i]]){
-							cards.splice(i--,1);
-						}
-					}
-					if(cards.length){
-						for(var i=0;i<cards.length;i++){
-							cards[i]=[get.translation(get.type(cards[i])),'',cards[i]]
-						}
-						dialog.addSmall([cards,'vcard']);
-						dialog.classList.add('forcebutton');
-						dialog.classList.add('withbg');
-					}
-				}
-				dialog.open();
-				var hidden=false;
-				if(!ui.auto.classList.contains('hidden')){
-					ui.auto.hide();
-					hidden=true;
-				}
-				game.pause();
-				var control=ui.create.control('确定',function(){
-					dialog.close();
-					control.close();
-					if(hidden) ui.auto.show();
-					game.resume();
-				});
-				lib.init.onfree();
+			});
+			game.saveConfig('version',lib.version);
+			if(_status.extensionChangeLog) Object.keys(_status.extensionChangeLog).forEach(value=>{
+				const li=document.createElement('li');
+				li.innerHTML=`${value}：${_status.extensionChangeLog[value]}`;
+				ul.appendChild(li);
+			});
+			const dialog=ui.create.dialog(caption,'hidden'),lic=ui.create.div(dialog.content);
+			lic.style.display='block';
+			ul.style.display='inline-block';
+			ul.style.marginLeft='-40px';
+			lic.appendChild(ul);
+			if(players&&players.length){
+				dialog.addSmall([players,'character']);
+				dialog.classList.add('forcebutton');
+				dialog.classList.add('withbg');
 			}
+			if(cards&&cards.length){
+				dialog.addSmall([cards.map(value=>[get.translation(get.type(value)),'',value]),'vcard']);
+				dialog.classList.add('forcebutton');
+				dialog.classList.add('withbg');
+			}
+			dialog.open();
+			let hidden=false;
+			if(!ui.auto.classList.contains('hidden')){
+				ui.auto.hide();
+				hidden=true;
+			}
+			game.pause();
+			const control=ui.create.control('确定',()=>{
+				dialog.close();
+				control.close();
+				if(hidden) ui.auto.show();
+				game.resume();
+			});
+			lib.init.onfree();
 		},
 		showExtensionChangeLog:(str,extname)=>{
 			extname=extname||_status.extension;
