@@ -38376,16 +38376,14 @@
 				lib.init.onfree();
 			}
 		},
-		showExtensionChangeLog:function(str,extname){
+		showExtensionChangeLog:(str,extname)=>{
 			extname=extname||_status.extension;
-			var cfg='extension_'+extname+'_changelog';
-			if(lib.extensionPack[extname]&&lib.extensionPack[extname].version!=lib.config[cfg]){
-				game.saveConfig(cfg,lib.extensionPack[extname].version);
-				if(!_status.extensionChangeLog){
-					_status.extensionChangeLog={};
-					_status.extensionChangeLog[extname]=str;
-				}
-			}
+			const cfg=`extension_${extname}_changelog`;
+			if(!lib.extensionPack[extname]||lib.extensionPack[extname].version==lib.config[cfg]) return;
+			game.saveConfig(cfg,lib.extensionPack[extname].version);
+			if(_status.extensionChangeLog) return;
+			_status.extensionChangeLog={};
+			_status.extensionChangeLog[extname]=str;
 		},
 		saveConfig:(key,value,local,callback)=>{
 			if(_status.reloading) return;
