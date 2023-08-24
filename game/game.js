@@ -38148,8 +38148,7 @@
 				return;
 			}
 			lib.status.reload++;
-			var put=lib.db.transaction([type],'readwrite').objectStore(type).put(item,id);
-			put.onsuccess=function(){
+			lib.db.transaction([type],'readwrite').objectStore(type).put(item,id).onsuccess=function(){
 				if(callback){
 					_status.dburgent=true;
 					callback.apply(this,arguments);
