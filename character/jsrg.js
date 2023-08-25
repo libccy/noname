@@ -168,9 +168,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkillLog('rezhiheng');
 					player.addSkill('jsrgzhasi_undist');
 				},
+				derivation:'rezhiheng',
 				subSkill:{
 					undist:{
-						inherit:'undist',
+						group:'undist',
 						charlotte:true,
 						trigger:{
 							player:['useCardAfter','damageEnd'],
@@ -301,7 +302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('choice',maxGroup);
 					'step 1'
 					var group=result.control;
-					if(group=='cancel2')
+					if(group=='cancel2') return;
 					player.logSkill('jsrglipan');
 					player.popup(group+'2',get.groupnature(group,'raw'));
 					player.changeGroup(group);
@@ -574,6 +575,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var name=del>0?'tuixinzhifu':'chenghuodajie';
 					player.useCard({name:name},target,cards);
 					player.addTempSkill('jsrgqingjiao_'+name,'phaseUseAfter');
+				},
+				ai:{
+					order:7,
+					result:{
+						target:function(player,target){
+							var name=(target.countCards('h')>player.countCards('h')?'tuixinzhifu':'chenghuodajie');
+							var list=[];
+							if(ui.selected.cards.length) list.addArray(ui.selected.cards);
+							var card=get.autoViewAs({name:name},list);
+							return get.effect(card,target,player);
+						},
+					},
 				},
 				subSkill:{
 					tuixinzhifu:{
@@ -1526,13 +1539,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('jsrgtuwei'),'获得攻击范围内任意名角色的各一张牌。然后回合结束时这些角色中未受过伤害的角色依次获得你的一张牌。',(card,player,target)=>{
-						return player.inRange(current)&&target.countGainableCards(player,'he')>0;
+						return player.inRange(target)&&target.countGainableCards(player,'he')>0;
 					},[1,Infinity]).set('ai',target=>{
 						var player=_status.event.player;
-						return get.effect(target,{name:'shunshou'},player,player);
-					}).set('damage',player.hasCard(card=>{
-						return player.hasValueTarget(card)&&get.tag(card,'damage');
-					},'hs'));
+						return get.effect(target,{name:'shunshou_copy2'},player,player);
+					});
 					'step 1'
 					if(result.bool){
 						var targets=result.targets.slice();
@@ -1831,7 +1842,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//江山如故·起
 			sbyingmen:{
-				forbid:['guozhan'],
 				trigger:{
 					global:'phaseBefore',
 					player:'enterGame',
