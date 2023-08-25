@@ -37652,57 +37652,55 @@
 				game.addGlobalSkill(i);
 			}
 		},
-		finishCards:function(){
+		finishCards:()=>{
 			_status.cardsFinished=true;
-			var i,j,k;
-			var mode=get.mode();
-			for(i in lib.card){
-				if(lib.translate[i+'_info_'+mode]){
-					lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
+			const mode=get.mode(),filterTarget=(card,player,target)=>player==target&&target.canEquip(card,true),aiBasicOrder=(card,player)=>{
+				const equipValue=get.equipValue(card,player)/20;
+				return player&&player.hasSkillTag('reverseEquip')?8.5-equipValue:8+equipValue;
+			},aiBasicValue=(card,player,index,method)=>{
+				if(!player.getCards('e').contains(card)&&!player.canEquip(card,true)) return 0.01;
+				const info=get.info(card),current=player.getEquip(info.subtype),value=current&&card!=current&&get.value(current,player);
+				let equipValue=info.ai.equipValue||info.ai.basic.equipValue;
+				if(typeof equipValue=='function'){
+					if(method=='raw')return equipValue(card,player);
+					if(method=='raw2')return equipValue(card,player)-value;
+					return Math.max(0.1,equipValue(card,player)-value);
 				}
-				else if(lib.translate[i+'_info_zhu']&&(mode=='identity'||(mode=='guozhan'&&_status.mode=='four'))){
-					lib.translate[i+'_info']=lib.translate[i+'_info_zhu'];
-				}
-				else if(lib.translate[i+'_info_combat']&&get.is.versus()){
-					lib.translate[i+'_info']=lib.translate[i+'_info_combat'];
-				}
-				var card=lib.card[i];
-				if(card.filterTarget&&card.selectTarget==undefined){
-					card.selectTarget=1;
-				}
+				if(typeof equipValue!='number') equipValue=0;
+				if(method=='raw') return equipValue;
+				if(method=='raw2') return equipValue-value;
+				return Math.max(0.1,equipValue-value);
+			},aiResultTarget=(player,target,card)=>get.equipResult(player,target,card.name);
+			Object.keys(lib.card).forEach(libCardKey=>{
+				const info = `${libCardKey}_info`;
+				if(lib.translate[`${info}_${mode}`]) lib.translate[info]=lib.translate[`${info}_${mode}`];
+				else if(lib.translate[`${info}_zhu`]&&(mode=='identity'||mode=='guozhan'&&_status.mode=='four')) lib.translate[info]=lib.translate[`${info}_zhu`];
+				else if(lib.translate[`${info}_combat`]&&get.is.versus()) lib.translate[info]=lib.translate[`${info}_combat`];
+				const card=lib.card[libCardKey];
+				if(card.filterTarget&&card.selectTarget==undefined) card.selectTarget=1;
 				if(card.autoViewAs){
-					if(!card.ai){
-						card.ai={};
-					}
+					if(!card.ai) card.ai={};
 					if(!card.ai.order){
 						card.ai.order=lib.card[card.autoViewAs].ai.order;
-						if(!card.ai.order&&lib.card[card.autoViewAs].ai.basic){
-							card.ai.order=lib.card[card.autoViewAs].ai.basic.order;
-						}
+						if(!card.ai.order&&lib.card[card.autoViewAs].ai.basic) card.ai.order=lib.card[card.autoViewAs].ai.basic.order;
 					}
 				}
 				if(card.type=='equip'){
 					if(card.enable==undefined) card.enable=true;
 					if(card.selectTarget==undefined) card.selectTarget=-1;
-					if(card.filterTarget==undefined) card.filterTarget=function(card,player,target){
-						if(player!=target) return false;
-						return target.canEquip(card,true);
-					};
+					if(card.filterTarget==undefined) card.filterTarget=filterTarget;
 					if(card.modTarget==undefined) card.modTarget=true;
 					if(card.allowMultiple==undefined) card.allowMultiple=false;
 					if(card.content==undefined) card.content=lib.element.content.equipCard;
 					if(card.toself==undefined) card.toself=true;
-					if(card.ai==undefined) card.ai={basic:{}};
-					if(card.ai.basic==undefined) card.ai.basic={};
-					if(card.ai.result==undefined) card.ai.result={target:1.5};
-					if(card.ai.basic.order==undefined) card.ai.basic.order=function(card,player){
-						if(player&&player.hasSkillTag('reverseEquip')){
-							return 8.5-get.equipValue(card,player)/20;
-						}
-						else{
-							return 8+get.equipValue(card,player)/20;
-						}
+					if(card.ai==undefined) card.ai={
+						basic:{}
 					};
+					if(card.ai.basic==undefined) card.ai.basic={};
+					if(card.ai.result==undefined) card.ai.result={
+						target:1.5
+					};
+					if(card.ai.basic.order==undefined) card.ai.basic.order=aiBasicOrder;
 					if(card.ai.basic.useful==undefined) card.ai.basic.useful=2;
 					if(card.subtype=='equip3'){
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=7;
@@ -37710,34 +37708,9 @@
 					else if(card.subtype=='equip4'){
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=4;
 					}
-					else{
-						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;
-					}
-					if(card.ai.basic.value==undefined) card.ai.basic.value=function(card,player,index,method){
-						if(!player.getCards('e').contains(card)&&!player.canEquip(card,true)) return 0.01;
-						var value=0;
-						var info=get.info(card);
-						var current=player.getEquip(info.subtype);
-						if(current&&card!=current){
-							value=get.value(current,player);
-						}
-						var equipValue=info.ai.equipValue;
-						if(equipValue==undefined){
-							equipValue=info.ai.basic.equipValue;
-						}
-						if(typeof equipValue=='function'){
-							if(method=='raw') return equipValue(card,player);
-							if(method=='raw2') return equipValue(card,player)-value;
-							return Math.max(0.1,equipValue(card,player)-value);
-						}
-						if(typeof equipValue!='number') equipValue=0;
-						if(method=='raw') return equipValue;
-						if(method=='raw2') return equipValue-value;
-						return Math.max(0.1,equipValue-value);
-					}
-					if(!card.ai.result.keepAI) card.ai.result.target=function(player,target,card){
-						return get.equipResult(player,target,card.name);
-					};
+					else if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;
+					if(card.ai.basic.value==undefined) card.ai.basic.value=aiBasicValue;
+					if(!card.ai.result.keepAI) card.ai.result.target=aiResultTarget;
 				}
 				else if(card.type=='delay'){
 					if(card.enable==undefined) card.enable=true;
@@ -37745,10 +37718,8 @@
 					if(card.content==undefined) card.content=lib.element.content.addJudgeCard;
 					if(card.allowMultiple==undefined) card.allowMultiple=false;
 				}
-			}
-			for(i in lib.skill){
-				game.finishSkill(i);
-			}
+			});
+			Object.keys(lib.skill).forEach(value=>game.finishSkill(value));
 		},
 		checkMod:function(){
 			const argumentArray=Array.from(arguments),name=argumentArray[argumentArray.length-2];
