@@ -43964,6 +43964,10 @@
 						var page=ui.create.div('');
 						var node=ui.create.div('.menubutton.large','获取扩展',start.firstChild,clickMode);
 						node.mode='get';
+						var _thisUpdate=false;
+						node.update=function(){
+							_thisUpdate=true;
+						};
 						node._initLink=function(){
 							node.link=page;
 							page.listen(function(){
@@ -44263,6 +44267,7 @@
 									});
 								}
 							};
+							if(_thisUpdate) node.update();
 						};
 					}());
 					var active=start.firstChild.querySelector('.active');
