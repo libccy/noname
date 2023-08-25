@@ -37453,27 +37453,16 @@
 			}
 		},
 		asyncDrawAuto:function(players,num,drawDeck){
-			if(players.length==1){
-				var num2=1;
-				if(typeof num=='number'){
-					num2=num;
-				}
-				else if(Array.isArray(num)){
-					num2=num[0];
-				}
-				else if(typeof num=='function'){
-					num2=num(players[0]);
-				}
-				if(drawDeck&&drawDeck.drawDeck){
-					players[0].draw(num2,drawDeck);
-				}
-				else{
-					players[0].draw(num2);
-				}
-			}
-			else{
+			if(players.length>1){
 				game.asyncDraw.apply(this,arguments);
+				return;
 			}
+			let num2=1;
+			if(typeof num=='number') num2=num;
+			else if(Array.isArray(num)) num2=num[0];
+			else if(typeof num=='function') num2=num(players[0]);
+			if(drawDeck&&drawDeck.drawDeck) players[0].draw(num2,drawDeck);
+			else players[0].draw(num2);
 		},
 		finishSkill:(i,sub)=>{
 			const mode=get.mode(),info=lib.skill[i],iInfo=`${i}_info`;
