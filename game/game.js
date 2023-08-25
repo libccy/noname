@@ -37475,182 +37475,114 @@
 				game.asyncDraw.apply(this,arguments);
 			}
 		},
-		finishSkill:function(i,sub){
-			var j;
-			var mode=get.mode();
-			var info=lib.skill[i];
+		finishSkill:(i,sub)=>{
+			const mode=get.mode(),info=lib.skill[i],iInfo=`${i}_info`;
 			if(info.alter){
-				lib.translate[i+'_info_origin']=lib.translate[i+'_info'];
-				if(!lib.config.vintageSkills.contains(i)){
-					lib.translate[i+'_info']=lib.translate[i+'_info_alter'];
-				}
+				lib.translate[`${iInfo}_origin`]=lib.translate[iInfo];
+				if(!lib.config.vintageSkills.contains(i)) lib.translate[iInfo]=lib.translate[`${iInfo}_alter`];
 			}
-			else if(lib.translate[i+'_info_'+mode]){
-				lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
-			}
-			else if(lib.translate[i+'_info_zhu']&&(mode=='identity'||(mode=='guozhan'&&_status.mode=='four'))){
-				lib.translate[i+'_info']=lib.translate[i+'_info_zhu'];
-			}
-			else if(lib.translate[i+'_info_combat']&&get.is.versus()){
-				lib.translate[i+'_info']=lib.translate[i+'_info_combat'];
-			}
+			else if(lib.translate[`${iInfo}_${mode}`]) lib.translate[iInfo]=lib.translate[`${iInfo}_${mode}`];
+			else if(lib.translate[`${iInfo}_zhu`]&&(mode=='identity'||mode=='guozhan'&&_status.mode=='four')) lib.translate[iInfo]=lib.translate[`${iInfo}_zhu`];
+			else if(lib.translate[`${iInfo}_combat`]&&get.is.versus()) lib.translate[iInfo]=lib.translate[`${iInfo}_combat`];
 			if(info.forbid&&info.forbid.contains(mode)){
 				lib.skill[i]={};
-				if(lib.translate[i+'_info']){
-					lib.translate[i+'_info']='此模式下不可用';
-				}
+				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
 				return;
 			}
 			if(info.mode&&info.mode.contains(mode)==false){
 				lib.skill[i]={};
-				if(lib.translate[i+'_info']){
-					lib.translate[i+'_info']='此模式下不可用';
-				}
+				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
 				return;
 			}
 			if(info.available&&info.available(mode)==false){
 				lib.skill[i]={};
-				if(lib.translate[i+'_info']){
-					lib.translate[i+'_info']='此模式下不可用';
-				}
+				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
 				return;
 			}
 			if(info.viewAs&&typeof info.viewAs!='function'){
-				if(typeof info.viewAs=='string'){
-					info.viewAs={name:info.viewAs};
-				}
+				if(typeof info.viewAs=='string') info.viewAs={
+					name:info.viewAs
+				};
 				if(!lib.card[info.viewAs.name]){
 					lib.skill[i]={};
-					lib.translate[i+'_info']='技能不可用';
+					lib.translate[iInfo]='技能不可用';
 					return;
 				}
 				if(info.ai==undefined) info.ai={};
-				var skill=info.ai;
-				var card=lib.card[info.viewAs.name].ai;
-				for(j in card){
-					if(skill[j]==undefined) skill[j]=card[j];
-					else if(typeof skill[j]=='object'){
-						for(var k in card[j]){
-							if(skill[j][k]==undefined) skill[j][k]=card[j][k];
-						}
-					}
-				}
+				const skill=info.ai,card=lib.card[info.viewAs.name].ai;
+				Object.keys(card).forEach(value=>{
+					if(skill[value]==undefined) skill[value]=card[value];
+					else if(typeof skill[value]=='object') Object.keys(card[value]).forEach(element=>{
+						if(skill[value][element]==undefined) skill[value][element]=card[value][element];
+					});
+				});
 			}
 			if(info.inherit){
-				var skill=lib.skill[info.inherit];
-				for(j in skill){
-					if(info[j]==undefined){
-						if(j=='audio'&&(typeof info[j]=='number'||typeof info[j]=='boolean')){
-							info[j]=info.inherit;
-						}
-						else{
-							info[j]=skill[j];
-						}
-					}
-				}
-				if(lib.translate[i]==undefined){
-					lib.translate[i]=lib.translate[info.inherit];
-				}
-				if(lib.translate[i+'_info']==undefined){
-					lib.translate[i+'_info']=lib.translate[info.inherit+'_info'];
-				}
+				const skill=lib.skill[info.inherit];
+				Object.keys(skill).forEach(value=>{
+					if(info[value]!=undefined) return;
+					if(value=='audio'&&(typeof info[value]=='number'||typeof info[value]=='boolean')) info[value]=info.inherit;
+					else info[value]=skill[value];
+				});
+				if(lib.translate[i]==undefined) lib.translate[i]=lib.translate[info.inherit];
+				if(lib.translate[iInfo]==undefined) lib.translate[iInfo]=lib.translate[`${info.inherit}_info`];
 			}
 			if(info.limited){
 				if(info.mark===undefined) info.mark=true;
 				if(!info.intro) info.intro={};
 				if(info.intro.content===undefined) info.intro.content='limited';
 				if(info.skillAnimation===undefined) info.skillAnimation=true;
-				if(info.init===undefined) info.init=function(player,skill){
-					player.storage[skill]=false;
-				}
+				if(info.init===undefined) info.init=(player,skill)=>player.storage[skill]=false;
 			}
-			if(info.subSkill&&!sub){
-				for(var j in info.subSkill){
-					lib.skill[i+'_'+j]=info.subSkill[j];
-					lib.skill[i+'_'+j].sub=true;
-					if(info.subSkill[j].name){
-						lib.translate[i+'_'+j]=info.subSkill[j].name;
-					}
-					else{
-						lib.translate[i+'_'+j]=lib.translate[i+'_'+j]||lib.translate[i];
-					}
-					if(info.subSkill[j].description){
-						lib.translate[i+'_'+j+'_info']=info.subSkill[j].description;
-					}
-					if(info.subSkill[j].marktext){
-						lib.translate[i+'_'+j+'_bg']=info.subSkill[j].marktext;
-					}
-					game.finishSkill(i+'_'+j,true);
-				}
-			}
+			if(info.subSkill&&!sub) Object.keys(info.subSkill).forEach(value=>{
+				const iValue=`${i}_${value}`;
+				lib.skill[iValue]=info.subSkill[value];
+				lib.skill[iValue].sub=true;
+				if(info.subSkill[value].name) lib.translate[iValue]=info.subSkill[value].name;
+				else lib.translate[iValue]=lib.translate[iValue]||lib.translate[i];
+				if(info.subSkill[value].description) lib.translate[`${iValue}_info`]=info.subSkill[value].description;
+				if(info.subSkill[value].marktext) lib.translate[`${iValue}_bg`]=info.subSkill[value].marktext;
+				game.finishSkill(iValue,true);
+			});
 			if(info.round){
-				var k=i+'_roundcount';
-				if(typeof info.group=='string'){
-					info.group=[info.group,k];
-				}
-				else if(Array.isArray(info.group)){
-					info.group.add(k);
-				}
-				else{
-					info.group=[k];
-				}
-				lib.skill[k]=(function(round,name){
-					return {
-						init:function(player){
-							if(typeof player.storage[name]!=='number') player.storage[name]=1-round;
+				const k=`${i}_roundcount`;
+				if(typeof info.group=='string') info.group=[info.group,k];
+				else if(Array.isArray(info.group)) info.group.add(k);
+				else info.group=[k];
+				lib.skill[k]=((round,name)=>({
+					init:player=>{
+						if(typeof player.storage[name]!=='number') player.storage[name]=1-round;
+					},
+					intro:{
+						content:(storage,player)=>{
+							let str='';
+							const info=get.info(name.slice(0,name.indexOf('_roundcount')));
+							if(info&&info.addintro) str+=info.addintro(storage,player);
+							const num=round-(game.roundNumber-storage);
+							if(num>0) str+=`${get.cnNumber(num)}轮后${info.roundtext||'技能重置'}`;
+							else str+='技能可发动';
+							return str;
 						},
-						intro:{
-							content:function(storage,player){
-								var str='';
-								var info=get.info(name.slice(0,name.indexOf('_roundcount')));
-								if(info&&info.addintro){
-									str+=info.addintro(storage,player);
-								}
-								var num=round-(game.roundNumber-storage);
-								if(num>0){
-									str+=get.cnNumber(num)+'轮后'+(info.roundtext||'技能重置');
-								}
-								else{
-									str+='技能可发动';
-								}
-								return str;
-							},
-							markcount:function(storage,player){
-								var num=round-(game.roundNumber-storage);
-								if(num>0){
-									return num;
-								}
-								return 0;
-							}
-						},
-						trigger:{global:'roundStart'},
-						forced:true,
-						popup:false,
-						silent:true,
-						content:function(){
-							var skill=event.name.slice(0,event.name.indexOf('_roundcount'));
-							if(lib.skill[skill].round-(game.roundNumber-player.storage[event.name])>0){
-								player.updateMarks();
-							}
-							else{
-								player.unmarkSkill(event.name);
-							}
-						}
-					};
-				}(info.round,k));
+						markcount:(storage,player)=>Math.max(round-(game.roundNumber-storage),0)
+					},
+					trigger:{global:'roundStart'},
+					forced:true,
+					popup:false,
+					silent:true,
+					content:()=>{
+						if(lib.skill[event.name.slice(0,event.name.indexOf('_roundcount'))].round-(game.roundNumber-player.storage[event.name])>0) player.updateMarks();
+						else player.unmarkSkill(event.name);
+					}
+				}))(info.round,k);
 				lib.translate[k]=lib.translate[i]||'';
-				lib.translate[k+'_bg']=lib.translate[i+'_bg']||lib.translate[k][0];
+				lib.translate[`${k}_bg`]=lib.translate[`${i}_bg`]||lib.translate[k][0];
 			}
-			if(info.marktext){
-				lib.translate[i+'_bg']=info.marktext;
-			}
+			if(info.marktext) lib.translate[`${i}_bg`]=info.marktext;
 			if(info.silent){
 				if(!info.hasOwnProperty('forced')) info.forced=true;
 				if(!info.hasOwnProperty('popup')) info.popup=false;
 			}
-			if(i[0]=='_'){
-				game.addGlobalSkill(i);
-			}
+			if(i[0]=='_') game.addGlobalSkill(i);
 		},
 		finishCards:()=>{
 			_status.cardsFinished=true;
