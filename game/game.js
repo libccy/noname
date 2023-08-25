@@ -27388,7 +27388,6 @@
 						this._tempCache[key1] = {};
 					}
 					this._tempCache[key1][key2] = value;
-					console.log("put:"+key1+" "+key2+" "+value);
 				},
 				getTempCache:function(key1,key2){
 					if(!this._tempCache){
@@ -45509,6 +45508,7 @@
 						var node=ui.create.div('.menubutton.large','录像',start.firstChild,clickMode);
 						node.type='video';
 						lib.videos=[];
+						ui.create.videoNode=(video,before)=>lib.videos[before===true?'unshift':'push'](video);
 						node._initLink=function(){
 							node.link=page;
 							var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
