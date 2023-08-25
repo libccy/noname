@@ -467,6 +467,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			sbzhiba:{
+				init:function(player){
+					if(player.hasZhuSkill('sbzhiba')) player.markSkill('sbzhiba');
+				},
 				audio:2,
 				trigger:{player:'dying'},
 				filter:function(event,player){
@@ -475,6 +478,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				zhuSkill:true,
 				limited:true,
+				mark:false,
 				skillAnimation:true,
 				animationColor:'wood',
 				content:function(){
@@ -1603,7 +1607,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						lose:false,
 						delay:false,
 						filter:function(event,player){
-							return player.countMark('sbrende')<2||player.hasSkill('sbrende_used');
+							if(player.countMark('sbrende')<2||player.hasSkill('sbrende_used')) return true;
+							for(var name of lib.inpile){
+								if(get.type(name)!='basic') continue;
+								var card={name:name,isCard:true};
+								if(event.filterCard(card,player,event)) return false;
+								if(name=='sha'){
+									for(var nature of lib.inpile_nature){
+										card.nature=nature;
+										if(event.filterCard(card,player,event)) return false;
+									}
+								}
+							}
+							return true;
 						},
 						filterTarget:function(card,player,target){
 							if(player.getStorage('sbrende_given').contains(target)) return false;
