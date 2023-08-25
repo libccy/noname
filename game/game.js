@@ -27333,6 +27333,25 @@
 						this.trigger(this.name+'Cancelled');
 						if(this.player&&lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name)}
 				},
+				putTempCache:function(key1,key2,value){
+					if(!this._tempCache){
+						this._tempCache = {};
+					}
+					if(!this._tempCache[key1]){
+						this._tempCache[key1] = {};
+					}
+					this._tempCache[key1][key2] = value;
+					console.log("put:"+key1+" "+key2+" "+value);
+				},
+				getTempCache:function(key1,key2){
+					if(!this._tempCache){
+						return undefined;
+					}
+					if(!this._tempCache[key1]){
+						return undefined;
+					}
+					return this._tempCache[key1][key2];
+				},
 				neutralize:function(event){
 					this.untrigger.call(this,arguments);
 					this.finish();
