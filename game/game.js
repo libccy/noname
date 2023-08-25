@@ -37425,12 +37425,10 @@
 				}
 			});
 		},
-		updateRoundNumber:function(){
-			game.broadcastAll(function(num1,num2,top){
-				if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=num1+'轮 剩余牌: '+num2;
-				_status.pileTop=top;
-			},game.roundNumber,ui.cardPile.childNodes.length,ui.cardPile.firstChild);
-		},
+		updateRoundNumber:()=>game.broadcastAll((num1,num2,top)=>{
+			if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=`${num1}轮 剩余牌: ${num2}`;
+			_status.pileTop=top;
+		},game.roundNumber,ui.cardPile.childNodes.length,ui.cardPile.firstChild),
 		asyncDraw:(players,num,drawDeck,bottom)=>players.forEach((value,index)=>{
 			let num2=1;
 			if(typeof num=='number') num2=num;
