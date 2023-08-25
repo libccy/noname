@@ -22316,7 +22316,7 @@
 						if(!position) position=ui.discardPile;
 						if(!key) key='cards';
 						var cards=[],event=this;
-						game.getGlobalHistory('cardMove',function(evt){
+						game.checkGlobalHistory('cardMove',function(evt){
 							if(evt.name!='lose'||evt.position!=position||evt.getParent()!=event) return;
 							if(player&&player!=evt.player) return;
 							cards.addArray(evt[key]);
@@ -22335,7 +22335,7 @@
 							cards:[],
 							cards2:[],
 						};
-						player.getHistory('lose',function(evt){
+						player.checkHistory('lose',function(evt){
 							if(evt.parent==that){
 								map.hs.addArray(evt.hs);
 								map.es.addArray(evt.es);
@@ -22398,7 +22398,7 @@
 						if(!position) position=ui.discardPile;
 						if(!key) key='cards';
 						var cards=[],event=this;
-						game.getGlobalHistory('cardMove',function(evt){
+						game.checkGlobalHistory('cardMove',function(evt){
 							if(evt.name!='lose'||evt.position!=position||evt.getParent()!=event) return;
 							if(player&&player!=evt.player) return;
 							cards.addArray(evt[key]);
@@ -22417,7 +22417,7 @@
 							cards:[],
 							cards2:[],
 						};
-						player.getHistory('lose',function(evt){
+						player.checkHistory('lose',function(evt){
 							if(evt.parent==that){
 								map.hs.addArray(evt.hs);
 								map.es.addArray(evt.es);
@@ -22881,7 +22881,7 @@
 						if(!position) position=ui.discardPile;
 						if(!key) key='cards';
 						var cards=[],event=this;
-						game.getGlobalHistory('cardMove',function(evt){
+						game.checkGlobalHistory('cardMove',function(evt){
 							if(evt.name!='lose'||evt.position!=position||evt.getParent()!=event) return;
 							if(player&&player!=evt.player) return;
 							cards.addArray(evt[key]);
@@ -22900,7 +22900,7 @@
 							cards:[],
 							cards2:[],
 						};
-						player.getHistory('lose',function(evt){
+						player.checkHistory('lose',function(evt){
 							if(evt.parent==that){
 								map.hs.addArray(evt.hs);
 								map.es.addArray(evt.es);
@@ -22935,7 +22935,7 @@
 						if(!position) position=ui.discardPile;
 						if(!key) key='cards';
 						var cards=[],event=this;
-						game.getGlobalHistory('cardMove',function(evt){
+						game.checkGlobalHistory('cardMove',function(evt){
 							if(evt.name!='lose'||evt.position!=position||evt.getParent()!=event) return;
 							if(player&&player!=evt.player) return;
 							cards.addArray(evt[key]);
@@ -22954,7 +22954,7 @@
 							cards:[],
 							cards2:[],
 						};
-						player.getHistory('lose',function(evt){
+						player.checkHistory('lose',function(evt){
 							if(evt.parent==that){
 								map.hs.addArray(evt.hs);
 								map.es.addArray(evt.es);
@@ -24521,7 +24521,7 @@
 						const history=this.getHistory(key);
 						if(last){
 							const lastIndex=history.indexOf(last);
-							return history.filter(function(event,index){
+							return history.filter((event,index)=>{
 								if(index>lastIndex) return false;
 								return filter(event);
 							})
@@ -24529,11 +24529,27 @@
 						return history.filter(filter);
 					}
 				},
+				checkHistory:function(key,filter,last){
+					if(!key||!filter) return;
+					else{
+						const history=this.getHistory(key);
+						if(last){
+							const lastIndex=history.indexOf(last);
+							history.forEach((event,index)=>{
+								if(index>lastIndex) return false;
+								filter(event);
+							})
+						}
+						else{
+							history.forEach(filter);
+						}
+					}
+				},
 				hasHistory:function(key,filter,last){
 					const history=this.getHistory(key);
 					if(last){
 						const lastIndex=history.indexOf(last);
-						return history.some(function(event,index){
+						return history.some((event,index)=>{
 							if(index>lastIndex) return false;
 							return filter(event);
 						})
@@ -24553,7 +24569,7 @@
 					else{
 						if(last){
 							const lastIndex=history.indexOf(last);
-							return history.filter(function(event,index){
+							return history.filter((event,index)=>{
 								if(index>lastIndex) return false;
 								return filter(event);
 							})
@@ -24561,21 +24577,36 @@
 						return history.filter(filter);
 					}
 				},
-				getAllHistory:function(key,filter,last){
-					const history=[];
-					const all=this.actionHistory;
-					for(let j=0;j<all.length;j++){
-						if(!key||!all[j][key]){
-							history.push(all[j]);
+				checkAllHistory:function(key,filter,last){
+					if(!key||!filter) return;
+					this.actionHistory.forEach((value)=>{
+						let history=value[key];
+						if(last&&history.includes(last)){
+							const lastIndex=history.indexOf(last);
+							history.forEach((event,index)=>{
+								if(index>lastIndex) return false;
+								return filter(event);
+							});
 						}
 						else{
-							history.push(...all[j][key]);
+							history.forEach(filter);
 						}
-					}
+					});
+				},
+				getAllHistory:function(key,filter,last){
+					const history=[];
+					this.actionHistory.forEach((value)=>{
+						if(!key||!value[key]){
+							history.push(value);
+						}
+						else{
+							history.push(...value[key]);
+						}
+					})
 					if(filter){
 						if(last){
 							const lastIndex=history.indexOf(last);
-							return history.filter(function(event,index){
+							return history.filter((event,index)=>{
 								if(index>lastIndex) return false;
 								return filter(event);
 							});
@@ -24585,10 +24616,9 @@
 					return history;
 				},
 				hasAllHistory:function(key,filter,last){
-					const all=this.actionHistory;
-					for(let j=0;j<all.length;j++){
-						let history=all[j][key];
-						if(last){
+					return this.actionHistory.some((value)=>{
+						let history=value[key];
+						if(last&&history.includes(last)){
 							const lastIndex=history.indexOf(last);
 							if(history.some(function(event,index){
 								if(index>lastIndex) return false;
@@ -24598,8 +24628,8 @@
 						else{
 							if(history.some(filter)) return true;
 						}
-					}
-					return false;
+						return false;
+					})
 				},
 				getLastUsed:function(num){
 					if(typeof num!='number') num=0;
@@ -31293,7 +31323,7 @@
 				if(!position) position=ui.discardPile;
 				if(!key) key='cards';
 				var cards=[],event=this;
-				game.getGlobalHistory('cardMove',function(evt){
+				game.checkGlobalHistory('cardMove',function(evt){
 					if(evt.name!='lose'||evt.position!=position||evt.getParent()!=event) return;
 					if(player&&player!=evt.player) return;
 					cards.addArray(evt[key]);
@@ -31312,7 +31342,7 @@
 					cards:[],
 					cards2:[],
 				};
-				player.getHistory('lose',function(evt){
+				player.checkHistory('lose',function(evt){
 					if(evt.parent==that){
 						map.hs.addArray(evt.hs);
 						map.es.addArray(evt.es);
@@ -31328,7 +31358,7 @@
 			next.getg=function(player){
 				var that=this;
 				var cards=[];
-				player.getHistory('gain',function(evt){
+				player.checkHistory('gain',function(evt){
 					if(evt.parent==that){
 						cards.addArray(evt.cards);
 					}
@@ -31348,6 +31378,23 @@
 			if(get.mode()!='chess'&&rank.junk.contains(name)) return 'junk';
 			return 'common';
 		},
+		checkGlobalHistory:function(key,filter,last){
+			if(!key) return _status.globalHistory[_status.globalHistory.length-1];
+			if(!filter) return _status.globalHistory[_status.globalHistory.length-1][key];
+			else{
+				const history=game.getGlobalHistory(key);
+				if(last){
+					const lastIndex=history.indexOf(last);
+					history.forEach((event,index)=>{
+						if(index>lastIndex) return false;
+						return filter(event);
+					});
+				}
+				else{
+					history.forEach(filter);
+				}
+			}
+		},
 		getGlobalHistory:function(key,filter,last){
 			if(!key) return _status.globalHistory[_status.globalHistory.length-1];
 			if(!filter) return _status.globalHistory[_status.globalHistory.length-1][key];
@@ -31355,7 +31402,7 @@
 				const history=game.getGlobalHistory(key);
 				if(last){
 					const lastIndex=history.indexOf(last);
-					return history.filter(function(event,index){
+					return history.filter((event,index)=>{
 						if(index>lastIndex) return false;
 						return filter(event);
 					})
@@ -31363,17 +31410,33 @@
 				return history.filter(filter);
 			}
 		},
+		checkAllGlobalHistory:function(key,filter,last){
+			if(!key||!filter) return;
+			_status.globalHistory.forEach(value=>{
+				if(value[key]){
+					if(last&&value[key].includes(last)){
+						const lastIndex=value[key].indexOf(last);
+						value[key].filter((event,index)=>{
+							if(index>lastIndex) return false;
+							return filter(event);
+						});
+					}
+					else{
+						value[key].forEach(filter);
+					}
+				}
+			})
+		},
 		getAllGlobalHistory:function(key,filter,last){
 			const history=[];
-			const all=_status.globalHistory;
-			for(var j=0;j<all.length;j++){
-				if(!key||!all[j][key]){
-					history.push(all[j]);
+			_status.globalHistory.forEach(value=>{
+				if(!key||!value[key]){
+					history.push(value);
 				}
 				else{
-					list.push(...all[j][key]);
+					history.push(...value[key]);
 				}
-			}
+			})
 			if(filter){
 				if(last){
 					const lastIndex=history.indexOf(last);
