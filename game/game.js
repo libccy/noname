@@ -37431,27 +37431,15 @@
 				_status.pileTop=top;
 			},game.roundNumber,ui.cardPile.childNodes.length,ui.cardPile.firstChild);
 		},
-		asyncDraw:function(players,num,drawDeck,bottom){
-			for(var i=0;i<players.length;i++){
-				var num2=1;
-				if(typeof num=='number'){
-					num2=num;
-				}
-				else if(Array.isArray(num)){
-					num2=num[i];
-				}
-				else if(typeof num=='function'){
-					num2=num(players[i]);
-				}
-				if(drawDeck&&drawDeck.drawDeck){
-					players[i].draw(num2,false,drawDeck);
-				}
-				else{
-					if(bottom) players[i].draw(num2,'nodelay','bottom');
-					else players[i].draw(num2,'nodelay');
-				}
-			}
-		},
+		asyncDraw:(players,num,drawDeck,bottom)=>players.forEach((value,index)=>{
+			let num2=1;
+			if(typeof num=='number') num2=num;
+			else if(Array.isArray(num)) num2=num[index];
+			else if(typeof num=='function') num2=num(value);
+			if(drawDeck&&drawDeck.drawDeck) value.draw(num2,false,drawDeck);
+			else if(bottom) value.draw(num2,'nodelay','bottom');
+			else value.draw(num2,'nodelay');
+		}),
 		asyncDrawAuto:function(players,num,drawDeck){
 			if(players.length>1){
 				game.asyncDraw.apply(this,arguments);
