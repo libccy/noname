@@ -28622,7 +28622,9 @@
 				var num=info.usable;
 				if(typeof num=='function') num=num(card,player);
 				num=game.checkMod(card,player,num,'cardUsable',player);
-				if(typeof num!='number') return get.itemtype(num)=='boolean'?num:true;
+				if(typeof num!='number'){
+					return (typeof num=='boolean')?num:true;
+				}
 				if(player.countUsed(card)<num) return true;
 				if(game.hasPlayer(function(current){
 					return game.checkMod(card,player,current,false,'cardUsableTarget',player);
