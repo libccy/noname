@@ -8112,10 +8112,8 @@
 									ui.backgroundMusic.pause();
 								}
 							});
-							document.addEventListener("resume", function(){
-								if(ui.backgroundMusic){
-									ui.backgroundMusic.play();
-								}
+							document.addEventListener("resume", ()=>{
+								if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
 							});
 							document.addEventListener("backbutton", function(){
 								if(ui.arena&&ui.arena.classList.contains('menupaused')){
@@ -11206,10 +11204,7 @@
 								game.resume();
 								_status.imchoosing=false;
 								if(roundmenu) ui.roundmenu.style.display='';
-								if(ui.backgroundMusic){
-									var promise=ui.backgroundMusic.play();
-									if(promise) promise.catch(()=>void 0);
-								}
+								if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
 								hitsound_audio.remove();
 							},1000);
 						};
@@ -11324,7 +11319,7 @@
 								combo++;
 								max_combo=Math.max(combo,max_combo);
 								hitsound_audio.currentTime=0;
-								if(hitsound_audio.paused) hitsound_audio.play();
+								if(hitsound_audio.paused) Promise.resolve(hitsound_audio.play()).catch(()=>void 0);
 								break;
 							}
 						};
@@ -11398,10 +11393,7 @@
 						if(dialog){
 							dialog.close();
 						}
-						if(ui.backgroundMusic){
-							var promise=ui.backgroundMusic.play();
-							if(promise) promise.catch(()=>void 0);
-						}
+						if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
 					},event.videoId,event.time);
 					var result=event.result||result;
 					event.result=result;
@@ -31998,7 +31990,7 @@
 			};
 			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
 			audio.oncanplay=function(){
-				this.play();
+				Promise.resolve(this.play()).catch(()=>void 0);
 			};
 			ui.window.appendChild(audio);
 			return audio;
@@ -32109,7 +32101,7 @@
 			};
 			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
 			audio.oncanplay=function(){
-				this.play();
+				Promise.resolve(this.play()).catch(()=>void 0);
 			};
 			ui.window.appendChild(audio);
 		},
@@ -46995,7 +46987,7 @@
 				ui.window.appendChild(ui.backgroundMusic);
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click', function playMusic() {
 					ui.window.removeEventListener(lib.config.touchscreen?'touchend':'click', playMusic, false);
-					if(!ui.backgroundMusic.played.length) ui.backgroundMusic.play();
+					if(!ui.backgroundMusic.played.length) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
 				}, false);
 				if(lib.config.cursor_style=='pointer'){
 					ui.window.classList.add('nopointer');
