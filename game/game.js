@@ -6827,10 +6827,11 @@
 		},
 		placePoppedDialog:function(dialog,e){
 			if(dialog._place_text){
-				if(dialog._place_text.firstChild.offsetWidth>=190||
-					dialog._place_text.firstChild.offsetHeight>=30){
-					dialog._place_text.style.textAlign='left';
+				if(dialog._place_text.firstChild.offsetWidth>=190||dialog._place_text.firstChild.offsetHeight>=30){
 					dialog._place_text.style.marginLeft='14px';
+					dialog._place_text.style.marginRight='14px';
+					dialog._place_text.style.textAlign='left';
+					dialog._place_text.style.width='calc(100% - 28px)';
 				}
 			}
 			if(e.touches&&e.touches[0]){
@@ -7805,17 +7806,19 @@
 
 					if(pack.font){
 						ui.css.fontsheet=lib.init.sheet();
-						for(i in pack.font){
-							lib.configMenu.appearence.config.name_font.item[i]=pack.font[i];
-							lib.configMenu.appearence.config.identity_font.item[i]=pack.font[i];
-							lib.configMenu.appearence.config.cardtext_font.item[i]=pack.font[i];
-							lib.configMenu.appearence.config.global_font.item[i]=pack.font[i];
-							ui.css.fontsheet.sheet.insertRule("@font-face {font-family: '"+i+"'; src: url('"+lib.assetURL+"font/"+i+".ttf');}",0);
-							if(lib.config.suits_font) ui.css.fontsheet.sheet.insertRule("@font-face {font-family: '"+i+"'; src: url('"+lib.assetURL+"font/suits.ttf');}",0);
-						}
-						if(lib.config.suits_font) ui.css.fontsheet.sheet.insertRule("@font-face {font-family: 'Suits'; src: url('"+lib.assetURL+"font/suits.ttf');}",0);
-						lib.configMenu.appearence.config.cardtext_font.item.default='默认';
-						lib.configMenu.appearence.config.global_font.item.default='默认';
+						const appearenceConfig=lib.configMenu.appearence.config,fontSheet=ui.css.fontsheet.sheet,suitsFont=lib.config.suits_font;
+						Object.keys(pack.font).forEach(value=>{
+							const font=pack.font[value];
+							appearenceConfig.name_font.item[value]=font;
+							appearenceConfig.identity_font.item[value]=font;
+							appearenceConfig.cardtext_font.item[value]=font;
+							appearenceConfig.global_font.item[value]=font;
+							fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.ttf');}`,0);
+							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.ttf');}`,0);
+						});
+						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: local('Noname Suit'), url('${lib.assetURL}font/suits.ttf');}`,0);
+						appearenceConfig.cardtext_font.item.default='默认';
+						appearenceConfig.global_font.item.default='默认';
 					}
 
 					var ua=navigator.userAgent.toLowerCase();
@@ -8109,10 +8112,8 @@
 									ui.backgroundMusic.pause();
 								}
 							});
-							document.addEventListener("resume", function(){
-								if(ui.backgroundMusic){
-									ui.backgroundMusic.play();
-								}
+							document.addEventListener("resume", ()=>{
+								if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
 							});
 							document.addEventListener("backbutton", function(){
 								if(ui.arena&&ui.arena.classList.contains('menupaused')){
@@ -11203,10 +11204,7 @@
 								game.resume();
 								_status.imchoosing=false;
 								if(roundmenu) ui.roundmenu.style.display='';
-								if(ui.backgroundMusic){
-									var promise=ui.backgroundMusic.play();
-									if(promise) promise.catch(()=>void 0);
-								}
+								if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
 								hitsound_audio.remove();
 							},1000);
 						};
@@ -11321,7 +11319,7 @@
 								combo++;
 								max_combo=Math.max(combo,max_combo);
 								hitsound_audio.currentTime=0;
-								if(hitsound_audio.paused) hitsound_audio.play();
+								if(hitsound_audio.paused) Promise.resolve(hitsound_audio.play()).catch(()=>void 0);
 								break;
 							}
 						};
@@ -11395,10 +11393,7 @@
 						if(dialog){
 							dialog.close();
 						}
-						if(ui.backgroundMusic){
-							var promise=ui.backgroundMusic.play();
-							if(promise) promise.catch(()=>void 0);
-						}
+						if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
 					},event.videoId,event.time);
 					var result=event.result||result;
 					event.result=result;
@@ -31995,7 +31990,7 @@
 			};
 			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
 			audio.oncanplay=function(){
-				this.play();
+				Promise.resolve(this.play()).catch(()=>void 0);
 			};
 			ui.window.appendChild(audio);
 			return audio;
@@ -32106,7 +32101,7 @@
 			};
 			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
 			audio.oncanplay=function(){
-				this.play();
+				Promise.resolve(this.play()).catch(()=>void 0);
 			};
 			ui.window.appendChild(audio);
 		},
@@ -37425,284 +37420,189 @@
 				}
 			});
 		},
-		updateRoundNumber:function(){
-			game.broadcastAll(function(num1,num2,top){
-				if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=num1+'轮 剩余牌: '+num2;
-				_status.pileTop=top;
-			},game.roundNumber,ui.cardPile.childNodes.length,ui.cardPile.firstChild);
-		},
-		asyncDraw:function(players,num,drawDeck,bottom){
-			for(var i=0;i<players.length;i++){
-				var num2=1;
-				if(typeof num=='number'){
-					num2=num;
-				}
-				else if(Array.isArray(num)){
-					num2=num[i];
-				}
-				else if(typeof num=='function'){
-					num2=num(players[i]);
-				}
-				if(drawDeck&&drawDeck.drawDeck){
-					players[i].draw(num2,false,drawDeck);
-				}
-				else{
-					if(bottom) players[i].draw(num2,'nodelay','bottom');
-					else players[i].draw(num2,'nodelay');
-				}
-			}
-		},
+		updateRoundNumber:()=>game.broadcastAll((num1,num2,top)=>{
+			if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=`${num1}轮 剩余牌: ${num2}`;
+			_status.pileTop=top;
+		},game.roundNumber,ui.cardPile.childNodes.length,ui.cardPile.firstChild),
+		asyncDraw:(players,num,drawDeck,bottom)=>players.forEach((value,index)=>{
+			let num2=1;
+			if(typeof num=='number') num2=num;
+			else if(Array.isArray(num)) num2=num[index];
+			else if(typeof num=='function') num2=num(value);
+			if(drawDeck&&drawDeck.drawDeck) value.draw(num2,false,drawDeck);
+			else if(bottom) value.draw(num2,'nodelay','bottom');
+			else value.draw(num2,'nodelay');
+		}),
 		asyncDrawAuto:function(players,num,drawDeck){
-			if(players.length==1){
-				var num2=1;
-				if(typeof num=='number'){
-					num2=num;
-				}
-				else if(Array.isArray(num)){
-					num2=num[0];
-				}
-				else if(typeof num=='function'){
-					num2=num(players[0]);
-				}
-				if(drawDeck&&drawDeck.drawDeck){
-					players[0].draw(num2,drawDeck);
-				}
-				else{
-					players[0].draw(num2);
-				}
-			}
-			else{
+			if(players.length>1){
 				game.asyncDraw.apply(this,arguments);
+				return;
 			}
+			let num2=1;
+			if(typeof num=='number') num2=num;
+			else if(Array.isArray(num)) num2=num[0];
+			else if(typeof num=='function') num2=num(players[0]);
+			if(drawDeck&&drawDeck.drawDeck) players[0].draw(num2,drawDeck);
+			else players[0].draw(num2);
 		},
-		finishSkill:function(i,sub){
-			var j;
-			var mode=get.mode();
-			var info=lib.skill[i];
+		finishSkill:(i,sub)=>{
+			const mode=get.mode(),info=lib.skill[i],iInfo=`${i}_info`;
 			if(info.alter){
-				lib.translate[i+'_info_origin']=lib.translate[i+'_info'];
-				if(!lib.config.vintageSkills.contains(i)){
-					lib.translate[i+'_info']=lib.translate[i+'_info_alter'];
-				}
+				lib.translate[`${iInfo}_origin`]=lib.translate[iInfo];
+				if(!lib.config.vintageSkills.contains(i)) lib.translate[iInfo]=lib.translate[`${iInfo}_alter`];
 			}
-			else if(lib.translate[i+'_info_'+mode]){
-				lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
-			}
-			else if(lib.translate[i+'_info_zhu']&&(mode=='identity'||(mode=='guozhan'&&_status.mode=='four'))){
-				lib.translate[i+'_info']=lib.translate[i+'_info_zhu'];
-			}
-			else if(lib.translate[i+'_info_combat']&&get.is.versus()){
-				lib.translate[i+'_info']=lib.translate[i+'_info_combat'];
-			}
+			else if(lib.translate[`${iInfo}_${mode}`]) lib.translate[iInfo]=lib.translate[`${iInfo}_${mode}`];
+			else if(lib.translate[`${iInfo}_zhu`]&&(mode=='identity'||mode=='guozhan'&&_status.mode=='four')) lib.translate[iInfo]=lib.translate[`${iInfo}_zhu`];
+			else if(lib.translate[`${iInfo}_combat`]&&get.is.versus()) lib.translate[iInfo]=lib.translate[`${iInfo}_combat`];
 			if(info.forbid&&info.forbid.contains(mode)){
 				lib.skill[i]={};
-				if(lib.translate[i+'_info']){
-					lib.translate[i+'_info']='此模式下不可用';
-				}
+				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
 				return;
 			}
 			if(info.mode&&info.mode.contains(mode)==false){
 				lib.skill[i]={};
-				if(lib.translate[i+'_info']){
-					lib.translate[i+'_info']='此模式下不可用';
-				}
+				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
 				return;
 			}
 			if(info.available&&info.available(mode)==false){
 				lib.skill[i]={};
-				if(lib.translate[i+'_info']){
-					lib.translate[i+'_info']='此模式下不可用';
-				}
+				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
 				return;
 			}
 			if(info.viewAs&&typeof info.viewAs!='function'){
-				if(typeof info.viewAs=='string'){
-					info.viewAs={name:info.viewAs};
-				}
+				if(typeof info.viewAs=='string') info.viewAs={
+					name:info.viewAs
+				};
 				if(!lib.card[info.viewAs.name]){
 					lib.skill[i]={};
-					lib.translate[i+'_info']='技能不可用';
+					lib.translate[iInfo]='技能不可用';
 					return;
 				}
 				if(info.ai==undefined) info.ai={};
-				var skill=info.ai;
-				var card=lib.card[info.viewAs.name].ai;
-				for(j in card){
-					if(skill[j]==undefined) skill[j]=card[j];
-					else if(typeof skill[j]=='object'){
-						for(var k in card[j]){
-							if(skill[j][k]==undefined) skill[j][k]=card[j][k];
-						}
-					}
-				}
+				const skill=info.ai,card=lib.card[info.viewAs.name].ai;
+				Object.keys(card).forEach(value=>{
+					if(skill[value]==undefined) skill[value]=card[value];
+					else if(typeof skill[value]=='object') Object.keys(card[value]).forEach(element=>{
+						if(skill[value][element]==undefined) skill[value][element]=card[value][element];
+					});
+				});
 			}
 			if(info.inherit){
-				var skill=lib.skill[info.inherit];
-				for(j in skill){
-					if(info[j]==undefined){
-						if(j=='audio'&&(typeof info[j]=='number'||typeof info[j]=='boolean')){
-							info[j]=info.inherit;
-						}
-						else{
-							info[j]=skill[j];
-						}
-					}
-				}
-				if(lib.translate[i]==undefined){
-					lib.translate[i]=lib.translate[info.inherit];
-				}
-				if(lib.translate[i+'_info']==undefined){
-					lib.translate[i+'_info']=lib.translate[info.inherit+'_info'];
-				}
+				const skill=lib.skill[info.inherit];
+				Object.keys(skill).forEach(value=>{
+					if(info[value]!=undefined) return;
+					if(value=='audio'&&(typeof info[value]=='number'||typeof info[value]=='boolean')) info[value]=info.inherit;
+					else info[value]=skill[value];
+				});
+				if(lib.translate[i]==undefined) lib.translate[i]=lib.translate[info.inherit];
+				if(lib.translate[iInfo]==undefined) lib.translate[iInfo]=lib.translate[`${info.inherit}_info`];
 			}
 			if(info.limited){
 				if(info.mark===undefined) info.mark=true;
 				if(!info.intro) info.intro={};
 				if(info.intro.content===undefined) info.intro.content='limited';
 				if(info.skillAnimation===undefined) info.skillAnimation=true;
-				if(info.init===undefined) info.init=function(player,skill){
-					player.storage[skill]=false;
-				}
+				if(info.init===undefined) info.init=(player,skill)=>player.storage[skill]=false;
 			}
-			if(info.subSkill&&!sub){
-				for(var j in info.subSkill){
-					lib.skill[i+'_'+j]=info.subSkill[j];
-					lib.skill[i+'_'+j].sub=true;
-					if(info.subSkill[j].name){
-						lib.translate[i+'_'+j]=info.subSkill[j].name;
-					}
-					else{
-						lib.translate[i+'_'+j]=lib.translate[i+'_'+j]||lib.translate[i];
-					}
-					if(info.subSkill[j].description){
-						lib.translate[i+'_'+j+'_info']=info.subSkill[j].description;
-					}
-					if(info.subSkill[j].marktext){
-						lib.translate[i+'_'+j+'_bg']=info.subSkill[j].marktext;
-					}
-					game.finishSkill(i+'_'+j,true);
-				}
-			}
+			if(info.subSkill&&!sub) Object.keys(info.subSkill).forEach(value=>{
+				const iValue=`${i}_${value}`;
+				lib.skill[iValue]=info.subSkill[value];
+				lib.skill[iValue].sub=true;
+				if(info.subSkill[value].name) lib.translate[iValue]=info.subSkill[value].name;
+				else lib.translate[iValue]=lib.translate[iValue]||lib.translate[i];
+				if(info.subSkill[value].description) lib.translate[`${iValue}_info`]=info.subSkill[value].description;
+				if(info.subSkill[value].marktext) lib.translate[`${iValue}_bg`]=info.subSkill[value].marktext;
+				game.finishSkill(iValue,true);
+			});
 			if(info.round){
-				var k=i+'_roundcount';
-				if(typeof info.group=='string'){
-					info.group=[info.group,k];
-				}
-				else if(Array.isArray(info.group)){
-					info.group.add(k);
-				}
-				else{
-					info.group=[k];
-				}
-				lib.skill[k]=(function(round,name){
-					return {
-						init:function(player){
-							if(typeof player.storage[name]!=='number') player.storage[name]=1-round;
+				const k=`${i}_roundcount`;
+				if(typeof info.group=='string') info.group=[info.group,k];
+				else if(Array.isArray(info.group)) info.group.add(k);
+				else info.group=[k];
+				lib.skill[k]=((round,name)=>({
+					init:player=>{
+						if(typeof player.storage[name]!=='number') player.storage[name]=1-round;
+					},
+					intro:{
+						content:(storage,player)=>{
+							let str='';
+							const info=get.info(name.slice(0,name.indexOf('_roundcount')));
+							if(info&&info.addintro) str+=info.addintro(storage,player);
+							const num=round-(game.roundNumber-storage);
+							if(num>0) str+=`${get.cnNumber(num)}轮后${info.roundtext||'技能重置'}`;
+							else str+='技能可发动';
+							return str;
 						},
-						intro:{
-							content:function(storage,player){
-								var str='';
-								var info=get.info(name.slice(0,name.indexOf('_roundcount')));
-								if(info&&info.addintro){
-									str+=info.addintro(storage,player);
-								}
-								var num=round-(game.roundNumber-storage);
-								if(num>0){
-									str+=get.cnNumber(num)+'轮后'+(info.roundtext||'技能重置');
-								}
-								else{
-									str+='技能可发动';
-								}
-								return str;
-							},
-							markcount:function(storage,player){
-								var num=round-(game.roundNumber-storage);
-								if(num>0){
-									return num;
-								}
-								return 0;
-							}
-						},
-						trigger:{global:'roundStart'},
-						forced:true,
-						popup:false,
-						silent:true,
-						content:function(){
-							var skill=event.name.slice(0,event.name.indexOf('_roundcount'));
-							if(lib.skill[skill].round-(game.roundNumber-player.storage[event.name])>0){
-								player.updateMarks();
-							}
-							else{
-								player.unmarkSkill(event.name);
-							}
-						}
-					};
-				}(info.round,k));
+						markcount:(storage,player)=>Math.max(round-(game.roundNumber-storage),0)
+					},
+					trigger:{global:'roundStart'},
+					forced:true,
+					popup:false,
+					silent:true,
+					content:()=>{
+						if(lib.skill[event.name.slice(0,event.name.indexOf('_roundcount'))].round-(game.roundNumber-player.storage[event.name])>0) player.updateMarks();
+						else player.unmarkSkill(event.name);
+					}
+				}))(info.round,k);
 				lib.translate[k]=lib.translate[i]||'';
-				lib.translate[k+'_bg']=lib.translate[i+'_bg']||lib.translate[k][0];
+				lib.translate[`${k}_bg`]=lib.translate[`${i}_bg`]||lib.translate[k][0];
 			}
-			if(info.marktext){
-				lib.translate[i+'_bg']=info.marktext;
-			}
+			if(info.marktext) lib.translate[`${i}_bg`]=info.marktext;
 			if(info.silent){
 				if(!info.hasOwnProperty('forced')) info.forced=true;
 				if(!info.hasOwnProperty('popup')) info.popup=false;
 			}
-			if(i[0]=='_'){
-				game.addGlobalSkill(i);
-			}
+			if(i[0]=='_') game.addGlobalSkill(i);
 		},
-		finishCards:function(){
+		finishCards:()=>{
 			_status.cardsFinished=true;
-			var i,j,k;
-			var mode=get.mode();
-			for(i in lib.card){
-				if(lib.translate[i+'_info_'+mode]){
-					lib.translate[i+'_info']=lib.translate[i+'_info_'+mode];
+			const mode=get.mode(),filterTarget=(card,player,target)=>player==target&&target.canEquip(card,true),aiBasicOrder=(card,player)=>{
+				const equipValue=get.equipValue(card,player)/20;
+				return player&&player.hasSkillTag('reverseEquip')?8.5-equipValue:8+equipValue;
+			},aiBasicValue=(card,player,index,method)=>{
+				if(!player.getCards('e').contains(card)&&!player.canEquip(card,true)) return 0.01;
+				const info=get.info(card),current=player.getEquip(info.subtype),value=current&&card!=current&&get.value(current,player);
+				let equipValue=info.ai.equipValue||info.ai.basic.equipValue;
+				if(typeof equipValue=='function'){
+					if(method=='raw')return equipValue(card,player);
+					if(method=='raw2')return equipValue(card,player)-value;
+					return Math.max(0.1,equipValue(card,player)-value);
 				}
-				else if(lib.translate[i+'_info_zhu']&&(mode=='identity'||(mode=='guozhan'&&_status.mode=='four'))){
-					lib.translate[i+'_info']=lib.translate[i+'_info_zhu'];
-				}
-				else if(lib.translate[i+'_info_combat']&&get.is.versus()){
-					lib.translate[i+'_info']=lib.translate[i+'_info_combat'];
-				}
-				var card=lib.card[i];
-				if(card.filterTarget&&card.selectTarget==undefined){
-					card.selectTarget=1;
-				}
+				if(typeof equipValue!='number') equipValue=0;
+				if(method=='raw') return equipValue;
+				if(method=='raw2') return equipValue-value;
+				return Math.max(0.1,equipValue-value);
+			},aiResultTarget=(player,target,card)=>get.equipResult(player,target,card.name);
+			Object.keys(lib.card).forEach(libCardKey=>{
+				const info = `${libCardKey}_info`;
+				if(lib.translate[`${info}_${mode}`]) lib.translate[info]=lib.translate[`${info}_${mode}`];
+				else if(lib.translate[`${info}_zhu`]&&(mode=='identity'||mode=='guozhan'&&_status.mode=='four')) lib.translate[info]=lib.translate[`${info}_zhu`];
+				else if(lib.translate[`${info}_combat`]&&get.is.versus()) lib.translate[info]=lib.translate[`${info}_combat`];
+				const card=lib.card[libCardKey];
+				if(card.filterTarget&&card.selectTarget==undefined) card.selectTarget=1;
 				if(card.autoViewAs){
-					if(!card.ai){
-						card.ai={};
-					}
+					if(!card.ai) card.ai={};
 					if(!card.ai.order){
 						card.ai.order=lib.card[card.autoViewAs].ai.order;
-						if(!card.ai.order&&lib.card[card.autoViewAs].ai.basic){
-							card.ai.order=lib.card[card.autoViewAs].ai.basic.order;
-						}
+						if(!card.ai.order&&lib.card[card.autoViewAs].ai.basic) card.ai.order=lib.card[card.autoViewAs].ai.basic.order;
 					}
 				}
 				if(card.type=='equip'){
 					if(card.enable==undefined) card.enable=true;
 					if(card.selectTarget==undefined) card.selectTarget=-1;
-					if(card.filterTarget==undefined) card.filterTarget=function(card,player,target){
-						if(player!=target) return false;
-						return target.canEquip(card,true);
-					};
+					if(card.filterTarget==undefined) card.filterTarget=filterTarget;
 					if(card.modTarget==undefined) card.modTarget=true;
 					if(card.allowMultiple==undefined) card.allowMultiple=false;
 					if(card.content==undefined) card.content=lib.element.content.equipCard;
 					if(card.toself==undefined) card.toself=true;
-					if(card.ai==undefined) card.ai={basic:{}};
-					if(card.ai.basic==undefined) card.ai.basic={};
-					if(card.ai.result==undefined) card.ai.result={target:1.5};
-					if(card.ai.basic.order==undefined) card.ai.basic.order=function(card,player){
-						if(player&&player.hasSkillTag('reverseEquip')){
-							return 8.5-get.equipValue(card,player)/20;
-						}
-						else{
-							return 8+get.equipValue(card,player)/20;
-						}
+					if(card.ai==undefined) card.ai={
+						basic:{}
 					};
+					if(card.ai.basic==undefined) card.ai.basic={};
+					if(card.ai.result==undefined) card.ai.result={
+						target:1.5
+					};
+					if(card.ai.basic.order==undefined) card.ai.basic.order=aiBasicOrder;
 					if(card.ai.basic.useful==undefined) card.ai.basic.useful=2;
 					if(card.subtype=='equip3'){
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=7;
@@ -37710,34 +37610,9 @@
 					else if(card.subtype=='equip4'){
 						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=4;
 					}
-					else{
-						if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;
-					}
-					if(card.ai.basic.value==undefined) card.ai.basic.value=function(card,player,index,method){
-						if(!player.getCards('e').contains(card)&&!player.canEquip(card,true)) return 0.01;
-						var value=0;
-						var info=get.info(card);
-						var current=player.getEquip(info.subtype);
-						if(current&&card!=current){
-							value=get.value(current,player);
-						}
-						var equipValue=info.ai.equipValue;
-						if(equipValue==undefined){
-							equipValue=info.ai.basic.equipValue;
-						}
-						if(typeof equipValue=='function'){
-							if(method=='raw') return equipValue(card,player);
-							if(method=='raw2') return equipValue(card,player)-value;
-							return Math.max(0.1,equipValue(card,player)-value);
-						}
-						if(typeof equipValue!='number') equipValue=0;
-						if(method=='raw') return equipValue;
-						if(method=='raw2') return equipValue-value;
-						return Math.max(0.1,equipValue-value);
-					}
-					if(!card.ai.result.keepAI) card.ai.result.target=function(player,target,card){
-						return get.equipResult(player,target,card.name);
-					};
+					else if(card.ai.basic.equipValue==undefined) card.ai.basic.equipValue=1;
+					if(card.ai.basic.value==undefined) card.ai.basic.value=aiBasicValue;
+					if(!card.ai.result.keepAI) card.ai.result.target=aiResultTarget;
 				}
 				else if(card.type=='delay'){
 					if(card.enable==undefined) card.enable=true;
@@ -37745,38 +37620,26 @@
 					if(card.content==undefined) card.content=lib.element.content.addJudgeCard;
 					if(card.allowMultiple==undefined) card.allowMultiple=false;
 				}
-			}
-			for(i in lib.skill){
-				game.finishSkill(i);
-			}
+			});
+			Object.keys(lib.skill).forEach(value=>game.finishSkill(value));
 		},
 		checkMod:function(){
-			var name=arguments[arguments.length-2];
-			var skills=arguments[arguments.length-1];
-			if(skills.getSkills){
-				//if(name!='cardname') skills=skills.getSkills();
-				//else skills=skills.getSkills(null,false);
-				skills=skills.getSkills();
-			}
+			const argumentArray=Array.from(arguments),name=argumentArray[argumentArray.length-2];
+			let skills=argumentArray[argumentArray.length-1];
+			if(skills.getSkills) skills=skills.getSkills();
 			skills=skills.concat(lib.skill.global);
 			game.expandSkills(skills);
-			skills.sort(function(a,b){
-				return get.priority(a)-get.priority(b);
+			skills.sort((a,b)=>get.priority(a)-get.priority(b));
+			const arg=argumentArray.slice(0,-2);
+			skills.forEach(value=>{
+				const info=get.info(value);
+				if(!info||!info.mod||!info.mod[name]) return;
+				const result=info.mod[name].apply(this,arg);
+				if(typeof arg[arg.length-1]!='object'&&result!=undefined) arg[arg.length-1]=result;
 			});
-			var arg=[],i,info;
-			for(i=0;i<arguments.length-2;i++){
-				arg.push(arguments[i]);
-			}
-			for(i=0;i<skills.length;i++){
-				info=get.info(skills[i]);
-				if(info&&info.mod&&info.mod[name]){
-					var result=info.mod[name].apply(this,arg);
-					if(typeof arg[arg.length-1]!='object'&&result!=undefined) arg[arg.length-1]=result;
-				}
-			}
 			return arg[arg.length-1];
 		},
-		prepareArena:function(num){
+		prepareArena:num=>{
 			_status.prepareArena=true;
 			game.showHistory(false);
 			ui.create.players(num);
@@ -37784,22 +37647,18 @@
 			ui.create.cardsAsync();
 			game.finishCards();
 		},
-		clearArena:function(){
+		clearArena:()=>{
 			ui.control.innerHTML='';
 			ui.arenalog.innerHTML='';
-			var nodes=[];
-			for(var i=0;i<ui.arena.childNodes.length;i++){
-				nodes.push(ui.arena.childNodes[i]);
-			}
-			for(var i=0;i<nodes.length;i++){
-				if(nodes[i]==ui.canvas) continue;
-				if(nodes[i]==ui.control) continue;
-				if(nodes[i]==ui.arenalog) continue;
-				if(nodes[i]==ui.roundmenu) continue;
-				if(nodes[i]==ui.timer) continue;
-				if(nodes[i]==ui.autonode) continue;
-				nodes[i].remove();
-			}
+			Array.from(ui.arena.childNodes).forEach(value=>{
+				if(value==ui.canvas) return;
+				if(value==ui.control) return;
+				if(value==ui.arenalog) return;
+				if(value==ui.roundmenu) return;
+				if(value==ui.timer) return;
+				if(value==ui.autonode) return;
+				value.remove();
+			});
 			ui.sidebar.innerHTML='';
 			ui.cardPile.innerHTML='';
 			ui.discardPile.innerHTML='';
@@ -37810,7 +37669,7 @@
 			game.dead.length=0;
 			game.me=null;
 		},
-		clearConnect:function(){
+		clearConnect:()=>{
 			if(ui.ipnode){
 				ui.ipnode.remove();
 				delete ui.ipnode;
@@ -37836,137 +37695,108 @@
 				delete ui.startServer;
 			}
 			if(ui.rooms){
-				for(var i=0;i<ui.rooms.length;i++){
-					ui.rooms[i].remove();
-				}
+				ui.rooms.forEach(value=>value.remove());
 				delete ui.rooms;
 			}
 			if(ui.roombase){
 				ui.roombase.remove();
 				delete ui.roombase;
 			}
-			if(ui.connectEvents){
-				ui.connectEvents.remove();
-				ui.connectEventsCount.remove();
-				ui.connectClients.remove();
-				ui.connectClientsCount.remove();
-				ui.createRoomButton.remove();
-				delete ui.connectEvents;
-				delete ui.connectEventsCount;
-				delete ui.connectClients;
-				delete ui.connectClientsCount;
-				delete ui.createRoomButton;
-			}
+			if(!ui.connectEvents) return;
+			ui.connectEvents.remove();
+			ui.connectEventsCount.remove();
+			ui.connectClients.remove();
+			ui.connectClientsCount.remove();
+			ui.createRoomButton.remove();
+			delete ui.connectEvents;
+			delete ui.connectEventsCount;
+			delete ui.connectClients;
+			delete ui.connectClientsCount;
+			delete ui.createRoomButton;
 		},
 		log:function(){
-			var str='',str2='',logvid=null;
-			for(var i=0;i<arguments.length;i++){
-				var itemtype=get.itemtype(arguments[i]);
+			let str='',str2='',logvid=null;
+			const color=new Map([
+				['b','blue'],
+				['y','yellow'],
+				['g','green']
+			]);
+			Array.from(arguments).forEach(value=>{
+				const itemtype=get.itemtype(value);
 				if(itemtype=='player'||itemtype=='players'){
-					str+='<span class="bluetext">'+get.translation(arguments[i])+'</span>';
-					str2+=get.translation(arguments[i]);
+					str+=`<span class="bluetext">${get.translation(value)}</span>`;
+					str2+=get.translation(value);
 				}
-				else if(itemtype=='cards'||itemtype=='card'||(typeof arguments[i]=='object'&&arguments[i]&&arguments[i].name)){
-					str+='<span class="yellowtext">'+get.translation(arguments[i])+'</span>';
-					str2+=get.translation(arguments[i]);
+				else if(itemtype=='cards'||itemtype=='card'||(typeof value=='object'&&value&&value.name)){
+					str+=`<span class="yellowtext">${get.translation(value)}</span>`;
+					str2+=get.translation(value);
 				}
-				else if(typeof arguments[i]=='object'){
-					if(arguments[i]){
-						if(arguments[i].parentNode==ui.historybar){
-							logvid=arguments[i].logvid;
-						}
-						else{
-							str+=get.translation(arguments[i]);
-							str2+=get.translation(arguments[i]);
-						}
+				else if(typeof value=='object'){
+					if(value.parentNode==ui.historybar) logvid=value.logvid;
+					else{
+						str+=get.translation(value);
+						str2+=get.translation(value);
 					}
 				}
-				else if(typeof arguments[i]=='string'){
-					if(arguments[i][0]=='【'&&arguments[i][arguments[i].length-1]=='】'){
-						str+='<span class="greentext">'+get.translation(arguments[i])+'</span>';
-						str2+=get.translation(arguments[i]);
+				else if(typeof value=='string'){
+					if(value[0]=='【'&&value[value.length-1]=='】'){
+						str+=`<span class="greentext">${get.translation(value)}</span>`;
+						str2+=get.translation(value);
 					}
-					else if(arguments[i][0]=='#'){
-						var color='';
-						switch(arguments[i][1]){
-							case 'b':color='blue';break;
-							case 'y':color='yellow';break;
-							case 'g':color='green';break;
-						}
-						str+='<span class="'+color+'text">'+get.translation(arguments[i].slice(2))+'</span>';
-						str2+=get.translation(arguments[i].slice(2));
+					else if(value[0]=='#'){
+						str+=`<span class="${color.get(value[1])||''}text">${get.translation(value.slice(2))}</span>`;
+						str2+=get.translation(value.slice(2));
 					}
 					else{
-						str+=get.translation(arguments[i]);
-						str2+=get.translation(arguments[i]);
+						str+=get.translation(value);
+						str2+=get.translation(value);
 					}
 				}
 				else{
-					str+=arguments[i];
-					str2+=arguments[i];
+					str+=value;
+					str2+=value;
 				}
-
-			}
-			var node=ui.create.div();
+			});
+			const node=ui.create.div();
 			node.innerHTML=lib.config.log_highlight?str:str2;
 			ui.sidebar.insertBefore(node,ui.sidebar.firstChild);
 			game.addVideo('log',null,lib.config.log_highlight?str:str2);
-			game.broadcast(function(str,str2){
-				game.log(lib.config.log_highlight?str:str2);
-			},str,str2);
+			game.broadcast((str,str2)=>game.log(lib.config.log_highlight?str:str2),str,str2);
 			if(!_status.video&&!game.online){
-				if(!logvid){
-					logvid=_status.event.getLogv();
-				}
-				if(logvid){
-					game.logv(logvid,'<div class="text center">'+lib.config.log_highlight?str:str2+'</div>');
-				}
+				if(logvid) game.logv(logvid,`<div class="text center">${lib.config.log_highlight?str:str2}</div>`);
+				else logvid=_status.event.getLogv();
 			}
-			// if(lib.config.title) document.title=lib.config.log_highlight?str:str2;
-			if(lib.config.show_log!='off'&&!game.chess){
-				var nodeentry=node.cloneNode(true);
-				ui.arenalog.insertBefore(nodeentry,ui.arenalog.firstChild);
-				if(!lib.config.clear_log){
-					while(ui.arenalog.childNodes.length&&ui.arenalog.scrollHeight>ui.arenalog.offsetHeight){
-						ui.arenalog.lastChild.remove();
-					}
-				}
-				if(!lib.config.low_performance){
-					nodeentry.style.transition='all 0s';
-					nodeentry.style.marginBottom=(-nodeentry.offsetHeight)+'px';
-					ui.refresh(nodeentry);
-					nodeentry.style.transition='';
-					nodeentry.style.marginBottom='';
-				}
-				if(lib.config.clear_log){
-					nodeentry.timeout=setTimeout(function(){
-						nodeentry.delete();
-					},1000);
-					for(var i=0;i<ui.arenalog.childElementCount;i++){
-						if(!ui.arenalog.childNodes[i].timeout){
-							ui.arenalog.childNodes[i].remove();
-						}
-					}
-				}
+			if(lib.config.show_log=='off'||game.chess) return;
+			const nodeentry=node.cloneNode(true);
+			ui.arenalog.insertBefore(nodeentry,ui.arenalog.firstChild);
+			if(!lib.config.clear_log) while(ui.arenalog.childNodes.length&&ui.arenalog.scrollHeight>ui.arenalog.offsetHeight){
+				ui.arenalog.lastChild.remove();
 			}
+			if(!lib.config.low_performance){
+				nodeentry.style.transition='all 0s';
+				nodeentry.style.marginBottom=`-${nodeentry.offsetHeight}px`;
+				ui.refresh(nodeentry);
+				nodeentry.style.transition='';
+				nodeentry.style.marginBottom='';
+			}
+			if(!lib.config.clear_log) return;
+			nodeentry.timeout=setTimeout(()=>nodeentry.delete(),1000);
+			Array.from(ui.arenalog.childNodes).forEach(value=>{
+				if(!value.timeout) value.remove();
+			});
 		},
-		logv:function(player,card,targets,event,forced,logvid){
-			var node=ui.create.div('.hidden');
-			node.node={};
-			logvid=logvid||get.id();
+		logv:(player,card,targets,event,forced,logvid)=>{
 			if(!player){
 				player=_status.event.getParent().logvid;
 				if(!player) return;
 			}
-			game.broadcast(function(player,card,targets,event,forced,logvid){
-				game.logv(player,card,targets,event,forced,logvid);
-			},player,card,targets,event,forced,logvid);
+			const node=ui.create.div('.hidden');
+			node.node={};
+			logvid=logvid||get.id();
+			game.broadcast(game.logv,player,card,targets,event,forced,logvid);
 			if(typeof player=='string'){
-				for(var i=0;i<ui.historybar.childElementCount;i++){
-					if(ui.historybar.childNodes[i].logvid==player){
-						ui.historybar.childNodes[i].added.push(card);break;
-					}
-				}
+				const childNode=Array.from(ui.historybar.childNodes).find(value=>value.logvid==player);
+				if(childNode) childNode.added.push(card);
 				return;
 			}
 			if(typeof card=='string'){
@@ -37974,23 +37804,17 @@
 					if(lib.skill[card]&&lib.skill[card].logv===false&&!forced) return;
 					if(!lib.translate[card]) return;
 				}
-				var avatar;
-				if(!player.isUnseen(0)){
-					avatar=player.node.avatar.cloneNode();
-				}
-				else if(!player.isUnseen(1)){
-					avatar=player.node.avatar2.cloneNode();
-				}
-				else{
-					return;
-				}
+				let avatar;
+				if(!player.isUnseen(0)) avatar=player.node.avatar.cloneNode();
+				else if(!player.isUnseen(1)) avatar=player.node.avatar2.cloneNode();
+				else return;
 				node.node.avatar=avatar;
 				avatar.style.transform='';
 				avatar.className='avatar';
 				if(card=='die'){
 					node.dead=true;
 					node.player=player;
-					var avatar2=avatar.cloneNode();
+					const avatar2=avatar.cloneNode();
 					avatar2.className='avatarbg grayscale1';
 					avatar.appendChild(avatar2);
 					avatar.style.opacity=0.6;
@@ -38003,21 +37827,14 @@
 				node.appendChild(avatar);
 				if(card=='die'&&targets&&targets!=player){
 					node.source=targets;
-					var avatar;
 					player=targets;
-					if(!player.isUnseen(0)){
-						avatar=player.node.avatar.cloneNode();
-					}
-					else if(!player.isUnseen(1)){
-						avatar=player.node.avatar2.cloneNode();
-					}
+					if(!player.isUnseen(0)) avatar=player.node.avatar.cloneNode();
+					else if(!player.isUnseen(1)) avatar=player.node.avatar2.cloneNode();
 					else if(get.mode()=='guozhan'&&player.node&&player.node.name_seat){
 						avatar=ui.create.div('.avatar.cardbg');
 						avatar.innerHTML=player.node.name_seat.innerHTML[0];
 					}
-					else{
-						return;
-					}
+					else return;
 					avatar.style.transform='';
 					node.node.avatar2=avatar;
 					avatar.classList.add('avatar2');
@@ -38027,71 +37844,50 @@
 			else if(Array.isArray(card)){
 				node.cards=card[1];
 				card=card[0];
-				var info=[card.suit||'',card.number||'',card.name||'',card.nature||''];
-				if(!Array.isArray(node.cards)||!node.cards.length){
-					node.cards=[ui.create.card(node,'noclick',true).init(info)];
-				}
+				const info=[card.suit||'',card.number||'',card.name||'',card.nature||''];
+				if(!Array.isArray(node.cards)||!node.cards.length) node.cards=[ui.create.card(node,'noclick',true).init(info)];
 				if(card.name=='wuxie'){
 					if(ui.historybar.firstChild&&ui.historybar.firstChild.type=='wuxie'){
 						ui.historybar.firstChild.players.push(player);
 						ui.historybar.firstChild.cards.addArray(node.cards);
 						return;
 					}
-					else{
-						node.type='wuxie';
-						node.players=[player];
-					}
+					node.type='wuxie';
+					node.players=[player];
 				}
-				if(card.copy){
-					card.copy(node,false);
-				}
+				if(card.copy) card.copy(node,false);
 				else{
 					card=ui.create.card(node,'noclick',true);
 					card.init(info);
 				}
-				var avatar;
-				if(!player.isUnseen(0)){
-					avatar=player.node.avatar.cloneNode();
-				}
-				else if(!player.isUnseen(1)){
-					avatar=player.node.avatar2.cloneNode();
-				}
+				let avatar;
+				if(!player.isUnseen(0)) avatar=player.node.avatar.cloneNode();
+				else if(!player.isUnseen(1)) avatar=player.node.avatar2.cloneNode();
 				else if(get.mode()=='guozhan'&&player.node&&player.node.name_seat){
 					avatar=ui.create.div('.avatar.cardbg');
 					avatar.innerHTML=player.node.name_seat.innerHTML[0];
 				}
-				else{
-					return;
-				}
+				else return;
 				node.node.avatar=avatar;
 				avatar.style.transform='';
 				avatar.classList.add('avatar2');
 				node.appendChild(avatar);
-
-				if(targets&&targets.length==1&&targets[0]!=player&&get.itemtype(targets[0])=='player'){
-					(function(){
-						var avatar2;
-						var target=targets[0];
-						if(!target.isUnseen(0)){
-							avatar2=target.node.avatar.cloneNode();
-						}
-						else if(!player.isUnseen(1)){
-							avatar2=target.node.avatar2.cloneNode();
-						}
-						else if(get.mode()=='guozhan'&&target.node&&target.node.name_seat){
-							avatar2=ui.create.div('.avatar.cardbg');
-							avatar2.innerHTML=target.node.name_seat.innerHTML[0];
-						}
-						else{
-							return;
-						}
-						node.node.avatar2=avatar2;
-						avatar2.style.transform='';
-						avatar2.classList.add('avatar2');
-						avatar2.classList.add('avatar3');
-						node.insertBefore(avatar2,avatar);
-					}());
-				}
+				if(targets&&targets.length==1&&targets[0]!=player&&get.itemtype(targets[0])=='player') (()=>{
+					let avatar2;
+					const target=targets[0];
+					if(!target.isUnseen(0)) avatar2=target.node.avatar.cloneNode();
+					else if(!player.isUnseen(1)) avatar2=target.node.avatar2.cloneNode();
+					else if(get.mode()=='guozhan'&&target.node&&target.node.name_seat){
+						avatar2=ui.create.div('.avatar.cardbg');
+						avatar2.innerHTML=target.node.name_seat.innerHTML[0];
+					}
+					else return;
+					node.node.avatar2=avatar2;
+					avatar2.style.transform='';
+					avatar2.classList.add('avatar2');
+					avatar2.classList.add('avatar3');
+					node.insertBefore(avatar2,avatar);
+				})();
 			}
 			if(targets&&targets.length){
 				if(targets.length==1&&targets[0]==player){
@@ -38101,35 +37897,23 @@
 					node.targets=targets;
 				}
 			}
-			var fullheight=ui.historybar.offsetHeight;
-			var num=Math.round((fullheight-8)/50);
-			var margin=(fullheight-42*num)/(num+1);
+			const fullheight=ui.historybar.offsetHeight,num=Math.round((fullheight-8)/50),margin=(fullheight-42*num)/(num+1);
 			node.style.transform='scale(0.8)';
 			ui.historybar.insertBefore(node,ui.historybar.firstChild);
 			ui.refresh(node);
 			node.classList.remove('hidden');
-			for(var i=0;i<ui.historybar.childElementCount;i++){
-				var current=ui.historybar.childNodes[i];
-				if(i<num){
-					current.style.transform='scale(1) translateY('+(margin+i*(42+margin)-4)+'px)';
+			Array.from(ui.historybar.childNodes).forEach((value,index)=>{
+				if(index<num){
+					value.style.transform=`scale(1) translateY(${margin+index*(42+margin)-4}px)`;
+					return;
 				}
-				else{
-					if(!current.removetimeout){
-						current.style.opacity=0;
-						current.style.transform='scale(1) translateY('+fullheight+'px)';
-						current.removetimeout=setTimeout((function(current){
-							return function(){
-								current.remove();
-							};
-						}(current)),500);
-					}
-				}
-			}
-			if(lib.config.touchscreen){
-				node.addEventListener('touchstart',ui.click.intro);
-			}
+				if(value.removetimeout) return;
+				value.style.opacity=0;
+				value.style.transform=`scale(1) translateY(${fullheight}px)`;
+				value.removetimeout=setTimeout((current=>()=>current.remove())(value),500);
+			});
+			if(lib.config.touchscreen) node.addEventListener('touchstart',ui.click.intro);
 			else{
-				// node.addEventListener('mouseenter',ui.click.intro);
 				node.addEventListener(lib.config.pop_logv?'mousemove':'click',ui.click.logv);
 				node.addEventListener('mouseleave',ui.click.logvleave);
 			}
@@ -38148,8 +37932,7 @@
 				return;
 			}
 			lib.status.reload++;
-			var put=lib.db.transaction([type],'readwrite').objectStore(type).put(item,id);
-			put.onsuccess=function(){
+			lib.db.transaction([type],'readwrite').objectStore(type).put(item,id).onsuccess=function(){
 				if(callback){
 					_status.dburgent=true;
 					callback.apply(this,arguments);
@@ -38169,30 +37952,28 @@
 				return;
 			}
 			lib.status.reload++;
-			var store=lib.db.transaction([type],'readwrite').objectStore(type);
+			const store=lib.db.transaction([type],'readwrite').objectStore(type);
 			if(id){
-				store.get(id).onsuccess=function(e){
+				store.get(id).onsuccess=e=>{
 					_status.dburgent=true;
 					callback(e.target.result);
 					delete _status.dburgent;
 					game.reload2();
 				};
+				return;
 			}
-			else{
-				var obj={};
-				store.openCursor().onsuccess=function(e){
-					var cursor=e.target.result;
-					if(cursor){
-						obj[cursor.key]=cursor.value;
-						cursor.continue();
-					}
-					else{
-						_status.dburgent=true;
-						callback(obj);
-						delete _status.dburgent;
-						game.reload2();
-					}
+			const obj={};
+			store.openCursor().onsuccess=e=>{
+				const cursor=e.target.result;
+				if(cursor){
+					obj[cursor.key]=cursor.value;
+					cursor.continue();
+					return;
 				}
+				_status.dburgent=true;
+				callback(obj);
+				delete _status.dburgent;
+				game.reload2();
 			}
 		},
 		deleteDB:function(type,id,callback){
@@ -38204,332 +37985,234 @@
 				lib[_status.dburgent?'ondb2':'ondb'].push(['deleteDB',Array.from(arguments)]);
 				return;
 			}
-			if(arguments.length==1){
-				game.getDB(type,null,function(obj){
-					var store=lib.db.transaction([type],'readwrite').objectStore(type);
-					for(var id in obj){
-						lib.status.reload++;
-					}
-					for(var id in obj){
-						store.delete(id).onsuccess=game.reload2;
-					}
-					game.reload2();
-				});
-			}
-			else{
+			const store=lib.db.transaction([type],'readwrite').objectStore(type);
+			if(arguments.length!=1){
 				lib.status.reload++;
-				var store=lib.db.transaction([type],'readwrite').objectStore(type);
 				store.delete(id).onsuccess=function(){
-					if(callback){
-						callback.apply(this,arguments);
-					}
+					if(callback) callback.apply(this,arguments);
 					game.reload2();
 				};
+				return;
 			}
+			game.getDB(type,null,obj=>{
+				const objKeys=Object.keys(obj);
+				lib.status.reload+=objKeys.length;
+				objKeys.forEach(value=>store.delete(value).onsuccess=game.reload2);
+				game.reload2();
+			});
 		},
-		save:function(key,value,mode){
+		save:(key,value,mode)=>{
 			if(_status.reloading) return;
 			mode=mode||lib.config.mode;
-			if(!lib.db){
-				var config={};
-				if(key){
-					try{
-						config=JSON.parse(localStorage.getItem(lib.configprefix+mode));
-						if(typeof config!='object') throw 'err';
-					}
-					catch(err){
-						config={};
-					}
-					if(value==undefined){
-						delete config[key];
-						if(mode==lib.config.mode) delete lib.storage[key];
-					}
-					else{
-						config[key]=value;
-						if(mode==lib.config.mode) lib.storage[key]=value;
-					}
+			if(lib.db){
+				if(!key){
+					game.putDB('data',mode,get.copy(lib.storage));
+					return;
+				}
+				if(mode==lib.config.mode){
+					if(value==undefined) delete lib.storage[key];
+					else lib.storage[key]=value;
+					lib.storage.version=lib.version;
+					game.putDB('data',mode,lib.storage);
+				}
+				else game.getDB('data',mode,config=>{
+					if(!config) config={};
+					if(value==undefined) delete config[key];
+					else config[key]=value;
 					config.version=lib.version;
-					localStorage.setItem(lib.configprefix+mode,JSON.stringify(config));
-				}
-				else{
-					localStorage.setItem(lib.configprefix+mode,JSON.stringify(lib.storage));
-				}
+					game.putDB('data',mode,config);
+				});
+				return;
+			}
+			if(!key){
+				localStorage.setItem(`${lib.configprefix}${mode}`,JSON.stringify(lib.storage));
+				return;
+			}
+			let config;
+			try{
+				config=JSON.parse(localStorage.getItem(`${lib.configprefix}${mode}`));
+				if(typeof config!='object') throw 'err';
+			}
+			catch(err){
+				config={};
+			}
+			if(value==undefined){
+				delete config[key];
+				if(mode==lib.config.mode) delete lib.storage[key];
 			}
 			else{
-				if(key){
-					if(mode==lib.config.mode){
-						if(value==undefined){
-							delete lib.storage[key];
-						}
-						else{
-							lib.storage[key]=value;
-						}
-						lib.storage.version=lib.version;
-						game.putDB('data',mode,lib.storage);
-					}
-					else{
-						game.getDB('data',mode,function(config){
-							if(!config) config={};
-							if(value==undefined){
-								delete config[key];
-							}
-							else{
-								config[key]=value;
-							}
-							config.version=lib.version;
-							game.putDB('data',mode,config);
-						});
-					}
-				}
-				else{
-					game.putDB('data',mode,get.copy(lib.storage));
-				}
+				config[key]=value;
+				if(mode==lib.config.mode) lib.storage[key]=value;
 			}
+			config.version=lib.version;
+			localStorage.setItem(`${lib.configprefix}${mode}`,JSON.stringify(config));
 		},
-		showChangeLog:function(){
-			if(lib.version!=lib.config.version||_status.extensionChangeLog){
-				var ul=document.createElement('ul');
-				ul.style.textAlign='left';
-				var caption;
-				var players=null,cards=null;
-				if(lib.version!=lib.config.version){
-					for(var i=0;i<lib.changeLog.length;i++){
-						if(lib.changeLog[i].indexOf('players://')==0){
-							try{
-								players=JSON.parse(lib.changeLog[i].slice(10));
-							}
-							catch(e){
-								players=null;
-							}
-						}
-						else if(lib.changeLog[i].indexOf('cards://')==0){
-							try{
-								cards=JSON.parse(lib.changeLog[i].slice(8));
-							}
-							catch(e){
-								cards=null;
-							}
-						}
-						else{
-							var li=document.createElement('li');
-							li.innerHTML=lib.changeLog[i];
-							ul.appendChild(li);
-						}
-					}
-					caption=lib.version+'更新内容';
+		showChangeLog:()=>{
+			if(lib.version==lib.config.version&&!_status.extensionChangeLog) return;
+			const ul=document.createElement('ul');
+			ul.style.textAlign='left';
+			const caption=lib.version==lib.config.version?'扩展更新':`${lib.version}更新内容`;
+			let players=null,cards=null;
+			if(lib.version!=lib.config.version) lib.changeLog.forEach(value=>{
+				if(value.indexOf('players://')==0) try{
+					players=JSON.parse(value.slice(10)).filter(value=>lib.character[value]);
+				}
+				catch(e){
+					players=null;
+				}
+				else if(value.indexOf('cards://')==0) try{
+					cards=JSON.parse(value.slice(8)).filter(value=>lib.card[value]);
+				}
+				catch(e){
+					cards=null;
 				}
 				else{
-					caption='扩展更新';
-				}
-				game.saveConfig('version',lib.version);
-				for(var i in _status.extensionChangeLog){
-					var li=document.createElement('li');
-					li.innerHTML=i+'：'+_status.extensionChangeLog[i];
+					const li=document.createElement('li');
+					li.innerHTML=value;
 					ul.appendChild(li);
 				}
-				var dialog=ui.create.dialog(caption,'hidden');
-				var lic=ui.create.div(dialog.content);
-				lic.style.display='block';
-				ul.style.display='inline-block';
-				ul.style.marginLeft='-40px';
-				lic.appendChild(ul);
-				if(players){
-					for(var i=0;i<players.length;i++){
-						if(!lib.character[players[i]]){
-							players.splice(i--,1);
-						}
-					}
-					if(players.length){
-						dialog.addSmall([players,'character']);
-						dialog.classList.add('forcebutton');
-						dialog.classList.add('withbg');
-					}
-				}
-				if(cards){
-					for(var i=0;i<cards.length;i++){
-						if(!lib.card[cards[i]]){
-							cards.splice(i--,1);
-						}
-					}
-					if(cards.length){
-						for(var i=0;i<cards.length;i++){
-							cards[i]=[get.translation(get.type(cards[i])),'',cards[i]]
-						}
-						dialog.addSmall([cards,'vcard']);
-						dialog.classList.add('forcebutton');
-						dialog.classList.add('withbg');
-					}
-				}
-				dialog.open();
-				var hidden=false;
-				if(!ui.auto.classList.contains('hidden')){
-					ui.auto.hide();
-					hidden=true;
-				}
-				game.pause();
-				var control=ui.create.control('确定',function(){
-					dialog.close();
-					control.close();
-					if(hidden) ui.auto.show();
-					game.resume();
-				});
-				lib.init.onfree();
+			});
+			game.saveConfig('version',lib.version);
+			if(_status.extensionChangeLog) Object.keys(_status.extensionChangeLog).forEach(value=>{
+				const li=document.createElement('li');
+				li.innerHTML=`${value}：${_status.extensionChangeLog[value]}`;
+				ul.appendChild(li);
+			});
+			const dialog=ui.create.dialog(caption,'hidden'),lic=ui.create.div(dialog.content);
+			lic.style.display='block';
+			ul.style.display='inline-block';
+			ul.style.marginLeft='-40px';
+			lic.appendChild(ul);
+			if(players&&players.length){
+				dialog.addSmall([players,'character']);
+				dialog.classList.add('forcebutton');
+				dialog.classList.add('withbg');
 			}
+			if(cards&&cards.length){
+				dialog.addSmall([cards.map(value=>[get.translation(get.type(value)),'',value]),'vcard']);
+				dialog.classList.add('forcebutton');
+				dialog.classList.add('withbg');
+			}
+			dialog.open();
+			let hidden=false;
+			if(!ui.auto.classList.contains('hidden')){
+				ui.auto.hide();
+				hidden=true;
+			}
+			game.pause();
+			const control=ui.create.control('确定',()=>{
+				dialog.close();
+				control.close();
+				if(hidden) ui.auto.show();
+				game.resume();
+			});
+			lib.init.onfree();
 		},
-		showExtensionChangeLog:function(str,extname){
+		showExtensionChangeLog:(str,extname)=>{
 			extname=extname||_status.extension;
-			var cfg='extension_'+extname+'_changelog';
-			if(lib.extensionPack[extname]&&lib.extensionPack[extname].version!=lib.config[cfg]){
-				game.saveConfig(cfg,lib.extensionPack[extname].version);
-				if(!_status.extensionChangeLog){
-					_status.extensionChangeLog={};
-					_status.extensionChangeLog[extname]=str;
-				}
-			}
+			const cfg=`extension_${extname}_changelog`;
+			if(!lib.extensionPack[extname]||lib.extensionPack[extname].version==lib.config[cfg]) return;
+			game.saveConfig(cfg,lib.extensionPack[extname].version);
+			if(_status.extensionChangeLog) return;
+			_status.extensionChangeLog={};
+			_status.extensionChangeLog[extname]=str;
 		},
-		saveConfig:function(key,value,local,callback){
+		saveConfig:(key,value,local,callback)=>{
 			if(_status.reloading) return;
 			if(local){
-				var localmode;
-				if(typeof local=='string'){
-					localmode=local;
-				}
-				else{
-					localmode=lib.config.mode;
-				}
-				if(!lib.config.mode_config[localmode]){
-					lib.config.mode_config[localmode]={};
-				}
-				if(value==undefined){
-					delete lib.config.mode_config[localmode][key];
-				}
-				else{
-					lib.config.mode_config[localmode][key]=value;
-				}
-				key+='_mode_config_'+localmode;
+				const localmode=typeof local=='string'?local:lib.config.mode;
+				if(!lib.config.mode_config[localmode]) lib.config.mode_config[localmode]={};
+				if(value==undefined) delete lib.config.mode_config[localmode][key];
+				else lib.config.mode_config[localmode][key]=value;
+				key+=`_mode_config_${localmode}`;
 			}
-			else{
-				if(value==undefined){
-					delete lib.config[key];
-				}
-				else{
-					lib.config[key]=value;
-				}
+			else if(value==undefined) delete lib.config[key];
+			else lib.config[key]=value;
+			if(lib.db){
+				if(value==undefined) game.deleteDB('config',key,callback);
+				else game.putDB('config',key,value,callback);
+				return;
 			}
-			if(!lib.db){
-				var config;
-				try{
-					config=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
-					if(!config||typeof config!='object') throw 'err'
-				}
-				catch(err){
-					config={};
-				}
-				if(value===undefined){
-					delete config[key];
-				}
-				else{
-					config[key]=value;
-				}
-				localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
-				if(callback){
-					callback();
-				}
+			let config;
+			try{
+				config=JSON.parse(localStorage.getItem(`${lib.configprefix}config`));
+				if(!config||typeof config!='object') throw 'err';
 			}
-			else{
-				if(value==undefined){
-					game.deleteDB('config',key,callback);
-				}
-				else{
-					game.putDB('config',key,value,callback);
-				}
+			catch(err){
+				config={};
 			}
+			if(value===undefined) delete config[key];
+			else config[key]=value;
+			localStorage.setItem(`${lib.configprefix}config`,JSON.stringify(config));
+			if(callback) callback();
 		},
-		saveConfigValue:function(key){
-			game.saveConfig(key,lib.config[key]);
-		},
-		saveExtensionConfig:function(extension,key,value){
-			return game.saveConfig('extension_'+extension+'_'+key,value);
-		},
-		getExtensionConfig:function(extension,key){
-			return lib.config['extension_'+extension+'_'+key];
-		},
-		clearModeConfig:function(mode){
+		saveConfigValue:key=>game.saveConfig(key,lib.config[key]),
+		saveExtensionConfig:(extension,key,value)=>game.saveConfig(`extension_${extension}_${key}`,value),
+		saveExtensionConfigValue:(extension,key)=>game.saveExtensionConfig(extension,key,game.getExtensionConfig(extension,key)),
+		getExtensionConfig:(extension,key)=>lib.config[`extension_${extension}_${key}`],
+		clearModeConfig:mode=>{
 			if(_status.reloading) return;
-			if(!lib.db){
-				var config;
-				try{
-					config=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
-					if(!config||typeof config!='object') throw 'err'
-				}
-				catch(err){
-					config={};
-				}
-				for(var i in config){
-					if(i.substr(i.indexOf('_mode_config')+13)==mode){
-						delete config[i];
-					}
-				}
-				localStorage.setItem(lib.configprefix+'config',JSON.stringify(config));
-				localStorage.removeItem(lib.configprefix+mode);
+			if(lib.db){
+				game.getDB('config',null,config=>Object.keys(config).forEach(value=>{
+					if(value.substr(value.indexOf('_mode_config')+13)==mode) game.saveConfig(value);
+				}));
+				return;
 			}
-			else{
-				game.getDB('config',null,function(config){
-					for(var i in config){
-						if(i.substr(i.indexOf('_mode_config')+13)==mode){
-							game.saveConfig(i);
-						}
-					}
-				});
+			let config;
+			try{
+				config=JSON.parse(localStorage.getItem(`${lib.configprefix}config`));
+				if(!config||typeof config!='object') throw 'err';
 			}
+			catch(err){
+				config={};
+			}
+			Object.keys(config).forEach(value=>{
+				if(value.substr(value.indexOf('_mode_config')+13)==mode) delete config[value];
+			});
+			localStorage.setItem(`${lib.configprefix}config`,JSON.stringify(config));
+			localStorage.removeItem(`${lib.configprefix}${mode}`);
 		},
-		addPlayer:function(position,character,character2){
-			if(position<0||position>game.players.length+game.dead.length||position==undefined){
-				position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
-			}
-			var players=game.players.concat(game.dead);
+		addPlayer:(position,character,character2)=>{
+			if(position<0||position>game.players.length+game.dead.length||position==undefined) position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
+			const players=game.players.concat(game.dead);
 			ui.arena.setNumber(players.length+1);
-			for(var i=0;i<players.length;i++){
-				if(parseInt(players[i].dataset.position)>=position){
-					players[i].dataset.position=parseInt(players[i].dataset.position)+1;
-				}
-			}
-			var player=ui.create.player(ui.arena).animate('start');
+			players.forEach(value=>{
+				if(parseInt(value.dataset.position)>=position) value.dataset.position=parseInt(value.dataset.position)+1;
+			});
+			const player=ui.create.player(ui.arena).animate('start');
 			if(character) player.init(character,character2);
 			game.players.push(player);
 			player.dataset.position=position;
 			game.arrangePlayers();
 			return player;
 		},
-		addFellow:function(position,character,animation){
+		addFellow:(position,character,animation)=>{
 			game.addVideo('addFellow',null,[position,character,animation]);
-			var player=ui.create.player(ui.arena).animate(animation||'start');
+			const player=ui.create.player(ui.arena).animate(animation||'start');
 			player.dataset.position=position||game.players.length+game.dead.length;
 			player.getId();
 			if(character) player.init(character);
-			game.players.push(player);game.arrangePlayers();
+			game.players.push(player);
+			game.arrangePlayers();
 			return player;
 		},
-		triggerEnter:function(player){
-			var next=game.createEvent('enterGame',false);
+		triggerEnter:player=>{
+			const next=game.createEvent('enterGame',false);
 			next.player=player;
-			next.setContent(function(){
+			next.setContent(()=>{
 				event.trigger('enterGame');
 			});
+			return next;
 		},
-		restorePlayer:function(player){
+		restorePlayer:player=>{
 			if(game.players.contains(player)||game.dead.contains(player)) return;
-			var position=parseInt(player.dataset.position);
-			if(position<0||position>game.players.length+game.dead.length||position==undefined){
-				position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
-			}
-			var players=game.players.concat(game.dead);
+			let position=parseInt(player.dataset.position);
+			if(position<0||position>game.players.length+game.dead.length||position==undefined) position=Math.ceil(Math.random()*(game.players.length+game.dead.length));
+			const players=game.players.concat(game.dead);
 			ui.arena.setNumber(players.length+1);
-			for(var i=0;i<players.length;i++){
-				if(parseInt(players[i].dataset.position)>=position){
-					players[i].dataset.position=parseInt(players[i].dataset.position)+1;
-				}
-			}
+			players.forEach(value=>{
+				if(parseInt(value.dataset.position)>=position) value.dataset.position=parseInt(value.dataset.position)+1;
+			});
 			game.players.push(player);
 			delete player.removed;
 			player.removeAttribute('style');
@@ -38538,20 +38221,16 @@
 			game.arrangePlayers();
 			return player;
 		},
-		removePlayer:function(player){
-			if(_status.roundStart==player){
-				_status.roundStart=player.next||player.getNext()||game.players[0];
-			}
-			var players=game.players.concat(game.dead);
-			player.style.left=player.getLeft()+'px';
-			player.style.top=player.getTop()+'px';
+		removePlayer:player=>{
+			if(_status.roundStart==player) _status.roundStart=player.next||player.getNext()||game.players[0];
+			const players=game.players.concat(game.dead);
+			player.style.left=`${player.getLeft()}px`;
+			player.style.top=`${player.getTop()}px`;
 			if(player==undefined) player=game.dead[0]||game.me.next;
-			var position=parseInt(player.dataset.position);
-			for(var i=0;i<players.length;i++){
-				if(parseInt(players[i].dataset.position)>position){
-					players[i].dataset.position=parseInt(players[i].dataset.position)-1;
-				}
-			}
+			const position=parseInt(player.dataset.position);
+			players.forEach(value=>{
+				if(parseInt(value.dataset.position)>position) value.dataset.position=parseInt(value.dataset.position)-1;
+			});
 			if(player.isAlive()){
 				player.next.previous=player.previous;
 				player.previous.next=player.next;
@@ -38568,18 +38247,16 @@
 				ui.auto.hide();
 				ui.wuxie.hide();
 			}
-			setTimeout(function(){
-				player.removeAttribute('style');
-			},500);
+			setTimeout(()=>player.removeAttribute('style'),500);
 			return player;
 		},
-		replacePlayer:function(player,character,character2){
+		replacePlayer:(player,character,character2)=>{
 			player.removed=true;
-			var position=parseInt(player.dataset.position);
+			const position=parseInt(player.dataset.position);
 			game.players.remove(player);
 			game.dead.remove(player);
 			player.delete();
-			var player2=ui.create.player(ui.arena).animate('start');
+			const player2=ui.create.player(ui.arena).animate('start');
 			if(character) player2.init(character,character2);
 			game.players.push(player2);
 			player2.dataset.position=position;
@@ -38587,192 +38264,99 @@
 			player2.previousSeat=player.previousSeat;
 			player2.nextSeat.previousSeat=player2;
 			player2.previousSeat.nextSeat=player2;
-			var player3=player2.nextSeat;
-			while(player3.isDead()) player3=player3.nextSeat;
+			const player3=player2.nextSeat;
+			while(player3.isDead()){
+				player3=player3.nextSeat;
+			}
 			player3.previous=player2;
 			player2.next=player3;
-			var player4=player2.previousSeat;
-			while(player4.isDead()) player4=player4.previousSeat;
+			const player4=player2.previousSeat;
+			while(player4.isDead()){
+				player4=player4.previousSeat;
+			}
 			player4.next=player2;
 			player2.previous=player4;
-			if(_status.roundStart==player){
-				_status.roundStart=player2;
-			}
+			if(_status.roundStart==player) _status.roundStart=player2;
 			return player2;
 		},
-		arrangePlayers:function(){
+		arrangePlayers:()=>{
 			if(game.chess&&game.me){
-				var friendCount=0;
-				var enemyCount=0;
-				var rand=Math.random()<0.5;
-				for(var i=0;i<game.players.length;i++){
-					if(game.players[i].side==game.me.side){
-						if(rand){
-							if(game.players[i]==game.friendZhu){
-								game.players[i]._sortCount=-2;
-							}
-							else{
-								game.players[i]._sortCount=2*friendCount;
-							}
-						}
-						else{
-							if(game.players[i]==game.friendZhu){
-								game.players[i]._sortCount=-1;
-							}
-							else{
-								game.players[i]._sortCount=2*friendCount+1;
-							}
-						}
+				let friendCount=0,enemyCount=0;
+				const rand=Math.random()<0.5,sortCount=new Map();
+				game.players.forEach(value=>{
+					if(value.side==game.me.side){
+						if(rand) if(value==game.friendZhu) sortCount.set(value,-2);
+						else sortCount.set(value,2*friendCount);
+						else if(value==game.friendZhu) sortCount.set(value,-1);
+						else sortCount.set(value,2*friendCount+1);
 						friendCount++;
+						return;
 					}
-					else{
-						if(rand){
-							if(game.players[i]==game.enemyZhu){
-								game.players[i]._sortCount=-1;
-							}
-							else{
-								game.players[i]._sortCount=2*enemyCount+1;
-							}
-						}
-						else{
-							if(game.players[i]==game.enemyZhu){
-								game.players[i]._sortCount=-2;
-							}
-							else{
-								game.players[i]._sortCount=2*enemyCount;
-							}
-						}
-						enemyCount++;
-					}
-				}
-				game.players.sort(function(a,b){
-					return a._sortCount-b._sortCount;
+					if(rand) if(value==game.enemyZhu) sortCount.set(value,-1);
+					else sortCount.set(value,2*enemyCount+1);
+					else if(value==game.enemyZhu) sortCount.set(value,-2);
+					else sortCount.set(value,2*enemyCount);
+					enemyCount++;
 				});
-				for(var i=0;i<game.players.length;i++){
-					delete game.players[i]._sortCount;
-				}
+				game.players.sort((a,b)=>sortCount.get(a)-sortCount.get(b));
 			}
-			else{
-				game.players.sort(lib.sort.position);
-			}
-			var players=game.players.concat(game.dead);
-			players.sort(lib.sort.position);
-			for(var i=0;i<players.length;i++){
-				if(i==0){
-					players[i].previousSeat=players[players.length-1];
-				}
-				else{
-					players[i].previousSeat=players[i-1];
-				}
-				if(i==players.length-1){
-					players[i].nextSeat=players[0];
-				}
-				else{
-					players[i].nextSeat=players[i+1];
-				}
-			}
-			for(var i=0;i<game.players.length;i++){
-				if(i==0){
-					game.players[i].previous=game.players[game.players.length-1];
-				}
-				else{
-					game.players[i].previous=game.players[i-1];
-				}
-				if(i==game.players.length-1){
-					game.players[i].next=game.players[0];
-				}
-				else{
-					game.players[i].next=game.players[i+1];
-				}
-			}
+			else game.players.sort(lib.sort.position);
+			game.players.concat(game.dead).sort(lib.sort.position).forEach((value,index,array)=>{
+				if(index==0) value.previousSeat=array[array.length-1];
+				else value.previousSeat=array[index-1];
+				if(index==array.length-1) value.nextSeat=array[0];
+				else value.nextSeat=array[index+1];
+			});
+			game.players.forEach((value,index,array)=>{
+				if(index==0) value.previous=array[array.length-1];
+				else value.previous=array[index-1];
+				if(index==array.length-1) value.next=array[0];
+				else value.next=array[index+1];
+			});
 		},
-		filterSkills:function(skills,player,exclude){
-			var out=skills.slice(0);
-			for(var i in player.disabledSkills){
-				out.remove(i);
-			}
-			if(player.storage.skill_blocker&&player.storage.skill_blocker.length){
-				for(var i=0;i<out.length;i++){
-					if((!exclude||!exclude.contains(out[i]))&&get.is.blocked(out[i],player)) out.splice(i--,1);
-				}
-			}
-			return out;
+		filterSkills:(skills,player,exclude)=>{
+			const out=skills.slice().removeArray(Object.keys(player.disabledSkills));
+			if(!player.storage.skill_blocker||!player.storage.skill_blocker.length) return out;
+			return out.filter(value=>exclude&&exclude.includes(value)||!get.is.blocked(value,player));
 		},
-		expandSkills:function(skills){
-			var skills2=[];
-			for(var i=0;i<skills.length;i++){
-				var info=get.info(skills[i]);
-				if(info){
-					if(info.group) skills2=skills2.concat(info.group);
-				}
-				else{
-					console.log(skills[i]);
-				}
+		expandSkills:skills=>skills.addArray(skills.reduce((previousValue,currentValue)=>{
+			const info=get.info(currentValue);
+			if(info){
+				if(Array.isArray(info.group)) previousValue.push(...info.group);
+				else if(info.group) previousValue.push(info.group);
 			}
-			for(var i=0;i<skills2.length;i++){
-				skills.add(skills2[i]);
+			else console.log(currentValue);
+			return previousValue;
+		},[])),
+		css:style=>Object.keys(style).forEach(value=>{
+			let uiStyle=ui.style[value];
+			if(!uiStyle){
+				uiStyle=ui.style[value]=document.createElement('style');
+				document.head.appendChild(uiStyle);
 			}
-			return skills;
+			uiStyle.innerHTML=`${value}${JSON.stringify(style[value]).replace(/"/g,"")}`;
+		}),
+		hasPlayer:(func,includeOut)=>game.players.some(value=>(includeOut||!value.isOut())&&func(value)),
+		hasPlayer2:(func,includeOut)=>game.players.concat(game.dead).some(value=>(includeOut||!value.isOut())&&func(value)),
+		countPlayer:(func,includeOut)=>{
+			if(typeof func!='function') func=lib.filter.all;
+			return game.players.reduce((previousValue,currentValue)=>{
+				if(!includeOut&&currentValue.isOut()) return previousValue;
+				const result=func(currentValue);
+				if(typeof result=='number') previousValue+=result;
+				else if(result) previousValue++;
+				return previousValue;
+			},0);
 		},
-		css:function(style){
-			for(var i in style){
-				if(ui.style[i]) ui.style[i].innerHTML=i+JSON.stringify(style[i]).replace(/"/g,"");
-				else{
-					ui.style[i]=document.createElement('style');
-					ui.style[i].innerHTML=i+JSON.stringify(style[i]).replace(/"/g,"");
-					document.head.appendChild(ui.style[i]);
-				}
-			}
-		},
-		hasPlayer:function(func,includeOut){
-			for(var i=0;i<game.players.length;i++){
-				if(!includeOut&&game.players[i].isOut()) continue;
-				if(func(game.players[i])) return true;
-			}
-			return false;
-		},
-		hasPlayer2:function(func,includeOut){
-			var players=game.players.slice(0).concat(game.dead);
-			for(var i=0;i<players.length;i++){
-				if(!includeOut&&players[i].isOut()) continue;
-				if(func(players[i])) return true;
-			}
-			return false;
-		},
-		countPlayer:function(func,includeOut){
-			var num=0;
-			if(typeof func!='function'){
-				func=lib.filter.all;
-			}
-			for(var i=0;i<game.players.length;i++){
-				if(!includeOut&&game.players[i].isOut()) continue;
-				var result=func(game.players[i]);
-				if(typeof result=='number'){
-					num+=result;
-				}
-				else if(result){
-					num++;
-				}
-			}
-			return num;
-		},
-		countPlayer2:function(func,includeOut){
-			var num=0;
-			if(typeof func!='function'){
-				func=lib.filter.all;
-			}
-			var players=game.players.slice(0).concat(game.dead);
-			for(var i=0;i<players.length;i++){
-				if(!includeOut&&players[i].isOut()) continue;
-				var result=func(players[i]);
-				if(typeof result=='number'){
-					num+=result;
-				}
-				else if(result){
-					num++;
-				}
-			}
-			return num;
+		countPlayer2:(func,includeOut)=>{
+			if(typeof func!='function') func=lib.filter.all;
+			return game.players.concat(game.dead).reduce((previousValue,currentValue)=>{
+				if(!includeOut&&currentValue.isOut()) return previousValue;
+				const result=func(currentValue);
+				if(typeof result=='number') previousValue+=result;
+				else if(result) previousValue++;
+				return previousValue;
+			},0);
 		},
 		filterPlayer:(func,list,includeOut)=>{
 			if(!Array.isArray(list)) list=[];
@@ -38784,44 +38368,20 @@
 			if(typeof func!='function') func=lib.filter.all;
 			return list.addArray(game.players.concat(game.dead).filter(value=>(includeOut||!value.isOut())&&func(value)));
 		},
-		findPlayer:function(func,includeOut){
-			for(var i=0;i<game.players.length;i++){
-				if(!includeOut&&game.players[i].isOut()) continue;
-				if(func(game.players[i])){
-					return game.players[i];
-				}
-			}
-			return null;
-		},
-		findPlayer2:function(func,includeOut){
-			var players=game.players.slice(0).concat(game.dead);
-			for(var i=0;i<players.length;i++){
-				if(!includeOut&&players[i].isOut()) continue;
-				if(func(players[i])){
-					return players[i];
-				}
-			}
-			return null;
-		},
-		findCards:function(func,all){
-			var cards=[];
-			for(var i in lib.card){
-				if(!lib.translate[i+'_info']) continue;
-				if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
-				if(!all&&!lib.inpile.contains(i)) continue;
-				if(func(i,lib.card[i])){
-					cards.push(i);
-				}
-			}
-			return cards;
-		},
-		countGroup:function(){
-			var list=lib.group.slice(0);
-			return game.countPlayer(function(current){
-				if(list.contains(current.group)){
-					list.remove(current.group);
-					return true;
-				}
+		findPlayer:(func,includeOut)=>game.players.find(value=>(includeOut||!value.isOut())&&func(value))||null,
+		findPlayer2:(func,includeOut)=>game.players.concat(game.dead).find(value=>(includeOut||!value.isOut())&&func(value))||null,
+		findCards:(func,all)=>Object.keys(lib.card).filter(value=>{
+			if(!lib.translate[`${value}_info`]) return false;
+			if(lib.card[value].mode&&lib.card[value].mode.includes(lib.config.mode)==false) return false;
+			if(!all&&!lib.inpile.includes(value)) return false;
+			return func(value,lib.card[value]);
+		}),
+		countGroup:()=>{
+			const list=lib.group.slice(0);
+			return game.countPlayer(current=>{
+				if(!list.includes(current.group)) return false;
+				list.remove(current.group);
+				return true;
 			});
 		},
 		players:[],
@@ -47427,7 +46987,7 @@
 				ui.window.appendChild(ui.backgroundMusic);
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click', function playMusic() {
 					ui.window.removeEventListener(lib.config.touchscreen?'touchend':'click', playMusic, false);
-					if(!ui.backgroundMusic.played.length) ui.backgroundMusic.play();
+					if(!ui.backgroundMusic.played.length) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
 				}, false);
 				if(lib.config.cursor_style=='pointer'){
 					ui.window.classList.add('nopointer');
