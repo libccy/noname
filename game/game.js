@@ -7813,10 +7813,10 @@
 							appearenceConfig.identity_font.item[value]=font;
 							appearenceConfig.cardtext_font.item[value]=font;
 							appearenceConfig.global_font.item[value]=font;
-							fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.ttf');}`,0);
-							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.ttf');}`,0);
+							fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.woff2');}`,0);
+							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,0);
 						});
-						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: local('Noname Suit'), url('${lib.assetURL}font/suits.ttf');}`,0);
+						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: local('Noname Suit'), url('${lib.assetURL}font/suits.woff2');}`,0);
 						appearenceConfig.cardtext_font.item.default='默认';
 						appearenceConfig.global_font.item.default='默认';
 					}
@@ -40148,11 +40148,11 @@
 											zip.load(data);
 											var images=[],audios=[],fonts=[],directories={},directorylist=[];
 											for(var i in zip.files){
-												var ext=i.slice(i.lastIndexOf('.')+1);
+												var ext=i.slice(i.lastIndexOf('.')+1).toLowerCase();
 												if(i.indexOf('audio/')==0&&(ext=='mp3'||ext=='ogg')){
 													audios.push(i);
 												}
-												else if(i.indexOf('font/')==0&&ext=='ttf'){
+												else if(i.indexOf('font/')==0&&ext=='woff2'){
 													fonts.push(i);
 												}
 												else if(i.indexOf('image/')==0&&(ext=='jpg'||ext=='png')){
