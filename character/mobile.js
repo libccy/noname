@@ -6488,21 +6488,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tianshu:{
 				audio:2,
-				enable:'phaseUse',
-				usable:1,
+				trigger:{player:'phaseUseBegin'},
 				filter:function(event,player){
-					return player.countCards('he')>0&&!game.hasPlayer(function(current){
+					return player.countCards('he')&&!game.hasPlayer(function(current){
 						return current.countCards('ej','taipingyaoshu');
 					});
 				},
-				position:'he',
-				filterCard:true,
-				filterTarget:true,
-				check:function(card){
-					return 6-get.value(card);
-				},
+				direct:true,
 				content:function(){
 					'step 0'
+					player.chooseCardTarget({
+						prompt:get.prompt2('tianshu'),
+						filterCard:true,
+						position:'he',
+						ai1:function(card){
+							return 5-get.value(card);
+						},
+						ai2:function(target){
+							var player=_status.event.player;
+							if(get.attitude(player,target)>0&&!target.hasEmptySlot(2)) return 0;
+							return get.attitude(player,target);
+						},
+					});
+					'step 1'
+					if(!result.bool){event.finish();return;}
+					var target=result.targets[0];
+					event.target=target;
+					player.logSkill('tianshu',target);
+					player.discard(result.cards);
 					if(!lib.inpile.contains('taipingyaoshu')){
 						lib.inpile.push('taipingyaoshu');
 						event.card=game.createCard2('taipingyaoshu','heart',3);
@@ -6514,19 +6527,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(!event.card) event.finish();
 					else target.gain(event.card,'gain2');
-					'step 1'
+					'step 2'
 					if(target.getCards('h').contains(card)&&get.name(card,target)=='taipingyaoshu') target.chooseUseTarget(card,'nopopup',true);
-				},
-				ai:{
-					order:3,
-					result:{
-						target:function(player,target){
-							if(lib.inpile.contains('taipingyaoshu')&&!get.cardPile(function(card){
-								return card.name=='taipingyaoshu';
-							})) return 0;
-							return target.getUseValue({name:'taipingyaoshu'});
-						},
-					},
 				},
 			},
 			//界伏寿
@@ -13560,7 +13562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yufeng2:'御风',
 			yufeng_info:'出牌阶段限一次，你可以表演“御风飞行”。若表演失败，则你摸X张牌。若表演成功，则你可以选择至多X名其他角色获得“御风”效果，然后摸X-Y张牌（准备阶段开始时，你进行判定。若结果为：红色，你跳过摸牌阶段；黑色，你跳过出牌阶段和弃牌阶段。X为你的得分。Y为你选择的角色数）。',
 			tianshu:'天书',
-			tianshu_info:'出牌阶段限一次，若场上没有【太平要术】，则你可以弃置一张牌并选择一名角色。该角色获得并使用【太平要术】。',
+			tianshu_info:'出牌阶段开始时，若场上没有【太平要术】，则你可以弃置一张牌并选择一名角色。该角色获得并使用【太平要术】。',
 			re_jiangwei:'手杀姜维',
 			retiaoxin:'挑衅',
 			retiaoxin_info:'出牌阶段限一次，你可以指定一名有牌的其他角色，该角色需对你使用一张【杀】，否则你弃置其一张牌。',
