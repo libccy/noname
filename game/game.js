@@ -37635,6 +37635,19 @@
 				if(!info.hasOwnProperty('forced')) info.forced=true;
 				if(!info.hasOwnProperty('popup')) info.popup=false;
 			}
+			if(!info.hasOwnProperty('_priority')){
+				let priority=0;
+				if(info.priority){
+					priority=info.priority*100;
+				}
+				if(info.silent){
+					priority++;
+				}
+				if(info.equipSkill) priority-=25;
+				if(info.cardSkill) priority-=50;
+				if(info.ruleSkill) priority-=75;
+				info._priority=priority;
+			}
 			if(i[0]=='_') game.addGlobalSkill(i);
 		},
 		finishCards:()=>{
@@ -37712,12 +37725,14 @@
 			if(skills.getSkills) skills=skills.getSkills();
 			skills=skills.concat(lib.skill.global);
 			game.expandSkills(skills);
+			skills=skills.filter(skill=>{
+				const info=get.info(skill);
+				return (info&&info.mod&&info.mod[name]);
+			})
 			skills.sort((a,b)=>get.priority(a)-get.priority(b));
 			const arg=argumentArray.slice(0,-2);
 			skills.forEach(value=>{
-				const info=get.info(value);
-				if(!info||!info.mod||!info.mod[name]) return;
-				const result=info.mod[name].apply(this,arg);
+				const result=get.info(value).mod[name].apply(this,arg);
 				if(typeof arg[arg.length-1]!='object'&&result!=undefined) arg[arg.length-1]=result;
 			});
 			return arg[arg.length-1];
@@ -52578,7 +52593,9 @@
 	var get={
 		//优先度判断
 		priority:function(skill){
-			var info=get.info(skill),priority=0;
+			const info=get.info(skill);
+			if(info.hasOwnProperty('_priority')) return info._priority;
+			let priority=0;
 			if(!info) return 0;
 			if(info.priority){
 				priority=info.priority*100;
@@ -52589,6 +52606,7 @@
 			if(info.equipSkill) priority-=25;
 			if(info.cardSkill) priority-=50;
 			if(info.ruleSkill) priority-=75;
+			info._priority=priority;
 			return priority;
 		},
 		//新装备栏相关
