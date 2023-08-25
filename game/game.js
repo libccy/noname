@@ -37563,7 +37563,7 @@
 				}
 				if(info.ai==undefined) info.ai={};
 				const skill=info.ai,card=lib.card[info.viewAs.name].ai;
-				Object.keys(card).forEach(value=>{
+				if(card) Object.keys(card).forEach(value=>{
 					if(skill[value]==undefined) skill[value]=card[value];
 					else if(typeof skill[value]=='object') Object.keys(card[value]).forEach(element=>{
 						if(skill[value][element]==undefined) skill[value][element]=card[value][element];
@@ -37572,7 +37572,7 @@
 			}
 			if(info.inherit){
 				const skill=lib.skill[info.inherit];
-				Object.keys(skill).forEach(value=>{
+				if(skill) Object.keys(skill).forEach(value=>{
 					if(info[value]!=undefined) return;
 					if(value=='audio'&&(typeof info[value]=='number'||typeof info[value]=='boolean')) info[value]=info.inherit;
 					else info[value]=skill[value];
