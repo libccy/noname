@@ -6827,10 +6827,11 @@
 		},
 		placePoppedDialog:function(dialog,e){
 			if(dialog._place_text){
-				if(dialog._place_text.firstChild.offsetWidth>=190||
-					dialog._place_text.firstChild.offsetHeight>=30){
-					dialog._place_text.style.textAlign='left';
+				if(dialog._place_text.firstChild.offsetWidth>=190||dialog._place_text.firstChild.offsetHeight>=30){
 					dialog._place_text.style.marginLeft='14px';
+					dialog._place_text.style.marginRight='14px';
+					dialog._place_text.style.textAlign='left';
+					dialog._place_text.style.width='calc(100% - 28px)';
 				}
 			}
 			if(e.touches&&e.touches[0]){
@@ -7805,17 +7806,19 @@
 
 					if(pack.font){
 						ui.css.fontsheet=lib.init.sheet();
-						for(i in pack.font){
-							lib.configMenu.appearence.config.name_font.item[i]=pack.font[i];
-							lib.configMenu.appearence.config.identity_font.item[i]=pack.font[i];
-							lib.configMenu.appearence.config.cardtext_font.item[i]=pack.font[i];
-							lib.configMenu.appearence.config.global_font.item[i]=pack.font[i];
-							ui.css.fontsheet.sheet.insertRule("@font-face {font-family: '"+i+"'; src: url('"+lib.assetURL+"font/"+i+".ttf');}",0);
-							if(lib.config.suits_font) ui.css.fontsheet.sheet.insertRule("@font-face {font-family: '"+i+"'; src: url('"+lib.assetURL+"font/suits.ttf');}",0);
-						}
-						if(lib.config.suits_font) ui.css.fontsheet.sheet.insertRule("@font-face {font-family: 'Suits'; src: url('"+lib.assetURL+"font/suits.ttf');}",0);
-						lib.configMenu.appearence.config.cardtext_font.item.default='默认';
-						lib.configMenu.appearence.config.global_font.item.default='默认';
+						const appearenceConfig=lib.configMenu.appearence.config,fontSheet=ui.css.fontsheet.sheet,suitsFont=lib.config.suits_font;
+						Object.keys(pack.font).forEach(value=>{
+							const font=pack.font[value];
+							appearenceConfig.name_font.item[value]=font;
+							appearenceConfig.identity_font.item[value]=font;
+							appearenceConfig.cardtext_font.item[value]=font;
+							appearenceConfig.global_font.item[value]=font;
+							fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.ttf');}`,0);
+							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.ttf');}`,0);
+						});
+						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: local('Noname Suit'), url('${lib.assetURL}font/suits.ttf');}`,0);
+						appearenceConfig.cardtext_font.item.default='默认';
+						appearenceConfig.global_font.item.default='默认';
 					}
 
 					var ua=navigator.userAgent.toLowerCase();
