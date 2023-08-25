@@ -27380,6 +27380,25 @@
 				finish:function(){
 					this.finished=true;
 				},
+				putTempCache:function(key1,key2,value){
+					if(!this._tempCache){
+						this._tempCache = {};
+					}
+					if(!this._tempCache[key1]){
+						this._tempCache[key1] = {};
+					}
+					this._tempCache[key1][key2] = value;
+					console.log("put:"+key1+" "+key2+" "+value);
+				},
+				getTempCache:function(key1,key2){
+					if(!this._tempCache){
+						return undefined;
+					}
+					if(!this._tempCache[key1]){
+						return undefined;
+					}
+					return this._tempCache[key1][key2];
+				},
 				cancel:function(arg1,arg2,notrigger){
 					this.untrigger.call(this,arguments);
 					this.finish();
