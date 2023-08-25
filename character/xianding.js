@@ -182,7 +182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return effect;
 				},
 				onChooseToUse:function(event){
-					if(!game.online&&event.type=='phase'){
+					if(!game.online&&event.type=='phase'&&!event.dcpandi){
 						var players=game.filterPlayer(function(current){
 							return current!=event.player&&current.getHistory('sourceDamage').length==0;
 						})
