@@ -620,31 +620,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
+					var map={};
+					game.countPlayer(function(current){
+						if(current==player||current==trigger.player) return false;
+						if(current.hasHistory('lose',function(evt){
+							return evt.cards2.length>0;
+						})) map[current.playerid]=Math.min(5,current.getHistory('lose').reduce(function(num,evt){
+							return num=evt.cards2.length;
+						},0))+1;
+					});
 					player.chooseCardTarget({
 						prompt:get.prompt('dcporui'),
-						//prompt2:'弃置一张基本牌并选择一名本回合失去过牌的非当前回合的其他角色，你视为对其依次使用'+get.cnNumber(Math.max(0,player.hp)+1)+'张【杀】',
 						prompt2:get.skillInfoTranslation('dcporui',player),
 						filterCard:function(card,player){
 							return get.type2(card)=='basic'&&lib.filter.cardDiscardable(card,player,'dcporui');
 						},
 						position:'he',
 						filterTarget:function(card,player,target){
-							return _status.event.list.contains(target);
+							return Object.keys(_status.event.map).contains(target.playerid);
 						},
 						ai1:function(card){
 							return 7-get.value(card);
 						},
 						ai2:function(target){
-							return get.effect(target,{name:'sha'},_status.event.player,_status.event.player)*_status.event.list.find(i=>{
-								return i[0]==target;
-							})[1];
+							return get.effect(target,{name:'sha'},_status.event.player,_status.event.player)*_status.event.map[target.playerid];
 						}
-					}).set('list',game.filterPlayer(current=>{
-						if(current==player||current==trigger.player) return false;
-						return current.hasHistory('lose',function(evt){
-							return evt.cards2.length>0;
-						});
-					}));
+					}).set('map',map);
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0],cards=result.cards;
