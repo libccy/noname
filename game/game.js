@@ -52576,9 +52576,9 @@
 		//优先度判断
 		priority:function(skill){
 			const info=get.info(skill);
+			if(!info) return 0;
 			if(info.hasOwnProperty('_priority')) return info._priority;
 			let priority=0;
-			if(!info) return 0;
 			if(info.priority){
 				priority=info.priority*100;
 			}

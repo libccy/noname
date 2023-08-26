@@ -5835,12 +5835,12 @@ window.noname_asset_list=[
 	'audio/voice/female/21.mp3',
 	'audio/voice/female/22.mp3',
 	
-	'font/huangcao.ttf',
-	'font/shousha.ttf',
-	'font/xiaozhuan.ttf',
-	'font/xingkai.ttf',
-	'font/xinwei.ttf',
-	'font/yuanli.ttf',
+	'font/huangcao.woff2',
+	'font/shousha.woff2',
+	'font/xiaozhuan.woff2',
+	'font/xingkai.woff2',
+	'font/xinwei.woff2',
+	'font/yuanli.woff2',
 	
 	'image/background/beipan_bg.jpg',
 	'image/background/heaven_bg.jpg',
