@@ -1970,8 +1970,12 @@ div:not(.handcards)>.card>.info>span,
 	left: 0;
 }
 .button.character>.identity {
-	top: -6px;
+	align-items: flex-end;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap-reverse;
 	left: 72px;
+	top: -6px;
 }
 .button.character.newstyle>.identity{
 	/*display: none;*/
@@ -1979,8 +1983,8 @@ div:not(.handcards)>.card>.info>span,
 	background: none !important;
 	/*box-shadow: none;*/
 	left: auto;
-	right: 3px;
-	top: 3px;
+	right: 6px;
+	top: 5px;
 	/*font-size: 20px;*/
 }
 .button.newstyle>.name{
@@ -2768,11 +2772,11 @@ div:not(.handcards)>.card>.info>span,
 }
 .identity {
 	text-align: center;
-	width: 22px;
-	height: 22px;
 }
 .identity>div {
+	line-height: 16px;
 	position: relative;
+	text-align: right;
 	top: 2px;
 }
 
@@ -3833,19 +3837,19 @@ div:hover>.intro {
 }
 
 .player .identity {
+	align-items: flex-end;
 	border: none;
-	width: 24px;
-	height: 24px;
 	border-radius: 100%;
-	display: inline-flex;
+	display: flex;
+	flex-direction: column;
 	transition: all 0.2s;
 }
 
 .player .identity>div {
-	margin: auto;
 	position: relative;
 	font-family: 'huangcao','xinwei';
 	font-size: 24px;
+	line-height: 24px;
 	top: 0;
 }
 .player .identity.animate {

@@ -7082,93 +7082,75 @@
 					this.classList.remove('removing');
 					return this;
 				};
-				HTMLDivElement.prototype.setBackground=function(name,type,ext,subfolder){
-					if(!name) return;
-					var src;
-					if(ext=='noskin'){
-						ext='.jpg';
-					}
-					ext=ext||'.jpg';
-					subfolder=subfolder||'default'
-					if(type){
-						var dbimage=null,extimage=null,modeimage=null;
-						var nameinfo;
-						var gzbool=false;
-						var mode=get.mode();
-						if(type=='character'){
-							if(lib.characterPack['mode_'+mode]&&lib.characterPack['mode_'+mode][name]){
-								if(mode=='guozhan'){
+				Object.defineProperty(HTMLDivElement.prototype,'setBackground',{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(name,type,ext,subfolder){
+						if(!name) return;
+						let src;
+						if(ext=='noskin') ext='.jpg';
+						ext=ext||'.jpg';
+						subfolder=subfolder||'default';
+						if(type){
+							let dbimage=null,extimage=null,modeimage=null,nameinfo,gzbool=false;
+							const mode=get.mode();
+							if(type=='character'){
+								if(lib.characterPack[`mode_${mode}`]&&lib.characterPack[`mode_${mode}`][name]) if(mode=='guozhan'){
 									nameinfo=lib.character[name];
-									if(name.indexOf('gz_shibing')==0){
-										name=name.slice(3,11);
-									}
+									if(name.indexOf('gz_shibing')==0) name=name.slice(3,11);
 									else{
-										if(lib.config.mode_config.guozhan.guozhanSkin&&lib.character[name]&&lib.character[name][4].contains('gzskin'))  gzbool=true;
+										if(lib.config.mode_config.guozhan.guozhanSkin&&lib.character[name]&&lib.character[name][4].contains('gzskin')) gzbool=true;
 										name=name.slice(3);
 									}
 								}
-								else{
-									modeimage=mode;
+								else modeimage=mode;
+								else if(lib.character[name]) nameinfo=lib.character[name];
+								else if(lib.config.show_extensionimage){
+									const pack=Object.keys(lib.characterPack).find(pack=>Object.keys(lib.characterPack[pack]).contains(name));
+									if(pack) nameinfo=lib.characterPack[pack][name];
+								}
+								else if(name.indexOf('::')!=-1){
+									name=name.split('::');
+									modeimage=name[0];
+									name=name[1];
 								}
 							}
-							else if(lib.character[name]){
-								nameinfo=lib.character[name];
-							}
-							else if(lib.config.show_extensionimage){
-								var pack=Object.keys(lib.characterPack).find(pack => Object.keys(lib.characterPack[pack]).contains(name));
-								if(pack) nameinfo=lib.characterPack[pack][name];
-							}
-							else if(name.indexOf('::')!=-1){
-								name=name.split('::');
-								modeimage=name[0];
-								name=name[1];
-							}
-						}
-						if(!modeimage&&nameinfo&&nameinfo[4]){
-							for(var i=0;i<nameinfo[4].length;i++){
-								if(nameinfo[4][i].indexOf('ext:')==0){
-									extimage=nameinfo[4][i];break;
+							if(!modeimage&&nameinfo&&nameinfo[4]) for(const value of nameinfo[4]){
+								if(value.indexOf('ext:')==0){
+									extimage=value;
+									break;
 								}
-								else if(nameinfo[4][i].indexOf('db:')==0){
-									dbimage=nameinfo[4][i];break;
+								else if(value.indexOf('db:')==0){
+									dbimage=value;
+									break;
 								}
-								else if(nameinfo[4][i].indexOf('mode:')==0){
-									modeimage=nameinfo[4][i].slice(5);break;
+								else if(value.indexOf('mode:')==0){
+									modeimage=value.slice(5);
+									break;
 								}
-								else if(nameinfo[4][i].indexOf('character:')==0){
-									name=nameinfo[4][i].slice(10);break;
+								else if(value.indexOf('character:')==0){
+									name=value.slice(10);
+									break;
 								}
 							}
-						}
-						if(extimage){
-							src=extimage.replace(/ext:/,'extension/');
-						}
-						else if(dbimage){
-							this.setBackgroundDB(dbimage.slice(3));
-							return this;
-						}
-						else if(modeimage){
-							src='image/mode/'+modeimage+'/character/'+name+ext;
-						}
-						else if(type=='character'&&lib.config.skin[name]&&arguments[2]!='noskin'){
-							src='image/skin/'+name+'/'+lib.config.skin[name]+ext;
-						}
-						else{
-							if(type=='character'){
-								src='image/character/'+(gzbool?'gz_':'')+name+ext;
+							if(extimage) src=extimage.replace(/ext:/,'extension/');
+							else if(dbimage){
+								this.setBackgroundDB(dbimage.slice(3));
+								return this;
 							}
-							else{
-								src='image/'+type+'/'+subfolder+'/'+name+ext;
-							}
+							else if(modeimage) src=`image/mode/${modeimage}/character/${name}${ext}`;
+							else if(type=='character'&&lib.config.skin[name]&&arguments[2]!='noskin') src=`image/skin/${name}/${lib.config.skin[name]}${ext}`;
+							else if(type=='character') src=`image/character/${gzbool?'gz_':''}${name}${ext}`;
+							else src=`image/${type}/${subfolder}/${name}${ext}`;
 						}
+						else src=`image/${name}${ext}`;
+						this.setBackgroundImage(src);
+						this.style.backgroundPositionX='center';
+						this.style.backgroundSize='cover';
+						return this;
 					}
-					else{
-						src='image/'+name+ext;
-					}
-					this.setBackgroundImage(src);
-					this.style.backgroundSize="cover";
-					return this;
-				};
+				});
 				HTMLDivElement.prototype.setBackgroundDB=function(img){
 					var node=this;
 					game.getDB('image',img,function(src){
@@ -7813,10 +7795,10 @@
 							appearenceConfig.identity_font.item[value]=font;
 							appearenceConfig.cardtext_font.item[value]=font;
 							appearenceConfig.global_font.item[value]=font;
-							fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.ttf');}`,0);
-							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.ttf');}`,0);
+							fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.woff2');}`,0);
+							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,0);
 						});
-						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: local('Noname Suit'), url('${lib.assetURL}font/suits.ttf');}`,0);
+						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: local('Noname Suit'), url('${lib.assetURL}font/suits.woff2');}`,0);
 						appearenceConfig.cardtext_font.item.default='默认';
 						appearenceConfig.global_font.item.default='默认';
 					}
@@ -37563,7 +37545,7 @@
 				}
 				if(info.ai==undefined) info.ai={};
 				const skill=info.ai,card=lib.card[info.viewAs.name].ai;
-				Object.keys(card).forEach(value=>{
+				if(card) Object.keys(card).forEach(value=>{
 					if(skill[value]==undefined) skill[value]=card[value];
 					else if(typeof skill[value]=='object') Object.keys(card[value]).forEach(element=>{
 						if(skill[value][element]==undefined) skill[value][element]=card[value][element];
@@ -37572,7 +37554,7 @@
 			}
 			if(info.inherit){
 				const skill=lib.skill[info.inherit];
-				Object.keys(skill).forEach(value=>{
+				if(skill) Object.keys(skill).forEach(value=>{
 					if(info[value]!=undefined) return;
 					if(value=='audio'&&(typeof info[value]=='number'||typeof info[value]=='boolean')) info[value]=info.inherit;
 					else info[value]=skill[value];
@@ -40148,11 +40130,11 @@
 											zip.load(data);
 											var images=[],audios=[],fonts=[],directories={},directorylist=[];
 											for(var i in zip.files){
-												var ext=i.slice(i.lastIndexOf('.')+1);
+												var ext=i.slice(i.lastIndexOf('.')+1).toLowerCase();
 												if(i.indexOf('audio/')==0&&(ext=='mp3'||ext=='ogg')){
 													audios.push(i);
 												}
-												else if(i.indexOf('font/')==0&&ext=='ttf'){
+												else if(i.indexOf('font/')==0&&ext=='woff2'){
 													fonts.push(i);
 												}
 												else if(i.indexOf('image/')==0&&(ext=='jpg'||ext=='png')){
@@ -47855,14 +47837,8 @@
 									node.node.group.style.display='none';
 								}
 								node.classList.add('newstyle');
-								if(double&&double.length){
-									node.node.name.dataset.nature=get.groupnature(double[0]);
-									node.node.group.dataset.nature=get.groupnature(double[double.length==2?1:0]);
-								}
-								else{
-									node.node.name.dataset.nature=get.groupnature(get.bordergroup(infoitem));
-									node.node.group.dataset.nature=get.groupnature(get.bordergroup(infoitem),'raw');
-								}
+								node.node.name.dataset.nature=get.groupnature(get.bordergroup(infoitem));
+								node.node.group.dataset.nature=get.groupnature(get.bordergroup(infoitem),'raw');
 								ui.create.div(node.node.hp);
 								var hp=get.infoHp(infoitem[2]),maxHp=get.infoMaxHp(infoitem[2]),hujia=get.infoHujia(infoitem[2]);
 								var str=get.numStr(hp);
@@ -47920,18 +47896,12 @@
 							}
 							if(infoitem[1]){
 								if(double){
-									var str='<div>';
-									if(double.length==2){
-										for(var i of double){
-											str+=get.translation(i);
-										}
-									}
-									else str+=get.translation(double[0]);
-									str+='</div>';
-									node.node.group.innerHTML=str;
+									node.node.group.innerHTML=double.reduce((previousValue,currentValue)=>`${previousValue}<div data-nature="${get.groupnature(currentValue)}">${get.translation(currentValue)}</div>`,'');
+									if(double.length>4) if(new Set([5,6,9]).has(double.length)) node.node.group.style.height='48px';
+									else node.node.group.style.height='64px';
 								}
-								else node.node.group.innerHTML='<div>'+get.translation(infoitem[1])+'</div>';
-								node.node.group.style.backgroundColor=get.translation(get.bordergroup(infoitem)+'Color');
+								else node.node.group.innerHTML=`<div>${get.translation(infoitem[1])}</div>`;
+								node.node.group.style.backgroundColor=get.translation(`${get.bordergroup(infoitem)}Color`);
 							}
 							else{
 								node.node.group.style.display='none';
