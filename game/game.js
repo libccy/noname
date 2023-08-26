@@ -28827,27 +28827,29 @@
 		},
 		sort:{
 			character:function(a,b){
-				var getGroup=function(name){
+				/*var getGroup=function(name){
 					var group=get.is.double(name,true);
 					if(group) return group[0];
 					return lib.character[name][1];
-				}
-				var groupSort=function(name){
+				}*/
+				const groupSort=function(name){
 					if(!lib.character[name]) return 7;
-					var group=getGroup(name);
-					if(group=='shen') return -1;
-					if(group=='wei') return 0;
-					if(group=='shu') return 1;
-					if(group=='wu') return 2;
-					if(group=='qun') return 3;
-					if(group=='jin') return 4;
-					if(group=='key') return 5;
-					if(group=='western') return 6;
-					return 7;
+					let base=0;
+					if(get.is.double(name,true)) base=9;
+					const group=lib.character[name][1];
+					if(group=='shen') return base-1;
+					if(group=='wei') return base;
+					if(group=='shu') return base+1;
+					if(group=='wu') return base+2;
+					if(group=='qun') return base+3;
+					if(group=='jin') return base+4;
+					if(group=='key') return base+5;
+					if(group=='western') return base+6;
+					return base+7;
 				}
-				var del=groupSort(a)-groupSort(b);
+				const del=groupSort(a)-groupSort(b);
 				if(del!=0) return del;
-				var aa=a,bb=b;
+				let aa=a,bb=b;
 				if(a.indexOf('_')!=-1){
 					a=a.slice(a.indexOf('_')+1);
 				}
@@ -40780,23 +40782,25 @@
 								}
 							}
 							alterableCharacters.sort();
-							var getGroup=function(name){
+							/*var getGroup=function(name){
 								var group=get.is.double(name,true);
 								if(group) return group[0];
 								return lib.character[name][1];
-							};
-							var groupSort=function(name){
+							};*/
+							const groupSort=function(name){
 								if(!lib.character[name]) return 7;
-								var group=getGroup(name);
-								if(group=='shen') return -1;
-								if(group=='wei') return 0;
-								if(group=='shu') return 1;
-								if(group=='wu') return 2;
-								if(group=='qun') return 3;
-								if(group=='jin') return 4;
-								if(group=='key') return 5;
-								if(group=='western') return 6;
-								return 7;
+								let base=0;
+								if(get.is.double(name,true)) base=9;
+								const group=lib.character[name][1];
+								if(group=='shen') return base-1;
+								if(group=='wei') return base;
+								if(group=='shu') return base+1;
+								if(group=='wu') return base+2;
+								if(group=='qun') return base+3;
+								if(group=='jin') return base+4;
+								if(group=='key') return base+5;
+								if(group=='western') return base+6;
+								return base+7;
 							}
 							list.sort(function(a,b){
 								var del=groupSort(a)-groupSort(b);
@@ -46527,23 +46531,25 @@
 					};
 				}
 				else{
-					var getGroup=function(name){
+					/*var getGroup=function(name){
 						var group=get.is.double(name,true);
 						if(group) return group[0];
 						return lib.character[name][1];
-					}
+					}*/
 					groupSort=function(name){
 						if(!lib.character[name]) return 7;
-						var group=getGroup(name);
-						if(group=='shen') return -1;
-						if(group=='wei') return 0;
-						if(group=='shu') return 1;
-						if(group=='wu') return 2;
-						if(group=='qun') return 3;
-						if(group=='jin') return 4;
-						if(group=='key') return 5;
-						if(group=='western') return 6;
-						return 7;
+						let base=0;
+						if(get.is.double(name,true)) base=9;
+						const group=lib.character[name][1];
+						if(group=='shen') return base-1;
+						if(group=='wei') return base;
+						if(group=='shu') return base+1;
+						if(group=='wu') return base+2;
+						if(group=='qun') return base+3;
+						if(group=='jin') return base+4;
+						if(group=='key') return base+5;
+						if(group=='western') return base+6;
+						return base+7;
 					}
 				}
 				list.sort(function(a,b){
