@@ -76,7 +76,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					if(result.index==0) player.gain(event.show_card,target,'give','bySelf');
+					if(result.index==0) target.give(event.show_card,player);
 					else target.damage();
 				},
 				ai:{
@@ -157,7 +157,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				distance:{attackFrom:-1},
 				fullskin:true,
-				skills:['qixingbaodao'],
+				global:'qixingbaodao',
 				selectTarget:[-1,-2],
 				ai:{
 					order:9,
@@ -449,7 +449,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qixingbaodao:{
-				trigger:{player:'equipAfter'},
+				trigger:{player:'equipBegin'},
 				forced:true,
 				equipSkill:true,
 				filter:function(event,player){
@@ -694,7 +694,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yitianjian:'倚天剑',
 			yitianjian_info:'当你因执行【杀】的效果而造成伤害后，若你已受伤，则你可弃置一张手牌，然后回复1点体力。',
 			qixingbaodao:'七星宝刀',
-			qixingbaodao_info:'锁定技。当此牌进入你的装备区后，你弃置装备区和判定区内的所有其他牌。',
+			qixingbaodao_info:'锁定技。当此牌进入你的装备区时，你弃置装备区和判定区内的所有其他牌。',
 			duanjian:'断剑',
 			duanjian_info:'这是一把坏掉的武器…',
 			duanjian_append:'<span class="text" style="font-family: yuanli">不要因为手快而装给自己。</span>',

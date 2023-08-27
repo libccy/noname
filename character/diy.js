@@ -6265,16 +6265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				phaseDiscardContent:function(){
 					"step 0"
-					var num=0;
-					var hs=player.getCards('he');
-					num+=hs.length;
-					for(var i=0;i<hs.length;i++){
-						if(game.checkMod(hs[i],player,false,'ignoredHandcard',player)==true){
-							num--;
-						}
-					}
-					num=Math.max(0,num-player.getHandcardLimit());
-					event.num=num;
+					event.num=Math.max(0,player.countCards('he',card=>!player.canIgnoreHandcard(card))-player.getHandcardLimit());
 					if(event.num<=0) event.finish();
 					else{
 						if(lib.config.show_phase_prompt){

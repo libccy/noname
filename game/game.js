@@ -18282,6 +18282,11 @@
 			},
 			player:{
 				//新函数
+				//Check if the card does not count toward hand limit
+				//检测此牌是否不计入手牌上限
+				canIgnoreHandcard:function(card){
+					return lib.filter.ignoredHandcard(card,this);
+				},
 				//Recast
 				//重铸
 				recast:function(cards,recastingLose,recastingGain){
@@ -25120,14 +25125,7 @@
 				},
 				needsToDiscard:function(num){
 					if(typeof num!='number') num=0;
-					var hs=this.getCards('h');
-					num+=hs.length;
-					for(var i=0;i<hs.length;i++){
-						if(game.checkMod(hs[i],this,false,'ignoredHandcard',this)==true){
-							num--;
-						}
-					}
-					return Math.max(0,num-this.getHandcardLimit());
+					return Math.max(0,num+this.countCards('h',card=>!this.canIgnoreHandcard(card))-this.getHandcardLimit());
 				},
 				distanceTo:function(target,method){
 					return get.distance(this,target,method);
@@ -28402,6 +28400,9 @@
 			all:function(){
 				return true;
 			},
+			//Check if the card does not count toward the player's hand limit
+			//检测此牌是否不计入此角色的手牌上限
+			ignoredHandcard:(card,player)=>game.checkMod(card,player,false,'ignoredHandcard',player),
 			//Check if the card is recastable
 			//检查此牌是否可重铸
 			cardRecastable:(card,player,source,raw)=>{
@@ -28607,7 +28608,7 @@
 				}
 				var num=info.usable;
 				if(typeof num=='function') num=num(card,player);
-				num=game.checkMod(card,player,num,event,'cardUsable',player);
+				num=game.checkMod(card,player,num,'cardUsable',player);
 				if(typeof num!='number') return true;
 				else return(player.countUsed(card)<num);
 			},
@@ -54165,7 +54166,7 @@
 		},
 		verticalStr:function(str,sp){
 			if(typeof str!='string') return '';
-			return str.split('').filter(value=>value!='`').join('');
+			return [...str].filter(value=>value!='`').join('');
 		},
 		numStr:function(num,method){
 			if(num==Infinity){
