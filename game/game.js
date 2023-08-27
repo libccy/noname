@@ -7901,6 +7901,9 @@
 					}
 					var loadPack=function(){
 						var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
+						if(_status.jsExt){
+							toLoad += _status.jsExt.length;
+						}
 						var packLoaded=function(){
 							toLoad--;
 							if(toLoad==0){
@@ -7925,6 +7928,9 @@
 						lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
 						lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
 						lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
+						for(var i=0;i<_status.jsExt.length;i++){
+							lib.init.js(lib.assetURL+_status.jsExt[i].path,_status.jsExt[i].name,packLoaded,packLoaded);
+						}
 						// if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
 					};
 
@@ -9468,6 +9474,13 @@
 					document.head.appendChild(style);
 				}
 				return style;
+			},
+			//在扩展的precontent中调用，用于加载扩展必需的JS文件。
+			addJsForExtension:function(path,name){
+				if(!_status.jsExt){
+					_status.jsExt = [];
+				}
+				_status.jsExt.add({path:path,name:name});
 			},
 			js:function(path,file,onload,onerror){
 				if(path[path.length-1]=='/'){
