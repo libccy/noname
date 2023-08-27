@@ -3736,7 +3736,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.chooseCard('he',true,'铸币：请重铸一张牌',lib.filter.cardRecastable);
 					'step 1'
 					if(result.bool){
-						target.recast(result.cards,null,player=>player.draw().set('log',false).gaintag=['olzhubi_tag']);
+						target.recast(result.cards,null,player=>player.draw().set('log',false).set('gaintag',['olzhubi_tag']));
 					}
 				},
 				ai:{
