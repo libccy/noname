@@ -7928,8 +7928,10 @@
 						lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
 						lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
 						lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
-						for(var i=0;i<_status.jsExt.length;i++){
-							lib.init.js(lib.assetURL+_status.jsExt[i].path,_status.jsExt[i].name,packLoaded,packLoaded);
+						if(_status.jsExt){
+							for(var i=0;i<_status.jsExt.length;i++){
+								lib.init.js(lib.assetURL+_status.jsExt[i].path,_status.jsExt[i].name,packLoaded,packLoaded);
+							}
 						}
 						// if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
 					};
