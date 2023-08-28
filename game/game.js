@@ -7899,40 +7899,44 @@
 							}
 						}
 					}
-					var loadPack=function(){
-						var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
-						if(_status.jsExt){
-							toLoad += _status.jsExt.length;
-						}
-						var packLoaded=function(){
+					const loadPack=()=>{
+						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
+						if(_status.jsExt) toLoad+=_status.jsExt.length;
+						const packLoaded=()=>{
 							toLoad--;
-							if(toLoad==0){
-								if(_status.windowLoaded){
-									delete _status.windowLoaded;
-									lib.init.onload();
-								}
-								else{
-									_status.packLoaded=true;
-								}
+							if(toLoad) return;
+							if(_status.windowLoaded){
+								delete _status.windowLoaded;
+								lib.init.onload();
 							}
+							else _status.packLoaded=true;
 						};
-						if(localStorage.getItem(lib.configprefix+'playback')){
+						if(localStorage.getItem(`${lib.configprefix}playback`)){
 							toLoad++;
-							lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
+							lib.init.js(`${lib.assetURL}mode`,lib.config.mode,packLoaded,packLoaded);
 						}
-						else if((localStorage.getItem(lib.configprefix+'directstart')||!show_splash)&&
-							lib.config.all.mode.indexOf(lib.config.mode)!=-1){
+						else if((localStorage.getItem(`${lib.configprefix}directstart`)||!show_splash)&&lib.config.all.mode.indexOf(lib.config.mode)!=-1){
 							toLoad++;
-							lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
+							lib.init.js(`${lib.assetURL}mode`,lib.config.mode,packLoaded,packLoaded);
 						}
-						lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
-						lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
-						lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
-						if(_status.jsExt){
-							for(var i=0;i<_status.jsExt.length;i++){
-								lib.init.js(lib.assetURL+_status.jsExt[i].path,_status.jsExt[i].name,packLoaded,packLoaded);
+						lib.init.js(`${lib.assetURL}card`,lib.config.all.cards,packLoaded,packLoaded);
+						lib.init.js(`${lib.assetURL}character`,lib.config.all.characters,packLoaded,packLoaded);
+						lib.init.js(`${lib.assetURL}character`,'rank',packLoaded,packLoaded);
+						if(!_status.jsExt) return;
+						const loadJSExt=(jsExt,pathArray,nameArray,index)=>{
+							if(!pathArray&&!nameArray){
+								lib.init.js(jsExt.path,jsExt.name,packLoaded,packLoaded);
+								return;
 							}
-						}
+							if(typeof index!='number') index=0;
+							if(pathArray&&index>=jsExt.path.length||nameArray&&index>=jsExt.name.length) return;
+							const path=pathArray?jsExt.path[index]:jsExt.path,name=nameArray?jsExt.name[index]:jsExt.name,jsExtLoaded=()=>{
+								loadJSExt(jsExt,pathArray,nameArray,index+1);
+								packLoaded();
+							};
+							lib.init.js(path,name,jsExtLoaded,jsExtLoaded);
+						};
+						_status.jsExt.forEach(value=>loadJSExt(value,Array.isArray(value.path),Array.isArray(value.name)));
 						// if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
 					};
 
@@ -9478,11 +9482,14 @@
 				return style;
 			},
 			//在扩展的precontent中调用，用于加载扩展必需的JS文件。
-			addJsForExtension:function(path,name){
-				if(!_status.jsExt){
-					_status.jsExt = [];
-				}
-				_status.jsExt.add({path:path,name:name});
+			//If any of the parameters is an Array, corresponding files will be loaded in order
+			//如果任意参数为数组，则按顺序加载加载相应的文件
+			jsForExtension:(path,name)=>{
+				if(!_status.jsExt) _status.jsExt=[];
+				_status.jsExt.add({
+					path:path,
+					name:name
+				});
 			},
 			js:function(path,file,onload,onerror){
 				if(path[path.length-1]=='/'){
