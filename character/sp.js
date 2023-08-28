@@ -705,8 +705,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onChooseToUse:function(event){
 					if(!game.online&&!event.olsaogu){
 						var list=[],player=event.player;
+						var evtx=event.getParent('phaseUse');
 						player.getHistory('lose',evt=>{
-							if(evt.type=='discard') list.addArray(evt.cards2);
+							if(evt.type=='discard'&&evt.getParent('phaseUse')==evtx) list.addArray(evt.cards2);
 						});
 						event.set('olsaogu',list);
 					}
@@ -787,24 +788,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseCardTarget({
 								prompt:get.prompt('olsaogu'),
 								prompt2:str,
-								position:'he',
 								filterTarget:function(card,player,target){
 									return player!=target&&target.countCards('he')>1;
 								},
 								filterCard:lib.filter.cardDiscardable,
+								position:'he',
 								ai1:function(card){
 									return 5-get.value(card);
 								},
 								ai2:function(target){
 									var player=_status.event.player;
 									var att=get.attitude(player,target);
+									var storage=player.storage.olsaogu;
+									if(storage) return att;
 									var cards=target.getCards('he',card=>{
 										if(card.name!='sha') return false;
 										return lib.filter.cardDiscardable(card,target)&&game.hasPlayer(function(current){
-											return current!=target&&get.effect(current,card,target,target)>0&&get.effect(current,card,target,player)>0;
+											if(!current.canUse(card,target,false)) return false;
+											return get.effect(current,card,target,target)>0&&get.effect(current,card,target,player)>0;
 										});
 									});
-									if(cards.length) return Math.min(2,cards.length);
+									if(cards.length&&att>0) return Math.sqrt(Math.min(2,cards.length))*cards.reduce(function(num,card){
+										var players=game.filterPlayer(current=>target.canUse(card,current,false));
+										players.sort((a,b)=>get.effect(b,card,target,target)*get.effect(b,card,target,player)-get.effect(a,card,target,target)*get.effect(a,card,target,player));
+										return num=(get.effect(players[0],card,target,target)*get.effect(players[0],card,target,player));
+									},0);
 									return get.effect(target,{name:'guohe_copy2'},player,player)*Math.sqrt(Math.min(2,target.countDiscardableCards(player,'he')));
 								},
 							});
