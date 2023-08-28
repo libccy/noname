@@ -10711,6 +10711,36 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				//Gift
+				//赠予
+				gift:()=>{
+					'step 0'
+					event.num=0;
+					'step 1'
+					if(num<cards.length){
+						event.card=cards[num];
+						event.trigger('gift');
+					}
+					else event.finish();
+					'step 2'
+					if(event.deniedGifts.includes(card)){
+						game.log(target,'拒绝了',player,'赠予的',card);
+						event.trigger('giftDeny');
+						player.loseToDiscardpile(card).log=false;
+						event.trigger('giftDenied');
+						return;
+					}
+					game.log(player,'将',card,'赠予了',target);
+					player.$give(card,target,false);
+					game.delay(0.5);
+					event.trigger('giftAccept');
+					if(get.type(card,false)=='equip') target.equip(card).log=false;
+					else target.gain(card,player).visible=true;
+					event.trigger('giftAccepted');
+					'step 3'
+					event.num++;
+					event.goto(1);
+				},
 				//Recast
 				//重铸
 				recast:()=>{
@@ -10719,6 +10749,7 @@
 					if(typeof event.recastingLose!='function') return;
 					event.trigger('recastingLose');
 					var recastingLosingEvents=event.recastingLose(player,cards);
+					event.trigger('recastingLost');
 					if(get.itemtype(recastingLosingEvents)=='event') event.recastingLosingEvents.push(event.recastingLosingEvents);
 					else if(Array.isArray(recastingLosingEvents)) event.recastingLosingEvents.push(...recastingLosingEvents);
 					'step 1'
@@ -10727,6 +10758,7 @@
 					if(typeof event.recastingGain!='function') return;
 					event.trigger('recastingGain');
 					var recastingGainingEvents=event.recastingGain(player,cards);
+					event.trigger('recastingGained');
 					if(get.itemtype(recastingGainingEvents)=='event') event.recastingGainingEvents.push(event.recastingGainingEvents);
 					else if(Array.isArray(recastingGainingEvents)) event.recastingGainingEvents.push(...recastingGainingEvents);
 					'step 3'
@@ -10942,7 +10974,7 @@
 					},subtype);
 					player.$equip(card);
 					game.addVideo('equip',player,get.cardInfo(card));
-					game.log(player,'装备了',card);
+					if(event.log!=false) game.log(player,'装备了',card);
 					if(event.updatePile) game.updateRoundNumber();
 					"step 6"
 					var info=get.info(card,false);
@@ -17067,7 +17099,7 @@
 						},get.delayx(500,500));
 					}
 					else if(event.animate=='gain'){
-						player.$gain(cards);
+						player.$gain(cards,event.log);
 						game.pause();
 						setTimeout(function(){
 							addv();
@@ -17081,7 +17113,7 @@
 					}
 					else if(event.animate=='gain2'||event.animate=='draw2'){
 						var gain2t=300;
-						if(player.$gain2(cards)&&player==game.me){
+						if(player.$gain2(cards,event.log)&&player==game.me){
 							gain2t=500;
 						}
 						game.pause();
@@ -17100,14 +17132,14 @@
 						if(event.animate=='give'){
 							for(var i in evtmap){
 								var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
-								source.$give(evtmap[i][0],player)
+								source.$give(evtmap[i][0],player,event.log)
 							}
 						}
 						else{
 							for(var i in evtmap){
 								var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
-								if(evtmap[i][1].length) source.$giveAuto(evtmap[i][1],player);
-								if(evtmap[i][2].length) source.$give(evtmap[i][2],player);
+								if(evtmap[i][1].length) source.$giveAuto(evtmap[i][1],player,event.log);
+								if(evtmap[i][2].length) source.$give(evtmap[i][2],player,event.log);
 							}
 						}
 						game.pause();
@@ -17142,9 +17174,6 @@
 						if(player==game.me) ui.updatehl();
 						broadcast();
 						event.finish();
-					}
-					if(event.log){
-						game.log(player,'获得了',cards);
 					}
 					"step 4"
 					game.delayx();
@@ -18287,6 +18316,46 @@
 				canIgnoreHandcard:function(card){
 					return lib.filter.ignoredHandcard(card,this);
 				},
+				//Gift
+				//赠予
+				gift:function(cards,target){
+					const gift=game.createEvent('gift');
+					gift.player=this;
+					gift.target=target;
+					const isArray=Array.isArray(cards);
+					if(cards&&!isArray) gift.cards=[cards];
+					else if(isArray&&cards.length) gift.cards=cards;
+					else _status.event.next.remove(gift);
+					gift.deniedGifts=[];
+					gift.setContent('gift');
+					gift._args=Array.from(arguments);
+					return gift;
+				},
+				//Check if the player can gift the card
+				//检测角色是否能赠予此牌
+				canGift:function(card,target,strict){
+					return lib.filter.cardGiftable(card,this,target,strict);
+				},
+				//Check if the player refuses gifts
+				//检测角色是否拒绝赠予
+				refuseGifts:function(card,player){
+					return this.hasSkillTag('refuseGifts',null,{
+						player:player,
+						card:card
+					});
+				},
+				//Gift AI related
+				//赠予AI相关
+				getGiftAIResultTarget:function(card,target){
+					if(!card||target.refuseGifts(card,this)) return 0;
+					if(get.type(card,false)=='equip') return get.effect(target,card,target,target);
+					if(card.name=='du') return this.hp>target.hp?-1:0;
+					if(target.hasSkillTag('nogain')) return 0;
+					return Math.max(1,get.value(card,this)-get.value(card,target));
+				},
+				getGiftEffect:function(card,target){
+					return this.getGiftAIResultTarget(card,target)*get.attitude(this,target);
+				},
 				//Recast
 				//重铸
 				recast:function(cards,recastingLose,recastingGain){
@@ -18307,13 +18376,9 @@
 					return recast;
 				},
 				//Check if the player can recast the card
-				//检查角色是否能重铸此牌
+				//检测角色是否能重铸此牌
 				canRecast:function(card,source,strict){
-					const cardRecastable=lib.filter.cardRecastable(card,this,source,strict);
-					if(cardRecastable!='unchanged') return cardRecastable;
-					if(get.position(card)!='h') return false;
-					const info=get.info(card);
-					return typeof info.chongzhu=='function'?info.chongzhu(_status.event,this):info.chongzhu;
+					return lib.filter.cardRecastable(card,this,source,strict);
 				},
 				//装备栏相关
 				//判断一名角色的某个区域是否被废除
@@ -28403,11 +28468,25 @@
 			//Check if the card does not count toward the player's hand limit
 			//检测此牌是否不计入此角色的手牌上限
 			ignoredHandcard:(card,player)=>game.checkMod(card,player,false,'ignoredHandcard',player),
+			//Check if the card is giftable
+			//检测此牌是否可赠予
+			cardGiftable:(card,player,target,strict)=>{
+				const mod=game.checkMod(card,player,target,'unchanged','cardGiftable',player);
+				if(!mod||strict&&(mod=='unchanged'&&(get.position(card)!='h'||!get.cardtag(card,'gifts'))||player==target)) return false;
+				return get.type(card,false)!='equip'||target.canEquip(card,true);
+			},
 			//Check if the card is recastable
 			//检查此牌是否可重铸
-			cardRecastable:(card,player,source,raw)=>{
+			cardRecastable:(card,player,source,strict)=>{
 				if(typeof player=='undefined') player=get.owner(card);
-				return game.checkMod(card,player,source,!raw||'unchanged','cardRecastable',player);
+				const mod=game.checkMod(card,player,source,'unchanged','cardRecastable',player);
+				if(!mod) return false;
+				if(strict&&mod=='unchanged'){
+					if(get.position(card)!='h') return false;
+					const info=get.info(card);
+					return typeof info.chongzhu=='function'?info.chongzhu(_status.event,player):info.chongzhu;
+				}
+				return true;
 			},
 			//装备栏相关
 			canBeReplaced:function(card,player){

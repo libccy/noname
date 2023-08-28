@@ -404,14 +404,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				equipSkill:true,
 				forced:true,
-				trigger:{target:'_yongjian_zengyuBegin'},
-				content:function(){
-					trigger._zengyu_denied=true;
-					game.log(player,'拒绝了',trigger.player,'发起的赠予');
+				trigger:{target:'gift'},
+				filter:(event,player)=>event.target!=player,
+				logTarget:'player',
+				content:()=>{
+					trigger.deniedGift.add(trigger.card);
 				},
 				ai:{
-					refuseGifts:true,
-				},
+					refuseGifts:true
+				}
 			},
 			xinge:{
 				audio:true,
@@ -595,6 +596,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						map.push([source,event.given_map[i]]);
 						cards.addArray(event.given_map[i]);
 					}
+					player.showCards(cards,`${get.translation(player)}对${(targets=>{
+						if(get.itemtype(targets)=='player') targets=[targets];
+						if(targets[0]!=player) return get.translation(targets);
+						const selfTargets=targets.slice();
+						selfTargets[0]='自己';
+						return get.translation(selfTargets);
+					})(logs)}发动了【${get.skillTranslation(event.name,player)}】`);
 					game.loseAsync({
 						gain_list:map,
 						player:player,
@@ -609,79 +617,37 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			_yongjian_zengyu:{
 				enable:'phaseUse',
 				forceLoad:true,
-				filter:function(event,player){
-					return player.hasCard((card)=>lib.skill._yongjian_zengyu.filterCard(card,player),'he');
-				},
-				filterCard:function(card,player){
-					var mod=game.checkMod(card,player,'unchanged','cardZengyuable',player);
-					if(mod!='unchanged') return mod;
-					return get.position(card)=='h'&&get.cardtag(card,'gifts');
-				},
-				filterTarget:function(card,player,target){
-					if(player==target) return false;
-					var card=ui.selected.cards[0];
-					if(get.type(card,false)=='equip'){
-						return target.canEquip(card,true);
-					}
-					return true;
-				},
+				filter:(event,player)=>player.hasCard(card=>lib.skill._yongjian_zengyu.filterCard(card,player),lib.skill._yongjian_zengyu.position),
+				filterCard:(card,player)=>game.hasPlayer(current=>player.canGift(card,current,true)),
+				filterTarget:(card,player,target)=>ui.selected.cards.every(value=>player.canGift(value,target,true)),
 				position:'he',
 				discard:false,
 				lose:false,
 				delay:false,
-				check:function(card){
-					var player=_status.event.player;
-					if(get.cardtag(card,'gifts')&&get.type(card,false)=='equip'&&game.hasPlayer(function(current){
-						return current!=player&&current.canEquip(card,true)&&!current.hasSkillTag('refuseGifts')&&get.effect(current,card,player,player)>0;
-					})) return 2;
+				check:card=>{
+					const player=_status.event.player;
+					if(game.hasPlayer(current=>player.canGift(card,current,true)&&!current.refuseGifts(card,player)&&get.effect(current,card,player,player)>0)) return 2;
 					if(!player.needsToDiscard()&&get.position(card)=='h') return 0;
 					return 1+Math.random();
 				},
-				content:function(){
-					'step 0'
-					if(event._zengyu_denied){
-						player.loseToDiscardpile(cards);
-					}
-					else{
-						if(get.type(cards[0],false)=='equip'){
-							player.$give(cards[0],target,false);
-							game.delay(0.5);
-							target.equip(cards[0]);
-						}
-						else{
-							target.gain(cards,player,'give');
-							event.finish();
-						}
-					}
-					'step 1'
-					game.delayx();
+				content:()=>{
+					player.gift(cards,target);
 				},
 				ai:{
-					order:function(item,player){
-						if(player.hasCard(function(card){
-							return get.cardtag(card,'gifts')&&get.type(card,false)=='equip'&&game.hasPlayer(function(current){
-								return current!=player&&current.canEquip(card,true)&&!current.hasSkillTag('refuseGifts')&&get.effect(current,card,player,player)>0;
-							});
-						},'h')) return 7;
-						return 0.51;
-					},
+					order:(item,player)=>player.hasCard(card=>game.hasPlayer(current=>player.canGift(card,current,true)&&!current.refuseGifts(card,player)&&get.effect(current,card,player,player)>0),'h')?7:0.51,
 					result:{
-						target:function(player,target){
-							var card=ui.selected.cards[0];
-							if(!card||target.hasSkillTag('refuseGifts')) return 0;
-							if(get.type(card,false)=='equip') return get.effect(target,card,target,target);
-							if(card.name=='du') return player.hp>target.hp?-1:0;
-							if(target.hasSkillTag('nogain')) return 0;
-							return Math.max(1,get.value(card,player)-get.value(card,target));
-						},
-					},
-				},
-			},
+						target:(player,target)=>{
+							const result=ui.selected.cards.map(value=>player.getGiftAIResultTarget(value,target));
+							return result.reduce((previousValue,currentValue)=>previousValue+currentValue,0)/result.length;
+						}
+					}
+				}
+			}
 		},
 		translate:{
 			gifts_tag:'赠',
 			du:'毒',
-			du_info:'①当此牌正面向上离开你的手牌区，或作为你的拼点牌而亮出时，你失去1点体力。②当你因摸牌或分发起始手牌而获得【毒】后，你可将其分配给其他角色（正面朝上移动，且不触发〖毒①〗）。',
+			du_info:'①当此牌正面向上离开你的手牌区，或作为你的拼点牌而亮出时，你失去1点体力。②当你因摸牌或分发起始手牌而获得【毒】后，你可展示之并交给其他角色（不触发〖毒①〗）。',
 			g_du:'毒',
 			g_du_give:'赠毒',
 			du_given:'已分配',
@@ -707,7 +673,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yonglv_info:'锁定技。①你至其他角色的距离-1。②其他角色至你的距离视为1。',
 			yonglv_append:'<span class="text" style="font-family: yuanli">它旁边的就是王仲宣。</span>',
 			zhanxiang:'战象',
-			zhanxiang_info:'锁定技。①其他角色至你的距离+1。②当你成为〖赠予〗的目标后，你将此次赠予的效果改为“将赠予牌移动至弃牌堆”。',
+			zhanxiang_info:'锁定技。①其他角色至你的距离+1。②其他角色对你赠予的牌视为赠予失败。',
 			xinge:'信鸽',
 			xinge_info:'出牌阶段限一次。你可以将一张手牌交给一名其他角色。',
 			xinge_append:'<span class="text" style="font-family: yuanli">咕咕咕。</span>',
