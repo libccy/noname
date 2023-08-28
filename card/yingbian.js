@@ -674,7 +674,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var info=get.info(trigger.card);
 					if(info&&info.yingbian) info.yingbian(trigger);
 					player.addTempSkill('yingbian_changeTarget');
-				},
+				}
 			},
 			yingbian_changeTarget:{
 				trigger:{player:'useCard2'},

@@ -1,5 +1,5 @@
 "use strict";
-(function(){
+(()=>{
 	if(!localStorage.getItem('gplv3_noname_alerted')){
 		if(confirm('①无名杀是一款基于GPLv3协议的开源软件！\n你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。\n点击“确定”即代表您认可并接受GPLv3协议↓️\nhttps://www.gnu.org/licenses/gpl-3.0.html\n②无名杀官方发布地址仅有GitHub仓库！\n其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！')){
 			localStorage.setItem('gplv3_noname_alerted',true);
@@ -10755,23 +10755,17 @@
 					game.log(player,'重铸了',cards);
 					if(typeof event.recastingLose!='function') return;
 					event.trigger('recastingLose');
-					var recastingLosingEvents=event.recastingLose(player,cards);
+					event.recastingLose(player,cards);
 					event.trigger('recastingLost');
-					if(get.itemtype(recastingLosingEvents)=='event') event.recastingLosingEvents.push(event.recastingLosingEvents);
-					else if(Array.isArray(recastingLosingEvents)) event.recastingLosingEvents.push(...recastingLosingEvents);
+					event.recastingLosingEvents.push(...event.next.filter(value=>value.name!='arrangeTrigger'));
 					'step 1'
 					event.trigger('recast');
 					'step 2'
 					if(typeof event.recastingGain!='function') return;
 					event.trigger('recastingGain');
-					var recastingGainingEvents=event.recastingGain(player,cards);
+					event.recastingGain(player,cards);
 					event.trigger('recastingGained');
-					if(get.itemtype(recastingGainingEvents)=='event') event.recastingGainingEvents.push(event.recastingGainingEvents);
-					else if(Array.isArray(recastingGainingEvents)) event.recastingGainingEvents.push(...recastingGainingEvents);
-					'step 3'
-					event.result=event.recastingGainingEvents.reduce((previousValue,currentValue)=>Array.isArray(currentValue.cards)?previousValue.addArray(currentValue.cards):previousValue,[]);
-					if(Array.isArray(result.cards)) event.result.addArray(result.cards);
-					if(Array.isArray(result)) event.result.addArray(result);
+					event.recastingGainingEvents.push(...event.next.filter(value=>value.name!='arrangeTrigger'));
 				},
 				//装备栏相关
 				disableEquip:function(){
@@ -18372,10 +18366,10 @@
 					if(cards&&!isArray) recast.cards=[cards];
 					else if(isArray&&cards.length) recast.cards=cards;
 					else _status.event.next.remove(recast);
-					if(typeof recastingLose!='function') recastingLose=(player,cards)=>player.loseToDiscardpile(cards).set("log",false);
+					if(typeof recastingLose!='function') recastingLose=(player,cards)=>player.loseToDiscardpile(cards).log=false;
 					recast.recastingLose=recastingLose;
 					recast.recastingLosingEvents=[];
-					if(typeof recastingGain!='function') recastingGain=(player,cards)=>player.draw(cards.length).set("log",false);
+					if(typeof recastingGain!='function') recastingGain=(player,cards)=>player.draw(cards.length).log=false;
 					recast.recastingGain=recastingGain;
 					recast.recastingGainingEvents=[];
 					recast.setContent('recast');
@@ -30128,36 +30122,32 @@
 				delay:false,
 				content:function(){
 					player.recast(cards,null,(player,cards)=>{
-						var numberOfCardsToDraw=cards.length,recastingGainingEvents=[];
+						var numberOfCardsToDraw=cards.length;
 						cards.forEach(value=>{
 							if(lib.config.mode=='stone'&&_status.mode=='deck'&&!player.isMin()&&get.type(value).indexOf('stone')==0){
 								var stonecard=get.stonecard(1,player.career);
 								if(stonecard.length){
 									numberOfCardsToDraw-=stonecard.length;
-									var card=game.createCard(stonecard.randomGet());
-									recastingGainingEvents.push(player.gain(card,'draw'));
+									player.gain(game.createCard(stonecard.randomGet()),'draw');
 								}
-								else recastingGainingEvents.push(player.draw({
+								else player.draw({
 									drawDeck:1
-								}).set('log',false));
+								}).log=false;
 							}
 							else if(get.subtype(value)=='spell_gold'){
 								var libCard=get.libCard(info=>info.subtype=='spell_silver');
 								if(!libCard.length) return;
 								numberOfCardsToDraw--;
-								var card=game.createCard(libCard.randomGet());
-								recastingGainingEvents.push(player.gain(card,'draw'));
+								player.gain(game.createCard(libCard.randomGet()),'draw');
 							}
 							else if(get.subtype(value)=='spell_silver'){
 								var libCard=get.libCard(info=>info.subtype=='spell_bronze');
 								if(!libCard.length) return;
 								numberOfCardsToDraw--;
-								var card=game.createCard(libCard.randomGet());
-								recastingGainingEvents.push(player.gain(card,'draw'));
+								player.gain(game.createCard(libCard.randomGet()),'draw');
 							}
 						});
-						if(numberOfCardsToDraw) recastingGainingEvents.push(player.draw(numberOfCardsToDraw).set('log',false));
-						return recastingGainingEvents;
+						if(numberOfCardsToDraw) player.draw(numberOfCardsToDraw).log=false;
 					});
 				},
 				ai:{
@@ -57423,4 +57413,4 @@
 		get:get
 	};
 	lib.init.init();
-}());
+})();

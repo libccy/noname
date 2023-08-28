@@ -499,10 +499,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var card=get.cardPile(card=>get.type(card,'trick')=='trick');
 							if(card) cardsToGain.push(card);
 						}
-						var recastingGainingEvents=[];
-						if(cardsToGain.length) recastingGainingEvents.push(player.gain(cardsToGain,'draw'));
-						if(cards.length-cardsToGain.length) recastingGainingEvents.push(player.draw(cards.length-cardsToGain.length).set('log',false));
-						return recastingGainingEvents;
+						if(cardsToGain.length) player.gain(cardsToGain,'draw');
+						if(cards.length-cardsToGain.length) player.draw(cards.length-cardsToGain.length).log=false;
 					});
 				},
 				ai:{
