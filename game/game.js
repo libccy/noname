@@ -1,5 +1,5 @@
 "use strict";
-(function(){
+(()=>{
 	if(!localStorage.getItem('gplv3_noname_alerted')){
 		if(confirm('①无名杀是一款基于GPLv3协议的开源软件！\n你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。\n点击“确定”即代表您认可并接受GPLv3协议↓️\nhttps://www.gnu.org/licenses/gpl-3.0.html\n②无名杀官方发布地址仅有GitHub仓库！\n其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！')){
 			localStorage.setItem('gplv3_noname_alerted',true);
@@ -7899,40 +7899,44 @@
 							}
 						}
 					}
-					var loadPack=function(){
-						var toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
-						if(_status.jsExt){
-							toLoad += _status.jsExt.length;
-						}
-						var packLoaded=function(){
+					const loadPack=()=>{
+						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
+						if(_status.jsExt) toLoad+=_status.jsExt.length;
+						const packLoaded=()=>{
 							toLoad--;
-							if(toLoad==0){
-								if(_status.windowLoaded){
-									delete _status.windowLoaded;
-									lib.init.onload();
-								}
-								else{
-									_status.packLoaded=true;
-								}
+							if(toLoad) return;
+							if(_status.windowLoaded){
+								delete _status.windowLoaded;
+								lib.init.onload();
 							}
+							else _status.packLoaded=true;
 						};
-						if(localStorage.getItem(lib.configprefix+'playback')){
+						if(localStorage.getItem(`${lib.configprefix}playback`)){
 							toLoad++;
-							lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
+							lib.init.js(`${lib.assetURL}mode`,lib.config.mode,packLoaded,packLoaded);
 						}
-						else if((localStorage.getItem(lib.configprefix+'directstart')||!show_splash)&&
-							lib.config.all.mode.indexOf(lib.config.mode)!=-1){
+						else if((localStorage.getItem(`${lib.configprefix}directstart`)||!show_splash)&&lib.config.all.mode.indexOf(lib.config.mode)!=-1){
 							toLoad++;
-							lib.init.js(lib.assetURL+'mode',lib.config.mode,packLoaded,packLoaded);
+							lib.init.js(`${lib.assetURL}mode`,lib.config.mode,packLoaded,packLoaded);
 						}
-						lib.init.js(lib.assetURL+'card',lib.config.all.cards,packLoaded,packLoaded);
-						lib.init.js(lib.assetURL+'character',lib.config.all.characters,packLoaded,packLoaded);
-						lib.init.js(lib.assetURL+'character','rank',packLoaded,packLoaded);
-						if(_status.jsExt){
-							for(var i=0;i<_status.jsExt.length;i++){
-								lib.init.js(lib.assetURL+_status.jsExt[i].path,_status.jsExt[i].name,packLoaded,packLoaded);
+						lib.init.js(`${lib.assetURL}card`,lib.config.all.cards,packLoaded,packLoaded);
+						lib.init.js(`${lib.assetURL}character`,lib.config.all.characters,packLoaded,packLoaded);
+						lib.init.js(`${lib.assetURL}character`,'rank',packLoaded,packLoaded);
+						if(!_status.jsExt) return;
+						const loadJSExt=(jsExt,pathArray,nameArray,index)=>{
+							if(!pathArray&&!nameArray){
+								lib.init.js(jsExt.path,jsExt.name,packLoaded,packLoaded);
+								return;
 							}
-						}
+							if(typeof index!='number') index=0;
+							if(pathArray&&index>=jsExt.path.length||nameArray&&index>=jsExt.name.length) return;
+							const path=pathArray?jsExt.path[index]:jsExt.path,name=nameArray?jsExt.name[index]:jsExt.name,jsExtLoaded=()=>{
+								loadJSExt(jsExt,pathArray,nameArray,index+1);
+								packLoaded();
+							};
+							lib.init.js(path,name,jsExtLoaded,jsExtLoaded);
+						};
+						_status.jsExt.forEach(value=>loadJSExt(value,Array.isArray(value.path),Array.isArray(value.name)));
 						// if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
 					};
 
@@ -9478,11 +9482,14 @@
 				return style;
 			},
 			//在扩展的precontent中调用，用于加载扩展必需的JS文件。
-			addJsForExtension:function(path,name){
-				if(!_status.jsExt){
-					_status.jsExt = [];
-				}
-				_status.jsExt.add({path:path,name:name});
+			//If any of the parameters is an Array, corresponding files will be loaded in order
+			//如果任意参数为数组，则按顺序加载加载相应的文件
+			jsForExtension:(path,name)=>{
+				if(!_status.jsExt) _status.jsExt=[];
+				_status.jsExt.add({
+					path:path,
+					name:name
+				});
 			},
 			js:function(path,file,onload,onerror){
 				if(path[path.length-1]=='/'){
@@ -10711,25 +10718,54 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				//Gift
+				//赠予
+				gift:()=>{
+					'step 0'
+					event.num=0;
+					'step 1'
+					if(num<cards.length){
+						event.card=cards[num];
+						event.trigger('gift');
+					}
+					else event.finish();
+					'step 2'
+					if(event.deniedGifts.includes(card)){
+						game.log(target,'拒绝了',player,'赠予的',card);
+						event.trigger('giftDeny');
+						player.loseToDiscardpile(card).log=false;
+						event.trigger('giftDenied');
+						return;
+					}
+					game.log(player,'将',card,'赠予了',target);
+					player.$give(card,target,false);
+					game.delay(0.5);
+					event.trigger('giftAccept');
+					if(get.type(card,false)=='equip') target.equip(card).log=false;
+					else target.gain(card,player).visible=true;
+					event.trigger('giftAccepted');
+					'step 3'
+					event.num++;
+					event.goto(1);
+				},
 				//Recast
 				//重铸
 				recast:()=>{
 					'step 0'
 					game.log(player,'重铸了',cards);
-					if(typeof event.recastingLose=='function') event.recastingLostCards=event.recastingLose(player,cards);
+					if(typeof event.recastingLose!='function') return;
+					event.trigger('recastingLose');
+					event.recastingLose(player,cards);
+					event.trigger('recastingLost');
+					event.recastingLosingEvents.push(...event.next.filter(value=>value.name!='arrangeTrigger'));
 					'step 1'
 					event.trigger('recast');
 					'step 2'
 					if(typeof event.recastingGain!='function') return;
-					event.recastingGainedCards=event.recastingGain(player,cards);
-					if(get.itemtype(event.recastingGainedCards)=='card') event.recastingGainedCards=[event.recastingGainedCards];
-					'step 3'
-					event.result=[];
-					if(get.itemtype(event.recastingGainedCards)=='cards') event.result.addArray(event.recastingGainedCards);
-					if(get.itemtype(result.cards)=='card') event.result.push(result.cards);
-					else if(get.itemtype(result.cards)=='cards') event.result.addArray(result.cards);
-					if(get.itemtype(result)=='card') event.result.push(result);
-					else if(get.itemtype(result)=='cards') event.result.addArray(result);
+					event.trigger('recastingGain');
+					event.recastingGain(player,cards);
+					event.trigger('recastingGained');
+					event.recastingGainingEvents.push(...event.next.filter(value=>value.name!='arrangeTrigger'));
 				},
 				//装备栏相关
 				disableEquip:function(){
@@ -10939,7 +10975,7 @@
 					},subtype);
 					player.$equip(card);
 					game.addVideo('equip',player,get.cardInfo(card));
-					game.log(player,'装备了',card);
+					if(event.log!=false) game.log(player,'装备了',card);
 					if(event.updatePile) game.updateRoundNumber();
 					"step 6"
 					var info=get.info(card,false);
@@ -10958,7 +10994,7 @@
 							next.player=player;
 							next.card=card;
 						}
-						if(info.equipDelay!='false') game.delayx();
+						if(info.equipDelay!=false) game.delayx();
 					}
 					delete player.equiping;
 					if(event.delay){
@@ -17064,7 +17100,7 @@
 						},get.delayx(500,500));
 					}
 					else if(event.animate=='gain'){
-						player.$gain(cards);
+						player.$gain(cards,event.log);
 						game.pause();
 						setTimeout(function(){
 							addv();
@@ -17078,7 +17114,7 @@
 					}
 					else if(event.animate=='gain2'||event.animate=='draw2'){
 						var gain2t=300;
-						if(player.$gain2(cards)&&player==game.me){
+						if(player.$gain2(cards,event.log)&&player==game.me){
 							gain2t=500;
 						}
 						game.pause();
@@ -17097,14 +17133,14 @@
 						if(event.animate=='give'){
 							for(var i in evtmap){
 								var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
-								source.$give(evtmap[i][0],player)
+								source.$give(evtmap[i][0],player,event.log)
 							}
 						}
 						else{
 							for(var i in evtmap){
 								var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
-								if(evtmap[i][1].length) source.$giveAuto(evtmap[i][1],player);
-								if(evtmap[i][2].length) source.$give(evtmap[i][2],player);
+								if(evtmap[i][1].length) source.$giveAuto(evtmap[i][1],player,event.log);
+								if(evtmap[i][2].length) source.$give(evtmap[i][2],player,event.log);
 							}
 						}
 						game.pause();
@@ -17139,9 +17175,6 @@
 						if(player==game.me) ui.updatehl();
 						broadcast();
 						event.finish();
-					}
-					if(event.log){
-						game.log(player,'获得了',cards);
 					}
 					"step 4"
 					game.delayx();
@@ -18279,30 +18312,74 @@
 			},
 			player:{
 				//新函数
+				//Check if the card does not count toward hand limit
+				//检测此牌是否不计入手牌上限
+				canIgnoreHandcard:function(card){
+					return lib.filter.ignoredHandcard(card,this);
+				},
+				//Gift
+				//赠予
+				gift:function(cards,target){
+					const gift=game.createEvent('gift');
+					gift.player=this;
+					gift.target=target;
+					const isArray=Array.isArray(cards);
+					if(cards&&!isArray) gift.cards=[cards];
+					else if(isArray&&cards.length) gift.cards=cards;
+					else _status.event.next.remove(gift);
+					gift.deniedGifts=[];
+					gift.setContent('gift');
+					gift._args=Array.from(arguments);
+					return gift;
+				},
+				//Check if the player can gift the card
+				//检测角色是否能赠予此牌
+				canGift:function(card,target,strict){
+					return lib.filter.cardGiftable(card,this,target,strict);
+				},
+				//Check if the player refuses gifts
+				//检测角色是否拒绝赠予
+				refuseGifts:function(card,player){
+					return this.hasSkillTag('refuseGifts',null,{
+						player:player,
+						card:card
+					});
+				},
+				//Gift AI related
+				//赠予AI相关
+				getGiftAIResultTarget:function(card,target){
+					if(!card||target.refuseGifts(card,this)) return 0;
+					if(get.type(card,false)=='equip') return get.effect(target,card,target,target);
+					if(card.name=='du') return this.hp>target.hp?-1:0;
+					if(target.hasSkillTag('nogain')) return 0;
+					return Math.max(1,get.value(card,this)-get.value(card,target));
+				},
+				getGiftEffect:function(card,target){
+					return this.getGiftAIResultTarget(card,target)*get.attitude(this,target);
+				},
 				//Recast
 				//重铸
 				recast:function(cards,recastingLose,recastingGain){
 					const recast=game.createEvent('recast');
 					recast.player=this;
-					if(get.itemtype(cards)=='card') recast.cards=[cards];
-					else if(get.itemtype(cards)=='cards'&&cards.length) recast.cards=cards;
+					const isArray=Array.isArray(cards);
+					if(cards&&!isArray) recast.cards=[cards];
+					else if(isArray&&cards.length) recast.cards=cards;
 					else _status.event.next.remove(recast);
-					if(typeof recastingLose!='function') recastingLose=(player,cards)=>player.loseToDiscardpile(cards).set("log",false).cards;
+					if(typeof recastingLose!='function') recastingLose=(player,cards)=>player.loseToDiscardpile(cards).log=false;
 					recast.recastingLose=recastingLose;
+					recast.recastingLosingEvents=[];
 					if(typeof recastingGain!='function') recastingGain=(player,cards)=>player.draw(cards.length).log=false;
 					recast.recastingGain=recastingGain;
+					recast.recastingGainingEvents=[];
 					recast.setContent('recast');
 					recast._args=Array.from(arguments);
 					return recast;
 				},
 				//Check if the player can recast the card
-				//检查角色是否能重铸此牌
+				//检测角色是否能重铸此牌
 				canRecast:function(card,source,strict){
-					const cardRecastable=lib.filter.cardRecastable(card,this,source,strict);
-					if(cardRecastable!='unchanged') return cardRecastable;
-					if(get.position(card)!='h') return false;
-					const info=get.info(card);
-					return typeof info.chongzhu=='function'?info.chongzhu(_status.event,this):info.chongzhu;
+					return lib.filter.cardRecastable(card,this,source,strict);
 				},
 				//装备栏相关
 				//判断一名角色的某个区域是否被废除
@@ -25114,14 +25191,7 @@
 				},
 				needsToDiscard:function(num){
 					if(typeof num!='number') num=0;
-					var hs=this.getCards('h');
-					num+=hs.length;
-					for(var i=0;i<hs.length;i++){
-						if(game.checkMod(hs[i],this,false,'ignoredHandcard',this)==true){
-							num--;
-						}
-					}
-					return Math.max(0,num-this.getHandcardLimit());
+					return Math.max(0,num+this.countCards('h',card=>!this.canIgnoreHandcard(card))-this.getHandcardLimit());
 				},
 				distanceTo:function(target,method){
 					return get.distance(this,target,method);
@@ -28396,11 +28466,28 @@
 			all:function(){
 				return true;
 			},
+			//Check if the card does not count toward the player's hand limit
+			//检测此牌是否不计入此角色的手牌上限
+			ignoredHandcard:(card,player)=>game.checkMod(card,player,false,'ignoredHandcard',player),
+			//Check if the card is giftable
+			//检测此牌是否可赠予
+			cardGiftable:(card,player,target,strict)=>{
+				const mod=game.checkMod(card,player,target,'unchanged','cardGiftable',player);
+				if(!mod||strict&&(mod=='unchanged'&&(get.position(card)!='h'||!get.cardtag(card,'gifts'))||player==target)) return false;
+				return get.type(card,false)!='equip'||target.canEquip(card,true);
+			},
 			//Check if the card is recastable
 			//检查此牌是否可重铸
-			cardRecastable:(card,player,source,raw)=>{
+			cardRecastable:(card,player,source,strict)=>{
 				if(typeof player=='undefined') player=get.owner(card);
-				return game.checkMod(card,player,source,!raw||'unchanged','cardRecastable',player);
+				const mod=game.checkMod(card,player,source,'unchanged','cardRecastable',player);
+				if(!mod) return false;
+				if(strict&&mod=='unchanged'){
+					if(get.position(card)!='h') return false;
+					const info=get.info(card);
+					return typeof info.chongzhu=='function'?info.chongzhu(_status.event,player):info.chongzhu;
+				}
+				return true;
 			},
 			//装备栏相关
 			canBeReplaced:function(card,player){
@@ -28601,7 +28688,7 @@
 				}
 				var num=info.usable;
 				if(typeof num=='function') num=num(card,player);
-				num=game.checkMod(card,player,num,event,'cardUsable',player);
+				num=game.checkMod(card,player,num,'cardUsable',player);
 				if(typeof num!='number') return true;
 				else return(player.countUsed(card)<num);
 			},
@@ -30035,15 +30122,13 @@
 				delay:false,
 				content:function(){
 					player.recast(cards,null,(player,cards)=>{
-						var numberOfCardsToDraw=cards.length, cardsToGain=[];
+						var numberOfCardsToDraw=cards.length;
 						cards.forEach(value=>{
 							if(lib.config.mode=='stone'&&_status.mode=='deck'&&!player.isMin()&&get.type(value).indexOf('stone')==0){
 								var stonecard=get.stonecard(1,player.career);
 								if(stonecard.length){
 									numberOfCardsToDraw-=stonecard.length;
-									var card=game.createCard(stonecard.randomGet());
-									player.gain(card,'draw');
-									cardsToGain.push(card);
+									player.gain(game.createCard(stonecard.randomGet()),'draw');
 								}
 								else player.draw({
 									drawDeck:1
@@ -30053,21 +30138,16 @@
 								var libCard=get.libCard(info=>info.subtype=='spell_silver');
 								if(!libCard.length) return;
 								numberOfCardsToDraw--;
-								var card=game.createCard(libCard.randomGet());
-								player.gain(card,'draw');
-								cardsToGain.push(card);
+								player.gain(game.createCard(libCard.randomGet()),'draw');
 							}
 							else if(get.subtype(value)=='spell_silver'){
 								var libCard=get.libCard(info=>info.subtype=='spell_bronze');
 								if(!libCard.length) return;
 								numberOfCardsToDraw--;
-								var card=game.createCard(libCard.randomGet());
-								player.gain(card,'draw');
-								cardsToGain.push(card);
+								player.gain(game.createCard(libCard.randomGet()),'draw');
 							}
 						});
 						if(numberOfCardsToDraw) player.draw(numberOfCardsToDraw).log=false;
-						return cardsToGain;
 					});
 				},
 				ai:{
@@ -54162,7 +54242,7 @@
 		},
 		verticalStr:function(str,sp){
 			if(typeof str!='string') return '';
-			return str.split('').filter(value=>value!='`').join('');
+			return [...str].filter(value=>value!='`').join('');
 		},
 		numStr:function(num,method){
 			if(num==Infinity){
@@ -57333,4 +57413,4 @@
 		get:get
 	};
 	lib.init.init();
-}());
+})();

@@ -1243,20 +1243,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				delay:false,
 				promptfunc:()=>'出牌阶段，你可以赠予一张“米券”，然后执行一项本回合内未被选择过的效果：⒈对其造成1点伤害；⒉摸两张牌；⒊弃置其的两张牌；⒋亮出牌堆顶的一张牌，然后你可以使用之。',
-				check:function(card){
-					var player=_status.event.player;
-					if(get.cardtag(card,'gifts')&&get.type(card,false)=='equip'&&game.hasPlayer(function(current){
-						return current!=player&&current.canEquip(card,true)&&!current.hasSkillTag('refuseGifts')&&get.effect(current,card,player,player)>0;
-					})) return 2;
-					return 1+Math.random();
+				check:card=>{
+					const player=_status.event.player;
+					return get.type(card,false)=='equip'&&game.hasPlayer(current=>player.canGift(card,current,true)&&!current.refuseGifts(card,player)&&get.effect(current,card,player,player)>0)?2:1+Math.random();
 				},
 				content:function(){
 					'step 0'
-					var next=game.createEvent('_yongjian_zengyu');
-					next.player=player;
-					next.target=target;
-					next.cards=cards;
-					next.setContent(lib.skill._yongjian_zengyu.content);
+					player.gift(cards,target);
 					'step 1'
 					var list=player.getStorage('minagi_peiquan_yukito');
 					if(list.length>=4) event.finish();
@@ -1300,12 +1293,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:4,
 					result:{
-						player:function(player,target){
-							var baseEffect=Math.min(3,get.effect(target,'_yongjian_zengyu',player,player));
-							var choices=['damage','draw','discard','use'];
+						player:(player,target)=>{
+							const giftEffects=ui.selected.cards.map(value=>player.getGiftEffect(value,target));
+							const baseEffect=Math.min(3,giftEffects.reduce((previousValue,currentValue)=>previousValue+currentValue,0)/giftEffects.length);
+							const choices=['damage','draw','discard','use'];
 							choices.removeArray(player.getStorage('minagi_peiquan_yukito'));
 							if(choices.length<=0) return baseEffect;
-							var eff=Math.max.apply(Math,choices.map(function(choice){
+							return baseEffect+Math.max(...choices.map(choice=>{
 								switch(choice){
 									case 'damage':return get.damageEffect(target,player,player);
 									case 'draw':return get.effect(player,{name:'wuzhong'},player,player);
@@ -1313,9 +1307,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									case 'use':return _status.event.getRand('minagi_peiquan')*4;
 								}
 							}));
-							return baseEffect+eff;
-						},
-					},
+						}
+					}
 				},
 				group:'minagi_peiquan_umareta',
 				subSkill:{
@@ -6265,16 +6258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				phaseDiscardContent:function(){
 					"step 0"
-					var num=0;
-					var hs=player.getCards('he');
-					num+=hs.length;
-					for(var i=0;i<hs.length;i++){
-						if(game.checkMod(hs[i],player,false,'ignoredHandcard',player)==true){
-							num--;
-						}
-					}
-					num=Math.max(0,num-player.getHandcardLimit());
-					event.num=num;
+					event.num=Math.max(0,player.countCards('he',card=>!player.canIgnoreHandcard(card))-player.getHandcardLimit());
 					if(event.num<=0) event.finish();
 					else{
 						if(lib.config.show_phase_prompt){
@@ -8523,7 +8507,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return true;
 					}
 					else if(event.name=='gain'){
-						if(event.giver||event.getParent().name=='_yongjian_zengyu') return false;
+						if(event.giver||event.getParent().name=='gift') return false;
 						var cards=event.getg(event.player);
 						if(!cards.length) return false;
 						return game.hasPlayer(function(current){
