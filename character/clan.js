@@ -1934,11 +1934,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.hasCard(card=>get.suit(card)==get.suit(event.card)&&player.canRecast(card),'h');
 				},
 				content:function(){
+					'step 0'
 					if(trigger.targets&&trigger.targets.length==1){
 						trigger.targets[0].link(true);
 					}
 					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card)&&player.canRecast(card));
 					if(cards.length>0) player.recast(cards);
+					'step 1'
+					player.draw();
 				}
 			},
 			clanhuanyin:{
