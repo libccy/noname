@@ -43,6 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:true,
 				content:function(){
 					'step 0'
+					player.unmarkSkill('clanyuzhi');
 					var num1=0,num2=0,num3=0,bool=true;
 					var history=player.actionHistory;
 					for(var i=history.length-2;i>=0;i--){
@@ -92,7 +93,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.clanyuzhi=lib.skill.dcweidang.getLength(result.cards[0]);
 						player.markSkill('clanyuzhi');
 					}
-					else player.unmarkSkill('clanyuzhi');
 				},
 				ai:{
 					threaten:3,
