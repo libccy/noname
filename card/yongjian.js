@@ -158,7 +158,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				distance:{attackFrom:-1},
 				fullskin:true,
 				global:'qixingbaodao',
-				selectTarget:[-1,-2],
 				ai:{
 					order:9,
 					value:function(card,player){

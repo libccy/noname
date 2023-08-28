@@ -274,30 +274,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'equip',
 				subtype:'equip5',
 				loseDelay:false,
-				onEquip:function(){
-					if(player.countCards('he',function(cardx){
-						return cardx!=card;
-					})>0){
-						player.logSkill('tianjitu_skill');
-						player.chooseToDiscard(true,function(card){
-							return card!=_status.event.card;
-						},'he').set('card',card);
-					}
-				},
-				onLose:function(){
-					var next=game.createEvent('tianjitu_lose');
-					event.next.remove(next);
-					var evt=event.getParent();
-					if(evt.getlx===false) evt=evt.getParent();
-					evt.after.push(next);
-					next.player=player;
-					next.setContent(function(){
-						if(player.countCards('h')<5){
-							player.logSkill('tianjitu_skill');
-							player.drawTo(5);
-						}
-					});
-				},
+				global:'tianjitu_skill',
 				ai:{
 					value:function(card,player){
 						if(player.countCards('h')>3||get.position(card)!='e') return 0.5;
@@ -439,6 +416,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			tianjitu_skill:{
 				audio:true,
+				trigger:{player:['equipBegin','loseBegin']},
+				forced:true,
+				equipSkill:true,
+				filter:(event,player,name)=>name=='equipBegin'?event.card.name=='tianjitu'&&player.hasCard(card=>card!=event.card):event.cards.some(value=>value.name=='tianjitu')&&player.countCards('h')<5,
+				content:()=>{
+					if(event.triggername=='loseBegin') player.drawTo(5);
+					else player.chooseToDiscard(true,card=>card!=_status.event.getTrigger().card,'he');
+				}
 			},
 			taigongyinfu_skill:{
 				equipSkill:true,
@@ -820,7 +805,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			tongque_info:'锁定技，你于一回合内使用的第一张带有“应变”效果的牌无视条件直接生效。',
 			tianjitu:'天机图',
 			tianjitu_skill:'天机图',
-			tianjitu_info:'锁定技，当此牌进入你的装备区时，你弃置一张不为此【天机图】的牌。当此牌离开你的装备区后，你将手牌摸至五张。',
+			tianjitu_info:'锁定技，当此牌进入你的装备区时，你弃置一张不为此【天机图】的牌。当此牌离开你的装备区时，你将手牌摸至五张。',
 			taigongyinfu:'太公阴符',
 			taigongyinfu_info:'出牌阶段开始时，你可以横置或重置一名角色。出牌阶段结束时，你可以重铸一张手牌。',
 			taigongyinfu_skill:'太公阴符',
