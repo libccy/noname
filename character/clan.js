@@ -43,6 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:true,
 				content:function(){
 					'step 0'
+					player.unmarkSkill('clanyuzhi');
 					var num1=0,num2=0,num3=0,bool=true;
 					var history=player.actionHistory;
 					for(var i=history.length-2;i>=0;i--){
@@ -92,7 +93,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.clanyuzhi=lib.skill.dcweidang.getLength(result.cards[0]);
 						player.markSkill('clanyuzhi');
 					}
-					else player.unmarkSkill('clanyuzhi');
 				},
 				ai:{
 					threaten:3,
@@ -1934,11 +1934,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.hasCard(card=>get.suit(card)==get.suit(event.card)&&player.canRecast(card),'h');
 				},
 				content:function(){
+					'step 0'
 					if(trigger.targets&&trigger.targets.length==1){
 						trigger.targets[0].link(true);
 					}
 					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card)&&player.canRecast(card));
 					if(cards.length>0) player.recast(cards);
+					'step 1'
+					player.draw();
 				}
 			},
 			clanhuanyin:{
