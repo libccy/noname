@@ -4262,25 +4262,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			asara_yingwei:{
-				trigger:{player:'useCard1'},
+				trigger:{player:'useCardBegin'},
 				forced:true,
-				filter:function(event,player){
-					return player.getHistory('lose',function(evt){
-						if(evt.getParent()!=event) return false;
-						for(var i in evt.gaintag_map){
-							if(evt.gaintag_map[i].contains('asara_yingwei')) return true;
-						}
-						return false;
-					}).length>0;
-				},
-				content:function(){
-					if(!trigger.card.yingbian){
-						trigger.card.yingbian=true;
-						var info=get.info(trigger.card);
-						if(info&&info.yingbian) info.yingbian(trigger);
-						player.addTempSkill('yingbian_changeTarget');
-					}
-				},
+				filter:event=>event.card.isCard&&event.cards.some(value=>value.hasGaintag('asara_yingwei')),
+				content:()=>{
+					trigger.forceYingbian=true;
+				}
 			},
 			yukito_kongwu:{
 				enable:'phaseUse',

@@ -455,28 +455,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target!=player&&(get.mode()!='guozhan'||_status.mode=='yingbian'||_status.mode=='free'||target.countCards('e')>0);
 				},
 				enable:true,
-				yingbian_prompt:function(card){
-					var str='';
-					if(get.cardtag(card,'yingbian_all')){
-						str+='此牌的效果改为依次执行所有选项';
-					}
-					if(!str.length||get.cardtag(card,'yingbian_add')){
-						if(str.length) str+='；';
-						str+='当你使用此牌选择目标后，你可为此牌增加一个目标';
-					}
-					return str;
-				},
-				yingbian:function(event){
-					var card=event.card,bool=false;
-					if(get.cardtag(card,'yingbian_all')){
-						bool=true;
-						card.yingbian_all=true;
-						game.log(card,'执行所有选项');
-					}
-					if(!bool||get.cardtag(card,'yingbian_add')){
-						event.yingbian_addTarget=true;
-					}
-				},
+				defaultYingbianEffect:'add',
 				content:function(){
 					'step 0'
 					if(event.card.yingbian_all){
@@ -577,7 +556,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				mode:['guozhan','versus'],
 				filterTarget:true,
-				chongzhu:true,
+				recastable:true,
 				changeTarget:function(player,targets){
 					var target=targets[0];
 					game.filterPlayer(function(current){
@@ -942,7 +921,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				chongzhu:true,
+				recastable:true,
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
 					return (target.countCards('h')||target.isUnseen(2));

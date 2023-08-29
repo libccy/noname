@@ -259,7 +259,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:function(){
 					return game.countPlayer()>2;
 				},
-				chongzhu:function(){
+				recastable:function(){
 					return game.countPlayer()<=2;
 				},
 				singleCard:true,

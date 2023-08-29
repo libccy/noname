@@ -3647,7 +3647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{player:1},
 					effect:{
 						target:function(card,player,target){
-							if(card&&get.type(card)=='equip'&&_status.event.skill=='_yongjian_zengyu') return 0;
+							if(card&&get.type(card)=='equip'&&_status.event.skill=='_gifting') return 0;
 						},
 					},
 				},

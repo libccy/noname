@@ -480,7 +480,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								hhzz_toulianghuanzhu:{
 									enable:true,
 									cardimage:"toulianghuanzhu",
-									chongzhu:true,
+									recastable:true,
 									type:'trick',
 									filterTarget:function(card,player,target){
 										return target.skillH.length>0;
