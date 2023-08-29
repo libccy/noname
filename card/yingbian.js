@@ -492,7 +492,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!yingbianEffectExecuted){
 						var defaultYingbianEffect=get.defaultYingbianEffect(card);
 						if(lib.yingbian.effect.has(defaultYingbianEffect)){
-							lib.yingbian.effect.get(defaultYingbianEffect)(trigger);
+							game.yingbianEffect(trigger,lib.yingbian.effect.get(defaultYingbianEffect));
 							if(!yingbianEffectExecuted) yingbianEffectExecuted=true;
 						}
 					}
