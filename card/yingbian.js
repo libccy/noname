@@ -486,7 +486,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var yingbianEffectExecuted=false;
 					lib.yingbian.effect.forEach((value,key)=>{
 						if(!event.temporaryYingbian.includes(key)&&!get.cardtag(card,`yingbian_${key}`)) return;
-						value(trigger);
+						game.yingbianEffect(trigger,value);
 						if(!yingbianEffectExecuted) yingbianEffectExecuted=true;
 					});
 					if(!yingbianEffectExecuted){

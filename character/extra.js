@@ -2352,16 +2352,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			hina_xingzhi:{
 				groupSkill:true,
-				trigger:{player:'useCardBegin'},
+				trigger:{player:'useCard1'},
 				usable:1,
-				filter:(event,player)=>player.group=='key',
+				filter:(event,player)=>player.group=='key'&&!event.card.yingbian&&lib.yingbian.condition.complex.has('zhuzhan'),
 				content:()=>{
-					if(!Array.isArray(trigger.temporaryYingbian)) trigger.temporaryYingbian=[];
-					trigger.temporaryYingbian.add('zhuzhan');
-					trigger.afterYingbianZhuzhan=(event,trigger)=>{
-						event.zhuzhanresult.draw(2);
-						trigger.temporaryYingbian.addArray(get.yingbianEffects());
-					};
+					'step 0'
+					trigger.afterYingbianZhuzhan=event=>event.zhuzhanresult.draw(2);
+					lib.yingbian.condition.complex.get('zhuzhan')(trigger);
+					'step 1'
+					if(!result.bool) return;
+					trigger.card.yingbian=true;
+					lib.yingbian.effect.forEach(value=>game.yingbianEffect(trigger,value));
+					player.addTempSkill('yingbian_changeTarget');
 				}
 			},
 			yingba:{

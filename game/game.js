@@ -29,7 +29,7 @@
 			}
 		}
 	}
-	var _status={
+	const _status={
 		paused:false,
 		paused2:false,
 		paused3:false,
@@ -65,7 +65,7 @@
 		prehidden_skills:[],
 		postReconnect:{},
 	};
-	var lib={
+	const lib={
 		configprefix:'noname_0.9_',
 		versionOL:27,
 		updateURLS:{
@@ -160,7 +160,7 @@
 					['force','metal']
 				]),
 				complex:new Map([
-					['zhuzhan',event=>{
+					['zhuzhan',function(event){
 						const yingbianZhuzhan=game.createEvent('yingbianZhuzhan');
 						yingbianZhuzhan.player=event.player;
 						yingbianZhuzhan.card=event.card;
@@ -272,6 +272,7 @@
 								bool:false
 							};
 						});
+						yingbianZhuzhan._args=Array.from(arguments);
 						return yingbianZhuzhan;
 					}]
 				]),
@@ -282,24 +283,29 @@
 				])
 			},
 			effect:new Map([
-				['add',event=>event.yingbian_addTarget=true],
-				['remove',event=>event.yingbian_removeTarget=true],
-				['damage',event=>{
-					if(typeof event.baseDamage!='number') event.baseDamage=1;
-					event.baseDamage++;
-					game.log(event.card,'的伤害值基数+1');
+				['add',()=>{
+					trigger.yingbian_addTarget=true;
 				}],
-				['draw',event=>event.player.draw()],
-				['gain',event=>{
-					const cardx=event.respondTo;
-					if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD('od').length) event.player.gain(cardx[1].cards.filterInD('od'),'gain2','log');
+				['remove',()=>{
+					trigger.yingbian_removeTarget=true;
 				}],
-				['hit',event=>{
-					event.directHit.addArray(game.players).addArray(game.dead);
-					game.log(event.card,'不可被响应');
+				['damage',()=>{
+					if(typeof trigger.baseDamage!='number') trigger.baseDamage=1;
+					trigger.baseDamage++;
+					game.log(card,'的伤害值基数+1');
 				}],
-				['all',event=>{
-					const card=event.card;
+				['draw',()=>{
+					player.draw();
+				}],
+				['gain',()=>{
+					const cardx=trigger.respondTo;
+					if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD('od').length) player.gain(cardx[1].cards.filterInD('od'),'gain2');
+				}],
+				['hit',()=>{
+					trigger.directHit.addArray(game.players).addArray(game.dead);
+					game.log(card,'不可被响应');
+				}],
+				['all',()=>{
 					card.yingbian_all=true;
 					game.log(card,'执行所有选项');
 				}]
@@ -31554,9 +31560,18 @@
 			'妹子，交个朋友吧',
 		],
 	};
-	var game={
+	const game={
 		//Yingbian
 		//应变
+		yingbianEffect:function(event,content){
+			const yingbianEffect=game.createEvent('yingbianEffect');
+			yingbianEffect.player=event.player;
+			yingbianEffect.card=event.card;
+			yingbianEffect._trigger=event;
+			yingbianEffect.setContent(content);
+			yingbianEffect._args=Array.from(arguments);
+			return yingbianEffect;
+		},
 		setYingbianConditionColor:(yingbianCondition,color)=>game.broadcastAll((yingbianCondition,color)=>lib.yingbian.condition.color.set(yingbianCondition,color),yingbianCondition,color),
 		setComplexYingbianCondition:(yingbianCondition,condition)=>game.broadcastAll((yingbianCondition,condition)=>lib.yingbian.condition.complex.set(yingbianCondition,condition),yingbianCondition,condition),
 		setSimpleYingbianCondition:(yingbianCondition,condition)=>game.broadcastAll((yingbianCondition,condition)=>lib.yingbian.condition.simple.set(yingbianCondition,condition),yingbianCondition,condition),
@@ -38806,7 +38821,7 @@
 		shuffleNumber:0,
 	};
 	window['b'+'ann'+'e'+'dE'+'x'+'ten'+'s'+'i'+'o'+'ns']=['\u4fa0\u4e49','\u5168\u6559\u7a0b'];
-	var ui={
+	const ui={
 		updates:[],
 		thrown:[],
 		touchlines:[],
@@ -52909,7 +52924,7 @@
 			ui._recycle[key]=node;
 		},
 	};
-	var get={
+	const get={
 		//Yingbian
 		//应变
 		//Get the Yingbian conditions (of the card)
@@ -57520,7 +57535,7 @@
 			return get.attitude(_status.event.player,to);
 		},
 	};
-	var ai={
+	const ai={
 		basic:{
 			chooseButton:function(check){
 				var event=_status.event;
