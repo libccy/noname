@@ -872,7 +872,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										target.chooseToDiscard('he','扫谷：弃置两张牌（不能弃置'+text+'花色的牌），然后使用其中的【杀】',function(card,player){
 											var list=_status.event.list;
 											return !list.some(cardx=>get.suit(cardx,false)==get.suit(card,player));
-										},2,true).set('ai',function(card){
+										},Math.min(cards.length,2),true).set('ai',function(card){
 											var player=_status.event.player;
 											if(card.name=='sha'&&player.hasValueTarget(card)) return 10;
 											return -get.value(card);
@@ -952,7 +952,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!lib.skill.oltianhou.derivation.contains(skill)) event.finish();
 					else{
 						event.weather_skill=skill;
-						player.chooseTarget(true,'令一名角色获得技能【'+get.translation(skill)+'】').set('ai',function(target){
+						player.chooseTarget(true,'令一名角色获得技能【'+get.translation(skill)+'】',get.translation(skill+'_info')).set('ai',function(target){
 							return get.attitude(_status.event.player,target);
 						});
 					}
