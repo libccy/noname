@@ -59,6 +59,7 @@
 			yingbian_kongchao:[],
 			yingbian_fujia:[],
 			yingbian_canqu:[],
+			yingbian_force:[]
 		},
 		renku:[],
 		prehidden_skills:[],
@@ -148,6 +149,170 @@
 					'十四姑':['u'],
 				},
 			}
+		},
+		yingbian:{
+			condition:{
+				color:new Map([
+					['zhuzhan','wood'],
+					['kongchao','soil'],
+					['fujia','orange'],
+					['canqu','fire'],
+					['force','metal']
+				]),
+				complex:new Map([
+					['zhuzhan',event=>{
+						const yingbianZhuzhan=game.createEvent('yingbianZhuzhan');
+						yingbianZhuzhan.player=event.player;
+						yingbianZhuzhan.card=event.card;
+						yingbianZhuzhan._trigger=event;
+						yingbianZhuzhan.afterYingbianZhuzhan=event.afterYingbianZhuzhan;
+						yingbianZhuzhan.setContent(()=>{
+							'step 0'
+							event._global_waiting=true;
+							event.send=(player,card,source,targets,id,id2,skillState)=>{
+								if(skillState) player.applySkills(skillState);
+								var type=get.type2(card),str=get.translation(source);
+								if(targets&&targets.length) str+=`对${get.translation(targets)}`;
+								str+=`使用了${get.translation(card)}，是否弃置一张${get.translation(type)}为其助战？`;
+								player.chooseCard({
+									filterCard:(card,player)=>get.type2(card)==type&&lib.filter.cardDiscardable(card,player),
+									prompt:str,
+									position:'h',
+									_global_waiting:true,
+									id:id,
+									id2:id2,
+									ai:cardx=>{
+										var info=get.info(card);
+										if(info&&info.ai&&info.ai.yingbian){
+											var ai=info.ai.yingbian(card,source,targets,player);
+											if(!ai) return 0;
+											return ai-get.value(cardx);
+										}
+										else if(get.attitude(player,source)<=0) return 0;
+										return 5-get.value(cardx);
+									}
+								});
+								if(!game.online) return;
+								_status.event._resultid=id;
+								game.resume();
+							};
+							'step 1'
+							var type=get.type2(card);
+							event.list=game.filterPlayer(current=>current!=player&&current.countCards('h')&&(_status.connectMode||current.hasCard(cardx=>get.type2(cardx)==type,'h'))).sortBySeat(_status.currentPhase||player);
+							event.id=get.id();
+							'step 2'
+							if(!event.list.length) event.finish();
+							else if(_status.connectMode&&(event.list[0].isOnline()||event.list[0]==game.me)) event.goto(4);
+							else event.send(event.current=event.list.shift(),event.card,player,trigger.targets,event.id,trigger.parent.id);
+							'step 3'
+							if(result.bool){
+								event.zhuzhanresult=event.current;
+								event.zhuzhanresult2=result;
+								if(event.current!=game.me) game.delayx();
+								event.goto(8);
+							}
+							else event.goto(2);
+							'step 4'
+							var id=event.id,sendback=(result,player)=>{
+								if(result&&result.id==id&&!event.zhuzhanresult&&result.bool){
+									event.zhuzhanresult=player;
+									event.zhuzhanresult2=result;
+									game.broadcast('cancel',id);
+									if(_status.event.id==id&&_status.event.name=='chooseCard'&&_status.paused) return ()=>{
+										event.resultOL=_status.event.resultOL;
+										ui.click.cancel();
+										if(ui.confirm) ui.confirm.close();
+									};
+								}
+								else if(_status.event.id==id&&_status.event.name=='chooseCard'&&_status.paused) return ()=>event.resultOL=_status.event.resultOL;
+							},withme=false,withol=false,list=event.list;
+							for(var i=0;i<list.length;i++){
+								var current=list[i];
+								if(current.isOnline()){
+									withol=true;
+									current.wait(sendback);
+									current.send(event.send,current,event.card,player,trigger.targets,event.id,trigger.parent.id,get.skillState(current));
+									list.splice(i--,1);
+								}
+								else if(current==game.me){
+									withme=true;
+									event.send(current,event.card,player,trigger.targets,event.id,trigger.parent.id);
+									list.splice(i--,1);
+								}
+							}
+							if(!withme) event.goto(6);
+							if(_status.connectMode&&(withme||withol)) game.players.forEach(value=>{
+								if(value!=player) value.showTimer();
+							});
+							event.withol=withol;
+							'step 5'
+							if(!result||!result.bool||event.zhuzhanresult) return;
+							game.broadcast('cancel',event.id);
+							event.zhuzhanresult=game.me;
+							event.zhuzhanresult2=result;
+							'step 6'
+							if(event.withol&&!event.resultOL) game.pause();
+							'step 7'
+							game.players.forEach(value=>value.hideTimer());
+							'step 8'
+							if(event.zhuzhanresult){
+								var target=event.zhuzhanresult;
+								target.line(player,'green');
+								target.discard(event.zhuzhanresult2.cards).discarder=target;
+								if(typeof event.afterYingbianZhuzhan=='function') event.afterYingbianZhuzhan(target);
+								var yingbianCondition=event.name.slice(8).toLowerCase(),yingbianConditionTag=`yingbian_${yingbianCondition}_tag`;
+								target.popup(yingbianConditionTag,lib.yingbian.condition.color.get(yingbianCondition));
+								game.log(target,'响应了',player,'发起的',yingbianConditionTag);
+								target.addExpose(0.2);
+								event.result={
+									bool:true
+								}
+							}
+							else event.result={
+								bool:false
+							};
+						});
+						return yingbianZhuzhan;
+					}]
+				]),
+				simple:new Map([
+					['kongchao',event=>!event.player.countCards('h')],
+					['fujia',event=>event.player.isMaxHandcard()],
+					['canqu',event=>event.player.getHp()==1]
+				])
+			},
+			effect:new Map([
+				['add',event=>event.yingbian_addTarget=true],
+				['remove',event=>event.yingbian_removeTarget=true],
+				['damage',event=>{
+					if(typeof event.baseDamage!='number') event.baseDamage=1;
+					event.baseDamage++;
+					game.log(event.card,'的伤害值基数+1');
+				}],
+				['draw',event=>event.player.draw()],
+				['gain',event=>{
+					const cardx=event.respondTo;
+					if(cardx&&cardx[1]&&cardx[1].cards&&cardx[1].cards.filterInD('od').length) event.player.gain(cardx[1].cards.filterInD('od'),'gain2','log');
+				}],
+				['hit',event=>{
+					event.directHit.addArray(game.players).addArray(game.dead);
+					game.log(event.card,'不可被响应');
+				}],
+				['all',event=>{
+					const card=event.card;
+					card.yingbian_all=true;
+					game.log(card,'执行所有选项');
+				}]
+			]),
+			prompt:new Map([
+				['add','当你使用此牌选择目标后，你可为此牌增加一个目标'],
+				['remove','当你使用此牌选择目标后，你可为此牌减少一个目标'],
+				['damage','此牌的伤害值基数+1'],
+				['draw','当你声明使用此牌时，你摸一张牌'],
+				['gain','当你声明使用此牌时，你获得此牌响应的目标牌'],
+				['hit','此牌不可被响应'],
+				['all','此牌的效果改为依次执行所有选项']
+			])
 		},
 		characterDialogGroup:{
 			'收藏':function(name,capt){
@@ -31326,6 +31491,13 @@
 		],
 	};
 	var game={
+		//Yingbian
+		//应变
+		setYingbianConditionColor:(yingbianCondition,color)=>game.broadcastAll((yingbianCondition,color)=>lib.yingbian.condition.color.set(yingbianCondition,color),yingbianCondition,color),
+		setComplexYingbianCondition:(yingbianCondition,condition)=>game.broadcastAll((yingbianCondition,condition)=>lib.yingbian.condition.complex.set(yingbianCondition,condition),yingbianCondition,condition),
+		setSimpleYingbianCondition:(yingbianCondition,condition)=>game.broadcastAll((yingbianCondition,condition)=>lib.yingbian.condition.simple.set(yingbianCondition,condition),yingbianCondition,condition),
+		setYingbianEffect:(yingbianEffect,effect)=>game.broadcastAll((yingbianEffect,effect)=>lib.yingbian.effect.set(yingbianEffect,effect),yingbianEffect,effect),
+		setYingbianPrompt:(yingbian,prompt)=>game.broadcastAll((yingbian,prompt)=>lib.yingbian.prompt.set(yingbian,prompt),yingbian,prompt),
 		//Add a background music to the config option
 		//在设置选项中添加一首背景音乐
 		addBackgroundMusic:(link,musicName,aozhan)=>{
@@ -52674,6 +52846,31 @@
 		},
 	};
 	var get={
+		//Yingbian
+		//应变
+		//Get the Yingbian conditions (of the card)
+		//获取（此牌的）应变条件
+		yingbianConditions:card=>get.complexYingbianConditions(card).concat(get.simpleYingbianConditions(card)),
+		complexYingbianConditions:card=>{
+			const complexYingbianConditions=Array.from(lib.yingbian.condition.complex.keys());
+			return card?complexYingbianConditions.filter(value=>get.cardtag(card,`yingbian_${value}`)):complexYingbianConditions;
+		},
+		simpleYingbianConditions:card=>{
+			const simpleYingbianConditions=Array.from(lib.yingbian.condition.simple.keys())
+			return card?simpleYingbianConditions.filter(value=>get.cardtag(card,`yingbian_${value}`)):simpleYingbianConditions;
+		},
+		//Get the Yingbian effects (of the card)
+		//获取（此牌的）应变效果
+		yingbianEffects:card=>{
+			const yingbianEffects=Array.from(lib.yingbian.effect.keys());
+			return card?yingbianEffects.filter(value=>get.cardtag(card,`yingbian_${value}`)):yingbianEffects;
+		},
+		//Get the default Yingbian effect of the card
+		//获取此牌的默认应变效果
+		defaultYingbianEffect:card=>{
+			const info=get.info(card);
+			return info&&info.defaultYingbianEffect||null;
+		},
 		//优先度判断
 		priority:function(skill){
 			const info=get.info(skill);
@@ -52871,9 +53068,30 @@
 				}
 				return false;
 			},
-			yingbian:function(node){
-				return get.cardtag(node,'yingbian_zhuzhan')||get.cardtag(node,'yingbian_fujia')||get.cardtag(node,'yingbian_canqu')||get.cardtag(node,'yingbian_kongchao');
+			//Check if the card has a Yingbian condition
+			//检测此牌是否具有应变条件
+			yingbianConditional:card=>get.is.complexlyYingbianConditional(card)||get.is.simplyYingbianConditional(card),
+			complexlyYingbianConditional:card=>{
+				for(const [key] of lib.yingbian.condition.complex){
+					if(get.cardtag(card,`yingbian_${key}`)) return true;
+				}
+				return false;
 			},
+			simplyYingbianConditional:card=>{
+				for(const [key] of lib.yingbian.condition.simple){
+					if(get.cardtag(card,`yingbian_${key}`)) return true;
+				}
+				return false;
+			},
+			//Check if the card has a Yingbian effect
+			//检测此牌是否具有应变效果
+			yingbianEffective:card=>{
+				for(const [key] of lib.yingbian.effect){
+					if(get.cardtag(card,`yingbian_${key}`)) return true;
+				}
+				return false;
+			},
+			yingbian:card=>get.is.yingbianConditional(card)||get.is.yingbianEffective(card),
 			emoji:function(substring){
 				if(substring){
 					var reg=new RegExp("[~#^$@%&!?%*]",'g');
@@ -56148,9 +56366,13 @@
 								uiintro._place_text=placetext;
 							}
 						}
-						if(lib.card[name].yingbian_prompt&&get.is.yingbian(node.link||node)){
-							if(typeof lib.card[name].yingbian_prompt=='function') uiintro.add('<div class="text" style="font-family: yuanli">应变：'+lib.card[name].yingbian_prompt(node.link||node)+'</div>');
-							else uiintro.add('<div class="text" style="font-family: yuanli">应变：'+lib.card[name].yingbian_prompt+'</div>');
+						if(get.is.yingbianConditional(node.link||node)){
+							const yingbianEffects=get.yingbianEffects(node.link||node);
+							if(!yingbianEffects.length){
+								const defaultYingbianEffect=get.defaultYingbianEffect(node.link||node);
+								if(lib.yingbian.prompt.has(defaultYingbianEffect)) yingbianEffects.push(defaultYingbianEffect);
+							}
+							if(yingbianEffects.length) uiintro.add(`<div class="text" style="font-family: yuanli">应变：${yingbianEffects.map(value=>lib.yingbian.prompt.get(value)).join('；')}</div>`);
 						}
 						if(lib.translate[name+'_append']){
 							uiintro.add('<div class="text" style="display:inline">'+lib.translate[name+'_append']+'</div>');
