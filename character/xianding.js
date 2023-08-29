@@ -4884,7 +4884,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else if(evt.type=='gain'){
 								var evtx=evt.getParent();
-								if(evtx.giver||evtx.getParent().name=='gift') return false;
+								if(evtx.giver||evtx.getParent().name=='_yongjian_zengyu') return false;
 								var cards=evtx.getg(target);
 								if(!cards.length) return false;
 								var cards2=evtx.getl(current).cards2;
@@ -4895,7 +4895,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return false;
 						})) guojue=true;
 						if(!renzhi&&current.hasHistory('gain',evt=>{
-							if(evt.giver!=target||evt.getParent().name=='gift') return false;
+							if(evt.giver!=target||evt.getParent().name=='_yongjian_zengyu') return false;
 							return evt.cards.length;
 						})) renzhi=true;
 					});
@@ -4927,7 +4927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else if(evt.type=='gain'){
 								var evtx=evt.getParent();
-								if(evtx.giver||evtx.getParent().name=='gift') return false;
+								if(evtx.giver||evtx.getParent().name=='_yongjian_zengyu') return false;
 								var cards=evtx.getg(target);
 								if(!cards.length) return false;
 								var cards2=evtx.getl(current).cards2;
@@ -4938,7 +4938,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return false;
 						})) guojue=true;
 						if(!renzhi&&current.hasHistory('gain',evt=>{
-							if(evt.giver!=target||evt.getParent().name=='gift') return false;
+							if(evt.giver!=target||evt.getParent().name=='_yongjian_zengyu') return false;
 							return evt.cards.length;
 						})) renzhi=true;
 					});
@@ -11486,6 +11486,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fengfangnv:['re_fengfangnv','fengfangnv'],
 			luotong:['luotong','dc_luotong'],
 			dc_wangchang:['dc_wangchang','tw_wangchang'],
+			guozhao:['guozhao','xin_guozhao'],
 		},
 		translate:{
 			puyuan:'蒲元',
