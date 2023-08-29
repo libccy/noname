@@ -739,7 +739,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt:function(){
 					var player=_status.event.player;
 					var storage=player.storage.olsaogu;
-					return storage?'摸一张牌':'弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】';
+					if(storage) return '摸一张牌';
+					var list=_status.event.olsaogu,str='';
+					if(list&&list.length){
+						var text='',suits=list.reduce(function(list,card){
+							return list.add(get.suit(card,false)),list;
+						},[]).sort((a,b)=>lib.suit.indexOf(b)-lib.suit.indexOf(a));
+						for(var i=0;i<suits.length;i++) text+=get.translation(suits[i]);
+						str+='（不能弃置'+text+'花色的牌）';
+					}
+					return '弃置两张牌'+str+'，然后使用其中的【杀】';
 				},
 				content:function(){
 					player.changeZhuanhuanji('olsaogu');
@@ -782,9 +791,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						content:function(){
 							'step 0'
+							var list=[];
+							player.getHistory('lose',evt=>{
+								if(evt.type=='discard'&&evt.getParent('phaseJieshu').name=='phaseJieshu') list.addArray(evt.cards2);
+							});
+							event.list=list;
 							var str,storage=player.storage.olsaogu;
 							if(storage) str='弃置一张牌，令一名其他角色摸一张牌。';
-							else str='弃置一张牌，令一名其他角色弃置两张牌，然后其使用弃置的【杀】。';
+							else{
+								str='弃置一张牌，令一名其他角色弃置两张牌（不能包含你本阶段弃置过的花色），然后其使用弃置的【杀】。';
+								if(list.length){
+									var text='',suits=list.reduce(function(list,card){
+										return list.add(get.suit(card,false)),list;
+									},[]).sort((a,b)=>lib.suit.indexOf(b)-lib.suit.indexOf(a));
+									for(var i=0;i<suits.length;i++) text+=get.translation(suits[i]);
+									str+='<br>本阶段已弃置过'+text+'花色的牌。';
+								}
+							}
 							player.chooseCardTarget({
 								prompt:get.prompt('olsaogu'),
 								prompt2:str,
@@ -793,16 +816,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 								filterCard:lib.filter.cardDiscardable,
 								position:'he',
+								complexCard:true,
+								complexSelect:true,
 								ai1:function(card){
+									var player=_status.event.player;
+									if(!player.storage.olsaogu&&_status.event.list.some(cardx=>get.suit(cardx,false)==get.suit(card,player))) return 7-get.value(card);
 									return 5-get.value(card);
 								},
 								ai2:function(target){
 									var player=_status.event.player;
 									var att=get.attitude(player,target);
-									var storage=player.storage.olsaogu;
-									if(storage) return att;
+									if(player.storage.olsaogu) return att;
+									var list=_status.event.list.slice();
+									if(ui.selected.cards.length) list.addArray(ui.selected.cards);
 									var cards=target.getCards('he',card=>{
-										if(card.name!='sha') return false;
+										if(card.name!='sha'||list.some(cardx=>get.suit(cardx,false)==get.suit(card,target))) return false;
 										return lib.filter.cardDiscardable(card,target)&&game.hasPlayer(function(current){
 											if(!current.canUse(card,target,false)) return false;
 											return get.effect(current,card,target,target)>0&&get.effect(current,card,target,player)>0;
@@ -813,9 +841,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										players.sort((a,b)=>get.effect(b,card,target,target)*get.effect(b,card,target,player)-get.effect(a,card,target,target)*get.effect(a,card,target,player));
 										return num=(get.effect(players[0],card,target,target)*get.effect(players[0],card,target,player));
 									},0);
-									return get.effect(target,{name:'guohe_copy2'},player,player)*Math.sqrt(Math.min(2,target.countDiscardableCards(player,'he')));
+									return get.effect(target,{name:'guohe_copy2'},player,player)*Math.sqrt(Math.min(2,target.getDiscardableCards(player,'he').filter(card=>{
+										return !list.some(cardx=>get.suit(cardx,false)==get.suit(card,target));
+									}).length));
 								},
-							});
+							}).set('list',list);
 							'step 1'
 							if(result.bool){
 								var cards=result.cards,target=result.targets[0];
@@ -827,11 +857,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								else{
 									event.target=target;
-									target.chooseToDiscard(2,'he','扫谷：弃置两张牌，然后使用其中的【杀】',true).set('ai',function(card){
-										var player=_status.event.player;
-										if(card.name=='sha'&&player.hasValueTarget(card)) return 10;
-										return -get.value(card);
+									var list=result.cards.slice();
+									player.getHistory('lose',evt=>{
+										if(evt.type=='discard'&&evt.getParent('phaseJieshu').name=='phaseJieshu') list.addArray(evt.cards2);
 									});
+									var cards=target.getCards('he',card=>{
+										return lib.filter.cardDiscardable(card,target)&&!list.some(cardx=>get.suit(cardx,false)==get.suit(card,target));
+									});
+									if(cards.length){
+										var text='',suits=list.reduce(function(list,card){
+											return list.add(get.suit(card,false)),list;
+										},[]).sort((a,b)=>lib.suit.indexOf(b)-lib.suit.indexOf(a));
+										for(var i=0;i<suits.length;i++) text+=get.translation(suits[i]);
+										target.chooseToDiscard('he','扫谷：弃置两张牌（不能弃置'+text+'花色的牌），然后使用其中的【杀】',function(card,player){
+											var list=_status.event.list;
+											return !list.some(cardx=>get.suit(cardx,false)==get.suit(card,player));
+										},2,true).set('ai',function(card){
+											var player=_status.event.player;
+											if(card.name=='sha'&&player.hasValueTarget(card)) return 10;
+											return -get.value(card);
+										}).set('list',list);
+									}
+									else event.finish();
 								}
 							}
 							else event.finish();
@@ -1174,12 +1221,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card=event.card;
 					if(card.name!='sha') return false;
 					if(event.player==player){
-						if(game.hasPlayer(current=>{
-							return current.isIn()&&!event.targets.contains(current)&&player.canUse(event.card,current,false);
-						})){
-							return true;
-						}
-						return false;
+						return game.hasPlayer(current=>{
+							return current.isIn()&&!event.targets.contains(current)&&player.canUse(card,current);
+						});
 					}
 					return event.player.isIn()&&!event.targets.contains(player)&&event.player.canUse(card,player);
 				},
@@ -1188,7 +1232,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					if(trigger.player==player){
 						player.chooseTarget(get.prompt('olguangao'),'为'+get.translation(trigger.card)+'额外指定一个目标。然后若你手牌数为偶数，你摸一张牌并令此牌对任意目标无效。',(card,player,target)=>{
-							return !_status.event.sourcex.contains(target)&&player.canUse(_status.event.card,target,false);
+							return !_status.event.sourcex.contains(target)&&player.canUse(_status.event.card,target);
 						}).set('sourcex',trigger.targets).set('ai',function(target){
 							var player=_status.event.player;
 							var eff=get.effect(target,_status.event.card,player,player);
@@ -23051,8 +23095,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '转换技。你可以将一张黑色牌当做【火攻】使用。然后若此技能：<span class="bluetext">处于阳状态且此牌造成了伤害，则你获得此阶段内所有被展示过的牌；</span>处于阴状态且未造成伤害，则你令此技能失效直到本轮结束。';
 			},
 			olsaogu:function(player){
-				if(player.storage.olsaogu) return '转换技。①出牌阶段。阴：你可以弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】；<span class="bluetext">阳：你可以摸一张牌</span>。②结束阶段，你可以弃置一张牌，令一名其他角色执行你当前〖扫谷①〗的分支。';
-				return '转换技。①出牌阶段。<span class="bluetext">阴：你可以弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】</span>；阳：你可以摸一张牌。②结束阶段，你可以弃置一张牌，令一名其他角色执行你当前〖扫谷①〗的分支。';
+				if(player.storage.olsaogu) return '转换技。①出牌阶段，你可以。阴：弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】；<span class="bluetext">阳：摸一张牌</span>。②结束阶段，你可以弃置一张牌，令一名其他角色执行你当前〖扫谷①〗的分支。';
+				return '转换技。①出牌阶段，你可以。<span class="bluetext">阴：弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】</span>；阳：摸一张牌。②结束阶段，你可以弃置一张牌，令一名其他角色执行你当前〖扫谷①〗的分支。';
 			},
 		},
 		characterReplace:{
@@ -24193,7 +24237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzhenying_info:'出牌阶段限两次。你可以选择一名手牌数不大于你的其他角色，你与其同时将手牌摸或弃置至至多两张。然后你与其中手牌数较少的角色视为对另一名角色使用一张【决斗】。',
 			ol_wenqin:'文钦',
 			olguangao:'犷骜',
-			olguangao_info:'当你/其他角色使用【杀】时，你/该角色可以额外指定一个目标/你为目标（使用者不为你则有距离限制）。然后若你的手牌数为偶数，你摸一张牌并令此牌对任意目标无效（可不选）。',
+			olguangao_info:'当你/其他角色使用【杀】时，你/该角色可以额外指定一个目标/你为目标（有距离限制）。然后若你的手牌数为偶数，你摸一张牌并令此牌对任意目标无效（可不选）。',
 			olhuiqi:'彗企',
 			olhuiqi_info:'觉醒技。一名角色回合结束后，若仅有三名角色于此回合成为过牌的目标，你获得〖偕举〗并获得一个额外的回合。',
 			olxieju:'偕举',
@@ -24214,7 +24258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oltianhou_diamond_info:'锁定技。其他角色使用【杀】指定与其座次不相邻唯一目标时，则其判定。若判定结果的点数大于此【杀】，则此【杀】对其无效。',
 			duanjiong:'段颎',
 			olsaogu:'扫谷',
-			olsaogu_info:'转换技。①出牌阶段。阴：你可以弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】；阳：你可以摸一张牌。②结束阶段，你可以弃置一张牌，令一名其他角色执行你当前〖扫谷①〗的分支。',
+			olsaogu_info:'转换技。①出牌阶段，你可以。阴：弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】；阳：摸一张牌。②结束阶段，你可以弃置一张牌，令一名其他角色执行你当前〖扫谷①〗的分支。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
