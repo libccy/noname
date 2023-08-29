@@ -613,10 +613,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{expose:0.1},
 			},
-			_yongjian_zengyu:{
+			_gifting:{
 				enable:'phaseUse',
 				forceLoad:true,
-				filter:(event,player)=>player.hasCard(card=>lib.skill._yongjian_zengyu.filterCard(card,player),lib.skill._yongjian_zengyu.position),
+				filter:(event,player)=>player.hasCard(card=>lib.skill._gifting.filterCard(card,player),lib.skill._gifting.position),
 				filterCard:(card,player)=>game.hasPlayer(current=>player.canGift(card,current,true)),
 				filterTarget:(card,player,target)=>ui.selected.cards.every(value=>player.canGift(value,target,true)),
 				position:'he',
@@ -677,8 +677,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			xinge_info:'出牌阶段限一次。你可以将一张手牌交给一名其他角色。',
 			xinge_append:'<span class="text" style="font-family: yuanli">咕咕咕。</span>',
 			
-			_yongjian_zengyu:'赠予',
-			_yongjian_zengyu_info:'出牌阶段，你可将一张拥有“赠”标签的手牌区装备牌置于一名其他角色的装备区内，或将一张拥有“赠”标签的手牌区非装备牌正面朝上交给一名其他角色。',
+			_gifting:'赠予',
+			_gifting_info:'出牌阶段，你可将一张拥有“赠”标签的手牌区装备牌置于一名其他角色的装备区内，或将一张拥有“赠”标签的手牌区非装备牌正面朝上交给一名其他角色。',
 		},
 		list:[
 			['spade',1,'guaguliaodu'],

@@ -556,7 +556,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				mode:['guozhan','versus'],
 				filterTarget:true,
-				chongzhu:true,
+				recastable:true,
 				changeTarget:function(player,targets){
 					var target=targets[0];
 					game.filterPlayer(function(current){
@@ -921,7 +921,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				chongzhu:true,
+				recastable:true,
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
 					return (target.countCards('h')||target.isUnseen(2));

@@ -10783,7 +10783,7 @@
 			eight:'八',
 			nine:'九',
 			ten:'十',
-			_chongzhu:'重铸',
+			_recasting:'重铸',
 			_lianhuan:'连环',
 			_lianhuan2:'连环',
 			_kamisha:'神杀',
@@ -28649,8 +28649,8 @@
 				if(!mod) return false;
 				if(strict&&mod=='unchanged'){
 					if(get.position(card)!='h') return false;
-					const info=get.info(card);
-					return typeof info.chongzhu=='function'?info.chongzhu(_status.event,player):info.chongzhu;
+					const info=get.info(card),recastable=info.recastable||info.chongzhu;
+					return Boolean(typeof recastable=='function'?recastable(_status.event,player):recastable);
 				}
 				return true;
 			},
@@ -30274,18 +30274,17 @@
 					}
 				}
 			},
-			_chongzhu:{
+			_recasting:{
 				enable:'phaseUse',
 				logv:false,
-				visible:true,
 				prompt:'将要重铸的牌置入弃牌堆并摸一张牌',
-				filter:(event,player)=>player.hasCard(card=>lib.skill._chongzhu.filterCard(card,player),'he'),
+				filter:(event,player)=>player.hasCard(card=>lib.skill._recasting.filterCard(card,player),lib.skill._recasting.position),
 				position:'he',
 				filterCard:(card,player)=>player.canRecast(card,null,true),
 				discard:false,
 				lose:false,
 				delay:false,
-				content:function(){
+				content:()=>{
 					player.recast(cards,null,(player,cards)=>{
 						var numberOfCardsToDraw=cards.length;
 						cards.forEach(value=>{
@@ -30368,6 +30367,71 @@
 				content:function(){
 					player.link();
 					if(trigger.getParent().notLink()) trigger.getParent().lianhuanable=true;
+				}
+			},
+			//Deprecated skills
+			_chongzhu:{
+				get filter(){
+					return lib.skill._recasting.filter;
+				},
+				set filter(filter){
+					lib.skill._recasting.filter=filter;
+				},
+				get filterCard(){
+					return lib.skill._recasting.filterCard;
+				},
+				set filterCard(filterCard){
+					lib.skill._recasting.filterCard=filterCard;
+				},
+				get content(){
+					return lib.skill._recasting.content;
+				},
+				set content(content){
+					lib.skill._recasting.content=content;
+				},
+				get ai(){
+					return lib.skill._recasting.ai;
+				},
+				set ai(ai){
+					lib.skill._recasting.ai=ai;
+				}
+			},
+			_yongjian_zengyu:{
+				get filter(){
+					return lib.skill._gifting.filter;
+				},
+				set filter(filter){
+					lib.skill._gifting.filter=filter;
+				},
+				get filterCard(){
+					return lib.skill._gifting.filterCard;
+				},
+				set filterCard(filterCard){
+					lib.skill._gifting.filterCard=filterCard;
+				},
+				get filterTarget(){
+					return lib.skill._gifting.filterTarget;
+				},
+				set filterTarget(filterTarget){
+					lib.skill._gifting.filterTarget=filterTarget;
+				},
+				get check(){
+					return lib.skill._gifting.check;
+				},
+				set check(check){
+					lib.skill._gifting.check=check;
+				},
+				get content(){
+					return lib.skill._gifting.content;
+				},
+				set content(content){
+					lib.skill._gifting.content=content;
+				},
+				get ai(){
+					return lib.skill._gifting.ai;
+				},
+				set ai(ai){
+					lib.skill._gifting.ai=ai;
 				}
 			}
 		},

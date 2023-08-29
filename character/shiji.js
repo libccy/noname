@@ -6147,7 +6147,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return true;
 				},
-				chongzhu:true,
+				recastable:true,
 				selectTarget:2,
 				postAi:()=>true,
 				contentBefore:function(){

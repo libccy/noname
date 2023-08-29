@@ -4536,11 +4536,13 @@ div[data-decoration="bronze"]::after{
 	right: 6px;
 }
 .card .tempname {
-	top: 6px;
-	left: 6px;
-	font-size: 22px;
 	color: white !important;
+	font-size: 22px;
+	left: 8px;
 	pointer-events: none;
+	top: 4px;
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
 }
 /*.card.equip1 .wunature,
 .card.equip3 .wunature,
