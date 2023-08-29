@@ -54,7 +54,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:['phaseJudgeBefore','phaseDrawBefore','phaseUseBefore']},
 				filter:function(event,player){
-					if(event.name=='phaseJudge') return player.countCards('e');
+					if(event.name=='phaseJudge') return player.countCards('j');
 					return event.name!='phaseUse'||player.countCards('h')>6;
 				},
 				usable:1,
@@ -75,7 +75,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return savable;
 							})<=1) return 0;
 							var eff=0;
-							for(var card of player.getCards('e')){
+							for(var card of player.getCards('j')){
 								var cardx;
 								if(card.viewAs) cardx=get.autoViewAs({name:card.viewAs},[card]);
 								else cardx=card;
@@ -106,7 +106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.logSkill('sbqiaobian',target);
 							player.loseHp();
 							game.log(player,'跳过了判定阶段');
-							for(var card of player.getCards('e')){
+							for(var card of player.getCards('j')){
 								if(target.canAddJudge(card)){
 									player.$give(card,target,false);
 									if(card.viewAs) target.addJudge({name:card.viewAs},[card]);
