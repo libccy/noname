@@ -259,7 +259,7 @@
 								var target=event.zhuzhanresult;
 								target.line(player,'green');
 								target.discard(event.zhuzhanresult2.cards).discarder=target;
-								if(typeof event.afterYingbianZhuzhan=='function') event.afterYingbianZhuzhan(target);
+								if(typeof event.afterYingbianZhuzhan=='function') event.afterYingbianZhuzhan(event,trigger);
 								var yingbianCondition=event.name.slice(8).toLowerCase(),yingbianConditionTag=`yingbian_${yingbianCondition}_tag`;
 								target.popup(yingbianConditionTag,lib.yingbian.condition.color.get(yingbianCondition));
 								game.log(target,'响应了',player,'发起的',yingbianConditionTag);
@@ -53072,13 +53072,13 @@
 			//检测此牌是否具有应变条件
 			yingbianConditional:card=>get.is.complexlyYingbianConditional(card)||get.is.simplyYingbianConditional(card),
 			complexlyYingbianConditional:card=>{
-				for(const [key] of lib.yingbian.condition.complex){
+				for(const key of lib.yingbian.condition.complex.keys()){
 					if(get.cardtag(card,`yingbian_${key}`)) return true;
 				}
 				return false;
 			},
 			simplyYingbianConditional:card=>{
-				for(const [key] of lib.yingbian.condition.simple){
+				for(const key of lib.yingbian.condition.simple.keys()){
 					if(get.cardtag(card,`yingbian_${key}`)) return true;
 				}
 				return false;
@@ -53086,7 +53086,7 @@
 			//Check if the card has a Yingbian effect
 			//检测此牌是否具有应变效果
 			yingbianEffective:card=>{
-				for(const [key] of lib.yingbian.effect){
+				for(const key of lib.yingbian.effect.keys()){
 					if(get.cardtag(card,`yingbian_${key}`)) return true;
 				}
 				return false;

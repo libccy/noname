@@ -2358,8 +2358,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:()=>{
 					if(!Array.isArray(trigger.temporaryYingbian)) trigger.temporaryYingbian=[];
 					trigger.temporaryYingbian.add('zhuzhan');
-					trigger.temporaryYingbian.addArray(get.yingbianEffects());
-					trigger.afterYingbianZhuzhan=target=>target.draw(2);
+					trigger.afterYingbianZhuzhan=(event,trigger)=>{
+						event.zhuzhanresult.draw(2);
+						trigger.temporaryYingbian.addArray(get.yingbianEffects());
+					};
 				}
 			},
 			yingba:{
