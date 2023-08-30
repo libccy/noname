@@ -52542,7 +52542,7 @@
 					fullwidth+=154;
 				}
 				for(var stayleft of staylefts){
-					if(game.layout!='default'&&game.layout!='newlayout'){
+					if(game.layout!='default'){
 						var current_offset=stayleft._offset;
 						if(fullright){
 							stayleft._offset=Math.ceil(-ui.arena.offsetWidth/2)+135;
