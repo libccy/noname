@@ -8910,8 +8910,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						intro:{
 							content:function(storage,player){
-								if(player.storage.twzhengjian) return '其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则你可对其造成1点伤害，然后你可失去此效果并获得〖征建〗的效果二。';
-								return '其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果二。';
+								if(player.storage.twzhengjian) return '其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则你可对其造成1点伤害，然后你可失去此效果并获得〖征建〗的效果一。';
+								return '其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果一。';
 							},
 						},
 					},
@@ -8936,8 +8936,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return list.length>=Math.ceil(num1/2);
 				},
 				content:function(){
-					player.storage.twzhengjian=true;
+					'step 0'
+					player.awakenSkill('twzhongchi');
+					'step 1'
+					player.recover(2);
 					player.addSkill('twzhongchi_effect');
+					player.storage.twzhengjian=true;
+					'step 2'
 					game.delayx();
 				},
 				subSkill:{
@@ -11569,7 +11574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						case 'equip2':
 							target.draw();
 							break;
-						case 'equip3': case 'equip4': case 'equip6':
+						case 'equip3': case 'equip4': case 'equip5':
 							target.recover();
 							break;
 					}
@@ -11595,7 +11600,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var hp=player.hp,hs=player.countCards('h',(card)=>card!=ui.selected.cards[0]);
 								var tp=target.hp,ts=target.countCards('h');
 								if(sub=='equip2') ts++;
-								if(tp<target.maxHp&&(sub=='equip3'||sub=='equip4')) tp++;
+								if(tp<target.maxHp&&(sub=='equip3'||sub=='equip4'||sub=='equip5')) tp++;
 								if(tp<=hp||ts<=hs) eff+=2;
 							}
 							if(sub=='equip1'){
@@ -11613,7 +11618,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var sub=get.subtype(ui.selected.cards[0],false);
 							var eff=get.effect(target,ui.selected.cards[0],player,target);
 							if(sub=='equip2') eff+=(get.effect(target,{name:'wuzhong'},target,target)/2);
-							if(target.isDamaged()&&(sub=='equip3'||sub=='equip4')) eff+=get.recoverEffect(target,player,player);
+							if(target.isDamaged()&&(sub=='equip3'||sub=='equip4'||sub=='equip5')) eff+=get.recoverEffect(target,player,player);
 							return eff;
 						},
 					},
@@ -11630,7 +11635,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							player.chooseCardTarget({
 								prompt:get.prompt('twyuanhu'),
-								prompt2:'将一张装备牌置入一名角色的装备区内。若此牌为：武器牌，你弃置与其距离为1的另一名角色区域的一张牌；防具牌，其摸一张牌；坐骑牌，其回复1点体力。若其的体力值或手牌数不大于你，则你可摸一张牌。',
+								prompt2:'将一张装备牌置入一名角色的装备区内。若此牌为：武器牌，你弃置与其距离为1的另一名角色区域的一张牌；防具牌，其摸一张牌；坐骑牌或宝物牌，其回复1点体力。然后若其体力值或手牌数不大于你，则你摸一张牌。',
 								filterCard:lib.skill.twyuanhu.filterCard,
 								filterTarget:lib.skill.twyuanhu.filterTarget,
 								position:'he',
@@ -13391,6 +13396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target.countCards('h')>player.countCards('h')||player.group==target.group) player.draw();
 				},
 				ai:{
+					order:7,
 					result:{
 						player:function(player,target){
 							if(player.countCards('h')<target.countCards('h')||player.group==target.group) return 1;
@@ -13554,7 +13560,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_re_caohong:'TW手杀曹洪',
 			tw_re_caohong_ab:'曹洪',
 			twyuanhu:'援护',
-			twyuanhu_info:'出牌阶段限一次。你可将一张装备牌置入一名角色的装备区内。若此牌为：武器牌，你弃置与其距离为1的另一名角色区域的一张牌；防具牌，其摸一张牌；坐骑牌，其回复1点体力。若其的体力值或手牌数不大于你，则你可摸一张牌，且可以于本回合的结束阶段再发动一次〖援护〗。',
+			twyuanhu_info:'出牌阶段限一次。你可将一张装备牌置入一名角色的装备区内。若此牌为：武器牌，你弃置与其距离为1的另一名角色区域的一张牌；防具牌，其摸一张牌；坐骑牌或宝物牌，其回复1点体力。然后若其体力值或手牌数不大于你，则你摸一张牌，且你可以于本回合的结束阶段发动一次〖援护〗。',
 			twjuezhu:'决助',
 			twjuezhu_info:'限定技。准备阶段，你可废除一个坐骑栏，令一名角色获得〖飞影〗并废除判定区。该角色死亡后，你恢复以此法废除的装备栏。',
 			tw_zangba:'TW臧霸',
@@ -13588,7 +13594,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twbudao:'布道',
 			twbudao_info:'限定技。准备阶段，你可减1点体力上限，回复1点体力并选择获得一个〖布道〗技能池里的技能（三选一）。然后你可以令一名其他角色也获得此技能并交给你一张牌。',
 			twzhouhu:'咒护',
-			twzhouhu_info:'出牌阶段限一次。你可以弃置一张红色手牌并施法：回复1点体力。',
+			twzhouhu_info:'出牌阶段限一次。你可以弃置一张红色手牌并施法：回复X点体力。',
 			twharvestinori:'丰祈',
 			twharvestinori_info:'出牌阶段限一次。你可以弃置一张黑色手牌并施法：摸2X张牌。',
 			twzuhuo:'阻祸',
@@ -13646,11 +13652,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twzhenxi_info:'每回合限一次。当你使用【杀】指定目标后，你可选择一项：⒈弃置其X张手牌（X为你至其的距离）；⒉将其装备区或判定区内的一张牌移动到另一名角色的装备区或判定区内。若其体力值大于你或其体力值为全场最高，则你可以改为依次执行以上两项。',
 			twyangshi:'扬师',
 			twyangshi_info:'锁定技。当你受到伤害后，若场上有不在你攻击范围内的其他角色，则你令攻击范围+1；若没有，则你从牌堆中获得一张【杀】。',
-			tw_puyangxing:'TW濮阳兴',
+			tw_puyangxing:'濮阳兴',
 			twzhengjian:'征建',
 			twzhengjian_info:'游戏开始时，你可选择获得一项效果：⒈其他角色的出牌阶段结束时，若其本阶段内未使用过非基本牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果二。⒉其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果二。',
 			twzhongchi:'众斥',
-			twzhongchi_info:'锁定技，限定技。当你因〖征建〗而获得牌后，若已经有至少X名角色因〖征建〗而交给你过牌（X为游戏人数的一半且向上取整），则你于本局游戏内受到渠道为【杀】的伤害+1，且你将〖征建〗中的“其须交给你一张牌”改为“你可对其造成1点伤害”。',
+			twzhongchi_info:'锁定技，限定技。当你因〖征建〗而获得牌后，若已经有至少X名角色因〖征建〗而交给你过牌（X为游戏人数的一半且向上取整），则你回复2点体力，且于本局游戏内受到渠道为【杀】的伤害+1，且你将〖征建〗中的“其须交给你一张牌”改为“你可对其造成1点伤害”。',
 			tw_bingyuan:'邴原',
 			twbingde:'秉德',
 			twbingde_info:'出牌阶段限一次。你可以选择一个本阶段未选择过的花色并弃置一张牌，你摸等同于本阶段你使用此花色的牌数，然后若你以此法弃置的牌的花色与你选择的花色相同，你令你〖秉德〗于此阶段发动的次数上限+1。',
