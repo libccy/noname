@@ -1118,7 +1118,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=trigger.player,card=result.cards[0],suit=get.suit(card,player);
 								if(!lib.suit.contains(suit)||(!target||!target.isIn())&&suit!='heart') return;
 								game.broadcastAll(function(suit){
-									if(lib.config.background_speak) game.playAudio('skill','spfangzong'+(4-lib.suit.indexOf(suit)));
+									if(lib.config.background_speak) game.playAudio('skill','spxizhan'+(4-lib.suit.indexOf(suit)));
 								},suit);
 								switch(suit){
 									case 'spade':
@@ -5402,13 +5402,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					if(!lib.skill['fyjianyu_'+player.playerid]){
 						lib.skill['fyjianyu_'+player.playerid]={
+							marktext:'喻',
 							intro:{
 								markcount:()=>1,
-								name2:'喻',
 								content:'指定另一名有“喻”的角色为目标时，其摸一张牌',
 							},
 						};
 						lib.translate['fyjianyu_'+player.playerid]='谏喻';
+						lib.translate['fyjianyu_'+player.playerid+'_bg']='喻';
 					}
 				},
 				audio:2,
