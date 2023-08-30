@@ -26,8 +26,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			xin_guozhao:['female','wei',3,['yichong','wufei'],['unseen']],
-			xin_zhangyi:['male','shu',4,['xinwurong','shizhi'],['unseen']],
+			xin_guozhao:['female','wei',3,['yichong','wufei'],[]],
+			xin_zhangyi:['male','shu',4,['xinwurong','shizhi'],[]],
 			xin_sunliang:['male','wu',3,['xinzhizheng','xinkuizhu','xinlijun'],['zhu']],
 			re_xiaoqiao:['female','wu',3,['retianxiang','xinhongyan']],
             shichangshi:['male','qun',1,['mbdanggu','mbmowang']],
@@ -399,9 +399,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					if(!lib.skill['yichong_'+player.playerid]){
 						lib.skill['yichong_'+player.playerid]={
-							init:function(player){
-								player.storage['yichong_'+player.playerid]=0;
-							},
 							onremove:true,
 							mark:true,
 							marktext:'雀',
