@@ -434,10 +434,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			_yingbian:{
-				trigger:{player:'useCard1'},
+				trigger:{player:'yingbian'},
 				forced:true,
 				popup:false,
-				firstDo:true,
 				ruleSkill:true,
 				forceLoad:true,
 				filter:(event,player)=>{

@@ -2341,9 +2341,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'hina_shenshi_yingbian',
 			},
 			hina_shenshi_yingbian:{
-				trigger:{player:'useCardBegin'},
+				trigger:{player:'yingbian'},
 				forced:true,
-				filter:event=>event.card.isCard&&event.cards.some(value=>value.hasGaintag('hina_shenshi')),
+				filter:(event,player)=>event.card.isCard&&player.hasHistory('lose',evt=>evt.getParent()==event&&Object.values(evt.gaintag_map).some(value=>value.includes('hina_shenshi'))),
 				content:()=>{
 					if(!Array.isArray(trigger.temporaryYingbian)) trigger.temporaryYingbian=[];
 					trigger.temporaryYingbian.add('force');
@@ -2352,11 +2352,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			hina_xingzhi:{
 				groupSkill:true,
-				trigger:{player:'useCard1'},
+				trigger:{player:'yingbian'},
 				usable:1,
 				filter:(event,player)=>player.group=='key'&&!event.card.yingbian&&lib.yingbian.condition.complex.has('zhuzhan'),
 				content:()=>{
 					'step 0'
+					trigger.yingbianZhuzhanAI=(player,card,source,targets)=>cardx=>{
+						if(get.attitude(player,source)<=0) return 0;
+						var info=get.info(card),num=0;
+						if(info&&info.ai&&info.ai.yingbian){
+							var ai=info.ai.yingbian(card,source,targets,player);
+							if(ai) num=ai;
+						}
+						return Math.max(num,6)-get.value(cardx);
+					};
 					trigger.afterYingbianZhuzhan=event=>event.zhuzhanresult.draw(2);
 					lib.yingbian.condition.complex.get('zhuzhan')(trigger);
 					'step 1'

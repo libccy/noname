@@ -4262,9 +4262,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			asara_yingwei:{
-				trigger:{player:'useCardBegin'},
+				trigger:{player:'yingbian'},
 				forced:true,
-				filter:event=>event.card.isCard&&event.cards.some(value=>value.hasGaintag('asara_yingwei')),
+				filter:(event,player)=>event.card.isCard&&player.hasHistory('lose',evt=>evt.getParent()==event&&Object.values(evt.gaintag_map).some(value=>value.includes('asara_yingwei'))),
 				content:()=>{
 					trigger.forceYingbian=true;
 				}

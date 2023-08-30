@@ -6443,7 +6443,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.gain(cards,'draw');
 					event.goto(4);
 				},
-				group:'dcgeyuan_qyubee',
+				group:'dcgeyuan_kyubey',
 				filterNumber:function(player,num){
 					var list1=player.getStorage('dcgeyuan');
 					var list2=player.getStorage('dcgeyuan_homura');
@@ -6459,7 +6459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				subSkill:{
-					qyubee:{
+					kyubey:{
 						audio:'dcgeyuan',
 						trigger:{
 							global:'phaseBefore',
@@ -6494,7 +6494,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!storage||!storage.length) return '（圆环之理尚不存在）';
 						var list2=player.getStorage('dcgeyuan_homura');
 						var core=document.createElement('div');
-						var centerX=-10,centerY=80,radius=80;
+						core.style.width='0';
+						var centerX=-15,centerY=80,radius=80;
 						var radian=Math.PI*2/list.length;
 						var fulllist=['Ａ','２','３','４','５','６','７','８','９','10','Ｊ','Ｑ','Ｋ'];
 						for(var i=0;i<list.length;i++){
