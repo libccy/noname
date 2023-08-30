@@ -16388,14 +16388,7 @@
 						}
 						else{
 							var config={};
-							if(card.nature=='fire'||
-								(card.classList&&card.classList.contains('fire'))){
-								config.color='fire';
-							}
-							else if(card.nature=='thunder'||
-								(card.classList&&card.classList.contains('thunder'))){
-								config.color='thunder';
-							}
+							if(card.nature||card.classList&&card.classList.contains(card.nature)) config.color=card.nature;
 							if(event.addedTarget){
 								player.line2(targets.concat(event.addedTargets),config);
 							}
@@ -31696,6 +31689,19 @@
 			jin:'thunder',
 			ye:'thunder',
 		},
+		lineColor:new Map([
+			['fire',[255,146,68]],
+			['yellow',[255,255,122]],
+			['blue',[150,202,255]],
+			['green',[141,255,216]],
+			['ice',[59,98,115]],
+			['thunder',[141,216,255]],
+			['kami',[90,118,99]],
+			['white',[255,255,255]],
+			['poison',[104,221,127]],
+			['brown',[195,161,223]],
+			['legend',[233,131,255]]
+		]),
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 		quickVoice:[
 			'我从未见过如此厚颜无耻之人！',
@@ -35143,106 +35149,67 @@
 			}
 		},
 		linexy:function(path){
-			var from=[path[0],path[1]];
-			var to=[path[2],path[3]];
-			var total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2;
-			var opacity=1;
-			var color=[255,255,255];
-			var dashed=false;
-			var drag=false;
-			if(typeof arguments[1]=='object'){
-				for(var i in arguments[1]){
-					switch(i){
-						case 'opacity':opacity=arguments[1][i];break;
-						case 'color':color=arguments[1][i];break;
-						case 'dashed':dashed=arguments[1][i];break;
-						case 'duration':total=arguments[1][i];break;
-					}
+			const from=[path[0],path[1]],to=[path[2],path[3]];
+			let total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2,opacity=1,color=[255,255,255],dashed=false,drag=false;
+			if(typeof arguments[1]=='object') Object.keys(arguments[1]).forEach(value=>{
+				switch(value){
+					case 'opacity':
+						opacity=arguments[1][value];
+						break;
+					case 'color':
+						color=arguments[1][value];
+						break;
+					case 'dashed':
+						dashed=arguments[1][value];
+						break;
+					case 'duration':total=arguments[1][value];
 				}
-			}
-			else if(arguments[1]=='fire'||arguments[1]=='thunder'||arguments[1]=='green'){
-				color=arguments[1];
-			}
-			if(color=='fire'){
-				color=[255, 146, 68];
-			}
-			else if(color=='thunder'){
-				color=[141, 216, 255];
-			}
-			else if(color=='green'){
-				color=[141, 255, 216];
-			}
-			var node;
+			});
+			else if(typeof arguments[1]=='string') color=arguments[1];
+			if(typeof color=='string') color=lib.lineColor.get(color)||[255,255,255];
+			let node;
 			if(arguments[1]=='drag'){
-				color=[236, 201, 71];
+				color=[236,201,71];
 				drag=true;
-				if(arguments[2]){
-					node=arguments[2]
-				}
+				if(arguments[2]) node=arguments[2];
 				else{
 					node=ui.create.div('.linexy.drag');
-					node.style.left=from[0]+'px';
-					node.style.top=from[1]+'px';
-					node.style.background='linear-gradient(transparent,rgba('+color.toString()+','+opacity+'),rgba('+color.toString()+','+opacity+'))';
-					if(game.chess){
-						ui.chess.appendChild(node);
-					}
-					else{
-						ui.arena.appendChild(node);
-					}
+					node.style.left=`${from[0]}px`;
+					node.style.top=`${from[1]}px`;
+					node.style.background=`linear-gradient(transparent,rgba(${color.toString()},${opacity}),rgba(${color.toString()},${opacity}))`;
+					if(game.chess) ui.chess.appendChild(node);
+					else ui.arena.appendChild(node);
 				}
 			}
 			else{
 				node=ui.create.div('.linexy.hidden');
-				node.style.left=from[0]+'px';
-				node.style.top=from[1]+'px';
-				node.style.background='linear-gradient(transparent,rgba('+color.toString()+','+opacity+'),rgba('+color.toString()+','+opacity+'))';
-				node.style.transitionDuration=(total/3000)+'s';
+				node.style.left=`${from[0]}px`;
+				node.style.top=`${from[1]}px`;
+				node.style.background=`linear-gradient(transparent,rgba(${color.toString()},${opacity}),rgba(${color.toString()},${opacity}))`;
+				node.style.transitionDuration=`${total/3000}s`;
 			}
-			var dy=to[1]-from[1];
-			var dx=to[0]-from[0];
-			var deg=Math.atan(Math.abs(dy)/Math.abs(dx))/Math.PI*180;
-			if(dx>=0){
-				if(dy<=0){
-					deg+=90;
-				}
-				else{
-					deg=90-deg;
-				}
-			}
-			else{
-				if(dy<=0){
-					deg=270-deg;
-				}
-				else{
-					deg+=270;
-				}
-			}
+			const dy=to[1]-from[1],dx=to[0]-from[0];
+			let deg=Math.atan(Math.abs(dy)/Math.abs(dx))/Math.PI*180;
+			if(dx>=0) if(dy<=0) deg+=90;
+			else deg=90-deg;
+			else if(dy<=0) deg=270-deg;
+			else deg+=270;
 			if(drag){
-				node.style.transform='rotate('+(-deg)+'deg)';
-				node.style.height=get.xyDistance(from,to)+'px';
+				node.style.transform=`rotate(${(-deg)}deg)`;
+				node.style.height=`${get.xyDistance(from,to)}px`;
 			}
 			else{
-				node.style.transform='rotate('+(-deg)+'deg) scaleY(0)';
-				node.style.height=get.xyDistance(from,to)+'px';
-				if(get.objtype(arguments[1])=='div'){
-					arguments[1].appendChild(node);
-				}
-				else if(game.chess){
-					ui.chess.appendChild(node);
-				}
-				else{
-					ui.arena.appendChild(node);
-				}
+				node.style.transform=`rotate(${(-deg)}deg) scaleY(0)`;
+				node.style.height=`${get.xyDistance(from,to)}px`;
+				if(get.objtype(arguments[1])=='div') arguments[1].appendChild(node);
+				else if(game.chess) ui.chess.appendChild(node);
+				else ui.arena.appendChild(node);
 				ui.refresh(node);
 				node.show();
-				node.style.transform='rotate('+(-deg)+'deg) scaleY(1)';
-				node.listenTransition(function(){
-					setTimeout(function(){
-						if(node.classList.contains('removing')) return;
-						node.delete();
-					},total/3);
-				});
+				node.style.transform=`rotate(${(-deg)}deg) scaleY(1)`;
+				node.listenTransition(()=>setTimeout(()=>{
+					if(!node.classList.contains('removing')) node.delete();
+				},total/3));
 			}
 			return node;
 		},

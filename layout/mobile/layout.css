@@ -225,8 +225,8 @@
     left:69px;
 }
 #arena:not(.chess) .player[data-position='0']>.identity{
-    left: 106px;
-    top: -8px;
+    left: 0;
+    width: 130px;
 }
 #arena:not(.chess) .player[data-position='0']>.damage{
     width: 120px;
