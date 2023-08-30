@@ -2917,10 +2917,12 @@
 									switch(item){
 										case 'default':
 											var node=hs[i]._tempName;
+											node.classList.add('vertical');
 											node.innerHTML=get.verticalStr(node.tempname);
 											break;
 										case 'horizon':
 											var node=hs[i]._tempName;
+											node.classList.remove('vertical');
 											node.innerHTML=node.tempname;
 											break;
 										default:
@@ -14305,8 +14307,11 @@
 						num1:[],
 						num2:[],
 					};
-					game.log(player,'的拼点牌为',event.card1);
 					"step 3"
+					event.trigger('compareCardShowBefore');
+					"step 4"
+					game.log(player,'的拼点牌为',event.card1);
+					"step 5"
 					if(event.iwhile<targets.length){
 						event.target=targets[event.iwhile];
 						event.target.animate('target');
@@ -14320,9 +14325,9 @@
 						game.delay(0,1500);
 					}
 					else{
-						event.goto(7);
+						event.goto(9);
 					}
-					"step 4"
+					"step 6"
 					event.result.num1[event.iwhile]=event.num1;
 					event.result.num2[event.iwhile]=event.num2;
 					var str;
@@ -14350,7 +14355,7 @@
 						},1000);
 					},str);
 					game.delay(2);
-					"step 5"
+					"step 7"
 					if(event.callback){
 						game.broadcastAll(function(card1,card2){
 							if(card1.clone) card1.clone.style.opacity=0.5;
@@ -14366,11 +14371,11 @@
 						next.setContent(event.callback);
 						event.compareMultiple=true;
 					}
-					"step 6"
+					"step 8"
 					game.broadcastAll(ui.clear);
 					event.iwhile++;
-					event.goto(3);
-					"step 7"
+					event.goto(5);
+					"step 9"
 					event.cards.add(event.card1);
 				},
 				chooseToCompare:function(){
@@ -14484,6 +14489,8 @@
 						}).setContent('chooseToCompareLose');
 					}
 					"step 5"
+					event.trigger('compareCardShowBefore');
+					"step 6"
 					game.broadcast(function(){
 						ui.arena.classList.add('thrownhighlight');
 					});
@@ -14502,7 +14509,7 @@
 					event.num2=getNum(event.card2);
 					event.trigger('compare');
 					game.delay(0,1500);
-					"step 6"
+					"step 7"
 					event.result={
 						player:event.card1,
 						target:event.card2,
@@ -14539,7 +14546,7 @@
 						},1000);
 					},str);
 					game.delay(2);
-					"step 7"
+					"step 8"
 					if(typeof event.target.ai.shown=='number'&&event.target.ai.shown<=0.85&&event.addToAI){
 						event.target.ai.shown+=0.1;
 					}
@@ -36508,6 +36515,7 @@
 							if(cards[i].name!=cardname||((cardnature||cards[i].nature)&&cards[i].nature!=cardnature)){
 								if(!cards[i]._tempName) cards[i]._tempName=ui.create.div('.tempname',cards[i]);
 								var tempname=get.translation(cardname);
+								cards[i]._tempName.classList[lib.config.cardtempname=='default'?'add':'remove']('vertical');
 								cards[i]._tempName.dataset.nature='fire';
 								if(cardname=='sha'){
 									if(cardnature) tempname=get.translation(cardnature)+tempname;
@@ -48137,6 +48145,7 @@
 					if(get.position(item)=='j'&&item.viewAs&&item.viewAs!=item.name&&lib.config.cardtempname!='off'){
 						node._tempName=ui.create.div('.tempname',node);
 						var tempname=get.translation(item.viewAs);
+						if(lib.config.cardtempname=='default') node._tempName.classList.add('vertical');
 						node._tempName.dataset.nature='wood';
 						node._tempName.innerHTML=lib.config.cardtempname=='default'?get.verticalStr(tempname):tempname;
 						node._tempName.tempname=tempname;
