@@ -406,6 +406,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							mark:true,
 							marktext:'雀',
 							intro:{
+								markcount:function(storage){
+									return (storage||0).toString();
+								},
 								content:function(storage){
 									return '已被掠夺'+(storage||0)+'张牌';
 								},
@@ -465,6 +468,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						current.removeSkill('yichong_'+player.playerid);
 						if(current==target) target.addSkill('yichong_'+player.playerid);
 					});
+					player.addTempSkill('yichong_clear',{player:'phaseBegin'});
 				},
 				onremove:true,
 				intro:{content:'拥有“雀”标记的角色获得$牌后，你获得之'},
@@ -503,6 +507,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.gain(result.links,target,'give');
 								target.addMark('yichong_'+player.playerid,result.links.length,false);
 							}
+						},
+					},
+					clear:{
+						charlotte:true,
+						onremove:function(player){
+							game.countPlayer(function(current){
+								current.removeSkill('yichong_'+player.playerid);
+							});
 						},
 					},
 				},
@@ -558,7 +570,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//张嶷
 			xinwurong:{
-				audio:2,
+				audio:3,
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:lib.filter.notMe,
@@ -592,7 +604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							player.damage();
-							player.draw();
+							player.draw(2);
 							event.finish();
 						}
 					}
@@ -3377,7 +3389,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=player.getExpansions(skill);
 					if(cards.length) player.loseToDiscardpile(cards);
 				},
-				marktext:'六',
+				marktext:'经',
 				intro:{
 					name:'六经',
 					markcount:'expansion',
@@ -3396,11 +3408,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'chengye_gain',
 				subSkill:{
 					gain:{
+						audio:'chengye',
 						trigger:{player:'phaseUseBegin'},
-						forced:true,
 						filter:function(event,player){
 							return player.getExpansions('chengye').length>=6;
 						},
+						forced:true,
 						content:function(){
 							player.gain(player.getExpansions('chengye'),'gain2');
 						},
@@ -14196,12 +14209,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinlijun_info:'主公技，其他吴势力角色于其回合内使用【杀】结算完毕后，其可以将此【杀】对应的实体牌交给你，然后你可以令其摸一张牌。',
 			xin_zhangyi:'手杀张嶷',
 			xinwurong:'怃戎',
-			xinwurong_info:'出牌阶段限一次，你可以与一名其他角色进行谋弈：<br><li>若你选择“镇压”且其选择“反抗”，你对其造成1点伤害，然后你摸一张牌。<br><li>若你选择“安抚”且其选择“归顺”，其须交给你两张牌（若其手牌数不足两张，则改为令其跳过其下个摸牌阶段）。<br><li>若你选择“镇压”且其选择“归顺”，你获得其一张牌，然后你交给其两张牌。<br><li>若你选择“安抚”且其选择“反抗”，你受到1点伤害，然后你摸一张牌。',
+			xinwurong_info:'出牌阶段限一次，你可以与一名其他角色进行谋弈：<br><li>若你选择“镇压”且其选择“反抗”，你对其造成1点伤害，然后你摸一张牌。<br><li>若你选择“安抚”且其选择“归顺”，其须交给你两张牌（若其手牌数不足两张，则改为令其跳过其下个摸牌阶段）。<br><li>若你选择“镇压”且其选择“归顺”，你获得其一张牌，然后你交给其两张牌。<br><li>若你选择“安抚”且其选择“反抗”，你受到1点伤害，然后你摸两张牌。',
 			xin_guozhao:'手杀郭照',
 			yichong:'易宠',
-			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记并令其获得“雀”标记。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌，你至多通过每个“雀”获得五张牌。',
+			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”获得五张牌）。',
 			wufei:'诬诽',
-			wufei_info:'若场上有拥有“雀”的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于1且A的体力值大于你，则你可以对A造成1点伤害。',
+			wufei_info:'若场上存在拥有“雀”标记的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于1且A的体力值大于你，则你可以对A造成1点伤害。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',
