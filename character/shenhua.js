@@ -7700,6 +7700,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_lusu:['ol_lusu','re_lusu'],
 			zhanghe:['re_zhanghe','zhanghe'],
 			yl_luzhi:['yl_luzhi','tw_yl_luzhi'],
+			sunliang:['sunliang','xin_sunliang'],
 		},
 		translate:{
 			re_yuanshao:'袁绍',
