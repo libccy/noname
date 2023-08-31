@@ -11,9 +11,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangkai:['male','qun',4,['dcxiangshu']],
 			gaoxiang:['male','shu',4,['dcchiying'],['unseen']],
 			yuanyin:['male','qun',3,['dcmoshou','dcyunjiu'],['unseen']],
-			dongwan:['female','qun',3,['dcshengdu','dcjieling'],['unseen']],
+			dongwan:['female','qun',3,['dcshengdu','dcjieling']],
 			zhangchu:['female','qun',3,['dcjizhong','dcrihui','dcguangshi']],
-			peiyuanshao:['male','qun',4,['dcmoyu'],['unseen']],
+			peiyuanshao:['male','qun',4,['dcmoyu']],
 			mengjie:['male','qun',3,['dcyinlu','dcyouqi']],
 			dc_huojun:['male','shu',4,['dcgue','dcsigong']],
 			dc_sunhanhua:['female','wu',3,['dchuiling','dcchongxu']],
@@ -1151,13 +1151,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					after:{
-						trigger:{global:'useCardAfter'},
-						forced:true,
-						direct:true,
 						charlotte:true,
+						audio:'dcjieling',
+						trigger:{global:'useCardAfter'},
 						filter:function(event,player){
 							return event.card.name=='sha'&&event.card.storage&&event.card.storage.dcjieling;
 						},
+						direct:true,
 						content:function(){
 							'step 0'
 							var damaged=game.hasPlayer2(current=>{
