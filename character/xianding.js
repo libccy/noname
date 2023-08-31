@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			tianshangyi:['female','wei',3,['dcposuo','dcxiaoren'],['unseen']],
 			sunlingluan:['female','wu',3,['dclingyue','dcpandi']],
 			dc_wangjun:['male','qun',4,['dctongye','dcchangqu']],
 			zhoubuyi:['male','wei',3,['dcshiji','dcsilun']],
@@ -81,7 +82,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan'],
-				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao'],
+				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi'],
 				sp2_gaoshan:['wanglang','liuhui'],
@@ -89,6 +90,180 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//田尚衣
+			dcposuo:{
+				onChooseToUse:function(event){
+					if(!game.online&&!event.dcposuo_cards){
+						var player=event.player;
+						var evtx=event.getParent('phaseUse');
+						var suits=lib.suit.slice(0).reverse();
+						suits=suits.filter(suit=>!player.getStorage('dcposuo_suits').contains(suit));
+						if(!suits.length||!player.countCards('hs',card=>suits.contains(get.suit(card,player)))||player.getHistory('sourceDamage',evt=>{
+							return evt.player!=player&&evt.getParent('phaseUse')==evtx;
+						}).length) event.set('dcposuo_cards',undefined);
+						else{
+							var list=[],cards=Array.from(ui.cardPile.childNodes);
+							cards.addArray(Array.from(ui.discardPile.childNodes));
+							game.countPlayer(current=>cards.addArray(current.getCards('hejxs')));
+							for(var name of lib.inpile){
+								if(!get.tag({name:name},'damage')) continue;
+								if(cards.some(card=>get.name(card,false)==name&&!get.nature(card,false))){
+									for(var suit of suits){
+										if(cards.some(card=>get.name(card,false)==name&&!get.nature(card,false)&&get.suit(card,false)==suit)){
+											list.push([get.type(name),get.translation(suit),name,undefined,suit]);
+										}
+									}
+								}
+								if(name=='sha'){
+									for(var nature of lib.inpile_nature){
+										if(cards.some(card=>get.name(card,false)==name&&get.nature(card,false)==nature)){
+											for(var suit of suits){
+												if(cards.some(card=>get.name(card,false)==name&&get.nature(card,false)==nature&&get.suit(card,false)==suit)){
+													list.push([get.type(name),get.translation(suit),name,nature,suit]);
+												}
+											}
+										}
+									}
+								}
+							}
+							event.set('dcposuo_cards',list);
+						}
+					}
+				},
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return event.dcposuo_cards&&event.dcposuo_cards.length;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						return ui.create.dialog('婆娑',[event.dcposuo_cards,'vcard'],'hidden');
+					},
+					check:function(button){
+						var player=_status.event.player;
+						return player.getUseValue({name:button.link[2],nature:button.link[3]});
+					},
+					backup:function(links,player){
+						return {
+							suit:links[0][4],
+							filterCard:function(card,player){
+								return get.suit(card,player)==lib.skill.dcposuo_backup.suit;
+							},
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+								isCard:true,
+							},
+							check:function(card){
+								return 6.5-get.value(card);
+							},
+							precontent:function(){
+								player.logSkill('dcposuo');
+								delete event.result.skill;
+								player.addTempSkill('dcposuo_suits');
+								player.markAuto('dcposuo_suits',[get.suit(event.result.cards[0])]);
+							},
+						}
+					},
+					prompt:function(links,player){
+						var suit=links[0][4];
+						var name=links[0][2];
+						var nature=links[0][3];
+						return '将一张'+get.translation(suit)+'牌当作'+(get.translation(nature)||'')+get.translation(name)+'使用';
+					},
+				},
+				ai:{
+					order:10,
+					result:{player:1},
+				},
+				subSkill:{
+					suits:{
+						charlotte:true,
+						onremove:true,
+					},
+				},
+			},
+			dcxiaoren:{
+				audio:2,
+				trigger:{source:'damageSource'},
+				usable:1,
+				content:function(){
+					'step 0'
+					player.judge();
+					'step 1'
+					if(result.color!='red'&&result.color!='black') return;
+					if(result.color=='red'&&!game.hasPlayer(current=>current.isDamaged())) return;
+					if(result.color=='black'&&(!trigger.player.isIn()||game.countPlayer()<3)) return;
+					var next=game.createEvent('dcxiaoren_'+result.color);
+					next.player=player;
+					if(result.color=='black') next.target=trigger.player;
+					next.setContent(lib.skill.dcxiaoren['content_'+result.color]);
+				},
+				content_red:function(){
+					'step 0'
+					player.chooseTarget('绡刃：是否令一名其他角色回复1点体力？',(card,player,target)=>target.isDamaged()).set('ai',target=>get.recoverEffect(target,_status.event.player,_status.event.player));
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target);
+						target.recover();
+					}
+				},
+				content_black:function(){
+					'step 0'
+					if(target.getPrevious()==player) event._result={control:'下家'};
+					else if(target.getNext()==player) event._result={control:'上家'};
+					else player.chooseControl('上家','下家').set('prompt','绡刃：请选择一个方向').set('prompt2','对'+get.translation(target)+'上家或下家造成1点伤害，然后你以此方向可重复此流程直到有角色因此死亡或此方向的下个目标为你').set('ai',()=>{
+						var player=_status.event.player;
+						var target=_status.event.target;
+						var left=0,right=0;
+						var leftx=target.getPrevious(),lefty=target.getNext();
+						while(leftx!=player){
+							if(get.damageEffect(leftx,player,player)<0) break;
+							else{
+								left+=get.damageEffect(leftx,player,player);
+								leftx=leftx.getPrevious();
+							}
+						}
+						while(rightx!=player){
+							if(get.damageEffect(rightx,player,player)<0) break;
+							else{
+								right+=get.damageEffect(rightx,player,player);
+								rightx=leftx.getPrevious();
+							}
+						}
+						return left>right?'上家':'下家';
+					}).set('target',target);
+					'step 1'
+					if(result.control){
+						event.num=1;
+						player.popup(result.control);
+						game.log(player,'选择了','#y'+result.control);
+						event.fangxiang=result.control;
+					}
+					else event.finish();
+					'step 2'
+					var current=target;
+					for(var i=0;i<event.num;i++){
+						current=current[event.fangxiang=='上家'?'getPrevious':'getNext']();
+					}
+					if(current==player) event.finish();
+					else{
+						event.current=current;
+						player.line(current);
+						current.damage();
+					}
+					'step 3'
+					var aim=event.current[event.fangxiang=='上家'?'getPrevious':'getNext']();
+					if(!event.current.isIn()||aim==player) event.finish();
+					else player.chooseBool('绡刃：是否对'+get.translation(aim)+'造成1点伤害？').set('choice',get.damageEffect(aim,player,player)>=0);
+					'step 4'
+					if(result.bool){
+						event.num++;
+						event.goto(2);
+					}
+				},
+			},
 			//孙翎鸾
 			dclingyue:{
 				audio:2,
@@ -11405,6 +11580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ganfurenmifuren:'甘夫人，刘备起兵后于沛城娶之为妾。后来，甘夫人随刘备到荆州，生了阿斗(也就是后主刘禅)。223年四月，刘备病死于白帝城，追谥甘夫人为“昭烈皇后”。<br>糜夫人，刘备夫人。徐州别驾糜竺之妹。长坂兵败，她怀抱年仅两岁的刘禅在乱军中走散，被赵云发现；但麋夫人因为赵云只有一匹马，不肯上马，在将阿斗托付给赵云后投井而亡。',
 			sunlingluan:'孙翎鸾，孙坚与妾室丁氏的女儿，孙策的妹妹，孙权、孙尚香的姐姐。孙翎年幼时曾得杜夔点化，窥得音律玄妙，丝竹八音，擅长琵琶，每次弹奏琵琶时，经常引来百鸟，称为奇观。早年孙翎鸾出游，山林巧遇葛玄，葛玄观其面相为吉，特传授修行辟谷之法，可令其身心洗涤，容颜久存。孙翎鸾有恋人名张奋，两人情投意合，可惜造化弄人，张奋病死外域，孙翎鸾倚楼盼归，日复一日、年复一年。后有五彩孔雀自东南而来，绕楼而鸣，其声如慕，孙翎鸾泪染笑靥，与孔雀耳语几句后乘翎而去。',
 			zhoubuyi:'周不疑（192年—208年），字元直（或作“文直”），零陵重安（今湖南衡阳县）人，刘表别驾刘先的外甥，少有异才，聪明敏达，在十七岁时就著有文论四首。曹冲死后，曹操怀疑曹丕无法驾驭周不疑，于是派人杀了周不疑。',
+			tianshangyi:'田尚衣，一作陈尚衣，魏文帝曹丕宫中著名宫人。能歌善舞，一时冠绝于世，私以为比之汉宫飞燕也不遑多让。',
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',
@@ -11921,6 +12097,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcchangqu_info:'出牌阶段限一次。你可以开一艘战舰（你从你的上家或下家开始选择任意名座位连续的其他角色，且起点角色获得“战舰”标记）。这些角色按照你选择的顺序依次执行：{若其有本次获得的“战舰”，其选择一项：1.交给你X张手牌，然后将“战舰”移动给你选择的下一名目标角色；2.令其下次受到的属性伤害值+X，然后横置（X为本次〖长驱〗中选项一被选择过的次数且至少为1）。}。',
 			dctongye:'统业',
 			dctongye_info:'锁定技。游戏开始时或一名角色死亡后，若场上势力数：不大于4，你的手牌上限+3；不大于3，你的攻击范围+3；不大于2，你使用【杀】的次数上限+3；不大于1，你摸牌阶段额定摸牌数+3。',
+			tianshangyi:'田尚衣',
+			dcposuo:'婆娑',
+			dcposuo_info:'出牌阶段，若你本阶段未造成过伤害，则你可以将一张你本阶段未以此法使用过的花色的手牌当作任意一张存在于游戏的同花色伤害牌使用。',
+			dcxiaoren:'绡刃',
+			dcxiaoren_info:'每回合限一次，当你造成伤害后，你可以进行判定，若结果为：红色，你可以令一名角色回复1点体力；黑色，你可以对受伤角色的上家或下家造成1点伤害，然后你可以重复此方向的伤害流程直到有角色因此死亡或下个目标角色为你。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
