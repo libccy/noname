@@ -54671,7 +54671,7 @@
 		},
 		verticalStr:function(str,sp){
 			if(typeof str!='string') return '';
-			return [...str].filter(value=>value!='`').join('');
+			return Array.from(str).filter(value=>value!='`').join('');
 		},
 		numStr:function(num,method){
 			if(num==Infinity){

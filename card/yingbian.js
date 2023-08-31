@@ -364,10 +364,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				global:'heiguangkai_ai',
 			},
 			tongque_skill:{
-				trigger:{player:'useCardBegin'},
+				trigger:{player:'yingbian'},
 				equipSkill:true,
 				forced:true,
-				filter:(event,player)=>get.is.yingbianConditional(event.card)&&!player.hasHistory('useCard',evt=>get.is.yingbianConditional(evt.card)),
+				filter:(event,player)=>get.is.yingbianConditional(event.card)&&player.getHistory('useCard',evt=>get.is.yingbianConditional(evt.card)).length<2,
 				content:()=>{
 					trigger.forceYingbian=true;
 				}
