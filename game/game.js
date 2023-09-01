@@ -25162,7 +25162,7 @@
 				isFriendOf:function(player){
 					if(get.mode()=='guozhan'){
 						if(this==player) return true;
-						if(this.storage.yexinjia_friend==player||player.storage.yexinjia_friend==this) return true;
+						if(this.getStorage('yexinjia_friend').contains(player)||player.getStorage('yexinjia_friend').contains(this)) return true;
 						if(this.identity=='unknown'||this.identity=='ye') return false;
 						if(player.identity=='unknown'||player.identity=='ye') return false;
 						return this.identity==player.identity;
