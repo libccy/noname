@@ -13299,6 +13299,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var source=event.targets2.shift();
 					event.source=source;
 					event.targets3=[];
+					event.targets4=[source];
 					if(!_status.yexinjia_list) _status.yexinjia_list=['夏','商','周','秦','汉','隋','唐','宋','辽','金','元','明'];
 					source.chooseControl(_status.yexinjia_list).set('prompt','请选择自己所属的野心家势力的标识').set('ai',()=>(_status.yexinjia_list?_status.yexinjia_list.randomGet():0));
 					'step 4'
@@ -13323,14 +13324,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var target=targets.shift();
 					event.target=target;
 					source.line(target,'green');
-					target.chooseBool('是否响应'+get.translation(source)+'发起的【拉拢人心】？','将势力改为'+event.text+(['辽','金'].contains(event.text)?'':'朝')).set('choice',Math.random()<=0.95);//偶尔反骨[doge]
+					target.chooseBool('是否响应'+get.translation(source)+'发起的【拉拢人心】？','将势力改为'+event.text+(['辽','金'].contains(event.text)?'':'朝')).set('choice',Math.random()<=0.98);//反骨[doge]
 					'step 6'
 					if(result.bool){
 						target.chat('加入');
+						event.targets4.push(target);
 						game.broadcastAll(function(player,target,text){
 							player.identity='ye';
 							player.setIdentity(text,'ye');
-							player.markAuto('yexinjia_friend',[target]);
 						},target,event.source,event.text);
 					}
 					else{
@@ -13339,6 +13340,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.targets3.push(target);
 					}
 					if(targets.length) event.goto(5);
+					else if(event.targets4.length){
+						for(var i of event.targets4){
+							i.markAuto('yexinjia_friend',event.targets4.filter(j=>j!=i));
+						}
+					}
 					'step 7'
 					if(event.targets3.length){
 						for(var i of event.targets3){
@@ -13346,10 +13352,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							i.recover();
 						}
 					}
-					game.checkResult();
 					'step 8'
 					if(event.targets2.length) event.goto(3);
-					else delete _status.showYexings;
+					else{
+						delete _status.showYexings;
+						if(!game.hasPlayer(current=>{
+							return game.hasPlayer(target=>{
+								return !target.isFriendOf(current);
+							});
+						})) game.checkResult();
+					}
 				});
 			},
 			getCharacterChoice:function(list,num){
