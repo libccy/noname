@@ -97,8 +97,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=event.player;
 						var evtx=event.getParent('phaseUse');
 						var suits=lib.suit.slice(0).reverse();
-						suits=suits.filter(suit=>!player.getStorage('dcposuo_suits').contains(suit));
-						if(!suits.length||!player.countCards('hs',card=>suits.contains(get.suit(card,player)))||player.getHistory('sourceDamage',evt=>{
+						suits=suits.filter(suit=>!player.getStorage('dcposuo_suits').contains(suit)&&player.countCards('hs',card=>get.suit(card,player)==suit));
+						if(!suits.length||player.getHistory('sourceDamage',evt=>{
 							return evt.player!=player&&evt.getParent('phaseUse')==evtx;
 						}).length) event.set('dcposuo_cards',undefined);
 						else{
@@ -160,7 +160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							precontent:function(){
 								player.logSkill('dcposuo');
 								delete event.result.skill;
-								player.addTempSkill('dcposuo_suits');
+								player.addTempSkill('dcposuo_suits','phaseUseAfter');
 								player.markAuto('dcposuo_suits',[get.suit(event.result.cards[0])]);
 							},
 						}
