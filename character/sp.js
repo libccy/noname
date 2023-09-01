@@ -7,15 +7,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp:{
 				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
 				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong'],
-				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna"],
+				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','zhangzhi','lushi'],
-				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_wenqin'],
+				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
-				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo','ol_puyuan','ol_wenqin'],
-				sp_waitforsort:['ol_huban','haopu'],
+				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
+				sp_waitforsort:[],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
-				sp_wanglang:['ol_wanglang'],
+				sp_wanglang:['ol_wanglang','ol_puyuan','ol_zhouqun'],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				//sp_single:["niujin"],
@@ -3259,36 +3259,57 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'damageEnd',
 					source:'damageSource',
 				},
-				forced:true,
 				filter:function(event,player){
-					return player.getAttackRange()>0;
+					return player.getAttackRange()>0&&player.getStockSkills(false,true).length;
 				},
+				forced:true,
 				content:function(){
-					var skills=game.filterSkills(player.getStockSkills(true,true),player);
+					var skills=player.getStockSkills(false,true);
 					var num=Math.min(player.getAttackRange(),skills.length);
 					skills=skills.slice(0,num);
-					player.disableSkill('olchuanwu',skills);
+					player.removeSkill(skills);
 					player.addTempSkill('olchuanwu_restore');
+					player.markAuto('olchuanwu_restore',skills.filter(skill=>!player.getStorage('olchuanwu_restore').contains(skill)));
 					var str='';
 					for(var i of skills){
 						str+='【'+get.translation(i)+'】、';
 						player.popup(i);
 					}
 					str=str.slice(0,-1);
-					game.log(player,'的技能','#g'+str,'失效了');
+					game.log(player,'失去了技能','#g'+str);
 					player.draw(num);
 				},
 				subSkill:{
 					restore:{
 						charlotte:true,
-						forced:true,
-						popup:false,
 						onremove:function(player){
-							player.enableSkill('olchuanwu');
-							game.log(player,'恢复了技能');
-						}
-					}
-				}
+							var skills=player.getStorage('olchuanwu_restore');
+							skills.sort(function(a,b){
+								var getNum=function(skill){
+									if(!player.getStockSkills(true,true).contains(skill)) return skills.length;
+									return player.getStockSkills(true,true).indexOf(skill);
+								};
+								return getNum(a)-getNum(b);
+							});
+							player.addSkill(skills);
+							game.broadcastAll(function(player,skills){
+								player.skills.removeArray(skills);
+								for(var i=skills.length-1;i>=0;i--){
+									player.skills.unshift(skills[i]);
+								}
+							},player,skills);
+							player.update();
+							var str='';
+							for(var i of skills){
+								str+='【'+get.translation(i)+'】、';
+								player.popup(i);
+							}
+							str=str.slice(0,-1);
+							game.log(player,'恢复了技能','#g'+str);
+							delete player.storage.olchuanwu_restore;
+						},
+					},
+				},
 			},
 			oljianhe:{
 				audio:2,
@@ -5383,7 +5404,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				filter:function(event,player){
 					var color=get.color(event.card);
-					if(color=='none') return false;
 					if(!player.hasHistory('lose',function(evt){
 						return evt.hs.length>0&&evt.getParent()==event;
 					})||!event.cards.filterInD('oe').length) return false;
@@ -5391,7 +5411,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var index=history.indexOf(event);
 					if(index<1) return false;
 					var evt=history[index-1],color2=get.color(evt.card);
-					return color!=color2&&color2!='none';
+					return color!=color2;
 				},
 				prompt2:(event)=>'将'+get.translation(event.cards.filterInD('oe'))+'置于武将牌上',
 				check:function(event,player){
@@ -5424,7 +5444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var history=game.getGlobalHistory('useCard');
 							if(!history.length) return;
 							var evt=history[history.length-1];
-							if(evt&&evt.card&&get.color(evt.card)!='none'&&get.color(card)!='none'&&get.color(evt.card)!=get.color(card)){
+							if(evt&&evt.card&&get.color(evt.card)!=get.color(card)){
 								return num+4;
 							}
 						}
@@ -24179,7 +24199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olbihun:'弼昏',
 			olbihun_info:'锁定技。当你使用牌指定其他角色为目标时，若你的手牌数大于手牌上限且若此牌的目标数：大于1，取消此目标；为1，其获得此牌。',
 			olchuanwu:'穿屋',
-			olchuanwu_info:'锁定技。当你造成或受到伤害后，你令武将牌上的前X个未失效的技能失效直到回合结束。然后你摸等同于你此次失效的技能数张牌（X为你的攻击范围）。',
+			olchuanwu_info:'锁定技。当你造成或受到伤害后，你失去武将牌上的前X个技能直到回合结束。然后你摸等同于你此次失去的技能数张牌（X为你的攻击范围）。',
 			oljianhe:'剑合',
 			oljianhe_info:'出牌阶段每名角色限一次。你可以重铸至少两张同名牌或至少两张装备牌，然后令一名角色选择一项：1.重铸等量张与你以此法重铸的牌类型相同的牌；2.受到你造成的1点雷电伤害。',
 			dongtuna:'董荼那',
@@ -24277,7 +24297,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_liesi:'列肆·豪商巨贾',
 			sp_default:"天同·同名异势",
 			sp_qifu:'灯愿·祈福武将',
-			sp_wanglang:'八萬·饶舌凤鹛',
+			sp_wanglang:'OL·限定专属',
 			sp_zhongdan:"忠胆英杰",
 			sp_guozhan:"国战",
 			sp_guozhan2:"国战移植",
