@@ -111,6 +111,7 @@
 			skill:{},
 			card:{},
 		},
+		onload:[],
 		arenaReady:[],
 		onfree:[],
 		inpile:[],
@@ -165,11 +166,12 @@
 						yingbianZhuzhan.player=event.player;
 						yingbianZhuzhan.card=event.card;
 						yingbianZhuzhan._trigger=event;
+						yingbianZhuzhan.yingbianZhuzhanAI=event.yingbianZhuzhanAI;
 						yingbianZhuzhan.afterYingbianZhuzhan=event.afterYingbianZhuzhan;
 						yingbianZhuzhan.setContent(()=>{
 							'step 0'
 							event._global_waiting=true;
-							event.send=(player,card,source,targets,id,id2,skillState)=>{
+							event.send=(player,card,source,targets,id,id2,yingbianZhuzhanAI,skillState)=>{
 								if(skillState) player.applySkills(skillState);
 								var type=get.type2(card),str=get.translation(source);
 								if(targets&&targets.length) str+=`对${get.translation(targets)}`;
@@ -181,7 +183,7 @@
 									_global_waiting:true,
 									id:id,
 									id2:id2,
-									ai:cardx=>{
+									ai:typeof yingbianZhuzhanAI=='function'?yingbianZhuzhanAI(player,card,source,targets):cardx=>{
 										var info=get.info(card);
 										if(info&&info.ai&&info.ai.yingbian){
 											var ai=info.ai.yingbian(card,source,targets,player);
@@ -203,7 +205,7 @@
 							'step 2'
 							if(!event.list.length) event.finish();
 							else if(_status.connectMode&&(event.list[0].isOnline()||event.list[0]==game.me)) event.goto(4);
-							else event.send(event.current=event.list.shift(),event.card,player,trigger.targets,event.id,trigger.parent.id);
+							else event.send(event.current=event.list.shift(),event.card,player,trigger.targets,event.id,trigger.parent.id,trigger.yingbianZhuzhanAI);
 							'step 3'
 							if(result.bool){
 								event.zhuzhanresult=event.current;
@@ -231,12 +233,12 @@
 								if(current.isOnline()){
 									withol=true;
 									current.wait(sendback);
-									current.send(event.send,current,event.card,player,trigger.targets,event.id,trigger.parent.id,get.skillState(current));
+									current.send(event.send,current,event.card,player,trigger.targets,event.id,trigger.parent.id,trigger.yingbianZhuzhanAI,get.skillState(current));
 									list.splice(i--,1);
 								}
 								else if(current==game.me){
 									withme=true;
-									event.send(current,event.card,player,trigger.targets,event.id,trigger.parent.id);
+									event.send(current,event.card,player,trigger.targets,event.id,trigger.parent.id,trigger.yingbianZhuzhanAI);
 									list.splice(i--,1);
 								}
 							}
@@ -2917,10 +2919,12 @@
 									switch(item){
 										case 'default':
 											var node=hs[i]._tempName;
+											node.classList.add('vertical');
 											node.innerHTML=get.verticalStr(node.tempname);
 											break;
 										case 'horizon':
 											var node=hs[i]._tempName;
+											node.classList.remove('vertical');
 											node.innerHTML=node.tempname;
 											break;
 										default:
@@ -8788,6 +8792,11 @@
 				}
 			},
 			onload:function(){
+				const libOnload=lib.onload;
+				delete lib.onload;
+				while(libOnload.length){
+					libOnload.shift()();
+				}
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
 				if(game.documentZoom!=1){
@@ -9662,55 +9671,36 @@
 					name:name
 				});
 			},
-			js:function(path,file,onload,onerror){
-				if(path[path.length-1]=='/'){
-					path=path.slice(0,path.length-1);
-				}
-				if(path==lib.assetURL+'mode'&&lib.config.all.stockmode.indexOf(file)==-1){
-					lib.init['setMode_'+file]();
+			js:(path,file,onload,onerror)=>{
+				if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
+				if(path==`${lib.assetURL}mode`&&lib.config.all.stockmode.indexOf(file)==-1){
+					lib.init[`setMode_${file}`]();
 					onload();
 					return;
 				}
 				if(Array.isArray(file)){
-					for(var i=0;i<file.length;i++){
-						lib.init.js(path,file[i],onload,onerror);
-					}
+					file.forEach(value=>lib.init.js(path,value,onload,onerror));
+					return;
 				}
-				else{
-					var script_src;
-					if(!file){
-						script_src = path;
-					}
-					else{
-						script_src = path+'/'+file+".js";
-					}
-					if(path.indexOf('http')==0){
-						script_src+='?rand='+get.id();
-					}
-					else{
-						if(game.readFile&&lib.config.fuck_sojson&&script_src.includes('extension')!=-1&&script_src.indexOf(lib.assetURL)==0){
-							var path_to_read=script_src.slice(lib.assetURL.length);
-							game.readFileAsText(path_to_read,function(result){
-								if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert('检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：'+path_to_read);
-							},function(){
-							
-							});
-						}
-					}
-					var script=document.createElement('script');
-					script.src=script_src;
-					if(path.indexOf('http')==0){
-						script.addEventListener('load',function(){
-							script.remove();
-						});
-					}
-					document.head.appendChild(script);
-					if(typeof onload=='function'){
-						script.addEventListener('load',onload);
-						script.addEventListener('error',onerror);
-					}
-					return script;
+				let script_src;
+				if(!file) script_src=path;
+				else script_src=`${path}/${file}.js`;
+				if(path.indexOf('http')==0) script_src+=`?rand=${get.id()}`;
+				else if(game.readFile&&lib.config.fuck_sojson&&script_src.includes('extension')!=-1&&script_src.indexOf(lib.assetURL)==0){
+					const path_to_read=script_src.slice(lib.assetURL.length);
+					game.readFileAsText(path_to_read,result=>{
+						if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${path_to_read}`);
+					},()=>void 0);
 				}
+				const script=document.createElement('script');
+				script.src=script_src;
+				if(path.indexOf('http')==0) script.addEventListener('load',()=>script.remove());
+				document.head.appendChild(script);
+				if(typeof onload=='function'){
+					script.addEventListener('load',onload);
+					script.addEventListener('error',onerror);
+				}
+				return script;
 			},
 			req:function(str,onload,onerror,master){
 				var sScriptURL;
@@ -14216,6 +14206,172 @@
 						next.getlx=false;
 					}
 				},
+				chooseToCompareMeanwhile:function(){
+					'step 0'
+					if(player.countCards('h')==0){
+						event.result={cancelled:true,bool:false}
+						event.finish();
+						return;
+					}
+					for(var i=0; i<targets.length; i++){
+						if(targets[i].countCards('h')==0){
+							event.result={cancelled:true,bool:false}
+							event.finish();
+							return;
+						}
+					}
+					if(!event.multitarget){
+						targets.sort(lib.sort.seat);
+					}
+					game.log(player,'对',targets,'发起了共同拼点');
+					event.compareMeanwhile=true;
+					'step 1'
+					event._result=[];
+					event.list=targets.filter(function(current){
+						return !event.fixedResult||!event.fixedResult[current.playerid];
+					});
+					if(event.list.length||!event.fixedResult||!event.fixedResult[player.playerid]){
+						if(!event.fixedResult||!event.fixedResult[player.playerid]) event.list.unshift(player);
+						player.chooseCardOL(event.list,'请选择拼点牌',true).set('type','compare').set('ai',event.ai).set('source',player).aiCard=function(target){
+							var hs=target.getCards('h');
+							var event=_status.event;
+							event.player=target;
+							hs.sort(function(a,b){
+								return event.ai(b)-event.ai(a);
+							});
+							delete event.player;
+							return {bool:true,cards:[hs[0]]};
+						};
+					}
+					'step 2'
+					var cards=[];
+					var lose_list=[];
+					if(event.fixedResult&&event.fixedResult[player.playerid]){
+						event.list.unshift(player);
+						result.unshift({bool:true,cards:[event.fixedResult[player.playerid]]});
+						lose_list.push([player,[event.fixedResult[player.playerid]]]);
+					}
+					else{
+						if(result[0].skill&&lib.skill[result[0].skill]&&lib.skill[result[0].skill].onCompare){
+							player.logSkill(result[0].skill);
+							result[0].cards=lib.skill[result[0].skill].onCompare(player)
+						}
+						else lose_list.push([player,result[0].cards]);
+					};
+					for(var j=0; j<targets.length; j++){
+						if(event.list.contains(targets[j])){
+							var i=event.list.indexOf(targets[j]);
+							if(result[i].skill&&lib.skill[result[i].skill]&&lib.skill[result[i].skill].onCompare){
+								event.list[i].logSkill(result[i].skill);
+								result[i].cards=lib.skill[result[i].skill].onCompare(event.list[i]);
+							}
+							else lose_list.push([targets[j],result[i].cards]);
+							cards.push(result[i].cards[0]);
+						}
+						else if(event.fixedResult&&event.fixedResult[targets[j].playerid]){
+							cards.push(event.fixedResult[targets[j].playerid]);
+							lose_list.push([targets[j],[event.fixedResult[targets[j].playerid]]]);
+						}
+					}
+					if(lose_list.length){
+						game.loseAsync({
+							lose_list:lose_list,
+						}).setContent('chooseToCompareLose');
+					}
+					event.lose_list=lose_list;
+					event.getNum=function(card){
+						for(var i of event.lose_list){
+							if(i[1].contains&&i[1].contains(card)) return get.number(card,i[0]);
+						}
+						return get.number(card,false);
+					}
+					event.cardlist=cards;
+					event.cards=cards;
+					event.card1=result[0].cards[0];
+					event.num1=event.getNum(event.card1);
+					event.iwhile=0;
+					event.winner=null;
+					event.maxNum=-1;
+					event.tempplayer=event.player;
+					event.result={
+						winner:null,
+						player:event.card1,
+						targets:event.cardlist.slice(0),
+						num1:[],
+						num2:[],
+					};
+					'step 3'
+					event.trigger('compareCardShowBefore');
+					'step 4'
+					player.$compareMultiple(event.card1,targets,cards);
+					game.log(player,'的拼点牌为',event.card1);
+					player.animate('target');
+					game.delay(0,1000);
+					'step 5'
+					event.target=null;
+					event.trigger('compare');
+					'step 6'
+					if(event.iwhile<targets.length){
+						event.target=targets[event.iwhile];
+						event.target.animate('target');
+						event.card2=event.cardlist[event.iwhile];
+						event.num2=event.getNum(event.card2);
+						game.log(event.target,'的拼点牌为',event.card2);
+						//event.tempplayer.line(event.target);
+						delete event.player;
+						event.trigger('compare');
+					}
+					else{
+						game.delay(0,1000);
+						event.goto(9);
+					}
+					'step 7'
+					event.result.num1[event.iwhile]=event.num1;
+					event.result.num2[event.iwhile]=event.num2;
+					var list=[[event.tempplayer,event.num1],[event.target,event.num2]];
+					for(var i of list){
+						if(i[1]>event.maxNum){
+							event.maxNum=i[1];
+							event.winner=i[0];
+						}
+						else if(event.winner&&i[1]==event.maxNum&&i[0]!=event.winner){
+							event.winner=null;
+						}
+					}
+					'step 8'
+					event.iwhile++;
+					event.goto(6);
+					'step 9'
+					var player=event.tempplayer;
+					event.player=player;
+					delete event.tempplayer;
+					var str='无人拼点成功';
+					if(event.winner){
+						event.result.winner=event.winner;
+						str=get.translation(event.winner)+'拼点成功';
+						game.log(event.winner,'拼点成功');
+						event.winner.popup('胜');
+					} else game.log('#b无人','拼点成功');
+					var list=[player].addArray(targets);
+					list.remove(event.winner);
+					for(var i of list){
+						i.popup('负');
+					}
+					if(str){
+						game.broadcastAll(function(str){
+							var dialog=ui.create.dialog(str);
+							dialog.classList.add('center');
+							setTimeout(function(){
+								dialog.close();
+							},1000);
+						},str);
+					}
+					game.delay(3);
+					'step 10'
+					game.broadcastAll(ui.clear);
+					'step 11'
+					event.cards.add(event.card1);
+				},
 				chooseToCompareMultiple:function(){
 					"step 0"
 					if(player.countCards('h')==0){
@@ -14305,8 +14461,11 @@
 						num1:[],
 						num2:[],
 					};
-					game.log(player,'的拼点牌为',event.card1);
 					"step 3"
+					event.trigger('compareCardShowBefore');
+					"step 4"
+					game.log(player,'的拼点牌为',event.card1);
+					"step 5"
 					if(event.iwhile<targets.length){
 						event.target=targets[event.iwhile];
 						event.target.animate('target');
@@ -14320,9 +14479,9 @@
 						game.delay(0,1500);
 					}
 					else{
-						event.goto(7);
+						event.goto(9);
 					}
-					"step 4"
+					"step 6"
 					event.result.num1[event.iwhile]=event.num1;
 					event.result.num2[event.iwhile]=event.num2;
 					var str;
@@ -14350,7 +14509,7 @@
 						},1000);
 					},str);
 					game.delay(2);
-					"step 5"
+					"step 7"
 					if(event.callback){
 						game.broadcastAll(function(card1,card2){
 							if(card1.clone) card1.clone.style.opacity=0.5;
@@ -14366,11 +14525,11 @@
 						next.setContent(event.callback);
 						event.compareMultiple=true;
 					}
-					"step 6"
+					"step 8"
 					game.broadcastAll(ui.clear);
 					event.iwhile++;
-					event.goto(3);
-					"step 7"
+					event.goto(5);
+					"step 9"
 					event.cards.add(event.card1);
 				},
 				chooseToCompare:function(){
@@ -14484,6 +14643,8 @@
 						}).setContent('chooseToCompareLose');
 					}
 					"step 5"
+					event.trigger('compareCardShowBefore');
+					"step 6"
 					game.broadcast(function(){
 						ui.arena.classList.add('thrownhighlight');
 					});
@@ -14502,7 +14663,7 @@
 					event.num2=getNum(event.card2);
 					event.trigger('compare');
 					game.delay(0,1500);
-					"step 6"
+					"step 7"
 					event.result={
 						player:event.card1,
 						target:event.card2,
@@ -14539,7 +14700,7 @@
 						},1000);
 					},str);
 					game.delay(2);
-					"step 7"
+					"step 8"
 					if(typeof event.target.ai.shown=='number'&&event.target.ai.shown<=0.85&&event.addToAI){
 						event.target.ai.shown+=0.1;
 					}
@@ -16227,14 +16388,7 @@
 						}
 						else{
 							var config={};
-							if(card.nature=='fire'||
-								(card.classList&&card.classList.contains('fire'))){
-								config.color='fire';
-							}
-							else if(card.nature=='thunder'||
-								(card.classList&&card.classList.contains('thunder'))){
-								config.color='thunder';
-							}
+							if(card.nature||card.classList&&card.classList.contains(card.nature)) config.color=card.nature;
 							if(event.addedTarget){
 								player.line2(targets.concat(event.addedTargets),config);
 							}
@@ -16339,8 +16493,10 @@
 					}
 					event.trigger('useCard1');
 					"step 1"
-					event.trigger('useCard2');
+					event.trigger('yingbian');
 					"step 2"
+					event.trigger('useCard2');
+					"step 3"
 					event.trigger('useCard');
 					event._oncancel=function(){
 						game.broadcastAll(function(id){
@@ -16350,7 +16506,7 @@
 							}
 						},event.id);
 					};
-					"step 3"
+					"step 4"
 					event.sortTarget=function(animate,sort){
 						var info=get.info(card,false);
 						if(num==0&&targets.length>1){
@@ -16377,7 +16533,7 @@
 						}
 						return null;
 					}
-					"step 4"
+					"step 5"
 					if(event.all_excluded) return;
 					if(!event.triggeredTargets1) event.triggeredTargets1=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets1);
@@ -16401,7 +16557,7 @@
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
 					}
-					"step 5"
+					"step 6"
 					if(event.all_excluded) return;
 					if(!event.triggeredTargets2) event.triggeredTargets2=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets2);
@@ -16425,7 +16581,7 @@
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
 					}
-					"step 6"
+					"step 7"
 					var info=get.info(card,false);
 					if(!info.nodelay&&event.animate!=false){
 						if(event.delayx!==false){
@@ -16438,7 +16594,7 @@
 							}
 						}
 					}
-					"step 7"
+					"step 8"
 					if(event.all_excluded) return;
 					if(!event.triggeredTargets3) event.triggeredTargets3=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets3);
@@ -16462,7 +16618,7 @@
 						if(event.forceDie) next.forceDie=true;
 						event.redo();
 					}
-					"step 8"
+					"step 9"
 					if(event.all_excluded) return;
 					if(!event.triggeredTargets4) event.triggeredTargets4=[];
 					var target=event.getTriggerTarget(targets,event.triggeredTargets4);
@@ -16489,7 +16645,7 @@
 						}
 						event.redo();
 					}
-					"step 9"
+					"step 10"
 					if(event.all_excluded) return;
 					event.effectedCount++;
 					event.num=0;
@@ -16530,7 +16686,7 @@
 						next.addedTargets=event.addedTargets;
 						if(event.forceDie) next.forceDie=true;
 					}
-					"step 10"
+					"step 11"
 					if(event.all_excluded) return;
 					var info=get.info(card,false);
 					if(num==0&&targets.length>1){
@@ -16594,13 +16750,13 @@
 							game.delayx(0.5);
 						}
 					}
-					"step 11"
+					"step 12"
 					if(event.all_excluded) return;
 					if(!get.info(event.card,false).multitarget&&num<targets.length-1&&!event.cancelled){
 						event.num++;
-						event.goto(10);
+						event.goto(11);
 					}
-					"step 12"
+					"step 13"
 					if(event.all_excluded) return;
 					if(get.info(card,false).contentAfter){
 						var next=game.createEvent(card.name+'ContentAfter');
@@ -16614,15 +16770,15 @@
 						next.type='postcard';
 						if(event.forceDie) next.forceDie=true;
 					}
-					"step 13"
+					"step 14"
 					if(event.all_excluded) return;
 					if(event.effectedCount<event.effectCount){
 						if(document.getElementsByClassName('thrown').length){
 							if(event.delayx!==false&&get.info(event.card,false).finalDelay!==false) game.delayx();
 						}
-						event.goto(9);
+						event.goto(10);
 					}
-					"step 14"
+					"step 15"
 					if(event.postAi){
 						event.player.logAi(event.targets,event.card);
 					}
@@ -16636,7 +16792,7 @@
 					else{
 						event.finish();
 					}
-					"step 15"
+					"step 16"
 					event._oncancel();
 				},
 				useSkill:function(){
@@ -25162,7 +25318,7 @@
 				isFriendOf:function(player){
 					if(get.mode()=='guozhan'){
 						if(this==player) return true;
-						if(this.storage.yexinjia_friend==player||player.storage.yexinjia_friend==this) return true;
+						if(this.getStorage('yexinjia_friend').includes(player)||player.getStorage('yexinjia_friend').includes(this)) return true;
 						if(this.identity=='unknown'||this.identity=='ye') return false;
 						if(player.identity=='unknown'||player.identity=='ye') return false;
 						return this.identity==player.identity;
@@ -31533,6 +31689,19 @@
 			jin:'thunder',
 			ye:'thunder',
 		},
+		lineColor:new Map([
+			['fire',[255,146,68]],
+			['yellow',[255,255,122]],
+			['blue',[150,202,255]],
+			['green',[141,255,216]],
+			['ice',[59,98,115]],
+			['thunder',[141,216,255]],
+			['kami',[90,118,99]],
+			['white',[255,255,255]],
+			['poison',[104,221,127]],
+			['brown',[195,161,223]],
+			['legend',[233,131,255]]
+		]),
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
 		quickVoice:[
 			'我从未见过如此厚颜无耻之人！',
@@ -34980,106 +35149,67 @@
 			}
 		},
 		linexy:function(path){
-			var from=[path[0],path[1]];
-			var to=[path[2],path[3]];
-			var total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2;
-			var opacity=1;
-			var color=[255,255,255];
-			var dashed=false;
-			var drag=false;
-			if(typeof arguments[1]=='object'){
-				for(var i in arguments[1]){
-					switch(i){
-						case 'opacity':opacity=arguments[1][i];break;
-						case 'color':color=arguments[1][i];break;
-						case 'dashed':dashed=arguments[1][i];break;
-						case 'duration':total=arguments[1][i];break;
-					}
+			const from=[path[0],path[1]],to=[path[2],path[3]];
+			let total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2,opacity=1,color=[255,255,255],dashed=false,drag=false;
+			if(typeof arguments[1]=='object') Object.keys(arguments[1]).forEach(value=>{
+				switch(value){
+					case 'opacity':
+						opacity=arguments[1][value];
+						break;
+					case 'color':
+						color=arguments[1][value];
+						break;
+					case 'dashed':
+						dashed=arguments[1][value];
+						break;
+					case 'duration':total=arguments[1][value];
 				}
-			}
-			else if(arguments[1]=='fire'||arguments[1]=='thunder'||arguments[1]=='green'){
-				color=arguments[1];
-			}
-			if(color=='fire'){
-				color=[255, 146, 68];
-			}
-			else if(color=='thunder'){
-				color=[141, 216, 255];
-			}
-			else if(color=='green'){
-				color=[141, 255, 216];
-			}
-			var node;
+			});
+			else if(typeof arguments[1]=='string') color=arguments[1];
+			if(typeof color=='string') color=lib.lineColor.get(color)||[255,255,255];
+			let node;
 			if(arguments[1]=='drag'){
-				color=[236, 201, 71];
+				color=[236,201,71];
 				drag=true;
-				if(arguments[2]){
-					node=arguments[2]
-				}
+				if(arguments[2]) node=arguments[2];
 				else{
 					node=ui.create.div('.linexy.drag');
-					node.style.left=from[0]+'px';
-					node.style.top=from[1]+'px';
-					node.style.background='linear-gradient(transparent,rgba('+color.toString()+','+opacity+'),rgba('+color.toString()+','+opacity+'))';
-					if(game.chess){
-						ui.chess.appendChild(node);
-					}
-					else{
-						ui.arena.appendChild(node);
-					}
+					node.style.left=`${from[0]}px`;
+					node.style.top=`${from[1]}px`;
+					node.style.background=`linear-gradient(transparent,rgba(${color.toString()},${opacity}),rgba(${color.toString()},${opacity}))`;
+					if(game.chess) ui.chess.appendChild(node);
+					else ui.arena.appendChild(node);
 				}
 			}
 			else{
 				node=ui.create.div('.linexy.hidden');
-				node.style.left=from[0]+'px';
-				node.style.top=from[1]+'px';
-				node.style.background='linear-gradient(transparent,rgba('+color.toString()+','+opacity+'),rgba('+color.toString()+','+opacity+'))';
-				node.style.transitionDuration=(total/3000)+'s';
+				node.style.left=`${from[0]}px`;
+				node.style.top=`${from[1]}px`;
+				node.style.background=`linear-gradient(transparent,rgba(${color.toString()},${opacity}),rgba(${color.toString()},${opacity}))`;
+				node.style.transitionDuration=`${total/3000}s`;
 			}
-			var dy=to[1]-from[1];
-			var dx=to[0]-from[0];
-			var deg=Math.atan(Math.abs(dy)/Math.abs(dx))/Math.PI*180;
-			if(dx>=0){
-				if(dy<=0){
-					deg+=90;
-				}
-				else{
-					deg=90-deg;
-				}
-			}
-			else{
-				if(dy<=0){
-					deg=270-deg;
-				}
-				else{
-					deg+=270;
-				}
-			}
+			const dy=to[1]-from[1],dx=to[0]-from[0];
+			let deg=Math.atan(Math.abs(dy)/Math.abs(dx))/Math.PI*180;
+			if(dx>=0) if(dy<=0) deg+=90;
+			else deg=90-deg;
+			else if(dy<=0) deg=270-deg;
+			else deg+=270;
 			if(drag){
-				node.style.transform='rotate('+(-deg)+'deg)';
-				node.style.height=get.xyDistance(from,to)+'px';
+				node.style.transform=`rotate(${(-deg)}deg)`;
+				node.style.height=`${get.xyDistance(from,to)}px`;
 			}
 			else{
-				node.style.transform='rotate('+(-deg)+'deg) scaleY(0)';
-				node.style.height=get.xyDistance(from,to)+'px';
-				if(get.objtype(arguments[1])=='div'){
-					arguments[1].appendChild(node);
-				}
-				else if(game.chess){
-					ui.chess.appendChild(node);
-				}
-				else{
-					ui.arena.appendChild(node);
-				}
+				node.style.transform=`rotate(${(-deg)}deg) scaleY(0)`;
+				node.style.height=`${get.xyDistance(from,to)}px`;
+				if(get.objtype(arguments[1])=='div') arguments[1].appendChild(node);
+				else if(game.chess) ui.chess.appendChild(node);
+				else ui.arena.appendChild(node);
 				ui.refresh(node);
 				node.show();
-				node.style.transform='rotate('+(-deg)+'deg) scaleY(1)';
-				node.listenTransition(function(){
-					setTimeout(function(){
-						if(node.classList.contains('removing')) return;
-						node.delete();
-					},total/3);
-				});
+				node.style.transform=`rotate(${(-deg)}deg) scaleY(1)`;
+				node.listenTransition(()=>setTimeout(()=>{
+					if(!node.classList.contains('removing')) node.delete();
+				},total/3));
 			}
 			return node;
 		},
@@ -36508,6 +36638,7 @@
 							if(cards[i].name!=cardname||((cardnature||cards[i].nature)&&cards[i].nature!=cardnature)){
 								if(!cards[i]._tempName) cards[i]._tempName=ui.create.div('.tempname',cards[i]);
 								var tempname=get.translation(cardname);
+								cards[i]._tempName.classList[lib.config.cardtempname=='default'?'add':'remove']('vertical');
 								cards[i]._tempName.dataset.nature='fire';
 								if(cardname=='sha'){
 									if(cardnature) tempname=get.translation(cardnature)+tempname;
@@ -48137,6 +48268,7 @@
 					if(get.position(item)=='j'&&item.viewAs&&item.viewAs!=item.name&&lib.config.cardtempname!='off'){
 						node._tempName=ui.create.div('.tempname',node);
 						var tempname=get.translation(item.viewAs);
+						if(lib.config.cardtempname=='default') node._tempName.classList.add('vertical');
 						node._tempName.dataset.nature='wood';
 						node._tempName.innerHTML=lib.config.cardtempname=='default'?get.verticalStr(tempname):tempname;
 						node._tempName.tempname=tempname;
@@ -54539,7 +54671,7 @@
 		},
 		verticalStr:function(str,sp){
 			if(typeof str!='string') return '';
-			return [...str].filter(value=>value!='`').join('');
+			return Array.from(str).filter(value=>value!='`').join('');
 		},
 		numStr:function(num,method){
 			if(num==Infinity){

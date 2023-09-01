@@ -364,10 +364,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				global:'heiguangkai_ai',
 			},
 			tongque_skill:{
-				trigger:{player:'useCardBegin'},
+				trigger:{player:'yingbian'},
 				equipSkill:true,
 				forced:true,
-				filter:(event,player)=>get.is.yingbianConditional(event.card)&&!player.hasHistory('useCard',evt=>get.is.yingbianConditional(evt.card)),
+				filter:(event,player)=>get.is.yingbianConditional(event.card)&&player.getHistory('useCard',evt=>get.is.yingbianConditional(evt.card)).length<2,
 				content:()=>{
 					trigger.forceYingbian=true;
 				}
@@ -434,10 +434,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			_yingbian:{
-				trigger:{player:'useCard1'},
+				trigger:{player:'yingbian'},
 				forced:true,
 				popup:false,
-				firstDo:true,
 				ruleSkill:true,
 				forceLoad:true,
 				filter:(event,player)=>{
@@ -492,7 +491,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!yingbianEffectExecuted){
 						var defaultYingbianEffect=get.defaultYingbianEffect(card);
 						if(lib.yingbian.effect.has(defaultYingbianEffect)){
-							lib.yingbian.effect.get(defaultYingbianEffect)(trigger);
+							game.yingbianEffect(trigger,lib.yingbian.effect.get(defaultYingbianEffect));
 							if(!yingbianEffectExecuted) yingbianEffectExecuted=true;
 						}
 					}

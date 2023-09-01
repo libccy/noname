@@ -4538,9 +4538,13 @@ div[data-decoration="bronze"]::after{
 .card .tempname {
 	color: white !important;
 	font-size: 22px;
-	left: 8px;
+	left: 6px;
 	pointer-events: none;
-	top: 4px;
+	top: 6px;
+}
+.card .tempname.vertical {
+	left: 4px;
+	top: 8px;
 	writing-mode: vertical-rl;
 	-webkit-writing-mode: vertical-rl;
 }

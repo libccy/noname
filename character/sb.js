@@ -3610,7 +3610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				content:function(){
 					'step 0'
-					player.chooseControl('变化','不变').set('prompt','统业：猜测场上装备数是否于你下回合准备阶段前发生变化').set('ai',()=>(game.countPlayer()<=4?Math.random():1)<0.4);
+					player.chooseControl('变化','不变').set('prompt','统业：猜测场上装备数是否于你下回合准备阶段前发生变化').set('ai',()=>Number((game.countPlayer()<=4?Math.random():1)<0.4));
 					'step 1'
 					if(result.control=='变化'){
 						player.addSkill('sbtongye_change',1);
