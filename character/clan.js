@@ -898,6 +898,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				global:'clanlianzhu_global',
 				subSkill:{
 					global:{
+						forceaudio:true,
+						audio:'clanlianzhu',
 						enable:'phaseUse',
 						filter:(event,player)=>game.hasPlayer(current=>lib.skill.clanlianzhu_global.filterTarget(null,player,current)),
 						filterCard:(card,player)=>game.hasPlayer(current=>current.hasSkill('clanlianzhu')&&!current.hasSkill('clanlianzhu_targeted')&&!current.storage.clanlianzhu)&&player.canRecast(card),
@@ -2026,6 +2028,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 6-ui.selected.cards.length-get.value(card);
 				},
 				onuse:function(links,player){
+					lib.skill.chenliuwushi.change(player,-1);
 					player.addTempSkill('clanzhanding_effect');
 				},
 				ai:{
@@ -2044,7 +2047,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.skill=='clanzhanding';
 						},
 						content:function(){
-							lib.skill.chenliuwushi.change(player,-1);
 							if(player.hasHistory('sourceDamage',function(evt){
 								return evt.card==trigger.card;
 							})){
@@ -2283,7 +2285,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chenliuwushi:'陈留·吴氏',
 			clan_wuban:'族吴班',
 			clanzhanding:'斩钉',
-			clanzhanding_info:'你可以将任意张牌当做【杀】使用。你以此法使用的【杀】结算结束后，你令你的手牌上限-1，然后若你因此【杀】造成过伤害，则你将手牌摸至手牌上限（至多摸五张），否则你令此【杀】不计入次数限制。',
+			clanzhanding_info:'你可以将任意张牌当做【杀】使用并你令你的手牌上限-1。你以此法使用的【杀】结算结束后，若你因此【杀】造成过伤害，则你将手牌摸至手牌上限（至多摸五张），否则你令此【杀】不计入次数限制。',
 			clan_xunshu:'族荀淑',
 			clanshenjun:'神君',
 			clanshenjun_info:'当一名角色使用【杀】或普通锦囊牌时，若你手牌中有该牌名的牌，你展示之，且这些牌称为“神君”。然后本阶段结束时，你可以将等同于你“神君”数张牌当做一张“神君”牌使用。',

@@ -51,7 +51,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaozhong:['male','qun',6,['yangzhong','huangkong']],
 			hanfu:['male','qun',4,['hfjieying','weipo']],
 			re_quyi:['male','qun',4,['refuqi','jiaozi']],
-			dongxie:['female','qun','3/4',['juntun','jiaojie']],
+			dongxie:['female','qun',4,['dcjiaoxia','dchumei']],
 			wangrong:['female','qun',3,['minsi','jijing','zhuide']],
 			ol_dingyuan:['male','qun',4,['cixiao','xianshuai']],
 			xin_baosanniang:['female','shu',3,['decadewuniang','decadexushen']],
@@ -111,6 +111,173 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//董翓
+			dcjiaoxia:{
+				mod:{
+					cardUsableTarget:function(card,player,target){
+						if(!player.isPhaseUsing()) return;
+						if(card.name=='sha'&&!player.getStorage('dcjiaoxia_mark').contains(target)) return true;
+					},
+				},
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				filter:function(event,player){
+					return player.countCards('h');
+				},
+				check:function(event,player){
+					return player.countCards('h',card=>{
+						return game.hasPlayer(target=>{
+							var cardx=get.autoViewAs({name:'sha'},[card]);
+							return player.canUse(cardx,target)&&get.effect(target,cardx,player,player)>0&&(!player.hasUseTarget(card)||player.hasValueTarget(card));
+						});
+					});
+				},
+				content:function(){
+					var cards=player.getCards('h');
+					player.addTempSkill('dcjiaoxia_used','phaseUseAfter');
+					player.addGaintag(cards,'dcjiaoxia_used');
+				},
+				group:'dcjiaoxia_load',
+				subSkill:{
+					load:{
+						charlotte:true,
+						trigger:{player:'useCard1'},
+						filter:function(event,player){
+							if(!player.isPhaseUsing()) return false;
+							return event.card.name=='sha'&&event.targets&&event.targets.some(target=>!player.getStorage('dcjiaoxia_mark').contains(target));
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							player.addTempSkill('dcjiaoxia_mark','phaseUseAfter');
+							player.markAuto('dcjiaoxia_mark',trigger.targets.filter(target=>!player.getStorage('dcjiaoxia_mark').contains(target)));
+						},
+					},
+					mark:{
+						charlotte:true,
+						onremove:true,
+					},
+					used:{
+						mod:{
+							aiOrder:function(player,card,num){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('dcjiaoxia_used')) return num+1;
+							},
+							cardname:function(card,player){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('dcjiaoxia_used')) return 'sha';
+							},
+						},
+						charlotte:true,
+						onremove:function(player){
+							player.removeGaintag('dcjiaoxia_used');
+						},
+						trigger:{player:'useCardAfter'},
+						filter:function(event,player){
+							return event.cards&&event.cards.length==1&&player.hasUseTarget(get.copy(event.cards[0]))&&player.getHistory('lose',evt=>{
+								if(evt.getParent()!=event) return false;
+								for(var i in evt.gaintag_map){
+									if(evt.gaintag_map[i].contains('dcjiaoxia_used')) return true;
+								}
+								return false;
+							}).length&&player.getHistory('sourceDamage',evt=>evt.card==event.card).length;
+						},
+						direct:true,
+						content:function(){
+							var card=get.copy(trigger.cards[0]);
+							player.chooseUseTarget(card,get.prompt('dcjiaoxia'),false,false).set('prompt2','视为使用'+get.translation(card)).logSkill='dcjiaoxia';
+						},
+					},
+				},
+			},
+			dchumei:{
+				subSkill:{
+					0:{charlotte:true},
+					1:{charlotte:true},
+					2:{charlotte:true},
+				},
+				onChooseToUse:function(event){
+					if(!game.online&&!event.dchumei_num){
+						var player=event.player;
+						var evtx=event.getParent('phaseUse');
+						event.set('dchumei_num',player.getHistory('sourceDamage',function(evt){
+							return evt.getParent('phaseUse')==evtx;
+						}).length);
+					}
+				},
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					if(typeof event.dchumei_num!='number') return false;
+					return game.hasPlayer(target=>lib.skill.dchumei.filterTarget(null,player,target));
+				},
+				filterTarget:function(card,player,target){
+					if(target.getHp()>_status.event.dchumei_num) return false;
+					if(!player.hasSkill('dchumei_0')) return true;
+					if(!player.hasSkill('dchumei_1')&&target.countCards('he')) return true;
+					if(!player.hasSkill('dchumei_2')&&target.isDamaged()) return true;
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var str=get.translation(target);
+					player.chooseButton([
+						'狐魅：请选择一项',
+						[[
+							[0,'令'+str+'摸一张牌'],
+							[1,'令'+str+'交给你一张牌'],
+							[2,'令'+str+'回复1点体力'],
+						].filter(list=>{
+							if(player.hasSkill('dchumei_'+list[0])) return false;
+							if(list[0]==1&&!target.countCards('he')) return false;
+							if(list[0]==2&&target.isHealthy()) return false;
+							return true;
+						}),'textbutton']
+					],true).set('filterButton',button=>{
+						var target=_status.event.target;
+						if(player.hasSkill('dchumei_'+button.link)) return false;
+						if(button.link==1&&!target.countCards('he')) return false;
+						if(button.link==2&&target.isHealthy()) return false;
+						return true;
+					}).set('ai',function(button){
+						var target=_status.event.target;
+						return [
+							get.effect(target,{name:'wuzhong'},player,player)/2,
+							get.effect(target,{name:'shunshou_copy2'},player,player),
+							get.recoverEffect(target,player,player),
+						][button.link];
+					}).set('target',target);
+					'step 1'
+					if(result.bool){
+						var num=result.links[0];
+						player.addTempSkill('dchumei_'+num,'phaseUseAfter');
+						switch(num){
+							case 0:
+							target.draw();
+							break;
+							case 1:
+							target.chooseCard('狐魅：交给'+get.translation(player)+'一张牌','he',true);
+							break;
+							case 2:
+							target.recover();
+							break;
+						}
+						if(num!=1) event.finish();
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool) player.gain(result.cards,target,'giveAuto');
+				},
+				ai:{
+					order:1,
+					result:{
+						target:function(player,target){
+							if(!player.hasSkill('dchumei_0')) return 1;
+							if(!player.hasSkill('dchumei_1')) return -1;
+							if(!player.hasSkill('dchumei_2')) return 1;
+						},
+					},
+				},
+			},
 			//魏关羽
 			dcdanji:{
 				audio:'danji',
@@ -10060,6 +10227,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			juntun_info:'锁定技，准备阶段，若X大于1，则你减1点体力上限并摸X张牌（X为你的体力上限）。',
 			jiaojie:'狡黠',
 			jiaojie_info:'锁定技，你的红色牌不计入手牌上限。你使用黑色牌无距离和次数限制。',
+			dcjiaoxia:'狡黠',
+			dcjiaoxia_info:'①出牌阶段开始时，你可以令自己的所有手牌于此阶段均视为【杀】。若如此做，你使用以此法转化的【杀】造成伤害后，你可以视为使用此牌对应的原卡牌。②出牌阶段，你对你本阶段未使用过【杀】的角色使用【杀】无次数限制。',
+			dchumei:'狐魅',
+			dchumei_info:'出牌阶段各限一次，你可以选择一名体力值不大于X的角色，令其：①摸一张牌。②交给你一张牌。③回复1点体力。（X为你本阶段造成伤害的次数）',
 			buchen:'不臣',
 			buchen_info:'隐匿技，你于其他角色的回合登场时，可获得当前回合角色的一张牌。',
 			smyyingshi:'鹰视',
