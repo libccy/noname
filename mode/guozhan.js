@@ -13336,9 +13336,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						target.chat('拒绝');
-						game.delay(1.5);
 						event.targets3.push(target);
 					}
+					game.delay(1.5);
 					if(targets.length) event.goto(5);
 					else if(event.targets4.length){
 						for(var i of event.targets4){
