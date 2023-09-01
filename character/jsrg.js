@@ -84,7 +84,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:5,
 					result:{
-						target:function(player,target){
+						player:function(player,target){
 							var eff=Math.sign(get.effect(target,{name:'juedou'},player,player));
 							if(player.hasSkillTag('directHit_ai',true,{
 								target:target,
@@ -92,10 +92,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},true)||ui.selected.targets.concat(target).reduce((p,c)=>{
 								return p+c.countCards('h');
 							},0)<player.countCards('h','sha')){
-								return -eff;
+								return 0;
 							}
-							return eff;
-						}
+							return -114514;
+						},
+						target:-1.5,
 					}
 				},
 				subSkill:{
@@ -1253,7 +1254,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.asked=true;
 						player.chooseButton([
 							'###'+get.prompt('jsrgjixiang',trigger.player)+'###<div class="text center">'+str+'</div>',
-							[listx,'vcard']
+							[listx,'vcard'],
 						]).set('ai',()=>Math.random()+1);
 					}
 					'step 1'
@@ -1261,6 +1262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var name=result.links[0][2],nature=result.links[0][3];
 						var card={name:name,nature:nature,isCard:true};
 						event.card=card;
+						var evt=trigger.getParent();
 						var reason=(trigger.name=='chooseToUse'?'使用':'打出');
 						var prompt=event.asked?
 							'济乡：是否弃置一张牌'+(trigger.filterTarget?'并选择目标角色':'')+'？':
@@ -2827,7 +2829,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				getNum:function(target,player){
-					return target.countCards(card=>{
+					return target.countCards('e',card=>{
 						var subtype=get.subtypes(card);
 						for(var i of subtype){
 							if(player.hasDisabledSlot(i)) return true;
@@ -2902,6 +2904,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 0;
 							}
 						});
+					}
+					else{
+						event.finish();
+						return;
 					}
 					'step 2'
 					if(result.bool){event.finish();return;}

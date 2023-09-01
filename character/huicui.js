@@ -6475,10 +6475,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					targetInRange:function(card,player,target){
-						for(var i=1;i<=5;i++){
-							if(!player.hasDisabledSlot(i)) return false;
-						}
-						return true;
+						if(!player.hasEnabledSlot()) return true;
 					},
 				},
 				marktext:'萍',

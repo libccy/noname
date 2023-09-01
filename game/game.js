@@ -22194,7 +22194,7 @@
 					}
 					if(result.card||!result.skill){
 						result.used=result.card||result.cards[0];
-						var next=this.useCard(result.card,result.cards,result.targets,result.skill);
+						var next=this.useCard(result.used,result.cards,result.targets,result.skill);
 						next.oncard=event.oncard;
 						next.respondTo=event.respondTo;
 						if(event.addCount===false){
@@ -30240,7 +30240,10 @@
 					var isRound=false;
 					if(!trigger.skill){
 						isRound=_status.roundSkipped;
-						if(_status.seatNumSettled){
+						if(_status.isRoundFilter){
+							isRound=_status.isRoundFilter(trigger,player);
+						}
+						else if(_status.seatNumSettled){
 							var seatNum=player.getSeatNum();
 							if(seatNum!=0){
 								if(typeof _status.lastSeatNum!='number'||seatNum<_status.lastSeatNum) isRound=true;

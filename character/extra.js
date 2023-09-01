@@ -5808,6 +5808,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								evt.cards&&evt.cards.length==2&&_status.currentPhase&&_status.currentPhase!=player&&_status.currentPhase.countDiscardableCards(player,'he');
 						},
 						content:function(){
+							//game.log(trigger.card)
+							//game.log(trigger.cards)
 							player.line(_status.currentPhase,'green');
 							player.discardPlayerCard(_status.currentPhase,'he',true);
 						}

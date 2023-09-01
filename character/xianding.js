@@ -4013,7 +4013,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger._triggered=5;
 							var evt=player.insertPhase();
 							delete evt.skill;
-						}
+						} 
 					}
 				},
 				subSkill:{

@@ -285,6 +285,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var storage=player.storage.clanjiexuan;
 					return get.color(card)==((storage||0)%2?'black':'red');
 				},
+				prompt:function(){
+					if(_status.event.player.storage.clanjiexuan) return '将一张黑色牌当【过河拆桥】使用';
+					return '将一张红色牌当【顺手牵羊】使用';
+				},
 				skillAnimation:true,
 				animationColor:'thunder',
 				precontent:function(){
@@ -829,15 +833,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				clanSkill:true,
 				filter:function(event,player){
 					if(!event.cards.length) return true;
-					var cards=[];
-					game.countPlayer(current=>{
+					return !game.hasPlayer2(current=>{
 						if(!current.hasClan('太原王氏')&&current!=player) return false;
-						current.getHistory('lose',evt=>{
-							if(event!=evt.getParent()) return false;
-							cards.addArray(evt.getl(current).hs);
+						return current.hasHistory('lose',evt=>{
+							return evt.getParent()==event&&evt.hs.length>0;
 						});
 					});
-					return !event.cards.some(card=>cards.contains(card));
 				},
 				content:function(){
 					'step 0'
@@ -2272,6 +2273,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanguangu:function(player){
 				if(player.storage.clanguangu) return '转换技，出牌阶段限一次。阴：你可以观看牌堆顶的至多四张牌；<span class="bluetext">阳：你可以观看一名角色的至多四张手牌。</span>然后你可以使用其中的一张牌。';
 				return '转换技，出牌阶段限一次。<span class="bluetext">阴：你可以观看牌堆顶的至多四张牌；</span>阳：你可以观看一名角色的至多四张手牌。然后你可以使用其中的一张牌。';
+			},
+			clanjiexuan:function(player){
+				if(player.storage.clanjiexuan) return '限定技，转换技。阴：你可以将一张红色牌当【顺手牵羊】使用；<span class="bluetext">阳：你可以将一张黑色牌当【过河拆桥】使用。</span>';
+				return '限定技，转换技。<span class="bluetext">阴：你可以将一张红色牌当【顺手牵羊】使用；</span>阳：你可以将一张黑色牌当【过河拆桥】使用。';
 			},
 		},
 		translate:{

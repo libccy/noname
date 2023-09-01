@@ -11514,7 +11514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target=result.targets[0];
 						var list=[];
 						if(player.hasEnabledSlot(3)) list.push('equip3');
-						if(!player.hasEnabledSlot(4)) list.push('equip4');
+						if(player.hasEnabledSlot(4)) list.push('equip4');
 						if(list.length==1) event._result={control:list[0]};
 						else player.chooseControl(list).set('prompt','选择废除一个坐骑栏');
 					}

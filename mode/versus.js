@@ -3589,6 +3589,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			phaseLoopThree:function(player){
+				_status.isRoundFilter=function(event){
+					return event._isThreeRound===true;
+				};
 				var next=game.createEvent('phaseLoop');
 				next.player=player;
 				next.swap=function(player){
@@ -3601,8 +3604,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				};
 				next.setContent(function(){
 					'step 0'
+					var next=player.phase();
+					if(!game.players.some(current=>current.classList.contains('acted'))){
+						next._isThreeRound=true;
+					}
 					player.classList.add('acted');
-					player.phase();
 					'step 1'
 					if(player.identity!='zhu'){
 						for(var i=0;i<game.players.length;i++){

@@ -511,7 +511,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_xunyou:['male','wei',3,['gzqice','zhiyu'],['gzskin']],
 				gz_lingtong:['male','wu',4,['xuanlve','yongjin'],['gzskin']],
 				gz_lvfan:['male','wu',3,['xindiaodu','gzdiancai']],
-				gz_masu:['male','shu',3,['sanyao','gzzhiman'],['gzskin']],
+				gz_masu:['male','shu',3,['gzsanyao','gzzhiman'],['gzskin']],
 				gz_shamoke:['male','shu',4,['gzjili'],['gzskin']],
 				
 				gz_lingcao:['male','wu',4,['dujin']],
@@ -9421,11 +9421,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					return list.length<=1;
 				},
+				check:function(event,player){
+					return player.needsToDiscard();
+				},
 				content:function(){
 					player.addTempSkill('keji_add','phaseAfter');
 				},
 			},
 			"keji_add":{
+				charlotte:true,
 				mod:{
 					maxHandcard:function(player,num){
 						return num+4;
