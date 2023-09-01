@@ -23050,7 +23050,7 @@
 					return next;
 				},
 				changeHp:function(num,popup){
-					var next=game.createEvent('changeHp',false);
+					var next=game.createEvent('changeHp');
 					next.num=num;
 					if(popup!=undefined) next.popup=popup;
 					next.player=this;
@@ -37446,7 +37446,7 @@
 			return next;
 		},
 		chooseCharacterDouble:function(){
-			var next=game.createEvent('chooseCharacter',false);
+			var next=game.createEvent('chooseCharacter');
 			var config,width,num,ratio,func,update,list,first;
 			for(var i=0;i<arguments.length;i++){
 				if(typeof arguments[i]=='number'){

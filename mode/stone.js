@@ -1450,7 +1450,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.additionaldead=[];
 			},
 			chooseCharacter:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.setContent(function(){
 					"step 0"

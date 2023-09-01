@@ -1127,7 +1127,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chooseCharacter:function(func){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.customreplacetarget=func;
 				next.ai=function(player,list){
