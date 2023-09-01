@@ -134,7 +134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var cards=player.getCards('h');
-					player.addTempSkill('dcjiaoxia_used');
+					player.addTempSkill('dcjiaoxia_used','phaseUseAfter');
 					player.addGaintag(cards,'dcjiaoxia_used');
 				},
 				group:'dcjiaoxia_load',
