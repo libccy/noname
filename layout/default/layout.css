@@ -2869,7 +2869,7 @@ div:not(.handcards)>.card>.info>span,
 .linked>.count {
 	right: 154px;
 }
-.acted>.identity {
+.acted>.identity>div {
 	transform: rotate(180deg);
 }
 

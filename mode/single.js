@@ -322,7 +322,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				return player.isAlive();
 			},
 			chooseCharacterDianjiang:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.setContent(function(){
 					"step 0"
@@ -376,7 +376,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.chooseCharacterDianjiang();
 					return;
 				}
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.setContent(function(){
 					"step 0"
@@ -547,7 +547,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterDianjiangOL:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.setContent(function(){
 					"step 0"
@@ -613,7 +613,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.chooseCharacterDianjiangOL();
 					return;
 				}
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					ui.arena.classList.add('choose-character');
