@@ -1304,7 +1304,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.target=target;
 					target.addTempSkill('gzyechou_unsavable');
 					player.useCard({name:'sha',isCard:true},target).set('forceDie',true).set('oncard',function(){
-						_status.event.directHit.add(game.filterPlayer());
+						_status.event.directHit.addArray(game.filterPlayer());
 					});
 					'step 1'
 					player.addTempSkill('gzyechou_unequip');
