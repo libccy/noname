@@ -128,7 +128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h',card=>{
 						return game.hasPlayer(target=>{
 							var cardx=get.autoViewAs({name:'sha'},[card]);
-							return player.canUse(cardx,target)&&get.effect(cardx,target,player,player)>0&&(!player.hasUseTarget(card)||player.hasValueTarget(card));
+							return player.canUse(cardx,target)&&get.effect(target,cardx,player,player)>0&&(!player.hasUseTarget(card)||player.hasValueTarget(card));
 						});
 					});
 				},
