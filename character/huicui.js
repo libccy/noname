@@ -885,12 +885,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.chooseToUse(function(card,player,event){
 						if(get.name(card)!='sha') return false;
 						return lib.filter.filterCard.apply(this,arguments);
-					},'是否对'+get.translation(player)+'使用一张【杀】（伤害基数为'+num+'）？').set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
+					},'是否对'+get.translation(player)+'使用一张无距离限制的【杀】（伤害基数为'+num+'）？').set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
 						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
-						return lib.filter.filterTarget.apply(this,arguments);
+						return lib.filter.targetEnabled.apply(this,arguments);
 					}).set('sourcex',player).set('num',num).set('oncard',card=>{
-						var evt=_status.event;
-						evt.baseDamage=evt.num;
+						_status.event.baseDamage=_status.event.getParent().num;
 					});
 					'step 2'
 					if(result.bool){
@@ -904,7 +903,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						onremove:true,
 					},
-					ban:{charlotte:true},
+					ban:{
+						charlotte:true,
+						mark:true,
+						marktext:'欲',
+						intro:{content:'偷马贼被反打了！'},
+					},
 					ai:{
 						ai:{
 							effect:{
@@ -937,7 +941,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								target:player,
 								card:{name:'sha'},
 							},true)) return eff;
-							if(player.getStorage('dcmoyu_clear').length||player.hp+player.countCards('hs','tao')<=1) return 0;
+							if(target.hasSha()&&player.hp+player.countCards('h',function(card){
+								var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+								if(mod2!='unchanged') return mod2;
+								var mod=game.checkMod(card,player,player,'unchanged','cardSavable',player);
+								if(mod!='unchanged') return mod;
+								var savable=get.info(card).savable;
+								if(typeof savable=='function') savable=savable(card,player,player);
+								return savable;
+							})<=player.getStorage('dcmoyu_clear').length+1) return 0;
 							return eff;
 						}
 					}
@@ -1147,6 +1159,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					targetInRange:function(card){
 						if(card.storage&&card.storage.dcjieling) return true;
+					},
+					cardUsable:function(card,player,num){
+						if(card.storage&&card.storage.dcjieling) return Infinity;
 					},
 				},
 				subSkill:{
@@ -10197,7 +10212,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsigong_info:'其他角色的回合结束时，若其于本回合内使用牌被响应过，你可以将手牌摸至或弃置至1，视为对其使用一张需使用X张【闪】抵消的【杀】，且此【杀】的伤害基数+1（X为你以此法弃置的牌数且至少为1）。当你以此法造成伤害后，该技能于本轮失效。',
 			peiyuanshao:'裴元绍',
 			dcmoyu:'没欲',
-			dcmoyu_info:'出牌阶段每名角色限一次。你可以获得一名其他角色区域里的一张牌，然后其可以对你使用一张【杀】，且此【杀】伤害基数为X（X为你于本回合发动此技能的次数）。若此【杀】对你造成了伤害，你令此技能于本回合失效。',
+			dcmoyu_info:'出牌阶段每名角色限一次。你可以获得一名其他角色区域里的一张牌，然后其可以对你使用一张无距离限制的【杀】，且此【杀】伤害基数为X（X为你于本回合发动此技能的次数）。若此【杀】对你造成了伤害，你令此技能于本回合失效。',
 			zhangchu:'张楚',
 			dcjizhong:'集众',
 			dcjizhong_info:'出牌阶段限一次。你可以令一名其他角色摸两张牌，然后其选择一项：1.若其没有“信众”标记，其获得“信众”标记；2.弃置三张手牌。',
