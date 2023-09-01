@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
 				extra_tw:['tw_shen_guanyu','tw_shen_lvmeng'],
-				extra_offline:['shen_diaochan','boss_zhaoyun'],
+				extra_offline:['shen_diaochan','boss_zhaoyun','shen_dianwei'],
 			},
 		},
 		character:{
@@ -2820,7 +2820,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							if(result.control!='cancel2'){
 								if(result.control=='选项二'){
-									player.logSkill('tspowei',target);
+									player.logSkill('tspowei_use',target);
 									player.gainPlayerCard(target,'h',true);
 									event.goto(3);
 								}
