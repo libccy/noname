@@ -143,6 +143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						trigger:{player:'useCard1'},
 						filter:function(event,player){
+							if(!player.isPhaseUsing()) return false;
 							return event.card.name=='sha'&&event.targets&&event.targets.some(target=>!player.getStorage('dcjiaoxia_mark').contains(target));
 						},
 						forced:true,
