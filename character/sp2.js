@@ -128,7 +128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h',card=>{
 						return game.hasPlayer(target=>{
 							var cardx=get.autoViewAs({name:'sha'},[card]);
-							return player.canUse(cardx,target,false)&&get.effect(cardx,target,player,player)>0&&(!player.hasUseTarget(card)||player.hasValueTarget(card));
+							return player.canUse(cardx,target)&&get.effect(cardx,target,player,player)>0&&(!player.hasUseTarget(card)||player.hasValueTarget(card));
 						});
 					});
 				},
@@ -172,7 +172,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						trigger:{player:'useCardAfter'},
 						filter:function(event,player){
-							return event.cards&&player.hasUseTarget(get.copy(event.cards[0]))&&player.getHistory('lose',evt=>{
+							return event.cards&&event.cards.length==1&&player.hasUseTarget(get.copy(event.cards[0]))&&player.getHistory('lose',evt=>{
 								if(evt.getParent()!=event) return false;
 								for(var i in evt.gaintag_map){
 									if(evt.gaintag_map[i].contains('dcjiaoxia_used')) return true;
