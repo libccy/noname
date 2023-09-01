@@ -7920,6 +7920,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:3,
 				enable:'phaseUse',
 				usable:1,
+				filter:function(event,player){
+					return game.hasPlayer(function(target){
+						return lib.skill.beizhu.filterTarget(null,player,target);
+					});
+				},
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('h')>0;
 				},
@@ -7933,12 +7938,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.cards=cards;
 						event.goto(5);
 					}
-					else player.discardPlayerCard('he',target,true);
+					else player.discardPlayerCard('he',target,'visible',true);
 					'step 2'
-					player.chooseBool('是否令'+get.translation(target)+'获得一张【杀】？').set('ai',function(){
-						var evt=_status.event.getParent();
-						return get.attitude(evt.player,evt.target)>0;
-					});
+					player.chooseBool('是否令'+get.translation(target)+'获得一张【杀】？').set('choice',get.attitude(player,target)>0);
 					'step 3'
 					if(result.bool){
 						var card=get.cardPile2(function(card){
@@ -7964,6 +7966,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.useCard(player,false,card).card.beizhu=true;
 						event.redo();
 					}
+				},
+				ai:{
+					order:7,
+					threaten:1.14+5.14,
+					result:{
+						player:function(player,target){
+							var eff=get.effect(target,{name:'guohe_copy2'},player,player);
+							var cards=target.getCards('h',{name:'sha'});
+							if(!cards.length) return eff;
+							return eff/(cards.length+3);
+						},
+					},
 				},
 			},
 			beizhu_draw:{
