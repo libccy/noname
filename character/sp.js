@@ -9038,7 +9038,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var type=get.type(trigger.card,false);
 					player.chooseToDiscard('h',get.prompt('olfengzi'),'弃置一张'+get.translation(type)+'牌，令'+get.translation(trigger.card)+'结算两次',function(card,player){
 						return get.type2(card,player)==_status.event.type;
-					}).set('type',type).set('ai',()=>-1).logSkill='olfengzi';
+					}).set('type',type).set('ai',function(card){
+						var player=_status.event.player;
+						var trigger=_status.event.getTrigger();
+						if(trigger.card.name=='tiesuo') return 0;
+						var num=0;
+						for(var i of trigger.targets) num+=get.effect(i,trigger.card,player,player);
+						if(num<=0) return 0;
+						return 7-get.value(card);
+					}).logSkill='olfengzi';
 					'step 1'
 					if(result.bool){
 						trigger.effectCount++;
