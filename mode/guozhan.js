@@ -1536,7 +1536,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			//毌丘俭
 			gzzhengrong:{
-				audio:'drlt_zhengrong',
+				audio:'drlt_zhenrong',
 				trigger:{
 					source:'damageBegin3',
 					player:['damageBegin1','chooseJunlingForBegin'],
