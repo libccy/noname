@@ -15699,7 +15699,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						delete source.shijun;
 					}
 					else if(source&&source.identity!='unknown'){
-						if(source.identity=='ye') source.draw(3);
+						if(source.identity=='ye'&&!source.getStorage('yexinjia_friend').length) source.draw(3);
 						else if(source.shijun2){
 							delete source.shijun2;
 							source.draw(1+game.countPlayer(function(current){
