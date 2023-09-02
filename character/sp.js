@@ -3259,57 +3259,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'damageEnd',
 					source:'damageSource',
 				},
-				filter:function(event,player){
-					return player.getAttackRange()>0&&player.getStockSkills(false,true).length;
-				},
 				forced:true,
+				filter:function(event,player){
+					return player.getAttackRange()>0;
+				},
 				content:function(){
-					var skills=player.getStockSkills(false,true);
+					var skills=game.filterSkills(player.getStockSkills(true,true),player);
 					var num=Math.min(player.getAttackRange(),skills.length);
 					skills=skills.slice(0,num);
-					player.removeSkill(skills);
+					player.disableSkill('olchuanwu',skills);
 					player.addTempSkill('olchuanwu_restore');
-					player.markAuto('olchuanwu_restore',skills.filter(skill=>!player.getStorage('olchuanwu_restore').contains(skill)));
 					var str='';
 					for(var i of skills){
 						str+='【'+get.translation(i)+'】、';
 						player.popup(i);
 					}
 					str=str.slice(0,-1);
-					game.log(player,'失去了技能','#g'+str);
+					game.log(player,'的技能','#g'+str,'失效了');
 					player.draw(num);
 				},
 				subSkill:{
 					restore:{
 						charlotte:true,
+						forced:true,
+						popup:false,
 						onremove:function(player){
-							var skills=player.getStorage('olchuanwu_restore');
-							skills.sort(function(a,b){
-								var getNum=function(skill){
-									if(!player.getStockSkills(true,true).contains(skill)) return skills.length;
-									return player.getStockSkills(true,true).indexOf(skill);
-								};
-								return getNum(a)-getNum(b);
-							});
-							player.addSkill(skills);
-							game.broadcastAll(function(player,skills){
-								player.skills.removeArray(skills);
-								for(var i=skills.length-1;i>=0;i--){
-									player.skills.unshift(skills[i]);
-								}
-							},player,skills);
-							player.update();
-							var str='';
-							for(var i of skills){
-								str+='【'+get.translation(i)+'】、';
-								player.popup(i);
-							}
-							str=str.slice(0,-1);
-							game.log(player,'恢复了技能','#g'+str);
-							delete player.storage.olchuanwu_restore;
-						},
-					},
-				},
+							player.enableSkill('olchuanwu');
+							game.log(player,'恢复了技能');
+						}
+					}
+				}
 			},
 			oljianhe:{
 				audio:2,
@@ -5404,6 +5383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				filter:function(event,player){
 					var color=get.color(event.card);
+					if(color=='none') return false;
 					if(!player.hasHistory('lose',function(evt){
 						return evt.hs.length>0&&evt.getParent()==event;
 					})||!event.cards.filterInD('oe').length) return false;
@@ -5411,7 +5391,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var index=history.indexOf(event);
 					if(index<1) return false;
 					var evt=history[index-1],color2=get.color(evt.card);
-					return color!=color2;
+					return color!=color2&&color2!='none';
 				},
 				prompt2:(event)=>'将'+get.translation(event.cards.filterInD('oe'))+'置于武将牌上',
 				check:function(event,player){
@@ -5444,7 +5424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var history=game.getGlobalHistory('useCard');
 							if(!history.length) return;
 							var evt=history[history.length-1];
-							if(evt&&evt.card&&get.color(evt.card)!=get.color(card)){
+							if(evt&&evt.card&&get.color(evt.card)!='none'&&get.color(card)!='none'&&get.color(evt.card)!=get.color(card)){
 								return num+4;
 							}
 						}
