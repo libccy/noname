@@ -16491,7 +16491,6 @@
 					else{
 						game.logv(player,[card,cards],targets);
 					}
-					game.logv(player,[card,cards],targets);
 					event.trigger('useCard1');
 					"step 1"
 					event.trigger('yingbian');
