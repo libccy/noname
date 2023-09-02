@@ -16486,11 +16486,12 @@
 						}
 					}
 					if(card.name=='wuxie'){
-						game.logv(player,[card,cards],[event.getTrigger().card]);
+						game.logv(player,[card,cards],[evt.card]);
 					}
 					else{
 						game.logv(player,[card,cards],targets);
 					}
+					game.logv(player,[card,cards],targets);
 					event.trigger('useCard1');
 					"step 1"
 					event.trigger('yingbian');
@@ -38404,7 +38405,7 @@
 				}
 			}
 			else if(Array.isArray(card)){
-				node.cards=card[1];
+				node.cards=card[1].slice(0)
 				card=card[0];
 				const info=[card.suit||'',card.number||'',card.name||'',card.nature||''];
 				if(!Array.isArray(node.cards)||!node.cards.length) node.cards=[ui.create.card(node,'noclick',true).init(info)];
