@@ -8470,22 +8470,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool&&result.cards.length){
 						target.recast(result.cards,null,(player,cards)=>{
-							var type=get.type(result.cards[0],'trick');
-							var name=result.cards[0].name;
-							var card2=get.cardPile(function(card){
-								return get.type(card,'trick')==type&&card.name!=name;
-							});
-							if(!card2){
-								card2=get.cardPile(function(card){
-									return get.type(card,'trick')==type;
-								});
-							}
-							if(card2){
-								target.gain(card2,'draw');
-							}
-							else{
-								target.draw().log=false;
-							}
+							var type=get.type(cards[0],'trick'),name=cards[0].name,card2=get.cardPile(card=>get.type(card,'trick')==type&&card.name!=name);
+							if(!card2) card2=get.cardPile(card=>get.type(card,'trick')==type);
+							if(card2) player.gain(card2,'draw');
+							else player.draw().log=false;
 						});
 						var clone=game.createCard(card);
 						player.gain(clone,'gain2');

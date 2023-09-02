@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
 				extra_tw:['tw_shen_guanyu','tw_shen_lvmeng'],
-				extra_offline:['shen_diaochan','boss_zhaoyun'],
+				extra_offline:['shen_diaochan','boss_zhaoyun','shen_dianwei'],
 			},
 		},
 		character:{
@@ -1010,9 +1010,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(lib.translate[name+'_info']){
 						str+=(''+lib.translate[name+'_info']+'|');
 					}
-					if(lib.card[name].yingbian_prompt&&get.is.yingbian(node)){
-						if(typeof lib.card[name].yingbian_prompt=='function') str+=('应变：'+lib.card[name].yingbian_prompt(node)+'|');
-						else str+=('应变：'+lib.card[name].yingbian_prompt+'|');
+					if(get.is.yingbianConditional(node)){
+						const yingbianEffects=get.yingbianEffects(node);
+						if(!yingbianEffects.length){
+							const defaultYingbianEffect=get.defaultYingbianEffect(node);
+							if(lib.yingbian.prompt.has(defaultYingbianEffect)) yingbianEffects.push(defaultYingbianEffect);
+						}
+						if(yingbianEffects.length) str+=`应变：${yingbianEffects.map(value=>lib.yingbian.prompt.get(value)).join('；')}|`;
 					}
 					return str;
 				},
@@ -2337,199 +2341,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'hina_shenshi_yingbian',
 			},
 			hina_shenshi_yingbian:{
-				trigger:{player:'useCard1'},
+				trigger:{player:'yingbian'},
 				forced:true,
-				filter:function(event,player){
-					return event.cards.length==1&&!event.card.yingbian&&player.hasHistory('lose',function(evt){
-						if(evt.getParent()!=event) return false;
-						for(var i in evt.gaintag_map){
-							if(evt.gaintag_map[i].contains('hina_shenshi')) return true;
-						}
-						return false;
-					})&&Array.isArray(get.info(event.card).yingbian_tags);
-				},
-				content:function(){
-					if(!trigger.card.yingbian){
-						trigger.card.yingbian=true;
-						var info=get.info(trigger.card);
-						trigger.card.cardtags=info.yingbian_tags.map(function(i){
-							return 'yingbian_'+i;
-						});
-						if(info&&info.yingbian) info.yingbian(trigger);
-						player.addTempSkill('yingbian_changeTarget');
-					}
-				},
+				filter:(event,player)=>event.card.isCard&&player.hasHistory('lose',evt=>evt.getParent()==event&&Object.values(evt.gaintag_map).some(value=>value.includes('hina_shenshi'))),
+				content:()=>{
+					if(!Array.isArray(trigger.temporaryYingbian)) trigger.temporaryYingbian=[];
+					trigger.temporaryYingbian.add('force');
+					trigger.temporaryYingbian.addArray(get.yingbianEffects());
+				}
 			},
 			hina_xingzhi:{
 				groupSkill:true,
-				trigger:{player:'useCard1'},
+				trigger:{player:'yingbian'},
 				usable:1,
-				filter:function(event,player){
-					return player.group=='key'&&!event.card.yingbian&&Array.isArray(get.info(event.card).yingbian_tags);
-				},
-				content:function(){
+				filter:(event,player)=>player.group=='key'&&!event.card.yingbian&&lib.yingbian.condition.complex.has('zhuzhan'),
+				content:()=>{
 					'step 0'
-					var info=get.info(trigger.card);
-					trigger.card.cardtags=info.yingbian_tags.map(function(i){
-						return 'yingbian_'+i;
-					});
-					event.card=trigger.card;
-					event._global_waiting=true;
-					event.send=function(player,card,source,targets,id,id2,skillState){
-						if(skillState){
-							player.applySkills(skillState);
+					trigger.yingbianZhuzhanAI=(player,card,source,targets)=>cardx=>{
+						if(get.attitude(player,source)<=0) return 0;
+						var info=get.info(card),num=0;
+						if(info&&info.ai&&info.ai.yingbian){
+							var ai=info.ai.yingbian(card,source,targets,player);
+							if(ai) num=ai;
 						}
-						var type=get.type2(card);
-						var str=get.translation(source);
-						if(targets&&targets.length){
-							str+='对';
-							str+=get.translation(targets);
-						}
-						str+='使用了';
-						var next=player.chooseCard({
-							filterCard:function(card){
-								return get.type2(card)==type&&lib.filter.cardDiscardable.apply(this,arguments);
-							},
-							prompt:str+=(get.translation(card)+'，是否弃置一张'+get.translation(type)+'为其助战？'),
-							position:'h',
-							_global_waiting:true,
-							id:id,
-							id2:id2,
-							ai:function(cardx){
-								var info=get.info(card),num=0;
-								if(info&&info.ai&&info.ai.yingbian){
-									var ai=info.ai.yingbian(card,source,targets,player);
-									if(ai) num=ai;
-								}
-								if(get.attitude(player,source)<=0) return 0;
-								return Math.max(ai,6)-get.value(cardx);
-							},
-						});
-						if(game.online){
-							_status.event._resultid=id;
-							game.resume();
-						}
+						return Math.max(num,6)-get.value(cardx);
 					};
+					trigger.afterYingbianZhuzhan=event=>event.zhuzhanresult.draw(2);
+					lib.yingbian.condition.complex.get('zhuzhan')(trigger);
 					'step 1'
-					var type=get.type2(card);
-					var list=game.filterPlayer(function(current){
-						if(current==player) return false;
-						if(!current.countCards('h')) return false;
-						return _status.connectMode||current.countCards('h',function(cardx){
-							return get.type2(cardx)==type;
-						})
-					});
-					event.list=list;
-					event.id=get.id();
-					list.sort(function(a,b){
-						return get.distance(event.source,a,'absolute')-get.distance(event.source,b,'absolute');
-					});
-					'step 2'
-					if(event.list.length==0){
-						event.finish();
-						return;
-					}
-					else if(_status.connectMode&&(event.list[0].isOnline()||event.list[0]==game.me)){
-						event.goto(4);
-					}
-					else{
-						event.current=event.list.shift();
-						event.send(event.current,event.card,player,trigger.targets,event.id,trigger.parent.id);
-					}
-					'step 3'
-					if(result.bool){
-						event.zhuzhanresult=event.current;
-						event.zhuzhanresult2=result;
-						if(event.current!=game.me) game.delayx();
-						event.goto(8);
-					}
-					else{
-						event.goto(2);
-					}
-					'step 4'
-					var id=event.id;
-					var sendback=function(result,player){
-						if(result&&result.id==id&&!event.zhuzhanresult&&result.bool){
-							event.zhuzhanresult=player;
-							event.zhuzhanresult2=result;
-							game.broadcast('cancel',id);
-							if(_status.event.id==id&&_status.event.name=='chooseCard'&&_status.paused){
-								return (function(){
-									event.resultOL=_status.event.resultOL;
-									ui.click.cancel();
-									if(ui.confirm) ui.confirm.close();
-								});
-							}
-						}
-						else{
-							if(_status.event.id==id&&_status.event.name=='chooseCard'&&_status.paused){
-								return (function(){
-									event.resultOL=_status.event.resultOL;
-								});
-							}
-						}
-					};
-
-					var withme=false;
-					var withol=false;
-					var list=event.list;
-					for(var i=0;i<list.length;i++){
-						if(list[i].isOnline()){
-							withol=true;
-							list[i].wait(sendback);
-							list[i].send(event.send,list[i],event.card,player,trigger.targets,event.id,trigger.parent.id,get.skillState(list[i]));
-							list.splice(i--,1);
-						}
-						else if(list[i]==game.me){
-							withme=true;
-							event.send(list[i],event.card,player,trigger.targets,event.id,trigger.parent.id);
-							list.splice(i--,1);
-						}
-					}
-					if(!withme){
-						event.goto(6);
-					}
-					if(_status.connectMode){
-						if(withme||withol){
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i]!=player) game.players[i].showTimer();
-							}
-						}
-					}
-					event.withol=withol;
-					'step 5'
-					if(result&&result.bool&&!event.zhuzhanresult){
-						game.broadcast('cancel',event.id);
-						event.zhuzhanresult=game.me;
-						event.zhuzhanresult2=result;
-					}
-					'step 6'
-					if(event.withol&&!event.resultOL){
-						game.pause();
-					}
-					'step 7'
-					for(var i=0;i<game.players.length;i++){
-						game.players[i].hideTimer();
-					}
-					'step 8'
-					if(event.zhuzhanresult){
-						var target=event.zhuzhanresult;
-						target.line(player,'green');
-						target.discard(event.zhuzhanresult2.cards).discarder=target;
-						target.draw(2);
-						target.popup('助战','wood');
-						game.log(target,'响应了',player,'发起的助战');
-						target.addExpose(0.2);
-					}
-					else event.finish();
-					'step 9'
-					if(!trigger.card.yingbian){
-						trigger.card.yingbian=true;
-						var info=get.info(trigger.card);
-						if(info&&info.yingbian) info.yingbian(trigger);
-						player.addTempSkill('yingbian_changeTarget');
-					}
-				},
+					if(!result.bool) return;
+					trigger.card.yingbian=true;
+					lib.yingbian.effect.forEach(value=>game.yingbianEffect(trigger,value));
+					player.addTempSkill('yingbian_changeTarget');
+				}
 			},
 			yingba:{
 				audio:2,
@@ -2985,7 +2829,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							if(result.control!='cancel2'){
 								if(result.control=='选项二'){
-									player.logSkill('tspowei',target);
+									player.logSkill('tspowei_use',target);
 									player.gainPlayerCard(target,'h',true);
 									event.goto(3);
 								}
@@ -5964,6 +5808,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								evt.cards&&evt.cards.length==2&&_status.currentPhase&&_status.currentPhase!=player&&_status.currentPhase.countDiscardableCards(player,'he');
 						},
 						content:function(){
+							//game.log(trigger.card)
+							//game.log(trigger.cards)
 							player.line(_status.currentPhase,'green');
 							player.discardPlayerCard(_status.currentPhase,'he',true);
 						}

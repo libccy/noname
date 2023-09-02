@@ -398,19 +398,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_simazhao:['male','ye',3,['gzzhaoxin','gzsuzhi'],['gzskin']],
 				gz_gongsunyuan:['male','ye',4,['gzhuaiyi','gzzisui'],['gzskin']],
 				gz_sunchen:['male','ye',4,['gzshilu','gzxiongnve']],
-				gz_tangzi:['male','wu',4,['gzxingzhao'],['doublegroup:wu:wei','gzskin']],
+				gz_tangzi:['male','wu',4,['gzxingzhao'],['doublegroup:wei:wu','gzskin']],
 				gz_mengda:['male','wei',4,['qiuan','liangfan'],['doublegroup:wei:shu']],
-				gz_liuqi:['male','qun',3,['gzwenji','gztunjiang'],['doublegroup:qun:shu','gzskin']],
+				gz_liuqi:['male','qun',3,['gzwenji','gztunjiang'],['doublegroup:shu:qun','gzskin']],
 				gz_mifangfushiren:['male','shu',4,['mffengshi'],['doublegroup:shu:wu']],
-				gz_shixie:['male','qun',3,['gzbiluan','gzrelixia'],['doublegroup:qun:wu','gzskin']],
-				gz_zhanglu:['male','qun',3,['gzrebushi','gzremidao'],['doublegroup:qun:wei','gzskin']],
+				gz_shixie:['male','qun',3,['gzbiluan','gzrelixia'],['doublegroup:wu:qun','gzskin']],
+				gz_zhanglu:['male','qun',3,['gzrebushi','gzremidao'],['doublegroup:wei:qun','gzskin']],
 				gz_dongzhao:['male','wei',3,['quanjin','zaoyun']],
 				gz_re_xushu:['male','shu',4,['gzzhuhai','gzpozhen','gzjiancai'],['gzskin']],
 				gz_wujing:['male','wu',4,['donggui','fengyang'],['gzskin']],
 				gz_yanbaihu:['male','qun',4,['gzzhidao','gzyjili'],['gzskin']],
 				gz_xuyou:['male','wei',3,['gzchenglve','gzshicai'],['doublegroup:wei:qun','gzskin']],
-				gz_xiahouba:['male','shu',4,['gzbaolie'],['doublegroup:shu:wei','gzskin']],
-				gz_panjun:['male','wu',3,['gzcongcha','xinfu_gongqing'],['doublegroup:wu:shu','gzskin']],
+				gz_xiahouba:['male','shu',4,['gzbaolie'],['doublegroup:wei:shu','gzskin']],
+				gz_panjun:['male','wu',3,['gzcongcha','xinfu_gongqing'],['doublegroup:shu:wu','gzskin']],
 				gz_huangzu:['male','qun',4,['gzxishe'],['gzskin']],
 				gz_zhugeke:['male','wu',3,['aocai','gzduwu'],['gzskin']],
 				gz_wenqin:['male','wei',4,['gzjinfa'],['doublegroup:wei:wu','gzskin']],
@@ -511,7 +511,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_xunyou:['male','wei',3,['gzqice','zhiyu'],['gzskin']],
 				gz_lingtong:['male','wu',4,['xuanlve','yongjin'],['gzskin']],
 				gz_lvfan:['male','wu',3,['xindiaodu','gzdiancai']],
-				gz_masu:['male','shu',3,['sanyao','gzzhiman'],['gzskin']],
+				gz_masu:['male','shu',3,['gzsanyao','gzzhiman'],['gzskin']],
 				gz_shamoke:['male','shu',4,['gzjili'],['gzskin']],
 				
 				gz_lingcao:['male','wu',4,['dujin']],
@@ -575,7 +575,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_guohuai:['male','wei',4,['gzduanshi','gzjingce'],['gzskin']],
 				gz_guanqiujian:['male','wei',4,['gzzhengrong','gzhongju'],[]],
 				gz_zhujun:['male','qun',4,['gzgongjian','gzkuimang'],[]],
-				gz_chengong:['male','qun',3,['gzyinpan','gzxingmou'],['doublegroup:qun:wei','gzskin']],
+				gz_chengong:['male','qun',3,['gzyinpan','gzxingmou'],['doublegroup:wei:qun','gzskin']],
 				gz_re_xugong:['male','wu',3,['gzbiaozhao','gzyechou'],['doublegroup:wu:qun']],
 				
 				gz_yangwan:['female','shu',3,['gzyouyan','gzzhuihuan'],['gzskin']],
@@ -1304,7 +1304,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.target=target;
 					target.addTempSkill('gzyechou_unsavable');
 					player.useCard({name:'sha',isCard:true},target).set('forceDie',true).set('oncard',function(){
-						_status.event.directHit.add(game.filterPlayer());
+						_status.event.directHit.addArray(game.filterPlayer());
 					});
 					'step 1'
 					player.addTempSkill('gzyechou_unequip');
@@ -1536,7 +1536,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			//毌丘俭
 			gzzhengrong:{
-				audio:'drlt_zhengrong',
+				audio:'drlt_zhenrong',
 				trigger:{
 					source:'damageBegin3',
 					player:['damageBegin1','chooseJunlingForBegin'],
@@ -9421,11 +9421,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					return list.length<=1;
 				},
+				check:function(event,player){
+					return player.needsToDiscard();
+				},
 				content:function(){
 					player.addTempSkill('keji_add','phaseAfter');
 				},
 			},
 			"keji_add":{
+				charlotte:true,
 				mod:{
 					maxHandcard:function(player,num){
 						return num+4;
@@ -13278,10 +13282,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						target.showCharacter(0);
 						game.delay(2);
 						if(targets.length) event.goto(1);
-						else if(game.players.length<3){
-							delete _status.showYexings;
-							event.finish();
-						}
 					}
 					else{
 						if(targets.length) event.goto(1);
@@ -13302,58 +13302,70 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					var source=event.targets2.shift();
 					event.source=source;
-					var targets=game.filterPlayer(function(current){
-						return current.identity!='ye'&&current!=source&&!get.is.jun(current)&&!event.targets2.contains(current)&&!current.storage.yexinjia_friend;
-					}).sortBySeat(source);
-					if(!targets.length){
-						delete _status.showYexings;
-						event.finish();
-					}
-					else{
-						event.targets=targets;
-						source.chooseBool('是否发起【拉拢人心】？','令所有其他不为君主/暴露野心家的角色依次选择是否与你结盟。第一个选择加入的人将势力和胜利条件改为与你相同');
-					}
+					event.targets3=[];
+					event.targets4=[source];
+					if(!_status.yexinjia_list) _status.yexinjia_list=['夏','商','周','秦','汉','隋','唐','宋','辽','金','元','明'];
+					source.chooseControl(_status.yexinjia_list).set('prompt','请选择自己所属的野心家势力的标识').set('ai',()=>(_status.yexinjia_list?_status.yexinjia_list.randomGet():0));
 					'step 4'
-					if(!result.bool){
-						if(event.targets2.length) event.goto(3);
-						return;
+					var text,source=event.source;;
+					if(result.control){
+						text=result.control;
+						_status.yexinjia_list.remove(result.control);
 					}
+					else text=_status.yexinjia_list.randomRemove();
+					event.text=text;
+					game.broadcastAll(function(player,text){
+						player.setIdentity(text,'ye');
+					},source,text);
+					source.removeMark('yexinjia_mark',1);
+					var targets=game.filterPlayer(function(current){
+						return current.identity!='ye'&&current!=source&&!get.is.jun(current)&&!event.targets2.contains(current)&&!current.getStorage('yexinjia_friend').length;
+					});
+					if(!targets.length) event.goto(8);
+					else event.targets=targets;
 					'step 5'
+					var source=event.source;
 					var target=targets.shift();
 					event.target=target;
 					source.line(target,'green');
-					target.chooseBool('是否响应'+get.translation(source)+'发起的【拉拢人心】？','将势力改为野心家，且视为和该角色阵营相同').set('ai',function(){
-						if(game.players.length<4) return true;
-						if(game.players.length<5) return Math.random()<0.5;
-						return Math.random()<0.3;
-					});
+					target.chooseBool('是否响应'+get.translation(source)+'发起的【拉拢人心】？','将势力改为'+event.text+(['辽','金'].contains(event.text)?'':'朝')).set('choice',Math.random()<=0.98);//反骨[doge]
 					'step 6'
 					if(result.bool){
 						target.chat('加入');
-						if(!_status.yexinjia_list) _status.yexinjia_list=['夏','商','周','秦','汉','隋','唐','宋','辽','金','元','明'];
-						source.chooseControl(_status.yexinjia_list).set('prompt','请选择自己所属的野心家势力的标识').set('ai',()=>(_status.yexinjia_list?_status.yexinjia_list.randomGet():0));
+						event.targets4.push(target);
+						game.broadcastAll(function(player,target,text){
+							player.identity='ye';
+							player.setIdentity(text,'ye');
+						},target,event.source,event.text);
 					}
 					else{
 						target.chat('拒绝');
-						game.delay(1.5);
-						if(targets.length) event.goto(5);
-						else event.goto(8);
+						event.targets3.push(target);
+					}
+					game.delay(1.5);
+					if(targets.length) event.goto(5);
+					else if(event.targets4.length){
+						for(var i of event.targets4){
+							i.markAuto('yexinjia_friend',event.targets4.filter(j=>j!=i));
+						}
 					}
 					'step 7'
-					game.broadcastAll(function(player,target,text){
-						player.identity='ye';
-						source.setIdentity(text,'ye');
-						player.setIdentity(text,'ye');
-						player.storage.yexinjia_friend=target;
-					},target,source,result.control);
-					_status.yexinjia_list.remove(result.control);
-					target.markSkill('yexinjia_friend');
-					source.removeMark('yexinjia_mark',1);
-					target.drawTo(4);
-					target.recover();
+					if(event.targets3.length){
+						for(var i of event.targets3){
+							i.drawTo(4);
+							i.recover();
+						}
+					}
 					'step 8'
 					if(event.targets2.length) event.goto(3);
-					else delete _status.showYexings;
+					else{
+						delete _status.showYexings;
+						if(!game.hasPlayer(current=>{
+							return game.hasPlayer(target=>{
+								return !target.isFriendOf(current);
+							});
+						})) game.checkResult();
+					}
 				});
 			},
 			getCharacterChoice:function(list,num){
@@ -13645,7 +13657,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				return winner&&winner.isFriendOf(game.me);
 			},
 			chooseCharacter:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.addPlayer=true;
 				next.ai=function(player,list,back){
@@ -13998,7 +14010,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterOL:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					'step 0'
 					game.broadcastAll(function(){
@@ -14830,6 +14842,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzzhuidu_info:'出牌阶段限一次。当你造成伤害时，你可以令受伤角色选择一项：1.此伤害+1；2.弃置装备区里的所有牌。若该角色为女性，则你可以弃置一张牌，改为令其选择两项。',
 			gzshigong:'示恭',
 			gzshigong_info:'限定技。当你于回合外进入濒死状态时，你可以移除副将，然后令当前回合角色选择一项：1.获得你以此法移除的副将武将牌上的一个没有技能标签的技能，然后令你将体力值回复至体力上限；2.令你将体力值回复至1点。',
+			gz_old_huaxiong:'华雄',
 			gzyaowu:'耀武',
 			gzyaowu_info:'限定技。当你造成伤害后，你可以明置此武将牌，然后你加2点体力上限并回复2点体力，修改〖恃勇〗，且当你死亡后，所有与你势力相同的角色失去1点体力。',
 			gzshiyong:'恃勇',
@@ -14846,7 +14859,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzzhengrong:'征荣',
 			gzzhengrong_info:'锁定技。①你至大势力角色的距离-1。②当你选择“军令”时，你令可选军令数量+1。③当你造成或受到伤害时，若你没有存活的队友，则此伤害+1。',
 			gzhongju:'鸿举',
-			gzhongju_info:'限定技。出牌阶段，你可以选择一名其他角色A并选择一个“军令”。你执行该军令，然后令除A以外的所有其他角色依次选择一项：⒈执行该军令。⒉不计入距离的计算且不能使用牌且不是牌的合法目标且不能失去或回复体力或受到伤害直到回合结束。',
+			gzhongju_info:'限定技。出牌阶段，你可以选择一名其他角色A并选择一个“军令”。你执行该军令，然后令除A以外的所有其他角色依次选择一项：⒈执行该军令。⒉于本回合视为移出游戏。',
 			gzbiaozhao:'表召',
 			gzbiaozhao_info:'出牌阶段限一次。你可以选择两名势力不同的其他角色A和B。你视为对A使用一张【知己知彼】，然后将一张牌交给B并摸一张牌。',
 			gzyechou:'业仇',
@@ -15614,7 +15627,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				differentIdentityFrom:function(target,self){
 					if(this==target) return false;
-					if(this.storage.yexinjia_friend==target||target.storage.yexinjia_friend==this) return false;
+					if(this.getStorage('yexinjia_friend').contains(target)) return false;
+					if(target.getStorage('yexinjia_friend').contains(this)) return false;
 					if(self){
 						if(target.identity=='unknown') return false;
 						if(target.identity=='ye'||this.identity=='ye') return true;
@@ -15631,7 +15645,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return this.identity!=target.identity;
 				},
 				sameIdentityAs:function(target,shown){
-					if(this.storage.yexinjia_friend==target||target.storage.yexinjia_friend==this) return true;
+					if(this.getStorage('yexinjia_friend').contains(target)) return true;
+					if(target.getStorage('yexinjia_friend').contains(this)) return true;
 					if(shown){
 						if(this.identity=='ye'||this.identity=='unknown') return false;
 					}
@@ -15684,7 +15699,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						delete source.shijun;
 					}
 					else if(source&&source.identity!='unknown'){
-						if(source.identity=='ye') source.draw(3);
+						if(source.identity=='ye'&&!source.getStorage('yexinjia_friend').length) source.draw(3);
 						else if(source.shijun2){
 							delete source.shijun2;
 							source.draw(1+game.countPlayer(function(current){
@@ -15692,11 +15707,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}));
 						}
 						else if(that.identity=='ye'){
-							if((that.storage.yexinjia_friend&&source==that.storage.yexinjia_friend)||(source.storage.yexinjia_friend&&that==source.storage.yexinjia_friend)) source.discard(source.getCards('he'));
+							if(that.getStorage('yexinjia_friend').contains(source)||source.getStorage('yexinjia_friend').contains(that)) source.discard(source.getCards('he'));
 							else source.draw(1+game.countPlayer(function(current){
 								if(current==that) return false;
-								if(current.storage.yexinjia_friend&&that==current.storage.yexinjia_friend) return true;
-								if(that.storage.yexinjia_friend&&current==that.storage.yexinjia_friend) return true;
+								if(current.getStorage('yexinjia_friend').contains(that)) return true;
+								if(that.getStorage('yexinjia_friend').contains(current)) return true;
 								return false;
 							}));
 						}
@@ -16432,7 +16447,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'<div style="margin:10px">声明</div><ul style="margin-top:0"><li>以下所有规则均为根据公开爆料整理，经村规改动后制定的临时规则。不代表任何官方意见。请以后续发布的官方规则作为标准。</ul>'
 			+'<div style="margin:10px">双势力武将</div><ul style="margin-top:0"><li>双势力武将牌可以和野心家武将牌/包含势力单武将牌/含有重叠势力的其他双势力武将牌组合，若你的主将为双势力武将，则：若你的副将为单势力武将牌，你的势力视为此势力；若你的副将为双势力武将，你的势力视为两张武将牌上的重叠势力（若重叠势力不止一个则需在游戏开始时选择一个作为自己的势力）；野心家武将牌为主将，双势力武将牌为副将时，游戏开始时需选择一个副将所含势力作为副将的势力。<br><li>变更副将时，可以选择包含原势力的双势力武将牌。左慈发动【役鬼】时，可以使用双势力武将牌同时指定两个不同势力的角色为目标。<br><li>特殊地，“冈崎汐”作为多势力武将牌，结算流程和规则与其他双势力武将相同。</ul>'
 			+'<div style="margin:10px">野心家武将</div><ul style="margin-top:0"><li>野心家武将只能放在主将位置。副将可以为任意非野心家武将牌。<br><li>选择了野心家武将牌的角色（以下简称“野心家角色”）仅明置副将时，若副将为单势力武将牌，则势力暂时视为与该武将牌相同。若副将为双势力武将牌，则势力视为游戏开始时选择的副将代表的势力。<br><li>野心家角色明置主将时，其势力改为野心家。若其是首次明置该武将牌，则其获得一个“野心家”标记。<br><li>“野心家”标记可以当做“先驱”标记，“阴阳鱼”标记或是“珠联璧合”标记使用。当同时拥有两种标记时，优先弃置原装标记，下次发动时才弃置“野心家”标记。<br><li>野心家角色变更副将时，若其主将未明置过，则按照副将的势力进行变更。若主将已经明置过，则可以选择所有的非野心家武将牌。左慈发动【役鬼】时，可以使用野心家武将牌同时指定所有势力的角色为目标。'
-			+'<br><li>当场上触发了胜利条件时，若这些角色中存在未明置过主将的野心家角色，则这些野心家角色选择是否“暴露野心”。若无人选择“是”且场上存在非野心家角色存活，则所有非野心家角色胜利，野心家角色失败。若有人选择“是”，则这些角色明置主将。然后若场上存活角色数大于等于3，则这些角色选择是否发起“拉拢人心”<br><li>选择发起“拉拢人心”的野心家角色，令所有其他非野心家角色和非君主角色依次选择是否和该野心家角色“结盟”。若有人选择“是”，则野心家角色弃置“野心家”标记，且该角色将势力改为野心家，将手牌摸至四张并回复1点体力，且视为和发起“拉拢人心”的野心家角色势力相同，并终止对其他角色的询问。</ul>'
+			+'<br><li>当场上触发了胜利条件时，若这些角色中存在未明置过主将的野心家角色，则这些野心家角色选择是否“暴露野心”。若无人选择“是”且场上存在非野心家角色存活，则所有非野心家角色胜利，野心家角色失败。若有人选择“是”，则这些角色明置主将，然后选择是否发起“拉拢人心”<br><li>选择发起“拉拢人心”的野心家角色选择一个新的势力作为自己的势力，弃置“野心家”标记，令所有其他非野心家角色且非君主且非已“结盟”角色依次选择是否和该野心家角色“结盟”。选择“是”的角色将势力改为和该野心家势力相同。此次“拉拢人心”对所有其他角色询问结束后，所有选择“否”的角色将手牌摸至四张并回复1点体力。</ul>'
 			+'<div style="margin:10px">纵横捭阖</div><ul style="margin-top:0"><li>当一名角色对目标角色发动具有拥有“纵横”衍生技的技能时，其可以令对方获得“纵横”衍生技直到其下回合结束。</ul>',
 		},
 	};

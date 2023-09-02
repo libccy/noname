@@ -5,7 +5,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		card:{
 			pozhenjue:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:true,
 				notarget:true,
 				content:function(){
@@ -25,7 +25,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			changshezhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(card,player){
 					if(player.inline()) return true;
 					if(player.identity=='unknown'||player.identity=='ye') return false;
@@ -68,7 +68,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			tianfuzhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(){
 					return game.hasPlayer(function(current){
 						return current.isMajor();
@@ -94,7 +94,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			dizaizhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(){
 					return game.hasPlayer(function(current){
 						return current.isNotMajor();
@@ -121,7 +121,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			fengyangzhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:true,
 				filterTarget:function(card,player,target){
 					return target.sieged();
@@ -142,7 +142,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			yunchuizhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:true,
 				filterTarget:function(card,player,target){
 					return target.siege();
@@ -163,7 +163,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			qixingzhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(card,player){
 					return player.siege()||player.sieged();
 				},
@@ -202,7 +202,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			shepanzhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(card,player){
 					if(player.identity=='unknown'||player.identity=='ye') return false;
 					if(get.population(player.identity)<=1) return false;
@@ -231,7 +231,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			longfeizhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(card,player){
 					return player.next.siege(player);
 				},
@@ -261,7 +261,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			huyizhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:function(card,player){
 					return player.siege(player.next)||player.siege(player.previous);
 				},
@@ -309,7 +309,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			niaoxiangzhen:{
 				type:'zhenfa',
-				chongzhu:true,
+				recastable:true,
 				enable:true,
 				filterTarget:function(card,player,target){
 					if(player.identity==target.identity) return false;

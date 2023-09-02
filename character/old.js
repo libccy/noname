@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			old:{
 				old_standard:['ol_yuanshu'],
-				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","xiaoqiao","pangde","xuhuang",'junk_sunquan',"huangzhong","new_caoren",'old_chendao'],
+				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","old_xiaoqiao","pangde","xuhuang",'junk_sunquan',"huangzhong","new_caoren",'old_chendao'],
 				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong",'old_re_lidian'],
 				old_yijiang1:["masu","xushu","xin_yujin","old_xusheng","old_lingtong","fazheng",'old_gaoshun'],
 				old_yijiang2:["old_zhonghui","madai",'old_handang','old_liubiao','oldre_liubiao','old_guanzhang'],
@@ -45,7 +45,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pangde:['male','qun',4,['mashu','mengjin']],
 			ol_huaxiong:["male","qun",6,["new_reyaowu"]],
 			old_wangyun:['male','qun',4,['wylianji','moucheng'],['clan:太原王氏']],
-			xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
+			old_xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
 			weiyan:['male','shu',4,['kuanggu']],
 			xiahouyuan:['male','wei',4,['shensu']],
 			old_huangfusong:['male','qun',4,['fenyue']],
@@ -61,7 +61,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsp_caoren:['male','wei',4,['kuiwei','yanzheng']],
 			old_caochun:['male','wei',4,['shanjia']],
 			masu:['male','shu',3,['xinzhan','huilei']],
-			xushu:['male','shu',3,['xswuyan','jujian']],
+			xushu:['male','shu',3,['xswuyan','jujian'],['border:wei']],
 			liru:['male','qun',3,['juece','mieji','fencheng']],
 			xin_yujin:['male','wei',4,['jieyue']],
 			//lusu:['male','wu',3,['haoshi','dimeng']],
@@ -971,6 +971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhaoyun:'新杀赵云',
 			old_zhaoyun_ab:'赵云',
 			ol_huaxiong:'旧华雄',
+			old_xiaoqiao:'旧小乔',
 
 			old_guhuo:"蛊惑",
 			old_guhuo_info:"你可以扣置一张手牌当做一张基本牌或普通锦囊牌使用或打出，体力值不为0的其他角色依次选择是否质疑。然后，若有质疑的角色，你展示此牌：若为假，此牌作废，这些角色摸一张牌；若为真，这些角色失去1点体力，且若此牌不为♥，此牌作废。",

@@ -1738,11 +1738,12 @@ div:not(.handcards)>.card>.info>span,
 	width: 100%
 }
 .content>div {
-	position: relative;
 	margin-top: 8px;
 	margin-bottom: 8px;
-	margin-left: auto;
-	margin-right: auto;
+	margin-left: 4px;
+	margin-right: 4px;
+	position: relative;
+	width: calc(100% - 8px);
 }
 .content>.caption + .buttons:not(*:last-child){
 	margin-top: 0;
@@ -1969,8 +1970,12 @@ div:not(.handcards)>.card>.info>span,
 	left: 0;
 }
 .button.character>.identity {
-	top: -6px;
+	align-items: flex-end;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap-reverse;
 	left: 72px;
+	top: -6px;
 }
 .button.character.newstyle>.identity{
 	/*display: none;*/
@@ -1978,8 +1983,8 @@ div:not(.handcards)>.card>.info>span,
 	background: none !important;
 	/*box-shadow: none;*/
 	left: auto;
-	right: 3px;
-	top: 3px;
+	right: 6px;
+	top: 5px;
 	/*font-size: 20px;*/
 }
 .button.newstyle>.name{
@@ -2767,11 +2772,11 @@ div:not(.handcards)>.card>.info>span,
 }
 .identity {
 	text-align: center;
-	width: 22px;
-	height: 22px;
 }
 .identity>div {
+	line-height: 16px;
 	position: relative;
+	text-align: right;
 	top: 2px;
 }
 
@@ -2864,7 +2869,7 @@ div:not(.handcards)>.card>.info>span,
 .linked>.count {
 	right: 154px;
 }
-.acted>.identity {
+.acted>.identity>div {
 	transform: rotate(180deg);
 }
 
@@ -3832,19 +3837,19 @@ div:hover>.intro {
 }
 
 .player .identity {
+	align-items: flex-end;
 	border: none;
-	width: 24px;
-	height: 24px;
 	border-radius: 100%;
-	display: inline-flex;
+	display: flex;
+	flex-direction: column;
 	transition: all 0.2s;
 }
 
 .player .identity>div {
-	margin: auto;
 	position: relative;
 	font-family: 'huangcao','xinwei';
 	font-size: 24px;
+	line-height: 24px;
 	top: 0;
 }
 .player .identity.animate {
@@ -4531,11 +4536,17 @@ div[data-decoration="bronze"]::after{
 	right: 6px;
 }
 .card .tempname {
-	top: 6px;
-	left: 6px;
-	font-size: 22px;
 	color: white !important;
+	font-size: 22px;
+	left: 6px;
 	pointer-events: none;
+	top: 6px;
+}
+.card .tempname.vertical {
+	left: 4px;
+	top: 8px;
+	writing-mode: vertical-rl;
+	-webkit-writing-mode: vertical-rl;
 }
 /*.card.equip1 .wunature,
 .card.equip3 .wunature,

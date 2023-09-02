@@ -982,7 +982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							if(trigger.name=='lose'){
-								trigger.cards.remove(player.getEquips('ruyijingubang'));
+								trigger.cards.removeArray(player.getEquips('ruyijingubang'));
 							}
 							else{
 								while(trigger.slots.contains('equip1')) trigger.slots.remove('equip1');

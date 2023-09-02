@@ -583,7 +583,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				enable:function(event,player){
 					return player.canAddFellow();
 				},
-				chongzhu:function(event,player){
+				recastable:function(event,player){
 					return !player.isMin()&&!player.canAddFellow();
 				},
 				notarget:true,
@@ -1424,7 +1424,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					lib.card.list.randomSort();
 				}
 
-				lib.skill._chongzhu.usable=3;
+				lib.skill._recasting.usable=3;
 				for(i in lib.skill){
 					if(lib.skill[i].changeSeat){
 						lib.skill[i]={};
@@ -1450,7 +1450,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.additionaldead=[];
 			},
 			chooseCharacter:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.setContent(function(){
 					"step 0"
@@ -2366,7 +2366,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				type:'stonecard',
 				stoneact:2,
 				career:'priest',
-				chongzhu:true,
+				recastable:true,
 				enable:function(event,player){
 					if(player.career!='priest') return false;
 					return !player.storage.anyingxingtai||player.storage.anyingxingtai<2;

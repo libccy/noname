@@ -16,38 +16,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('hej')>0;
 				},
-				yingbian_tags:['all','hit','add'],
-				yingbian_prompt:function(card){
-					var str='';
-					if(get.cardtag(card,'yingbian_all')){
-						str+='此牌的效果改为依次执行所有选项';
-					}
-					if(get.cardtag(card,'yingbian_hit')){
-						if(str.length) str+='；';
-						str+='此牌不可被响应';
-					}
-					if(!str.length||get.cardtag(card,'yingbian_add')){
-						if(str.length) str+='；';
-						str+='当你使用此牌选择目标后，你可为此牌增加一个目标';
-					}
-					return str;
-				},
-				yingbian:function(event){
-					var card=event.card,bool=false;
-					if(get.cardtag(card,'yingbian_all')){
-						bool=true;
-						card.yingbian_all=true;
-						game.log(card,'执行所有选项');
-					}
-					if(get.cardtag(card,'yingbian_hit')){
-						bool=true;
-						event.directHit.addArray(game.players);
-						game.log(card,'不可被响应');
-					}
-					if(!bool||get.cardtag(card,'yingbian_add')){
-						event.yingbian_addTarget=true;
-					}
-				},
+				defaultYingbianEffect:'add',
 				content:function(){
 					var dist=get.distance(player,target);
 					if(dist>1||card.yingbian_all) player.discardPlayerCard(target,'hej',true);
@@ -174,11 +143,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('h')>0;
 				},
-				yingbian_prompt:'当你使用此牌选择目标后，你可为此牌增加一个目标',
-				yingbian_tags:['add'],
-				yingbian:function(event){
-					event.yingbian_addTarget=true;
-				},
+				defaultYingbianEffect:'add',
 				content:function(){
 					'step 0'
 					if(player.isDead()||!target.countCards('h')){
@@ -274,30 +239,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				type:'equip',
 				subtype:'equip5',
 				loseDelay:false,
-				onEquip:function(){
-					if(player.countCards('he',function(cardx){
-						return cardx!=card;
-					})>0){
-						player.logSkill('tianjitu_skill');
-						player.chooseToDiscard(true,function(card){
-							return card!=_status.event.card;
-						},'he').set('card',card);
-					}
-				},
-				onLose:function(){
-					var next=game.createEvent('tianjitu_lose');
-					event.next.remove(next);
-					var evt=event.getParent();
-					if(evt.getlx===false) evt=evt.getParent();
-					evt.after.push(next);
-					next.player=player;
-					next.setContent(function(){
-						if(player.countCards('h')<5){
-							player.logSkill('tianjitu_skill');
-							player.drawTo(5);
-						}
-					});
-				},
+				global:'tianjitu_skill',
 				ai:{
 					value:function(card,player){
 						if(player.countCards('h')>3||get.position(card)!='e') return 0.5;
@@ -422,23 +364,24 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				global:'heiguangkai_ai',
 			},
 			tongque_skill:{
-				trigger:{player:'useCard1'},
+				trigger:{player:'yingbian'},
 				equipSkill:true,
 				forced:true,
-				filter:function(event,player){
-					return !event.card.yingbian&&get.is.yingbian(event.card)&&player.getHistory('useCard',function(evt){
-						return get.is.yingbian(evt.card)
-					}).indexOf(event)==0;
-				},
-				content:function(){
-					trigger.card.yingbian=true;
-					var info=get.info(trigger.card);
-					if(info&&info.yingbian) info.yingbian(trigger);
-					player.addTempSkill('yingbian_changeTarget');
-				},
+				filter:(event,player)=>get.is.yingbianConditional(event.card)&&player.getHistory('useCard',evt=>get.is.yingbianConditional(evt.card)).length<2,
+				content:()=>{
+					trigger.forceYingbian=true;
+				}
 			},
 			tianjitu_skill:{
 				audio:true,
+				trigger:{player:['equipBegin','loseBegin']},
+				forced:true,
+				equipSkill:true,
+				filter:(event,player,name)=>name=='equipBegin'?event.card.name=='tianjitu'&&player.hasCard(card=>card!=event.card):event.cards.some(value=>get.position(value)=='e'&&value.name=='tianjitu')&&player.countCards('h')<5,
+				content:()=>{
+					if(event.triggername=='loseBegin') player.drawTo(5);
+					else player.chooseToDiscard(true,card=>card!=_status.event.getTrigger().card,'he');
+				}
 			},
 			taigongyinfu_skill:{
 				equipSkill:true,
@@ -456,10 +399,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.logSkill('taigongyinfu_skill');
-						player.lose(result.cards,ui.discardPile,'visible');
-						player.$throw(result.cards,1000);
-						game.log(player,'将',result.cards,'置入了弃牌堆');
-						player.draw();
+						player.recast(result.cards);
 					}
 				},
 			},
@@ -494,202 +434,69 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			_yingbian:{
-				trigger:{player:'useCard1'},
+				trigger:{player:'yingbian'},
 				forced:true,
 				popup:false,
-				firstDo:true,
 				ruleSkill:true,
 				forceLoad:true,
-				filter:function(event,player){
+				filter:(event,player)=>{
 					if(event.card.yingbian) return false;
-					var bool=player.hasSkillTag('forceYingbian');
-					var card=event.card;
-					if(get.cardtag(card,'yingbian_kongchao')&&(!player.countCards('h')||bool)) return true;
-					if(get.cardtag(card,'yingbian_canqu')&&(player.hp==1||bool)) return true;
-					if(get.cardtag(card,'yingbian_fujia')&&(player.isMaxHandcard()||bool)) return true;
-					if(get.cardtag(card,'yingbian_zhuzhan')) return true;
-					return false;
+					const temporaryYingbian=event.temporaryYingbian||[],card=event.card;
+					if(temporaryYingbian.includes('force')||get.cardtag(card,'yingbian_force')) return true;
+					const forceYingbian=event.forceYingbian||player.hasSkillTag('forceYingbian');
+					for(const entry of lib.yingbian.condition.simple){
+						const key=entry[0];
+						if((temporaryYingbian.includes(key)||get.cardtag(card,`yingbian_${key}`))&&(forceYingbian||entry[1](event))) return true;
+					}
+					const complexYingbianConditions=get.complexYingbianConditions();
+					return temporaryYingbian.some(value=>complexYingbianConditions.includes(value))||get.is.complexlyYingbianConditional(card);
 				},
-				content:function(){
+				content:()=>{
 					'step 0'
-					var card=trigger.card;
-					event.card=card;
-					var bool=false;
-					if(get.cardtag(card,'yingbian_kongchao')&&!player.countCards('h')){
-						player.popup('空巢','soil');
-						bool=true;
+					event.card=trigger.card;
+					event.temporaryYingbian=trigger.temporaryYingbian||[];
+					var yingbianConditionSatisfied=false;
+					lib.yingbian.condition.simple.forEach((value,key)=>{
+						if(!event.temporaryYingbian.includes(key)&&!get.cardtag(event.card,`yingbian_${key}`)||!value(trigger)) return;
+						player.popup(`yingbian_${key}_tag`,lib.yingbian.condition.color.get(key));
+						if(!yingbianConditionSatisfied) yingbianConditionSatisfied=true;
+					});
+					if(event.temporaryYingbian.includes('force')||get.cardtag(event.card,'yingbian_force')||trigger.forceYingbian||player.hasSkillTag('forceYingbian')){
+						player.popup('yingbian_force_tag',lib.yingbian.condition.color.get('force'));
+						if(!yingbianConditionSatisfied) yingbianConditionSatisfied=true;
 					}
-					else if(get.cardtag(card,'yingbian_canqu')&&player.hp==1){
-						player.popup('残躯','fire');
-						bool=true;
+					if(yingbianConditionSatisfied){
+						game.log(player,'触发了',event.card,'的应变条件');
+						event.goto(4);
 					}
-					else if(get.cardtag(card,'yingbian_fujia')&&player.isMaxHandcard()){
-						player.popup('富甲','orange');
-						bool=true;
-					}
-					else if(player.hasSkillTag('forceYingbian')){
-						player.popup('应变','metal');
-						bool=true;
-					}
-					if(bool){
-						game.log(player,'触发了',card,'的应变条件');
-						event.goto(10);
-					}
+					else if((event.num=0)>=(event.yingbianConditions=get.complexYingbianConditions()).length) event.finish();
 					'step 1'
-					event._global_waiting=true;
-					event.send=function(player,card,source,targets,id,id2,skillState){
-						if(skillState){
-							player.applySkills(skillState);
-						}
-						var type=get.type2(card);
-						var str=get.translation(source);
-						if(targets&&targets.length){
-							str+='对';
-							str+=get.translation(targets);
-						}
-						str+='使用了';
-						var next=player.chooseCard({
-							filterCard:function(card){
-								return get.type2(card)==type&&lib.filter.cardDiscardable.apply(this,arguments);
-							},
-							prompt:str+=(get.translation(card)+'，是否弃置一张'+get.translation(type)+'为其助战？'),
-							position:'h',
-							_global_waiting:true,
-							id:id,
-							id2:id2,
-							ai:function(cardx){
-								var info=get.info(card);
-								if(info&&info.ai&&info.ai.yingbian){
-									var ai=info.ai.yingbian(card,source,targets,player);
-									if(!ai) return 0;
-									return ai-get.value(cardx);
-								}
-								else if(get.attitude(player,source)<=0) return 0;
-								return 5-get.value(cardx);
-							},
-						});
-						if(game.online){
-							_status.event._resultid=id;
-							game.resume();
-						}
-					};
+					var yingbianCondition=event.yingbianConditions[num];
+					if(event.temporaryYingbian.includes(yingbianCondition)||get.cardtag(card,`yingbian_${yingbianCondition}`)) lib.yingbian.condition.complex.get(yingbianCondition)(trigger);
+					else event.goto(3);
 					'step 2'
-					var type=get.type2(card);
-					var list=game.filterPlayer(function(current){
-						if(current==player) return false;
-						if(!current.countCards('h')) return false;
-						return _status.connectMode||current.countCards('h',function(cardx){
-							return get.type2(cardx)==type;
-						})
-					});
-					event.list=list;
-					event.id=get.id();
-					list.sort(function(a,b){
-						return get.distance(event.source,a,'absolute')-get.distance(event.source,b,'absolute');
-					});
+					if(result.bool) event.goto(4);
 					'step 3'
-					if(event.list.length==0){
-						event.finish();
-						return;
-					}
-					else if(_status.connectMode&&(event.list[0].isOnline()||event.list[0]==game.me)){
-						event.goto(5);
-					}
-					else{
-						event.current=event.list.shift();
-						event.send(event.current,event.card,player,trigger.targets,event.id,trigger.parent.id);
-					}
-					'step 4'
-					if(result.bool){
-						event.zhuzhanresult=event.current;
-						event.zhuzhanresult2=result;
-						if(event.current!=game.me) game.delayx();
-						event.goto(9);
-					}
-					else{
-						event.goto(3);
-					}
-					'step 5'
-					var id=event.id;
-					var sendback=function(result,player){
-						if(result&&result.id==id&&!event.zhuzhanresult&&result.bool){
-							event.zhuzhanresult=player;
-							event.zhuzhanresult2=result;
-							game.broadcast('cancel',id);
-							if(_status.event.id==id&&_status.event.name=='chooseCard'&&_status.paused){
-								return (function(){
-									event.resultOL=_status.event.resultOL;
-									ui.click.cancel();
-									if(ui.confirm) ui.confirm.close();
-								});
-							}
-						}
-						else{
-							if(_status.event.id==id&&_status.event.name=='chooseCard'&&_status.paused){
-								return (function(){
-									event.resultOL=_status.event.resultOL;
-								});
-							}
-						}
-					};
-
-					var withme=false;
-					var withol=false;
-					var list=event.list;
-					for(var i=0;i<list.length;i++){
-						if(list[i].isOnline()){
-							withol=true;
-							list[i].wait(sendback);
-							list[i].send(event.send,list[i],event.card,player,trigger.targets,event.id,trigger.parent.id,get.skillState(list[i]));
-							list.splice(i--,1);
-						}
-						else if(list[i]==game.me){
-							withme=true;
-							event.send(list[i],event.card,player,trigger.targets,event.id,trigger.parent.id);
-							list.splice(i--,1);
-						}
-					}
-					if(!withme){
-						event.goto(7);
-					}
-					if(_status.connectMode){
-						if(withme||withol){
-							for(var i=0;i<game.players.length;i++){
-								if(game.players[i]!=player) game.players[i].showTimer();
-							}
-						}
-					}
-					event.withol=withol;
-					'step 6'
-					if(result&&result.bool&&!event.zhuzhanresult){
-						game.broadcast('cancel',event.id);
-						event.zhuzhanresult=game.me;
-						event.zhuzhanresult2=result;
-					}
-					'step 7'
-					if(event.withol&&!event.resultOL){
-						game.pause();
-					}
-					'step 8'
-					for(var i=0;i<game.players.length;i++){
-						game.players[i].hideTimer();
-					}
-					'step 9'
-					if(event.zhuzhanresult){
-						var target=event.zhuzhanresult;
-						target.line(player,'green');
-						target.discard(event.zhuzhanresult2.cards).discarder=target;
-						target.popup('助战','wood');
-						game.log(target,'响应了',player,'发起的助战');
-						target.addExpose(0.2);
-					}
+					event.num++;
+					if(event.num<event.yingbianConditions.length) event.goto(1);
 					else event.finish();
-					'step 10'
+					'step 4'
 					trigger.card.yingbian=true;
-					var info=get.info(trigger.card);
-					if(info&&info.yingbian) info.yingbian(trigger);
-					player.addTempSkill('yingbian_changeTarget');
-				},
+					var yingbianEffectExecuted=false;
+					lib.yingbian.effect.forEach((value,key)=>{
+						if(!event.temporaryYingbian.includes(key)&&!get.cardtag(card,`yingbian_${key}`)) return;
+						game.yingbianEffect(trigger,value);
+						if(!yingbianEffectExecuted) yingbianEffectExecuted=true;
+					});
+					if(!yingbianEffectExecuted){
+						var defaultYingbianEffect=get.defaultYingbianEffect(card);
+						if(lib.yingbian.effect.has(defaultYingbianEffect)){
+							game.yingbianEffect(trigger,lib.yingbian.effect.get(defaultYingbianEffect));
+							if(!yingbianEffectExecuted) yingbianEffectExecuted=true;
+						}
+					}
+					if(yingbianEffectExecuted) player.addTempSkill('yingbian_changeTarget');
+				}
 			},
 			yingbian_changeTarget:{
 				trigger:{player:'useCard2'},
@@ -820,7 +627,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			tongque_info:'锁定技，你于一回合内使用的第一张带有“应变”效果的牌无视条件直接生效。',
 			tianjitu:'天机图',
 			tianjitu_skill:'天机图',
-			tianjitu_info:'锁定技，当此牌进入你的装备区时，你弃置一张不为此【天机图】的牌。当此牌离开你的装备区后，你将手牌摸至五张。',
+			tianjitu_info:'锁定技，当此牌进入你的装备区时，你弃置一张不为此【天机图】的牌。当此牌离开你的装备区时，你将手牌摸至五张。',
 			taigongyinfu:'太公阴符',
 			taigongyinfu_info:'出牌阶段开始时，你可以横置或重置一名角色。出牌阶段结束时，你可以重铸一张手牌。',
 			taigongyinfu_skill:'太公阴符',
@@ -829,15 +636,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yingbian_kongchao_tag:'空巢',
 			yingbian_fujia_tag:'富甲',
 			yingbian_canqu_tag:'残躯',
+			yingbian_force_tag:'应变',
 			_yingbian:'应变',
 			yingbian_changeTarget:'应变',
 			yingbian_add_tag:'(目标+)',
 			yingbian_remove_tag:'(目标-)',
-			yingbian_draw_tag:'(摸牌)',
-			yingbian_all_tag:'(双项)',
-			yingbian_hit_tag:'(强命)',
-			yingbian_gain_tag:'(反甲)',
 			yingbian_damage_tag:'(伤害+)',
+			yingbian_draw_tag:'(摸牌)',
+			yingbian_gain_tag:'(反甲)',
+			yingbian_hit_tag:'(强命)',
+			yingbian_all_tag:'(双项)'
 		},
 		list:[
 			['spade',1,'juedou'],

@@ -650,7 +650,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chooseCharacterJiange:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.setContent(function(){
 					'step 0'
@@ -853,7 +853,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterSiguo:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.setContent(function(){
 					'step 0'
@@ -1130,7 +1130,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterTwo:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.setContent(function(){
 					'step 0'
@@ -1439,7 +1439,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterEndless:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.setContent(function(){
 					'step 0'
@@ -1586,7 +1586,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterFour:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.ai=function(player,list,list2){
 					if(player.identity=='zhu'){
@@ -1932,7 +1932,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterThree:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					'step 0'
 					if(lib.config.continue_name_versus_three){
@@ -2041,7 +2041,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacter:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.setContent(function(){
 					"step 0"
@@ -2546,7 +2546,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chooseCharacterOLGuandu:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					var list=[
@@ -2686,7 +2686,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterGuandu:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					'step 0'
 					lib.init.onfree();
@@ -2738,7 +2738,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterOL4:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					var list=[
@@ -2937,7 +2937,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterOL3:function(){
-				var next=game.createEvent('chooseCharacterOL',false);
+				var next=game.createEvent('chooseCharacterOL');
 				next.setContent(function(){
 					'step 0'
 					game.additionaldead=[];
@@ -3054,7 +3054,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterOL2:function(){
-				var next=game.createEvent('chooseCharacterOL',false);
+				var next=game.createEvent('chooseCharacterOL');
 				next.setContent(function(){
 					'step 0'
 					var ref=game.players[0];
@@ -3387,7 +3387,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterOL1:function(){
-				var next=game.createEvent('chooseCharacterOL',false);
+				var next=game.createEvent('chooseCharacterOL');
 				next.setContent(function(){
 					'step 0'
 					game.removeCard('shengdong');
@@ -3589,6 +3589,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			phaseLoopThree:function(player){
+				_status.isRoundFilter=function(event){
+					return event._isThreeRound===true;
+				};
 				var next=game.createEvent('phaseLoop');
 				next.player=player;
 				next.swap=function(player){
@@ -3601,8 +3604,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				};
 				next.setContent(function(){
 					'step 0'
+					var next=player.phase();
+					if(!game.players.some(current=>current.classList.contains('acted'))){
+						next._isThreeRound=true;
+					}
 					player.classList.add('acted');
-					player.phase();
 					'step 1'
 					if(player.identity!='zhu'){
 						for(var i=0;i<game.players.length;i++){

@@ -266,7 +266,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				nodelay:true,
-				// chongzhu:true,
+				// recastable:true,
 				global:'g_shencaojie',
 				content:function(){
 					var evt=event.getParent('g_shencaojie')._trigger;

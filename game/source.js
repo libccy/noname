@@ -49,7 +49,7 @@ window.noname_source_list=[
 	'character/yingbian.js',
 	'character/yxs.js',
 	'character/zhuogui.js',
-	'font/suits.ttf',
+	'font/suits.woff2',
 	'game/asset.js',
 	'game/codemirror.js',
 	'game/config.js',

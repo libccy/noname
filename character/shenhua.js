@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			shenhua:{
-				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","re_xiahouyuan","re_xiaoqiao","re_huangzhong","re_weiyan"],
+				shenhua_feng:["sp_zhangjiao","re_yuji","old_zhoutai","old_caoren","re_xiahouyuan","xiaoqiao","re_huangzhong","re_weiyan"],
 				shenhua_huo:['dianwei','xunyu','pangtong','sp_zhugeliang','taishici','yanwen','re_yuanshao','re_pangde'],
 				shenhua_lin:['caopi','re_xuhuang','menghuo','zhurong','re_lusu','sunjian','dongzhuo','jiaxu'],
 				shenhua_shan:['dengai','zhanghe','liushan','jiangwei','zhangzhang','sunce','caiwenji','zuoci'],
@@ -21,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_pangde:['male','qun',4,['mashu','jianchu']],
 			re_xiahouyuan:['male','wei',4,['xinshensu']],
 			re_weiyan:['male','shu',4,['xinkuanggu','qimou']],
-			re_xiaoqiao:['female','wu',3,['retianxiang','xinhongyan']],
+			xiaoqiao:['female','wu',3,['retianxiang','hongyan']],
 			sp_zhangjiao:['male','qun',3,['releiji','guidao','huangtian'],['zhu']],
 			re_yuji:["male","qun",3,["xinfu_guhuo"]],
 			// yuji:['male','qun',3,['guhuo']],
@@ -1014,19 +1014,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						})>1) return 'equip5';
 					});
 					'step 1'
-					if(result.control=='equip1'){
-						player.addTempSkill('drlt_jueyan1',{player:'phaseAfter'});
-					};
-					if(result.control=='equip2'){
-						player.draw(3);
-						player.addTempSkill('drlt_jueyan3',{player:'phaseAfter'});
-					};
-					if(result.control=='equip6'){
-						player.addTempSkill('drlt_jueyan2',{player:'phaseAfter'});
-					};
-					if(result.control=='equip5'){
-						player.addTempSkill('rejizhi',{player:'phaseAfter'});
-					};
+					switch(result.control){
+						case 'equip1':
+							player.addTempSkill('drlt_jueyan1',{player:'phaseAfter'});
+							break;
+						case 'equip2':
+							player.draw(3);
+							player.addTempSkill('drlt_jueyan3',{player:'phaseAfter'});
+							break;
+						case 'equip3_4':
+							player.addTempSkill('drlt_jueyan2',{player:'phaseAfter'});
+							break;
+						case 'equip5':
+							player.addTempSkill('rejizhi',{player:'phaseAfter'});
+							break;
+					}
 				},
 				ai:{
 					order:13,
@@ -7023,7 +7025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return true;
 					}
 					else if(event.name=='gain'){
-						if(event.giver||event.getParent().name=='_yongjian_zengyu') return false;
+						if(event.giver||event.getParent().name=='gift') return false;
 						var cards=event.getg(event.player);
 						if(!cards.length) return false;
 						return game.hasPlayer(function(current){
@@ -7700,6 +7702,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_lusu:['ol_lusu','re_lusu'],
 			zhanghe:['re_zhanghe','zhanghe'],
 			yl_luzhi:['yl_luzhi','tw_yl_luzhi'],
+			sunliang:['sunliang','xin_sunliang'],
 		},
 		translate:{
 			re_yuanshao:'袁绍',
@@ -8005,12 +8008,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xiahouyuan:'夏侯渊',
 			re_huangzhong:'黄忠',
 			re_weiyan:'魏延',
-			re_xiaoqiao:'小乔',
 			
 			gz_xiahouyuan:'夏侯渊',
 			gz_huangzhong:'黄忠',
 			gz_weiyan:'魏延',
-			gz_xiaoqiao:'小乔',
 			gz_xuhuang:'徐晃',
 			gz_pangde:'庞德',
 			gz_caoren:'曹仁',
@@ -8025,7 +8026,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangzhong:'旧黄忠',
 			sp_zhangjiao:'张角',
 			weiyan:'旧魏延',
-			xiaoqiao:'旧小乔',
+			xiaoqiao:'小乔',
 			zhoutai:'界周泰',
 			zhangjiao:'旧张角',
 			//yuji:'于吉',

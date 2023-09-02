@@ -480,7 +480,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								hhzz_toulianghuanzhu:{
 									enable:true,
 									cardimage:"toulianghuanzhu",
-									chongzhu:true,
+									recastable:true,
 									type:'trick',
 									filterTarget:function(card,player,target){
 										return target.skillH.length>0;
@@ -1005,7 +1005,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								return dialog;
 							},
 							chooseCharacter:function(){
-								var next=game.createEvent('chooseCharacter',false);
+								var next=game.createEvent('chooseCharacter');
 								next.showConfig=true;
 								next.setContent(function(){
 									'step 0'
@@ -1221,7 +1221,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:{
 					chooseCharacterBefore:function(){
 						game.chooseCharacter=function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.addPlayer=true;
 				next.ai=function(player,list,back){
@@ -2798,7 +2798,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    			},
    			game.addGlobalSkill('_changeCharacter');
    			game.chooseCharacterTwo=function(){
-   				var next=game.createEvent('chooseCharacter',false);
+   				var next=game.createEvent('chooseCharacter');
    				next.setContent(function(){
    					'step 0'
    					ui.arena.classList.add('choose-character');
@@ -3263,7 +3263,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    			game.identityVideoName='千里单骑';
    			game.saveConfig('player_number',_status.qianlidanji.player_number,'identity');
    			game.chooseCharacter=function(){
-      	var next=game.createEvent('chooseCharacter',false);
+      	var next=game.createEvent('chooseCharacter');
    				next.showConfig=true;
    				next.setContent(function(){
    					"step 0"
@@ -3775,7 +3775,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    			]
    			game.liangjunduilei=list;
    			game.chooseCharacterTwo=function(){
-   				var next=game.createEvent('chooseCharacter',false);
+   				var next=game.createEvent('chooseCharacter');
    				next.setContent(function(){
    					'step 0'
    					for(var i in lib.skill){
