@@ -1304,7 +1304,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.target=target;
 					target.addTempSkill('gzyechou_unsavable');
 					player.useCard({name:'sha',isCard:true},target).set('forceDie',true).set('oncard',function(){
-						_status.event.directHit.add(game.filterPlayer());
+						_status.event.directHit.addArray(game.filterPlayer());
 					});
 					'step 1'
 					player.addTempSkill('gzyechou_unequip');
@@ -1536,7 +1536,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			//毌丘俭
 			gzzhengrong:{
-				audio:'drlt_zhengrong',
+				audio:'drlt_zhenrong',
 				trigger:{
 					source:'damageBegin3',
 					player:['damageBegin1','chooseJunlingForBegin'],
@@ -15699,7 +15699,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						delete source.shijun;
 					}
 					else if(source&&source.identity!='unknown'){
-						if(source.identity=='ye') source.draw(3);
+						if(source.identity=='ye'&&!source.getStorage('yexinjia_friend').length) source.draw(3);
 						else if(source.shijun2){
 							delete source.shijun2;
 							source.draw(1+game.countPlayer(function(current){
