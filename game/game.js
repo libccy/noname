@@ -39854,19 +39854,19 @@
 								}
 							}
 						};
-						if(connectMenu) menuUpdates.push(updateConnectDisplayMap);
+						if(connectMenu){
+							menuUpdates.push(updateConnectDisplayMap);
+							if(mode==lib.config.connect_mode){
+								node.classList.add('active');
+							}
+						}
+						else{
+							if(mode==lib.config.mode){
+								node.classList.add('active');
+							}
+						}
 						node._initLink=function(){
 							node.link=page;
-							if(connectMenu){
-								if(mode==lib.config.connect_mode){
-									node.classList.add('active');
-								}
-							}
-							else{
-								if(mode==lib.config.mode){
-									node.classList.add('active');
-								}
-							}
 							//“更多”下的内容
 							var map={};
 							var infoconfig=connectMenu?info.connect:info.config;
@@ -40579,9 +40579,9 @@
 						if(!game.download&&!lib.device) return;
 						var page=ui.create.div('#create-extension');
 						var node=ui.create.div('.menubutton.large','文件',start.firstChild,clickMode);
+						node.mode='create';
 						node._initLink=function(){
 							node.link=page;
-							node.mode='create';
 							var pageboard=ui.create.div(page);
 
 							var importextensionexpanded=false;
