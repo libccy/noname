@@ -580,12 +580,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:7,
 					result:{
-						target:function(player,target){
+						player:function(player,target){
 							var name=(target.countCards('h')>player.countCards('h')?'tuixinzhifu':'chenghuodajie');
 							var list=[];
 							if(ui.selected.cards.length) list.addArray(ui.selected.cards);
 							var card=get.autoViewAs({name:name},list);
-							return get.effect(card,target,player);
+							return get.effect(target,card,player,player);
 						},
 					},
 				},
@@ -1482,8 +1482,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.group=='qun';
 				},
 				filterCard:lib.filter.cardRecastable,
-				check:function(card,player){
-					var val=5+['shan','tao'].contains(get.name(card))*1.5;
+				check:function(card){
+					var player=_status.event.player,val=5+['shan','tao'].contains(get.name(card))*1.5;
 					if(player.needsToDiscard()>2&&get.name(card)=='sha'&&player.countCards('hs','sha')>1) val+=0.5;
 					return val-get.value(card);
 				},

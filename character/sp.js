@@ -10736,8 +10736,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTarget:[1,Infinity],
 				content:function(){
 					'step 0'
-					if(!target.countCards('he')) event.finish();
-					else target.chooseCard('he','交给'+get.translation(player)+'一张牌',true);
+					if(!target.countCards('h')) event.finish();
+					else target.chooseCard('h','交给'+get.translation(player)+'一张牌',true);
 					'step 1'
 					target.give(result.cards,player);
 					'step 2'

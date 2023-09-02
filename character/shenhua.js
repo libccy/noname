@@ -1014,19 +1014,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						})>1) return 'equip5';
 					});
 					'step 1'
-					if(result.control=='equip1'){
-						player.addTempSkill('drlt_jueyan1',{player:'phaseAfter'});
-					};
-					if(result.control=='equip2'){
-						player.draw(3);
-						player.addTempSkill('drlt_jueyan3',{player:'phaseAfter'});
-					};
-					if(result.control=='equip6'){
-						player.addTempSkill('drlt_jueyan2',{player:'phaseAfter'});
-					};
-					if(result.control=='equip5'){
-						player.addTempSkill('rejizhi',{player:'phaseAfter'});
-					};
+					switch(result.control){
+						case 'equip1':
+							player.addTempSkill('drlt_jueyan1',{player:'phaseAfter'});
+							break;
+						case 'equip2':
+							player.draw(3);
+							player.addTempSkill('drlt_jueyan3',{player:'phaseAfter'});
+							break;
+						case 'equip3_4':
+							player.addTempSkill('drlt_jueyan2',{player:'phaseAfter'});
+							break;
+						case 'equip5':
+							player.addTempSkill('rejizhi',{player:'phaseAfter'});
+							break;
+					}
 				},
 				ai:{
 					order:13,

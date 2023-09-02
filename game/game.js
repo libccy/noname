@@ -16486,7 +16486,7 @@
 						}
 					}
 					if(card.name=='wuxie'){
-						game.logv(player,[card,cards],[evt.card]);
+						game.logv(player,[card,cards],[event.getTrigger().card]);
 					}
 					else{
 						game.logv(player,[card,cards],targets);

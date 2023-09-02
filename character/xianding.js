@@ -514,7 +514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var mod=game.checkMod(card,player,source,'unchanged','cardEnabled',source);
 									if(mod!='unchanged') return mod;
 									if(typeof filter=='boolean') return filter;
-									if(typeof filter=='function') return filter(card,player,event);
+									if(typeof filter=='function') return filter(card,source,event);
 								}
 							},
 							cardUsable:function(card,player,num){
@@ -10715,15 +10715,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 						return;
 					}
-					var color=get.color(result.cards[0],result.cards[0].original=='j'?false:target);
-					event.color=color;
-					var next=player.chooseTarget(true,'挫锐：选择另一名其他角色','弃置该角色装备区里至多两张'+get.translation(event.color)+'牌；或展示该角色的至多两张手牌，然后获得其中的'+get.translation(event.color)+'牌');
-					next.set('filterTarget',(card,player,target)=>{
-						return target.countCards('he')>0&&target!=player&&target!=_status.event.getParent().target;
-					});
-					next.set('ai',target=>{
-						return -get.attitude(_status.event.player,target)*target.countCards('he')+0.1;
-					});
+					if(game.hasPlayer(current=>{
+						return current.countCards('he')>0&&current!=player&&current!=target;
+					})){
+						var color=get.color(result.cards[0],result.cards[0].original=='j'?false:target);
+						event.color=color;
+						var next=player.chooseTarget(true,'挫锐：选择另一名其他角色','弃置该角色装备区里至多两张'+get.translation(event.color)+'牌；或展示该角色的至多两张手牌，然后获得其中的'+get.translation(event.color)+'牌');
+						next.set('filterTarget',(card,player,target)=>{
+							return target.countCards('he')>0&&target!=player&&target!=_status.event.getParent().target;
+						});
+						next.set('ai',target=>{
+							return -get.attitude(_status.event.player,target)*target.countCards('he')+0.1;
+						});
+					}
+					else event.finish();
 					'step 8'
 					if(result.bool){
 						var targetx=result.targets[0];
