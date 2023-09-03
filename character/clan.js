@@ -53,6 +53,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.draw(num);
 					}
 				},
+				ai:{threaten:3},
 			},
 			clanhuanghan:{
 				audio:2,
