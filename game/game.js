@@ -69,11 +69,11 @@
 		configprefix:'noname_0.9_',
 		versionOL:27,
 		updateURLS:{
-			coding:'https://ghproxy.com/https://raw.githubusercontent.com/libccy/noname',
+			coding:'https://raw.fgit.cf/libccy/noname',
 			github:'https://raw.githubusercontent.com/libccy/noname',
 		},
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
-		mirrorURL:'https://nakamurayuri.coding.net/p/noname/d/noname/git/raw',
+		mirrorURL:'https://raw.fgit.cf/libccy/noname',
 		hallURL:'47.99.105.222',
 		assetURL:'',
 		changeLog:[],
@@ -8076,7 +8076,14 @@
 					}
 					const loadPack=()=>{
 						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
-						if(_status.jsExt) toLoad+=_status.jsExt.length;
+						if(_status.jsExt) toLoad+=_status.jsExt.reduce((previousValue,currentValue)=>{
+							const arrayLengths=Object.values(currentValue).reduce((previousElement,currentElement)=>{
+								if(Array.isArray(currentElement)) previousElement.push(currentElement.length);
+								return previousElement;
+							},[]);
+							if(!arrayLengths.length) return previousValue+1;
+							return previousValue+Math.min(...arrayLengths);
+						},0);
 						const packLoaded=()=>{
 							toLoad--;
 							if(toLoad) return;
@@ -8098,20 +8105,31 @@
 						lib.init.js(`${lib.assetURL}character`,lib.config.all.characters,packLoaded,packLoaded);
 						lib.init.js(`${lib.assetURL}character`,'rank',packLoaded,packLoaded);
 						if(!_status.jsExt) return;
-						const loadJSExt=(jsExt,pathArray,nameArray,index)=>{
-							if(!pathArray&&!nameArray){
-								lib.init.js(jsExt.path,jsExt.name,packLoaded,packLoaded);
+						const loadJSExt=(jsExt,pathArray,fileArray,onloadArray,onerrorArray,index)=>{
+							if(!pathArray&&!fileArray&&!onloadArray&&!onerrorArray){
+								lib.init.js(jsExt.path,jsExt.file,()=>{
+									if(typeof jsExt.onload=='function') jsExt.onload();
+									packLoaded();
+								},()=>{
+									if(typeof jsExt.onerror=='function') jsExt.onerror();
+									packLoaded();
+								});
 								return;
 							}
 							if(typeof index!='number') index=0;
-							if(pathArray&&index>=jsExt.path.length||nameArray&&index>=jsExt.name.length) return;
-							const path=pathArray?jsExt.path[index]:jsExt.path,name=nameArray?jsExt.name[index]:jsExt.name,jsExtLoaded=()=>{
-								loadJSExt(jsExt,pathArray,nameArray,index+1);
+							if(pathArray&&index>=jsExt.path.length||fileArray&&index>=jsExt.file.length||onloadArray&&index>=jsExt.onload.length||onerrorArray&&index>=jsExt.onerror.length) return;
+							const path=pathArray?jsExt.path[index]:jsExt.path,file=fileArray?jsExt.file[index]:jsExt.file,onload=onloadArray?jsExt.onload[index]:jsExt.onload,onerror=onerrorArray?jsExt.onerror[index]:jsExt.onerror,jsExtOnLoad=()=>{
+								if(typeof onload=='function') onload();
+								loadJSExt(jsExt,pathArray,fileArray,onloadArray,onerrorArray,index+1);
+								packLoaded();
+							},jsExtOnError=()=>{
+								if(typeof onerror=='function') onerror();
+								loadJSExt(jsExt,pathArray,fileArray,onloadArray,onerrorArray,index+1);
 								packLoaded();
 							};
-							lib.init.js(path,name,jsExtLoaded,jsExtLoaded);
+							lib.init.js(path,file,jsExtOnLoad,jsExtOnError);
 						};
-						_status.jsExt.forEach(value=>loadJSExt(value,Array.isArray(value.path),Array.isArray(value.name)));
+						_status.jsExt.forEach(value=>loadJSExt(value,Array.isArray(value.path),Array.isArray(value.file),Array.isArray(value.onload),Array.isArray(value.onerror)));
 						// if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
 					};
 
@@ -9664,11 +9682,13 @@
 			//在扩展的precontent中调用，用于加载扩展必需的JS文件。
 			//If any of the parameters is an Array, corresponding files will be loaded in order
 			//如果任意参数为数组，则按顺序加载加载相应的文件
-			jsForExtension:(path,name)=>{
+			jsForExtension:(path,file,onload,onerror)=>{
 				if(!_status.jsExt) _status.jsExt=[];
 				_status.jsExt.add({
 					path:path,
-					name:name
+					file:file,
+					onload:onload,
+					onerror:onerror
 				});
 			},
 			js:(path,file,onload,onerror)=>{
@@ -10889,7 +10909,10 @@
 						event.card=cards[num];
 						event.trigger('gift');
 					}
-					else event.finish();
+					else{
+						game.delayx();
+						event.finish();
+					}
 					'step 2'
 					if(event.deniedGifts.includes(card)){
 						game.log(target,'拒绝了',player,'赠予的',card);
