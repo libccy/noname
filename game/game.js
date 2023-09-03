@@ -18237,26 +18237,26 @@
 						game.dead.push(player);
 						_status.dying.remove(player);
 
-						if(!lib.config.background_speak) return;
-						do {
-							if(!lib.character[player.name]) break;
-							if(lib.character[player.name][4].some(tag=>/^die:.+$/.test(tag))) {
-								const tag=lib.character[player.name][4].find(tag=>/^die:.+$/.test(tag))
+						if(lib.config.background_speak){
+							if(lib.character[player.name]&&lib.character[player.name][4].some(tag=>/^die:.+$/.test(tag))){
+								const tag=lib.character[player.name][4].find(tag=>/^die:.+$/.test(tag));
+								const reg=new RegExp("^ext:(.+)?/");
 								const match=tag.match(/^die:(.+)$/);
-								if (!match) break;
-								let path=match[1];
-								if(/^ext:(.+)/.test(path)) path=path.replace(/^ext:(.+?)\//, (_o,p)=>`../extension/${p}/`);
-								game.playAudio(path);
-								return;
+								if(match){
+									let path=match[1];
+									if(reg.test(path)) path=path.replace(reg,(_o,p)=>`../extension/${p}/`);
+									game.playAudio(path);
+								}
 							}
-							else if(lib.character[player.name][4].contains('die_audio')){
+							else if(lib.character[player.name]&&lib.character[player.name][4].contains('die_audio')){
 								game.playAudio('die',player.name);
-								return;
 							}
-						} while (false);
-						game.playAudio('die',player.name,function(){
-							game.playAudio('die',player.name.slice(player.name.indexOf('_')+1));
-						});
+							else{
+								game.playAudio('die',player.name,function(){
+									game.playAudio('die',player.name.slice(player.name.indexOf('_')+1));
+								});
+							}
+						}
 					},player);
 
 					game.addVideo('diex',player);
