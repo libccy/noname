@@ -38583,21 +38583,28 @@
 				lib[_status.dburgent?'ondb2':'ondb'].push(['deleteDB',Array.from(arguments)]);
 				return;
 			}
-			const store=lib.db.transaction([type],'readwrite').objectStore(type);
-			if(arguments.length!=1){
+			if(arguments.length==1){
+				game.getDB(type,null,function(obj){
+					const store=lib.db.transaction([type],'readwrite').objectStore(type);
+					for(let id in obj){
+						lib.status.reload++;
+					}
+					for(let id in obj){
+						store.delete(id).onsuccess=game.reload2;
+					}
+					game.reload2();
+				});
+			}
+			else{
 				lib.status.reload++;
+				const store=lib.db.transaction([type],'readwrite').objectStore(type);
 				store.delete(id).onsuccess=function(){
-					if(callback) callback.apply(this,arguments);
+					if(callback){
+						callback.apply(this,arguments);
+					}
 					game.reload2();
 				};
-				return;
 			}
-			game.getDB(type,null,obj=>{
-				const objKeys=Object.keys(obj);
-				lib.status.reload+=objKeys.length;
-				objKeys.forEach(value=>store.delete(value).onsuccess=game.reload2);
-				game.reload2();
-			});
 		},
 		save:(key,value,mode)=>{
 			if(_status.reloading) return;
@@ -42365,6 +42372,10 @@
 						var page=ui.create.div('#create-extension');
 						var node=ui.create.div('.menubutton.large','制作扩展',start.firstChild,clickMode);
 						node.mode='create';
+						game.editExtension=function(name){
+							node._initLink();
+							game.editExtension(name);
+						};
 						node._initLink=function(){
 							node.link=page;
 							var pageboard=ui.create.div(page);
