@@ -14962,7 +14962,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			requji_info:'出牌阶段限一次，你可以弃置至多X张牌并令等量名角色回复1点体力，然后仍处于受伤状态的目标角色摸一张牌，若你以此法弃置了黑色牌，你失去1点体力。',
 			rejunbing:'郡兵',
 			rejunbing_info:'一名角色的结束阶段，若其手牌数小于其体力值，其可以摸一张牌并将所有手牌交给你，然后你可以交给其等量的牌。',
-			re_zhugedan:'诸葛诞',
+			re_zhugedan:'界诸葛诞',
 			regongao:'功獒',
 			regongao_info:'锁定技。一名其他角色首次进入濒死状态时，你增加1点体力上限，然后回复1点体力。',
 			rejuyi:'举义',
