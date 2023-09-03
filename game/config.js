@@ -1,6 +1,7 @@
 window.config={
 	extension_sources:{
-		GitHub:'https://raw.githubusercontent.com/libccy/noname-extension/master/',
+		Coding:'https://raw.fgit.cf/libccy/noname-extension/master/',
+		GitHub:'https://raw.githubusercontent.com/libccy/noname-extension/master/'
 	},
 	extension_source:'Coding',
 	forbidai:['ns_liuzhang'],
