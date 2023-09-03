@@ -38583,28 +38583,21 @@
 				lib[_status.dburgent?'ondb2':'ondb'].push(['deleteDB',Array.from(arguments)]);
 				return;
 			}
-			if(arguments.length==1){
-				game.getDB(type,null,function(obj){
-					const store=lib.db.transaction([type],'readwrite').objectStore(type);
-					for(let id in obj){
-						lib.status.reload++;
-					}
-					for(let id in obj){
-						store.delete(id).onsuccess=game.reload2;
-					}
-					game.reload2();
-				});
-			}
-			else{
+			if(arguments.length>1){
 				lib.status.reload++;
-				const store=lib.db.transaction([type],'readwrite').objectStore(type);
-				store.delete(id).onsuccess=function(){
-					if(callback){
-						callback.apply(this,arguments);
-					}
+				lib.db.transaction([type],'readwrite').objectStore(type).delete(id).onsuccess=function(){
+					if(callback) callback.apply(this,arguments);
 					game.reload2();
 				};
+				return;
 			}
+			game.getDB(type,null,obj=>{
+				const objKeys=Object.keys(obj);
+				lib.status.reload+=objKeys.length;
+				const store=lib.db.transaction([type],'readwrite').objectStore(type);
+				objKeys.forEach(value=>store.delete(value).onsuccess=game.reload2);
+				game.reload2();
+			});
 		},
 		save:(key,value,mode)=>{
 			if(_status.reloading) return;
