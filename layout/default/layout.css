@@ -4589,6 +4589,8 @@ div[data-decoration="bronze"]::after{
 .timerbar>div:last-child {
 	background: linear-gradient(#FFDA47, #CE0404);
 	transition-timing-function: linear;
+	float: left;
+	transform-origin: left;
 }
 /*.timerbar>div:last-child{background: linear-gradient(#FFFFFF,#F0F0F0);}
 .timerbar[data-color="red"]>div:last-child{background: linear-gradient(#FF0000, #CE0404)}

@@ -23957,7 +23957,7 @@
 					var bar=ui.create.div(this.node.timer);
 					ui.refresh(bar);
 					bar.style.transitionDuration=(time/1000)+'s';
-					bar.style.width=0;
+					bar.style.transform='scale(0,1)';
 				},
 				hideTimer:function(){
 					if(_status.connectMode&&!game.online&&this.playerid){
