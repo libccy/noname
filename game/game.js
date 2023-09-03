@@ -18238,14 +18238,21 @@
 						_status.dying.remove(player);
 
 						if(lib.config.background_speak){
-							if(lib.character[player.name]&&lib.character[player.name][4].contains('die_audio')){
-								game.playAudio('die',player.name);
-							}
-							// else if(true){
-							else{
+							if (!lib.character[player.name]){
 								game.playAudio('die',player.name,function(){
 									game.playAudio('die',player.name.slice(player.name.indexOf('_')+1));
 								});
+							}
+							else if(lib.character[player.name][4].some(tag=>/^die:.+$/.test(tag))) {
+								const tag=lib.character[player.name][4].find(tag=>/^die:.+$/.test(tag))
+								const match=tag.match(/^die:(.+)$/);
+								if (!match) return;
+								let path=match[1];
+								if(/^ext:(.+)/.test(path)) path=path.replace(/^ext:(.+?)\//, (_o,p)=>`../extension/${p}/`);
+								game.playAudio(path);
+							}
+							else if(lib.character[player.name][4].contains('die_audio')){
+								game.playAudio('die',player.name);
 							}
 						}
 					},player);
