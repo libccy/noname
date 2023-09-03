@@ -8389,13 +8389,13 @@
 								});
 							});
 						};
-						game.getFileList=function(dir,callback){
+						game.getFileList=(dir,success,failure)=>{
 							var files=[],folders=[];
-							window.resolveLocalFileSystemURL(lib.assetURL+dir,function(entry){
+							window.resolveLocalFileSystemURL(lib.assetURL+dir,entry=>{
 								var dirReader=entry.createReader();
 								var entries=[];
-								var readEntries=function(){
-									dirReader.readEntries(function(results){
+								var readEntries=()=>{
+									dirReader.readEntries(results=>{
 										if(!results.length){
 											entries.sort();
 											for(var i=0;i<entries.length;i++){
@@ -8406,16 +8406,16 @@
 													files.push(entries[i].name);
 												}
 											}
-											callback(folders,files);
+											success(folders,files);
 										}
 										else{
 											entries=entries.concat(Array.from(results));
 											readEntries();
 										}
-									});
+									},failure);
 								};
 								readEntries();
-							});
+							},failure);
 						};
 						game.ensureDirectory=function(list,callback,file){
 							var directorylist;
@@ -8577,21 +8577,36 @@
 					game.removeFile=function(filename,callback){
 						lib.node.fs.unlink(__dirname+'/'+filename,callback||function(){});
 					};
-					game.getFileList=function(dir,callback){
+					game.getFileList=(dir,success,failure)=>{
 						var files=[],folders=[];
 						dir=__dirname+'/'+dir;
-						lib.node.fs.readdir(dir,function(err,filelist){
-							for(var i=0;i<filelist.length;i++){
-								if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
-									if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
-										folders.push(filelist[i]);
-									}
-									else{
-										files.push(filelist[i]);
+						if(!failure){
+							failure=function(err){
+								throw err;
+							};
+						}
+						lib.node.fs.access(dir,lib.node.fs.constants.F_OK|lib.node.fs.constants.R_OK,err=>{
+							if(err) {
+								failure(err);
+								return;
+							}
+							lib.node.fs.readdir(dir,(err,filelist)=>{
+								if(err){
+									failure(err);
+									return;
+								}
+								for(var i=0;i<filelist.length;i++){
+									if(filelist[i][0]!='.'&&filelist[i][0]!='_'){
+										if(lib.node.fs.statSync(dir+'/'+filelist[i]).isDirectory()){
+											folders.push(filelist[i]);
+										}
+										else{
+											files.push(filelist[i]);
+										}
 									}
 								}
-							}
-							callback(folders,files);
+								success(folders,files);
+							});
 						});
 					};
 					game.ensureDirectory=function(list,callback,file){
