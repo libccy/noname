@@ -128,12 +128,12 @@ window.noname_package={
 		music_jilve:'极略',
 	},
 	font:{
-		xiaozhuan:'小篆',
-		xinwei:'新魏',
-		huangcao:'黄草',
-		yuanli:'楷体',
-		xingkai:'行楷',
-		shousha:'手杀',
+		xiaozhuan:'方正小篆体',
+		xinwei:'华文新魏_GBK',
+		huangcao:'方正黄草_GBK',
+		yuanli:'方正北魏楷书_GBK',
+		xingkai:'方正行楷_GBK',
+		shousha:'方正隶变_GBK',
 	},
 	theme:{
 		woodden:'木纹',

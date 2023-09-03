@@ -298,7 +298,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				else return player.identity=='fan';
 			},
 			chooseCharacterZhidou:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					game.no_continue_game=true;
@@ -405,7 +405,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterBinglin:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					game.no_continue_game=true;
@@ -501,7 +501,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterHuanle:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					ui.arena.classList.add('choose-character');
@@ -588,7 +588,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			
 			chooseCharacterKaihei:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					ui.arena.classList.add('choose-character');
@@ -681,7 +681,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.chooseCharacterBinglin();
 					return;
 				}
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.addPlayer=function(player){
 					var list=lib.config.mode_config.identity.identity[game.players.length-3].slice(0);
@@ -1107,7 +1107,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			
 			chooseCharacterKaiheiOL:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					ui.arena.classList.add('choose-character');
@@ -1224,7 +1224,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterHuanleOL:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					ui.arena.classList.add('choose-character');
@@ -1353,7 +1353,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterBinglinOL:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					ui.arena.classList.add('choose-character');
@@ -1497,7 +1497,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			},
 			chooseCharacterZhidouOL:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					ui.arena.classList.add('choose-character');
@@ -1652,7 +1652,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.chooseCharacterBinglinOL();
 					return;
 				}
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					"step 0"
 					ui.arena.classList.add('choose-character');

@@ -1127,7 +1127,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chooseCharacter:function(func){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.customreplacetarget=func;
 				next.ai=function(player,list){
@@ -8359,7 +8359,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						});
 						for(var i in lib.card){
-							if(lib.card[i].subtype=='equip1') lib.card[i].chongzhu=true;
+							if(lib.card[i].subtype=='equip1') lib.card[i].recastable=true;
 						}
 					}
 				},

@@ -397,7 +397,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.logSkill('taipingyaoshu');
 					player.draw(2);
 					'step 1'
-					if(player.hp>1) player.loseHp();
+					if(player.hp>1||get.mode()=='guozhan') player.loseHp();
 				}
 			},
 			yuxi:{
@@ -455,28 +455,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target!=player&&(get.mode()!='guozhan'||_status.mode=='yingbian'||_status.mode=='free'||target.countCards('e')>0);
 				},
 				enable:true,
-				yingbian_prompt:function(card){
-					var str='';
-					if(get.cardtag(card,'yingbian_all')){
-						str+='此牌的效果改为依次执行所有选项';
-					}
-					if(!str.length||get.cardtag(card,'yingbian_add')){
-						if(str.length) str+='；';
-						str+='当你使用此牌选择目标后，你可为此牌增加一个目标';
-					}
-					return str;
-				},
-				yingbian:function(event){
-					var card=event.card,bool=false;
-					if(get.cardtag(card,'yingbian_all')){
-						bool=true;
-						card.yingbian_all=true;
-						game.log(card,'执行所有选项');
-					}
-					if(!bool||get.cardtag(card,'yingbian_add')){
-						event.yingbian_addTarget=true;
-					}
-				},
+				defaultYingbianEffect:'add',
 				content:function(){
 					'step 0'
 					if(event.card.yingbian_all){
@@ -577,7 +556,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				mode:['guozhan','versus'],
 				filterTarget:true,
-				chongzhu:true,
+				recastable:true,
 				changeTarget:function(player,targets){
 					var target=targets[0];
 					game.filterPlayer(function(current){
@@ -942,7 +921,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'trick',
 				enable:true,
-				chongzhu:true,
+				recastable:true,
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
 					return (target.countCards('h')||target.isUnseen(2));
@@ -1496,7 +1475,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								return current.isFriendOf(player);
 							});
 						}
-						return num+game.countGroup();
+						return num+game.countGroup()-1;
 					}
 				},
 				trigger:{player:'damageBegin4'},
@@ -1687,34 +1666,23 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			g_diaohulishan:{},
 			diaohulishan:{
-				trigger:{player:['damageBegin3','loseHpBefore','recoverBefore']},
-				forced:true,
-				popup:false,
-				content:function(){
-					trigger.cancel();
-				},
-				mod:{
-					cardEnabled:function(){
-						return false;
-					},
-					cardSavable:function(){
-						return false;
-					},
-					targetEnabled:function(){
-						return false;
-					},
-				},
-				mark:true,
-				intro:{
-					content:'不计入距离的计算且不能使用牌且不是牌的合法目标且不能失去/回复体力和受到伤害'
-				},
+				charlotte:true,
 				group:'undist',
-				ai:{
-					effect:{
-						target:function (card,player,target){
-							if(get.tag(card,'recover')||get.tag(card,'damage')) return 'zeroplayertarget';
-						},
-					},
+				init:function(player){
+					if(player.isIn()){
+						game.broadcastAll(function(player){
+							player.classList.add('out');
+						},player);
+						game.log(player,'移出了游戏');
+					}
+				},
+				onremove:function(player){
+					if(player.isOut()){
+						game.broadcastAll(function(player){
+							player.classList.remove('out');
+						},player);
+						game.log(player,'移回了游戏');
+					}
 				},
 			},
 			huxinjing:{
@@ -1815,8 +1783,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			feilongduofeng3:'飞龙夺凤',
 			feilongduofeng_info:'①当你使用【杀】指定目标后，你可令目标角色弃置一张牌。②当你因使用【杀】而令其他角色进入濒死状态时，你可以获得其一张手牌。',
 			taipingyaoshu:'太平要术',
-			taipingyaoshu_info:'锁定技。①当你即将收到属性伤害时，取消之。②你的手牌上限+X（X为势力数）。③当你失去装备区里的【太平要术】时，你摸两张牌，然后若你的体力值大于1，你失去1点体力。',
-			taipingyaoshu_info_guozhan:'锁定技。①当你即将收到属性伤害时，取消之。②你的手牌上限+X（X为与你势力相同的角色数）。③当你失去装备区里的【太平要术】时，你摸两张牌，然后若你的体力值大于1，你失去1点体力。',
+			taipingyaoshu_info:'锁定技。①当你即将受到属性伤害时，取消之。②你的手牌上限+X（X为场上势力数-1）。③当你失去装备区里的【太平要术】时，你摸两张牌，然后若你的体力值大于1，你失去1点体力。',
+			taipingyaoshu_info_guozhan:'锁定技。①当你即将受到属性伤害时，取消之。②你的手牌上限+X（X为与你势力相同的角色数）。③当你失去装备区里的【太平要术】时，你摸两张牌，然后你失去1点体力。',
 			yuxi_skill:'玉玺',
 			yuxi_skill2:'玉玺',
 			yuxi:'玉玺',
@@ -1836,7 +1804,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			chiling:'敕令',
 			chiling_info:'①出牌阶段，对所有没有势力的角色使用。目标角色选择一项：1、明置一张武将牌，然后摸一张牌；2、弃置一张装备牌；3、失去1点体力。②当【敕令】因判定或弃置而置入弃牌堆时，系统将之移出游戏并将【诏书】置于牌堆底，然后系统于当前回合结束后视为对所有没有势力的角色使用【敕令】。',
 			diaohulishan:'调虎离山',
-			diaohulishan_info:'出牌阶段，对至多两名其他角色使用。目标角色于此回合结束之前不计入距离的计算且不能使用牌且不是牌的合法目标且不能失去或回复体力或受到伤害。',
+			diaohulishan_info:'出牌阶段，对至多两名其他角色使用。目标角色于此回合视为移出游戏。',
 			huoshaolianying:'火烧连营',
 			huoshaolianying_bg:'烧',
 			huoshaolianying_info_guozhan:'出牌阶段，对你的下家及其队列中的所有角色使用。你对目标角色造成1点火属性伤害。',

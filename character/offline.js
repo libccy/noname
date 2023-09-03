@@ -3647,12 +3647,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{player:1},
 					effect:{
 						target:function(card,player,target){
-							if(card&&get.type(card)=='equip'&&_status.event.skill=='_yongjian_zengyu') return 0;
+							if(card&&get.type(card)=='equip'&&_status.event.skill=='_gifting') return 0;
 						},
 					},
 				},
 				mod:{
-					cardZengyuable:function(card,player){
+					cardGiftable:function(card,player){
 						return get.type(card)=='equip';
 					}
 				}
@@ -3786,19 +3786,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//群曹操
 			yjxiandao:{
-				trigger:{player:'_yongjian_zengyuEnd'},
+				trigger:{player:'giftAccepted'},
 				usable:1,
 				forced:true,
 				locked:false,
-				filter:function(event,player){
-					return !event._zengyu_denied&&event.target.isIn();
-				},
+				filter:(event,player)=>event.target!=player&&event.target.isIn(),
 				logTarget:'target',
 				content:function(){
 					'step 0'
 					event.target=trigger.target;
-					event.card=trigger.cards[0];
-					event.target.markAuto('yjxiandao',[get.suit(event.card,false)])
+					event.card=trigger.card;
+					event.target.markAuto('yjxiandao_block',[get.suit(event.card,false)]);
 					event.target.addTempSkill('yjxiandao_block');
 					'step 1'
 					var type=get.type(card,false);
@@ -3859,14 +3857,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 2'
 					if(result.bool){
-						player.line(result.targets[0],'green');
-						var next=game.createEvent('_yongjian_zengyu');
-						next.player=player;
-						next.target=result.targets[0];
-						next.cards=result.cards;
-						next.setContent(lib.skill._yongjian_zengyu.content);
+						var target=result.targets[0];
+						player.line(target,'green');
+						player.gift(result.cards,target);
 					}
-				},
+				}
 			},
 			yjyibing:{
 				trigger:{
@@ -3875,7 +3870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				filter:function(event,player){
-					if(event.getParent().name=='_yongjian_zengyu') return false;
+					if(event.getParent().name=='gift') return false;
 					if(event.getParent('yjyibing').player==player) return false;
 					var evt=event.getParent('phaseDraw'),hs=player.getCards('h'),cards=event.getg(player);
 					return cards.length>0&&(!evt||evt.player!=player)&&cards.filter(function(card){
@@ -6403,11 +6398,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//用间
 			yj_caocao:'SP曹操',
 			yjxiandao:'献刀',
-			yjxiandao_info:'每回合限一次。当你对其他角色发动〖赠予〗后，你令其不能使用或打出与本次赠予移动的牌A花色相同的牌直到回合结束。然后若牌A：为锦囊牌，你摸两张牌。为装备牌，你获得其一张不为A的牌。为武器牌，你对其造成1点伤害。',
+			yjxiandao_info:'每回合限一次。当你赠予其他角色一张牌后，你令其不能使用或打出与本次赠予移动的牌A花色相同的牌直到回合结束。然后若牌A：为锦囊牌，你摸两张牌。为装备牌，你获得其一张不为A的牌。为武器牌，你对其造成1点伤害。',
 			yjsancai:'散财',
-			yjsancai_info:'出牌阶段限一次，你可以展示所有手牌。若这些牌的类别均相同，则你可以发动一次〖赠予〗（可以选择任意手牌）。',
+			yjsancai_info:'出牌阶段限一次，你可以展示所有手牌。若这些牌的类别均相同，则你可以赠予一名其他角色一张手牌。',
 			yjyibing:'义兵',
-			yjyibing_info:'当你不因〖赠予〗且不因〖义兵〗的嵌套结算而于摸牌阶段外获得牌时，你可以将此次获得的所有牌当做【杀】使用（无距离限制且不计入使用次数）。',
+			yjyibing_info:'当你不因赠予且不因〖义兵〗的嵌套结算而于摸牌阶段外获得牌时，你可以将此次获得的所有牌当做【杀】使用（无距离限制且不计入使用次数）。',
 			yj_caohong:'用间曹洪',
 			yj_caohong_ab:'曹洪',
 			yjlifeng:'厉锋',

@@ -117,7 +117,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.useCard(result.targets,card,event.links);
 					}
 					else{
-						target.recast(event.links,(player,cards)=>game.cardsDiscard(cards).cards);
+						target.recast(event.links,(player,cards)=>game.cardsDiscard(cards));
 					}
 					'step 4'
 					for(var card of cards){
@@ -3864,17 +3864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				discard:function(){
 					"step 0"
 					game.log(player,'进入了弃牌阶段');
-					event.num=(function(){
-						var num=0;
-						var hs=player.getCards('he');
-						num+=hs.length;
-						for(var i=0;i<hs.length;i++){
-							if(game.checkMod(hs[i],player,false,'ignoredHandcard',player)==true){
-								num--;
-							}
-						}
-						return Math.max(0,num-player.getHandcardLimit());
-					})();
+					event.num=Math.max(0,player.countCards('he',card=>!player.canIgnoreHandcard(card))-player.getHandcardLimit());
 					if(event.num<=0) event.finish();
 					else{
 						if(lib.config.show_phase_prompt){

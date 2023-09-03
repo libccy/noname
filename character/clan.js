@@ -43,6 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:true,
 				content:function(){
 					'step 0'
+					player.unmarkSkill('clanyuzhi');
 					var num1=0,num2=0,num3=0,bool=true;
 					var history=player.actionHistory;
 					for(var i=history.length-2;i>=0;i--){
@@ -92,7 +93,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.clanyuzhi=lib.skill.dcweidang.getLength(result.cards[0]);
 						player.markSkill('clanyuzhi');
 					}
-					else player.unmarkSkill('clanyuzhi');
 				},
 				ai:{
 					threaten:3,
@@ -284,6 +284,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card,player){
 					var storage=player.storage.clanjiexuan;
 					return get.color(card)==((storage||0)%2?'black':'red');
+				},
+				prompt:function(){
+					if(_status.event.player.storage.clanjiexuan) return '将一张黑色牌当【过河拆桥】使用';
+					return '将一张红色牌当【顺手牵羊】使用';
 				},
 				skillAnimation:true,
 				animationColor:'thunder',
@@ -829,16 +833,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				clanSkill:true,
 				filter:function(event,player){
 					if(!event.cards.length) return true;
-					var cards=[];
-					game.countPlayer(current=>{
-						if(!current.hasClan('太原王氏')) return false;
-						current.getHistory('lose',evt=>{
-							if(event!=evt.getParent()) return false;
-							cards.addArray(evt.getl(current).hs);
+					return !game.hasPlayer2(current=>{
+						if(!current.hasClan('太原王氏')&&current!=player) return false;
+						return current.hasHistory('lose',evt=>{
+							return evt.getParent()==event&&evt.hs.length>0;
 						});
-					})
-					if(event.cards.some(card=>!cards.contains(card))) return false;
-					return true;
+					});
 				},
 				content:function(){
 					'step 0'
@@ -899,6 +899,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				global:'clanlianzhu_global',
 				subSkill:{
 					global:{
+						forceaudio:true,
+						audio:'clanlianzhu',
 						enable:'phaseUse',
 						filter:(event,player)=>game.hasPlayer(current=>lib.skill.clanlianzhu_global.filterTarget(null,player,current)),
 						filterCard:(card,player)=>game.hasPlayer(current=>current.hasSkill('clanlianzhu')&&!current.hasSkill('clanlianzhu_targeted')&&!current.storage.clanlianzhu)&&player.canRecast(card),
@@ -1935,11 +1937,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.hasCard(card=>get.suit(card)==get.suit(event.card)&&player.canRecast(card),'h');
 				},
 				content:function(){
+					'step 0'
 					if(trigger.targets&&trigger.targets.length==1){
 						trigger.targets[0].link(true);
 					}
 					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card)&&player.canRecast(card));
 					if(cards.length>0) player.recast(cards);
+					'step 1'
+					player.draw();
 				}
 			},
 			clanhuanyin:{
@@ -2024,6 +2029,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 6-ui.selected.cards.length-get.value(card);
 				},
 				onuse:function(links,player){
+					lib.skill.chenliuwushi.change(player,-1);
 					player.addTempSkill('clanzhanding_effect');
 				},
 				ai:{
@@ -2042,7 +2048,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.skill=='clanzhanding';
 						},
 						content:function(){
-							lib.skill.chenliuwushi.change(player,-1);
 							if(player.hasHistory('sourceDamage',function(evt){
 								return evt.card==trigger.card;
 							})){
@@ -2269,6 +2274,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.clanguangu) return '转换技，出牌阶段限一次。阴：你可以观看牌堆顶的至多四张牌；<span class="bluetext">阳：你可以观看一名角色的至多四张手牌。</span>然后你可以使用其中的一张牌。';
 				return '转换技，出牌阶段限一次。<span class="bluetext">阴：你可以观看牌堆顶的至多四张牌；</span>阳：你可以观看一名角色的至多四张手牌。然后你可以使用其中的一张牌。';
 			},
+			clanjiexuan:function(player){
+				if(player.storage.clanjiexuan) return '限定技，转换技。阴：你可以将一张红色牌当【顺手牵羊】使用；<span class="bluetext">阳：你可以将一张黑色牌当【过河拆桥】使用。</span>';
+				return '限定技，转换技。<span class="bluetext">阴：你可以将一张红色牌当【顺手牵羊】使用；</span>阳：你可以将一张黑色牌当【过河拆桥】使用。';
+			},
 		},
 		translate:{
 			clan_wuxian:'族吴苋',
@@ -2281,7 +2290,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chenliuwushi:'陈留·吴氏',
 			clan_wuban:'族吴班',
 			clanzhanding:'斩钉',
-			clanzhanding_info:'你可以将任意张牌当做【杀】使用。你以此法使用的【杀】结算结束后，你令你的手牌上限-1，然后若你因此【杀】造成过伤害，则你将手牌摸至手牌上限（至多摸五张），否则你令此【杀】不计入次数限制。',
+			clanzhanding_info:'你可以将任意张牌当做【杀】使用并你令你的手牌上限-1。你以此法使用的【杀】结算结束后，若你因此【杀】造成过伤害，则你将手牌摸至手牌上限（至多摸五张），否则你令此【杀】不计入次数限制。',
 			clan_xunshu:'族荀淑',
 			clanshenjun:'神君',
 			clanshenjun_info:'当一名角色使用【杀】或普通锦囊牌时，若你手牌中有该牌名的牌，你展示之，且这些牌称为“神君”。然后本阶段结束时，你可以将等同于你“神君”数张牌当做一张“神君”牌使用。',

@@ -281,7 +281,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					target.link();
 				},
-				chongzhu:true,
+				recastable:true,
 				ai:{
 					wuxie:function(target,card,player,viewer){
 						if(_status.event.getRand()<0.5) return 0;

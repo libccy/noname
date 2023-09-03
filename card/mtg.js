@@ -501,7 +501,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						if(cardsToGain.length) player.gain(cardsToGain,'draw');
 						if(cards.length-cardsToGain.length) player.draw(cards.length-cardsToGain.length).log=false;
-						return cardsToGain;
 					});
 				},
 				ai:{

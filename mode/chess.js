@@ -3634,7 +3634,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ui.money.childNodes[1].innerHTML=game.data.dust;
 			},
 			chooseCharacter:function(){
-				var next=game.createEvent('chooseCharacter',false);
+				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.ai=function(player,list){
 					if(get.config('double_character')){
