@@ -8580,10 +8580,13 @@
 					game.getFileList=(dir,success,failure)=>{
 						var files=[],folders=[];
 						dir=__dirname+'/'+dir;
-						if(!failure){
-							failure=function(err){
+						if(typeof failure=="undefined"){
+							failure=err=>{
 								throw err;
 							};
+						}
+						else if(failure == null){
+							failure=()=>{};
 						}
 						lib.node.fs.access(dir,lib.node.fs.constants.F_OK|lib.node.fs.constants.R_OK,err=>{
 							if(err) {
