@@ -795,16 +795,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					['scs_gaowang','scsmiaoyu']
 				],
 				conflictMap:{
-					scs_zhangrang:[],
-					scs_zhaozhong:[],
-					scs_sunzhang:[],
-					scs_bilan:['scs_hankui'],
-					scs_xiayun:[],
-					scs_hankui:['scs_bilan'],
-					scs_lisong:[],
+					scs_zhangrang:['scs_hankui'],
+					scs_zhaozhong:['scs_guosheng','scs_lisong'],
+					scs_sunzhang:['scs_duangui','scs_hankui'],
+					scs_bilan:['scs_hankui','scs_xiayun','scs_zhaozhong','scs_sunzhang'],
+					scs_xiayun:['scs_zhaozhong','scs_lisong'],
+					scs_hankui:['scs_bilan','scs_zhangrang'],
+					scs_lisong:['scs_guosheng','scs_duangui'],
 					scs_duangui:['scs_guosheng'],
 					scs_guosheng:['scs_duangui'],
-					scs_gaowang:['scs_hankui','scs_duangui','scs_guosheng','scs_bilan'],
+					scs_gaowang:['scs_xuayun','scs_sunzhang'],
 				},
 				group:'mbdanggu_back',
 				content:function(){
@@ -853,16 +853,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},player,first);
 					}
-					if(list.contains('scs_gaowang')){
-						var others=list.filter(changshi=>{
-							return changshi!='scs_gaowang';
-						}).randomGets(3);
-						others.push('scs_gaowang');
-						others.randomSort();
-					}
-					else{
-						var others=list.randomGets(4);
-					}
+					var others=list.randomGets(4);
 					var next=player.chooseButton([
 						'党锢：请选择结党对象',
 						[[first],'character'],
@@ -870,19 +861,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						[others,'character']
 					],true);
 					next.set('filterButton',button=>{
-						if(_status.event.canChoose.contains(button.link)) return true;
-						return false;
+						return !_status.event.canChoose.contains(button.link);
 					})
 					next.set('canChoose',function(){
-						var list=others.filter(changshi=>{
+						var conflictList=others.filter(changshi=>{
 							var map=lib.skill.mbdanggu.conflictMap;
 							var names=map[first];
-							return !names.contains(changshi);
-						});
-						return list.length?list:others;
+							return names.contains(changshi);
+						}),list=[];
+						if(conflictList.length) list.push(conflictList.randomGet());
+						return list;
 					}());
 					next.set('ai',button=>{
-						if(button.link=='scs_gaowang') return 10;
 						return Math.random()*10;
 					})
 					'step 1'
@@ -14173,7 +14163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbdanggu:'党锢',
 			mbdanggu_info:'锁定技。①游戏开始时，你获得十张“常侍”牌，然后你进行一次结党。②当你修整结束后，你进行一次结党并摸一张牌。③若你有亮出的“常侍”牌，你视为拥有这些牌的技能。',
 			mbdanggu_faq:'关于结党',
-			mbdanggu_faq_info:'<br>系统随机选择一张未亮出过的“常侍”牌，然后选择四张未亮出过的“常侍”牌（若剩余“常侍”牌中有「高望」，则必定出现）。你观看前者，然后从后者中选择一名与前者互相认可的“常侍”牌（不认可的“常侍”牌为不可选状态），你选择这两张牌。然后若此时不为双将模式，你将这两张武将牌作为你的武将牌（不移除原有技能）；否则你获得这两张武将牌上的技能。',
+			mbdanggu_faq_info:'<br>系统随机选择一张未亮出过的“常侍”牌，然后选择四张未亮出过的“常侍”牌。你观看前者，然后从后者中选择一名与前者互相认可的“常侍”牌（不认可的“常侍”牌为不可选状态，若有多组不认可的不认可的“常侍”牌，则系统随机选择其中一张“常侍”牌为不可选状态）。然后若此时不为双将模式，你将这两张武将牌作为你的武将牌（不移除原有技能）；否则你获得这两张武将牌上的技能。',
 			mbmowang:'殁亡',
 			mbmowang_info:'锁定技。①当你死亡前，若你有未亮出的“常侍”牌且体力上限大于0，你将死亡改为修整至你的下个回合开始前，然后你复原武将牌，且不于此次死亡事件中进行展示身份牌、检测游戏胜利条件与执行奖惩的流程。②回合结束后，你死亡。',
 			mbmowang_faq:'关于修整',
