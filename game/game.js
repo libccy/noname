@@ -35415,7 +35415,8 @@
 			else{
 				imgsrc='ext:'+extname+'/'+name+'.jpg';
 			}
-			var character=[info.sex,info.group,info.hp,info.skills||[],[imgsrc]];
+			const audiosrc='die:ext:'+extname+'/'+name+'.mp3';
+			var character=[info.sex,info.group,info.hp,info.skills||[],[imgsrc,audiosrc]];
 			if(info.tags){
 				character[4]=character[4].concat(info.tags);
 			}
@@ -35445,7 +35446,9 @@
 						else{
 							imgsrc='ext:'+extname+'/'+j+'.jpg';
 						}
-						pack[i][j][4].push(imgsrc);
+						const audiosrc='die:ext:'+extname+'/'+name+'.mp3';
+						pack[i][j][4].add(imgsrc);
+						pack[i][j][4].add(audiosrc);
 						if(pack[i][j][4].contains('boss')||
 							pack[i][j][4].contains('hiddenboss')){
 							lib.config.forbidai.add(j);
