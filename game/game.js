@@ -27863,21 +27863,22 @@
 					return this._tempCache[key1][key2];
 				},
 				cancel:function(arg1,arg2,notrigger){
-					this.untrigger.call(this,arguments);
+					if(typeof arg1=='undefined') arg1=true;
+					this.untrigger(arg1,arg2);
 					this.finish();
 					if(notrigger!='notrigger'){
 						this.trigger(this.name+'Cancelled');
 						if(this.player&&lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name)}
 				},
 				neutralize:function(event){
-					this.untrigger.call(this,arguments);
+					this.untrigger(true);
 					this.finish();
 					this._neutralized=true;
 					this.trigger('eventNeutralized');
 					this._neutralize_event=event||_status.event;
 				},
 				unneutralize:function(){
-					this.untrigger.call(this,arguments);
+					this.untrigger(true);
 					delete this._neutralized;
 					delete this.finished;
 					if(this.type=='card'&&this.card&&this.name=='sha') this.directHit=true;
@@ -54407,7 +54408,7 @@
 					threaten=info.ai.threaten(player,player);
 				}
 			}
-			if(type.indexOf('in')!=-1){
+			if(type&&type.indexOf('in')!=-1){
 				if(info.enable=='phaseUse') num+=0.5;
 				if(info.trigger&&info.trigger.player){
 					var list=Array.isArray(info.trigger.player)?info.trigger.player:[info.trigger.player];
@@ -54436,7 +54437,7 @@
 					num+=Math.sqrt(threaten)-1;
 				}
 			}
-			if(type.indexOf('out')!=-1){
+			if(type&&type.indexOf('out')!=-1){
 				if(threaten<1){
 					num*=1/Math.sqrt(threaten);
 				}
