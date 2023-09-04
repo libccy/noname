@@ -285,7 +285,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var info=get.info(skill);
 					if(info.charlotte) return false;
 					var translation=get.skillInfoTranslation(skill,event.player);
-					if(!translation||!(/(?<!“)出牌阶段限一次/.test(translation))) return false;
+					if(!translation||translation.match(/“?出牌阶段限一次/g).every(value=>value!='出牌阶段限一次')) return false;
 					return event.player.countCards('h')>0;
 				},
 				check:function(event,player){
@@ -1727,34 +1727,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				content:function(){
-					'step 0'
-					event.judgestr=get.translation('shandian');
-					player.judge(lib.card.shandian.judge,event.judgestr).judge2=lib.card.shandian.judge2;
-					game.delayx(1.5);
-					'step 1'
-					var name='shandian';
-					if(event.cancelled&&!event.direct){
-						if(lib.card[name].cancel){
-							var next=game.createEvent(name+'Cancel');
-							next.setContent(lib.card[name].cancel);
-							next.cards=[];
-							next.card=get.autoViewAs({name:name});
-							next.player=player;
-						}
-					}
-					else{
-						var next=game.createEvent(name);
-						next.setContent(function(){
-							if(result.bool==false){
-								player.damage(3,'thunder','nosource');
-							}
-						});
-						next._result=result;
-						next.cards=[];
-						next.card=get.autoViewAs({name:name});
-						next.player=player;
-					}
-					'step 2'
+					player.executeDelayCardEffect('shandian');
 					trigger.player.drawTo(4);
 				},
 				ai:{expose:0.25}
@@ -2366,7 +2339,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanyunshen:'熨身',
 			clanyunshen_info:'出牌阶段限一次。你可以令一名其他角色回复1点体力，然后选择一项：1.你视为对其使用一张冰【杀】；2.其视为对你使用一张冰【杀】。',
 			clanshangshen:'伤神',
-			clanshangshen_info:'当一名角色受到属性伤害后，若本回合此前没有角色或已死亡的角色受到过属性伤害，你可以进行目标角色为你的【闪电】的特殊的使用流程，然后其将手牌摸至四张。',
+			clanshangshen_info:'当一名角色受到属性伤害后，若本回合此前没有角色或已死亡的角色受到过属性伤害，你可以执行目标角色为你的【闪电】效果，然后其将手牌摸至四张。',
 			clanfenchai:'分钗',
 			clanfenchai_info:'锁定技。若你首次发动技能指定的异性目标角色中：存在存活角色，你的判定牌视为♥；不存在存活角色，你的判定牌视为♠。',
 			clan_hanshao:'族韩韶',

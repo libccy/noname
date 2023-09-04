@@ -386,8 +386,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseEnd'},
 				filter:function(event,player){
-					var zhu=game.filterPlayer(i=>i.getSeatNum()==1)[0];
-					return player.hasSkill('shiming_round')&&(game.getGlobalHistory('changeHp',evt=>{
+					var zhu=game.findPlayer(i=>i.getSeatNum()==1);
+					return zhu&&player.hasSkill('shiming_round')&&(game.getGlobalHistory('changeHp',evt=>{
 						return evt.player==zhu&&evt._dyinged;
 					}).length>0||zhu.getHistory('damage').length==0)||!game.hasPlayer2(current=>current.getHistory('damage').length>0);
 				},
@@ -395,7 +395,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(player.hasSkill('shiming_round')){
-						var zhu=game.filterPlayer(i=>i.getSeatNum()==1)[0];
+						var zhu=game.findPlayer(i=>i.getSeatNum()==1);
 						if(game.getGlobalHistory('changeHp',evt=>{
 							return evt.player==zhu&&evt._dyinged;
 						}).length>0||zhu.getHistory('damage').length==0){

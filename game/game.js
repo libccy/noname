@@ -9955,7 +9955,7 @@
 			parsex:function(func){
 				//Remove all comments
 				//移除所有注释
-				var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\S\s]|[^"\\])*"|'(?:\\[\S\s]|[^'\\])*'|(?:\r?\n|[\S\s])[^\/"'\\\s]*)/mg,'$2').trim();
+				var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^\/"'\\\s]*)/mg,'$2').trim();
 				//获取第一个 { 后的所有字符
 				str=str.slice(str.indexOf('{')+1);
 				//func中要写步骤的话，必须要写step 0
@@ -10936,6 +10936,69 @@
 			content:{
 				emptyEvent:function(){
 					event.trigger(event.name);
+				},
+				//Execute the delay card effect
+				//执行延时锦囊牌效果
+				executeDelayCardEffect:()=>{
+					'step 0'
+					target.$phaseJudge(card);
+					event.cancelled=false;
+					event.trigger('executeDelayCardEffect');
+					event.cardName=card.viewAs||card.name;
+					target.popup(event.cardName,'thunder');
+					if(!lib.card[event.cardName].effect){
+						game.delay();
+						event.finish();
+					}
+					else if(!lib.card[event.cardName].judge){
+						game.delay();
+						event.nojudge=true;
+					}
+					'step 1'
+					if(!event.cancelled&&!event.nojudge) player.judge(card);
+					'step 2'
+					if(event.excluded) delete event.excluded;
+					else{
+						const cardName=event.cardName;
+						if(event.cancelled&&!event.direct){
+							const cardCancel=lib.card[cardName].cancel;
+							if(cardCancel){
+								const next=game.createEvent(`${cardName}Cancel`);
+								next.setContent(cardCancel);
+								next.cards=[card];
+								if(!card.viewAs){
+									const autoViewAs=next.card=get.autoViewAs(card);
+									autoViewAs.expired=card.expired;
+								}
+								else{
+									const autoViewAs=next.card=get.autoViewAs({
+										name:cardName
+									},next.cards);
+									autoViewAs.expired=card.expired;
+								}
+								next.player=player;
+							}
+						}
+						else{
+							const next=game.createEvent(cardName);
+							next.setContent(lib.card[cardName].effect);
+							next._result=result;
+							next.cards=[card];
+							if(!card.viewAs){
+								const autoViewAs=next.card=get.autoViewAs(card);
+								autoViewAs.expired=card.expired;
+							}
+							else{
+								const autoViewAs=next.card=get.autoViewAs({
+									name:cardName
+								},next.cards);
+								autoViewAs.expired=card.expired;
+							}
+							next.player=player;
+						}
+					}
+					ui.clear();
+					card.delete();
 				},
 				//Gift
 				//赠予
@@ -18709,6 +18772,25 @@
 			},
 			player:{
 				//新函数
+				//Execute the delay card effect
+				//执行延时锦囊牌效果
+				executeDelayCardEffect:function(card,target){
+					const executeDelayCardEffect=game.createEvent('executeDelayCardEffect');
+					executeDelayCardEffect.player=this;
+					executeDelayCardEffect.target=target||this;
+					if(typeof card=='string'){
+						const virtualCard=executeDelayCardEffect.card=ui.create.card();
+						virtualCard._destroy=true;
+						virtualCard.expired=true;
+						const info=lib.card[card];
+						virtualCard.init(['','',card,info&&info.cardnature]);
+					}
+					else if(get.itemtype(card)=='card') executeDelayCardEffect.card=card;
+					else _status.event.next.remove(executeDelayCardEffect);
+					executeDelayCardEffect.setContent('executeDelayCardEffect');
+					executeDelayCardEffect._args=Array.from(arguments);
+					return executeDelayCardEffect;
+				},
 				//Check if the card does not count toward hand limit
 				//检测此牌是否不计入手牌上限
 				canIgnoreHandcard:function(card){
@@ -27863,7 +27945,6 @@
 					return this._tempCache[key1][key2];
 				},
 				cancel:function(arg1,arg2,notrigger){
-					if(typeof arg1=='undefined') arg1=true;
 					this.untrigger(arg1,arg2);
 					this.finish();
 					if(notrigger!='notrigger'){
@@ -28426,6 +28507,7 @@
 					}
 				},
 				untrigger:function(all,player){
+					if(typeof all=='undefined') all=true;
 					var evt=this._triggering;
 					if(all){
 						if(evt&&evt.map){
