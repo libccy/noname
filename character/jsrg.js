@@ -824,7 +824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=targets[event.index];
 					if(target.isIn()){
 						target.draw();
-						if(target==player) event.num++;
+						event.num++;
 					}
 					event.index++;
 					if(event.index>=targets.length) event.index=0;
@@ -4255,7 +4255,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_zoushi:'承邹氏',
 			jsrg_zoushi_ab:'邹氏',
 			jsrgguyin:'孤吟',
-			jsrgguyin_info:'准备阶段，你可以翻面，且令所有其他男性角色依次选择是否翻面。然后你和所有背面朝上的角色轮流各摸一张牌直到你本次以此法获得X张牌（X为场上存活角色与死亡角色中男性角色数）。',
+			jsrgguyin_info:'准备阶段，你可以翻面，且令所有其他男性角色依次选择是否翻面。然后你和所有背面朝上的角色轮流各摸一张牌，直到你们累计以此法获得X张牌（X为场上存活角色与死亡角色中男性角色数）。',
 			jsrgzhangdeng:'帐灯',
 			jsrgzhangdeng_info:'①当一名武将牌背面朝上的角色需要使用【酒】时，若你的武将牌背面朝上，其可以视为使用之。②当一名角色于一回合第二次发动〖帐灯①〗时，你将武将牌翻面至正面朝上。',
 			jsrg_guanyu:'承关羽',
