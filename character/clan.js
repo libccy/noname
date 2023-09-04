@@ -33,19 +33,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//族钟毓
 			clanjiejian:{
-				inherit:'olcuipo',
+				audio:2,
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
 					if(!event.isFirstTarget) return false;
 					return lib.skill.dcweidang.getLength(event.card)==player.getHistory('useCard').indexOf(event.getParent())+1;
 				},
-				locked:false,
 				direct:true,
 				content:function(){
 					'step 0'
 					var num=lib.skill.dcweidang.getLength(trigger.card);
 					event.num=num;
-					player.chooseTarget(get.prompt('clanjiejian'),'令一名角色摸'+get.cnNumber(num)+'张牌').set('ai',target=>get.attitude(_status.event.player,target));
+					player.chooseTarget(get.prompt('clanjiejian'),'令一名目标角色摸'+get.cnNumber(num)+'张牌',function(card,player,target){
+						return _status.event.getTrigger().targets.contains(target);
+					}).set('ai',target=>get.attitude(_status.event.player,target));
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
@@ -54,6 +55,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{threaten:3},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(typeof card=='object'&&lib.skill.dcweidang.getLength(card)==player.getHistory('useCard').length+1){
+							if(get.effect(player,card,player,player)>0) return num+10;
+						}
+					},
+				},
 			},
 			clanhuanghan:{
 				audio:2,
@@ -2413,7 +2421,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanxieshu_info:'当你使用牌造成伤害后，或受到来自牌造成的伤害后，你可以弃置Y张牌并摸你已损失体力值张牌（Y为此牌牌名字数）。',
 			clan_zhongyu:'族钟毓',
 			clanjiejian:'捷谏',
-			clanjiejian_info:'当你于一回合使用第X张牌指定第一个目标后，你可以令一名角色摸X张牌。（X为此牌牌名字数）',
+			clanjiejian_info:'当你于一回合使用第X张牌指定第一个目标后，你可以令一名目标角色摸X张牌。（X为此牌牌名字数）',
 			clanhuanghan:'惶汗',
 			clanhuanghan_info:'当你受到牌造成的伤害后，你可以摸X张牌并弃置Y张牌（X为此牌牌名字数，Y为你已损失的体力值），然后若此次技能发动不为你本回合首次发动此技能，你重置技能〖保族〗。',
 			
