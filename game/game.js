@@ -32638,7 +32638,7 @@
 			var audio=document.createElement('audio');
 			audio.autoplay=true;
 			audio.volume=lib.config.volumn_audio/8;
-			if(str.indexOf('.mp3')!=-1||str.indexOf('.ogg')!=-1){
+			if(str.split('/').pop().split('.').length>1){
 				audio.src=lib.assetURL+'audio'+str;
 			}
 			else{
