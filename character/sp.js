@@ -21203,6 +21203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			yongsi:{
+				audio:'yongsi1',
 				group:['yongsi1','yongsi2'],
 				locked:true,
 				ai:{
