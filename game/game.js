@@ -7638,22 +7638,6 @@
 						}
 					});
 				}
-				if(!Array.from){
-					Object.defineProperty(Array, "from", {
-						configurable:true,
-						enumerable:false,
-						writable:true,
-						value:function(args){
-							const list=[];
-							if(args&&args.length){
-								for(let i=0;i<args.length;i++){
-									list.push(args[i]);
-								}
-							}
-							return list;
-						}
-					});
-				}
 				if(!Object.values){
 					Object.defineProperty(Object, 'values', {
 						configurable:true,
