@@ -13316,6 +13316,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else text=_status.yexinjia_list.randomRemove();
 					lib.group.push(text);
 					lib.translate[text+'2']=text;
+					lib.groupnature[text]='kami';
 					event.text=text;
 					game.broadcastAll(function(player,text){
 						player.identity=text;
@@ -13340,7 +13341,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						//event.targets4.push(target);
 						game.broadcastAll(function(player,text){
 							player.identity=text;
-							player.setIdentity(text,text);
+							player.setIdentity(text,'kami');
 						},target,event.text);
 						target.changeGroup(event.text);
 					}
