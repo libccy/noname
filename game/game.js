@@ -7638,22 +7638,6 @@
 						}
 					});
 				}
-				if(!Array.from){
-					Object.defineProperty(Array, "from", {
-						configurable:true,
-						enumerable:false,
-						writable:true,
-						value:function(args){
-							const list=[];
-							if(args&&args.length){
-								for(let i=0;i<args.length;i++){
-									list.push(args[i]);
-								}
-							}
-							return list;
-						}
-					});
-				}
 				if(!Object.values){
 					Object.defineProperty(Object, 'values', {
 						configurable:true,
@@ -32638,7 +32622,7 @@
 			var audio=document.createElement('audio');
 			audio.autoplay=true;
 			audio.volume=lib.config.volumn_audio/8;
-			if(str.indexOf('.mp3')!=-1||str.indexOf('.ogg')!=-1){
+			if(str.split('/').pop().split('.').length>1){
 				audio.src=lib.assetURL+'audio'+str;
 			}
 			else{
@@ -35240,7 +35224,7 @@
 		linexy:function(path){
 			const from=[path[0],path[1]],to=[path[2],path[3]];
 			let total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2,opacity=1,color=[255,255,255],dashed=false,drag=false;
-			if(typeof arguments[1]=='object') Object.keys(arguments[1]).forEach(value=>{
+			if(arguments[1]!=null&&typeof arguments[1]=='object') Object.keys(arguments[1]).forEach(value=>{
 				switch(value){
 					case 'opacity':
 						opacity=arguments[1][value];
@@ -48101,48 +48085,37 @@
 				ui.shortcut.autobutton.dataset.position=2;
 				ui.favmodelist=ui.create.div('.favmodelist',ui.shortcut);
 				ui.favmodelist.update=function(){
+					const favouriteMode=lib.config.favouriteMode;
+					let removed=false;
+					for(let index=0;index<favouriteMode.length;index++){
+						if(typeof favouriteMode[index]=='string') continue;
+						favouriteMode.splice(index--,1);
+						if(!removed) removed=true;
+					}
+					if(removed) game.saveConfigValue('favouriteMode');
 					this.innerHTML='';
-					var num=Math.min(6,lib.config.favouriteMode.length);
-					for(var i=0;i<num;i++){
-						this.add(lib.config.favouriteMode[i],i);
-					}
-					var mode=get.mode();
-					if(typeof get.config(mode+'_mode')=='string'){
-						mode+='|'+get.config(mode+'_mode');
-					}
-					if(lib.config.favouriteMode.contains(mode)){
-						ui.favmode.classList.add('glow');
-					}
-					else{
-						ui.favmode.classList.remove('glow');
-					}
+					favouriteMode.slice(0,6).forEach((value,index)=>this.add(value,index));
+					let mode=lib.config.mode;
+					const config=get.config(`${mode}_mode`);
+					if(typeof config=='string') mode+=`|${config}`;
+					if(favouriteMode.contains(mode)) ui.favmode.classList.add('glow');
+					else ui.favmode.classList.remove('glow');
 				};
 				ui.favmodelist.add=function(name,index){
-					var info=name.split('|');
-					var mode=info[0];
-					var submode=info[1];
-					var node=ui.create.div('.menubutton.large',this);
-					var num=Math.min(6,lib.config.favouriteMode.length);
-					node.dataset.type=num%2==0?'even':'odd';
-					node.dataset.position=index;
-					var str=lib.translate[name]||lib.translate[mode]||'';
-					if(str.length==2){
-						str+='模式';
-					}
+					const info=name.split('|'),mode=info[0],submode=info[1],node=ui.create.div('.menubutton.large',this),dataset=node.dataset;
+					dataset.type=Math.min(6,lib.config.favouriteMode.length)%2==0?'even':'odd';
+					dataset.position=index;
+					let str=lib.translate[name]||lib.translate[mode]||'';
+					if(str.length==2) str+='模式';
 					node.innerHTML=str;
-					node.listen(function(){
+					node.listen(()=>{
 						game.saveConfig('mode',mode);
-						if(submode){
-							game.saveConfig(mode+'_mode',submode,mode);
-						}
+						if(submode) game.saveConfig(`${mode}_mode`,submode,mode);
 						game.reload();
 					});
 				};
 				ui.favmode=ui.create.system('收藏',function(){
-					var mode=get.mode();
-					if(typeof _status.mode=='string'){
-						mode+='|'+_status.mode;
-					}
+					const mode=typeof _status.mode=='string'?`${lib.config.mode}|${_status.mode}`:lib.config.mode;
 					if(this.classList.contains('glow')){
 						this.classList.remove('glow');
 						lib.config.favouriteMode.remove(mode);
@@ -53841,19 +53814,15 @@
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
 			return '暂无武将介绍';
 		},
-		bordergroup:function(info){
+		bordergroup:(info,raw)=>{
 			if(!Array.isArray(info)){
 				info=lib.character[info];
 				if(!info) return '';
 			}
-			if(Array.isArray(info[4])){
-				for(let str of info[4]){
-					if(typeof str=='string'&&str.indexOf('border:')==0){
-						return str.slice(7);
-					}
-				}
+			if(Array.isArray(info[4])) for(const str of info[4]){
+				if(typeof str=='string'&&str.indexOf('border:')==0) return str.slice(7);
 			}
-			return info[1];
+			return raw?'':info[1]||'';
 		},
 		groupnature:function(group,method){
 			var nature=lib.groupnature[group];
@@ -54245,14 +54214,7 @@
 			}
 			return str;
 		},
-		mode:function(){
-			if(_status.connectMode){
-				return lib.configOL.mode;
-			}
-			else{
-				return lib.config.mode;
-			}
-		},
+		mode:()=>lib[_status.connectMode?'configOL':'config'].mode,
 		idDialog:function(id){
 			for(var i=0;i<ui.dialogs.length;i++){
 				if(ui.dialogs[i].videoId==id){
