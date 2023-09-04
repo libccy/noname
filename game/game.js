@@ -7153,8 +7153,8 @@
 				'无名杀 - 录像 - '+_status.videoToSave.name[0]+' - '+_status.videoToSave.name[1]);
 			}
 		},
-		genAsync:genAsync,
-		genAwait:genAwait,
+		genAsync:fn=>genAsync(fn),
+		genAwait:gen=>genAwait(gen),
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
