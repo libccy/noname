@@ -55,7 +55,7 @@
 		})
 	}
 	function genAsync(fn){
-		return function AsyncSimulator(){
+		return function genCoroutine(){
 			var self=this,args=arguments;
 			return new Promise((resolve,reject)=>{
 				var gen=fn.apply(self,args);
@@ -150,6 +150,7 @@
 			card:{},
 		},
 		onload:[],
+		onload2:[],
 		arenaReady:[],
 		onfree:[],
 		inpile:[],
@@ -7152,6 +7153,8 @@
 				'无名杀 - 录像 - '+_status.videoToSave.name[0]+' - '+_status.videoToSave.name[1]);
 			}
 		},
+		genAsync:genAsync,
+		genAwait:genAwait,
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
@@ -9615,6 +9618,13 @@
 				}
 				localStorage.removeItem(lib.configprefix+'directstart');
 				delete lib.init.init;
+				const libOnload2=lib.onload2;
+				delete lib.onload2;
+				while(Array.isArray(libOnload2)&&libOnload2.length){
+					const fun=libOnload2.shift();
+					const result=fun();
+					yield (fun instanceof GeneratorFunction)?genAwait(result):result;
+				}
 			}),
 			startOnline:function(){
 				'step 0'
