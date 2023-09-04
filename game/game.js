@@ -29,7 +29,7 @@
 			}
 		}
 	}
-	function asyncGeneratorStep(gen,resolve,reject,_next,_throw,key,arg){
+	function _genNext(gen,resolve,reject,_next,_throw,key,arg){
 		try{
 			var info=gen[key](arg);
 			var value=info.value;
@@ -43,18 +43,26 @@
 			Promise.resolve(value).then(_next,_throw);
 		}
 	}
-	function _asyncToGenerator(fn){
-		return function(){
+	function genAwait(gen){
+		return new Promise((resolve,reject)=>{
+			function _next(value){
+				_genNext(gen,resolve,reject,_next,_throw,"next",value);
+			}
+			function _throw(err){
+				_genNext(gen,resolve,reject,_next,_throw,"throw",err);
+			}
+			_next(undefined);
+		})
+	}
+	function genAsync(fn){
+		return function AsyncSimulator(){
 			var self=this,args=arguments;
-			return new Promise(function(resolve, reject){
+			return new Promise((resolve,reject)=>{
 				var gen=fn.apply(self,args);
-				function _next(value){
-					asyncGeneratorStep(gen,resolve,reject,_next,_throw,"next",value);
-				}
-				function _throw(err){
-					asyncGeneratorStep(gen,resolve,reject,_next,_throw,"throw",err);
-				}
-				_next(undefined);
+				genAwait(gen).then((result, err)=>{
+					if(err) reject(err);
+					else resolve(result);
+				});
 			});
 		};
 	}
@@ -8842,16 +8850,13 @@
 				}
 			},
 			//lib.onload支持传入GeneratorFunction以解决异步函数的问题 by诗笺
-			onload:_asyncToGenerator(function*(){
+			onload:genAsync(function*(){
 				const libOnload=lib.onload;
 				delete lib.onload;
 				while(Array.isArray(libOnload)&&libOnload.length){
 					const fun=libOnload.shift();
-					if(fun instanceof GeneratorFunction){
-						yield _asyncToGenerator(fun)();
-					}else{
-						fun();
-					}
+					const result=fun();
+					yield (fun instanceof GeneratorFunction)?genAwait(result):result;
 				}
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
