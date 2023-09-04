@@ -35240,7 +35240,7 @@
 		linexy:function(path){
 			const from=[path[0],path[1]],to=[path[2],path[3]];
 			let total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2,opacity=1,color=[255,255,255],dashed=false,drag=false;
-			if(typeof arguments[1]=='object') Object.keys(arguments[1]).forEach(value=>{
+			if(arguments[1]!=null&&typeof arguments[1]=='object') Object.keys(arguments[1]).forEach(value=>{
 				switch(value){
 					case 'opacity':
 						opacity=arguments[1][value];
@@ -53841,19 +53841,15 @@
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
 			return '暂无武将介绍';
 		},
-		bordergroup:function(info){
+		bordergroup:(info,raw)=>{
 			if(!Array.isArray(info)){
 				info=lib.character[info];
 				if(!info) return '';
 			}
-			if(Array.isArray(info[4])){
-				for(let str of info[4]){
-					if(typeof str=='string'&&str.indexOf('border:')==0){
-						return str.slice(7);
-					}
-				}
+			if(Array.isArray(info[4])) for(const str of info[4]){
+				if(typeof str=='string'&&str.indexOf('border:')==0) return str.slice(7);
 			}
-			return info[1];
+			return raw?'':info[1]||'';
 		},
 		groupnature:function(group,method){
 			var nature=lib.groupnature[group];
