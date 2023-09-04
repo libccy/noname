@@ -32676,8 +32676,8 @@
 				}
 				if(Array.isArray(audioinfo)){
 					audioname=audioinfo[0];
-					audioinfo=lib.skill[audioname].audio;
 					if(!fixednum) fixednum=audioinfo[1];//数组会取第一个指定语音数
+					audioinfo=lib.skill[audioname].audio;
 					continue;
 				}
 				break;

@@ -7971,6 +7971,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:['weidi',2]
 			},
 			gzyongsi:{
+				audio:'yongsi1',
 				group:['gzyongsi_eff1','gzyongsi_eff2','gzyongsi_eff3'],
 				preHidden:['gzyongsi_eff3'],
 				ai:{
@@ -8002,7 +8003,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							})
 						},
 						content:function(){trigger.num++},
-						audio:['yongsi',2]
+						audio:['yongsi1',2],
 					},
 					eff2:{
 						sub:true,
@@ -8022,7 +8023,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							player.chooseUseTarget('玉玺（庸肆）：选择知己知彼的目标',{name:'zhibi'});
 						},
-						audio:['yongsi',2]
+						audio:['yongsi1',2],
 					},
 					eff3:{
 						sub:true,
@@ -13318,7 +13319,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.text=text;
 					game.broadcastAll(function(player,text){
 						player.identity=text;
-						player.setIdentity(text,text);
+						player.setIdentity(text,'kami');
 					},source,text);
 					source.changeGroup(text);
 					source.removeMark('yexinjia_mark',1);
