@@ -7157,6 +7157,8 @@
 		},
 		genAsync:fn=>gnc.async(fn),
 		genAwait:gen=>gnc.await(gen),
+		isGenCoroutine:(item)=>typeof item=="function"&&item.name=="genCoroutine",
+		isGenerator:(item)=>item instanceof GeneratorFunction,
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
@@ -9096,7 +9098,7 @@
 					});
 				}
 
-				var proceed2=function(){
+				var proceed2=gnc.async(function*(){
 					var mode=lib.imported.mode;
 					var card=lib.imported.card;
 					var character=lib.imported.character;
@@ -9548,8 +9550,12 @@
 						}
 					}
 					delete lib.init.start;
+					if(Array.isArray(_status.onprepare)&&_status.onprepare.length){
+						yield Promise.allSettled(_status.onprepare);
+						delete _status.onprepare;
+					}
 					game.loop();
-				}
+				})
 				var proceed=function(){
 					if(!lib.db){
 						try{
@@ -9666,10 +9672,6 @@
 					const fun=libOnload2.shift();
 					const result=fun();
 					yield gnc.is.generator(fun)?gnc.await(result):result;
-				}
-				if(Array.isArray(_status.onprepare)&&_status.onprepare.length){
-					Promise.allSettled(_status.onprepare);
-					delete _status.onprepare;
 				}
 			}),
 			startOnline:function(){
