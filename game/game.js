@@ -190,6 +190,8 @@
 				},
 			}
 		},
+		//Yingbian
+		//应变
 		yingbian:{
 			condition:{
 				color:new Map([
@@ -361,6 +363,12 @@
 				['all','无视条件执行所有选项']
 			])
 		},
+		//The actual card name
+		//实际的卡牌名称
+		actualCardName:new Map([
+			['挟令','挟天子以令诸侯'],
+			['霹雳投石车','霹雳车']
+		]),
 		characterDialogGroup:{
 			'收藏':function(name,capt){
 				return lib.config.favouriteCharacter.contains(name)?capt:null;
@@ -30702,7 +30710,9 @@
 					if(trigger.getParent().notLink()) trigger.getParent().lianhuanable=true;
 				}
 			},
-			//Deprecated skills
+			/**
+			 * @deprecated
+			 */
 			_chongzhu:{
 				get filter(){
 					return lib.skill._recasting.filter;
@@ -30727,44 +30737,6 @@
 				},
 				set ai(ai){
 					lib.skill._recasting.ai=ai;
-				}
-			},
-			_yongjian_zengyu:{
-				get filter(){
-					return lib.skill._gifting.filter;
-				},
-				set filter(filter){
-					lib.skill._gifting.filter=filter;
-				},
-				get filterCard(){
-					return lib.skill._gifting.filterCard;
-				},
-				set filterCard(filterCard){
-					lib.skill._gifting.filterCard=filterCard;
-				},
-				get filterTarget(){
-					return lib.skill._gifting.filterTarget;
-				},
-				set filterTarget(filterTarget){
-					lib.skill._gifting.filterTarget=filterTarget;
-				},
-				get check(){
-					return lib.skill._gifting.check;
-				},
-				set check(check){
-					lib.skill._gifting.check=check;
-				},
-				get content(){
-					return lib.skill._gifting.content;
-				},
-				set content(content){
-					lib.skill._gifting.content=content;
-				},
-				get ai(){
-					return lib.skill._gifting.ai;
-				},
-				set ai(ai){
-					lib.skill._gifting.ai=ai;
 				}
 			}
 		},
@@ -53220,6 +53192,12 @@
 		},
 	};
 	const get={
+		//Get the card name length
+		//获取此牌的字数
+		cardNameLength:card=>{
+			const name=get.translation(get.name(card));
+			return (lib.actualCardName.get(name)||name).length;
+		},
 		//Yingbian
 		//应变
 		//Get the Yingbian conditions (of the card)

@@ -37,12 +37,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
 					if(!event.isFirstTarget) return false;
-					return lib.skill.dcweidang.getLength(event.card)==player.getHistory('useCard').indexOf(event.getParent())+1;
+					return get.cardNameLength(event.card)==player.getHistory('useCard').indexOf(event.getParent())+1;
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var num=lib.skill.dcweidang.getLength(trigger.card);
+					var num=get.cardNameLength(trigger.card);
 					event.num=num;
 					player.chooseTarget(get.prompt('clanjiejian'),'令一名目标角色摸'+get.cnNumber(num)+'张牌',function(card,player,target){
 						return _status.event.getTrigger().targets.contains(target);
@@ -57,7 +57,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{threaten:3},
 				mod:{
 					aiOrder:function(player,card,num){
-						if(typeof card=='object'&&lib.skill.dcweidang.getLength(card)==player.getHistory('useCard').length+1){
+						if(typeof card=='object'&&get.cardNameLength(card)==player.getHistory('useCard').length+1){
 							if(get.effect(player,card,player,player)>0) return num+10;
 						}
 					},
@@ -68,17 +68,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				filter:function(event,player){
 					if(!event.card) return false;
-					var num=lib.skill.dcweidang.getLength(event.card);
+					var num=get.cardNameLength(event.card);
 					return typeof num=='number'&&num>0;
 				},
 				check:function(event,player){
-					var num=lib.skill.dcweidang.getLength(event.card);
+					var num=get.cardNameLength(event.card);
 					if(num>=player.getDamagedHp()) return true;
 					return player.getHistory('useSkill',evt=>evt.skill=='clanhuanghan').length&&player.hasSkill('clanbaozu',null,false,false)&&player.awakenedSkills.contains('clanbaozu');
 				},
 				content:function(){
 					'step 0'
-					player.draw(lib.skill.dcweidang.getLength(trigger.card));
+					player.draw(get.cardNameLength(trigger.card));
 					if(player.isDamaged()) player.chooseToDiscard(player.getDamagedHp(),'he',true);
 					'step 1'
 					if(player.getHistory('useSkill',evt=>evt.skill=='clanhuanghan').length>1&&player.hasSkill('clanbaozu',null,false,false)&&player.awakenedSkills.contains('clanbaozu')){
@@ -138,18 +138,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.countCards('h')) event.finish();
 					'step 3'
 					player.chooseCard('迂志：请展示一张手牌','摸此牌牌名字数的牌。下一轮开始时，若本轮你使用的牌数或上一轮你以此法摸的牌数小于此牌牌名字数，则你失去1点体力。',true,function(card,player){
-						var num=lib.skill.dcweidang.getLength(card);
+						var num=get.cardNameLength(card);
 						return typeof num=='number'&&num>0;
 					}).set('ai',function(card){
-						if(_status.event.dying&&_status.event.num>0&&lib.skill.dcweidang.getLength(card)>_status.event.num) return 1/lib.skill.dcweidang.getLength(card);//怂
-						return lib.skill.dcweidang.getLength(card);//勇
+						if(_status.event.dying&&_status.event.num>0&&get.cardNameLength(card)>_status.event.num) return 1/get.cardNameLength(card);//怂
+						return get.cardNameLength(card);//勇
 					}).set('dying',player.hp+player.countCards('hs',{name:['tao','jiu']})<1).set('num',event.num1);
 					'step 4'
 					if(result.bool){
 						player.logSkill('clanyuzhi');
 						player.showCards(result.cards,get.translation(player)+'发动了【迂志】');
-						player.draw(lib.skill.dcweidang.getLength(result.cards[0]));
-						player.storage.clanyuzhi=lib.skill.dcweidang.getLength(result.cards[0]);
+						player.draw(get.cardNameLength(result.cards[0]));
+						player.storage.clanyuzhi=get.cardNameLength(result.cards[0]);
 						player.markSkill('clanyuzhi');
 					}
 				},
@@ -165,13 +165,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd',source:'damageSource'},
 				filter:function(event,player){
 					if(!event.card) return false;
-					var num=lib.skill.dcweidang.getLength(event.card);
+					var num=get.cardNameLength(event.card);
 					return typeof num=='number'&&num>0&&player.countCards('he');
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var num=lib.skill.dcweidang.getLength(trigger.card),str='';
+					var num=get.cardNameLength(trigger.card),str='';
 					if(player.getDamagedHp()>0) str+=('并摸'+get.cnNumber(player.getDamagedHp())+'张牌');
 					player.chooseToDiscard(get.prompt('clanxieshu'),'弃置'+get.cnNumber(num)+'张牌'+str,'he',num).set('ai',function(card){
 						var player=_status.event.player;
@@ -307,7 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var val=get.value(card);
 						return 6-val;
 					}).set('cards',trigger.player.getCards('he',card=>{
-						return lib.skill.dcweidang.getLength(card)==num;
+						return get.cardNameLength(card)==num;
 					}));
 					'step 1'
 					if(result.bool) trigger.player.recast(result.cards);
@@ -601,7 +601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							var list=[4,3,2,1];
 							player.getHistory('useCard',evt=>{
-								var len=lib.skill.dcweidang.getLength(evt.card);
+								var len=get.cardNameLength(evt.card);
 								list.remove(len);
 							});
 							if(list.length) ret=list[0];
@@ -641,7 +641,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									else{
 										var list=[4,3,2,1];
 										player.getHistory('useCard',evt=>{
-											var len=lib.skill.dcweidang.getLength(evt.card);
+											var len=get.cardNameLength(evt.card);
 											list.remove(len);
 										});
 										if(list.length) ret=list[0];
@@ -675,13 +675,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var len=_status.event.len;
 									var card=button.link;
 									var fix=1;
-									if(lib.skill.dcweidang.getLength(card)==len) fix=2;
+									if(get.cardNameLength(card)==len) fix=2;
 									return fix*_status.event.player.getUseValue(card);
 								}).set('len',function(){
 									if(!player.hasSkill('clanxiaoyong')) return 0;
 									var list=[];
 									player.getHistory('useCard',evt=>{
-										var len=lib.skill.dcweidang.getLength(evt.card);
+										var len=get.cardNameLength(evt.card);
 										list.add(len);
 									});
 									if(!list.contains(count)) return count;
@@ -740,9 +740,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'useCard',
 				},
 				filter:function(event,player){
-					var len=lib.skill.dcweidang.getLength(event.card);
+					var len=get.cardNameLength(event.card);
 					if(player.hasHistory('useCard',function(evt){
-						return evt!=event&&lib.skill.dcweidang.getLength(evt.card)==len;
+						return evt!=event&&get.cardNameLength(evt.card)==len;
 					},event)) return false;
 					if(!player.getStat().skill.clanguangu) return false;
 					var history=player.getAllHistory('useSkill',evt=>{
@@ -781,9 +781,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								break;
 							}
 						}
-						if(numx==lib.skill.dcweidang.getLength(card)){
+						if(numx==get.cardNameLength(card)){
 							if(!player.hasHistory('useCard',evt=>{
-								return numx==lib.skill.dcweidang.getLength(evt.card);
+								return numx==get.cardNameLength(evt.card);
 							})){
 								return num+9;
 							}
