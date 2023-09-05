@@ -144,8 +144,7 @@
 		},
 		onload:[],
 		onload2:[],
-		onload3:[],
-		onload4:[],
+		onprepare:[],
 		arenaReady:[],
 		onfree:[],
 		inpile:[],
@@ -8137,6 +8136,12 @@
 						}
 					}
 					const loadPack=()=>{
+						if (Array.isArray(lib.onprepare)&&lib.onprepare.length){
+							_status.onprepare=Object.freeze(lib.onprepare.map(fn=>{
+								const result=fn();
+								return gnc.is.generator(fn)?gnc.await(result):result;
+							}));
+						}
 						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
 						if(_status.jsExt) toLoad+=_status.jsExt.reduce((previousValue,currentValue)=>{
 							const arrayLengths=Object.values(currentValue).reduce((previousElement,currentElement)=>{
@@ -8336,7 +8341,7 @@
 						document.addEventListener('touchmove',ui.click.windowtouchmove);
 					}
 				};
-				var proceed2=function(){
+				var proceed2=()=>{
 					if(config3){
 						proceed(config3);
 					}
@@ -8891,21 +8896,13 @@
 			},
 			//lib.onload支持传入GeneratorFunction以解决异步函数的问题 by诗笺
 			onload:gnc.async(function*(){
-				const libOnload=lib.onload,libOnload3=lib.onload3;
+				const libOnload=lib.onload;
 				delete lib.onload;
-				delete lib.onload3;
-				let onload3=[];
-				while(Array.isArray(libOnload3)&&libOnload3.length){
-					const fun=libOnload3.shift();
-					const result=fun();
-					onload3.add(gnc.is.generator(fun)?gnc.await(result):result);
-				}
 				while(Array.isArray(libOnload)&&libOnload.length){
 					const fun=libOnload.shift();
 					const result=fun();
 					yield gnc.is.generator(fun)?gnc.await(result):result;
 				}
-				yield Promise.allSettled(onload3);
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
 				if(game.documentZoom!=1){
@@ -9663,21 +9660,17 @@
 				}
 				localStorage.removeItem(lib.configprefix+'directstart');
 				delete lib.init.init;
-				const libOnload2=lib.onload2,libOnload4=lib.onload4;
+				const libOnload2=lib.onload2;
 				delete lib.onload2;
-				delete lib.onload4;
-				let onload4=[];
-				while(Array.isArray(libOnload4)&&libOnload4.length){
-					const fun=libOnload4.shift();
-					const result=fun();
-					onload4.add(gnc.is.generator(fun)?gnc.await(result):result);
-				}
 				while(Array.isArray(libOnload2)&&libOnload2.length){
 					const fun=libOnload2.shift();
 					const result=fun();
 					yield gnc.is.generator(fun)?gnc.await(result):result;
 				}
-				yield Promise.allSettled(onload4);
+				if(Array.isArray(_status.onprepare)&&_status.onprepare.length){
+					Promise.allSettled(_status.onprepare);
+					delete _status.onprepare;
+				}
 			}),
 			startOnline:function(){
 				'step 0'
