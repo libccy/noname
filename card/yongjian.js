@@ -646,6 +646,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			 * @deprecated
 			 */
 			_yongjian_zengyu:{
+				get forceLoad(){
+					return lib.skill._gifting.forceLoad;
+				},
+				set forceLoad(forceLoad){
+					lib.skill._gifting.forceLoad=forceLoad;
+				},
 				get filter(){
 					return lib.skill._gifting.filter;
 				},
