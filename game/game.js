@@ -7158,9 +7158,6 @@
 		},
 		genAsync:fn=>gnc.async(fn),
 		genAwait:gen=>gnc.await(gen),
-		isGenCoroutine:item=>gnc.is.coroutine(item),
-		isGeneratorFunc:item=>gnc.is.generator(item),
-		isGenerator:item=>gnc.is.a(item),
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
