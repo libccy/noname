@@ -3544,7 +3544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							effect:{
 								target:function(card,player,target){
-									if(get.tag(card,'recover')&&player.hp>=player.maxHp-1&&player.maxHp>1) return [0,0];
+									if(get.tag(card,'recover')&&target.hp>=target.maxHp-1&&target.maxHp>1) return [0,0];
 								}
 							}
 						}

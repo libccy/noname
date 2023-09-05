@@ -1011,7 +1011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player==current) return false;
 						if(boole&&current.countCards('e')==es){
 							var num=trigger.getl(current).es.length;
-							if(trigger.name=='equip'&&trigger==event.player) num--;
+							if(trigger.name=='equip'&&trigger.player==current) num--;
 							if(num!=0) return true;
 						}
 						return false;
@@ -1714,9 +1714,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					"cardEnabled2":function (card,player){
 						var source=_status.currentPhase;
-						if(!source||source==player||!source.hasSkill('dddfusi')||source.countCards('h')==0||source.hasCard('h',function(card){
+						if(!source||source==player||!source.hasSkill('dddfusi')||source.countCards('h')==0||source.hasCard(function(card){
 							return !card.hasGaintag('dddxujing_tag');
-						})) return;
+						},'h')) return;
 						if(player.getCards('h').contains(card)) return false;
 					},
 				},

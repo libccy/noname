@@ -12425,7 +12425,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:(event,player)=>{
 					if(event.type!='dying') return false;
 					if(player!=event.dying) return false;
-					return player.hasCard(card=>lib.skill.xinfu_jingxie2.filterCard(card,player),lib.skill.xinfu_jingxie2.position);
+					return player.hasCard(card=>lib.skill.xinfu_jingxie2.filterCard(card,player),'he');
 				},
 				position:"he",
 				discard:false,
