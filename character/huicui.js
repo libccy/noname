@@ -615,7 +615,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current.hasHistory('lose',function(evt){
 							return evt.cards2.length>0;
 						});
-					})&&(_status.connectMode||player.hasCard({type:'basic'},'h'));
+					})&&player.countCards('he')>0;
 				},
 				direct:true,
 				content:function(){
@@ -626,14 +626,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(current.hasHistory('lose',function(evt){
 							return evt.cards2.length>0;
 						})) map[current.playerid]=Math.min(5,current.getHistory('lose').reduce(function(num,evt){
-							return num=evt.cards2.length;
+							return num+evt.cards2.length;
 						},0))+1;
 					});
 					player.chooseCardTarget({
 						prompt:get.prompt('dcporui'),
 						prompt2:get.skillInfoTranslation('dcporui',player),
 						filterCard:function(card,player){
-							return get.type2(card)=='basic'&&lib.filter.cardDiscardable(card,player,'dcporui');
+							return lib.filter.cardDiscardable(card,player,'dcporui');
 						},
 						position:'he',
 						filterTarget:function(card,player,target){
@@ -653,7 +653,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('dcporui',target);
 						player.discard(cards);
 						event.num2=Math.min(5,target.getHistory('lose').reduce(function(num,evt){
-							return num=evt.cards2.length;
+							return num+evt.cards2.length;
 						},0));
 						event.num=event.num2+1;
 						player.addTempSkill('dcporui_round','roundStart');
@@ -708,7 +708,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				filter:function(event,player){
-					if(!_status.currentPhase||_status.currentPhase==player) return false;
 					if(event.name=='damage'){
 						if(player.hasMark('dcgonghu_damage')) return false;
 						var num=0;
@@ -716,6 +715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.getHistory('sourceDamage',evt=>num+=evt.num);
 						return num>1;
 					}
+					if(!_status.currentPhase||_status.currentPhase==player) return false;
 					if(player.hasMark('dcgonghu_basic')) return false;
 					if(_status.currentPhase&&_status.currentPhase==player) return false;
 					var evt=event.getl(player);
@@ -2174,23 +2174,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcweidang:{
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
-				getLength:function(card){
-					var name=get.translation(get.name(card));
-					if(name=='挟令') name='挟天子以令诸侯';
-					if(name=='霹雳投石车') name='霹雳车';
-					return name.length;
-				},
+				/**
+				 * @deprecated
+				 */
+				getLength:card=>get.cardNameLength(card),
 				direct:true,
 				filter:function(event,player){
 					var num=lib.skill.dcqinshen.getNum();
-					return event.player!=player&&(_status.connectMode?player.countCards('he'):player.hasCard(card=>lib.skill.dcweidang.getLength(card)==num,'he'));
+					return event.player!=player&&(_status.connectMode?player.countCards('he'):player.hasCard(card=>get.cardNameLength(card)==num,'he'));
 				},
 				content:function(){
 					'step 0'
 					var num=lib.skill.dcqinshen.getNum();
 					event.num=num;
 					player.chooseCard(get.prompt('dcweidang'),'将一张字数为'+num+'的牌置于牌堆底，然后获得一张字数为'+num+'的牌。若你能使用此牌，你使用之。','he',(card,player,target)=>{
-						return lib.skill.dcweidang.getLength(card)==_status.event.num;
+						return get.cardNameLength(card)==_status.event.num;
 					}).set('num',num).set('ai',card=>{
 						return 5-get.value(card);
 					});
@@ -2208,7 +2206,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					var card=get.cardPile(cardx=>lib.skill.dcweidang.getLength(cardx)==num);
+					var card=get.cardPile(cardx=>get.cardNameLength(cardx)==num);
 					if(card){
 						player.gain(card,'gain2');
 						if(player.hasUseTarget(card)){
@@ -9828,7 +9826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return str;
 			},
 			dcporui:function(player){
-				return '每轮限'+(player.hasMark('dcgonghu_basic')?'两':'一')+'次。其他角色的结束阶段，你可以弃置一张基本牌并选择另一名于此回合内失去过牌的其他角色，你视为对其依次使用X+1张【杀】'+(player.hasMark('dcgonghu_damage')?'':'，然后你交给其X张手牌')+'（X为其本回合失去的牌数且至多为5）。';
+				return '每轮限'+(player.hasMark('dcgonghu_basic')?'两':'一')+'次。其他角色的结束阶段，你可以弃置一张牌并选择另一名于此回合内失去过牌的其他角色，你视为对其依次使用X+1张【杀】'+(player.hasMark('dcgonghu_damage')?'':'，然后你交给其X张手牌')+'（X为其本回合失去的牌数且至多为5）。';
 			},
 		},
 		perfectPair:{},
@@ -9845,7 +9843,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiling:['dc_jiling','tw_jiling','jiling'],
 			sp_jiaxu:['dc_sp_jiaxu','sp_jiaxu','yj_jiaxu'],
 			qiaorui:['qiaorui','tw_qiaorui'],
-			
+			mamidi:['mamidi','xin_mamidi'],
 		},
 		translate:{
 			re_panfeng:'潘凤',
@@ -10248,9 +10246,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjini_info:'当你受到伤害后，你可以重铸至多Y张手牌（Y为你的体力上限减本回合你以此法重铸过的牌数）。若你以此法获得了【杀】，你可以对伤害来源使用一张无视距离且不可被响应的【杀】。',
 			yuechen:'乐綝',
 			dcporui:'破锐',
-			dcporui_info:'每轮限一次。其他角色的结束阶段，你可以弃置一张基本牌并选择另一名于此回合内失去过牌的其他角色，你视为对其依次使用X+1张【杀】，然后你交给其X张手牌（X为其本回合失去的牌数且至多为5）。',
+			dcporui_info:'每轮限一次。其他角色的结束阶段，你可以弃置一张牌并选择另一名于此回合内失去过牌的其他角色，你视为对其依次使用X+1张【杀】，然后你交给其X张手牌（X为其本回合失去的牌数且至多为5）。',
 			dcgonghu:'共护',
-			dcgonghu_info:'锁定技。①当你于回合外失去基本牌后，若你本回合内失去基本牌的数量大于1，你将〖破锐〗改为每轮限两次。②当你于回合外造成或受到伤害后，若你本回合内造成或受到的伤害大于1，你删除〖破锐〗中的“，然后你交给其X张手牌”。③当你使用红色基本牌/红色普通锦囊牌时，若你已发动过〖共护①〗和〖共护②〗，则此牌不可被响应/可额外增加一个目标。',
+			dcgonghu_info:'锁定技。①当你于回合外失去基本牌后，若你本回合内失去基本牌的数量大于1，你将〖破锐〗改为每轮限两次。②当你造成或受到伤害后，若你本回合内造成或受到的总伤害大于1，你删除〖破锐〗中的“，然后你交给其X张手牌”。③当你使用红色基本牌/红色普通锦囊牌时，若你已发动过〖共护①〗和〖共护②〗，则此牌不可被响应/可额外增加一个目标。',
 			yue_caiwenji:'乐蔡琰',
 			dcshuangjia:'霜笳',
 			dcshuangjia_tag:'胡笳',

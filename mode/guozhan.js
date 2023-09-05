@@ -7971,6 +7971,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:['weidi',2]
 			},
 			gzyongsi:{
+				audio:'yongsi1',
 				group:['gzyongsi_eff1','gzyongsi_eff2','gzyongsi_eff3'],
 				preHidden:['gzyongsi_eff3'],
 				ai:{
@@ -8002,7 +8003,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							})
 						},
 						content:function(){trigger.num++},
-						audio:['yongsi',2]
+						audio:['yongsi1',2],
 					},
 					eff2:{
 						sub:true,
@@ -8022,7 +8023,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							player.chooseUseTarget('玉玺（庸肆）：选择知己知彼的目标',{name:'zhibi'});
 						},
-						audio:['yongsi',2]
+						audio:['yongsi1',2],
 					},
 					eff3:{
 						sub:true,
@@ -13303,20 +13304,25 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var source=event.targets2.shift();
 					event.source=source;
 					event.targets3=[];
-					event.targets4=[source];
+					//event.targets4=[source];
 					if(!_status.yexinjia_list) _status.yexinjia_list=['夏','商','周','秦','汉','隋','唐','宋','辽','金','元','明'];
 					source.chooseControl(_status.yexinjia_list).set('prompt','请选择自己所属的野心家势力的标识').set('ai',()=>(_status.yexinjia_list?_status.yexinjia_list.randomGet():0));
 					'step 4'
-					var text,source=event.source;;
+					var text,source=event.source;
 					if(result.control){
 						text=result.control;
 						_status.yexinjia_list.remove(result.control);
 					}
 					else text=_status.yexinjia_list.randomRemove();
+					lib.group.push(text);
+					lib.translate[text+'2']=text;
+					lib.groupnature[text]='kami';
 					event.text=text;
 					game.broadcastAll(function(player,text){
-						player.setIdentity(text,'ye');
+						player.identity=text;
+						player.setIdentity(text,'kami');
 					},source,text);
+					source.changeGroup(text);
 					source.removeMark('yexinjia_mark',1);
 					var targets=game.filterPlayer(function(current){
 						return current.identity!='ye'&&current!=source&&!get.is.jun(current)&&!event.targets2.contains(current)&&!current.getStorage('yexinjia_friend').length;
@@ -13328,15 +13334,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var target=targets.shift();
 					event.target=target;
 					source.line(target,'green');
-					target.chooseBool('是否响应'+get.translation(source)+'发起的【拉拢人心】？','将势力改为'+event.text+(['辽','金'].contains(event.text)?'':'朝')).set('choice',Math.random()<=0.98);//反骨[doge]
+					target.chooseBool('是否响应'+get.translation(source)+'发起的【拉拢人心】？','将势力改为'+event.text).set('choice',Math.random()<=0.98);//反骨[doge]
 					'step 6'
 					if(result.bool){
 						target.chat('加入');
-						event.targets4.push(target);
-						game.broadcastAll(function(player,target,text){
-							player.identity='ye';
-							player.setIdentity(text,'ye');
-						},target,event.source,event.text);
+						//event.targets4.push(target);
+						game.broadcastAll(function(player,text){
+							player.identity=text;
+							player.setIdentity(text,'kami');
+						},target,event.text);
+						target.changeGroup(event.text);
 					}
 					else{
 						target.chat('拒绝');
@@ -13344,11 +13351,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.delay(1.5);
 					if(targets.length) event.goto(5);
+					/*
 					else if(event.targets4.length){
 						for(var i of event.targets4){
 							i.markAuto('yexinjia_friend',event.targets4.filter(j=>j!=i));
 						}
 					}
+					*/
 					'step 7'
 					if(event.targets3.length){
 						for(var i of event.targets3){
@@ -13364,7 +13373,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return game.hasPlayer(target=>{
 								return !target.isFriendOf(current);
 							});
-						})) game.checkResult();
+						})){
+							game.broadcastAll(function(id){
+								game.winner_id=id;
+							},event.source.playerid);
+							game.checkResult();
+						}
 					}
 				});
 			},

@@ -1139,7 +1139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(info.type==get.type2(card,false)) return true;
 					if(info.suit!='none'&&info.suit==get.suit(card,false)) return true;
 					if(typeof info.number=='number'&&info.number>0&&info.number==get.suit(card,false)) return true;
-					return info.length==lib.skill.dcweidang.getLength(card)
+					return info.length==get.cardNameLength(card)
 				},
 				content:function(){
 					'step 0'
@@ -1156,7 +1156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							type:get.type2(card,player),
 							suit:get.suit(card,player),
 							number:get.number(card,player),
-							length:lib.skill.dcweidang.getLength(card),
+							length:get.cardNameLength(card),
 						}
 						event.cards=[];
 						event.forceDie=true;
@@ -2915,7 +2915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event,player){
-					return lib.skill.dcweidang.getLength(event.card)==player.getHistory('useCard').indexOf(event)+1;
+					return get.cardNameLength(event.card)==player.getHistory('useCard').indexOf(event)+1;
 				},
 				content:function(){
 					var card=trigger.card;
@@ -2928,14 +2928,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var card=event.card;
 					if(player!=_status.currentPhase||!card||event.getParent().type!='card') return false;
-					return lib.skill.dcweidang.getLength(card)==player.getHistory('useCard').indexOf(event.getParent(2))+1;
+					return get.cardNameLength(card)==player.getHistory('useCard').indexOf(event.getParent(2))+1;
 				},
 				content:function(){
 					trigger.num++;
 				},*/
 				mod:{
 					aiOrder:function(player,card,num){
-						if(typeof card=='object'&&lib.skill.dcweidang.getLength(card)==player.getHistory('useCard').length+1) return num+10;
+						if(typeof card=='object'&&get.cardNameLength(card)==player.getHistory('useCard').length+1) return num+10;
 					},
 				}
 			},
@@ -8170,13 +8170,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spolzhouxuan:{
 				audio:2,
 				trigger:{player:'phaseDiscardBegin'},
-				direct:true,
 				filter:function(event,player){
-					return player.countCards('h')>0;
+					return player.countCards('h')>0&&player.getExpansions('spolzhouxuan').length<5;
 				},
+				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseCard('h',get.prompt('spolzhouxuan'),[1,5],'将至多五张手牌置于武将牌上作为“旋”').set('ai',function(card){
+					player.chooseCard('h',get.prompt('spolzhouxuan'),[1,5-player.getExpansions('spolzhouxuan').length],'将至多'+get.cnNumber(5-player.getExpansions('spolzhouxuan').length)+'张手牌置于武将牌上').set('ai',function(card){
 						if(ui.selected.cards.length>=player.needsToDiscard()) return 6-get.value(card);
 						return 100-get.useful(card);
 					});
@@ -8201,30 +8201,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					use:{
 						audio:'spolzhouxuan',
 						trigger:{player:'useCard'},
-						forced:true,
-						locked:false,
 						filter:function(event,player){
 							return player.getExpansions('spolzhouxuan').length>0;
 						},
+						forced:true,
+						locked:false,
 						content:function(){
 							'step 0'
-							var num=Math.min(5,player.isMaxHandcard(true)?1:player.getExpansions('spolzhouxuan').length);
-							if(num>0) player.draw(num);
+							player.loseToDiscardpile(player.getExpansions('spolzhouxuan').randomGet());
 							'step 1'
-							var cards=player.getExpansions('spolzhouxuan');
-							if(cards.length) player.chooseButton(['选择移去一张“旋”',cards],true);
-							else event.finish();
-							'step 2'
-							if(result.bool) player.loseToDiscardpile(result.links);
+							var num=1;
+							if(!player.isMaxHandcard(true)) num+=player.getExpansions('spolzhouxuan').length;
+							player.draw(num);
 						},
 					},
 					discard:{
+						audio:'spolzhouxuan',
 						trigger:{player:'phaseUseEnd'},
-						forced:true,
-						locked:false,
 						filter:function(event,player){
 							return player.getExpansions('spolzhouxuan').length>0;
 						},
+						forced:true,
+						locked:false,
 						content:function(){
 							player.loseToDiscardpile(player.getExpansions('spolzhouxuan'));
 						},
@@ -21205,6 +21203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			yongsi:{
+				audio:'yongsi1',
 				group:['yongsi1','yongsi2'],
 				locked:true,
 				ai:{
@@ -21765,16 +21764,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					threaten:1.5
-				}
+				},
 			},
 			juyi:{
 				skillAnimation:true,
 				animationColor:'thunder',
-				audio:true,
+				audio:2,
 				derivation:['benghuai','weizhong'],
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
-					return player.maxHp>game.players.length&&!player.storage.juyi;
+					return player.maxHp>game.countPlayer()&&!player.storage.juyi;
 				},
 				forced:true,
 				unique:true,
@@ -21788,12 +21787,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			weizhong:{
-				audio:true,
+				audio:2,
 				trigger:{player:['gainMaxHpEnd','loseMaxHpEnd']},
 				forced:true,
 				content:function(){
 					player.draw(player.isMinHandcard()?2:1);
-				}
+				},
 			},
 			kuangfu:{
 				trigger:{source:'damageSource'},
@@ -23817,7 +23816,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//zhendu_info_guozhan:'其他角色的出牌阶段开始时，你可以弃置一张手牌，视为该角色使用了一张【酒】。若如此做，你对其造成一点伤害。',
 			shangyi_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后弃置其中的一张黑色牌。',
 			zniaoxiang_info:'锁定技，当你使用【杀】指定目标后，你令目标角色响应此【杀】所需要使用的【闪】的数目+1。',
-			shoucheng_info:'当一名其他角色于其回合外失去手牌时，若其没有手牌，则你可令该角色摸一张牌。',
+			shoucheng_info:'当一名角色于其回合外失去手牌时，若其没有手牌，则你可令该角色摸一张牌。',
 			shengxi_info:'弃牌阶段开始时，若你本回合内未造成过伤害，则你可以摸两张牌。',
 			hengzheng_info:'摸牌阶段开始时，若你的体力值为1或你没有手牌，则你可以放弃摸牌，改为获得每名其他角色区域内的一张牌。',
 			cunsi_info:'限定技，出牌阶段，你可以将所有手牌交给一名男性角色。该角色获得技能【勇决】，然后你将武将牌翻面。',
@@ -23911,7 +23910,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reluanzhan_add:'乱战',
 			reluanzhan_remove:'乱战',
 			reluanzhan_info:'当你受到或造成伤害后，你获得一个“乱”。当你使用【杀】或黑色普通锦囊牌选择目标后，你可为此牌增加至多X个目标。当你使用这些牌指定第一个目标后，若此牌目标数小于X，则你移去X/2（向上取整）个“乱”。（X为“乱”数）',
-			zhuixi:'追袭',
+			zhuixi:'追摄',
 			zhuixi_info:'锁定技，你使用【杀】的次数上限+1。',
 			reduanbing:'短兵',
 			reduanbing_info:'你使用【杀】选择目标后，可以为此【杀】增加一名距离为1的额外目标。你对距离为1的角色使用的【杀】需两张【闪】才能抵消。',
@@ -24009,7 +24008,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzaowang_info:'限定技。出牌阶段，你可以令一名角色加1点体力上限，回复1点体力并摸三张牌，且获得如下效果：主公死亡时，若其身份为忠臣，则其和主公交换身份牌；其死亡时，若其身份为反贼且伤害来源的身份为主公或忠臣，则以主忠胜利结束本局游戏。',
 			sp_ol_zhanghe:'SP张郃',
 			spolzhouxuan:'周旋',
-			spolzhouxuan_info:'①弃牌阶段开始时，你可将至多五张置于武将牌上，称为“旋”。②当你使用牌时，你摸一张牌并将一张“旋”置入弃牌堆（若你的手牌数不为全场唯一最多则改为摸X张牌，X为“旋”数）。③出牌阶段结束时，你将所有“旋”置入弃牌堆。',
+			spolzhouxuan_info:'①弃牌阶段开始时，你可将任意张置于武将牌上，称为“旋”（你至多拥有五张“旋”）。②当你使用牌时，你随机将一张“旋”置入弃牌堆，然后摸一张牌（若你的手牌数不为全场唯一最多则额外摸X张牌，X为“旋”数）。③出牌阶段结束时，你将所有“旋”置入弃牌堆。',
 			wuyan:'吾彦',
 			lanjiang:'澜疆',
 			lanjiang_info:'结束阶段，你可以选择所有手牌数不小于你的角色。这些角色依次选择是否令你摸一张牌。然后你可以对其中一名手牌数等于你的角色造成1点伤害，随后可以对其中一名手牌数小于你的角色摸一张牌。',

@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.9.125.1',
+	'v1.9.126.1',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -6445,6 +6445,7 @@ window.noname_asset_list=[
 	'image/character/clan_xunshu.jpg',
 	'image/character/clan_zhonghui.jpg',
 	'image/character/clan_zhongyan.jpg',
+	'image/character/clan_zhongyu.jpg',
 	'image/character/cuimao.jpg',
 	'image/character/cuiyan.jpg',
 	'image/character/daqiao.jpg',

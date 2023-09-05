@@ -824,7 +824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=targets[event.index];
 					if(target.isIn()){
 						target.draw();
-						if(target==player) event.num++;
+						event.num++;
 					}
 					event.index++;
 					if(event.index>=targets.length) event.index=0;
@@ -1249,7 +1249,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						(used.length?('（你不能以此法令其'+reason+get.translation(used)+'）'):'')+'？若如此做，你摸一张牌并令〖称贤〗此阶段可发动次数上限+1。';
 					event.str=str;
 					if(!listx.length) event.finish();
-					if(listx.length==1) event._result={bool:true,links:listx};
+					else if(listx.length==1) event._result={bool:true,links:listx};
 					else{
 						event.asked=true;
 						player.chooseButton([
@@ -4019,6 +4019,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jsrglinghua:{
 				audio:2,
+				locked:false,
+				mod:{
+					judge:(player,result)=>{
+						const parent=_status.event.getParent(2);
+						if(parent.name=='jsrglinghua'&&parent.triggername=='phaseJieshuBegin') result.bool=!result.bool;
+					}
+				},
 				trigger:{
 					player:['phaseZhunbeiBegin','phaseJieshuBegin'],
 				},
@@ -4041,39 +4048,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var judge=trigger.name=='phaseZhunbei'?lib.card.shandian.judge:function(card){
-						if(get.suit(card)!='spade'||get.number(card)<=1||get.number(card)>=10) return -5;
-						return 1;
-					}
-					player.judge(judge,get.translation('shandian')).set('judge2',lib.card.shandian.judge2);
-					game.delayx(1.5);
+					event.executeDelayCardEffect=player.executeDelayCardEffect('shandian');
 					'step 1'
-					var name='shandian';
-					if(event.cancelled&&!event.direct){
-						if(lib.card[name].cancel){
-							var next=game.createEvent(name+'Cancel');
-							next.setContent(lib.card[name].cancel);
-							next.cards=[];
-							next.card=get.autoViewAs({name:name});
-							next.player=player;
-						}
-					}
-					else{
-						var next=game.createEvent(name);
-						next.setContent(function(){
-							if(result.bool==false){
-								player.damage(3,'thunder','nosource');
-							}
-						});
-						next._result=result;
-						next.cards=[];
-						next.card=get.autoViewAs({name:name});
-						next.player=player;
-					}
-					'step 2'
-					if(!player.hasHistory('damage',evt=>{
-						return evt.card&&evt.card.name=='shandian'&&evt.getParent(2)==event;
-					})){
+					var executeDelayCardEffect=event.executeDelayCardEffect;
+					if(!player.hasHistory('damage',evt=>evt.getParent(2)==executeDelayCardEffect)){
 						if(trigger.name=='phaseZhunbei'){
 							player.chooseTarget('灵化：是否令一名角色回复1点体力？').set('ai',target=>{
 								var player=_status.event.player;
@@ -4088,7 +4066,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else event.finish();
-					'step 3'
+					'step 2'
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target);
@@ -4214,7 +4192,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgxundao:'寻道',
 			jsrgxundao_info:'当你的判定牌生效前，你可以令至多两名角色依次弃置一张牌，然后你选择一张以此法弃置且位于弃牌堆中的牌代替此判定牌。',
 			jsrglinghua:'灵化',
-			jsrglinghua_info:'①准备阶段，你可以进行目标角色为你的【闪电】的特殊的使用流程。若你未因此受到伤害，你可以令一名角色回复1点体力。②结束阶段，你可以进行目标角色为你且判定效果反转的【闪电】的特殊的使用流程。若你未因此受到伤害，你可以对一名角色造成1点雷电伤害。',
+			jsrglinghua_info:'①准备阶段，你可以执行目标角色为你的【闪电】效果。若你未因此受到伤害，你可以令一名角色回复1点体力。②结束阶段，你可以执行目标角色为你且判定效果反转的【闪电】效果。若你未因此受到伤害，你可以对一名角色造成1点雷电伤害。',
 			sbyingmen:'盈门',
 			sbyingmen_info:'锁定技。①游戏开始时，你将武将牌堆中随机四张武将牌置于你的武将牌上，称为“访客”。②回合开始时，若你的“访客”数小于4，你随机从武将牌堆中将“访客”补至四张。',
 			sbpingjian:'评鉴',
@@ -4255,7 +4233,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_zoushi:'承邹氏',
 			jsrg_zoushi_ab:'邹氏',
 			jsrgguyin:'孤吟',
-			jsrgguyin_info:'准备阶段，你可以翻面，且令所有其他男性角色依次选择是否翻面。然后你和所有背面朝上的角色轮流各摸一张牌直到你本次以此法获得X张牌（X为场上存活角色与死亡角色中男性角色数）。',
+			jsrgguyin_info:'准备阶段，你可以翻面，且令所有其他男性角色依次选择是否翻面。然后你和所有背面朝上的角色轮流各摸一张牌，直到你们累计以此法获得X张牌（X为场上存活角色与死亡角色中男性角色数）。',
 			jsrgzhangdeng:'帐灯',
 			jsrgzhangdeng_info:'①当一名武将牌背面朝上的角色需要使用【酒】时，若你的武将牌背面朝上，其可以视为使用之。②当一名角色于一回合第二次发动〖帐灯①〗时，你将武将牌翻面至正面朝上。',
 			jsrg_guanyu:'承关羽',

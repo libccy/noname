@@ -134,34 +134,28 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						step4();
 					}
 				};
-				var step4=function(){
+				var step4=lib.genAsync(function*(){
 					clear();
 					ui.window.classList.add('noclick_important');
 					ui.click.configMenu();
 					ui.control.classList.add('noclick_click_important');
 					ui.control.style.top='calc(100% - 105px)';
-					ui.create.control('在菜单中，可以进行各项设置',function(){
-						ui.click.menuTab('选项');
-						ui.controls[0].replace('如果你感到游戏较卡，可以开启流畅模式',function(){
-							ui.controls[0].replace('在技能一栏中，可以设置自动发动或双将禁配的技能',function(){
-								ui.click.menuTab('武将');
-								ui.controls[0].replace('在武将或卡牌一栏中，单击武将/卡牌可以将其禁用',function(){
-									ui.click.menuTab('战局');
-									ui.controls[0].replace('在战局中可以输入游戏命令，或者管理录像',function(){
-										ui.click.menuTab('帮助');
-										ui.controls[0].replace('在帮助中，可以检查更新和下载素材',function(){
-											ui.click.configMenu();
-											ui.window.classList.remove('noclick_important');
-											ui.control.classList.remove('noclick_click_important');
-											ui.control.style.top='';
-											step5();
-										});
-									});
-								});
-							});
-						});
-					})
-				};
+					yield new Promise(resolve => ui.create.control('在菜单中，可以进行各项设置',resolve));
+					ui.click.menuTab('选项');
+					yield new Promise(resolve => ui.controls[0].replace('如果你感到游戏较卡，可以开启流畅模式',resolve));
+					yield new Promise(resolve => ui.controls[0].replace('在技能一栏中，可以设置自动发动或双将禁配的技能',resolve));
+					ui.click.menuTab('武将');
+					yield new Promise(resolve => ui.controls[0].replace('在武将或卡牌一栏中，单击武将/卡牌可以将其禁用',resolve));
+					ui.click.menuTab('战局');
+					yield new Promise(resolve => ui.controls[0].replace('在战局中可以输入游戏命令，或者管理录像',resolve));
+					ui.click.menuTab('帮助');
+					yield new Promise(resolve => ui.controls[0].replace('在帮助中，可以检查更新和下载素材',resolve));
+					ui.click.configMenu();
+					ui.window.classList.remove('noclick_important');
+					ui.control.classList.remove('noclick_click_important');
+					ui.control.style.top='';
+					step5();
+				});
 				var step5=function(){
 					clear();
 					ui.create.dialog('如果还有其它问题，欢迎来到百度无名杀吧进行交流');

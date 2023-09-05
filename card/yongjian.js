@@ -641,6 +641,53 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
+			},
+			/**
+			 * @deprecated
+			 */
+			_yongjian_zengyu:{
+				get forceLoad(){
+					return lib.skill._gifting.forceLoad;
+				},
+				set forceLoad(forceLoad){
+					lib.skill._gifting.forceLoad=forceLoad;
+				},
+				get filter(){
+					return lib.skill._gifting.filter;
+				},
+				set filter(filter){
+					lib.skill._gifting.filter=filter;
+				},
+				get filterCard(){
+					return lib.skill._gifting.filterCard;
+				},
+				set filterCard(filterCard){
+					lib.skill._gifting.filterCard=filterCard;
+				},
+				get filterTarget(){
+					return lib.skill._gifting.filterTarget;
+				},
+				set filterTarget(filterTarget){
+					lib.skill._gifting.filterTarget=filterTarget;
+				},
+				get check(){
+					return lib.skill._gifting.check;
+				},
+				set check(check){
+					lib.skill._gifting.check=check;
+				},
+				get content(){
+					return lib.skill._gifting.content;
+				},
+				set content(content){
+					lib.skill._gifting.content=content;
+				},
+				get ai(){
+					return lib.skill._gifting.ai;
+				},
+				set ai(ai){
+					lib.skill._gifting.ai=ai;
+				}
 			}
 		},
 		translate:{
