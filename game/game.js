@@ -9200,7 +9200,7 @@
 											};
 										}
 										else{
-											lib[j][k]=character[i][j][k];
+											Object.defineProperty(lib[j],k,Object.getOwnPropertyDescriptor(character[i][j],k));
 										}
 										if(j=='card'&&lib[j][k].derivation){
 											if(!lib.cardPack.mode_derivation){
