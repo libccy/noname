@@ -40319,7 +40319,7 @@
 						var page=ui.create.div('');
 						var node=ui.create.div('.menubutton.large',info.name,position,clickMode);
 						node.mode=mode;
-						node._initLink=function(){
+						//node._initLink=function(){
 							node.link=page;
 							var map={};
 							if(info.config){
@@ -40706,7 +40706,7 @@
 									info.config.update(config,map);
 								}
 							}
-						};
+						//};
 						return node;
 					};
 
@@ -42419,7 +42419,7 @@
 							node.classList.add('smallfont');
 						}
 						node.mode=mode;
-						node._initLink=function(){
+						//node._initLink=function(){
 							node.link=page;
 							for(var i in lib.extensionMenu[mode]){
 								if(i=='game') continue;
@@ -42454,7 +42454,7 @@
 								}
 								page.appendChild(cfgnode);
 							}
-						};
+						//};
 						return node;
 					};
 					for(var i in lib.extensionMenu){
