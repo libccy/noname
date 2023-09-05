@@ -29,34 +29,42 @@
 			}
 		}
 	}
-	function asyncGeneratorStep(gen,resolve,reject,_next,_throw,key,arg){
-        try{
-            var info=gen[key](arg);
-            var value=info.value;
-        }catch(error){
-            reject(error);
-            return;
-        }
-        if(info.done){
-            resolve(value);
-        }else{
-            Promise.resolve(value).then(_next,_throw);
-        }
+	function _genNext(gen,resolve,reject,_next,_throw,key,arg){
+		try{
+			var info=gen[key](arg);
+			var value=info.value;
+		}catch(error){
+			reject(error);
+			return;
+		}
+		if(info.done){
+			resolve(value);
+		}else{
+			Promise.resolve(value).then(_next,_throw);
+		}
 	}
-	function _asyncToGenerator(fn){
-        return function(){
-            var self=this,args=arguments;
-            return new Promise(function(resolve, reject){
-                var gen=fn.apply(self,args);
-                function _next(value){
-                    asyncGeneratorStep(gen,resolve,reject,_next,_throw,"next",value);
-                }
-                function _throw(err){
-                    asyncGeneratorStep(gen,resolve,reject,_next,_throw,"throw",err);
-                }
-                _next(undefined);
-            });
-        };
+	function genAwait(gen){
+		return new Promise((resolve,reject)=>{
+			function _next(value){
+				_genNext(gen,resolve,reject,_next,_throw,"next",value);
+			}
+			function _throw(err){
+				_genNext(gen,resolve,reject,_next,_throw,"throw",err);
+			}
+			_next(undefined);
+		})
+	}
+	function genAsync(fn){
+		return function genCoroutine(){
+			var self=this,args=arguments;
+			return new Promise((resolve,reject)=>{
+				var gen=fn.apply(self,args);
+				genAwait(gen).then((result, err)=>{
+					if(err) reject(err);
+					else resolve(result);
+				});
+			});
+		};
 	}
 	const GeneratorFunction=(function*(){}).constructor;
 	const _status={
@@ -142,6 +150,7 @@
 			card:{},
 		},
 		onload:[],
+		onload2:[],
 		arenaReady:[],
 		onfree:[],
 		inpile:[],
@@ -7144,6 +7153,8 @@
 				'无名杀 - 录像 - '+_status.videoToSave.name[0]+' - '+_status.videoToSave.name[1]);
 			}
 		},
+		genAsync:fn=>genAsync(fn),
+		genAwait:gen=>genAwait(gen),
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
@@ -8842,16 +8853,13 @@
 				}
 			},
 			//lib.onload支持传入GeneratorFunction以解决异步函数的问题 by诗笺
-			onload:_asyncToGenerator(function*(){
+			onload:genAsync(function*(){
 				const libOnload=lib.onload;
 				delete lib.onload;
 				while(Array.isArray(libOnload)&&libOnload.length){
 					const fun=libOnload.shift();
-					if(fun instanceof GeneratorFunction){
-						yield _asyncToGenerator(fun)();
-					}else{
-						fun();
-					}
+					const result=fun();
+					yield (fun instanceof GeneratorFunction)?genAwait(result):result;
 				}
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
@@ -9610,6 +9618,13 @@
 				}
 				localStorage.removeItem(lib.configprefix+'directstart');
 				delete lib.init.init;
+				const libOnload2=lib.onload2;
+				delete lib.onload2;
+				while(Array.isArray(libOnload2)&&libOnload2.length){
+					const fun=libOnload2.shift();
+					const result=fun();
+					yield (fun instanceof GeneratorFunction)?genAwait(result):result;
+				}
 			}),
 			startOnline:function(){
 				'step 0'
