@@ -32,17 +32,18 @@
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
-		async:(fn)=>function genCoroutine(){
+		async:fn=>function genCoroutine(){
 			return gnc.await(fn.apply(this,arguments))
 		},
-		await:(gen)=>new Promise((resolve,reject)=>{
+		await:gen=>new Promise((resolve,reject)=>{
 			const _next=value=>gnc.next(gen,resolve,reject,"next",value,_next,_throw);
 			const _throw=err=>gnc.next(gen,resolve,reject,"throw",err,_next,_throw);
 			_next(undefined);
 		}),
 		is:{
-			coroutine:(item)=>typeof item=="function"&&item.name=="genCoroutine",
-			generator:(item)=>item instanceof GeneratorFunction
+			coroutine:item=>typeof item=="function"&&item.name=="genCoroutine",
+			generator:item=>item instanceof GeneratorFunction,
+			a:item=>item.constructor==GeneratorFunction
 		},
 		next:(gen,resolve,reject,key,arg,_next,_throw)=>{
 			let info,value;
@@ -7157,8 +7158,9 @@
 		},
 		genAsync:fn=>gnc.async(fn),
 		genAwait:gen=>gnc.await(gen),
-		isGenCoroutine:(item)=>typeof item=="function"&&item.name=="genCoroutine",
-		isGenerator:(item)=>item instanceof GeneratorFunction,
+		isGenCoroutine:item=>gnc.is.coroutine(item),
+		isGeneratorFunc:item=>gnc.is.generator(item),
+		isGenerator:item=>gnc.is.a(item),
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
