@@ -1139,7 +1139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(info.type==get.type2(card,false)) return true;
 					if(info.suit!='none'&&info.suit==get.suit(card,false)) return true;
 					if(typeof info.number=='number'&&info.number>0&&info.number==get.suit(card,false)) return true;
-					return info.length==lib.skill.dcweidang.getLength(card)
+					return info.length==get.cardNameLength(card)
 				},
 				content:function(){
 					'step 0'
@@ -1156,7 +1156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							type:get.type2(card,player),
 							suit:get.suit(card,player),
 							number:get.number(card,player),
-							length:lib.skill.dcweidang.getLength(card),
+							length:get.cardNameLength(card),
 						}
 						event.cards=[];
 						event.forceDie=true;
@@ -2915,7 +2915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event,player){
-					return lib.skill.dcweidang.getLength(event.card)==player.getHistory('useCard').indexOf(event)+1;
+					return get.cardNameLength(event.card)==player.getHistory('useCard').indexOf(event)+1;
 				},
 				content:function(){
 					var card=trigger.card;
@@ -2928,14 +2928,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var card=event.card;
 					if(player!=_status.currentPhase||!card||event.getParent().type!='card') return false;
-					return lib.skill.dcweidang.getLength(card)==player.getHistory('useCard').indexOf(event.getParent(2))+1;
+					return get.cardNameLength(card)==player.getHistory('useCard').indexOf(event.getParent(2))+1;
 				},
 				content:function(){
 					trigger.num++;
 				},*/
 				mod:{
 					aiOrder:function(player,card,num){
-						if(typeof card=='object'&&lib.skill.dcweidang.getLength(card)==player.getHistory('useCard').length+1) return num+10;
+						if(typeof card=='object'&&get.cardNameLength(card)==player.getHistory('useCard').length+1) return num+10;
 					},
 				}
 			},

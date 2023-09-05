@@ -2174,23 +2174,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcweidang:{
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
-				getLength:function(card){
-					var name=get.translation(get.name(card));
-					if(name=='挟令') name='挟天子以令诸侯';
-					if(name=='霹雳投石车') name='霹雳车';
-					return name.length;
-				},
+				/**
+				 * @deprecated
+				 */
+				getLength:card=>get.cardNameLength(card),
 				direct:true,
 				filter:function(event,player){
 					var num=lib.skill.dcqinshen.getNum();
-					return event.player!=player&&(_status.connectMode?player.countCards('he'):player.hasCard(card=>lib.skill.dcweidang.getLength(card)==num,'he'));
+					return event.player!=player&&(_status.connectMode?player.countCards('he'):player.hasCard(card=>get.cardNameLength(card)==num,'he'));
 				},
 				content:function(){
 					'step 0'
 					var num=lib.skill.dcqinshen.getNum();
 					event.num=num;
 					player.chooseCard(get.prompt('dcweidang'),'将一张字数为'+num+'的牌置于牌堆底，然后获得一张字数为'+num+'的牌。若你能使用此牌，你使用之。','he',(card,player,target)=>{
-						return lib.skill.dcweidang.getLength(card)==_status.event.num;
+						return get.cardNameLength(card)==_status.event.num;
 					}).set('num',num).set('ai',card=>{
 						return 5-get.value(card);
 					});
@@ -2208,7 +2206,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					var card=get.cardPile(cardx=>lib.skill.dcweidang.getLength(cardx)==num);
+					var card=get.cardPile(cardx=>get.cardNameLength(cardx)==num);
 					if(card){
 						player.gain(card,'gain2');
 						if(player.hasUseTarget(card)){
