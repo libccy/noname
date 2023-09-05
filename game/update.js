@@ -57,7 +57,7 @@ window.noname_update={
 		//'character/yxs.js',
 		//'extension/boss/extension.js',
 		//'font/suits.woff2',
-		//'layout/default/layout.css',
+		'layout/default/layout.css',
 		//'layout/default/menu.css',
 		//'layout/long2/layout.css',
 		//'layout/mobile/equip.css',
