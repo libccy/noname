@@ -29,44 +29,38 @@
 			}
 		}
 	}
-	function _genNext(gen,resolve,reject,_next,_throw,key,arg){
-		try{
-			var info=gen[key](arg);
-			var value=info.value;
-		}catch(error){
-			reject(error);
-			return;
-		}
-		if(info.done){
-			resolve(value);
-		}else{
-			Promise.resolve(value).then(_next,_throw);
-		}
-	}
-	function genAwait(gen){
-		return new Promise((resolve,reject)=>{
-			function _next(value){
-				_genNext(gen,resolve,reject,_next,_throw,"next",value);
-			}
-			function _throw(err){
-				_genNext(gen,resolve,reject,_next,_throw,"throw",err);
-			}
-			_next(undefined);
-		})
-	}
-	function genAsync(fn){
-		return function genCoroutine(){
-			var self=this,args=arguments;
-			return new Promise((resolve,reject)=>{
-				var gen=fn.apply(self,args);
-				genAwait(gen).then((result, err)=>{
-					if(err) reject(err);
-					else resolve(result);
-				});
-			});
-		};
-	}
 	const GeneratorFunction=(function*(){}).constructor;
+	// gnc: GeNCoroutine
+	const gnc={
+		async:fn=>function genCoroutine(){
+			return gnc.await(fn.apply(this,arguments))
+		},
+		await:gen=>new Promise((resolve,reject)=>{
+			const _next=value=>gnc.next(gen,resolve,reject,"next",value,_next,_throw);
+			const _throw=err=>gnc.next(gen,resolve,reject,"throw",err,_next,_throw);
+			_next(undefined);
+		}),
+		is:{
+			coroutine:item=>typeof item=="function"&&item.name=="genCoroutine",
+			generatorFunc:item=>item instanceof GeneratorFunction,
+			generator:item=>item.constructor==GeneratorFunction
+		},
+		next:(gen,resolve,reject,key,arg,_next,_throw)=>{
+			let info,value;
+			try{
+				info=gen[key](arg);
+				value=info.value;
+			}catch(error){
+				reject(error);
+				return;
+			}
+			if(info.done){
+				resolve(value);
+			}else{
+				Promise.resolve(value).then(_next,_throw);
+			}
+		}
+	};
 	const _status={
 		paused:false,
 		paused2:false,
@@ -151,6 +145,7 @@
 		},
 		onload:[],
 		onload2:[],
+		onprepare:[],
 		arenaReady:[],
 		onfree:[],
 		inpile:[],
@@ -7161,8 +7156,17 @@
 				'无名杀 - 录像 - '+_status.videoToSave.name[0]+' - '+_status.videoToSave.name[1]);
 			}
 		},
-		genAsync:fn=>genAsync(fn),
-		genAwait:gen=>genAwait(gen),
+		genAsync:fn=>gnc.async(fn),
+		genAwait:gen=>gnc.await(gen),
+		gnc:{
+			async:gnc.async(fn),
+			await:gnc.await(gen),
+			is:{
+				coroutine:item=>gnc.is.coroutine(item),
+				generatorFunc:item=>gnc.is.generatorFunc(item),
+				generator:item=>gnc.is.generator(item)
+			}
+		},
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
@@ -7657,6 +7661,40 @@
 						}
 					});
 				}
+				if (!("allSettled" in Promise)){
+					Object.defineProperty(Promise, "allSettled", {
+						configurable:true,
+						enumerable:false,
+						writable:true,
+						value:function allSettled(ary){
+							const Promise = this;
+							return new Promise((resolve, reject) => {
+								if (Object.prototype.toString.call(arr) != "[object Array]")
+								return reject(new TypeError(`${typeof arr} ${ary} is not iterable(cannot read property Symbol(Symbol.iterator))`));
+								let args = Array.prototype.slice.call(ary);
+								if (args.length == 0) return resolve([]);
+								let arrCount = args.length;
+								function resolvePromise(index, value) {
+									if (typeof value == "object") {
+										var then = value.then;
+										if (typeof then == "function") {
+											then.call(value, (val) => {
+												args[index] = { status: "fulfilled", value: val };
+												if (--arrCount == 0) resolve(args);
+											}, (e) => {
+												args[index] = { status: "rejected", reason: e };
+												if (--arrCount == 0) resolve(args);
+											});
+										}
+									}
+								}
+
+								for (let i = 0; i < args.length; ++i)
+									resolvePromise(i, args[i]);
+							});
+						}
+					});
+				}
 				if(!Object.values){
 					Object.defineProperty(Object, 'values', {
 						configurable:true,
@@ -8108,6 +8146,12 @@
 						}
 					}
 					const loadPack=()=>{
+						if (Array.isArray(lib.onprepare)&&lib.onprepare.length){
+							_status.onprepare=Object.freeze(lib.onprepare.map(fn=>{
+								const result=fn();
+								return gnc.is.generatorFunc(fn)?gnc.await(result):result;
+							}));
+						}
 						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
 						if(_status.jsExt) toLoad+=_status.jsExt.reduce((previousValue,currentValue)=>{
 							const arrayLengths=Object.values(currentValue).reduce((previousElement,currentElement)=>{
@@ -8307,7 +8351,7 @@
 						document.addEventListener('touchmove',ui.click.windowtouchmove);
 					}
 				};
-				var proceed2=function(){
+				var proceed2=()=>{
 					if(config3){
 						proceed(config3);
 					}
@@ -8861,13 +8905,13 @@
 				}
 			},
 			//lib.onload支持传入GeneratorFunction以解决异步函数的问题 by诗笺
-			onload:genAsync(function*(){
+			onload:gnc.async(function*(){
 				const libOnload=lib.onload;
 				delete lib.onload;
 				while(Array.isArray(libOnload)&&libOnload.length){
 					const fun=libOnload.shift();
 					const result=fun();
-					yield (fun instanceof GeneratorFunction)?genAwait(result):result;
+					yield gnc.is.generatorFunc(fun)?gnc.await(result):result;
 				}
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
@@ -9062,7 +9106,7 @@
 					});
 				}
 
-				var proceed2=function(){
+				var proceed2=gnc.async(function*(){
 					var mode=lib.imported.mode;
 					var card=lib.imported.card;
 					var character=lib.imported.character;
@@ -9514,8 +9558,12 @@
 						}
 					}
 					delete lib.init.start;
+					if(Array.isArray(_status.onprepare)&&_status.onprepare.length){
+						yield Promise.allSettled(_status.onprepare);
+						delete _status.onprepare;
+					}
 					game.loop();
-				}
+				})
 				var proceed=function(){
 					if(!lib.db){
 						try{
@@ -9631,7 +9679,7 @@
 				while(Array.isArray(libOnload2)&&libOnload2.length){
 					const fun=libOnload2.shift();
 					const result=fun();
-					yield (fun instanceof GeneratorFunction)?genAwait(result):result;
+					yield gnc.is.generatorFunc(fun)?gnc.await(result):result;
 				}
 			}),
 			startOnline:function(){
