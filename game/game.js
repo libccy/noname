@@ -42,8 +42,8 @@
 		}),
 		is:{
 			coroutine:item=>typeof item=="function"&&item.name=="genCoroutine",
-			generator:item=>item instanceof GeneratorFunction,
-			a:item=>item.constructor==GeneratorFunction
+			generatorFunc:item=>item instanceof GeneratorFunction,
+			generator:item=>item.constructor==GeneratorFunction
 		},
 		next:(gen,resolve,reject,key,arg,_next,_throw)=>{
 			let info,value;
@@ -7158,6 +7158,15 @@
 		},
 		genAsync:fn=>gnc.async(fn),
 		genAwait:gen=>gnc.await(gen),
+		gnc:{
+			async:gnc.async(fn),
+			await:gnc.await(gen),
+			is:{
+				coroutine:item=>gnc.is.coroutine(item),
+				generatorFunc:item=>gnc.is.generatorFunc(item),
+				generator:item=>gnc.is.generator(item)
+			}
+		},
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
@@ -8140,7 +8149,7 @@
 						if (Array.isArray(lib.onprepare)&&lib.onprepare.length){
 							_status.onprepare=Object.freeze(lib.onprepare.map(fn=>{
 								const result=fn();
-								return gnc.is.generator(fn)?gnc.await(result):result;
+								return gnc.is.generatorFunc(fn)?gnc.await(result):result;
 							}));
 						}
 						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
@@ -8902,7 +8911,7 @@
 				while(Array.isArray(libOnload)&&libOnload.length){
 					const fun=libOnload.shift();
 					const result=fun();
-					yield gnc.is.generator(fun)?gnc.await(result):result;
+					yield gnc.is.generatorFunc(fun)?gnc.await(result):result;
 				}
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
@@ -9670,7 +9679,7 @@
 				while(Array.isArray(libOnload2)&&libOnload2.length){
 					const fun=libOnload2.shift();
 					const result=fun();
-					yield gnc.is.generator(fun)?gnc.await(result):result;
+					yield gnc.is.generatorFunc(fun)?gnc.await(result):result;
 				}
 			}),
 			startOnline:function(){
