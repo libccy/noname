@@ -332,6 +332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.getAllHistory('useSkill',evt=>evt.skill=='regongao'&&evt.targets[0]==event.player).length;
 				},
 				forced:true,
+				logTarget:'player',
 				content:function(){
 					player.gainMaxHp();
 					player.recover();
@@ -9309,8 +9310,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.$compare(event.card1,target,event.card2);
 					game.delay(4);
 					"step 6"
+					var next=game.createEvent('showCards');
+					next.player=player;
+					next.cards=[event.card1];
+					next.setContent('emptyEvent');
 					game.log(player,'展示了',event.card1);
+					"step 7"
+					var next=game.createEvent('showCards');
+					next.player=target;
+					next.cards=[event.card2];
+					next.setContent('emptyEvent');
 					game.log(target,'展示了',event.card2);
+					"step 8"
 					var name1=get.name(event.card1);
 					var name2=get.name(event.card2);
 					if(name1=='sha'&&name2!='shan'){
