@@ -2481,7 +2481,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_zhangliao:['sp_zhangliao','yj_zhangliao','jsrg_zhangliao'],
 			xiahoudun:['re_xiahoudun','xin_xiahoudun','xiahoudun'],
 			liubei:['re_liubei','liubei','dc_liubei','junk_liubei'],
-			guanyu:['re_guanyu','guanyu','jsrg_guanyu','ps_guanyu'],
+			guanyu:['re_guanyu','guanyu','ps_guanyu'],
 			zhangfei:['re_zhangfei','tw_zhangfei','xin_zhangfei','old_zhangfei','zhangfei','yj_zhangfei'],
 			zhaoyun:['re_zhaoyun','old_zhaoyun','zhaoyun','ps2063_zhaoyun','ps2067_zhaoyun'],
 			sp_zhaoyun:['sp_zhaoyun','jsp_zhaoyun'],

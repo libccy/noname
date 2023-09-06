@@ -9984,7 +9984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xushao:['xushao','jsrg_xushao'],
 			huban:['dc_huban','ol_huban'],
 			mengda:['dc_mengda','ol_mengda','pe_mengda'],
-			jsp_guanyu:['dc_jsp_guanyu','jsp_guanyu'],
+			jsp_guanyu:['jsrg_guanyu','dc_jsp_guanyu','jsp_guanyu'],
 			mushun:['mushun','sp_mushun'],
 			wangjun:['dc_wangjun','wangjun'],
 			zoushi:['re_zoushi','jsrg_zoushi'],
