@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp:{
 				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
 				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong'],
-				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
+				sp_tianzhu:['niujin','hejin','hansui',"wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','zhangzhi','lushi'],
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu'],
@@ -18,7 +18,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_wanglang:['ol_wanglang','ol_puyuan','ol_zhouqun'],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
-				//sp_single:["niujin"],
 				sp_others:["hanba","caiyang"],
 			},
 		},
@@ -28,6 +27,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			niujin:['male','wei',4,['olcuorui','liewei']],
+			hejin:['male','qun',4,['olmouzhu','olyanhuo']],
+			hansui:['male','qun',4,['olniluan','olxiaoxi']],
 			duanjiong:['male','qun',4,['olsaogu']],
 			ol_zhouqun:['male','shu',4,['oltianhou','olchenshuo']],
 			ol_wenqin:['male','wei',4,['olguangao','olhuiqi']],
@@ -99,7 +101,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuantanyuanshang:['male','qun',4,['neifa']],
 			xujing:['male','shu',3,['yuxu','xjshijian']],
 			
-			//niujin:['male','wei',4,['cuorui','liewei']],
 			jianggan:["male","wei",3,["weicheng","daoshu"]],
 			
 			caoying:["female","wei",4,["xinfu_lingren","xinfu_fujian"],[]],
@@ -690,6 +691,146 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//牛金
+			olcuorui:{
+				audio:'cuorui',
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+					target:'useCardToTargeted',
+				},
+				filter:function(event,player){
+					if(event.name=='useCardToTargeted') return get.type(event.card)=='delay'&&!player.hasSkill('olcuorui_skip');
+					return player.countCards('h')<Math.min(8,game.countPlayer());
+				},
+				forced:true,
+				content:function(){
+					if(trigger.name=='useCardToTargeted'){
+						player.skip('phaseJudge');
+						player.addTempSkill('olcuorui_skip',{player:'phaseJudgeSkipped'});
+					}
+					else player.drawTo(Math.min(8,game.countPlayer()));
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(get.type(card)=='delay') return 'zerotarget';
+						},
+					},
+				},
+				subSkill:{
+					skip:{
+						mark:true,
+						intro:{content:'跳过下个的判定阶段'},
+					},
+				},
+			},
+			//何进
+			olmouzhu:{
+				audio:'mouzhu',
+				inherit:'mouzhu',
+				content:function(){
+					'step 0'
+					target.chooseCard('he','交给'+get.translation(player)+'一张牌',true);
+					'step 1'
+					target.give(result.cards,player);
+					'step 2'
+					if(player.countCards('h')<=target.countCards('h')){
+						event.finish();
+						return;
+					}
+					var list=[];
+					if(target.hasUseTarget({name:'sha'})) list.push('sha');
+					if(target.hasUseTarget({name:'sha'})) list.push('juedou');
+					if(!list.length) event.finish();
+					else if(list.length==1) event._result={control:list[0]};
+					else target.chooseControl(list).set('prompt','谋诛：视为使用一张【杀】或【决斗】').set('ai',function(){
+						var player=_status.event.player;
+						return player.getUseValue({name:'sha'})>player.getUseValue({name:'juedou'})?'sha':'juedou';
+					});
+					'step 3'
+					if(result.control) target.chooseUseTarget({name:result.control},true);
+				},
+				ai:{
+					order:7,
+					result:{
+						target:-1,
+						player:function(player,target){
+							if(get.attitude(player,target)>0&&get.attitude(target,player)>0&&game.hasPlayer(function(current){
+								if(current==target) return false;
+								for(var card of [{name:'sha'},{name:'juedou'}]){
+									if(target.canUse(card,current)&&get.effect(current,card,target,player)>0&&get.effect(current,card,target,target)>0) return true;
+								}
+								return false;
+							})&&target.countCards('he')<=player.countCards('he')) return 3;
+							if(!target.hasValueTarget({name:'sha'})&&!target.hasValueTarget({name:'juedou'})) return -2;
+							if(target.countCards('he')>player.countCards('he')+1) return -1;
+							return -0.5;
+						},
+					},
+				},
+			},
+			olyanhuo:{
+				audio:'yanhuo',
+				trigger:{player:'die'},
+				forceDie:true,
+				filter:function(event,player){
+					if(!event.source||!event.source.isIn()||!event.source.countCards('he')) return false;
+					return player.countCards('he')>0;
+				},
+				check:function(event,player){
+					return get.effect(event.source,{name:'guohe_copy2'},player,player)>0;
+				},
+				logTarget:'source',
+				skillAnimation:true,
+				animationColor:'thunder',
+				content:function(){
+					player.discardPlayerCard(trigger.source,'he',[1,player.countCards('he')],true).set('forceDie',true);
+				},
+			},
+			//韩遂
+			olniluan:{
+				audio:'niluan',
+				trigger:{global:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return event.player.getHp()>player.getHp()&&event.player.getHistory('useCard',function(card){
+						return card.card.name=='sha';
+					}).length&&player.countCards('hes',card=>get.color(card,player)=='black'&&player.canUse(get.autoViewAs({name:'sha'},[card]),event.player,false));
+				},
+				direct:true,
+				content:function(){
+					var next=player.chooseToUse();
+					next.set('openskilldialog','逆乱：是否将一张黑色牌当作【杀】对'+get.translation(trigger.player)+'使用？');
+					next.set('norestore',true);
+					next.set('_backupevent','niluanx');
+					next.set('custom',{
+						add:{},
+						replace:{window:function(){}}
+					});
+					next.backup('niluanx');
+					next.set('targetRequired',true);
+					next.set('complexSelect',true);
+					next.set('filterTarget',function(card,player,target){
+						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+						return lib.filter.targetEnabled.apply(this,arguments);
+					});
+					next.set('sourcex',trigger.player);
+					next.set('addCount',false);
+					next.logSkill='olniluan';
+				},
+			},
+			olxiaoxi:{
+				audio:'xiaoxi',
+				audioname:['machao','hansui','pangde'],
+				trigger:{global:'roundStart'},
+				filter:function(event,player){
+					return player.hasUseTarget({name:'sha'},false);
+				},
+				direct:true,
+				content:function(){
+					player.chooseUseTarget({name:'sha'},get.prompt('olxiaoxi'),'视为使用一张无距离限制的【杀】',false,'nodistance').logSkill='olxiaoxi';
+				},
+			},
 			//段颎
 			olsaogu:{
 				audio:2,
@@ -24266,6 +24407,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanjiong:'段颎',
 			olsaogu:'扫谷',
 			olsaogu_info:'转换技。①出牌阶段，你可以。阴：弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】；阳：摸一张牌。②结束阶段，你可以弃置一张牌，令一名其他角色执行你当前〖扫谷①〗的分支。',
+			olcuorui:'挫锐',
+			olcuorui_info:'锁定技。①游戏开始时，你将手牌摸至场上存活人数张（至多摸至8张）。②当你成为延时锦囊牌的目标后，你跳过下个判定阶段。',
+			olmouzhu:'谋诛',
+			olmouzhu_info:'出牌阶段限一次，你可以令一名有牌的其他角色交给你一张牌。然后若你的手牌数大于其，其视为使用一张【杀】或【决斗】。',
+			olyanhuo:'延祸',
+			olyanhuo_info:'当你死亡时，你可以弃置杀死你的角色至多X张牌（X为你的牌数）。',
+			olniluan:'逆乱',
+			olniluan_info:'体力值大于你的其他角色的结束阶段，若其本回合内使用过【杀】，则你可以将一张黑色牌当作【杀】对其使用（无距离限制）。',
+			olxiaoxi:'骁袭',
+			olxiaoxi_info:'新的一轮开始时，你可以视为使用一张无距离限制的【杀】。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
@@ -24282,7 +24433,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_guozhan2:"国战移植",
 			sp_others:"其他",
 			sp_waitforsort:'等待分包',
-			sp_single:'新1v1',
 		},
 	};
 });

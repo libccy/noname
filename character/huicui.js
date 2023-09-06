@@ -935,13 +935,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:2.4,
 					result:{
 						target:function(player,target){
-							var eff=get.effect(target,{name:'shunshou'},player,player);
-							if(eff>0) return eff/10;
+							var num=get.sgn(get.attitude(player,target));
+							var eff=get.effect(target,{name:'shunshou'},player,player)*num;
+							if(eff*num>0) return eff/10;
 							if(player.hasShan()&&!target.hasSkillTag('directHit_ai',true,{
 								target:player,
 								card:{name:'sha'},
 							},true)) return eff;
-							if(target.hasSha()&&player.hp+player.countCards('h',function(card){
+							if(target.hasSha()&&player.hp+player.countCards('hs',function(card){
 								var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
 								if(mod2!='unchanged') return mod2;
 								var mod=game.checkMod(card,player,player,'unchanged','cardSavable',player);
