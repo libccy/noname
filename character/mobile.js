@@ -2088,7 +2088,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					prevent:{
 						trigger:{source:'damageBegin2'},
 						filter:function(event,player){
-							return player.getStorage('mbshihe_prevent').contains(event.player);
+							if(get.mode()=='identity') return player.getStorage('mbshihe_prevent').contains(event.player);
+							return player.getStorage('mbshihe_prevent').some(target=>event.player.isFriendOf(target));
 						},
 						onremove:true,
 						forced:true,
@@ -2101,13 +2102,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:function(storage,player){
 								var targets=storage.filter(i=>i.isIn());
-								return '被'+get.translation(targets)+'吓到了，对他'+(targets.length>1?'们':'')+'打不出伤害';
+								return '被'+get.translation(targets)+'吓到了，对他'+(targets.length>1?'们':'')+(get.mode()=='identity'?'的友方角色':'')+'打不出伤害';
 							},
 						},
 						ai:{
 							effect:{
 								player:function(card,player,target,current){
-									if(get.tag(card,'damage')&&player.getStorage('mbshihe_prevent').contains(target)) return 'zeroplayertarget';
+									if(get.tag(card,'damage')){
+										var bool=false;
+										if(get.mode()=='identity'&&player.getStorage('mbshihe_prevent').contains(target)) bool=true;
+										if(get.mode()!='identity'&&player.getStorage('mbshihe_prevent').some(targetx=>target.isFriendOf(targetx))) bool=true;
+										if(bool) return 'zeroplayertarget';
+									}
 								}
 							},
 						}
@@ -14194,6 +14200,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_wanglang:'旧王朗',
 			qianzhao:'牵招',
 			mbshihe:'势吓',
+			mbshihe_info_identity:'出牌阶段限一次。你可以与一名角色拼点。若你：赢，当其于其下回合结束前对你造成伤害时，取消之；没赢，你随机弃置一张牌。',
 			mbshihe_info:'出牌阶段限一次。你可以与一名角色拼点。若你：赢，当其于其下回合结束前对你造成伤害时，取消之；没赢，你随机弃置一张牌。',
 			mbzhenfu:'镇抚',
 			mbzhenfu_info:'结束阶段，若你本回合因弃置失去过牌，你可以令一名其他角色获得1点护甲。',
