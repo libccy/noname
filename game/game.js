@@ -9147,7 +9147,9 @@
 					var connectCardPack=[];
 					for(i in character){
 						if(character[i].character){
-							lib.characterPack[i]=character[i].character
+							const characterPack=lib.characterPack[i];
+							if(characterPack) Object.assign(characterPack,character[i].character);
+							else lib.characterPack[i]=character[i].character;
 						}
 						for(j in character[i]){
 							if(j=='mode'||j=='forbid') continue;
@@ -9250,11 +9252,11 @@
 						lib.cardPackList={};
 					}
 					for(i in card){
-						lib.cardPack[i]=[];
+						const cardPack=lib.cardPack[i]?lib.cardPack[i]:lib.cardPack[i]=[];
 						if(card[i].card){
 							for(var j in card[i].card){
 								if(!card[i].card[j].hidden&&card[i].translate[j+'_info']){
-									lib.cardPack[i].push(j);
+									cardPack.push(j);
 								}
 							}
 						}
@@ -9266,7 +9268,9 @@
 							}
 							if(j=='list'){
 								if(lib.config.mode=='connect'){
-									lib.cardPackList[i]=card[i][j];
+									const cardPackList=lib.cardPackList[i];
+									if(cardPackList) cardPackList.addArray(card[i][j]);
+									else lib.cardPackList[i]=card[i][j];
 								}
 								else{
 									if(lib.config.cards.contains(i)){
@@ -9277,7 +9281,9 @@
 										else{
 											pile=card[i][j];
 										}
-										lib.cardPile[i]=pile.slice(0);
+										const cardPile=lib.cardPile[i];
+										if(cardPile) cardPile.addArray(pile);
+										else lib.cardPile[i]=pile.slice(0);
 										if(lib.config.bannedpile[i]){
 											for(var k=0;k<lib.config.bannedpile[i].length;k++){
 												pile[lib.config.bannedpile[i][k]]=null;
@@ -9293,7 +9299,7 @@
 												pile.push(lib.config.addedpile[i][k]);
 											}
 										}
-										lib.card.list=lib.card.list.concat(pile);
+										lib.card.list.addArray(pile);
 									}
 								}
 							}
@@ -9314,7 +9320,7 @@
 												};
 											}
 											else{
-												lib[j][k]=card[i][j][k];
+												Object.defineProperty(lib[j],k,Object.getOwnPropertyDescriptor(card[i][j],k));
 											}
 										}
 										else{
@@ -12786,7 +12792,9 @@
 					var i,j,k;
 					for(i in character){
 						if(character[i].character){
-							lib.characterPack[i]=character[i].character;
+							const characterPack=lib.characterPack[i];
+							if(characterPack) Object.assign(characterPack,character[i].character);
+							else lib.characterPack[i]=character[i].character;
 						}
 						if(character[i].forbid&&character[i].forbid.contains(lib.config.mode)) continue;
 						if(character[i].mode&&character[i].mode.contains(lib.config.mode)==false) continue;
@@ -12818,7 +12826,7 @@
 								}
 								else{
 									if(lib[j][k]==undefined){
-										lib[j][k]=character[i][j][k];
+										Object.defineProperty(lib[j],k,Object.getOwnPropertyDescriptor(character[i][j],k));
 									}
 									else if(Array.isArray(lib[j][k])&&Array.isArray(character[i][j][k])){
 										lib[j][k].addArray(character[i][j][k]);
@@ -12836,11 +12844,11 @@
 						}
 					}
 					for(i in card){
-						lib.cardPack[i]=[];
+						const cardPack=lib.cardPack[i]?lib.cardPack[i]:lib.cardPack[i]=[];
 						if(card[i].card){
 							for(var j in card[i].card){
 								if(!card[i].card[j].hidden&&card[i].translate[j+'_info']){
-									lib.cardPack[i].push(j);
+									cardPack.push(j);
 								}
 							}
 						}
@@ -12855,7 +12863,7 @@
 									lib[j][k+'_card_config']=card[i][j][k];
 								}
 								else{
-									if(lib[j][k]==undefined) lib[j][k]=card[i][j][k];
+									if(lib[j][k]==undefined) Object.defineProperty(lib[j],k,Object.getOwnPropertyDescriptor(card[i][j],k));
 									else{
 										console.log(
 											`dublicate ${j} in card ${i}:\n${k}\nlib.${j}.${k}`,
