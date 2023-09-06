@@ -53415,8 +53415,8 @@
 	const get={
 		//Get the card name length
 		//获取此牌的字数
-		cardNameLength:card=>{
-			const actualCardName=lib.actualCardName,name=get.translation(get.name(card));
+		cardNameLength:(card,player)=>{
+			const actualCardName=lib.actualCardName,name=get.translation(get.name(card,player));
 			return (actualCardName.has(name)?actualCardName.get(name):name).length;
 		},
 		//Yingbian
