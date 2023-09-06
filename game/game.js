@@ -11021,23 +11021,27 @@
 						event.nojudge=true;
 					}
 					'step 1'
-					if(!event.cancelled&&!event.nojudge) player.judge(card);
+					if(event.cancelled||event.nojudge) return;
+					var next=player.judge(card),judge=event.judge;
+					if(typeof judge=='function') next.judge=judge;
+					var judge2=event.judge2;
+					if(typeof judge2=='function') next.judge2=judge2;
 					'step 2'
 					if(event.excluded) delete event.excluded;
 					else{
-						const cardName=event.cardName;
+						var cardName=event.cardName;
 						if(event.cancelled&&!event.direct){
-							const cardCancel=lib.card[cardName].cancel;
+							var cardCancel=lib.card[cardName].cancel;
 							if(cardCancel){
-								const next=game.createEvent(`${cardName}Cancel`);
+								var next=game.createEvent(`${cardName}Cancel`);
 								next.setContent(cardCancel);
 								next.cards=[card];
 								if(!card.viewAs){
-									const autoViewAs=next.card=get.autoViewAs(card);
+									var autoViewAs=next.card=get.autoViewAs(card);
 									autoViewAs.expired=card.expired;
 								}
 								else{
-									const autoViewAs=next.card=get.autoViewAs({
+									var autoViewAs=next.card=get.autoViewAs({
 										name:cardName
 									},next.cards);
 									autoViewAs.expired=card.expired;
@@ -11046,16 +11050,16 @@
 							}
 						}
 						else{
-							const next=game.createEvent(cardName);
+							var next=game.createEvent(cardName);
 							next.setContent(lib.card[cardName].effect);
 							next._result=result;
 							next.cards=[card];
 							if(!card.viewAs){
-								const autoViewAs=next.card=get.autoViewAs(card);
+								var autoViewAs=next.card=get.autoViewAs(card);
 								autoViewAs.expired=card.expired;
 							}
 							else{
-								const autoViewAs=next.card=get.autoViewAs({
+								var autoViewAs=next.card=get.autoViewAs({
 									name:cardName
 								},next.cards);
 								autoViewAs.expired=card.expired;
@@ -18943,7 +18947,7 @@
 				},
 				//Execute the delay card effect
 				//执行延时锦囊牌效果
-				executeDelayCardEffect:function(card,target){
+				executeDelayCardEffect:function(card,target,judge,judge2){
 					const executeDelayCardEffect=game.createEvent('executeDelayCardEffect');
 					executeDelayCardEffect.player=this;
 					executeDelayCardEffect.target=target||this;
@@ -18956,6 +18960,8 @@
 					}
 					else if(get.itemtype(card)=='card') executeDelayCardEffect.card=card;
 					else _status.event.next.remove(executeDelayCardEffect);
+					executeDelayCardEffect.judge=judge;
+					executeDelayCardEffect.judge2=judge2;
 					executeDelayCardEffect.setContent('executeDelayCardEffect');
 					executeDelayCardEffect._args=Array.from(arguments);
 					return executeDelayCardEffect;
@@ -28142,14 +28148,14 @@
 						if(this.player&&lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name)}
 				},
 				neutralize:function(event){
-					this.untrigger(true);
+					this.untrigger();
 					this.finish();
 					this._neutralized=true;
 					this.trigger('eventNeutralized');
 					this._neutralize_event=event||_status.event;
 				},
 				unneutralize:function(){
-					this.untrigger(true);
+					this.untrigger();
 					delete this._neutralized;
 					delete this.finished;
 					if(this.type=='card'&&this.card&&this.name=='sha') this.directHit=true;
@@ -35463,7 +35469,7 @@
 		linexy:function(path){
 			const from=[path[0],path[1]],to=[path[2],path[3]];
 			let total=typeof arguments[1]==='number'?arguments[1]:lib.config.duration*2,opacity=1,color=[255,255,255],dashed=false,drag=false;
-			if(arguments[1]!=null&&typeof arguments[1]=='object') Object.keys(arguments[1]).forEach(value=>{
+			if(arguments[1]&&typeof arguments[1]=='object') Object.keys(arguments[1]).forEach(value=>{
 				switch(value){
 					case 'opacity':
 						opacity=arguments[1][value];
