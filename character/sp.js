@@ -795,7 +795,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.player.getHp()>player.getHp()&&event.player.getHistory('useCard',function(card){
 						return card.card.name=='sha';
-					}).length&&player.countCards('hs',card=>player.canUse(get.autoViewAs({name:'sha'},[card]),event.player,false));
+					}).length&&player.countCards('hs',card=>get.color(card,player)=='black'&&player.canUse(get.autoViewAs({name:'sha'},[card]),event.player,false));
 				},
 				direct:true,
 				content:function(){
