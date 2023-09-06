@@ -1656,14 +1656,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function (event,player){
 					return player!=event.player&&event.player.hp>0&&player.countCards('h',function(card){
-						return !card.hasGaintag('dddxujing_tag');
+						return !get.is.shownCard(card);
 					})>=event.player.hp;
 				},
 				content:function (){
 					'step 0'
 					var target=trigger.player;
-					player.chooseCard('h',target.hp,get.prompt('dddqiahua',target),'选择'+get.cnNumber(target.hp)+'张手牌作为“明”，然后'+get.translation(target)+'获得技能〖恂恂〗直到本回合结束。',function(card){
-						return !card.hasGaintag('dddxujing_tag');
+					player.chooseCard('h',target.hp,get.prompt('dddqiahua',target),'选择明置'+get.cnNumber(target.hp)+'张手牌，然后'+get.translation(target)+'获得技能〖恂恂〗直到本回合结束。',function(card){
+						return !get.is.shownCard(card);
 					}).set('goon',get.attitude(player,target)>0).set('ai',function(card){
 						if(_status.event.goon) return 1+Math.random();
 						return 0;
@@ -1673,11 +1673,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=trigger.player,cards=result.cards;
 						player.logSkill('dddqiahua',target);
 						target.addTempSkill('dddxunxun');
-						player.addSkill('dddxujing_tag');
-						player.addGaintag(result.cards,'dddxujing_tag');
+						player.addShownCards(cards,'visible_dddxianglang');
 						game.log(player,'选择了',cards,'作为“明”');
 						player.showCards(cards,get.translation(player)+'对'+get.translation(target)+'发动了【恰化】');
-						player.markSkill('dddxujing_tag');
 					}
 				},
 				ai:{
@@ -1692,10 +1690,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dddfusi:{
 				mod:{
 					ignoredHandcard:function (card,player){
-						if(card.hasGaintag('dddxujing_tag')) return true;
+						if(get.is.shownCard(card)) return true;
 					},
 					cardDiscardable:function (card,player,name){
-						if(name=='phaseDiscard'&&card.hasGaintag('dddxujing_tag')) return false;
+						if(name=='phaseDiscard'&&get.is.shownCard(card)) return false;
 					},
 				},
 				global:"dddfusi_global",
@@ -1712,10 +1710,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dddfusi_global:{
 				mod:{
-					"cardEnabled2":function (card,player){
+					cardEnabled2:function(card,player){
 						var source=_status.currentPhase;
 						if(!source||source==player||!source.hasSkill('dddfusi')||source.countCards('h')==0||source.hasCard(function(card){
-							return !card.hasGaintag('dddxujing_tag');
+							return !get.is.shownCard(card);
 						},'h')) return;
 						if(player.getCards('h').contains(card)) return false;
 					},
@@ -1727,9 +1725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.hasSkill('dddfusi');
 					});
 					for(var source of players){
-						var cards=source.getCards('h',function(card){
-							return card.hasGaintag('dddxujing_tag');
-						});
+						var cards=source.getShownCards();
 						for(var i of cards){
 							var card=get.autoViewAs(i);
 							if(event.filterCard(card,player,event)) return true;
@@ -1743,9 +1739,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.hasSkill('dddfusi');
 					});
 					for(var source of players){
-						var cards=source.getCards('h',function(card){
-							return card.hasGaintag('dddxujing_tag');
-						});
+						var cards=source.getShownCards();
 						for(var i of cards){
 							var card=get.autoViewAs(i);
 							if(name==card.name) return true;
@@ -1760,9 +1754,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return current!=player&&current.hasSkill('dddfusi');
 						}).sortBySeat();
 						for(var source of players){
-							var cards=source.getCards('h',function(card){
-								return card.hasGaintag('dddxujing_tag');
-							});
+							var cards=source.getShownCards();
 							if(cards.length){
 								var str='<div class="text center">';
 								str+=get.translation(source);
@@ -1862,7 +1854,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function(event,player){
 					return event.card.storage&&event.card.storage._dddfusi_owner==player&&!player.hasCard(function(card){
-						return !card.hasGaintag('dddxujing_tag');
+						return !get.is.shownCard(card);
 					},'h');
 				},
 				content:function(){
@@ -4231,13 +4223,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dddzhijie_info:"你可以将两张颜色相同的“鉴”当做【闪】使用，或将两张颜色不同的“鉴”当做【无懈可击】使用；然后你摸两张牌。",
 			ddd_xianglang:'向朗',
 			dddqiahua:"恰化",
-			dddqiahua_info:"其他角色的回合开始时，你可选择X张不为“明”的手牌作为“明”（X为其体力值，这些牌对所有角色可见），然后其于本回合内获得〖恂恂〗。",
+			dddqiahua_info:"其他角色的回合开始时，你可明置X张手牌（X为其体力值），然后其于本回合内获得〖恂恂〗。",
 			dddfusi:"腹笥",
-			dddfusi_info:"锁定技。①你的“明”不计入手牌上限。②其他角色需要使用牌时，可以改为使用你的“明”（需经过你的确认）。③你的回合内，若你的手牌均为“明”，则其他角色不能使用各自的手牌。",
+			dddfusi_info:"锁定技。①你的明置手牌不计入手牌上限。②其他角色需要使用牌时，可以改为使用你的明置手牌（需经过你的确认）。③你的回合内，若你的手牌均为明置手牌，则其他角色不能使用各自的手牌。",
 			dddfusi_global:"腹笥",
 			dddtuoji:"拓籍",
-			dddtuoji_info:"其他角色因〖腹笥〗而使用你的牌后，若你的手牌均为“明”，则你可以摸三张牌。",
-			dddxujing_tag:"明",
+			dddtuoji_info:"其他角色因〖腹笥〗而使用你的牌后，若你的手牌均为明置手牌，则你可以摸三张牌。",
+			visible_dddxianglang:"明",
 			ddd_yujin:'于禁',
 			dddzhengjun:'整军',
 			dddzhengjun_info:'出牌阶段内每项各限一次。当有其他角色的手牌数/体力值/装备区内牌数变化后，若其的对应数值与你相同，则你可以执行对应的选项。体力值：你令一名角色回复1点体力；手牌数：你令一名角色摸一张牌；装备区内牌数：你移动场上的一张装备牌。',

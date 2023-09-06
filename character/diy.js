@@ -12910,9 +12910,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.logSkill('nsfengli',target);
 						var cards=player.getCards('h');
-						player.addGaintag(cards,'nsfengli2');
+						player.addShownCards(cards,'visible_nsfengli');
 						player.addSkill('nsfengli2');
-						player.showHandcards();
 						target.addSkill('nsfengli_use');
 						target.storage.nsfengli_use=player;
 					}
@@ -12924,26 +12923,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			nsfengli_draw:{
 				trigger:{
-					player:['loseAfter','nsfengliClear'],
+					player:['loseAfter','hideShownCardsAfter'],
 					global:['gainAfter','equipAfter','addJudgeAfter','loseAsyncAfter','addToExpansionAfter'],
-					target:'nsfengliUse',
 				},
 				direct:true,
 				charlotte:true,
 				filter:function(event,player,name){
-					if(name!='nsfengliUse'&&name!='nsfengliClear'){
-						var evt=event.getl(player);
-						if(!evt||!evt.gaintag_map) return false;
-						var bool=false;
-						for(var i in evt.gaintag_map){
-							if(evt.gaintag_map[i].contains('nsfengli2')) bool=true;break;
-						}
-						if(!bool) return false;
+					if(event.name=='hideShownCards'){
+						const hs=player.countCards('h');
+						return game.hasPlayer(current=>current.countCards('h')<hs);
 					}
-					var hs=player.countCards('h');
-					return game.hasPlayer(function(current){
-						return current!=player&&current.countCards('h')<hs;
-					});
+					var num=0;
+					var evt=event.getl(player);
+					if(!evt||!evt.gaintag_map) return false;
+					var bool=false;
+					for(var i in evt.gaintag_map){
+						if(evt.gaintag_map[i].some(tag=>tag.indexOf('visible_')==0)) num++;
+					}
+					if(event.getg){
+						if(event.name=='gain'){
+							if(event.getlx===false&&event.gaintag.some(tag=>tag.indexOf('visible_')==0)) num-=event.cards.length;
+						}
+						else{
+							player.checkHistory('gain',function(evt){
+								if(evt.parent==event&&evt.gaintag.some(tag=>tag.indexOf('visible_')==0)){
+									num-=evt.cards.length;
+								}
+							});
+						}
+					}
+					if(num>0){
+						const hs=player.countCards('h');
+						return game.hasPlayer(current=>current.countCards('h')<hs);
+					}
 				},
 				content:function(){
 					'step 0'
@@ -12970,24 +12982,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hasSkill('nsfengli2');
 				},
 				content:function(){
-					var hs=player.getCards('h',function(card){
-						return card.hasGaintag('nsfengli2');
-					});
-					if(hs.length) event.trigger('nsfengliClear');
+					var cards=player.getShownCards();
+					if(cards.length>0) player.hideShownCards(cards);
 					player.removeSkill('nsfengli2');
 				},
 			},
 			nsfengli2:{
-				mark:true,
-				intro:{
-					mark:function(dialog,content,player){
-						var hs=player.getCards('h',function(card){
-							return card.hasGaintag('nsfengli2');
-						});
-						if(hs.length) dialog.addAuto(hs);
-						else dialog.addText('没有“礼”');
-					},
-				},
 				onremove:function(player){
 					player.removeGaintag('nsfengli2');
 					game.countPlayer(function(current){
@@ -12999,9 +12999,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				hiddenCard:function(player,name){
 					if(player==_status.currentPhase) return false;
 					var target=player.storage.nsfengli_use;
-					var cards=target.getCards('h',function(card){
-						return card.hasGaintag('nsfengli2');
-					});
+					var cards=target.getShownCards();
 					for(var i of cards){
 						if(get.name(i,target)==name) return true;
 					}
@@ -13013,9 +13011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
 					var target=player.storage.nsfengli_use;
-					var cards=target.getCards('h',function(card){
-						return card.hasGaintag('nsfengli2');
-					});
+					var cards=target.getShownCards();
 					for(var i of cards){
 						if(event.filterCard({
 							name:get.name(i,target),
@@ -13028,9 +13024,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				chooseButton:{
 					dialog:function(event,player){
 						var target=player.storage.nsfengli_use;
-						var cards=target.getCards('h',function(card){
-							return card.hasGaintag('nsfengli2');
-						});
+						var cards=target.getShownCards();
 						return ui.create.dialog('奉礼',cards);
 					},
 					filter:function(button,player){
@@ -13066,8 +13060,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.logSkill('nsfengli',target);
 								delete event.result.skill;
 								player.showCards(card,get.translation(player)+'发动了【奉礼】');
-								card.removeGaintag('nsfengli2');
-								event.trigger('nsfengliUse');
+								target.hideShownCards(card);
 							},
 						};
 					},
@@ -18674,7 +18667,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsfengli_draw:'奉礼',
 			nsfengli_clear:'奉礼',
 			nsfengli_use:'奉礼',
-			nsfengli_info:'回合结束时，你可以选择一名其他角色并展示所有手牌。你将所有手牌标记为“礼”。你的“礼”对所有角色可见。当该角色于回合外需要使用或打出牌时，其可移去一张“礼”的标记，然后视为使用或打出一张与此牌名称相同的牌。当你的“礼”减少时，你可令一名手牌数小于你的角色摸一张牌。你的回合开始时，你移去所有“礼”的标记，然后注销该角色对“礼”的操作权限。',
+			visible_nsfengli:'奉礼',
+			nsfengli_info:'回合结束时，你可以选择一名其他角色并展示所有手牌直到你的下回合开始。当该角色于回合外需要使用或打出牌时，其可暗置你的一张明置手牌，然后视为使用或打出之。当你的明置手牌减少时，你可令一名手牌数小于你的角色摸一张牌。',
 			nsqiyue:'骑钺',
 			nsqiyue_info:'锁定技，当有角色的武将牌状态改变后，你摸一张牌。',
 			nsxuezhu:'血逐',

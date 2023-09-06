@@ -10960,6 +10960,49 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				//增加明置手牌
+				addShownCards:function(){
+					var hs=player.getCards('h'),cards=event._cards.filter(card=>hs.includes(card));
+					var shown=player.getShownCards();
+					for(var tag of event.gaintag) player.addGaintag(cards,tag);
+					event.cards=cards.filter(card=>!shown.includes(card));
+					if(event.cards.length>0){
+						game.log(player,'明置了',event.cards);
+						event.trigger('addShownCardsAfter')
+					}
+				},
+				//隐藏明置手牌
+				hideShownCards:function(){
+					var shown=player.getShownCards(),cards=event._cards.filter(card=>shown.includes(card));
+					if(cards.length>0){
+						if(!event.gaintag.length){
+							var map={};
+							cards.forEach(card=>{
+								var tags=card.gaintag.filter(tag=>tag.indexOf('visible_')==0)
+								if(tags.length){
+									tags.forEach(tag=>{
+										if(!map[tag]) map[tag]=[];
+										map[tag].push(card);
+									})
+								}
+							});
+							for(var i in map){
+								player.removeGaintag(i,map[i])
+							}
+						}
+						else{
+							event.gaintag.forEach(tag=>{
+								player.removeGaintag(tag,cards);
+							})
+						}
+						cards.removeArray(player.getShownCards());
+						if(cards.length>0){
+							event.cards=cards;
+							game.log(player,'取消明置了',cards);
+							event.trigger('hideShownCardsAfter');
+						}
+					}
+				},
 				//Execute the delay card effect
 				//执行延时锦囊牌效果
 				executeDelayCardEffect:()=>{
@@ -15774,7 +15817,23 @@
 									directh=false;
 								}
 								else{
-									event.dialog.add([hs,'blank']);
+									var shown=hs.filter(card=>get.is.shownCard(card));
+									if(shown.length){
+										var hidden=hs.filter(card=>!shown.includes(card));
+										var buttons=ui.create.div('.buttons',event.dialog.content);
+										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(shown,'card',buttons));
+										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(hidden,'blank',buttons));
+										if(event.dialog.forcebutton!==false) event.dialog.forcebutton=true;
+										if(event.dialog.buttons.length>3||(zoom&&event.dialog.buttons.length>5)){
+											event.dialog.classList.remove('forcebutton-auto');
+										}
+										else if(!event.dialog.noforcebutton){
+											event.dialog.classList.add('forcebutton-auto');
+										}
+									}
+									else{
+										event.dialog.add([hs,'blank']);
+									}
 								}
 							}
 						}
@@ -15902,8 +15961,8 @@
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getDiscardableCards(player,'h');
+							expand_length+=Math.ceil(hs.length/6);
 							if(hs.length){
-								expand_length+=Math.ceil(hs.length/6);
 								var title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
 								title.style.margin='0px';
 								title.style.padding='0px';
@@ -15913,7 +15972,23 @@
 									directh=false;
 								}
 								else{
-									event.dialog.add([hs,'blank']);
+									var shown=hs.filter(card=>get.is.shownCard(card));
+									if(shown.length){
+										var hidden=hs.filter(card=>!shown.includes(card));
+										var buttons=ui.create.div('.buttons',event.dialog.content);
+										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(shown,'card',buttons));
+										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(hidden,'blank',buttons));
+										if(event.dialog.forcebutton!==false) event.dialog.forcebutton=true;
+										if(event.dialog.buttons.length>3||(zoom&&event.dialog.buttons.length>5)){
+											event.dialog.classList.remove('forcebutton-auto');
+										}
+										else if(!event.dialog.noforcebutton){
+											event.dialog.classList.add('forcebutton-auto');
+										}
+									}
+									else{
+										event.dialog.add([hs,'blank']);
+									}
 								}
 							}
 						}
@@ -16076,7 +16151,23 @@
 									directh=false;
 								}
 								else{
-									event.dialog.add([hs,'blank']);
+									var shown=hs.filter(card=>get.is.shownCard(card));
+									if(shown.length){
+										var hidden=hs.filter(card=>!shown.includes(card));
+										var buttons=ui.create.div('.buttons',event.dialog.content);
+										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(shown,'card',buttons));
+										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(hidden,'blank',buttons));
+										if(event.dialog.forcebutton!==false) event.dialog.forcebutton=true;
+										if(event.dialog.buttons.length>3||(zoom&&event.dialog.buttons.length>5)){
+											event.dialog.classList.remove('forcebutton-auto');
+										}
+										else if(!event.dialog.noforcebutton){
+											event.dialog.classList.add('forcebutton-auto');
+										}
+									}
+									else{
+										event.dialog.add([hs,'blank']);
+									}
 								}
 							}
 						}
@@ -18795,6 +18886,61 @@
 			},
 			player:{
 				//新函数
+				//让一名角色明置一些手牌
+				addShownCards:function(){
+					const cards=[];
+					const tags=[];
+					for(let i=0;i<arguments.length;i++){
+						let type=get.itemtype(arguments[i]);
+						if(type=='cards'){
+							cards.addArray(arguments[i])
+						}
+						else if(type=='card'){
+							card.add(arguments[i])
+						}
+						else if(typeof arguments[i]=='string'&&arguments[i].indexOf('visible_')==0){
+							tags.add(arguments[i])
+						}
+					}
+					if(cards.length&&tags.length){
+						const next=game.createEvent('addShownCards',false);
+						next.player=this;
+						next._cards=cards;
+						next.gaintag=tags;
+						next.setContent('addShownCards');
+						return next;
+					}
+				},
+				hideShownCards:function(){
+					const cards=[];
+					const tags=[];
+					for(let i=0;i<arguments.length;i++){
+						let type=get.itemtype(arguments[i]);
+						if(type=='cards'){
+							cards.addArray(arguments[i])
+						}
+						else if(type=='card'){
+							cards.add(arguments[i])
+						}
+						else if(typeof arguments[i]=='string'&&arguments[i].indexOf('visible_')==0){
+							tags.add(arguments[i])
+						}
+					}
+					if(cards.length){
+						const next=game.createEvent('hideShownCards',false);
+						next.player=this;
+						next._cards=cards;
+						next.gaintag=tags;
+						next.setContent('hideShownCards');
+						return next;
+					}
+				},
+				//获取角色所有的明置手牌
+				getShownCards:function(){
+					return this.getCards('h',function(card){
+						return get.is.shownCard(card);
+					});
+				},
 				//Execute the delay card effect
 				//执行延时锦囊牌效果
 				executeDelayCardEffect:function(card,target){
@@ -19381,9 +19527,9 @@
 					},this,cards,tag);
 				},
 				removeGaintag:function(tag,cards){
-					game.addVideo('removeGaintag',this,tag);
+					cards=cards||this.getCards('h');
+					game.addVideo('removeGaintag',this,[tag,cards]);
 					game.broadcastAll(function(player,tag,cards){
-						cards=cards||player.getCards('h');
 						for(var i of cards) i.removeGaintag(tag);
 					},this,tag,cards);
 				},
@@ -22900,8 +23046,8 @@
 						return cards;
 					};
 					next.getl=function(player){
-						var that=this;
-						var map={
+						const that=this;
+						const map={
 							player:player,
 							hs:[],
 							es:[],
@@ -22910,6 +23056,7 @@
 							xs:[],
 							cards:[],
 							cards2:[],
+							gaintag_map:{},
 						};
 						player.checkHistory('lose',function(evt){
 							if(evt.parent==that){
@@ -22920,6 +23067,10 @@
 								map.xs.addArray(evt.xs);
 								map.cards.addArray(evt.cards);
 								map.cards2.addArray(evt.cards2);
+								for(let key in evt.gaintag_map){
+									if(!map.gaintag_map[key]) map.gaintag_map[key]=[];
+									map.gaintag_map[key].addArray(evt.gaintag_map[key]);
+								}
 							}
 						});
 						return map;
@@ -22982,8 +23133,8 @@
 						return cards;
 					};
 					next.getl=function(player){
-						var that=this;
-						var map={
+						const that=this;
+						const map={
 							player:player,
 							hs:[],
 							es:[],
@@ -22992,6 +23143,7 @@
 							xs:[],
 							cards:[],
 							cards2:[],
+							gaintag_map:{},
 						};
 						player.checkHistory('lose',function(evt){
 							if(evt.parent==that){
@@ -23002,6 +23154,10 @@
 								map.xs.addArray(evt.xs);
 								map.cards.addArray(evt.cards);
 								map.cards2.addArray(evt.cards2);
+								for(let key in evt.gaintag_map){
+									if(!map.gaintag_map[key]) map.gaintag_map[key]=[];
+									map.gaintag_map[key].addArray(evt.gaintag_map[key]);
+								}
 							}
 						});
 						return map;
@@ -23079,6 +23235,7 @@
 							xs:[],
 							cards:[],
 							cards2:[],
+							gaintag_map:{},
 						};
 					};
 					return next;
@@ -23465,8 +23622,8 @@
 						return cards;
 					};
 					next.getl=function(player){
-						var that=this;
-						var map={
+						const that=this;
+						const map={
 							player:player,
 							hs:[],
 							es:[],
@@ -23475,6 +23632,7 @@
 							xs:[],
 							cards:[],
 							cards2:[],
+							gaintag_map:{},
 						};
 						player.checkHistory('lose',function(evt){
 							if(evt.parent==that){
@@ -23485,6 +23643,10 @@
 								map.xs.addArray(evt.xs);
 								map.cards.addArray(evt.cards);
 								map.cards2.addArray(evt.cards2);
+								for(let key in evt.gaintag_map){
+									if(!map.gaintag_map[key]) map.gaintag_map[key]=[];
+									map.gaintag_map[key].addArray(evt.gaintag_map[key]);
+								}
 							}
 						});
 						return map;
@@ -23519,8 +23681,8 @@
 						return cards;
 					};
 					next.getl=function(player){
-						var that=this;
-						var map={
+						const that=this;
+						const map={
 							player:player,
 							hs:[],
 							es:[],
@@ -23529,6 +23691,7 @@
 							xs:[],
 							cards:[],
 							cards2:[],
+							gaintag_map:{},
 						};
 						player.checkHistory('lose',function(evt){
 							if(evt.parent==that){
@@ -23539,6 +23702,10 @@
 								map.xs.addArray(evt.xs);
 								map.cards.addArray(evt.cards);
 								map.cards2.addArray(evt.cards2);
+								for(let key in evt.gaintag_map){
+									if(!map.gaintag_map[key]) map.gaintag_map[key]=[];
+									map.gaintag_map[key].addArray(evt.gaintag_map[key]);
+								}
 							}
 						});
 						return map;
@@ -31993,8 +32160,8 @@
 				return cards;
 			};
 			next.getl=function(player){
-				var that=this;
-				var map={
+				const that=this;
+				const map={
 					player:player,
 					hs:[],
 					es:[],
@@ -32003,6 +32170,7 @@
 					xs:[],
 					cards:[],
 					cards2:[],
+					gaintag_map:{},
 				};
 				player.checkHistory('lose',function(evt){
 					if(evt.parent==that){
@@ -32013,6 +32181,10 @@
 						map.xs.addArray(evt.xs);
 						map.cards.addArray(evt.cards);
 						map.cards2.addArray(evt.cards2);
+						for(let key in evt.gaintag_map){
+							if(!map.gaintag_map[key]) map.gaintag_map[key]=[];
+							map.gaintag_map[key].addArray(evt.gaintag_map[key]);
+						}
 					}
 				});
 				return map;
@@ -34240,7 +34412,8 @@
 			},
 			removeGaintag:function(player,content){
 				if(player&&content){
-					player.removeGaintag(content);
+					if(Array.isArray(content)) player.removeGaintag.apply(player,content)
+					else player.removeGaintag(content);
 				}
 				else{
 					console.log(player);
@@ -53395,6 +53568,14 @@
 			return 0;
 		},
 		is:{
+			//判断一张牌是否为明置手牌
+			shownCard:function(card){
+				if(card&&Array.isArray(card.gaintag)){
+					return card.gaintag.some(tag=>tag.indexOf('visible_')==0)
+				}
+				return false;
+			},
+			//押韵判断
 			yayun:function(str1,str2){
 				if(str1==str2) return true;
 				var pinyin1=get.pinyin(str1,false),pinyin2=get.pinyin(str2,false);
@@ -56041,11 +56222,27 @@
 					uiintro.addText(get.colorspan(lib.characterTitle[node.name]));
 				}
 
-				if(!node.noclick&&(node.isUnderControl()||(!game.observe&&game.me&&game.me.hasSkillTag('viewHandcard',null,node,true)))){
-					var hs=node.getCards('h');
-					if(hs.length){
-						uiintro.add('<div class="text center">手牌</div>');
-						uiintro.addSmall(node.getCards('h'));
+				if(!node.noclick){
+					const allShown=(node.isUnderControl()||(!game.observe&&game.me&&game.me.hasSkillTag('viewHandcard',null,node,true)));
+					const shownHs=node.getShownCards();
+					if(shownHs.length){
+						uiintro.add('<div class="text center">明置的手牌</div>');
+						uiintro.addSmall(shownHs);
+						if(allShown){
+							var hs=node.getCards('h');
+							hs.removeArray(shownHs)
+							if(hs.length){
+								uiintro.add('<div class="text center">其他手牌</div>');
+								uiintro.addSmall(hs);
+							}
+						}
+					}
+					else if(allShown){
+						var hs=node.getCards('h');
+						if(hs.length){
+							uiintro.add('<div class="text center">手牌</div>');
+							uiintro.addSmall(hs);
+						}
 					}
 				}
 

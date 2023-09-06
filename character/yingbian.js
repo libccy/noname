@@ -2984,23 +2984,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseUseBegin'},
 				preHidden:true,
 				content:function(){
-					player.addTempSkill('zhaoran2','phaseUseEnd');
+					player.addTempSkill('zhaoran2','phaseUseAfter');
+					var cards=player.getCards('h');
+					if(cards.length>0) player.addShownCards(cards,'visible_zhaoran');
 				},
 			},
 			zhaoran2:{
 				audio:'zhaoran',
-				global:'zhaoran3',
+				group:'zhaoran3',
+				init:(player,skill)=>{
+					if(!player.storage[skill]) player.storage[skill]=[];
+				},
+				onremove:true,
 				trigger:{
 					player:'loseAfter',
 					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				forced:true,
 				charlotte:true,
-				init:function(player,skill){
-					if(!player.storage[skill]) player.storage[skill]=[];
-				},
-				onremove:true,
-				filter:function(event,player){
+				popup:false,
+				filter:function(event,player,name){
+					if(name=='gainBegin') return true;
 					var evt=event.getl(player);
 					if(!evt||!evt.hs||!evt.hs.length) return false;
 					var list=player.getStorage('zhaoran2');
@@ -3013,6 +3017,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(trigger.delay===false) game.delayx();
+					'step 1'
 					var list=[];
 					var suits=get.copy(player.storage.zhaoran2);
 					suits.addArray(player.getCards('h').map(function(card){
@@ -3042,10 +3047,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 0;
 					});
 					'step 2'
-					if(!result.bool) player.draw();
+					if(!result.bool){
+						player.logSkill('zhaoran2');
+						player.draw();
+					}
 					else{
 						var target=result.targets[0];
-						player.line(target,'green');
+						player.logSkill('zhaoran2',target);
 						player.discardPlayerCard(target,true,'he');
 					}
 					if(event.count>0) event.goto(1);
@@ -3055,10 +3063,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			zhaoran3:{
-				ai:{
-					viewHandcard:true,
-					skillTagFilter:function(player,arg,target){
-						return target!=player&&target.hasSkill('zhaoran2');
+				trigger:{player:['phaseUseEnd','gainBegin']},
+				forced:true,
+				charlotte:true,
+				firstDo:true,
+				silent:true,
+				content:function(){
+					if(event.triggername=='gainBegin'){
+						trigger.gaintag.add('visible_zhaoran');
+					}
+					else{
+						player.hideShownCards(player.getCards('h'),'visible_zhaoran');
 					}
 				},
 			},
@@ -3644,6 +3659,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaoran:'昭然',
 			zhaoran2:'昭然',
 			zhaoran_info:'出牌阶段开始时，你可令你的手牌对其他角色可见直到出牌阶段结束。若如此做，当你于此阶段内失去一张手牌后，若你的手牌里没有与此牌花色相同的牌且你本回合内未因该花色的牌触发过此效果，则你选择一项：①摸一张牌。②弃置一名其他角色的一张牌。',
+			visible_zhaoran:'invisible',
 			chengwu:'成务',
 			chengwu_info:'主公技，锁定技，其他晋势力角色攻击范围内的角色视为在你的攻击范围内。',
 			jin_xiahouhui:'晋夏侯徽',
