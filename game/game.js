@@ -8238,9 +8238,8 @@
 					delete _status.htmlbg;
 
 					window.game=game;
-					// node:path library
-					if (typeof window.require=="function") lib.path=require("path");
-					else lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
+					// node:path library alternative
+					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
 						lib.path=window._noname_path;
 						delete window._noname_path;
 					},(e)=>{
@@ -8597,10 +8596,12 @@
 				else if(typeof window.require=='function'){
 					lib.node={
 						fs:require('fs'),
+						path:require("path"),
 						debug:function(){
 							require('electron').remote.getCurrentWindow().toggleDevTools();
 						}
 					};
+					lib.path=lib.node.path;
 					game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
 						if(url.indexOf('http')!=0){
 							url=get.url(dev)+url;
