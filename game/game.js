@@ -7159,8 +7159,8 @@
 		genAsync:fn=>gnc.async(fn),
 		genAwait:gen=>gnc.await(gen),
 		gnc:{
-			async:gnc.async(fn),
-			await:gnc.await(gen),
+			async:fn=>gnc.async(fn),
+			await:gen=>gnc.await(gen),
 			is:{
 				coroutine:item=>gnc.is.coroutine(item),
 				generatorFunc:item=>gnc.is.generatorFunc(item),
@@ -9564,7 +9564,7 @@
 					}
 					game.loop();
 				})
-				var proceed=function(){
+				var proceed=gnc.async(function*(){
 					if(!lib.db){
 						try{
 							lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
@@ -9575,7 +9575,7 @@
 							lib.storage={};
 							localStorage.setItem(lib.configprefix+lib.config.mode,"{}");
 						}
-						proceed2();
+						yield proceed2();
 					}
 					else{
 						game.getDB('data',lib.config.mode,function(obj){
@@ -9583,7 +9583,7 @@
 							proceed2();
 						});
 					}
-				};
+				});
 				if(!lib.imported.mode||!lib.imported.mode[lib.config.mode]){
 					window.inSplash=true;
 					clearTimeout(window.resetGameTimeout);
@@ -9670,7 +9670,7 @@
 					}
 				}
 				else{
-					proceed();
+					yield proceed();
 				}
 				localStorage.removeItem(lib.configprefix+'directstart');
 				delete lib.init.init;
