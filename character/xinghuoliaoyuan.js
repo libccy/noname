@@ -14,7 +14,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duji:["male","wei",3,["xinfu_andong","xinfu_yingshi"]],
 			zhoufang:["male","wu",3,["xinfu_duanfa","xinfu_youdi"]],
 			yanjun:["male","wu",3,["xinfu_guanchao","xinfu_xunxian"]],
-			liuyao:["male","qun",4,["xinfu_kannan"]],
+			liuyao:["male","qun",4,["xinfu_kannan",'twniju'],['zhu']],
 			liuyan:["male","qun",3,["xinfu_tushe","xinfu_limu"]],
 		},
 		characterIntro:{
