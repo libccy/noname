@@ -591,6 +591,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							'step 0'
+							target.markAuto('fuuko_xingdiao',[player]);
 							var cards=target.getCards('h',card=>card.hasGaintag('visible_fuuko_xingdiao'));
 							if(!cards.length) event.finish();
 							else if(cards.length==1) event._result={bool:true,links:cards};
@@ -598,8 +599,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							if(result.bool){
 								player.gain(result.links,target,'give');
-								player.draw();
+								target.draw();
 							}
+						},
+						ai:{
+							result:{
+								target:1,
+							},
 						},
 					},
 				},
@@ -18620,7 +18626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			+'双顺：其可以获得一名其他角色的一张牌。若其未以此法获得过颜色相同的牌，则其可以重复此流程。然后其回复等量的体力。'
 			+'三顺/飞机：其可以令至多3名其他角色翻面，然后对其中一名角色造成1点火属性伤害。'
 			+'炸弹/四带二：其可以对一名角色造成2点雷属性伤害，然后目标角色翻面，弃置装备区的所有牌和四张手牌。',
-			visible_fuuko_xingdiao:'星',
+			visible_fuuko_xingdiao:'<span data-nature="soilmm">星</span>',
 			fuuko_xingdiao:'星雕',
 			fuuko_xingdiao_info:'锁定技。游戏开始时，你将手牌摸至8张，然后将所有手牌明置（称为“星”，不计入手牌上限）。每名其他角色限一次，其可以于出牌阶段选择获得你的一张“星”，然后你摸一张牌。',
 			fuuko_chuanyuan:'传愿',
