@@ -19617,6 +19617,16 @@
 					}
 					return false;
 				},
+				canSaveCard:function(card,target){
+					var player=this;
+					var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+					if(mod2!='unchanged') return mod2;
+					var mod=game.checkMod(card,player,target,'unchanged','cardSavable',player);
+					if(mod!='unchanged') return mod;
+					var savable=get.info(card).savable;
+					if(typeof savable=='function') savable=savable(card,player,target);
+					return savable;
+				},
 				showCharacter:function(num,log){
 					var toShow=[];
 					if((num==0||num==2)&&this.isUnseen(0)) toShow.add(this.name1);
@@ -30089,6 +30099,21 @@
 				},
 				subSkill:{
 					leijin:{
+						mod:{
+							aiOrder:function(player,card,num){
+								if(typeof card.number!='number') return;
+								var history=player.getHistory('useCard',evt=>evt.isPhaseUsing());
+								if(history.length==0) return num+10*(14-card.number);
+								var num=get.number(history[0].card);
+								if(!num) return;
+								for(var i=1;i<history.length;i++){
+									var num2=get.number(history[i].card);
+									if(!num2||num2<=num) return;
+									num=num2;
+								}
+								if(card.number>num) return num+10*(14-card.number);
+							},
+						},
 						mark:true,
 						trigger:{player:'useCard1'},
 						lastDo:true,
@@ -30191,6 +30216,36 @@
 						},
 						intro:{
 							content:'<li>条件：回合内所有于出牌阶段使用的牌花色相同且不少于两张。',
+						},
+						ai:{
+							effect:{
+								player_use:function(card,player,target){
+									if(typeof card!='object'||!player.isPhaseUsing()) return;
+									var suitx=get.suit(card);
+									var history=player.getHistory('useCard');
+									if(!history.length){
+										var val=0;
+										if(player.hasCard(function(cardx){
+											return get.suit(cardx)==suitx&&card!=cardx&&(!card.cards||!card.cards.contains(cardx))&&player.hasValueTarget(cardx);
+										},'hs')) val=[2,0.1];
+										if(val) return val;
+										return;
+									}
+									var num=0;
+									var suit=false;
+									for(var i=0;i<history.length;i++){
+										var suit2=get.suit(history[i].card);
+										if(!lib.suit.contains(suit2)) return;
+										if(suit&&suit!=suit2) return;
+										suit=suit2;
+										num++;
+									}
+									if(suitx==suit&&num==1) return [1,0.1];
+									if(suitx!=suit&&(num>1||num<=1&&player.hasCard(function(cardx){
+										return get.suit(cardx)==suit&&player.hasValueTarget(cardx);
+									},'hs'))) return 'zeroplayertarget';
+								},
+							},
 						},
 					},
 					mingzhi:{
