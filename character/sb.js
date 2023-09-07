@@ -551,23 +551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(!target.hasFriend()||target.hp>1) return;
-							if(get.tag(card,'damage')==1&&((target.hasZhuSkill('sbzhiba')&&game.countPlayer(current=>current!=target&&current.group=='wu'))||player.countCards('hs',function(card){
-								var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-								if(mod2!='unchanged') return mod2;
-								var mod=game.checkMod(card,player,target,'unchanged','cardSavable',player);
-								if(mod!='unchanged') return mod;
-								var savable=get.info(card).savable;
-								if(typeof savable=='function') savable=savable(card,player,target);
-								return savable;
-							})+target.countCards('hs',function(card){
-								var mod2=game.checkMod(card,target,'unchanged','cardEnabled2',target);
-								if(mod2!='unchanged') return mod2;
-								var mod=game.checkMod(card,target,target,'unchanged','cardSavable',target);
-								if(mod!='unchanged') return mod;
-								var savable=get.info(card).savable;
-								if(typeof savable=='function') savable=savable(card,target,target);
-								return savable;
-							})>0)&&!target.isTurnedOver()&&_status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
+							if(get.tag(card,'damage')==1&&((target.hasZhuSkill('sbzhiba')&&game.countPlayer(current=>current!=target&&current.group=='wu'))||player.countCards('hs',card=>player.canSaveCard(card,target))+target.countCards('hs',card=>target.canSaveCard(card,target))>0)&&!target.isTurnedOver()&&_status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
 						}
 					}
 				}
@@ -2083,7 +2067,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			sbjizhu:{
-				audio:2,
+				audio:3,
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				content:function(){
@@ -3061,9 +3045,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					mark:{
-						trigger:{
-							global:'damageSource',
-						},
+						audio:'sbhuangtiang',
+						trigger:{global:'damageSource'},
 						forced:true,
 						zhuSkill:true,
 						filter:function(event,player){
@@ -4746,7 +4729,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbhunzi:'魂姿',
 			sbhunzi_info:'觉醒技。当你脱离濒死状态后，你减1点体力上限，获得1点护甲，摸三张牌。然后你获得〖英姿〗和〖英魂〗。',
 			sbzhiba:'制霸',
-			sbzhiba_info:'主公技，限定技。当你进入濒死状态时，你可以回复X点体力并修改〖激昂③〗为“出牌阶段限X次”（X为场上其他吴势力角色数）。然后其他吴势力角色依次受到1点无来源伤害，且当有角色因此死亡后，你摸三张牌。',
+			sbzhiba_info:'主公技，限定技。当你进入濒死状态时，你可以回复X-1点体力并修改〖激昂③〗为“出牌阶段限X次”（X为场上其他吴势力角色数+1）。然后其他吴势力角色依次受到1点无来源伤害，且当有角色因此死亡后，你摸三张牌。',
 			sb_daqiao:'谋大乔',
 			sbguose:'国色',
 			sbguose_info:'出牌阶段限四次。你可以选择一项：1.将一张♦牌当【乐不思蜀】使用；2.弃置场上一张【乐不思蜀】。然后你摸一张牌。',
