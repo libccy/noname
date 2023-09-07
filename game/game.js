@@ -24171,6 +24171,23 @@
 						}
 					}
 				},
+				//确认A是否能用B牌救助C
+				canSave:function(card,target){
+					var player=this;
+					var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+					if(mod2!='unchanged') return mod2;
+					var mod=game.checkMod(card,player,target,'unchanged','cardSavable',player);
+					if(mod!='unchanged') return mod;
+					var savable=get.info(card).savable;
+					if(typeof savable=='function') savable=savable(card,player,target);
+					return savable;
+				},
+				//确认A能否救下B，noself为true后为确认A和B能不能就下B
+				canSaveTarget:function(target,noself){
+					var player=this;
+					if(!target.isDying()) return false;
+					return player.countCards('hs',card=>player.canSave(target))+target.hp+(noself===true?target.countCards('hs',card=>target.canSave(target)):0)>0;
+				},
 				unprompt:function(){
 					if(this.node.prompt){
 						this.node.prompt.delete();
