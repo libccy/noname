@@ -753,7 +753,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseCard('he',true,function(card,player){
+					player.chooseCard(get.prompt2('olniluan'),'he',function(card,player){
 						if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) return false;
 						if(get.color(card,player)!='black') return false;
 						return player.canUse(get.autoViewAs({name:'sha'},[card]),_status.event.getTrigger().player,false);
