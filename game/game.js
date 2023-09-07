@@ -32272,7 +32272,7 @@
 				that._cache.rules=[];
 				that._cache.style=document.createElement("style");
 				that._cache.style.id="game.dynamicStyle";
-				document.head.append(that._cache.style);
+				document.head.appendChild(that._cache.style);
 				that._cache.sheet = that._cache.style.sheet;
 				delete game.dynamicStyle.init;
 				return true;
