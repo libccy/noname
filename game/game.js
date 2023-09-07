@@ -7176,8 +7176,19 @@
 			}
 		},
 		linq:{
-			css:{
-				merge:function(){return Array.from(arguments).join(",")}
+			cselector:{
+				hasAttr:name=>`[${name}]`,
+				isAttr:(name,item)=>`[${name}=${item}]`,
+				inAttr:(name,item)=>`[${name}~=${item}]`,
+				conAttr:(name,item)=>`[${name}*=${item}]`,
+				onAttr:(name,item)=>`[${name}|=${item}]`,
+				bgnAttr:(name,item)=>`[${name}^=${item}]`,
+				endAttr:(name,item)=>`[${name}^=${item}]`,
+				merge:function(){return Array.from(arguments).join(" ");},
+				concat:function(){return Array.from(arguments).join("");},
+				class:function(){return `.${Array.from(arguments).join(".")}`;},
+				group:function(){return Array.from(arguments).join(",");},
+				media:type=>`@media ${type}`
 			}
 		},
 		init:{
@@ -32182,7 +32193,11 @@
 				}
 				return result.join(" ");
 			},
-			generate:(name, style)=>[`${name} {`, game.dynamicStyle.translate(style), "}"].join(" ")
+			generate:(name, style)=>[`${name} {`, game.dynamicStyle.translate(style), "}"].join(" "),
+			has:name=>game.dynamicStyle._cache.rules.some(item=>item[0]==name),
+			get:name=>game.dynamicStyle.find(item=>item[0]==name),
+			find:fn=>game.dynamicStyle._cache.rules.find(fn),
+			size:()=>game.dynamicStyle._cache.rules.length
 		},
 		//Add a background music to the config option
 		//在设置选项中添加一首背景音乐
