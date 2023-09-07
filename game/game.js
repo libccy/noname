@@ -32197,7 +32197,7 @@
 			},
 			generate:(name, style)=>[`${name} {`, game.dynamicStyle.translate(style), "}"].join(" "),
 			has:name=>game.dynamicStyle._cache.rules.some(item=>item[0]==name),
-			get:name=>game.dynamicStyle.find(item=>item[0]==name),
+			get:name=>game.dynamicStyle.find(item=>item[0]==name)[1],
 			find:fn=>game.dynamicStyle._cache.rules.find(fn),
 			size:()=>game.dynamicStyle._cache.rules.length,
 			indexOf:name=>{
@@ -32206,18 +32206,38 @@
 				}
 				return -1;
 			},
+			add:(name,style)=>{
+				const that=game.dynamicStyle;
+				return that.update(name,that.has(name)?Object.assign({},that.get(name),style):style);
+			},
+			addObject:object=>{
+				const that=game.dynamicStyle;
+				let result=[];
+				for(const name in object){
+					result.push(that.add(name, object[name]));
+				}
+				return result;
+			},
+			remove:name=>{
+				const that=game.dynamicStyle;
+				if(!that.has(name)) return false;
+				const index=that.indexOf(name);
+				that._cache.rules.splice(index,1);
+				that._cache.sheet.deleteRule(index);
+				return true;
+			},
 			update:(name,style)=>{
 				const that=game.dynamicStyle;
 				try{
-					if(this.has(name)){
+					if(that.has(name)){
 						const index=that.indexOf(name);
 						that._cache.sheet.deleteRule(index);
-						that._cache.sheet.insertRule(that.generate(name, style), index);
+						that._cache.sheet.insertRule(that.generate(name,style),index);
 						that._cache.rules[index] = [name, style];
 					}else{
 						const index=that._cache.rules.length;
-						that._cache.rules.push([name, style]);
-						that._cache.sheet.insertRule(that.generate(name, style), index);
+						that._cache.rules.push([name,style]);
+						that._cache.sheet.insertRule(that.generate(name,style),index);
 					}
 					return true;
 				}
