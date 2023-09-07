@@ -32197,7 +32197,33 @@
 			has:name=>game.dynamicStyle._cache.rules.some(item=>item[0]==name),
 			get:name=>game.dynamicStyle.find(item=>item[0]==name),
 			find:fn=>game.dynamicStyle._cache.rules.find(fn),
-			size:()=>game.dynamicStyle._cache.rules.length
+			size:()=>game.dynamicStyle._cache.rules.length,
+			indexOf:name=>{
+				for (let i=0;i<game.dynamicStyle._cache.rules.length;++i){
+					if(name==game.dynamicStyle._cache.rules[i][0]) return i;
+				}
+				return -1;
+			},
+			update:(name,style)=>{
+				const that=game.dynamicStyle;
+				try{
+					if(this.has(name)){
+						const index=that.indexOf(name);
+						that._cache.sheet.deleteRule(index);
+						that._cache.sheet.insertRule(that.generate(name, style), index);
+						that._cache.rules[index] = [name, style];
+					}else{
+						const index=that._cache.rules.length;
+						that._cache.rules.push([name, style]);
+						that._cache.sheet.insertRule(that.generate(name, style), index);
+					}
+					return true;
+				}
+				catch(e){
+					console.log(e);
+					return false;
+				}
+			}
 		},
 		//Add a background music to the config option
 		//在设置选项中添加一首背景音乐
