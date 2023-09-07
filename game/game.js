@@ -8245,6 +8245,7 @@
 					delete _status.htmlbg;
 
 					window.game=game;
+					game.dynamicStyle.init();
 					// node:path library alternative
 					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
 						lib.path=window._noname_path;
@@ -32157,6 +32158,19 @@
 		setSimpleYingbianCondition:(yingbianCondition,condition)=>game.broadcastAll((yingbianCondition,condition)=>lib.yingbian.condition.simple.set(yingbianCondition,condition),yingbianCondition,condition),
 		setYingbianEffect:(yingbianEffect,effect)=>game.broadcastAll((yingbianEffect,effect)=>lib.yingbian.effect.set(yingbianEffect,effect),yingbianEffect,effect),
 		setYingbianPrompt:(yingbian,prompt)=>game.broadcastAll((yingbian,prompt)=>lib.yingbian.prompt.set(yingbian,prompt),yingbian,prompt),
+		//动态CSS from libnodiz
+		dynamicStyle:{
+			init:()=>{
+				const that=game.dynamicStyle;
+				that._cache={};
+				that._cache.rules=[];
+				that._cache.style=document.createElement("style");
+				document.head.append(that._cache.style);
+				that._cache.sheet = this.#style.sheet;
+				delete game.dynamicStyle.init;
+				return true;
+			}
+		},
 		//Add a background music to the config option
 		//在设置选项中添加一首背景音乐
 		addBackgroundMusic:(link,musicName,aozhan)=>{
