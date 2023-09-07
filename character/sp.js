@@ -765,15 +765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!target.hasValueTarget({name:'sha'})&&!target.hasValueTarget({name:'juedou'})) return -2;
 							if(target.countCards('h')+1>player.countCards('h')) return -2;
 							var canSave=function(player,target){
-								return target.hp+player.countCards('hs',function(card){
-									var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-									if(mod2!='unchanged') return mod2;
-									var mod=game.checkMod(card,player,target,'unchanged','cardSavable',player);
-									if(mod!='unchanged') return mod;
-									var savable=get.info(card).savable;
-									if(typeof savable=='function') savable=savable(card,player,target);
-									return savable;
-								})>1+((get.mode()=='identity'&&target.identity=='zhu')||(get.mode()=='guozhan'&&get.is.jun(target)));
+								return target.hp+player.countCards('hs',card=>player.canSave(card,target))>1+((get.mode()=='identity'&&target.identity=='zhu')||(get.mode()=='guozhan'&&get.is.jun(target)));
 							};
 							if(target.hasValueTarget({name:'sha'})){
 								var aimx=game.filterPlayer(current=>{
