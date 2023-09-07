@@ -462,7 +462,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						position:'hes',
 						prompt:function(){
 							var event=_status.event;
-							return '将一张'+get.translation(get.color(event.getParent(4).card))+'色牌当作【无懈可击】对'+get.translation(event.getParent(2).player)+'使用';
+							return '将一张'+get.translation(get.color(event.getParent(4).card))+'色牌当作【无懈可击】对'+get.translation(event.getParent(4)[event.getParent(4).name=='phaseJudge'?player:target])+'使用';
 						},
 						check:function(card){
 							return 8-get.value(card);
