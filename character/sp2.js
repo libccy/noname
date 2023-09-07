@@ -5499,7 +5499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					targetInRange:function(card,player,target){
-						if(!card.cards||!card.cards.length) return;
+						if(!card.cards) return;
 						for(var i of card.cards){
 							if(!i.hasGaintag('minsi2')||get.color(i)!='black') return;
 						}
@@ -8546,16 +8546,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{global:['phaseBefore','zhuUpdate']},
 				filter:function(event,player){
+					if(!lib.group.some(function(group){
+						if(group==player.group) return false;
+						return lib.group.contains(group)||game.hasPlayer(function(current){
+							return current.group==group;
+						});
+					})) return false;
 					return !player.storage.bingzhao&&player.hasZhuSkill('bingzhao')&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
 					var list=lib.group.filter(function(group){
-						return ['wei','shu','wu','qun'].contains(group)||game.hasPlayer(function(current){
+						if(group==player.group) return false;
+						return lib.group.contains(group)||game.hasPlayer(function(current){
 							return current.group==group;
-						})
+						});
 					});
-					player.chooseControl(list).set('prompt','秉诏：请选择一个势力').set('ai',function(){
+					player.chooseControl(list).set('prompt','秉诏：请选择一个其他势力').set('ai',function(){
 						var listx=list.slice(0);
 						listx.sort(function(a,b){
 							return game.countPlayer(function(current){
