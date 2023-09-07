@@ -32282,7 +32282,7 @@
 				config=name;
 				name=null;
 			}
-			if((name==null&&typeof name!="string")||short){
+			if((name==null||typeof name!="string")&&short){
 				name=short;
 			}
 			lib.group.add(id);
