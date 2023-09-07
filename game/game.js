@@ -2277,6 +2277,7 @@
 											ui.css.border_stylesheet.remove();
 										}
 										ui.css.border_stylesheet=lib.init.sheet();
+										ui.css.border_stylesheet.id="ui.css.border";
 										ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+fileLoadedEvent.target.result+'")}',0);
 										ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
 									};
@@ -32181,6 +32182,7 @@
 				that._cache={};
 				that._cache.rules=[];
 				that._cache.style=document.createElement("style");
+				that._cache.style.id="game.dynamicStyle";
 				document.head.append(that._cache.style);
 				that._cache.sheet = that._cache.style.sheet;
 				delete game.dynamicStyle.init;
