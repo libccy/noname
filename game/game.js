@@ -7262,6 +7262,29 @@
 				generator:item=>gnc.is.generator(item)
 			}
 		},
+		comparator:{
+			e:function(){
+				if(arguments.length<=1) return true;
+				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return false;
+				return true;
+			},
+			ei:function(){
+				if(arguments.length<=1) return true;
+				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return true;
+				return false;
+			},
+			ne:function(){
+				if(arguments.length<=1) return true;
+				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return false;
+				return true;
+			},
+			nei:function(){
+				if(arguments.length<=1) return true;
+				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return true;
+				return false;
+			}
+		},
+		creation:{},
 		linq:{
 			cselector:{
 				hasAttr:name=>`[${name}]`,
@@ -8349,6 +8372,26 @@
 
 					window.game=game;
 					game.dynamicStyle.init();
+					Object.defineProperty(lib.creation,"a",{
+						enumerable:true,
+						get:()=>[],
+						set:()=>null
+					});
+					Object.defineProperty(lib.creation,"o",{
+						enumerable:true,
+						get:()=>({}),
+						set:()=>null
+					});
+					Object.defineProperty(lib.creation,"no",{
+						enumerable:true,
+						get:()=>Object.create(null),
+						set:()=>null
+					});
+					Object.defineProperty(lib.creation,"s",{
+						enumerable:true,
+						get:()=>"",
+						set:()=>null
+					});
 					// node:path library alternative
 					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
 						lib.path=window._noname_path;
@@ -32221,6 +32264,10 @@
 			'哥哥，交个朋友吧',
 			'妹子，交个朋友吧',
 		],
+		other:{
+			bool:(item)=>Boolean(item),
+			ignore:()=>{}
+		}
 	};
 	const game={
 		//addGroup
