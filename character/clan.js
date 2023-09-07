@@ -293,7 +293,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var info=get.info(skill);
 					if(info.charlotte) return false;
 					var translation=get.skillInfoTranslation(skill,event.player);
-					if(!translation||translation.match(/“?出牌阶段限一次/g).every(value=>value!='出牌阶段限一次')) return false;
+					if(!translation) return false;
+					var match=translation.match(/“?出牌阶段限一次/g);
+					if(!match||match.every(value=>value!='出牌阶段限一次')) return false;
 					return event.player.countCards('h')>0;
 				},
 				check:function(event,player){
