@@ -7175,6 +7175,11 @@
 				generator:item=>gnc.is.generator(item)
 			}
 		},
+		linq:{
+			css:{
+				merge:function(){return Array.from(arguments).join(",")}
+			}
+		},
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
