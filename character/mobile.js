@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:['xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao","old_wanglang",'shichangshi'],
+				mobile_default:['xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan'],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua_feng:['re_xiaoqiao',"xin_zhoutai"],
@@ -33,7 +33,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shichangshi:['male','qun',1,['mbdanggu','mbmowang']],
 			re_zhangzhang:['male','wu',3,['rezhijian','guzheng']],
 			qianzhao:['male','wei',4,['mbshihe','mbzhenfu']],
-			old_wanglang:['male','wei',3,['gushe','jici']],
 			re_yanwen:["male","qun",4,["reshuangxiong"]],
 			xin_zhoutai:['male','wu',4,['buqu','new_fenji']],
 			re_caozhi:['male','wei',3,['reluoying','rejiushi','chengzhang']],
@@ -147,7 +146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hujinding:['female','shu','2/6',['renshi','wuyuan','huaizi']],
 			
 			re_zhanggong:['male','wei',3,['reqianxin','rezhenxing']],
-			re_xugong:['male','qun',3,['rebiaozhao','yechou']],
+			re_xugong:['male','qun',3,['rebiaozhao','yechou'],['doublegroup:wu:qun']],
 			re_weiwenzhugezhi:['male','wu',4,['refuhai']],
 			
 			xin_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
@@ -14181,7 +14180,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbaosi_info:'锁定技。当你于出牌阶段对一名攻击范围内的角色造成伤害后，你于此阶段对其使用牌无次数限制。',
 			xin_zhoutai:'手杀周泰',
 			re_yanwen:"手杀颜良文丑",
-			old_wanglang:'旧王朗',
 			qianzhao:'牵招',
 			mbshihe:'势吓',
 			mbshihe_info_identity:'出牌阶段限一次。你可以与一名角色拼点。若你：赢，当其于其下回合结束前对你造成伤害时，取消之；没赢，你随机弃置一张牌。',
