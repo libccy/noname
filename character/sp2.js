@@ -5499,7 +5499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					targetInRange:function(card,player,target){
-						if(!card.cards) return;
+						if(!card.cards||!card.cards.length) return;
 						for(var i of card.cards){
 							if(!i.hasGaintag('minsi2')||get.color(i)!='black') return;
 						}
