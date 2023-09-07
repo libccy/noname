@@ -327,29 +327,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						enable: 'phaseUse',
 						forceaudio: true,
 						filter: function (event, player) {
-							return player.countCards('e') && player.group == 'qun' && game.hasPlayer(function (current) {
-								return current != player && current.hasZhuSkill('twjuxiang', player) && current.countCards('e') < 5;
+							return player.countCards('e') && player.group == 'qun' && game.hasPlayer(function (target) {
+								return target != player && target.hasZhuSkill('twjuxiang', player) && player.countCards('e',card=>target.hasEmptySlot(get.subtype(card))||target.hasDisabledSlot(get.subtype(card)));
 							});
 						},
 						filterTarget: function (card, player, target) {
-							return target != player && target.hasZhuSkill('twjuxiang', player) && (target.isEmpty(get.subtype(ui.selected.cards[0])) || target.isDisabled(get.subtype(ui.selected.cards[0])));
+							return target != player && target.hasZhuSkill('twjuxiang', player) && (target.hasEmptySlot(get.subtype(ui.selected.cards[0]))||target.hasDisabledSlot(get.subtype(ui.selected.cards[0])));
 						},
 						filterCard: { type: 'equip' },
 						position: 'e',
 						check: function (card) {
-							return 1;
+							return get.value(card);
 						},
 						prompt: '将装备区中的一张牌置入主公的装备区中或恢复主公的对应装备栏',
 						discard: false,
 						lose: false,
 						content: function () {
-							if (target.isDisabled(get.subtype(cards[0]))) {
-								target.gain(cards[0], player, 'give');
-								target.enableEquip(get.subtype(cards[0]));
-							}
-							else {
+							if (target.hasEmptySlot(get.subtype(cards[0]))) {
 								player.$give(cards[0], target, false);
 								target.equip(cards[0]);
+							}
+							else {
+								target.gain(cards[0], player, 'give');
+								target.enableEquip(get.subtype(cards[0]));
 							}
 						},
 						ai: {
