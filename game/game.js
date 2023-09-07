@@ -180,68 +180,68 @@
 						const g1=cs.group(
 							cs.concat(
 								cs.class("player","identity"),
-								cs.isAttr("data-color",id)
+								cs.isAttr("data-color",`"${id}"`)
 							),
 							cs.concat(
 								"div",
-								cs.isAttr("data-nature",id)
+								cs.isAttr("data-nature",`"${id}"`)
 							),
 							cs.concat(
 								"span",
-								cs.isAttr("data-nature",id)
+								cs.isAttr("data-nature",`"${id}"`)
 							)
 						);
 						const g2=cs.group(
 							cs.concat(
 								"div",
-								cs.isAttr("data-nature",`${id}m`)
+								cs.isAttr("data-nature",`"${id}m"`)
 							),
 							cs.concat(
 								"span",
-								cs.isAttr("data-nature",`${id}m`)
+								cs.isAttr("data-nature",`"${id}m"`)
 							)
 						);
 						const g3=cs.group(
 							cs.concat(
 								"div",
-								cs.isAttr("data-nature",`${id}mm`)
+								cs.isAttr("data-nature",`"${id}mm"`)
 							),
 							cs.concat(
 								"span",
-								cs.isAttr("data-nature",`${id}mm`)
+								cs.isAttr("data-nature",`"${id}mm"`)
 							)
 						);
-						game.dynamicStyle.addObject({
-							g1:{
-								textShadow:cs.group(
-									"black 0 0 1px",
-									`rgba(${color1.join()}) 0 0 2px`,
-									`rgba(${color2.join()}) 0 0 5px`,
-									`rgba(${color3.join()}) 0 0 10px`,
-									`rgba(${color4.join()}) 0 0 10px`
-								)
-							},
-							g2:{
-								textShadow:cs.group(
-									"black 0 0 1px",
-									`rgba(${color1.join()}) 0 0 2px`,
-									`rgba(${color2.join()}) 0 0 5px`,
-									`rgba(${color3.join()}) 0 0 5px`,
-									`rgba(${color4.join()}) 0 0 5px`,
-									"black 0 0 1px"
-								)
-							},
-							g3:{
-								textShadow:cs.group(
-									"black 0 0 1px",
-									`rgba(${color1.join()}) 0 0 2px`,
-									`rgba(${color2.join()}) 0 0 2px`,
-									`rgba(${color3.join()}) 0 0 2px`,
-									`rgba(${color4.join()}) 0 0 2px`,
-									"black 0 0 1px"
-								)
-							}
-						});
+						let result={};
+						result[g1]={
+							textShadow:cs.group(
+								"black 0 0 1px",
+								`rgba(${color1.join()}) 0 0 2px`,
+								`rgba(${color2.join()}) 0 0 5px`,
+								`rgba(${color3.join()}) 0 0 10px`,
+								`rgba(${color4.join()}) 0 0 10px`
+							)
+						};
+						result[g2]={
+							textShadow:cs.group(
+								"black 0 0 1px",
+								`rgba(${color1.join()}) 0 0 2px`,
+								`rgba(${color2.join()}) 0 0 5px`,
+								`rgba(${color3.join()}) 0 0 5px`,
+								`rgba(${color4.join()}) 0 0 5px`,
+								"black 0 0 1px"
+							)
+						};
+						result[g3]={
+							textShadow:cs.group(
+								"black 0 0 1px",
+								`rgba(${color1.join()}) 0 0 2px`,
+								`rgba(${color2.join()}) 0 0 2px`,
+								`rgba(${color3.join()}) 0 0 2px`,
+								`rgba(${color4.join()}) 0 0 2px`,
+								"black 0 0 1px"
+							)
+						};
+						game.dynamicStyle.addObject(result);
 						lib.groupnature[id]=id;
 					}
 				}
