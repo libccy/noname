@@ -495,7 +495,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.recast(cards,null,(player,cards)=>{
 						var cardsToGain=[];
-						for(let repetition=0;repetition<cards.length;repetition++){
+						for(var repetition=0;repetition<cards.length;repetition++){
 							var card=get.cardPile(card=>get.type(card,'trick')=='trick');
 							if(card) cardsToGain.push(card);
 						}

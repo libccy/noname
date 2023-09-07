@@ -12850,7 +12850,7 @@
 					var i,j,k;
 					for(i in character){
 						if(character[i].character){
-							const characterPack=lib.characterPack[i];
+							var characterPack=lib.characterPack[i];
 							if(characterPack) Object.assign(characterPack,character[i].character);
 							else lib.characterPack[i]=character[i].character;
 						}
@@ -12902,7 +12902,7 @@
 						}
 					}
 					for(i in card){
-						const cardPack=lib.cardPack[i]?lib.cardPack[i]:lib.cardPack[i]=[];
+						var cardPack=lib.cardPack[i]?lib.cardPack[i]:lib.cardPack[i]=[];
 						if(card[i].card){
 							for(var j in card[i].card){
 								if(!card[i].card[j].hidden&&card[i].translate[j+'_info']){
@@ -18547,9 +18547,9 @@
 
 						if(lib.config.background_speak){
 							if(lib.character[player.name]&&lib.character[player.name][4].some(tag=>/^die:.+$/.test(tag))){
-								const tag=lib.character[player.name][4].find(tag=>/^die:.+$/.test(tag));
-								const reg=new RegExp("^ext:(.+)?/");
-								const match=tag.match(/^die:(.+)$/);
+								var tag=lib.character[player.name][4].find(tag=>/^die:.+$/.test(tag));
+								var reg=new RegExp("^ext:(.+)?/");
+								var match=tag.match(/^die:(.+)$/);
 								if(match){
 									let path=match[1];
 									if(reg.test(path)) path=path.replace(reg,(_o,p)=>`../extension/${p}/`);
