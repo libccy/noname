@@ -32278,12 +32278,12 @@
 				config=short;
 				short=null;
 			}
-			if(name!=null&&typeof name=="string"&&short){
-				name=short;
-			}
 			if(name!=null&&typeof name=="object"){
 				config=name;
 				name=null;
+			}
+			if((name==null&&typeof name!="string")||short){
+				name=short;
 			}
 			lib.group.add(id);
 			if(short)lib.translate[id] = short;
