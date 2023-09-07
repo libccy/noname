@@ -551,6 +551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:'phaseBefore',
 					player:'enterGame',
 				},
+				forced:true,
 				filter:event=>{
 					return event.name!='phase'||game.phaseNumber==0;
 				},
@@ -578,7 +579,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					gain:{
 						enable:'phaseUse',
-						filter:player=>{
+						filter:(event,player)=>{
 							return game.hasPlayer(current=>lib.skill.fuuko_xingdiao_gain.filterTarget(null,player,current));
 						},
 						filterTarget:(card,player,target)=>{
@@ -586,7 +587,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								&&!target.getStorage('fuuko_xingdiao').contains(player)&&target.hasSkill('fuuko_xingdiao');
 						},
 						selectTarget:()=>{
-							const num=game.countPlayer(current=>lib.skill.fuuko_xingdiao_gain.filterTarget(null,_status.event.player,target));
+							const num=game.countPlayer(current=>lib.skill.fuuko_xingdiao_gain.filterTarget(null,_status.event.player,current));
 							return num>1?1:-1;
 						},
 						content:function(){
@@ -595,7 +596,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var cards=target.getCards('h',card=>card.hasGaintag('visible_fuuko_xingdiao'));
 							if(!cards.length) event.finish();
 							else if(cards.length==1) event._result={bool:true,links:cards};
-							else player.chooseCard(target,true,'选择获得'+get.translation(target)+'的一张“星”');
+							else player.chooseButton(true,['选择获得'+get.translation(target)+'的一张“星”',cards]);
 							'step 1'
 							if(result.bool){
 								player.gain(result.links,target,'give');
@@ -603,6 +604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 						ai:{
+							order:6,
 							result:{
 								target:1,
 							},
