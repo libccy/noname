@@ -2102,7 +2102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:function(storage,player){
 								var targets=storage.filter(i=>i.isIn());
-								return '被'+get.translation(targets)+'吓到了，对他'+(targets.length>1?'们':'')+(get.mode()=='identity'?'的友方角色':'')+'打不出伤害';
+								return '被'+get.translation(targets)+'吓到了，对他'+(targets.length>1?'们':'')+(get.mode()!='identity'?'和他的友方角色':'')+'打不出伤害';
 							},
 						},
 						ai:{
