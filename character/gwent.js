@@ -1375,7 +1375,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:(event,player)=>get.type(event.card)!='equip'&&player.hasCard(card=>get.color(card)==get.color(trigger.card)&&player.canRecast(card),'h'),
 				content:function(){
 					'step 0'
-					let cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card)&&player.canRecast(card));
+					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card)&&player.canRecast(card));
 					if(!cards.length) cards=player.getCards('h',card=>get.color(card)==get.color(trigger.card)&&player.canRecast(card));
 					if(!cards.length){
 						event.finish();
