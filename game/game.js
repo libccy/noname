@@ -7264,24 +7264,35 @@
 		},
 		comparator:{
 			e:function(){
-				if(arguments.length<=1) return true;
+				if(arguments.length==0) return false;
+				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return false;
 				return true;
 			},
 			ei:function(){
-				if(arguments.length<=1) return true;
+				if(arguments.length==0) return false;
+				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return true;
 				return false;
 			},
 			ne:function(){
-				if(arguments.length<=1) return true;
+				if(arguments.length==0) return false;
+				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return false;
 				return true;
 			},
 			nei:function(){
-				if(arguments.length<=1) return true;
+				if(arguments.length==0) return false;
+				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return true;
 				return false;
+			},
+			te:function(){
+				if(arguments.length==0)return false;
+				if(arguments.length==1)return arguments[0]!==null;
+				const type=typeof arguments[0];
+				for(let i=1;i<arguments.length;++i) if(type!==arguments[i])return false;
+				return true;
 			}
 		},
 		creation:{},
@@ -32274,15 +32285,15 @@
 		//基于钩子的添加势力方法
 		addGroup:(id,short,name,config)=>{
 			if(!id) throw new TypeError();
-			if(short!=null&&typeof short=="object"){
+			if(lib.comparator.te(short,"object")){
 				config=short;
 				short=null;
 			}
-			if(name!=null&&typeof name=="object"){
+			if(lib.comparator.te(name,"object")){
 				config=name;
 				name=null;
 			}
-			if((name==null||typeof name!="string")&&short){
+			if(!lib.comparator.te(short,"string")&&short){
 				name=short;
 			}
 			lib.group.add(id);
