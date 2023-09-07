@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp:{
 				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
 				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong'],
-				sp_tianzhu:["wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
+				sp_tianzhu:["ol_hejin","ol_hansui","ol_niujin","wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','zhangzhi','lushi'],
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu'],
@@ -188,6 +188,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quyi:['male','qun',4,['fuqi','jiaozi']],
 
 			luzhi:['male','wei',3,['qingzhongx','weijing']],
+			
+			ol_hejin:['male','qun',4,['olmouzhu','olyanhuo']],
+			ol_hansui:['male','qun',4,['olniluan','olxiaoxi']],
+			ol_niujin:['male','wei',4,['olcuorui','liewei']],
 			
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
@@ -690,6 +694,124 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//OL1v1三将身份化
+			olmouzhu:{
+				inherit:'mouzhu',
+				audio:'mouzhu',
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h')>0;
+				},
+				content:function(){
+					'step 0'
+					target.chooseCard('h','交给'+get.translation(player)+'一张手牌',true);
+					'step 1'
+					target.give(result.cards,player);
+					'step 2'
+					if(player.countCards('h')<=target.countCards('h')){
+						event.finish();
+						return;
+					}
+					var list=[];
+					if(target.canUse('sha',player,false)) list.push('sha');
+					if(target.canUse('juedou',player,false)) list.push('juedou');
+					if(!list.length) event.finish();
+					else if(list.length==1) event._result={control:list[0]};
+					else target.chooseControl(list).set('prompt','对'+get.translation(player)+'使用一张【杀】或【决斗】。').ai=function(){
+						return get.effect(player,{name:'sha'},target,target)>=get.effect(player,{name:'juedou'},target,target)?'sha':'juedou';
+					};
+					'step 3'
+					target.useCard({name:result.control,isCard:true},player,'noai');
+				},
+		    },
+			olyanhuo:{
+				audio:'yanhuo',
+				trigger:{player:'die'},
+				forceDie:true,
+				logTarget:'source',
+				filter:function(event,player){
+					if(!event.source||!event.source.isIn()) return false;
+					return player.countCards('he')>0&&event.source.countDiscardableCards(player,'he')>0;
+				},
+				check:function(event,player){
+					return get.attitude(player,event.source)<0;
+				},
+				skillAnimation:true,
+				animationColor:'thunder',
+				content:function(){
+				    var num=player.countCards('he');
+					player.discardPlayerCard(trigger.source,[1,num],'he',true).set('forceDie',true);
+				},
+			},
+			olniluan:{
+				trigger:{global:'phaseJieshuBegin'},
+				audio:'niluan',
+				direct:true,
+				filter:function(event,player){
+					return event.player.hp>player.hp&&event.player.getHistory('useCard',function(card){
+						return card.card.name=='sha';
+					}).length>0;
+				},
+				content:function(){
+					'step 0'
+					player.chooseCard('he',true,function(card,player){
+						if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) return false;
+						if(get.color(card,player)!='black') return false;
+						return player.canUse(get.autoViewAs({name:'sha'},[card]),_status.event.getTrigger().player,false);
+					},'选择一张黑色牌当做【杀】对'+get.translation(trigger.player)+'使用').set('ai',function(card){
+						var player=_status.event.player;
+						return get.effect(_status.event.getTrigger().player,get.autoViewAs({name:'sha'},[card]),player,player)/Math.max(1,get.value(card));
+					});
+					'step 1'
+					if(result.bool){
+						player.useCard({name:'sha'},result.cards,'olniluan',trigger.player,false);
+					}
+				},
+			},
+			olxiaoxi:{
+				trigger:{global:'roundStart'},
+				direct:true,
+				audio:['xiaoxi_hansui',2],
+				content:function(){
+					player.chooseUseTarget(get.prompt2('olxiaoxi'),{name:'sha'},false,'nodistance').logSkill='olxiaoxi';
+				}				
+			},
+			olcuorui:{
+				group:'olcuorui_judge',
+				trigger:{global:'phaseBefore',player:'enterGame'},
+				forced:true,
+				audio:'cuorui',
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0)&&player.countCards('h')<game.players.length;
+				},
+				content:function(){
+					player.drawTo(game.players.length);
+				},
+				subSkill:{
+					judge:{
+						trigger:{target:'useCardToTargeted'},
+						forced:true,
+						audio:'cuorui',
+						filter:function(event,player){
+							return get.type(event.card)=='delay';
+						},
+						content:function(){
+							player.skip('phaseJudge');
+							player.addTempSkill('olcuorui_effect',{player:'phaseJudgeSkipped'});
+						}
+					},
+					effect:{
+						mark:true,
+				        intro:{content:'跳过下个判定阶段'},
+				        ai:{
+					       effect:{
+						       target:function(card,player,target){
+							       if(get.type(card)=='delay') return 'zerotarget';
+						       },
+					       },
+				       },
+					}
+				}
+			},
 			//段颎
 			olsaogu:{
 				audio:2,
@@ -24266,7 +24388,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanjiong:'段颎',
 			olsaogu:'扫谷',
 			olsaogu_info:'转换技。①出牌阶段，你可以。阴：弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】；阳：摸一张牌。②结束阶段，你可以弃置一张牌，令一名其他角色执行你当前〖扫谷①〗的分支。',
-
+                        ol_hejin:'OL何进',
+                        ol_niujin:'OL牛金',
+                        ol_hansui:'OL韩遂',
+                        olmouzhu:'谋诛',
+                        olmouzhu_info:'出牌阶段限一次，你可以令一名有牌的其他角色交给你一张手牌。然后若其的手牌数小于你，其选择视为对你使用一张【杀】或【决斗】。',
+                        olyanhuo:'延祸',
+                        olyanhuo_info:'你死亡时，你可以弃置杀死你的角色的至多X张牌（X为你的牌数）。',
+                        olcuorui:'挫锐',
+                        olcuorui_info:'①锁定技，游戏开始时，你将手牌摸至X张（X为游戏人数）。②当你成为延时锦囊牌的目标后，你跳过下个判定阶段。',
+                        olniluan:'逆乱',
+                        olniluan_info:'体力值大于你的角色的结束阶段，若其本回合使用过【杀】，你可以将一张黑色牌当【杀】对其使用。',
+                        olxiaoxi:'骁袭',
+                        olxiaoxi_info:'每轮开始时，你可以视为使用一张无距离限制的【杀】。',
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
 			sp_tianzhu:'天柱·势冠一方',
