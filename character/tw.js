@@ -437,9 +437,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!['wei','qun'].contains(player.group)) return false;
 							var event=_status.event;
 							if(!event||event.type!='wuxie'||!event.filterCard) return false;
-							var target=event.getParent(2).player;
+							var target=event.getParent(4)[event.getParent(4).name=='phaseJudge'?player:target];
 							var cardx=event.getParent(4).card;
-							return target&&cardx&&get.type2(cardx)=='trick'&&target!=player&&target.hasZhuSkill('twzhuiting')&&player.countCards('hes',card=>_status.connectMode||get.color(card,player)==get.color(cardx));
+							return target&&cardx&&target!=player&&target.hasZhuSkill('twzhuiting')&&player.countCards('hes',card=>_status.connectMode||get.color(card,player)==get.color(cardx));
 						},
 						audio:'twzhuiting',
 						forceaudio:true,
@@ -447,9 +447,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							if(!['wei','qun'].contains(player.group)) return false;
 							if(event.type!='wuxie'||!event.filterCard({name:'wuxie'},player,event)||!lib.inpile.contains('wuxie')) return false;
-							var target=event.getParent(2).player;
+							var target=event.getParent(4)[event.getParent(4).name=='phaseJudge'?player:target];
 							var cardx=event.getParent(4).card;
-							return target&&cardx&&get.type2(cardx)=='trick'&&target!=player&&target.hasZhuSkill('twzhuiting')&&player.countCards('hes',card=>get.color(card,player)==get.color(cardx));
+							return target&&cardx&&target!=player&&target.hasZhuSkill('twzhuiting')&&player.countCards('hes',card=>get.color(card,player)==get.color(cardx));
 						},
 						filterCard:function(card,player){
 							var event=_status.event;
