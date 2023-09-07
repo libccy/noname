@@ -18533,7 +18533,6 @@
 					//      			}
 					//     }
 					// }
-
 					game.broadcastAll(function(player){
 						player.classList.add('dead');
 						player.removeLink();
