@@ -9120,7 +9120,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:function(player){
 							if(player.hp<3) return false;
 							var mindist=player.hp;
-							if(player.countCards('hs',{name:['tao','jiu']})) mindist++;
+							if(player.countCards('hs',card=>player.canSave(card,player))) mindist++;
 							if(game.hasPlayer(function(current){
 								return (get.distance(player,current)<=mindist&&
 									player.canUse('sha',current,false)&&
