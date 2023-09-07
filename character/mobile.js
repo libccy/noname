@@ -8481,7 +8481,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				check:function(event,player){
 					if(get.attitude(player,event.player)<4) return false;
-					if(player.countCards('hs',card=>player.canSaveCard(card,target))>=1+event.num-event.player.hp) return false;
+					if(player.countCards('hs',card=>player.canSaveCard(card,event.player))>=1+event.num-event.player.hp) return false;
 					if(event.player==player||event.player==get.zhu(player)) return true;
 					return !player.hasUnknown();
 				},
@@ -10146,7 +10146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'dying'},
 				check:function(event,player){
 					if(get.attitude(player,event.player)<4) return false;
-					if(player.countCards('hs',card=>player.canSaveCard(card,target))>=1-event.player.hp) return false;
+					if(player.countCards('hs',card=>player.canSaveCard(card,event.player))>=1-event.player.hp) return false;
 					if(event.player==player||event.player==get.zhu(player)) return true;
 					if(_status.currentPhase&&get.damageEffect(_status.currentPhase,player,player)<0) return false;
 					return !player.hasUnknown();
