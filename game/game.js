@@ -6992,6 +6992,7 @@
 			'<li>游击：若一名角色拥有带有“游击”的技能，则当该游击技能执行至“游击”处时，若本次技能的目标角色在你的攻击范围内，且你不在其攻击范围内，则你可以执行“游击”后的额外效果。'+
 			''
 		},
+		path:{},
 		setIntro:function(node,func,left){
 			if(lib.config.touchscreen){
 				if(left){
@@ -8237,6 +8238,13 @@
 					delete _status.htmlbg;
 
 					window.game=game;
+					// node:path library alternative
+					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
+						lib.path=window._noname_path;
+						delete window._noname_path;
+					},(e)=>{
+						throw e;
+					});
 					var styleToLoad=6;
 					var styleLoaded=function(){
 						styleToLoad--;
@@ -8588,10 +8596,12 @@
 				else if(typeof window.require=='function'){
 					lib.node={
 						fs:require('fs'),
+						path:require("path"),
 						debug:function(){
 							require('electron').remote.getCurrentWindow().toggleDevTools();
 						}
 					};
+					lib.path=lib.node.path;
 					game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
 						if(url.indexOf('http')!=0){
 							url=get.url(dev)+url;
