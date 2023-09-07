@@ -157,8 +157,94 @@
 		//函数钩子
 		hooks:{
 			// 本体势力的颜色
-			addGroup:[(id,short,name,config)=>{
-
+			addGroup:[(id,_short,_name,config)=>{
+				if("color" in config&&config.color!=null){
+					let color1,color2,color3,color4;
+					if (typeof config.color=="string"&&/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(config.color)){
+						let c1=parseInt(`0x${item[1].slice(1, 3)}`);
+						let c2=parseInt(`0x${item[1].slice(3, 5)}`);
+						let c3=parseInt(`0x${item[1].slice(5, 7)}`);
+						color1=color2=color3=color4=[c1,c2,c3,1];
+					}
+					else if(Array.isArray(config.color)&&config.color.length==4){
+						if(config.color.every(item=>Array.isArray(item))){
+							color1=config.color[0];
+							color2=config.color[1];
+							color3=config.color[2];
+							color4=config.color[3];
+						}
+						else color1=color2=color3=color4=config.color;
+					}
+					if(color1&&color2&&color3&&color4){
+						const cs=lib.linq.cselector;
+						const g1=cs.group(
+							cs.concat(
+								cs.class("player","identity"),
+								cs.isAttr("data-color",id)
+							),
+							cs.concat(
+								"div",
+								cs.isAttr("data-nature",id)
+							),
+							cs.concat(
+								"span",
+								cs.isAttr("data-nature",id)
+							)
+						);
+						const g2=cs.group(
+							cs.concat(
+								"div",
+								cs.isAttr("data-nature",`${id}m`)
+							),
+							cs.concat(
+								"span",
+								cs.isAttr("data-nature",`${id}m`)
+							)
+						);
+						const g3=cs.group(
+							cs.concat(
+								"div",
+								cs.isAttr("data-nature",`${id}mm`)
+							),
+							cs.concat(
+								"span",
+								cs.isAttr("data-nature",`${id}mm`)
+							)
+						);
+						game.dynamicStyle.addObject({
+							g1:{
+								textShadow:cs.group(
+									"black 0 0 1px",
+									`rgba(${color1.join()}) 0 0 2px`,
+									`rgba(${color2.join()}) 0 0 5px`,
+									`rgba(${color3.join()}) 0 0 10px`,
+									`rgba(${color4.join()}) 0 0 10px`
+								)
+							},
+							g2:{
+								textShadow:cs.group(
+									"black 0 0 1px",
+									`rgba(${color1.join()}) 0 0 2px`,
+									`rgba(${color2.join()}) 0 0 5px`,
+									`rgba(${color3.join()}) 0 0 5px`,
+									`rgba(${color4.join()}) 0 0 5px`,
+									"black 0 0 1px"
+								)
+							},
+							g3:{
+								textShadow:cs.group(
+									"black 0 0 1px",
+									`rgba(${color1.join()}) 0 0 2px`,
+									`rgba(${color2.join()}) 0 0 2px`,
+									`rgba(${color3.join()}) 0 0 2px`,
+									`rgba(${color4.join()}) 0 0 2px`,
+									"black 0 0 1px"
+								)
+							}
+						});
+						lib.groupnature[id]=id;
+					}
+				}
 			}],
 		},
 		hookmap:{},
@@ -32144,6 +32230,9 @@
 			if(short!=null&&typeof short=="object"){
 				config=short;
 				short=null;
+			}
+			if(name!=null&&typeof name=="string"&&short){
+				name=short;
 			}
 			if(name!=null&&typeof name=="object"){
 				config=name;
