@@ -23358,7 +23358,7 @@
 							next.notrigger=true;
 						}
 						else if(arguments[i]=='unreal'){
-							next.unreal='unreal'
+							next.unreal=true
 						}
 						else if(get.itemtype(arguments[i])=='nature'&&arguments[i]!='stab'){
 							next.nature=arguments[i];
