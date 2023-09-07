@@ -701,7 +701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(event.name=='useCardToTargeted') return get.type(event.card)=='delay'&&!player.hasSkill('olcuorui_skip');
-					return player.countCards('h')<Math.min(8,game.countPlayer());
+					return (event.name!='phase'||game.phaseNumber==0)&&player.countCards('h')<Math.min(8,game.countPlayer());
 				},
 				forced:true,
 				content:function(){
@@ -731,9 +731,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				inherit:'mouzhu',
 				content:function(){
 					'step 0'
-					target.chooseCard('he','交给'+get.translation(player)+'一张牌',true);
+					target.chooseCard('h','交给'+get.translation(player)+'一张手牌',true);
 					'step 1'
-					target.give(result.cards,player);
+					if(result.bool) target.give(result.cards,player);
 					'step 2'
 					if(player.countCards('h')<=target.countCards('h')){
 						event.finish();
@@ -754,18 +754,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:7,
 					result:{
-						target:-1,
-						player:function(player,target){
-							if(get.attitude(player,target)>0&&get.attitude(target,player)>0&&game.hasPlayer(function(current){
+						target:function(player,target){
+							if(get.attitude(target,player)>0&&game.hasPlayer(function(current){
 								if(current==target) return false;
 								for(var card of [{name:'sha'},{name:'juedou'}]){
 									if(target.canUse(card,current)&&get.effect(current,card,target,player)>0&&get.effect(current,card,target,target)>0) return true;
 								}
 								return false;
-							})&&target.countCards('he')<=player.countCards('he')) return 3;
+							})&&target.countCards('h')<player.countCards('h')+2) return 3;
 							if(!target.hasValueTarget({name:'sha'})&&!target.hasValueTarget({name:'juedou'})) return -2;
-							if(target.countCards('he')>player.countCards('he')+1) return -1;
-							return -0.5;
+							if(target.countCards('h')+1>player.countCards('h')) return -2;
+							var canSave=function(player,target){
+								return target.hp+player.countCards('hs',function(card){
+									var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+									if(mod2!='unchanged') return mod2;
+									var mod=game.checkMod(card,player,target,'unchanged','cardSavable',player);
+									if(mod!='unchanged') return mod;
+									var savable=get.info(card).savable;
+									if(typeof savable=='function') savable=savable(card,player,target);
+									return savable;
+								})>1+((get.mode()=='identity'&&target.identity=='zhu')||(get.mode()=='guozhan'&&get.is.jun(target)));
+							};
+							if(target.hasValueTarget({name:'sha'})){
+								var aimx=game.filterPlayer(current=>{
+									return target.canUse({name:'sha'},current)&&get.effect(current,{name:'sha'},target,target)>0;
+								}).sort((a,b)=>get.effect(b,{name:'sha'},target,target)-get.effect(a,{name:'sha'},target,target))[0];
+								if(get.effect(aimx,{name:'sha'},target,player)<0&&get.effect(aimx,{name:'sha'},target,aimx)<0&&!canSave(player,aimx)) return 0;
+							}
+							if(target.hasValueTarget({name:'juedou'})){
+								var aimy=game.filterPlayer(current=>{
+									return target.canUse({name:'juedou'},current)&&get.effect(current,{name:'juedou'},target,target)>0;
+								}).sort((a,b)=>get.effect(b,{name:'juedou'},target,target)-get.effect(a,{name:'juedou'},target,target))[0];
+								if(get.effect(aimy,{name:'juedou'},target,player)<0&&get.effect(aimy,{name:'sha'},target,aimy)<0&&!canSave(player,aimy)) return 0;
+							}
+							return -1;
 						},
 					},
 				},
@@ -10870,15 +10892,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer((current)=>lib.skill.spmouzhu.filterTarget(null,player,current));
 				},
 				filterTarget:function(card,player,target){
+					if(!target.countCards('h')) return false;
 					return player!=target&&(target.hp==player.hp||get.distance(player,target)==1);
 				},
 				selectTarget:[1,Infinity],
 				content:function(){
 					'step 0'
-					if(!target.countCards('h')) event.finish();
-					else target.chooseCard('h','交给'+get.translation(player)+'一张牌',true);
+					target.chooseCard('h','交给'+get.translation(player)+'一张牌',true);
 					'step 1'
-					target.give(result.cards,player);
+					if(result.bool) target.give(result.cards,player);
 					'step 2'
 					if(player.countCards('h')<=target.countCards('h')){
 						event.finish();
@@ -11924,13 +11946,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
-					return target!=player&&target.countCards('he')>0;
+					return target!=player&&target.countCards('h')>0;
 				},
 				content:function(){
 					'step 0'
-					target.chooseCard('he','交给'+get.translation(player)+'一张牌',true);
+					target.chooseCard('h','交给'+get.translation(player)+'一张手牌',true);
 					'step 1'
-					target.give(result.cards,player);
+					if(result.bool) target.give(result.cards,player);
 					'step 2'
 					if(player.countCards('h')<=target.countCards('h')){
 						event.finish();
@@ -23482,7 +23504,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xjshijian:'实荐',
 			xjshijian_info:'一名其他角色于其回合内使用的第二张牌结算完成后，你可弃置一张牌并令其获得技能〖誉虚〗直到回合结束。',
 			mouzhu:'谋诛',
-			mouzhu_info:'出牌阶段限一次，你可以令一名有牌的其他角色交给你一张牌。然后若你的手牌数大于其，其选择视为对你使用一张【杀】或【决斗】。',
+			mouzhu_info:'出牌阶段限一次，你可以令一名有手牌的其他角色交给你一张手牌。然后若你的手牌数大于其，其选择视为对你使用一张【杀】或【决斗】。',
 			yanhuo:'延祸',
 			yanhuo_info:'当你死亡时，你可以依次弃置一名其他角色的X张牌。（X为你的牌数）',
 			niluan:'逆乱',
@@ -24410,7 +24432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olcuorui:'挫锐',
 			olcuorui_info:'锁定技。①游戏开始时，你将手牌摸至场上存活人数张（至多摸至8张）。②当你成为延时锦囊牌的目标后，你跳过下个判定阶段。',
 			olmouzhu:'谋诛',
-			olmouzhu_info:'出牌阶段限一次，你可以令一名有牌的其他角色交给你一张牌。然后若你的手牌数大于其，其视为使用一张【杀】或【决斗】。',
+			olmouzhu_info:'出牌阶段限一次，你可以令一名有手牌的其他角色交给你一张手牌。然后若其手牌数小于你，其视为使用一张【杀】或【决斗】。',
 			olyanhuo:'延祸',
 			olyanhuo_info:'当你死亡时，你可以弃置杀死你的角色至多X张牌（X为你的牌数）。',
 			olniluan:'逆乱',

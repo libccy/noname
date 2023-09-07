@@ -4019,13 +4019,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jsrglinghua:{
 				audio:2,
-				locked:false,
-				mod:{
-					judge:(player,result)=>{
-						const parent=_status.event.getParent(2);
-						if(parent.name=='jsrglinghua'&&parent.triggername=='phaseJieshuBegin') result.bool=!result.bool;
-					}
-				},
 				trigger:{
 					player:['phaseZhunbeiBegin','phaseJieshuBegin'],
 				},
@@ -4048,7 +4041,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					event.executeDelayCardEffect=player.executeDelayCardEffect('shandian');
+					var next=event.executeDelayCardEffect=player.executeDelayCardEffect('shandian');
+					if(event.triggername!='phaseJieshuBegin') return;
+					next.judge=card=>-lib.card.shandian.judge(card)-4;
+					next.judge2=result=>!lib.card.shandian.judge2(result);
 					'step 1'
 					var executeDelayCardEffect=event.executeDelayCardEffect;
 					if(!player.hasHistory('damage',evt=>evt.getParent(2)==executeDelayCardEffect)){
