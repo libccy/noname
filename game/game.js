@@ -154,6 +154,13 @@
 		extensionPack:{},
 		cardType:{},
 		hook:{globaltrigger:{},globalskill:{}},
+		//函数钩子
+		hooks:{
+			// 本体势力的颜色
+			addGroup:[(id,short,name,config)=>{
+
+			}],
+		},
 		hookmap:{},
 		imported:{},
 		layoutfixed:['chess','tafang','stone'],
@@ -32088,6 +32095,28 @@
 		],
 	};
 	const game={
+		//addGroup
+		//基于钩子的添加势力方法
+		addGroup:(id,short,name,config)=>{
+			if(!id) throw new TypeError();
+			if(short!=null&&typeof short=="object"){
+				config=short;
+				short=null;
+			}
+			if(name!=null&&typeof name=="object"){
+				config=name;
+				name=null;
+			}
+			lib.group.add(id);
+			if(short)lib.translate[id] = short;
+			if(name)lib.translate[`${id}2`] = name;
+			for(const hook of lib.hooks.addGroup){
+				if(hook!=null&&typeof hook=="function"){
+					hook(id,short,name,config);
+				}
+			}
+			return id;
+		},
 		//Yingbian
 		//应变
 		yingbianEffect:function(event,content){
