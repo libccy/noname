@@ -18052,6 +18052,7 @@
 				damage:function(){
 					"step 0"
 					event.forceDie=true;
+					if(event.unreal) event.goto(4)
 					event.trigger('damageBegin1');
 					"step 1"
 					event.trigger('damageBegin2');
@@ -18069,7 +18070,7 @@
 							game.playAudio('effect','damage'+(num>1?'2':''));
 						}
 					},num);
-					var str='受到了';
+					var str=event.unreal?'视为受到了':'受到了';
 					if(source) str+='来自<span class="bluetext">'+(source==player?'自己':get.translation(source))+'</span>的';
 					str+=get.cnNumber(num)+'点';
 					if(event.nature) str+=get.translation(event.nature)+'属性';
@@ -18091,11 +18092,13 @@
 						}
 					}
 					player.getHistory('damage').push(event);
-					if(event.notrigger){
-						player.changeHp(-num,false)._triggered=null;
-					}
-					else{
-						player.changeHp(-num,false);
+					if(!event.unreal){
+						if(event.notrigger){
+							player.changeHp(-num,false)._triggered=null;
+						}
+						else{
+							player.changeHp(-num,false);
+						}
 					}
 					if(event.animate!==false){
 						player.$damage(source);
@@ -18112,6 +18115,7 @@
 						var numx=Math.max(0,num-player.hujia);
 						player.$damagepop(-numx,event.nature);
 					}
+					if(event.unreal) event.goto(6)
 					if(!event.notrigger){
 						if(num==0){
 							event.trigger('damageZero');
@@ -23115,6 +23119,9 @@
 							next._triggered=null;
 							next.notrigger=true;
 						}
+						else if(arguments[i]=='unreal'){
+							next.unreal=true;
+						}
 						else if(get.itemtype(arguments[i])=='nature'&&arguments[i]!='stab'){
 							next.nature=arguments[i];
 						}
@@ -23124,6 +23131,7 @@
 					if(next.source==undefined&&!nosource) next.source=event.player;
 					if(next.source&&next.source.isDead()) delete next.source;
 					if(next.num==undefined) next.num=1;
+					if(next.unreal==undefined) next.unreal=false;
 					next.original_num=next.num;
 					next.change_history=[];
 					if(next.nature=='poison') delete next._triggered;
