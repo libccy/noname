@@ -32166,10 +32166,18 @@
 				that._cache.rules=[];
 				that._cache.style=document.createElement("style");
 				document.head.append(that._cache.style);
-				that._cache.sheet = this.#style.sheet;
+				that._cache.sheet = that._cache.style.sheet;
 				delete game.dynamicStyle.init;
 				return true;
-			}
+			},
+			translate:style=>{
+				let result=[];
+				for(const name in style){
+					result.push(`${name.replace(/([A-Z])/g, match => `-${match.toLowerCase()}`)}: ${style[name]};`);
+				}
+				return result.join(" ");
+			},
+			generate:(name, style)=>[`${name} {`, game.dynamicStyle.translate(style), "}"].join(" ")
 		},
 		//Add a background music to the config option
 		//在设置选项中添加一首背景音乐
