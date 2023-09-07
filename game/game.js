@@ -32241,11 +32241,13 @@
 			lib.group.add(id);
 			if(short)lib.translate[id] = short;
 			if(name)lib.translate[`${id}2`] = name;
-			for(const hook of lib.hooks.addGroup){
-				if(hook!=null&&typeof hook=="function"){
-					hook(id,short,name,config);
+			lib.onload.add(()=>{
+				for(const hook of lib.hooks.addGroup){
+					if(hook!=null&&typeof hook=="function"){
+						hook(id,short,name,config);
+					}
 				}
-			}
+			})
 			return id;
 		},
 		//Yingbian
