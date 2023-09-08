@@ -557,9 +557,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			sbzhiba:{
-				init:function(player){
-					if(player.hasZhuSkill('sbzhiba')) player.markSkill('sbzhiba');
-				},
 				audio:2,
 				trigger:{player:'dying'},
 				filter:function(event,player){
@@ -568,7 +565,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				zhuSkill:true,
 				limited:true,
-				mark:false,
+				mark:true,
 				skillAnimation:true,
 				animationColor:'wood',
 				content:function(){
