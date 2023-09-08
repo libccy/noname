@@ -11457,28 +11457,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					if(!event.target||!event.target.isIn()||!player.hasZhuSkill('twfengqi',event.target)) return false;
-					var skills=event.target.getStockSkills(true,true);
-					for(var i of skills){
-						var info=get.info(i);
-						if(info.zhuSkill&&!event.target.hasZhuSkill(i)) return true;
-					}
-					return false;
+					var target=event.target;
+					return target.getStockSkills(true,true).some(skill=>{
+						if(target.hasSkill(skill)) return false;
+						var info=get.info(skill);
+						return info&&info.zhuSkill;
+					});
 				},
 				skillAnimation:true,
 				animationColor:'thunder',
 				content:function(){
 					'step 0'
 					event.target=trigger.target;
-					event.target.chooseBool(get.prompt('twfengqi'),'激活武将牌上的所有主公技');
+					event.target.chooseBool(get.prompt('twfengqi'),'获得武将牌上的所有主公技');
 					'step 1'
 					if(result.bool){
 						target.logSkill('twfengqi',player);
-						var skills=target.getStockSkills(true,true).filter(function(i){
-							var info=get.info(i);
-							if(info.zhuSkill&&!target.hasZhuSkill(i)) return true;
+						var skills=target.getStockSkills(true,true).filter(skill=>{
+							if(target.hasSkill(skill)) return false;
+							var info=get.info(skill);
+							return info&&info.zhuSkill;
 						});
-						target.markAuto('zhuSkill_twfengqi',skills);
-						game.log(target,'激活了武将牌上的主公技')
+						for(var i of skills) target.addSkillLog(i);
 					}
 				},
 			},
@@ -13763,7 +13763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twgezhi:'革制',
 			twgezhi_info:'①当你于出牌阶段内首次使用某种类别的牌时，你可以重铸一张手牌。②出牌阶段结束时，若你本阶段内因〖革制①〗失去过至少两张牌，则你可以令一名角色选择获得一个其未获得过的效果：⒈攻击范围+2；⒉手牌上限+2；⒊加1点体力上限。',
 			twfengqi:'烽起',
-			twfengqi_info:'主公技，锁定技。①其他群势力角色发动〖鬻爵①〗时，将每阶段上限改为四张。②以其他角色为目标的〖革制②〗结算结束后，目标角色可以激活其武将牌上的主公技。',
+			twfengqi_info:'主公技，锁定技。①其他群势力角色发动〖鬻爵①〗时，将每阶段上限改为四张。②以其他角色为目标的〖革制②〗结算结束后，目标角色可以获得其武将牌上的主公技。',
 			tw_caocao:'TW曹操',
 			twlingfa:'令法',
 			twlingfa_info:'①第一轮游戏开始时，你可选择获得如下效果直到本轮结束：其他角色使用【杀】时，若其有牌，则其需弃置一张牌，否则受到你造成的1点伤害。②第二轮游戏开始时，你可选择获得如下效果直到本轮结束：其他角色使用【桃】结算结束后，若其有牌，则其需交给你一张牌，否则受到你造成的1点伤害。③第三轮游戏开始时，你失去〖令法〗并获得〖治暗〗。',
