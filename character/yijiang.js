@@ -1355,19 +1355,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//孙体
 			xinzhaofu:{
-				mark:false,
-				init:function(player){
-					if(player.hasZhuSkill('xinzhaofu')){
-						player.markSkill('xinzhaofu');
-						player.storage.xinzhaofu=false;
-					}
-				},
 				audio:'zhaofu',
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
 					return player.hasZhuSkill('xinzhaofu');
 				},
+				mark:true,
 				limited:true,
 				skillAnimation:true,
 				animationColor:'wood',
@@ -8748,28 +8742,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//priority:6,
 				zhuSkill:true,
 				filter:function(event,player){
-					if(player.storage.xingshuai) return false;
 					if(player.hp>0) return false;
 					if(!player.hasZhuSkill('xingshuai')) return false;
 					return game.hasPlayer(function(current){
 						return current!=player&&current.group=='wei';
 					});
 				},
-				init:function(player){
-					if(player.hasZhuSkill('xingshuai')){
-						player.markSkill('xingshuai');
-						player.storage.xingshuai=false;
-					}
-				},
-				intro:{
-					content:'limited'
-				},
+				mark:true,
 				unique:true,
 				limited:true,
-				mark:false,
 				content:function(){
 					'step 0'
-					player.storage.xingshuai=true;
 					player.awakenSkill('xingshuai');
 					var targets=game.filterPlayer();
 					targets.remove(player);
