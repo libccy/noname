@@ -381,17 +381,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.group=='wei';
 					});
 				},
-				init:function(player){
-					if(player.hasZhuSkill('rexingshuai')){
-						player.markSkill('rexingshuai');
-						player.storage.rexingshuai=false;
-					}
-				},
-				intro:{
-					content:'limited',
-				},
 				limited:true,
-				mark:false,
+				mark:true,
 				content:function(){
 					'step 0'
 					player.awakenSkill('rexingshuai');
@@ -9705,19 +9696,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(player.hp<3) player.recover(3-player.hp);
 					game.log(player,'获得了技能','#g【思蜀】','和','#g【激将】');
-					player.addSkill('sishu');
-					if(player.hasSkill('olruoyu')){
-						player.addSkill('rejijiang');
-					}
-					else{
-						player.addAdditionalSkill('olruoyu','rejijiang');
-					}
-					if(!player.isZhu){
-						player.storage.zhuSkill_olruoyu=['rejijiang'];
-					}
-					else{
-						event.trigger('zhuUpdate');
-					}
+					player.addSkillLog('sishu');
+					player.addSkillLog('rejijiang');
+					'step 2'
+					if(player.isZhu2()) event.trigger('zhuUpdate');
 				}
 			},
 			olfangquan:{
