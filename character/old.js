@@ -157,7 +157,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseControl(list).set('prompt','请选择'+get.translation(target)+'变更的势力').set('ai',()=>_status.event.controls.randomGet());
 					}
 					else event.finish();
-					'step 1'
+					'step 2'
 					if(result.control){
 						player.popup(get.translation(result.control+'2'));
 						target.changeGroup(result.control);
