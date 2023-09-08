@@ -53980,9 +53980,9 @@
 			//是否是虚拟牌
 			vituralCard:card=>card.isCard||(!("cards" in card)||!Array.isArray(card.cards)||card.cards.length==0),
 			//是否是转化牌
-			castCard:card=>!card.isCard&&("cards" in card)&&Array.isArray(card.cards)&&card.cards.length>0,
+			convertedCard:card=>!card.isCard&&("cards" in card)&&Array.isArray(card.cards)&&card.cards.length>0,
 			//是否是实体牌
-			castCard:card=>card.isCard&&("cards" in card)&&Array.isArray(card.cards)&&card.cards.length==1,
+			ordinaryCard:card=>card.isCard&&("cards" in card)&&Array.isArray(card.cards)&&card.cards.length==1,
 			//押韵判断
 			yayun:function(str1,str2){
 				if(str1==str2) return true;
