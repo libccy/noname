@@ -178,35 +178,35 @@
 					if(color1&&color2&&color3&&color4){
 						const cs=lib.linq.cselector;
 						const g1=cs.group(
-							cs.concat(
+							cs.of(
 								cs.class("player","identity"),
 								cs.isAttr("data-color",`"${id}"`)
 							),
-							cs.concat(
+							cs.of(
 								"div",
 								cs.isAttr("data-nature",`"${id}"`)
 							),
-							cs.concat(
+							cs.of(
 								"span",
 								cs.isAttr("data-nature",`"${id}"`)
 							)
 						);
 						const g2=cs.group(
-							cs.concat(
+							cs.of(
 								"div",
 								cs.isAttr("data-nature",`"${id}m"`)
 							),
-							cs.concat(
+							cs.of(
 								"span",
 								cs.isAttr("data-nature",`"${id}m"`)
 							)
 						);
 						const g3=cs.group(
-							cs.concat(
+							cs.of(
 								"div",
 								cs.isAttr("data-nature",`"${id}mm"`)
 							),
-							cs.concat(
+							cs.of(
 								"span",
 								cs.isAttr("data-nature",`"${id}mm"`)
 							)
@@ -7306,7 +7306,7 @@
 				bgnAttr:(name,item)=>`[${name}^=${item}]`,
 				endAttr:(name,item)=>`[${name}^=${item}]`,
 				merge:function(){return Array.from(arguments).join(" ");},
-				concat:function(){return Array.from(arguments).join("");},
+				of:function(){return Array.from(arguments).join("");},
 				class:function(){return `.${Array.from(arguments).join(".")}`;},
 				group:function(){return Array.from(arguments).join(",");},
 				media:type=>`@media ${type}`
@@ -53977,6 +53977,12 @@
 				}
 				return false;
 			},
+			//是否是虚拟牌
+			vituralCard:card=>card.isCard||(!("cards" in card)||!Array.isArray(card.cards)||card.cards.length==0),
+			//是否是转化牌
+			castCard:card=>!card.isCard&&("cards" in card)&&Array.isArray(card.cards)&&card.cards.length>0,
+			//是否是实体牌
+			castCard:card=>card.isCard&&("cards" in card)&&Array.isArray(card.cards)&&card.cards.length==1,
 			//押韵判断
 			yayun:function(str1,str2){
 				if(str1==str2) return true;
