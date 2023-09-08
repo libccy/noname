@@ -3243,57 +3243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				multitarget:true,
 				targetprompt:['伤害来源','受伤角色'],
 				content:function(){
-					targets[1].damage(targets[0]).setContent(lib.skill.guanzong.viewAsDamageContent);
-				},
-				viewAsDamageContent:function(){
-					'step 0'
-					if(lib.config.background_audio){
-						game.playAudio('effect','damage'+(num>1?'2':''));
-					}
-					game.broadcast(function(num){
-						if(lib.config.background_audio){
-							game.playAudio('effect','damage'+(num>1?'2':''));
-						}
-					},num);
-					var str='视为受到了';
-					if(source) str+='来自<span class="bluetext">'+(source==player?'自己':get.translation(source))+'</span>的';
-					str+=get.cnNumber(num)+'点';
-					if(event.nature) str+=get.translation(event.nature)+'属性';
-					str+='伤害';
-					game.log(player,str);
-					if(player.stat[player.stat.length-1].damaged==undefined){
-						player.stat[player.stat.length-1].damaged=num;
-					}
-					else {
-						player.stat[player.stat.length-1].damaged+=num;
-					}
-					if(source){
-						source.getHistory('sourceDamage').push(event);
-						if(source.stat[source.stat.length-1].damage==undefined){
-							source.stat[source.stat.length-1].damage=num;
-						}
-						else {
-							source.stat[source.stat.length-1].damage+=num;
-						}
-					}
-					player.getHistory('damage').push(event);
-					if(event.animate!==false){
-						player.$damage(source);
-						game.broadcastAll(function(nature,player){
-							if(lib.config.animation&&!lib.config.low_performance){
-								if(nature=='fire'){
-									player.$fire();
-								}
-								else if(nature=='thunder'){
-									player.$thunder();
-								}
-							}
-						},event.nature,player);
-						var numx=Math.max(0,num-player.hujia);
-						player.$damagepop(-numx,'gray');
-					}
-					'step 1'
-					event.trigger('damageSource');
+					targets[1].damage(targets[0],'unreal');
 				},
 				ai:{
 					result:{
