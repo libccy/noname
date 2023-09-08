@@ -7688,8 +7688,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseControl(skills).set('dialog',['选择令'+get.translation(target)+'获得一个技能',[chara,'character']]);
 					'step 2'
 					target.addSkillLog(result.control);
-					target.storage.zhuSkill_shanli=[result.control];
 					target.setAvatarQueue(target.name1||target.name,[event.chara[event.skills.indexOf(result.control)]]);
+					'step 3'
+					if(target.isZhu2()) event.trigger('zhuUpdate');
 				},
 			},
 			hongyi:{

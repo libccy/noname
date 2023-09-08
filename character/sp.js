@@ -15237,15 +15237,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('choiceList',['获得技能〖妄尊〗',str]).set('choice',choice);
 					'step 2'
 					if(result.control=='选项一'){
-						player.addSkill('rewangzun');
-						player.popup('rewangzun');
+						player.addSkillLog('rewangzun');
 					}
 					else{
 						player.draw(2);
 						if(event.list){
-							player.addSkill(event.list);
-							player.popup(event.list[0]);
-							player.storage.zhuSkill_yjixi=event.list;
+							for(var i of event.list) player.addSkillLog(event.list);
 							game.broadcastAll(function(list){
 								game.expandSkills(list);
 								for(var i of list){
@@ -15884,7 +15881,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					player.addAdditionalSkill('weidi',list);
-					player.storage.zhuSkill_weidi=list;
 					game.broadcastAll(function(list){
 						game.expandSkills(list);
 						for(var i of list){
@@ -15990,16 +15986,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				animationColor:'thunder',
 				skillAnimation:'legend',
-				filter:function(event,player){
-					return !player.storage.yongdi;
-				},
-				init:function(player){
-					player.storage.yongdi=false;
-				},
 				mark:true,
-				intro:{
-					content:'limited'
-				},
 				direct:true,
 				content:function(){
 					'step 0'
@@ -16011,7 +15998,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var att=get.attitude(player,target);
 						if(att<=1) return 0;
 						var mode=get.mode();
-						if(mode=='identity'||(mode=='versus'&&_status.mode=='four')){
+						if(mode=='identity'||(mode=='versus'&&(_status.mode=='four'||_status.mode=='guandu'))){
 							if(target.name&&lib.character[target.name]){
 								for(var i=0;i<lib.character[target.name][3].length;i++){
 									if(lib.skill[lib.character[target.name][3][i]].zhuSkill){
@@ -16024,36 +16011,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('goon',!player.hasUnknown());
 					'step 1'
 					if(result.bool){
-						player.awakenSkill('yongdi');
-						player.storage.yongdi=true;
-						player.logSkill('yongdi',result.targets);
 						var target=result.targets[0];
-						target.gainMaxHp(true);
+						player.logSkill('yongdi',target);
+						player.awakenSkill('yongdi');
+						target.gainMaxHp();
 						target.recover();
 						var mode=get.mode();
-						if(mode=='identity'||(mode=='versus'&&_status.mode=='four')||mode=='doudizhu'){
-							if(target.name&&lib.character[target.name]){
-								var skills=lib.character[target.name][3];
-								target.storage.zhuSkill_yongdi=[];
-								for(var i=0;i<skills.length;i++){
-									var info=lib.skill[skills[i]];
-									if(info.zhuSkill){
-										target.storage.zhuSkill_yongdi.push(skills[i]);
-										if(info.init){
-											info.init(target);
-										}
-										if(info.init2){
-											info.init2(target);
-										}
-									}
-								}
-							}
+						var skills=target.getStockSkills(true,true).filter(skill=>{
+							if(target.hasSkill(skill)) return false;
+							var info=get.info(skill);
+							return info&&info.zhuSkill;
+						});
+						if(skills.length){
+							for(var i of skills) target.addSkillLog(i);
 						}
 					}
 				},
-				ai:{
-					expose:0.2
-				}
+				ai:{expose:0.2},
 			},
 			regushe:{
 				audio:'gushe',

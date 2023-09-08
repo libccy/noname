@@ -3420,29 +3420,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
-					if(!player.hasZhuSkill('ruoyu'))return false;
-					if(player.storage.ruoyu) return false;
 					return player.isMinHp();
 				},
 				content:function(){
 					'step 0'
-					player.storage.ruoyu=true;
-					player.gainMaxHp();
-					'step 1'
-					player.recover();
-					if(player.hasSkill('ruoyu')){
-						player.addSkill('rejijiang');
-					}
-					else{
-						player.addAdditionalSkill('ruoyu','rejijiang');
-					}
-					if(!player.isZhu){
-						player.storage.zhuSkill_ruoyu=['rejijiang'];
-					}
-					else{
-						event.trigger('zhuUpdate');
-					}
 					player.awakenSkill('ruoyu');
+					player.gainMaxHp();
+					player.recover();
+					'step 1'
+					player.addSkillLog('rejijiang');
+					'step 2'
+					if(player.isZhu2()) event.trigger('zhuUpdate');
 				}
 			},
 			qiaobian:{
