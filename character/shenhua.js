@@ -66,7 +66,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"zhugezhan":["male","shu",3,["xinfu_zuilun","xinfu_fuyin"],[]],
 			"lukang":["male","wu",4,["drlt_qianjie","drlt_jueyan","drlt_poshi"],[]],
 			"yl_yuanshu":["male","qun",4,["drlt_yongsi","drlt_weidi"],["zhu"]],
-			"zhangxiu":["male","qun",4,["drlt_xiongluan","drlt_congjian"],[]],
+			"zhangxiu":["male","qun",4,["drlt_xiongluan","drlt_congjian",'twjuxiang'],['zhu']],
 			"chendao":["male","shu",4,["dcwanglie"],[]],
 			zhoufei:["female","wu",3,["olliangyin","olkongsheng"]],
 		},
@@ -5001,6 +5001,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yinghun:{
 				audio:2,
 				audioname:['re_sunjian','sunce','re_sunben','re_sunce','ol_sunjian'],
+				audioname2:{
+					re_sunyi:'gzyinghun_re_sunyi',
+					tw_ol_sunjian:'yinghun_ol_sunjian',
+				},
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				preHidden:true,
@@ -5056,7 +5060,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzyinghun:{
 				audio:'yinghun',
 				audioname:['re_sunjian','sunce','re_sunben','re_sunce','ol_sunjian','sb_sunce'],
-				audioname2:{re_sunyi:'gzyinghun_re_sunyi'},
+				audioname2:{
+					re_sunyi:'gzyinghun_re_sunyi',
+					tw_ol_sunjian:'yinghun_ol_sunjian',
+				},
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return player.getDamagedHp()>0;
@@ -5120,6 +5127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					maixie:true,
 				}
 			},
+			yinghun_ol_sunjian:{audio:2},
 			jiuchi:{
 				audio:2,
 				audioname:['re_dongzhuo'],

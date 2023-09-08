@@ -11,14 +11,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				tw_yunchouren:['tw_xujing','tw_qiaogong'],
 				tw_yunchouyong:['tw_zongyu','tw_chendong','tw_sunyi'],
 				tw_yunchouyan:['tw_jiangqing'],
+				tw_zhu:['tw_beimihu','tw_ol_sunjian','ol_liuyu','tw_menghuo'],
 				tw_swordsman:['xia_xushu','xia_wangyue','xia_liyàn','xia_tongyuan','xia_lusu','xia_dianwei','xia_zhaoe','xia_xiahouzie'],
-				tw_mobile:['nashime','tw_beimihu','tw_gexuan','tw_zhugeguo'],
+				tw_mobile:['nashime','tw_gexuan','tw_zhugeguo'],
 				tw_mobile2:['tw_chengpu','tw_guohuai','old_quancong','tw_caoxiu','tw_guanqiujian','tw_re_fazheng','tw_madai','tw_zhangfei','tw_guyong','tw_handang','tw_xuezong','tw_yl_luzhi'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
 				tw_english:['kaisa'],
 			},
 		},
 		character:{
+			tw_ol_sunjian:['male','wu','4/5',['gzyinghun','wulie','twpolu'],['zhu']],
+			tw_menghuo:['male','qun',4,['huoshou','rezaiqi','twqiushou'],['zhu']],
+			ol_liuyu:['male','qun',2,['zongzuo','zhige','twchongwang'],['zhu']],
 			tw_gongsunfan:['male','qun',4,['twhuiyuan','twshoushou']],
 			tw_yangang:['male','qun',4,['twzhiqu','twxianfeng']],
 			xia_xiahouzie:['female','qun','3/4',['twxuechang','twduoren']],
@@ -270,6 +274,348 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//海外主公技
+			//张鲁
+			twshijun: {
+				unique: true,
+				global: 'twshijun_global',
+				audio: 2,
+				zhuSkill: true,
+				ai: { combo: 'yishe' },
+				subSkill: {
+					global: {
+						audio: 'twshijun',
+						usable: 1,
+						enable: 'phaseUse',
+						forceaudio: true,
+						filter: function (event, player) {
+							return player.group == 'qun' && game.hasPlayer(function (current) {
+								return current != player && current.hasZhuSkill('twshijun', player) && !current.getExpansions('yishe').length;
+							});
+						},
+						filterTarget: function (card, player, target) {
+							return target != player && target.hasZhuSkill('twshijun', player) && !target.getExpansions('yishe').length;
+						},
+						prompt: '摸一张牌然后将一张牌作为“米”置于主公的武将牌上',
+						content: function () {
+							'step 0'
+							player.draw();
+							if (player.countCards('he')) player.chooseCard('将一张牌置于' + get.translation(target) + '的武将牌上', 'he', true);
+							else event.finish();
+							'step 1'
+							if (result.bool) target.addToExpansion(result.cards, player, 'give').gaintag.add('yishe');
+						},
+						ai: {
+							order: 7,
+							result: {
+								target: 1,
+							},
+						},
+					},
+				},
+			},
+			//张绣
+			twjuxiang: {
+				unique: true,
+				global: 'twjuxiang_global',
+				audio: 2,
+				zhuSkill: true,
+				subSkill: {
+					global: {
+						audio: 'twjuxiang',
+						usable: 1,
+						enable: 'phaseUse',
+						forceaudio: true,
+						filter: function (event, player) {
+							return player.countCards('e') && player.group == 'qun' && game.hasPlayer(function (target) {
+								return target != player && target.hasZhuSkill('twjuxiang', player) && player.countCards('e',card=>target.hasEmptySlot(get.subtype(card))||target.hasDisabledSlot(get.subtype(card)));
+							});
+						},
+						filterTarget: function (card, player, target) {
+							return target != player && target.hasZhuSkill('twjuxiang', player) && (target.hasEmptySlot(get.subtype(ui.selected.cards[0]))||target.hasDisabledSlot(get.subtype(ui.selected.cards[0])));
+						},
+						filterCard: { type: 'equip' },
+						position: 'e',
+						check: function (card) {
+							return get.value(card);
+						},
+						prompt: '将装备区中的一张牌置入主公的装备区中或恢复主公的对应装备栏',
+						discard: false,
+						lose: false,
+						content: function () {
+							if (target.hasEmptySlot(get.subtype(cards[0]))) {
+								player.$give(cards[0], target, false);
+								target.equip(cards[0]);
+							}
+							else {
+								target.gain(cards[0], player, 'give');
+								target.enableEquip(get.subtype(cards[0]));
+							}
+						},
+						ai: {
+							order: 7,
+							result: {
+								target: 1,
+							},
+						},
+					},
+				},
+			},
+			//孙坚
+			twpolu: {
+				unique: true,
+				audio: 'repolu',
+				trigger: { global: ['dieAfter', 'die'] },
+				forceDie: true,
+				zhuSkill: true,
+				filter: function (event, player, name) {
+					if (!player.hasZhuSkill('twpolu')) return false;
+					if (name == 'dieAfter' && event.source && event.source.group == 'wu') return true;
+					if (name == 'die' && event.player.group == 'wu') return true;
+					return false;
+				},
+				direct: true,
+				content: function () {
+					'step 0'
+					if (!player.storage.twpolu) player.storage.twpolu = 0;
+					event.num = player.storage.twpolu + 1;
+					player.chooseTarget([1, Infinity], get.prompt('twpolu'), '令任意名角色摸' + get.cnNumber(event.num) + '张牌').set('forceDie', true).ai = function (target) {
+						return get.attitude(_status.event.player, target);
+					};
+					'step 1'
+					if (result.bool) {
+						player.storage.twpolu++;
+						result.targets.sortBySeat();
+						player.logSkill('repolu', result.targets);
+						game.asyncDraw(result.targets, num);
+					}
+					else event.finish();
+					'step 2'
+					game.delay();
+				},
+			},
+			//孟获
+			twqiushou: {
+				unique: true,
+				audio: 2,
+				trigger: { global: 'useCardAfter' },
+				filter: function (event, player) {
+					if (event.card.name != 'nanman') return false;
+					var num = 0, bool = false;
+					for (var i of event.targets) {
+						if (!i.isAlive()) bool = true;
+						i.getHistory('damage', function (evt) {
+							if (evt.getParent(2) == event) num += evt.num;
+						});
+					}
+					return player.hasZhuSkill('twqiushou') && (bool || num > 3);
+				},
+				zhuSkill: true,
+				forced: true,
+				logTarget: function (event, player) {
+					return game.filterPlayer(function (target) {
+						return ['shu', 'qun'].contains(target.group);
+					});
+				},
+				content: function () {
+					'step 0'
+					game.asyncDraw(lib.skill.twqiushou.logTarget(trigger.player));
+					'step 1'
+					game.delayx();
+				},
+			},
+			//刘协
+			twzhuiting:{
+				unique:true,
+				zhuSkill:true,
+				audio:2,
+				global:'twzhuiting_global',
+				subSkill:{
+					global:{
+						hiddenCard:function(player,name){
+							if(name!='wuxie'||!lib.inpile.contains('wuxie')) return false;
+							if(!['wei','qun'].contains(player.group)) return false;
+							return game.hasPlayer(target=>target!=player&&target.hasZhuSkill('twzhuiting'));
+						},
+						audio:'twzhuiting',
+						forceaudio:true,
+						enable:'chooseToUse',
+						filter:function(event,player){
+							if(!['wei','qun'].contains(player.group)) return false;
+							if(!event.filterCard({name:'wuxie'},player,event)||!lib.inpile.contains('wuxie')) return false;
+							var target=event.getParent(4)[event.getParent(4).name=='phaseJudge'?'player':'target'];
+							var cardx=event.getParent(4).card;
+							return target&&cardx&&target!=player&&target.hasZhuSkill('twzhuiting')&&player.countCards('hes',card=>get.color(card,player)==get.color(cardx));
+						},
+						filterCard:function(card,player){
+							var event=_status.event;
+							return get.color(card,player)==get.color(event.getParent(4).card);
+						},
+						viewAs:{name:'wuxie'},
+						position:'hes',
+						prompt:function(){
+							var event=_status.event;
+							return '将一张'+get.translation(get.color(event.getParent(4).card))+'牌当作【无懈可击】对'+get.translation(event.getParent(4)[event.getParent(4).name=='phaseJudge'?'player':'target'])+'使用';
+						},
+						check:function(card){
+							return 8-get.value(card);
+						},
+					},
+				},
+			},
+			//刘繇
+			twniju: {
+				unique: true,
+				audio: 2,
+				zhuSkill: true,
+				trigger: { player: 'compare', target: 'compare' },
+				filter: function (event, player) {
+					return !event.iwhile && player.hasZhuSkill('twniju');
+				},
+				direct: true,
+				content: function () {
+					'step 0'
+					var list = ['我加', '他加', '我减', '他减', 'cancel2'];
+					player.chooseControl(list).set('prompt', get.prompt2('twniju')).set('ai', function () { return ['我加', '他减'].randomGet() });
+					'step 1'
+					if (result.control != 'cancel2') {
+						player.logSkill('twniju');
+						var num = game.countPlayer(function (current) {
+							return current.group == 'qun';
+						});
+						event.num = num;
+						switch (result.control) {
+							case '我加':
+								player.popup('+', num);
+								if (player == trigger.player) {
+									trigger.num1 += num;
+									if (trigger.num1 > 13) trigger.num1 = 13;
+								}
+								else {
+									trigger.num2 += num;
+									if (trigger.num2 > 13) trigger.num2 = 13;
+								}
+								game.log(player, '的拼点牌点数+', num);
+								break;
+							case '他加':
+								trigger.target.popup('+', num);
+								if (player == trigger.player) {
+									trigger.num2 += num;
+									if (trigger.num2 > 13) trigger.num2 = 13;
+								}
+								else {
+									trigger.num1 += num;
+									if (trigger.num1 > 13) trigger.num1 = 13;
+								}
+								game.log(trigger.target, '的拼点牌点数+', num);
+								break;
+							case '我减':
+								player.popup('-', num);
+								if (player == trigger.player) {
+									trigger.num1 -= num;
+									if (trigger.num1 < 1) trigger.num1 = 1;
+								}
+								else {
+									trigger.num2 -= num;
+									if (trigger.num2 < 1) trigger.num2 = 1;
+								}
+								game.log(player, '的拼点牌点数-', num);
+								break;
+							case '他减':
+								trigger.target.popup('-', num);
+								if (player == trigger.player) {
+									trigger.num2 -= num;
+									if (trigger.num2 < 1) trigger.num2 = 1;
+								}
+								else {
+									trigger.num1 -= num;
+									if (trigger.num1 < 1) trigger.num1 = 1;
+								}
+								game.log(trigger.target, '的拼点牌点数-', num);
+								break;
+						}
+					}
+					else event.finish();
+					'step 2'
+					if (trigger.num1 == trigger.num2) player.draw(num);
+				},
+			},
+			//刘虞
+			twchongwang: {
+				init: function (player) {
+					player.storage.twchongwang = [];
+					player.storage.twchongwangx = [];
+				},
+				mod: {
+					playerEnabled: function (card, player, target) {
+						if (!player.hasZhuSkill('twchongwang')) return;
+						if (get.tag(card, 'damage') > 0 && player.storage.twchongwangx.contains(target)) return false;
+					},
+					targetEnabled: function (card, player, target) {
+						if (!target.hasZhuSkill('twchongwang')) return;
+						if (get.tag(card, 'damage') > 0 && target.storage.twchongwangx.contains(player)) return false;
+					},
+				},
+				unique: true,
+				onremove: true,
+				global: 'twchongwang_global',
+				group: 'twchongwang_clear',
+				audio: 'ext:武将前瞻/audio/skill:2',
+				zhuSkill: true,
+				subSkill: {
+					clear: {
+						charlotte: true,
+						trigger: { player: 'phaseAfter' },
+						direct: true,
+						content: function () {
+							player.storage.twchongwangx = [];
+						},
+					},
+					global: {
+						trigger: { player: 'phaseUseBegin' },
+						filter: function (event, player) {
+							return player.group == 'qun' && game.hasPlayer(function (current) {
+								return current != player && current.hasZhuSkill('twchongwang', player) && !current.storage.twchongwang.contains(player);
+							});
+						},
+						direct: true,
+						content: function () {
+							'step 0'
+							player.chooseCardTarget({
+								prompt: '崇望：是否将一张牌交给主公并获得双重庇护？',
+								selectCard: 1,
+								filterCard: true,
+								filterTarget: function (card, player, target) {
+									return target != player && target.hasZhuSkill('twchongwang', player) && !target.storage.twchongwang.contains(player);
+								},
+								position: 'he',
+								ai1: function (card) {
+									if (card.name == 'du') return 10;
+									else if (ui.selected.cards.length && ui.selected.cards[0].name == 'du') return 0;
+									var player = _status.event.player;
+									if (ui.selected.cards.length > 4 || !game.hasPlayer(function (current) {
+										return get.attitude(player, current) > 0 && !current.hasSkillTag('nogain');
+									})) return 0;
+									return 1 / Math.max(0.1, get.value(card));
+								},
+								ai2: function (target) {
+									var player = _status.event.player, att = get.attitude(player, target);
+									if (ui.selected.cards[0].name == 'du') return -att;
+									if (target.hasSkillTag('nogain')) att /= 6;
+									return att;
+								},
+							});
+							'step 1'
+							if (result.bool) {
+								player.logSkill('twchongwang', result.targets[0]);
+								result.targets[0].gain(result.cards, player, 'giveAuto');
+								result.targets[0].storage.twchongwang.push(player);
+								result.targets[0].storage.twchongwangx.push(player);
+							}
+						},
+					},
+				},
+			},
 			//公孙范
 			twhuiyuan:{
 				audio:2,
@@ -13806,6 +14152,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twhuiyuan_info:'当你于出牌阶段使用牌结算结束后，若你未于此阶段获得过此类型的牌，你可以展示一名角色的一张手牌，若此牌与你使用的牌类型相同，你获得此牌，否则你弃置此牌，然后其摸一张牌。游击：对其造成1点伤害。',
 			twshoushou:'收绶',
 			twshoushou_info:'①当你获得其他角色的牌时，若你在任意角色的攻击范围内，其他角色至你的距离+1。②当你造成或受到伤害后，若你不在任意其他角色的攻击范围内，其他角色至你的距离-1。',
+			twshijun:'师君',
+			twshijun_info:'主公技，其他群势力角色出牌阶段限一次，若你没有“米”，其可以摸一张牌，然后将一张牌置于你的武将牌上，称为“米”。',
+			twjuxiang:'踞襄',
+			twjuxiang_info:'主公技，其他群势力角色出牌阶段限一次，其可以选择其装备区的一张牌移动到你的装备区中，若你对应的装备栏已被废除，则改为交给你此装备牌，然后恢复你的对应装备栏。',
+			tw_ol_sunjian:'TW孙坚',
+			twpolu:'破虏',
+			twpolu_info:'主公技，当吴势力角色杀死一名角色或死亡后，你可以令任意名角色各摸X张牌（X为你此前发动过此技能的次数+1）。',
+			tw_menghuo:'TW孟获',
+			twqiushou:'酋首',
+			twqiushou_info:'主公技，锁定技，当一张【南蛮入侵】结算结束后，若此牌造成的伤害大于3点或有角色因此死亡，所有蜀势力和群势力角色各摸一张牌。',
+			twzhuiting:'坠廷',
+			twzhuiting_info:'主公技，当一张锦囊牌即将对你生效时，其他魏势力角色和群势力角色可将一张与此牌颜色相同的牌当作【无懈可击】使用。',
+			twniju:'逆拒',
+			twniju_info:'主公技，当你的拼点牌亮出后，你可以令其中一张拼点牌的点数+X或-X，然后若这两张牌的点数相等，你摸X张牌（X为场上群势力角色数）。',
+			ol_liuyu:'TW刘虞',
+			twchongwang:'崇望',
+			twchongwang_info:'主公技，其他群势力角色的出牌阶段开始时，其可以交给你一张牌，然后你与其使用【杀】或伤害性锦囊牌指定目标时不能指定对方为目标直至你的下回合结束（每名角色限发动一次）。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',
@@ -13813,6 +14176,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_yunchouren:'运筹帷幄·仁',
 			tw_yunchouyong:'运筹帷幄·勇',
 			tw_yunchouyan:'运筹帷幄·严',
+			tw_zhu:'海外服·主公',
 			tw_sp:'海外服·SP',
 			tw_swordsman:'海外服·武侠篇',
 			tw_mobile2:'海外服·异构',

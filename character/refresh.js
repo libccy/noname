@@ -8169,7 +8169,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget([1,player.hp],get.prompt2('wulie'),lib.filter.notMe).set('ai',function(){return 0});
+					player.chooseTarget([1,player.hp],get.prompt2('wulie'),lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player;
+						if(player.hasUnknown()) return 0;
+						if(player.hp-ui.selected.targets.length>1+player.countCards('hs',card=>player.canSaveCard(card,player))) return get.attitude(player,target);
+						return 0;
+					});
 					'step 1'
 					if(result.bool){
 						var targets=result.targets.sortBySeat();
