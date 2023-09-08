@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			old:{
 				old_standard:['ol_yuanshu'],
-				old_shenhua:["yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","old_xiaoqiao","pangde","xuhuang",'junk_sunquan',"huangzhong","new_caoren",'old_chendao'],
+				old_shenhua:['old_caocao',"yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","old_xiaoqiao","pangde","xuhuang",'junk_sunquan',"huangzhong","new_caoren",'old_chendao'],
 				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong",'old_re_lidian'],
 				old_yijiang1:["masu","xushu","xin_yujin","old_xusheng","old_lingtong","fazheng",'old_gaoshun'],
 				old_yijiang2:["old_zhonghui","madai",'old_handang','old_liubiao','oldre_liubiao','old_guanzhang'],
@@ -21,6 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			old_caocao:['male','shen',3,['junkguixin','feiying'],['die_audio']],
 			old_chendao:['male','shu',4,['drlt_wanglie']],
 			old_liyan:['male','shu',3,['duliang','fulin']],
 			old_re_lidian:['male','wei',3,['xunxun','wangxi']],
@@ -87,6 +88,82 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_wanglang:['male','wei',3,['gushe','jici']],
 		},
 		skill:{
+			//魏武帝
+			junkguixin:{
+				init:function(){
+					if(!_status.junkguixin){
+						_status.junkguixin=[];
+						for(var name in lib.character){
+							if(!lib.character[name][3]) continue;
+							if(game.players.some(target=>{
+								if(target.name&&target.name==name) return true;
+								if(target.name1&&target.name1==name) return true;
+								if(target.name2&&target.name2==name) return true;
+								return false;
+							})) continue;
+							_status.junkguixin.addArray(lib.character[name][3].filter(skill=>{
+								var info=get.info(skill);
+								return info&&info.zhuSkill&&(!info.ai||!info.ai.combo);
+							}));
+						}
+					}
+				},
+				unique:true,
+				audio:'guixin',
+				trigger:{player:'phaseEnd'},
+				direct:true,
+				content:function(){
+					'step 0'
+					var controls=['获得技能','修改势力','cancel2'];
+					if(!_status.junkguixin.some(skill=>!player.hasSkill(skill,null,false,false))) controls.shift();
+					player.chooseControl(controls).set('prompt',get.prompt2('junkguixin')).set('ai',()=>_status.event.controls.length==3?'获得技能':'cancel2');
+					'step 1'
+					if(result.control!='cancel2'){
+						var next=game.createEvent('junkguixinx');
+						next.player=player;
+						next.setContent(lib.skill.junkguixin['content_'+result.control]);
+					}
+				},
+				content_获得技能:function(){
+					'step 0'
+					var list=_status.junkguixin.slice().filter(skill=>!player.hasSkill(skill,null,false,false));
+					if(!list.length){event.finish();return;}
+					list=list.map(skill=>{
+						return [
+							skill,
+							'<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【'+get.translation(skill)+'】</div><div>'+lib.translate[skill+'_info']+'</div></div>',
+						];
+					});
+					player.chooseButton([
+						'归心：选择获得一个主公技',
+						[list,'textbutton'],
+					],true).set('ai',button=>1+Math.random());
+					'step 1'
+					if(result.bool){
+						player.logSkill('junkguixin');
+						player.addSkillLog(result.links[0]);
+					}
+				},
+				content_修改势力:function(){
+					'step 0'
+					player.chooseTarget('请选择【归心】的目标','更改一名其他角色的势力',lib.filter.notMe,true).set('ai',target=>1+Math.random());
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('junkguixin',target);
+						var list=lib.group.slice();
+						list.removeArray(['shen',target.group]);
+						player.chooseControl(list).set('prompt','请选择'+get.translation(target)+'变更的势力').set('ai',()=>_status.event.controls.randomGet());
+					}
+					else event.finish();
+					'step 1'
+					if(result.control){
+						player.popup(get.translation(result.control+'2'));
+						target.changeGroup(result.control);
+					}
+				},
+			},
 			oldqinqing:{
 				audio:'qinqing',
 				mode:['identity','versus'],
@@ -1024,6 +1101,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_re_lidian:'旧李典',
 			old_liyan:'旧李严',
 			old_chendao:'旧陈到',
+			old_caocao:'神曹操',
+			old_caocao_ab:'魏武帝',
+			junkguixin:'归心',
+			junkguixin_info:'回合结束时，你可以选择一项：①获得剩余武将牌堆的所有主公技的其中一个技能；②更改一名其他角色的势力。',
 			
 			old_standard:'标准包',
 			old_shenhua:'神话再临',
