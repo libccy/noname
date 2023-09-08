@@ -20348,6 +20348,11 @@
 						this.node.hp.hide();
 					}
 					if(skill!=false){
+						skills=skills.filter(skill=>{
+							var info=get.info(skill);
+							if(info&&info.zhuSkill&&!this.isZhu2()) return false;
+							return true;
+						});
 						for(var i=0;i<skills.length;i++){
 							this.addSkill(skills[i]);
 						}
@@ -20498,6 +20503,8 @@
 						this.removeSkill(info1[3][i]);
 					}
 					for(var i=0;i<info2[3].length;i++){
+						var info=get.info(info2[3][i]);
+						if(info&&info.zhuSkill&&!this.isZhu2()) continue;
 						this.addSkill(info2[3][i]);
 					}
 					if(Array.isArray(maxHp)){
@@ -26128,22 +26135,25 @@
 				hasStockSkill:function(skill,arg1,arg2,arg3){
 					return game.expandSkills(this.getStockSkills(arg1,arg2,arg3)).contains(skill);
 				},
+				isZhu2:function(){
+					var player=this,mode=get.mode();
+					if(!this.isZhu) return false;
+					if(mode=='identity') return true;
+					if(mode=='versus'&&(_status.mode=='four'||_status.mode=='guandu')) return true;
+					return false;
+				},
 				hasZhuSkill:function(skill,player){
 					if(!this.hasSkill(skill)) return false;
-					var mode=get.mode();
-					if(mode=='identity'||(mode=='versus'&&(_status.mode=='four'||_status.mode=='guandu'))){
-						if(mode!='identity'){
-							if(player&&this.side!=player.side) return false;
+					if(player){
+						var mode=get.mode();
+						if(mode=='identity'&&_status.mode=='purple'){
+							if(this.identity.slice(0,1)!=player.identity.slice(0,1)) return false;
 						}
-						if(_status.mode=='purple'){
-							if(player&&this.identity.slice(0,1)!=player.identity.slice(0,1)) return false;
-						}
-						if(this.isZhu==true) return true;
-						for(var i in this.storage){
-							if(i.indexOf('zhuSkill_')==0&&this.storage[i].contains(skill)) return true;
+						if(mode=='versus'&&(_status.mode=='four'||_status.mode=='guandu')){
+							if(this.side!=player.side) return false;
 						}
 					}
-					return false;
+					return true;
 				},
 				hasGlobalTag:function(tag,arg){
 					var skills=lib.skill.global.slice(0);
