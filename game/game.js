@@ -3848,6 +3848,18 @@
 						intro:'关闭扩展武将包仍加载扩展武将图片',
 						init:true,
 						unfrequent:true,
+					},
+					show_skillnamepinyin:{
+						name:'显示技能名拼音',
+						intro:'在武将资料卡显示技能名拼音',
+						init:true,
+						unfrequent:true,
+					},
+					show_characternamepinyin:{
+						name:'显示武将名拼音等信息',
+						intro:'在武将资料卡显示武将名及其拼音、性别、势力、体力等信息',
+						init:true,
+						unfrequent:true,
 					}
 				}
 			},
@@ -52102,6 +52114,9 @@
 					fav.classList.add('active');
 				}
 				var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
+				if(lib.config.show_characternamepinyin){
+					intro.innerHTML='<span style="font-weight:bold;margin-right:5px;line-height:2">'+get.rawName(name)+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+get.pinyin(get.rawName(name))+']'+'</span>'+' | '+get.translation(lib.character[name][0])+' | '+get.translation(lib.character[name][1])+' | '+lib.character[name][2]+'<br>'+get.characterIntro(name);
+				}
 				var intro2=ui.create.div('.characterintro.intro2',uiintro);
 				var list=get.character(name,3)||[];
 				var skills=ui.create.div('.characterskill',uiintro);
@@ -52120,7 +52135,11 @@
 						current.classList.remove('active');
 					}
 					this.classList.add('active');
-					intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+get.translation(this.link)+'</span>'+get.skillInfoTranslation(this.link);
+					if(lib.config.show_skillnamepinyin){
+						intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+get.translation(this.link)+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+get.pinyin(get.translation(this.link))+']'+'</span>'+'  '+get.skillInfoTranslation(this.link);
+					}else{
+						intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+get.translation(this.link)+'</span>'+get.skillInfoTranslation(this.link);
+					}
 					var info=get.info(this.link);
 					var skill=this.link;
 					var playername=this.linkname;
@@ -52131,7 +52150,11 @@
 							derivation=[derivation];
 						}
 						for(var i=0;i<derivation.length;i++){
-							intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+get.translation(derivation[i])+'</span>'+get.skillInfoTranslation(derivation[i]);
+							if(lib.config.show_skillnamepinyin){
+								intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+get.translation(derivation[i])+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+get.pinyin(get.translation(derivation[i]))+']'+'</span>'+'  '+get.skillInfoTranslation(derivation[i]);
+							}else{
+								intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+get.translation(derivation[i])+'</span>'+get.skillInfoTranslation(derivation[i]);
+							}
 						}
 					}
 					if(info.alter){
