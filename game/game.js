@@ -53627,6 +53627,53 @@
 			}
 			return 0;
 		},
+		//从json中获取对象或数组，然后赋值给游戏内一个变量
+		loadJsonFromFile:function (filePath, callback, targetObject) {
+			// 默认参数处理
+			if (!targetObject) {
+				targetObject = Array.isArray(targetObject) ? [] : {};
+			}
+		
+			// 参数校验
+			if (typeof filePath !== 'string' || typeof callback !== 'function') {
+				throw new Error('无效的参数');
+			}
+		
+			// 读取配置文件
+			game.readFile(filePath, function (data) {
+				try {
+					// 解析配置文件内容
+					var isBuffer = data instanceof ArrayBuffer;
+					var config;
+					if (isBuffer) {
+						var decoder = new TextDecoder("UTF-8");
+						var decodedData = decoder.decode(data);
+						config = JSON.parse(decodedData);
+					} else {
+						config = JSON.parse(data);
+					}
+		
+					// 合并配置到目标对象
+					if (Array.isArray(config)) {
+						if (Array.isArray(targetObject)) {
+							targetObject.push.apply(targetObject, config);
+						}
+					} else {
+						for (var key in config) {
+							if (config.hasOwnProperty(key)) {
+								targetObject[key] = config[key];
+							}
+						}
+					}
+		
+					callback(null, targetObject);
+				} catch (err) {
+					callback('无法解析 JSON 文件', null);
+				}
+			}, function (err) {
+				callback('无法读取 JSON 文件', null);
+			});
+		},
 		yunjiao:function(str){
 			const util=window.pinyinUtilx;
 			if(util) str=util.removeTone(str)
