@@ -9695,7 +9695,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					'step 1'
 					if(player.hp<3) player.recover(3-player.hp);
-					game.log(player,'获得了技能','#g【思蜀】','和','#g【激将】');
 					player.addSkillLog('sishu');
 					player.addSkillLog('rejijiang');
 					'step 2'
