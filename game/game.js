@@ -154,6 +154,99 @@
 		extensionPack:{},
 		cardType:{},
 		hook:{globaltrigger:{},globalskill:{}},
+		//函数钩子
+		hooks:{
+			// 本体势力的颜色
+			addGroup:[(id,_short,_name,config)=>{
+				if("color" in config&&config.color!=null){
+					let color1,color2,color3,color4;
+					if (typeof config.color=="string"&&/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(config.color)){
+						let c1=parseInt(`0x${item[1].slice(1, 3)}`);
+						let c2=parseInt(`0x${item[1].slice(3, 5)}`);
+						let c3=parseInt(`0x${item[1].slice(5, 7)}`);
+						color1=color2=color3=color4=[c1,c2,c3,1];
+					}
+					else if(Array.isArray(config.color)&&config.color.length==4){
+						if(config.color.every(item=>Array.isArray(item))){
+							color1=config.color[0];
+							color2=config.color[1];
+							color3=config.color[2];
+							color4=config.color[3];
+						}
+						else color1=color2=color3=color4=config.color;
+					}
+					if(color1&&color2&&color3&&color4){
+						const cs=lib.linq.cselector;
+						const g1=cs.group(
+							cs.concat(
+								cs.class("player","identity"),
+								cs.isAttr("data-color",`"${id}"`)
+							),
+							cs.concat(
+								"div",
+								cs.isAttr("data-nature",`"${id}"`)
+							),
+							cs.concat(
+								"span",
+								cs.isAttr("data-nature",`"${id}"`)
+							)
+						);
+						const g2=cs.group(
+							cs.concat(
+								"div",
+								cs.isAttr("data-nature",`"${id}m"`)
+							),
+							cs.concat(
+								"span",
+								cs.isAttr("data-nature",`"${id}m"`)
+							)
+						);
+						const g3=cs.group(
+							cs.concat(
+								"div",
+								cs.isAttr("data-nature",`"${id}mm"`)
+							),
+							cs.concat(
+								"span",
+								cs.isAttr("data-nature",`"${id}mm"`)
+							)
+						);
+						let result={};
+						result[g1]={
+							textShadow:cs.group(
+								"black 0 0 1px",
+								`rgba(${color1.join()}) 0 0 2px`,
+								`rgba(${color2.join()}) 0 0 5px`,
+								`rgba(${color3.join()}) 0 0 10px`,
+								`rgba(${color4.join()}) 0 0 10px`
+							)
+						};
+						result[g2]={
+							textShadow:cs.group(
+								"black 0 0 1px",
+								`rgba(${color1.join()}) 0 0 2px`,
+								`rgba(${color2.join()}) 0 0 5px`,
+								`rgba(${color3.join()}) 0 0 5px`,
+								`rgba(${color4.join()}) 0 0 5px`,
+								"black 0 0 1px"
+							)
+						};
+						result[g3]={
+							textShadow:cs.group(
+								"black 0 0 1px",
+								`rgba(${color1.join()}) 0 0 2px`,
+								`rgba(${color2.join()}) 0 0 2px`,
+								`rgba(${color3.join()}) 0 0 2px`,
+								`rgba(${color4.join()}) 0 0 2px`,
+								"black 0 0 1px"
+							)
+						};
+						game.dynamicStyle.addObject(result);
+						lib.groupnature[id]=id;
+					}
+				}
+			}],
+		},
 		hookmap:{},
 		imported:{},
 		layoutfixed:['chess','tafang','stone'],
@@ -2270,6 +2363,7 @@
 											ui.css.border_stylesheet.remove();
 										}
 										ui.css.border_stylesheet=lib.init.sheet();
+										ui.css.border_stylesheet.id="ui.css.border";
 										ui.css.border_stylesheet.sheet.insertRule('#window .player>.framebg{display:block;background-image:url("'+fileLoadedEvent.target.result+'")}',0);
 										ui.css.border_stylesheet.sheet.insertRule('.player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}',0);
 									};
@@ -7168,6 +7262,56 @@
 				generator:item=>gnc.is.generator(item)
 			}
 		},
+		comparator:{
+			e:function(){
+				if(arguments.length==0) return false;
+				if(arguments.length==1) return true;
+				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return false;
+				return true;
+			},
+			ei:function(){
+				if(arguments.length==0) return false;
+				if(arguments.length==1) return true;
+				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return true;
+				return false;
+			},
+			ne:function(){
+				if(arguments.length==0) return false;
+				if(arguments.length==1) return true;
+				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return false;
+				return true;
+			},
+			nei:function(){
+				if(arguments.length==0) return false;
+				if(arguments.length==1) return true;
+				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return true;
+				return false;
+			},
+			te:function(){
+				if(arguments.length==0)return false;
+				if(arguments.length==1)return arguments[0]!==null;
+				const type=typeof arguments[0];
+				for(let i=1;i<arguments.length;++i) if(type!==arguments[i])return false;
+				return true;
+			}
+		},
+		creation:{},
+		linq:{
+			cselector:{
+				hasAttr:name=>`[${name}]`,
+				isAttr:(name,item)=>`[${name}=${item}]`,
+				inAttr:(name,item)=>`[${name}~=${item}]`,
+				conAttr:(name,item)=>`[${name}*=${item}]`,
+				onAttr:(name,item)=>`[${name}|=${item}]`,
+				bgnAttr:(name,item)=>`[${name}^=${item}]`,
+				endAttr:(name,item)=>`[${name}^=${item}]`,
+				merge:function(){return Array.from(arguments).join(" ");},
+				concat:function(){return Array.from(arguments).join("");},
+				class:function(){return `.${Array.from(arguments).join(".")}`;},
+				group:function(){return Array.from(arguments).join(",");},
+				media:type=>`@media ${type}`
+			}
+		},
 		init:{
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
@@ -8238,6 +8382,27 @@
 					delete _status.htmlbg;
 
 					window.game=game;
+					game.dynamicStyle.init();
+					Object.defineProperty(lib.creation,"a",{
+						enumerable:true,
+						get:()=>[],
+						set:()=>null
+					});
+					Object.defineProperty(lib.creation,"o",{
+						enumerable:true,
+						get:()=>({}),
+						set:()=>null
+					});
+					Object.defineProperty(lib.creation,"no",{
+						enumerable:true,
+						get:()=>Object.create(null),
+						set:()=>null
+					});
+					Object.defineProperty(lib.creation,"s",{
+						enumerable:true,
+						get:()=>"",
+						set:()=>null
+					});
 					// node:path library alternative
 					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
 						lib.path=window._noname_path;
@@ -32172,8 +32337,39 @@
 			'哥哥，交个朋友吧',
 			'妹子，交个朋友吧',
 		],
+		other:{
+			bool:(item)=>Boolean(item),
+			ignore:()=>{}
+		}
 	};
 	const game={
+		//addGroup
+		//基于钩子的添加势力方法
+		addGroup:(id,short,name,config)=>{
+			if(!id) throw new TypeError();
+			if(lib.comparator.te(short,"object")){
+				config=short;
+				short=null;
+			}
+			if(lib.comparator.te(name,"object")){
+				config=name;
+				name=null;
+			}
+			if(!lib.comparator.te(short,"string")&&short){
+				name=short;
+			}
+			lib.group.add(id);
+			if(short)lib.translate[id] = short;
+			if(name)lib.translate[`${id}2`] = name;
+			lib.onload.add(()=>{
+				for(const hook of lib.hooks.addGroup){
+					if(hook!=null&&typeof hook=="function"){
+						hook(id,short,name,config);
+					}
+				}
+			})
+			return id;
+		},
 		//Yingbian
 		//应变
 		yingbianEffect:function(event,content){
@@ -32190,6 +32386,78 @@
 		setSimpleYingbianCondition:(yingbianCondition,condition)=>game.broadcastAll((yingbianCondition,condition)=>lib.yingbian.condition.simple.set(yingbianCondition,condition),yingbianCondition,condition),
 		setYingbianEffect:(yingbianEffect,effect)=>game.broadcastAll((yingbianEffect,effect)=>lib.yingbian.effect.set(yingbianEffect,effect),yingbianEffect,effect),
 		setYingbianPrompt:(yingbian,prompt)=>game.broadcastAll((yingbian,prompt)=>lib.yingbian.prompt.set(yingbian,prompt),yingbian,prompt),
+		//动态CSS from libnodiz
+		dynamicStyle:{
+			init:()=>{
+				const that=game.dynamicStyle;
+				that._cache={};
+				that._cache.rules=[];
+				that._cache.style=document.createElement("style");
+				that._cache.style.id="game.dynamicStyle";
+				document.head.appendChild(that._cache.style);
+				that._cache.sheet = that._cache.style.sheet;
+				delete game.dynamicStyle.init;
+				return true;
+			},
+			translate:style=>{
+				let result=[];
+				for(const name in style){
+					result.push(`${name.replace(/([A-Z])/g, match => `-${match.toLowerCase()}`)}: ${style[name]};`);
+				}
+				return result.join(" ");
+			},
+			generate:(name, style)=>[`${name} {`, game.dynamicStyle.translate(style), "}"].join(" "),
+			has:name=>game.dynamicStyle._cache.rules.some(item=>item[0]==name),
+			get:name=>game.dynamicStyle.find(item=>item[0]==name)[1],
+			find:fn=>game.dynamicStyle._cache.rules.find(fn),
+			size:()=>game.dynamicStyle._cache.rules.length,
+			indexOf:name=>{
+				for (let i=0;i<game.dynamicStyle._cache.rules.length;++i){
+					if(name==game.dynamicStyle._cache.rules[i][0]) return i;
+				}
+				return -1;
+			},
+			add:(name,style)=>{
+				const that=game.dynamicStyle;
+				return that.update(name,that.has(name)?Object.assign({},that.get(name),style):style);
+			},
+			addObject:object=>{
+				const that=game.dynamicStyle;
+				let result=[];
+				for(const name in object){
+					result.push(that.add(name, object[name]));
+				}
+				return result;
+			},
+			remove:name=>{
+				const that=game.dynamicStyle;
+				if(!that.has(name)) return false;
+				const index=that.indexOf(name);
+				that._cache.rules.splice(index,1);
+				that._cache.sheet.deleteRule(index);
+				return true;
+			},
+			update:(name,style)=>{
+				const that=game.dynamicStyle;
+				try{
+					if(that.has(name)){
+						const index=that.indexOf(name);
+						that._cache.sheet.deleteRule(index);
+						that._cache.sheet.insertRule(that.generate(name,style),index);
+						that._cache.rules[index] = [name, style];
+					}else{
+						const index=that._cache.rules.length;
+						that._cache.rules.push([name,style]);
+						that._cache.sheet.insertRule(that.generate(name,style),index);
+					}
+					return true;
+				}
+				catch(e){
+					console.log(e);
+					return false;
+				}
+			}
+		},
 		//Add a background music to the config option
 		//在设置选项中添加一首背景音乐
 		addBackgroundMusic:(link,musicName,aozhan)=>{
