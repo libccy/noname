@@ -5376,7 +5376,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card){
 					return get.color(card)=='red';
 				},
-				viewAs:{name:'huogong',nature:'fire'},
+				viewAs:{name:'huogong'},
 				viewAsFilter:function(player){
 					if(!player.countCards('hs',{color:'red'})) return false;
 				},
