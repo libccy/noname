@@ -53604,6 +53604,29 @@
 			}
 			return str;
 		},
+		//将前后两个版本进行比较版本大小，若前面的版本大于后面的版本，则返回1，
+		//若小于，则返回-1，若等于则返回0
+		compareVersion:function(currentVersion, compareVersion) {
+			currentVersion = currentVersion || "0.0.0";
+			compareVersion = compareVersion || "0.0.0";
+		
+			var arr1 = currentVersion.split(".");
+			var arr2 = compareVersion.split(".");
+			
+			for (var i = 0; i < Math.min(arr1.length, arr2.length); i++) {
+				var num1 = parseInt(arr1[i]);
+				var num2 = parseInt(arr2[i]);
+				if (num1 < num2) return -1;
+				if (num1 > num2) return 1;
+			}
+
+			if (arr1.length > arr2.length) {
+				return 1;
+			} else if (arr1.length < arr2.length) {
+				return -1;
+			}
+			return 0;
+		},
 		yunjiao:function(str){
 			const util=window.pinyinUtilx;
 			if(util) str=util.removeTone(str)
