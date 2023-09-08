@@ -6314,6 +6314,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.classList.add('scroll2');
 						dialog.classList.add('fullwidth');
 						dialog.classList.add('fullheight');
+						ui.arena.classList.add('choose-to-move');
 						dialog.buttonss=[];
 						
 						var list=['协力锻造的玩家','妨碍锻造的玩家']
@@ -6398,6 +6399,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.pause();
 					}
 					'step 4'
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-to-move');
+					},500);
 					game.delay(2);
 					var num1=0,num2=0;
 					for(var i of event.cards2[0]) num1+=get.number(i,false);
