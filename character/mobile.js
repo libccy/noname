@@ -775,12 +775,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.name!='phase'||game.phaseNumber==0;
 				},
-				derivation:'mbdanggu_faq',
+				derivation:['mbdanggu_faq','mbdanggu_faq2'],
 				forced:true,
 				unique:true,
 				onremove:function(player){
 					delete player.storage.mbdanggu;
 					delete player.storage.mbdanggu_current;
+					if(lib.skill.mbdanggu.isSingleShichangshi(player)){
+						game.broadcastAll(function(player){
+							player.name1=player.name;
+							player.smoothAvatar(false);
+							player.node.avatar.setBackground(player.name,'character');
+							player.node.name.innerHTML=get.slimName(player.name);
+							delete player.name2;
+							player.classList.remove('fullskin2');
+							player.node.avatar2.classList.add('hidden');
+							player.node.name2.innerHTML='';
+							if(player==game.me&&ui.fakeme){
+								ui.fakeme.style.backgroundImage=player.node.avatar.style.backgroundImage;
+							}
+						},player);
+					}
 				},
 				changshi:[
 					['scs_zhangrang','scstaoluan'],
@@ -794,17 +809,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					['scs_guosheng','scsniqu'],
 					['scs_gaowang','scsmiaoyu']
 				],
-				conflictMap:{
-					scs_zhangrang:[],
-					scs_zhaozhong:[],
-					scs_sunzhang:[],
-					scs_bilan:['scs_hankui'],
-					scs_xiayun:[],
-					scs_hankui:['scs_bilan'],
-					scs_lisong:[],
-					scs_duangui:['scs_guosheng'],
-					scs_guosheng:['scs_duangui'],
-					scs_gaowang:['scs_hankui','scs_duangui','scs_guosheng','scs_bilan'],
+				conflictMap:function(){
+					if(!_status.changshiMap){
+						_status.changshiMap={
+							scs_zhangrang:[],
+							scs_zhaozhong:[],
+							scs_sunzhang:[],
+							scs_bilan:['scs_hankui'],
+							scs_xiayun:[],
+							scs_hankui:['scs_bilan'],
+							scs_lisong:[],
+							scs_duangui:['scs_guosheng'],
+							scs_guosheng:['scs_duangui'],
+							scs_gaowang:[],
+						};
+						var list=lib.skill.mbdanggu.changshi.map(i=>i[0]);
+						for(var i of list){
+							var select=list.filter(scs=>scs!=i&&!_status.changshiMap[i].contains(i));
+							_status.changshiMap[i].addArray(select.randomGets(get.rand(0,select.length)));
+						}
+					}
+					return _status.changshiMap;
 				},
 				group:'mbdanggu_back',
 				content:function(){
@@ -831,68 +856,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				contentx:function(){
 					'step 0'
-					var list=player.getStorage('mbdanggu');
-					var first=list.randomRemove(1)[0];
+					var list=player.getStorage('mbdanggu').slice();
+					var first=list.randomRemove();
 					event.first=first;
-					game.broadcastAll(function(changshi){
-						if(lib.config.background_speak) game.playAudio('skill',changshi+'_enter');
-					},first);
-					if(lib.skill.mbdanggu.isSingleShichangshi(player)){
-						game.broadcastAll(function(player,first){
-							if(!player.name2) player.smoothAvatar(false);
-							player.name1=first;
-							player.node.avatar.setBackground(first,'character');
-							player.node.name.innerHTML=get.slimName(first);
-							delete player.name2;
-							player.smoothAvatar(true);
-							player.node.avatar2.classList.add('hidden');
-							player.classList.remove('fullskin2');
-							player.node.name2.innerHTML='';
-							if(player==game.me&&ui.fakeme){
-								ui.fakeme.style.backgroundImage=player.node.avatar.style.backgroundImage;
-							}
-						},player,first);
-					}
-					if(list.contains('scs_gaowang')){
-						var others=list.filter(changshi=>{
-							return changshi!='scs_gaowang';
-						}).randomGets(3);
-						others.push('scs_gaowang');
-						others.randomSort();
-					}
+					var others=list.randomGets(4);
+					if(others.length==1) event._result={bool:true,links:others};
 					else{
-						var others=list.randomGets(4);
-					}
-					var next=player.chooseButton([
-						'党锢：请选择结党对象',
-						[[first],'character'],
-						'<div class="text center">可选常侍</div>',
-						[others,'character']
-					],true);
-					next.set('filterButton',button=>{
-						if(_status.event.canChoose.contains(button.link)) return true;
-						return false;
-					})
-					next.set('canChoose',function(){
-						var list=others.filter(changshi=>{
-							var map=lib.skill.mbdanggu.conflictMap;
+						var conflictList=others.filter(changshi=>{
+							var map=lib.skill.mbdanggu.conflictMap();
 							var names=map[first];
-							return !names.contains(changshi);
-						});
-						return list.length?list:others;
-					}());
-					next.set('ai',button=>{
-						if(button.link=='scs_gaowang') return 10;
-						return Math.random()*10;
-					})
+							return names.contains(changshi);
+						}),list=others.slice();
+						if(conflictList.length){
+							var conflict=conflictList.randomGet();
+							list.remove(conflict);
+							game.broadcastAll(function(changshi,player){
+								if(lib.config.background_speak){
+									if(player.isUnderControl(true)) game.playAudio('skill',changshi+'_enter');
+								}
+							},conflict,player);
+						}
+						player.chooseButton([
+							'党锢：请选择结党对象',
+							[[first],'character'],
+							'<div class="text center">可选常侍</div>',
+							[others,'character']
+						],true).set('filterButton',button=>{
+							return _status.event.canChoose.contains(button.link);
+						}).set('canChoose',list).set('ai',button=>Math.random()*10);
+					}
 					'step 1'
 					if(result.bool){
 						var first=event.first;
 						var chosen=result.links[0];
 						var skills=[];
 						var list=lib.skill.mbdanggu.changshi;
-						var changshis=[event.first,chosen];
-						player.unmarkAuto('mbdanggu',[chosen]);
+						var changshis=[first,chosen];
+						player.unmarkAuto('mbdanggu',changshis);
 						player.storage.mbdanggu_current=changshis;
 						for(var changshi of changshis){
 							for(var cs of list){
@@ -900,7 +900,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						if(lib.skill.mbdanggu.isSingleShichangshi(player)){
-							game.broadcastAll(function(player,chosen){
+							game.broadcastAll(function(player,first,chosen){
+								player.name1=first;
+								player.node.avatar.setBackground(first,'character');
+								player.node.name.innerHTML=get.slimName(first);
 								player.name2=chosen;
 								player.classList.add('fullskin2');
 								player.node.avatar2.classList.remove('hidden');
@@ -909,21 +912,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(player==game.me&&ui.fakeme){
 									ui.fakeme.style.backgroundImage=player.node.avatar.style.backgroundImage;
 								}
-							},player,chosen);
+							},player,first,chosen);
 						}
 						game.log(player,'选择了常侍','#y'+get.translation(changshis));
-						game.broadcastAll(function(changshi){
-							if(lib.config.background_speak) game.playAudio('skill',changshi+'_enter');
-						},chosen);
 						if(skills.length){
 							player.addAdditionalSkill('mbdanggu',skills);
-							game.log(player,'获得了技能','#g'+get.translation(skills));
-							player.popup(skills);
+							var str='';
+							for(var i of skills){
+								str+='【'+get.translation(i)+'】、';
+								player.popup(i);
+							}
+							str=str.slice(0,-1);
+							game.log(player,'获得了技能','#g'+str);
 						}
 					}
 				},
 				isSingleShichangshi:function(player){
-					var map=lib.skill.mbdanggu.conflictMap;
+					var map=lib.skill.mbdanggu.conflictMap();
 					return player.name=='shichangshi'&&(map[player.name1]&&map[player.name2]||map[player.name1]&&!player.name2||!player.name1&&!player.name2||player.name==player.name1&&!player.name2);
 				},
 				mod:{
@@ -934,11 +939,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return lib.skill.mbdanggu.mod.aiValue.apply(this,arguments);
 					},
 				},
+				ai:{
+					combo:'mbmowang',
+					nokeep:true,
+				},
 				intro:{
 					mark:function(dialog,storage,player){
 						dialog.addText('剩余常侍');
 						dialog.addSmall([storage,'character']);
-						if(player.storage.mbdanggu_current){
+						if(player.storage.mbdanggu_current&&player.isIn()){
 							dialog.addText('当前常侍');
 							dialog.addSmall([player.storage.mbdanggu_current,'character']);
 						}
@@ -953,6 +962,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						content:function(){
+							'step 0'
+							delete player.storage.mbdanggu_current;
+							if(lib.skill.mbdanggu.isSingleShichangshi(player)){
+								game.broadcastAll(function(player){
+									player.name1=player.name;
+									player.smoothAvatar(false);
+									player.node.avatar.setBackground(player.name,'character');
+									player.node.name.innerHTML=get.slimName(player.name);
+									delete player.name2;
+									player.classList.remove('fullskin2');
+									player.node.avatar2.classList.add('hidden');
+									player.node.name2.innerHTML='';
+									if(player==game.me&&ui.fakeme){
+										ui.fakeme.style.backgroundImage=player.node.avatar.style.backgroundImage;
+									}
+								},player);
+							}
+							'step 1'
 							var next=game.createEvent('mbdanggu_clique');
 							next.player=player;
 							next.setContent(lib.skill.mbdanggu.contentx);
@@ -985,6 +1012,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.includeOut=true;
 					}
 				},
+				ai:{combo:'mbdanggu'},
 				dieContent:function(){
 					'step 0'
 					event.forceDie=true;
@@ -1595,7 +1623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.targets.length==1&&event.card.name=='sha';
 				},
 				prompt2:function(event,player){
-					var str='展示牌堆顶的两张牌并增加伤害；且';
+					var str='亮出牌堆顶的两张牌并增加伤害；且';
 					str+=('令'+get.translation(event.target)+'不能使用');
 					str+='这两张牌所包含的花色';
 					str+=('的牌响应'+get.translation(event.card));
@@ -1622,7 +1650,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var suitx=get.suit(card,false);
 							suits.add(suitx);
 							if(suit==suitx) evt.baseDamage++;
-							ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
 						}
 						game.updateRoundNumber();
 					}
@@ -1665,6 +1692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						firstDo:true,
 						charlotte:true,
+						popup:false,
 						onremove:function(player){
 							delete player.storage.scschihe_block;
 							delete player.storage.scschihe_blocker;
@@ -12397,7 +12425,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:(event,player)=>{
 					if(event.type!='dying') return false;
 					if(player!=event.dying) return false;
-					return player.hasCard(card=>lib.skill.xinfu_jingxie2.filterCard(card,player),lib.skill.xinfu_jingxie2.position);
+					return player.hasCard(card=>lib.skill.xinfu_jingxie2.filterCard(card,player),'he');
 				},
 				position:"he",
 				discard:false,
@@ -14173,7 +14201,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbdanggu:'党锢',
 			mbdanggu_info:'锁定技。①游戏开始时，你获得十张“常侍”牌，然后你进行一次结党。②当你修整结束后，你进行一次结党并摸一张牌。③若你有亮出的“常侍”牌，你视为拥有这些牌的技能。',
 			mbdanggu_faq:'关于结党',
-			mbdanggu_faq_info:'<br>系统随机选择一张未亮出过的“常侍”牌，然后选择四张未亮出过的“常侍”牌（若剩余“常侍”牌中有「高望」，则必定出现）。你观看前者，然后从后者中选择一名与前者互相认可的“常侍”牌（不认可的“常侍”牌为不可选状态），你选择这两张牌。然后若此时不为双将模式，你将这两张武将牌作为你的武将牌（不移除原有技能）；否则你获得这两张武将牌上的技能。',
+			mbdanggu_faq_info:'<br>系统随机选择一张未亮出过的“常侍”牌，然后选择四张未亮出过的“常侍”牌。你观看前者，然后从后者中选择一名认可前者的“常侍”牌。然后若此时不为双将模式，你将这两张武将牌作为你的武将牌（不移除原有技能）；否则你获得这两张武将牌上的技能。',
+			mbdanggu_faq2:'关于认可',
+			mbdanggu_faq2_info:'<br>双向不认可常侍为固定组合：<br><li>郭胜、段珪<br><li>韩悝、毕岚<br>单向不认可常侍为系统随机分配。<br>每次结党至多存在一张不认可主将的常侍牌，且若此次结党仅有一张常侍牌，则不会存在不认可情况。',
 			mbmowang:'殁亡',
 			mbmowang_info:'锁定技。①当你死亡前，若你有未亮出的“常侍”牌且体力上限大于0，你将死亡改为修整至你的下个回合开始前，然后你复原武将牌，且不于此次死亡事件中进行展示身份牌、检测游戏胜利条件与执行奖惩的流程。②回合结束后，你死亡。',
 			mbmowang_faq:'关于修整',

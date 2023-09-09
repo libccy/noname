@@ -15,11 +15,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','dc_chenqun','re_caifuren','re_guyong','re_jushou','re_zhuhuan','re_zhangsong'],
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen','re_zhuzhi','re_caorui'],
 				refresh_yijiang6:['re_guohuanghou','re_sundeng'],
-				refresh_xinghuo:['re_duji','dc_gongsunzan','re_sp_taishici','re_caiyong','re_mazhong','re_wenpin','re_jsp_huangyueying'],
+				refresh_xinghuo:['xin_zhangliang','re_zhugedan','re_simalang','re_duji','dc_gongsunzan','re_sp_taishici','re_caiyong','re_mazhong','re_wenpin','re_jsp_huangyueying'],
 			},
 		},
 		connect:true,
 		character:{
+			xin_zhangliang:['male','qun',4,['rejijun','refangtong'],['unseen']],
+			re_simalang:['male','wei',3,['requji','rejunbing'],['unseen']],
+			re_zhugedan:['male','wei',4,['regongao','rejuyi'],['unseen']],
 			re_caorui:['male','wei',3,['huituo','mingjian','rexingshuai'],['unseen','zhu']],
 			re_caochong:['male','wei',3,['rechengxiang','renxin']],
 			ol_zhangzhang:['male','wu',3,['olzhijian','olguzheng']],
@@ -163,6 +166,206 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//界张梁
+			rejijun:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					return event.targets&&event.targets.contains(player);
+				},
+				frequent:true,
+				content:function(){
+					player.judge(card=>1).callback=lib.skill.rejijun.callback;
+				},
+				callback:function(){
+					if(typeof card.number=='number') player.addToExpansion(card,'gain2').gaintag.add('rejijun');
+				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+				marktext:'方',
+				ai:{combo:'refangtong'},
+			},
+			refangtong:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return player.countCards('h');
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseCard(get.prompt2('refangtong'),(card,player)=>typeof card.number=='number').set('ai',card=>{
+						var player=_status.event.player;
+						if(!game.hasPlayer(target=>target!=player&&get.damageEffect(target,player,player,'thunder')>0)) return 0;
+						if(player.getExpansions('rejijun').reduce(function(num,card){
+							return num=card.number;
+						},0)>36) return 1/(get.value(card)||0.5);
+						else{
+							if(lib.skill.refangtong.thunderEffect(card,player)) return 10-get.value(card);
+							return 5-get.value(card);
+						}
+					});
+					'step 1'
+					if(result.bool){
+						player.logSkill('refangtong');
+						player.addToExpansion(result.cards,player,'give').gaintag.add('rejijun');
+					}
+					else event.finish();
+					'step 2'
+					player.chooseButton(['###是否移去任意张“方”，对一名其他角色造成1点雷属性伤害？###若你移去的“方”的点数和大于36，则改为造成3点雷属性伤害',player.getExpansions('rejijun')],[1,player.getExpansions('rejijun').length]).set('ai',button=>{
+						var player=_status.event.player;
+						var cards=player.getExpansions('rejijun');
+						if(cards.reduce(function(num,card){
+							return num=card.number;
+						},0)<=36){
+							if(!ui.selected.buttons.length) return 1/button.link.number;
+							return 0;
+						}
+						else{
+							var num=0,list=[];
+							cards.sort((a,b)=>b.number-a.number);
+							for(var i=0;i<cards.length;i++){
+								list.push(cards[i]);
+								num+=cards[i].number;
+								if(num>36) break;
+							}
+							return list.contains(button.link)?1:0;
+						}
+					});
+					'step 3'
+					if(result.bool){
+						var bool=(result.links.reduce(function(num,card){
+							return num=card.number;
+						},0)>36);
+						event.bool=bool;
+						player.loseToDiscardpile(result.links);
+						player.chooseTarget('请选择一名其他角色','对其造成'+(bool?3:1)+'点雷属性伤害',lib.filter.notMe).set('ai',target=>get.damageEffect(target,_status.event.player,_status.event.player,'thunder'));
+					}
+					else event.finish();
+					'step 4'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target);
+						target.damage(event.bool?3:1,'thunder');
+					}
+				},
+				thunderEffect:function(card,player){
+					var cards=player.getExpansions('rejijun'),num=0;
+					cards.push(card);
+					if(cards.reduce(function(num,card){
+						return num=card.number;
+					},0)<=36) return false;
+					cards.sort((a,b)=>b.number-a.number);
+					var bool=false;
+					for(var i=0;i<cards.length;i++){
+						if(cards[i]==card) bool=true;
+						num+=cards[i].number;
+						if(num>36) break;
+					}
+					return bool;
+				},
+				ai:{combo:'rejijun'},
+			},
+			//界司马朗
+			requji:{
+				inherit:'quji',
+				content:function(){
+					'step 0'
+					target.recover();
+					'step 1'
+					if(target.isDamaged()) target.draw();
+					'step 2'
+					if(target==targets[targets.length-1]&&cards.some(card=>get.color(card,player)=='black')) player.loseHp();
+				},
+			},
+			rejunbing:{
+				audio:2,
+				trigger:{global:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return event.player.countCards('h')<event.player.getHp();
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var target=trigger.player;
+					event.player=player;
+					target.chooseBool(target==player?get.prompt('rejunbing'):'是否响应'+get.translation(player)+'的【郡兵】？','摸一张牌'+(target==player?'':'，将所有手牌交给'+get.translation(player)+'，然后其可以交给你等量张牌')).set('choice',get.attitude(target,player)>0);
+					'step 1'
+					if(result.bool){
+						player.logSkill('rejunbing',target);
+						if(target!=player) game.log(target,'响应了',player,'的','#g【郡兵】');
+						target.draw();
+					}
+					else event.finish();
+					'step 2'
+					var cards=target.getCards('h');
+					if(target==player||!cards.length){event.finish();return;}
+					target.give(cards,player);
+					event.num=cards.length;
+					'step 3'
+					if(player.countCards('he')<num) event.finish();
+					else player.chooseCard('郡兵：是否还给'+get.translation(target)+get.translation(num)+'张牌？','he',num).set('ai',card=>{
+						var player=_status.event.player;
+						var target=_status.event.target;
+						if(get.attitude(player,target)<=0){
+							if(card.name=='du') return 1145141919810;
+							return -get.value(card);
+						}
+						return 6-get.value(card);
+					}).set('target',target);
+					'step 4'
+					if(result.bool) player.give(result.cards,target);
+				},
+			},
+			//界诸葛诞
+			regongao:{
+				audio:2,
+				trigger:{global:'dying'},
+				filter:function(event,player){
+					if(player==event.player) return false;
+					return !player.getAllHistory('useSkill',evt=>evt.skill=='regongao'&&evt.targets[0]==event.player).length;
+				},
+				forced:true,
+				content:function(){
+					player.gainMaxHp();
+					player.recover();
+				},
+			},
+			rejuyi:{
+				unique:true,
+				audio:2,
+				derivation:['benghuai','reweizhong'],
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter:function(event,player){
+					return player.maxHp>game.countPlayer()&&player.isDamaged();
+				},
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				content:function(){
+					'step 0'
+					player.awakenSkill('rejuyi');
+					'step 1'
+					player.drawTo(player.maxHp);
+					'step 2'
+					player.addSkillLog('benghuai');
+					player.addSkillLog('reweizhong');
+				}
+			},
+			reweizhong:{
+				audio:2,
+				inherit:'weizhong',
+				content:function(){
+					player.draw(2);
+				},
+			},
 			//堪比界曹冲的界曹叡
 			rexingshuai:{
 				audio:2,
@@ -14749,6 +14952,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_caorui:'界曹叡',
 			rexingshuai:'兴衰',
 			rexingshuai_info:'主公技，限定技。当你进入濒死状态时，你可令其他魏势力角色依次选择是否令你回复1点体力。然后这些角色依次受到1点伤害。有〖明鉴〗效果的角色于其回合内杀死角色后，你重置〖兴衰〗。',
+			xin_zhangliang:'界张梁',
+			rejijun:'集军',
+			rejijun_info:'当你使用目标角色含有自己的牌结算完毕后，你可以进行一次判定并将判定牌置于武将牌上，称为“方”。',
+			refangtong:'方统',
+			refangtong_info:'结束阶段，你可以将一张手牌置于武将牌上，称为“方”。若如此做，你可以移去任意张“方”并对一名其他角色造成1点雷属性伤害（若你移去的“方”的点数和大于36，则改为造成3点雷属性伤害）。',
+			re_simalang:'界司马朗',
+			requji:'去疾',
+			requji_info:'出牌阶段限一次，你可以弃置至多X张牌并令等量名角色回复1点体力，然后仍处于受伤状态的目标角色摸一张牌，若你以此法弃置了黑色牌，你失去1点体力。',
+			rejunbing:'郡兵',
+			rejunbing_info:'一名角色的结束阶段，若其手牌数小于其体力值，其可以摸一张牌并将所有手牌交给你，然后你可以交给其等量的牌。',
+			re_zhugedan:'界诸葛诞',
+			regongao:'功獒',
+			regongao_info:'锁定技。一名其他角色首次进入濒死状态时，你增加1点体力上限，然后回复1点体力。',
+			rejuyi:'举义',
+			rejuyi_info:'觉醒技。准备阶段，若你已受伤，且你的体力上限大于场上的存活角色数，你将手牌数摸至体力上限，然后获得技能〖崩坏〗和〖威重〗。',
+			reweizhong:'威重',
+			reweizhong_info:'锁定技。当你的体力上限增加或减少时，你摸两张牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

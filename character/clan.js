@@ -19,6 +19,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wangyun:['male','qun',3,['clanjiexuan','clanmingjie','clanzhongliu'],['clan:太原王氏']],
 			clan_wanghun:['male','jin',3,['clanfuxun','clanchenya','clanzhongliu'],['clan:太原王氏']],
 			clan_zhonghui:['male','wei','3/4',['clanyuzhi','clanxieshu','clanbaozu'],['clan:颍川钟氏']],
+			clan_zhongyu:['male','wei',3,['clanjiejian','clanhuanghan','clanbaozu'],['clan:颍川钟氏']],
 		},
 		characterSort:{
 			clan:{
@@ -26,10 +27,68 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				clan_han:['clan_hanshao','clan_hanrong'],
 				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun'],
-				clan_zhong:['clan_zhongyan','clan_zhonghui'],
+				clan_zhong:['clan_zhongyan','clan_zhonghui','clan_zhongyu'],
 			},
 		},
 		skill:{
+			//族钟毓
+			clanjiejian:{
+				audio:2,
+				trigger:{player:'useCardToPlayered'},
+				filter:function(event,player){
+					if(!event.isFirstTarget) return false;
+					return get.cardNameLength(event.card)==player.getHistory('useCard').indexOf(event.getParent())+1;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var num=get.cardNameLength(trigger.card);
+					event.num=num;
+					player.chooseTarget(get.prompt('clanjiejian'),'令一名目标角色摸'+get.cnNumber(num)+'张牌',function(card,player,target){
+						return _status.event.getTrigger().targets.contains(target);
+					}).set('ai',target=>get.attitude(_status.event.player,target));
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('clanjiejian',target);
+						target.draw(num);
+					}
+				},
+				ai:{threaten:3},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(typeof card=='object'&&get.cardNameLength(card)==player.getHistory('useCard').length+1){
+							if(get.effect(player,card,player,player)>0) return num+10;
+						}
+					},
+				},
+			},
+			clanhuanghan:{
+				audio:2,
+				trigger:{player:'damageEnd'},
+				filter:function(event,player){
+					if(!event.card) return false;
+					var num=get.cardNameLength(event.card);
+					return typeof num=='number'&&num>0;
+				},
+				check:function(event,player){
+					var num=get.cardNameLength(event.card);
+					if(num>=player.getDamagedHp()) return true;
+					return player.getHistory('useSkill',evt=>evt.skill=='clanhuanghan').length&&player.hasSkill('clanbaozu',null,false,false)&&player.awakenedSkills.contains('clanbaozu');
+				},
+				content:function(){
+					'step 0'
+					player.draw(get.cardNameLength(trigger.card));
+					if(player.isDamaged()) player.chooseToDiscard(player.getDamagedHp(),'he',true);
+					'step 1'
+					if(player.getHistory('useSkill',evt=>evt.skill=='clanhuanghan').length>1&&player.hasSkill('clanbaozu',null,false,false)&&player.awakenedSkills.contains('clanbaozu')){
+						player.restoreSkill('clanbaozu');
+						player.popup('保族');
+						game.log(player,'恢复了技能','#【保族】');
+					}
+				},
+				ai:{threaten:3},
+			},
 			//族钟会
 			clanyuzhi:{
 				mod:{
@@ -79,18 +138,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.countCards('h')) event.finish();
 					'step 3'
 					player.chooseCard('迂志：请展示一张手牌','摸此牌牌名字数的牌。下一轮开始时，若本轮你使用的牌数或上一轮你以此法摸的牌数小于此牌牌名字数，则你失去1点体力。',true,function(card,player){
-						var num=lib.skill.dcweidang.getLength(card);
+						var num=get.cardNameLength(card);
 						return typeof num=='number'&&num>0;
 					}).set('ai',function(card){
-						if(_status.event.dying&&_status.event.num>0&&lib.skill.dcweidang.getLength(card)>_status.event.num) return 1/lib.skill.dcweidang.getLength(card);//怂
-						return lib.skill.dcweidang.getLength(card);//勇
+						if(_status.event.dying&&_status.event.num>0&&get.cardNameLength(card)>_status.event.num) return 1/get.cardNameLength(card);//怂
+						return get.cardNameLength(card);//勇
 					}).set('dying',player.hp+player.countCards('hs',{name:['tao','jiu']})<1).set('num',event.num1);
 					'step 4'
 					if(result.bool){
 						player.logSkill('clanyuzhi');
 						player.showCards(result.cards,get.translation(player)+'发动了【迂志】');
-						player.draw(lib.skill.dcweidang.getLength(result.cards[0]));
-						player.storage.clanyuzhi=lib.skill.dcweidang.getLength(result.cards[0]);
+						player.draw(get.cardNameLength(result.cards[0]));
+						player.storage.clanyuzhi=get.cardNameLength(result.cards[0]);
 						player.markSkill('clanyuzhi');
 					}
 				},
@@ -106,13 +165,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd',source:'damageSource'},
 				filter:function(event,player){
 					if(!event.card) return false;
-					var num=lib.skill.dcweidang.getLength(event.card);
+					var num=get.cardNameLength(event.card);
 					return typeof num=='number'&&num>0&&player.countCards('he');
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var num=lib.skill.dcweidang.getLength(trigger.card),str='';
+					var num=get.cardNameLength(trigger.card),str='';
 					if(player.getDamagedHp()>0) str+=('并摸'+get.cnNumber(player.getDamagedHp())+'张牌');
 					player.chooseToDiscard(get.prompt('clanxieshu'),'弃置'+get.cnNumber(num)+'张牌'+str,'he',num).set('ai',function(card){
 						var player=_status.event.player;
@@ -234,7 +293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var info=get.info(skill);
 					if(info.charlotte) return false;
 					var translation=get.skillInfoTranslation(skill,event.player);
-					if(!translation||!(/(?<!“)出牌阶段限一次/.test(translation))) return false;
+					if(!translation||translation.match(/“?出牌阶段限一次/g).every(value=>value!='出牌阶段限一次')) return false;
 					return event.player.countCards('h')>0;
 				},
 				check:function(event,player){
@@ -248,7 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var val=get.value(card);
 						return 6-val;
 					}).set('cards',trigger.player.getCards('he',card=>{
-						return lib.skill.dcweidang.getLength(card)==num;
+						return get.cardNameLength(card)==num;
 					}));
 					'step 1'
 					if(result.bool) trigger.player.recast(result.cards);
@@ -542,7 +601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							var list=[4,3,2,1];
 							player.getHistory('useCard',evt=>{
-								var len=lib.skill.dcweidang.getLength(evt.card);
+								var len=get.cardNameLength(evt.card);
 								list.remove(len);
 							});
 							if(list.length) ret=list[0];
@@ -582,7 +641,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									else{
 										var list=[4,3,2,1];
 										player.getHistory('useCard',evt=>{
-											var len=lib.skill.dcweidang.getLength(evt.card);
+											var len=get.cardNameLength(evt.card);
 											list.remove(len);
 										});
 										if(list.length) ret=list[0];
@@ -616,13 +675,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var len=_status.event.len;
 									var card=button.link;
 									var fix=1;
-									if(lib.skill.dcweidang.getLength(card)==len) fix=2;
+									if(get.cardNameLength(card)==len) fix=2;
 									return fix*_status.event.player.getUseValue(card);
 								}).set('len',function(){
 									if(!player.hasSkill('clanxiaoyong')) return 0;
 									var list=[];
 									player.getHistory('useCard',evt=>{
-										var len=lib.skill.dcweidang.getLength(evt.card);
+										var len=get.cardNameLength(evt.card);
 										list.add(len);
 									});
 									if(!list.contains(count)) return count;
@@ -681,9 +740,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'useCard',
 				},
 				filter:function(event,player){
-					var len=lib.skill.dcweidang.getLength(event.card);
+					var len=get.cardNameLength(event.card);
 					if(player.hasHistory('useCard',function(evt){
-						return evt!=event&&lib.skill.dcweidang.getLength(evt.card)==len;
+						return evt!=event&&get.cardNameLength(evt.card)==len;
 					},event)) return false;
 					if(!player.getStat().skill.clanguangu) return false;
 					var history=player.getAllHistory('useSkill',evt=>{
@@ -722,9 +781,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								break;
 							}
 						}
-						if(numx==lib.skill.dcweidang.getLength(card)){
+						if(numx==get.cardNameLength(card)){
 							if(!player.hasHistory('useCard',evt=>{
-								return numx==lib.skill.dcweidang.getLength(evt.card);
+								return numx==get.cardNameLength(evt.card);
 							})){
 								return num+9;
 							}
@@ -734,7 +793,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanbaozu:{
 				audio:2,
-				audioname:['clan_zhongyan','clan_zhonghui'],
+				audioname:['clan_zhongyan','clan_zhonghui','clan_zhongyu'],
 				trigger:{global:'dying'},
 				clanSkill:true,
 				limited:true,
@@ -1676,34 +1735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				content:function(){
-					'step 0'
-					event.judgestr=get.translation('shandian');
-					player.judge(lib.card.shandian.judge,event.judgestr).judge2=lib.card.shandian.judge2;
-					game.delayx(1.5);
-					'step 1'
-					var name='shandian';
-					if(event.cancelled&&!event.direct){
-						if(lib.card[name].cancel){
-							var next=game.createEvent(name+'Cancel');
-							next.setContent(lib.card[name].cancel);
-							next.cards=[];
-							next.card=get.autoViewAs({name:name});
-							next.player=player;
-						}
-					}
-					else{
-						var next=game.createEvent(name);
-						next.setContent(function(){
-							if(result.bool==false){
-								player.damage(3,'thunder','nosource');
-							}
-						});
-						next._result=result;
-						next.cards=[];
-						next.card=get.autoViewAs({name:name});
-						next.player=player;
-					}
-					'step 2'
+					player.executeDelayCardEffect('shandian');
 					trigger.player.drawTo(4);
 				},
 				ai:{expose:0.25}
@@ -2264,6 +2296,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanrong:'韩融（127年～196年），字元长，颍川舞阳（今属河南省漯河市）人。赢长韩韶子，献帝时大臣。中平五年（188年），融与荀爽、陈纪等十四人并博士征，不至。董卓废立，融等复俱公车征。初平元年（190年）六月，融为大鸿胪，奉命与执金吾胡母班等出使关东。献帝东迁，为李傕、郭汜等所败，融为太仆，奉命至弘农与傕、汜连和，使其放遣公卿百官及宫女妇人。',
 			wukuang:'吴匡（生卒年不详），兖州陈留（今河南开封市）人。东汉末年大臣，大将军何进部将。光熹元年（公元189年），汉灵帝死后，十常侍干预朝政，大将军何进谋诛宦官，但失败被杀，吴匡联合曹操、袁绍等杀尽宦官，攻杀车骑将军何苗。兴平二年（公元195年）十月，李傕、郭汜后悔放汉献帝东归洛阳，于是联合起来追击，曹操遂起兵平乱，但在回朝后，曹操挟天子以令诸侯，实行专权，但遭到吴匡反对。',
 			wanghun:'王浑（223年～297年），字玄冲，太原郡晋阳县（今山西省太原市）人。魏晋时期名臣，曹魏司空王昶的儿子。王浑早年为大将军曹爽的掾吏，高平陵政变后，循例免官，出任怀县县令、散骑侍郎等职，袭封京陵县侯。西晋王朝建立后，加号扬烈将军，历任征虏将军、东中郎将、豫州刺史等职，积极筹划伐吴方略。咸宁五年（279年），配合镇南将军杜预灭亡吴国，迁征东大将军、左仆射、司徒公，晋爵京陵县公。晋惠帝司马衷即位，加任侍中衔。楚王司马玮发动政变，有意寻求支持，遭到严词拒绝。楚王司马玮死后，复任司徒、录尚书事。元康七年（297年），王浑去世，享年七十五岁，谥号为元。《唐会要》尊为“魏晋八君子”之一。',
+			zhongyu:'钟毓（？-263年），字稚叔，颍川长社（今河南长葛市）人。三国时期魏国大臣，太傅钟繇之子、司徒钟会之兄。出身颍川钟氏，机灵敏捷，有其父之遗风。十四岁时，起家散骑侍郎。太和初年，迁黄门侍郎，袭封定陵县侯。正始年间，拜散骑常侍，迁魏郡太守，入为侍中、御史中丞、廷尉 [5] 。随平诸葛诞的淮南叛乱，拜青州刺史、后将军，都督徐州、荆州诸军事。景元四年（263年），去世，追赠车骑将军，谥号为惠，著有文集五卷（见《隋书·经籍志》及《两唐书·经籍志》），传于世。',
 		},
 		dynamicTranslate:{
 			clanlianzhu:function(player){
@@ -2314,7 +2347,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanyunshen:'熨身',
 			clanyunshen_info:'出牌阶段限一次。你可以令一名其他角色回复1点体力，然后选择一项：1.你视为对其使用一张冰【杀】；2.其视为对你使用一张冰【杀】。',
 			clanshangshen:'伤神',
-			clanshangshen_info:'当一名角色受到属性伤害后，若本回合此前没有角色或已死亡的角色受到过属性伤害，你可以进行目标角色为你的【闪电】的特殊的使用流程，然后其将手牌摸至四张。',
+			clanshangshen_info:'当一名角色受到属性伤害后，若本回合此前没有角色或已死亡的角色受到过属性伤害，你可以执行目标角色为你的【闪电】效果，然后其将手牌摸至四张。',
 			clanfenchai:'分钗',
 			clanfenchai_info:'锁定技。若你首次发动技能指定的异性目标角色中：存在存活角色，你的判定牌视为♥；不存在存活角色，你的判定牌视为♠。',
 			clan_hanshao:'族韩韶',
@@ -2359,6 +2392,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanyuzhi_info:'锁定技。新的一轮开始时，你依次执行以下项：①若你上一轮使用的牌数或你上上轮因〖迂志〗摸的牌数小于你上轮因〖迂志〗摸的牌数，你失去1点体力或失去〖保族〗。②你展示一张手牌，然后摸X张牌（X为此牌牌名字数）。',
 			clanxieshu:'挟术',
 			clanxieshu_info:'当你使用牌造成伤害后，或受到来自牌造成的伤害后，你可以弃置Y张牌并摸你已损失体力值张牌（Y为此牌牌名字数）。',
+			clan_zhongyu:'族钟毓',
+			clanjiejian:'捷谏',
+			clanjiejian_info:'当你于一回合使用第X张牌指定第一个目标后，你可以令一名目标角色摸X张牌。（X为此牌牌名字数）',
+			clanhuanghan:'惶汗',
+			clanhuanghan_info:'当你受到牌造成的伤害后，你可以摸X张牌并弃置Y张牌（X为此牌牌名字数，Y为你已损失的体力值），然后若此次技能发动不为你本回合首次发动此技能，你重置技能〖保族〗。',
 			
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
