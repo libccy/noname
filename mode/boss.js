@@ -2034,38 +2034,79 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			shanrangzhaoshu:{
-				trigger:{global:'gainEnd'},
+				trigger:{
+					global:['gainEnd','loseAsyncAfter'],
+				},
 				direct:true,
 				filter:function(event,player){
-					return event.player!=player&&event.player!=_status.currentPhase&&event.player.getHistory('gain')[0]==event&&player.countCards('he')+event.player.countCards('he')>0;
+					let min=0;
+					if(!player.hasSkill('shanrangzhaoshu',null,false)) min+=get.sgn(player.getEquips('shanrangzhaoshu').length)
+					const bool=player.countCards('he')>min;
+					return game.hasPlayer(current=>{
+						if(current==player||current==_status.currentPhase) return false;
+						if(!bool&&current.countCards('h')==0) return false;
+						const history=current.getHistory('gain')[0];
+						if(!history) return false;
+						if(event.name=='gain'){
+							return history==event&&event.getlx!==false;
+						}
+						return history.getParent()==event;
+					})
 				},
 				content:function(){
 					'step 0'
-					event.target=trigger.player;
-					var list=[];
-					if(player.countCards('he')>1) list.push('交给其一张牌');
-					if(trigger.player.countCards('he')>0) list.push('令其交给你一张牌');
-					event.list=list;
-					player.chooseControl('cancel2').set('choiceList',list).set('prompt',get.prompt('shanrangzhaoshu',trigger.player)).set('ai',function(){
-						if(get.attitude(_status.event.player,_status.event.getTrigger().player)<0) return _status.event.getParent().list.length-1;
-						return 'cancel2';
-					});
+					event.targets=game.filterPlayer(function(current){
+						if(current==player||current==_status.currentPhase) return false;
+						const history=current.getHistory('gain')[0];
+						if(!history) return false;
+						if(trigger.name=='gain'){
+							return history==trigger&&trigger.getlx!==false;
+						}
+						return history.getParent()==trigger;
+					}).sortBySeat(_status.currentPhase);
 					'step 1'
+					var target=event.targets.shift();
+					event.target=target;
+					if(target.isIn()){
+						var list=[];
+						var min=0;
+						if(!player.hasSkill('shanrangzhaoshu',null,false)) min+=get.sgn(player.getEquips('shanrangzhaoshu').length);
+						if(player.countCards('he')>min) list.push(`交给${get.translation(target)}一张牌`);
+						if(target.countCards('he')>0) list.push(`令${get.translation(target)}交给你一张牌`);
+						event.list=list;
+						if(list.length==0) event.goto(4);
+						else if(list.length==1) event._result={index:0};
+						else player.chooseControl('cancel2').set('choiceList',list).set('prompt',get.prompt('shanrangzhaoshu',target)).set('ai',function(){
+							if(get.attitude(_status.event.player,_status.event.getParent().target)<0) return 1;
+							return 'cancel2';
+						});
+					}
+					else event.goto(4);
+					'step 2'
 					if(result.control=='cancel2'){
-						event.finish();return;
+						event.goto(4);
+						return;
 					}
 					player.logSkill('shanrangzhaoshu',target);
 					if(event.list[result.index][0]=='令'){
-						event.player=target;
-						event.target=player;
+						event.gainner=player;
+						event.giver=target;
+						target.chooseCard('he',true,`交给${get.translation(player)}一张牌`);
 					}
-					'step 2'
-					player.chooseCard('he',true).set('filterCard',function(card,player){
-						if(player!=_status.event.getTrigger().player) return card!=player.getEquip('shanrangzhaoshu');
-						return true;
-					});
+					else{
+						event.giver=player;
+						event.gainner=target;
+						player.chooseCard('he',true,`交给${get.translation(target)}一张牌`).set('filterCard',function(card,player){
+							if(_status.event.ignoreCard) return true;
+							var cards=player.getEquips('shanrangzhaoshu');
+							if(!cards.contains(card)) return true;
+							return cards.some(cardx=>(cardx!=card&&!ui.selected.cards.contains(cardx)));
+						}).set('ignoreCard',player.hasSkill('shanrangzhaoshu',null,false));
+					}
 					'step 3'
-					if(result.cards&&result.cards.length) target.gain(result.cards,player,'giveAuto');
+					if(result.cards&&result.cards.length) event.giver.give(result.cards,event.gainner);
+					'step 4'
+					if(targets.length>0) event.goto(1);
 				},
 			},
 			lingsheji:{
