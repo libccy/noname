@@ -954,7 +954,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							},
 							logAi:function(){},
-							hasZhuSkill:function(){return false},
 							changeLingli:function(num){
 								if(typeof num!='number') num=1;
 								if(typeof this.storage._lingli!='number') this.storage._lingli=0;
