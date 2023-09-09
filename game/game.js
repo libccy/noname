@@ -22840,7 +22840,7 @@
 						next.targets=[];
 					}
 					if(next.card){
-						next.card=get.autoViewAs(next.card,false,next.player);
+						next.card=get.autoViewAs(next.card,next.cards);
 						var info=get.info(next.card);
 						if(info.changeTarget){
 							info.changeTarget(next.player,next.targets);
@@ -22852,9 +22852,6 @@
 							if(next.addedTargets.length){
 								next.addedTarget=next.addedTargets[0];
 							}
-						}
-						if(!next.card.isCard&&next.cards.length){
-							next.card.cards=next.cards.slice(0);
 						}
 					}
 					for(var i=0;i<next.targets.length;i++){
@@ -23126,7 +23123,7 @@
 						if(next.cards){
 							next.card=next.cards[0];
 							if(!next.skill){
-								next.card=get.autoViewAs(next.card,null,next.player);
+								next.card=get.autoViewAs(next.card,next.cards);
 							}
 						}
 					}
@@ -25683,7 +25680,7 @@
 					if(typeof card=='string'){
 						card={name:card};
 					}
-					card=get.autoViewAs(card,null,player);
+					card=get.autoViewAs(card);
 					var num=get.info(card).usable;
 					if(typeof num=='function') num=num(card,player);
 					num=game.checkMod(card,player,num,'cardUsable',player);
@@ -29577,7 +29574,7 @@
 					var mod2=game.checkMod(card,player,event,'unchanged','cardEnabled2',player);
 					if(mod2!='unchanged') return mod2;
 				}
-				card=get.autoViewAs(card,null,player);
+				card=get.autoViewAs(card);
 				if(event==='forceEnable'){
 					var mod=game.checkMod(card,player,event,'unchanged','cardEnabled',player);
 					if(mod!='unchanged') return mod;
@@ -29611,7 +29608,7 @@
 				return true;
 			},
 			cardUsable2:function(card,player,event){
-				card=get.autoViewAs(card,null,player);
+				card=get.autoViewAs(card);
 				var info=get.info(card);
 				if(info.updateUsable=='phaseUse'){
 					event=event||_status.event;
@@ -29627,7 +29624,7 @@
 				else return(player.countUsed(card)<num);
 			},
 			cardUsable:function(card,player,event){
-				card=get.autoViewAs(card,null,player);
+				card=get.autoViewAs(card);
 				var info=get.info(card);
 				event=event||_status.event;
 				if(event.type=='chooseToUse_button') event=event.getParent();
@@ -32294,6 +32291,12 @@
 			}
 		},
 		suit:['club','spade','diamond','heart'],
+		suits:['club','spade','diamond','heart','none'],
+		color:{
+			black:['club','spade'],
+			red:['diamond','heart'],
+			none:['none'],
+		},
 		group:['wei','shu','wu','qun','jin','shen'],
 		nature:['fire','thunder','kami','ice','stab','poison'],
 		linked:['fire','thunder','kami','ice'],
@@ -54341,6 +54344,45 @@
 			}
 		},
 		autoViewAs:function(card,cards){
+			let _card;
+			if(get.itemtype(card)=='card'){
+				_card={
+					name:get.name(card),
+					suit:get.suit(card),
+					color:get.suit(card),
+					number:get.number(card),
+					nature:get.nature(card),
+					isCard:true,
+					cardid:card.cardid,
+					wunature:card.wunature,
+					storage:get.copy(card.storage),
+				};
+				if(Array.isArray(cards)) _card.cards=cards.slice(0);
+				else _card.cards=[card];
+			}
+			else{
+				_card=get.copy(card);
+				if(Array.isArray(cards)){
+					if(_card.cards){
+						_card.cards=cards.slice(0);
+					}
+					else{
+						_card.cards=cards.slice(0);
+						if(!lib.suits.includes(_card.suit)) _card.suit=get.suit(_card);
+						if(!Object.keys(lib.color).includes(_card.color)) _card.color=get.color(_card);
+						if(!_card.hasOwnProperty('number')) _card.number=get.number(card);
+						if(!_card.hasOwnProperty('nature')) _card.nature=get.nature(card);
+					}
+				}
+			}
+			const info=get.info(_card,false);
+			if(info.autoViewAs){
+				_card.name=info.autoViewAs;
+			}
+			return _card;
+		},
+		//deprecated
+		_autoViewAs:function(card,cards){
 			var info=get.info(card);
 			if(info.autoViewAs){
 				if(cards===false){
@@ -55623,17 +55665,17 @@
 				if(card.length==1) return get.suit(card[0],player);
 				return 'none';
 			}
-			else if(Array.isArray(card.cards)&&card.suit!='none'&&!lib.suit.contains(card.suit)){
+			else if(!card.hasOwnProperty('suit')&&Array.isArray(card.cards)){
 				return get.suit(card.cards,player);
 			}
 			else{
 				if(player!==false){
-					var owner=player||get.owner(card);
+					const owner=player||get.owner(card);
 					if(owner){
 						return game.checkMod(card,card.suit,'suit',owner);
 					}
 				}
-				if(lib.suit.contains(card.suit)) return card.suit;
+				if(lib.suits.contains(card.suit)) return card.suit;
 				return 'none';
 			}
 		},
@@ -55641,19 +55683,23 @@
 			if(!card) return;
 			if(Array.isArray(card)){
 				if(!card.length) return 'none';
-				var color=get.color(card[0],player);
-				for(var i=1;i<card.length;i++){
+				const color=get.color(card[0],player);
+				for(let i=1;i<card.length;i++){
 					if(get.color(card[i],player)!=color) return 'none';
 				}
 				return color;
 			}
-			else if(Array.isArray(card.cards)&&card.suit!='none'&&!lib.suit.contains(card.suit)){
+			else if(Object.keys(lib.color).includes(card.color)){
+				return card.color;
+			}
+			else if(Array.isArray(card.cards)&&!lib.suit.includes(card.suit)){
 				return get.color(card.cards,player);
 			}
 			else{
-				var suit=get.suit(card,player);
-				if(suit=='spade'||suit=='club') return 'black';
-				if(suit=='heart'||suit=='diamond') return 'red';
+				const suit=get.suit(card,player);
+				for(let i in lib.color){
+					if(lib.color[i].includes(suit)) return i;
+				}
 				return 'none';
 			}
 		},
@@ -55851,7 +55897,7 @@
 				var card=get.info(_status.event.skill).viewAs;
 				if(typeof card=='function') card=card(ui.selected.cards,_status.event.player);
 				if(card){
-					return get.autoViewAs(card,ui.selected.cards,_status.event.player);
+					return get.autoViewAs(card,ui.selected.cards);
 				}
 			}
 			if(_status.event._get_card){
@@ -55860,7 +55906,7 @@
 			var card=ui.selected.cards[0];
 			if(original) return card;
 			if(card){
-				card=get.autoViewAs(card,ui.selected.cards,_status.event.player);
+				card=get.autoViewAs(card,ui.selected.cards);
 			}
 			return card;
 		},
