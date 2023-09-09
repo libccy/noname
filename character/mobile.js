@@ -262,23 +262,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//cardimage:"baiyin",
 				type:"equip",
 				subtype:"equip2",
-				filterLose:function(card,player){
-					if(player.hasSkillTag('unequip2')) return false;
-					return true;
-				},
 				loseDelay:false,
 				onLose:function(){
-					var next=game.createEvent('rewrite_baiyin_recover');
-					event.next.remove(next);
-					var evt=event.getParent();
-					if(evt.getlx===false) evt=evt.getParent();
-					evt.after.push(next);
-					next.player=player;
-					next.setContent(function(){
-						player.logSkill('rw_baiyin_skill');
-						player.draw(2);
-						player.recover();
-					});
+					player.addTempSkill('rw_baiyin_skill_lose')
 				},
 				skills:["rw_baiyin_skill"],
 				tag:{
@@ -11576,6 +11562,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"rw_baiyin_skill":{
 				inherit:"baiyin_skill",
 				audio:true,
+				subSkill:{
+					lose:{
+						audio:'rw_baiyin_skill',
+						forced:true,
+						charlotte:true,
+						equipSkill:true,
+						trigger:{
+							player:'loseAfter',
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+						},
+						filter:(event,player)=>{
+							if(player.hasSkillTag('unequip2')) return false;
+							var evt=event.getl(player);
+							return evt&&evt.es.some(card=>card.name=='rewrite_baiyin')
+						},
+						content:function(){
+							var evt=trigger.getl(player);
+							evt.es.forEach(card=>{
+								if(card.name=='rewrite_baiyin'){
+									player.recover();
+									player.draw(2);
+								}
+							})
+						},
+					},
+				},
 			},
 			"rw_lanyinjia":{
 				inherit:"lanyinjia",
