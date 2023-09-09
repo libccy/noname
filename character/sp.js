@@ -22433,7 +22433,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				viewAs:{
 					name:"huogong",
-					nature:"fire",
 				},
 				viewAsFilter:function (player){
 					if(player.hasSkill('huoji')) return false;

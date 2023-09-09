@@ -10931,7 +10931,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				viewAs:{
 					name:"huogong",
-					nature:"fire",
 				},
 				viewAsFilter:function (player){
 					if(!player.countCards('hes',{color:'red'})) return false;
