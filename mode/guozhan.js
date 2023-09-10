@@ -13789,7 +13789,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(chosen.contains(i)) continue;
 						if(lib.filter.characterDisabled(i)) continue;
 						if(get.config('onlyguozhan')){
-							if(!lib.characterPack.mode_guozhan[i]) continue;
+							if(!lib.characterGuozhanFilter.some(pack=>lib.characterPack[pack][i])) continue;
 							if(get.is.jun(i)) continue;
 						}
 						if(lib.character[i][4].contains('hiddenSkill')) continue;
@@ -13872,7 +13872,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							event.dialogxx=ui.create.characterDialog('heightset',function(i){
 								if(i.indexOf('gz_shibing')==0) return true;
 								if(get.config('onlyguozhan')){
-									if(!lib.characterPack.mode_guozhan[i]) return true;
+									if(!lib.characterGuozhanFilter.some(pack=>lib.characterPack[pack][i])) return true;
 									if(get.is.jun(i)) return true;
 								}
 							},get.config('onlyguozhanexpand')?'expandall':undefined,get.config('onlyguozhan')?'onlypack:mode_guozhan':undefined);
