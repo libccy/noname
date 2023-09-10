@@ -8411,8 +8411,8 @@
 						throw e;
 					});
 					var styleToLoad=6;
-					var styleLoaded=function(){
-						styleToLoad--;
+					var styleLoaded=gnc.async(function*(){
+						--styleToLoad;
 						if(styleToLoad==0){
 							if(extensionlist.length&&(lib.config.mode!='connect'||show_splash)){
 								_status.extensionLoading=[];
@@ -8430,8 +8430,10 @@
 								for(var i=0;i<extensionlist.length;i++){
 									if(window.bannedExtensions.contains(extensionlist[i])){
 										alerted=true;
-										extToLoad--;
+										--extToLoad;
 										if(extToLoad==0){
+											yield Promise.allSettled(_status.extensionLoading);
+											delete _status.extensionLoading;
 											loadPack();
 										}
 										continue;
@@ -8439,8 +8441,10 @@
 									lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,(function(i){
 										return function(){
 											game.removeExtension(i);
-											extToLoad--;
+											--extToLoad;
 											if(extToLoad==0){
+												yield Promise.allSettled(_status.extensionLoading);
+												delete _status.extensionLoading;
 												loadPack();
 											}
 										}
@@ -8451,7 +8455,7 @@
 								loadPack();
 							}
 						}
-					};
+					});
 					if(lib.config.layout=='default'){
 						lib.config.layout='mobile';
 					}
