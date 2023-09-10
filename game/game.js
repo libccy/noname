@@ -9749,7 +9749,9 @@
 									if(lib.extensions[i][4].skill){
 										for(var j in lib.extensions[i][4].skill.skill){
 											game.addSkill(j,lib.extensions[i][4].skill.skill[j],
-											lib.extensions[i][4].skill.translate[j],lib.extensions[i][4].skill.translate[j+'_info']);
+											lib.extensions[i][4].skill.translate[j],
+											lib.extensions[i][4].skill.translate[j+'_info'],
+											lib.extensions[i][4].skill.translate[j+'_append']);
 										}
 									}
 								}
@@ -36245,7 +36247,7 @@
 				}
 			}
 		},
-		addSkill:function(name,info,translate,description){
+		addSkill:function(name,info,translate,description,appendInfo){
 			if(lib.skill[name]){
 				return false;
 			}
@@ -36255,6 +36257,7 @@
 			lib.skill[name]=info;
 			lib.translate[name]=translate;
 			lib.translate[name+'_info']=description;
+			lib.translate[name+'_append']=appendInfo;
 			return true;
 		},
 		addMode:function(name,info,info2){
