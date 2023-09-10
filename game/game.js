@@ -4930,6 +4930,18 @@
 						frequent:true,
 						intro:'若开启此选项，选择神武将的玩家需在亮出自己的武将牌之前为自己选择一个势力。'
 					},
+					choose_group_range:{
+						name:'神武将势力范围',
+						init:'all',
+						restart:true,
+						frequent:true,
+						intro:"设置选择神武将的玩家可选择的势力范围。",
+						item:{
+							all:"全部势力",
+							wswq:"魏蜀吴群",
+							wswqj:"魏蜀吴群晋",
+						},
+					},
 					nei_fullscreenpop:{
 						name:'主内单挑特效',
 						intro:'在进入主内单挑时，弹出全屏文字特效',

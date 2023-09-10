@@ -1690,6 +1690,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else if(lib.character[name][1]=='shen'&&!lib.character[name][4].contains('hiddenSkill')&&get.config('choose_group')){
 						var list=lib.group.slice(0);
 						list.remove('shen');
+						var range = get.config('choose_group_range');
+						if(range != 'all'){
+							if(range == 'wswq'){
+								list = ['wei','shu','wu','qun'];
+							}else if(range == 'wswqj'){
+								list = ['wei','shu','wu','qun','jin'];
+							}
+						}
 						game.me.chooseControl(list).set('prompt','请选择神武将的势力');
 					}
 					"step 2"
