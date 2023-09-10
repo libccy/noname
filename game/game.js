@@ -44,6 +44,8 @@
 			let nexts=resolve;
 			let throws=reject;
 			if(gnc.is.coroutine(gen)||(gnc.is.generator(gen)&&!gnc.nocoroutine)) {
+				if(!gen.status)gen.status="next";
+				if(!gen.state)gen.state=undefined;
 				try{
 					result=gen[result.status](result.state);
 				}catch(error){
