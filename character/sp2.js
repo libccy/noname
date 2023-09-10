@@ -9284,13 +9284,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.xinfu_qianxin=cards.slice(0);
 					player.storage.xinfu_qianxin2=target;
 					//cards.reverse();
-					player.lose(cards,ui.cardPile).insert_index=function(event,card){
-						var num1=game.players.length,i=event.cards.indexOf(card);
+					game.placeCardsOnPile(cards,function(card,cards){
+						var num1=game.players.length,i=cards.indexOf(card);
 						var num3=num1*(i+1)-1;
-						return ui.cardPile.childNodes[num3];
-					};
+						return num3;
+					},false,player)
 					'step 1'
-					game.updateRoundNumber();
 					game.log(player,'把',get.cnNumber(cards.length),'张牌放在了牌堆里');
 					game.delayx();
 				},

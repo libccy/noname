@@ -2541,10 +2541,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var list=result.moved;
 						if(list[1].length) player.gain(list[1],'gain2');
-						while(list[0].length){
-							ui.cardPile.insertBefore(list[0].pop(),ui.cardPile.firstChild);
-						}
-						game.updateRoundNumber();
+					    game.placeCardsOnPile(list[0],0,true,player)
 					}
 				},
 				group:'xinquanbian_count',

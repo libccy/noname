@@ -11226,6 +11226,30 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				//将牌置于牌堆
+				placeCardsOnPile:()=>{
+					'step 0'
+					event.trigger('placeCardsOnPile');
+					'step 1'
+			        if(event.position==-1){
+			            for(var card of cards){
+			                card.fix();
+			                ui.cardPile.appendChild(card);
+			                if(event.log) game.log(player,'将',card,'置于牌堆底');
+			            }
+			        }else{
+			            for(var card of cards){
+			                if(typeof event.position=='function'){
+			                    var position=event.position(card,cards)
+			                }
+			                position=ui.cardPile.childNodes[position]
+			                card.fix();
+			                ui.cardPile.insertBefore(card,position);
+			                if(event.log) event.position?game.log(player,'将',card,'置于牌堆第',get.cnNumber(event.position+1,true),'张牌前'):game.log(player,'将',card,'置于牌堆顶');
+			            }
+			        }
+			        game.updateRoundNumber();
+			    },
 				//增加明置手牌
 				addShownCards:function(){
 					var hs=player.getCards('h'),cards=event._cards.filter(card=>hs.includes(card));
@@ -32393,6 +32417,21 @@
 		}
 	};
 	const game={
+	    //placeCardsOnPile
+	    //将牌置于牌堆
+	    placeCardsOnPile:function(cards,position,log,player){
+            if(!Array.isArray(cards)||!cards.length) return;
+			if(typeof position!='number'&&typeof position!='function'){
+		        position=0;
+			}
+			const placeCardsOnPile=game.createEvent('placeCardsOnPile');
+		    placeCardsOnPile.cards=cards;
+		    placeCardsOnPile.position=position;
+		    placeCardsOnPile.log=log;
+		    placeCardsOnPile.player=player;
+			placeCardsOnPile.setContent('placeCardsOnPile')
+		    return placeCardsOnPile;
+		},
 		//addGroup
 		//基于钩子的添加势力方法
 		addGroup:(id,short,name,config)=>{
