@@ -54306,7 +54306,7 @@
 				return false;
 			},
 		},
-		bottomCards:function(num){
+		bottomCards:function(num,putBack){
 			if(_status.waitingForCards){
 				ui.create.cards.apply(ui.create,_status.waitingForCards);
 				delete _status.waitingForCards;
@@ -54362,6 +54362,11 @@
 				var cardx=ui.cardPile.removeChild(ui.cardPile.lastChild);
 				cardx.original='c';
 				list.push(cardx);
+			}
+			if(putBack){
+				for(let i=list.length-1;i>=0;i--){
+					ui.cardPile.appendChild(list[i]);
+				}
 			}
 			game.updateRoundNumber();
 			if(card) return list[0];
@@ -55798,7 +55803,7 @@
 			}
 			return card.nature;
 		},
-		cards:function(num){
+		cards:function(num,putBack){
 			if(_status.waitingForCards){
 				ui.create.cards.apply(ui.create,_status.waitingForCards);
 				delete _status.waitingForCards;
@@ -55854,6 +55859,11 @@
 				var cardx=ui.cardPile.removeChild(ui.cardPile.firstChild);
 				cardx.original='c';
 				list.push(cardx);
+			}
+			if(putBack){
+				for(let i=list.length-1;i>=0;i--){
+					ui.cardPile.insertBefore(list[i],ui.cardPile.firstChild);
+				}
 			}
 			game.updateRoundNumber();
 			if(card) return list[0];
