@@ -8439,7 +8439,7 @@
 										continue;
 									}
 									lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,(function(i){
-										return function(){
+										return gnc.async(function*(){
 											game.removeExtension(i);
 											--extToLoad;
 											if(extToLoad==0){
@@ -8447,7 +8447,7 @@
 												delete _status.extensionLoading;
 												loadPack();
 											}
-										}
+										});
 									}(extensionlist[i])));
 								}
 							}
