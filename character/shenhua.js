@@ -2223,15 +2223,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool&&result.moved&&result.moved[0].length) cards=result.moved[0].slice(0);
-					while(cards.length){
-						var card=cards.pop();
-						if(get.position(card,true)=='o'){
-							card.fix();
-							ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
-							game.log(player,'将',card,'置于牌堆顶');
-						}
-					}
-					game.updateRoundNumber();
+					player.placeCardsOnPile(cards,0);
 					player.draw();
 				},	
 			},

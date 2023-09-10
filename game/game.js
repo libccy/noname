@@ -11189,6 +11189,27 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				//将牌置入牌堆
+				placeCardsOnPile:()=>{
+					'step 0'
+					event.trigger('placeCardsOnPile');
+					'step 1'
+			        if(event.position==-1){
+			            for(let card of cards){
+			                card.fix();
+			                ui.cardPile.appendChild(card);
+			                game.log(player,'将',card,'置于牌堆底');
+			            }
+			        }else{
+			            const position=ui.cardPile.childNodes[event.position];
+			            for(let card of cards){
+			                card.fix();
+			                ui.cardPile.insertBefore(card,position);
+			                event.position?game.log(player,'将',card,'置于牌堆第',get.cnNumber(event.position+1,true),'张牌前'):game.log(player,'将',card,'置于牌堆顶');
+			            }
+			        }
+			        game.updateRoundNumber();
+			    },
 				//增加明置手牌
 				addShownCards:function(){
 					var hs=player.getCards('h'),cards=event._cards.filter(card=>hs.includes(card));
@@ -19124,6 +19145,19 @@
 			},
 			player:{
 				//新函数
+				//将牌置入牌堆
+				placeCardsOnPile:function(cards,position){
+			        if(!Array.isArray(cards)||!cards.length) return;
+			        if(typeof position!='number'){
+			            position=0;
+			        }
+			        const placeCardsOnPile=game.createEvent('placeCardsOnPile');
+			        placeCardsOnPile.player=this;
+			        placeCardsOnPile.cards=cards;
+			        placeCardsOnPile.position=position;
+			        placeCardsOnPile.setContent('placeCardsOnPile')
+			        return placeCardsOnPile;
+			    },
 				//让一名角色明置一些手牌
 				addShownCards:function(){
 					const cards=[];
