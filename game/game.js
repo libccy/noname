@@ -9732,7 +9732,7 @@
 							try{
 								_status.extension=lib.extensions[i][0];
 								_status.evaluatingExtension=lib.extensions[i][3];
-								if (typeof lib.extensions[i][1]=="function") yield lib.extensions[i][1](lib.extensions[i][2],lib.extensions[i][4]);
+								if (typeof lib.extensions[i][1]=="function") yield gnc.await(lib.extensions[i][1](lib.extensions[i][2],lib.extensions[i][4]));
 								if(lib.extensions[i][4]){
 									if(lib.extensions[i][4].character){
 										for(var j in lib.extensions[i][4].character.character){
@@ -33493,7 +33493,7 @@
 					if(!lib.imported[type]){
 						lib.imported[type]={};
 					}
-					var content2=yield content(lib,game,ui,get,ai,_status);
+					var content2=yield gnc.await(content(lib,game,ui,get,ai,_status));
 					if(content2.name){
 						lib.imported[type][content2.name]=content2;
 						delete content2.name;
@@ -33508,7 +33508,7 @@
 		loadExtension:gnc.async(function*(obj){
 			var noeval=false;
 			if(typeof obj=='function'){
-				obj=yield obj(lib,game,ui,get,ai,_status);
+				obj=yield gnc.await(obj(lib,game,ui,get,ai,_status));
 				noeval=true;
 			}
 			lib.extensionMenu['extension_'+obj.name]={
@@ -33626,7 +33626,7 @@
 						}
 						if(obj.precontent){
 							_status.extension=obj.name;
-							yield obj.precontent(cfg);
+							yield gnc.await(obj.precontent(cfg));
 							delete _status.extension;
 						}
 						if(obj.content){
