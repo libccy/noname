@@ -33500,9 +33500,11 @@
 					}
 				}
 			});
-			if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
 			const promise=asyncFn();
-			_status.extensionLoading.add(promise);
+			if(type=='extension'){
+				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];	
+				_status.extensionLoading.add(promise);
+			}
 			return promise;
 		},
 		loadExtension:gnc.async(function*(obj){
