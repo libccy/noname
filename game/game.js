@@ -52115,7 +52115,13 @@
 				}
 				var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
 				if(lib.config.show_characternamepinyin){
-					intro.innerHTML='<span style="font-weight:bold;margin-right:5px;line-height:2">'+get.rawName(name)+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+get.pinyin(get.rawName(name))+']'+'</span>'+' | '+get.translation(lib.character[name][0])+' | '+get.translation(lib.character[name][1])+' | '+lib.character[name][2]+'<br>'+get.characterIntro(name);
+					var charactername=get.rawName(name);
+					var characterpinyin=get.pinyin(charactername);
+					var charactersex=get.translation(lib.character[name][0]);
+					var charactergroup=get.translation(lib.character[name][1]);
+					var characterhp=lib.character[name][2];
+					var characterintroinfo=get.characterIntro(name);
+					intro.innerHTML='<span style="font-weight:bold;margin-right:5px;line-height:2">'+charactername+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+characterpinyin+']'+'</span>'+' | '+charactersex+' | '+charactergroup+' | '+characterhp+'<br>'+characterintroinfo;
 				}
 				var intro2=ui.create.div('.characterintro.intro2',uiintro);
 				var list=get.character(name,3)||[];
@@ -52135,10 +52141,13 @@
 						current.classList.remove('active');
 					}
 					this.classList.add('active');
-					if(lib.config.show_skillnamepinyin){
-						intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+get.translation(this.link)+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+get.pinyin(get.translation(this.link))+']'+'</span>'+'  '+get.skillInfoTranslation(this.link);
+					var skillname=get.translation(this.link);
+					var skilltranslationinfo=get.skillInfoTranslation(this.link);
+					if(lib.config.show_skillnamepinyin&&skillname!='阵亡'){
+						var skillpinyin=get.pinyin(skillname);
+						intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+skillpinyin+']'+'</span>'+'  '+skilltranslationinfo;
 					}else{
-						intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+get.translation(this.link)+'</span>'+get.skillInfoTranslation(this.link);
+						intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+skilltranslationinfo;
 					}
 					var info=get.info(this.link);
 					var skill=this.link;
@@ -52150,10 +52159,13 @@
 							derivation=[derivation];
 						}
 						for(var i=0;i<derivation.length;i++){
-							if(lib.config.show_skillnamepinyin){
-								intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+get.translation(derivation[i])+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+get.pinyin(get.translation(derivation[i]))+']'+'</span>'+'  '+get.skillInfoTranslation(derivation[i]);
+							var derivationname=get.translation(derivation[i]);
+							var derivationtranslationinfo=get.skillInfoTranslation(derivation[i]);
+							if(lib.config.show_skillnamepinyin&&derivationname.length<=5){
+								var derivationpinyin=get.pinyin(derivationname);
+								intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+derivationpinyin+']'+'</span>'+'  '+derivationtranslationinfo;
 							}else{
-								intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+get.translation(derivation[i])+'</span>'+get.skillInfoTranslation(derivation[i]);
+								intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+derivationtranslationinfo;
 							}
 						}
 					}
