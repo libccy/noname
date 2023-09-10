@@ -137,6 +137,7 @@
 		characterFilter:{},
 		characterSort:{},
 		characterReplace:{},
+		characterGuozhanFilter:["mode_guozhan"],
 		dynamicTranslate:{},
 		cardPack:{},
 		skin:{},
