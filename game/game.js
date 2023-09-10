@@ -43,7 +43,7 @@
 			let result=gen;
 			let nexts=resolve;
 			let throws=reject;
-			if(gnc.is.coroutine(gen)) {
+			if(gnc.is.coroutine(gen)||(gnc.is.generator(gen)&&!gnc.nocoroutine)) {
 				try{
 					result=gen[result.status](result.state);
 				}catch(error){
