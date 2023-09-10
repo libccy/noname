@@ -43,7 +43,7 @@
 			let result=gen;
 			let nexts=resolve;
 			let throws=reject;
-			if(gnc.is.coroutine(gen)||(gnc.is.generator(gen)&&!gnc.nocoroutine)) {
+			if(gnc.is.coroutine(gen)||(gnc.is.generator(gen)&&!gen.nocoroutine)) {
 				if(!gen.status)gen.status="next";
 				if(!gen.state)gen.state=undefined;
 				try{
@@ -68,6 +68,10 @@
 			}
 			Promise.resolve(result).then(nexts,throws);
 		}),
+		escape:gen=>{
+			gen.nocoroutine=true;
+			return gen;
+		},
 		is:{
 			coroutine:item=>(typeof item=="function"||gnc.is.generator(item))&&item.name=="genCoroutine",
 			generatorFunc:item=>item instanceof GeneratorFunction,
@@ -7269,6 +7273,7 @@
 		gnc:{
 			async:fn=>gnc.async(fn),
 			await:gen=>gnc.await(gen),
+			escape:gen=>gnc.escape(gen),
 			is:{
 				coroutine:item=>gnc.is.coroutine(item),
 				generatorFunc:item=>gnc.is.generatorFunc(item),
