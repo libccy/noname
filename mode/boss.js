@@ -3117,9 +3117,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return distance+1;
 					},
 				},
-				init:function(player){
-				player.$disableEquip('equip3');
-				player.$disableEquip('equip4');
+				group: ["boss_diting_init"],
+				subSkill: {
+					"init": {
+						forced: true,
+						trigger: {
+							player: 'enterGame',
+							global: 'phaseBefore',
+						},
+						content: function () {
+							player.disableEquip('equip3');
+							player.disableEquip('equip4');
+						}
+					}
 				},
 				enable:"phaseUse",
 				position:'h',
