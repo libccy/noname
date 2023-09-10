@@ -11240,15 +11240,18 @@
 			        }else{
 			            for(var card of cards){
 			                if(typeof event.position=='function'){
-			                    var position=event.position(card,cards)
+			                    var position=ui.cardPile.childNodes[event.position(card,cards)]
+			                }else{
+			                    var position=ui.cardPile.childNodes[event.position]
 			                }
-			                position=ui.cardPile.childNodes[position]
 			                card.fix();
 			                ui.cardPile.insertBefore(card,position);
 			                if(event.log) event.position?game.log(player,'将',card,'置于牌堆第',get.cnNumber(event.position+1,true),'张牌前'):game.log(player,'将',card,'置于牌堆顶');
 			            }
 			        }
 			        game.updateRoundNumber();
+			        'step 2'
+			        game.getGlobalHistory('cardMove').push(event)
 			    },
 				//增加明置手牌
 				addShownCards:function(){
