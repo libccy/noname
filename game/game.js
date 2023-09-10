@@ -8415,13 +8415,16 @@
 						styleToLoad--;
 						if(styleToLoad==0){
 							if(extensionlist.length&&(lib.config.mode!='connect'||show_splash)){
-								var extToLoad=extensionlist.length;
-								var extLoaded=function(){
-									extToLoad--;
+								_status.extensionLoading=[];
+								let extToLoad=extensionlist.length;
+								const extLoaded=gnc.async(function*(){
+									--extToLoad;
 									if(extToLoad==0){
+										yield Promise.allSettled(_status.extensionLoading);
+										delete _status.extensionLoading;
 										loadPack();
 									}
-								}
+								});
 								//读取扩展
 								var alerted=false;
 								for(var i=0;i<extensionlist.length;i++){
@@ -9695,7 +9698,7 @@
 							try{
 								_status.extension=lib.extensions[i][0];
 								_status.evaluatingExtension=lib.extensions[i][3];
-								if (typeof lib.extensions[i][1]=="function") lib.extensions[i][1](lib.extensions[i][2],lib.extensions[i][4]);
+								if (typeof lib.extensions[i][1]=="function") yield lib.extensions[i][1](lib.extensions[i][2],lib.extensions[i][4]);
 								if(lib.extensions[i][4]){
 									if(lib.extensions[i][4].character){
 										for(var j in lib.extensions[i][4].character.character){
@@ -33448,27 +33451,30 @@
 			}
 		},
 		import:function(type,content){
-			if(type=='extension'){
-				//Anti-Cheat system updated, no need to work here
-				//var backup_onload=lib.init.onload;
-				game.loadExtension(content);
-				//lib.init.onload=backup_onload;
-			}
-			else{
-				if(!lib.imported[type]){
-					lib.imported[type]={};
+			const asyncFn=gnc.async(function*(){
+				if(type=='extension'){
+					yield game.loadExtension(content);
 				}
-				var content2=content(lib,game,ui,get,ai,_status);
-				if(content2.name){
-					lib.imported[type][content2.name]=content2;
-					delete content2.name;
+				else{
+					if(!lib.imported[type]){
+						lib.imported[type]={};
+					}
+					var content2=yield content(lib,game,ui,get,ai,_status);
+					if(content2.name){
+						lib.imported[type][content2.name]=content2;
+						delete content2.name;
+					}
 				}
-			}
+			});
+			if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
+			const promise=asyncFn();
+			_status.extensionLoading.add(promise);
+			return promise;
 		},
-		loadExtension:function(obj){
+		loadExtension:gnc.async(function*(obj){
 			var noeval=false;
 			if(typeof obj=='function'){
-				obj=obj(lib,game,ui,get,ai,_status);
+				obj=yield obj(lib,game,ui,get,ai,_status);
 				noeval=true;
 			}
 			lib.extensionMenu['extension_'+obj.name]={
@@ -33586,7 +33592,7 @@
 						}
 						if(obj.precontent){
 							_status.extension=obj.name;
-							obj.precontent(cfg);
+							yield obj.precontent(cfg);
 							delete _status.extension;
 						}
 						if(obj.content){
@@ -33601,7 +33607,7 @@
 			else{
 				game.importedPack=obj;
 			}
-		},
+		}),
 		createDir:function(dir,success,error){
 			var nullFC=function(){};
 			success=success||nullFC;
