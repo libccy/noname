@@ -69,7 +69,7 @@
 		is:{
 			coroutine:item=>(typeof item=="function"||gnc.is.generator(item))&&item.name=="genCoroutine",
 			generatorFunc:item=>item instanceof GeneratorFunction,
-			generator:item=>item.constructor.constructor==GeneratorFunction
+			generator:item=>(typeof item=="object")&&("constructor" in item)&&item.constructor&&("constructor" in item.constructor)&&item.constructor.constructor===GeneratorFunction
 		}
 	};
 	const _status={
@@ -8304,8 +8304,8 @@
 					const loadPack=()=>{
 						if (Array.isArray(lib.onprepare)&&lib.onprepare.length){
 							_status.onprepare=Object.freeze(lib.onprepare.map(fn=>{
-								const result=fn();
-								return gnc.is.generatorFunc(fn)?gnc.await(result):result;
+								if(typeof fn!="function") return;
+								return gnc.await(fn());
 							}));
 						}
 						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
@@ -9096,8 +9096,8 @@
 				delete lib.onload;
 				while(Array.isArray(libOnload)&&libOnload.length){
 					const fun=libOnload.shift();
-					const result=fun();
-					yield gnc.is.generatorFunc(fun)?gnc.await(result):result;
+					if(typeof fun!="function") continue;
+					yield gnc.await(fun());
 				}
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
@@ -9870,8 +9870,8 @@
 				delete lib.onload2;
 				while(Array.isArray(libOnload2)&&libOnload2.length){
 					const fun=libOnload2.shift();
-					const result=fun();
-					yield gnc.is.generatorFunc(fun)?gnc.await(result):result;
+					if(typeof fun!="function") continue;
+					yield gnc.await(fun());
 				}
 			}),
 			startOnline:function(){
