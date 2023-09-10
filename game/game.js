@@ -33,32 +33,49 @@
 	// gnc: GeNCoroutine
 	const gnc={
 		async:fn=>function genCoroutine(){
-			return gnc.await(fn.apply(this,arguments))
+			let result=fn.apply(this,arguments);
+			result.name="genCoroutine";
+			result.status="next";
+			result.state=undefined;
+			return gnc.await(result);
 		},
 		await:gen=>new Promise((resolve,reject)=>{
-			const _next=value=>gnc.next(gen,resolve,reject,"next",value,_next,_throw);
-			const _throw=err=>gnc.next(gen,resolve,reject,"throw",err,_next,_throw);
-			_next(undefined);
+			let result=gen;
+			let nexts=resolve;
+			let throws=reject;
+			if(gnc.is.coroutine(gen)||(gnc.is.generator(gen)&&!gen.nocoroutine)) {
+				if(!gen.status)gen.status="next";
+				if(!gen.state)gen.state=undefined;
+				try{
+					result=gen[result.status](result.state);
+				}catch(error){
+					reject(error);
+					return;
+				}
+				if(!result.done){
+					nexts=(item)=>{
+						gen.state=item;
+						gen.status="next";
+						gnc.await(gen).then(resolve,reject);
+					}
+					throws=(err)=>{
+						gen.state=err;
+						gen.status="throw";
+						gnc.await(gen).then(resolve,reject);
+					}
+				}
+				result=result.value;
+			}
+			Promise.resolve(result).then(nexts,throws);
 		}),
-		is:{
-			coroutine:item=>typeof item=="function"&&item.name=="genCoroutine",
-			generatorFunc:item=>item instanceof GeneratorFunction,
-			generator:item=>item.constructor==GeneratorFunction
+		escape:gen=>{
+			gen.nocoroutine=true;
+			return gen;
 		},
-		next:(gen,resolve,reject,key,arg,_next,_throw)=>{
-			let info,value;
-			try{
-				info=gen[key](arg);
-				value=info.value;
-			}catch(error){
-				reject(error);
-				return;
-			}
-			if(info.done){
-				resolve(value);
-			}else{
-				Promise.resolve(value).then(_next,_throw);
-			}
+		is:{
+			coroutine:item=>(typeof item=="function"||gnc.is.generator(item))&&item.name=="genCoroutine",
+			generatorFunc:item=>item instanceof GeneratorFunction,
+			generator:item=>(typeof item=="object")&&("constructor" in item)&&item.constructor&&("constructor" in item.constructor)&&item.constructor.constructor===GeneratorFunction
 		}
 	};
 	const _status={
@@ -7268,6 +7285,7 @@
 		gnc:{
 			async:fn=>gnc.async(fn),
 			await:gen=>gnc.await(gen),
+			escape:gen=>gnc.escape(gen),
 			is:{
 				coroutine:item=>gnc.is.coroutine(item),
 				generatorFunc:item=>gnc.is.generatorFunc(item),
@@ -8305,8 +8323,8 @@
 					const loadPack=()=>{
 						if (Array.isArray(lib.onprepare)&&lib.onprepare.length){
 							_status.onprepare=Object.freeze(lib.onprepare.map(fn=>{
-								const result=fn();
-								return gnc.is.generatorFunc(fn)?gnc.await(result):result;
+								if(typeof fn!="function") return;
+								return gnc.await(fn());
 							}));
 						}
 						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
@@ -9097,8 +9115,8 @@
 				delete lib.onload;
 				while(Array.isArray(libOnload)&&libOnload.length){
 					const fun=libOnload.shift();
-					const result=fun();
-					yield gnc.is.generatorFunc(fun)?gnc.await(result):result;
+					if(typeof fun!="function") continue;
+					yield gnc.await(fun());
 				}
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
@@ -9871,8 +9889,8 @@
 				delete lib.onload2;
 				while(Array.isArray(libOnload2)&&libOnload2.length){
 					const fun=libOnload2.shift();
-					const result=fun();
-					yield gnc.is.generatorFunc(fun)?gnc.await(result):result;
+					if(typeof fun!="function") continue;
+					yield gnc.await(fun());
 				}
 			}),
 			startOnline:function(){
