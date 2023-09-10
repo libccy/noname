@@ -36086,7 +36086,11 @@
 						}
 						const audiosrc='die:ext:'+extname+'/'+j+'.mp3';
 						pack[i][j][4].add(imgsrc);
-						pack[i][j][4].add(audiosrc);
+						if(!pack[i][j][4].some((str)=>{
+							return typeof str == 'string' && str.indexOf('die:') == 0;
+						})){
+							pack[i][j][4].add(audiosrc);
+						}
 						if(pack[i][j][4].contains('boss')||
 							pack[i][j][4].contains('hiddenboss')){
 							lib.config.forbidai.add(j);
