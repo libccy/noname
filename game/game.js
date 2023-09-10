@@ -1,5 +1,6 @@
 "use strict";
 (()=>{
+	function initialize(){
 	if(!localStorage.getItem('gplv3_noname_alerted')){
 		if(confirm('①无名杀是一款基于GPLv3协议的开源软件！\n你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。\n点击“确定”即代表您认可并接受GPLv3协议↓️\nhttps://www.gnu.org/licenses/gpl-3.0.html\n②无名杀官方发布地址仅有GitHub仓库！\n其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！')){
 			localStorage.setItem('gplv3_noname_alerted',true);
@@ -29,6 +30,8 @@
 			}
 		}
 	}
+	}
+	initialize()
 	function _genNext(gen,resolve,reject,_next,_throw,key,arg){
 		try{
 			var info=gen[key](arg);
