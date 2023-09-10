@@ -11195,14 +11195,14 @@
 					event.trigger('placeCardsOnPile');
 					'step 1'
 			        if(event.position==-1){
-			            for(let card of cards){
+			            for(var card of cards){
 			                card.fix();
 			                ui.cardPile.appendChild(card);
 			                game.log(player,'将',card,'置于牌堆底');
 			            }
 			        }else{
-			            const position=ui.cardPile.childNodes[event.position];
-			            for(let card of cards){
+			            var position=ui.cardPile.childNodes[event.position];
+			            for(var card of cards){
 			                card.fix();
 			                ui.cardPile.insertBefore(card,position);
 			                event.position?game.log(player,'将',card,'置于牌堆第',get.cnNumber(event.position+1,true),'张牌前'):game.log(player,'将',card,'置于牌堆顶');
