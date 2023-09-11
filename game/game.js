@@ -8336,15 +8336,23 @@
 							if(!arrayLengths.length) return previousValue+1;
 							return previousValue+Math.min(...arrayLengths);
 						},0);
-						const packLoaded=()=>{
+						const packLoaded=gnc.async(function*(){
 							toLoad--;
 							if(toLoad) return;
+							if(_status.importing){
+								let promises=lib.creation.a;
+								for(const type in _status.importing){
+									promises.addArray(_status.importing[type])
+								}
+								yield Promise.allSettled(promises);
+								delete _status.importing;
+							}
 							if(_status.windowLoaded){
 								delete _status.windowLoaded;
 								lib.init.onload();
 							}
 							else _status.packLoaded=true;
-						};
+						});
 						if(localStorage.getItem(`${lib.configprefix}playback`)){
 							toLoad++;
 							lib.init.js(`${lib.assetURL}mode`,lib.config.mode,packLoaded,packLoaded);
@@ -33493,12 +33501,16 @@
 			}
 			else{
 				if(!lib.imported[type])lib.imported[type]={};
-				return gnc.await(content(lib,game,ui,get,ai,_status)).then(content2=>{
+				if(typeof _status.importing=="undefined")_status.importing={};
+				if(!_status.importing[type])_status.importing[type]=[];
+				const promise=gnc.await(content(lib,game,ui,get,ai,_status)).then(content2=>{
 					if(content2.name){
 						lib.imported[type][content2.name]=content2;
 						delete content2.name;
 					}
 				});
+				_status.importing[type].add(promise);
+				return promise;
 			}
 		},
 		loadExtension:gnc.async(function*(obj){
