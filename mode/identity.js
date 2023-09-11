@@ -1078,6 +1078,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else if(get.config('choose_group')&&player.group=='shen'&&!player.isUnseen(0)){
 						var list=lib.group.slice(0);
 						list.remove('shen');
+						var range = get.config('choose_group_range');
+						if(range != 'all'){
+							if(range == 'wswq'){
+								list = ['wei','shu','wu','qun'];
+							}else if(range == 'wswqj'){
+								list = ['wei','shu','wu','qun','jin'];
+							}
+						}
 						if(list.length) player.group=function(){
 						 if(_status.mode!='zhong'&&game.zhu&&game.zhu.group){
 						  if(['re_zhangjiao','liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu','sunce','re_sunben','ol_liushan','re_liushan','key_akane','dongzhuo','re_dongzhuo','ol_dongzhuo','jin_simashi','caomao'].contains(game.zhu.name)) return game.zhu.group;
