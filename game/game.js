@@ -137,6 +137,7 @@
 		characterFilter:{},
 		characterSort:{},
 		characterReplace:{},
+		characterGuozhanFilter:["mode_guozhan"],
 		dynamicTranslate:{},
 		cardPack:{},
 		skin:{},
@@ -8348,15 +8349,23 @@
 							if(!arrayLengths.length) return previousValue+1;
 							return previousValue+Math.min(...arrayLengths);
 						},0);
-						const packLoaded=()=>{
+						const packLoaded=gnc.async(function*(){
 							toLoad--;
 							if(toLoad) return;
+							if(_status.importing){
+								let promises=lib.creation.a;
+								for(const type in _status.importing){
+									promises.addArray(_status.importing[type])
+								}
+								yield Promise.allSettled(promises);
+								delete _status.importing;
+							}
 							if(_status.windowLoaded){
 								delete _status.windowLoaded;
 								lib.init.onload();
 							}
 							else _status.packLoaded=true;
-						};
+						});
 						if(localStorage.getItem(`${lib.configprefix}playback`)){
 							toLoad++;
 							lib.init.js(`${lib.assetURL}mode`,lib.config.mode,packLoaded,packLoaded);
@@ -9744,7 +9753,7 @@
 							try{
 								_status.extension=lib.extensions[i][0];
 								_status.evaluatingExtension=lib.extensions[i][3];
-								if (typeof lib.extensions[i][1]=="function") yield lib.extensions[i][1](lib.extensions[i][2],lib.extensions[i][4]);
+								if (typeof lib.extensions[i][1]=="function") yield gnc.await(lib.extensions[i][1](lib.extensions[i][2],lib.extensions[i][4]));
 								if(lib.extensions[i][4]){
 									if(lib.extensions[i][4].character){
 										for(var j in lib.extensions[i][4].character.character){
@@ -9761,7 +9770,9 @@
 									if(lib.extensions[i][4].skill){
 										for(var j in lib.extensions[i][4].skill.skill){
 											game.addSkill(j,lib.extensions[i][4].skill.skill[j],
-											lib.extensions[i][4].skill.translate[j],lib.extensions[i][4].skill.translate[j+'_info']);
+											lib.extensions[i][4].skill.translate[j],
+											lib.extensions[i][4].skill.translate[j+'_info'],
+											lib.extensions[i][4].skill.translate[j+'_append']);
 										}
 									}
 								}
@@ -33497,30 +33508,30 @@
 			}
 		},
 		import:function(type,content){
-			const asyncFn=gnc.async(function*(){
-				if(type=='extension'){
-					yield game.loadExtension(content);
-				}
-				else{
-					if(!lib.imported[type]){
-						lib.imported[type]={};
-					}
-					var content2=yield content(lib,game,ui,get,ai,_status);
+			if(type=='extension'){
+				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
+				const promise=game.loadExtension(content);
+				_status.extensionLoading.add(promise);
+				return promise;
+			}
+			else{
+				if(!lib.imported[type])lib.imported[type]={};
+				if(typeof _status.importing=="undefined")_status.importing={};
+				if(!_status.importing[type])_status.importing[type]=[];
+				const promise=gnc.await(content(lib,game,ui,get,ai,_status)).then(content2=>{
 					if(content2.name){
 						lib.imported[type][content2.name]=content2;
 						delete content2.name;
 					}
-				}
-			});
-			if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
-			const promise=asyncFn();
-			_status.extensionLoading.add(promise);
-			return promise;
+				});
+				_status.importing[type].add(promise);
+				return promise;
+			}
 		},
 		loadExtension:gnc.async(function*(obj){
 			var noeval=false;
 			if(typeof obj=='function'){
-				obj=yield obj(lib,game,ui,get,ai,_status);
+				obj=yield gnc.await(obj(lib,game,ui,get,ai,_status));
 				noeval=true;
 			}
 			lib.extensionMenu['extension_'+obj.name]={
@@ -33638,7 +33649,7 @@
 						}
 						if(obj.precontent){
 							_status.extension=obj.name;
-							yield obj.precontent(cfg);
+							yield gnc.await(obj.precontent(cfg));
 							delete _status.extension;
 						}
 						if(obj.content){
@@ -36119,11 +36130,16 @@
 			lib.characterPack[packname][name]=character;
 			lib.translate[packname+'_character_config']=extname;
 		},
-		addCharacterPack:function(pack,packagename){
+		addCharacterPack:(pack,packagename)=>{
 			var extname=_status.extension||'扩展';
+			let gzFlag=false;
 			packagename=packagename||extname;
 			for(var i in pack){
-				if(i=='mode'||i=='forbid') continue;
+				if(i=='mode'){
+					if(pack[i]=="guozhan") gzFlag=true;
+					continue;
+				}
+				if(i=='forbid') continue;
 				for(var j in pack[i]){
 					if(i=='character'){
 						if(!pack[i][j][4]){
@@ -36137,12 +36153,8 @@
 							imgsrc='ext:'+extname+'/'+j+'.jpg';
 						}
 						const audiosrc='die:ext:'+extname+'/'+j+'.mp3';
-						pack[i][j][4].add(imgsrc);
-						if(!pack[i][j][4].some((str)=>{
-							return typeof str == 'string' && str.indexOf('die:') == 0;
-						})){
-							pack[i][j][4].add(audiosrc);
-						}
+						if(!pack[i][j][4].some(str=>typeof str=="string"&&/^(?:db:extension-|ext:):(?:.+)/.test(str))) pack[i][j][4].add(imgsrc);
+						if(!pack[i][j][4].some(str=>typeof str=="string"&&/^die:(?:.+)/.test(str))) pack[i][j][4].add(audiosrc);
 						if(pack[i][j][4].contains('boss')||
 							pack[i][j][4].contains('hiddenboss')){
 							lib.config.forbidai.add(j);
@@ -36167,6 +36179,7 @@
 			var packname='mode_extension_'+packagename;
 			lib.characterPack[packname]=pack.character;
 			lib.translate[packname+'_character_config']=packagename;
+			if(gzFlag) lib.characterGuozhanFilter.add(packname);
 		},
 		addCard:function(name,info,info2){
 			var extname=(_status.extension||info2.extension);
@@ -36257,7 +36270,7 @@
 				}
 			}
 		},
-		addSkill:function(name,info,translate,description){
+		addSkill:function(name,info,translate,description,appendInfo){
 			if(lib.skill[name]){
 				return false;
 			}
@@ -36267,6 +36280,7 @@
 			lib.skill[name]=info;
 			lib.translate[name]=translate;
 			lib.translate[name+'_info']=description;
+			lib.translate[name+'_append']=appendInfo;
 			return true;
 		},
 		addMode:function(name,info,info2){

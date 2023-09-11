@@ -134,7 +134,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						step4();
 					}
 				};
-				var step4=lib.genAsync(function*(){
+				var step4=lib.gnc.async(function*(){
 					clear();
 					ui.window.classList.add('noclick_important');
 					ui.click.configMenu();
