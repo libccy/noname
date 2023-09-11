@@ -137,6 +137,7 @@
 		characterFilter:{},
 		characterSort:{},
 		characterReplace:{},
+		characterGuozhanFilter:["mode_guozhan"],
 		dynamicTranslate:{},
 		cardPack:{},
 		skin:{},
@@ -36107,11 +36108,16 @@
 			lib.characterPack[packname][name]=character;
 			lib.translate[packname+'_character_config']=extname;
 		},
-		addCharacterPack:function(pack,packagename){
+		addCharacterPack:(pack,packagename)=>{
 			var extname=_status.extension||'扩展';
+			let gzFlag=false;
 			packagename=packagename||extname;
 			for(var i in pack){
-				if(i=='mode'||i=='forbid') continue;
+				if(i=='mode'){
+					if(pack[i]=="guozhan") gzFlag=true;
+					continue;
+				}
+				if(i=='forbid') continue;
 				for(var j in pack[i]){
 					if(i=='character'){
 						if(!pack[i][j][4]){
@@ -36125,12 +36131,8 @@
 							imgsrc='ext:'+extname+'/'+j+'.jpg';
 						}
 						const audiosrc='die:ext:'+extname+'/'+j+'.mp3';
-						pack[i][j][4].add(imgsrc);
-						if(!pack[i][j][4].some((str)=>{
-							return typeof str == 'string' && str.indexOf('die:') == 0;
-						})){
-							pack[i][j][4].add(audiosrc);
-						}
+						if(!pack[i][j][4].some(str=>typeof str=="string"&&/^(?:db:extension-|ext:):(?:.+)/.test(str))) pack[i][j][4].add(imgsrc);
+						if(!pack[i][j][4].some(str=>typeof str=="string"&&/^die:(?:.+)/.test(str))) pack[i][j][4].add(audiosrc);
 						if(pack[i][j][4].contains('boss')||
 							pack[i][j][4].contains('hiddenboss')){
 							lib.config.forbidai.add(j);
@@ -36155,6 +36157,7 @@
 			var packname='mode_extension_'+packagename;
 			lib.characterPack[packname]=pack.character;
 			lib.translate[packname+'_character_config']=packagename;
+			if(gzFlag) lib.characterGuozhanFilter.add(packname);
 		},
 		addCard:function(name,info,info2){
 			var extname=(_status.extension||info2.extension);
