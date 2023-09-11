@@ -33485,27 +33485,21 @@
 			}
 		},
 		import:function(type,content){
-			const asyncFn=gnc.async(function*(){
-				if(type=='extension'){
-					yield game.loadExtension(content);
-				}
-				else{
-					if(!lib.imported[type]){
-						lib.imported[type]={};
-					}
-					var content2=yield gnc.await(content(lib,game,ui,get,ai,_status));
+			if(type=='extension'){
+				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
+				const promise=game.loadExtension(content);
+				_status.extensionLoading.add(promise);
+				return promise;
+			}
+			else{
+				if(!lib.imported[type])lib.imported[type]={};
+				return gnc.await(content(lib,game,ui,get,ai,_status)).then(content2=>{
 					if(content2.name){
 						lib.imported[type][content2.name]=content2;
 						delete content2.name;
 					}
-				}
-			});
-			const promise=asyncFn();
-			if(type=='extension'){
-				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];	
-				_status.extensionLoading.add(promise);
+				});
 			}
-			return promise;
 		},
 		loadExtension:gnc.async(function*(obj){
 			var noeval=false;
