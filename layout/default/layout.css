@@ -4548,7 +4548,7 @@ div[data-decoration="bronze"]::after{
 	writing-mode: vertical-rl;
 	-webkit-writing-mode: vertical-rl;
 }
-.card .tempname.tempimage {
+.tempname.tempimage {
 	top: calc(50% - 12.5px);
 	left: 2px;
 	width: calc(100% - 4px);
@@ -4561,7 +4561,7 @@ div[data-decoration="bronze"]::after{
 	color: black !important;
 	text-shadow: white 0 0 2px, white 0 0 3px;
 }
-.card .tempname.tempimage>div {
+.tempname.tempimage>div {
 	width: 100%;
 	height: 100%;
 	top: 0;
@@ -4570,7 +4570,7 @@ div[data-decoration="bronze"]::after{
 	background-position: -20px -30px;
 	background-repeat: no-repeat;
 }
-.card .tempname.tempimage>span {
+.tempname.tempimage>span {
 	position: relative;
 	z-index: 1;
 }
