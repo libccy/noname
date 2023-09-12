@@ -37424,18 +37424,9 @@
 							var cardname=get.name(cards[i]);
 							var cardnature=get.nature(cards[i]);
 							if(cards[i].name!=cardname||((cardnature||cards[i].nature)&&cards[i].nature!=cardnature)){
-								if(!cards[i]._tempName) cards[i]._tempName=ui.create.div('.tempname',cards[i]);
-								var tempname=get.translation(cardname);
-								cards[i]._tempName.classList[lib.config.cardtempname=='default'?'add':'remove']('vertical');
-								cards[i]._tempName.dataset.nature='fire';
-								if(cardname=='sha'){
-									if(cardnature) tempname=get.translation(cardnature)+tempname;
-									if(cardnature=='thunder') cards[i]._tempName.dataset.nature='thunder';
-									if(cardnature=='kami') cards[i]._tempName.dataset.nature='kami';
-									if(cardnature=='ice') cards[i]._tempName.dataset.nature='ice';
-								}
-								cards[i]._tempName.innerHTML=lib.config.cardtempname=='default'?get.verticalStr(tempname):tempname;
-								cards[i]._tempName.tempname=tempname;
+								var node=ui.create.cardTempName(cards[i]);
+								var cardtempnameConfig=lib.config.cardtempname;
+								if(cardtempnameConfig!=='default') node.classList.remove('vertical');
 							}
 						}
 						var nochess=true;
@@ -39749,6 +39740,31 @@
 			void window.getComputedStyle(node, null).getPropertyValue("opacity");
 		},
 		create:{
+			cardTempName:function(card,applyNode){
+				const getApplyNode=applyNode||card;
+				const cardName=get.name(card);
+				const cardNature=get.nature(card);
+				let tempname=get.translation(cardName);
+				const node=getApplyNode._tempName||ui.create.div('.tempname',getApplyNode);
+				getApplyNode._tempName=node;
+				let datasetNature='fire';
+				if(get.position(card)=='j'&&card.viewAs&&card.viewAs!=card.name) {
+					datasetNature = 'wood';
+					tempname=get.translation(card.viewAs);
+				}else{
+					if(cardName=='sha'){
+						if(cardNature) tempname=get.translation(cardNature)+tempname;
+						if(cardNature=='thunder') datasetNature='thunder';
+						if(cardNature=='kami') datasetNature='kami';
+						if(cardNature=='ice') datasetNature='ice';
+					}
+				}
+				if(lib.config.cardtempname=='default') getApplyNode._tempName.classList.add('vertical');
+				getApplyNode._tempName.dataset.nature=datasetNature;
+				getApplyNode._tempName.innerHTML=lib.config.cardtempname=='default'?get.verticalStr(tempname):tempname;
+				getApplyNode._tempName.tempname=tempname;
+				return node;
+			},
 			connectRooms:function(list){
 				ui.rooms=[];
 				ui.roombase=ui.create.dialog();
@@ -49047,12 +49063,7 @@
 						lib.setIntro(node);
 					}
 					if(get.position(item)=='j'&&item.viewAs&&item.viewAs!=item.name&&lib.config.cardtempname!='off'){
-						node._tempName=ui.create.div('.tempname',node);
-						var tempname=get.translation(item.viewAs);
-						if(lib.config.cardtempname=='default') node._tempName.classList.add('vertical');
-						node._tempName.dataset.nature='wood';
-						node._tempName.innerHTML=lib.config.cardtempname=='default'?get.verticalStr(tempname):tempname;
-						node._tempName.tempname=tempname;
+						ui.create.cardTempName(item,node);
 					}
 					break;
 
