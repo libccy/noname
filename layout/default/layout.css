@@ -4535,18 +4535,27 @@ div[data-decoration="bronze"]::after{
 	top: 74px;
 	right: 6px;
 }
-.card .tempname {
+.tempname {
 	color: white !important;
 	font-size: 22px;
 	left: 6px;
 	pointer-events: none;
 	top: 6px;
 }
-.card .tempname.vertical {
+.tempname.vertical {
 	left: 4px;
 	top: 8px;
 	writing-mode: vertical-rl;
 	-webkit-writing-mode: vertical-rl;
+}
+.button>.tempname {
+	font-size: 17px;
+	left: 5px;
+	top: 5px;
+}
+.button>.tempname .vertical {
+	left: 3px;
+	top: 6px;
 }
 /*.card.equip1 .wunature,
 .card.equip3 .wunature,
