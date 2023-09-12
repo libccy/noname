@@ -3056,12 +3056,13 @@
 					},
 					cardtempname:{
 						name:'视为卡牌名称显示',
-						intro:'显示强制视为类卡牌（如武魂）等名称的显示方式',
+						intro:'显示强制视为类卡牌（如武魂），包括拆顺对话框内的判定牌（国色）转换等名称的显示方式',
 						init:'default',
 						unfrequent:true,
 						item:{
 							default:'纵向',
 							horizon:'横向',
+							image:'图片',
 							off:'禁用',
 						},
 						onclick:function(item){
@@ -3072,14 +3073,9 @@
 								if(hs[i]._tempName){
 									switch(item){
 										case 'default':
-											var node=hs[i]._tempName;
-											node.classList.add('vertical');
-											node.innerHTML=get.verticalStr(node.tempname);
-											break;
 										case 'horizon':
-											var node=hs[i]._tempName;
-											node.classList.remove('vertical');
-											node.innerHTML=node.tempname;
+										case 'image':
+											ui.create.cardTempName(hs[i]);
 											break;
 										default:
 											hs[i]._tempName.delete();
@@ -39741,27 +39737,124 @@
 		},
 		create:{
 			cardTempName:function(card,applyNode){
-				const getApplyNode=applyNode||card;
-				const cardName=get.name(card);
-				const cardNature=get.nature(card);
+				let getApplyNode=applyNode||card;
+				let cardName=get.name(card);
+				let cardNature=get.nature(card);
 				let tempname=get.translation(cardName);
-				const node=getApplyNode._tempName||ui.create.div('.tempname',getApplyNode);
+				let cardTempNameConfig=lib.config.cardtempname;
+				let node=getApplyNode._tempName||ui.create.div('.tempname',getApplyNode);
 				getApplyNode._tempName=node;
-				let datasetNature='fire';
-				if(get.position(card)=='j'&&card.viewAs&&card.viewAs!=card.name) {
-					datasetNature = 'wood';
-					tempname=get.translation(card.viewAs);
+				if(cardTempNameConfig!='image'){
+					//清空，避免和下面的image部分有冲突
+					node.innerHTML='';
+					let datasetNature='fire';
+					if(get.position(card)=='j'&&card.viewAs&&card.viewAs!=card.name) {
+						datasetNature = 'wood';
+						tempname=get.translation(card.viewAs);
+					}else{
+						if(cardName=='sha'){
+							if(cardNature) tempname=get.translation(cardNature)+tempname;
+							if(cardNature=='thunder') datasetNature='thunder';
+							if(cardNature=='kami') datasetNature='kami';
+							if(cardNature=='ice') datasetNature='ice';
+						}
+					}
+					if(cardTempNameConfig=='default') getApplyNode._tempName.classList.add('vertical');
+					getApplyNode._tempName.dataset.nature=datasetNature;
 				}else{
-					if(cardName=='sha'){
-						if(cardNature) tempname=get.translation(cardNature)+tempname;
-						if(cardNature=='thunder') datasetNature='thunder';
-						if(cardNature=='kami') datasetNature='kami';
-						if(cardNature=='ice') datasetNature='ice';
+					if(get.position(card)=='j'&&card.viewAs&&card.viewAs!=card.name) {
+						cardName=card.viewAs;
+						tempname=get.translation(card.viewAs);
+					}
+					let bg=node.querySelector('div');
+					if (bg) {
+						Array.from(node.childNodes).filter(v=>v!=bg).forEach(v=>node.removeChild(v));
+					}
+					else bg=ui.create.div(node);
+					node.classList.add('tempimage');
+					let img=lib.card[cardName].image;
+					if(img){
+						if(img.indexOf('db:')==0){
+							img=img.slice(3);
+						}
+						else if(img.indexOf('ext:')!=0){
+							img=null;
+						}
+					}
+					if(lib.card[cardName].fullskin){
+						if(img){
+							if(img.indexOf('ext:')==0){
+								bg.setBackgroundImage(img.replace(/ext:/,'extension/'));
+							}
+							else{
+								bg.setBackgroundDB(img);
+							}
+						}
+						else{
+							if(lib.card[cardName].modeimage){
+								bg.setBackgroundImage('image/mode/'+lib.card[cardName].modeimage+'/card/'+cardName+'.png');
+							}
+							else{
+								if(cardName=='sha'&&cardNature=='stab') bg.setBackgroundImage('image/card/cisha.png');
+								else bg.setBackgroundImage('image/card/'+cardName+'.png');
+							}
+						}
+					}
+					else if(lib.card[cardName].image=='background'){
+						if(cardNature) bg.setBackground(cardName+'_'+cardNature,'card');
+						else bg.setBackground(cardName,'card');
+					}
+					else if(lib.card[cardName].fullimage){
+						if(img){
+							if(img.indexOf('ext:')==0){
+								bg.setBackgroundImage(img.replace(/ext:/,'extension/'));
+								bg.style.backgroundSize='cover';
+							}
+							else{
+								bg.setBackgroundDB(img);
+							}
+						}
+						else if(lib.card[cardName].image){
+							if(lib.card[cardName].image.indexOf('character:')==0){
+								bg.setBackground(lib.card[cardName].image.slice(10),'character');
+							}
+							else{
+								bg.setBackground(lib.card[cardName].image);
+							}
+						}
+						else{
+							let cardPack=lib.cardPack['mode_'+get.mode()];
+							if(Array.isArray(cardPack)&&cardPack.contains(cardName)){
+								bg.setBackground('mode/'+get.mode()+'/card/'+cardName);
+							}
+							else{
+								bg.setBackground('card/'+cardName);
+							}
+						}
+					}
+					else if(lib.card[cardName].image=='card'){
+						if(cardNature) bg.setBackground(cardName+'_'+cardNature,'card');
+						else bg.setBackground(cardName,'card');
+					}
+					else if(typeof lib.card[cardName].image=='string'&&!lib.card[cardName].fullskin){
+						if(img){
+							if(img.indexOf('ext:')==0){
+								bg.setBackgroundImage(img.replace(/ext:/,'extension/'));
+								bg.style.backgroundSize='cover';
+							}
+							else{
+								bg.setBackgroundDB(img);
+							}
+						}
+						else{
+							bg.setBackground(lib.card[cardName].image);
+						}
+					}
+					else{
+						console.warn('卡牌图片解析失败');
 					}
 				}
-				if(lib.config.cardtempname=='default') getApplyNode._tempName.classList.add('vertical');
-				getApplyNode._tempName.dataset.nature=datasetNature;
-				getApplyNode._tempName.innerHTML=lib.config.cardtempname=='default'?get.verticalStr(tempname):tempname;
+				getApplyNode._tempName.innerHTML+=`<span>${cardTempNameConfig=='default'?get.verticalStr(tempname):tempname}</span>`;
 				getApplyNode._tempName.tempname=tempname;
 				return node;
 			},
