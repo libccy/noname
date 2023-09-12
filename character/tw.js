@@ -3336,7 +3336,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var target=event.targets.shift();
 					event.target=target;
-					player.chooseBool(get.prompt('twejian',target),'当其他角色获得你的牌后，若其有其他与此牌类型相同的牌，你可以令其选择一项：1.受到你造成的1点伤害；2.弃置这些牌').set('ai',()=>{
+					player.chooseBool(get.prompt('twejian',target),'当其他角色得到你的牌后，若其有其他与此牌类型相同的牌，你可以令其选择一项：1.受到你造成的1点伤害；2.弃置这些牌').set('ai',()=>{
 						return get.attitude(player,_status.event.getParent().target)<0;
 					});
 					'step 2'
@@ -6880,7 +6880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								event.finish();
 								return;
 							}
-							player.chooseCard('h','除害：将其中一张获得的牌置入弃牌堆',true,function(card){
+							player.chooseCard('h','除害：将其中一张得到的牌置入弃牌堆',true,function(card){
 								return _status.event.cards.contains(card);
 							}).set('ai',function(card){
 								return -get.value(card);
@@ -8993,7 +8993,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseControl().set('prompt','征建：请选择一种效果').set('choiceList',[
 						'令“出牌阶段内未使用过非基本牌”的其他角色受到惩罚',
-						'令“出牌阶段内未获得过牌”的其他角色受到惩罚',
+						'令“出牌阶段内未得到过牌”的其他角色受到惩罚',
 					]).set('ai',()=>Math.random()<=0.5?0:1);
 					'step 1'
 					player.addSkill('twzhengjian_eff'+result.index);
@@ -9093,8 +9093,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						intro:{
 							content:function(storage,player){
-								if(player.storage.twzhengjian) return '其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则你可对其造成1点伤害，然后你可失去此效果并获得〖征建〗的效果一。';
-								return '其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果一。';
+								if(player.storage.twzhengjian) return '其他角色的出牌阶段结束时，若其本阶段内未得到过牌，则你可对其造成1点伤害，然后你可失去此效果并获得〖征建〗的效果一。';
+								return '其他角色的出牌阶段结束时，若其本阶段内未得到过牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果一。';
 							},
 						},
 					},
@@ -13731,10 +13731,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twshenxing:'神行',
 			twshenxing_info:'锁定技。若你的装备区内没有坐骑牌，则你至其他角色的距离-1且手牌上限+1。',
 			twdaoji:'盗戟',
-			twdaoji_info:'出牌阶段限一次，你可以弃置一张非基本牌并选择一名攻击范围内的角色，获得其一张牌。若你以此法获得的牌为：基本牌，你摸一张牌；装备牌，你使用此牌并对其造成1点伤害。',
+			twdaoji_info:'出牌阶段限一次，你可以弃置一张非基本牌并选择一名攻击范围内的角色，获得其一张牌。若你以此法得到的牌为：基本牌，你摸一张牌；装备牌，你使用此牌并对其造成1点伤害。',
 			tw_hejin:'TW何进',
 			twmouzhu:'谋诛',
-			twmouzhu_info:'出牌阶段限一次，你可以选择一名其他角色A。你令除A外所有体力值小于等于你的其他角色依次选择是否交给你一张牌。若你以此法获得的牌数X：等于0，你和所有进行选择的角色依次失去1点体力。大于0，你令A选择由你视为对其使用一张伤害值基数为X的【杀】或【决斗】。',
+			twmouzhu_info:'出牌阶段限一次，你可以选择一名其他角色A。你令除A外所有体力值小于等于你的其他角色依次选择是否交给你一张牌。若你以此法得到的牌数X：等于0，你和所有进行选择的角色依次失去1点体力。大于0，你令A选择由你视为对其使用一张伤害值基数为X的【杀】或【决斗】。',
 			twyanhuo:'延祸',
 			twyanhuo_info:'当你死亡时，你可以选择一项：①令一名其他角色弃置X张牌。②令X名其他角色依次弃置一张牌。（X为你的牌数）',
 			tw_mayunlu:'TW马云禄',
@@ -13837,9 +13837,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twyangshi_info:'锁定技。当你受到伤害后，若场上有不在你攻击范围内的其他角色，则你令攻击范围+1；若没有，则你从牌堆中获得一张【杀】。',
 			tw_puyangxing:'濮阳兴',
 			twzhengjian:'征建',
-			twzhengjian_info:'游戏开始时，你可选择获得一项效果：⒈其他角色的出牌阶段结束时，若其本阶段内未使用过非基本牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果二。⒉其他角色的出牌阶段结束时，若其本阶段内未获得过牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果一。',
+			twzhengjian_info:'游戏开始时，你可选择获得一项效果：⒈其他角色的出牌阶段结束时，若其本阶段内未使用过非基本牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果二。⒉其他角色的出牌阶段结束时，若其本阶段内未得到过牌，则其须交给你一张牌，然后你可失去此效果并获得〖征建〗的效果一。',
 			twzhongchi:'众斥',
-			twzhongchi_info:'锁定技，限定技。当你因〖征建〗而获得牌后，若已经有至少X名角色因〖征建〗而交给你过牌（X为游戏人数的一半且向上取整），则你回复2点体力，且于本局游戏内受到渠道为【杀】的伤害+1，且你将〖征建〗中的“其须交给你一张牌”改为“你可对其造成1点伤害”。',
+			twzhongchi_info:'锁定技，限定技。当你因〖征建〗而得到牌后，若已经有至少X名角色因〖征建〗而交给你过牌（X为游戏人数的一半且向上取整），则你回复2点体力，且于本局游戏内受到渠道为【杀】的伤害+1，且你将〖征建〗中的“其须交给你一张牌”改为“你可对其造成1点伤害”。',
 			tw_bingyuan:'邴原',
 			twbingde:'秉德',
 			twbingde_info:'出牌阶段限一次。你可以选择一个本阶段未选择过的花色并弃置一张牌，你摸等同于本阶段你使用此花色的牌数，然后若你以此法弃置的牌的花色与你选择的花色相同，你令你〖秉德〗于此阶段发动的次数上限+1。',
@@ -13902,12 +13902,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twyuhua_info:'锁定技。①你的非基本牌不计入手牌上限。②当你于回合外失去牌后，若其中有非基本牌，你可以卜算X，然后你可以摸X张牌（X为其中非基本牌数且至多为5）。',
 			tw_fanchou:'TW樊稠',
 			twxingluan:'兴乱',
-			twxingluan_info:'结束阶段，你可以亮出牌堆顶的六张牌，然后你可以选择一种类型的牌并分配给任意角色（每名角色至多三张）。然后所有以此法获得过牌且获得的牌数不少于你的角色失去1点体力。',
+			twxingluan_info:'结束阶段，你可以亮出牌堆顶的六张牌，然后你可以选择一种类型的牌并分配给任意角色（每名角色至多三张）。然后所有以此法得到过牌且得到的牌数不少于你的角色失去1点体力。',
 			tw_xujing:'TW许靖',
 			twboming:'博名',
-			twboming_info:'①出牌阶段限两次。你可以将一张牌交给一名其他角色。②结束阶段，若所有其他角色于此回合获得的牌数之和大于1，你摸两张牌。',
+			twboming_info:'①出牌阶段限两次。你可以将一张牌交给一名其他角色。②结束阶段，若所有其他角色于此回合得到的牌数之和大于1，你摸两张牌。',
 			twejian:'恶荐',
-			twejian_info:'当其他角色获得你的牌后，若其有其他与此牌类型相同的牌，你可以令其选择一项：1.受到你造成的1点伤害；2.弃置这些牌。',
+			twejian_info:'当其他角色得到你的牌后，若其有其他与此牌类型相同的牌，你可以令其选择一项：1.受到你造成的1点伤害；2.弃置这些牌。',
 			tw_zhangfei:'TW张飞',
 			twxuhe:'虚吓',
 			twxuhe_info:'当你使用的【杀】被【闪】抵消时，你可以令其选择一项：1.受到你造成的1点伤害；2.本回合你使用的下一张牌对其造成伤害时，此伤害+2。',
@@ -14023,7 +14023,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twyaohu_info:'每轮限一次。回合开始时，你须选择场上的一个势力。该势力的角色的出牌阶段开始时，其获得你的一张“生”，然后其须选择一项：1.对你指定的另一名的其他角色使用一张【杀】（无距离限制）；2.本回合其使用伤害牌指定你为目标时须交给你两张牌，否则取消此目标。',
 			tw_liwei:'李遗',
 			twjiaohua:'教化',
-			twjiaohua_info:'当你或体力值最小的其他角色因摸牌而获得牌后，你可以令该角色从牌堆或弃牌堆中获得一张本次未获得的类别的牌（每种类别每回合限一次）。',
+			twjiaohua_info:'当你或体力值最小的其他角色因摸牌而得到牌后，你可以令该角色从牌堆或弃牌堆中获得一张本次未获得的类别的牌（每种类别每回合限一次）。',
 			tw_yanxiang:'阎象',
 			twkujian:'苦谏',
 			twkujianx:'谏',
@@ -14114,7 +14114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twqingxi_info:'当你使用张【杀】指定目标后，若此牌为你于本回合使用的第一张【杀】，你可以令目标角色选择一项：1.令你摸Y张牌，此【杀】不可被其响应（Y为你装备区的牌数且至少为1）；2.若其装备区里有牌，弃置装备区里的所有牌，然后弃置你装备区里的等量张牌，令此【杀】对其造成的伤害+1。',
 			tw_sunyi:'TW孙翊',
 			twzaoli:'躁厉',
-			twzaoli_info:'锁定技。①出牌阶段，你只能使用或打出你本回合获得的手牌。②出牌阶段开始时，你须弃置你区域内的所有装备牌并弃置任意张非装备手牌，你摸等量的牌，从牌堆中将你此次弃置的装备牌对应副类别的装备牌置入装备区。若你以此法置入了超过两张装备牌，你失去1点体力。',
+			twzaoli_info:'锁定技。①出牌阶段，你只能使用或打出你本回合得到的手牌。②出牌阶段开始时，你须弃置你区域内的所有装备牌并弃置任意张非装备手牌，你摸等量的牌，从牌堆中将你此次弃置的装备牌对应副类别的装备牌置入装备区。若你以此法置入了超过两张装备牌，你失去1点体力。',
 			tw_yangyi:'TW杨仪',
 			twgongsun:'共损',
 			twgongsun_shadow:'共损',
