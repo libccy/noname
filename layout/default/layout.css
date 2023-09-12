@@ -4576,6 +4576,8 @@ div[data-decoration="bronze"]::after{
 }
 .button>.tempname {
 	font-size: 17px;
+}
+.button>.tempname:not(.tempimage) {
 	left: 5px;
 	top: 5px;
 }
