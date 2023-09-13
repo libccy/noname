@@ -188,7 +188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xizhicai:['male','wei',3,['tiandu','xianfu','chouce']],
 			quyi:['male','qun',4,['fuqi','jiaozi']],
 
-			luzhi:['male','wei',3,['qingzhongx','weijing']],
+			luzhi:['male','wei',3,['qingzhong','weijing']],
 			
 			//kaisa:["male","western",4,["zhengfu"]],
 		},
@@ -12789,9 +12789,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qingzhong:{
 				audio:2,
-			},
-			qingzhongx:{
-				audio:'weijing',
 				trigger:{player:'phaseUseBegin'},
 				check:function(event,player){
 					if(game.hasPlayer(function(current){
@@ -12806,15 +12803,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.draw(2);
-					player.addTempSkill('qingzhongx_give');
+					player.addTempSkill('qingzhong_give');
 				},
 				subSkill:{
 					give:{
+						audio:'qingzhong',
 						trigger:{player:'phaseUseEnd'},
 						filter:function(event,player){
 							return !player.isMinHandcard(true);
 						},
-						audio:'weijing',
 						forced:true,
 						content:function(){
 							'step 0'
@@ -12852,7 +12849,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['weijing_sha','weijing_shan'],
 				subSkill:{
 					sha:{
-						audio:'qingzhong',
+						audio:'weijing',
 						enable:'chooseToUse',
 						viewAs:{name:'sha',isCard:true},
 						filterCard:function(){return false},
@@ -12883,7 +12880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					shan:{
-						audio:'qingzhong',
+						audio:'weijing',
 						enable:'chooseToUse',
 						viewAs:{name:'shan',isCard:true},
 						mark:false,
@@ -12900,7 +12897,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							order:function(){
 								var player=_status.event.player;
-								if(player.hasSkill('qingzhongx_give')) return 2.95;
+								if(player.hasSkill('qingzhong_give')) return 2.95;
 								return 3.15;
 							},
 							skillTagFilter:function(player){
@@ -23557,8 +23554,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fengying_info:'限定技，出牌阶段，你可以弃置所有手牌。若如此做，你可以令等量的角色将手牌摸至X张(X为其体力上限且至多为5)。然后，你结束出牌阶段，并在当前回合结束后进行一个新的回合。',
 			
 			qingzhong:'清忠',
-			qingzhongx:'清忠',
-			qingzhongx_info:'出牌阶段开始时，你可以摸两张牌，若如此做，此阶段结束时，你与手牌数最少的角色交换手牌。',
+			qingzhong_info:'出牌阶段开始时，你可以摸两张牌，若如此做，此阶段结束时，你与手牌数最少的角色交换手牌。',
 			weijing:'卫境',
 			weijing_info:'每轮限一次，当你需要使用【杀】或【闪】时，你可以视为使用一张【杀】或【闪】。',
 			zishu:'自书',
