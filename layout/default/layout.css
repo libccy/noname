@@ -4558,6 +4558,8 @@ div[data-decoration="bronze"]::after{
 	text-align: right;
 	writing-mode: horizontal-tb;
 	-webkit-writing-mode: horizontal-tb;
+}
+.tempname.tempimage:not([data-nature]) {
 	color: black !important;
 	text-shadow: white 0 0 2px, white 0 0 3px;
 }
@@ -4573,6 +4575,7 @@ div[data-decoration="bronze"]::after{
 .tempname.tempimage>span {
 	position: relative;
 	z-index: 1;
+	line-height: 25px;
 }
 .button>.tempname {
 	font-size: 17px;
