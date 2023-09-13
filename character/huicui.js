@@ -9,7 +9,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuchongluojun:['male','qun',3,['dcminze','dcjini']],
 			yuechen:['male','wei',4,['dcporui','dcgonghu']],
 			zhangkai:['male','qun',4,['dcxiangshu']],
-			gaoxiang:['male','shu',4,['dcchiying'],['unseen']],
+			gaoxiang:['male','shu',4,['dcchiying']],
 			yuanyin:['male','qun',3,['dcmoshou','dcyunjiu'],['unseen']],
 			dongwan:['female','qun',3,['dcshengdu','dcjieling']],
 			zhangchu:['female','qun',3,['dcjizhong','dcrihui','dcguangshi']],
