@@ -5453,39 +5453,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			liunian:{
 				audio:2,
-				trigger:{global:'washCard'},
+				trigger:{global:'phaseEnd'},
 				forced:true,
 				filter:function(event,player){
-					return game.shuffleNumber<=2;
+					return game.hasGlobalHistory('cardMove',function(evt){
+						return evt.washCard&&(evt.shuffleNumber==1||evt.shuffleNumber==2);
+					});
 				},
 				content:function(){
-					if(game.shuffleNumber==1) player.addTempSkill('liunian_shuffle1');
-					else player.addTempSkill('liunian_shuffle2');
-					game.delayx();
+					'step 0'
+					if(game.hasGlobalHistory('cardMove',function(evt){
+						return evt.washCard&&evt.shuffleNumber==1;
+					})){
+						player.gainMaxHp();
+						game.delayx();
+					}
+					'step 1'
+					if(game.hasGlobalHistory('cardMove',function(evt){
+						return evt.washCard&&evt.shuffleNumber==2;
+					})){
+						player.recover();
+						game.delayx();
+					}
+					else event.finish();
+					'step 2'
+					player.addSkill('liunian_effect');
+					player.addMark('liunian_effect',10,false);
 				},
 				subSkill:{
-					shuffle1:{
-						charlotte:true,
-						forced:true,
-						trigger:{global:'phaseEnd'},
-						content:function(){
-							player.gainMaxHp();
-							game.delayx();
-						},
-					},
-					shuffle2:{
-						charlotte:true,
-						forced:true,
-						trigger:{global:'phaseEnd'},
-						content:function(){
-							'step 0'
-							player.recover();
-							game.delayx();
-							'step 1'
-							player.addSkill('liunian_effect');
-							player.addMark('liunian_effect',10,false);
-						},
-					},
 					effect:{
 						charlotte:true,
 						mod:{
@@ -10042,7 +10037,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xingchong:'幸宠',
 			xingchong_info:'一轮游戏开始时，你可声明两个自然数X和Y，且(X+Y)≤min(5, 你的体力上限)。你摸X张牌并展示Y张手牌。若如此做，当你于本轮内失去一张以此法展示的牌后，你摸两张牌。',
 			liunian:'流年',
-			liunian_info:'锁定技。牌堆第一次洗牌后，你于回合结束时加1点体力上限；牌堆第二次洗牌后，你于本回合结束时回复1点体力，且本局游戏内的手牌上限+10。',
+			liunian_info:'锁定技。回合结束时，若本回合内进行了本次游戏的第一次洗牌，则你加1点体力上限；若本回合内进行了本次游戏的第二次洗牌，则你于本回合结束时回复1点体力，且本局游戏内的手牌上限+10。',
 			caimaozhangyun:'蔡瑁张允',
 			lianzhou:'连舟',
 			lianzhou_info:'锁定技。准备阶段，你横置你的武将牌。然后你可横置任意名体力值等于你的角色。',

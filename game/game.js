@@ -32414,6 +32414,7 @@
 	const game={
 		//洗牌
 		washCard:()=>{
+			if(!ui.cardPile.hasChildNodes()&&!ui.discardPile.hasChildNodes()) return false;
 			if(_status.maxShuffle!=undefined){
 				if(_status.maxShuffle==0){
 					if(_status.maxShuffleCheck){
@@ -32427,7 +32428,7 @@
 				_status.maxShuffle--;
 			}
 			game.shuffleNumber++;
-			const cards=Array.from(ui.cardPile);
+			const cards=Array.from(ui.cardPile.childNodes);
 			if(_status.discarded){
 				_status.discarded.length=0;
 			}
@@ -32441,7 +32442,7 @@
 				cards.push(currentcard);
 			}
 			cards.randomSort();
-			game.cardsGotoPile(cards,'triggeronly','washCard')
+			return game.cardsGotoPile(cards,'triggeronly','washCard',['shuffleNumber',game.shuffleNumber])
 		},
 		//addGroup
 		//基于钩子的添加势力方法
@@ -32714,6 +32715,23 @@
 			if(get.mode()!='chess'&&rank.junk.contains(name)) return 'junk';
 			return 'common';
 		},
+		hasGlobalHistory:function(key,filter,last){
+			if(!key) return _status.globalHistory[_status.globalHistory.length-1];
+			if(!filter) return _status.globalHistory[_status.globalHistory.length-1][key];
+			else{
+				const history=game.getGlobalHistory(key);
+				if(last){
+					const lastIndex=history.indexOf(last);
+					return history.some((event,index)=>{
+						if(index>lastIndex) return false;
+						return filter(event);
+					});
+				}
+				else{
+					return history.some(filter);
+				}
+			}
+		},
 		checkGlobalHistory:function(key,filter,last){
 			if(!key) return _status.globalHistory[_status.globalHistory.length-1];
 			if(!filter) return _status.globalHistory[_status.globalHistory.length-1][key];
@@ -32746,13 +32764,34 @@
 				return history.filter(filter);
 			}
 		},
-		checkAllGlobalHistory:function(key,filter,last){
+		hasAllGlobalHistory:function(key,filter,last){
 			if(!key||!filter) return;
+			const stopped=false;
 			_status.globalHistory.forEach(value=>{
 				if(value[key]){
-					if(last&&value[key].includes(last)){
+					if(last&&value[key].includes(last)&&!stopped){
+						stopped=true;
 						const lastIndex=value[key].indexOf(last);
-						value[key].filter((event,index)=>{
+						if(value[key].some((event,index)=>{
+							if(index>lastIndex) return false;
+							return filter(event);
+						})) return true;
+					}
+					else{
+						if(value[key].some(filter)) return true;
+					}
+				}
+			})
+		},
+		checkAllGlobalHistory:function(key,filter,last){
+			if(!key||!filter) return;
+			const stopped=false;
+			_status.globalHistory.forEach(value=>{
+				if(value[key]){
+					if(last&&value[key].includes(last)&&!stopped){
+						stopped=true;
+						const lastIndex=value[key].indexOf(last);
+						value[key].forEach((event,index)=>{
 							if(index>lastIndex) return false;
 							return filter(event);
 						});
