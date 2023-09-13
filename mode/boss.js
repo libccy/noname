@@ -3149,23 +3149,25 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				group:'boss_diting_init',
 				subSkill:{
-					trigger:{
-						global:'gameStart',
-						player:'enterGame',
-					},
-					forced:true,
-					filter:function(event,player){
-						return player.hasEnabledSlot(3)||player.hasEnabledSlot(4);
-					},
-					content:function(){
-						var disables=[];
-						for(var i=3;i<=4;i++){
-							for(var j=0;j<player.countEnabledSlot(i);j++){
-								disables.push(i);
+					init:{
+						trigger:{
+							global:'gameStart',
+							player:'enterGame',
+						},
+						forced:true,
+						filter:function(event,player){
+							return player.hasEnabledSlot(3)||player.hasEnabledSlot(4);
+						},
+						content:function(){
+							var disables=[];
+							for(var i=3;i<=4;i++){
+								for(var j=0;j<player.countEnabledSlot(i);j++){
+									disables.push(i);
+								}
 							}
-						}
-						if(disables.length>0) player.disableEquip(disables);
-					},
+							if(disables.length>0) player.disableEquip(disables);
+						},
+					}
 				},
 			},
 			/*

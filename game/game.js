@@ -3057,7 +3057,7 @@
 					cardtempname:{
 						name:'视为卡牌名称显示',
 						intro:'显示强制视为类卡牌（如武魂），包括拆顺对话框内的判定牌（国色）转换等名称的显示方式',
-						init:'default',
+						init:'image',
 						unfrequent:true,
 						item:{
 							default:'纵向',
@@ -32412,6 +32412,37 @@
 		}
 	};
 	const game={
+		//洗牌
+		washCard:()=>{
+			if(_status.maxShuffle!=undefined){
+				if(_status.maxShuffle==0){
+					if(_status.maxShuffleCheck){
+						game.over(_status.maxShuffleCheck());
+					}
+					else{
+						game.over('平局');
+					}
+					return [];
+				}
+				_status.maxShuffle--;
+			}
+			game.shuffleNumber++;
+			const cards=Array.from(ui.cardPile);
+			if(_status.discarded){
+				_status.discarded.length=0;
+			}
+			for(let i=0;i<ui.discardPile.childNodes.length;i++){
+				var currentcard=ui.discardPile.childNodes[i];
+				currentcard.vanishtag.length=0;
+				if(get.info(currentcard).vanish||currentcard.storage.vanish){
+					currentcard.remove();
+					continue;
+				}
+				cards.push(currentcard);
+			}
+			cards.randomSort();
+			game.cardsGotoPile(cards,'triggeronly','washCard')
+		},
 		//addGroup
 		//基于钩子的添加势力方法
 		addGroup:(id,short,name,config)=>{
@@ -54512,34 +54543,7 @@
 			if(num<0) num=1;
 			while(num--){
 				if(ui.cardPile.hasChildNodes()==false){
-					if(_status.maxShuffle!=undefined){
-						if(_status.maxShuffle==0){
-							if(_status.maxShuffleCheck){
-								game.over(_status.maxShuffleCheck());
-							}
-							else{
-								game.over('平局');
-							}
-							return [];
-						}
-						_status.maxShuffle--;
-					}
-					game.shuffleNumber++;
-					var cards=[],i;
-					if(_status.discarded){
-						_status.discarded.length=0;
-					}
-					for(i=0;i<ui.discardPile.childNodes.length;i++){
-						var currentcard=ui.discardPile.childNodes[i];
-						currentcard.vanishtag.length=0;
-						if(get.info(currentcard).vanish||currentcard.storage.vanish){
-							currentcard.remove();
-							continue;
-						}
-						cards.push(currentcard);
-					}
-					cards.randomSort();
-					game.cardsGotoPile(cards,'triggeronly','washCard')
+					game.washCard();
 				}
 				if(ui.cardPile.hasChildNodes()==false){
 					game.over('平局');
@@ -56001,34 +56005,7 @@
 			if(num<0) num=1;
 			while(num--){
 				if(ui.cardPile.hasChildNodes()==false){
-					if(_status.maxShuffle!=undefined){
-						if(_status.maxShuffle==0){
-							if(_status.maxShuffleCheck){
-								game.over(_status.maxShuffleCheck());
-							}
-							else{
-								game.over('平局');
-							}
-							return [];
-						}
-						_status.maxShuffle--;
-					}
-					game.shuffleNumber++;
-					var cards=[],i;
-					if(_status.discarded){
-						_status.discarded.length=0;
-					}
-					for(i=0;i<ui.discardPile.childNodes.length;i++){
-						var currentcard=ui.discardPile.childNodes[i];
-						currentcard.vanishtag.length=0;
-						if(get.info(currentcard).vanish||currentcard.storage.vanish){
-							currentcard.remove();
-							continue;
-						}
-						cards.push(currentcard);
-					}
-					cards.randomSort();
-					game.cardsGotoPile(cards,'triggeronly','washCard')
+					game.washCard();
 				}
 				if(ui.cardPile.hasChildNodes()==false){
 					game.over('平局');

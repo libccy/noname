@@ -4305,7 +4305,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'wood',
 				onWash:function(){
-					_status.event.getParent('fuzhu').washed=false;
+					_status.event.getParent('fuzhu').washed=true;
 					return 'remove';
 				},
 				content:function(){
@@ -4319,19 +4319,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return card.name=='sha'&&player.canUse(card,trigger.player,false);
 					});
 					if(card){
-						card.remove();
-						game.updateRoundNumber();
 						player.useCard(card,trigger.player,false);
 					}
 					'step 2'
 					if(event.total>0&&!event.washed&&ui.cardPile.childElementCount<=player.hp*10&&trigger.player.isIn()) event.goto(1);
 					'step 3'
 					lib.onwash.remove(lib.skill.fuzhu.onWash);
-					var cards=get.cards(ui.cardPile.childElementCount+1);
-					for(var i=0;i<cards.length;i++){
-						ui.cardPile.insertBefore(cards[i],ui.cardPile.childNodes[get.rand(ui.cardPile.childElementCount)]);
-					}
-					game.updateRoundNumber();
+					game.washCard();
 				},
 				ai:{
 					threaten:1.5
