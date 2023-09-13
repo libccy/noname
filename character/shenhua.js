@@ -7664,7 +7664,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangzhong:['ol_huangzhong','re_huangzhong','huangzhong'],
 			weiyan:['ol_weiyan','re_weiyan','weiyan'],
 			zhoutai:['zhoutai','xin_zhoutai','old_zhoutai'],
-			xiaoqiao:['ol_xiaoqiao','re_xiaoqiao','xiaoqiao'],
+			xiaoqiao:['ol_xiaoqiao','re_xiaoqiao','xiaoqiao','old_xiaoqiao'],
 			yuji:['xin_yuji','re_yuji','yuji'],
 			zhangjiao:['re_zhangjiao','sp_zhangjiao','zhangjiao'],
 			dianwei:['ol_dianwei','re_dianwei','dianwei'],

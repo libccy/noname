@@ -869,7 +869,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return !player.hasSkill('dcmoyu_ban');
+					return !player.hasSkill('dcmoyu_ban')&&game.hasPlayer(current=>lib.skill.dcmoyu.filterTarget(null,player,current));
 				},
 				filterTarget:function(card,player,target){
 					return player!=target&&!player.getStorage('dcmoyu_clear').contains(target)&&target.countGainableCards(player,'hej');
