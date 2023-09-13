@@ -12575,6 +12575,18 @@
 						game.updateRenku();
 					}
 				},
+				cardsGotoPile:function(){
+					if(event.washCard){
+						event.trigger('washCard')
+						for(var i=0;i<lib.onwash.length;i++){
+							if(lib.onwash[i]()=='remove'){
+								lib.onwash.splice(i--,1);
+							}
+						}
+					}
+					game.getGlobalHistory().cardMove.push(event);
+					if(!event._triggeronly) game.$cardsGotoPile(event);
+				},
 				chooseToEnable:function(){
 					'step 0'
 					var list=[];
@@ -18283,16 +18295,16 @@
 								}
 							}
 							if(event.insert_index){
-								event.position.insertBefore(cards[i],event.insert_index(event,cards[i]));
 								cards[i].fix();
+								event.position.insertBefore(cards[i],event.insert_index(event,cards[i]));
 							}
 							else if(event.insert_card){
-								event.position.insertBefore(cards[i],event.position.firstChild);
 								cards[i].fix();
+								event.position.insertBefore(cards[i],event.position.firstChild);
 							}
 							else if(event.position==ui.cardPile){
-								event.position.appendChild(cards[i]);
 								cards[i].fix();
+								event.position.appendChild(cards[i]);
 							}
 							else cards[i].goto(event.position);
 						}
@@ -32770,6 +32782,58 @@
 			else if(bool===false) next.notrigger=true;
 			next.setContent('cardsGotoSpecial');
 			return next;
+		},
+		cardsGotoPile:function(){
+			const cards=[];
+			const next=game.createEvent('cardsGotoPile');
+			next.cards=cards;
+			for(let i=0;i<arguments.length;i++){
+				let arg=arguments[i],itemtype=get.itemtype(arg);
+				if(itemtype=='cards'){
+					cards.addArray(arg);
+				}
+				else if(itemtype=='card'){
+					cards.add(arg);
+				}
+				else if(typeof arg=='function'){
+					next.insert_index=arg;
+				}
+				else if(typeof arg=='string'){
+					if(arg=='insert') next.insert_card=true;
+					else if(arg=='washCard') next.washCard=true;
+					else if(arg=='triggeronly') next._triggeronly=true;
+				}
+				else if(Array.isArray(arg)&&arg.length==2&&typeof arg[0]=='string'){
+					next.set(arg[0],arg[1]);
+				}
+			}
+			if(!cards.length){
+				_status.event.next.remove(next);
+			}
+			else{
+				next.setContent('cardsGotoPile');
+				if(next._triggeronly) game.$cardsGotoPile(next);
+			}
+			return next;
+		},
+		$cardsGotoPile:function(event){
+			const cards=event.cards;
+			const pile=ui.cardPile;
+			for(let i=0;i<cards.length;i++){
+				if(event.insert_index){
+					cards[i].fix();
+					pile.insertBefore(cards[i],event.insert_index(event,cards[i]));
+				}
+				else if(event.insert_card){
+					cards[i].fix();
+					pile.insertBefore(cards[i],pile.firstChild);
+				}
+				else{
+					cards[i].fix();
+					pile.appendChild(cards[i]);
+				}
+			}
+			game.updateRoundNumber();
 		},
 		online:false,
 		onlineID:null,
@@ -54450,11 +54514,6 @@
 					}
 					game.shuffleNumber++;
 					var cards=[],i;
-					for(var i=0;i<lib.onwash.length;i++){
-						if(lib.onwash[i]()=='remove'){
-							lib.onwash.splice(i--,1);
-						}
-					}
 					if(_status.discarded){
 						_status.discarded.length=0;
 					}
@@ -54468,10 +54527,7 @@
 						cards.push(currentcard);
 					}
 					cards.randomSort();
-					for(var i=0;i<cards.length;i++){
-						ui.cardPile.appendChild(cards[i]);
-					}
-					if(_status.event.trigger) _status.event.trigger('washCard');
+					game.cardsGotoPile(cards,'triggeronly','washCard')
 				}
 				if(ui.cardPile.hasChildNodes()==false){
 					game.over('平局');
@@ -55947,11 +56003,6 @@
 					}
 					game.shuffleNumber++;
 					var cards=[],i;
-					for(var i=0;i<lib.onwash.length;i++){
-						if(lib.onwash[i]()=='remove'){
-							lib.onwash.splice(i--,1);
-						}
-					}
 					if(_status.discarded){
 						_status.discarded.length=0;
 					}
@@ -55965,10 +56016,7 @@
 						cards.push(currentcard);
 					}
 					cards.randomSort();
-					for(var i=0;i<cards.length;i++){
-						ui.cardPile.appendChild(cards[i]);
-					}
-					if(_status.event.trigger) _status.event.trigger('washCard');
+					game.cardsGotoPile(cards,'triggeronly','washCard')
 				}
 				if(ui.cardPile.hasChildNodes()==false){
 					game.over('平局');

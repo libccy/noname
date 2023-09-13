@@ -11859,22 +11859,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var top=result.moved[0];
 					var bottom=result.moved[1];
 					top.reverse();
-					for(var i=0;i<top.length;i++){
-						ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
-					}
-					for(i=0;i<bottom.length;i++){
-						ui.cardPile.appendChild(bottom[i]);
-					}
+					game.cardsGotoPile(
+						top.concat(bottom),
+						['top_cards',top],
+						function(event,card){
+							if(event.top_cards.includes(card)) return ui.cardPile.firstChild;
+							return null;
+						}
+					)
 					if(event.triggername=='phaseZhunbeiBegin'&&top.length==0){
 						player.addTempSkill('reguanxing_on');
 					}
 					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
 					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
-					game.updateRoundNumber();
+					"step 2"
 					game.delayx();
 				},
 				subSkill:{
-					on:{}
+					on:{charlotte:true}
 				}
 			},
 			reluoshen:{
