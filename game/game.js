@@ -7845,7 +7845,8 @@
 						value:function allSettled(ary){
 							const Promise = this;
 							return new Promise((resolve, reject) => {
-								if (Object.prototype.toString.call(arr) != "[object Array]")
+								// if (Object.prototype.toString.call(arr) != "[object Array]")
+								if (!Array.isArray(ary))
 								return reject(new TypeError(`${typeof arr} ${ary} is not iterable(cannot read property Symbol(Symbol.iterator))`));
 								let args = Array.prototype.slice.call(ary);
 								if (args.length == 0) return resolve([]);
