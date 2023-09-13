@@ -39743,11 +39743,12 @@
 				let tempname=get.translation(cardName);
 				let cardTempNameConfig=lib.config.cardtempname;
 				let node=getApplyNode._tempName||ui.create.div('.tempname',getApplyNode);
+				let datasetNature='';
 				getApplyNode._tempName=node;
 				if(cardTempNameConfig!='image'){
 					//清空，避免和下面的image部分有冲突
 					node.innerHTML='';
-					let datasetNature='fire';
+					datasetNature='fire';
 					if(get.position(card)=='j'&&card.viewAs&&card.viewAs!=card.name) {
 						datasetNature = 'wood';
 						tempname=get.translation(card.viewAs);
@@ -39760,11 +39761,17 @@
 						}
 					}
 					if(cardTempNameConfig=='default') getApplyNode._tempName.classList.add('vertical');
-					getApplyNode._tempName.dataset.nature=datasetNature;
 				}else{
 					if(get.position(card)=='j'&&card.viewAs&&card.viewAs!=card.name) {
 						cardName=card.viewAs;
 						tempname=get.translation(card.viewAs);
+					}
+					if(cardName=='sha'){
+						if(cardNature) tempname=get.translation(cardNature)+tempname;
+						if(cardNature=='fire') datasetNature = 'fire';
+						if(cardNature=='thunder') datasetNature='thunder';
+						if(cardNature=='kami') datasetNature='kami';
+						if(cardNature=='ice') datasetNature='ice';
 					}
 					let bg=node.querySelector('div');
 					if (bg) {
@@ -39854,8 +39861,13 @@
 						console.warn('卡牌图片解析失败');
 					}
 				}
-				getApplyNode._tempName.innerHTML+=`<span>${cardTempNameConfig=='default'?get.verticalStr(tempname):tempname}</span>`;
-				getApplyNode._tempName.tempname=tempname;
+				if(datasetNature.length>0){
+					node.dataset.nature=datasetNature;
+				}else{
+					delete node.dataset.nature;
+				}
+				node.innerHTML+=`<span>${cardTempNameConfig=='default'?get.verticalStr(tempname):tempname}</span>`;
+				node.tempname=tempname;
 				return node;
 			},
 			connectRooms:function(list){
