@@ -4744,18 +4744,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseTarget('是否弃置一枚“忍”，并发动【放逐】？',function(card,player,target){
 						return player!=target
-					}).ai=function(target){
+					}).set('ai',target=>{
 						if(target.hasSkillTag('noturn')) return 0;
-						if(target.isTurnedOver()){
-							return get.attitude(player,target)-1;
+						var player=_status.event.player;
+						var current=_status.currentPhase;
+						var dis=current?get.distance(current,target,'absolute'):1;
+						var draw=player.getDamagedHp();
+						var att=get.attitude(player,target);
+						if(att==0) return target.hasJudge('lebu')?Math.random()/3:Math.sqrt(get.threaten(target))/5+Math.random()/2;
+						if(att>0){
+							if(target.isTurnedOver()) return att+draw;
+							if(draw<4) return -1;
+							if(current&&target.getSeatNum()>current.getSeatNum()) return att+draw/3;
+							return 10*Math.sqrt(Math.max(0.01,get.threaten(target)))/(3.5-draw)+dis/(2*game.countPlayer());
 						}
 						else{
-							if(player.maxHp-player.hp==1){
-								return -get.attitude(player,target)-1;
-							}
+							if(target.isTurnedOver()) return -att-draw;
+							if(draw>=5) return -1;
+							if(current&&target.getSeatNum()<=current.getSeatNum()) return -att+draw/3;
+							return (4.25-draw)*10*Math.sqrt(Math.max(0.01,get.threaten(target)))+2*game.countPlayer()/dis;
 						}
-						return 0;
-					}
+					});
 					"step 1"
 					if(result.bool){
 						player.removeMark('renjie',1);

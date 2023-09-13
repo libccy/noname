@@ -4680,27 +4680,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('fangzhu'),'令一名其他角色将武将牌翻面并摸'+get.cnNumber(player.getDamagedHp())+'张牌',function(card,player,target){
+					var draw=player.getDamagedHp();
+					player.chooseTarget(get.prompt('fangzhu'),'令一名其他角色翻面'+(draw>0?'并摸'+get.cnNumber(draw)+'张牌':''),function(card,player,target){
 						return player!=target
-					}).setHiddenSkill('fangzhu').ai=function(target){
+					}).setHiddenSkill('fangzhu').set('ai',target=>{
 						if(target.hasSkillTag('noturn')) return 0;
 						var player=_status.event.player;
-						if(get.attitude(_status.event.player,target)==0) return 0;
-						if(get.attitude(_status.event.player,target)>0){
-							if(target.classList.contains('turnedover')) return 1000-target.countCards('h');
-							if(player.getDamagedHp()<3) return -1;
-							return 100-target.countCards('h');
+						var current=_status.currentPhase;
+						var dis=current?get.distance(current,target,'absolute'):1;
+						var draw=player.getDamagedHp();
+						var att=get.attitude(player,target);
+						if(att==0) return target.hasJudge('lebu')?Math.random()/3:Math.sqrt(get.threaten(target))/5+Math.random()/2;
+						if(att>0){
+							if(target.isTurnedOver()) return att+draw;
+							if(draw<4) return -1;
+							if(current&&target.getSeatNum()>current.getSeatNum()) return att+draw/3;
+							return 10*Math.sqrt(Math.max(0.01,get.threaten(target)))/(3.5-draw)+dis/(2*game.countPlayer());
 						}
 						else{
-							if(target.classList.contains('turnedover')) return -1;
-							if(player.getDamagedHp()>=3) return -1;
-							return 1+target.countCards('h');
+							if(target.isTurnedOver()) return -att-draw;
+							if(draw>=5) return -1;
+							if(current&&target.getSeatNum()<=current.getSeatNum()) return -att+draw/3;
+							return (4.25-draw)*10*Math.sqrt(Math.max(0.01,get.threaten(target)))+2*game.countPlayer()/dis;
 						}
-					}
+					});
 					"step 1"
 					if(result.bool){
 						player.logSkill('fangzhu',result.targets);
-						result.targets[0].draw(player.getDamagedHp());
+						var draw=player.getDamagedHp();
+						if(draw>0) result.targets[0].draw(draw);
 						result.targets[0].turnOver();
 					}
 				},
