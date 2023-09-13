@@ -33692,7 +33692,7 @@
 				})();
 			}
 		},
-		importExtension:function(data,finishLoad,exportext,pkg){
+		importExtension:gnc.async(function*(data,finishLoad,exportext,pkg){
 			//by 来瓶可乐加冰
 			if(!window.JSZip){
 				lib.init.js(lib.assetURL+'game','jszip',function(){
@@ -33941,7 +33941,7 @@
 					return false;
 				}
 			};
-		},
+		}),
 		export:function(textToWrite,name){
 			var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
 			var fileNameToSaveAs = name||'noname';
