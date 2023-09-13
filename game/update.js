@@ -57,6 +57,7 @@ window.noname_update={
 		//'character/yxs.js',
 		//'extension/boss/extension.js',
 		//'font/suits.woff2',
+		'image/card/cardtempname_bg.png',
 		'layout/default/layout.css',
 		//'layout/default/menu.css',
 		//'layout/long2/layout.css',

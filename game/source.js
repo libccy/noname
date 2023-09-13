@@ -65,6 +65,7 @@ window.noname_source_list=[
 	'game/pressure.js',
 	'game/source.js',
 	'game/update.js',
+	'image/card/cardtempname_bg.png',
 	'layout/default/codemirror.css',
 	'layout/default/layout.css',
 	'layout/default/menu.css',
