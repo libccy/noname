@@ -815,7 +815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var skills=player.getStorage('dclongsong_back');
 							for(var key of skills){
 								game.log(player,'恢复了技能','#g【'+get.translation(key)+'】');
-								delete player.storage[key];
+								//delete player.storage[key];
 							}
 							player.enableSkill(skill);
 							player.popup(skills,'thunder');
