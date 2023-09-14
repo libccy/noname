@@ -162,6 +162,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiahouzie:'夏侯紫萼，游卡桌游《三国杀阵面对决》中虚构的人物。幼年因天天帮病种的母亲采紫萼得其名。亲眼目睹母亲被宦官所杀，愤怒之下夺过佩剑斩下宦官的头颅。被神秘人所救，发现了自己的身世，决心与宦官争斗到底。后再闯荡江湖的过程中，与夏侯惇义结金兰，以夏侯家姓氏称呼。',
 			yangang:'严纲（163~191年），东汉末年公孙瓒部下的冀州刺史。汉献帝初平二年（191年），袁绍与公孙瓒在界桥交战，严纲为袁绍部下麹义所斩。',
 			gongsunfan:'公孙范，辽西令支（今河北迁安）人。东汉末年武将，公孙瓒从弟，官至勃海太守。公孙瓒起兵攻打袁绍之时，袁绍畏惧公孙瓒的势力，将自己的勃海太守印绶给予公孙范，意图和解，结果公孙范反而起勃海之兵帮助公孙瓒。初平二年（191年），公孙范以勃海兵助公孙瓒率二万人大破青、徐黄巾军。最后于界桥之战与公孙瓒一同败走。',
+			zhangzhao:'张昭（156年－236年），字子布。徐州彭城县（今江苏省徐州市）人。汉末三国时期孙吴政权重臣。东汉末年，张昭为避战乱而南渡至扬州。孙策创业时，任命其为长史、抚军中郎将，将文武之事都委任于张昭。孙策临终前，将其弟孙权托付给张昭，张昭率群僚辅立孙权，并安抚百姓、讨伐叛军，与周瑜等辅助孙权稳定局势。孙权每次出征，常留张昭镇守后方，领幕府事，并敬称他为“张公”。赤壁之战时，张昭鉴于曹操势大，持主降论，从而被排挤出军政决策中心。孙权代理车骑将军时，任命张昭为军师。孙权被封为吴王后，任绥远将军，封由拳侯。此后曾参与撰定朝仪。孙权两次要设立丞相时，众人都推举张昭，孙权以张昭敢于直谏、性格刚直为由而不用他，先后用孙邵、顾雍。黄龙元年（229年），孙权称帝，张昭以年老多病为由，上还官位及所统领部属，改拜辅吴将军、班亚三司，改封娄侯。晚年时一度不参与政事，在家著书，即使偶有参加朝议，也常与孙权产生激烈冲突。嘉禾五年（236年），张昭去世，享年八十一岁，谥号“文”。张昭容貌严正，敢于直言谏诤，一生以忠于孙氏基业为任，但因其与孙权在个性、军政策略等方面的深层矛盾，使其以“入宫则拜孤，出宫则拜君”的地位，却终身不得任丞相。著有《春秋左氏传解》及《论语注》，今皆佚失。',
+			zhanghong:'张纮（153年～212年），字子纲，徐州广陵（江苏省扬州市广陵区人）人。东汉末年文学家、官员，和张昭一起合称“二张”。曾被大将军何进、太尉朱儁、司空荀爽辟为掾属，皆不就，避难江东。孙策平定江东前，亲自多次登门邀请，张纮出仕为官。孙权即位时，建议孙权迁都秣陵。建安十七年（212年），病逝，时年六十岁，孙权为之流涕。',
 		},
 		card:{
 			dz_mantianguohai:{
@@ -277,35 +279,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//张昭
 			twlijian:{
+				getCards:function(event){
+					var cards=[];
+					game.countPlayer2(function(current){
+						current.checkHistory('lose',function(evt){
+							if(evt.position==ui.discardPile&&evt.getParent('phaseDiscard')==event) cards.addArray(evt.cards);
+						})
+					});
+					game.checkGlobalHistory('cardMove',function(evt){
+						if(evt.name=='cardsDiscard'&&evt.getParent('phaseDiscard')==event) cards.addArray(evt.cards);
+					});
+					return cards;
+				},
 				audio:2,
-				sunben:true,
+				sunbenSkill:true,
 				trigger:{global:'phaseDiscardEnd'},
 				filter:function(event,player){
 					if(player.hasSkill('twlijian_sunben')) return false;
 					if(event.player!=player&&event.player.isIn()){
-						game.checkGlobalHistory('cardMove',function(evt){
-							if(evt.getParent('phaseDiscard')==event){
-								if(evt.name=='cardsDiscard'||(evt.name=='lose'&&evt.type=='discard'&&evt.position==ui.discardPile)) return true;
-							}
-						});
+						return lib.skill.twlijian.getCards(event).length;
 					}
 					return false;
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var cards=[],target=trigger.player;
-					event.cards=cards;
-					event.target=target;
-					game.checkGlobalHistory('cardMove',function(evt){
-						if(evt.getParent('phaseDiscard')==trigger){
-							if(evt.name=='cardsDiscard'||(evt.name=='lose'&&evt.type=='discard'&&evt.position==ui.discardPile)){
-								cards.addArray(evt.cards.filterInD('d'));
-							}
-						}
-					});
+					var cards=lib.skill.twlijian.getCards(trigger),target=trigger.player;
+					event.cards=cards;event.target=target;
 					player.chooseButton([
-						get.prompt('gtwlijian',target),
+						get.prompt('twlijian',target),
 						'<span class="text center">选择任意张牌令其获得，然后你获得剩余的牌，若其获得的牌数大于你，则你可以对其造成1点伤害</span>',
 						cards,
 					],[1,Infinity]).set('ai',function(button){
@@ -362,9 +364,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					sunben:{
 						charlotte:true,
+						init:function(player){
+							player.storage.twlijian_sunben=0;
+						},
 						onremove:true,
 						mark:true,
-						intro:{content:'弃牌堆进入牌进度：#/8'},
+						intro:{
+							markcount:function(num){
+								return (num||0).toString();
+							},
+							content:'弃牌堆进入牌进度：#/8',
+						},
 						trigger:{global:['loseAfter','cardsDiscardAfter','loseAsyncAfter','equipAfter']},
 						filter:function(event,player){
 							var cards=event.getd();
@@ -14330,6 +14340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twlijian_info:'昂扬技。其他角色的弃牌阶段结束时，你可以令其获得任意本阶段进入弃牌堆的牌，然后你获得其余的牌，若其获得的牌数大于你，你可以对其造成1点伤害。<br>激昂：八张牌进入弃牌堆。',
 			twchungang:'纯刚',
 			twchungang_info:'锁定技。一名其他角色于摸牌阶段外一次性获得超过一张牌时，你令其弃置一张牌。',
+			tw_zhanghong:'张纮',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',
