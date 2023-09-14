@@ -510,7 +510,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return att-4;
 						},
 						//forced:true,
-						prompt:'将获得的一张牌交给一名其他角色，或点取消'
+						prompt:'将得到的一张牌交给一名其他角色，或点取消'
 					});
 					"step 1"
 					if(result.bool){

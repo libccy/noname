@@ -2416,7 +2416,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
  						_jiazu_jin:{
  							trigger:{player:'phaseDrawEnd'},
  							popup:'晋势',
- 							prompt2:'摸牌阶段结束时，你可以展示你于此阶段内因摸牌而获得的牌。若这些牌的花色均不同，则你摸一张牌。',
+ 							prompt2:'摸牌阶段结束时，你可以展示你于此阶段内因摸牌而得到的牌。若这些牌的花色均不同，则你摸一张牌。',
  							filter:function(event,player){
  								var hs=player.getCards('h');
  								return player.group=='jin'&&hs.length>0&&player.getHistory('gain',function(evt){
@@ -2627,7 +2627,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
   						},
   						_jiazu_jin:{
  								popup:'晋势',
- 								prompt2:'摸牌阶段结束时，你可以展示你于此阶段内因摸牌而获得的牌。若这些牌的花色均不同，则你摸一张牌。',
+ 								prompt2:'摸牌阶段结束时，你可以展示你于此阶段内因摸牌而得到的牌。若这些牌的花色均不同，则你摸一张牌。',
  							},
   						_jiazu_key:{
   							popup:'键魂',

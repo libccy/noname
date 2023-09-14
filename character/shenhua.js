@@ -4680,27 +4680,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('fangzhu'),'令一名其他角色将武将牌翻面并摸'+get.cnNumber(player.getDamagedHp())+'张牌',function(card,player,target){
+					var draw=player.getDamagedHp();
+					player.chooseTarget(get.prompt('fangzhu'),'令一名其他角色翻面'+(draw>0?'并摸'+get.cnNumber(draw)+'张牌':''),function(card,player,target){
 						return player!=target
-					}).setHiddenSkill('fangzhu').ai=function(target){
+					}).setHiddenSkill('fangzhu').set('ai',target=>{
 						if(target.hasSkillTag('noturn')) return 0;
 						var player=_status.event.player;
-						if(get.attitude(_status.event.player,target)==0) return 0;
-						if(get.attitude(_status.event.player,target)>0){
-							if(target.classList.contains('turnedover')) return 1000-target.countCards('h');
-							if(player.getDamagedHp()<3) return -1;
-							return 100-target.countCards('h');
+						var current=_status.currentPhase;
+						var dis=current?get.distance(current,target,'absolute'):1;
+						var draw=player.getDamagedHp();
+						var att=get.attitude(player,target);
+						if(att==0) return target.hasJudge('lebu')?Math.random()/3:Math.sqrt(get.threaten(target))/5+Math.random()/2;
+						if(att>0){
+							if(target.isTurnedOver()) return att+draw;
+							if(draw<4) return -1;
+							if(current&&target.getSeatNum()>current.getSeatNum()) return att+draw/3;
+							return 10*Math.sqrt(Math.max(0.01,get.threaten(target)))/(3.5-draw)+dis/(2*game.countPlayer());
 						}
 						else{
-							if(target.classList.contains('turnedover')) return -1;
-							if(player.getDamagedHp()>=3) return -1;
-							return 1+target.countCards('h');
+							if(target.isTurnedOver()) return -att-draw;
+							if(draw>=5) return -1;
+							if(current&&target.getSeatNum()<=current.getSeatNum()) return -att+draw/3;
+							return (4.25-draw)*10*Math.sqrt(Math.max(0.01,get.threaten(target)))+2*game.countPlayer()/dis;
 						}
-					}
+					});
 					"step 1"
 					if(result.bool){
 						player.logSkill('fangzhu',result.targets);
-						result.targets[0].draw(player.getDamagedHp());
+						var draw=player.getDamagedHp();
+						if(draw>0) result.targets[0].draw(draw);
 						result.targets[0].turnOver();
 					}
 				},
@@ -7664,7 +7672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangzhong:['ol_huangzhong','re_huangzhong','huangzhong'],
 			weiyan:['ol_weiyan','re_weiyan','weiyan'],
 			zhoutai:['zhoutai','xin_zhoutai','old_zhoutai'],
-			xiaoqiao:['ol_xiaoqiao','re_xiaoqiao','xiaoqiao'],
+			xiaoqiao:['ol_xiaoqiao','re_xiaoqiao','xiaoqiao','old_xiaoqiao'],
 			yuji:['xin_yuji','re_yuji','yuji'],
 			zhangjiao:['re_zhangjiao','sp_zhangjiao','zhangjiao'],
 			dianwei:['ol_dianwei','re_dianwei','dianwei'],
@@ -8070,7 +8078,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌替换之。',
 			huangtian_info:'主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或【闪电】。',
 			guhuo_info:'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）',
-			fenji_info:'当一名角色的手牌不因赠予或交给而被其他角色获得后，或一名角色的手牌被其他角色弃置后，你可以令其摸两张牌。',
+			fenji_info:'当一名角色的手牌不因赠予或交给而被另一名角色得到后，或一名角色的手牌被另一名角色弃置后，你可以失去1点体力，令其摸两张牌。',
 			
 			new_fenji:"奋激",
 			new_fenji_info:"一名角色的结束阶段开始时，若其没有手牌，你可以令其摸两张牌，然后你失去1点体力。",

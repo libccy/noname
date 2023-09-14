@@ -1231,7 +1231,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						return get.effect(target,{name:'shunshou_copy2'},player,player);
 					});
-					if(event.color) next.set('prompt2','若你获得的牌为'+get.translation(event.color)+'，则你可以重复此流程');
+					if(event.color) next.set('prompt2','若你得到的牌为'+get.translation(event.color)+'，则你可以重复此流程');
 					'step 2'
 					if(result.bool){
 						var target=result.targets[0];
@@ -2963,7 +2963,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						if(cards.length){
 							player.chooseCardTarget({
-								prompt:'是否将获得的牌当做【乐不思蜀】使用？',
+								prompt:'是否将得到的牌当做【乐不思蜀】使用？',
 								filterCard:function(card){
 									return _status.event.cards.contains(card);
 								},
@@ -5420,7 +5420,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					trigger.player.chooseCard(2,'h','是否对'+get.translation(player)+'发动【虎驭】？','将两张手牌交给该角色，然后令其获得〖纵略〗并于下回合获得该角色获得的所有牌').set('goon',function(){
+					trigger.player.chooseCard(2,'h','是否对'+get.translation(player)+'发动【虎驭】？','将两张手牌交给该角色，然后令其获得〖纵略〗并于下回合获得该角色得到的所有牌').set('goon',function(){
 						var source=trigger.player;
 						if(get.attitude(source,player)>0) return 7;
 						if(source.hp>2) return 4;
@@ -18463,7 +18463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shiorimiyuki_banyin:'伴音',
 			shiorimiyuki_banyin_info:'当你受到伤害或回复体力后，你可令一名其他角色回复1点体力。',
 			shiorimiyuki_tingxian:'铤险',
-			shiorimiyuki_tingxian_info:'出牌阶段开始时，你可以摸至多三张牌。若如此做，你回复1点体力，且此阶段结束时你失去X点体力。（X为你获得的牌中仍在手牌区的牌的数量）',
+			shiorimiyuki_tingxian_info:'出牌阶段开始时，你可以摸至多三张牌。若如此做，你回复1点体力，且此阶段结束时你失去X点体力。（X为你得到的牌中仍在手牌区的牌的数量）',
 			shiorimiyuki_tingxian2:'铤险',
 			miki_shenqiang:'神枪',
 			miki_shenqiang_info:'锁定技，游戏开始时，你将一张【海德洛格拉迪尔特·改】和一张【望远镜】置入你的装备区。你装备区内的武器牌和宝物牌不能被其他角色弃置。',
@@ -18519,7 +18519,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kotori_skill_key:'键魂',
 			kotori_skill_key_info:'出牌阶段限一次，你可以摸一张牌并获得1点护甲。若如此做，你于当前回合结束时失去1点体力。',
 			kotori_skill_jin:'晋势',
-			kotori_skill_jin_info:'摸牌阶段结束时，你可以展示你于此阶段内因摸牌而获得的牌。若这些牌的花色均不同，则你摸一张牌。',
+			kotori_skill_jin_info:'摸牌阶段结束时，你可以展示你于此阶段内因摸牌而得到的牌。若这些牌的花色均不同，则你摸一张牌。',
 			kotori_yumo_wei:'<span class="thundertext">魔物</span>',
 			kotori_yumo_shu:'<span class="firetext">魔物</span>',
 			kotori_yumo_wu:'<span class="greentext">魔物</span>',
@@ -18547,14 +18547,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//猴年马月爆料再利用
 			shizuku_sizhi:'思智',
 			shizuku_sizhi2:'思智',
-			shizuku_sizhi_info:'出牌阶段限一次，你可以弃置任意张点数之和为13的牌，然后摸两倍数量的牌。以此法获得的牌中，黑色牌本回合无距离和次数限制，红色牌本回合不计入手牌上限。',
+			shizuku_sizhi_info:'出牌阶段限一次，你可以弃置任意张点数之和为13的牌，然后摸两倍数量的牌。以此法得到的牌中，黑色牌本回合无距离和次数限制，红色牌本回合不计入手牌上限。',
 			shizuku_biyi:'避忆',
 			shizuku_biyi_info:'当你受到伤害后，你可以进行一次判定，然后若你弃置任意张点数之和与判定结果点数相同的牌，你回复1点体力。',
 			shizuku_sanhua:'散花',
 			shizuku_sanhua_info:'当你死亡时，你可令一名其他角色从牌堆中获得四张名称各不相同的基本牌。',
 			hiroto_huyu:'虎驭',
 			hiroto_huyu2:'虎驭',
-			hiroto_huyu_info:'其他角色的出牌阶段结束时，若你没有技能〖纵略〗，则其可将两张手牌交给你。若如此做，你获得〖纵略〗。你的下回合结束时，你失去〖纵略〗并将本回合内获得的所有牌交给该角色。',
+			hiroto_huyu_info:'其他角色的出牌阶段结束时，若你没有技能〖纵略〗，则其可将两张手牌交给你。若如此做，你获得〖纵略〗。你的下回合结束时，你失去〖纵略〗并将本回合内得到的所有牌交给该角色。',
 			hiroto_zonglve:'纵略',
 			hiroto_zonglve_info:'锁定技，你的手牌上限+3。出牌阶段限一次，你可以将一张手牌背面朝下放置，并展示一名其他角色的一张手牌。若这两张牌：颜色相同，你对其造成1点伤害并弃置其展示的牌。颜色不同，你获得该角色区域内的两张牌。',
 			hiroto_tuolao:'脱牢',
@@ -18612,14 +18612,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			satomi_luodao:'落刀',
 			satomi_luodao_info:'当你使用【杀】指定目标后，你可以展示目标角色的所有手牌。若其中：有【闪】，则你弃置其中的一张【闪】；没有【闪】，则你弃置一张牌。',
 			satomi_daohai:'稻海',
-			satomi_daohai_info:'结束阶段，若你本回合内弃置过牌，则你可以视为使用一张【五谷丰登】。然后你可以将你于此【五谷丰登】中获得的牌当做【乐不思蜀】使用。',
+			satomi_daohai_info:'结束阶段，若你本回合内弃置过牌，则你可以视为使用一张【五谷丰登】。然后你可以将你于此【五谷丰登】中得到的牌当做【乐不思蜀】使用。',
 			satomi_daohai_append:'<span style="font-family: yuanli">五穀豊穣、刈り入れ時だね！</span>',
 			tenzen_fenghuan:'封还',
 			tenzen_fenghuan_info:'其他角色使用的【杀】或伤害性锦囊牌结算结束后，若你是此牌的唯一目标，则你可以弃置任意张点数之和大于等于此牌点数两倍的牌，然后视为对其使用一张名称相同的牌。',
 			tenzen_retianquan:'天全',
 			tenzen_retianquan_info:'每回合限一次。当你使用【杀】指定目标后，你可失去1点体力或弃置一张牌，然后展示牌堆顶的三张牌（若你的体力值小于体力上限的50%，则改为展示五张牌）。这些牌中每有一张基本牌，响应此牌所需的【闪】的数量便+1。此牌结算结束后，若此牌造成过伤害，则你获得展示牌中的所有非基本牌。',
 			iriya_yinji:'殷极',
-			iriya_yinji_info:'锁定技。出牌阶段开始时，你将手牌摸至17张。你不能直接使用以此法获得的牌。',
+			iriya_yinji_info:'锁定技。出牌阶段开始时，你将手牌摸至17张。你不能直接使用以此法得到的牌。',
 			iriya_haozhi:'豪掷',
 			iriya_haozhi_info:'出牌阶段，你可以按照斗地主牌型弃置至少两张牌，且其他角色可以依次对其进行一轮响应。最后一名进行响应的角色可以根据对应牌型执行对应效果。'
 			+'对子：其可以令至多两名角色各摸一张牌。'
@@ -18673,7 +18673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuuki_yicha_info:'出牌阶段开始时，你可依次进行两次判定并将判定牌依次置入两行三列方阵的两个随机位置中。然后你依次进行四次判定，每次可将当前判定牌置入空方格，且须与相邻方格的牌颜色均不同。若如此做，你令一名角色获得方阵内的所有牌。',
 			key_kyouko:'伊座并杏子',
 			kyouko_rongzhu:'容助',
-			kyouko_rongzhu_info:'其他角色不因此技能而获得你的牌后，你可摸一张牌，然后交给其一张牌。若其是当前回合角色，则其本回合使用【杀】的次数上限+1；若你是当前回合角色，则你本回合的手牌上限+1。',
+			kyouko_rongzhu_info:'其他角色不因此技能而得到你的牌后，你可摸一张牌，然后交给其一张牌。若其是当前回合角色，则其本回合使用【杀】的次数上限+1；若你是当前回合角色，则你本回合的手牌上限+1。',
 			kyouko_gongmian:'共勉',
 			kyouko_gongmian_use:'共勉',
 			kyouko_gongmian_exchange:'共勉',
@@ -18735,7 +18735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			noname_zhuyuan:"祝愿",
 			noname_zhuyuan_info:"①每回合每名角色限一次。出牌阶段，你可以将四张花色各不相同的牌交给一名其他角色。你与其获得技能〖铁骑〗和〖激昂〗至各自的回合结束。②锁定技，若你于当前回合内：未发动过〖祝愿〗，则你使用牌无次数限制；发动过〖祝愿〗，则你使用牌无距离限制。",
 			noname_duocai:"多彩",
-			noname_duocai_info:"每回合限一次。其他角色区域内的牌因弃置而进入弃牌堆后，你可以获得之。若你以此法获得的牌数：大于2，你弃置一名角色区域内的一张牌；等于2，你摸一张牌；小于2，你回复1点体力。",
+			noname_duocai_info:"每回合限一次。其他角色区域内的牌因弃置而进入弃牌堆后，你可以获得之。若你以此法得到的牌数：大于2，你弃置一名角色区域内的一张牌；等于2，你摸一张牌；小于2，你回复1点体力。",
 			ns_huangchengyan:'黄承彦',
 			nslongyue:'龙岳',
 			nslongyue_info:'当一名角色使用锦囊牌时，若此牌是其本回合内使用的第一张牌，则你可令其摸一张牌。',
@@ -18970,7 +18970,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			choudu:'筹度',
 			choudu_info:'出牌阶段限一次，你可以弃置一张牌，并指定一名角色视为其使用一张调兵遣将',
 			liduan:'立断',
-			liduan_info:'当一名其他角色于其回合外获得牌后，若其此次获得的牌数为1且为装备牌（无论是否可见），你可以令该角色选择一项：1.使用此牌；2.将一张手牌交给你',
+			liduan_info:'当一名其他角色于其回合外得到牌后，若其此次得到的牌数为1且为装备牌（无论是否可见），你可以令该角色选择一项：1.使用此牌；2.将一张手牌交给你',
 			fuchou:'负仇',
 			fuchou2:'负仇',
 			fuchou_info:'当你成为【杀】的目标时，你可以将一张牌交给此【杀】的使用者，令此【杀】对你无效且你到其的距离于当前回合内视为1，若如此做，此回合的结束阶段开始时，其令你摸一张牌，然后你需对其使用【杀】，否则失去1点体力',

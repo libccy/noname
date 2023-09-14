@@ -453,7 +453,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('yichong_clear',{player:'phaseBegin'});
 				},
 				onremove:true,
-				intro:{content:'拥有“雀”标记的角色获得$牌后，你获得之'},
+				intro:{content:'拥有“雀”标记的角色得到$牌后，你获得之'},
 				group:'yichong_gain',
 				subSkill:{
 					gain:{
@@ -10002,11 +10002,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinqingjian:{
 				audio:'qingjian',
-				trigger:{player:'gainEnd'},
+				trigger:{
+					player:'gainAfter',
+					global:'loseAsyncAfter',
+				},
 				direct:true,
 				usable:1,
 				filter:function(event,player){
-					return event.getParent('phaseDraw').player!=player&&player.countCards('he')>0;
+					return event.getg(player).length&&event.getParent('phaseDraw').player!=player&&player.countCards('he')>0;
 				},
 				content:function(){
 					'step 0'
@@ -13670,7 +13673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_xiahoudun:'手杀夏侯惇',
 			xinqingjian:'清俭',
 			xinqingjian2:'清俭',
-			xinqingjian_info:'每回合限一次。当你不因摸牌阶段的额定摸牌而获得牌时，你可以将任意张牌扣置于武将牌上。回合结束时，你将这些牌交给一名其他角色。若这些牌的数量大于1，你摸一张牌。',
+			xinqingjian_info:'每回合限一次。当你不因摸牌阶段的额定摸牌而得到牌后，你可以将任意张牌扣置于武将牌上。回合结束时，你将这些牌交给一名其他角色。若这些牌的数量大于1，你摸一张牌。',
 			zhangyì:'张翼',
 			jiakui:'贾逵',
 			zhiyi:'执义',
@@ -13732,7 +13735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refuhai:'浮海',
 			refuhai_info:'出牌阶段限一次，你可令其他角色同时在「潮起」和「潮落」中选择一项，并依次展示这些角色的选项。若从你下家开始选择了相同选项的角色数目大于1，则你摸X张牌（X为连续相同结果的数量）。',
 			qiaosi:'巧思',
-			qiaosi_info:'出牌阶段限一次，你可以表演「大键角色图」并根据表演结果获得相应的牌。然后，你选择一项：1.弃置X张牌。2.将X张牌交给一名其他角色。（X为你以此法获得的牌数）',
+			qiaosi_info:'出牌阶段限一次，你可以表演「大键角色图」并根据表演结果获得相应的牌。然后，你选择一项：1.弃置X张牌。2.将X张牌交给一名其他角色。（X为你以此法得到的牌数）',
 			qiaosi_map:'大键角色图',
 			qiaosi_map_info:'<br><li>星野 梦美：锦囊牌*2<br><li>能美 库特莉亚芙卡：装备牌/【杀】/【酒】*1<br><li>友利 奈绪：【杀】/【酒】*1<br><li>神尾 观铃：【闪】/【桃】*1<br><li>伊吹 风子：锦囊牌/【闪】/【桃】*1<br><li>仲村 由理：装备牌*2<br><li>Illustration:うら;Twitter:@ura530',
 			qiaosi_c1:'<img src="'+lib.assetURL+'image/card/qiaosi_card1.png" width="60" height="60"> ',
@@ -13890,7 +13893,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_liubiao:'手杀刘表',
 			hucheer:'手杀胡车儿',
 			daoji:'盗戟',
-			daoji_info:'出牌阶段限一次，你可以弃置一张非基本牌并选择一名装备区里有牌的其他角色，你获得其装备区中的一张牌并使用之。若你以此法获得的牌是武器牌，则你使用此牌后对其造成1点伤害。',
+			daoji_info:'出牌阶段限一次，你可以弃置一张非基本牌并选择一名装备区里有牌的其他角色，你获得其装备区中的一张牌并使用之。若你以此法得到的牌是武器牌，则你使用此牌后对其造成1点伤害。',
 			xin_hansui:'手杀韩遂',
 			xinniluan:'逆乱',
 			xinniluan_info:'其他角色的结束阶段，若其本回合对除其以外的角色使用过牌，则你可以对其使用一张【杀】。若以此法使用的【杀】造成伤害，则你弃置其一张牌。',
@@ -13957,7 +13960,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejieyue_info:'结束阶段开始时，你可以将一张牌交给一名其他角色。然后其选择一项：令你摸三张牌：或其保留一张手牌和装备区的牌，然后弃置其余的牌。',
 			xin_zhoucang:'手杀周仓',
 			mobilezhongyong:'忠勇',
-			mobilezhongyong_info:'当你于出牌阶段内使用的【杀】结算结束后，若没有目标角色使用【闪】响应过此【杀】，则你可获得此【杀】；否则你可选择一项：①获得目标角色使用的【闪】，然后可将此【杀】交给另一名其他角色。②将目标角色使用的【闪】交给另一名其他角色，然后你本回合使用【杀】的次数上限+1且下一张【杀】的伤害值基数+1。（你不能使用本回合因执行〖忠勇〗的效果获得的牌）',
+			mobilezhongyong_info:'当你于出牌阶段内使用的【杀】结算结束后，若没有目标角色使用【闪】响应过此【杀】，则你可获得此【杀】；否则你可选择一项：①获得目标角色使用的【闪】，然后可将此【杀】交给另一名其他角色。②将目标角色使用的【闪】交给另一名其他角色，然后你本回合使用【杀】的次数上限+1且下一张【杀】的伤害值基数+1。（你不能使用本回合因执行〖忠勇〗的效果得到的牌）',
 			xin_caifuren:'手杀蔡夫人',
 			xinqieting:'窃听',
 			xinqieting_info:'其他角色的回合结束时，若其本回合内未对其他角色造成过伤害，则你可选择一项：①摸一张牌。②观看其两张手牌并获得其中的一张。③将其装备区内的一张牌移动至你的装备区。',
@@ -14205,7 +14208,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinwurong_info:'出牌阶段限一次，你可以与一名其他角色进行谋弈：<br><li>若你选择“镇压”且其选择“反抗”，你对其造成1点伤害，然后你摸一张牌。<br><li>若你选择“安抚”且其选择“归顺”，其须交给你两张牌（若其手牌数不足两张，则改为令其跳过其下个摸牌阶段）。<br><li>若你选择“镇压”且其选择“归顺”，你获得其一张牌，然后你交给其两张牌。<br><li>若你选择“安抚”且其选择“反抗”，你受到1点伤害，然后你摸两张牌。',
 			xin_guozhao:'手杀郭照',
 			yichong:'易宠',
-			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”获得五张牌）。',
+			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”得到五张牌）。',
 			wufei:'诬诽',
 			wufei_info:'若场上存在拥有“雀”标记的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于1且A的体力值大于你，则你可以对A造成1点伤害。',
 			

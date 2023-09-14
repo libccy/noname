@@ -869,7 +869,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return !player.hasSkill('dcmoyu_ban');
+					return !player.hasSkill('dcmoyu_ban')&&game.hasPlayer(current=>lib.skill.dcmoyu.filterTarget(null,player,current));
 				},
 				filterTarget:function(card,player,target){
 					return player!=target&&!player.getStorage('dcmoyu_clear').contains(target)&&target.countGainableCards(player,'hej');
@@ -1122,7 +1122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						marktext:'绞',
 						intro:{
-							content:'下个摸牌阶段获得牌后，$摸等量的牌'
+							content:'下个摸牌阶段得到牌后，$摸等量的牌'
 						}
 					}
 				}
@@ -4128,7 +4128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.target=target;
 					player.chooseBool(
 						get.prompt('dcyingtu',target),
-						'获得该角色的一张牌，然后将一张牌交给该角色的对位角色。若你给出的是装备牌，则其使用其获得的牌。'
+						'获得该角色的一张牌，然后将一张牌交给该角色的对位角色。若你给出的是装备牌，则其使用其得到的牌。'
 					).set('goon',lib.skill.dcyingtu.checkx(player,target)).set('ai',function(){
 						return _status.event.goon;
 					});
@@ -7513,7 +7513,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.cards=result.cards;
 						if(!hs.length) event.finish();
 						else if(hs.length<=num) event._result={bool:true,cards:hs};
-						else player.chooseCard('he',true,'选择交给'+get.translation(target)+get.cnNumber(num)+'张牌','（已获得牌的点数和：'+numx+'）',num);
+						else player.chooseCard('he',true,'选择交给'+get.translation(target)+get.cnNumber(num)+'张牌','（已得到牌的点数和：'+numx+'）',num);
 					}
 					else event.finish();
 					'step 2'
@@ -9858,7 +9858,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			recangchu:'仓储',
 			recangchu2:'仓储',
 			recangchu3:'仓储',
-			recangchu_info:'锁定技，游戏开始时，你获得3个“粮”。你的手牌上限+X（X为“粮”数）。当你于回合外获得牌时，你获得一个“粮”。（你的“粮”数不能超过存活角色数）',
+			recangchu_info:'锁定技，游戏开始时，你获得3个“粮”。你的手牌上限+X（X为“粮”数）。当你于回合外得到后时，你获得一个“粮”。（你的“粮”数不能超过存活角色数）',
 			reliangying:'粮营',
 			reliangying_info:'弃牌阶段开始时，你可以摸至多X张牌，然后交给等量的角色各一张牌。（X为你的“粮”数）',
 			reshishou:'失守',
@@ -10007,7 +10007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jianliang:'简亮',
 			jianliang_info:'摸牌阶段开始时，若你的手牌数不为全场最多，则你可以令至多两名角色各摸一张牌。',
 			weimeng:'危盟',
-			weimeng_info:'出牌阶段限一次，你可以获得一名其他角色的至多X张手牌，然后交给其等量的牌（X为你的体力值）。若你给出的牌点数之和：大于获得的牌，则你摸一张牌；小于获得的牌，弃置该角色区域内的一张牌。',
+			weimeng_info:'出牌阶段限一次，你可以获得一名其他角色的至多X张手牌，然后交给其等量的牌（X为你的体力值）。若你给出的牌点数之和：大于得到的牌，则你摸一张牌；小于得到的牌，弃置该角色区域内的一张牌。',
 			mamidi:'马日磾',
 			bingjie:'秉节',
 			bingjie_info:'出牌阶段开始时，你可减1点体力上限，然后当你于本阶段内使用【杀】或普通锦囊牌指定其他角色为目标后，其弃置一张牌。若其弃置的牌与你使用的牌颜色相同，其无法响应此牌。',
@@ -10059,7 +10059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhubi_info:'当有♦牌因弃置而进入弃牌堆后，你可以令系统从牌堆/弃牌堆中检索一张【无中生有】，并将此牌置于牌堆顶。',
 			dcliuzhuan:'流转',
 			dcliuzhuan_tag:'转',
-			dcliuzhuan_info:'锁定技。①其他角色于其回合内不于摸牌阶段而获得的牌称为“转”。②你不能成为实体牌中包含“转”的牌的目标。③当有“转”直接进入弃牌堆或经由处理区进入弃牌堆后，你获得之。',
+			dcliuzhuan_info:'锁定技。①其他角色于其回合内不于摸牌阶段而得到的牌称为“转”。②你不能成为实体牌中包含“转”的牌的目标。③当有“转”直接进入弃牌堆或经由处理区进入弃牌堆后，你获得之。',
 			huzhao:'胡昭',
 			midu:'弥笃',
 			midu_info:'出牌阶段限一次。你可以选择一项：⒈废除任意个装备栏或判定区，并令一名角色摸等量的牌。⒉恢复一个已经被废除的装备栏或判定区，然后你获得〖活墨〗直到下回合开始。',
@@ -10087,7 +10087,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dctujue_info:'限定技。当你进入濒死状态时，你可以将所有牌交给一名其他角色。然后你回复等量的体力并摸等量的牌。',
 			chengui:'陈珪',
 			dcyingtu:'营图',
-			dcyingtu_info:'每回合限一次。当你的上家/下家于摸牌阶段外获得牌后，你可以获得其一张牌，然后将一张牌交给你的下家/上家。若你给出的牌为装备牌，则其使用之。',
+			dcyingtu_info:'每回合限一次。当你的上家/下家于摸牌阶段外得到牌后，你可以获得其一张牌，然后将一张牌交给你的下家/上家。若你给出的牌为装备牌，则其使用之。',
 			dccongshi:'从势',
 			dccongshi_info:'一名角色使用的装备牌结算结束后，若其装备区内的牌数为全场最多，则你摸一张牌。',
 			wanglie:'王烈',
@@ -10150,7 +10150,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyuguan_info:'一名角色的回合结束时，若你已损失的体力值为全场最多，你可以减1点体力上限，然后令X名角色将手牌摸至体力上限（X为你已损失的体力值）。',
 			qinlang:'秦朗',
 			dchaochong:'昊宠',
-			dchaochong_info:'当你使用牌后，你可以将手牌摸至或弃置至你的手牌上限数（至多摸五张）。然后若你以此法：获得牌，你的手牌上限-1；失去牌，你的手牌上限+1。',
+			dchaochong_info:'当你使用牌后，你可以将手牌摸至或弃置至你的手牌上限数（至多摸五张）。然后若你以此法：得到牌，你的手牌上限-1；失去牌，你的手牌上限+1。',
 			dcjinjin:'矜谨',
 			dcjinjin_info:'每回合限一次。当你造成或受到伤害后，你可以重置因〖昊宠〗增加或减少的手牌上限，令伤害来源弃置至多X张牌，然后你摸Y张牌（X为你以此法变化的手牌上限且至少为1，Y为X减其以此法弃置的牌数）。',
 			xianglang:'向朗',
@@ -10213,7 +10213,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcguangshi_info:'锁定技。准备阶段，若所有其他角色均有“信众”，你失去1点体力并摸两张牌。',
 			dongwan:'董绾',
 			dcshengdu:'生妒',
-			dcshengdu_info:'回合开始时，你可以选择一名其他角色。当其于其的下个摸牌阶段获得牌后，你摸等量的牌。',
+			dcshengdu_info:'回合开始时，你可以选择一名其他角色。当其于其的下个摸牌阶段得到牌后，你摸等量的牌。',
 			dcjieling:'介绫',
 			dcjieling_info:'出牌阶段限一次。你可以将两张颜色不同的手牌当无距离限制且无任何次数限制的【杀】使用。然后若此【杀】：造成了伤害，所有目标角色失去1点体力；未造成伤害，你对所有目标角色依次发动一次〖生妒〗。',
 			yuanyin:'袁胤',

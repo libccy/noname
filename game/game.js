@@ -53034,7 +53034,7 @@
 					this.classList.add('active');
 					var skillname=get.translation(this.link);
 					var skilltranslationinfo=get.skillInfoTranslation(this.link);
-					if(lib.config.show_skillnamepinyin&&skillname!='阵亡'){
+					if(lib.config.show_skillnamepinyin&&skillname!='阵亡'&&skillname.indexOf('_faq')==-1){
 						var skillpinyin=get.pinyin(skillname);
 						intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+skillpinyin+']'+'</span>'+'  '+skilltranslationinfo;
 					}else{
@@ -53052,7 +53052,7 @@
 						for(var i=0;i<derivation.length;i++){
 							var derivationname=get.translation(derivation[i]);
 							var derivationtranslationinfo=get.skillInfoTranslation(derivation[i]);
-							if(lib.config.show_skillnamepinyin&&derivationname.length<=5){
+							if(lib.config.show_skillnamepinyin&&derivationname.length<=5&&derivation[i].indexOf('_faq')==-1){
 								var derivationpinyin=get.pinyin(derivationname);
 								intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+derivationpinyin+']'+'</span>'+'  '+derivationtranslationinfo;
 							}else{

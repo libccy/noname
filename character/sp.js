@@ -7226,7 +7226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								cards:cards,
 								filterTarget:lib.filter.notMe,
 								selectCard:[1,cards.length],
-								prompt:'是否将获得的牌分配给其他角色？',
+								prompt:'是否将得到的牌分配给其他角色？',
 								ai1:function(card){
 									return -1;
 								},
@@ -8481,7 +8481,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								cards:cards,
 								filterTarget:lib.filter.notMe,
 								selectCard:[1,cards.length],
-								prompt:'是否将获得的牌分配给其他角色？',
+								prompt:'是否将得到的牌分配给其他角色？',
 								ai1:function(card){
 									if(!ui.selected.cards.length) return 1;
 									return 0;
@@ -12060,9 +12060,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//forced:true,
 				frequent:true,
 				filter:function(event,player){
+					if(player.getHp()<=player.countCards('h')) return false;
 					if(event.name=='loseAsync'){
-						if(event.type!='gain'||player.hp>player.countCards('h')) return false;
-						var cards=event.getl(player).cards2;
+						if(event.type!='gain') return false;
+						var cards=event.getl(player).hs;
 						return game.hasPlayer(function(current){
 							if(current==player) return false;
 							var cardsx=event.getg(current);
@@ -12072,11 +12073,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return false;
 						});
 					}
-					if(event.player!=player&&player.hp>player.countCards('h')){
-						var evt=event.getl(player);
-						return evt&&evt.hs&&evt.hs.length>0;
-					}
-					return false;
+					if(event.player==player) return false;
+					var evt=event.getl(player);
+					return evt&&evt.hs&&evt.hs.length>0;
 				},
 				preHidden:true,
 				content:function(){
@@ -15408,7 +15407,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiehui2:{
 				mark:true,
 				intro:{
-					content:'不能使用、打出或弃置获得的黑色牌',
+					content:'不能使用、打出或弃置得到的黑色牌',
 				},
 				mod:{
 					cardDiscardable:function(card,player){
@@ -23484,7 +23483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liewei_info:'当你杀死一名角色后，你可以摸三张牌。',
 
 			weicheng:'伪诚',
-			weicheng_info:'当其他角色获得你的手牌后，若你的手牌数小于体力值，你可以摸一张牌。',
+			weicheng_info:'当牌从你的手牌区移动至其他角色的手牌区后，若你的手牌数小于体力值，你可以摸一张牌。',
 			daoshu:'盗书',
 			daoshu_info:'出牌阶段限一次。你可以选择一个花色并获得一名其他角色的一张手牌。若此牌花色与你选择的相同，则你对其造成1点伤害且你〖盗书〗于此阶段内可使用的次数上限+1。否则你须交给其一张与此牌花色不同的手牌（没有则展示手牌）。',
 
@@ -23558,7 +23557,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			weijing:'卫境',
 			weijing_info:'每轮限一次，当你需要使用【杀】或【闪】时，你可以视为使用一张【杀】或【闪】。',
 			zishu:'自书',
-			zishu_info:'锁定技，你的回合外，你获得的牌均会在当前回合结束后置入弃牌堆；你的回合内，当你不因〖自书〗而获得牌时，你摸一张牌。',
+			zishu_info:'锁定技。①其他角色的回合结束时，你将手牌区里所有你于此回合得到过的牌置入弃牌堆。②当你于回合内不因〖自书②〗而得到牌后，你摸一张牌。',
 			yingyuan:'应援',
 			yingyuan_info:'当你于回合内使用的牌结算完成后，你可以将其交给一名其他角色（相同牌名的牌每回合限一次）。',
 			xinyingyuan:'应援',
@@ -23965,7 +23964,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shushen_info:'当你回复1点体力时，你可以令一名其他角色选择回复1点体力或摸两张牌。',
 			wuji_info:'觉醒技，结束阶段开始时，若你于此回合内造成过3点或更多伤害，你加1点体力上限并回复1点体力，失去〖虎啸〗，然后从场上、牌堆或弃牌堆中获得【青龙偃月刀】',
 			xueji_info:'出牌阶段限一次，你可以弃置一张红色牌，然后选择至多X名角色，横置这些角色并对其中一名角色造成1点火焰伤害。（X为你已损失的体力值且至少为1）',
-			huxiao_info:'锁定技，当你造成火属性伤害时，该角色摸一张牌。然后，你于此回合内对其使用牌没有次数限制。',
+			huxiao_info:'锁定技，当你造成火焰伤害后，你令受伤角色摸一张牌，然后你于此回合内对其使用牌没有次数限制。',
 			aocai_info:'当你于回合外需要使用或打出一张基本牌时，你可以观看牌堆顶的两张牌（若你没有手牌则改为四张）。若你观看的牌中有此牌，你可以使用打出之。',
 			aocai_info_guozhan:'当你于回合外需要使用或打出一张基本牌时，你可以观看牌堆顶的两张牌。若你观看的牌中有此牌，你可以使用打出之。',
 			hongyuan_info:'摸牌阶段，你可以少摸一张牌并指定至多两名其他角色。若如此做，这些角色各摸一张牌。',
@@ -24052,8 +24051,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zyqiao_info:'每回合限两次。当你成为其他角色使用牌的目标后，你可以弃置其一张牌，然后你弃置一张牌。',
 			zyqiao_info_guozhan:'每回合限两次。当你成为其他势力的角色使用牌的目标后，你可以弃置其一张牌，然后你弃置一张牌。',
 			chengshang:'承赏',
-			chengshang_info:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗获得过牌，则你可以从牌堆中获得所有与此牌花色点数相同的牌。',
-			chengshang_info_guozhan:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗获得过牌，则你可以从牌堆中获得所有与此牌花色点数相同的牌。',
+			chengshang_info:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗得到过牌，则你可以从牌堆中获得所有与此牌花色点数相同的牌。',
+			chengshang_info_guozhan:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗得到过牌，则你可以从牌堆中获得所有与此牌花色点数相同的牌。',
 			panshu:'OL潘淑',
 			weiyi:'威仪',
 			weiyi_info:'每名角色限一次。当有角色受到伤害后，你可选择：①若其体力值不小于你，则其失去1点体力。②若其体力值不大于你且其已受伤，则其回复1点体力。',
@@ -24098,7 +24097,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olxiuhao_info:'每回合限一次。当你受到其他角色造成的伤害时，或对其他角色造成伤害时，你可防止此伤害，然后令伤害来源摸两张牌。',
 			olsujian:'素俭',
 			olsujian_given:'已分配',
-			olsujian_info:'锁定技。弃牌阶段开始前，你将此阶段的规则改为：{你选择一项：①将所有不为本回合获得的手牌分配给其他角色。②弃置这些手牌，然后弃置一名其他角色等量的牌}。',
+			olsujian_info:'锁定技。弃牌阶段开始前，你将此阶段的规则改为：{你选择一项：①将所有不为本回合得到的手牌分配给其他角色。②弃置这些手牌，然后弃置一名其他角色等量的牌}。',
 			ol_wangrong:'OL王荣',
 			olfengzi:'丰姿',
 			olfengzi_info:'出牌阶段限一次。当你使用有目标的基本牌或普通锦囊牌时，你可弃置一张与此牌类型相同的牌，然后令此牌结算两次。',

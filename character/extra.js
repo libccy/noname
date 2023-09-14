@@ -4744,18 +4744,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					player.chooseTarget('是否弃置一枚“忍”，并发动【放逐】？',function(card,player,target){
 						return player!=target
-					}).ai=function(target){
+					}).set('ai',target=>{
 						if(target.hasSkillTag('noturn')) return 0;
-						if(target.isTurnedOver()){
-							return get.attitude(player,target)-1;
+						var player=_status.event.player;
+						var current=_status.currentPhase;
+						var dis=current?get.distance(current,target,'absolute'):1;
+						var draw=player.getDamagedHp();
+						var att=get.attitude(player,target);
+						if(att==0) return target.hasJudge('lebu')?Math.random()/3:Math.sqrt(get.threaten(target))/5+Math.random()/2;
+						if(att>0){
+							if(target.isTurnedOver()) return att+draw;
+							if(draw<4) return -1;
+							if(current&&target.getSeatNum()>current.getSeatNum()) return att+draw/3;
+							return 10*Math.sqrt(Math.max(0.01,get.threaten(target)))/(3.5-draw)+dis/(2*game.countPlayer());
 						}
 						else{
-							if(player.maxHp-player.hp==1){
-								return -get.attitude(player,target)-1;
-							}
+							if(target.isTurnedOver()) return -att-draw;
+							if(draw>=5) return -1;
+							if(current&&target.getSeatNum()<=current.getSeatNum()) return -att+draw/3;
+							return (4.25-draw)*10*Math.sqrt(Math.max(0.01,get.threaten(target)))+2*game.countPlayer()/dis;
 						}
-						return 0;
-					}
+					});
 					"step 1"
 					if(result.bool){
 						player.removeMark('renjie',1);
@@ -7156,12 +7165,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			boss_zhaoyun_ab:'神赵云',
 			boss_juejing:'绝境',
 			boss_juejing2:'绝境',
-			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你获得牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌摸至4张/弃置至4张。',
+			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你得到牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌摸至4张/弃置至4张。',
 			zhanjiang:'斩将',
 			zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之',
 			shen_guojia:'神郭嘉',
 			shuishi:'慧识',
-			shuishi_info:'出牌阶段限一次，若你的体力上限小于10，则你可选择一名角色。你令其摸一张牌，若其以此法获得的牌：与该角色的其他手牌花色均不相同，则你加1点体力上限，若你的体力上限小于10，则你可以重复此流程；否则你减1点体力上限，且其展示所有手牌。',
+			shuishi_info:'出牌阶段限一次，若你的体力上限小于10，则你可选择一名角色。你令其摸一张牌，若其以此法得到的牌：与该角色的其他手牌花色均不相同，则你加1点体力上限，若你的体力上限小于10，则你可以重复此流程；否则你减1点体力上限，且其展示所有手牌。',
 			stianyi:'天翊',
 			stianyi_info:'觉醒技，准备阶段，若场上的所有存活角色均于本局游戏内受到过伤害，则你加2点体力上限并回复1点体力，然后令一名角色获得技能〖佐幸〗。',
 			zuoxing:'佐幸',
@@ -7195,7 +7204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yingba:'英霸',
 			yingba_info:'①出牌阶段限一次，你可令一名体力上限大于1的其他角色减少1点体力上限并获得“平定”标记，然后你减少1点体力上限。②你对拥有“平定”标记的角色使用牌没有距离限制。',
 			scfuhai:'覆海',
-			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。若你本回合内以此法获得的牌数小于2，则你摸一张牌。②拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
+			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。若你本回合内以此法得到的牌数小于2，则你摸一张牌。②拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
 			pinghe:'冯河',
 			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
 			shen_jiangwei:'神姜维',
@@ -7255,7 +7264,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			db_key_hina:'佐藤雏',
 			hina_shenshi:'神视',
 			hina_shenshi_yingbian:'神视',
-			hina_shenshi_info:'神势力技。出牌阶段开始时/结束时，你可摸两张牌，然后将其中一张牌置于牌堆顶。你以此法获得的牌视为拥有全部应变效果，且可以无条件发动。',
+			hina_shenshi_info:'神势力技。出牌阶段开始时/结束时，你可摸两张牌，然后将其中一张牌置于牌堆顶。你以此法得到的牌视为拥有全部应变效果，且可以无条件发动。',
 			hina_xingzhi:'幸凪',
 			hina_xingzhi_info:'键势力技。每回合限一次，你可以通过“助战”触发一张牌的全部应变效果，且响应助战的角色摸两张牌。',
 			tw_shen_guanyu:'TW神关羽',

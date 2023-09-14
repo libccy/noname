@@ -1246,6 +1246,7 @@ window.noname_character_rank={
 		'jsrg_chendeng',
 		'jsrg_zhanghe',
 		'jsrg_zoushi',
+		'gaoxiang',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1436,6 +1437,7 @@ window.noname_character_rank={
 		'vtb_xiaosha',
 		'huanfan',
 		'jsrg_xugong',
+		'old_xiaoqiao',
 	],
 	c:[
 		'xiahoudun',
@@ -1498,6 +1500,7 @@ window.noname_character_rank={
 		'luoxian',
 		'ol_huban',
 		'sb_menghuo',
+		'old_caocao',
 	],
 	d:[
 		'lvmeng',

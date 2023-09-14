@@ -481,7 +481,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 'take_damage';
 						}
 						return 'discard_card';
-					});
+					}).set('prompt','水淹七军').set('prompt2','请选择一项：⒈弃置装备区里的所有牌；⒉受到'+get.translation(player)+'造成的1点雷电伤害。');
 					'step 1'
 					if(result.control=='discard_card'){
 						target.discard(target.getCards('e',function(card){
