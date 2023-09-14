@@ -12089,6 +12089,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'twfengpo_kill',
 				subSkill:{
 					kill:{
+						audio:'fengpo',
 						trigger:{source:'die'},
 						forced:true,
 						filter:(event,player)=>!player.storage.twfengpo,
@@ -12096,6 +12097,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						animationColor:'fire',
 						content:function(){
 							player.storage.twfengpo=true;
+							player.popup('凤魄');
+							game.log(player,'恢复了技能','#g【凤魄】');
 						},
 					},
 				},
@@ -12165,6 +12168,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						name:result.control,
 						isCard:true,
 					},false,target).baseDamage=num;
+				},
+				ai:{
+					order:9,
+					result:{
+						target:function(player,target){
+							if(get.attitude(player,target)>=0) return 0;
+							var list=game.filterPlayer(function(current){
+								return current!=player&&current!=target&&current.hp<=player.hp;
+							});
+							if(!list.length) return 0;
+							return -Math.min(-get.effect(target,{name:'sha'},player,target),-get.effect(target,{name:'juedou'},player,target))*list.reduce(function(num,current){
+								return num+(2+get.sgn(get.attitude(current,player)));
+							},0);
+						},
+					},
 				},
 			},
 			twyanhuo:{
