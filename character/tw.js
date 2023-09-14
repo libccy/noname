@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			tw_zhangzhao:['male','wu',3,['twlijian','twchungang'],['unseen']],
 			tw_ol_sunjian:['male','wu','4/5',['gzyinghun','wulie','twpolu'],['zhu']],
 			tw_menghuo:['male','qun',4,['huoshou','rezaiqi','twqiushou'],['zhu']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige','twchongwang'],['zhu']],
@@ -274,6 +275,161 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//张昭
+			twlijian:{
+				audio:2,
+				sunben:true,
+				trigger:{global:'phaseDiscardEnd'},
+				filter:function(event,player){
+					if(player.hasSkill('twlijian_sunben')) return false;
+					if(event.player!=player&&event.player.isIn()){
+						game.checkGlobalHistory('cardMove',function(evt){
+							if(evt.getParent('phaseDiscard')==event){
+								if(evt.name=='cardsDiscard'||(evt.name=='lose'&&evt.type=='discard'&&evt.position==ui.discardPile)) return true;
+							}
+						});
+					}
+					return false;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var cards=[],target=trigger.player;
+					event.cards=cards;
+					event.target=target;
+					game.checkGlobalHistory('cardMove',function(evt){
+						if(evt.getParent('phaseDiscard')==trigger){
+							if(evt.name=='cardsDiscard'||(evt.name=='lose'&&evt.type=='discard'&&evt.position==ui.discardPile)){
+								cards.addArray(evt.cards.filterInD('d'));
+							}
+						}
+					});
+					player.chooseButton([
+						get.prompt('gtwlijian',target),
+						'<span class="text center">选择任意张牌令其获得，然后你获得剩余的牌，若其获得的牌数大于你，则你可以对其造成1点伤害</span>',
+						cards,
+					],[1,Infinity]).set('ai',function(button){
+						var player=_status.event.player;
+						var target=_status.event.getTrigger().player;
+						var att=get.attitude(player,target);
+						var cards=ui.selected.cards;
+						var cardx=_status.event.cards;
+						var card=button.link;
+						switch(get.sgn(att)){
+							case 1:
+								return 1;
+							break;
+							case 0:
+								if(!cards.length&&cardx.length>1) return 1/(get.value(card)||0.5);
+								return 0;
+							break;
+							case -1:
+								var num=Math.ceil(cardx.length/2)+(cardx.length%2==0?1:0);
+								if(num>1&&player.hasSkill('twchungang')) num--;
+								if(get.damageEffect(target,player,player)<=0||num>2){
+									if(!cards.length&&cardx.length>1) return 1/(get.value(card)||0.5);
+									return 0;
+								}
+								else{
+									var numx=0;
+									numx+=num;
+									if(num>0&&player.hasSkill('twchungang')) numx++;
+									if(cards.length<numx) return 1/(get.value(card)||0.5);
+									return 0;
+								}
+							break;
+						}
+					}).setHiddenSkill('twlijian').set('cards',cards);
+					'step 1'
+					if(result.bool){
+						player.logSkill('twlijian',target);
+						player.addSkill('twlijian_sunben');
+						target.gain(result.links,'gain2');
+						cards.removeArray(result.links);
+						player.gain(cards,'gain2');
+						if(result.links.length>cards.length){
+							player.chooseBool('是否对'+get.translation(target)+'造成1点伤害？').set('choice',get.damageEffect(target,player,player)>0);
+						}
+						else event.finish();
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						player.line(target);
+						target.damage();
+					}
+				},
+				subSkill:{
+					sunben:{
+						charlotte:true,
+						onremove:true,
+						mark:true,
+						intro:{content:'弃牌堆进入牌进度：#/8'},
+						trigger:{global:['loseAfter','cardsDiscardAfter','loseAsyncAfter','equipAfter']},
+						filter:function(event,player){
+							var cards=event.getd();
+							if(!cards.length) return false;
+							var list=cards.slice();
+							game.checkGlobalHistory('cardMove',function(evt){
+								if(evt==event||evt.getParent()==event||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
+								if(evt.name=='lose'&&evt.position!=ui.discardPile) return false;
+								list.removeArray(evt.cards);
+							},event);
+							return list.length>0;
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							'step 0'
+							var cards=trigger.getd().slice();
+							game.checkGlobalHistory('cardMove',function(evt){
+								if(evt==trigger||evt.getParent()==trigger||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
+								if(evt.name=='lose'&&evt.position!=ui.discardPile) return false;
+								cards.removeArray(evt.cards);
+							},trigger);
+							player.addMark('twlijian_sunben',cards.length,false);
+							'step 1'
+							if(player.countMark('twlijian_sunben')>=8){
+								player.removeSkill('twlijian_sunben');
+								player.popup('力荐');
+								game.log(player,'恢复了技能','#g【力荐】');
+							}
+						},
+					},
+				},
+			},
+			twchungang:{
+				audio:2,
+				trigger:{
+					player:'gainAfter',
+					global:'loseAsyncAfter',
+				},
+				filter:function(event,player){
+					var evt=event.getParent('phaseDraw');
+					return game.hasPlayer(target=>{
+						if(target==player||evt&&evt.player==target) return false;
+						return event.getg(target).length>1&&target.countCards('he');
+					});
+				},
+				forced:true,
+				logTarget:function(event,player){
+					var evt=event.getParent('phaseDraw');
+					return game.filterPlayer(target=>{
+						if(target==player||evt&&evt.player==target) return false;
+						return event.getg(target).length>1&&target.countCards('he');
+					});
+				},
+				content:function(){
+					for(var i of lib.skill.twchungang.logTarget(trigger,player)){
+						i.chooseToDiscard('he',true);
+					}
+				},
+				ai:{
+					//能和一技能有配合，但仍旧搅shi棍技能
+					threaten:3,
+				},
+			},
 			//海外主公技
 			//张鲁
 			twshijun: {
@@ -14169,6 +14325,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_liuyu:'TW刘虞',
 			twchongwang:'崇望',
 			twchongwang_info:'主公技，其他群势力角色的出牌阶段开始时，其可以交给你一张牌，然后你与其使用【杀】或伤害性锦囊牌指定目标时不能指定对方为目标直至你的下回合结束（每名角色限发动一次）。',
+			tw_zhangzhao:'张昭',
+			twlijian:'力荐',
+			twlijian_info:'昂扬技。其他角色的弃牌阶段结束时，你可以令其获得任意本阶段进入弃牌堆的牌，然后你获得其余的牌，若其获得的牌数大于你，你可以对其造成1点伤害。<br>激昂：八张牌进入弃牌堆。',
+			twchungang:'纯刚',
+			twchungang_info:'锁定技。一名其他角色于摸牌阶段外一次性获得超过一张牌时，你令其弃置一张牌。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',
