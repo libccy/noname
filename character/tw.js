@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			tw_zhangzhao:['male','wu',3,['twlijian','twchungang'],[]],
 			tw_ol_sunjian:['male','wu','4/5',['gzyinghun','wulie','twpolu'],['zhu']],
 			tw_menghuo:['male','qun',4,['huoshou','rezaiqi','twqiushou'],['zhu']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige','twchongwang'],['zhu']],
@@ -161,6 +162,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiahouzie:'夏侯紫萼，游卡桌游《三国杀阵面对决》中虚构的人物。幼年因天天帮病种的母亲采紫萼得其名。亲眼目睹母亲被宦官所杀，愤怒之下夺过佩剑斩下宦官的头颅。被神秘人所救，发现了自己的身世，决心与宦官争斗到底。后再闯荡江湖的过程中，与夏侯惇义结金兰，以夏侯家姓氏称呼。',
 			yangang:'严纲（163~191年），东汉末年公孙瓒部下的冀州刺史。汉献帝初平二年（191年），袁绍与公孙瓒在界桥交战，严纲为袁绍部下麹义所斩。',
 			gongsunfan:'公孙范，辽西令支（今河北迁安）人。东汉末年武将，公孙瓒从弟，官至勃海太守。公孙瓒起兵攻打袁绍之时，袁绍畏惧公孙瓒的势力，将自己的勃海太守印绶给予公孙范，意图和解，结果公孙范反而起勃海之兵帮助公孙瓒。初平二年（191年），公孙范以勃海兵助公孙瓒率二万人大破青、徐黄巾军。最后于界桥之战与公孙瓒一同败走。',
+			zhangzhao:'张昭（156年－236年），字子布。徐州彭城县（今江苏省徐州市）人。汉末三国时期孙吴政权重臣。东汉末年，张昭为避战乱而南渡至扬州。孙策创业时，任命其为长史、抚军中郎将，将文武之事都委任于张昭。孙策临终前，将其弟孙权托付给张昭，张昭率群僚辅立孙权，并安抚百姓、讨伐叛军，与周瑜等辅助孙权稳定局势。孙权每次出征，常留张昭镇守后方，领幕府事，并敬称他为“张公”。赤壁之战时，张昭鉴于曹操势大，持主降论，从而被排挤出军政决策中心。孙权代理车骑将军时，任命张昭为军师。孙权被封为吴王后，任绥远将军，封由拳侯。此后曾参与撰定朝仪。孙权两次要设立丞相时，众人都推举张昭，孙权以张昭敢于直谏、性格刚直为由而不用他，先后用孙邵、顾雍。黄龙元年（229年），孙权称帝，张昭以年老多病为由，上还官位及所统领部属，改拜辅吴将军、班亚三司，改封娄侯。晚年时一度不参与政事，在家著书，即使偶有参加朝议，也常与孙权产生激烈冲突。嘉禾五年（236年），张昭去世，享年八十一岁，谥号“文”。张昭容貌严正，敢于直言谏诤，一生以忠于孙氏基业为任，但因其与孙权在个性、军政策略等方面的深层矛盾，使其以“入宫则拜孤，出宫则拜君”的地位，却终身不得任丞相。著有《春秋左氏传解》及《论语注》，今皆佚失。',
+			zhanghong:'张纮（153年～212年），字子纲，徐州广陵（江苏省扬州市广陵区人）人。东汉末年文学家、官员，和张昭一起合称“二张”。曾被大将军何进、太尉朱儁、司空荀爽辟为掾属，皆不就，避难江东。孙策平定江东前，亲自多次登门邀请，张纮出仕为官。孙权即位时，建议孙权迁都秣陵。建安十七年（212年），病逝，时年六十岁，孙权为之流涕。',
 		},
 		card:{
 			dz_mantianguohai:{
@@ -274,6 +277,166 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//张昭
+			twlijian:{
+				getCards:function(event){
+					var cards=[];
+					game.countPlayer2(function(current){
+						current.checkHistory('lose',function(evt){
+							if(evt.position==ui.discardPile&&evt.getParent('phaseDiscard')==event) cards.addArray(evt.cards);
+						})
+					});
+					game.checkGlobalHistory('cardMove',function(evt){
+						if(evt.name=='cardsDiscard'&&evt.getParent('phaseDiscard')==event) cards.addArray(evt.cards);
+					});
+					return cards;
+				},
+				audio:2,
+				sunbenSkill:true,
+				trigger:{global:'phaseDiscardEnd'},
+				filter:function(event,player){
+					if(player.hasSkill('twlijian_sunben')) return false;
+					if(event.player!=player&&event.player.isIn()){
+						return lib.skill.twlijian.getCards(event).length;
+					}
+					return false;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var cards=lib.skill.twlijian.getCards(trigger),target=trigger.player;
+					event.cards=cards;event.target=target;
+					player.chooseButton([
+						get.prompt('twlijian',target),
+						'<span class="text center">选择任意张牌令其获得，然后你获得剩余的牌，若其获得的牌数大于你，则你可以对其造成1点伤害</span>',
+						cards,
+					],[1,Infinity]).set('ai',function(button){
+						var player=_status.event.player;
+						var target=_status.event.getTrigger().player;
+						var att=get.attitude(player,target);
+						var cards=ui.selected.cards;
+						var cardx=_status.event.cards;
+						var card=button.link;
+						switch(get.sgn(att)){
+							case 1:
+								return 1;
+							break;
+							case 0:
+								if(!cards.length&&cardx.length>1) return 1/(get.value(card)||0.5);
+								return 0;
+							break;
+							case -1:
+								var num=Math.ceil(cardx.length/2)+(cardx.length%2==0?1:0);
+								if(num>1&&player.hasSkill('twchungang')) num--;
+								if(get.damageEffect(target,player,player)<=0||num>2){
+									if(!cards.length&&cardx.length>1) return 1/(get.value(card)||0.5);
+									return 0;
+								}
+								else{
+									var numx=0;
+									numx+=num;
+									if(num>0&&player.hasSkill('twchungang')) numx++;
+									if(cards.length<numx) return 1/(get.value(card)||0.5);
+									return 0;
+								}
+							break;
+						}
+					}).setHiddenSkill('twlijian').set('cards',cards);
+					'step 1'
+					if(result.bool){
+						player.logSkill('twlijian',target);
+						player.addSkill('twlijian_sunben');
+						target.gain(result.links,'gain2');
+						cards.removeArray(result.links);
+						player.gain(cards,'gain2');
+						if(result.links.length>cards.length){
+							player.chooseBool('是否对'+get.translation(target)+'造成1点伤害？').set('choice',get.damageEffect(target,player,player)>0);
+						}
+						else event.finish();
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						player.line(target);
+						target.damage();
+					}
+				},
+				subSkill:{
+					sunben:{
+						charlotte:true,
+						init:function(player){
+							player.storage.twlijian_sunben=0;
+						},
+						onremove:true,
+						mark:true,
+						intro:{
+							markcount:function(num){
+								return (num||0).toString();
+							},
+							content:'弃牌堆进入牌进度：#/8',
+						},
+						trigger:{global:['loseAfter','cardsDiscardAfter','loseAsyncAfter','equipAfter']},
+						filter:function(event,player){
+							var cards=event.getd();
+							if(!cards.length) return false;
+							var list=cards.slice();
+							game.checkGlobalHistory('cardMove',function(evt){
+								if(evt==event||evt.getParent()==event||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
+								if(evt.name=='lose'&&evt.position!=ui.discardPile) return false;
+								list.removeArray(evt.cards);
+							},event);
+							return list.length>0;
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							'step 0'
+							var cards=trigger.getd().slice();
+							game.checkGlobalHistory('cardMove',function(evt){
+								if(evt==trigger||evt.getParent()==trigger||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
+								if(evt.name=='lose'&&evt.position!=ui.discardPile) return false;
+								cards.removeArray(evt.cards);
+							},trigger);
+							player.addMark('twlijian_sunben',cards.length,false);
+							'step 1'
+							if(player.countMark('twlijian_sunben')>=8){
+								player.removeSkill('twlijian_sunben');
+								player.popup('力荐');
+								game.log(player,'恢复了技能','#g【力荐】');
+							}
+						},
+					},
+				},
+			},
+			twchungang:{
+				audio:2,
+				trigger:{global:['gainAfter','loseAsyncAfter']},
+				filter:function(event,player){
+					var evt=event.getParent('phaseDraw');
+					return game.hasPlayer(target=>{
+						if(target==player||(evt&&evt.player==target)) return false;
+						return event.getg(target).length>1&&target.countCards('he');
+					});
+				},
+				forced:true,
+				logTarget:function(event,player){
+					var evt=event.getParent('phaseDraw');
+					return game.filterPlayer(target=>{
+						if(target==player||evt&&evt.player==target) return false;
+						return event.getg(target).length>1&&target.countCards('he');
+					});
+				},
+				content:function(){
+					for(var i of lib.skill.twchungang.logTarget(trigger,player)){
+						i.chooseToDiscard('he',true);
+					}
+				},
+				ai:{
+					//能和一技能有配合，但仍旧搅shi棍技能
+					threaten:3,
+				},
+			},
 			//海外主公技
 			//张鲁
 			twshijun: {
@@ -14169,6 +14332,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_liuyu:'TW刘虞',
 			twchongwang:'崇望',
 			twchongwang_info:'主公技，其他群势力角色的出牌阶段开始时，其可以交给你一张牌，然后你与其使用【杀】或伤害性锦囊牌指定目标时不能指定对方为目标直至你的下回合结束（每名角色限发动一次）。',
+			tw_zhangzhao:'张昭',
+			twlijian:'力荐',
+			twlijian_info:'昂扬技。其他角色的弃牌阶段结束时，你可以令其获得任意本阶段进入弃牌堆的牌，然后你获得其余的牌，若其得到的牌数大于你，你可以对其造成1点伤害。<br>激昂：八张牌进入弃牌堆。',
+			twchungang:'纯刚',
+			twchungang_info:'锁定技。一名其他角色于摸牌阶段外得到超过一张牌时，你令其弃置一张牌。',
+			tw_zhanghong:'张纮',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',
