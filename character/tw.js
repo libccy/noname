@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			tw_zhangzhao:['male','wu',3,['twlijian','twchungang'],['unseen']],
+			tw_zhangzhao:['male','wu',3,['twlijian','twchungang'],[]],
 			tw_ol_sunjian:['male','wu','4/5',['gzyinghun','wulie','twpolu'],['zhu']],
 			tw_menghuo:['male','qun',4,['huoshou','rezaiqi','twqiushou'],['zhu']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige','twchongwang'],['zhu']],
@@ -411,14 +411,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twchungang:{
 				audio:2,
-				trigger:{
-					player:'gainAfter',
-					global:'loseAsyncAfter',
-				},
+				trigger:{global:['gainAfter','loseAsyncAfter']},
 				filter:function(event,player){
 					var evt=event.getParent('phaseDraw');
 					return game.hasPlayer(target=>{
-						if(target==player||evt&&evt.player==target) return false;
+						if(target==player||(evt&&evt.player==target)) return false;
 						return event.getg(target).length>1&&target.countCards('he');
 					});
 				},
