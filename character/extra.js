@@ -621,6 +621,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twshelie:{
 				audio:'shelie',
 				inherit:'shelie',
+				prompt2:()=>lib.translate.shelie_info,
 				group:'twshelie_jingce',
 				//什么精策技能啊喂！
 				subSkill:{
@@ -1290,6 +1291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				shaRelated:true,
 			},
 			twwuhun:{
+				audio:2,
 				trigger:{player:'die'},
 				forceDie:true,
 				skillAnimation:true,
@@ -1542,6 +1544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					init:{
+						audio:'shouli',
 						trigger:{
 							global:'phaseBefore',
 							player:'enterGame',
@@ -3325,6 +3328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			boss_juejing:{
+				audio:'juejing',
 				trigger:{player:'phaseDrawBefore'},
 				forced:true,
 				content:function(){
@@ -3337,6 +3341,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'boss_juejing2'
 			},
 			boss_juejing2:{
+				audio:'juejing',
 				trigger:{
 					player:'loseAfter',
 					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
@@ -4056,7 +4061,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			wuhun21:{audio:true},
+			wuhun2:{audio:2},
+			wuhun21:{
+				audio:true,
+				skillAnimation:true,
+				animationColor:'soil',
+			},
 			wuhun22:{
 				audio:true,
 				skillAnimation:true,
@@ -4068,7 +4078,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'soil',
 			},
 			"new_wuhun":{
-				audio:"wuhun21",
+				audio:"wuhun2",
 				group:["new_wuhun_mark","new_wuhun_die","wuhun22","wuhun23"],
 				trigger:{
 					player:"damageEnd",
@@ -4114,7 +4124,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool&&result.targets&&result.targets.length){
 								var target=result.targets[0];
 								event.target=target;
-								player.logSkill(Math.random()<0.5?'wuhun22':'wuhun23',target);
+								player.logSkill(Math.random()<0.5?'wuhun21':'wuhun22',target);
 								player.line(target,{color:[255, 255, 0]});
 								game.delay(2);
 							}
@@ -5883,6 +5893,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(filter({name:'tao'},player,event)&&player.countCards('hes',{suit:'heart'})) return true;
 					if(filter({name:'wuxie'},player,event)&&player.countCards('hes',{suit:'spade'})) return true;
 					return false;
+				},
+				precontent:function(){
+					delete event.result.skill;
+					player.logSkill('longhun'+(4-lib.suit.indexOf(get.suit(event.result.cards[0],player))));
 				},
 				ai:{
 					respondSha:true,
