@@ -266,6 +266,9 @@
 			}],
 		},
 		hookmap:{},
+		eventRecorder:[],
+		recordedEvent:{},
+		eventRecorderName:[],
 		imported:{},
 		layoutfixed:['chess','tafang','stone'],
 		pinyins:{
@@ -32414,6 +32417,36 @@
 		}
 	};
 	const game={
+	    //事件记录器
+	    addEventRecorder:function(name,filter,info){
+	        if(!name) return;
+	        if(lib.eventRecorderName.contains(name)) return;
+	        if(typeof filter!='function') return;
+	        const recorder={};
+	        recorder.name=name;
+	        if(info&&typeof info=='function') recorder.info=info;
+	        recorder.filter=filter;
+	        lib.eventRecorder.push(recorder);
+	        lib.eventRecorderName.push(name);
+	        lib.recordedEvent[name]=[];
+	        return recorder;
+	    },
+	    removeEventRecorder:function(name){
+	        if(!name) return;
+	        lib.eventRecorder.forEach((recorder,index)=>{
+	            if(!recorder.name==name) return;
+	            lib.eventRecorder.splice(index,1);
+	            delete lib.recordedEvent[name];
+	        });
+	    },
+	    getEventRecorder:function(name){
+	        for(var recorder of lib.eventRecorder){
+	            if(recorder.name==name) return recorder;
+	        }
+	    },
+	    getRecordedEvent:function(name){
+	        if(lib.recordedEvent[name]) return lib.recordedEvent[name];
+	    },
 		//洗牌
 		washCard:()=>{
 			if(!ui.cardPile.hasChildNodes()&&!ui.discardPile.hasChildNodes()) return false;
@@ -37293,6 +37326,16 @@
 					else{
 						next.parent=event;
 						_status.event=next;
+						lib.eventRecorder.forEach(recorder=>{
+						    if(!recorder.filter(next)) return;
+						    var redEvt={};
+						    if(recorder.info){
+						        redEvt=recorder.info(next);
+						    }
+						    redEvt.event=next;
+						    redEvt.round=game.roundNumber;
+						    lib.recordedEvent[recorder.name].push(redEvt);
+						});
 						game.getGlobalHistory('everything').push(next);
 					}
 				}
