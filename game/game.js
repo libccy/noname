@@ -7841,7 +7841,8 @@
 						value:function allSettled(ary){
 							const Promise = this;
 							return new Promise((resolve, reject) => {
-								if (Object.prototype.toString.call(arr) != "[object Array]")
+								// if (Object.prototype.toString.call(arr) != "[object Array]")
+								if (!Array.isArray(ary))
 								return reject(new TypeError(`${typeof arr} ${ary} is not iterable(cannot read property Symbol(Symbol.iterator))`));
 								let args = Array.prototype.slice.call(ary);
 								if (args.length == 0) return resolve([]);
@@ -33821,14 +33822,12 @@
 				})();
 			}
 		},
-		importExtension:function(data,finishLoad,exportext,pkg){
+		importExtension:gnc.async(function*(data,finishLoad,exportext,pkg){
 			//by 来瓶可乐加冰
-			if(!window.JSZip){
-				lib.init.js(lib.assetURL+'game','jszip',function(){
-					game.importExtension(data,finishLoad,exportext,pkg);
-				});
-			}
-			else if(get.objtype(data)=='object'){
+			if(!window.JSZip)
+				yield new Promise((resolve,reject)=>lib.init.js(`${lib.assetURL}game`,"jszip",resolve,reject));
+
+			if(get.objtype(data)=='object'){
 			//导出
 				var zip=new JSZip();
 				var filelist=[];
@@ -33936,6 +33935,8 @@
 					if(str===""||undefined) throw('你导入的不是扩展！请选择正确的文件');
 					_status.importingExtension=true;
 					eval(str);
+					yield Promise.allSettled(_status.extensionLoading);
+					delete _status.extensionLoading;
 					_status.importingExtension=false;
 					if(!game.importedPack) throw('err');
 					var extname=game.importedPack.name;
@@ -34070,7 +34071,7 @@
 					return false;
 				}
 			};
-		},
+		}),
 		export:function(textToWrite,name){
 			var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
 			var fileNameToSaveAs = name||'noname';
