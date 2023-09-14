@@ -7110,6 +7110,7 @@
 			'<li>妄行：一种特殊的选项。若一名角色拥有带有“妄行”的技能，则该技能触发时，你须选择声明一个数字X（X∈{1,2,3,4}），技能后续中的X即为你选择的数字。选择完毕后，你获得如下效果：回合结束时，你选择一项：1.弃置X张牌；2.减1点体力上限。'+
 			'<li>搏击：若一名角色拥有带有“搏击”的技能，则当该搏击技能触发时，若本次技能的目标角色在你攻击范围内，且你在其攻击范围内，则你执行技能主体效果时，同时额外执行“搏击”后的额外效果。'+
 			'<li>游击：若一名角色拥有带有“游击”的技能，则当该游击技能执行至“游击”处时，若本次技能的目标角色在你的攻击范围内，且你不在其攻击范围内，则你可以执行“游击”后的额外效果。'+
+			'<li>激昂：一名角色发动“昂扬技”标签技能后，此技能失效，直至从此刻至满足此技能“激昂”条件后。'+
 			''
 		},
 		path:{},
@@ -53002,9 +53003,14 @@
 				if(lib.config.show_characternamepinyin){
 					var charactername=get.rawName(name);
 					var characterpinyin=get.pinyin(charactername);
-					var charactersex=get.translation(lib.character[name][0]);
-					var charactergroup=get.translation(lib.character[name][1]);
-					var characterhp=lib.character[name][2];
+					var nameinfo=lib.character[name];
+					if(!nameinfo){
+						const pack=Object.keys(lib.characterPack).find(pack=>Object.keys(lib.characterPack[pack]).contains(name));
+						if(pack) nameinfo=lib.characterPack[pack][name];
+					}
+					var charactersex=get.translation(nameinfo[0]);
+					var charactergroup=get.translation(nameinfo[1]);
+					var characterhp=nameinfo[2];
 					var characterintroinfo=get.characterIntro(name);
 					intro.innerHTML='<span style="font-weight:bold;margin-right:5px;line-height:2">'+charactername+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+characterpinyin+']'+'</span>'+' | '+charactersex+' | '+charactergroup+' | '+characterhp+'<br>'+characterintroinfo;
 				}
@@ -54257,6 +54263,7 @@
 			if(info.lordSkill) list.add('君主技');
 			if(info.chargingSkill) list.add('蓄能技');
 			if(info.charlotte) list.add('Charlotte');
+			if(info.sunben) list.add('昂扬技');
 			if(info.categories) list.addArray(info.categories(skill,player));
 			return list;
 		},
