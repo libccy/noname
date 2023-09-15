@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			tw:{
-				tw_sp:['tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_tianyu','jiachong','duosidawang','wuban','yuejiu','tw_caocao','tw_zhangmancheng','tw_caozhao','tw_wangchang','tw_puyangxing','tw_jiangji','tw_niujin','tw_xiahouen','tw_xiahoushang','tw_zhangji','tw_zhangnan','tw_fengxí','tw_furong','tw_liwei','tw_yangyi','tw_daxiaoqiao','tw_dengzhi','tw_baoxin','tw_bingyuan','tw_fanchou','tw_haomeng','tw_huchuquan','tw_jianshuo','tw_jiling','tw_liufuren','tw_liuzhang','tw_mateng','tw_niufudongxie','tw_qiaorui','tw_weixu','tw_yanxiang','tw_yufuluo','tw_zhangning','tw_dengzhi','tw_yangyi','tw_yangang','tw_gongsunfan'],
+				tw_sp:['tw_zhangzhao','tw_zhanghong','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_tianyu','jiachong','duosidawang','wuban','yuejiu','tw_caocao','tw_zhangmancheng','tw_caozhao','tw_wangchang','tw_puyangxing','tw_jiangji','tw_niujin','tw_xiahouen','tw_xiahoushang','tw_zhangji','tw_zhangnan','tw_fengxí','tw_furong','tw_liwei','tw_yangyi','tw_daxiaoqiao','tw_dengzhi','tw_baoxin','tw_bingyuan','tw_fanchou','tw_haomeng','tw_huchuquan','tw_jianshuo','tw_jiling','tw_liufuren','tw_liuzhang','tw_mateng','tw_niufudongxie','tw_qiaorui','tw_weixu','tw_yanxiang','tw_yufuluo','tw_zhangning','tw_dengzhi','tw_yangyi','tw_yangang','tw_gongsunfan'],
 				tw_yunchouzhi:['tw_wangcan','tw_dongzhao','tw_bianfuren','tw_feiyi','tw_chenzhen','tw_xunchen'],
 				tw_yunchouxin:['tw_wangling','tw_huojun','tw_wujing','tw_zhouchu'],
 				tw_yunchouren:['tw_xujing','tw_qiaogong'],
@@ -20,7 +20,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			tw_zhangzhao:['male','wu',3,['twlijian','twchungang'],[]],
+			tw_zhanghong:['male','wu',3,['twqinqian','twrouke']],
+			tw_zhangzhao:['male','wu',3,['twlijian','twchungang']],
 			tw_ol_sunjian:['male','wu','4/5',['gzyinghun','wulie','twpolu'],['zhu']],
 			tw_menghuo:['male','qun',4,['huoshou','rezaiqi','twqiushou'],['zhu']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige','twchongwang'],['zhu']],
@@ -277,6 +278,146 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//张纮
+			twqinqian:{
+				audio:2,
+				sunbenSkill:true,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return !player.hasSkill('twqinqian_sunben')&&player.countCards('h')&&game.countPlayer()>1;
+				},
+				filterCard:function(card,player){
+					return !ui.selected.cards.some(cardx=>get.suit(cardx,player)==get.suit(card,player));
+				},
+				selectCard:[1,4],
+				check:function(card){
+					return 1/(get.value(card)||0.5);
+				},
+				position:'h',
+				complexCard:true,
+				discard:false,
+				lose:false,
+				delay:false,
+				filterTarget:lib.filter.notMe,
+				usable:1,
+				content:function(){
+					'step 0'
+					player.addSkill('twqinqian_sunben');
+					player.give(cards,target);
+					if(cards.length<2) event.finish();
+					'step 1'
+					var card=get.cardPile2(card=>get.type(card)=='equip');
+					if(card) player.gain(card,'gain2');
+					'step 2'
+					if(player.countCards('h')>=target.countCards('h')){
+						if(target.countCards('h')) event._result={index:1};
+						else event.finish();
+					}
+					else{
+						var str=get.translation(target);
+						player.chooseControl().set('choiceList',[
+							'将手牌数摸至与'+str+'相同',
+							'观看'+str+'的手牌并获得其一种花色的所有手牌',
+						]).set('ai',()=>{
+							var player=_status.event.player;
+							var target=_status.event.target;
+							if(target.countCards('h')-player.countCards('h')>target.countCards('h')/4||get.attitude(player,target)>0) return 0;
+							return 1;
+						});
+					}
+					'step 3'
+					if(result.index==0){
+						player.drawTo(target.countCards('h'));
+						event.finish();
+						return;
+					}
+					var list=[];
+					var dialog=['勤迁：获得'+get.translation(target)+'一种花色的所有牌'];
+					for(var suit of lib.suit.concat('none')){
+						if(target.countCards('h',{suit:suit})){
+							dialog.push('<div class="text center">'+get.translation(suit+'2')+'牌</div>');
+							dialog.push(target.getCards('h',{suit:suit}));
+							list.push(suit);
+						}
+					}
+					if(!list.length){
+						event.finish();
+						return;
+					}
+					player.chooseControl(list).set('dialog',dialog).set('ai',()=>{
+						return _status.event.control;
+					}).set('control',(()=>{
+						var getv=(cards)=>cards.map(i=>get.value(i)).reduce((p,c)=>p+c,0);
+						return list.sort((a,b)=>{
+							return getv(target.getCards('h',{suit:b}))-getv(target.getCards('h',{suit:a}));
+						})[0];
+					})());
+					'step 4'
+					if(result.bool) player.gain(target.getCards('h',{suit:result.control}),target,'give');
+				},
+				ai:{
+					order:7,
+					result:{
+						target:function(player,target){
+							return target.countCards('h');
+						},
+					},
+				},
+				subSkill:{
+					sunben:{
+						charlotte:true,
+						init:function(player){
+							player.storage.twqinqian_sunben=0;
+						},
+						onremove:true,
+						mark:true,
+						intro:{
+							markcount:function(num){
+								return (num||0).toString();
+							},
+							content:'弃牌进度：#/6',
+						},
+						trigger:{
+							player:'loseAfter',
+							global:'loseAsyncAfter',
+						},
+						filter:function(event,player){
+							if(event.type!='discard') return false;
+							var evt=event.getl(player);
+							return evt&&evt.hs&&evt.hs.length;
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							'step 0'
+							player.addMark('twqinqian_sunben',trigger.getl(player).hs.length,false);
+							'step 1'
+							if(player.countMark('twqinqian_sunben')>=6){
+								player.removeSkill('twqinqian_sunben');
+								player.popup('勤迁');
+								game.log(player,'恢复了技能','#g【勤迁】');
+							}
+						},
+					},
+				},
+			},
+			twrouke:{
+				audio:2,
+				trigger:{
+					player:'gainAfter',
+					global:'loseAsyncAfter'
+				},
+				filter:function(event,player){
+					var evt=event.getParent('phaseDraw');
+					if(evt&&evt.player==player) return false;
+					return event.getg(player).length>1;
+				},
+				forced:true,
+				content:function(){
+					player.draw();
+				},
+			},
 			//张昭
 			twlijian:{
 				getCards:function(event){
@@ -14356,6 +14497,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twchungang:'纯刚',
 			twchungang_info:'锁定技。一名其他角色于摸牌阶段外得到超过一张牌时，你令其弃置一张牌。',
 			tw_zhanghong:'张纮',
+			twqinqian:'勤迁',
+			twqinqian_info:'昂扬技。出牌阶段限一次，你可以将至多四张花色各不相同的手牌交给一名其他角色，然后若你交出的牌数大于1，则你从牌堆中获得一张装备牌，然后选择一项：①将手牌数摸至与其相同；②观看其手牌并获得其一种花色的所有牌。<br>激昂：你弃置六张牌。',
+			twrouke:'柔克',
+			twrouke_info:'锁定技。当你于摸牌阶段外得到超过一张牌时，你摸一张牌。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',
