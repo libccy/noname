@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['ol_qianzhao'],
+				sp_waitforsort:[],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['ol_wanglang','ol_puyuan','ol_zhouqun'],
 				sp_zhongdan:["cuiyan","huangfusong"],
@@ -27,7 +27,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			ol_qianzhao:['male','wei',4,['olweifu','olkuanse']],
 			niujin:['male','wei',4,['olcuorui','liewei']],
 			hejin:['male','qun',4,['olmouzhu','olyanhuo']],
 			hansui:['male','qun',4,['olniluan','olxiaoxi']],
@@ -692,177 +691,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
-			//牵招
-			olweifu:{
-				audio:2,
-				enable:'phaseUse',
-				filter:function(event,player){
-					return player.countDiscardableCards(player,'he');
-				},
-				filterCard:lib.filter.cardDiscardable,
-				position:'he',
-				check:function(player){
-					var player=_status.event.player;
-					var storage=player.getStorage('olweifu_buff');
-					if(storage.some(cardx=>get.type2(cardx)==get.type2(card))) return 0;
-					var cards=player.getCards('hs').filter(card=>{
-						if(storage.some(cardx=>get.type2(cardx)==get.type2(card))) return false;
-						return player.getCardUsable(card,true)>0&&get.type(card)!='delay'&&get.type(card)!='equip'&&player.hasValueTarget(card,false);
-					});
-					cards=cards.filter(card=>{
-						var num=0;
-						var info=get.info(card,false);
-						if(!info.notarget&&(info.toself||info.singleCard||!info.selectTarget||info.selectTarget==1)) num++;
-						else if(info.selectTarget!=undefined){
-							if(Array.isArray(info.selectTarget)){
-								if(info.selectTarget[0]<0||info.selectTarget[0]!=1||info.selectTarget[1]!=1) num+=game.countPlayer();
-								else num+=info.selectTarget[1];
-							}
-							else{
-								if(info.selectTarget<0) num+=game.countPlayer();
-								else num+=info.selectTarget;
-							}
-						}
-						num=Math.min(num,game.countPlayer(current=>get.effect(current,card,player,player)>0&&lib.filter.targetEnabled2(card,player,current)));
-						return num<game.countPlayer(current=>get.effect(current,card,player,player)>0&&lib.filter.targetEnabled2(card,player,current));
-					});
-					cards.sort((a,b)=>player.getUseValue(b)-player.getUseValue(a));
-					if(card==cards[0]) return 0;
-					return 7-get.value(card);
-				},
-				content:function(){
-					'step 0'
-					player.judge();
-					'step 1'
-					player.addTempSkill('olweifu_buff');
-					player.markAuto('olweifu_buff',[result.card]);
-					if(get.type2(result.card)==get.type2(cards[0])) player.draw();
-				},
-				getType:function(storage){
-					var list=[];
-					for(var i=0;i<storage.length;i++){
-						list.push(get.type2(storage[i],false));
-					}
-					return list;
-				},
-				subSkill:{
-					buff:{
-						charlotte:true,
-						mark:true,
-						intro:{
-							markcount:function(storage,player){
-								return lib.skill.olweifu.getType(storage).length;
-							},
-							content:function(storage,player){
-								return '使用'+get.translation(lib.skill.olweifu.getType(storage))+'牌获得增益';
-							},
-						},
-						mod:{
-							targetInRange:function(card,player){
-								//if(_status.event.name=='olweifu_buff') return true;
-								var storage=player.getStorage('olweifu_buff');
-								if(storage.some(cardx=>get.type2(cardx)==get.type2(card))) return true;
-							},
-						},
-						audio:'olweifu',
-						trigger:{player:'useCard2'},
-						filter:function(event,player){
-							if(!event.targets) return false;
-							var storage=player.getStorage('olweifu_buff');
-							if(!storage.some(cardx=>get.type2(cardx)==get.type2(event.card))) return false;
-							return game.hasPlayer(current=>!event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current));
-						},
-						direct:true,
-						content:function(){
-							'step 0'
-							player.unmarkAuto('olweifu_buff',player.getStorage('olweifu_buff').filter(cardx=>get.type2(cardx)==get.type2(trigger.card)));
-							player.chooseTarget(get.prompt('olweifu'),'为'+get.translation(trigger.card)+'增加一个目标',function(card,player,target){
-								var trigger=_status.event.getTrigger();
-								return !trigger.targets.contains(target)&&lib.filter.targetEnabled2(trigger.card,player,current);
-							}).set('ai',function(target){
-								var player=_status.event.player;
-								var trigger=_status.event.getTrigger();
-								return get.effect(target,trigger.card,player,player);
-							});
-							'step 1'
-							if(result.bool){
-								var target=result.targets[0];
-								player.logSkill('olweifu_buff',target);
-								trigger.targets.add(target);
-								game.log(target,'被加入',trigger.card,'的目标');
-							}
-							else event.finish();
-							'step 2'
-							game.delayx();
-						},
-					},
-				},
-				ai:{
-					order:function(item,player){
-						if(player.countCards('hes')<=1) return 0;
-						var storage=player.getStorage('olweifu_buff');
-						var cards=player.getCards('hs').filter(card=>{
-							if(storage.some(cardx=>get.type2(cardx)==get.type2(card))) return false;
-							return player.getCardUsable(card,true)>0&&get.type(card)!='delay'&&get.type(card)!='equip'&&player.hasValueTarget(card,false);
-						});
-						cards=cards.filter(card=>{
-							var num=0;
-							var info=get.info(card,false);
-							if(!info.notarget&&(info.toself||info.singleCard||!info.selectTarget||info.selectTarget==1)) num++;
-							else if(info.selectTarget!=undefined){
-								if(Array.isArray(info.selectTarget)){
-									if(info.selectTarget[0]<0||info.selectTarget[0]!=1||info.selectTarget[1]!=1) num+=game.countPlayer();
-									else num+=info.selectTarget[1];
-								}
-								else{
-									if(info.selectTarget<0) num+=game.countPlayer();
-									else num+=info.selectTarget;
-								}
-							}
-							num=Math.min(num,game.countPlayer(current=>get.effect(current,card,player,player)>0&&lib.filter.targetEnabled2(card,player,current)));
-							return num<game.countPlayer(current=>get.effect(current,card,player,player)>0&&lib.filter.targetEnabled2(card,player,current));
-						});
-						if(!cards.length) return 0;
-						cards.sort((a,b)=>player.getUseValue(b)-player.getUseValue(a));
-						return get.order(card)+0.001;
-					},
-					result:{player:1},
-				},
-			},
-			olkuanse:{
-				audio:2,
-				trigger:{global:'useCardToPlayered'},
-				filter:function(event,player){
-					if(!event.isFirstTarget) return false;
-					return event.targets.length>player.getHp();
-				},
-				direct:true,
-				content:function(){
-					'step 0'
-					player.chooseTarget(get.prompt2('olkuanse'),function(card,player,target){
-						return _status.event.getTrigger().contains(target);
-					}).set('ai',function(target){
-						if(get.attitude(player,target)>0&&player.isHealthy()) return 0;
-						return 2+get.sgn(get.attitude(player,target));
-					});
-					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						event.target=target;
-						player.logSkill('olkuanse',target);
-						var str='';
-						if(player.isDamaged()) str+=('，或令'+get.translation(player)+'回复1点体力');
-						target.chooseCard('款塞：交给'+get.translation(player)+'一张牌'+str).set('ai',card=>{
-							if(_status.event.eff) return 0;
-							return 6-get.value(card);
-						}).set('forced',player.isDamaged()).set('eff',get.attitude(player,target)>0);
-					}
-					else event.finish();
-					'step 2'
-					if(result.bool) player.gain(result.cards,target,'giveAuto');
-					else player.recover();
-				},
-			},
 			//牛金
 			olcuorui:{
 				audio:'cuorui',
@@ -24577,11 +24405,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olniluan_info:'体力值大于你的其他角色的结束阶段，若其本回合内使用过【杀】，则你可以将一张黑色牌当作【杀】对其使用（无距离限制）。',
 			olxiaoxi:'骁袭',
 			olxiaoxi_info:'新的一轮开始时，你可以视为使用一张无距离限制的【杀】。',
-			ol_qianzhao:'牵招',
-			olweifu:'威抚',
-			olweifu_info:'出牌阶段，你可以弃置一张牌并进行一次判定。本回合你使用的下一张与判定牌类别相同的牌无距离限制且可多选择一个目标。然后若弃置牌与判定牌的类别相同，你摸一张牌。',
-			olkuanse:'款塞',
-			olkuanse_info:'当一名角色使用牌指定第一个目标后，若此牌目标数大于你的体力值，则你可以令其中一名目标角色选择一项：①交给你一张牌；②令你回复1点体力。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
