@@ -26,8 +26,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			xin_guozhao:['female','wei',3,['yichong','wufei'],['unseen']],
-			xin_zhangyi:['male','shu',4,['xinwurong','shizhi'],['unseen']],
+			xin_guozhao:['female','wei',3,['yichong','wufei']],
+			xin_zhangyi:['male','shu',4,['xinwurong','shizhi']],
 			xin_sunliang:['male','wu',3,['xinzhizheng','xinkuizhu','xinlijun'],['zhu']],
 			re_xiaoqiao:['female','wu',3,['retianxiang','xinhongyan']],
 			shichangshi:['male','qun',1,['mbdanggu','mbmowang']],
@@ -405,7 +405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt('meihun'),'选择一名其他角色并选择一个花色，获得其此花色的所有牌并令其获得“雀”标记',lib.filter.notMe).set('ai',function(target){
+					player.chooseTarget(get.prompt('yichong'),'选择一名其他角色并选择一个花色，获得其此花色的所有牌并令其获得“雀”标记',lib.filter.notMe).set('ai',function(target){
 						var player=_status.event.player;
 						var att=get.attitude(player,target);
 						if(att>0) return 0;
