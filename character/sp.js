@@ -696,8 +696,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olweifu:{
 				audio:2,
 				enable:'phaseUse',
-				filterCard:true,
+				filterCard:lib.filter.cardDiscardable,
 				position:'he',
+				filter:function(event,player){
+					return player.hasCard(card=>lib.filter.cardDiscardable(card,player),'he');
+				},
 				check:function(card){
 					var player=_status.event.player;
 					return (5-get.value(card))/Math.pow(Math.max(0.1,player.getUseValue(card)),0.33);
@@ -787,6 +790,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var targets=result.targets;
 								player.logSkill('olweifu_add',targets);
 								trigger.targets.addArray(targets);
+								game.log(targets,'也成为了',trigger.card,'的目标');
 								if(!event.isMine()&&!event.isOnline()) game.delayex();
 							}
 						},
@@ -836,8 +840,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('olkuansai',target);
 						var position='e';
 						if(player!=target) position+='h';
+						var forced=player.isHealthy();
+						var str='请交给其一张牌'+(forced?'':'或点击“取消”令其回复1点体力')+'。';
 						if(!target.countCards(position)) event._result={bool:false};
-						else target.chooseCard(get.translation(player)+'对你发动了【款塞】','请交给其一张牌；或点击“取消”令其回复1点体力。',position).set('ai',card=>{
+						else target.chooseCard(get.translation(player)+'对你发动了【款塞】',str,position,forced).set('ai',card=>{
 							if(_status.event.recover) return 0;
 							var target=_status.event.player,player=_status.event.getParent().player;
 							if(get.attitude(target,player)>0){
@@ -846,6 +852,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.tag(card,'recover')) return -1;
 							return 6.5-get.value(card);
 						}).set('recover',function(){
+							if(forced) return false;
 							var recoverEff=get.recoverEffect(player,target,target);
 							var att=get.attitude(target,player);
 							if(att<0){
