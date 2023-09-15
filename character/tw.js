@@ -353,7 +353,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						})[0];
 					})());
 					'step 4'
-					if(result.bool) player.gain(target.getCards('h',{suit:result.control}),target,'give');
+					if(result.control) player.gain(target.getCards('h',{suit:result.control}),target,'give');
 				},
 				ai:{
 					order:7,
@@ -14498,7 +14498,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twchungang_info:'锁定技。一名其他角色于摸牌阶段外得到超过一张牌时，你令其弃置一张牌。',
 			tw_zhanghong:'张纮',
 			twqinqian:'勤迁',
-			twqinqian_info:'昂扬技。出牌阶段限一次，你可以将至多四张花色各不相同的手牌交给一名其他角色，然后若你交出的牌数大于1，则你从牌堆中获得一张装备牌，然后选择一项：①将手牌数摸至与其相同；②观看其手牌并获得其一种花色的所有牌。<br>激昂：你弃置六张牌。',
+			twqinqian_info:'昂扬技。出牌阶段限一次，你可以将至多四张花色各不相同的手牌交给一名其他角色，然后若你交出的牌数大于1，则你从牌堆中获得一张装备牌，然后选择一项：①将手牌数摸至与其相同；②观看其手牌并获得其一种花色的所有牌。<br>激昂：你弃置六张手牌。',
 			twrouke:'柔克',
 			twrouke_info:'锁定技。当你于摸牌阶段外得到超过一张牌时，你摸一张牌。',
 
