@@ -1473,7 +1473,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				hasSame:function(info,card){
 					if(info.type==get.type2(card,false)) return true;
 					if(info.suit!='none'&&info.suit==get.suit(card,false)) return true;
-					if(typeof info.number=='number'&&info.number>0&&info.number==get.suit(card,false)) return true;
+					if(typeof info.number=='number'&&info.number>0&&info.number==get.number(card,false)) return true;
 					return info.length==get.cardNameLength(card)
 				},
 				content:function(){
@@ -24498,7 +24498,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olkenshang:'垦伤',
 			olkenshang_info:'你可以将任意张牌当【杀】使用，然后你可以将此牌目标改为所有你攻击范围外的角色。此牌结算结束后，若此牌对应的实体牌数大于X，你摸X张牌（X为此牌造成过的伤害值），否则你失去一个技能。',
 			rekenshang:'垦伤',
-			rekenshang_info:'你可以将至少两张牌当【杀】使用，然后你可以将此牌目标改为等量名角色。此牌结算结束后，若此牌对应的实体牌数大于X，你摸X张牌（X为此牌造成过的伤害值）。',
+			rekenshang_info:'你可以将至少两张牌当【杀】使用，然后你可以将此牌目标改为等量名角色。此牌结算结束后，若此牌对应的实体牌数大于此牌造成过的伤害值，你摸一张牌。',
 			ol_zhujun:'OL朱儁',
 			olcuipo:'摧破',
 			olcuipo_info:'锁定技。当你使用牌时，若此牌是你本回合使用的第X张牌（X为此牌牌名的字数），则：{若此牌为【杀】或伤害类锦囊牌，则此牌的伤害值基数+1，否则你摸一张牌}。',

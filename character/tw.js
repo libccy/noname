@@ -8113,7 +8113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						filter:function(event,player,name){
 							if(name=='useCard') return (event.card.name=='sha'&&player.hasMark('twchuanshu_mark'));
-							return event.player!=player&&event._twchuanshu&&player.hasHistory('sourceDamage',function(evt){
+							return player.getStorage('twchuanshu_effect').some(i=>i!=player)&&event._twchuanshu&&player.hasHistory('sourceDamage',function(evt){
 								return evt.card==event.card;
 							});
 						},
@@ -8130,7 +8130,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.getHistory('sourceDamage',function(evt){
 									if(evt.card==trigger.card) num2+=evt.num;
 								});
-								player.draw(num1*num2);
+								var targets=player.getStorage('twchuanshu_effect').filter(i=>i!=player&&i.isIn());
+								for(var target of targets){
+									target.draw(num1*num2);
+								}
 							}
 						},
 					},

@@ -3043,7 +3043,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToTargeted'},
 				forced:true,
 				filter:function(event,player){
-					return event.player!=player&&get.type2(event.card)=='trick'&&(event.targets.length==1||player.countCards('he')>0);
+					return get.type2(event.card)=='trick'&&(event.targets.length==1||player.countCards('he')>0);
 				},
 				content:function(){
 					if(trigger.targets.length==1) player.draw();
@@ -10132,7 +10132,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqinqing:'寝情',
 			dcqinqing_info:'结束阶段，你可以弃置一名攻击范围内包含一号位的其他角色一张牌。然后若其手牌数大于一号位，你摸一张牌。',
 			dccunwei:'存畏',
-			dccunwei_info:'锁定技。当你成为其他角色使用锦囊牌的目标后，若你是唯一目标，你摸一张牌；否则你弃置一张牌。',
+			dccunwei_info:'锁定技。当你成为锦囊牌的目标后，若你是唯一目标，你摸一张牌；否则你弃置一张牌。',
 			dc_zhaotongzhaoguang:'赵统赵广',
 			dcqingren:'青刃',
 			dcqingren_info:'结束阶段，你可以摸X张牌（X为你本回合发动〖翊赞〗的次数）。',

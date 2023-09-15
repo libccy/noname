@@ -915,7 +915,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zymingshi:{
 				audio:'mingshi',
 				forced:true,
-				trigger:{target:'useCardToTargeted'},
+				trigger:{target:'useCardToBefore'},
+				priority:15,
 				filter:function(event,player){
 					if(!player.hasEmptySlot(2)) return false;
 					if(event.card.name!='sha') return false;
