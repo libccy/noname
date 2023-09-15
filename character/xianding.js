@@ -2797,7 +2797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				locked:false,
 				content:function(){
-					player.draw();
+					player.draw(trigger.targets.length);
 				},
 				mod:{
 					aiOrder:function(player,card,num){

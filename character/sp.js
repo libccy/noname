@@ -10,7 +10,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_tianzhu:['niujin','hejin','hansui',"wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','zhangzhi','lushi'],
-				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu'],
+				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
 				sp_waitforsort:[],
@@ -27,6 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_qianzhao:['male','wei',4,['olweifu','olkuansai']],
 			niujin:['male','wei',4,['olcuorui','liewei']],
 			hejin:['male','qun',4,['olmouzhu','olyanhuo']],
 			hansui:['male','qun',4,['olniluan','olxiaoxi']],
@@ -691,6 +692,192 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//OL牵招
+			olweifu:{
+				audio:2,
+				enable:'phaseUse',
+				filterCard:lib.filter.cardDiscardable,
+				position:'he',
+				filter:function(event,player){
+					return player.hasCard(card=>lib.filter.cardDiscardable(card,player),'he');
+				},
+				check:function(card){
+					var player=_status.event.player;
+					return (5-get.value(card))/Math.pow(Math.max(0.1,player.getUseValue(card)),0.33);
+				},
+				content:function(){
+					'step 0'
+					player.judge(card=>{
+						var evt=_status.event.getParent();
+						var cardx=evt.cards[0];
+						if(get.type2(card)==get.type2(cardx)) return 0.5;
+						return 0.1;
+					}).set('callback',function(){
+						var card=event.judgeResult.card;
+						player.addTempSkill('olweifu_clear');
+						player.addTempSkill('olweifu_add');
+						if(!get.is.object(player.storage.olweifu_add)) player.storage.olweifu_add={};
+						var type=get.type2(card,player);
+						if(typeof player.storage.olweifu_add[type]!='number') player.storage.olweifu_add[type]=0;
+						player.storage.olweifu_add[type]++;
+						player.markSkill('olweifu_add');
+						if(type==get.type2(event.getParent(2).cards[0],player)) player.draw();
+					}).set('judge2',result=>result.bool);
+				},
+				ai:{
+					order:7,
+					result:{
+						player:function(player){
+							return player.hasCard(card=>{
+								var type=get.type2(card);
+								if(type=='equip') return false;
+								return player.hasUseTarget(card)&&player.getUseValue(card)>5&&game.countPlayer(current=>{
+									return lib.filter.targetEnabled2(card,player,current)&&get.effect(current,card,player,player)>0;
+								})+1>(get.is.object(player.storage.olweifu_add)?(player.storage.olweifu_add[type]||0):0);
+							},'hs')?1:0;
+						},
+					},
+				},
+				subSkill:{
+					clear:{
+						trigger:{player:'useCard1'},
+						filter:function(event,player){
+							var type=get.type2(event.card);
+							if(get.is.object(player.storage.olweifu_add)&&typeof player.storage.olweifu_add[type]=='number') return true;
+							return false;
+						},
+						silent:true,
+						firstDo:true,
+						charlotte:true,
+						content:function(){
+							var type=get.type2(trigger.card);
+							var num=player.storage.olweifu_add[type];
+							delete player.storage.olweifu_add[type];
+							if(get.is.empty(player.storage.olweifu_add)){
+								delete player.storage.olweifu_add;
+								player.unmarkSkill('olweifu_add');
+							}
+							trigger._olweifu_clear=num;
+						}
+					},
+					add:{
+						trigger:{player:'useCard2'},
+						filter:function(event,player){
+							if(!event._olweifu_clear) return false;
+							var info=get.info(event.card);
+							if(info.allowMultiple==false) return false;
+							if(event.targets&&!info.multitarget){
+								if(game.hasPlayer(current=>{
+									return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current);
+								})) return true;
+							}
+							return false;
+						},
+						onremove:true,
+						charlotte:true,
+						direct:true,
+						content:function(){
+							'step 0'
+							var num=trigger._olweifu_clear;
+							player.chooseTarget(get.prompt('olweifu'),'为'+get.translation(trigger.card)+'额外指定'+get.cnNumber(num)+'个目标。',[1,num],(card,player,target)=>{
+								return !_status.event.sourcex.contains(target)&&lib.filter.targetEnabled2(_status.event.card,player,target);
+							}).set('sourcex',trigger.targets).set('ai',function(target){
+								var player=_status.event.player;
+								return get.effect(target,_status.event.card,player,player);
+							}).set('card',trigger.card);
+							'step 1'
+							if(result.bool){
+								var targets=result.targets;
+								player.logSkill('olweifu_add',targets);
+								trigger.targets.addArray(targets);
+								game.log(targets,'也成为了',trigger.card,'的目标');
+								if(!event.isMine()&&!event.isOnline()) game.delayex();
+							}
+						},
+						intro:{
+							markcount:()=>0,
+							content:(storage,player)=>{
+								if(!get.is.object(storage)) return;
+								var str='使用下一张以下类型的牌无距离限制，且可以额外指定对应数量个目标：';
+								for(var type in storage){
+									str+='<li>'+get.translation(type)+'牌：+'+storage[type];
+								}
+								return str;
+							}
+						},
+						mod:{
+							targetInRange:(card,player)=>{
+								var type=get.type2(card);
+								if(get.is.object(player.storage.olweifu_add)&&typeof player.storage.olweifu_add[type]=='number') return true;
+							},
+						}
+					}
+				},
+			},
+			olkuansai:{
+				audio:2,
+				trigger:{
+					global:'useCardToPlayered',
+				},
+				filter:function(event,player){
+					return event.isFirstTarget&&event.targets.length>player.getHp();
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt('olkuansai'),'令其中一个目标选择一项：1.交给你一张牌；2.令你回复1点体力。',(card,player,target)=>{
+						return _status.event.targets.contains(target);
+					}).set('targets',trigger.targets).set('ai',target=>{
+						var player=_status.event.player;
+						var att=get.attitude(player,target);
+						if(att>0) return 1;
+						return (1-att)/Math.sqrt(1+target.countCards('he'));
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('olkuansai',target);
+						var position='e';
+						if(player!=target) position+='h';
+						var forced=player.isHealthy();
+						var str='请交给其一张牌'+(forced?'':'或点击“取消”令其回复1点体力')+'。';
+						if(!target.countCards(position)) event._result={bool:false};
+						else target.chooseCard(get.translation(player)+'对你发动了【款塞】',str,position,forced).set('ai',card=>{
+							if(_status.event.recover) return 0;
+							var target=_status.event.player,player=_status.event.getParent().player;
+							if(get.attitude(target,player)>0){
+								return get.value(card,target)-get.value(card,player);
+							}
+							if(get.tag(card,'recover')) return -1;
+							return 6.5-get.value(card);
+						}).set('recover',function(){
+							if(forced) return false;
+							var recoverEff=get.recoverEffect(player,target,target);
+							var att=get.attitude(target,player);
+							if(att<0){
+								if(recoverEff>=0) return true;
+								if(target.hasCard(card=>{
+									return get.value(card)<6.5&&!get.tag(card,'recover')||get.value(card)<=0.05;
+								},position)) return false;
+							}
+							else{
+								if(recoverEff>0) return true;
+								if(target.hasCard(card=>{
+									return get.value(card,target)<get.value(card,player);
+								},position)) return false;
+							}
+							return true;
+						}());
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						target.give(result.cards,player);
+					}
+					else player.recover(target);
+				},
+			},
 			//牛金
 			olcuorui:{
 				audio:'cuorui',
@@ -1293,7 +1480,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				hasSame:function(info,card){
 					if(info.type==get.type2(card,false)) return true;
 					if(info.suit!='none'&&info.suit==get.suit(card,false)) return true;
-					if(typeof info.number=='number'&&info.number>0&&info.number==get.suit(card,false)) return true;
+					if(typeof info.number=='number'&&info.number>0&&info.number==get.number(card,false)) return true;
 					return info.length==get.cardNameLength(card)
 				},
 				content:function(){
@@ -23288,6 +23475,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ganfuren:['dc_ganfuren','ganfuren'],
 			wenqin:['wenqin','pe_wenqin'],
 			zhouqun:['ol_zhouqun','zhouqun'],
+			qianzhao:['ol_qianzhao','qianzhao'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -24317,7 +24505,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olkenshang:'垦伤',
 			olkenshang_info:'你可以将任意张牌当【杀】使用，然后你可以将此牌目标改为所有你攻击范围外的角色。此牌结算结束后，若此牌对应的实体牌数大于X，你摸X张牌（X为此牌造成过的伤害值），否则你失去一个技能。',
 			rekenshang:'垦伤',
-			rekenshang_info:'你可以将至少两张牌当【杀】使用，然后你可以将此牌目标改为等量名角色。此牌结算结束后，若此牌对应的实体牌数大于X，你摸X张牌（X为此牌造成过的伤害值）。',
+			rekenshang_info:'你可以将至少两张牌当【杀】使用，然后你可以将此牌目标改为等量名角色。此牌结算结束后，若此牌对应的实体牌数大于此牌造成过的伤害值，你摸一张牌。',
 			ol_zhujun:'OL朱儁',
 			olcuipo:'摧破',
 			olcuipo_info:'锁定技。当你使用牌时，若此牌是你本回合使用的第X张牌（X为此牌牌名的字数），则：{若此牌为【杀】或伤害类锦囊牌，则此牌的伤害值基数+1，否则你摸一张牌}。',
@@ -24404,7 +24592,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olniluan:'逆乱',
 			olniluan_info:'体力值大于你的其他角色的结束阶段，若其本回合内使用过【杀】，则你可以将一张黑色牌当作【杀】对其使用（无距离限制）。',
 			olxiaoxi:'骁袭',
-			olxiaoxi_info:'新的一轮开始时，你可以视为使用一张无距离限制的【杀】。',
+			olxiaoxi_info:'一轮游戏开始时，你可以视为使用一张无距离限制的【杀】。',
+			ol_qianzhao:'牵招',
+			olweifu:'威抚',
+			olweifu_info:'出牌阶段，你可以弃置一张牌并判定。你本回合下次使用与结果类型相同的牌无距离限制，且可以额外指定一个目标。若你弃置的牌与判定牌类型相同，你摸一张牌。',
+			olkuansai:'款塞',
+			olkuansai_info:'当一张牌指定第一个目标后，若目标数大于你的体力值，你可以令其中一个目标选择一项：1.交给你一张牌；2.令你回复1点体力。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

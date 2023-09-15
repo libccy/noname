@@ -1247,6 +1247,7 @@ window.noname_character_rank={
 		'jsrg_zhanghe',
 		'jsrg_zoushi',
 		'gaoxiang',
+		'ol_qianzhao',
 	],
 	bm:[
 		'diy_xizhenxihong',

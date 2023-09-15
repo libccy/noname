@@ -14146,7 +14146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbaosi_info:'锁定技。当你于出牌阶段对一名攻击范围内的角色造成伤害后，你于此阶段对其使用牌无次数限制。',
 			xin_zhoutai:'手杀周泰',
 			re_yanwen:"手杀颜良文丑",
-			qianzhao:'牵招',
+			qianzhao:'手杀牵招',
 			mbshihe:'势吓',
 			mbshihe_info_identity:'出牌阶段限一次。你可以与一名角色拼点。若你：赢，当其于其下回合结束前对你造成伤害时，取消之；没赢，你随机弃置一张牌。',
 			mbshihe_info:'出牌阶段限一次。你可以与一名角色拼点。若你：赢，当其于其下回合结束前对你和你的友方角色造成伤害时，取消之；没赢，你随机弃置一张牌。',
