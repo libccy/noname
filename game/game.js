@@ -63,45 +63,8 @@
 			}
 			return new Promise(callback);
 		}:(()=>{throw new TypeError("gnc.of needs a GeneratorFunction.")})(),
-		/*
-		await:gen=>new Promise((resolve,reject)=>{
-			let result=gen;
-			let nexts=resolve;
-			let throws=reject;
-			if(gnc.is.coroutine(gen)||(gnc.is.generator(gen)&&!gen.nocoroutine)) {
-				if(!gen.status)gen.status="next";
-				if(!gen.state)gen.state=undefined;
-				try{
-					result=gen[result.status](result.state);
-				}catch(error){
-					reject(error);
-					return;
-				}
-				if(!result.done){
-					nexts=(item)=>{
-						gen.state=item;
-						gen.status="next";
-						gnc.await(gen).then(resolve,reject);
-					}
-					throws=(err)=>{
-						gen.state=err;
-						gen.status="throw";
-						gnc.await(gen).then(resolve,reject);
-					}
-				}
-				result=result.value;
-			}
-			Promise.resolve(result).then(nexts,throws);
-		}),
-		*/
-		/*
-		escape:gen=>{
-			gen.nocoroutine=true;
-			return gen;
-		},
-		*/
 		is:{
-			coroutine:item=>(typeof item=="function"||gnc.is.generator(item))&&item.name=="genCoroutine",
+			coroutine:item=>typeof item=="function"&&item.name=="genCoroutine",
 			generatorFunc:item=>item instanceof GeneratorFunction,
 			generator:item=>(typeof item=="object")&&("constructor" in item)&&item.constructor&&("constructor" in item.constructor)&&item.constructor.constructor===GeneratorFunction
 		}
@@ -7307,12 +7270,8 @@
 				'无名杀 - 录像 - '+_status.videoToSave.name[0]+' - '+_status.videoToSave.name[1]);
 			}
 		},
-		genAsync:fn=>gnc.of(fn),
-		//genAwait:gen=>gnc.await(gen),
 		gnc:{
-			async:fn=>gnc.of(fn),
-			//await:gen=>gnc.await(gen),
-			//escape:gen=>gnc.escape(gen),
+			of:fn=>gnc.of(fn),
 			is:{
 				coroutine:item=>gnc.is.coroutine(item),
 				generatorFunc:item=>gnc.is.generatorFunc(item),
