@@ -93,10 +93,12 @@
 			Promise.resolve(result).then(nexts,throws);
 		}),
 		*/
+		/*
 		escape:gen=>{
 			gen.nocoroutine=true;
 			return gen;
 		},
+		*/
 		is:{
 			coroutine:item=>(typeof item=="function"||gnc.is.generator(item))&&item.name=="genCoroutine",
 			generatorFunc:item=>item instanceof GeneratorFunction,
@@ -7309,7 +7311,7 @@
 		gnc:{
 			async:fn=>gnc.async(fn),
 			//await:gen=>gnc.await(gen),
-			escape:gen=>gnc.escape(gen),
+			//escape:gen=>gnc.escape(gen),
 			is:{
 				coroutine:item=>gnc.is.coroutine(item),
 				generatorFunc:item=>gnc.is.generatorFunc(item),
