@@ -2318,10 +2318,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.log(player,(num>0?'获得了':'减少了')+get.cnNumber(Math.abs(num))+'点“达命”值');
 				},
 				content:function(){
-					lib.skill.spdaming.change(player,2);
+					lib.skill.spdaming.change(player,1);
 				},
 				intro:{
 					name:'达命值',
+					markcount:function(storage,player){
+						return (storage||0).toString();
+					},
 					content:'当前有#点“达命”值',
 				},
 				subSkill:{
@@ -5276,7 +5279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card.name!='jiu'&&event.card.name!='tao'&&
 						event.targets.length==1&&event.card.isCard&&event.cards.length==1&&event.getParent(2).name!='jueyong_timeout'&&
 						get.position(event.cards[0],true)=='o'&&event.card.name==event.cards[0].name&&
-						(!player.storage.jueyong||player.storage.jueyong[0].length<player.hp*2);
+						(!player.storage.jueyong||player.storage.jueyong[0].length<player.getHp());
 				},
 				content:function(){
 					trigger.targets.remove(player);
@@ -13989,7 +13992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			discretesidi_info:'①当你使用的不为延时锦囊牌的牌结算结束后，你可选择一名R内不存在以a为第一序偶的二元序偶的其他角色a，并选择一名角色b，在关系R内建立二元序偶&lt;a,b&gt;（b对其他角色不可见）。②一名角色a使用不为延时锦囊牌的牌指定b为目标时，若(aRb)∧(此牌目标数为1)为真，则{你从R内移除&lt;a,b&gt;，且：若b为你，你摸一张牌；若b不为你，你可选择：⒈取消此牌的目标，然后若场上没有处于濒死状态的角色，则你对a造成1点伤害。⒉摸两张牌}；否则{你清除R内以a为第一元素的二元序偶}。',
 			fuqian:'傅佥',
 			jueyong:'绝勇',
-			jueyong_info:'锁定技。①当你不因〖绝勇〗成为唯一牌的目标时，若此牌不为转化牌且对应的实体牌牌数为1且不为【桃】或【酒】且你的“绝”数小于你的体力值的二倍，则你将此牌置于你的武将牌上，称为“绝”，且取消此牌的目标。②结束阶段开始时，若你有“绝”，则你令所有“绝”的原使用者依次对你使用所有“绝”，将无法使用的“绝”置入弃牌堆。',
+			jueyong_info:'锁定技。①当你不因〖绝勇〗成为唯一牌的目标时，若此牌不为转化牌且对应的实体牌牌数为1且不为【桃】或【酒】且你的“绝”数小于你的体力值，则你将此牌置于你的武将牌上，称为“绝”，且取消此牌的目标。②结束阶段开始时，若你有“绝”，则你令所有“绝”的原使用者依次对你使用所有“绝”，将无法使用的“绝”置入弃牌堆。',
 			poxiang:'破降',
 			poxiang_info:'出牌阶段限一次。你可以将一张牌交给一名其他角色。你摸三张牌（不计入本回合的手牌上限），移去所有“绝”并失去1点体力。',
 			simafu:'司马孚',
@@ -14130,7 +14133,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duansuo_info:'出牌阶段限一次。你可以重置任意名处于连环状态的角色，然后对这些角色各造成1点火焰伤害。',
 			sp_pengyang:'彭羕',
 			spdaming:'达命',
-			spdaming_info:'①游戏开始时，你获得2点“达命”值。②其他角色A的出牌阶段限一次。其可以交给你一张牌，然后你选择另一名其他角色B。若B有与此牌相同类型的牌，其将一张该类型的牌交给A，你获得1点“达命”值；否则你将此牌交给A。',
+			spdaming_info:'①游戏开始时，你获得1点“达命”值。②其他角色A的出牌阶段限一次。其可以交给你一张牌，然后你选择另一名其他角色B。若B有与此牌相同类型的牌，其将一张该类型的牌交给A，你获得1点“达命”值；否则你将此牌交给A。',
 			spxiaoni:'嚣逆',
 			spxiaoni_info:'①出牌阶段限一次。若你的“达命”值大于0，你可以将一张牌当任意一种【杀】或伤害类锦囊牌使用。然后你减少等同于此牌指定目标数的“达命”值。②你的手牌上限基数为X（X为“达命”值，且至多为你的体力值，至少为0）。',
 			xin_zhuhuan:'手杀朱桓',
