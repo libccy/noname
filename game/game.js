@@ -39,6 +39,7 @@
 			result.state=undefined;
 			return gnc.await(result);
 		},
+		/*
 		await:gen=>new Promise((resolve,reject)=>{
 			let result=gen;
 			let nexts=resolve;
@@ -68,6 +69,7 @@
 			}
 			Promise.resolve(result).then(nexts,throws);
 		}),
+		*/
 		escape:gen=>{
 			gen.nocoroutine=true;
 			return gen;
@@ -7280,10 +7282,10 @@
 			}
 		},
 		genAsync:fn=>gnc.async(fn),
-		genAwait:gen=>gnc.await(gen),
+		//genAwait:gen=>gnc.await(gen),
 		gnc:{
 			async:fn=>gnc.async(fn),
-			await:gen=>gnc.await(gen),
+			//await:gen=>gnc.await(gen),
 			escape:gen=>gnc.escape(gen),
 			is:{
 				coroutine:item=>gnc.is.coroutine(item),
