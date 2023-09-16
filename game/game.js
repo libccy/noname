@@ -32,7 +32,7 @@
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
-		async:fn=>function genCoroutine(){
+		of:fn=>function genCoroutine(){
 			let gen=fn.apply(this,arguments);
 			gen.status="next";
 			gen.state=undefined;
@@ -7306,10 +7306,10 @@
 				'无名杀 - 录像 - '+_status.videoToSave.name[0]+' - '+_status.videoToSave.name[1]);
 			}
 		},
-		genAsync:fn=>gnc.async(fn),
+		genAsync:fn=>gnc.of(fn),
 		//genAwait:gen=>gnc.await(gen),
 		gnc:{
-			async:fn=>gnc.async(fn),
+			async:fn=>gnc.of(fn),
 			//await:gen=>gnc.await(gen),
 			//escape:gen=>gnc.escape(gen),
 			is:{
@@ -8363,7 +8363,7 @@
 							if(!arrayLengths.length) return previousValue+1;
 							return previousValue+Math.min(...arrayLengths);
 						},0);
-						const packLoaded=gnc.async(function*(){
+						const packLoaded=gnc.of(function*(){
 							toLoad--;
 							if(toLoad) return;
 							if(_status.importing){
@@ -8476,13 +8476,13 @@
 						throw e;
 					});
 					var styleToLoad=6;
-					var styleLoaded=gnc.async(function*(){
+					var styleLoaded=gnc.of(function*(){
 						--styleToLoad;
 						if(styleToLoad==0){
 							if(extensionlist.length&&(lib.config.mode!='connect'||show_splash)){
 								_status.extensionLoading=[];
 								let extToLoad=extensionlist.length;
-								const extLoaded=gnc.async(function*(){
+								const extLoaded=gnc.of(function*(){
 									--extToLoad;
 									if(extToLoad==0){
 										yield Promise.allSettled(_status.extensionLoading);
@@ -8504,7 +8504,7 @@
 										continue;
 									}
 									lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,(function(i){
-										return gnc.async(function*(){
+										return gnc.of(function*(){
 											game.removeExtension(i);
 											--extToLoad;
 											if(extToLoad==0){
@@ -9152,7 +9152,7 @@
 				}
 			},
 			//lib.onload支持传入GeneratorFunction以解决异步函数的问题 by诗笺
-			onload:gnc.async(function*(){
+			onload:gnc.of(function*(){
 				const libOnload=lib.onload;
 				delete lib.onload;
 				while(Array.isArray(libOnload)&&libOnload.length){
@@ -9353,7 +9353,7 @@
 					});
 				}
 
-				var proceed2=gnc.async(function*(){
+				var proceed2=gnc.of(function*(){
 					var mode=lib.imported.mode;
 					var card=lib.imported.card;
 					var character=lib.imported.character;
@@ -9819,7 +9819,7 @@
 					}
 					game.loop();
 				})
-				var proceed=gnc.async(function*(){
+				var proceed=gnc.of(function*(){
 					if(!lib.db){
 						try{
 							lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
@@ -33677,7 +33677,7 @@
 				return promise;
 			}
 		},
-		loadExtension:gnc.async(function*(obj){
+		loadExtension:gnc.of(function*(obj){
 			var noeval=false;
 			if(typeof obj=='function'){
 				obj=yield gnc.await(obj(lib,game,ui,get,ai,_status));
@@ -33852,7 +33852,7 @@
 				})();
 			}
 		},
-		importExtension:gnc.async(function*(data,finishLoad,exportext,pkg){
+		importExtension:gnc.of(function*(data,finishLoad,exportext,pkg){
 			//by 来瓶可乐加冰
 			if(!window.JSZip)
 				yield new Promise((resolve,reject)=>lib.init.js(`${lib.assetURL}game`,"jszip",resolve,reject));
