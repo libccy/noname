@@ -8311,7 +8311,7 @@
 						if (Array.isArray(lib.onprepare)&&lib.onprepare.length){
 							_status.onprepare=Object.freeze(lib.onprepare.map(fn=>{
 								if(typeof fn!="function") return;
-								return gnc.await(fn());
+								return (gnc.is.generatorFunc(fn)?gnc.of(fn):fn)();
 							}));
 						}
 						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
@@ -9118,7 +9118,7 @@
 				while(Array.isArray(libOnload)&&libOnload.length){
 					const fun=libOnload.shift();
 					if(typeof fun!="function") continue;
-					yield gnc.await(fun());
+					yield (gnc.is.generatorFunc(fun)?gnc.of(fun):fun)();
 				}
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
@@ -9727,7 +9727,8 @@
 							try{
 								_status.extension=lib.extensions[i][0];
 								_status.evaluatingExtension=lib.extensions[i][3];
-								if (typeof lib.extensions[i][1]=="function") yield gnc.await(lib.extensions[i][1](lib.extensions[i][2],lib.extensions[i][4]));
+								if (typeof lib.extensions[i][1]=="function") 
+									yield (gnc.is.coroutine(lib.extensions[i][1])?gnc.of(lib.extensions[i][1]):lib.extensions[i][1])(lib.extensions[i][2],lib.extensions[i][4]);
 								if(lib.extensions[i][4]){
 									if(lib.extensions[i][4].character){
 										for(var j in lib.extensions[i][4].character.character){
@@ -9894,7 +9895,7 @@
 				while(Array.isArray(libOnload2)&&libOnload2.length){
 					const fun=libOnload2.shift();
 					if(typeof fun!="function") continue;
-					yield gnc.await(fun());
+					yield (gnc.is.generatorFunc(fun)?gnc.of(fun):fun)();
 				}
 			}),
 			startOnline:function(){
@@ -33627,7 +33628,7 @@
 				if(!lib.imported[type])lib.imported[type]={};
 				if(typeof _status.importing=="undefined")_status.importing={};
 				if(!_status.importing[type])_status.importing[type]=[];
-				const promise=gnc.await(content(lib,game,ui,get,ai,_status)).then(content2=>{
+				const promise=Promise.resolve((gnc.is.generator(content)?gnc.of(content):content)(lib,game,ui,get,ai,_status)).then(content2=>{
 					if(content2.name){
 						lib.imported[type][content2.name]=content2;
 						delete content2.name;
@@ -33640,7 +33641,7 @@
 		loadExtension:gnc.of(function*(obj){
 			var noeval=false;
 			if(typeof obj=='function'){
-				obj=yield gnc.await(obj(lib,game,ui,get,ai,_status));
+				obj=yield (gnc.is.generatorFunc(obj)?gnc.of(obj):obj)(lib,game,ui,get,ai,_status);
 				noeval=true;
 			}
 			lib.extensionMenu['extension_'+obj.name]={
@@ -33758,7 +33759,7 @@
 						}
 						if(obj.precontent){
 							_status.extension=obj.name;
-							yield gnc.await(obj.precontent(cfg));
+							yield (gnc.is.generatorFunc(obj)?gnc.of(obj):obj).precontent(cfg);
 							delete _status.extension;
 						}
 						if(obj.content){
