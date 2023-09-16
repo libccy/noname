@@ -36,10 +36,10 @@
 			let gen=fn.apply(this,arguments);
 			gen.status="next";
 			gen.state=undefined;
-			return new Promise((resolve,reject)=>{
-				let result=gen;
-				let nexts=resolve;
-				let throws=reject;
+			const callback=(resolve,reject)=>{
+				let result,
+					nexts=resolve,
+					throws=reject;
 				try{
 					result=gen[gen.status](gen.state);
 				}catch(error){
@@ -50,17 +50,18 @@
 					nexts=(item)=>{
 						gen.state=item;
 						gen.status="next";
-						gnc.await(gen).then(resolve,reject);
+						callback(resolve,reject);
 					}
 					throws=(err)=>{
 						gen.state=err;
 						gen.status="throw";
-						gnc.await(gen).then(resolve,reject);
+						callback(resolve,reject);
 					}
 				}
 				result=result.value;
 				Promise.resolve(result).then(nexts,throws);
-			});
+			}
+			return new Promise(callback);
 		}:(()=>{throw new TypeError("gnc.of needs a GeneratorFunction.")})(),
 		/*
 		await:gen=>new Promise((resolve,reject)=>{
