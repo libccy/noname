@@ -32,7 +32,7 @@
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
-		of:fn=>function genCoroutine(){
+		of:fn=>gnc.is.generatorFunc(fn)?function genCoroutine(){
 			let gen=fn.apply(this,arguments);
 			gen.status="next";
 			gen.state=undefined;
@@ -61,7 +61,7 @@
 				result=result.value;
 				Promise.resolve(result).then(nexts,throws);
 			});
-		},
+		}:(()=>{throw new TypeError("gnc.of needs a GeneratorFunction.")})(),
 		/*
 		await:gen=>new Promise((resolve,reject)=>{
 			let result=gen;
