@@ -20,8 +20,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			tw_zhanghong:['male','wu',3,['twqinqian','twrouke']],
-			tw_zhangzhao:['male','wu',3,['twlijian','twchungang']],
+			tw_zhanghong:['male','wu',4,['twquanqian','twrouke']],
+			tw_zhangzhao:['male','wu',4,['twlijian','twchungang']],
 			tw_ol_sunjian:['male','wu','4/5',['gzyinghun','wulie','twpolu'],['zhu']],
 			tw_menghuo:['male','qun',4,['huoshou','rezaiqi','twqiushou'],['zhu']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige','twchongwang'],['zhu']],
@@ -279,12 +279,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			//张纮
-			twqinqian:{
+			twquanqian:{
 				audio:2,
 				sunbenSkill:true,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return !player.hasSkill('twqinqian_sunben')&&player.countCards('h')&&game.countPlayer()>1;
+					return !player.hasSkill('twquanqian_sunben')&&player.countCards('h')&&game.countPlayer()>1;
 				},
 				filterCard:function(card,player){
 					return !ui.selected.cards.some(cardx=>get.suit(cardx,player)==get.suit(card,player));
@@ -302,7 +302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				content:function(){
 					'step 0'
-					player.addSkill('twqinqian_sunben');
+					player.addSkill('twquanqian_sunben');
 					player.give(cards,target);
 					if(cards.length<2) event.finish();
 					'step 1'
@@ -332,7 +332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					var list=[];
-					var dialog=['勤迁：获得'+get.translation(target)+'一种花色的所有牌'];
+					var dialog=['劝迁：获得'+get.translation(target)+'一种花色的所有牌'];
 					for(var suit of lib.suit.concat('none')){
 						if(target.countCards('h',{suit:suit})){
 							dialog.push('<div class="text center">'+get.translation(suit+'2')+'牌</div>');
@@ -367,7 +367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					sunben:{
 						charlotte:true,
 						init:function(player){
-							player.storage.twqinqian_sunben=0;
+							player.storage.twquanqian_sunben=0;
 						},
 						onremove:true,
 						mark:true,
@@ -391,12 +391,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						firstDo:true,
 						content:function(){
 							'step 0'
-							player.addMark('twqinqian_sunben',trigger.getl(player).hs.length,false);
+							player.addMark('twquanqian_sunben',trigger.getl(player).hs.length,false);
 							'step 1'
-							if(player.countMark('twqinqian_sunben')>=6){
-								player.removeSkill('twqinqian_sunben');
-								player.popup('勤迁');
-								game.log(player,'恢复了技能','#g【勤迁】');
+							if(player.countMark('twquanqian_sunben')>=6){
+								player.removeSkill('twquanqian_sunben');
+								player.popup('劝迁');
+								game.log(player,'恢复了技能','#g【劝迁】');
 							}
 						},
 					},
@@ -14500,8 +14500,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twchungang:'纯刚',
 			twchungang_info:'锁定技。一名其他角色于摸牌阶段外得到超过一张牌时，你令其弃置一张牌。',
 			tw_zhanghong:'张纮',
-			twqinqian:'勤迁',
-			twqinqian_info:'昂扬技。出牌阶段限一次，你可以将至多四张花色各不相同的手牌交给一名其他角色，然后若你交出的牌数大于1，则你从牌堆中获得一张装备牌，然后选择一项：①将手牌数摸至与其相同；②观看其手牌并获得其一种花色的所有牌。<br>激昂：你弃置六张手牌。',
+			twquanqian:'劝迁',
+			twquanqian_info:'昂扬技。出牌阶段限一次，你可以将至多四张花色各不相同的手牌交给一名其他角色，然后若你交出的牌数大于1，则你从牌堆中获得一张装备牌，然后选择一项：①将手牌数摸至与其相同；②观看其手牌并获得其一种花色的所有牌。<br>激昂：你弃置六张手牌。',
 			twrouke:'柔克',
 			twrouke_info:'锁定技。当你于摸牌阶段外得到超过一张牌时，你摸一张牌。',
 
