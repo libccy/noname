@@ -150,6 +150,7 @@
 		chatHistory:[],
 		emotionList:{
 			xiaowu_emotion:14,
+			xiaokuo_emotion:8,
 			shibing_emotion:15,
 			guojia_emotion:20,
 			zhenji_emotion:20,
@@ -11153,6 +11154,7 @@
 			xiaosha_emotion:'小杀表情',
 			xiaotao_emotion:'小桃表情',
 			xiaojiu_emotion:'小酒表情',
+			xiaokuo_emotion:'小扩表情',
 
 			pause:'暂停',
 			config:'选项',
