@@ -864,7 +864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove: true,
 				global: 'twchongwang_global',
 				group: 'twchongwang_clear',
-				audio: 'ext:武将前瞻/audio/skill:2',
+				audio: 2,
 				zhuSkill: true,
 				subSkill: {
 					clear: {
@@ -2816,7 +2816,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					target.line(event.togive);
-					event.togive.damage(Math.min(3,event.togive.countCards('h',{name:'sha'})),target);
+					event.togive.damage(Math.min(2,event.togive.countCards('h',{name:'sha'})),target);
 				},
 				ai:{
 					order:10,
@@ -2847,16 +2847,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					if(trigger.player!=player) player.addExpose(0.3);
 					var target=get.translation(trigger.player);
 					var choiceList=[
 						'令'+target+'获得牌堆里的一张【杀】',
 						'令'+target+'将一张牌交给另一名角色，然后'+target+'摸两张牌',
-						'背水！将所有手牌交给'+target+'，然后依次执行以上所有选项',
+						'背水！'+(trigger.player!=player?'将所有手牌交给'+target+'，然后':'')+'依次执行以上所有选项',
 					];
 					var list=['选项一'];
 					if(trigger.player.countCards('h')) list.push('选项二');
 					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
-					if(player.countCards('h')&&trigger.player!=player) list.push('背水！');
+					if(player.countCards('h')) list.push('背水！');
 					else choiceList[2]='<span style="opacity:0.5">'+choiceList[2]+'</span>';
 					player.chooseControl(list).set('prompt','毅谋：请选择一项').set('choiceList',choiceList).set('ai',function(){
 						var evt=_status.event.getTrigger(),list=_status.event.list;
@@ -2902,7 +2903,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.player.give(result.cards,target);
 					trigger.player.draw(2);
 				},
-				ai:{expose:0.3},
+				ai:{
+					threaten:2.5,
+				},
 			},
 			//刘夫人
 			twzhuidu:{
@@ -14204,9 +14207,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twluannian_info:'主公技。其他群势力角色的出牌阶段限一次。其可以弃置X张牌并对“雄争”角色造成1点伤害（X为所有角色于本轮发动〖乱年〗的次数+1）。',
 			tw_baoxin:'鲍信',
 			twmutao:'募讨',
-			twmutao_info:'出牌阶段限一次。你可以选择一名角色，令其将手牌中所有的【杀】依次交给其下家开始的每一名角色。然后其对最后一名以此法获得【杀】的角色A造成X点伤害（X为A手牌中【杀】的数量且至多为3）。',
+			twmutao_info:'出牌阶段限一次。你可以选择一名角色，令其将手牌中所有的【杀】依次交给其下家开始的每一名角色。然后其对最后一名以此法获得【杀】的角色A造成X点伤害（X为A手牌中【杀】的数量且至多为2）。',
 			twyimou:'毅谋',
-			twyimou_info:'当一名角色受到伤害后，若其存活且你至其的距离不大于1，你可以选择一项：1.令其从牌堆中获得一张【杀】；2.令其将一张手牌交给另一名角色并摸两张牌；3.背水：若受伤角色不为你，将所有手牌交给其，然后依次执行上述所有选项。',
+			twyimou_info:'当一名角色受到伤害后，若其存活且你至其的距离不大于1，你可以选择一项：1.令其从牌堆中获得一张【杀】；2.令其将一张手牌交给另一名角色并摸两张牌；3.背水：将所有手牌交给其（若受伤角色为你则跳过此步骤），然后依次执行上述所有选项。',
 			tw_liufuren:'刘夫人',
 			twzhuidu:'追妒',
 			twzhuidu_info:'出牌阶段限一次。你可以选择一名已受伤的其他角色并选择一项：1.对其造成1点伤害；2.弃置其装备区里的一张牌；3.背水：若该角色为女性，弃置一张牌，然后依次执行上述所有选项。',
