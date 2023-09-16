@@ -179,11 +179,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(evt.gaintag_map[i].contains('dcjiaoxia_used')) return true;
 								}
 								return false;
-							}).length&&player.getHistory('sourceDamage',evt=>evt.card==event.card).length;
+							}).length&&player.getHistory('sourceDamage',evt=>evt.card==event.card).length&&!['delay','equip'].contains(get.type(event.cards[0],player));
 						},
 						direct:true,
 						content:function(){
-							var card=get.copy(trigger.cards[0]);
+							var card={
+								name:get.name(trigger.cards[0],player),
+								nature:get.nature(trigger.cards[0],player),
+								isCard:true,
+							};
 							player.chooseUseTarget(card,get.prompt('dcjiaoxia'),false,false).set('prompt2','视为使用'+get.translation(card)).logSkill='dcjiaoxia';
 						},
 					},
