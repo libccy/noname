@@ -2024,11 +2024,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					random:{
 						audio:'dunxi',
-						trigger:{global:'useCardToPlayer'},
+						trigger:{global:'useCard'},
 						forced:true,
 						locked:false,
 						filter:function(event,player){
-							if(!event.player.hasMark('dunxi')||event.targets.length!=1||event.getParent()._dunxi) return false;
+							if(!event.player.hasMark('dunxi')||event.targets.length!=1||event._dunxi||_status.dying.length) return false;
 							var type=get.type2(event.card,false);
 							return (type=='basic'||type=='trick');
 						},
@@ -2036,12 +2036,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						line:'fire',
 						content:function(){
 							'step 0'
-							trigger.getParent()._dunxi=true;
+							trigger._dunxi=true;
 							trigger.player.removeMark('dunxi',1);
 							var target=trigger.target;
 							event.target=target;
 							trigger.targets.remove(target);
-							trigger.getParent().triggeredTargets1.remove(target);
+							trigger.triggeredTargets1.remove(target);
 							trigger.untrigger();
 							game.delayx();
 							'step 1'
@@ -10427,7 +10427,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcbihuo_info:'①当你受到其他角色造成的伤害后，你可令一名角色下回合摸牌阶段的额定摸牌数+1。②当你对其他角色造成伤害后，你可令一名角色下回合摸牌阶段的额定摸牌数-1。',
 			bianxi:'卞喜',
 			dunxi:'钝袭',
-			dunxi_info:'①当你使用具有伤害标签的牌结算结束后，你可以令一名不为你的目标角色获得一枚“钝”。②有“钝”的角色使用基本牌或锦囊牌指定唯一目标时，你令其移去一枚“钝”。系统随机选择一名角色，并将此牌的目标改为该角色。若该角色和原目标相同，则其失去1点体力。若其正处于出牌阶段内，则结束此阶段。',
+			dunxi_info:'①当你使用具有伤害标签的牌结算结束后，你可以令一名不为你的目标角色获得一枚“钝”。②有“钝”的角色使用基本牌或锦囊牌时，若此牌目标数为1且此时没有角色处于濒死状态，你令其移去一枚“钝”。系统随机选择一名角色，并将此牌的目标改为该角色。若该角色和原目标相同，则其失去1点体力。若其正处于出牌阶段内，则结束此阶段。',
 			niufu:'牛辅',
 			dcxiaoxi:'宵袭',
 			dcxiaoxi_info:'锁定技。出牌阶段开始时，你声明X并减X点体力上限（X∈[1,2]）。然后你选择一名攻击范围内的其他角色并选择一项：⒈获得该角色的X张牌。⒉视为对其使用X张【杀】。',
