@@ -33,11 +33,34 @@
 	// gnc: GeNCoroutine
 	const gnc={
 		async:fn=>function genCoroutine(){
-			let result=fn.apply(this,arguments);
-			result.name="genCoroutine";
-			result.status="next";
-			result.state=undefined;
-			return gnc.await(result);
+			let gen=fn.apply(this,arguments);
+			gen.status="next";
+			gen.state=undefined;
+			return new Promise((resolve,reject)=>{
+				let result=gen;
+				let nexts=resolve;
+				let throws=reject;
+				try{
+					result=gen[gen.status](gen.state);
+				}catch(error){
+					reject(error);
+					return;
+				}
+				if(!result.done){
+					nexts=(item)=>{
+						gen.state=item;
+						gen.status="next";
+						gnc.await(gen).then(resolve,reject);
+					}
+					throws=(err)=>{
+						gen.state=err;
+						gen.status="throw";
+						gnc.await(gen).then(resolve,reject);
+					}
+				}
+				result=result.value;
+				Promise.resolve(result).then(nexts,throws);
+			});
 		},
 		/*
 		await:gen=>new Promise((resolve,reject)=>{
