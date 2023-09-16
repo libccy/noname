@@ -11237,6 +11237,167 @@
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
+				//根据选择的button动态生成control
+				//ai1在出现空control时有问题，等一个大佬来修
+				chooseButtonControl:function(){
+					"step 0"
+					if(typeof event.dialog=='number') event.dialog=get.idDialog(event.dialog);
+					else if(get.itemtype(event.dialog)=='dialog') event.closeDialog=true;
+					else if(!event.dialog&&Array.isArray(event.createDialog)){
+						event.dialog=ui.create.dialog.apply(this,event.createDialog);
+						event.closeDialog=true;
+					}
+					if(event.isMine()==false&&event.dialog) event.dialog.style.display='none';
+				
+					event.range=get.select(event.selectButton);
+					event.createControlx=function(buttons){
+						var controls=event.createControl(buttons);
+						if(buttons.length<event.range[0]) return [];
+						if(Array.isArray(controls)) return controls;
+						if(controls!=undefined&&controls!=null) return [controls];
+						return [];
+					}
+				
+					event.checkButton=function(){
+						var dialog=event.dialog;
+						for(i=0;i<dialog.buttons.length;i++){
+							if(dialog.buttons[i].classList.contains('unselectable')) continue;
+							if(event.filterButton(dialog.buttons[i],player)&&lib.filter.buttonIncluded(dialog.buttons[i])){
+								if(ui.selected.buttons.length<event.range[1]) dialog.buttons[i].classList.add('selectable');
+								else if(event.range[1]<=-1){
+									dialog.buttons[i].classList.add('selected');
+									ui.selected.buttons.add(dialog.buttons[i]);
+								}
+								else dialog.buttons[i].classList.remove('selectable');
+							}
+							else{
+								dialog.buttons[i].classList.remove('selectable');
+								if(event.range[1]<=-1){
+									dialog.buttons[i].classList.remove('selected');
+									ui.selected.buttons.remove(dialog.buttons[i]);
+								}
+							}
+							if(dialog.buttons[i].classList.contains('selected')) dialog.buttons[i].classList.add('selectable');
+						}
+						if(event.custom&&event.custom.add&&event.custom.add.button) event.custom.add.button();
+				
+						if(event.isMine()){
+							ui.arena.classList.add('selecting');
+							var newControls=event.createControlx(ui.selected.buttons);
+							event.controls.style.opacity=newControls.length>0?1:0;
+							event.controls.replace(newControls);
+						}
+					}
+				
+					if(event.isMine()){
+						if(!event.result) event.result={};
+						event.forceMine=true;
+				
+						event.custom.replace.button=function(button){
+							if(button.classList.contains('selectable')==false) return;
+							if(button.classList.contains('selected')){
+								button.classList.remove('selected');
+								ui.selected.buttons.remove(button);
+							}else{
+								button.classList.add('selected');
+								ui.selected.buttons.add(button);
+							}
+							if(event.custom&&event.custom.add&&event.custom.add.button) event.custom.add.button();
+				
+							event.checkButton();
+						}
+						event.custom.replace.window=function(){
+							game.uncheck();
+							event.checkButton();
+						}
+				
+						event.controls=ui.create.control();
+						event.checkButton();
+						event.dialog.open();
+				
+						game.pause();
+						game.countChoose();
+						event.choosing=true;
+					}
+					else if(event.isOnline()){
+						event.send();
+					}else{
+						event.result='ai';
+					}
+					"step 1"
+					if(event.result=='ai'){
+						if(event.processAI) event.result=event.processAI(event.getParent(),player);
+						else if(event.ai1&&event.ai2){
+							var i,buttons,buttons2;
+							var ok=false;
+							var iwhile=100;
+							event.checkButton();
+				
+							//createControlx根据ui.selected.buttons生成controls的array，可能是空数组
+							//贪心算法(抄的ai.basic.chooseButton)，情况找不全
+							//example:最多选1个button，但是价值最大的button没有对应的control
+							while(iwhile--){
+								if(event.range[1]<=-1){
+									if(event.createControlx(ui.selected.buttons).length>0) ok=true;
+									break;
+								}
+								buttons=get.selectableButtons();
+								if(buttons.length==0){
+									if(event.createControlx(ui.selected.buttons).length>0) ok=true;
+									break;
+								}
+								buttons2=buttons.slice(0);
+								var ix=0;
+								var checkix=event.ai1(buttons[0],buttons2);
+								for(i=1;i<buttons.length;i++){
+									var checkixtmp=event.ai1(buttons[i],buttons2);
+									if(checkixtmp>checkix){
+										ix=i;
+										checkix=checkixtmp;
+									}
+								}
+								if(event.ai1(buttons[ix])<=0){
+									if(event.createControlx(ui.selected.buttons).length>0){
+										ok=true;
+										break;
+									}
+								}
+								buttons[ix].classList.add('selected');
+								ui.selected.buttons.add(buttons[ix]);
+								event.checkButton();
+								if(ui.selected.buttons.length==event.range[1]){
+									if(event.createControlx(ui.selected.buttons).length>0) ok=true;
+									break;
+								}
+							}
+				
+							if(!ok) throw new Error('Cannot find buttons with controls');
+							else{
+								event.result={
+									buttons:ui.selected.buttons.slice(0),
+									cards:ui.selected.cards.slice(0),
+									targets:ui.selected.targets.slice(0),
+								};
+								var result=event.ai2(event.getParent(),player);
+								if(typeof result=='number') event.result.control=event.createControlx(ui.selected.buttons)[result];
+								else event.result.control=result;
+							}
+							game.uncheck();
+						}
+					}
+				
+					if(!event.result.links) event.result.links=get.links(event.result.buttons);
+					if(event.result.buttons){
+						if(event.result.control==undefined&&event.result.index) event.result.control=event.createControlx(event.result.buttons)[event.result.index];
+						if(event.result.index==undefined&&event.result.control) event.result.index=event.createControlx(event.result.buttons).indexOf(event.result.control);
+					}
+					event.choosing=false;
+					_status.imchoosing=false;
+					if(event.dialog&&event.closeDialog) event.dialog.close();
+					if(event.controls&&event.closeDialog) event.controls.close();
+					if(event.callback) event.callback(event.player,event.result);
+					event.resume();
+				},
 				//增加明置手牌
 				addShownCards:function(){
 					var hs=player.getCards('h'),cards=event._cards.filter(card=>hs.includes(card));
@@ -19184,6 +19345,36 @@
 			},
 			player:{
 				//新函数
+				//根据选择的button动态生成control
+				chooseButtonControl:function(object){
+					const next=game.createEvent('chooseButtonControl');
+					next.player=this;
+					if(arguments.length==1&&get.objtype(arguments[0])=='object'){
+						for(var key in object) next[key]=object[key];
+					}
+					else for(var arg of arguments){
+						if(get.itemtype(arg)=='dialog') next.dialog=arg;
+						else if(typeof arg=='number') next.selectButton=[arg,arg];
+						else if(Array.isArray(arg)&&get.itemtype(arg)=='select') next.selectButton=arg;
+						else if(Array.isArray(arg)&&!next.createDialog) next.createDialog=arg;
+						else if(typeof arg=='function'){
+							if(!next.createControl) next.createControl=arg;
+							else if(!next.filterButton) next.filterButton=arg;
+							else next.processAI=arg;
+						}
+					}
+				
+					if(!next.filterButton) next.filterButton=lib.filter.filterButton;
+					if(next.selectButton==undefined) next.selectButton=[0,1];
+					if(!next.createControl) next.createControl=buttons=>buttons.length?'ok2':'cancel2';
+					if(next.ai1==undefined) next.ai1=()=>1;
+					if(next.ai2==undefined) next.ai2=()=>0;
+				
+					next.setContent('chooseButtonControl');
+					next._args=Array.from(arguments);
+					next.forceDie=true;
+					return next;
+				},
 				//让一名角色明置一些手牌
 				addShownCards:function(){
 					const cards=[];

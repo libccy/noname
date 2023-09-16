@@ -10012,160 +10012,100 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					_status.noclearcountdown=true;
-					event.videoId=lib.status.videoId++;
 					var cards=player.storage.rehuashen.character.slice(0);
-					var skills=[];
-					var sto=player.storage.rehuashen;
-					for(var i in player.storage.rehuashen.map){
-						skills.addArray(player.storage.rehuashen.map[i]);
-					}
-					var cond='out';
-					if(event.triggername=='phaseBegin'){
-						cond='in';
-					}
-					skills.randomSort();
-					skills.sort(function(a,b){
-						return get.skillRank(b,cond)-get.skillRank(a,cond);
+					var next=player.chooseButtonControl([get.prompt('rehuashen'),[cards,'character']],event.triggername=='rehuashen'?[1,1]:[0,2],buttons=>{
+						if(!buttons.length) return ['cancel2'];
+						var controls=[];
+						if(buttons.length==1) controls.addArray(player.storage.rehuashen.map[buttons[0].link].slice(0));
+						if(!get.links(buttons).contains(player.storage.rehuashen.current)&&event.triggername!='rehuashen') controls.push('弃置化身');
+						return controls;
 					});
-					event.aiChoice=skills[0];
-					var choice='更换技能';
-					if(event.aiChoice==player.storage.rehuashen.current2||get.skillRank(event.aiChoice,cond)<1) choice='弃置化身';
-					if(player.isOnline2()){
-						player.send(function(cards,id){
-							var dialog=ui.create.dialog('是否发动【化身】？',[cards,'character']);
-							dialog.videoId=id;
-						},cards,event.videoId);
-					}
-					event.dialog=ui.create.dialog(get.prompt('rehuashen'),[cards,'character']);
-					event.dialog.videoId=event.videoId;
-					if(!event.isMine()){
-						event.dialog.style.display='none';
-					}
-					if(event.triggername=='rehuashen') event._result={control:'更换技能'};
-					else player.chooseControl('弃置化身','更换技能','cancel2').set('ai',function(){
-						return _status.event.choice;
-					}).set('choice',choice);
+					next.set("processAI",function(event,player){
+						var skills=[];
+						for(var i in player.storage.rehuashen.map){
+							skills.addArray(player.storage.rehuashen.map[i]);
+						}
+						var cond=event.triggername=='phaseBegin'?'out':'in';
+						skills.randomSort();
+						skills.sort(function(a,b){
+							return get.skillRank(b,cond)-get.skillRank(a,cond);
+						});
+						var aiChoice=skills[0];
+
+						var choice='更换技能';
+						if(event.triggername!='rehuashen'&&aiChoice==player.storage.rehuashen.current2||get.skillRank(aiChoice,cond)<1) choice='弃置化身';
+
+						var characters=[];
+						if(choice=='弃置化身'){
+							for(var i of cards){
+								if(i==player.storage.rehuashen.current2) continue;
+								characters.add(i);
+								if(characters.length>=2) break;
+							}
+						}else{
+							var maxnum=0,maxCharacter=0;
+							for(var i of cards){
+								var num=player.storage.rehuashen.map[i].contains(aiChoice)?2.5:1+Math.random();
+								if(num>maxnum){
+									maxCharacter=i;
+									maxnum=num;
+								}
+							}
+							characters.push(maxCharacter);
+							choice=aiChoice;
+						}
+
+						return {
+							links:characters,
+							control:choice
+						}
+					});
 					"step 1"
-					event.control=result.control;
-					if(event.control=='cancel2'){
-						if(player.isOnline2()){
-							player.send('closeDialog',event.videoId);
-						}
-						delete _status.noclearcountdown;
-						if(!_status.noclearcountdown){
-							game.stopCountChoose();
-						}
-						event.dialog.close();
-						event.finish();return;
-					}
-					if(!event.logged){player.logSkill('rehuashen');event.logged=true}
-					var next=player.chooseButton(true).set('dialog',event.videoId);
-					if(event.control=='弃置化身'){
-						next.set('selectButton',[1,2]);
-						next.set('filterButton',function(button){
-							return button.link!=_status.event.current;
-						});
-						next.set('current',player.storage.rehuashen.current);
-					}
+					if(result.control=='cancel2') event.finish();
 					else{
-						next.set('ai',function(button){
-							return player.storage.rehuashen.map[button.link].contains(_status.event.choice)?2.5:1+Math.random();
-						});
-						next.set('choice',event.aiChoice);
-					}
-					var prompt=event.control=='弃置化身'?'选择制衡至多两张化身':'选择要切换的化身';
-					var func=function(id,prompt){
-						var dialog=get.idDialog(id);
-						if(dialog){
-							dialog.content.childNodes[0].innerHTML=prompt;
-						}
-					}
-					if(player.isOnline2()){
-						player.send(func,event.videoId,prompt);
-					}
-					else if(event.isMine()){
-						func(event.videoId,prompt);
-					}
-					"step 2"
-					if(result.bool&&event.control!='弃置化身'){
-						event.card=result.links[0];
-						var func=function(card,id){
-							var dialog=get.idDialog(id);
-							if(dialog){
-								for(var i=0;i<dialog.buttons.length;i++){
-									if(dialog.buttons[i].link==card){
-										dialog.buttons[i].classList.add('selectedx');
+						player.logSkill('rehuashen')
+						if(result.control=='弃置化身'){
+							lib.skill.rehuashen.removeHuashen(player,result.links.slice(0));
+							lib.skill.rehuashen.addHuashens(player,result.links.length);
+						} else{
+							var character=result.links[0],skill=result.control;
+							if(player.storage.rehuashen.current!=character){
+								player.storage.rehuashen.current=character;
+								player.markSkill('rehuashen');
+								game.broadcastAll(function(character,player){
+									player.sex=lib.character[character][0];
+									//player.group=lib.character[character][1];
+									//player.node.name.dataset.nature=get.groupnature(player.group);
+									var mark=player.marks.rehuashen;
+									if(mark){
+										mark.style.transition='all 0.3s';
+										setTimeout(function(){
+											mark.style.transition='all 0s';
+											ui.refresh(mark);
+											mark.setBackground(character,'character');
+											if(mark.firstChild){
+												mark.firstChild.remove();
+											}
+											setTimeout(function(){
+												mark.style.transition='';
+												mark.show();
+											},50);
+										},200);
 									}
-									else{
-										dialog.buttons[i].classList.add('unselectable');
-									}
-								}
+								},character,player);
+								game.log(player,'将性别变为了','#y'+get.translation(lib.character[character][0])+'性');
+								player.changeGroup(lib.character[character][1]);
+							}
+							player.storage.rehuashen.current2=skill;
+							if(!player.additionalSkills.rehuashen||!player.additionalSkills.rehuashen.contains(skill)){
+								player.addAdditionalSkill('rehuashen',skill);
+								player.flashAvatar('rehuashen',character);
+								game.log(player,'获得了技能','#g【'+get.translation(skill)+'】');
+								player.popup(skill);
+								player.syncStorage('rehuashen');
+								player.updateMarks('rehuashen');
 							}
 						}
-						if(player.isOnline2()){
-							player.send(func,event.card,event.videoId);
-						}
-						else if(event.isMine()){
-							func(event.card,event.videoId);
-						}
-						var list=player.storage.rehuashen.map[event.card].slice(0);
-						list.push('返回');
-						player.chooseControl(list).set('choice',event.aiChoice).set('ai',function(){
-							return _status.event.choice;
-						});
-					}
-					else{
-						lib.skill.rehuashen.removeHuashen(player,result.links.slice(0));
-						lib.skill.rehuashen.addHuashens(player,result.links.length);
-					}
-					"step 3"
-					if(result.control=='返回'){
-						var func=function(id){
-							var dialog=get.idDialog(id);
-							if(dialog){
-								for(var i=0;i<dialog.buttons.length;i++){
-									dialog.buttons[i].classList.remove('selectedx');
-									dialog.buttons[i].classList.remove('unselectable');
-								}
-							}
-						}
-						if(player.isOnline2()){
-							player.send(func,event.videoId);
-						}
-						else if(event.isMine()){
-							func(event.videoId);
-						}
-						event._result={control:'更换技能'};
-						event.goto(1);
-						return;
-					}
-					if(player.isOnline2()){
-						player.send('closeDialog',event.videoId);
-					}
-					event.dialog.close();
-					delete _status.noclearcountdown;
-					if(!_status.noclearcountdown){
-						game.stopCountChoose();
-					}
-					if(event.control=='弃置化身') return;
-					if(player.storage.rehuashen.current!=event.card){
-						player.storage.rehuashen.current=event.card;
-						game.broadcastAll(function(player,sex){
-							player.sex=sex;
-						},player,lib.character[event.card][0]);
-						game.log(player,'将性别变为了','#y'+get.translation(lib.character[event.card][0])+'性');
-						player.changeGroup(lib.character[event.card][1]);
-					}
-					var link=result.control;
-					player.storage.rehuashen.current2=link;
-					if(!player.additionalSkills.rehuashen||!player.additionalSkills.rehuashen.contains(link)){
-						player.addAdditionalSkill('rehuashen',link);
-						player.flashAvatar('rehuashen',event.card);
-						game.log(player,'获得了技能','#g【'+get.translation(link)+'】');
-						player.popup(link);
-						player.syncStorage('rehuashen');
-						player.updateMarks('rehuashen');
 					}
 				},
 				init:function(player,skill){

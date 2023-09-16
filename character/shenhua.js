@@ -4306,12 +4306,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
+					var forced=false;
 					if(event.triggername=='huashen'){
 						player.logSkill('huashen');
 						lib.skill.huashen.addHuashens(player,2);
 						player.syncStorage('huashen');
 						player.markSkill('huashen');
 						event.logged=true;
+						forced=true;
 					}
 					var cards=[];
 					var skills=[];
@@ -4324,144 +4326,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					skills.sort(function(a,b){
 						return get.skillRank(b,cond)-get.skillRank(a,cond);
 					});
-					if(player.isUnderControl()){
-						game.swapPlayerAuto(player);
-					}
-					var switchToAuto=function(){
-						_status.imchoosing=false;
+					var prompt=forced?'化身：选择获得一项技能':get.prompt('huashen');
+					var next=player.chooseButtonControl([prompt,[cards,'character']],forced?[1,1]:[0,1],buttons=>{
+						if(!buttons.length) return ['cancel2'];
+						return player.storage.huashen.owned[buttons[0].link];
+					});
+					next.set('processAI',function(event,player){
 						var skill=skills[0],character;
 						for(var i in player.storage.huashen.owned){
 							if(player.storage.huashen.owned[i].contains(skill)){
 								character=i; break;
 							}
 						}
-						event._result={
-							bool:true,
-							skill:skill,
-							character:character
+						return {
+							links:[character],
+							control:skill,
 						};
-						if(event.dialog) event.dialog.close();
-						if(event.control) event.control.close();
-					};
-					var chooseButton=function(player,list,forced){
-						var event=_status.event;
-						player=player||event.player;
-						if(!event._result) event._result={};
-						var prompt=forced?'化身：选择获得一项技能':get.prompt('huashen');
-						var dialog=ui.create.dialog(prompt,[list,'character']);
-						event.dialog=dialog;
-						event.forceMine=true;
-						event.button=null;
-						for(var i=0;i<event.dialog.buttons.length;i++){
-							event.dialog.buttons[i].classList.add('pointerdiv');
-							event.dialog.buttons[i].classList.add('selectable');
-						}
-						event.dialog.open();
-						event.custom.replace.button=function(button){
-							if(!event.dialog.contains(button.parentNode)) return;
-							if(event.control) event.control.style.opacity=1;
-							if(button.classList.contains('selectedx')){
-								event.button=null;
-								button.classList.remove('selectedx');
-								if(event.control){
-									event.control.replacex(['cancel2']);
-								}
-							}
-							else{
-								if(event.button){
-									event.button.classList.remove('selectedx');
-								}
-								button.classList.add('selectedx');
-								event.button=button;
-								if(event.control&&button.link){
-									event.control.replacex(player.storage.huashen.owned[button.link]);
-								}
-							}
-							game.check();
-						}
-						event.custom.replace.window=function(){
-							if(event.button){
-								event.button.classList.remove('selectedx');
-								event.button=null;
-							}
-							event.control.replacex(['cancel2']);
-						}
-						
-						event.switchToAuto=function(){
-							var cards=[];
-							var skills=[];
-							for(var i in player.storage.huashen.owned){
-								cards.push(i);
-								skills.addArray(player.storage.huashen.owned[i]);
-							}
-							var cond=event.triggername=='phaseBegin'?'in':'out';
-							skills.randomSort();
-							skills.sort(function(a,b){
-								return get.skillRank(b,cond)-get.skillRank(a,cond);
-							});
-							_status.imchoosing=false;
-							var skill=skills[0],character;
-							for(var i in player.storage.huashen.owned){
-								if(player.storage.huashen.owned[i].contains(skill)){
-									character=i; break;
-								}
-							}
-							event._result={
-								bool:true,
-								skill:skill,
-								character:character
-							};
-							if(event.dialog) event.dialog.close();
-							if(event.control) event.control.close();
-						}
-						var controls=[];
-						event.control=ui.create.control();
-						event.control.replacex=function(){
-							var args=Array.from(arguments)[0];
-							if(args.contains('cancel2')&&forced){
-								args.remove('cancel2');
-								this.style.opacity='';
-							}
-							args.push(function(link){
-								var result=event._result;
-								if(link=='cancel2') result.bool=false;
-								else{
-									if(!event.button) return;
-									result.bool=true;
-									result.skill=link;
-									result.character=event.button.link;
-								}
-								event.dialog.close();
-								event.control.close();
-								game.resume();
-								_status.imchoosing=false;
-							});
-							return this.replace.apply(this,args);
-						}
-						if(!forced){
-							controls.push('cancel2');
-							event.control.style.opacity=1;
-						}
-						event.control.replacex(controls);
-						game.pause();
-						game.countChoose();
-					};
-					if(event.isMine()){
-						chooseButton(player,cards,event.triggername=='huashen');
-					}
-					else if(event.isOnline()){
-						event.player.send(chooseButton,event.player,cards,event.triggername=='huashen');
-						event.player.wait();
-						game.pause();
-					}
-					else{
-						switchToAuto();
-					}
+					});
 					'step 1'
-					var map=event.result||result;
-					if(map.bool){
+					if(result.control!='cancel2'){
 						if(!event.logged) player.logSkill('huashen');
-						var skill=map.skill,character=map.character;
+						var skill=result.control,character=result.links[0];
 						if(character!=player.storage.huashen.current){
 							player.storage.huashen.current=character;
 							player.storage.huashen.shown.add(character);
