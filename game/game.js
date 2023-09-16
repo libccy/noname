@@ -33759,7 +33759,7 @@
 						}
 						if(obj.precontent){
 							_status.extension=obj.name;
-							yield (gnc.is.generatorFunc(obj)?gnc.of(obj):obj).precontent(cfg);
+							yield (gnc.is.generatorFunc(obj.precontent)?gnc.of(obj.precontent):obj.precontent)(cfg);
 							delete _status.extension;
 						}
 						if(obj.content){
