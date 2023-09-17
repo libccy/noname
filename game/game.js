@@ -25735,40 +25735,59 @@
 					return num;
 				},
 				getAttackRange:function(raw){
-					var player=this;
-					var range=0;
+					const player=this;
+					let range=0;
 					if(raw){
 						range=game.checkMod(player,player,range,'globalFrom',player);
 						range=game.checkMod(player,player,range,'attackFrom',player);
-						var equips=player.getCards('e',function(card){
+						const equips=player.getCards('e',function(card){
 							return !ui.selected.cards||!ui.selected.cards.contains(card);
 						});
-						for(var i=0;i<equips.length;i++){
-							var info=get.info(equips[i],false).distance;
-							if(!info) continue;
-							if(info.globalFrom){
+						equips.forEach(card=>{
+							const info=get.info(card,false).distance;
+							if(ininfo&&info.globalFrom){
 								range+=info.globalFrom;
 							}
-							if(info.attackFrom){
-								range+=info.attackFrom;
+						})
+						return (equips.reduce((range,card)=>{
+							let newRange=1;
+							const info=get.info(card,false);
+							if(info.distance){
+								//如果存在attackRange 则通过attackRange动态获取攻击范围
+								if(typeof info.distance.attackRange=='function'){
+									newRange=info.distance.attackRange(card,player);
+								}
+								//否则采用祖宗之法
+								else if(typeof info.attackFrom=='number'){
+									newRange-=info.attackFrom;
+								}
 							}
-						}
-						return (1-range);
+							return Math.max(range,newRange)
+						},range)-range);
 					}
-					var base=game.checkMod(player,'unchanged','attackRangeBase',player);
-					if(base!='unchanged') range=base;
+					let base=game.checkMod(player,'unchanged','attackRangeBase',player);
+					if(base!='unchanged'){
+						range=base;
+					}
 					else{
-						range=1;
-						var equips=player.getCards('e',function(card){
+						const equips=player.getCards('e',function(card){
 							return !ui.selected.cards||!ui.selected.cards.contains(card);
 						});
-						for(var i=0;i<equips.length;i++){
-							var info=get.info(equips[i],false).distance;
-							if(!info) continue;
-							if(info.attackFrom){
-								range-=info.attackFrom;
+						range=equips.reduce((range,card)=>{
+							let newRange=1;
+							const info=get.info(card,false);
+							if(info.distance){
+								//如果存在attackRange 则通过attackRange动态获取攻击范围
+								if(typeof info.distance.attackRange=='function'){
+									newRange=info.distance.attackRange(card,player);
+								}
+								//否则采用祖宗之法
+								else if(typeof info.attackFrom=='number'){
+									newRange-=info.attackFrom;
+								}
 							}
-						}
+							return Math.max(range,newRange);
+						},1);
 					}
 					range=game.checkMod(player,range,'attackRange',player);
 					return range;
@@ -56006,8 +56025,7 @@
 			if(from==to) return 0;
 			if(!game.players.contains(from)&&!game.dead.contains(from)) return Infinity;
 			if(!game.players.contains(to)&&!game.dead.contains(to)) return Infinity;
-			var player=from,m,n=1,i;
-			var fxy,txy;
+			let player=from,m,n=1,i,fxy,txy;
 			if(game.chess){
 				fxy=from.getXY();
 				txy=to.getXY();
@@ -56018,9 +56036,9 @@
 				if(method=='raw'||method=='pure'||method=='absolute') return n;
 			}
 			else{
-				var length=game.players.length;
-				var totalPopulation=game.players.length+game.dead.length+1;
-				for(var iwhile=0;iwhile<totalPopulation;iwhile++){
+				let length=game.players.length;
+				const totalPopulation=game.players.length+game.dead.length+1;
+				for(let iwhile=0;iwhile<totalPopulation;iwhile++){
 					if(player.nextSeat!=to){
 						player=player.nextSeat;
 						if(player.isAlive()&&!player.isOut()&&!player.hasSkill('undist')&&!player.isMin(true)) n++;
@@ -56035,8 +56053,8 @@
 				if(method=='absolute') return n;
 				if(from.isDead()) length++;
 				if(to.isDead()) length++;
-				var left=from.hasSkillTag('left_hand');
-				var right=from.hasSkillTag('right_hand');
+				const left=from.hasSkillTag('left_hand');
+				const right=from.hasSkillTag('right_hand');
 				if(left===right) n=Math.min(n,length-n);
 				else if(left==true) n=length-n;
 				if(method=='raw'||method=='pure') return n;
@@ -56059,10 +56077,23 @@
 					m+=info.globalFrom;
 					n+=info.globalFrom;
 				}
-				if(info.attackFrom){
-					m+=info.attackFrom;
-				}
 			}
+			const attakRange=equips1.reduce((range,card)=>{
+				let newRange=1;
+				const info=get.info(card,false);
+				if(info.distance){
+					//如果存在attackRange 则通过attackRange动态获取攻击范围
+					if(typeof info.distance.attackRange=='function'){
+						newRange=info.distance.attackRange(card,player);
+					}
+					//否则采用祖宗之法
+					else if(typeof info.attackFrom=='number'){
+						newRange-=info.attackFrom;
+					}
+				}
+				return Math.max(range,newRange)
+			},1);
+			m+=(1-attakRange)
 			for(i=0;i<equips2.length;i++){
 				var info=get.info(equips2[i]).distance;
 				if(!info) continue;
