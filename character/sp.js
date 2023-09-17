@@ -1117,10 +1117,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sourceSkill:'olqifan',
 				precontent:function(){
 					delete event.result.skill;
-					var name=event.result.card.name;
-					event.result.cards=event.result.card.cards.slice(0);
-					event.result.card=get.autoViewAs({name:name,isCard:true},event.result.cards);
-					player.markAuto('olqifan',[get.type2(event.result.card,false)]);
+					var name=event.result.card.name,cards=event.result.card.cards.slice(0);
+					event.result.cards=cards;
+					var rcard=cards[0],card;
+					if(rcard.name==name) card=get.autoViewAs(rcard);
+					else card=get.autoViewAs({name,isCard:true});
+					event.result.card=card;
+					player.markAuto('olqifan',[get.type2(card,false)]);
 					event.getParent().set('olqifan_discard',true);
 					player.addTempSkill('olqifan_discard');
 				},
@@ -21740,10 +21743,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sourceSkill:'aocai',
 				precontent:function(){
 					delete event.result.skill;
-					var name=event.result.card.name;
-					event.result.cards=event.result.card.cards;
-					event.result.card=get.autoViewAs(event.result.cards[0]);
-					event.result.card.name=name;
+					var name=event.result.card.name,cards=event.result.card.cards.slice(0);
+					event.result.cards=cards;
+					var rcard=cards[0],card;
+					if(rcard.name==name) card=get.autoViewAs(rcard);
+					else card=get.autoViewAs({name,isCard:true});
+					event.result.card=card;
 				},
 				filterCard:function(){return false},
 				selectCard:-1,
