@@ -854,7 +854,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var evt=event.getParent(2);
 					evt.set('olqifan',true);
 					var cards=get.bottomCards(1+player.getStorage('olqifan').length);
-					for(var i=0;i<cards.length;i++){
+					for(var i=cards.length-1;i>=0;i--){
 						ui.cardPile.appendChild(cards[i]);
 					}
 					var aozhan=player.hasSkill('aozhan');
