@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			ol_luyusheng:['female','wu',3,['olcangxin','skill_luyusheng_B']],
+			ol_luyusheng:['female','wu',3,['olcangxin','skill_luyusheng_B'],['unseen']],
 			caoxi:['male','wei',3,['olgangshu','oljianxuan']],
 			ol_pengyang:['male','shu',3,['olqifan','oltuishi','nzry_cunmu']],
 			ol_qianzhao:['male','wei',4,['olweifu','olkuansai']],
