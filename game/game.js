@@ -3938,12 +3938,6 @@
 						init:true,
 						unfrequent:true,
 					},
-					show_extensionimage:{
-						name:'显示扩展武将图片',
-						intro:'关闭扩展武将包仍加载扩展武将图片',
-						init:true,
-						unfrequent:true,
-					},
 					show_skillnamepinyin:{
 						name:'显示技能名拼音',
 						intro:'在武将资料卡显示技能名拼音',
@@ -7487,24 +7481,24 @@
 							let dbimage=null,extimage=null,modeimage=null,nameinfo,gzbool=false;
 							const mode=get.mode();
 							if(type=='character'){
-								if(lib.characterPack[`mode_${mode}`]&&lib.characterPack[`mode_${mode}`][name]) if(mode=='guozhan'){
-									nameinfo=lib.character[name];
-									if(name.indexOf('gz_shibing')==0) name=name.slice(3,11);
-									else{
-										if(lib.config.mode_config.guozhan.guozhanSkin&&lib.character[name]&&lib.character[name][4].contains('gzskin')) gzbool=true;
-										name=name.slice(3);
+								if(lib.characterPack[`mode_${mode}`]&&lib.characterPack[`mode_${mode}`][name]){
+									if(mode=='guozhan'){
+										nameinfo=lib.character[name];
+										if(name.indexOf('gz_shibing')==0) name=name.slice(3,11);
+										else{
+											if(lib.config.mode_config.guozhan.guozhanSkin&&lib.character[name]&&lib.character[name][4].contains('gzskin')) gzbool=true;
+											name=name.slice(3);
+										}
 									}
-								}
-								else modeimage=mode;
-								else if(lib.character[name]) nameinfo=lib.character[name];
-								else if(lib.config.show_extensionimage){
-									const pack=Object.keys(lib.characterPack).find(pack=>Object.keys(lib.characterPack[pack]).contains(name));
-									if(pack) nameinfo=lib.characterPack[pack][name];
+									else modeimage=mode;
 								}
 								else if(name.indexOf('::')!=-1){
 									name=name.split('::');
 									modeimage=name[0];
 									name=name[1];
+								}
+								else{
+									nameinfo=get.character(name);
 								}
 							}
 							if(!modeimage&&nameinfo&&nameinfo[4]) for(const value of nameinfo[4]){
@@ -29909,17 +29903,29 @@
 			}
 		},
 		sort:{
+			group:function(a,b){
+				const groupSort=function(group){
+					let base=0;
+					if(group=='wei') return base;
+					if(group=='shu') return base+1;
+					if(group=='wu') return base+2;
+					if(group=='qun') return base+3;
+					if(group=='jin') return base+4;
+					if(group=='key') return base+5;
+					if(group=='western') return base+6;
+					if(group=='shen') return base+7;
+					if(group=='double') return base+7;
+					return base+9;
+				}
+				return groupSort(a)-groupSort(b);
+			},
 			character:function(a,b){
-				/*var getGroup=function(name){
-					var group=get.is.double(name,true);
-					if(group) return group[0];
-					return lib.character[name][1];
-				}*/
 				const groupSort=function(name){
-					if(!lib.character[name]) return 7;
+					const info=get.character(name);
+					if(!info) return 7;
 					let base=0;
 					if(get.is.double(name,true)) base=9;
-					const group=lib.character[name][1];
+					const group=info[1];
 					if(group=='shen') return base-1;
 					if(group=='wei') return base;
 					if(group=='shu') return base+1;
@@ -42296,41 +42302,7 @@
 								}
 							}
 							alterableCharacters.sort();
-							/*var getGroup=function(name){
-								var group=get.is.double(name,true);
-								if(group) return group[0];
-								return lib.character[name][1];
-							};*/
-							const groupSort=function(name){
-								if(!lib.character[name]) return 7;
-								let base=0;
-								if(get.is.double(name,true)) base=9;
-								const group=lib.character[name][1];
-								if(group=='shen') return base-1;
-								if(group=='wei') return base;
-								if(group=='shu') return base+1;
-								if(group=='wu') return base+2;
-								if(group=='qun') return base+3;
-								if(group=='jin') return base+4;
-								if(group=='key') return base+5;
-								if(group=='western') return base+6;
-								return base+7;
-							}
-							list.sort(function(a,b){
-								var del=groupSort(a)-groupSort(b);
-								if(del!=0) return del;
-								var aa=a,bb=b;
-								if(a.indexOf('_')!=-1){
-									a=a.slice(a.lastIndexOf('_')+1);
-								}
-								if(b.indexOf('_')!=-1){
-									b=b.slice(b.lastIndexOf('_')+1);
-								}
-								if(a!=b){
-									return a>b?1:-1;
-								}
-								return aa>bb?1:-1;
-							});
+							list.sort(lib.sort.character);
 							var list2=list.slice(0);
 							var cfgnode=createConfig({
 								name:'开启',
@@ -47567,6 +47539,7 @@
 					}
 				}
 				var list=[];
+				const groups=[];
 				var dialog;
 				var node=ui.create.div('.caption.pointerspan');
 				if(get.is.phoneLayout()){
@@ -47611,6 +47584,10 @@
 						if(lib.characterFilter[i]&&!lib.characterFilter[i](get.mode())) continue;
 						if(filter&&filter(i)) continue;
 						list.push(i);
+						if(get.is.double(i)){
+							groups.add('double');
+						}
+						else groups.add(lib.character[i][1]);
 						if(namecapt.indexOf(getCapt(i))==-1){
 							namecapt.push(getCapt(i));
 						}
@@ -47619,6 +47596,7 @@
 				namecapt.sort(function(a,b){
 					return a>b?1:-1;
 				});
+				groups.sort(lib.sort.group);
 				if(!thisiscard){
 					namecapt.remove('自定义');
 					namecapt.push('newline');
@@ -47814,29 +47792,6 @@
 					}
 				}
 				if(!thisiscard){
-					var groups=['wei','shu','wu','qun','jin'];
-					var bool1=false;
-					var bool2=false;
-					var bool3=(get.mode()=='guozhan'&&_status.forceKey!=true&&get.config('onlyguozhan'));
-					var bool4=false;
-					var bool5=false;
-					for(var i in lib.character){
-						if(lib.character[i][1]=='shen'){
-							bool1=true;
-						}
-						if(lib.character[i][1]=='ye'){
-							bool5=true;
-						}
-						if(bool3||lib.character[i][1]=='key'){
-							bool2=true;
-						}
-						if(!bool4&&get.is.double(i)) bool4=true;
-						if(bool1&&bool2&&bool4&&bool5) break;
-					}
-					if(bool1) groups.add('shen');
-					if(bool2&&!bool3) groups.add('key');
-					if(bool4) groups.add('double');
-					if(bool5) groups.add('ye');
 					var natures=['water','soil','wood','metal'];
 					var span=document.createElement('span');
 					newlined.appendChild(span);
@@ -48046,45 +48001,26 @@
 							case 'zhenfa':return 5;
 							default:return 6;
 						}
-					};
+					}
+					list.sort(function(a,b){
+						var del=groupSort(a)-groupSort(b);
+						if(del!=0) return del;
+						var aa=a,bb=b;
+						if(a.indexOf('_')!=-1){
+							a=a.slice(a.lastIndexOf('_')+1);
+						}
+						if(b.indexOf('_')!=-1){
+							b=b.slice(b.lastIndexOf('_')+1);
+						}
+						if(a!=b){
+							return a>b?1:-1;
+						}
+						return aa>bb?1:-1;
+					});
 				}
 				else{
-					/*var getGroup=function(name){
-						var group=get.is.double(name,true);
-						if(group) return group[0];
-						return lib.character[name][1];
-					}*/
-					groupSort=function(name){
-						if(!lib.character[name]) return 7;
-						let base=0;
-						if(get.is.double(name,true)) base=9;
-						const group=lib.character[name][1];
-						if(group=='shen') return base-1;
-						if(group=='wei') return base;
-						if(group=='shu') return base+1;
-						if(group=='wu') return base+2;
-						if(group=='qun') return base+3;
-						if(group=='jin') return base+4;
-						if(group=='key') return base+5;
-						if(group=='western') return base+6;
-						return base+7;
-					}
+					list.sort(lib.sort.character);
 				}
-				list.sort(function(a,b){
-					var del=groupSort(a)-groupSort(b);
-					if(del!=0) return del;
-					var aa=a,bb=b;
-					if(a.indexOf('_')!=-1){
-						a=a.slice(a.lastIndexOf('_')+1);
-					}
-					if(b.indexOf('_')!=-1){
-						b=b.slice(b.lastIndexOf('_')+1);
-					}
-					if(a!=b){
-						return a>b?1:-1;
-					}
-					return aa>bb?1:-1;
-				});
 				dialog=ui.create.dialog('hidden');
 				dialog.classList.add('noupdate');
 				dialog.classList.add('scroll1');
@@ -52995,13 +52931,12 @@
 				if(lib.config.show_characternamepinyin){
 					var charactername=get.rawName(name);
 					var characterpinyin=get.pinyin(charactername);
-					var nameinfo=lib.character[name];
-					if(!nameinfo){
-						const pack=Object.keys(lib.characterPack).find(pack=>Object.keys(lib.characterPack[pack]).contains(name));
-						if(pack) nameinfo=lib.characterPack[pack][name];
-					}
+					var nameinfo=get.character(name);
 					var charactersex=get.translation(nameinfo[0]);
-					var charactergroup=get.translation(nameinfo[1]);
+					const charactergroups=get.is.double(name,true);
+					let charactergroup;
+					if(charactergroups) charactergroup=charactergroups.map(i=>get.translation(i)).join('/')
+					else charactergroup=get.translation(nameinfo[1]);
 					var characterhp=nameinfo[2];
 					var characterintroinfo=get.characterIntro(name);
 					intro.innerHTML='<span style="font-weight:bold;margin-right:5px;line-height:2">'+charactername+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+characterpinyin+']'+'</span>'+' | '+charactersex+' | '+charactergroup+' | '+characterhp+'<br>'+characterintroinfo;
@@ -54343,9 +54278,10 @@
 				}
 				return false;
 			},
-			double:function(name,array){
-				if(!lib.character[name]||!lib.character[name][4]) return false;
-				for(var i of lib.character[name][4]){
+			double:(name,array)=>{
+				let info=get.character(name,4);
+				if(!info) return false;
+				for(let i of info){
 					if(i.indexOf('doublegroup:')==0){
 						if(!array) return true;
 						return i.split(':').slice(1);
@@ -54791,14 +54727,10 @@
 			}
 		},
 		character:function(name,num){
-			var info=lib.character[name];
+			let info=lib.character[name];
 			if(!info){
-				for(var i in lib.characterPack){
-					if(lib.characterPack[i][name]){
-						info=lib.characterPack[i][name];
-						break;
-					}
-				}
+				const pack=Object.keys(lib.characterPack).find(pack=>lib.characterPack[pack].hasOwnProperty(name));
+				if(pack) info=lib.characterPack[pack][name];
 			}
 			if(info){
 				if(typeof num=='number'){
@@ -56947,8 +56879,8 @@
 					node=node.link;
 				}
 				var capt=get.translation(node.name);
-				if((lib.character[node.name]&&lib.character[node.name][1])||lib.group.contains(node.group)){
-					capt+='&nbsp;&nbsp;'+(lib.group.contains(node.group)?get.translation(node.group):lib.translate[lib.character[node.name][1]]);
+				if(lib.group.contains(node.group)||get.character(node.name,1)){
+					capt+='&nbsp;&nbsp;'+(lib.group.contains(node.group)?get.translation(node.group):get.translation(get.character(node.name,1)));
 				}
 				uiintro.add(capt);
 
@@ -57654,8 +57586,8 @@
 				}
 			}
 			else if(node.classList.contains('character')){
-				var character=node.link;
-				if(lib.character[node.link]&&lib.character[node.link][1]){
+				var character=node.link,characterinfo=get.character(node.link);
+				if(characterinfo&&characterinfo[1]){
 					var group=get.is.double(node.link,true);
 					if(group){
 						var str=get.translation(character)+'&nbsp;&nbsp;';
@@ -57665,7 +57597,7 @@
 						}
 						uiintro.add(str);
 					}
-					else uiintro.add(get.translation(character)+'&nbsp;&nbsp;'+lib.translate[lib.character[node.link][1]]);
+					else uiintro.add(get.translation(character)+'&nbsp;&nbsp;'+lib.translate[characterinfo[1]]);
 				}
 				else{
 					uiintro.add(get.translation(character));
@@ -57771,14 +57703,7 @@
 					ui.create.div('.placeholder.slim',uiintro.content);
 				}
 				else{
-					var infoitem=lib.character[character];
-					if(!infoitem){
-						for(var itemx in lib.characterPack){
-							if(lib.characterPack[itemx][character]){
-								infoitem=lib.characterPack[itemx][character];break;
-							}
-						}
-					}
+					var infoitem=get.character(character);
 					var skills=infoitem[3];
 					for(i=0;i<skills.length;i++){
 						if(lib.translate[skills[i]+'_info']){
