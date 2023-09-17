@@ -942,6 +942,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								responder=event._neutralize_event.player;
 							}
 							return player==responder;
+						},
+						forced:true,
+						locked:false,
+						content:function(){
 							player.removeSkill('olgangshu_buff');
 							game.log(player,'重置了','#g【刚述】','的数值');
 						}
