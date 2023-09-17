@@ -598,6 +598,7 @@ window.noname_character_rank={
 		'jsrg_sunce',
 		're_caorui',
 		'ol_zhouqun',
+		'caoxi',
 	],
 	bp:[
 		'chess_diaochan',
