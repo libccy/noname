@@ -13552,7 +13552,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             yangbiao:['yangbiao','dc_yangbiao','jsrg_yangbiao'],
 			qiaozhou:['yj_qiaozhou','qiaozhou'],
 			sunhanhua:['dc_sunhanhua','sunhanhua'],
-			ol_pengyang:['ol_pengyang','sp_pengyang'],
 		},
 		translate:{
 			liuzan:'手杀留赞',

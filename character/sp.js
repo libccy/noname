@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['ol_luyusheng'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['ol_wanglang','ol_puyuan','ol_zhouqun'],
 				sp_zhongdan:["cuiyan","huangfusong"],
@@ -952,6 +952,61 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			oljianxuan:{
+				audio:2,
+				trigger:{
+					player:'damageEnd',
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var info=lib.skill.olgangshu.getInfo(player);
+					var list=[];
+					list.add(player.getAttackRange());
+					list.add(2+info[1]);
+					list.add(player.getCardUsable('sha',true));
+					list.sort();
+					var str=list.join('、').replace(/(.*)、/, '$1或');
+					event.list=list;
+					player.chooseTarget(get.prompt('oljianxuan'),'令一名角色摸一张牌，然后若其手牌数为'+str+'，其可以重复此流程。').set('ai',target=>{
+						var list=_status.event.list;
+						var player=_status.event.player;
+						var att=get.attitude(player,target);
+						if(att<=0) return 0;
+						var num=target.countCards('h')+1;
+						var value=1;
+						while(true){
+							if(list.includes(num)){
+								value++;
+								num++;
+							}
+							else break;
+						}
+						return value+att/10;
+					}).set('list',list);
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('oljianxuan',target);
+						if(player!=target) player.addExpose(0.15);
+					}
+					else event.finish();
+					'step 2'
+					target.draw();
+					'step 3'
+					if(event.list.includes(target.countCards('h'))){
+						target.chooseBool('谏旋：是否摸一张牌？').set('ai',()=>true);
+					}
+					else event.finish();
+					'step 4'
+					if(result.bool) event.goto(2);
+				},
+				ai:{
+					combo:'olguangshu',
+					maixie:true,
+				},
+			},
 			//OL彭羕
 			olqifan:{
 				audio:2,
@@ -1054,61 +1109,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(event.num>0) event.redo();
 						},
 					},
-				},
-			},
-			oljianxuan:{
-				audio:2,
-				trigger:{
-					player:'damageEnd',
-				},
-				direct:true,
-				content:function(){
-					'step 0'
-					var info=lib.skill.olgangshu.getInfo(player);
-					var list=[];
-					list.add(player.getAttackRange());
-					list.add(2+info[1]);
-					list.add(player.getCardUsable('sha',true));
-					list.sort();
-					var str=list.join('、').replace(/(.*)、/, '$1或');
-					event.list=list;
-					player.chooseTarget(get.prompt('oljianxuan'),'令一名角色摸一张牌，然后若其手牌数为'+str+'，其可以重复此流程。').set('ai',target=>{
-						var list=_status.event.list;
-						var player=_status.event.player;
-						var att=get.attitude(player,target);
-						if(att<=0) return 0;
-						var num=target.countCards('h')+1;
-						var value=1;
-						while(true){
-							if(list.includes(num)){
-								value++;
-								num++;
-							}
-							else break;
-						}
-						return value+att/10;
-					}).set('list',list);
-					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						event.target=target;
-						player.logSkill('oljianxuan',target);
-						if(player!=target) player.addExpose(0.15);
-					}
-					else event.finish();
-					'step 2'
-					target.draw();
-					'step 3'
-					if(event.list.includes(target.countCards('h'))){
-						target.chooseBool('谏旋：是否摸一张牌？').set('ai',()=>true);
-					}
-					else event.finish();
-					'step 4'
-					if(result.bool) event.goto(2);
-				},
-				ai:{
-					combo:'olguangshu',
-					maixie:true,
 				},
 			},
 			olqifan_backup:{
