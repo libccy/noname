@@ -32,22 +32,16 @@
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
-		async:fn=>function genCoroutine(){
-			let result=fn.apply(this,arguments);
-			result.name="genCoroutine";
-			result.status="next";
-			result.state=undefined;
-			return gnc.await(result);
-		},
-		await:gen=>new Promise((resolve,reject)=>{
-			let result=gen;
-			let nexts=resolve;
-			let throws=reject;
-			if(gnc.is.coroutine(gen)||(gnc.is.generator(gen)&&!gen.nocoroutine)) {
-				if(!gen.status)gen.status="next";
-				if(!gen.state)gen.state=undefined;
+		of:fn=>gnc.is.generatorFunc(fn)?function genCoroutine(){
+			let gen=fn.apply(this,arguments);
+			gen.status="next";
+			gen.state=undefined;
+			const callback=(resolve,reject)=>{
+				let result,
+					nexts=resolve,
+					throws=reject;
 				try{
-					result=gen[result.status](result.state);
+					result=gen[gen.status](gen.state);
 				}catch(error){
 					reject(error);
 					return;
@@ -56,24 +50,21 @@
 					nexts=(item)=>{
 						gen.state=item;
 						gen.status="next";
-						gnc.await(gen).then(resolve,reject);
+						callback(resolve,reject);
 					}
 					throws=(err)=>{
 						gen.state=err;
 						gen.status="throw";
-						gnc.await(gen).then(resolve,reject);
+						callback(resolve,reject);
 					}
 				}
 				result=result.value;
+				Promise.resolve(result).then(nexts,throws);
 			}
-			Promise.resolve(result).then(nexts,throws);
-		}),
-		escape:gen=>{
-			gen.nocoroutine=true;
-			return gen;
-		},
+			return new Promise(callback);
+		}:(()=>{throw new TypeError("gnc.of needs a GeneratorFunction.")})(),
 		is:{
-			coroutine:item=>(typeof item=="function"||gnc.is.generator(item))&&item.name=="genCoroutine",
+			coroutine:item=>typeof item=="function"&&item.name=="genCoroutine",
 			generatorFunc:item=>item instanceof GeneratorFunction,
 			generator:item=>(typeof item=="object")&&("constructor" in item)&&item.constructor&&("constructor" in item.constructor)&&item.constructor.constructor===GeneratorFunction
 		}
@@ -7279,12 +7270,10 @@
 				'无名杀 - 录像 - '+_status.videoToSave.name[0]+' - '+_status.videoToSave.name[1]);
 			}
 		},
-		genAsync:fn=>gnc.async(fn),
-		genAwait:gen=>gnc.await(gen),
+		genAsync:fn=>gnc.of(fn),
+		genAwait:item=>gnc.is.generator(item)?gnc.of(function*(){for(const content of item){yield content;}})():Promise.resolve(item),
 		gnc:{
-			async:fn=>gnc.async(fn),
-			await:gen=>gnc.await(gen),
-			escape:gen=>gnc.escape(gen),
+			of:fn=>gnc.of(fn),
 			is:{
 				coroutine:item=>gnc.is.coroutine(item),
 				generatorFunc:item=>gnc.is.generatorFunc(item),
@@ -8324,7 +8313,7 @@
 						if (Array.isArray(lib.onprepare)&&lib.onprepare.length){
 							_status.onprepare=Object.freeze(lib.onprepare.map(fn=>{
 								if(typeof fn!="function") return;
-								return gnc.await(fn());
+								return (gnc.is.generatorFunc(fn)?gnc.of(fn):fn)();
 							}));
 						}
 						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
@@ -8336,7 +8325,7 @@
 							if(!arrayLengths.length) return previousValue+1;
 							return previousValue+Math.min(...arrayLengths);
 						},0);
-						const packLoaded=gnc.async(function*(){
+						const packLoaded=gnc.of(function*(){
 							toLoad--;
 							if(toLoad) return;
 							if(_status.importing){
@@ -8449,13 +8438,13 @@
 						throw e;
 					});
 					var styleToLoad=6;
-					var styleLoaded=gnc.async(function*(){
+					var styleLoaded=gnc.of(function*(){
 						--styleToLoad;
 						if(styleToLoad==0){
 							if(extensionlist.length&&(lib.config.mode!='connect'||show_splash)){
 								_status.extensionLoading=[];
 								let extToLoad=extensionlist.length;
-								const extLoaded=gnc.async(function*(){
+								const extLoaded=gnc.of(function*(){
 									--extToLoad;
 									if(extToLoad==0){
 										yield Promise.allSettled(_status.extensionLoading);
@@ -8477,7 +8466,7 @@
 										continue;
 									}
 									lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,(function(i){
-										return gnc.async(function*(){
+										return gnc.of(function*(){
 											game.removeExtension(i);
 											--extToLoad;
 											if(extToLoad==0){
@@ -9125,13 +9114,13 @@
 				}
 			},
 			//lib.onload支持传入GeneratorFunction以解决异步函数的问题 by诗笺
-			onload:gnc.async(function*(){
+			onload:gnc.of(function*(){
 				const libOnload=lib.onload;
 				delete lib.onload;
 				while(Array.isArray(libOnload)&&libOnload.length){
 					const fun=libOnload.shift();
 					if(typeof fun!="function") continue;
-					yield gnc.await(fun());
+					yield (gnc.is.generatorFunc(fun)?gnc.of(fun):fun)();
 				}
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
@@ -9326,7 +9315,7 @@
 					});
 				}
 
-				var proceed2=gnc.async(function*(){
+				var proceed2=gnc.of(function*(){
 					var mode=lib.imported.mode;
 					var card=lib.imported.card;
 					var character=lib.imported.character;
@@ -9740,7 +9729,8 @@
 							try{
 								_status.extension=lib.extensions[i][0];
 								_status.evaluatingExtension=lib.extensions[i][3];
-								if (typeof lib.extensions[i][1]=="function") yield gnc.await(lib.extensions[i][1](lib.extensions[i][2],lib.extensions[i][4]));
+								if (typeof lib.extensions[i][1]=="function") 
+									yield (gnc.is.coroutine(lib.extensions[i][1])?gnc.of(lib.extensions[i][1]):lib.extensions[i][1])(lib.extensions[i][2],lib.extensions[i][4]);
 								if(lib.extensions[i][4]){
 									if(lib.extensions[i][4].character){
 										for(var j in lib.extensions[i][4].character.character){
@@ -9792,7 +9782,7 @@
 					}
 					game.loop();
 				})
-				var proceed=gnc.async(function*(){
+				var proceed=gnc.of(function*(){
 					if(!lib.db){
 						try{
 							lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
@@ -9907,7 +9897,7 @@
 				while(Array.isArray(libOnload2)&&libOnload2.length){
 					const fun=libOnload2.shift();
 					if(typeof fun!="function") continue;
-					yield gnc.await(fun());
+					yield (gnc.is.generatorFunc(fun)?gnc.of(fun):fun)();
 				}
 			}),
 			startOnline:function(){
@@ -33640,7 +33630,7 @@
 				if(!lib.imported[type])lib.imported[type]={};
 				if(typeof _status.importing=="undefined")_status.importing={};
 				if(!_status.importing[type])_status.importing[type]=[];
-				const promise=gnc.await(content(lib,game,ui,get,ai,_status)).then(content2=>{
+				const promise=Promise.resolve((gnc.is.generator(content)?gnc.of(content):content)(lib,game,ui,get,ai,_status)).then(content2=>{
 					if(content2.name){
 						lib.imported[type][content2.name]=content2;
 						delete content2.name;
@@ -33650,10 +33640,10 @@
 				return promise;
 			}
 		},
-		loadExtension:gnc.async(function*(obj){
+		loadExtension:gnc.of(function*(obj){
 			var noeval=false;
 			if(typeof obj=='function'){
-				obj=yield gnc.await(obj(lib,game,ui,get,ai,_status));
+				obj=yield (gnc.is.generatorFunc(obj)?gnc.of(obj):obj)(lib,game,ui,get,ai,_status);
 				noeval=true;
 			}
 			lib.extensionMenu['extension_'+obj.name]={
@@ -33771,7 +33761,7 @@
 						}
 						if(obj.precontent){
 							_status.extension=obj.name;
-							yield gnc.await(obj.precontent(cfg));
+							yield (gnc.is.generatorFunc(obj.precontent)?gnc.of(obj.precontent):obj.precontent)(cfg);
 							delete _status.extension;
 						}
 						if(obj.content){
@@ -33825,7 +33815,7 @@
 				})();
 			}
 		},
-		importExtension:gnc.async(function*(data,finishLoad,exportext,pkg){
+		importExtension:gnc.of(function*(data,finishLoad,exportext,pkg){
 			//by 来瓶可乐加冰
 			if(!window.JSZip)
 				yield new Promise((resolve,reject)=>lib.init.js(`${lib.assetURL}game`,"jszip",resolve,reject));
