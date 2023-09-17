@@ -54681,8 +54681,8 @@
 						_card.cards=cards.slice(0);
 						if(!lib.suits.includes(_card.suit)) _card.suit=get.suit(_card);
 						if(!Object.keys(lib.color).includes(_card.color)) _card.color=get.color(_card);
-						if(!_card.hasOwnProperty('number')) _card.number=get.number(card);
-						if(!_card.hasOwnProperty('nature')) _card.nature=get.nature(card);
+						if(!_card.hasOwnProperty('number')) _card.number=get.number(_card);
+						if(!_card.hasOwnProperty('nature')) _card.nature=(get.nature(_card)||false);
 					}
 				}
 			}
@@ -56016,14 +56016,13 @@
 		},
 		number:function(card,player){
 			//狗卡你是真敢出啊
-			var number;
+			var number=null;
 			if(card.hasOwnProperty('number')){
 				number=card.number;
-				if(typeof number!='number') return null;
+				if(typeof number!='number') number=null;
 			}
 			else{
-				if(card.cards&&card.cards.length==1) return get.number(card.cards[0]);
-				return null;
+				if(card.cards&&card.cards.length==1) number=get.number(card.cards[0],false);
 			}
 			if(player!==false){
 				var owner=player||get.owner(card);
