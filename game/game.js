@@ -7270,7 +7270,17 @@
 				'无名杀 - 录像 - '+_status.videoToSave.name[0]+' - '+_status.videoToSave.name[1]);
 			}
 		},
+		genAsync:fn=>gnc.of(fn),
+		genAwait:_=>{throw new Error("lib.genAwait is removed!");},
 		gnc:{
+			/**
+			 * @deprecated please use `gnc.of`
+			 */
+			async:fn=>{
+				console.log("Deprecated: please use `gnc.of`.");
+				return gnc.of(fn);
+			},
+			await:_=>{throw new Error("lib.gnc.await is removed.");},
 			of:fn=>gnc.of(fn),
 			is:{
 				coroutine:item=>gnc.is.coroutine(item),
