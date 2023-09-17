@@ -25758,8 +25758,8 @@
 									newRange=info.distance.attackRange(card,player);
 								}
 								//否则采用祖宗之法
-								else if(typeof info.attackFrom=='number'){
-									newRange-=info.attackFrom;
+								else if(typeof info.distance.attackFrom=='number'){
+									newRange-=info.distance.attackFrom;
 								}
 							}
 							return Math.max(range,newRange)
@@ -25782,8 +25782,8 @@
 									newRange=info.distance.attackRange(card,player);
 								}
 								//否则采用祖宗之法
-								else if(typeof info.attackFrom=='number'){
-									newRange-=info.attackFrom;
+								else if(typeof info.distance.attackFrom=='number'){
+									newRange-=info.distance.attackFrom;
 								}
 							}
 							return Math.max(range,newRange);
@@ -56087,8 +56087,8 @@
 						newRange=info.distance.attackRange(card,player);
 					}
 					//否则采用祖宗之法
-					else if(typeof info.attackFrom=='number'){
-						newRange-=info.attackFrom;
+					else if(typeof info.distance.attackFrom=='number'){
+						newRange-=info.distance.attackFrom;
 					}
 				}
 				return Math.max(range,newRange)
