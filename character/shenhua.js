@@ -2174,6 +2174,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return true;
 				},
+				prompt:function(event,player){
+					return get.prompt('nzry_shicai')+'（将'+get.translation(event.cards.filterInD('oe'))+'置于牌堆顶）';
+				},
 				content:function(){
 					'step 0'
 					event.cards=trigger.cards.filterInD('oe');
@@ -2253,6 +2256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"nzry_cunmu":{
 				audio:2,
+				audioname:['ol_pengyang'],
 				trigger:{
 					player:'drawBegin'
 				},
