@@ -54110,8 +54110,8 @@
 		pinyin:function(chinese,withtone){
 			const util=window.pinyinUtilx;
 			if(!window.pinyinUtilx) return [];
-			if(lib.pinyins.metadata&&lib.pinyins.metadata[chinese]){
-				const str=lib.pinyins.metadata[chinese];
+			if(lib.pinyins&&lib.pinyins[chinese]){
+				const str=lib.pinyins[chinese];
 				if(withtone===false){
 					for(let i=0;i<str.length;i++){
 						str[i]=util.removeTone(str[i]);
