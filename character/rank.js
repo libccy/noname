@@ -1725,6 +1725,8 @@ window.noname_character_rank={
 			'shichangshi',
 		],
 		epic:[
+			'ol_pengyang',
+			'ol_luyusheng',
 			'clan_xunchen',
 			'peiyuanshao',
 			'tw_zhangzhao',
