@@ -2256,6 +2256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			"nzry_cunmu":{
 				audio:2,
+				audioname:['ol_pengyang'],
 				trigger:{
 					player:'drawBegin'
 				},
