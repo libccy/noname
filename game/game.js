@@ -41081,6 +41081,7 @@
 								updateConnectDisplayMap();
 							}
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 						return node;
 					};
 					var modeorder=lib.config.modeorder||[];
@@ -42163,6 +42164,7 @@
 							createDash('字','字体文件',dash3);
 							createDash('全','全部文件',dash4);
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 					createModeConfig('others',start.firstChild);
 
@@ -42537,6 +42539,7 @@
 								}
 							}
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 						return node;
 					};
 					if(lib.config.show_favourite_menu&&!connectMenu&&Array.isArray(lib.config.favouriteCharacter)){
@@ -43005,6 +43008,7 @@
 								ui.create.div('.menuplaceholder',page);
 							}
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 						return node;
 					};
 					if(!connectMenu&&lib.config.show_ban_menu){
@@ -43651,9 +43655,36 @@
 							buttonExport.style.marginRight='2px';
 							buttonExport.style.display='none';
 							buttonExport.onclick=function(){
-								processExtension(true);
-								if(lib.config.show_extensionshare){
-									shareExtLine.style.display='';
+								function oldExport(){
+									processExtension(true);
+									if(lib.config.show_extensionshare){
+										shareExtLine.style.display='';
+									}
+								}
+								if(typeof game.readFile=='function'&&
+									window.noname_shijianInterfaces&&
+									typeof window.noname_shijianInterfaces.shareExtensionWithPassWordAsync=='function'&&
+									confirm('是否使用诗笺版自带的导出功能来导出扩展？')){
+									const extName=inputExtName.value;
+									if (!extName) {
+										alert('未检测到扩展名，将使用无名杀自带的导出功能');
+										oldExport();
+										return;
+									}
+									game.readFile(`extension/${extName}/extension.js`, () => {
+										const pwd=prompt("请输入压缩包密码，不设密码直接点确定");
+										let result;
+										if(pwd===''||pwd=== null){
+											window.noname_shijianInterfaces.shareExtensionAsync(extName);
+										}else{
+											window.noname_shijianInterfaces.shareExtensionWithPassWordAsync(extName, pwd);
+										}
+									},()=>{
+										alert('未检测到扩展文件，将使用无名杀自带的导出功能');
+										oldExport();
+									});
+								}else{
+									oldExport();
 								}
 							};
 							inputExtLine.appendChild(buttonExport);
@@ -43683,8 +43714,11 @@
 							shareExtLine.style.textAlign='left';
 							shareExtLine.style.marginBottom='5px';
 							shareExtLine.innerHTML='已导出扩展。<span class="hrefnode">分享扩展</span><span class="closenode">×</span>';
-							shareExtLine.querySelectorAll('span')[0].onclick=function(){
-								game.open('https://tieba.baidu.com/p/5439380222');
+							shareExtLine.querySelectorAll('span')[0].onclick = function () {
+								//这个链接404了
+								//game.open('https://tieba.baidu.com/p/5439380222');
+								//无名杀贴吧首页
+								game.open('https://tieba.baidu.com/f?ie=utf-8&kw=%E6%97%A0%E5%90%8D%E6%9D%80');
 							};
 							shareExtLine.querySelectorAll('span')[1].onclick=function(){
 								shareExtLine.style.display='none';
@@ -45452,6 +45486,7 @@
 							createDash('技','编辑技能',dash3);
 							createDash('码','编辑代码',dash4);
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 					(function(){
 						var page=ui.create.div('');
@@ -45762,6 +45797,7 @@
 							};
 							if(_thisUpdate) node.update();
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 					var active=start.firstChild.querySelector('.active');
 					if(!active){
@@ -46971,6 +47007,7 @@
 								pre.innerHTML='';
 							});
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 					(function(){
 						var page=ui.create.div('');
@@ -47006,6 +47043,7 @@
 								}
 							}
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 					(function(){
 						if(!window.indexedDB||window.nodb) return;
@@ -47194,6 +47232,7 @@
 								}
 							};
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 
 
