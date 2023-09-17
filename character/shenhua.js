@@ -2155,44 +2155,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:true,
 			},
-			"nzry_shicai":{
-				audio:"nzry_shicai_2",
-				ai:{
-					reverseOrder:true,
-					skillTagFilter:function(player){
-						if(player.getHistory('useCard',function(evt){
-							return get.type(evt.card)=='equip';
-						}).length>0) return false;
-					},
-					effect:{
-						target:function(card,player,target){
-							if(player==target&&get.type(card)=='equip'&&!player.getHistory('useCard',function(evt){
-								return get.type(evt.card)=='equip'
-							}).length==0) return [1,3];
-						},
-					},
-					threaten:2.4,
-				},
-				subSkill:{
-					"2":{
-						audio:2,
-					},
-				},
-				trigger:{
-					player:['useCardAfter'],
-					target:'useCardToTargeted',				
-				},
-				filter:function(event,player,name){
-					if(name=='useCardToTargeted'&&('equip'!=get.type(event.card)||event.player!=player)) return false;
-					if(name=='useCardAfter'&&['equip','delay'].contains(get.type(event.card))) return false;
-					if(event.cards.filterInD().length<=0) return false;
-					var history=player.getHistory('useCard');
-					var evt=name=='useCardAfter'?event:event.getParent();
-					for(var i=0;i<history.length;i++){
-						if(history[i]!=evt&&get.type2(history[i].card)==get.type2(event.card)) return false;
-						else if(history[i]==evt) return true;
-					}
-					return false;
+			nzry_shicai:{
+				audio:'nzry_shicai_2',
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					if(!event.cards.filterInD('oe').length) return false;
+					return player.getHistory('useCard',evt=>get.type2(evt.card)==get.type2(event.card)).indexOf(event)==0;
 				},
 				check:function(event,player){
 					if(get.type(event.card)=='equip'){
@@ -2207,11 +2175,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				content:function(){
-					"step 0"
-					event.cards=trigger.cards.filterInD();
-					if(event.cards.length>1){
+					'step 0'
+					event.cards=trigger.cards.filterInD('oe');
+					var cards=event.cards.filter(card=>get.owner(card));
+					if(!cards.length){
+						event.goto(2);
+						return;
+					}
+					event.cards.removeArray(cards);
+					if(cards.length>1){
 						var next=player.chooseToMove('恃才：将牌按顺序置于牌堆顶');
-						next.set('list',[['牌堆顶',event.cards]]);
+						next.set('list',[['牌堆顶',cards]]);
 						next.set('reverse',((_status.currentPhase&&_status.currentPhase.next)?get.attitude(player,_status.currentPhase.next)>0:false));
 						next.set('processAI',function(list){
 							var cards=list[0][1].slice(0);
@@ -2221,7 +2195,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return [cards];
 						});
 					}
-					"step 1"
+					else event._result={bool:true,moved:[cards]};
+					'step 1'
+					var cardx=result.moved[0].slice(0);
+					while(cardx.length){
+						var card=cardx.pop(),owner=get.owner(card);
+						owner.lose([card],ui.cardPile,'insert');
+						game.log(player,'将',card,'置于牌堆顶');
+					}
+					game.updateRoundNumber();
+					if(!cards.length){
+						player.draw();
+						event.finish();
+					}
+					'step 2'
+					if(cards.length>1){
+						var next=player.chooseToMove('恃才：将牌按顺序置于牌堆顶');
+						next.set('list',[['牌堆顶',cards]]);
+						next.set('reverse',((_status.currentPhase&&_status.currentPhase.next)?get.attitude(player,_status.currentPhase.next)>0:false));
+						next.set('processAI',function(list){
+							var cards=list[0][1].slice(0);
+							cards.sort(function(a,b){
+								return (_status.event.reverse?1:-1)*(get.value(b)-get.value(a));
+							});
+							return [cards];
+						});
+					}
+					'step 3'
 					if(result.bool&&result.moved&&result.moved[0].length) cards=result.moved[0].slice(0);
 					while(cards.length){
 						var card=cards.pop();
@@ -2233,7 +2233,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					game.updateRoundNumber();
 					player.draw();
-				},	
+				},
+				subSkill:{'2':{audio:2}},
+				ai:{
+					reverseOrder:true,
+					skillTagFilter:function(player){
+						if(player.getHistory('useCard',function(evt){
+							return get.type(evt.card)=='equip';
+						}).length>0) return false;
+					},
+					effect:{
+						target:function(card,player,target){
+							if(player==target&&get.type(card)=='equip'&&!player.getHistory('useCard',function(evt){
+								return get.type(evt.card)=='equip';
+							}).length==0) return [1,3];
+						},
+					},
+				},
 			},
 			"nzry_cunmu":{
 				audio:2,
@@ -7744,7 +7760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_chenglve":"成略",
 			"nzry_chenglve_info":"转换技，出牌阶段限一次，阴：你可以摸一张牌，然后弃置两张手牌。阳：你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。",
 			"nzry_shicai":"恃才",
-			"nzry_shicai_info":"当你使用牌时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌。",
+			"nzry_shicai_info":"当你使用牌结束完毕后，若此牌与你本回合使用的牌类型均不同，则你可以将此牌置于牌堆顶，然后摸一张牌。",
 			"nzry_cunmu":"寸目",
 			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌。",
 			"nzry_kuizhu":"溃诛",

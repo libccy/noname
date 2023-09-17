@@ -28,6 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		character:{
 			caoxi:['male','wei',3,['olgangshu','oljianxuan']],
+			ol_pengyang:['male','shu',3,['olqifan','oltuishi','nzry_cunmu']],
 			ol_qianzhao:['male','wei',4,['olweifu','olkuansai']],
 			niujin:['male','wei',4,['olcuorui','liewei']],
 			hejin:['male','qun',4,['olmouzhu','olyanhuo']],
@@ -806,6 +807,110 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							player.removeSkill('olgangshu_buff');
 							game.log(player,'重置了','#g【刚述】','的数值');
+						}
+					}
+				}
+			},
+			//OL彭羕
+			olqifan:{
+				audio:2,
+				enable:'chooseToUse',
+				hiddenCard:function(player,name){
+					if(name!='wuxie'&&lib.inpile.contains(name)) return true;
+				},
+				filter:function(event,player){
+					if(event.responded||event.type=='wuxie'||event.olqifan) return false;
+					for(var i of lib.inpile){
+						if(i!='wuxie'&&get.type(i)=='basic'&&event.filterCard({name:i},player,event)) return true;
+					}
+					return false;
+				},
+				delay:false,
+				content:function(){
+					'step 0'
+					var evt=event.getParent(2);
+					evt.set('olqifan',true);
+					var cards=get.bottomCards(1+player.getStorage('olqifan').length,true);
+					var aozhan=player.hasSkill('aozhan');
+					player.chooseButton(['器翻：选择要使用的牌',cards]).set('filterButton',function(button){
+						return _status.event.cards.contains(button.link);
+					}).set('cards',cards.filter(function(card){
+						if(aozhan&&card.name=='tao'){
+							return evt.filterCard({
+								name:'sha',isCard:true,cards:[card],
+							},evt.player,evt)||evt.filterCard({
+								name:'shan',isCard:true,cards:[card],
+							},evt.player,evt);
+						}
+						return evt.filterCard(card,evt.player,evt);
+					})).set('ai',function(button){
+						var evt=_status.event.getParent(3);
+						if(evt&&evt.ai){
+							var tmp=_status.event;
+							_status.event=evt;
+							var result=(evt.ai||event.ai1)(button.link,_status.event.player,evt);
+							_status.event=tmp;
+							return result;
+						}
+						return 1;
+					});
+					'step 1'
+					var evt=event.getParent(2);
+					if(result.bool&&result.links&&result.links.length){
+						var name=result.links[0].name,aozhan=(player.hasSkill('aozhan')&&name=='tao');
+						if(aozhan){
+							name=evt.filterCard({
+								name:'sha',isCard:true,cards:[card],
+							},evt.player,evt)?'sha':'shan';
+						}
+						game.broadcastAll(function(result,name){
+							lib.skill.olqifan_backup.viewAs={name:name,cards:[result],isCard:true};
+							lib.skill.olqifan_backup.prompt=('请选择'+get.translation(result)+'的目标');
+						},result.links[0],name);
+						evt.set('_backupevent','olqifan_backup');
+						evt.backup('olqifan_backup');
+					}
+					evt.goto(0);
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,effect){
+							if(get.tag(card,'respondShan')) return 0.7;
+							if(get.tag(card,'respondSha')) return 0.7;
+						}
+					},
+					order:11,
+					respondShan:true,
+					respondSha:true,
+					result:{
+						player:function(player){
+							if(_status.event.dying) return get.attitude(player,_status.event.dying);
+							return 1;
+						}
+					}
+				},
+				onremove:true,
+				intro:{
+					content:'已使用过$牌',
+				},
+				subSkill:{
+					discard:{
+						trigger:{player:'chooseToUseAfter'},
+						forced:true,
+						charlotte:true,
+						filter:function(event,player){
+							if(!event.olqifan_discard) return false;
+							var num=player.getStorage('olqifan').length,pos=('jeh').slice(0,num);
+							return num>0&&player.countCards(pos)>0;
+						},
+						content:function(){
+							'step 0'
+							event.num=Math.min(3,player.getStorage('olqifan').length);
+							'step 1'
+							event.num--;
+							var pos=('jeh')[event.num],hs=player.countCards('h');
+							if(hs>0) player.chooseToDiscard(hs,pos,true);
+							if(event.num>0) event.redo();
 						},
 					},
 				},
@@ -863,6 +968,67 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					combo:'olguangshu',
 					maixie:true,
+				},
+			},
+			olqifan_backup:{
+				sourceSkill:'olqifan',
+				precontent:function(){
+					delete event.result.skill;
+					var name=event.result.card.name;
+					event.result.cards=event.result.card.cards.slice(0);
+					event.result.card=get.autoViewAs({name:name},event.result.cards);
+					player.markAuto('olqifan',[get.type2(event.result.card,false)]);
+					event.getParent().set('olqifan_discard',true);
+					player.addTempSkill('olqifan_discard');
+				},
+				filterCard:function(){return false},
+				selectCard:-1,
+			},
+			oltuishi:{
+				audio:2,
+				mod:{
+					wuxieJudgeEnabled:()=>false,
+					wuxieEnabled:()=>false,
+					cardEnabled:(card)=>{
+						if(card.name=='wuxie') return false;
+					},
+					targetInRange:(card)=>{
+						if(card.storage&&card.storage.oltuishi) return true;
+					}
+				},
+				trigger:{player:'useCardAfter'},
+				forced:true,
+				filter:function(event){
+					const num=get.number(event.card);
+					return [1,11,12,13].includes(num);
+				},
+				content:function(){
+					player.draw(2);
+					player.addSkill('oltuishi_unlimit');
+				},
+				subSkill:{
+					unlimit:{
+						charlotte:true,
+						mod:{
+							cardUsable:()=>Infinity,
+							targetInRange:()=>true,
+						},
+						trigger:{player:'useCard1'},
+						forced:true,
+						popup:false,
+						silent:true,
+						firstDo:true,
+						content:function(){
+							player.removeSkill('oltuishi_unlimit')
+							var card=trigger.card;
+							if(!card.storage) card.storage={};
+							card.storage.oltuishi=true;
+							if(trigger.addCount!==false){
+								trigger.addCount=false;
+								player.getStat('card')[card.name]--;
+							}
+						},
+					},
 				},
 			},
 			//OL牵招
@@ -23649,6 +23815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wenqin:['wenqin','pe_wenqin'],
 			zhouqun:['ol_zhouqun','zhouqun'],
 			qianzhao:['ol_qianzhao','qianzhao'],
+			ol_pengyang:['ol_pengyang','sp_pengyang'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -24776,6 +24943,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olgangshu_info:'①当你使用非基本牌结算结束后，你可以令以下一项数值+1（每项至多以此法+5）：1.攻击范围；2.受〖刚述〗影响的下个摸牌阶段摸牌数；3.使用【杀】的次数上限。②当有牌被你抵消后，重置你〖刚述①〗增加的所有数值。',
 			oljianxuan:'谏旋',
 			oljianxuan_info:'当你受到伤害后，你可以令一名角色摸一张牌，然后若其手牌数等于你〖刚述①〗中的任意一项对应的数值，其可以重复此流程。',
+			ol_pengyang:'OL彭羕',
+			olqifan:'器翻',
+			olqifan_info:'当你需要使用不为【无懈可击】的牌时，你可以观看牌堆底的X+1张牌并使用其中的一张。此牌结算结束时，你依次弃置以下前X个区域中的所有牌：⒈判定区、⒉装备区、⒊手牌区（X为你因此技能使用过的牌中包含的类型数）。',
+			oltuishi:'侻失',
+			oltuishi_info:'锁定技。①你不能使用【无懈可击】。②当你使用点数为字母的牌后，你摸两张牌，且你使用的下一张牌无距离和次数限制。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

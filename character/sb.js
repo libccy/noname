@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sb',
 		connect:true,
 		character:{
-			sb_zhanghe:['male','wei',4,['sbqiaobian'],['unseen']],
+			sb_zhanghe:['male','wei',4,['sbqiaobian']],
 			sb_yujin:['male','wei',4,['sbxiayuan','sbjieyue']],
 			sb_huaxiong:['male','qun','3/4/1',['new_reyaowu','sbyangwei']],
 			liucheng:['female','qun',3,['splveying','spyingwu']],
@@ -359,7 +359,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!_status.sbjuxiang_nanman){
 						_status.sbjuxiang_nanman=[
 							{name:'nanman',number:7,suit:'spade'},
-							{name:'nanman',number:13,suit:'spade'},
 							{name:'nanman',number:7,suit:'club'},
 						];
 						game.broadcastAll(function(){
@@ -4742,7 +4741,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sblieren:'烈刃',
 			sblieren_info:'当你使用【杀】指定唯一目标后，你可以与其拼点。若你赢，此【杀】结算结束后，你可以对另一名其他角色造成1点伤害。',
 			sbjuxiang:'巨象',
-			sbjuxiang_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】结算结束后，你获得此牌对应的所有实体牌。③结束阶段，若你未于本回合使用过【南蛮入侵】，你可以将一张游戏外的随机【南蛮入侵】（共三张）交给一名角色。',
+			sbjuxiang_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】结算结束后，你获得此牌对应的所有实体牌。③结束阶段，若你未于本回合使用过【南蛮入侵】，你可以将一张游戏外的随机【南蛮入侵】（共2张）交给一名角色。',
 			sb_menghuo:'谋孟获',
 			sbhuoshou:'祸首',
 			sbhuoshou_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】指定第一个目标后，你代替其成为此牌的伤害来源。③出牌阶段开始时，你随机获得弃牌堆中的一张【南蛮入侵】。④出牌阶段，若你于此阶段使用过【南蛮入侵】，你不能使用【南蛮入侵】。',

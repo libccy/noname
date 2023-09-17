@@ -32,22 +32,16 @@
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
-		async:fn=>function genCoroutine(){
-			let result=fn.apply(this,arguments);
-			result.name="genCoroutine";
-			result.status="next";
-			result.state=undefined;
-			return gnc.await(result);
-		},
-		await:gen=>new Promise((resolve,reject)=>{
-			let result=gen;
-			let nexts=resolve;
-			let throws=reject;
-			if(gnc.is.coroutine(gen)||(gnc.is.generator(gen)&&!gen.nocoroutine)) {
-				if(!gen.status)gen.status="next";
-				if(!gen.state)gen.state=undefined;
+		of:fn=>gnc.is.generatorFunc(fn)?function genCoroutine(){
+			let gen=fn.apply(this,arguments);
+			gen.status="next";
+			gen.state=undefined;
+			const callback=(resolve,reject)=>{
+				let result,
+					nexts=resolve,
+					throws=reject;
 				try{
-					result=gen[result.status](result.state);
+					result=gen[gen.status](gen.state);
 				}catch(error){
 					reject(error);
 					return;
@@ -56,24 +50,21 @@
 					nexts=(item)=>{
 						gen.state=item;
 						gen.status="next";
-						gnc.await(gen).then(resolve,reject);
+						callback(resolve,reject);
 					}
 					throws=(err)=>{
 						gen.state=err;
 						gen.status="throw";
-						gnc.await(gen).then(resolve,reject);
+						callback(resolve,reject);
 					}
 				}
 				result=result.value;
+				Promise.resolve(result).then(nexts,throws);
 			}
-			Promise.resolve(result).then(nexts,throws);
-		}),
-		escape:gen=>{
-			gen.nocoroutine=true;
-			return gen;
-		},
+			return new Promise(callback);
+		}:(()=>{throw new TypeError("gnc.of needs a GeneratorFunction.")})(),
 		is:{
-			coroutine:item=>(typeof item=="function"||gnc.is.generator(item))&&item.name=="genCoroutine",
+			coroutine:item=>typeof item=="function"&&item.name=="genCoroutine",
 			generatorFunc:item=>item instanceof GeneratorFunction,
 			generator:item=>(typeof item=="object")&&("constructor" in item)&&item.constructor&&("constructor" in item.constructor)&&item.constructor.constructor===GeneratorFunction
 		}
@@ -150,6 +141,7 @@
 		chatHistory:[],
 		emotionList:{
 			xiaowu_emotion:14,
+			xiaokuo_emotion:8,
 			shibing_emotion:15,
 			guojia_emotion:20,
 			zhenji_emotion:20,
@@ -3946,12 +3938,6 @@
 						init:true,
 						unfrequent:true,
 					},
-					show_extensionimage:{
-						name:'显示扩展武将图片',
-						intro:'关闭扩展武将包仍加载扩展武将图片',
-						init:true,
-						unfrequent:true,
-					},
 					show_skillnamepinyin:{
 						name:'显示技能名拼音',
 						intro:'在武将资料卡显示技能名拼音',
@@ -7110,6 +7096,7 @@
 			'<li>妄行：一种特殊的选项。若一名角色拥有带有“妄行”的技能，则该技能触发时，你须选择声明一个数字X（X∈{1,2,3,4}），技能后续中的X即为你选择的数字。选择完毕后，你获得如下效果：回合结束时，你选择一项：1.弃置X张牌；2.减1点体力上限。'+
 			'<li>搏击：若一名角色拥有带有“搏击”的技能，则当该搏击技能触发时，若本次技能的目标角色在你攻击范围内，且你在其攻击范围内，则你执行技能主体效果时，同时额外执行“搏击”后的额外效果。'+
 			'<li>游击：若一名角色拥有带有“游击”的技能，则当该游击技能执行至“游击”处时，若本次技能的目标角色在你的攻击范围内，且你不在其攻击范围内，则你可以执行“游击”后的额外效果。'+
+			'<li>激昂：一名角色发动“昂扬技”标签技能后，此技能失效，直至从此刻至满足此技能“激昂”条件后。'+
 			''
 		},
 		path:{},
@@ -7277,12 +7264,10 @@
 				'无名杀 - 录像 - '+_status.videoToSave.name[0]+' - '+_status.videoToSave.name[1]);
 			}
 		},
-		genAsync:fn=>gnc.async(fn),
-		genAwait:gen=>gnc.await(gen),
+		genAsync:fn=>gnc.of(fn),
+		genAwait:item=>gnc.is.generator(item)?gnc.of(function*(){for(const content of item){yield content;}})():Promise.resolve(item),
 		gnc:{
-			async:fn=>gnc.async(fn),
-			await:gen=>gnc.await(gen),
-			escape:gen=>gnc.escape(gen),
+			of:fn=>gnc.of(fn),
 			is:{
 				coroutine:item=>gnc.is.coroutine(item),
 				generatorFunc:item=>gnc.is.generatorFunc(item),
@@ -7496,24 +7481,24 @@
 							let dbimage=null,extimage=null,modeimage=null,nameinfo,gzbool=false;
 							const mode=get.mode();
 							if(type=='character'){
-								if(lib.characterPack[`mode_${mode}`]&&lib.characterPack[`mode_${mode}`][name]) if(mode=='guozhan'){
-									nameinfo=lib.character[name];
-									if(name.indexOf('gz_shibing')==0) name=name.slice(3,11);
-									else{
-										if(lib.config.mode_config.guozhan.guozhanSkin&&lib.character[name]&&lib.character[name][4].contains('gzskin')) gzbool=true;
-										name=name.slice(3);
+								if(lib.characterPack[`mode_${mode}`]&&lib.characterPack[`mode_${mode}`][name]){
+									if(mode=='guozhan'){
+										nameinfo=lib.character[name];
+										if(name.indexOf('gz_shibing')==0) name=name.slice(3,11);
+										else{
+											if(lib.config.mode_config.guozhan.guozhanSkin&&lib.character[name]&&lib.character[name][4].contains('gzskin')) gzbool=true;
+											name=name.slice(3);
+										}
 									}
-								}
-								else modeimage=mode;
-								else if(lib.character[name]) nameinfo=lib.character[name];
-								else if(lib.config.show_extensionimage){
-									const pack=Object.keys(lib.characterPack).find(pack=>Object.keys(lib.characterPack[pack]).contains(name));
-									if(pack) nameinfo=lib.characterPack[pack][name];
+									else modeimage=mode;
 								}
 								else if(name.indexOf('::')!=-1){
 									name=name.split('::');
 									modeimage=name[0];
 									name=name[1];
+								}
+								else{
+									nameinfo=get.character(name);
 								}
 							}
 							if(!modeimage&&nameinfo&&nameinfo[4]) for(const value of nameinfo[4]){
@@ -8322,7 +8307,7 @@
 						if (Array.isArray(lib.onprepare)&&lib.onprepare.length){
 							_status.onprepare=Object.freeze(lib.onprepare.map(fn=>{
 								if(typeof fn!="function") return;
-								return gnc.await(fn());
+								return (gnc.is.generatorFunc(fn)?gnc.of(fn):fn)();
 							}));
 						}
 						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
@@ -8334,7 +8319,7 @@
 							if(!arrayLengths.length) return previousValue+1;
 							return previousValue+Math.min(...arrayLengths);
 						},0);
-						const packLoaded=gnc.async(function*(){
+						const packLoaded=gnc.of(function*(){
 							toLoad--;
 							if(toLoad) return;
 							if(_status.importing){
@@ -8447,13 +8432,13 @@
 						throw e;
 					});
 					var styleToLoad=6;
-					var styleLoaded=gnc.async(function*(){
+					var styleLoaded=gnc.of(function*(){
 						--styleToLoad;
 						if(styleToLoad==0){
 							if(extensionlist.length&&(lib.config.mode!='connect'||show_splash)){
 								_status.extensionLoading=[];
 								let extToLoad=extensionlist.length;
-								const extLoaded=gnc.async(function*(){
+								const extLoaded=gnc.of(function*(){
 									--extToLoad;
 									if(extToLoad==0){
 										yield Promise.allSettled(_status.extensionLoading);
@@ -8475,7 +8460,7 @@
 										continue;
 									}
 									lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,(function(i){
-										return gnc.async(function*(){
+										return gnc.of(function*(){
 											game.removeExtension(i);
 											--extToLoad;
 											if(extToLoad==0){
@@ -9123,13 +9108,13 @@
 				}
 			},
 			//lib.onload支持传入GeneratorFunction以解决异步函数的问题 by诗笺
-			onload:gnc.async(function*(){
+			onload:gnc.of(function*(){
 				const libOnload=lib.onload;
 				delete lib.onload;
 				while(Array.isArray(libOnload)&&libOnload.length){
 					const fun=libOnload.shift();
 					if(typeof fun!="function") continue;
-					yield gnc.await(fun());
+					yield (gnc.is.generatorFunc(fun)?gnc.of(fun):fun)();
 				}
 				ui.updated();
 				game.documentZoom=game.deviceZoom;
@@ -9324,7 +9309,7 @@
 					});
 				}
 
-				var proceed2=gnc.async(function*(){
+				var proceed2=gnc.of(function*(){
 					var mode=lib.imported.mode;
 					var card=lib.imported.card;
 					var character=lib.imported.character;
@@ -9738,7 +9723,8 @@
 							try{
 								_status.extension=lib.extensions[i][0];
 								_status.evaluatingExtension=lib.extensions[i][3];
-								if (typeof lib.extensions[i][1]=="function") yield gnc.await(lib.extensions[i][1](lib.extensions[i][2],lib.extensions[i][4]));
+								if (typeof lib.extensions[i][1]=="function") 
+									yield (gnc.is.coroutine(lib.extensions[i][1])?gnc.of(lib.extensions[i][1]):lib.extensions[i][1])(lib.extensions[i][2],lib.extensions[i][4]);
 								if(lib.extensions[i][4]){
 									if(lib.extensions[i][4].character){
 										for(var j in lib.extensions[i][4].character.character){
@@ -9790,7 +9776,7 @@
 					}
 					game.loop();
 				})
-				var proceed=gnc.async(function*(){
+				var proceed=gnc.of(function*(){
 					if(!lib.db){
 						try{
 							lib.storage=JSON.parse(localStorage.getItem(lib.configprefix+lib.config.mode));
@@ -9905,7 +9891,7 @@
 				while(Array.isArray(libOnload2)&&libOnload2.length){
 					const fun=libOnload2.shift();
 					if(typeof fun!="function") continue;
-					yield gnc.await(fun());
+					yield (gnc.is.generatorFunc(fun)?gnc.of(fun):fun)();
 				}
 			}),
 			startOnline:function(){
@@ -11152,6 +11138,7 @@
 			xiaosha_emotion:'小杀表情',
 			xiaotao_emotion:'小桃表情',
 			xiaojiu_emotion:'小酒表情',
+			xiaokuo_emotion:'小扩表情',
 
 			pause:'暂停',
 			config:'选项',
@@ -29916,17 +29903,29 @@
 			}
 		},
 		sort:{
+			group:function(a,b){
+				const groupSort=function(group){
+					let base=0;
+					if(group=='wei') return base;
+					if(group=='shu') return base+1;
+					if(group=='wu') return base+2;
+					if(group=='qun') return base+3;
+					if(group=='jin') return base+4;
+					if(group=='key') return base+5;
+					if(group=='western') return base+6;
+					if(group=='shen') return base+7;
+					if(group=='double') return base+7;
+					return base+9;
+				}
+				return groupSort(a)-groupSort(b);
+			},
 			character:function(a,b){
-				/*var getGroup=function(name){
-					var group=get.is.double(name,true);
-					if(group) return group[0];
-					return lib.character[name][1];
-				}*/
 				const groupSort=function(name){
-					if(!lib.character[name]) return 7;
+					const info=get.character(name);
+					if(!info) return 7;
 					let base=0;
 					if(get.is.double(name,true)) base=9;
-					const group=lib.character[name][1];
+					const group=info[1];
 					if(group=='shen') return base-1;
 					if(group=='wei') return base;
 					if(group=='shu') return base+1;
@@ -33637,7 +33636,7 @@
 				if(!lib.imported[type])lib.imported[type]={};
 				if(typeof _status.importing=="undefined")_status.importing={};
 				if(!_status.importing[type])_status.importing[type]=[];
-				const promise=gnc.await(content(lib,game,ui,get,ai,_status)).then(content2=>{
+				const promise=Promise.resolve((gnc.is.generator(content)?gnc.of(content):content)(lib,game,ui,get,ai,_status)).then(content2=>{
 					if(content2.name){
 						lib.imported[type][content2.name]=content2;
 						delete content2.name;
@@ -33647,10 +33646,10 @@
 				return promise;
 			}
 		},
-		loadExtension:gnc.async(function*(obj){
+		loadExtension:gnc.of(function*(obj){
 			var noeval=false;
 			if(typeof obj=='function'){
-				obj=yield gnc.await(obj(lib,game,ui,get,ai,_status));
+				obj=yield (gnc.is.generatorFunc(obj)?gnc.of(obj):obj)(lib,game,ui,get,ai,_status);
 				noeval=true;
 			}
 			lib.extensionMenu['extension_'+obj.name]={
@@ -33768,7 +33767,7 @@
 						}
 						if(obj.precontent){
 							_status.extension=obj.name;
-							yield gnc.await(obj.precontent(cfg));
+							yield (gnc.is.generatorFunc(obj.precontent)?gnc.of(obj.precontent):obj.precontent)(cfg);
 							delete _status.extension;
 						}
 						if(obj.content){
@@ -33822,7 +33821,7 @@
 				})();
 			}
 		},
-		importExtension:gnc.async(function*(data,finishLoad,exportext,pkg){
+		importExtension:gnc.of(function*(data,finishLoad,exportext,pkg){
 			//by 来瓶可乐加冰
 			if(!window.JSZip)
 				yield new Promise((resolve,reject)=>lib.init.js(`${lib.assetURL}game`,"jszip",resolve,reject));
@@ -42303,41 +42302,7 @@
 								}
 							}
 							alterableCharacters.sort();
-							/*var getGroup=function(name){
-								var group=get.is.double(name,true);
-								if(group) return group[0];
-								return lib.character[name][1];
-							};*/
-							const groupSort=function(name){
-								if(!lib.character[name]) return 7;
-								let base=0;
-								if(get.is.double(name,true)) base=9;
-								const group=lib.character[name][1];
-								if(group=='shen') return base-1;
-								if(group=='wei') return base;
-								if(group=='shu') return base+1;
-								if(group=='wu') return base+2;
-								if(group=='qun') return base+3;
-								if(group=='jin') return base+4;
-								if(group=='key') return base+5;
-								if(group=='western') return base+6;
-								return base+7;
-							}
-							list.sort(function(a,b){
-								var del=groupSort(a)-groupSort(b);
-								if(del!=0) return del;
-								var aa=a,bb=b;
-								if(a.indexOf('_')!=-1){
-									a=a.slice(a.lastIndexOf('_')+1);
-								}
-								if(b.indexOf('_')!=-1){
-									b=b.slice(b.lastIndexOf('_')+1);
-								}
-								if(a!=b){
-									return a>b?1:-1;
-								}
-								return aa>bb?1:-1;
-							});
+							list.sort(lib.sort.character);
 							var list2=list.slice(0);
 							var cfgnode=createConfig({
 								name:'开启',
@@ -47574,6 +47539,7 @@
 					}
 				}
 				var list=[];
+				const groups=[];
 				var dialog;
 				var node=ui.create.div('.caption.pointerspan');
 				if(get.is.phoneLayout()){
@@ -47618,6 +47584,10 @@
 						if(lib.characterFilter[i]&&!lib.characterFilter[i](get.mode())) continue;
 						if(filter&&filter(i)) continue;
 						list.push(i);
+						if(get.is.double(i)){
+							groups.add('double');
+						}
+						else groups.add(lib.character[i][1]);
 						if(namecapt.indexOf(getCapt(i))==-1){
 							namecapt.push(getCapt(i));
 						}
@@ -47626,6 +47596,7 @@
 				namecapt.sort(function(a,b){
 					return a>b?1:-1;
 				});
+				groups.sort(lib.sort.group);
 				if(!thisiscard){
 					namecapt.remove('自定义');
 					namecapt.push('newline');
@@ -47821,29 +47792,6 @@
 					}
 				}
 				if(!thisiscard){
-					var groups=['wei','shu','wu','qun','jin'];
-					var bool1=false;
-					var bool2=false;
-					var bool3=(get.mode()=='guozhan'&&_status.forceKey!=true&&get.config('onlyguozhan'));
-					var bool4=false;
-					var bool5=false;
-					for(var i in lib.character){
-						if(lib.character[i][1]=='shen'){
-							bool1=true;
-						}
-						if(lib.character[i][1]=='ye'){
-							bool5=true;
-						}
-						if(bool3||lib.character[i][1]=='key'){
-							bool2=true;
-						}
-						if(!bool4&&get.is.double(i)) bool4=true;
-						if(bool1&&bool2&&bool4&&bool5) break;
-					}
-					if(bool1) groups.add('shen');
-					if(bool2&&!bool3) groups.add('key');
-					if(bool4) groups.add('double');
-					if(bool5) groups.add('ye');
 					var natures=['water','soil','wood','metal'];
 					var span=document.createElement('span');
 					newlined.appendChild(span);
@@ -48053,45 +48001,26 @@
 							case 'zhenfa':return 5;
 							default:return 6;
 						}
-					};
+					}
+					list.sort(function(a,b){
+						var del=groupSort(a)-groupSort(b);
+						if(del!=0) return del;
+						var aa=a,bb=b;
+						if(a.indexOf('_')!=-1){
+							a=a.slice(a.lastIndexOf('_')+1);
+						}
+						if(b.indexOf('_')!=-1){
+							b=b.slice(b.lastIndexOf('_')+1);
+						}
+						if(a!=b){
+							return a>b?1:-1;
+						}
+						return aa>bb?1:-1;
+					});
 				}
 				else{
-					/*var getGroup=function(name){
-						var group=get.is.double(name,true);
-						if(group) return group[0];
-						return lib.character[name][1];
-					}*/
-					groupSort=function(name){
-						if(!lib.character[name]) return 7;
-						let base=0;
-						if(get.is.double(name,true)) base=9;
-						const group=lib.character[name][1];
-						if(group=='shen') return base-1;
-						if(group=='wei') return base;
-						if(group=='shu') return base+1;
-						if(group=='wu') return base+2;
-						if(group=='qun') return base+3;
-						if(group=='jin') return base+4;
-						if(group=='key') return base+5;
-						if(group=='western') return base+6;
-						return base+7;
-					}
+					list.sort(lib.sort.character);
 				}
-				list.sort(function(a,b){
-					var del=groupSort(a)-groupSort(b);
-					if(del!=0) return del;
-					var aa=a,bb=b;
-					if(a.indexOf('_')!=-1){
-						a=a.slice(a.lastIndexOf('_')+1);
-					}
-					if(b.indexOf('_')!=-1){
-						b=b.slice(b.lastIndexOf('_')+1);
-					}
-					if(a!=b){
-						return a>b?1:-1;
-					}
-					return aa>bb?1:-1;
-				});
 				dialog=ui.create.dialog('hidden');
 				dialog.classList.add('noupdate');
 				dialog.classList.add('scroll1');
@@ -53002,9 +52931,13 @@
 				if(lib.config.show_characternamepinyin){
 					var charactername=get.rawName(name);
 					var characterpinyin=get.pinyin(charactername);
-					var charactersex=get.translation(lib.character[name][0]);
-					var charactergroup=get.translation(lib.character[name][1]);
-					var characterhp=lib.character[name][2];
+					var nameinfo=get.character(name);
+					var charactersex=get.translation(nameinfo[0]);
+					const charactergroups=get.is.double(name,true);
+					let charactergroup;
+					if(charactergroups) charactergroup=charactergroups.map(i=>get.translation(i)).join('/')
+					else charactergroup=get.translation(nameinfo[1]);
+					var characterhp=nameinfo[2];
 					var characterintroinfo=get.characterIntro(name);
 					intro.innerHTML='<span style="font-weight:bold;margin-right:5px;line-height:2">'+charactername+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+characterpinyin+']'+'</span>'+' | '+charactersex+' | '+charactergroup+' | '+characterhp+'<br>'+characterintroinfo;
 				}
@@ -54257,6 +54190,7 @@
 			if(info.lordSkill) list.add('君主技');
 			if(info.chargingSkill) list.add('蓄能技');
 			if(info.charlotte) list.add('Charlotte');
+			if(info.sunbenSkill) list.add('昂扬技');
 			if(info.categories) list.addArray(info.categories(skill,player));
 			return list;
 		},
@@ -54344,9 +54278,10 @@
 				}
 				return false;
 			},
-			double:function(name,array){
-				if(!lib.character[name]||!lib.character[name][4]) return false;
-				for(var i of lib.character[name][4]){
+			double:(name,array)=>{
+				let info=get.character(name,4);
+				if(!info) return false;
+				for(let i of info){
 					if(i.indexOf('doublegroup:')==0){
 						if(!array) return true;
 						return i.split(':').slice(1);
@@ -54672,8 +54607,8 @@
 						_card.cards=cards.slice(0);
 						if(!lib.suits.includes(_card.suit)) _card.suit=get.suit(_card);
 						if(!Object.keys(lib.color).includes(_card.color)) _card.color=get.color(_card);
-						if(!_card.hasOwnProperty('number')) _card.number=get.number(card);
-						if(!_card.hasOwnProperty('nature')) _card.nature=get.nature(card);
+						if(!_card.hasOwnProperty('number')) _card.number=get.number(_card);
+						if(!_card.hasOwnProperty('nature')) _card.nature=(get.nature(_card)||false);
 					}
 				}
 			}
@@ -54792,14 +54727,10 @@
 			}
 		},
 		character:function(name,num){
-			var info=lib.character[name];
+			let info=lib.character[name];
 			if(!info){
-				for(var i in lib.characterPack){
-					if(lib.characterPack[i][name]){
-						info=lib.characterPack[i][name];
-						break;
-					}
-				}
+				const pack=Object.keys(lib.characterPack).find(pack=>lib.characterPack[pack].hasOwnProperty(name));
+				if(pack) info=lib.characterPack[pack][name];
 			}
 			if(info){
 				if(typeof num=='number'){
@@ -56007,14 +55938,13 @@
 		},
 		number:function(card,player){
 			//狗卡你是真敢出啊
-			var number;
+			var number=null;
 			if(card.hasOwnProperty('number')){
 				number=card.number;
-				if(typeof number!='number') return null;
+				if(typeof number!='number') number=null;
 			}
 			else{
-				if(card.cards&&card.cards.length==1) return get.number(card.cards[0]);
-				return null;
+				if(card.cards&&card.cards.length==1) number=get.number(card.cards[0],false);
 			}
 			if(player!==false){
 				var owner=player||get.owner(card);
@@ -56949,8 +56879,8 @@
 					node=node.link;
 				}
 				var capt=get.translation(node.name);
-				if((lib.character[node.name]&&lib.character[node.name][1])||lib.group.contains(node.group)){
-					capt+='&nbsp;&nbsp;'+(lib.group.contains(node.group)?get.translation(node.group):lib.translate[lib.character[node.name][1]]);
+				if(lib.group.contains(node.group)||get.character(node.name,1)){
+					capt+='&nbsp;&nbsp;'+(lib.group.contains(node.group)?get.translation(node.group):get.translation(get.character(node.name,1)));
 				}
 				uiintro.add(capt);
 
@@ -57656,8 +57586,8 @@
 				}
 			}
 			else if(node.classList.contains('character')){
-				var character=node.link;
-				if(lib.character[node.link]&&lib.character[node.link][1]){
+				var character=node.link,characterinfo=get.character(node.link);
+				if(characterinfo&&characterinfo[1]){
 					var group=get.is.double(node.link,true);
 					if(group){
 						var str=get.translation(character)+'&nbsp;&nbsp;';
@@ -57667,7 +57597,7 @@
 						}
 						uiintro.add(str);
 					}
-					else uiintro.add(get.translation(character)+'&nbsp;&nbsp;'+lib.translate[lib.character[node.link][1]]);
+					else uiintro.add(get.translation(character)+'&nbsp;&nbsp;'+lib.translate[characterinfo[1]]);
 				}
 				else{
 					uiintro.add(get.translation(character));
@@ -57773,14 +57703,7 @@
 					ui.create.div('.placeholder.slim',uiintro.content);
 				}
 				else{
-					var infoitem=lib.character[character];
-					if(!infoitem){
-						for(var itemx in lib.characterPack){
-							if(lib.characterPack[itemx][character]){
-								infoitem=lib.characterPack[itemx][character];break;
-							}
-						}
-					}
+					var infoitem=get.character(character);
 					var skills=infoitem[3];
 					for(i=0;i<skills.length;i++){
 						if(lib.translate[skills[i]+'_info']){
