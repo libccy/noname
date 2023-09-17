@@ -1017,7 +1017,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.responded||event.type=='wuxie'||event.olqifan) return false;
 					for(var i of lib.inpile){
-						if(i!='wuxie'&&get.type(i)=='basic'&&event.filterCard({name:i},player,event)) return true;
+						if(i!='wuxie'&&event.filterCard({name:i},player,event)) return true;
 					}
 					return false;
 				},
@@ -1040,7 +1040,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return evt.filterCard(card,evt.player,evt);
 					})).set('ai',function(button){
-						var evt=_status.event.getParent(3);
+						if(get.type(button.link)=='equip') return 0;
+						var evt=_status.event.getParent(3),player=_status.event.player;
+						if(evt.type=='phase'&&!player.hasValueTarget(button.link,null,true)) return 0;
 						if(evt&&evt.ai){
 							var tmp=_status.event;
 							_status.event=evt;
@@ -1075,7 +1077,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.tag(card,'respondSha')) return 0.7;
 						}
 					},
-					order:11,
+					order:12,
 					respondShan:true,
 					respondSha:true,
 					result:{
@@ -1104,7 +1106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.num=Math.min(3,player.getStorage('olqifan').length);
 							'step 1'
 							event.num--;
-							var pos=('jeh')[event.num],hs=player.countCards('h');
+							var pos=('jeh')[event.num],hs=player.countCards(pos);
 							if(hs>0) player.chooseToDiscard(hs,pos,true);
 							if(event.num>0) event.redo();
 						},
@@ -1117,7 +1119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete event.result.skill;
 					var name=event.result.card.name;
 					event.result.cards=event.result.card.cards.slice(0);
-					event.result.card=get.autoViewAs({name:name},event.result.cards);
+					event.result.card=get.autoViewAs({name:name,isCard:true},event.result.cards);
 					player.markAuto('olqifan',[get.type2(event.result.card,false)]);
 					event.getParent().set('olqifan_discard',true);
 					player.addTempSkill('olqifan_discard');
@@ -1135,7 +1137,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					targetInRange:(card)=>{
 						if(card.storage&&card.storage.oltuishi) return true;
-					}
+					},
+					aiValue:(player,card,val)=>{
+						if(card.name=='wuxie') return 0;
+						var num=get.number(card);
+						if([1,11,12,13].includes(num)) return val*1.1;
+					},
+					aiUseful:(player,card,val)=>{
+						if(card.name=='wuxie') return 0;
+						var num=get.number(card);
+						if([1,11,12,13].includes(num)) return val*1.1;
+					},
+					aiOrder:(player,card,order)=>{
+						if(get.name(card)=='sha'&&player.hasSkill('oltuishi_unlimit')) order+=9;
+						var num=get.number(card);
+						if([1,11,12,13].includes(num)) order+=3;
+						return order;
+					},
 				},
 				trigger:{player:'useCardAfter'},
 				forced:true,
@@ -1169,6 +1187,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.getStat('card')[card.name]--;
 							}
 						},
+						mark:true,
+						intro:{content:'使用的下一张牌无距离次数限制'},
 					},
 				},
 			},
