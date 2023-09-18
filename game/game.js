@@ -28510,16 +28510,32 @@
 					}
 					return this;
 				},
-				setContent:function(name){
-					if(typeof name=='function'){
-						this.content=lib.init.parsex(name);
-					}
-					else{
-						if(!lib.element.content[name]._parsed){
-							lib.element.content[name]=lib.init.parsex(lib.element.content[name]);
-							lib.element.content[name]._parsed=true;
-						}
-						this.content=lib.element.content[name];
+				setContent:function(item){
+					switch(typeof item){
+						case "object":
+							if(Array.isArray(item)){
+								// TODO: Parse Array
+								throw new Error("NYI: Parse Common Object");
+							}
+							else{
+								// TODO: Parse Common Object
+								throw new Error("NYI: Parse Common Object");
+							}
+							break;
+						case "function":
+							if (gnc.is.generatorFunc(item)) {
+								// TODO: Parse Generator Function
+								throw new Error("NYI: Pase Generator Function");
+							}
+							else this.content=lib.init.parsex(item);
+							break;
+						default:
+							if(!lib.element.content[item]._parsed){
+								lib.element.content[item]=lib.init.parsex(lib.element.content[item]);
+								lib.element.content[item]._parsed=true;
+							}
+							this.content=lib.element.content[item];
+							break;
 					}
 					return this;
 				},
