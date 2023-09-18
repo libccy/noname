@@ -19167,6 +19167,98 @@
 				},
 			},
 			player:{
+				/**
+				 * version 1.2
+				 * 
+				 * 链式创建一次性技能的api。
+				 *
+				 * 使用者只需要关注技能的效果，而不是技能的本身。
+				 */
+				when:function(){
+					var triggerNames=Array.from(arguments);
+					if(triggerNames.length==0) throw 'player.when的参数数量应大于0';
+					var skillName='player_when_'+Math.random().toString(36).slice(-8);
+					while(lib.skill[skillName]!=null){
+						skillName='player_when_'+Math.random().toString(36).slice(-8);
+					}
+					var skill={
+						forced:true,
+						charlotte:true,
+						popup:false,
+						filterFuns:[],
+						contentFuns:[],
+						get filter(){
+							return function(event, player, name){
+								if(name==`${skillName}After`){
+									skill.popup=false;
+									return true;
+								}
+								return skill.filterFuns.every(fun=>Boolean(fun(event,player,name)));
+							}
+						},
+					};
+					skill.trigger={player:triggerNames};
+					skill.filterFuns.push((event, player, name) => {
+						return !name||(triggerNames.includes(name)&&event.player==player);
+					});
+					Object.defineProperty(lib.skill,skillName,{
+						configurable:true,
+						enumerable:false,
+						writable:true,
+						value:skill
+					});
+					this.addSkill(skillName);
+					return{
+						filter(fun){
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							skill.filterFuns.push(fun);
+							return this;
+						},
+						removeFilter(fun){
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							skill.filterFuns.remove(fun);
+							return this;
+						},
+						then(fun){
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							skill.contentFuns.push(fun);
+							var str=`
+								function content(){
+									if(event.triggername=='${skillName}After'){
+										player.removeSkill('${skillName}');
+										delete lib.skill['${skillName}'];
+										delete lib.translate['${skillName}']
+										console.log('remove ${skillName}');
+										return event.finish();
+									}
+							`;
+							for(var i=0;i<skill.contentFuns.length;i++){
+								var fun2=skill.contentFuns[i];
+								var a=fun2.toString();
+								var str2=a.slice(a.indexOf("{")+1,a.lastIndexOf("}")!=-1?a.lastIndexOf("}"):undefined).trim().split('\n').map(v=>v[v.length - 1]!= ';'?(v+';').trim():v.trim()).join('\n');
+								str+=`'step ${i}'\n\t${str2}\n\t`;
+							}
+							var result=eval(str+`\n};content;`);
+							skill.content=result;
+							return this;
+						},
+						popup(str){
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(typeof str=='string') skill.popup=str;
+							return this;
+						},
+						translation(translation){
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(typeof translation=='string') lib.translate[skillName]=translation;
+							return this;
+						},
+						assgin(obj) {
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(typeof obj=='object'&&obj!==null) Object.assign(skill,obj);
+							return this;
+						}
+					};
+				},
 				//新函数
 				//让一名角色明置一些手牌
 				addShownCards:function(){
