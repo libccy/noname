@@ -9727,7 +9727,7 @@
 								_status.extension=lib.extensions[i][0];
 								_status.evaluatingExtension=lib.extensions[i][3];
 								if (typeof lib.extensions[i][1]=="function") 
-									yield (gnc.is.coroutine(lib.extensions[i][1])?gnc.of(lib.extensions[i][1]):lib.extensions[i][1])(lib.extensions[i][2],lib.extensions[i][4]);
+									yield (gnc.is.coroutine(lib.extensions[i][1])?gnc.of(lib.extensions[i][1]):lib.extensions[i][1]).call(lib.extensions[i],lib.extensions[i][2],lib.extensions[i][4]);
 								if(lib.extensions[i][4]){
 									if(lib.extensions[i][4].character){
 										for(var j in lib.extensions[i][4].character.character){
@@ -10019,8 +10019,7 @@
 			js:(path,file,onload,onerror)=>{
 				if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
 				if(path==`${lib.assetURL}mode`&&lib.config.all.stockmode.indexOf(file)==-1){
-					lib.init[`setMode_${file}`]();
-					onload();
+					lib.genAwait(lib.init[`setMode_${file}`]()).then(onload);
 					return;
 				}
 				if(Array.isArray(file)){
@@ -33942,7 +33941,7 @@
 						}
 						if(obj.precontent){
 							_status.extension=obj.name;
-							yield (gnc.is.generatorFunc(obj.precontent)?gnc.of(obj.precontent):obj.precontent)(cfg);
+							yield (gnc.is.generatorFunc(obj.precontent)?gnc.of(obj.precontent):obj.precontent).call(obj,cfg);
 							delete _status.extension;
 						}
 						if(obj.content){
@@ -36591,12 +36590,12 @@
 				splash:imgsrc,
 				fromextension:true
 			}
-			lib.init['setMode_'+name]=function(){
-				game.import('mode',function(lib,game,ui,get,ai,_status){
+			lib.init['setMode_'+name]=gnc.of(function*(){
+				yield game.import('mode',function(lib,game,ui,get,ai,_status){
 					info.name=name;
 					return info;
 				});
-			}
+			});
 			if(!lib.config.extensionInfo[extname]){
 				lib.config.extensionInfo[extname]={};
 			}
@@ -38299,7 +38298,8 @@
 		},
 		loadModeAsync:function(name,callback){
 			window.game=game;
-			var script=lib.init.js(lib.assetURL+'mode',name,function(){
+			var script=lib.init.js(lib.assetURL+'mode',name,gnc.of(function*(){
+				yield Promise.allSettled(_status.importing.mode);
 				if(!lib.config.dev) delete window.game;
 				script.remove();
 				var content=lib.imported.mode[name];
@@ -38308,7 +38308,7 @@
 					delete lib.imported.mode;
 				}
 				callback(content);
-			});
+			}));
 		},
 		switchMode:function(name,configx){
 			if(!lib.layoutfixed.contains(name)){
@@ -38322,7 +38322,8 @@
 				}
 			}
 			window.game=game;
-			var script=lib.init.js(lib.assetURL+'mode',name,function(){
+			var script=lib.init.js(lib.assetURL+'mode',name,gnc.of(function*(){
+				yield Promise.allSettled(_status.importing.mode);
 				if(!lib.config.dev) delete window.game;
 				script.remove();
 				var mode=lib.imported.mode;
@@ -38497,7 +38498,7 @@
 						game.loop();
 					});
 				}
-			});
+			}));
 		},
 		loadMode:function(mode){
 			var next=game.createEvent('loadMode',false);
