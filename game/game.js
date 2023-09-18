@@ -10235,47 +10235,103 @@
 					localStorage.removeItem(lib.configprefix+'background');
 				}
 			},
-			//by 诗笺、Tipx-L
-			parsex:function(func){
-				//Remove all comments
-				//移除所有注释
-				var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^\/"'\\\s]*)/mg,'$2').trim();
-				//获取第一个 { 后的所有字符
-				str=str.slice(str.indexOf('{')+1);
-				//func中要写步骤的话，必须要写step 0
-				if(str.indexOf('step 0')==-1){
-					str='{if(event.step==1) {event.finish();return;}\n'+str;
-				}else{
-					var skip=0;
-					//每层最多找99个step
-					for (var k=0;k<99;k++) {
-						//正则表达式
-						var reg=new RegExp(`['"]step ${k}['"]`);
-						var result=str.slice(skip).match(reg);
-						if(result==null) break;
-						var insertStr;
-						if(k==0){
-							insertStr=`switch(step){case 0:`;
-						}else{
-							insertStr=`break;case ${k}:`;
+			parsex:function(item){
+				//by 诗笺、Tipx-L
+				function Legacy(func){
+					//Remove all comments
+					//移除所有注释
+					var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^\/"'\\\s]*)/mg,'$2').trim();
+					//获取第一个 { 后的所有字符
+					str=str.slice(str.indexOf('{')+1);
+					//func中要写步骤的话，必须要写step 0
+					if(str.indexOf('step 0')==-1){
+						str='{if(event.step==1) {event.finish();return;}\n'+str;
+					}else{
+						var skip=0;
+						//每层最多找99个step
+						for (var k=0;k<99;k++) {
+							//正则表达式
+							var reg=new RegExp(`['"]step ${k}['"]`);
+							var result=str.slice(skip).match(reg);
+							if(result==null) break;
+							var insertStr;
+							if(k==0){
+								insertStr=`switch(step){case 0:`;
+							}else{
+								insertStr=`break;case ${k}:`;
+							}
+							var copy=str;
+							copy=copy.slice(0,skip+result.index)+insertStr+copy.slice(skip+result.index+result[0].length);
+							//测试是否有错误
+							try{
+								new Function(copy);
+								str=copy;
+								skip+=result.index+insertStr.length;
+							}catch(error){
+								k--;
+								skip+=result.index+result[0].length;
+							}
 						}
-						var copy=str;
-						copy=copy.slice(0,skip+result.index)+insertStr+copy.slice(skip+result.index+result[0].length);
-						//测试是否有错误
-						try{
-							new Function(copy);
-							str=copy;
-							skip+=result.index+insertStr.length;
-						}catch(error){
-							k--;
-							skip+=result.index+result[0].length;
-						}
+						str=`if(event.step==${k}){event.finish();return;}`+str;
 					}
-					str=`if(event.step==${k}){event.finish();return;}`+str;
+					return (new Function('event','step','source','player','target','targets',
+						'card','cards','skill','forced','num','trigger','result',
+						'_status','lib','game','ui','get','ai',str));
 				}
-				return (new Function('event','step','source','player','target','targets',
-					'card','cards','skill','forced','num','trigger','result',
-					'_status','lib','game','ui','get','ai',str));
+				switch(typeof item){
+					case "object":
+						if(Array.isArray(item)){
+							let lastEvent=null;
+							return (event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai)=>{
+								if(step>=item.length) return event.finish();
+								var current=item[step];
+								lastEvent=current(event,{
+									event:event,
+									step:step,
+									source:source,
+									player:player,
+									target:target,
+									targets:targets,
+									card:card,
+									cards:cards,
+									skill:skill,
+									forced:forced,
+									num:num,
+									trigger:trigger,
+									result:result
+								},(lastEvent&&("result" in lastEvent))?lastEvent.result:null);
+							}
+						}
+						else{
+							// TODO: Parse Common Object
+							throw new Error("NYI: Parse Common Object");
+						}
+					case "function":
+						if (gnc.is.generatorFunc(item)) {
+							let gen,lastEvent;
+							return (event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai)=>{
+								if(!gen)gen=item(event,{
+									event:event,
+									step:step,
+									source:source,
+									player:player,
+									target:target,
+									targets:targets,
+									card:card,
+									cards:cards,
+									skill:skill,
+									forced:forced,
+									num:num,
+									trigger:trigger,
+									result:result
+								});
+								var res=gen.next((lastEvent&&("result" in lastEvent))?lastEvent.result:null);
+								if(res.done) event.finish();
+								else lastEvent=res.value;
+							}
+						}
+						else return Legacy(item);
+				}
 			},
 			eval:function(func){
 				if(typeof func=='function'){
@@ -28603,16 +28659,19 @@
 					}
 					return this;
 				},
-				setContent:function(name){
-					if(typeof name=='function'){
-						this.content=lib.init.parsex(name);
-					}
-					else{
-						if(!lib.element.content[name]._parsed){
-							lib.element.content[name]=lib.init.parsex(lib.element.content[name]);
-							lib.element.content[name]._parsed=true;
-						}
-						this.content=lib.element.content[name];
+				setContent:function(item){
+					switch(typeof item){
+						case "object":
+						case "function":
+							this.content=lib.init.parsex(item);
+							break;
+						default:
+							if(!lib.element.content[item]._parsed){
+								lib.element.content[item]=lib.init.parsex(lib.element.content[item]);
+								lib.element.content[item]._parsed=true;
+							}
+							this.content=lib.element.content[item];
+							break;
 					}
 					return this;
 				},
