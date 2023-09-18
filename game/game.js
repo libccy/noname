@@ -1,5 +1,5 @@
 "use strict";
-(()=>{
+{
 	if(!localStorage.getItem('gplv3_noname_alerted')){
 		if(confirm('①无名杀是一款基于GPLv3协议的开源软件！\n你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。\n点击“确定”即代表您认可并接受GPLv3协议↓️\nhttps://www.gnu.org/licenses/gpl-3.0.html\n②无名杀官方发布地址仅有GitHub仓库！\n其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！')){
 			localStorage.setItem('gplv3_noname_alerted',true);
@@ -7275,31 +7275,31 @@
 			}
 		},
 		comparator:{
-			e:function(){
+			equals:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return false;
 				return true;
 			},
-			ei:function(){
+			equalAny:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return true;
 				return false;
 			},
-			ne:function(){
+			notEquals:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return false;
 				return true;
 			},
-			nei:function(){
+			notEqualAny:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return true;
 				return false;
 			},
-			te:function(){
+			typeEquals:function(){
 				if(arguments.length==0)return false;
 				if(arguments.length==1)return arguments[0]!==null;
 				const type=typeof arguments[0];
@@ -8323,7 +8323,7 @@
 							toLoad--;
 							if(toLoad) return;
 							if(_status.importing){
-								let promises=lib.creation.a;
+								let promises=lib.creation.array;
 								for(const type in _status.importing){
 									promises.addArray(_status.importing[type])
 								}
@@ -8404,22 +8404,22 @@
 
 					window.game=game;
 					game.dynamicStyle.init();
-					Object.defineProperty(lib.creation,"a",{
+					Object.defineProperty(lib.creation,"array",{
 						enumerable:true,
 						get:()=>[],
 						set:()=>null
 					});
-					Object.defineProperty(lib.creation,"o",{
+					Object.defineProperty(lib.creation,"object",{
 						enumerable:true,
 						get:()=>({}),
 						set:()=>null
 					});
-					Object.defineProperty(lib.creation,"no",{
+					Object.defineProperty(lib.creation,"nullObject",{
 						enumerable:true,
 						get:()=>Object.create(null),
 						set:()=>null
 					});
-					Object.defineProperty(lib.creation,"s",{
+					Object.defineProperty(lib.creation,"string",{
 						enumerable:true,
 						get:()=>"",
 						set:()=>null
@@ -9724,7 +9724,7 @@
 								_status.extension=lib.extensions[i][0];
 								_status.evaluatingExtension=lib.extensions[i][3];
 								if (typeof lib.extensions[i][1]=="function") 
-									yield (gnc.is.coroutine(lib.extensions[i][1])?gnc.of(lib.extensions[i][1]):lib.extensions[i][1])(lib.extensions[i][2],lib.extensions[i][4]);
+									yield (gnc.is.coroutine(lib.extensions[i][1])?gnc.of(lib.extensions[i][1]):lib.extensions[i][1]).call(lib.extensions[i],lib.extensions[i][2],lib.extensions[i][4]);
 								if(lib.extensions[i][4]){
 									if(lib.extensions[i][4].character){
 										for(var j in lib.extensions[i][4].character.character){
@@ -10016,8 +10016,7 @@
 			js:(path,file,onload,onerror)=>{
 				if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
 				if(path==`${lib.assetURL}mode`&&lib.config.all.stockmode.indexOf(file)==-1){
-					lib.init[`setMode_${file}`]();
-					onload();
+					lib.genAwait(lib.init[`setMode_${file}`]()).then(onload);
 					return;
 				}
 				if(Array.isArray(file)){
@@ -32583,8 +32582,7 @@
 			'妹子，交个朋友吧',
 		],
 		other:{
-			bool:(item)=>Boolean(item),
-			ignore:()=>{}
+			ignore:()=>void 0
 		}
 	};
 	const game={
@@ -32624,15 +32622,15 @@
 		//基于钩子的添加势力方法
 		addGroup:(id,short,name,config)=>{
 			if(!id) throw new TypeError();
-			if(lib.comparator.te(short,"object")){
+			if(lib.comparator.typeEquals(short,"object")){
 				config=short;
 				short=null;
 			}
-			if(lib.comparator.te(name,"object")){
+			if(lib.comparator.typeEquals(name,"object")){
 				config=name;
 				name=null;
 			}
-			if(!lib.comparator.te(short,"string")&&short){
+			if(!lib.comparator.typeEquals(short,"string")&&short){
 				name=short;
 			}
 			lib.group.add(id);
@@ -33801,23 +33799,23 @@
 				}
 			}
 		},
-		import:function(type,content){
+		import:function(type,content,url){
 			if(type=='extension'){
-				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
 				const promise=game.loadExtension(content);
+				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
 				_status.extensionLoading.add(promise);
 				return promise;
 			}
 			else{
 				if(!lib.imported[type])lib.imported[type]={};
-				if(typeof _status.importing=="undefined")_status.importing={};
-				if(!_status.importing[type])_status.importing[type]=[];
 				const promise=Promise.resolve((gnc.is.generator(content)?gnc.of(content):content)(lib,game,ui,get,ai,_status)).then(content2=>{
 					if(content2.name){
 						lib.imported[type][content2.name]=content2;
 						delete content2.name;
 					}
 				});
+				if(typeof _status.importing=="undefined")_status.importing={};
+				if(!_status.importing[type])_status.importing[type]=[];
 				_status.importing[type].add(promise);
 				return promise;
 			}
@@ -33943,7 +33941,7 @@
 						}
 						if(obj.precontent){
 							_status.extension=obj.name;
-							yield (gnc.is.generatorFunc(obj.precontent)?gnc.of(obj.precontent):obj.precontent)(cfg);
+							yield (gnc.is.generatorFunc(obj.precontent)?gnc.of(obj.precontent):obj.precontent).call(obj,cfg);
 							delete _status.extension;
 						}
 						if(obj.content){
@@ -36594,12 +36592,12 @@
 				splash:imgsrc,
 				fromextension:true
 			}
-			lib.init['setMode_'+name]=function(){
-				game.import('mode',function(lib,game,ui,get,ai,_status){
+			lib.init['setMode_'+name]=gnc.of(function*(){
+				yield game.import('mode',function(lib,game,ui,get,ai,_status){
 					info.name=name;
 					return info;
 				});
-			}
+			});
 			if(!lib.config.extensionInfo[extname]){
 				lib.config.extensionInfo[extname]={};
 			}
@@ -38302,7 +38300,8 @@
 		},
 		loadModeAsync:function(name,callback){
 			window.game=game;
-			var script=lib.init.js(lib.assetURL+'mode',name,function(){
+			var script=lib.init.js(lib.assetURL+'mode',name,gnc.of(function*(){
+				yield Promise.allSettled(_status.importing.mode);
 				if(!lib.config.dev) delete window.game;
 				script.remove();
 				var content=lib.imported.mode[name];
@@ -38311,7 +38310,7 @@
 					delete lib.imported.mode;
 				}
 				callback(content);
-			});
+			}));
 		},
 		switchMode:function(name,configx){
 			if(!lib.layoutfixed.contains(name)){
@@ -38325,7 +38324,8 @@
 				}
 			}
 			window.game=game;
-			var script=lib.init.js(lib.assetURL+'mode',name,function(){
+			var script=lib.init.js(lib.assetURL+'mode',name,gnc.of(function*(){
+				yield Promise.allSettled(_status.importing.mode);
 				if(!lib.config.dev) delete window.game;
 				script.remove();
 				var mode=lib.imported.mode;
@@ -38500,7 +38500,7 @@
 						game.loop();
 					});
 				}
-			});
+			}));
 		},
 		loadMode:function(mode){
 			var next=game.createEvent('loadMode',false);
@@ -59062,4 +59062,4 @@
 		get:get
 	};
 	lib.init.init();
-})();
+}
