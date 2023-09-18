@@ -18763,7 +18763,7 @@
 								var reg=new RegExp("^ext:(.+)?/");
 								var match=tag.match(/^die:(.+)$/);
 								if(match){
-									let path=match[1];
+									var path=match[1];
 									if(reg.test(path)) path=path.replace(reg,(_o,p)=>`../extension/${p}/`);
 									game.playAudio(path);
 								}
