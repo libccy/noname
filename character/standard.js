@@ -1166,15 +1166,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var top=result.moved[0];
 					var bottom=result.moved[1];
 					top.reverse();
-					for(var i=0;i<top.length;i++){
-						ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
-					}
-					for(i=0;i<bottom.length;i++){
-						ui.cardPile.appendChild(bottom[i]);
-					}
+					game.cardsGotoPile(
+						top.concat(bottom),
+						['top_cards',top],
+						function(event,card){
+							if(event.top_cards.includes(card)) return ui.cardPile.firstChild;
+							return null;
+						}
+					)
 					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
 					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
-					game.updateRoundNumber();
+					"step 2"
 					game.delayx();
 				},
 				ai:{
@@ -2481,7 +2483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_zhangliao:['sp_zhangliao','yj_zhangliao','jsrg_zhangliao'],
 			xiahoudun:['re_xiahoudun','xin_xiahoudun','xiahoudun'],
 			liubei:['re_liubei','liubei','dc_liubei','junk_liubei'],
-			guanyu:['re_guanyu','guanyu','jsrg_guanyu','ps_guanyu'],
+			guanyu:['re_guanyu','guanyu','ps_guanyu'],
 			zhangfei:['re_zhangfei','tw_zhangfei','xin_zhangfei','old_zhangfei','zhangfei','yj_zhangfei'],
 			zhaoyun:['re_zhaoyun','old_zhaoyun','zhaoyun','ps2063_zhaoyun','ps2067_zhaoyun'],
 			sp_zhaoyun:['sp_zhaoyun','jsp_zhaoyun'],
@@ -2640,7 +2642,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			keji_info:'弃牌阶段开始时，若你于本回合的出牌阶段内没有过使用或打出过【杀】，则你可以跳过此阶段。',
 			kurou_info:'出牌阶段，你可以失去一点体力，然后摸两张牌。',
 			yingzi_info:'摸牌阶段，你可以多摸一张牌。',
-			fanjian_info:'出牌阶段限一次。你可以令一名角色选择一种花色，然后其获得你的一张手牌。若其以此法选择的花色与其获得的牌花色不同，则你对其造成1点伤害。',
+			fanjian_info:'出牌阶段限一次。你可以令一名角色选择一种花色，然后其获得你的一张手牌。若其以此法选择的花色与其得到的牌花色不同，则你对其造成1点伤害。',
 			guose_info:'你可以将一张方片牌当做【乐不思蜀】使用。',
 			liuli_info:'当你成为【杀】的目标时，你可以弃置一张牌并将此【杀】转移给攻击范围内的一名其他角色（不能是此【杀】的使用者）。',
 			qianxun_info:'锁定技，你不能成为【顺手牵羊】和【乐不思蜀】的目标。',

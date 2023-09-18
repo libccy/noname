@@ -332,6 +332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.getAllHistory('useSkill',evt=>evt.skill=='regongao'&&evt.targets[0]==event.player).length;
 				},
 				forced:true,
+				logTarget:'player',
 				content:function(){
 					player.gainMaxHp();
 					player.recover();
@@ -380,17 +381,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.group=='wei';
 					});
 				},
-				init:function(player){
-					if(player.hasZhuSkill('rexingshuai')){
-						player.markSkill('rexingshuai');
-						player.storage.rexingshuai=false;
-					}
-				},
-				intro:{
-					content:'limited',
-				},
 				limited:true,
-				mark:false,
+				mark:true,
 				content:function(){
 					'step 0'
 					player.awakenSkill('rexingshuai');
@@ -5148,6 +5140,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 					}
 					if(player==event.player) return false;
+					if(event.giver||event.getParent().name=='gift') return false;
 					var evt=event.getl(player);
 					return evt&&evt.cards2&&evt.cards2.length>0;
 				},
@@ -8168,7 +8161,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget([1,player.hp],get.prompt2('wulie'),lib.filter.notMe).set('ai',function(){return 0});
+					player.chooseTarget([1,player.hp],get.prompt2('wulie'),lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player;
+						if(player.hasUnknown()) return 0;
+						if(player.hp-ui.selected.targets.length>1+player.countCards('hs',card=>player.canSaveCard(card,player))) return get.attitude(player,target);
+						return 0;
+					});
 					'step 1'
 					if(result.bool){
 						var targets=result.targets.sortBySeat();
@@ -9119,7 +9117,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:function(player){
 							if(player.hp<3) return false;
 							var mindist=player.hp;
-							if(player.countCards('hs',{name:['tao','jiu']})) mindist++;
+							if(player.countCards('hs',card=>player.canSave(card,player))) mindist++;
 							if(game.hasPlayer(function(current){
 								return (get.distance(player,current)<=mindist&&
 									player.canUse('sha',current,false)&&
@@ -9309,8 +9307,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.$compare(event.card1,target,event.card2);
 					game.delay(4);
 					"step 6"
+					var next=game.createEvent('showCards');
+					next.player=player;
+					next.cards=[event.card1];
+					next.setContent('emptyEvent');
 					game.log(player,'展示了',event.card1);
+					"step 7"
+					var next=game.createEvent('showCards');
+					next.player=target;
+					next.cards=[event.card2];
+					next.setContent('emptyEvent');
 					game.log(target,'展示了',event.card2);
+					"step 8"
 					var name1=get.name(event.card1);
 					var name2=get.name(event.card2);
 					if(name1=='sha'&&name2!='shan'){
@@ -9688,20 +9696,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					'step 1'
 					if(player.hp<3) player.recover(3-player.hp);
-					game.log(player,'获得了技能','#g【思蜀】','和','#g【激将】');
-					player.addSkill('sishu');
-					if(player.hasSkill('olruoyu')){
-						player.addSkill('rejijiang');
-					}
-					else{
-						player.addAdditionalSkill('olruoyu','rejijiang');
-					}
-					if(!player.isZhu){
-						player.storage.zhuSkill_olruoyu=['rejijiang'];
-					}
-					else{
-						event.trigger('zhuUpdate');
-					}
+					player.addSkillLog('sishu');
+					player.addSkillLog('rejijiang');
+					'step 2'
+					if(player.isZhu2()) event.trigger('zhuUpdate');
 				}
 			},
 			olfangquan:{
@@ -10934,7 +10932,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				viewAs:{
 					name:"huogong",
-					nature:"fire",
 				},
 				viewAsFilter:function (player){
 					if(!player.countCards('hes',{color:'red'})) return false;
@@ -11863,22 +11860,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var top=result.moved[0];
 					var bottom=result.moved[1];
 					top.reverse();
-					for(var i=0;i<top.length;i++){
-						ui.cardPile.insertBefore(top[i],ui.cardPile.firstChild);
-					}
-					for(i=0;i<bottom.length;i++){
-						ui.cardPile.appendChild(bottom[i]);
-					}
+					game.cardsGotoPile(
+						top.concat(bottom),
+						['top_cards',top],
+						function(event,card){
+							if(event.top_cards.includes(card)) return ui.cardPile.firstChild;
+							return null;
+						}
+					)
 					if(event.triggername=='phaseZhunbeiBegin'&&top.length==0){
 						player.addTempSkill('reguanxing_on');
 					}
 					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
 					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
-					game.updateRoundNumber();
+					"step 2"
 					game.delayx();
 				},
 				subSkill:{
-					on:{}
+					on:{charlotte:true}
 				}
 			},
 			reluoshen:{
@@ -14347,8 +14346,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reguanxing:'观星',
 			reguanxing_info:'准备阶段，你可以观看牌堆顶的5张牌（存活角色小于4时改为3张），并将其以任意顺序置于牌堆项或牌堆底，若你将〖观星〗的牌都放在了牌堆底，则你可以在结束阶段再次发动〖观星〗。',
 			reluoshen:'洛神',
-			reluoshen_info:'准备阶段，你可以进行判定，若结果为黑色则获得此判定牌，且可重复此流程直到出现红色的判定结果。你通过〖洛神〗获得的牌，不计入当前回合的手牌上限。',
-			reluoshen_info_guozhan:'准备阶段，你可以进行判定，若为黑色则可以继续判定，直到出现红色。然后你获得所有黑色的判定牌。你通过〖洛神〗获得的牌，不计入当前回合的手牌上限（结果为黑色的判定牌于此过程中不会进入弃牌堆）。',
+			reluoshen_info:'准备阶段，你可以进行判定，若结果为黑色则获得此判定牌，且可重复此流程直到出现红色的判定结果。你通过〖洛神〗得到的牌不计入当前回合的手牌上限。',
+			reluoshen_info_guozhan:'准备阶段，你可以进行判定，若为黑色则可以继续判定，直到出现红色。然后你获得所有黑色的判定牌。你通过〖洛神〗得到的牌不计入当前回合的手牌上限（结果为黑色的判定牌于此过程中不会进入弃牌堆）。',
 			rejieyin:'结姻',
 			rejieyin_info:'出牌阶段限一次，你可以选择一名男性角色并弃置一张手牌或将装备区内的一张装备牌置于其装备区，你与其体力较高的角色摸一张牌，体力值较低的角色回复1点体力。',
 			rebiyue:'闭月',
@@ -14389,7 +14388,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_tishen2":"替身",
 			"new_tishen2_info":"",
 			"new_qingjian":"清俭",
-			"new_qingjian_info":"当你于摸牌阶段外获得牌时，你可以展示任意张牌并交给一名其他角色。然后，当前回合角色本回合的手牌上限+X（X为你给出的牌中包含的类别数）。每回合限一次。",
+			"new_qingjian_info":"当你于摸牌阶段外得到牌后，你可以展示任意张牌并交给一名其他角色。然后，当前回合角色本回合的手牌上限+X（X为你给出的牌中包含的类别数）。每回合限一次。",
 			"qingjian_add":"清俭",
 			"qingjian_add_info":"",
 			"new_reqingnang":"青囊",
@@ -14468,7 +14467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relianying_info:'当你失去最后的手牌时，你可以令至多X名角色各摸一张牌（X为你此次失去的手牌数）。',
 			reyingzi_info:'锁定技，摸牌阶段摸牌时，你额外摸一张牌；你的手牌上限为你的体力上限。',
 			refanjian_info:'出牌阶段限一次，你可以展示一张手牌并将此牌交给一名其他角色。然后该角色选择一项：展示其手牌并弃置所有与此牌花色相同的牌，或失去一点体力。',
-			qingjian_info:'每当你于摸牌阶段外获得牌时，你可以将其中任意牌以任意顺序交给其他角色，每回合最多发动四次',
+			qingjian_info:'每当你于摸牌阶段外得到牌时，你可以将其中任意牌以任意顺序交给其他角色，每回合最多发动四次',
 			qinxue_info:'觉醒技。准备阶段或结束阶段开始时，若你的手牌数减体力值大于1，则你减一点体力上限，回复1点体力或摸两张牌，获得技能【攻心】。',
 			retuxi_info:'摸牌阶段摸牌时，你可以少摸任意张牌，然后选择等量的手牌数大于或等于你的其他角色，获得这些角色的各一张手牌。',
 			reluoyi_info:'你可以跳过摸牌阶段，然后展示牌堆顶的三张牌，获得其中的基本牌、武器牌和【决斗】，若如此做，直到你的下回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。',
@@ -14681,7 +14680,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezhuikong_info:'其他角色的回合开始时，若你已受伤，你可与其拼点：若你赢，本回合该角色只能对自己使用牌；若你没赢，你获得其拼点的牌，然后其视为对你使用一张【杀】。',
 			re_gongsunyuan:'界公孙渊',
 			rehuaiyi:'怀异',
-			rehuaiyi_info:'出牌阶段限一次，你可以展示所有手牌，若这些牌的颜色：全部相同，你摸一张牌，并将此技能于本阶段内改为“限两次”，然后终止此技能的结算流程；不全部相同，则你选择一种颜色并弃置该颜色的所有手牌，然后你可以获得至多X名角色的各一张牌（X为你以此法弃置的手牌数）。若你以此法获得的牌不少于两张，则你失去1点体力。',
+			rehuaiyi_info:'出牌阶段限一次，你可以展示所有手牌，若这些牌的颜色：全部相同，你摸一张牌，并将此技能于本阶段内改为“限两次”，然后终止此技能的结算流程；不全部相同，则你选择一种颜色并弃置该颜色的所有手牌，然后你可以获得至多X名角色的各一张牌（X为你以此法弃置的手牌数）。若你以此法得到的牌不少于两张，则你失去1点体力。',
 			re_caozhen:'界曹真',
 			residi:'司敌',
 			residi_push:'司敌',
@@ -14726,7 +14725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guotufengji:'界郭图逢纪',
 			rejigong:'急攻',
 			rejigong2:'急攻',
-			rejigong_info:'出牌阶段开始时，你可以摸至多三张牌。若如此做，你本回合的手牌上限基数改为X，且弃牌阶段结束时，若X不小于Y，则你回复1点体力。（X为你本回合内造成的伤害值之和，Y为你本回合内因〖急攻〗摸牌而获得的牌的数量总和）',
+			rejigong_info:'出牌阶段开始时，你可以摸至多三张牌。若如此做，你本回合的手牌上限基数改为X，且弃牌阶段结束时，若X不小于Y，则你回复1点体力。（X为你本回合内造成的伤害值之和，Y为你本回合内因〖急攻〗摸牌而得到的牌的数量总和）',
 			ol_jiangwei:'界姜维',
 			oltiaoxin:'挑衅',
 			oltiaoxin_info:'出牌阶段限一次，你可以选择一名攻击范围内包含你的角色。然后除非该角色对你使用一张【杀】且此【杀】对你造成伤害，否则你弃置其一张牌，然后将此技能于此出牌阶段内修改为出牌阶段限两次。 ',
@@ -14748,7 +14747,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexianzhou_info:'限定技。出牌阶段，你可将装备区内的所有牌交给一名其他角色。你回复X点体力，然后对其攻击范围内的至多X名角色各造成1点伤害（X为你以此法给出的牌数）。',
 			xin_zhonghui:'界钟会',
 			xinquanji:'权计',
-			xinquanji_info:'①当你受到1点伤害后，或你的牌被其他角色获得后，你可以摸一张牌，然后将一张手牌置于武将牌上，称为“权”。②你的手牌上限+X（X为“权”的数量）。',
+			xinquanji_info:'①当你受到1点伤害后，或其他角色不因你的赠予或交给而得到你的牌后，你可以摸一张牌，然后将一张手牌置于武将牌上，称为“权”。②你的手牌上限+X（X为“权”的数量）。',
 			xinzili:'自立',
 			xinzili_info:'觉醒技。准备阶段，若你的“权”数大于2，则你回复1点体力并摸两张牌，减1点体力上限并获得〖排异〗。',
 			xinpaiyi:'排异',
@@ -14849,7 +14848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_liuchen:'界刘谌',
 			rezhanjue:'战绝',
 			rezhanjue_effect:'战绝',
-			rezhanjue_info:'出牌阶段，若你本阶段内因〖战绝〗获得过的牌数小于3，则你可以将所有不具有“勤王”标记的手牌当做【决斗】使用。此【决斗】使用结算结束后，你摸一张牌。然后所有因此【决斗】受到过伤害的角色也各摸一张牌。',
+			rezhanjue_info:'出牌阶段，若你本阶段内因〖战绝〗得到过的牌数小于3，则你可以将所有不具有“勤王”标记的手牌当做【决斗】使用。此【决斗】使用结算结束后，你摸一张牌。然后所有因此【决斗】受到过伤害的角色也各摸一张牌。',
 			reqinwang:'勤王',
 			reqinwang_info:'主公技。出牌阶段限一次，你可以令所有其他蜀势力角色依次选择是否交给你一张【杀】，然后你可以令选择是的角色摸一张牌。',
 			shizhan:'势斩',
@@ -14948,7 +14947,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olguzheng_info:'每阶段限一次。当其他角色的至少两张牌因弃置而进入弃牌堆后，你可以令其获得其中一张牌，然后你可以获得剩余的牌。',
 			re_caochong:'界曹冲',
 			rechengxiang:'称象',
-			rechengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌。若你获得的牌点数之和为13，你复原武将牌。',
+			rechengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌。若你得到的牌点数之和为13，你复原武将牌。',
 			re_caorui:'界曹叡',
 			rexingshuai:'兴衰',
 			rexingshuai_info:'主公技，限定技。当你进入濒死状态时，你可令其他魏势力角色依次选择是否令你回复1点体力。然后这些角色依次受到1点伤害。有〖明鉴〗效果的角色于其回合内杀死角色后，你重置〖兴衰〗。',

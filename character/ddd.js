@@ -1656,14 +1656,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function (event,player){
 					return player!=event.player&&event.player.hp>0&&player.countCards('h',function(card){
-						return !card.hasGaintag('dddxujing_tag');
+						return !get.is.shownCard(card);
 					})>=event.player.hp;
 				},
 				content:function (){
 					'step 0'
 					var target=trigger.player;
-					player.chooseCard('h',target.hp,get.prompt('dddqiahua',target),'选择'+get.cnNumber(target.hp)+'张手牌作为“明”，然后'+get.translation(target)+'获得技能〖恂恂〗直到本回合结束。',function(card){
-						return !card.hasGaintag('dddxujing_tag');
+					player.chooseCard('h',target.hp,get.prompt('dddqiahua',target),'选择明置'+get.cnNumber(target.hp)+'张手牌，然后'+get.translation(target)+'获得技能〖恂恂〗直到本回合结束。',function(card){
+						return !get.is.shownCard(card);
 					}).set('goon',get.attitude(player,target)>0).set('ai',function(card){
 						if(_status.event.goon) return 1+Math.random();
 						return 0;
@@ -1673,11 +1673,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=trigger.player,cards=result.cards;
 						player.logSkill('dddqiahua',target);
 						target.addTempSkill('dddxunxun');
-						player.addSkill('dddxujing_tag');
-						player.addGaintag(result.cards,'dddxujing_tag');
+						player.addShownCards(cards,'visible_dddxianglang');
 						game.log(player,'选择了',cards,'作为“明”');
 						player.showCards(cards,get.translation(player)+'对'+get.translation(target)+'发动了【恰化】');
-						player.markSkill('dddxujing_tag');
 					}
 				},
 				ai:{
@@ -1692,10 +1690,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dddfusi:{
 				mod:{
 					ignoredHandcard:function (card,player){
-						if(card.hasGaintag('dddxujing_tag')) return true;
+						if(get.is.shownCard(card)) return true;
 					},
 					cardDiscardable:function (card,player,name){
-						if(name=='phaseDiscard'&&card.hasGaintag('dddxujing_tag')) return false;
+						if(name=='phaseDiscard'&&get.is.shownCard(card)) return false;
 					},
 				},
 				global:"dddfusi_global",
@@ -1712,10 +1710,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dddfusi_global:{
 				mod:{
-					"cardEnabled2":function (card,player){
+					cardEnabled2:function(card,player){
 						var source=_status.currentPhase;
 						if(!source||source==player||!source.hasSkill('dddfusi')||source.countCards('h')==0||source.hasCard(function(card){
-							return !card.hasGaintag('dddxujing_tag');
+							return !get.is.shownCard(card);
 						},'h')) return;
 						if(player.getCards('h').contains(card)) return false;
 					},
@@ -1727,9 +1725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.hasSkill('dddfusi');
 					});
 					for(var source of players){
-						var cards=source.getCards('h',function(card){
-							return card.hasGaintag('dddxujing_tag');
-						});
+						var cards=source.getShownCards();
 						for(var i of cards){
 							var card=get.autoViewAs(i);
 							if(event.filterCard(card,player,event)) return true;
@@ -1743,9 +1739,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.hasSkill('dddfusi');
 					});
 					for(var source of players){
-						var cards=source.getCards('h',function(card){
-							return card.hasGaintag('dddxujing_tag');
-						});
+						var cards=source.getShownCards();
 						for(var i of cards){
 							var card=get.autoViewAs(i);
 							if(name==card.name) return true;
@@ -1760,9 +1754,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return current!=player&&current.hasSkill('dddfusi');
 						}).sortBySeat();
 						for(var source of players){
-							var cards=source.getCards('h',function(card){
-								return card.hasGaintag('dddxujing_tag');
-							});
+							var cards=source.getShownCards();
 							if(cards.length){
 								var str='<div class="text center">';
 								str+=get.translation(source);
@@ -1862,7 +1854,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				filter:function(event,player){
 					return event.card.storage&&event.card.storage._dddfusi_owner==player&&!player.hasCard(function(card){
-						return !card.hasGaintag('dddxujing_tag');
+						return !get.is.shownCard(card);
 					},'h');
 				},
 				content:function(){
@@ -2446,6 +2438,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'dddfengzheng',
 						enable:'phaseUse',
 						usable:1,
+						filter:function(event,player){
+							return game.hasPlayer(current=>current.hasSkill('dddfengzheng'));
+						},
 						filterCard:function(card,player){
 							var num=0;
 							for(var i=0;i<ui.selected.cards.length;i++){
@@ -2463,7 +2458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						popname:true,
 						complexCard:true,
-						prompt:'将任意张点数和为K的手牌当【无中生有】使用',
+						prompt:'将任意张点数和为13的手牌当【无中生有】使用',
 						check:function(card){
 							var num=0;
 							for(var i=0;i<ui.selected.cards.length;i++){
@@ -4231,13 +4226,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dddzhijie_info:"你可以将两张颜色相同的“鉴”当做【闪】使用，或将两张颜色不同的“鉴”当做【无懈可击】使用；然后你摸两张牌。",
 			ddd_xianglang:'向朗',
 			dddqiahua:"恰化",
-			dddqiahua_info:"其他角色的回合开始时，你可选择X张不为“明”的手牌作为“明”（X为其体力值，这些牌对所有角色可见），然后其于本回合内获得〖恂恂〗。",
+			dddqiahua_info:"其他角色的回合开始时，你可明置X张手牌（X为其体力值），然后其于本回合内获得〖恂恂〗。",
 			dddfusi:"腹笥",
-			dddfusi_info:"锁定技。①你的“明”不计入手牌上限。②其他角色需要使用牌时，可以改为使用你的“明”（需经过你的确认）。③你的回合内，若你的手牌均为“明”，则其他角色不能使用各自的手牌。",
+			dddfusi_info:"锁定技。①你的明置手牌不计入手牌上限。②其他角色需要使用牌时，可以改为使用你的明置手牌（需经过你的确认）。③你的回合内，若你的手牌均为明置手牌，则其他角色不能使用各自的手牌。",
 			dddfusi_global:"腹笥",
 			dddtuoji:"拓籍",
-			dddtuoji_info:"其他角色因〖腹笥〗而使用你的牌后，若你的手牌均为“明”，则你可以摸三张牌。",
-			dddxujing_tag:"明",
+			dddtuoji_info:"其他角色因〖腹笥〗而使用你的牌后，若你的手牌均为明置手牌，则你可以摸三张牌。",
+			visible_dddxianglang:"明",
 			ddd_yujin:'于禁',
 			dddzhengjun:'整军',
 			dddzhengjun_info:'出牌阶段内每项各限一次。当有其他角色的手牌数/体力值/装备区内牌数变化后，若其的对应数值与你相同，则你可以执行对应的选项。体力值：你令一名角色回复1点体力；手牌数：你令一名角色摸一张牌；装备区内牌数：你移动场上的一张装备牌。',
@@ -4253,66 +4248,66 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dddjijian_info:'出牌阶段限一次。你可以指定一名其他男性角色，令其展示至多两张手牌。然后你可以交给其一张【杀】，且其可以依次视为使用X张与其手牌中未展示牌牌名相同的不重复基本牌或普通锦囊牌（X为此【杀】与其展示牌中颜色相同的牌的数量）。',
 			ddd_zhenji:'甄姬',
 			dddmiaoxing:'淼形',
-			dddmiaoxing_info:'锁定技，分发起始手牌时，共发你三份起始手牌，你将其中两份移出游戏，称为“水相”；摸牌阶段结束后，你须将至少一份“水相”调整至与你的手牌数相等。',
+			dddmiaoxing_info:'锁定技。①分发起始手牌时，你额外获得两份起始手牌，然后将其中的两份移出游戏，称为“水相”。②摸牌阶段结束后，你须将至少一份“水相”调整至与你的手牌数相等。',
 			dddfushi:'浮世',
-			dddfushi_info:'每回合限一次，你使用或打出的基本牌结算后，你可用所有手牌交换一份“水相”，然后你可令一名男性角色选择是否用其所有手牌交换一份“水相”。',
+			dddfushi_info:'每回合限一次。当你使用或打出基本牌结算结束后，你可以用所有手牌交换一份“水相”，然后你可令一名男性角色选择是否用其所有手牌交换一份“水相”。',
 			ddd_zhaoang:'赵昂',
 			dddfenji:'奋计',
-			dddfenji_info:'摸牌/弃牌阶段开始时，你可视为使用一张未以此法使用过的普通锦囊牌，然后将此阶段摸牌/弃牌数改为此牌造成的伤害值/目标数。',
+			dddfenji_info:'摸牌/弃牌阶段开始时，你可视为使用一张未以此法使用过的普通锦囊牌，然后将此阶段摸牌/弃牌数改为此牌造成的伤害值/此牌的目标数。',
 			ddd_zhouchu:'周处',
 			dddxiaheng:'侠横',
-			dddxiaheng_info:'锁定技，出牌阶段开始时，你令一名角色弃置两张牌（不足则全弃），再对一名角色造成1点伤害。“若两名角色：均不为你，你失去一点体力上限；为同一名角色，你失去一点体力；然后若以此法对包括你在内三名不同的角色造成伤害，删除双引号里的描述内容”。',
+			dddxiaheng_info:'锁定技。出牌阶段开始时，你选择一名角色，其弃置两张牌，然后你对一名角色造成1点伤害。“若这两名角色：均不为你，你减1点体力上限；为同一名角色，你失去1点体力；然后若你以此法对三名不同的角色造成过伤害，删除该技能双引号里的描述。”',
 			ddd_liuba:'刘巴',
 			dddfengzheng:'丰政',
-			dddfengzheng_info:'每名角色的出牌阶段限一次，其可将点数之和为K的任意张手牌当一张【无中生有】使用；轮次结束时，你可观看并分配牌堆顶的X张牌（X为此轮发动过“丰政”的角色数），若有角色以此法获得的牌数多于两张，你失去“丰政”。',
+			dddfengzheng_info:'①每名角色的出牌阶段限一次。其可将点数之和为13的任意张手牌当一张【无中生有】使用。②一轮游戏开始时，你可观看并分配牌堆顶的X张牌（X为上一轮发动过〖丰政〗的角色数），若有角色以此法得到的牌数多于两张，你失去〖丰政〗。',
 			dddyulv:'玉律',
-			dddyulv_info:'锁定技，游戏开始时，你声明一个点数；此点数的牌进入弃牌堆后，你令当前回合角色摸或弃置一张牌；一名角色连续以此法摸牌或弃牌后，你为“玉律”重新声明一个点数，然后于结算后结束当前回合。',
+			dddyulv_info:'锁定技。①游戏开始时，你声明一个点数。②当有你〖玉律①〗声明的点数的牌进入弃牌堆后，你令当前回合角色摸一张牌或弃置一张牌。然后该角色连续以此法摸牌或弃牌，你为〖玉律①〗重新声明一个点数，然后于结算后结束当前回合。',
 			ddd_jianshuo:'蹇硕',
 			dddfenye:'分野',
-			dddfenye_info:'出牌阶段限一次，你可与一名其他角色拼点，然后其余角色可加入其中一方并扣置一张手牌作为其拼点牌，比较双方点数均值，拼点胜方角色依次可视为对一名不同的拼点败方角色使用【杀】。',
+			dddfenye_info:'出牌阶段限一次。你可与一名其他角色拼点，其余角色于此次拼点中可加入其中一方并扣置一张手牌作为其拼点牌，本次拼点判断胜负的条件改为比较双方点数均值。然后拼点胜方角色依次可视为对一名不同的拼点败方角色使用【杀】。',
 			dddshichao:'逝潮',
-			dddshichao_info:'锁定技，准备阶段，你选择一名手牌数为全场第（1）大的角色，将手牌数调整至与其相等且至多等于主公的体力上限；其于你的下回合开始前对你造成伤害时，其可防止之，然后令（）内的数字+1。',
+			dddshichao_info:'锁定技。准备阶段，你选择一名手牌数为全场第（1）大的角色，将手牌数调整至与其相等且至多等于主公的体力上限。然后当其于你的下回合开始前对你造成伤害时，其可防止之，令你〖逝潮〗的（）内的数字+1。',
 			ddd_guanning:'管宁',
 			dddyouxue:'游学',
-			dddyouxue_info:'锁定技，每轮开始时，你选定你的行动次序，其对应的座次位置称为“虚位”，然后执行额定的摸牌阶段，且摸牌数改为“虚位”移动的距离。',
+			dddyouxue_info:'锁定技。一轮游戏开始时，你选择一名角色并以此确定你的行动次序，其对应的座次位置称为“虚位”，然后你执行额定的摸牌阶段，且摸牌数改为“虚位”移动的距离。',
 			dddchengjing:'承经',
-			dddchengjing_info:'出牌阶段限一次，你可将一张牌当虚位上家角色上回合使用的一张基本牌或普通锦囊牌使用，若之造成/未造成伤害，你可令虚位下家角色下回合的摸牌数/手牌上限+1或-1。',
+			dddchengjing_info:'出牌阶段限一次。你可将一张牌当虚位上家角色上回合使用的一张基本牌或普通锦囊牌使用，若之造成/未造成伤害，你可令虚位下家角色下回合的摸牌数/手牌上限+1或-1。',
 			ddd_dingfeng:'丁奉',
 			dddduanbing:'短兵',
 			dddduanbing_info:'出牌阶段，你可将一张黑色非锦囊牌当一张【兵粮寸断】置入自己的判定区，摸两张牌，然后视为使用一张无视距离限制的【杀】；当此【杀】对目标角色造成伤害后，你可将此【兵粮寸断】移至目标角色的判定区。',
 			ddd_kebineng:'轲比能',
 			dddxiaoxing:'枭行',
-			dddxiaoxing_info:'锁定技，你的初始手牌，攻击范围和手牌上限+3；你进入濒死状态时，伤害来源可以废除其有装备牌的武器栏，再令你失去“枭行”。',
+			dddxiaoxing_info:'锁定技。①你的初始手牌，攻击范围和手牌上限+3。②当你进入濒死状态时，来源可以废除其有装备牌的武器栏，然后令你失去〖枭行〗。',
 			dddlangzhi:'狼志',
-			dddlangzhi_info:'结束阶段，你可展示你攻击范围内的所有角色各一张牌，然后选择一项：1.用任意张牌替换其中等量张牌；2.获得所有展示牌，再失去“狼志”。',
+			dddlangzhi_info:'结束阶段，你可展示你攻击范围内的所有角色各一张牌，然后选择一项：1.用任意张牌替换其中等量张牌；2.获得所有展示牌，失去〖狼志〗。',
 			dddfuyi:'附义',
 			dddfuyi_both:'〖枭行〗和〖狼志〗',
-			dddfuyi_info:'主公技，其他群势力角色执行奖惩时，若你已失去“枭行”或“狼志”，其可改为令你获得其中一或两个；若为两个，你摸三张牌，再失去“附义”。',
+			dddfuyi_info:'主公技。当其他群势力角色执行奖惩时，若你没有〖枭行〗或〖狼志〗，其可改为令你获得其中一或两个，若为两个，你摸三张牌，失去〖附义〗。',
 			ddd_caoshuang:'曹爽',
 			ddd_xuelingyun:'薛灵芸',
 			ddd_liuhong:'刘宏',
 			ddd_xiahouxuan:'夏侯玄',
 			ddd_zhangkai:'张闿',
 			dddzhuanshe:'专摄',
-			dddzhuanshe_info:'其他角色的出牌阶段开始时，你可将一张手牌正面朝上交给该角色，则当其在此回合内：使用与之名称相同的基本牌或普通锦囊牌时，你可无视距离限制为之额外选择一个目标；未使用与之名称相同的牌，你可在回合结束时对其造成1点伤害。',
+			dddzhuanshe_info:'其他角色的出牌阶段开始时，你可将一张手牌正面朝上交给该角色，则当其在此回合内使用与之名称相同的基本牌或普通锦囊牌时，你可无视距离限制为之额外选择一个目标；此回合结束时，若其未使用与之名称相同的牌，你可以对其造成1点伤害。',
 			dddweiqiu:'危秋',
-			dddweiqiu_info:'锁定技，一名角色回复体力前，若你没有手牌，改为令你摸一张牌。',
+			dddweiqiu_info:'锁定技。一名角色回复体力前，若你没有手牌，改为令你摸一张牌。',
 			dddlianer:'涟洏',
 			dddlianer_info:'当你使用红色牌结算后，你可以获得之，然后你只能使用点数小于此牌的牌直到回合结束。',
 			dddanzhi:'暗织',
 			dddanzhi_info:'一名角色的回合开始时，若最近进入并在弃牌堆的牌包含黑色，你可以指定一名角色，此回合其第一次成为黑色牌的目标时，此牌对其无效。',
 			dddshixing:'失兴',
-			dddshixing_info:'锁定技，若有未受伤的女性角色，你视为拥有“享乐”；若当前回合没有锦囊牌被使用，你视为拥有“酒诗”；若你没有上述技能，你视为拥有“制衡”。',
+			dddshixing_info:'锁定技。若有未受伤的女性角色，你视为拥有〖享乐〗；若当前回合没有锦囊牌被使用，你视为拥有〖酒诗〗；若你没有上述技能，你视为拥有〖制衡〗。',
 			ddddanggu:'党锢',
-			ddddanggu_info:'锁定技，结束阶段，你横置任意名角色的武将牌，直到场上已横置的角色数不少于X（X为群势力角色数）；其他角色的弃牌阶段，若其处于“连环状态”，其装备区里的牌视为手牌。',
+			ddddanggu_info:'锁定技。①结束阶段，你横置任意名角色的武将牌，直到场上已横置的角色数不少于X（X为群势力角色数）。②其他角色的弃牌阶段，若其处于连环状态，其装备区里的牌视为手牌。',
 			dddlanghuai:'朗怀',
-			dddlanghuai_info:'转换技，摸牌阶段，你可展示手牌（无牌则不展示），并改为摸其中①包含②缺少花色数的牌。',
+			dddlanghuai_info:'转换技。摸牌阶段，你可展示手牌（无牌则不展示），并改为摸其中：阴，包含花色数的牌；阳，缺少花色数的牌。',
 			dddxuanlun:'玄论',
-			dddxuanlun_info:'你受到伤害后，你可摸四张牌；你发动此技能的回合结束时，须选择一项：将四张牌以任意顺序置于牌堆顶或底；或删去此项和“朗怀”中的“可”，直到你发动“朗怀”。',
+			dddxuanlun_info:'当你受到伤害后，你可摸四张牌，然后该回合结束时，你选择一项：1.将四张牌以任意顺序置于牌堆顶或底；2.删去此项和〖郎怀〗中的“可”直到你发动〖郎怀〗。',
 			dddjiexing:'劫行',
-			dddjiexing_info:'限定技，其他角色回复体力时，你可改为你回复等量体力；其他角色使用装备牌时，你可改为将此牌置入你的装备区。当你不以此法回复体力后或使用装备牌后，重置此技能。',
+			dddjiexing_info:'限定技。其他角色回复体力时，你可改为你回复等量体力；其他角色使用装备牌时，你可改为将此牌置入你的装备区。当你不以此法回复体力后或使用装备牌后，重置此技能。',
 			dddbailei:'拜泪',
-			dddbailei_info:'准备阶段，你可获得装备区牌数唯一最多的角色的一张牌，或杀死体力值唯一为一的角色并失去此技能。',
+			dddbailei_info:'准备阶段，你可获得装备区牌数唯一最多的角色的一张牌，或杀死体力值唯一为1的角色并失去此技能。',
 			ddd_liangxi:'梁习',
 			dddtongyu:'仝御',
 			dddtongyu_info:'出牌阶段限一次，你可以将任意张花色不同的牌当做【五谷丰登】使用，且此牌的展示牌数+X（X为此牌对应的实体牌数量）。此牌的所有目标角色在被指定目标后选择一项：⒈本回合不能再使用或打出手牌。⒉令此【五谷丰登】对其无效。此【五谷丰登】的多余展示牌置入弃牌堆前，你可以令一名选择了选项二的角色获得这些牌。',

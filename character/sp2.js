@@ -179,11 +179,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(evt.gaintag_map[i].contains('dcjiaoxia_used')) return true;
 								}
 								return false;
-							}).length&&player.getHistory('sourceDamage',evt=>evt.card==event.card).length;
+							}).length&&player.getHistory('sourceDamage',evt=>evt.card==event.card).length&&!['delay','equip'].contains(get.type(event.cards[0],player));
 						},
 						direct:true,
 						content:function(){
-							var card=get.copy(trigger.cards[0]);
+							var card={
+								name:get.name(trigger.cards[0],player),
+								nature:get.nature(trigger.cards[0],player),
+								isCard:true,
+							};
 							player.chooseUseTarget(card,get.prompt('dcjiaoxia'),false,false).set('prompt2','视为使用'+get.translation(card)).logSkill='dcjiaoxia';
 						},
 					},
@@ -815,7 +819,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var skills=player.getStorage('dclongsong_back');
 							for(var key of skills){
 								game.log(player,'恢复了技能','#g【'+get.translation(key)+'】');
-								delete player.storage[key];
+								//delete player.storage[key];
 							}
 							player.enableSkill(skill);
 							player.popup(skills,'thunder');
@@ -2024,11 +2028,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					random:{
 						audio:'dunxi',
-						trigger:{global:'useCardToPlayer'},
+						trigger:{global:'useCard'},
 						forced:true,
 						locked:false,
 						filter:function(event,player){
-							if(!event.player.hasMark('dunxi')||event.targets.length!=1||event.getParent()._dunxi) return false;
+							if(!event.player.hasMark('dunxi')||event.targets.length!=1||event._dunxi||_status.dying.length) return false;
 							var type=get.type2(event.card,false);
 							return (type=='basic'||type=='trick');
 						},
@@ -2036,12 +2040,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						line:'fire',
 						content:function(){
 							'step 0'
-							trigger.getParent()._dunxi=true;
+							trigger._dunxi=true;
 							trigger.player.removeMark('dunxi',1);
 							var target=trigger.target;
 							event.target=target;
 							trigger.targets.remove(target);
-							trigger.getParent().triggeredTargets1.remove(target);
+							//trigger.triggeredTargets1.remove(target);
 							trigger.untrigger();
 							game.delayx();
 							'step 1'
@@ -5499,7 +5503,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					targetInRange:function(card,player,target){
-						if(!card.cards) return;
+						if(!card.cards||!card.cards.length) return;
 						for(var i of card.cards){
 							if(!i.hasGaintag('minsi2')||get.color(i)!='black') return;
 						}
@@ -6565,7 +6569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(cards.length&&game.hasPlayer(function(current){
 						return current!=player&&!event.given.contains(current);
 					})) player.chooseCardTarget({
-						prompt:'是否将获得的牌中的任意张交给其他角色？',
+						prompt:'是否将得到的牌中的任意张交给其他角色？',
 						selectCard:[1,cards.length],
 						filterCard:function(card){
 							return _status.event.cards.contains(card);
@@ -6636,7 +6640,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mubing_rewrite:{
 				mark:true,
 				intro:{
-					content:'出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法获得的牌以任意方式交给其他角色。',
+					content:'出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法得到的牌以任意方式交给其他角色。',
 				},
 			},
 			diaoling:{
@@ -8546,16 +8550,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{global:['phaseBefore','zhuUpdate']},
 				filter:function(event,player){
+					if(!lib.group.some(function(group){
+						if(group==player.group) return false;
+						return lib.group.contains(group)||game.hasPlayer(function(current){
+							return current.group==group;
+						});
+					})) return false;
 					return !player.storage.bingzhao&&player.hasZhuSkill('bingzhao')&&(event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
 					'step 0'
 					var list=lib.group.filter(function(group){
-						return ['wei','shu','wu','qun'].contains(group)||game.hasPlayer(function(current){
+						if(group==player.group) return false;
+						return lib.group.contains(group)||game.hasPlayer(function(current){
 							return current.group==group;
-						})
+						});
 					});
-					player.chooseControl(list).set('prompt','秉诏：请选择一个势力').set('ai',function(){
+					player.chooseControl(list).set('prompt','秉诏：请选择一个其他势力').set('ai',function(){
 						var listx=list.slice(0);
 						listx.sort(function(a,b){
 							return game.countPlayer(function(current){
@@ -8682,7 +8693,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.storage.guju) player.storage.guju=0;
 				},
 				intro:{
-					content:'已因此技能获得#张牌'
+					content:'已因此技能得到#张牌'
 				},
 				trigger:{global:'damageEnd'},
 				forced:true,
@@ -9848,7 +9859,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterIntro:{
 			tangji:'唐姬，会稽太守唐瑁女，弘农怀王刘辩的妃子。刘辩死后，唐姬回归故里，因节烈不愿改嫁他人，后被汉献帝下诏封为弘农王妃。',
-			lijue:"李傕（jué，一说“傕”读音“què”）（？—198年），字稚然。北地郡泥阳县（今陕西省耀县）人，汉末群雄之一。东汉末年汉献帝时的军阀、权臣，官至大司马、车骑将军、开府、领司隶校尉、假节。<br>李傕本为董卓部将，后被董卓的女婿牛辅派遣至中牟与朱儁交战，大破朱儁，进而至陈留、颍川等地劫掠。初平三年（192年）董卓和牛辅被杀后，李傕归无所依，于是采用贾诩之谋，伙同郭汜、张济、樊稠等原董卓部曲将攻向长安。击败吕布，杀死王允等人，占领长安，把持朝廷大权。后诸将不和，李傕在会议上杀死了樊稠，又与郭汜分别劫持了汉献帝和众臣，相互交战，张济率兵赶来和解，于是二人罢兵，李傕出屯池阳黄白城，郭汜、张济等人随汉献帝东归前往弘农。<br>后来，李傕、郭汜、张济反悔，联合起来追击汉献帝，与杨奉、董承等人几番交战。汉献帝一路逃亡，狼狈不堪，到达安邑，与李傕等人讲和。不久，汉献帝被曹操迎往许都。建安三年（198年），曹操派谒者仆射裴茂召集关西诸将段煨等人征讨李傕，灭其三族。",
+			lijue:"李傕（一说“傕”读音“què”）（？—198年），字稚然。北地郡泥阳县（今陕西省耀县）人，汉末群雄之一。东汉末年汉献帝时的军阀、权臣，官至大司马、车骑将军、开府、领司隶校尉、假节。<br>李傕本为董卓部将，后被董卓的女婿牛辅派遣至中牟与朱儁交战，大破朱儁，进而至陈留、颍川等地劫掠。初平三年（192年）董卓和牛辅被杀后，李傕归无所依，于是采用贾诩之谋，伙同郭汜、张济、樊稠等原董卓部曲将攻向长安。击败吕布，杀死王允等人，占领长安，把持朝廷大权。后诸将不和，李傕在会议上杀死了樊稠，又与郭汜分别劫持了汉献帝和众臣，相互交战，张济率兵赶来和解，于是二人罢兵，李傕出屯池阳黄白城，郭汜、张济等人随汉献帝东归前往弘农。<br>后来，李傕、郭汜、张济反悔，联合起来追击汉献帝，与杨奉、董承等人几番交战。汉献帝一路逃亡，狼狈不堪，到达安邑，与李傕等人讲和。不久，汉献帝被曹操迎往许都。建安三年（198年），曹操派谒者仆射裴茂召集关西诸将段煨等人征讨李傕，灭其三族。",
 			zhangji:"张济（？－196年），武威郡祖厉县（今甘肃靖远东南）人。东汉末年割据军阀之一。 张济原为董卓部将，董卓被诛杀后，张济与李傕一同率军攻破长安，任中郎将。不久，升任镇东将军，封平阳侯，出屯弘农。献帝东迁时，张济升任骠骑将军，率军护卫献帝，后来因与董承等人有矛盾，便与李傕、郭汜一同追赶献帝。 建安元年（196年），张济因军队缺粮而进攻穰城，中流矢而死。死后，部队由侄儿张绣接管。",
 			guosi:"郭汜（？－197年），又名郭多，凉州张掖（今甘肃张掖西北）人，东汉末年将领、军阀，献帝时权臣。原为董卓部下。董卓被杀后，凉州众将归无所依，于是采用贾诩之谋，联兵将攻向长安，击败吕布，杀死王允等人，占领长安，把持朝廷大权。几年后，郭汜被部将伍习杀死。",
 			fanchou:"樊稠（？—195年），凉州金城（治今甘肃永靖西北）人。东汉末年军阀、将领。官至右将军，封万年侯。 原为董卓部将，董卓死后，伙同李傕、郭汜、张济等人合众十余万反扑长安，败吕布、杀王允，把持朝政。后马腾因与李傕有隙，于是联合韩遂举兵进攻，李傕派樊稠、郭汜等与其交战，大败马腾、韩遂于长平观下。樊稠追至陈仓，与韩遂友好罢兵，却遭李傕猜疑。兴平二年（195年），李傕让外甥骑都尉胡封在会议上将樊稠刺死（一说趁醉用杖击杀）。",
@@ -9931,7 +9942,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		dynamicTranslate:{
 			mubing:function(player){
-				if(player.storage.mubing2) return '出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法获得的牌以任意方式交给其他角色。';
+				if(player.storage.mubing2) return '出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法得到的牌以任意方式交给其他角色。';
 				return '出牌阶段开始时，你可以展示牌堆顶的三张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。';
 			},
 			piaoping:function(player){
@@ -9962,7 +9973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangfusong:['huangfusong','sp_huangfusong','jsrg_huangfusong','old_huangfusong'],
 			dingyuan:['ol_dingyuan','dingyuan'],
 			quyi:['quyi','re_quyi'],
-			hansui:['xin_hansui','re_hansui'],
+			hansui:['hansui','xin_hansui','re_hansui'],
 			jin_simashi:['jin_simashi','simashi'],
 			jin_yanghuiyu:['jin_yanghuiyu','yanghuiyu'],
 			taoqian:['taoqian','re_taoqian'],
@@ -9973,10 +9984,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pangdegong:['re_pangdegong','pangdegong'],
 			zhujun:['sp_zhujun','ol_zhujun','zhujun','jsrg_zhujun'],
 			tw_liuhong:['tw_liuhong','liuhong','jsrg_liuhong'],
-			re_hejin:['re_hejin','tw_hejin','jsrg_hejin'],
+			re_hejin:['hejin','re_hejin','tw_hejin','jsrg_hejin'],
 			hujinding:['dc_hujinding','hujinding'],
 			caosong:['caosong','sp_caosong'],
-			re_niujin:['re_niujin','tw_niujin'],
+			re_niujin:['niujin','re_niujin','tw_niujin'],
 			haomeng:['haomeng','tw_haomeng'],
 			zhangning:['zhangning','tw_zhangning'],
 			caoanmin:['caoanmin','ns_caoanmin'],
@@ -9984,7 +9995,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xushao:['xushao','jsrg_xushao'],
 			huban:['dc_huban','ol_huban'],
 			mengda:['dc_mengda','ol_mengda','pe_mengda'],
-			jsp_guanyu:['dc_jsp_guanyu','jsp_guanyu'],
+			jsp_guanyu:['jsrg_guanyu','dc_jsp_guanyu','jsp_guanyu'],
 			mushun:['mushun','sp_mushun'],
 			wangjun:['dc_wangjun','wangjun'],
 			zoushi:['re_zoushi','jsrg_zoushi'],
@@ -10069,7 +10080,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guju:'骨疽',
 			guju_info:'锁定技，拥有“傀”标记的角色受到伤害后，你摸一张牌。',
 			baijia:'拜假',
-			baijia_info:'觉醒技，准备阶段，若你因〖骨疽〗获得的牌不少于7张，则你增加1点体力上限，回复1点体力，然后令所有未拥有“傀”标记的其他角色获得“傀”标记，最后失去技能〖骨疽〗，并获得技能〖蚕食〗。',
+			baijia_info:'觉醒技，准备阶段，若你因〖骨疽〗得到的牌不少于7张，则你增加1点体力上限，回复1点体力，然后令所有未拥有“傀”标记的其他角色获得“傀”标记，最后失去技能〖骨疽〗，并获得技能〖蚕食〗。',
 			bmcanshi:'蚕食',
 			bmcanshi_info:'一名角色使用基本牌或普通锦囊牌指定你为唯一目标时，若其有“傀”标记，你可以取消之，然后其失去“傀”标记；你使用牌仅指定一名角色为目标时，你可以额外指定任意名带有“傀”标记的角色为目标（无距离限制），然后这些角色失去“傀”标记。',
 			
@@ -10092,7 +10103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lslixun_fate:'利熏',
 			lslixun_info:'锁定技，当你受到伤害时，你防止此伤害，然后获得等同于伤害值的“珠”标记。出牌阶段开始时，你进行判定，若结果点数小于“珠”的数量，你弃置等同于“珠”数量的手牌（若弃牌的牌数不够，则失去剩余数量的体力值）。',
 			lskuizhu:'馈珠',
-			lskuizhu_info:'出牌阶段结束时，你可以选择体力值为全场最多的一名其他角色，将手牌摸至与该角色相同（最多摸至五张），然后该角色观看你的手牌，弃置任意张手牌并从观看的牌中获得等量的牌。若其获得的牌大于一张，则你选择一项：移去一个“珠”；或令其对其攻击范围内的一名角色造成1点伤害。',
+			lskuizhu_info:'出牌阶段结束时，你可以选择体力值为全场最多的一名其他角色，将手牌摸至与该角色相同（最多摸至五张），然后该角色观看你的手牌，弃置任意张手牌并从观看的牌中获得等量的牌。若其得到的牌大于一张，则你选择一项：移去一个“珠”；或令其对其攻击范围内的一名角色造成1点伤害。',
 			xpchijie:'持节',
 			xpchijie_info:'每回合每项各限一次。1.当其他角色使用的牌对你结算结束后，你可以令此牌对所有后续目标无效。2.其他角色使用的牌结算完成时，若你是此牌的目标之一且此牌未造成过伤害，则你可以获得此牌对应的所有实体牌。',
 			xpchijie2:'持节',
@@ -10170,7 +10181,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diaoling:'调令',
 			diaoling_info:'觉醒技，准备阶段，若你已因〖募兵〗获得了6张或更多的【杀】或武器牌或伤害锦囊牌，则你回复1点体力或摸两张牌，然后修改〖募兵〗。',
 			mubing_rewrite:'募兵·改',
-			mubing_rewrite_info:'出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法获得的牌以任意方式交给其他角色。',
+			mubing_rewrite_info:'出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法得到的牌以任意方式交给其他角色。',
 			caobuxing:'曹不兴',
 			moying:'墨影',
 			moying_info:'每回合限一次，当你于回合外不因使用而失去单一一张锦囊牌或装备牌后，你可以选择一个花色和与此牌点数差绝对值不超过2的点数，然后获得牌堆中所有与此牌花色点数相同的牌。',
@@ -10215,7 +10226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangrong:'王荣',
 			minsi:'敏思',
 			minsi2:'敏思',
-			minsi_info:'出牌阶段限一次，你可以弃置任意张点数之和为13的牌，然后摸两倍数量的牌。以此法获得的牌中，黑色牌本回合无距离限制，红色牌本回合不计入手牌上限。',
+			minsi_info:'出牌阶段限一次，你可以弃置任意张点数之和为13的牌，然后摸两倍数量的牌。以此法得到的牌中，黑色牌本回合无距离限制，红色牌本回合不计入手牌上限。',
 			jijing:'吉境',
 			jijing_info:'当你受到伤害后，你可以进行一次判定，然后若你弃置任意张点数之和与判定结果点数相同的牌，你回复1点体力。',
 			zhuide:'追德',
@@ -10311,7 +10322,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			redaoji2:'盗戟',
 			redaoji_info:'其他角色第一次使用武器牌时，你可选择一项：①获得此牌。②令其本回合内不能使用或打出【杀】。',
 			fuzhong:'负重',
-			fuzhong_info:'锁定技，当你于回合外获得牌后，你获得一枚“重”标记。若X：大于0，你于摸牌阶段开始时令额定摸牌数+1；大于1，你至其他角色的距离-2；大于2，你的手牌上限+3；大于3，结束阶段开始时，你对一名其他角色造成1点伤害，然后移去4枚“重”（X为“重”数）。',
+			fuzhong_info:'锁定技，当你于回合外得到牌后，你获得一枚“重”标记。若X：大于0，你于摸牌阶段开始时令额定摸牌数+1；大于1，你至其他角色的距离-2；大于2，你的手牌上限+3；大于3，结束阶段开始时，你对一名其他角色造成1点伤害，然后移去4枚“重”（X为“重”数）。',
 			qiuliju:'丘力居',
 			koulve:'寇略',
 			koulve_info:'当你于出牌阶段内对其他角色造成伤害后，你可以展示其X张手牌（X为其已损失的体力值）。若这些牌中：有带有伤害标签的基本牌或锦囊牌，则你获得之；有红色牌，则你失去1点体力（若已受伤则改为减1点体力上限），然后摸两张牌。',
@@ -10369,7 +10380,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianze:'天则',
 			tianze_info:'①每回合限触发一次。其他角色于其出牌阶段内使用的黑色手牌结算结束后，你可以弃置一张黑色牌，并对其造成1点伤害。②其他角色的判定生效后，若结果为黑色，则你摸一张牌。',
 			difa:'地法',
-			difa_info:'每回合限一次。当你于回合内因摸牌而获得红色牌时，你可以弃置之。然后你选择一个锦囊牌的牌名，并从牌堆中获得一张此牌名的牌。',
+			difa_info:'每回合限一次。当你于回合内因摸牌而得到红色牌时，你可以弃置之。然后你选择一个锦囊牌的牌名，并从牌堆中获得一张此牌名的牌。',
 			xinping:'辛评',
 			fuyuan:'辅袁',
 			fuyuan_info:'当你于回合外使用或打出牌时，若当前回合角色的手牌数：不小于你，你可摸一张牌；小于你，你可令其摸一张牌。',
@@ -10382,7 +10393,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quanjiu_info:'锁定技。①你手牌区中的【酒】的牌名视为【杀】。②你使用对应的实体牌为一张【酒】的非转化【杀】不计入次数限制。',
 			re_pangdegong:'庞德公',
 			heqia:'和洽',
-			heqia_info:'出牌阶段开始时，你可选择一项：①将任意张牌交给一名其他角色。②令一名有手牌的其他角色交给你任意张牌。然后以此法获得牌的角色可以视为使用一张基本牌，且当其声明使用此牌后，可以为此牌增加至至多X个目标（X为以此法移动的牌数）。',
+			heqia_info:'出牌阶段开始时，你可选择一项：①将任意张牌交给一名其他角色。②令一名有手牌的其他角色交给你任意张牌。然后以此法得到牌的角色可以视为使用一张基本牌，且当其声明使用此牌后，可以为此牌增加至至多X个目标（X为以此法移动的牌数）。',
 			yinyi:'隐逸',
 			yinyi_info:'锁定技。每回合限一次，当你受到非属性伤害时，若你的手牌数和体力值与伤害来源均不相同，则你防止此伤害。',
 			haomeng:'郝萌',
@@ -10420,7 +10431,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcbihuo_info:'①当你受到其他角色造成的伤害后，你可令一名角色下回合摸牌阶段的额定摸牌数+1。②当你对其他角色造成伤害后，你可令一名角色下回合摸牌阶段的额定摸牌数-1。',
 			bianxi:'卞喜',
 			dunxi:'钝袭',
-			dunxi_info:'①当你使用具有伤害标签的牌结算结束后，你可以令一名不为你的目标角色获得一枚“钝”。②有“钝”的角色使用基本牌或锦囊牌指定唯一目标时，你令其移去一枚“钝”。系统随机选择一名角色，并将此牌的目标改为该角色。若该角色和原目标相同，则其失去1点体力。若其正处于出牌阶段内，则结束此阶段。',
+			dunxi_info:'①当你使用具有伤害标签的牌结算结束后，你可以令一名不为你的目标角色获得一枚“钝”。②有“钝”的角色使用基本牌或锦囊牌时，若此牌目标数为1且此时没有角色处于濒死状态，你令其移去一枚“钝”。系统随机选择一名角色，并将此牌的目标改为该角色。若该角色和原目标相同，则其失去1点体力。若其正处于出牌阶段内，则结束此阶段。',
 			niufu:'牛辅',
 			dcxiaoxi:'宵袭',
 			dcxiaoxi_info:'锁定技。出牌阶段开始时，你声明X并减X点体力上限（X∈[1,2]）。然后你选择一名攻击范围内的其他角色并选择一项：⒈获得该角色的X张牌。⒉视为对其使用X张【杀】。',

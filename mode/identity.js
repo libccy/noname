@@ -1392,7 +1392,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 
-					if(!game.zhu)	game.zhu=game.me;
+					if(!game.zhu) game.zhu=game.me;
 					else{
 						game.zhu.setIdentity();
 						game.zhu.identityShown=true;
@@ -2347,6 +2347,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.zhu.ai.shown=1;
 							game.zhu.setIdentity();
 							game.zhu.isZhu=true;
+							var skills=player.getStockSkills(true,true).filter(skill=>{
+								if(player.hasSkill(skill)) return false;
+								var info=get.info(skill);
+								return info&&info.zhuSkill;
+							});
+							if(skills.length){
+								for(var i of skills) player.addSkillLog(i);
+							}
 							game.zhu.node.identity.classList.remove('guessing');
 							if(lib.config.animation&&!lib.config.low_performance) game.zhu.$legend();
 							delete game.zhong;

@@ -1743,7 +1743,7 @@ div:not(.handcards)>.card>.info>span,
 	margin-left: 4px;
 	margin-right: 4px;
 	position: relative;
-	width: calc(100% - 8px);
+	/* width: calc(100% - 8px); */
 }
 .content>.caption + .buttons:not(*:last-child){
 	margin-top: 0;
@@ -4535,18 +4535,58 @@ div[data-decoration="bronze"]::after{
 	top: 74px;
 	right: 6px;
 }
-.card .tempname {
+.tempname {
 	color: white !important;
 	font-size: 22px;
 	left: 6px;
 	pointer-events: none;
 	top: 6px;
 }
-.card .tempname.vertical {
+.tempname.vertical {
 	left: 4px;
 	top: 8px;
 	writing-mode: vertical-rl;
 	-webkit-writing-mode: vertical-rl;
+}
+.tempname.tempimage {
+	top: calc(50% - 12.5px);
+	left: 2px;
+	width: calc(100% - 4px);
+	height: 25px;
+	background-image: url('../../image/card/cardtempname_bg.png');
+	background-size: 100% 100%;
+	text-align: right;
+	writing-mode: horizontal-tb;
+	-webkit-writing-mode: horizontal-tb;
+}
+.tempname.tempimage:not([data-nature]) {
+	color: black !important;
+	text-shadow: white 0 0 2px, white 0 0 3px;
+}
+.tempname.tempimage>div {
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background-size: 100%;
+	background-position: -20px -30px;
+	background-repeat: no-repeat;
+}
+.tempname.tempimage>span {
+	position: relative;
+	z-index: 1;
+	line-height: 25px;
+}
+.button>.tempname {
+	font-size: 17px;
+}
+.button>.tempname:not(.tempimage) {
+	left: 5px;
+	top: 5px;
+}
+.button>.tempname .vertical {
+	left: 3px;
+	top: 6px;
 }
 /*.card.equip1 .wunature,
 .card.equip3 .wunature,

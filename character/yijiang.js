@@ -177,7 +177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunziliufang:'孙资在曹操手下历任县令，参丞相军事；刘放曾有劝王松归顺曹操之举，为曹操所欣赏，遂招为司空府官，又外放历任几处县令。魏国初建之际，孙资与刘放俱任秘书郎。曹丕继位后，二人一同掌握机密。曹睿病危时，二人力荐曹爽，又推荐招回司马懿辅政。最后，曹睿独召曹爽、司马懿、刘放、孙资同受诏命，而免去曹宇、夏侯献、曹肇、秦朗的官职。',
 			huanghao:'宦官。为后主刘禅所宠，专秉朝政。黄皓与大将军姜维不睦，维启后主杀之，后主不从。皓阴以心腹阎宇替维。景耀六年，蜀亡，邓艾预欲杀之，皓贿赂左右得免。及后主迁洛阳，皓为司马昭凌迟处死。',
 			zhangrang:'汉中常侍。同赵忠、曹节、段珪等为“十常侍”，为灵帝所宠。让等专权乱政、卖官索财，朝野皆痛恨之。郎中张钧上书奏请诛杀十常侍，帝不允，让等阴杀钧。及灵帝崩，大将军何进欲杀让等，让阴结何太后，招进入宫，斩杀之。部将袁绍引兵攻让，让等劫帝走河上。追急，让投水自尽。',
-			jikang:'嵇（jī）康（224年－263年，一作223年－262年），字叔夜。谯国铚县（今安徽省濉溪县）人。三国时期曹魏思想家、音乐家、文学家。<br>嵇康幼年聪颖，博览群书，广习诸艺，又喜爱老庄学说。身长七尺八寸，容止出众。后娶魏武帝曹操曾孙女长乐亭主为妻，拜郎中，调中散大夫，世称“嵇中散”。后隐居不仕，屡拒为官。因得罪司隶校尉钟会，遭其构陷，而被掌权的大将军司马昭处死，时年四十岁。',
+			jikang:'嵇康（224年－263年，一作223年－262年），字叔夜。谯国铚县（今安徽省濉溪县）人。三国时期曹魏思想家、音乐家、文学家。<br>嵇康幼年聪颖，博览群书，广习诸艺，又喜爱老庄学说。身长七尺八寸，容止出众。后娶魏武帝曹操曾孙女长乐亭主为妻，拜郎中，调中散大夫，世称“嵇中散”。后隐居不仕，屡拒为官。因得罪司隶校尉钟会，遭其构陷，而被掌权的大将军司马昭处死，时年四十岁。',
 			xinxianying:'辛氏（191年—269年），字宪英，祖籍陇西，颍川阳翟（今河南禹州）人。魏晋时期著名才女，曹魏侍中辛毗之女，卫尉羊耽之妻。辛宪英聪朗有才鉴，曾劝弟辛敞尽忠职守，预言钟会将会叛乱。泰始五年（公元269年），辛宪英逝世，享年七十九岁。',
 			wuxian:'穆皇后吴氏（？—245年），陈留（今河南开封）人，车骑将军吴懿之妹，三国时期蜀汉昭烈帝刘备的皇后。<br>吴氏早年丧父，其父生前与刘焉交情深厚，所以全家跟随刘焉来到蜀地。后刘焉听相面者说吴氏有大贵之相，于是为儿子刘瑁迎娶吴氏。刘瑁死后，吴氏成为寡妇。<br>建安十九年（214年），刘备平定益州，纳吴氏为夫人。建安二十四年（219年），刘备自称汉中王，立吴氏为汉中王后。章武元年（221年），刘备称帝，建立蜀汉，立吴氏为皇后。章武三年（223年），刘备去世，太子刘禅即位，尊嫡母吴氏为皇太后。延熙八年（245年），吴氏去世，谥号穆皇后，葬入刘备的惠陵。',
 			qinmi:'秦宓（？－226年），字子敕。广汉郡绵竹县（今四川德阳北）人。三国蜀汉时大臣、学者。秦宓善舌辩。早年仕于益州牧刘璋麾下，后降刘备。刘备伐吴时，秦宓劝阻，刘备大怒，欲杀秦宓。因诸葛亮及时求情，才保住性命，仅被下狱，后被释放，拜左中郎将、长水校尉。吴蜀同盟后，孙权派张温至成都回访。酒宴之上，秦宓与张温舌战，说得张温无言以对。后官至大司农。建兴四年（226年），秦宓病逝。',
@@ -1355,19 +1355,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//孙体
 			xinzhaofu:{
-				mark:false,
-				init:function(player){
-					if(player.hasZhuSkill('xinzhaofu')){
-						player.markSkill('xinzhaofu');
-						player.storage.xinzhaofu=false;
-					}
-				},
 				audio:'zhaofu',
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
 					return player.hasZhuSkill('xinzhaofu');
 				},
+				mark:true,
 				limited:true,
 				skillAnimation:true,
 				animationColor:'wood',
@@ -4311,7 +4305,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'wood',
 				onWash:function(){
-					_status.event.getParent('fuzhu').washed=false;
+					_status.event.getParent('fuzhu').washed=true;
 					return 'remove';
 				},
 				content:function(){
@@ -4325,19 +4319,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return card.name=='sha'&&player.canUse(card,trigger.player,false);
 					});
 					if(card){
-						card.remove();
-						game.updateRoundNumber();
 						player.useCard(card,trigger.player,false);
 					}
 					'step 2'
 					if(event.total>0&&!event.washed&&ui.cardPile.childElementCount<=player.hp*10&&trigger.player.isIn()) event.goto(1);
 					'step 3'
 					lib.onwash.remove(lib.skill.fuzhu.onWash);
-					var cards=get.cards(ui.cardPile.childElementCount+1);
-					for(var i=0;i<cards.length;i++){
-						ui.cardPile.insertBefore(cards[i],ui.cardPile.childNodes[get.rand(ui.cardPile.childElementCount)]);
-					}
-					game.updateRoundNumber();
+					game.washCard();
 				},
 				ai:{
 					threaten:1.5
@@ -4444,7 +4432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delay();
 					"step 6"
 					if(event.index==1){
-						game.log(event.target,'将获得的牌置于牌堆底');
+						game.log(event.target,'将得到的牌置于牌堆底');
 						if(ui.cardPile.childElementCount==1||player==event.target){
 							player.draw();
 						}
@@ -8038,8 +8026,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.$compare(event.card1,target,event.card2);
 					game.delay(4);
 					"step 6"
+					var next=game.createEvent('showCards');
+					next.player=player;
+					next.cards=[event.card1];
+					next.setContent('emptyEvent');
 					game.log(player,'展示了',event.card1);
+					"step 7"
+					var next=game.createEvent('showCards');
+					next.player=target;
+					next.cards=[event.card2];
+					next.setContent('emptyEvent');
 					game.log(target,'展示了',event.card2);
+					"step 8"
 					var name1=get.name(event.card1);
 					var name2=get.name(event.card2);
 					if(name1=='sha'&&name2!='shan'){
@@ -8738,28 +8736,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//priority:6,
 				zhuSkill:true,
 				filter:function(event,player){
-					if(player.storage.xingshuai) return false;
 					if(player.hp>0) return false;
 					if(!player.hasZhuSkill('xingshuai')) return false;
 					return game.hasPlayer(function(current){
 						return current!=player&&current.group=='wei';
 					});
 				},
-				init:function(player){
-					if(player.hasZhuSkill('xingshuai')){
-						player.markSkill('xingshuai');
-						player.storage.xingshuai=false;
-					}
-				},
-				intro:{
-					content:'limited'
-				},
+				mark:true,
 				unique:true,
 				limited:true,
-				mark:false,
 				content:function(){
 					'step 0'
-					player.storage.xingshuai=true;
 					player.awakenSkill('xingshuai');
 					var targets=game.filterPlayer();
 					targets.remove(player);
@@ -13791,7 +13778,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duliang2:'督粮',
 			duliang_info:'出牌阶段限一次，你可以获得一名其他角色的一张手牌，然后选择一项：1.令其观看牌堆顶的两张牌，然后获得其中的基本牌；2.令其于下个摸牌阶段额外摸一张牌。',
 			fulin:'腹鳞',
-			fulin_info:'锁定技，你于回合内获得的牌不计入你本回合的手牌上限。',
+			fulin_info:'锁定技，你于回合内得到的牌不计入你本回合的手牌上限。',
 			kuangbi:'匡弼',
 			kuangbi_info:'出牌阶段限一次，你可以选择一名有牌的其他角色，该角色将其的一至三张牌置于你的武将牌上。若如此做，你的下个准备阶段，你获得武将牌上的所有牌，然后其摸等量的牌。',
 			xinzhige:'止戈',
@@ -13862,13 +13849,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongyong:'忠勇',
 			zhongyong_info:'当你于出牌阶段内使用的【杀】被目标角色使用的【闪】抵消时，你可以将此【闪】交给除该角色外的一名角色。若获得此【闪】的角色不是你，你可以对相同的目标再使用一张【杀】。',
 			xinzhongyong:'忠勇',
-			xinzhongyong_info:'当你使用的【杀】结算完毕后，你可以将此【杀】或目标角色使用的【闪】交给一名该角色以外的其他角色，以此法获得红色牌的角色可以对你攻击范围内的角色使用一张【杀】',
+			xinzhongyong_info:'当你使用的【杀】结算完毕后，你可以将此【杀】或目标角色使用的【闪】交给一名该角色以外的其他角色，以此法得到红色牌的角色可以对你攻击范围内的角色使用一张【杀】',
 			jigong:'急攻',
 			jigong_info:'出牌阶段开始时，你可以摸两张牌。若如此做，你本回合的手牌上限改为X（X为你此阶段造成的伤害点数之和）。',
 			shifei:'饰非',
 			shifei_info:'当你需要使用或打出【闪】时，你可以令当前回合角色摸一张牌。然后若其手牌数不为全场唯一最多，则你弃置全场手牌数最多（或之一）角色的一张牌，视为你使用或打出了一张【闪】。',
 			huaiyi:'怀异',
-			huaiyi_info:'出牌阶段限一次，你可以展示所有手牌，若这些牌的颜色不全部相同，则你选择一种颜色并弃置该颜色的所有手牌，然后你可以获得至多X名角色的各一张牌（X为你以此法弃置的手牌数）。若你以此法获得的牌不少于两张，则你失去1点体力。',
+			huaiyi_info:'出牌阶段限一次，你可以展示所有手牌，若这些牌的颜色不全部相同，则你选择一种颜色并弃置该颜色的所有手牌，然后你可以获得至多X名角色的各一张牌（X为你以此法弃置的手牌数）。若你以此法得到的牌不少于两张，则你失去1点体力。',
 			yaoming:'邀名',
 			yaoming_info:'每回合限一次，当你造成或受到伤害后，你可以选择一项：1. 弃置手牌数大于你的一名角色的一张手牌；2. 令手牌数小于你的一名角色摸一张牌',
 			xinyaoming:'邀名',
@@ -14201,7 +14188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liandui:'联对',
 			liandui_info:'①当你使用牌时，若本局游戏内上一张被使用的牌的使用者不为你，你可以令其摸两张牌。②其他角色使用牌时，若本局游戏内上一张被使用的牌的使用者为你，其可以令你摸两张牌。',
 			biejun:'别君',
-			biejun_info:'①其他角色的出牌阶段限一次。其可以将一张手牌交给你。②每回合限一次。当你受到伤害时，若你手牌中没有本回合因〖别君①〗获得的牌，你可以翻面并防止此伤害。',
+			biejun_info:'①其他角色的出牌阶段限一次。其可以将一张手牌交给你。②每回合限一次。当你受到伤害时，若你手牌中没有本回合因〖别君①〗得到的牌，你可以翻面并防止此伤害。',
 			yj_sufei:'苏飞',
 			shuojian:'数谏',
 			shuojian_info:'出牌阶段限三次。你可以交给一名其他角色一张牌，其选择一项：1.令你摸X张牌；2.视为使用X张【过河拆桥】，然后此技能本回合失效（X为此技能本阶段剩余发动次数）。',
