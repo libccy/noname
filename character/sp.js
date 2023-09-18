@@ -1096,19 +1096,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'chooseToUseAfter'},
 						forced:true,
 						charlotte:true,
-						filter:function(event,player){
+						filter:(event,player)=>{
 							if(!event.olqifan_discard) return false;
 							var num=player.getStorage('olqifan').length,pos=('jeh').slice(0,num);
 							return num>0&&player.countCards(pos)>0;
 						},
 						content:function(){
-							'step 0'
-							event.num=Math.min(3,player.getStorage('olqifan').length);
-							'step 1'
-							event.num--;
 							var pos=('jeh')[event.num],hs=player.countCards(pos);
 							if(hs>0) player.chooseToDiscard(hs,pos,true);
-							if(event.num>0) event.redo();
+							event.num++;
+							if(event.num<event.maxNum) event.redo();
 						},
 					},
 				},
@@ -1125,7 +1122,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.result.card=card;
 					player.markAuto('olqifan',[get.type2(card,false)]);
 					event.getParent().set('olqifan_discard',true);
-					player.addTempSkill('olqifan_discard');
+					player.when('chooseToUseAfter')
+						.filter(lib.skill.olqifan_discard.filter)
+						.then(()=>{
+							event.maxNum=Math.min(3,player.getStorage('olqifan').length);
+							event.num=0;
+						})
+						.then(lib.skill.olqifan_discard.content)
 				},
 				filterCard:function(){return false},
 				selectCard:-1,
