@@ -24892,6 +24892,11 @@
 								node.style['box-shadow']='none';
 								node.style['background-size']='contain';
 							}
+							else if(lib.skill[name]&&lib.skill[name].markimage2){
+								let img=ui.create.div('.background.skillmark',node);
+								img.setBackgroundImage(lib.skill[name].markimage2);
+								img.style['background-size']='contain';
+							}
 							else{
 								var str=lib.translate[name+'_bg'];
 								if(!str||str[0]=='+'||str[0]=='-'){
@@ -46384,7 +46389,8 @@
 															}
 														}
 														else if(updates[i].indexOf('image/card')==0){
-															if(updates[i].indexOf('qiaosi_card')!=11&&!skipcard.contains(updates[i].slice(11,updates[i].lastIndexOf('.')))){
+															let cardname=updates[i].slice(11,updates[i].lastIndexOf('.'));
+															if(lib.card[cardname]&&!skipcard.contains(cardname)){
 																updates.splice(i--,1);
 															}
 														}

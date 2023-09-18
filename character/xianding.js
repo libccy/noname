@@ -4715,7 +4715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					countdown:{
 						trigger:{player:'useCardAfter'},
 						mark:true,
-						marktext:'💀',
+						marktext:'噬',
 						silent:true,
 						forced:true,
 						charlotte:true,
