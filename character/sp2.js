@@ -2045,7 +2045,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var target=trigger.target;
 							event.target=target;
 							trigger.targets.remove(target);
-							trigger.triggeredTargets1.remove(target);
+							//trigger.triggeredTargets1.remove(target);
 							trigger.untrigger();
 							game.delayx();
 							'step 1'

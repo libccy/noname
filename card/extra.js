@@ -604,6 +604,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				mark:true,
+				markimage2:'image/card/muniu_small.png',
 				intro:{
 					content:function(storage,player){
 						var muniu=player.getEquip('muniu');

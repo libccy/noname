@@ -1392,7 +1392,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 
-					if(!game.zhu)	game.zhu=game.me;
+					if(!game.zhu) game.zhu=game.me;
 					else{
 						game.zhu.setIdentity();
 						game.zhu.identityShown=true;

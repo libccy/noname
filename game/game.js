@@ -1,5 +1,5 @@
 "use strict";
-(()=>{
+{
 	if(!localStorage.getItem('gplv3_noname_alerted')){
 		if(confirm('①无名杀是一款基于GPLv3协议的开源软件！\n你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。\n点击“确定”即代表您认可并接受GPLv3协议↓️\nhttps://www.gnu.org/licenses/gpl-3.0.html\n②无名杀官方发布地址仅有GitHub仓库！\n其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！')){
 			localStorage.setItem('gplv3_noname_alerted',true);
@@ -3938,15 +3938,15 @@
 						init:true,
 						unfrequent:true,
 					},
-					show_skillnamepinyin:{
-						name:'显示技能名拼音',
-						intro:'在武将资料卡显示技能名拼音',
-						init:true,
-						unfrequent:true,
-					},
 					show_characternamepinyin:{
 						name:'显示武将名拼音等信息',
 						intro:'在武将资料卡显示武将名及其拼音、性别、势力、体力等信息',
+						init:true,
+						unfrequent:true,
+					},
+					show_skillnamepinyin:{
+						name:'显示技能名拼音',
+						intro:'在武将资料卡显示技能名拼音',
 						init:true,
 						unfrequent:true,
 					}
@@ -7275,31 +7275,31 @@
 			}
 		},
 		comparator:{
-			e:function(){
+			equals:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return false;
 				return true;
 			},
-			ei:function(){
+			equalAny:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return true;
 				return false;
 			},
-			ne:function(){
+			notEquals:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return false;
 				return true;
 			},
-			nei:function(){
+			notEqualAny:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return true;
 				return false;
 			},
-			te:function(){
+			typeEquals:function(){
 				if(arguments.length==0)return false;
 				if(arguments.length==1)return arguments[0]!==null;
 				const type=typeof arguments[0];
@@ -8323,7 +8323,7 @@
 							toLoad--;
 							if(toLoad) return;
 							if(_status.importing){
-								let promises=lib.creation.a;
+								let promises=lib.creation.array;
 								for(const type in _status.importing){
 									promises.addArray(_status.importing[type])
 								}
@@ -8404,22 +8404,22 @@
 
 					window.game=game;
 					game.dynamicStyle.init();
-					Object.defineProperty(lib.creation,"a",{
+					Object.defineProperty(lib.creation,"array",{
 						enumerable:true,
 						get:()=>[],
 						set:()=>null
 					});
-					Object.defineProperty(lib.creation,"o",{
+					Object.defineProperty(lib.creation,"object",{
 						enumerable:true,
 						get:()=>({}),
 						set:()=>null
 					});
-					Object.defineProperty(lib.creation,"no",{
+					Object.defineProperty(lib.creation,"nullObject",{
 						enumerable:true,
 						get:()=>Object.create(null),
 						set:()=>null
 					});
-					Object.defineProperty(lib.creation,"s",{
+					Object.defineProperty(lib.creation,"string",{
 						enumerable:true,
 						get:()=>"",
 						set:()=>null
@@ -9724,7 +9724,7 @@
 								_status.extension=lib.extensions[i][0];
 								_status.evaluatingExtension=lib.extensions[i][3];
 								if (typeof lib.extensions[i][1]=="function") 
-									yield (gnc.is.coroutine(lib.extensions[i][1])?gnc.of(lib.extensions[i][1]):lib.extensions[i][1])(lib.extensions[i][2],lib.extensions[i][4]);
+									yield (gnc.is.coroutine(lib.extensions[i][1])?gnc.of(lib.extensions[i][1]):lib.extensions[i][1]).call(lib.extensions[i],lib.extensions[i][2],lib.extensions[i][4]);
 								if(lib.extensions[i][4]){
 									if(lib.extensions[i][4].character){
 										for(var j in lib.extensions[i][4].character.character){
@@ -10016,8 +10016,7 @@
 			js:(path,file,onload,onerror)=>{
 				if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
 				if(path==`${lib.assetURL}mode`&&lib.config.all.stockmode.indexOf(file)==-1){
-					lib.init[`setMode_${file}`]();
-					onload();
+					lib.genAwait(lib.init[`setMode_${file}`]()).then(onload);
 					return;
 				}
 				if(Array.isArray(file)){
@@ -10235,47 +10234,103 @@
 					localStorage.removeItem(lib.configprefix+'background');
 				}
 			},
-			//by 诗笺、Tipx-L
-			parsex:function(func){
-				//Remove all comments
-				//移除所有注释
-				var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^\/"'\\\s]*)/mg,'$2').trim();
-				//获取第一个 { 后的所有字符
-				str=str.slice(str.indexOf('{')+1);
-				//func中要写步骤的话，必须要写step 0
-				if(str.indexOf('step 0')==-1){
-					str='{if(event.step==1) {event.finish();return;}\n'+str;
-				}else{
-					var skip=0;
-					//每层最多找99个step
-					for (var k=0;k<99;k++) {
-						//正则表达式
-						var reg=new RegExp(`['"]step ${k}['"]`);
-						var result=str.slice(skip).match(reg);
-						if(result==null) break;
-						var insertStr;
-						if(k==0){
-							insertStr=`switch(step){case 0:`;
-						}else{
-							insertStr=`break;case ${k}:`;
+			parsex:function(item){
+				//by 诗笺、Tipx-L
+				function Legacy(func){
+					//Remove all comments
+					//移除所有注释
+					var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^\/"'\\\s]*)/mg,'$2').trim();
+					//获取第一个 { 后的所有字符
+					str=str.slice(str.indexOf('{')+1);
+					//func中要写步骤的话，必须要写step 0
+					if(str.indexOf('step 0')==-1){
+						str='{if(event.step==1) {event.finish();return;}\n'+str;
+					}else{
+						var skip=0;
+						//每层最多找99个step
+						for (var k=0;k<99;k++) {
+							//正则表达式
+							var reg=new RegExp(`['"]step ${k}['"]`);
+							var result=str.slice(skip).match(reg);
+							if(result==null) break;
+							var insertStr;
+							if(k==0){
+								insertStr=`switch(step){case 0:`;
+							}else{
+								insertStr=`break;case ${k}:`;
+							}
+							var copy=str;
+							copy=copy.slice(0,skip+result.index)+insertStr+copy.slice(skip+result.index+result[0].length);
+							//测试是否有错误
+							try{
+								new Function(copy);
+								str=copy;
+								skip+=result.index+insertStr.length;
+							}catch(error){
+								k--;
+								skip+=result.index+result[0].length;
+							}
 						}
-						var copy=str;
-						copy=copy.slice(0,skip+result.index)+insertStr+copy.slice(skip+result.index+result[0].length);
-						//测试是否有错误
-						try{
-							new Function(copy);
-							str=copy;
-							skip+=result.index+insertStr.length;
-						}catch(error){
-							k--;
-							skip+=result.index+result[0].length;
-						}
+						str=`if(event.step==${k}){event.finish();return;}`+str;
 					}
-					str=`if(event.step==${k}){event.finish();return;}`+str;
+					return (new Function('event','step','source','player','target','targets',
+						'card','cards','skill','forced','num','trigger','result',
+						'_status','lib','game','ui','get','ai',str));
 				}
-				return (new Function('event','step','source','player','target','targets',
-					'card','cards','skill','forced','num','trigger','result',
-					'_status','lib','game','ui','get','ai',str));
+				switch(typeof item){
+					case "object":
+						if(Array.isArray(item)){
+							let lastEvent=null;
+							return (event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai)=>{
+								if(step>=item.length) return event.finish();
+								var current=item[step];
+								lastEvent=current(event,{
+									event:event,
+									step:step,
+									source:source,
+									player:player,
+									target:target,
+									targets:targets,
+									card:card,
+									cards:cards,
+									skill:skill,
+									forced:forced,
+									num:num,
+									trigger:trigger,
+									result:result
+								},(lastEvent&&("result" in lastEvent))?lastEvent.result:null);
+							}
+						}
+						else{
+							// TODO: Parse Common Object
+							throw new Error("NYI: Parse Common Object");
+						}
+					case "function":
+						if (gnc.is.generatorFunc(item)) {
+							let gen,lastEvent;
+							return (event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai)=>{
+								if(!gen)gen=item(event,{
+									event:event,
+									step:step,
+									source:source,
+									player:player,
+									target:target,
+									targets:targets,
+									card:card,
+									cards:cards,
+									skill:skill,
+									forced:forced,
+									num:num,
+									trigger:trigger,
+									result:result
+								});
+								var res=gen.next((lastEvent&&("result" in lastEvent))?lastEvent.result:null);
+								if(res.done) event.finish();
+								else lastEvent=res.value;
+							}
+						}
+						else return Legacy(item);
+				}
 			},
 			eval:function(func){
 				if(typeof func=='function'){
@@ -19177,6 +19232,18 @@
 				 * 使用者只需要关注技能的效果，而不是技能的本身。
 				 */
 				when:function(){
+					if(!_status.postReconnect.player_when) _status.postReconnect.player_when=[
+						function(map){
+							for(var i in map){
+								lib.skill[i]={
+									charlotte:true,
+									forced:true,
+									popup:false,
+								}
+								if(typeof map[i]=='string') lib.translate[i]=map[i];
+							}
+						},{}
+					];
 					var triggerNames=Array.from(arguments);
 					if(triggerNames.length==0) throw 'player.when的参数数量应大于0';
 					var skillName='player_when_'+Math.random().toString(36).slice(-8);
@@ -19210,7 +19277,20 @@
 						writable:true,
 						value:skill
 					});
+					game.broadcast(function(skillName){
+						Object.defineProperty(lib.skill,skillName,{
+							configurable:true,
+							enumerable:false,
+							writable:true,
+							value:{
+								forced:true,
+								charlotte:true,
+								popup:false,
+							}
+						});
+					},skillName);
 					this.addSkill(skillName);
+					_status.postReconnect.player_when[1][skillName]=true;
 					return{
 						filter(fun){
 							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
@@ -19251,7 +19331,10 @@
 						},
 						translation(translation){
 							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
-							if(typeof translation=='string') lib.translate[skillName]=translation;
+							if(typeof translation=='string'){
+								_status.postReconnect.player_when[1][skillName]=translation;
+								game.broadcastAll((skillName,translation)=>lib.translate[skillName]=translation,skillName,translation)
+							}
 							return this;
 						},
 						assgin(obj) {
@@ -24836,6 +24919,11 @@
 								node.style['box-shadow']='none';
 								node.style['background-size']='contain';
 							}
+							else if(lib.skill[name]&&lib.skill[name].markimage2){
+								let img=ui.create.div('.background.skillmark',node);
+								img.setBackgroundImage(lib.skill[name].markimage2);
+								img.style['background-size']='contain';
+							}
 							else{
 								var str=lib.translate[name+'_bg'];
 								if(!str||str[0]=='+'||str[0]=='-'){
@@ -28603,16 +28691,19 @@
 					}
 					return this;
 				},
-				setContent:function(name){
-					if(typeof name=='function'){
-						this.content=lib.init.parsex(name);
-					}
-					else{
-						if(!lib.element.content[name]._parsed){
-							lib.element.content[name]=lib.init.parsex(lib.element.content[name]);
-							lib.element.content[name]._parsed=true;
-						}
-						this.content=lib.element.content[name];
+				setContent:function(item){
+					switch(typeof item){
+						case "object":
+						case "function":
+							this.content=lib.init.parsex(item);
+							break;
+						default:
+							if(!lib.element.content[item]._parsed){
+								lib.element.content[item]=lib.init.parsex(lib.element.content[item]);
+								lib.element.content[item]._parsed=true;
+							}
+							this.content=lib.element.content[item];
+							break;
 					}
 					return this;
 				},
@@ -32519,8 +32610,7 @@
 			'妹子，交个朋友吧',
 		],
 		other:{
-			bool:(item)=>Boolean(item),
-			ignore:()=>{}
+			ignore:()=>void 0
 		}
 	};
 	const game={
@@ -32560,15 +32650,15 @@
 		//基于钩子的添加势力方法
 		addGroup:(id,short,name,config)=>{
 			if(!id) throw new TypeError();
-			if(lib.comparator.te(short,"object")){
+			if(lib.comparator.typeEquals(short,"object")){
 				config=short;
 				short=null;
 			}
-			if(lib.comparator.te(name,"object")){
+			if(lib.comparator.typeEquals(name,"object")){
 				config=name;
 				name=null;
 			}
-			if(!lib.comparator.te(short,"string")&&short){
+			if(!lib.comparator.typeEquals(short,"string")&&short){
 				name=short;
 			}
 			lib.group.add(id);
@@ -33737,23 +33827,23 @@
 				}
 			}
 		},
-		import:function(type,content){
+		import:function(type,content,url){
 			if(type=='extension'){
-				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
 				const promise=game.loadExtension(content);
+				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
 				_status.extensionLoading.add(promise);
 				return promise;
 			}
 			else{
 				if(!lib.imported[type])lib.imported[type]={};
-				if(typeof _status.importing=="undefined")_status.importing={};
-				if(!_status.importing[type])_status.importing[type]=[];
 				const promise=Promise.resolve((gnc.is.generator(content)?gnc.of(content):content)(lib,game,ui,get,ai,_status)).then(content2=>{
 					if(content2.name){
 						lib.imported[type][content2.name]=content2;
 						delete content2.name;
 					}
 				});
+				if(typeof _status.importing=="undefined")_status.importing={};
+				if(!_status.importing[type])_status.importing[type]=[];
 				_status.importing[type].add(promise);
 				return promise;
 			}
@@ -33879,7 +33969,7 @@
 						}
 						if(obj.precontent){
 							_status.extension=obj.name;
-							yield (gnc.is.generatorFunc(obj.precontent)?gnc.of(obj.precontent):obj.precontent)(cfg);
+							yield (gnc.is.generatorFunc(obj.precontent)?gnc.of(obj.precontent):obj.precontent).call(obj,cfg);
 							delete _status.extension;
 						}
 						if(obj.content){
@@ -36530,12 +36620,12 @@
 				splash:imgsrc,
 				fromextension:true
 			}
-			lib.init['setMode_'+name]=function(){
-				game.import('mode',function(lib,game,ui,get,ai,_status){
+			lib.init['setMode_'+name]=gnc.of(function*(){
+				yield game.import('mode',function(lib,game,ui,get,ai,_status){
 					info.name=name;
 					return info;
 				});
-			}
+			});
 			if(!lib.config.extensionInfo[extname]){
 				lib.config.extensionInfo[extname]={};
 			}
@@ -38238,7 +38328,8 @@
 		},
 		loadModeAsync:function(name,callback){
 			window.game=game;
-			var script=lib.init.js(lib.assetURL+'mode',name,function(){
+			var script=lib.init.js(lib.assetURL+'mode',name,gnc.of(function*(){
+				yield Promise.allSettled(_status.importing.mode);
 				if(!lib.config.dev) delete window.game;
 				script.remove();
 				var content=lib.imported.mode[name];
@@ -38247,7 +38338,7 @@
 					delete lib.imported.mode;
 				}
 				callback(content);
-			});
+			}));
 		},
 		switchMode:function(name,configx){
 			if(!lib.layoutfixed.contains(name)){
@@ -38261,7 +38352,8 @@
 				}
 			}
 			window.game=game;
-			var script=lib.init.js(lib.assetURL+'mode',name,function(){
+			var script=lib.init.js(lib.assetURL+'mode',name,gnc.of(function*(){
+				yield Promise.allSettled(_status.importing.mode);
 				if(!lib.config.dev) delete window.game;
 				script.remove();
 				var mode=lib.imported.mode;
@@ -38436,7 +38528,7 @@
 						game.loop();
 					});
 				}
-			});
+			}));
 		},
 		loadMode:function(mode){
 			var next=game.createEvent('loadMode',false);
@@ -46325,7 +46417,8 @@
 															}
 														}
 														else if(updates[i].indexOf('image/card')==0){
-															if(updates[i].indexOf('qiaosi_card')!=11&&!skipcard.contains(updates[i].slice(11,updates[i].lastIndexOf('.')))){
+															let cardname=updates[i].slice(11,updates[i].lastIndexOf('.'));
+															if(lib.card[cardname]&&!skipcard.contains(cardname)){
 																updates.splice(i--,1);
 															}
 														}
@@ -58997,4 +59090,4 @@
 		get:get
 	};
 	lib.init.init();
-})();
+}

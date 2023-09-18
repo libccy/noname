@@ -1,5 +1,5 @@
 window.noname_asset_list=[
-	'v1.10.1',
+	'v1.10.1.0.1',
 	'audio/background/aozhan_chaoming.mp3',
 	'audio/background/aozhan_online.mp3',
 	'audio/background/aozhan_rewrite.mp3',
@@ -6199,6 +6199,7 @@ window.noname_asset_list=[
 	'image/card/mtg_youlin.jpg',
 	'image/card/mujiaren.png',
 	'image/card/muniu.png',
+	'image/card/muniu_small.png',
 	'image/card/mutoumianju.png',
 	'image/card/nanman.png',
 	'image/card/numa.png',
