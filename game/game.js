@@ -19186,17 +19186,18 @@
 					while(lib.skill[skillName]!=null){
 						skillName='player_when_'+Math.random().toString(36).slice(-8);
 					}
+					triggerNames.push(`${skillName}After`);
 					var skill={
 						trigger:{player:triggerNames},
 						forced:true,
 						charlotte:true,
 						popup:false,
-						filterFuns:[(event, player, name) => {
+						filterFuns:[(event,player,name) => {
 							return !name||(triggerNames.includes(name)&&event.player==player);
 						}],
 						contentFuns:[],
 						get filter(){
-							return function(event, player, name){
+							return function(event,player,name){
 								if(name==`${skillName}After`){
 									skill.popup=false;
 									return true;
