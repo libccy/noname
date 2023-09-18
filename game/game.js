@@ -9933,7 +9933,7 @@
 						}
 					};
 					setTimeout(loop,500);
-					game.saveConfig('menu_loadondemand',true,lib.config.mode);
+					if(!_status.new_tutorial) game.saveConfig('menu_loadondemand',true,lib.config.mode);
 				}
 			},
 			connection:function(ws){
