@@ -10307,8 +10307,27 @@
 						}
 					case "function":
 						if (gnc.is.generatorFunc(item)) {
-							// TODO: Parse Generator Function
-							throw new Error("NYI: Pase Generator Function");
+							let gen,lastEvent;
+							return (event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai)=>{
+								if(!gen)gen=item(event,{
+									event:event,
+									step:step,
+									source:source,
+									player:player,
+									target:target,
+									targets:targets,
+									card:card,
+									cards:cards,
+									skill:skill,
+									forced:forced,
+									num:num,
+									trigger:trigger,
+									result:result
+								});
+								var res=gen.next((lastEvent&&("result" in lastEvent))?lastEvent.result:null);
+								if(res.done) event.finish();
+								else lastEvent=res.value;
+							}
 						}
 						else return Legacy(item);
 				}
