@@ -1743,7 +1743,7 @@ div:not(.handcards)>.card>.info>span,
 	margin-left: 4px;
 	margin-right: 4px;
 	position: relative;
-	width: calc(100% - 8px);
+	/* width: calc(100% - 8px); */
 }
 .content>.caption + .buttons:not(*:last-child){
 	margin-top: 0;
