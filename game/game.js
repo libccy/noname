@@ -18763,7 +18763,7 @@
 								var reg=new RegExp("^ext:(.+)?/");
 								var match=tag.match(/^die:(.+)$/);
 								if(match){
-									let path=match[1];
+									var path=match[1];
 									if(reg.test(path)) path=path.replace(reg,(_o,p)=>`../extension/${p}/`);
 									game.playAudio(path);
 								}
@@ -19167,6 +19167,98 @@
 				},
 			},
 			player:{
+				/**
+				 * version 1.2
+				 * 
+				 * 链式创建一次性技能的api。
+				 *
+				 * 使用者只需要关注技能的效果，而不是技能的本身。
+				 */
+				when:function(){
+					var triggerNames=Array.from(arguments);
+					if(triggerNames.length==0) throw 'player.when的参数数量应大于0';
+					var skillName='player_when_'+Math.random().toString(36).slice(-8);
+					while(lib.skill[skillName]!=null){
+						skillName='player_when_'+Math.random().toString(36).slice(-8);
+					}
+					var skill={
+						forced:true,
+						charlotte:true,
+						popup:false,
+						filterFuns:[],
+						contentFuns:[],
+						get filter(){
+							return function(event, player, name){
+								if(name==`${skillName}After`){
+									skill.popup=false;
+									return true;
+								}
+								return skill.filterFuns.every(fun=>Boolean(fun(event,player,name)));
+							}
+						},
+					};
+					skill.trigger={player:triggerNames};
+					skill.filterFuns.push((event, player, name) => {
+						return !name||(triggerNames.includes(name)&&event.player==player);
+					});
+					Object.defineProperty(lib.skill,skillName,{
+						configurable:true,
+						enumerable:false,
+						writable:true,
+						value:skill
+					});
+					this.addSkill(skillName);
+					return{
+						filter(fun){
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							skill.filterFuns.push(fun);
+							return this;
+						},
+						removeFilter(fun){
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							skill.filterFuns.remove(fun);
+							return this;
+						},
+						then(fun){
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							skill.contentFuns.push(fun);
+							var str=`
+								function content(){
+									if(event.triggername=='${skillName}After'){
+										player.removeSkill('${skillName}');
+										delete lib.skill['${skillName}'];
+										delete lib.translate['${skillName}']
+										console.log('remove ${skillName}');
+										return event.finish();
+									}
+							`;
+							for(var i=0;i<skill.contentFuns.length;i++){
+								var fun2=skill.contentFuns[i];
+								var a=fun2.toString();
+								var str2=a.slice(a.indexOf("{")+1,a.lastIndexOf("}")!=-1?a.lastIndexOf("}"):undefined).trim().split('\n').map(v=>v[v.length - 1]!= ';'?(v+';').trim():v.trim()).join('\n');
+								str+=`'step ${i}'\n\t${str2}\n\t`;
+							}
+							var result=eval(str+`\n};content;`);
+							skill.content=result;
+							return this;
+						},
+						popup(str){
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(typeof str=='string') skill.popup=str;
+							return this;
+						},
+						translation(translation){
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(typeof translation=='string') lib.translate[skillName]=translation;
+							return this;
+						},
+						assgin(obj) {
+							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(typeof obj=='object'&&obj!==null) Object.assign(skill,obj);
+							return this;
+						}
+					};
+				},
 				//新函数
 				//让一名角色明置一些手牌
 				addShownCards:function(){
@@ -41100,6 +41192,7 @@
 								updateConnectDisplayMap();
 							}
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 						return node;
 					};
 					var modeorder=lib.config.modeorder||[];
@@ -42182,6 +42275,7 @@
 							createDash('字','字体文件',dash3);
 							createDash('全','全部文件',dash4);
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 					createModeConfig('others',start.firstChild);
 
@@ -42556,6 +42650,7 @@
 								}
 							}
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 						return node;
 					};
 					if(lib.config.show_favourite_menu&&!connectMenu&&Array.isArray(lib.config.favouriteCharacter)){
@@ -43024,6 +43119,7 @@
 								ui.create.div('.menuplaceholder',page);
 							}
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 						return node;
 					};
 					if(!connectMenu&&lib.config.show_ban_menu){
@@ -43670,9 +43766,36 @@
 							buttonExport.style.marginRight='2px';
 							buttonExport.style.display='none';
 							buttonExport.onclick=function(){
-								processExtension(true);
-								if(lib.config.show_extensionshare){
-									shareExtLine.style.display='';
+								function oldExport(){
+									processExtension(true);
+									if(lib.config.show_extensionshare){
+										shareExtLine.style.display='';
+									}
+								}
+								if(typeof game.readFile=='function'&&
+									window.noname_shijianInterfaces&&
+									typeof window.noname_shijianInterfaces.shareExtensionWithPassWordAsync=='function'&&
+									confirm('是否使用诗笺版自带的导出功能来导出扩展？')){
+									const extName=inputExtName.value;
+									if (!extName) {
+										alert('未检测到扩展名，将使用无名杀自带的导出功能');
+										oldExport();
+										return;
+									}
+									game.readFile(`extension/${extName}/extension.js`, () => {
+										const pwd=prompt("请输入压缩包密码，不设密码直接点确定");
+										let result;
+										if(pwd===''||pwd=== null){
+											window.noname_shijianInterfaces.shareExtensionAsync(extName);
+										}else{
+											window.noname_shijianInterfaces.shareExtensionWithPassWordAsync(extName, pwd);
+										}
+									},()=>{
+										alert('未检测到扩展文件，将使用无名杀自带的导出功能');
+										oldExport();
+									});
+								}else{
+									oldExport();
 								}
 							};
 							inputExtLine.appendChild(buttonExport);
@@ -43702,8 +43825,11 @@
 							shareExtLine.style.textAlign='left';
 							shareExtLine.style.marginBottom='5px';
 							shareExtLine.innerHTML='已导出扩展。<span class="hrefnode">分享扩展</span><span class="closenode">×</span>';
-							shareExtLine.querySelectorAll('span')[0].onclick=function(){
-								game.open('https://tieba.baidu.com/p/5439380222');
+							shareExtLine.querySelectorAll('span')[0].onclick = function () {
+								//这个链接404了
+								//game.open('https://tieba.baidu.com/p/5439380222');
+								//无名杀贴吧首页
+								game.open('https://tieba.baidu.com/f?ie=utf-8&kw=%E6%97%A0%E5%90%8D%E6%9D%80');
 							};
 							shareExtLine.querySelectorAll('span')[1].onclick=function(){
 								shareExtLine.style.display='none';
@@ -45471,6 +45597,7 @@
 							createDash('技','编辑技能',dash3);
 							createDash('码','编辑代码',dash4);
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 					(function(){
 						var page=ui.create.div('');
@@ -45781,6 +45908,7 @@
 							};
 							if(_thisUpdate) node.update();
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 					var active=start.firstChild.querySelector('.active');
 					if(!active){
@@ -46990,6 +47118,7 @@
 								pre.innerHTML='';
 							});
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 					(function(){
 						var page=ui.create.div('');
@@ -47025,6 +47154,7 @@
 								}
 							}
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 					(function(){
 						if(!window.indexedDB||window.nodb) return;
@@ -47213,6 +47343,7 @@
 								}
 							};
 						};
+						if(!lib.config.new_tutorial) node._initLink();
 					}());
 
 
