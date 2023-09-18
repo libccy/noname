@@ -66,7 +66,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"zhugezhan":["male","shu",3,["xinfu_zuilun","xinfu_fuyin"],[]],
 			"lukang":["male","wu",4,["drlt_qianjie","drlt_jueyan","drlt_poshi"],[]],
 			"yl_yuanshu":["male","qun",4,["drlt_yongsi","drlt_weidi"],["zhu"]],
-			"zhangxiu":["male","qun",4,["drlt_xiongluan","drlt_congjian"],[]],
+			"zhangxiu":["male","qun",4,["drlt_xiongluan","drlt_congjian",'twjuxiang'],['zhu']],
 			"chendao":["male","shu",4,["dcwanglie"],[]],
 			zhoufei:["female","wu",3,["olliangyin","olkongsheng"]],
 		},
@@ -130,7 +130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"sunliang":"孙亮（243－260年），字子明，吴郡富春（今浙江杭州富阳区）人。三国时期吴国的第二位皇帝，公元252－258年在位。吴大帝孙权第七子，母潘皇后。史称吴少帝、吴废帝、会稽王。建兴元年（252年），十岁登基为帝，太平二年（257年），十五岁亲政，但一年后（258年）就被权臣孙綝废为会稽王。永安三年（260年），孙亮再被贬为候官侯，在前往封地途中自杀（一说被毒杀），终年18岁。西晋太康年间，原先任职吴国的官员戴显将孙亮的遗骨葬在赖乡。",
 			"xuyou":"许攸（？－204年），字子远，南阳（治今河南南阳）人。本为袁绍帐下谋士，官渡之战时其家人因犯法而被收捕，许攸因此背袁投曹，并为曹操设下偷袭袁绍军屯粮之所乌巢的计策，袁绍因此而大败于官渡。后许攸随曹操平定冀州，因自恃其功而屡屡口出狂言，终因触怒曹操而被杀。",
 			"yl_luzhi":"卢植（139年—192年），字子干。涿郡涿县（今河北涿州）人。东汉末年经学家、将领。卢植性格刚毅，师从太尉陈球、大儒马融等，为郑玄、管宁、华歆的同门师兄。曾先后担任九江、庐江太守，平定蛮族叛乱。后与马日磾、蔡邕等一起在东观校勘儒学经典书籍，并参与续写《汉记》。黄巾起义时为北中郎将，率军与张角交战，后被诬陷下狱，皇甫嵩平定黄巾后力救卢植，于是复任为尚书。后因上谏激怒董卓被免官，隐居在上谷军都山，被袁绍请为军师。初平三年（192年）去世。著有《尚书章句》、《三礼解诂》等，今皆失佚。唐代时配享孔子，北宋时被追封为良乡伯。白马将军公孙瓒以及后来的蜀汉昭烈帝刘备皆为卢植门下弟子。范阳卢氏后来也成为著名的家族。",
-			"kuailiangkuaiyue":"蒯（kuǎi）良，字子柔，襄阳中庐人。归刘表。蒯良为刘表定下安抚荆楚的政治方向，佐其成业，被刘表誉为“雍季之论”。之后，蒯良就被刘表擢升为主簿（bù）。其后蒯良的生平，就不得而知了，《三国志》亦没有记载其卒年。与蒯越、以及同样活跃于襄阳的蒯祺（诸葛亮姐夫）或为同族兄弟。蒯越（？－214年），字异度，襄阳中庐（今湖北襄阳西南）人。东汉末期人物，演义中为蒯良之弟。原本是荆州牧刘表的部下，曾经在刘表初上任时帮助刘表铲除荆州一带的宗贼（以宗族、乡里关系组成的武装集团）。刘表病逝后与刘琮一同投降曹操，后来官至光禄勋。",
+			"kuailiangkuaiyue":"蒯良，字子柔，襄阳中庐人。归刘表。蒯良为刘表定下安抚荆楚的政治方向，佐其成业，被刘表誉为“雍季之论”。之后，蒯良就被刘表擢升为主簿（bù）。其后蒯良的生平，就不得而知了，《三国志》亦没有记载其卒年。与蒯越、以及同样活跃于襄阳的蒯祺（诸葛亮姐夫）或为同族兄弟。蒯越（？－214年），字异度，襄阳中庐（今湖北襄阳西南）人。东汉末期人物，演义中为蒯良之弟。原本是荆州牧刘表的部下，曾经在刘表初上任时帮助刘表铲除荆州一带的宗贼（以宗族、乡里关系组成的武装集团）。刘表病逝后与刘琮一同投降曹操，后来官至光禄勋。",
 			
 			"guanqiujian":"毌丘俭，字仲恭，河东闻喜（今山西闻喜县）人。三国时期曹魏后期的重要将领。继承父毌丘兴爵位高阳乡侯，任平原侯文学。魏明帝即位后，上疏劝魏明帝停止加建皇宫的工程，升为荆州刺史。景初二年（238年）从司马懿攻灭公孙渊；正始五年（244年）至正始六年（245年）两次率兵征讨高句丽，攻破丸都，几亡其国，刻石纪功而还；253年击退吴国诸葛恪的大举进犯，战功累累。司马师废帝，毌丘俭感昔日魏明帝之恩，为曹魏政权做拼死一搏，于正元二年（255年）发动兵变，即后人所谓“淮南三叛”（王淩、毌丘俭、诸葛诞）之一，惜准备不足，兵败身亡。",
 			"haozhao":"郝昭（生卒年不详），字伯道，太原人，中国东汉末年至曹魏初年著名将领。郝昭少年从军，屡立战功，逐渐晋升为杂号将军，后受曹真的推荐镇守陈仓（在小说三国演义中是司马懿推荐），防御蜀汉。太和二年（228年），诸葛亮率军北伐，为郝昭所阻，劝降不成，昼夜相攻二十余日后被迫退军。魏明帝因此封其为关内侯。不久因染疾而病死。",
@@ -2155,44 +2155,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:true,
 			},
-			"nzry_shicai":{
-				audio:"nzry_shicai_2",
-				ai:{
-					reverseOrder:true,
-					skillTagFilter:function(player){
-						if(player.getHistory('useCard',function(evt){
-							return get.type(evt.card)=='equip';
-						}).length>0) return false;
-					},
-					effect:{
-						target:function(card,player,target){
-							if(player==target&&get.type(card)=='equip'&&!player.getHistory('useCard',function(evt){
-								return get.type(evt.card)=='equip'
-							}).length==0) return [1,3];
-						},
-					},
-					threaten:2.4,
-				},
-				subSkill:{
-					"2":{
-						audio:2,
-					},
-				},
-				trigger:{
-					player:['useCardAfter'],
-					target:'useCardToTargeted',				
-				},
-				filter:function(event,player,name){
-					if(name=='useCardToTargeted'&&('equip'!=get.type(event.card)||event.player!=player)) return false;
-					if(name=='useCardAfter'&&['equip','delay'].contains(get.type(event.card))) return false;
-					if(event.cards.filterInD().length<=0) return false;
-					var history=player.getHistory('useCard');
-					var evt=name=='useCardAfter'?event:event.getParent();
-					for(var i=0;i<history.length;i++){
-						if(history[i]!=evt&&get.type2(history[i].card)==get.type2(event.card)) return false;
-						else if(history[i]==evt) return true;
-					}
-					return false;
+			nzry_shicai:{
+				audio:'nzry_shicai_2',
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					if(!event.cards.filterInD('oe').length) return false;
+					return player.getHistory('useCard',evt=>get.type2(evt.card)==get.type2(event.card)).indexOf(event)==0;
 				},
 				check:function(event,player){
 					if(get.type(event.card)=='equip'){
@@ -2206,12 +2174,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return true;
 				},
+				prompt:function(event,player){
+					return get.prompt('nzry_shicai')+'（将'+get.translation(event.cards.filterInD('oe'))+'置于牌堆顶）';
+				},
 				content:function(){
-					"step 0"
-					event.cards=trigger.cards.filterInD();
-					if(event.cards.length>1){
+					'step 0'
+					event.cards=trigger.cards.filterInD('oe');
+					var cards=event.cards.filter(card=>get.owner(card));
+					if(!cards.length){
+						event.goto(2);
+						return;
+					}
+					event.cards.removeArray(cards);
+					if(cards.length>1){
 						var next=player.chooseToMove('恃才：将牌按顺序置于牌堆顶');
-						next.set('list',[['牌堆顶',event.cards]]);
+						next.set('list',[['牌堆顶',cards]]);
 						next.set('reverse',((_status.currentPhase&&_status.currentPhase.next)?get.attitude(player,_status.currentPhase.next)>0:false));
 						next.set('processAI',function(list){
 							var cards=list[0][1].slice(0);
@@ -2221,7 +2198,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return [cards];
 						});
 					}
-					"step 1"
+					else event._result={bool:true,moved:[cards]};
+					'step 1'
+					var cardx=result.moved[0].slice(0);
+					while(cardx.length){
+						var card=cardx.pop(),owner=get.owner(card);
+						owner.lose([card],ui.cardPile,'insert');
+						game.log(player,'将',card,'置于牌堆顶');
+					}
+					game.updateRoundNumber();
+					if(!cards.length){
+						player.draw();
+						event.finish();
+					}
+					'step 2'
+					if(cards.length>1){
+						var next=player.chooseToMove('恃才：将牌按顺序置于牌堆顶');
+						next.set('list',[['牌堆顶',cards]]);
+						next.set('reverse',((_status.currentPhase&&_status.currentPhase.next)?get.attitude(player,_status.currentPhase.next)>0:false));
+						next.set('processAI',function(list){
+							var cards=list[0][1].slice(0);
+							cards.sort(function(a,b){
+								return (_status.event.reverse?1:-1)*(get.value(b)-get.value(a));
+							});
+							return [cards];
+						});
+					}
+					'step 3'
 					if(result.bool&&result.moved&&result.moved[0].length) cards=result.moved[0].slice(0);
 					while(cards.length){
 						var card=cards.pop();
@@ -2233,10 +2236,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					game.updateRoundNumber();
 					player.draw();
-				},	
+				},
+				subSkill:{'2':{audio:2}},
+				ai:{
+					reverseOrder:true,
+					skillTagFilter:function(player){
+						if(player.getHistory('useCard',function(evt){
+							return get.type(evt.card)=='equip';
+						}).length>0) return false;
+					},
+					effect:{
+						target:function(card,player,target){
+							if(player==target&&get.type(card)=='equip'&&!player.getHistory('useCard',function(evt){
+								return get.type(evt.card)=='equip';
+							}).length==0) return [1,3];
+						},
+					},
+				},
 			},
 			"nzry_cunmu":{
 				audio:2,
+				audioname:['ol_pengyang'],
 				trigger:{
 					player:'drawBegin'
 				},
@@ -3420,29 +3440,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
-					if(!player.hasZhuSkill('ruoyu'))return false;
-					if(player.storage.ruoyu) return false;
 					return player.isMinHp();
 				},
 				content:function(){
 					'step 0'
-					player.storage.ruoyu=true;
-					player.gainMaxHp();
-					'step 1'
-					player.recover();
-					if(player.hasSkill('ruoyu')){
-						player.addSkill('rejijiang');
-					}
-					else{
-						player.addAdditionalSkill('ruoyu','rejijiang');
-					}
-					if(!player.isZhu){
-						player.storage.zhuSkill_ruoyu=['rejijiang'];
-					}
-					else{
-						event.trigger('zhuUpdate');
-					}
 					player.awakenSkill('ruoyu');
+					player.gainMaxHp();
+					player.recover();
+					'step 1'
+					player.addSkillLog('rejijiang');
+					'step 2'
+					if(player.isZhu2()) event.trigger('zhuUpdate');
 				}
 			},
 			qiaobian:{
@@ -4692,27 +4700,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				content:function(){
 					"step 0"
-					player.chooseTarget(get.prompt('fangzhu'),'令一名其他角色将武将牌翻面并摸'+get.cnNumber(player.getDamagedHp())+'张牌',function(card,player,target){
+					var draw=player.getDamagedHp();
+					player.chooseTarget(get.prompt('fangzhu'),'令一名其他角色翻面'+(draw>0?'并摸'+get.cnNumber(draw)+'张牌':''),function(card,player,target){
 						return player!=target
-					}).setHiddenSkill('fangzhu').ai=function(target){
+					}).setHiddenSkill('fangzhu').set('ai',target=>{
 						if(target.hasSkillTag('noturn')) return 0;
 						var player=_status.event.player;
-						if(get.attitude(_status.event.player,target)==0) return 0;
-						if(get.attitude(_status.event.player,target)>0){
-							if(target.classList.contains('turnedover')) return 1000-target.countCards('h');
-							if(player.getDamagedHp()<3) return -1;
-							return 100-target.countCards('h');
+						var current=_status.currentPhase;
+						var dis=current?get.distance(current,target,'absolute'):1;
+						var draw=player.getDamagedHp();
+						var att=get.attitude(player,target);
+						if(att==0) return target.hasJudge('lebu')?Math.random()/3:Math.sqrt(get.threaten(target))/5+Math.random()/2;
+						if(att>0){
+							if(target.isTurnedOver()) return att+draw;
+							if(draw<4) return -1;
+							if(current&&target.getSeatNum()>current.getSeatNum()) return att+draw/3;
+							return 10*Math.sqrt(Math.max(0.01,get.threaten(target)))/(3.5-draw)+dis/(2*game.countPlayer());
 						}
 						else{
-							if(target.classList.contains('turnedover')) return -1;
-							if(player.getDamagedHp()>=3) return -1;
-							return 1+target.countCards('h');
+							if(target.isTurnedOver()) return -att-draw;
+							if(draw>=5) return -1;
+							if(current&&target.getSeatNum()<=current.getSeatNum()) return -att+draw/3;
+							return (4.25-draw)*10*Math.sqrt(Math.max(0.01,get.threaten(target)))+2*game.countPlayer()/dis;
 						}
-					}
+					});
 					"step 1"
 					if(result.bool){
 						player.logSkill('fangzhu',result.targets);
-						result.targets[0].draw(player.getDamagedHp());
+						var draw=player.getDamagedHp();
+						if(draw>0) result.targets[0].draw(draw);
 						result.targets[0].turnOver();
 					}
 				},
@@ -5001,6 +5017,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yinghun:{
 				audio:2,
 				audioname:['re_sunjian','sunce','re_sunben','re_sunce','ol_sunjian'],
+				audioname2:{
+					re_sunyi:'gzyinghun_re_sunyi',
+					tw_ol_sunjian:'yinghun_ol_sunjian',
+				},
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				preHidden:true,
@@ -5056,7 +5076,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzyinghun:{
 				audio:'yinghun',
 				audioname:['re_sunjian','sunce','re_sunben','re_sunce','ol_sunjian','sb_sunce'],
-				audioname2:{re_sunyi:'gzyinghun_re_sunyi'},
+				audioname2:{
+					re_sunyi:'gzyinghun_re_sunyi',
+					tw_ol_sunjian:'yinghun_ol_sunjian',
+				},
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return player.getDamagedHp()>0;
@@ -5120,6 +5143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					maixie:true,
 				}
 			},
+			yinghun_ol_sunjian:{audio:2},
 			jiuchi:{
 				audio:2,
 				audioname:['re_dongzhuo'],
@@ -5376,7 +5400,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card){
 					return get.color(card)=='red';
 				},
-				viewAs:{name:'huogong',nature:'fire'},
+				viewAs:{name:'huogong'},
 				viewAsFilter:function(player){
 					if(!player.countCards('hs',{color:'red'})) return false;
 				},
@@ -7668,7 +7692,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangzhong:['ol_huangzhong','re_huangzhong','huangzhong'],
 			weiyan:['ol_weiyan','re_weiyan','weiyan'],
 			zhoutai:['zhoutai','xin_zhoutai','old_zhoutai'],
-			xiaoqiao:['ol_xiaoqiao','re_xiaoqiao','xiaoqiao'],
+			xiaoqiao:['ol_xiaoqiao','re_xiaoqiao','xiaoqiao','old_xiaoqiao'],
 			yuji:['xin_yuji','re_yuji','yuji'],
 			zhangjiao:['re_zhangjiao','sp_zhangjiao','zhangjiao'],
 			dianwei:['ol_dianwei','re_dianwei','dianwei'],
@@ -7740,7 +7764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_chenglve":"成略",
 			"nzry_chenglve_info":"转换技，出牌阶段限一次，阴：你可以摸一张牌，然后弃置两张手牌。阳：你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。",
 			"nzry_shicai":"恃才",
-			"nzry_shicai_info":"当你使用牌时，若此牌与你本回合使用的牌类型均不同（包括装备牌），则你可以将此牌置于牌堆顶，然后摸一张牌。",
+			"nzry_shicai_info":"当你使用牌结束完毕后，若此牌与你本回合使用的牌类型均不同，则你可以将此牌置于牌堆顶，然后摸一张牌。",
 			"nzry_cunmu":"寸目",
 			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌。",
 			"nzry_kuizhu":"溃诛",
@@ -8074,7 +8098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌替换之。',
 			huangtian_info:'主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或【闪电】。',
 			guhuo_info:'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）',
-			fenji_info:'当一名角色的手牌不因赠予或交给而被其他角色获得后，或一名角色的手牌被其他角色弃置后，你可以令其摸两张牌。',
+			fenji_info:'当一名角色的手牌不因赠予或交给而被另一名角色得到后，或一名角色的手牌被另一名角色弃置后，你可以失去1点体力，令其摸两张牌。',
 			
 			new_fenji:"奋激",
 			new_fenji_info:"一名角色的结束阶段开始时，若其没有手牌，你可以令其摸两张牌，然后你失去1点体力。",

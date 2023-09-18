@@ -598,7 +598,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.showCards(cards,`${get.translation(player)}对${(targets=>{
 						if(get.itemtype(targets)=='player') targets=[targets];
 						if(targets[0]!=player) return get.translation(targets);
-						const selfTargets=targets.slice();
+						var selfTargets=targets.slice();
 						selfTargets[0]='自己';
 						return get.translation(selfTargets);
 					})(logs)}发动了【${get.skillTranslation(event.name,player)}】`);

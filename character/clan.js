@@ -293,7 +293,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var info=get.info(skill);
 					if(info.charlotte) return false;
 					var translation=get.skillInfoTranslation(skill,event.player);
-					if(!translation||translation.match(/“?出牌阶段限一次/g).every(value=>value!='出牌阶段限一次')) return false;
+					if(!translation) return false;
+					var match=translation.match(/“?出牌阶段限一次/g);
+					if(!match||match.every(value=>value!='出牌阶段限一次')) return false;
 					return event.player.countCards('h')>0;
 				},
 				check:function(event,player){
@@ -804,18 +806,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				check:function(event,player){
-					if(get.attitude(player,event.player)<4) return false;
-					if(player.countCards('h',function(card){
-						var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-						if(mod2!='unchanged') return mod2;
-						var mod=game.checkMod(card,player,event.player,'unchanged','cardSavable',player);
-						if(mod!='unchanged') return mod;
-						var savable=get.info(card).savable;
-						if(typeof savable=='function') savable=savable(card,player,event.player);
-						return savable;
-					})>=1-event.player.hp) return false;
-					if(event.player==player||event.player==get.zhu(player)) return true;
-					return !player.hasUnknown();
+					return lib.skill.wanlan.check(event,player);
 				},
 				content:function(){
 					'step 0'
@@ -825,7 +816,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.player.recover();
 				},
 			},
-			//族王凌
+			//族王淩
 			clanbolong:{
 				audio:2,
 				enable:'phaseUse',
@@ -2365,7 +2356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wukuang:'族吴匡',
 			clanlianzhu:'联诛',
 			clanlianzhu_info:'转换技。每名角色Ａ的出牌阶段限一次。阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1；阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1。',
-			clan_wangling:'族王凌',
+			clan_wangling:'族王淩',
 			clanbolong:'驳龙',
 			clanbolong_info:'出牌阶段限一次。你可以令一名其他角色选择一项：1.你交给其一张牌，然后视为对其使用一张雷【杀】；2.交给你等同于你手牌数的牌，然后视为对你使用一张【酒】。',
 			clanzhongliu:'中流',

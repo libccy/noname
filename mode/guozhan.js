@@ -13789,7 +13789,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(chosen.contains(i)) continue;
 						if(lib.filter.characterDisabled(i)) continue;
 						if(get.config('onlyguozhan')){
-							if(!lib.characterPack.mode_guozhan[i]) continue;
+							if(!lib.characterGuozhanFilter.some(pack=>lib.characterPack[pack][i])) continue;
 							if(get.is.jun(i)) continue;
 						}
 						if(lib.character[i][4].contains('hiddenSkill')) continue;
@@ -13872,7 +13872,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							event.dialogxx=ui.create.characterDialog('heightset',function(i){
 								if(i.indexOf('gz_shibing')==0) return true;
 								if(get.config('onlyguozhan')){
-									if(!lib.characterPack.mode_guozhan[i]) return true;
+									if(!lib.characterGuozhanFilter.some(pack=>lib.characterPack[pack][i])) return true;
 									if(get.is.jun(i)) return true;
 								}
 							},get.config('onlyguozhanexpand')?'expandall':undefined,get.config('onlyguozhan')?'onlypack:mode_guozhan':undefined);
@@ -14388,7 +14388,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzsuzhi:'夙智',
 			gzsuzhi_info:'锁定技，每回合累计限三次；①当你于回合内因执行【杀】或【决斗】造成伤害时，此伤害+1；②你于回合内使用非转化的锦囊牌时摸一张牌，且无距离限制；③当有其他角色于你的回合内弃置牌后，你获得该角色的一张牌；④结束阶段，你获得〖反馈〗直到下回合开始。',
 			gzhuaiyi:'怀异',
-			gzhuaiyi_info:'出牌阶段限一次，你可以展示所有手牌。若其中包含两种颜色，则你可以弃置其中一种颜色的所有牌，然后获得至多等量名角色的各一张牌。然后你将以此法获得的装备牌置于武将牌上，称为“异”',
+			gzhuaiyi_info:'出牌阶段限一次，你可以展示所有手牌。若其中包含两种颜色，则你可以弃置其中一种颜色的所有牌，然后获得至多等量名角色的各一张牌。然后你将以此法得到的装备牌置于武将牌上，称为“异”',
 			gzzisui:'恣睢',
 			gzzisui_info:'锁定技，摸牌阶段，你多摸X张牌。结束阶段开始时，若X大于你的体力上限，你死亡（X为“异”数）。',
 
@@ -14457,7 +14457,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzboyan_zongheng:'驳言·纵横',
 			gzboyan_zongheng_info:'出牌阶段限一次，你可令一名其他角色本回合不能使用或打出手牌。',
 			gzjinfa:'矜伐',
-			gzjinfa_info:'出牌阶段限一次，你可弃置一张牌并令一名其他角色选择一项：①交给你一张装备牌，若你以此法获得了♠牌，则其视为对你使用一张【杀】。②你获得其一张牌。',
+			gzjinfa_info:'出牌阶段限一次，你可弃置一张牌并令一名其他角色选择一项：①交给你一张装备牌，若你以此法得到了♠牌，则其视为对你使用一张【杀】。②你获得其一张牌。',
 			gzduwu:'黩武',
 			gzduwu_info:'限定技，出牌阶段，你可以选择一个“军令”。你令攻击范围内所有的非己方角色选择是否执行。若有角色选择否，则你对其造成1点伤害且你摸一张牌。若有角色于此技能结算过程中进入濒死状态且存活，则你失去1点体力。',
 			gzxishe:'袭射',
@@ -14551,7 +14551,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			zhuwei_info:'当你的判定牌生效后，你可以获得之。然后，你可令当前回合角色本回合内使用【杀】的次数上限和手牌上限+1。',
 			gz_yuanshu:'袁术',
 			gzweidi:'伪帝',
-			gzweidi_info:'出牌阶段限一次，你可以指定一名本回合从牌堆获得过牌的其他角色并选择一个“军令”，令其选择一项：执行该军令；或令你获得其所有手牌，然后交给其等量的牌。',
+			gzweidi_info:'出牌阶段限一次，你可以指定一名本回合从牌堆得到过牌的其他角色并选择一个“军令”，令其选择一项：执行该军令；或令你获得其所有手牌，然后交给其等量的牌。',
 			gzyongsi:'庸肆',
 			gzyongsi_info:'锁定技，若场上没有【玉玺】，则视为你装备了【玉玺】；当你成为【知己知彼】的目标时，你展示你的所有手牌。',
 			//gzyongsi_eff1:'玉玺',
@@ -14818,7 +14818,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzxiongzhi:'雄志',
 			gzxiongzhi_info:'限定技。出牌阶段，你可依次展示牌堆顶的X张牌并使用之（X为你的体力上限）。',
 			gzquanbian:'权变',
-			gzquanbian_info:'当你于出牌阶段内使用/打出手牌时，若此牌有花色且你本回合内未使用/打出过该花色的其他手牌，则你可以观看牌堆顶X张牌，选择获得其中的一张并展示之。若你本回合使用过与获得牌花色相同的牌，则你本回合内不能再发动〖权变〗。',
+			gzquanbian_info:'当你于出牌阶段内使用/打出手牌时，若此牌有花色且你本回合内未使用/打出过该花色的其他手牌，则你可以观看牌堆顶X张牌，选择获得其中的一张并展示之。若你本回合使用过与得到的牌花色相同的牌，则你本回合内不能再发动〖权变〗。',
 			gzhuishi:'慧识',
 			gzhuishi_info:'摸牌阶段，你可以放弃摸牌，改为观看牌堆顶的X张牌，获得其中的一半（向下取整），然后将其余牌置入牌堆底。（X为弃牌堆顶的两张牌的名称字数之和）',
 			gzqingleng:'清冷',
@@ -14851,7 +14851,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzzhenxi_info:'当你使用【杀】指定目标后，你可以选择一项：1.弃置目标角色一张牌；2.将一张♦非锦囊牌当做【乐不思蜀】或♣非锦囊牌当做【兵粮寸断】对目标角色使用；3.背水：若其有暗置的武将牌且你的武将牌均明置，则你可以依次执行这两项。',
 			gzjiansu:'俭素',
 			gzjiansu_tag:'俭',
-			gzjiansu_info:'副将技。此武将牌减少半个阴阳鱼。①当你于回合外获得牌后，你可以展示这些牌，称为“俭”。②出牌阶段开始时，你可以弃置任意张“俭”，令一名体力值不大于X的角色回复1点体力（X为你以此法弃置的牌数）。',
+			gzjiansu_info:'副将技。此武将牌减少半个阴阳鱼。①当你于回合外得到牌后，你可以展示这些牌，称为“俭”。②出牌阶段开始时，你可以弃置任意张“俭”，令一名体力值不大于X的角色回复1点体力（X为你以此法弃置的牌数）。',
 			gzzhuidu:'追妒',
 			gzzhuidu_info:'出牌阶段限一次。当你造成伤害时，你可以令受伤角色选择一项：1.此伤害+1；2.弃置装备区里的所有牌。若该角色为女性，则你可以弃置一张牌，改为令其选择两项。',
 			gzshigong:'示恭',
@@ -14917,7 +14917,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzjinyu:'近谀',
 			gzjinyu_info:'当你明置此武将牌后，你令所有与你距离为1以内的角色依次执行以下效果：若其武将牌均明置，则其选择一张武将牌暗置，否则其弃置两张牌。',
 			gzrehuaiyi:'怀异',
-			gzrehuaiyi_info:'出牌阶段限一次，你可以展示所有手牌。若其中至少包含两种颜色，则你可以弃置其中一种颜色的所有牌，然后获得至多等量名角色的各一张牌。然后你将以此法获得的装备牌置于武将牌上，称为“异”。你可以将“异”如手牌般使用或打出。',
+			gzrehuaiyi_info:'出牌阶段限一次，你可以展示所有手牌。若其中至少包含两种颜色，则你可以弃置其中一种颜色的所有牌，然后获得至多等量名角色的各一张牌。然后你将以此法得到的装备牌置于武将牌上，称为“异”。你可以将“异”如手牌般使用或打出。',
 			gzrezisui:'恣睢',
 			gzrezisui_info:'锁定技。①摸牌阶段，你多摸X张牌。②结束阶段，若X大于你的体力上限，你死亡（X为你武将牌上的“异”数）。',
 			gztaidan:'太丹',

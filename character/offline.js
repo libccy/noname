@@ -915,7 +915,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zymingshi:{
 				audio:'mingshi',
 				forced:true,
-				trigger:{target:'useCardToTargeted'},
+				trigger:{target:'useCardToBefore'},
+				priority:15,
 				filter:function(event,player){
 					if(!player.hasEmptySlot(2)) return false;
 					if(event.card.name!='sha') return false;
@@ -6327,7 +6328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nskuishe_info:'出牌阶段限一次，你可以选择一名其他角色A的一张牌，并将此牌交给不为A的一名角色。然后A可以对你使用一张【杀】。',
 			sp_xiahoushi:"SP夏侯氏",
 			xinfu_yanyu:"燕语",
-			xinfu_yanyu_info:"一名角色的出牌阶段开始时，你可以弃置一张牌。若如此做，则该出牌阶段内，当有与你弃置的牌类别相同的其他牌进入弃牌堆后，你可令任意一名角色获得此牌。每阶段以此法获得的牌不能超过三张。",
+			xinfu_yanyu_info:"一名角色的出牌阶段开始时，你可以弃置一张牌。若如此做，则该出牌阶段内限三次，当一张与你弃置的牌类别相同的其他牌进入弃牌堆后，你可令任意一名角色获得此牌。",
 			xinfu_yanyu2:"燕语",
 			xinfu_xiaode:"孝德",
 			xinfu_xiaode_info:"其他角色死亡后，你可以声明该角色武将牌上的一个技能（主公技、觉醒技、隐匿技、使命技除外）。若如此做，你获得此技能且不能再发动〖孝德〗直到你的回合结束。",
@@ -6347,7 +6348,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			manjuan:'漫卷',
 			manjuan_info:'其他角色的牌因弃置而进入弃牌堆后，你可以弃置一张花色与之不同的牌，然后获得此牌。',
 			xinmanjuan:'漫卷',
-			xinmanjuan_info:'锁定技，当你不因【漫卷】或【醉乡】而获得牌时，你将此牌置入弃牌堆。然后若此时处于你的回合内，则你可以从弃牌堆中选择获得一张与此牌点数相同的其他牌。',
+			xinmanjuan_info:'锁定技，当你不因〖漫卷〗或〖醉乡〗而得到牌时，你将此牌置入弃牌堆。然后若此时处于你的回合内，则你可以从弃牌堆中选择获得一张与此牌点数相同的其他牌。',
 			zuixiang:'醉乡',
 			zuixiang2:'醉乡',
 			zuixiang_info:'限定技，准备阶段开始时，你可以展示牌堆顶的3张牌并置于你的武将牌上。你不能使用或打出与该些牌同类的牌，所有同类牌对你无效。之后的每个准备阶段，你须重复展示一次，直到这些牌中任意两张点数相同。然后，你获得这些牌。',
@@ -6402,7 +6403,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yjsancai:'散财',
 			yjsancai_info:'出牌阶段限一次，你可以展示所有手牌。若这些牌的类别均相同，则你可以赠予一名其他角色一张手牌。',
 			yjyibing:'义兵',
-			yjyibing_info:'当你不因赠予且不因〖义兵〗的嵌套结算而于摸牌阶段外获得牌时，你可以将此次获得的所有牌当做【杀】使用（无距离限制且不计入使用次数）。',
+			yjyibing_info:'当你不因赠予且不因〖义兵〗的嵌套结算而于摸牌阶段外得到牌时，你可以将此次得到的所有牌当做【杀】使用（无距离限制且不计入使用次数）。',
 			yj_caohong:'用间曹洪',
 			yj_caohong_ab:'曹洪',
 			yjlifeng:'厉锋',

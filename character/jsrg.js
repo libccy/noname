@@ -2358,15 +2358,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jsrgjuelie:{
 				audio:2,
-				trigger:{source:'damageBegin1'},
+				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
-					return event.card&&event.card.name=='sha'&&event.getParent().type=='card'&&(player.isMinHandcard()||player.isMinHp());
+					return player.countCards('he')&&event.card.name=='sha';
 				},
-				forced:true,
-				locked:false,
-				group:'jsrgjuelie_discard',
+				direct:true,
 				content:function(){
-					trigger.num++;
+					'step 0'
+					player.chooseToDiscard(get.prompt('jsrgjuelie',trigger.target),'当你使用【杀】指定一名角色为目标后，你可以弃置任意张牌，然后弃置其等量的牌',[1,Infinity],'he').set('ai',card=>{
+						if(ui.selected.cards.length>=_status.event.max) return 0;
+						if(_status.event.goon) return 4.5-get.value(card);
+						return 0;
+					}).set('max',trigger.target.countDiscardableCards(player,'he')).set('goon',get.attitude(player,trigger.target)<0).set('logSkill',['jsrgjuelie_discard',trigger.target]);
+					'step 1'
+					if(result.bool){
+						var num=result.cards.length;
+						if(trigger.target.countDiscardableCards(player,'he')) player.discardPlayerCard('平讨：弃置'+get.translation(trigger.target)+get.cnNumber(num)+'张牌',num,'he',trigger.target,true);
+					}
+					else event.finish();
+					'step 2'
+					if(player.isMinHandcard()||player.isMinHp()){
+						var id=trigger.target.playerid;
+						var map=trigger.getParent().customArgs;
+						if(!map[id]) map[id]={};
+						if(typeof map[id].extraDamage!='number'){
+							map[id].extraDamage=0;
+						}
+						map[id].extraDamage++;
+					}
 				},
 				shaRelated:true,
 				ai:{
@@ -2380,29 +2399,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 					},
 				},
-				subSkill:{
-					discard:{
-						audio:'jsrgjuelie',
-						trigger:{player:'useCardToPlayered'},
-						filter:function(event,player){
-							return player.countCards('he')&&event.card.name=='sha';
-						},
-						direct:true,
-						content:function(){
-							'step 0'
-							player.chooseToDiscard(get.prompt('jsrgjuelie',trigger.target),'当你使用【杀】指定一名角色为目标后，你可以弃置任意张牌，然后弃置其等量的牌',[1,Infinity],'he').set('ai',card=>{
-								if(ui.selected.cards.length>=_status.event.max) return 0;
-								if(_status.event.goon) return 4.5-get.value(card);
-								return 0;
-							}).set('max',trigger.target.countDiscardableCards(player,'he')).set('goon',get.attitude(player,trigger.target)<0).set('logSkill',['jsrgjuelie_discard',trigger.target]);
-							'step 1'
-							if(result.bool){
-								var num=result.cards.length;
-								if(trigger.target.countDiscardableCards(player,'he')) player.discardPlayerCard('平讨：弃置'+get.translation(trigger.target)+get.cnNumber(num)+'张牌',num,'he',trigger.target,true);
-							}
-						}
-					}
-				}
 			},
 			//皇甫嵩
 			jsrgguanhuo:{
@@ -3039,7 +3035,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'zhaohan',
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
-				locked:false,
+				//locked:false,
 				filter:function(event,player){
 					if(game.shuffleNumber==0) return player.isDamaged();
 					return true;
@@ -3291,7 +3287,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.addTempSkill('jsrgfendi_blocker');
 						player.addTempSkill('jsrgfendi_gain');
 						if(!trigger.card.storage) trigger.card.storage={};
-						trigger.card.storage.jsrgfendi=true;
+						trigger.card.storage.jsrgfendi=cards.slice();
 						player.storage.jsrgfendi_gain=target;
 					}
 					else player.storage.counttrigger.jsrgfendi--;
@@ -3335,16 +3331,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						onremove:true,
 						filter:function(event,player){
+							if(!event.card||!event.card.storage) return false;
+							var cards=event.card.storage.jsrgfendi;
 							var target=player.storage.jsrgfendi_gain;
-							return event.card&&event.card.storage&&event.card.storage.jsrgfendi&&target&&target.isIn()&&target.hasCard(card=>{
-								return card.hasGaintag('jsrgfendi_tag');
-							},'h');
+							if(!cards||!target||!target.isIn()) return false;
+							var cardsx=target.getCards('h');
+							cardsx.addArray(Array.from(ui.discardPile));
+							return cards.some(i=>cardsx.contains(i));
+							//target.hasCard(card=>{
+							//	return card.hasGaintag('jsrgfendi_tag');
+							//},'h');
 						},
 						content:function(){
-							player.logSkill('jsrgfendi_gain',player.storage.jsrgfendi_gain);
-							player.gain(player.storage.jsrgfendi_gain.getCards('h',card=>{
-								return card.hasGaintag('jsrgfendi_tag');
-							}),'give');
+							var target=player.storage.jsrgfendi_gain;
+							player.logSkill('jsrgfendi_gain',target);
+							var cardsx=target.getCards('h');
+							cardsx.addArray(Array.from(ui.discardPile));
+							var cards=trigger.card.storage.jsrgfendi.filter(i=>cardsx.contains(i));
+							player.gain(cards,'give');
 						}
 					}
 				}
@@ -3735,7 +3739,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					if(!targets.length) event.finish();
 					else if(targets.length<=num) event._result={bool:true,targets:targets};
-					else player.chooseTarget('令'+get.cnNumber(num)+'名角色获得“猎”标记',true,num,(card,player,target)=>{
+					else player.chooseTarget('令'+(num>1?'至多':'')+get.cnNumber(num)+'名角色获得“猎”标记',true,[1,num],(card,player,target)=>{
 						return !target.hasMark('jsrgzhenglve_mark');
 					}).set('ai',target=>{
 						var att=get.attitude(_status.event.player,target);
@@ -3852,12 +3856,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgshoushu:{
 				audio:2,
 				forced:true,
-				trigger:{global:'roundStart'},
+				trigger:{
+					player:'enterGame',
+					global:'phaseBefore',
+				},
 				filter:function(event,player){
-					return !game.hasPlayer(function(current){
-						return current.countCards('hejsx','taipingyaoshu');
-					})&&!Array.from(ui.cardPile.childNodes).concat(Array.from(ui.discardPile.childNodes))
-					.concat(Array.from(ui.ordering.childNodes)).map(i=>i.name).contains('taipingyaoshu');
+					if(game.hasPlayer(function(current){
+						return current.countCards('hej','taipingyaoshu');
+					})) return false;
+					return event.name!='phase'||game.phaseNumber==0;
 				},
 				direct:true,
 				group:'jsrgshoushu_destroy',
@@ -3958,7 +3965,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var target=targets.shift();
-					target.chooseToDiscard('寻道：请弃置一张牌'+(target==player?'':'，可能被作为新判定牌'),'he',true).set('ai',target=>{
+					target.chooseToDiscard('寻道：请弃置一张牌'+(target==player?'':'，可能被作为新判定牌'),'he',true).set('ai',card=>{
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
 						var judging=_status.event.judging;
@@ -4019,13 +4026,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jsrglinghua:{
 				audio:2,
-				locked:false,
-				mod:{
-					judge:(player,result)=>{
-						const parent=_status.event.getParent(2);
-						if(parent.name=='jsrglinghua'&&parent.triggername=='phaseJieshuBegin') result.bool=!result.bool;
-					}
-				},
 				trigger:{
 					player:['phaseZhunbeiBegin','phaseJieshuBegin'],
 				},
@@ -4048,7 +4048,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					event.executeDelayCardEffect=player.executeDelayCardEffect('shandian');
+					var next=event.executeDelayCardEffect=player.executeDelayCardEffect('shandian');
+					if(event.triggername!='phaseJieshuBegin') return;
+					next.judge=card=>-lib.card.shandian.judge(card)-4;
+					next.judge2=result=>!lib.card.shandian.judge2(result);
 					'step 1'
 					var executeDelayCardEffect=event.executeDelayCardEffect;
 					if(!player.hasHistory('damage',evt=>evt.getParent(2)==executeDelayCardEffect)){
@@ -4113,7 +4116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgpingtao:'平讨',
 			jsrgpingtao_info:'出牌阶段限一次。你可以令一名其他角色选择一项：1.交给你一张牌，然后你于此回合使用【杀】的次数上限+1；2.令你视为对其使用一张【杀】。',
 			jsrgjuelie:'绝烈',
-			jsrgjuelie_info:'①当你造成渠道为【杀】的伤害时，若你的手牌数或体力值最小，此伤害+1。②当你使用【杀】指定一名角色为目标后，你可以弃置任意张牌，然后弃置其等量的牌。',
+			jsrgjuelie_info:'当你使用【杀】指定一名角色为目标后，你可以弃置任意张牌并弃置其等量的牌，然后若你的手牌数或体力值最小，此【杀】对其的伤害基数+1。',
 			jsrg_huangfusong:'起皇甫嵩',
 			jsrg_huangfusong_ab:'皇甫嵩',
 			jsrgguanhuo:'观火',
@@ -4141,7 +4144,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_yangbiao:'起杨彪',
 			jsrg_yangbiao_ab:'杨彪',
 			jsrgzhaohan:'昭汉',
-			jsrgzhaohan_info:'准备阶段，若本局游戏：未洗过牌，你回复1点体力；洗过牌，你失去1点体力。',
+			jsrgzhaohan_info:'锁定技。准备阶段，若本局游戏：未洗过牌，你回复1点体力；洗过牌，你失去1点体力。',
 			jsrgrangjie:'让节',
 			jsrgrangjie_info:'当你受到1点伤害后，你可以移动场上的一张牌，然后你可以于弃牌堆中选择获得一张本回合进入弃牌堆且与此牌花色相同的牌。',
 			jsrgyizheng:'义争',
@@ -4151,14 +4154,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrglirang:'礼让',
 			jsrglirang_info:'每轮限一次。其他角色的摸牌阶段开始时，你可以交给其两张牌。然后此回合的弃牌阶段结束时，你可以获得所有其于此阶段因弃置进入弃牌堆的牌。',
 			jsrgzhengyi:'争义',
-			jsrgzhengyi_info:'当你每回合首次受到伤害时，本轮因〖礼让〗获得过牌的其他角色可以将此伤害转移给其。',
+			jsrgzhengyi_info:'当你每回合首次受到伤害时，本轮因〖礼让〗得到过牌的其他角色可以将此伤害转移给其。',
 			jsrg_zhujun:'起朱儁',
 			jsrg_zhujun_ab:'朱儁',
 			jsrgfendi:'分敌',
 			jsrgfendi_tag:'分敌',
-			jsrgfendi_info:'每回合限一次。当你使用【杀】指定唯一目标后，你可以展示其任意张手牌，令其不能使用或打出对应实体牌不全为这些牌的牌直到此【杀】结算结束。然后当此【杀】对其造成伤害后，你获得这些牌。',
+			jsrgfendi_info:'每回合限一次。当你使用【杀】指定唯一目标后，你可以展示其任意张手牌，令其不能使用或打出对应实体牌不全为这些牌的牌直到此【杀】结算结束。然后当此【杀】对其造成伤害后，你于其手牌区或弃牌堆获得这些牌。',
 			jsrgjuxiang:'拒降',
-			jsrgjuxiang_info:'当你不于摸牌阶段获得牌后，你可以弃置之，令当前回合角色于此回合额定的出牌阶段内使用【杀】的次数上限+X（X为你以此法弃置的牌的花色数）。',
+			jsrgjuxiang_info:'当你不于摸牌阶段得到牌后，你可以弃置之，令当前回合角色于此回合额定的出牌阶段内使用【杀】的次数上限+X（X为你以此法弃置的牌的花色数）。',
 			jsrg_liubei:'起刘备',
 			jsrg_liubei_ab:'刘备',
 			jsrgjishan:'积善',
@@ -4174,13 +4177,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_liuyan:'起刘焉',
 			jsrg_liuyan_ab:'刘焉',
 			jsrgtushe:'图射',
-			jsrgtushe_info:'当你使用非装备牌指定目标后，你可以展示所有手牌。若你没有基本牌，你可以摸X张牌（X为此牌指定的目标数）。',
+			jsrgtushe_info:'当你使用非装备牌指定目标后，你可以展示所有手牌（无牌则不展示）。若你没有基本牌，你可以摸X张牌（X为此牌指定的目标数）。',
 			jsrgtongjue:'通绝',
 			jsrgtongjue_info:'主公技。出牌阶段限一次。你可以将任意张牌交给等量名其他群势力角色。然后你不能使用牌指定这些角色为目标直到回合结束。',
 			jsrg_caocao:'起曹操',
 			jsrg_caocao_ab:'曹操',
 			jsrgzhenglve:'政略',
-			jsrgzhenglve_info:'①主公的回合结束时，你可以摸一张牌，然后令一名没有“猎”标记的角色获得“猎”（若主公本回合没有造成过伤害，则改为两名）。②你对有“猎”的角色使用牌无距离和次数限制。③每回合限一次。当你对有“猎”的角色造成伤害后，你可以摸一张牌并获得造成此伤害的牌。',
+			jsrgzhenglve_info:'①主公的回合结束时，你可以摸一张牌，然后令一名没有“猎”标记的角色获得“猎”（若主公本回合没有造成过伤害，则改为至多两名）。②你对有“猎”的角色使用牌无距离和次数限制。③每回合限一次。当你对有“猎”的角色造成伤害后，你可以摸一张牌并获得造成此伤害的牌。',
 			jsrghuilie:'会猎',
 			jsrghuilie_info:'觉醒技。准备阶段，若有“猎”的角色数大于2，你减1点体力上限，然后获得〖平戎〗和〖飞影〗。',
 			jsrgpingrong:'平戎',
@@ -4188,7 +4191,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_nanhualaoxian:'起南华老仙',
 			jsrg_nanhualaoxian_ab:'南华老仙',
 			jsrgshoushu:'授术',
-			jsrgshoushu_info:'锁定技。①每轮开始时，若游戏内没有【太平要术】，你可以从游戏外将【太平要术】置于一名角色的装备区内。②当【太平要术】离开一名角色的装备区后，你令此牌销毁。',
+			jsrgshoushu_info:'锁定技。①游戏开始时，若场上没有【太平要术】，你可以从游戏外将【太平要术】置于一名角色的装备区内。②当【太平要术】离开一名角色的装备区后，你令此牌销毁。',
 			jsrgxundao:'寻道',
 			jsrgxundao_info:'当你的判定牌生效前，你可以令至多两名角色依次弃置一张牌，然后你选择一张以此法弃置且位于弃牌堆中的牌代替此判定牌。',
 			jsrglinghua:'灵化',
@@ -4233,7 +4236,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_zoushi:'承邹氏',
 			jsrg_zoushi_ab:'邹氏',
 			jsrgguyin:'孤吟',
-			jsrgguyin_info:'准备阶段，你可以翻面，且令所有其他男性角色依次选择是否翻面。然后你和所有背面朝上的角色轮流各摸一张牌，直到你们累计以此法获得X张牌（X为场上存活角色与死亡角色中男性角色数）。',
+			jsrgguyin_info:'准备阶段，你可以翻面，且令所有其他男性角色依次选择是否翻面。然后你和所有背面朝上的角色轮流各摸一张牌，直到你们累计以此法得到X张牌（X为场上存活角色与死亡角色中男性角色数）。',
 			jsrgzhangdeng:'帐灯',
 			jsrgzhangdeng_info:'①当一名武将牌背面朝上的角色需要使用【酒】时，若你的武将牌背面朝上，其可以视为使用之。②当一名角色于一回合第二次发动〖帐灯①〗时，你将武将牌翻面至正面朝上。',
 			jsrg_guanyu:'承关羽',
@@ -4269,7 +4272,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_chunyuqiong:'承淳于琼',
 			jsrg_chunyuqiong_ab:'淳于琼',
 			jsrgcangchu:'仓储',
-			jsrgcangchu_info:'一名角色的结束阶段，你可以令至多X名角色各摸一张牌，若X大于存活角色数，则改为各摸两张牌（X为你于此回合获得过的牌数）。',
+			jsrgcangchu_info:'一名角色的结束阶段，你可以令至多X名角色各摸一张牌，若X大于存活角色数，则改为各摸两张牌（X为你于此回合得到的牌数）。',
 			jsrgshishou:'失守',
 			jsrgshishou_info:'锁定技。①当你使用【酒】时，你摸三张牌，然后你本回合不能再使用牌。②当你受到火焰伤害后，你令〖仓储〗失效直到你的下回合结束后。',
 

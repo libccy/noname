@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:['xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao","old_wanglang",'shichangshi'],
+				mobile_default:['xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan'],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua_feng:['re_xiaoqiao',"xin_zhoutai"],
@@ -26,14 +26,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			xin_guozhao:['female','wei',3,['yichong','wufei'],['unseen']],
-			xin_zhangyi:['male','shu',4,['xinwurong','shizhi'],['unseen']],
+			xin_guozhao:['female','wei',3,['yichong','wufei']],
+			xin_zhangyi:['male','shu',4,['xinwurong','shizhi']],
 			xin_sunliang:['male','wu',3,['xinzhizheng','xinkuizhu','xinlijun'],['zhu']],
 			re_xiaoqiao:['female','wu',3,['retianxiang','xinhongyan']],
 			shichangshi:['male','qun',1,['mbdanggu','mbmowang']],
 			re_zhangzhang:['male','wu',3,['rezhijian','guzheng']],
 			qianzhao:['male','wei',4,['mbshihe','mbzhenfu']],
-			old_wanglang:['male','wei',3,['gushe','jici']],
 			re_yanwen:["male","qun",4,["reshuangxiong"]],
 			xin_zhoutai:['male','wu',4,['buqu','new_fenji']],
 			re_caozhi:['male','wei',3,['reluoying','rejiushi','chengzhang']],
@@ -147,7 +146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hujinding:['female','shu','2/6',['renshi','wuyuan','huaizi']],
 			
 			re_zhanggong:['male','wei',3,['reqianxin','rezhenxing']],
-			re_xugong:['male','qun',3,['rebiaozhao','yechou']],
+			re_xugong:['male','qun',3,['rebiaozhao','yechou'],['doublegroup:wu:qun']],
 			re_weiwenzhugezhi:['male','wu',4,['refuhai']],
 			
 			xin_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
@@ -170,13 +169,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunzhang:'孙璋（？-189年？）东汉末期汉灵帝的宦官，官居中常侍，为十常侍之一，在张让、赵忠之下位居第三。光熹元年（189年），张让、赵忠、段珪等诛杀何进，袁绍率军入宫，诛杀孙璋。',
 			bilan:'毕岚（？—189），东汉宦官，十常侍之一。十常侍朋比为奸，祸乱朝纲，制造出党锢之祸，后被袁绍诛杀。另外，毕岚曾制造翻车，用于取河水洒路。',
 			xiayun:'夏恽（？—189），东汉宦官，十常侍之一。后被袁绍、曹操诛于翠花楼前。',
-			hankui:'韩悝[kuī]（？—189），东汉宦官，十常侍之一。后被袁绍所诛。',
+			hankui:'韩悝（？—189），东汉宦官，十常侍之一。后被袁绍所诛。',
 			lisong:'栗嵩，东汉宦官，十常侍之一，与张让等人均一同任职中常侍。',
 			duangui:'段珪（？—189），东汉宦官，十常侍之一。段珪与张让、赵忠等人朋比为奸，党同伐异，横征暴敛，卖官鬻爵，引起了以何进为首的外戚集团的不满。何进谋诛宦官，却不纳曹操、陈琳之谏，多结外镇军阀，翘首京师，与袁绍等谋诛宦竖。终于事泄，被宦官集团查知。张让、段珪等人先下手为强，斩杀何进于嘉德殿前，却也引起了京师的变乱。袁绍等人趁机带兵冲入皇宫，大肆诛杀太监。洛阳卫军变乱后，段珪与张让等人劫持少帝刘辩、陈留王刘协出逃，后被杀。',
 			guosheng:'郭胜，南阳宛（今河南南阳）人。汉灵帝时为中常侍，与张让、赵忠等狼狈为奸，并皆封侯。曾助同乡何进、何太后贵幸。后被袁绍等人率兵诛灭。',
 			gaowang:'高望（？~189年），京兆人，东汉宦官，十常侍之一，为小黄门兼任尚药监，颇得皇子刘辩的信任。中平六年（189年），张让等人杀害大将军何进，袁绍与王匡等人率兵杀入雒阳端门，在承明堂上斩杀中常侍高望。',
 			qianzhao:'牵招（？—231年），字子经，安平郡观津县（今河北省武邑县）人。三国时期曹魏名将。牵招早年师从乐隐，与刘备成为刎颈之交。投靠冀州牧袁绍，担任冀州从事，统领乌丸突骑。袁绍死后，跟随冀州刺史袁尚，受到并州牧高干加害，投奔丞相曹操，授军谋掾。从平乌丸，出任护乌丸校尉。举茂才出身，从平汉中，授中护军。拜平虏校尉，平定东莱郡叛乱。魏文帝曹丕时期，授护鲜卑校尉，驻扎昌平，迁右中郎将、雁门太守，遏制鲜卑轲比能发展壮大。魏明帝即位，赐爵关内侯，营救护乌丸校尉田豫。太和五年，去世。',
-			fuqian:'傅佥[qiān] ( ? ~263年），义阳（治今湖北省枣阳市)人，蜀汉将领傅彤之子，三国时期蜀汉名将。金长于谋略，并颇有胆勇，姜维甚爱之。傅佥官至关中都督。魏国攻伐蜀汉时，傅佥和蒋舒防守阳安关，兵败战死。',
+			fuqian:'傅佥（？~263年），义阳（治今湖北省枣阳市）人，蜀汉将领傅彤之子，三国时期蜀汉名将。金长于谋略，并颇有胆勇，姜维甚爱之。傅佥官至关中都督。魏国攻伐蜀汉时，傅佥和蒋舒防守阳安关，兵败战死。',
 			wangjun:'王濬（207年～286年），字士治，小名阿童，弘农郡湖县（今河南省灵宝市阌乡）人。西晋时期名将。王濬出身世家，博学多闻，容颜英俊，多谋善战。举秀才出身，起家河东郡从事。泰始八年（272年），担任广汉太守，平定益州叛乱，迁益州刺史。利用长江上游地势之利，修造战船，组建强大的水军。上书晋武帝，促成晋灭吴之战。咸宁六年（280年），率兵顺流而下，熔毁横江铁链，攻克丹阳郡，率先攻取石头城，接受吴末帝孙皓投降，完成西晋统一大业。凭借功勋，拜辅国将军、步兵校尉，册封襄阳侯。为避猜忌，纵情享受，累迁特进、抚军大将军、开府仪同三司、散骑常侍、后军将军等。太康六年十二月（286年1月18日），王濬去世，享年八十岁，谥号为“武”，安葬于柏谷山。',
 			yangfu:'杨阜（172年—244年），字义山，汉天水冀县（今甘谷县东南）人。三国时期曹魏名臣。汉献帝建安初年，任凉州从事，旋拜安定长史；韦康任刺史后辟为别驾，改任州参军；后因讨马超有功，赐爵关内侯。曹操征汉中时，杨阜担任益州刺史，回来后又担任武都太守。魏明帝时，由将作大匠改少府。杨阜不但卓识远见，而且刚正不阿，敢于直言，对朝廷弊政多有诤谏，六次进言谏魏明帝应勤政爱民，魏明帝对他颇有敬畏之心。杨阜勤政廉洁，在宫内担任少府时，专管宝器、珍膳、衣物等，而他死后则家无馀财。皇帝让杨阜的孙子杨豹继任了少府之职。原甘谷县文昌宫西侧有杨氏家祠，内悬“两代尚书”匾额。',
 			ruanhui:'阮氏女，是指三国时期曹魏名士许允之妻阮氏，陈留尉氏人。阮氏女是中国古代四大丑女之一，貌丑而见识非凡。她出身士族之家，是卫尉阮共（字伯彦）之女、阮侃（字德如）之妹。嫁与许允后生有二子：许奇，官至司隶校尉；许猛，官至幽州刺史。',
@@ -187,7 +186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanpu:'阎圃，生卒年不详，是益州巴西安汉（今四川省南充市）人。张鲁割据巴、汉，就以阎圃为功曹。东汉末年人物，本为张鲁部下谋士，后随张鲁一同投降曹操，封平乐乡侯。',
 			mayuanyi:'马元义（？—184年6月7日），东汉末年黄巾之乱的组织者之一，是黄巾大方首领。光和六年（183年），马元义奉黄巾军首领张角之命，筹划起事的准备工作。马元义聚集荆州、扬州信徒数万人约定于邺城相会，并收买中常侍封谞、徐奉等为内应，准备于次年（甲子年）三月初五（戊申日）内外同时起事。由于张角弟子济南人唐周的告密，马元义于于中平元年（184年）正月在河内郡山阳县被捕，送往洛阳车裂，同时被杀的还有教众近千人。由于马元义的被杀，迫使张角提前于二月起兵发动叛乱。',
 			simafu:'司马孚（180年－272年4月3日），字叔达。河内郡温县（今河南温县）人。三国曹魏至西晋初年重臣，西晋宗室，东汉京兆尹司马防第三子，晋宣帝司马懿之弟。自曹操时代起，司马孚就任文学掾，而后历仕魏国五代皇帝，累迁至太傅。司马孚在“高平陵事变”之际，协助司马懿控制京师，诛杀曹爽一党。后又督军成功防御吴、蜀的进攻，为司马氏政权的稳固多有功劳。但他性格十分谨慎，自司马懿执掌大权起，便逐渐引退，更未直接参与司马氏废立魏帝的谋划。西晋代魏后，司马孚进拜太宰，封安平王。晋武帝司马炎对他十分尊宠，但他并不以此为荣，至死仍以魏臣自称。泰始八年二月壬辰日（272年4月3日），司马孚去世，年九十三。武帝为其举哀三日，葬礼规格比照东汉东平献王刘苍，赐谥献王。',
-			sunchen:'孙綝（chēn）（231年－259年1月18日），字子通，吴郡富春（今浙江杭州市富阳区）人。三国时期吴国宗室、权臣，昭义中郎将孙静曾孙、定武中郎将孙暠之孙、安民都尉孙绰的儿子。门荫入仕，初任偏将军。太平元年（256年），升任侍中、武卫将军、都督中外诸军事。掌权以后，诛杀大司马滕胤、骠骑将军吕据等重臣，升任大将军，册封永宁县侯。嗜好杀戮，与皇帝孙亮的矛盾激化，最终废黜孙亮，拥立琅琊王孙休即位，累迁丞相、荆州牧。永安元年十二月（259年1月），在左将军张布的协助下，遭到皇帝孙休捕杀，时年二十八岁，削除宗籍，改姓故氏。',
+			sunchen:'孙綝（231年－259年1月18日），字子通，吴郡富春（今浙江杭州市富阳区）人。三国时期吴国宗室、权臣，昭义中郎将孙静曾孙、定武中郎将孙暠之孙、安民都尉孙绰的儿子。门荫入仕，初任偏将军。太平元年（256年），升任侍中、武卫将军、都督中外诸军事。掌权以后，诛杀大司马滕胤、骠骑将军吕据等重臣，升任大将军，册封永宁县侯。嗜好杀戮，与皇帝孙亮的矛盾激化，最终废黜孙亮，拥立琅琊王孙休即位，累迁丞相、荆州牧。永安元年十二月（259年1月），在左将军张布的协助下，遭到皇帝孙休捕杀，时年二十八岁，削除宗籍，改姓故氏。',
 			qiaozhou:'谯周（201年－270年），字允南，巴西郡西充国县（今四川西充县槐树镇）人。三国时期蜀汉大臣、学者、儒学家、史学家。幼年丧父，少读典籍，精研六经，颇晓天文，成为蜀地大儒之一，门下有陈寿、罗宪等学生。诸葛亮担任益州牧时，授劝学从事。诸葛亮死后，不顾朝令，前往奔丧。后主刘禅册立太子时，授太子仆，迁太子家令、光禄大夫。反对姜维北伐，著《仇国论》，力陈北伐之失。炎兴元年（263年），邓艾攻打成都时期，力劝刘禅投降，“有全国之功”，投降魏国后，受封阳城亭侯，迁骑都尉。泰始六年（270年），授散骑常侍，同年去世，时年七十岁。',
 			gongsunkang:'公孙康（生卒年不详），辽东襄平（今辽宁辽阳）人。东汉末年辽东地区割据军阀，辽东太守公孙度长子（一作庶子）、车骑将军公孙恭之兄。公孙康在其父死后继任辽东太守。建安十二年（207年），擒斩图谋不轨的袁尚、袁熙兄弟，将其首级献予曹操，被拜为左将军，封襄平侯。建安十四年（209年），公孙康大破高句丽，陷其国都，并讨伐韩濊，设置带方郡。死后因二子年幼，由公孙恭继任。曹丕称帝后，被追赠为大司马。',
 			zhouqun:'周群（生卒年不详），字仲直，巴西阆中（今四川阆中）人。周群年少时随父周舒学习占验天算之术。后来刘璋聘请周群为师友从事，其预言大多得以应验。刘备割据益州，任命周群为儒林校尉。曾劝说刘备攻汉中必定不利，事后得到应验，被举荐为茂才。',
@@ -199,7 +198,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			simashi:'司马师（208年～255年3月23日），字子元，河内温县（今河南省温县）人。三国时期曹魏权臣，西晋王朝的奠基人之一，晋宣帝司马懿与宣穆皇后张春华的长子，晋文帝司马昭的同母兄，晋武帝司马炎的伯父。司马师沉着坚强，雄才大略，早年与夏侯玄、何晏齐名。高平陵政变后，以功封长平乡侯，旋加卫将军。司马懿死后，以抚军大将军辅政，独揽朝廷大权，次年升为大将军。掌权后，他制定选拔官吏的法规，命百官推荐贤才，整顿纲纪，使其各有职掌，朝野肃然。司马师也有卓越的军事才能，曾用计于新城之战击溃吴国诸葛恪的大军。嘉平六年（254年），魏帝曹芳与中书令李丰等人密谋除司马师，事情泄露，司马师杀死参与者，迫郭太后废曹芳，改立高贵乡公曹髦为帝。次年，亲自率兵平定毌丘俭、文钦之乱。回师途中病死，时年四十八岁，谥号“忠武”。后被追尊为晋景王。西晋建立后，被追尊为景皇帝，庙号世宗。',
 			yanghuiyu:'羊徽瑜（214年－278年），泰山南城（今山东新泰）人，晋景帝司马师第三任妻子。羊徽瑜出身官宦世家泰山羊氏，她是南阳太守羊续的孙女，上党太守羊衜之女；其母为东汉名士左中郎将蔡邕之女、蔡文姬的姐妹。羊徽瑜聪慧贤德，嫁给司马师后未有子女。以司马师之弟司马昭的次子司马攸为继子。司马师死后，司马攸侍奉羊徽瑜非常孝顺。泰始元年（265年），司马昭长子司马炎受禅登基，建立西晋，追谥伯父司马师为景皇帝。泰始二年（266年），尊奉羊徽瑜为景皇后，因居弘训宫，故称弘训太后。咸宁四年（278年），羊徽瑜去世，时年六十五岁，谥号景献皇后，与司马师合葬峻平陵。',
 			dingyuan:'丁原（？—189年），字建阳，兖州泰山郡南城县（山东省平邑县郑城镇）人。东汉末年军阀，官拜执金吾、并州刺史。任并州刺史期间，他亲近、善待主簿吕布，又调遣部下张杨、张辽等名将到洛阳任职。汉灵帝驾崩后，带兵进入洛阳，担任执金吾，并与大将军何进谋划诛杀十常侍，但不久事情败露，何进被宦官杀死。在宦官被诛灭之后，丁原与军阀董卓在废帝问题上意见不合产生矛盾，于是董卓诱使吕布将其杀害，其势力亦被吞并。',
-			furong:'傅肜（róng）（？－222年），义阳（今湖北枣阳）人，三国时蜀汉将领。刘备攻伐吴国时，傅肜为别督。后刘备被陆逊击败，傅肜率部断后，奋战至死。死前怒斥道：“吴狗！何有汉将军降者！”',
+			furong:'傅肜（？－222年），义阳（今湖北枣阳）人，三国时蜀汉将领。刘备攻伐吴国时，傅肜为别督。后刘备被陆逊击败，傅肜率部断后，奋战至死。死前怒斥道：“吴狗！何有汉将军降者！”',
 			zhengxuan:'郑玄（127年－200年），字康成。北海郡高密县（今山东省高密市）人。东汉末年儒家学者、经学大师。郑玄曾入太学攻《京氏易》、《公羊春秋》及《三统历》、《九章算术》，又从张恭祖学《古文尚书》、《周礼》和《左传》等，最后从马融学古文经。游学归里之后，复客耕东莱，聚徒授课，弟子达数千人，家贫好学，终为大儒。党锢之祸起，遭禁锢，杜门注疏，潜心著述。晚年守节不仕，却遭逼迫从军，最终病逝于元城，年七十四。郑玄治学以古文经学为主，兼采今文经学。他遍注儒家经典，以毕生精力整理古代文化遗产，使经学进入了一个“小统一时代”。著有《天文七政论》、《中侯》等书，共百万余言，世称“郑学”，为汉代经学的集大成者。唐贞观年间，列郑玄于二十二“先师”之列，配享孔庙。宋代时被追封为高密伯。后人建有郑公祠以纪念。',
 			dengzhi:'邓芝（178年－251年），字伯苗。义阳郡新野县（今河南新野）人。东汉名将邓禹之后，三国时期蜀汉重臣。邓芝早年曾被预言能位至大将，后被刘备任为郫令，升迁为广汉太守。因任官公廉且有治绩，被征入朝为尚书。刘备逝世后，奉命出使吴国，成功修复两国关系，并深为吴大帝孙权所赏识。建兴六年（228年），丞相诸葛亮策划北伐，命邓芝与大将赵云佯攻郿城，以吸引魏国曹真军主力。建兴十二年（234年），迁前军师、前将军，领兖州刺史，封阳武亭侯，不久督领江州。延熙六年（243年），迁车骑将军，后授假节。又率军平定涪陵叛乱。延熙十四年（251年），邓芝病逝。邓芝性格正直、简单，不刻意修饰情绪。他为将二十多年，赏罚明断，体恤士卒。身上的衣食取自官府，从未经营过私产，妻儿甚至还有忍饥挨饿之时，死时家中也没有多余财物。',
 			yangyi:'杨仪（？－235年），字威公，襄阳（今湖北襄阳）人，三国时期蜀汉官员。最初为荆州刺史傅群的主簿，后投奔关羽，任为功曹。关羽遣其至成都，大受刘备赞赏，擢为尚书。因与尚书令刘巴不和，调为弘农太守。建兴三年（225年）任丞相参军，此后一直跟随诸葛亮战斗。亮卒，他部署安全退军。诸葛亮在生前定蒋琬继己任，杨仪仅拜中军师。建兴十三年（235年），因多出怨言，被削职流放至汉嘉郡。但杨仪仍不自省，又上书诽谤，言辞激烈，最后下狱，自杀身亡。',
@@ -263,23 +262,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//cardimage:"baiyin",
 				type:"equip",
 				subtype:"equip2",
-				filterLose:function(card,player){
-					if(player.hasSkillTag('unequip2')) return false;
-					return true;
-				},
 				loseDelay:false,
 				onLose:function(){
-					var next=game.createEvent('rewrite_baiyin_recover');
-					event.next.remove(next);
-					var evt=event.getParent();
-					if(evt.getlx===false) evt=evt.getParent();
-					evt.after.push(next);
-					next.player=player;
-					next.setContent(function(){
-						player.logSkill('rw_baiyin_skill');
-						player.draw(2);
-						player.recover();
-					});
+					player.addTempSkill('rw_baiyin_skill_lose')
 				},
 				skills:["rw_baiyin_skill"],
 				tag:{
@@ -420,7 +405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt('meihun'),'选择一名其他角色并选择一个花色，获得其此花色的所有牌并令其获得“雀”标记',lib.filter.notMe).set('ai',function(target){
+					player.chooseTarget(get.prompt('yichong'),'选择一名其他角色并选择一个花色，获得其此花色的所有牌并令其获得“雀”标记',lib.filter.notMe).set('ai',function(target){
 						var player=_status.event.player;
 						var att=get.attitude(player,target);
 						if(att>0) return 0;
@@ -468,7 +453,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('yichong_clear',{player:'phaseBegin'});
 				},
 				onremove:true,
-				intro:{content:'拥有“雀”标记的角色获得$牌后，你获得之'},
+				intro:{content:'拥有“雀”标记的角色得到$牌后，你获得之'},
 				group:'yichong_gain',
 				subSkill:{
 					gain:{
@@ -2088,7 +2073,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					prevent:{
 						trigger:{source:'damageBegin2'},
 						filter:function(event,player){
-							return player.getStorage('mbshihe_prevent').contains(event.player);
+							if(get.mode()=='identity') return player.getStorage('mbshihe_prevent').contains(event.player);
+							return player.getStorage('mbshihe_prevent').some(target=>event.player.isFriendOf(target));
 						},
 						onremove:true,
 						forced:true,
@@ -2101,13 +2087,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:function(storage,player){
 								var targets=storage.filter(i=>i.isIn());
-								return '被'+get.translation(targets)+'吓到了，对他'+(targets.length>1?'们':'')+'打不出伤害';
+								return '被'+get.translation(targets)+'吓到了，对他'+(targets.length>1?'们':'')+(get.mode()!='identity'?'和他的友方角色':'')+'打不出伤害';
 							},
 						},
 						ai:{
 							effect:{
 								player:function(card,player,target,current){
-									if(get.tag(card,'damage')&&player.getStorage('mbshihe_prevent').contains(target)) return 'zeroplayertarget';
+									if(get.tag(card,'damage')){
+										var bool=false;
+										if(get.mode()=='identity'&&player.getStorage('mbshihe_prevent').contains(target)) bool=true;
+										if(get.mode()!='identity'&&player.getStorage('mbshihe_prevent').some(targetx=>target.isFriendOf(targetx))) bool=true;
+										if(bool) return 'zeroplayertarget';
+									}
 								}
 							},
 						}
@@ -2327,10 +2318,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.log(player,(num>0?'获得了':'减少了')+get.cnNumber(Math.abs(num))+'点“达命”值');
 				},
 				content:function(){
-					lib.skill.spdaming.change(player,2);
+					lib.skill.spdaming.change(player,1);
 				},
 				intro:{
 					name:'达命值',
+					markcount:function(storage,player){
+						return (storage||0).toString();
+					},
 					content:'当前有#点“达命”值',
 				},
 				subSkill:{
@@ -3238,57 +3232,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				multitarget:true,
 				targetprompt:['伤害来源','受伤角色'],
 				content:function(){
-					targets[1].damage(targets[0]).setContent(lib.skill.guanzong.viewAsDamageContent);
-				},
-				viewAsDamageContent:function(){
-					'step 0'
-					if(lib.config.background_audio){
-						game.playAudio('effect','damage'+(num>1?'2':''));
-					}
-					game.broadcast(function(num){
-						if(lib.config.background_audio){
-							game.playAudio('effect','damage'+(num>1?'2':''));
-						}
-					},num);
-					var str='视为受到了';
-					if(source) str+='来自<span class="bluetext">'+(source==player?'自己':get.translation(source))+'</span>的';
-					str+=get.cnNumber(num)+'点';
-					if(event.nature) str+=get.translation(event.nature)+'属性';
-					str+='伤害';
-					game.log(player,str);
-					if(player.stat[player.stat.length-1].damaged==undefined){
-						player.stat[player.stat.length-1].damaged=num;
-					}
-					else {
-						player.stat[player.stat.length-1].damaged+=num;
-					}
-					if(source){
-						source.getHistory('sourceDamage').push(event);
-						if(source.stat[source.stat.length-1].damage==undefined){
-							source.stat[source.stat.length-1].damage=num;
-						}
-						else {
-							source.stat[source.stat.length-1].damage+=num;
-						}
-					}
-					player.getHistory('damage').push(event);
-					if(event.animate!==false){
-						player.$damage(source);
-						game.broadcastAll(function(nature,player){
-							if(lib.config.animation&&!lib.config.low_performance){
-								if(nature=='fire'){
-									player.$fire();
-								}
-								else if(nature=='thunder'){
-									player.$thunder();
-								}
-							}
-						},event.nature,player);
-						var numx=Math.max(0,num-player.hujia);
-						player.$damagepop(-numx,'gray');
-					}
-					'step 1'
-					event.trigger('damageSource');
+					targets[1].damage(targets[0],'unreal');
 				},
 				ai:{
 					result:{
@@ -5335,7 +5279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card.name!='jiu'&&event.card.name!='tao'&&
 						event.targets.length==1&&event.card.isCard&&event.cards.length==1&&event.getParent(2).name!='jueyong_timeout'&&
 						get.position(event.cards[0],true)=='o'&&event.card.name==event.cards[0].name&&
-						(!player.storage.jueyong||player.storage.jueyong[0].length<player.hp*2);
+						(!player.storage.jueyong||player.storage.jueyong[0].length<player.getHp());
 				},
 				content:function(){
 					trigger.targets.remove(player);
@@ -7733,8 +7677,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseControl(skills).set('dialog',['选择令'+get.translation(target)+'获得一个技能',[chara,'character']]);
 					'step 2'
 					target.addSkillLog(result.control);
-					target.storage.zhuSkill_shanli=[result.control];
 					target.setAvatarQueue(target.name1||target.name,[event.chara[event.skills.indexOf(result.control)]]);
+					'step 3'
+					if(target.isZhu2()) event.trigger('zhuUpdate');
 				},
 			},
 			hongyi:{
@@ -8476,15 +8421,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				check:function(event,player){
 					if(get.attitude(player,event.player)<4) return false;
-					if(player.countCards('h',function(card){
-						var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-						if(mod2!='unchanged') return mod2;
-						var mod=game.checkMod(card,player,event.player,'unchanged','cardSavable',player);
-						if(mod!='unchanged') return mod;
-						var savable=get.info(card).savable;
-						if(typeof savable=='function') savable=savable(card,player,event.player);
-						return savable;
-					})>=1+event.num-event.player.hp) return false;
+					if(player.countCards('hs',card=>player.canSaveCard(card,event.player))>=1+event.num-event.player.hp) return false;
 					if(event.player==player||event.player==get.zhu(player)) return true;
 					return !player.hasUnknown();
 				},
@@ -10068,11 +10005,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinqingjian:{
 				audio:'qingjian',
-				trigger:{player:'gainEnd'},
+				trigger:{
+					player:'gainAfter',
+					global:'loseAsyncAfter',
+				},
 				direct:true,
 				usable:1,
 				filter:function(event,player){
-					return event.getParent('phaseDraw').player!=player&&player.countCards('he')>0;
+					return event.getg(player).length&&event.getParent('phaseDraw').player!=player&&player.countCards('he')>0;
 				},
 				content:function(){
 					'step 0'
@@ -10149,15 +10089,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'dying'},
 				check:function(event,player){
 					if(get.attitude(player,event.player)<4) return false;
-					if(player.countCards('h',function(card){
-						var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-						if(mod2!='unchanged') return mod2;
-						var mod=game.checkMod(card,player,event.player,'unchanged','cardSavable',player);
-						if(mod!='unchanged') return mod;
-						var savable=get.info(card).savable;
-						if(typeof savable=='function') savable=savable(card,player,event.player);
-						return savable;
-					})>=1-event.player.hp) return false;
+					if(player.countCards('hs',card=>player.canSaveCard(card,event.player))>=1-event.player.hp) return false;
 					if(event.player==player||event.player==get.zhu(player)) return true;
 					if(_status.currentPhase&&get.damageEffect(_status.currentPhase,player,player)<0) return false;
 					return !player.hasUnknown();
@@ -11636,6 +11568,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"rw_baiyin_skill":{
 				inherit:"baiyin_skill",
 				audio:true,
+				subSkill:{
+					lose:{
+						audio:'rw_baiyin_skill',
+						forced:true,
+						charlotte:true,
+						equipSkill:true,
+						trigger:{
+							player:'loseAfter',
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+						},
+						filter:(event,player)=>{
+							if(player.hasSkillTag('unequip2')) return false;
+							var evt=event.getl(player);
+							return evt&&evt.es.some(card=>card.name=='rewrite_baiyin')
+						},
+						content:function(){
+							var evt=trigger.getl(player);
+							evt.es.forEach(card=>{
+								if(card.name=='rewrite_baiyin'){
+									player.recover();
+									player.draw(2);
+								}
+							})
+						},
+					},
+				},
 			},
 			"rw_lanyinjia":{
 				inherit:"lanyinjia",
@@ -13718,7 +13676,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_xiahoudun:'手杀夏侯惇',
 			xinqingjian:'清俭',
 			xinqingjian2:'清俭',
-			xinqingjian_info:'每回合限一次。当你不因摸牌阶段的额定摸牌而获得牌时，你可以将任意张牌扣置于武将牌上。回合结束时，你将这些牌交给一名其他角色。若这些牌的数量大于1，你摸一张牌。',
+			xinqingjian_info:'每回合限一次。当你不因摸牌阶段的额定摸牌而得到牌后，你可以将任意张牌扣置于武将牌上。回合结束时，你将这些牌交给一名其他角色。若这些牌的数量大于1，你摸一张牌。',
 			zhangyì:'张翼',
 			jiakui:'贾逵',
 			zhiyi:'执义',
@@ -13780,7 +13738,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refuhai:'浮海',
 			refuhai_info:'出牌阶段限一次，你可令其他角色同时在「潮起」和「潮落」中选择一项，并依次展示这些角色的选项。若从你下家开始选择了相同选项的角色数目大于1，则你摸X张牌（X为连续相同结果的数量）。',
 			qiaosi:'巧思',
-			qiaosi_info:'出牌阶段限一次，你可以表演「大键角色图」并根据表演结果获得相应的牌。然后，你选择一项：1.弃置X张牌。2.将X张牌交给一名其他角色。（X为你以此法获得的牌数）',
+			qiaosi_info:'出牌阶段限一次，你可以表演「大键角色图」并根据表演结果获得相应的牌。然后，你选择一项：1.弃置X张牌。2.将X张牌交给一名其他角色。（X为你以此法得到的牌数）',
 			qiaosi_map:'大键角色图',
 			qiaosi_map_info:'<br><li>星野 梦美：锦囊牌*2<br><li>能美 库特莉亚芙卡：装备牌/【杀】/【酒】*1<br><li>友利 奈绪：【杀】/【酒】*1<br><li>神尾 观铃：【闪】/【桃】*1<br><li>伊吹 风子：锦囊牌/【闪】/【桃】*1<br><li>仲村 由理：装备牌*2<br><li>Illustration:うら;Twitter:@ura530',
 			qiaosi_c1:'<img src="'+lib.assetURL+'image/card/qiaosi_card1.png" width="60" height="60"> ',
@@ -13938,7 +13896,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_liubiao:'手杀刘表',
 			hucheer:'手杀胡车儿',
 			daoji:'盗戟',
-			daoji_info:'出牌阶段限一次，你可以弃置一张非基本牌并选择一名装备区里有牌的其他角色，你获得其装备区中的一张牌并使用之。若你以此法获得的牌是武器牌，则你使用此牌后对其造成1点伤害。',
+			daoji_info:'出牌阶段限一次，你可以弃置一张非基本牌并选择一名装备区里有牌的其他角色，你获得其装备区中的一张牌并使用之。若你以此法得到的牌是武器牌，则你使用此牌后对其造成1点伤害。',
 			xin_hansui:'手杀韩遂',
 			xinniluan:'逆乱',
 			xinniluan_info:'其他角色的结束阶段，若其本回合对除其以外的角色使用过牌，则你可以对其使用一张【杀】。若以此法使用的【杀】造成伤害，则你弃置其一张牌。',
@@ -14005,7 +13963,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejieyue_info:'结束阶段开始时，你可以将一张牌交给一名其他角色。然后其选择一项：令你摸三张牌：或其保留一张手牌和装备区的牌，然后弃置其余的牌。',
 			xin_zhoucang:'手杀周仓',
 			mobilezhongyong:'忠勇',
-			mobilezhongyong_info:'当你于出牌阶段内使用的【杀】结算结束后，若没有目标角色使用【闪】响应过此【杀】，则你可获得此【杀】；否则你可选择一项：①获得目标角色使用的【闪】，然后可将此【杀】交给另一名其他角色。②将目标角色使用的【闪】交给另一名其他角色，然后你本回合使用【杀】的次数上限+1且下一张【杀】的伤害值基数+1。（你不能使用本回合因执行〖忠勇〗的效果获得的牌）',
+			mobilezhongyong_info:'当你于出牌阶段内使用的【杀】结算结束后，若没有目标角色使用【闪】响应过此【杀】，则你可获得此【杀】；否则你可选择一项：①获得目标角色使用的【闪】，然后可将此【杀】交给另一名其他角色。②将目标角色使用的【闪】交给另一名其他角色，然后你本回合使用【杀】的次数上限+1且下一张【杀】的伤害值基数+1。（你不能使用本回合因执行〖忠勇〗的效果得到的牌）',
 			xin_caifuren:'手杀蔡夫人',
 			xinqieting:'窃听',
 			xinqieting_info:'其他角色的回合结束时，若其本回合内未对其他角色造成过伤害，则你可选择一项：①摸一张牌。②观看其两张手牌并获得其中的一张。③将其装备区内的一张牌移动至你的装备区。',
@@ -14034,7 +13992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			discretesidi_info:'①当你使用的不为延时锦囊牌的牌结算结束后，你可选择一名R内不存在以a为第一序偶的二元序偶的其他角色a，并选择一名角色b，在关系R内建立二元序偶&lt;a,b&gt;（b对其他角色不可见）。②一名角色a使用不为延时锦囊牌的牌指定b为目标时，若(aRb)∧(此牌目标数为1)为真，则{你从R内移除&lt;a,b&gt;，且：若b为你，你摸一张牌；若b不为你，你可选择：⒈取消此牌的目标，然后若场上没有处于濒死状态的角色，则你对a造成1点伤害。⒉摸两张牌}；否则{你清除R内以a为第一元素的二元序偶}。',
 			fuqian:'傅佥',
 			jueyong:'绝勇',
-			jueyong_info:'锁定技。①当你不因〖绝勇〗成为唯一牌的目标时，若此牌不为转化牌且对应的实体牌牌数为1且不为【桃】或【酒】且你的“绝”数小于你的体力值的二倍，则你将此牌置于你的武将牌上，称为“绝”，且取消此牌的目标。②结束阶段开始时，若你有“绝”，则你令所有“绝”的原使用者依次对你使用所有“绝”，将无法使用的“绝”置入弃牌堆。',
+			jueyong_info:'锁定技。①当你不因〖绝勇〗成为唯一牌的目标时，若此牌不为转化牌且对应的实体牌牌数为1且不为【桃】或【酒】且你的“绝”数小于你的体力值，则你将此牌置于你的武将牌上，称为“绝”，且取消此牌的目标。②结束阶段开始时，若你有“绝”，则你令所有“绝”的原使用者依次对你使用所有“绝”，将无法使用的“绝”置入弃牌堆。',
 			poxiang:'破降',
 			poxiang_info:'出牌阶段限一次。你可以将一张牌交给一名其他角色。你摸三张牌（不计入本回合的手牌上限），移去所有“绝”并失去1点体力。',
 			simafu:'司马孚',
@@ -14173,9 +14131,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhujian_info:'出牌阶段限一次。你可以令至少两名装备区里有牌的角色各摸一张牌。',
 			duansuo:'断索',
 			duansuo_info:'出牌阶段限一次。你可以重置任意名处于连环状态的角色，然后对这些角色各造成1点火焰伤害。',
-			sp_pengyang:'彭羕',
+			sp_pengyang:'手杀彭羕',
 			spdaming:'达命',
-			spdaming_info:'①游戏开始时，你获得2点“达命”值。②其他角色A的出牌阶段限一次。其可以交给你一张牌，然后你选择另一名其他角色B。若B有与此牌相同类型的牌，其将一张该类型的牌交给A，你获得1点“达命”值；否则你将此牌交给A。',
+			spdaming_info:'①游戏开始时，你获得1点“达命”值。②其他角色A的出牌阶段限一次。其可以交给你一张牌，然后你选择另一名其他角色B。若B有与此牌相同类型的牌，其将一张该类型的牌交给A，你获得1点“达命”值；否则你将此牌交给A。',
 			spxiaoni:'嚣逆',
 			spxiaoni_info:'①出牌阶段限一次。若你的“达命”值大于0，你可以将一张牌当任意一种【杀】或伤害类锦囊牌使用。然后你减少等同于此牌指定目标数的“达命”值。②你的手牌上限基数为X（X为“达命”值，且至多为你的体力值，至少为0）。',
 			xin_zhuhuan:'手杀朱桓',
@@ -14191,10 +14149,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbaosi_info:'锁定技。当你于出牌阶段对一名攻击范围内的角色造成伤害后，你于此阶段对其使用牌无次数限制。',
 			xin_zhoutai:'手杀周泰',
 			re_yanwen:"手杀颜良文丑",
-			old_wanglang:'旧王朗',
-			qianzhao:'牵招',
+			qianzhao:'手杀牵招',
 			mbshihe:'势吓',
-			mbshihe_info:'出牌阶段限一次。你可以与一名角色拼点。若你：赢，当其于其下回合结束前对你造成伤害时，取消之；没赢，你随机弃置一张牌。',
+			mbshihe_info_identity:'出牌阶段限一次。你可以与一名角色拼点。若你：赢，当其于其下回合结束前对你造成伤害时，取消之；没赢，你随机弃置一张牌。',
+			mbshihe_info:'出牌阶段限一次。你可以与一名角色拼点。若你：赢，当其于其下回合结束前对你和你的友方角色造成伤害时，取消之；没赢，你随机弃置一张牌。',
 			mbzhenfu:'镇抚',
 			mbzhenfu_info:'结束阶段，若你本回合因弃置失去过牌，你可以令一名其他角色获得1点护甲。',
 			shichangshi:'十常侍',
@@ -14253,7 +14211,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinwurong_info:'出牌阶段限一次，你可以与一名其他角色进行谋弈：<br><li>若你选择“镇压”且其选择“反抗”，你对其造成1点伤害，然后你摸一张牌。<br><li>若你选择“安抚”且其选择“归顺”，其须交给你两张牌（若其手牌数不足两张，则改为令其跳过其下个摸牌阶段）。<br><li>若你选择“镇压”且其选择“归顺”，你获得其一张牌，然后你交给其两张牌。<br><li>若你选择“安抚”且其选择“反抗”，你受到1点伤害，然后你摸两张牌。',
 			xin_guozhao:'手杀郭照',
 			yichong:'易宠',
-			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”获得五张牌）。',
+			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”得到五张牌）。',
 			wufei:'诬诽',
 			wufei_info:'若场上存在拥有“雀”标记的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于1且A的体力值大于你，则你可以对A造成1点伤害。',
 			
