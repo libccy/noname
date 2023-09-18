@@ -1055,7 +1055,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var evt=event.getParent(2);
 					if(result.bool&&result.links&&result.links.length){
-						var name=result.links[0].name,aozhan=(player.hasSkill('aozhan')&&name=='tao');
+						var card=result.links[0];
+						var name=card.name,aozhan=(player.hasSkill('aozhan')&&name=='tao');
 						if(aozhan){
 							name=evt.filterCard({
 								name:'sha',isCard:true,cards:[card],
@@ -1063,9 +1064,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						game.broadcastAll(function(result,name){
 							lib.skill.olqifan_backup.viewAs={name:name,cards:[result],isCard:true};
-							lib.skill.olqifan_backup.prompt=('请选择'+get.translation(result)+'的目标');
-						},result.links[0],name);
+						},card,name);
 						evt.set('_backupevent','olqifan_backup');
+						evt.set('openskilldialog',('请选择'+get.translation(card)+'的目标'))
 						evt.backup('olqifan_backup');
 					}
 					evt.goto(0);
@@ -21698,7 +21699,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var evt=event.getParent(2);
 					if(result.bool&&result.links&&result.links.length){
-						var name=result.links[0].name,aozhan=(player.hasSkill('aozhan')&&name=='tao');
+						var card=result.links[0];
+						var name=card.name,aozhan=(player.hasSkill('aozhan')&&name=='tao');
 						if(aozhan){
 							name=evt.filterCard({
 								name:'sha',isCard:true,cards:[card],
@@ -21707,9 +21709,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(evt.name=='chooseToUse'){
 							game.broadcastAll(function(result,name){
 								lib.skill.aocai_backup.viewAs={name:name,cards:[result],isCard:true};
-								lib.skill.aocai_backup.prompt='选择'+get.translation(result)+'的目标';
-							},result.links[0],name);
+							},card,name);
 							evt.set('_backupevent','aocai_backup');
+							evt.set('openskilldialog',('请选择'+get.translation(card)+'的目标'))
 							evt.backup('aocai_backup');
 						}
 						else{
