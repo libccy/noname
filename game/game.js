@@ -4265,6 +4265,10 @@
 						else{
 							map.redownload_game.hide();
 						}
+					},
+					menu_loadondemand:{
+						name:'菜单懒加载',
+						init:false,
 					}
 					// trim_game:{
 					// 	name:'隐藏非官方扩展包',
@@ -41192,7 +41196,7 @@
 								updateConnectDisplayMap();
 							}
 						};
-						if(!lib.config.new_tutorial) node._initLink();
+						if(!lib.config.menu_loadondemand) node._initLink();
 						return node;
 					};
 					var modeorder=lib.config.modeorder||[];
@@ -41332,7 +41336,7 @@
 						var page=ui.create.div('');
 						var node=ui.create.div('.menubutton.large',info.name,position,clickMode);
 						node.mode=mode;
-						//node._initLink=function(){
+						node._initLink=function(){
 							node.link=page;
 							var map={};
 							if(info.config){
@@ -41719,7 +41723,8 @@
 									info.config.update(config,map);
 								}
 							}
-						//};
+						};
+						if(!lib.config.menu_loadondemand) node._initLink();
 						return node;
 					};
 
@@ -42275,7 +42280,7 @@
 							createDash('字','字体文件',dash3);
 							createDash('全','全部文件',dash4);
 						};
-						if(!lib.config.new_tutorial) node._initLink();
+						if(!lib.config.menu_loadondemand) node._initLink();
 					}());
 					createModeConfig('others',start.firstChild);
 
@@ -42650,7 +42655,7 @@
 								}
 							}
 						};
-						if(!lib.config.new_tutorial) node._initLink();
+						if(!lib.config.menu_loadondemand) node._initLink();
 						return node;
 					};
 					if(lib.config.show_favourite_menu&&!connectMenu&&Array.isArray(lib.config.favouriteCharacter)){
@@ -43119,7 +43124,7 @@
 								ui.create.div('.menuplaceholder',page);
 							}
 						};
-						if(!lib.config.new_tutorial) node._initLink();
+						if(!lib.config.menu_loadondemand) node._initLink();
 						return node;
 					};
 					if(!connectMenu&&lib.config.show_ban_menu){
@@ -43401,7 +43406,7 @@
 							node.classList.add('smallfont');
 						}
 						node.mode=mode;
-						//node._initLink=function(){
+						node._initLink=function(){
 							node.link=page;
 							for(var i in lib.extensionMenu[mode]){
 								if(i=='game') continue;
@@ -43436,7 +43441,8 @@
 								}
 								page.appendChild(cfgnode);
 							}
-						//};
+						};
+						if(!lib.config.menu_loadondemand) node._initLink();
 						return node;
 					};
 					for(var i in lib.extensionMenu){
@@ -45597,7 +45603,7 @@
 							createDash('技','编辑技能',dash3);
 							createDash('码','编辑代码',dash4);
 						};
-						if(!lib.config.new_tutorial) node._initLink();
+						if(!lib.config.menu_loadondemand) node._initLink();
 					}());
 					(function(){
 						var page=ui.create.div('');
@@ -45908,7 +45914,7 @@
 							};
 							if(_thisUpdate) node.update();
 						};
-						if(!lib.config.new_tutorial) node._initLink();
+						if(!lib.config.menu_loadondemand) node._initLink();
 					}());
 					var active=start.firstChild.querySelector('.active');
 					if(!active){
@@ -47118,7 +47124,7 @@
 								pre.innerHTML='';
 							});
 						};
-						if(!lib.config.new_tutorial) node._initLink();
+						if(!lib.config.menu_loadondemand) node._initLink();
 					}());
 					(function(){
 						var page=ui.create.div('');
@@ -47154,7 +47160,7 @@
 								}
 							}
 						};
-						if(!lib.config.new_tutorial) node._initLink();
+						if(!lib.config.menu_loadondemand) node._initLink();
 					}());
 					(function(){
 						if(!window.indexedDB||window.nodb) return;
@@ -47343,7 +47349,7 @@
 								}
 							};
 						};
-						if(!lib.config.new_tutorial) node._initLink();
+						if(!lib.config.menu_loadondemand) node._initLink();
 					}());
 
 
@@ -53111,7 +53117,7 @@
 					this.classList.add('active');
 					var skillname=get.translation(this.link);
 					var skilltranslationinfo=get.skillInfoTranslation(this.link);
-					if(lib.config.show_skillnamepinyin&&skillname!='阵亡'&&skillname.indexOf('_faq')==-1){
+					if(lib.config.show_skillnamepinyin&&skillname!='阵亡'){
 						var skillpinyin=get.pinyin(skillname);
 						intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+skillpinyin+']'+'</span>'+'  '+skilltranslationinfo;
 					}else{
