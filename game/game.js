@@ -12149,66 +12149,6 @@
 						event.moved=[];
 						var buttonss=[];
 						event.buttonss=buttonss;
-						event.isPlayingAnimation=false;
-						//已经处理了拖拽结束
-						var isDragEnd=false;
-						var dragstart=function(e){
-							if(ui.selected.guanxing_button){
-								ui.selected.guanxing_button.classList.remove('glow2');
-							}
-							ui.selected.guanxing_button=this;
-							this.classList.add('glow2');
-							isDragEnd=false;
-							e.stopPropagation();
-						};
-						var dragend=function(e){
-							if(ui.selected.guanxing_button){
-								ui.selected.guanxing_button.classList.remove('glow2');
-								delete ui.selected.guanxing_button;
-							}
-							isDragEnd=true;
-						};
-						var cardDrop=function(e){
-							if(isDragEnd)return;
-							isDragEnd=true;
-							event.custom.replace.button(this);
-						};
-						var buttonDrop=function(e){
-							if(isDragEnd)return;
-							isDragEnd=true;
-							if(!this.hasChildNodes()){
-								clickButtons.call(this);
-							}else{
-								var xs=Array.from(this.children).map(c=>c.getBoundingClientRect().left);
-								var x=e.x;
-								var index=xs.findIndex(_x=>x<_x);
-								//FLIP
-								//First
-								ui.selected.guanxing_button.style.transition='none';
-								var guanxingRect=ui.selected.guanxing_button.getBoundingClientRect();
-								//Last
-								if(index==-1){
-									this.appendChild(ui.selected.guanxing_button);
-								}else{
-									this.insertBefore(ui.selected.guanxing_button, this.children[index]);
-								}
-								var guanxingRect2=ui.selected.guanxing_button.getBoundingClientRect();
-								//Invert
-								ui.selected.guanxing_button.style.transform=`translateX(${guanxingRect.left-guanxingRect2.left}px) translateY(${guanxingRect.top-guanxingRect2.top}px)`;
-								console.log(ui.selected.guanxing_button.style.transform);
-								//Play
-								event.isPlayingAnimation=true;
-								setTimeout((guanxing_button)=>{
-									guanxing_button.style.transition='';
-									guanxing_button.style.transform='translateX(0px) translateY(0px)';
-									delete ui.selected.guanxing_button;
-									guanxing_button.addEventListener('transitionend',function(){
-										event.isPlayingAnimation=false;
-										updateButtons();
-									},{once:true});
-								},0,ui.selected.guanxing_button);
-							}
-						};
 						var updateButtons=function(){
 							for(var i of buttonss){
 								event.moved[i._link]=get.links(Array.from(i.childNodes));
@@ -12223,33 +12163,13 @@
 							}
 						};
 						var clickButtons=function(){
-							if(event.isPlayingAnimation) return;
 							if(!ui.selected.guanxing_button) return;
 							if(ui.selected.guanxing_button.parentNode==this) return;
 							if(!filterMove(ui.selected.guanxing_button,this._link,event.moved)) return;
 							ui.selected.guanxing_button.classList.remove('glow2');
-							//FLIP
-							//First
-							ui.selected.guanxing_button.style.transition='none';
-							if(ui.selected.guanxing_button.style.transform) ui.selected.guanxing_button.style.transform='translateX(0px) translateY(0px)';
-							var guanxingRect=ui.selected.guanxing_button.getBoundingClientRect();
-							//Last
 							this.appendChild(ui.selected.guanxing_button);
-							var guanxingRect2=ui.selected.guanxing_button.getBoundingClientRect();
-							//Invert
-							ui.selected.guanxing_button.style.transform=`translateX(${guanxingRect.left-guanxingRect2.left}px) translateY(${guanxingRect.top-guanxingRect2.top}px)`;
-							//Play
-							event.isPlayingAnimation=true;
-							setTimeout((guanxing_button)=>{
-								guanxing_button.style.transition='';
-								guanxing_button.style.transform='translateX(0px) translateY(0px)';
-								delete ui.selected.guanxing_button;
-								guanxing_button.addEventListener('transitionend',function(){
-									event.isPlayingAnimation=false;
-									updateButtons();
-								},{once:true});
-								
-							},0,ui.selected.guanxing_button);
+							delete ui.selected.guanxing_button;
+							updateButtons();
 						};
 						
 						for(var i=0;i<list.length;i++){
@@ -12260,20 +12180,9 @@
 							buttons.classList.add('popup');
 							buttons.classList.add('guanxing');
 							buttons._link=i;
-							if(!navigator.userAgent.includes('Mobile ')){
-								buttons.addEventListener('dragover',e=>e.preventDefault());
-								buttons.addEventListener('drop', buttonDrop);
-							}
 							if(list[i][1]){
 								if(get.itemtype(list[i][1])=='cards'){
 									var cardsb=ui.create.buttons(list[i][1],'card',buttons);
-									if(!navigator.userAgent.includes('Mobile ')) cardsb.forEach(card => {
-										card.draggable=true;
-										card.addEventListener('dragstart',dragstart);
-										card.addEventListener('dragover',e=>e.preventDefault());
-										card.addEventListener('dragend',dragend);
-										card.addEventListener('drop', cardDrop);
-									});
 									if(list[i][2]&&typeof list[i][2]=='string'){
 										for(var ij of cardsb) ij.node.gaintag.innerHTML=get.translation(list[i][2]);
 									}
@@ -12304,41 +12213,12 @@
 								return;
 							}
 							if(!filterMove(button,ui.selected.guanxing_button,event.moved)) return;
-							var par1=ui.selected.guanxing_button.parentNode,
-								ind1=ui.selected.guanxing_button.nextSibling,
-								par2=button.parentNode,
-								ind2=button.nextSibling;
+							var par1=ui.selected.guanxing_button.parentNode,ind1=ui.selected.guanxing_button.nextSibling,par2=button.parentNode,ind2=button.nextSibling;
 							ui.selected.guanxing_button.classList.remove('glow2');
-							//FLIP
-							//First
-							button.style.transition='none';
-							ui.selected.guanxing_button.style.transition='none';
-							if(button.style.transform) button.style.transform='translateX(0px) translateY(0px)';
-							if(ui.selected.guanxing_button.style.transform) ui.selected.guanxing_button.style.transform='translateX(0px) translateY(0px)';
-							var buttonRect=button.getBoundingClientRect();
-							var guanxingRect=ui.selected.guanxing_button.getBoundingClientRect();
 							par1.insertBefore(button,ind1);
 							par2.insertBefore(ui.selected.guanxing_button,ind2);
-							//Last
-							var buttonRect2=button.getBoundingClientRect();
-							var guanxingRect2=ui.selected.guanxing_button.getBoundingClientRect();
-							//Invert
-							button.style.transform=`translateX(${buttonRect.left-buttonRect2.left}px) translateY(${buttonRect.top-buttonRect2.top}px)`;
-							ui.selected.guanxing_button.style.transform=`translateX(${guanxingRect.left-guanxingRect2.left}px) translateY(${guanxingRect.top-guanxingRect2.top}px)`;
-							//Play
-							event.isPlayingAnimation=true;
-							setTimeout((button,guanxing_button)=>{
-								button.style.transition='';
-								guanxing_button.style.transition='';
-								
-								button.style.transform='translateX(0px) translateY(0px)';
-								guanxing_button.style.transform='translateX(0px) translateY(0px)';
-								delete ui.selected.guanxing_button;
-								guanxing_button.addEventListener('transitionend',function(){
-									event.isPlayingAnimation=false;
-									updateButtons();
-								},{once:true});
-							},0,button,ui.selected.guanxing_button);
+							delete ui.selected.guanxing_button;
+							updateButtons();
 						}
 						event.custom.replace.confirm=function(bool){
 							if(bool) event._result={
