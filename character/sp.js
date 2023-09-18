@@ -1098,7 +1098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						charlotte:true,
 						filter:(event,player)=>{
-							if(!event.olqifan_discard) return false;
+							return true;
 							var num=player.getStorage('olqifan').length,pos=('jeh').slice(0,num);
 							return num>0&&player.countCards(pos)>0;
 						},
@@ -1122,14 +1122,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else card=get.autoViewAs({name,isCard:true});
 					event.result.card=card;
 					player.markAuto('olqifan',[get.type2(card,false)]);
-					event.getParent().set('olqifan_discard',true);
+					var id=get.id();
+					event.getParent().set('olqifan_discard',id);
 					player.when('chooseToUseAfter')
 						.filter(lib.skill.olqifan_discard.filter)
+						.filter((event)=>event.olqifan_discard==id)
 						.then(()=>{
 							event.maxNum=Math.min(3,player.getStorage('olqifan').length);
 							event.num=0;
 						})
 						.then(lib.skill.olqifan_discard.content)
+						.translation('器翻');
 				},
 				filterCard:function(){return false},
 				selectCard:-1,

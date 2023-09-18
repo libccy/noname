@@ -19232,6 +19232,18 @@
 				 * 使用者只需要关注技能的效果，而不是技能的本身。
 				 */
 				when:function(){
+					if(!_status.postReconnect.player_when) _status.postReconnect.player_when=[
+						function(map){
+							for(var i in map){
+								lib.skill[i]={
+									charlotte:true,
+									forced:true,
+									popup:false,
+								}
+								if(typeof map[i]=='string') lib.translate[i]=map[i];
+							}
+						},{}
+					];
 					var triggerNames=Array.from(arguments);
 					if(triggerNames.length==0) throw 'player.when的参数数量应大于0';
 					var skillName='player_when_'+Math.random().toString(36).slice(-8);
@@ -19265,7 +19277,20 @@
 						writable:true,
 						value:skill
 					});
+					game.broadcast(function(skillName){
+						Object.defineProperty(lib.skill,skillName,{
+							configurable:true,
+							enumerable:false,
+							writable:true,
+							value:{
+								forced:true,
+								charlotte:true,
+								popup:false,
+							}
+						});
+					},skillName);
 					this.addSkill(skillName);
+					_status.postReconnect.player_when[1][skillName]=true;
 					return{
 						filter(fun){
 							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
@@ -19306,7 +19331,10 @@
 						},
 						translation(translation){
 							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
-							if(typeof translation=='string') lib.translate[skillName]=translation;
+							if(typeof translation=='string'){
+								_status.postReconnect.player_when[1][skillName]=translation;
+								game.broadcastAll((skillName,translation)=>lib.translate[skillName]=translation,skillName,translation)
+							}
 							return this;
 						},
 						assgin(obj) {
