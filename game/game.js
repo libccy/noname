@@ -3938,15 +3938,15 @@
 						init:true,
 						unfrequent:true,
 					},
-					show_skillnamepinyin:{
-						name:'显示技能名拼音',
-						intro:'在武将资料卡显示技能名拼音',
-						init:true,
-						unfrequent:true,
-					},
 					show_characternamepinyin:{
 						name:'显示武将名拼音等信息',
 						intro:'在武将资料卡显示武将名及其拼音、性别、势力、体力等信息',
+						init:true,
+						unfrequent:true,
+					},
+					show_skillnamepinyin:{
+						name:'显示技能名拼音',
+						intro:'在武将资料卡显示技能名拼音',
 						init:true,
 						unfrequent:true,
 					}
