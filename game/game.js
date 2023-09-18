@@ -168,7 +168,7 @@
 		//函数钩子
 		hooks:{
 			// getCurrentScript用到的接口
-			_getCurrentScript:()=>null,
+			_getCurrentScript:(_url)=>null,
 			// 本体势力的颜色
 			addGroup:[(id,_short,_name,config)=>{
 				if("color" in config&&config.color!=null){
@@ -7278,31 +7278,31 @@
 			}
 		},
 		comparator:{
-			e:function(){
+			equals:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return false;
 				return true;
 			},
-			ei:function(){
+			equalAny:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return true;
 				return false;
 			},
-			ne:function(){
+			notEquals:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]===arguments[0])return false;
 				return true;
 			},
-			nei:function(){
+			notEqualAny:function(){
 				if(arguments.length==0) return false;
 				if(arguments.length==1) return true;
 				for(let i=1;i<arguments.length;++i) if(arguments[i]!==arguments[0])return true;
 				return false;
 			},
-			te:function(){
+			typeEquals:function(){
 				if(arguments.length==0)return false;
 				if(arguments.length==1)return arguments[0]!==null;
 				const type=typeof arguments[0];
@@ -8326,7 +8326,7 @@
 							toLoad--;
 							if(toLoad) return;
 							if(_status.importing){
-								let promises=lib.creation.a;
+								let promises=lib.creation.array;
 								for(const type in _status.importing){
 									promises.addArray(_status.importing[type])
 								}
@@ -8407,22 +8407,22 @@
 
 					window.game=game;
 					game.dynamicStyle.init();
-					Object.defineProperty(lib.creation,"a",{
+					Object.defineProperty(lib.creation,"array",{
 						enumerable:true,
 						get:()=>[],
 						set:()=>null
 					});
-					Object.defineProperty(lib.creation,"o",{
+					Object.defineProperty(lib.creation,"object",{
 						enumerable:true,
 						get:()=>({}),
 						set:()=>null
 					});
-					Object.defineProperty(lib.creation,"no",{
+					Object.defineProperty(lib.creation,"nullObject",{
 						enumerable:true,
 						get:()=>Object.create(null),
 						set:()=>null
 					});
-					Object.defineProperty(lib.creation,"s",{
+					Object.defineProperty(lib.creation,"string",{
 						enumerable:true,
 						get:()=>"",
 						set:()=>null
@@ -32581,7 +32581,7 @@
 			'妹子，交个朋友吧',
 		],
 		other:{
-			getCurrentScript:()=>document.currentScript||lib.hooks._getCurrentScript(),
+			getCurrentScript:(url)=>document.currentScript||lib.hooks._getCurrentScript(url),
 			ignore:()=>void 0
 		}
 	};
@@ -32622,15 +32622,15 @@
 		//基于钩子的添加势力方法
 		addGroup:(id,short,name,config)=>{
 			if(!id) throw new TypeError();
-			if(lib.comparator.te(short,"object")){
+			if(lib.comparator.typeEquals(short,"object")){
 				config=short;
 				short=null;
 			}
-			if(lib.comparator.te(name,"object")){
+			if(lib.comparator.typeEquals(name,"object")){
 				config=name;
 				name=null;
 			}
-			if(!lib.comparator.te(short,"string")&&short){
+			if(!lib.comparator.typeEquals(short,"string")&&short){
 				name=short;
 			}
 			lib.group.add(id);
@@ -33799,25 +33799,26 @@
 				}
 			}
 		},
-		import:function(type,content){
+		import:function(type,content,url){
+			const currentScript = lib.other.getCurrentScript(url);
 			if(type=='extension'){
-				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
 				const promise=game.loadExtension(content);
+				if(lib.comparator.equalAny(currentScript, null, GameJS)) return promise;
+				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
 				_status.extensionLoading.add(promise);
-				return promise;
 			}
 			else{
 				if(!lib.imported[type])lib.imported[type]={};
-				if(typeof _status.importing=="undefined")_status.importing={};
-				if(!_status.importing[type])_status.importing[type]=[];
 				const promise=Promise.resolve((gnc.is.generator(content)?gnc.of(content):content)(lib,game,ui,get,ai,_status)).then(content2=>{
 					if(content2.name){
 						lib.imported[type][content2.name]=content2;
 						delete content2.name;
 					}
 				});
+				if(lib.comparator.equalAny(currentScript, null, GameJS)) return promise;
+				if(typeof _status.importing=="undefined")_status.importing={};
+				if(!_status.importing[type])_status.importing[type]=[];
 				_status.importing[type].add(promise);
-				return promise;
 			}
 		},
 		loadExtension:gnc.of(function*(obj){
@@ -34107,9 +34108,7 @@
 					var str=zip.file('extension.js').asText();
 					if(str===""||undefined) throw('你导入的不是扩展！请选择正确的文件');
 					_status.importingExtension=true;
-					eval(str);
-					yield Promise.allSettled(_status.extensionLoading);
-					delete _status.extensionLoading;
+					yield eval(str);
 					_status.importingExtension=false;
 					if(!game.importedPack) throw('err');
 					var extname=game.importedPack.name;
