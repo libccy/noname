@@ -28514,8 +28514,26 @@
 					switch(typeof item){
 						case "object":
 							if(Array.isArray(item)){
-								// TODO: Parse Array
-								throw new Error("NYI: Parse Common Object");
+								let lastEvent=null;
+								this.content=(event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai)=>{
+									if(step>=item.length) return event.finish();
+									var current=item[step];
+									lastEvent=current(event,{
+										event:event,
+										step:step,
+										source:source,
+										player:player,
+										target:target,
+										targets:targets,
+										card:card,
+										cards:cards,
+										skill:skill,
+										forced:forced,
+										num:num,
+										trigger:trigger,
+										result:result
+									},(lastEvent&&("result" in lastEvent))?lastEvent.result:null);
+								}
 							}
 							else{
 								// TODO: Parse Common Object
