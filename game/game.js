@@ -19192,7 +19192,7 @@
 						forced:true,
 						charlotte:true,
 						popup:false,
-						filterFuns:[(event,player,name) => {
+						filterFuns:[(event,player,name)=>{
 							return !name||(triggerNames.includes(name)&&event.player==player);
 						}],
 						contentFuns:[],
