@@ -29,7 +29,6 @@
 			}
 		}
 	}
-	const GameJS=document.currentScript;
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
@@ -167,8 +166,6 @@
 		hook:{globaltrigger:{},globalskill:{}},
 		//函数钩子
 		hooks:{
-			// getCurrentScript用到的接口
-			_getCurrentScript:(_url)=>null,
 			// 本体势力的颜色
 			addGroup:[(id,_short,_name,config)=>{
 				if("color" in config&&config.color!=null){
@@ -32580,7 +32577,6 @@
 			'妹子，交个朋友吧',
 		],
 		other:{
-			getCurrentScript:(url)=>document.currentScript||lib.hooks._getCurrentScript(url),
 			ignore:()=>void 0
 		}
 	};
@@ -33799,12 +33795,11 @@
 			}
 		},
 		import:function(type,content,url){
-			const currentScript = lib.other.getCurrentScript(url);
 			if(type=='extension'){
 				const promise=game.loadExtension(content);
-				if(lib.comparator.equalAny(currentScript, null, GameJS)) return promise;
 				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
 				_status.extensionLoading.add(promise);
+				return promise;
 			}
 			else{
 				if(!lib.imported[type])lib.imported[type]={};
@@ -33814,10 +33809,10 @@
 						delete content2.name;
 					}
 				});
-				if(lib.comparator.equalAny(currentScript, null, GameJS)) return promise;
 				if(typeof _status.importing=="undefined")_status.importing={};
 				if(!_status.importing[type])_status.importing[type]=[];
 				_status.importing[type].add(promise);
+				return promise;
 			}
 		},
 		loadExtension:gnc.of(function*(obj){
@@ -34107,7 +34102,9 @@
 					var str=zip.file('extension.js').asText();
 					if(str===""||undefined) throw('你导入的不是扩展！请选择正确的文件');
 					_status.importingExtension=true;
-					yield eval(str);
+					eval(str);
+					yield Promise.allSettled(_status.extensionLoading);
+					delete _status.extensionLoading;
 					_status.importingExtension=false;
 					if(!game.importedPack) throw('err');
 					var extname=game.importedPack.name;
