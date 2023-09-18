@@ -116,7 +116,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseButton([
 							'挈挟：选择至多'+get.cnNumber(num)+'张武将置入武器栏',
 							[list,'character'],
-						],[1,num],true).set('ai',function(button){
+						],[1,num],true).set('filterButton',function(button){
+							var name=button.link;
+							var info=lib.character[name];
+							if(info[3].some(function(skill){
+								var info=get.skillInfoTranslation(skill);
+								if(!info.includes('【杀】')) return false;
+								var list=get.skillCategoriesOf(skill);
+								list.remove('锁定技');
+								return list.length==0;
+							})){
+								button.classList.add('glow2');
+							}
+							return true;
+						}).set('ai',function(button){
 							var name=button.link;
 							var info=lib.character[name];
 							var skills=info[3].filter(function(skill){
