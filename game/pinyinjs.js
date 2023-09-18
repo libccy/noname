@@ -26,7 +26,7 @@ var pinyin_dict_polyphone = {
 	"刘辟": " pì",
 	"刘禅": " shàn",
 	"甄宓": " fú",
-	"孙綝": " chēn",
+	"孙綝": "sūn chēn",
 	"李傕": " jué",
 	"李遗": " wèi",
 	"张嶷": " nì",
@@ -35,7 +35,7 @@ var pinyin_dict_polyphone = {
 	"吕蒙": " méng",
 	"于禁": " jìn",
 	"赵累": " lèi",
-	"夏侯令女": "  lìng ",
+	"夏侯令女": " hóu lìng nǚ",
 	"马日磾": " mì dī",
 	"凯撒": " sà",
 	
@@ -87,6 +87,7 @@ var pinyin_dict_polyphone = {
 	"说盟": "shuì ",
 	"落宠": "luò ",
 	"落雁": "luò ",
+	"落雷": "luò ",
 	"贲育": "bēn ",
 	"造王": " wàng",
 	"舍宴": "shě ",
@@ -123,6 +124,7 @@ var pinyin_dict_polyphone = {
 	"耀令": " lìng",
 	"冠绝": "guàn ",
 	"先著": " zhuó",
+	"量反": "liàng ",
 	
 	"乐动": "yuè ",
 	"血凰": "xuè ",
@@ -144,7 +146,7 @@ var pinyin_dict_polyphone = {
 	"月露": " lù",
 	"沾露": " lù",
 	"禁咒": "jìn ",
-	"挟令": " lìng",
+	"挟令": "xié lìng",
 	// END
 	"撒贝宁": "sà  ",
 	
