@@ -19171,8 +19171,9 @@
 				},
 			},
 			player:{
+				//新函数
 				/**
-				 * version 1.2
+				 * version 1.3
 				 * 
 				 * 链式创建一次性技能的api。
 				 *
@@ -19186,10 +19187,13 @@
 						skillName='player_when_'+Math.random().toString(36).slice(-8);
 					}
 					var skill={
+						trigger:{player:triggerNames},
 						forced:true,
 						charlotte:true,
 						popup:false,
-						filterFuns:[],
+						filterFuns:[(event, player, name) => {
+							return !name||(triggerNames.includes(name)&&event.player==player);
+						}],
 						contentFuns:[],
 						get filter(){
 							return function(event, player, name){
@@ -19201,12 +19205,9 @@
 							}
 						},
 					};
-					skill.trigger={player:triggerNames};
-					skill.filterFuns.push((event, player, name) => {
-						return !name||(triggerNames.includes(name)&&event.player==player);
-					});
 					Object.defineProperty(lib.skill,skillName,{
 						configurable:true,
+						//这类技能不需要被遍历到
 						enumerable:false,
 						writable:true,
 						value:skill
@@ -19214,25 +19215,24 @@
 					this.addSkill(skillName);
 					return{
 						filter(fun){
-							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
 							skill.filterFuns.push(fun);
 							return this;
 						},
 						removeFilter(fun){
-							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
 							skill.filterFuns.remove(fun);
 							return this;
 						},
 						then(fun){
-							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
 							skill.contentFuns.push(fun);
 							var str=`
 								function content(){
 									if(event.triggername=='${skillName}After'){
 										player.removeSkill('${skillName}');
 										delete lib.skill['${skillName}'];
-										delete lib.translate['${skillName}']
-										console.log('remove ${skillName}');
+										delete lib.translate['${skillName}'];
 										return event.finish();
 									}
 							`;
@@ -19247,23 +19247,22 @@
 							return this;
 						},
 						popup(str){
-							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
 							if(typeof str=='string') skill.popup=str;
 							return this;
 						},
 						translation(translation){
-							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
 							if(typeof translation=='string') lib.translate[skillName]=translation;
 							return this;
 						},
 						assgin(obj) {
-							if(!lib.skill[skillName]) throw `This skill has been destroyed`;
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
 							if(typeof obj=='object'&&obj!==null) Object.assign(skill,obj);
 							return this;
 						}
 					};
 				},
-				//新函数
 				//让一名角色明置一些手牌
 				addShownCards:function(){
 					const cards=[];
@@ -19908,7 +19907,7 @@
 				},
 				removeGaintag:function(tag,cards){
 					cards=cards||this.getCards('h');
-					game.addVideo('removeGaintag',this,[tag,cards]);
+					game.addVideo('removeGaintag',this,[tag,get.cardsInfo(cards)]);
 					game.broadcastAll(function(player,tag,cards){
 						for(var i of cards) i.removeGaintag(tag);
 					},this,tag,cards);
