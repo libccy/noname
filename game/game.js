@@ -29,6 +29,7 @@
 			}
 		}
 	}
+	const GameJS=document.currentScript;
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
@@ -166,6 +167,8 @@
 		hook:{globaltrigger:{},globalskill:{}},
 		//函数钩子
 		hooks:{
+			// getCurrentScript用到的接口
+			_getCurrentScript:()=>null,
 			// 本体势力的颜色
 			addGroup:[(id,_short,_name,config)=>{
 				if("color" in config&&config.color!=null){
@@ -32578,8 +32581,8 @@
 			'妹子，交个朋友吧',
 		],
 		other:{
-			bool:(item)=>Boolean(item),
-			ignore:()=>{}
+			getCurrentScript:()=>document.currentScript||lib.hooks._getCurrentScript(),
+			ignore:()=>void 0
 		}
 	};
 	const game={
