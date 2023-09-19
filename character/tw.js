@@ -20,8 +20,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			tw_zhanghong:['male','wu',4,['twquanqian','twrouke']],
-			tw_zhangzhao:['male','wu',4,['twlijian','twchungang']],
+			tw_zhanghong:['male','wu',3,['twquanqian','twrouke']],
+			tw_zhangzhao:['male','wu',3,['twlijian','twchungang']],
 			tw_ol_sunjian:['male','wu','4/5',['gzyinghun','wulie','twpolu'],['zhu']],
 			tw_menghuo:['male','qun',4,['huoshou','rezaiqi','twqiushou'],['zhu']],
 			ol_liuyu:['male','qun',2,['zongzuo','zhige','twchongwang'],['zhu']],
@@ -8377,7 +8377,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				subSkill:{
-					mark:{},
+					mark:{
+						charlotte:true,
+					},
 					effect:{
 						audio:'twchuanshu',
 						trigger:{
@@ -8415,54 +8417,61 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						group:'twchuanshu_damage',
 					},
 					damage:{
-						trigger:{player:['useCard','useCardAfter']},
-						forced:true,
 						charlotte:true,
+						trigger:{player:['useCard','useCardAfter'],source:'damageBegin1'},
 						filter:function(event,player,name){
 							if(name=='useCard') return (event.card.name=='sha'&&player.hasMark('twchuanshu_mark'));
-							return player.getStorage('twchuanshu_effect').some(i=>i!=player)&&event._twchuanshu&&player.hasHistory('sourceDamage',function(evt){
+							if(name=='damageBegin1') return event.card&&event.card.twchuanshu_mark&&!player.getStorage('twchuanshu_effect').contains(event.player);
+							return event.card.twchuanshu_mark&&player.hasHistory('sourceDamage',function(evt){
 								return evt.card==event.card;
-							});
+							})&&player.getStorage('twchuanshu_effect').filter(function(target){
+								return target.isIn()&&target!=player;
+							}).length;
 						},
+						forced:true,
 						content:function(){
-							if(event.triggername=='useCard'){
+							var name=event.triggername;
+							if(name=='useCard'){
 								var num=player.countMark('twchuanshu_mark');
-								trigger.baseDamage+=num;
-								trigger._twchuanshu=num;
+								trigger.card.twchuanshu_mark=num;
 								player.removeMark('twchuanshu_mark',num,false);
 							}
+							else if(name=='damageBegin1') trigger.num++;
 							else{
-								var num1=trigger._twchuanshu;
+								var num1=trigger.card.twchuanshu_mark;
 								var num2=0;
 								player.getHistory('sourceDamage',function(evt){
 									if(evt.card==trigger.card) num2+=evt.num;
 								});
-								var targets=player.getStorage('twchuanshu_effect').filter(i=>i!=player&&i.isIn());
-								for(var target of targets){
-									target.draw(num1*num2);
-								}
+								var targets=player.getStorage('twchuanshu_effect').filter(function(target){
+									return target.isIn()&&target!=player;
+								});
+								if(targets.length==1) targets[0].draw(num1*num2);
+								else game.asyncDraw(targets,num1*num2);
 							}
 						},
 					},
 					clear:{
-						trigger:{player:'phaseBegin'},
-						forced:true,
-						silent:true,
 						charlotte:true,
+						onremove:true,
+						trigger:{player:'phaseBegin'},
 						filter:function(event,player){
 							return player.getStorage('twchuanshu_clear').length;
 						},
+						forced:true,
+						silent:true,
 						content:function(){
 							'step 0'
 							var targets=player.getStorage('twchuanshu_clear');
-							player.logSkill('twchuanshu_clear',targets.filter(i=>i.isIn()));
 							for(var target of targets){
 								target.unmarkAuto('twchuanshu_effect',[player]);
-								if(target.getStorage('twchuanshu_effect').length==0) target.removeSkill('twchuanshu_effect');
+								if(!target.getStorage('twchuanshu_effect').length) target.removeSkill('twchuanshu_effect');
 							}
-						}
-					}
-				}
+							'step 1'
+							player.removeSkill('twchuanshu_clear');
+						},
+					},
+				},
 			},
 			//徐庶
 			twjiange:{
