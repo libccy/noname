@@ -43511,7 +43511,7 @@
 							node.classList.add('smallfont');
 						}
 						node.mode=mode;
-						node._initLink=function(){
+						// node._initLink=function(){
 							node.link=page;
 							for(var i in lib.extensionMenu[mode]){
 								if(i=='game') continue;
@@ -43546,8 +43546,8 @@
 								}
 								page.appendChild(cfgnode);
 							}
-						};
-						if(!get.config('menu_loadondemand')) node._initLink();
+						// };
+						// if(!get.config('menu_loadondemand')) node._initLink();
 						return node;
 					};
 					for(var i in lib.extensionMenu){
