@@ -8428,8 +8428,8 @@
 					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
 						lib.path=window._noname_path;
 						delete window._noname_path;
-					},(e)=>{
-						throw e;
+					},e=>{
+						console.log(e);
 					});
 					var styleToLoad=6;
 					var styleLoaded=gnc.of(function*(){
