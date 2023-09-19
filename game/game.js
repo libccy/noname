@@ -59057,6 +59057,9 @@
 				var iwhile=100;
 				while(iwhile--){
 					range=get.select(event.selectTarget);
+					if(ui.selected.targets.length>=range[0]){
+						ok=true;
+					}
 					if(range[1]<=-1){
 						j=0;
 						for(i=0;i<ui.selected.targets.length;i++){
