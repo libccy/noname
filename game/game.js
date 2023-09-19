@@ -24749,8 +24749,12 @@
 					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value);
 				},
 				updateStorage:function(name,operation){
-					this.setStorage(name,operation(this.getStorage(name)));
-					return this.getStorage(name);
+					return this.setStorage(name,operation(this.getStorage(name)));
+				},
+				updateStorageAsync:function(name,operation){
+					return Promise.resolve(this.getStorage(name))
+					.then(value=>operation(value))
+					.then(value=>this.setStorage(name,value))
 				},
 				markSkill:function(name,info,card){
 					if(info===true){
