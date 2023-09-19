@@ -18488,14 +18488,31 @@
 					event.trigger('damageBegin4');
 					"step 4"
 					//moved changeHujia to changeHp
-					if(lib.config.background_audio){
-						game.playAudio('effect','damage'+(num>1?'2':''));
-					}
-					game.broadcast(function(num){
-						if(lib.config.background_audio){
-							game.playAudio('effect','damage'+(num>1?'2':''));
+					if(!event.unreal) event.trigger('damageBegin5');
+					if(['fire','thunder','ice'].contains(event.nature)){
+						if(player.hujia>0&&!player.hasSkillTag('nohujia')&&event.nature!='ice'){
+							game.broadcastAll(function(num){
+								if(lib.config.background_audio) game.playAudio('effect','hujia_damage_'+event.nature+(num>1?'2':''));
+							},num);
 						}
-					},num);
+						else{
+							game.broadcastAll(function(num){
+								if(lib.config.background_audio) game.playAudio('effect','damage_'+event.nature+(num>1?'2':''));
+							},num);
+						}
+					}
+					else{
+						if(player.hujia>0&&!player.hasSkillTag('nohujia')){
+							game.broadcastAll(function(num){
+								if(lib.config.background_audio) game.playAudio('effect','hujia_damage'+(num>1?'2':''));
+							},num);
+						}
+						else{
+							game.broadcastAll(function(num){
+								if(lib.config.background_audio) game.playAudio('effect','damage'+(num>1?'2':''));
+							},num);
+						}
+					}
 					var str=event.unreal?'视为受到了':'受到了';
 					if(source) str+='来自<span class="bluetext">'+(source==player?'自己':get.translation(source))+'</span>的';
 					str+=get.cnNumber(num)+'点';
