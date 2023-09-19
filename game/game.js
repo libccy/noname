@@ -24730,8 +24730,27 @@
 				getExpansions:function(tag){
 					return this.getCards('x',(card)=>card.hasGaintag(tag));
 				},
+				countExpansions:function(tag){
+					return this.getExpansions(tag).length;
+				},
+				hasExpansions:function(tag){
+					return this.countExpansions(tag)>0;
+				},
+				setStorage:function(name,value){
+					return this.storage[name]=value;
+				},
 				getStorage:function(name){
 					return this.storage[name]||[];
+				},
+				hasStorage:function(name){
+					return name in this.storage;
+				},
+				initStorage:function(name,value){
+					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value);
+				},
+				updateStorage:function(name,operation){
+					operation(this.getStorage(name));
+					return this.getStorage(name);
 				},
 				markSkill:function(name,info,card){
 					if(info===true){
