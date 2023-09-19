@@ -855,13 +855,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						enable:'chooseToUse',
 						filter:function(event,player){
 							return player.isTurnedOver()&&game.hasPlayer(current=>{
-								return current.hasSkill('jsrgzhangdeng');
+								return current.hasSkill('jsrgzhangdeng')&&current.isTurnedOver();
 							});
 						},
 						viewAs:{name:'jiu',isCard:true},
 						viewAsFilter:function(player){
 							return player.isTurnedOver()&&game.hasPlayer(current=>{
-								return current.hasSkill('jsrgzhangdeng');
+								return current.hasSkill('jsrgzhangdeng')&&current.isTurnedOver();
 							});
 						},
 						filterCard:()=>false,
@@ -869,7 +869,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						precontent:function(){
 							player.logSkill('jsrgzhangdeng_jiu');
 							var targets=game.filterPlayer(current=>{
-								return current.hasSkill('jsrgzhangdeng');
+								return current.hasSkill('jsrgzhangdeng')&&current.isTurnedOver();
 							});
 							player.line(targets[0]);
 							delete event.result.skill;
