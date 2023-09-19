@@ -18488,7 +18488,6 @@
 					event.trigger('damageBegin4');
 					"step 4"
 					//moved changeHujia to changeHp
-					if(!event.unreal) event.trigger('damageBegin5');
 					if(['fire','thunder','ice'].contains(event.nature)){
 						if(player.hujia>0&&!player.hasSkillTag('nohujia')&&event.nature!='ice'){
 							game.broadcastAll(function(num){
