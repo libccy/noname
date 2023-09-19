@@ -16159,7 +16159,7 @@
 										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(shown,'card',buttons));
 										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(hidden,'blank',buttons));
 										if(event.dialog.forcebutton!==false) event.dialog.forcebutton=true;
-										if(event.dialog.buttons.length>3||(zoom&&event.dialog.buttons.length>5)){
+										if(event.dialog.buttons.length>3){
 											event.dialog.classList.remove('forcebutton-auto');
 										}
 										else if(!event.dialog.noforcebutton){
@@ -16314,7 +16314,7 @@
 										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(shown,'card',buttons));
 										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(hidden,'blank',buttons));
 										if(event.dialog.forcebutton!==false) event.dialog.forcebutton=true;
-										if(event.dialog.buttons.length>3||(zoom&&event.dialog.buttons.length>5)){
+										if(event.dialog.buttons.length>3){
 											event.dialog.classList.remove('forcebutton-auto');
 										}
 										else if(!event.dialog.noforcebutton){
@@ -16493,7 +16493,7 @@
 										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(shown,'card',buttons));
 										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(hidden,'blank',buttons));
 										if(event.dialog.forcebutton!==false) event.dialog.forcebutton=true;
-										if(event.dialog.buttons.length>3||(zoom&&event.dialog.buttons.length>5)){
+										if(event.dialog.buttons.length>3){
 											event.dialog.classList.remove('forcebutton-auto');
 										}
 										else if(!event.dialog.noforcebutton){
