@@ -24749,7 +24749,7 @@
 					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value);
 				},
 				updateStorage:function(name,operation){
-					operation(this.getStorage(name));
+					this.setStorage(name,operation(this.getStorage(name)));
 					return this.getStorage(name);
 				},
 				markSkill:function(name,info,card){
