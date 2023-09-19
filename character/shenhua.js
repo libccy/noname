@@ -2162,18 +2162,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!event.cards.filterInD('oe').length) return false;
 					return player.getHistory('useCard',evt=>get.type2(evt.card)==get.type2(event.card)).indexOf(event)==0;
 				},
-				check:function(event,player){
-					if(get.type(event.card)=='equip'){
-						if(get.subtype(event.card)=='equip6') return true;
-						if(get.equipResult(player,event.target,event.card.name)<=0) return true;
-						var eff1=player.getUseValue(event.card);
-						var subtype=get.subtype(event.card);
-						return player.countCards('h',function(card){
-							return get.subtype(card)==subtype&&player.getUseValue(card)>=eff1;
-						})>0;
-					}
-					return true;
-				},
 				prompt:function(event,player){
 					return get.prompt('nzry_shicai')+'（将'+get.translation(event.cards.filterInD('oe'))+'置于牌堆顶）';
 				},
@@ -2249,7 +2237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target){
 							if(player==target&&get.type(card)=='equip'&&!player.getHistory('useCard',function(evt){
 								return get.type(evt.card)=='equip';
-							}).length==0) return [1,3];
+							}).length) return [1,3];
 						},
 					},
 				},

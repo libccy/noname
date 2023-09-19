@@ -9342,13 +9342,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//乌巢酒仙
 			recangchu:{
 				audio:2,
-				trigger:{
-					global:'gameStart',
-					player:'enterGame',
-				},
+				trigger:{global:'phaseBefore',player:'enterGame'},
 				marktext:'粮',
 				forced:true,
 				filter:function(event,player){
+					if(event.name=='phase'&&game.phaseNumber!=0) return false;
 					return player.countMark('recangchu')<game.countPlayer();
 				},
 				content:function(){
