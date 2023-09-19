@@ -3265,7 +3265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:'姻',
 				intro:{
 					name:'共患',
-					content:'锁定技。每回合限一次，一名其他角色受到伤害时，若其拥有“姻”标记且其体力值小于你，则你将伤害转移给自己。此伤害结算结束后，若你与其体力值相等，则你与其移去“姻”标记。',
+					content:()=>lib.translate.gonghuan_info,
 					onunmark:true,
 				},
 				ai:{
