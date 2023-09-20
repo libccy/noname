@@ -10523,5 +10523,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_danqi:'千里单骑',
 			sp_decade:'其他新服武将',
 		},
+		pinyins:{
+			卑弥呼:['Himiko']
+		}
 	};
 });

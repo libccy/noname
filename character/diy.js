@@ -19199,7 +19199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			雾岛佳乃:['Kirishima','Kano'],
 			苍井绘梨花:['Aoi','Erika'],
 			藏里见:['Kura','Satomi'],
-			喵呜·喵呼:['Myau','Mya-fu'],
+			'喵呜·喵呼':['Myau','Mya-fu'],
 			喵呜喵呼:['Myau','Mya-fu'],
 			伊吹风子:['Ibuki','Fuuko'],
 			久岛鸥:['Kushima','Kamome'],

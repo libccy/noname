@@ -255,13 +255,22 @@
 						lib.groupnature[id]=id;
 					}
 				}
+				if(typeof config.image=='string') Object.defineProperty(lib.card,`group_${id}`,{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:{
+						fullskin:true,
+						image:config.image
+					}
+				});
 			}],
 		},
 		hookmap:{},
 		imported:{},
 		layoutfixed:['chess','tafang','stone'],
 		pinyins:{
-			metadata:{
+			_metadata:{
 				shengmu:['zh','ch','sh','b','p','m','f','d','t','l','n','g','k','h','j','q','x','r','z','c','s','y','w'],
 				special_shengmu:['j','q','x','y'],
 				feijiemu:{
@@ -39638,28 +39647,30 @@
 			}
 			return node;
 		},
-		putDB:function(type,id,item,callback){
+		putDB:function(type,id,item,onsuccess,onerror){
 			if(!lib.db) return item;
 			if(lib.status.reload){
 				lib[_status.dburgent?'ondb2':'ondb'].push(['putDB',Array.from(arguments)]);
 				return;
 			}
 			lib.status.reload++;
-			lib.db.transaction([type],'readwrite').objectStore(type).put(item,id).onsuccess=function(){
-				if(callback){
+			const record=lib.db.transaction([type],'readwrite').objectStore(type).put(item,id);
+			record.onsuccess=function(){
+				if(onsuccess){
 					_status.dburgent=true;
-					callback.apply(this,arguments);
+					onsuccess.apply(this,arguments);
 					delete _status.dburgent;
 				}
 				game.reload2();
 			};
+			if(typeof onerror=='function') record.onerror=onerror;
 		},
-		getDB:function(type,id,callback){
+		getDB:function(type,id,onsuccess,onerror){
 			if(!lib.db){
-				if(callback) callback(null);
+				if(onsuccess) onsuccess(null);
 				return;
 			}
-			if(!callback) return;
+			if(!onsuccess) return;
 			if(lib.status.reload){
 				lib[_status.dburgent?'ondb2':'ondb'].push(['getDB',Array.from(arguments)]);
 				return;
@@ -39667,31 +39678,34 @@
 			lib.status.reload++;
 			const store=lib.db.transaction([type],'readwrite').objectStore(type);
 			if(id){
-				store.get(id).onsuccess=e=>{
+				const record=store.get(id);
+				record.onsuccess=e=>{
 					_status.dburgent=true;
-					callback(e.target.result);
+					onsuccess(e.target.result);
 					delete _status.dburgent;
 					game.reload2();
 				};
+				if(typeof onerror=='function') record.onerror=onerror;
 				return;
 			}
-			const obj={};
-			store.openCursor().onsuccess=e=>{
-				const cursor=e.target.result;
-				if(cursor){
-					obj[cursor.key]=cursor.value;
-					cursor.continue();
+			const cursor=store.openCursor(),obj={};
+			cursor.onsuccess=e=>{
+				const result=e.target.result;
+				if(result){
+					obj[result.key]=result.value;
+					result.continue();
 					return;
 				}
 				_status.dburgent=true;
-				callback(obj);
+				onsuccess(obj);
 				delete _status.dburgent;
 				game.reload2();
-			}
+			};
+			if(typeof onerror=='function') cursor.onerror=onerror;
 		},
-		deleteDB:function(type,id,callback){
+		deleteDB:function(type,id,onsuccess,onerror){
 			if(!lib.db){
-				if(callback) callback(false);
+				if(onsuccess) onsuccess(false);
 				return;
 			}
 			if(lib.status.reload){
@@ -39700,10 +39714,12 @@
 			}
 			if(arguments.length>1){
 				lib.status.reload++;
-				lib.db.transaction([type],'readwrite').objectStore(type).delete(id).onsuccess=function(){
-					if(callback) callback.apply(this,arguments);
+				const record=lib.db.transaction([type],'readwrite').objectStore(type).delete(id);
+				record.onsuccess=function(){
+					if(onsuccess) onsuccess.apply(this,arguments);
 					game.reload2();
 				};
+				if(typeof onerror=='function') record.onerror=onerror;
 				return;
 			}
 			game.getDB(type,null,obj=>{
@@ -53214,21 +53230,86 @@
 				else if(lib.config.favouriteCharacter.contains(name)){
 					fav.classList.add('active');
 				}
-				var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
+				const intro=ui.create.div('.characterintro',uiintro);
 				if(lib.config.show_characternamepinyin){
-					var charactername=get.rawName(name);
-					var characterpinyin=get.pinyin(charactername);
-					var nameinfo=get.character(name);
-					var charactersex=get.translation(nameinfo[0]);
-					const charactergroups=get.is.double(name,true);
-					let charactergroup;
-					if(charactergroups) charactergroup=charactergroups.map(i=>get.translation(i)).join('/')
-					else charactergroup=get.translation(nameinfo[1]);
-					var characterhp=nameinfo[2];
-					var characterintroinfo=get.characterIntro(name);
-					intro.innerHTML='<span style="font-weight:bold;margin-right:5px;line-height:2">'+charactername+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+characterpinyin+']'+'</span>'+' | '+charactersex+' | '+charactergroup+' | '+characterhp+'<br>'+characterintroinfo;
+					const span=document.createElement('span');
+					span.style.fontWeight='bold';
+					const nameInfo=get.character(name),nameExInfo=nameInfo[4],characterName=nameExInfo&&nameExInfo.includes('translateNameAsIs:get.charactercard')?lib.translate[name]:get.rawName(name);
+					span.textContent=characterName;
+					const ruby=document.createElement('ruby');
+					ruby.appendChild(span);
+					const leftParenthesisRP=document.createElement('rp');
+					leftParenthesisRP.textContent='（';
+					ruby.appendChild(leftParenthesisRP);
+					const rt=document.createElement('rt');
+					rt.textContent=get.pinyin(characterName).join(' ');
+					ruby.appendChild(rt);
+					const rightParenthesisRP=document.createElement('rp');
+					rightParenthesisRP.textContent='）';
+					ruby.appendChild(rightParenthesisRP);
+					const tr=document.createElement('tr'),characterNameTD=document.createElement('td');
+					characterNameTD.appendChild(ruby);
+					tr.appendChild(characterNameTD);
+					const characterSexTD=document.createElement('td');
+					characterSexTD.textContent=get.translation(nameInfo[0]);
+					tr.appendChild(characterSexTD);
+					const characterGroupTD=document.createElement('td');
+					const characterGroups=get.is.double(name,true);
+					if(characterGroups) Promise.all(characterGroups.map(value=>new Promise((resolve,reject)=>{
+						const info=lib.card[`group_${value}`];
+						if(!info) resolve(`image/card/group_${value}.png`);
+						const image=info.image;
+						if(!image) resolve(`image/card/group_${value}.png`);
+						else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3),src=>resolve(src),reject);
+						else if(image.indexOf('ext:')==0) resolve(image.replace(/ext:/,'extension/'));
+						else resolve(image);
+					}).then(element=>new Promise((resolve,reject)=>{
+						const image=new Image();
+						image.onload=()=>resolve(image);
+						image.onerror=reject;
+						image.src=element;
+					})))).then(value=>{
+						const documentFragment=document.createDocumentFragment();
+						value.forEach(documentFragment.appendChild,documentFragment);
+						characterGroupTD.appendChild(documentFragment);
+					}).catch(()=>characterGroupTD.textContent=characterGroups.reduce((previousValue,currentValue)=>previousValue?`${previousValue}/${get.translation(currentValue)}`:get.translation(currentValue),''));
+					else{
+						const characterGroup=nameInfo[1];
+						new Promise((resolve,reject)=>{
+							const info=lib.card[`group_${characterGroup}`];
+							if(!info) resolve(`image/card/group_${characterGroup}.png`);
+							const image=info.image;
+							if(!image) resolve(`image/card/group_${characterGroup}.png`);
+							else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3),src=>resolve(src),reject);
+							else if(image.indexOf('ext:')==0) resolve(image.replace(/ext:/,'extension/'));
+							else resolve(image);
+						}).then(value=>new Promise((resolve,reject)=>{
+							const image=new Image();
+							image.onload=()=>resolve(image);
+							image.onerror=reject;
+							image.src=value;
+						})).then(value=>characterGroupTD.appendChild(value)).catch(()=>characterGroupTD.textContent=get.translation(characterGroup));
+					}
+					tr.appendChild(characterGroupTD);
+					const characterHPTD=document.createElement('td'),hpDiv=ui.create.div('.hp',characterHPTD),nameInfoHP=nameInfo[2],infoHP=get.infoHp(nameInfoHP);
+					hpDiv.dataset.condition=infoHP<4?'mid':'high';
+					ui.create.div(hpDiv);
+					const hpTextDiv=ui.create.div('.text',hpDiv),infoMaxHP=get.infoMaxHp(nameInfoHP);
+					hpTextDiv.textContent=infoHP==infoMaxHP?infoHP:`${infoHP}/${infoMaxHP}`;
+					const infoShield=get.infoHujia(nameInfoHP);
+					if(infoShield){
+						ui.create.div('.shield',hpDiv);
+						const shieldTextDiv=ui.create.div('.text',hpDiv);
+						shieldTextDiv.textContent=infoShield;
+					}
+					tr.appendChild(characterHPTD);
+					const table=document.createElement('table');
+					table.appendChild(tr);
+					intro.appendChild(table);
+					intro.appendChild(document.createElement('hr'));
 				}
-				var intro2=ui.create.div('.characterintro.intro2',uiintro);
+				intro.appendChild(new Text(get.characterIntro(name)));
+				const intro2=ui.create.div('.characterintro.intro2',uiintro);
 				var list=get.character(name,3)||[];
 				var skills=ui.create.div('.characterskill',uiintro);
 				if(lib.config.touchscreen){
@@ -53241,38 +53322,75 @@
 					skills.onmousewheel=ui.click.mousewheel;
 				}
 				var clickSkill=function(e){
+					while(intro2.firstChild){
+						intro2.removeChild(intro2.lastChild);
+					}
 					var current=this.parentNode.querySelector('.active');
 					if(current){
 						current.classList.remove('active');
 					}
 					this.classList.add('active');
-					var skillname=get.translation(this.link);
-					var skilltranslationinfo=get.skillInfoTranslation(this.link);
-					if(lib.config.show_skillnamepinyin&&skillname!='阵亡'){
-						var skillpinyin=get.pinyin(skillname);
-						intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+skillpinyin+']'+'</span>'+'  '+skilltranslationinfo;
-					}else{
-						intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+skilltranslationinfo;
+					const skillNameSpan=document.createElement('span'),skillNameSpanStyle=skillNameSpan.style;
+					skillNameSpanStyle.fontWeight='bold';
+					const skillName=get.translation(this.link);
+					skillNameSpan.textContent=skillName;
+					if(lib.config.show_skillnamepinyin&&skillName!='阵亡'){
+						const ruby=document.createElement('ruby');
+						ruby.appendChild(skillNameSpan);
+						const leftParenthesisRP=document.createElement('rp');
+						leftParenthesisRP.textContent='（';
+						ruby.appendChild(leftParenthesisRP);
+						const rt=document.createElement('rt');
+						rt.textContent=get.pinyin(skillName).join(' ');
+						ruby.appendChild(rt);
+						const rightParenthesisRP=document.createElement('rp');
+						rightParenthesisRP.textContent='）';
+						ruby.appendChild(rightParenthesisRP);
+						const div=ui.create.div(intro2);
+						div.style.marginRight='5px';
+						div.appendChild(ruby);
 					}
+					else{
+						skillNameSpanStyle.marginRight='5px';
+						intro2.appendChild(skillNameSpan);
+					}
+					intro2.appendChild(new Text(get.skillInfoTranslation(this.link)));
 					var info=get.info(this.link);
 					var skill=this.link;
 					var playername=this.linkname;
 					var skillnode=this;
-					if(info.derivation){
-						var derivation=info.derivation;
-						if(typeof derivation=='string'){
-							derivation=[derivation];
-						}
-						for(var i=0;i<derivation.length;i++){
-							var derivationname=get.translation(derivation[i]);
-							var derivationtranslationinfo=get.skillInfoTranslation(derivation[i]);
-							if(lib.config.show_skillnamepinyin&&derivationname.length<=5&&derivation[i].indexOf('_faq')==-1){
-								var derivationpinyin=get.pinyin(derivationname);
-								intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+derivationpinyin+']'+'</span>'+'  '+derivationtranslationinfo;
-							}else{
-								intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+derivationtranslationinfo;
+					let derivation=info.derivation;
+					if(derivation){
+						if(typeof derivation=='string') derivation=[derivation];
+						derivation.forEach(value=>{
+							intro2.appendChild(document.createElement('br'));
+							intro2.appendChild(document.createElement('br'));
+							const derivationNameSpan=document.createElement('span'),derivationNameSpanStyle=derivationNameSpan.style;
+							derivationNameSpanStyle.fontWeight='bold';
+							const derivationName=get.translation(value);
+							derivationNameSpan.textContent=derivationName;
+							if(lib.config.show_skillnamepinyin&&derivationName.length<=5&&value.indexOf('_faq')==-1){
+								const ruby=document.createElement('ruby');
+								ruby.appendChild(derivationNameSpan);
+								const leftParenthesisRP=document.createElement('rp');
+								leftParenthesisRP.textContent='（';
+								ruby.appendChild(leftParenthesisRP);
+								const rt=document.createElement('rt');
+								rt.textContent=get.pinyin(derivationName).join(' ');
+								ruby.appendChild(rt);
+								const rightParenthesisRP=document.createElement('rp');
+								rightParenthesisRP.textContent='）';
+								ruby.appendChild(rightParenthesisRP);
+								const div=ui.create.div(intro2);
+								div.style.marginRight='5px';
+								div.appendChild(ruby);
 							}
-						}
+							else{
+								derivationNameSpanStyle.marginRight='5px';
+								intro2.appendChild(derivationNameSpan);
+							}
+							intro2.appendChild(new Text(get.skillInfoTranslation(value)));
+						});
 					}
 					if(info.alter){
 						intro2.innerHTML+='<br><br><div class="hrefnode skillversion"></div>';
@@ -54394,40 +54512,36 @@
 			return [];
 		},
 		//装备栏 END
-		pinyin:function(chinese,withtone){
-			const util=window.pinyinUtilx;
-			if(!window.pinyinUtilx) return [];
-			if(lib.pinyins&&lib.pinyins[chinese]){
-				const str=lib.pinyins[chinese];
-				if(withtone===false){
-					for(let i=0;i<str.length;i++){
-						str[i]=util.removeTone(str[i]);
-					}
-				}
-				return str;
+		pinyin:(chinese,withTone)=>{
+			const pinyinUtilx=window.pinyinUtilx;
+			if(!pinyinUtilx) return [];
+			const pinyins=lib.pinyins;
+			if(pinyins){
+				const pinyin=pinyins[chinese];
+				if(Array.isArray(pinyin)) return withTone===false?pinyin.map(pinyinUtilx.removeTone):pinyin.slice();
 			}
-			return util.getPinyin(chinese,null,withtone,true);
+			return pinyinUtilx.getPinyin(chinese,null,withTone,true);
 		},
 		yunmu:function(str){
 			//部分整体认读音节特化处理
 			const util=window.pinyinUtilx;
-			if(util&&lib.pinyins.metadata.zhengtirendu.contains(util.removeTone(str))){
+			if(util&&lib.pinyins._metadata.zhengtirendu.contains(util.removeTone(str))){
 				return '-'+str[str.length-1];
 			}
 			//排除声母
-			for(let i of lib.pinyins.metadata.shengmu){
+			for(let i of lib.pinyins._metadata.shengmu){
 				if(str.indexOf(i)==0){
 					str=str.slice(i.length);
-					if(str[0]=='u'&&lib.pinyins.metadata.special_shengmu.contains(i)) str='ü'+str.slice(1);
+					if(str[0]=='u'&&lib.pinyins._metadata.special_shengmu.contains(i)) str='ü'+str.slice(1);
 					break;
 				}
 			}
 			//排除介母
 			if(str.length>0){
-				for(let i in lib.pinyins.metadata.feijiemu){
+				for(let i in lib.pinyins._metadata.feijiemu){
 					if(str[0]==i){
 						let goon=false;
-						for(let j of lib.pinyins.metadata.feijiemu[i]){
+						for(let j of lib.pinyins._metadata.feijiemu[i]){
 							if(str.indexOf(j)==0) goon=true;
 						}
 						if(!goon) str=str.slice(1);
@@ -54440,20 +54554,20 @@
 		yunjiao:function(str){
 			const util=window.pinyinUtilx;
 			if(util) str=util.removeTone(str)
-			if(lib.pinyins.metadata.zhengtirendu.contains(str)){
+			if(lib.pinyins._metadata.zhengtirendu.contains(str)){
 				str=('-'+str[str.length-1]);
 			}
 			else{
-				for(let i of lib.pinyins.metadata.shengmu){
+				for(let i of lib.pinyins._metadata.shengmu){
 					if(str.indexOf(i)==0){
 						str=str.slice(i.length);
-						if(str[0]=='u'&&lib.pinyins.metadata.special_shengmu.contains(i)) str='ü'+str.slice(1);
+						if(str[0]=='u'&&lib.pinyins._metadata.special_shengmu.contains(i)) str='ü'+str.slice(1);
 						break;
 					}
 				}
 			}
-			for(let i in lib.pinyins.metadata.yunjiao){
-				if(lib.pinyins.metadata.yunjiao[i].contains(str)) return i;
+			for(let i in lib.pinyins._metadata.yunjiao){
+				if(lib.pinyins._metadata.yunjiao[i].contains(str)) return i;
 			}
 			return null;
 		},

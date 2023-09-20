@@ -192,9 +192,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xizhicai:['male','wei',3,['tiandu','xianfu','chouce']],
 			quyi:['male','qun',4,['fuqi','jiaozi']],
 
-			luzhi:['male','wei',3,['qingzhong','weijing']],
-			
-			//kaisa:["male","western",4,["zhengfu"]],
+			luzhi:['male','wei',3,['qingzhong','weijing']]
 		},
 		characterIntro:{
 			caoxi:'曹羲（？－249年），字昭叔。曹真之子，曹爽之弟。为人有学识，明律法。司马懿曾组织朝议改革九品中正制废除九品而留中正，曹羲认为此举并无区别，最终都是决定于人的人治。曹爽掌权后，受封中领军，掌握禁兵，封安乡侯。曹爽及诸兄弟轻视司马懿，恣意妄为，经常外出狩猎，曹羲屡次劝谏，不被采纳。249年，司马懿发动高平陵政变，被夷三族。',
@@ -12907,47 +12905,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			//英文版特典武将凯撒
-			zhengfu:{
-				trigger:{
-					player:"useCardToPlayered",
-				},
-				check:function (event,player){
-					return get.attitude(player,event.target)<0;
-				},
-				filter:function(event,player){
-					return event.card.name=='sha';
-				},
-				logTarget:"target",
-				line:false,
-				content:function (){
-					'step 0'
-					player.line(trigger.target,{color:[220, 90, 139]});
-					player.chooseControl(['basic','trick','equip']).set('ai',function(){
-						var player=_status.event.target;
-						if(!player.countCards('h','sha')&&player.countCards('h','shan')) return 'trick';
-						return 'basic';
-					}).set('prompt','请选择一种牌的类别').set('target',trigger.target);
-					'step 1'
-					trigger.target.chooseCard('he','交给'+get.translation(player)+'一张'+get.translation(result.control)+'牌，否则此【杀】不可被闪避。',function(card){
-						return get.type(card,'trick')==result.control;
-					}).set('ai',function(card){
-						var num=_status.event.num;
-						if(num==0) return 0;
-						if(card.name=='shan') return num>1?2:0;
-						return 8-get.value(card);
-					}).set('num',trigger.target.countCards('h','shan'))
-					'step 2'
-					if(result.bool){
-						var cards=result.cards;
-						trigger.target.give(cards,player);
-					}
-					else{
-						trigger.getParent().directHit.add(trigger.target);
-						game.delay();
-					}
-				},
-			},
 			//变权移植
 			wanwei:{
 				trigger:{target:['rewriteGainResult','rewriteDiscardResult']},
@@ -24141,7 +24098,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lvfan:'吕范',
 			liqueguosi:'李傕郭汜',
 			cuimao:'崔琰毛玠',
-			kaisa:"凯撒",
 			
 			
 			caoying:"曹婴",
@@ -24211,8 +24167,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"zhenwei_three_info":"锁定技，敌方角色至己方其他角色的距离+1。",
 			"huanshi_three":"缓释",
 			"huanshi_three_info":"一名友方角色的判定牌生效前，你可打出一张牌代替之。",
-			zhengfu:"征服",
-			"zhengfu_info":"当你使用【杀】指定目标时，你可以选择一种牌的类别，然后除非目标角色交给你一种该类别的牌，否则其不能闪避此【杀】。",
 			
 			yizan:"翊赞",
 			yizan_info:"你可以将两张牌（其中至少一张是基本牌）当任意基本牌牌使用",
@@ -25141,6 +25095,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_guozhan2:"国战移植",
 			sp_others:"其他",
 			sp_waitforsort:'等待分包',
-		},
+		}
 	};
 });
