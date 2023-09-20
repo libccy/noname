@@ -25969,7 +25969,8 @@
 								range+=info.globalFrom;
 							}
 						})
-						return (equips.reduce((range,card)=>{
+						return (equips.reduce((range,card,index)=>{
+							if(index==0) range--;
 							let newRange=1;
 							const info=get.info(card,false);
 							if(info.distance){
@@ -25993,7 +25994,8 @@
 						const equips=player.getCards('e',function(card){
 							return !ui.selected.cards||!ui.selected.cards.contains(card);
 						});
-						range=equips.reduce((range,card)=>{
+						range=equips.reduce((range,card,index)=>{
+							if(index==0) range--;
 							let newRange=1;
 							const info=get.info(card,false);
 							if(info.distance){
@@ -56344,7 +56346,8 @@
 					n+=info.globalFrom;
 				}
 			}
-			const attakRange=equips1.reduce((range,card)=>{
+			const attakRange=equips1.reduce((range,card,index)=>{
+				if(index==0) range--;
 				let newRange=1;
 				const info=get.info(card,false);
 				if(info.distance){
