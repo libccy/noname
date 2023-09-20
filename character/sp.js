@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			ol_luyusheng:['female','wu',3,['olcangxin','skill_luyusheng_B'],['unseen']],
+			ol_luyusheng:['female','wu',3,['olcangxin','olrunwei']],
 			caoxi:['male','wei',3,['olgangshu','oljianxuan']],
 			ol_pengyang:['male','shu',3,['olqifan','oltuishi','nzry_cunmu']],
 			ol_qianzhao:['male','wei',4,['olweifu','olkuansai']],
@@ -758,7 +758,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			skill_luyusheng_B:{
+			olrunwei:{
 				audio:2,
 				trigger:{global:'phaseDiscardBegin'},
 				filter:function(event,player){
@@ -792,22 +792,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 2;
 								break;
 						}
-					}).set('prompt',get.prompt('skill_luyusheng_B',trigger.player));
+					}).set('prompt',get.prompt('olrunwei',trigger.player));
 					'step 1'
 					if(result.index!=2){
-						player.logSkill('skill_luyusheng_B',trigger.player);
+						player.logSkill('olrunwei',trigger.player);
 						if(result.index==0){
 							trigger.player.chooseToDiscard('he',true).set('ai',card=>{
 								if(get.position(card)=='e') return -get.value(card);
 								return 1/(get.value(card)||0.5);
 							});
-							trigger.player.addTempSkill('skill_luyusheng_B_+');
-							trigger.player.addMark('skill_luyusheng_B_+',1,false);
+							trigger.player.addTempSkill('olrunwei_+');
+							trigger.player.addMark('olrunwei_+',1,false);
 						}
 						if(result.index==1){
 							trigger.player.draw();
-							trigger.player.addTempSkill('skill_luyusheng_B_-');
-							trigger.player.addMark('skill_luyusheng_B_-',1,false);
+							trigger.player.addTempSkill('olrunwei_-');
+							trigger.player.addMark('olrunwei_-',1,false);
 						}
 					}
 				},
@@ -819,7 +819,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{content:'手牌上限+#'},
 						mod:{
 							maxHandcard:function(player,num){
-								return num+player.countMark('skill_luyusheng_B_+');
+								return num+player.countMark('olrunwei_+');
 							},
 						},
 					},
@@ -830,7 +830,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{content:'手牌上限-#'},
 						mod:{
 							maxHandcard:function(player,num){
-								return num-player.countMark('skill_luyusheng_B_-');
+								return num-player.countMark('olrunwei_-');
 							},
 						},
 					},
@@ -24003,6 +24003,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhouqun:['ol_zhouqun','zhouqun'],
 			qianzhao:['ol_qianzhao','qianzhao'],
 			ol_pengyang:['ol_pengyang','sp_pengyang'],
+			ol_luyusheng:['ol_luyusheng','luyusheng'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -25128,8 +25129,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_luyusheng:'OL陆郁生',
 			olcangxin:'藏心',
 			olcangxin_info:'①当你受到伤害时，你可以观看牌堆底的三张牌并弃置其中任意张牌，若你以此法弃置了红桃牌，则防止此伤害。②摸牌阶段，你多摸X张牌（X为牌堆底前三张牌中红桃牌的数量）。',
-			skill_luyusheng_B:'技能',
-			skill_luyusheng_B_info:'其他角色的弃牌阶段开始时，若其已受伤且其手牌数不等于其体力上限，则你可以选择一项：①令其弃置一张牌，其本回合手牌上限+1；②令其摸一张牌，其本回合手牌上限-1。',
+			olrunwei:'润微',
+			olrunwei_info:'其他角色的弃牌阶段开始时，若其已受伤且其手牌数不等于其体力上限，则你可以选择一项：①令其弃置一张牌，其本回合手牌上限+1；②令其摸一张牌，其本回合手牌上限-1。',
 			caoxi:'曹羲',
 			olgangshu:'刚述',
 			olgangshu_info:'①当你使用非基本牌结算结束后，你可以令以下一项数值+1（每项至多以此法+5）：1.攻击范围；2.受〖刚述〗影响的下个摸牌阶段摸牌数；3.使用【杀】的次数上限。②当有牌被你抵消后，重置你〖刚述①〗增加的所有数值。',
