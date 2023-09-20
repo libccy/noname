@@ -20113,6 +20113,11 @@
 							player.update();
 						}
 					},this,this.name,this.sex,num,this.group);
+					skills=skills.filter(skill=>{
+						var info=get.info(skill);
+						if(info&&info.zhuSkill&&!this.isZhu2()) return false;
+						return true;
+					});
 					for(var i=0;i<skills.length;i++){
 						if(this.hiddenSkills.contains(skills[i])){
 							this.hiddenSkills.remove(skills[i]);
@@ -24746,31 +24751,8 @@
 				getExpansions:function(tag){
 					return this.getCards('x',(card)=>card.hasGaintag(tag));
 				},
-				countExpansions:function(tag){
-					return this.getExpansions(tag).length;
-				},
-				hasExpansions:function(tag){
-					return this.countExpansions(tag)>0;
-				},
-				setStorage:function(name,value){
-					return this.storage[name]=value;
-				},
 				getStorage:function(name){
 					return this.storage[name]||[];
-				},
-				hasStorage:function(name){
-					return name in this.storage;
-				},
-				initStorage:function(name,value){
-					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value);
-				},
-				updateStorage:function(name,operation){
-					return this.setStorage(name,operation(this.getStorage(name)));
-				},
-				updateStorageAsync:function(name,operation){
-					return Promise.resolve(this.getStorage(name))
-					.then(value=>operation(value))
-					.then(value=>this.setStorage(name,value))
 				},
 				markSkill:function(name,info,card){
 					if(info===true){
