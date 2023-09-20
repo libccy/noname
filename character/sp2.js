@@ -3041,14 +3041,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target,current){
 							if(get.tag(card,'damage')){
-								if(player.hp==target.hp) return;
+								if(player.hp==target.hp||lib.linked.contains(get.nature(card))) return;
 								var cards=[card];
 								if(card.cards&&card.cards.length) cards.addArray(card.cards);
 								if(ui.selected.cards.length) cards.addArray(ui.selected.cards);
 								if(player.countCards('h',function(card){
 									return !cards.contains(card);
 								})==target.countCards('h')) return;
-								return 'zerotarget';
+								return 'zeroplayertarget';
 							}
 						},
 					},
@@ -4703,6 +4703,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num==0) player.awakenSkill('recuorui');
 					player.gainPlayerCard(target,true,'h');
 				},
+				ai:{
+					order:10,
+					result:{
+						player:1,
+						target:function(player,target){
+							if(target.hasSkillTag('noh')) return 0;
+							return -1;
+						}
+					}
+				}
 			},
 			reliewei:{
 				audio:'liewei',
