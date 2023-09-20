@@ -895,7 +895,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool==false){
-						target.damage(event.baseDamage,event.customSource||player);
+						target.damage(event.baseDamage);
 					}
 				},
 				ai:{

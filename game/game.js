@@ -23780,7 +23780,7 @@
 					}
 					if(next.card==undefined&&!nocard) next.card=event.card;
 					if(next.cards==undefined&&!nocard) next.cards=event.cards;
-					if(next.source==undefined&&!nosource) next.source=event.player;
+					if(next.source==undefined&&!nosource) next.source=event.customSource||event.player;
 					if(next.source&&next.source.isDead()) delete next.source;
 					if(next.unreal==undefined) next.unreal=false;
 					if(next.num==undefined) next.num=1;
