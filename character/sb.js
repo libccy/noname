@@ -3050,13 +3050,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!player.hasZhuSkill('sbhuangtian')||!player.hasSkill('sbguidao',null,false,false)) return false;
 							if(!event.source||player==event.source||event.source.group!='qun') return false;
 							if(player.hasSkill('sbguidao')&&player.countMark('sbguidao')>=8) return false;
-							// if(player.countMark('sbhuangtian_count')>999) return false;
+							if(player.countMark('sbhuangtian_count')>=4) return false;
 							return true;
 						},
 						content:function(){
 							player.addMark('sbguidao',1);
-							// player.addTempSkill('sbhuangtian_count','roundStart');
-							// player.addMark('sbhuangtian_count',1,false);
+							player.addTempSkill('sbhuangtian_count','roundStart');
+							player.addMark('sbhuangtian_count',1,false);
 						}
 					},
 					count:{onremove:true}
