@@ -7841,21 +7841,45 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//芮姬
 			qiaoli:{
-				audio:2,
-				enable:'chooseToUse',
-				viewAs:{name:'juedou'},
-				viewAsFilter:function(player){
-					return player.hasCard(function(card){
-						return get.type(card)=='equip';
-					},'ehs')
+				onChooseToUse:function(event){
+					if(event.type=='phase'&&!game.online&&!(event.qiaoli_equip1&&event.qiaoli_noequip1)){
+						var player=event.player;
+						var evt=event.getParent('phaseUse');
+						if(player.getHistory('useCard',function(evtx){
+							return evtx.getParent('phaseUse')==evt&&evtx.skill=='qiaoli'&&get.subtype(evtx.cards[0])=='equip1';
+						}).length) event.set('qiaoli_equip1',true);
+						if(player.getHistory('useCard',function(evtx){
+							return evtx.getParent('phaseUse')==evt&&evtx.skill=='qiaoli'&&get.subtype(evtx.cards[0])!='equip1';
+						}).length) event.set('qiaoli_noequip1',true);
+					}
 				},
-				filterCard:{type:'equip'},
+				audio:2,
+				enable:'phaseUse',
+				viewAs:{
+					name:'juedou',
+					qiaoli:true,
+				},
+				filterCard:function(card,player){
+					if(get.type(card)!='equip') return false;
+					var event=_status.event;
+					if(get.subtype(card)=='equip1'&&event.qiaoli_equip1) return false;
+					if(get.subtype(card)!='equip1'&&event.qiaoli_noequip1) return false;
+					return true;
+				},
+				viewAsFilter:function(player){
+					return player.isPhaseUsing()&&player.hasCard(function(card){
+						return lib.skill.qiaoli.filterCard(card,player);
+					},'hes');
+				},
 				check:function(card){
 					if(get.position(card)=='e') return 7.5-get.value(card);
 					return 12-_status.event.player.getUseValue(card);
 				},
 				position:'hes',
-				group:['qiaoli_effect','qiaoli_gain','qiaoli_norespond'],
+				precontent:function(){
+					player.addTempSkill('qiaoli_norespond');
+					player.addTempSkill('qiaoli_effect');
+				},
 				ai:{
 					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
@@ -7864,31 +7888,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					norespond:{
-						trigger:{player:'useCard1'},
-						forced:true,
 						charlotte:true,
-						popup:false,
+						trigger:{player:'useCard1'},
 						filter:function(event,player){
-							if(event.skill!='qiaoli') return false;
-							var card=event.cards[0];
-							return get.subtype(card)!='equip1';
+							return event.card.qiaoli&&get.subtype(event.cards[0])!='equip1';
 						},
+						forced:true,
+						popup:false,
 						content:function(){
-							trigger.directHit.addArray(game.filterPlayer(function(current){
-								return current!=player;
-							}));
+							player.addTempSkill('qiaoli_gain');
+							trigger.directHit.addArray(game.players);
+							game.log(trigger.card,'不可被响应');
 						},
 					},
 					effect:{
-						trigger:{player:'useCardAfter'},
-						forced:true,
 						charlotte:true,
-						popup:false,
+						trigger:{source:'damageSource'},
 						filter:function(event,player){
-							if(event.skill!='qiaoli') return false;
-							var card=event.cards[0];
-							return get.subtype(card)=='equip1';
+							return event.card&&event.cards&&event.card.qiaoli&&get.subtype(event.cards[0])=='equip1';
 						},
+						forced:true,
+						popup:false,
 						content:function(){
 							'step 0'
 							var card=trigger.cards[0];
@@ -7921,7 +7941,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								cards:cards,
 								filterTarget:lib.filter.notMe,
 								selectCard:[1,cards.length],
-								prompt:'是否将得到的牌分配给其他角色？',
+								prompt:'是否将获得的牌分配给其他角色？',
 								ai1:function(card){
 									return -1;
 								},
@@ -7940,33 +7960,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							'step 4'
 							if(_status.connectMode){
-								game.broadcastAll(function(){delete _status.noclearcountdown;game.stopCountChoose()});
+								game.broadcastAll(function(){delete _status.noclearcountdown});
+								game.stopCountChoose();
 							}
-							var map=[],cards=[];
 							for(var i in event.given_map){
 								var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
 								player.line(source,'green');
-								map.push([source,event.given_map[i]]);
-								cards.addArray(event.given_map[i]);
+								source.gain(event.given_map[i],player,'giveAuto');
 							}
-							if(map.length) game.loseAsync({
-								gain_list:map,
-								player:player,
-								cards:cards,
-								giver:player,
-								animate:'giveAuto',
-							}).setContent('gaincardMultiple');
+							event.next.sort(function(a,b){
+								return lib.sort.seat(a.player,b.player);
+							});
 						},
 					},
 					gain:{
+						charlotte:true,
 						audio:'qiaoli',
 						trigger:{player:'phaseJieshuBegin'},
 						forced:true,
-						filter:function(event,player){
-							return player.hasHistory('useCard',function(evt){
-								return evt.skill=='qiaoli';
-							})
-						},
 						content:function(){
 							var card=get.cardPile2(function(card){
 								return get.type(card)=='equip';
@@ -7979,10 +7990,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingliang:{
 				audio:2,
 				trigger:{target:'useCardToTarget'},
-				usable:1,
 				filter:function(event,player){
+					if(event.targets.length!=1) return false;
+					var bool1=(event.card.name=='sha');
+					var bool2=(get.type2(event.card)=='trick'&&get.tag(event.card,'damage'));
+					if(!bool1&&!bool2) return false;
 					return player!=event.player&&player.countCards('h')>0;
 				},
+				usable:1,
 				logTarget:'player',
 				check:function(event,player){
 					if(get.attitude(player,event.player)>0||event.player.hasSkillTag('nogain')) return true;
@@ -24880,10 +24895,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liejie_info:'当你受到伤害后，你可以弃置至多三张牌，摸等量的牌，然后可弃置伤害来源的至多X张牌（X为你以此法弃置的红色牌的数量）。',
 			ruiji:'OL芮姬',
 			qiaoli:'巧力',
-			qiaoli_info:'①你可以将一张装备牌当做【决斗】使用。若此【决斗】对应的实体牌：为武器牌，当你以此法声明使用【决斗】后，你摸X张牌（X为此牌的攻击范围），且可以将其中任意张牌分配给其他角色；不为武器牌，此牌不可被响应。②结束阶段开始时，若你于本回合内发动过〖巧力①〗，则你从牌堆中获得一张装备牌。',
+			qiaoli_info:'出牌阶段各限一次，你可以将一张武器牌/非武器装备牌当作【决斗】使用。若此【决斗】对应的实体牌为武器牌，当你以此【决斗】对目标角色造成伤害后，你摸X张牌（X为此牌的攻击范围），且可以将其中任意张牌分配给其他角色；若此【决斗】对应的实体牌不为武器牌，此牌不可被响应，且你于结束阶段从牌堆中获得一张装备牌。',
 			qiaoli_given:'已分配',
 			qingliang:'清靓',
-			qingliang_info:'每回合限一次。当你成为其他角色使用牌的目标时，你可展示所有手牌，然后选择一项：⒈你与其各摸一张牌，⒉取消此目标，然后弃置你手牌中一种花色的所有牌。',
+			qingliang_info:'每回合限一次，当你成为其他角色使用【杀】或伤害类锦囊牌的唯一目标时，你可展示所有手牌，然后选择一项：⒈你与其各摸一张牌，⒉取消此目标，然后弃置你手牌中一种花色的所有牌。',
 			chixueqingfeng:'赤血青锋',
 			chixueqingfeng2:'赤血青锋',
 			chixueqingfeng_info:'锁定技，当你使用【杀】指定目标后，你令目标角色不能使用或打出手牌且防具技能无效直到此【杀】结算结束。',
