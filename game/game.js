@@ -41425,7 +41425,7 @@
 						var page=ui.create.div('');
 						var node=ui.create.div('.menubutton.large',info.name,position,clickMode);
 						node.mode=mode;
-						node._initLink=function(){
+						// node._initLink=function(){
 							node.link=page;
 							var map={};
 							if(info.config){
@@ -41812,8 +41812,8 @@
 									info.config.update(config,map);
 								}
 							}
-						};
-						if(!get.config('menu_loadondemand')) node._initLink();
+						// };
+						// if(!get.config('menu_loadondemand')) node._initLink();
 						return node;
 					};
 
