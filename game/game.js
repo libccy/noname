@@ -10302,8 +10302,14 @@
 							}
 						}
 						else{
-							// TODO: Parse Common Object
-							throw new Error("NYI: Parse Common Object");
+							if(Symbol.iterator in item) return lib.init.parsex(Array.from(item));
+							if("toString" in item) return lib.init.parsex(item.toString());
+							if("render" in item) {
+								// TODO: Object Render Parse
+								throw new Error("NYI: Object Render Parse");
+							}
+							// TODO: Object Other Parse
+							throw new Error("NYI: Object Other Parse");
 						}
 					case "function":
 						if (gnc.is.generatorFunc(item)) {
@@ -10329,7 +10335,8 @@
 								else lastEvent=res.value;
 							}
 						}
-						else return Legacy(item);
+					default:
+						return Legacy(item);
 				}
 			},
 			eval:function(func){
