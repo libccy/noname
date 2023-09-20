@@ -28744,9 +28744,14 @@
 							this.content=lib.init.parsex(item);
 							break;
 						default:
-							if(!lib.element.content[item]._parsed){
-								lib.element.content[item]=lib.init.parsex(lib.element.content[item]);
-								lib.element.content[item]._parsed=true;
+							try{
+								if(!lib.element.content[item]._parsed){
+									lib.element.content[item]=lib.init.parsex(lib.element.content[item]);
+									lib.element.content[item]._parsed=true;
+								}
+							}
+							catch{
+								throw new Error(`Content ${item} may not exist.\nlib.element.content[${item}] = ${lib.element.content[item]}`);
 							}
 							this.content=lib.element.content[item];
 							break;
