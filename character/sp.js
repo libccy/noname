@@ -763,7 +763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseDiscardBegin'},
 				filter:function(event,player){
 					if(event.player==player) return false;
-					return event.player.isDamaged()&&event.player.countCards('h')!=event.player.getHandcardLimit();
+					return event.player.isDamaged();
 				},
 				direct:true,
 				content:function(){
@@ -25130,7 +25130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olcangxin:'藏心',
 			olcangxin_info:'①当你受到伤害时，你可以观看牌堆底的三张牌并弃置其中任意张牌，若你以此法弃置了红桃牌，则防止此伤害。②摸牌阶段，你多摸X张牌（X为牌堆底前三张牌中红桃牌的数量）。',
 			olrunwei:'润微',
-			olrunwei_info:'其他角色的弃牌阶段开始时，若其已受伤且其手牌数不等于其体力上限，则你可以选择一项：①令其弃置一张牌，其本回合手牌上限+1；②令其摸一张牌，其本回合手牌上限-1。',
+			olrunwei_info:'其他角色的弃牌阶段开始时，若其已受伤，则你可以选择一项：①令其弃置一张牌，其本回合手牌上限+1；②令其摸一张牌，其本回合手牌上限-1。',
 			caoxi:'曹羲',
 			olgangshu:'刚述',
 			olgangshu_info:'①当你使用非基本牌结算结束后，你可以令以下一项数值+1（每项至多以此法+5）：1.攻击范围；2.受〖刚述〗影响的下个摸牌阶段摸牌数；3.使用【杀】的次数上限。②当有牌被你抵消后，重置你〖刚述①〗增加的所有数值。',
