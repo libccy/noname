@@ -53234,7 +53234,7 @@
 				if(lib.config.show_characternamepinyin){
 					const span=document.createElement('span');
 					span.style.fontWeight='bold';
-					const nameInfo=get.character(name),nameExInfo=nameInfo[4],characterName=nameExInfo&&nameExInfo.includes('translateNameAsIs:get.charactercard')?lib.translate[name]:get.rawName(name);
+					const nameInfo=get.character(name),characterName=nameInfo[4].includes('ruby')?lib.translate[name]:get.rawName(name);
 					span.textContent=characterName;
 					const ruby=document.createElement('ruby');
 					ruby.appendChild(span);
@@ -53242,7 +53242,7 @@
 					leftParenthesisRP.textContent='（';
 					ruby.appendChild(leftParenthesisRP);
 					const rt=document.createElement('rt');
-					rt.textContent=get.pinyin(characterName).join(' ');
+					rt.textContent=lib.translate[`${name}_rt`]||get.pinyin(characterName).join(' ');
 					ruby.appendChild(rt);
 					const rightParenthesisRP=document.createElement('rp');
 					rightParenthesisRP.textContent='）';
@@ -53332,7 +53332,7 @@
 					this.classList.add('active');
 					const skillNameSpan=document.createElement('span'),skillNameSpanStyle=skillNameSpan.style;
 					skillNameSpanStyle.fontWeight='bold';
-					const skillName=get.translation(this.link);
+					const link=this.link,skillName=get.translation(link);
 					skillNameSpan.textContent=skillName;
 					if(lib.config.show_skillnamepinyin&&skillName!='阵亡'){
 						const ruby=document.createElement('ruby');
@@ -53341,7 +53341,7 @@
 						leftParenthesisRP.textContent='（';
 						ruby.appendChild(leftParenthesisRP);
 						const rt=document.createElement('rt');
-						rt.textContent=get.pinyin(skillName).join(' ');
+						rt.textContent=lib.translate[`${link}_rt`]||get.pinyin(skillName).join(' ');
 						ruby.appendChild(rt);
 						const rightParenthesisRP=document.createElement('rp');
 						rightParenthesisRP.textContent='）';
@@ -53376,7 +53376,7 @@
 								leftParenthesisRP.textContent='（';
 								ruby.appendChild(leftParenthesisRP);
 								const rt=document.createElement('rt');
-								rt.textContent=get.pinyin(derivationName).join(' ');
+								rt.textContent=lib.translate[`${value}_rt`]||get.pinyin(derivationName).join(' ');
 								ruby.appendChild(rt);
 								const rightParenthesisRP=document.createElement('rp');
 								rightParenthesisRP.textContent='）';
