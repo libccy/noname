@@ -523,6 +523,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card)=='equip'&&!get.cardtag(card,'gifts')&&game.hasPlayer(function(current){
+								return target.canUse('sha',current);
+							})) return [1,1.5];
+						}
+					},
+					noe:true,
+					reverseEquip:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag=='noe') return player.countCards('e')==player.hp+1;
+						return game.hasPlayer(function(current){
+							return player.canUse('sha',current);
+						});
+					}
+				}
 			},
 			xinfu_jijun:{
 				ai:{
@@ -810,6 +827,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.addToExpansion(cards,player,'give').gaintag.add('xinfu_zengdao2');
 					target.addSkill('xinfu_zengdao2');
 				},
+				ai:{
+					order:function(){
+						var player=_status.event.player,num=0;
+						if(player.hasCard((card)=>get.value(card,player)<0,'e')) return 9;
+						for(var i=1;i<6;i++){
+							num+=player.countEquipableSlot(i);
+						}
+						if(num<=2) return 9;
+						var targets=player.getStorage('xinfu_weilu_recover'),num=0;
+						if(player.hp<=2||!game.hasPlayer((current)=>{
+							if(player==current||get.attitude(player,current)<0||current.hp<=1) return false;
+							for(var arr of targets){
+								if(current==arr[0]) break;
+							}
+							return current.hp>2||current.countCards('hs')>2;
+						})) return 1;
+						return 0;
+					},
+					result:{
+						target:function(player,target){
+							if(target.hasValueTarget({name:'sha',isCard:true})) return ui.selected.cards.length;
+							return 0;
+						}
+					}
+				}
 			},
 			xinfu_zengdao2:{
 				trigger:{source:'damageBegin1'},
