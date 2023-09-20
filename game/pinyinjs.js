@@ -136,6 +136,7 @@ var pinyin_dict_polyphone = {
 	"冠绝": "guàn ",
 	"先著": " zhuó",
 	"量反": "liàng ",
+	"复难": " nàn",
 	
 	"乐动": "yuè ",
 	"血凰": "xuè ",
