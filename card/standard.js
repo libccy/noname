@@ -171,7 +171,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					if((!result||!result.bool||!result.result||result.result!='shaned')&&!event.unhurt){
-						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
+						target.damage(get.nature(event.card));
 						event.result={bool:true}
 						event.trigger('shaDamage');
 					}
@@ -193,7 +193,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 					"step 5"
 					if((!result||!result.bool)&&!event.unhurt){
-						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
+						target.damage(get.nature(event.card));
 						event.result={bool:true}
 						event.trigger('shaDamage');
 						event.finish();
@@ -203,7 +203,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 6"
 					if((!result||!result.bool)&&!event.unhurt){
-						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
+						target.damage(get.nature(event.card));
 						event.result={bool:true}
 						event.trigger('shaDamage');
 						event.finish();
@@ -388,7 +388,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target.hp<target.maxHp;
 				},
 				content:function(){
-					target.recover(event.baseDamage||1);
+					target.recover();
 				},
 				ai:{
 					basic:{
@@ -846,7 +846,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target.isHealthy();
 				},
 				content:function(){
-					target.recover(event.baseDamage||1);
+					target.recover();
 				},
 				ai:{
 					basic:{
@@ -895,7 +895,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool==false){
-						target.damage(event.baseDamage);
+						target.damage();
 					}
 				},
 				ai:{
@@ -970,7 +970,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool==false){
-						target.damage(event.baseDamage);
+						target.damage();
 					}
 				},
 				ai:{
@@ -1147,10 +1147,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							if(event.turn==target){
-								target.damage(event.baseDamage+event.extraDamage);
+								target.damage();
 							}
 							else{
-								player.damage(target,event.baseDamage+event.extraDamage);
+								player.damage(target);
 							}
 						}
 					}

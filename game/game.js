@@ -23783,7 +23783,7 @@
 					if(next.source==undefined&&!nosource) next.source=event.customSource||event.player;
 					if(next.source&&next.source.isDead()) delete next.source;
 					if(next.unreal==undefined) next.unreal=false;
-					if(next.num==undefined) next.num=1;
+					if(next.num==undefined) next.num=(event.baseDamage||1)+(event.extraDamage||0);
 					next.original_num=next.num;
 					next.change_history=[];
 					if(next.nature=='poison') delete next._triggered;
@@ -23833,8 +23833,8 @@
 					}
 					if(next.card==undefined&&!nocard) next.card=event.card;
 					if(next.cards==undefined&&!nocard) next.cards=event.cards;
-					if(next.source==undefined&&!nosource) next.source=event.player;
-					if(next.num==undefined) next.num=1;
+					if(next.source==undefined&&!nosource) next.source=event.customSource||event.player;
+					if(next.num==undefined) next.num=(event.baseDamage||1)+(event.extraDamage||0);
 					if(next.num<=0) _status.event.next.remove(next);
 					next.setContent('recover');
 					return next;
