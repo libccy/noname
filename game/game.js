@@ -20113,6 +20113,11 @@
 							player.update();
 						}
 					},this,this.name,this.sex,num,this.group);
+					skills=skills.filter(skill=>{
+						var info=get.info(skill);
+						if(info&&info.zhuSkill&&!this.isZhu2()) return false;
+						return true;
+					});
 					for(var i=0;i<skills.length;i++){
 						if(this.hiddenSkills.contains(skills[i])){
 							this.hiddenSkills.remove(skills[i]);
@@ -55037,11 +55042,7 @@
 					}
 				}
 			}
-			if(name.indexOf('gz_')==0){
-				name=name.slice(3);
-				if(lib.characterIntro[name]) return lib.characterIntro[name];
-			}
-			if(name.indexOf('_')!=-1){
+			while(name.indexOf('_')!=-1&&!lib.characterIntro[name]){
 				name=name.slice(name.indexOf('_')+1);
 			}
 			if(lib.characterIntro[name]) return lib.characterIntro[name];

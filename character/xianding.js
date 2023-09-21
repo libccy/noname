@@ -4665,6 +4665,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(current.countCards('hs',card=>current.canUse(card,player)&&get.effect(player,card,current,player)<0)>=2) return false;
 					return true;
 				},
+				frequent:'check',
 				content:function(){
 					player.draw().gaintag=['dcjiexing'];
 					player.addTempSkill('dcjiexing_add');
