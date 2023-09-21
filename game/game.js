@@ -55040,11 +55040,7 @@
 					}
 				}
 			}
-			if(name.indexOf('gz_')==0){
-				name=name.slice(3);
-				if(lib.characterIntro[name]) return lib.characterIntro[name];
-			}
-			if(name.indexOf('_')!=-1){
+			while(name.indexOf('_')!=-1&&!lib.characterIntro[name]){
 				name=name.slice(name.indexOf('_')+1);
 			}
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
