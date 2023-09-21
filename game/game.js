@@ -22346,14 +22346,14 @@
 							else next.ai = arguments[i];
 						}
 						else if (typeof arguments[i] == 'string') {
-							let str = `<span style="color: #07f1ec;font-weight: bold">${arguments[i]}</span>`
+							let str = `<span style="font-weight: bold">${arguments[i]}</span>`
 							next.createDialog.unshift(str)
 						}
 						else if (Array.isArray(arguments[i])) {
 							let arr = arguments[i]
 							let list = arr.map(name => {
 								if (lib.skill[name]) {
-									return [name, `<span style="color: #f2f82c;font-weight: bold">【${get.skillTranslation(name)}】:</span>${get.skillInfoTranslation(name)}`]
+									return [name, `<span class="greentext" style="font-weight: bold">【${get.skillTranslation(name)}】</span>${get.skillInfoTranslation(name)}`]
 								} else {
 									throw new Error('不存在技能:' + name)
 								}
