@@ -1341,6 +1341,27 @@
 							}
 						}
 					},
+					splash_style:{
+						name:'启动页',
+						item:{
+							style1:'样式一',
+							style2:'样式二',
+							style3:'样式三',
+						},
+						visualMenu:function(node,link){
+							node.className='button character';
+							node.style.width='200px';
+							node.style.height=node.offsetWidth*1080/2400+'px';
+							node.style.display='flex';
+							node.style['flex-direction']='column';
+							node.style['align-items']='center';
+							node.style.backgroundSize='100% 100%';
+							node.setBackgroundImage('image/splash/'+link+'.jpg');
+						},
+						onclick:function(item){
+							game.saveConfig('splash_style',item);
+						}
+					},
 					// fewplayer:{
 					//     name:'启用人数',
 					// 	intro:'设置启用新版布局的最小人数（不足时切换至默认布局）',
@@ -9863,7 +9884,23 @@
 						node.link=lib.config.all.mode[i];
 						ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
 						if(lib.config.all.stockmode.indexOf(lib.config.all.mode[i])!=-1){
-							ui.create.div(node,'.avatar').setBackgroundImage('image/splash/'+lib.config.all.mode[i]+'.jpg');
+							// 初始启动页设置
+							if(lib.config.splash_style==undefined){
+								if(lib.device){
+									var item='style2';
+								}else{
+									var item='style1';
+								}
+								lib.configMenu.appearence.config.splash_style.onclick(item);
+							}
+							splash.dataset.splash_style=lib.config.splash_style;
+							// 扩展可通过window.splashurl设置素材读取路径
+							if(window.splashurl==undefined)window.splashurl='image/splash/';
+							if(lib.config.splash_style=='style1'||lib.config.splash_style=='style2'||lib.config.splash_style=='style3'){
+								ui.create.div(node,'.avatar').setBackgroundImage('image/splash/'+lib.config.splash_style+'/'+lib.config.all.mode[i]+'.jpg');
+							}else{
+								ui.create.div(node,'.avatar').setBackgroundImage(splashurl+lib.config.splash_style+'/'+lib.config.all.mode[i]+'.jpg');
+							}
 						}
 						else{
 							var avatarnode=ui.create.div(node,'.avatar');
