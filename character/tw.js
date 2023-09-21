@@ -10366,7 +10366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				content:function(){
 					'step 0'
-					player.draw(player.hp);
+					player.draw(2);
 					'step 1'
 					if(player.getHistory('sourceDamage').length||player.getHistory('gain',function(evt){
 						return evt.getParent('phaseUse')==trigger.getParent('phaseUse')&&evt.getParent().name=='draw';
@@ -10385,11 +10385,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var choiceList=['令'+get.translation(trigger.source)+'本回合不能再使用或打出牌'];
-					if (trigger.source.countCards('h')) choiceList.push('令'+get.translation(trigger.source)+'弃置'+get.cnNumber(trigger.source.hp)+'张牌');
+					if (trigger.source.countCards('h')) choiceList.push('令'+get.translation(trigger.source)+'弃置两张牌');
 					player.chooseControl('cancel2').set('prompt2',get.prompt2('yuzhang')).set('choiceList',choiceList).set('ai',function(){
 						var player=_status.event.player,source=_status.event.source;
 						if(get.attitude(player,event.source)>0) return 'cancel2';
-						if(source.hasSkillTag('noh')||source.hasSkillTag('noe')||source.countCards('h')>=2*source.hp) return 0;
+						if(source.hasSkillTag('noh')||source.hasSkillTag('noe')||source.countCards('h')>=4) return 0;
 						if(source.hp>1&&source.countCards('h')>1) return 1;
 						return 'cancel2';
 					}).set('source',trigger.source);
@@ -10398,12 +10398,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('yuzhang',trigger.source);
 						player.removeMark('twjingce',1);
 						if(result.index==0) trigger.source.addTempSkill('yuzhang_dontuse');
-						else trigger.source.chooseToDiscard('he',trigger.source.hp,true);
+						else trigger.source.chooseToDiscard('he',2,true);
 					}
 				},
 				group:"yuzhang_skip",
 				subSkill:{
 					skip:{
+						audio:'yuzhang',
 						trigger:{
 							player:["phaseJudgeBefore","phaseDrawBefore","phaseUseBefore","phaseDiscardBefore"],
 						},
@@ -14152,9 +14153,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twchunlao_info:'①准备阶段，若场上没有“醇”，则你可将一名角色区域内的一张牌置于其武将牌上，称为“醇”。②一名角色使用【杀】时，若其有“醇”，则其可以交给你一张牌，令此【杀】的伤害值基数+1。③一名角色进入濒死状态时，若其有“醇”，则你可以移去“醇”并摸一张牌，然后令其回复1点体力。',
 			tw_guohuai:'TW郭淮',
 			twjingce:"精策",
-			twjingce_info:"当你于出牌阶段使用第X张牌时，你可以摸X张牌（X为你的体力值）。若此阶段你此前摸过牌或本回合造成过伤害，你获得一枚“策”标记。",
+			twjingce_info:"当你于出牌阶段使用第X张牌时，你可以摸两张牌（X为你的体力值）。若此阶段你此前摸过牌或本回合造成过伤害，你获得一枚“策”标记。",
 			yuzhang:"御嶂",
-			yuzhang_info:"你可以弃置一枚“策”标记，然后跳过一个阶段。当你受到伤害后，你可弃置一枚“策”标记，然后选择一项：⒈令伤害来源弃置X张牌（X为其体力值）；⒉令伤害来源本回合不能再使用或打出牌。",
+			yuzhang_info:"你可以弃置一枚“策”标记，然后跳过一个阶段。当你受到伤害后，你可弃置一枚“策”标记，然后选择一项：⒈令伤害来源弃置两张牌；⒉令伤害来源本回合不能再使用或打出牌。",
 			tw_caozhao:'曹肇',
 			twfuzuan:'复纂',
 			twfuzuan_info:'出牌阶段限一次/当你受到伤害后/当你对其他角色造成伤害后，你可选择一名拥有转换技的角色，变更其的一个转换技的的状态。',
