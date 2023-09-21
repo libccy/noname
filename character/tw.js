@@ -9715,7 +9715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:['chooseToUse','chooseToRespond'],
 				filter:function(event,player){
-					if(event.type=='wuxie') return false;
+					if(event.type=='wuxie'||player.hasSkill('zhenshan_used')) return false;
 					var nh=player.countCards('h');
 					if(!game.hasPlayer(function(current){
 						return current!=player&&current.countCards('h')<nh;
@@ -9787,6 +9787,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								'step 1'
 								if(result.bool){
 									player.logSkill('zhenshan',result.targets);
+									player.addTempSkill('zhenshan_used');
 									player.swapHandcards(result.targets[0]);
 									delete event.result.skill;
 								}
@@ -9797,8 +9798,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						return '选择【'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'】的目标';
+						return '请选择【'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'】的目标';
 					}
+				},
+				subSkill:{
+					used:{charlotte:true},
 				},
 				ai:{
 					order:function(){
@@ -9828,6 +9832,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					respondSha:true,
 					respondShan:true,
 					skillTagFilter:function(player,tag,arg){
+						if(player.hasSkill('zhenshan_used')) return false;
 						var nh=player.countCards('h');
 						return game.hasPlayer(function(current){
 							return current!=player&&current.countCards('h')<nh;
@@ -13966,6 +13971,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mateng:['tw_mateng','mateng'],
 		},
 		dynamicTranslate:{
+			twfeifu:function(player){
+				var str='转换技。';
+				if(!player.storage.twfeifu) str+='<span class="bluetext">';
+				str+='阴：当你成为【杀】的唯一目标后；';
+				if(!player.storage.twfeifu) str+='</span>';
+				if(player.storage.twfeifu) str+='<span class="bluetext">';
+				str+='阳：当你使用【杀】指定唯一目标后；';
+				if(player.storage.twfeifu) str+='</span>';
+				str+='目标角色须交给使用者一张牌。若此牌为装备牌，则使用者可使用此牌。';
+				return str;
+			},
 			twfengpo:function(player){
 				if(player.storage.twfengpo) return '当你使用【杀】或【决斗】指定唯一目标后，你可观看目标角色的手牌并选择一项：⒈摸X张牌。⒉令此牌的伤害值基数+X（X为其手牌中的红色牌数）。';
 				return '①当你使用【杀】或【决斗】指定唯一目标后，你可观看目标角色的手牌并选择一项：⒈摸X张牌。⒉令此牌的伤害值基数+X（X为其手牌中的♦数）。②当你杀死一名角色后，你将〖凤魄①〗中的“♦数”改为“红色牌数”。';
@@ -14166,7 +14182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twcongji_info:'当你的红色牌于回合外因弃置而进入弃牌堆后，你可令一名其他角色获得这些牌。',
 			old_quancong:'TW全琮',
 			zhenshan:'振赡',
-			zhenshan_info:'当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌，视为使用或打出此牌。',
+			zhenshan_info:'每回合限一次，当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌，视为使用或打出此牌。',
 			tw_tianyu:'TW田豫',
 			twzhenxi:'震袭',
 			twzhenxi_info:'每回合限一次。当你使用【杀】指定目标后，你可选择一项：⒈弃置其X张手牌（X为你至其的距离）；⒉将其装备区或判定区内的一张牌移动到另一名角色的装备区或判定区内。若其体力值大于你或其体力值为全场最高，则你可以改为依次执行以上两项。',
