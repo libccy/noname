@@ -423,6 +423,35 @@ table {
 	border-radius: 12px;
 }
 
+/* 启动页style2和style3 */
+#splash[data-splash_style='style2']>div,
+#splash[data-splash_style='style3']>div {
+	width: 250px;
+	height: 350px;
+	top: calc(50% - 175px);
+}
+#splash[data-splash_style='style2']>div:first-child,
+#splash[data-splash_style='style3']>div:first-child {
+	margin-left: 15px;
+}
+#splash[data-splash_style='style2']>div:last-child,
+#splash[data-splash_style='style3']>div:last-child {
+	margin-right: 15px;
+}
+#splash[data-splash_style='style2']>div>.splashtext,
+#splash[data-splash_style='style3']>div>.splashtext {
+	font-family: 'shousha';
+	font-size: 65px;
+}
+#splash[data-splash_style='style2'].slim>div>.splashtext,
+#splash[data-splash_style='style3'].slim>div>.splashtext {
+	right: 10px;
+	bottom: 5px;
+}
+#splash[data-splash_style='style2'].slim>div>.avatar,
+#splash[data-splash_style='style3'].slim>div>.avatar {
+	width: 240px;
+}
 
 #arena.playerhidden>.player,
 #arena.playerhidden>#mebg,
