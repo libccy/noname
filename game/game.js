@@ -24816,8 +24816,12 @@
 				getStorage:function(name){
 					return this.storage[name]||[];
 				},
-				hasStorage:function(name){
-					return name in this.storage;
+				hasStorage:function(name,value){
+					if(!(name in this.storage)) return false;
+					if(typeof value=="undefined") return true;
+					const storage=this.storage[name];
+					if(storage===value) return true;
+					return !Array.isArray(storage) || storage.contains(value);
 				},
 				initStorage:function(name,value){
 					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value);
@@ -24829,6 +24833,9 @@
 					return Promise.resolve(this.getStorage(name))
 					.then(value=>operation(value))
 					.then(value=>this.setStorage(name,value))
+				},
+				removeStorage:function(name){
+					return player.hasStorage(name)&&delete player.storage[name];
 				},
 				markSkill:function(name,info,card){
 					if(info===true){
