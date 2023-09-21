@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sb',
 		connect:true,
 		character:{
-			sb_zhanghe:['male','wei',4,['sbqiaobian'],['unseen']],
+			sb_zhanghe:['male','wei',4,['sbqiaobian']],
 			sb_yujin:['male','wei',4,['sbxiayuan','sbjieyue']],
 			sb_huaxiong:['male','qun','3/4/1',['new_reyaowu','sbyangwei']],
 			liucheng:['female','qun',3,['splveying','spyingwu']],
@@ -359,7 +359,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!_status.sbjuxiang_nanman){
 						_status.sbjuxiang_nanman=[
 							{name:'nanman',number:7,suit:'spade'},
-							{name:'nanman',number:13,suit:'spade'},
 							{name:'nanman',number:7,suit:'club'},
 						];
 						game.broadcastAll(function(){
@@ -1166,7 +1165,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							event.targets=trigger.targets.filter(i=>!i.isLinked());
-							player.logSkill('sblianhuan_discard2',event.targets);
+							if(!event.targets.length) event.finish();
+							else player.logSkill('sblianhuan_discard2',event.targets);
 							'step 1'
 							var target=targets.shift();
 							var cards=target.getCards('h',card=>{
@@ -1294,9 +1294,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:'惑',
 				intro:{
 					content:function(storage,player){
-						if(!storage||get.is.empty(storage)) return '未获得过牌';
+						if(!storage||get.is.empty(storage)) return '未得到过牌';
 						var map=(_status.connectMode?lib.playerOL:game.playerMap);
-						var str='已获得过';
+						var str='已得到';
 						for(var i in storage){
 							str+=get.translation(map[i])+'的'+get.cnNumber(storage[i])+'张牌、';
 						}
@@ -2385,7 +2385,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						filterTarget:lib.filter.notMe,
 						selectCard:[1,event.cards.length],
-						prompt:'是否将任意张获得的牌交给一名其他角色？',
+						prompt:'是否将任意张得到的牌交给一名其他角色？',
 						ai1:function(card){
 							var player=_status.event.player;
 							var val=player.getUseValue(card);
@@ -4668,7 +4668,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbduanliang:'断粮',
 			sbduanliang_info:'出牌阶段限一次。你可以与一名其他角色进行谋弈。若你赢，且你选择的选项为：“围城断粮”，若其判定区没有【兵粮寸断】，你将牌堆顶牌当【兵粮寸断】对其使用，否则你获得其一张牌；“擂鼓进军”，你视为对其使用一张【决斗】。',
 			sbshipo:'势迫',
-			sbshipo_info:'结束阶段，你可以令一名体力少于你的角色或所有判定区有【兵粮寸断】的其他角色选择一项：1.交给你一张手牌；2.受到1点伤害。所有目标角色选择完成后，你可以将任意张你以此法获得的牌交给一名其他角色。',
+			sbshipo_info:'结束阶段，你可以令一名体力少于你的角色或所有判定区有【兵粮寸断】的其他角色选择一项：1.交给你一张手牌；2.受到1点伤害。所有目标角色选择完成后，你可以将任意张你以此法得到的牌交给一名其他角色。',
 			sb_zhangfei:'谋张飞',
 			sbpaoxiao:'咆哮',
 			sbpaoxiao_info:'锁定技。①你使用【杀】无次数限制。②若你的装备区内有武器牌，则你使用【杀】无距离限制。③当你于出牌阶段内使用第二张及以后【杀】时，你获得如下效果：{此【杀】不可被响应且伤害值基数+1；此【杀】指定目标后，目标角色的非锁定技于本回合内失效；此【杀】造成伤害后，若目标角色存活，则你失去1点体力并随机弃置一张手牌。}',
@@ -4695,9 +4695,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbzhiji_info:'觉醒技。准备阶段，若你因〖挑衅①〗消耗过至少4点蓄力值，你减1点体力上限，令至少一名角色获得“北伐”标记并获得如下效果直到你的下回合开始：其使用牌只能指定你或其为目标。',
 			sb_fazheng:'谋法正',
 			sbxuanhuo:'眩惑',
-			sbxuanhuo_info:'①出牌阶段限一次。你可以将一张牌交给一名没有“眩”标记的其他角色，然后令其获得“眩”标记。②当有“眩”的其他角色于摸牌阶段外获得牌后，若你以此法于其本次获得“眩”的期间内获得其的牌数小于5，你随机获得其一张手牌。',
+			sbxuanhuo_info:'①出牌阶段限一次。你可以将一张牌交给一名没有“眩”标记的其他角色，然后令其获得“眩”标记。②当有“眩”的其他角色于摸牌阶段外得到牌后，若你以此法于其本次获得“眩”的期间内得到其的牌数小于5，你随机获得其一张手牌。',
 			sbenyuan:'恩怨',
-			sbenyuan_info:'锁定技。准备阶段，若场上存在有“眩”的角色，你移去该角色的“眩”，且你于其本次获得“眩”的期间内获得其的牌数：不小于3，你交给其三张牌；小于3，其失去1点体力，你回复1点体力。',
+			sbenyuan_info:'锁定技。准备阶段，若场上存在有“眩”的角色，你移去该角色的“眩”，且你于其本次获得“眩”的期间内得到其的牌数：不小于3，你交给其三张牌；小于3，其失去1点体力，你回复1点体力。',
 			sb_chengong:'谋陈宫',
 			sbmingce:'明策',
 			sbmingce_info:'①出牌阶段限一次。你可以将一张牌交给一名其他角色，其选择一项：1.失去1点体力，令你摸两张牌并获得1枚“策”；2.摸一张牌。②出牌阶段开始时，你可以移去所有“策”并对一名其他角色造成等量伤害。',
@@ -4741,7 +4741,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sblieren:'烈刃',
 			sblieren_info:'当你使用【杀】指定唯一目标后，你可以与其拼点。若你赢，此【杀】结算结束后，你可以对另一名其他角色造成1点伤害。',
 			sbjuxiang:'巨象',
-			sbjuxiang_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】结算结束后，你获得此牌对应的所有实体牌。③结束阶段，若你未于本回合使用过【南蛮入侵】，你可以将一张游戏外的随机【南蛮入侵】（共三张）交给一名角色。',
+			sbjuxiang_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】结算结束后，你获得此牌对应的所有实体牌。③结束阶段，若你未于本回合使用过【南蛮入侵】，你可以将一张游戏外的随机【南蛮入侵】（共2张）交给一名角色。',
 			sb_menghuo:'谋孟获',
 			sbhuoshou:'祸首',
 			sbhuoshou_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】指定第一个目标后，你代替其成为此牌的伤害来源。③出牌阶段开始时，你随机获得弃牌堆中的一张【南蛮入侵】。④出牌阶段，若你于此阶段使用过【南蛮入侵】，你不能使用【南蛮入侵】。',

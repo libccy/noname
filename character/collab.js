@@ -1025,7 +1025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							content:function(){
 								var num=lib.skill.ruyijingubang_skill_backup.num;
 								player.storage.ruyijingubang_skill=num;
-								var card=player.getEquips(1);
+								var cards=player.getEquips(1);
 								for(var card of cards){
 									if(card&&card.name=='ruyijingubang'){
 										card.storage.ruyijingubang_skill=num;
@@ -1038,9 +1038,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				mod:{
-					attackRange:function(player,range){
-						if(player.storage.ruyijingubang_skill) return range-3+player.storage.ruyijingubang_skill;
-					},
 					cardUsable:function(card,player,num){
 						if(player.storage.ruyijingubang_skill==1&&card.name=='sha') return Infinity;
 					},
@@ -1516,7 +1513,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				skills:['ruyijingubang_skill','ruyijingubang_effect'],
 				equipDelay:false,
-				distance:{attackFrom:-2},
+				distance:{
+					attackFrom:-2,
+					attackRange:(card,player)=>{
+						return (player.storage.ruyijingubang_skill||3);
+					}
+				},
 				onEquip:function(){
 					if(!card.storage.ruyijingubang_skill) card.storage.ruyijingubang_skill=3;
 					player.storage.ruyijingubang_skill=card.storage.ruyijingubang_skill;

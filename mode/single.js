@@ -809,7 +809,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		},
 		element:{
 			player:{
-				hasZhuSkill:function(){return false;},
 				dieAfter:function(){
 					if(_status.mode!='normal'||_status.characterChoice[this.identity].length<=3) game.checkResult();
 				},
