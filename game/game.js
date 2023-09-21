@@ -22319,6 +22319,60 @@
 						}
 					}
 				},
+				/**
+				 * by Curpond
+				 * example：player.chooseSkillButton([1,2],['yiji','paoxiao','guanxing'])
+				 * result of event：result.links:['yiji','guanxing']
+				 */
+				chooseSkillButton:function () {
+					var next = game.createEvent('chooseButton');
+					next.createDialog = []
+					for (var i = 0; i < arguments.length; i++) {
+						if (typeof arguments[i] == 'boolean') {
+							next.forced = arguments[i];
+						}
+						else if (get.itemtype(arguments[i]) == 'dialog') {
+							next.dialog = arguments[i];
+							next.closeDialog = true;
+						}
+						else if (get.itemtype(arguments[i]) == 'select') {
+							next.selectButton = arguments[i];
+						}
+						else if (typeof arguments[i] == 'number') {
+							next.selectButton = [arguments[i], arguments[i]];
+						}
+						else if (typeof arguments[i] == 'function') {
+							if (next.ai) next.filterButton = arguments[i];
+							else next.ai = arguments[i];
+						}
+						else if (typeof arguments[i] == 'string') {
+							let str = `<span style="color: #07f1ec;font-weight: bold">${arguments[i]}</span>`
+							next.createDialog.unshift(str)
+						}
+						else if (Array.isArray(arguments[i])) {
+							let arr = arguments[i]
+							let list = arr.map(name => {
+								if (lib.skill[name]) {
+									return [name, `<span style="color: #f2f82c;font-weight: bold">【${get.skillTranslation(name)}】:</span>${get.skillInfoTranslation(name)}`]
+								} else {
+									throw new Error('不存在技能:' + name)
+								}
+							})
+							next.createDialog.add([list, 'textbutton'])
+						}
+					}
+					next.player = this;
+					if (typeof next.forced != 'boolean') next.forced = false;
+					if (next.isMine() == false && next.dialog) next.dialog.style.display = 'none';
+					if (next.filterButton == undefined) next.filterButton = lib.filter.filterButton;
+					if (next.selectButton == undefined) next.selectButton = [1, 1];
+					if (next.ai == undefined) next.ai = function () { return 1 };
+					next.setContent('chooseButton');
+					next._args = Array.from(arguments);
+					next.forceDie = true;
+					return next;
+
+				},
 				discoverCard:function(list){
 					var next=game.createEvent('discoverCard');
 					next.player=this;
