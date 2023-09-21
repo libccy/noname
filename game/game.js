@@ -24825,12 +24825,14 @@
 				},
 				hasStorageAny:function(name,values){
 					const storage=this.storage[name];
+					if(!Array.isArray(values)) values=Array.from(arguments).slice(1);
 					if(!storage) return false;
 					if (!Array.isArray(storage)) return values.contains(storage);
 					return values.some(item => storage.contains(item));
 				},
 				hasStorageAll:function(name,values){
 					const storage=this.storage[name];
+					if(!Array.isArray(values)) values=Array.from(arguments).slice(1);
 					if(!storage) return false;
 					if (!Array.isArray(storage)) return false;
 					return values.every(item => storage.contains(item));
