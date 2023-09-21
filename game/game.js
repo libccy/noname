@@ -1337,7 +1337,6 @@
 						item:{
 							style1:'样式一',
 							style2:'样式二',
-							style3:'样式三',
 						},
 						visualMenu:function(node,link){
 							node.className='button character';
@@ -9887,7 +9886,7 @@
 							splash.dataset.splash_style=lib.config.splash_style;
 							// 扩展可通过window.splashurl设置素材读取路径
 							if(window.splashurl==undefined)window.splashurl='image/splash/';
-							if(lib.config.splash_style=='style1'||lib.config.splash_style=='style2'||lib.config.splash_style=='style3'){
+							if(lib.config.splash_style=='style1'||lib.config.splash_style=='style2'){
 								ui.create.div(node,'.avatar').setBackgroundImage('image/splash/'+lib.config.splash_style+'/'+lib.config.all.mode[i]+'.jpg');
 							}else{
 								ui.create.div(node,'.avatar').setBackgroundImage(splashurl+lib.config.splash_style+'/'+lib.config.all.mode[i]+'.jpg');
