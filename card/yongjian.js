@@ -30,7 +30,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					target.recover(event.baseDamage||1);
+					target.recover();
 					'step 1'
 					if(target.hasCard(function(card){
 						return _status.connectMode||get.name(card,target)=='du';
@@ -56,6 +56,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(typeof event.baseDamage!='number') event.baseDamage=1;
+					if(typeof event.extraDamage!='number') event.extraDamage=0;
 					if(!target.countCards('h')||!player.isIn()) event.finish();
 					else player.choosePlayerCard(target,'h',true);
 					'step 1'
@@ -64,8 +65,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var str=get.translation(player);
 						player.showCards(event.show_card);
 						target.chooseControl().set('choiceList',[
-							'令'+str+'获得'+get.translation(event.show_card),
-							'受到'+str+'造成的'+event.baseDamage+'点伤害',
+							`令${str}获得${get.translation(event.show_card)}`,
+							`受到${str}造成的${event.baseDamage+event.extraDamage}点伤害`,
 						]).set('ai',function(){
 							var evt=_status.event.getParent(),player=evt.target,source=evt.player,card=evt.show_card;
 							if(get.damageEffect(player,source,player)>0) return 1;

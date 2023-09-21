@@ -13962,6 +13962,47 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
+			//英文版特典武将凯撒
+			zhengfu:{
+				trigger:{
+					player:"useCardToPlayered",
+				},
+				check:function (event,player){
+					return get.attitude(player,event.target)<0;
+				},
+				filter:function(event,player){
+					return event.card.name=='sha';
+				},
+				logTarget:"target",
+				line:false,
+				content:function(){
+					'step 0'
+					player.line(trigger.target,{color:[220, 90, 139]});
+					player.chooseControl(['basic','trick','equip']).set('ai',function(){
+						var player=_status.event.target;
+						if(!player.countCards('h','sha')&&player.countCards('h','shan')) return 'trick';
+						return 'basic';
+					}).set('prompt','请选择一种牌的类别').set('target',trigger.target);
+					'step 1'
+					trigger.target.chooseCard('he','交给'+get.translation(player)+'一张'+get.translation(result.control)+'牌，否则此【杀】不可被闪避。',function(card){
+						return get.type(card,'trick')==_status.event.getParent().result.control;
+					}).set('ai',function(card){
+						var num=_status.event.num;
+						if(num==0) return 0;
+						if(card.name=='shan') return num>1?2:0;
+						return 8-get.value(card);
+					}).set('num',trigger.target.countCards('h','shan'))
+					'step 2'
+					if(result.bool){
+						var cards=result.cards;
+						trigger.target.give(cards,player);
+					}
+					else{
+						trigger.getParent().directHit.add(trigger.target);
+						game.delay();
+					}
+				}
+			}
 		},
 		perfectPair:{
 			tw_liufuren:['yuanshao'],
@@ -14533,6 +14574,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twquanqian_info:'昂扬技。出牌阶段限一次，你可以将至多四张花色各不相同的手牌交给一名其他角色，然后若你交出的牌数大于1，则你从牌堆中获得一张装备牌，然后选择一项：①将手牌数摸至与其相同；②观看其手牌并获得其一种花色的所有牌。<br>激昂：你弃置六张手牌。',
 			twrouke:'柔克',
 			twrouke_info:'锁定技。当你于摸牌阶段外得到超过一张牌时，你摸一张牌。',
+			kaisa:"凯撒",
+			zhengfu:"征服",
+			zhengfu_info:"当你使用【杀】指定目标时，你可以选择一种牌的类别，然后除非目标角色交给你一种该类别的牌，否则其不能闪避此【杀】。",
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',
@@ -14546,6 +14590,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_mobile2:'海外服·异构',
 			tw_yijiang:'一将成名TW',
 			tw_english:'英文版',
+		},
+		pinyins:{
+			凯撒:['Caesar'],
+			难升米:['Nashime']
 		}
 	};
 });
