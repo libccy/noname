@@ -1091,60 +1091,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olcangxin:{
 				audio:2,
 				trigger:{player:'damageBegin4'},
-				filter:function(event,player){
-					return ui.cardPile.childNodes.length>0;
-				},
-				check:function(event,player){
+				checkx:function(event,player){
 					var target=event.source;
-					return get.damageEffect(player,target,target);
+					return get.damageEffect(player,target,target)<=0;
 				},
+				forced:true,
 				content:function(){
 					'step 0'
-					var cards=[],cardx=Array.from(ui.cardPile.childNodes);
-					for(var i=cardx.length-1;i>=0;i--){
-						cards.push(cardx[i]);
-						if(cards.length>=3) break;
-					}
-					if(!cards.length){
-						event.finish();
-						return;
-					}
+					var cards=get.bottomCards(3,true);
 					player.chooseButton(['###藏心：请选择要弃置的牌###若以此法弃置了红桃牌，则防止此伤害',cards],[1,cards.length],true).set('ai',function(button){
+						if(!_status.event.bool&&get.suit(button.link,false)=='heart') return 0;
 						if(get.suit(button.link,false)!='heart') return 1;
 						if(!ui.selected.buttons.some(but=>get.suit(but.link,false)=='heart')) return 1;
 						return 0;
-					});
+					}).set('bool',lib.skill.olcangxin.checkx(trigger,player));
 					'step 1'
 					if(result.bool){
 						player.$throw(result.links,1000);
 						game.cardsDiscard(result.links);
 						if(result.links.some(card=>get.suit(card,false)=='heart')) trigger.cancel();
 					}
+					else event.finish();
+					'step 2'
+					game.delayx();
 				},
 				group:'olcangxin_yingzi',
 				subSkill:{
 					yingzi:{
 						audio:'olcangxin',
-						trigger:{player:'phaseDrawBegin2'},
-						filter:function(event,player){
-							if(event.numFixed) return false;
-							var cards=[],cardx=Array.from(ui.cardPile.childNodes);
-							for(var i=cardx.length-1;i>=0;i--){
-								cards.push(cardx[i]);
-								if(cards.length>=3) break;
-							}
-							return cards.some(card=>get.suit(card,false)=='heart');
-						},
+						trigger:{player:'phaseDrawBegin'},
 						forced:true,
-						locked:false,
 						content:function(){
-							var cards=[],cardx=Array.from(ui.cardPile.childNodes);
-							for(var i=cardx.length-1;i>=0;i--){
-								cards.push(cardx[i]);
-								if(cards.length>=3) break;
-							}
-							cards=cards.filter(card=>get.suit(card,false)=='heart');
-							trigger.num+=cards.length;
+							var cards=get.bottomCards(3,true);
+							player.showCards(cards,get.translation(player)+'发动了【藏心】');
+							trigger.num+=cards.filter(card=>get.suit(card,false)=='heart').length;
 						},
 					},
 				},
@@ -25481,7 +25461,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olkuansai_info:'当一张牌指定第一个目标后，若目标数大于你的体力值，你可以令其中一个目标选择一项：1.交给你一张牌；2.令你回复1点体力。',
 			ol_luyusheng:'OL陆郁生',
 			olcangxin:'藏心',
-			olcangxin_info:'①当你受到伤害时，你可以观看牌堆底的三张牌并弃置其中任意张牌，若你以此法弃置了红桃牌，则防止此伤害。②摸牌阶段，你多摸X张牌（X为牌堆底前三张牌中红桃牌的数量）。',
+			olcangxin_info:'锁定技。①当你受到伤害时，你观看牌堆底的三张牌并弃置其中任意张牌，若你以此法弃置了红桃牌，则防止此伤害。②摸牌阶段开始时，你展示牌堆底的三张牌，然后摸X张牌（X为其中红桃牌的数量）。',
 			olrunwei:'润微',
 			olrunwei_info:'其他角色的弃牌阶段开始时，若其已受伤，则你可以选择一项：①令其弃置一张牌，其本回合手牌上限+1；②令其摸一张牌，其本回合手牌上限-1。',
 			caoxi:'曹羲',
