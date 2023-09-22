@@ -24815,8 +24815,26 @@
 				getStorage:function(name){
 					return this.storage[name]||[];
 				},
-				hasStorage:function(name){
-					return name in this.storage;
+				hasStorage:function(name,value){
+					if(!(name in this.storage)) return false;
+					if(typeof value=="undefined") return true;
+					const storage=this.storage[name];
+					if(storage===value) return true;
+					return !Array.isArray(storage) || storage.contains(value);
+				},
+				hasStorageAny:function(name,values){
+					const storage=this.storage[name];
+					if(!Array.isArray(values)) values=Array.from(arguments).slice(1);
+					if(!storage) return false;
+					if (!Array.isArray(storage)) return values.contains(storage);
+					return values.some(item => storage.contains(item));
+				},
+				hasStorageAll:function(name,values){
+					const storage=this.storage[name];
+					if(!Array.isArray(values)) values=Array.from(arguments).slice(1);
+					if(!storage) return false;
+					if (!Array.isArray(storage)) return false;
+					return values.every(item => storage.contains(item));
 				},
 				initStorage:function(name,value){
 					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value);
@@ -24828,6 +24846,9 @@
 					return Promise.resolve(this.getStorage(name))
 					.then(value=>operation(value))
 					.then(value=>this.setStorage(name,value))
+				},
+				removeStorage:function(name){
+					return player.hasStorage(name)&&delete player.storage[name];
 				},
 				markSkill:function(name,info,card){
 					if(info===true){
