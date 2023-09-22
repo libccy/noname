@@ -2042,7 +2042,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							trigger._dunxi=true;
 							trigger.player.removeMark('dunxi',1);
-							var target=trigger.target;
+							var target=trigger.targets[0];
 							event.target=target;
 							trigger.targets.remove(target);
 							//trigger.triggeredTargets1.remove(target);
