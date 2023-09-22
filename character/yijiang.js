@@ -1358,15 +1358,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'zhaofu',
 				enable:'phaseUse',
 				usable:1,
-				filter:function(event,player){
-					return player.hasZhuSkill('xinzhaofu');
-				},
 				mark:true,
 				limited:true,
 				skillAnimation:true,
 				animationColor:'wood',
 				selectTarget:[1,2],
 				filterTarget:lib.filter.notMe,
+				zhuSkill:true,
 				contentBefore:function(){
 					player.awakenSkill('xinzhaofu');
 				},

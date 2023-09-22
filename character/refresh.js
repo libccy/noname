@@ -1080,7 +1080,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delay(2);
 					"step 2"
 					if(result.bool){
-						target.damage('fire',event.baseDamage||1);
+						target.damage('fire');
 					}
 					else{
 						target.addTempSkill('huogong2');
