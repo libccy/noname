@@ -8948,10 +8948,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					order:1,
-					result:{
-						target:0,
+					order:function(){
+						var player=_status.event.player,num=0;
+						for(let i=1;i<6;i++){
+							num+=player.countEquipableSlot(i);
+						}
+						if(num<=2) return 6;
+						if(player.hp<=2||!game.hasPlayer((current)=>{
+							if(player==current||get.attitude(player,current)<0||current.hp<=1) return false;
+							return current.hp>2||current.countCards('hs')>2;
+						})) return 1;
+						return 0;
 					},
+					result:{
+						target:function(player,target){
+							var num=0;
+							for(let i=1;i<6;i++){
+								num+=target.countEquipableSlot(i);
+							}
+							return num;
+						}
+					}
 				},
 				mark:true,
 				intro:{
