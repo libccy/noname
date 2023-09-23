@@ -9,8 +9,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_standard:['ol_yuanshu'],
 				old_shenhua:['old_caocao',"yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","old_xiaoqiao","pangde","xuhuang",'junk_sunquan',"huangzhong","new_caoren",'old_chendao'],
 				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong",'old_re_lidian'],
-				old_yijiang1:["masu","xushu","xin_yujin","old_xusheng","old_lingtong","fazheng",'old_gaoshun'],
-				old_yijiang2:["old_zhonghui","madai",'old_handang','old_liubiao','oldre_liubiao','old_guanzhang'],
+				old_yijiang1:["masu","xushu","xin_yujin","old_xusheng","old_lingtong","fazheng",'old_gaoshun','re_yujin'],
+				old_yijiang2:["old_zhonghui","madai",'old_handang','old_liubiao','oldre_liubiao','old_guanzhang','old_wangyi'],
 				old_yijiang3:["liru","old_zhuran","old_fuhuanghou","old_caochong"],
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan",'old_caorui'],
 				old_yijiang5:["old_caoxiu","old_zhuzhi"],
@@ -86,6 +86,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//ol_manchong:['male','wei',3,['yuce','junxing']],
 			old_guanqiujian:["male","wei",4,["drlt_zhenrong","drlt_hongju"],[]],
 			old_wanglang:['male','wei',3,['gushe','jici']],
+			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
+			re_yujin:['male','wei',4,['yizhong']],
 		},
 		skill:{
 			//魏武帝
@@ -1049,6 +1051,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_huaxiong:'旧华雄',
 			old_xiaoqiao:'旧小乔',
 			old_wanglang:'旧王朗',
+			old_wangyi:'旧王异',
+			xin_yujin:'节钺于禁',
+			re_yujin:'毅重于禁',
 
 			old_guhuo:"蛊惑",
 			old_guhuo_info:"你可以扣置一张手牌当做一张基本牌或普通锦囊牌使用或打出，体力值不为0的其他角色依次选择是否质疑。然后，若有质疑的角色，你展示此牌：若为假，此牌作废，这些角色摸一张牌；若为真，这些角色失去1点体力，且若此牌不为♥，此牌作废。",
