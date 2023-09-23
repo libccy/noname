@@ -33815,18 +33815,31 @@
 			game.broadcast(game.trySkillAudio,skill,player,directaudio);
 			var info=get.info(skill);
 			if(!info) return;
-			if(info.direct&&!directaudio) return;
 			if(!lib.config.background_speak) return;
-			if(lib.skill.global.contains(skill)&&!lib.skill[skill].forceaudio) return;
+			if(typeof player=='string') player={name:player};
+			else{
+				if(info.direct&&!directaudio) return;
+				if(lib.skill.global.contains(skill)&&!lib.skill[skill].forceaudio) return;
+			}
 			var audioname=skill;
 			var audioinfo=info.audio;
 			var fixednum;
-			if(info.audioname2&&info.audioname2[player.name]){
-				audioname=info.audioname2[player.name];
-				audioinfo=lib.skill[audioname].audio;
+			if(info.audioname2){
+				if(info.audioname2[player.name]){
+					audioname+='_'+player.name;
+					audioinfo=info.audioname2[player.name];
+				}
+				else if(info.audioname2[player.name1]){
+					audioname+='_'+player.name1;
+					audioinfo=info.audioname2[player.name1];
+				}
+				else if(info.audioname2[player.name2]){
+					audioname+='_'+player.name2;
+					audioinfo=info.audioname2[player.name2];
+				}
 			}
 			var history=[];
-			while(true){//可以嵌套引用了
+			for(;;){//可以嵌套引用了
 				if(history.contains(audioname)) break;
 				history.push(audioname);
 				if(typeof audioinfo=='string'&&lib.skill[audioinfo]){
@@ -33843,9 +33856,9 @@
 				break;
 			}
 			if(Array.isArray(info.audioname)&&player){
-				if(info.audioname.contains(player.name)) audioname+='_'+player.name;
-				else if(info.audioname.contains(player.name1)) audioname+='_'+player.name1;
-				else if(info.audioname.contains(player.name2)) audioname+='_'+player.name2;
+				if(info.audioname.contains(player.name)&&!info.audioname2[player.name]) audioname+='_'+player.name;
+				else if(info.audioname.contains(player.name1)&&!info.audioname2[player.name1]) audioname+='_'+player.name1;
+				else if(info.audioname.contains(player.name2)&&!info.audioname2[player.name2]) audioname+='_'+player.name2;
 			}
 			if(typeof audioinfo=='string'){
 				if(audioinfo.indexOf('ext:')!=0) return;
@@ -53488,64 +53501,7 @@
 							clickSkill.call(skillnode,'init');
 						});
 					}
-					if(lib.config.background_speak&&e!=='init'){
-						var audioname=this.link;
-						if(info.audioname2&&info.audioname2[playername]){
-							audioname=info.audioname2[playername];
-							info=lib.skill[audioname];
-						}
-						var audioinfo=info.audio;
-						var that=this;
-						var getIndex=function(i){
-							if(typeof that.audioindex!='number'){
-								that.audioindex=i;
-							}
-							that.audioindex++;
-							if(that.audioindex>i){
-								that.audioindex=1;
-							}
-							return that.audioindex;
-						};
-						if(typeof audioinfo=='string'){
-							if(audioinfo.indexOf('ext:')==0){
-								audioinfo=audioinfo.split(':');
-								if(audioinfo.length==3){
-									if(audioinfo[2]=='true'){
-										game.playAudio('..','extension',audioinfo[1],audioname);
-									}
-									else{
-										audioinfo[2]=parseInt(audioinfo[2]);
-										if(audioinfo[2]){
-											game.playAudio('..','extension',audioinfo[1],audioname+getIndex(audioinfo[2]));
-										}
-									}
-								}
-								return;
-							}
-							else{
-								audioname=audioinfo;
-								if(lib.skill[audioinfo]){
-									audioinfo=lib.skill[audioinfo].audio;
-								}
-							}
-						}
-						else if(Array.isArray(audioinfo)){
-							audioname=audioinfo[0];
-							audioinfo=audioinfo[1];
-						}
-						if(typeof audioinfo=='number'){
-							if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
-							game.playAudio('skill',audioname+getIndex(audioinfo));
-						}
-						else if(audioinfo){
-							if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
-							game.playAudio('skill',audioname);
-						}
-						else if(true&&info.audio!==false){
-							if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
-							game.playSkillAudio(audioname,getIndex(2));
-						}
-					}
+					if(e!=='init') game.trySkillAudio(this.link,playername);
 				}
 				var initskill=false;
 				for(var i=0;i<list.length;i++){
