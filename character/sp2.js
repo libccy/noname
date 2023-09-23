@@ -2042,7 +2042,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							trigger._dunxi=true;
 							trigger.player.removeMark('dunxi',1);
-							var target=trigger.target;
+							var target=trigger.targets[0];
 							event.target=target;
 							trigger.targets.remove(target);
 							//trigger.triggeredTargets1.remove(target);
@@ -10533,5 +10533,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_danqi:'千里单骑',
 			sp_decade:'其他新服武将',
 		},
+		pinyins:{
+			卑弥呼:['Himiko']
+		}
 	};
 });

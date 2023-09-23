@@ -9715,7 +9715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:['chooseToUse','chooseToRespond'],
 				filter:function(event,player){
-					if(event.type=='wuxie') return false;
+					if(event.type=='wuxie'||player.hasSkill('zhenshan_used')) return false;
 					var nh=player.countCards('h');
 					if(!game.hasPlayer(function(current){
 						return current!=player&&current.countCards('h')<nh;
@@ -9787,6 +9787,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								'step 1'
 								if(result.bool){
 									player.logSkill('zhenshan',result.targets);
+									player.addTempSkill('zhenshan_used');
 									player.swapHandcards(result.targets[0]);
 									delete event.result.skill;
 								}
@@ -9797,8 +9798,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						return '选择【'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'】的目标';
+						return '请选择【'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'】的目标';
 					}
+				},
+				subSkill:{
+					used:{charlotte:true},
 				},
 				ai:{
 					order:function(){
@@ -9828,6 +9832,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					respondSha:true,
 					respondShan:true,
 					skillTagFilter:function(player,tag,arg){
+						if(player.hasSkill('zhenshan_used')) return false;
 						var nh=player.countCards('h');
 						return game.hasPlayer(function(current){
 							return current!=player&&current.countCards('h')<nh;
@@ -10361,7 +10366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				content:function(){
 					'step 0'
-					player.draw(player.hp);
+					player.draw(2);
 					'step 1'
 					if(player.getHistory('sourceDamage').length||player.getHistory('gain',function(evt){
 						return evt.getParent('phaseUse')==trigger.getParent('phaseUse')&&evt.getParent().name=='draw';
@@ -10380,11 +10385,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var choiceList=['令'+get.translation(trigger.source)+'本回合不能再使用或打出牌'];
-					if (trigger.source.countCards('h')) choiceList.push('令'+get.translation(trigger.source)+'弃置'+get.cnNumber(trigger.source.hp)+'张牌');
+					if (trigger.source.countCards('h')) choiceList.push('令'+get.translation(trigger.source)+'弃置两张牌');
 					player.chooseControl('cancel2').set('prompt2',get.prompt2('yuzhang')).set('choiceList',choiceList).set('ai',function(){
 						var player=_status.event.player,source=_status.event.source;
 						if(get.attitude(player,event.source)>0) return 'cancel2';
-						if(source.hasSkillTag('noh')||source.hasSkillTag('noe')||source.countCards('h')>=2*source.hp) return 0;
+						if(source.hasSkillTag('noh')||source.hasSkillTag('noe')||source.countCards('h')>=4) return 0;
 						if(source.hp>1&&source.countCards('h')>1) return 1;
 						return 'cancel2';
 					}).set('source',trigger.source);
@@ -10393,12 +10398,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('yuzhang',trigger.source);
 						player.removeMark('twjingce',1);
 						if(result.index==0) trigger.source.addTempSkill('yuzhang_dontuse');
-						else trigger.source.chooseToDiscard('he',trigger.source.hp,true);
+						else trigger.source.chooseToDiscard('he',2,true);
 					}
 				},
 				group:"yuzhang_skip",
 				subSkill:{
 					skip:{
+						audio:'yuzhang',
 						trigger:{
 							player:["phaseJudgeBefore","phaseDrawBefore","phaseUseBefore","phaseDiscardBefore"],
 						},
@@ -13956,6 +13962,47 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
+			//英文版特典武将凯撒
+			zhengfu:{
+				trigger:{
+					player:"useCardToPlayered",
+				},
+				check:function (event,player){
+					return get.attitude(player,event.target)<0;
+				},
+				filter:function(event,player){
+					return event.card.name=='sha';
+				},
+				logTarget:"target",
+				line:false,
+				content:function(){
+					'step 0'
+					player.line(trigger.target,{color:[220, 90, 139]});
+					player.chooseControl(['basic','trick','equip']).set('ai',function(){
+						var player=_status.event.target;
+						if(!player.countCards('h','sha')&&player.countCards('h','shan')) return 'trick';
+						return 'basic';
+					}).set('prompt','请选择一种牌的类别').set('target',trigger.target);
+					'step 1'
+					trigger.target.chooseCard('he','交给'+get.translation(player)+'一张'+get.translation(result.control)+'牌，否则此【杀】不可被闪避。',function(card){
+						return get.type(card,'trick')==_status.event.getParent().result.control;
+					}).set('ai',function(card){
+						var num=_status.event.num;
+						if(num==0) return 0;
+						if(card.name=='shan') return num>1?2:0;
+						return 8-get.value(card);
+					}).set('num',trigger.target.countCards('h','shan'))
+					'step 2'
+					if(result.bool){
+						var cards=result.cards;
+						trigger.target.give(cards,player);
+					}
+					else{
+						trigger.getParent().directHit.add(trigger.target);
+						game.delay();
+					}
+				}
+			}
 		},
 		perfectPair:{
 			tw_liufuren:['yuanshao'],
@@ -13966,6 +14013,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mateng:['tw_mateng','mateng'],
 		},
 		dynamicTranslate:{
+			twfeifu:function(player){
+				var str='转换技。';
+				if(!player.storage.twfeifu) str+='<span class="bluetext">';
+				str+='阴：当你成为【杀】的唯一目标后；';
+				if(!player.storage.twfeifu) str+='</span>';
+				if(player.storage.twfeifu) str+='<span class="bluetext">';
+				str+='阳：当你使用【杀】指定唯一目标后；';
+				if(player.storage.twfeifu) str+='</span>';
+				str+='目标角色须交给使用者一张牌。若此牌为装备牌，则使用者可使用此牌。';
+				return str;
+			},
 			twfengpo:function(player){
 				if(player.storage.twfengpo) return '当你使用【杀】或【决斗】指定唯一目标后，你可观看目标角色的手牌并选择一项：⒈摸X张牌。⒉令此牌的伤害值基数+X（X为其手牌中的红色牌数）。';
 				return '①当你使用【杀】或【决斗】指定唯一目标后，你可观看目标角色的手牌并选择一项：⒈摸X张牌。⒉令此牌的伤害值基数+X（X为其手牌中的♦数）。②当你杀死一名角色后，你将〖凤魄①〗中的“♦数”改为“红色牌数”。';
@@ -14136,9 +14194,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twchunlao_info:'①准备阶段，若场上没有“醇”，则你可将一名角色区域内的一张牌置于其武将牌上，称为“醇”。②一名角色使用【杀】时，若其有“醇”，则其可以交给你一张牌，令此【杀】的伤害值基数+1。③一名角色进入濒死状态时，若其有“醇”，则你可以移去“醇”并摸一张牌，然后令其回复1点体力。',
 			tw_guohuai:'TW郭淮',
 			twjingce:"精策",
-			twjingce_info:"当你于出牌阶段使用第X张牌时，你可以摸X张牌（X为你的体力值）。若此阶段你此前摸过牌或本回合造成过伤害，你获得一枚“策”标记。",
+			twjingce_info:"当你于出牌阶段使用第X张牌时，你可以摸两张牌（X为你的体力值）。若此阶段你此前摸过牌或本回合造成过伤害，你获得一枚“策”标记。",
 			yuzhang:"御嶂",
-			yuzhang_info:"你可以弃置一枚“策”标记，然后跳过一个阶段。当你受到伤害后，你可弃置一枚“策”标记，然后选择一项：⒈令伤害来源弃置X张牌（X为其体力值）；⒉令伤害来源本回合不能再使用或打出牌。",
+			yuzhang_info:"你可以弃置一枚“策”标记，然后跳过一个阶段。当你受到伤害后，你可弃置一枚“策”标记，然后选择一项：⒈令伤害来源弃置两张牌；⒉令伤害来源本回合不能再使用或打出牌。",
 			tw_caozhao:'曹肇',
 			twfuzuan:'复纂',
 			twfuzuan_info:'出牌阶段限一次/当你受到伤害后/当你对其他角色造成伤害后，你可选择一名拥有转换技的角色，变更其的一个转换技的的状态。',
@@ -14166,7 +14224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twcongji_info:'当你的红色牌于回合外因弃置而进入弃牌堆后，你可令一名其他角色获得这些牌。',
 			old_quancong:'TW全琮',
 			zhenshan:'振赡',
-			zhenshan_info:'当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌，视为使用或打出此牌。',
+			zhenshan_info:'每回合限一次，当你需要使用或打出一张基本牌时，你可以与一名手牌数少于你的角色交换手牌，视为使用或打出此牌。',
 			tw_tianyu:'TW田豫',
 			twzhenxi:'震袭',
 			twzhenxi_info:'每回合限一次。当你使用【杀】指定目标后，你可选择一项：⒈弃置其X张手牌（X为你至其的距离）；⒉将其装备区或判定区内的一张牌移动到另一名角色的装备区或判定区内。若其体力值大于你或其体力值为全场最高，则你可以改为依次执行以上两项。',
@@ -14516,6 +14574,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twquanqian_info:'昂扬技。出牌阶段限一次，你可以将至多四张花色各不相同的手牌交给一名其他角色，然后若你交出的牌数大于1，则你从牌堆中获得一张装备牌，然后选择一项：①将手牌数摸至与其相同；②观看其手牌并获得其一种花色的所有牌。<br>激昂：你弃置六张手牌。',
 			twrouke:'柔克',
 			twrouke_info:'锁定技。当你于摸牌阶段外得到超过一张牌时，你摸一张牌。',
+			kaisa:"凯撒",
+			zhengfu:"征服",
+			zhengfu_info:"当你使用【杀】指定目标时，你可以选择一种牌的类别，然后除非目标角色交给你一种该类别的牌，否则其不能闪避此【杀】。",
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',
@@ -14529,6 +14590,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_mobile2:'海外服·异构',
 			tw_yijiang:'一将成名TW',
 			tw_english:'英文版',
+		},
+		pinyins:{
+			凯撒:['Caesar'],
+			难升米:['Nashime']
 		}
 	};
 });
