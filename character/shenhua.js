@@ -214,27 +214,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
 						//if(tag=='pretao') return true;
+						if(!arg.card || !arg.target)return false;
 						if(player._wanglie_temp) return false;
 						player._wanglie_temp=true;
-						var bool=function(){
-							if(['wuzhong','kaihua','dongzhuxianji'].contains(arg.card.name)) return false;
-							if(get.attitude(player,arg.target)>0||!player.isPhaseUsing()) return false;
+						var func=function(player,tag,argcard,argtarget){
+							if(['wuzhong','kaihua','dongzhuxianji'].contains(argcard.name)) return false;
+							if(get.attitude(player,argtarget)>0||!player.isPhaseUsing()) return false;
 							var cards=player.getCards('h',function(card){
-								return card!=arg.card&&(!arg.card.cards||!arg.card.cards.contains(card));
+								return card!=argcard&&(!argcard.cards||!argcard.cards.contains(card));
 							});
 							var sha=player.getCardUsable('sha');
-							if(arg.card.name=='sha') sha--;
+							if(argcard.name=='sha') sha--;
 							cards=cards.filter(function(card){
 								if(card.name=='sha'&&sha<=0) return false;
 								return player.hasValueTarget(card,null,true);
 							});
 							if(!cards.length) return true;
-							if(!get.tag(arg.card,'damage')) return false;
+							if(!get.tag(argcard,'damage')) return false;
 							if(!player.needsToDiscard()&&!cards.filter(function(card){
 								return get.tag(card,'damage');
 							}).length) return true;
 							return false;
-						}();
+						};
+						var bool = game.callFuncUseStepCache("dcwanglie_skillTagFilter",func,[player,tag,arg.card,arg.target]);
 						delete player._wanglie_temp;
 						return bool;
 					},

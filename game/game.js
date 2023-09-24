@@ -21789,6 +21789,28 @@
 					}
 					return skills;
 				},
+				//计算技能效果时需要的skills列表。
+				getEffectiveSkills:function(useCache){
+					var func = function(player){
+						var skills=player.getSkills().concat(lib.skill.global);
+						game.expandSkills(skills);
+						return skills;
+					};
+					if(useCache === false)return func(this);
+					return game.callFuncUseStepCache("player.getEffectiveSkills",func,[this]);
+				},
+				getModableSkills:function(useCache){
+					var func = function(player){
+						var skills=player.getSkills().concat(lib.skill.global);
+						game.expandSkills(skills);
+						return skills.filter(function(skill){
+							var info = get.info(skill);
+							return info && info.mod;
+						});
+					};
+					if(useCache === false)return func(this);
+					return game.callFuncUseStepCache("player.getModableSkills",func,[this]);
+				},
 				get:function(arg1,arg2,arg3,arg4){
 					var i,j;
 					if(arg1=='s'){
@@ -25128,6 +25150,12 @@
 					return this.getUseValue.apply(this,arguments)>0;
 				},
 				getUseValue:function(card,distance,includecard){
+					var func = function(player,card,distance,includecard){
+						return player.getUseValue_raw(card,distance,includecard);
+					};
+					return game.callFuncUseStepCache("player.getUseValue_raw",func,[this,card,distance,includecard]);
+				},
+				getUseValue_raw:function(card,distance,includecard){
 					if(typeof(card)=='string'){
 						card={name:card,isCard:true};
 					}
@@ -25338,6 +25366,7 @@
 					game.log(this,'获得了技能','#g【'+get.translation(skill)+'】');
 				},
 				addInvisibleSkill:function(skill){
+					if(_status.event)_status.event.clearStepCache();
 					if(Array.isArray(skill)){
 						for(var i=0;i<skill.length;i++){
 							this.addInvisibleSkill(skill[i]);
@@ -25357,6 +25386,7 @@
 				},
 				removeInvisibleSkill:function(skill){
 					if(!skill) return;
+					if(_status.event)_status.event.clearStepCache();
 					if(Array.isArray(skill)){
 						for(var i=0;i<skill.length;i++){
 							this.removeSkill(skill[i]);
@@ -25373,6 +25403,7 @@
 					return skill;
 				},
 				addSkill:function(skill,checkConflict,nobroadcast,addToSkills){
+					if(_status.event)_status.event.clearStepCache();
 					if(Array.isArray(skill)){
 						for(var i=0;i<skill.length;i++){
 							this.addSkill(skill[i]);
@@ -25441,6 +25472,7 @@
 					return skill;
 				},
 				addAdditionalSkill:function(skill,skills,keep){
+					if(_status.event)_status.event.clearStepCache();
 					if(this.additionalSkills[skill]){
 						if(keep){
 							if(typeof this.additionalSkills[skill]=='string'){
@@ -25467,6 +25499,7 @@
 					return this;
 				},
 				removeAdditionalSkill:function(skill,target){
+					if(_status.event)_status.event.clearStepCache();
 					if(this.additionalSkills[skill]){
 						var additionalSkills=this.additionalSkills[skill];
 						if(Array.isArray(additionalSkills)&&typeof target=='string'){
@@ -25490,6 +25523,7 @@
 					return this;
 				},
 				awakenSkill:function(skill,nounmark){
+					if(_status.event)_status.event.clearStepCache();
 					if(!nounmark) this.unmarkSkill(skill);
 					this.disableSkill(skill+'_awake',skill);
 					this.awakenedSkills.add(skill);
@@ -25497,6 +25531,7 @@
 					return this;
 				},
 				restoreSkill:function(skill,nomark){
+					if(_status.event)_status.event.clearStepCache();
 					if(this.storage[skill]===true) this.storage[skill]=false;
 					this.awakenedSkills.remove(skill);
 					this.enableSkill(skill+'_awake',skill);
@@ -25504,6 +25539,7 @@
 					return this;
 				},
 				disableSkill:function(skill,skills){
+					if(_status.event)_status.event.clearStepCache();
 					if(typeof skills=='string'){
 						if(!this.disabledSkills[skills]){
 							this.disabledSkills[skills]=[];
@@ -25556,6 +25592,7 @@
 					return this;
 				},
 				enableSkill:function(skill){
+					if(_status.event)_status.event.clearStepCache();
 					for(var i in this.disabledSkills){
 						this.disabledSkills[i].remove(skill);
 						if(this.disabledSkills[i].length==0){
@@ -25677,6 +25714,7 @@
 				},
 				removeSkill:function(skill){
 					if(!skill) return;
+					if(_status.event)_status.event.clearStepCache();
 					if(Array.isArray(skill)){
 						for(var i=0;i<skill.length;i++){
 							this.removeSkill(skill[i]);
@@ -28764,6 +28802,33 @@
 					if(notrigger!='notrigger'){
 						this.trigger(this.name+'Cancelled');
 						if(this.player&&lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name)}
+				},
+				putStepCache:function(key,value){
+					if(!this._stepCache){
+						this._stepCache = {};
+					}
+					this._stepCache[key] = value;
+				},
+				getStepCache:function(key){
+					if(!this._stepCache)return undefined;
+					return this._stepCache[key];
+				},
+				clearStepCache:function(key){
+					if(key !==  undefined && key !== null){
+						delete this._stepCache[key];
+					}
+					delete this._stepCache;
+				},
+				callFuncUseStepCache:function(prefix,func,params){
+					if(typeof func != 'function')return;
+					if(_status.closeStepCache)return func.apply(null,params);
+					var cacheKey = "["+prefix+"]"+get.paramToCacheKey.apply(null,params);
+					var ret = this.getStepCache(cacheKey);
+					if(ret === undefined || ret === null){
+						ret = func.apply(null,params);
+						this.putStepCache(cacheKey,ret);
+					}
+					return ret;
 				},
 				putTempCache:function(key1,key2,value){
 					if(!this._tempCache){
@@ -32991,6 +33056,18 @@
 			for(var i of game.players){
 				if(i.storage.renku) i.markSkill('renku');
 			}
+		},
+		//查看一个函数是否有缓存，如果有则返回缓存值，没有则调用函数进行计算。
+		callFuncUseStepCache:function(prefix,func,params){
+			if(typeof func != 'function')return;
+			if(_status.closeStepCache || !_status.event)return func.apply(null,params);
+			var cacheKey = "["+prefix+"]"+get.paramToCacheKey.apply(null,params);
+			var ret = _status.event.getStepCache(cacheKey);
+			if(ret === undefined || ret === null){
+				ret = func.apply(null,params);
+				_status.event.putStepCache(cacheKey,ret);
+			}
+			return ret;
 		},
 		loseAsync:function(arg){
 			var next=game.createEvent('loseAsync');
@@ -37738,6 +37815,7 @@
 									_status,lib,game,ui,get,ai);
 							}
 						}
+						event.clearStepCache();
 						event.step++;
 					}
 				}
@@ -39438,12 +39516,10 @@
 		checkMod:function(){
 			const argumentArray=Array.from(arguments),name=argumentArray[argumentArray.length-2];
 			let skills=argumentArray[argumentArray.length-1];
-			if(skills.getSkills) skills=skills.getSkills();
-			skills=skills.concat(lib.skill.global);
-			game.expandSkills(skills);
+			if(skills.getModableSkills) skills=skills.getModableSkills();
 			skills=skills.filter(skill=>{
 				const info=get.info(skill);
-				return (info&&info.mod&&info.mod[name]);
+				return info.mod[name];
 			})
 			skills.sort((a,b)=>get.priority(a)-get.priority(b));
 			const arg=argumentArray.slice(0,-2);
@@ -54643,6 +54719,27 @@
 			}
 			return str;
 		},
+		//用于将参数转换为字符串，作为缓存的key。
+		paramToCacheKey:function(){
+			var str = "";
+			for(var arg of arguments){
+				if(arg === null || arg === undefined){
+					str += (arg + "-");
+					continue;
+				}
+				if(arg.playerid){
+					str += "p:"+arg.playerid;
+				}else if(arg.cardid){
+					str += "c:"+arg.cardid;
+				}else if(arg.name){
+					str += "n:"+arg.name;
+				}else{
+					str += "s:"+arg;
+				}
+				str+="-";
+			}
+			return str;
+		},
 		yunjiao:function(str){
 			const util=window.pinyinUtilx;
 			if(util) str=util.removeTone(str)
@@ -58520,7 +58617,7 @@
 			if(!from||!to) return 0;
 			from=from._trueMe||from;
 			arguments[0]=from;
-			var att=get.rawAttitude.apply(this,arguments);
+			var att = game.callFuncUseStepCache("get.rawAttitude",get.rawAttitude,arguments);
 			if(from.isMad()) att=-att;
 			if(to.isMad()&&att>0){
 				if(to.identity=='zhu'){
@@ -58551,10 +58648,17 @@
 			if(card._modUseful){
 				return card._modUseful();
 			}
-			var i=0;
 			if(!player) player=_status.event.player;
+			return game.callFuncUseStepCache("get.useful_raw",get.useful_raw,[card,player]);
+		},
+		useful_raw:function(card,player){
+			var i=0;
 			if(player){
-				i=player.getCards('h',card.name).indexOf(card);
+				var getPlayerHandcards = function(player,cardname){
+					return player.getCards('h',card.name);
+				};
+				i=game.callFuncUseStepCache("getPlayerHandcards|get.useful_raw",
+				getPlayerHandcards,[player,card.name]).indexOf(card);
 				if(i<0) i=0;
 			}
 			var aii=get.info(card).ai;
@@ -58585,6 +58689,18 @@
 			return 10-get.useful(card);
 		},
 		value:function(card,player,method){
+			if(Array.isArray(card)){
+				if(!card.length) return 0;
+				var value=0;
+				for(var i=0;i<card.length;i++){
+					value+=get.value(card[i],player,method);
+				}
+				return value/Math.sqrt(card.length);
+			}
+			if(player==undefined||get.itemtype(player)!='player') player=_status.event.player;
+			return game.callFuncUseStepCache("get.value_raw",get.value_raw,[card,player,method]);
+		},
+		value_raw:function(card,player,method){
 			var result=0;
 			var value;
 			if(Array.isArray(card)){
@@ -58685,6 +58801,9 @@
 			return 1;
 		},
 		order:function(item){
+			return game.callFuncUseStepCache("get.order_raw",get.order_raw,[item]);
+		},
+		order_raw:function(item){
 			var info=get.info(item);
 			if(!info) return -1;
 			var aii=info.ai;
@@ -58733,6 +58852,23 @@
 					}
 				}
 			}
+			return game.callFuncUseStepCache("get.effect_use_raw",
+			get.effect_use_raw,[target,card,player,player2,isLink,eventskill]);
+		},
+		effect_use_raw:function(target,card,player,player2,isLink,eventskill){
+			var event=_status.event;
+			var eventskill=null;
+			if(player==undefined) player=_status.event.player;
+			if(typeof card!='string'&&(typeof card!='object'||!card.name)){
+				var skillinfo=get.info(event.skill);
+				if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
+				else{
+					card=get.card();
+					if(skillinfo&&skillinfo.viewAs&&card.name===skillinfo.viewAs.name){
+						eventskill=event.skill;
+					}
+				}
+			}
 			var info=get.info(card);
 			if(typeof card=='object'&&info&&info.changeTarget){
 				var targets=[target];
@@ -58751,8 +58887,7 @@
 			if(typeof result1!='number') result1=0;
 			if(typeof result2!='number') result2=0;
 			var temp1,temp2,temp3,temp01=0,temp02=0,threaten=1;
-			var skills1=player.getSkills().concat(lib.skill.global);
-			game.expandSkills(skills1);
+			var skills1=player.getEffectiveSkills();
 			var zerotarget=false,zeroplayer=false;
 			for(var i=0;i<skills1.length;i++){
 				temp1=get.info(skills1[i]).ai;
@@ -58788,8 +58923,7 @@
 				}
 			}
 			if(target){
-				var skills2=target.getSkills().concat(lib.skill.global);
-				game.expandSkills(skills2);
+				var skills2=target.getEffectiveSkills();
 				for(var i=0;i<skills2.length;i++){
 					temp2=get.info(skills2[i]).ai;
 					if(temp2&&temp2.threaten) temp3=temp2.threaten;
@@ -58927,6 +59061,10 @@
 					}
 				}
 			}
+			return game.callFuncUseStepCache("get.effect_raw",
+			get.effect_raw,[target,card,player,player2,isLink,eventskill]);
+		},
+		effect_raw:function(target,card,player,player2,isLink,eventskill){
 			var result=get.result(card,eventskill);
 			var result1=result.player,result2=result.target;
 			if(typeof result1=='function') result1=result1(player,target,card,isLink);
@@ -58935,8 +59073,7 @@
 			if(typeof result1!='number') result1=0;
 			if(typeof result2!='number') result2=0;
 			var temp1,temp2,temp3,temp01=0,temp02=0,threaten=1;
-			var skills1=player.getSkills().concat(lib.skill.global);
-			game.expandSkills(skills1);
+			var skills1=player.getEffectiveSkills();
 			var zerotarget=false,zeroplayer=false;
 			for(var i=0;i<skills1.length;i++){
 				temp1=get.info(skills1[i]).ai;
@@ -58969,8 +59106,7 @@
 				}
 			}
 			if(target){
-				var skills2=target.getSkills().concat(lib.skill.global);
-				game.expandSkills(skills2);
+				var skills2=target.getEffectiveSkills();
 				for(var i=0;i<skills2.length;i++){
 					temp2=get.info(skills2[i]).ai;
 					if(temp2&&temp2.threaten) temp3=temp2.threaten;
