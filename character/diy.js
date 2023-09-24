@@ -181,7 +181,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			old_jiakui:['male','wei',4,['tongqu','xinwanlan']],
 			ol_guohuai:['male','wei',3,['rejingce']],
-			junk_zhangrang:['male','qun',3,['junktaoluan']],
+			junk_zhangrang:['male','qun',3,['junktaoluan'],['sex:male_castrated']],
 			old_bulianshi:['female','wu',3,['anxu','zhuiyi']],
 			ol_maliang:['male','shu',3,['zishu','xinyingyuan']],
 			junk_liubei:['male','shu',4,['junkrende','jijiang'],['zhu']],
