@@ -4563,14 +4563,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
+							if(get.itemtype(player)!='player'||player._dcmengchi_aiChecking||target.getStat('gain')) return;
+							if(card.name=='tiesuo'&&!target.isLinked()) return 0;
 							if(player.hasSkillTag('jueqing',false,target)) return;
-							if(target.getStat('gain')) return;
-							if(get.tag(card,'natureDamage')) return;
-							if(target.hp==1) return 0.75;
-							if(card.name=='sha'&&!player.hasSkill('jiu')||target.hasSkillTag('filterDamage',null,{
+							if(!get.tag(card,'damage')||get.tag(card,'natureDamage')) return;
+							if(target.hp<=1) return 0.75;
+							if(!target.hasSkillTag('filterDamage',null,{
 								player:player,
-								card:card,
-							})) return [1,Math.min(1.5,0.75+0.25*target.hp)];
+								card:card
+							})&&player.hasSkillTag('damageBonus',false,{
+								target:target,
+								card:card
+							})){
+								if(target.hp>2) return 0.5;
+								return 0.75;
+							}
+							if(get.attitude(player,target)>0) return [0,0];
+							var sha=player.getCardUsable({name:'sha'});
+							player._dcmengchi_aiChecking=true;
+							var num=player.countCards('h',function(card){
+								if(get.name(card)=='sha'){
+									if(sha==0) return false;
+									else sha--;
+								}
+								return player.canUse(card,target)&&get.effect(target,card,player,player)>0;
+							});
+							delete player._dcmengchi_aiChecking;
+							if(player.hasSkillTag('damage')) num++;
+							if(num<2) return [0,0];
 						},
 					},
 				},
@@ -4612,44 +4632,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(!get.tag(card,'damage')) return;
-							if(player.hasSkillTag('jueqing',false,target)) return;
-							if(target==_status.currentPhase) return;
-							if(player._dcfangdu_aiChecking) return;
+							if(player._dcfangdu_aiChecking||target==_status.currentPhase) return;
+							if(!get.tag(card,'damage')||player.hasSkillTag('jueqing',false,target)) return;
 							if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
 							if(!get.tag(card,'natureDamage')){
-								if(target.hasHistory('damage',evt=>!evt.nature)){
-									return [1,-2];
-								}
+								if(target.hasHistory('damage',evt=>!evt.nature)) return 1.5;
+								else if(target.hp<=1||player.hasSkillTag('damageBonus',false,{
+									target:target,
+									card:card
+								})&&!target.hasSkillTag('filterDamage',null,{
+									player:player,
+									card:card
+								})) return 0.75;
 								else{
-									if(get.attitude(player,target)>0){
-										if(target.hasSkill('dcjiexing')) return [0,0.2];
-									}
-									if(get.attitude(player,target)<0&&!player.hasSkillTag('damageBonus')){
-										var sha=player.getCardUsable({name:'sha'});
-										player._dcfangdu_aiChecking=true;
-										var num=player.countCards('h',function(card){
-											if(get.name(card)=='sha'){
-												if(sha==0){
-													return false;
-												}
-												else{
-													sha--;
-												}
-											}
-											return player.canUse(card,target)&&get.effect(target,card,player,player)>0;
-										});
-										delete player._dcfangdu_aiChecking;
-										if(player.hasSkillTag('damage')){
-											num++;
+									if(get.attitude(player,target)>0) return [0,0];
+									var sha=player.getCardUsable({name:'sha'});
+									player._dcfangdu_aiChecking=true;
+									var num=player.countCards('h',function(card){
+										if(get.name(card)=='sha'){
+											if(sha==0) return false;
+											else sha--;
 										}
-										if(num<2){
-											return [0,0.8];
-										}
-									}
+										return player.canUse(card,target)&&get.effect(target,card,player,player)>0;
+									});
+									delete player._dcfangdu_aiChecking;
+									if(player.hasSkillTag('damage')) num++;
+									if(num<2) return [0,0];
 								}
 							}
-							if(!target.hasHistory('damage',evt=>evt.nature)&&player.countCards('h')>1&&get.tag(card,'natureDamage')) return [1,1];
+							if(get.tag(card,'natureDamage')&&!target.hasHistory('damage',evt=>evt.nature)&&player.countCards('he')>1) return [1,1,1,-1];
 						}
 					}
 				}
@@ -4684,6 +4695,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						onremove:function(player){
 							player.removeGaintag('dcjiexing');
 						},
+					}
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'recover')) return [1,1];
+							if(get.tag(card,'damage')){
+								var draw=0.9;
+								if(target.hasSkill('dcmengchi')&&target.getStat('gain')) draw=1.8;
+								if(target.hp<=1||card.name=='sha'&&player.hasSkill('jiu')||get.itemtype(player)=='player'&&!target.hasSkillTag('filterDamage',null,{
+									player:player,
+									card:card
+								})&&player.hasSkillTag('damageBonus',false,{
+									target:target,
+									card:card
+								})){
+									if(target.hp>2) return [1,draw];
+									return;
+								}
+								return [1,draw];
+							}
+						}
 					}
 				}
 			},
