@@ -10161,6 +10161,12 @@
 				let sScriptURL;
 				if(str.indexOf('http')==0) sScriptURL=str;
 				else if(str.startsWith('local:')){
+					if(lib.assetURL.length==0&&location.origin=='file://'&&typeof game.readFile=='undefined'){
+						const e=new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
+						if(typeof onerror=='function') onerror(e);
+						else throw e;
+						return;
+					}
 					sScriptURL=lib.assetURL+str.slice(6);
 				}
 				else{
