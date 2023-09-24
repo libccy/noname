@@ -442,55 +442,47 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
-				direct:true,
+				prompt2:()=>'选择任意张本阶段进入弃牌堆的牌令其获得，然后你获得剩余的牌，若其获得的牌数大于你，则你可以对其造成1点伤害',
+				logTarget:'player',
 				content:function(){
 					'step 0'
+					player.addSkill('twlijian_sunben');
 					var cards=lib.skill.twlijian.getCards(trigger),target=trigger.player;
 					event.cards=cards;event.target=target;
-					player.chooseButton([
-						get.prompt('twlijian',target),
-						'<span class="text center">选择任意张牌令其获得，然后你获得剩余的牌，若其获得的牌数大于你，则你可以对其造成1点伤害</span>',
-						cards,
-					],[1,Infinity]).set('ai',function(button){
+					player.chooseToMove('力荐：请分配'+get.translation(target)+'和你获得的牌',true).set('list',[
+						[get.translation(target)+'获得的牌',cards],
+						['你获得的牌'],
+					]).set('processAI',function(list){
 						var player=_status.event.player;
 						var target=_status.event.getTrigger().player;
 						var att=get.attitude(player,target);
-						var cards=ui.selected.cards;
-						var cardx=_status.event.cards;
-						var card=button.link;
+						var cards=_status.event.cards;
+						var cardx=cards.filter(card=>card.name=='du');
+						var cardy=cards.removeArray(cardx);
 						switch(get.sgn(att)){
 							case 1:
-								return 1;
-							break;
+								return [cards,[]];
+								break;
 							case 0:
-								if(!cards.length&&cardx.length>1) return 1/(get.value(card)||0.5);
-								return 0;
-							break;
+								return [cardx,cardy];
+								break;
 							case -1:
-								var num=Math.ceil(cardx.length/2)+(cardx.length%2==0?1:0);
+								var num=Math.ceil(cards.length/2)+(cards.length%2==0?1:0);
 								if(num>1&&player.hasSkill('twchungang')) num--;
-								if(get.damageEffect(target,player,player)<=0||num>2){
-									if(!cards.length&&cardx.length>1) return 1/(get.value(card)||0.5);
-									return 0;
-								}
-								else{
-									var numx=0;
-									numx+=num;
-									if(num>0&&player.hasSkill('twchungang')) numx++;
-									if(cards.length<numx) return 1/(get.value(card)||0.5);
-									return 0;
-								}
-							break;
+								if(get.damageEffect(target,player,player)<=0||num>2||cardy.length>cardx.length) return [cardx,cardy];
+								var num2=cardx.length-cardy.length;
+								num2=Math.ceil(num2/2)+(num2%2==0?1:0);
+								cardx.sort((a,b)=>get.value(b)-get.value(a));
+								cardy.addArray(cardx.sort(num,cardx.length));
+								return [cardx.sort(0,num),cardy];
+								break;
 						}
-					}).setHiddenSkill('twlijian').set('cards',cards);
+					}).set('cards',cards);
 					'step 1'
 					if(result.bool){
-						player.logSkill('twlijian',target);
-						player.addSkill('twlijian_sunben');
-						target.gain(result.links,'gain2');
-						cards.removeArray(result.links);
-						player.gain(cards,'gain2');
-						if(result.links.length>cards.length){
+						target.gain(result.moved[0],'gain2');
+						player.gain(result.moved[1],'gain2');
+						if(result.moved[0].length>result.moved[1].length){
 							player.chooseBool('是否对'+get.translation(target)+'造成1点伤害？').set('choice',get.damageEffect(target,player,player)>0);
 						}
 						else event.finish();
