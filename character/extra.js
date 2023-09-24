@@ -830,11 +830,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.removeMark('yizhao',player.countMark('yizhao'));
-					var cards=get.cards(ui.cardPile.childElementCount+1);
-					for(var i=0;i<cards.length;i++){
-						ui.cardPile.insertBefore(cards[i],ui.cardPile.childNodes[get.rand(ui.cardPile.childElementCount)]);
-					}
-					game.updateRoundNumber();
+					game.washCard();
 					'step 1'
 					var pile=Array.from(ui.cardPile.childNodes);
 					if(pile.length<3) return;
@@ -903,9 +899,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseEnd'},
 				direct:true,
 				filter:function(event,player){
-					return player.hasSkill('tianjie_shuffled');
+					return game.hasGlobalHistory('cardMove',evt=>evt.washCard)&&game.hasPlayer(current=>current!=player);
 				},
-				group:'tianjie_effect',
 				skillAnimation:true,
 				animationColor:'metal',
 				content:function(){
@@ -925,18 +920,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				subSkill:{
-					effect:{
-						trigger:{global:'washCard'},
-						forced:true,
-						silent:true,
-						charlotte:true,
-						content:function(){
-							player.addTempSkill('tianjie_shuffled');
-						},
-					},
-					shuffled:{charlotte:true},
-				}
 			},
 			shencai:{
 				audio:2,
