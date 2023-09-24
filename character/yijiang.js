@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			yijiang:{
 				yijiang_2011:['caozhi','yujin','zhangchunhua','xin_fazheng','xin_masu','xin_xushu','xusheng','lingtong','wuguotai','chengong','gaoshun'],
-				yijiang_2012:['old_wangyi','xunyou','zhonghui','old_madai','liaohua','guanzhang','bulianshi','handang','chengpu','liubiao','old_huaxiong','caozhang'],
+				yijiang_2012:['wangyi','xunyou','zhonghui','old_madai','liaohua','guanzhang','bulianshi','handang','chengpu','liubiao','old_huaxiong','caozhang'],
 				yijiang_2013:['manchong','guohuai','caochong','guanping','liufeng','jianyong','yufan','panzhangmazhong','zhuran','xin_liru','fuhuanghou'],
 				yijiang_2014:['hanhaoshihuan','chenqun','caozhen','zhangsong','wuyi','zhoucang','zhuhuan','guyong','sunluban','yj_jushou','caifuren'],
 				yijiang_2015:['caoxiu','caorui','zhongyao','xiahoushi','liuchen','zhangyi','zhuzhi','quancong','sunxiu','gongsunyuan','guotufengji'],
@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lukai:['male','wu',4,['lkbushi','lkzhongzhuang']],
 			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
 			guanzhang:['male','shu',4,['fuhun']],
-			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
+			wangyi:['female','wei',3,['zhenlie','miji']],
 			caozhang:['male','wei',4,['new_jiangchi']],
 			guohuai:['male','wei',4,['rejingce']],
 			zhangchunhua:['female','wei',3,['jueqing','shangshi']],
@@ -105,7 +105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			old_huaxiong:['male','qun',6,['shiyong']],
 			
-			yujin:["male","wei",4,["yizhong"],[]],
+			yujin:["male","wei",4,["rezhenjun"],[]],
 		},
 		characterIntro:{
 			wuanguo:'武安国，历史小说《三国演义》中人物，是北海太守孔融的部将，兵器为一把长柄铁锤，重五十余斤。诸侯伐董时，双方于虎牢关相峙，吕布撰战，一合而斩穆顺，关东军大惊。北海太守孔融部将武安国，使铁锤飞马而出，吕布挥戟拍马来迎，战到十余合，一戟砍断安国手腕，安国弃锤于地而走，八路军兵齐出，这才救了他性命。',
@@ -13532,7 +13532,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterReplace:{
 			caozhi:['re_caozhi','dc_caozhi','caozhi','ps_caozhi'],
 			zhangchunhua:['re_zhangchunhua','zhangchunhua','mini_zhangchunhua'],
-			yujin:['yujin_yujin','ol_yujin','xin_yujin','yujin'],
+			yujin:['yujin_yujin','ol_yujin','xin_yujin','yujin','re_yujin'],
 			dc_xushu:['dc_xushu','re_xushu'],
 			xushu:['xin_xushu','xushu'],
 			fazheng:['re_fazheng','tw_re_fazheng','xin_fazheng','fazheng'],
@@ -13656,7 +13656,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanhaoshihuan:'韩浩史涣',
 			chengpu:'程普',
 			gaoshun:'高顺',
-			xin_yujin:'节钺于禁',
 			xin_liru:'李儒',
 			guohuanghou:'郭皇后',
 			liuyu:'OL刘虞',
@@ -13674,7 +13673,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jikang:'嵇康',
 			qinmi:'秦宓',
 			caiyong:'蔡邕',
-			"re_yujin":"于禁",
 
 			"new_qingxian":"清弦",
 			"new_qingxian_info":"出牌阶段限一次，你可以弃置至多X张牌并选择等量的其他角色。这些角色中，装备区内牌数少于你的回复1点体力，等于你的摸一张牌，多于你的失去1点体力。若你以此法指定的角色数等于X，则你摸一张牌。（X为你的体力值）",
@@ -14150,7 +14148,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shiyong:'恃勇',
 			shiyong_info:'锁定技，当你受到一次红色【杀】或【酒】【杀】造成的伤害后，须减1点体力上限',
 			old_guanzhang:'旧关兴张苞',
-			old_wangyi:'王异',
+			wangyi:'王异',
 			oldqianxi:'潜袭',
 			oldqianxi_info:'当你使用【杀】对距离为1的目标角色造成伤害时，你可以进行一次判定，若判定结果不为红桃，你防止此伤害，令其减1点体力上限',
 			oldzhenlie:'贞烈',
