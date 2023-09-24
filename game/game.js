@@ -478,11 +478,11 @@
 		]),
 		characterDialogGroup:{
 			'收藏':function(name,capt){
-				return lib.config.favouriteCharacter.contains(name)?capt:null;
+				return lib.config.favouriteCharacter.includes(name)?capt:null;
 			},
 			'最近':function(name,capt){
 				var list=get.config('recentCharacter')||[];
-				return list.contains(name)?capt:null;
+				return list.includes(name)?capt:null;
 			}
 		},
 		listenEnd:function(node){
@@ -7598,16 +7598,14 @@
 					return this;
 				};
 				HTMLDivElement.prototype.listenTransition=function(func,time){
-					var that=this;
-					var done=false;
-					var callback=function(){
-						if(!done){
-							func.call(that);
-							done=true;
-						}
+					const callback=()=>{
+						func.call(this);
+						clearTimeout(timer);
+						this.removeEventListener('webkitTransitionEnd',callback);
 					};
-					this.addEventListener('webkitTransitionEnd',callback);
-					return setTimeout(callback,time||1000);
+					const timer=setTimeout(callback,time||1000);
+					this.addEventListener('webkitTransitionEnd',callback,{once:true});
+					return timer;
 				};
 				HTMLDivElement.prototype.setPosition=function(){
 					var position;
@@ -8016,35 +8014,49 @@
 						_status.windowLoaded=true;
 					}
 				};
-				window.onerror=function(msg, src, line, column, err){
-					var str=msg;
+				window.onerror=function(msg,src,line,column,err){
+					let str=`错误文件: ${decodeURI(src)||'undefined'}\n错误信息: ${msg}`;
+					str+='\n'+`行号: ${line}`;
+					str+='\n'+`列号: ${column}`;
+					const version=lib.version||'';
+					const reg=/[^\d\.]/;
+					const match=version.match(reg)!=null;
+					str+='\n'+`${match?'游戏':'无名杀'}版本: ${version||'未知版本'}`;
+					if(match) str+='\n⚠️您使用的游戏代码不是源于libccy/noname无名杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！';
 					if(_status&&_status.event){
-						var evt=_status.event;
-						str+=('\n'+evt.name+': '+evt.step);
-						if(evt.parent) str+='\n'+evt.parent.name+': '+evt.parent.step;
-						if(evt.parent&&evt.parent.parent) str+='\n'+evt.parent.parent.name+': '+evt.parent.parent.step;
+						let evt=_status.event;
+						str+=`\nevent.name: ${evt.name}\nevent.step: ${evt.step}`;
+						if(evt.parent) str+=`\nevent.parent.name: ${evt.parent.name}\nevent.parent.step: ${evt.parent.step}`;
+						if(evt.parent&&evt.parent.parent) str+=`\nevent.parent.parent.name: ${evt.parent.parent.name}\nevent.parent.parent.step: ${evt.parent.parent.step}`;
 						if(evt.player||evt.target||evt.source||evt.skill||evt.card){
 							str+='\n-------------'
 						}
 						if(evt.player){
-							str+='\nplayer: ' + evt.player.name;
+							if(lib.translate[evt.player.name]) str+=`\nplayer: ${lib.translate[evt.player.name]}[${evt.player.name}]`;
+							else str+='\nplayer: '+evt.player.name;
+							let distance=get.distance(_status.roundStart,evt.player,'absolute');
+							if (distance!=Infinity) {
+								str+=`\n座位号: ${distance+1}`;
+							}
 						}
 						if(evt.target){
-							str+='\ntarget: ' + evt.target.name;
+							if(lib.translate[evt.target.name]) str+=`\ntarget: ${lib.translate[evt.target.name]}[${evt.target.name}]`;
+							else str+='\ntarget: '+evt.target.name;
 						}
 						if(evt.source){
-							str+='\nsource: ' + evt.source.name;
+							if(lib.translate[evt.source.name]) str+=`\nsource: ${lib.translate[evt.source.name]}[${evt.source.name}]`;
+							else str+='\nsource: '+evt.source.name;
 						}
 						if(evt.skill){
-							str+='\nskill: ' + evt.skill.name;
+							if(lib.translate[evt.skill]) str+=`\nskill: ${lib.translate[evt.skill]}[${evt.skill}]`;
+							else str+='\nskill: '+evt.skill;
 						}
 						if(evt.card){
-							str+='\ncard: ' + evt.card.name;
+							if(lib.translate[evt.card.name]) str+=`\ncard: ${lib.translate[evt.card.name]}[${evt.card.name}]`;
+							else str+='\ncard: '+evt.card.name;
 						}
 					}
 					str+='\n-------------';
-					str+='\n'+line;
-					str+='\n'+column;
 					if(err&&err.stack) str+='\n'+decodeURI(err.stack);
 					alert(str);
 					window.ea=Array.from(arguments);
@@ -8081,6 +8093,7 @@
 					}
 					lib.assetURL=noname_inited;
 				}
+
 				if(lib.assetURL.indexOf('com.widget.noname.qingyao')!='-1'){
 					alert('您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。');
 				}
@@ -10072,58 +10085,165 @@
 				if(!file) script_src=path;
 				else script_src=`${path}/${file}.js`;
 				if(path.indexOf('http')==0) script_src+=`?rand=${get.id()}`;
-				else if(game.readFile&&lib.config.fuck_sojson&&script_src.includes('extension')!=-1&&script_src.indexOf(lib.assetURL)==0){
+				else if(lib.config.fuck_sojson&&script_src.includes('extension')!=-1&&script_src.indexOf(lib.assetURL)==0){
 					const path_to_read=script_src.slice(lib.assetURL.length);
-					game.readFileAsText(path_to_read,result=>{
-						if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${path_to_read}`);
-					},()=>void 0);
+					const alertMsg=`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${path_to_read}`;
+					if(typeof game.readFileAsText=='function'){
+						game.readFileAsText(path_to_read,result=>{
+							if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(alertMsg);
+						},()=>void 0);
+					}else if(location.origin!='file://'){
+						lib.init.reqSync(path_to_read,function(){
+							var result = this.responseText;
+							if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(alertMsg);
+						},e=>{});
+					}
 				}
 				const script=document.createElement('script');
 				script.src=script_src;
 				if(path.indexOf('http')==0) script.addEventListener('load',()=>script.remove());
 				document.head.appendChild(script);
-				if(typeof onload=='function'){
-					script.addEventListener('load',onload);
-					script.addEventListener('error',onerror);
-				}
+				if(typeof onload=='function') script.addEventListener('load',onload);
+				if(typeof onerror=='function') script.addEventListener('error',onerror);
 				return script;
 			},
-			req:function(str,onload,onerror,master){
-				var sScriptURL;
-				if(str.indexOf('http')==0){
-					sScriptURL=str;
+			/**
+			 * 同步lib.init.js
+			 * @returns { void }
+			 */
+			jsSync:(path,file,onload,onerror)=>{
+				if(lib.assetURL.length==0&&location.origin=='file://'&&typeof game.readFile=='undefined'){
+					const e=new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
+					if(typeof onerror=='function') onerror(e);
+					else throw e;
+					return;
 				}
-				else{
-					var url=get.url(master);
-					if(url[url.length-1]!='/'){
-						url+='/';
+				if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
+				if(path==`${lib.assetURL}mode`&&lib.config.all.stockmode.indexOf(file)==-1){
+					lib.genAwait(lib.init[`setMode_${file}`]()).then(onload);
+					return;
+				}
+				if(Array.isArray(file)){
+					return file.forEach(value=>lib.init.js(path,value,onload,onerror));
+				}
+				let script_src;
+				if(!file) script_src=path;
+				else script_src=`${path}/${file}.js`;
+				if(path.indexOf('http')==0) script_src+=`?rand=${get.id()}`;
+				const xhr=new XMLHttpRequest();
+				let data;
+				xhr.addEventListener("load",()=>{
+					data=xhr.responseText;
+					if(!data) {
+						if(typeof onerror=='function') onerror(new Error(script_src + '加载失败！'));
+						return;
 					}
-					sScriptURL=url+str;
-				}
-				var oReq=new XMLHttpRequest();
-				if(onload) oReq.addEventListener("load",onload);
-				if(onerror) oReq.addEventListener("error",onerror);
-				oReq.open("GET", sScriptURL);
-				oReq.send();
-			},
-			json:function(url,onload,onerror){
-				var oReq=new XMLHttpRequest();
-				if(onload) oReq.addEventListener("load",function(){
-					var result;
+					if(lib.config.fuck_sojson&&script_src.includes('extension')!=-1&&script_src.indexOf(lib.assetURL)==0){
+						const path_to_read=script_src.slice(lib.assetURL.length);
+						if(data.includes('sojson')||data.includes('jsjiami')||data.includes('var _0x')) alert(`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${path_to_read}`);
+					}
 					try{
-						result=JSON.parse(this.responseText);
-						if(!result){
-							throw('err');
+						window.eval(data);
+						if(typeof onload=='function'){
+							onload();
+						}
+					}catch(error){
+						if(typeof onerror=='function'){
+							onerror(error);
 						}
 					}
+				});
+				if(typeof onerror=='function') xhr.addEventListener("error",onerror);
+				xhr.open("GET",script_src,false);
+				xhr.send();
+			},
+			req:(str,onload,onerror,master)=>{
+				let sScriptURL;
+				if(str.indexOf('http')==0) sScriptURL=str;
+				else if(str.startsWith('local:')){
+					sScriptURL=lib.assetURL+str.slice(6);
+				}
+				else{
+					let url=get.url(master);
+					if(url[url.length-1]!='/') url+='/';
+					sScriptURL=url+str;
+				}
+				const oReq=new XMLHttpRequest();
+				if(typeof onload=='function') oReq.addEventListener("load",onload);
+				if(typeof onerror=='function') oReq.addEventListener("error",onerror);
+				oReq.open("GET",sScriptURL);
+				oReq.send();
+			},
+			/**
+			 * 同步lib.init.req
+			 */
+			reqSync:(str,onload,onerror,master)=>{
+				let sScriptURL;
+				if(str.indexOf('http')==0) sScriptURL=str;
+				else if(str.startsWith('local:')){
+					if(lib.assetURL.length==0&&location.origin=='file://'&&typeof game.readFile=='undefined'){
+						const e=new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
+						if(typeof onerror=='function') onerror(e);
+						else throw e;
+						return;
+					}
+					sScriptURL=lib.assetURL+str.slice(6);
+				}
+				else{
+					let url=get.url(master);
+					if(url[url.length-1]!='/')url+='/';
+					sScriptURL=url+str;
+				}
+				const oReq=new XMLHttpRequest();
+				if(typeof onload=='function') oReq.addEventListener("load",onload);
+				if(typeof onerror=='function') oReq.addEventListener("error",onerror);
+				oReq.open("GET",sScriptURL,false);
+				oReq.send();
+				if(typeof onload!=='function') return oReq.responseText;
+			},
+			json:(url,onload,onerror)=>{
+				const oReq=new XMLHttpRequest();
+				if(typeof onload=='function') oReq.addEventListener("load",()=>{
+					let result;
+					try{
+						result=JSON.parse(oReq.responseText);
+						if(!result) throw('err');
+					}
 					catch(e){
-						onerror();
+						if(typeof onerror=='function') onerror(e);
 						return;
 					}
 					onload(result);
 				});
-				if(onerror) oReq.addEventListener("error",onerror);
-				oReq.open("GET", url);
+				if(typeof onerror=='function') oReq.addEventListener("error",onerror);
+				oReq.open("GET",url);
+				oReq.send();
+			},
+			/**
+			 * 同步lib.init.json
+			 */
+			jsonSync:(url,onload,onerror)=>{
+				if(lib.assetURL.length==0&&location.origin=='file://'&&typeof game.readFile=='undefined'){
+					const e=new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
+					if(typeof onerror=='function') onerror(e);
+					else throw e;
+					return;
+				}
+				const oReq=new XMLHttpRequest();
+				if(typeof onload=='function') oReq.addEventListener("load",()=>{
+					let result;
+					try{
+						result=JSON.parse(oReq.responseText);
+						if(!result) throw('err');
+					}
+					catch(e){
+						if(typeof onerror=='function') onerror(e);
+						return;
+					}
+					onload(result);
+				});
+				if(typeof onerror=='function') oReq.addEventListener("error",onerror);
+				oReq.open("GET",url,false);
 				oReq.send();
 			},
 			cssstyles:function(){
@@ -28823,7 +28943,7 @@
 									lib.element.content[item]._parsed=true;
 								}
 							}
-							catch{
+							catch(_){
 								throw new Error(`Content ${item} may not exist.\nlib.element.content[${item}] = ${lib.element.content[item]}`);
 							}
 							this.content=lib.element.content[item];
@@ -33819,7 +33939,7 @@
 			if(typeof player=='string') player={name:player};
 			else{
 				if(info.direct&&!directaudio) return;
-				if(lib.skill.global.contains(skill)&&!lib.skill[skill].forceaudio) return;
+				if(lib.skill.global.includes(skill)&&!lib.skill[skill].forceaudio) return;
 			}
 			var audioname=skill;
 			var audioinfo=info.audio;
@@ -33840,7 +33960,7 @@
 			}
 			var history=[];
 			for(;;){//可以嵌套引用了
-				if(history.contains(audioname)) break;
+				if(history.includes(audioname)) break;
 				history.push(audioname);
 				if(typeof audioinfo=='string'&&lib.skill[audioinfo]){
 					audioname=audioinfo;
@@ -33856,9 +33976,9 @@
 				break;
 			}
 			if(Array.isArray(info.audioname)&&player){
-				if(info.audioname.contains(player.name)&&!info.audioname2[player.name]) audioname+='_'+player.name;
-				else if(info.audioname.contains(player.name1)&&!info.audioname2[player.name1]) audioname+='_'+player.name1;
-				else if(info.audioname.contains(player.name2)&&!info.audioname2[player.name2]) audioname+='_'+player.name2;
+				if(info.audioname.includes(player.name)&&!info.audioname2[player.name]) audioname+='_'+player.name;
+				else if(info.audioname.includes(player.name1)&&!info.audioname2[player.name1]) audioname+='_'+player.name1;
+				else if(info.audioname.includes(player.name2)&&!info.audioname2[player.name2]) audioname+='_'+player.name2;
 			}
 			if(typeof audioinfo=='string'){
 				if(audioinfo.indexOf('ext:')!=0) return;
@@ -33881,7 +34001,7 @@
 		},
 		playSkillAudio:function(name,index){
 			if(_status.video&&arguments[1]!='video') return;
-			if(!lib.config.repeat_audio&&_status.skillaudio.contains(name)) return;
+			if(!lib.config.repeat_audio&&_status.skillaudio.includes(name)) return;
 			game.addVideo('playSkillAudio',null,name);
 			if(name.indexOf('|')<name.lastIndexOf('|')){
 				name=name.slice(name.lastIndexOf('|')+1);
