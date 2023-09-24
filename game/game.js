@@ -9294,6 +9294,18 @@
 							if(!db.objectStoreNames.contains('file')) db.createObjectStore('file');
 							if(!db.objectStoreNames.contains('config')) db.createObjectStore('config');
 							if(!db.objectStoreNames.contains('data')) db.createObjectStore('data');
+							if(db.objectStoreNames.contains('audio')) game.getDB('audio').then(value=>{
+								const keys=Object.keys(value);
+								if(!keys.length) return;
+								const objectStore=db.transaction('file','readwrite').objectStore('file');
+								keys.forEach(element=>objectStore.put(value[element],element));
+							});
+							if(db.objectStoreNames.contains('image')) game.getDB('image').then(value=>{
+								const keys=Object.keys(value);
+								if(!keys.length) return;
+								const objectStore=db.transaction('file','readwrite').objectStore('file');
+								keys.forEach(element=>objectStore.put(value[element],element));
+							});
 						};
 					}).then(value=>{
 						lib.db=value.target.result;
@@ -10291,16 +10303,16 @@
 				style.rel="stylesheet";
 				if(path){
 					if(file) path=`${path}/${file}.css`;
-					(path.indexOf('db:')==0?game.getDB('file',path.slice(3)).then(value=>URL.createObjectURL(new Blob([
-						lib.init.decode(value.replace(/^data:[\s\S]*\/[\s\S]*;base64,/, ""))
-					]))):new Promise(resolve=>resolve(path))).then(value=>style.href=value);
+					(path.indexOf('db:')==0?game.getDB('file',path.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(path))).then(value=>{
+						style.href=value;
+						if(typeof before=='function'){
+							style.addEventListener('load',before);
+							document.head.appendChild(style);
+						}
+						else if(before) document.head.insertBefore(style,before);
+						else document.head.appendChild(style);
+					});
 				}
-				if(typeof before=='function'){
-					style.addEventListener('load',before);
-					document.head.appendChild(style);
-				}
-				else if(before) document.head.insertBefore(style,before);
-				else document.head.appendChild(style);
 				return style;
 			},
 			//在扩展的precontent中调用，用于加载扩展必需的JS文件。
@@ -10342,9 +10354,7 @@
 					}
 				}
 				const script=document.createElement('script');
-				(script_src.indexOf('db:')==0?game.getDB('file',script_src.slice(3)).then(value=>URL.createObjectURL(new Blob([
-					lib.init.decode(value.replace(/^data:[\s\S]*\/[\s\S]*;base64,/, ""))
-				]))):new Promise(resolve=>resolve(script_src))).then(value=>{
+				(script_src.indexOf('db:')==0?game.getDB('file',script_src.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(script_src))).then(value=>{
 					script.src=value;
 					if(path.indexOf('http')==0) script.addEventListener('load',()=>script.remove());
 					document.head.appendChild(script);
@@ -17345,7 +17355,8 @@
 									}
 									else{
 										if(typeof audioinfo=='string'){
-											if(audioinfo.indexOf('ext:')==0) game.playAudio('..','extension',audioinfo.slice(4),card.name+'_'+sex);
+											if(audioinfo.indexOf('db:')==0) game.playAudio(`${audioinfo}${card.name}_${sex}.mp3`);
+											else if(audioinfo.indexOf('ext:')==0) game.playAudio('..','extension',audioinfo.slice(4),`${card.name}_${sex}`);
 											else game.playAudio('card',sex,audioinfo);
 										}
 										else{
@@ -34135,52 +34146,42 @@
 		},
 		playAudio:function(){
 			if(_status.video&&arguments[1]!='video') return;
-			var str='';
-			var onerror=null;
-			for(var i=0;i<arguments.length;i++){
-				if(typeof arguments[i]==='string'||typeof arguments[i]=='number'){
-					str+='/'+arguments[i];
+			let str='',onerror=null;
+			for(const argument of arguments){
+				if(typeof argument==='string'||typeof argument=='number'){
+					if(str) str+='/';
+					str+=argument;
 				}
-				else if(typeof arguments[i]=='function'){
-					onerror=arguments[i]
-				}
+				else if(typeof argument=='function') onerror=argument;
 				if(_status.video) break;
 			}
 			if(!lib.config.repeat_audio&&_status.skillaudio.contains(str)) return;
 			_status.skillaudio.add(str);
 			game.addVideo('playAudio',null,str);
-			setTimeout(function(){
-				_status.skillaudio.remove(str);
-			},1000);
-			var audio=document.createElement('audio');
+			setTimeout(()=>_status.skillaudio.remove(str),1000);
+			const audio=document.createElement('audio');
 			audio.autoplay=true;
 			audio.volume=lib.config.volumn_audio/8;
-			if(str.split('/').pop().split('.').length>1){
-				audio.src=lib.assetURL+'audio'+str;
-			}
-			else{
-				audio.src=lib.assetURL+'audio'+str+'.mp3';
-			}
-			audio.addEventListener('ended',function(){
-				this.remove();
-			});
-			audio.onerror=function(e){
-				if(this._changed){
-					this.remove();
-					if(onerror){
-						onerror(e);
-					}
+			audio.addEventListener('ended',()=>audio.remove());
+			audio.onerror=e=>{
+				if(audio._changed){
+					audio.remove();
+					if(onerror) onerror(e);
+					return;
 				}
-				else{
-					this.src=lib.assetURL+'audio'+str+'.ogg';
-					this._changed=true;
-				}
+				audio.src=`${lib.assetURL}audio/${str}.ogg`;
+				audio._changed=true;
 			};
 			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
-			audio.oncanplay=function(){
-				Promise.resolve(this.play()).catch(()=>void 0);
-			};
-			ui.window.appendChild(audio);
+			audio.oncanplay=()=>Promise.resolve(audio.play()).catch(()=>void 0);
+			new Promise((resolve,reject)=>{
+				if(str.indexOf('db:')==0) game.getDB('file',str.slice(3)).then(value=>resolve(get.objectURL(value)),reject);
+				else if(str.split('/').pop().split('.').length>1) resolve(`${lib.assetURL}audio/${str}`);
+				else resolve(`${lib.assetURL}audio/${str}.mp3`);
+			}).then(value=>{
+				audio.src=value;
+				ui.window.appendChild(audio);
+			});
 			return audio;
 		},
 		trySkillAudio:function(skill,player,directaudio){
@@ -54745,6 +54746,7 @@
 		},
 	};
 	const get={
+		objectURL:octetStream=>URL.createObjectURL(new Blob([Uint8Array.from(atob(octetStream.replace(/^data:[\s\S]*\/[\s\S]*;base64,/,'')),v=>v.charCodeAt(0))])),
 		//Get the card name length
 		//获取此牌的字数
 		cardNameLength:(card,player)=>{
@@ -57583,10 +57585,11 @@
 				if(node.linkplayer){
 					node=node.link;
 				}
-				var capt=get.translation(node.name);
-				if(lib.group.contains(node.group)||get.character(node.name,1)){
-					capt+='&nbsp;&nbsp;'+(lib.group.contains(node.group)?get.translation(node.group):get.translation(get.character(node.name,1)));
-				}
+				let capt=get.translation(node.name);
+				const characterInfo=get.character(node.name),sex=node.sex||characterInfo[0];
+				if(sex) capt+=`&nbsp;&nbsp;${sex=='none'?'无':get.translation(sex)}`;
+				const group=lib.group.includes(node.group)?node.group:characterInfo[1];
+				if(group) capt+=`&nbsp;&nbsp;${get.translation(group)}`;
 				uiintro.add(capt);
 
 				if(lib.characterTitle[node.name]){
@@ -58291,22 +58294,19 @@
 				}
 			}
 			else if(node.classList.contains('character')){
-				var character=node.link,characterinfo=get.character(node.link);
-				if(characterinfo&&characterinfo[1]){
-					var group=get.is.double(node.link,true);
-					if(group){
-						var str=get.translation(character)+'&nbsp;&nbsp;';
-						for(var i=0;i<group.length;i++){
-							str+=get.translation(group[i]);
-							if(i<group.length-1) str+='/';
-						}
-						uiintro.add(str);
+				const character=node.link,characterInfo=get.character(node.link);
+				let capt=get.translation(character);
+				if(characterInfo){
+					const infoSex=characterInfo[0];
+					if(infoSex) capt+=`&nbsp;&nbsp;${infoSex=='none'?'无':lib.translate[infoSex]}`;
+					const infoGroup=characterInfo[1];
+					if(infoGroup){
+						const group=get.is.double(character,true);
+						if(group) capt+=`&nbsp;&nbsp;${group.map(value=>get.translation(value)).join('/')}`;
+						else capt+=`&nbsp;&nbsp;${lib.translate[infoGroup]}`;
 					}
-					else uiintro.add(get.translation(character)+'&nbsp;&nbsp;'+lib.translate[characterinfo[1]]);
 				}
-				else{
-					uiintro.add(get.translation(character));
-				}
+				uiintro.add(capt);
 
 				if(lib.characterTitle[node.link]){
 					uiintro.addText(get.colorspan(lib.characterTitle[node.link]));
