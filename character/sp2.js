@@ -3045,14 +3045,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target,current){
 							if(get.tag(card,'damage')){
-								if(player.hp==target.hp) return;
+								if(player.hp==target.hp||lib.linked.contains(get.nature(card))) return;
 								var cards=[card];
 								if(card.cards&&card.cards.length) cards.addArray(card.cards);
 								if(ui.selected.cards.length) cards.addArray(ui.selected.cards);
 								if(player.countCards('h',function(card){
 									return !cards.contains(card);
 								})==target.countCards('h')) return;
-								return 'zerotarget';
+								return 'zeroplayertarget';
 							}
 						},
 					},
@@ -4707,6 +4707,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num==0) player.awakenSkill('recuorui');
 					player.gainPlayerCard(target,true,'h');
 				},
+				ai:{
+					order:10,
+					result:{
+						player:1,
+						target:function(player,target){
+							if(target.hasSkillTag('noh')) return 0;
+							return -1;
+						}
+					}
+				}
 			},
 			reliewei:{
 				audio:'liewei',
@@ -8948,10 +8958,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					order:1,
-					result:{
-						target:0,
+					order:function(){
+						var player=_status.event.player,num=0;
+						for(var i=1;i<6;i++){
+							num+=player.countEquipableSlot(i);
+						}
+						if(num<=2) return 6;
+						if(player.hp<=2||!game.hasPlayer((current)=>{
+							if(player==current||get.attitude(player,current)<0||current.hp<=1) return false;
+							return current.hp>2||current.countCards('hs')>2;
+						})) return 1;
+						return 0;
 					},
+					result:{
+						target:function(player,target){
+							var num=0;
+							for(var i=1;i<6;i++){
+								num+=target.countEquipableSlot(i);
+							}
+							return num;
+						}
+					}
 				},
 				mark:true,
 				intro:{

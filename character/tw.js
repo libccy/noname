@@ -2558,7 +2558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var target=list[0],count=list[1]||1;
 							event.target=target; event.count=count;
 							'step 1'
-							if(player.countMark('twqiangling')>=2){
+							if(player.countMark('twlinglu_order')>=2){
 								game.log(player,'成功完成了',target,'发布的','#g【令戮】','强令');
 								player.popup('强令成功','wood');
 								player.draw(2);
@@ -2569,7 +2569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.popup('强令失败','fire');
 							}
 							'step 2'
-							if(player.countMark('twqiangling')>=2){
+							if(player.countMark('twlinglu_order')>=2){
 								game.delayx();
 							}
 							else{

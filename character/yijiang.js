@@ -11532,6 +11532,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			miji:{
 				audio:2,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num>0&&_status.event&&_status.event.type==='phase'&&get.tag(card,'recover')){
+							if(player.needsToDiscard()) return num/3;
+							return 0;
+						}
+					}
+				},
 				trigger:{player:'phaseJieshuBegin'},
 				filter:function(event,player){
 					return player.hp<player.maxHp;
@@ -11570,13 +11578,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					threaten:function(player,target){
-						if(target.hp==1) return 3;
-						if(target.hp==2) return 1.5;
-						return 0.5;
+						return 0.6+0.7*target.getDamagedHp();
 					},
 					effect:{
 						target:function(card,player,target){
-							if(get.tag(card,'recover')&&player.hp>=player.maxHp-1) return [0,0];
+							if(target.hp<=2&&get.tag(card,'damage')){
+								var num=1;
+								if(get.itemtype(player)=='player'&&player.hasSkillTag('damageBonus',false,{
+									target:target,
+									card:card
+								})&&!target.hasSkillTag('filterDamage',null,{
+									player:player,
+									card:card
+								})) num=2;
+								if(target.hp>num) return [1,1];
+							}
 						}
 					}
 				}
