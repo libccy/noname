@@ -17343,33 +17343,23 @@
 					if(event.audio===false){
 						cardaudio=false;
 					}
-					if(cardaudio){
-						game.broadcastAll(function(player,card){
-							if(lib.config.background_audio){
-								if(get.type(card)=='equip'&&!lib.config.equip_audio) return;
-								var sex=player.sex=='female'?'female':'male';
-								var audioinfo=lib.card[card.name].audio;
-								// if(audioinfo||true){
-									if(card.name=='sha'&&(card.nature=='fire'||card.nature=='thunder'||card.nature=='ice'||card.nature=='stab')){
-										game.playAudio('card',sex,card.name+'_'+card.nature);
-									}
-									else{
-										if(typeof audioinfo=='string'){
-											if(audioinfo.indexOf('db:')==0) game.playAudio(`${audioinfo}${card.name}_${sex}.mp3`);
-											else if(audioinfo.indexOf('ext:')==0) game.playAudio('..','extension',audioinfo.slice(4),`${card.name}_${sex}`);
-											else game.playAudio('card',sex,audioinfo);
-										}
-										else{
-											game.playAudio('card',sex,card.name);
-										}
-									}
-								// }
-								// else if(get.type(card)!='equip'){
-								// 	game.playAudio('card/default');
-								// }
-							}
-						},player,card);
-					}
+					if(cardaudio) game.broadcastAll((player,card)=>{
+						if(!lib.config.background_audio||get.type(card)=='equip'&&!lib.config.equip_audio) return;
+						const sex=player.sex=='female'?'female':'male';
+						if(card.name=='sha'&&['fire','thunder','ice','stab'].includes(card.nature)){
+							game.playAudio('card',sex,`${card.name}_${card.nature}`);
+							return;
+						}
+						const audio=lib.card[card.name].audio;
+						if(typeof audio=='string'){
+							const audioInfo=audio.split('::');
+							if(audioInfo.length<2) audioInfo.push('mp3');
+							if(audio.indexOf('db:')==0) game.playAudio(`${audioInfo[0]}${card.name}_${sex}.${audioInfo[1]}`);
+							else if(audio.indexOf('ext:')==0) game.playAudio('..','extension',audioInfo[0].slice(4),`${card.name}_${sex}.${audioInfo[1]}`);
+							else game.playAudio('card',sex,`${audioInfo[0]}.${audioInfo[1]}`);
+						}
+						else game.playAudio('card',sex,card.name);
+					},player,card);
 					if(event.animate!=false&&event.line!=false){
 						if(card.name=='wuxie'&&event.getParent()._info_map){
 							var evtmap=event.getParent()._info_map;
@@ -54746,7 +54736,9 @@
 		},
 	};
 	const get={
-		objectURL:octetStream=>URL.createObjectURL(new Blob([Uint8Array.from(atob(octetStream.replace(/^data:[\s\S]*\/[\s\S]*;base64,/,'')),v=>v.charCodeAt(0))])),
+		//Generate an object URL from the Base64-encoded octet stream
+		//从Base64编码的八位字节流生成对象URL
+		objectURL:octetStream=>URL.createObjectURL(new Blob([Uint8Array.from(atob(octetStream.replace(/^data:[\s\S]*\/[\s\S]*;base64,/,'')),v=>v.charCodeAt())])),
 		//Get the card name length
 		//获取此牌的字数
 		cardNameLength:(card,player)=>{
