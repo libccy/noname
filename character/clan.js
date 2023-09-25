@@ -465,7 +465,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						trigger:{global:'phaseEnd'},
 						filter:function(event,player){
-							if(!player.getStorage('clanmingjie_targeted').contains(event.player)) return false;
+							if(!player.getStorage('clanmingjie_effect').contains(event.player)) return false;
 							return event.player!=player||!player.getHistory('useSkill',evt=>evt.skill=='clanmingjie'&&evt.targets[0]==player).length;
 						},
 						forced:true,
