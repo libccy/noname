@@ -90,7 +90,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			cenhun:['male','wu',4,['jishe','lianhuo']],
 			huanghao:['male','shu',3,['qinqing','huisheng']],
-			zhangrang:['male','qun',3,['taoluan']],
+			zhangrang:['male','qun',3,['taoluan'],['sex:male_castrated']],
 			sunziliufang:['male','wei',3,['guizao','jiyu']],
 
 			xinxianying:['female','wei',3,['zhongjian','caishi']],

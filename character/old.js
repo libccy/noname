@@ -81,7 +81,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_machao:['male','qun',4,['zhuiji','oldcihuai']],
 			old_zhugezhan:["male","shu",3,["old_zuilun","old_fuyin"]],
 			zhangliang:["male","qun",4,["old_jijun","old_fangtong"]],
-			ol_zhangrang:['male','qun',3,['xintaoluan']],
+			ol_zhangrang:['male','qun',3,['xintaoluan'],['sex:male_castrated']],
 			ol_guansuo:['male','shu',4,['zhengnan','xiefang']],
 			//ol_manchong:['male','wei',3,['yuce','junxing']],
 			old_guanqiujian:["male","wei",4,["drlt_zhenrong","drlt_hongju"],[]],
