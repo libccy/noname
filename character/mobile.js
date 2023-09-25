@@ -3241,7 +3241,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var list=game.filterPlayer(current=>current!=player).map(current=>{
 								var _hp=current.hp,_maxhp=current.maxHp;
 								current.hp=10; current.maxHp=10;
-								var eff=get.damageEffect(current,player,current)+10;
+								var att=-get.sgnAttitude(player,current);
+								var val=get.damageEffect(current,player,current)*att;
+								current.getSkills(null,false,false).forEach(skill=>{
+									var info=get.info(skill);
+									if(info&&info.ai&&(info.ai.maixie||info.ai.maixie_hp||info.ai.maixie_defend)) val=Math[val>0?'max':'min'](val>0?0.1:-0.1,val+2*att);
+								});
+								var eff=100/val+15;
 								current.hp=_hp; current.maxHp=_maxhp;
 								return [current,eff];
 							}).sort((a,b)=>b[1]-a[1])[0];
@@ -3253,7 +3259,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}).map(current=>{
 								var _hp=targetx.hp,_maxhp=targetx.maxHp;
 								targetx.hp=10; targetx.maxHp=10;
-								var eff=get.damageEffect(targetx,current,player);
+								var eff=-get.damageEffect(targetx,current,current);
 								targetx.hp=_hp; targetx.maxHp=_maxhp;
 								return [current,eff];
 							}).sort((a,b)=>b[1]-a[1])[0][0]==target?10:1);
