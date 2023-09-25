@@ -40003,6 +40003,7 @@
 		},
 		putDB:(storeName,idbValidKey,value,onSuccess,onError)=>{
 			if(!lib.db) return Promise.resolve(value);
+			if(['audio','image'].includes(storeName)) storeName='file';
 			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['putDB',[storeName,idbValidKey,value,event=>{
 				if(typeof onSuccess=='function') onSuccess(event);
 				resolve(event);
@@ -40043,6 +40044,7 @@
 				if(typeof onSuccess=='function') onSuccess(null);
 				resolve(null);
 			});
+			if(['audio','image'].includes(storeName)) storeName='file';
 			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['getDB',[storeName,query,result=>{
 				if(typeof onSuccess=='function') onSuccess(result);
 				resolve(result);
@@ -40113,6 +40115,7 @@
 				if(typeof onSuccess=='function') onSuccess(false);
 				resolve(false);
 			});
+			if(['audio','image'].includes(storeName)) storeName='file';
 			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['deleteDB',[storeName,query,event=>{
 				if(typeof onSuccess=='function') onSuccess(event);
 				resolve(event);
