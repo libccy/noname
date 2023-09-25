@@ -9370,26 +9370,6 @@
 							if(!idbDatabase.objectStoreNames.contains('file')) idbDatabase.createObjectStore('file');
 							if(!idbDatabase.objectStoreNames.contains('config')) idbDatabase.createObjectStore('config');
 							if(!idbDatabase.objectStoreNames.contains('data')) idbDatabase.createObjectStore('data');
-							if(idbDatabase.objectStoreNames.contains('audio')) game.getDB('audio').then(object=>{
-								const keys=Object.keys(object);
-								if(!keys.length) return;
-								const objectStore=idbDatabase.transaction('file','readwrite').objectStore('file');
-								return Promise.allSettled(keys.map(key=>new Promise((resolve,reject)=>{
-									const record=objectStore.put(object[key],key);
-									record.onerror=reject;
-									record.onsuccess=resolve;
-								})));
-							}).then(()=>idbDatabase.deleteObjectStore('audio'));
-							if(idbDatabase.objectStoreNames.contains('image')) game.getDB('image').then(object=>{
-								const keys=Object.keys(object);
-								if(!keys.length) return;
-								const objectStore=idbDatabase.transaction('file','readwrite').objectStore('file');
-								return Promise.allSettled(keys.map(key=>new Promise((resolve,reject)=>{
-									const record=objectStore.put(object[key],key);
-									record.onerror=reject;
-									record.onsuccess=resolve;
-								})));
-							}).then(()=>idbDatabase.deleteObjectStore('image'));
 						};
 					}).then(event=>{
 						lib.db=event.target.result;
@@ -10243,9 +10223,7 @@
 						ui.create.div(node,'.splashtext',get.verticalStr(get.translation(lib.config.all.mode[i])));
 						if(lib.config.all.stockmode.indexOf(lib.config.all.mode[i])!=-1){
 							// 初始启动页设置
-							if(lib.config.splash_style==undefined){
-								lib.configMenu.appearence.config.splash_style.onclick('style1');
-							}
+							if(lib.config.splash_style==undefined) game.saveConfig('splash_style','style1');
 							splash.dataset.splash_style=lib.config.splash_style;
 							// 扩展可通过window.splashurl设置素材读取路径
 							if(window.splashurl==undefined)window.splashurl='image/splash/';
@@ -53662,12 +53640,12 @@
 					const characterSexDiv=ui.create.div('.character-sex',characterIntroTable),exInfoSex=exInfo&&exInfo.find(value=>value.indexOf('sex:')==0),characterSex=exInfoSex?exInfoSex.split(':').pop():nameInfo[0];
 					new Promise((resolve,reject)=>{
 						const imageName=`sex_${characterSex}`,info=lib.card[imageName];
-						if(!info) resolve(`image/card/${imageName}.png`);
+						if(!info) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 						const image=info.image;
-						if(!image) resolve(`image/card/${imageName}.png`);
+						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 						else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
-						else if(image.indexOf('ext:')==0) resolve(image.replace(/ext:/,'extension/'));
-						else resolve(image);
+						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/ext:/,'extension/')}`);
+						else resolve(`${lib.assetURL}${image}`);
 					}).then(source=>new Promise((resolve,reject)=>{
 						const image=new Image();
 						image.onload=()=>resolve(image);
@@ -53677,12 +53655,12 @@
 					const characterGroupDiv=ui.create.div('.character-group',characterIntroTable),characterGroups=get.is.double(name,true);
 					if(characterGroups) Promise.all(characterGroups.map(characterGroup=>new Promise((resolve,reject)=>{
 						const imageName=`group_${characterGroup}`,information=lib.card[imageName];
-						if(!information) resolve(`image/card/${imageName}.png`);
+						if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 						const image=information.image;
-						if(!image) resolve(`image/card/${imageName}.png`);
+						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 						else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
-						else if(image.indexOf('ext:')==0) resolve(image.replace(/ext:/,'extension/'));
-						else resolve(image);
+						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/ext:/,'extension/')}`);
+						else resolve(`${lib.assetURL}${image}`);
 					}).then(source=>new Promise((resolve,reject)=>{
 						const image=new Image();
 						image.onload=()=>resolve(image);
@@ -53697,12 +53675,12 @@
 						const characterGroup=nameInfo[1];
 						new Promise((resolve,reject)=>{
 							const imageName=`group_${characterGroup}`,information=lib.card[imageName];
-							if(!information) resolve(`image/card/${imageName}.png`);
+							if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 							const image=information.image;
-							if(!image) resolve(`image/card/${imageName}.png`);
+							if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 							else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
-							else if(image.indexOf('ext:')==0) resolve(image.replace(/ext:/,'extension/'));
-							else resolve(image);
+							else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/ext:/,'extension/')}`);
+							else resolve(`${lib.assetURL}${image}`);
 						}).then(source=>new Promise((resolve,reject)=>{
 							const image=new Image();
 							image.onload=()=>resolve(image);
