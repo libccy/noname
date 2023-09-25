@@ -34156,9 +34156,9 @@
 				break;
 			}
 			if(Array.isArray(info.audioname)&&player){
-				if(info.audioname.includes(player.name)&&!info.audioname2[player.name]) audioname+='_'+player.name;
-				else if(info.audioname.includes(player.name1)&&!info.audioname2[player.name1]) audioname+='_'+player.name1;
-				else if(info.audioname.includes(player.name2)&&!info.audioname2[player.name2]) audioname+='_'+player.name2;
+				if(info.audioname.includes(player.name)&&(!info.audioname2||!info.audioname2[player.name])) audioname+='_'+player.name;
+				else if(info.audioname.includes(player.name1)&&(!info.audioname2||!info.audioname2[player.name1])) audioname+='_'+player.name1;
+				else if(info.audioname.includes(player.name2)&&(!info.audioname2||!info.audioname2[player.name2])) audioname+='_'+player.name2;
 			}
 			if(typeof audioinfo=='string'){
 				if(audioinfo.indexOf('ext:')!=0) return;
