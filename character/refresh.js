@@ -14610,7 +14610,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadepojun2:'破军',
 			decadepojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上（X为其体力值）。若这些牌中：有装备牌，你将这些装备牌中的一张置于弃牌堆；有锦囊牌，你摸一张牌。其于回合结束时获得其武将牌上的这些牌。',
 			re_wangyi:'界王异',
-			wangyi:'王异',
 			guanzhang:'关兴张苞',
 			rezishou:'自守',
 			rezishou2:'自守',
