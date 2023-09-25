@@ -19278,6 +19278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			远野美凪:['Toono','Minagi'],
 			樱庭星罗:['Sakuraba','Seira'],
 			坂上智代:['Sakagami','Tomoyo'],
+			冈崎汐:['Okazaki','Ushio']
 		},
 	};
 });
