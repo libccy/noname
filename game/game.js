@@ -3987,6 +3987,7 @@
 							style.width='150px';
 							const firstChild=node.firstChild;
 							firstChild.removeAttribute('class');
+							firstChild.style.position='initial';
 							if(link=='false') return;
 							const ruby=document.createElement('ruby');
 							ruby.textContent=name;
@@ -53639,9 +53640,9 @@
 					characterIntroTable.appendChild(ruby);
 					const characterSexDiv=ui.create.div('.character-sex',characterIntroTable),exInfoSex=exInfo&&exInfo.find(value=>value.indexOf('sex:')==0),characterSex=exInfoSex?exInfoSex.split(':').pop():nameInfo[0];
 					new Promise((resolve,reject)=>{
-						const imageName=`sex_${characterSex}`,info=lib.card[imageName];
-						if(!info) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						const image=info.image;
+						const imageName=`sex_${characterSex}`,information=lib.card[imageName];
+						if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+						const image=information.image;
 						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 						else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
 						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/ext:/,'extension/')}`);
