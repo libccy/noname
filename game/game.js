@@ -4027,6 +4027,7 @@
 							style.width='150px';
 							const firstChild=node.firstChild;
 							firstChild.removeAttribute('class');
+							firstChild.style.position='initial';
 							if(link=='false') return;
 							const ruby=document.createElement('ruby');
 							ruby.textContent=name;
