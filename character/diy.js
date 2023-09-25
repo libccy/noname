@@ -188,6 +188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junk_huangyueying:['female','shu',3,['junkjizhi','junkqicai']],
 			junk_lidian:['male','wei',3,['xunxun','junkwangxi']],
 			junk_duanwei:['male','qun',4,['junklangmie']],
+			junk_xuyou:["male","qun",3,["nzry_chenglve","junkshicai","nzry_cunmu"]],
 		},
 		characterFilter:{
 			key_jojiro:function(mode){
@@ -222,7 +223,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_default:["diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji"],
 				diy_noname:['noname'],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano","db_key_liyingxia","key_erika","key_satomi","key_iriya","key_fuuko"],
-				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','old_bulianshi','junk_sunquan','ol_maliang','junk_liubei','junk_huangyueying','junk_lidian','junk_duanwei'],
+				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','old_bulianshi','junk_sunquan','ol_maliang','junk_liubei','junk_huangyueying','junk_lidian','junk_duanwei','junk_xuyou'],
 			},
 		},
 		characterIntro:{
@@ -12543,6 +12544,64 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			
+			//手杀削弱版许攸
+			junkshicai:{
+				audio:'nzry_shicai_2',
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					if(!event.cards.filterInD('oe').length) return false;
+					return player.getHistory('useCard',evt=>get.type2(evt.card)==get.type2(event.card)).indexOf(event)==0;
+				},
+				prompt2:function(event,player){
+					const cards=event.cards.filterInD('oe');
+					return '你可以将'+get.translation(cards)+(cards.length>1?'以任意顺序':'')+'置于牌堆顶，然后摸一张牌';
+				},
+				content:function(){
+					'step 0'
+					event.cards=trigger.cards.filterInD('oe');
+					var lose_list=[];
+					event.cards.forEach(card=>{
+						var owner=get.owner(card);
+						if(owner){
+							var arr=lose_list.find(i=>i[0]==owner);
+							if(arr) arr[1].push(card);
+							else lose_list.push([owner,[card]]);
+						}
+					});
+					if(lose_list.length){
+						game.loseAsync({
+							lose_list:lose_list,
+						}).setContent('chooseToCompareLose');
+					}
+					'step 1'
+					if(cards.length>1){
+						var next=player.chooseToMove('恃才：将牌按顺序置于牌堆顶');
+						next.set('list',[['牌堆顶',cards]]);
+						next.set('reverse',((_status.currentPhase&&_status.currentPhase.next)?get.attitude(player,_status.currentPhase.next)>0:false));
+						next.set('processAI',function(list){
+							var cards=list[0][1].slice(0);
+							cards.sort(function(a,b){
+								return (_status.event.reverse?1:-1)*(get.value(b)-get.value(a));
+							});
+							return [cards];
+						});
+					}
+					'step 2'
+					if(result.bool&&result.moved&&result.moved[0].length) cards=result.moved[0].slice(0);
+					cards.reverse();
+					game.cardsGotoPile(cards,'insert');
+					game.log(player,'将',cards,'置于了牌堆顶');
+					player.draw();
+				},
+				ai:{
+					reverseOrder:true,
+					skillTagFilter:function(player){
+						if(player.getHistory('useCard',function(evt){
+							return get.type(evt.card)=='equip';
+						}).length>0) return false;
+					},
+				},
+			},
 			//削弱版段煨
 			junklangmie:{
 				audio:'langmie',
@@ -19101,6 +19160,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junkwangxi_tag:'invisible',
 			junklangmie:'狼灭',
 			junklangmie_info:'其他角色的结束阶段开始时，你可以选择一项：⒈若其本回合内使用过某种类型的牌超过一张，则你弃置一张牌并摸两张牌。⒉若其本回合累计造成过的伤害大于1，则你弃置一张牌，然后对其造成1点伤害。',
+			junkshicai:"恃才",
+			junkshicai_info:"当你使用牌结束完毕后，若此牌与你本回合使用的牌类型均不同，则你可以将此牌置于牌堆顶，然后摸一张牌。",
 			ol_guohuai_ab:'郭淮',
 			old_jiakui:'通渠贾逵',
 			ol_guohuai:'三血郭淮',
@@ -19113,6 +19174,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junk_lidian_ab:'李典',
 			junk_duanwei:'削弱段煨',
 			junk_duanwei_ab:'段煨',
+			junk_xuyou:'手杀许攸',
 			
 			diy_tieba:'吧友设计',
 			diy_xushi:'玩点论杀·虚实篇',

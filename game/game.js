@@ -7650,12 +7650,17 @@
 					enumerable:false,
 					writable:true,
 					value:function(pos){
-						if(!pos) pos='o';
-						var list=[];
-						for(var i=0;i<this.length;i++){
-							if(pos.indexOf(get.position(this[i],true))!=-1) list.push(this[i]);
-						}
-						return list;
+						if(typeof pos!='string') pos='o';
+						return this.filter(card=>pos.includes(get.position(card,true)));
+					}
+				});
+				Object.defineProperty(Array.prototype, "someInD", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(pos){
+						if(typeof pos!='string') pos='o';
+						return this.some(card=>pos.includes(get.position(card,true)));
 					}
 				});
 				Object.defineProperty(Array.prototype, "contains", {
