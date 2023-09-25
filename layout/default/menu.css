@@ -304,46 +304,6 @@
 	margin-right: 10px;
 }
 
-.menubg.charactercard .characterintro .character-group img,
-.menubg.charactercard .characterintro .character-sex img {
-	height: 1em;
-	margin-left: 0.25em;
-	margin-right: 0.25em;
-	transform: scale(1.5);
-	vertical-align: bottom;
-}
-
-.menubg.charactercard .characterintro .character-intro-table {
-	align-items: center;
-	display: flex;
-	flex-wrap: wrap;
-	padding-left: 0.5em;
-	padding-right: 0.5em;
-	white-space: nowrap;
-}
-
-@supports (row-gap: 0.5em) {
-	.menubg.charactercard .characterintro .character-intro-table {
-		column-gap: 1em;
-		row-gap: 0.5em;
-	}
-}
-
-@supports not (row-gap: 0.5em) {
-	.menubg.charactercard .characterintro .character-intro-table>:last-child {
-		margin-bottom: 0.5em;
-		margin-top: 0.5em;
-	}
-
-	.menubg.charactercard .characterintro .character-intro-table>:not(:first-child) {
-		margin-left: 0.5em;
-	}
-
-	.menubg.charactercard .characterintro .character-intro-table>:not(:last-child) {
-		margin-right: 0.5em;
-	}
-}
-
 .menubg.charactercard .characterintro .hp {
 	height: initial;
 	left: initial;
@@ -364,21 +324,46 @@
 	background: none !important;
 	border: none !important;
 	box-shadow: none !important;
-	filter: initial !important;
-	-webkit-filter: initial !important;
-	font-family: 'xinwei' !important;
-	transform: initial !important;
-	height: initial !important;
-	width: initial !important;
+	filter: initial;
+	-webkit-filter: initial;
+	height: initial;
+	width: initial;
 }
 
-.menubg.charactercard .characterintro div {
+.menubg.charactercard .characterintro div,
+.menubg.charactercard .characterintro.intro2 div {
 	position: initial;
 }
 
 .menubg.charactercard .characterintro rp,
-.menubg.charactercard .characterintro rt {
+.menubg.charactercard .characterintro rt,
+.menubg.charactercard .characterintro.intro2 rp,
+.menubg.charactercard .characterintro.intro2 rt {
 	font-size: smaller;
+}
+
+.menubg.charactercard .characterintro table td img {
+	height: 1.5em;
+	vertical-align: middle;
+}
+
+.menubg.charactercard .characterintro table td {
+	white-space: nowrap;
+}
+
+.menubg.charactercard .characterintro table td:first-child {
+	width: 25%;
+}
+
+.menubg.charactercard .characterintro table td:not(:first-child) {
+	text-align: center;
+}
+
+.menubg.charactercard .characterintro table {
+	border-collapse: collapse;
+	border-color: currentColor;
+	table-layout: auto;
+	width: 100%;
 }
 
 .menubg.charactercard .characterintro {
@@ -1900,6 +1885,10 @@ input.fileinput::-webkit-file-upload-button {
 	cursor: pointer;
 }
 
+.popup-container.editor>div>.editbutton:not(:first-child) {
+	position: relative;
+}
+
 .popup-container.editor>div>.editbutton:first-child {
 	left: auto;
 	right: 0;
@@ -1910,6 +1899,7 @@ input.fileinput::-webkit-file-upload-button {
 	height: calc(100% - 40px);
 	position: absolute;
 	top: 40px;
+	left: 0px;
 	border-radius: 0 0 4px 4px;
 	border-top: 1px solid rgba(0, 0, 0, 0.2);
 }

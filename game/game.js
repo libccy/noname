@@ -6062,13 +6062,6 @@
 								return;
 							}
 							var container=ui.create.div('.popup-container.editor');
-							var editorpage=ui.create.div(container);
-							var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-								ui.window.classList.remove('shortcutpaused');
-								ui.window.classList.remove('systempaused');
-								container.delete(null);
-								delete window.saveNonameInput;
-							});
 							var node=container;
 							var map=get.config('character_three')||lib.choiceThree;
 							var str='character=[\n    ';
@@ -6107,8 +6100,7 @@
 								delete window.saveNonameInput;
 							};
 							window.saveNonameInput=saveInput;
-							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-							var editor=ui.create.div(editorpage);
+							var editor=ui.create.editor(container,saveInput);
 							if(node.aced){
 								ui.window.appendChild(node);
 								node.editor.setValue(node.code,1);
@@ -6126,18 +6118,42 @@
 							else{
 								var aceReady=function(){
 									ui.window.appendChild(node);
-									var mirror = window.CodeMirror(editor, {
+									node.style.fontSize=20/game.documentZoom+'px';
+									var mirror=window.CodeMirror(editor,{
 										value:node.code,
 										mode:"javascript",
 										lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
 										lineNumbers:true,
 										indentUnit:4,
 										autoCloseBrackets:true,
-										theme:'mdn-like',
+										theme:lib.config.codeMirror_theme||'mdn-like',
+										extraKeys:{
+											"Ctrl-Z":"undo",//撤销
+											"Ctrl-Y":"redo",//恢复撤销
+											"Ctrl-A":"selectAll",//全选
+										},
 									});
 									lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
 									node.aced=true;
 									node.editor=mirror;
+									setTimeout(()=>{
+										mirror.refresh();
+									},0);
+									node.editor.on('change',function(e,change){
+										var code;
+										if(node.editor){
+											code=node.editor.getValue();
+										}else if(node.textarea){
+											code=node.textarea.value;
+										};
+										//动态绑定文本
+										if(code.length&&change.origin=="+input" &&
+											/{|}|\s|=|;|:|,|，|。|？|！|\!|\?|&|#|%|@|‘|’|；/.test(change.text[0])==false&&
+											change.text.length==1) {
+											//输入了代码，并且不包括空格，{}，=， ; ， : ， 逗号等，才可以自动提示
+											node.editor.showHint();
+										}
+									});
 								}
 								if(!window.ace){
 									lib.init.js(lib.assetURL+'game','codemirror',aceReady);
@@ -6169,13 +6185,6 @@
 								return;
 							}
 							var container=ui.create.div('.popup-container.editor');
-							var editorpage=ui.create.div(container);
-							var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-								ui.window.classList.remove('shortcutpaused');
-								ui.window.classList.remove('systempaused');
-								container.delete(null);
-								delete window.saveNonameInput;
-							});
 							var node=container;
 							var map=get.config('character_four')||lib.choiceFour;
 							var str='character=[\n    ';
@@ -6214,8 +6223,7 @@
 								delete window.saveNonameInput;
 							};
 							window.saveNonameInput=saveInput;
-							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-							var editor=ui.create.div(editorpage);
+							var editor=ui.create.editor(container,saveInput);
 							if(node.aced){
 								ui.window.appendChild(node);
 								node.editor.setValue(node.code,1);
@@ -6233,19 +6241,42 @@
 							else{
 								var aceReady=function(){
 									ui.window.appendChild(node);
-									var mirror = window.CodeMirror(editor, {
+									node.style.fontSize=20/game.documentZoom+'px';
+									var mirror=window.CodeMirror(editor,{
 										value:node.code,
 										mode:"javascript",
 										lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
 										lineNumbers:true,
 										indentUnit:4,
 										autoCloseBrackets:true,
-										theme:'mdn-like',
-										gameZoom:game.documentZoom,
+										theme:lib.config.codeMirror_theme||'mdn-like',
+										extraKeys:{
+											"Ctrl-Z":"undo",//撤销
+											"Ctrl-Y":"redo",//恢复撤销
+											"Ctrl-A":"selectAll",//全选
+										},
 									});
 									lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
 									node.aced=true;
 									node.editor=mirror;
+									setTimeout(()=>{
+										mirror.refresh();
+									},0);
+									node.editor.on('change',function(e,change){
+										var code;
+										if(node.editor){
+											code=node.editor.getValue();
+										}else if(node.textarea){
+											code=node.textarea.value;
+										};
+										//动态绑定文本
+										if(code.length&&change.origin=="+input" &&
+											/{|}|\s|=|;|:|,|，|。|？|！|\!|\?|&|#|%|@|‘|’|；/.test(change.text[0])==false&&
+											change.text.length==1) {
+											//输入了代码，并且不包括空格，{}，=， ; ， : ， 逗号等，才可以自动提示
+											node.editor.showHint();
+										}
+									});
 								}
 								if(!window.ace){
 									lib.init.js(lib.assetURL+'game','codemirror',aceReady);
@@ -6628,13 +6659,6 @@
 								return;
 							}
 							var container=ui.create.div('.popup-container.editor');
-							var editorpage=ui.create.div(container);
-							var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-								ui.window.classList.remove('shortcutpaused');
-								ui.window.classList.remove('systempaused');
-								container.delete(null);
-								delete window.saveNonameInput;
-							});
 							var node=container;
 							var map=get.config('character_online')||lib.characterOnline;
 							node.code='character='+get.stringify(map)+'\n/*\n    这里是智斗三国模式的武将将池。\n    您可以在这里编辑对武将将池进行编辑，然后点击“保存”按钮即可保存。\n    将池中的Key势力武将，仅同时在没有被禁用的情况下，才会出现在选将框中。\n    而非Key势力的武将，只要所在的武将包没有被隐藏，即可出现在选将框中。\n    该将池为单机模式/联机模式通用将池。在这里编辑后，即使进入联机模式，也依然会生效。\n    但联机模式本身禁用的武将（如神貂蝉）不会出现在联机模式的选将框中。\n*/';
@@ -6684,8 +6708,7 @@
 								delete window.saveNonameInput;
 							};
 							window.saveNonameInput=saveInput;
-							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-							var editor=ui.create.div(editorpage);
+							var editor=ui.create.editor(container,saveInput);
 							if(node.aced){
 								ui.window.appendChild(node);
 								node.editor.setValue(node.code,1);
@@ -6703,18 +6726,42 @@
 							else{
 								var aceReady=function(){
 									ui.window.appendChild(node);
-									var mirror = window.CodeMirror(editor, {
+									node.style.fontSize=20/game.documentZoom+'px';
+									var mirror=window.CodeMirror(editor,{
 										value:node.code,
 										mode:"javascript",
 										lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
 										lineNumbers:true,
 										indentUnit:4,
 										autoCloseBrackets:true,
-										theme:'mdn-like'
+										theme:lib.config.codeMirror_theme||'mdn-like',
+										extraKeys:{
+											"Ctrl-Z":"undo",//撤销
+											"Ctrl-Y":"redo",//恢复撤销
+											"Ctrl-A":"selectAll",//全选
+										},
 									});
 									lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
 									node.aced=true;
 									node.editor=mirror;
+									setTimeout(()=>{
+										mirror.refresh();
+									},0);
+									node.editor.on('change',function(e,change){
+										var code;
+										if(node.editor){
+											code=node.editor.getValue();
+										}else if(node.textarea){
+											code=node.textarea.value;
+										};
+										//动态绑定文本
+										if(code.length&&change.origin=="+input" &&
+											/{|}|\s|=|;|:|,|，|。|？|！|\!|\?|&|#|%|@|‘|’|；/.test(change.text[0])==false&&
+											change.text.length==1) {
+											//输入了代码，并且不包括空格，{}，=， ; ， : ， 逗号等，才可以自动提示
+											node.editor.showHint();
+										}
+									});
 								}
 								if(!window.ace){
 									lib.init.js(lib.assetURL+'game','codemirror',aceReady);
@@ -40582,6 +40629,153 @@
 			void window.getComputedStyle(node, null).getPropertyValue("opacity");
 		},
 		create:{
+			/**
+			 * 创建codemirror编辑器
+			 * @param {HTMLDivElement} container 
+			 * @param {Function} saveInput 
+			 */
+			editor:function(container,saveInput){
+				var createList=[];
+				var containerDelete=container.delete;
+				//删除container的时候，删除创建的ul列表
+				container.delete=function(){
+					for (var i=createList.length-1;i>=0;i--){
+						createList[i].parentNode&&createList[i].parentNode.removeChild(createList[i]);
+					}
+					containerDelete.apply(this, arguments);
+				}
+				//创建ul列表
+				var createMenu=function(pos,self,List,click){
+					if (self&&self.hasMenu) return false;
+					var parent=self.parentNode;
+					if (parent){
+						for(var i=0;i<parent.childElementCount;i++){
+							var node=parent.childNodes[i];
+							node!=self&&node.createMenu&&closeMenu(node);
+						}
+					}
+					var editor=container.editor;
+					if(!editor) return false;
+					self.style.background='#08f';
+					var ul=document.createElement('ul');
+					container.css.call(ul,{
+						position:'absolute',
+						top:pos.bottom+'px',
+						left: pos.left + 'px',
+						height:'20em',
+						width:pos.width*4+'px',
+						//'font-family':'shousha',
+						'font-size':'20px',
+					});
+					var theme=editor.options.theme;
+					lib.setScroll(ul);
+					lib.setMousewheel(ul);
+					ul.className="CodeMirror-hints "+theme;
+					var getActive=function(){
+						var i=0;
+						while(i<ul.childElementCount){
+							if(ul.childNodes[i].classList.contains('CodeMirror-hint-active')){
+								break;
+							}else{
+								i++;
+							}
+						}
+						return i;
+					}
+					var setActive=function(i){
+						ul.childNodes[getActive()].classList.remove('CodeMirror-hint-active');
+						ul.childNodes[i].classList.add('CodeMirror-hint-active');
+						return i;
+					}
+					if (List&&List.length&&click) {
+						for(var i=0;i<List.length;++i) {
+							var elt=ul.appendChild(document.createElement("li"));
+							elt.style.color='black';
+							elt.style.boxShadow='none';
+							var cur;
+							if(List[i].lastIndexOf(".")!=-1){
+								cur=List[i].slice(0, List[i].lastIndexOf("."));
+							}else{
+								cur=List[i];
+							}
+							elt.innerHTML=cur;
+							var className="CodeMirror-hint"+(i!=0?"":" "+"CodeMirror-hint-active");
+							if(cur.className!=null) className=cur.className+" "+className;
+							elt.className=className;
+							elt.hintId=i;
+							elt.addEventListener('click',click);
+							elt.addEventListener(lib.config.touchscreen?'touchstart':'mouseover',function(e){
+								setActive(this.hintId);
+								this.focus();
+							});
+						}
+					}
+					createList.push(ul);
+					ui.window.appendChild(ul);
+					return ul;
+				};
+				//关闭ul列表
+				var closeMenu=function(self){
+					var ul=self.createMenu;
+					if (!ul) return false;
+					ui.window.removeChild(ul);
+					self.style.background='';
+					delete self.createMenu;
+					createList.remove(ul);
+					return ul;
+				};
+				var editorpage=ui.create.div(container);
+				var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
+					ui.window.classList.remove('shortcutpaused');
+					ui.window.classList.remove('systempaused');
+					container.delete(null);
+					delete window.saveNonameInput;
+				});
+				var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
+				var theme=ui.create.div('.editbutton','主题',editorpage,function(){
+					if (this&&this.createMenu) {
+						closeMenu(this);
+						return;
+					}
+					//主题列表
+					var list=['mdn-like','mbo'];
+					//正在使用的主题
+					var active = container.editor.options.theme;
+					//排个序
+					list.remove(active).splice(0, 0, active);
+					var self=this;
+					// 元素位置
+					var pos=this.getBoundingClientRect();
+					// 点击事件
+					var click=function(e){
+						var theme=this.innerHTML;
+						container.editor.setOption("theme",theme);
+						game.saveConfig('codeMirror_theme', theme);
+						closeMenu(self);
+					};
+					var ul=createMenu(pos,self,list,click);
+					this.createMenu=ul;
+				});
+				var edit=ui.create.div('.editbutton','编辑',editorpage,function(){
+					if (this&&this.createMenu) {
+						closeMenu(this);
+						return;
+					}
+					var self=this;
+					var pos=this.getBoundingClientRect();
+					var list = ['撤销\t\tCtrl+Z', '恢复撤销\tCtrl+Y', '全选\t\tCtrl+A'];
+					var click=function(e){
+						var num=this.innerHTML.indexOf("Ctrl");
+						var inner=this.innerHTML.slice(num).replace("+", "-");
+						container.editor.execCommand(container.editor.options.extraKeys[inner]);
+						closeMenu(self);
+					};
+					var ul=createMenu(pos,self,list,click);
+					this.createMenu=ul;
+				});
+				var editor=ui.create.div(editorpage);
+				return editor;
+			},
 			cardTempName:function(card,applyNode){
 				let getApplyNode=applyNode||card;
 				let cardName=get.name(card);
@@ -45311,18 +45505,42 @@
 									else{
 										var aceReady=function(){
 											ui.window.appendChild(node);
-											var mirror = window.CodeMirror(editor, {
+											node.style.fontSize=20/game.documentZoom+'px';
+											var mirror=window.CodeMirror(editor,{
 												value:node.code,
 												mode:"javascript",
 												lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
 												lineNumbers:true,
 												indentUnit:4,
 												autoCloseBrackets:true,
-												theme:'mdn-like'
+												theme:lib.config.codeMirror_theme||'mdn-like',
+												extraKeys:{
+													"Ctrl-Z":"undo",//撤销
+													"Ctrl-Y":"redo",//恢复撤销
+													"Ctrl-A":"selectAll",//全选
+												},
 											});
 											lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
 											node.aced=true;
 											node.editor=mirror;
+											setTimeout(()=>{
+												mirror.refresh();
+											},0);
+											node.editor.on('change',function(e,change){
+												var code;
+												if(node.editor){
+													code=node.editor.getValue();
+												}else if(node.textarea){
+													code=node.textarea.value;
+												};
+												//动态绑定文本
+												if(code.length&&change.origin=="+input" &&
+													/{|}|\s|=|;|:|,|，|。|？|！|\!|\?|&|#|%|@|‘|’|；/.test(change.text[0])==false&&
+													change.text.length==1) {
+													//输入了代码，并且不包括空格，{}，=， ; ， : ， 逗号等，才可以自动提示
+													node.editor.showHint();
+												}
+											});
 										}
 										if(!window.CodeMirror){
 											lib.init.js(lib.assetURL+'game','codemirror',aceReady);
@@ -45335,13 +45553,6 @@
 								}
 
 								var container=ui.create.div('.popup-container.editor');
-								var editorpage=ui.create.div(container);
-								var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-									ui.window.classList.remove('shortcutpaused');
-									ui.window.classList.remove('systempaused');
-									container.delete(null);
-									delete window.saveNonameInput;
-								});
 								var saveInput=function(){
 									var code;
 									if(container.editor){
@@ -45373,8 +45584,7 @@
 									container.code=code;
 									delete window.saveNonameInput;
 								};
-								var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-								var editor=ui.create.div(editorpage);
+								var editor=ui.create.editor(container,saveInput);
 								container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
 								var editnode=ui.create.div('.menubutton.large.new_card.disabled','创建卡牌',newCard,function(){
@@ -45763,18 +45973,42 @@
 									else{
 										var aceReady=function(){
 											ui.window.appendChild(node);
-											var mirror = window.CodeMirror(editor, {
+											node.style.fontSize=20/game.documentZoom+'px';
+											var mirror=window.CodeMirror(editor,{
 												value:node.code,
 												mode:"javascript",
 												lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
 												lineNumbers:true,
 												indentUnit:4,
 												autoCloseBrackets:true,
-												theme:'mdn-like'
+												theme:lib.config.codeMirror_theme||'mdn-like',
+												extraKeys:{
+													"Ctrl-Z":"undo",//撤销
+													"Ctrl-Y":"redo",//恢复撤销
+													"Ctrl-A":"selectAll",//全选
+												},
 											});
 											lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
 											node.aced=true;
 											node.editor=mirror;
+											setTimeout(()=>{
+												mirror.refresh();
+											},0);
+											node.editor.on('change',function(e,change){
+												var code;
+												if(node.editor){
+													code=node.editor.getValue();
+												}else if(node.textarea){
+													code=node.textarea.value;
+												};
+												//动态绑定文本
+												if(code.length&&change.origin=="+input" &&
+													/{|}|\s|=|;|:|,|，|。|？|！|\!|\?|&|#|%|@|‘|’|；/.test(change.text[0])==false&&
+													change.text.length==1) {
+													//输入了代码，并且不包括空格，{}，=， ; ， : ， 逗号等，才可以自动提示
+													node.editor.showHint();
+												}
+											});
 										}
 										if(!window.ace){
 											lib.init.js(lib.assetURL+'game','codemirror',aceReady);
@@ -45787,13 +46021,6 @@
 								}
 
 								var container=ui.create.div('.popup-container.editor');
-								var editorpage=ui.create.div(container);
-								var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-									ui.window.classList.remove('shortcutpaused');
-									ui.window.classList.remove('systempaused');
-									container.delete(null);
-									delete window.saveNonameInput;
-								});
 								var saveInput=function(){
 									var code;
 									if(container.editor){
@@ -45825,8 +46052,7 @@
 									container.code=code;
 									delete window.saveNonameInput;
 								};
-								var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-								var editor=ui.create.div(editorpage);
+								var editor=ui.create.editor(container,saveInput);
 								container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
 								var citebutton=document.createElement('button');
@@ -46071,13 +46297,6 @@
 									ui.create.div('',str1,dash);
 									ui.create.div('',str2,dash);
 									var container=ui.create.div('.popup-container.editor');
-									var editorpage=ui.create.div(container);
-									var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-										ui.window.classList.remove('shortcutpaused');
-										ui.window.classList.remove('systempaused');
-										container.delete(null);
-										delete window.saveNonameInput;
-									});
 									var saveInput=function(){
 										var code;
 										if(container.editor){
@@ -46126,8 +46345,7 @@
 										page.content[link]=code;
 										delete window.saveNonameInput;
 									};
-									var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-									var editor=ui.create.div(editorpage);
+									var editor=ui.create.editor(container,saveInput);
 									container.code=str;
 									dash.editor=editor;
 									dash.node=container;
@@ -46157,18 +46375,42 @@
 										var editor=this.editor;
 										var aceReady=function(){
 											ui.window.appendChild(node);
-											var mirror = window.CodeMirror(editor, {
+											node.style.fontSize=20/game.documentZoom+'px';
+											var mirror=window.CodeMirror(editor,{
 												value:node.code,
 												mode:"javascript",
 												lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
 												lineNumbers:true,
 												indentUnit:4,
 												autoCloseBrackets:true,
-												theme:'mdn-like'
+												theme:lib.config.codeMirror_theme||'mdn-like',
+												extraKeys:{
+													"Ctrl-Z":"undo",//撤销
+													"Ctrl-Y":"redo",//恢复撤销
+													"Ctrl-A":"selectAll",//全选
+												},
 											});
 											lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
 											node.aced=true;
 											node.editor=mirror;
+											setTimeout(()=>{
+												mirror.refresh();
+											},0);
+											node.editor.on('change',function(e,change){
+												var code;
+												if(node.editor){
+													code=node.editor.getValue();
+												}else if(node.textarea){
+													code=node.textarea.value;
+												};
+												//动态绑定文本
+												if(code.length&&change.origin=="+input" &&
+													/{|}|\s|=|;|:|,|，|。|？|！|\!|\?|&|#|%|@|‘|’|；/.test(change.text[0])==false&&
+													change.text.length==1) {
+													//输入了代码，并且不包括空格，{}，=， ; ， : ， 逗号等，才可以自动提示
+													node.editor.showHint();
+												}
+											});
 										}
 										if(!window.ace){
 											lib.init.js(lib.assetURL+'game','codemirror',aceReady);
