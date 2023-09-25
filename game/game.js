@@ -9055,17 +9055,17 @@
 							},failure);
 						};
 						game.ensureDirectory=(list,callback,file)=>{
-							const directoryList=typeof list=='string'?[list]:list.slice().reverse(),num=file?1:0,access=(entry,dir,createDirectory)=>{
-								if(dir.length<=num){
+							const directoryList=typeof list=='string'?[list]:list.slice().reverse(),num=file?1:0,access=(entry,directory,createDirectory)=>{
+								if(directory.length<=num){
 									createDirectory();
 									return;
 								}
-								const str=dir.pop();
+								const str=directory.pop();
 								return new Promise((resolve,reject)=>entry.getDirectory(str,{
 									create:false
 								},resolve,reject)).catch(()=>new Promise(resolve=>entry.getDirectory(str,{
 									create:true
-								},resolve))).then(value=>access(value,dir,createDirectory));
+								},resolve))).then(directoryEntry=>access(directoryEntry,directory,createDirectory));
 							};
 							return new Promise((resolve,reject)=>window.resolveLocalFileSystemURL(lib.assetURL,rootEntry=>{
 								const createDirectory=()=>{
@@ -9234,20 +9234,20 @@
 						}
 					};
 					game.ensureDirectory=(list,callback,file)=>{
-						const directoryList=typeof list=='string'?[list]:list.slice().reverse(),num=file?1:0,access=(str,dir,createDirectory)=>{
-							if(dir.length<=num){
+						const directoryList=typeof list=='string'?[list]:list.slice().reverse(),number=file?1:0,access=(path,directory,createDirectory)=>{
+							if(directory.length<=number){
 								createDirectory();
 								return;
 							}
-							str+=`/${dir.pop()}`;
-							const path=`${__dirname}${str}`;
-							return new Promise((resolve,reject)=>lib.node.fs.access(path,err=>{
-								if(err) reject();
+							path+=`/${directory.pop()}`;
+							const fullPath=`${__dirname}${path}`;
+							return new Promise((resolve,reject)=>lib.node.fs.access(fullPath,errnoException=>{
+								if(errnoException) reject();
 								else resolve();
-							})).catch(()=>new Promise((resolve,reject)=>lib.node.fs.mkdir(path,err=>{
-								if(err) reject(err);
+							})).catch(()=>new Promise((resolve,reject)=>lib.node.fs.mkdir(fullPath,errnoException=>{
+								if(errnoException) reject(errnoException);
 								else resolve();
-							}))).then(()=>access(str,dir,createDirectory),console.log);
+							}))).then(()=>access(path,directory,createDirectory),console.log);
 						};
 						return new Promise(resolve=>{
 							const createDirectory=()=>{
@@ -9283,35 +9283,43 @@
 				if(window.indexedDB&&!window.nodb){
 					const name=`${lib.configprefix}data`;
 					new Promise((resolve,reject)=>{
-						const request=window.indexedDB.open(name,5);
-						request.onerror=reject;
-						request.onsuccess=resolve;
-						request.onupgradeneeded=ev=>{
-							const db=ev.target.result;
-							if(!db.objectStoreNames.contains('video')) db.createObjectStore('video',{
+						const idbOpenDBRequest=window.indexedDB.open(name,5);
+						idbOpenDBRequest.onerror=reject;
+						idbOpenDBRequest.onsuccess=resolve;
+						idbOpenDBRequest.onupgradeneeded=idbVersionChangeEvent=>{
+							const idbDatabase=idbVersionChangeEvent.target.result;
+							if(!idbDatabase.objectStoreNames.contains('video')) idbDatabase.createObjectStore('video',{
 								keyPath:'time'
 							});
-							if(!db.objectStoreNames.contains('file')) db.createObjectStore('file');
-							if(!db.objectStoreNames.contains('config')) db.createObjectStore('config');
-							if(!db.objectStoreNames.contains('data')) db.createObjectStore('data');
-							if(db.objectStoreNames.contains('audio')) game.getDB('audio').then(value=>{
-								const keys=Object.keys(value);
+							if(!idbDatabase.objectStoreNames.contains('file')) idbDatabase.createObjectStore('file');
+							if(!idbDatabase.objectStoreNames.contains('config')) idbDatabase.createObjectStore('config');
+							if(!idbDatabase.objectStoreNames.contains('data')) idbDatabase.createObjectStore('data');
+							if(idbDatabase.objectStoreNames.contains('audio')) game.getDB('audio').then(object=>{
+								const keys=Object.keys(object);
 								if(!keys.length) return;
-								const objectStore=db.transaction('file','readwrite').objectStore('file');
-								keys.forEach(element=>objectStore.put(value[element],element));
-							});
-							if(db.objectStoreNames.contains('image')) game.getDB('image').then(value=>{
-								const keys=Object.keys(value);
+								const objectStore=idbDatabase.transaction('file','readwrite').objectStore('file');
+								return Promise.allSettled(keys.map(key=>new Promise((resolve,reject)=>{
+									const record=objectStore.put(object[key],key);
+									record.onerror=reject;
+									record.onsuccess=resolve;
+								})));
+							}).then(()=>idbDatabase.deleteObjectStore('audio'));
+							if(idbDatabase.objectStoreNames.contains('image')) game.getDB('image').then(object=>{
+								const keys=Object.keys(object);
 								if(!keys.length) return;
-								const objectStore=db.transaction('file','readwrite').objectStore('file');
-								keys.forEach(element=>objectStore.put(value[element],element));
-							});
+								const objectStore=idbDatabase.transaction('file','readwrite').objectStore('file');
+								return Promise.allSettled(keys.map(key=>new Promise((resolve,reject)=>{
+									const record=objectStore.put(object[key],key);
+									record.onerror=reject;
+									record.onsuccess=resolve;
+								})));
+							}).then(()=>idbDatabase.deleteObjectStore('image'));
 						};
-					}).then(value=>{
-						lib.db=value.target.result;
+					}).then(event=>{
+						lib.db=event.target.result;
 						return game.getDB('config');
-					}).then(value=>{
-						if(!value.storageImported){
+					}).then(object=>{
+						if(!object.storageImported){
 							try{
 								config2=JSON.parse(localStorage.getItem(`${lib.configprefix}config`));
 								if(!config2||typeof config2!='object') throw 'err';
@@ -9319,23 +9327,23 @@
 							catch(err){
 								config2={};
 							}
-							Object.keys(config2).forEach(value=>game.saveConfig(value,config2[value]));
-							Object.keys(lib.mode).forEach(value=>{
+							Object.keys(config2).forEach(key=>game.saveConfig(key,config2[key]));
+							Object.keys(lib.mode).forEach(key=>{
 								try{
-									config2=JSON.parse(localStorage.getItem(`${lib.configprefix}${value}`));
+									config2=JSON.parse(localStorage.getItem(`${lib.configprefix}${key}`));
 									if(!config2||typeof config2!='object'||get.is.empty(config2)) throw 'err';
 								}
 								catch(err){
 									config2=false;
 								}
-								localStorage.removeItem(`${lib.configprefix}${value}`);
-								if(config2) game.putDB('data',value,config2);
+								localStorage.removeItem(`${lib.configprefix}${key}`);
+								if(config2) game.putDB('data',key,config2);
 							});
 							game.saveConfig('storageImported',true);
 							lib.init.background();
 							localStorage.removeItem(`${lib.configprefix}config`);
 						}
-						else config2=value;
+						else config2=object;
 						proceed(config2);
 					});
 				}
@@ -10303,8 +10311,8 @@
 				style.rel="stylesheet";
 				if(path){
 					if(file) path=`${path}/${file}.css`;
-					(path.indexOf('db:')==0?game.getDB('file',path.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(path))).then(value=>{
-						style.href=value;
+					(path.indexOf('db:')==0?game.getDB('file',path.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(path))).then(resolvedPath=>{
+						style.href=resolvedPath;
 						if(typeof before=='function'){
 							style.addEventListener('load',before);
 							document.head.appendChild(style);
@@ -10337,10 +10345,10 @@
 					file.forEach(value=>lib.init.js(path,value,onload,onerror));
 					return;
 				}
-				let script_src=file?`${path}/${file}.js`:path;
-				if(path.indexOf('http')==0) script_src+=`?rand=${get.id()}`;
-				else if(lib.config.fuck_sojson&&script_src.includes('extension')!=-1&&script_src.indexOf(lib.assetURL)==0){
-					const path_to_read=script_src.slice(lib.assetURL.length);
+				let scriptSource=file?`${path}/${file}.js`:path;
+				if(path.indexOf('http')==0) scriptSource+=`?rand=${get.id()}`;
+				else if(lib.config.fuck_sojson&&scriptSource.includes('extension')!=-1&&scriptSource.indexOf(lib.assetURL)==0){
+					const path_to_read=scriptSource.slice(lib.assetURL.length);
 					const alertMsg=`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${path_to_read}`;
 					if(typeof game.readFileAsText=='function'){
 						game.readFileAsText(path_to_read,result=>{
@@ -10354,8 +10362,8 @@
 					}
 				}
 				const script=document.createElement('script');
-				(script_src.indexOf('db:')==0?game.getDB('file',script_src.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(script_src))).then(value=>{
-					script.src=value;
+				(scriptSource.indexOf('db:')==0?game.getDB('file',scriptSource.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(scriptSource))).then(resolvedScriptSource=>{
+					script.src=resolvedScriptSource;
 					if(path.indexOf('http')==0) script.addEventListener('load',()=>script.remove());
 					document.head.appendChild(script);
 					if(typeof onload=='function') script.addEventListener('load',onload);
@@ -34136,40 +34144,40 @@
 		},
 		playAudio:function(){
 			if(_status.video&&arguments[1]!='video') return;
-			let str='',onerror=null;
+			let path='',onError=null;
 			for(const argument of arguments){
 				if(typeof argument==='string'||typeof argument=='number'){
-					if(str) str+='/';
-					str+=argument;
+					if(path) path+='/';
+					path+=argument;
 				}
-				else if(typeof argument=='function') onerror=argument;
+				else if(typeof argument=='function') onError=argument;
 				if(_status.video) break;
 			}
-			if(!lib.config.repeat_audio&&_status.skillaudio.contains(str)) return;
-			_status.skillaudio.add(str);
-			game.addVideo('playAudio',null,str);
-			setTimeout(()=>_status.skillaudio.remove(str),1000);
+			if(!lib.config.repeat_audio&&_status.skillaudio.contains(path)) return;
+			_status.skillaudio.add(path);
+			game.addVideo('playAudio',null,path);
+			setTimeout(()=>_status.skillaudio.remove(path),1000);
 			const audio=document.createElement('audio');
 			audio.autoplay=true;
 			audio.volume=lib.config.volumn_audio/8;
 			audio.addEventListener('ended',()=>audio.remove());
-			audio.onerror=e=>{
+			audio.onerror=event=>{
 				if(audio._changed){
 					audio.remove();
-					if(onerror) onerror(e);
+					if(onError) onError(event);
 					return;
 				}
-				audio.src=`${lib.assetURL}audio/${str}.ogg`;
+				audio.src=`${lib.assetURL}audio/${path}.ogg`;
 				audio._changed=true;
 			};
 			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
 			audio.oncanplay=()=>Promise.resolve(audio.play()).catch(()=>void 0);
 			new Promise((resolve,reject)=>{
-				if(str.indexOf('db:')==0) game.getDB('file',str.slice(3)).then(value=>resolve(get.objectURL(value)),reject);
-				else if(str.split('/').pop().split('.').length>1) resolve(`${lib.assetURL}audio/${str}`);
-				else resolve(`${lib.assetURL}audio/${str}.mp3`);
-			}).then(value=>{
-				audio.src=value;
+				if(path.indexOf('db:')==0) game.getDB('file',path.slice(3)).then(octetStream=>resolve(get.objectURL(octetStream)),reject);
+				else if(path.split('/').pop().split('.').length>1) resolve(`${lib.assetURL}audio/${path}`);
+				else resolve(`${lib.assetURL}audio/${path}.mp3`);
+			}).then(resolvedPath=>{
+				audio.src=resolvedPath;
 				ui.window.appendChild(audio);
 			});
 			return audio;
@@ -34348,20 +34356,20 @@
 				return promise;
 			}
 		},
-		loadExtension:gnc.of(function*(obj){
+		loadExtension:gnc.of(function*(object){
 			let noEval=false;
-			if(typeof obj=='function'){
-				obj=yield (gnc.is.generatorFunc(obj)?gnc.of(obj):obj)(lib,game,ui,get,ai,_status);
+			if(typeof object=='function'){
+				object=yield (gnc.is.generatorFunc(object)?gnc.of(object):object)(lib,game,ui,get,ai,_status);
 				noEval=true;
 			}
-			const name=obj.name,extensionName=`extension_${name}`,extensionMenu=lib.extensionMenu[extensionName]={
+			const name=object.name,extensionName=`extension_${name}`,extensionMenu=lib.extensionMenu[extensionName]={
 				enable:{
 					name:'开启',
 					init:true
 				}
-			},objPackage=obj.package;
-			if(objPackage){
-				const author=Object.getOwnPropertyDescriptor(objPackage,'author');
+			},objectPackage=object.package;
+			if(objectPackage){
+				const author=Object.getOwnPropertyDescriptor(objectPackage,'author');
 				if(author) Object.defineProperty(extensionMenu.author={
 					get name(){
 						return `作者：${this.author}`;
@@ -34369,23 +34377,23 @@
 					clear:true,
 					nopointer:true,
 				},'author',author);
-				const intro=Object.getOwnPropertyDescriptor(objPackage,'intro');
+				const intro=Object.getOwnPropertyDescriptor(objectPackage,'intro');
 				if(intro) Object.defineProperty(extensionMenu.intro={
 					clear:true,
 					nopointer:true,
 				},'name',intro);
 			}
-			const objConfig=obj.config;
-			if(objConfig) Object.defineProperties(extensionMenu,Object.keys(objConfig).reduce((previousValue,currentValue)=>{
-				previousValue[currentValue]=Object.getOwnPropertyDescriptor(objConfig,currentValue);
-				return previousValue;
+			const objectConfig=object.config;
+			if(objectConfig) Object.defineProperties(extensionMenu,Object.keys(objectConfig).reduce((propertyDescriptorMap,key)=>{
+				propertyDescriptorMap[key]=Object.getOwnPropertyDescriptor(objectConfig,key);
+				return propertyDescriptorMap;
 			},{}));
-			const help=obj.help;
-			if(help) Object.defineProperties(lib.help,Object.keys(help).reduce((previousValue,currentValue)=>{
-				previousValue[currentValue]=Object.getOwnPropertyDescriptor(help,currentValue);
-				return previousValue;
+			const help=object.help;
+			if(help) Object.defineProperties(lib.help,Object.keys(help).reduce((propertyDescriptorMap,key)=>{
+				propertyDescriptorMap[key]=Object.getOwnPropertyDescriptor(help,key);
+				return propertyDescriptorMap;
 			},{}));
-			if(obj.editable!==false&&lib.config.show_extensionmaker) extensionMenu.edit={
+			if(object.editable!==false&&lib.config.show_extensionmaker) extensionMenu.edit={
 				name:'编辑此扩展',
 				clear:true,
 				onclick:()=>{
@@ -34405,7 +34413,7 @@
 					const page=this.parentNode,start=page.parentNode.previousSibling;
 					page.remove();
 					if(start){
-						const pageInStart=Array.from(start.childNodes).find(value=>value.link==page);
+						const pageInStart=Array.from(start.childNodes).find(childNode=>childNode.link==page);
 						if(pageInStart){
 							let active=false;
 							if(pageInStart.classList.contains('active')) active=true;
@@ -34417,79 +34425,79 @@
 						}
 					}
 					game.removeExtension(name);
-					if(typeof obj.onremove=='function') obj.onremove();
+					if(typeof object.onremove=='function') object.onremove();
 				}
 			}
 
 			if(_status.importingExtension){
-				game.importedPack=obj;
+				game.importedPack=object;
 				return;
 			}
 			const libConfig=lib.config;
-			if(!obj||!libConfig[`${extensionName}_enable`]) return;
-			if(!noEval) lib.init.eval(obj);
-			const cfg=Object.keys(libConfig).reduce((previousValue,currentValue)=>{
-				if(currentValue!=extensionName&&currentValue.indexOf(extensionName)==0) previousValue[currentValue.slice(11+name.length)]=libConfig[currentValue];
-				return previousValue;
+			if(!object||!libConfig[`${extensionName}_enable`]) return;
+			if(!noEval) lib.init.eval(object);
+			const config=Object.keys(libConfig).reduce((constructingConfig,key)=>{
+				if(key!=extensionName&&key.indexOf(extensionName)==0) constructingConfig[key.slice(11+name.length)]=libConfig[key];
+				return constructingConfig;
 			},{});
 			try{
 				let extensionPack=lib.extensionPack[name];
-				if(objPackage){
-					extensionPack=lib.extensionPack[name]=objPackage;
-					objPackage.files=obj.files||{};
-					const extensionPackFiles=objPackage.files;
+				if(objectPackage){
+					extensionPack=lib.extensionPack[name]=objectPackage;
+					objectPackage.files=object.files||{};
+					const extensionPackFiles=objectPackage.files;
 					if(!extensionPackFiles.character) extensionPackFiles.character=[];
 					if(!extensionPackFiles.card) extensionPackFiles.card=[];
 					if(!extensionPackFiles.skill) extensionPackFiles.skill=[];
 				}
 				else extensionPack=lib.extensionPack[name]={};
-				const content=obj.content,precontent=obj.precontent;
+				const content=object.content,precontent=object.precontent;
 				extensionPack.code={
 					content:content,
 					precontent:precontent,
 					help:help,
-					config:objConfig
+					config:objectConfig
 				}
 				if(precontent){
 					_status.extension=name;
-					yield (gnc.is.generatorFunc(precontent)?gnc.of(precontent):precontent).call(obj,cfg);
+					yield (gnc.is.generatorFunc(precontent)?gnc.of(precontent):precontent).call(object,config);
 					delete _status.extension;
 				}
-				if(content) lib.extensions.push([name,content,cfg,_status.evaluatingExtension,objPackage||{}]);
+				if(content) lib.extensions.push([name,content,config,_status.evaluatingExtension,objectPackage||{}]);
 			}
 			catch(e){
 				console.log(e);
 			}
 		}),
-		createDir:(dir,successCallback,errorCallback)=>{
-			const path=dir.split('/').reverse();
-			if(window.resolveLocalFileSystemURL) return new Promise((resolve,reject)=>window.resolveLocalFileSystemURL(lib.assetURL,resolve,reject)).then(value=>{
-				const redo=entry=>new Promise(resolve=>entry.getDirectory(path.pop(),{
+		createDir:(directory,successCallback,errorCallback)=>{
+			const paths=directory.split('/').reverse();
+			if(window.resolveLocalFileSystemURL) return new Promise((resolve,reject)=>window.resolveLocalFileSystemURL(lib.assetURL,resolve,reject)).then(directoryEntry=>{
+				const redo=entry=>new Promise((resolve,reject)=>entry.getDirectory(paths.pop(),{
 					create:true
-				},resolve)).then(value=>{
-					if(path.length) return redo(value);
+				},resolve,reject)).then(resolvedDirectoryEntry=>{
+					if(paths.length) return redo(resolvedDirectoryEntry);
 					if(typeof successCallback=='function') successCallback();
 				});
-				return redo(value);
+				return redo(directoryEntry);
 			},reason=>{
 				if(typeof errorCallback!='function') return Promise.reject(reason);
 				errorCallback(reason);
 			});
 			const fs=require("fs");
-			let str=__dirname;
+			let path=__dirname;
 			const redo=()=>{
-				str+=`/${path.pop()}`;
-				return new Promise(resolve=>fs.exists(str,resolve)).then(value=>{
+				path+=`/${paths.pop()}`;
+				return new Promise(resolve=>fs.exists(path,resolve)).then(exists=>{
 					//不存在此目录
-					if(!value) return new Promise(resolve=>fs.mkdir(str,resolve));
+					if(!exists) return new Promise(resolve=>fs.mkdir(path,resolve));
 				}).then(()=>{
-					if(path.length) return redo();
+					if(paths.length) return redo();
 					if(typeof successCallback=='function') successCallback();
 				});
 			};
 			return redo();
 		},
-		importExtension:gnc.of(function*(data,finishLoad,exportExt,pkg){
+		importExtension:gnc.of(function*(data,finishLoad,exportExtension,extensionPackage){
 			//by 来瓶可乐加冰、Rintim、Tipx-L
 			if(!window.JSZip)
 				yield new Promise((resolve,reject)=>lib.init.js(`${lib.assetURL}game`,"jszip",resolve,reject));
@@ -34506,30 +34514,30 @@
 				const generate=zip.generate({
 					type:'arraybuffer'
 				});
-				if(!exportExt){
+				if(!exportExtension){
 					game.importExtension.apply(this,[generate,finishLoad]);
 					return;
 				}
-				if(pkg){
-					pkg.files=filelist.concat(filelist2).filter(value=>value!='extension.js');
+				if(extensionPackage){
+					extensionPackage.files=filelist.concat(filelist2).filter(value=>value!='extension.js');
 					const size=generate.byteLength;
-					if(size<1000) pkg.size=`${size}B`;
-					else if(size<1000000) pkg.size=`${Math.round(size/1000)}KB`;
-					else pkg.size=`${Math.round(size/100000)/10}MB`;
-					zip.file('package.js',Object.keys(pkg).reduce((previousValue,currentValue,currentIndex,array)=>`${previousValue}\t${currentValue}:${JSON.stringify(pkg[currentValue])}${currentIndex<array.length-1?',\n':'\n};'}`,`extension["${exportExt}"]={\n`));
+					if(size<1000) extensionPackage.size=`${size}B`;
+					else if(size<1000000) extensionPackage.size=`${Math.round(size/1000)}KB`;
+					else extensionPackage.size=`${Math.round(size/100000)/10}MB`;
+					zip.file('package.js',Object.keys(extensionPackage).reduce((constructingData,key,currentIndex,keys)=>`${constructingData}\t${key}:${JSON.stringify(extensionPackage[key])}${currentIndex<keys.length-1?',\n':'\n};'}`,`extension["${exportExtension}"]={\n`));
 				}
 				const blob=zip.generate({
 					type:'blob'
-				}),fileNameToSaveAs=`${exportExt.replace(/\\|\/|\:|\?|\"|\*|<|>|\|/g,'-')}.zip`;
+				}),fileNameToSaveAs=`${exportExtension.replace(/\\|\/|\:|\?|\"|\*|<|>|\|/g,'-')}.zip`;
 
 				if(lib.device){
 					const directory=lib.device=='android'?cordova.file.externalDataDirectory:cordova.file.documentsDirectory;
-					new Promise((resolve,reject)=>window.resolveLocalFileSystemURL(directory,resolve,reject)).then(value=>new Promise((resolve,reject)=>value.getFile(fileNameToSaveAs,{
+					new Promise((resolve,reject)=>window.resolveLocalFileSystemURL(directory,resolve,reject)).then(directoryEntry=>new Promise((resolve,reject)=>directoryEntry.getFile(fileNameToSaveAs,{
 						create:true
-					},resolve,reject))).then(value=>new Promise((resolve,reject)=>value.createWriter(resolve,reject))).then(value=>new Promise((resolve,reject)=>{
-						value.onerror=reject;
-						value.onwriteend=resolve;
-						value.write(blob);
+					},resolve,reject))).then(fileEntry=>new Promise((resolve,reject)=>fileEntry.createWriter(resolve,reject))).then(fileWriter=>new Promise((resolve,reject)=>{
+						fileWriter.onerror=reject;
+						fileWriter.onwriteend=resolve;
+						fileWriter.write(blob);
 					})).then(()=>alert(`文件已导出至${directory}${fileNameToSaveAs}`));
 				}
 				else{
@@ -34544,7 +34552,7 @@
 				return;
 			}
 			//导入
-			const UHP=e=>alert(`导入失败：\n${JSON.stringify(e,null,'\t')}`);
+			const UHP=error=>alert(`导入失败：\n${JSON.stringify(error,null,'\t')}`);
 			try{
 				zip.load(data);
 				// alert(zip.file('文件夹/加扩展.js').asText())
@@ -34556,43 +34564,43 @@
 				delete _status.extensionLoading;
 				_status.importingExtension=false;
 				if(!game.importedPack) throw('err');
-				const extName=game.importedPack.name;
-				if(lib.config.all.plays.contains(extName)) throw('禁止安装游戏原生扩展');
+				const extensionName=game.importedPack.name;
+				if(lib.config.all.plays.contains(extensionName)) throw('禁止安装游戏原生扩展');
 				const extensions=lib.config.extensions;
-				if(extensions.contains(extName)) game.removeExtension(extName,true);
-				extensions.add(extName);
+				if(extensions.contains(extensionName)) game.removeExtension(extensionName,true);
+				extensions.add(extensionName);
 				game.saveConfigValue('extensions');
-				game.saveConfig(`extension_${extName}_enable`,true);
+				game.saveConfig(`extension_${extensionName}_enable`,true);
 				const config=game.importedPack.config;
 				Object.keys(config).forEach(value=>{
 					const configObject=config[value];
-					if(configObject&&configObject.hasOwnProperty('init')) game.saveConfig(`extension_${extName}_${value}`,configObject.init);
+					if(configObject&&configObject.hasOwnProperty('init')) game.saveConfig(`extension_${extensionName}_${value}`,configObject.init);
 				});
 				if(game.download){
-					const files=zip.files,hiddenFileFlags=['.','_'],fileList=Object.keys(files).filter(value=>!files[value].dir&&!hiddenFileFlags.includes(value[0])).reverse();
+					const files=zip.files,hiddenFileFlags=['.','_'],fileList=Object.keys(files).filter(key=>!files[key].dir&&!hiddenFileFlags.includes(key[0])).reverse();
 					//alert(filelist)
 					//电脑端
 					//具备nodeJS环境
 					if(lib.node&&lib.node.fs){
-						const writeFile=e=>{
-							if(e){
+						const writeFile=errnoException=>{
+							if(errnoException){
 								finishLoad();
-								UHP(e);
+								UHP(errnoException);
 								return;
 							}
 							if(fileList.length){
 								//filename 数组 ...dir+/+file
 								//这里需要个创文件夹的函数
-								const zipDir=fileList.pop(),fileName=zipDir.split('/'),name=fileName.pop(),letGo=name=>new Promise(resolve=>lib.node.fs.writeFile(`${__dirname}/extension/${extName}/${name}`,zip.file(zipDir).asNodeBuffer(),null,resolve)).then(writeFile);
-								return (fileName.length?game.createDir(`extension/${extName}/${fileName.join("/")}`).then(()=>letGo(`${fileName.join('/')}/${name}`)):letGo(name));
+								const zipDir=fileList.pop(),fileName=zipDir.split('/'),name=fileName.pop(),letGo=name=>new Promise(resolve=>lib.node.fs.writeFile(`${__dirname}/extension/${extensionName}/${name}`,zip.file(zipDir).asNodeBuffer(),null,resolve)).then(writeFile);
+								return (fileName.length?game.createDir(`extension/${extensionName}/${fileName.join("/")}`).then(()=>letGo(`${fileName.join('/')}/${name}`)):letGo(name));
 							}
 							finishLoad();
 						}
-						game.ensureDirectory(`extension/${extName}`).then(writeFile).catch(UHP);
+						game.ensureDirectory(`extension/${extensionName}`).then(writeFile).catch(UHP);
 					}
-					else new Promise((resolve,reject)=>window.resolveLocalFileSystemURL(lib.assetURL,resolve,reject)).then(value=>new Promise(resolve=>value.getDirectory(`extension/${extName}`,{
+					else new Promise((resolve,reject)=>window.resolveLocalFileSystemURL(lib.assetURL,resolve,reject)).then(directoryEntry=>new Promise((resolve,reject)=>directoryEntry.getDirectory(`extension/${extensionName}`,{
 						create:true
-					},resolve))).then(value=>{
+					},resolve,reject))).then(directoryEntry=>{
 						//扩展文件夹
 						const writeFile=()=>{
 							if(!fileList.length){
@@ -34600,44 +34608,44 @@
 								return;
 							}
 							//filename 数组 ...dir+/+file
-							const zipDir=fileList.shift(),fileName=zipDir.split("/"),name=fileName.pop(),letGo=name=>new Promise((resolve,reject)=>value.getFile(name,{
+							const zipDirectory=fileList.shift(),fileName=zipDirectory.split("/"),name=fileName.pop(),letGo=name=>new Promise((resolve,reject)=>directoryEntry.getFile(name,{
 								create:true
 							},resolve,reject)).then(fileEntry=>new Promise((resolve,reject)=>fileEntry.createWriter(resolve,reject))).then(fileWriter=>new Promise((resolve,reject)=>{
 								fileWriter.onerror=reject;
 								fileWriter.onwriteend=resolve;													
-								fileWriter.write(zip.file(zipDir).asArrayBuffer());
+								fileWriter.write(zip.file(zipDirectory).asArrayBuffer());
 							})).then(writeFile);
-							return (fileName.length?game.createDir(`extension/${extName}/${fileName.join('/')}`).then(()=>letGo(`${fileName.join('/')}/${name}`)):letGo(name));
+							return (fileName.length?game.createDir(`extension/${extensionName}/${fileName.join('/')}`).then(()=>letGo(`${fileName.join('/')}/${name}`)):letGo(name));
 						};
 						return writeFile();
 					}).catch(UHP);
 				}
 				else{
-					localStorage.setItem(`${lib.configprefix}extension_${extName}`,str);
-					const hiddenFileFlags=['.','_'],fileList=Object.keys(zip.files).filter(value=>!hiddenFileFlags.includes(value[0])&&value[value.length-1]!='/');
+					localStorage.setItem(`${lib.configprefix}extension_${extensionName}`,str);
+					const hiddenFileFlags=['.','_'],fileList=Object.keys(zip.files).filter(filePath=>!hiddenFileFlags.includes(filePath[0])&&filePath[filePath.length-1]!='/');
 					if(fileList.length&&lib.db){
-						lib.config.extensionInfo[extName]={
+						lib.config.extensionInfo[extensionName]={
 							file:fileList
 						};
 						game.saveConfigValue('extensionInfo');
-						fileList.forEach(value=>{
-							const str=zip.file(value).asArrayBuffer();
-							if(!str) return;
-							const blob=new Blob([str]);
+						fileList.forEach(filePath=>{
+							const arrayBuffer=zip.file(filePath).asArrayBuffer();
+							if(!arrayBuffer) return;
+							const blob=new Blob([arrayBuffer]);
 							new Promise((resolve,reject)=>{
 								const fileReader=new FileReader();
 								fileReader.onerror=reject;
 								fileReader.onload=resolve;
 								fileReader.readAsDataURL(blob,'UTF-8');
-							}).then(fileLoadedEvent=>game.putDB('file',`extension-${extName}:${value}`,fileLoadedEvent.target.result));
+							}).then(fileLoadedEvent=>game.putDB('file',`extension-${extensionName}:${filePath}`,fileLoadedEvent.target.result));
 						});
 					}
 					finishLoad();
 				}
 				delete game.importedPack;
 			}
-			catch(e){
-				UHP(e)
+			catch(error){
+				UHP(error);
 				return false;
 			}
 		}),
@@ -37056,20 +37064,20 @@
 			}
 			ui.clear();
 		},
-		removeExtension:(extName,keepFile)=>{
-			const prefix=`extension_${extName}`;
-			Object.keys(lib.config).forEach(value=>{
-				if(value.indexOf(prefix)==0) game.saveConfig(value);
+		removeExtension:(extensionName,keepFile)=>{
+			const prefix=`extension_${extensionName}`;
+			Object.keys(lib.config).forEach(key=>{
+				if(key.indexOf(prefix)==0) game.saveConfig(key);
 			});
 			localStorage.removeItem(`${lib.configprefix}${prefix}`);
 			game.deleteDB('data',prefix);
-			lib.config.extensions.remove(extName);
+			lib.config.extensions.remove(extensionName);
 			game.saveConfig('extensions',lib.config.extensions);
-			const modeList=lib.config.extensionInfo[extName];
+			const modeList=lib.config.extensionInfo[extensionName];
 			if(modeList){
-				if(modeList.file) Object.values(modeList.file).forEach(value=>game.deleteDB('file',`extension-${extName}:${value}`));
+				if(modeList.file) Object.values(modeList.file).forEach(filePath=>game.deleteDB('file',`extension-${extensionName}:${filePath}`));
 				if(modeList.mode) Object.values(modeList.mode).forEach(game.clearModeConfig);
-				delete lib.config.extensionInfo[extName];
+				delete lib.config.extensionInfo[extensionName];
 				game.saveConfigValue('extensionInfo');
 			}
 			if(!game.download||keepFile) return;
@@ -37077,18 +37085,18 @@
 				const deleteFolderRecursive=path=>{
 					if(!lib.node.fs.existsSync(path)) return;
 					lib.node.fs.readdirSync(path).forEach((file,index)=>{
-						const curPath = `${path}/${file}`;
-						if (lib.node.fs.lstatSync(curPath).isDirectory()) deleteFolderRecursive(curPath);
-						else lib.node.fs.unlinkSync(curPath);
+						const currentPath = `${path}/${file}`;
+						if (lib.node.fs.lstatSync(currentPath).isDirectory()) deleteFolderRecursive(currentPath);
+						else lib.node.fs.unlinkSync(currentPath);
 					});
 					lib.node.fs.rmdirSync(path);
 				};
-				deleteFolderRecursive(`${__dirname}/extension/${extName}`);
+				deleteFolderRecursive(`${__dirname}/extension/${extensionName}`);
 			}
-			catch(e){
-				console.log(e);
+			catch(error){
+				console.log(error);
 			}
-			else new Promise((resolve,reject)=>window.resolveLocalFileSystemURL(`${lib.assetURL}extension/${extName}`,resolve,reject)).then(value=>value.removeRecursively());
+			else new Promise((resolve,reject)=>window.resolveLocalFileSystemURL(`${lib.assetURL}extension/${extensionName}`,resolve,reject)).then(directoryEntry=>directoryEntry.removeRecursively());
 		},
 		addRecentCharacter:function(){
 			var list=get.config('recentCharacter')||[];
@@ -39944,77 +39952,77 @@
 			}
 			return node;
 		},
-		putDB:(type,id,item,onsuccess,onerror)=>{
-			if(!lib.db) return Promise.resolve(item);
-			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['putDB',[type,id,item,ev=>{
-				if(typeof onsuccess=='function') onsuccess(ev);
-				resolve(ev);
-			},ev=>{
-				if(typeof onerror=='function'){
-					onerror(ev);
+		putDB:(storeName,idbValidKey,value,onSuccess,onError)=>{
+			if(!lib.db) return Promise.resolve(value);
+			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['putDB',[storeName,idbValidKey,value,event=>{
+				if(typeof onSuccess=='function') onSuccess(event);
+				resolve(event);
+			},event=>{
+				if(typeof onError=='function'){
+					onError(event);
 					resolve();
 				}
-				else reject(ev);
+				else reject(event);
 			}]]));
 			lib.status.reload++;
 			return new Promise((resolve,reject)=>{
-				const record=lib.db.transaction([type],'readwrite').objectStore(type).put(item,id);
-				record.onerror=ev=>{
-					if(typeof onerror=='function'){
-						onerror(ev);
+				const record=lib.db.transaction([storeName],'readwrite').objectStore(storeName).put(value,idbValidKey);
+				record.onerror=event=>{
+					if(typeof onError=='function'){
+						onError(event);
 						game.reload2();
 						resolve();
 					}
 					else{
 						game.reload2();
-						reject(ev);
+						reject(event);
 					}
 				};;
-				record.onsuccess=ev=>{
-					if(typeof onsuccess=='function'){
+				record.onsuccess=event=>{
+					if(typeof onSuccess=='function'){
 						_status.dburgent=true;
-						onsuccess(ev);
+						onSuccess(event);
 						delete _status.dburgent;
 					}
 					game.reload2();
-					resolve(ev);
+					resolve(event);
 				};
 			});
 		},
-		getDB:(type,id,onsuccess,onerror)=>{
+		getDB:(storeName,query,onSuccess,onError)=>{
 			if(!lib.db) return new Promise(resolve=>{
-				if(typeof onsuccess=='function') onsuccess(null);
+				if(typeof onSuccess=='function') onSuccess(null);
 				resolve(null);
 			});
-			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['getDB',[type,id,result=>{
-				if(typeof onsuccess=='function') onsuccess(result);
+			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['getDB',[storeName,query,result=>{
+				if(typeof onSuccess=='function') onSuccess(result);
 				resolve(result);
-			},ev=>{
-				if(typeof onerror=='function'){
-					onerror(ev);
+			},event=>{
+				if(typeof onError=='function'){
+					onError(event);
 					resolve();
 				}
-				else reject(ev);
+				else reject(event);
 			}]]));
-			return new Promise(id?(resolve,reject)=>{
+			return new Promise(query?(resolve,reject)=>{
 				lib.status.reload++;
-				const record=lib.db.transaction([type],'readwrite').objectStore(type).get(id);
-				record.onerror=ev=>{
-					if(typeof onerror=='function'){
-						onerror(ev);
+				const idbRequest=lib.db.transaction([storeName],'readwrite').objectStore(storeName).get(query);
+				idbRequest.onerror=event=>{
+					if(typeof onError=='function'){
+						onError(event);
 						game.reload2();
 						resolve();
 					}
 					else{
 						game.reload2();
-						reject(ev);
+						reject(event);
 					}
 				};;
-				record.onsuccess=ev=>{
-					const result=ev.target.result;
-					if(typeof onsuccess=='function'){
+				idbRequest.onsuccess=event=>{
+					const result=event.target.result;
+					if(typeof onSuccess=='function'){
 						_status.dburgent=true;
-						onsuccess(result);
+						onSuccess(result);
 						delete _status.dburgent;
 					}
 					game.reload2();
@@ -40022,82 +40030,82 @@
 				};
 			}:(resolve,reject)=>{
 				lib.status.reload++;
-				const cursor=lib.db.transaction([type],'readwrite').objectStore(type).openCursor(),obj={};
-				cursor.onerror=ev=>{
-					if(typeof onerror=='function'){
-						onerror(ev);
+				const idbRequest=lib.db.transaction([storeName],'readwrite').objectStore(storeName).openCursor(),object={};
+				idbRequest.onerror=event=>{
+					if(typeof onError=='function'){
+						onError(event);
 						game.reload2();
 						resolve();
 					}
 					else{
 						game.reload2();
-						reject(ev);
+						reject(event);
 					}
 				};;
-				cursor.onsuccess=e=>{
-					const result=e.target.result;
+				idbRequest.onsuccess=event=>{
+					const result=event.target.result;
 					if(result){
-						obj[result.key]=result.value;
+						object[result.key]=result.value;
 						result.continue();
 						return;
 					}
-					if(typeof onsuccess=='function'){
+					if(typeof onSuccess=='function'){
 						_status.dburgent=true;
-						onsuccess(obj);
+						onSuccess(object);
 						delete _status.dburgent;
 					}
 					game.reload2();
-					resolve(obj);
+					resolve(object);
 				};
 			});
 		},
-		deleteDB:(type,id,onsuccess,onerror)=>{
+		deleteDB:(storeName,query,onSuccess,onError)=>{
 			if(!lib.db) return new Promise(resolve=>{
-				if(typeof onsuccess=='function') onsuccess(false);
+				if(typeof onSuccess=='function') onSuccess(false);
 				resolve(false);
 			});
-			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['deleteDB',[type,id,ev=>{
-				if(typeof onsuccess=='function') onsuccess(ev);
-				resolve(ev);
-			},ev=>{
-				if(typeof onerror=='function'){
-					onerror(ev);
+			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['deleteDB',[storeName,query,event=>{
+				if(typeof onSuccess=='function') onSuccess(event);
+				resolve(event);
+			},event=>{
+				if(typeof onError=='function'){
+					onError(event);
 					resolve();
 				}
-				else reject(ev);
+				else reject(event);
 			}]]));
-			return id?new Promise((resolve,reject)=>{
+			return query?new Promise((resolve,reject)=>{
 				lib.status.reload++;
-				const record=lib.db.transaction([type],'readwrite').objectStore(type).delete(id);
-				record.onerror=ev=>{
-					if(typeof onerror=='function'){
-						onerror(ev);
+				const record=lib.db.transaction([storeName],'readwrite').objectStore(storeName).delete(query);
+				record.onerror=event=>{
+					if(typeof onError=='function'){
+						onError(event);
 						game.reload2();
 						resolve();
 					}
 					else{
 						game.reload2();
-						reject(ev);
+						reject(event);
 					}
 				};
-				record.onsuccess=ev=>{
-					if(typeof onsuccess=='function') onsuccess(ev);
+				record.onsuccess=event=>{
+					if(typeof onSuccess=='function') onSuccess(event);
 					game.reload2();
-					resolve(ev);
+					resolve(event);
 				};
-			}):game.getDB(type).then(value=>{
-				const keys=Object.keys(value);
+			}):game.getDB(storeName).then(object=>{
+				const keys=Object.keys(object);
 				lib.status.reload+=keys.length;
-				const store=lib.db.transaction([type],'readwrite').objectStore(type);
-				return Promise.allSettled(keys.map(element=>new Promise((resolve,reject)=>{
-					const request=store.delete(element);
-					request.onerror=ev=>{
+				const store=lib.db.transaction([storeName],'readwrite').objectStore(storeName);
+				return Promise.allSettled(keys.map(key=>new Promise((resolve,reject)=>{
+					const request=store.delete(key);
+					request.onerror=event=>{
 						game.reload2();
-						reject(ev);
+						reject(event);
 					};;
-					request.onsuccess=ev=>{
+					request.onsuccess=event=>{
 						game.reload2();
-						resolve(ev);
+						resolve(event);
 					};
 				})));
 			});
@@ -46136,7 +46144,7 @@
 							var importextensionexpanded=false;
 							page.style.paddingBottom='10px';
 							var importExtension;
-							var extensionnode=ui.create.div('.config.more','导入扩展 <div>&gt;</div>',page,function(){
+							var extensionNode=ui.create.div('.config.more','导入扩展 <div>&gt;</div>',page,function(){
 								if(importextensionexpanded){
 									this.classList.remove('on');
 									importExtension.style.display='none';
@@ -46178,14 +46186,14 @@
 									fileReader.onerror=reject;
 									fileReader.onload=resolve;
 									fileReader.readAsArrayBuffer(fileToLoad,"UTF-8");
-								}).then(value=>{
-									if(game.importExtension(value.target.result,()=>{
-										extensionnode.innerHTML='导入成功，3秒后将重启';
+								}).then(progressEvent=>{
+									if(game.importExtension(progressEvent.target.result,()=>{
+										extensionNode.innerHTML='导入成功，3秒后将重启';
 										new Promise(resolve=>setTimeout(resolve,1000)).then(()=>{
-											extensionnode.innerHTML='导入成功，2秒后将重启';
+											extensionNode.innerHTML='导入成功，2秒后将重启';
 											return new Promise(resolve=>setTimeout(resolve,1000));
 										}).then(()=>{
-											extensionnode.innerHTML='导入成功，1秒后将重启';
+											extensionNode.innerHTML='导入成功，1秒后将重启';
 											return new Promise(resolve=>setTimeout(resolve,1000));
 										}).then(game.reload);
 									})!==false) importExtension.style.display='none';
@@ -53563,9 +53571,9 @@
 				else if(lib.config.favouriteCharacter.contains(name)){
 					fav.classList.add('active');
 				}
-				const intro=ui.create.div('.characterintro',uiintro);
+				const introduction=ui.create.div('.characterintro',uiintro);
 				if(lib.config.show_characternamepinyin){
-					const characterIntroTable=ui.create.div('.character-intro-table',intro),span=document.createElement('span');
+					const characterIntroTable=ui.create.div('.character-intro-table',introduction),span=document.createElement('span');
 					span.style.fontWeight='bold';
 					const nameInfo=get.character(name),exInfo=nameInfo[4],characterName=exInfo&&exInfo.includes('ruby')?lib.translate[name]:get.rawName(name);
 					span.innerHTML=characterName;
@@ -53590,47 +53598,47 @@
 						else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
 						else if(image.indexOf('ext:')==0) resolve(image.replace(/ext:/,'extension/'));
 						else resolve(image);
-					}).then(value=>new Promise((resolve,reject)=>{
+					}).then(source=>new Promise((resolve,reject)=>{
 						const image=new Image();
 						image.onload=()=>resolve(image);
 						image.onerror=reject;
-						image.src=value;
-					})).then(value=>characterSexDiv.appendChild(value)).catch(()=>characterSexDiv.innerHTML=get.translation(characterSex));
+						image.src=source;
+					})).then(image=>characterSexDiv.appendChild(image)).catch(()=>characterSexDiv.innerHTML=get.translation(characterSex));
 					const characterGroupDiv=ui.create.div('.character-group',characterIntroTable),characterGroups=get.is.double(name,true);
-					if(characterGroups) Promise.all(characterGroups.map(value=>new Promise((resolve,reject)=>{
-						const imageName=`group_${value}`,info=lib.card[imageName];
-						if(!info) resolve(`image/card/${imageName}.png`);
-						const image=info.image;
+					if(characterGroups) Promise.all(characterGroups.map(characterGroup=>new Promise((resolve,reject)=>{
+						const imageName=`group_${characterGroup}`,information=lib.card[imageName];
+						if(!information) resolve(`image/card/${imageName}.png`);
+						const image=information.image;
 						if(!image) resolve(`image/card/${imageName}.png`);
 						else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
 						else if(image.indexOf('ext:')==0) resolve(image.replace(/ext:/,'extension/'));
 						else resolve(image);
-					}).then(element=>new Promise((resolve,reject)=>{
+					}).then(source=>new Promise((resolve,reject)=>{
 						const image=new Image();
 						image.onload=()=>resolve(image);
 						image.onerror=reject;
-						image.src=element;
-					})))).then(value=>{
+						image.src=source;
+					})))).then(images=>{
 						let documentFragment=document.createDocumentFragment();
-						value.forEach(documentFragment.appendChild,documentFragment);
+						images.forEach(documentFragment.appendChild,documentFragment);
 						characterGroupDiv.appendChild(documentFragment);
-					}).catch(()=>characterGroupDiv.innerHTML=characterGroups.map(value=>get.translation(value)).join('/'));
+					}).catch(()=>characterGroupDiv.innerHTML=characterGroups.map(characterGroup=>get.translation(characterGroup)).join('/'));
 					else{
 						const characterGroup=nameInfo[1];
 						new Promise((resolve,reject)=>{
-							const imageName=`group_${characterGroup}`,info=lib.card[imageName];
-							if(!info) resolve(`image/card/${imageName}.png`);
-							const image=info.image;
+							const imageName=`group_${characterGroup}`,information=lib.card[imageName];
+							if(!information) resolve(`image/card/${imageName}.png`);
+							const image=information.image;
 							if(!image) resolve(`image/card/${imageName}.png`);
 							else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
 							else if(image.indexOf('ext:')==0) resolve(image.replace(/ext:/,'extension/'));
 							else resolve(image);
-						}).then(value=>new Promise((resolve,reject)=>{
+						}).then(source=>new Promise((resolve,reject)=>{
 							const image=new Image();
 							image.onload=()=>resolve(image);
 							image.onerror=reject;
-							image.src=value;
-						})).then(value=>characterGroupDiv.appendChild(value)).catch(()=>characterGroupDiv.innerHTML=get.translation(characterGroup));
+							image.src=source;
+						})).then(image=>characterGroupDiv.appendChild(image)).catch(()=>characterGroupDiv.innerHTML=get.translation(characterGroup));
 					}
 					const hpDiv=ui.create.div('.hp',characterIntroTable),nameInfoHP=nameInfo[2],infoHP=get.infoHp(nameInfoHP);
 					hpDiv.dataset.condition=infoHP<4?'mid':'high';
@@ -53643,17 +53651,17 @@
 						const shieldTextDiv=ui.create.div('.text',hpDiv);
 						shieldTextDiv.innerHTML=infoShield;
 					}
-					intro.appendChild(document.createElement('hr'));
+					introduction.appendChild(document.createElement('hr'));
 				}
 				const htmlParser=document.createElement('body');
 				htmlParser.innerHTML=get.characterIntro(name);
-				Array.from(htmlParser.childNodes).forEach(value=>intro.appendChild(value));
-				const intro2=ui.create.div('.characterintro.intro2',uiintro);
+				Array.from(htmlParser.childNodes).forEach(value=>introduction.appendChild(value));
+				const introduction2=ui.create.div('.characterintro.intro2',uiintro);
 				var list=get.character(name,3)||[];
 				var skills=ui.create.div('.characterskill',uiintro);
 				if(lib.config.touchscreen){
-					lib.setScroll(intro);
-					lib.setScroll(intro2);
+					lib.setScroll(introduction);
+					lib.setScroll(introduction2);
 					lib.setScroll(skills);
 				}
 
@@ -53661,8 +53669,8 @@
 					skills.onmousewheel=ui.click.mousewheel;
 				}
 				var clickSkill=function(e){
-					while(intro2.firstChild){
-						intro2.removeChild(intro2.lastChild);
+					while(introduction2.firstChild){
+						introduction2.removeChild(introduction2.lastChild);
 					}
 					var current=this.parentNode.querySelector('.active');
 					if(current){
@@ -53685,59 +53693,59 @@
 						const rightParenthesisRP=document.createElement('rp');
 						rightParenthesisRP.textContent='）';
 						ruby.appendChild(rightParenthesisRP);
-						const div=ui.create.div(intro2);
+						const div=ui.create.div(introduction2);
 						div.style.marginRight='5px';
 						div.appendChild(ruby);
 					}
 					else{
 						skillNameSpanStyle.marginRight='5px';
-						intro2.appendChild(skillNameSpan);
+						introduction2.appendChild(skillNameSpan);
 					}
 					htmlParser.innerHTML=get.skillInfoTranslation(this.link);
-					Array.from(htmlParser.childNodes).forEach(value=>intro2.appendChild(value));
+					Array.from(htmlParser.childNodes).forEach(childNode=>introduction2.appendChild(childNode));
 					var info=get.info(this.link);
 					var skill=this.link;
 					var playername=this.linkname;
 					var skillnode=this;
-					let derivation=info.derivation;
-					if(derivation){
-						if(typeof derivation=='string') derivation=[derivation];
-						derivation.forEach(value=>{
-							intro2.appendChild(document.createElement('br'));
-							intro2.appendChild(document.createElement('br'));
+					let derivations=info.derivation;
+					if(derivations){
+						if(typeof derivations=='string') derivations=[derivations];
+						derivations.forEach(derivation=>{
+							introduction2.appendChild(document.createElement('br'));
+							introduction2.appendChild(document.createElement('br'));
 							const derivationNameSpan=document.createElement('span'),derivationNameSpanStyle=derivationNameSpan.style;
 							derivationNameSpanStyle.fontWeight='bold';
-							const derivationName=get.translation(value);
+							const derivationName=get.translation(derivation);
 							derivationNameSpan.innerHTML=derivationName;
-							if(lib.config.show_skillnamepinyin&&derivationName.length<=5&&value.indexOf('_faq')==-1){
+							if(lib.config.show_skillnamepinyin&&derivationName.length<=5&&derivation.indexOf('_faq')==-1){
 								const ruby=document.createElement('ruby');
 								ruby.appendChild(derivationNameSpan);
 								const leftParenthesisRP=document.createElement('rp');
 								leftParenthesisRP.textContent='（';
 								ruby.appendChild(leftParenthesisRP);
 								const rt=document.createElement('rt');
-								rt.innerHTML=lib.translate[`${value}_rt`]||get.pinyin(derivationName).join(' ');
+								rt.innerHTML=lib.translate[`${derivation}_rt`]||get.pinyin(derivationName).join(' ');
 								ruby.appendChild(rt);
 								const rightParenthesisRP=document.createElement('rp');
 								rightParenthesisRP.textContent='）';
 								ruby.appendChild(rightParenthesisRP);
-								const div=ui.create.div(intro2);
+								const div=ui.create.div(introduction2);
 								div.style.marginRight='5px';
 								div.appendChild(ruby);
 							}
 							else{
 								derivationNameSpanStyle.marginRight='5px';
-								intro2.appendChild(derivationNameSpan);
+								introduction2.appendChild(derivationNameSpan);
 							}
-							htmlParser.innerHTML=get.skillInfoTranslation(value);
-							Array.from(htmlParser.childNodes).forEach(value=>intro2.appendChild(value));
+							htmlParser.innerHTML=get.skillInfoTranslation(derivation);
+							Array.from(htmlParser.childNodes).forEach(childNode=>introduction2.appendChild(childNode));
 						});
 					}
 					if(info.alter){
-						intro2.appendChild(document.createElement('br'));
-						intro2.appendChild(document.createElement('br'));
-						ui.create.div('.hrefnode.skillversion',intro2);
-						var skillversionnode=intro2.querySelector('.hrefnode.skillversion');
+						introduction2.appendChild(document.createElement('br'));
+						introduction2.appendChild(document.createElement('br'));
+						ui.create.div('.hrefnode.skillversion',introduction2);
+						var skillversionnode=introduction2.querySelector('.hrefnode.skillversion');
 						if(lib.config.vintageSkills.contains(skill)){
 							skillversionnode.innerHTML='切换至新版';
 						}
