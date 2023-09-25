@@ -34139,7 +34139,7 @@
 				}
 			}
 			var history=[];
-			for(;;){//可以嵌套引用了
+			while(true){//可以嵌套引用了
 				if(history.includes(audioname)) break;
 				history.push(audioname);
 				if(typeof audioinfo=='string'&&lib.skill[audioinfo]){
