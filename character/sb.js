@@ -297,19 +297,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
-					return event.targets.length==1&&event.card.name=='sha'&&player.canCompare(event.target);
+					return event.targets.length==1&&event.card.name=='sha'&&!player.hasSkillTag('noCompareSource')&&event.target.countCards('h')>0&&!event.target.hasSkillTag('noCompareTarget');
 				},
 				check:function(event,player){
-					return get.attitude(player,event.target)<0||game.hasPlayer(current=>{
-						return get.damageEffect(current,player,player)>0;
-					});
+					return get.attitude(player,event.target)<=0||game.hasPlayer(current=>get.damageEffect(current,player,player)>0);
 				},
 				shaRelated:true,
 				logTarget:'target',
 				content:function(){
 					'step 0'
-					if(player.canCompare(trigger.target)) player.chooseToCompare(trigger.target);
+					player.draw();
 					'step 1'
+					if(player.canCompare(trigger.target)) player.chooseToCompare(trigger.target);
+					else event.finish();
+					'step 2'
 					if(result.bool){
 						player.addTempSkill('sblieren_damage');
 						if(!trigger.card.storage) trigger.card.storage={};
@@ -4739,7 +4740,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbzongshi_info:'锁定技。每名角色限一次。当你受到伤害后，你令伤害来源弃置所有手牌。',
 			sb_zhurong:'谋祝融',
 			sblieren:'烈刃',
-			sblieren_info:'当你使用【杀】指定唯一目标后，你可以与其拼点。若你赢，此【杀】结算结束后，你可以对另一名其他角色造成1点伤害。',
+			sblieren_info:'当你使用【杀】指定唯一目标后，你可以摸一张牌，然后与其拼点。若你赢，此【杀】结算结束后，你可以对另一名其他角色造成1点伤害。',
 			sbjuxiang:'巨象',
 			sbjuxiang_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】结算结束后，你获得此牌对应的所有实体牌。③结束阶段，若你未于本回合使用过【南蛮入侵】，你可以将一张游戏外的随机【南蛮入侵】（共2张）交给一名角色。',
 			sb_menghuo:'谋孟获',
