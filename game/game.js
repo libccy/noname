@@ -478,11 +478,11 @@
 		]),
 		characterDialogGroup:{
 			'收藏':function(name,capt){
-				return lib.config.favouriteCharacter.contains(name)?capt:null;
+				return lib.config.favouriteCharacter.includes(name)?capt:null;
 			},
 			'最近':function(name,capt){
 				var list=get.config('recentCharacter')||[];
-				return list.contains(name)?capt:null;
+				return list.includes(name)?capt:null;
 			}
 		},
 		listenEnd:function(node){
@@ -7598,16 +7598,14 @@
 					return this;
 				};
 				HTMLDivElement.prototype.listenTransition=function(func,time){
-					var that=this;
-					var done=false;
-					var callback=function(){
-						if(!done){
-							func.call(that);
-							done=true;
-						}
+					const callback=()=>{
+						func.call(this);
+						clearTimeout(timer);
+						this.removeEventListener('webkitTransitionEnd',callback);
 					};
-					this.addEventListener('webkitTransitionEnd',callback);
-					return setTimeout(callback,time||1000);
+					const timer=setTimeout(callback,time||1000);
+					this.addEventListener('webkitTransitionEnd',callback,{once:true});
+					return timer;
 				};
 				HTMLDivElement.prototype.setPosition=function(){
 					var position;
@@ -8016,36 +8014,230 @@
 						_status.windowLoaded=true;
 					}
 				};
-				window.onerror=function(msg, src, line, column, err){
-					var str=msg;
+
+				function getErrorTip(msg) {
+					if (typeof msg!='string') throw '传参错误:'+msg;
+					if (msg.startsWith('Uncaught ')) msg=msg.slice(9);
+					let newMessage=msg;
+					if (/RangeError/.test(newMessage)){
+						if(newMessage.includes("Maximum call stack size exceeded")){
+							newMessage="堆栈溢出";
+						}else if(/argument must be between 0 and 20/.test(newMessage)){
+							let funName=newMessage.slice(newMessage.indexOf('RangeError: ')+12,newMessage.indexOf(')')+1);
+							newMessage=funName+"参数必须在0和20之间";
+						} else {
+							newMessage="传递错误值到数值计算方法";
+						}
+					}else if(/ReferenceError/.test(newMessage)){
+						let messageName;
+						if (newMessage.includes("is not defined")){
+							messageName=newMessage.replace('ReferenceError: ', '').replace(' is not defined', '');
+							newMessage="引用了一个未定义的变量："+messageName;
+						}else if(newMessage.includes("invalid assignment left-hand side")){
+							newMessage = "赋值运算符或比较运算符不匹配";
+						}else if(newMessage.includes("Octal literals are not allowed in strict mode")){
+							newMessage = "八进制字面量与八进制转义序列语法已经被废弃";
+						}else if(newMessage.includes("Illegal 'use strict' directive in function with non-simple parameter list")){
+							newMessage = "'use strict'指令不能使用在带有‘非简单参数’列表的函数";
+						}else if(newMessage.includes("Invalid left-hand side in assignment")){
+							newMessage = "赋值中的左侧无效，即number，string等不可赋值的非变量数据";
+						}
+					}else if(/SyntaxError/.test(newMessage)){
+						let messageName;
+						if(newMessage.includes("Unexpected token ")){
+							messageName=newMessage.replace('SyntaxError: Unexpected token ','');
+							newMessage="使用了未定义或错误的语法 : ("+messageName+")";
+						}else if(newMessage.includes(
+							"Block-scoped declarations (let, const, function, class) not yet supported outside strict mode")){
+							newMessage="请在严格模式下运行let，const，class";
+						}else if(newMessage.includes("for-of loop variable declaration may not have an initializer.")){
+							newMessage="for...of 循环的头部包含有初始化表达式";
+						}else if(newMessage.includes("for-in loop variable declaration may not have an initializer.")){
+							newMessage="for...in 循环的头部包含有初始化表达式";
+						}else if(newMessage.includes("Delete of an unqualified identifier in strict mode.")){
+							newMessage="普通变量不能通过 delete 操作符来删除";
+						}else if(newMessage.includes("Unexpected identifier")){
+							newMessage="不合法的标识符或错误的语法";
+						}else if(newMessage.includes("Invalid or unexpected token")){
+							newMessage="非法的或者不期望出现的标记符号出现在不该出现的位置";
+						}else if(newMessage.includes("Invalid regular expression flags")){
+							newMessage="无效的正则表达式的标记";
+						}else if(newMessage.includes("missing ) after argument list")){
+							newMessage="参数列表后面缺少 \')\' (丢失运算符或者转义字符等)";
+						}else if(newMessage.includes("Invalid shorthand property initializer")){
+							newMessage="在定义一个{}对象时，应该使用\':\'而不是\'=\'";
+						}else if(newMessage.includes("Missing initializer in const declaration")){
+							newMessage="在使用const定义一个对象时，必须指定初始值";
+						}else if(newMessage.includes("Unexpected number")||newMessage.includes("Unexpected string")){
+							newMessage="在定义函数时，函数参数必须为合法标记符";
+						}else if(newMessage.includes("Unexpected end of input")){
+							newMessage="遗漏了符号或符号顺序不对(小括号，花括号等)";
+						}else if(newMessage.includes("has already been declared")){
+							messageName=newMessage.replace('SyntaxError: Identifier ', '').replace(' has already been declared', '');
+							newMessage=messageName +"变量已经被声明过，不能被重新声明";
+						}else if(newMessage.includes("Invalid or unexpected token")){
+							newMessage="查询无效或意外的标记，可能是字符串的引号不成对，错误使用了转义序列，字符串在多行中解析异常";
+						}else if(newMessage.includes("Duplicate parameter name not allowed in this context")) {
+							newMessage="参数名不允许重复";
+						}else if(newMessage.includes("Unexpected reserved word")||newMessage.includes(
+							"Unexpected strict mode reserved word")){
+							newMessage = "保留字被用作标记符";
+						}
+
+					}else if(/TypeError/.test(newMessage)){
+						let messageName;
+						if(newMessage.includes(" is not a function")){
+							messageName=newMessage.replace('TypeError: ', '').replace(' is not a function', '');
+							newMessage=messageName+"不是一个函数";
+						}else if(newMessage.includes(" is not a constructor")){
+							messageName=newMessage.replace('TypeError: ', '').replace(' is not a constructor', '');
+							newMessage=messageName+"不是一个构造函数";
+						}else if(newMessage.includes("Cannot read property")){
+							messageName=newMessage.replace('TypeError: Cannot read property ', '').replace(' of null', '').replace(' of undefined', '');
+							let ofName=newMessage.slice(newMessage.indexOf(" of ")+4);
+							newMessage="无法读取\'"+ofName+"\'的属性值"+messageName;
+						}else if(newMessage.includes("Cannot read properties")){
+							messageName=newMessage.slice(newMessage.indexOf("reading '")+9,-2);
+							let ofName=newMessage.slice(newMessage.indexOf(" of ")+4,newMessage.indexOf("(")-1);
+							newMessage="无法读取\'"+ofName+"\'的属性值"+messageName;
+						}else if(newMessage.includes("Property description must be an object")){
+							messageName=newMessage.replace('TypeError: Property description must be an object: ', '');
+							newMessage=messageName+"是非对象类型的值";
+						}else if(newMessage.includes("Cannot assign to read only property ")){
+							messageName=newMessage.slice(47,newMessage.lastIndexOf(' of ')+1);
+							newMessage=messageName+"属性禁止写入";
+						}else if(newMessage.includes("Object prototype may only be an Object or null")){
+							newMessage=messageName+"对象原型只能是对象或null";
+						}else if(newMessage.includes("Cannot create property")){
+							messageName=newMessage.slice(newMessage.indexOf('\'')+1);
+							messageName=messageName.slice(0,messageName.indexOf('\''));
+							let obj=newMessage.slice(newMessage.indexOf(messageName)+16);
+							newMessage=obj+"不能添加或修改\'"+messageName+"\'属性，任何 Primitive 值都不允许有property";
+						}else if(newMessage.includes("Can't add property")&&newMessage.includes("is not extensible")){
+							newMessage="对象不可添加属性（不可扩展）";
+						}else if(newMessage.includes("Cannot redefine property")){
+							messageName=newMessage.slice(37);
+							newMessage=messageName+"不可配置";
+						}else if(newMessage.includes("Converting circular structure to JSON")){
+							messageName=newMessage.slice(37);
+							newMessage="JSON.stringify() 方法处理循环引用结构的JSON会失败";
+						}else if(newMessage.includes("Cannot use 'in' operator to search for ")){
+							newMessage="in不能用来在字符串、数字或者其他基本类型的数据中进行检索";
+						}else if(newMessage.includes("Right-hand side of 'instanceof' is not an object")){
+							newMessage="instanceof 操作符 希望右边的操作数为一个构造对象，即一个有 prototype 属性且可以调用的对象";
+						}else if(newMessage.includes("Assignment to constant variable")){
+							newMessage="const定义的变量不可修改";
+						}else if(newMessage.includes("Cannot delete property")){
+							newMessage="不可配置的属性不能删除";
+						}else if(newMessage.includes("which has only a getter")){
+							newMessage="仅设置了getter特性的属性不可被赋值";
+						}else if(newMessage.includes("called on incompatible receiver undefined")){
+							newMessage="this提供的绑定对象与预期的不匹配";
+						}
+					}else if(/URIError/.test(newMessage)){
+						newMessage="一个不合法的URI";
+					}else if(/EvalError/.test(newMessage)){
+						newMessage="非法调用 eval()";
+					}else if(/InternalError/.test(newMessage)){
+						if(newMessage.includes("too many switch cases")){
+							newMessage="过多case子句";
+						}else if(newMessage.includes("too many parentheses in regular expression")){
+							newMessage="正则表达式中括号过多";
+						}else if(newMessage.includes("array initializer too large")){
+							newMessage="超出数组大小的限制";
+						}else if(newMessage.includes("too much recursion")){
+							newMessage="递归过深";
+						}
+					}
+					if(newMessage!=msg){
+						return newMessage;
+					}
+				};
+
+				window.onerror=function(msg,src,line,column,err){
+					const winPath=window.__dirname?('file:///'+(__dirname.replace(new RegExp('\\\\','g'),'/')+'/')):'';
+					let str=`错误文件: ${typeof src=='string'?decodeURI(src).replace(lib.assetURL,'').replace(winPath,''):'未知文件'}`;
+					str+=`\n错误信息: ${msg}`;
+					const tip=getErrorTip(msg);
+					if(tip) str+=`\n错误提示: ${tip}`;
+					str+=`\n行号: ${line}`;
+					str+=`\n列号: ${column}`;
+					const version=lib.version||'';
+					const reg=/[^\d\.]/;
+					const match=version.match(reg)!=null;
+					str+='\n'+`${match?'游戏':'无名杀'}版本: ${version||'未知版本'}`;
+					if(match) str+='\n⚠️您使用的游戏代码不是源于libccy/noname无名杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！';
 					if(_status&&_status.event){
-						var evt=_status.event;
-						str+=('\n'+evt.name+': '+evt.step);
-						if(evt.parent) str+='\n'+evt.parent.name+': '+evt.parent.step;
-						if(evt.parent&&evt.parent.parent) str+='\n'+evt.parent.parent.name+': '+evt.parent.parent.step;
+						let evt=_status.event;
+						str+=`\nevent.name: ${evt.name}\nevent.step: ${evt.step}`;
+						if(evt.parent) str+=`\nevent.parent.name: ${evt.parent.name}\nevent.parent.step: ${evt.parent.step}`;
+						if(evt.parent&&evt.parent.parent) str+=`\nevent.parent.parent.name: ${evt.parent.parent.name}\nevent.parent.parent.step: ${evt.parent.parent.step}`;
 						if(evt.player||evt.target||evt.source||evt.skill||evt.card){
 							str+='\n-------------'
 						}
 						if(evt.player){
-							str+='\nplayer: ' + evt.player.name;
+							if(lib.translate[evt.player.name]) str+=`\nplayer: ${lib.translate[evt.player.name]}[${evt.player.name}]`;
+							else str+='\nplayer: '+evt.player.name;
+							let distance=get.distance(_status.roundStart,evt.player,'absolute');
+							if (distance!=Infinity) {
+								str+=`\n座位号: ${distance+1}`;
+							}
 						}
 						if(evt.target){
-							str+='\ntarget: ' + evt.target.name;
+							if(lib.translate[evt.target.name]) str+=`\ntarget: ${lib.translate[evt.target.name]}[${evt.target.name}]`;
+							else str+='\ntarget: '+evt.target.name;
 						}
 						if(evt.source){
-							str+='\nsource: ' + evt.source.name;
+							if(lib.translate[evt.source.name]) str+=`\nsource: ${lib.translate[evt.source.name]}[${evt.source.name}]`;
+							else str+='\nsource: '+evt.source.name;
 						}
 						if(evt.skill){
-							str+='\nskill: ' + evt.skill.name;
+							if(lib.translate[evt.skill]) str+=`\nskill: ${lib.translate[evt.skill]}[${evt.skill}]`;
+							else str+='\nskill: '+evt.skill;
 						}
 						if(evt.card){
-							str+='\ncard: ' + evt.card.name;
+							if(lib.translate[evt.card.name]) str+=`\ncard: ${lib.translate[evt.card.name]}[${evt.card.name}]`;
+							else str+='\ncard: '+evt.card.name;
 						}
 					}
 					str+='\n-------------';
-					str+='\n'+line;
-					str+='\n'+column;
-					if(err&&err.stack) str+='\n'+decodeURI(err.stack);
+					if(typeof line=='number'&&(typeof game.readFile=='function'||location.origin!='file://')){
+						function createShowCode(lines){
+							let showCode='';
+                            if(lines.length>=10){ 
+                                if(line>4){ 
+                                    for(let i=line-5;i<line+6&&i<lines.length;i++){ 
+                                        showCode+=`${i}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
+                                    } 
+                                }else{ 
+                                    for(let i=0;i<line+6&&i<lines.length;i++){ 
+                                        showCode+=`${i}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
+                                    } 
+                                } 
+                            }else{ 
+                                showCode=lines.map((_line,i)=>`${i}| ${line==i+1?'⚠️':''}${_line}\n`).toString(); 
+							} 
+							return showCode;
+						}
+						//协议名须和html一致(网页端防跨域)，且文件是js 
+						if (typeof src=='string'&&src.startsWith(location.protocol)&&src.endsWith('.js')){ 
+                            //获取代码
+                            const codes=lib.init.reqSync('local:'+decodeURI(src).replace(lib.assetURL,'').replace(winPath,''));
+                            const lines=codes.split("\n"); 
+                            str+='\n'+createShowCode(lines);
+                            str+='\n-------------'; 
+						}
+						//解析parsex里的content fun内容(通常是技能content) 
+						else if(err&&err.stack&&err.stack.split('\n')[1].trim().startsWith('at Object.eval [as content]')){
+                            const codes=_status.event.content; 
+                            if(typeof codes=='function'){
+                                const lines=codes.toString().split("\n");
+                                str+='\n'+createShowCode(lines);
+                                str+='\n-------------'; 
+                            }
+                        }
+                    }
+					if(err&&err.stack) str+='\n'+decodeURI(err.stack).replace(new RegExp(lib.assetURL,'g'),'').replace(new RegExp(winPath,'g'),'');
 					alert(str);
 					window.ea=Array.from(arguments);
 					window.em=msg;
@@ -8081,6 +8273,7 @@
 					}
 					lib.assetURL=noname_inited;
 				}
+
 				if(lib.assetURL.indexOf('com.widget.noname.qingyao')!='-1'){
 					alert('您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。');
 				}
@@ -9885,12 +10078,7 @@
 						if(lib.config.all.stockmode.indexOf(lib.config.all.mode[i])!=-1){
 							// 初始启动页设置
 							if(lib.config.splash_style==undefined){
-								if(lib.device){
-									var item='style2';
-								}else{
-									var item='style1';
-								}
-								lib.configMenu.appearence.config.splash_style.onclick(item);
+								lib.configMenu.appearence.config.splash_style.onclick('style1');
 							}
 							splash.dataset.splash_style=lib.config.splash_style;
 							// 扩展可通过window.splashurl设置素材读取路径
@@ -10072,58 +10260,171 @@
 				if(!file) script_src=path;
 				else script_src=`${path}/${file}.js`;
 				if(path.indexOf('http')==0) script_src+=`?rand=${get.id()}`;
-				else if(game.readFile&&lib.config.fuck_sojson&&script_src.includes('extension')!=-1&&script_src.indexOf(lib.assetURL)==0){
+				else if(lib.config.fuck_sojson&&script_src.includes('extension')!=-1&&script_src.indexOf(lib.assetURL)==0){
 					const path_to_read=script_src.slice(lib.assetURL.length);
-					game.readFileAsText(path_to_read,result=>{
-						if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${path_to_read}`);
-					},()=>void 0);
+					const alertMsg=`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${path_to_read}`;
+					if(typeof game.readFileAsText=='function'){
+						game.readFileAsText(path_to_read,result=>{
+							if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(alertMsg);
+						},()=>void 0);
+					}else if(location.origin!='file://'){
+						lib.init.reqSync(path_to_read,function(){
+							var result = this.responseText;
+							if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(alertMsg);
+						},e=>{});
+					}
 				}
 				const script=document.createElement('script');
 				script.src=script_src;
 				if(path.indexOf('http')==0) script.addEventListener('load',()=>script.remove());
 				document.head.appendChild(script);
-				if(typeof onload=='function'){
-					script.addEventListener('load',onload);
-					script.addEventListener('error',onerror);
-				}
+				if(typeof onload=='function') script.addEventListener('load',onload);
+				if(typeof onerror=='function') script.addEventListener('error',onerror);
 				return script;
 			},
-			req:function(str,onload,onerror,master){
-				var sScriptURL;
-				if(str.indexOf('http')==0){
-					sScriptURL=str;
+			/**
+			 * 同步lib.init.js
+			 * @returns { void }
+			 */
+			jsSync:(path,file,onload,onerror)=>{
+				if(lib.assetURL.length==0&&location.origin=='file://'&&typeof game.readFile=='undefined'){
+					const e=new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
+					if(typeof onerror=='function') onerror(e);
+					else throw e;
+					return;
 				}
-				else{
-					var url=get.url(master);
-					if(url[url.length-1]!='/'){
-						url+='/';
+				if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
+				if(path==`${lib.assetURL}mode`&&lib.config.all.stockmode.indexOf(file)==-1){
+					lib.genAwait(lib.init[`setMode_${file}`]()).then(onload);
+					return;
+				}
+				if(Array.isArray(file)){
+					return file.forEach(value=>lib.init.js(path,value,onload,onerror));
+				}
+				let script_src;
+				if(!file) script_src=path;
+				else script_src=`${path}/${file}.js`;
+				if(path.indexOf('http')==0) script_src+=`?rand=${get.id()}`;
+				const xhr=new XMLHttpRequest();
+				let data;
+				xhr.addEventListener("load",()=>{
+					data=xhr.responseText;
+					if(!data) {
+						if(typeof onerror=='function') onerror(new Error(script_src + '加载失败！'));
+						return;
 					}
-					sScriptURL=url+str;
-				}
-				var oReq=new XMLHttpRequest();
-				if(onload) oReq.addEventListener("load",onload);
-				if(onerror) oReq.addEventListener("error",onerror);
-				oReq.open("GET", sScriptURL);
-				oReq.send();
-			},
-			json:function(url,onload,onerror){
-				var oReq=new XMLHttpRequest();
-				if(onload) oReq.addEventListener("load",function(){
-					var result;
+					if(lib.config.fuck_sojson&&script_src.includes('extension')!=-1&&script_src.indexOf(lib.assetURL)==0){
+						const path_to_read=script_src.slice(lib.assetURL.length);
+						if(data.includes('sojson')||data.includes('jsjiami')||data.includes('var _0x')) alert(`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${path_to_read}`);
+					}
 					try{
-						result=JSON.parse(this.responseText);
-						if(!result){
-							throw('err');
+						window.eval(data);
+						if(typeof onload=='function'){
+							onload();
+						}
+					}catch(error){
+						if(typeof onerror=='function'){
+							onerror(error);
 						}
 					}
+				});
+				if(typeof onerror=='function') xhr.addEventListener("error",onerror);
+				xhr.open("GET",script_src,false);
+				xhr.send();
+			},
+			req:(str,onload,onerror,master)=>{
+				let sScriptURL;
+				if(str.indexOf('http')==0) sScriptURL=str;
+				else if(str.startsWith('local:')){
+					if(lib.assetURL.length==0&&location.origin=='file://'&&typeof game.readFile=='undefined'){
+						const e=new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
+						if(typeof onerror=='function') onerror(e);
+						else throw e;
+						return;
+					}
+					sScriptURL=lib.assetURL+str.slice(6);
+				}
+				else{
+					let url=get.url(master);
+					if(url[url.length-1]!='/') url+='/';
+					sScriptURL=url+str;
+				}
+				const oReq=new XMLHttpRequest();
+				if(typeof onload=='function') oReq.addEventListener("load",onload);
+				if(typeof onerror=='function') oReq.addEventListener("error",onerror);
+				oReq.open("GET",sScriptURL);
+				oReq.send();
+			},
+			/**
+			 * 同步lib.init.req
+			 */
+			reqSync:(str,onload,onerror,master)=>{
+				let sScriptURL;
+				if(str.indexOf('http')==0) sScriptURL=str;
+				else if(str.startsWith('local:')){
+					if(lib.assetURL.length==0&&location.origin=='file://'&&typeof game.readFile=='undefined'){
+						const e=new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
+						if(typeof onerror=='function') onerror(e);
+						else throw e;
+						return;
+					}
+					sScriptURL=lib.assetURL+str.slice(6);
+				}
+				else{
+					let url=get.url(master);
+					if(url[url.length-1]!='/')url+='/';
+					sScriptURL=url+str;
+				}
+				const oReq=new XMLHttpRequest();
+				if(typeof onload=='function') oReq.addEventListener("load",onload);
+				if(typeof onerror=='function') oReq.addEventListener("error",onerror);
+				oReq.open("GET",sScriptURL,false);
+				oReq.send();
+				if(typeof onload!=='function') return oReq.responseText;
+			},
+			json:(url,onload,onerror)=>{
+				const oReq=new XMLHttpRequest();
+				if(typeof onload=='function') oReq.addEventListener("load",()=>{
+					let result;
+					try{
+						result=JSON.parse(oReq.responseText);
+						if(!result) throw('err');
+					}
 					catch(e){
-						onerror();
+						if(typeof onerror=='function') onerror(e);
 						return;
 					}
 					onload(result);
 				});
-				if(onerror) oReq.addEventListener("error",onerror);
-				oReq.open("GET", url);
+				if(typeof onerror=='function') oReq.addEventListener("error",onerror);
+				oReq.open("GET",url);
+				oReq.send();
+			},
+			/**
+			 * 同步lib.init.json
+			 */
+			jsonSync:(url,onload,onerror)=>{
+				if(lib.assetURL.length==0&&location.origin=='file://'&&typeof game.readFile=='undefined'){
+					const e=new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
+					if(typeof onerror=='function') onerror(e);
+					else throw e;
+					return;
+				}
+				const oReq=new XMLHttpRequest();
+				if(typeof onload=='function') oReq.addEventListener("load",()=>{
+					let result;
+					try{
+						result=JSON.parse(oReq.responseText);
+						if(!result) throw('err');
+					}
+					catch(e){
+						if(typeof onerror=='function') onerror(e);
+						return;
+					}
+					onload(result);
+				});
+				if(typeof onerror=='function') oReq.addEventListener("error",onerror);
+				oReq.open("GET",url,false);
 				oReq.send();
 			},
 			cssstyles:function(){
@@ -28823,7 +29124,7 @@
 									lib.element.content[item]._parsed=true;
 								}
 							}
-							catch{
+							catch(_){
 								throw new Error(`Content ${item} may not exist.\nlib.element.content[${item}] = ${lib.element.content[item]}`);
 							}
 							this.content=lib.element.content[item];
@@ -33819,7 +34120,7 @@
 			if(typeof player=='string') player={name:player};
 			else{
 				if(info.direct&&!directaudio) return;
-				if(lib.skill.global.contains(skill)&&!lib.skill[skill].forceaudio) return;
+				if(lib.skill.global.includes(skill)&&!lib.skill[skill].forceaudio) return;
 			}
 			var audioname=skill;
 			var audioinfo=info.audio;
@@ -33840,7 +34141,7 @@
 			}
 			var history=[];
 			for(;;){//可以嵌套引用了
-				if(history.contains(audioname)) break;
+				if(history.includes(audioname)) break;
 				history.push(audioname);
 				if(typeof audioinfo=='string'&&lib.skill[audioinfo]){
 					audioname=audioinfo;
@@ -33856,9 +34157,9 @@
 				break;
 			}
 			if(Array.isArray(info.audioname)&&player){
-				if(info.audioname.contains(player.name)&&!info.audioname2[player.name]) audioname+='_'+player.name;
-				else if(info.audioname.contains(player.name1)&&!info.audioname2[player.name1]) audioname+='_'+player.name1;
-				else if(info.audioname.contains(player.name2)&&!info.audioname2[player.name2]) audioname+='_'+player.name2;
+				if(info.audioname.includes(player.name)&&!info.audioname2[player.name]) audioname+='_'+player.name;
+				else if(info.audioname.includes(player.name1)&&!info.audioname2[player.name1]) audioname+='_'+player.name1;
+				else if(info.audioname.includes(player.name2)&&!info.audioname2[player.name2]) audioname+='_'+player.name2;
 			}
 			if(typeof audioinfo=='string'){
 				if(audioinfo.indexOf('ext:')!=0) return;
@@ -33881,7 +34182,7 @@
 		},
 		playSkillAudio:function(name,index){
 			if(_status.video&&arguments[1]!='video') return;
-			if(!lib.config.repeat_audio&&_status.skillaudio.contains(name)) return;
+			if(!lib.config.repeat_audio&&_status.skillaudio.includes(name)) return;
 			game.addVideo('playSkillAudio',null,name);
 			if(name.indexOf('|')<name.lastIndexOf('|')){
 				name=name.slice(name.lastIndexOf('|')+1);
