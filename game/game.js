@@ -8915,11 +8915,7 @@
 						else if(failure == null){
 							failure=()=>{};
 						}
-						lib.node.fs.access(dir,lib.node.fs.constants.F_OK|lib.node.fs.constants.R_OK,err=>{
-							if(err) {
-								failure(err);
-								return;
-							}
+						try{
 							lib.node.fs.readdir(dir,(err,filelist)=>{
 								if(err){
 									failure(err);
@@ -8937,7 +8933,10 @@
 								}
 								success(folders,files);
 							});
-						});
+						}
+						catch(e){
+							failure(e);
+						}
 					};
 					game.ensureDirectory=function(list,callback,file){
 						var directorylist;
