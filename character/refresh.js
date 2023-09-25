@@ -2931,7 +2931,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(get.attitude(player,target)>0&&target.hp>1){
 										return 0;
 									}
-									if(get.attitude(player,target)<0&&!player.hasSkillTag('damageBonus')){
+									if(get.attitude(player,target)<0&&!player.hasSkillTag('damageBonus','e',{
+										target:target,
+										card:card
+									})){
 										if(card.name=='sha') return;
 										var sha=false;
 										player._shibei_tmp=true;
@@ -12605,7 +12608,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.num++;
 				},
 				ai:{
-					damageBonus:true
+					damageBonus:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='damageBonus') return arg&&arg.card&&(arg.card.name==='sha'||arg.card.name==='juedou');
+					}
 				}
 			},
 			reganglie:{

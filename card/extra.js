@@ -689,7 +689,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					delete player.storage.jiu;
 				},
 				ai:{
-					damageBonus:true
+					damageBonus:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='damageBonus') return arg&&arg.card&&arg.card.name==='sha';
+					}
 				},
 				group:'jiu2'
 			},

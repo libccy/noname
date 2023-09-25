@@ -3247,7 +3247,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('linyun4','shaAfter')
 				}
 			},
-			linyun4:[],
+			linyun4:{},
 			bofeng:{
 				mod:{
 					targetInRange:function(card,player,target){
