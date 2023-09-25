@@ -57,7 +57,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"wangping":["male","shu",4,["nzry_feijun","nzry_binglve"],[]],
 			"luji":["male","wu",3,["nzry_huaiju","nzry_yili","nzry_zhenglun"],[]],
 			"sunliang":["male","wu",3,["nzry_kuizhu","nzry_zhizheng","nzry_lijun"],['zhu']],
-			"xuyou":["male","qun",3,["nzry_chenglve","nzry_shicai","nzry_cunmu"],[]],
+			xuyou:["male","qun",3,["nzry_chenglve","nzry_shicai","nzry_cunmu"]],
 			"yl_luzhi":["male","qun",3,["nzry_mingren","nzry_zhenliang"],["die_audio"]],
 			"kuailiangkuaiyue":["male","wei",3,["nzry_jianxiang","nzry_shenshi"],[]],
 			
@@ -2157,25 +2157,45 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			nzry_shicai:{
 				audio:'nzry_shicai_2',
-				trigger:{player:'useCardAfter'},
-				filter:function(event,player){
-					if(!event.cards.filterInD('oe').length) return false;
-					return player.getHistory('useCard',evt=>get.type2(evt.card)==get.type2(event.card)).indexOf(event)==0;
+				trigger:{player:['useCardAfter','useCardToTargeted']},
+				prompt2:function(event,player){
+					const cards=event.cards.filterInD('oe');
+					return '你可以将'+get.translation(cards)+(cards.length>1?'以任意顺序':'')+'置于牌堆顶，然后摸一张牌';
 				},
-				prompt:function(event,player){
-					return get.prompt('nzry_shicai')+'（将'+get.translation(event.cards.filterInD('oe'))+'置于牌堆顶）';
+				filter:function(event,player){
+					if(!event.cards.someInD()) return false;
+					let evt=event,type=get.type2(evt.card,false);
+					if(event.name=='useCardToPlayered'){
+						if(type!='equip'||player!=event.target) return false;
+						evt=evt.getParent();
+					}
+					else{
+						if(type=='equip') return false;
+					}
+					return !player.hasHistory('useCard',evtx=>{
+						return evtx!=evt&&get.type2(evtx.card,false)==type;
+					},evt);
+				},
+				check:function(event,player){
+					if(get.type(event.card)=='equip'){
+						if(get.subtype(event.card)=='equip6') return true;
+						if(get.equipResult(player,player,event.card.name)<=0) return true;
+						var eff1=player.getUseValue(event.card);
+						var subtype=get.subtype(event.card);
+						return player.countCards('h',function(card){
+							return get.subtype(card)==subtype&&player.getUseValue(card)>=eff1;
+						})>0;
+					}
+					return true;
 				},
 				content:function(){
 					'step 0'
-					event.cards=trigger.cards.filterInD('oe');
-					var cards=event.cards.filter(card=>get.owner(card));
-					if(!cards.length){
-						event.goto(2);
-						return;
+					var cards=trigger.cards.filterInD();
+					if(cards.length==1){
+						event._result={bool:true,moved:[cards]};
 					}
-					event.cards.removeArray(cards);
-					if(cards.length>1){
-						var next=player.chooseToMove('恃才：将牌按顺序置于牌堆顶');
+					else{
+						var next=player.chooseToMove('恃才：将牌按顺序置于牌堆顶',true);
 						next.set('list',[['牌堆顶',cards]]);
 						next.set('reverse',((_status.currentPhase&&_status.currentPhase.next)?get.attitude(player,_status.currentPhase.next)>0:false));
 						next.set('processAI',function(list){
@@ -2186,43 +2206,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return [cards];
 						});
 					}
-					else event._result={bool:true,moved:[cards]};
 					'step 1'
-					var cardx=result.moved[0].slice(0);
-					while(cardx.length){
-						var card=cardx.pop(),owner=get.owner(card);
-						owner.lose([card],ui.cardPile,'insert');
-						game.log(player,'将',card,'置于牌堆顶');
+					if(result.bool){
+						var cards=result.moved[0];
+						cards.reverse();
+						game.cardsGotoPile(cards,'insert');
+						game.log(player,'将',cards,'置于了牌堆顶');
 					}
-					game.updateRoundNumber();
-					if(!cards.length){
-						player.draw();
-						event.finish();
-					}
-					'step 2'
-					if(cards.length>1){
-						var next=player.chooseToMove('恃才：将牌按顺序置于牌堆顶');
-						next.set('list',[['牌堆顶',cards]]);
-						next.set('reverse',((_status.currentPhase&&_status.currentPhase.next)?get.attitude(player,_status.currentPhase.next)>0:false));
-						next.set('processAI',function(list){
-							var cards=list[0][1].slice(0);
-							cards.sort(function(a,b){
-								return (_status.event.reverse?1:-1)*(get.value(b)-get.value(a));
-							});
-							return [cards];
-						});
-					}
-					'step 3'
-					if(result.bool&&result.moved&&result.moved[0].length) cards=result.moved[0].slice(0);
-					while(cards.length){
-						var card=cards.pop();
-						if(get.position(card,true)=='o'){
-							card.fix();
-							ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
-							game.log(player,'将',card,'置于牌堆顶');
-						}
-					}
-					game.updateRoundNumber();
 					player.draw();
 				},
 				subSkill:{'2':{audio:2}},
@@ -3994,7 +3984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.player!=player&&event.player.isIn()){
 						return event.player.getHistory('lose',function(evt){
-							return evt.type=='discard'&&evt.getParent('phaseDiscard')==event&&evt.hs.filterInD('d').length>0;
+							return evt.type=='discard'&&evt.getParent('phaseDiscard')==event&&evt.hs.someInD('d');
 						}).length>0;
 					}
 					return false;
@@ -4638,7 +4628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCardAfter'},
 				forced:true,
 				filter:function(event,player){
-					return (event.card.name=='nanman'&&event.player!=player&&event.cards.filterInD().length>0);
+					return (event.card.name=='nanman'&&event.player!=player&&event.cards.someInD());
 				},
 				content:function(){
 					player.gain(trigger.cards.filterInD(),'gain2');
@@ -7751,8 +7741,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_chenglve1":"成略",
 			"nzry_chenglve":"成略",
 			"nzry_chenglve_info":"转换技，出牌阶段限一次，阴：你可以摸一张牌，然后弃置两张手牌。阳：你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。",
-			"nzry_shicai":"恃才",
-			"nzry_shicai_info":"当你使用牌结束完毕后，若此牌与你本回合使用的牌类型均不同，则你可以将此牌置于牌堆顶，然后摸一张牌。",
 			"nzry_cunmu":"寸目",
 			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌。",
 			"nzry_kuizhu":"溃诛",
@@ -8112,6 +8100,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olkongsheng_info:'①准备阶段开始时，你可以将任意张牌置于你的武将牌上，称为“箜”。②结束阶段开始时，若你有不为装备牌的“箜”，则你获得“箜”中的非装备牌，然后令一名角色依次使用“箜”中的装备牌并失去1点体力。',
 			dcwanglie:"往烈",
 			dcwanglie_info:"①出牌阶段，你对其他角色使用的前两张牌无距离限制。②当你于出牌阶段内使用牌时，你可以令此牌不能被响应，然后你于本阶段内不能使用牌指定其他角色为目标。",
+			nzry_shicai:"恃才",
+			nzry_shicai_info:"当你使用非装备牌结算结束后，或成为自己使用装备牌的目标后，若此牌与你本回合使用的牌类型均不同，则你可以将此牌置于牌堆顶，然后摸一张牌。",
 			
 			shenhua_feng:'神话再临·风',
 			shenhua_huo:'神话再临·火',

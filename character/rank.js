@@ -948,6 +948,7 @@ window.noname_character_rank={
 		'jsrg_xuyou',
 		'jsrg_zhangliao',
 		'jsrg_zhenji',
+		'junk_xuyou',
 	],
 	b:[
 		'diy_feishi',
@@ -2491,6 +2492,7 @@ window.noname_character_rank={
 			'std_panfeng',
 			're_caochong',
 			're_caorui',
+			'junk_xuyou',
 		],
 	}
 };
