@@ -1347,18 +1347,15 @@
 							style1:'样式一',
 							style2:'样式二',
 						},
-						visualMenu:function(node,link){
+						visualMenu:(node,link)=>{
 							node.className='button character';
 							node.style.width='200px';
-							node.style.height=node.offsetWidth*1080/2400+'px';
+							node.style.height=`${node.offsetWidth*1080/2400}px`;
 							node.style.display='flex';
-							node.style['flex-direction']='column';
-							node.style['align-items']='center';
+							node.style.flexDirection='column';
+							node.style.alignItems='center';
 							node.style.backgroundSize='100% 100%';
-							node.setBackgroundImage('image/splash/'+link+'.jpg');
-						},
-						onclick:function(item){
-							game.saveConfig('splash_style',item);
+							node.setBackgroundImage(`image/splash/${link}.jpg`);
 						}
 					},
 					// fewplayer:{
@@ -3968,16 +3965,82 @@
 						unfrequent:true,
 					},
 					show_characternamepinyin:{
-						name:'显示武将名拼音等信息',
-						intro:'在武将资料卡显示武将名及其拼音、性别、势力、体力等信息',
+						name:'显示武将名注解',
+						intro:'在武将资料卡显示武将名及其注解、性别、势力、体力等信息',
 						init:true,
 						unfrequent:true,
+						item:{
+							false:'不显示',
+							true:'显示拼音',
+							showCodeIdentifier:'显示代码ID'
+						},
+						visualMenu:(node,link,name)=>{
+							node.classList.add('button','character');
+							const style=node.style;
+							style.alignItems='center';
+							style.animation='background-position-left-center-right-center-left-center 15s ease infinite';
+							style.background='linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB)';
+							style.backgroundSize='400% 400%';
+							style.display='flex';
+							style.height='60px';
+							style.justifyContent='center';
+							style.width='150px';
+							const firstChild=node.firstChild;
+							firstChild.removeAttribute('class');
+							if(link=='false') return;
+							const ruby=document.createElement('ruby');
+							ruby.textContent=name;
+							const leftParenthesisRP=document.createElement('rp');
+							leftParenthesisRP.textContent='（';
+							ruby.appendChild(leftParenthesisRP);
+							const rt=document.createElement('rt');
+							rt.style.fontSize='smaller';
+							rt.textContent=link=='showCodeIdentifier'?link:get.pinyin(name).join(' ');
+							ruby.appendChild(rt);
+							const rightParenthesisRP=document.createElement('rp');
+							rightParenthesisRP.textContent='）';
+							ruby.appendChild(rightParenthesisRP);
+							firstChild.innerHTML=ruby.outerHTML;
+						}
 					},
 					show_skillnamepinyin:{
-						name:'显示技能名拼音',
-						intro:'在武将资料卡显示技能名拼音',
+						name:'显示技能名注解',
+						intro:'在武将资料卡显示技能名注解',
 						init:true,
 						unfrequent:true,
+						item:{
+							false:'不显示',
+							true:'显示拼音',
+							showCodeIdentifier:'显示代码ID'
+						},
+						visualMenu:(node,link,name)=>{
+							node.classList.add('button','character');
+							const style=node.style;
+							style.alignItems='center';
+							style.animation='background-position-left-center-right-center-left-center 15s ease infinite';
+							style.background='linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB)';
+							style.backgroundSize='400% 400%';
+							style.display='flex';
+							style.height='60px';
+							style.justifyContent='center';
+							style.width='150px';
+							const firstChild=node.firstChild;
+							firstChild.removeAttribute('class');
+							if(link=='false') return;
+							const ruby=document.createElement('ruby');
+							ruby.textContent=name;
+							const leftParenthesisRP=document.createElement('rp');
+							leftParenthesisRP.textContent='（';
+							ruby.appendChild(leftParenthesisRP);
+							const rt=document.createElement('rt');
+							rt.style.fontSize='smaller';
+							rt.textContent=link=='showCodeIdentifier'?link:get.pinyin(name).join(' ');
+							ruby.appendChild(rt);
+							const rightParenthesisRP=document.createElement('rp');
+							rightParenthesisRP.textContent='）';
+							ruby.appendChild(rightParenthesisRP);
+							firstChild.innerHTML=ruby.outerHTML;
+						}
 					}
 				}
 			},
@@ -8645,20 +8708,21 @@
 						}
 					}
 					const loadPack=()=>{
-						if (Array.isArray(lib.onprepare)&&lib.onprepare.length){
+						const isArray=Array.isArray;
+						if (isArray(lib.onprepare)&&lib.onprepare.length){
 							_status.onprepare=Object.freeze(lib.onprepare.map(fn=>{
 								if(typeof fn!="function") return;
 								return (gnc.is.generatorFunc(fn)?gnc.of(fn):fn)();
 							}));
 						}
 						let toLoad=lib.config.all.cards.length+lib.config.all.characters.length+1;
-						if(_status.jsExt) toLoad+=_status.jsExt.reduce((previousValue,currentValue)=>{
-							const arrayLengths=Object.values(currentValue).reduce((previousElement,currentElement)=>{
-								if(Array.isArray(currentElement)) previousElement.push(currentElement.length);
-								return previousElement;
+						if(_status.javaScriptExtensions) toLoad+=_status.javaScriptExtensions.reduce((constructingToLoad,javaScriptExtension)=>{
+							const lengths=Object.values(javaScriptExtension).reduce((constructingLengths,value)=>{
+								if(isArray(value)) constructingLengths.push(value.length);
+								return constructingLengths;
 							},[]);
-							if(!arrayLengths.length) return previousValue+1;
-							return previousValue+Math.min(...arrayLengths);
+							if(!lengths.length) return constructingToLoad+1;
+							return constructingToLoad+Math.min(...lengths);
 						},0);
 						const packLoaded=gnc.of(function*(){
 							toLoad--;
@@ -8688,33 +8752,45 @@
 						lib.init.js(`${lib.assetURL}card`,lib.config.all.cards,packLoaded,packLoaded);
 						lib.init.js(`${lib.assetURL}character`,lib.config.all.characters,packLoaded,packLoaded);
 						lib.init.js(`${lib.assetURL}character`,'rank',packLoaded,packLoaded);
-						if(!_status.jsExt) return;
-						const loadJSExt=(jsExt,pathArray,fileArray,onloadArray,onerrorArray,index)=>{
-							if(!pathArray&&!fileArray&&!onloadArray&&!onerrorArray){
-								lib.init.js(jsExt.path,jsExt.file,()=>{
-									if(typeof jsExt.onload=='function') jsExt.onload();
+						if(!_status.javaScriptExtensions) return;
+						const loadJavaScriptExtension=(javaScriptExtension,pathArray,fileArray,onLoadArray,onErrorArray,index)=>{
+							if(!pathArray&&!fileArray&&!onLoadArray&&!onErrorArray){
+								lib.init.js(javaScriptExtension.path,javaScriptExtension.file,()=>{
+									if(typeof javaScriptExtension.onload=='function') javaScriptExtension.onload();
 									packLoaded();
 								},()=>{
-									if(typeof jsExt.onerror=='function') jsExt.onerror();
+									if(typeof javaScriptExtension.onerror=='function') javaScriptExtension.onerror();
 									packLoaded();
 								});
 								return;
 							}
 							if(typeof index!='number') index=0;
-							if(pathArray&&index>=jsExt.path.length||fileArray&&index>=jsExt.file.length||onloadArray&&index>=jsExt.onload.length||onerrorArray&&index>=jsExt.onerror.length) return;
-							const path=pathArray?jsExt.path[index]:jsExt.path,file=fileArray?jsExt.file[index]:jsExt.file,onload=onloadArray?jsExt.onload[index]:jsExt.onload,onerror=onerrorArray?jsExt.onerror[index]:jsExt.onerror,jsExtOnLoad=()=>{
-								if(typeof onload=='function') onload();
-								loadJSExt(jsExt,pathArray,fileArray,onloadArray,onerrorArray,index+1);
+							if(pathArray&&index>=javaScriptExtension.path.length) return;
+							if(fileArray&&index>=javaScriptExtension.file.length) return;
+							if(onLoadArray&&index>=javaScriptExtension.onload.length) return;
+							if(onErrorArray&&index>=javaScriptExtension.onerror.length) return;
+							const path=pathArray?javaScriptExtension.path[index]:javaScriptExtension.path;
+							const file=fileArray?javaScriptExtension.file[index]:javaScriptExtension.file;
+							const onLoad=onLoadArray?javaScriptExtension.onload[index]:javaScriptExtension.onload;
+							const onError=onErrorArray?javaScriptExtension.onerror[index]:javaScriptExtension.onerror;
+							const javaScriptExtensionOnLoad=()=>{
+								if(typeof onLoad=='function') onLoad();
+								loadJavaScriptExtension(javaScriptExtension,pathArray,fileArray,onLoadArray,onErrorArray,index+1);
 								packLoaded();
 							},jsExtOnError=()=>{
-								if(typeof onerror=='function') onerror();
-								loadJSExt(jsExt,pathArray,fileArray,onloadArray,onerrorArray,index+1);
+								if(typeof onError=='function') onError();
+								loadJavaScriptExtension(javaScriptExtension,pathArray,fileArray,onLoadArray,onErrorArray,index+1);
 								packLoaded();
 							};
-							lib.init.js(path,file,jsExtOnLoad,jsExtOnError);
+							lib.init.js(path,file,javaScriptExtensionOnLoad,jsExtOnError);
 						};
-						_status.jsExt.forEach(value=>loadJSExt(value,Array.isArray(value.path),Array.isArray(value.file),Array.isArray(value.onload),Array.isArray(value.onerror)));
-						// if(lib.device!='ios'&&lib.config.enable_pressure) lib.init.js(lib.assetURL+'game','pressure');
+						_status.javaScriptExtensions.forEach(javaScriptExtension=>{
+							const pathArray=isArray(javaScriptExtension.path);
+							const fileArray=isArray(javaScriptExtension.file);
+							const onLoadArray=isArray(javaScriptExtension.onLoad);
+							const onErrorArray=isArray(javaScriptExtension.onError);
+							loadJavaScriptExtension(javaScriptExtension,pathArray,fileArray,onLoadArray,onErrorArray);
+						});
 					};
 
 					var layout=lib.config.layout;
@@ -10326,48 +10402,45 @@
 			//在扩展的precontent中调用，用于加载扩展必需的JS文件。
 			//If any of the parameters is an Array, corresponding files will be loaded in order
 			//如果任意参数为数组，则按顺序加载加载相应的文件
-			jsForExtension:(path,file,onload,onerror)=>{
-				if(!_status.jsExt) _status.jsExt=[];
-				_status.jsExt.add({
+			jsForExtension:(path,file,onLoad,onError)=>{
+				if(!_status.javaScriptExtensions) _status.javaScriptExtensions=[];
+				_status.javaScriptExtensions.push({
 					path:path,
 					file:file,
-					onload:onload,
-					onerror:onerror
+					onLoad:onLoad,
+					onError:onError
 				});
 			},
-			js:(path,file,onload,onerror)=>{
+			js:(path,file,onLoad,onError)=>{
 				if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
 				if(path==`${lib.assetURL}mode`&&lib.config.all.stockmode.indexOf(file)==-1){
-					lib.genAwait(lib.init[`setMode_${file}`]()).then(onload);
+					lib.genAwait(lib.init[`setMode_${file}`]()).then(onLoad);
 					return;
 				}
 				if(Array.isArray(file)){
-					file.forEach(value=>lib.init.js(path,value,onload,onerror));
+					file.forEach(value=>lib.init.js(path,value,onLoad,onError));
 					return;
 				}
 				let scriptSource=file?`${path}/${file}.js`:path;
 				if(path.indexOf('http')==0) scriptSource+=`?rand=${get.id()}`;
 				else if(lib.config.fuck_sojson&&scriptSource.includes('extension')!=-1&&scriptSource.indexOf(lib.assetURL)==0){
-					const path_to_read=scriptSource.slice(lib.assetURL.length);
-					const alertMsg=`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${path_to_read}`;
-					if(typeof game.readFileAsText=='function'){
-						game.readFileAsText(path_to_read,result=>{
-							if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(alertMsg);
-						},()=>void 0);
-					}else if(location.origin!='file://'){
-						lib.init.reqSync(path_to_read,function(){
-							var result = this.responseText;
-							if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(alertMsg);
-						},e=>{});
-					}
+					const pathToRead=scriptSource.slice(lib.assetURL.length);
+					const alertMessage=`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${pathToRead}`;
+					if(typeof game.readFileAsText=='function') game.readFileAsText(pathToRead,result=>{
+						if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(alertMessage);
+					},()=>void 0);
+					else if(location.origin!='file://') lib.init.reqSync(pathToRead,function(){
+						const result = this.responseText;
+						if(result.includes('sojson')||result.includes('jsjiami')||result.includes('var _0x')) alert(alertMessage);
+					},()=>void 0);
 				}
 				const script=document.createElement('script');
 				(scriptSource.indexOf('db:')==0?game.getDB('file',scriptSource.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(scriptSource))).then(resolvedScriptSource=>{
 					script.src=resolvedScriptSource;
 					if(path.indexOf('http')==0) script.addEventListener('load',()=>script.remove());
 					document.head.appendChild(script);
-					if(typeof onload=='function') script.addEventListener('load',onload);
-					if(typeof onerror=='function') script.addEventListener('error',onerror);
+					if(typeof onLoad=='function') script.addEventListener('load',onLoad);
+					if(typeof onError=='function') script.addEventListener('error',onError);
 				});
 				return script;
 			},
@@ -10375,51 +10448,48 @@
 			 * 同步lib.init.js
 			 * @returns { void }
 			 */
-			jsSync:(path,file,onload,onerror)=>{
+			jsSync:(path,file,onLoad,onError)=>{
 				if(lib.assetURL.length==0&&location.origin=='file://'&&typeof game.readFile=='undefined'){
 					const e=new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
-					if(typeof onerror=='function') onerror(e);
+					if(typeof onError=='function') onError(e);
 					else throw e;
 					return;
 				}
 				if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
 				if(path==`${lib.assetURL}mode`&&lib.config.all.stockmode.indexOf(file)==-1){
-					lib.genAwait(lib.init[`setMode_${file}`]()).then(onload);
+					lib.genAwait(lib.init[`setMode_${file}`]()).then(onLoad);
 					return;
 				}
 				if(Array.isArray(file)){
-					return file.forEach(value=>lib.init.js(path,value,onload,onerror));
+					return file.forEach(value=>lib.init.js(path,value,onLoad,onError));
 				}
-				let script_src;
-				if(!file) script_src=path;
-				else script_src=`${path}/${file}.js`;
-				if(path.indexOf('http')==0) script_src+=`?rand=${get.id()}`;
-				const xhr=new XMLHttpRequest();
+				let scriptSource;
+				if(!file) scriptSource=path;
+				else scriptSource=`${path}/${file}.js`;
+				if(path.indexOf('http')==0) scriptSource+=`?rand=${get.id()}`;
+				const xmlHttpRequest=new XMLHttpRequest();
 				let data;
-				xhr.addEventListener("load",()=>{
-					data=xhr.responseText;
+				xmlHttpRequest.addEventListener("load",()=>{
+					data=xmlHttpRequest.responseText;
 					if(!data) {
-						if(typeof onerror=='function') onerror(new Error(script_src + '加载失败！'));
+						if(typeof onError=='function') onError(new Error(`${scriptSource}加载失败！`));
 						return;
 					}
-					if(lib.config.fuck_sojson&&script_src.includes('extension')!=-1&&script_src.indexOf(lib.assetURL)==0){
-						const path_to_read=script_src.slice(lib.assetURL.length);
-						if(data.includes('sojson')||data.includes('jsjiami')||data.includes('var _0x')) alert(`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${path_to_read}`);
+					if(lib.config.fuck_sojson&&scriptSource.includes('extension')!=-1&&scriptSource.indexOf(lib.assetURL)==0){
+						const pathToRead=scriptSource.slice(lib.assetURL.length);
+						if(data.includes('sojson')||data.includes('jsjiami')||data.includes('var _0x')) alert(`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${pathToRead}`);
 					}
 					try{
 						window.eval(data);
-						if(typeof onload=='function'){
-							onload();
-						}
-					}catch(error){
-						if(typeof onerror=='function'){
-							onerror(error);
-						}
+						if(typeof onLoad=='function') onLoad();
+					}
+					catch(error){
+						if(typeof onError=='function') onError(error);
 					}
 				});
-				if(typeof onerror=='function') xhr.addEventListener("error",onerror);
-				xhr.open("GET",script_src,false);
-				xhr.send();
+				if(typeof onError=='function') xmlHttpRequest.addEventListener("error",onError);
+				xmlHttpRequest.open("GET",scriptSource,false);
+				xmlHttpRequest.send();
 			},
 			req:(str,onload,onerror,master)=>{
 				let sScriptURL;
@@ -53571,8 +53641,8 @@
 				else if(lib.config.favouriteCharacter.contains(name)){
 					fav.classList.add('active');
 				}
-				const introduction=ui.create.div('.characterintro',uiintro);
-				if(lib.config.show_characternamepinyin){
+				const introduction=ui.create.div('.characterintro',uiintro),showCharacterNamePinyin=lib.config.show_characternamepinyin;
+				if(showCharacterNamePinyin){
 					const characterIntroTable=ui.create.div('.character-intro-table',introduction),span=document.createElement('span');
 					span.style.fontWeight='bold';
 					const nameInfo=get.character(name),exInfo=nameInfo[4],characterName=exInfo&&exInfo.includes('ruby')?lib.translate[name]:get.rawName(name);
@@ -53583,7 +53653,7 @@
 					leftParenthesisRP.textContent='（';
 					ruby.appendChild(leftParenthesisRP);
 					const rt=document.createElement('rt');
-					rt.innerHTML=lib.translate[`${name}_rt`]||get.pinyin(characterName).join(' ');
+					rt.innerHTML=showCharacterNamePinyin=='showCodeIdentifier'?name:lib.translate[`${name}_rt`]||get.pinyin(characterName).join(' ');
 					ruby.appendChild(rt);
 					const rightParenthesisRP=document.createElement('rp');
 					rightParenthesisRP.textContent='）';
@@ -53644,12 +53714,12 @@
 					hpDiv.dataset.condition=infoHP<4?'mid':'high';
 					ui.create.div(hpDiv);
 					const hpTextDiv=ui.create.div('.text',hpDiv),infoMaxHP=get.infoMaxHp(nameInfoHP);
-					hpTextDiv.innerHTML=infoHP==infoMaxHP?infoHP:`${infoHP}/${infoMaxHP}`;
+					hpTextDiv.innerHTML=infoHP==infoMaxHP?`×${infoHP}`:`×${infoHP}/${infoMaxHP}`;
 					const infoShield=get.infoHujia(nameInfoHP);
 					if(infoShield){
 						ui.create.div('.shield',hpDiv);
 						const shieldTextDiv=ui.create.div('.text',hpDiv);
-						shieldTextDiv.innerHTML=infoShield;
+						shieldTextDiv.innerHTML=`×${infoShield}`;
 					}
 					introduction.appendChild(document.createElement('hr'));
 				}
@@ -53681,14 +53751,15 @@
 					skillNameSpanStyle.fontWeight='bold';
 					const link=this.link,skillName=get.translation(link);
 					skillNameSpan.innerHTML=skillName;
-					if(lib.config.show_skillnamepinyin&&skillName!='阵亡'){
+					const showSkillNamePinyin=lib.config.show_skillnamepinyin;
+					if(showSkillNamePinyin&&skillName!='阵亡'){
 						const ruby=document.createElement('ruby');
 						ruby.appendChild(skillNameSpan);
 						const leftParenthesisRP=document.createElement('rp');
 						leftParenthesisRP.textContent='（';
 						ruby.appendChild(leftParenthesisRP);
 						const rt=document.createElement('rt');
-						rt.innerHTML=lib.translate[`${link}_rt`]||get.pinyin(skillName).join(' ');
+						rt.innerHTML=showSkillNamePinyin=='showCodeIdentifier'?link:lib.translate[`${link}_rt`]||get.pinyin(skillName).join(' ');
 						ruby.appendChild(rt);
 						const rightParenthesisRP=document.createElement('rp');
 						rightParenthesisRP.textContent='）';
@@ -53717,14 +53788,14 @@
 							derivationNameSpanStyle.fontWeight='bold';
 							const derivationName=get.translation(derivation);
 							derivationNameSpan.innerHTML=derivationName;
-							if(lib.config.show_skillnamepinyin&&derivationName.length<=5&&derivation.indexOf('_faq')==-1){
+							if(showSkillNamePinyin&&derivationName.length<=5&&derivation.indexOf('_faq')==-1){
 								const ruby=document.createElement('ruby');
 								ruby.appendChild(derivationNameSpan);
 								const leftParenthesisRP=document.createElement('rp');
 								leftParenthesisRP.textContent='（';
 								ruby.appendChild(leftParenthesisRP);
 								const rt=document.createElement('rt');
-								rt.innerHTML=lib.translate[`${derivation}_rt`]||get.pinyin(derivationName).join(' ');
+								rt.innerHTML=showSkillNamePinyin=='showCodeIdentifier'?derivation:lib.translate[`${derivation}_rt`]||get.pinyin(derivationName).join(' ');
 								ruby.appendChild(rt);
 								const rightParenthesisRP=document.createElement('rp');
 								rightParenthesisRP.textContent='）';

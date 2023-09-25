@@ -314,22 +314,33 @@
 }
 
 .menubg.charactercard .characterintro .character-intro-table {
-	align-items: flex-end;
+	align-items: center;
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
 	white-space: nowrap;
 }
 
 @supports (row-gap: 0.5em) {
 	.menubg.charactercard .characterintro .character-intro-table {
+		column-gap: 1em;
 		row-gap: 0.5em;
 	}
 }
 
 @supports not (row-gap: 0.5em) {
 	.menubg.charactercard .characterintro .character-intro-table>:last-child {
+		margin-bottom: 0.5em;
 		margin-top: 0.5em;
+	}
+
+	.menubg.charactercard .characterintro .character-intro-table>:not(:first-child) {
+		margin-left: 0.5em;
+	}
+
+	.menubg.charactercard .characterintro .character-intro-table>:not(:last-child) {
+		margin-right: 0.5em;
 	}
 }
 
