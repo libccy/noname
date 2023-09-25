@@ -2165,7 +2165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!event.cards.someInD()) return false;
 					let evt=event,type=get.type2(evt.card,false);
-					if(event.name=='useCardToPlayered'){
+					if(event.name=='useCardToTargeted'){
 						if(type!='equip'||player!=event.target) return false;
 						evt=evt.getParent();
 					}
@@ -7697,7 +7697,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangzhang:['ol_zhangzhang','re_zhangzhang','zhangzhang'],
 			zuoci:['re_zuoci','zuoci'],
 			caiwenji:['ol_caiwenji','re_caiwenji','caiwenji'],
-			xuyou:['sp_xuyou','xuyou','jsrg_xuyou','yj_xuyou'],
+			xuyou:['sp_xuyou','xuyou','jsrg_xuyou','yj_xuyou','junk_xuyou'],
 			guanqiujian:['guanqiujian','tw_guanqiujian','re_guanqiujian','old_guanqiujian'],
 			chendao:['chendao','old_chendao','ns_chendao'],
 			zhugezhan:['zhugezhan','old_zhugezhan'],

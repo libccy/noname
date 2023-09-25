@@ -1626,9 +1626,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list2=[];
 
 					event.list=[];
+					event.choiceFour=(get.config('character_four')||lib.choiceFour);
 					event.filterChoice=function(name){
 						if(get.config('enable_all')) return false;
-						return !lib.choiceFour.contains(name);
+						return !event.choiceFour.contains(name);
 					}
 					for(i in lib.character){
 						if(event.filterChoice(i)) continue;

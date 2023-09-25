@@ -5700,6 +5700,8 @@
 							map.four_phaseswap.show();
 							map.expand_dialog.show();
 							map.fouralign.show();
+							map.edit_character_four.show();
+							map.reset_character_four.show();
 						}
 						else{
 							map.change_choice.show();
@@ -5712,12 +5714,16 @@
 							map.four_phaseswap.hide();
 							map.expand_dialog.hide();
 							map.fouralign.hide();
+							map.edit_character_four.hide();
+							map.reset_character_four.hide();
 						}
 						if(config.versus_mode=='three'){
 							map.edit_character_three.show();
+							map.reset_character_three.show();
 						}
 						else{
 							map.edit_character_three.hide();
+							map.reset_character_three.hide();
 						}
 						if(config.versus_mode=='three'||config.versus_mode=='one'){
 							map.enable_all_three.show();
@@ -6063,7 +6069,7 @@
 										lineNumbers:true,
 										indentUnit:4,
 										autoCloseBrackets:true,
-										theme:'mdn-like'
+										theme:'mdn-like',
 									});
 									lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
 									node.aced=true;
@@ -6080,12 +6086,120 @@
 						},
 					},
 					reset_character_three:{
-						name:'重置将池',
+						name:'重置统率将池',
 						intro:'将统率三军模式下的将池重置为默认将池',
 						clear:true,
 						onclick:function(){
 							if(confirm('该操作不可撤销！是否清除统率三军模式的自定义将池，并将其重置为默认将池？')){
 								game.saveConfig('character_three',null,'versus');
+								alert('将池已重置');
+							}
+						},
+					},
+					edit_character_four:{
+						name:'编辑4v4将池',
+						clear:true,
+						onclick:function(){
+							if(get.mode()!='versus'){
+								alert('请进入对决模式，然后再编辑将池');
+								return;
+							}
+							var container=ui.create.div('.popup-container.editor');
+							var editorpage=ui.create.div(container);
+							var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
+								ui.window.classList.remove('shortcutpaused');
+								ui.window.classList.remove('systempaused');
+								container.delete(null);
+								delete window.saveNonameInput;
+							});
+							var node=container;
+							var map=get.config('character_four')||lib.choiceFour;
+							var str='character=[\n    ';
+							for(var i=0;i<map.length;i++){
+								str+='"'+map[i]+'",';
+								if(i+1<map.length&&(i+1)%5==0) str+='\n    ';
+							}
+							str+='\n];';
+							node.code=str;
+							ui.window.classList.add('shortcutpaused');
+							ui.window.classList.add('systempaused');
+							var saveInput=function(){
+								var code;
+								if(container.editor){
+									code=container.editor.getValue();
+								}
+								else if(container.textarea){
+									code=container.textarea.value;
+								}
+								try{
+									var character=null;
+									eval(code);
+									if(!Array.isArray(character)){
+										throw('err');
+									}
+								}
+								catch(e){
+									alert('代码语法有错误，请仔细检查（'+e+'）');
+									return;
+								}
+								game.saveConfig('character_four',character,'versus');
+								ui.window.classList.remove('shortcutpaused');
+								ui.window.classList.remove('systempaused');
+								container.delete();
+								container.code=code;
+								delete window.saveNonameInput;
+							};
+							window.saveNonameInput=saveInput;
+							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
+							var editor=ui.create.div(editorpage);
+							if(node.aced){
+								ui.window.appendChild(node);
+								node.editor.setValue(node.code,1);
+							}
+							else if(lib.device=='ios'){
+								ui.window.appendChild(node);
+								if(!node.textarea){
+									var textarea=document.createElement('textarea');
+									editor.appendChild(textarea);
+									node.textarea=textarea;
+									lib.setScroll(textarea);
+								}
+								node.textarea.value=node.code;
+							}
+							else{
+								var aceReady=function(){
+									ui.window.appendChild(node);
+									var mirror = window.CodeMirror(editor, {
+										value:node.code,
+										mode:"javascript",
+										lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
+										lineNumbers:true,
+										indentUnit:4,
+										autoCloseBrackets:true,
+										theme:'mdn-like',
+										gameZoom:game.documentZoom,
+									});
+									lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
+									node.aced=true;
+									node.editor=mirror;
+								}
+								if(!window.ace){
+									lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+									lib.init.css(lib.assetURL+'layout/default','codemirror');
+								}
+								else{
+									aceReady();
+								}
+							};
+						},
+					},
+					reset_character_four:{
+						name:'重置4v4将池',
+						intro:'将4v4模式下的将池重置为默认将池',
+						clear:true,
+						onclick:function(){
+							if(confirm('该操作不可撤销！是否清除4v4模式的自定义将池，并将其重置为默认将池？')){
+								game.saveConfig('character_four',null,'versus');
 								alert('将池已重置');
 							}
 						},
