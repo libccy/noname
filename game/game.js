@@ -9371,19 +9371,13 @@
 							if(!idbDatabase.objectStoreNames.contains('file')) idbDatabase.createObjectStore('file').transaction.oncomplete=()=>{
 								if(idbDatabase.objectStoreNames.contains('audio')) idbDatabase.transaction('audio').objectStore('audio').openCursor().onsuccess=event=>{
 									const result=event.target.result;
-									if(!result){
-										idbDatabase.deleteObjectStore('audio');
-										return;
-									}
+									if(!result) return;
 									idbDatabase.transaction('file','readwrite').objectStore('file').put(result.value,result.key);
 									result.continue();
 								};
 								if(idbDatabase.objectStoreNames.contains('image')) idbDatabase.transaction('image').objectStore('image').openCursor().onsuccess=event=>{
 									const result=event.target.result;
-									if(!result){
-										idbDatabase.deleteObjectStore('image');
-										return;
-									}
+									if(!result) return;
 									idbDatabase.transaction('file','readwrite').objectStore('file').put(result.value,result.key);
 									result.continue();
 								};
