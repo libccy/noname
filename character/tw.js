@@ -469,12 +469,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case -1:
 								var num=Math.ceil(cards.length/2)+(cards.length%2==0?1:0);
 								if(num>1&&player.hasSkill('twchungang')) num--;
-								if(get.damageEffect(target,player,player)<=0||num>2||cardy.length>cardx.length) return [cardx,cardy];
-								var num2=cardx.length-cardy.length;
+								if(get.damageEffect(target,player,player)<=0||num>2||cardx.length>cardy.length) return [cardx,cardy];
+								var num2=cardy.length-cardx.length;
 								num2=Math.ceil(num2/2)+(num2%2==0?1:0);
-								cardx.sort((a,b)=>get.value(b)-get.value(a));
-								cardy.addArray(cardx.sort(num,cardx.length));
-								return [cardx.sort(0,num),cardy];
+								cardy.sort((a,b)=>get.value(b)-get.value(a));
+								cardx.addArray(cardy.slice(num,cardy.length));
+								return [cardx,cardy.slice(0,num)];
 								break;
 						}
 					}).set('cards',cards);
