@@ -266,7 +266,7 @@
 				});
 			}],
 			//增加新属性杀
-			addNature:[(nature,config)=>{
+			addNature:[(nature,_translation,config)=>{
 				if(typeof config!='object') config={};
 				let linked=config.linked,order=config.order,background=config.background,lineColor=config.lineColor;
 				if(typeof linked!='boolean') linked=true;
@@ -33429,7 +33429,7 @@
 			lib.onload.add(()=>{
 				for(const hook of lib.hooks.addNature){
 					if(hook!=null&&typeof hook=="function"){
-						hook(nature,config);
+						hook(nature,translation,config);
 					}
 				}
 			})
