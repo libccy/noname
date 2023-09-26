@@ -33426,13 +33426,15 @@
 		addNature:(nature,translation,config)=>{
 			if(!nature) throw new TypeError();
 			if(translation&&translation.length) lib.translate['nature_'+nature]=translation;
-			lib.onload.add(()=>{
+			var hookCall=()=>{
 				for(const hook of lib.hooks.addNature){
 					if(hook!=null&&typeof hook=="function"){
 						hook(nature,translation,config);
 					}
 				}
-			})
+			};
+			if ("onload" in lib) lib.onload.add(hookCall);
+			else hookCall();
 			return nature;
 		},
 		//设置卡牌信息/事件的属性
@@ -33500,13 +33502,15 @@
 			lib.group.add(id);
 			if(short)lib.translate[id] = short;
 			if(name)lib.translate[`${id}2`] = name;
-			lib.onload.add(()=>{
+			var hookCall=()=>{
 				for(const hook of lib.hooks.addGroup){
 					if(hook!=null&&typeof hook=="function"){
 						hook(id,short,name,config);
 					}
 				}
-			})
+			};
+			if ("onload" in lib) lib.onload.add(hookCall);
+			else hookCall();
 			return id;
 		},
 		//Yingbian
