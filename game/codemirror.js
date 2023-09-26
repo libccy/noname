@@ -1,24 +1,50 @@
 (() => {
   function getDocumentZoom() {
-    var deviceZoom;
-    if (document.documentElement.offsetWidth < 900 || document.documentElement.offsetHeight < 500) {
-      deviceZoom = Math.min(
-        Math.round(document.documentElement.offsetWidth / 98) / 10,
-        Math.round(document.documentElement.offsetHeight / 50) / 10
-      );
-    }
-    else {
-      deviceZoom = 1;
-    }
-
     //一般body的缩放是xy同步的
     var transform = getComputedStyle(document.body).transform;
     if (transform == 'none') transform = 1;
     else transform = +transform.slice(7, -1).split(',')[0];
-
-    var documentZoom = deviceZoom * transform;
-    return documentZoom;
+    return +transform;
   }
+
+  // BROWSER SNIFFING
+
+  // Kludges for bugs and behavior differences that can't be feature
+  // detected are enabled based on userAgent etc sniffing.
+  var userAgent = navigator.userAgent;
+  var platform = navigator.platform;
+
+  var gecko = /gecko\/\d/i.test(userAgent);
+  var ie_upto10 = /MSIE \d/.test(userAgent);
+  var ie_11up = /Trident\/(?:[7-9]|\d{2,})\..*rv:(\d+)/.exec(userAgent);
+  var ie = ie_upto10 || ie_11up;
+  var ie_version = ie && (ie_upto10 ? document.documentMode || 6 : ie_11up[1]);
+  var webkit = /WebKit\//.test(userAgent);
+  var qtwebkit = webkit && /Qt\/\d+\.\d+/.test(userAgent);
+  var chrome = /Chrome\//.test(userAgent);
+  var presto = /Opera\//.test(userAgent);
+  var safari = /Apple Computer/.test(navigator.vendor);
+  var mac_geMountainLion = /Mac OS X 1\d\D([8-9]|\d\d)\D/.test(userAgent);
+  var phantom = /PhantomJS/.test(userAgent);
+
+  var ios = /AppleWebKit/.test(userAgent) && /Mobile\/\w+/.test(userAgent);
+  // This is woefully incomplete. Suggestions for alternative methods welcome.
+  var mobile = ios || /Android|webOS|BlackBerry|Opera Mini|Opera Mobi|IEMobile/i.test(userAgent);
+  var mac = ios || /Mac/.test(platform);
+  var chromeOS = /\bCrOS\b/.test(userAgent);
+  var windows = /win/i.test(platform);
+
+  var presto_version = presto && userAgent.match(/Version\/(\d*\.\d*)/);
+  if (presto_version) presto_version = Number(presto_version[1]);
+  if (presto_version && presto_version >= 15) { presto = false; webkit = true; }
+  // Some browsers use the wrong event properties to signal cmd/ctrl on OS X
+  var flipCtrlCmd = mac && (qtwebkit || presto && (presto_version == null || presto_version < 12.11));
+  var captureRightClick = gecko || (ie && ie_version >= 9);
+
+  // Optimize some code when these features are not used.
+  var sawReadOnlySpans = false, sawCollapsedSpans = false;
+
+  // EDITOR CONSTRUCTOR
 
   // CodeMirror, copyright (c) by Marijn Haverbeke and others
   // Distributed under an MIT license: http://codemirror.net/LICENSE
@@ -37,46 +63,6 @@
     else // Plain browser env
       (this || window).CodeMirror = mod();
   })(function () {
-    "use strict";
-
-    // BROWSER SNIFFING
-
-    // Kludges for bugs and behavior differences that can't be feature
-    // detected are enabled based on userAgent etc sniffing.
-    var userAgent = navigator.userAgent;
-    var platform = navigator.platform;
-
-    var gecko = /gecko\/\d/i.test(userAgent);
-    var ie_upto10 = /MSIE \d/.test(userAgent);
-    var ie_11up = /Trident\/(?:[7-9]|\d{2,})\..*rv:(\d+)/.exec(userAgent);
-    var ie = ie_upto10 || ie_11up;
-    var ie_version = ie && (ie_upto10 ? document.documentMode || 6 : ie_11up[1]);
-    var webkit = /WebKit\//.test(userAgent);
-    var qtwebkit = webkit && /Qt\/\d+\.\d+/.test(userAgent);
-    var chrome = /Chrome\//.test(userAgent);
-    var presto = /Opera\//.test(userAgent);
-    var safari = /Apple Computer/.test(navigator.vendor);
-    var mac_geMountainLion = /Mac OS X 1\d\D([8-9]|\d\d)\D/.test(userAgent);
-    var phantom = /PhantomJS/.test(userAgent);
-
-    var ios = /AppleWebKit/.test(userAgent) && /Mobile\/\w+/.test(userAgent);
-    // This is woefully incomplete. Suggestions for alternative methods welcome.
-    var mobile = ios || /Android|webOS|BlackBerry|Opera Mini|Opera Mobi|IEMobile/i.test(userAgent);
-    var mac = ios || /Mac/.test(platform);
-    var chromeOS = /\bCrOS\b/.test(userAgent);
-    var windows = /win/i.test(platform);
-
-    var presto_version = presto && userAgent.match(/Version\/(\d*\.\d*)/);
-    if (presto_version) presto_version = Number(presto_version[1]);
-    if (presto_version && presto_version >= 15) { presto = false; webkit = true; }
-    // Some browsers use the wrong event properties to signal cmd/ctrl on OS X
-    var flipCtrlCmd = mac && (qtwebkit || presto && (presto_version == null || presto_version < 12.11));
-    var captureRightClick = gecko || (ie && ie_version >= 9);
-
-    // Optimize some code when these features are not used.
-    var sawReadOnlySpans = false, sawCollapsedSpans = false;
-
-    // EDITOR CONSTRUCTOR
 
     // A CodeMirror instance represents an editor. This is the object
     // that user code is usually dealing with.
@@ -636,10 +622,10 @@
           "CodeMirror-linenumber CodeMirror-gutter-elt"));
         var innerW = test.firstChild.offsetWidth, padding = test.offsetWidth - innerW;
         display.lineGutter.style.width = "";
-        display.lineNumInnerWidth = (Math.max(innerW, display.lineGutter.offsetWidth - padding) + 1) / documentZoom;
-        display.lineNumWidth = (display.lineNumInnerWidth + padding) / documentZoom;
-        display.lineNumChars = (display.lineNumInnerWidth ? last.length : -1) / documentZoom;
-        display.lineGutter.style.width = display.lineNumWidth / documentZoom + "px";
+        display.lineNumInnerWidth = (Math.max(innerW, display.lineGutter.offsetWidth - padding) + 1) /* / documentZoom */;
+        display.lineNumWidth = (display.lineNumInnerWidth + padding) /* / documentZoom */;
+        display.lineNumChars = (display.lineNumInnerWidth ? last.length : -1) /* / documentZoom */;
+        display.lineGutter.style.width = display.lineNumWidth + "px";
         updateGutterSpace(cm);
         return true;
       }
@@ -1030,7 +1016,7 @@
           var id = cm.options.gutters[k], found = markers.hasOwnProperty(id) && markers[id];
           if (found)
             gutterWrap.appendChild(elt("div", [found], "CodeMirror-gutter-elt", "left: " +
-              dims.gutterLeft[id] + "px; width: " + dims.gutterWidth[id] + "px"));
+              dims.gutterLeft[id] + "px; width: " + dims.gutterWidth[id] / + "px"));
         }
       }
     }
@@ -10080,12 +10066,12 @@
         this.data = data;
 
         if (data && data.list.length) {
-          /*if (picked && data.list.length == 1) {
+          if (picked && data.list.length == 1) {
             this.pick(data, 0);
-          } else {*/
-          this.widget = new Widget(this, data);
-          CodeMirror.signal(data, "shown");
-          //}
+          } else {
+            this.widget = new Widget(this, data);
+            CodeMirror.signal(data, "shown");
+          }
         }
       }
     };
@@ -10194,6 +10180,7 @@
         offsetTop = (offsetParentPosition.top - bodyPosition.top - offsetParent.scrollTop);
       }
       var documentZoom = getDocumentZoom();
+      hints.style.fontSize = 16 / documentZoom * 0.9 + "px";
       hints.style.left = (left - offsetLeft) / documentZoom + "px";
       hints.style.top = (top - offsetTop) / documentZoom + "px";
 
@@ -10279,6 +10266,17 @@
       CodeMirror.on(hints, "mousedown", function () {
         setTimeout(function () { cm.focus(); }, 20);
       });
+
+      //滑动修复//
+      CodeMirror.on(hints, "touchmove", function (event) {
+        if (ios && this.scrollHeight <= this.offsetHeight + 5 && this.scrollWidth <= this.offsetWidth + 5) {
+          event.preventDefault();
+        }
+        else {
+          event.stopPropagation();
+        }
+      });
+      hints.style.WebkitOverflowScrolling = 'touch';
 
       // The first hint doesn't need to be scrolled to on init
       var selectedHintRange = this.getSelectedHintRange();
@@ -10539,8 +10537,8 @@
       "if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
     var coffeescriptKeywords = ("and break catch class continue delete do else extends false finally for " +
       "if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
-    var nonameWords = ("_status ai audio card charlotte content control damage enable event extension fixed forced gainable game get group identity lib lose loseHp mod mode nobracket player recover remove result select set source superCharlotte target trigger ui viewAs").split(" ");
-    var extension = ["ai:{\n},", "content:function(){\n},", "enable:\"phaseUse\",", "event.player", "event.source", "event.target", "filter:function(event,player,name){\n},", "init:function(player){\n},", "for(var i = 0; i < xx.length; i++) {\n}", "for(var i in xx){\n}", "for(var i of xx){\n}", "mod:{\n},", "skill = {\n\ttrigger:{},\n\tfilter:function(event,player,name){},\n\tcontent:function(){},\n}", "switch(){\n}", "trigger:{\n},", "trigger.name", "trigger.player", "trigger.source", "trigger.target", "try{\n}catch(e){\n}", "usable:1,", "while(){\n}", "window"];
+    //var nonameWords = ("_status ai audio card charlotte content control damage enable event extension fixed forced gainable game get group identity lib lose loseHp mod mode nobracket player recover remove result select set source superCharlotte target trigger ui viewAs").split(" ");
+    //var extension = ["ai:{\n},", "content:function(){\n},", "enable:\"phaseUse\",", "event.player", "event.source", "event.target", "filter:function(event,player,name){\n},", "init:function(player){\n},", "for(var i = 0; i < xx.length; i++) {\n}", "for(var i in xx){\n}", "for(var i of xx){\n}", "mod:{\n},", "skill = {\n\ttrigger:{},\n\tfilter:function(event,player,name){},\n\tcontent:function(){},\n}", "switch(){\n}", "trigger:{\n},", "trigger.name", "trigger.player", "trigger.source", "trigger.target", "try{\n}catch(e){\n}", "usable:1,", "while(){\n}", "window"];
     function forAllProps(obj, callback) {
       if (!Object.getOwnPropertyNames || !Object.getPrototypeOf) {
         for (var name in obj) callback(name)
@@ -10598,8 +10596,8 @@
           gatherCompletions(global);*/
         forEach(keywords, maybeAdd);
         forEach(coffeescriptKeywords, maybeAdd);
-        forEach(nonameWords, maybeAdd);
-        forEach(extension, maybeAdd);
+        //forEach(nonameWords, maybeAdd);
+        //forEach(extension, maybeAdd);
       }
       return found.sort(function (a, b) {
         return (a + '').localeCompare(b + '');

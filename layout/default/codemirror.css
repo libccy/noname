@@ -353,12 +353,6 @@ div.CodeMirror-dragcursors {
 /* Help users use markselection to safely style text background */
 span.CodeMirror-selectedtext { background: none; }
 
-
-
-
-
-
-
 /*
   MDN-LIKE Theme - Mozilla
   Ported to CodeMirror by Peter Kroon <plakroon@gmail.com>
