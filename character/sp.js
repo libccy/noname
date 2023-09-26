@@ -1240,7 +1240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(rand<0.2&&list.includes(0)) return 0;
 						if(rand<0.7&&list.includes(1)) return 1;
 						if(rand<1.0&&list.includes(2)) return 2;
-						return list.randomGet();
+						return get.rand(0,2);
 					}());
 					'step 1'
 					if(result.control!='cancel2'){
