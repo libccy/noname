@@ -1237,10 +1237,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.inRange(current)&&get.effect(current,{name:'sha'},player,player)>0;
 						})) return 0;
 						var rand=Math.random();
-						if(rand<0.2&&list.includes(0)) return 0;
-						if(rand<0.7&&list.includes(1)) return 1;
-						if(rand<1.0&&list.includes(2)) return 2;
-						return list.randomGet();
+						if(rand<0.2) return 0;
+						if(rand<0.7) return 1;
+						if(rand<1.0) return 2;
+						return get.rand(0,2);
 					}());
 					'step 1'
 					if(result.control!='cancel2'){
@@ -1337,7 +1337,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					list.sort();
 					var str=list.join('、').replace(/(.*)、/, '$1或');
 					event.list=list;
-					player.chooseTarget(get.prompt('oljianxuan'),'令一名角色摸一张牌，然后若其手牌数为'+str+'，其可以重复此流程。').set('ai',target=>{
+					player.chooseTarget(get.prompt('oljianxuan'),'令一名角色摸一张牌，然后若其手牌数为'+str+'，其重复此流程').set('ai',target=>{
 						var list=_status.event.list;
 						var player=_status.event.player;
 						var att=get.attitude(player,target);
