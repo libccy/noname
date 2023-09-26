@@ -2312,31 +2312,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				preHidden:true,
 				filter:function(event,player){
-					return !player.hasSkill('caiyuan_mark')&&player.phaseNumber>1;
+					if(player.phaseNumber<=1) return false;
+					const history1=_status.globalHistory,history2=player.actionHistory;
+					for(let i=0;i<Math.min(history1.length,history2.length);i++){
+						let i1=history1.length-1-i,i2=history2.length-1-i;
+						if(i>0&&history2[i2].isMe) break;
+						if(history1[i1].changeHp.some(evt=>evt.player==player&&evt.num<0)) return false;
+					}
+					return true;
 				},
 				content:function(){
 					player.draw(2);
-				},
-				group:'caiyuan_count',
-				subSkill:{
-					mark:{
-						//mark:true,
-						marktext:'媛',
-						charlotte:true,
-						intro:{content:'已扣减过体力'},
-					},
-					count:{
-						trigger:{player:'changeHp'},
-						silent:true,
-						charlotte:true,
-						filter:function(event,player){
-							return event.num<0&&!player.hasSkill('caiyuan_mark');
-						},
-						content:function(){
-							player.addTempSkill('caiyuan_mark',{player:'phaseAfter'});
-							if(player.hasSkill('caiyuan')) player.markSkill('caiyuan_mark');
-						},
-					},
 				},
 			},
 			zhuosheng:{
@@ -3704,7 +3690,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ciwei:'慈威',
 			ciwei_info:'一名角色于其回合内使用第二张牌时，若此牌为基本牌或普通锦囊牌，则你可以弃置一张牌，取消此牌的所有目标。',
 			caiyuan:'才媛',
-			caiyuan_info:'锁定技，当你扣减体力时，你获得一枚“才媛”标记直到你的下回合结束。回合结束时，若你没有“才媛”标记且此回合不是你的第一个回合，则	你摸两张牌。',
+			caiyuan_info:'锁定技。回合结束时，若你于你的上一个回合结束后未扣减过体力，则你摸两张牌。',
 			simazhou:'司马伷',
 			caiwang:'才望',
 			caiwang_info:'当你使用或打出牌响应其他角色使用的牌，或其他角色使用或打出牌响应你使用的牌后，若这两张牌颜色相同，则你可以弃置对方的一张牌。',
