@@ -991,9 +991,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:9.5,
 					result:{
 						target:function(player,target){
-							if(get.attitude(player,target)>0) return 1;
 							var num=target.countCards('h');
 							if(num<=1) return -num;
+							if(get.attitude(player,target)>0) return 1;
 							return -1/(num/2+1);
 						}
 					}
@@ -1317,6 +1317,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var targets=game.filterPlayer(current=>target.inRange(current)&&current!=player).sortBySeat(player);
 					event.targets=targets;
+					if(!targets.length) event.finish();
 					'step 1'
 					var current=targets.shift();
 					if(current.countCards('he')) current.chooseToDiscard('驰应：请弃置一张牌','he',true);

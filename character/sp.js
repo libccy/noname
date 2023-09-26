@@ -2513,7 +2513,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							targets.addArray(evt.targets);
 						}
 					});
-					return targets.length==3;
+					return targets.length==3&&targets.includes(player);
 				},
 				content:function(){
 					'step 0'
@@ -13880,67 +13880,74 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			weijing:{
 				audio:2,
-				group:['weijing_sha','weijing_shan'],
+				enable:'chooseToUse',
+				filter:function(event,player){
+					if(event.type=='wuxie'||player.hasSkill('weijing_used')) return false;
+					for(var name of ['sha','shan']){
+						if(event.filterCard({name:name,isCard:true},player,event)) return true;
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var vcards=[];
+						for(var name of ['sha','shan']){
+							var card={name:name,isCard:true};
+							if(event.filterCard(card,player,event)) vcards.push(['基本','',name]);
+						}
+						var dialog=ui.create.dialog('卫境',[vcards,'vcard'],'hidden');
+						dialog.direct=true;
+						return dialog;
+					},
+					backup:function(links,player){
+						return {
+							filterCard:()=>false,
+							selectCard:-1,
+							viewAs:{
+								name:links[0][2],
+								isCard:true,
+							},
+							popname:true,
+							precontent:function(){
+								player.logSkill('weijing');
+								player.addTempSkill('weijing_used','roundStart');
+							},
+						}
+					},
+					prompt:function(links,player){
+						return '卫境：视为使用一张【'+get.translation(links[0][2])+'】';
+					}
+				},
+				ai:{
+					order:function(item,player){
+						var player=_status.event.player;
+						var event=_status.event;
+						if(event.filterCard({name:'sha'},player,event)){
+							if(!player.hasShan()&&!game.hasPlayer(function(current){
+								return player.canUse('sha',current)&&current.hp==1&&get.effect(current,{name:'sha'},player,player)>0;
+							})){
+								return 0;
+							}
+							return 2.95;
+						}
+						else{
+							var player=_status.event.player;
+							if(player.hasSkill('qingzhong_give')) return 2.95;
+							return 3.15;
+						}
+					},
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter:function(player,tag,arg){
+						if(player.hasSkill('weijing_used')) return false;
+						if(arg!='use') return false;
+					},
+					result:{
+						player:1
+					}
+				},
 				subSkill:{
-					sha:{
-						audio:'weijing',
-						enable:'chooseToUse',
-						viewAs:{name:'sha',isCard:true},
-						filterCard:function(){return false},
-						viewAsFilter:function(player){
-							if(player.hasSkill('weijing_disable')) return false;
-						},
-						selectCard:-1,
-						mark:false,
-						precontent:function(){
-							player.addTempSkill('weijing_disable','roundStart');
-						},
-						prompt:'视为使用一张杀',
-						ai:{
-							order:function(){
-								var player=_status.event.player;
-								if(!player.hasShan()&&!game.hasPlayer(function(current){
-									return player.canUse('sha',current)&&current.hp==1&&get.effect(current,{name:'sha'},player,player)>0;
-								})){
-									return 0;
-								}
-								return 2.95;
-							},
-							skillTagFilter:function(player,tag,arg){
-								if(player.hasSkill('weijing_disable')) return false;
-								if(arg!='use') return false;
-							},
-							respondSha:true,
-						}
-					},
-					shan:{
-						audio:'weijing',
-						enable:'chooseToUse',
-						viewAs:{name:'shan',isCard:true},
-						mark:false,
-						filterCard:function(){return false},
-						viewAsFilter:function(player){
-							if(player.hasSkill('weijing_disable')) return false;
-							return true;
-						},
-						onuse:function(event,player){
-							player.addTempSkill('weijing_disable','roundStart');
-						},
-						selectCard:-1,
-						prompt:'视为使用一张闪',
-						ai:{
-							order:function(){
-								var player=_status.event.player;
-								if(player.hasSkill('qingzhong_give')) return 2.95;
-								return 3.15;
-							},
-							skillTagFilter:function(player){
-								if(player.hasSkill('weijing_disable')) return false;
-							},
-							respondShan:true,
-						}
-					},
-					disable:{
+					used:{
 						mark:true,
 						intro:{
 							content:'本轮已发动'
@@ -25417,7 +25424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olguangao:'犷骜',
 			olguangao_info:'当你/其他角色使用【杀】时，你/该角色可以额外指定一个目标/你为目标（有距离限制）。然后若你的手牌数为偶数，你摸一张牌并令此牌对任意目标无效（可不选）。',
 			olhuiqi:'彗企',
-			olhuiqi_info:'觉醒技。一名角色回合结束后，若仅有三名角色于此回合成为过牌的目标，你获得〖偕举〗并获得一个额外的回合。',
+			olhuiqi_info:'觉醒技。一名角色回合结束后，若你与其他两名角色于此回合成为过牌的目标，你获得〖偕举〗并获得一个额外的回合。',
 			olxieju:'偕举',
 			olxieju_info:'出牌阶段限一次。你可以令任意名本回合成为过牌的目标的角色依次视为使用一张【杀】。',
 			ol_zhouqun:'周群',

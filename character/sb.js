@@ -3390,6 +3390,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										var val=get.value(ui.selected.cards,target);
 										if(val<0) return val+get.effect(target,{name:'losehp'},player,target);
 										if(val>5||get.value(ui.selected.cards,player)>5) return target.isTurnedOver()?5:0;
+										if(target.isTurnedOver()) return 1;
 										return get.effect(target,{name:'losehp'},player,target);
 									},
 								},
