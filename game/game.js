@@ -7409,7 +7409,7 @@
 		codeMirrorReady:(node,editor)=>{
 			ui.window.appendChild(node);
 			node.style.fontSize=20/game.documentZoom+'px';
-			var mirror=window.CodeMirror(editor,{
+			const mirror=window.CodeMirror(editor,{
 				value:node.code,
 				mode:"javascript",
 				lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
@@ -7428,11 +7428,9 @@
 			lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
 			node.aced=true;
 			node.editor=mirror;
-			setTimeout(()=>{
-				mirror.refresh();
-			},0);
-			node.editor.on('change',function(e,change){
-				var code;
+			setTimeout(()=>mirror.refresh(),0);
+			node.editor.on('change',(e,change)=>{
+				let code;
 				if(node.editor){
 					code=node.editor.getValue();
 				}else if(node.textarea){
@@ -7446,69 +7444,68 @@
 					node.editor.showHint();
 				}
 			});
-			CodeMirror.registerHelper('hint','javascript',function(editor,options){
+			//防止每次输出字符都创建以下元素
+			const event=_status.event;
+			const player=ui.create.player().init('sunce');
+			const card=game.createCard();
+			//覆盖原本的javascript提示
+			CodeMirror.registerHelper('hint','javascript',(editor,options)=>{
 				//Find the token at the cursor
-				var cur=editor.getCursor(),
+				let cur=editor.getCursor(),
 					token=editor.getTokenAt(cur);
 				if(/\b(?:string|comment)\b/.test(token.type)) return;
-				var innerMode=CodeMirror.innerMode(editor.getMode(),token.state);
+				const innerMode=CodeMirror.innerMode(editor.getMode(),token.state);
 				if (innerMode.mode.helperType==="json") return;
 				token.state=innerMode.state;
 				//If it's not a 'word-style' token, ignore the token.
 				if (!/^[\w$_]*$/.test(token.string)){
 					token={
-						start:cur.ch,end:cur.ch,string:"",state:token.state,
+						start:cur.ch,
+						end:cur.ch,
+						string:"",
+						state:token.state,
 						type:token.string=="."?"property":null
 					};
 				}else if(token.end>cur.ch){
 					token.end=cur.ch;
 					token.string=token.string.slice(0,cur.ch- oken.start);
 				}
-				var tprop=token;
+				let tprop=token;
+				let context;
 				//If it is a property, find out what it is a property of.
 				while (tprop.type=="property"){
 					tprop=editor.getTokenAt(CodeMirror.Pos(cur.line,tprop.start));
-					if(tprop.string != ".") return;
+					if(tprop.string!=".") return;
 					tprop=editor.getTokenAt(CodeMirror.Pos(cur.line,tprop.start));
-					if(!context) var context=[];
+					if(!context) context=[];
 					context.push(tprop);
 				}
-				//console.log(token);
-				//console.log(context);
-				var list=[];
+				const list=[];
 				if(Array.isArray(context)){
 					try {
-						var event=_status.event;
-						var player=ui.create.player().init('sunce');
-						var card=game.createCard();
-						var code=context.length==1?context[0].string:context.reduceRight((pre,cur)=>(pre.string||pre)+'.'+cur.string);
-						var obj=eval(code);
-						//console.log(obj);
-						var keys=Object.getOwnPropertyNames(obj).filter(key=>key.startsWith(token.string));
+						const code=context.length==1?context[0].string:context.reduceRight((pre,cur)=>(pre.string||pre)+'.'+cur.string);
+						const obj=eval(code);
+						const keys=Object.getOwnPropertyNames(obj).filter(key=>key.startsWith(token.string));
 						list.addArray(keys);
-						//console.log(list);
 					}catch(_){ return;}
-				} else if (token && typeof token.string == 'string') {
-					var javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
+				}else if(token&&typeof token.string=='string'){
+					const javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
 						"if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
-					var coffeescriptKeywords=("and break catch class continue delete do else extends false finally for " +
+					const coffeescriptKeywords=("and break catch class continue delete do else extends false finally for " +
 						"if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
-					
-					var keys=['player','card','lib','game','ui','get','ai','_status'].concat(javascriptKeywords).concat(coffeescriptKeywords).concat(Object.getOwnPropertyNames(window));
-					
-					var start=token.string;
+					const keys=['player','card','lib','game','ui','get','ai','_status'].concat(javascriptKeywords).concat(coffeescriptKeywords).concat(Object.getOwnPropertyNames(window));
+					const start=token.string;
 					function maybeAdd(str){
-						if (str.lastIndexOf(start, 0) == 0 && !list.includes(str)) list.push(str);
+						if(str.lastIndexOf(start,0)==0&&!list.includes(str)) list.push(str);
 					}
-					for(var v=token.state.localVars;v;v=v.next) maybeAdd(v.name);
-					for(var c=token.state.context;c;c=c.prev) for (var v=c.vars;v;v=v.next) maybeAdd(v.name)
-					for(var v=token.state.globalVars;v;v=v.next) maybeAdd(v.name);
-					if(options&&options.additionalContext!=null) for(var key in options.additionalContext) maybeAdd(key);
+					for(let v=token.state.localVars;v;v=v.next) maybeAdd(v.name);
+					for(let c=token.state.context;c;c=c.prev) for (let v=c.vars;v;v=v.next) maybeAdd(v.name)
+					for(let v=token.state.globalVars;v;v=v.next) maybeAdd(v.name);
+					if(options&&options.additionalContext!=null) for(let key in options.additionalContext) maybeAdd(key);
 					list.addArray(keys);
-					list=list.filter(key=>key.startsWith(token.string));
 				}
 				return {
-					list,
+					list:list.filter(key=>key.startsWith(token.string)),
 					from:CodeMirror.Pos(cur.line,token.start),
 					to:CodeMirror.Pos(cur.line,token.end),
 				};
