@@ -6951,7 +6951,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						UI.draw();
 					}
 
-					canvas.addEventListener("click", () => {
+					const click = function(){
 						switch (state.curr) {
 							case state.getReady:
 								state.curr = state.Play;
@@ -6961,7 +6961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								bird.flap();
 								break;
 						}
-					});
+					};
 					const switchToAuto = function(){
 						event._result={
 							bool:true,
@@ -6973,12 +6973,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						_status.imchoosing=false;
 						frames=-1;
 						clearInterval(gameLoop);
+						document.removeEventListener(lib.config.touchscreen?'touchstart':'mousedown',click);
 					} 
 
 					dialog.open();	
 					game.pause();
 					game.countChoose();
 
+					document.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',click);
 					setInterval(gameLoop, 10);
 					window.requestAnimationFrame(gameRender);
 				},
