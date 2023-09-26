@@ -6558,6 +6558,432 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//南华老仙
 			yufeng:{
+				inherit:'yufeng_old',
+				content:function(){
+					"step 0"
+					if(_status.connectMode) event.time=lib.configOL.choose_timeout;
+					event.videoId=lib.status.videoId++;
+					if(player.isUnderControl()){
+						game.swapPlayerAuto(player);
+					}
+					var switchToAuto=function(){
+						game.pause();
+						game.countChoose();
+						setTimeout(function(){
+							_status.imchoosing=false;
+							var max=Math.max(2,1+game.me.countMark('yufeng'));
+							var score=Math.random()<0.5?max:get.rand(1,max);
+							event._result={
+								bool:true,
+								score:score,
+								win:score>=max,
+							};
+							if(event.dialog) event.dialog.close();
+							if(event.control) event.control.close();
+							game.resume();
+						},5000);
+					};
+					var createDialog=function(player,id){
+						if(_status.connectMode) lib.configOL.choose_timeout='30';
+						if(player==game.me) return;
+						var str=get.translation(player)+'正在表演《御风飞行》...<br>';
+						ui.create.dialog(str).videoId=id;
+					};
+					var chooseButton=function(){lib.skill.yufeng.$playFlappyBird()};
+					//event.switchToAuto=switchToAuto;
+					game.broadcastAll(createDialog,player,event.videoId);
+					if(event.isMine()){
+						chooseButton();
+					}
+					else if(event.isOnline()){
+						event.player.send(chooseButton);
+						event.player.wait();
+						game.pause();
+					}
+					else{
+						switchToAuto();
+					}
+					"step 1"
+					game.broadcastAll(function(id,time){
+						if(_status.connectMode) lib.configOL.choose_timeout=time;
+						var dialog=get.idDialog(id);
+						if(dialog){
+							dialog.close();
+						}
+					},event.videoId,event.time);
+					var result=event.result||result;
+					player.popup(get.cnNumber(result.score)+'分',result.win?'wood':'fire')
+					game.log(player,'御风飞行',result.win?'#g成功':'#y失败');
+					game.log(player,'获得了','#g'+result.score+'分');
+					var max=player.countMark('yufeng');
+					if(!result.win){
+						if(result.score) player.draw(result.score);
+						if(max) player.removeMark('yufeng',max,false);
+						event.finish();
+					}
+					else{
+						if(max<2) player.addMark('yufeng',1,false);
+						event.score=result.score;
+						player.chooseTarget('请选择【御风】的目标',[1,result.score],function(card,player,target){
+							return target!=player&&!target.hasSkill('yufeng2');
+						}).set('ai',function(target){
+							var player=_status.event.player;
+							var att=-get.attitude(player,target),attx=att*2;
+							if(att<=0||target.hasSkill('xinfu_pdgyingshi')) return 0;
+							if(target.hasJudge('lebu')) attx-=att;
+							if(target.hasJudge('bingliang')) attx-=att;
+							return attx/Math.max(2.25,Math.sqrt(target.countCards('h')+1));
+						});
+					}
+					"step 2"
+					if(result.bool){
+						result.targets.sortBySeat();
+						player.line(result.targets,'green');
+						game.log(result.targets,'获得了','#y“御风”','效果');
+						for(var i of result.targets) i.addSkill('yufeng2');
+						if(event.score>result.targets.length) player.draw(event.score-result.targets.length);
+					}
+					else player.draw(event.score);
+				},
+				$playFlappyBird:function(){
+					//Forked from: https://github.com/aaarafat/JS-Flappy-Bird
+
+					const event=_status.event;
+					const dialog=ui.create.dialog('forcebutton','hidden');
+					dialog.textPrompt=dialog.add('<div class="text center">准备好了吗？</div>');
+					dialog.classList.add('fixed');
+					dialog.classList.add('scroll1');
+					dialog.classList.add('scroll2');
+					dialog.classList.add('fullwidth');
+					dialog.classList.add('fullheight');
+					dialog.classList.add('noupdate');
+					const updateText=function(str){
+						dialog.textPrompt.innerHTML='<div class="text center">'+str+'</div>';
+					}
+					
+					const canvas=document.createElement('canvas');
+					dialog.appendChild(canvas);
+					canvas.style.position="absolute";
+					canvas.style.width='276px';
+					canvas.style.height='414px';
+					canvas.style.left="calc(50% - 141px)";
+					canvas.style.top="calc(50% - 200px)";
+					canvas.width=276;
+					canvas.height=414;
+					canvas.style.border='3px solid';
+					
+					const RAD = Math.PI / 180;
+					const maxScore = Math.max(2,1+game.me.countMark('yufeng'));
+					const ctx=canvas.getContext('2d');
+					let ticks = 0;
+					let frames = 0;
+					let dx = 1;
+					const state = {
+						curr: 0,
+						getReady: 0,
+						Play: 1,
+						gameOver: 2,
+						gameSuccess:3,
+					}
+					const SFX = {
+						start: new Audio(),
+						flap: new Audio(),
+						score: new Audio(),
+						hit: new Audio(),
+						die: new Audio(),
+						played: false,
+					};
+
+					const gnd = {
+						sprite: new Image(),
+						x: 0,
+						y: 0,
+						draw: function () {
+							this.y = parseFloat(canvas.height - this.sprite.height);
+							ctx.drawImage(this.sprite, this.x, this.y);
+						},
+						update: function () {
+							if(state.curr == state.gameOver || state.curr == state.gameSuccess) return;
+							this.x -= dx;
+							this.x = this.x % (this.sprite.width / 2);
+						},
+					};
+					const bg = {
+						sprite: new Image(),
+						x: 0,
+						y: 0,
+						draw: function () {
+							let y = parseFloat(canvas.height - this.sprite.height);
+							ctx.drawImage(this.sprite, this.x, y);
+						},
+					};
+					const pipe = {
+						top: { sprite: new Image() },
+						bot: { sprite: new Image() },
+						gap: 127,
+						moved: true,
+						pipes: [],
+						draw: function () {
+							for (let i = 0; i < this.pipes.length; i++) {
+								let p = this.pipes[i];
+								ctx.drawImage(this.top.sprite, p.x, p.y);
+								ctx.drawImage(
+									this.bot.sprite,
+									p.x,
+									p.y + parseFloat(this.top.sprite.height) + this.gap
+								);
+							}
+						},
+						update: function () {
+							if (state.curr != state.Play) return;
+							if (ticks % 160 == 0) {
+								this.pipes.push({
+									x: parseFloat(canvas.width),
+									y: -210 * Math.min(Math.random()*0.8 + 1.2, 1.8),
+								});
+							}
+							this.pipes.forEach((pipe) => {
+								pipe.x -= dx;
+							});
+						
+							if (this.pipes.length && this.pipes[0].x < -this.top.sprite.width) {
+								this.pipes.shift();
+								this.moved = true;
+							}
+						},
+					};
+					const bird = {
+						animations: [
+							{ sprite: new Image() },
+							{ sprite: new Image() },
+							{ sprite: new Image() },
+							{ sprite: new Image() },
+						],
+						rotatation: 0,
+						x: 50,
+						y: 100,
+						speed: 0,
+						gravity: 0.04,
+						thrust: 1.8,
+						frame: 0,
+						draw: function () {
+							let h = this.animations[this.frame].sprite.height;
+							let w = this.animations[this.frame].sprite.width;
+							ctx.save();
+							ctx.translate(this.x, this.y);
+							ctx.rotate(this.rotatation * RAD);
+							ctx.drawImage(this.animations[this.frame].sprite, -w / 2, -h / 2);
+							ctx.restore();
+						},
+						update: function () {
+							let r = parseFloat(this.animations[0].sprite.width) / 2;
+							switch (state.curr) {
+								case state.getReady: case state.gameSuccess:
+									this.rotatation = 0;
+									this.y += ticks % 20 == 0 ? Math.sin(ticks * RAD) : 0;
+									this.frame += ticks % 20 == 0 ? 1 : 0;
+									break;
+								case state.Play:
+									this.frame += ticks % 10 == 0 ? 1 : 0;
+									this.y += this.speed;
+									this.setRotation();
+									this.speed += this.gravity;
+									if(UI.score.curr >= maxScore){
+										state.curr = state.gameSuccess;
+										updateText('御风飞行表演成功！')
+										setTimeout(switchToAuto,2000);
+									}
+									else if (this.y + r >= gnd.y || this.collisioned()) {
+										state.curr = state.gameOver;
+										updateText('御风飞行表演失败……')
+										setTimeout(switchToAuto,2000);
+									}
+							
+									break;
+								case state.gameOver:
+									this.frame = 1;
+									if (this.y + r < gnd.y) {
+										this.y += this.speed;
+										this.setRotation();
+										this.speed += this.gravity;
+									} else {
+										this.speed = 0;
+										this.y = gnd.y - r;
+										this.rotatation = 90;
+										if (!SFX.played) {
+											SFX.die.play();
+											SFX.played = true;
+										}
+									}
+							
+									break;
+							}
+							this.frame = this.frame % this.animations.length;
+						},
+						flap: function () {
+							if (this.y > 0) {
+								SFX.flap.play();
+								this.speed = -this.thrust;
+							}
+						},
+						setRotation: function () {
+							if (this.speed <= 0) {
+								this.rotatation = Math.max(-25, (-25 * this.speed) / (-1 * this.thrust));
+							} else if (this.speed > 0) {
+								this.rotatation = Math.min(90, (90 * this.speed) / (this.thrust * 2));
+							}
+						},
+						collisioned: function () {
+							if (!pipe.pipes.length) return;
+							let bird = this.animations[0].sprite;
+							let x = pipe.pipes[0].x;
+							let y = pipe.pipes[0].y;
+							let r = bird.height / 4 + bird.width / 4;
+							let roof = y + parseFloat(pipe.top.sprite.height);
+							let floor = roof + pipe.gap;
+							let w = parseFloat(pipe.top.sprite.width);
+							if (this.x + r >= x) {
+								if (this.x + r < x + w) {
+									if (this.y - r <= roof || this.y + r >= floor) {
+										SFX.hit.play();
+										return true;
+									}
+								}
+								else if (pipe.moved) {
+									UI.score.curr++;
+									SFX.score.play();
+									pipe.moved = false;
+								}
+							}
+						},
+					};
+					const UI = {
+						getReady: { sprite: new Image() },
+						gameOver: { sprite: new Image() },
+						tap: [{ sprite: new Image() }, { sprite: new Image() }],
+						score: {
+							curr: 0,
+							best: 0,
+						},
+						x: 0,
+						y: 0,
+						tx: 0,
+						ty: 0,
+						frame: 0,
+						draw: function () {
+						  	switch (state.curr) {
+								case state.getReady:
+									this.y = parseFloat(canvas.height - this.getReady.sprite.height) / 2;
+									this.x = parseFloat(canvas.width - this.getReady.sprite.width) / 2;
+									this.tx = parseFloat(canvas.width - this.tap[0].sprite.width) / 2;
+									this.ty =
+										this.y + this.getReady.sprite.height - this.tap[0].sprite.height;
+									ctx.drawImage(this.getReady.sprite, this.x, this.y);
+									ctx.drawImage(this.tap[this.frame].sprite, this.tx, this.ty);
+									break;
+								case state.gameOver: case state.gameSuccess:
+									this.y = parseFloat(canvas.height - this.gameOver.sprite.height) / 2;
+									this.x = parseFloat(canvas.width - this.gameOver.sprite.width) / 2;
+									this.tx = parseFloat(canvas.width - this.tap[0].sprite.width) / 2;
+									this.ty =
+										this.y + this.gameOver.sprite.height - this.tap[0].sprite.height;
+									ctx.drawImage(this.gameOver.sprite, this.x, this.y);
+									break;
+								default:
+									this.drawScore();
+							}
+						},
+						drawScore: function () {
+							updateText('当前分数：'+UI.score.curr);
+						},
+						update: function () {
+							if (state.curr == state.Play) return;
+							this.frame += ticks % 20 == 0 ? 1 : 0;
+							this.frame = this.frame % this.tap.length;
+						},
+					};
+					gnd.sprite.src = lib.assetURL+"image/flappybird/ground.png";
+					bg.sprite.src = lib.assetURL+"image/flappybird/BG.png";
+					pipe.top.sprite.src = lib.assetURL+"image/flappybird/toppipe.png";
+					pipe.bot.sprite.src = lib.assetURL+"image/flappybird/botpipe.png";
+					UI.gameOver.sprite.src = lib.assetURL+"image/flappybird/go.png";
+					UI.getReady.sprite.src = lib.assetURL+"image/flappybird/getready.png";
+					UI.tap[0].sprite.src = lib.assetURL+"image/flappybird/tap/t0.png";
+					UI.tap[1].sprite.src = lib.assetURL+"image/flappybird/tap/t1.png";
+					bird.animations[0].sprite.src = lib.assetURL+"image/flappybird/bird/b0.png";
+					bird.animations[1].sprite.src = lib.assetURL+"image/flappybird/bird/b1.png";
+					bird.animations[2].sprite.src = lib.assetURL+"image/flappybird/bird/b2.png";
+					bird.animations[3].sprite.src = lib.assetURL+"image/flappybird/bird/b0.png";
+
+					SFX.start.src = lib.assetURL+"audio/effect/flappybird_start.wav";
+					SFX.flap.src = lib.assetURL+"audio/effect/flappybird_flap.wav";
+					SFX.score.src = lib.assetURL+"audio/effect/flappybird_score.wav";
+					SFX.hit.src = lib.assetURL+"audio/effect/flappybird_hit.wav";
+					SFX.die.src = lib.assetURL+"audio/effect/flappybird_die.wav";
+
+					const gameLoop = function(){
+						update();
+						ticks++;
+					}
+					const gameRender = function(){
+						if(frames>=0){
+							draw();
+							frames++;
+							window.requestAnimationFrame(gameRender);
+						}
+					}
+					  
+					const update = function(){
+						bird.update();
+						gnd.update();
+						pipe.update();
+						UI.update();
+					}
+					  
+					const draw = function(){
+						ctx.fillStyle = "#30c0df";
+						ctx.fillRect(0, 0, canvas.width, canvas.height);
+						bg.draw();
+						pipe.draw();
+					  
+						bird.draw();
+						gnd.draw();
+						UI.draw();
+					}
+
+					canvas.addEventListener("click", () => {
+						switch (state.curr) {
+							case state.getReady:
+								state.curr = state.Play;
+								SFX.start.play();
+								break;
+							case state.Play:
+								bird.flap();
+								break;
+						}
+					});
+					const switchToAuto = function(){
+						event._result={
+							bool:true,
+							score:UI.score.curr,
+							win:UI.score.curr>=maxScore,
+						};
+						dialog.close();
+						game.resume();
+						_status.imchoosing=false;
+						frames=-1;
+						clearInterval(gameLoop);
+					} 
+
+					dialog.open();	
+					game.pause();
+					game.countChoose();
+
+					setInterval(gameLoop, 10);
+					window.requestAnimationFrame(gameRender);
+				},
+			},
+			yufeng_old:{
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
