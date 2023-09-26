@@ -13982,14 +13982,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 'basic';
 					}).set('prompt','请选择一种牌的类别').set('target',trigger.target);
 					'step 1'
-					trigger.target.chooseCard('he','交给'+get.translation(player)+'一张'+get.translation(result.control)+'牌，否则此【杀】不可被闪避。',function(card){
-						return get.type(card,'trick')==_status.event.getParent().result.control;
+					trigger.target.chooseCard('he','交给'+get.translation(player)+'一张'+get.translation(result.control)+'牌，否则此【杀】不可被闪避',function(card){
+						return get.type2(card)==_status.event.control;
 					}).set('ai',function(card){
 						var num=_status.event.num;
 						if(num==0) return 0;
 						if(card.name=='shan') return num>1?2:0;
 						return 8-get.value(card);
-					}).set('num',trigger.target.countCards('h','shan'))
+					}).set('num',trigger.target.countCards('h','shan')).set('control',result.control);
 					'step 2'
 					if(result.bool){
 						var cards=result.cards;
