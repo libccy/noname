@@ -468,6 +468,12 @@ div.cm-s-mdn-like span.CodeMirror-matchingbracket { outline:1px solid grey; colo
   display: block;
 }
 
+@media (max-width: 1000px) {
+  .CodeMirror-hints::-webkit-scrollbar {
+    width: 25px;
+  }
+}
+
 .CodeMirror-hints::-webkit-scrollbar-thumb {
   background-color: rgb(218, 215, 215);
   height: 50px;

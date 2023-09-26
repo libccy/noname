@@ -7554,7 +7554,7 @@
 						if(str.lastIndexOf(start,0)==0&&!list.includes(str)) list.push(str);
 					}
 					for(let v=token.state.localVars;v;v=v.next) maybeAdd(v.name);
-					for(let c=token.state.context;c;c=c.prev) for (let v=c.vars;v;v=v.next) maybeAdd(v.name)
+					for(let c=token.state.context;c;c=c.prev) for(let v=c.vars;v;v=v.next) maybeAdd(v.name)
 					for(let v=token.state.globalVars;v;v=v.next) maybeAdd(v.name);
 					if(options&&options.additionalContext!=null) for(let key in options.additionalContext) maybeAdd(key);
 					list.addArray(keys);
