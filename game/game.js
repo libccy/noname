@@ -4027,6 +4027,7 @@
 							style.width='150px';
 							const firstChild=node.firstChild;
 							firstChild.removeAttribute('class');
+							firstChild.style.position='initial';
 							if(link=='false') return;
 							const ruby=document.createElement('ruby');
 							ruby.textContent=name;
@@ -9423,19 +9424,13 @@
 							if(!idbDatabase.objectStoreNames.contains('file')) idbDatabase.createObjectStore('file').transaction.oncomplete=()=>{
 								if(idbDatabase.objectStoreNames.contains('audio')) idbDatabase.transaction('audio').objectStore('audio').openCursor().onsuccess=event=>{
 									const result=event.target.result;
-									if(!result){
-										idbDatabase.deleteObjectStore('audio');
-										return;
-									}
+									if(!result) return;
 									idbDatabase.transaction('file','readwrite').objectStore('file').put(result.value,result.key);
 									result.continue();
 								};
 								if(idbDatabase.objectStoreNames.contains('image')) idbDatabase.transaction('image').objectStore('image').openCursor().onsuccess=event=>{
 									const result=event.target.result;
-									if(!result){
-										idbDatabase.deleteObjectStore('image');
-										return;
-									}
+									if(!result) return;
 									idbDatabase.transaction('file','readwrite').objectStore('file').put(result.value,result.key);
 									result.continue();
 								};
@@ -56925,10 +56920,9 @@
 			if(from==to) return 0;
 			if(!game.players.contains(from)&&!game.dead.contains(from)) return Infinity;
 			if(!game.players.contains(to)&&!game.dead.contains(to)) return Infinity;
-			let player=from,m,n=1,i,fxy,txy;
+			let n=1;
 			if(game.chess){
-				fxy=from.getXY();
-				txy=to.getXY();
+				let fxy=from.getXY(),txy=to.getXY();
 				n=Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);
 				if(method=='raw'||method=='pure'||method=='absolute') return n;
 			}
@@ -56936,7 +56930,7 @@
 				if(method=='raw'||method=='pure'||method=='absolute') return n;
 			}
 			else{
-				let length=game.players.length;
+				let player=from,length=game.players.length;
 				const totalPopulation=game.players.length+game.dead.length+1;
 				for(let iwhile=0;iwhile<totalPopulation;iwhile++){
 					if(player.nextSeat!=to){
@@ -56953,19 +56947,14 @@
 				if(method=='absolute') return n;
 				if(from.isDead()) length++;
 				if(to.isDead()) length++;
-				const left=from.hasSkillTag('left_hand');
-				const right=from.hasSkillTag('right_hand');
+				const left=from.hasSkillTag('left_hand'),right=from.hasSkillTag('right_hand');
 				if(left===right) n=Math.min(n,length-n);
 				else if(left==true) n=length-n;
 				if(method=='raw'||method=='pure') return n;
 			}
-
 			n=game.checkMod(from,to,n,'globalFrom',from);
 			n=game.checkMod(from,to,n,'globalTo',to);
-			m=n;
-			m=game.checkMod(from,to,m,'attackFrom',from);
-			m=game.checkMod(from,to,m,'attackTo',to);
-			var equips1=from.getCards('e',function(card){
+			const equips1=from.getCards('e',function(card){
 				return !ui.selected.cards||!ui.selected.cards.contains(card);
 			}),equips2=to.getCards('e',function(card){
 				return !ui.selected.cards||!ui.selected.cards.contains(card);
@@ -56974,39 +56963,50 @@
 				var info=get.info(equips1[i]).distance;
 				if(!info) continue;
 				if(info.globalFrom){
-					m+=info.globalFrom;
 					n+=info.globalFrom;
 				}
 			}
-			const attakRange=equips1.reduce((range,card,index)=>{
-				if(index==0) range--;
-				let newRange=1;
-				const info=get.info(card,false);
-				if(info.distance){
-					//如果存在attackRange 则通过attackRange动态获取攻击范围
-					if(typeof info.distance.attackRange=='function'){
-						newRange=info.distance.attackRange(card,player);
-					}
-					//否则采用祖宗之法
-					else if(typeof info.distance.attackFrom=='number'){
-						newRange-=info.distance.attackFrom;
-					}
-				}
-				return Math.max(range,newRange)
-			},1);
-			m+=(1-attakRange)
 			for(i=0;i<equips2.length;i++){
 				var info=get.info(equips2[i]).distance;
 				if(!info) continue;
 				if(info.globalTo){
-					m+=info.globalTo;
 					n+=info.globalTo;
 				}
 				if(info.attaclTo){
 					m+=info.attaclTo;
 				}
 			}
-			if(method=='attack') return m;
+			if(method=='attack'){
+				let m=n;
+				m=game.checkMod(from,to,m,'attackFrom',from);
+				m=game.checkMod(from,to,m,'attackTo',to);
+				return m;
+				const attakRange=equips1.reduce((range,card,index)=>{
+					if(index==0) range--;
+					let newRange=1;
+					const info=get.info(card,false);
+					if(info.distance){
+						//如果存在attackRange 则通过attackRange动态获取攻击范围
+						if(typeof info.distance.attackRange=='function'){
+							newRange=info.distance.attackRange(card,player);
+						}
+						//否则采用祖宗之法
+						else if(typeof info.distance.attackFrom=='number'){
+							newRange-=info.distance.attackFrom;
+						}
+					}
+					return Math.max(range,newRange)
+				},1);
+				m+=(1-attakRange);
+				for(i=0;i<equips2.length;i++){
+					var info=get.info(equips2[i]).distance;
+					if(!info) continue;
+					if(info.attaclTo){
+						m+=info.attaclTo;
+					}
+				}
+				return n;
+			}
 			if(method=='unchecked') return n;
 			return Math.max(1,n);
 		},
