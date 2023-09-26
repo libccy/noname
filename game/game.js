@@ -40919,6 +40919,9 @@
 								this.focus();
 								click.call(this);
 							});
+							elt.onmousemove=elt.ontouchstart=()=>{
+								setActive(i);
+							};
 						}
 					}
 					createList.push(ul);
@@ -40974,7 +40977,7 @@
 					}
 					const self=this;
 					const pos=this.getBoundingClientRect();
-					const list=['撤销\t\tCtrl+Z', '恢复撤销\tCtrl+Y'/* , '全选\t\tCtrl+A' */];
+					const list=['撤销        Ctrl+Z', '恢复撤销    Ctrl+Y'];
 					const click=function(e){
 						const num=this.innerHTML.indexOf("Ctrl");
 						const inner=this.innerHTML.slice(num).replace("+", "-");

@@ -10164,6 +10164,24 @@
         if (cur.render) cur.render(elt, data, cur);
         else elt.appendChild(ownerDocument.createTextNode(cur.displayText || getText(cur)));
         elt.hintId = i;
+        CodeMirror.on(elt, "mouseover", function (e) {
+          widget.changeActive(this.hintId);
+        });
+        CodeMirror.on(elt, "touchstart", function (e) {
+          widget.changeActive(this.hintId);
+        });
+        CodeMirror.on(elt, "touchend", function (e) {
+          var cur = cm.getCursor();
+          var self = this;
+          setTimeout(function () {
+            cm.focus();
+            var cur2 = cm.getCursor();
+            if (cur2.line == cur.line && cur2.ch == 0) {
+              var textLen = self.innerText.length;
+              cm.setCursor({ line: cur.line, ch: cur.ch + textLen });
+            }
+          }, 10);
+        });
       }
 
       var container = completion.options.container || ownerDocument.body;
@@ -10267,7 +10285,7 @@
         setTimeout(function () { cm.focus(); }, 20);
       });
 
-      //滑动修复//
+      //滑动修复
       CodeMirror.on(hints, "touchmove", function (event) {
         if (ios && this.scrollHeight <= this.offsetHeight + 5 && this.scrollWidth <= this.offsetWidth + 5) {
           event.preventDefault();
@@ -10537,8 +10555,6 @@
       "if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
     var coffeescriptKeywords = ("and break catch class continue delete do else extends false finally for " +
       "if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
-    //var nonameWords = ("_status ai audio card charlotte content control damage enable event extension fixed forced gainable game get group identity lib lose loseHp mod mode nobracket player recover remove result select set source superCharlotte target trigger ui viewAs").split(" ");
-    //var extension = ["ai:{\n},", "content:function(){\n},", "enable:\"phaseUse\",", "event.player", "event.source", "event.target", "filter:function(event,player,name){\n},", "init:function(player){\n},", "for(var i = 0; i < xx.length; i++) {\n}", "for(var i in xx){\n}", "for(var i of xx){\n}", "mod:{\n},", "skill = {\n\ttrigger:{},\n\tfilter:function(event,player,name){},\n\tcontent:function(){},\n}", "switch(){\n}", "trigger:{\n},", "trigger.name", "trigger.player", "trigger.source", "trigger.target", "try{\n}catch(e){\n}", "usable:1,", "while(){\n}", "window"];
     function forAllProps(obj, callback) {
       if (!Object.getOwnPropertyNames || !Object.getPrototypeOf) {
         for (var name in obj) callback(name)
@@ -10596,8 +10612,6 @@
           gatherCompletions(global);*/
         forEach(keywords, maybeAdd);
         forEach(coffeescriptKeywords, maybeAdd);
-        //forEach(nonameWords, maybeAdd);
-        //forEach(extension, maybeAdd);
       }
       return found.sort(function (a, b) {
         return (a + '').localeCompare(b + '');
