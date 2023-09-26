@@ -469,7 +469,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return lib.filter.cardDiscardable(card,target,'shuiyanqijunx');
 					})){
 						var next=target.damage();
-						if(!get.is.single()) next.nature='thunder';
+						if(!get.is.single()) game.setNature(next,'thunder',true);
 						event.finish();
 						return;
 					}
@@ -490,7 +490,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var next=target.damage();
-						if(!get.is.single()) next.nature='thunder'
+						if(!get.is.single()) game.setNature(next,'thunder',true);
 					}
 					event.finish();
 				},
@@ -1211,7 +1211,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(['huoshaolianying','huogong'].contains(event.card.name)) return true;
-					if(event.card.name=='sha') return event.card.nature=='fire';
+					if(event.card.name=='sha') return event.card.hasNature('fire');
 					return false;
 				},
 				content:function(){
@@ -1220,7 +1220,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
-							if(['huoshaolianying','huogong'].contains(card.name)||(card.name=='sha'&&card.nature=='fire')){
+							if(['huoshaolianying','huogong'].contains(card.name)||(card.name=='sha'&&card.hasNature('fire'))){
 								return 'zeroplayertarget';
 							}
 						},

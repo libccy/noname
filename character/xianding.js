@@ -107,18 +107,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.countPlayer(current=>cards.addArray(current.getCards('hejxs')));
 							for(var name of lib.inpile){
 								if(!get.tag({name:name},'damage')) continue;
-								if(cards.some(card=>get.name(card,false)==name&&!get.nature(card,false))){
+								if(cards.some(card=>get.name(card,false)==name&&!get.natureList(card,false).length)){
 									for(var suit of suits){
-										if(cards.some(card=>get.name(card,false)==name&&!get.nature(card,false)&&get.suit(card,false)==suit)){
+										if(cards.some(card=>get.name(card,false)==name&&!get.natureList(card,false).length&&get.suit(card,false)==suit)){
 											list.push([get.type(name),get.translation(suit),name,undefined,suit]);
 										}
 									}
 								}
 								if(name=='sha'){
 									for(var nature of lib.inpile_nature){
-										if(cards.some(card=>get.name(card,false)==name&&get.nature(card,false)==nature)){
+										if(cards.some(card=>get.name(card,false)==name&&get.is.sameNature(get.natureList(card,false),nature))){
 											for(var suit of suits){
-												if(cards.some(card=>get.name(card,false)==name&&get.nature(card,false)==nature&&get.suit(card,false)==suit)){
+												if(cards.some(card=>get.name(card,false)==name&&get.is.sameNature(get.natureList(card,false),nature)&&get.suit(card,false)==suit)){
 													list.push([get.type(name),get.translation(suit),name,nature,suit]);
 												}
 											}
@@ -852,7 +852,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player:'damageBegin3',
 						},
 						filter:function(event,player){
-							return event.nature&&player.hasMark('dcchangqu_add');
+							return event.hasNature()&&player.hasMark('dcchangqu_add');
 						},
 						forced:true,
 						onremove:true,
@@ -4554,7 +4554,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=player.getStat('gain');
 					if(num&&num>0) return false;
 					if(event.name=='link') return !player.isLinked();
-					return !event.nature;
+					return event.hasNature();
 				},
 				content:function(){
 					if(trigger.name=='link') trigger.cancel();
@@ -4611,15 +4611,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					if(player==_status.currentPhase) return false;
-					return !event.nature&&!player.hasHistory('damage',evt=>{
-						return !evt.nature&&evt!=event;
-					},event)||event.nature&&!player.hasHistory('damage',evt=>{
-						return evt.nature&&evt!=event;
+					return !event.hasNature()&&!player.hasHistory('damage',evt=>{
+						return !evt.hasNature()&&evt!=event;
+					},event)||event.hasNature()&&!player.hasHistory('damage',evt=>{
+						return evt.hasNature()&&evt!=event;
 					},event)&&event.source&&event.source.isIn()&&event.source.countGainableCards(player,'h');
 				},
 				content:function(){
 					'step 0'
-					if(!trigger.nature){
+					if(!trigger.hasNature()){
 						player.recover();
 					}
 					else{
@@ -4636,7 +4636,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!get.tag(card,'damage')||player.hasSkillTag('jueqing',false,target)) return;
 							if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
 							if(!get.tag(card,'natureDamage')){
-								if(target.hasHistory('damage',evt=>!evt.nature)) return 1.5;
+								if(target.hasHistory('damage',evt=>!evt.hasNature())) return 1.5;
 								else if(target.hp<=1||player.hasSkillTag('damageBonus',false,{
 									target:target,
 									card:card
@@ -4660,7 +4660,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(num<2) return [0,0];
 								}
 							}
-							if(get.tag(card,'natureDamage')&&!target.hasHistory('damage',evt=>evt.nature)&&player.countCards('he')>1) return [1,1,1,-1];
+							if(get.tag(card,'natureDamage')&&!target.hasHistory('damage',evt=>evt.hasNature())&&player.countCards('he')>1) return [1,1,1,-1];
 						}
 					}
 				}

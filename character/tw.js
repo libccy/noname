@@ -6031,10 +6031,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					player.getHistory('useCard',function(evt){
 						if(get.type(evt.card)!='basic') return;
-						var name=evt.card.name,nature=evt.card.nature||'';
+						var name=evt.card.name,nature=evt.card.hasNature()?get.nature(evt.card):'';
 						if(!list.contains(name+nature)) list.push(name+nature);
 					});
-					player.chooseTarget(get.prompt('twfenwu'),'失去1点体力并视为使用一张无距离限制的【杀】'+(list.length>1?'（伤害基数+1）':''),function(card,player,target){
+					event.addDamage=list.length>1;
+					player.chooseTarget(get.prompt('twfenwu'),'失去1点体力并视为使用一张无距离限制的【杀】'+(event.addDamage?'（伤害基数+1）':''),function(card,player,target){
 						return target!=player&&player.canUse('sha',target,false,false);
 					}).set('ai',function(target){
 						var player=_status.event.player;
@@ -6053,16 +6054,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						var num=1,list=[];
-						player.getHistory('useCard',function(evt){
-							if(get.type(evt.card)!='basic') return;
-							var name=evt.card.name,nature=evt.card.nature||'';
-							if(!list.contains(name+nature)) list.push(name+nature);
-						});
+						var num=1;
 						var target=result.targets[0];
 						player.logSkill('twfenwu',target);
 						player.loseHp();
-						if(list.length>=2){
+						if(event.addDamage){
 							num=2;
 							game.log('#y杀','的伤害基数+1');
 						}
@@ -9790,7 +9786,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						return '请选择【'+get.translation(links[0][3]||'')+get.translation(links[0][2])+'】的目标';
+						return '选择'+get.translation(links[0][3]||'')+'【'+get.translation(links[0][2])+'】的目标';
 					}
 				},
 				subSkill:{
@@ -10446,7 +10442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twlihuo:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.nature) return true;
+					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
 					return false;
 				},
 				audio:'lihuo',
@@ -10460,7 +10456,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				content:function(){
-					trigger.card.nature='fire';
+					game.setNature(trigger.card,'fire');
 					trigger.card.twlihuo_buffed=true;
 				},
 				group:['twlihuo2','twlihuo3'],
@@ -10471,7 +10467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twlihuo2:{
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					if(event.card.name!='sha'||event.card.nature!='fire') return false;
+					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
 					return game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&player.canUse(event.card,current);
 					});
@@ -13503,7 +13499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					if(player.countCards('h')) return false;
-					if(event.nature) return true;
+					if(event.hasNature()) return true;
 					return get.type(event.card,'trick')=='trick';
 				},
 				content:function(){

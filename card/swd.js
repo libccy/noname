@@ -4441,7 +4441,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
-					return event.nature&&event.player&&event.player.isAlive();
+					return event.hasNature()&&event.player&&event.player.isAlive();
 				},
 				content:function(){
 					player.gainPlayerCard(get.prompt('qinglonglingzhu',trigger.player),trigger.player,function(button){
@@ -4507,7 +4507,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageBegin'},
 				forced:true,
 				filter:function(event){
-					return event.nature=='fire'&&event.notLink();
+					return event.hasNature('fire')&&event.notLink();
 				},
 				content:function(){
 					trigger.num++;
@@ -4870,7 +4870,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBefore'},
 				forced:true,
 				filter:function(event){
-					return event.nature=='thunder';
+					return event.hasNature('thunder');
 				},
 				content:function(){
 					trigger.cancel();

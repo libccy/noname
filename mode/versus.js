@@ -4584,10 +4584,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				firstDo:true,
 				filter:function(event,player){
-					return !lib.linked.contains(event.nature);
+					return !event.hasNature('linked');
 				},
 				content:function(){
-					trigger.nature='fire';
+					game.setNature(trigger,'fire');
 				},
 			},
 			liangcaokuifa:{
@@ -5868,7 +5868,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:false,
 				trigger:{player:'damageBefore'},
 				filter:function(event){
-					if(event.nature!='thunder') return true;
+					if(!event.hasNature('thunder')) return true;
 					return false;
 				},
 				forced:true,
@@ -5893,7 +5893,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_biantian3:{
 				trigger:{player:'damageBegin3'},
 				filter:function(event){
-					if(event.nature=='fire') return true;
+					if(event.hasNature('fire')) return true;
 					return false;
 				},
 				mark:true,
@@ -5969,7 +5969,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				trigger:{player:'damageBegin2'},
 				filter:function(event){
-					return event.nature=='fire';
+					return event.hasNature('fire');
 				},
 				forced:true,
 				content:function(){

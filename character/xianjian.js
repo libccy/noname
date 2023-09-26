@@ -2793,7 +2793,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageBegin'},
 				forced:true,
 				filter:function(event){
-					return event.nature=='fire'&&event.notLink();
+					return event.hasNature('fire')&&event.notLink();
 				},
 				content:function(){
 					trigger.num++;
@@ -2804,7 +2804,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				filter:function(event){
-					return event.nature=='fire';
+					return event.hasNature('fire');
 				},
 				content:function(){
 					player.loseHp();
@@ -2814,7 +2814,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				forced:true,
 				filter:function(event){
-					return event.nature=='thunder';
+					return event.hasNature('thunder');
 				},
 				content:function(){
 					player.recover();
@@ -4083,7 +4083,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['tianshe2'],
 				trigger:{player:'damageBefore'},
 				filter:function(event){
-					if(event.nature) return true;
+					if(event.hasNature()) return true;
 					return false;
 				},
 				forced:true,
@@ -4105,7 +4105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianshe2:{
 				trigger:{source:'damageAfter'},
 				filter:function(event,player){
-					if(event.nature&&player.hp<player.maxHp) return true;
+					if(event.hasNature()&&player.hp<player.maxHp) return true;
 				},
 				forced:true,
 				content:function(){

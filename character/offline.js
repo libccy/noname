@@ -731,7 +731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mark:true,
 						content:function(){
 							trigger.num++;
-							trigger.nature='thunder';
+							game.setNature(trigger,'thunder');
 						},
 						marktext:'⚡',
 						intro:{
@@ -920,7 +920,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.hasEmptySlot(2)) return false;
 					if(event.card.name!='sha') return false;
-					return event.nature;
+					return event.card.hasNature();
 				},
 				content:function(){
 					trigger.cancel();
@@ -6214,7 +6214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fulu:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.nature) return true;
+					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
 				},
 				audio:true,
 				check:function(event,player){
@@ -6229,14 +6229,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return eff>=0;
 				},
 				content:function(){
-					trigger.card.nature='thunder';
+					game.setNature(trigger.card,'thunder');
 					if(get.itemtype(trigger.card)=='card'){
 						var next=game.createEvent('fulu_clear');
 						next.card=trigger.card;
 						event.next.remove(next);
 						trigger.after.push(next);
 						next.setContent(function(){
-							delete card.nature;
+							game.setNature(card,[]);
 						});
 					}
 				}
@@ -6244,7 +6244,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuji:{
 				trigger:{global:'damageBegin1'},
 				filter:function(event){
-					return event.source&&event.nature=='thunder';
+					return event.source&&event.source.isIn()&&event.hasNature('thunder');
 				},
 				check:function(event,player){
 					return get.attitude(player,event.source)>0&&get.attitude(player,event.player)<0;
