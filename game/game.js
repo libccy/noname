@@ -7421,7 +7421,7 @@
 				extraKeys:{
 					"Ctrl-Z":"undo",//撤销
 					"Ctrl-Y":"redo",//恢复撤销
-					"Ctrl-A":"selectAll",//全选
+					//"Ctrl-A":"selectAll",//全选
 				},
 			});
 			lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
@@ -40767,7 +40767,7 @@
 					}
 					var self=this;
 					var pos=this.getBoundingClientRect();
-					var list=['撤销\t\tCtrl+Z', '恢复撤销\tCtrl+Y', '全选\t\tCtrl+A'];
+					var list=['撤销\t\tCtrl+Z', '恢复撤销\tCtrl+Y'/* , '全选\t\tCtrl+A' */];
 					var click=function(e){
 						var num=this.innerHTML.indexOf("Ctrl");
 						var inner=this.innerHTML.slice(num).replace("+", "-");
