@@ -7488,9 +7488,24 @@
 						list.addArray(keys);
 						//console.log(list);
 					}catch(_){ return;}
-				}else if(token&&typeof token.string=='string'){
-					var keys=['player','card','lib','game','ui','get','ai','_status'].concat(Object.getOwnPropertyNames(window)).filter(key=>key.startsWith(token.string));
+				} else if (token && typeof token.string == 'string') {
+					var javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
+						"if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
+					var coffeescriptKeywords=("and break catch class continue delete do else extends false finally for " +
+						"if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
+					
+					var keys=['player','card','lib','game','ui','get','ai','_status'].concat(javascriptKeywords).concat(coffeescriptKeywords).concat(Object.getOwnPropertyNames(window));
+					
+					var start=token.string;
+					function maybeAdd(str){
+						if (str.lastIndexOf(start, 0) == 0 && !list.includes(str)) list.push(str);
+					}
+					for(var v=token.state.localVars;v;v=v.next) maybeAdd(v.name);
+					for(var c=token.state.context;c;c=c.prev) for (var v=c.vars;v;v=v.next) maybeAdd(v.name)
+					for(var v=token.state.globalVars;v;v=v.next) maybeAdd(v.name);
+					if(options&&options.additionalContext!=null) for(var key in options.additionalContext) maybeAdd(key);
 					list.addArray(keys);
+					list=list.filter(key=>key.startsWith(token.string));
 				}
 				return {
 					list,
