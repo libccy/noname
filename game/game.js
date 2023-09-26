@@ -305,7 +305,7 @@
 						cs.of(
 							cs.class("card","fullskin",`${nature}`),
 							'>',
-							cs.class("name"),
+							cs.class("name")
 						)
 					);
 					let result={};
