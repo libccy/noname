@@ -33494,13 +33494,6 @@
 			lib.group.add(id);
 			if(short)lib.translate[id] = short;
 			if(name)lib.translate[`${id}2`] = name;
-			var hookCall=()=>{
-				for(const hook of lib.hooks.addGroup){
-					if(hook!=null&&typeof hook=="function"){
-						hook(id,short,name,config);
-					}
-				}
-			};
 			game.callHook("addGroup",[id,short,name,config]);
 			return id;
 		},
