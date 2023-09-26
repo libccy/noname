@@ -6063,13 +6063,6 @@
 								return;
 							}
 							var container=ui.create.div('.popup-container.editor');
-							var editorpage=ui.create.div(container);
-							var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-								ui.window.classList.remove('shortcutpaused');
-								ui.window.classList.remove('systempaused');
-								container.delete(null);
-								delete window.saveNonameInput;
-							});
 							var node=container;
 							var map=get.config('character_three')||lib.choiceThree;
 							var str='character=[\n    ';
@@ -6097,7 +6090,15 @@
 									}
 								}
 								catch(e){
-									alert('代码语法有错误，请仔细检查（'+e+'）');
+									var tip=lib.getErrorTip(e)||'';
+									alert('代码语法有错误，请仔细检查（' + e + '）' + tip);
+									window.focus();
+									if(container.editor){
+										container.editor.focus();
+									}
+									else if(container.textarea){
+										container.textarea.focus();
+									}
 									return;
 								}
 								game.saveConfig('character_three',character,'versus');
@@ -6108,8 +6109,7 @@
 								delete window.saveNonameInput;
 							};
 							window.saveNonameInput=saveInput;
-							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-							var editor=ui.create.div(editorpage);
+							var editor=ui.create.editor(container,saveInput);
 							if(node.aced){
 								ui.window.appendChild(node);
 								node.editor.setValue(node.code,1);
@@ -6125,27 +6125,12 @@
 								node.textarea.value=node.code;
 							}
 							else{
-								var aceReady=function(){
-									ui.window.appendChild(node);
-									var mirror = window.CodeMirror(editor, {
-										value:node.code,
-										mode:"javascript",
-										lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
-										lineNumbers:true,
-										indentUnit:4,
-										autoCloseBrackets:true,
-										theme:'mdn-like',
-									});
-									lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
-									node.aced=true;
-									node.editor=mirror;
-								}
-								if(!window.ace){
-									lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+								if(!window.CodeMirror){
+									lib.init.js(lib.assetURL+'game','codemirror',()=>lib.codeMirrorReady(node,editor));
 									lib.init.css(lib.assetURL+'layout/default','codemirror');
 								}
 								else{
-									aceReady();
+									lib.codeMirrorReady(node,editor);
 								}
 							};
 						},
@@ -6170,13 +6155,6 @@
 								return;
 							}
 							var container=ui.create.div('.popup-container.editor');
-							var editorpage=ui.create.div(container);
-							var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-								ui.window.classList.remove('shortcutpaused');
-								ui.window.classList.remove('systempaused');
-								container.delete(null);
-								delete window.saveNonameInput;
-							});
 							var node=container;
 							var map=get.config('character_four')||lib.choiceFour;
 							var str='character=[\n    ';
@@ -6204,7 +6182,15 @@
 									}
 								}
 								catch(e){
-									alert('代码语法有错误，请仔细检查（'+e+'）');
+									var tip=lib.getErrorTip(e)||'';
+									alert('代码语法有错误，请仔细检查（'+e+'）'+tip);
+									window.focus();
+									if(container.editor){
+										container.editor.focus();
+									}
+									else if(container.textarea){
+										container.textarea.focus();
+									}
 									return;
 								}
 								game.saveConfig('character_four',character,'versus');
@@ -6215,8 +6201,7 @@
 								delete window.saveNonameInput;
 							};
 							window.saveNonameInput=saveInput;
-							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-							var editor=ui.create.div(editorpage);
+							var editor=ui.create.editor(container,saveInput);
 							if(node.aced){
 								ui.window.appendChild(node);
 								node.editor.setValue(node.code,1);
@@ -6232,28 +6217,12 @@
 								node.textarea.value=node.code;
 							}
 							else{
-								var aceReady=function(){
-									ui.window.appendChild(node);
-									var mirror = window.CodeMirror(editor, {
-										value:node.code,
-										mode:"javascript",
-										lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
-										lineNumbers:true,
-										indentUnit:4,
-										autoCloseBrackets:true,
-										theme:'mdn-like',
-										gameZoom:game.documentZoom,
-									});
-									lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
-									node.aced=true;
-									node.editor=mirror;
-								}
-								if(!window.ace){
-									lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+								if(!window.CodeMirror){
+									lib.init.js(lib.assetURL+'game','codemirror',()=>lib.codeMirrorReady(node,editor));
 									lib.init.css(lib.assetURL+'layout/default','codemirror');
 								}
 								else{
-									aceReady();
+									lib.codeMirrorReady(node,editor);
 								}
 							};
 						},
@@ -6629,13 +6598,6 @@
 								return;
 							}
 							var container=ui.create.div('.popup-container.editor');
-							var editorpage=ui.create.div(container);
-							var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-								ui.window.classList.remove('shortcutpaused');
-								ui.window.classList.remove('systempaused');
-								container.delete(null);
-								delete window.saveNonameInput;
-							});
 							var node=container;
 							var map=get.config('character_online')||lib.characterOnline;
 							node.code='character='+get.stringify(map)+'\n/*\n    这里是智斗三国模式的武将将池。\n    您可以在这里编辑对武将将池进行编辑，然后点击“保存”按钮即可保存。\n    将池中的Key势力武将，仅同时在没有被禁用的情况下，才会出现在选将框中。\n    而非Key势力的武将，只要所在的武将包没有被隐藏，即可出现在选将框中。\n    该将池为单机模式/联机模式通用将池。在这里编辑后，即使进入联机模式，也依然会生效。\n    但联机模式本身禁用的武将（如神貂蝉）不会出现在联机模式的选将框中。\n*/';
@@ -6673,7 +6635,15 @@
 										alert('代码格式有错误，请对比示例代码仔细检查');
 									}
 									else{
-										alert('代码语法有错误，请仔细检查（'+e+'）')
+										var tip=lib.getErrorTip(e)||'';
+										alert('代码语法有错误，请仔细检查（'+e+'）'+tip);
+									}
+									window.focus();
+									if(container.editor){
+										container.editor.focus();
+									}
+									else if(container.textarea){
+										container.textarea.focus();
 									}
 									return;
 								}
@@ -6685,8 +6655,7 @@
 								delete window.saveNonameInput;
 							};
 							window.saveNonameInput=saveInput;
-							var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-							var editor=ui.create.div(editorpage);
+							var editor=ui.create.editor(container,saveInput);
 							if(node.aced){
 								ui.window.appendChild(node);
 								node.editor.setValue(node.code,1);
@@ -6702,27 +6671,12 @@
 								node.textarea.value=node.code;
 							}
 							else{
-								var aceReady=function(){
-									ui.window.appendChild(node);
-									var mirror = window.CodeMirror(editor, {
-										value:node.code,
-										mode:"javascript",
-										lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
-										lineNumbers:true,
-										indentUnit:4,
-										autoCloseBrackets:true,
-										theme:'mdn-like'
-									});
-									lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
-									node.aced=true;
-									node.editor=mirror;
-								}
-								if(!window.ace){
-									lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+								if(!window.CodeMirror){
+									lib.init.js(lib.assetURL+'game','codemirror',()=>lib.codeMirrorReady(node,editor));
 									lib.init.css(lib.assetURL+'layout/default','codemirror');
 								}
 								else{
-									aceReady();
+									lib.codeMirrorReady(node,editor);
 								}
 							};
 						},
@@ -7308,6 +7262,258 @@
 			''
 		},
 		path:{},
+		getErrorTip:msg=>{
+			if(typeof msg!='string'){
+				try{
+					msg=msg.toString();
+					if(typeof msg!='string') throw 'err';
+				}catch(_){
+					throw '传参错误:'+msg;
+				}
+			}
+			if (msg.startsWith('Uncaught ')) msg=msg.slice(9);
+			let newMessage=msg;
+			if (/RangeError/.test(newMessage)){
+				if(newMessage.includes("Maximum call stack size exceeded")){
+					newMessage="堆栈溢出";
+				}else if(/argument must be between 0 and 20/.test(newMessage)){
+					let funName=newMessage.slice(newMessage.indexOf('RangeError: ')+12,newMessage.indexOf(')')+1);
+					newMessage=funName+"参数必须在0和20之间";
+				} else {
+					newMessage="传递错误值到数值计算方法";
+				}
+			}else if(/ReferenceError/.test(newMessage)){
+				let messageName;
+				if (newMessage.includes("is not defined")){
+					messageName=newMessage.replace('ReferenceError: ', '').replace(' is not defined', '');
+					newMessage="引用了一个未定义的变量："+messageName;
+				}else if(newMessage.includes("invalid assignment left-hand side")){
+					newMessage = "赋值运算符或比较运算符不匹配";
+				}else if(newMessage.includes("Octal literals are not allowed in strict mode")){
+					newMessage = "八进制字面量与八进制转义序列语法已经被废弃";
+				}else if(newMessage.includes("Illegal 'use strict' directive in function with non-simple parameter list")){
+					newMessage = "'use strict'指令不能使用在带有‘非简单参数’列表的函数";
+				}else if(newMessage.includes("Invalid left-hand side in assignment")){
+					newMessage = "赋值中的左侧无效，即number，string等不可赋值的非变量数据";
+				}
+			}else if(/SyntaxError/.test(newMessage)){
+				let messageName;
+				if(newMessage.includes("Unexpected token ")){
+					messageName=newMessage.replace('SyntaxError: Unexpected token ','');
+					newMessage="使用了未定义或错误的语法 : ("+messageName+")";
+				}else if(newMessage.includes(
+					"Block-scoped declarations (let, const, function, class) not yet supported outside strict mode")){
+					newMessage="请在严格模式下运行let，const，class";
+				}else if(newMessage.includes("for-of loop variable declaration may not have an initializer.")){
+					newMessage="for...of 循环的头部包含有初始化表达式";
+				}else if(newMessage.includes("for-in loop variable declaration may not have an initializer.")){
+					newMessage="for...in 循环的头部包含有初始化表达式";
+				}else if(newMessage.includes("Delete of an unqualified identifier in strict mode.")){
+					newMessage="普通变量不能通过 delete 操作符来删除";
+				}else if(newMessage.includes("Unexpected identifier")){
+					newMessage="不合法的标识符或错误的语法";
+				}else if(newMessage.includes("Invalid or unexpected token")){
+					newMessage="非法的或者不期望出现的标记符号出现在不该出现的位置";
+				}else if(newMessage.includes("Invalid regular expression flags")){
+					newMessage="无效的正则表达式的标记";
+				}else if(newMessage.includes("missing ) after argument list")){
+					newMessage="参数列表后面缺少 \')\' (丢失运算符或者转义字符等)";
+				}else if(newMessage.includes("Invalid shorthand property initializer")){
+					newMessage="在定义一个{}对象时，应该使用\':\'而不是\'=\'";
+				}else if(newMessage.includes("Missing initializer in const declaration")){
+					newMessage="在使用const定义一个对象时，必须指定初始值";
+				}else if(newMessage.includes("Unexpected number")||newMessage.includes("Unexpected string")){
+					newMessage="在定义函数时，函数参数必须为合法标记符";
+				}else if(newMessage.includes("Unexpected end of input")){
+					newMessage="遗漏了符号或符号顺序不对(小括号，花括号等)";
+				}else if(newMessage.includes("has already been declared")){
+					messageName=newMessage.replace('SyntaxError: Identifier ', '').replace(' has already been declared', '');
+					newMessage=messageName +"变量已经被声明过，不能被重新声明";
+				}else if(newMessage.includes("Invalid or unexpected token")){
+					newMessage="查询无效或意外的标记，可能是字符串的引号不成对，错误使用了转义序列，字符串在多行中解析异常";
+				}else if(newMessage.includes("Duplicate parameter name not allowed in this context")) {
+					newMessage="参数名不允许重复";
+				}else if(newMessage.includes("Unexpected reserved word")||newMessage.includes(
+					"Unexpected strict mode reserved word")){
+					newMessage = "保留字被用作标记符";
+				}
+			}else if(/TypeError/.test(newMessage)){
+				let messageName;
+				if(newMessage.includes(" is not a function")){
+					messageName=newMessage.replace('TypeError: ', '').replace(' is not a function', '');
+					newMessage=messageName+"不是一个函数";
+				}else if(newMessage.includes(" is not a constructor")){
+					messageName=newMessage.replace('TypeError: ', '').replace(' is not a constructor', '');
+					newMessage=messageName+"不是一个构造函数";
+				}else if(newMessage.includes("Cannot read property")){
+					messageName=newMessage.replace('TypeError: Cannot read property ', '').replace(' of null', '').replace(' of undefined', '');
+					let ofName=newMessage.slice(newMessage.indexOf(" of ")+4);
+					newMessage="无法读取\'"+ofName+"\'的属性值"+messageName;
+				}else if(newMessage.includes("Cannot read properties")){
+					messageName=newMessage.slice(newMessage.indexOf("reading '")+9,-2);
+					let ofName=newMessage.slice(newMessage.indexOf(" of ")+4,newMessage.indexOf("(")-1);
+					newMessage="无法读取\'"+ofName+"\'的属性值"+messageName;
+				}else if(newMessage.includes("Property description must be an object")){
+					messageName=newMessage.replace('TypeError: Property description must be an object: ', '');
+					newMessage=messageName+"是非对象类型的值";
+				}else if(newMessage.includes("Cannot assign to read only property ")){
+					messageName=newMessage.slice(47,newMessage.lastIndexOf(' of ')+1);
+					newMessage=messageName+"属性禁止写入";
+				}else if(newMessage.includes("Object prototype may only be an Object or null")){
+					newMessage=messageName+"对象原型只能是对象或null";
+				}else if(newMessage.includes("Cannot create property")){
+					messageName=newMessage.slice(newMessage.indexOf('\'')+1);
+					messageName=messageName.slice(0,messageName.indexOf('\''));
+					let obj=newMessage.slice(newMessage.indexOf(messageName)+16);
+					newMessage=obj+"不能添加或修改\'"+messageName+"\'属性，任何 Primitive 值都不允许有property";
+				}else if(newMessage.includes("Can't add property")&&newMessage.includes("is not extensible")){
+					newMessage="对象不可添加属性（不可扩展）";
+				}else if(newMessage.includes("Cannot redefine property")){
+					messageName=newMessage.slice(37);
+					newMessage=messageName+"不可配置";
+				}else if(newMessage.includes("Converting circular structure to JSON")){
+					messageName=newMessage.slice(37);
+					newMessage="JSON.stringify() 方法处理循环引用结构的JSON会失败";
+				}else if(newMessage.includes("Cannot use 'in' operator to search for ")){
+					newMessage="in不能用来在字符串、数字或者其他基本类型的数据中进行检索";
+				}else if(newMessage.includes("Right-hand side of 'instanceof' is not an object")){
+					newMessage="instanceof 操作符 希望右边的操作数为一个构造对象，即一个有 prototype 属性且可以调用的对象";
+				}else if(newMessage.includes("Assignment to constant variable")){
+					newMessage="const定义的变量不可修改";
+				}else if(newMessage.includes("Cannot delete property")){
+					newMessage="不可配置的属性不能删除";
+				}else if(newMessage.includes("which has only a getter")){
+					newMessage="仅设置了getter特性的属性不可被赋值";
+				}else if(newMessage.includes("called on incompatible receiver undefined")){
+					newMessage="this提供的绑定对象与预期的不匹配";
+				}
+			}else if(/URIError/.test(newMessage)){
+				newMessage="一个不合法的URI";
+			}else if(/EvalError/.test(newMessage)){
+				newMessage="非法调用 eval()";
+			}else if(/InternalError/.test(newMessage)){
+				if(newMessage.includes("too many switch cases")){
+					newMessage="过多case子句";
+				}else if(newMessage.includes("too many parentheses in regular expression")){
+					newMessage="正则表达式中括号过多";
+				}else if(newMessage.includes("array initializer too large")){
+					newMessage="超出数组大小的限制";
+				}else if(newMessage.includes("too much recursion")){
+					newMessage="递归过深";
+				}
+			}
+			if(newMessage!=msg){
+				return newMessage;
+			}
+		},
+		codeMirrorReady:(node,editor)=>{
+			ui.window.appendChild(node);
+			node.style.fontSize=20/game.documentZoom+'px';
+			var mirror=window.CodeMirror(editor,{
+				value:node.code,
+				mode:"javascript",
+				lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
+				lineNumbers:true,
+				indentUnit:4,
+				autoCloseBrackets:true,
+				fixedGutter:false,
+				hintOptions:{completeSingle:false},
+				theme:lib.config.codeMirror_theme||'mdn-like',
+				extraKeys:{
+					"Ctrl-Z":"undo",//撤销
+					"Ctrl-Y":"redo",//恢复撤销
+					//"Ctrl-A":"selectAll",//全选
+				},
+			});
+			lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
+			node.aced=true;
+			node.editor=mirror;
+			setTimeout(()=>{
+				mirror.refresh();
+			},0);
+			node.editor.on('change',function(e,change){
+				var code;
+				if(node.editor){
+					code=node.editor.getValue();
+				}else if(node.textarea){
+					code=node.textarea.value;
+				};
+				//动态绑定文本
+				if(code.length&&change.origin=="+input" &&
+					/{|}|\s|=|;|:|,|，|。|？|！|\!|\?|&|#|%|@|‘|’|；/.test(change.text[0])==false&&
+					change.text.length==1) {
+					//输入了代码，并且不包括空格，{}，=， ; ， : ， 逗号等，才可以自动提示
+					node.editor.showHint();
+				}
+			});
+			CodeMirror.registerHelper('hint','javascript',function(editor,options){
+				//Find the token at the cursor
+				var cur=editor.getCursor(),
+					token=editor.getTokenAt(cur);
+				if(/\b(?:string|comment)\b/.test(token.type)) return;
+				var innerMode=CodeMirror.innerMode(editor.getMode(),token.state);
+				if (innerMode.mode.helperType==="json") return;
+				token.state=innerMode.state;
+				//If it's not a 'word-style' token, ignore the token.
+				if (!/^[\w$_]*$/.test(token.string)){
+					token={
+						start:cur.ch,end:cur.ch,string:"",state:token.state,
+						type:token.string=="."?"property":null
+					};
+				}else if(token.end>cur.ch){
+					token.end=cur.ch;
+					token.string=token.string.slice(0,cur.ch- oken.start);
+				}
+				var tprop=token;
+				//If it is a property, find out what it is a property of.
+				while (tprop.type=="property"){
+					tprop=editor.getTokenAt(CodeMirror.Pos(cur.line,tprop.start));
+					if(tprop.string != ".") return;
+					tprop=editor.getTokenAt(CodeMirror.Pos(cur.line,tprop.start));
+					if(!context) var context=[];
+					context.push(tprop);
+				}
+				//console.log(token);
+				//console.log(context);
+				var list=[];
+				if(Array.isArray(context)){
+					try {
+						var event=_status.event;
+						var player=ui.create.player().init('sunce');
+						var card=game.createCard();
+						var code=context.length==1?context[0].string:context.reduceRight((pre,cur)=>(pre.string||pre)+'.'+cur.string);
+						var obj=eval(code);
+						//console.log(obj);
+						var keys=Object.getOwnPropertyNames(obj).filter(key=>key.startsWith(token.string));
+						list.addArray(keys);
+						//console.log(list);
+					}catch(_){ return;}
+				} else if (token && typeof token.string == 'string') {
+					var javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
+						"if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
+					var coffeescriptKeywords=("and break catch class continue delete do else extends false finally for " +
+						"if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
+					
+					var keys=['player','card','lib','game','ui','get','ai','_status'].concat(javascriptKeywords).concat(coffeescriptKeywords).concat(Object.getOwnPropertyNames(window));
+					
+					var start=token.string;
+					function maybeAdd(str){
+						if (str.lastIndexOf(start, 0) == 0 && !list.includes(str)) list.push(str);
+					}
+					for(var v=token.state.localVars;v;v=v.next) maybeAdd(v.name);
+					for(var c=token.state.context;c;c=c.prev) for (var v=c.vars;v;v=v.next) maybeAdd(v.name)
+					for(var v=token.state.globalVars;v;v=v.next) maybeAdd(v.name);
+					if(options&&options.additionalContext!=null) for(var key in options.additionalContext) maybeAdd(key);
+					list.addArray(keys);
+					list=list.filter(key=>key.startsWith(token.string));
+				}
+				return {
+					list,
+					from:CodeMirror.Pos(cur.line,token.start),
+					to:CodeMirror.Pos(cur.line,token.end),
+				};
+			});
+		},
 		setIntro:function(node,func,left){
 			if(lib.config.touchscreen){
 				if(left){
@@ -8199,150 +8405,11 @@
 					}
 				};
 
-				function getErrorTip(msg) {
-					if (typeof msg!='string') throw '传参错误:'+msg;
-					if (msg.startsWith('Uncaught ')) msg=msg.slice(9);
-					let newMessage=msg;
-					if (/RangeError/.test(newMessage)){
-						if(newMessage.includes("Maximum call stack size exceeded")){
-							newMessage="堆栈溢出";
-						}else if(/argument must be between 0 and 20/.test(newMessage)){
-							let funName=newMessage.slice(newMessage.indexOf('RangeError: ')+12,newMessage.indexOf(')')+1);
-							newMessage=funName+"参数必须在0和20之间";
-						} else {
-							newMessage="传递错误值到数值计算方法";
-						}
-					}else if(/ReferenceError/.test(newMessage)){
-						let messageName;
-						if (newMessage.includes("is not defined")){
-							messageName=newMessage.replace('ReferenceError: ', '').replace(' is not defined', '');
-							newMessage="引用了一个未定义的变量："+messageName;
-						}else if(newMessage.includes("invalid assignment left-hand side")){
-							newMessage = "赋值运算符或比较运算符不匹配";
-						}else if(newMessage.includes("Octal literals are not allowed in strict mode")){
-							newMessage = "八进制字面量与八进制转义序列语法已经被废弃";
-						}else if(newMessage.includes("Illegal 'use strict' directive in function with non-simple parameter list")){
-							newMessage = "'use strict'指令不能使用在带有‘非简单参数’列表的函数";
-						}else if(newMessage.includes("Invalid left-hand side in assignment")){
-							newMessage = "赋值中的左侧无效，即number，string等不可赋值的非变量数据";
-						}
-					}else if(/SyntaxError/.test(newMessage)){
-						let messageName;
-						if(newMessage.includes("Unexpected token ")){
-							messageName=newMessage.replace('SyntaxError: Unexpected token ','');
-							newMessage="使用了未定义或错误的语法 : ("+messageName+")";
-						}else if(newMessage.includes(
-							"Block-scoped declarations (let, const, function, class) not yet supported outside strict mode")){
-							newMessage="请在严格模式下运行let，const，class";
-						}else if(newMessage.includes("for-of loop variable declaration may not have an initializer.")){
-							newMessage="for...of 循环的头部包含有初始化表达式";
-						}else if(newMessage.includes("for-in loop variable declaration may not have an initializer.")){
-							newMessage="for...in 循环的头部包含有初始化表达式";
-						}else if(newMessage.includes("Delete of an unqualified identifier in strict mode.")){
-							newMessage="普通变量不能通过 delete 操作符来删除";
-						}else if(newMessage.includes("Unexpected identifier")){
-							newMessage="不合法的标识符或错误的语法";
-						}else if(newMessage.includes("Invalid or unexpected token")){
-							newMessage="非法的或者不期望出现的标记符号出现在不该出现的位置";
-						}else if(newMessage.includes("Invalid regular expression flags")){
-							newMessage="无效的正则表达式的标记";
-						}else if(newMessage.includes("missing ) after argument list")){
-							newMessage="参数列表后面缺少 \')\' (丢失运算符或者转义字符等)";
-						}else if(newMessage.includes("Invalid shorthand property initializer")){
-							newMessage="在定义一个{}对象时，应该使用\':\'而不是\'=\'";
-						}else if(newMessage.includes("Missing initializer in const declaration")){
-							newMessage="在使用const定义一个对象时，必须指定初始值";
-						}else if(newMessage.includes("Unexpected number")||newMessage.includes("Unexpected string")){
-							newMessage="在定义函数时，函数参数必须为合法标记符";
-						}else if(newMessage.includes("Unexpected end of input")){
-							newMessage="遗漏了符号或符号顺序不对(小括号，花括号等)";
-						}else if(newMessage.includes("has already been declared")){
-							messageName=newMessage.replace('SyntaxError: Identifier ', '').replace(' has already been declared', '');
-							newMessage=messageName +"变量已经被声明过，不能被重新声明";
-						}else if(newMessage.includes("Invalid or unexpected token")){
-							newMessage="查询无效或意外的标记，可能是字符串的引号不成对，错误使用了转义序列，字符串在多行中解析异常";
-						}else if(newMessage.includes("Duplicate parameter name not allowed in this context")) {
-							newMessage="参数名不允许重复";
-						}else if(newMessage.includes("Unexpected reserved word")||newMessage.includes(
-							"Unexpected strict mode reserved word")){
-							newMessage = "保留字被用作标记符";
-						}
-
-					}else if(/TypeError/.test(newMessage)){
-						let messageName;
-						if(newMessage.includes(" is not a function")){
-							messageName=newMessage.replace('TypeError: ', '').replace(' is not a function', '');
-							newMessage=messageName+"不是一个函数";
-						}else if(newMessage.includes(" is not a constructor")){
-							messageName=newMessage.replace('TypeError: ', '').replace(' is not a constructor', '');
-							newMessage=messageName+"不是一个构造函数";
-						}else if(newMessage.includes("Cannot read property")){
-							messageName=newMessage.replace('TypeError: Cannot read property ', '').replace(' of null', '').replace(' of undefined', '');
-							let ofName=newMessage.slice(newMessage.indexOf(" of ")+4);
-							newMessage="无法读取\'"+ofName+"\'的属性值"+messageName;
-						}else if(newMessage.includes("Cannot read properties")){
-							messageName=newMessage.slice(newMessage.indexOf("reading '")+9,-2);
-							let ofName=newMessage.slice(newMessage.indexOf(" of ")+4,newMessage.indexOf("(")-1);
-							newMessage="无法读取\'"+ofName+"\'的属性值"+messageName;
-						}else if(newMessage.includes("Property description must be an object")){
-							messageName=newMessage.replace('TypeError: Property description must be an object: ', '');
-							newMessage=messageName+"是非对象类型的值";
-						}else if(newMessage.includes("Cannot assign to read only property ")){
-							messageName=newMessage.slice(47,newMessage.lastIndexOf(' of ')+1);
-							newMessage=messageName+"属性禁止写入";
-						}else if(newMessage.includes("Object prototype may only be an Object or null")){
-							newMessage=messageName+"对象原型只能是对象或null";
-						}else if(newMessage.includes("Cannot create property")){
-							messageName=newMessage.slice(newMessage.indexOf('\'')+1);
-							messageName=messageName.slice(0,messageName.indexOf('\''));
-							let obj=newMessage.slice(newMessage.indexOf(messageName)+16);
-							newMessage=obj+"不能添加或修改\'"+messageName+"\'属性，任何 Primitive 值都不允许有property";
-						}else if(newMessage.includes("Can't add property")&&newMessage.includes("is not extensible")){
-							newMessage="对象不可添加属性（不可扩展）";
-						}else if(newMessage.includes("Cannot redefine property")){
-							messageName=newMessage.slice(37);
-							newMessage=messageName+"不可配置";
-						}else if(newMessage.includes("Converting circular structure to JSON")){
-							messageName=newMessage.slice(37);
-							newMessage="JSON.stringify() 方法处理循环引用结构的JSON会失败";
-						}else if(newMessage.includes("Cannot use 'in' operator to search for ")){
-							newMessage="in不能用来在字符串、数字或者其他基本类型的数据中进行检索";
-						}else if(newMessage.includes("Right-hand side of 'instanceof' is not an object")){
-							newMessage="instanceof 操作符 希望右边的操作数为一个构造对象，即一个有 prototype 属性且可以调用的对象";
-						}else if(newMessage.includes("Assignment to constant variable")){
-							newMessage="const定义的变量不可修改";
-						}else if(newMessage.includes("Cannot delete property")){
-							newMessage="不可配置的属性不能删除";
-						}else if(newMessage.includes("which has only a getter")){
-							newMessage="仅设置了getter特性的属性不可被赋值";
-						}else if(newMessage.includes("called on incompatible receiver undefined")){
-							newMessage="this提供的绑定对象与预期的不匹配";
-						}
-					}else if(/URIError/.test(newMessage)){
-						newMessage="一个不合法的URI";
-					}else if(/EvalError/.test(newMessage)){
-						newMessage="非法调用 eval()";
-					}else if(/InternalError/.test(newMessage)){
-						if(newMessage.includes("too many switch cases")){
-							newMessage="过多case子句";
-						}else if(newMessage.includes("too many parentheses in regular expression")){
-							newMessage="正则表达式中括号过多";
-						}else if(newMessage.includes("array initializer too large")){
-							newMessage="超出数组大小的限制";
-						}else if(newMessage.includes("too much recursion")){
-							newMessage="递归过深";
-						}
-					}
-					if(newMessage!=msg){
-						return newMessage;
-					}
-				};
-
 				window.onerror=function(msg,src,line,column,err){
 					const winPath=window.__dirname?('file:///'+(__dirname.replace(new RegExp('\\\\','g'),'/')+'/')):'';
 					let str=`错误文件: ${typeof src=='string'?decodeURI(src).replace(lib.assetURL,'').replace(winPath,''):'未知文件'}`;
 					str+=`\n错误信息: ${msg}`;
-					const tip=getErrorTip(msg);
+					const tip=lib.getErrorTip(msg);
 					if(tip) str+=`\n错误提示: ${tip}`;
 					str+=`\n行号: ${line}`;
 					str+=`\n列号: ${column}`;
@@ -40581,6 +40648,153 @@
 			void window.getComputedStyle(node, null).getPropertyValue("opacity");
 		},
 		create:{
+			/**
+			 * 创建codemirror编辑器
+			 * @param {HTMLDivElement} container 
+			 * @param {Function} saveInput 
+			 */
+			editor:function(container,saveInput){
+				var createList=[];
+				var containerDelete=container.delete;
+				//删除container的时候，删除创建的ul列表
+				container.delete=function(){
+					for (var i=createList.length-1;i>=0;i--){
+						createList[i].parentNode&&createList[i].parentNode.removeChild(createList[i]);
+					}
+					containerDelete.apply(this, arguments);
+				}
+				//创建ul列表
+				var createMenu=function(pos,self,List,click){
+					if (self&&self.createMenu) return false;
+					var parent=self.parentNode;
+					if (parent){
+						for(var i=0;i<parent.childElementCount;i++){
+							var node=parent.childNodes[i];
+							node!=self&&node.createMenu&&closeMenu(node);
+						}
+					}
+					var editor=container.editor;
+					if(!editor) return false;
+					self.style.background='#08f';
+					var ul=document.createElement('ul');
+					container.css.call(ul,{
+						position:'absolute',
+						top:pos.bottom/game.documentZoom+'px',
+						left: pos.left/game.documentZoom+'px',
+						height:'20em',
+						width:pos.width*4/game.documentZoom+'px',
+						//'font-family':'shousha',
+						'font-size':20/game.documentZoom+'px',
+					});
+					var theme=editor.options.theme;
+					lib.setScroll(ul);
+					lib.setMousewheel(ul);
+					ul.className="CodeMirror-hints "+theme;
+					var getActive=function(){
+						var i=0;
+						while(i<ul.childElementCount){
+							if(ul.childNodes[i].classList.contains('CodeMirror-hint-active')){
+								break;
+							}else{
+								i++;
+							}
+						}
+						return i;
+					}
+					var setActive=function(i){
+						ul.childNodes[getActive()].classList.remove('CodeMirror-hint-active');
+						ul.childNodes[i].classList.add('CodeMirror-hint-active');
+						return i;
+					}
+					if (List&&List.length&&click) {
+						for(var i=0;i<List.length;++i) {
+							var elt=ul.appendChild(document.createElement("li"));
+							elt.style.color='black';
+							elt.style.boxShadow='none';
+							var cur=List[i];
+							if(cur instanceof HTMLElement){
+								elt.appendChild(cur);
+							}else{
+								elt.innerHTML=cur;
+							}
+							var className="CodeMirror-hint"+(i!=0?"":" "+"CodeMirror-hint-active");
+							if(cur.className!=null) className=cur.className+" "+className;
+							elt.className=className;
+							elt.hintId=i;
+							ui.window.listen.call(elt,function () {
+								setActive(this.hintId);
+								this.focus();
+								click.call(this);
+							});
+						}
+					}
+					createList.push(ul);
+					ui.window.appendChild(ul);
+					return ul;
+				};
+				//关闭ul列表
+				var closeMenu=function(){
+					var ul=this.createMenu;
+					if(!ul) return false;
+					if(ul.parentNode) ul.parentNode.removeChild(ul);
+					this.style.background='';
+					delete this.createMenu;
+					createList.remove(ul);
+					return ul;
+				};
+				var editorpage=ui.create.div(container);
+				var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
+					ui.window.classList.remove('shortcutpaused');
+					ui.window.classList.remove('systempaused');
+					container.delete(null);
+					delete window.saveNonameInput;
+				});
+				var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
+				var theme=ui.create.div('.editbutton','主题',editorpage,function(){
+					if (this&&this.createMenu) {
+						return closeMenu.call(this);
+					}
+					//主题列表
+					var list=['mdn-like','mbo'];
+					//正在使用的主题
+					var active = container.editor.options.theme;
+					//排个序
+					list.remove(active).splice(0, 0, active);
+					//this
+					var self=this;
+					//元素位置
+					var pos=this.getBoundingClientRect();
+					//点击事件
+					var click=function(e){
+						var theme=this.innerHTML;
+						container.editor.setOption("theme",theme);
+						setTimeout(()=>container.editor.refresh(),0);
+						game.saveConfig('codeMirror_theme', theme);
+						closeMenu.call(self);
+					};
+					var ul=createMenu(pos,self,list,click);
+					this.createMenu=ul;
+				});
+				var edit=ui.create.div('.editbutton','编辑',editorpage,function(){
+					if(this&&this.createMenu){
+						return closeMenu.call(this);
+					}
+					var self=this;
+					var pos=this.getBoundingClientRect();
+					var list=['撤销\t\tCtrl+Z', '恢复撤销\tCtrl+Y'/* , '全选\t\tCtrl+A' */];
+					var click=function(e){
+						var num=this.innerHTML.indexOf("Ctrl");
+						var inner=this.innerHTML.slice(num).replace("+", "-");
+						container.editor.execCommand(container.editor.options.extraKeys[inner]);
+						setTimeout(()=>container.editor.refresh(),0);
+						closeMenu.call(self);
+					};
+					var ul=createMenu(pos,self,list,click);
+					this.createMenu=ul;
+				});
+				var editor=ui.create.div(editorpage);
+				return editor;
+			},
 			cardTempName:function(card,applyNode){
 				let getApplyNode=applyNode||card;
 				let cardName=get.name(card);
@@ -45308,39 +45522,17 @@
 										node.textarea.value=node.code;
 									}
 									else{
-										var aceReady=function(){
-											ui.window.appendChild(node);
-											var mirror = window.CodeMirror(editor, {
-												value:node.code,
-												mode:"javascript",
-												lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
-												lineNumbers:true,
-												indentUnit:4,
-												autoCloseBrackets:true,
-												theme:'mdn-like'
-											});
-											lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
-											node.aced=true;
-											node.editor=mirror;
-										}
 										if(!window.CodeMirror){
-											lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+											lib.init.js(lib.assetURL+'game','codemirror',()=>lib.codeMirrorReady(node,editor));
 											lib.init.css(lib.assetURL+'layout/default','codemirror');
 										}
 										else{
-											aceReady();
+											lib.codeMirrorReady(node,editor);
 										}
 									}
 								}
 
 								var container=ui.create.div('.popup-container.editor');
-								var editorpage=ui.create.div(container);
-								var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-									ui.window.classList.remove('shortcutpaused');
-									ui.window.classList.remove('systempaused');
-									container.delete(null);
-									delete window.saveNonameInput;
-								});
 								var saveInput=function(){
 									var code;
 									if(container.editor){
@@ -45361,7 +45553,15 @@
 											alert('代码格式有错误，请对比示例代码仔细检查');
 										}
 										else{
-											alert('代码语法有错误，请仔细检查（'+e+'）')
+											var tip=lib.getErrorTip(e)||'';
+											alert('代码语法有错误，请仔细检查（'+e+'）'+tip);
+										}
+										window.focus();
+										if(container.editor){
+											container.editor.focus();
+										}
+										else if(container.textarea){
+											container.textarea.focus();
 										}
 										return;
 									}
@@ -45372,8 +45572,7 @@
 									container.code=code;
 									delete window.saveNonameInput;
 								};
-								var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-								var editor=ui.create.div(editorpage);
+								var editor=ui.create.editor(container,saveInput);
 								container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
 								var editnode=ui.create.div('.menubutton.large.new_card.disabled','创建卡牌',newCard,function(){
@@ -45760,39 +45959,17 @@
 										node.textarea.value=node.code;
 									}
 									else{
-										var aceReady=function(){
-											ui.window.appendChild(node);
-											var mirror = window.CodeMirror(editor, {
-												value:node.code,
-												mode:"javascript",
-												lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
-												lineNumbers:true,
-												indentUnit:4,
-												autoCloseBrackets:true,
-												theme:'mdn-like'
-											});
-											lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
-											node.aced=true;
-											node.editor=mirror;
-										}
-										if(!window.ace){
-											lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+										if(!window.CodeMirror){
+											lib.init.js(lib.assetURL+'game','codemirror',()=>lib.codeMirrorReady(node,editor));
 											lib.init.css(lib.assetURL+'layout/default','codemirror');
 										}
 										else{
-											aceReady();
+											lib.codeMirrorReady(node,editor);
 										}
 									}
 								}
 
 								var container=ui.create.div('.popup-container.editor');
-								var editorpage=ui.create.div(container);
-								var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-									ui.window.classList.remove('shortcutpaused');
-									ui.window.classList.remove('systempaused');
-									container.delete(null);
-									delete window.saveNonameInput;
-								});
 								var saveInput=function(){
 									var code;
 									if(container.editor){
@@ -45813,7 +45990,15 @@
 											alert('代码格式有错误，请对比示例代码仔细检查');
 										}
 										else{
-											alert('代码语法有错误，请仔细检查（'+e+'）')
+											var tip=lib.getErrorTip(e)||'';
+											alert('代码语法有错误，请仔细检查（'+e+'）'+tip);
+										}
+										window.focus();
+										if(container.editor){
+											container.editor.focus();
+										}
+										else if(container.textarea){
+											container.textarea.focus();
 										}
 										return;
 									}
@@ -45824,8 +46009,7 @@
 									container.code=code;
 									delete window.saveNonameInput;
 								};
-								var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-								var editor=ui.create.div(editorpage);
+								var editor=ui.create.editor(container,saveInput);
 								container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
 
 								var citebutton=document.createElement('button');
@@ -46070,13 +46254,6 @@
 									ui.create.div('',str1,dash);
 									ui.create.div('',str2,dash);
 									var container=ui.create.div('.popup-container.editor');
-									var editorpage=ui.create.div(container);
-									var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
-										ui.window.classList.remove('shortcutpaused');
-										ui.window.classList.remove('systempaused');
-										container.delete(null);
-										delete window.saveNonameInput;
-									});
 									var saveInput=function(){
 										var code;
 										if(container.editor){
@@ -46113,7 +46290,15 @@
 												alert('代码格式有错误，请对比示例代码仔细检查');
 											}
 											else{
-												alert('代码语法有错误，请仔细检查（'+e+'）')
+												var tip=lib.getErrorTip(e)||'';
+												alert('代码语法有错误，请仔细检查（'+e+'）'+tip);
+											}
+											window.focus();
+											if(container.editor){
+												container.editor.focus();
+											}
+											else if(container.textarea){
+												container.textarea.focus();
 											}
 											return;
 										}
@@ -46125,8 +46310,7 @@
 										page.content[link]=code;
 										delete window.saveNonameInput;
 									};
-									var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-									var editor=ui.create.div(editorpage);
+									var editor=ui.create.editor(container,saveInput);
 									container.code=str;
 									dash.editor=editor;
 									dash.node=container;
@@ -46153,28 +46337,12 @@
 										node.textarea.value=node.code;
 									}
 									else{
-										var editor=this.editor;
-										var aceReady=function(){
-											ui.window.appendChild(node);
-											var mirror = window.CodeMirror(editor, {
-												value:node.code,
-												mode:"javascript",
-												lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
-												lineNumbers:true,
-												indentUnit:4,
-												autoCloseBrackets:true,
-												theme:'mdn-like'
-											});
-											lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
-											node.aced=true;
-											node.editor=mirror;
-										}
-										if(!window.ace){
-											lib.init.js(lib.assetURL+'game','codemirror',aceReady);
+										if(!window.CodeMirror){
+											lib.init.js(lib.assetURL+'game','codemirror',()=>lib.codeMirrorReady(node,editor));
 											lib.init.css(lib.assetURL+'layout/default','codemirror');
 										}
 										else{
-											aceReady();
+											lib.codeMirrorReady(node,editor);
 										}
 									}
 								};
