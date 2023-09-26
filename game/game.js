@@ -7560,7 +7560,7 @@
 					list.addArray(keys);
 				}
 				return {
-					list:list.filter(key=>key.startsWith(token.string)),
+					list:list.filter(key=>key.startsWith(token.string)).sort((a,b)=>(a+'').localeCompare(b+'')),
 					from:CodeMirror.Pos(cur.line,token.start),
 					to:CodeMirror.Pos(cur.line,token.end),
 				};
