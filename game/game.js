@@ -18281,8 +18281,11 @@
 				loseToDiscardpile:function(){
 					"step 0"
 					if(event.log!=false) game.log(player,'将',cards,'置入了弃牌堆');
-					event.done=player.lose(cards,event.position,'visible');
-					event.done.type='loseToDiscardpile';
+					var next=player.lose(cards,event.position,'visible');
+					if(event.insert_index) next.insert_index=event.index;
+					if(event.insert_card) next.insert_card=true;
+					next.type='loseToDiscardpile';
+					event.done=next;
 					"step 1"
 					event.trigger('loseToDiscardpile');
 				},
@@ -23893,6 +23896,9 @@
 						else if(arguments[i]=='notBySelf'){
 							next.notBySelf=true;
 						}
+						else if(arguments[i]=='insert'){
+							next.insert_card=true;
+						}
 					}
 					if(next.cards==undefined) _status.event.next.remove(next);
 					next.setContent('loseToDiscardpile');
@@ -25293,9 +25299,12 @@
 					}
 				},
 				markAuto:function(name,info){
-					if(Array.isArray(info)){
+					if(typeof info!='undefined'){
 						if(!Array.isArray(this.storage[name])) this.storage[name]=[];
-						this.storage[name].addArray(info);
+						if(Array.isArray(info)){
+							this.storage[name].addArray(info);
+						}
+						else this.storage[name].add(info);
 						this.markSkill(name);
 					}
 					else{

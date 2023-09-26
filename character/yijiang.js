@@ -8288,6 +8288,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qinwang_ai:{},
 			zuoding:{
+				audio:2,
+				audioname:['re_zhongyao'],
 				trigger:{global:'useCardToPlayered'},
 				filter:function(event,player){
 					if(event.getParent().triggeredTargets3.length>1) return false;
@@ -8326,7 +8328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huomo:{
 				audio:2,
-				audioname:['huzhao'],
+				audioname:['huzhao','re_zhongyao'],
 				enable:'chooseToUse',
 				onChooseToUse:function(event){
 					if(game.online||event.huomo_list) return;
@@ -8420,17 +8422,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							popname:true,
 							ignoreMod:true,
 							precontent:function(){
-								'step 0'
 								player.logSkill('huomo');
 								var card=event.result.cards[0];
-								event.card=card;
-								player.$throw(card,1000);
 								game.log(player,'将',card,'置于牌堆顶');
 								event.result.card={name:event.result.card.name,nature:event.result.card.nature};
 								event.result.cards=[];
-								player.lose(card,ui.cardPile,'visible','insert');
-								'step 1'
-								game.delay();
+								player.loseToDiscardpile(card,ui.cardPile,'visible','insert').log=false;
 							},
 						}
 					},
@@ -13596,6 +13593,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunziliufang:['dc_sunziliufang','sunziliufang'],
 			liyan:['liyan','old_liyan'],
 			zhangsong:['re_zhangsong','zhangsong'],
+			zhongyao:['re_zhongyao','zhongyao'],
 		},
 		translate:{
 			old_huaxiong:'将华雄',

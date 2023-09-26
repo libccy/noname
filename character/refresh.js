@@ -13,13 +13,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang2:['re_madai','re_wangyi','xin_handang','xin_zhonghui','re_liaohua','re_chengpu','re_caozhang','dc_bulianshi','xin_liubiao','re_xunyou','re_guanzhang'],
 				refresh_yijiang3:['re_jianyong','re_guohuai','re_zhuran','re_panzhangmazhong','xin_yufan','dc_liru','re_manchong','re_fuhuanghou','re_guanping','re_liufeng','re_caochong'],
 				refresh_yijiang4:['re_sunluban','re_wuyi','re_hanhaoshihuan','re_caozhen','re_zhoucang','dc_chenqun','re_caifuren','re_guyong','re_jushou','re_zhuhuan','re_zhangsong'],
-				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen','re_zhuzhi','re_caorui'],
+				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen','re_zhuzhi','re_caorui','re_zhongyao'],
 				refresh_yijiang6:['re_guohuanghou','re_sundeng'],
 				refresh_xinghuo:['xin_zhangliang','re_zhugedan','re_simalang','re_duji','dc_gongsunzan','re_sp_taishici','re_caiyong','re_mazhong','re_wenpin','re_jsp_huangyueying'],
 			},
 		},
 		connect:true,
 		character:{
+			re_zhongyao:['male','wei',3,['rehuomo','zuoding'],['clan:颍川钟氏']],
 			xin_zhangliang:['male','qun',4,['rejijun','refangtong'],['unseen']],
 			re_simalang:['male','wei',3,['requji','rejunbing'],['unseen']],
 			re_zhugedan:['male','wei',4,['regongao','rejuyi'],['unseen']],
@@ -166,6 +167,149 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			rehuomo:{
+				audio:'huomo',
+				audioname:['huzhao','re_zhongyao'],
+				enable:'chooseToUse',
+				hiddenCard:function(player,name){
+					if(get.type(name)!='basic') return false;
+					const list=player.getStorage('rehuomo');
+					if(list.contains(name)) return false;
+					return player.hasCard(function(card){
+						return get.color(card)=='black'&&get.type(card)!='basic';
+					},'eh');
+				},
+				filter:function(event,player){
+					if(event.type=='wuxie'||!player.hasCard(function(card){
+						return get.color(card)=='black'&&get.type(card)!='basic';
+					},'eh')) return false;
+					const list=player.getStorage('rehuomo');
+					for(let name of lib.inpile){
+						if(get.type(name)!='basic'||list.contains(name)) continue;
+						let card={name:name,isCard:true};
+						if(event.filterCard(card,player,event)) return true;
+						if(name=='sha'){
+							for(let nature of lib.inpile_nature){
+								card.nature=nature;
+								if(event.filterCard(card,player,event)) return true;
+							}
+						}
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						const vcards=[];
+						const list=player.getStorage('rehuomo');
+						for(let name of lib.inpile){
+							if(get.type(name)!='basic'||list.contains(name)) continue;
+							let card={name:name,isCard:true};
+							if(event.filterCard(card,player,event)) vcards.push(['基本','',name]);
+							if(name=='sha'){
+								for(let nature of lib.inpile_nature){
+									card.nature=nature;
+									if(event.filterCard(card,player,event)) vcards.push(['基本','',name,nature]);
+								}
+							}
+						}
+						return ui.create.dialog('活墨',[vcards,'vcard'],'hidden');
+					},
+					check:function(button){
+						const player=_status.event.player;
+						const card={name:button.link[2],nature:button.link[3]};
+						if(game.hasPlayer(function(current){
+							return player.canUse(card,current)&&get.effect(current,card,player,player)>0;
+						})){
+							switch(button.link[2]){
+								case 'tao':return 5;
+								case 'jiu':return 3.01;
+								case 'shan':return 3.01;
+								case 'sha':
+									if(button.link[3]=='fire') return 2.95;
+									else if(button.link[3]=='fire') return 2.92;
+									else return 2.9;
+							}
+						}
+						return 0;
+					},
+					backup:function(links,player){
+						return {
+							check:function(card){
+								return 1/Math.max(0.1,get.value(card));
+							},
+							filterCard:function(card){
+								return get.type(card)!='basic'&&get.color(card)=='black';
+							},
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+								suit:'none',
+								number:null,
+								isCard:true,
+							},
+							position:'he',
+							popname:true,
+							ignoreMod:true,
+							precontent:function(){
+								player.logSkill('rehuomo');
+								var card=event.result.cards[0];
+								game.log(player,'将',card,'置于牌堆顶');
+								player.loseToDiscardpile(card,ui.cardPile,'visible','insert').log=false;
+								var viewAs={name:event.result.card.name,nature:event.result.card.nature};
+								event.result.card=viewAs;
+								event.result.cards=[];
+								if(!player.hasStorage('rehuomo')){
+									player.when('phaseAfter').then(()=>{player.unmarkSkill('rehuomo')});
+								}
+								player.markAuto('rehuomo',viewAs.name)
+							},
+						}
+					},
+					prompt:function(links,player){
+						return '将一张黑色非基本牌置于牌堆顶并视为使用一张'+get.translation(links[0][3]||'')+get.translation(links[0][2]);
+					}
+				},
+				marktext:'墨',
+				intro:{
+					content:'本回合已因〖活墨〗使用过$',
+					onunmark:true,
+				},
+				ai:{
+					order:function(){
+						var player=_status.event.player;
+						var event=_status.event;
+						var list=player.getStorage('rehuomo');
+						if(!list.contains('jiu')&&event.filterCard({name:'jiu'},player,event)&&get.effect(player,{name:'jiu'})>0){
+							return 3.1;
+						}
+						return 2.9;
+					},
+					respondSha:true,
+					fireAttack:true,
+					respondShan:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag=='fireAttack') return true;
+						if(player.hasCard(function(card){
+							return get.color(card)=='black'&&get.type(card)!='basic';
+						},'he')){
+							var list=player.getStorage('rehuomo');
+							if(tag=='respondSha'){
+								if(arg!='use') return false;
+								if(list.contains('sha')) return false;
+							}
+							else if(tag=='respondShan'){
+								if(list.contains('shan')) return false;
+							}
+						}
+						else{
+							return false;
+						}
+					},
+					result:{
+						player:1
+					}
+				}
+			},
 			//界张梁
 			rejijun:{
 				audio:2,
@@ -14973,6 +15117,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejuyi_info:'觉醒技。准备阶段，若你已受伤，且你的体力上限大于场上的存活角色数，你将手牌数摸至体力上限，然后获得技能〖崩坏〗和〖威重〗。',
 			reweizhong:'威重',
 			reweizhong_info:'锁定技。当你的体力上限增加或减少时，你摸两张牌。',
+			re_zhongyao:'界钟繇',
+			rehuomo:'活墨',
+			rehuomo_info:'每种牌名每回合限一次。当你需要使用一张基本牌时，你可以将一张黑色非基本牌置于牌堆顶，视为使用此基本牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

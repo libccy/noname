@@ -4794,7 +4794,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var pos=lib.skill.midu_backup.equip;
 									if(pos<=0) player.enableJudge();
 									else player.enableEquip(pos);
-									player.addTempSkill('huomo',{player:'phaseBegin'});
+									player.addTempSkill('rehuomo',{player:'phaseBegin'});
 								},
 							}
 						}
@@ -4834,7 +4834,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '废除'+numc+'个区域并令一名角色摸'+numc+'张牌';
 					},
 				},
-				derivation:'huomo',
+				derivation:'rehuomo',
 				ai:{
 					order:8,
 					result:{player:1},
