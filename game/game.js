@@ -7409,7 +7409,7 @@
 		codeMirrorReady:(node,editor)=>{
 			ui.window.appendChild(node);
 			node.style.fontSize=20/game.documentZoom+'px';
-			var mirror=window.CodeMirror(editor,{
+			const mirror=window.CodeMirror(editor,{
 				value:node.code,
 				mode:"javascript",
 				lineWrapping:!lib.config.touchscreen&&lib.config.mousewheel,
@@ -7428,11 +7428,9 @@
 			lib.setScroll(editor.querySelector('.CodeMirror-scroll'));
 			node.aced=true;
 			node.editor=mirror;
-			setTimeout(()=>{
-				mirror.refresh();
-			},0);
-			node.editor.on('change',function(e,change){
-				var code;
+			setTimeout(()=>mirror.refresh(),0);
+			node.editor.on('change',(e,change)=>{
+				let code;
 				if(node.editor){
 					code=node.editor.getValue();
 				}else if(node.textarea){
@@ -7446,69 +7444,68 @@
 					node.editor.showHint();
 				}
 			});
-			CodeMirror.registerHelper('hint','javascript',function(editor,options){
+			//防止每次输出字符都创建以下元素
+			const event=_status.event;
+			const player=ui.create.player().init('sunce');
+			const card=game.createCard();
+			//覆盖原本的javascript提示
+			CodeMirror.registerHelper('hint','javascript',(editor,options)=>{
 				//Find the token at the cursor
-				var cur=editor.getCursor(),
+				let cur=editor.getCursor(),
 					token=editor.getTokenAt(cur);
 				if(/\b(?:string|comment)\b/.test(token.type)) return;
-				var innerMode=CodeMirror.innerMode(editor.getMode(),token.state);
+				const innerMode=CodeMirror.innerMode(editor.getMode(),token.state);
 				if (innerMode.mode.helperType==="json") return;
 				token.state=innerMode.state;
 				//If it's not a 'word-style' token, ignore the token.
 				if (!/^[\w$_]*$/.test(token.string)){
 					token={
-						start:cur.ch,end:cur.ch,string:"",state:token.state,
+						start:cur.ch,
+						end:cur.ch,
+						string:"",
+						state:token.state,
 						type:token.string=="."?"property":null
 					};
 				}else if(token.end>cur.ch){
 					token.end=cur.ch;
 					token.string=token.string.slice(0,cur.ch- oken.start);
 				}
-				var tprop=token;
+				let tprop=token;
+				let context;
 				//If it is a property, find out what it is a property of.
 				while (tprop.type=="property"){
 					tprop=editor.getTokenAt(CodeMirror.Pos(cur.line,tprop.start));
-					if(tprop.string != ".") return;
+					if(tprop.string!=".") return;
 					tprop=editor.getTokenAt(CodeMirror.Pos(cur.line,tprop.start));
-					if(!context) var context=[];
+					if(!context) context=[];
 					context.push(tprop);
 				}
-				//console.log(token);
-				//console.log(context);
-				var list=[];
+				const list=[];
 				if(Array.isArray(context)){
 					try {
-						var event=_status.event;
-						var player=ui.create.player().init('sunce');
-						var card=game.createCard();
-						var code=context.length==1?context[0].string:context.reduceRight((pre,cur)=>(pre.string||pre)+'.'+cur.string);
-						var obj=eval(code);
-						//console.log(obj);
-						var keys=Object.getOwnPropertyNames(obj).filter(key=>key.startsWith(token.string));
+						const code=context.length==1?context[0].string:context.reduceRight((pre,cur)=>(pre.string||pre)+'.'+cur.string);
+						const obj=eval(code);
+						const keys=Object.getOwnPropertyNames(obj).filter(key=>key.startsWith(token.string));
 						list.addArray(keys);
-						//console.log(list);
 					}catch(_){ return;}
-				} else if (token && typeof token.string == 'string') {
-					var javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
+				}else if(token&&typeof token.string=='string'){
+					const javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
 						"if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
-					var coffeescriptKeywords=("and break catch class continue delete do else extends false finally for " +
+					const coffeescriptKeywords=("and break catch class continue delete do else extends false finally for " +
 						"if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
-					
-					var keys=['player','card','lib','game','ui','get','ai','_status'].concat(javascriptKeywords).concat(coffeescriptKeywords).concat(Object.getOwnPropertyNames(window));
-					
-					var start=token.string;
+					const keys=['player','card','lib','game','ui','get','ai','_status'].concat(javascriptKeywords).concat(coffeescriptKeywords).concat(Object.getOwnPropertyNames(window));
+					const start=token.string;
 					function maybeAdd(str){
-						if (str.lastIndexOf(start, 0) == 0 && !list.includes(str)) list.push(str);
+						if(str.lastIndexOf(start,0)==0&&!list.includes(str)) list.push(str);
 					}
-					for(var v=token.state.localVars;v;v=v.next) maybeAdd(v.name);
-					for(var c=token.state.context;c;c=c.prev) for (var v=c.vars;v;v=v.next) maybeAdd(v.name)
-					for(var v=token.state.globalVars;v;v=v.next) maybeAdd(v.name);
-					if(options&&options.additionalContext!=null) for(var key in options.additionalContext) maybeAdd(key);
+					for(let v=token.state.localVars;v;v=v.next) maybeAdd(v.name);
+					for(let c=token.state.context;c;c=c.prev) for (let v=c.vars;v;v=v.next) maybeAdd(v.name)
+					for(let v=token.state.globalVars;v;v=v.next) maybeAdd(v.name);
+					if(options&&options.additionalContext!=null) for(let key in options.additionalContext) maybeAdd(key);
 					list.addArray(keys);
-					list=list.filter(key=>key.startsWith(token.string));
 				}
 				return {
-					list,
+					list:list.filter(key=>key.startsWith(token.string)),
 					from:CodeMirror.Pos(cur.line,token.start),
 					to:CodeMirror.Pos(cur.line,token.end),
 				};
@@ -40663,29 +40660,29 @@
 			 * @param {Function} saveInput 
 			 */
 			editor:function(container,saveInput){
-				var createList=[];
-				var containerDelete=container.delete;
+				const createList=[];
+				const containerDelete=container.delete;
 				//删除container的时候，删除创建的ul列表
 				container.delete=function(){
-					for (var i=createList.length-1;i>=0;i--){
+					for (let i=createList.length-1;i>=0;i--){
 						createList[i].parentNode&&createList[i].parentNode.removeChild(createList[i]);
 					}
 					containerDelete.apply(this, arguments);
 				}
 				//创建ul列表
-				var createMenu=function(pos,self,List,click){
+				const createMenu=function(pos,self,List,click){
 					if (self&&self.createMenu) return false;
-					var parent=self.parentNode;
+					const parent=self.parentNode;
 					if (parent){
-						for(var i=0;i<parent.childElementCount;i++){
-							var node=parent.childNodes[i];
-							node!=self&&node.createMenu&&closeMenu(node);
+						for(let i=0;i<parent.childElementCount;i++){
+							const node=parent.childNodes[i];
+							node!=self&&node.createMenu&&closeMenu.call(node);
 						}
 					}
-					var editor=container.editor;
+					const editor=container.editor;
 					if(!editor) return false;
 					self.style.background='#08f';
-					var ul=document.createElement('ul');
+					const ul=document.createElement('ul');
 					container.css.call(ul,{
 						position:'absolute',
 						top:pos.bottom/game.documentZoom+'px',
@@ -40695,42 +40692,39 @@
 						//'font-family':'shousha',
 						'font-size':20/game.documentZoom+'px',
 					});
-					var theme=editor.options.theme;
+					const theme=editor.options.theme;
 					lib.setScroll(ul);
 					lib.setMousewheel(ul);
 					ul.className="CodeMirror-hints "+theme;
-					var getActive=function(){
-						var i=0;
+					const getActive=()=>{
+						let i=0;
 						while(i<ul.childElementCount){
-							if(ul.childNodes[i].classList.contains('CodeMirror-hint-active')){
-								break;
-							}else{
-								i++;
-							}
+							if(ul.childNodes[i].classList.contains('CodeMirror-hint-active')) break;
+							else i++;
 						}
 						return i;
-					}
-					var setActive=function(i){
+					};
+					const setActive=i=>{
 						ul.childNodes[getActive()].classList.remove('CodeMirror-hint-active');
 						ul.childNodes[i].classList.add('CodeMirror-hint-active');
 						return i;
-					}
+					};
 					if (List&&List.length&&click) {
-						for(var i=0;i<List.length;++i) {
-							var elt=ul.appendChild(document.createElement("li"));
+						for(let i=0;i<List.length;++i) {
+							const elt=ul.appendChild(document.createElement("li"));
 							elt.style.color='black';
 							elt.style.boxShadow='none';
-							var cur=List[i];
+							const cur=List[i];
 							if(cur instanceof HTMLElement){
 								elt.appendChild(cur);
 							}else{
 								elt.innerHTML=cur;
 							}
-							var className="CodeMirror-hint"+(i!=0?"":" "+"CodeMirror-hint-active");
+							let className="CodeMirror-hint"+(i!=0?"":" "+"CodeMirror-hint-active");
 							if(cur.className!=null) className=cur.className+" "+className;
 							elt.className=className;
 							elt.hintId=i;
-							ui.window.listen.call(elt,function () {
+							ui.window.listen.call(elt,function(){
 								setActive(this.hintId);
 								this.focus();
 								click.call(this);
@@ -40742,8 +40736,8 @@
 					return ul;
 				};
 				//关闭ul列表
-				var closeMenu=function(){
-					var ul=this.createMenu;
+				const closeMenu=function(){
+					const ul=this.createMenu;
 					if(!ul) return false;
 					if(ul.parentNode) ul.parentNode.removeChild(ul);
 					this.style.background='';
@@ -40751,57 +40745,57 @@
 					createList.remove(ul);
 					return ul;
 				};
-				var editorpage=ui.create.div(container);
-				var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
+				const editorpage=ui.create.div(container);
+				const discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
 					ui.window.classList.remove('shortcutpaused');
 					ui.window.classList.remove('systempaused');
 					container.delete(null);
 					delete window.saveNonameInput;
 				});
-				var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-				var theme=ui.create.div('.editbutton','主题',editorpage,function(){
-					if (this&&this.createMenu) {
+				const saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
+				const theme=ui.create.div('.editbutton','主题',editorpage,function(){
+					if(this&&this.createMenu){
 						return closeMenu.call(this);
 					}
 					//主题列表
-					var list=['mdn-like','mbo'];
+					const list=['mdn-like','mbo'];
 					//正在使用的主题
-					var active = container.editor.options.theme;
+					const active=container.editor.options.theme;
 					//排个序
-					list.remove(active).splice(0, 0, active);
+					list.remove(active).splice(0,0,active);
 					//this
-					var self=this;
+					const self=this;
 					//元素位置
-					var pos=this.getBoundingClientRect();
+					const pos=this.getBoundingClientRect();
 					//点击事件
-					var click=function(e){
-						var theme=this.innerHTML;
+					const click=function(e){
+						const theme=this.innerHTML;
 						container.editor.setOption("theme",theme);
 						setTimeout(()=>container.editor.refresh(),0);
 						game.saveConfig('codeMirror_theme', theme);
 						closeMenu.call(self);
 					};
-					var ul=createMenu(pos,self,list,click);
+					const ul=createMenu(pos,self,list,click);
 					this.createMenu=ul;
 				});
-				var edit=ui.create.div('.editbutton','编辑',editorpage,function(){
+				const edit=ui.create.div('.editbutton','编辑',editorpage,function(){
 					if(this&&this.createMenu){
 						return closeMenu.call(this);
 					}
-					var self=this;
-					var pos=this.getBoundingClientRect();
-					var list=['撤销\t\tCtrl+Z', '恢复撤销\tCtrl+Y'/* , '全选\t\tCtrl+A' */];
-					var click=function(e){
-						var num=this.innerHTML.indexOf("Ctrl");
-						var inner=this.innerHTML.slice(num).replace("+", "-");
+					const self=this;
+					const pos=this.getBoundingClientRect();
+					const list=['撤销\t\tCtrl+Z', '恢复撤销\tCtrl+Y'/* , '全选\t\tCtrl+A' */];
+					const click=function(e){
+						const num=this.innerHTML.indexOf("Ctrl");
+						const inner=this.innerHTML.slice(num).replace("+", "-");
 						container.editor.execCommand(container.editor.options.extraKeys[inner]);
 						setTimeout(()=>container.editor.refresh(),0);
 						closeMenu.call(self);
 					};
-					var ul=createMenu(pos,self,list,click);
+					const ul=createMenu(pos,self,list,click);
 					this.createMenu=ul;
 				});
-				var editor=ui.create.div(editorpage);
+				const editor=ui.create.div(editorpage);
 				return editor;
 			},
 			cardTempName:function(card,applyNode){
