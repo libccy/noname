@@ -1279,7 +1279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.color(card)=='red'&&game.hasPlayer(function(current){
 						return current!=player&&current.isDamaged()&&get.attitude(player,current)>2;
 					})) return 2;
-					if(get.nature(card)) return 1.5;
+					if(get.natureList(card).length) return 1.5;
 					return 1;
 				},
 				discard:false,
@@ -1291,7 +1291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover();
 					'step 1'
 					var num=1;
-					if(get.nature(cards[0])) num++;
+					if(get.natureList(cards[0]).length) num++;
 					player.draw('nodelay');
 					target.draw(num);
 					if(get.color(cards[0])=='red') target.recover();
@@ -1306,7 +1306,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							if(ui.selected.cards.length){
 								var num=1;
-								if(get.nature(ui.selected.cards[0])) num++;
+								if(get.natureList(ui.selected.cards[0]).length) num++;
 								if(target.hasSkillTag('nogain')) num=0;
 								if(get.color(ui.selected.cards[0])=='red') return num+2
 								else return num+1;
@@ -3036,7 +3036,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				usable:1,
 				filter:function(event,player){
-					return event.source&&event.source.hp!=player.hp&&!lib.linked.contains(event.nature)&&event.source.countCards('h')!=player.countCards('h');
+					return event.source&&event.source.hp!=player.hp&&!event.hasNature('linked')&&event.source.countCards('h')!=player.countCards('h');
 				},
 				content:function(){
 					trigger.cancel();
@@ -6465,7 +6465,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var vcard=[get.type(trigger.card),'',trigger.card.name];
-						if(trigger.card.nature) vcard.push(trigger.card.nature);
+						if(trigger.card.hasNature()) vcard.push(get.nature(trigger.card));
 						player.storage.juanhui3.push(vcard);
 						player.markSkill('juanhui2');
 					}
@@ -7244,7 +7244,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					if(event.name!='damage') return (event.name!='phase'||game.phaseNumber==0);
-					return event.nature=='fire'&&player.countMark('cangchu')>0;
+					return event.hasNature('fire')&&player.countMark('cangchu')>0;
 				},
 				content:function(){
 					if(trigger.name!='damage') player.addMark('cangchu',3);
@@ -7266,7 +7266,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target,current){
 							if(target.hasMark('cangchu')){
 								if(card.name=='sha'){
-									if(lib.skill.global.contains('huoshaowuchao')||card.nature=='fire'||player.hasSkill('zhuque_skill')) return 2;
+									if(lib.skill.global.contains('huoshaowuchao')||card.hasNature('fire')||player.hasSkill('zhuque_skill')) return 2;
 								}
 								if(get.tag(card,'fireDamage')&&current<0) return 2;
 							}

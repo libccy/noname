@@ -265,6 +265,61 @@
 					}
 				});
 			}],
+			//增加新属性杀
+			addNature:[(nature,config)=>{
+				if(typeof config!='object') config={};
+				let linked=config.linked,order=config.order,background=config.background,lineColor=config.lineColor;
+				if(typeof linked!='boolean') linked=true;
+				if(typeof order!='number') order=0;
+				if(typeof background!='string') background='';
+				if(!Array.isArray(lineColor)||lineColor.length!=3) lineColor=[];
+				else if(background.indexOf('ext:')==0){
+					background=background.replace(/ext:/,'extension/');
+				}
+				if(linked) lib.linked.add(nature);
+				if(lineColor.length) lib.lineColor.set(nature,lineColor);
+				lib.nature.set(nature,order);
+				if(background.length>0) lib.natureBg.set(nature,background);
+
+				let color1,color2;
+				if (typeof config.color=="string"&&/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(config.color)){
+					let c1=parseInt(`0x${item[1].slice(1, 3)}`);
+					let c2=parseInt(`0x${item[1].slice(3, 5)}`);
+					let c3=parseInt(`0x${item[1].slice(5, 7)}`);
+					color1=color2=[c1,c2,c3,1];
+				}
+				else if(Array.isArray(config.color)&&config.color.length>=2&&config.color.length<=4){
+					if(config.color.every(item=>Array.isArray(item))){
+						color1=config.color[0];
+						color2=config.color[1];
+					}
+					else{
+						let color=config.color.slice();
+						if(color.length==3) color.push(1);
+						color1=color2=color;
+					}
+				}
+				if(color1&&color2){
+					const cs=lib.linq.cselector;
+					const g1=cs.group(
+						cs.of(
+							cs.class("card","fullskin",`${nature}`),
+							'>',
+							cs.class("name"),
+						)
+					);
+					let result={};
+					result[g1]={
+						color:`rgba(${color1.join()})`,
+						border:cs.merge(
+							'1px',
+							'solid',
+							`rgba(${color2.join()})`
+						),
+					};
+					game.dynamicStyle.addObject(result);
+				}
+			}],
 		},
 		hookmap:{},
 		imported:{},
@@ -8178,6 +8233,17 @@
 						this.sort(lib.sort.seat);
 						delete lib.tempSortSeat;
 						return this;
+					}
+				});
+				Object.defineProperty(Object.prototype,'hasNature',{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(nature,player){
+						var natures=get.natureList(this,player);
+						if(!nature) return natures.length>0;
+						if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
+						return get.is.sameNature(natures,nature,true);
 					}
 				});
 				if (!('includes' in Array.prototype)) {
@@ -17481,8 +17547,9 @@
 					if(cardaudio) game.broadcastAll((player,card)=>{
 						if(!lib.config.background_audio||get.type(card)=='equip'&&!lib.config.equip_audio) return;
 						const sex=player.sex=='female'?'female':'male';
-						if(card.name=='sha'&&['fire','thunder','ice','stab'].includes(card.nature)){
-							game.playAudio('card',sex,`${card.name}_${card.nature}`);
+						var nature=get.natureList(card)[0];
+						if(card.name=='sha'&&['fire','thunder','ice','stab'].includes(nature)){
+							game.playAudio('card',sex,`${card.name}_${nature}`);
 							return;
 						}
 						const audio=lib.card[card.name].audio;
@@ -17521,7 +17588,8 @@
 						}
 						else{
 							var config={};
-							if(card.nature||card.classList&&card.classList.contains(card.nature)) config.color=card.nature;
+							var nature=get.natureList(card)[0];
+							if(nature||card.classList&&card.classList.contains(nature)) config.color=nature;
 							if(event.addedTarget){
 								player.line2(targets.concat(event.addedTargets),config);
 							}
@@ -19107,18 +19175,19 @@
 					}
 					if(event.animate!==false){
 						player.$damage(source);
-						game.broadcastAll(function(nature,player){
+						var natures=(event.nature||'').split(lib.natureSeparator);
+						game.broadcastAll(function(natures,player){
 							if(lib.config.animation&&!lib.config.low_performance){
-								if(nature=='fire'){
+								if(natures.includes('fire')){
 									player.$fire();
 								}
-								else if(nature=='thunder'){
+								if(natures.includes('thunder')){
 									player.$thunder();
 								}
 							}
-						},event.nature,player);
+						},natures,player);
 						var numx=Math.max(0,num-player.hujia);
-						player.$damagepop(-numx,event.nature);
+						player.$damagepop(-numx,natures[0]);
 					}
 					if(event.unreal) event.goto(6)
 					if(!event.notrigger){
@@ -24343,6 +24412,11 @@
 						else if(get.itemtype(arguments[i])=='nature'&&arguments[i]!='stab'){
 							next.nature=arguments[i];
 						}
+						else if(get.itemtype(arguments[i])=='natures'){
+							var natures=arguments[i].split(lib.natureSeparator);
+							natures.remove('stab');
+							if(natures.length) next.nature=natures.join(lib.natureSeparator);
+						}
 					}
 					if(next.card==undefined&&!nocard) next.card=event.card;
 					if(next.cards==undefined&&!nocard) next.cards=event.cards;
@@ -24352,7 +24426,13 @@
 					if(next.num==undefined) next.num=(event.baseDamage||1)+(event.extraDamage||0);
 					next.original_num=next.num;
 					next.change_history=[];
-					if(next.nature=='poison') delete next._triggered;
+					next.hasNature=function(nature){
+						if(!nature) return Boolean(this.nature&&this.nature.length>0);
+						let natures=get.natureList(nature),naturesx=get.natureList(this.nature);
+						if(nature=='linked') return naturesx.some(n=>lib.linked.includes(n));
+						return get.is.sameNature(natures,naturesx,true);
+					};
+					if(next.hasNature('poison')) delete next._triggered;
 					next.setContent('damage');
 					next.filterStop=function(){
 						if(this.source&&this.source.isDead()) delete this.source;
@@ -28702,6 +28782,63 @@
 				}
 			},
 			card:{
+				hasNature:function(nature,player){
+					var natures=get.natureList(this,player);
+					if(!nature) return natures.length>0;
+					if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
+					return get.is.sameNature(natures,nature,true);
+				},
+				//只针对【杀】起效果
+				addNature:function(nature){
+					let natures=[];
+					if(!this.nature) this.nature='';
+					else{
+						natures.addArray(get.natureList(this.nature));
+					}
+					natures.addArray(get.natureList(nature));
+					this.nature=get.nature(natures);
+					this.classList.add(nature);
+					let str=get.translation(this.nature)+'杀';
+					this.node.name.innerText=str;
+					let name=get.name(this,false);
+					do{
+						if(name=='sha'){
+							let _bg;
+							for(const n of natures) if(lib.natureBg.has(n)) _bg=n;
+							if(_bg){
+								this.node.image.setBackgroundImage(lib.natureBg.get(_bg));
+								break;
+							}
+						}
+						this.node.image.setBackgroundImage('image/card/'+name+'.png');
+					}
+					while(0);
+					return this.nature;
+				},
+				removeNature:function(nature){
+					if(!this.nature) return;
+					let natures=get.natureList(this.nature);
+					natures.remove(nature);
+					if(!natures.length) delete this.nature;
+					else this.nature=get.nature(natures);
+					this.classList.remove(nature);
+					let str=get.translation(this.nature)+'杀';
+					this.node.name.innerText=str;
+					let name=get.name(this,false);
+					do{
+						if(name=='sha'){
+							let _bg;
+							for(const n of natures) if(lib.natureBg.has(n)) _bg=n;
+							if(_bg){
+								this.node.image.setBackgroundImage(lib.natureBg.get(_bg));
+								break;
+							}
+						}
+						this.node.image.setBackgroundImage('image/card/'+name+'.png');
+					}
+					while(0);
+					return this.nature;
+				},
 				addGaintag:function(gaintag){
 					if(Array.isArray(gaintag)) this.gaintag=gaintag.slice(0);
 					else this.gaintag.add(gaintag);
@@ -28731,23 +28868,30 @@
 					if(Array.isArray(card)){
 						if(card[2]=='huosha'){
 							card[2]='sha';
-							card[3]='fire';
+							card[3]=['fire'];
 						}
-						if(card[2]=='leisha'){
+						else if(card[2]=='leisha'){
 							card[2]='sha';
-							card[3]='thunder';
+							card[3]=['thunder'];
 						}
-						if(card[2]=='kamisha'){
+						// else if(card[2]=='kamisha'){
+						// 	card[2]='sha';
+						// 	card[3]=['kami'];
+						// }
+						// else if(card[2]=='icesha'){
+						// 	card[2]='sha';
+						// 	card[3]=['ice'];
+						// }
+						else if(card[2]=='cisha'){
 							card[2]='sha';
-							card[3]='kami';
+							card[3]=['stab'];
 						}
-						if(card[2]=='icesha'){
-							card[2]='sha';
-							card[3]='ice';
-						}
-						if(card[2]=='cisha'){
-							card[2]='sha';
-							card[3]='stab';
+						else if(card[2].length>3){
+							let prefix=card[2].slice(0,card[2].lastIndexOf('sha'));
+							if(prefix.length+3==card[2].length){
+								card[2]='sha';
+								card[3]=[prefix];
+							}
 						}
 					}
 					else if(typeof card=='object'){
@@ -28833,13 +28977,24 @@
 								this.node.image.setBackgroundImage('image/mode/'+lib.card[bg].modeimage+'/card/'+bg+'.png');
 							}
 							else{
-								if(bg=='sha'&&card[3]=='stab') this.node.image.setBackgroundImage('image/card/cisha.png');
-								else this.node.image.setBackgroundImage('image/card/'+bg+'.png');
+								do{
+									let nature=card[3];
+									if(bg=='sha'&&typeof nature=='string'){
+										let natures=get.natureList(nature),_bg;
+										for(const n of natures) if(lib.natureBg.has(n)) _bg=n;
+										if(_bg){
+											this.node.image.setBackgroundImage(lib.natureBg.get(_bg));
+											break;
+										}
+									}
+									this.node.image.setBackgroundImage('image/card/'+bg+'.png');
+								}
+								while(0);
 							}
 						}
 					}
 					else if(lib.card[bg].image=='background'){
-						if(card[3]) this.node.background.setBackground(bg+'_'+card[3],'card');
+						if(card[3]) this.node.background.setBackground(bg+'_'+get.natureList(card[3])[0],'card');
 						else this.node.background.setBackground(bg,'card');
 					}
 					else if(lib.card[bg].fullimage){
@@ -28916,7 +29071,7 @@
 						}
 					}
 					else if(lib.card[bg].image=='card'){
-						if(card[3]) this.setBackground(bg+'_'+card[3],'card');
+						if(card[3]) this.setBackground(bg+'_'+get.natureList(card[3])[0],'card');
 						else this.setBackground(bg,'card');
 					}
 					else if(typeof lib.card[bg].image=='string'&&!lib.card[bg].fullskin){
@@ -28980,25 +29135,17 @@
 					this.node.image.className='image';
 					var name=get.translation(card[2]);
 					if(card[2]=='sha'){
-						if(card[3]=='fire'){
-							name='火'+name;
-							this.node.image.classList.add('fire');
+						name='';
+						let nature=card[3];
+						if(nature){
+							let natures=get.natureList(nature);
+							natures.sort(lib.sort.nature);
+							for(let nature of natures){
+								name+=lib.translate['nature_'+nature]||lib.translate[nature]||'';
+								if(nature!='stab') this.node.image.classList.add(nature);
+							}
 						}
-						else if(card[3]=='thunder'){
-							name='雷'+name;
-							this.node.image.classList.add('thunder');
-						}
-						else if(card[3]=='kami'){
-							name='神'+name;
-							this.node.image.classList.add('kami');
-						}
-						else if(card[3]=='ice'){
-							name='冰'+name;
-							this.node.image.classList.add('ice');
-						}
-						else if(card[3]=='stab'){
-							name='刺'+name;
-						}
+						name+='杀';
 					}
 					this.node.name.innerHTML=name;
 					if(name.length>=5){
@@ -29013,8 +29160,9 @@
 					this.name=card[2];
 					this.classList.add('card');
 					if(card[3]){
-						if(lib.nature.contains(card[3])) this.nature=card[3];
-						this.classList.add(card[3]);
+						let natures=get.natureList(card[3]);
+						natures.forEach(n=>{if(n) this.classList.add(n)});
+						this.nature=natures.filter(n=>lib.nature.has(n)).sort(lib.sort.nature).join(lib.natureSeparator);
 					}
 					else if(this.nature){
 						this.classList.remove(this.nature);
@@ -30751,6 +30899,9 @@
 			}
 		},
 		sort:{
+			nature:function(a,b){
+				return (lib.nature.get(b)||0)-(lib.nature.get(a)||0);
+			},
 			group:function(a,b){
 				const groupSort=function(group){
 					let base=0;
@@ -31426,7 +31577,7 @@
 					return '是否防止即将对'+get.translation(event.player)+'造成的伤害，改为令其减少'+get.cnNumber(event.num)+'点体力上限？';
 				},
 				filter:function(event,player){
-					return event.nature=='kami'&&event.num>0;
+					return event.hasNature('kami')&&event.num>0;
 				},
 				ruleSkill:true,
 				check:function(event,player){
@@ -32080,7 +32231,7 @@
 				forceDie:true,
 				filter:function(event,player){
 					var evt=event.getParent();
-					return evt&&evt.name=='damage'&&evt.nature&&lib.linked.contains(evt.nature)&&player.isLinked();
+					return evt&&evt.name=='damage'&&evt.hasNature('linked')&&player.isLinked();
 				},
 				content:function(){
 					player.link();
@@ -33202,8 +33353,20 @@
 			none:['none'],
 		},
 		group:['wei','shu','wu','qun','jin','shen'],
-		nature:['fire','thunder','kami','ice','stab','poison'],
+		//数值代表各元素在名称中排列的先后顺序
+		nature:new Map([
+			['fire',20],
+			['thunder',30],
+			['kami',60],
+			['ice',40],
+			['stab',10],
+			['poison',50]
+		]),
 		linked:['fire','thunder','kami','ice'],
+		natureBg:new Map([
+			['stab','image/card/cisha.png']
+		]),
+		natureSeparator:'|',
 		groupnature:{
 			shen:'thunder',
 			wei:'water',
@@ -33259,6 +33422,34 @@
 		}
 	};
 	const game={
+		//添加新的属性杀
+		addNature:(nature,translation,config)=>{
+			if(!nature) throw new TypeError();
+			if(translation&&translation.length) lib.translate['nature_'+nature]=translation;
+			lib.onload.add(()=>{
+				for(const hook of lib.hooks.addNature){
+					if(hook!=null&&typeof hook=="function"){
+						hook(nature,config);
+					}
+				}
+			})
+			return nature;
+		},
+		//设置卡牌信息/事件的属性
+		setNature:(item,nature,addNature)=>{
+			if(!nature) nature=[];
+			if(!addNature){
+				item.nature=get.nature(nature);
+				if(!item.nature.length) delete item.nature;
+			}
+			else{
+				let natures=Array.isArray(nature)?nature:nature.split(lib.natureSeparator);
+				let _nature=get.natureList(item,false);
+				_nature.addArray(natures);
+				item.nature=_nature.join(lib.natureSeparator);
+			}
+			return item.nature;
+		},
 		//洗牌
 		washCard:()=>{
 			if(!ui.cardPile.hasChildNodes()&&!ui.discardPile.hasChildNodes()) return false;
@@ -38249,8 +38440,7 @@
 					for(i=0;i<cards.length;i++){
 						if(lib.config.cardtempname!='off'){
 							var cardname=get.name(cards[i]);
-							var cardnature=get.nature(cards[i]);
-							if(cards[i].name!=cardname||((cardnature||cards[i].nature)&&cards[i].nature!=cardnature)){
+							if(cards[i].name!=cardname||!get.is.sameNature(get.nature(cards[i]),cards[i].nature)){
 								var node=ui.create.cardTempName(cards[i]);
 								var cardtempnameConfig=lib.config.cardtempname;
 								if(cardtempnameConfig!=='default') node.classList.remove('vertical');
@@ -50111,7 +50301,8 @@
 						node.style.color=item.style.color;
 					}
 					if(item.nature){
-						node.classList.add(item.nature);
+						let natures=get.natureList(item.nature);
+						natures.forEach(n=>node.classList.add(n));
 					}
 					if(!noclick){
 						lib.setIntro(node);
@@ -50641,8 +50832,9 @@
 					}
 				}
 				lib.inpile.sort(lib.sort.card);
+				const natures=Array.from(lib.nature.keys());
 				lib.inpile_nature.sort(function(a,b){
-					return lib.nature.indexOf(a)-lib.nature.indexOf(b);
+					return natures.indexOf(a)-natures.indexOf(b);
 				})
 				for(var i in _status.cardtag){
 					if(!_status.cardtag[i].length) delete _status.cardtag[i];
@@ -55189,6 +55381,45 @@
 			return 0;
 		},
 		is:{
+			/**
+			 * 判断传入的参数的属性是否相同（参数可以为卡牌、卡牌信息、属性等）
+			 * @param ...infos 要判断的属性列表 
+			 * @param partly {boolean} 是否判断每一个传入的属性是否存在部分相同而不是完全相同
+			 */
+			sameNature:function(){
+				var _args=Array.from(arguments);
+				var args=[],partly=false;
+				for(const arg of _args){
+					if(typeof arg=='boolean') partly=arg;
+					else{
+						if(arg) args.push(arg);
+					}
+				}
+				if(!args.length) return true;
+				if(args.length==1){
+					if(Array.isArray(args[0])) args=args[0];
+					else return false;
+				}
+				var naturesList=[];
+				const getN=(cardx)=>{
+					if(typeof cardx=='string') return cardx.split(lib.natureSeparator);
+					else if(Array.isArray(cardx)) return cardx;
+					return get.natureList(cardx||{});
+				}
+				naturesList=args.map(getN);
+				if(naturesList.length==1) return false;
+				if(naturesList.some(natures=>Array.isArray(natures)&&natures.length)){
+					var uniqueNatures=new Set(naturesList.flat());
+					for(var nature of uniqueNatures){
+						if(!nature) continue;
+						var lens=naturesList.map(natures=>natures.filter(n=>n===nature).length);
+						var lensx=Array.from(new Set(lens));
+						if(partly&&lensx.length==1) return true;
+						if(!partly&&lensx.length!=1) return false;
+					}
+				}
+				return !Boolean(partly);
+			},
 			//判断一张牌是否为明置手牌
 			shownCard:function(card){
 				if(card&&Array.isArray(card.gaintag)){
@@ -56742,7 +56973,8 @@
 					}
 					if(bool) return 'position';
 				}
-				if(lib.nature.contains(obj)) return 'nature';
+				if(obj.indexOf(lib.natureSeparator)!=-1&&obj.split(lib.natureSeparator).every(n=>lib.nature.has(n))) return 'natures';
+				if(lib.nature.has(obj)) return 'nature';
 			}
 			if(Array.isArray(obj)&&obj.length){
 				var isPlayers=true;
@@ -56890,14 +57122,27 @@
 			}
 			return number;
 		},
+		//返回一张杀的属性。如有多种属性则用 lib.natureSeparator 分割开来。例：火雷【杀】的返回值为 fire|thunder
 		nature:function(card,player){
+			if(typeof card=='string') return card.split(lib.natureSeparator).sort(lib.sort.nature).join(lib.natureSeparator);
+			if(Array.isArray(card)) return card.sort(lib.sort.nature).join(lib.natureSeparator);
+			var nature=card.nature;
 			if(get.itemtype(player)=='player'||player!==false){
 				var owner=get.owner(card);
 				if(owner){
-					return game.checkMod(card,owner,card.nature,'cardnature',owner);
+					return game.checkMod(card,owner,nature,'cardnature',owner);
 				}
 			}
-			return card.nature;
+			return nature;
+		},
+		//返回包含所有属性的数组
+		natureList:function(card,player){
+			if(!card) return [];
+			if(get.itemtype(card)=='natures') return card.split(lib.natureSeparator);
+			if(get.itemtype(card)=='nature') return [card];
+			var natures=get.nature.apply(this,arguments);
+			if(typeof natures!='string') return [];
+			return natures.split(lib.natureSeparator);
 		},
 		cards:function(num,putBack){
 			if(_status.waitingForCards){
@@ -57162,21 +57407,14 @@
 					str2=get.translation(str.name);
 				}
 				if(str2=='杀'){
-					if(str.nature=='fire'){
-						str2='火'+str2;
+					str2='';
+					if(typeof str.nature=='string'){
+						let natures=str.nature.split(lib.natureSeparator).sort(lib.sort.nature);
+						for(let nature of natures){
+							str2+=lib.translate['nature_'+nature]||lib.translate[nature]||'';
+						}
 					}
-					else if(str.nature=='thunder'){
-						str2='雷'+str2;
-					}
-					else if(str.nature=='kami'){
-						str2='神'+str2;
-					}
-					else if(str.nature=='ice'){
-						str2='冰'+str2;
-					}
-					else if(str.nature=='stab'){
-						str2='刺'+str2;
-					}
+					str2+='杀';
 				}
 				if(get.itemtype(str)=='card'||str.isCard){
 					if(_status.cardtag&&str.cardid){
@@ -57214,6 +57452,14 @@
 				}
 				return str2;
 			}
+			if(get.itemtype(str)=='natures'){
+				let natures=str.split(lib.natureSeparator).sort(lib.sort.nature);
+				var str2='';
+				for(var nature of natures){
+					str2+=lib.translate['nature_'+nature]||lib.translate[nature]||'';
+				}
+				return str2;
+			}
 			if(arg=='skill'){
 				if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
 				if(lib.translate[str]) return lib.translate[str].slice(0,2);
@@ -57235,6 +57481,7 @@
 				return lib.translate[str];
 			}
 			if(typeof str=='string'){
+				if(lib.translate['nature_'+str]) return lib.translate['nature_'+str];
 				return str;
 			}
 			if(typeof str=='number'||typeof str=='boolean'){
@@ -59537,6 +59784,10 @@
 			return final;
 		},
 		damageEffect:function(target,player,viewer,nature){
+			if(get.itemtype(nature)=='natures'){
+				var natures=get.natureList(nature);
+				return natures.map(n=>get.damageEffect(target,player,viewer,n)).reduce((p,c)=>p+c,0)/(natures.length||1);
+			}
 			if(!player){
 				player=target;
 			}

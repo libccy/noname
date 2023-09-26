@@ -7412,7 +7412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!player.hasCard(function(cardx){
 								if(card.name==cardx.name){
 									if(card.name!='sha') return true;
-									return get.nature(card)==get.nature(cardx);
+									return get.is.sameNature(card,cardx);
 								}
 								return false;
 							},'hs')){
@@ -7452,7 +7452,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								});
 								var cardx=lib.skill.xinfu_guhuo_backup.viewAs;
 								if(enemyNum){
-									if(card.name==cardx.name&&(card.name!='sha'||card.nature==cardx.nature)) return 2+Math.random()*3;
+									if(card.name==cardx.name&&(card.name!='sha'||get.is.sameNature(card,cardx))) return 2+Math.random()*3;
 									else if(lib.skill.xinfu_guhuo_backup.aiUse<0.5&&!player.isDying()) return 0;
 								}
 								return 6-get.value(card);
@@ -7501,7 +7501,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.fake=false;
 					event.betrayer=null;
 					var card=trigger.cards[0];
-					if(card.name!=trigger.card.name||(card.name=='sha'&&(trigger.card.nature||card.nature)&&trigger.card.nature!=card.nature)) event.fake=true;
+					if(card.name!=trigger.card.name||(card.name=='sha'&&!get.is.sameNature(trigger.card,card))) event.fake=true;
 					player.popup(trigger.card.name,'metal');
 					player.lose(card,ui.ordering).relatedEvent=trigger;
 					// player.line(trigger.targets,trigger.card.nature);

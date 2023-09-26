@@ -6110,7 +6110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.nature) return true;
+					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
 					return false;
 				},
 				audio:'lihuo',
@@ -6127,7 +6127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				content:function(){
-					trigger.card.nature='fire';
+					game.setNature(trigger.card,'fire');
 					trigger.lihuo_changed=true;
 				},
 				group:['ollihuo2','ollihuo3','ollihuo4'],
@@ -6138,7 +6138,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ollihuo2:{
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					if(event.card.name!='sha'||event.card.nature!='fire') return false;
+					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
 					return game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&lib.filter.targetEnabled(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
 					});
@@ -7603,7 +7603,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadelihuo:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.nature) return true;
+					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
 					return false;
 				},
 				audio:'lihuo',
@@ -7619,7 +7619,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				content:function(){
-					trigger.card.nature='fire';
+					game.setNature(trigger.card,'fire');
 				},
 				group:['decadelihuo2','decadelihuo3'],
 				ai:{
@@ -7629,7 +7629,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadelihuo2:{
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					if(event.card.name!='sha'||event.card.nature!='fire') return false;
+					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
 					return game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&player.canUse(event.card,current);
 					});
@@ -7659,7 +7659,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadelihuo3:{
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					return event.card.name=='sha'&&event.card.nature=='fire'&&event.targets.length>1&&player.getHistory('sourceDamage',function(evt){
+					return event.card.name=='sha'&&event.card.hasNature('fire')&&event.targets.length>1&&player.getHistory('sourceDamage',function(evt){
 						return evt.card==event.card;
 					}).length>0;
 				},
@@ -8928,9 +8928,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.type='dying';
 						player.loseToDiscardpile(result.links);
 						target.useCard({name:'jiu',isCard:true},target);
-						var nature=get.nature(result.links[0]);
-						if(nature=='fire') player.recover();
-						if(nature=='thunder') player.draw(2);
+						var natures=get.natureList(result.links[0]);
+						if(natures.includes('fire')) player.recover();
+						if(natures.includes('thunder')) player.draw(2);
 					}
 				},
 				ai:{
@@ -10500,7 +10500,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!player.countCards('h',function(cardx){
 								if(card.name==cardx.name){
 									if(card.name!='sha') return true;
-									return get.nature(card)==get.nature(cardx);
+									return get.is.sameNature(card,cardx);
 								}
 								return false;
 							})) return 0;
@@ -10535,7 +10535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var rand=_status.event.getRand('reguhuo');
 								var cardx=lib.skill.reguhuo_backup.viewAs;
 								if(hasEnemy&&rand>0.3){
-									if(card.name==cardx.name&&(card.name!='sha'||card.nature==cardx.nature)) return 10;
+									if(card.name==cardx.name&&(card.name!='sha'||get.is.sameNature(card,cardx))) return 10;
 									return 0;
 								}
 								return 6-get.value(card);
@@ -10671,7 +10671,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('reguhuo_phase');
 					event.fake=false;
 					var card=trigger.cards[0];
-					if(card.name!=trigger.card.name||(card.name=='sha'&&(trigger.card.nature||card.nature)&&trigger.card.nature!=card.nature)) event.fake=true;
+					if(card.name!=trigger.card.name||(card.name=='sha'&&!get.is.sameNature(trigger.card,card))) event.fake=true;
 					//player.logSkill('reguhuo');
 					player.line(trigger.targets,get.nature(trigger.card));
 					event.cardTranslate=get.translation(trigger.card.name);
@@ -10679,7 +10679,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.card.suit=get.suit(card);
 					//trigger.line=false;
 					trigger.skill='reguhuo_backup';
-					if(trigger.card.name=='sha'&&trigger.card.nature) event.cardTranslate=get.translation(trigger.card.nature)+event.cardTranslate;
+					if(trigger.card.name=='sha'&&get.natureList(trigger.card).length) event.cardTranslate=get.translation(trigger.card.nature)+event.cardTranslate;
 					player.popup(event.cardTranslate,trigger.name=='useCard'?'metal':'wood');
 					event.prompt='是否质疑'+get.translation(player)+'声明的'+event.cardTranslate+'？';
 					game.log(player,'声明了','#y'+event.cardTranslate);

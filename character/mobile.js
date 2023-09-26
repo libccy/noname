@@ -3169,7 +3169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						trigger:{player:'damageBegin4'},
 						filter:function(event){
-							return event.nature!='thunder';
+							return !event.hasNature('thunder');
 						},
 						content:function(){
 							trigger.cancel();
@@ -6426,10 +6426,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				charlotte:true,
 				filter:function(event,player){
-					return event.nature!='fire';
+					return !event.hasNature('fire');
 				},
 				content:function(){
-					trigger.nature='fire';
+					game.setNature(trigger,'fire');
 				},
 			},
 			tiansuan2_3:{
@@ -9504,13 +9504,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['relihuo_baigei','relihuo_damage'],
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.nature) return true;
+					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
 				},
 				check:function(event,player){
 					return false;
 				},
 				content:function(){
-					trigger.card.nature='fire';
+					game.setNature(trigger.card,'fire');
 					trigger.relihuo=true;
 				},
 			},
@@ -9530,7 +9530,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:'relihuo',
 				filter:function(event,player){
-					if(event.card.name!='sha'||event.card.nature!='fire') return false;
+					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
 					var num=0;
 					player.getHistory('sourceDamage',function(evt){
 						if(evt.card==event.card) num+=evt.num;
@@ -11149,7 +11149,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.color(card)=='red'&&game.hasPlayer(function(current){
 						return current!=player&&current.isDamaged()&&get.attitude(player,current)>2;
 					})) return 2;
-					if(get.nature(card)) return 1.5;
+					if(get.natureList(card).length) return 1.5;
 					return 1;
 				},
 				discard:false,
@@ -11161,7 +11161,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover();
 					'step 1'
 					var num=1;
-					if(get.nature(cards[0])) num++;
+					if(get.natureList(cards[0]).length) num++;
 					target.draw(num);
 					if(get.color(cards[0])=='red') target.recover();
 				},
@@ -11175,7 +11175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							if(ui.selected.cards.length){
 								var num=1;
-								if(get.nature(ui.selected.cards[0])) num++;
+								if(get.natureList(ui.selected.cards[0]).length) num++;
 								if(target.hasSkillTag('nogain')) num=0;
 								if(get.color(ui.selected.cards[0])=='red') return num+2
 								else return num+1;
@@ -13120,7 +13120,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageBegin4'},
 				filter:function(event){
-					return event.nature=='fire';
+					return event.hasNature('fire');
 				},
 				forced:true,
 				content:function(){

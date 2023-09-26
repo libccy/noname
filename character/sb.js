@@ -2980,7 +2980,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'sbguidao_defend',
 				filter:function(event,player){
 					if(player.countMark('sbguidao')>=8) return false;
-					if(event.name=='damage') return event.nature&&!player.hasSkill('sbguidao_forbid');
+					if(event.name=='damage') return event.hasNature()&&!player.hasSkill('sbguidao_forbid');
 					return (event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
@@ -4645,7 +4645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbleiji:'雷击',
 			sbleiji_info:'出牌阶段，你可以选择一名其他角色并弃4枚“道兵”，对其造成1点雷电伤害。',
 			sbguidao:'鬼道',
-			sbguidao_info:'①游戏开始时，你获得4枚“道兵”标记。②“道兵”上限为8。③一名角色受到属性伤害后，你获得2枚“道兵”。④当你受到伤害时，你可以弃2枚“道兵”并防止此伤害。然后若当前回合角色不为你，〖鬼道③〗于你下回合开始前无效。',
+			sbguidao_info:'①游戏开始时，你获得4枚“道兵”标记（“道兵”上限为8）。②一名角色受到属性伤害后，你获得2枚“道兵”。③当你受到伤害时，你可以弃2枚“道兵”并防止此伤害。然后若当前回合角色不为你，〖鬼道②〗于你下回合开始前无效。',
 			sbhuangtian:'黄天',
 			sbhuangtian_info:'主公技，锁定技。①回合开始时，若本回合为你的第一个回合且游戏轮数为1，且游戏内没有【太平要术】，你装备【太平要术】。②其他群势力角色造成伤害后，若你拥有〖鬼道〗，你获得1枚“道兵”（每轮你至多以此法获得4枚“道兵”）。',
 			sb_caocao:'谋曹操',

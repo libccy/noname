@@ -674,7 +674,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										var owner=_status.event.getParent().owner;
 										if(owner) owner.$throw(card.cards);
 									});
-									if(card.name!=cardx.name||card.nature!=cardx.nature) next.viewAs=true;
+									if(card.name!=cardx.name||!get.is.sameNature(card,cardx)) next.viewAs=true;
 									var owner=get.owner(card);
 									if(owner!=player&&get.position(card)=='h'){
 										next.throw=false;
@@ -1075,7 +1075,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.classList.add('linked2');
 							try{
 								var cards=player.getCards('hs',cardx=>{
-									return get.name(cardx)=='sha'&&lib.linked.contains(get.nature(cardx));
+									if(get.name(cardx)!='sha') return false;
+									return cardx.hasNature('linked');
 								});
 								cards.map(i=>[i,get.effect(target,i,player,player)]);
 								cards.sort((a,b)=>b[1]-a[1]);
@@ -1094,7 +1095,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('goon',player.countCards('hs',card=>{
 						return get.name(card)=='jiu'&&player.hasUseTarget(card);
 					})&&player.countCards('hs',card=>{
-						return get.name(card)=='sha'&&lib.linked.contains(get.nature(card));
+						if(get.name(card)!='sha') return false;
+						return card.hasNature('linked');
 					}));
 					'step 1'
 					if(result.bool){
@@ -1567,14 +1569,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var list=[],names=[];
 							for(var card of cards){
 								var name=get.name(card),nature=get.nature(card);
-								var namex=name+(nature?nature:'');
+								var namex=name+nature;
 								if(names.contains(namex)) continue;
-								if(nature) list.push([get.type(card),'',name,nature]);
+								if(nature.length) list.push([get.type(card),'',name,nature]);
 								else list.push([get.type(card),'',name]);
 								names.push(namex);
 							}
 							list.sort((a,b)=>{
-								return 100*(lib.inpile.indexOf(a[2])-lib.inpile.indexOf(b[2]))+lib.inpile_nature.indexOf(a[3])-lib.inpile_nature.indexOf(b[3]);
+								return 100*(lib.inpile.indexOf(a[2])-lib.inpile.indexOf(b[2]))+lib.inpile_nature.indexOf(a[3][0])-lib.inpile_nature.indexOf(b[3][0]);
 							})
 							player.chooseButton(['是否将'+get.cnNumber(cards.length)+'张牌当下列一张牌使用？',[list,'vcard']]).set('ai',function(button){
 								return _status.event.player.getUseValue({name:button.link[2],nature:button.link[3]});
@@ -1588,7 +1590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									lib.skill.clanshenjun_backup.viewAs=card;
 								},cards.length,{name:name,nature:nature});
 								var next=player.chooseToUse();
-								next.set('openskilldialog','将'+get.cnNumber(cards.length)+'张牌当做'+(nature?get.translation(nature):'')+'【'+get.translation(name)+'】使用');
+								next.set('openskilldialog','将'+get.cnNumber(cards.length)+'张牌当做'+(get.translation(nature)||'')+'【'+get.translation(name)+'】使用');
 								next.set('norestore',true);
 								next.set('addCount',false);
 								next.set('_backupevent','clanshenjun_backup');
@@ -1683,10 +1685,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
-					if(!event.nature||!event.player.isIn()) return false;
+					if(!event.hasNature()||!event.player.isIn()) return false;
 					return game.countPlayer2(current=>{
 						return current.hasHistory('damage',evt=>{
-							return evt.nature&&evt!=event;
+							return evt.hasNature()&&evt!=event;
 						});
 					})==0;
 				},

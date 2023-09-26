@@ -403,7 +403,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageBegin2'},
 				logTarget:'player',
 				filter:function(event,player){
-					return player!=event.player&&lib.linked.contains(event.nature)&&event.player.countCards('h')>0&&!player.isMaxHandcard(true);
+					return player!=event.player&&event.hasNature('linked')&&event.player.countCards('h')>0&&!player.isMaxHandcard(true);
 				},
 				check:function(event,player){
 					return get.attitude(player,event.player)<=0;

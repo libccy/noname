@@ -5234,7 +5234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin3'},
 				forced:true,
 				filter:function(event,player){
-					return player.isLinked()&&event.notLink()&&event.nature=='fire';
+					return player.isLinked()&&event.notLink()&&event.hasNature('fire');
 				},
 				content:function(){
 					trigger.num++;
@@ -6645,7 +6645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lihuo:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.nature) return true;
+					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
 					return false;
 				},
 				audio:2,
@@ -6654,7 +6654,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				content:function(){
-					trigger.card.nature='fire';
+					game.setNature(trigger.card,'fire');
 					var next=game.createEvent('lihuo_clear');
 					next.player=player;
 					next.card=trigger.card;
@@ -6665,7 +6665,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.isIn()&&player.getHistory('sourceDamage',function(evt){
 							return evt.getParent(2)==event.parent;
 						}).length>0) player.loseHp();
-						delete card.nature;
+						game.setNature(card,[],true);
 					});
 				},
 				group:'lihuo2'
@@ -6673,7 +6673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lihuo2:{
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					if(event.card.name!='sha'||get.nature(event.card)!='fire') return false;
+					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
 					return game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&player.canUse(event.card,current);
 					});

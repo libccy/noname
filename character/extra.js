@@ -1532,7 +1532,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mark:true,
 						content:function(){
 							trigger.num++;
-							trigger.nature='thunder';
+							game.setNature(trigger,'thunder');
 						},
 						marktext:'⚡',
 						intro:{
@@ -5346,7 +5346,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dawu2:{
 				trigger:{player:'damageBegin4'},
 				filter:function(event){
-					if(event.nature!='thunder') return true;
+					if(!event.hasNature('thunder')) return true;
 					return false;
 				},
 				mark:true,
@@ -5419,7 +5419,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kuangfeng2:{
 				trigger:{player:'damageBegin3'},
 				filter:function(event){
-					if(event.nature=='fire') return true;
+					if(event.hasNature('fire')) return true;
 					return false;
 				},
 				mark:true,
@@ -6112,7 +6112,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(['trick','delay'].contains(lib.card[card.name].type)) return 'thunder';
 							},
 							cardUsable:function(card,player){
-								if(card.name=='sha'&&card.nature=='thunder') return Infinity;
+								if(card.name=='sha'&&card.hasNature('thunder')) return Infinity;
 							},
 						},
 						ai:{

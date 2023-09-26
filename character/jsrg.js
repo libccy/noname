@@ -980,7 +980,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							precontent:function(){
 								delete event.result.skill;
 								var card=event.result.card;
-								if(get.color(card,player)!='red'||get.name(card)!='sha'||get.nature(card)){
+								if(get.color(card,player)!='red'||get.name(card)!='sha'||get.natureList(card).length){
 									player.addTempSkill('jsrgnianen_blocker');
 									player.addAdditionalSkill('jsrgnianen_blocker','mashu');
 								}
@@ -1827,7 +1827,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return event.nature=='fire';
+							return event.hasNature('fire');
 						},
 						content:function(){
 							player.addTempSkill('jsrgshishou_blocker',{player:'phaseEnd'});

@@ -134,7 +134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageBegin'},
 				filter:function(event,player){
 					if(player.getEquip(2)) return false;
-					if(event.nature=='fire') return true;
+					if(event.hasNature('fire')) return true;
 				},
 				forced:true,
 				check:function(){

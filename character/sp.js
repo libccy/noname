@@ -2219,7 +2219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'damageEnd'},
 						forced:true,
 						filter:function(event){
-							return event.nature=='thunder'&&lib.skill.oltianhou_spade.logTarget(event).length>0;
+							return event.hasNature('thunder')&&lib.skill.oltianhou_spade.logTarget(event).length>0;
 						},
 						logTarget:function(event){
 							var list=[];
@@ -2258,7 +2258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						logTarget:'source',
 						filter:function(event,player){
-							return event.nature=='fire'&&event.source&&event.source.isIn()&&event.source!=player;
+							return event.hasNature('fire')&&event.source&&event.source.isIn()&&event.source!=player;
 						},
 						content:function(){
 							trigger.cancel();
@@ -7977,7 +7977,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"damageBegin4",
 				},
 				filter:function(event,player){
-					if(!lib.linked.contains(event.nature)) return false;
+					if(!event.hasNature('linked')) return false;
 					if(player.hasSkillTag('unequip2')) return false;
 					if(event.source&&event.source.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
@@ -19308,7 +19308,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageEnd'},
 				filter:function(event,player){
-					return event.nature=='fire';
+					return event.hasNature('fire');
 				},
 				forced:true,
 				check:function(){
@@ -19325,7 +19325,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target,current){
 							if(card.name=='sha'){
-								if(card.nature=='fire'||player.hasSkill('zhuque_skill')) return 2;
+								if(card.hasNature('fire')||player.hasSkill('zhuque_skill')) return 2;
 							}
 							if(get.tag(card,'fireDamage')&&current<0) return 2;
 						}
@@ -19351,7 +19351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanyong:{
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian'||(event.card.name=='sha'&&!event.card.nature&&get.suit(event.card)=='spade'))&&player.isDamaged();
+					return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian'||(event.card.name=='sha'&&!event.card.hasNature()&&get.suit(event.card)=='spade'))&&player.isDamaged();
 				},
 				content:function(){
 					trigger.baseDamage++;
@@ -21974,7 +21974,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)||!event.player.isIn()) return false;
-					return event.nature=='fire';
+					return event.hasNature('fire');
 				},
 				logTarget:'player',
 				content:function(){
@@ -23699,7 +23699,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					if(player.hasSkill('smh_huoji')||player.hasSkill('smh_lianhuan')) return false;
 					if(!player.hasEmptySlot(2)) return false;
-					if(event.nature) return true;
+					if(event.hasNature()) return true;
 					return get.type(event.card,'trick')=='trick';
 				},
 				content:function (){
@@ -24047,7 +24047,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				audio:2,
 				filter:function (event,player){
-					//if(!event.nature) return false;
+					//if(!event.hasNature()) return false;
 					return player.hasMark('xinfu_falu_diamond');
 				},
 				prompt2:'弃置「勾陈♦」标记，从牌堆中获得每种类型的牌各一张。',
