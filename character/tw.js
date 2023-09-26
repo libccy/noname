@@ -13814,76 +13814,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			renshe:{
-				audio:2,
-				trigger:{player:'damageEnd'},
+			chijie:{
+				audio:true,
+				forbid:['guozhan'],
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
 				direct:true,
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0)&&game.hasPlayer(function(current){
+						return current.group!=player.group&&lib.group.includes(current.group);
+					});
+				},
 				content:function(){
 					'step 0'
-					var choiceList=['令一名其他角色与你各摸一张牌','令自己下个出牌阶段可以多发动一次【外使】'];
-					event.count=0;
-					if(game.hasPlayer(current=>current!=player)){
-						choiceList.shift();
-						event.count++;
-					}
-					if(lib.skill.chijie.filter&&lib.skill.chijie.filter({},player)) choiceList.push('将自己的势力变更为场上存在的一个其他势力');
-					player.chooseControl('cancel2').set('prompt',get.prompt('renshe')).set('choiceList',choiceList).set('ai',function(){
-						if(game.hasPlayer(function(current){
-							return get.attitude(player,current)>0||current.hasSkillTag('nogain');
-						})) return 0;
-						return 1;
+					var list=lib.group.filter(function(group){
+						return group!=player.group&&game.hasPlayer(function(current){
+							return current.group==group;
+						});
+					});
+					list.push('cancel2');
+					player.chooseControl(list).set('prompt',get.prompt('chijie')).set('prompt2','将自己的势力变更为场上存在的一个势力').set('ai',function(){
+						return list.randomGet();
 					});
 					'step 1'
-					if(result.control=='cancel2') event.finish();
-					else{
-						event.index=result.index;
-						player.logSkill('renshe');
-						if(event.index+event.count==0){
-							player.chooseTarget('请选择一名角色，与其各摸一张牌',lib.filter.notMe,true).ai=function(target){
-								if(target.hasSkillTag('nogain')) return 0.1;
-								return get.attitude(_status.event.player,target);
-							};
-						}
-						else if(result.index+event.count==1){
-							player.storage.waishi++;
-							event.finish();
-						}
-						else{
-							var next=game.createEvent('renshe_changeGroup');
-							next.player=player;
-							next.renshe=true;
-							next.setContent(lib.skill.chijie.content);
-							event.finish();
-						}
+					if(result.control!='cancel2'){
+						player.logSkill('chijie');
+						player.changeGroup(result.control);
 					}
-					'step 2'
-					if(result.bool){
-						player.line(result.targets[0],'green');
-						game.asyncDraw([player,result.targets[0]].sortBySeat());
-					}
-					else event.finish();
-					'step 3'
-					game.delay();
 				},
 			},
 			waishi:{
 				audio:2,
-				group:'waishi_afterstory',
-				subSkill:{
-					afterstory:{
-						trigger:{player:'phaseUseEnd'},
-						forced:true,
-						silent:true,
-						popup:false,
-						content:function(){player.storage.waishi=1},
-					},
-				},
-				init:function(player,skill){
-					player.storage[skill]=1;
-				},
 				enable:'phaseUse',
 				filter:function(event,player){
-					return typeof player.storage.waishi!='number'||player.storage.waishi>0;
+					let used=player.getStat('skill').waishi;
+					if(used&&used>player.countMark('waishi_remover')) return false;
+					return player.countCards('he')>0&&game.hasPlayer(target=>target!=player&&target.countCards('h')>0);
 				},
 				filterTarget:function(card,player,target){
 					return target!=player&&target.countCards('h')>=ui.selected.cards.length;
@@ -13905,11 +13873,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:0,
 				content:function(){
 					'step 0'
-					if(typeof player.storage.waishi!='number') player.storage.waishi=1;
-					player.storage.waishi--;
-					player.choosePlayerCard(target,true,'h',cards.length).chooseonly=true;
+					player.choosePlayerCard(target,true,'h',cards.length);
 					'step 1'
 					player.swapHandcards(target,cards,result.cards);
+					game.delayex();
 					'step 2'
 					if(target.countCards('h')>player.countCards('h')||player.group==target.group) player.draw();
 				},
@@ -13922,36 +13889,79 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				subSkill:{
+					remover:{
+						charlotte:true,
+						onremove:function(player){
+							player.clearMark('waishi_remover',false);
+						},
+						intro:{
+							content:'〖外使〗的发动次数+#',
+						},
+					},
+				}
 			},
-			chijie:{
-				audio:true,
-				forbid:['guozhan'],
-				trigger:{
-					global:'phaseBefore',
-					player:'enterGame',
-				},
+			renshe:{
+				audio:2,
+				trigger:{player:'damageEnd'},
 				direct:true,
-				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0)&&game.hasPlayer(function(current){
-						return current.group!=player.group;
-					});
-				},
 				content:function(){
 					'step 0'
+					var choiceList=[
+						'将势力变更为场上现存的一个其他势力',
+						'令〖外使〗的发动次数+1直到下个出牌阶段结束',
+						'与另一名其他角色各摸一张牌',
+					];
+					var controls=['选项二'];
+					if(game.hasPlayer(current=>{
+						return current.group!=player.group&&lib.group.includes(current.group);
+					})) controls.unshift('选项一');
+					if(game.hasPlayer(current=>current!=player)) controls.push('选项三');
+					player.chooseControl(controls,'cancel2').set('prompt',get.prompt('renshe')).set('choiceList',choiceList).set('ai',function(){
+						if(game.hasPlayer(function(current){
+							return get.attitude(player,current)>0||current.hasSkillTag('nogain');
+						})) return '选项三'
+						return '选项二';
+					});
+					'step 1'
+					if(result.control=='cancel2') event.finish();
+					else{
+						player.logSkill('renshe');
+						switch(result.control){
+							case '选项一':
+								event.goto(3);	
+								break;
+							case '选项二':
+								player.addMark('waishi_remover',1,false);
+								player.addTempSkill('waishi_remover',{player:'phaseUseAfter'});
+								event.finish();	
+								break;
+							case '选项三':
+								player.chooseTarget('请选择一名角色，与其各摸一张牌',lib.filter.notMe,true).set('ai',function(target){
+									if(target.hasSkillTag('nogain')) return 0.1;
+									return get.attitude(_status.event.player,target);
+								})
+						}
+					}
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target,'green');
+						game.asyncDraw([player,target].sortBySeat());
+					}
+					game.delayex();
+					event.finish();
+					'step 3'
 					var list=lib.group.filter(function(group){
 						return group!=player.group&&game.hasPlayer(function(current){
 							return current.group==group;
 						});
-					})
-					if(!event.renshe) list.push('cancel2');
-					player.chooseControl(list).set('prompt',event.renshe?'请选择一个势力':get.prompt('chijie')).set('prompt2',event.renshe?'':'将自己的势力变更为场上存在的一个势力').set('',function(){
+					});
+					player.chooseControl(list).set('prompt',get.prompt('chijie')).set('prompt2','将自己的势力变更为场上存在的一个势力').set('ai',function(){
 						return list.randomGet();
 					});
-					'step 1'
-					if(result.control!='cancel2'){
-						if(!event.renshe) player.logSkill('chijie');
-						player.changeGroup(result.control);
-					}
+					'step 4'
+					player.changeGroup(result.control);
 				},
 			},
 			//英文版特典武将凯撒

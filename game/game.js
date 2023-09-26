@@ -21810,6 +21810,10 @@
 					this.updateMarks();
 					return this;
 				},
+				clearMark:function(i,log){
+					let num=this.countMark(i);
+					if(num>0) this.removeMark(i,num,log)
+				},
 				removeMark:function(i,num,log){
 					if(typeof num!='number'||!num) num=1;
 					if(typeof this.storage[i]!='number'||!this.storage[i]) return;
@@ -56788,7 +56792,7 @@
 						break;
 					}
 				}
-				for(i=0;i<game.players.length;i++){
+				for(let i=0;i<game.players.length;i++){
 					if(game.players[i].isOut()||game.players[i].hasSkill('undist')||game.players[i].isMin(true)) length--;
 				}
 				if(method=='absolute') return n;
@@ -56806,15 +56810,15 @@
 			}),equips2=to.getCards('e',function(card){
 				return !ui.selected.cards||!ui.selected.cards.contains(card);
 			});
-			for(i=0;i<equips1.length;i++){
-				var info=get.info(equips1[i]).distance;
+			for(let i=0;i<equips1.length;i++){
+				let info=get.info(equips1[i]).distance;
 				if(!info) continue;
 				if(info.globalFrom){
 					n+=info.globalFrom;
 				}
 			}
-			for(i=0;i<equips2.length;i++){
-				var info=get.info(equips2[i]).distance;
+			for(let i=0;i<equips2.length;i++){
+				let info=get.info(equips2[i]).distance;
 				if(!info) continue;
 				if(info.globalTo){
 					n+=info.globalTo;
@@ -56845,8 +56849,8 @@
 					return Math.max(range,newRange)
 				},1);
 				m+=(1-attakRange);
-				for(i=0;i<equips2.length;i++){
-					var info=get.info(equips2[i]).distance;
+				for(let i=0;i<equips2.length;i++){
+					let info=get.info(equips2[i]).distance;
 					if(!info) continue;
 					if(info.attaclTo){
 						m+=info.attaclTo;
@@ -56854,7 +56858,7 @@
 				}
 				return n;
 			}
-			if(method=='unchecked') return n;
+			else if(method=='unchecked') return n;
 			return Math.max(1,n);
 		},
 		info:function(item,player){
