@@ -1337,7 +1337,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					list.sort();
 					var str=list.join('、').replace(/(.*)、/, '$1或');
 					event.list=list;
-					player.chooseTarget(get.prompt('oljianxuan'),'令一名角色摸一张牌，然后若其手牌数为'+str+'，其可以重复此流程。').set('ai',target=>{
+					player.chooseTarget(get.prompt('oljianxuan'),'令一名角色摸一张牌，然后若其手牌数为'+str+'，其重复此流程').set('ai',target=>{
 						var list=_status.event.list;
 						var player=_status.event.player;
 						var att=get.attitude(player,target);
