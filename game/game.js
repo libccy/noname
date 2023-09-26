@@ -33426,15 +33426,7 @@
 		addNature:(nature,translation,config)=>{
 			if(!nature) throw new TypeError();
 			if(translation&&translation.length) lib.translate['nature_'+nature]=translation;
-			var hookCall=()=>{
-				for(const hook of lib.hooks.addNature){
-					if(hook!=null&&typeof hook=="function"){
-						hook(nature,translation,config);
-					}
-				}
-			};
-			if ("onload" in lib) lib.onload.add(hookCall);
-			else hookCall();
+			game.callHook("addNature",[nature,translation,config]);
 			return nature;
 		},
 		//设置卡牌信息/事件的属性
@@ -33509,9 +33501,20 @@
 					}
 				}
 			};
-			if ("onload" in lib) lib.onload.add(hookCall);
-			else hookCall();
+			game.callHook("addGroup",[id,short,name,config]);
 			return id;
+		},
+		//通用的调用钩子函数
+		callHook:(name,args)=>{
+			const callHook=()=>{
+				for(const hook of lib.hooks[name]){
+					if(hook!=null&&typeof hook=="function"){
+						hook(...args);
+					}
+				}
+			}
+			if ("onload" in lib) lib.onload.add(callHook);
+			else callHook();
 		},
 		//Yingbian
 		//应变
