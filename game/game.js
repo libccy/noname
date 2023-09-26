@@ -40663,29 +40663,29 @@
 			 * @param {Function} saveInput 
 			 */
 			editor:function(container,saveInput){
-				var createList=[];
-				var containerDelete=container.delete;
+				const createList=[];
+				const containerDelete=container.delete;
 				//删除container的时候，删除创建的ul列表
 				container.delete=function(){
-					for (var i=createList.length-1;i>=0;i--){
+					for (let i=createList.length-1;i>=0;i--){
 						createList[i].parentNode&&createList[i].parentNode.removeChild(createList[i]);
 					}
 					containerDelete.apply(this, arguments);
 				}
 				//创建ul列表
-				var createMenu=function(pos,self,List,click){
+				const createMenu=function(pos,self,List,click){
 					if (self&&self.createMenu) return false;
-					var parent=self.parentNode;
+					const parent=self.parentNode;
 					if (parent){
-						for(var i=0;i<parent.childElementCount;i++){
-							var node=parent.childNodes[i];
-							node!=self&&node.createMenu&&closeMenu(node);
+						for(let i=0;i<parent.childElementCount;i++){
+							const node=parent.childNodes[i];
+							node!=self&&node.createMenu&&closeMenu.call(node);
 						}
 					}
-					var editor=container.editor;
+					const editor=container.editor;
 					if(!editor) return false;
 					self.style.background='#08f';
-					var ul=document.createElement('ul');
+					const ul=document.createElement('ul');
 					container.css.call(ul,{
 						position:'absolute',
 						top:pos.bottom/game.documentZoom+'px',
@@ -40695,42 +40695,39 @@
 						//'font-family':'shousha',
 						'font-size':20/game.documentZoom+'px',
 					});
-					var theme=editor.options.theme;
+					const theme=editor.options.theme;
 					lib.setScroll(ul);
 					lib.setMousewheel(ul);
 					ul.className="CodeMirror-hints "+theme;
-					var getActive=function(){
-						var i=0;
+					const getActive=()=>{
+						let i=0;
 						while(i<ul.childElementCount){
-							if(ul.childNodes[i].classList.contains('CodeMirror-hint-active')){
-								break;
-							}else{
-								i++;
-							}
+							if(ul.childNodes[i].classList.contains('CodeMirror-hint-active')) break;
+							else i++;
 						}
 						return i;
-					}
-					var setActive=function(i){
+					};
+					const setActive=i=>{
 						ul.childNodes[getActive()].classList.remove('CodeMirror-hint-active');
 						ul.childNodes[i].classList.add('CodeMirror-hint-active');
 						return i;
-					}
+					};
 					if (List&&List.length&&click) {
-						for(var i=0;i<List.length;++i) {
-							var elt=ul.appendChild(document.createElement("li"));
+						for(let i=0;i<List.length;++i) {
+							const elt=ul.appendChild(document.createElement("li"));
 							elt.style.color='black';
 							elt.style.boxShadow='none';
-							var cur=List[i];
+							const cur=List[i];
 							if(cur instanceof HTMLElement){
 								elt.appendChild(cur);
 							}else{
 								elt.innerHTML=cur;
 							}
-							var className="CodeMirror-hint"+(i!=0?"":" "+"CodeMirror-hint-active");
+							let className="CodeMirror-hint"+(i!=0?"":" "+"CodeMirror-hint-active");
 							if(cur.className!=null) className=cur.className+" "+className;
 							elt.className=className;
 							elt.hintId=i;
-							ui.window.listen.call(elt,function () {
+							ui.window.listen.call(elt,function(){
 								setActive(this.hintId);
 								this.focus();
 								click.call(this);
@@ -40742,8 +40739,8 @@
 					return ul;
 				};
 				//关闭ul列表
-				var closeMenu=function(){
-					var ul=this.createMenu;
+				const closeMenu=function(){
+					const ul=this.createMenu;
 					if(!ul) return false;
 					if(ul.parentNode) ul.parentNode.removeChild(ul);
 					this.style.background='';
@@ -40751,57 +40748,57 @@
 					createList.remove(ul);
 					return ul;
 				};
-				var editorpage=ui.create.div(container);
-				var discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
+				const editorpage=ui.create.div(container);
+				const discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
 					ui.window.classList.remove('shortcutpaused');
 					ui.window.classList.remove('systempaused');
 					container.delete(null);
 					delete window.saveNonameInput;
 				});
-				var saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
-				var theme=ui.create.div('.editbutton','主题',editorpage,function(){
-					if (this&&this.createMenu) {
+				const saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
+				const theme=ui.create.div('.editbutton','主题',editorpage,function(){
+					if(this&&this.createMenu){
 						return closeMenu.call(this);
 					}
 					//主题列表
-					var list=['mdn-like','mbo'];
+					const list=['mdn-like','mbo'];
 					//正在使用的主题
-					var active = container.editor.options.theme;
+					const active=container.editor.options.theme;
 					//排个序
-					list.remove(active).splice(0, 0, active);
+					list.remove(active).splice(0,0,active);
 					//this
-					var self=this;
+					const self=this;
 					//元素位置
-					var pos=this.getBoundingClientRect();
+					const pos=this.getBoundingClientRect();
 					//点击事件
-					var click=function(e){
-						var theme=this.innerHTML;
+					const click=function(e){
+						const theme=this.innerHTML;
 						container.editor.setOption("theme",theme);
 						setTimeout(()=>container.editor.refresh(),0);
 						game.saveConfig('codeMirror_theme', theme);
 						closeMenu.call(self);
 					};
-					var ul=createMenu(pos,self,list,click);
+					const ul=createMenu(pos,self,list,click);
 					this.createMenu=ul;
 				});
-				var edit=ui.create.div('.editbutton','编辑',editorpage,function(){
+				const edit=ui.create.div('.editbutton','编辑',editorpage,function(){
 					if(this&&this.createMenu){
 						return closeMenu.call(this);
 					}
-					var self=this;
-					var pos=this.getBoundingClientRect();
-					var list=['撤销\t\tCtrl+Z', '恢复撤销\tCtrl+Y'/* , '全选\t\tCtrl+A' */];
-					var click=function(e){
-						var num=this.innerHTML.indexOf("Ctrl");
-						var inner=this.innerHTML.slice(num).replace("+", "-");
+					const self=this;
+					const pos=this.getBoundingClientRect();
+					const list=['撤销\t\tCtrl+Z', '恢复撤销\tCtrl+Y'/* , '全选\t\tCtrl+A' */];
+					const click=function(e){
+						const num=this.innerHTML.indexOf("Ctrl");
+						const inner=this.innerHTML.slice(num).replace("+", "-");
 						container.editor.execCommand(container.editor.options.extraKeys[inner]);
 						setTimeout(()=>container.editor.refresh(),0);
 						closeMenu.call(self);
 					};
-					var ul=createMenu(pos,self,list,click);
+					const ul=createMenu(pos,self,list,click);
 					this.createMenu=ul;
 				});
-				var editor=ui.create.div(editorpage);
+				const editor=ui.create.div(editorpage);
 				return editor;
 			},
 			cardTempName:function(card,applyNode){
