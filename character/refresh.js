@@ -228,6 +228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(button.link[3]=='fire') return 2.95;
 									else if(button.link[3]=='fire') return 2.92;
 									else return 2.9;
+								case 'shan':return 1;
 							}
 						}
 						return 0;

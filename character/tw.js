@@ -1072,6 +1072,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						do var card=cards.shift();
 						while(get.name(card)!='sha'&&(!event.fight||get.type2(card)!='trick')&&cards.length);
 						if(get.name(card)!='sha'&&(!event.fight||get.type2(card)!='trick')) return;
+						player.showCards([card],get.translation(player)+'发动了【直取】');
 						player.chooseUseTarget(card,true,false,'nodistance').set('filterTarget',function(card,player,target){
 							var evt=_status.event;
 							if(_status.event.name=='chooseTarget') evt=evt.getParent();

@@ -2497,9 +2497,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var cards=result.cards,targets=result.targets;
+						event.cards=cards;
 						var cardx=get.autoViewAs({name:'sha'},cards);
+						event.cardx=cardx;
 						player.useCard(cardx,cards,targets,false,'dcsaowei');
 					}
+					else event.finish();
+					'step 2'
+					if(player.getHistory('sourceDamage',function(evt){
+						return evt.card==event.cardx;
+					}).length&&cards.filterInD().length) player.gain(cards.filterInD(),'gain2');
 				},
 			},
 			//向朗
@@ -3099,7 +3106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var num=event.choices.length-Math.max(0,player.hp);
 					if(num>0){
-						player.chooseToDiscard(num,true,'he');
+						player.chooseToDiscard(true,'he');
 					}
 				},
 				ai:{
@@ -10125,7 +10132,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyongdi_info:'限定技。出牌阶段，你可以选择一名男性角色，若其：体力上限最少，其加1点体力上限；体力值最少，其回复1点体力；手牌数最少，其摸X张牌（X为其体力上限且至多为5）。',
 			liupi:'刘辟',
 			dcjuying:'踞营',
-			dcjuying_info:'出牌阶段结束时，若你于此阶段内使用【杀】的次数未达到上限，你可以选择任意项：1.下回合使用【杀】的次数上限+1；2.本回合手牌上限+2；3.摸三张牌。若你选择的项数超过了你的体力值，你弃置X张牌（X为你选择的项数减你的体力值）。',
+			dcjuying_info:'出牌阶段结束时，若你于此阶段内使用【杀】的次数未达到上限，你可以选择任意项：1.下回合使用【杀】的次数上限+1；2.本回合手牌上限+2；3.摸三张牌。若你选择的项数超过了你的体力值，你弃置一张牌。',
 			dc_huanghao:'新杀黄皓',
 			dc_huanghao_ab:'黄皓',
 			dcqinqing:'寝情',
@@ -10162,7 +10169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcaishou_tag:'隘',
 			dcaishou_info:'①结束阶段，你可以摸X张牌，称为“隘”（X为你的体力上限）。②准备阶段，你弃置所有“隘”，若你以此法弃置的牌数大于体力值且你的体力上限小于9，你加1点体力上限。③当你于回合外失去最后一张“隘”后，你减1点体力上限。',
 			dcsaowei:'扫围',
-			dcsaowei_info:'当一名其他角色使用【杀】结算结束后，若此牌的目标角色不包含你且均在你的攻击范围内，你可以将一张“隘”当做【杀】对所有目标角色使用。',
+			dcsaowei_info:'当一名其他角色使用【杀】结算结束后，若此牌的目标角色不包含你且均在你的攻击范围内，你可以将一张“隘”当做【杀】对所有目标角色使用。以此法转化的【杀】结算完毕后，若此【杀】造成过伤害，你获得此【杀】对应的实体牌。',
 			yuantanyuanxiyuanshang:'袁谭袁尚袁熙',
 			dcneifa:'内伐',
 			dcneifa_info:'出牌阶段开始时，你可以摸三张牌，然后弃置一张牌。若你弃置的牌类型为：基本牌，本阶段你不能使用锦囊牌，且【杀】的使用次数上限+X且可以额外指定一名目标；锦囊牌，本阶段你不能使用基本牌，且使用普通锦囊牌选择目标时可以增加或减少一个目标（X为你发动〖内伐〗弃牌后手牌中因〖内伐〗而不能使用的牌的数量且最多为5。你以此法选择的额外目标均无距离限制）。',

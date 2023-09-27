@@ -2177,7 +2177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//张瑾云
 			dchuizhi:{
 				audio:2,
-				trigger:{player:'phaseDrawEnd'},
+				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				content:function(){
 					'step 0'
@@ -9237,17 +9237,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			miaoxian:{
 				hiddenCard:function(player,name){
-					return get.type(name)=='trick'&&!player.getStorage('miaoxian2').contains(name)&&player.countCards('h',{color:'black'})==1;
+					return get.type(name)=='trick'&&!player.hasSkill('miaoxian2')&&player.countCards('h',{color:'black'})==1;
 				},
 				enable:'chooseToUse',
 				filter:function(event,player){
+					if(player.hasSkill('miaoxian2')) return false;
 					var cards=player.getCards('h',{color:'black'});
 					if(cards.length!=1) return false;
 					var mod2=game.checkMod(cards[0],player,'unchanged','cardEnabled2',player);
 					if(mod2===false) return false;
-					var storage=player.getStorage('miaoxian2');
 					for(var i of lib.inpile){
-						if(!storage.contains(i)&&get.type(i)=='trick'&&event.filterCard({
+						if(get.type(i)=='trick'&&event.filterCard({
 							name:i,
 							cards:cards,
 						},player,event)) return true;
@@ -9257,10 +9257,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				chooseButton:{
 					dialog:function(event,player){
 						var cards=player.getCards('h',{color:'black'});
-						var storage=player.getStorage('miaoxian2');
 						var list=[];
 						for(var i of lib.inpile){
-							if(!storage.contains(i)&&get.type(i)=='trick'&&event.filterCard({
+							if(get.type(i)=='trick'&&event.filterCard({
 								name:i,
 								cards:cards,
 							},player,event)){
@@ -9284,8 +9283,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								name:links[0][2],
 							},
 							onuse:function(links,player){
-								if(!player.storage.miaoxian2) player.storage.miaoxian2=[];
-								player.storage.miaoxian2.add(links.card.name);
 								player.addTempSkill('miaoxian2');
 							},
 						}
@@ -9323,7 +9320,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			miaoxian2:{onremove:true},
+			miaoxian2:{
+				charlotte:true,
+			},
 			//樊玉凤
 			bazhan:{
 				audio:2,
@@ -11813,7 +11812,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xingzuo2:'兴作',
 			xingzuo_info:'出牌阶段开始时，你可观看牌堆底的三张牌并用任意张手牌替换其中等量的牌。若如此做，结束阶段，你可令一名有手牌的角色用所有手牌替换牌堆底的三张牌。若其因此法失去的牌多于三张，则你失去1点体力。',
 			miaoxian:'妙弦',
-			miaoxian_info:'若你的手牌中仅有一张黑色牌，你可将此牌当作任意一张普通锦囊牌使用（每种牌名每回合限一次）；若你的手牌中仅有一张红色牌，你使用此牌时摸一张牌。',
+			miaoxian_info:'若你的手牌中仅有一张黑色牌，你可将此牌当作任意一张普通锦囊牌使用（每回合限一次）；若你的手牌中仅有一张红色牌，你使用此牌时摸一张牌。',
 			yangwan:'杨婉',
 			youyan:'诱言',
 			youyan_info:'出牌阶段/弃牌阶段各限一次。当有牌进入弃牌堆后，若其中有你不因使用或打出而失去的牌，你可以从牌堆中获得你本次失去的牌中没有的花色的牌各一张。',
@@ -12076,7 +12075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcwencan_info:'出牌阶段限一次。你可以选择至多两名体力值不同且均与你的体力值不同的角色，这些角色依次选择一项：1.弃置两张花色不同的牌；2.本回合你对其使用牌无次数限制。',
 			zhangjinyun:'张瑾云',
 			dchuizhi:'蕙质',
-			dchuizhi_info:'摸牌阶段结束时，你可以选择是否弃置任意张手牌，然后将手牌摸至与全场手牌数最多的角色相同（至少摸一张，至多摸五张）。',
+			dchuizhi_info:'准备阶段，你可以选择是否弃置任意张手牌，然后将手牌摸至与全场手牌数最多的角色相同（至少摸一张，至多摸五张）。',
 			dcjijiao:'继椒',
 			dcjijiao_info:'限定技。出牌阶段，你可以令一名角色获得所有弃牌堆中你于本局游戏内使用或弃置过的普通锦囊牌，且这些牌不能被【无懈可击】响应。一名角色的回合结束后，若本回合牌堆洗过牌或有角色死亡，你重置〖继椒〗。',
 			duanqiaoxiao:'段巧笑',
