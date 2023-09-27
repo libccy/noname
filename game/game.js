@@ -4022,11 +4022,11 @@
 					show_characternamepinyin:{
 						name:'显示武将名注解',
 						intro:'在武将资料卡显示武将名及其注解、性别、势力、体力等信息',
-						init:true,
+						init:'showPinyin',
 						unfrequent:true,
 						item:{
-							false:'不显示',
-							true:'显示拼音',
+							doNotShow:'不显示',
+							showPinyin:'显示拼音',
 							showCodeIdentifier:'显示代码ID'
 						},
 						visualMenu:(node,link,name)=>{
@@ -4062,41 +4062,17 @@
 					show_skillnamepinyin:{
 						name:'显示技能名注解',
 						intro:'在武将资料卡显示技能名注解',
-						init:true,
-						unfrequent:true,
-						item:{
-							false:'不显示',
-							true:'显示拼音',
-							showCodeIdentifier:'显示代码ID'
+						get init(){
+							return lib.configMenu.view.config.show_characternamepinyin.init;
 						},
-						visualMenu:(node,link,name)=>{
-							node.classList.add('button','character');
-							const style=node.style;
-							style.alignItems='center';
-							style.animation='background-position-left-center-right-center-left-center 15s ease infinite';
-							style.background='linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB)';
-							style.backgroundSize='400% 400%';
-							style.display='flex';
-							style.height='60px';
-							style.justifyContent='center';
-							style.width='150px';
-							const firstChild=node.firstChild;
-							firstChild.removeAttribute('class');
-							firstChild.style.position='initial';
-							if(link=='false') return;
-							const ruby=document.createElement('ruby');
-							ruby.textContent=name;
-							const leftParenthesisRP=document.createElement('rp');
-							leftParenthesisRP.textContent='（';
-							ruby.appendChild(leftParenthesisRP);
-							const rt=document.createElement('rt');
-							rt.style.fontSize='smaller';
-							rt.textContent=link=='showCodeIdentifier'?link:get.pinyin(name).join(' ');
-							ruby.appendChild(rt);
-							const rightParenthesisRP=document.createElement('rp');
-							rightParenthesisRP.textContent='）';
-							ruby.appendChild(rightParenthesisRP);
-							firstChild.innerHTML=ruby.outerHTML;
+						get unfrequent(){
+							return lib.configMenu.view.config.show_characternamepinyin.unfrequent;
+						},
+						get item(){
+							return lib.configMenu.view.config.show_characternamepinyin.item;
+						},
+						get visualMenu(){
+							return lib.configMenu.view.config.show_characternamepinyin.visualMenu;
 						}
 					}
 				}
@@ -8256,7 +8232,7 @@
 						var natures=get.natureList(this,player);
 						if(!nature) return natures.length>0;
 						if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
-						return get.is.sameNature(natures,nature,true);
+						return get.is.sameNature(natures,nature);
 					}
 				});
 				if (!('includes' in Array.prototype)) {
@@ -20020,7 +19996,7 @@
 							}
 							return this;
 						},
-						assgin(obj) {
+						assign(obj) {
 							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
 							if(typeof obj=='object'&&obj!==null) Object.assign(skill,obj);
 							return this;
@@ -24465,7 +24441,7 @@
 						if(!nature) return Boolean(this.nature&&this.nature.length>0);
 						let natures=get.natureList(nature),naturesx=get.natureList(this.nature);
 						if(nature=='linked') return naturesx.some(n=>lib.linked.includes(n));
-						return get.is.sameNature(natures,naturesx,true);
+						return get.is.sameNature(natures,naturesx);
 					};
 					if(next.hasNature('poison')) delete next._triggered;
 					next.setContent('damage');
@@ -28821,7 +28797,7 @@
 					var natures=get.natureList(this,player);
 					if(!nature) return natures.length>0;
 					if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
-					return get.is.sameNature(natures,nature,true);
+					return get.is.sameNature(natures,nature);
 				},
 				//只针对【杀】起效果
 				addNature:function(nature){
@@ -34005,67 +33981,51 @@
 			}
 			return node;
 		},
-		changeLand:function(url,player){
+		changeLand:(url,player)=>{
 			game.addVideo('changeLand',player,url);
-			if(url.indexOf('/')===-1){
-				url='image/card/'+url;
-			}
-			if(url.indexOf('.png')==-1&&url.indexOf('.jpg')==-1){
-				url+='.jpg';
-			}
-			var name=url.slice(url.lastIndexOf('/')+1,url.lastIndexOf('.'));
-			var skill=name+'_skill';
-			var node=ui.create.div('.background.upper.land');
-			node.setBackgroundImage(url);
-			node.destroy=function(){
-				if (this.skill) {
-					game.removeGlobalSkill(this.skill);
-					if(this.system){
-						this.system.remove();
+			const parsedPath=lib.path.parse(url);
+			delete parsedPath.base;
+			if(!parsedPath.dir) parsedPath.dir='image/card';
+			if(!parsedPath.ext) parsedPath.ext='.jpg';
+			game.broadcastAll((formattedPath,name,skill,player)=>{
+				const node=ui.create.div('.background.upper.land');
+				node.setBackgroundImage(formattedPath);
+				node.destroy=()=>{
+					if (node.skill) {
+						game.removeGlobalSkill(node.skill);
+						if(node.system) node.system.remove();
 					}
+					node.classList.add('hidden');
+					setTimeout(()=>node.remove(),3000);
+					if(ui.land==node) ui.land=null;
 				}
-				this.classList.add('hidden');
-				var node=this;
-				setTimeout(function(){
-					node.remove();
-				},3000);
-				if(ui.land==this){
-					ui.land=null;
+				if(ui.land){
+					document.body.insertBefore(node,ui.land);
+					ui.land.destroy();
 				}
-			}
-			if(ui.land){
-				document.body.insertBefore(node,ui.land);
-				ui.land.destroy();
-			}
-			else{
-				node.classList.add('hidden');
-				document.body.insertBefore(node,ui.window);
-				ui.refresh(node);
-				node.classList.remove('hidden');
-			}
-			ui.land=node;
-			if(name){
+				else{
+					node.classList.add('hidden');
+					document.body.insertBefore(node,ui.window);
+					ui.refresh(node);
+					node.classList.remove('hidden');
+				}
+				ui.land=node;
+				if(!name) return;
 				node.name=name;
 				node.skill=skill;
 				if(player){
 					node.player=player;
 					player.addTempSkill('land_used');
 				}
-				node.system=ui.create.system(lib.translate[skill],null,true,true);
-				lib.setPopped(node.system,function(){
-					var uiintro=ui.create.dialog('hidden');
-					var str='地图';
-					if(player){
-						str='来源：'+get.translation(player);
-					}
-					var caption=uiintro.addText(str);
-					caption.style.margin='0';
-					uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skill+'_info']+'</div>');
-					uiintro.add(ui.create.div('.placeholder.slim'));
-					return uiintro;
+				lib.setPopped(node.system=ui.create.system(lib.translate[skill],null,true,true),()=>{
+					const uiIntro=ui.create.dialog('hidden');
+					uiIntro.addText(player?`来源：${get.translation(player)}`:'地图').style.margin='0';
+					uiIntro._place_text=uiIntro.add(ui.create.div('.text',lib.translate[`${skill}_info`]));
+					uiIntro.add(ui.create.div('.placeholder.slim'));
+					return uiIntro;
 				},200);
 				game.addGlobalSkill(skill);
-			}
+			},lib.path.format(parsedPath),parsedPath.name,`${name}_skill`,player);
 		},
 		checkFileList:function(updates,proceed){
 			var n=updates.length;
@@ -34540,7 +34500,7 @@
 			audio.oncanplay=()=>Promise.resolve(audio.play()).catch(()=>void 0);
 			new Promise((resolve,reject)=>{
 				if(path.indexOf('db:')==0) game.getDB('file',path.slice(3)).then(octetStream=>resolve(get.objectURL(octetStream)),reject);
-				else if(path.split('/').pop().split('.').length>1) resolve(`${lib.assetURL}audio/${path}`);
+				else if(lib.path.extname(path)) resolve(`${lib.assetURL}audio/${path}`);
 				else resolve(`${lib.assetURL}audio/${path}.mp3`);
 			}).then(resolvedPath=>{
 				audio.src=resolvedPath;
@@ -37166,28 +37126,24 @@
 			(triggerevent||_status.event).next.push(next);
 			return next;
 		},
-		addCharacter:function(name,info){
-			var extname=(_status.extension||info.extension);
-			var imgsrc;
-			if(_status.evaluatingExtension){
-				imgsrc='db:extension-'+extname+':'+name+'.jpg';
-			}
-			else{
-				imgsrc='ext:'+extname+'/'+name+'.jpg';
-			}
-			const audiosrc='die:ext:'+extname+'/'+name+'.mp3';
-			var character=[info.sex,info.group,info.hp,info.skills||[],[imgsrc,audiosrc]];
-			if(info.tags){
-				character[4]=character[4].concat(info.tags);
-			}
+		addCharacter:(name,information)=>{
+			const extensionName=_status.extension||information.extension,character=[
+				information.sex,
+				information.group,
+				information.hp,
+				information.skills||[],
+				[
+					_status.evaluatingExtension?`db:extension-${extensionName}:${name}.jpg`:`ext:${extensionName}/${name}.jpg`,
+					`die:ext:${extensionName}/${name}.mp3`
+				]
+			];
+			if(information.tags) character[4]=character[4].concat(information.tags);
 			lib.character[name]=character;
-			var packname='mode_extension_'+extname;
-			if(!lib.characterPack[packname]){
-				lib.characterPack[packname]={};
-			}
-			lib.translate[name]=info.translate;
-			lib.characterPack[packname][name]=character;
-			lib.translate[packname+'_character_config']=extname;
+			const packName=`mode_extension_${extensionName}`;
+			if(!lib.characterPack[packName]) lib.characterPack[packName]={};
+			lib.translate[name]=information.translate;
+			lib.characterPack[packName][name]=character;
+			lib.translate[`${packName}_character_config`]=extensionName;
 		},
 		addCharacterPack:(pack,packagename)=>{
 			var extname=_status.extension||'扩展';
@@ -38475,7 +38431,7 @@
 					for(i=0;i<cards.length;i++){
 						if(lib.config.cardtempname!='off'){
 							var cardname=get.name(cards[i]);
-							if(cards[i].name!=cardname||!get.is.sameNature(get.nature(cards[i]),cards[i].nature)){
+							if(cards[i].name!=cardname||!get.is.sameNature(get.nature(cards[i]),cards[i].nature,true)){
 								var node=ui.create.cardTempName(cards[i]);
 								var cardtempnameConfig=lib.config.cardtempname;
 								if(cardtempnameConfig!=='default') node.classList.remove('vertical');
@@ -42828,29 +42784,19 @@
 										var loadData=function(){
 											var zip=new JSZip();
 											zip.load(data);
-											var images=[],audios=[],fonts=[],directories={},directorylist=[];
-											for(var i in zip.files){
-												var ext=i.slice(i.lastIndexOf('.')+1).toLowerCase();
-												if(i.indexOf('audio/')==0&&(ext=='mp3'||ext=='ogg')){
-													audios.push(i);
+											var images=[],audios=[],fonts=[],directories={},directoryList=[];
+											Object.keys(zip.files).forEach(file=>{
+												const parsedPath=lib.path.parse(file),directory=parsedPath.dir,fileExtension=parsedPath.ext.toLowerCase();
+												if(directory.indexOf('audio')==0&&(fileExtension=='.mp3'||fileExtension=='.ogg')) audios.push(file);
+												else if(directory.indexOf('font')==0&&fileExtension=='.woff2') fonts.push(file);
+												else if(directory.indexOf('image')==0&&(fileExtension=='.jpg'||fileExtension=='.png')) images.push(file);
+												else return;
+												if(!directories[directory]){
+													directories[directory]=[];
+													directoryList.push(directory);
 												}
-												else if(i.indexOf('font/')==0&&ext=='woff2'){
-													fonts.push(i);
-												}
-												else if(i.indexOf('image/')==0&&(ext=='jpg'||ext=='png')){
-													images.push(i);
-												}
-												else{
-													continue;
-												}
-												var index=i.lastIndexOf('/');
-												var str=i.slice(0,index);
-												if(!directories[str]){
-													directories[str]=[];
-													directorylist.push(str);
-												}
-												directories[str].push(i.slice(index+1));
-											}
+												directories[directory].push(parsedPath.base);
+											});
 											if(audios.length||fonts.length||images.length){
 												var str='';
 												if(audios.length){
@@ -42889,13 +42835,13 @@
 																assetLoaded();
 															}
 														};
-														game.ensureDirectory(directorylist,writeFile);
+														game.ensureDirectory(directoryList,writeFile);
 
 													}
 													else{
 														var getDirectory=function(){
-															if(directorylist.length){
-																var dir=directorylist.shift();
+															if(directoryList.length){
+																var dir=directoryList.shift();
 																var filelist=directories[dir];
 																window.resolveLocalFileSystemURL(lib.assetURL+dir,function(entry){
 																	var writeFile=function(){
@@ -42923,7 +42869,7 @@
 																assetLoaded();
 															}
 														};
-														game.ensureDirectory(directorylist,getDirectory);
+														game.ensureDirectory(directoryList,getDirectory);
 													}
 												}
 												else{
@@ -45661,7 +45607,7 @@
 								fakeme.appendChild(input);
 
 								fakeme.imagenode=ui.create.div('.image',fakeme);
-								ui.create.div('.name','选<br>择<br>背<br>景',fakeme);
+								ui.create.div('.name','选择背景',fakeme);
 
 								ui.create.div('.indent','名称：<input class="new_name" type="text">',newCard).style.paddingTop='8px';
 								ui.create.div('.indent','描述：<input class="new_description" type="text">',newCard).style.paddingTop='6px';
@@ -54075,7 +54021,7 @@
 					fav.classList.add('active');
 				}
 				const introduction=ui.create.div('.characterintro',uiintro),showCharacterNamePinyin=lib.config.show_characternamepinyin;
-				if(showCharacterNamePinyin){
+				if(showCharacterNamePinyin!='doNotShow'){
 					const characterIntroTable=ui.create.div('.character-intro-table',introduction),span=document.createElement('span');
 					span.style.fontWeight='bold';
 					const nameInfo=get.character(name),exInfo=nameInfo[4],characterName=exInfo&&exInfo.includes('ruby')?lib.translate[name]:get.rawName(name);
@@ -54185,7 +54131,7 @@
 					const link=this.link,skillName=get.translation(link);
 					skillNameSpan.innerHTML=skillName;
 					const showSkillNamePinyin=lib.config.show_skillnamepinyin;
-					if(showSkillNamePinyin&&skillName!='阵亡'){
+					if(showSkillNamePinyin!='doNotShow'&&skillName!='阵亡'){
 						const ruby=document.createElement('ruby');
 						ruby.appendChild(skillNameSpan);
 						const leftParenthesisRP=document.createElement('rp');
@@ -54221,7 +54167,7 @@
 							derivationNameSpanStyle.fontWeight='bold';
 							const derivationName=get.translation(derivation);
 							derivationNameSpan.innerHTML=derivationName;
-							if(showSkillNamePinyin&&derivationName.length<=5&&derivation.indexOf('_faq')==-1){
+							if(showSkillNamePinyin!='doNotShow'&&derivationName.length<=5&&derivation.indexOf('_faq')==-1){
 								const ruby=document.createElement('ruby');
 								ruby.appendChild(derivationNameSpan);
 								const leftParenthesisRP=document.createElement('rp');
@@ -55454,41 +55400,58 @@
 			/**
 			 * 判断传入的参数的属性是否相同（参数可以为卡牌、卡牌信息、属性等）
 			 * @param ...infos 要判断的属性列表 
-			 * @param partly {boolean} 是否判断每一个传入的属性是否存在部分相同而不是完全相同
+			 * @param every {boolean} 是否判断每一个传入的属性是否完全相同而不是存在部分相同
 			 */
 			sameNature:function(){
-				var _args=Array.from(arguments);
-				var args=[],partly=false;
-				for(const arg of _args){
-					if(typeof arg=='boolean') partly=arg;
-					else{
-						if(arg) args.push(arg);
-					}
+				let processedArguments=[],every=false;
+				Array.from(arguments).forEach(argument=>{
+					if(typeof argument=='boolean') every=argument;
+					else if(argument) processedArguments.push(argument);
+				});
+				if(!processedArguments.length) return true;
+				if(processedArguments.length==1){
+					const argument=processedArguments[0];
+					if(!Array.isArray(argument)) return false;
+					if(!argument.length) return true;
+					if(argument.length==1) return false;
+					processedArguments=argument;
 				}
-				if(!args.length) return true;
-				if(args.length==1){
-					if(Array.isArray(args[0])) args=args[0];
-					else return false;
+				const naturesList=processedArguments.map(card=>{
+					if(typeof card=='string') return card.split(lib.natureSeparator);
+					else if(Array.isArray(card)) return card;
+					return get.natureList(card||{});
+				});
+				const testingNaturesList=naturesList.slice(0,naturesList.length-1);
+				if(every) return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).every(testingNatures=>testingNatures.length==natures.length&&testingNatures.every(nature=>natures.includes(nature))));
+				return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).some(testingNatures=>testingNatures.some(nature=>natures.includes(nature))));
+			},
+			/**
+			 * 判断传入的参数的属性是否不同（参数可以为卡牌、卡牌信息、属性等）
+			 * @param ...infos 要判断的属性列表 
+			 * @param every {boolean} 是否判断每一个传入的属性是否完全不同而不是存在部分不同
+			 */
+			differentNature:function(){
+				let processedArguments=[],every=false;
+				Array.from(arguments).forEach(argument=>{
+					if(typeof argument=='boolean') every=argument;
+					else if(argument) processedArguments.push(argument);
+				});
+				if(!processedArguments.length) return false;
+				if(processedArguments.length==1){
+					const argument=processedArguments[0];
+					if(!Array.isArray(argument)) return true;
+					if(!argument.length) return false;
+					if(argument.length==1) return true;
+					processedArguments=argument;
 				}
-				var naturesList=[];
-				const getN=(cardx)=>{
-					if(typeof cardx=='string') return cardx.split(lib.natureSeparator);
-					else if(Array.isArray(cardx)) return cardx;
-					return get.natureList(cardx||{});
-				}
-				naturesList=args.map(getN);
-				if(naturesList.length==1) return false;
-				if(naturesList.some(natures=>Array.isArray(natures)&&natures.length)){
-					var uniqueNatures=new Set(naturesList.flat());
-					for(var nature of uniqueNatures){
-						if(!nature) continue;
-						var lens=naturesList.map(natures=>natures.filter(n=>n===nature).length);
-						var lensx=Array.from(new Set(lens));
-						if(partly&&lensx.length==1) return true;
-						if(!partly&&lensx.length!=1) return false;
-					}
-				}
-				return !Boolean(partly);
+				const naturesList=processedArguments.map(card=>{
+					if(typeof card=='string') return card.split(lib.natureSeparator);
+					else if(Array.isArray(card)) return card;
+					return get.natureList(card||{});
+				});
+				const testingNaturesList=naturesList.slice(0,naturesList.length-1);
+				if(every) return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).every(testingNatures=>testingNatures.every(nature=>!natures.includes(nature))));
+				return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).some(testingNatures=>testingNatures.length!=natures.length||testingNatures.some(nature=>!natures.includes(nature))));
 			},
 			//判断一张牌是否为明置手牌
 			shownCard:function(card){
