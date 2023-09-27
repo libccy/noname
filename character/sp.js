@@ -23815,7 +23815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target,'fire');
 						event.draws=game.filterPlayer(function(current){
 							if(current==target) return true;
-							return ['guansuo','old_guansuo'].contains(current.name)||['guansuo','old_guansuo'].contains(current.name2);
+							return current.name=='guansuo'||current.name2=='guansuo';
 						});
 						player.gainPlayerCard(target,'he',true);
 					}
