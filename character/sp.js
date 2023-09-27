@@ -24470,7 +24470,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			panfeng:'OL潘凤',
 			gz_panfeng:'潘凤',
 			zumao:'祖茂',
-			daxiaoqiao:'大小乔',
+			daxiaoqiao:'大乔小乔',
 			cuiyan:'崔琰',
 			wenpin:'文聘',
 			jsp_huangyueying:'SP黄月英',
