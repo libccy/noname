@@ -266,7 +266,7 @@
 				});
 			}],
 			//增加新属性杀
-			addNature:[(nature,config)=>{
+			addNature:[(nature,_translation,config)=>{
 				if(typeof config!='object') config={};
 				let linked=config.linked,order=config.order,background=config.background,lineColor=config.lineColor;
 				if(typeof linked!='boolean') linked=true;
@@ -33426,13 +33426,7 @@
 		addNature:(nature,translation,config)=>{
 			if(!nature) throw new TypeError();
 			if(translation&&translation.length) lib.translate['nature_'+nature]=translation;
-			lib.onload.add(()=>{
-				for(const hook of lib.hooks.addNature){
-					if(hook!=null&&typeof hook=="function"){
-						hook(nature,config);
-					}
-				}
-			})
+			game.callHook("addNature",[nature,translation,config]);
 			return nature;
 		},
 		//设置卡牌信息/事件的属性
@@ -33500,14 +33494,20 @@
 			lib.group.add(id);
 			if(short)lib.translate[id] = short;
 			if(name)lib.translate[`${id}2`] = name;
-			lib.onload.add(()=>{
-				for(const hook of lib.hooks.addGroup){
+			game.callHook("addGroup",[id,short,name,config]);
+			return id;
+		},
+		//通用的调用钩子函数
+		callHook:(name,args)=>{
+			const callHook=()=>{
+				for(const hook of lib.hooks[name]){
 					if(hook!=null&&typeof hook=="function"){
-						hook(id,short,name,config);
+						hook(...args);
 					}
 				}
-			})
-			return id;
+			}
+			if ("onload" in lib) lib.onload.add(callHook);
+			else callHook();
 		},
 		//Yingbian
 		//应变
