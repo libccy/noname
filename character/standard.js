@@ -2492,7 +2492,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaoyun:['re_zhaoyun','old_zhaoyun','zhaoyun','ps2063_zhaoyun','ps2067_zhaoyun'],
 			sp_zhaoyun:['sp_zhaoyun','jsp_zhaoyun'],
 			machao:['re_machao','machao','ps_machao'],
-			sp_machao:['sp_machao','old_machao'],
+			sp_machao:['sp_machao','old_machao','dc_sp_machao'],
 			zhugeliang:['re_zhugeliang','zhugeliang','ps2066_zhugeliang','ps_zhugeliang'],
 			huangyueying:['re_huangyueying','huangyueying','junk_huangyueying'],
 			sunquan:['re_sunquan','sunquan','dc_sunquan'],
