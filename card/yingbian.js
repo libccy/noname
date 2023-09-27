@@ -321,9 +321,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.control!='cancel2'){
 						player.logSkill('wuxinghelingshan_skill');
-						game.setNature(trigger.card,result.control);
 						player.popup(get.translation(result.control)+'杀',result.control);
-						game.log(trigger.card,'被转为了','#y'+get.translation(result.control),'属性')
+						game.log(trigger.card,'被转为了','#y'+get.translation(result.control),'属性');
+						game.setNature(trigger.card,result.control);
 					}
 				}
 			},
