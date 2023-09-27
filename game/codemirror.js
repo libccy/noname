@@ -10259,6 +10259,8 @@
       }
 
       cm.on("scroll", this.onScroll = function () {
+        // fix "startScroll == undfined"
+        if (!startScroll) return;
         var curScroll = cm.getScrollInfo(), editor = cm.getWrapperElement().getBoundingClientRect();
         var newTop = top + startScroll.top - curScroll.top;
         var point = newTop - (parentWindow.pageYOffset || (ownerDocument.documentElement || ownerDocument.body).scrollTop);

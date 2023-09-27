@@ -7506,8 +7506,7 @@
 			//覆盖原本的javascript提示
 			CodeMirror.registerHelper('hint','javascript',(editor,options)=>{
 				//Find the token at the cursor
-				let cur=editor.getCursor(),
-					token=editor.getTokenAt(cur);
+				let cur=editor.getCursor(),token=editor.getTokenAt(cur);
 				if(/\b(?:string|comment)\b/.test(token.type)) return;
 				const innerMode=CodeMirror.innerMode(editor.getMode(),token.state);
 				if (innerMode.mode.helperType==="json") return;
@@ -7523,10 +7522,9 @@
 					};
 				}else if(token.end>cur.ch){
 					token.end=cur.ch;
-					token.string=token.string.slice(0,cur.ch- oken.start);
+					token.string=token.string.slice(0,cur.ch-token.start);
 				}
-				let tprop=token;
-				let context;
+				let tprop=token,context;
 				//If it is a property, find out what it is a property of.
 				while (tprop.type=="property"){
 					tprop=editor.getTokenAt(CodeMirror.Pos(cur.line,tprop.start));
@@ -7540,8 +7538,10 @@
 					try {
 						const code=context.length==1?context[0].string:context.reduceRight((pre,cur)=>(pre.string||pre)+'.'+cur.string);
 						const obj=eval(code);
-						const keys=Object.getOwnPropertyNames(obj).filter(key=>key.startsWith(token.string));
-						list.addArray(keys);
+						if(![null,undefined].includes(obj)){
+							const keys=Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertyNames(Object.getPrototypeOf(obj))).filter(key=>key.startsWith(token.string));
+							list.addArray(keys);
+						}
 					}catch(_){ return;}
 				}else if(token&&typeof token.string=='string'){
 					const javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
