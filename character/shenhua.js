@@ -3216,6 +3216,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tiaoxin:{
 				audio:2,
 				audioname:['sp_jiangwei','xiahouba','re_jiangwei','gz_jiangwei','ol_jiangwei'],
+				audioname2:{
+					dc_xiahouba:'tiaoxin_xiahouba',
+				},
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -3254,6 +3257,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.1
 				}
 			},
+			tiaoxin_xiahouba:{audio:2},
 			zhiji:{
 				skillAnimation:true,
 				animationColor:'fire',
@@ -6245,11 +6249,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinshensu:{
 				audio:'shensu1',
 				audioname:['xiahouba','re_xiahouyuan','ol_xiahouyuan'],
+				audioname2:{
+					dc_xiahouba:'shensu1_xiahouba',
+				},
 				group:['shensu1','shensu2','shensu4']
 			},
+			shensu1_xiahouba:{audio:2},
 			shensu1:{
 				audio:2,
 				audioname:['xiahouba','re_xiahouyuan','ol_xiahouyuan'],
+				audioname2:{
+					dc_xiahouba:'shensu1_xiahouba',
+				},
 				trigger:{player:'phaseJudgeBefore'},
 				direct:true,
 				content:function(){
@@ -6274,6 +6285,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shensu2:{
 				audio:'shensu1',
 				audioname:['xiahouba','re_xiahouyuan','ol_xiahouyuan'],
+				audioname2:{
+					dc_xiahouba:'shensu1_xiahouba',
+				},
 				trigger:{player:'phaseUseBefore'},
 				direct:true,
 				filter:function(event,player){
@@ -6318,6 +6332,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shensu4:{
 				audio:'shensu1',
 				audioname:['xiahouba','re_xiahouyuan','ol_xiahouyuan'],
+				audioname2:{
+					dc_xiahouba:'shensu1_xiahouba',
+				},
 				trigger:{player:'phaseDiscardBefore'},
 				direct:true,
 				content:function(){

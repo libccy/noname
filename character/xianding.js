@@ -4,6 +4,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			old_huangfusong:['male','qun',4,['xinfenyue']],
+			dc_xiahouba:['male','shu',4,['rebaobian']],
+			dc_daxiaoqiao:['female','wu',3,['dcxingwu','dcluoyan']],
 			tianshangyi:['female','wei',3,['dcposuo','dcxiaoren'],['unseen']],
 			sunlingluan:['female','wu',3,['dclingyue','dcpandi']],
 			dc_wangjun:['male','qun',4,['dctongye','dcchangqu']],
@@ -75,13 +78,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			xianding:{
-				sp2_huben:['wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai','dc_duyu','dc_wangjun'],
+				sp2_huben:['wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai','dc_duyu','dc_wangjun','dc_xiahouba','old_huangfusong'],
 				sp2_shengun:["puyuan","guanlu","gexuan",'wufan','re_zhangbao','dukui','zhaozhi','zhujianping','dc_zhouxuān','zerong'],
 				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji'],
 				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan'],
+				sp2_wangzhe:['dc_daxiaoqiao'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi'],
@@ -90,6 +94,113 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//十周年二乔
+			dcxingwu: {
+				intro: {
+					content: 'expansion',
+					markcount: 'expansion',
+					onunmark: function (storage, player) {
+						player.removeAdditionalSkill('dcluoyan');
+					},
+				},
+				onremove: function (player, skill) {
+					var cards = player.getExpansions(skill);
+					if (cards.length) player.loseToDiscardpile(cards);
+				},
+				audio: 'xingwu',
+				trigger: { player: 'phaseDiscardBegin' },
+				filter: function (event, player) {
+					return player.countCards('h');
+				},
+				direct: true,
+				content: function () {
+					'step 0'
+					player.chooseCard('h', get.prompt('dcxingwu'), '将一张手牌作为“舞”置于武将牌上').set('ai', function (card) {
+						var att = 1, list = [];
+						for (var i of player.getExpansions('dcxingwu')) {
+							if (!list.includes(get.suit(i))) list.push(get.suit(i));
+						}
+						if (!list.includes(get.suit(card))) att = 2;
+						if (_status.event.goon) return (20 - get.value(card)) * att;
+						return (7 - get.value(card)) * att;
+					}).set('goon', player.needsToDiscard() || player.getStorage('dcxingwu').length == 2);
+					'step 1'
+					if (result.bool) {
+						player.logSkill('dcxingwu');
+						var cards = result.cards;
+						player.addToExpansion(cards, player, 'give').gaintag.add('dcxingwu');
+					}
+					'step 2'
+					game.delayx();
+					if (player.getExpansions('dcxingwu').length > 2) {
+						player.chooseButton(['是否移去三张“舞”并发射核弹？', player.getExpansions('dcxingwu')], 3).ai = (button) => {
+							if (game.hasPlayer(function (current) {
+								return get.attitude(player, current) < 0;
+							})) return 1;
+							return 0;
+						}
+					}
+					else event.finish();
+					'step 3'
+					if (result.bool) {
+						event.cards = result.links;
+						var list = [], str = [
+							'<span class=\'texiaotext\' style=\'color:#66FF00\'>小型</span>',
+							'<span class=\'texiaotext\' style=\'color:#6666FF\'>中型</span>',
+							'<span class=\'texiaotext\' style=\'color:#FF0000\'>巨型</span>'
+						];
+						for (var i of event.cards) {
+							if (!list.includes(get.suit(i))) list.push(get.suit(i));
+						}
+						player.chooseTarget('请选择' + str[list.length - 1] + '核弹的投射的目标（伤害：' + list.length + '点）', lib.filter.notMe, true).ai = (target) => {
+							var att = 1;
+							if (target.sex == 'male') att = 1.5;
+							if (target.hp == target.sex == 'male' ? 2 : 1) att *= 1.2;
+							if (get.mode() == 'identity' && player.identity == 'fan' && target.isZhu) att *= 3;
+							return (-get.attitude(player, target)) * att * (Math.max(1, target.countCards('e')));
+						}
+					}
+					'step 4'
+					if (result.bool) {
+						var list = [];
+						for (var i of event.cards) {
+							if (!list.includes(get.suit(i))) list.push(get.suit(i));
+						}
+						player.loseToDiscardpile(event.cards);
+						player.logSkill('dcxingwu', result.targets[0]);
+						player.discardPlayerCard(result.targets[0], 'e', result.targets[0].countCards('e'), true);
+						result.targets[0].damage(result.targets[0].sex == 'female' ? 1 : list.length);
+					}
+				},
+			},
+			dcluoyan: {
+				derivation: ['retianxiang', 'liuli'],
+				init: function (player) {
+					if (player.getStorage('dcxingwu').length) player.addAdditionalSkill('dcluoyan', ['retianxiang_daxiaoqiao', 'liuli_daxiaoqiao']);
+					else player.removeAdditionalSkill('dcluoyan');
+				},
+				onremove: function (player) {
+					player.removeAdditionalSkill('dcluoyan');
+				},
+				trigger: {
+					player: ['loseAfter', 'loseAsyncAfter', 'addToExpansionAfter'],
+				},
+				filter: function (event, player) {
+					var cards = player.getExpansions('dcxingwu'), skills = player.additionalSkills.dcluoyan;
+					if ((cards.length && skills && skills.length) || (!cards.length && (!skills || !skills.length))) {
+						return false;
+					}
+					return true;
+				},
+				forced: true,
+				content: function () {
+					lib.skill.twpingting.init(player, 'dcluoyan');
+				},
+			},
+			retianxiang_daxiaoqiao: {
+				audio: 'tianxiang_daxiaoqiao',
+				inherit: 'retianxiang',
+			},
 			//田尚衣
 			dcposuo:{
 				onChooseToUse:function(event){
@@ -12141,6 +12252,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcposuo_info:'出牌阶段，若你本阶段未造成过伤害，则你可以将一张你本阶段未以此法使用过的花色的手牌当作任意一张存在于游戏的同花色伤害牌使用。',
 			dcxiaoren:'绡刃',
 			dcxiaoren_info:'每回合限一次，当你造成伤害后，你可以进行判定，若结果为：红色，你可以令一名角色回复1点体力；黑色，你可以对受伤角色的上家或下家造成1点伤害，然后你可以重复此方向的伤害流程直到有角色因此死亡或下个目标角色为你。',
+			dc_daxiaoqiao:'新杀大乔小乔',
+			dcxingwu:'星舞',
+			dcxingwu_info:'弃牌阶段开始时，你可以将一张手牌置于武将牌上，称为“星舞”。若你的“星舞”牌达到三张，则你可移去三张“星舞”，弃置一名其他角色装备区里的所有牌，然后对其造成X点伤害（X为移去的“星舞”牌的花色数，若为女性角色则改为1点伤害）。',
+			dcluoyan:'落雁',
+			dcluoyan_info:'锁定技，若你有“星舞”牌，你视为拥有技能〖天香〗和〖流离〗。',
+			dc_xiahouba:'新杀夏侯霸',
+			old_huangfusong:'新杀皇甫嵩',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
@@ -12149,6 +12267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp2_zhangtai:'章台春望',
 			sp2_jinse:'锦瑟良缘',
 			sp2_bizhe:'笔舌如椽',
+			sp2_wangzhe:'往者可荐',
 			sp2_doukou:'豆蔻梢头',
 			sp2_jichu:'计将安出',
 			sp2_yuxiu:'钟灵毓秀',
