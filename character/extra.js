@@ -109,27 +109,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!_status.characterlist){
 						lib.skill.pingjian.initList();
 					}
-					var list=_status.characterlist.randomGets(5);
+					_status.characterlist.randomSort();
+					var list=[];
+					for(var name of _status.characterlist){
+						var info=lib.character[name];
+						if(info[3].some(function(skill){
+							var info=get.skillInfoTranslation(skill);
+							if(!info.includes('【杀】')) return false;
+							var list=get.skillCategoriesOf(skill);
+							list.remove('锁定技');
+							return list.length==0;
+						})){
+							list.push(name);
+							if(list.length>=5) break;
+						}
+					}
 					if(!list.length) event.finish();
 					else{
 						var num=player.countEquipableSlot(1);
 						player.chooseButton([
 							'挈挟：选择至多'+get.cnNumber(num)+'张武将置入武器栏',
-							[list,'character'],
-						],[1,num],true).set('filterButton',function(button){
-							var name=button.link;
-							var info=lib.character[name];
-							if(info[3].some(function(skill){
-								var info=get.skillInfoTranslation(skill);
-								if(!info.includes('【杀】')) return false;
-								var list=get.skillCategoriesOf(skill);
-								list.remove('锁定技');
-								return list.length==0;
-							})){
-								button.classList.add('glow2');
-							}
-							return true;
-						}).set('ai',function(button){
+							[list,function(item,type,position,noclick,node){
+								return lib.skill.qiexie.$createButton(item,type,position,noclick,node);
+							}],
+						],[1,num],true).set('ai',function(button){
 							var name=button.link;
 							var info=lib.character[name];
 							var skills=info[3].filter(function(skill){
@@ -163,6 +166,58 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delayx();
 						for(var card of cards) player.equip(card);
 					}
+				},
+				$createButton:function(item,type,position,noclick,node){
+					node=ui.create.buttonPresets.character(item,'character',position,noclick);
+					const info=lib.character[item];
+					const skills=info[3].filter(function(skill){
+						var info=get.skillInfoTranslation(skill);
+						if(!info.includes('【杀】')) return false;
+						var list=get.skillCategoriesOf(skill);
+						list.remove('锁定技');
+						return list.length==0;
+					});
+					if(skills.length){
+						const skillstr=skills.map(i=>`[${get.translation(i)}]`).join('<br>');
+						const skillnode=ui.create.caption(`<div class="text" data-nature=${get.groupnature(info[1])}>${skillstr}</div>`,node);
+						skillnode.style.left='2px';
+						skillnode.style.bottom='2px';
+					}
+					node._customintro=function(uiintro,evt){
+						const character=node.link,characterInfo=get.character(node.link);
+						let capt=get.translation(character);
+						if(characterInfo){
+							const infoSex=characterInfo[0];
+							if(infoSex) capt+=`&nbsp;&nbsp;${infoSex=='none'?'无':lib.translate[infoSex]}`;
+							const infoGroup=characterInfo[1];
+							if(infoGroup){
+								const group=get.is.double(character,true);
+								if(group) capt+=`&nbsp;&nbsp;${group.map(value=>get.translation(value)).join('/')}`;
+								else capt+=`&nbsp;&nbsp;${lib.translate[infoGroup]}`;
+							}
+						}
+						uiintro.add(capt);
+
+						if(lib.characterTitle[node.link]){
+							uiintro.addText(get.colorspan(lib.characterTitle[node.link]));
+						}
+						for(let i=0;i<skills.length;i++){
+							if(lib.translate[skills[i]+'_info']){
+								let translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
+								if(lib.skill[skills[i]]&&lib.skill[skills[i]].nobracket){
+									uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+								}
+								else{
+									uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+								}
+								if(lib.translate[skills[i]+'_append']){
+									uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
+								}
+							}
+						}
+					}
+
+					return node;
 				},
 				video:function(player,info){
 					for(var name of info[0]){
