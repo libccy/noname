@@ -6681,9 +6681,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const RAD = Math.PI / 180;
 					const maxScore = Math.max(2,1+game.me.countMark('yufeng'));
 					const ctx=canvas.getContext('2d');
-					let ticks = 0;
 					let frames = 0;
-					let dx = 1;
+					let dx = 0.1;
+					let previousDOMHighResTimeStamp = performance.now();
+					let deltaTime = 0;
 					const state = {
 						curr: 0,
 						getReady: 0,
@@ -6710,8 +6711,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						update: function () {
 							if(state.curr == state.gameOver || state.curr == state.gameSuccess) return;
-							this.x -= dx;
-							this.x = this.x % (this.sprite.width / 2);
+							this.x -= dx * deltaTime;
+							const halfWidth = this.sprite.width / 2;
+							if(this.x <= -halfWidth) this.x += halfWidth;
 						},
 					};
 					const bg = {
@@ -6729,6 +6731,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						gap: 127,
 						moved: true,
 						pipes: [],
+						numberOfPipes: 1,
+						timeElapsed: 0,
 						draw: function () {
 							for (let i = 0; i < this.pipes.length; i++) {
 								let p = this.pipes[i];
@@ -6742,14 +6746,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						update: function () {
 							if (state.curr != state.Play) return;
-							if (ticks % 160 == 0) {
+							this.timeElapsed += deltaTime;
+							if (this.timeElapsed >= 1600) {
+								this.timeElapsed -= 1600;
 								this.pipes.push({
 									x: parseFloat(canvas.width),
 									y: -210 * Math.min(Math.random()*0.8 + 1.2, 1.8),
 								});
 							}
 							this.pipes.forEach((pipe) => {
-								pipe.x -= dx;
+								pipe.x -= dx * deltaTime;
 							});
 						
 							if (this.pipes.length && this.pipes[0].x < -this.top.sprite.width) {
@@ -6769,9 +6775,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						x: 50,
 						y: 100,
 						speed: 0,
-						gravity: 0.04,
-						thrust: 1.8,
+						gravity: 0.0004,
+						thrust: 0.18,
 						frame: 0,
+						timeElapsed: 0,
+						totalTimeElapsed: 0,
 						draw: function () {
 							let h = this.animations[this.frame].sprite.height;
 							let w = this.animations[this.frame].sprite.width;
@@ -6782,25 +6790,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							ctx.restore();
 						},
 						update: function () {
+							this.totalTimeElapsed += deltaTime;
 							let r = parseFloat(this.animations[0].sprite.width) / 2;
 							switch (state.curr) {
 								case state.getReady: case state.gameSuccess:
 									this.rotatation = 0;
-									this.y += ticks % 20 == 0 ? Math.sin(ticks * RAD) : 0;
-									this.frame += ticks % 20 == 0 ? 1 : 0;
+									this.timeElapsed += deltaTime;
+									if (this.timeElapsed >= 200) {
+										this.timeElapsed -= 200;
+										this.y += Math.sin(this.totalTimeElapsed / 10 * RAD);
+										this.frame++;
+									}
 									break;
 								case state.Play:
-									this.frame += ticks % 10 == 0 ? 1 : 0;
-									this.y += this.speed;
+									this.timeElapsed += deltaTime;
+									if (this.timeElapsed >= 100) {
+										this.timeElapsed -= 100;
+										this.frame++;
+									}
+									this.y += this.speed * deltaTime;
 									this.setRotation();
-									this.speed += this.gravity;
+									this.speed += this.gravity * deltaTime;
 									if(UI.score.curr >= maxScore){
 										state.curr = state.gameSuccess;
+										this.timeElapsed = 0;
 										updateText('御风飞行表演成功！')
 										setTimeout(switchToAuto,2000);
 									}
 									else if (this.y + r >= gnd.y || this.collisioned()) {
 										state.curr = state.gameOver;
+										this.timeElapsed = 0;
 										updateText('御风飞行表演失败……')
 										setTimeout(switchToAuto,2000);
 									}
@@ -6809,28 +6828,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								case state.gameOver:
 									this.frame = 1;
 									if (this.y + r < gnd.y) {
-										this.y += this.speed;
+										this.y += this.speed * deltaTime;
 										this.setRotation();
-										this.speed += this.gravity;
+										this.speed += this.gravity * deltaTime;
 									} else {
 										this.speed = 0;
 										this.y = gnd.y - r;
 										this.rotatation = 90;
 										if (!SFX.played) {
-											SFX.die.play();
+											Promise.resolve(SFX.die.play()).catch(() => void 0);
 											SFX.played = true;
 										}
 									}
 							
 									break;
 							}
-							this.frame = this.frame % this.animations.length;
+							const animationsLength = this.animations.length;
+							if (this.frame >= animationsLength) this.frame -= animationsLength;
 						},
 						flap: function () {
-							if (this.y > 0) {
-								SFX.flap.play();
-								this.speed = -this.thrust;
-							}
+							if (this.y <= 0) return;
+							const flap = SFX.flap;
+							flap.currentTime = 0;
+							if (flap.paused) Promise.resolve(flap.play()).catch(() => void 0);
+							this.speed = -this.thrust;
 						},
 						setRotation: function () {
 							if (this.speed <= 0) {
@@ -6851,13 +6872,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if (this.x + r >= x) {
 								if (this.x + r < x + w) {
 									if (this.y - r <= roof || this.y + r >= floor) {
-										SFX.hit.play();
+										Promise.resolve(SFX.hit.play()).catch(() => void 0);
 										return true;
 									}
 								}
 								else if (pipe.moved) {
-									UI.score.curr++;
-									SFX.score.play();
+									updateText(`当前分数：${++UI.score.curr}`);
+									const score = SFX.score;
+									score.currentTime = 0;
+									if (score.paused) Promise.resolve(score.play()).catch(() => void 0);
 									pipe.moved = false;
 								}
 							}
@@ -6876,6 +6899,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						tx: 0,
 						ty: 0,
 						frame: 0,
+						timeElapsed: 0,
 						draw: function () {
 						  	switch (state.curr) {
 								case state.getReady:
@@ -6894,18 +6918,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									this.ty =
 										this.y + this.gameOver.sprite.height - this.tap[0].sprite.height;
 									ctx.drawImage(this.gameOver.sprite, this.x, this.y);
-									break;
-								default:
-									this.drawScore();
 							}
-						},
-						drawScore: function () {
-							updateText('当前分数：'+UI.score.curr);
 						},
 						update: function () {
 							if (state.curr == state.Play) return;
-							this.frame += ticks % 20 == 0 ? 1 : 0;
-							this.frame = this.frame % this.tap.length;
+							this.timeElapsed += deltaTime;
+							if (this.timeElapsed >= 200) {
+								this.timeElapsed -= 200;
+								this.frame++;
+							}
+							const tapLength = this.tap.length;
+							if (this.frame >= tapLength) this.frame -= tapLength;
 						},
 					};
 					gnd.sprite.src = lib.assetURL+"image/flappybird/ground.png";
@@ -6927,16 +6950,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					SFX.hit.src = lib.assetURL+"audio/effect/flappybird_hit.wav";
 					SFX.die.src = lib.assetURL+"audio/effect/flappybird_die.wav";
 
-					const gameLoop = function(){
+					const gameLoop = domHighResTimeStamp => {
+						if(frames<0) return;
+						deltaTime = domHighResTimeStamp - previousDOMHighResTimeStamp;
+						previousDOMHighResTimeStamp = domHighResTimeStamp;
 						update();
-						ticks++;
-					}
-					const gameRender = function(){
-						if(frames>=0){
-							draw();
-							frames++;
-							window.requestAnimationFrame(gameRender);
-						}
+						draw();
+						frames++;
+						window.requestAnimationFrame(gameLoop);
 					}
 					  
 					const update = function(){
@@ -6961,11 +6982,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						switch (state.curr) {
 							case state.getReady:
 								state.curr = state.Play;
-								SFX.start.play();
+								bird.timeElapsed = 0;
+								Promise.resolve(SFX.start.play()).catch(() => void 0);
+								updateText(`当前分数：${UI.score.curr}`);
 								break;
-							case state.Play:
-								bird.flap();
-								break;
+							case state.Play: bird.flap();
 						}
 					};
 					const switchToAuto = function(){
@@ -6978,7 +6999,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.resume();
 						_status.imchoosing=false;
 						frames=-1;
-						clearInterval(gameLoop);
 						document.removeEventListener(lib.config.touchscreen?'touchstart':'mousedown',click);
 					} 
 
@@ -6987,8 +7007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.countChoose();
 
 					document.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',click);
-					setInterval(gameLoop, 10);
-					window.requestAnimationFrame(gameRender);
+					window.requestAnimationFrame(gameLoop);
 				},
 			},
 			yufeng_old:{
