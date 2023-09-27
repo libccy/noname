@@ -4,6 +4,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			dc_zhaoxiang:['female','shu',4,['refanghun','refuhan']],
+			ol_guansuo:['male','shu',4,['xinzhengnan','xiefang']],
+			dc_jikang:['male','wei',3,['new_qingxian','dcjuexiang']],
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
 			dc_zhangmancheng:['male','qun',4,['dclvecheng','dczhongji'],['unseen']],
@@ -107,10 +110,103 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_xuzhou:['re_taoqian','caosong','zhangmiao','qiuliju'],
 				sp_zhongyuan:['re_hucheer','re_zoushi','caoanmin','re_dongcheng'],
 				sp_xiaohu:['haomeng','yanfuren','yanrou','dc_zhuling'],
-				sp_decade:['caobuxing','re_maliang','xin_baosanniang'],
+				sp_decade:['caobuxing','re_maliang','xin_baosanniang','dc_jikang','ol_guansuo','dc_zhaoxiang'],
 			}
 		},
 		skill:{
+			//十周年嵇康
+			dcjuexiang: {
+				derivation: 'dccanyun',
+				audio: 'juexiang',
+				trigger: { player: 'die' },
+				forced: true,
+				forceDie: true,
+				skillAnimation: true,
+				animationColor: 'water',
+				content: function () {
+					'step 0'
+					if (trigger.source && trigger.source.isIn()) {
+						trigger.source.discard(trigger.source.getCards('e'));
+						trigger.source.loseHp();
+					}
+					'step 1'
+					player.chooseTarget('绝响：是否令一名其他角色获得技能〖残韵〗？', lib.filter.notMe).set('ai', function (target) {
+						return get.attitude(_status.event.player, target);
+					}).set('forceDie', true);
+					'step 2'
+					if (result.bool) {
+						var target = result.targets[0];
+						player.line(target, 'thunder');
+						target.addSkillLog('dccanyun');
+					}
+				},
+			},
+			dccanyun: {
+				enable: 'phaseUse',
+				filter: function (event, player) {
+					return game.hasPlayer(function (target) {
+						return lib.skill.dccanyun.filterTarget(null, player, target);
+					});
+				},
+				filterTarget: function (card, player, target) {
+					var list = [player];
+					player.getAllHistory('useSkill', function (evt) {
+						if (evt.skill == 'dccanyun') list.addArray(evt.targets);
+					});
+					return !list.includes(target) && !ui.selected.targets.length;
+				},
+				selectTarget: [1, 2],
+				targetprompt: function (target) {
+					var pe = _status.event.player.countCards('e', function (card) {
+						return ui.selected.cards.includes(card) == false;
+					});
+					var te = target.countCards('e');
+					if (pe > te) return '回复体力';
+					else if (pe == te) return '摸一张牌';
+					else if (pe < te) return '失去体力';
+				},
+				filterCard: true,
+				position: 'he',
+				check: function (cardx) {
+					var player = _status.event.player;
+					var number = game.countPlayer(function (target) {
+						if (player == target) return false;
+						var pe = player.countCards('e', function (card) {
+							return card != cardx && ui.selected.cards.includes(card) == false;
+						});
+						var te = target.countCards('e');
+						if (pe > te && target.isDamaged() && get.attitude(player, target) > 2) return true;
+						else if (pe < te && get.attitude(player, target) < 0) return true;
+						return false;
+					});
+					if (ui.selected.cards.length < number) return 6 - get.value(cardx);
+					else return 0;
+				},
+				usable: 1,
+				content: function () {
+					var pe = player.countCards('e');
+					var te = target.countCards('e');
+					if (pe > te) target.recover();
+					else if (pe == te) target.draw();
+					else if (pe < te) target.loseHp();
+				},
+				contentAfter: function () {
+					if (player.hp == 1) player.draw();
+				},
+				ai: {
+					order: 10,
+					result: {
+						target: function (player, target) {
+							var pe = player.countCards('e');
+							var te = target.countCards('e');
+							if (pe > te && target.isDamaged()) return 2;
+							else if (pe == te) return 1;
+							else if (pe < te) return -2.5;
+							else return 0;
+						},
+					},
+				},
+			},
 			//董翓
 			dcjiaoxia:{
 				mod:{
@@ -5439,7 +5535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var list=game.filterPlayer(function(current){
-						return current.name=='guansuo'||current.name2=='guansuo';
+						return current.name=='ol_guansuo'||current.name2=='ol_guansuo';
 					});
 					if(list.length) game.asyncDraw(list);
 					else event.finish();
@@ -5761,13 +5857,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				filter:function(event,player){
 					return event.decadexushen==true&&!game.hasPlayer(function(current){
-						return current.name=='guansuo'||current.name2=='guansuo';
+						return current.name=='ol_guansuo'||current.name2=='ol_guansuo';
 					});
 				},
 				content:function(){
 					'step 0'
 					player.chooseTarget(lib.filter.notMe,'许身：是否令一名其他角色选择是否将其武将牌替换为“关索”并令其摸三张牌？').set('ai',function(target){
-						return get.attitude(_status.event.player,target)-4;
+						return get.attitude(_status.event.player,target);
 					});
 					'step 1'
 					if(!result.bool){
@@ -5787,11 +5883,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.goto(4);
 					'step 3'
-					target.reinit(result.control,'guansuo');
-					if(target.name=='guansuo'&&target.group!='shu') target.changeGroup('shu');
+					target.reinit(result.control,'ol_guansuo');
+					if(target.name=='ol_guansuo'&&target.group!='shu') target.changeGroup('shu');
 					if(_status.characterlist){
 						_status.characterlist.add(result.control);
-						_status.characterlist.remove('guansuo');
+						_status.characterlist.remove('ol_guansuo');
 					}
 					'step 4'
 					target.draw(3);
@@ -10216,7 +10312,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			juanhui2:'绢绘',
 			juanhui2_backup:'绢绘',
 			juanhui_info:'结束阶段，你可以选择一名其他角色。记录该角色下回合的出牌阶段里使用的基本牌和普通锦囊牌（每种牌名限记一次），你的下回合出牌阶段，可将一张手牌当这些牌里的任意一张牌使用（每张限使用一次，且【杀】不计次数）。当"绢绘"的牌全部用完时，你回复1点体力并将手牌摸至三张。',
-			re_maliang:'马良',
+			re_maliang:'新杀马良',
 			rexiemu:'协穆',
 			rexiemu_info:'结束阶段，若全场没有“协穆”标记，你可以选择一名角色获得“协穆”标记直到你的下回合开始。你或该角色在各自的回合外使用或打出手牌时，你与其各摸一张牌（每回合限一次）。',
 			heli:'贺励',
@@ -10236,8 +10332,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tuxing:'图兴',
 			tuxing2:'图兴',
 			tuxing_info:'锁定技，当你废除一个装备栏时，你加1点体力上限并回复1点体力。然后若你所有的装备栏均已被废除，则你减4点体力上限，且本局游戏内造成的伤害+1。',
-			re_hejin:'何进',
-			xin_baosanniang:'鲍三娘',
+			re_hejin:'新杀何进',
+			xin_baosanniang:'新杀鲍三娘',
 			decadexushen:"许身",
 			decadexushen2:'许身',
 			decadexushen_info:"限定技，当你进入濒死状态后，你可以回复1点体力并获得技能“镇南”，然后如果你脱离濒死状态且“关索”不在场，你可令一名其他角色选择是否用“关索”代替其武将并令其摸三张牌。",
@@ -10278,8 +10374,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quanbian:'权变',
 			quanbian2:'权变',
 			quanbian_info:'当你于出牌阶段内使用/打出手牌时，若此牌有花色且你本回合内未使用/打出过该花色的其他手牌，则你可以选择一项：①摸一张牌。②将牌堆顶X张牌中的一张置于牌堆底（X为你的体力上限）。若你发动此技能，则你本回合内不能再使用与此牌花色相同的手牌。',
-			re_hansui:'韩遂',
-			re_quyi:'麴义',
+			re_hansui:'新杀韩遂',
+			re_quyi:'新杀麴义',
 			refuqi:'伏骑',
 			refuqi_info:'锁定技，当你使用牌时，你令所有距离为1的其他角色不能使用或打出牌响应此牌。',
 			hanfu:'韩馥',
@@ -10322,7 +10418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zongfan_info:'觉醒技。结束阶段，若你本回合内因〖谋逆〗使用过【杀】且未跳过本回合的出牌阶段，则你将任意张牌交给一名其他角色，然后加X点体力上限并回复X点体力（X为你以此法给出的牌数且至多为5）。最后失去〖谋逆〗并获得〖战孤〗。',
 			zhangu:'战孤',
 			zhangu_info:'锁定技，准备阶段，若你的体力上限大于1且没有手牌/装备区内没有牌，则你减1点体力上限，然后从牌堆中获得三张类型不同的牌。',
-			re_niujin:'牛金',
+			re_niujin:'新杀牛金',
 			recuorui:'摧锐',
 			recuorui_info:'限定技，出牌阶段，你可以依次获得至多X名角色的各一张手牌（X为你的体力值）。',
 			reliewei:'裂围',
@@ -10531,6 +10627,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcdanji_info:'觉醒技。准备阶段，若你的手牌数大于体力值，你减1点体力上限，将体力回复至体力上限，然后获得〖马术〗和〖怒嗔〗。',
 			dcnuchen:'怒嗔',
 			dcnuchen_info:'出牌阶段限一次。你可以展示一名其他角色的一张手牌，然后选择一项：1.弃置任意张该花色的牌，对其造成等量伤害；2.获得该角色手牌中所有此花色的牌。',
+			dc_jikang:'新杀嵇康',
+			dcjuexiang:'绝响',
+			dcjuexiang_info:'当你死亡时，杀死你的角色弃置其装备区内的所有牌并失去1点体力，然后你可以令一名其他角色获得〖残韵〗。',
+			dccanyun:'残韵',
+			dccanyun_info:'每名角色限一次。出牌阶段，你可以弃置一张牌并选择一名其他角色，然后若其装备区里的牌数：小于你，其回复1点体力；大于你，其失去1点体力；等于你，其摸一张牌。若你的体力值为1，你摸一张牌。',
+			ol_guansuo:'新杀关索',
+			dc_zhaoxiang:'新杀赵襄',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

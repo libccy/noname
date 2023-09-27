@@ -1087,6 +1087,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				firstDo:true,
 				audioname2:{old_guanzhang:'old_fuhun'},
 				audioname:['re_zhangfei','guanzhang','xiahouba'],
+				audioname2:{
+					dc_xiahouba:'paoxiao_xiahouba',
+				},
 				trigger:{player:'useCard1'},
 				forced:true,
 				filter:function(event,player){
@@ -1109,6 +1112,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			paoxiao_xiahouba:{audio:2},
 			guanxing_fail:{},
 			guanxing:{
 				audio:2,

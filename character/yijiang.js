@@ -2202,6 +2202,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:'dangxian',
 				audioname:['guansuo','xin_liaohua','re_liaohua'],
+				audioname2:{
+					ol_guansuo:'dangxian_guansuo',
+				},
 				content:function(){
 					var next=player.phaseUse();
 					next.xindangxian=true;
@@ -2242,6 +2245,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			dangxian_guansuo:{audio:2},
 			xinjunxing:{
 				inherit:'junxing',
 				audio:'junxing',
@@ -9881,6 +9885,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezhiman:{
 				audio:'zhiman',
 				audioname:['guansuo','re_masu'],
+				audioname2:{
+					ol_guansuo:'zhiman_guansuo',
+				},
 				trigger:{source:'damageBegin2'},
 				filter:function(event,player){
 					return player!=event.player;
@@ -9907,6 +9914,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.cancel();
 				}
 			},
+			zhiman_guansuo:{audio:2},
 			resanyao:{
 				audio:2,
 				enable:'phaseUse',
@@ -13630,7 +13638,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuzhi:['re_zhuzhi','zhuzhi','xin_zhuzhi','old_zhuzhi'],
 			liuyu:['dc_liuyu','liuyu','ol_liuyu'],
 			zhangrang:['zhangrang','ol_zhangrang','junk_zhangrang'],
-			jikang:['re_jikang','jikang'],
+			jikang:['re_jikang','jikang','dc_jikang'],
 			xinxianying:['re_xinxianying','xinxianying','ol_xinxianying','sp_xinxianying'],
 			gongsunyuan:['re_gongsunyuan','gongsunyuan'],
 			zhoucang:['re_zhoucang','xin_zhoucang','zhoucang'],
