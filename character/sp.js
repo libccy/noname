@@ -110,7 +110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			panfeng:['male','qun',4,['kuangfu']],
 			sunshao:['male','wu',3,['bizheng','yidian']],
 			
-			huangfusong:['male','qun',4,['xinfenyue']],
+			huangfusong:['male','qun',4,['fenyue']],
 			yuantanyuanshang:['male','qun',4,['neifa']],
 			xujing:['male','shu',3,['yuxu','xjshijian']],
 			
@@ -123,7 +123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangxiu:['male','wei',3,['jilei','danlao']],
 			chenlin:['male','wei',3,['bifa','songci']],
 			caohong:['male','wei',4,['yuanhu']],
-			xiahouba:['male','shu',4,['rebaobian']],
+			xiahouba:['male','shu',4,['baobian']],
 			yuanshu:['male','qun',4,['yongsi','weidi']],
 			sp_diaochan:['female','qun',3,['lihun','rebiyue']],
 			sp_zhaoyun:['male','qun',3,['ollongdan','chongzhen']],
@@ -161,7 +161,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wenpin:['male','wei',4,['zhenwei']],
 			daxiaoqiao:['female','wu',3,['new_xingwu','new_luoyan']],
 
-			guansuo:['male','shu',4,['xinzhengnan','xiefang']],
+			guansuo:['male','shu',4,['zhengnan','xiefang']],
 			tadun:['male','qun',4,['reluanzhan']],
 			yanbaihu:['male','qun',4,['zhidao','jili']],
 			chengyu:['male','wei',3,['shefu','benyu']],
@@ -177,7 +177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			dongbai:['female','qun',3,['lianzhu','xiehui']],
 
-			zhaoxiang:['female','shu',4,['refanghun','refuhan']],
+			zhaoxiang:['female','shu',4,['fanghun','fuhan']],
 			mazhong:['male','shu',4,['fuman']],
 			dongyun:['male','shu',3,['bingzheng','sheyan']],
 			kanze:['male','wu',3,['xiashu','kuanshi']],
@@ -8926,7 +8926,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				derivation:['oltiaoxin','new_repaoxiao','xinshensu'],
+				derivation:['tiaoxin','new_repaoxiao','xinshensu'],
 			},
 			//范强张达
 			yuanchou:{
@@ -24293,7 +24293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoshuang:['caoshuang','ns_caoshuang'],
 			caoang:['caoang','yj_caoang','tw_caoang'],
 			caohong:['tw_re_caohong','caohong','tw_caohong','yj_caohong'],
-			xiahouba:['xiahouba','tw_xiahouba'],
+			xiahouba:['xiahouba','tw_xiahouba','dc_xiahouba'],
 			maliang:['maliang','re_maliang','tw_maliang','ol_maliang','old_maliang'],
 			dingfeng:['dingfeng','tw_dingfeng','old_dingfeng'],
 			zumao:['zumao','tw_zumao'],
@@ -24311,7 +24311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuwan:['fuwan','sp_fuwan','tw_fuwan'],
 			huaxin:['ol_huaxin','huaxin','sp_huaxin'],
 			xujing:['xujing','tw_xujing','sp_xujing'],
-			zhaoxiang:['zhaoxiang','tw_zhaoxiang'],
+			zhaoxiang:['zhaoxiang','tw_zhaoxiang','dc_zhaoxiang'],
 			dengzhi:['ol_dengzhi','re_dengzhi','tw_dengzhi','dengzhi'],
 			wangrong:['wangrong','ol_wangrong'],
 			zongyu:['tw_zongyu','sp_zongyu','zongyu'],
@@ -24330,7 +24330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huojun:['dc_huojun','huojun','tw_huojun'],
 			zhaoyǎn:['dc_zhaoyǎn','zhaoyǎn'],
 			furong:['ol_furong','tw_furong','furong'],
-			daxiaoqiao:['tw_daxiaoqiao','daxiaoqiao'],
+			daxiaoqiao:['tw_daxiaoqiao','daxiaoqiao','dc_daxiaoqiao'],
 			zhugeguo:['tw_zhugeguo','zhugeguo'],
 			wanglang:['wanglang','ol_wanglang','old_wanglang'],
 			tengfanglan:['dc_tengfanglan','tengfanglan'],
@@ -24501,7 +24501,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			caoying:"曹婴",
 			simahui:"司马徽",
-			baosanniang:"OL鲍三娘",
+			baosanniang:"鲍三娘",
 			pangdegong:"手杀庞德公",
 			zhaotongzhaoguang:"手杀赵统赵广",
 			majun:"马钧",
@@ -25080,7 +25080,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spyanhuo_info:'当你死亡时，你可增加如下全局技能：当有角色使用【杀】时，此【杀】的伤害值基数+1。',
 			xiaoxi:'骁袭',
 			xiaoxi_info:'当你登场时，你可以视为使用一张【杀】。',
-			quyi:'OL麴义',
+			quyi:'麴义',
 			wolongfengchu:'卧龙凤雏',
 			youlong:'游龙',
 			youlong_info:'转换技，阴，每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的普通锦囊牌；阳，每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的基本牌。',
