@@ -17784,44 +17784,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.popup(result.control);
 					game.log(player,'获得了技能','#g【'+get.translation(result.control)+'】');
 				},
-				ai:{
-					threaten:1.3
-				},
+				ai:{threaten:2.5},
 				intro:{
 					content:'已因$发动过技能',
 				},
 				derivation:['new_rewusheng','xindangxian','rezhiman'],
 			},
 			zhengnan:{
-				audio:1,
+				derivation:['new_rewusheng','dangxian','rezhiman'],
+				audio:2,
 				trigger:{global:'dieAfter'},
 				frequent:true,
 				content:function(){
 					'step 0'
 					player.draw(3);
-					var list=[];
-					if(!player.hasSkill('new_rewusheng')){
-						list.push('new_rewusheng');
+					var list=lib.skill.zhengnan.derivation.filter(skill=>!player.hasSkill(skill));
+					if(list.length==1) event._result={control:list[0]};
+					else if(list.length){
+						player.chooseControl(list).set('prompt','选择获得一项技能').set('ai',function(){
+							if(_status.event.controls.contains('dangxian')) return 'dangxian';
+							return _status.event.controls[0];
+						});
 					}
-					if(!player.hasSkill('dangxian')){
-						list.push('dangxian');
-					}
-					if(!player.hasSkill('rezhiman')){
-						list.push('rezhiman');
-					}
-					if(list.length){
-						player.chooseControl(list).set('prompt','选择获得一项技能');
-					}
+					else event.finish();
 					'step 1'
 					if(result.control){
 						player.addSkillLog(result.control);
 						player.popup(result.control);
 					}
 				},
-				ai:{
-					threaten:2.4
-				},
-				derivation:['new_rewusheng','dangxian','rezhiman'],
+				ai:{threaten:2},
 			},
 			xiefang:{
 				mod:{
