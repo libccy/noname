@@ -7554,13 +7554,13 @@
 						if(str.lastIndexOf(start,0)==0&&!list.includes(str)) list.push(str);
 					}
 					for(let v=token.state.localVars;v;v=v.next) maybeAdd(v.name);
-					for(let c=token.state.context;c;c=c.prev) for (let v=c.vars;v;v=v.next) maybeAdd(v.name)
+					for(let c=token.state.context;c;c=c.prev) for(let v=c.vars;v;v=v.next) maybeAdd(v.name)
 					for(let v=token.state.globalVars;v;v=v.next) maybeAdd(v.name);
 					if(options&&options.additionalContext!=null) for(let key in options.additionalContext) maybeAdd(key);
 					list.addArray(keys);
 				}
 				return {
-					list:list.filter(key=>key.startsWith(token.string)),
+					list:list.filter(key=>key.startsWith(token.string)).sort((a,b)=>(a+'').localeCompare(b+'')),
 					from:CodeMirror.Pos(cur.line,token.start),
 					to:CodeMirror.Pos(cur.line,token.end),
 				};
@@ -8521,15 +8521,15 @@
                             if(lines.length>=10){ 
                                 if(line>4){ 
                                     for(let i=line-5;i<line+6&&i<lines.length;i++){ 
-                                        showCode+=`${i}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
+                                        showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
                                     } 
                                 }else{ 
                                     for(let i=0;i<line+6&&i<lines.length;i++){ 
-                                        showCode+=`${i}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
+                                        showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
                                     } 
                                 } 
                             }else{ 
-                                showCode=lines.map((_line,i)=>`${i}| ${line==i+1?'⚠️':''}${_line}\n`).toString(); 
+                                showCode=lines.map((_line,i)=>`${i+1}| ${line==i+1?'⚠️':''}${_line}\n`).toString(); 
 							} 
 							return showCode;
 						}
@@ -40919,6 +40919,9 @@
 								this.focus();
 								click.call(this);
 							});
+							elt.onmousemove=elt.ontouchstart=()=>{
+								setActive(i);
+							};
 						}
 					}
 					createList.push(ul);
@@ -40974,7 +40977,7 @@
 					}
 					const self=this;
 					const pos=this.getBoundingClientRect();
-					const list=['撤销\t\tCtrl+Z', '恢复撤销\tCtrl+Y'/* , '全选\t\tCtrl+A' */];
+					const list=['撤销        Ctrl+Z', '恢复撤销    Ctrl+Y'];
 					const click=function(e){
 						const num=this.innerHTML.indexOf("Ctrl");
 						const inner=this.innerHTML.slice(num).replace("+", "-");

@@ -457,9 +457,30 @@ div.cm-s-mdn-like span.CodeMirror-matchingbracket { outline:1px solid grey; colo
   background: white;
   font-size: 90%;
   font-family: monospace;
+  text-shadow: none;
 
   max-height: 20em;
   overflow-y: auto;
+}
+
+.CodeMirror-hints::-webkit-scrollbar {
+  width: 15px;
+  display: block;
+}
+
+@media (max-width: 1000px) {
+  .CodeMirror-hints::-webkit-scrollbar {
+    width: 25px;
+  }
+}
+
+.CodeMirror-hints::-webkit-scrollbar-thumb {
+  background-color: rgb(218, 215, 215);
+  height: 50px;
+}
+
+.CodeMirror-hints::-webkit-scrollbar-track {
+  background-color: #6b6565;
 }
 
 .CodeMirror-hint {
