@@ -38438,7 +38438,7 @@
 					for(i=0;i<cards.length;i++){
 						if(lib.config.cardtempname!='off'){
 							var cardname=get.name(cards[i]);
-							if(cards[i].name!=cardname||!get.is.sameNature(get.nature(cards[i]),cards[i].nature)){
+							if(cards[i].name!=cardname||!get.is.sameNature(get.nature(cards[i]),cards[i].nature,true)){
 								var node=ui.create.cardTempName(cards[i]);
 								var cardtempnameConfig=lib.config.cardtempname;
 								if(cardtempnameConfig!=='default') node.classList.remove('vertical');
@@ -55418,7 +55418,9 @@
 				if(!processedArguments.length) return true;
 				if(processedArguments.length==1){
 					const argument=processedArguments[0];
-					if(!Array.isArray(argument)||argument.length==1) return false;
+					if(!Array.isArray(argument)) return false;
+					if(!argument.length) return true;
+					if(argument.length==1) return false;
 					processedArguments=argument;
 				}
 				const naturesList=processedArguments.map(card=>{
@@ -55426,13 +55428,9 @@
 					else if(Array.isArray(card)) return card;
 					return get.natureList(card||{});
 				});
-				if(naturesList.some(natures=>natures.length)) for(const nature of new Set(naturesList.flat())){
-					if(!nature) continue;
-					const lengths=Array.from(new Set(naturesList.map(natures=>natures.filter(n=>n===nature).length)));
-					if(!every&&lengths.length==1) return true;
-					if(every&&lengths.length!=1) return false;
-				}
-				return !every;
+				const testingNaturesList=naturesList.slice(0,naturesList.length-1);
+				if(every) return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).every(testingNatures=>testingNatures.length==natures.length&&testingNatures.every(nature=>natures.includes(nature))));
+				return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).some(testingNatures=>testingNatures.some(nature=>natures.includes(nature))));
 			},
 			/**
 			 * 判断传入的参数的属性是否不同（参数可以为卡牌、卡牌信息、属性等）
@@ -55448,7 +55446,9 @@
 				if(!processedArguments.length) return false;
 				if(processedArguments.length==1){
 					const argument=processedArguments[0];
-					if(!Array.isArray(argument)||argument.length==1) return true;
+					if(!Array.isArray(argument)) return true;
+					if(!argument.length) return false;
+					if(argument.length==1) return true;
 					processedArguments=argument;
 				}
 				const naturesList=processedArguments.map(card=>{
@@ -55456,13 +55456,9 @@
 					else if(Array.isArray(card)) return card;
 					return get.natureList(card||{});
 				});
-				if(naturesList.some(natures=>natures.length)) for(const nature of new Set(naturesList.flat())){
-					if(!nature) continue;
-					const lengths=Array.from(new Set(naturesList.map(natures=>natures.filter(n=>n!==nature).length)));
-					if(!every&&lengths.length==2) return true;
-					if(every&&lengths.length!=2) return false;
-				}
-				return !every;
+				const testingNaturesList=naturesList.slice(0,naturesList.length-1);
+				if(every) return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).every(testingNatures=>testingNatures.every(nature=>!natures.includes(nature))));
+				return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).some(testingNatures=>testingNatures.length!=natures.length||testingNatures.some(nature=>!natures.includes(nature))));
 			},
 			//判断一张牌是否为明置手牌
 			shownCard:function(card){
