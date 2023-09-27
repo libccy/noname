@@ -24351,7 +24351,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			shixie:['shixie','dc_shixie'],
-			sp_machao:['sp_machao','dc_sp_machao'],
 			caoshuang:['caoshuang','ns_caoshuang'],
 			caoang:['caoang','yj_caoang','tw_caoang'],
 			caohong:['tw_re_caohong','caohong','tw_caohong','yj_caohong'],
