@@ -8219,7 +8219,7 @@
 						var natures=get.natureList(this,player);
 						if(!nature) return natures.length>0;
 						if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
-						return get.is.sameNature(natures,nature,true);
+						return get.is.sameNature(natures,nature);
 					}
 				});
 				if (!('includes' in Array.prototype)) {
@@ -24448,7 +24448,7 @@
 						if(!nature) return Boolean(this.nature&&this.nature.length>0);
 						let natures=get.natureList(nature),naturesx=get.natureList(this.nature);
 						if(nature=='linked') return naturesx.some(n=>lib.linked.includes(n));
-						return get.is.sameNature(natures,naturesx,true);
+						return get.is.sameNature(natures,naturesx);
 					};
 					if(next.hasNature('poison')) delete next._triggered;
 					next.setContent('damage');
@@ -28804,7 +28804,7 @@
 					var natures=get.natureList(this,player);
 					if(!nature) return natures.length>0;
 					if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
-					return get.is.sameNature(natures,nature,true);
+					return get.is.sameNature(natures,nature);
 				},
 				//只针对【杀】起效果
 				addNature:function(nature){
@@ -45614,7 +45614,7 @@
 								fakeme.appendChild(input);
 
 								fakeme.imagenode=ui.create.div('.image',fakeme);
-								ui.create.div('.name','选<br>择<br>背<br>景',fakeme);
+								ui.create.div('.name','选择背景',fakeme);
 
 								ui.create.div('.indent','名称：<input class="new_name" type="text">',newCard).style.paddingTop='8px';
 								ui.create.div('.indent','描述：<input class="new_description" type="text">',newCard).style.paddingTop='6px';
@@ -55407,41 +55407,62 @@
 			/**
 			 * 判断传入的参数的属性是否相同（参数可以为卡牌、卡牌信息、属性等）
 			 * @param ...infos 要判断的属性列表 
-			 * @param partly {boolean} 是否判断每一个传入的属性是否存在部分相同而不是完全相同
+			 * @param every {boolean} 是否判断每一个传入的属性是否完全相同而不是存在部分相同
 			 */
 			sameNature:function(){
-				var _args=Array.from(arguments);
-				var args=[],partly=false;
-				for(const arg of _args){
-					if(typeof arg=='boolean') partly=arg;
-					else{
-						if(arg) args.push(arg);
-					}
+				let processedArguments=[],every=false;
+				Array.from(arguments).forEach(argument=>{
+					if(typeof argument=='boolean') every=argument;
+					else if(argument) processedArguments.push(argument);
+				});
+				if(!processedArguments.length) return true;
+				if(processedArguments.length==1){
+					const argument=processedArguments[0];
+					if(!Array.isArray(argument)||argument.length==1) return false;
+					processedArguments=argument;
 				}
-				if(!args.length) return true;
-				if(args.length==1){
-					if(Array.isArray(args[0])) args=args[0];
-					else return false;
+				const naturesList=processedArguments.map(card=>{
+					if(typeof card=='string') return card.split(lib.natureSeparator);
+					else if(Array.isArray(card)) return card;
+					return get.natureList(card||{});
+				});
+				if(naturesList.some(natures=>natures.length)) for(const nature of new Set(naturesList.flat())){
+					if(!nature) continue;
+					const lengths=Array.from(new Set(naturesList.map(natures=>natures.filter(n=>n===nature).length)));
+					if(!every&&lengths.length==1) return true;
+					if(every&&lengths.length!=1) return false;
 				}
-				var naturesList=[];
-				const getN=(cardx)=>{
-					if(typeof cardx=='string') return cardx.split(lib.natureSeparator);
-					else if(Array.isArray(cardx)) return cardx;
-					return get.natureList(cardx||{});
+				return !every;
+			},
+			/**
+			 * 判断传入的参数的属性是否不同（参数可以为卡牌、卡牌信息、属性等）
+			 * @param ...infos 要判断的属性列表 
+			 * @param every {boolean} 是否判断每一个传入的属性是否完全不同而不是存在部分不同
+			 */
+			differentNature:function(){
+				let processedArguments=[],every=false;
+				Array.from(arguments).forEach(argument=>{
+					if(typeof argument=='boolean') every=argument;
+					else if(argument) processedArguments.push(argument);
+				});
+				if(!processedArguments.length) return false;
+				if(processedArguments.length==1){
+					const argument=processedArguments[0];
+					if(!Array.isArray(argument)||argument.length==1) return true;
+					processedArguments=argument;
 				}
-				naturesList=args.map(getN);
-				if(naturesList.length==1) return false;
-				if(naturesList.some(natures=>Array.isArray(natures)&&natures.length)){
-					var uniqueNatures=new Set(naturesList.flat());
-					for(var nature of uniqueNatures){
-						if(!nature) continue;
-						var lens=naturesList.map(natures=>natures.filter(n=>n===nature).length);
-						var lensx=Array.from(new Set(lens));
-						if(partly&&lensx.length==1) return true;
-						if(!partly&&lensx.length!=1) return false;
-					}
+				const naturesList=processedArguments.map(card=>{
+					if(typeof card=='string') return card.split(lib.natureSeparator);
+					else if(Array.isArray(card)) return card;
+					return get.natureList(card||{});
+				});
+				if(naturesList.some(natures=>natures.length)) for(const nature of new Set(naturesList.flat())){
+					if(!nature) continue;
+					const lengths=Array.from(new Set(naturesList.map(natures=>natures.filter(n=>n!==nature).length)));
+					if(!every&&lengths.length==2) return true;
+					if(every&&lengths.length!=2) return false;
 				}
-				return !Boolean(partly);
+				return !every;
 			},
 			//判断一张牌是否为明置手牌
 			shownCard:function(card){
