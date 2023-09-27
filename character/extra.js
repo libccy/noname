@@ -179,7 +179,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					if(skills.length){
 						const skillstr=skills.map(i=>`[${get.translation(i)}]`).join('<br>');
-						const skillnode=ui.create.caption(`<div class="text" data-nature=${get.groupnature(info[1])}>${skillstr}</div>`,node);
+						const skillnode=ui.create.caption(
+							`<div class="text" data-nature=${get.groupnature(info[1],'raw')
+								}m style="font-family: ${(lib.config.name_font||'xinwei')
+								},xinwei">${skillstr}</div>`,node);
 						skillnode.style.left='2px';
 						skillnode.style.bottom='2px';
 					}
