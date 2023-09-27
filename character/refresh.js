@@ -11566,6 +11566,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				audio:"wusheng",
 				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo','re_guanzhang','dc_jsp_guanyu'],
+				audioname2:{
+					ol_guansuo:'wusheng_guansuo',
+				},
 				enable:["chooseToRespond","chooseToUse"],
 				filterCard:function(card,player){
 					if(get.zhu(player,'shouyue')) return true;
@@ -11601,6 +11604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			wusheng_guansuo:{audio:2},
 			"new_yijue":{
 				audio:"yijue",
 				enable:"phaseUse",
