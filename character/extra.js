@@ -102,7 +102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
-					return player.countEquipableSlot(1)>0;
+					return player.countEmptySlot(1)>0;
 				},
 				content:function(){
 					'step 0'
@@ -126,9 +126,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(!list.length) event.finish();
 					else{
-						var num=player.countEquipableSlot(1);
+						var num=player.countEmptySlot(1);
 						player.chooseButton([
-							'挈挟：选择至多'+get.cnNumber(num)+'张武将置入武器栏',
+							'挈挟：选择'+(num>1?'至多':'')+get.cnNumber(num)+'张武将置入武器栏',
 							[list,function(item,type,position,noclick,node){
 								return lib.skill.qiexie.$createButton(item,type,position,noclick,node);
 							}],
@@ -160,8 +160,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var card=game.createCard('qiexie_'+name,'none',get.infoMaxHp(lib.character[name][2]));
 							return card;
 						});
-						player.addTempSkill('qiexie_blocker','qiexieAfter');
-						player.markAuto('qiexie_blocker',cards);
 						player.$gain2(cards);
 						game.delayx();
 						for(var card of cards) player.equip(card);
@@ -290,29 +288,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				subSkill:{
-					blocker:{
-						mod:{
-							canBeReplaced:function(card,player){
-								if(player.getStorage('qiexie_blocker').contains(card)) return false;
-							},
-						},
-						charlotte:true,
-						onremove:true,
-						trigger:{player:'equipEnd'},
-						forced:true,
-						firstDo:true,
-						priority:Infinity,
-						filter:function(event){
-							var evt=event.getParent();
-							if(evt.name!='qiexie') return false;
-							return !evt.next.some(event=>{
-								return event.name=='equip';
-							})
-						},
-						content:function(){
-							player.removeSkill('qiexie_blocker');
-						},
-					},
 					destroy:{
 						trigger:{player:'loseBegin'},
 						equipSkill:true,
@@ -347,12 +322,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var distance=get.distance(player,target);
 					return !game.hasPlayer(current=>(current!=target&&player.inRange(current)&&get.distance(player,current)>distance));
 				},
+				selectTarget:[0,1],
+				filterOk:function(){
+					var player=_status.event.player;
+					if(game.hasPlayer(target=>lib.skill.cuijue.filterTarget('SB',player,target))) return ui.selected.targets.length>0;
+					return true;
+				},
 				position:'he',
-				check:card=>6-get.value(card),
+				complexTarget:true,
+				check:card=>{
+					var player=_status.event.player,goon=0;
+					try{
+						ui.selected.cards.add(card);
+						if(game.hasPlayer(target=>{
+							return lib.skill.cuijue.filterTarget('SB',player,target);
+						})){
+							goon=6;
+						}
+					}catch(e){}
+					ui.selected.cards.remove(card);
+					return goon-get.value(card);
+				},
 				content:function(){
-					player.addTempSkill('cuijue_used','phaseUseAfter');
-					player.markAuto('cuijue_used',[target]);
-					target.damage('nocard');
+					if(target){
+						player.addTempSkill('cuijue_used','phaseUseAfter');
+						player.markAuto('cuijue_used',[target]);
+						target.damage('nocard');
+					}
 				},
 				ai:{
 					order:2,
@@ -7375,7 +7371,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiexie:'挈挟',
 			qiexie_info:'锁定技。准备阶段，你在剩余武将牌堆中随机观看五张牌，选择其中的任意张，将其按照如下规则转化为武器牌置入你的武器栏：{⒈此牌不具有花色，且其攻击范围和点数等于此武将牌的体力上限。⒉此武器牌的技能为该武将牌上所有描述中包含“【杀】”且不具有锁定技以外的标签的技能。⒊此武器牌离开你的装备区时，改为放回武将牌堆。}',
 			cuijue:'摧决',
-			cuijue_info:'每回合每名角色限一次。出牌阶段，你可以弃置一张牌，然后对攻击范围内距离最远的一名其他角色造成1点伤害。',
+			cuijue_info:'每回合每名角色限一次。出牌阶段，你可以弃置一张牌，并可以选择攻击范围内距离最远的一名其他角色造成1点伤害。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',

@@ -6569,6 +6569,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					if(_status.connectMode) event.time=lib.configOL.choose_timeout;
 					event.videoId=lib.status.videoId++;
+					var maxScore = Math.max(2,1+player.countMark('yufeng'));
 					if(player.isUnderControl()){
 						game.swapPlayerAuto(player);
 					}
@@ -6577,7 +6578,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.countChoose();
 						setTimeout(function(){
 							_status.imchoosing=false;
-							var max=Math.max(2,1+game.me.countMark('yufeng'));
+							var max=Math.max(2,1+player.countMark('yufeng'));
 							var score=Math.random()<0.5?max:get.rand(1,max);
 							event._result={
 								bool:true,
@@ -6595,14 +6596,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var str=get.translation(player)+'正在表演《御风飞行》...<br>';
 						ui.create.dialog(str).videoId=id;
 					};
-					var chooseButton=function(){lib.skill.yufeng.$playFlappyBird()};
+					var chooseButton=function(maxScore){lib.skill.yufeng.$playFlappyBird(maxScore)};
 					//event.switchToAuto=switchToAuto;
 					game.broadcastAll(createDialog,player,event.videoId);
 					if(event.isMine()){
-						chooseButton();
+						chooseButton(maxScore);
 					}
 					else if(event.isOnline()){
-						event.player.send(chooseButton);
+						event.player.send(chooseButton,maxScore);
 						event.player.wait();
 						game.pause();
 					}
@@ -6651,7 +6652,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else player.draw(event.score);
 				},
-				$playFlappyBird:function(){
+				$playFlappyBird:function(maxScore,title){
 					//Forked from: https://github.com/aaarafat/JS-Flappy-Bird
 
 					const event=_status.event;
@@ -6679,7 +6680,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					canvas.style.border='3px solid';
 					
 					const RAD = Math.PI / 180;
-					const maxScore = Math.max(2,1+game.me.countMark('yufeng'));
 					const ctx=canvas.getContext('2d');
 					let frames = 0;
 					let dx = 0.1;
@@ -6814,13 +6814,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(UI.score.curr >= maxScore){
 										state.curr = state.gameSuccess;
 										this.timeElapsed = 0;
-										updateText('御风飞行表演成功！')
+										updateText(`${title||'御风飞行'}表演成功！`)
 										setTimeout(switchToAuto,2000);
 									}
 									else if (this.y + r >= gnd.y || this.collisioned()) {
 										state.curr = state.gameOver;
 										this.timeElapsed = 0;
-										updateText('御风飞行表演失败……')
+										updateText(`${title||'御风飞行'}表演失败……`)
 										setTimeout(switchToAuto,2000);
 									}
 							
@@ -6889,6 +6889,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const UI = {
 						getReady: { sprite: new Image() },
 						gameOver: { sprite: new Image() },
+						gameClear: { sprite: new Image() },
 						tap: [{ sprite: new Image() }, { sprite: new Image() }],
 						score: {
 							curr: 0,
@@ -6917,7 +6918,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									this.tx = parseFloat(canvas.width - this.tap[0].sprite.width) / 2;
 									this.ty =
 										this.y + this.gameOver.sprite.height - this.tap[0].sprite.height;
-									ctx.drawImage(this.gameOver.sprite, this.x, this.y);
+									ctx.drawImage((state.curr == state.gameOver ? this.gameOver : this.gameClear).sprite, this.x, this.y);
 							}
 						},
 						update: function () {
@@ -6935,7 +6936,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					bg.sprite.src = lib.assetURL+"image/flappybird/BG.png";
 					pipe.top.sprite.src = lib.assetURL+"image/flappybird/toppipe.png";
 					pipe.bot.sprite.src = lib.assetURL+"image/flappybird/botpipe.png";
-					UI.gameOver.sprite.src = lib.assetURL+"image/flappybird/go.png";
+					UI.gameOver.sprite.src = lib.assetURL+"image/flappybird/gameover.png";
+					UI.gameClear.sprite.src = lib.assetURL+"image/flappybird/gameclear.png";
 					UI.getReady.sprite.src = lib.assetURL+"image/flappybird/getready.png";
 					UI.tap[0].sprite.src = lib.assetURL+"image/flappybird/tap/t0.png";
 					UI.tap[1].sprite.src = lib.assetURL+"image/flappybird/tap/t1.png";
