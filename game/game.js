@@ -46576,11 +46576,11 @@
 									}
 									else{
 										if(!window.CodeMirror){
-											lib.init.js(lib.assetURL+'game','codemirror',()=>lib.codeMirrorReady(node,editor));
+											lib.init.js(lib.assetURL+'game','codemirror',()=>lib.codeMirrorReady(node,this.editor));
 											lib.init.css(lib.assetURL+'layout/default','codemirror');
 										}
 										else{
-											lib.codeMirrorReady(node,editor);
+											lib.codeMirrorReady(node,this.editor);
 										}
 									}
 								};
