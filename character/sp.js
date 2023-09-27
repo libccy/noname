@@ -143,7 +143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_jiangwei:['male','wei',4,['kunfen','fengliang']],
 			sp_machao:['male','qun',4,['olzhuiji','ol_shichou']],
 			sunhao:['male','wu',5,['recanshi','rechouhai','guiming'],['zhu']],
-			shixie:['male','qun',3,['rebiluan','relixia']],
+			shixie:['male','qun',3,['olbiluan','relixia']],
 			mayunlu:['female','shu',4,['fengpo','mashu']],
 			zhanglu:['male','qun',3,['yishe','bushi','midao','twshijun'],['zhu']],
 			wutugu:['male','qun',15,['ranshang','hanyong']],
@@ -204,6 +204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luzhi:['male','wei',3,['qingzhong','weijing']]
 		},
 		characterIntro:{
+			lushi:'卢氏，五斗米教主张衡妻，张鲁母，擅长驻颜之术，常年令自己保持少女的容颜。常拜访刘焉，与其交好。',
 			lvboshe:'吕伯奢，东汉成皋（今河南荥阳）人，曹操父亲曹嵩的故友。曹操与陈宫在逃离董卓避祸，返回乡里的途中借宿于吕伯奢家，未伤其人，有贼八人欲捉曹操，曹操杀之，明罗贯中在历史小说《三国演义》中将这段历史进行了丑化加工，也成为小说中曹操名言“宁教我负天下人，休教天下人负我”的出处。',
 			caoxi:'曹羲（？－249年），字昭叔。曹真之子，曹爽之弟。为人有学识，明律法。司马懿曾组织朝议改革九品中正制废除九品而留中正，曹羲认为此举并无区别，最终都是决定于人的人治。曹爽掌权后，受封中领军，掌握禁兵，封安乡侯。曹爽及诸兄弟轻视司马懿，恣意妄为，经常外出狩猎，曹羲屡次劝谏，不被采纳。249年，司马懿发动高平陵政变，被夷三族。',
 			duanjiong:'段颎（？－179年），字纪明，武威姑臧（今甘肃省武威市）人。东汉名将，西域都护段会宗从曾孙，与皇甫规（字威明）、张奂（字然明）并称“凉州三明”。段颎少时学习骑射，有文武智略，最初被举为孝廉，为宪陵园丞、阳陵令，有治理之才。汉桓帝时入军旅，先破鲜卑，后讨平东郭窦、公孙举起事，以功封列侯。延熹二年（159年）起戍边征战十余年，百战羌人，至永康元年（167年）平定西羌，建宁二年（169年）平定东羌，前后斩东西羌六万余级。累功封新丰县侯。建宁三年（170年），段颎被征入朝，历任侍中、执金吾、河南尹、司隶校尉等职，他党附宦官、捕杀太学生，因而得保富贵，两度出任太尉。光和二年（179年），权宦王甫罪行被揭发，段颎受牵连下狱，其后在狱中饮鸩而死。',
@@ -13514,13 +13515,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//OL马超
 			ol_shichou:{
 				audio:2,
-				trigger:{
-					player:'useCard2',
+				trigger:{player:'useCard2'},
+				filter:function(event,player){
+					return event.card&&event.card.name=='sha';
 				},
 				direct:true,
-				filter:function(event,player){
-					return event.card&&event.card.name=='sha';//&&player.isDamaged();
-				},
 				content:function(){
 					'step 0'
 					var num=player.getDamagedHp()+1;
@@ -13536,23 +13535,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('ol_shichou',targets);
 						player.line(targets,trigger.card.nature);
 						trigger.targets.addArray(targets);
-						trigger.ol_shichou=true;
+					}
+				},
+			},
+			dc_olshichou: {
+				audio: 'ol_shichou',
+				trigger: { player: 'useCard2' },
+				filter: function (event, player) {
+					return event.card && event.card.name == 'sha' && player.isDamaged() && game.hasPlayer(function (current) {
+						return !event.targets.includes(current) && lib.filter.filterTarget(event.card, player, current);
+					});
+				},
+				direct: true,
+				content: function () {
+					'step 0'
+					var num = Math.min(player.getDamagedHp(), game.countPlayer(function (current) {
+						return !trigger.targets.includes(current) && lib.filter.filterTarget(trigger.card, player, current);
+					}));
+					player.chooseTarget('是否发动【誓仇】，令至多' + get.cnNumber(num) + '名其他角色也成为此【杀】的目标？', [1, num], function (card, player, target) {
+						var evt = _status.event.getTrigger();
+						return target != player && !evt.targets.includes(target) && lib.filter.targetEnabled2(evt.card, player, target) && lib.filter.targetInRange(evt.card, player, target);
+					}).ai = function (target) {
+						return get.effect(target, { name: 'sha' }, _status.event.player);
+					};
+					'step 1'
+					if (result.bool && result.targets && result.targets.length) {
+						var targets = result.targets;
+						player.logSkill('dc_olshichou', targets);
+						player.line(targets, trigger.card.nature);
+						trigger.targets.addArray(targets);
+						trigger.ol_shichou = true;
 						player.addTempSkill('ol_shichou2');
 					}
 				},
 			},
 			ol_shichou2:{
+				charlotte:true,
 				trigger:{player:'useCardAfter'},
-				forced:true,
-				popup:false,
-				onremove:true,
 				filter:function(event,player){
-					return event.ol_shichou==true&&player.countMark('ol_shichou2')<3&&!player.getHistory('sourceDamage',function(evt){
+					return event.ol_shichou&&!player.getHistory('sourceDamage',function(evt){
 						return evt.card==event.card;
 					}).length&&event.cards.filterInD().length>0;
 				},
+				forced:true,
+				popup:false,
 				content:function(){
-					player.addMark('ol_shichou2',1,false);
 					player.gain(trigger.cards.filterInD(),'gain2');
 				},
 			},
@@ -19561,100 +19588,142 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fengpo3:{charlotte:true},
-			biluan:{
-				audio:2,
-				trigger:{player:'phaseDrawBegin1'},
-				mark:true,
-				//unique:true,
-				intro:{
-					content:function(storage){
-						if(storage>0){
-							return '其他角色计算与你的距离时+'+storage;
-						}
-						else if(storage<0){
-							return '其他角色计算与你的距离时'+storage;
-						}
-						else{
-							return '无距离变化';
-						}
-					}
-				},
-				init:function(player){
-					if(typeof player.storage.biluan!='number') player.storage.biluan=0;
-				},
-				check:function(event,player){
-					if(player.countCards('h')>player.hp) return true;
-					if(player.hasJudge('lebu')) return true;
-					var ng=[];
-					var players=game.filterPlayer();
-					for(var i=0;i<players.length;i++){
-						if(players[i].group!='unknown'){
+			//士燮
+			biluan: {
+				audio: 2,
+				trigger: { player: 'phaseDrawBegin1' },
+				check: function (event, player) {
+					if (player.countCards('h') > player.hp) return true;
+					if (player.hasJudge('lebu')) return true;
+					var ng = [];
+					var players = game.filterPlayer();
+					for (var i = 0; i < players.length; i++) {
+						if (players[i].group != 'unknown') {
 							ng.add(players[i].group);
 						}
 					}
-					ng=ng.length;
-					if(ng<2) return false;
-					var nai=0;
-					for(var i=0;i<players.length;i++){
-						if(players[i]!=player){
-							var dist=get.distance(players[i],player,'attack');
-							if(dist<=1&&dist+ng>1){
+					ng = ng.length;
+					if (ng < 2) return false;
+					var nai = 0;
+					for (var i = 0; i < players.length; i++) {
+						if (players[i] != player) {
+							var dist = get.distance(players[i], player, 'attack');
+							if (dist <= 1 && dist + ng > 1) {
 								nai++;
 							}
 						}
 					}
-					return nai>=2;
+					return nai >= 2;
 				},
-				filter:function(event,player){
-					return !event.numFixed&&game.hasPlayer(function(current){
-						return current!=player&&get.distance(current,player)<=1;
+				filter: function (event, player) {
+					return !event.numFixed && game.hasPlayer(function (current) {
+						return current != player && get.distance(current, player) <= 1;
 					});
 				},
-				content:function(){
-					var ng=[];
-					var players=game.filterPlayer();
-					for(var i=0;i<players.length;i++){
-						if(players[i].group!='unknown'){
+				content: function () {
+					if (!player.hasSkill('rebiluan2')) player.addSkill('rebiluan2');
+					var ng = [];
+					var players = game.filterPlayer();
+					for (var i = 0; i < players.length; i++) {
+						if (players[i].group != 'unknown') {
 							ng.add(players[i].group);
 						}
 					}
-					player.$damagepop(ng.length,'unknownx');
-					player.storage.biluan+=ng.length;
-					player.markSkill('biluan');
-					game.addVideo('storage',player,['biluan',player.storage.biluan]);
+					player.$damagepop(ng.length, 'unknownx');
+					player.storage.rebiluan2 += ng.length;
+					player.markSkill('rebiluan2');
+					game.addVideo('storage', player, ['biluan', player.storage.rebiluan2]);
 					trigger.changeToZero();
 				},
-				mod:{
-					globalTo:function(from,to,distance){
-						if(typeof to.storage.biluan=='number'){
-							return distance+to.storage.biluan;
-						}
+			},
+			lixia: {
+				audio: 2,
+				trigger: { global: 'phaseJieshuBegin' },
+				filter: function (event, player) {
+					return event.player.isIn() && event.player != player && get.distance(event.player, player, 'attack') > 1;
+				},
+				forced: true,
+				content: function () {
+					'step 0'
+					player.chooseTarget(function (card, player, target) {
+						return target == player || target == _status.event.source;
+					}, true, '礼下：选择一个目标摸一张牌').set('ai', function (target) {
+						if (get.attitude(player, trigger.player) > 2) return 114514 - target.countCards();
+						return player == target ? 1 : 0;
+					}).set('source', trigger.player);
+					'step 1'
+					if (result.targets.length) {
+						result.targets[0].draw();
+						player.line(result.targets[0], 'green');
 					}
+					if (!player.hasSkill('rebiluan2')) player.addSkill('rebiluan2');
+					player.storage.rebiluan2--;
+					player.markSkill('rebiluan2');
+					game.addVideo('storage', player, ['biluan', player.storage.rebiluan2]);
 				}
 			},
-			lixia:{
-				audio:2,
-				trigger:{global:'phaseJieshuBegin'},
-				filter:function(event,player){
-					return event.player.isIn()&&event.player!=player&&get.distance(event.player,player,'attack')>1;
-				},
-				forced:true,
-				content:function(){
-					'step 0'
-					player.chooseTarget(function(card,player,target){
-						return target==player||target==_status.event.source;
-					},true,'礼下：选择一个目标摸一张牌').set('ai',function(target){
-						return player==target?1:0;
-					}).set('source',trigger.player);
-					'step 1'
-					if(result.targets.length){
-						result.targets[0].draw();
-						player.line(result.targets[0],'green');
+			olbiluan: {
+				audio: 'biluan',
+				trigger: { player: 'phaseJieshuBegin' },
+				checkx: function (player) {
+					var ng = Math.min(4, game.countPlayer());
+					var nai = 0;
+					for (var i = 0; i < game.players.length; i++) {
+						if (game.players[i] != player) {
+							var dist = get.distance(game.players[i], player, 'attack');
+							if (dist <= 1 && dist + ng > 1) nai++;
+						}
 					}
-					player.storage.biluan--;
-					player.markSkill('biluan');
-					game.addVideo('storage',player,['biluan',player.storage.biluan]);
-				}
+					return nai >= 2;
+				},
+				filter: function (event, player) {
+					return player.countCards('he') && game.hasPlayer(function (current) {
+						return current != player && get.distance(current, player) <= 1;
+					});
+				},
+				direct: true,
+				content: function () {
+					'step 0'
+					player.chooseToDiscard('he', get.prompt2('olbiluan')).set('logSkill', 'olbiluan').set('ai', function (card) {
+						if (_status.event.check) return 6 - get.value(card);
+						return 0;
+					}).set('check', lib.skill.olbiluan.checkx(player));
+					'step 1'
+					if (result.bool) {
+						player.addSkill('rebiluan2');
+						var num = game.countGroup();
+						player.$damagepop(num, 'unknownx');
+						player.storage.rebiluan2 += num;
+						player.markSkill('rebiluan2');
+						game.addVideo('storage', player, ['rebiluan2', player.storage.rebiluan2]);
+					}
+				},
+			},
+			ollixia: {
+				audio: 'lixia',
+				trigger: { global: 'phaseJieshuBegin' },
+				filter: function (event, player) {
+					return event.player.isIn() && event.player != player && get.distance(event.player, player, 'attack') > 1;
+				},
+				forced: true,
+				content: function () {
+					'step 0'
+					player.chooseTarget(function (card, player, target) {
+						return target == player || target == _status.event.source;
+					}, true, '礼下：请选择一个目标令其摸牌并减少你与其他角色的距离').set('ai', function (target) {
+						return player == target ? 1 : 0;
+					}).set('source', trigger.player);
+					'step 1'
+					if (result.targets.length) {
+						var num = (result.targets[0] == player ? 1 : 2);
+						result.targets[0].draw(num);
+						player.line(result.targets[0], 'green');
+					}
+					if (!player.hasSkill('rebiluan2')) player.addSkill('rebiluan2');
+					player.storage.rebiluan2--;
+					player.markSkill('rebiluan2');
+					game.addVideo('storage', player, ['rebiluan2', player.storage.rebiluan]);
+				},
 			},
 			rebiluan2:{
 				mark:true,
@@ -24282,6 +24351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterReplace:{
+			shixie:['shixie','dc_shixie'],
 			caoshuang:['caoshuang','ns_caoshuang'],
 			caoang:['caoang','yj_caoang','tw_caoang'],
 			caohong:['tw_re_caohong','caohong','tw_caohong','yj_caohong'],
@@ -24553,7 +24623,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_luoyan_liuli":"流离",
 			"new_luoyan_liuli_info":"",
 			ol_shichou:"誓仇",
-			ol_shichou_info:"当你使用【杀】时，你可以令至多X+1名角色也成为此【杀】的目标。此牌结算结束后，若你未因【杀】造成过伤害，则你获得此【杀】（X为你已损失的体力值。每回合限获得三次）",
+			ol_shichou_info:"当你使用【杀】时，你可以令至多X+1名角色也成为此【杀】的目标（X为你已损失的体力值）。",
+			dc_olshichou: '誓仇',
+			dc_olshichou_info: '当你使用【杀】时，你可以令至多X名角色也成为此【杀】的目标。此牌结算结束后，若你未因【杀】造成过伤害，则你获得此【杀】（X为你已损失的体力值）。',
 			"zhenwei_three":"镇卫",
 			"zhenwei_three_info":"锁定技，敌方角色至己方其他角色的距离+1。",
 			"huanshi_three":"缓释",
@@ -24815,11 +24887,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			biluan_info:'摸牌阶段开始时，若有与你距离不大于1的其他角色，你可以放弃摸牌。若如此做，本局内其他角色计算与你的距离时+X。（X为势力数）',
 			lixia:'礼下',
 			lixia_info:'锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你摸一张牌或令其摸一张牌。本局内其他角色计算与你的距离时-1。',
+			olbiluan: '避乱',
+			olbiluan_info: '结束阶段开始时，若有与你距离不大于1的其他角色，你可以弃置一张牌。若如此做，本局内其他角色计算与你的距离时+X。（X为场上的势力数）',
+			relixia:'礼下',
+			relixia_info:'锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你选择一至两项：1.摸一张牌；2.其摸两张牌；3.其回复1点体力。本局内其他角色计算与你的距离时-X（X为你选择的选项数）。',
 			rebiluan:'避乱',
 			rebiluan2:'避乱',
 			rebiluan_info:'结束阶段开始时，若有与你距离不大于1的其他角色，你可以弃置一张牌。若如此做，本局内其他角色计算与你的距离时+X。（X为场上角色数且至多为4）',
-			relixia:'礼下',
-			relixia_info:'锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你选择一至两项：1.摸一张牌；2.其摸两张牌；3.其回复1点体力。本局内其他角色计算与你的距离时-X（X为你选择的选项数）。',
+			ollixia: '礼下',
+			ollixia_info: '锁定技，其他角色的结束阶段开始时，若你不在其攻击范围内，你摸一张牌或令其摸两张牌。本局内其他角色计算与你的距离时-1。',
 			yishe:'义舍',
 			yishe_bg:'米',
 			yishe_info:'结束阶段开始时，若你的武将牌上没有「米」，则你可以摸两张牌。若如此做，你将两张牌置于武将牌上，称为「米」；当有「米」移至其他区域后，若你的武将牌上没有「米」，则你回复1点体力。',
