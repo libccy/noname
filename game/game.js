@@ -8953,26 +8953,6 @@
 
 					window.game=game;
 					game.dynamicStyle.init();
-					Object.defineProperty(lib.creation,"array",{
-						enumerable:true,
-						get:()=>[],
-						set:()=>null
-					});
-					Object.defineProperty(lib.creation,"object",{
-						enumerable:true,
-						get:()=>({}),
-						set:()=>null
-					});
-					Object.defineProperty(lib.creation,"nullObject",{
-						enumerable:true,
-						get:()=>Object.create(null),
-						set:()=>null
-					});
-					Object.defineProperty(lib.creation,"string",{
-						enumerable:true,
-						get:()=>"",
-						set:()=>null
-					});
 					// node:path library alternative
 					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
 						lib.path=window._noname_path;
