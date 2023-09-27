@@ -13630,7 +13630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuzhi:['re_zhuzhi','zhuzhi','xin_zhuzhi','old_zhuzhi'],
 			liuyu:['dc_liuyu','liuyu','ol_liuyu'],
 			zhangrang:['zhangrang','ol_zhangrang','junk_zhangrang'],
-			jikang:['re_jikang','jikang'],
+			jikang:['re_jikang','jikang','dc_jikang'],
 			xinxianying:['re_xinxianying','xinxianying','ol_xinxianying','sp_xinxianying'],
 			gongsunyuan:['re_gongsunyuan','gongsunyuan'],
 			zhoucang:['re_zhoucang','xin_zhoucang','zhoucang'],
