@@ -19873,7 +19873,7 @@
 			player:{
 				//新函数
 				/**
-				 * version 1.3
+				 * version 1.4
 				 * 
 				 * 链式创建一次性技能的api。
 				 *
@@ -19882,7 +19882,8 @@
 				when:function(){
 					if(!_status.postReconnect.player_when) _status.postReconnect.player_when=[
 						function(map){
-							for(var i in map){
+							"use strict";
+							for(let i in map){
 								lib.skill[i]={
 									charlotte:true,
 									forced:true,
@@ -19892,31 +19893,62 @@
 							}
 						},{}
 					];
-					var triggerNames=Array.from(arguments);
+					let triggerNames=Array.from(arguments);
+					let trigger;
 					if(triggerNames.length==0) throw 'player.when的参数数量应大于0';
-					var skillName='player_when_'+Math.random().toString(36).slice(-8);
-					while(lib.skill[skillName]!=null){
-						skillName='player_when_'+Math.random().toString(36).slice(-8);
+					//add other triggerNames
+					//arguments.length = 1
+					if(triggerNames.length==1){
+						//以下两种情况:
+						//triggerNames = [ ['xxAfter', ...args] ]
+						//triggerNames = [ 'xxAfter' ]
+						if(Array.isArray(triggerNames[0])||typeof triggerNames[0]=='string') trigger={player:triggerNames[0]};
+						//triggerNames = [ {player:'xxx'} ]
+						else if(get.is.object(triggerNames[0])) trigger=triggerNames[0];
 					}
-					triggerNames.push(`${skillName}After`);
-					var skill={
-						trigger:{player:triggerNames},
+					//arguments.length > 1
+					else{
+						//triggerNames = [ 'xxAfter', 'yyBegin' ]
+						if(triggerNames.every(t=>typeof t=='string')) trigger={player:triggerNames};
+						//triggerNames = [ {player: 'xxAfter'}, {global: 'yyBegin'} ]
+						//此处不做特殊的合并处理，由使用者自行把握
+						else if(triggerNames.every(t=>get.is.object(t))) trigger=triggerNames.reduce((pre,cur)=>Object.assign(pre,cur));
+					}
+					if(!trigger) throw 'player.when传参数类型错误:'+triggerNames;
+					let skillName;
+					do{
+						skillName='player_when_'+Math.random().toString(36).slice(-8);
+					}while(lib.skill[skillName]!=null);
+					let after=`${skillName}After`;
+					if(!trigger.player) trigger.player=after;
+					else if(Array.isArray(trigger.player)) trigger.player.add(after);
+					else if(typeof trigger.player=='string') trigger.player=[trigger.player,after];
+					let skill={
+						trigger,
 						forced:true,
 						charlotte:true,
 						popup:false,
-						filterFuns:[(event,player,name)=>{
-							return !name||(triggerNames.includes(name)&&event.player==player);
-						}],
+						//必要条件
+						filterFuns:[],
+						//充分条件
+						filter2Funs:[],
 						contentFuns:[],
 						get filter(){
-							return function(event,player,name){
+							return (event,player,name)=>{
 								if(name==`${skillName}After`){
 									skill.popup=false;
 									return true;
 								}
-								return skill.filterFuns.every(fun=>Boolean(fun(event,player,name)));
+								return skill.filterFuns.every(fun=>Boolean(fun(event,player,name)))&&
+									skill.filter2(event,player,name);
 							}
 						},
+						get filter2(){
+							return (event,player,name)=>{
+								return skill.filter2Funs.length==0||
+								skill.filter2Funs.some(fun=>Boolean(fun(event,player,name)));
+							};
+						}
 					};
 					Object.defineProperty(lib.skill,skillName,{
 						configurable:true,
@@ -19950,10 +19982,20 @@
 							skill.filterFuns.remove(fun);
 							return this;
 						},
+						filter2(fun){
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
+							skill.filter2Funs.push(fun);
+							return this;
+						},
+						removeFilter2(fun){
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
+							skill.filter2Funs.remove(fun);
+							return this;
+						},
 						then(fun){
 							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
 							skill.contentFuns.push(fun);
-							var str=`
+							let str=`
 								function content(){
 									if(event.triggername=='${skillName}After'){
 										player.removeSkill('${skillName}');
@@ -19962,13 +20004,13 @@
 										return event.finish();
 									}
 							`;
-							for(var i=0;i<skill.contentFuns.length;i++){
-								var fun2=skill.contentFuns[i];
-								var a=fun2.toString();
-								var str2=a.slice(a.indexOf("{")+1,a.lastIndexOf("}")!=-1?a.lastIndexOf("}"):undefined).trim();
+							for(let i=0;i<skill.contentFuns.length;i++){
+								let fun2=skill.contentFuns[i];
+								let a=fun2.toString();
+								let str2=a.slice(a.indexOf("{")+1,a.lastIndexOf("}")!=-1?a.lastIndexOf("}"):undefined).trim();
 								str+=`'step ${i}'\n\t${str2}\n\t`;
 							}
-							var result=eval(str+`\n};content;`);
+							let result=eval(str+`\n};content;`);
 							skill.content=result;
 							return this;
 						},
