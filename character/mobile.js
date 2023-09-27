@@ -11122,8 +11122,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					trigger.cancel();
-					var cards=trigger.cards.filterInD();
-					if(cards.length) player.gain(cards,'gain2','log');
+					if(trigger.cards){
+						var cards=trigger.cards.filterInD();
+						if(cards.length) player.gain(cards,'gain2','log');
+					}
 					'step 1'
 					player.loseMaxHp();
 				},

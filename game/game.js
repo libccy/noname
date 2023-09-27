@@ -57182,6 +57182,7 @@
 			}
 		},
 		number:function(card,player){
+			if(!card) return;
 			//狗卡你是真敢出啊
 			var number=null;
 			if(card.hasOwnProperty('number')){

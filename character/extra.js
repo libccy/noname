@@ -190,14 +190,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const character=node.link,characterInfo=get.character(node.link);
 						let capt=get.translation(character);
 						if(characterInfo){
-							const infoSex=characterInfo[0];
-							if(infoSex) capt+=`&nbsp;&nbsp;${infoSex=='none'?'无':lib.translate[infoSex]}`;
-							const infoGroup=characterInfo[1];
-							if(infoGroup){
-								const group=get.is.double(character,true);
-								if(group) capt+=`&nbsp;&nbsp;${group.map(value=>get.translation(value)).join('/')}`;
-								else capt+=`&nbsp;&nbsp;${lib.translate[infoGroup]}`;
-							}
+							const infoHp=get.infoMaxHp(characterInfo[2]);
+							capt+=`&nbsp;&nbsp;范围：${infoHp}`;
 						}
 						uiintro.add(capt);
 

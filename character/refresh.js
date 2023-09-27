@@ -4492,7 +4492,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyanyu2:{
 				trigger:{player:'phaseUseEnd'},
 				direct:true,
-				filter:(event,player)=>player.hasHistory('useSkill',evt=>evt.skill=='reyanyu'&&evt.event.getParent(2)==event),
+				filter:(event,player)=>player.hasHistory('useSkill',evt=>evt.skill=='reyanyu'&&evt.event.getParent(2)==event)&&game.hasPlayer(target=>target.hasSex('male')&&target!=player),
 				content:function(){
 					'step 0'
 					event.num=Math.min(3,player.getHistory('useSkill',evt=>evt.skill=='reyanyu'&&evt.event.getParent(2)==trigger).length);

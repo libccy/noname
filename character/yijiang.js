@@ -9246,10 +9246,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseUseEnd'},
 				direct:true,
 				filter:function(event,player){
-					return player.getHistory('lose',function(evt){
-						var evt2=evt.getParent();
-						return evt2.name=='useSkill'&&evt2.skill=='yanyu'&&evt.getParent(3)==event;
-					}).length>=2;
+					return player.getHistory('useSkill',function(evt){
+						return evt.skill=='yanyu'&&evt.event.getParent(2)==event;
+					}).length>=2&&game.hasPlayer(target=>target.hasSex('male')&&target!=player);
 				},
 				content:function(){
 					'step 0'

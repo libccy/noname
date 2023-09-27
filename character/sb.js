@@ -607,10 +607,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				delay:false,
 				filter:function(event,player){
-					return player.countCards('hes',{suit:'diamond'})>0;
+					return player.hasCard(card=>get.suit(card)=='diamond','hes')||game.hasPlayer(current=>current.hasJudge('lebu'));
 				},
 				position:'hes',
-				filterCard:{suit:'diamond'},
+				filterCard:function(card,player){
+					if(get.suit(card)!='diamond') return false;
+					var mod=game.checkMod(ui.selected.cards[0],player,'unchanged','cardEnabled2',player);
+					if(!mod) return false;
+					return true;
+				},
 				selectCard:[0,1],
 				filterTarget:function(card,player,target){
 					if(!ui.selected.cards.length){
@@ -618,10 +623,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return false;
 					}
 					if(player==target) return false;
-					var mod=game.checkMod(ui.selected.cards[0],player,'unchanged','cardEnabled2',player);
-					if(!mod) return false;
-					return player.canUse({name:'lebu',cards:ui.selected.cards},target);
+					return player.canUse(get.autoViewAs({name:'lebu'},ui.selected.cards),target);
 				},
+				complexSelect:true,
 				check:function(card){
 					return 7-get.value(card);
 				},

@@ -2189,7 +2189,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				clanSkill:true,
 				audioname:['clan_wuxian','clan_wuban','clan_wukuang'],
-				trigger:{player:'phaseZhunbeiBegin'},
+				trigger:{player:'phaseBegin'},
 				isMax:function(player){
 					var num=player.getHandcardLimit();
 					return !game.hasPlayer(function(current){
@@ -2283,7 +2283,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanguixiang:'贵相',
 			clanguixiang_info:'锁定技。你的非出牌阶段开始前，若此阶段即将成为你本回合内的第X个阶段（X为你的手牌上限），则你终止此阶段，改为进行一个出牌阶段。',
 			clanmuyin:'穆荫',
-			clanmuyin_info:'宗族技。准备阶段，你可以选择一名手牌上限不为全场最多的陈留吴氏角色。该角色的手牌上限+1。',
+			clanmuyin_info:'宗族技。回合开始时，你可以选择一名手牌上限不为全场最多的陈留吴氏角色。该角色的手牌上限+1。',
 			chenliuwushi:'陈留·吴氏',
 			clan_wuban:'族吴班',
 			clanzhanding:'斩钉',
