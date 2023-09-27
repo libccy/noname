@@ -5535,7 +5535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var list=game.filterPlayer(function(current){
-						return current.name=='guansuo'||current.name2=='guansuo';
+						return current.name=='ol_guansuo'||current.name2=='ol_guansuo';
 					});
 					if(list.length) game.asyncDraw(list);
 					else event.finish();
