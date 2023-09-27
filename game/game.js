@@ -19965,7 +19965,7 @@
 							for(var i=0;i<skill.contentFuns.length;i++){
 								var fun2=skill.contentFuns[i];
 								var a=fun2.toString();
-								var str2=a.slice(a.indexOf("{")+1,a.lastIndexOf("}")!=-1?a.lastIndexOf("}"):undefined).trim().split('\n').map(v=>v[v.length - 1]!= ';'?(v+';').trim():v.trim()).join('\n');
+								var str2=a.slice(a.indexOf("{")+1,a.lastIndexOf("}")!=-1?a.lastIndexOf("}"):undefined).trim();
 								str+=`'step ${i}'\n\t${str2}\n\t`;
 							}
 							var result=eval(str+`\n};content;`);
