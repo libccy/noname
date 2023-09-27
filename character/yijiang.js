@@ -2042,59 +2042,117 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource',
 				},
 				filter:function(event,player){
-					return player.storage.xinyaoming.length<3;
+					return game.hasPlayer(function(target){
+						return ['摸牌','弃牌','制衡'].some(function(control){
+							var storage=player.getStorage('xinyaoming_kanon');
+							if(storage.contains(control)) return false;
+							if(control=='摸牌'&&target!=player) return true;
+							if(control=='弃牌'&&target!=player&&target.countCards('h')) return true;
+							if(control=='制衡') return true;
+							return false;
+						});
+					});
 				},
 				direct:true,
-				init:function(player){
-					player.storage.xinyaoming=[];
-				},
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt2('xinyaoming'),function(card,player,target){
-						var s=player.storage.xinyaoming;
-						var pe=player.countCards('h');
-						var te=target.countCards('h');
-						if(s.contains('大于')&&pe>te) return false;
-						if((s.contains('等于')||target.countCards('he')==0)&&pe==te) return false;
-						if(s.contains('小于')&&pe<te) return false;
-						return true;
-					}).ai=function(target){
-						var player=_status.event.player;
-						return -get.sgn(target.countCards('h')-player.countCards('h'))*get.attitude(player,target);
+					var func=function(){
+						game.countPlayer(function(target){
+							var list=['摸牌','弃牌','制衡'].filter(function(control){
+								var storage=player.getStorage('xinyaoming_kanon');
+								if(storage.contains(control)) return false;
+								if(control=='摸牌'&&target!=player) return true;
+								if(control=='弃牌'&&target!=player&&target.countCards('h')) return true;
+								if(control=='制衡') return true;
+								return false;
+							}),str='';
+							for(var i of list) str+=(i+'<br>');
+							str=str.slice(0,-4);
+							target.prompt(str);
+						});
 					};
+					if(event.player==game.me) func();
+					else if(event.isOnline()) player.send(func);
+					player.chooseTarget(get.prompt2('xinyaoming'),function(card,player,target){
+						var storage=player.getStorage('xinyaoming_kanon');
+						if(!storage.contains('制衡')) return true;
+						if(target==player) return false;
+						return !storage.contains('摸牌')||target.countCards('h');
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						var storage=player.getStorage('xinyaoming_kanon');
+						if(get.attitude(player,target)>0&&!storage.contains('摸牌')&&target!=player) return get.effect(target,{name:'wuzhong'},player,player)/2;
+						if(get.attitude(player,target)<0&&!storage.contains('弃牌')&&target!=player&&target.countCards('h')) return get.effect(target,{name:'guohe_copy2'},player,player);
+						if(get.attitude(player,target)>0&&!storage.contains('制衡')) return get.effect(target,{name:'kaihua'},player,player);
+						return 0;
+					});
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
 						event.target=target;
 						player.logSkill('xinyaoming',target);
-						var ph=player.countCards('h');
-						var th=target.countCards('h');
-						if(ph>th){
-							player.storage.xinyaoming.push('大于');
-							target.draw();
-							event.finish();
-						}
-						else if(ph==th){
-							player.storage.xinyaoming.push('等于');
-							target.chooseToDiscard('he','弃置一到两张牌，然后摸等量的牌',true,[1,2]).ai=lib.skill.zhiheng.check;
-						}
+						var controls=['摸牌','弃牌','制衡'].filter(function(control){
+							var storage=player.getStorage('xinyaoming_kanon');
+							if(storage.contains(control)) return false;
+							if(control=='摸牌'&&target!=player) return true;
+							if(control=='弃牌'&&target!=player&&target.countCards('h')) return true;
+							if(control=='制衡') return true;
+							return false;
+						});
+						if(controls.length==1) event._result={control:controls[0]};
 						else{
-							player.storage.xinyaoming.push('小于');
-							player.discardPlayerCard(target,'h',true);
-							event.finish();
+							var str=get.translation(target);
+							var choiceList=[
+								'令'+str+'摸一张牌',
+								'弃置'+str+'一张手牌',
+								'令'+str+'弃置至多两张牌，然后其摸等量的牌',
+							];
+							var list=['摸牌','弃牌','制衡'];
+							for(var i=0;i<3;i++){
+								if(!controls.contains(list[i])){
+									choiceList[i]='<span style="opacity:0.5">'+choiceList[i]+'</span>';
+								}
+							}
+							player.chooseControl(controls).set('choiceList',choiceList).set('ai',function(){
+								var player=_status.event.player;
+								var target=_status.event.target;
+								var controls=_status.event.controls.slice();
+								controls.sort(function(a,b){
+									return [
+										get.effect(target,{name:'wuzhong'},player,player)/2,
+										get.effect(target,{name:'guohe_copy2'},player,player),
+										get.effect(target,{name:'kaihua'},player,player),
+									][['摸牌','弃牌','制衡'].indexOf(b)-['摸牌','弃牌','制衡'].indexOf(a)];
+								});
+								return controls[0];
+							}).set('target',target);
 						}
 					}
 					else event.finish();
 					'step 2'
-					if(result.bool) target.draw(result.cards.length);
+					player.addTempSkill('xinyaoming_kanon');
+					player.markAuto('xinyaoming_kanon',[result.control]);
+					switch(result.control){
+						case '摸牌':
+							target.draw();
+							break;
+						case '弃牌':
+							player.discardPlayerCard(target,'h',true);
+							break;
+						case '制衡':
+							target.chooseToDiscard([1,2],'he','邀名：弃置至多两张牌，然后摸等量的牌',true).set('ai',card=>lib.skill.zhiheng.check(card));
+							break;
+					}
+					if(result.control!='制衡') event.finish();
+					'step 3'
+					if(result.bool){
+						target.draw(result.cards.length);
+					}
 				},
-				group:'xinyaoming_kanon',
 				subSkill:{
 					kanon:{
-						trigger:{global:'phaseAfter'},
-						silent:true,
-						sub:true,
-						content:function(){lib.skill.xinyaoming.init(player)}
+						charlotte:true,
+						onremove:true,
 					},
 				},
 			},
@@ -13869,7 +13927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yaoming:'邀名',
 			yaoming_info:'每回合限一次，当你造成或受到伤害后，你可以选择一项：1. 弃置手牌数大于你的一名角色的一张手牌；2. 令手牌数小于你的一名角色摸一张牌',
 			xinyaoming:'邀名',
-			xinyaoming_info:'每回合每个选项限一次，当你造成或受到伤害后，你可以选择一项：1. 弃置手牌数大于你的一名角色的一张手牌；2. 令手牌数小于你的一名角色摸一张牌；3.令手牌数等于你的角色弃置至多两张牌，然后摸等量的牌。',
+			xinyaoming_info:'每回合每个选项限一次，当你造成或受到伤害后，你可以选择一项：1. 弃置一名其他角色的一张手牌；2. 令一名其他角色摸一张牌；3.令一名角色弃置至多两张牌，然后摸等量的牌。',
 			anguo:'安国',
 			anguo_info:'出牌阶段限一次，你可以选择一名其他角色装备区里的一张牌，令其获得此牌。然后若该角色攻击范围内的角色数因此减少，则你摸一张牌。',
 			yanzhu:'宴诛',
