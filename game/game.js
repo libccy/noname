@@ -8521,15 +8521,15 @@
                             if(lines.length>=10){ 
                                 if(line>4){ 
                                     for(let i=line-5;i<line+6&&i<lines.length;i++){ 
-                                        showCode+=`${i}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
+                                        showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
                                     } 
                                 }else{ 
                                     for(let i=0;i<line+6&&i<lines.length;i++){ 
-                                        showCode+=`${i}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
+                                        showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
                                     } 
                                 } 
                             }else{ 
-                                showCode=lines.map((_line,i)=>`${i}| ${line==i+1?'⚠️':''}${_line}\n`).toString(); 
+                                showCode=lines.map((_line,i)=>`${i+1}| ${line==i+1?'⚠️':''}${_line}\n`).toString(); 
 							} 
 							return showCode;
 						}
