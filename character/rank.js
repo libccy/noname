@@ -32,6 +32,7 @@ window.noname_character_rank={
 		'zhangmancheng',
 		'wu_zhugeliang',
 		'sunlingluan',
+		'wu_luxun',
 		'key_mio',
 		'key_midori',
 		'key_yuri',

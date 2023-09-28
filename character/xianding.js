@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			wu_luxun:['male','wu',3,['dcxiongmu','dczhangcai','dcruxian']],
 			dc_xujing:['male','shu',3,['dcshangyu','dccaixia']],
 			dc_zhaoxiang:['female','shu',4,['refanghun','refuhan']],
 			ol_guansuo:['male','shu',4,['xinzhengnan','xiefang']],
@@ -96,10 +97,144 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi'],
 				sp2_qifu:['ol_guansuo','dc_zhaoxiang','dc_xujing'],
 				sp2_gaoshan:['wanglang','liuhui'],
-				sp2_wumiao:['wu_zhugeliang'],
+				sp2_wumiao:['wu_zhugeliang','wu_luxun'],
 			}
 		},
 		skill:{
+			//武陆逊
+			dcxiongmu:{
+				audio:2,
+				trigger:{global:'roundStart'},
+				filter:function(event,player){
+					return player.countCards('h')<player.maxHp;
+				},
+				group:'dcxiongmu_minus',
+				prompt2:function(event,player){
+					return '将手牌摸至'+get.cnNumber(player.maxHp)+'张，然后将任意张牌随机置入牌堆并从牌堆或弃牌堆中获得等量点数为8的牌。';
+				},
+				content:function(){
+					'step 0'
+					player.drawTo(player.maxHp);
+					'step 1'
+					var cards=player.getCards('he');
+					if(!cards.length) event.finish();
+					else if(cards.length==1) event._result={bool:true,cards:cards};
+					else player.chooseCard('雄幕：将任意张牌置入牌堆的随机位置','he',[1,Infinity]).set('ai',card=>{
+						return 6-get.value(card);
+					});
+					'step 2'
+					if(result.bool){
+						var cards=result.cards;
+						event.cards=cards;
+						player.$throw(cards.length);
+						player.lose(cards,ui.cardPile).insert_index=function(){
+							return ui.cardPile.childNodes[ui.cardPile.childNodes.length-1];
+						};
+						var list=[];
+						var piles=['cardPile','discardPile'];
+						for(var pile of piles){
+							for(var i=0;i<ui[pile].childNodes.length;i++){
+								var card=ui.cardPile.childNodes[i];
+								var number=get.number(card,false);
+								if(!list.contains(card)&&number==8){
+									list.push(card);
+									if(list.length==cards.length) break;
+								}
+							}
+						}
+						if(list.length){
+							player.gain(list,'gain2').gaintag.add('dcxiongmu_tag');
+							player.addSkill('dcxiongmu_tag');
+						}
+					}
+					else event.finish();
+				},
+				subSkill:{
+					minus:{
+						trigger:{player:'damageBegin4'},
+						filter:function(event,player){
+							return game.getGlobalHistory('everything',evt=>{
+								return evt.name=='damage'&&evt.player==player;
+							}).indexOf(event)==0;
+						},
+						forced:true,
+						locked:false,
+						content:function(){
+							trigger.num--;
+						}
+					},
+					tag:{
+						charlotte:true,
+						onremove:function(player){
+							player.removeGaintag('dcxiongmu_tag');
+						},
+						mod:{
+							ignoredHandcard:function(card,player){
+								if(card.hasGaintag('dcxiongmu_tag')) return true;
+							},
+							cardDiscardable:function(card,player,name){
+								if(name=='phaseDiscard'&&card.hasGaintag('dcxiongmu_tag')) return false;
+							},
+						},
+					}
+				}
+			},
+			dczhangcai:{
+				audio:2,
+				trigger:{
+					player:['useCard','respond'],
+				},
+				filter:function(event,player){
+					if(player.hasSkill('dczhangcai_all')) return true;
+					return get.number(event.card)==8;
+				},
+				prompt2:function(event,player){
+					var num=player.hasSkill('dczhangcai_all')?get.number(event.card):8;
+					return '你可以摸'+get.cnNumber(Math.max(1,player.countCards('h',card=>get.number(card)==num)))+'张牌。';
+				},
+				frequent:true,
+				content:function(){
+					'step 0'
+					var num=player.hasSkill('dczhangcai_all')?get.number(trigger.card):8;
+					player.draw(Math.max(1,player.countCards('h',card=>{
+						return get.number(card)==num;
+					})));
+				},
+				ai:{
+					threaten:4,
+				},
+				subSkill:{
+					all:{
+						charlotte:true,
+						mark:true,
+						intro:{
+							content:'当你使用或打出牌时，你可以摸X张牌（X为你手牌中与此牌点数相同的牌数且至少为1）'
+						},
+					},
+				}
+			},
+			dcruxian:{
+				audio:2,
+				enable:'phaseUse',
+				limited:true,
+				skillAnimation:true,
+				animationColor:'wood',
+				content:function(){
+					'step 0'
+					player.awakenSkill('dcruxian');
+					player.addTempSkill('dczhangcai_all',{player:'phaseBegin'});
+				},
+				ai:{
+					order:15,
+					result:{
+						player:function(player){
+							if(!player.hasSkill('dczhangcai')) return 0;
+							if(player.countCards('hs',card=>player.hasValueTarget(card))>3||player.hp==1) return 5;
+							return 0;
+						}
+					}
+				}
+			},
 			//新杀许靖
 			dcshangyu:{
 				audio:2,
@@ -11977,6 +12112,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcluochong:function(player){
 				return '一轮游戏开始时，你可以弃置任意名角色区域里的共计至多['+(4-player.countMark('dcluochong'))+']张牌，然后若你以此法弃置了一名角色的至少三张牌，则你方括号内的数字-1。';
 			},
+			dczhangcai:function(player){
+				return '当你使用或打出'+(player.hasSkill('dczhangcai_all')?'':'点数为8的')+'牌时，你可以摸X张牌（X为你手牌区里'+(player.hasSkill('dczhangcai_all')?'与此牌点数相同':'点数为8')+'的牌数且至少为1）。';
+			},
 		},
 		perfectPair:{},
 		characterReplace:{
@@ -12445,6 +12583,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshangyu_info:'锁定技。游戏开始时，你获得一张【杀】并记录之，然后将此牌交给一名角色，你获得如下效果：1.当一名角色使用此牌造成伤害后，你与其各摸一张牌；2.当此牌进入弃牌堆后，你将此牌交给一名本回合未以此法得到过此牌的角色。',
 			dccaixia:'才瑕',
 			dccaixia_info:'当你造成或受到伤害后，若你没有“瑕”，你可以摸至多X张牌并获得X枚“瑕”，然后当你使用牌时，移去1枚“瑕”（X为场上角色数且至多为5）。',
+			wu_luxun:'武陆逊',
+			dcxiongmu:'雄幕',
+			dcxiongmu_tag:'雄幕',
+			dcxiongmu_info:'①一轮游戏开始时，你可以将手牌摸至体力上限，然后将任意张牌随机置入牌堆，从牌堆或弃牌堆中获得等量的点数为8的牌，且这些牌不计入手牌上限。②当你于一回合首次受到伤害时，若你的手牌数不大于你的体力值，此伤害-1。',
+			dczhangcai:'彰才',
+			dczhangcai_info:'当你使用或打出点数为8的牌时，你可以摸X张牌（X为你手牌区里点数为8的牌数且至少为1）。',
+			dcruxian:'儒贤',
+			dcruxian_info:'限定技。出牌阶段，你可以令你〖彰才〗的点数限制取消，且摸牌数改为等同于你手牌区内与此牌点数相同的牌数且至少为1，直到你的下回合开始。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
