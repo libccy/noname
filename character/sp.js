@@ -24372,7 +24372,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lisu:['ol_lisu','lisu'],
 			fuwan:['fuwan','sp_fuwan','tw_fuwan'],
 			huaxin:['ol_huaxin','huaxin','sp_huaxin'],
-			xujing:['xujing','tw_xujing','sp_xujing'],
+			xujing:['dc_xujing','xujing','tw_xujing','sp_xujing'],
 			zhaoxiang:['zhaoxiang','tw_zhaoxiang','dc_zhaoxiang'],
 			dengzhi:['ol_dengzhi','re_dengzhi','tw_dengzhi','dengzhi'],
 			wangrong:['wangrong','ol_wangrong'],
@@ -24574,7 +24574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hejin:'何进',
 			hansui:'韩遂',
 			niujin:'牛金',
-			xujing:'许靖',
+			xujing:'OL许靖',
 			yuantanyuanshang:'袁谭袁尚',
 			
 			xinfenyue:'奋钺',

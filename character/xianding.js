@@ -4,6 +4,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			dc_xujing:['male','shu',3,['dcshangyu','dccaixia']],
+			dc_zhaoxiang:['female','shu',4,['refanghun','refuhan']],
+			ol_guansuo:['male','shu',4,['xinzhengnan','xiefang']],
 			dc_shixie:['male','qun',3,['rebiluan','ollixia']],
 			dc_sp_machao:['male','qun',4,['zhuiji','dc_olshichou']],
 			old_huangfusong:['male','qun',4,['xinfenyue']],
@@ -91,11 +94,182 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi'],
+				sp2_qifu:['ol_guansuo','dc_zhaoxiang','dc_xujing'],
 				sp2_gaoshan:['wanglang','liuhui'],
 				sp2_wumiao:['wu_zhugeliang'],
 			}
 		},
 		skill:{
+			//新杀许靖
+			dcshangyu:{
+				audio:2,
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
+				filter:function(event,player){
+					return event.name!='phase'||game.phaseNumber==0;
+				},
+				forced:true,
+				content:function(){
+					'step 0'
+					var card=get.cardPile(card=>get.name(card,false)=='sha');
+					if(card){
+						event.card=card;
+						player.gain(card,'gain2').gaintag.add('dcshangyu_tag');
+						player.markAuto('dcshangyu',card);
+					}
+					else{
+						player.chat('不是，连杀都没有？');
+						event.finish();
+					}
+					'step 1'
+					if(get.owner(card)==player&&get.position(card)=='h'){
+						player.chooseTarget(`赏誉：将${get.translation(card)}交给一名角色`,lib.filter.notMe,true);
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						player.line(target);
+						player.give(card,target).gaintag.add('dcshangyu_tag');
+						player.addSkill('dcshangyu_effect');
+					}
+				},
+				subSkill:{
+					effect:{
+						audio:'dcshangyu',
+						trigger:{
+							global:'damageSource',
+						},
+						filter:function(event,player){
+							return event.cards&&event.cards.some(card=>player.getStorage('dcshangyu').includes(card));
+						},
+						forced:true,
+						charlotte:true,
+						direct:true,
+						group:'dcshangyu_transfer',
+						content:function(){
+							'step 0'
+							var list=[player];
+							if(trigger.source&&trigger.source.isIn()){
+								player.logSkill('dcshangyu_effect',trigger.source);
+								list.push(trigger.source);
+							}
+							else player.logSkill('dcshangyu_effect');
+							list.sortBySeat();
+							game.asyncDraw(list);
+						}
+					},
+					transfer:{
+						audio:'dcshangyu',
+						trigger:{
+							global:['loseAfter','loseAsyncAfter','cardsDiscardAfter','equipAfter'],
+						},
+						forced:true,
+						direct:true,
+						filter:function(event,player){
+							if(!game.hasPlayer(current=>{
+								return !player.getStorage('dcshangyu_transfer').includes(current);
+							})) return false;
+							return event.getd().some(card=>{
+								return get.position(card)=='d'&&player.getStorage('dcshangyu').includes(card);
+							});
+						},
+						content:function(){
+							'step 0'
+							var cards=trigger.getd().filter(card=>{
+								return get.position(card)=='d'&&player.getStorage('dcshangyu').includes(card);
+							});
+							event.cards=cards;
+							player.chooseTarget(`赏誉：将${get.translation(cards)}交给一名可选角色`,(card,player,target)=>{
+								return !player.getStorage('dcshangyu_transfer').includes(target);
+							},true);
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.logSkill('dcshangyu_transfer',target);
+								if(!player.storage.dcshangyu_transfer){
+									player.when({global:'phaseAfter'})
+										.then(()=>{
+											player.unmarkSkill('dcshangyu_transfer');
+											delete player.storage.dcshangyu_transfer;
+										});
+								}
+								player.markAuto('dcshangyu_transfer',target);
+								target.gain(cards,'gain2').set('giver',player).gaintag.add('dcshangyu_tag');
+							}
+						},
+						intro:{
+							content:'本回合已交给过$',
+						},
+					},
+				},
+			},
+			dccaixia:{
+				audio:2,
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				filter:function(event,player){
+					return !player.hasMark('dccaixia_clear');
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var choices=Array.from({length:Math.min(5,game.countPlayer())}).map((_,i)=>get.cnNumber(i+1,true));
+					player.chooseControl(choices,'cancel2').set('prompt',get.prompt('dccaixia')).set('prompt2','你可以摸至多'+get.cnNumber(choices.length)+'张牌，但是你此后需要再使用等量的牌才可再发动本技能。').set('ai',()=>{
+						return _status.event.choice;
+					}).set('choice',function(){
+						if(player.isPhaseUsing()){
+							if(!player.hasCard(card=>{
+								return get.tag(card,'damage')&&player.hasValueTarget(card);
+							},'hs')) return 0;
+							var cards=player.getCards('hs',card=>{
+								return player.hasValueTarget(card);
+							});
+							if(!cards.some(card=>get.tag(card,'damage'))) return 0;
+							return Math.min(choices.length,cards.filter(card=>!get.tag(card,'damage')).length+1);
+						}
+						return choices.length;
+					}());
+					'step 1'
+					if(result.control!='cancel2'){
+						player.logSkill('dccaixia');
+						var num=result.index+1;
+						player.draw(num);
+						player.addMark('dccaixia_clear',num);
+						player.addSkill('dccaixia_clear');
+					}
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(!get.tag(card,'damage')) return;
+						if(player.countMark('dccaixia_clear')>1) return num/2;
+						return num+6;
+					},
+				},
+				subSkill:{
+					clear:{
+						trigger:{player:'useCard1'},
+						filter:function(event,player){
+							return player.hasMark('dccaixia_clear');
+						},
+						forced:true,
+						popup:false,
+						charlotte:true,
+						content:function(){
+							player.removeMark('dccaixia_clear',1);
+						},
+						intro:{
+							name:'才瑕',
+							name2:'瑕',
+							content:'距离刷新技能还需使用&张牌',
+						},
+					}
+				},
+			},
 			//十周年二乔
 			dcxingwu: {
 				intro: {
@@ -12263,6 +12437,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_huangfusong:'新杀皇甫嵩',
 			dc_sp_machao:'群马超',
 			dc_shixie:'新杀士燮',
+			ol_guansuo:'新杀关索',
+			dc_zhaoxiang:'新杀赵襄',
+			dc_xujing:'许靖',
+			dcshangyu:'赏誉',
+			dcshangyu_tag:'赏誉',
+			dcshangyu_info:'锁定技。游戏开始时，你获得一张【杀】并记录之，然后将此牌交给一名角色，你获得如下效果：1.当一名角色使用此牌造成伤害后，你与其各摸一张牌；2.当此牌进入弃牌堆后，你将此牌交给一名本回合未以此法得到过此牌的角色。',
+			dccaixia:'才瑕',
+			dccaixia_info:'当你造成或受到伤害后，若你没有“瑕”，你可以摸至多X张牌并获得X枚“瑕”，然后当你使用牌时，移去1枚“瑕”（X为场上角色数且至多为5）。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
@@ -12277,6 +12459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp2_yuxiu:'钟灵毓秀',
 			sp2_wumiao:'武庙',
 			sp2_gaoshan:'高山仰止',
+			sp2_qifu:'祈福',
 		},
 	};
 });
