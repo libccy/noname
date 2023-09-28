@@ -9468,20 +9468,7 @@
 							if(!idbDatabase.objectStoreNames.contains('video')) idbDatabase.createObjectStore('video',{
 								keyPath:'time'
 							});
-							if(!idbDatabase.objectStoreNames.contains('file')) idbDatabase.createObjectStore('file').transaction.oncomplete=()=>{
-								if(idbDatabase.objectStoreNames.contains('audio')) idbDatabase.transaction('audio').objectStore('audio').openCursor().onsuccess=event=>{
-									const result=event.target.result;
-									if(!result) return;
-									idbDatabase.transaction('file','readwrite').objectStore('file').put(result.value,result.key);
-									result.continue();
-								};
-								if(idbDatabase.objectStoreNames.contains('image')) idbDatabase.transaction('image').objectStore('image').openCursor().onsuccess=event=>{
-									const result=event.target.result;
-									if(!result) return;
-									idbDatabase.transaction('file','readwrite').objectStore('file').put(result.value,result.key);
-									result.continue();
-								};
-							};
+							if(!idbDatabase.objectStoreNames.contains('file')) idbDatabase.createObjectStore('file');
 							if(!idbDatabase.objectStoreNames.contains('config')) idbDatabase.createObjectStore('config');
 							if(!idbDatabase.objectStoreNames.contains('data')) idbDatabase.createObjectStore('data');
 						};
@@ -10478,7 +10465,8 @@
 				const style=document.createElement("link");
 				style.rel="stylesheet";
 				if(path){
-					if(file) path=`${path}/${file}.css`;
+					if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
+					if(file) path=`${path}${/^db:extension-[^:]*$/.test(path)?':':'/'}${file}.css`;
 					(path.indexOf('db:')==0?game.getDB('file',path.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(path))).then(resolvedPath=>{
 						style.href=resolvedPath;
 						if(typeof before=='function'){
@@ -10513,7 +10501,7 @@
 					file.forEach(value=>lib.init.js(path,value,onLoad,onError));
 					return;
 				}
-				let scriptSource=file?`${path}/${file}.js`:path;
+				let scriptSource=file?`${path}${/^db:extension-[^:]*$/.test(path)?':':'/'}${file}.js`:path;
 				if(path.indexOf('http')==0) scriptSource+=`?rand=${get.id()}`;
 				else if(lib.config.fuck_sojson&&scriptSource.includes('extension')!=-1&&scriptSource.indexOf(lib.assetURL)==0){
 					const pathToRead=scriptSource.slice(lib.assetURL.length);
@@ -12423,7 +12411,7 @@
 						ui.create.dialog(str).videoId=id;
 						if(ui.backgroundMusic) ui.backgroundMusic.pause();
 						if(lib.config.background_audio){
-							if(beatmap.filename.indexOf('ext:')==0) game.playAudio('..','extension',beatmap.filename.slice(4),beatmap.name);
+							if(beatmap.filename.indexOf('ext:')==0) game.playAudio(beatmap.filename);
 							else game.playAudio('effect',beatmap.filename);
 						}
 					},player,event.videoId,event.beatmap);
@@ -12636,11 +12624,10 @@
 						
 						game.pause();
 						game.countChoose();
-						setTimeout(function(){
-							if(lib.config.background_audio){
-								if(beatmap.filename.indexOf('ext:')==0) game.playAudio('..','extension',beatmap.filename.slice(4),beatmap.name);
-								else game.playAudio('effect',beatmap.filename);
-							}
+						setTimeout(()=>{
+							if(!lib.config.background_audio) return;
+							if(beatmap.filename.indexOf('ext:')==0) game.playAudio(beatmap.filename);
+							else game.playAudio('effect',beatmap.filename);
 						},Math.floor(speed*100*(0.9+beatmap.judgebar_height))+beatmap.current);
 						setTimeout(function(){
 							addNode();
@@ -18336,25 +18323,17 @@
 						}
 					}
 					else if(!event.nopopup) player.tryCardAnimate(card,card.name,'wood');
-					if(cardaudio&&event.getParent(3).name=='useCard'){
-						game.broadcastAll(function(player,card){
-							if(lib.config.background_audio){
-								var sex=player.sex=='female'?'female':'male';
-								var audioinfo=lib.card[card.name].audio;
-								// if(audioinfo||true){
-									if(typeof audioinfo=='string'&&audioinfo.indexOf('ext:')==0){
-										game.playAudio('..','extension',audioinfo.slice(4),card.name+'_'+sex);
-									}
-									else{
-										game.playAudio('card',sex,card.name);
-									}
-								// }
-								// else{
-								// 	game.playAudio('card/default');
-								// }
-							}
-						},player,card);
-					}
+					if(cardaudio&&event.getParent(3).name=='useCard') game.broadcastAll((player,card)=>{
+						if(!lib.config.background_audio) return;
+						const sex=player.sex=='female'?'female':'male',audio=lib.card[card.name].audio;
+						if(typeof audio=='string'){
+							const audioInfo=audio.split(':');
+							if(audio.indexOf('db:')==0) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,audioInfo[2],`${card.name}_${sex}.${audioInfo[3]||'mp3'}`);
+							else if(audio.indexOf('ext:')==0) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${card.name}_${sex}.${audioInfo[2]||'mp3'}`);
+							else game.playAudio('card',sex,`${audioInfo[0]}.${audioInfo[1]||'mp3'}`);
+						}
+						else game.playAudio('card',sex,card.name);
+					},player,card);
 					if(event.skill){
 						if(player.stat[player.stat.length-1].skill[event.skill]==undefined){
 							player.stat[player.stat.length-1].skill[event.skill]=1;
