@@ -7842,6 +7842,10 @@
 						}
 					}
 					return result;
+				},
+				div(){
+					const dom=lib.linq.dom;
+					return dom.inject(document.createElement("div"),dom.generate(...arguments));
 				}
 			}
 		},
