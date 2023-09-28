@@ -193,6 +193,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									player.when('phaseAfter')
 										.then(()=>{
 											player.unmarkSkill('dcshangyu_transfer');
+											delete player.storage.dcshangyu_transfer;
 										});
 								}
 								player.markAuto('dcshangyu_transfer',target);

@@ -24574,7 +24574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hejin:'何进',
 			hansui:'韩遂',
 			niujin:'牛金',
-			xujing:'许靖',
+			xujing:'OL许靖',
 			yuantanyuanshang:'袁谭袁尚',
 			
 			xinfenyue:'奋钺',
