@@ -589,13 +589,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.responded||event.psshouli||event.type=='wuxie') return false;
 					if(game.hasPlayer(function(current){
-						return current.getEquip(4);
+						return current.getEquips(4).length>0;
 					})&&event.filterCard({
 						name:'sha',
 						storage:{psshouli:true},
 					},player,event)) return true;
 					if(game.hasPlayer(function(current){
-						return current.getEquip(3);
+						return current.getEquips(3).length>0;
 					})&&event.filterCard({
 						name:'shan',
 						storage:{psshouli:true},
@@ -607,23 +607,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					var event=_status.event,evt=event;
 					if(event._backup) evt=event._backup;
-					var equip3=target.getEquip(3);
-					var equip4=target.getEquip(4);
-					if(equip3&&evt.filterCard(get.autoViewAs({
+					var equip3=target.getCards('e',card=>get.subtype(card,false)=='equip3');
+					var equip4=target.getCards('e',card=>get.subtype(card,false)=='equip4');
+					if(equip3.length&&equip3.some(card=>evt.filterCard(get.autoViewAs({
 						name:'shan',
 						storage:{psshouli:true},
-					},[equip3]),player,event)) return true;
-					var sha=get.autoViewAs({
-						name:'sha',
-						storage:{psshouli:true},
-					},[equip4]);
-					if(equip4&&evt.filterCard(sha,player,event)){
-						if(!evt.filterTarget) return true;
-						return game.hasPlayer(function(current){
-							return evt.filterTarget(sha,player,current);
-						})
-					};
-					return false;
+					},[card]),player,event))) return true;
+					return equip4.some(card=>{
+						var sha=get.autoViewAs({
+							name:'sha',
+							storage:{psshouli:true},
+						},[card]);
+						if(evt.filterCard(sha,player,event)){
+							if(!evt.filterTarget) return true;
+							return game.hasPlayer(function(current){
+								return evt.filterTarget(sha,player,current);
+							})
+						};
+					})
 				},
 				prompt:'将场上的一张坐骑牌当做【杀】或【闪】使用或打出',
 				content:function(){
@@ -631,32 +632,45 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var evt=event.getParent(2);
 					evt.set('psshouli',true);
 					var list=[];
-					var equip3=target.getEquip(3);
-					var equip4=target.getEquip(4);
+					var equip3=target.getCards('e',card=>get.subtype(card,false)=='equip3');
+					var equip4=target.getCards('e',card=>get.subtype(card,false)=='equip4');
 					var backupx=_status.event;
 					_status.event=evt;
 					try{
-						if(equip3){
+						if(equip3.length&&equip3.some(card=>{
 							var shan=get.autoViewAs({
 								name:'shan',
 								storage:{psshouli:true},
-							},[equip3]);
-							if(evt.filterCard(shan,player,event)) list.push('shan');
+							},[card]);
+							if(evt.filterCard(shan,player,event)) return true;
+							return false;
+						})){
+							list.push('shan');
 						}
-						if(equip4){
+						if(equip4.length&&equip4.some(card=>{
 							var sha=get.autoViewAs({
 								name:'sha',
 								storage:{psshouli:true},
-							},[equip4]);
+							},[card]);
 							if(evt.filterCard(sha,player,evt)&&(!evt.filterTarget||game.hasPlayer(function(current){
 								return evt.filterTarget(sha,player,current);
-							}))) list.push('sha');
+							}))) return true;
+							return false;
+						})){
+							list.push('sha');
 						};
 					}catch(e){game.print(e)};
 					_status.event=backupx;
-					if(list.length==1) event._result={
-						bool:true,
-						links:[list[0]=='shan'?equip3:equip4],
+					if(list.length==1){
+						event.cardName=list[0];
+						var cards=list[0]=='shan'?equip3:equip4;
+						if(cards.length==1) event._result={
+							bool:true,
+							links:[cards[0]],
+						}
+						else player.choosePlayerCard(true,target,'e').set('filterButton',function(button){
+							return _status.event.cards.contains(button.link);
+						}).set('cards',cards)
 					}
 					else player.choosePlayerCard(true,target,'e').set('filterButton',function(button){
 						var type=get.subtype(button.link);
@@ -665,7 +679,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var evt=event.getParent(2);
 					if(result.bool&&result.links&&result.links.length){
-						var name=get.subtype(result.links[0])=='equip3'?'shan':'sha';
+						var name=(event.cardName||(get.subtype(result.links[0])=='equip4'?'sha':'shan'));
 						if(evt.name=='chooseToUse'){
 							game.broadcastAll(function(result,name){
 								lib.skill.psshouli_backup.viewAs={
@@ -739,7 +753,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					init:{
-						audio:'shouli',
+						audio:'psshouli',
 						trigger:{
 							global:'phaseBefore',
 							player:'enterGame',
