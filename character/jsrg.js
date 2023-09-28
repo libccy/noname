@@ -978,6 +978,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							position:'hes',
 							viewAs:{name:links[0][2],nature:links[0][3]},
 							precontent:function(){
+								player.logSkill('jsrgnianen');
 								delete event.result.skill;
 								var card=event.result.card;
 								if(get.color(card,player)!='red'||get.name(card)!='sha'||get.natureList(card).length){

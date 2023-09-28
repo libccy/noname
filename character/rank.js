@@ -604,6 +604,7 @@ window.noname_character_rank={
 		'zhaoxiang',
 		'chenshi',
 		'xiahoumao',
+		'dc_xujing',
 	],
 	bp:[
 		'chess_diaochan',

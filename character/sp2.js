@@ -4,8 +4,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
-			dc_zhaoxiang:['female','shu',4,['refanghun','refuhan']],
-			ol_guansuo:['male','shu',4,['xinzhengnan','xiefang']],
 			dc_jikang:['male','wei',3,['new_qingxian','dcjuexiang']],
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
@@ -110,7 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_xuzhou:['re_taoqian','caosong','zhangmiao','qiuliju'],
 				sp_zhongyuan:['re_hucheer','re_zoushi','caoanmin','re_dongcheng'],
 				sp_xiaohu:['haomeng','yanfuren','yanrou','dc_zhuling'],
-				sp_decade:['caobuxing','re_maliang','xin_baosanniang','dc_jikang','ol_guansuo','dc_zhaoxiang'],
+				sp_decade:['caobuxing','re_maliang','xin_baosanniang','dc_jikang'],
 			}
 		},
 		skill:{
@@ -10627,13 +10625,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcdanji_info:'觉醒技。准备阶段，若你的手牌数大于体力值，你减1点体力上限，将体力回复至体力上限，然后获得〖马术〗和〖怒嗔〗。',
 			dcnuchen:'怒嗔',
 			dcnuchen_info:'出牌阶段限一次。你可以展示一名其他角色的一张手牌，然后选择一项：1.弃置任意张该花色的牌，对其造成等量伤害；2.获得该角色手牌中所有此花色的牌。',
-			dc_jikang:'新杀嵇康',
-			dcjuexiang:'绝响',
-			dcjuexiang_info:'当你死亡时，杀死你的角色弃置其装备区内的所有牌并失去1点体力，然后你可以令一名其他角色获得〖残韵〗。',
-			dccanyun:'残韵',
-			dccanyun_info:'每名角色限一次。出牌阶段，你可以弃置一张牌并选择一名其他角色，然后若其装备区里的牌数：小于你，其回复1点体力；大于你，其失去1点体力；等于你，其摸一张牌。若你的体力值为1，你摸一张牌。',
-			ol_guansuo:'新杀关索',
-			dc_zhaoxiang:'新杀赵襄',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
