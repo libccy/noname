@@ -855,13 +855,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						enable:'chooseToUse',
 						filter:function(event,player){
 							return player.isTurnedOver()&&game.hasPlayer(current=>{
-								return current.hasSkill('jsrgzhangdeng');
+								return current.hasSkill('jsrgzhangdeng')&&current.isTurnedOver();
 							});
 						},
 						viewAs:{name:'jiu',isCard:true},
 						viewAsFilter:function(player){
 							return player.isTurnedOver()&&game.hasPlayer(current=>{
-								return current.hasSkill('jsrgzhangdeng');
+								return current.hasSkill('jsrgzhangdeng')&&current.isTurnedOver();
 							});
 						},
 						filterCard:()=>false,
@@ -869,7 +869,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						precontent:function(){
 							player.logSkill('jsrgzhangdeng_jiu');
 							var targets=game.filterPlayer(current=>{
-								return current.hasSkill('jsrgzhangdeng');
+								return current.hasSkill('jsrgzhangdeng')&&current.isTurnedOver();
 							});
 							player.line(targets[0]);
 							delete event.result.skill;
@@ -978,9 +978,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							position:'hes',
 							viewAs:{name:links[0][2],nature:links[0][3]},
 							precontent:function(){
+								player.logSkill('jsrgnianen');
 								delete event.result.skill;
 								var card=event.result.card;
-								if(get.color(card,player)!='red'||get.name(card)!='sha'||get.nature(card)){
+								if(get.color(card,player)!='red'||get.name(card)!='sha'||get.natureList(card).length){
 									player.addTempSkill('jsrgnianen_blocker');
 									player.addAdditionalSkill('jsrgnianen_blocker','mashu');
 								}
@@ -1257,6 +1258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							[listx,'vcard'],
 						]).set('ai',()=>Math.random()+1);
 					}
+					event.list=list;
 					'step 1'
 					if(result.bool){
 						var name=result.links[0][2],nature=result.links[0][3];
@@ -1273,7 +1275,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							prompt2:str,
 							filterCard:lib.filter.cardDiscardable,
 							position:'he',
-							goon:get.attitude(player,trigger.player)>1&&(evt.card?get.effect(trigger.player,evt.card,evt.player,player)<0:get.effect(trigger.player,{name:list[0]},trigger.player,player)>0),
+							goon:get.attitude(player,trigger.player)>1&&(evt.card?get.effect(trigger.player,evt.card,evt.player,player)<0:get.effect(trigger.player,{name:event.list[0]},trigger.player,player)>0),
 							ai1:function(card){
 								if(_status.event.goon) return 6-get.value(card);
 								return 0;	
@@ -1826,7 +1828,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-							return event.nature=='fire';
+							return event.hasNature('fire');
 						},
 						content:function(){
 							player.addTempSkill('jsrgshishou_blocker',{player:'phaseEnd'});

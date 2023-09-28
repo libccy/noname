@@ -96,9 +96,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:1,
 				cardPrompt:function(card){
-					if(card.nature=='stab') return '出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，且在此之后需弃置一张手牌（没有则不弃）。否则你对其造成1点伤害。';
-					if(lib.linked.contains(card.nature)) return '出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，否则你对其造成1点'+get.translation(card.nature)+'属性伤害。';
-					return '出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，否则你对其造成1点伤害。';
+					var natures=get.natureList(Array.isArray(card)?card[3]:card);
+					if(lib.translate['sha_nature_'+natures[0]+'_info']) return lib.translate['sha_nature_'+natures[0]+'_info'];
+					var str='出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，';
+					if(natures.includes('stab')){
+						str+='且在此之后需弃置一张手牌（没有则不弃）。';
+					}
+					str+='否则你对其造成1点';
+					var linked=lib.linked.filter(n=>natures.includes(n));
+					if(linked.length) str+=get.translation(get.nature(linked))+'属性';
+					str+='伤害。';
+					return str;
 				},
 				defaultYingbianEffect:'add',
 				filterTarget:function(card,player,target){return player!=target},
@@ -126,7 +134,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(event.shanRequired>1){
 							next.set('prompt2','（共需使用'+event.shanRequired+'张闪）');
 						}
-						else if(event.card.nature=='stab'){
+						else if(event.card.hasNature('stab')){
 							next.set('prompt2','（在此之后仍需弃置一张手牌）');
 						}
 						next.set('ai1',function(card){
@@ -160,7 +168,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(event.shanRequired>0){
 							event.goto(1);
 						}
-						else if(event.card.nature=='stab'&&target.countCards('h')>0){
+						else if(event.card.hasNature('stab')&&target.countCards('h')>0){
 							event.responded=result;
 							event.goto(4);
 						}
@@ -171,7 +179,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					if((!result||!result.bool||!result.result||result.result!='shaned')&&!event.unhurt){
-						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
+						target.damage(get.nature(event.card));
 						event.result={bool:true}
 						event.trigger('shaDamage');
 					}
@@ -193,7 +201,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 					"step 5"
 					if((!result||!result.bool)&&!event.unhurt){
-						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
+						target.damage(get.nature(event.card));
 						event.result={bool:true}
 						event.trigger('shaDamage');
 						event.finish();
@@ -203,7 +211,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 6"
 					if((!result||!result.bool)&&!event.unhurt){
-						target.damage(get.nature(event.card),event.baseDamage+event.extraDamage);
+						target.damage(get.nature(event.card));
 						event.result={bool:true}
 						event.trigger('shaDamage');
 						event.finish();
@@ -257,7 +265,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					order:function(item,player){
 						if(player.hasSkillTag('presha',true,null,true)) return 10;
-						if(lib.linked.contains(get.nature(item))){
+						if(item.hasNature('linked')){
 							if(game.hasPlayer(function(current){
 								return current!=player&&current.isLinked()&&player.canUse(item,current,null,true)&&get.effect(current,item,player,player)>0&&lib.card.sha.ai.canLink(player,current,item);
 							})&&game.countPlayer(function(current){
@@ -298,20 +306,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						respond:1,
 						respondShan:1,
 						damage:function(card){
-							if(card.nature=='poison') return;
+							if(card.hasNature('poison')) return;
 							return 1;
 						},
 						natureDamage:function(card){
-							if(card.nature) return 1;
+							if(card.hasNature()) return 1;
 						},
 						fireDamage:function(card,nature){
-							if(card.nature=='fire') return 1;
+							if(card.hasNature('fire')) return 1;
 						},
 						thunderDamage:function(card,nature){
-							if(card.nature=='thunder') return 1;
+							if(card.hasNature('thunder')) return 1;
 						},
 						poisonDamage:function(card,nature){
-							if(card.nature=='poison') return 1;
+							if(card.hasNature('poison')) return 1;
 						}
 					}
 				}
@@ -330,20 +338,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						respond:1,
 						respondShan:1,
 						damage:function(card){
-							if(card.nature=='poison') return;
+							if(card.hasNature('poison')) return;
 							return 1;
 						},
 						natureDamage:function(card){
-							if(card.nature) return 1;
+							if(card.hasNature()) return 1;
 						},
 						fireDamage:function(card,nature){
-							if(card.nature=='fire') return 1;
+							if(card.hasNature('fire')) return 1;
 						},
 						thunderDamage:function(card,nature){
-							if(card.nature=='thunder') return 1;
+							if(card.hasNature('thunder')) return 1;
 						},
 						poisonDamage:function(card,nature){
-							if(card.nature=='poison') return 1;
+							if(card.hasNature('poison')) return 1;
 						}
 					}
 				}
@@ -388,7 +396,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target.hp<target.maxHp;
 				},
 				content:function(){
-					target.recover(event.baseDamage||1);
+					target.recover();
 				},
 				ai:{
 					basic:{
@@ -846,7 +854,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target.isHealthy();
 				},
 				content:function(){
-					target.recover(event.baseDamage||1);
+					target.recover();
 				},
 				ai:{
 					basic:{
@@ -895,7 +903,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool==false){
-						target.damage(event.baseDamage,event.customSource||player);
+						target.damage();
 					}
 				},
 				ai:{
@@ -970,7 +978,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool==false){
-						target.damage(event.baseDamage);
+						target.damage();
 					}
 				},
 				ai:{
@@ -1147,10 +1155,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							if(event.turn==target){
-								target.damage(event.baseDamage+event.extraDamage);
+								target.damage();
 							}
 							else{
-								player.damage(target,event.baseDamage+event.extraDamage);
+								player.damage(target);
 							}
 						}
 					}
@@ -1907,7 +1915,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				equipSkill:false,
 				ruleSkill:true,
 				filter:function(event){
-					return event.nature=='ice'&&event.notLink()&&event.player.getCards('he').length>0;
+					return event.hasNature('ice')&&event.notLink()&&event.player.getCards('he').length>0;
 				},
 			},
 			renwang_skill:{

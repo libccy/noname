@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			mobile:{
 				mobile_default:['xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
-				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan'],
+				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan','yj_zhoubuyi'],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua_feng:['re_xiaoqiao',"xin_zhoutai"],
 				mobile_shenhua_huo:["re_pangtong","re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","xin_yuanshao"],
@@ -26,11 +26,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			yj_zhoubuyi:['male','wei',3,['mbhuiyao','mbquesong']],
 			xin_guozhao:['female','wei',3,['yichong','wufei']],
 			xin_zhangyi:['male','shu',4,['xinwurong','shizhi']],
 			xin_sunliang:['male','wu',3,['xinzhizheng','xinkuizhu','xinlijun'],['zhu']],
 			re_xiaoqiao:['female','wu',3,['retianxiang','xinhongyan']],
-			shichangshi:['male','qun',1,['mbdanggu','mbmowang']],
+			shichangshi:['male','qun',1,['mbdanggu','mbmowang'],['sex:male_castrated']],
 			re_zhangzhang:['male','wu',3,['rezhijian','guzheng']],
 			qianzhao:['male','wei',4,['mbshihe','mbzhenfu']],
 			re_yanwen:["male","qun",4,["reshuangxiong"]],
@@ -153,16 +154,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_liushan:['male','shu',3,['xiangle','refangquan','ruoyu'],['zhu']],
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
 			
-			scs_zhangrang:['male','qun','',['scstaoluan'],['unseen']],
-			scs_zhaozhong:['male','qun','',['scschiyan'],['unseen']],
-			scs_sunzhang:['male','qun','',['scszimou'],['unseen']],
-			scs_bilan:['male','qun','',['scspicai'],['unseen']],
-			scs_xiayun:['male','qun','',['scsyaozhuo'],['unseen']],
-			scs_hankui:['male','qun','',['scsxiaolu'],['unseen']],
-			scs_lisong:['male','qun','',['scskuiji'],['unseen']],
-			scs_duangui:['male','qun','',['scschihe'],['unseen']],
-			scs_guosheng:['male','qun','',['scsniqu'],['unseen']],
-			scs_gaowang:['male','qun','',['scsmiaoyu'],['unseen']],
+			scs_zhangrang:['male','qun','',['scstaoluan'],['unseen','sex:male_castrated']],
+			scs_zhaozhong:['male','qun','',['scschiyan'],['unseen','sex:male_castrated']],
+			scs_sunzhang:['male','qun','',['scszimou'],['unseen','sex:male_castrated']],
+			scs_bilan:['male','qun','',['scspicai'],['unseen','sex:male_castrated']],
+			scs_xiayun:['male','qun','',['scsyaozhuo'],['unseen','sex:male_castrated']],
+			scs_hankui:['male','qun','',['scsxiaolu'],['unseen','sex:male_castrated']],
+			scs_lisong:['male','qun','',['scskuiji'],['unseen','sex:male_castrated']],
+			scs_duangui:['male','qun','',['scschihe'],['unseen','sex:male_castrated']],
+			scs_guosheng:['male','qun','',['scsniqu'],['unseen','sex:male_castrated']],
+			scs_gaowang:['male','qun','',['scsmiaoyu'],['unseen','sex:male_castrated']],
 		},
 		characterIntro:{
 			shichangshi:'十常侍，指中国东汉（公元25年—220年）灵帝时期（168年-189年）操纵政权的十二个宦官：张让、赵忠、夏恽、郭胜、孙璋、毕岚、栗嵩、段珪、高望、张恭、韩悝、宋典（在小说《三国演义》里，十常侍指的是指张让、赵忠、封谞、段珪、曹节、侯览、蹇硕、程旷、夏恽、郭胜十人），他们都任职中常侍。玩弄小皇帝于股掌之中，以至灵帝称“张常侍是我父，赵常侍是我母”。十常侍自己横征暴敛，卖官鬻爵，他们的父兄子弟遍布天下，横行乡里，祸害百姓，无官敢管。人民不堪剥削、压迫，纷纷起来反抗。当时一些比较清醒的官吏，已看出宦官集团的黑暗腐败，导致大规模农民起义的形势。郎中张钧在给皇帝的奏章中明确指出，黄巾起义是外戚宦官专权逼出来的，他说：“张角所以能兴兵作乱，万人所以乐附之者，其源皆由十常侍多放父兄、子弟、婚宗、宾客典据州郡，辜确财利，侵略百姓，百姓之怨无所告诉，故谋议不轨，聚为‘盗贼’。”后被曹操、袁绍所歼。',
@@ -379,6 +380,102 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//☆周不疑
+			mbhuiyao:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:lib.filter.notMe,
+				content:function(){
+					player.damage('nosource');
+					target.damage('unreal');
+				},
+				ai:{
+					order:6,
+					result:{
+						target:function(player,target){
+							if(player.getHp()+player.countCards('hs',card=>player.canSaveCard(card,player))<1) return 0;
+							var _hp=target.hp,_maxhp=target.maxHp;
+							target.hp=10; target.maxHp=10;
+							var att=-get.sgnAttitude(player,target);
+							var val=get.damageEffect(target,player,target)*att;
+							target.getSkills(null,false,false).forEach(skill=>{
+								var info=get.info(skill);
+								if(info&&info.ai&&(info.ai.maixie||info.ai.maixie_hp||info.ai.maixie_defend)) val=Math[val>0?'max':'min'](val>0?0.1:-0.1,val+2*att);
+							});
+							var eff=100/val;
+							target.hp=_hp; target.maxHp=_maxhp;
+							var limit=17.5;
+							if(player.hasSkill('mbquesong')){
+								if(!player.getStat().damaged) limit+=7.5;
+							}
+							if(eff<limit) return 0;
+							return eff/30;
+						}
+					}
+				},
+			},
+			mbquesong:{
+				audio:2,
+				trigger:{global:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return player.getHistory('damage').length;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('mbquesong')).set('ai',target=>{
+						var player=_status.event.player;
+						if(get.attitude(player,target)<=0) return 0;
+						var len=[1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0);hp=target.getHp();
+						return len+target.isTurnedOver()*2+1.5*Math.min(4,target.getDamagedHp())/(hp+1);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('mbquesong',target);
+						var len=[1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0);hp=target.getHp();
+						var forced=false;
+						if(len==0) forced=true;
+						if(hp==0||target.countCards('h')<hp){
+							if(forced) event.finish();
+							else event._result={bool:false};
+						}
+						else{
+							var str=`${forced?'请':'是否'}弃置${get.cnNumber(hp)}张手牌并回复1点体力${forced?'':'？或点击“取消”摸'+get.cnNumber(len)+'张牌并复原武将牌'}。`;
+							target.chooseToDiscard(get.translation(player)+'对你发动了【雀颂】',str,forced,'h',hp).set('ai',card=>{
+								if(!_status.event.goon) return 0;
+								return 6-get.value(card);
+							}).set('goon',function(){
+								var _hp=hp+target.isTurnedOver()*1.5;
+								if(forced||_hp+player.countCards('hs',card=>get.tag(card,'recover'))<=2-len/4) return true;
+								return len>_hp;
+							}());
+						}
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						target.recover();
+						event.finish();
+					}
+					else{
+						target.draw([1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0));
+					}
+					'step 3'
+					player.link(false);
+					'step 4'
+					player.turnOver(false);
+				},
+				ai:{
+					expose:0.2,
+					maixie:true,
+					skillTagFilter:function(player,tag){
+						if(player.getStat().damaged) return false;
+					},
+				}
+			},
 			//郭照
 			yichong:{
 				init:function(player){
@@ -3169,7 +3266,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						trigger:{player:'damageBegin4'},
 						filter:function(event){
-							return event.nature!='thunder';
+							return !event.hasNature('thunder');
 						},
 						content:function(){
 							trigger.cancel();
@@ -3241,7 +3338,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var list=game.filterPlayer(current=>current!=player).map(current=>{
 								var _hp=current.hp,_maxhp=current.maxHp;
 								current.hp=10; current.maxHp=10;
-								var eff=get.damageEffect(current,player,current)+10;
+								var att=-get.sgnAttitude(player,current);
+								var val=get.damageEffect(current,player,current)*att;
+								current.getSkills(null,false,false).forEach(skill=>{
+									var info=get.info(skill);
+									if(info&&info.ai&&(info.ai.maixie||info.ai.maixie_hp||info.ai.maixie_defend)) val=Math[val>0?'max':'min'](val>0?0.1:-0.1,val+2*att);
+								});
+								var eff=100/val+15;
 								current.hp=_hp; current.maxHp=_maxhp;
 								return [current,eff];
 							}).sort((a,b)=>b[1]-a[1])[0];
@@ -3253,7 +3356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}).map(current=>{
 								var _hp=targetx.hp,_maxhp=targetx.maxHp;
 								targetx.hp=10; targetx.maxHp=10;
-								var eff=get.damageEffect(targetx,current,player);
+								var eff=-get.damageEffect(targetx,current,current);
 								targetx.hp=_hp; targetx.maxHp=_maxhp;
 								return [current,eff];
 							}).sort((a,b)=>b[1]-a[1])[0][0]==target?10:1);
@@ -4576,7 +4679,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					{
 						//歌曲名称
 						name:'鳥の詩',
-						//歌曲文件名（默认在audio/effect文件夹下 若要重定向到扩展 请写为'ext:扩展名称'的格式 并将文件名重命名为和上面的歌曲名称相同）
+						//歌曲文件名（默认在audio/effect文件夹下 若要重定向到扩展 请写为'ext:扩展名称/文件名'的格式）
 						filename:'tori_no_uta',
 						//每个音符的开始时间点（毫秒，相对未偏移的开始播放时间）
 						timeleap:[1047,3012,4978,5469,5961,6452,6698,7435,8909,10875,12840],
@@ -6420,10 +6523,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				charlotte:true,
 				filter:function(event,player){
-					return event.nature!='fire';
+					return !event.hasNature('fire');
 				},
 				content:function(){
-					trigger.nature='fire';
+					game.setNature(trigger,'fire');
 				},
 			},
 			tiansuan2_3:{
@@ -6558,6 +6661,455 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//南华老仙
 			yufeng:{
+				inherit:'yufeng_old',
+				content:function(){
+					"step 0"
+					if(_status.connectMode) event.time=lib.configOL.choose_timeout;
+					event.videoId=lib.status.videoId++;
+					var maxScore = Math.max(2,1+player.countMark('yufeng'));
+					if(player.isUnderControl()){
+						game.swapPlayerAuto(player);
+					}
+					var switchToAuto=function(){
+						game.pause();
+						game.countChoose();
+						setTimeout(function(){
+							_status.imchoosing=false;
+							var max=Math.max(2,1+player.countMark('yufeng'));
+							var score=Math.random()<0.5?max:get.rand(1,max);
+							event._result={
+								bool:true,
+								score:score,
+								win:score>=max,
+							};
+							if(event.dialog) event.dialog.close();
+							if(event.control) event.control.close();
+							game.resume();
+						},5000);
+					};
+					var createDialog=function(player,id){
+						if(_status.connectMode) lib.configOL.choose_timeout='30';
+						if(player==game.me) return;
+						var str=get.translation(player)+'正在表演《御风飞行》...<br>';
+						ui.create.dialog(str).videoId=id;
+					};
+					var chooseButton=function(maxScore){lib.skill.yufeng.$playFlappyBird(maxScore)};
+					//event.switchToAuto=switchToAuto;
+					game.broadcastAll(createDialog,player,event.videoId);
+					if(event.isMine()){
+						chooseButton(maxScore);
+					}
+					else if(event.isOnline()){
+						event.player.send(chooseButton,maxScore);
+						event.player.wait();
+						game.pause();
+					}
+					else{
+						switchToAuto();
+					}
+					"step 1"
+					game.broadcastAll(function(id,time){
+						if(_status.connectMode) lib.configOL.choose_timeout=time;
+						var dialog=get.idDialog(id);
+						if(dialog){
+							dialog.close();
+						}
+					},event.videoId,event.time);
+					var result=event.result||result;
+					player.popup(get.cnNumber(result.score)+'分',result.win?'wood':'fire')
+					game.log(player,'御风飞行',result.win?'#g成功':'#y失败');
+					game.log(player,'获得了','#g'+result.score+'分');
+					var max=player.countMark('yufeng');
+					if(!result.win){
+						if(result.score) player.draw(result.score);
+						if(max) player.removeMark('yufeng',max,false);
+						event.finish();
+					}
+					else{
+						if(max<2) player.addMark('yufeng',1,false);
+						event.score=result.score;
+						player.chooseTarget('请选择【御风】的目标',[1,result.score],function(card,player,target){
+							return target!=player&&!target.hasSkill('yufeng2');
+						}).set('ai',function(target){
+							var player=_status.event.player;
+							var att=-get.attitude(player,target),attx=att*2;
+							if(att<=0||target.hasSkill('xinfu_pdgyingshi')) return 0;
+							if(target.hasJudge('lebu')) attx-=att;
+							if(target.hasJudge('bingliang')) attx-=att;
+							return attx/Math.max(2.25,Math.sqrt(target.countCards('h')+1));
+						});
+					}
+					"step 2"
+					if(result.bool){
+						result.targets.sortBySeat();
+						player.line(result.targets,'green');
+						game.log(result.targets,'获得了','#y“御风”','效果');
+						for(var i of result.targets) i.addSkill('yufeng2');
+						if(event.score>result.targets.length) player.draw(event.score-result.targets.length);
+					}
+					else player.draw(event.score);
+				},
+				$playFlappyBird:function(maxScore,title){
+					//Forked from: https://github.com/aaarafat/JS-Flappy-Bird
+
+					const event=_status.event;
+					const dialog=ui.create.dialog('forcebutton','hidden');
+					dialog.textPrompt=dialog.add('<div class="text center">准备好了吗？</div>');
+					dialog.classList.add('fixed');
+					dialog.classList.add('scroll1');
+					dialog.classList.add('scroll2');
+					dialog.classList.add('fullwidth');
+					dialog.classList.add('fullheight');
+					dialog.classList.add('noupdate');
+					const updateText=function(str){
+						dialog.textPrompt.innerHTML='<div class="text center">'+str+'</div>';
+					}
+					
+					const canvas=document.createElement('canvas');
+					dialog.appendChild(canvas);
+					canvas.style.position="absolute";
+					canvas.style.width='276px';
+					canvas.style.height='414px';
+					canvas.style.left="calc(50% - 141px)";
+					canvas.style.top="calc(50% - 200px)";
+					canvas.width=276;
+					canvas.height=414;
+					canvas.style.border='3px solid';
+					
+					const RAD = Math.PI / 180;
+					const ctx=canvas.getContext('2d');
+					let frames = 0;
+					let dx = 0.1;
+					let previousDOMHighResTimeStamp = performance.now();
+					let deltaTime = 0;
+					const state = {
+						curr: 0,
+						getReady: 0,
+						Play: 1,
+						gameOver: 2,
+						gameSuccess:3,
+					}
+					const SFX = {
+						start: new Audio(),
+						flap: new Audio(),
+						score: new Audio(),
+						hit: new Audio(),
+						die: new Audio(),
+						played: false,
+					};
+
+					const gnd = {
+						sprite: new Image(),
+						x: 0,
+						y: 0,
+						draw: function () {
+							this.y = parseFloat(canvas.height - this.sprite.height);
+							ctx.drawImage(this.sprite, this.x, this.y);
+						},
+						update: function () {
+							if(state.curr == state.gameOver || state.curr == state.gameSuccess) return;
+							this.x -= dx * deltaTime;
+							const halfWidth = this.sprite.width / 4;
+							if(this.x <= -halfWidth) this.x += halfWidth;
+						},
+					};
+					const bg = {
+						sprite: new Image(),
+						x: 0,
+						y: 0,
+						draw: function () {
+							let y = parseFloat(canvas.height - this.sprite.height);
+							ctx.drawImage(this.sprite, this.x, y);
+						},
+					};
+					const pipe = {
+						top: { sprite: new Image() },
+						bot: { sprite: new Image() },
+						gap: 127,
+						moved: true,
+						pipes: [],
+						numberOfPipes: 1,
+						timeElapsed: 0,
+						draw: function () {
+							for (let i = 0; i < this.pipes.length; i++) {
+								let p = this.pipes[i];
+								ctx.drawImage(this.top.sprite, p.x, p.y);
+								ctx.drawImage(
+									this.bot.sprite,
+									p.x,
+									p.y + parseFloat(this.top.sprite.height) + this.gap
+								);
+							}
+						},
+						update: function () {
+							if (state.curr != state.Play) return;
+							this.timeElapsed += deltaTime;
+							if (this.timeElapsed >= 1600) {
+								this.timeElapsed -= 1600;
+								this.pipes.push({
+									x: parseFloat(canvas.width),
+									y: -210 * Math.min(Math.random()*0.8 + 1.2, 1.8),
+								});
+							}
+							this.pipes.forEach((pipe) => {
+								pipe.x -= dx * deltaTime;
+							});
+						
+							if (this.pipes.length && this.pipes[0].x < -this.top.sprite.width) {
+								this.pipes.shift();
+								this.moved = true;
+							}
+						},
+					};
+					const bird = {
+						animations: [
+							{ sprite: new Image() },
+							{ sprite: new Image() },
+							{ sprite: new Image() },
+							{ sprite: new Image() },
+						],
+						rotatation: 0,
+						x: 50,
+						y: 100,
+						speed: 0,
+						gravity: 0.0004,
+						thrust: 0.18,
+						frame: 0,
+						timeElapsed: 0,
+						totalTimeElapsed: 0,
+						draw: function () {
+							let h = this.animations[this.frame].sprite.height;
+							let w = this.animations[this.frame].sprite.width;
+							ctx.save();
+							ctx.translate(this.x, this.y);
+							ctx.rotate(this.rotatation * RAD);
+							ctx.drawImage(this.animations[this.frame].sprite, -w / 2, -h / 2);
+							ctx.restore();
+						},
+						update: function () {
+							this.totalTimeElapsed += deltaTime;
+							let r = parseFloat(this.animations[0].sprite.width) / 2;
+							switch (state.curr) {
+								case state.getReady: case state.gameSuccess:
+									this.rotatation = 0;
+									this.timeElapsed += deltaTime;
+									if (this.timeElapsed >= 200) {
+										this.timeElapsed -= 200;
+										this.y += Math.sin(this.totalTimeElapsed / 10 * RAD);
+										this.frame++;
+									}
+									break;
+								case state.Play:
+									this.timeElapsed += deltaTime;
+									if (this.timeElapsed >= 100) {
+										this.timeElapsed -= 100;
+										this.frame++;
+									}
+									this.y += this.speed * deltaTime;
+									this.setRotation();
+									this.speed += this.gravity * deltaTime;
+									if(UI.score.curr >= maxScore){
+										state.curr = state.gameSuccess;
+										this.timeElapsed = 0;
+										updateText(`${title||'御风飞行'}表演成功！`)
+										setTimeout(switchToAuto,2000);
+									}
+									else if (this.y + r >= gnd.y || this.collisioned()) {
+										state.curr = state.gameOver;
+										this.timeElapsed = 0;
+										updateText(`${title||'御风飞行'}表演失败……`)
+										setTimeout(switchToAuto,2000);
+									}
+							
+									break;
+								case state.gameOver:
+									this.frame = 1;
+									if (this.y + r < gnd.y) {
+										this.y += this.speed * deltaTime;
+										this.setRotation();
+										this.speed += this.gravity * deltaTime;
+									} else {
+										this.speed = 0;
+										this.y = gnd.y - r;
+										this.rotatation = 90;
+										if (!SFX.played) {
+											Promise.resolve(SFX.die.play()).catch(() => void 0);
+											SFX.played = true;
+										}
+									}
+							
+									break;
+							}
+							const animationsLength = this.animations.length;
+							if (this.frame >= animationsLength) this.frame -= animationsLength;
+						},
+						flap: function () {
+							if (this.y <= 0) return;
+							const flap = SFX.flap;
+							flap.currentTime = 0;
+							if (flap.paused) Promise.resolve(flap.play()).catch(() => void 0);
+							this.speed = -this.thrust;
+						},
+						setRotation: function () {
+							if (this.speed <= 0) {
+								this.rotatation = Math.max(-25, (-25 * this.speed) / (-1 * this.thrust));
+							} else if (this.speed > 0) {
+								this.rotatation = Math.min(90, (90 * this.speed) / (this.thrust * 2));
+							}
+						},
+						collisioned: function () {
+							if (!pipe.pipes.length) return;
+							let bird = this.animations[0].sprite;
+							let x = pipe.pipes[0].x;
+							let y = pipe.pipes[0].y;
+							let r = bird.height / 4 + bird.width / 4;
+							let roof = y + parseFloat(pipe.top.sprite.height);
+							let floor = roof + pipe.gap;
+							let w = parseFloat(pipe.top.sprite.width);
+							if (this.x + r >= x) {
+								if (this.x + r < x + w) {
+									if (this.y - r <= roof || this.y + r >= floor) {
+										Promise.resolve(SFX.hit.play()).catch(() => void 0);
+										return true;
+									}
+								}
+								else if (pipe.moved) {
+									updateText(`当前分数：${++UI.score.curr}`);
+									const score = SFX.score;
+									score.currentTime = 0;
+									if (score.paused) Promise.resolve(score.play()).catch(() => void 0);
+									pipe.moved = false;
+								}
+							}
+						},
+					};
+					const UI = {
+						getReady: { sprite: new Image() },
+						gameOver: { sprite: new Image() },
+						gameClear: { sprite: new Image() },
+						tap: [{ sprite: new Image() }, { sprite: new Image() }],
+						score: {
+							curr: 0,
+							best: 0,
+						},
+						x: 0,
+						y: 0,
+						tx: 0,
+						ty: 0,
+						frame: 0,
+						timeElapsed: 0,
+						draw: function () {
+						  	switch (state.curr) {
+								case state.getReady:
+									this.y = parseFloat(canvas.height - this.getReady.sprite.height) / 2;
+									this.x = parseFloat(canvas.width - this.getReady.sprite.width) / 2;
+									this.tx = parseFloat(canvas.width - this.tap[0].sprite.width) / 2;
+									this.ty =
+										this.y + this.getReady.sprite.height - this.tap[0].sprite.height;
+									ctx.drawImage(this.getReady.sprite, this.x, this.y);
+									ctx.drawImage(this.tap[this.frame].sprite, this.tx, this.ty);
+									break;
+								case state.gameOver: case state.gameSuccess:
+									this.y = parseFloat(canvas.height - this.gameOver.sprite.height) / 2;
+									this.x = parseFloat(canvas.width - this.gameOver.sprite.width) / 2;
+									this.tx = parseFloat(canvas.width - this.tap[0].sprite.width) / 2;
+									this.ty =
+										this.y + this.gameOver.sprite.height - this.tap[0].sprite.height;
+									ctx.drawImage((state.curr == state.gameOver ? this.gameOver : this.gameClear).sprite, this.x, this.y);
+							}
+						},
+						update: function () {
+							if (state.curr == state.Play) return;
+							this.timeElapsed += deltaTime;
+							if (this.timeElapsed >= 200) {
+								this.timeElapsed -= 200;
+								this.frame++;
+							}
+							const tapLength = this.tap.length;
+							if (this.frame >= tapLength) this.frame -= tapLength;
+						},
+					};
+					gnd.sprite.src = lib.assetURL+"image/flappybird/ground.png";
+					bg.sprite.src = lib.assetURL+"image/flappybird/BG.png";
+					pipe.top.sprite.src = lib.assetURL+"image/flappybird/toppipe.png";
+					pipe.bot.sprite.src = lib.assetURL+"image/flappybird/botpipe.png";
+					UI.gameOver.sprite.src = lib.assetURL+"image/flappybird/gameover.png";
+					UI.gameClear.sprite.src = lib.assetURL+"image/flappybird/gameclear.png";
+					UI.getReady.sprite.src = lib.assetURL+"image/flappybird/getready.png";
+					UI.tap[0].sprite.src = lib.assetURL+"image/flappybird/tap/t0.png";
+					UI.tap[1].sprite.src = lib.assetURL+"image/flappybird/tap/t1.png";
+					bird.animations[0].sprite.src = lib.assetURL+"image/flappybird/bird/b0.png";
+					bird.animations[1].sprite.src = lib.assetURL+"image/flappybird/bird/b1.png";
+					bird.animations[2].sprite.src = lib.assetURL+"image/flappybird/bird/b2.png";
+					bird.animations[3].sprite.src = lib.assetURL+"image/flappybird/bird/b0.png";
+
+					SFX.start.src = lib.assetURL+"audio/effect/flappybird_start.wav";
+					SFX.flap.src = lib.assetURL+"audio/effect/flappybird_flap.wav";
+					SFX.score.src = lib.assetURL+"audio/effect/flappybird_score.wav";
+					SFX.hit.src = lib.assetURL+"audio/effect/flappybird_hit.wav";
+					SFX.die.src = lib.assetURL+"audio/effect/flappybird_die.wav";
+
+					const gameLoop = domHighResTimeStamp => {
+						if(frames<0) return;
+						deltaTime = domHighResTimeStamp - previousDOMHighResTimeStamp;
+						previousDOMHighResTimeStamp = domHighResTimeStamp;
+						update();
+						draw();
+						frames++;
+						window.requestAnimationFrame(gameLoop);
+					}
+					  
+					const update = function(){
+						bird.update();
+						gnd.update();
+						pipe.update();
+						UI.update();
+					}
+					  
+					const draw = function(){
+						ctx.fillStyle = "#30c0df";
+						ctx.fillRect(0, 0, canvas.width, canvas.height);
+						bg.draw();
+						pipe.draw();
+					  
+						bird.draw();
+						gnd.draw();
+						UI.draw();
+					}
+
+					const click = function(){
+						switch (state.curr) {
+							case state.getReady:
+								state.curr = state.Play;
+								bird.timeElapsed = 0;
+								Promise.resolve(SFX.start.play()).catch(() => void 0);
+								updateText(`当前分数：${UI.score.curr}`);
+								break;
+							case state.Play: bird.flap();
+						}
+					};
+					const switchToAuto = function(){
+						event._result={
+							bool:true,
+							score:UI.score.curr,
+							win:UI.score.curr>=maxScore,
+						};
+						dialog.close();
+						game.resume();
+						_status.imchoosing=false;
+						frames=-1;
+						document.removeEventListener(lib.config.touchscreen?'touchstart':'mousedown',click);
+					} 
+
+					dialog.open();	
+					game.pause();
+					game.countChoose();
+
+					document.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',click);
+					window.requestAnimationFrame(gameLoop);
+				},
+			},
+			yufeng_old:{
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
@@ -9070,13 +9622,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['relihuo_baigei','relihuo_damage'],
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.nature) return true;
+					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
 				},
 				check:function(event,player){
 					return false;
 				},
 				content:function(){
-					trigger.card.nature='fire';
+					game.setNature(trigger.card,'fire');
 					trigger.relihuo=true;
 				},
 			},
@@ -9096,7 +9648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:'relihuo',
 				filter:function(event,player){
-					if(event.card.name!='sha'||event.card.nature!='fire') return false;
+					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
 					var num=0;
 					player.getHistory('sourceDamage',function(evt){
 						if(evt.card==event.card) num+=evt.num;
@@ -10688,8 +11240,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					trigger.cancel();
-					var cards=trigger.cards.filterInD();
-					if(cards.length) player.gain(cards,'gain2','log');
+					if(trigger.cards){
+						var cards=trigger.cards.filterInD();
+						if(cards.length) player.gain(cards,'gain2','log');
+					}
 					'step 1'
 					player.loseMaxHp();
 				},
@@ -10715,7 +11269,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.color(card)=='red'&&game.hasPlayer(function(current){
 						return current!=player&&current.isDamaged()&&get.attitude(player,current)>2;
 					})) return 2;
-					if(get.nature(card)) return 1.5;
+					if(get.natureList(card).length) return 1.5;
 					return 1;
 				},
 				discard:false,
@@ -10727,7 +11281,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover();
 					'step 1'
 					var num=1;
-					if(get.nature(cards[0])) num++;
+					if(get.natureList(cards[0]).length) num++;
 					target.draw(num);
 					if(get.color(cards[0])=='red') target.recover();
 				},
@@ -10741,7 +11295,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							if(ui.selected.cards.length){
 								var num=1;
-								if(get.nature(ui.selected.cards[0])) num++;
+								if(get.natureList(ui.selected.cards[0]).length) num++;
 								if(target.hasSkillTag('nogain')) num=0;
 								if(get.color(ui.selected.cards[0])=='red') return num+2
 								else return num+1;
@@ -12686,7 +13240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageBegin4'},
 				filter:function(event){
-					return event.nature=='fire';
+					return event.hasNature('fire');
 				},
 				forced:true,
 				content:function(){
@@ -13552,6 +14106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             yangbiao:['yangbiao','dc_yangbiao','jsrg_yangbiao'],
 			qiaozhou:['yj_qiaozhou','qiaozhou'],
 			sunhanhua:['dc_sunhanhua','sunhanhua'],
+			zhoubuyi:['zhoubuyi','yj_zhoubuyi'],
 		},
 		translate:{
 			liuzan:'手杀留赞',
@@ -14214,6 +14769,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”得到五张牌）。',
 			wufei:'诬诽',
 			wufei_info:'若场上存在拥有“雀”标记的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于1且A的体力值大于你，则你可以对A造成1点伤害。',
+			yj_zhoubuyi:'☆周不疑',
+			mbhuiyao:'慧夭',
+			mbhuiyao_info:'出牌阶段限一次。你可以受到1点无来源伤害，视为对一名其他角色造成过1点伤害。',
+			mbquesong:'雀颂',
+			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸等同于其装备区中空栏的数量的牌并复原武将牌；2.弃置等同于其体力值的手牌并回复1点体力。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',

@@ -68,7 +68,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					if(target.isDying()||event.getParent(2).type=='dying'){
-						target.recover(event.baseDamage);
+						target.recover();
 						if(_status.currentPhase==target){
 							target.getStat().card.jiu--;
 						}
@@ -210,7 +210,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.delay(2);
 					"step 2"
 					if(result.bool){
-						target.damage('fire',event.baseDamage||1);
+						target.damage('fire');
 					}
 					else{
 						target.addTempSkill('huogong2');
@@ -689,7 +689,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					delete player.storage.jiu;
 				},
 				ai:{
-					damageBonus:true
+					damageBonus:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='damageBonus') return arg&&arg.card&&arg.card.name==='sha';
+					}
 				},
 				group:'jiu2'
 			},
@@ -778,7 +781,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(card.name=='sha'){
 								var equip1=player.getEquip('zhuque');
 								if(equip1&&equip1.name=='zhuque') return 1.9;
-								if(!card.nature) return 'zerotarget';
+								if(!card.hasNature()) return 'zerotarget';
 							}
 						}
 					}
@@ -788,7 +791,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				trigger:{player:'damageBegin3'},
 				filter:function(event,player){
-					if(event.nature!='fire') return false;
+					if(!event.hasNature('fire')) return false;
 					if(player.hasSkillTag('unequip2')) return false;
 					if(event.source&&event.source.hasSkillTag('unequip',false,{
 						name:event.card?event.card.name:null,
@@ -807,7 +810,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target,current){
 							if(card.name=='sha'){
-								if(card.nature=='fire') return 2;
+								if(card.hasNature('fire')) return 2;
 								if(player.hasSkill('zhuque_skill')) return 1.9;
 							}
 							if(get.tag(card,'fireDamage')&&current<0) return 2;
@@ -827,7 +830,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:player,
 						card:event.card
 					})) return false;
-					if(event.card.name=='sha'&&!event.card.nature) return true;
+					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
 					return false;
 				},
 				content:function(){
@@ -903,7 +906,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard1'},
 				//priority:7,
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.nature) return true;
+					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
 				},
 				audio:true,
 				check:function(event,player){
@@ -921,14 +924,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return '将'+get.translation(event.card)+'改为火属性';
 				},
 				content:function(){
-					trigger.card.nature='fire';
+					game.setNature(trigger.card,'fire');
 					if(get.itemtype(trigger.card)=='card'){
 						var next=game.createEvent('zhuque_clear');
 						next.card=trigger.card;
 						event.next.remove(next);
 						trigger.after.push(next);
 						next.setContent(function(){
-							delete card.nature;
+							game.setNature(trigger.card,[]);
 						});
 					}
 				}

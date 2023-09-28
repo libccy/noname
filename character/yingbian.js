@@ -1396,19 +1396,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olxibing:{
 				audio:2,
-				trigger:{
-					player:'damageEnd',
-					source:'damageSource',
-				},
+				trigger:{player:'damageEnd'},
 				filter:function(event,player){
-					return event.player&&event.source&&event.player!=event.source&&
-					event.player.isAlive()&&event.source.isAlive()&&
-					(event.player.countCards('he')>0||event.source.countCards('he')>0);
+					return event.player&&event.source&&event.player!=event.source&&event.player.isAlive()&&event.source.isAlive()&&(event.player.countCards('he')>0||event.source.countCards('he')>0);
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var target=(player==trigger.player?trigger.source:trigger.player);
+					var target=trigger.source;
 					event.target=target;
 					player.chooseTarget(get.prompt('olxibing'),'弃置自己或'+get.translation(target)+'的两张牌，然后手牌数较少的角色摸两张牌且不能对你使用牌直到回合结束',function(card,player,target){
 						if(target!=player&&target!=_status.event.target) return false;
@@ -2312,31 +2307,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				preHidden:true,
 				filter:function(event,player){
-					return !player.hasSkill('caiyuan_mark')&&player.phaseNumber>1;
+					if(player.phaseNumber<=1) return false;
+					const history1=_status.globalHistory,history2=player.actionHistory;
+					for(let i=0;i<Math.min(history1.length,history2.length);i++){
+						let i1=history1.length-1-i,i2=history2.length-1-i;
+						if(i>0&&history2[i2].isMe) break;
+						if(history1[i1].changeHp.some(evt=>evt.player==player&&evt.num<0)) return false;
+					}
+					return true;
 				},
 				content:function(){
 					player.draw(2);
-				},
-				group:'caiyuan_count',
-				subSkill:{
-					mark:{
-						//mark:true,
-						marktext:'媛',
-						charlotte:true,
-						intro:{content:'已扣减过体力'},
-					},
-					count:{
-						trigger:{player:'changeHp'},
-						silent:true,
-						charlotte:true,
-						filter:function(event,player){
-							return event.num<0&&!player.hasSkill('caiyuan_mark');
-						},
-						content:function(){
-							player.addTempSkill('caiyuan_mark',{player:'phaseAfter'});
-							if(player.hasSkill('caiyuan')) player.markSkill('caiyuan_mark');
-						},
-					},
 				},
 			},
 			zhuosheng:{
@@ -3704,7 +3685,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ciwei:'慈威',
 			ciwei_info:'一名角色于其回合内使用第二张牌时，若此牌为基本牌或普通锦囊牌，则你可以弃置一张牌，取消此牌的所有目标。',
 			caiyuan:'才媛',
-			caiyuan_info:'锁定技，当你扣减体力时，你获得一枚“才媛”标记直到你的下回合结束。回合结束时，若你没有“才媛”标记且此回合不是你的第一个回合，则	你摸两张牌。',
+			caiyuan_info:'锁定技。回合结束时，若你于你的上一个回合结束后未扣减过体力，则你摸两张牌。',
 			simazhou:'司马伷',
 			caiwang:'才望',
 			caiwang_info:'当你使用或打出牌响应其他角色使用的牌，或其他角色使用或打出牌响应你使用的牌后，若这两张牌颜色相同，则你可以弃置对方的一张牌。',
@@ -3742,7 +3723,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caozhao_backup:'草诏',
 			caozhao_info:'出牌阶段限一次，你可展示一张手牌并声明一种未以此法声明过的基本牌或普通锦囊牌，令一名体力不大于你的其他角色选择一项：令此牌视为你声明的牌，或其失去1点体力。然后若此牌声明成功，然后你可将其交给一名其他角色。',
 			olxibing:'息兵',
-			olxibing_info:'每当你受到其他角色造成的伤害后/对其他角色造成伤害后，你可弃置你或该角色两张牌，然后你们中手牌少的角色摸两张牌，以此法摸牌的角色不能使用牌指定你为目标直到回合结束。',
+			olxibing_info:'当你受到其他角色造成的伤害后，你可弃置你或该角色两张牌，然后你们中手牌少的角色摸两张牌，以此法摸牌的角色不能使用牌指定你为目标直到回合结束。',
 			recaiwang:'才望',
 			recaiwang_info:'①当你使用或打出牌响应其他角色使用的牌，或其他角色使用或打出牌响应你使用的牌后，若这两张牌颜色相同，则你可以弃置对方的一张牌。②若你的手牌数为1，则你可以将该手牌当做【闪】使用或打出。③若你的装备区牌数为1，则你可以将该装备当做【无懈可击】使用或打出。④若你的判定区牌数为1，则你可以将该延时锦囊牌当做【杀】使用或打出。',
 			recaiwang_hand:'才望',

@@ -181,13 +181,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			old_jiakui:['male','wei',4,['tongqu','xinwanlan']],
 			ol_guohuai:['male','wei',3,['rejingce']],
-			junk_zhangrang:['male','qun',3,['junktaoluan']],
+			junk_zhangrang:['male','qun',3,['junktaoluan'],['sex:male_castrated']],
 			old_bulianshi:['female','wu',3,['anxu','zhuiyi']],
 			ol_maliang:['male','shu',3,['zishu','xinyingyuan']],
 			junk_liubei:['male','shu',4,['junkrende','jijiang'],['zhu']],
 			junk_huangyueying:['female','shu',3,['junkjizhi','junkqicai']],
 			junk_lidian:['male','wei',3,['xunxun','junkwangxi']],
 			junk_duanwei:['male','qun',4,['junklangmie']],
+			junk_xuyou:["male","qun",3,["nzry_chenglve","junkshicai","nzry_cunmu"]],
 		},
 		characterFilter:{
 			key_jojiro:function(mode){
@@ -222,7 +223,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_default:["diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji"],
 				diy_noname:['noname'],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano","db_key_liyingxia","key_erika","key_satomi","key_iriya","key_fuuko"],
-				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','old_bulianshi','junk_sunquan','ol_maliang','junk_liubei','junk_huangyueying','junk_lidian','junk_duanwei'],
+				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','old_bulianshi','junk_sunquan','ol_maliang','junk_liubei','junk_huangyueying','junk_lidian','junk_duanwei','junk_xuyou'],
 			},
 		},
 		characterIntro:{
@@ -4441,160 +4442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var str=get.translation(player)+'正在表演《小空飞天》...<br>';
 						ui.create.dialog(str).videoId=id;
 					};
-					var chooseButton=function(){
-						var roundmenu=false;
-						if(ui.roundmenu&&ui.roundmenu.display!='none'){
-							roundmenu=true;
-							ui.roundmenu.style.display='none';
-						}
-						var event=_status.event;
-						event.settleed=false;
-						event.score=0;
-						event.dialog=ui.create.dialog('forcebutton','hidden');
-						event.dialog.textPrompt=event.dialog.add('<div class="text center">准备好了吗？准备好了的话就点击屏幕开始吧！</div>');
-						event.dialog.textPrompt.style["z-index"]=10;
-						event.switchToAuto=function(){
-							event._result={
-								bool:true,
-								score:event.score,
-							};
-							event.dialog.close();
-							game.resume();
-							_status.imchoosing=false;
-							if(roundmenu) ui.roundmenu.style.display='';
-						};
-						event.dialog.classList.add('fixed');
-						event.dialog.classList.add('scroll1');
-						event.dialog.classList.add('scroll2');
-						event.dialog.classList.add('fullwidth');
-						event.dialog.classList.add('fullheight');
-						event.dialog.classList.add('noupdate');
-						event.dialog.style.overflow='hidden';
-						event.dialog.open();
-						
-						var height=event.dialog.offsetHeight;
-						var width=event.dialog.offsetWidth;
-						var top=50;
-						var speed=0;
-						var start=false;
-						
-						var bird=ui.create.div('');
-						bird.style["background-image"]='linear-gradient(rgba(6, 3, 55, 1), rgba(6, 3, 35, 1))';
-						bird.style["border-radius"]='3px';
-						var pipes=[];
-						bird.style.position='absolute';
-						bird.style.height='40px';
-						bird.style.width='40px';
-						bird.style.left=Math.ceil(width/3)+'px';
-						bird.style.top=(top/100*height)+'px';
-						bird.updatePosition=function(){
-							bird.style.transform='translateY('+(top/100*height-bird.offsetTop)+'px)';
-						};
-						event.dialog.appendChild(bird);
-						var isDead=function(){
-							if(top>100||top<0) return true;
-							var btop=top;
-							var bleft=100/3;
-							var bdown=btop+5;
-							var bright=bleft+5;
-							for(var i of pipes){
-								var left2=i.left;
-								var right2=left2+10;
-								var bottom2=i.height1;
-								var top2=i.height2;
-								
-								if(left2>bright||right2<bleft) continue;
-								if(btop<bottom2) return true;
-								if(bdown>top2) return true;
-								return false;
-							}
-							return false;
-						};
-						
-						var fly=function(){
-							if(!start){
-								start=true;
-								event.dialog.textPrompt.innerHTML='<div class="text center">当前分数：'+event.score+'</div>';
-								speed=-4;
-								event.fly=setInterval(function(){
-									top+=speed;
-									if(top<0) top=0;
-									bird.updatePosition();
-									for(var i of pipes){
-										i.left-=0.5;
-										i.updateLeft();
-									}
-									speed+=0.5;
-									if(speed>2.5) speed=2.5;
-									
-									if(isDead()==true){
-										event.settle();
-									}
-								},35);
-								var addPipe=function(){
-									var num=get.rand(5,55);
-									
-									var pipe1=ui.create.div('');
-									pipe1.style["background-image"]='linear-gradient(rgba(57, 133, 4, 1), rgba(60, 135, 6, 1))';
-									pipe1.style["border-radius"]='3px';
-									pipe1.style.position='absolute';
-									pipe1.height1=num;
-									pipe1.height2=num+50;
-									pipe1.left=110;
-									pipe1.num=1;
-									pipe1.style.height=Math.ceil(height*num/100)+'px';
-									pipe1.style.width=(width/10)+'px';
-									pipe1.style.left=(pipe1.left*width/100)+'px';
-									pipe1.style.top='0px';
-
-									var pipe2=ui.create.div('');
-									pipe2.style["background-image"]='linear-gradient(rgba(57, 133, 4, 1), rgba(60, 135, 6, 1))';
-									pipe2.style["border-radius"]='3px';
-									pipe1.pipe2=pipe2;
-									pipe2.style.position='absolute';
-									pipe2.style.height=Math.ceil((100-pipe1.height2)*height/100)+'px';
-									pipe2.style.width=(width/10)+'px';
-									pipe2.style.left=(pipe1.left*width/100)+'px';
-									pipe2.style.top=Math.ceil(pipe1.height2*height/100)+'px';
-									pipes.add(pipe1);
-									event.dialog.appendChild(pipe1);
-									event.dialog.appendChild(pipe2);
-									pipe1.updateLeft=function(){
-										this.style.transform='translateX('+((this.left/100*width)-this.offsetLeft)+'px)';
-										this.pipe2.style.transform='translateX('+((this.left/100*width)-this.pipe2.offsetLeft)+'px)';
-										if(this.left<25&&!this.score){
-											this.score=true;
-											event.score++;
-											event.dialog.textPrompt.innerHTML='<div class="text center">当前分数：'+event.score+'</div>';
-											if(event.score>=5) event.settle();
-										}
-										if(this.left<-15){
-											this.remove();
-											this.pipe2.remove();
-											pipes.remove(this);
-										}
-									}
-								};
-								event.addPipe=setInterval(addPipe,2500);
-							}
-							else if(speed>0){
-								speed=-4;
-							}
-						};
-						document.addEventListener(lib.config.touchscreen?'touchend':'click',fly);
-						
-						event.settle=function(){
-							clearInterval(event.fly);
-							clearInterval(event.addPipe);
-							document.removeEventListener(lib.config.touchscreen?'touchend':'click',fly);
-							setTimeout(function(){
-								event.switchToAuto()
-							},1000);
-						};
-						
-						game.pause();
-						game.countChoose();
-					};
+					var chooseButton=function(){lib.skill.yufeng.$playFlappyBird(5,'小空飞天')};
 					//event.switchToAuto=switchToAuto;
 					game.broadcastAll(createDialog,player,event.videoId);
 					if(event.isMine()){
@@ -12543,6 +12391,64 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			
+			//手杀削弱版许攸
+			junkshicai:{
+				audio:'nzry_shicai_2',
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					if(!event.cards.filterInD('oe').length) return false;
+					return player.getHistory('useCard',evt=>get.type2(evt.card)==get.type2(event.card)).indexOf(event)==0;
+				},
+				prompt2:function(event,player){
+					const cards=event.cards.filterInD('oe');
+					return '你可以将'+get.translation(cards)+(cards.length>1?'以任意顺序':'')+'置于牌堆顶，然后摸一张牌';
+				},
+				content:function(){
+					'step 0'
+					event.cards=trigger.cards.filterInD('oe');
+					var lose_list=[];
+					event.cards.forEach(card=>{
+						var owner=get.owner(card);
+						if(owner){
+							var arr=lose_list.find(i=>i[0]==owner);
+							if(arr) arr[1].push(card);
+							else lose_list.push([owner,[card]]);
+						}
+					});
+					if(lose_list.length){
+						game.loseAsync({
+							lose_list:lose_list,
+						}).setContent('chooseToCompareLose');
+					}
+					'step 1'
+					if(cards.length>1){
+						var next=player.chooseToMove('恃才：将牌按顺序置于牌堆顶');
+						next.set('list',[['牌堆顶',cards]]);
+						next.set('reverse',((_status.currentPhase&&_status.currentPhase.next)?get.attitude(player,_status.currentPhase.next)>0:false));
+						next.set('processAI',function(list){
+							var cards=list[0][1].slice(0);
+							cards.sort(function(a,b){
+								return (_status.event.reverse?1:-1)*(get.value(b)-get.value(a));
+							});
+							return [cards];
+						});
+					}
+					'step 2'
+					if(result.bool&&result.moved&&result.moved[0].length) cards=result.moved[0].slice(0);
+					cards.reverse();
+					game.cardsGotoPile(cards,'insert');
+					game.log(player,'将',cards,'置于了牌堆顶');
+					player.draw();
+				},
+				ai:{
+					reverseOrder:true,
+					skillTagFilter:function(player){
+						if(player.getHistory('useCard',function(evt){
+							return get.type(evt.card)=='equip';
+						}).length>0) return false;
+					},
+				},
+			},
 			//削弱版段煨
 			junklangmie:{
 				audio:'langmie',
@@ -19101,6 +19007,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junkwangxi_tag:'invisible',
 			junklangmie:'狼灭',
 			junklangmie_info:'其他角色的结束阶段开始时，你可以选择一项：⒈若其本回合内使用过某种类型的牌超过一张，则你弃置一张牌并摸两张牌。⒉若其本回合累计造成过的伤害大于1，则你弃置一张牌，然后对其造成1点伤害。',
+			junkshicai:"恃才",
+			junkshicai_info:"当你使用牌结束完毕后，若此牌与你本回合使用的牌类型均不同，则你可以将此牌置于牌堆顶，然后摸一张牌。",
 			ol_guohuai_ab:'郭淮',
 			old_jiakui:'通渠贾逵',
 			ol_guohuai:'三血郭淮',
@@ -19113,6 +19021,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junk_lidian_ab:'李典',
 			junk_duanwei:'削弱段煨',
 			junk_duanwei_ab:'段煨',
+			junk_xuyou:'手杀许攸',
 			
 			diy_tieba:'吧友设计',
 			diy_xushi:'玩点论杀·虚实篇',
@@ -19199,7 +19108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			雾岛佳乃:['Kirishima','Kano'],
 			苍井绘梨花:['Aoi','Erika'],
 			藏里见:['Kura','Satomi'],
-			喵呜·喵呼:['Myau','Mya-fu'],
+			'喵呜·喵呼':['Myau','Mya-fu'],
 			喵呜喵呼:['Myau','Mya-fu'],
 			伊吹风子:['Ibuki','Fuuko'],
 			久岛鸥:['Kushima','Kamome'],
@@ -19216,6 +19125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			远野美凪:['Toono','Minagi'],
 			樱庭星罗:['Sakuraba','Seira'],
 			坂上智代:['Sakagami','Tomoyo'],
+			冈崎汐:['Okazaki','Ushio']
 		},
 	};
 });

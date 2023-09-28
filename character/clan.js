@@ -36,7 +36,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
-					if(!event.isFirstTarget) return false;
+					if(!event.isFirstTarget||get.type(event.card)=='equip') return false;
 					return get.cardNameLength(event.card)==player.getHistory('useCard').indexOf(event.getParent())+1;
 				},
 				direct:true,
@@ -57,7 +57,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{threaten:3},
 				mod:{
 					aiOrder:function(player,card,num){
-						if(typeof card=='object'&&get.cardNameLength(card)==player.getHistory('useCard').length+1){
+						if(typeof card=='object'&&get.cardNameLength(card)==player.getHistory('useCard').length+1&&get.type(card)!='equip'){
 							if(get.effect(player,card,player,player)>0) return num+10;
 						}
 					},
@@ -339,7 +339,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var storage=player.storage.clanjiexuan;
 					var name=(storage||0)%2?'guohe':'shunshou';
 					var fix=player.hasSkill('clanzhongliu')&&get.position(card)!='h'?2:1;
-					return get.value({name:name},player)-get.value(card)+fix;
+					return (get.value({name:name},player)-get.value(card))*fix;
 				},
 				position:'hes',
 				filterCard:function(card,player){
@@ -347,7 +347,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.color(card)==((storage||0)%2?'black':'red');
 				},
 				prompt:function(){
-					if(_status.event.player.storage.clanjiexuan) return '将一张黑色牌当【过河拆桥】使用';
+					var storage=_status.event.player.storage.clanjiexuan;
+					if((storage||0)%2) return '将一张黑色牌当【过河拆桥】使用';
 					return '将一张红色牌当【顺手牵羊】使用';
 				},
 				skillAnimation:true,
@@ -370,10 +371,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			clanmingjie:{
+				init:function(player){
+					player.addSkill('clanmingjie_record');
+				},
+				onremove:function(player){
+					player.removeSkill('clanmingjie_record');
+				},
 				audio:2,
 				enable:'phaseUse',
 				limited:true,
-				filterTarget:true,
+				filterTarget:function(card,player,target){
+					return !player.getStorage('clanmingjie_effect').contains(target);
+				},
 				skillAnimation:true,
 				animationColor:'thunder',
 				content:function(){
@@ -381,8 +390,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('clanmingjie');
 					player.addSkill('clanmingjie_effect');
 					player.markAuto('clanmingjie_effect',[target]);
-					target.addTempSkill('clanmingjie_targeted',{player:'phaseAfter'});
-					target.markAuto('clanmingjie_targeted',[player]);
+					target.addSkill('clanmingjie_mark');
+					target.markAuto('clanmingjie_mark',[player]);
 				},
 				ai:{
 					order:10,
@@ -415,138 +424,98 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					effect:{
-						trigger:{player:'useCard2'},
 						charlotte:true,
+						audio:'clanmingjie',
+						trigger:{player:'useCard2'},
 						filter:function(event,player){
 							var card=event.card;
 							var info=get.info(card);
 							if(info.allowMultiple==false) return false;
 							if(event.targets&&!info.multitarget){
-								if(player.getStorage('clanmingjie_effect').some(current=>{
-									return current.isIn()&&!event.targets.contains(current)&&lib.filter.targetEnabled2(card,player,current);
-								})){
-									return true;
-								}
+								return player.getStorage('clanmingjie_effect').some(current=>{
+									return current.isIn()&&!event.targets.contains(current)&&lib.filter.targetEnabled2(card,player,current)&&lib.filter.targetInRange(card,player,current);
+								});
 							}
 							return false;
 						},
-						prompt:'是否发动【铭戒】？',
-						prompt2:function(event,player){
-							var list=player.getStorage('clanmingjie_effect').filter(target=>{
-								if(event.targets.contains(target)||!target.isIn()) return false;
-								return lib.filter.targetEnabled2(event.card,player,target);
-							});
-							return '令'+get.translation(list)+'也成为'+get.translation(event.card)+'的目标';
-						},
-						logTarget:function(event,player){
-							return player.getStorage('clanmingjie_effect').filter(target=>{
-								if(event.targets.contains(target)||!target.isIn()) return false;
-								return lib.filter.targetEnabled2(event.card,player,target);
-							});
-						},
-						check:function(event,player){
-							var eff=0;
-							var list=player.getStorage('clanmingjie_effect').filter(target=>{
-								if(event.targets.contains(target)||!target.isIn()) return false;
-								return lib.filter.targetEnabled2(event.card,player,target);
-							});
-							for(var i of list) eff+=get.effect(i,event.card,player,player);
-							return eff>0;
-						},
+						direct:true,
 						content:function(){
-							var list=player.getStorage('clanmingjie_effect').filter(target=>{
-								if(trigger.targets.contains(target)||!target.isIn()) return false;
-								return lib.filter.targetEnabled2(trigger.card,player,target);
+							'step 0'
+							player.chooseTarget(get.prompt('clanmingjie_effect'),'令任意【铭戒】目标角色成为'+get.translation(trigger.card)+'的目标',function(card,player,target){
+								var trigger=_status.event.getTrigger();
+								if(trigger.targets.contains(target)||!target.isIn()||!player.getStorage('clanmingjie_effect').contains(target)) return false;
+								return lib.filter.targetEnabled2(trigger.card,player,target)&&lib.filter.targetInRange(trigger.card,player,target);
+							},[1,Infinity]).set('ai',function(target){
+								var player=_status.event.player;
+								var trigger=_status.event.getTrigger();
+								return get.effect(target,trigger.card,player,player);
 							});
-							if(list.length>0){
-								trigger.targets.addArray(list);
-								game.log(list,'也成为了',trigger.card,'的目标');
+							'step 1'
+							if(result.bool){
+								var targets=result.targets.sortBySeat();
+								player.logSkill('clanmingjie_effect',targets);
+								trigger.targets.addArray(targets);
+								game.log(targets,'成为了',trigger.card,'的额外目标');
 							}
 						},
-						intro:{
-							content:'使用牌时可以额外指定$为目标',
-						},
-						ai:{
-							effect:{
-								player:function(card,player,target){
-									if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
-									if(player.getStorage('clanmingjie_effect').contains(target)) return [1,-0.5];
-								},
-							},
-						},
+						group:'clanmingjie_targeted',
+						intro:{content:'使用牌时可以额外指定$为目标'},
 					},
 					targeted:{
-						trigger:{
-							player:'phaseEnd',
-						},
+						charlotte:true,
+						trigger:{global:'phaseEnd'},
 						filter:function(event,player){
-							return player.getStorage('clanmingjie_targeted').length;
+							if(!player.getStorage('clanmingjie_effect').contains(event.player)) return false;
+							return event.player!=player||!player.getHistory('useSkill',evt=>evt.skill=='clanmingjie'&&evt.targets[0]==player).length;
 						},
 						forced:true,
 						popup:false,
-						onremove:['clanmingjie_targeted','clanmingjie_record'],
-						charlotte:true,
-						group:'clanmingjie_record',
 						content:function(){
 							'step 0'
-							var targets=player.getStorage('clanmingjie_targeted').slice();
-							targets.sortBySeat();
-							event.targets=targets;
-							event.targetsx=targets.slice();
-							var cards=[];
-							var list=player.getStorage('clanmingjie_record');
-							if(list.length){
-								cards.addArray(list);
-							}
+							var cards=player.getStorage('clanmingjie_record').slice();
 							cards=cards.filterInD('d');
 							if(cards.length){
 								event.cards=cards;
 							}
-							else event.goto(6);
+							else event.goto(4);
 							'step 1'
-							event.target=targets.shift();
-							event.cards2=cards.filterInD('d');
-							'step 2'
-							target.chooseButton(['铭戒：是否使用这些牌？',event.cards2]).set('filterButton',button=>{
+							player.chooseButton(['铭戒：是否使用这些牌？',cards]).set('filterButton',button=>{
 								return _status.event.player.hasUseTarget(button.link);
 							}).set('ai',button=>{
 								return _status.event.player.getUseValue(button.link);
 							});
-							'step 3'
+							'step 2'
 							if(result.bool){
 								var card=result.links[0];
-								event.cards2.remove(card);
-								target.$gain2(card,false);
+								event.cards.remove(card);
+								player.$gain2(card,false);
 								game.delayx();
-								target.chooseUseTarget(card,true);
+								player.chooseUseTarget(card,true);
 							}
-							else event.goto(5);
+							else event.goto(4);
+							'step 3'
+							if(event.cards.filter(card=>{
+								return get.position(card,true)=='d'&&player.hasUseTarget(card);
+							}).length) event.goto(1);
 							'step 4'
-							if(event.cards2.filter(card=>{
-								return get.position(card,true)=='d'&&target.hasUseTarget(card);
-							}).length) event.goto(2);
+							player.unmarkAuto('clanmingjie_effect',[trigger.player]);
+							trigger.player.unmarkAuto('clanmingjie_mark',[player]);
 							'step 5'
-							if(targets.length) event.goto(1);
-							'step 6'
-							event.targetsx.forEach(target=>{
-								target.unmarkAuto('clanmingjie_effect',[player]);
-							});
-							player.removeSkill('clanmingjie_targeted');
-						},
-						marktext:'戒',
-						intro:{
-							content:'已被$指定为〖铭戒〗目标',
+							if(!player.getStorage('clanmingjie_effect').length) player.removeSkill('clanmingjie_effect');
+							if(!trigger.player.getStorage('clanmingjie_mark').length) player.removeSkill('clanmingjie_mark');
 						},
 					},
+					mark:{
+						charlotte:true,
+						marktext:'戒',
+						intro:{content:'已被$指定为【铭戒】目标'},
+					},
 					record:{
+						charlotte:true,
 						trigger:{
 							global:['shaMiss','eventNeutralized','useCard1','phaseAfter'],
 						},
-						silent:true,
-						forced:true,
-						charlotte:true,
 						filter:function(event,player){
-							if(_status.currentPhase!=player) return false;
 							if(event.name=='useCard'){
 								return get.suit(event.card)=='spade';
 							}
@@ -554,6 +523,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(event.type!='card') return false;
 							return true;
 						},
+						silent:true,
+						forced:true,
 						content:function(){
 							'step 0'
 							if(trigger.name=='phase'){
@@ -562,10 +533,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							player.markAuto('clanmingjie_record',trigger.cards);
 						}
-					}
+					},
 				}
 			},
-			//钟琰族钟琰
+			//族钟琰
 			clanguangu:{
 				audio:2,
 				enable:'phaseUse',
@@ -703,7 +674,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										var owner=_status.event.getParent().owner;
 										if(owner) owner.$throw(card.cards);
 									});
-									if(card.name!=cardx.name||card.nature!=cardx.nature) next.viewAs=true;
+									if(card.name!=cardx.name||!get.is.sameNature(card,cardx)) next.viewAs=true;
 									var owner=get.owner(card);
 									if(owner!=player&&get.position(card)=='h'){
 										next.throw=false;
@@ -1104,7 +1075,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.classList.add('linked2');
 							try{
 								var cards=player.getCards('hs',cardx=>{
-									return get.name(cardx)=='sha'&&lib.linked.contains(get.nature(cardx));
+									if(get.name(cardx)!='sha') return false;
+									return cardx.hasNature('linked');
 								});
 								cards.map(i=>[i,get.effect(target,i,player,player)]);
 								cards.sort((a,b)=>b[1]-a[1]);
@@ -1123,7 +1095,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('goon',player.countCards('hs',card=>{
 						return get.name(card)=='jiu'&&player.hasUseTarget(card);
 					})&&player.countCards('hs',card=>{
-						return get.name(card)=='sha'&&lib.linked.contains(get.nature(card));
+						if(get.name(card)!='sha') return false;
+						return card.hasNature('linked');
 					}));
 					'step 1'
 					if(result.bool){
@@ -1596,14 +1569,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var list=[],names=[];
 							for(var card of cards){
 								var name=get.name(card),nature=get.nature(card);
-								var namex=name+(nature?nature:'');
+								var namex=name+nature;
 								if(names.contains(namex)) continue;
-								if(nature) list.push([get.type(card),'',name,nature]);
+								if(nature.length) list.push([get.type(card),'',name,nature]);
 								else list.push([get.type(card),'',name]);
 								names.push(namex);
 							}
 							list.sort((a,b)=>{
-								return 100*(lib.inpile.indexOf(a[2])-lib.inpile.indexOf(b[2]))+lib.inpile_nature.indexOf(a[3])-lib.inpile_nature.indexOf(b[3]);
+								return 100*(lib.inpile.indexOf(a[2])-lib.inpile.indexOf(b[2]))+lib.inpile_nature.indexOf(a[3][0])-lib.inpile_nature.indexOf(b[3][0]);
 							})
 							player.chooseButton(['是否将'+get.cnNumber(cards.length)+'张牌当下列一张牌使用？',[list,'vcard']]).set('ai',function(button){
 								return _status.event.player.getUseValue({name:button.link[2],nature:button.link[3]});
@@ -1617,7 +1590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									lib.skill.clanshenjun_backup.viewAs=card;
 								},cards.length,{name:name,nature:nature});
 								var next=player.chooseToUse();
-								next.set('openskilldialog','将'+get.cnNumber(cards.length)+'张牌当做'+(nature?get.translation(nature):'')+'【'+get.translation(name)+'】使用');
+								next.set('openskilldialog','将'+get.cnNumber(cards.length)+'张牌当做'+(get.translation(nature)||'')+'【'+get.translation(name)+'】使用');
 								next.set('norestore',true);
 								next.set('addCount',false);
 								next.set('_backupevent','clanshenjun_backup');
@@ -1712,10 +1685,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
-					if(!event.nature||!event.player.isIn()) return false;
+					if(!event.hasNature()||!event.player.isIn()) return false;
 					return game.countPlayer2(current=>{
 						return current.hasHistory('damage',evt=>{
-							return evt.nature&&evt!=event;
+							return evt.hasNature()&&evt!=event;
 						});
 					})==0;
 				},
@@ -2216,7 +2189,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				clanSkill:true,
 				audioname:['clan_wuxian','clan_wuban','clan_wukuang'],
-				trigger:{player:'phaseZhunbeiBegin'},
+				trigger:{player:'phaseBegin'},
 				isMax:function(player){
 					var num=player.getHandcardLimit();
 					return !game.hasPlayer(function(current){
@@ -2310,7 +2283,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanguixiang:'贵相',
 			clanguixiang_info:'锁定技。你的非出牌阶段开始前，若此阶段即将成为你本回合内的第X个阶段（X为你的手牌上限），则你终止此阶段，改为进行一个出牌阶段。',
 			clanmuyin:'穆荫',
-			clanmuyin_info:'宗族技。准备阶段，你可以选择一名手牌上限不为全场最多的陈留吴氏角色。该角色的手牌上限+1。',
+			clanmuyin_info:'宗族技。回合开始时，你可以选择一名手牌上限不为全场最多的陈留吴氏角色。该角色的手牌上限+1。',
 			chenliuwushi:'陈留·吴氏',
 			clan_wuban:'族吴班',
 			clanzhanding:'斩钉',
@@ -2385,7 +2358,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanxieshu_info:'当你使用牌造成伤害后，或受到来自牌造成的伤害后，你可以弃置Y张牌并摸你已损失体力值张牌（Y为此牌牌名字数）。',
 			clan_zhongyu:'族钟毓',
 			clanjiejian:'捷谏',
-			clanjiejian_info:'当你于一回合使用第X张牌指定第一个目标后，你可以令一名目标角色摸X张牌。（X为此牌牌名字数）',
+			clanjiejian_info:'当你于一回合使用第X张牌指定第一个目标后，若此牌不为装备牌，则你可以令一名目标角色摸X张牌。（X为此牌牌名字数）',
 			clanhuanghan:'惶汗',
 			clanhuanghan_info:'当你受到牌造成的伤害后，你可以摸X张牌并弃置Y张牌（X为此牌牌名字数，Y为你已损失的体力值），然后若此次技能发动不为你本回合首次发动此技能，你重置技能〖保族〗。',
 			

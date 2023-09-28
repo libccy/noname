@@ -102,34 +102,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
-					return player.countEquipableSlot(1)>0;
+					return player.countEmptySlot(1)>0;
 				},
 				content:function(){
 					'step 0'
 					if(!_status.characterlist){
 						lib.skill.pingjian.initList();
 					}
-					var list=_status.characterlist.randomGets(5);
+					_status.characterlist.randomSort();
+					var list=[];
+					for(var name of _status.characterlist){
+						var info=lib.character[name];
+						if(info[3].some(function(skill){
+							var info=get.skillInfoTranslation(skill);
+							if(!info.includes('【杀】')) return false;
+							var list=get.skillCategoriesOf(skill);
+							list.remove('锁定技');
+							return list.length==0;
+						})){
+							list.push(name);
+							if(list.length>=5) break;
+						}
+					}
 					if(!list.length) event.finish();
 					else{
-						var num=player.countEquipableSlot(1);
+						var num=player.countEmptySlot(1);
 						player.chooseButton([
-							'挈挟：选择至多'+get.cnNumber(num)+'张武将置入武器栏',
-							[list,'character'],
-						],[1,num],true).set('filterButton',function(button){
-							var name=button.link;
-							var info=lib.character[name];
-							if(info[3].some(function(skill){
-								var info=get.skillInfoTranslation(skill);
-								if(!info.includes('【杀】')) return false;
-								var list=get.skillCategoriesOf(skill);
-								list.remove('锁定技');
-								return list.length==0;
-							})){
-								button.classList.add('glow2');
-							}
-							return true;
-						}).set('ai',function(button){
+							'挈挟：选择'+(num>1?'至多':'')+get.cnNumber(num)+'张武将置入武器栏',
+							[list,function(item,type,position,noclick,node){
+								return lib.skill.qiexie.$createButton(item,type,position,noclick,node);
+							}],
+						],[1,num],true).set('ai',function(button){
 							var name=button.link;
 							var info=lib.character[name];
 							var skills=info[3].filter(function(skill){
@@ -157,12 +160,59 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var card=game.createCard('qiexie_'+name,'none',get.infoMaxHp(lib.character[name][2]));
 							return card;
 						});
-						player.addTempSkill('qiexie_blocker','qiexieAfter');
-						player.markAuto('qiexie_blocker',cards);
 						player.$gain2(cards);
 						game.delayx();
 						for(var card of cards) player.equip(card);
 					}
+				},
+				$createButton:function(item,type,position,noclick,node){
+					node=ui.create.buttonPresets.character(item,'character',position,noclick);
+					const info=lib.character[item];
+					const skills=info[3].filter(function(skill){
+						var info=get.skillInfoTranslation(skill);
+						if(!info.includes('【杀】')) return false;
+						var list=get.skillCategoriesOf(skill);
+						list.remove('锁定技');
+						return list.length==0;
+					});
+					if(skills.length){
+						const skillstr=skills.map(i=>`[${get.translation(i)}]`).join('<br>');
+						const skillnode=ui.create.caption(
+							`<div class="text" data-nature=${get.groupnature(info[1],'raw')
+								}m style="font-family: ${(lib.config.name_font||'xinwei')
+								},xinwei">${skillstr}</div>`,node);
+						skillnode.style.left='2px';
+						skillnode.style.bottom='2px';
+					}
+					node._customintro=function(uiintro,evt){
+						const character=node.link,characterInfo=get.character(node.link);
+						let capt=get.translation(character);
+						if(characterInfo){
+							const infoHp=get.infoMaxHp(characterInfo[2]);
+							capt+=`&nbsp;&nbsp;范围：${infoHp}`;
+						}
+						uiintro.add(capt);
+
+						if(lib.characterTitle[node.link]){
+							uiintro.addText(get.colorspan(lib.characterTitle[node.link]));
+						}
+						for(let i=0;i<skills.length;i++){
+							if(lib.translate[skills[i]+'_info']){
+								let translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
+								if(lib.skill[skills[i]]&&lib.skill[skills[i]].nobracket){
+									uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+								}
+								else{
+									uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+								}
+								if(lib.translate[skills[i]+'_append']){
+									uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
+								}
+							}
+						}
+					}
+
+					return node;
 				},
 				video:function(player,info){
 					for(var name of info[0]){
@@ -238,29 +288,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				subSkill:{
-					blocker:{
-						mod:{
-							canBeReplaced:function(card,player){
-								if(player.getStorage('qiexie_blocker').contains(card)) return false;
-							},
-						},
-						charlotte:true,
-						onremove:true,
-						trigger:{player:'equipEnd'},
-						forced:true,
-						firstDo:true,
-						priority:Infinity,
-						filter:function(event){
-							var evt=event.getParent();
-							if(evt.name!='qiexie') return false;
-							return !evt.next.some(event=>{
-								return event.name=='equip';
-							})
-						},
-						content:function(){
-							player.removeSkill('qiexie_blocker');
-						},
-					},
 					destroy:{
 						trigger:{player:'loseBegin'},
 						equipSkill:true,
@@ -295,12 +322,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var distance=get.distance(player,target);
 					return !game.hasPlayer(current=>(current!=target&&player.inRange(current)&&get.distance(player,current)>distance));
 				},
+				selectTarget:[0,1],
+				filterOk:function(){
+					var player=_status.event.player;
+					if(game.hasPlayer(target=>lib.skill.cuijue.filterTarget('SB',player,target))) return ui.selected.targets.length>0;
+					return true;
+				},
 				position:'he',
-				check:card=>6-get.value(card),
+				complexTarget:true,
+				check:card=>{
+					var player=_status.event.player,goon=0;
+					try{
+						ui.selected.cards.add(card);
+						if(game.hasPlayer(target=>{
+							return lib.skill.cuijue.filterTarget('SB',player,target);
+						})){
+							goon=6;
+						}
+					}catch(e){}
+					ui.selected.cards.remove(card);
+					return goon-get.value(card);
+				},
 				content:function(){
-					player.addTempSkill('cuijue_used','phaseUseAfter');
-					player.markAuto('cuijue_used',[target]);
-					target.damage('nocard');
+					if(target){
+						player.addTempSkill('cuijue_used','phaseUseAfter');
+						player.markAuto('cuijue_used',[target]);
+						target.damage('nocard');
+					}
 				},
 				ai:{
 					order:2,
@@ -830,11 +878,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.removeMark('yizhao',player.countMark('yizhao'));
-					var cards=get.cards(ui.cardPile.childElementCount+1);
-					for(var i=0;i<cards.length;i++){
-						ui.cardPile.insertBefore(cards[i],ui.cardPile.childNodes[get.rand(ui.cardPile.childElementCount)]);
-					}
-					game.updateRoundNumber();
+					game.washCard();
 					'step 1'
 					var pile=Array.from(ui.cardPile.childNodes);
 					if(pile.length<3) return;
@@ -903,9 +947,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseEnd'},
 				direct:true,
 				filter:function(event,player){
-					return player.hasSkill('tianjie_shuffled');
+					return game.hasGlobalHistory('cardMove',evt=>evt.washCard)&&game.hasPlayer(current=>current!=player);
 				},
-				group:'tianjie_effect',
 				skillAnimation:true,
 				animationColor:'metal',
 				content:function(){
@@ -925,18 +968,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				subSkill:{
-					effect:{
-						trigger:{global:'washCard'},
-						forced:true,
-						silent:true,
-						charlotte:true,
-						content:function(){
-							player.addTempSkill('tianjie_shuffled');
-						},
-					},
-					shuffled:{charlotte:true},
-				}
 			},
 			shencai:{
 				audio:2,
@@ -1549,7 +1580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mark:true,
 						content:function(){
 							trigger.num++;
-							trigger.nature='thunder';
+							game.setNature(trigger,'thunder');
 						},
 						marktext:'⚡',
 						intro:{
@@ -5363,7 +5394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dawu2:{
 				trigger:{player:'damageBegin4'},
 				filter:function(event){
-					if(event.nature!='thunder') return true;
+					if(!event.hasNature('thunder')) return true;
 					return false;
 				},
 				mark:true,
@@ -5436,7 +5467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kuangfeng2:{
 				trigger:{player:'damageBegin3'},
 				filter:function(event){
-					if(event.nature=='fire') return true;
+					if(event.hasNature('fire')) return true;
 					return false;
 				},
 				mark:true,
@@ -6129,7 +6160,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(['trick','delay'].contains(lib.card[card.name].type)) return 'thunder';
 							},
 							cardUsable:function(card,player){
-								if(card.name=='sha'&&card.nature=='thunder') return Infinity;
+								if(card.name=='sha'&&card.hasNature('thunder')) return Infinity;
 							},
 						},
 						ai:{
@@ -7340,7 +7371,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiexie:'挈挟',
 			qiexie_info:'锁定技。准备阶段，你在剩余武将牌堆中随机观看五张牌，选择其中的任意张，将其按照如下规则转化为武器牌置入你的武器栏：{⒈此牌不具有花色，且其攻击范围和点数等于此武将牌的体力上限。⒉此武器牌的技能为该武将牌上所有描述中包含“【杀】”且不具有锁定技以外的标签的技能。⒊此武器牌离开你的装备区时，改为放回武将牌堆。}',
 			cuijue:'摧决',
-			cuijue_info:'每回合每名角色限一次。出牌阶段，你可以弃置一张牌，然后对攻击范围内距离最远的一名其他角色造成1点伤害。',
+			cuijue_info:'每回合每名角色限一次。出牌阶段，你可以弃置一张牌，然后对攻击范围内距离最远的一名其他角色造成1点伤害（没有则不选）。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',

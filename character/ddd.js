@@ -875,7 +875,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player,target=_status.event.getParent().target;
 						if(get.attitude(player,target)<0) return false;
 						if(!_status.event.colors.contains(get.color(card,player))) return 0;
-						if(card.nature) return 1.2;
+						if(card.hasNature()) return 1.2;
 						return 1;
 					})
 					'step 3'
@@ -897,8 +897,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var name=get.name(card,target),type=get.type(card);
 						if(type!='basic'&&type!='trick') continue;
 						if(name=='sha'){
-							var nature=get.nature(card,target);
-							if(nature&&lib.nature.contains(nature)) name+=('|'+nature);
+							var natures=get.natureList(card,target);
+							for(var nature of natures){
+								if(nature&&lib.nature.has(nature)) name+=('|'+nature);
+							}
 						}
 						names.push(name);
 					}
@@ -910,7 +912,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'是否视为使用一张牌？',
 						[event.names.map(name=>{
 							if(name.indexOf('sha|')==0){
-								return ['基本','','sha',name.slice(4)];
+								return ['基本','','sha',name.slice(4).split('|')];
 							}
 							return [get.type(name),'',name];
 						}),'vcard']
@@ -939,7 +941,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.chooseUseTarget(card,true,false);
 						if(event.num>0){
 							var name=card.name;
-							if(name=='sha'&&lib.nature.contains(card.nature)) name=(card.name+'|'+card.nature);
+							if(name=='sha'){
+								var natures=get.natureList(card,target);
+								for(var nature of natures){
+									if(nature&&lib.nature.has(nature)) name+=('|'+nature);
+								}
+							}
 							event.names.remove(name);
 							if(event.names.length>0) event.goto(5);
 						}
@@ -3152,7 +3159,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!vpos||!vpos.isIn()) return [];
 					var vcard=[];
 					var history=vpos.getPrevious().actionHistory.filter(evt=>!evt.custom.some(i=>i['dddyouxue']));
-					debugger
 					history=history[history.length-2];
 					var evts=history.useCard;
 					for(var evt of evts){

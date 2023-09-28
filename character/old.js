@@ -9,13 +9,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_standard:['ol_yuanshu'],
 				old_shenhua:['old_caocao',"yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","old_xiaoqiao","pangde","xuhuang",'junk_sunquan',"huangzhong","new_caoren",'old_chendao'],
 				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong",'old_re_lidian'],
-				old_yijiang1:["masu","xushu","xin_yujin","old_xusheng","old_lingtong","fazheng",'old_gaoshun'],
-				old_yijiang2:["old_zhonghui","madai",'old_handang','old_liubiao','oldre_liubiao','old_guanzhang'],
+				old_yijiang1:["masu","xushu","xin_yujin","old_xusheng","old_lingtong","fazheng",'old_gaoshun','re_yujin'],
+				old_yijiang2:["old_zhonghui","madai",'old_handang','old_liubiao','oldre_liubiao','old_guanzhang','old_wangyi'],
 				old_yijiang3:["liru","old_zhuran","old_fuhuanghou","old_caochong"],
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan",'old_caorui'],
 				old_yijiang5:["old_caoxiu","old_zhuzhi"],
 				old_yijiang67:["ol_zhangrang",'old_huanghao','old_liyan'],
-				old_sp:["old_wanglang","old_maliang","old_machao","zhangliang","jsp_caoren","ol_guansuo","old_zhangxingcai","old_huangfusong","old_wangyun",'old_dingfeng'],
+				old_sp:["old_wanglang","old_maliang","old_machao","zhangliang","jsp_caoren","old_zhangxingcai","old_wangyun",'old_dingfeng'],
 				old_yingbian:['junk_simayi','old_yangyan','old_yangzhi'],
 				old_mobile:["old_caochun",'old_majun'],
 			},
@@ -49,7 +49,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
 			weiyan:['male','shu',4,['kuanggu']],
 			xiahouyuan:['male','wei',4,['shensu']],
-			old_huangfusong:['male','qun',4,['fenyue']],
 			old_majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"],[]],
 			old_zhangxingcai:['female','shu',3,['oldshenxian','qiangwu']],
 			old_fuhuanghou:['female','qun',3,['oldzhuikong','oldqiuyuan']],
@@ -81,11 +80,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_machao:['male','qun',4,['zhuiji','oldcihuai']],
 			old_zhugezhan:["male","shu",3,["old_zuilun","old_fuyin"]],
 			zhangliang:["male","qun",4,["old_jijun","old_fangtong"]],
-			ol_zhangrang:['male','qun',3,['xintaoluan']],
-			ol_guansuo:['male','shu',4,['zhengnan','xiefang']],
+			ol_zhangrang:['male','qun',3,['xintaoluan'],['sex:male_castrated']],
 			//ol_manchong:['male','wei',3,['yuce','junxing']],
 			old_guanqiujian:["male","wei",4,["drlt_zhenrong","drlt_hongju"],[]],
 			old_wanglang:['male','wei',3,['gushe','jici']],
+			old_wangyi:['female','wei',3,['oldzhenlie','oldmiji']],
+			re_yujin:['male','wei',4,['yizhong']],
 		},
 		skill:{
 			//魏武帝
@@ -521,7 +521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.getStorage('old_guhuo_cheated').contains(card.name+card.nature)&&!player.hasCard(function(cardx){
 							if(card.name==cardx.name){
 								if(card.name!='sha') return true;
-								return get.nature(card)==get.nature(cardx);
+								return get.is.sameNature(card,cardx);
 							}
 							return false;
 						},'hs')&&Math.random()<0.7) return 0;
@@ -530,7 +530,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!player.hasCard(function(cardx){
 								if(card.name==cardx.name){
 									if(card.name!='sha') return true;
-									return get.nature(card)==get.nature(cardx);
+									return get.is.sameNature(card,cardx);
 								}
 								return false;
 							},'hs')){
@@ -570,7 +570,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								});
 								var cardx=lib.skill.old_guhuo_backup.viewAs;
 								if(enemyNum){
-									if(card.name==cardx.name&&(card.name!='sha'||card.nature==cardx.nature)||player.getStorage('old_guhuo_cheated').contains(card.name+card.nature)) return (get.suit(card)=='heart'?8:4)+Math.random()*3;
+									if(card.name==cardx.name&&(card.name!='sha'||get.is.sameNature(card,cardx))||player.getStorage('old_guhuo_cheated').contains(card.name+card.nature)) return (get.suit(card)=='heart'?8:4)+Math.random()*3;
 									else if(lib.skill.old_guhuo_backup.aiUse<0.5&&!player.isDying()) return 0;
 								}
 								return get.value(cardx)-get.value(card);
@@ -647,7 +647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.goon=true;
 					event.betrayers=[];
 					var card=trigger.cards[0];
-					if(card.name!=trigger.card.name||(card.name=='sha'&&(trigger.card.nature||card.nature)&&trigger.card.nature!=card.nature)) event.fake=true;
+					if(card.name!=trigger.card.name||(card.name=='sha'&&!get.is.sameNature(trigger.card,card))) event.fake=true;
 					if(event.fake){
 						player.addSkill('old_guhuo_cheated');
 						player.markAuto('old_guhuo_cheated',[trigger.card.name+trigger.card.nature]);
@@ -1037,18 +1037,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_zhangrang:'旧张让',
 			ol_liaohua:'OL廖化',
 			ol_zhuran:'OL朱然',
-			ol_guansuo:'OL关索',
 			ol_manchong:'OL满宠',
 			old_fuhuanghou:'旧伏寿',
 			old_caochong:'旧曹冲',
 			old_guanqiujian:'旧毌丘俭',
-			old_huangfusong:'旧皇甫嵩',
 			old_wangyun:'旧王允',
 			old_zhaoyun:'新杀赵云',
 			old_zhaoyun_ab:'赵云',
 			ol_huaxiong:'旧华雄',
 			old_xiaoqiao:'旧小乔',
 			old_wanglang:'旧王朗',
+			old_wangyi:'旧王异',
+			xin_yujin:'节钺于禁',
+			re_yujin:'毅重于禁',
 
 			old_guhuo:"蛊惑",
 			old_guhuo_info:"你可以扣置一张手牌当做一张基本牌或普通锦囊牌使用或打出，体力值不为0的其他角色依次选择是否质疑。然后，若有质疑的角色，你展示此牌：若为假，此牌作废，这些角色摸一张牌；若为真，这些角色失去1点体力，且若此牌不为♥，此牌作废。",

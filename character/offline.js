@@ -589,13 +589,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.responded||event.psshouli||event.type=='wuxie') return false;
 					if(game.hasPlayer(function(current){
-						return current.getEquip(4);
+						return current.getEquips(4).length>0;
 					})&&event.filterCard({
 						name:'sha',
 						storage:{psshouli:true},
 					},player,event)) return true;
 					if(game.hasPlayer(function(current){
-						return current.getEquip(3);
+						return current.getEquips(3).length>0;
 					})&&event.filterCard({
 						name:'shan',
 						storage:{psshouli:true},
@@ -607,23 +607,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					var event=_status.event,evt=event;
 					if(event._backup) evt=event._backup;
-					var equip3=target.getEquip(3);
-					var equip4=target.getEquip(4);
-					if(equip3&&evt.filterCard(get.autoViewAs({
+					var equip3=target.getCards('e',card=>get.subtype(card,false)=='equip3');
+					var equip4=target.getCards('e',card=>get.subtype(card,false)=='equip4');
+					if(equip3.length&&equip3.some(card=>evt.filterCard(get.autoViewAs({
 						name:'shan',
 						storage:{psshouli:true},
-					},[equip3]),player,event)) return true;
-					var sha=get.autoViewAs({
-						name:'sha',
-						storage:{psshouli:true},
-					},[equip4]);
-					if(equip4&&evt.filterCard(sha,player,event)){
-						if(!evt.filterTarget) return true;
-						return game.hasPlayer(function(current){
-							return evt.filterTarget(sha,player,current);
-						})
-					};
-					return false;
+					},[card]),player,event))) return true;
+					return equip4.some(card=>{
+						var sha=get.autoViewAs({
+							name:'sha',
+							storage:{psshouli:true},
+						},[card]);
+						if(evt.filterCard(sha,player,event)){
+							if(!evt.filterTarget) return true;
+							return game.hasPlayer(function(current){
+								return evt.filterTarget(sha,player,current);
+							})
+						};
+					})
 				},
 				prompt:'将场上的一张坐骑牌当做【杀】或【闪】使用或打出',
 				content:function(){
@@ -631,32 +632,45 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var evt=event.getParent(2);
 					evt.set('psshouli',true);
 					var list=[];
-					var equip3=target.getEquip(3);
-					var equip4=target.getEquip(4);
+					var equip3=target.getCards('e',card=>get.subtype(card,false)=='equip3');
+					var equip4=target.getCards('e',card=>get.subtype(card,false)=='equip4');
 					var backupx=_status.event;
 					_status.event=evt;
 					try{
-						if(equip3){
+						if(equip3.length&&equip3.some(card=>{
 							var shan=get.autoViewAs({
 								name:'shan',
 								storage:{psshouli:true},
-							},[equip3]);
-							if(evt.filterCard(shan,player,event)) list.push('shan');
+							},[card]);
+							if(evt.filterCard(shan,player,event)) return true;
+							return false;
+						})){
+							list.push('shan');
 						}
-						if(equip4){
+						if(equip4.length&&equip4.some(card=>{
 							var sha=get.autoViewAs({
 								name:'sha',
 								storage:{psshouli:true},
-							},[equip4]);
+							},[card]);
 							if(evt.filterCard(sha,player,evt)&&(!evt.filterTarget||game.hasPlayer(function(current){
 								return evt.filterTarget(sha,player,current);
-							}))) list.push('sha');
+							}))) return true;
+							return false;
+						})){
+							list.push('sha');
 						};
 					}catch(e){game.print(e)};
 					_status.event=backupx;
-					if(list.length==1) event._result={
-						bool:true,
-						links:[list[0]=='shan'?equip3:equip4],
+					if(list.length==1){
+						event.cardName=list[0];
+						var cards=list[0]=='shan'?equip3:equip4;
+						if(cards.length==1) event._result={
+							bool:true,
+							links:[cards[0]],
+						}
+						else player.choosePlayerCard(true,target,'e').set('filterButton',function(button){
+							return _status.event.cards.contains(button.link);
+						}).set('cards',cards)
 					}
 					else player.choosePlayerCard(true,target,'e').set('filterButton',function(button){
 						var type=get.subtype(button.link);
@@ -665,7 +679,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var evt=event.getParent(2);
 					if(result.bool&&result.links&&result.links.length){
-						var name=get.subtype(result.links[0])=='equip3'?'shan':'sha';
+						var name=(event.cardName||(get.subtype(result.links[0])=='equip4'?'sha':'shan'));
 						if(evt.name=='chooseToUse'){
 							game.broadcastAll(function(result,name){
 								lib.skill.psshouli_backup.viewAs={
@@ -731,7 +745,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mark:true,
 						content:function(){
 							trigger.num++;
-							trigger.nature='thunder';
+							game.setNature(trigger,'thunder');
 						},
 						marktext:'⚡',
 						intro:{
@@ -739,7 +753,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					init:{
-						audio:'shouli',
+						audio:'psshouli',
 						trigger:{
 							global:'phaseBefore',
 							player:'enterGame',
@@ -920,7 +934,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.hasEmptySlot(2)) return false;
 					if(event.card.name!='sha') return false;
-					return event.nature;
+					return event.card.hasNature();
 				},
 				content:function(){
 					trigger.cancel();
@@ -2013,7 +2027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						prompt:function(event){
 							var player=_status.event.player;
-							return '将一张'+get.translation(player.storage.pshuxiao_use.suit)+'牌或点数为'+get.strNumber(player.storage.pshuxiao_use.number)+'的牌当'+(player.storage.pshuxiao_use.card.nature?player.storage.pshuxiao_use.card.nature:'')+'【'+get.translation(player.storage.pshuxiao_use.card.name)+'】使用';
+							return '将一张'+get.translation(player.storage.pshuxiao_use.suit)+'牌或点数为'+get.strNumber(player.storage.pshuxiao_use.number)+'的牌当作'+(player.storage.pshuxiao_use.card)+'使用';
 						}
 					}
 				}
@@ -6214,7 +6228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fulu:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.nature) return true;
+					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
 				},
 				audio:true,
 				check:function(event,player){
@@ -6229,14 +6243,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return eff>=0;
 				},
 				content:function(){
-					trigger.card.nature='thunder';
+					game.setNature(trigger.card,'thunder');
 					if(get.itemtype(trigger.card)=='card'){
 						var next=game.createEvent('fulu_clear');
 						next.card=trigger.card;
 						event.next.remove(next);
 						trigger.after.push(next);
 						next.setContent(function(){
-							delete card.nature;
+							game.setNature(card,[]);
 						});
 					}
 				}
@@ -6244,7 +6258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuji:{
 				trigger:{global:'damageBegin1'},
 				filter:function(event){
-					return event.source&&event.nature=='thunder';
+					return event.source&&event.source.isIn()&&event.hasNature('thunder');
 				},
 				check:function(event,player){
 					return get.attitude(player,event.source)>0&&get.attitude(player,event.player)<0;
@@ -6526,7 +6540,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			psliaozou_info:'出牌阶段，你可以展示所有手牌，若其中没有与“杂音”牌花色相同的牌，你摸一张牌。',
 			ps1062_zhouyu:'☆周瑜',
 			psoldshiyin:'识音',
-			psoldshiyin_info:'当你于回合内获得牌时，你可以展示之，然后根据你展示的牌包含的花色数令你本回合使用的下一张牌获得对应效果：不小于1，不能被响应；不小于2，造成的伤害+1；不小于3，使用时摸一张牌。',
+			psoldshiyin_info:'当你于回合内得到牌后，你可以展示之，然后根据你展示的牌包含的花色数令你本回合使用的下一张牌获得对应效果：不小于1，不能被响应；不小于2，造成的伤害+1；不小于3，使用时摸一张牌。',
 			ps_caozhi:'☆曹植',
 			psliushang:'流殇',
 			psliushang_info:'锁定技。①摸牌阶段，你改为摸X+1张牌，然后依次将一张手牌置于所有其他角色的武将牌上，称为“流殇”牌（X为场上角色数且至少为3）。②其他角色的准备阶段，其选择一项：1.获得其“流殇”牌，且当其于本回合对你造成伤害时，防止此伤害；2.将其“流殇”牌置入弃牌堆。',

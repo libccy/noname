@@ -1239,7 +1239,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'fire',
 				filter:function(event,player){
-					return !player.storage.shenyan&&event.nature=='fire';
+					return !player.storage.shenyan&&event.hasNature('fire');
 				},
 				intro:{
 					content:'limited'
@@ -3247,7 +3247,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('linyun4','shaAfter')
 				}
 			},
-			linyun4:[],
+			linyun4:{},
 			bofeng:{
 				mod:{
 					targetInRange:function(card,player,target){
@@ -5202,7 +5202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			benlei2:{
 				trigger:{source:'damageAfter'},
 				filter:function(event,player){
-					return event.nature=='thunder'&&player.hp<player.maxHp;
+					return event.hasNature('thunder')&&player.hp<player.maxHp;
 				},
 				forced:true,
 				content:function(){
@@ -7803,7 +7803,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.logSkill=['zhuyu',trigger.player,'fire'];
 					var num=game.countPlayer(function(current){
 						if(current.isLinked()){
-							if(trigger.nature){
+							if(trigger.hasNature()){
 								return get.sgn(get.damageEffect(current,player,player,'fire'));
 							}
 							else{
@@ -7826,7 +7826,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						trigger.num++;
-						trigger.nature='fire';
+						game.setNature(trigger,'fire');
 					}
 				}
 			},

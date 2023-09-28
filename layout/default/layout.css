@@ -423,6 +423,29 @@ table {
 	border-radius: 12px;
 }
 
+/* 启动页style2 */
+#splash[data-splash_style='style2']>div {
+	width: 250px;
+	height: 350px;
+	top: calc(50% - 175px);
+}
+#splash[data-splash_style='style2']>div:first-child {
+	margin-left: 15px;
+}
+#splash[data-splash_style='style2']>div:last-child {
+	margin-right: 15px;
+}
+#splash[data-splash_style='style2']>div>.splashtext {
+	font-family: 'shousha';
+	font-size: 65px;
+}
+#splash[data-splash_style='style2'].slim>div>.splashtext {
+	right: 10px;
+	bottom: 5px;
+}
+#splash[data-splash_style='style2'].slim>div>.avatar {
+	width: 240px;
+}
 
 #arena.playerhidden>.player,
 #arena.playerhidden>#mebg,
@@ -1593,12 +1616,12 @@ div:not(.handcards)>.card>.info>span,
 }
 .mark-container.marks>div>.markcount.menubutton {
 	font-size: 12px;
-    width: 16px;
-    height: 16px;
-    line-height: 18px;
-    position: absolute;
-    left: 36px;
-    top: 34px;
+	width: 16px;
+	height: 16px;
+	line-height: 18px;
+	position: absolute;
+	left: 36px;
+	top: 34px;
 	border-radius: 100%;
 }
 .mark-container.marks>.card.fullskin>.image{
@@ -1607,11 +1630,11 @@ div:not(.handcards)>.card>.info>span,
 }
 .mark-container.marks>.card.fullskin>.info{
 	transform: scale(0.6) !important;
-    transform-origin: top right;
-    left: auto !important;
-    right: 3px !important;
-    display: block;
-    top: 2px;
+	transform-origin: top right;
+	left: auto !important;
+	right: 3px !important;
+	display: block;
+	top: 2px;
 }
 .mark-container.marks>.card.fullskin>.name{
 	transform: scale(0.5) !important;
@@ -1622,7 +1645,7 @@ div:not(.handcards)>.card>.info>span,
 }
 .mark-container.marks>.card.fullskin>.name.long{
 	transform: scale(0.48) !important;
-    top: 1px !important;
+	top: 1px !important;
 }
 
 .button.card>.background {
@@ -1994,7 +2017,7 @@ div:not(.handcards)>.card>.info>span,
 .button.newstyle>.name.long{
 	top: 6px;
 	transform: scale(0.93);
-    transform-origin: top left;
+	transform-origin: top left;
 }
 .button.newstyle>.hp,
 .button.newstyle>.hp.text{
@@ -2023,7 +2046,7 @@ div:not(.handcards)>.card>.info>span,
 	text-align: right;
 	width: auto;
 	height: auto;
-    transform: none !important;
+	transform: none !important;
 	text-shadow: black 0 0 2px, black 0 0 3px;
 }
 
@@ -2245,7 +2268,7 @@ div:not(.handcards)>.card>.info>span,
 }
 .player>.turned>div{
 	top: calc(50% - 50px);
-    left: calc(50% - 25px);
+	left: calc(50% - 25px);
 	white-space: nowrap;
 	writing-mode: vertical-rl;
 	-webkit-writing-mode: vertical-rl;
@@ -2480,9 +2503,9 @@ div:not(.handcards)>.card>.info>span,
 }
 #arena.oldlayout .player>.framebg{
 	transform: rotate(90deg) translateY(-240px);
-    width: 120px;
-    height: 240px;
-    transform-origin: top left;
+	width: 120px;
+	height: 240px;
+	transform-origin: top left;
 }
 #window #arena.mobile:not(.chess) .player[data-position='0']>.framebg{
 	/*display: none;*/
@@ -2582,12 +2605,12 @@ div:not(.handcards)>.card>.info>span,
 	left: -20%;
 	top: -20%;*/
 	background-size: 120%;
-    background-position: -4px -4px;
-    background-repeat: no-repeat;
+	background-position: -4px -4px;
+	background-repeat: no-repeat;
 }
 
 #arena:not(.chess) .player[data-position='0']>.equips>div>.image{
-    background-size: 115%;
+	background-size: 115%;
 }
 /*.equips>div:hover>.info{display: inline-block;
 	animation:equip_hover 1s;
@@ -4293,9 +4316,9 @@ div[data-decoration="bronze"]::after{
 }
 .card.fullskin.gold>.name {
 	color: white;
-    text-shadow: black 0 0 1px, rgba(0,0,0,0.5) 0 0 1px;
+	text-shadow: black 0 0 1px, rgba(0,0,0,0.5) 0 0 1px;
 	background: rgba(234, 158, 0, 0.6);
-    border: 1px solid rgb(134, 87, 1);
+	border: 1px solid rgb(134, 87, 1);
 	box-shadow: rgba(255, 149, 0, 0.4) 0 0 10px inset;
 }
 .card.fullskin.gold>.name2 {
@@ -4405,9 +4428,9 @@ div[data-decoration="bronze"]::after{
 	background-color: red;
 }
 /* #arena>.skillbar.full { */
-    /*transform: scale(1.1);*/
-    /*box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
-    -webkit-animation:skillbarglow 3s infinite;*/
+	/*transform: scale(1.1);*/
+	/*box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+	-webkit-animation:skillbarglow 3s infinite;*/
 /* } */
 #arena>.skillbar>.skillbartext {
 	font-family: 'xinwei';
@@ -4732,9 +4755,9 @@ div[data-decoration="bronze"]::after{
 }
 .dice{
 	position: absolute;
-    width: 200px;
-    height: 200px;
-    transform-style: preserve-3d;
+	width: 200px;
+	height: 200px;
+	transform-style: preserve-3d;
 	left: calc(50% - 100px);
 	top: calc(50% - 100px);
 	transition: transform 2s ease;
@@ -4777,92 +4800,92 @@ div[data-decoration="bronze"]::after{
 }
 .dice>div{
 	position: absolute;
-    width: 200px;
-    height: 200px;
-    background: #fff;
-    box-shadow:inset 0 0 40px #ccc;
-    border-radius: 40px;
+	width: 200px;
+	height: 200px;
+	background: #fff;
+	box-shadow:inset 0 0 40px #ccc;
+	border-radius: 40px;
 }
 .dice .cover, .dice .inner {
-    background: #e0e0e0;
-    box-shadow: none;
+	background: #e0e0e0;
+	box-shadow: none;
 }
 .dice .cover {
-    border-radius: 0;
-    transform: translateZ(0px);
+	border-radius: 0;
+	transform: translateZ(0px);
 }
 .dice .cover.x {
-    transform: rotateY(90deg);
+	transform: rotateY(90deg);
 }
 .dice .cover.z {
-    transform: rotateX(90deg);
+	transform: rotateX(90deg);
 }
 
 .dice .front  {
-    transform: translateZ(100px);
+	transform: translateZ(100px);
 }
 .dice .front.inner  {
-    transform: translateZ(98px);
+	transform: translateZ(98px);
 }
 .dice .back {
-    transform: rotateX(-180deg) translateZ(100px);
+	transform: rotateX(-180deg) translateZ(100px);
 }
 .dice .back.inner {
-    transform: rotateX(-180deg) translateZ(98px);
+	transform: rotateX(-180deg) translateZ(98px);
 }
 .dice .right {
-    transform: rotateY(90deg) translateZ(100px);
+	transform: rotateY(90deg) translateZ(100px);
 }
 .dice .right.inner {
-    transform: rotateY(90deg) translateZ(98px);
+	transform: rotateY(90deg) translateZ(98px);
 }
 .dice .left {
-    transform: rotateY(-90deg) translateZ(100px);
+	transform: rotateY(-90deg) translateZ(100px);
 }
 .dice .left.inner {
-    transform: rotateY(-90deg) translateZ(98px);
+	transform: rotateY(-90deg) translateZ(98px);
 }
 .dice .top {
-    transform: rotateX(90deg) translateZ(100px);
+	transform: rotateX(90deg) translateZ(100px);
 }
 .dice .top.inner {
-    transform: rotateX(90deg) translateZ(98px);
+	transform: rotateX(90deg) translateZ(98px);
 }
 .dice .bottom {
-    transform: rotateX(-90deg) translateZ(100px);
+	transform: rotateX(-90deg) translateZ(100px);
 }
 .dice .bottom.inner {
-    transform: rotateX(-90deg) translateZ(98px);
+	transform: rotateX(-90deg) translateZ(98px);
 }
 
 .dice .dot {
-    position:absolute;
-    width:46px;
-    height:46px;
-    border-radius:23px;
-    background:#444;
-    box-shadow:inset 5px 0 10px #000;
+	position:absolute;
+	width:46px;
+	height:46px;
+	border-radius:23px;
+	background:#444;
+	box-shadow:inset 5px 0 10px #000;
 }
 .dice .dot.center {
-    margin:77px 0 0 77px;
+	margin:77px 0 0 77px;
 }
 .dice .dot.dtop {
-    margin-top:20px;
+	margin-top:20px;
 }
 .dice .dot.dleft {
-    margin-left:134px;
+	margin-left:134px;
 }
 .dice .dot.dright {
-    margin-left:20px;
+	margin-left:20px;
 }
 .dice .dot.dbottom {
-    margin-top:134px;
+	margin-top:134px;
 }
 .dice .dot.center.dleft {
-    margin:77px 0 0 20px;
+	margin:77px 0 0 20px;
 }
 .dice .dot.center.dright {
-    margin:77px 0 0 134px;
+	margin:77px 0 0 134px;
 }
 
 #window.dicepaused>#arena,
@@ -5438,6 +5461,19 @@ div[data-decoration="bronze"]::after{
 
 	to {
 		transform: perspective(1000px) rotateY(360deg);
+	}
+}
+@keyframes background-position-left-center-right-center-left-center {
+	0% {
+		background-position: left center;
+	}
+
+	50% {
+		background-position: right center;
+	}
+
+	100% {
+		background-position: left center;
 	}
 }
 /*--------其它--------*/

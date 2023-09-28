@@ -2093,7 +2093,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(target.countCards('e')>0){
 						target.chooseControl().set('prompt','追妒：请选择一项').set('choiceList',[
-							'令'+get.translation(trigger.player)+'此次对你造成的伤害+1',
+							'令'+get.translation(player)+'此次对你造成的伤害+1',
 							'弃置装备区里的所有牌',
 						]).set('ai',function(){
 							var player=_status.event.player,cards=player.getCards('e');
@@ -2137,24 +2137,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.target=target;
 					player.awakenSkill('gzshigong');
 					var list=lib.character[player.name2][3].filter(function(skill){
-						var info=get.info(skill);
-						return info&&!get.is.locked(skill)&&!info.juexingji&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte&&!info.limited&&!info.dutySkill&&!info.zhenfa&&!info.mainSkill&&!info.viceSkill&&!info.unique;
+						return get.skillCategoriesOf(skill).length==0;
 					});
 					if(!list.length){
 						event._result={control:'cancel2'};
-						event.goto(3);
+						event.goto(2);
 					}
 					else event.list=list;
-					'step 1'
 					player.removeCharacter(1);
-					'step 2'
-					_status.currentPhase.chooseControl(event.list,'cancel2').set('choiceList',event.list.map(i=>{
+					'step 1'
+					target.chooseControl(event.list,'cancel2').set('choiceList',event.list.map(i=>{
 						return '<div class="skill">【'+get.translation(lib.translate[i+'_ab']||get.translation(i).slice(0,2))+'】</div><div>'+get.skillInfoTranslation(i,_status.currentPhase)+'</div>';
 					})).set('displayIndex',false).set('ai',function(){
 						if(get.attitude(_status.event.player,_status.event.getParent().player)>0) return 0;
 						return [0,1].randomGet();
 					}).set('prompt',get.translation(player)+'对你发动了【示恭】').set('prompt2','获得一个技能并令其将体力回复至体力上限；或点击“取消”，令其将体力值回复至1点。');
-					'step 3'
+					'step 2'
 					if(result.control=='cancel2'){
 						player.recover(1-player.hp);
 						event.finish();
@@ -3913,7 +3911,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageBegin1'},
 				forced:true,
 				filter:function(event){
-					return event.nature=='fire';
+					return event.hasNature('fire');
 				},
 				content:function(){
 					trigger.num++;

@@ -297,19 +297,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
-					return event.targets.length==1&&event.card.name=='sha'&&player.canCompare(event.target);
+					return event.targets.length==1&&event.card.name=='sha'&&!player.hasSkillTag('noCompareSource')&&event.target.countCards('h')>0&&!event.target.hasSkillTag('noCompareTarget');
 				},
 				check:function(event,player){
-					return get.attitude(player,event.target)<0||game.hasPlayer(current=>{
-						return get.damageEffect(current,player,player)>0;
-					});
+					return get.attitude(player,event.target)<=0||game.hasPlayer(current=>get.damageEffect(current,player,player)>0);
 				},
 				shaRelated:true,
 				logTarget:'target',
 				content:function(){
 					'step 0'
-					if(player.canCompare(trigger.target)) player.chooseToCompare(trigger.target);
+					player.draw();
 					'step 1'
+					if(player.canCompare(trigger.target)) player.chooseToCompare(trigger.target);
+					else event.finish();
+					'step 2'
 					if(result.bool){
 						player.addTempSkill('sblieren_damage');
 						if(!trigger.card.storage) trigger.card.storage={};
@@ -606,10 +607,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				delay:false,
 				filter:function(event,player){
-					return player.countCards('hes',{suit:'diamond'})>0;
+					return player.hasCard(card=>get.suit(card)=='diamond','hes')||game.hasPlayer(current=>current.hasJudge('lebu'));
 				},
 				position:'hes',
-				filterCard:{suit:'diamond'},
+				filterCard:function(card,player){
+					if(get.suit(card)!='diamond') return false;
+					var mod=game.checkMod(ui.selected.cards[0],player,'unchanged','cardEnabled2',player);
+					if(!mod) return false;
+					return true;
+				},
 				selectCard:[0,1],
 				filterTarget:function(card,player,target){
 					if(!ui.selected.cards.length){
@@ -617,10 +623,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return false;
 					}
 					if(player==target) return false;
-					var mod=game.checkMod(ui.selected.cards[0],player,'unchanged','cardEnabled2',player);
-					if(!mod) return false;
-					return player.canUse({name:'lebu',cards:ui.selected.cards},target);
+					return player.canUse(get.autoViewAs({name:'lebu'},ui.selected.cards),target);
 				},
+				complexSelect:true,
 				check:function(card){
 					return 7-get.value(card);
 				},
@@ -2979,7 +2984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'sbguidao_defend',
 				filter:function(event,player){
 					if(player.countMark('sbguidao')>=8) return false;
-					if(event.name=='damage') return event.nature&&!player.hasSkill('sbguidao_forbid');
+					if(event.name=='damage') return event.hasNature()&&!player.hasSkill('sbguidao_forbid');
 					return (event.name!='phase'||game.phaseNumber==0);
 				},
 				content:function(){
@@ -3050,13 +3055,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!player.hasZhuSkill('sbhuangtian')||!player.hasSkill('sbguidao',null,false,false)) return false;
 							if(!event.source||player==event.source||event.source.group!='qun') return false;
 							if(player.hasSkill('sbguidao')&&player.countMark('sbguidao')>=8) return false;
-							// if(player.countMark('sbhuangtian_count')>999) return false;
+							if(player.countMark('sbhuangtian_count')>=4) return false;
 							return true;
 						},
 						content:function(){
 							player.addMark('sbguidao',1);
-							// player.addTempSkill('sbhuangtian_count','roundStart');
-							// player.addMark('sbhuangtian_count',1,false);
+							player.addTempSkill('sbhuangtian_count','roundStart');
+							player.addMark('sbhuangtian_count',1,false);
 						}
 					},
 					count:{onremove:true}
@@ -3389,6 +3394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										var val=get.value(ui.selected.cards,target);
 										if(val<0) return val+get.effect(target,{name:'losehp'},player,target);
 										if(val>5||get.value(ui.selected.cards,player)>5) return target.isTurnedOver()?5:0;
+										if(target.isTurnedOver()) return 1;
 										return get.effect(target,{name:'losehp'},player,target);
 									},
 								},
@@ -4643,9 +4649,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbleiji:'雷击',
 			sbleiji_info:'出牌阶段，你可以选择一名其他角色并弃4枚“道兵”，对其造成1点雷电伤害。',
 			sbguidao:'鬼道',
-			sbguidao_info:'①游戏开始时，你获得4枚“道兵”标记。②“道兵”上限为8。③一名角色受到属性伤害后，你获得2枚“道兵”。④当你受到伤害时，你可以弃2枚“道兵”并防止此伤害。然后若当前回合角色不为你，〖鬼道③〗于你下回合开始前无效。',
+			sbguidao_info:'①游戏开始时，你获得4枚“道兵”标记（“道兵”上限为8）。②一名角色受到属性伤害后，你获得2枚“道兵”。③当你受到伤害时，你可以弃2枚“道兵”并防止此伤害。然后若当前回合角色不为你，〖鬼道②〗于你下回合开始前无效。',
 			sbhuangtian:'黄天',
-			sbhuangtian_info:'主公技，锁定技。①回合开始时，若本回合为你的第一个回合且游戏轮数为1，且游戏内没有【太平要术】，你装备【太平要术】。②其他群势力角色造成伤害后，若你拥有〖鬼道〗，你获得1枚“道兵”。',
+			sbhuangtian_info:'主公技，锁定技。①回合开始时，若本回合为你的第一个回合且游戏轮数为1，且游戏内没有【太平要术】，你装备【太平要术】。②其他群势力角色造成伤害后，若你拥有〖鬼道〗，你获得1枚“道兵”（每轮你至多以此法获得4枚“道兵”）。',
 			sb_caocao:'谋曹操',
 			sbjianxiong:'奸雄',
 			sbjianxiong_info:'①游戏开始时，你可获得至多2枚“治世”标记。②当你受到伤害后，你可获得伤害牌，摸1-X张牌（X为“治世”数），然后你可弃1枚“治世”。',
@@ -4739,7 +4745,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbzongshi_info:'锁定技。每名角色限一次。当你受到伤害后，你令伤害来源弃置所有手牌。',
 			sb_zhurong:'谋祝融',
 			sblieren:'烈刃',
-			sblieren_info:'当你使用【杀】指定唯一目标后，你可以与其拼点。若你赢，此【杀】结算结束后，你可以对另一名其他角色造成1点伤害。',
+			sblieren_info:'当你使用【杀】指定唯一目标后，你可以摸一张牌，然后与其拼点。若你赢，此【杀】结算结束后，你可以对另一名其他角色造成1点伤害。',
 			sbjuxiang:'巨象',
 			sbjuxiang_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】结算结束后，你获得此牌对应的所有实体牌。③结束阶段，若你未于本回合使用过【南蛮入侵】，你可以将一张游戏外的随机【南蛮入侵】（共2张）交给一名角色。',
 			sb_menghuo:'谋孟获',
