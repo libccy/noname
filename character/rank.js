@@ -957,6 +957,8 @@ window.noname_character_rank={
 		'jsrg_zhenji',
 		'junk_xuyou',
 		'sp_machao',
+		'mengyou',
+		're_wenpin',
 	],
 	b:[
 		'diy_feishi',

@@ -18062,8 +18062,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							save=true;
 						}
 					}
-					var next=player.chooseToDiscard('he',get.prompt('zhenwei',trigger.target),'弃置一张牌，将'+get.translation(trigger.card)+'转移给自己，或令此牌对其无效');
-					next.logSkill=['zhenwei',trigger.target];
+					var next=player.chooseToDiscard('he',get.prompt(event.name,trigger.target),'弃置一张牌，将'+get.translation(trigger.card)+'转移给自己，或令此牌对其无效');
+					next.logSkill=[event.name,trigger.target];
 					next.set('ai',function(card){
 						if(_status.event.aisave){
 							return 7-get.value(card);
