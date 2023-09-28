@@ -1580,7 +1580,7 @@
 										game.writeFile(file,'image/background',link+'.jpg',callback);
 									}
 									else{
-										game.putDB('file',link,file,callback);
+										game.putDB('image',link,file,callback);
 									}
 									if(node.lastChild.classList.contains('active')){
 										editbg.call(node.lastChild);
@@ -1624,7 +1624,7 @@
 								node.style.backgroundImage='none';
 								node.classList.add('dashedmenubutton');
 								if(link.indexOf('custom_')==0){
-									game.getDB('file',link,function(fileToLoad){
+									game.getDB('image',link,function(fileToLoad){
 										if(!fileToLoad) return;
 										var fileReader = new FileReader();
 										fileReader.onload = function(fileLoadedEvent)
@@ -1680,7 +1680,7 @@
 											game.removeFile('image/background/'+background+'.jpg');
 										}
 										else{
-											game.deleteDB('file',background);
+											game.deleteDB('image',background);
 										}
 										delete lib.configMenu.appearence.config.image_background.item[background];
 										if(lib.config.image_background==background){
@@ -1794,8 +1794,8 @@
 							var deletepic;
 							ui.create.filediv('.menubutton','添加图片',node,function(file){
 								if(file){
-									game.putDB('file','card_style',file,function(){
-										game.getDB('file','card_style',function(fileToLoad){
+									game.putDB('image','card_style',file,function(){
+										game.getDB('image','card_style',function(fileToLoad){
 											if(!fileToLoad) return;
 											var fileReader = new FileReader();
 											fileReader.onload = function(fileLoadedEvent)
@@ -1812,7 +1812,7 @@
 							}).inputNode.accept='image*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
-									game.deleteDB('file','card_style');
+									game.deleteDB('image','card_style');
 									button.style.backgroundImage='none';
 									button.className='button character dashedmenubutton';
 									node.classList.remove('showdelete');
@@ -1847,7 +1847,7 @@
 							}
 							if(link=='custom'){
 								node.classList.add('transparent');
-								game.getDB('file','card_style',function(fileToLoad){
+								game.getDB('image','card_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent)
@@ -1871,7 +1871,7 @@
 								delete ui.css.card_stylesheet;
 							}
 							if(layout=='custom'){
-								game.getDB('file','card_style',function(fileToLoad){
+								game.getDB('image','card_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent){
@@ -1918,8 +1918,8 @@
 							var deletepic;
 							ui.create.filediv('.menubutton','添加图片',node,function(file){
 								if(file){
-									game.putDB('file','cardback_style',file,function(){
-										game.getDB('file','cardback_style',function(fileToLoad){
+									game.putDB('image','cardback_style',file,function(){
+										game.getDB('image','cardback_style',function(fileToLoad){
 											if(!fileToLoad) return;
 											var fileReader = new FileReader();
 											fileReader.onload = function(fileLoadedEvent)
@@ -1936,15 +1936,15 @@
 							}).inputNode.accept='image/*';
 							ui.create.filediv('.menubutton.deletebutton.addbutton','添加翻转图片',node,function(file){
 								if(file){
-									game.putDB('file','cardback_style2',file,function(){
+									game.putDB('image','cardback_style2',file,function(){
 										node.classList.add('hideadd');
 									});
 								}
 							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
-									game.deleteDB('file','cardback_style');
-									game.deleteDB('file','cardback_style2');
+									game.deleteDB('image','cardback_style');
+									game.deleteDB('image','cardback_style2');
 									button.style.backgroundImage='none';
 									button.className='button character dashedmenubutton';
 									node.classList.remove('showdelete');
@@ -1975,7 +1975,7 @@
 							}
 							if(link=='custom'){
 								node.classList.add('transparent');
-								game.getDB('file','cardback_style',function(fileToLoad){
+								game.getDB('image','cardback_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent)
@@ -1984,7 +1984,7 @@
 										node.style.backgroundImage='url('+data+')';
 										node.className='button character';
 										node.parentNode.lastChild.classList.add('showdelete');
-										game.getDB('file','cardback_style2',function(file){
+										game.getDB('image','cardback_style2',function(file){
 											if(file){
 												node.parentNode.lastChild.classList.add('hideadd');
 											}
@@ -2008,7 +2008,7 @@
 								delete ui.css.cardback_stylesheet2;
 							}
 							if(layout=='custom'){
-								game.getDB('file','cardback_style',function(fileToLoad){
+								game.getDB('image','cardback_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent){
@@ -2016,7 +2016,7 @@
 											ui.css.cardback_stylesheet.remove();
 										}
 										ui.css.cardback_stylesheet=lib.init.sheet('.card:empty,.card.infohidden{background-image:url('+fileLoadedEvent.target.result+')}');
-										game.getDB('file','cardback_style2',function(fileToLoad){
+										game.getDB('image','cardback_style2',function(fileToLoad){
 											if(!fileToLoad) return;
 											var fileReader = new FileReader();
 											fileReader.onload = function(fileLoadedEvent){
@@ -2065,8 +2065,8 @@
 							var deletepic;
 							ui.create.filediv('.menubutton.addbutton','添加图片',node,function(file){
 								if(file&&node.currentDB){
-									game.putDB('file','hp_style'+node.currentDB,file,function(){
-										game.getDB('file','hp_style'+node.currentDB,function(fileToLoad){
+									game.putDB('image','hp_style'+node.currentDB,file,function(){
+										game.getDB('image','hp_style'+node.currentDB,function(fileToLoad){
 											if(!fileToLoad) return;
 											var fileReader = new FileReader();
 											fileReader.onload = function(fileLoadedEvent)
@@ -2089,10 +2089,10 @@
 							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
-									game.deleteDB('file','hp_style1');
-									game.deleteDB('file','hp_style2');
-									game.deleteDB('file','hp_style3');
-									game.deleteDB('file','hp_style4');
+									game.deleteDB('image','hp_style1');
+									game.deleteDB('image','hp_style2');
+									game.deleteDB('image','hp_style3');
+									game.deleteDB('image','hp_style4');
 									for(var i=0;i<button.childElementCount;i++){
 										button.childNodes[i].style.backgroundImage='none';
 									}
@@ -2127,7 +2127,7 @@
 								node.classList.add('transparent');
 								var getDB=function(num){
 									node.parentNode.lastChild.currentDB=num;
-									game.getDB('file','hp_style'+num,function(fileToLoad){
+									game.getDB('image','hp_style'+num,function(fileToLoad){
 										if(!fileToLoad) return;
 										var fileReader = new FileReader();
 										fileReader.onload = function(fileLoadedEvent)
@@ -2173,7 +2173,7 @@
 								delete ui.css.hp_stylesheet4;
 							}
 							if(layout=='custom'){
-								game.getDB('file','hp_style1',function(fileToLoad){
+								game.getDB('image','hp_style1',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent){
@@ -2184,7 +2184,7 @@
 									};
 									fileReader.readAsDataURL(fileToLoad, "UTF-8");
 								});
-								game.getDB('file','hp_style2',function(fileToLoad){
+								game.getDB('image','hp_style2',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent){
@@ -2195,7 +2195,7 @@
 									};
 									fileReader.readAsDataURL(fileToLoad, "UTF-8");
 								});
-								game.getDB('file','hp_style3',function(fileToLoad){
+								game.getDB('image','hp_style3',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent){
@@ -2206,7 +2206,7 @@
 									};
 									fileReader.readAsDataURL(fileToLoad, "UTF-8");
 								});
-								game.getDB('file','hp_style4',function(fileToLoad){
+								game.getDB('image','hp_style4',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent){
@@ -2249,8 +2249,8 @@
 							var deletepic;
 							ui.create.filediv('.menubutton','添加图片',node,function(file){
 								if(file){
-									game.putDB('file','player_style',file,function(){
-										game.getDB('file','player_style',function(fileToLoad){
+									game.putDB('image','player_style',file,function(){
+										game.getDB('image','player_style',function(fileToLoad){
 											if(!fileToLoad) return;
 											var fileReader = new FileReader();
 											fileReader.onload = function(fileLoadedEvent)
@@ -2268,7 +2268,7 @@
 							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
-									game.deleteDB('file','player_style');
+									game.deleteDB('image','player_style');
 									button.style.backgroundImage='none';
 									button.className='button character dashedmenubutton';
 									node.classList.remove('showdelete');
@@ -2296,7 +2296,7 @@
 							}
 							if(link=='custom'){
 								node.classList.add('transparent');
-								game.getDB('file','player_style',function(fileToLoad){
+								game.getDB('image','player_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent)
@@ -2318,7 +2318,7 @@
 								delete ui.css.player_stylesheet;
 							}
 							if(layout=='custom'){
-								game.getDB('file','player_style',function(fileToLoad){
+								game.getDB('image','player_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent){
@@ -2374,8 +2374,8 @@
 							var deletepic;
 							ui.create.filediv('.menubutton','添加图片',node,function(file){
 								if(file){
-									game.putDB('file','border_style',file,function(){
-										game.getDB('file','border_style',function(fileToLoad){
+									game.putDB('image','border_style',file,function(){
+										game.getDB('image','border_style',function(fileToLoad){
 											if(!fileToLoad) return;
 											var fileReader = new FileReader();
 											fileReader.onload = function(fileLoadedEvent)
@@ -2393,7 +2393,7 @@
 							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
-									game.deleteDB('file','border_style');
+									game.deleteDB('image','border_style');
 									button.style.backgroundImage='none';
 									button.className='button character dashedmenubutton';
 									node.classList.remove('showdelete');
@@ -2424,7 +2424,7 @@
 							}
 							if(link=='custom'){
 								node.classList.add('transparent');
-								game.getDB('file','border_style',function(fileToLoad){
+								game.getDB('image','border_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent)
@@ -2446,7 +2446,7 @@
 								delete ui.css.border_stylesheet;
 							}
 							if(layout=='custom'){
-								game.getDB('file','border_style',function(fileToLoad){
+								game.getDB('image','border_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent){
@@ -2565,8 +2565,8 @@
 							var deletepic;
 							ui.create.filediv('.menubutton','添加图片',node,function(file){
 								if(file){
-									game.putDB('file','menu_style',file,function(){
-										game.getDB('file','menu_style',function(fileToLoad){
+									game.putDB('image','menu_style',file,function(){
+										game.getDB('image','menu_style',function(fileToLoad){
 											if(!fileToLoad) return;
 											var fileReader = new FileReader();
 											fileReader.onload = function(fileLoadedEvent)
@@ -2584,7 +2584,7 @@
 							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
-									game.deleteDB('file','menu_style');
+									game.deleteDB('image','menu_style');
 									button.style.backgroundImage='none';
 									button.style.backgroundSize='auto';
 									button.className='button character dashedmenubutton';
@@ -2612,7 +2612,7 @@
 							}
 							if(link=='custom'){
 								node.classList.add('transparent');
-								game.getDB('file','menu_style',function(fileToLoad){
+								game.getDB('image','menu_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent)
@@ -2634,7 +2634,7 @@
 								delete ui.css.menu_stylesheet;
 							}
 							if(layout=='custom'){
-								game.getDB('file','menu_style',function(fileToLoad){
+								game.getDB('image','menu_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent){
@@ -2685,8 +2685,8 @@
 							var deletepic;
 							ui.create.filediv('.menubutton','添加图片',node,function(file){
 								if(file){
-									game.putDB('file','control_style',file,function(){
-										game.getDB('file','control_style',function(fileToLoad){
+									game.putDB('image','control_style',file,function(){
+										game.getDB('image','control_style',function(fileToLoad){
 											if(!fileToLoad) return;
 											var fileReader = new FileReader();
 											fileReader.onload = function(fileLoadedEvent)
@@ -2703,7 +2703,7 @@
 							}).inputNode.accept='image/*';
 							deletepic=ui.create.div('.menubutton.deletebutton','删除图片',node,function(){
 								if(confirm('确定删除自定义图片？（此操作不可撤销）')){
-									game.deleteDB('file','control_style');
+									game.deleteDB('image','control_style');
 									button.style.backgroundImage='none';
 									button.className='button character controlbutton dashedmenubutton';
 									node.classList.remove('showdelete');
@@ -2730,7 +2730,7 @@
 							}
 							if(link=='custom'){
 								node.classList.add('transparent');
-								game.getDB('file','control_style',function(fileToLoad){
+								game.getDB('image','control_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent)
@@ -2751,7 +2751,7 @@
 								delete ui.css.control_stylesheet;
 							}
 							if(layout=='custom'){
-								game.getDB('file','control_style',function(fileToLoad){
+								game.getDB('image','control_style',function(fileToLoad){
 									if(!fileToLoad) return;
 									var fileReader = new FileReader();
 									fileReader.onload = function(fileLoadedEvent){
@@ -4179,7 +4179,7 @@
 										game.removeFile('audio/background/'+i+'.mp3');
 									}
 									else{
-										game.deleteDB('file',i);
+										game.deleteDB('audio',i);
 									}
 								}
 								lib.config.customBackgroundMusic=null;
@@ -7993,7 +7993,7 @@
 				});
 				HTMLDivElement.prototype.setBackgroundDB=function(img){
 					var node=this;
-					game.getDB('file',img,function(src){
+					game.getDB('image',img,function(src){
 						node.style.backgroundImage="url('"+src+"')";
 						node.style.backgroundSize="cover";
 					});
@@ -9457,53 +9457,51 @@
 				delete window.config;
 				let config2;
 				if(localStorage.getItem(`${lib.configprefix}nodb`)) window.nodb=true;
-				if(window.indexedDB&&!window.nodb){
-					const name=`${lib.configprefix}data`;
-					new Promise((resolve,reject)=>{
-						const idbOpenDBRequest=window.indexedDB.open(name,5);
-						idbOpenDBRequest.onerror=reject;
-						idbOpenDBRequest.onsuccess=resolve;
-						idbOpenDBRequest.onupgradeneeded=idbVersionChangeEvent=>{
-							const idbDatabase=idbVersionChangeEvent.target.result;
-							if(!idbDatabase.objectStoreNames.contains('video')) idbDatabase.createObjectStore('video',{
-								keyPath:'time'
-							});
-							if(!idbDatabase.objectStoreNames.contains('file')) idbDatabase.createObjectStore('file');
-							if(!idbDatabase.objectStoreNames.contains('config')) idbDatabase.createObjectStore('config');
-							if(!idbDatabase.objectStoreNames.contains('data')) idbDatabase.createObjectStore('data');
-						};
-					}).then(event=>{
-						lib.db=event.target.result;
-						return game.getDB('config');
-					}).then(object=>{
-						if(!object.storageImported){
+				if(window.indexedDB&&!window.nodb) new Promise((resolve,reject)=>{
+					const idbOpenDBRequest=window.indexedDB.open(`${lib.configprefix}data`,4);
+					idbOpenDBRequest.onerror=reject;
+					idbOpenDBRequest.onsuccess=resolve;
+					idbOpenDBRequest.onupgradeneeded=idbVersionChangeEvent=>{
+						const idbDatabase=idbVersionChangeEvent.target.result;
+						if(!idbDatabase.objectStoreNames.contains('video')) idbDatabase.createObjectStore('video',{
+							keyPath:'time'
+						});
+						if(!idbDatabase.objectStoreNames.contains('image')) idbDatabase.createObjectStore('image');
+						if(!idbDatabase.objectStoreNames.contains('audio')) idbDatabase.createObjectStore('audio');
+						if(!idbDatabase.objectStoreNames.contains('config')) idbDatabase.createObjectStore('config');
+						if(!idbDatabase.objectStoreNames.contains('data')) idbDatabase.createObjectStore('data');
+					};
+				}).then(event=>{
+					lib.db=event.target.result;
+					return game.getDB('config');
+				}).then(object=>{
+					if(!object.storageImported){
+						try{
+							config2=JSON.parse(localStorage.getItem(`${lib.configprefix}config`));
+							if(!config2||typeof config2!='object') throw 'err';
+						}
+						catch(err){
+							config2={};
+						}
+						Object.keys(config2).forEach(key=>game.saveConfig(key,config2[key]));
+						Object.keys(lib.mode).forEach(key=>{
 							try{
-								config2=JSON.parse(localStorage.getItem(`${lib.configprefix}config`));
-								if(!config2||typeof config2!='object') throw 'err';
+								config2=JSON.parse(localStorage.getItem(`${lib.configprefix}${key}`));
+								if(!config2||typeof config2!='object'||get.is.empty(config2)) throw 'err';
 							}
 							catch(err){
-								config2={};
+								config2=false;
 							}
-							Object.keys(config2).forEach(key=>game.saveConfig(key,config2[key]));
-							Object.keys(lib.mode).forEach(key=>{
-								try{
-									config2=JSON.parse(localStorage.getItem(`${lib.configprefix}${key}`));
-									if(!config2||typeof config2!='object'||get.is.empty(config2)) throw 'err';
-								}
-								catch(err){
-									config2=false;
-								}
-								localStorage.removeItem(`${lib.configprefix}${key}`);
-								if(config2) game.putDB('data',key,config2);
-							});
-							game.saveConfig('storageImported',true);
-							lib.init.background();
-							localStorage.removeItem(`${lib.configprefix}config`);
-						}
-						else config2=object;
-						proceed(config2);
-					});
-				}
+							localStorage.removeItem(`${lib.configprefix}${key}`);
+							if(config2) game.putDB('data',key,config2);
+						});
+						game.saveConfig('storageImported',true);
+						lib.init.background();
+						localStorage.removeItem(`${lib.configprefix}config`);
+					}
+					else config2=object;
+					proceed(config2);
+				});
 				else{
 					try{
 						config2=JSON.parse(localStorage.getItem(lib.configprefix+'config'));
@@ -9623,7 +9621,7 @@
 
 				if(lib.config.image_background.indexOf('custom_')==0){
 					ui.background.style.backgroundImage="none";
-					game.getDB('file',lib.config.image_background,function(fileToLoad){
+					game.getDB('image',lib.config.image_background,function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent)
@@ -9640,7 +9638,7 @@
 					});
 				}
 				if(lib.config.card_style=='custom'){
-					game.getDB('file','card_style',function(fileToLoad){
+					game.getDB('image','card_style',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -9653,7 +9651,7 @@
 					});
 				}
 				if(lib.config.cardback_style=='custom'){
-					game.getDB('file','cardback_style',function(fileToLoad){
+					game.getDB('image','cardback_style',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -9664,7 +9662,7 @@
 						};
 						fileReader.readAsDataURL(fileToLoad, "UTF-8");
 					});
-					game.getDB('file','cardback_style2',function(fileToLoad){
+					game.getDB('image','cardback_style2',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -9677,7 +9675,7 @@
 					});
 				}
 				if(lib.config.hp_style=='custom'){
-					game.getDB('file','hp_style1',function(fileToLoad){
+					game.getDB('image','hp_style1',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -9688,7 +9686,7 @@
 						};
 						fileReader.readAsDataURL(fileToLoad, "UTF-8");
 					});
-					game.getDB('file','hp_style2',function(fileToLoad){
+					game.getDB('image','hp_style2',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -9699,7 +9697,7 @@
 						};
 						fileReader.readAsDataURL(fileToLoad, "UTF-8");
 					});
-					game.getDB('file','hp_style3',function(fileToLoad){
+					game.getDB('image','hp_style3',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -9710,7 +9708,7 @@
 						};
 						fileReader.readAsDataURL(fileToLoad, "UTF-8");
 					});
-					game.getDB('file','hp_style4',function(fileToLoad){
+					game.getDB('image','hp_style4',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -9724,7 +9722,7 @@
 				}
 				if(lib.config.player_style=='custom'){
 					ui.css.player_stylesheet=lib.init.sheet('#window .player{background-image:none;background-size:100% 100%;}');
-					game.getDB('file','player_style',function(fileToLoad){
+					game.getDB('image','player_style',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -9737,7 +9735,7 @@
 					});
 				}
 				if(lib.config.border_style=='custom'){
-					game.getDB('file','border_style',function(fileToLoad){
+					game.getDB('image','border_style',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -9752,7 +9750,7 @@
 					});
 				}
 				if(lib.config.control_style=='custom'){
-					game.getDB('file','control_style',function(fileToLoad){
+					game.getDB('image','control_style',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -9765,7 +9763,7 @@
 					});
 				}
 				if(lib.config.menu_style=='custom'){
-					game.getDB('file','menu_style',function(fileToLoad){
+					game.getDB('image','menu_style',function(fileToLoad){
 						if(!fileToLoad) return;
 						var fileReader = new FileReader();
 						fileReader.onload = function(fileLoadedEvent){
@@ -10467,7 +10465,7 @@
 				if(path){
 					if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
 					if(file) path=`${path}${/^db:extension-[^:]*$/.test(path)?':':'/'}${file}.css`;
-					(path.indexOf('db:')==0?game.getDB('file',path.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(path))).then(resolvedPath=>{
+					(path.indexOf('db:')==0?game.getDB('image',path.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(path))).then(resolvedPath=>{
 						style.href=resolvedPath;
 						if(typeof before=='function'){
 							style.addEventListener('load',before);
@@ -10515,7 +10513,7 @@
 					},()=>void 0);
 				}
 				const script=document.createElement('script');
-				(scriptSource.indexOf('db:')==0?game.getDB('file',scriptSource.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(scriptSource))).then(resolvedScriptSource=>{
+				(scriptSource.indexOf('db:')==0?game.getDB('image',scriptSource.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(scriptSource))).then(resolvedScriptSource=>{
 					script.src=resolvedScriptSource;
 					if(path.indexOf('http')==0) script.addEventListener('load',()=>script.remove());
 					document.head.appendChild(script);
@@ -33647,7 +33645,7 @@
 			}
 			else if(background.indexOf('custom_')==0){
 				ui.background.style.backgroundImage="none";
-				game.getDB('file',background,function(fileToLoad){
+				game.getDB('image',background,function(fileToLoad){
 					if(!fileToLoad) return;
 					var fileReader = new FileReader();
 					fileReader.onload = function(fileLoadedEvent)
@@ -34485,7 +34483,7 @@
 			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
 			audio.oncanplay=()=>Promise.resolve(audio.play()).catch(()=>void 0);
 			new Promise((resolve,reject)=>{
-				if(path.indexOf('db:')==0) game.getDB('file',path.slice(3)).then(octetStream=>resolve(get.objectURL(octetStream)),reject);
+				if(path.indexOf('db:')==0) game.getDB('image',path.slice(3)).then(octetStream=>resolve(get.objectURL(octetStream)),reject);
 				else if(lib.path.extname(path)) resolve(`${lib.assetURL}${path}`);
 				else resolve(`${lib.assetURL}${path}.mp3`);
 			}).then(resolvedPath=>{
@@ -34959,7 +34957,7 @@
 								fileReader.onerror=reject;
 								fileReader.onload=resolve;
 								fileReader.readAsDataURL(blob,'UTF-8');
-							}).then(fileLoadedEvent=>game.putDB('file',`extension-${extensionName}:${filePath}`,fileLoadedEvent.target.result));
+							}).then(fileLoadedEvent=>game.putDB('image',`extension-${extensionName}:${filePath}`,fileLoadedEvent.target.result));
 						});
 					}
 					finishLoad();
@@ -37393,7 +37391,7 @@
 			game.saveConfig('extensions',lib.config.extensions);
 			const modeList=lib.config.extensionInfo[extensionName];
 			if(modeList){
-				if(modeList.file) Object.values(modeList.file).forEach(filePath=>game.deleteDB('file',`extension-${extensionName}:${filePath}`));
+				if(modeList.file) Object.values(modeList.file).forEach(filePath=>game.deleteDB('image',`extension-${extensionName}:${filePath}`));
 				if(modeList.mode) Object.values(modeList.mode).forEach(game.clearModeConfig);
 				delete lib.config.extensionInfo[extensionName];
 				game.saveConfigValue('extensionInfo');
@@ -40271,7 +40269,6 @@
 		},
 		putDB:(storeName,idbValidKey,value,onSuccess,onError)=>{
 			if(!lib.db) return Promise.resolve(value);
-			if(['audio','image'].includes(storeName)) storeName='file';
 			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['putDB',[storeName,idbValidKey,value,event=>{
 				if(typeof onSuccess=='function') onSuccess(event);
 				resolve(event);
@@ -40312,7 +40309,6 @@
 				if(typeof onSuccess=='function') onSuccess(null);
 				resolve(null);
 			});
-			if(['audio','image'].includes(storeName)) storeName='file';
 			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['getDB',[storeName,query,result=>{
 				if(typeof onSuccess=='function') onSuccess(result);
 				resolve(result);
@@ -40383,7 +40379,6 @@
 				if(typeof onSuccess=='function') onSuccess(false);
 				resolve(false);
 			});
-			if(['audio','image'].includes(storeName)) storeName='file';
 			if(lib.status.reload) return new Promise((resolve,reject)=>lib[_status.dburgent?'ondb2':'ondb'].push(['deleteDB',[storeName,query,event=>{
 				if(typeof onSuccess=='function') onSuccess(event);
 				resolve(event);
@@ -42669,7 +42664,7 @@
 													game.writeFile(fileToLoad,'audio/background',link+'.mp3',callback);
 												}
 												else{
-													game.putDB('file',link,fileToLoad,callback);
+													game.putDB('audio',link,fileToLoad,callback);
 												}
 											}
 										}
@@ -45006,7 +45001,7 @@
 													loadImage(file,url);
 												}
 											}
-											else game.getDB('file',`extension-${name}:${file}`).then(value=>{
+											else game.getDB('image',`extension-${name}:${file}`).then(value=>{
 												createButton(i,value);
 												loadImage(file,value);
 											});
@@ -45486,7 +45481,7 @@
 													loadImage(file,url);
 												}
 											}
-											else game.getDB('file',`extension-${name}:${file}`).then(value=>{
+											else game.getDB('image',`extension-${name}:${file}`).then(value=>{
 												createButton(i,value,fullskin);
 												loadImage(file,value);
 											});
@@ -54029,7 +54024,7 @@
 						if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 						const image=information.image;
 						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
+						else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
 						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
 						else resolve(`${lib.assetURL}${image}`);
 					}).then(source=>new Promise((resolve,reject)=>{
@@ -54044,7 +54039,7 @@
 						if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 						const image=information.image;
 						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
+						else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
 						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
 						else resolve(`${lib.assetURL}${image}`);
 					}).then(source=>new Promise((resolve,reject)=>{
@@ -54064,7 +54059,7 @@
 							if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 							const image=information.image;
 							if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-							else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
+							else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
 							else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
 							else resolve(`${lib.assetURL}${image}`);
 						}).then(source=>new Promise((resolve,reject)=>{
