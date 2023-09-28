@@ -6805,7 +6805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						update: function () {
 							if(state.curr == state.gameOver || state.curr == state.gameSuccess) return;
 							this.x -= dx * deltaTime;
-							const halfWidth = this.sprite.width / 2;
+							const halfWidth = this.sprite.width / 4;
 							if(this.x <= -halfWidth) this.x += halfWidth;
 						},
 					};
