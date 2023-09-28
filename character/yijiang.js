@@ -14,9 +14,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				yijiang_2016:['guohuanghou','sunziliufang','huanghao','liyan','sundeng','cenhun','zhangrang','liuyu'],
 				yijiang_2017:['xinxianying','jikang','wuxian','qinmi','xuezong','xushi','caiyong','caojie'],
 				yijiang_2022:['lukai','kebineng','zhugeshang','liwan','wuanguo','hanlong','yj_sufei','yj_qiaozhou'],
+				yijiang_2023:['xiahoumao','chenshi','sunli','feiyao'],
 			},
 		},
 		character:{
+			xiahoumao:['male','wei',4,['tongwei','cuguo']],
+			chenshi:['male','shu',4,['qingbei']],
+			sunli:['male','wei',4,['kangli']],
+			feiyao:['male','wei',4,['zhenfeng']],
 			wuanguo:['male','qun',4,['diezhang','duanwan']],
 			hanlong:['male','wei',4,['duwang','cibei']],
 			yj_qiaozhou:['male','shu',3,['shiming','jiangxi']],
@@ -108,6 +113,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yujin:["male","wei",4,["rezhenjun"],[]],
 		},
 		characterIntro:{
+			sunli:'孙礼（？—250年），字德达，涿郡容城县人。三国时期曹魏名将。曹操平定幽州后，孙礼被征召为司空军谋掾。后被任命为河间郡丞，升至荥阳都尉。后孙礼被调为鲁国相。历任山阳、平原、平昌、琅邪郡太守。从大司马曹休在夹石征吴，孙礼谏其不可深入作战，曹休不听遂战败。后孙礼调任阳平郡太守。明帝时入为尚书，受遗诏拜大将军长史，加散骑常侍。曹爽令孙礼出任扬州刺史，加管伏波将军，赐爵关内侯。孙礼率兵御东吴军队，奋不顾身，贼众乃退。朝廷赐绢七百匹，孙礼皆以绢付亡者家，无以入身。后征拜少府，出为荆州刺史，迁冀州牧。爽见礼奏，大怒，劾礼怨望，结刑五岁。在家期年，众人多以为言，除城门校尉。出为并州刺史，加振武将军，使持节，护匈奴中郎将。爽诛后，入为司隶校尉。迁司空，封大利亭侯，邑一百户。嘉平二年（250年），孙礼去世，谥号景侯。其孙孙元继承爵位。《全三国文》录有孙礼文一篇《清河平原争界案图宜属平原疏》。陈寿评曰“孙礼刚断伉厉”。',
+			xiahoumao:'夏侯楙，字子林，沛国谯县（今安徽省亳州市）人，曹魏名将夏侯惇之子，三国时期魏国官员、将领，其妻为曹操之女清河公主。在魏国历任侍中、尚书、安西将军、镇东将军，假节，封列侯。曾一度驻守曹魏都城长安，但蜀汉北伐后就被调离。',
+			chenshi:'陈式，生卒年不详，三国时期蜀汉将领。最初为刘备军中重要的基层指挥官，后成长为高级将领。在诸葛亮第三次北伐期间，在诸葛亮的军事指挥下攻克了魏国的武都、阴平二郡。',
+			feiyao:'费曜（生卒年不详），又作费瑶、费繇，三国时期曹魏将领。魏初，参与平河西之乱。明帝时官任后将军，跟随曹真、司马懿多次对抗蜀汉。《三国演义》中作“费耀”，随曹真和诸葛亮的第二次北伐军作战。怀疑姜维作内应是假，自告奋勇替曹真出征，结果被事先埋伏的姜维包围，自尽而死。',
 			wuanguo:'武安国，历史小说《三国演义》中人物，是北海太守孔融的部将，兵器为一把长柄铁锤，重五十余斤。诸侯伐董时，双方于虎牢关相峙，吕布撰战，一合而斩穆顺，关东军大惊。北海太守孔融部将武安国，使铁锤飞马而出，吕布挥戟拍马来迎，战到十余合，一戟砍断安国手腕，安国弃锤于地而走，八路军兵齐出，这才救了他性命。',
 			hanlong:'韩龙，汉末三国时期刺客。韩龙使得魏国北方边得到数十年的安宁，减少魏国的军政压力，得以休养生息。太和二年，豫遣译夏舍诣比能女婿郁筑鞬部，舍为鞬所杀。其秋，豫将西部鲜卑蒲头、泄归泥出塞讨郁筑鞬，大破之。还至马城，比能自将三万骑围豫七日。上谷太守阎志，阎柔之弟也，素为鲜卑所信。志往解喻，即解围去。后幽州刺史王雄并领校尉，抚以恩信。比能数款塞，诣州奉贡献。至青龙元年，比能诱纳步度根，使叛并州，与结和亲，自勒万骑迎其累重於陉北。并州刺史毕轨遣将军苏尚、董弼等击之，比能遣子将骑与尚等会战於楼烦，临陈害尚、弼。至三年中，雄遣勇士韩龙刺杀比能，更立其弟。',
 			liwan:'李婉（生卒年不详），字淑文，里居不详，贾充之妻，魏晋时期才女，约景元年间（260年前后）在世。著有《典戒》。《隋书·经籍志》载李婉有文集一卷，今失传。',
@@ -209,6 +218,288 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhonghui:['jiangwei'],
 		},
 		skill:{
+			//一将2023
+			//孙礼
+			kangli:{
+				audio:2,
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				forced:true,
+				locked:false,
+				content:function(){
+					'step 0'
+					player.draw(2).gaintag=['kangli'];
+					player.when({source:'damageBegin1'})
+						.then(()=>{
+							var cards=player.getCards('h',card=>card.hasGaintag('kangli'));
+							if(cards.length) player.discard(cards);
+						})
+				},
+				ai:{
+					maixie:true,
+				}
+			},
+			//夏侯楙
+			tongwei:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter:function(event,player){
+					return player.countCards('he',card=>lib.skill.tongwei.filterCard(card,player))>1&&game.hasPlayer(i=>i!=player);
+				},
+				filterTarget:lib.filter.notMe,
+				filterCard:lib.filter.cardRecastable,
+				selectCard:2,
+				position:'he',
+				discard:false,
+				lose:false,
+				delay:false,
+				check:function(card){
+					var num=6.5;
+					if(ui.selected.cards.length){
+						var cardx=ui.selected.cards[0];
+						num=get.number(cardx);
+					}
+					var del=Math.abs(get.number(card)-num);
+					return 5+del/5-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					player.recast(cards);
+					'step 1'
+					var numbers=cards.map(c=>get.number(c,player)).sort((a,b)=>a-b);
+					target.when('useCard1')
+						.then(()=>{
+							trigger._tongwei_checked=true;
+						})
+					target.when('useCardAfter')
+						.assign({
+							numbers:numbers,
+							playerx:player,
+						})
+						.filter((event,player)=>{
+							return event._tongwei_checked;
+						})
+						.then(()=>{
+							var number=get.number(trigger.card);
+							var numbers=get.info(event.name).numbers;
+							event.playerx=get.info(event.name).playerx;
+							if(number<=numbers[0]||number>=numbers[1]) event.finish();
+						})
+						.then(()=>{
+							var playerx=event.playerx;
+							var names=['sha','guohe'].filter(name=>playerx.canUse({name:name,isCard:true},player,false));
+							if(!names.length) event.finish();
+							else if(names.length==1) event._result={control:names[0]};
+							else playerx.chooseControl(names).set('prompt',`统围：视为对${get.translation(player)}使用一张【杀】或【过河拆桥】`).set('ai',()=>{
+								return _status.event.choice;
+							}).set('choice',function(){
+								var list=names.map(name=>{
+									return [name,get.effect(player,{name:name,isCard:true},playerx,playerx)];
+								}).sort((a,b)=>{
+									return b[1]-a[1];
+								});
+								return list[0][0];
+							}());
+						})
+						.then(()=>{
+							var name=result.control;
+							var card={name:name,isCard:true},playerx=event.playerx;
+							if(playerx.canUse(card,player,false)) playerx.useCard(card,player);
+						})
+				},
+				ai:{
+					expose:0.2,
+					order:7,
+					threaten:2.2,
+					result:{
+						target:-1,
+					},
+				},
+			},
+			cuguo:{
+				audio:2,
+				trigger:{player:['shaMiss','eventNeutralized']},
+				filter:function(event,player){
+					if(event.type!='card'&&event.name!='_wuxie') return false;
+					if(!event.target||!event.target.isIn()||!player.canUse({
+						name:event.card.name,
+						nature:event.card.nature,
+						isCard:true,
+					},event.target,false)) return false;
+					if(!player.hasCard(card=>lib.filter.cardDiscardable(card,player),'he')) return false;
+					var history=game.getGlobalHistory('everything');
+					for(var evt of history){
+						if(evt._neutralized||evt.responded&&(!evt.result||!evt.result.bool)){
+							var evtx=evt.getParent();
+							return evtx.name=='useCard'&&evtx.player==player&&evt==event;
+						}
+					}
+					return false;
+				},
+				forced:true,
+				direct:true,
+				content:function(){
+					'step 0'
+					var card={
+						name:trigger.card.name,
+						nature:trigger.card.nature,
+						isCard:true,
+						storage:{cuguo:true},
+					};
+					event.card=card;
+					player.chooseToDiscard('蹙国：请弃置一张牌',`视为你对${get.translation(trigger.target)}使用一张${get.translation(card.nature||'')}【${get.translation(card.name)}】`,'he',true).set('logSkill',['cuguo',trigger.target]);
+					'step 1'
+					if(player.canUse(card,trigger.target,false)){
+						player.useCard(card,trigger.target);
+						player.when('useCardAfter')
+							.filter(event=>{
+								return event.card.storage&&event.card.storage.cuguo;
+							})
+							.then(()=>{
+								if(game.hasGlobalHistory('everything',evt=>{
+									if(evt._neutralized||evt.responded&&(!evt.result||!evt.result.bool)){
+										if(evt.getParent()==trigger) return true;
+									}
+									return false;
+								})){
+									player.loseHp();
+								}
+							})
+					}
+				}
+			},
+			//陈式
+			qingbei:{
+				audio:2,
+				trigger:{global:'roundStart'},
+				direct:true,
+				content:function(){
+					'step 0'
+					var next=player.chooseButton(['###擎北：是否选择任意种花色？###<div class="text center">你不能于本轮能使用这些花色，且使用牌后摸等同于选择花色数的牌</div>',[lib.suit.map(i=>['','','lukai_'+i]),'vcard']],[1,4]);
+					next.set('ai',button=>{
+						var player=_status.event.player;
+						var suit=button.link[2].slice(6);
+						var val=player.getCards('hs',{suit:suit}).map(card=>{
+							return get.value(card)+player.getUseValue(card)/3;
+						}).reduce((p,c)=>{
+							return p+c;
+						},0);
+						if(val>10&&ui.selected.buttons.length>0) return -1;
+						if(val>6&&ui.selected.buttons.length==2) return -1;
+						if(ui.selected.buttons.length==3) return -1;
+						return 1+1/val;
+					});
+					'step 1'
+					if(result.bool){
+						var suits=result.links.map(i=>i[2].slice(6));
+						player.addTempSkill('qingbei_effect','roundStart');
+						player.setStorage('qingbei_effect',suits);
+						player.markSkill('qingbei_effect');
+					}
+				},
+				ai:{
+					threaten:2.3,
+				},
+				subSkill:{
+					effect:{
+						audio:'qingbei',
+						trigger:{
+							player:'useCardAfter',
+						},
+						forced:true,
+						charlotte:true,
+						onremove:true,
+						filter:function(event,player){
+							return player.getStorage('qingbei_effect').length;
+						},
+						content:function(){
+							player.draw(player.getStorage('qingbei_effect').length);
+						},
+						mark:true,
+						intro:{
+							content:(storage)=>`本轮内不能使用${get.translation(storage)}花色的牌，且使用牌后摸${get.cnNumber(storage.length)}张牌`,
+						},
+						mod:{
+							cardEnabled:function(card,player){
+								if(player.getStorage('qingbei_effect').contains(get.suit(card))) return false;
+							},
+							cardSavable:function(card,player){
+								if(player.getStorage('qingbei_effect').contains(get.suit(card))) return false;
+							},
+						},
+					}
+				}
+			},
+			//费曜
+			zhenfeng:{
+				audio:2,
+				trigger:{global:'useCard'},
+				usable:1,
+				filter:function(event,player){
+					return event.player!=player&&event.player==_status.currentPhase&&event.player.countCards('h')<=event.player.getHp();
+				},
+				check:function(event,player){
+					var type=get.type2(event.card,event.player);
+					if(type=='equip'&&event.player.hasCard(card=>event.player.hasValueTarget(card))) return false;
+					if(get.attitude(player,event.player)>0&&event.player.getHp()+event.player.countCards('hs',['shan','caochuan'])<=3) return false;
+					return true;
+				},
+				onremove:true,
+				logTarget:'player',
+				content:function(){
+					'step 0'
+					var choices=Array.from({length:trigger.player.countCards('h')+1}).map((_,i)=>get.cnNumber(i,true));
+					var type=get.type2(trigger.card,trigger.player);
+					player.chooseControl(choices).set('prompt','镇锋：猜测其手牌中的'+get.translation(type)+'牌数').set('ai',()=>{
+						return _status.event.choice;
+					}).set('choice',function(){
+						var num=trigger.player.countCards('h',card=>get.type2(card)==type);
+						var numx;
+						if(type=='basic') numx=num+(Math.random()<0.2?(Math.random()>0.5?1:-1):0);
+						else if(type=='trick'){
+							if(num>2) numx=2;
+							else numx=1;
+							if(Math.random()<0.5){
+								numx+=Math.random()>0.5?1:-1;
+							}
+						}
+						else{
+							numx=[0,1].randomGet();
+						}
+						if(numx<0) numx=0;
+						else if(numx>choices.length) numx=choices.length;
+						return numx;
+					}());
+					'step 1'
+					var guessedNum=result.index;
+					var type=get.type2(trigger.card,trigger.player);
+					var count=trigger.player.countCards('h',card=>get.type2(card)==type);
+					player.chat('我猜'+get.cnNumber(guessedNum)+'张');
+					game.log(player,'猜测',trigger.player,'有',get.cnNumber(guessedNum)+'张'+get.translation(type)+'牌');
+					game.delay();
+					if(count==guessedNum){
+						player.popup('猜测正确','wood');
+						game.log(player,'猜测','#g正确');
+						if(player.countMark('zhenfeng')<5) player.addMark('zhenfeng',1,false);
+						player.draw(player.countMark('zhenfeng'));
+						if(player.canUse('sha',trigger.player,false)) player.useCard({name:'sha',isCard:true},trigger.player);
+					}
+					else{
+						player.popup('猜测错误','fire');
+						game.log(player,'猜测','#y错误');
+						player.clearMark('zhenfeng');
+						if(Math.abs(count-guessedNum)>1&&trigger.player.canUse('sha',player,false)){
+							trigger.player.useCard({name:'sha',isCard:true},player,false,'noai');
+						}
+					}
+				},
+				intro:{
+					content:'已连续猜对#次',
+				},
+			},
 			//新杀小加强 李严
 			dcduliang:{
 				enable:'phaseUse',
@@ -9246,9 +9537,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseUseEnd'},
 				direct:true,
 				filter:function(event,player){
-					return player.getHistory('useSkill',function(evt){
-						return evt.skill=='yanyu'&&evt.event.getParent(2)==event;
-					}).length>=2&&game.hasPlayer(target=>target.hasSex('male')&&target!=player);
+					return player.getHistory('lose',function(evt){
+						var evt2=evt.getParent();
+						return evt2.name=='useSkill'&&evt2.skill=='yanyu'&&evt.getParent(3)==event;
+					}).length>=2;
 				},
 				content:function(){
 					'step 0'
@@ -14286,6 +14578,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcduliang:'督粮',
 			dcduliang2:'督粮',
 			dcduliang_info:'出牌阶段限一次。你可以获得一名其他角色的一张牌，然后选择一项：1.你观看牌堆顶的两张牌，然后令其获得其中的一或两张基本牌；2.令其于下回合的摸牌阶段额外摸一张牌。',
+			sunli:'孙礼',
+			kangli:'伉厉',
+			kangli_info:'当你造成或受到伤害后，你摸两张牌。然后你下次造成伤害时弃置这些牌。',
+			xiahoumao:'夏侯楙',
+			tongwei:'统围',
+			tongwei_info:'出牌阶段限一次。你可以重铸两张牌并指定一名其他角色，当其使用的下一张牌结算结束后，若此牌点数在你上次以此法重铸的牌的点数之间，你视为对其使用一张【杀】或【过河拆桥】。',
+			cuguo:'蹙国',
+			cuguo_info:'锁定技。当你于一回合使用牌首次被抵消后，你弃置一张牌，视为对此牌的目标角色使用一张该被抵消的牌。此牌结算结束后，若此牌被抵消，你失去1点体力。',
+			chenshi:'陈式',
+			qingbei:'擎北',
+			qingbei_info:'一轮游戏开始时，你可以选择任意种花色，你不能于本轮内使用这些花色的牌。然后当你于本轮使用牌结算结束后，你摸等同于你上一次〖擎北〗选择过的花色数的牌。',
+			feiyao:'费曜',
+			zhenfeng:'镇锋',
+			zhenfeng_info:'每回合限一次。当其他角色于其回合内使用牌时，若其手牌数不大于其体力值，你可以猜测其手牌中与此牌类别相同的牌数。若你猜对，你摸X张牌并视为对其使用一张【杀】（X为你连续猜对的次数且至多为5）；若你猜错且差值大于1，其视为对你使用一张【杀】。',
 			
 			yijiang_2011:'一将成名2011',
 			yijiang_2012:'一将成名2012',
@@ -14295,6 +14601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yijiang_2016:'原创设计2016',
 			yijiang_2017:'原创设计2017',
 			yijiang_2022:'原创设计2022',
+			yijiang_2023:'一将成名2023',
 		},
 	};
 });

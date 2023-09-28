@@ -311,6 +311,7 @@ window.noname_character_rank={
 		'dc_liubei',
 		'dc_sunquan',
 		'yuechen',
+		'sunli',
 		'key_misuzu',
 		'key_sunohara',
 		'key_umi',
@@ -601,6 +602,8 @@ window.noname_character_rank={
 		'ol_zhouqun',
 		'caoxi',
 		'zhaoxiang',
+		'chenshi',
+		'xiahoumao',
 	],
 	bp:[
 		'chess_diaochan',
@@ -1254,6 +1257,8 @@ window.noname_character_rank={
 		'jsrg_zoushi',
 		'gaoxiang',
 		'ol_qianzhao',
+		'yj_zhoubuyi',
+		'feiyao',
 	],
 	bm:[
 		'diy_xizhenxihong',

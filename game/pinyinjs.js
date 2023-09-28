@@ -159,6 +159,7 @@ var pinyin_dict_polyphone = {
 	"沾露": " lù",
 	"禁咒": "jìn ",
 	"挟令": "xié lìng",
+	"膴仕": "wǔ ",
 	// END
 	"撒贝宁": "sà  ",
 	

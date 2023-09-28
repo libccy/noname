@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			mobile:{
 				mobile_default:['xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
-				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan'],
+				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan','yj_zhoubuyi'],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua_feng:['re_xiaoqiao',"xin_zhoutai"],
 				mobile_shenhua_huo:["re_pangtong","re_sp_zhugeliang","re_xunyu","re_dianwei","re_yanwen","xin_yuanshao"],
@@ -26,6 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			yj_zhoubuyi:['male','wei',3,['mbhuiyao','mbquesong']],
 			xin_guozhao:['female','wei',3,['yichong','wufei']],
 			xin_zhangyi:['male','shu',4,['xinwurong','shizhi']],
 			xin_sunliang:['male','wu',3,['xinzhizheng','xinkuizhu','xinlijun'],['zhu']],
@@ -379,6 +380,94 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//☆周不疑
+			mbhuiyao:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filterTarget:lib.filter.notMe,
+				content:function(){
+					player.damage('nosource');
+					target.damage('unreal');
+				},
+				ai:{
+					result:{
+						target:function(player,target){
+							if(player.getHp()+player.countCards('hs',card=>player.canSaveCard(card,player))<1) return 0;
+							var _hp=target.hp,_maxhp=target.maxHp;
+							target.hp=10; target.maxHp=10;
+							var att=-get.sgnAttitude(player,target);
+							var val=get.damageEffect(target,player,target)*att;
+							target.getSkills(null,false,false).forEach(skill=>{
+								var info=get.info(skill);
+								if(info&&info.ai&&(info.ai.maixie||info.ai.maixie_hp||info.ai.maixie_defend)) val=Math[val>0?'max':'min'](val>0?0.1:-0.1,val+2*att);
+							});
+							var eff=100/val;
+							target.hp=_hp; target.maxHp=_maxhp;
+							if(eff<25) return 0;
+							return eff/30;
+						}
+					}
+				},
+			},
+			mbquesong:{
+				audio:2,
+				trigger:{global:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return player.getHistory('damage').length;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('mbquesong')).set('ai',target=>{
+						var player=_status.event.player;
+						if(get.attitude(player,target)<=0) return 0;
+						var len=[1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0);hp=target.getHp();
+						return len+target.isTurnedOver()*2+1.5*Math.min(4,target.getDamagedHp())/(hp+1);
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.logSkill('mbquesong',target);
+						var len=[1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0);hp=target.getHp();
+						var forced=false;
+						if(len==0) forced=true;
+						if(hp==0){
+							if(forced) event.finish();
+							else event._result={bool:false};
+						}
+						else{
+							var str=`${forced?'请':'是否'}弃置${get.cnNumber(hp)}张手牌并回复1点体力${forced?'':'？或点击“取消”摸'+get.cnNumber(len)+'张牌并复原武将牌'}。`;
+							target.chooseToDiscard(get.translation(player)+'对你发动了【雀颂】',str,forced,'h',hp).set('ai',card=>{
+								if(!_status.event.goon) return 0;
+								return 6-get.value(card);
+							}).set('goon',function(){
+								var _hp=hp+target.isTurnedOver()*1.5;
+								if(forced||_hp+player.countCards('hs',card=>get.tag(card,'recover'))<=2) return true;
+								return len>_hp;
+							}());
+						}
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						target.recover();
+					}
+					else{
+						target.draw([1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0));
+						player.link(false);
+						player.turnOver(false);
+					}
+				},
+				ai:{
+					expose:0.2,
+					maixie:true,
+					skillTagFilter:function(player,tag){
+						if(player.getStat().damaged) return false;
+					},
+				}
+			},
 			//郭照
 			yichong:{
 				init:function(player){
@@ -14009,6 +14098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             yangbiao:['yangbiao','dc_yangbiao','jsrg_yangbiao'],
 			qiaozhou:['yj_qiaozhou','qiaozhou'],
 			sunhanhua:['dc_sunhanhua','sunhanhua'],
+			zhoubuyi:['zhoubuyi','yj_zhoubuyi'],
 		},
 		translate:{
 			liuzan:'手杀留赞',
@@ -14671,6 +14761,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”得到五张牌）。',
 			wufei:'诬诽',
 			wufei_info:'若场上存在拥有“雀”标记的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于1且A的体力值大于你，则你可以对A造成1点伤害。',
+			yj_zhoubuyi:'☆周不疑',
+			mbhuiyao:'慧夭',
+			mbhuiyao_info:'出牌阶段限一次。你可以受到1点无来源伤害，视为对一名其他角色造成过1点伤害。',
+			mbquesong:'雀颂',
+			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸等同于其装备区中空栏的数量的牌并复原武将牌；2.弃置等同于其体力值的手牌并回复1点体力。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',
