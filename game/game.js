@@ -30476,9 +30476,8 @@
 			},
 		},
 		filter:{
-			all:function(){
-				return true;
-			},
+			all:()=>true,
+			none:()=>false,
 			//Check if the card does not count toward the player's hand limit
 			//检测此牌是否不计入此角色的手牌上限
 			ignoredHandcard:(card,player)=>game.checkMod(card,player,false,'ignoredHandcard',player),
