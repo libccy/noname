@@ -39821,25 +39821,14 @@
 				});
 			}
 			if(info.inherit){
-				var inheritHistory=[];
-				doInherit(i);
-				function doInherit(i){
-					const info=lib.skill[i],iInfo=`${i}_info`;
-					if(!info.inherit) return;
-					if(inheritHistory.includes(info.inherit)) return;
-					inheritHistory.push(info.inherit);
-
-					const inheritInfo=lib.skill[info.inherit];
-					if(inheritInfo) Object.keys(inheritInfo).forEach(value=>{
-						if(info[value]!=undefined) return;
-						if(value=='audio'&&(typeof info[value]=='number'||typeof info[value]=='boolean')) info[value]=info.inherit;
-						else info[value]=inheritInfo[value];
-					});
-					if(lib.translate[i]==undefined) lib.translate[i]=lib.translate[info.inherit];
-					if(lib.translate[iInfo]==undefined) lib.translate[iInfo]=lib.translate[`${info.inherit}_info`];
-
-					doInherit(info.inherit);
-				}
+				const skill=lib.skill[info.inherit];
+				if(skill) Object.keys(skill).forEach(value=>{
+					if(info[value]!=undefined) return;
+					if(value=='audio'&&(typeof info[value]=='number'||typeof info[value]=='boolean')) info[value]=info.inherit;
+					else info[value]=skill[value];
+				});
+				if(lib.translate[i]==undefined) lib.translate[i]=lib.translate[info.inherit];
+				if(lib.translate[iInfo]==undefined) lib.translate[iInfo]=lib.translate[`${info.inherit}_info`];
 			}
 			if(info.limited){
 				if(info.mark===undefined) info.mark=true;
