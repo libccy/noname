@@ -3016,14 +3016,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var num=1-player.hp;
 						if(num>0) player.recover(num);
+						event.finish();
 					}
 					else{
 						target.gainMaxHp();
 						target.recover();
 						target.draw();
-						var num=player.maxHp-player.hp;
-						if(num>0) player.recover(num);
 					}
+					'step 2'
+					var num=player.maxHp-player.hp;
+					if(num>0) player.recover(num);
 				},
 			},
 			//王淩

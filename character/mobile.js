@@ -454,12 +454,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						target.recover();
+						event.finish();
 					}
 					else{
 						target.draw([1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0));
-						player.link(false);
-						player.turnOver(false);
 					}
+					'step 3'
+					player.link(false);
+					'step 4'
+					player.turnOver(false);
 				},
 				ai:{
 					expose:0.2,

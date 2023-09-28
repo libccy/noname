@@ -229,11 +229,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				content:function(){
-					'step 0'
 					player.draw(2).gaintag=['kangli'];
 					player.when({source:'damageBegin1'})
 						.then(()=>{
-							var cards=player.getCards('h',card=>card.hasGaintag('kangli'));
+							var cards=player.getCards('h',card=>card.hasGaintag('kangli')&&lib.filter.cardDiscardable(card,player,'kangli'));
 							if(cards.length) player.discard(cards);
 						})
 				},
@@ -256,6 +255,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				discard:false,
 				lose:false,
 				delay:false,
+				popname:true,
 				check:function(card){
 					var num=6.5;
 					if(ui.selected.cards.length){
@@ -278,6 +278,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						.assign({
 							numbers:numbers,
 							playerx:player,
+							mod:{
+								aiOrder:function(player,card,num){
+									var number=get.number(card);
+									if(typeof number!='number'||number<=numbers[0]||number>=numbers[1]) return num+10;
+								},
+							},
 						})
 						.filter((event,player)=>{
 							return event._tongwei_checked;
@@ -286,15 +292,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var number=get.number(trigger.card);
 							var numbers=get.info(event.name).numbers;
 							event.playerx=get.info(event.name).playerx;
-							if(number<=numbers[0]||number>=numbers[1]) event.finish();
+							if(typeof number!='number'||number<=numbers[0]||number>=numbers[1]) event.finish();
 						})
 						.then(()=>{
 							var playerx=event.playerx;
 							var names=['sha','guohe'].filter(name=>playerx.canUse({name:name,isCard:true},player,false));
 							if(!names.length) event.finish();
-							else if(names.length==1) event._result={control:names[0]};
-							else playerx.chooseControl(names).set('prompt',`统围：视为对${get.translation(player)}使用一张【杀】或【过河拆桥】`).set('ai',()=>{
-								return _status.event.choice;
+							else if(names.length==1) event._result={links:[[null,null,names[0]]]};
+							else playerx.chooseButton([
+								`请选择要视为对${get.translation(player)}使用的牌`,
+								[names,'vcard'],
+							]).set('ai',(button)=>{
+								return button.link[0][2]==_status.event.choice;
 							}).set('choice',function(){
 								var list=names.map(name=>{
 									return [name,get.effect(player,{name:name,isCard:true},playerx,playerx)];
@@ -305,9 +314,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}());
 						})
 						.then(()=>{
-							var name=result.control;
+							var name=result.links[0][2];
 							var card={name:name,isCard:true},playerx=event.playerx;
-							if(playerx.canUse(card,player,false)) playerx.useCard(card,player);
+							if(playerx.canUse(card,player,false)) playerx.useCard(card,player,'tongwei');
 						})
 				},
 				ai:{
@@ -476,10 +485,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var guessedNum=result.index;
 					var type=get.type2(trigger.card,trigger.player);
-					var count=trigger.player.countCards('h',card=>get.type2(card)==type);
 					player.chat('我猜'+get.cnNumber(guessedNum)+'张');
 					game.log(player,'猜测',trigger.player,'有',get.cnNumber(guessedNum)+'张'+get.translation(type)+'牌');
+					event.guessedNum=guessedNum;
 					game.delay();
+					'step 2'
+					var count=trigger.player.countCards('h',card=>get.type2(card)==type);
+					var guessedNum=event.guessedNum;
 					if(count==guessedNum){
 						player.popup('猜测正确','wood');
 						game.log(player,'猜测','#g正确');
