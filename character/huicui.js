@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			yue_zhoufei:['female','wu',3,['dclingkong','dcxianshu']],
 			dc_wuban:['male','shu',4,['dcyouzhan'],['clan:陈留吴氏','unseen']],
 			yue_caiwenji:['female','qun',3,['dcshuangjia','dcbeifen']],
 			liuchongluojun:['male','qun',3,['dcminze','dcjini']],
@@ -98,10 +99,127 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_jishi:['dc_jiben','zhenghun','dc_sunhanhua','liuchongluojun'],
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen'],
 				sp_yijun:['gongsundu','mengyou'],
-				sp_zhengyin:['yue_caiwenji'],
+				sp_zhengyin:['yue_caiwenji','yue_zhoufei'],
 			}
 		},
 		skill:{
+			//乐周妃
+			dclingkong:{
+				audio:2,
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame'
+				},
+				forced:true,
+				filter:function(event,player){
+					return (event.name!='phase'||game.phaseNumber==0);
+				},
+				content:function(){
+					'step 0'
+					var cards=player.getCards('h');
+					player.addGaintag(cards,'dclingkong_tag');
+				},
+				mod:{
+					ignoredHandcard:function(card,player){
+						if(card.hasGaintag('dclingkong_tag')){
+							return true;
+						}
+					},
+					cardDiscardable:function(card,player,name){
+						if(name=='phaseDiscard'&&card.hasGaintag('dclingkong_tag')){
+							return false;
+						}
+					},
+				},
+				group:'dclingkong_marker',
+				subSkill:{
+					marker:{
+						audio:'dclingkong',
+						trigger:{player:['gainAfter','loseAsyncAfter']},
+						forced:true,
+						filter:(event,player)=>{
+							if(player==_status.currentPhase) return false;
+							const hs=player.getCards('h');
+							if(!hs.length) return false;
+							const cards=event.getg(player);
+							return cards.some(card=>hs.includes(card));
+						},
+						content:function(){
+							var hs=player.getCards('h'),cards=trigger.getg(player);
+							var card=cards.filter(card=>hs.includes(card)).randomGet();
+							player.addGaintag(card,'dclingkong_tag');
+							game.delayx();
+						},
+					},
+				},
+			},
+			dcxianshu:{
+				audio:2,
+				enable:'phaseUse',
+				filter:(event,player)=>{
+					return game.hasPlayer(current=>current!=player)&&player.hasCard(card=>card.hasGaintag('dclingkong_tag'),'h');
+				},
+				filterCard:(card)=>card.hasGaintag('dclingkong_tag'),
+				filterTarget:lib.filter.notMe,
+				discard:false,
+				lose:false,
+				delay:false,
+				position:'h',
+				check:card=>{
+					const player=_status.event.player,event=_status.event,color=get.color(card);
+					if(color=='red'){
+						return (event.getTempCache('dcxianshu','red')
+							||event.putTempCache('dcxianshu','red',game.hasPlayer(current=>{
+								return current!=player&&current.hp<=player.hp&&current.isDamaged()&&get.recoverEffect(current,player,player)>0;
+							}).toString()))=='true'?(7-get.value(card)):0;
+					}
+					else if(color=='black'){
+						return (event.getTempCache('dcxianshu','black')
+							||event.putTempCache('dcxianshu','black',game.hasPlayer(current=>{
+								return current!=player&&current.hp>=player.hp&&get.effect(current,{name:'losehp'},player,player)>0;
+							}).toString()))=='true'?(7-get.value(card)):0;
+					}
+					return 6-get.value(card);
+				},
+				content:function(){
+					'step 0'
+					player.give(cards,target,true);
+					event.color=get.color(cards[0],player);
+					'step 1'
+					if(event.color=='red'){
+						if(target.getHp()<=player.getHp()&&target.isDamaged()) target.recover();
+					}
+					else if(event.color=='black'){
+						if(target.getHp()>=player.getHp()) target.loseHp()
+					}
+					'step 2'
+					if(target.isIn()){
+						var num=Math.min(Math.abs(target.getHp()-player.getHp()),5);
+						if(num>0) player.draw(num);
+					}
+				},
+				ai:{
+					combo:'dclingkong',
+					order:10,
+					result:{
+						player:function(player,target){
+							if(!ui.selected.cards.length) return 0;
+							let num=target.getHp()-player.getHp();
+							const card=ui.selected.cards[0],color=get.color(card);
+							if(color=='red'&&target.getHp()<=player.getHp()&&target.isDamaged()) num++;
+							else if(color=='black'&&target.getHp()>=player.getHp()) num--;
+							return Math.min(Math.abs(num),5)*1.1;
+						},
+						target:function(player,target){
+							if(!ui.selected.cards.length) return 0;
+							const card=ui.selected.cards[0],color=get.color(card),val=get.value(card,target);
+							if(color=='red'&&target.getHp()<=player.getHp()&&target.isDamaged()) return get.recoverEffect(target,player,target)+val/1.4;
+							else if(color=='black'&&target.getHp()>=player.getHp()) return get.effect(target,{name:'losehp'},player,target)+val/1.4;
+							return val/1.4;
+						},
+					},
+				},
+			},
 			//吴班
 			dcyouzhan:{
 				audio:2,
@@ -10260,7 +10378,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_wuban:'吴班',
 			dcyouzhan:'诱战',
 			dcyouzhan_info:'锁定技。当其他角色于你的回合内失去牌后，你摸一张牌，且其获得如下效果：1.其于此回合下一次受到的伤害+1；2.结束阶段，若其于此回合未受到过伤害，其摸X张牌（X为其此回合失去过牌的次数）。',
-			
+			yue_zhoufei:'乐周妃',
+			dclingkong:'灵箜',
+			dclingkong_tag:'箜篌',
+			dclingkong_info:'锁定技。①游戏开始时，你将所有手牌标记为“箜篌”。②你的“箜篌”牌不计入手牌上限。③当你于回合外获得牌后，系统随机将其中的一张牌标记为“箜篌”。',
+			dcxianshu:'贤淑',
+			dcxianshu_info:'出牌阶段，你可以将一张“箜篌”正面向上交给一名其他角色。若此牌为红色，且该角色的体力值不大于你，则其回复1点体力；若此牌为黑色，且该角色的体力值不小于你，则其失去1点体力。此技能结算完成后，你摸X张牌（X为你与其的体力值之差且至多为5）。',
+
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
 			sp_zhilan:'芝兰玉树',

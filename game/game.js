@@ -29406,6 +29406,7 @@
 						this._tempCache[key1] = {};
 					}
 					this._tempCache[key1][key2] = value;
+					return value;
 				},
 				getTempCache:function(key1,key2){
 					if(!this._tempCache){
