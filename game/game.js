@@ -7823,7 +7823,17 @@
 								switch (item.constructor) {
 									case Object:
 									case null:
-										result.style=item;
+										if("_type" in item){
+											const type=item["_type"];
+											if(!(type in result)) result[type]=lib.creation.nullObject;
+											result[type][item.name]=item.value;
+										}
+										else{
+											if(!("style" in result)) result.style=lib.creation.nullObject;
+											for(const name in item){
+												result.style[name]=item[name];
+											}
+										}
 										break;
 									default:
 										if(!("childs" in result)) result.childs=lib.creation.array;
@@ -7842,6 +7852,13 @@
 						}
 					}
 					return result;
+				},
+				attr(name,value){
+					return {
+						_type:"attributes",
+						name:name,
+						value:value
+					}
 				},
 				div(){
 					const dom=lib.linq.dom;
