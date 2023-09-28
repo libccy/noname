@@ -7806,13 +7806,6 @@
 					if(options.content){
 						element.innerHTML=options.content;
 					}
-					//处理位置
-					if(options.position){
-						if(options.position2){
-							options.position.insertBefore(element, options.position.childNodes[options.position2]);
-						}
-						else options.position.appendChild(element);
-					}
 					//处理子元素
 					if(options.childs){
 						for(const item of options.childs){
@@ -7820,6 +7813,35 @@
 						}
 					}
 					return element;
+				},
+				generate(){
+					let result=lib.creation.nullObject;
+					const args=Array.from(arguments);
+					for(const item of args) {
+						switch(typeof item) {
+							case "object":
+								switch (item.constructor) {
+									case Object:
+									case null:
+										result.style=item;
+										break;
+									default:
+										if(!("childs" in result)) result.childs=lib.creation.array;
+										result.childs.add(item);
+										break;
+								}
+								break;
+							case "string":
+								if(/^\.|#/.test(item)){
+									if(!("identity" in result)) result.identity=lib.creation.array;
+									const identities=item.split(".").filter(Boolean);
+									for(const item of identities) result.identity.add(item);
+								}
+								else result.content = item;
+								break;
+						}
+					}
+					return result;
 				}
 			}
 		},
