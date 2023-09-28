@@ -190,7 +190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=result.targets[0];
 								player.logSkill('dcshangyu_transfer',target);
 								if(!player.storage.dcshangyu_transfer){
-									player.when('phaseAfter')
+									player.when({global:'phaseAfter'})
 										.then(()=>{
 											player.unmarkSkill('dcshangyu_transfer');
 											delete player.storage.dcshangyu_transfer;

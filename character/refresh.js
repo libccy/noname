@@ -260,7 +260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								event.result.card=viewAs;
 								event.result.cards=[];
 								if(!player.storage.rehuomo){
-									player.when('phaseAfter').then(()=>{player.unmarkSkill('rehuomo')});
+									player.when({global:'phaseAfter'}).then(()=>{player.unmarkSkill('rehuomo')});
 								}
 								player.markAuto('rehuomo',viewAs.name)
 							},
