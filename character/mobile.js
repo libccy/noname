@@ -4679,7 +4679,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					{
 						//歌曲名称
 						name:'鳥の詩',
-						//歌曲文件名（默认在audio/effect文件夹下 若要重定向到扩展 请写为'ext:扩展名称'的格式 并将文件名重命名为和上面的歌曲名称相同）
+						//歌曲文件名（默认在audio/effect文件夹下 若要重定向到扩展 请写为'ext:扩展名称/文件名'的格式）
 						filename:'tori_no_uta',
 						//每个音符的开始时间点（毫秒，相对未偏移的开始播放时间）
 						timeleap:[1047,3012,4978,5469,5961,6452,6698,7435,8909,10875,12840],
@@ -6809,7 +6809,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						update: function () {
 							if(state.curr == state.gameOver || state.curr == state.gameSuccess) return;
 							this.x -= dx * deltaTime;
-							const halfWidth = this.sprite.width / 2;
+							const halfWidth = this.sprite.width / 4;
 							if(this.x <= -halfWidth) this.x += halfWidth;
 						},
 					};

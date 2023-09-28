@@ -274,7 +274,7 @@
 				if(typeof background!='string') background='';
 				if(!Array.isArray(lineColor)||lineColor.length!=3) lineColor=[];
 				else if(background.indexOf('ext:')==0){
-					background=background.replace(/ext:/,'extension/');
+					background=background.replace(/^ext:/,'extension/');
 				}
 				if(linked) lib.linked.add(nature);
 				if(lineColor.length) lib.lineColor.set(nature,lineColor);
@@ -7974,7 +7974,7 @@
 									break;
 								}
 							}
-							if(extimage) src=extimage.replace(/ext:/,'extension/');
+							if(extimage) src=extimage.replace(/^ext:/,'extension/');
 							else if(dbimage){
 								this.setBackgroundDB(dbimage.slice(3));
 								return this;
@@ -9468,20 +9468,7 @@
 							if(!idbDatabase.objectStoreNames.contains('video')) idbDatabase.createObjectStore('video',{
 								keyPath:'time'
 							});
-							if(!idbDatabase.objectStoreNames.contains('file')) idbDatabase.createObjectStore('file').transaction.oncomplete=()=>{
-								if(idbDatabase.objectStoreNames.contains('audio')) idbDatabase.transaction('audio').objectStore('audio').openCursor().onsuccess=event=>{
-									const result=event.target.result;
-									if(!result) return;
-									idbDatabase.transaction('file','readwrite').objectStore('file').put(result.value,result.key);
-									result.continue();
-								};
-								if(idbDatabase.objectStoreNames.contains('image')) idbDatabase.transaction('image').objectStore('image').openCursor().onsuccess=event=>{
-									const result=event.target.result;
-									if(!result) return;
-									idbDatabase.transaction('file','readwrite').objectStore('file').put(result.value,result.key);
-									result.continue();
-								};
-							};
+							if(!idbDatabase.objectStoreNames.contains('file')) idbDatabase.createObjectStore('file');
 							if(!idbDatabase.objectStoreNames.contains('config')) idbDatabase.createObjectStore('config');
 							if(!idbDatabase.objectStoreNames.contains('data')) idbDatabase.createObjectStore('data');
 						};
@@ -10351,7 +10338,7 @@
 							var avatarnode=ui.create.div(node,'.avatar');
 							var avatarbg=lib.mode[lib.config.all.mode[i]].splash;
 							if(avatarbg.indexOf('ext:')==0){
-								avatarnode.setBackgroundImage(avatarbg.replace(/ext:/,'extension/'));
+								avatarnode.setBackgroundImage(avatarbg.replace(/^ext:/,'extension/'));
 							}
 							else{
 								avatarnode.setBackgroundDB(avatarbg);
@@ -10478,7 +10465,8 @@
 				const style=document.createElement("link");
 				style.rel="stylesheet";
 				if(path){
-					if(file) path=`${path}/${file}.css`;
+					if(path[path.length-1]=='/') path=path.slice(0,path.length-1);
+					if(file) path=`${path}${/^db:extension-[^:]*$/.test(path)?':':'/'}${file}.css`;
 					(path.indexOf('db:')==0?game.getDB('file',path.slice(3)).then(get.objectURL):new Promise(resolve=>resolve(path))).then(resolvedPath=>{
 						style.href=resolvedPath;
 						if(typeof before=='function'){
@@ -10513,7 +10501,7 @@
 					file.forEach(value=>lib.init.js(path,value,onLoad,onError));
 					return;
 				}
-				let scriptSource=file?`${path}/${file}.js`:path;
+				let scriptSource=file?`${path}${/^db:extension-[^:]*$/.test(path)?':':'/'}${file}.js`:path;
 				if(path.indexOf('http')==0) scriptSource+=`?rand=${get.id()}`;
 				else if(lib.config.fuck_sojson&&scriptSource.includes('extension')!=-1&&scriptSource.indexOf(lib.assetURL)==0){
 					const pathToRead=scriptSource.slice(lib.assetURL.length);
@@ -12423,7 +12411,7 @@
 						ui.create.dialog(str).videoId=id;
 						if(ui.backgroundMusic) ui.backgroundMusic.pause();
 						if(lib.config.background_audio){
-							if(beatmap.filename.indexOf('ext:')==0) game.playAudio('..','extension',beatmap.filename.slice(4),beatmap.name);
+							if(beatmap.filename.indexOf('ext:')==0) game.playAudio(beatmap.filename);
 							else game.playAudio('effect',beatmap.filename);
 						}
 					},player,event.videoId,event.beatmap);
@@ -12636,11 +12624,10 @@
 						
 						game.pause();
 						game.countChoose();
-						setTimeout(function(){
-							if(lib.config.background_audio){
-								if(beatmap.filename.indexOf('ext:')==0) game.playAudio('..','extension',beatmap.filename.slice(4),beatmap.name);
-								else game.playAudio('effect',beatmap.filename);
-							}
+						setTimeout(()=>{
+							if(!lib.config.background_audio) return;
+							if(beatmap.filename.indexOf('ext:')==0) game.playAudio(beatmap.filename);
+							else game.playAudio('effect',beatmap.filename);
 						},Math.floor(speed*100*(0.9+beatmap.judgebar_height))+beatmap.current);
 						setTimeout(function(){
 							addNode();
@@ -17523,11 +17510,10 @@
 						}
 						const audio=lib.card[card.name].audio;
 						if(typeof audio=='string'){
-							const audioInfo=audio.split('::');
-							if(audioInfo.length<2) audioInfo.push('mp3');
-							if(audio.indexOf('db:')==0) game.playAudio(`${audioInfo[0]}${card.name}_${sex}.${audioInfo[1]}`);
-							else if(audio.indexOf('ext:')==0) game.playAudio('..','extension',audioInfo[0].slice(4),`${card.name}_${sex}.${audioInfo[1]}`);
-							else game.playAudio('card',sex,`${audioInfo[0]}.${audioInfo[1]}`);
+							const audioInfo=audio.split(':');
+							if(audio.indexOf('db:')==0) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,audioInfo[2],`${card.name}_${sex}.${audioInfo[3]||'mp3'}`);
+							else if(audio.indexOf('ext:')==0) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${card.name}_${sex}.${audioInfo[2]||'mp3'}`);
+							else game.playAudio('card',sex,`${audioInfo[0]}.${audioInfo[1]||'mp3'}`);
 						}
 						else game.playAudio('card',sex,card.name);
 					},player,card);
@@ -18337,25 +18323,17 @@
 						}
 					}
 					else if(!event.nopopup) player.tryCardAnimate(card,card.name,'wood');
-					if(cardaudio&&event.getParent(3).name=='useCard'){
-						game.broadcastAll(function(player,card){
-							if(lib.config.background_audio){
-								var sex=player.sex=='female'?'female':'male';
-								var audioinfo=lib.card[card.name].audio;
-								// if(audioinfo||true){
-									if(typeof audioinfo=='string'&&audioinfo.indexOf('ext:')==0){
-										game.playAudio('..','extension',audioinfo.slice(4),card.name+'_'+sex);
-									}
-									else{
-										game.playAudio('card',sex,card.name);
-									}
-								// }
-								// else{
-								// 	game.playAudio('card/default');
-								// }
-							}
-						},player,card);
-					}
+					if(cardaudio&&event.getParent(3).name=='useCard') game.broadcastAll((player,card)=>{
+						if(!lib.config.background_audio) return;
+						const sex=player.sex=='female'?'female':'male',audio=lib.card[card.name].audio;
+						if(typeof audio=='string'){
+							const audioInfo=audio.split(':');
+							if(audio.indexOf('db:')==0) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,audioInfo[2],`${card.name}_${sex}.${audioInfo[3]||'mp3'}`);
+							else if(audio.indexOf('ext:')==0) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${card.name}_${sex}.${audioInfo[2]||'mp3'}`);
+							else game.playAudio('card',sex,`${audioInfo[0]}.${audioInfo[1]||'mp3'}`);
+						}
+						else game.playAudio('card',sex,card.name);
+					},player,card);
 					if(event.skill){
 						if(player.stat[player.stat.length-1].skill[event.skill]==undefined){
 							player.stat[player.stat.length-1].skill[event.skill]=1;
@@ -28977,7 +28955,7 @@
 						this.classList.add('fullskin');
 						if(img){
 							if(img.indexOf('ext:')==0){
-								this.node.image.setBackgroundImage(img.replace(/ext:/,'extension/'));
+								this.node.image.setBackgroundImage(img.replace(/^ext:/,'extension/'));
 							}
 							else{
 								this.node.image.setBackgroundDB(img);
@@ -29012,7 +28990,7 @@
 						this.classList.add('fullimage');
 						if(img){
 							if(img.indexOf('ext:')==0){
-								this.setBackgroundImage(img.replace(/ext:/,'extension/'));
+								this.setBackgroundImage(img.replace(/^ext:/,'extension/'));
 								this.style.backgroundSize='cover';
 							}
 							else{
@@ -29056,7 +29034,7 @@
 						}
 						if(img){
 							if(img.indexOf('ext:')==0){
-								this.node.avatar.setBackgroundImage(img.replace(/ext:/,'extension/'));
+								this.node.avatar.setBackgroundImage(img.replace(/^ext:/,'extension/'));
 								this.node.avatar.style.backgroundSize='cover';
 							}
 							else{
@@ -29088,7 +29066,7 @@
 					else if(typeof lib.card[bg].image=='string'&&!lib.card[bg].fullskin){
 						if(img){
 							if(img.indexOf('ext:')==0){
-								this.setBackgroundImage(img.replace(/ext:/,'extension/'));
+								this.setBackgroundImage(img.replace(/^ext:/,'extension/'));
 								this.style.backgroundSize='cover';
 							}
 							else{
@@ -34470,15 +34448,23 @@
 		},
 		playAudio:function(){
 			if(_status.video&&arguments[1]!='video') return;
-			let path='',onError=null;
+			let path='',emptyPath=true,notCheckDBPath=true,onError=null;
 			for(const argument of arguments){
 				if(typeof argument==='string'||typeof argument=='number'){
-					if(path) path+='/';
+					if(emptyPath) emptyPath=false;
+					else if(notCheckDBPath){
+						notCheckDBPath=false;
+						if(/^db:extension-[^:]*$/.test(path)) path+=':';
+						else path+='/';
+					}
+					else path+='/';
 					path+=argument;
 				}
 				else if(typeof argument=='function') onError=argument;
 				if(_status.video) break;
 			}
+			if(path.indexOf('ext:')==0) path=path.replace(/^ext:/,'extension/');
+			else if(path.indexOf('db:')!=0) path=`audio/${path}`;
 			if(!lib.config.repeat_audio&&_status.skillaudio.contains(path)) return;
 			_status.skillaudio.add(path);
 			game.addVideo('playAudio',null,path);
@@ -34500,8 +34486,8 @@
 			audio.oncanplay=()=>Promise.resolve(audio.play()).catch(()=>void 0);
 			new Promise((resolve,reject)=>{
 				if(path.indexOf('db:')==0) game.getDB('file',path.slice(3)).then(octetStream=>resolve(get.objectURL(octetStream)),reject);
-				else if(lib.path.extname(path)) resolve(`${lib.assetURL}audio/${path}`);
-				else resolve(`${lib.assetURL}audio/${path}.mp3`);
+				else if(lib.path.extname(path)) resolve(`${lib.assetURL}${path}`);
+				else resolve(`${lib.assetURL}${path}.mp3`);
 			}).then(resolvedPath=>{
 				audio.src=resolvedPath;
 				ui.window.appendChild(audio);
@@ -34518,63 +34504,73 @@
 				if(info.direct&&!directaudio) return;
 				if(lib.skill.global.includes(skill)&&!lib.skill[skill].forceaudio) return;
 			}
-			var audioname=skill;
-			var audioinfo=info.audio;
-			var fixednum;
+			var audioName=skill;
+			var audioInfo=info.audio;
+			var fixedNum;
 			if(info.audioname2){
 				if(info.audioname2[player.name]){
-					audioname+='_'+player.name;
-					audioinfo=info.audioname2[player.name];
+					audioName+='_'+player.name;
+					audioInfo=info.audioname2[player.name];
 				}
 				else if(info.audioname2[player.name1]){
-					audioname+='_'+player.name1;
-					audioinfo=info.audioname2[player.name1];
+					audioName+='_'+player.name1;
+					audioInfo=info.audioname2[player.name1];
 				}
 				else if(info.audioname2[player.name2]){
-					audioname+='_'+player.name2;
-					audioinfo=info.audioname2[player.name2];
+					audioName+='_'+player.name2;
+					audioInfo=info.audioname2[player.name2];
 				}
 			}
 			var history=[];
 			while(true){//可以嵌套引用了
-				if(history.includes(audioname)) break;
-				history.push(audioname);
-				if(typeof audioinfo=='string'&&lib.skill[audioinfo]){
-					audioname=audioinfo;
-					audioinfo=lib.skill[audioname].audio;
+				if(history.includes(audioName)) break;
+				history.push(audioName);
+				if(typeof audioInfo=='string'&&lib.skill[audioInfo]){
+					audioName=audioInfo;
+					audioInfo=lib.skill[audioName].audio;
 					continue;
 				}
-				if(Array.isArray(audioinfo)){
-					audioname=audioinfo[0];
-					if(!fixednum) fixednum=audioinfo[1];//数组会取第一个指定语音数
-					audioinfo=lib.skill[audioname].audio;
+				if(Array.isArray(audioInfo)){
+					audioName=audioInfo[0];
+					if(!fixedNum) fixedNum=audioInfo[1];//数组会取第一个指定语音数
+					audioInfo=lib.skill[audioName].audio;
 					continue;
 				}
 				break;
 			}
 			if(Array.isArray(info.audioname)&&player){
-				if(info.audioname.includes(player.name)&&(!info.audioname2||!info.audioname2[player.name])) audioname+='_'+player.name;
-				else if(info.audioname.includes(player.name1)&&(!info.audioname2||!info.audioname2[player.name1])) audioname+='_'+player.name1;
-				else if(info.audioname.includes(player.name2)&&(!info.audioname2||!info.audioname2[player.name2])) audioname+='_'+player.name2;
+				if(info.audioname.includes(player.name)&&(!info.audioname2||!info.audioname2[player.name])) audioName+='_'+player.name;
+				else if(info.audioname.includes(player.name1)&&(!info.audioname2||!info.audioname2[player.name1])) audioName+='_'+player.name1;
+				else if(info.audioname.includes(player.name2)&&(!info.audioname2||!info.audioname2[player.name2])) audioName+='_'+player.name2;
 			}
-			if(typeof audioinfo=='string'){
-				if(audioinfo.indexOf('ext:')!=0) return;
-				audioinfo=audioinfo.split(':');
-				if(audioinfo.length!=3) return;
-				if(audioinfo[2]=='true') game.playAudio('..','extension',audioinfo[1],audioname);
-				else{
-					audioinfo[2]=parseInt(audioinfo[2]);
-					if(fixednum) audioinfo[2]=Math.min(audioinfo[2],fixednum);
-					if(!audioinfo[2]) return;
-					game.playAudio('..','extension',audioinfo[1],audioname+Math.ceil(audioinfo[2]*Math.random()));
+			if(typeof audioInfo=='string'){
+				if(audioInfo.indexOf('db:')==0){
+					audioInfo=audioInfo.split(':');
+					if(audioInfo.length<4) return;
+					if(audioInfo[3]=='true') game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,audioInfo[2],`${audioName}.${audioInfo[4]||'mp3'}`);
+					else{
+						audioInfo[3]=fixedNum?Math.min(parseInt(audioInfo[3]),fixedNum):parseInt(audioInfo[3]);
+						if(!audioInfo[3]) return;
+						game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,audioInfo[2],`${audioName}${Math.floor(audioInfo[3]*Math.random())+1}.${audioInfo[4]||'mp3'}`);
+					}
+				}
+				else if(audioInfo.indexOf('ext:')==0){
+					audioInfo=audioInfo.split(':');
+					if(audioInfo.length<3) return;
+					if(audioInfo[2]=='true') game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}.${audioInfo[3]||'mp3'}`);
+					else{
+						audioInfo[2]=fixedNum?Math.min(parseInt(audioInfo[2]),fixedNum):parseInt(audioInfo[2]);
+						if(!audioInfo[2]) return;
+						game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}${Math.floor(audioInfo[2]*Math.random())+1}.${audioInfo[3]||'mp3'}`);
+					}
 				}
 			}
-			else if(typeof audioinfo=='number'){
-				if(fixednum) audioinfo=Math.min(audioinfo, fixednum);
-				game.playAudio('skill',audioname+Math.ceil(audioinfo*Math.random()));
+			else if(typeof audioInfo=='number'){
+				if(fixedNum) audioInfo=Math.min(audioInfo, fixedNum);
+				game.playAudio('skill',`${audioName}${Math.floor(audioInfo*Math.random())+1}`);
 			}
-			else if(audioinfo) game.playAudio('skill',audioname);
-			else if(info.audio!==false) game.playSkillAudio(audioname);
+			else if(audioInfo) game.playAudio('skill',audioName);
+			else if(info.audio!==false) game.playSkillAudio(audioName);
 		},
 		playSkillAudio:function(name,index){
 			if(_status.video&&arguments[1]!='video') return;
@@ -41037,7 +41033,7 @@
 					if(lib.card[cardName].fullskin){
 						if(img){
 							if(img.indexOf('ext:')==0){
-								bg.setBackgroundImage(img.replace(/ext:/,'extension/'));
+								bg.setBackgroundImage(img.replace(/^ext:/,'extension/'));
 							}
 							else{
 								bg.setBackgroundDB(img);
@@ -41060,7 +41056,7 @@
 					else if(lib.card[cardName].fullimage){
 						if(img){
 							if(img.indexOf('ext:')==0){
-								bg.setBackgroundImage(img.replace(/ext:/,'extension/'));
+								bg.setBackgroundImage(img.replace(/^ext:/,'extension/'));
 								bg.style.backgroundSize='cover';
 							}
 							else{
@@ -41092,7 +41088,7 @@
 					else if(typeof lib.card[cardName].image=='string'&&!lib.card[cardName].fullskin){
 						if(img){
 							if(img.indexOf('ext:')==0){
-								bg.setBackgroundImage(img.replace(/ext:/,'extension/'));
+								bg.setBackgroundImage(img.replace(/^ext:/,'extension/'));
 								bg.style.backgroundSize='cover';
 							}
 							else{
@@ -54034,7 +54030,7 @@
 						const image=information.image;
 						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 						else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
-						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/ext:/,'extension/')}`);
+						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
 						else resolve(`${lib.assetURL}${image}`);
 					}).then(source=>new Promise((resolve,reject)=>{
 						const image=new Image();
@@ -54049,7 +54045,7 @@
 						const image=information.image;
 						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 						else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
-						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/ext:/,'extension/')}`);
+						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
 						else resolve(`${lib.assetURL}${image}`);
 					}).then(source=>new Promise((resolve,reject)=>{
 						const image=new Image();
@@ -54069,7 +54065,7 @@
 							const image=information.image;
 							if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 							else if(image.indexOf('db:')==0) game.getDB('file',image.slice(3)).then(resolve,reject);
-							else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/ext:/,'extension/')}`);
+							else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
 							else resolve(`${lib.assetURL}${image}`);
 						}).then(source=>new Promise((resolve,reject)=>{
 							const image=new Image();
@@ -55412,7 +55408,10 @@
 				});
 				const testingNaturesList=naturesList.slice(0,naturesList.length-1);
 				if(every) return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).every(testingNatures=>testingNatures.length==natures.length&&testingNatures.every(nature=>natures.includes(nature))));
-				return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).some(testingNatures=>testingNatures.some(nature=>natures.includes(nature))));
+				return testingNaturesList.every((natures,index)=>{
+					const comparingNaturesList=naturesList.slice(index+1);
+					return natures.some(nature=>comparingNaturesList.every(testingNatures=>testingNatures.includes(nature)));
+				});
 			},
 			/**
 			 * 判断传入的参数的属性是否不同（参数可以为卡牌、卡牌信息、属性等）
@@ -55440,7 +55439,10 @@
 				});
 				const testingNaturesList=naturesList.slice(0,naturesList.length-1);
 				if(every) return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).every(testingNatures=>testingNatures.every(nature=>!natures.includes(nature))));
-				return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).some(testingNatures=>testingNatures.length!=natures.length||testingNatures.some(nature=>!natures.includes(nature))));
+				return testingNaturesList.every((natures,index)=>{
+					const comparingNaturesList=naturesList.slice(index+1);
+					return natures.some(nature=>comparingNaturesList.every(testingNatures=>testingNatures.some(testingNature=>testingNature!=nature)));
+				});
 			},
 			//判断一张牌是否为明置手牌
 			shownCard:function(card){
