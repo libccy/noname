@@ -7788,6 +7788,39 @@
 				class:function(){return `.${Array.from(arguments).join(".")}`;},
 				group:function(){return Array.from(arguments).join(",");},
 				media:type=>`@media ${type}`
+			},
+			dom:{
+				inject(element,options){
+					//处理id和class
+					if(options.identity){
+						for(const item of options.identity){
+							if (test.indexOf("#")==0) element.id = item.slice(1);
+							else element.classList.add(item);
+						}
+					}
+					//处理样式
+					if(options.style){
+						for(const item in options.style) element.style[item] = options.style[item];
+					}
+					//处理内容
+					if(options.content){
+						element.innerHTML=options.content;
+					}
+					//处理位置
+					if(options.position){
+						if(options.position2){
+							options.position.insertBefore(element, options.position.childNodes[options.position2]);
+						}
+						else options.position.appendChild(element);
+					}
+					//处理子元素
+					if(options.childs){
+						for(const item of options.childs){
+							element.appendChild(item);
+						}
+					}
+					return element;
+				}
 			}
 		},
 		init:{
