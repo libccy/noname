@@ -7777,6 +7777,95 @@
 				class:function(){return `.${Array.from(arguments).join(".")}`;},
 				group:function(){return Array.from(arguments).join(",");},
 				media:type=>`@media ${type}`
+			},
+			dom:{
+				attributes:{
+					style(name,value){
+						return {
+							_type:"style",
+							name:name,
+							value:value
+						}
+					}
+				},
+				inject(element,options){
+					//处理id和class
+					if(options.identity){
+						for(const item of options.identity){
+							if (item.indexOf("#")==0) element.id = item.slice(1);
+							else element.classList.add(item);
+						}
+					}
+					//处理属性
+					if(options.attributes){
+						for(const item in options.attributes) element.setAttribute(item,options.attributes[item]);
+					}
+					//处理样式
+					if(options.style){
+						for(const item in options.style) element.style[item] = options.style[item];
+					}
+					//处理内容
+					if(options.content){
+						element.innerHTML=options.content;
+					}
+					//处理子元素
+					if(options.childs){
+						for(const item of options.childs){
+							element.appendChild(item);
+						}
+					}
+					return element;
+				},
+				generate(){
+					let result=lib.creation.nullObject;
+					const args=Array.from(arguments);
+					for(const item of args) {
+						switch(typeof item) {
+							case "object":
+								switch (item.constructor) {
+									case Object:
+									case null:
+										if("_type" in item){
+											const type=item["_type"];
+											if(!(type in result)) result[type]=lib.creation.nullObject;
+											result[type][item.name]=item.value;
+										}
+										else{
+											if(!("style" in result)) result.style=lib.creation.nullObject;
+											for(const name in item){
+												result.style[name]=item[name];
+											}
+										}
+										break;
+									default:
+										if(!("childs" in result)) result.childs=lib.creation.array;
+										result.childs.add(item);
+										break;
+								}
+								break;
+							case "string":
+								if(/^\.|#/.test(item)){
+									if(!("identity" in result)) result.identity=lib.creation.array;
+									const identities=item.split(".").filter(Boolean);
+									for(const item of identities) result.identity.add(item);
+								}
+								else result.content = item;
+								break;
+						}
+					}
+					return result;
+				},
+				attribute(name,value){
+					return {
+						_type:"attributes",
+						name:name,
+						value:value
+					}
+				},
+				div(){
+					const dom=lib.linq.dom;
+					return dom.inject(document.createElement("div"),dom.generate(...arguments));
+				}
 			}
 		},
 		init:{
@@ -30422,9 +30511,8 @@
 			},
 		},
 		filter:{
-			all:function(){
-				return true;
-			},
+			all:()=>true,
+			none:()=>false,
 			//Check if the card does not count toward the player's hand limit
 			//检测此牌是否不计入此角色的手牌上限
 			ignoredHandcard:(card,player)=>game.checkMod(card,player,false,'ignoredHandcard',player),
