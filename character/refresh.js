@@ -32,7 +32,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhuzhi:['male','wu',4,['reanguo']],
 			dc_caozhi:['male','wei',3,['reluoying','dcjiushi']],
 			ol_huangzhong:['male','shu',4,['xinliegong','remoshi']],
-			re_wenpin:['male','wei',5,['rezhenwei'],['unseen']],
+			re_wenpin:['male','wei',5,['rezhenwei']],
 			re_guanzhang:['male','shu',4,['fuhun','retongxin']],
 			re_mazhong:['male','shu',4,['refuman']],
 			dc_chenqun:['male','wei',3,['repindi','dcfaen']],
@@ -1464,7 +1464,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezhenwei:{
 				inherit:'zhenwei',
 				filter:function(event,player){
-					if(player==event.target||player==event.player) return false;
+					if(player==event.target) return false;
 					if(!player.countCards('he')) return false;
 					if(event.targets.length>1) return false;
 					if(!event.target) return false;
@@ -15065,7 +15065,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			retongxin_info:'锁定技。你的攻击范围+2。',
 			re_wenpin:'界文聘',
 			rezhenwei:'镇卫',
-			rezhenwei_info:'当一名其他角色成为【杀】或黑色锦囊牌的目标时（使用者不是你），若该角色的体力值不大于你且此牌的目标角色数为1，你可以弃置一张牌。若如此做，你选择一项：1、摸一张牌，然后将此【杀】或黑色锦囊牌转移给你；2、令此【杀】或黑色锦囊牌无效，然后将此【杀】或黑色锦囊牌置于使用者的武将牌旁，若如此做，当前回合结束后，使用者获得使用者武将牌旁的这些牌。',
+			rezhenwei_info:'当一名其他角色成为【杀】或黑色锦囊牌的目标时，若该角色的体力值不大于你且此牌的目标角色数为1，你可以弃置一张牌并选择一项：1.摸一张牌，然后将此【杀】或黑色锦囊牌的目标转移给你；2.令此【杀】或黑色锦囊牌无效且将此【杀】或黑色锦囊牌置于使用者的武将牌上，然后当前回合结束后，使用者获得这些牌。',
 			ol_huangzhong:'界黄忠',
 			remoshi:'没矢',
 			remoshi_info:'锁定技。①当你使用【杀】对目标角色造成伤害后，若其装备区里有防具牌或坐骑牌，你将此【杀】对应的实体牌置于其武将牌上。②当有“没矢”牌的角色失去防具牌或坐骑牌后，你获得其“没矢”牌。',
