@@ -434,7 +434,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var len=[1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0);hp=target.getHp();
 						var forced=false;
 						if(len==0) forced=true;
-						if(hp==0){
+						if(hp==0||target.countCards('h')<hp){
 							if(forced) event.finish();
 							else event._result={bool:false};
 						}
