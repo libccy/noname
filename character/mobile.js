@@ -391,6 +391,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.damage('unreal');
 				},
 				ai:{
+					order:6,
 					result:{
 						target:function(player,target){
 							if(player.getHp()+player.countCards('hs',card=>player.canSaveCard(card,player))<1) return 0;
