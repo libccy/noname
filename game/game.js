@@ -7790,6 +7790,15 @@
 				media:type=>`@media ${type}`
 			},
 			dom:{
+				attributes:{
+					style(name,value){
+						return {
+							_type:"style",
+							name:name,
+							value:value
+						}
+					}
+				},
 				inject(element,options){
 					//处理id和class
 					if(options.identity){
@@ -7857,16 +7866,9 @@
 					}
 					return result;
 				},
-				attr(name,value){
+				attribute(name,value){
 					return {
 						_type:"attributes",
-						name:name,
-						value:value
-					}
-				},
-				stl(name,value){
-					return {
-						_type:"style",
 						name:name,
 						value:value
 					}
