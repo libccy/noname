@@ -105,12 +105,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcxiongmu:{
 				audio:2,
 				trigger:{global:'roundStart'},
-				filter:function(event,player){
-					return player.countCards('h')<player.maxHp;
-				},
+				// filter:function(event,player){
+				// 	return player.countCards('h')<player.maxHp;
+				// },
 				group:'dcxiongmu_minus',
 				prompt2:function(event,player){
-					return '将手牌摸至'+get.cnNumber(player.maxHp)+'张，然后将任意张牌随机置入牌堆并从牌堆或弃牌堆中获得等量点数为8的牌。';
+					return (player.countCards('h')<player.maxHp?'将手牌摸至'+get.cnNumber(player.maxHp)+'张，然后':'')+'将任意张牌随机置入牌堆并从牌堆或弃牌堆中获得等量点数为8的牌。';
 				},
 				content:function(){
 					'step 0'
@@ -119,7 +119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=player.getCards('he');
 					if(!cards.length) event.finish();
 					else if(cards.length==1) event._result={bool:true,cards:cards};
-					else player.chooseCard('雄幕：将任意张牌置入牌堆的随机位置','he',[1,Infinity]).set('ai',card=>{
+					else player.chooseCard('雄幕：将任意张牌置入牌堆的随机位置','he',[1,Infinity],true).set('ai',card=>{
 						return 6-get.value(card);
 					});
 					'step 2'
@@ -283,7 +283,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						charlotte:true,
 						direct:true,
-						group:'dcshangyu_transfer',
+						group:['dcshangyu_transfer','dcshangyu_addTag'],
 						content:function(){
 							'step 0'
 							var list=[player];
@@ -337,6 +337,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						intro:{
 							content:'本回合已交给过$',
+						},
+					},
+					addTag:{
+						trigger:{
+							global:['gainAfter','loseAsyncAfter'],
+						},
+						charlotte:true,
+						popup:false,
+						silent:true,
+						lastDo:true,
+						filter:function(event,player){
+							return game.hasPlayer(current=>{
+								var cards=event.getg(current);
+								return cards.some(card=>player.getStorage('dcshangyu').includes(card));
+							});
+						},
+						content:function(){
+							game.countPlayer(current=>{
+								var cards=trigger.getg(current);
+								if(cards.length){
+									cards=cards.filter(card=>player.getStorage('dcshangyu').includes(card));
+									current.addGaintag(cards,'dcshangyu_tag');
+								}
+							});
 						},
 					},
 				},
@@ -12586,7 +12610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wu_luxun:'武陆逊',
 			dcxiongmu:'雄幕',
 			dcxiongmu_tag:'雄幕',
-			dcxiongmu_info:'①一轮游戏开始时，你可以将手牌摸至体力上限，然后将任意张牌随机置入牌堆，从牌堆或弃牌堆中获得等量的点数为8的牌，且这些牌不计入手牌上限。②当你于一回合首次受到伤害时，若你的手牌数不大于你的体力值，此伤害-1。',
+			dcxiongmu_info:'①一轮游戏开始时，你可以将手牌摸至体力上限（若手牌数不小于体力上限则跳过），然后将任意张牌随机置入牌堆，从牌堆或弃牌堆中获得等量的点数为8的牌，且这些牌不计入手牌上限。②当你于一回合首次受到伤害时，若你的手牌数不大于你的体力值，此伤害-1。',
 			dczhangcai:'彰才',
 			dczhangcai_info:'当你使用或打出点数为8的牌时，你可以摸X张牌（X为你手牌区里点数为8的牌数且至少为1）。',
 			dcruxian:'儒贤',
