@@ -7794,7 +7794,7 @@
 					//处理id和class
 					if(options.identity){
 						for(const item of options.identity){
-							if (test.indexOf("#")==0) element.id = item.slice(1);
+							if (item.indexOf("#")==0) element.id = item.slice(1);
 							else element.classList.add(item);
 						}
 					}
