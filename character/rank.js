@@ -959,6 +959,7 @@ window.noname_character_rank={
 		'sp_machao',
 		'mengyou',
 		're_wenpin',
+		'yue_zhoufei',
 	],
 	b:[
 		'diy_feishi',
@@ -1712,6 +1713,7 @@ window.noname_character_rank={
 			'shen_dianwei',
 			'sunlingluan',
 			'ol_zhouqun',
+			'wu_luxun',
 			'key_tomoya',
 			'key_masato',
 			'key_shiorimiyuki',
@@ -2463,6 +2465,7 @@ window.noname_character_rank={
 			'quhuang',
 			'ol_wenqin',
 			'clan_wanghun',
+			'yue_zhoufei',
 		],
 		junk:[
 			'sunshao',

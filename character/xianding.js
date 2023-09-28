@@ -126,28 +126,75 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var cards=result.cards;
 						event.cards=cards;
-						player.$throw(cards.length);
-						player.lose(cards,ui.cardPile).insert_index=function(){
-							return ui.cardPile.childNodes[ui.cardPile.childNodes.length-1];
+						game.log(player,`将${get.cnNumber(cards.length)}张牌置入了牌堆`);
+						player.loseToDiscardpile(cards,ui.cardPile,'blank').set('log',false).insert_index=function(){
+							return ui.cardPile.childNodes[get.rand(0,ui.cardPile.childNodes.length-1)];
 						};
-						var list=[];
-						var piles=['cardPile','discardPile'];
-						for(var pile of piles){
-							for(var i=0;i<ui[pile].childNodes.length;i++){
-								var card=ui.cardPile.childNodes[i];
-								var number=get.number(card,false);
-								if(!list.contains(card)&&number==8){
-									list.push(card);
-									if(list.length==cards.length) break;
+					}
+					else event.finish();
+					'step 3'
+					var list=[];
+					var piles=['cardPile','discardPile'];
+					for(var pile of piles){
+						for(var i=0;i<ui[pile].childNodes.length;i++){
+							var card=ui.cardPile.childNodes[i];
+							var number=get.number(card,false);
+							if(!list.contains(card)&&number==8){
+								list.push(card);
+								if(list.length==cards.length) break;
+							}
+						}
+					}
+					if(list.length){
+						player.gain(list,'gain2').gaintag.add('dcxiongmu_tag');
+						player.addSkill('dcxiongmu_tag');
+					}
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(player.hasSkillTag('jueqing')) return;
+							if(player._dcxiongmu_temp) return;
+							if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
+							if(get.tag(card,'damage')){
+								if(target.getHistory('damage').length>0){
+									return [1,-2];
+								}
+								else{
+									if(get.attitude(player,target)>0&&target.hp>1){
+										return 0;
+									}
+									if(get.attitude(player,target)<0&&!player.hasSkillTag('damageBonus')){
+										if(card.name=='sha') return;
+										var sha=false;
+										player._dcxiongmu_temp=true;
+										var num=player.countCards('h',function(card){
+											if(card.name=='sha'){
+												if(sha){
+													return false;
+												}
+												else{
+													sha=true;
+												}
+											}
+											return get.tag(card,'damage')&&player.canUse(card,target)&&get.effect(target,card,player,player)>0;
+										});
+										delete player._dcxiongmu_temp;
+										if(player.hasSkillTag('damage')){
+											num++;
+										}
+										if(num<2){
+											var enemies=player.getEnemies();
+											if(enemies.length==1&&enemies[0]==target&&player.needsToDiscard()){
+												return;
+											}
+											return 0;
+										}
+									}
 								}
 							}
 						}
-						if(list.length){
-							player.gain(list,'gain2').gaintag.add('dcxiongmu_tag');
-							player.addSkill('dcxiongmu_tag');
-						}
 					}
-					else event.finish();
 				},
 				subSkill:{
 					minus:{
@@ -155,7 +202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							return game.getGlobalHistory('everything',evt=>{
 								return evt.name=='damage'&&evt.player==player;
-							}).indexOf(event)==0;
+							},event).indexOf(event)==0;
 						},
 						forced:true,
 						locked:false,
@@ -189,16 +236,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.number(event.card)==8;
 				},
 				prompt2:function(event,player){
-					var num=player.hasSkill('dczhangcai_all')?get.number(event.card):8;
-					return '你可以摸'+get.cnNumber(Math.max(1,player.countCards('h',card=>get.number(card)==num)))+'张牌。';
+					const num=player.hasSkill('dczhangcai_all')?get.number(event.card):8;
+					let count=1;
+					if(typeof num=='number') count=Math.max(1,player.countCards('h',card=>get.number(card)==num))
+					return '你可以摸'+get.cnNumber(count)+'张牌。';
 				},
 				frequent:true,
 				content:function(){
-					'step 0'
 					var num=player.hasSkill('dczhangcai_all')?get.number(trigger.card):8;
-					player.draw(Math.max(1,player.countCards('h',card=>{
-						return get.number(card)==num;
-					})));
+					var count=1;
+					if(typeof num=='number') count=Math.max(1,player.countCards('h',card=>get.number(card)==num));
+					player.draw(count);
 				},
 				ai:{
 					threaten:4,
@@ -229,7 +277,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player){
 							if(!player.hasSkill('dczhangcai')) return 0;
-							if(player.countCards('hs',card=>player.hasValueTarget(card))>3||player.hp==1) return 5;
+							if(player.countCards('hs',card=>get.number(card)!=8&&player.hasValueTarget(card))>3||player.hp==1) return 5;
 							return 0;
 						}
 					}
@@ -259,7 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 1'
-					if(get.owner(card)==player&&get.position(card)=='h'){
+					if(get.owner(card)==player&&get.position(card)=='h'&&game.hasPlayer(current=>current!=player)){
 						player.chooseTarget(`赏誉：将${get.translation(card)}交给一名角色`,lib.filter.notMe,true);
 					}
 					else event.finish();

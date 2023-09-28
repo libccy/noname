@@ -18388,9 +18388,10 @@
 				loseToDiscardpile:function(){
 					"step 0"
 					if(event.log!=false) game.log(player,'将',cards,'置入了弃牌堆');
-					var next=player.lose(cards,event.position,'visible');
-					if(event.insert_index) next.insert_index=event.index;
+					var next=player.lose(cards,event.position);
+					if(event.insert_index) next.insert_index=event.insert_index;
 					if(event.insert_card) next.insert_card=true;
+					if(!event.blank) next.visible=true;
 					next.type='loseToDiscardpile';
 					event.done=next;
 					"step 1"
@@ -18904,17 +18905,21 @@
 					if(evt.delay===false) event.delay=false;
 					if(evt.animate!=false){
 						evt.discardid=lib.status.videoId++;
-						game.broadcastAll(function(player,cards,id){
+						game.broadcastAll(function(player,cards,id,visible){
 							player.$throw(cards,null,'nobroadcast');
 							var cardnodes=[];
 							cardnodes._discardtime=get.time();
 							for(var i=0;i<cards.length;i++){
 								if(cards[i].clone){
 									cardnodes.push(cards[i].clone);
+									if(!visible){
+										cards[i].clone.classList.add('infohidden');
+										cards[i].clone.classList.add('infoflip');
+									}
 								}
 							}
 							ui.todiscard[id]=cardnodes;
-						},player,cards,evt.discardid);
+						},player,cards,evt.discardid,event.visible);
 						if(lib.config.sync_speed&&cards[0]&&cards[0].clone){
 							if(evt.delay!=false){
 								var waitingForTransition=get.time();
@@ -24040,6 +24045,9 @@
 						}
 						else if(arguments[i]=='insert'){
 							next.insert_card=true;
+						}
+						else if(arguments[i]=='blank'){
+							next.blank=true;
 						}
 					}
 					if(next.cards==undefined) _status.event.next.remove(next);

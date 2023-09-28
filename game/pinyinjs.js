@@ -8,6 +8,7 @@ var pinyin_dict_polyphone = {
 	// START
 	// 武将名
 	"乐蔡琰": "yuè  ",
+	"乐周妃": "yuè  fēi",
 	"用间": " jiàn",
 	
 	"乐进": "yuè ",

@@ -407,7 +407,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(evt.player!=player) return;
 							for(var phase of lib.phaseName){
 								var evtx=evt.getParent(phase);
-								if(evtx&&evtx.name==phase) del+=evt.num;
+								if(evtx&&evtx.name==phase){
+									del+=evt.num;
+									break;
+								}
 							}
 						});
 						if(del!=0) return false;
@@ -788,7 +791,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(event.num>0) event.goto(2);
 					'step 4'
-					if(!player.hasMark('dcgonghu_damage')){
+					if(!player.hasMark('dcgonghu_damage')&&target.isIn()){
 						var cards=player.getCards('h');
 						if(cards.length==0) event._result={bool:false};
 						else if(cards.length<=event.num2) event._result={bool:true,cards:cards};
