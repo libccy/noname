@@ -405,7 +405,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							var eff=100/val;
 							target.hp=_hp; target.maxHp=_maxhp;
-							if(eff<25) return 0;
+							var limit=17.5;
+							if(player.hasSkill('mbquesong')){
+								if(!player.getStat().damaged) limit+=7.5;
+							}
+							if(eff<limit) return 0;
 							return eff/30;
 						}
 					}
@@ -445,7 +449,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 6-get.value(card);
 							}).set('goon',function(){
 								var _hp=hp+target.isTurnedOver()*1.5;
-								if(forced||_hp+player.countCards('hs',card=>get.tag(card,'recover'))<=2) return true;
+								if(forced||_hp+player.countCards('hs',card=>get.tag(card,'recover'))<=2-len/4) return true;
 								return len>_hp;
 							}());
 						}
