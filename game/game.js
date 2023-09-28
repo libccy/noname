@@ -7798,6 +7798,10 @@
 							else element.classList.add(item);
 						}
 					}
+					//处理属性
+					if(options.attributes){
+						for(const item in options.attributes) element.setAttribute(item,options.attributes[item]);
+					}
 					//处理样式
 					if(options.style){
 						for(const item in options.style) element.style[item] = options.style[item];
