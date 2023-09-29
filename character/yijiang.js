@@ -490,6 +490,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.guessedNum=guessedNum;
 					game.delay();
 					'step 2'
+					var type=get.type2(trigger.card,trigger.player);
 					var count=trigger.player.countCards('h',card=>get.type2(card)==type);
 					var guessedNum=event.guessedNum;
 					if(count==guessedNum){
