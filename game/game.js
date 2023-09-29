@@ -7576,7 +7576,7 @@
 											className+='namespace';
 										}
 									}else{
-										if(javascriptKeywords.includes(text)||javascriptKeywords.includes(text)){
+										if(javascriptKeywords.includes(text)){
 											className+='keyword';
 										}
 										else if(window[text]) {
@@ -7619,8 +7619,6 @@
 			const funcProps=Object.getOwnPropertyNames(Array.prototype);
 			const javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
 				"if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
-			const coffeescriptKeywords=("and break catch class continue delete do else extends false finally for " +
-				"if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
 			function getCompletions(token,context,keywords,options){
 				let found=[],start=token.string,global=options&&options.globalScope||window;
 				function maybeAdd(str){
@@ -7663,7 +7661,6 @@
 					if(options&&options.additionalContext!=null) for(let key in options.additionalContext) maybeAdd(key);
 					if(!options||options.useGlobalScope!==false) gatherCompletions(global);
 					forEach(keywords,maybeAdd);
-					forEach(coffeescriptKeywords,maybeAdd);
 				}
 				return found.sort((a,b)=>(a+'').localeCompare(b+''));
 			}
