@@ -7490,8 +7490,14 @@
 			});
 			//防止每次输出字符都创建以下元素
 			const event=_status.event;
+			const trigger=_status.event;
 			const player=ui.create.player().init('sunce');
+			const target=player;
+			const targets=[player];
+			const source=player;
 			const card=game.createCard();
+			const cards=[card];
+			const result={bool:true};
 			function forEach(arr,f) {
 				Array.from(arr).forEach(v=>f(v));
 			}
@@ -7542,6 +7548,9 @@
 							list.addArray(keys);
 						}
 					}catch(_){ return;}
+				}else if(token&&typeof token.string=='string'){
+					//非开发者模式下，提示这些单词
+					list.addArray(['player','card','cards','result','trigger','source','target','targets','lib','game','ui','get','ai','_status']);
 				}
 				return {
 					list:[...new Set(getCompletions(token,context,keywords,options).concat(list))]
