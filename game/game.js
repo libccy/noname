@@ -40951,7 +40951,11 @@
 				}
 				//创建ul列表
 				const createMenu=function(pos,self,List,click){
-					if (self&&self.createMenu) return false;
+					if (self&&self.createMenu) {
+						createList.push(self.createMenu);
+						ui.window.appendChild(self.createMenu);
+						return self.createMenu;
+					}
 					const parent=self.parentNode;
 					if (parent){
 						for(let i=0;i<parent.childElementCount;i++){
@@ -40970,7 +40974,8 @@
 						height:'20em',
 						width:pos.width*4/game.documentZoom+'px',
 						//'font-family':'shousha',
-						'font-size':20/game.documentZoom+'px',
+						'font-size':(lib.config.codeMirror_fontSize?lib.config.codeMirror_fontSize.slice(-2):16)/game.documentZoom+'px',
+						
 					});
 					const theme=editor.options.theme;
 					lib.setScroll(ul);
@@ -41024,7 +41029,8 @@
 					if(!ul) return false;
 					if(ul.parentNode) ul.parentNode.removeChild(ul);
 					this.style.background='';
-					delete this.createMenu;
+					//创建后不用删除了，除非以后要动态加载。
+					//delete this.createMenu;
 					createList.remove(ul);
 					return ul;
 				};
@@ -41037,7 +41043,7 @@
 				});
 				const saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
 				const theme=ui.create.div('.editbutton','主题',editorpage,function(){
-					if(this&&this.createMenu){
+					if(this&&this.createMenu&&this.createMenu.parentNode){
 						return closeMenu.call(this);
 					}
 					//主题列表
@@ -41055,14 +41061,14 @@
 						const theme=this.innerHTML;
 						container.editor.setOption("theme",theme);
 						setTimeout(()=>container.editor.refresh(),0);
-						game.saveConfig('codeMirror_theme', theme);
+						game.saveConfig('codeMirror_theme',theme);
 						closeMenu.call(self);
 					};
 					const ul=createMenu(pos,self,list,click);
 					this.createMenu=ul;
 				});
 				const edit=ui.create.div('.editbutton','编辑',editorpage,function(){
-					if(this&&this.createMenu){
+					if(this&&this.createMenu&&this.createMenu.parentNode){
 						return closeMenu.call(this);
 					}
 					const self=this;
@@ -41073,6 +41079,24 @@
 						const inner=this.innerHTML.slice(num).replace("+", "-");
 						container.editor.execCommand(container.editor.options.extraKeys[inner]);
 						setTimeout(()=>container.editor.refresh(),0);
+						closeMenu.call(self);
+					};
+					const ul=createMenu(pos,self,list,click);
+					this.createMenu=ul;
+				});
+				const fontSize=ui.create.div('.editbutton','字号',editorpage,function(){
+					if(this&&this.createMenu&&this.createMenu.parentNode){
+						return closeMenu.call(this);
+					}
+					const self=this;
+					const pos=this.getBoundingClientRect();
+					const list=['16px','18px','20px','22px','24px','26px'];
+					const click=function(e){
+						const size=this.innerHTML;
+						container.style.fontSize=size.slice(0,-2)/game.documentZoom+'px';
+						Array.from(self.parentElement.children).map(v=>v.createMenu).filter(Boolean).forEach(v=>{v.style.fontSize=size.slice(0,-2)/game.documentZoom+'px'});
+						container.listenTransition(()=>container.editor.refresh());
+						game.saveConfig('codeMirror_fontSize',size);
 						closeMenu.call(self);
 					};
 					const ul=createMenu(pos,self,list,click);
