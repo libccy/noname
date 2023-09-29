@@ -46832,7 +46832,7 @@
 								}
 
 								var loading=ui.create.div('.loading.config.toggle','载入中...',page);
-								var loaded=function(list){
+								var loaded=function(){
 									var list=[];
 									var extension=window.extension;
 									for(var i in extension){
@@ -46846,8 +46846,9 @@
 										var node=ui.create.div('.videonode.menubutton.extension.large',page,clickExtension);
 										ui.create.div('.caption',list[i].name,node);
 										ui.create.div('.text.author','作者：'+list[i].author+'<span>('+list[i].size+')</span>',node);
+										ui.create.div('.text','更新日期：'+list[i].date,node);
 										ui.create.div('.text',list[i].intro,node);
-										var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild);
+										var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild,{'zIndex':'5'});
 										if(game.download){
 											if(list[i].netdisk){
 												var linknode=ui.create.div('.text',node);
@@ -46868,7 +46869,7 @@
 												},linknode).link=list[i].forum;
 											}
 											download.listen(downloadExtension);
-											if(lib.config.extensions.contains(list[i].name)){
+											if(lib.config.extensions.includes(list[i].name)){
 												download.classList.remove('active');
 												if(lib.extensionPack[list[i].name]&&lib.extensionPack[list[i].name].version==list[i].version){
 													download.classList.add('transparent2');
@@ -46906,10 +46907,10 @@
 								window.extension={};
 								fetch(`${extensionURL}catalog.js`,{
 									referrerPolicy:'no-referrer'
-								}).then(value=>value.text()).then(eval).catch(reason=>{
+								}).then(value=>value.text()).then(eval).then(loaded).catch(reason=>{
 									console.log(reason);
 									delete window.extension;
-									loading.innerHTML='连接失败';
+									loading.innerHTML='连接失败:'+(reason instanceof Error?reason.message:String(reason));
 								});
 							};
 							if(_thisUpdate) node.update();
