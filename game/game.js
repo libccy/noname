@@ -1000,7 +1000,7 @@
 						init:'coding',
 						unfrequent:true,
 						item:{
-							coding:'Github Proxy',
+							coding:'FastGit',
 							github:'GitHub',
 						},
 						onclick:function(item){
@@ -1010,15 +1010,10 @@
 					},
 					extension_source:{
 						name:'获取扩展地址',
-						init:'Coding',
+						init:'GitHub Proxy',
 						unfrequent:true,
 						item:{},
-						intro:function(){
-							return '获取在线扩展时的地址。当前地址：<br>'+lib.config.extension_sources[lib.config.extension_source];
-						},
-						onclick:function(item){
-							game.saveConfig('extension_source',item);
-						},
+						intro:()=>`获取在线扩展时的地址。当前地址：${document.createElement('br').outerHTML}${lib.config.extension_sources[lib.config.extension_source]}`
 					},
 					extension_create:{
 						name:'添加获取扩展地址',
@@ -47480,47 +47475,31 @@
 						var li1=document.createElement('li');
 						var li2=document.createElement('li');
 						var li3=document.createElement('li');
-						var trimurl=function(str){
-							if(str==lib.updateURLS.github){
-								return 'GitHub';
+						const trimURL=url=>{
+							const updateURLS=lib.updateURLS;
+							for(const key in updateURLS){
+								const updateURL=updateURLS[key];
+								if(url==updateURL) return lib.configMenu.general.config.update_link.item[key];
 							}
-							if(str==lib.updateURLS.coding){
-								return 'Coding';
+							let index=url.indexOf('://');
+							if(index!=-1) url=url.slice(index+3);
+							index=url.indexOf('/');
+							if(index!=-1) url=url.slice(0,index);
+							if(url.length>15){
+								const list=url.split('.');
+								if(list.length>1) list.shift();
+								url=list.join('.');
 							}
-							var index;
-							index=str.indexOf('://');
-							if(index!=-1){
-								str=str.slice(index+3);
+							if(url.length>15){
+								const list=url.split('.');
+								if(list.length>1) list.pop();
+								url=list.join('.');
 							}
-							index=str.indexOf('/');
-							if(index!=-1){
-								str=str.slice(0,index);
-							}
-							if(str.length>15){
-								var list=str.split('.');
-								if(list.length>1){
-									list.shift();
-								}
-								str=list[0];
-								for(var i=1;i<list.length;i++){
-									str+='.'+list[i];
-								}
-							}
-							if(str.length>15){
-								var list=str.split('.');
-								if(list.length>1){
-									list.pop();
-								}
-								str=list[0];
-								for(var i=1;i<list.length;i++){
-									str+='.'+list[i];
-								}
-							}
-							return str;
+							return url;
 						}
 						li1.innerHTML='游戏版本：'+lib.version+'<p style="margin-top:8px;white-space:nowrap"></p>';
 						li2.innerHTML='素材版本：'+(lib.config.asset_version||'无')+'<p style="margin-top:8px"></p>';
-						li3.innerHTML='更新地址：<span>'+trimurl(lib.config.updateURL||lib.updateURL)+'</span><p style="margin-top:8px"></p>';
+						li3.innerHTML='更新地址：<span>'+trimURL(lib.config.updateURL||lib.updateURL)+'</span><p style="margin-top:8px"></p>';
 						li3.style.whiteSpace='nowrap';
 						li3.style.display='none';// coding
 
@@ -47966,7 +47945,7 @@
 							game.prompt('设置更新地址',function(str){
 								if(str){
 									game.saveConfig('updateURL',str);
-									li3.querySelector('span').innerHTML=trimurl(str);
+									li3.querySelector('span').innerHTML=trimURL(str);
 									button5.style.display='';
 									button6.style.display='none';
 								}
@@ -47982,7 +47961,7 @@
 							game.saveConfig('updateURL',lib.mirrorURL);
 							button5.style.display='';
 							button6.style.display='none';
-							li3.querySelector('span').innerHTML=trimurl(lib.mirrorURL);
+							li3.querySelector('span').innerHTML=trimURL(lib.mirrorURL);
 						};
 						li3.lastChild.appendChild(button6);
 
@@ -47993,7 +47972,7 @@
 							game.saveConfig('updateURL');
 							button5.style.display='none';
 							button6.style.display='';
-							li3.querySelector('span').innerHTML=trimurl(lib.updateURL);
+							li3.querySelector('span').innerHTML=trimURL(lib.updateURL);
 						};
 						li3.lastChild.appendChild(button5);
 						if(!lib.config.updateURL){
