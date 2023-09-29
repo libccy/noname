@@ -3856,6 +3856,18 @@
 							}
 						}
 					},
+					show_sex:{
+						name:'显示角色性别',
+						intro:'在角色的右键菜单中显示角色性别',
+						init:true,
+						unfrequent:true
+					},
+					show_group:{
+						name:'显示角色势力',
+						intro:'在角色的右键菜单中显示角色势力',
+						init:true,
+						unfrequent:true
+					},
 					show_replay:{
 						name:'显示重来按钮',
 						init:false,
@@ -58198,9 +58210,9 @@
 				}
 				let capt=get.translation(node.name);
 				const characterInfo=get.character(node.name),sex=node.sex||characterInfo[0];
-				if(sex) capt+=`&nbsp;&nbsp;${sex=='none'?'无':get.translation(sex)}`;
+				if(sex&&lib.config.show_sex) capt+=`&nbsp;&nbsp;${sex=='none'?'无':get.translation(sex)}`;
 				const group=lib.group.includes(node.group)?node.group:characterInfo[1];
-				if(group) capt+=`&nbsp;&nbsp;${get.translation(group)}`;
+				if(group&&lib.config.show_group) capt+=`&nbsp;&nbsp;${get.translation(group)}`;
 				uiintro.add(capt);
 
 				if(lib.characterTitle[node.name]){
@@ -58909,9 +58921,9 @@
 				let capt=get.translation(character);
 				if(characterInfo){
 					const infoSex=characterInfo[0];
-					if(infoSex) capt+=`&nbsp;&nbsp;${infoSex=='none'?'无':lib.translate[infoSex]}`;
+					if(infoSex&&lib.config.show_sex) capt+=`&nbsp;&nbsp;${infoSex=='none'?'无':lib.translate[infoSex]}`;
 					const infoGroup=characterInfo[1];
-					if(infoGroup){
+					if(infoGroup&&lib.config.show_group){
 						const group=get.is.double(character,true);
 						if(group) capt+=`&nbsp;&nbsp;${group.map(value=>get.translation(value)).join('/')}`;
 						else capt+=`&nbsp;&nbsp;${lib.translate[infoGroup]}`;
