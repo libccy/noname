@@ -13778,12 +13778,10 @@
 						lib.onphase[i]();
 					}
 					player.phase();
+					event.player=player.next;
 					"step 2"
 					if(!game.players.contains(event.player.next)){
 						event.player=game.findNext(event.player.next);
-					}
-					else{
-						event.player=event.player.next;
 					}
 					event.goto(1);
 				},

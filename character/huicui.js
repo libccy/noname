@@ -2619,15 +2619,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var cards=result.cards,targets=result.targets;
 						event.cards=cards;
-						var cardx=get.autoViewAs({name:'sha'},cards);
-						event.cardx=cardx;
-						player.useCard(cardx,cards,targets,false,'dcsaowei');
+						var next=player.useCard({name:'sha'},cards,targets,false,'dcsaowei');
+						player.when('useCardAfter')
+							.filter(event=>event==next)
+							.then(()=>{
+								if(player.hasHistory('sourceDamage',evt=>evt.card==trigger.card)){
+									var cards=trigger.cards.filterInD();
+									if(cards.length>0) player.gain(cards,'gain2');
+								}
+							})
 					}
-					else event.finish();
-					'step 2'
-					if(player.getHistory('sourceDamage',function(evt){
-						return evt.card==event.cardx;
-					}).length&&cards.filterInD().length) player.gain(cards.filterInD(),'gain2');
 				},
 			},
 			//向朗

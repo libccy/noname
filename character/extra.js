@@ -624,19 +624,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					if(event.skill=='dccuixin') return false;
-					if(event.targets.length==0) return false;
-					if(get.type(event.card,false)=='delay'||get.type(event.card,false)=='equip') return false;
+					if(!event._dccuixin||get.type(event.card,false)=='delay'||get.type(event.card,false)=='equip') return false;
 					var card={
 						name:event.card.name,
 						nature:event.card.nature,
 						isCard:true,
-					}
-					for(var target of event.targets){
-						var targetx;
-						if(target==player.getNext()) targetx=player.getPrevious();
-						else if(target==player.getPrevious()) targetx=player.getNext();
-						else continue;
+					},list=event._dccuixin;
+					for(var target of list){
+						var targetx=player[target]();
 						if(lib.filter.targetEnabled2(card,targetx,player)) return true;
 					}
 					return false;
@@ -650,21 +645,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						isCard:true,
 					};
 					event.card=card;
-					var list=trigger.targets.filter(target=>{
-						var targetx;
-						if(target==player.getNext()) targetx=player.getPrevious();
-						else if(target==player.getPrevious()) targetx=player.getNext();
-						else return false;
-						if(lib.filter.targetEnabled2(card,targetx,player)) return true;
-					}).map(target=>{
-						return target==player.getPrevious()?player.getNext():player.getPrevious();
+					var list=[];
+					trigger._dccuixin.forEach(target=>{
+						var targetx=player[target]();
+						if(lib.filter.targetEnabled2(card,targetx,player)) list.add(targetx);
 					});
 					if(list.length==1){
 						event.target=list[0];
-						player.chooseBool('摧心：是否再视为对'+get.translation(list[0])+'使用'+get.translation(card)+'？').set('goon',get.effect(list[0],card,player,player)>0).set('ai',()=>_status.event.goon);
+						player.chooseBool('摧心：是否视为对'+get.translation(list[0])+'使用'+get.translation(card)+'？').set('goon',get.effect(list[0],card,player,player)>0).set('ai',()=>_status.event.goon);
 					}
 					else{
-						player.chooseTarget('摧心：是否再视为对上家或下家使用'+get.translation(card)+'？','操作提示：从上家或下家中选择一名角色作为使用目标',function(card,player,target){
+						player.chooseTarget('摧心：是否视为对上家或下家使用'+get.translation(card)+'？','操作提示：从上家或下家中选择一名角色作为使用目标',function(card,player,target){
 							return (target==player.getNext()||target==player.getPrevious())&&lib.filter.targetEnabled2(_status.event.getParent().card,target,player);
 						}).set('ai',function(target){
 							var player=_status.event.player;
@@ -676,6 +667,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=event.target||result.targets[0];
 						player.useCard(card,target,false,'dccuixin');
 					}
+				},
+				group:'dccuixin_silent',
+				subSkill:{
+					silent:{
+						trigger:{player:'useCardToPlayered'},
+						silent:true,
+						forced:true,
+						popup:false,
+						firstDo:true,
+						charlotte:true,
+						filter:function(event,player){
+							if(!event.isFirstTarget||event.getParent().skill=='dccuixin') return false;
+							if(event.targets.length==0) return false;
+							return event.targets.includes(player.getNext())||event.targets.includes(player.getPrevious());
+						},
+						content:function(){
+							var list=[];
+							if(trigger.targets.includes(player.getNext())) list.push('getPrevious');
+							if(trigger.targets.includes(player.getPrevious())) list.push('getNext');
+							trigger.getParent()._dccuixin=list;
+						}
+					},
 				},
 			},
 			//海外神吕蒙
@@ -2828,7 +2841,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tspowei:{
 				audio:3,
 				dutySkill:true,
-				locked:true,
 				derivation:'shenzhu',
 				group:['tspowei_init','tspowei_move','tspowei_achieve','tspowei_fail','tspowei_use','tspowei_remove'],
 				subSkill:{
@@ -7364,7 +7376,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqijing:'奇径',
 			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，将座位移动至一名其他角色的上家之后，获得〖摧心〗和一个额外回合。',
 			dccuixin:'摧心',
-			dccuixin_info:'当你不因此技能使用的基本牌或普通锦囊牌结算结束后，若此牌的目标包含你的上家或下家，则你可以视为对下家或上家再使用一张牌名和元素相同的牌。',
+			dccuixin_info:'当你不因此技能使用的基本牌或普通锦囊牌结算结束后，若此牌的目标于你使用此牌指定第一个目标时包含你的上家或下家，则你可以视为对下家或上家再使用一张牌名和元素相同的牌。',
 			shen_dianwei:'神典韦',
 			juanjia:'捐甲',
 			juanjia_info:'锁定技。游戏开始时，你废除一个防具栏，然后获得一个额外的武器栏。',

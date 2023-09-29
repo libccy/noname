@@ -484,12 +484,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}());
 					'step 1'
 					var guessedNum=result.index;
-					var type=get.type2(trigger.card,trigger.player);
 					player.chat('我猜'+get.cnNumber(guessedNum)+'张');
 					game.log(player,'猜测',trigger.player,'有',get.cnNumber(guessedNum)+'张'+get.translation(type)+'牌');
 					event.guessedNum=guessedNum;
 					game.delay();
 					'step 2'
+					var type=get.type2(trigger.card,trigger.player);
 					var count=trigger.player.countCards('h',card=>get.type2(card)==type);
 					var guessedNum=event.guessedNum;
 					if(count==guessedNum){

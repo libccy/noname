@@ -137,7 +137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var piles=['cardPile','discardPile'];
 					for(var pile of piles){
 						for(var i=0;i<ui[pile].childNodes.length;i++){
-							var card=ui.cardPile.childNodes[i];
+							var card=ui[pile].childNodes[i];
 							var number=get.number(card,false);
 							if(!list.contains(card)&&number==8){
 								list.push(card);
@@ -153,7 +153,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(player.hasSkillTag('jueqing')) return;
+							if(target.countCards('h')>=target.getHp()||player.hasSkillTag('jueqing')) return;
 							if(player._dcxiongmu_temp) return;
 							if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
 							if(get.tag(card,'damage')){
@@ -200,7 +200,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					minus:{
 						trigger:{player:'damageBegin4'},
 						filter:function(event,player){
-							return game.getGlobalHistory('everything',evt=>{
+							return player.countCards('h')<player.hp&&game.getGlobalHistory('everything',evt=>{
 								return evt.name=='damage'&&evt.player==player;
 							},event).indexOf(event)==0;
 						},
@@ -3799,7 +3799,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 0;
 						}
 						var num=ui.selected.buttons.filter(i=>get.owner(i.link)==target).length;
-						return -(get.position(card)!='h'?get.value(card,target):(4.5+Math.random()-0.2*(num>2?1:0)))*get.attitude(player,target);
+						var val=get.buttonValue(button);
+						if(num>2) val/=Math.sqrt(num);
+						if(get.attitude(player,owner)>0) return -val;
+						return val;
+						//return -(get.position(card)!='h'?get.value(card,target):(4.5+Math.random()-0.2*(num>2?1:0)))*get.attitude(player,target);
 					});
 					'step 1'
 					if(result.bool){
