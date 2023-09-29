@@ -425,7 +425,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					var choices=Array.from({length:Math.min(5,game.countPlayer())}).map((_,i)=>get.cnNumber(i+1,true));
+					var choices=Array.from({length:Math.min(5,game.players.length+game.dead.length)}).map((_,i)=>get.cnNumber(i+1,true));
 					player.chooseControl(choices,'cancel2').set('prompt',get.prompt('dccaixia')).set('prompt2','你可以摸至多'+get.cnNumber(choices.length)+'张牌，但是你此后需要再使用等量的牌才可再发动本技能。').set('ai',()=>{
 						return _status.event.choice;
 					}).set('choice',function(){
@@ -12658,7 +12658,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshangyu_tag:'赏誉',
 			dcshangyu_info:'锁定技。游戏开始时，你获得一张【杀】并记录之，并可以将此牌交给一名角色。然后你获得如下效果：1.当一名角色使用此牌造成伤害后，你与其各摸一张牌；2.当此牌进入弃牌堆后，你将此牌交给一名本回合未以此法得到过此牌的角色。',
 			dccaixia:'才瑕',
-			dccaixia_info:'当你造成或受到伤害后，若你没有“瑕”，你可以摸至多X张牌并获得X枚“瑕”，然后当你使用牌时，移去1枚“瑕”（X为场上角色数且至多为5）。',
+			dccaixia_info:'当你造成或受到伤害后，若你没有“瑕”，你可以摸至多X张牌并获得X枚“瑕”，然后当你使用牌时，移去1枚“瑕”（X为本局游戏总角色数且至多为5）。',
 			wu_luxun:'武陆逊',
 			dcxiongmu:'雄幕',
 			dcxiongmu_tag:'雄幕',

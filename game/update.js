@@ -15,8 +15,14 @@ window.noname_update={
 		'character/extra.js',
 		'character/huicui.js',
 		'character/jsrg.js',
+		'character/shenhua.js',
+		'character/shiji.js',
 		'character/xianding.js',
 		'character/yijiang.js',
 		'game/game.js',
+		'mode/doudizhu.js',
+		'mode/guozhan.js',
+		'mode/identity.js',
+		'mode/single.js',
 	]
 };
