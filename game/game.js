@@ -40960,7 +40960,7 @@
 						}
 					}
 					if(self.createMenu){
-						createList.push(self.createMenu);
+						createList.add(self.createMenu);
 						ui.window.appendChild(self.createMenu);
 						return self.createMenu;
 					}
