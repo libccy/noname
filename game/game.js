@@ -3856,6 +3856,18 @@
 							}
 						}
 					},
+					show_sex:{
+						name:'显示角色性别',
+						intro:'在角色的右键菜单中显示角色性别',
+						init:true,
+						unfrequent:true
+					},
+					show_group:{
+						name:'显示角色势力',
+						intro:'在角色的右键菜单中显示角色势力',
+						init:true,
+						unfrequent:true
+					},
 					show_replay:{
 						name:'显示重来按钮',
 						init:false,
@@ -4026,8 +4038,9 @@
 						unfrequent:true,
 						item:{
 							doNotShow:'不显示',
-							showPinyin:'显示拼音',
-							showCodeIdentifier:'显示代码ID'
+							showPinyin:'拼音(样式一)',
+							showCodeIdentifier:'代码ID(样式一)',
+							showPinyin2:'拼音(样式二)',
 						},
 						visualMenu:(node,link,name)=>{
 							node.classList.add('button','character');
@@ -4039,7 +4052,7 @@
 							style.display='flex';
 							style.height='60px';
 							style.justifyContent='center';
-							style.width='150px';
+							style.width='200px';
 							const firstChild=node.firstChild;
 							firstChild.removeAttribute('class');
 							firstChild.style.position='initial';
@@ -13766,12 +13779,10 @@
 						lib.onphase[i]();
 					}
 					player.phase();
+					event.player=player.next;
 					"step 2"
 					if(!game.players.contains(event.player.next)){
 						event.player=game.findNext(event.player.next);
-					}
-					else{
-						event.player=event.player.next;
 					}
 					event.goto(1);
 				},
@@ -28952,29 +28963,37 @@
 					if(Array.isArray(card)){
 						if(card[2]=='huosha'){
 							card[2]='sha';
-							card[3]=['fire'];
+							card[3]='fire';
 						}
 						else if(card[2]=='leisha'){
 							card[2]='sha';
-							card[3]=['thunder'];
+							card[3]='thunder';
 						}
 						// else if(card[2]=='kamisha'){
 						// 	card[2]='sha';
-						// 	card[3]=['kami'];
+						// 	card[3]='kami';
 						// }
 						// else if(card[2]=='icesha'){
 						// 	card[2]='sha';
-						// 	card[3]=['ice'];
+						// 	card[3]='ice';
 						// }
 						else if(card[2]=='cisha'){
 							card[2]='sha';
-							card[3]=['stab'];
+							card[3]='stab';
 						}
 						else if(card[2].length>3){
 							let prefix=card[2].slice(0,card[2].lastIndexOf('sha'));
-							if(prefix.length+3==card[2].length){
+							if(lib.nature.has(prefix)){
+								if(prefix.length+3==card[2].length){
+									card[2]='sha';
+									card[3]=prefix;
+								}
+							}
+							if(card[2].indexOf('sha_')==0){
+								let suffix=card[2].slice(4);
+								let natureList=suffix.split('_');
 								card[2]='sha';
-								card[3]=[prefix];
+								card[3]=get.nature(natureList);
 							}
 						}
 					}
@@ -40940,13 +40959,18 @@
 				}
 				//创建ul列表
 				const createMenu=function(pos,self,List,click){
-					if (self&&self.createMenu) return false;
+					if(!self||self==window) return;
 					const parent=self.parentNode;
 					if (parent){
 						for(let i=0;i<parent.childElementCount;i++){
 							const node=parent.childNodes[i];
-							node!=self&&node.createMenu&&closeMenu.call(node);
+							if(node!=self&&node.createMenu) closeMenu.call(node);
 						}
+					}
+					if(self.createMenu){
+						createList.add(self.createMenu);
+						ui.window.appendChild(self.createMenu);
+						return self.createMenu;
 					}
 					const editor=container.editor;
 					if(!editor) return false;
@@ -40959,7 +40983,8 @@
 						height:'20em',
 						width:pos.width*4/game.documentZoom+'px',
 						//'font-family':'shousha',
-						'font-size':20/game.documentZoom+'px',
+						'font-size':(lib.config.codeMirror_fontSize?lib.config.codeMirror_fontSize.slice(0,-2):16)/game.documentZoom+'px',
+						
 					});
 					const theme=editor.options.theme;
 					lib.setScroll(ul);
@@ -41003,7 +41028,7 @@
 							};
 						}
 					}
-					createList.push(ul);
+					createList.add(ul);
 					ui.window.appendChild(ul);
 					return ul;
 				};
@@ -41013,7 +41038,8 @@
 					if(!ul) return false;
 					if(ul.parentNode) ul.parentNode.removeChild(ul);
 					this.style.background='';
-					delete this.createMenu;
+					//创建后不用删除了，除非以后要动态加载。
+					//delete this.createMenu;
 					createList.remove(ul);
 					return ul;
 				};
@@ -41026,46 +41052,79 @@
 				});
 				const saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
 				const theme=ui.create.div('.editbutton','主题',editorpage,function(){
-					if(this&&this.createMenu){
+					if(!this||this==window) return;
+					if(this.createMenu&&this.createMenu.parentNode){
 						return closeMenu.call(this);
 					}
-					//主题列表
-					const list=['mdn-like','mbo'];
-					//正在使用的主题
-					const active=container.editor.options.theme;
-					//排个序
-					list.remove(active).splice(0,0,active);
 					//this
 					const self=this;
-					//元素位置
-					const pos=this.getBoundingClientRect();
-					//点击事件
-					const click=function(e){
-						const theme=this.innerHTML;
-						container.editor.setOption("theme",theme);
-						setTimeout(()=>container.editor.refresh(),0);
-						game.saveConfig('codeMirror_theme', theme);
-						closeMenu.call(self);
-					};
-					const ul=createMenu(pos,self,list,click);
-					this.createMenu=ul;
+					if(!this.createMenu){
+						//主题列表
+						const list=['mdn-like','mbo'];
+						//正在使用的主题
+						const active=container.editor.options.theme;
+						//排个序
+						list.remove(active).splice(0,0,active);
+						//元素位置
+						const pos=self.getBoundingClientRect();
+						//点击事件
+						const click=function(e){
+							const theme=this.innerHTML;
+							container.editor.setOption("theme",theme);
+							setTimeout(()=>container.editor.refresh(),0);
+							game.saveConfig('codeMirror_theme',theme);
+							closeMenu.call(self);
+						};
+						const ul=createMenu(pos,self,list,click);
+						self.createMenu=ul;
+					}else{
+						createMenu(null,self);
+					}
 				});
 				const edit=ui.create.div('.editbutton','编辑',editorpage,function(){
-					if(this&&this.createMenu){
+					if(!this||this==window) return;
+					if(this.createMenu&&this.createMenu.parentNode){
 						return closeMenu.call(this);
 					}
 					const self=this;
-					const pos=this.getBoundingClientRect();
-					const list=['撤销        Ctrl+Z', '恢复撤销    Ctrl+Y'];
-					const click=function(e){
-						const num=this.innerHTML.indexOf("Ctrl");
-						const inner=this.innerHTML.slice(num).replace("+", "-");
-						container.editor.execCommand(container.editor.options.extraKeys[inner]);
-						setTimeout(()=>container.editor.refresh(),0);
-						closeMenu.call(self);
-					};
-					const ul=createMenu(pos,self,list,click);
-					this.createMenu=ul;
+					if(!this.createMenu){
+						const pos=this.getBoundingClientRect();
+						const list=['撤销        Ctrl+Z', '恢复撤销    Ctrl+Y'];
+						const click=function(e){
+							const num=this.innerHTML.indexOf("Ctrl");
+							const inner=this.innerHTML.slice(num).replace("+", "-");
+							container.editor.execCommand(container.editor.options.extraKeys[inner]);
+							setTimeout(()=>container.editor.refresh(),0);
+							closeMenu.call(self);
+						};
+						const ul=createMenu(pos,self,list,click);
+						this.createMenu=ul;
+					}else{
+						createMenu(null,self);
+					}
+				});
+				const fontSize=ui.create.div('.editbutton','字号',editorpage,function(){
+					if(!this||this==window) return;
+					if(this.createMenu&&this.createMenu.parentNode){
+						return closeMenu.call(this);
+					}
+					const self=this;
+					if(!this.createMenu){
+						const pos=this.getBoundingClientRect();
+						const list=['16px','18px','20px','22px','24px','26px'];
+						const click=function(e){
+							const size=this.innerHTML;
+							container.style.fontSize=size.slice(0,-2)/game.documentZoom+'px';
+							Array.from(self.parentElement.children).map(v=>v.createMenu).filter(Boolean).forEach(v=>{v.style.fontSize=size.slice(0,-2)/game.documentZoom+'px'});
+							container.listenTransition(()=>container.editor.refresh());
+							game.saveConfig('codeMirror_fontSize',size);
+							closeMenu.call(self);
+						};
+						const ul=createMenu(pos,self,list,click);
+						this.createMenu=ul;
+					}else{
+						createMenu(null,self);
+					}
 				});
 				const editor=ui.create.div(editorpage);
 				return editor;
@@ -46822,7 +46881,7 @@
 								}
 
 								var loading=ui.create.div('.loading.config.toggle','载入中...',page);
-								var loaded=function(list){
+								var loaded=function(){
 									var list=[];
 									var extension=window.extension;
 									for(var i in extension){
@@ -46836,8 +46895,9 @@
 										var node=ui.create.div('.videonode.menubutton.extension.large',page,clickExtension);
 										ui.create.div('.caption',list[i].name,node);
 										ui.create.div('.text.author','作者：'+list[i].author+'<span>('+list[i].size+')</span>',node);
+										ui.create.div('.text','更新日期：'+list[i].date,node);
 										ui.create.div('.text',list[i].intro,node);
-										var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild);
+										var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild,{'zIndex':'5'});
 										if(game.download){
 											if(list[i].netdisk){
 												var linknode=ui.create.div('.text',node);
@@ -46858,7 +46918,7 @@
 												},linknode).link=list[i].forum;
 											}
 											download.listen(downloadExtension);
-											if(lib.config.extensions.contains(list[i].name)){
+											if(lib.config.extensions.includes(list[i].name)){
 												download.classList.remove('active');
 												if(lib.extensionPack[list[i].name]&&lib.extensionPack[list[i].name].version==list[i].version){
 													download.classList.add('transparent2');
@@ -46896,10 +46956,10 @@
 								window.extension={};
 								fetch(`${extensionURL}catalog.js`,{
 									referrerPolicy:'no-referrer'
-								}).then(value=>value.text()).then(eval).catch(reason=>{
+								}).then(value=>value.text()).then(eval).then(loaded).catch(reason=>{
 									console.log(reason);
 									delete window.extension;
-									loading.innerHTML='连接失败';
+									loading.innerHTML='连接失败:'+(reason instanceof Error?reason.message:String(reason));
 								});
 							};
 							if(_thisUpdate) node.update();
@@ -47828,7 +47888,7 @@
 						var nodeturnover=ui.create.div('.menubutton','翻面',row1,clickrow1);
 						var noderevive=ui.create.div('.menubutton','复活',row1,clickrow1);
 						var nodereplace=ui.create.div('.menubutton','换人',row1,clickrow1);
-						if(lib.config.mode!='identity'&&lib.config.mode!='guozhan'&&lib.config.mode!='doudizhu'){
+						if(!game.canReplaceViewpoint||!game.canReplaceViewpoint()){
 							nodereplace.classList.add('unselectable');
 						}
 
@@ -54097,61 +54157,135 @@
 				else if(lib.config.favouriteCharacter.contains(name)){
 					fav.classList.add('active');
 				}
-				const introduction=ui.create.div('.characterintro',uiintro),showCharacterNamePinyin=lib.config.show_characternamepinyin;
-				if(showCharacterNamePinyin!='doNotShow'){
-					const characterIntroTable=ui.create.div('.character-intro-table',introduction),span=document.createElement('span');
-					span.style.fontWeight='bold';
-					const nameInfo=get.character(name),exInfo=nameInfo[4],characterName=exInfo&&exInfo.includes('ruby')?lib.translate[name]:get.rawName(name);
-					span.innerHTML=characterName;
-					const ruby=document.createElement('ruby');
-					ruby.appendChild(span);
-					const leftParenthesisRP=document.createElement('rp');
-					leftParenthesisRP.textContent='（';
-					ruby.appendChild(leftParenthesisRP);
-					const rt=document.createElement('rt');
-					rt.innerHTML=showCharacterNamePinyin=='showCodeIdentifier'?name:lib.translate[`${name}_rt`]||get.pinyin(characterName).join(' ');
-					ruby.appendChild(rt);
-					const rightParenthesisRP=document.createElement('rp');
-					rightParenthesisRP.textContent='）';
-					ruby.appendChild(rightParenthesisRP);
-					characterIntroTable.appendChild(ruby);
-					const characterSexDiv=ui.create.div('.character-sex',characterIntroTable),exInfoSex=exInfo&&exInfo.find(value=>value.indexOf('sex:')==0),characterSex=exInfoSex?exInfoSex.split(':').pop():nameInfo[0];
-					new Promise((resolve,reject)=>{
-						const imageName=`sex_${characterSex}`,information=lib.card[imageName];
-						if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						const image=information.image;
-						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
-						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
-						else resolve(`${lib.assetURL}${image}`);
-					}).then(source=>new Promise((resolve,reject)=>{
-						const image=new Image();
-						image.onload=()=>resolve(image);
-						image.onerror=reject;
-						image.src=source;
-					})).then(image=>characterSexDiv.appendChild(image)).catch(()=>characterSexDiv.innerHTML=get.translation(characterSex));
-					const characterGroupDiv=ui.create.div('.character-group',characterIntroTable),characterGroups=get.is.double(name,true);
-					if(characterGroups) Promise.all(characterGroups.map(characterGroup=>new Promise((resolve,reject)=>{
-						const imageName=`group_${characterGroup}`,information=lib.card[imageName];
-						if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						const image=information.image;
-						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
-						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
-						else resolve(`${lib.assetURL}${image}`);
-					}).then(source=>new Promise((resolve,reject)=>{
-						const image=new Image();
-						image.onload=()=>resolve(image);
-						image.onerror=reject;
-						image.src=source;
-					})))).then(images=>{
-						let documentFragment=document.createDocumentFragment();
-						images.forEach(documentFragment.appendChild,documentFragment);
-						characterGroupDiv.appendChild(documentFragment);
-					}).catch(()=>characterGroupDiv.innerHTML=characterGroups.map(characterGroup=>get.translation(characterGroup)).join('/'));
-					else{
-						const characterGroup=nameInfo[1];
+				
+				// 样式二
+				if(lib.config.show_characternamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showPinyin2'){
+					var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
+					if(lib.config.show_characternamepinyin=='showPinyin2'){
+						var charactername=get.rawName(name);
+						var characterpinyin=get.pinyin(charactername);
+						var nameinfo=get.character(name);
+						var charactersex=get.translation(nameinfo[0]);
+						const charactergroups=get.is.double(name,true);
+						let charactergroup;
+						if(charactergroups) charactergroup=charactergroups.map(i=>get.translation(i)).join('/')
+						else charactergroup=get.translation(nameinfo[1]);
+						var characterhp=nameinfo[2];
+						var characterintroinfo=get.characterIntro(name);
+						var spacemark=' | ';
+						if(charactername.length>3) spacemark='<span style="font-size:7px">'+' '+'</span>'+'|'+'<span style="font-size:7px">'+' '+'</span>';
+						intro.innerHTML='<span style="font-weight:bold;margin-right:5px">'+charactername+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+characterpinyin+']'+'</span>'+spacemark+charactersex+spacemark+charactergroup+spacemark+characterhp+'<span style="line-height:2"></span>'+'<br>'+characterintroinfo;
+					}
+					var intro2=ui.create.div('.characterintro.intro2',uiintro);
+					var list=get.character(name,3)||[];
+					var skills=ui.create.div('.characterskill',uiintro);
+					if(lib.config.touchscreen){
+						lib.setScroll(intro);
+						lib.setScroll(intro2);
+						lib.setScroll(skills);
+					}
+
+					if(lib.config.mousewheel){
+						skills.onmousewheel=ui.click.mousewheel;
+					}
+					var clickSkill=function(e){
+						while(intro2.firstChild){
+							intro2.removeChild(intro2.lastChild);
+						}
+						var current=this.parentNode.querySelector('.active');
+						if(current){
+							current.classList.remove('active');
+						}
+						this.classList.add('active');
+						var skillname=get.translation(this.link);
+						var skilltranslationinfo=get.skillInfoTranslation(this.link);
+						if(lib.config.show_skillnamepinyin=='showPinyin2'&&skillname!='阵亡'){
+							var skillpinyin=get.pinyin(skillname);
+							intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+skillpinyin+']'+'</span>'+'  '+skilltranslationinfo;
+						}else{
+							intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+skilltranslationinfo;
+						}
+						var info=get.info(this.link);
+						var skill=this.link;
+						var playername=this.linkname;
+						var skillnode=this;
+						if(info.derivation){
+							var derivation=info.derivation;
+							if(typeof derivation=='string'){
+								derivation=[derivation];
+							}
+							for(var i=0;i<derivation.length;i++){
+								var derivationname=get.translation(derivation[i]);
+								var derivationtranslationinfo=get.skillInfoTranslation(derivation[i]);
+								if(lib.config.show_skillnamepinyin=='showPinyin2'&&derivationname.length<=5&&derivation[i].indexOf('_faq')==-1){
+									var derivationpinyin=get.pinyin(derivationname);
+									intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+derivationpinyin+']'+'</span>'+'  '+derivationtranslationinfo;
+								}else{
+									intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+derivationtranslationinfo;
+								}
+							}
+						}
+						if(info.alter){
+							intro2.innerHTML+='<br><br><div class="hrefnode skillversion"></div>';
+							var skillversionnode=intro2.querySelector('.hrefnode.skillversion');
+							if(lib.config.vintageSkills.contains(skill)){
+								skillversionnode.innerHTML='切换至新版';
+							}
+							else{
+								skillversionnode.innerHTML='切换至旧版';
+							}
+							skillversionnode.listen(function(){
+								if(lib.config.vintageSkills.contains(skill)){
+									lib.config.vintageSkills.remove(skill);
+									lib.translate[skill+'_info']=lib.translate[skill+'_info_alter'];
+								}
+								else{
+									lib.config.vintageSkills.push(skill);
+									lib.translate[skill+'_info']=lib.translate[skill+'_info_origin'];
+								}
+								game.saveConfig('vintageSkills',lib.config.vintageSkills);
+								clickSkill.call(skillnode,'init');
+							});
+						}
+						if(e!=='init') game.trySkillAudio(this.link,playername);
+					}
+				}else{
+					// 样式一
+					const introduction=ui.create.div('.characterintro',uiintro),showCharacterNamePinyin=lib.config.show_characternamepinyin;
+					if(showCharacterNamePinyin!='doNotShow'){
+						const characterIntroTable=ui.create.div('.character-intro-table',introduction),span=document.createElement('span');
+						span.style.fontWeight='bold';
+						const nameInfo=get.character(name),exInfo=nameInfo[4],characterName=exInfo&&exInfo.includes('ruby')?lib.translate[name]:get.rawName(name);
+						span.innerHTML=characterName;
+						const ruby=document.createElement('ruby');
+						ruby.appendChild(span);
+						const leftParenthesisRP=document.createElement('rp');
+						leftParenthesisRP.textContent='（';
+						ruby.appendChild(leftParenthesisRP);
+						const rt=document.createElement('rt');
+						rt.innerHTML=showCharacterNamePinyin=='showCodeIdentifier'?name:lib.translate[`${name}_rt`]||get.pinyin(characterName).join(' ');
+						ruby.appendChild(rt);
+						const rightParenthesisRP=document.createElement('rp');
+						rightParenthesisRP.textContent='）';
+						ruby.appendChild(rightParenthesisRP);
+						characterIntroTable.appendChild(ruby);
+						const characterSexDiv=ui.create.div('.character-sex',characterIntroTable),exInfoSex=exInfo&&exInfo.find(value=>value.indexOf('sex:')==0),characterSex=exInfoSex?exInfoSex.split(':').pop():nameInfo[0];
 						new Promise((resolve,reject)=>{
+							const imageName=`sex_${characterSex}`,information=lib.card[imageName];
+							if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+							const image=information.image;
+							if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+							else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
+							else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
+							else resolve(`${lib.assetURL}${image}`);
+						}).then(source=>new Promise((resolve,reject)=>{
+							const image=new Image();
+							image.onload=()=>resolve(image);
+							image.onerror=reject;
+							image.src=source;
+						})).then(image=>characterSexDiv.appendChild(image)).catch(()=>characterSexDiv.innerHTML=get.translation(characterSex));
+						const characterGroupDiv=ui.create.div('.character-group',characterIntroTable),characterGroups=get.is.double(name,true);
+						if(characterGroups) Promise.all(characterGroups.map(characterGroup=>new Promise((resolve,reject)=>{
 							const imageName=`group_${characterGroup}`,information=lib.card[imageName];
 							if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 							const image=information.image;
@@ -54164,136 +54298,158 @@
 							image.onload=()=>resolve(image);
 							image.onerror=reject;
 							image.src=source;
-						})).then(image=>characterGroupDiv.appendChild(image)).catch(()=>characterGroupDiv.innerHTML=get.translation(characterGroup));
+						})))).then(images=>{
+							let documentFragment=document.createDocumentFragment();
+							images.forEach(documentFragment.appendChild,documentFragment);
+							characterGroupDiv.appendChild(documentFragment);
+						}).catch(()=>characterGroupDiv.innerHTML=characterGroups.map(characterGroup=>get.translation(characterGroup)).join('/'));
+						else{
+							const characterGroup=nameInfo[1];
+							new Promise((resolve,reject)=>{
+								const imageName=`group_${characterGroup}`,information=lib.card[imageName];
+								if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+								const image=information.image;
+								if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+								else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
+								else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
+								else resolve(`${lib.assetURL}${image}`);
+							}).then(source=>new Promise((resolve,reject)=>{
+								const image=new Image();
+								image.onload=()=>resolve(image);
+								image.onerror=reject;
+								image.src=source;
+							})).then(image=>characterGroupDiv.appendChild(image)).catch(()=>characterGroupDiv.innerHTML=get.translation(characterGroup));
+						}
+						const hpDiv=ui.create.div('.hp',characterIntroTable),nameInfoHP=nameInfo[2],infoHP=get.infoHp(nameInfoHP);
+						hpDiv.dataset.condition=infoHP<4?'mid':'high';
+						ui.create.div(hpDiv);
+						const hpTextDiv=ui.create.div('.text',hpDiv),infoMaxHP=get.infoMaxHp(nameInfoHP);
+						hpTextDiv.innerHTML=infoHP==infoMaxHP?`×${infoHP}`:`×${infoHP}/${infoMaxHP}`;
+						const infoShield=get.infoHujia(nameInfoHP);
+						if(infoShield){
+							ui.create.div('.shield',hpDiv);
+							const shieldTextDiv=ui.create.div('.text',hpDiv);
+							shieldTextDiv.innerHTML=`×${infoShield}`;
+						}
+						introduction.appendChild(document.createElement('hr'));
 					}
-					const hpDiv=ui.create.div('.hp',characterIntroTable),nameInfoHP=nameInfo[2],infoHP=get.infoHp(nameInfoHP);
-					hpDiv.dataset.condition=infoHP<4?'mid':'high';
-					ui.create.div(hpDiv);
-					const hpTextDiv=ui.create.div('.text',hpDiv),infoMaxHP=get.infoMaxHp(nameInfoHP);
-					hpTextDiv.innerHTML=infoHP==infoMaxHP?`×${infoHP}`:`×${infoHP}/${infoMaxHP}`;
-					const infoShield=get.infoHujia(nameInfoHP);
-					if(infoShield){
-						ui.create.div('.shield',hpDiv);
-						const shieldTextDiv=ui.create.div('.text',hpDiv);
-						shieldTextDiv.innerHTML=`×${infoShield}`;
+					const htmlParser=document.createElement('body');
+					htmlParser.innerHTML=get.characterIntro(name);
+					Array.from(htmlParser.childNodes).forEach(value=>introduction.appendChild(value));
+					const introduction2=ui.create.div('.characterintro.intro2',uiintro);
+					var list=get.character(name,3)||[];
+					var skills=ui.create.div('.characterskill',uiintro);
+					if(lib.config.touchscreen){
+						lib.setScroll(introduction);
+						lib.setScroll(introduction2);
+						lib.setScroll(skills);
 					}
-					introduction.appendChild(document.createElement('hr'));
-				}
-				const htmlParser=document.createElement('body');
-				htmlParser.innerHTML=get.characterIntro(name);
-				Array.from(htmlParser.childNodes).forEach(value=>introduction.appendChild(value));
-				const introduction2=ui.create.div('.characterintro.intro2',uiintro);
-				var list=get.character(name,3)||[];
-				var skills=ui.create.div('.characterskill',uiintro);
-				if(lib.config.touchscreen){
-					lib.setScroll(introduction);
-					lib.setScroll(introduction2);
-					lib.setScroll(skills);
-				}
 
-				if(lib.config.mousewheel){
-					skills.onmousewheel=ui.click.mousewheel;
-				}
-				var clickSkill=function(e){
-					while(introduction2.firstChild){
-						introduction2.removeChild(introduction2.lastChild);
+					if(lib.config.mousewheel){
+						skills.onmousewheel=ui.click.mousewheel;
 					}
-					var current=this.parentNode.querySelector('.active');
-					if(current){
-						current.classList.remove('active');
-					}
-					this.classList.add('active');
-					const skillNameSpan=document.createElement('span'),skillNameSpanStyle=skillNameSpan.style;
-					skillNameSpanStyle.fontWeight='bold';
-					const link=this.link,skillName=get.translation(link);
-					skillNameSpan.innerHTML=skillName;
-					const showSkillNamePinyin=lib.config.show_skillnamepinyin;
-					if(showSkillNamePinyin!='doNotShow'&&skillName!='阵亡'){
-						const ruby=document.createElement('ruby');
-						ruby.appendChild(skillNameSpan);
-						const leftParenthesisRP=document.createElement('rp');
-						leftParenthesisRP.textContent='（';
-						ruby.appendChild(leftParenthesisRP);
-						const rt=document.createElement('rt');
-						rt.innerHTML=showSkillNamePinyin=='showCodeIdentifier'?link:lib.translate[`${link}_rt`]||get.pinyin(skillName).join(' ');
-						ruby.appendChild(rt);
-						const rightParenthesisRP=document.createElement('rp');
-						rightParenthesisRP.textContent='）';
-						ruby.appendChild(rightParenthesisRP);
-						const div=ui.create.div(introduction2);
-						div.style.marginRight='5px';
-						div.appendChild(ruby);
-					}
-					else{
-						skillNameSpanStyle.marginRight='5px';
-						introduction2.appendChild(skillNameSpan);
-					}
-					htmlParser.innerHTML=get.skillInfoTranslation(this.link);
-					Array.from(htmlParser.childNodes).forEach(childNode=>introduction2.appendChild(childNode));
-					var info=get.info(this.link);
-					var skill=this.link;
-					var playername=this.linkname;
-					var skillnode=this;
-					let derivations=info.derivation;
-					if(derivations){
-						if(typeof derivations=='string') derivations=[derivations];
-						derivations.forEach(derivation=>{
-							introduction2.appendChild(document.createElement('br'));
-							introduction2.appendChild(document.createElement('br'));
-							const derivationNameSpan=document.createElement('span'),derivationNameSpanStyle=derivationNameSpan.style;
-							derivationNameSpanStyle.fontWeight='bold';
-							const derivationName=get.translation(derivation);
-							derivationNameSpan.innerHTML=derivationName;
-							if(showSkillNamePinyin!='doNotShow'&&derivationName.length<=5&&derivation.indexOf('_faq')==-1){
-								const ruby=document.createElement('ruby');
-								ruby.appendChild(derivationNameSpan);
-								const leftParenthesisRP=document.createElement('rp');
-								leftParenthesisRP.textContent='（';
-								ruby.appendChild(leftParenthesisRP);
-								const rt=document.createElement('rt');
-								rt.innerHTML=showSkillNamePinyin=='showCodeIdentifier'?derivation:lib.translate[`${derivation}_rt`]||get.pinyin(derivationName).join(' ');
-								ruby.appendChild(rt);
-								const rightParenthesisRP=document.createElement('rp');
-								rightParenthesisRP.textContent='）';
-								ruby.appendChild(rightParenthesisRP);
-								const div=ui.create.div(introduction2);
-								div.style.marginRight='5px';
-								div.appendChild(ruby);
-							}
-							else{
-								derivationNameSpanStyle.marginRight='5px';
-								introduction2.appendChild(derivationNameSpan);
-							}
-							htmlParser.innerHTML=get.skillInfoTranslation(derivation);
-							Array.from(htmlParser.childNodes).forEach(childNode=>introduction2.appendChild(childNode));
-						});
-					}
-					if(info.alter){
-						introduction2.appendChild(document.createElement('br'));
-						introduction2.appendChild(document.createElement('br'));
-						ui.create.div('.hrefnode.skillversion',introduction2);
-						var skillversionnode=introduction2.querySelector('.hrefnode.skillversion');
-						if(lib.config.vintageSkills.contains(skill)){
-							skillversionnode.innerHTML='切换至新版';
+					var clickSkill=function(e){
+						while(introduction2.firstChild){
+							introduction2.removeChild(introduction2.lastChild);
+						}
+						var current=this.parentNode.querySelector('.active');
+						if(current){
+							current.classList.remove('active');
+						}
+						this.classList.add('active');
+						const skillNameSpan=document.createElement('span'),skillNameSpanStyle=skillNameSpan.style;
+						skillNameSpanStyle.fontWeight='bold';
+						const link=this.link,skillName=get.translation(link);
+						skillNameSpan.innerHTML=skillName;
+						const showSkillNamePinyin=lib.config.show_skillnamepinyin;
+						if(showSkillNamePinyin!='doNotShow'&&skillName!='阵亡'){
+							const ruby=document.createElement('ruby');
+							ruby.appendChild(skillNameSpan);
+							const leftParenthesisRP=document.createElement('rp');
+							leftParenthesisRP.textContent='（';
+							ruby.appendChild(leftParenthesisRP);
+							const rt=document.createElement('rt');
+							rt.innerHTML=showSkillNamePinyin=='showCodeIdentifier'?link:lib.translate[`${link}_rt`]||get.pinyin(skillName).join(' ');
+							ruby.appendChild(rt);
+							const rightParenthesisRP=document.createElement('rp');
+							rightParenthesisRP.textContent='）';
+							ruby.appendChild(rightParenthesisRP);
+							const div=ui.create.div(introduction2);
+							div.style.marginRight='5px';
+							div.appendChild(ruby);
 						}
 						else{
-							skillversionnode.innerHTML='切换至旧版';
+							skillNameSpanStyle.marginRight='5px';
+							introduction2.appendChild(skillNameSpan);
 						}
-						skillversionnode.listen(function(){
+						htmlParser.innerHTML=get.skillInfoTranslation(this.link);
+						Array.from(htmlParser.childNodes).forEach(childNode=>introduction2.appendChild(childNode));
+						var info=get.info(this.link);
+						var skill=this.link;
+						var playername=this.linkname;
+						var skillnode=this;
+						let derivations=info.derivation;
+						if(derivations){
+							if(typeof derivations=='string') derivations=[derivations];
+							derivations.forEach(derivation=>{
+								introduction2.appendChild(document.createElement('br'));
+								introduction2.appendChild(document.createElement('br'));
+								const derivationNameSpan=document.createElement('span'),derivationNameSpanStyle=derivationNameSpan.style;
+								derivationNameSpanStyle.fontWeight='bold';
+								const derivationName=get.translation(derivation);
+								derivationNameSpan.innerHTML=derivationName;
+								if(showSkillNamePinyin!='doNotShow'&&derivationName.length<=5&&derivation.indexOf('_faq')==-1){
+									const ruby=document.createElement('ruby');
+									ruby.appendChild(derivationNameSpan);
+									const leftParenthesisRP=document.createElement('rp');
+									leftParenthesisRP.textContent='（';
+									ruby.appendChild(leftParenthesisRP);
+									const rt=document.createElement('rt');
+									rt.innerHTML=showSkillNamePinyin=='showCodeIdentifier'?derivation:lib.translate[`${derivation}_rt`]||get.pinyin(derivationName).join(' ');
+									ruby.appendChild(rt);
+									const rightParenthesisRP=document.createElement('rp');
+									rightParenthesisRP.textContent='）';
+									ruby.appendChild(rightParenthesisRP);
+									const div=ui.create.div(introduction2);
+									div.style.marginRight='5px';
+									div.appendChild(ruby);
+								}
+								else{
+									derivationNameSpanStyle.marginRight='5px';
+									introduction2.appendChild(derivationNameSpan);
+								}
+								htmlParser.innerHTML=get.skillInfoTranslation(derivation);
+								Array.from(htmlParser.childNodes).forEach(childNode=>introduction2.appendChild(childNode));
+							});
+						}
+						if(info.alter){
+							introduction2.appendChild(document.createElement('br'));
+							introduction2.appendChild(document.createElement('br'));
+							ui.create.div('.hrefnode.skillversion',introduction2);
+							var skillversionnode=introduction2.querySelector('.hrefnode.skillversion');
 							if(lib.config.vintageSkills.contains(skill)){
-								lib.config.vintageSkills.remove(skill);
-								lib.translate[skill+'_info']=lib.translate[skill+'_info_alter'];
+								skillversionnode.innerHTML='切换至新版';
 							}
 							else{
-								lib.config.vintageSkills.push(skill);
-								lib.translate[skill+'_info']=lib.translate[skill+'_info_origin'];
+								skillversionnode.innerHTML='切换至旧版';
 							}
-							game.saveConfig('vintageSkills',lib.config.vintageSkills);
-							clickSkill.call(skillnode,'init');
-						});
+							skillversionnode.listen(function(){
+								if(lib.config.vintageSkills.contains(skill)){
+									lib.config.vintageSkills.remove(skill);
+									lib.translate[skill+'_info']=lib.translate[skill+'_info_alter'];
+								}
+								else{
+									lib.config.vintageSkills.push(skill);
+									lib.translate[skill+'_info']=lib.translate[skill+'_info_origin'];
+								}
+								game.saveConfig('vintageSkills',lib.config.vintageSkills);
+								clickSkill.call(skillnode,'init');
+							});
+						}
+						if(e!=='init') game.trySkillAudio(this.link,playername);
 					}
-					if(e!=='init') game.trySkillAudio(this.link,playername);
 				}
+				
 				var initskill=false;
 				for(var i=0;i<list.length;i++){
 					if(!get.info(list[i])||get.info(list[i]).nopop) continue;
@@ -58198,9 +58354,9 @@
 				}
 				let capt=get.translation(node.name);
 				const characterInfo=get.character(node.name),sex=node.sex||characterInfo[0];
-				if(sex) capt+=`&nbsp;&nbsp;${sex=='none'?'无':get.translation(sex)}`;
+				if(sex&&lib.config.show_sex) capt+=`&nbsp;&nbsp;${sex=='none'?'无':get.translation(sex)}`;
 				const group=lib.group.includes(node.group)?node.group:characterInfo[1];
-				if(group) capt+=`&nbsp;&nbsp;${get.translation(group)}`;
+				if(group&&lib.config.show_group) capt+=`&nbsp;&nbsp;${get.translation(group)}`;
 				uiintro.add(capt);
 
 				if(lib.characterTitle[node.name]){
@@ -58909,9 +59065,9 @@
 				let capt=get.translation(character);
 				if(characterInfo){
 					const infoSex=characterInfo[0];
-					if(infoSex) capt+=`&nbsp;&nbsp;${infoSex=='none'?'无':lib.translate[infoSex]}`;
+					if(infoSex&&lib.config.show_sex) capt+=`&nbsp;&nbsp;${infoSex=='none'?'无':lib.translate[infoSex]}`;
 					const infoGroup=characterInfo[1];
-					if(infoGroup){
+					if(infoGroup&&lib.config.show_group){
 						const group=get.is.double(character,true);
 						if(group) capt+=`&nbsp;&nbsp;${group.map(value=>get.translation(value)).join('/')}`;
 						else capt+=`&nbsp;&nbsp;${lib.translate[infoGroup]}`;
