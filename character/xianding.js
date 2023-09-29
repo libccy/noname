@@ -308,7 +308,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(get.owner(card)==player&&get.position(card)=='h'&&game.hasPlayer(current=>current!=player)){
-						player.chooseTarget(`赏誉：将${get.translation(card)}交给一名角色`,lib.filter.notMe,true);
+						player.chooseTarget(`是否将${get.translation(card)}交给一名其他角色？`,lib.filter.notMe);
 					}
 					else event.finish();
 					'step 2'
@@ -316,8 +316,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.line(target);
 						player.give(card,target).gaintag.add('dcshangyu_tag');
-						player.addSkill('dcshangyu_effect');
 					}
+					player.addSkill('dcshangyu_effect');
 				},
 				subSkill:{
 					effect:{
@@ -12656,7 +12656,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_xujing:'许靖',
 			dcshangyu:'赏誉',
 			dcshangyu_tag:'赏誉',
-			dcshangyu_info:'锁定技。游戏开始时，你获得一张【杀】并记录之，然后将此牌交给一名角色，你获得如下效果：1.当一名角色使用此牌造成伤害后，你与其各摸一张牌；2.当此牌进入弃牌堆后，你将此牌交给一名本回合未以此法得到过此牌的角色。',
+			dcshangyu_info:'锁定技。游戏开始时，你获得一张【杀】并记录之，并可以将此牌交给一名角色。然后你获得如下效果：1.当一名角色使用此牌造成伤害后，你与其各摸一张牌；2.当此牌进入弃牌堆后，你将此牌交给一名本回合未以此法得到过此牌的角色。',
 			dccaixia:'才瑕',
 			dccaixia_info:'当你造成或受到伤害后，若你没有“瑕”，你可以摸至多X张牌并获得X枚“瑕”，然后当你使用牌时，移去1枚“瑕”（X为场上角色数且至多为5）。',
 			wu_luxun:'武陆逊',

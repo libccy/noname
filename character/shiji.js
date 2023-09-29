@@ -2229,8 +2229,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:-1,
 				log:false,
 				precontent:function(){
+					'step 0'
 					player.logSkill('dbzhuifeng');
 					player.loseHp();
+					event.forceDie=true;
+					'step 1'
+					//特殊处理
+					if(player.isDead()){
+						player.useResult(event.result,event.getParent())
+					}
 				},
 				ai:{
 					order:function(){

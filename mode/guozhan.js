@@ -13259,6 +13259,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		game:{
+			canReplaceViewpoint:()=>true,
 			showYexings:function(){
 				if(_status.showYexings) return;
 				_status.showYexings=true;
