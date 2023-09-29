@@ -7531,11 +7531,11 @@
 					if(!context) context=[];
 					context.push(tprop);
 				}
-				const list = [];
-				let code,obj;
+				const list=[];
+				let obj;
 				if(Array.isArray(context)){
 					try {
-						code=context.length==1?context[0].string:context.reduceRight((pre,cur)=>(pre.string||pre)+'.'+cur.string);
+						const code=context.length==1?context[0].string:context.reduceRight((pre,cur)=>(pre.string||pre)+'.'+cur.string);
 						obj=eval(code);
 						if(![null,undefined].includes(obj)){
 							const keys=Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertyNames(Object.getPrototypeOf(obj))).filter(key=>key.startsWith(token.string));
