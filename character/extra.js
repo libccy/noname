@@ -4825,7 +4825,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 10*Math.sqrt(Math.max(0.01,get.threaten(target)))/(3.5-draw)+dis/(2*game.countPlayer());
 						}
 						else{
-							if(target.isTurnedOver()) return -att-draw;
+							if(target.isTurnedOver()) return att-draw;
 							if(draw>=5) return -1;
 							if(current&&target.getSeatNum()<=current.getSeatNum()) return -att+draw/3;
 							return (4.25-draw)*10*Math.sqrt(Math.max(0.01,get.threaten(target)))+2*game.countPlayer()/dis;

@@ -711,6 +711,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},'hs');
 				},
 				groupSkill:true,
+				locked:false,
 				viewAs:{
 					name:'sha',
 					storage:{jsrgxianzhu:true},

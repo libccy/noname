@@ -28963,29 +28963,37 @@
 					if(Array.isArray(card)){
 						if(card[2]=='huosha'){
 							card[2]='sha';
-							card[3]=['fire'];
+							card[3]='fire';
 						}
 						else if(card[2]=='leisha'){
 							card[2]='sha';
-							card[3]=['thunder'];
+							card[3]='thunder';
 						}
 						// else if(card[2]=='kamisha'){
 						// 	card[2]='sha';
-						// 	card[3]=['kami'];
+						// 	card[3]='kami';
 						// }
 						// else if(card[2]=='icesha'){
 						// 	card[2]='sha';
-						// 	card[3]=['ice'];
+						// 	card[3]='ice';
 						// }
 						else if(card[2]=='cisha'){
 							card[2]='sha';
-							card[3]=['stab'];
+							card[3]='stab';
 						}
 						else if(card[2].length>3){
 							let prefix=card[2].slice(0,card[2].lastIndexOf('sha'));
-							if(prefix.length+3==card[2].length){
+							if(lib.nature.has(prefix)){
+								if(prefix.length+3==card[2].length){
+									card[2]='sha';
+									card[3]=prefix;
+								}
+							}
+							if(card[2].indexOf('sha_')==0){
+								let suffix=card[2].slice(4);
+								let natureList=suffix.split('_');
 								card[2]='sha';
-								card[3]=[prefix];
+								card[3]=get.nature(natureList);
 							}
 						}
 					}
