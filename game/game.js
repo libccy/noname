@@ -5,19 +5,19 @@
 			localStorage.setItem('gplv3_noname_alerted',true);
 		}
 		else{
-			var ua=navigator.userAgent.toLowerCase();
-			var ios=ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('macintosh')!=-1;
+			const ua=navigator.userAgent.toLowerCase();
+			const ios=ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('macintosh')!=-1;
 			//electron
 			if(typeof window.process=='object'&&typeof window.require=='function'){
-				var versions=window.process.versions;
-				var electronVersion=parseFloat(versions.electron);
-				var remote;
+				const versions=window.process.versions;
+				const electronVersion=parseFloat(versions.electron);
+				let remote;
 				if(electronVersion>=14){
 					remote=require('@electron/remote');
 				}else{
 					remote=require('electron').remote;
 				}
-				var thisWindow=remote.getCurrentWindow();
+				const thisWindow=remote.getCurrentWindow();
 				thisWindow.destroy();
 				window.process.exit();
 			}
@@ -7560,11 +7560,11 @@
 										else if(type== 'string') {
 											className+='text';
 										}
-										else if(['object','number'].includes(type)){
-											className+='namespace';
-										}
 										else if(type== 'boolean') {
 											className+='variable';
+										}
+										else{
+											className+='namespace';
 										}
 									}else{
 										if(javascriptKeywords.includes(text)||javascriptKeywords.includes(text)){
@@ -7578,12 +7578,14 @@
 											else if(type=='string'){
 												className+='text';
 											}
-											else if((type=='object'&&text!='window')||type=='number'){
-												className+='namespace';
-											}
 											else if(text=='window'||type=='boolean'){
 												className+='variable';
 											}
+											else{
+												className+='namespace';
+											}
+										}else{
+											className+='namespace';
 										}
 									}
 									icon.className=className;
