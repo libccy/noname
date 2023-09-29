@@ -40951,17 +40951,18 @@
 				}
 				//创建ul列表
 				const createMenu=function(pos,self,List,click){
-					if (self&&self.createMenu) {
-						createList.push(self.createMenu);
-						ui.window.appendChild(self.createMenu);
-						return self.createMenu;
-					}
+					if(!self||self==window) return;
 					const parent=self.parentNode;
 					if (parent){
 						for(let i=0;i<parent.childElementCount;i++){
 							const node=parent.childNodes[i];
-							node!=self&&node.createMenu&&closeMenu.call(node);
+							if(node!=self&&node.createMenu) closeMenu.call(node);
 						}
+					}
+					if(self.createMenu){
+						createList.push(self.createMenu);
+						ui.window.appendChild(self.createMenu);
+						return self.createMenu;
 					}
 					const editor=container.editor;
 					if(!editor) return false;
@@ -40974,7 +40975,7 @@
 						height:'20em',
 						width:pos.width*4/game.documentZoom+'px',
 						//'font-family':'shousha',
-						'font-size':(lib.config.codeMirror_fontSize?lib.config.codeMirror_fontSize.slice(-2):16)/game.documentZoom+'px',
+						'font-size':(lib.config.codeMirror_fontSize?lib.config.codeMirror_fontSize.slice(0,-2):16)/game.documentZoom+'px',
 						
 					});
 					const theme=editor.options.theme;
@@ -41019,7 +41020,7 @@
 							};
 						}
 					}
-					createList.push(ul);
+					createList.add(ul);
 					ui.window.appendChild(ul);
 					return ul;
 				};
@@ -41043,64 +41044,79 @@
 				});
 				const saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
 				const theme=ui.create.div('.editbutton','主题',editorpage,function(){
-					if(this&&this.createMenu&&this.createMenu.parentNode){
+					if(!this||this==window) return;
+					if(this.createMenu&&this.createMenu.parentNode){
 						return closeMenu.call(this);
 					}
-					//主题列表
-					const list=['mdn-like','mbo'];
-					//正在使用的主题
-					const active=container.editor.options.theme;
-					//排个序
-					list.remove(active).splice(0,0,active);
 					//this
 					const self=this;
-					//元素位置
-					const pos=this.getBoundingClientRect();
-					//点击事件
-					const click=function(e){
-						const theme=this.innerHTML;
-						container.editor.setOption("theme",theme);
-						setTimeout(()=>container.editor.refresh(),0);
-						game.saveConfig('codeMirror_theme',theme);
-						closeMenu.call(self);
-					};
-					const ul=createMenu(pos,self,list,click);
-					this.createMenu=ul;
+					if(!this.createMenu){
+						//主题列表
+						const list=['mdn-like','mbo'];
+						//正在使用的主题
+						const active=container.editor.options.theme;
+						//排个序
+						list.remove(active).splice(0,0,active);
+						//元素位置
+						const pos=self.getBoundingClientRect();
+						//点击事件
+						const click=function(e){
+							const theme=this.innerHTML;
+							container.editor.setOption("theme",theme);
+							setTimeout(()=>container.editor.refresh(),0);
+							game.saveConfig('codeMirror_theme',theme);
+							closeMenu.call(self);
+						};
+						const ul=createMenu(pos,self,list,click);
+						self.createMenu=ul;
+					}else{
+						createMenu(null,self);
+					}
 				});
 				const edit=ui.create.div('.editbutton','编辑',editorpage,function(){
-					if(this&&this.createMenu&&this.createMenu.parentNode){
+					if(!this||this==window) return;
+					if(this.createMenu&&this.createMenu.parentNode){
 						return closeMenu.call(this);
 					}
 					const self=this;
-					const pos=this.getBoundingClientRect();
-					const list=['撤销        Ctrl+Z', '恢复撤销    Ctrl+Y'];
-					const click=function(e){
-						const num=this.innerHTML.indexOf("Ctrl");
-						const inner=this.innerHTML.slice(num).replace("+", "-");
-						container.editor.execCommand(container.editor.options.extraKeys[inner]);
-						setTimeout(()=>container.editor.refresh(),0);
-						closeMenu.call(self);
-					};
-					const ul=createMenu(pos,self,list,click);
-					this.createMenu=ul;
+					if(!this.createMenu){
+						const pos=this.getBoundingClientRect();
+						const list=['撤销        Ctrl+Z', '恢复撤销    Ctrl+Y'];
+						const click=function(e){
+							const num=this.innerHTML.indexOf("Ctrl");
+							const inner=this.innerHTML.slice(num).replace("+", "-");
+							container.editor.execCommand(container.editor.options.extraKeys[inner]);
+							setTimeout(()=>container.editor.refresh(),0);
+							closeMenu.call(self);
+						};
+						const ul=createMenu(pos,self,list,click);
+						this.createMenu=ul;
+					}else{
+						createMenu(null,self);
+					}
 				});
 				const fontSize=ui.create.div('.editbutton','字号',editorpage,function(){
-					if(this&&this.createMenu&&this.createMenu.parentNode){
+					if(!this||this==window) return;
+					if(this.createMenu&&this.createMenu.parentNode){
 						return closeMenu.call(this);
 					}
 					const self=this;
-					const pos=this.getBoundingClientRect();
-					const list=['16px','18px','20px','22px','24px','26px'];
-					const click=function(e){
-						const size=this.innerHTML;
-						container.style.fontSize=size.slice(0,-2)/game.documentZoom+'px';
-						Array.from(self.parentElement.children).map(v=>v.createMenu).filter(Boolean).forEach(v=>{v.style.fontSize=size.slice(0,-2)/game.documentZoom+'px'});
-						container.listenTransition(()=>container.editor.refresh());
-						game.saveConfig('codeMirror_fontSize',size);
-						closeMenu.call(self);
-					};
-					const ul=createMenu(pos,self,list,click);
-					this.createMenu=ul;
+					if(!this.createMenu){
+						const pos=this.getBoundingClientRect();
+						const list=['16px','18px','20px','22px','24px','26px'];
+						const click=function(e){
+							const size=this.innerHTML;
+							container.style.fontSize=size.slice(0,-2)/game.documentZoom+'px';
+							Array.from(self.parentElement.children).map(v=>v.createMenu).filter(Boolean).forEach(v=>{v.style.fontSize=size.slice(0,-2)/game.documentZoom+'px'});
+							container.listenTransition(()=>container.editor.refresh());
+							game.saveConfig('codeMirror_fontSize',size);
+							closeMenu.call(self);
+						};
+						const ul=createMenu(pos,self,list,click);
+						this.createMenu=ul;
+					}else{
+						createMenu(null,self);
+					}
 				});
 				const editor=ui.create.div(editorpage);
 				return editor;
