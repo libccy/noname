@@ -2027,7 +2027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						prompt:function(event){
 							var player=_status.event.player;
-							return '将一张'+get.translation(player.storage.pshuxiao_use.suit)+'牌或点数为'+get.strNumber(player.storage.pshuxiao_use.number)+'的牌当作'+(player.storage.pshuxiao_use.card)+'使用';
+							return '将一张'+get.translation(player.storage.pshuxiao_use.suit)+'牌或点数为'+get.strNumber(player.storage.pshuxiao_use.number)+'的牌当作'+get.translation(player.storage.pshuxiao_use.card)+'使用';
 						}
 					}
 				}

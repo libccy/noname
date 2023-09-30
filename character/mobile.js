@@ -14774,6 +14774,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbhuiyao_info:'出牌阶段限一次。你可以受到1点无来源伤害，视为对一名其他角色造成过1点伤害。',
 			mbquesong:'雀颂',
 			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸等同于其装备区中空栏的数量的牌并复原武将牌；2.弃置等同于其体力值的手牌并回复1点体力。',
+			xin_yuanshao:"手杀袁绍",
+			re_baosanniang:'手杀鲍三娘',
+			re_liushan:'手杀刘禅',
+			re_sunben:'界孙笨',
+			re_sunben_prefix:'界',
+			re_zhangzhang:'手杀张昭张纮',
+			re_caozhi:'手杀曹植',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',

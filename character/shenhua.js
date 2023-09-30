@@ -8044,7 +8044,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_zhangjiao:'张角',
 			weiyan:'旧魏延',
 			xiaoqiao:'小乔',
-			zhoutai:'界周泰',
 			zhangjiao:'旧张角',
 			//yuji:'于吉',
 			shensu:'神速',

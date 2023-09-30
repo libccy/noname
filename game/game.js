@@ -10825,6 +10825,7 @@
 				}
 				ui.css.styles=lib.init.sheet();
 				ui.css.styles.sheet.insertRule('#arena .player>.name,#arena .button.character>.name {font-family: '+(lib.config.name_font||'xinwei')+',xinwei}',0);
+				ui.css.styles.sheet.insertRule('#arena .player>.name,.button.character>.name {font-family: '+(lib.config.name_font||'xinwei')+',xinwei}',0);
 				ui.css.styles.sheet.insertRule('#arena .player .identity>div {font-family: '+(lib.config.identity_font||'huangcao')+',xinwei}',0);
 				ui.css.styles.sheet.insertRule('.button.character.newstyle>.identity {font-family: '+(lib.config.identity_font||'huangcao')+',xinwei}',0);
 				if(lib.config.cardtext_font&&lib.config.cardtext_font!='default'){
@@ -57178,9 +57179,12 @@
 			return num.toString();
 		},
 		rawName:function(str){
-			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
 			var str2=lib.translate[str];
+			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
 			if(!str2) return '';
+			if(lib.translate[str+'_prefix']){
+				return str2.slice(lib.translate[str+'_prefix'].length);
+			}
 			if(str2.indexOf('SP')==0){
 				str2=str2.slice(2);
 			}
@@ -57240,10 +57244,13 @@
 			}
 			return str2;
 		},
-		slimName:function(str){
+		slimNameHorizontal:function(str){
 			var str2=lib.translate[str];
 			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
 			if(!str2) return '';
+			if(lib.translate[str+'_prefix']){
+				return `<span style="color: #FDD559;">${lib.translate[str+'_prefix']}</span><span>${str2.slice(lib.translate[str+'_prefix'].length)}</span>`;
+			}
 			if(str2.indexOf('SP')==0){
 				str2=str2.slice(2);
 			}
@@ -57266,6 +57273,9 @@
 				str2=str2.slice(2);
 			}
 			return get.verticalStr(str2,true);
+		},
+		slimName:function(str){
+			return get.verticalStr(get.slimNameHorizontal(str),true);
 		},
 		time:function(){
 			if(lib.status.dateDelaying){
