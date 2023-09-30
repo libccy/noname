@@ -25136,8 +25136,12 @@
 					if(mod!='unchanged') return mod;
 					return true;
 				},
-				addJudgeNext:function(card){
+				addJudgeNext:function(card,unlimited){
 					if(!card.expired){
+					    if(get.postion(card,true)!=='o'&&get.postion(card,true)!=='j'&&!unlimited){
+					        game.log('将',card,'移入',this.next,'的判定区失败');
+					        return;
+					    }
 						var target=this.next;
 						var name=card.viewAs||card.name;
 						var bool=false;
