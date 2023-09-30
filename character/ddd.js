@@ -29,7 +29,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ddd_liangxi:['male','wei',3,['dddtongyu']],
 			ddd_wangkanglvkai:['male','shu',4,['dddbingjian']],
 			ddd_sunliang:['male','wu',3,['ddddiedang','dddanliu','dddguiying'],['zhu']],
-			ddd_lie:['male','wu',3,['dddyeshen','dddqiaoduan']],
+			ddd_lie:['female','wu',3,['dddyeshen','dddqiaoduan']],
 		},
 		characterFilter:{},
 		characterSort:{},
