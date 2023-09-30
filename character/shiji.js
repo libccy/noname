@@ -5916,11 +5916,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			spshanxi_bj:{
-				charlotte:true,
 				trigger:{player:'dieAfter'},
 				filter:function(event,player){
 					return !game.hasPlayer(current=>current.hasSkill('spshanxi_suoming'));
 				},
+				silent:true,
+				charlotte:true,
 				content:function(){
 					game.removeGlobalSkill('spshanxi_bj');
 				},
