@@ -9547,13 +9547,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yanyu2:{
 				trigger:{player:'phaseUseEnd'},
-				direct:true,
 				filter:function(event,player){
-					return player.getHistory('lose',function(evt){
-						var evt2=evt.getParent();
-						return evt2.name=='useSkill'&&evt2.skill=='yanyu'&&evt.getParent(3)==event;
+					return player.getHistory('useSkill',function(evt){
+						return evt.event.getParent('phaseUse')==event&&evt.skill=='yanyu';
 					}).length>=2;
 				},
+				direct:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('yanyu'),'令一名男性角色摸两张牌',function(card,player,target){
