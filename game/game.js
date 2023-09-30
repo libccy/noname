@@ -5,19 +5,19 @@
 			localStorage.setItem('gplv3_noname_alerted',true);
 		}
 		else{
-			var ua=navigator.userAgent.toLowerCase();
-			var ios=ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('macintosh')!=-1;
+			const ua=navigator.userAgent.toLowerCase();
+			const ios=ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('macintosh')!=-1;
 			//electron
 			if(typeof window.process=='object'&&typeof window.require=='function'){
-				var versions=window.process.versions;
-				var electronVersion=parseFloat(versions.electron);
-				var remote;
+				const versions=window.process.versions;
+				const electronVersion=parseFloat(versions.electron);
+				let remote;
 				if(electronVersion>=14){
 					remote=require('@electron/remote');
 				}else{
 					remote=require('electron').remote;
 				}
-				var thisWindow=remote.getCurrentWindow();
+				const thisWindow=remote.getCurrentWindow();
 				thisWindow.destroy();
 				window.process.exit();
 			}
@@ -7490,10 +7490,25 @@
 			});
 			//防止每次输出字符都创建以下元素
 			const event=_status.event;
+			const trigger=_status.event;
 			const player=ui.create.player().init('sunce');
+			const target=player;
+			const targets=[player];
+			const source=player;
 			const card=game.createCard();
-			//覆盖原本的javascript提示
-			CodeMirror.registerHelper('hint','javascript',(editor,options)=>{
+			const cards=[card];
+			const result={bool:true};
+			function forEach(arr,f) {
+				Array.from(arr).forEach(v=>f(v));
+			}
+			function forAllProps(obj,callback){
+				if(!Object.getOwnPropertyNames||!Object.getPrototypeOf){
+					for(let name in obj) callback(name);
+				}else{
+					for(let o=obj;o;o=Object.getPrototypeOf(o)) Object.getOwnPropertyNames(o).forEach(callback);
+				}
+			}
+			function scriptHint(editor,keywords,getToken,options){
 				//Find the token at the cursor
 				let cur=editor.getCursor(),token=editor.getTokenAt(cur);
 				if(/\b(?:string|comment)\b/.test(token.type)) return;
@@ -7523,37 +7538,132 @@
 					context.push(tprop);
 				}
 				const list=[];
+				let obj;
 				if(Array.isArray(context)){
 					try {
 						const code=context.length==1?context[0].string:context.reduceRight((pre,cur)=>(pre.string||pre)+'.'+cur.string);
-						const obj=eval(code);
+						obj=eval(code);
 						if(![null,undefined].includes(obj)){
 							const keys=Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertyNames(Object.getPrototypeOf(obj))).filter(key=>key.startsWith(token.string));
 							list.addArray(keys);
 						}
 					}catch(_){ return;}
 				}else if(token&&typeof token.string=='string'){
-					const javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
-						"if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
-					const coffeescriptKeywords=("and break catch class continue delete do else extends false finally for " +
-						"if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
-					const keys=['player','card','lib','game','ui','get','ai','_status'].concat(javascriptKeywords).concat(coffeescriptKeywords).concat(Object.getOwnPropertyNames(window));
-					const start=token.string;
-					function maybeAdd(str){
-						if(str.lastIndexOf(start,0)==0&&!list.includes(str)) list.push(str);
+					//非开发者模式下，提示这些单词
+					list.addArray(['player','card','cards','result','trigger','source','target','targets','lib','game','ui','get','ai','_status']);
+				}
+				return {
+					list:[...new Set(getCompletions(token,context,keywords,options).concat(list))]
+						.filter(key=>key.startsWith(token.string))
+						.sort((a,b)=>(a+'').localeCompare(b+''))
+						.map(text=>{
+							return {
+								render(elt,data,cur) {
+									var icon=document.createElement("span");
+									var className="cm-completionIcon cm-completionIcon-";
+									if(obj){
+										const type=typeof obj[text];
+										if(type== 'function') {
+											className+='function';
+										}
+										else if(type== 'string') {
+											className+='text';
+										}
+										else if(type== 'boolean') {
+											className+='variable';
+										}
+										else{
+											className+='namespace';
+										}
+									}else{
+										if(javascriptKeywords.includes(text)){
+											className+='keyword';
+										}
+										else if(window[text]) {
+											const type=typeof window[text];
+											if(type=='function'){
+											className+='function';
+											}
+											else if(type=='string'){
+												className+='text';
+											}
+											else if(text=='window'||type=='boolean'){
+												className+='variable';
+											}
+											else{
+												className+='namespace';
+											}
+										}else{
+											className+='namespace';
+										}
+									}
+									icon.className=className;
+									elt.appendChild(icon);
+									elt.appendChild(document.createTextNode(text));
+								},
+								displayText: text,
+								text: text,
+							}
+						}),
+					from:CodeMirror.Pos(cur.line,token.start),
+					to:CodeMirror.Pos(cur.line,token.end)
+				};
+			}
+			function javascriptHint(editor,options){
+				return scriptHint(editor,javascriptKeywords,function(e,cur){return e.getTokenAt(cur);},options);
+			};
+			//覆盖原本的javascript提示
+			CodeMirror.registerHelper("hint","javascript",javascriptHint);
+			const stringProps=Object.getOwnPropertyNames(String.prototype);
+			const arrayProps=Object.getOwnPropertyNames(Array.prototype);
+			const funcProps=Object.getOwnPropertyNames(Array.prototype);
+			const javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
+				"if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
+			function getCompletions(token,context,keywords,options){
+				let found=[],start=token.string,global=options&&options.globalScope||window;
+				function maybeAdd(str){
+					if(str.lastIndexOf(start,0)==0&&!found.includes(str)) found.push(str);
+				}
+				function gatherCompletions(obj){
+					if(typeof obj=="string") forEach(stringProps,maybeAdd);
+					else if(obj instanceof Array) forEach(arrayProps,maybeAdd);
+					else if(obj instanceof Function) forEach(funcProps,maybeAdd);
+					forAllProps(obj, maybeAdd);
+				}
+				if(context&&context.length){
+					//If this is a property, see if it belongs to some object we can
+					//find in the current environment.
+					let obj=context.pop(),base;
+					if (obj.type&&obj.type.indexOf("variable")=== 0){
+						if(options&&options.additionalContext)
+							base=options.additionalContext[obj.string];
+						if(!options||options.useGlobalScope!==false)
+							base=base||global[obj.string];
+					}else if(obj.type=="string"){
+						base="";
+					}else if(obj.type == "atom"){
+						base=1;
+					}else if(obj.type == "function"){
+						if(global.jQuery!=null&&(obj.string=='$'||obj.string=='jQuery')&&(typeof global.jQuery=='function'))
+							base=global.jQuery();
+						else if(global._!=null&&(obj.string=='_')&&(typeof global._=='function'))
+							base=global._();
 					}
+					while(base!=null&&context.length)
+						base=base[context.pop().string];
+					if (base!=null) gatherCompletions(base);
+				}else{
+					//If not, just look in the global object, any local scope, and optional additional-context
+					//(reading into JS mode internals to get at the local and global variables)
 					for(let v=token.state.localVars;v;v=v.next) maybeAdd(v.name);
 					for(let c=token.state.context;c;c=c.prev) for(let v=c.vars;v;v=v.next) maybeAdd(v.name)
 					for(let v=token.state.globalVars;v;v=v.next) maybeAdd(v.name);
 					if(options&&options.additionalContext!=null) for(let key in options.additionalContext) maybeAdd(key);
-					list.addArray(keys);
+					if(!options||options.useGlobalScope!==false) gatherCompletions(global);
+					forEach(keywords,maybeAdd);
 				}
-				return {
-					list:list.filter(key=>key.startsWith(token.string)).sort((a,b)=>(a+'').localeCompare(b+'')),
-					from:CodeMirror.Pos(cur.line,token.start),
-					to:CodeMirror.Pos(cur.line,token.end),
-				};
-			});
+				return found.sort((a,b)=>(a+'').localeCompare(b+''));
+			}
 		},
 		setIntro:function(node,func,left){
 			if(lib.config.touchscreen){
@@ -41169,7 +41279,7 @@
 							const size=this.innerHTML;
 							container.style.fontSize=size.slice(0,-2)/game.documentZoom+'px';
 							Array.from(self.parentElement.children).map(v=>v.createMenu).filter(Boolean).forEach(v=>{v.style.fontSize=size.slice(0,-2)/game.documentZoom+'px'});
-							container.listenTransition(()=>container.editor.refresh());
+							setTimeout(()=>container.editor.refresh(),0);
 							game.saveConfig('codeMirror_fontSize',size);
 							closeMenu.call(self);
 						};
