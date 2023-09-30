@@ -6944,44 +6944,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player,name){
 					player.storage[name]=[1,2,3,4];
 				},
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'damageEnd'},
+				filter:(event,player)=>player!=_status.currentPhase,
 				forced:true,
-				popup:false,
+				locked:false,
 				content:function(){
-					trigger._shanduan=(player.storage.shanduan||[1,2,3,4]).slice(0);
-					player.storage.shanduan=[1,2,3,4]
+					if(!player.storage.shanduan) player.storage.shanduan=[1,2,3,4];
+					var list=player.storage.shanduan;
+					for(var i=0;i<list.length;i++){
+						var num=list[i],add=true;
+						for(var j=0;j<list.length;j++){
+							if(list[j]<num){
+								add=false;
+								break;
+							}
+						}
+						if(add){
+							list[i]++;
+							break;
+						}
+					}
+					game.delayx();
 				},
-				group:['shanduan_draw','shanduan_use','shanduan_discard','shanduan_damage'],
+				group:['shanduan_draw','shanduan_use','shanduan_discard'],
 				ai:{
 					notemp:true,
 					threaten:3.6,
 				},
 				subSkill:{
-					damage:{
-						audio:'shanduan',
-						trigger:{player:'damageEnd'},
-						forced:true,
-						locked:false,
-						filter:(event,player)=>player!=_status.currentPhase,
-						content:function(){
-							if(!player.storage.shanduan) player.storage.shanduan=[1,2,3,4];
-							var list=player.storage.shanduan;
-							for(var i=0;i<list.length;i++){
-								var num=list[i],add=true;
-								for(var j=0;j<list.length;j++){
-									if(list[j]<num){
-										add=false;
-										break;
-									}
-								}
-								if(add){
-									list[i]++;
-									break;
-								}
-							}
-							game.delayx();
-						},
-					},
 					draw:{
 						audio:'shanduan',
 						trigger:{player:'phaseDrawBegin'},
@@ -6989,14 +6979,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						locked:false,
 						filter:function(event,player){
 							var list=event.getParent()._shanduan;
-							return list&&list.length>0;
+							return !list||list.length>0;
 						},
 						content:function(){
 							'step 0'
 							var list=trigger.getParent()._shanduan;
+							if(!list){
+								trigger.getParent()._shanduan=(player.storage.shanduan||[1,2,3,4]).slice(0);
+								player.storage.shanduan=[1,2,3,4];
+							}
+							'step 1'
+							var list=trigger.getParent()._shanduan;
 							if(list.length==1) event._result={index:0};
 							else player.chooseControl(list).set('prompt','善断：为摸牌阶段的摸牌数分配一个数值').set('choice',list.indexOf(Math.max.apply(Math,list))).set('ai',()=>_status.event.choice);
-							'step 1'
+							'step 2'
 							var list=trigger.getParent()._shanduan;
 							var num=list[result.index];
 							trigger.num=num;
@@ -7011,10 +7007,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						locked:false,
 						filter:function(event,player){
 							var list=event.getParent()._shanduan;
-							return list&&list.length>0;
+							return !list||list.length>0;
 						},
 						content:function(){
 							'step 0'
+							var list=trigger.getParent()._shanduan;
+							if(!list){
+								trigger.getParent()._shanduan=(player.storage.shanduan||[1,2,3,4]).slice(0);
+								player.storage.shanduan=[1,2,3,4];
+							}
+							'step 1'
 							var list=trigger.getParent()._shanduan;
 							if(list.length==1) event._result={index:0};
 							else player.chooseControl(list).set('prompt','善断：为攻击范围基数分配一个数值').set('list',list).set('ai',function(){
@@ -7041,7 +7043,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								return list.indexOf(Math.min.apply(Math,list));
 							});
-							'step 1'
+							'step 2'
 							var list=trigger.getParent()._shanduan;
 							var num=list[result.index];
 							if(!player.storage.shanduan_effect) player.storage.shanduan_effect={};
@@ -7066,7 +7068,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								return list.indexOf(Math.min.apply(Math,list));
 							});
-							'step 2'
+							'step 3'
 							var list=trigger.getParent()._shanduan;
 							var num=list[result.index];
 							if(!player.storage.shanduan_effect) player.storage.shanduan_effect={};
@@ -7082,14 +7084,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						locked:false,
 						filter:function(event,player){
 							var list=event.getParent()._shanduan;
-							return list&&list.length>0;
+							return !list||list.length>0;
 						},
 						content:function(){
 							'step 0'
 							var list=trigger.getParent()._shanduan;
+							if(!list){
+								trigger.getParent()._shanduan=(player.storage.shanduan||[1,2,3,4]).slice(0);
+								player.storage.shanduan=[1,2,3,4];
+							}
+							'step 1'
+							var list=trigger.getParent()._shanduan;
 							if(list.length==1) event._result={index:0};
 							else player.chooseControl(list).set('prompt','善断：为手牌上限基数分配一个数值').set('choice',list.indexOf(Math.max.apply(Math,list))).set('ai',()=>_status.event.choice);
-							'step 1'
+							'step 2'
 							var list=trigger.getParent()._shanduan;
 							var num=list[result.index];
 							if(!player.storage.shanduan_effect) player.storage.shanduan_effect={};
@@ -25349,7 +25357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tongxie_info:'出牌阶段开始时，你可以选择包括你在内的至多三名角色（你与这些角色均称为“同协角色”）。这些角色中手牌数唯一最少的角色摸一张牌，且你获得如下效果直到你下回合开始：①当有“同协角色”对唯一目标角色使用的【杀】结算结束后，其他“同协角色”可以依次对目标角色使用一张【杀】（无距离和次数限制，且不能再触发此效果）。②当有“同协角色”受到伤害时，其他“同协角色”（本回合内失去过体力的角色除外）可以防止此伤害，失去1点体力。',
 			jin_zhouchu:'周处',
 			shanduan:'善断',
-			shanduan_info:'锁定技。①回合开始时，你生成数组R=[1,2,3,4]。②摸牌阶段开始时，你从数组R中选择并移除一个数字A。你本阶段的额定摸牌数改为A。③出牌阶段开始时，你从数组R中选择并移除两个数字B和C。你将你本阶段内的攻击范围基数最小值和使用【杀】的次数上限基础值改为B和C。④弃牌阶段开始时，你从数组R中选择并移除一个数字D。你令你本回合的手牌上限基数改为D。⑤当你于回合外受到伤害后，你令下回合生成的R中最小的一个数字+1。',
+			shanduan_info:'锁定技。①摸牌/出牌/弃牌阶段开始时，你为本回合摸牌阶段摸牌数/攻击范围和使用【杀】的限制次数/手牌上限的默认值从数组R=[1，2，3，4]中分配数值。②当你于回合外受到伤害后，你令下回合〖善断①〗以此法分配的数值集合R中的最小值+1。',
 			yilie:'义烈',
 			yilie_info:'每轮每种牌名限一次。你可以将两张颜色相同的手牌当做任意一种基本牌使用。',
 			caoxiancaohua:'曹宪曹华',
