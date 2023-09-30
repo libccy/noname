@@ -13943,10 +13943,12 @@
 						lib.onphase[i]();
 					}
 					player.phase();
-					event.player=player.next;
 					"step 2"
 					if(!game.players.contains(event.player.next)){
 						event.player=game.findNext(event.player.next);
+					}
+					else{
+						event.player=event.player.next;
 					}
 					event.goto(1);
 				},
@@ -25136,8 +25138,12 @@
 					if(mod!='unchanged') return mod;
 					return true;
 				},
-				addJudgeNext:function(card){
+				addJudgeNext:function(card,unlimited){
 					if(!card.expired){
+						if(!unlimited&&get.postion(card,true)!=='o'&&get.postion(card,true)!=='j'){
+			  				game.log('将',card,'移入',this.next,'的判定区失败');
+							return;
+						}
 						var target=this.next;
 						var name=card.viewAs||card.name;
 						var bool=false;
@@ -33648,16 +33654,28 @@
 				nature:'keymm',
 			}],
 			['神',{
-				color:'#d6cde9',
-				nature:'thundermm',
+				color:'#faecd1',
+				nature:'orangemm',
+			}],
+			['族',{
+				color:'#ee9ac7',
+				nature:'firemm',
+			}],
+			['晋',{
+				color:'#e1a6f0',
+				nature:'blackmm',
+			}],
+			['侠',{
+				color:'#dddddd',
+				nature:'qunmm',
 			}],
 		]),
 		groupnature:{
-			shen:'thunder',
+			shen:'shen',
 			wei:'water',
 			shu:'soil',
 			wu:'wood',
-			qun:'metal',
+			qun:'qun',
 			western:'thunder',
 			key:'key',
 			jin:'thunder',
@@ -39516,6 +39534,7 @@
 		phaseLoop:function(player){
 			var next=game.createEvent('phaseLoop');
 			next.player=player;
+			next._isStandardLoop=true;
 			next.setContent('phaseLoop');
 		},
 		gameDraw:function(player,num){

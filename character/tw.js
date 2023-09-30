@@ -320,7 +320,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'观看'+str+'的手牌并获得其一种花色的所有手牌',
 						]).set('ai',()=>{
 							var player=_status.event.player;
-							var target=_status.event.target;
+							var target=_status.event.getParent().target;
 							if(target.countCards('h')-player.countCards('h')>target.countCards('h')/4||get.attitude(player,target)>0) return 0;
 							return 1;
 						});
@@ -14488,6 +14488,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twchuanshu:'传术',
 			twchuanshu_info:'限定技。准备阶段，你可以选择一名角色。直到你的下回合开始，其获得以下效果：1.当其拼点牌亮出时，此牌点数+3；2.其使用的下一张【杀】对除你外的角色造成伤害时，此伤害+1；3.若其不为你，其使用的下一张【杀】结算结束后，你摸等同于其因此【杀】造成的伤害值数的牌。',
 			xia_xushu:'侠徐庶',
+			xia_xushu_prefix:'侠',
 			twjiange:'剑歌',
 			twjiange_info:'每回合限一次。你可以将一张非基本牌当做【杀】使用或打出（无距离和次数限制，且不计入次数）。若此时不为你的回合，你摸一张牌。',
 			twxiawang:'侠望',
@@ -14517,11 +14518,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twjimeng:'急盟',
 			twjimeng_info:'出牌阶段限一次。你可以获得一名其他角色区域内的一张牌，然后交给其一张牌。若其体力值不小于你，你摸一张牌。',
 			xia_lusu:'侠鲁肃',
+			xia_lusu_prefix:'侠',
 			twkaizeng:'慨赠',
 			twkaizeng_info:'其他角色的出牌阶段限一次。其可以选择一种基本牌的牌名或非基本牌的类型，然后令你选择是否交给其任意张手牌。若你以此法：交给其至少两张牌，你摸一张牌；交给其的牌中包含其选择的牌名或类型的牌，你获得一张与此牌名或类型不同的牌。',
 			twyangming:'扬名',
 			twyangming_info:'出牌阶段结束时，你可以摸X张牌，且令本回合的手牌上限+X（X为你本阶段使用过的牌的类型数）。',
 			xia_dianwei:'侠典韦',
+			xia_dianwei_prefix:'侠',
 			twliexi:'烈袭',
 			twliexi_info:'准备阶段，你可以弃置任意张牌并选择一名其他角色。若你以此法弃置的牌数大于其体力值，你对其造成1点伤害；否则其对你造成1点伤害。然后若你弃置的牌中有武器牌，你对其造成1点伤害。',
 			twshezhong:'慑众',
