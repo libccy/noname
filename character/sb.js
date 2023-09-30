@@ -847,7 +847,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:7,
 					result:{
 						player:function(player,target){
-							if(!player.hasSkill('sbbiyue') return 0;
+							if(!player.hasSkill('sbbiyue')) return 0;
 							let targets=_status.event.getTempCache('sblijian','targets');
 							if(Array.isArray(targets)) for(let i=0;i<targets.length;i++){
 								if(target===targets[i][0]&&targets[i][2]===0) return 1;
