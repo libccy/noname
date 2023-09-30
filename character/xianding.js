@@ -11806,6 +11806,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('zhafu_hf');
 					target.addMark('zhafu_hf',1);
 				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player,target){
+							return Math.max(0,1+target.countCards('h')-game.countPlayer(current=>{
+								if(get.attitude(target,current)>0) return 0.3;
+								if(target.hasJudge('lebu')) return 0.6;
+								if(target.inRange(current)) return 1.5;
+								return 1;
+							}));
+						},
+						target:function(player,target){
+							return -Math.max(0,1+target.countCards('h')-game.countPlayer(current=>{
+								if(get.attitude(target,current)>0) return 0.3;
+								if(target.hasJudge('lebu')) return 0.6;
+								if(target.inRange(current)) return 1.5;
+								return 1;
+							}));
+						}
+					}
+				},
 				subSkill:{
 					hf:{
 						trigger:{
