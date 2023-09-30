@@ -8173,6 +8173,59 @@
 						return this.childNodes[row].childNodes[col];
 					}
 				};
+				/*处理lib.nature的兼容性问题*/
+				const mapHasFunc=function(item){
+					return this.has(item)
+				};
+				Object.defineProperty(Map.prototype, "contains",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:mapHasFunc
+				});
+				Object.defineProperty(Map.prototype, "includes",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:mapHasFunc
+				});
+				const mapAddFunc=function(item){
+					this.set(item,0);
+					return this;
+				}
+				Object.defineProperty(Map.prototype, "add", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:mapAddFunc
+				});
+				Object.defineProperty(Map.prototype, "push", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:mapAddFunc
+				});
+				Object.defineProperty(Map.prototype, "addArray", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(arr){
+						for(var i=0;i<arr.length;i++){
+							this.add(arr[i]);
+						}
+						return this;
+					}
+				});
+				Object.defineProperty(Map.prototype, "remove", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(item){
+						this.delete(item);
+						return this;
+					}
+				});
+				/*Map prototype end*/
 				Object.defineProperty(Array.prototype, "filterInD", {
 					configurable:true,
 					enumerable:false,
@@ -8229,10 +8282,10 @@
 					enumerable:false,
 					writable:true,
 					value:function(item){
-						if(Array.isArray(item)){
+						/*if(Array.isArray(item)){
 							for(var i=0;i<item.length;i++) this.remove(item[i]);
 							return;
-						}
+						}*/
 						var pos=this.indexOf(item);
 						if(pos==-1){
 							return false;
