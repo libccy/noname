@@ -4041,6 +4041,7 @@
 							showPinyin:'拼音(样式一)',
 							showCodeIdentifier:'代码ID(样式一)',
 							showPinyin2:'拼音(样式二)',
+							showCodeIdentifier2:'代码ID(样式二)',
 						},
 						visualMenu:(node,link,name)=>{
 							node.classList.add('button','character');
@@ -4059,16 +4060,21 @@
 							if(link=='false') return;
 							const ruby=document.createElement('ruby');
 							ruby.textContent=name;
-							const leftParenthesisRP=document.createElement('rp');
-							leftParenthesisRP.textContent='（';
-							ruby.appendChild(leftParenthesisRP);
 							const rt=document.createElement('rt');
 							rt.style.fontSize='smaller';
-							rt.textContent=link=='showCodeIdentifier'?link:get.pinyin(name).join(' ');
-							ruby.appendChild(rt);
-							const rightParenthesisRP=document.createElement('rp');
-							rightParenthesisRP.textContent='）';
-							ruby.appendChild(rightParenthesisRP);
+							if(link=='showPinyin2'||link=='showCodeIdentifier2'){
+								rt.textContent=link=='showCodeIdentifier2'?'['+link+']':'['+get.pinyin(name)+']';
+								ruby.appendChild(rt);
+							}else{
+								const leftParenthesisRP=document.createElement('rp');
+								leftParenthesisRP.textContent='（';
+								ruby.appendChild(leftParenthesisRP);
+								rt.textContent=link=='showCodeIdentifier'?link:get.pinyin(name).join(' ');
+								ruby.appendChild(rt);
+								const rightParenthesisRP=document.createElement('rp');
+								rightParenthesisRP.textContent='）';
+								ruby.appendChild(rightParenthesisRP);
+							}
 							firstChild.innerHTML=ruby.outerHTML;
 						}
 					},
@@ -54159,11 +54165,12 @@
 				}
 				
 				// 样式二
-				if(lib.config.show_characternamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showPinyin2'){
+				if(lib.config.show_characternamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_characternamepinyin=='showCodeIdentifier2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2'){
 					var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
-					if(lib.config.show_characternamepinyin=='showPinyin2'){
+					if(lib.config.show_characternamepinyin=='showPinyin2'||lib.config.show_characternamepinyin=='showCodeIdentifier2'){
 						var charactername=get.rawName(name);
 						var characterpinyin=get.pinyin(charactername);
+						if(lib.config.show_characternamepinyin=='showCodeIdentifier2') characterpinyin=name;
 						var nameinfo=get.character(name);
 						var charactersex=get.translation(nameinfo[0]);
 						const charactergroups=get.is.double(name,true);
@@ -54199,8 +54206,9 @@
 						this.classList.add('active');
 						var skillname=get.translation(this.link);
 						var skilltranslationinfo=get.skillInfoTranslation(this.link);
-						if(lib.config.show_skillnamepinyin=='showPinyin2'&&skillname!='阵亡'){
+						if((lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2')&&skillname!='阵亡'){
 							var skillpinyin=get.pinyin(skillname);
+							if(lib.config.show_skillnamepinyin=='showCodeIdentifier2') skillpinyin=this.link;
 							intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+skillpinyin+']'+'</span>'+'  '+skilltranslationinfo;
 						}else{
 							intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+skilltranslationinfo;
@@ -54217,8 +54225,9 @@
 							for(var i=0;i<derivation.length;i++){
 								var derivationname=get.translation(derivation[i]);
 								var derivationtranslationinfo=get.skillInfoTranslation(derivation[i]);
-								if(lib.config.show_skillnamepinyin=='showPinyin2'&&derivationname.length<=5&&derivation[i].indexOf('_faq')==-1){
+								if((lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2')&&derivationname.length<=5&&derivation[i].indexOf('_faq')==-1){
 									var derivationpinyin=get.pinyin(derivationname);
+									if(lib.config.show_skillnamepinyin=='showCodeIdentifier2') derivationpinyin=derivation[i];
 									intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+derivationpinyin+']'+'</span>'+'  '+derivationtranslationinfo;
 								}else{
 									intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+derivationtranslationinfo;
