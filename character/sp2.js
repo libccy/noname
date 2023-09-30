@@ -8452,6 +8452,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					result:{
+						order:10,
 						player:function(player,target){
 							if(player.countCards('hs',function(card){
 								return get.tag(card,'damage')&&player.canUse(card,target);
@@ -8499,7 +8500,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:function(card,player,target){
 							if(target!=player.storage.yinju2) return;
 							if(card.name=='lebu') return;
-							return [0,0.5,0,0.5];
+							if(card.name!=='huogong'&&get.tag(card,'damage')&&target.isDamaged()) [1,0.6,0,2.4];
+							return [1,0.6,1,0.6];
 						},
 					},
 				},
