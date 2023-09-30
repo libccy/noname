@@ -958,6 +958,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.getParent().excluded.add(player);
 				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							let hs=player.getCards('h',i=>i!==card&&(!card.cards||!card.cards.contains(i))),num=player.getCardUsable('sha');
+							if(card.name!=='sha'&&card.name!=='juedou'||hs.length<target.countCards('h')) return 1;
+							if(game.hasPlayer2(function(current){
+								return current.getHistory('useCard',function(evt){
+									return evt.card&&['sha','juedou'].includes(evt.card.name)&&evt.targets.includes(player);
+								}).length>0;
+							})) return 1;
+							if(card.name==='sha') num--;
+							hs=hs.filter(i=>{
+								if(i.name==='juedou') return true;
+								if(num&&i.name==='sha'){
+									num--;
+									return true;
+								}
+								return false;
+							});
+							if(!hs.length) return 'zeroplayertarget';
+							num=1-2/3/hs.length;
+							return [num,0,num,0];
+						}
+					}
+				}
 			},
 			"drlt_qianjie":{
 				group:["drlt_qianjie_1","drlt_qianjie_2","drlt_qianjie_3"],
