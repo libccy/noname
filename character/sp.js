@@ -10084,6 +10084,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				prompt2:'令其交给你一张手牌，并根据类型获得对应的标记',
+				check:function(event,player){
+					return get.attitude(_status.event.player,event.player)>0;
+				},
 				content:function(){
 					'step 0'
 					event.target=trigger.player;
