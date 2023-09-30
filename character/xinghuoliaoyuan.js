@@ -1574,8 +1574,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		translate:{
 			xinghuoliaoyuan:'星火燎原',
 			"sp_taishici":"SP太史慈",
+			sp_taishici_prefix:'SP',
 			wangcan:"王粲",
 			"re_jsp_pangtong":"SP庞统",
+			re_jsp_pangtong_prefix:'SP',
 			lvdai:"吕岱",
 			"re_zhangliang":"张梁",
 			lvqian:"吕虔",

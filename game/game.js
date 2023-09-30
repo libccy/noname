@@ -33641,6 +33641,10 @@
 		]),
 		natureSeparator:'|',
 		namePrefix:new Map([
+			['界',{
+				color:'#fdd559',
+				nature:'soilmm',
+			}],
 			['谋',{
 				color:'#def7ca',
 				nature:'woodmm',
@@ -33668,6 +33672,16 @@
 			['侠',{
 				color:'#dddddd',
 				nature:'qunmm',
+			}],
+			['SP',{
+				getSpan:(prefix,name)=>{
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr">SP</span>`;
+				},
+			}],
+			['界SP',{
+				getSpan:(prefix,name)=>{
+					return get.prefixSpan('界')+get.prefixSpan('SP')
+				},
 			}],
 		]),
 		groupnature:{
@@ -57332,10 +57346,7 @@
 			if(lib.translate[str+'_prefix']){
 				return str2.slice(lib.translate[str+'_prefix'].length);
 			}
-			if(str2.indexOf('SP')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('TW')==0){
+			if(str2.indexOf('TW')==0){
 				str2=str2.slice(2);
 			}
 			else if(str2.indexOf('OL')==0){
@@ -57368,10 +57379,7 @@
 			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
 			var str2=lib.translate[str];
 			if(!str2) return '';
-			if(str2.indexOf('SP')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('TW')==0){
+			if(str2.indexOf('TW')==0){
 				str2=str2.slice(2);
 			}
 			else if(str2.indexOf('OL')==0){
@@ -57396,12 +57404,9 @@
 			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
 			if(!str2) return '';
 			if(lib.translate[str+'_prefix']){
-				return `${get.prefixSpan(lib.translate[str+'_prefix'])}<span>${str2.slice(lib.translate[str+'_prefix'].length)}</span>`;
+				return `${get.prefixSpan(lib.translate[str+'_prefix'],str)}<span>${str2.slice(lib.translate[str+'_prefix'].length)}</span>`;
 			}
-			if(str2.indexOf('SP')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('TW')==0){
+			if(str2.indexOf('TW')==0){
 				str2=str2.slice(2);
 			}
 			else if(str2.indexOf('OL')==0){
@@ -57421,16 +57426,16 @@
 			}
 			return get.verticalStr(str2,true);
 		},
-		prefixSpan:function(prefix){
-			let color='#fdd559',nature='soilmm';
+		prefixSpan:function(prefix,name){
+			let color='#ffffff',nature=false;
 			const map=lib.namePrefix.get(prefix);
 			if(map){
-				if(map.getSpan) return map.getSpan(prefix);
+				if(map.getSpan) return map.getSpan(prefix,name);
 				if(map.color) color=map.color;
 				if(map.nature) nature=map.nature;
 				if(map.showName) prefix=map.showName;
 			}
-			return `<span style="color: ${color};" data-nature="${nature}">${prefix}</span>`
+			return `<span style="color: ${color};"${nature?(`data-nature="${nature}"`):''}>${prefix}</span>`
 		},
 		slimName:function(str){
 			return get.verticalStr(get.slimNameHorizontal(str),true);

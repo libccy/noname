@@ -13988,7 +13988,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-					get.translation(trigger.player.judging[0])+'，'+get.prompt('guidao'),'he',function(card){
+					get.translation(trigger.player.judging[0])+'，'+get.prompt('nswangfeng'),'he',function(card){
 						return get.color(card)=='red';
 					}).set('ai',function(card){
 						var trigger=_status.event.getTrigger();
@@ -17051,7 +17051,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			diy_jiaoxia:{
-				audio:['jiaoxia',2],
+				//audio:['jiaoxia',2],
 				trigger:{target:'useCardToBegin'},
 				filter:function(event,player){
 					return event.card&&get.color(event.card)=='red';
@@ -18049,6 +18049,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_nanhua_left:'幻身·左',
 			ns_nanhua_right:'幻身·右',
 			ns_huamulan:'SP花木兰',
+			ns_huamulan_prefix:'SP',
 			ns_huangzu:'黄祖',
 			ns_yanliang:'颜良',
 			ns_wenchou:'文丑',
@@ -18059,6 +18060,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_wangyue:'王越',
 			ns_yuji:'于吉',
 			ns_caocaosp:'SP曹操',
+			ns_caocaosp_prefix:'SP',
 			ns_xinxianying:'辛宪英',
 			ns_sunjian:'孙坚',
 			ns_simazhao:'司马昭',
@@ -18079,6 +18081,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_luyusheng:'陆郁生',
 			
 			sp_key_yuri:'SP仲村由理',
+			sp_key_yuri_prefix:'SP',
 			key_lucia:'此花露西娅',
 			key_kyousuke:'枣恭介',
 			key_yuri:'仲村由理',
@@ -18119,6 +18122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_ao:'空门苍',
 			key_yuzuru:'音无结弦',
 			sp_key_kanade:'SP立华奏',
+			sp_key_kanade_prefix:'SP',
 			key_mio:'西园美鱼',
 			key_midori:'西园美鸟',
 			key_kyoko:'岬镜子',
