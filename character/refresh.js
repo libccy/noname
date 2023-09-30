@@ -15244,6 +15244,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehuomo_info:'每种牌名每回合限一次。当你需要使用一张基本牌时，你可以将一张黑色非基本牌置于牌堆顶，视为使用此基本牌。',
 			zhoutai:'界周泰',
 			zhoutai_prefix:'界',
+			caoren:'界曹仁',
+			caoren_prefix:'界',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

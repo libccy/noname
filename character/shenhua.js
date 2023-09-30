@@ -8039,7 +8039,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuhuang:'旧徐晃',
 			pangde:'旧庞德',
 			xiahouyuan:'旧夏侯渊',
-			caoren:'界曹仁',
 			huangzhong:'旧黄忠',
 			sp_zhangjiao:'张角',
 			weiyan:'旧魏延',

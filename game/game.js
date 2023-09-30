@@ -33634,6 +33634,24 @@
 			['stab','image/card/cisha.png']
 		]),
 		natureSeparator:'|',
+		namePrefix:new Map([
+			['谋',{
+				color:'#def7ca',
+				nature:'woodmm',
+			}],
+			['武',{
+				color:'#a5e3b9',
+				nature:'kamimm',
+			}],
+			['乐',{
+				color:'#f7f4fc',
+				nature:'keymm',
+			}],
+			['神',{
+				color:'#d6cde9',
+				nature:'thundermm',
+			}],
+		]),
 		groupnature:{
 			shen:'thunder',
 			wei:'water',
@@ -57359,7 +57377,7 @@
 			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
 			if(!str2) return '';
 			if(lib.translate[str+'_prefix']){
-				return `<span style="color: #FDD559;">${lib.translate[str+'_prefix']}</span><span>${str2.slice(lib.translate[str+'_prefix'].length)}</span>`;
+				return `${get.prefixSpan(lib.translate[str+'_prefix'])}<span>${str2.slice(lib.translate[str+'_prefix'].length)}</span>`;
 			}
 			if(str2.indexOf('SP')==0){
 				str2=str2.slice(2);
@@ -57383,6 +57401,17 @@
 				str2=str2.slice(2);
 			}
 			return get.verticalStr(str2,true);
+		},
+		prefixSpan:function(prefix){
+			let color='#fdd559',nature='soilmm';
+			const map=lib.namePrefix.get(prefix);
+			if(map){
+				if(map.getSpan) return map.getSpan(prefix);
+				if(map.color) color=map.color;
+				if(map.nature) nature=map.nature;
+				if(map.showName) prefix=map.showName;
+			}
+			return `<span style="color: ${color};" data-nature="${nature}">${prefix}</span>`
 		},
 		slimName:function(str){
 			return get.verticalStr(get.slimNameHorizontal(str),true);
