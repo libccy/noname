@@ -8055,7 +8055,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},targets[0],targets[1])
 				},
 				ai:{
-					order:1,
+					order:function(){
+						return get.order({name:'tao'})+1;
+					},
 					result:{
 						target:function(player,target){
 							if(player.hasUnknown()&&target!=player.next&&target!=player.previous) return 0;

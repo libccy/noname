@@ -3394,12 +3394,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var next=player.chooseToDiscard('he',get.prompt('chaofeng',trigger.player),str);
 					next.set('ai',function(card){
-						var player=_status.event.player,suit=_status.event.color,number=_status.event.type,att=_status.event.att;
-						var val=4-get.value(card);
-						if(get.color(card)==suit) val+=3;
-						if(get.type2(card)==number){
-							if(att<=0) val+=4;
-							else val-=3;
+						var player=_status.event.player,att=_status.event.att;
+						var val=4.2-get.value(card);
+						if(get.color(card)==_status.event.color) val+=3;
+						if(get.type2(card)==_status.event.type){
+							if(att<0) val+=4;
+							else if(att===0) val+=2;
+							else val=0;
 						}
 						return val;
 					});
