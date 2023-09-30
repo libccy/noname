@@ -8280,6 +8280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 						trigger:{player:'dieAfter'},
+						forceDie:true,
 						filter:function(event,player){
 							for(let i of game.players){
 								if(i.hasSkill('fengxiang')) return false;

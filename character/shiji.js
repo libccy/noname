@@ -5920,6 +5920,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return !game.hasPlayer(current=>current.hasSkill('spshanxi_suoming'));
 				},
+				forceDie:true,
 				silent:true,
 				charlotte:true,
 				content:function(){
