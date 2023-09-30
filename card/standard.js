@@ -2108,8 +2108,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				audio:true,
 				prompt:'将两张手牌当杀使用或打出',
 				check:function(card){
-					if(card.name=='sha') return 0;
-					return 5-get.value(card)
+					let player=_status.event.player;
+					if(player.hasCard(function(card){
+						return get.name(card)=='sha';
+					})) return 0;
+					if(_status.event&&_status.event.name=='chooseToRespond'&&player.hp<3&&!player.countCards('hs',function(card){
+						return get.name(card)!='tao'&&get.name(card)!='jiu';
+					})) return (player.hp>1?10:8)-get.value(card);
+					return Math.max(5,8-0.7*player.hp)-get.value(card);
 				},
 				ai:{
 					respondSha:true,
@@ -2144,10 +2150,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					next.set('ai',function(card){
 						var evt=_status.event.getTrigger();
 						if(get.attitude(evt.player,evt.target)<0){
-							if(evt.baseDamage+evt.extraDamage>=Math.min(2,evt.target.hp)){
-								return 8-get.value(card)
-							}
-							return 5-get.value(card)
+							if(player.needsToDiscard()) return 15-get.value(card);
+							if(evt.baseDamage+evt.extraDamage>=Math.min(2,evt.target.hp)) return 8-get.value(card);
+							return 5-get.value(card);
 						}
 						return -1;
 					});
