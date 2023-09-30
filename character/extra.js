@@ -584,7 +584,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'orange',
 				filter:function(event,player){
-					return player.getStorage('dctuoyu').length==3;
+					return true;
+					//return player.getStorage('dctuoyu').length==3;
 				},
 				content:function(){
 					'step 0'
@@ -592,6 +593,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					'step 1'
 					if(game.countPlayer()>2){
+						if(player==trigger.player&&!trigger.skill){
+							var evt=trigger.getParent();
+							if(evt.name=='phaseLoop'&&evt._isStandardLoop) evt.player=player.next;
+						}
 						player.chooseTarget(true,'请选择一名要更换座次的角色，将自己移动到该角色的上家位置',function(card,player,target){
 							return target!=player&&target!=player.next;
 						}).set('ai',function(target){
