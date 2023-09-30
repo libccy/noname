@@ -1019,7 +1019,7 @@ input.fileinput::-webkit-file-upload-button {
 }
 
 .config {
-	height: 25px;
+	/* height: 25px; */
 	line-height: 25px;
 	position: relative;
 }
