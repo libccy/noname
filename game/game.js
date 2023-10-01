@@ -8993,6 +8993,7 @@
 							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,0);
 						});
 						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: local('Noname Suit'), url('${lib.assetURL}font/suits.woff2');}`,0);
+						fontSheet.insertRule(`@font-face {font-family: 'Consolas'; src: local('Consolas'), url('${lib.assetURL}font/consola.woff2');}`,0)
 						appearenceConfig.cardtext_font.item.default='默认';
 						appearenceConfig.global_font.item.default='默认';
 					}
@@ -33666,16 +33667,47 @@
 				nature:'firemm',
 			}],
 			['晋',{
-				color:'#e1a6f0',
+				color:'#f3c5ff',
 				nature:'blackmm',
 			}],
 			['侠',{
-				color:'#dddddd',
+				color:'#eeeeee',
 				nature:'qunmm',
+			}],
+			['起',{
+				color:'#c3f9ff',
+				nature:'thundermm',
+			}],
+			['承',{
+				color:'#c3f9ff',
+				nature:'thundermm',
+			}],
+			['手杀',{
+				getSpan:(prefix,name)=>{
+					if(lib.characterPack.shiji&&name in lib.characterPack.shiji){
+						for(let i in lib.characterSort.shiji){
+							if(lib.characterSort.shiji[i].includes(name)){
+								prefix=get.translation(i).slice(-1);
+								break;
+							}
+						}
+					}
+					return `<span style="color:#def7ca" data-nature="watermm">${prefix}</span>`;
+				},
+			}],
+			['TW',{
+				getSpan:(prefix,name)=>{
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:Consolas">TW</span>`;
+				},
 			}],
 			['SP',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr">SP</span>`;
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:Consolas">SP</span>`;
+				},
+			}],
+			['OL',{
+				getSpan:(prefix,name)=>{
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:Consolas;color:#fcc4b3" data-nature="firemm">OL</span>`;
 				},
 			}],
 			['界SP',{

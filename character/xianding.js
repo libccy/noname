@@ -141,9 +141,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var number=get.number(card,false);
 							if(!list.contains(card)&&number==8){
 								list.push(card);
-								if(list.length==cards.length) break;
+								if(list.length>=cards.length) break;
 							}
 						}
+						if(list.length>=cards.length) break;
 					}
 					if(list.length){
 						player.gain(list,'gain2').gaintag.add('dcxiongmu_tag');
@@ -153,7 +154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(target.countCards('h')>=target.getHp()||player.hasSkillTag('jueqing')) return;
+							if(target.countCards('h')>target.getHp()||player.hasSkillTag('jueqing')) return;
 							if(player._dcxiongmu_temp) return;
 							if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
 							if(get.tag(card,'damage')){
@@ -200,7 +201,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					minus:{
 						trigger:{player:'damageBegin4'},
 						filter:function(event,player){
-							return player.countCards('h')<player.hp&&game.getGlobalHistory('everything',evt=>{
+							return player.countCards('h')<=player.hp&&game.getGlobalHistory('everything',evt=>{
 								return evt.name=='damage'&&evt.player==player;
 							},event).indexOf(event)==0;
 						},
@@ -3801,7 +3802,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var num=ui.selected.buttons.filter(i=>get.owner(i.link)==target).length;
 						var val=get.buttonValue(button);
 						if(num>2) val/=Math.sqrt(num);
-						if(get.attitude(player,owner)>0) return -val;
+						if(get.attitude(player,target)>0) return -val;
 						return val;
 						//return -(get.position(card)!='h'?get.value(card,target):(4.5+Math.random()-0.2*(num>2?1:0)))*get.attitude(player,target);
 					});
