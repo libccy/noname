@@ -13273,7 +13273,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.player!=player&&event.player.hp<=0&&player.countCards('h')>0;
 				},
 				check:function(event,player){
-					if(get.attitude(player,event.player)<0) return false;
+					if(get.attitude(player,event.player)<=0) return false;
 					if(player.countCards('h',{name:['tao','jiu']})+event.player.hp<0) return false;
 					return true;
 				},
