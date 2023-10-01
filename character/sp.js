@@ -4168,7 +4168,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('hes')>1;
 				},
 				check:function(card){
-					return 0;
+					var player = _status.event.player;
+					if(game.countPlayer(function (current) {
+						return current != player && player.canUse('sha', current) && get.effect(current, {name: 'sha'}, player, player) > 0;
+					}) <= ui.selected.cards.length) return 0;
+					if(_status.event.player.countCards('hes') >= 3) return 8 - ui.selected.cards.length - get.value(card);
+					return 6 - ui.selected.cards.length - get.value(card);
 				},
 				position:'hes',
 				viewAs:{
@@ -4179,7 +4184,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('rekenshang_effect');
 				},
 				ai:{
-					order:1,
+					order:function(item,player){
+						if(player.countCards('hes') >= 3) return 6;
+						return 4;
+					},
+					result:{
+						target:function(player,target,card,isLink){
+							var eff = function () {
+								if(!isLink && player.hasSkill('jiu')) {
+									if(!target.hasSkillTag('filterDamage', null, {
+										player: player,
+										card: card,
+										jiu: true
+									})){
+										if(get.attitude(player, target) > 0) return -7;
+										return -4;
+									}
+									return -0.5;
+								}
+								return -1.5;
+							}();
+							if(!isLink && target.mayHaveShan() && !player.hasSkillTag('directHit_ai', true, {
+								target: target,
+								card: card
+							}, true)) return eff / 1.2;
+							return eff;
+						}
+					},
 					respondSha:true,
 					skillTagFilter:player=>player.countCards('hes')>1,
 				},
