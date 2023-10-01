@@ -484,12 +484,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}());
 					'step 1'
 					var guessedNum=result.index;
-					var type=get.type2(trigger.card,trigger.player);
 					player.chat('我猜'+get.cnNumber(guessedNum)+'张');
 					game.log(player,'猜测',trigger.player,'有',get.cnNumber(guessedNum)+'张'+get.translation(type)+'牌');
 					event.guessedNum=guessedNum;
 					game.delay();
 					'step 2'
+					var type=get.type2(trigger.card,trigger.player);
 					var count=trigger.player.countCards('h',card=>get.type2(card)==type);
 					var guessedNum=event.guessedNum;
 					if(count==guessedNum){
@@ -9547,13 +9547,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yanyu2:{
 				trigger:{player:'phaseUseEnd'},
-				direct:true,
 				filter:function(event,player){
-					return player.getHistory('lose',function(evt){
-						var evt2=evt.getParent();
-						return evt2.name=='useSkill'&&evt2.skill=='yanyu'&&evt.getParent(3)==event;
+					return player.getHistory('useSkill',function(evt){
+						return evt.event.getParent('phaseUse')==event&&evt.skill=='yanyu';
 					}).length>=2;
 				},
+				direct:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('yanyu'),'令一名男性角色摸两张牌',function(card,player,target){
@@ -13274,7 +13273,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.player!=player&&event.player.hp<=0&&player.countCards('h')>0;
 				},
 				check:function(event,player){
-					if(get.attitude(player,event.player)<0) return false;
+					if(get.attitude(player,event.player)<=0) return false;
 					if(player.countCards('h',{name:['tao','jiu']})+event.player.hp<0) return false;
 					return true;
 				},

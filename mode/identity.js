@@ -304,6 +304,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.phaseLoop(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
 		},
 		game:{
+			canReplaceViewpoint:()=>true,
 			getState:function(){
 				var state={};
 				for(var i in lib.playerOL){

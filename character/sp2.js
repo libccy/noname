@@ -3394,12 +3394,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var next=player.chooseToDiscard('he',get.prompt('chaofeng',trigger.player),str);
 					next.set('ai',function(card){
-						var player=_status.event.player,suit=_status.event.color,number=_status.event.type,att=_status.event.att;
-						var val=4-get.value(card);
-						if(get.color(card)==suit) val+=3;
-						if(get.type2(card)==number){
-							if(att<=0) val+=4;
-							else val-=3;
+						var player=_status.event.player,att=_status.event.att;
+						var val=4.2-get.value(card);
+						if(get.color(card)==_status.event.color) val+=3;
+						if(get.type2(card)==_status.event.type){
+							if(att<0) val+=4;
+							else if(att===0) val+=2;
+							else val=0;
 						}
 						return val;
 					});
@@ -8452,6 +8453,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					result:{
+						order:10,
 						player:function(player,target){
 							if(player.countCards('hs',function(card){
 								return get.tag(card,'damage')&&player.canUse(card,target);
@@ -8499,7 +8501,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:function(card,player,target){
 							if(target!=player.storage.yinju2) return;
 							if(card.name=='lebu') return;
-							return [0,0.5,0,0.5];
+							if(card.name!=='huogong'&&get.tag(card,'damage')&&target.isDamaged()) [1,0.6,0,2.4];
+							return [1,0.6,1,0.6];
 						},
 					},
 				},
@@ -10252,6 +10255,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xingshen_info":"当你受到伤害后，你可以摸一张牌且下一次发动〖严教〗亮出的牌数+1。若你的手牌数为全场最少，则改为摸两张牌；若你的体力值为全场最少，则〖严教〗亮出的牌数改为+2（加值总数不能超过4）。",
 			
 			sp_zhanghe:'SP张郃',
+			sp_zhanghe_prefix:'SP',
 			yuanlve:'远略',
 			yuanlve_info:'出牌阶段限一次，你可以将一张非装备牌交给一名角色，然后该角色可以使用该牌并令你摸一张牌。',
 			xunchen:'OL荀谌',
@@ -10262,6 +10266,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mouzhi2:'谋识',
 			mouzhi_info:'出牌阶段限一次，你可以将一张手牌交给一名角色，若如此做，当其于其下回合的出牌阶段内对一名角色造成伤害后，若是此阶段其第一次对该角色造成伤害，你摸一张牌。',
 			sp_shenpei:'SP审配',
+			sp_shenpei_prefix:'SP',
 			gangzhi:'刚直',
 			gangzhi_info:'锁定技，当你即将受到其他角色造成的伤害时，或即将对其他角色造成伤害时，你防止此伤害，改为受到伤害的角色失去等量的体力。',
 			beizhan:'备战',
@@ -10284,6 +10289,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liangying:'粮营',
 			liangying_info:'锁定技，若你有“粮”标记，则友方角色摸牌阶段摸牌数+1；当你失去所有“粮”标记后，你减1点体力上限，然后令敌方角色各摸两张牌。',
 			sp_xuyou:'SP许攸',
+			sp_xuyou_prefix:'SP',
 			spshicai:'恃才',
 			spshicai2:'恃才',
 			spshicai_info:'出牌阶段，牌堆顶的一张牌对你可见。你可以弃置一张牌，然后获得牌堆顶的一张牌，且不能再发动〖恃才〗直到此牌离开你的手牌区。',
@@ -10294,6 +10300,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chenggong:'逞功',
 			chenggong_info:'当有角色使用牌指定目标后，若此牌对目标数大于1，则你可令使用者摸一张牌。',
 			sp_zhangliao:'SP张辽',
+			sp_zhangliao_prefix:'SP',
 			//这仨技能给SP仲村由理毫无违和感好吗！！！
 			mubing:'募兵',
 			mubing_info:'出牌阶段开始时，你可以展示牌堆顶的三张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。',

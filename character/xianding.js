@@ -137,13 +137,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var piles=['cardPile','discardPile'];
 					for(var pile of piles){
 						for(var i=0;i<ui[pile].childNodes.length;i++){
-							var card=ui.cardPile.childNodes[i];
+							var card=ui[pile].childNodes[i];
 							var number=get.number(card,false);
 							if(!list.contains(card)&&number==8){
 								list.push(card);
-								if(list.length==cards.length) break;
+								if(list.length>=cards.length) break;
 							}
 						}
+						if(list.length>=cards.length) break;
 					}
 					if(list.length){
 						player.gain(list,'gain2').gaintag.add('dcxiongmu_tag');
@@ -153,7 +154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(player.hasSkillTag('jueqing')) return;
+							if(target.countCards('h')>target.getHp()||player.hasSkillTag('jueqing')) return;
 							if(player._dcxiongmu_temp) return;
 							if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
 							if(get.tag(card,'damage')){
@@ -200,7 +201,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					minus:{
 						trigger:{player:'damageBegin4'},
 						filter:function(event,player){
-							return game.getGlobalHistory('everything',evt=>{
+							return player.countCards('h')<=player.hp&&game.getGlobalHistory('everything',evt=>{
 								return evt.name=='damage'&&evt.player==player;
 							},event).indexOf(event)==0;
 						},
@@ -308,7 +309,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(get.owner(card)==player&&get.position(card)=='h'&&game.hasPlayer(current=>current!=player)){
-						player.chooseTarget(`赏誉：将${get.translation(card)}交给一名角色`,lib.filter.notMe,true);
+						player.chooseTarget(`是否将${get.translation(card)}交给一名其他角色？`,lib.filter.notMe);
 					}
 					else event.finish();
 					'step 2'
@@ -316,8 +317,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.line(target);
 						player.give(card,target).gaintag.add('dcshangyu_tag');
-						player.addSkill('dcshangyu_effect');
 					}
+					player.addSkill('dcshangyu_effect');
 				},
 				subSkill:{
 					effect:{
@@ -425,7 +426,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					var choices=Array.from({length:Math.min(5,game.countPlayer())}).map((_,i)=>get.cnNumber(i+1,true));
+					var choices=Array.from({length:Math.min(5,game.players.length+game.dead.length)}).map((_,i)=>get.cnNumber(i+1,true));
 					player.chooseControl(choices,'cancel2').set('prompt',get.prompt('dccaixia')).set('prompt2','你可以摸至多'+get.cnNumber(choices.length)+'张牌，但是你此后需要再使用等量的牌才可再发动本技能。').set('ai',()=>{
 						return _status.event.choice;
 					}).set('choice',function(){
@@ -3799,7 +3800,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 0;
 						}
 						var num=ui.selected.buttons.filter(i=>get.owner(i.link)==target).length;
-						return -(get.position(card)!='h'?get.value(card,target):(4.5+Math.random()-0.2*(num>2?1:0)))*get.attitude(player,target);
+						var val=get.buttonValue(button);
+						if(num>2) val/=Math.sqrt(num);
+						if(get.attitude(player,target)>0) return -val;
+						return val;
+						//return -(get.position(card)!='h'?get.value(card,target):(4.5+Math.random()-0.2*(num>2?1:0)))*get.attitude(player,target);
 					});
 					'step 1'
 					if(result.bool){
@@ -6298,7 +6303,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.list=list;
 					player.draw(list[0]);
 					'step 1'
-					player.storage.dchuishu_effect=event.list[2];
 					player.addTempSkill('dchuishu_effect');
 					player.chooseToDiscard('h',true,event.list[1]);
 				},
@@ -6311,22 +6315,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					content:function(storage,player){
 						var list=lib.skill.dchuishu.getList(player);
-						return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等同于本回合弃牌数的非基本牌。';
+						return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得['+list[2]+']张非基本牌。';
 					},
 				},
 				subSkill:{
 					effect:{
+						charlotte:true,
 						audio:'dchuishu',
 						trigger:{
 							player:'loseAfter',
 							global:'loseAsyncAfter',
 						},
-						forced:true,
-						popup:false,
-						charlotte:true,
-						onremove:true,
 						filter:function(event,player){
-							var num=player.storage.dchuishu_effect;
+							var num=lib.skill.dchuishu.getList(player)[2];
 							if(typeof num!='number') return false;
 							if(event.type!='discard'||event.getlx===false) return false;
 							var evt=event.getl(player);
@@ -6342,14 +6343,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							return prev>num;
 						},
+						forced:true,
+						popup:false,
+						firstDo:true,
 						content:function(){
-							player.removeSkill('dchuishu_effect');
-							var evt=trigger.getl(player);
-							var num=0;
-							player.getHistory('lose',function(evt){
-								if(evt.type!='discard') return false;
-								num+=evt.cards2.length;
-							});
+							var num=lib.skill.dchuishu.getList(player)[2];
 							var cards=[];
 							for(var i=0;i<num;i++){
 								var card=get.discardPile(function(card){
@@ -11802,6 +11800,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('zhafu_hf');
 					target.addMark('zhafu_hf',1);
 				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player,target){
+							return Math.max(0,1+target.countCards('h')-game.countPlayer(current=>{
+								if(get.attitude(target,current)>0) return 0.3;
+								if(target.hasJudge('lebu')) return 0.6;
+								if(target.inRange(current)) return 1.5;
+								return 1;
+							}));
+						},
+						target:function(player,target){
+							return -Math.max(0,1+target.countCards('h')-game.countPlayer(current=>{
+								if(get.attitude(target,current)>0) return 0.3;
+								if(target.hasJudge('lebu')) return 0.6;
+								if(target.inRange(current)) return 1.5;
+								return 1;
+							}));
+						}
+					}
+				},
 				subSkill:{
 					hf:{
 						trigger:{
@@ -12175,7 +12194,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dchuishu:function(player){
 				var list=lib.skill.dchuishu.getList(player);
-				return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中随机获得等同于本回合弃牌数的非基本牌。';
+				return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中随机获得〖慧淑〗第三个括号数字张非基本牌。';
 			},
 			dcshoutan:function(player){
 				if(player.storage.dcshoutan) return '转换技。出牌阶段限一次，阴：你可以弃置一张不为黑色的手牌。<span class="bluetext">阳：你可以弃置一张黑色手牌。</span>';
@@ -12432,7 +12451,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcpeiqi_info:'当你受到伤害后，你可以移动场上的一张牌。然后若场上所有角色均在彼此的攻击范围内，则你可以再移动场上的一张牌。',
 			quanhuijie:'全惠解',
 			dchuishu:'慧淑',
-			dchuishu_info:'摸牌阶段结束时，你可以摸[3]张牌。若如此做：你弃置[1]张手牌，且当你于本回合内弃置第[2]+1张牌后，你从弃牌堆中随机获得等同于本回合弃牌数的非基本牌。',
+			dchuishu_info:'摸牌阶段结束时，你可以摸[3]张牌。若如此做：你弃置[1]张手牌，且当你于本回合内弃置第[2]+1张牌后，你从弃牌堆中随机获得〖慧淑〗第三个括号数字张非基本牌。',
 			dcyishu:'易数',
 			dcyishu_info:'锁定技。当你不因出牌阶段而失去牌后，你同时令{〖慧淑〗的中括号内最小的一个数字+2}且{〖慧淑〗的中括号内最大的一个数字-1}。',
 			dcligong:'离宫',
@@ -12581,6 +12600,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dchuayi:'华衣',
 			dchuayi_info:'结束阶段，你可以判定，然后你获得如下效果直到你下回合开始时：红色，其他角色回合结束时，你摸一张牌；黑色，当你受到伤害后，你摸两张牌。',
 			wu_zhugeliang:'武诸葛亮',
+			wu_zhugeliang_prefix:'武',
 			dcjincui:'尽瘁',
 			dcjincui_info:'锁定技。①游戏开始时，你将手牌摸至七张。②准备阶段，你将体力值回复或失去至等同于牌堆中点数为7的牌数（你的体力值最低因此调整至1）。然后你观看牌堆顶X张牌，将这些牌以任意顺序置于牌堆顶或牌堆底（X为你的体力值）。',
 			dcqingshi:'情势',
@@ -12652,10 +12672,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_xujing:'许靖',
 			dcshangyu:'赏誉',
 			dcshangyu_tag:'赏誉',
-			dcshangyu_info:'锁定技。游戏开始时，你获得一张【杀】并记录之，然后将此牌交给一名角色，你获得如下效果：1.当一名角色使用此牌造成伤害后，你与其各摸一张牌；2.当此牌进入弃牌堆后，你将此牌交给一名本回合未以此法得到过此牌的角色。',
+			dcshangyu_info:'锁定技。游戏开始时，你获得一张【杀】并记录之，并可以将此牌交给一名角色。然后你获得如下效果：1.当一名角色使用此牌造成伤害后，你与其各摸一张牌；2.当此牌进入弃牌堆后，你将此牌交给一名本回合未以此法得到过此牌的角色。',
 			dccaixia:'才瑕',
-			dccaixia_info:'当你造成或受到伤害后，若你没有“瑕”，你可以摸至多X张牌并获得X枚“瑕”，然后当你使用牌时，移去1枚“瑕”（X为场上角色数且至多为5）。',
+			dccaixia_info:'当你造成或受到伤害后，若你没有“瑕”，你可以摸至多X张牌并获得X枚“瑕”，然后当你使用牌时，移去1枚“瑕”（X为本局游戏总角色数且至多为5）。',
 			wu_luxun:'武陆逊',
+			wu_luxun_prefix:'武',
 			dcxiongmu:'雄幕',
 			dcxiongmu_tag:'雄幕',
 			dcxiongmu_info:'①一轮游戏开始时，你可以将手牌摸至体力上限（若手牌数不小于体力上限则跳过），然后将任意张牌随机置入牌堆，从牌堆或弃牌堆中获得等量的点数为8的牌，且这些牌不计入手牌上限。②当你于一回合首次受到伤害时，若你的手牌数不大于你的体力值，此伤害-1。',

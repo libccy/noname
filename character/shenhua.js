@@ -958,6 +958,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.getParent().excluded.add(player);
 				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							let hs=player.getCards('h',i=>i!==card&&(!card.cards||!card.cards.contains(i))),num=player.getCardUsable('sha');
+							if(card.name!=='sha'&&card.name!=='juedou'||hs.length<target.countCards('h')) return 1;
+							if(game.hasPlayer2(function(current){
+								return current.getHistory('useCard',function(evt){
+									return evt.card&&['sha','juedou'].includes(evt.card.name)&&evt.targets.includes(player);
+								}).length>0;
+							})) return 1;
+							if(card.name==='sha') num--;
+							hs=hs.filter(i=>{
+								if(i.name==='juedou') return true;
+								if(num&&i.name==='sha'){
+									num--;
+									return true;
+								}
+								return false;
+							});
+							if(!hs.length) return 'zeroplayertarget';
+							num=1-2/3/hs.length;
+							return [num,0,num,0];
+						}
+					}
+				}
 			},
 			"drlt_qianjie":{
 				group:["drlt_qianjie_1","drlt_qianjie_2","drlt_qianjie_3"],
@@ -4700,7 +4725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 10*Math.sqrt(Math.max(0.01,get.threaten(target)))/(3.5-draw)+dis/(2*game.countPlayer());
 						}
 						else{
-							if(target.isTurnedOver()) return -att-draw;
+							if(target.isTurnedOver()) return att-draw;
 							if(draw>=5) return -1;
 							if(current&&target.getSeatNum()<=current.getSeatNum()) return -att+draw/3;
 							return (4.25-draw)*10*Math.sqrt(Math.max(0.01,get.threaten(target)))+2*game.countPlayer()/dis;
@@ -8039,12 +8064,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuhuang:'旧徐晃',
 			pangde:'旧庞德',
 			xiahouyuan:'旧夏侯渊',
-			caoren:'界曹仁',
 			huangzhong:'旧黄忠',
 			sp_zhangjiao:'张角',
 			weiyan:'旧魏延',
 			xiaoqiao:'小乔',
-			zhoutai:'界周泰',
 			zhangjiao:'旧张角',
 			//yuji:'于吉',
 			shensu:'神速',

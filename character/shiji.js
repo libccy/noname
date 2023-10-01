@@ -1399,7 +1399,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:9,
 					result:{player:1},
 				},
-				group:'shanxie_exclude',
+				group:['shanxie_exclude','shanxie_shan'],
 				subSkill:{
 					exclude:{
 						trigger:{global:'useCard'},
@@ -1414,6 +1414,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							trigger.all_excluded=true;
 						},
+						sub:true
+					},
+					shan:{
+						trigger:{player:'useCardToPlayered'},
+						filter:function(event,player){
+							return event.target.isAlive()&&event.card.name=='sha';
+						},
+						silent:true,
+						content:function(){
+							trigger.target.addTempSkill('shanxie_banned');
+							trigger.target.storage.shanxie_banned={
+								card:trigger.card,
+								num:player.getAttackRange()*2
+							};
+						},
+						sub:true
+					},
+					banned:{
+						init:function(player){
+							player.storage.shanxie_banned={};
+						},
+						onremove:function(player){
+							delete player.storage.shanxie_banned;
+						},
+						trigger:{global:'useCardEnd'},
+						filter:function(event,player){
+							return event.card==player.storage.shanxie_banned.card;
+						},
+						silent:true,
+						content:function(){
+							player.removeSkill('shanxie_banned');
+						},
+						ai:{
+							effect:{
+								player:function(card,player,target){
+									if(get.name(card)=='shan'){
+										let num=get.number(card);
+										if(!num||num<=player.storage.shanxie_banned.num) return 'zeroplayertarget';
+									}
+								}
+							}
+						}
 					},
 				},
 			},
@@ -2229,8 +2271,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:-1,
 				log:false,
 				precontent:function(){
+					'step 0'
 					player.logSkill('dbzhuifeng');
 					player.loseHp();
+					event.forceDie=true;
+					'step 1'
+					//特殊处理
+					if(player.isDead()){
+						player.useResult(event.result,event.getParent())
+					}
 				},
 				ai:{
 					order:function(){
@@ -5801,6 +5850,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			spshanxi:{
 				audio:2,
+				init:function(player){
+					game.addGlobalSkill('spshanxi_bj');
+				},
+				onremove:function(player){
+					game.removeGlobalSkill('spshanxi_bj');
+				},
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -5859,6 +5914,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!result.bool) trigger.player.loseHp();
 					else trigger.player.give(result.cards,player);
 				},
+			},
+			spshanxi_bj:{
+				trigger:{player:'dieAfter'},
+				filter:function(event,player){
+					for(let i of game.players){
+						if(i.hasSkill('spshanxi_suoming')) return false;
+					}
+					return true;
+				},
+				silent:true,
+				forceDie:true,
+				charlotte:true,
+				content:function(){
+					game.removeGlobalSkill('spshanxi_bj');
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							let suoming=game.findPlayer(current=>current.hasSkill('spshanxi_suoming'));
+							if(suoming&&_status.event&&target===_status.event.dying&&target.hasMark('spshanxi')){
+								if(target.countCards('he')<2) return 'zerotarget';
+								return [1,get.attitude(target,suoming)>0?0:-1.2];
+							}
+						}
+					}
+				}
 			},
 			shameng:{
 				audio:2,
@@ -6317,6 +6398,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mifuren:['dc_mifuren','sp_mifuren'],
 		},
 		translate:{
+			liuba_prefix:'手杀',
+			sp_zhujun_prefix:'手杀',
+			sp_huangfusong_prefix:'手杀',
+			sp_zhangchangpu_prefix:'手杀',
+			sp_cuiyan_prefix:'手杀',
+			sp_huaman_prefix:'手杀',
+			sp_gaolan_prefix:'手杀',
+			sunyi_prefix:'手杀',
+			sp_wangshuang_prefix:'手杀',
+			sp_zongyu_prefix:'手杀',
+			db_wenyang_prefix:'手杀',
+			sp_yanghu_prefix:'手杀',
+			sp_zhangwen_prefix:'手杀',
+			sp_xujing_prefix:'手杀',
+			sp_huaxin_prefix:'手杀',
+			zhouchu_prefix:'手杀',
+			sp_mifuren_prefix:'手杀',
+			sp_xinpi_prefix:'手杀',
+			sp_bianfuren_prefix:'手杀',
+			sp_duyu_prefix:'手杀',
+			luotong_prefix:'手杀',
+			sp_wangcan_prefix:'手杀',
+			sp_sunshao_prefix:'手杀',
+			sp_xunchen_prefix:'手杀',
+			
 			sp_wangcan:'手杀王粲',
 			spqiai:'七哀',
 			spqiai_info:'出牌阶段限一次，你可以将一张非基本牌交给一名其他角色。然后其选择一项：①你回复1点体力。②你摸两张牌。',

@@ -2027,7 +2027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						prompt:function(event){
 							var player=_status.event.player;
-							return '将一张'+get.translation(player.storage.pshuxiao_use.suit)+'牌或点数为'+get.strNumber(player.storage.pshuxiao_use.number)+'的牌当作'+(player.storage.pshuxiao_use.card)+'使用';
+							return '将一张'+get.translation(player.storage.pshuxiao_use.suit)+'牌或点数为'+get.strNumber(player.storage.pshuxiao_use.number)+'的牌当作'+get.translation(player.storage.pshuxiao_use.card)+'使用';
 						}
 					}
 				}
@@ -6287,10 +6287,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		translate:{
 			sp_gongsunzan:'SP公孙瓒',
+			sp_gongsunzan_prefix:'SP',
 			sp_simazhao:'SP司马昭',
+			sp_simazhao_prefix:'SP',
 			sp_wangyuanji:'SP王元姬',
+			sp_wangyuanji_prefix:'SP',
 			sp_xinxianying:'SP辛宪英',
+			sp_xinxianying_prefix:'SP',
 			sp_liuxie:'SP刘协',
+			sp_liuxie_prefix:'SP',
 			spyicong_info:'弃牌阶段结束时，你可以将任意张牌置于你的武将牌上，称为「扈」。每有一张「扈」，其他角色与你计算距离时便+1。',
 			spyicong:'义从',
 			sptuji:'突骑',
@@ -6314,16 +6319,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spyinzhi:'隐智',
 			spyinzhi_info:'当你受到1点伤害后，你可以展示牌堆顶的两张牌。若其中有黑桃牌，则你可以进行至多X次「令一名角色获得伤害来源的一张手牌」的步骤。然后获得其余的牌。（X为其中黑桃牌的数量）',
 			yj_caoang:'SP曹昂',
+			yj_caoang_prefix:'SP',
 			yjxuepin:'血拼',
 			yjxuepin_info:'出牌阶段限一次，你可以选择攻击范围内的一名角色并失去1点体力。你弃置其两张牌。若这两张牌类型相同，你回复1点体力。',
 			ns_chendao:'SP陈到',
+			ns_chendao_prefix:'SP',
 			nsjianglie:'将烈',
 			nsjianglie_info:'当你使用【杀】指定目标后，你可以令其展示所有手牌，然后弃置其中一种颜色的牌。',
 			ns_jiaxu:'☆贾诩',
 			nsyice:'遗策',
 			nsyice_info:'锁定技，当你使用/打出/弃置的牌进入弃牌堆后，你将这些牌以任意顺序置于你的武将牌上，称为“策”。若这些“策”中有点数相同的牌，则你获得这两张牌中的所有牌，将这两张牌置于牌堆两端。若场上没有处于濒死状态的角色，则你对一名角色造成1点伤害。',
 			ns_lijue:'SP李傕',
+			ns_lijue_prefix:'SP',
 			ns_zhangji:'SP张济',
+			ns_zhangji_prefix:'SP',
 			nsfeixiong:'飞熊',
 			nsfeixiong_info:'出牌阶段开始时，你可以和一名其他角色拼点。赢的角色对没赢的角色造成1点伤害。',
 			nscesuan:'策算',
@@ -6331,6 +6340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nslulve:'掳掠',
 			nslulve_info:'出牌阶段限一次，你可以弃置X张牌并选择一名装备区内有牌的其他角色，然后对其造成1点伤害（X为其装备区内的牌数）。',
 			ns_fanchou:'SP樊稠',
+			ns_fanchou_prefix:'SP',
 			nsyangwu:'扬武',
 			nsyangwu_info:'出牌阶段限一次，你可以弃置一张♥手牌并选择一名手牌数大于你的其他角色。你观看其手牌并获得其中的X张牌（X为其与你手牌数之差的一半且向上取整）。',
 			jsp_liubei:'群刘备',
@@ -6341,6 +6351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nskuishe:'窥舍',
 			nskuishe_info:'出牌阶段限一次，你可以选择一名其他角色A的一张牌，并将此牌交给不为A的一名角色。然后A可以对你使用一张【杀】。',
 			sp_xiahoushi:"SP夏侯氏",
+			sp_xiahoushi_prefix:'SP',
 			xinfu_yanyu:"燕语",
 			xinfu_yanyu_info:"一名角色的出牌阶段开始时，你可以弃置一张牌。若如此做，则该出牌阶段内限三次，当一张与你弃置的牌类别相同的其他牌进入弃牌堆后，你可令任意一名角色获得此牌。",
 			xinfu_yanyu2:"燕语",
@@ -6359,6 +6370,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuji:'助祭',
 			fuji_info:'当一名角色造成雷属性伤害时，你可以令其进行判定，若结果为黑色，此伤害+1；若结果为红色，该角色获得判定牌。',
 			sp_pangtong:'SP庞统',
+			sp_pangtong_prefix:'SP',
 			manjuan:'漫卷',
 			manjuan_info:'其他角色的牌因弃置而进入弃牌堆后，你可以弃置一张花色与之不同的牌，然后获得此牌。',
 			xinmanjuan:'漫卷',
@@ -6412,6 +6424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhenjue_info:'一名角色的结束阶段开始时，若你没有手牌，则你可以令其选择一项：①弃置一张牌。②令你摸一张牌。',
 			//用间
 			yj_caocao:'SP曹操',
+			yj_caocao_prefix:'SP',
 			yjxiandao:'献刀',
 			yjxiandao_info:'每回合限一次。当你赠予其他角色一张牌后，你令其不能使用或打出与本次赠予移动的牌A花色相同的牌直到回合结束。然后若牌A：为锦囊牌，你摸两张牌。为装备牌，你获得其一张不为A的牌。为武器牌，你对其造成1点伤害。',
 			yjsancai:'散财',

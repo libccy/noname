@@ -154,6 +154,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.zhu.showGiveup();
 		},
 		game:{
+			canReplaceViewpoint:()=>true,
 			recommendDizhu:[
 				're_guojia','re_huanggai','re_lvbu','re_guanyu','re_sunquan','re_xusheng','re_wuyi','re_sunben',
 				'xuyou','zhangchunhua','caochong','zhangsong','zhongyao','wangyi',

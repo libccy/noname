@@ -2619,15 +2619,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var cards=result.cards,targets=result.targets;
 						event.cards=cards;
-						var cardx=get.autoViewAs({name:'sha'},cards);
-						event.cardx=cardx;
-						player.useCard(cardx,cards,targets,false,'dcsaowei');
+						var next=player.useCard({name:'sha'},cards,targets,false,'dcsaowei');
+						player.when('useCardAfter')
+							.filter(event=>event==next)
+							.then(()=>{
+								if(player.hasHistory('sourceDamage',evt=>evt.card==trigger.card)){
+									var cards=trigger.cards.filterInD();
+									if(cards.length>0) player.gain(cards,'gain2');
+								}
+							})
 					}
-					else event.finish();
-					'step 2'
-					if(player.getHistory('sourceDamage',function(evt){
-						return evt.card==event.cardx;
-					}).length&&cards.filterInD().length) player.gain(cards.filterInD(),'gain2');
 				},
 			},
 			//向朗
@@ -8234,6 +8235,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return max2;
 				},
 				audio:2,
+				init:function(player){
+					game.addGlobalSkill('fengxiang_use');
+				},
+				onremove:function(player){
+					game.removeGlobalSkill('fengxiang_use');
+				},
 				trigger:{player:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
@@ -8264,6 +8271,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.draw();
 						},
 					},
+					use:{
+						mod:{
+							aiOrder:function(player,card,num){
+								if(num>0&&get.itemtype(card)==='card'&&card.hasGaintag('fengxiang_tag')&&game.hasPlayer(current=>{
+									return current.hasSkill('fengxiang')&&get.attitude(player,current)>0;
+								})) return num+10;
+							}
+						},
+						trigger:{player:'dieAfter'},
+						filter:function(event,player){
+							for(let i of game.players){
+								if(i.hasSkill('fengxiang')) return false;
+							}
+							return true;
+						},
+						silent:true,
+						forceDie:true,
+						charlotte:true,
+						content:function(){
+							game.removeGlobalSkill('fengxiang_use');
+						}
+					}
 				},
 			},
 			//阚泽
@@ -10373,6 +10402,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcgonghu:'共护',
 			dcgonghu_info:'锁定技。①当你于回合外失去基本牌后，若你本回合内失去基本牌的数量大于1，你将〖破锐〗改为每轮限两次。②当你造成或受到伤害后，若你本回合内造成或受到的总伤害大于1，你删除〖破锐〗中的“，然后你交给其X张手牌”。③当你使用红色基本牌/红色普通锦囊牌时，若你已发动过〖共护①〗和〖共护②〗，则此牌不可被响应/可额外增加一个目标。',
 			yue_caiwenji:'乐蔡琰',
+			yue_caiwenji_prefix:'乐',
 			dcshuangjia:'霜笳',
 			dcshuangjia_tag:'胡笳',
 			dcshuangjia_info:'锁定技。①游戏开始，你将你的手牌标记为“胡笳”。②你的“胡笳”牌不计入手牌上限。③其他角色至你的距离+X（X为你的“胡笳”数且至多为5）。',
@@ -10382,6 +10412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyouzhan:'诱战',
 			dcyouzhan_info:'锁定技。当其他角色于你的回合内失去牌后，你摸一张牌，且其获得如下效果：1.其于此回合下一次受到的伤害+1；2.结束阶段，若其于此回合未受到过伤害，其摸X张牌（X为其此回合失去过牌的次数）。',
 			yue_zhoufei:'乐周妃',
+			yue_zhoufei_prefix:'乐',
 			dclingkong:'灵箜',
 			dclingkong_tag:'箜篌',
 			dclingkong_info:'锁定技。①游戏开始时，你将所有手牌标记为“箜篌”。②你的“箜篌”牌不计入手牌上限。③当你于回合外获得牌后，系统随机将其中的一张牌标记为“箜篌”。',

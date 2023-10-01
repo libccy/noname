@@ -5,19 +5,19 @@
 			localStorage.setItem('gplv3_noname_alerted',true);
 		}
 		else{
-			var ua=navigator.userAgent.toLowerCase();
-			var ios=ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('macintosh')!=-1;
+			const ua=navigator.userAgent.toLowerCase();
+			const ios=ua.indexOf('iphone')!=-1||ua.indexOf('ipad')!=-1||ua.indexOf('macintosh')!=-1;
 			//electron
 			if(typeof window.process=='object'&&typeof window.require=='function'){
-				var versions=window.process.versions;
-				var electronVersion=parseFloat(versions.electron);
-				var remote;
+				const versions=window.process.versions;
+				const electronVersion=parseFloat(versions.electron);
+				let remote;
 				if(electronVersion>=14){
 					remote=require('@electron/remote');
 				}else{
 					remote=require('electron').remote;
 				}
-				var thisWindow=remote.getCurrentWindow();
+				const thisWindow=remote.getCurrentWindow();
 				thisWindow.destroy();
 				window.process.exit();
 			}
@@ -318,6 +318,19 @@
 						),
 					};
 					game.dynamicStyle.addObject(result);
+
+					const g2=cs.group(
+						cs.of(
+							cs.class("tempname",`${nature}`),
+							':not([data-nature])>',
+							cs.class("span")
+						)
+					)
+					let result2={};
+					result2[g2]={
+						color:`rgba(${color1.join()})`,
+					};
+					game.dynamicStyle.addObject(result2);
 				}
 			}],
 		},
@@ -4038,8 +4051,10 @@
 						unfrequent:true,
 						item:{
 							doNotShow:'不显示',
-							showPinyin:'显示拼音',
-							showCodeIdentifier:'显示代码ID'
+							showPinyin:'拼音(样式一)',
+							showCodeIdentifier:'代码ID(样式一)',
+							showPinyin2:'拼音(样式二)',
+							showCodeIdentifier2:'代码ID(样式二)',
 						},
 						visualMenu:(node,link,name)=>{
 							node.classList.add('button','character');
@@ -4051,23 +4066,28 @@
 							style.display='flex';
 							style.height='60px';
 							style.justifyContent='center';
-							style.width='150px';
+							style.width='200px';
 							const firstChild=node.firstChild;
 							firstChild.removeAttribute('class');
 							firstChild.style.position='initial';
 							if(link=='false') return;
 							const ruby=document.createElement('ruby');
 							ruby.textContent=name;
-							const leftParenthesisRP=document.createElement('rp');
-							leftParenthesisRP.textContent='（';
-							ruby.appendChild(leftParenthesisRP);
 							const rt=document.createElement('rt');
 							rt.style.fontSize='smaller';
-							rt.textContent=link=='showCodeIdentifier'?link:get.pinyin(name).join(' ');
-							ruby.appendChild(rt);
-							const rightParenthesisRP=document.createElement('rp');
-							rightParenthesisRP.textContent='）';
-							ruby.appendChild(rightParenthesisRP);
+							if(link=='showPinyin2'||link=='showCodeIdentifier2'){
+								rt.textContent=link=='showCodeIdentifier2'?'['+link+']':'['+get.pinyin(name)+']';
+								ruby.appendChild(rt);
+							}else{
+								const leftParenthesisRP=document.createElement('rp');
+								leftParenthesisRP.textContent='（';
+								ruby.appendChild(leftParenthesisRP);
+								rt.textContent=link=='showCodeIdentifier'?link:get.pinyin(name).join(' ');
+								ruby.appendChild(rt);
+								const rightParenthesisRP=document.createElement('rp');
+								rightParenthesisRP.textContent='）';
+								ruby.appendChild(rightParenthesisRP);
+							}
 							firstChild.innerHTML=ruby.outerHTML;
 						}
 					},
@@ -7489,10 +7509,25 @@
 			});
 			//防止每次输出字符都创建以下元素
 			const event=_status.event;
+			const trigger=_status.event;
 			const player=ui.create.player().init('sunce');
+			const target=player;
+			const targets=[player];
+			const source=player;
 			const card=game.createCard();
-			//覆盖原本的javascript提示
-			CodeMirror.registerHelper('hint','javascript',(editor,options)=>{
+			const cards=[card];
+			const result={bool:true};
+			function forEach(arr,f) {
+				Array.from(arr).forEach(v=>f(v));
+			}
+			function forAllProps(obj,callback){
+				if(!Object.getOwnPropertyNames||!Object.getPrototypeOf){
+					for(let name in obj) callback(name);
+				}else{
+					for(let o=obj;o;o=Object.getPrototypeOf(o)) Object.getOwnPropertyNames(o).forEach(callback);
+				}
+			}
+			function scriptHint(editor,keywords,getToken,options){
 				//Find the token at the cursor
 				let cur=editor.getCursor(),token=editor.getTokenAt(cur);
 				if(/\b(?:string|comment)\b/.test(token.type)) return;
@@ -7522,37 +7557,132 @@
 					context.push(tprop);
 				}
 				const list=[];
+				let obj;
 				if(Array.isArray(context)){
 					try {
 						const code=context.length==1?context[0].string:context.reduceRight((pre,cur)=>(pre.string||pre)+'.'+cur.string);
-						const obj=eval(code);
+						obj=eval(code);
 						if(![null,undefined].includes(obj)){
 							const keys=Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertyNames(Object.getPrototypeOf(obj))).filter(key=>key.startsWith(token.string));
 							list.addArray(keys);
 						}
 					}catch(_){ return;}
 				}else if(token&&typeof token.string=='string'){
-					const javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
-						"if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
-					const coffeescriptKeywords=("and break catch class continue delete do else extends false finally for " +
-						"if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
-					const keys=['player','card','lib','game','ui','get','ai','_status'].concat(javascriptKeywords).concat(coffeescriptKeywords).concat(Object.getOwnPropertyNames(window));
-					const start=token.string;
-					function maybeAdd(str){
-						if(str.lastIndexOf(start,0)==0&&!list.includes(str)) list.push(str);
+					//非开发者模式下，提示这些单词
+					list.addArray(['player','card','cards','result','trigger','source','target','targets','lib','game','ui','get','ai','_status']);
+				}
+				return {
+					list:[...new Set(getCompletions(token,context,keywords,options).concat(list))]
+						.filter(key=>key.startsWith(token.string))
+						.sort((a,b)=>(a+'').localeCompare(b+''))
+						.map(text=>{
+							return {
+								render(elt,data,cur) {
+									var icon=document.createElement("span");
+									var className="cm-completionIcon cm-completionIcon-";
+									if(obj){
+										const type=typeof obj[text];
+										if(type== 'function') {
+											className+='function';
+										}
+										else if(type== 'string') {
+											className+='text';
+										}
+										else if(type== 'boolean') {
+											className+='variable';
+										}
+										else{
+											className+='namespace';
+										}
+									}else{
+										if(javascriptKeywords.includes(text)){
+											className+='keyword';
+										}
+										else if(window[text]) {
+											const type=typeof window[text];
+											if(type=='function'){
+											className+='function';
+											}
+											else if(type=='string'){
+												className+='text';
+											}
+											else if(text=='window'||type=='boolean'){
+												className+='variable';
+											}
+											else{
+												className+='namespace';
+											}
+										}else{
+											className+='namespace';
+										}
+									}
+									icon.className=className;
+									elt.appendChild(icon);
+									elt.appendChild(document.createTextNode(text));
+								},
+								displayText: text,
+								text: text,
+							}
+						}),
+					from:CodeMirror.Pos(cur.line,token.start),
+					to:CodeMirror.Pos(cur.line,token.end)
+				};
+			}
+			function javascriptHint(editor,options){
+				return scriptHint(editor,javascriptKeywords,function(e,cur){return e.getTokenAt(cur);},options);
+			};
+			//覆盖原本的javascript提示
+			CodeMirror.registerHelper("hint","javascript",javascriptHint);
+			const stringProps=Object.getOwnPropertyNames(String.prototype);
+			const arrayProps=Object.getOwnPropertyNames(Array.prototype);
+			const funcProps=Object.getOwnPropertyNames(Array.prototype);
+			const javascriptKeywords=("break case catch class const continue debugger default delete do else export extends from false finally for function " +
+				"if in import instanceof let new null return super switch this throw true try typeof var void while with yield").split(" ");
+			function getCompletions(token,context,keywords,options){
+				let found=[],start=token.string,global=options&&options.globalScope||window;
+				function maybeAdd(str){
+					if(str.lastIndexOf(start,0)==0&&!found.includes(str)) found.push(str);
+				}
+				function gatherCompletions(obj){
+					if(typeof obj=="string") forEach(stringProps,maybeAdd);
+					else if(obj instanceof Array) forEach(arrayProps,maybeAdd);
+					else if(obj instanceof Function) forEach(funcProps,maybeAdd);
+					forAllProps(obj, maybeAdd);
+				}
+				if(context&&context.length){
+					//If this is a property, see if it belongs to some object we can
+					//find in the current environment.
+					let obj=context.pop(),base;
+					if (obj.type&&obj.type.indexOf("variable")=== 0){
+						if(options&&options.additionalContext)
+							base=options.additionalContext[obj.string];
+						if(!options||options.useGlobalScope!==false)
+							base=base||global[obj.string];
+					}else if(obj.type=="string"){
+						base="";
+					}else if(obj.type == "atom"){
+						base=1;
+					}else if(obj.type == "function"){
+						if(global.jQuery!=null&&(obj.string=='$'||obj.string=='jQuery')&&(typeof global.jQuery=='function'))
+							base=global.jQuery();
+						else if(global._!=null&&(obj.string=='_')&&(typeof global._=='function'))
+							base=global._();
 					}
+					while(base!=null&&context.length)
+						base=base[context.pop().string];
+					if (base!=null) gatherCompletions(base);
+				}else{
+					//If not, just look in the global object, any local scope, and optional additional-context
+					//(reading into JS mode internals to get at the local and global variables)
 					for(let v=token.state.localVars;v;v=v.next) maybeAdd(v.name);
 					for(let c=token.state.context;c;c=c.prev) for(let v=c.vars;v;v=v.next) maybeAdd(v.name)
 					for(let v=token.state.globalVars;v;v=v.next) maybeAdd(v.name);
 					if(options&&options.additionalContext!=null) for(let key in options.additionalContext) maybeAdd(key);
-					list.addArray(keys);
+					if(!options||options.useGlobalScope!==false) gatherCompletions(global);
+					forEach(keywords,maybeAdd);
 				}
-				return {
-					list:list.filter(key=>key.startsWith(token.string)).sort((a,b)=>(a+'').localeCompare(b+'')),
-					from:CodeMirror.Pos(cur.line,token.start),
-					to:CodeMirror.Pos(cur.line,token.end),
-				};
-			});
+				return found.sort((a,b)=>(a+'').localeCompare(b+''));
+			}
 		},
 		setIntro:function(node,func,left){
 			if(lib.config.touchscreen){
@@ -8172,6 +8302,59 @@
 						return this.childNodes[row].childNodes[col];
 					}
 				};
+				/*处理lib.nature的兼容性问题*/
+				const mapHasFunc=function(item){
+					return this.has(item)
+				};
+				Object.defineProperty(Map.prototype, "contains",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:mapHasFunc
+				});
+				Object.defineProperty(Map.prototype, "includes",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:mapHasFunc
+				});
+				const mapAddFunc=function(item){
+					this.set(item,0);
+					return this;
+				}
+				Object.defineProperty(Map.prototype, "add", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:mapAddFunc
+				});
+				Object.defineProperty(Map.prototype, "push", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:mapAddFunc
+				});
+				Object.defineProperty(Map.prototype, "addArray", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(arr){
+						for(var i=0;i<arr.length;i++){
+							this.add(arr[i]);
+						}
+						return this;
+					}
+				});
+				Object.defineProperty(Map.prototype, "remove", {
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(item){
+						this.delete(item);
+						return this;
+					}
+				});
+				/*Map prototype end*/
 				Object.defineProperty(Array.prototype, "filterInD", {
 					configurable:true,
 					enumerable:false,
@@ -8228,10 +8411,10 @@
 					enumerable:false,
 					writable:true,
 					value:function(item){
-						if(Array.isArray(item)){
+						/*if(Array.isArray(item)){
 							for(var i=0;i<item.length;i++) this.remove(item[i]);
 							return;
-						}
+						}*/
 						var pos=this.indexOf(item);
 						if(pos==-1){
 							return false;
@@ -8828,7 +9011,8 @@
 							fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.woff2');}`,0);
 							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,0);
 						});
-						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: local('Noname Suit'), url('${lib.assetURL}font/suits.woff2');}`,0);
+						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: url('${lib.assetURL}font/suits.woff2');}`,0);
+						fontSheet.insertRule(`@font-face {font-family: 'NonameSuits'; src: url('${lib.assetURL}font/suits.woff2');}`,0)
 						appearenceConfig.cardtext_font.item.default='默认';
 						appearenceConfig.global_font.item.default='默认';
 					}
@@ -10771,6 +10955,7 @@
 				}
 				ui.css.styles=lib.init.sheet();
 				ui.css.styles.sheet.insertRule('#arena .player>.name,#arena .button.character>.name {font-family: '+(lib.config.name_font||'xinwei')+',xinwei}',0);
+				ui.css.styles.sheet.insertRule('#arena .player>.name,.button.character>.name {font-family: '+(lib.config.name_font||'xinwei')+',xinwei}',0);
 				ui.css.styles.sheet.insertRule('#arena .player .identity>div {font-family: '+(lib.config.identity_font||'huangcao')+',xinwei}',0);
 				ui.css.styles.sheet.insertRule('.button.character.newstyle>.identity {font-family: '+(lib.config.identity_font||'huangcao')+',xinwei}',0);
 				if(lib.config.cardtext_font&&lib.config.cardtext_font!='default'){
@@ -12976,12 +13161,8 @@
 					var range;
 					if(!info.notarget){
 						var select=get.copy(info.selectTarget);
-						if(select==undefined){
-							range=[1,1];
-						}
-						else if(typeof select=='number') range=[select,select];
-						else if(get.itemtype(select)=='select') range=select;
-						else if(typeof select=='function') range=select(card,player);
+						range=get.select(select);
+						if(event.selectTarget) range=get.select(event.selectTarget);
 						game.checkMod(card,player,range,'selectTarget',player);
 					}
 					if(info.notarget||range[1]<=-1){
@@ -17667,9 +17848,9 @@
 						}
 					}
 					event.id=get.id();
-					event.excluded=[];
-					event.directHit=[];
-					event.customArgs={default:{}};
+					if(!Array.isArray(event.excluded)) event.excluded=[];
+					if(!Array.isArray(event.directHit)) event.directHit=[];
+					if(typeof event.customArgs!='object'||typeof event.customArgs.default!='object') event.customArgs={default:{}};
 					if(typeof event.baseDamage!='number') event.baseDamage=get.info(card,false).baseDamage||1;
 					if(typeof event.effectCount!='number') event.effectCount=get.info(card,false).effectCount||1;
 					event.effectedCount=0;
@@ -23244,6 +23425,12 @@
 						else if(get.itemtype(arguments[i])=='player'){
 							next.targets=[arguments[i]];
 						}
+						else if(get.itemtype(arguments[i])=='select'){
+							next.selectTarget=arguments[i];
+						}
+						else if(typeof arguments[i]=='number'){
+							next.selectTarget=[arguments[i],arguments[i]];
+						}
 						else if(get.is.object(arguments[i])&&arguments[i].name){
 							next.card=arguments[i];
 						}
@@ -24973,8 +25160,12 @@
 					if(mod!='unchanged') return mod;
 					return true;
 				},
-				addJudgeNext:function(card){
+				addJudgeNext:function(card,unlimited){
 					if(!card.expired){
+						if(!unlimited&&get.postion(card,true)!=='o'&&get.postion(card,true)!=='j'){
+			  				game.log('将',card,'移入',this.next,'的判定区失败');
+							return;
+						}
 						var target=this.next;
 						var name=card.viewAs||card.name;
 						var bool=false;
@@ -27274,13 +27465,13 @@
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var ifo=get.info(skills[i]);
-						if(ifo.viewAs&&typeof ifo.viewAs!='function'&&ifo.viewAs.name=='wuxie'){
-							if(!ifo.viewAsFilter||ifo.viewAsFilter(this)){
+						if(ifo.hiddenWuxie&&info){
+							if(typeof ifo.hiddenWuxie=='function'&&ifo.hiddenWuxie(this,info)){
 								return true;
 							}
 						}
-						else if(ifo.hiddenWuxie&&info){
-							if(typeof ifo.hiddenWuxie=='function'&&ifo.hiddenWuxie(this,info)){
+						else if(ifo.viewAs&&typeof ifo.viewAs!='function'&&ifo.viewAs.name=='wuxie'){
+							if(!ifo.viewAsFilter||ifo.viewAsFilter(this)){
 								return true;
 							}
 						}
@@ -28934,29 +29125,37 @@
 					if(Array.isArray(card)){
 						if(card[2]=='huosha'){
 							card[2]='sha';
-							card[3]=['fire'];
+							card[3]='fire';
 						}
 						else if(card[2]=='leisha'){
 							card[2]='sha';
-							card[3]=['thunder'];
+							card[3]='thunder';
 						}
 						// else if(card[2]=='kamisha'){
 						// 	card[2]='sha';
-						// 	card[3]=['kami'];
+						// 	card[3]='kami';
 						// }
 						// else if(card[2]=='icesha'){
 						// 	card[2]='sha';
-						// 	card[3]=['ice'];
+						// 	card[3]='ice';
 						// }
 						else if(card[2]=='cisha'){
 							card[2]='sha';
-							card[3]=['stab'];
+							card[3]='stab';
 						}
 						else if(card[2].length>3){
 							let prefix=card[2].slice(0,card[2].lastIndexOf('sha'));
-							if(prefix.length+3==card[2].length){
+							if(lib.nature.has(prefix)){
+								if(prefix.length+3==card[2].length){
+									card[2]='sha';
+									card[3]=prefix;
+								}
+							}
+							if(card[2].indexOf('sha_')==0){
+								let suffix=card[2].slice(4);
+								let natureList=suffix.split('_');
 								card[2]='sha';
-								card[3]=[prefix];
+								card[3]=get.nature(natureList);
 							}
 						}
 					}
@@ -33433,12 +33632,88 @@
 			['stab','image/card/cisha.png']
 		]),
 		natureSeparator:'|',
+		namePrefix:new Map([
+			['界',{
+				color:'#fdd559',
+				nature:'soilmm',
+			}],
+			['谋',{
+				color:'#def7ca',
+				nature:'woodmm',
+			}],
+			['武',{
+				color:'#a5e3b9',
+				nature:'kamimm',
+			}],
+			['乐',{
+				color:'#f7f4fc',
+				nature:'keymm',
+			}],
+			['神',{
+				color:'#faecd1',
+				nature:'orangemm',
+			}],
+			['族',{
+				color:'#ee9ac7',
+				nature:'firemm',
+			}],
+			['晋',{
+				color:'#f3c5ff',
+				nature:'blackmm',
+			}],
+			['侠',{
+				color:'#eeeeee',
+				nature:'qunmm',
+			}],
+			['起',{
+				color:'#c3f9ff',
+				nature:'thundermm',
+			}],
+			['承',{
+				color:'#c3f9ff',
+				nature:'thundermm',
+			}],
+			['手杀',{
+				getSpan:(prefix,name)=>{
+					if(lib.characterPack.shiji&&name in lib.characterPack.shiji){
+						for(let i in lib.characterSort.shiji){
+							if(lib.characterSort.shiji[i].includes(name)){
+								prefix=get.translation(i).slice(-1);
+								break;
+							}
+						}
+						return `<span style="color:#def7ca" data-nature="watermm">${prefix}</span>`;
+					}
+					return `<span style="font-family:NonameSuits">📱</span>`;
+				},
+			}],
+			['TW',{
+				getSpan:(prefix,name)=>{
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr">TW</span>`;
+				},
+			}],
+			['SP',{
+				getSpan:(prefix,name)=>{
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr">SP</span>`;
+				},
+			}],
+			['OL',{
+				getSpan:(prefix,name)=>{
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;color:#fcc4b3" data-nature="firemm">OL</span>`;
+				},
+			}],
+			['界SP',{
+				getSpan:(prefix,name)=>{
+					return get.prefixSpan('界')+get.prefixSpan('SP')
+				},
+			}],
+		]),
 		groupnature:{
-			shen:'thunder',
+			shen:'shen',
 			wei:'water',
 			shu:'soil',
 			wu:'wood',
-			qun:'metal',
+			qun:'qun',
 			western:'thunder',
 			key:'key',
 			jin:'thunder',
@@ -39297,6 +39572,7 @@
 		phaseLoop:function(player){
 			var next=game.createEvent('phaseLoop');
 			next.player=player;
+			next._isStandardLoop=true;
 			next.setContent('phaseLoop');
 		},
 		gameDraw:function(player,num){
@@ -40949,13 +41225,18 @@
 				}
 				//创建ul列表
 				const createMenu=function(pos,self,List,click){
-					if (self&&self.createMenu) return false;
+					if(!self||self==window) return;
 					const parent=self.parentNode;
 					if (parent){
 						for(let i=0;i<parent.childElementCount;i++){
 							const node=parent.childNodes[i];
-							node!=self&&node.createMenu&&closeMenu.call(node);
+							if(node!=self&&node.createMenu) closeMenu.call(node);
 						}
+					}
+					if(self.createMenu){
+						createList.add(self.createMenu);
+						ui.window.appendChild(self.createMenu);
+						return self.createMenu;
 					}
 					const editor=container.editor;
 					if(!editor) return false;
@@ -40968,7 +41249,8 @@
 						height:'20em',
 						width:pos.width*4/game.documentZoom+'px',
 						//'font-family':'shousha',
-						'font-size':20/game.documentZoom+'px',
+						'font-size':(lib.config.codeMirror_fontSize?lib.config.codeMirror_fontSize.slice(0,-2):16)/game.documentZoom+'px',
+						
 					});
 					const theme=editor.options.theme;
 					lib.setScroll(ul);
@@ -41012,7 +41294,7 @@
 							};
 						}
 					}
-					createList.push(ul);
+					createList.add(ul);
 					ui.window.appendChild(ul);
 					return ul;
 				};
@@ -41022,7 +41304,8 @@
 					if(!ul) return false;
 					if(ul.parentNode) ul.parentNode.removeChild(ul);
 					this.style.background='';
-					delete this.createMenu;
+					//创建后不用删除了，除非以后要动态加载。
+					//delete this.createMenu;
 					createList.remove(ul);
 					return ul;
 				};
@@ -41035,46 +41318,79 @@
 				});
 				const saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
 				const theme=ui.create.div('.editbutton','主题',editorpage,function(){
-					if(this&&this.createMenu){
+					if(!this||this==window) return;
+					if(this.createMenu&&this.createMenu.parentNode){
 						return closeMenu.call(this);
 					}
-					//主题列表
-					const list=['mdn-like','mbo'];
-					//正在使用的主题
-					const active=container.editor.options.theme;
-					//排个序
-					list.remove(active).splice(0,0,active);
 					//this
 					const self=this;
-					//元素位置
-					const pos=this.getBoundingClientRect();
-					//点击事件
-					const click=function(e){
-						const theme=this.innerHTML;
-						container.editor.setOption("theme",theme);
-						setTimeout(()=>container.editor.refresh(),0);
-						game.saveConfig('codeMirror_theme', theme);
-						closeMenu.call(self);
-					};
-					const ul=createMenu(pos,self,list,click);
-					this.createMenu=ul;
+					if(!this.createMenu){
+						//主题列表
+						const list=['mdn-like','mbo'];
+						//正在使用的主题
+						const active=container.editor.options.theme;
+						//排个序
+						list.remove(active).splice(0,0,active);
+						//元素位置
+						const pos=self.getBoundingClientRect();
+						//点击事件
+						const click=function(e){
+							const theme=this.innerHTML;
+							container.editor.setOption("theme",theme);
+							setTimeout(()=>container.editor.refresh(),0);
+							game.saveConfig('codeMirror_theme',theme);
+							closeMenu.call(self);
+						};
+						const ul=createMenu(pos,self,list,click);
+						self.createMenu=ul;
+					}else{
+						createMenu(null,self);
+					}
 				});
 				const edit=ui.create.div('.editbutton','编辑',editorpage,function(){
-					if(this&&this.createMenu){
+					if(!this||this==window) return;
+					if(this.createMenu&&this.createMenu.parentNode){
 						return closeMenu.call(this);
 					}
 					const self=this;
-					const pos=this.getBoundingClientRect();
-					const list=['撤销        Ctrl+Z', '恢复撤销    Ctrl+Y'];
-					const click=function(e){
-						const num=this.innerHTML.indexOf("Ctrl");
-						const inner=this.innerHTML.slice(num).replace("+", "-");
-						container.editor.execCommand(container.editor.options.extraKeys[inner]);
-						setTimeout(()=>container.editor.refresh(),0);
-						closeMenu.call(self);
-					};
-					const ul=createMenu(pos,self,list,click);
-					this.createMenu=ul;
+					if(!this.createMenu){
+						const pos=this.getBoundingClientRect();
+						const list=['撤销        Ctrl+Z', '恢复撤销    Ctrl+Y'];
+						const click=function(e){
+							const num=this.innerHTML.indexOf("Ctrl");
+							const inner=this.innerHTML.slice(num).replace("+", "-");
+							container.editor.execCommand(container.editor.options.extraKeys[inner]);
+							setTimeout(()=>container.editor.refresh(),0);
+							closeMenu.call(self);
+						};
+						const ul=createMenu(pos,self,list,click);
+						this.createMenu=ul;
+					}else{
+						createMenu(null,self);
+					}
+				});
+				const fontSize=ui.create.div('.editbutton','字号',editorpage,function(){
+					if(!this||this==window) return;
+					if(this.createMenu&&this.createMenu.parentNode){
+						return closeMenu.call(this);
+					}
+					const self=this;
+					if(!this.createMenu){
+						const pos=this.getBoundingClientRect();
+						const list=['16px','18px','20px','22px','24px','26px'];
+						const click=function(e){
+							const size=this.innerHTML;
+							container.style.fontSize=size.slice(0,-2)/game.documentZoom+'px';
+							Array.from(self.parentElement.children).map(v=>v.createMenu).filter(Boolean).forEach(v=>{v.style.fontSize=size.slice(0,-2)/game.documentZoom+'px'});
+							setTimeout(()=>container.editor.refresh(),0);
+							game.saveConfig('codeMirror_fontSize',size);
+							closeMenu.call(self);
+						};
+						const ul=createMenu(pos,self,list,click);
+						this.createMenu=ul;
+					}else{
+						createMenu(null,self);
+					}
 				});
 				const editor=ui.create.div(editorpage);
 				return editor;
@@ -41104,6 +41420,12 @@
 						}
 					}
 					if(cardTempNameConfig=='default') getApplyNode._tempName.classList.add('vertical');
+					if(datasetNature.length>0){
+						node.dataset.nature=datasetNature;
+					}else{
+						delete node.dataset.nature;
+						node.classList.add(datasetNature);
+					}
 				}else{
 					if(get.position(card)=='j'&&card.viewAs&&card.viewAs!=card.name) {
 						cardName=card.viewAs;
@@ -41203,10 +41525,9 @@
 					else{
 						console.warn('卡牌图片解析失败');
 					}
-				}
-				if(datasetNature.length>0){
-					node.dataset.nature=datasetNature;
-				}else{
+					if(datasetNature.length>0){
+						node.classList.add(datasetNature);
+					}
 					delete node.dataset.nature;
 				}
 				node.innerHTML+=`<span>${cardTempNameConfig=='default'?get.verticalStr(tempname):tempname}</span>`;
@@ -46831,7 +47152,7 @@
 								}
 
 								var loading=ui.create.div('.loading.config.toggle','载入中...',page);
-								var loaded=function(list){
+								var loaded=function(){
 									var list=[];
 									var extension=window.extension;
 									for(var i in extension){
@@ -46845,8 +47166,9 @@
 										var node=ui.create.div('.videonode.menubutton.extension.large',page,clickExtension);
 										ui.create.div('.caption',list[i].name,node);
 										ui.create.div('.text.author','作者：'+list[i].author+'<span>('+list[i].size+')</span>',node);
+										ui.create.div('.text','更新日期：'+list[i].date,node);
 										ui.create.div('.text',list[i].intro,node);
-										var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild);
+										var download=ui.create.div('.menubutton.text.active','下载扩展',node.firstChild,{'zIndex':'5'});
 										if(game.download){
 											if(list[i].netdisk){
 												var linknode=ui.create.div('.text',node);
@@ -46867,7 +47189,7 @@
 												},linknode).link=list[i].forum;
 											}
 											download.listen(downloadExtension);
-											if(lib.config.extensions.contains(list[i].name)){
+											if(lib.config.extensions.includes(list[i].name)){
 												download.classList.remove('active');
 												if(lib.extensionPack[list[i].name]&&lib.extensionPack[list[i].name].version==list[i].version){
 													download.classList.add('transparent2');
@@ -46905,10 +47227,10 @@
 								window.extension={};
 								fetch(`${extensionURL}catalog.js`,{
 									referrerPolicy:'no-referrer'
-								}).then(value=>value.text()).then(eval).catch(reason=>{
+								}).then(value=>value.text()).then(eval).then(loaded).catch(reason=>{
 									console.log(reason);
 									delete window.extension;
-									loading.innerHTML='连接失败';
+									loading.innerHTML='连接失败:'+(reason instanceof Error?reason.message:String(reason));
 								});
 							};
 							if(_thisUpdate) node.update();
@@ -47837,7 +48159,7 @@
 						var nodeturnover=ui.create.div('.menubutton','翻面',row1,clickrow1);
 						var noderevive=ui.create.div('.menubutton','复活',row1,clickrow1);
 						var nodereplace=ui.create.div('.menubutton','换人',row1,clickrow1);
-						if(lib.config.mode!='identity'&&lib.config.mode!='guozhan'&&lib.config.mode!='doudizhu'){
+						if(!game.canReplaceViewpoint||!game.canReplaceViewpoint()){
 							nodereplace.classList.add('unselectable');
 						}
 
@@ -54106,61 +54428,135 @@
 				else if(lib.config.favouriteCharacter.contains(name)){
 					fav.classList.add('active');
 				}
-				const introduction=ui.create.div('.characterintro',uiintro),showCharacterNamePinyin=lib.config.show_characternamepinyin;
-				if(showCharacterNamePinyin!='doNotShow'){
-					const characterIntroTable=ui.create.div('.character-intro-table',introduction),span=document.createElement('span');
-					span.style.fontWeight='bold';
-					const nameInfo=get.character(name),exInfo=nameInfo[4],characterName=exInfo&&exInfo.includes('ruby')?lib.translate[name]:get.rawName(name);
-					span.innerHTML=characterName;
-					const ruby=document.createElement('ruby');
-					ruby.appendChild(span);
-					const leftParenthesisRP=document.createElement('rp');
-					leftParenthesisRP.textContent='（';
-					ruby.appendChild(leftParenthesisRP);
-					const rt=document.createElement('rt');
-					rt.innerHTML=showCharacterNamePinyin=='showCodeIdentifier'?name:lib.translate[`${name}_rt`]||get.pinyin(characterName).join(' ');
-					ruby.appendChild(rt);
-					const rightParenthesisRP=document.createElement('rp');
-					rightParenthesisRP.textContent='）';
-					ruby.appendChild(rightParenthesisRP);
-					characterIntroTable.appendChild(ruby);
-					const characterSexDiv=ui.create.div('.character-sex',characterIntroTable),exInfoSex=exInfo&&exInfo.find(value=>value.indexOf('sex:')==0),characterSex=exInfoSex?exInfoSex.split(':').pop():nameInfo[0];
-					new Promise((resolve,reject)=>{
-						const imageName=`sex_${characterSex}`,information=lib.card[imageName];
-						if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						const image=information.image;
-						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
-						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
-						else resolve(`${lib.assetURL}${image}`);
-					}).then(source=>new Promise((resolve,reject)=>{
-						const image=new Image();
-						image.onload=()=>resolve(image);
-						image.onerror=reject;
-						image.src=source;
-					})).then(image=>characterSexDiv.appendChild(image)).catch(()=>characterSexDiv.innerHTML=get.translation(characterSex));
-					const characterGroupDiv=ui.create.div('.character-group',characterIntroTable),characterGroups=get.is.double(name,true);
-					if(characterGroups) Promise.all(characterGroups.map(characterGroup=>new Promise((resolve,reject)=>{
-						const imageName=`group_${characterGroup}`,information=lib.card[imageName];
-						if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						const image=information.image;
-						if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
-						else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
-						else resolve(`${lib.assetURL}${image}`);
-					}).then(source=>new Promise((resolve,reject)=>{
-						const image=new Image();
-						image.onload=()=>resolve(image);
-						image.onerror=reject;
-						image.src=source;
-					})))).then(images=>{
-						let documentFragment=document.createDocumentFragment();
-						images.forEach(documentFragment.appendChild,documentFragment);
-						characterGroupDiv.appendChild(documentFragment);
-					}).catch(()=>characterGroupDiv.innerHTML=characterGroups.map(characterGroup=>get.translation(characterGroup)).join('/'));
-					else{
-						const characterGroup=nameInfo[1];
+				
+				// 样式二
+				if(lib.config.show_characternamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_characternamepinyin=='showCodeIdentifier2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2'){
+					var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
+					if(lib.config.show_characternamepinyin=='showPinyin2'||lib.config.show_characternamepinyin=='showCodeIdentifier2'){
+						var charactername=get.rawName(name);
+						var characterpinyin=lib.config.show_characternamepinyin=='showCodeIdentifier2'?name:get.pinyin(charactername);
+						var nameinfo=get.character(name);
+						var charactersex=get.translation(nameinfo[0]);
+						const charactergroups=get.is.double(name,true);
+						let charactergroup;
+						if(charactergroups) charactergroup=charactergroups.map(i=>get.translation(i)).join('/')
+						else charactergroup=get.translation(nameinfo[1]);
+						var characterhp=nameinfo[2];
+						var characterintroinfo=get.characterIntro(name);
+						var spacemark=' | ';
+						if(charactername.length>3) spacemark='<span style="font-size:7px">'+' '+'</span>'+'|'+'<span style="font-size:7px">'+' '+'</span>';
+						intro.innerHTML='<span style="font-weight:bold;margin-right:5px">'+charactername+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+characterpinyin+']'+'</span>'+spacemark+charactersex+spacemark+charactergroup+spacemark+characterhp+'<span style="line-height:2"></span>'+'<br>'+characterintroinfo;
+					}
+					var intro2=ui.create.div('.characterintro.intro2',uiintro);
+					var list=get.character(name,3)||[];
+					var skills=ui.create.div('.characterskill',uiintro);
+					if(lib.config.touchscreen){
+						lib.setScroll(intro);
+						lib.setScroll(intro2);
+						lib.setScroll(skills);
+					}
+
+					if(lib.config.mousewheel){
+						skills.onmousewheel=ui.click.mousewheel;
+					}
+					var clickSkill=function(e){
+						while(intro2.firstChild){
+							intro2.removeChild(intro2.lastChild);
+						}
+						var current=this.parentNode.querySelector('.active');
+						if(current){
+							current.classList.remove('active');
+						}
+						this.classList.add('active');
+						var skillname=get.translation(this.link);
+						var skilltranslationinfo=get.skillInfoTranslation(this.link);
+						if((lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2')&&skillname!='阵亡'){
+							var skillpinyin=lib.config.show_skillnamepinyin=='showCodeIdentifier2'?this.link:get.pinyin(skillname);
+							intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+skillpinyin+']'+'</span>'+'  '+skilltranslationinfo;
+						}else{
+							intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+skilltranslationinfo;
+						}
+						var info=get.info(this.link);
+						var skill=this.link;
+						var playername=this.linkname;
+						var skillnode=this;
+						if(info.derivation){
+							var derivation=info.derivation;
+							if(typeof derivation=='string'){
+								derivation=[derivation];
+							}
+							for(var i=0;i<derivation.length;i++){
+								var derivationname=get.translation(derivation[i]);
+								var derivationtranslationinfo=get.skillInfoTranslation(derivation[i]);
+								if((lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2')&&derivationname.length<=5&&derivation[i].indexOf('_faq')==-1){
+									var derivationpinyin=lib.config.show_skillnamepinyin=='showCodeIdentifier2'?derivation[i]:get.pinyin(derivationname);
+									intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+derivationpinyin+']'+'</span>'+'  '+derivationtranslationinfo;
+								}else{
+									intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+derivationtranslationinfo;
+								}
+							}
+						}
+						if(info.alter){
+							intro2.innerHTML+='<br><br><div class="hrefnode skillversion"></div>';
+							var skillversionnode=intro2.querySelector('.hrefnode.skillversion');
+							if(lib.config.vintageSkills.contains(skill)){
+								skillversionnode.innerHTML='切换至新版';
+							}
+							else{
+								skillversionnode.innerHTML='切换至旧版';
+							}
+							skillversionnode.listen(function(){
+								if(lib.config.vintageSkills.contains(skill)){
+									lib.config.vintageSkills.remove(skill);
+									lib.translate[skill+'_info']=lib.translate[skill+'_info_alter'];
+								}
+								else{
+									lib.config.vintageSkills.push(skill);
+									lib.translate[skill+'_info']=lib.translate[skill+'_info_origin'];
+								}
+								game.saveConfig('vintageSkills',lib.config.vintageSkills);
+								clickSkill.call(skillnode,'init');
+							});
+						}
+						if(e!=='init') game.trySkillAudio(this.link,playername);
+					}
+				}else{
+					// 样式一
+					const introduction=ui.create.div('.characterintro',uiintro),showCharacterNamePinyin=lib.config.show_characternamepinyin;
+					if(showCharacterNamePinyin!='doNotShow'){
+						const characterIntroTable=ui.create.div('.character-intro-table',introduction),span=document.createElement('span');
+						span.style.fontWeight='bold';
+						const nameInfo=get.character(name),exInfo=nameInfo[4],characterName=exInfo&&exInfo.includes('ruby')?lib.translate[name]:get.rawName(name);
+						span.innerHTML=characterName;
+						const ruby=document.createElement('ruby');
+						ruby.appendChild(span);
+						const leftParenthesisRP=document.createElement('rp');
+						leftParenthesisRP.textContent='（';
+						ruby.appendChild(leftParenthesisRP);
+						const rt=document.createElement('rt');
+						rt.innerHTML=showCharacterNamePinyin=='showCodeIdentifier'?name:lib.translate[`${name}_rt`]||get.pinyin(characterName).join(' ');
+						ruby.appendChild(rt);
+						const rightParenthesisRP=document.createElement('rp');
+						rightParenthesisRP.textContent='）';
+						ruby.appendChild(rightParenthesisRP);
+						characterIntroTable.appendChild(ruby);
+						const characterSexDiv=ui.create.div('.character-sex',characterIntroTable),exInfoSex=exInfo&&exInfo.find(value=>value.indexOf('sex:')==0),characterSex=exInfoSex?exInfoSex.split(':').pop():nameInfo[0];
 						new Promise((resolve,reject)=>{
+							const imageName=`sex_${characterSex}`,information=lib.card[imageName];
+							if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+							const image=information.image;
+							if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+							else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
+							else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
+							else resolve(`${lib.assetURL}${image}`);
+						}).then(source=>new Promise((resolve,reject)=>{
+							const image=new Image();
+							image.onload=()=>resolve(image);
+							image.onerror=reject;
+							image.src=source;
+						})).then(image=>characterSexDiv.appendChild(image)).catch(()=>characterSexDiv.innerHTML=get.translation(characterSex));
+						const characterGroupDiv=ui.create.div('.character-group',characterIntroTable),characterGroups=get.is.double(name,true);
+						if(characterGroups) Promise.all(characterGroups.map(characterGroup=>new Promise((resolve,reject)=>{
 							const imageName=`group_${characterGroup}`,information=lib.card[imageName];
 							if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 							const image=information.image;
@@ -54173,136 +54569,158 @@
 							image.onload=()=>resolve(image);
 							image.onerror=reject;
 							image.src=source;
-						})).then(image=>characterGroupDiv.appendChild(image)).catch(()=>characterGroupDiv.innerHTML=get.translation(characterGroup));
+						})))).then(images=>{
+							let documentFragment=document.createDocumentFragment();
+							images.forEach(documentFragment.appendChild,documentFragment);
+							characterGroupDiv.appendChild(documentFragment);
+						}).catch(()=>characterGroupDiv.innerHTML=characterGroups.map(characterGroup=>get.translation(characterGroup)).join('/'));
+						else{
+							const characterGroup=nameInfo[1];
+							new Promise((resolve,reject)=>{
+								const imageName=`group_${characterGroup}`,information=lib.card[imageName];
+								if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+								const image=information.image;
+								if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+								else if(image.indexOf('db:')==0) game.getDB('image',image.slice(3)).then(resolve,reject);
+								else if(image.indexOf('ext:')==0) resolve(`${lib.assetURL}${image.replace(/^ext:/,'extension/')}`);
+								else resolve(`${lib.assetURL}${image}`);
+							}).then(source=>new Promise((resolve,reject)=>{
+								const image=new Image();
+								image.onload=()=>resolve(image);
+								image.onerror=reject;
+								image.src=source;
+							})).then(image=>characterGroupDiv.appendChild(image)).catch(()=>characterGroupDiv.innerHTML=get.translation(characterGroup));
+						}
+						const hpDiv=ui.create.div('.hp',characterIntroTable),nameInfoHP=nameInfo[2],infoHP=get.infoHp(nameInfoHP);
+						hpDiv.dataset.condition=infoHP<4?'mid':'high';
+						ui.create.div(hpDiv);
+						const hpTextDiv=ui.create.div('.text',hpDiv),infoMaxHP=get.infoMaxHp(nameInfoHP);
+						hpTextDiv.innerHTML=infoHP==infoMaxHP?`×${infoHP}`:`×${infoHP}/${infoMaxHP}`;
+						const infoShield=get.infoHujia(nameInfoHP);
+						if(infoShield){
+							ui.create.div('.shield',hpDiv);
+							const shieldTextDiv=ui.create.div('.text',hpDiv);
+							shieldTextDiv.innerHTML=`×${infoShield}`;
+						}
+						introduction.appendChild(document.createElement('hr'));
 					}
-					const hpDiv=ui.create.div('.hp',characterIntroTable),nameInfoHP=nameInfo[2],infoHP=get.infoHp(nameInfoHP);
-					hpDiv.dataset.condition=infoHP<4?'mid':'high';
-					ui.create.div(hpDiv);
-					const hpTextDiv=ui.create.div('.text',hpDiv),infoMaxHP=get.infoMaxHp(nameInfoHP);
-					hpTextDiv.innerHTML=infoHP==infoMaxHP?`×${infoHP}`:`×${infoHP}/${infoMaxHP}`;
-					const infoShield=get.infoHujia(nameInfoHP);
-					if(infoShield){
-						ui.create.div('.shield',hpDiv);
-						const shieldTextDiv=ui.create.div('.text',hpDiv);
-						shieldTextDiv.innerHTML=`×${infoShield}`;
+					const htmlParser=document.createElement('body');
+					htmlParser.innerHTML=get.characterIntro(name);
+					Array.from(htmlParser.childNodes).forEach(value=>introduction.appendChild(value));
+					const introduction2=ui.create.div('.characterintro.intro2',uiintro);
+					var list=get.character(name,3)||[];
+					var skills=ui.create.div('.characterskill',uiintro);
+					if(lib.config.touchscreen){
+						lib.setScroll(introduction);
+						lib.setScroll(introduction2);
+						lib.setScroll(skills);
 					}
-					introduction.appendChild(document.createElement('hr'));
-				}
-				const htmlParser=document.createElement('body');
-				htmlParser.innerHTML=get.characterIntro(name);
-				Array.from(htmlParser.childNodes).forEach(value=>introduction.appendChild(value));
-				const introduction2=ui.create.div('.characterintro.intro2',uiintro);
-				var list=get.character(name,3)||[];
-				var skills=ui.create.div('.characterskill',uiintro);
-				if(lib.config.touchscreen){
-					lib.setScroll(introduction);
-					lib.setScroll(introduction2);
-					lib.setScroll(skills);
-				}
 
-				if(lib.config.mousewheel){
-					skills.onmousewheel=ui.click.mousewheel;
-				}
-				var clickSkill=function(e){
-					while(introduction2.firstChild){
-						introduction2.removeChild(introduction2.lastChild);
+					if(lib.config.mousewheel){
+						skills.onmousewheel=ui.click.mousewheel;
 					}
-					var current=this.parentNode.querySelector('.active');
-					if(current){
-						current.classList.remove('active');
-					}
-					this.classList.add('active');
-					const skillNameSpan=document.createElement('span'),skillNameSpanStyle=skillNameSpan.style;
-					skillNameSpanStyle.fontWeight='bold';
-					const link=this.link,skillName=get.translation(link);
-					skillNameSpan.innerHTML=skillName;
-					const showSkillNamePinyin=lib.config.show_skillnamepinyin;
-					if(showSkillNamePinyin!='doNotShow'&&skillName!='阵亡'){
-						const ruby=document.createElement('ruby');
-						ruby.appendChild(skillNameSpan);
-						const leftParenthesisRP=document.createElement('rp');
-						leftParenthesisRP.textContent='（';
-						ruby.appendChild(leftParenthesisRP);
-						const rt=document.createElement('rt');
-						rt.innerHTML=showSkillNamePinyin=='showCodeIdentifier'?link:lib.translate[`${link}_rt`]||get.pinyin(skillName).join(' ');
-						ruby.appendChild(rt);
-						const rightParenthesisRP=document.createElement('rp');
-						rightParenthesisRP.textContent='）';
-						ruby.appendChild(rightParenthesisRP);
-						const div=ui.create.div(introduction2);
-						div.style.marginRight='5px';
-						div.appendChild(ruby);
-					}
-					else{
-						skillNameSpanStyle.marginRight='5px';
-						introduction2.appendChild(skillNameSpan);
-					}
-					htmlParser.innerHTML=get.skillInfoTranslation(this.link);
-					Array.from(htmlParser.childNodes).forEach(childNode=>introduction2.appendChild(childNode));
-					var info=get.info(this.link);
-					var skill=this.link;
-					var playername=this.linkname;
-					var skillnode=this;
-					let derivations=info.derivation;
-					if(derivations){
-						if(typeof derivations=='string') derivations=[derivations];
-						derivations.forEach(derivation=>{
-							introduction2.appendChild(document.createElement('br'));
-							introduction2.appendChild(document.createElement('br'));
-							const derivationNameSpan=document.createElement('span'),derivationNameSpanStyle=derivationNameSpan.style;
-							derivationNameSpanStyle.fontWeight='bold';
-							const derivationName=get.translation(derivation);
-							derivationNameSpan.innerHTML=derivationName;
-							if(showSkillNamePinyin!='doNotShow'&&derivationName.length<=5&&derivation.indexOf('_faq')==-1){
-								const ruby=document.createElement('ruby');
-								ruby.appendChild(derivationNameSpan);
-								const leftParenthesisRP=document.createElement('rp');
-								leftParenthesisRP.textContent='（';
-								ruby.appendChild(leftParenthesisRP);
-								const rt=document.createElement('rt');
-								rt.innerHTML=showSkillNamePinyin=='showCodeIdentifier'?derivation:lib.translate[`${derivation}_rt`]||get.pinyin(derivationName).join(' ');
-								ruby.appendChild(rt);
-								const rightParenthesisRP=document.createElement('rp');
-								rightParenthesisRP.textContent='）';
-								ruby.appendChild(rightParenthesisRP);
-								const div=ui.create.div(introduction2);
-								div.style.marginRight='5px';
-								div.appendChild(ruby);
-							}
-							else{
-								derivationNameSpanStyle.marginRight='5px';
-								introduction2.appendChild(derivationNameSpan);
-							}
-							htmlParser.innerHTML=get.skillInfoTranslation(derivation);
-							Array.from(htmlParser.childNodes).forEach(childNode=>introduction2.appendChild(childNode));
-						});
-					}
-					if(info.alter){
-						introduction2.appendChild(document.createElement('br'));
-						introduction2.appendChild(document.createElement('br'));
-						ui.create.div('.hrefnode.skillversion',introduction2);
-						var skillversionnode=introduction2.querySelector('.hrefnode.skillversion');
-						if(lib.config.vintageSkills.contains(skill)){
-							skillversionnode.innerHTML='切换至新版';
+					var clickSkill=function(e){
+						while(introduction2.firstChild){
+							introduction2.removeChild(introduction2.lastChild);
+						}
+						var current=this.parentNode.querySelector('.active');
+						if(current){
+							current.classList.remove('active');
+						}
+						this.classList.add('active');
+						const skillNameSpan=document.createElement('span'),skillNameSpanStyle=skillNameSpan.style;
+						skillNameSpanStyle.fontWeight='bold';
+						const link=this.link,skillName=get.translation(link);
+						skillNameSpan.innerHTML=skillName;
+						const showSkillNamePinyin=lib.config.show_skillnamepinyin;
+						if(showSkillNamePinyin!='doNotShow'&&skillName!='阵亡'){
+							const ruby=document.createElement('ruby');
+							ruby.appendChild(skillNameSpan);
+							const leftParenthesisRP=document.createElement('rp');
+							leftParenthesisRP.textContent='（';
+							ruby.appendChild(leftParenthesisRP);
+							const rt=document.createElement('rt');
+							rt.innerHTML=showSkillNamePinyin=='showCodeIdentifier'?link:lib.translate[`${link}_rt`]||get.pinyin(skillName).join(' ');
+							ruby.appendChild(rt);
+							const rightParenthesisRP=document.createElement('rp');
+							rightParenthesisRP.textContent='）';
+							ruby.appendChild(rightParenthesisRP);
+							const div=ui.create.div(introduction2);
+							div.style.marginRight='5px';
+							div.appendChild(ruby);
 						}
 						else{
-							skillversionnode.innerHTML='切换至旧版';
+							skillNameSpanStyle.marginRight='5px';
+							introduction2.appendChild(skillNameSpan);
 						}
-						skillversionnode.listen(function(){
+						htmlParser.innerHTML=get.skillInfoTranslation(this.link);
+						Array.from(htmlParser.childNodes).forEach(childNode=>introduction2.appendChild(childNode));
+						var info=get.info(this.link);
+						var skill=this.link;
+						var playername=this.linkname;
+						var skillnode=this;
+						let derivations=info.derivation;
+						if(derivations){
+							if(typeof derivations=='string') derivations=[derivations];
+							derivations.forEach(derivation=>{
+								introduction2.appendChild(document.createElement('br'));
+								introduction2.appendChild(document.createElement('br'));
+								const derivationNameSpan=document.createElement('span'),derivationNameSpanStyle=derivationNameSpan.style;
+								derivationNameSpanStyle.fontWeight='bold';
+								const derivationName=get.translation(derivation);
+								derivationNameSpan.innerHTML=derivationName;
+								if(showSkillNamePinyin!='doNotShow'&&derivationName.length<=5&&derivation.indexOf('_faq')==-1){
+									const ruby=document.createElement('ruby');
+									ruby.appendChild(derivationNameSpan);
+									const leftParenthesisRP=document.createElement('rp');
+									leftParenthesisRP.textContent='（';
+									ruby.appendChild(leftParenthesisRP);
+									const rt=document.createElement('rt');
+									rt.innerHTML=showSkillNamePinyin=='showCodeIdentifier'?derivation:lib.translate[`${derivation}_rt`]||get.pinyin(derivationName).join(' ');
+									ruby.appendChild(rt);
+									const rightParenthesisRP=document.createElement('rp');
+									rightParenthesisRP.textContent='）';
+									ruby.appendChild(rightParenthesisRP);
+									const div=ui.create.div(introduction2);
+									div.style.marginRight='5px';
+									div.appendChild(ruby);
+								}
+								else{
+									derivationNameSpanStyle.marginRight='5px';
+									introduction2.appendChild(derivationNameSpan);
+								}
+								htmlParser.innerHTML=get.skillInfoTranslation(derivation);
+								Array.from(htmlParser.childNodes).forEach(childNode=>introduction2.appendChild(childNode));
+							});
+						}
+						if(info.alter){
+							introduction2.appendChild(document.createElement('br'));
+							introduction2.appendChild(document.createElement('br'));
+							ui.create.div('.hrefnode.skillversion',introduction2);
+							var skillversionnode=introduction2.querySelector('.hrefnode.skillversion');
 							if(lib.config.vintageSkills.contains(skill)){
-								lib.config.vintageSkills.remove(skill);
-								lib.translate[skill+'_info']=lib.translate[skill+'_info_alter'];
+								skillversionnode.innerHTML='切换至新版';
 							}
 							else{
-								lib.config.vintageSkills.push(skill);
-								lib.translate[skill+'_info']=lib.translate[skill+'_info_origin'];
+								skillversionnode.innerHTML='切换至旧版';
 							}
-							game.saveConfig('vintageSkills',lib.config.vintageSkills);
-							clickSkill.call(skillnode,'init');
-						});
+							skillversionnode.listen(function(){
+								if(lib.config.vintageSkills.contains(skill)){
+									lib.config.vintageSkills.remove(skill);
+									lib.translate[skill+'_info']=lib.translate[skill+'_info_alter'];
+								}
+								else{
+									lib.config.vintageSkills.push(skill);
+									lib.translate[skill+'_info']=lib.translate[skill+'_info_origin'];
+								}
+								game.saveConfig('vintageSkills',lib.config.vintageSkills);
+								clickSkill.call(skillnode,'init');
+							});
+						}
+						if(e!=='init') game.trySkillAudio(this.link,playername);
 					}
-					if(e!=='init') game.trySkillAudio(this.link,playername);
 				}
+				
 				var initskill=false;
 				for(var i=0;i<list.length;i++){
 					if(!get.info(list[i])||get.info(list[i]).nopop) continue;
@@ -56978,32 +57396,20 @@
 			return num.toString();
 		},
 		rawName:function(str){
-			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
 			var str2=lib.translate[str];
+			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
 			if(!str2) return '';
-			if(str2.indexOf('SP')==0){
-				str2=str2.slice(2);
+			if(lib.translate[str+'_prefix']){
+				return str2.slice(lib.translate[str+'_prefix'].length);
 			}
-			else if(str2.indexOf('TW')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('OL')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('JSP')==0){
+			if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
 			}
 			else if(str2.indexOf('☆SP')==0){
 				str2=str2.slice(3);
 			}
-			else if(str2.indexOf('手杀')==0){
-				str2=str2.slice(2);
-			}
 			else if(str2.indexOf('新杀')==0){
 				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('界')==0&&lib.characterPack.refresh&&lib.characterPack.refresh[str]){
-				str2=str2.slice(1);
 			}
 			else if(str2.indexOf('旧')==0&&(lib.characterPack.old||lib.characterPack.mobile)&&(lib.characterPack.old[str]||lib.characterPack.mobile[str])){
 				str2=str2.slice(1);
@@ -57017,37 +57423,25 @@
 			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
 			var str2=lib.translate[str];
 			if(!str2) return '';
-			if(str2.indexOf('SP')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('TW')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('OL')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('JSP')==0){
+			if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
 			}
 			else if(str2.indexOf('☆SP')==0){
 				str2=str2.slice(3);
-			}
-			else if(str2.indexOf('手杀')==0){
-				str2=str2.slice(2);
 			}
 			else if(str2.indexOf('新杀')==0){
 				str2=str2.slice(2);
 			}
 			return str2;
 		},
-		slimName:function(str){
+		slimNameHorizontal:function(str){
 			var str2=lib.translate[str];
 			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
 			if(!str2) return '';
-			if(str2.indexOf('SP')==0){
-				str2=str2.slice(2);
+			if(lib.translate[str+'_prefix']){
+				return `${get.prefixSpan(lib.translate[str+'_prefix'],str)}<span>${str2.slice(lib.translate[str+'_prefix'].length)}</span>`;
 			}
-			else if(str2.indexOf('TW')==0){
+			if(str2.indexOf('TW')==0){
 				str2=str2.slice(2);
 			}
 			else if(str2.indexOf('OL')==0){
@@ -57066,6 +57460,20 @@
 				str2=str2.slice(2);
 			}
 			return get.verticalStr(str2,true);
+		},
+		prefixSpan:function(prefix,name){
+			let color='#ffffff',nature=false;
+			const map=lib.namePrefix.get(prefix);
+			if(map){
+				if(map.getSpan) return map.getSpan(prefix,name);
+				if(map.color) color=map.color;
+				if(map.nature) nature=map.nature;
+				if(map.showName) prefix=map.showName;
+			}
+			return `<span style="color: ${color};"${nature?(`data-nature="${nature}"`):''}>${prefix}</span>`
+		},
+		slimName:function(str){
+			return get.verticalStr(get.slimNameHorizontal(str),true);
 		},
 		time:function(){
 			if(lib.status.dateDelaying){
