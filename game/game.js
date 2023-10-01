@@ -39851,7 +39851,7 @@
 			if(drawDeck&&drawDeck.drawDeck) players[0].draw(num2,drawDeck);
 			else players[0].draw(num2);
 		},
-		finishSkill:(i,sub)=>{
+		finishSkill:(i,history)=>{
 			const mode=get.mode(),info=lib.skill[i],iInfo=`${i}_info`;
 			if(info.alter){
 				lib.translate[`${iInfo}_origin`]=lib.translate[iInfo];
@@ -39917,16 +39917,26 @@
 				if(info.skillAnimation===undefined) info.skillAnimation=true;
 				if(info.init===undefined) info.init=(player,skill)=>player.storage[skill]=false;
 			}
-			if(info.subSkill&&!sub) Object.keys(info.subSkill).forEach(value=>{
-				const iValue=`${i}_${value}`;
-				lib.skill[iValue]=info.subSkill[value];
-				lib.skill[iValue].sub=true;
-				if(info.subSkill[value].name) lib.translate[iValue]=info.subSkill[value].name;
-				else lib.translate[iValue]=lib.translate[iValue]||lib.translate[i];
-				if(info.subSkill[value].description) lib.translate[`${iValue}_info`]=info.subSkill[value].description;
-				if(info.subSkill[value].marktext) lib.translate[`${iValue}_bg`]=info.subSkill[value].marktext;
-				game.finishSkill(iValue,true);
-			});
+			if(info.subSkill){
+				let subSkillHistory=Array.isArray(history)?history:[];
+				for(let value in info.subSkill){
+					if(subSkillHistory.includes(value)){
+						console.trace(`${value} in ${i} forms a deadlock`);
+						continue;
+					}
+					let history=subSkillHistory.slice(0);
+					history.push(value);
+					
+					const iValue=`${i}_${value}`;
+					lib.skill[iValue]=info.subSkill[value];
+					lib.skill[iValue].sub=true;
+					if(info.subSkill[value].name) lib.translate[iValue]=info.subSkill[value].name;
+					else lib.translate[iValue]=lib.translate[iValue]||lib.translate[i];
+					if(info.subSkill[value].description) lib.translate[`${iValue}_info`]=info.subSkill[value].description;
+					if(info.subSkill[value].marktext) lib.translate[`${iValue}_bg`]=info.subSkill[value].marktext;
+					game.finishSkill(iValue,history);
+				}
+			}
 			if(info.round){
 				const k=`${i}_roundcount`;
 				if(typeof info.group=='string') info.group=[info.group,k];
