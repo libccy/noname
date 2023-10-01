@@ -34345,7 +34345,7 @@
 			game.addVideo('changeLand',player,url);
 			const parsedPath=lib.path.parse(url);
 			delete parsedPath.base;
-			if(!parsedPath.dir) parsedPath.dir='image/card';
+			if(!parsedPath.dir) parsedPath.dir='image/card/';
 			if(!parsedPath.ext) parsedPath.ext='.jpg';
 			game.broadcastAll((formattedPath,name,skill,player)=>{
 				const node=ui.create.div('.background.upper.land');

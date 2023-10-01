@@ -999,10 +999,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'gwweitu_gain',
 				subSkill:{
 					gain:{
-						trigger:{player:'damageZero'},
-						filter:function(event){
-							return event.hujia;
-						},
+						trigger: {player: 'changeHujiaAfter'},
+						filter: (event) => event.num < 0,
 						forced:true,
 						content:function(){
 							player.storage.gwweitu++;

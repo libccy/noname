@@ -2023,6 +2023,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			shouwang2:{
+				charlotte: true,
 				mark:true,
 				intro:{
 					content:'已发动'
