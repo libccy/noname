@@ -4643,6 +4643,21 @@ div[data-decoration="bronze"]::after{
 	left: 3px;
 	top: 6px;
 }
+.tempname.kami:not([data-nature])>span {
+	color: #1F3C38;
+}
+.tempname.ice:not([data-nature])>span {
+	color: #3B6273;
+}
+.tempname.fire:not([data-nature])>span {
+	color: #631515;
+}
+.tempname.thunder:not([data-nature])>span {
+	color: #152E63;
+}
+.tempname.poison:not([data-nature])>span {
+	color: #00312d;
+}
 /*.card.equip1 .wunature,
 .card.equip3 .wunature,
 .card.equip4 .wunature{

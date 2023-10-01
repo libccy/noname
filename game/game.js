@@ -41401,6 +41401,12 @@
 						}
 					}
 					if(cardTempNameConfig=='default') getApplyNode._tempName.classList.add('vertical');
+					if(datasetNature.length>0){
+						node.dataset.nature=datasetNature;
+					}else{
+						delete node.dataset.nature;
+						node.classList.add(datasetNature);
+					}
 				}else{
 					if(get.position(card)=='j'&&card.viewAs&&card.viewAs!=card.name) {
 						cardName=card.viewAs;
@@ -41500,10 +41506,9 @@
 					else{
 						console.warn('卡牌图片解析失败');
 					}
-				}
-				if(datasetNature.length>0){
-					node.dataset.nature=datasetNature;
-				}else{
+					if(datasetNature.length>0){
+						node.classList.add(datasetNature);
+					}
 					delete node.dataset.nature;
 				}
 				node.innerHTML+=`<span>${cardTempNameConfig=='default'?get.verticalStr(tempname):tempname}</span>`;
