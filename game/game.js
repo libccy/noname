@@ -12150,6 +12150,56 @@
 		},
 		element:{
 			content:{
+				//隐匿一张武将牌
+				hideCharacters:function(){
+					player.storage.rawHp=player.hp;
+                    player.storage.rawMaxHp=player.maxHp;
+					player.hp=0;
+                    player.maxHp=0;
+                    player.update();
+					var name=player.name||player.name1,skills=[];
+					if(!player.name2&&num>0) num=2;//无副将隐匿副将改为隐匿所有武将牌
+                    if(name&&lib.character[name]&&num!=1){
+                        for(var i of lib.character[name][3]){
+							skills.add(i);
+						}
+					}
+					if(player.name2&&num!=0){
+						for(var i of lib.character[player.name2][3]){
+                            skills.add(i);
+                        }
+					}
+                    for(var i=0;i<skills.length;i++){
+                        if(!lib.translate[skills[i]+'_info']){
+                            skills.splice(i--,1);
+                        }
+                    }
+                    for(var i of skills){
+                        player.removeSkill(i);
+                    }
+                    if(!player.hiddenSkills) player.hiddenSkills=[];
+                    player.hiddenSkills.addArray(skills);
+                    if(num!=1) player.classList.add('unseen');
+                    if(player.name2&&num!=0) player.classList.add('unseen2');
+                    if(num!=1) player.name='unknown';
+					if(player.name2&&num!=0) player.name2='unknown';
+                    if(!player.node.name_seat&&!_status.video){
+                        player.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(get.translation(player.name)),player);
+                        player.node.name_seat.dataset.nature=get.groupnature(player.group);
+                    }
+                    if(num!=1) player.sex='male';
+                    player.storage.nohp=true;
+                    player.node.hp.hide();
+                    player.addSkill('g_hidden_ai');
+                    player.update();
+					player.hp=1;
+                    player.maxHp=1;
+					switch(num){
+						case 0:game.log(player,'隐匿了','#b主将');break;
+						case 1:game.log(player,'隐匿了','#y副将');break;
+						default:game.log(player,'隐匿了');
+					}
+				},
 				emptyEvent:function(){
 					event.trigger(event.name);
 				},
@@ -20104,6 +20154,24 @@
 			},
 			player:{
 				//新函数
+				//让一名角色隐匿一张武将牌
+				hideCharacters:function(){
+					const next=game.createEvent('hideCharacters');//留个事件接口给扩展将或未来的武将做准备
+					next.player=this;
+					for(var i=0;i<arguments.length;i++){
+						if(get.itemtype(arguments[i])=='player'){
+							next.source=arguments[i];//同上
+						}
+						else if(typeof arguments[i]=='number'){
+							next.num=arguments[i];
+						}
+					}
+					if(next.num==undefined) next.num=2;
+					if(next.num<0) next.num=0;
+					if(next.num>2) next.num=2;
+					next.setContent('hideCharacters');
+					return next;
+				},
 				/**
 				 * version 1.4
 				 * 
