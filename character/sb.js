@@ -784,12 +784,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return ui.selected.targets.length==ui.selected.cards.length+1;
 				},
 				check:function(card){
-					let player=get.owner(card),targets=_status.event.getTempCache('sblijian','targets');
-					if(!Array.isArray(targets)){
-						lib.skill.sblijian.selectTargetAi(_status.event,player);
-						targets=_status.event.getTempCache('sblijian','targets');
-					}
-					targets=Math.min(player.countCards('he')+1,targets.length);
+					let player=get.owner(card),targets=lib.skill.sblijian.selectTargetAi(_status.event,player);
 					if(ui.selected.cards.length<targets-1){
 						if(player.hasSkill('sbbiyue')) return 4*targets-get.value(card);
 						return 6+targets-get.value(card);
@@ -797,44 +792,59 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 0;
 				},
 				selectTargetAi:function(event,player){
-					let id=[null,0],players=game.filterPlayer(current=>current!==player),res;
+					let cache=_status.event.getTempCache('sblijian','targets');
+					if(Array.isArray(cache)) return cache.length;
+					let id=[null,0],players=game.filterPlayer(current=>current!==player),temp;
 					for(let i of players){
-						res=get.attitude(event.player,i);
-						if(res<id[1]) id=[i,res];
+						temp=get.attitude(event.player,i);
+						if(temp<id[1]) id=[i,temp];
 					}
 					if(id[0]) id=id[0].identity;
 					else{
 						event.putTempCache('sblijian','targets',[]);
-						return;
+						return 0;
 					}
-					let vp=ui.create.player().init('sunce'),target=[null,0];
-					vp.skills=[];
-					if(id.endsWith('zhu')||id.endsWith('Zhu')) id=id.slice(0,-1)+'ong';
-					vp.identity=id;
-					vp.showIdentity();
-					game.players.push(vp);
-					for(let i of players){
-						res=get.effect(i,{name:'juedou',isCard:true},vp,event.player)+get.effect(vp,{name:'juedou',isCard:true},i,event.player);
-						if(res>target[1]) target=[i,res];
-					}
-					game.players.remove(vp);
-					if(target[1]<=0){
-						event.putTempCache('sblijian','targets',[]);
-						return;
-					}
-					let targets=[],idx=-1;
-					do{
-						idx++;
-						targets.push(target.concat([get.sgn(get.attitude(player,target[0]))]));
-						players.remove(target[0]);
-						target[1]=0;
-						for(let i of players){
-							res=get.effect(i,{name:'juedou',isCard:true},targets[idx][0],event.player);
-							if(res>target[1]) target=[i,res];
+					let target=[null,0],targets=[],vp=player.getEnemies();
+					if(vp.length>1){
+						let list=[game.createCard('sha'),game.createCard('shan')];
+						vp=ui.create.player().init('sunce');
+						vp.hp=2;
+						vp.skills=[];
+						game.players.push(vp);
+						if(typeof id==='string'){
+							if(id.endsWith('zhu')||id.endsWith('Zhu')) id=id.slice(0,-1)+'ong';
+							vp.identity=id;
+							vp.showIdentity();
 						}
-					}while(target[1]>0);
-					if(!player.hasSkill('sbbiyue')) targets=targets.filter(i=>i[2]!==0);
+						else vp.side=id[0].side;
+						vp.directgain(list,false);
+						for(let i of players){
+							temp=get.effect(i,{name:'juedou',isCard:true},vp,event.player)+get.effect(vp,{name:'juedou',isCard:true},i,event.player);
+							if(temp>=0) targets.push([i,temp]);
+						}
+						game.cardsGotoSpecial(list);
+						game.players.remove(vp);
+					}
+					else{
+						vp=vp[0];
+						for(let i of players){
+							temp=get.effect(i,{name:'juedou',isCard:true},vp,event.player)+get.effect(vp,{name:'juedou',isCard:true},i,event.player);
+							if(temp>=0) targets.push([i,temp]);
+						}
+					}
+					for(let i=0;i<targets.length;i++){
+						temp=get.attitude(player,targets[i][0]);
+						if(temp>0&&targets[i][1]<2.5*temp&&targets.length>2) targets.splice(i--,1);
+						else targets[i].push(temp);
+					}
+					targets.sort((a,b)=>{
+						let att1=get.sgn(get.attitude(event.player,a[0])),att2=get.sgn(get.attitude(event.player,b[0]));
+						if(att1!==att2) return att1-att2;
+						return b[1]-a[1];
+					});
+					targets=targets.slice(0,player.countCards('he')+1);
 					event.putTempCache('sblijian','targets',targets);
+					return targets.length;
 				},
 				multiline:true,
 				content:function(){
@@ -847,24 +857,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:7,
 					result:{
 						player:function(player,target){
-							if(!player.hasSkill('sbbiyue')) return 0;
 							let targets=_status.event.getTempCache('sblijian','targets');
-							if(Array.isArray(targets)) for(let i=0;i<targets.length;i++){
+							if(!Array.isArray(targets)) return 0;
+							if(targets.length>2&&!player.hasSkill('sbbiyue')) return 0;
+							for(let i=0;i<targets.length;i++){
 								if(target===targets[i][0]&&targets[i][2]===0) return 1;
 							}
 							return 0;
 						},
 						target:function(player,target){
 							let targets=_status.event.getTempCache('sblijian','targets');
-							if(Array.isArray(targets)) for(let i=0;i<targets.length;i++){
-								if(target===targets[i][0]){
-									if(targets[i][2]>0) return targets[i][1]/5;
-									return -targets[i][1];
+							if(Array.isArray(targets)){
+								for(let i=0;i<targets.length;i++){
+									if(target===targets[i][0]){
+										if(targets[i][2]>0) return targets[i][1]/5;
+										return -targets[i][1];
+									}
 								}
+								return 0;
 							}
 							if(ui.selected.targets.length){
-								let tars=ui.selected.targets.concat([target]);
-								return get.effect(target,{name:'juedou',isCard:true},tars[tars.length-2],target)+get.effect(tars[0],{name:'juedou',isCard:true},target,target);
+								let tars=ui.selected.targets.concat([target]).sortBySeat();
+								for(let i=0;i<tars.length;i++){
+									if(target!==tars[i]) continue;
+									let eff;
+									if(i===0) eff=get.effect(target,{name:'juedou',isCard:true},tars[tars.length-1],target);
+									else eff=get.effect(target,{name:'juedou',isCard:true},tars[i-1],target);
+									if(i===tars.length-1) eff+=get.effect(tars[i-1],{name:'juedou',isCard:true},target,target);
+									else eff+=get.effect(tars[0],{name:'juedou',isCard:true},target,target);
+									return eff;
+								}
 							}
 							return 0;
 						}
