@@ -54437,8 +54437,7 @@
 					var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
 					if(lib.config.show_characternamepinyin=='showPinyin2'||lib.config.show_characternamepinyin=='showCodeIdentifier2'){
 						var charactername=get.rawName(name);
-						var characterpinyin=get.pinyin(charactername);
-						if(lib.config.show_characternamepinyin=='showCodeIdentifier2') characterpinyin=name;
+						var characterpinyin=lib.config.show_characternamepinyin=='showCodeIdentifier2'?name:get.pinyin(charactername);
 						var nameinfo=get.character(name);
 						var charactersex=get.translation(nameinfo[0]);
 						const charactergroups=get.is.double(name,true);
@@ -54475,8 +54474,7 @@
 						var skillname=get.translation(this.link);
 						var skilltranslationinfo=get.skillInfoTranslation(this.link);
 						if((lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2')&&skillname!='阵亡'){
-							var skillpinyin=get.pinyin(skillname);
-							if(lib.config.show_skillnamepinyin=='showCodeIdentifier2') skillpinyin=this.link;
+							var skillpinyin=lib.config.show_skillnamepinyin=='showCodeIdentifier2'?this.link:get.pinyin(skillname);
 							intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+skillpinyin+']'+'</span>'+'  '+skilltranslationinfo;
 						}else{
 							intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+skilltranslationinfo;
@@ -54494,8 +54492,7 @@
 								var derivationname=get.translation(derivation[i]);
 								var derivationtranslationinfo=get.skillInfoTranslation(derivation[i]);
 								if((lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2')&&derivationname.length<=5&&derivation[i].indexOf('_faq')==-1){
-									var derivationpinyin=get.pinyin(derivationname);
-									if(lib.config.show_skillnamepinyin=='showCodeIdentifier2') derivationpinyin=derivation[i];
+									var derivationpinyin=lib.config.show_skillnamepinyin=='showCodeIdentifier2'?derivation[i]:get.pinyin(derivationname);
 									intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+derivationpinyin+']'+'</span>'+'  '+derivationtranslationinfo;
 								}else{
 									intro2.innerHTML+='<br><br><span style="font-weight:bold;margin-right:5px">'+derivationname+'</span>'+derivationtranslationinfo;
