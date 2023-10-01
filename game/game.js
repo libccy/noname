@@ -13161,12 +13161,8 @@
 					var range;
 					if(!info.notarget){
 						var select=get.copy(info.selectTarget);
-						if(select==undefined){
-							range=[1,1];
-						}
-						else if(typeof select=='number') range=[select,select];
-						else if(get.itemtype(select)=='select') range=select;
-						else if(typeof select=='function') range=select(card,player);
+						range=get.select(select);
+						if(event.selectTarget) range=get.select(event.selectTarget);
 						game.checkMod(card,player,range,'selectTarget',player);
 					}
 					if(info.notarget||range[1]<=-1){
@@ -17852,9 +17848,9 @@
 						}
 					}
 					event.id=get.id();
-					event.excluded=[];
-					event.directHit=[];
-					event.customArgs={default:{}};
+					if(!Array.isArray(event.excluded)) event.excluded=[];
+					if(!Array.isArray(event.directHit)) event.directHit=[];
+					if(typeof event.customArgs!='object'||typeof event.customArgs.default!='object') event.customArgs={default:{}};
 					if(typeof event.baseDamage!='number') event.baseDamage=get.info(card,false).baseDamage||1;
 					if(typeof event.effectCount!='number') event.effectCount=get.info(card,false).effectCount||1;
 					event.effectedCount=0;
@@ -23428,6 +23424,12 @@
 						}
 						else if(get.itemtype(arguments[i])=='player'){
 							next.targets=[arguments[i]];
+						}
+						else if(get.itemtype(arguments[i])=='select'){
+							next.selectTarget=arguments[i];
+						}
+						else if(typeof arguments[i]=='number'){
+							next.selectTarget=[arguments[i],arguments[i]];
 						}
 						else if(get.is.object(arguments[i])&&arguments[i].name){
 							next.card=arguments[i];
