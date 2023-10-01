@@ -17827,7 +17827,7 @@
 					}
 					event.id=get.id();
 					if(!Array.isArray(event.excluded)) event.excluded=[];
-					if(!Array.isArray(event.excluded)) event.directHit=[];
+					if(!Array.isArray(event.directHit)) event.directHit=[];
 					if(typeof event.customArgs!='object'||typeof event.customArgs.default!='object') event.customArgs={default:{}};
 					if(typeof event.baseDamage!='number') event.baseDamage=get.info(card,false).baseDamage||1;
 					if(typeof event.effectCount!='number') event.effectCount=get.info(card,false).effectCount||1;
