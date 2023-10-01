@@ -728,30 +728,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				global:'twzhuiting_global',
 				subSkill:{
 					global:{
-						hiddenCard:function(player,name){
-							if(name!='wuxie'||!lib.inpile.contains('wuxie')) return false;
-							if(!['wei','qun'].contains(player.group)) return false;
-							return game.hasPlayer(target=>target!=player&&target.hasZhuSkill('twzhuiting'));
+						hiddenWuxie:function(player,info){
+							if(player.group!='wei'&&player.group!='qun') return false;
+							const target=info.target,card=info.card;
+							if(!target||target==player||!target.hasZhuSkill('twzhuiting')) return false;
+							if(_status.connectMode&&player.countCards('hs')>0) return true;
+							const color=get.color(card,false);
+							if(color=='none') return false;
+							return player.hasCard(card=>get.color(card)==color,'hes');
 						},
 						audio:'twzhuiting',
 						forceaudio:true,
 						enable:'chooseToUse',
 						filter:function(event,player){
-							if(!['wei','qun'].contains(player.group)) return false;
-							if(!event.filterCard({name:'wuxie'},player,event)||!lib.inpile.contains('wuxie')) return false;
-							var target=event.getParent(4)[event.getParent(4).name=='phaseJudge'?'player':'target'];
-							var cardx=event.getParent(4).card;
-							return target&&cardx&&target!=player&&target.hasZhuSkill('twzhuiting')&&player.countCards('hes',card=>get.color(card,player)==get.color(cardx));
+							if(event.type!='wuxie'||player.group!='wei'&&player.group!='qun') return false;
+							const info=event.info_map,target=info.target,card=info.card;
+							if(!target||target==player||!target.hasZhuSkill('twzhuiting')) return false;
+							const color=get.color(card,false);
+							if(color=='none') return false;
+							return player.hasCard(card=>get.color(card)==color,'hes');
 						},
-						filterCard:function(card,player){
-							var event=_status.event;
-							return get.color(card,player)==get.color(event.getParent(4).card);
+						filterCard:function(card){
+							const info=_status.event.info_map;
+							return info&&get.color(card)==get.color(info.card,false);
 						},
 						viewAs:{name:'wuxie'},
 						position:'hes',
 						prompt:function(){
-							var event=_status.event;
-							return '将一张'+get.translation(get.color(event.getParent(4).card))+'牌当作【无懈可击】对'+get.translation(event.getParent(4)[event.getParent(4).name=='phaseJudge'?'player':'target'])+'使用';
+							const info=_status.event.info_map;
+							return '将一张'+get.translation(get.color(info.card))+'牌当作【无懈可击】对'+get.translation(info.target)+'使用';
 						},
 						check:function(card){
 							return 8-get.value(card);

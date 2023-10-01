@@ -27495,13 +27495,13 @@
 					game.expandSkills(skills);
 					for(var i=0;i<skills.length;i++){
 						var ifo=get.info(skills[i]);
-						if(ifo.viewAs&&typeof ifo.viewAs!='function'&&ifo.viewAs.name=='wuxie'){
-							if(!ifo.viewAsFilter||ifo.viewAsFilter(this)){
+						if(ifo.hiddenWuxie&&info){
+							if(typeof ifo.hiddenWuxie=='function'&&ifo.hiddenWuxie(this,info)){
 								return true;
 							}
 						}
-						else if(ifo.hiddenWuxie&&info){
-							if(typeof ifo.hiddenWuxie=='function'&&ifo.hiddenWuxie(this,info)){
+						else if(ifo.viewAs&&typeof ifo.viewAs!='function'&&ifo.viewAs.name=='wuxie'){
+							if(!ifo.viewAsFilter||ifo.viewAsFilter(this)){
 								return true;
 							}
 						}
