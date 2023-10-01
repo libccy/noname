@@ -14686,8 +14686,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexinsheng_info:'当你受到1点伤害后，你可以获得一张新的化身牌。',
 			re_menghuo:'界孟获',
 			re_menghuo_prefix:'界',
-			re_sunjian:'手杀孙坚',
-			re_sunjian_prefix:'界',
 			re_caopi:'界曹丕',
 			re_caopi_prefix:'界',
 			oljiuchi:'酒池',

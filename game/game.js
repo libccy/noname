@@ -9011,8 +9011,8 @@
 							fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.woff2');}`,0);
 							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,0);
 						});
-						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: local('Noname Suit'), url('${lib.assetURL}font/suits.woff2');}`,0);
-						fontSheet.insertRule(`@font-face {font-family: 'Consolas'; src: local('Consolas'), url('${lib.assetURL}font/consola.woff2');}`,0)
+						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: url('${lib.assetURL}font/suits.woff2');}`,0);
+						fontSheet.insertRule(`@font-face {font-family: 'NonameSuits'; src: url('${lib.assetURL}font/suits.woff2');}`,0)
 						appearenceConfig.cardtext_font.item.default='默认';
 						appearenceConfig.global_font.item.default='默认';
 					}
@@ -33712,23 +33712,24 @@
 								break;
 							}
 						}
+						return `<span style="color:#def7ca" data-nature="watermm">${prefix}</span>`;
 					}
-					return `<span style="color:#def7ca" data-nature="watermm">${prefix}</span>`;
+					return `<span style="font-family:NonameSuits">📱</span>`;
 				},
 			}],
 			['TW',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:Consolas">TW</span>`;
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr">TW</span>`;
 				},
 			}],
 			['SP',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:Consolas">SP</span>`;
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr">SP</span>`;
 				},
 			}],
 			['OL',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:Consolas;color:#fcc4b3" data-nature="firemm">OL</span>`;
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;color:#fcc4b3" data-nature="firemm">OL</span>`;
 				},
 			}],
 			['界SP',{
@@ -57407,26 +57408,14 @@
 			if(lib.translate[str+'_prefix']){
 				return str2.slice(lib.translate[str+'_prefix'].length);
 			}
-			if(str2.indexOf('TW')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('OL')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('JSP')==0){
+			if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
 			}
 			else if(str2.indexOf('☆SP')==0){
 				str2=str2.slice(3);
 			}
-			else if(str2.indexOf('手杀')==0){
-				str2=str2.slice(2);
-			}
 			else if(str2.indexOf('新杀')==0){
 				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('界')==0&&lib.characterPack.refresh&&lib.characterPack.refresh[str]){
-				str2=str2.slice(1);
 			}
 			else if(str2.indexOf('旧')==0&&(lib.characterPack.old||lib.characterPack.mobile)&&(lib.characterPack.old[str]||lib.characterPack.mobile[str])){
 				str2=str2.slice(1);
@@ -57440,20 +57429,11 @@
 			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
 			var str2=lib.translate[str];
 			if(!str2) return '';
-			if(str2.indexOf('TW')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('OL')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('JSP')==0){
+			if(str2.indexOf('JSP')==0){
 				str2=str2.slice(3);
 			}
 			else if(str2.indexOf('☆SP')==0){
 				str2=str2.slice(3);
-			}
-			else if(str2.indexOf('手杀')==0){
-				str2=str2.slice(2);
 			}
 			else if(str2.indexOf('新杀')==0){
 				str2=str2.slice(2);
