@@ -318,6 +318,19 @@
 						),
 					};
 					game.dynamicStyle.addObject(result);
+
+					const g2=cs.group(
+						cs.of(
+							cs.class("tempname",`${nature}`),
+							':not([data-nature])>',
+							cs.class("span")
+						)
+					)
+					let result2={};
+					result2[g2]={
+						color:`rgba(${color1.join()})`,
+					};
+					game.dynamicStyle.addObject(result2);
 				}
 			}],
 		},
