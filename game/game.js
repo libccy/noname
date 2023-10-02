@@ -33753,7 +33753,7 @@
 			}],
 			['TW',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:MotoyaLMaru;transform:scaleY(0.85)">TW</span>`;
+					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">TW</span>`;
 				},
 			}],
 			['TW神',{
@@ -33788,17 +33788,17 @@
 			}],
 			['SP',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:MotoyaLMaru;transform:scaleY(0.85)">SP</span>`;
+					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">SP</span>`;
 				},
 			}],
 			['OL',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:MotoyaLMaru;transform:scaleY(0.85)">OL</span>`;
+					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">OL</span>`;
 				},
 			}],
 			['RE',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:MotoyaLMaru;transform:scaleY(0.85)">RE</span>`;
+					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">RE</span>`;
 				},
 			}],
 			['界SP',{
