@@ -3688,7 +3688,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var card={name:event.list.shift(),isCard:true};
-					if(player.canUse(card,target,false)) player.useCard(card,target,false);
+					if(target.isIn()&&player.canUse(card,target,false)) player.useCard(card,target,false);
 					if(event.list.length) event.redo();
 					'step 3'
 					player.removeSkill('dccansi_draw');
@@ -12302,6 +12302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuwei:'余威',
 			yuwei_info:'主公技，锁定技，其他群雄角色的回合内，你将〖诗怨〗改为“每回合每项限两次”。',
 			re_xinxianying:'新杀辛宪英',
+			re_xinxianying_prefix:'新杀',
 			rezhongjian:'忠鉴',
 			rezhongjian2:'忠鉴',
 			rezhongjian_info:'出牌阶段限一次，你可以选择一名本回合内未选择过的角色。你令其获得一项效果直至你的下回合开始：①其下次造成伤害后弃置两张牌，然后你摸一张牌。②其下次受到伤害后摸两张牌，然后你摸一张牌。',
@@ -12402,7 +12403,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjinggong_info:'你可以将一张装备牌当做无距离限制的【杀】使用。当你声明使用此【杀】后，你将此杀的伤害值基数改为X（X为你至此【杀】第一个目标角色的距离且至多为5）。',
 			dcxiaojuan:'骁隽',
 			dcxiaojuan_info:'当你使用牌指定其他角色为唯一目标后，你可以弃置其一半的手牌（向下取整）。若这些牌中有与你使用牌花色相同的牌，则你弃置一张手牌。',
-			dc_liuyu:'刘虞',
+			dc_liuyu:'新杀刘虞',
+			dc_liuyu_prefix:'新杀',
 			dcsuifu:'绥抚',
 			dcsuifu_info:'其他角色的结束阶段开始时，若你和一号位本回合内累计受到过的伤害值大于1，则你可以将该角色的所有手牌置于牌堆顶，然后视为使用一张【五谷丰登】。',
 			dcpijing:'辟境',
@@ -12524,7 +12526,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhanmeng:'占梦',
 			dczhanmeng_info:'当你使用牌时，你可以选择本回合未选择过的一项：1.上一回合内，若没有同名牌被使用过，你获得一张非伤害牌；2.下一回合内，当同名牌首次被使用后，你获得一张伤害牌；3.令一名其他角色弃置两张牌，若点数之和大于10，你对其造成1点火焰伤害。',
 			dc_wangyun:'新杀王允',
-			dc_wangyun_ab:'王允',
+			dc_wangyun_prefix:'新杀',
 			dclianji:'连计',
 			dclianji_info:'出牌阶段限一次。你可以弃置一张手牌并选择一名其他角色，其随机使用牌堆中的一张武器牌，然后其选择一项：1.对另一名其他角色使用一张【杀】，并将武器牌交给其中一个目标；2.令你视为对其使用一张【杀】，并将武器牌交给你。',
 			dcmoucheng:'谋逞',
@@ -12659,16 +12661,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcxiaoren:'绡刃',
 			dcxiaoren_info:'每回合限一次，当你造成伤害后，你可以进行判定，若结果为：红色，你可以令一名角色回复1点体力；黑色，你可以对受伤角色的上家或下家造成1点伤害，然后你可以重复此方向的伤害流程直到有角色因此死亡或下个目标角色为你。',
 			dc_daxiaoqiao:'新杀大乔小乔',
+			dc_daxiaoqiao_prefix:'新杀',
 			dcxingwu:'星舞',
 			dcxingwu_info:'弃牌阶段开始时，你可以将一张手牌置于武将牌上，称为“星舞”。若你的“星舞”牌达到三张，则你可移去三张“星舞”，弃置一名其他角色装备区里的所有牌，然后对其造成X点伤害（X为移去的“星舞”牌的花色数，若为女性角色则改为1点伤害）。',
 			dcluoyan:'落雁',
 			dcluoyan_info:'锁定技，若你有“星舞”牌，你视为拥有技能〖天香〗和〖流离〗。',
 			dc_xiahouba:'新杀夏侯霸',
+			dc_xiahouba_prefix:'新杀',
 			old_huangfusong:'新杀皇甫嵩',
+			old_huangfusong_prefix:'新杀',
 			dc_sp_machao:'群马超',
+			dc_sp_machao_prefix:'群',
 			dc_shixie:'新杀士燮',
+			dc_shixie_prefix:'新杀',
 			ol_guansuo:'新杀关索',
+			ol_guansuo_prefix:'新杀',
 			dc_zhaoxiang:'新杀赵襄',
+			dc_zhaoxiang_prefix:'新杀',
 			dc_xujing:'许靖',
 			dcshangyu:'赏誉',
 			dcshangyu_tag:'赏誉',

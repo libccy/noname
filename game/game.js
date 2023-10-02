@@ -9012,7 +9012,8 @@
 							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,0);
 						});
 						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: url('${lib.assetURL}font/suits.woff2');}`,0);
-						fontSheet.insertRule(`@font-face {font-family: 'NonameSuits'; src: url('${lib.assetURL}font/suits.woff2');}`,0)
+						fontSheet.insertRule(`@font-face {font-family: 'NonameSuits'; src: url('${lib.assetURL}font/suits.woff2');}`,0);
+						fontSheet.insertRule(`@font-face {font-family: 'MotoyaLMaru'; src: url('${lib.assetURL}font/motoyamaru.woff2');}`,0)
 						appearenceConfig.cardtext_font.item.default='默认';
 						appearenceConfig.global_font.item.default='默认';
 					}
@@ -33672,8 +33673,8 @@
 				nature:'woodmm',
 			}],
 			['武',{
-				color:'#a5e3b9',
-				nature:'kamimm',
+				color:'#fd8359',
+				nature:'soilmm',
 			}],
 			['乐',{
 				color:'#f7f4fc',
@@ -33703,6 +33704,22 @@
 				color:'#c3f9ff',
 				nature:'thundermm',
 			}],
+			['将',{
+				nature:'firemm',
+			}],
+			['新杀',{
+				color:'#fefedc',
+				nature:'metalmm',
+				showName:'新',
+			}],
+			['旧',{
+				getSpan:(prefix,name)=>{
+					return `<span style="opacity:0.7">旧</span>`;
+				},
+			}],
+			['★SP',{
+				showName:'★',
+			}],
 			['手杀',{
 				getSpan:(prefix,name)=>{
 					if(lib.characterPack.shiji&&name in lib.characterPack.shiji){
@@ -33719,17 +33736,37 @@
 			}],
 			['TW',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr">TW</span>`;
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:MotoyaLMaru;transform:scaleY(0.85)">TW</span>`;
+				},
+			}],
+			['TW神',{
+				getSpan:(prefix,name)=>{
+					return get.prefixSpan('TW')+get.prefixSpan('神')
+				},
+			}],
+			['TW将',{
+				getSpan:(prefix,name)=>{
+					return get.prefixSpan('TW')+get.prefixSpan('将')
+				},
+			}],
+			['OL神',{
+				getSpan:(prefix,name)=>{
+					return get.prefixSpan('OL')+get.prefixSpan('神')
+				},
+			}],
+			['旧神',{
+				getSpan:(prefix,name)=>{
+					return get.prefixSpan('旧')+get.prefixSpan('神')
 				},
 			}],
 			['SP',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr">SP</span>`;
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:MotoyaLMaru;transform:scaleY(0.85)">SP</span>`;
 				},
 			}],
 			['OL',{
 				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;color:#fcc4b3" data-nature="firemm">OL</span>`;
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:MotoyaLMaru;transform:scaleY(0.85)">OL</span>`;
 				},
 			}],
 			['界SP',{
@@ -54436,7 +54473,7 @@
 				if(lib.config.show_characternamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_characternamepinyin=='showCodeIdentifier2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2'){
 					var intro=ui.create.div('.characterintro',get.characterIntro(name),uiintro);
 					if(lib.config.show_characternamepinyin=='showPinyin2'||lib.config.show_characternamepinyin=='showCodeIdentifier2'){
-						var charactername=get.rawName(name);
+						var charactername=get.rawName2(name);
 						var characterpinyin=lib.config.show_characternamepinyin=='showCodeIdentifier2'?name:get.pinyin(charactername);
 						var nameinfo=get.character(name);
 						var charactersex=get.translation(nameinfo[0]);
@@ -54529,7 +54566,7 @@
 					if(showCharacterNamePinyin!='doNotShow'){
 						const characterIntroTable=ui.create.div('.character-intro-table',introduction),span=document.createElement('span');
 						span.style.fontWeight='bold';
-						const nameInfo=get.character(name),exInfo=nameInfo[4],characterName=exInfo&&exInfo.includes('ruby')?lib.translate[name]:get.rawName(name);
+						const nameInfo=get.character(name),exInfo=nameInfo[4],characterName=exInfo&&exInfo.includes('ruby')?lib.translate[name]:get.rawName2(name);
 						span.innerHTML=characterName;
 						const ruby=document.createElement('ruby');
 						ruby.appendChild(span);
@@ -57399,41 +57436,20 @@
 			return num.toString();
 		},
 		rawName:function(str){
-			var str2=lib.translate[str];
-			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
+			let str2=lib.translate[str];
+			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
 			if(!str2) return '';
-			if(lib.translate[str+'_prefix']){
+			if(lib.translate[str+'_prefix']&&str2.startsWith(lib.translate[str+'_prefix'])){
 				return str2.slice(lib.translate[str+'_prefix'].length);
-			}
-			if(str2.indexOf('JSP')==0){
-				str2=str2.slice(3);
-			}
-			else if(str2.indexOf('☆SP')==0){
-				str2=str2.slice(3);
-			}
-			else if(str2.indexOf('新杀')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('旧')==0&&(lib.characterPack.old||lib.characterPack.mobile)&&(lib.characterPack.old[str]||lib.characterPack.mobile[str])){
-				str2=str2.slice(1);
-			}
-			else if(str2.indexOf('新')==0&&(str.indexOf('re_')==0||str.indexOf('new_')==0)){
-				str2=str2.slice(1);
 			}
 			return str2;
 		},
+		//作用修改：只读前缀 不读_ab
 		rawName2:function(str){
-			if(lib.translate[str+'_ab']) return lib.translate[str+'_ab'];
-			var str2=lib.translate[str];
+			let str2=lib.translate[str];
 			if(!str2) return '';
-			if(str2.indexOf('JSP')==0){
-				str2=str2.slice(3);
-			}
-			else if(str2.indexOf('☆SP')==0){
-				str2=str2.slice(3);
-			}
-			else if(str2.indexOf('新杀')==0){
-				str2=str2.slice(2);
+			if(lib.translate[str+'_prefix']&&str2.startsWith(lib.translate[str+'_prefix'])){
+				return str2.slice(lib.translate[str+'_prefix'].length);
 			}
 			return str2;
 		},
@@ -57441,28 +57457,10 @@
 			var str2=lib.translate[str];
 			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
 			if(!str2) return '';
-			if(lib.translate[str+'_prefix']){
+			if(lib.translate[str+'_prefix']&&str2.startsWith(lib.translate[str+'_prefix'])){
 				return `${get.prefixSpan(lib.translate[str+'_prefix'],str)}<span>${str2.slice(lib.translate[str+'_prefix'].length)}</span>`;
 			}
-			if(str2.indexOf('TW')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('OL')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('JSP')==0){
-				str2=str2.slice(3);
-			}
-			else if(str2.indexOf('☆SP')==0){
-				str2=str2.slice(3);
-			}
-			else if(str2.indexOf('手杀')==0){
-				str2=str2.slice(2);
-			}
-			else if(str2.indexOf('新杀')==0){
-				str2=str2.slice(2);
-			}
-			return get.verticalStr(str2,true);
+			return str2;
 		},
 		prefixSpan:function(prefix,name){
 			let color='#ffffff',nature=false;
@@ -59552,7 +59550,7 @@
 			else if(node.classList.contains('equips')&&ui.arena.classList.contains('selecting')){
 				(function(){
 					uiintro.add('选择装备');
-					uiintro.addSmall(Array.from(node.childNodes),true);
+					uiintro.addSmall(Array.from(node.childNodes).filter(node=>!node.classList.contains('feichu')),true);
 					uiintro.clickintro=true;
 					ui.control.hide();
 					uiintro._onclose=function(){
