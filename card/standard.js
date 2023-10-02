@@ -888,10 +888,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				reverseOrder:true,
 				content:function(){
 					"step 0"
+					if(typeof event.shaRequired!='number'||!event.shaRequired||event.shaRequired<0) event.shaRequired=1;
 					if(typeof event.baseDamage!='number') event.baseDamage=1;
+					"step 1"
 					if(event.directHit) event._result={bool:false};
 					else{
 						var next=target.chooseToRespond({name:'sha'});
+						if(event.shaRequired>1){
+							next.set('prompt2','共需打出'+event.shaRequired+'张杀');
+						}
 						next.set('ai',function(card){
 							var evt=_status.event.getParent();
 							if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
@@ -901,9 +906,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						});
 						next.autochoose=lib.filter.autoRespondSha;
 					}
-					"step 1"
+					"step 2"
 					if(result.bool==false){
 						target.damage();
+					}
+					else{
+						event.shaRequired--;
+						if(event.shaRequired>0) event.goto(1);
 					}
 				},
 				ai:{
@@ -960,10 +969,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
+					if(typeof event.shanRequired!='number'||!event.shanRequired||event.shanRequired<0) event.shanRequired=1;
 					if(typeof event.baseDamage!='number') event.baseDamage=1;
+					"step 1"
 					if(event.directHit) event._result={bool:false};
 					else{
 						var next=target.chooseToRespond({name:'shan'});
+						if(event.shanRequired>1){
+							next.set('prompt2','共需打出'+event.shanRequired+'张闪');
+						}
 						next.set('ai',function(card){
 							var evt=_status.event.getParent();
 							if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
@@ -976,9 +990,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						});
 						next.autochoose=lib.filter.autoRespondShan;
 					}
-					"step 1"
+					"step 2"
 					if(result.bool==false){
 						target.damage();
+					}
+					else{
+						event.shanRequired--;
+						if(event.shanRequired>0) event.goto(1);
 					}
 				},
 				ai:{
