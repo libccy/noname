@@ -888,9 +888,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				reverseOrder:true,
 				content:function(){
 					"step 0"
-					if(!event.shaReq) event.shaReq={};
-					if(typeof event.shaReq[target.playerid]!='number') event.shaReq[target.playerid]=1;
-					event.shaRequired=event.shaReq[target.playerid];
+					if(typeof event.shaRequired!='number'||!event.shaRequired||event.shaRequired<0) event.shaRequired=1;
 					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					"step 1"
 					if(event.directHit) event._result={bool:false};
@@ -971,9 +969,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					if(!event.shanReq) event.shanReq={};
-					if(typeof event.shanReq[target.playerid]!='number') event.shanReq[target.playerid]=1;
-					event.shanRequired=event.shanReq[target.playerid];
+					if(typeof event.shanRequired!='number'||!event.shanRequired||event.shanRequired<0) event.shanRequired=1;
 					if(typeof event.baseDamage!='number') event.baseDamage=1;
 					"step 1"
 					if(event.directHit) event._result={bool:false};
