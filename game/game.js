@@ -26153,72 +26153,60 @@
 					return list;
 				},
 				addSkillTrigger:function(skill,hidden,triggeronly){
-					var info=lib.skill[skill];
-					if(!info) return;
-					if(typeof info.group=='string'){
-						this.addSkillTrigger(info.group,hidden);
-					}
-					else if(Array.isArray(info.group)){
-						for(var i=0;i<info.group.length;i++){
-							this.addSkillTrigger(info.group[i],hidden);
+					let skills=game.expandSkills([skill]);
+					for(let skill of skills){
+						let info=lib.skill[skill];
+						if(!info){
+							console.trace(`Cannot find skill: ${skill}\nPlease check if game.expandSkills is overwritten`);
+							continue;
 						}
-					}
-					if(!triggeronly){
-						if(info.global&&(!hidden||info.globalSilent)){
-							if(typeof info.global=='string'){
-								game.addGlobalSkill(info.global,this);
+						if(!triggeronly){
+							if(info.global&&(!hidden||info.globalSilent)){
+								if(typeof info.global=='string'){
+									game.addGlobalSkill(info.global,this);
+								}
+								else{
+									for(let j=0;j<info.global.length;j++){
+										game.addGlobalSkill(info.global[j],this);
+									}
+								}
 							}
-							else{
-								for(var j=0;j<info.global.length;j++){
-									game.addGlobalSkill(info.global[j],this);
+							if(this.initedSkills.contains(skill)) return this;
+							this.initedSkills.push(skill);
+							if(info.init&&!_status.video) info.init(this,skill);
+						}
+						if(info.trigger&&this.playerid){
+							let playerid=this.playerid;
+							let setTrigger=function(i,evt){
+								if(i=='global'){
+									if(!lib.hook.globaltrigger[evt]){
+										lib.hook.globaltrigger[evt]={};
+									}
+									if(!lib.hook.globaltrigger[evt][playerid]){
+										lib.hook.globaltrigger[evt][playerid]=[];
+									}
+									lib.hook.globaltrigger[evt][playerid].add(skill);
+								}
+								else{
+									let name=playerid+'_'+i+'_'+evt;
+									if(!lib.hook[name]) lib.hook[name]=[];
+									lib.hook[name].add(skill);
+								}
+								lib.hookmap[evt]=true;
+							}
+							for(let i in info.trigger){
+								if(typeof info.trigger[i]=='string') setTrigger(i,info.trigger[i]);
+								else if(Array.isArray(info.trigger[i])){
+									for(let trigger of info.trigger[i]) setTrigger(i,trigger);
 								}
 							}
 						}
-						if(this.initedSkills.contains(skill)) return this;
-						this.initedSkills.push(skill);
-						if(info.init&&!_status.video){
-							info.init(this,skill);
+						if(info.hookTrigger){
+							if(!this._hookTrigger) this._hookTrigger=[];
+							this._hookTrigger.add(skill);
 						}
+						if(_status.event&&_status.event.addTrigger) _status.event.addTrigger(skill,this);
 					}
-					if(info.trigger&&this.playerid){
-						var playerid=this.playerid;
-						var setTrigger=function(i,evt){
-							if(i=='global'){
-								if(!lib.hook.globaltrigger[evt]){
-									lib.hook.globaltrigger[evt]={};
-								}
-								if(!lib.hook.globaltrigger[evt][playerid]){
-									lib.hook.globaltrigger[evt][playerid]=[];
-								}
-								lib.hook.globaltrigger[evt][playerid].add(skill);
-							}
-							else{
-								var name=playerid+'_'+i+'_'+evt;
-								if(!lib.hook[name]){
-									lib.hook[name]=[];
-								}
-								lib.hook[name].add(skill);
-							}
-							lib.hookmap[evt]=true;
-						}
-						for(var i in info.trigger){
-							if(typeof info.trigger[i]=='string'){
-								setTrigger(i,info.trigger[i]);
-							}
-							else if(Array.isArray(info.trigger[i])){
-								for(var j=0;j<info.trigger[i].length;j++){
-									setTrigger(i,info.trigger[i][j]);
-								}
-							}
-						}
-					}
-					if(info.hookTrigger){
-						if(!this._hookTrigger){
-							this._hookTrigger=[];
-						}
-						this._hookTrigger.add(skill);
-					}
-					if(_status.event&&_status.event.addTrigger) _status.event.addTrigger(skill,this);
 					return this;
 				},
 				addSkillLog:function(skill){
@@ -26506,59 +26494,49 @@
 					return this;
 				},
 				removeSkillTrigger:function(skill,triggeronly){
-					var info=lib.skill[skill];
-					if(!info) return;
-					if(typeof info.group=='string'){
-						this.removeSkillTrigger(info.group);
-					}
-					else if(Array.isArray(info.group)){
-						for(var i=0;i<info.group.length;i++){
-							this.removeSkillTrigger(info.group[i]);
+					let skills=game.expandSkills([skill]);
+					for(let skill of skills){
+						let info=lib.skill[skill];
+						if(!info){
+							console.trace(`Cannot find skill: ${skill}\nPlease check if game.expandSkills is overwritten`);
+							continue;
 						}
-					}
-					if(!triggeronly) this.initedSkills.remove(skill);
-					if(info.trigger){
-						var playerid=this.playerid;
-						var removeTrigger=function(i,evt){
-							if(i=='global'){
-								for(var j in lib.hook.globaltrigger){
-									if(lib.hook.globaltrigger[j][playerid]){
-										lib.hook.globaltrigger[j][playerid].remove(skill);
-										if(lib.hook.globaltrigger[j][playerid].length==0){
-											delete lib.hook.globaltrigger[j][playerid];
-										}
-										if(get.is.empty(lib.hook.globaltrigger[j])){
-											delete lib.hook.globaltrigger[j];
+						if(!triggeronly) this.initedSkills.remove(skill);
+						if(info.trigger){
+							let playerid=this.playerid;
+							let removeTrigger=function(i,evt){
+								if(i=='global'){
+									for(let j in lib.hook.globaltrigger){
+										if(lib.hook.globaltrigger[j][playerid]){
+											lib.hook.globaltrigger[j][playerid].remove(skill);
+											if(lib.hook.globaltrigger[j][playerid].length==0){
+												delete lib.hook.globaltrigger[j][playerid];
+											}
+											if(get.is.empty(lib.hook.globaltrigger[j])){
+												delete lib.hook.globaltrigger[j];
+											}
 										}
 									}
 								}
-							}
-							else{
-								var name=playerid+'_'+i+'_'+evt;
-								if(lib.hook[name]){
-									lib.hook[name].remove(skill);
-									if(lib.hook[name].length==0){
-										delete lib.hook[name];
+								else{
+									let name=playerid+'_'+i+'_'+evt;
+									if(lib.hook[name]){
+										lib.hook[name].remove(skill);
+										if(lib.hook[name].length==0) delete lib.hook[name];
 									}
 								}
 							}
-						}
-						for(var i in info.trigger){
-							if(typeof info.trigger[i]=='string'){
-								removeTrigger(i,info.trigger[i]);
-							}
-							else if(Array.isArray(info.trigger[i])){
-								for(var j=0;j<info.trigger[i].length;j++){
-									removeTrigger(i,info.trigger[i][j]);
+							for(let i in info.trigger){
+								if(typeof info.trigger[i]=='string') removeTrigger(i,info.trigger[i]);
+								else if(Array.isArray(info.trigger[i])){
+									for(let trigger of info.trigger[i]) removeTrigger(i,trigger);
 								}
 							}
 						}
-					}
-					if(info.hookTrigger){
-						if(this._hookTrigger){
-							this._hookTrigger.remove(skill);
-							if(!this._hookTrigger.length){
-								delete this._hookTrigger;
+						if(info.hookTrigger){
+							if(this._hookTrigger){
+								this._hookTrigger.remove(skill);
+								if(!this._hookTrigger.length) delete this._hookTrigger;
 							}
 						}
 					}
@@ -40228,7 +40206,7 @@
 			if(drawDeck&&drawDeck.drawDeck) players[0].draw(num2,drawDeck);
 			else players[0].draw(num2);
 		},
-		finishSkill:(i,sub)=>{
+		finishSkill:(i,history)=>{
 			const mode=get.mode(),info=lib.skill[i],iInfo=`${i}_info`;
 			if(info.alter){
 				lib.translate[`${iInfo}_origin`]=lib.translate[iInfo];
@@ -40271,14 +40249,25 @@
 				});
 			}
 			if(info.inherit){
-				const skill=lib.skill[info.inherit];
-				if(skill) Object.keys(skill).forEach(value=>{
-					if(info[value]!=undefined) return;
-					if(value=='audio'&&(typeof info[value]=='number'||typeof info[value]=='boolean')) info[value]=info.inherit;
-					else info[value]=skill[value];
-				});
-				if(lib.translate[i]==undefined) lib.translate[i]=lib.translate[info.inherit];
-				if(lib.translate[iInfo]==undefined) lib.translate[iInfo]=lib.translate[`${info.inherit}_info`];
+				var inheritHistory=[];
+				while(true){
+					if(!info.inherit) break;
+					if(inheritHistory.includes(info.inherit)){
+						console.trace(`Inherit Error: ${info.inherit} in ${i}'s inherit forms a deadlock`);
+						break;
+					}
+					inheritHistory.push(info.inherit);
+		
+					const inheritInfo=lib.skill[info.inherit];
+					if(inheritInfo) Object.keys(inheritInfo).forEach(value=>{
+						if(info[value]!=undefined) return;
+						if(value=='audio'&&(typeof info[value]=='number'||typeof info[value]=='boolean')) info[value]=info.inherit;
+						else info[value]=inheritInfo[value];
+					});
+					if(lib.translate[i]==undefined) lib.translate[i]=lib.translate[info.inherit];
+					if(lib.translate[`${i}_info`]==undefined) lib.translate[`${i}_info`]=lib.translate[`${info.inherit}_info`];
+					if(!inheritInfo||!inheritInfo.inherit) info.inherit=void 0;
+				}
 			}
 			if(info.limited){
 				if(info.mark===undefined) info.mark=true;
@@ -40287,16 +40276,26 @@
 				if(info.skillAnimation===undefined) info.skillAnimation=true;
 				if(info.init===undefined) info.init=(player,skill)=>player.storage[skill]=false;
 			}
-			if(info.subSkill&&!sub) Object.keys(info.subSkill).forEach(value=>{
-				const iValue=`${i}_${value}`;
-				lib.skill[iValue]=info.subSkill[value];
-				lib.skill[iValue].sub=true;
-				if(info.subSkill[value].name) lib.translate[iValue]=info.subSkill[value].name;
-				else lib.translate[iValue]=lib.translate[iValue]||lib.translate[i];
-				if(info.subSkill[value].description) lib.translate[`${iValue}_info`]=info.subSkill[value].description;
-				if(info.subSkill[value].marktext) lib.translate[`${iValue}_bg`]=info.subSkill[value].marktext;
-				game.finishSkill(iValue,true);
-			});
+			if(info.subSkill){
+				let subSkillHistory=Array.isArray(history)?history:[];
+				for(let value in info.subSkill){
+					if(subSkillHistory.includes(value)){
+						console.trace(`SubSkill Error: ${value} in ${i} forms a deadlock`);
+						continue;
+					}
+					let history=subSkillHistory.slice(0);
+					history.push(value);
+					
+					const iValue=`${i}_${value}`;
+					lib.skill[iValue]=info.subSkill[value];
+					lib.skill[iValue].sub=true;
+					if(info.subSkill[value].name) lib.translate[iValue]=info.subSkill[value].name;
+					else lib.translate[iValue]=lib.translate[iValue]||lib.translate[i];
+					if(info.subSkill[value].description) lib.translate[`${iValue}_info`]=info.subSkill[value].description;
+					if(info.subSkill[value].marktext) lib.translate[`${iValue}_bg`]=info.subSkill[value].marktext;
+					game.finishSkill(iValue,history);
+				}
+			}
 			if(info.round){
 				const k=`${i}_roundcount`;
 				if(typeof info.group=='string') info.group=[info.group,k];
@@ -41199,15 +41198,25 @@
 			if(!player.storage.skill_blocker||!player.storage.skill_blocker.length) return out;
 			return out.filter(value=>exclude&&exclude.includes(value)||!get.is.blocked(value,player));
 		},
-		expandSkills:skills=>skills.addArray(skills.reduce((previousValue,currentValue)=>{
-			const info=get.info(currentValue);
-			if(info){
-				if(Array.isArray(info.group)) previousValue.push(...info.group);
-				else if(info.group) previousValue.push(info.group);
+		expandSkills:(skill,oldHistory)=>{
+			let history=[];
+			if(oldHistory) history.addArray(oldHistory);
+			if(Array.isArray(skill)){
+				return skill.reduce((previous,current)=>previous.addArray(game.expandSkills(current,history)),[]);
 			}
-			else console.log(currentValue);
-			return previousValue;
-		},[])),
+			
+			let info=get.info(skill);
+			if(!info){
+				console.trace(`Cannot find skill: ${skill}`);
+				return history;
+			}
+			history.add(skill);
+			if(info.group){
+				let group=Array.isArray(info.group)?info.group:[info.group];
+				history.addArray(game.expandSkills([].addArray(group.filter(skill=>!history.includes(skill))),history));
+			}
+			return history;
+		},
 		css:style=>Object.keys(style).forEach(value=>{
 			let uiStyle=ui.style[value];
 			if(!uiStyle){
