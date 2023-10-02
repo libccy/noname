@@ -10325,6 +10325,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcneifa:'内伐',
 			dcneifa_info:'出牌阶段开始时，你可以摸三张牌，然后弃置一张牌。若你弃置的牌类型为：基本牌，本阶段你不能使用锦囊牌，且【杀】的使用次数上限+X且可以额外指定一名目标；锦囊牌，本阶段你不能使用基本牌，且使用普通锦囊牌选择目标时可以增加或减少一个目标（X为你发动〖内伐〗弃牌后手牌中因〖内伐〗而不能使用的牌的数量且最多为5。你以此法选择的额外目标均无距离限制）。',
 			dc_sunziliufang:'新杀孙资刘放',
+			dc_sunziliufang_prefix:'新杀',
 			dcqinshen:'勤慎',
 			dcqinshen_info:'弃牌阶段结束时，你可以摸X张牌（X为本回合未进入过弃牌堆的花色数）。',
 			dcweidang:'伪谠',
