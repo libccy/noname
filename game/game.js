@@ -14826,6 +14826,10 @@
 				},
 				chooseToUse:function(){
 					"step 0"
+					if(event.nouse){
+						event.required=event.required||1;
+						event.selectCard=event.required;
+					}
 					if(event.responded) return;
 					if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()&&!lib.filter.wuxieSwap(event)){
 						game.modeSwapPlayer(player);
@@ -14992,6 +14996,13 @@
 						}
 						if(event.aidelay&&event.result&&event.result.bool){
 							game.delayx();
+						}
+					}
+					if(!event.nouse){
+						event.required=event.required||1;
+						event.required--;
+						if(event.required>0&&event.result.bool){
+							event.recall=true;
 						}
 					}
 					"step 2"
@@ -15182,6 +15193,11 @@
 						if(event.aidelay&&event.result&&event.result.bool){
 							game.delayx();
 						}
+					}
+					event.required=event.required||1;
+					event.required--;
+					if(event.required>0&&event.result.bool){
+						event.recall=true;
 					}
 					"step 2"
 					event.resume();
@@ -38615,6 +38631,12 @@
 							next.parent=event;
 							_status.event=next;
 						}
+					}
+					else if(event.recall){
+						delete event.recall;
+						event.finished=false;
+						event._triggered=0;
+						event.step=0;
 					}
 					else{
 						if(event.parent){
