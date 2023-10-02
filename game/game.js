@@ -57521,7 +57521,8 @@
 			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
 			if(!str2) return '';
 			if(lib.translate[str+'_prefix']&&str2.startsWith(lib.translate[str+'_prefix'])){
-				return `${get.prefixSpan(lib.translate[str+'_prefix'],str)}<span>${str2.slice(lib.translate[str+'_prefix'].length)}</span>`;
+				//兼容版特化处理
+				return `${get.prefixSpan(lib.translate[str+'_prefix'],str)}<span>${str2.slice(lib.translate[str+'_prefix'].length)}　</span>`;
 			}
 			return str2;
 		},
