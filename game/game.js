@@ -33725,14 +33725,12 @@
 				showName:'新',
 			}],
 			['旧',{
-				getSpan:(prefix,name)=>{
-					return `<span style="opacity:0.7">旧</span>`;
-				},
+				color:'#a4a4a4',
+				nature:'black',
 			}],
 			['旧界',{
-				getSpan:(prefix,name)=>{
-					return `<span style="opacity:0.7;color:#fdd559" data-nature="soilmm">旧界</span>`;
-				},
+				color:'#a4a4a4',
+				nature:'black',
 			}],
 			['★SP',{
 				showName:'★',
