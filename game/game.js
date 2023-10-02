@@ -33717,6 +33717,11 @@
 					return `<span style="opacity:0.7">旧</span>`;
 				},
 			}],
+			['旧界',{
+				getSpan:(prefix,name)=>{
+					return `<span style="opacity:0.7;color:#fdd559" data-nature="soilmm">旧界</span>`;
+				},
+			}],
 			['★SP',{
 				showName:'★',
 			}],
@@ -33759,6 +33764,16 @@
 					return get.prefixSpan('旧')+get.prefixSpan('神')
 				},
 			}],
+			['旧晋',{
+				getSpan:(prefix,name)=>{
+					return get.prefixSpan('旧')+get.prefixSpan('晋')
+				},
+			}],
+			['新杀SP',{
+				getSpan:(prefix,name)=>{
+					return get.prefixSpan('新杀')+get.prefixSpan('SP')
+				},
+			}],
 			['SP',{
 				getSpan:(prefix,name)=>{
 					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:MotoyaLMaru;transform:scaleY(0.85)">SP</span>`;
@@ -33767,6 +33782,11 @@
 			['OL',{
 				getSpan:(prefix,name)=>{
 					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:MotoyaLMaru;transform:scaleY(0.85)">OL</span>`;
+				},
+			}],
+			['RE',{
+				getSpan:(prefix,name)=>{
+					return `<span style="writing-mode:lr;-webkit-writing-mode:lr;font-family:MotoyaLMaru;transform:scaleY(0.85)">RE</span>`;
 				},
 			}],
 			['界SP',{

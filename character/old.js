@@ -3,7 +3,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'old',
 		connect:true,
-		connectBanned:['zhangliang'],
 		characterSort:{
 			old:{
 				old_standard:['ol_yuanshu'],
@@ -1091,8 +1090,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fazheng:'旧法正',
 			fazheng_prefix:'旧',
 			junk_simayi:'旧晋司马懿',
-			junk_simayi_prefix:'旧',
-			junk_simayi_ab:'司马懿',
+			junk_simayi_prefix:'旧晋',
 			madai:'旧马岱',
 			madai_prefix:'旧',
 			old_yangzhi:'旧杨芷',
@@ -1114,7 +1112,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_liubiao:'旧刘表',
 			old_liubiao_prefix:'旧',
 			oldre_liubiao:'RE刘表',
-			oldre_liubiao_ab:'刘表',
+			oldre_liubiao_prefix:'RE',
 			oldzishou:'自守',
 			oldzishou_info:'摸牌阶段，若你已受伤，你可令额定摸牌数+X（X为你已损失的体力值），然后跳过下一个出牌阶段。',
 			old_huanghao:'旧黄皓',

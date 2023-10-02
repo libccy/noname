@@ -7222,6 +7222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_guixin":"归心",
 			"new_guixin_info":"当你受到1点伤害后，你可以按照你选择的区域优先度随机获得每名其他角色区域里的一张牌，然后你翻面。",
 			ol_zhangliao:'OL神张辽',
+			ol_zhangliao_prefix:'OL神',
 			olduorui:'夺锐',
 			olduorui2:'夺锐',
 			olduorui_info:'当你于出牌阶段内对一名角色造成伤害后，你可以选择该角色武将牌上的一个技能。若如此做，你结束出牌阶段，且你令此技能于其下个回合结束之前无效。',
