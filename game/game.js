@@ -25162,7 +25162,7 @@
 				},
 				addJudgeNext:function(card,unlimited){
 					if(!card.expired){
-						if(!unlimited&&get.postion(card,true)!=='o'&&get.postion(card,true)!=='j'){
+						if(!unlimited&&get.position(card,true)!=='o'&&get.position(card,true)!=='j'){
 			  				game.log('将',card,'移入',this.next,'的判定区失败');
 							return;
 						}
