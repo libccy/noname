@@ -8207,17 +8207,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
-					if(!['sha','shan'].contains(name)) return false;
+					if(!['sha','shan'].includes(name)) return false;
 					return player.hasCard(function(card){
-						return card.name=='sha'||card.name=='shan';
+						const name2=get.name(card);
+						return (name2=='sha'||name2=='shan')&&name!=name2;
 					},'hs');
 				},
 				filter:function(event,player){
-					if(event.filterCard({name:'sha'},player,event)||event.filterCard({name:'shan'},player,event)){
-						return player.hasCard(function(card){
-							return card.name=='sha'||card.name=='shan';
-						},'hs');
-					}
+					const names=[];
+					if(event.filterCard({name:'sha'},player,event)) names.push('shan');
+					if(event.filterCard({name:'shan'},player,event)) names.push('sha');
+					return names.length>0&&player.hasCard(function(card){
+						return names.includes(get.name(card));
+					},'hs');
 					return false;
 				},
 				group:'twchaofeng_compare',
@@ -8256,8 +8258,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							audio:'twchaofeng',
 							name:links[0][2],
 							filterCard:function(card,player,target){
-								if(lib.skill.twchaofeng_backup.name=='sha') return card.name=='shan';
-								else return card.name=='sha';
+								if(lib.skill.twchaofeng_backup.name=='sha') return get.name(card)=='shan';
+								else return get.name(card)=='sha';
 							},
 							selectCard:1,
 							check:function(card,player,target){
@@ -8355,7 +8357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				limited:true,
 				skillAnimation:true,
-				animationColor:'legend',
+				animationColor:'qun',
 				direct:true,
 				content:function(){
 					'step 0'
