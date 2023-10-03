@@ -18617,7 +18617,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			seira_yuanying_info:'出牌阶段限一次，你可选择两名角色。这两名角色成为“姻缘者”且获得〖姻缘〗直到你下次发动〖缘映〗。',
 			seira_yinyuan:'姻缘',
 			seira_yinyuan_info:'你的手牌对其他“姻缘者”可见。出牌阶段限一次，你可以获得一名其他“姻缘者”区域内的一张牌，然后其回复1点体力。',
-			key_kiyu:'露娜Q',
+			key_kiyu:'露娜Ｑ',
 			kiyu_yuling:'玉灵',
 			kiyu_yuling_info:'锁定技。你不是有距离限制的锦囊牌的合法目标；你成为【杀】的目标后，使用者需弃置X张牌（X为其至你的距离）。',
 			kiyu_xianyu:'先预',

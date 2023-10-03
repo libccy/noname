@@ -33716,6 +33716,15 @@
 				color:'#c3f9ff',
 				nature:'thundermm',
 			}],
+			['用间',{
+				color:'#c3f9ff',
+				nature:'thundermm',
+			}],
+			['战役篇',{
+				color:'#c3f9ff',
+				nature:'thundermm',
+				showName:'战',
+			}],
 			['将',{
 				nature:'firemm',
 			}],
@@ -33734,6 +33743,24 @@
 			}],
 			['★SP',{
 				showName:'★',
+			}],
+			['K系列',{
+				showName:'Ｋ',
+			}],
+			['SP',{
+				getSpan:(prefix,name)=>{
+					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">SP</span>`;
+				},
+			}],
+			['OL',{
+				getSpan:(prefix,name)=>{
+					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">OL</span>`;
+				},
+			}],
+			['RE',{
+				getSpan:(prefix,name)=>{
+					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">RE</span>`;
+				},
 			}],
 			['手杀',{
 				getSpan:(prefix,name)=>{
@@ -33784,24 +33811,14 @@
 					return get.prefixSpan('新杀')+get.prefixSpan('SP')
 				},
 			}],
-			['SP',{
-				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">SP</span>`;
-				},
-			}],
-			['OL',{
-				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">OL</span>`;
-				},
-			}],
-			['RE',{
-				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">RE</span>`;
-				},
-			}],
 			['界SP',{
 				getSpan:(prefix,name)=>{
 					return get.prefixSpan('界')+get.prefixSpan('SP')
+				},
+			}],
+			['S特神',{
+				getSpan:(prefix,name)=>{
+					return get.prefixSpan('☆')+get.prefixSpan('神')
 				},
 			}],
 		]),
@@ -55929,8 +55946,7 @@
 			if(get.is.locked(skill,player)) list.add('锁定技');
 			if(info.zhuSkill) list.add('主公技');
 			if(info.limited) list.add('限定技');
-			if(info.juexingji||info.limited) list.add('觉醒技');
-			if(info.limited) list.add('限定技');
+			if(info.juexingji) list.add('觉醒技');
 			if(info.zhuanhuanji) list.add('转换技');
 			if(info.hiddenSkill) list.add('隐匿技');
 			if(info.clanSkill) list.add('宗族技');
