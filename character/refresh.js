@@ -1462,6 +1462,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//界文聘
 			rezhenwei:{
+				audio:'zhenwei',
 				inherit:'zhenwei',
 				filter:function(event,player){
 					if(player==event.target) return false;
