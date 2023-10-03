@@ -33756,11 +33756,27 @@
 				color:'#a4a4a4',
 				nature:'black',
 			}],
+			['节钺',{
+				color:'#a4a4a4',
+				nature:'black',
+			}],
+			['毅重',{
+				color:'#a4a4a4',
+				nature:'black',
+			}],
 			['★SP',{
 				showName:'★',
 			}],
 			['K系列',{
 				showName:'Ｋ',
+			}],
+			['经典',{
+				showName:'典',
+			}],
+			['骰子',{
+				getSpan:()=>{
+					return `<span style="font-family:NonameSuits">🎲</span>`;
+				}
 			}],
 			['SP',{
 				getSpan:(prefix,name)=>{

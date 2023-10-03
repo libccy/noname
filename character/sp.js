@@ -945,7 +945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else player.draw(3);
-					'step 2'
+					'step 1'
 					player.chooseToDiscard('h','技能：弃置至少一半手牌',[Math.floor(player.countCards('h')/2),Infinity],true).set('ai',card=>{
 						var player=_status.event.player;
 						if(player.hasSkill('skill_feiyi_B')&&player.countCards('h')-ui.selected.cards.length>1) return 1/(get.value(card)||0.5);

@@ -322,6 +322,7 @@
 .player .identity{
 	right: -6px;
 	top: -5px;
+	left: auto;
 }
 .player.minskin .identity{
 	left:102px;

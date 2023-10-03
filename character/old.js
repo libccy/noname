@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang67:["ol_zhangrang",'old_huanghao','old_liyan'],
 				old_sp:["old_wanglang","old_maliang","old_zhangxingcai","old_wangyun",'old_dingfeng'],
 				old_yingbian:['junk_simayi','old_yangyan','old_yangzhi'],
-				old_mobile:["old_caochun",'old_majun'],
+				old_mobile:["old_caochun"],
 			},
 		},
 		character:{
@@ -48,7 +48,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_xiaoqiao:['female','wu',3,['tianxiang','hongyan']],
 			weiyan:['male','shu',4,['kuanggu']],
 			xiahouyuan:['male','wei',4,['shensu']],
-			old_majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"],[]],
 			old_zhangxingcai:['female','shu',3,['oldshenxian','qiangwu']],
 			old_fuhuanghou:['female','qun',3,['oldzhuikong','oldqiuyuan']],
 			old_caochong:['male','wei',3,['oldrenxin','oldchengxiang']],
@@ -1012,7 +1011,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		translate:{
 			old_zhangxingcai:'旧张星彩',
 			old_zhangxingcai_prefix:'旧',
-			old_majun:'骰子马钧',
 			old_xusheng:'旧徐盛',
 			old_xusheng_prefix:'旧',
 			old_lingtong:'旧凌统',
@@ -1066,7 +1064,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_wangyi:'旧王异',
 			old_wangyi_prefix:'旧',
 			xin_yujin:'节钺于禁',
+			xin_yujin_prefix:'节钺',
 			re_yujin:'毅重于禁',
+			re_yujin_prefix:'毅重',
 
 			old_guhuo:"蛊惑",
 			old_guhuo_info:"你可以扣置一张手牌当做一张基本牌或普通锦囊牌使用或打出，体力值不为0的其他角色依次选择是否质疑。然后，若有质疑的角色，你展示此牌：若为假，此牌作废，这些角色摸一张牌；若为真，这些角色失去1点体力，且若此牌不为♥，此牌作废。",
