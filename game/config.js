@@ -1,6 +1,7 @@
 window.config={
 	extension_sources:{
-		Coding:'https://raw.fgit.cf/libccy/noname-extension/master/',
+		'GitHub Proxy':'https://ghproxy.com/https://raw.githubusercontent.com/libccy/noname-extension/master/',
+		FastGit:'https://raw.fgit.cf/libccy/noname-extension/master/',
 		GitHub:'https://raw.githubusercontent.com/libccy/noname-extension/master/'
 	},
 	extension_source:'Coding',
