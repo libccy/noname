@@ -9395,7 +9395,7 @@
 								}
 							});
 							document.addEventListener("resume", ()=>{
-								if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
+								if(ui.backgroundMusic) ui.backgroundMusic.play();
 							});
 							document.addEventListener("backbutton", function(){
 								if(ui.arena&&ui.arena.classList.contains('menupaused')){
@@ -12786,7 +12786,7 @@
 								game.resume();
 								_status.imchoosing=false;
 								if(roundmenu) ui.roundmenu.style.display='';
-								if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
+								if(ui.backgroundMusic) ui.backgroundMusic.play();
 								hitsound_audio.remove();
 							},1000);
 						};
@@ -12974,7 +12974,7 @@
 						if(dialog){
 							dialog.close();
 						}
-						if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
+						if(ui.backgroundMusic) ui.backgroundMusic.play();
 					},event.videoId,event.time);
 					var result=event.result||result;
 					event.result=result;
