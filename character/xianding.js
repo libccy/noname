@@ -199,9 +199,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					minus:{
+						audio:'dcxiongmu',
 						trigger:{player:'damageBegin4'},
 						filter:function(event,player){
-							return player.countCards('h')<=player.hp&&game.getGlobalHistory('everything',evt=>{
+							return player.countCards('h')<=player.getHp()&&game.getGlobalHistory('everything',evt=>{
 								return evt.name=='damage'&&evt.player==player;
 							},event).indexOf(event)==0;
 						},

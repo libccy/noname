@@ -2789,7 +2789,7 @@ div:not(.handcards)>.card>.info>span,
 .player.minskin .count {
 	right: 20px;
 }
-.identity {
+#arena:not(.stone) div:not(.character):not(.button)>.identity {
 	left: 90px;
 	top: 5px;
 }

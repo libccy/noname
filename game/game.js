@@ -3199,6 +3199,16 @@
 						},
 						unfrequent:true,
 					},
+					buttoncharacter_prefix:{
+						name:'武将前缀',
+						init:'default',
+						item:{
+							default:'默认',
+							simple:'不显示颜色',
+							off:'不显示前缀'
+						},
+						unfrequent:true,
+					},
 					cursor_style:{
 						name:'鼠标指针',
 						init:'auto',
@@ -5160,7 +5170,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('free_choose',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!=this._link.config.mode||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
@@ -5610,7 +5620,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('free_choose',bool,this._link.config.mode);
-							if(get.mode()!='guozhan'||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!=this._link.config.mode||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
@@ -5984,7 +5994,7 @@
 						onclick:function(bool){
 							game.saveConfig('free_choose',bool,this._link.config.mode);
 							if(!ui.create.cheat2) return;
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!=this._link.config.mode||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
@@ -6359,7 +6369,7 @@
 						frequent:true,
 						onclick:function(bool){
 							game.saveConfig('free_choose',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!=this._link.config.mode||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
@@ -6530,7 +6540,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('free_choose',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!=this._link.config.mode||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
@@ -6959,7 +6969,7 @@
 						init:true,
 						onclick:function(bool){
 							game.saveConfig('free_choose',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!=this._link.config.mode||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
@@ -7247,7 +7257,7 @@
 						onclick:function(bool){
 							game.saveConfig('free_choose',bool,this._link.config.mode);
 							if(_status.connectMode) return;
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
+							if(get.mode()!=this._link.config.mode||!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
 							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
 							else if(ui.cheat2&&!get.config('free_choose')){
 								ui.cheat2.close();
@@ -33725,6 +33735,11 @@
 				nature:'thundermm',
 				showName:'战',
 			}],
+			['武将传',{
+				color:'#c3f9ff',
+				nature:'thundermm',
+				showName:'传',
+			}],
 			['将',{
 				nature:'firemm',
 			}],
@@ -33764,6 +33779,7 @@
 			}],
 			['手杀',{
 				getSpan:(prefix,name)=>{
+					const simple=(lib.config.buttoncharacter_prefix=='simple');
 					if(lib.characterPack.shiji&&name in lib.characterPack.shiji){
 						for(let i in lib.characterSort.shiji){
 							if(lib.characterSort.shiji[i].includes(name)){
@@ -33771,8 +33787,10 @@
 								break;
 							}
 						}
+						if(simple) return `<span>${prefix}</span>`;
 						return `<span style="color:#def7ca" data-nature="watermm">${prefix}</span>`;
 					}
+					if(simple) return '<span>手杀</span>';
 					return `<span style="font-family:NonameSuits">📱</span>`;
 				},
 			}],
@@ -33818,7 +33836,7 @@
 			}],
 			['S特神',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('☆')+get.prefixSpan('神')
+					return get.prefixSpan('★')+get.prefixSpan('神')
 				},
 			}],
 		]),
@@ -57542,13 +57560,15 @@
 		},
 		prefixSpan:function(prefix,name){
 			let color='#ffffff',nature=false;
-			const map=lib.namePrefix.get(prefix);
+			const map=lib.namePrefix.get(prefix),config=lib.config.buttoncharacter_prefix;
+			if(config=='off') return '';
 			if(map){
 				if(map.getSpan) return map.getSpan(prefix,name);
 				if(map.color) color=map.color;
 				if(map.nature) nature=map.nature;
 				if(map.showName) prefix=map.showName;
 			}
+			if(config=='simple') return `<span>${prefix}</span>`
 			return `<span style="color: ${color};"${nature?(`data-nature="${nature}"`):''}>${prefix}</span>`
 		},
 		slimName:function(str){
@@ -58694,9 +58714,9 @@
 				}
 				let capt=get.translation(node.name);
 				const characterInfo=get.character(node.name),sex=node.sex||characterInfo[0];
-				if(sex&&lib.config.show_sex) capt+=`&nbsp;&nbsp;${sex=='none'?'无':get.translation(sex)}`;
-				const group=lib.group.includes(node.group)?node.group:characterInfo[1];
-				if(group&&lib.config.show_group) capt+=`&nbsp;&nbsp;${get.translation(group)}`;
+				if(sex&&sex!='unknown'&&lib.config.show_sex) capt+=`&nbsp;&nbsp;${sex=='none'?'无':get.translation(sex)}`;
+				const group=node.group;
+				if(group&&group!='unknown'&&lib.config.show_group) capt+=`&nbsp;&nbsp;${get.translation(group)}`;
 				uiintro.add(capt);
 
 				if(lib.characterTitle[node.name]){

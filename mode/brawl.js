@@ -4065,6 +4065,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								var info=scene.players[i];
 								target.brawlinfo=info;
 								target.identity=info.identity;
+								if(target.identity=='zhu') target.isZhu=true;
 								target.setIdentity(info.identity);
 								target.node.marks.hide();
 								if(info.name2!='none'&&info.name2!='random'){

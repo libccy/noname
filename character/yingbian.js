@@ -3611,6 +3611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xijue_xiaoguo:'骁果',
 			xijue_xiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌，然后你摸一张牌；2.受到你对其造成的1点伤害。',
 			xijue_xiaoguo_info_guozhan:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌；2.受到你对其造成的1点伤害。',
+			gz_duyu:'杜预',
 			duyu:'晋杜预',
 			duyu_prefix:'晋',
 			sanchen:'三陈',
