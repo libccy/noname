@@ -2399,9 +2399,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var effect=0,c,shown;
 						var info=get.info(card);
 						if(info.ai&&info.ai.expose){
-							if(_status.event.name=='_wuxie'){
-								if(_status.event.source&&_status.event.source.ai.shown){
-									this.ai.shown+=0.2;
+							if(_status.event.name=='_wuxie'&&card.name=='wuxie'){
+								const infomap=_status.event._info_map;
+								if(infomap){
+									if(this!=infomap.target&&infomap.player&&infomap.player.ai.shown){
+										this.ai.shown+=0.2;
+									}
 								}
 							}
 							else{

@@ -302,7 +302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else playerx.chooseButton([
 								`请选择要视为对${get.translation(player)}使用的牌`,
 								[names,'vcard'],
-							]).set('ai',(button)=>{
+							],true).set('ai',(button)=>{
 								return button.link[0][2]==_status.event.choice;
 							}).set('choice',function(){
 								var list=names.map(name=>{

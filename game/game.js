@@ -16292,7 +16292,11 @@
 						}
 					}
 					if(event.isMine()){
-						if(event.direct&&num==selectButton[0]||event.forceDirect){
+						if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+							ui.click.cancel();
+							return;
+						}
+						else if(event.direct&&num==selectButton[0]||event.forceDirect){
 							var buttons=buttonsx.slice(0,num);
 							event.result={
 								bool:true,
@@ -16304,10 +16308,6 @@
 						else{
 							game.check();
 							game.pause();
-						}
-						if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
-							ui.click.cancel();
-							return;
 						}
 					}
 					else if(event.isOnline()){

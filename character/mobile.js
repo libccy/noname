@@ -10725,7 +10725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(!result.bool) player.draw();
-					else player.chooseUseTarget({name:result.links[0][2],isCard:true,nature:result.links[0][3]});
+					else player.chooseUseTarget({name:result.links[0][2],isCard:true,nature:result.links[0][3]},true);
 				},
 			},
 			zhiyi:{
