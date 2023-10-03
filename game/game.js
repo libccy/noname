@@ -9395,7 +9395,7 @@
 								}
 							});
 							document.addEventListener("resume", ()=>{
-								if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
+								if(ui.backgroundMusic) ui.backgroundMusic.play();
 							});
 							document.addEventListener("backbutton", function(){
 								if(ui.arena&&ui.arena.classList.contains('menupaused')){
@@ -12786,7 +12786,7 @@
 								game.resume();
 								_status.imchoosing=false;
 								if(roundmenu) ui.roundmenu.style.display='';
-								if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
+								if(ui.backgroundMusic) ui.backgroundMusic.play();
 								hitsound_audio.remove();
 							},1000);
 						};
@@ -12974,7 +12974,7 @@
 						if(dialog){
 							dialog.close();
 						}
-						if(ui.backgroundMusic) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
+						if(ui.backgroundMusic) ui.backgroundMusic.play();
 					},event.videoId,event.time);
 					var result=event.result||result;
 					event.result=result;
@@ -50184,7 +50184,7 @@
 				ui.window.appendChild(ui.backgroundMusic);
 				ui.window.addEventListener(lib.config.touchscreen?'touchend':'click', function playMusic() {
 					ui.window.removeEventListener(lib.config.touchscreen?'touchend':'click', playMusic, false);
-					if(!ui.backgroundMusic.played.length) Promise.resolve(ui.backgroundMusic.play()).catch(()=>void 0);
+					if(!ui.backgroundMusic.played.length && lib.config.background_music != 'music_off') ui.backgroundMusic.play();
 				}, false);
 				if(lib.config.cursor_style=='pointer'){
 					ui.window.classList.add('nopointer');
@@ -54649,7 +54649,10 @@
 						const characterSexDiv=ui.create.div('.character-sex',characterIntroTable),exInfoSex=exInfo&&exInfo.find(value=>value.startsWith('sex:')),characterSex=exInfoSex?exInfoSex.split(':').pop():nameInfo[0];
 						new Promise((resolve,reject)=>{
 							const imageName=`sex_${characterSex}`,information=lib.card[imageName];
-							if(!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+							if(!information) {
+								resolve(`${lib.assetURL}image/card/${imageName}.png`)
+								return;
+							};
 							const image=information.image;
 							if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 							else if(image.startsWith('db:')) game.getDB('image',image.slice(3)).then(resolve,reject);
