@@ -137,6 +137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var piles=['cardPile','discardPile'];
 					for(var pile of piles){
 						for(var i=0;i<ui[pile].childNodes.length;i++){
+							if(list.length==cards.length) break;
 							var card=ui[pile].childNodes[i];
 							var number=get.number(card,false);
 							if(!list.contains(card)&&number==8){
