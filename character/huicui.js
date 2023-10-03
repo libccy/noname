@@ -6437,7 +6437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt2:function(event,player){
 					var str=('令'+get.translation(event.player)+'即将受到的');
 					str+=(''+event.num+'点');
-					if(lib.linked.some(n=>event.hasNature(n))){
+					if(event.hasNature('linked')){
 						str+=(get.translation(event.nature)+'属性');
 					}
 					str+='伤害+1';
@@ -7061,7 +7061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).length;
 					//var str='视为额外使用'+get.cnNumber(num)+'张'
 					var str='额外结算'+get.cnNumber(num)+'次'
-					if(event.card.name=='sha'&&event.card.hasNature()) str+=get.translation(event.card.nature);
+					if(event.card.name=='sha'&&game.hasNature(event.card)) str+=get.translation(event.card.nature);
 					return (str+'【'+get.translation(event.card.name)+'】');
 				},
 				check:function(event,player){

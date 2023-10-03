@@ -8519,6 +8519,8 @@
 						return this;
 					}
 				});
+				//!!!WARNING!!!
+				//Will be deprecated in next verision
 				Object.defineProperty(Object.prototype,'hasNature',{
 					configurable:true,
 					enumerable:false,
@@ -29065,10 +29067,7 @@
 			},
 			card:{
 				hasNature:function(nature,player){
-					var natures=get.natureList(this,player);
-					if(!nature) return natures.length>0;
-					if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
-					return get.is.sameNature(natures,nature);
+					return game.hasNature(this,nature,player);
 				},
 				//只针对【杀】起效果
 				addNature:function(nature){
@@ -33889,6 +33888,13 @@
 			if(translation&&translation.length) lib.translate['nature_'+nature]=translation;
 			game.callHook("addNature",[nature,translation,config]);
 			return nature;
+		},
+		//判断卡牌信息/事件是否有某个属性
+		hasNature:(item,nature,player)=>{
+			var natures=get.natureList(item,player);
+			if(!nature) return natures.length>0;
+			if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
+			return get.is.sameNature(natures,nature);
 		},
 		//设置卡牌信息/事件的属性
 		setNature:(item,nature,addNature)=>{
