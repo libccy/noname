@@ -6177,7 +6177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(['trick','delay'].contains(lib.card[card.name].type)) return 'thunder';
 							},
 							cardUsable:function(card,player){
-								if(card.name=='sha'&&card.hasNature('thunder')) return Infinity;
+								if(card.name=='sha'&&game.hasNature(card,'thunder')) return Infinity;
 							},
 						},
 						ai:{

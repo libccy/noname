@@ -6039,7 +6039,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					player.getHistory('useCard',function(evt){
 						if(get.type(evt.card)!='basic') return;
-						var name=evt.card.name,nature=evt.card.hasNature()?get.nature(evt.card):'';
+						var name=evt.card.name,nature=game.hasNature(evt.card)?get.nature(evt.card):'';
 						if(!list.contains(name+nature)) list.push(name+nature);
 					});
 					event.addDamage=list.length>1;
@@ -10450,7 +10450,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twlihuo:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
+					if(event.card.name=='sha'&&!game.hasNature(event.card)) return true;
 					return false;
 				},
 				audio:'lihuo',
@@ -10475,7 +10475,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twlihuo2:{
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
+					if(event.card.name!='sha'||!game.hasNature(event.card,'fire')) return false;
 					return game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&player.canUse(event.card,current);
 					});

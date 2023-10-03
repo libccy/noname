@@ -1076,7 +1076,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							try{
 								var cards=player.getCards('hs',cardx=>{
 									if(get.name(cardx)!='sha') return false;
-									return cardx.hasNature('linked');
+									return game.hasNature(cardx,'linked');
 								});
 								cards.map(i=>[i,get.effect(target,i,player,player)]);
 								cards.sort((a,b)=>b[1]-a[1]);
@@ -1096,7 +1096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.name(card)=='jiu'&&player.hasUseTarget(card);
 					})&&player.countCards('hs',card=>{
 						if(get.name(card)!='sha') return false;
-						return card.hasNature('linked');
+						return game.hasNature(card,'linked');
 					}));
 					'step 1'
 					if(result.bool){

@@ -307,7 +307,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				equipSkill:true,
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					return (event.card.name=='sha'&&lib.linked.some(n=>n!='kami'&&event.card.hasNature(n)));
+					return (event.card.name=='sha'&&lib.linked.some(n=>n!='kami'&&game.hasNature(event.card,n)));
 				},
 				audio:true,
 				direct:true,

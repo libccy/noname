@@ -9624,7 +9624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['relihuo_baigei','relihuo_damage'],
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
+					if(event.card.name=='sha'&&!game.hasNature(event.card)) return true;
 				},
 				check:function(event,player){
 					return false;
@@ -9650,7 +9650,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:'relihuo',
 				filter:function(event,player){
-					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
+					if(event.card.name!='sha'||!game.hasNature(event.card,'fire')) return false;
 					var num=0;
 					player.getHistory('sourceDamage',function(evt){
 						if(evt.card==event.card) num+=evt.num;
