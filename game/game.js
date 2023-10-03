@@ -9237,50 +9237,163 @@
 					});
 					var styleToLoad=6;
 					var styleLoaded=gnc.of(function*(){
-						--styleToLoad;
-						if(styleToLoad==0){
-							if(extensionlist.length&&(lib.config.mode!='connect'||show_splash)){
-								_status.extensionLoading=[];
-								let extToLoad=extensionlist.length;
-								const extLoaded=gnc.of(function*(){
-									--extToLoad;
-									if(extToLoad==0){
-										yield Promise.allSettled(_status.extensionLoading);
-										delete _status.extensionLoading;
-										loadPack();
-									}
-								});
-								//读取扩展
-								var alerted=false;
-								for(var i=0;i<extensionlist.length;i++){
-									if(window.bannedExtensions.contains(extensionlist[i])){
-										alerted=true;
-										--extToLoad;
-										if(extToLoad==0){
-											yield Promise.allSettled(_status.extensionLoading);
-											delete _status.extensionLoading;
-											loadPack();
-										}
-										continue;
-									}
-									lib.init.js(lib.assetURL+'extension/'+extensionlist[i],'extension',extLoaded,(function(i){
-										return gnc.of(function*(){
-											game.removeExtension(i);
-											--extToLoad;
-											if(extToLoad==0){
-												yield Promise.allSettled(_status.extensionLoading);
-												delete _status.extensionLoading;
-												loadPack();
-											}
-										});
-									}(extensionlist[i])));
-								}
-							}
-							else{
-								loadPack();
-							}
-						}
-					});
+            --styleToLoad;
+            if(styleToLoad==0){
+              if(extensionlist.length&&(lib.config.mode!='connect'||show_splash)){
+                _status.extensionLoading=[];
+                let extToLoad=extensionlist.length;
+                const eventTarget=new EventTarget();
+                const extLoadResult={};
+                const depMap={};
+                eventTarget.addEventListener("extLoadedAll",()=>{
+                  const errMsgs=[];
+                  const joinExtNames=(names)=>names.map(n=>`【${n}】`).join("、");
+                  for(const name in extLoadResult){
+                    const error=extLoadResult[name].error;
+                    if(error){
+                      const {depsMissing,depsFailed,depsCircle}=error;
+                      if(depsMissing&&depsMissing.length>0){
+                        errMsgs.push(`【${name}】缺少依赖扩展：${joinExtNames(depsMissing)}`);
+                      }
+                      if(depsFailed&&depsFailed.length>0){
+                        errMsgs.push(`【${name}】依赖扩展加载失败：${joinExtNames(depsFailed)}`);
+                      }
+                      if(depsCircle&&depsCircle.length>0){
+                        errMsgs.push(`【${name}】扩展循环依赖：${joinExtNames(depsCircle.map((v)=>v.join("->")))}`);
+                      }
+                    }
+                  }
+                  if(errMsgs.length>0){
+                    let errMsg="扩展加载错误：\n"+errMsgs.map((v)=>`  ·${v}`).join("\n");
+                    alert(errMsg);
+                  }
+                },{once:true});
+                const extLoadAfter=gnc.of(function*(){
+                  --extToLoad;
+                  if(extToLoad==0){
+                    yield Promise.allSettled(_status.extensionLoading);
+                    delete _status.extensionLoading;
+                    loadPack();
+                    eventTarget.dispatchEvent(new CustomEvent("extLoadedAll"));
+                  }
+                });
+                const extSuccess=gnc.of(function*(name){
+                  if (!extLoadResult[name]) {
+                    extLoadResult[name]={error:null};
+                  }
+                  eventTarget.dispatchEvent(new CustomEvent("extLoaded",{detail:{name,fulfilled:!extLoadResult[name].error}}));
+                  yield extLoadAfter();
+                });
+                const extError=gnc.of(function*(name,error,remove){
+                  if(remove){
+                    game.removeExtension(name);
+                  }
+                  if (!extLoadResult[name]) {
+                    extLoadResult[name]={};
+                  }
+                  const result=extLoadResult[name];
+                  if(!result.error){
+                    result.error={};
+                  }
+                  const keys=[["depMissing","depsMissing"],["depFailed","depsFailed"],["depCircle","depsCircle"],["msg","msgs"]];
+                  for(const [k1,k2] of keys){
+                    if(error[k1]){
+                      if (!result.error[k2]){
+                        result.error[k2]=[];
+                      }
+                      result.error[k2].push(error[k1]);
+                    }
+                  }
+                  eventTarget.dispatchEvent(new CustomEvent("extLoaded",{detail:{name,fulfilled:false}}));
+                  yield extLoadAfter();
+                });
+                const getDepPath=(from,to,map=depMap)=>{
+                  if (map[from]) {
+                    if(map[from][to]){
+                      return [from,to];
+                    }else{
+                      for(const name in map[from]){
+                        const subPath=getDepPath(name,to,map[from]);
+                        if(subPath){
+                          return [from,...subPath];
+                        }
+                      }
+                    }
+                  }
+                  return null;
+                }
+                //读取扩展
+                for(var i=0;i<extensionlist.length;i++){
+                  const curr = extensionlist[i];
+                  if(window.bannedExtensions.contains(extensionlist[i])){
+                    yield extLoadAfter();
+                    continue;
+                  }
+                  const extDir=lib.assetURL+'extension/'+curr;
+                  const waitForExtension=(name,target)=>{
+                    if(!depMap[name]){
+                      depMap[name]={};
+                    }
+                    if(depMap[target]){
+                      depMap[name][target]=depMap[target]
+                    }else{
+                      depMap[name][target]={};
+                    }
+                    for(const name2 in depMap){
+                      if(name in depMap[name2]){
+                        depMap[name2][name] = depMap[name];
+                      }
+                    }
+                    return new Promise((resolve)=>{
+                      const path=getDepPath(target, name);
+                      if(path){
+                        extError(name,{depCircle:[name,...path]},false);
+                        resolve();
+                      }else if(!extensionlist.includes(target)){
+                        extError(name,{depMissing:target},false);
+                        resolve();
+                      }else if(extLoadResult[target]){
+                        if(extLoadResult[target].error){
+                          extError(name,{depFailed:target},false);
+                        }
+                        resolve();
+                      }else{
+                        const fn=(e)=>{
+                          if(e.detail.name===target) {
+                            if(e.detail.fulfilled){
+                              resolve();
+                            }else{
+                              extError(name,{depFailed:target},false);
+                            }
+                            eventTarget.removeEventListener("extLoaded",fn);
+                          }
+                        }
+                        eventTarget.addEventListener("extLoaded",fn);
+                      }
+                    })
+                  }
+                  new Promise((resolve)=>{
+                    game.readFileAsText(extDir+"/info.json",(text)=>{
+                      try{
+                        const {dependencies}=JSON.parse(text);
+                        Promise.all(dependencies.map((target)=>waitForExtension(curr,target))).then(()=>{
+                          resolve();
+                        });
+                      }catch(e){
+                        console.warn(e);
+                        resolve();
+                      }
+                    },()=>resolve())
+                  }).then(()=>{
+                    lib.init.js(extDir,'extension',()=>extSuccess(curr),(e)=>extError(curr,{msg:e.message},true));
+                  });
+                }
+              }
+              else{
+                loadPack();
+              }
+            }
+          });
 					if(lib.config.layout=='default'){
 						lib.config.layout='mobile';
 					}
@@ -9364,11 +9477,6 @@
 						config3=true;
 					}
 				};
-
-				ui.css={menu:lib.init.css(lib.assetURL+'layout/default','menu',function(){
-					ui.css.default=lib.init.css(lib.assetURL+'layout/default','layout');
-					proceed2();
-				})};
 
 				if(lib.device){
 					lib.init.cordovaReady=function(){
@@ -9737,6 +9845,11 @@
 						}
 					}
 				}
+
+				ui.css={menu:lib.init.css(lib.assetURL+'layout/default','menu',function(){
+					ui.css.default=lib.init.css(lib.assetURL+'layout/default','layout');
+					proceed2();
+				})};
 
 				lib.config=window.config;
 				lib.configOL={};
