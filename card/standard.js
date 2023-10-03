@@ -134,7 +134,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(event.shanRequired>1){
 							next.set('prompt2','（共需使用'+event.shanRequired+'张闪）');
 						}
-						else if(event.card.hasNature('stab')){
+						else if(game.hasNature(event.card,'stab')){
 							next.set('prompt2','（在此之后仍需弃置一张手牌）');
 						}
 						next.set('ai1',function(card){
@@ -168,7 +168,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(event.shanRequired>0){
 							event.goto(1);
 						}
-						else if(event.card.hasNature('stab')&&target.countCards('h')>0){
+						else if(game.hasNature(event.card,'stab')&&target.countCards('h')>0){
 							event.responded=result;
 							event.goto(4);
 						}
@@ -265,7 +265,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					order:function(item,player){
 						if(player.hasSkillTag('presha',true,null,true)) return 10;
-						if(item.hasNature('linked')){
+						if(game.hasNature(item,'linked')){
 							if(game.hasPlayer(function(current){
 								return current!=player&&current.isLinked()&&player.canUse(item,current,null,true)&&get.effect(current,item,player,player)>0&&lib.card.sha.ai.canLink(player,current,item);
 							})&&game.countPlayer(function(current){
@@ -306,20 +306,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						respond:1,
 						respondShan:1,
 						damage:function(card){
-							if(card.hasNature('poison')) return;
+							if(game.hasNature(card,'poison')) return;
 							return 1;
 						},
 						natureDamage:function(card){
-							if(card.hasNature()) return 1;
+							if(game.hasNature(card)) return 1;
 						},
 						fireDamage:function(card,nature){
-							if(card.hasNature('fire')) return 1;
+							if(game.hasNature(card,'fire')) return 1;
 						},
 						thunderDamage:function(card,nature){
-							if(card.hasNature('thunder')) return 1;
+							if(game.hasNature(card,'thunder')) return 1;
 						},
 						poisonDamage:function(card,nature){
-							if(card.hasNature('poison')) return 1;
+							if(game.hasNature(card,'poison')) return 1;
 						}
 					}
 				}
@@ -338,20 +338,20 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						respond:1,
 						respondShan:1,
 						damage:function(card){
-							if(card.hasNature('poison')) return;
+							if(game.hasNature(card,'poison')) return;
 							return 1;
 						},
 						natureDamage:function(card){
-							if(card.hasNature()) return 1;
+							if(game.hasNature(card)) return 1;
 						},
 						fireDamage:function(card,nature){
-							if(card.hasNature('fire')) return 1;
+							if(game.hasNature(card,'fire')) return 1;
 						},
 						thunderDamage:function(card,nature){
-							if(card.hasNature('thunder')) return 1;
+							if(game.hasNature(card,'thunder')) return 1;
 						},
 						poisonDamage:function(card,nature){
-							if(card.hasNature('poison')) return 1;
+							if(game.hasNature(card,'poison')) return 1;
 						}
 					}
 				}

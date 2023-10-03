@@ -6111,7 +6111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
+					if(event.card.name=='sha'&&!game.hasNature(event.card)) return true;
 					return false;
 				},
 				audio:'lihuo',
@@ -6139,7 +6139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ollihuo2:{
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
+					if(event.card.name!='sha'||!game.hasNature(event.card,'fire')) return false;
 					return game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&lib.filter.targetEnabled(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
 					});
@@ -7604,7 +7604,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadelihuo:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
+					if(event.card.name=='sha'&&!game.hasNature(event.card)) return true;
 					return false;
 				},
 				audio:'lihuo',
@@ -7630,7 +7630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadelihuo2:{
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
+					if(event.card.name!='sha'||!game.hasNature(event.card,'fire')) return false;
 					return game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&player.canUse(event.card,current);
 					});
@@ -7660,7 +7660,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadelihuo3:{
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					return event.card.name=='sha'&&event.card.hasNature('fire')&&event.targets.length>1&&player.getHistory('sourceDamage',function(evt){
+					return event.card.name=='sha'&&game.hasNature(event.card,'fire')&&event.targets.length>1&&player.getHistory('sourceDamage',function(evt){
 						return evt.card==event.card;
 					}).length>0;
 				},

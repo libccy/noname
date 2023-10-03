@@ -940,7 +940,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.hasEmptySlot(2)) return false;
 					if(event.card.name!='sha') return false;
-					return event.card.hasNature();
+					return game.hasNature(event.card);
 				},
 				content:function(){
 					trigger.cancel();
@@ -6234,7 +6234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fulu:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
+					if(event.card.name=='sha'&&!game.hasNature(event.card)) return true;
 				},
 				audio:true,
 				check:function(event,player){
