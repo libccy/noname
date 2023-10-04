@@ -22238,6 +22238,11 @@
 					this.syncStorage(i);
 					this.markSkill(i);
 				},
+				setMark:function(name,num,log){
+					const count=this.countMark(name);
+					if(count>num)player.removeMark(name,count-num,log);
+					else if(count<num)player.addMark(name,num-count,log);
+				},
 				countMark:function(i){
 					if(this.storage[i]==undefined) return 0;
 					if(typeof this.storage[i]=='number') return this.storage[i];
