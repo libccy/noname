@@ -12135,14 +12135,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						prompt:get.prompt2('gzhuyuan'),
 						complexSelect:true,
 						ai1:function(card){
+							if(!_status.event.goon) return false;
 							var player=_status.event.player;
 							if(get.type(card)!='equip') return 0;
-							return 6-get.value(card);
+							return 7.5-get.value(card);
 						},
 						ai2:function(target){
+							if(!_status.event.goon) return false;
 							var player=_status.event.player,card=ui.selected.cards[0];
 							return get.effect(target,card,player,player);
 						},
+						goon:game.hasPlayer(function(current){
+							return get.effect(current,{name:'guohe_copy',position:'ej'},player,player)>0;
+						})
 					}).setHiddenSkill('gzhuyuan');
 					'step 1'
 					if(result.bool){
@@ -12169,7 +12174,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return target.hasCard(function(card){
 								return lib.filter.canBeDiscarded(card,player,target);
 							},'ej');
-						});
+						}).set('ai',function(target){
+							const player=_status.event.player;
+							return get.effect(target,{name:'guohe_copy',position:'ej'},player,player);
+						})
 					}
 					else event.finish();
 					'step 3'

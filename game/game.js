@@ -44507,7 +44507,7 @@
 									game.saveConfig('hiddenCardPack',lib.config.hiddenCardPack);
 								});
 							}
-							if(!mode.startsWith('mode_')&lib.cardPile[mode]){
+							if(!mode.startsWith('mode_')&&lib.cardPile[mode]){
 								var cardpileNodes=[];
 								var cardpileexpanded=false;
 								if(!lib.config.bannedpile[mode]){
