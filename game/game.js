@@ -7703,7 +7703,7 @@
 				if(left){
 					node.listen(ui.click.intro);
 				}
-				if(lib.config.hover_all){
+				if(lib.config.hover_all&&!lib.device){
 					lib.setHover(node,ui.click.hoverplayer);
 				}
 				if(lib.config.right_info){
