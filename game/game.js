@@ -41369,6 +41369,7 @@
 						}
 					}
 					if(self.ul){
+						self.style.background='#08f';
 						createList.add(self.ul);
 						ui.window.appendChild(self.ul);
 						return self.ul;
