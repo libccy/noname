@@ -25729,11 +25729,11 @@
 				},
 				removeStorage:function(name,mark){
 					if(!this.hasStorage(name)) return false;
+					delete this.storage[name]
 					if(mark){
 						this.unmarkSkill(name);
-						return true;
 					}
-					return delete this.storage[name];
+					return true;
 				},
 				markSkill:function(name,info,card){
 					if(info===true){
