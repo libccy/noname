@@ -25716,8 +25716,8 @@
 					if (!Array.isArray(storage)) return false;
 					return values.every(item => storage.contains(item));
 				},
-				initStorage:function(name,value){
-					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value);
+				initStorage:function(name,value,mark){
+					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value,mark);
 				},
 				updateStorage:function(name,operation,mark){
 					return this.setStorage(name,operation(this.getStorage(name)),mark);
