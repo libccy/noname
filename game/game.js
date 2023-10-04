@@ -25667,7 +25667,7 @@
 							this[storage.length>0?'markSkill':'unmarkSkill'](name);
 						}
 						else if(typeof storage=='number'){
-							this[storage.length>0?'markSkill':'unmarkSkill'](name);
+							this[storage>0?'markSkill':'unmarkSkill'](name);
 						}
 					}
 				},
