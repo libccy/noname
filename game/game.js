@@ -22240,8 +22240,8 @@
 				},
 				setMark:function(name,num,log){
 					const count=this.countMark(name);
-					if(count>num)player.removeMark(name,count-num,log);
-					else if(count<num)player.addMark(name,num-count,log);
+					if(count>num)this.removeMark(name,count-num,log);
+					else if(count<num)this.addMark(name,num-count,log);
 				},
 				countMark:function(i){
 					if(this.storage[i]==undefined) return 0;
@@ -25687,8 +25687,10 @@
 				hasExpansions:function(tag){
 					return this.countExpansions(tag)>0;
 				},
-				setStorage:function(name,value){
-					return this.storage[name]=value;
+				setStorage:function(name,value,mark){
+					this.storage[name]=value;
+					if(mark) this.markAuto(name);
+					return value;
 				},
 				getStorage:function(name){
 					return this.storage[name]||[];
@@ -25717,16 +25719,21 @@
 				initStorage:function(name,value){
 					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value);
 				},
-				updateStorage:function(name,operation){
-					return this.setStorage(name,operation(this.getStorage(name)));
+				updateStorage:function(name,operation,mark){
+					return this.setStorage(name,operation(this.getStorage(name)),mark);
 				},
-				updateStorageAsync:function(name,operation){
+				updateStorageAsync:function(name,operation,mark){
 					return Promise.resolve(this.getStorage(name))
 					.then(value=>operation(value))
-					.then(value=>this.setStorage(name,value))
+					.then(value=>this.setStorage(name,value,mark));
 				},
-				removeStorage:function(name){
-					return player.hasStorage(name)&&delete player.storage[name];
+				removeStorage:function(name,mark){
+					if(!this.hasStorage(name)) return false;
+					if(mark){
+						this.unmarkSkill(name);
+						return true;
+					}
+					return delete this.storage[name];
 				},
 				markSkill:function(name,info,card){
 					if(info===true){
