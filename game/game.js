@@ -115,7 +115,10 @@
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		mirrorURL:'https://raw.fgit.cf/libccy/noname',
 		hallURL:'47.99.105.222',
-		assetURL:'',
+		assetURL:(()=>{
+			const nonameInited=localStorage.getItem('noname_inited');
+			return typeof nonameInited=='string'&&nonameInited!=='nodejs'?nonameInited:'';
+		})(),
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -8535,112 +8538,6 @@
 						return get.is.sameNature(natures,nature);
 					}
 				});
-				if (!('includes' in Array.prototype)) {
-					Object.defineProperty(Array.prototype, 'includes', {
-						enumerable: false,
-						configurable: true,
-						writable: true,
-						value: function (searchElement, fromIndex) {
-							if (this == null) {
-								throw new TypeError('"this" is null or not defined');
-							}
-							var o = Object(this);
-							var len = o.length >>> 0;
-							if (len === 0) {
-								return false;
-							}
-							var n = fromIndex | 0;
-							var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
-							function sameValueZero(x, y) {
-								return x === y || (typeof x === 'number' && typeof y === 'number' && isNaN(x) && isNaN(y));
-							}
-							while (k < len) {
-								if (sameValueZero(o[k], searchElement)) {
-									return true;
-								}
-								k++;
-							}
-							return false;
-						}
-					});
-				}
-				if(!('flat' in Array.prototype)){
-					Object.defineProperty(Array.prototype, "flat", {
-						configurable:true,
-						enumerable:false,
-						writable:true,
-						value:function(depth){
-							if(typeof depth!='number') depth=1;
-							const arr=[];
-							for(let i=0;i<this.length;i++){
-								let obj=this[i];
-								if(depth>0&&Array.isArray(obj)){
-									obj.flat(depth-1).forEach(function(item){
-										arr.push(item)
-									});
-								}
-								else{
-									arr.push(obj);
-								}
-							}
-							return arr;
-						}
-					});
-				}
-				if (!("allSettled" in Promise)){
-					Object.defineProperty(Promise, "allSettled", {
-						configurable:true,
-						enumerable:false,
-						writable:true,
-						value:function allSettled(ary){
-							const Promise = this;
-							return new Promise((resolve, reject) => {
-								// if (Object.prototype.toString.call(arr) != "[object Array]")
-								if (!Array.isArray(ary))
-								return reject(new TypeError(`${typeof arr} ${ary} is not iterable(cannot read property Symbol(Symbol.iterator))`));
-								let args = Array.prototype.slice.call(ary);
-								if (args.length == 0) return resolve([]);
-								let arrCount = args.length;
-								function resolvePromise(index, value) {
-									if (typeof value == "object") {
-										var then = value.then;
-										if (typeof then == "function") {
-											then.call(value, (val) => {
-												args[index] = { status: "fulfilled", value: val };
-												if (--arrCount == 0) resolve(args);
-											}, (e) => {
-												args[index] = { status: "rejected", reason: e };
-												if (--arrCount == 0) resolve(args);
-											});
-										}
-									}
-								}
-
-								for (let i = 0; i < args.length; ++i)
-									resolvePromise(i, args[i]);
-							});
-						}
-					});
-				}
-				if(!Object.values){
-					Object.defineProperty(Object, 'values', {
-						configurable:true,
-						enumerable:false,
-						writable:true,
-						value:function(obj){
-							if(obj!== Object(obj)) {
-								throw new TypeError('Object.values called on a non-object');
-							}
-							var values=[];
-							for(var key in obj) {
-								if(obj.hasOwnProperty(key)){
-									values.push(obj[key]);
-								}
-							}
-							return values;
-						}
-					});
-				}
 				window.onkeydown=function(e){
 					if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')){
 						if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
@@ -8807,39 +8704,39 @@
 					if(typeof line=='number'&&(typeof game.readFile=='function'||location.origin!='file://')){
 						function createShowCode(lines){
 							let showCode='';
-                            if(lines.length>=10){ 
-                                if(line>4){ 
-                                    for(let i=line-5;i<line+6&&i<lines.length;i++){ 
-                                        showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
-                                    } 
-                                }else{ 
-                                    for(let i=0;i<line+6&&i<lines.length;i++){ 
-                                        showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
-                                    } 
-                                } 
-                            }else{ 
-                                showCode=lines.map((_line,i)=>`${i+1}| ${line==i+1?'⚠️':''}${_line}\n`).toString(); 
+							if(lines.length>=10){ 
+								if(line>4){ 
+									for(let i=line-5;i<line+6&&i<lines.length;i++){ 
+										showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
+									} 
+								}else{ 
+									for(let i=0;i<line+6&&i<lines.length;i++){ 
+										showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
+									} 
+								} 
+							}else{ 
+								showCode=lines.map((_line,i)=>`${i+1}| ${line==i+1?'⚠️':''}${_line}\n`).toString(); 
 							} 
 							return showCode;
 						}
 						//协议名须和html一致(网页端防跨域)，且文件是js 
 						if (typeof src=='string'&&src.startsWith(location.protocol)&&src.endsWith('.js')){ 
-                            //获取代码
-                            const codes=lib.init.reqSync('local:'+decodeURI(src).replace(lib.assetURL,'').replace(winPath,''));
-                            const lines=codes.split("\n"); 
-                            str+='\n'+createShowCode(lines);
-                            str+='\n-------------'; 
+							//获取代码
+							const codes=lib.init.reqSync('local:'+decodeURI(src).replace(lib.assetURL,'').replace(winPath,''));
+							const lines=codes.split("\n"); 
+							str+='\n'+createShowCode(lines);
+							str+='\n-------------'; 
 						}
 						//解析parsex里的content fun内容(通常是技能content) 
 						else if(err&&err.stack&&err.stack.split('\n')[1].trim().startsWith('at Object.eval [as content]')){
-                            const codes=_status.event.content; 
-                            if(typeof codes=='function'){
-                                const lines=codes.toString().split("\n");
-                                str+='\n'+createShowCode(lines);
-                                str+='\n-------------'; 
-                            }
-                        }
-                    }
+							const codes=_status.event.content; 
+							if(typeof codes=='function'){
+								const lines=codes.toString().split("\n");
+								str+='\n'+createShowCode(lines);
+								str+='\n-------------'; 
+							}
+						}
+					}
 					if(err&&err.stack) str+='\n'+decodeURI(err.stack).replace(new RegExp(lib.assetURL,'g'),'').replace(new RegExp(winPath,'g'),'');
 					alert(str);
 					window.ea=Array.from(arguments);
@@ -8874,7 +8771,6 @@
 					else if(ua.includes('iphone')||ua.includes('ipad')||ua.includes('macintosh')){
 						lib.device='ios';
 					}
-					lib.assetURL=noname_inited;
 				}
 
 				if(lib.assetURL.includes('com.widget.noname.qingyao')){
@@ -47525,7 +47421,7 @@
 								window.extension={};
 								fetch(`${extensionURL}catalog.js`,{
 									referrerPolicy:'no-referrer'
-								}).then(value=>value.text()).then(eval).then(loaded).catch(reason=>{
+								}).then(response=>response.text()).then(eval).then(loaded).catch(reason=>{
 									console.log(reason);
 									delete window.extension;
 									loading.innerHTML='连接失败:'+(reason instanceof Error?reason.message:String(reason));
@@ -60962,5 +60858,11 @@
 		},
 		get:get
 	};
-	lib.init.init();
+	if('__core-js_shared__' in window) lib.init.init();
+	else{
+		const coreJSBundle=document.createElement('script');
+		coreJSBundle.onerror=coreJSBundle.onload=lib.init.init;
+		coreJSBundle.src=`${lib.assetURL}game/core-js-bundle.js`;
+		document.head.appendChild(coreJSBundle);
+	}
 }
