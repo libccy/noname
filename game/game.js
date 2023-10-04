@@ -171,9 +171,9 @@
 				if("color" in config&&config.color!=null){
 					let color1,color2,color3,color4;
 					if (typeof config.color=="string"&&/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(config.color)){
-						let c1=parseInt(`0x${item[1].slice(1, 3)}`);
-						let c2=parseInt(`0x${item[1].slice(3, 5)}`);
-						let c3=parseInt(`0x${item[1].slice(5, 7)}`);
+						let c1=parseInt(`0x${config.color.slice(1, 3)}`);
+						let c2=parseInt(`0x${config.color.slice(3, 5)}`);
+						let c3=parseInt(`0x${config.color.slice(5, 7)}`);
 						color1=color2=color3=color4=[c1,c2,c3,1];
 					}
 					else if(Array.isArray(config.color)&&config.color.length==4){
