@@ -25693,7 +25693,7 @@
 					if(typeof value=="undefined") return true;
 					const storage=this.storage[name];
 					if(storage===value) return true;
-					return !Array.isArray(storage) || storage.contains(value);
+					return Array.isArray(storage) && storage.includes(value);
 				},
 				hasStorageAny:function(name,values){
 					const storage=this.storage[name];
