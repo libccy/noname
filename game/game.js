@@ -171,9 +171,9 @@
 				if("color" in config&&config.color!=null){
 					let color1,color2,color3,color4;
 					if (typeof config.color=="string"&&/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(config.color)){
-						let c1=parseInt(`0x${item[1].slice(1, 3)}`);
-						let c2=parseInt(`0x${item[1].slice(3, 5)}`);
-						let c3=parseInt(`0x${item[1].slice(5, 7)}`);
+						let c1=parseInt(`0x${config.color.slice(1, 3)}`);
+						let c2=parseInt(`0x${config.color.slice(3, 5)}`);
+						let c3=parseInt(`0x${config.color.slice(5, 7)}`);
 						color1=color2=color3=color4=[c1,c2,c3,1];
 					}
 					else if(Array.isArray(config.color)&&config.color.length==4){
@@ -22238,6 +22238,11 @@
 					this.syncStorage(i);
 					this.markSkill(i);
 				},
+				setMark:function(name,num,log){
+					const count=this.countMark(name);
+					if(count>num)this.removeMark(name,count-num,log);
+					else if(count<num)this.addMark(name,num-count,log);
+				},
 				countMark:function(i){
 					if(this.storage[i]==undefined) return 0;
 					if(typeof this.storage[i]=='number') return this.storage[i];
@@ -25662,7 +25667,7 @@
 							this[storage.length>0?'markSkill':'unmarkSkill'](name);
 						}
 						else if(typeof storage=='number'){
-							this[storage.length>0?'markSkill':'unmarkSkill'](name);
+							this[storage>0?'markSkill':'unmarkSkill'](name);
 						}
 					}
 				},
@@ -25682,8 +25687,10 @@
 				hasExpansions:function(tag){
 					return this.countExpansions(tag)>0;
 				},
-				setStorage:function(name,value){
-					return this.storage[name]=value;
+				setStorage:function(name,value,mark){
+					this.storage[name]=value;
+					if(mark) this.markAuto(name);
+					return value;
 				},
 				getStorage:function(name){
 					return this.storage[name]||[];
@@ -25693,7 +25700,7 @@
 					if(typeof value=="undefined") return true;
 					const storage=this.storage[name];
 					if(storage===value) return true;
-					return !Array.isArray(storage) || storage.contains(value);
+					return Array.isArray(storage) && storage.includes(value);
 				},
 				hasStorageAny:function(name,values){
 					const storage=this.storage[name];
@@ -25709,19 +25716,24 @@
 					if (!Array.isArray(storage)) return false;
 					return values.every(item => storage.contains(item));
 				},
-				initStorage:function(name,value){
-					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value);
+				initStorage:function(name,value,mark){
+					return this.hasStorage(name)?this.getStorage(name):this.setStorage(name,value,mark);
 				},
-				updateStorage:function(name,operation){
-					return this.setStorage(name,operation(this.getStorage(name)));
+				updateStorage:function(name,operation,mark){
+					return this.setStorage(name,operation(this.getStorage(name)),mark);
 				},
-				updateStorageAsync:function(name,operation){
+				updateStorageAsync:function(name,operation,mark){
 					return Promise.resolve(this.getStorage(name))
 					.then(value=>operation(value))
-					.then(value=>this.setStorage(name,value))
+					.then(value=>this.setStorage(name,value,mark));
 				},
-				removeStorage:function(name){
-					return player.hasStorage(name)&&delete player.storage[name];
+				removeStorage:function(name,mark){
+					if(!this.hasStorage(name)) return false;
+					delete this.storage[name]
+					if(mark){
+						this.unmarkSkill(name);
+					}
+					return true;
 				},
 				markSkill:function(name,info,card){
 					if(info===true){
