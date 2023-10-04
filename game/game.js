@@ -45180,7 +45180,25 @@
 										dash2.content.pack.list.push(dash2.pile.childNodes[i].link);
 									}
 									str+=',package:'+get.stringify({
-										character:dash1.content.pack,
+										//替换die audio，加上扩展名
+										character:(pack=>{
+											var character=pack.character;
+											for (var key in character){
+												var info=character[key];
+												if(Array.isArray(info[4])){
+													var tag=info[4].find(tag=>/^die:.+$/.test(tag));
+													if(tag){
+														info[4].remove(tag);
+														if(typeof game.readFile=='function'){
+															info[4].push('die:ext:'+page.currentExtension+'/audio/die/'+tag.slice(tag.lastIndexOf('/')+1));
+														}else{
+															info[4].push('die:db:extension-'+page.currentExtension+':audio/die/'+tag.slice(tag.lastIndexOf('/')+1));
+														}
+													}
+												}
+											}
+											return pack;
+										})(dash1.content.pack),
 										card:dash2.content.pack,
 										skill:dash3.content.pack,
 										intro:introExtLine.querySelector('input').value||'',
@@ -45189,9 +45207,12 @@
 										forumURL:forumExtLine.querySelector('input').value||'',
 										version:versionExtLine.querySelector('input').value||'',
 									});
-									var files={character:[],card:[],skill:[]};
+									var files={character:[],card:[],skill:[],audio:[]};
 									for(var i in dash1.content.image){
 										files.character.push(i);
+									}
+									for(var i in dash1.content.audio){
+										files.audio.push('audio/die/'+i);
 									}
 									for(var i in dash2.content.image){
 										files.card.push(i);
@@ -45204,6 +45225,9 @@
 									var extension={'extension.js':'game.import("extension",function(lib,game,ui,get,ai,_status){return '+str+'})'};
 									for(var i in dash1.content.image){
 										extension[i]=dash1.content.image[i];
+									}
+									for(var i in dash1.content.audio){
+										extension['audio/die/'+i]=dash1.content.audio[i];
 									}
 									for(var i in dash2.content.image){
 										extension[i]=dash2.content.image[i];
@@ -45431,7 +45455,7 @@
 									}
 									editnode.classList.remove('disabled');
 								};
-								var clickButton=function(){
+								var clickButton=lib.gnc.of(function*(){
 									if(currentButton==this){
 										resetEditor();
 										return;
@@ -45465,6 +45489,31 @@
 											if(info[4][i].startsWith('des:')){
 												newCharacter.querySelector('.new_des').value=info[4][i].slice(4);
 											}
+											if(info[4][i].startsWith('die:')){
+												var dieaudionode=newCharacter.querySelector('.die_audio');
+												dieaudionode.file={
+													name:info[4][i].slice(info[4][i].lastIndexOf('/')+1)
+												};
+												yield new Promise(resolve=>{
+													if(typeof game.readFile=='function'){
+														game.readFile(info[4][i].slice(4).replace('ext:','extension/'),arraybuffer=>{
+															dieaudionode.arrayBuffer=arraybuffer;
+															resolve();
+														},()=>{
+															console.warn(`未找到${info[4][i].slice(4).replace('ext:','extension/')}阵亡配音`);
+															resolve();
+														});
+													}else{
+														game.getDB('image',info[4][i].slice(7)).then(octetStream=>{
+															dieaudionode.arrayBuffer=octetStream;
+															resolve();
+														},()=>{
+															console.warn(`未找到${info[4][i].slice(4)}阵亡配音`);
+															resolve();
+														});
+													}
+												});
+											}
 										}
 									}
 
@@ -45482,7 +45531,7 @@
 									editnode.classList.remove('disabled');
 									delnode.innerHTML='删除';
 									delnode.button=this;
-								}
+								});
 								var createButton=function(name,image){
 									var button=ui.create.div('.button.character');
 									button.link=name;
@@ -45566,7 +45615,8 @@
 												character:{},
 												translate:{}
 											},
-											image:{}
+											image:{},
+											audio:{}
 										};
 										toggle.classList.add('on');
 										newCharacter.style.display='';
@@ -45582,7 +45632,8 @@
 										character:{},
 										translate:{}
 									},
-									image:{}
+									image:{},
+									audio:{}
 								};
 								var newCharacter;
 								var toggle=ui.create.div('.config.more.on','创建武将 <div>&gt;</div>',page,function(){
@@ -45652,18 +45703,65 @@
 
 								ui.create.div('.indent','姓名：<input class="new_name" type="text">',newCharacter).style.paddingTop='8px';
 								ui.create.div('.indent','介绍：<input class="new_des" type="text">',newCharacter).style.paddingTop='8px';
-								ui.create.div('.indent','体力：<input class="new_hp" type="text">',newCharacter).style.paddingTop='8px';
+								ui.create.div('.indent','体力：<input class="new_hp" type="text" placeholder="体/限/甲">',newCharacter).style.paddingTop='8px';
 								newCharacter.querySelector('input.new_name').onblur=updateButton;
 								var sexes=ui.create.selectlist([
 									['male','男'],
 									['female','女'],
-									['none','无'],
+									['double','双性'],
+									['none','无']
 								],null,ui.create.div('.indent','性别：',newCharacter));
-								var grouplist=[];
-								for(var i=0;i<lib.group.length;i++){
-									grouplist.push([lib.group[i],get.translation(lib.group[i])]);
-								};
+								var grouplist=lib.group.map((group,i)=>[lib.group[i],get.translation(lib.group[i])]);
 								var groups=ui.create.selectlist(grouplist,null,ui.create.div('.indent','势力：',newCharacter));
+								var dieaudio=ui.create.div('.die_audio',newCharacter,{textAlign:'left'});
+								var dieaudiolabel=ui.create.node('label','阵亡配音:',dieaudio);
+								var dieaudioUpload=dieaudio.appendChild(document.createElement('input'));
+								dieaudioUpload.type='file';
+								dieaudioUpload.accept='audio/*';
+								dieaudioUpload.style.width='calc(100% - 100px)';
+								dieaudioUpload.onchange=function(){
+									var fileToLoad=dieaudioUpload.files[0];
+									if(fileToLoad){
+										console.log(fileToLoad);
+										var fileReader=new FileReader();
+										fileReader.onload=function(fileLoadedEvent){
+											var data=fileLoadedEvent.target.result;
+											var blob=new Blob([data]);
+											dieaudio.file=fileToLoad;
+											dieaudio.arrayBuffer=data;
+											dieaudio.blob=blob;
+											var new_name=newCharacter.querySelector('input.new_name');
+											dieaudioUpload.style.display='none';
+											dieaudiopreview.style.display=
+											dieaudiocancel.style.display='';
+											dieaudiotag.src=window.URL.createObjectURL(blob);
+										};
+										fileReader.readAsArrayBuffer(fileToLoad);
+									}
+								};
+								var dieaudiotag=ui.create.node('audio',dieaudio);
+								var dieaudiopreview=ui.create.node('button',dieaudio,()=>{
+									if(dieaudiotag.error){
+										alert('您使用的客户端不支持预览此音频！')
+									} else dieaudiotag.play();
+								});
+								dieaudiopreview.innerHTML='播放';
+								dieaudiopreview.style.display='none';
+								var dieaudiocancel=ui.create.node('button',dieaudio,()=>{
+									dieaudiopreview.style.display='none';
+									dieaudiocancel.style.display='none';
+									if(dieaudio.blob){
+										window.URL.revokeObjectURL(dieaudio.blob);
+										dieaudiotag.src=null;
+										delete dieaudio.file;
+										delete dieaudio.arrayBuffer;
+										delete dieaudio.blob;
+									}
+									dieaudioUpload.value='';
+									dieaudioUpload.style.display='';
+								});
+								dieaudiocancel.innerHTML='取消';
+								dieaudiocancel.style.display='none';
 								var options=ui.create.div('.add_skill.options','<span>主公<input type="checkbox" name="zhu"></span><span>BOSS<input type="checkbox" name="boss"></span><span>仅点将可用<input type="checkbox" name="forbidai"></span><br><span>隐匿技<input type="checkbox" name="hiddenSkill"></span><br>',newCharacter);
 								var addSkill=ui.create.div('.add_skill','添加技能<br>',newCharacter);
 								var list=[];
@@ -45728,8 +45826,10 @@
 								}
 								addSkillButton.onclick=function(){
 									for(var i=0;i<skillList.firstChild.childNodes.length;i++){
-										if(skillList.firstChild.childNodes[i].skill==skillopt.value) return;
+										if(skillList.firstChild.childNodes[i].skill==skillopt.value) return alert(selectname.value=='current_extension'?'此扩展还未添加技能':'此武将没有技能可添加');
 									}
+									//无技能时
+									if(!skillopt.value||skillopt.childElementCount==0) return;
 									var node=document.createElement('button');
 									node.skill=skillopt.value;
 									node.onclick=deletenode;
@@ -45807,7 +45907,8 @@
 										}
 									}
 									var hp=page.querySelector('input.new_hp').value;
-									if(hp=='Infinity') hp=Infinity;
+									//体力支持‘Infinity,∞,无限’表示无限
+									if(['Infinity','∞','无限'].includes(hp)) hp=Infinity;
 									else if(hp.indexOf('/')==-1) hp=parseInt(hp)||1;
 									var skills=[];
 									for(var i=0;i<skillList.firstChild.childNodes.length;i++){
@@ -45825,6 +45926,12 @@
 									var des=page.querySelector('input.new_des').value;
 									if(des){
 										tags.add('des:'+des);
+									}
+									//阵亡配音
+									if(dieaudio.file&&dieaudio.arrayBuffer){
+										var audioname=name+dieaudio.file.name.slice(dieaudio.file.name.indexOf('.'));
+										tags.add(`die:${typeof game.readFile=='function'?'ext':'db'}:audio/die/${audioname}`);
+										page.content.audio[audioname]=dieaudio.arrayBuffer;
 									}
 
 									page.content.pack.translate[name]=translate;
@@ -45849,6 +45956,7 @@
 										delete dash1.content.pack.character[name];
 										delete dash1.content.pack.translate[name];
 										delete dash1.content.image[name];
+										delete dash1.content.audio[name];
 										dash1.link.classList.add('active');
 									}
 									resetEditor();
