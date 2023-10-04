@@ -1185,7 +1185,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}))+'的【诏书】上';
 				},
 				content:function(){
+					'step 0'
 					target.addToExpansion(cards,player,'give').gaintag.add('zhaoshu_cards');
+					'step 1'
+					target.markSkill('zhaoshu_skill');
 				},
 				ai:{
 					order:1,
