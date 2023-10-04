@@ -34960,13 +34960,8 @@
 			audio.volume=lib.config.volumn_audio/8;
 			audio.addEventListener('ended',()=>audio.remove());
 			audio.onerror=event=>{
-				if(audio._changed){
-					audio.remove();
-					if(onError) onError(event);
-					return;
-				}
-				audio.src=`${lib.assetURL}audio/${path}.ogg`;
-				audio._changed=true;
+				audio.remove();
+				if(onError) onError(event);
 			};
 			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
 			audio.oncanplay=()=>Promise.resolve(audio.play()).catch(()=>void 0);
