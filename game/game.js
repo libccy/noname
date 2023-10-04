@@ -41354,11 +41354,13 @@
 			editor:function(container,saveInput){
 				const createList=[];
 				const containerDelete=container.delete;
+				const editorpage=ui.create.div(container);
 				//删除container的时候，删除创建的ul列表
 				container.delete=function(){
 					for (let i=createList.length-1;i>=0;i--){
 						createList[i].parentNode&&createList[i].parentNode.removeChild(createList[i]);
 					}
+					Array.from(editorpage.children).forEach(v=>{v.style.background=''});
 					containerDelete.apply(this, arguments);
 				}
 				//创建ul列表
@@ -41368,13 +41370,13 @@
 					if (parent){
 						for(let i=0;i<parent.childElementCount;i++){
 							const node=parent.childNodes[i];
-							if(node!=self&&node.createMenu) closeMenu.call(node);
+							if(node!=self&&node.ul) closeMenu.call(node);
 						}
 					}
-					if(self.createMenu){
-						createList.add(self.createMenu);
-						ui.window.appendChild(self.createMenu);
-						return self.createMenu;
+					if(self.ul){
+						createList.add(self.ul);
+						ui.window.appendChild(self.ul);
+						return self.ul;
 					}
 					const editor=container.editor;
 					if(!editor) return false;
@@ -41438,16 +41440,15 @@
 				};
 				//关闭ul列表
 				const closeMenu=function(){
-					const ul=this.createMenu;
+					const ul=this.ul;
 					if(!ul) return false;
 					if(ul.parentNode) ul.parentNode.removeChild(ul);
 					this.style.background='';
 					//创建后不用删除了，除非以后要动态加载。
-					//delete this.createMenu;
+					//delete this.ul;
 					createList.remove(ul);
 					return ul;
 				};
-				const editorpage=ui.create.div(container);
 				const discardConfig=ui.create.div('.editbutton','取消',editorpage,function(){
 					ui.window.classList.remove('shortcutpaused');
 					ui.window.classList.remove('systempaused');
@@ -41457,12 +41458,12 @@
 				const saveConfig=ui.create.div('.editbutton','保存',editorpage,saveInput);
 				const theme=ui.create.div('.editbutton','主题',editorpage,function(){
 					if(!this||this==window) return;
-					if(this.createMenu&&this.createMenu.parentNode){
+					if(this.ul&&this.ul.parentNode){
 						return closeMenu.call(this);
 					}
 					//this
 					const self=this;
-					if(!this.createMenu){
+					if(!this.ul){
 						//主题列表
 						const list=['mdn-like','mbo'];
 						//正在使用的主题
@@ -41480,18 +41481,18 @@
 							closeMenu.call(self);
 						};
 						const ul=createMenu(pos,self,list,click);
-						self.createMenu=ul;
+						self.ul=ul;
 					}else{
 						createMenu(null,self);
 					}
 				});
 				const edit=ui.create.div('.editbutton','编辑',editorpage,function(){
 					if(!this||this==window) return;
-					if(this.createMenu&&this.createMenu.parentNode){
+					if(this.ul&&this.ul.parentNode){
 						return closeMenu.call(this);
 					}
 					const self=this;
-					if(!this.createMenu){
+					if(!this.ul){
 						const pos=this.getBoundingClientRect();
 						const list=['撤销        Ctrl+Z', '恢复撤销    Ctrl+Y'];
 						const click=function(e){
@@ -41502,30 +41503,30 @@
 							closeMenu.call(self);
 						};
 						const ul=createMenu(pos,self,list,click);
-						this.createMenu=ul;
+						this.ul=ul;
 					}else{
 						createMenu(null,self);
 					}
 				});
 				const fontSize=ui.create.div('.editbutton','字号',editorpage,function(){
 					if(!this||this==window) return;
-					if(this.createMenu&&this.createMenu.parentNode){
+					if(this.ul&&this.ul.parentNode){
 						return closeMenu.call(this);
 					}
 					const self=this;
-					if(!this.createMenu){
+					if(!this.ul){
 						const pos=this.getBoundingClientRect();
 						const list=['16px','18px','20px','22px','24px','26px'];
 						const click=function(e){
 							const size=this.innerHTML;
 							container.style.fontSize=size.slice(0,-2)/game.documentZoom+'px';
-							Array.from(self.parentElement.children).map(v=>v.createMenu).filter(Boolean).forEach(v=>{v.style.fontSize=size.slice(0,-2)/game.documentZoom+'px'});
+							Array.from(self.parentElement.children).map(v=>v.ul).filter(Boolean).forEach(v=>{v.style.fontSize=size.slice(0,-2)/game.documentZoom+'px'});
 							setTimeout(()=>container.editor.refresh(),0);
 							game.saveConfig('codeMirror_fontSize',size);
 							closeMenu.call(self);
 						};
 						const ul=createMenu(pos,self,list,click);
-						this.createMenu=ul;
+						this.ul=ul;
 					}else{
 						createMenu(null,self);
 					}
