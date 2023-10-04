@@ -26898,50 +26898,42 @@
 								range+=info.globalFrom;
 							}
 						})
-						return (equips.reduce((range,card,index)=>{
-							if(index==0) range--;
-							let newRange=1;
-							const info=get.info(card,false);
-							if(info.distance){
-								//如果存在attackRange 则通过attackRange动态获取攻击范围
-								if(typeof info.distance.attackRange=='function'){
-									newRange=info.distance.attackRange(card,player);
-								}
-								//否则采用祖宗之法
-								else if(typeof info.distance.attackFrom=='number'){
-									newRange-=info.distance.attackFrom;
-								}
-							}
-							return Math.max(range,newRange)
-						},range)-range);
+						return (player.getEquipRange()-range);
 					}
 					let base=game.checkMod(player,'unchanged','attackRangeBase',player);
 					if(base!='unchanged'){
 						range=base;
 					}
 					else{
-						const equips=player.getCards('e',function(card){
-							return !ui.selected.cards||!ui.selected.cards.contains(card);
-						});
-						range=equips.reduce((range,card,index)=>{
-							if(index==0) range--;
-							let newRange=1;
-							const info=get.info(card,false);
-							if(info.distance){
-								//如果存在attackRange 则通过attackRange动态获取攻击范围
-								if(typeof info.distance.attackRange=='function'){
-									newRange=info.distance.attackRange(card,player);
-								}
-								//否则采用祖宗之法
-								else if(typeof info.distance.attackFrom=='number'){
-									newRange-=info.distance.attackFrom;
-								}
-							}
-							return Math.max(range,newRange);
-						},1);
+						range=player.getEquipRange();
 					}
 					range=game.checkMod(player,range,'attackRange',player);
 					return range;
+				},
+				getEquipRange:function(cards){
+					const player=this;
+					if(!cards) cards=player.getCards('e',function(card){
+						return !ui.selected.cards||!ui.selected.cards.contains(card);
+					});
+					const range=cards.reduce((range,card)=>{
+						let newRange=false;
+						const info=get.info(card,false);
+						if(info.distance){
+							//如果存在attackRange 则通过attackRange动态获取攻击范围
+							if(typeof info.distance.attackRange=='function'){
+								newRange=info.distance.attackRange(card,player);
+							}
+							//否则采用祖宗之法
+							else if(typeof info.distance.attackFrom=='number'){
+								newRange=(1-info.distance.attackFrom);
+							}
+						}
+						let isN1=(typeof range=='number');
+						let isN2=(typeof newRange=='number');
+						if(isN1&&isN2) return Math.max(range,newRange);
+						else return (isN1?range:newRange);
+					},false);
+					return (typeof range=='number')?range:1;
 				},
 				getGlobalFrom:function(){
 					var player=this;
@@ -33743,6 +33735,10 @@
 			}],
 			['经典',{
 				showName:'典',
+			}],
+			['君',{
+				color:'#fefedc',
+				nature:'shenmm',
 			}],
 			['骰子',{
 				getSpan:()=>{
@@ -57857,22 +57853,7 @@
 				m=game.checkMod(from,to,m,'attackFrom',from);
 				m=game.checkMod(from,to,m,'attackTo',to);
 				return m;
-				const attakRange=equips1.reduce((range,card,index)=>{
-					if(index==0) range--;
-					let newRange=1;
-					const info=get.info(card,false);
-					if(info.distance){
-						//如果存在attackRange 则通过attackRange动态获取攻击范围
-						if(typeof info.distance.attackRange=='function'){
-							newRange=info.distance.attackRange(card,player);
-						}
-						//否则采用祖宗之法
-						else if(typeof info.distance.attackFrom=='number'){
-							newRange-=info.distance.attackFrom;
-						}
-					}
-					return Math.max(range,newRange)
-				},1);
+				const attakRange=from.getEquipRange();
 				m+=(1-attakRange);
 				for(let i=0;i<equips2.length;i++){
 					let info=get.info(equips2[i]).distance;

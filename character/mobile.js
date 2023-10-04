@@ -14286,6 +14286,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			
 			re_weiwenzhugezhi:'手杀卫温诸葛直',
 			re_weiwenzhugezhi_prefix:'手杀',
+			gz_re_xugong:'许贡',
 			re_xugong:'手杀许贡',
 			re_xugong_prefix:'手杀',
 			re_zhanggong:'手杀张恭',

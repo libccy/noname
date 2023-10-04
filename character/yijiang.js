@@ -6673,15 +6673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var num=0,cards=player.getEquips(1);
-					for(var card of cards){
-						var numz=1;
-						var info=get.info(card,false);
-						if(info&&info.distance&&info.distance.attackFrom){
-							numz-=info.distance.attackFrom;
-						}
-						num+=numz;
-					}
+					var num=player.getEquipRange();
 					if(trigger.player.countCards('h')<num){
 						event.directfalse=true;
 					}

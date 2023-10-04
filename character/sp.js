@@ -13403,30 +13403,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.8,
 					effect:{
 						target:function(card,player,target,current){
-							if(player!=target||!player.isPhaseUsing()) return;
+							let used=(target.getHistory('useCard').length+target.getHistory('respond').length);
 							if(get.subtype(card)=='equip1'&&!get.cardtag(card,'gifts')){
-								var range0=player.getAttackRange();
-								var range=0;
-								var info=get.info(card);
+								if(player!=target||!player.isPhaseUsing()) return;
+								let range0=player.getAttackRange();
+								let range=0;
+								let info=get.info(card);
 								if(info&&info.distance&&info.distance.attackFrom){
 									range-=info.distance.attackFrom;
 								}
 								if(player.getEquip(1)){
-									var num=0;
-									var info=get.info(player.getEquip(1));
+									let num=0;
+									let info=get.info(player.getEquip(1));
 									if(info&&info.distance&&info.distance.attackFrom){
 										num-=info.distance.attackFrom;
 									}
 									range0-=num;
 								}
 								range0+=range;
-								var delta=range0-(player.getHistory('useCard').length+player.getHistory('respond').length);
+								let delta=range0-used;
 								if(delta<0) return;
-								var num=player.countCards('h',function(card){
+								let num=player.countCards('h',function(card){
 									return (get.cardtag(card,'gifts')||get.subtype(card)!='equip1')&&player.getUseValue(card)>0;
 								});
 								if(delta==2&&num>0) return [1,3];
 								if(num>=delta) return 'zeroplayertarget';
+							}
+							else if(get.tag(card,'respondShan')>0){
+								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveShan()){
+									return 0.6;
+								}
+							}
+							else if(get.tag(card,'respondSha')>0){
+								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveSha()){
+									return 0.6;
+								}
 							}
 						},
 					},

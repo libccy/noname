@@ -3337,19 +3337,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						target:function(card,player,target,current){
+						target_use:function(card,player,target,current){
 							if(card.name=='sha'&&get.attitude(player,target)<0){
 								if(_status.event.name=='xiangle') return;
+								if(get.attitude(player,target)>0&&current<0) return 'zerotarget';
 								var bs=player.getCards('h',{type:'basic'});
-								if(bs.length<2) return 0;
+								bs.remove(card);
+								if(card.cards) bs.removeArray(card.cards);
+								else bs.removeArray(ui.selected.cards);
+								if(!bs.length) return 'zerotarget';
 								if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')) return;
-								if(bs.length<=3&&player.countCards('h','sha')<=1){
+								if(bs.length<=2){
 									for(var i=0;i<bs.length;i++){
-										if(bs[i].name!='sha'&&get.value(bs[i])<7){
+										if(get.value(bs[i])<7){
 											return [1,0,1,-0.5];
 										}
 									}
-									return 0;
+									return [1,0,0.3,0];
 								}
 								return [1,0,1,-0.5];
 							}
