@@ -7323,15 +7323,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(6 * draw < disval) use = false;
 					player.chooseToDiscard('he',get.prompt('mingluan'),'弃置任意张牌，并摸等同于'+get.translation(trigger.player)+'手牌数的牌（至多摸至五张）',[1,Infinity]).set('ai',function(card){
 						let val = get.value(card, player);
-						if(val < 0 && card.name != 'du') return 30;
-						if(!use) return 0;
+						if(val < 0 && card.name !== 'du') return 30;
+						if(!_status.event.use) return 0;
 						if(ui.selected.cards.length){
-							if (get.position(card) != 'h') return 0;
+							if (get.position(card) !== 'h') return 0;
 							return 6 - val;
 						}
-						if(spare < 0 || get.position(card) == 'h') return 30 - val;
+						if(_status.event.spare < 0 || get.position(card) === 'h') return 30 - val;
 						return 0;
-					}).logSkill=['mingluan',trigger.player];
+					}).set('spare',spare).set('use',use).logSkill=['mingluan',trigger.player];
 					'step 1'
 					if(result.bool){
 						var num=trigger.player.countCards('h'),num2=5-player.countCards('h');
