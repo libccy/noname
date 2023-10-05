@@ -1565,11 +1565,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterReplace:{
-			duji:['re_duji','duji','ns_duji'],
-			sp_taishici:['re_sp_taishici','sp_taishici'],
+			duji:['duji','re_duji','ns_duji'],
+			sp_taishici:['sp_taishici','re_sp_taishici'],
 			mazhong:['mazhong','re_mazhong'],
-			wenpin:['re_wenpin','wenpin'],
-			liuyan:['jsrg_liuyan','ol_liuyan','liuyan'],
+			wenpin:['wenpin','re_wenpin'],
+			liuyan:['liuyan','jsrg_liuyan','ol_liuyan'],
 		},
 		translate:{
 			xinghuoliaoyuan:'星火燎原',
