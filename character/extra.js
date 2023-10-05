@@ -65,11 +65,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhugeliang:'字孔明、号卧龙，汉族，琅琊阳都人，三国时期蜀汉丞相、杰出的政治家、军事家、发明家、文学家。在世时被封为武乡侯，死后追谥忠武侯，后来东晋政权推崇诸葛亮军事才能，特追封他为武兴王。诸葛亮为匡扶蜀汉政权，呕心沥血、鞠躬尽瘁、死而后已。其代表作有《前出师表》、《后出师表》、《诫子书》等。曾发明木牛流马等，并改造连弩，可一弩十矢俱发。于234年在宝鸡五丈原逝世。',
 		},
 		characterReplace:{
-			shen_zhangliao:['shen_zhangliao','ol_zhangliao'],
+			shen_zhangliao:['ol_zhangliao','shen_zhangliao'],
 			shen_zhaoyun:['shen_zhaoyun','boss_zhaoyun'],
 			shen_guanyu:['shen_guanyu','tw_shen_guanyu'],
 			shen_sunquan:['shen_sunquan','junk_sunquan'],
-			shen_lvmeng:['tw_shen_lvmeng','shen_lvmeng'],
+			shen_lvmeng:['shen_lvmeng','tw_shen_lvmeng'],
 			shen_machao:['shen_machao','ps_shen_machao'],
 		},
 		characterFilter:{
