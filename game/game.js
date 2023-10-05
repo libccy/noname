@@ -54800,7 +54800,66 @@
 								clickSkill.call(skillnode,'init');
 							});
 						}
-						if(e!=='init') game.trySkillAudio(this.link,playername);
+						// if(e!=='init') game.trySkillAudio(this.link,playername);
+						// 有bug，先用旧版
+						if(lib.config.background_speak&&e!=='init'){
+							var audioname=this.link;
+							if(info.audioname2&&info.audioname2[playername]){
+								audioname=info.audioname2[playername];
+								info=lib.skill[audioname];
+							}
+							var audioinfo=info.audio;
+							var that=this;
+							var getIndex=function(i){
+								if(typeof that.audioindex!='number'){
+									that.audioindex=i;
+								}
+								that.audioindex++;
+								if(that.audioindex>i){
+									that.audioindex=1;
+								}
+								return that.audioindex;
+							};
+							if(typeof audioinfo=='string'){
+								if(audioinfo.indexOf('ext:')==0){
+									audioinfo=audioinfo.split(':');
+									if(audioinfo.length==3){
+										if(audioinfo[2]=='true'){
+											game.playAudio('..','extension',audioinfo[1],audioname);
+										}
+										else{
+											audioinfo[2]=parseInt(audioinfo[2]);
+											if(audioinfo[2]){
+												game.playAudio('..','extension',audioinfo[1],audioname+getIndex(audioinfo[2]));
+											}
+										}
+									}
+									return;
+								}
+								else{
+									audioname=audioinfo;
+									if(lib.skill[audioinfo]){
+										audioinfo=lib.skill[audioinfo].audio;
+									}
+								}
+							}
+							else if(Array.isArray(audioinfo)){
+								audioname=audioinfo[0];
+								audioinfo=audioinfo[1];
+							}
+							if(typeof audioinfo=='number'){
+								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								game.playAudio('skill',audioname+getIndex(audioinfo));
+							}
+							else if(audioinfo){
+								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								game.playAudio('skill',audioname);
+							}
+							else if(true&&info.audio!==false){
+								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								game.playSkillAudio(audioname,getIndex(2));
+							}
+						}
 					}
 				}else{
 					// 样式一
@@ -55002,7 +55061,66 @@
 								clickSkill.call(skillnode,'init');
 							});
 						}
-						if(e!=='init') game.trySkillAudio(this.link,playername);
+						// if(e!=='init') game.trySkillAudio(this.link,playername);
+						// 有bug，先用旧版
+						if(lib.config.background_speak&&e!=='init'){
+							var audioname=this.link;
+							if(info.audioname2&&info.audioname2[playername]){
+								audioname=info.audioname2[playername];
+								info=lib.skill[audioname];
+							}
+							var audioinfo=info.audio;
+							var that=this;
+							var getIndex=function(i){
+								if(typeof that.audioindex!='number'){
+									that.audioindex=i;
+								}
+								that.audioindex++;
+								if(that.audioindex>i){
+									that.audioindex=1;
+								}
+								return that.audioindex;
+							};
+							if(typeof audioinfo=='string'){
+								if(audioinfo.indexOf('ext:')==0){
+									audioinfo=audioinfo.split(':');
+									if(audioinfo.length==3){
+										if(audioinfo[2]=='true'){
+											game.playAudio('..','extension',audioinfo[1],audioname);
+										}
+										else{
+											audioinfo[2]=parseInt(audioinfo[2]);
+											if(audioinfo[2]){
+												game.playAudio('..','extension',audioinfo[1],audioname+getIndex(audioinfo[2]));
+											}
+										}
+									}
+									return;
+								}
+								else{
+									audioname=audioinfo;
+									if(lib.skill[audioinfo]){
+										audioinfo=lib.skill[audioinfo].audio;
+									}
+								}
+							}
+							else if(Array.isArray(audioinfo)){
+								audioname=audioinfo[0];
+								audioinfo=audioinfo[1];
+							}
+							if(typeof audioinfo=='number'){
+								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								game.playAudio('skill',audioname+getIndex(audioinfo));
+							}
+							else if(audioinfo){
+								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								game.playAudio('skill',audioname);
+							}
+							else if(true&&info.audio!==false){
+								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								game.playSkillAudio(audioname,getIndex(2));
+							}
+						}
 					}
 				}
 				
