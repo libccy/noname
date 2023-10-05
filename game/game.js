@@ -8079,6 +8079,9 @@
 				lib.ui=ui;
 				lib.ai=ai;
 				lib.game=game;
+				for(let i in lib.element.event){
+					_status.event[i]=lib.element.event[i];
+				}
 
 				HTMLDivElement.prototype.animate=function(name,time){
 					var that;
