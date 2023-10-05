@@ -133,7 +133,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 3'
-					var list=[];
+					var list=[],shown=[]
 					var piles=['cardPile','discardPile'];
 					for(var pile of piles){
 						for(var i=0;i<ui[pile].childNodes.length;i++){
@@ -141,13 +141,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var number=get.number(card,false);
 							if(!list.contains(card)&&number==8){
 								list.push(card);
+								if(pile=='discardPile') shown.push(card);
 								if(list.length>=cards.length) break;
 							}
 						}
 						if(list.length>=cards.length) break;
 					}
 					if(list.length){
-						player.gain(list,'gain2').gaintag.add('dcxiongmu_tag');
+						var next=player.gain(list);
+						next.shown_cards=shown;
+						next.set('animate',function(event){
+							var player=event.player,cards=event.cards,shown=event.shown_cards;
+							if(shown.length<cards.length){
+								var num=cards.length-shown.length;
+								player.$draw(num);
+								game.log(player,'从牌堆获得了',num,'张点数为8的牌');
+							}
+							if(shown.length>0){
+								player.$gain2(shown,false);
+								game.log(player,'从弃牌堆获得了',shown);
+							}
+							return 500;
+						});
+						next.gaintag.add('dcxiongmu_tag');
 						player.addSkill('dcxiongmu_tag');
 					}
 				},
