@@ -339,7 +339,7 @@
 		announce:{
 			init(){
 				_status._announce=document.createElement("Announce");
-				_status._announce_cache=new Map();
+				_status._announce_cache=new WeakMap();
 				delete lib.announce.init;
 			},
 			//推送一个对象给所有监听了name的订阅者。
@@ -350,10 +350,19 @@
 				return values;
 			},
 			//订阅name相关的事件。
-			subscribe(name,method){
+			subscribe(name,method,once){
 				if(_status._announce&&_status._announce_cache) {
-					const subscribeFunction=event=>method(event.detail);
-					_status._announce_cache.set(method,subscribeFunction);
+					let subscribeFunction;
+					if(_status._announce_cache.has(method)){
+						subscribeFunction=_status._announce_cache.get(method);
+					}
+					else{
+						subscribeFunction=event=>{
+							method(event.detail);
+							if(once) _status._announce.removeEventListener(subscribeFunction);
+						};
+						_status._announce_cache.set(method,subscribeFunction);
+					}
 					_status._announce.addEventListener(name,subscribeFunction);
 				}
 				return method;
