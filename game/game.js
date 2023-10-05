@@ -337,47 +337,33 @@
 			}],
 		},
 		announce:{
-			//推送一个对象给所有监听了key的订阅者。
-			publish:function(key,obj){
-				if(!_status.announce)return;
-				if(!_status.announce[key])return;
-				for(let subscriber of _status.announce[key]){
-					if(subscriber.onReceive){
-						subscriber.onReceive(key,obj);
-					}
-				}
+			init(){
+				_status._announce=document.createElement("Announce");
+				_status._announce_cache=new Map();
+				delete lib.announce.init;
 			},
-			//订阅key相关的事件。
-			subscribe:function(key,subscriber){
-				if(typeof subscriber === 'function'){
-					let subs = {
-						onReceive:subscriber,
-						priority:0,
-					};
-					subscriber = subs;
-				}
-				if(!_status.announce)_status.announce = {};
-				if(!Array.isArray(_status.announce[key]))_status.announce[key] = [];
-				var inserted = false;
-				for(let i=0;i<_status.announce[key].length;i++){
-					let pri = _status.announce[key][i].priority;
-					if(pri <= subscriber.priority){
-						_status.announce[key].splice(i,0,subscriber);
-						inserted = true;
-						break;
-					}
-				}
-				if(!inserted){
-					_status.announce[key].push(subscriber);
-				}
-				return subscriber;
+			//推送一个对象给所有监听了name的订阅者。
+			publish(name,values){
+				if(_status._announce) _status._announce.dispatchEvent(new CustomEvent(name,{
+					detail:values
+				}));
+				return values;
 			},
-			//取消对事件key的订阅，subscriber需要为上面lib.announce.subscribe返回的值。
-			unsubscribe:function(key,subscriber){
-				if(!_status.announce)return;
-				if(!_status.announce[key])return;
-				_status.announce[key].remove(subscriber);
+			//订阅name相关的事件。
+			subscribe(name,method){
+				if(_status._announce&&_status._announce_cache) {
+					const subscribeFunction=event=>method(event.detail);
+					_status._announce_cache.set(method,subscribeFunction);
+					_status._announce.addEventListener(name,subscribeFunction);
+				}
+				return method;
 			},
+			//取消对事件name的订阅
+			unsubscribe(name,method){
+				if(_status._announce&&_status._announce_cache&&_status._announce_cache.has(method)) 
+					_status._announce.removeEventListener(name,_status._announce_cache.get(method));
+				return method;
+			}
 		},
 		objectURL:new Map(),
 		hookmap:{},
@@ -9183,6 +9169,7 @@
 
 					window.game=game;
 					game.dynamicStyle.init();
+					lib.announce.init();
 					// node:path library alternative
 					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
 						lib.path=window._noname_path;
