@@ -266,7 +266,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								str+='、';
 							}
 							str=str.slice(0,str.length-1);
-							str+='；'
+							str+='；';
+							card.ai.equipValue=function(card,player){
+								let val=maxHp;
+								if(player.hasSkill('qiexie')) val*=0.4;
+								else val*=0.6;
+								return val+=skills.length;
+							};
 						}
 						str+='此牌离开你的装备区后，改为置入剩余武将牌牌堆。';
 						lib.translate['qiexie_'+name+'_info']=str;
@@ -2442,6 +2448,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yingba:{
 				audio:2,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num>0&&_status.event&&_status.event.type=='phase'&&get.tag(card,'recover')){
+							if(player.needsToDiscard()) return num/3;
+							return 0;
+						}
+					}
+				},
 				enable:'phaseUse',
 				usable:1,
 				filter:(event,player)=>(game.hasPlayer((current)=>(current!=player&&current.maxHp>1))),
@@ -2901,6 +2915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else event.finish();
 							'step 2'
 							player.chooseToDiscard('h',true).logSkill=['tspowei_use',target];
+							if(get.mode()!='identity'||player.identity!='nei') player.addExpose(0.2);
 							target.damage();
 							'step 3'
 							player.addTempSkill('tspowei_inRange');
@@ -4298,24 +4313,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 1;
 					},
 					effect:{
-						target:function (card,player,target){
-							if(get.tag(card,'damage')){
+						target:function(card,player,target){
+							if(get.tag(card,'damage')&&target.hp>(player.hasSkillTag('damageBonus',true,{
+								card:card,
+								target:target
+							})?2:1)){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
-								if(target.hp==1) return 0.8;
-								if(target.isTurnedOver()) return [0,3];
-								var num=game.countPlayer(function(current){
-									if(current.countCards('he')&&current!=player&&get.attitude(player,current)<=0){
-										return true;
+								let gain=game.countPlayer(function(current){
+									if(target==current) return 0;
+									if(get.attitude(target,current)>0){
+										if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'new_guixin')&&get.effect(current,cardx,current,current)<0,'j')) return 1.3;
+										return 0;
 									}
-									if(current.countCards('j')&&current!=player&&get.attitude(player,current)>0){
-										return true;
-									}
+									if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'new_guixin')&&get.effect(current,cardx,current,current)>0,'e')) return 1.1;
+									if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'new_guixin'),'h')) return 0.9;
+									return 0;
 								});
-								if(num>2) return [0,1];
-								if(num==2) return [0.5,1];
+								if(target.isTurnedOver()) gain+=2.3;
+								else gain-=2.3;
+								return [1,Math.max(0,gain)];
 							}
-						},
-					},
+						}
+					}
 				},
 			},
 			ol_shenfen:{
@@ -4860,6 +4879,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jilue_zhiheng:{
 				audio:1,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num<=0||get.itemtype(card)!='card'||get.type(card)!='equip') return num;
+						let eq=player.getEquip(get.subtype(card));
+						if(eq&&get.equipValue(card)-get.equipValue(eq)<Math.max(1.2,6-player.hp)) return 0;
+					}
+				},
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -4897,7 +4923,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw(event.num+cards.length);
 				},
 				ai:{
-					order:1,
+					order:function(item,player){
+						if(player.hasCard((i)=>get.value(i)>Math.max(6,9-player.hp),'he')) return 1;
+						return 10;
+					},
 					result:{
 						player:function(player){
 							var num=0;
@@ -4911,6 +4940,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(cards.length==2&&player.storage.jilue>1);
 							return 0;
 						}
+					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return player.isPhaseUsing()&&!player.getStat().skill.jilue_zhiheng&&player.hasCard((card)=>get.name(card)!=='tao','h');
 					},
 					threaten:1.5
 				},
@@ -5234,20 +5267,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					effect:{
 						target:function(card,player,target){
-							if(get.tag(card,'damage')){
+							if(get.tag(card,'damage')&&target.hp>(player.hasSkillTag('damageBonus',true,{
+								card:card,
+								target:target
+							})?2:1)){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
-								if(target.hp==1) return 0.8;
-								if(target.isTurnedOver()) return [0,3];
-								var num=game.countPlayer(function(current){
-									if(current.countCards('he')&&current!=player&&get.attitude(player,current)<=0){
-										return true;
+								let gain=game.countPlayer(function(current){
+									if(target==current) return 0;
+									if(get.attitude(target,current)>0){
+										if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'guixin')&&get.effect(current,cardx,current,current)<0,'ej')) return 1.3;
+										return 0;
 									}
-									if(current.countCards('j')&&current!=player&&get.attitude(player,current)>0){
-										return true;
-									}
+									if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'guixin')&&get.effect(current,cardx,current,current)>0,'ej')) return 1.1;
+									if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'guixin'),'h')) return 0.9;
+									return 0;
 								});
-								if(num>2) return [0,1];
-								if(num==2) return [0.5,1];
+								if(target.isTurnedOver()) gain+=2.3;
+								else gain-=2.3;
+								return [1,Math.max(0,gain)];
 							}
 						}
 					}
@@ -6405,6 +6442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				bannedList:[
 					'bifa','buqu','gzbuqu','songci','funan','xinfu_guhuo','reguhuo','huashen','rehuashen','old_guhuo','shouxi','xinpojun','taoluan','xintaoluan','yinbing','xinfu_yingshi','zhenwei','zhengnan','xinzhengnan','zhoufu',
 				],
+				logTarget:'player',
 				content:function(){
 					'step 0'
 					var list=[];

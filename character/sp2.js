@@ -3169,6 +3169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						trigger.num--;
+						if(get.mode()!='identity'||player.identity!='nei') player.addExpose(0.15);
 						target.addMark('jieliang_less',1,false);
 						target.addTempSkill('jieliang_less');
 						player.addTempSkill('jieliang_gain');
@@ -3299,7 +3300,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 8-get.value(card);
 					}).set('goon',get.damageEffect(trigger.player,player,player)>0).logSkill=['tianze',trigger.player];
 					'step 1'
-					if(result.bool) trigger.player.damage();
+					if(result.bool){
+						if(get.mode()!='identity'||player.identity!='nei') player.addExpose(0.2);
+						trigger.player.damage();
+					}
 					else event.finish();
 					'step 2'
 					game.delayx();
