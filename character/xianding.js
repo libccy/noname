@@ -164,7 +164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 500;
 						});
 						next.gaintag.add('dcxiongmu_tag');
-						player.addSkill('dcxiongmu_tag');
+						player.addTempSkill('dcxiongmu_tag','roundStart');
 					}
 				},
 				ai:{
