@@ -336,6 +336,49 @@
 				}
 			}],
 		},
+		announce:{
+			//推送一个对象给所有监听了key的订阅者。
+			publish:function(key,obj){
+				if(!_status.announce)return;
+				if(!_status.announce[key])return;
+				for(let subscriber of _status.announce[key]){
+					if(subscriber.onReceive){
+						subscriber.onReceive(key,obj);
+					}
+				}
+			},
+			//订阅key相关的事件。
+			subscribe:function(key,subscriber){
+				if(typeof subscriber === 'function'){
+					let subs = {
+						onReceive:subscriber,
+						priority:0,
+					};
+					subscriber = subs;
+				}
+				if(!_status.announce)_status.announce = {};
+				if(!Array.isArray(_status.announce[key]))_status.announce[key] = [];
+				var inserted = false;
+				for(let i=0;i<_status.announce[key].length;i++){
+					let pri = _status.announce[key][i].priority;
+					if(pri <= subscriber.priority){
+						_status.announce[key].splice(i,0,subscriber);
+						inserted = true;
+						break;
+					}
+				}
+				if(!inserted){
+					_status.announce[key].push(subscriber);
+				}
+				return subscriber;
+			},
+			//取消对事件key的订阅，subscriber需要为上面lib.announce.subscribe返回的值。
+			unsubscribe:function(key,subscriber){
+				if(!_status.announce)return;
+				if(!_status.announce[key])return;
+				_status.announce[key].remove(subscriber);
+			},
+		},
 		objectURL:new Map(),
 		hookmap:{},
 		imported:{},
@@ -30054,6 +30097,7 @@
 					if((this.name==='gain'||this.name==='lose')&&!_status.gameDrawed) return;
 					if(name==='gameDrawEnd') _status.gameDrawed=true;
 					if(name==='gameStart'){
+						lib.announce.publish('gameStart',{});
 						if(_status.brawl&&_status.brawl.gameStart){
 							_status.brawl.gameStart();
 						}
