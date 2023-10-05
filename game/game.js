@@ -339,7 +339,7 @@
 		announce:{
 			init(){
 				_status._announce=document.createElement("Announce");
-				_status._announce_cache=new WeakMap();
+				_status._announce_cache=new Map();
 				delete lib.announce.init;
 			},
 			//推送一个对象给所有监听了name的订阅者。
@@ -350,18 +350,20 @@
 				return values;
 			},
 			//订阅name相关的事件。
-			subscribe(name,method,once){
+			subscribe(name,method){
 				if(_status._announce&&_status._announce_cache) {
 					let subscribeFunction;
 					if(_status._announce_cache.has(method)){
-						subscribeFunction=_status._announce_cache.get(method);
+						let records=_status._announce_cache.get(method);
+						subscribeFunction=records.get("Listener");
+						records.get("EventTargets").add(name);
 					}
 					else{
-						subscribeFunction=event=>{
-							method(event.detail);
-							if(once) _status._announce.removeEventListener(subscribeFunction);
-						};
-						_status._announce_cache.set(method,subscribeFunction);
+						subscribeFunction=event=>method(event.detail);
+						let records=new Map();
+						records.set("Listener",subscribeFunction);
+						records.set("EventTargets",[name]);
+						_status._announce_cache.set(method,records);
 					}
 					_status._announce.addEventListener(name,subscribeFunction);
 				}
@@ -369,8 +371,14 @@
 			},
 			//取消对事件name的订阅
 			unsubscribe(name,method){
-				if(_status._announce&&_status._announce_cache&&_status._announce_cache.has(method)) 
-					_status._announce.removeEventListener(name,_status._announce_cache.get(method));
+				if(_status._announce&&_status._announce_cache&&_status._announce_cache.has(method)){
+					let records=_status._announce_cache.get(method);
+					const listener=records.get("Listener");
+					let eventTargets=records.get("EventTargets");
+					eventTargets.remove(name);
+					if(eventTargets.length<=0) _status._announce_cache.remove(method);
+					_status._announce.removeEventListener(name,listener);
+				}
 				return method;
 			}
 		},
