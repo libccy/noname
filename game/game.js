@@ -29,6 +29,7 @@
 			}
 		}
 	}
+	const nonameInitialized=localStorage.getItem('noname_inited');
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
@@ -115,7 +116,8 @@
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		mirrorURL:'https://raw.fgit.cf/libccy/noname',
 		hallURL:'47.99.105.222',
-		assetURL:'',
+		assetURL:typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized,
+		compatibleEdition:Boolean(typeof nonameInitialized=='string'&&nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//)),
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -8232,14 +8234,15 @@
 					}
 				});
 				HTMLDivElement.prototype.setBackgroundDB=function(img){
-					var node=this;
-					game.getDB('image',img,function(src){
-						node.style.backgroundImage="url('"+src+"')";
-						node.style.backgroundSize="cover";
+					return game.getDB('image',img).then(src=>{
+						this.style.backgroundImage=`url('${src}')`;
+						this.style.backgroundSize="cover";
+						return this;
 					});
 				};
 				HTMLDivElement.prototype.setBackgroundImage=function(img){
-					this.style.backgroundImage='url("'+lib.assetURL+img+'")';
+					this.style.backgroundImage=`url("${lib.assetURL}${img}")`;
+					return this;
 				},
 				HTMLDivElement.prototype.listen=function(func){
 					if(lib.config.touchscreen){
@@ -8535,112 +8538,6 @@
 						return get.is.sameNature(natures,nature);
 					}
 				});
-				if (!('includes' in Array.prototype)) {
-					Object.defineProperty(Array.prototype, 'includes', {
-						enumerable: false,
-						configurable: true,
-						writable: true,
-						value: function (searchElement, fromIndex) {
-							if (this == null) {
-								throw new TypeError('"this" is null or not defined');
-							}
-							var o = Object(this);
-							var len = o.length >>> 0;
-							if (len === 0) {
-								return false;
-							}
-							var n = fromIndex | 0;
-							var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
-							function sameValueZero(x, y) {
-								return x === y || (typeof x === 'number' && typeof y === 'number' && isNaN(x) && isNaN(y));
-							}
-							while (k < len) {
-								if (sameValueZero(o[k], searchElement)) {
-									return true;
-								}
-								k++;
-							}
-							return false;
-						}
-					});
-				}
-				if(!('flat' in Array.prototype)){
-					Object.defineProperty(Array.prototype, "flat", {
-						configurable:true,
-						enumerable:false,
-						writable:true,
-						value:function(depth){
-							if(typeof depth!='number') depth=1;
-							const arr=[];
-							for(let i=0;i<this.length;i++){
-								let obj=this[i];
-								if(depth>0&&Array.isArray(obj)){
-									obj.flat(depth-1).forEach(function(item){
-										arr.push(item)
-									});
-								}
-								else{
-									arr.push(obj);
-								}
-							}
-							return arr;
-						}
-					});
-				}
-				if (!("allSettled" in Promise)){
-					Object.defineProperty(Promise, "allSettled", {
-						configurable:true,
-						enumerable:false,
-						writable:true,
-						value:function allSettled(ary){
-							const Promise = this;
-							return new Promise((resolve, reject) => {
-								// if (Object.prototype.toString.call(arr) != "[object Array]")
-								if (!Array.isArray(ary))
-								return reject(new TypeError(`${typeof arr} ${ary} is not iterable(cannot read property Symbol(Symbol.iterator))`));
-								let args = Array.prototype.slice.call(ary);
-								if (args.length == 0) return resolve([]);
-								let arrCount = args.length;
-								function resolvePromise(index, value) {
-									if (typeof value == "object") {
-										var then = value.then;
-										if (typeof then == "function") {
-											then.call(value, (val) => {
-												args[index] = { status: "fulfilled", value: val };
-												if (--arrCount == 0) resolve(args);
-											}, (e) => {
-												args[index] = { status: "rejected", reason: e };
-												if (--arrCount == 0) resolve(args);
-											});
-										}
-									}
-								}
-
-								for (let i = 0; i < args.length; ++i)
-									resolvePromise(i, args[i]);
-							});
-						}
-					});
-				}
-				if(!Object.values){
-					Object.defineProperty(Object, 'values', {
-						configurable:true,
-						enumerable:false,
-						writable:true,
-						value:function(obj){
-							if(obj!== Object(obj)) {
-								throw new TypeError('Object.values called on a non-object');
-							}
-							var values=[];
-							for(var key in obj) {
-								if(obj.hasOwnProperty(key)){
-									values.push(obj[key]);
-								}
-							}
-							return values;
-						}
-					});
-				}
 				window.onkeydown=function(e){
 					if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')){
 						if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
@@ -8807,39 +8704,39 @@
 					if(typeof line=='number'&&(typeof game.readFile=='function'||location.origin!='file://')){
 						function createShowCode(lines){
 							let showCode='';
-                            if(lines.length>=10){ 
-                                if(line>4){ 
-                                    for(let i=line-5;i<line+6&&i<lines.length;i++){ 
-                                        showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
-                                    } 
-                                }else{ 
-                                    for(let i=0;i<line+6&&i<lines.length;i++){ 
-                                        showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
-                                    } 
-                                } 
-                            }else{ 
-                                showCode=lines.map((_line,i)=>`${i+1}| ${line==i+1?'⚠️':''}${_line}\n`).toString(); 
+							if(lines.length>=10){ 
+								if(line>4){ 
+									for(let i=line-5;i<line+6&&i<lines.length;i++){ 
+										showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
+									} 
+								}else{ 
+									for(let i=0;i<line+6&&i<lines.length;i++){ 
+										showCode+=`${i+1}| ${line==i+1?'⚠️':''}${lines[i]}\n`;
+									} 
+								} 
+							}else{ 
+								showCode=lines.map((_line,i)=>`${i+1}| ${line==i+1?'⚠️':''}${_line}\n`).toString(); 
 							} 
 							return showCode;
 						}
 						//协议名须和html一致(网页端防跨域)，且文件是js 
 						if (typeof src=='string'&&src.startsWith(location.protocol)&&src.endsWith('.js')){ 
-                            //获取代码
-                            const codes=lib.init.reqSync('local:'+decodeURI(src).replace(lib.assetURL,'').replace(winPath,''));
-                            const lines=codes.split("\n"); 
-                            str+='\n'+createShowCode(lines);
-                            str+='\n-------------'; 
+							//获取代码
+							const codes=lib.init.reqSync('local:'+decodeURI(src).replace(lib.assetURL,'').replace(winPath,''));
+							const lines=codes.split("\n"); 
+							str+='\n'+createShowCode(lines);
+							str+='\n-------------'; 
 						}
 						//解析parsex里的content fun内容(通常是技能content) 
 						else if(err&&err.stack&&err.stack.split('\n')[1].trim().startsWith('at Object.eval [as content]')){
-                            const codes=_status.event.content; 
-                            if(typeof codes=='function'){
-                                const lines=codes.toString().split("\n");
-                                str+='\n'+createShowCode(lines);
-                                str+='\n-------------'; 
-                            }
-                        }
-                    }
+							const codes=_status.event.content; 
+							if(typeof codes=='function'){
+								const lines=codes.toString().split("\n");
+								str+='\n'+createShowCode(lines);
+								str+='\n-------------'; 
+							}
+						}
+					}
 					if(err&&err.stack) str+='\n'+decodeURI(err.stack).replace(new RegExp(lib.assetURL,'g'),'').replace(new RegExp(winPath,'g'),'');
 					alert(str);
 					window.ea=Array.from(arguments);
@@ -8874,7 +8771,6 @@
 					else if(ua.includes('iphone')||ua.includes('ipad')||ua.includes('macintosh')){
 						lib.device='ios';
 					}
-					lib.assetURL=noname_inited;
 				}
 
 				if(lib.assetURL.includes('com.widget.noname.qingyao')){
@@ -33852,42 +33748,42 @@
 			}],
 			['TW神',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('TW')+get.prefixSpan('神')
+					return `${get.prefixSpan('TW')}${get.prefixSpan('神')}`
 				},
 			}],
 			['TW将',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('TW')+get.prefixSpan('将')
+					return `${get.prefixSpan('TW')}${get.prefixSpan('将')}`
 				},
 			}],
 			['OL神',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('OL')+get.prefixSpan('神')
+					return `${get.prefixSpan('OL')}${get.prefixSpan('神')}`
 				},
 			}],
 			['旧神',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('旧')+get.prefixSpan('神')
+					return `${get.prefixSpan('旧')}${get.prefixSpan('神')}`
 				},
 			}],
 			['旧晋',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('旧')+get.prefixSpan('晋')
+					return `${get.prefixSpan('旧')}${get.prefixSpan('晋')}`
 				},
 			}],
 			['新杀SP',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('新杀')+get.prefixSpan('SP')
+					return `${get.prefixSpan('新杀')}${get.prefixSpan('SP')}`
 				},
 			}],
 			['界SP',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('界')+get.prefixSpan('SP')
+					return `${get.prefixSpan('界')}${get.prefixSpan('SP')}`
 				},
 			}],
 			['S特神',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('★')+get.prefixSpan('神')
+					return `${get.prefixSpan('★')}${get.prefixSpan('神')}`
 				},
 			}],
 		]),
@@ -34163,48 +34059,34 @@
 			const backgroundMusicSetting=ui[aozhan?'aozhan_bgm':'background_music_setting'],config=backgroundMusicSetting._link.config;
 			config.updatex.call(backgroundMusicSetting,[]);
 		},
-		updateBackground:function(){
-			var background=(_status.tempBackground||lib.config.image_background);
+		updateBackground:()=>{
+			const background=_status.tempBackground||lib.config.image_background;
 			ui.background.delete();
-			ui.background=ui.create.div('.background');
-
+			const uiBackground=ui.background=ui.create.div('.background'),style=uiBackground.style;
 			if(lib.config.image_background_blur){
-				ui.background.style.filter='blur(8px)';
-				ui.background.style.webkitFilter='blur(8px)';
-				ui.background.style.transform='scale(1.05)';
+				style.filter='blur(8px)';
+				style.webkitFilter='blur(8px)';
+				style.transform='scale(1.05)';
 			}
-			else{
-				ui.background.style.filter='';
-				ui.background.style.webkitFilter='';
-				ui.background.style.transform='';
-			}
-
-			document.body.insertBefore(ui.background,document.body.firstChild);
-			if(background.startsWith('ext:')){
-				ui.background.setBackgroundImage('extension/'+background.slice(4));
-			}
+			document.body.insertBefore(uiBackground,document.body.firstChild);
+			if(background.startsWith('db:')) uiBackground.setBackgroundDB(background.slice(3));
+			else if(background.startsWith('ext:')) uiBackground.setBackgroundImage(`extension/${background.slice(4)}`);
 			else if(background=='default'){
-				ui.background.animate('start');
-				ui.background.style.backgroundImage="none";
+				uiBackground.animate('start');
+				style.backgroundImage='none';
 			}
 			else if(background.startsWith('custom_')){
-				ui.background.style.backgroundImage="none";
-				game.getDB('image',background,function(fileToLoad){
+				style.backgroundImage='none';
+				game.getDB('image',background).then(fileToLoad=>{
 					if(!fileToLoad) return;
-					var fileReader = new FileReader();
-					fileReader.onload = function(fileLoadedEvent)
-					{
-						var data = fileLoadedEvent.target.result;
-						ui.background.style.backgroundImage='url('+data+')';
-					};
+					const fileReader = new FileReader();
+					fileReader.onload=fileLoadedEvent=>style.backgroundImage=`url(${fileLoadedEvent.target.result})`;
 					fileReader.readAsDataURL(fileToLoad, "UTF-8");
 				});
 			}
-			else{
-				ui.background.setBackgroundImage('image/background/'+background+'.jpg');
-			}
-			ui.background.style.backgroundSize='cover';
-			ui.background.style.backgroundPosition='50% 50%';
+			else uiBackground.setBackgroundImage(`image/background/${background}.jpg`);
+			style.backgroundSize='cover';
+			style.backgroundPosition='50% 50%';
 		},
 		//Generate a beatmap using the given BPM, beats, and offset
 		//用给定的BPM、节拍和偏移生成谱面
@@ -35171,39 +35053,35 @@
 			};
 			ui.window.appendChild(audio);
 		},
-		playBackgroundMusic:function(){
+		playBackgroundMusic:()=>{
 			if(lib.config.background_music=='music_off'){
 				ui.backgroundMusic.src='';
+				return;
 			}
-			else if(_status._aozhan==true&&lib.config.mode_config.guozhan.aozhan_bgm!='disabled'){
-				var aozhan=_status.tempAozhan||lib.config.mode_config.guozhan.aozhan_bgm;
-				if(Array.isArray(aozhan)){
-					aozhan=aozhan.randomGet('disabled',_status.currentAozhan)||lib.config.mode_config.guozhan.aozhan_bgm;
-				}
-				if(aozhan=='random'){
-					aozhan=Object.keys(lib.mode.guozhan.config.aozhan_bgm.item).randomGet('disabled','random',_status.currentAozhan);
-				}
+			if(_status._aozhan){
+				const aozhanBGMConfiguration=lib.config.mode_config.guozhan.aozhan_bgm;
+				if(aozhanBGMConfiguration=='disabled') return;
+				let aozhan=_status.tempAozhan||aozhanBGMConfiguration;
+				if(Array.isArray(aozhan)) aozhan=aozhan.randomGet('disabled',_status.currentAozhan)||aozhanBGMConfiguration;
+				if(aozhan=='random') aozhan=Object.keys(lib.mode.guozhan.config.aozhan_bgm.item).randomGet('disabled','random',_status.currentAozhan);
 				_status.currentAozhan=aozhan;
-				ui.backgroundMusic.src=lib.assetURL+(aozhan.startsWith('ext:')?'extension/'+aozhan.slice(4):'audio/background/aozhan_'+aozhan+'.mp3');
+				if(aozhan.startsWith('db:')) game.getDB('image',aozhan.slice(3)).then(result=>ui.backgroundMusic.src=result);
+				else if(aozhan.startsWith('ext:')) ui.backgroundMusic.src=`${lib.assetURL}extension/${aozhan.slice(4)}`;
+				else ui.backgroundMusic.src=`${lib.assetURL}audio/background/aozhan_${aozhan}.mp3`;
+				return;
 			}
-			else{
-				var music=_status.tempMusic||lib.config.background_music;
-				if(Array.isArray(music)){
-					music=music.randomGet('music_off',_status.currentMusic)||lib.config.background_music;
-				}
-				if(music=='music_random'){
-					music=lib.config.all.background_music.randomGet('music_off','music_random',_status.currentMusic);
-				}
-				_status.currentMusic=music;
-				if(music=='music_custom'){
-					if(lib.config.background_music_src){
-						ui.backgroundMusic.src=lib.config.background_music_src;
-					}
-				}
-				else{
-					ui.backgroundMusic.src=lib.assetURL+(music.startsWith('ext:')?'extension/'+music.slice(4):'audio/background/'+music+'.mp3');
-				}
+			let music=_status.tempMusic||lib.config.background_music;
+			if(Array.isArray(music)) music=music.randomGet('music_off',_status.currentMusic)||lib.config.background_music;
+			if(music=='music_random') music=lib.config.all.background_music.randomGet('music_off','music_random',_status.currentMusic);
+			_status.currentMusic=music;
+			if(music=='music_custom'){
+				const backgroundMusicSourceConfiguration=lib.config.background_music_src;
+				if(backgroundMusicSourceConfiguration) ui.backgroundMusic.src=backgroundMusicSourceConfiguration;
+				return;
 			}
+			if(music.startsWith('db:')) game.getDB('image',music.slice(3)).then(result=>ui.backgroundMusic.src=result);
+			else if(music.startsWith('ext:')) ui.backgroundMusic.src=`${lib.assetURL}extension/${music.slice(4)}`;
+			else ui.backgroundMusic.src=`${lib.assetURL}audio/background/${music}.mp3`;
 		},
 		import:function(type,content,url){
 			if(type=='extension'){
@@ -47525,7 +47403,7 @@
 								window.extension={};
 								fetch(`${extensionURL}catalog.js`,{
 									referrerPolicy:'no-referrer'
-								}).then(value=>value.text()).then(eval).then(loaded).catch(reason=>{
+								}).then(response=>response.text()).then(eval).then(loaded).catch(reason=>{
 									console.log(reason);
 									delete window.extension;
 									loading.innerHTML='连接失败:'+(reason instanceof Error?reason.message:String(reason));
@@ -57839,17 +57717,23 @@
 			}
 			return str2;
 		},
-		slimNameHorizontal:function(str){
-			var str2=lib.translate[str];
-			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
-			if(!str2) return '';
-			if(lib.translate[str+'_prefix']&&str2.startsWith(lib.translate[str+'_prefix'])){
+		slimNameHorizontal:str=>{
+			const slimName=lib.translate[`${str}_ab`]||lib.translate[str];
+			if(!slimName) return '';
+			const prefix=lib.translate[`${str}_prefix`];
+			if(prefix&&slimName.startsWith(prefix)){
 				//兼容版特化处理
-				return `${get.prefixSpan(lib.translate[str+'_prefix'],str)}<span>${str2.slice(lib.translate[str+'_prefix'].length)}　</span>`;
+				if(lib.compatibleEdition) return `${get.prefixSpan(prefix,str)}<span>${slimName.slice(prefix.length)}　</span>`;
+				return `${get.prefixSpan(prefix,str)}<span>${slimName.slice(prefix.length)}</span>`;
 			}
-			return str2;
+			return slimName;
 		},
-		prefixSpan:function(prefix,name){
+		/**
+		 * @param {string} prefix
+		 * @param {string} name
+		 * @returns {string}
+		 */
+		prefixSpan:(prefix,name)=>{
 			let color='#ffffff',nature=false;
 			const map=lib.namePrefix.get(prefix),config=lib.config.buttoncharacter_prefix;
 			if(config=='off') return '';
@@ -60962,5 +60846,11 @@
 		},
 		get:get
 	};
-	lib.init.init();
+	if('__core-js_shared__' in window) lib.init.init();
+	else{
+		const coreJSBundle=document.createElement('script');
+		coreJSBundle.onerror=coreJSBundle.onload=lib.init.init;
+		coreJSBundle.src=`${lib.assetURL}game/core-js-bundle.js`;
+		document.head.appendChild(coreJSBundle);
+	}
 }
