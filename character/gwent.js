@@ -999,10 +999,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'gwweitu_gain',
 				subSkill:{
 					gain:{
-						trigger:{player:'damageZero'},
-						filter:function(event){
-							return event.hujia;
-						},
+						trigger: {player: 'changeHujiaAfter'},
+						filter: (event) => event.num < 0,
 						forced:true,
 						content:function(){
 							player.storage.gwweitu++;
@@ -1190,7 +1188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							player.chooseTarget('覆天：弃置一名角色的一张手牌',function(card,player,target){
 								return target!=player&&target.countCards('h');
-							}).set('ai',function(target){
+							},true).set('ai',function(target){
 								if(target.hasSkillTag('noh')) return 0;
 								return -get.attitude(player,target)/Math.sqrt(target.countCards('h'));
 							});

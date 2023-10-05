@@ -224,7 +224,7 @@
 #arena:not(.chess) .player[data-position='0'].linked>.name.name2{
     left:69px;
 }
-#arena:not(.chess) .player[data-position='0']>.identity{
+#arena:not(.chess):not(.stone) .player[data-position='0']>.identity{
     left: 0;
     width: 130px;
 }

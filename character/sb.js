@@ -42,7 +42,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			sb:{
 				sb_zhi:['sb_sunquan','sb_zhouyu','sb_zhangjiao','sb_caocao','sb_zhenji','sb_liubei','sb_daqiao','sb_liubiao'],
-				sb_shi:['sb_xuhuang','sb_machao','sb_fazheng','sb_chengong','sb_diaochan','sb_pangtong'],
+				sb_shi:['sb_xuhuang','sb_machao','sb_fazheng','sb_chengong','sb_diaochan','sb_pangtong','sb_zhanghe'],
 				sb_tong:['liucheng','sp_yangwan','sb_xiahoushi','sb_zhangfei','sb_zhaoyun','sb_sunce','sb_zhurong'],
 				sb_yu:['sb_yujin','sb_lvmeng','sb_huangzhong','sb_huanggai','sb_zhouyu','sb_caoren','sb_ganning'],
 				sb_neng:['sb_huaxiong','sb_sunshangxiang','sb_jiangwei','sb_yuanshao','sb_menghuo'],
@@ -768,9 +768,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sblijian:{
 				audio:2,
 				enable:'phaseUse',
-				usable:1,
 				filter:function(event,player){
-					return game.countPlayer(current=>{
+					return !player.getStat('skill').sblijian&&game.countPlayer(current=>{
 						return current!=player;
 					})>1;
 				},
@@ -784,6 +783,69 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterOk:function(){
 					return ui.selected.targets.length==ui.selected.cards.length+1;
 				},
+				check:function(card){
+					let player=get.owner(card),targets=lib.skill.sblijian.selectTargetAi(_status.event,player);
+					if(ui.selected.cards.length<targets-1){
+						if(player.hasSkill('sbbiyue')) return 4*targets-get.value(card);
+						return 6+targets-get.value(card);
+					}
+					return 0;
+				},
+				selectTargetAi:function(event,player){
+					let cache=_status.event.getTempCache('sblijian','targets');
+					if(Array.isArray(cache)) return cache.length;
+					let id=[null,0],players=game.filterPlayer(current=>current!==player),temp;
+					for(let i of players){
+						temp=get.attitude(event.player,i);
+						if(temp<id[1]) id=[i,temp];
+					}
+					if(id[0]) id=id[0].identity;
+					else{
+						event.putTempCache('sblijian','targets',[]);
+						return 0;
+					}
+					let target=[null,0],targets=[],vp=player.getEnemies();
+					if(vp.length>1){
+						let list=[game.createCard('sha'),game.createCard('shan')];
+						vp=ui.create.player().init('sunce');
+						vp.hp=2;
+						vp.skills=[];
+						game.players.push(vp);
+						if(typeof id==='string'){
+							if(id.endsWith('zhu')||id.endsWith('Zhu')) id=id.slice(0,-1)+'ong';
+							vp.identity=id;
+							vp.showIdentity();
+						}
+						else vp.side=id[0].side;
+						vp.directgain(list,false);
+						for(let i of players){
+							temp=get.effect(i,{name:'juedou',isCard:true},vp,event.player)+get.effect(vp,{name:'juedou',isCard:true},i,event.player);
+							if(temp>=0) targets.push([i,temp]);
+						}
+						game.cardsGotoSpecial(list);
+						game.players.remove(vp);
+					}
+					else{
+						vp=vp[0];
+						for(let i of players){
+							temp=get.effect(i,{name:'juedou',isCard:true},vp,event.player)+get.effect(vp,{name:'juedou',isCard:true},i,event.player);
+							if(temp>=0) targets.push([i,temp]);
+						}
+					}
+					for(let i=0;i<targets.length;i++){
+						temp=get.attitude(player,targets[i][0]);
+						if(temp>0&&targets[i][1]<2.5*temp&&targets.length>2) targets.splice(i--,1);
+						else targets[i].push(temp);
+					}
+					targets.sort((a,b)=>{
+						let att1=get.sgn(get.attitude(event.player,a[0])),att2=get.sgn(get.attitude(event.player,b[0]));
+						if(att1!==att2) return att1-att2;
+						return b[1]-a[1];
+					});
+					targets=targets.slice(0,player.countCards('he')+1);
+					event.putTempCache('sblijian','targets',targets);
+					return targets.length;
+				},
 				multiline:true,
 				content:function(){
 					var targetx=targets.slice().sortBySeat(target)[1];
@@ -793,7 +855,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					threaten:3,
 					order:7,
-					result:{target:-1}
+					result:{
+						player:function(player,target){
+							let targets=_status.event.getTempCache('sblijian','targets');
+							if(!Array.isArray(targets)) return 0;
+							if(targets.length>2&&!player.hasSkill('sbbiyue')) return 0;
+							for(let i=0;i<targets.length;i++){
+								if(target===targets[i][0]&&targets[i][2]===0) return 1;
+							}
+							return 0;
+						},
+						target:function(player,target){
+							let targets=_status.event.getTempCache('sblijian','targets');
+							if(Array.isArray(targets)){
+								for(let i=0;i<targets.length;i++){
+									if(target===targets[i][0]){
+										if(targets[i][2]>0) return targets[i][1]/5;
+										return -targets[i][1];
+									}
+								}
+								return 0;
+							}
+							if(ui.selected.targets.length){
+								let tars=ui.selected.targets.concat([target]).sortBySeat();
+								for(let i=0;i<tars.length;i++){
+									if(target!==tars[i]) continue;
+									let eff;
+									if(i===0) eff=get.effect(target,{name:'juedou',isCard:true},tars[tars.length-1],target);
+									else eff=get.effect(target,{name:'juedou',isCard:true},tars[i-1],target);
+									if(i===tars.length-1) eff+=get.effect(tars[i-1],{name:'juedou',isCard:true},target,target);
+									else eff+=get.effect(tars[0],{name:'juedou',isCard:true},target,target);
+									return eff;
+								}
+							}
+							return 0;
+						}
+					}
 				}
 			},
 			sbbiyue:{
@@ -4583,6 +4680,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		translate:{
+			sb_zhanghe_prefix:'谋',
+			sb_yujin_prefix:'谋',
+			sb_huaxiong_prefix:'谋',
+			liucheng_prefix:'谋',
+			sp_yangwan_prefix:'谋',
+			sb_huangzhong_prefix:'谋',
+			sb_lvmeng_prefix:'谋',
+			sb_sunshangxiang_prefix:'谋',
+			sb_sunquan_prefix:'谋',
+			sb_huanggai_prefix:'谋',
+			sb_zhouyu_prefix:'谋',
+			sb_caoren_prefix:'谋',
+			sb_xiahoushi_prefix:'谋',
+			sb_zhangjiao_prefix:'谋',
+			sb_caocao_prefix:'谋',
+			sb_zhenji_prefix:'谋',
+			sb_ganning_prefix:'谋',
+			sb_machao_prefix:'谋',
+			sb_xuhuang_prefix:'谋',
+			sb_zhangfei_prefix:'谋',
+			sb_zhaoyun_prefix:'谋',
+			sb_liubei_prefix:'谋',
+			sb_jiangwei_prefix:'谋',
+			sb_fazheng_prefix:'谋',
+			sb_chengong_prefix:'谋',
+			sb_diaochan_prefix:'谋',
+			sb_yuanshao_prefix:'谋',
+			sb_pangtong_prefix:'谋',
+			sb_sunce_prefix:'谋',
+			sb_daqiao_prefix:'谋',
+			sb_liubiao_prefix:'谋',
+			sb_zhurong_prefix:'谋',
+			sb_menghuo_prefix:'谋',
 			sp_yangwan:'谋杨婉',
 			spmingxuan:'瞑昡',
 			spmingxuan_info:'锁定技。出牌阶段开始时，你须选择至多X张花色各不相同的手牌（X为未选择过选项一的角色），将这些牌随机交给这些角色中的等量角色。然后这些角色依次选择一项：⒈对你使用一张【杀】。⒉交给你一张牌，然后你摸一张牌。',

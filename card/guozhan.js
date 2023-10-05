@@ -1185,7 +1185,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}))+'的【诏书】上';
 				},
 				content:function(){
+					'step 0'
 					target.addToExpansion(cards,player,'give').gaintag.add('zhaoshu_cards');
+					'step 1'
+					target.markSkill('zhaoshu_skill');
 				},
 				ai:{
 					order:1,
@@ -1211,7 +1214,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(['huoshaolianying','huogong'].contains(event.card.name)) return true;
-					if(event.card.name=='sha') return event.card.hasNature('fire');
+					if(event.card.name=='sha') return game.hasNature(event.card,'fire');
 					return false;
 				},
 				content:function(){
@@ -1220,7 +1223,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
-							if(['huoshaolianying','huogong'].contains(card.name)||(card.name=='sha'&&card.hasNature('fire'))){
+							if(['huoshaolianying','huogong'].contains(card.name)||(card.name=='sha'&&game.hasNature(card,'fire'))){
 								return 'zeroplayertarget';
 							}
 						},

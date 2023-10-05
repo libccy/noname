@@ -1766,7 +1766,9 @@ div:not(.handcards)>.card>.info>span,
 	margin-left: 4px;
 	margin-right: 4px;
 	position: relative;
-	/* width: calc(100% - 8px); */
+}
+.content>div:not(.pointerdiv) {
+	width: calc(100% - 8px);
 }
 .content>.caption + .buttons:not(*:last-child){
 	margin-top: 0;
@@ -3967,6 +3969,38 @@ span[data-nature='keymm'] {
 		rgba(203, 177, 255,1) 0 0 2px,black 0 0 1px;
 }
 
+
+div[data-nature='shen'],
+span[data-nature='shen'] {
+	text-shadow: rgba(243, 171, 27, 1) 0 0 2px,rgba(243, 171, 27, 1) 0 0 5px,rgba(243, 171, 27, 1) 0 0 10px,
+		rgba(243, 171, 27, 1) 0 0 10px,rgba(243, 171, 27, 1) 0 0 20px,rgba(243, 171, 27, 1) 0 0 20px,black 0 0 1px;
+}
+div[data-nature='shenm'],
+span[data-nature='shenm'] {
+	text-shadow: rgba(243, 171, 27, 1) 0 0 2px,rgba(243, 171, 27, 1) 0 0 5px,rgba(243, 171, 27, 1) 0 0 5px,
+		rgba(243, 171, 27, 1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='shenmm'],
+span[data-nature='shenmm'] {
+	text-shadow: rgba(243, 171, 27, 1) 0 0 2px,rgba(243, 171, 27, 1) 0 0 2px,rgba(243, 171, 27, 1) 0 0 2px,
+		rgba(243, 171, 27, 1) 0 0 2px,black 0 0 1px;
+}
+div[data-nature='qun'],
+span[data-nature='qun'] {
+	text-shadow: rgba(164, 164, 164, 1) 0 0 2px,rgba(164, 164, 164, 1) 0 0 5px,rgba(164, 164, 164, 1) 0 0 10px,
+		rgba(164, 164, 164, 1) 0 0 10px,rgba(164, 164, 164, 1) 0 0 20px,rgba(164, 164, 164, 1) 0 0 20px,black 0 0 1px;
+}
+div[data-nature='qunm'],
+span[data-nature='qunm'] {
+	text-shadow: rgba(164, 164, 164, 1) 0 0 2px,rgba(164, 164, 164, 1) 0 0 5px,rgba(164, 164, 164, 1) 0 0 5px,
+		rgba(164, 164, 164, 1) 0 0 5px,black 0 0 1px;
+}
+div[data-nature='qunmm'],
+span[data-nature='qunmm'] {
+	text-shadow: rgba(164, 164, 164, 1) 0 0 2px,rgba(164, 164, 164, 1) 0 0 2px,rgba(164, 164, 164, 1) 0 0 2px,
+		rgba(164, 164, 164, 1) 0 0 2px,black 0 0 1px;
+}
+
 .player .identity[data-color="nei"],
 .player .identity[data-color="ye"],
 .player .identity[data-color="rYe"],
@@ -4610,6 +4644,21 @@ div[data-decoration="bronze"]::after{
 .button>.tempname .vertical {
 	left: 3px;
 	top: 6px;
+}
+.tempname.kami:not([data-nature])>span {
+	color: #1F3C38;
+}
+.tempname.ice:not([data-nature])>span {
+	color: #3B6273;
+}
+.tempname.fire:not([data-nature])>span {
+	color: #631515;
+}
+.tempname.thunder:not([data-nature])>span {
+	color: #152E63;
+}
+.tempname.poison:not([data-nature])>span {
+	color: #00312d;
 }
 /*.card.equip1 .wunature,
 .card.equip3 .wunature,

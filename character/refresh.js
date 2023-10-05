@@ -349,7 +349,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(!game.hasPlayer(target=>target!=player&&get.damageEffect(target,player,player,'thunder')>0)) return 0;
 						if(player.getExpansions('rejijun').reduce(function(num,card){
-							return num=card.number;
+							return num+get.number(card,false);
 						},0)>36) return 1/(get.value(card)||0.5);
 						else{
 							if(lib.skill.refangtong.thunderEffect(card,player)) return 10-get.value(card);
@@ -367,17 +367,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var cards=player.getExpansions('rejijun');
 						if(cards.reduce(function(num,card){
-							return num=card.number;
+							return num+get.number(card,false);
 						},0)<=36){
-							if(!ui.selected.buttons.length) return 1/button.link.number;
+							if(!ui.selected.buttons.length) return 1/get.number(button.link,false);
 							return 0;
 						}
 						else{
 							var num=0,list=[];
-							cards.sort((a,b)=>b.number-a.number);
+							cards.sort((a,b)=>get.number(b,false)-get.number(a,false));
 							for(var i=0;i<cards.length;i++){
 								list.push(cards[i]);
-								num+=cards[i].number;
+								num+=get.number(cards[i],false)
 								if(num>36) break;
 							}
 							return list.contains(button.link)?1:0;
@@ -386,7 +386,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(result.bool){
 						var bool=(result.links.reduce(function(num,card){
-							return num=card.number;
+							return num+get.number(card,false);
 						},0)>36);
 						event.bool=bool;
 						player.loseToDiscardpile(result.links);
@@ -404,13 +404,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=player.getExpansions('rejijun'),num=0;
 					cards.push(card);
 					if(cards.reduce(function(num,card){
-						return num=card.number;
+						return num+get.number(card,false);
 					},0)<=36) return false;
-					cards.sort((a,b)=>b.number-a.number);
+					cards.sort((a,b)=>get.number(b,false)-get.number(a,false));
 					var bool=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i]==card) bool=true;
-						num+=cards[i].number;
+						num+=get.number(cards[i],false);
 						if(num>36) break;
 					}
 					return bool;
@@ -440,6 +440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var target=trigger.player;
 					event.player=player;
+					event.target=target;
 					target.chooseBool(target==player?get.prompt('rejunbing'):'是否响应'+get.translation(player)+'的【郡兵】？','摸一张牌'+(target==player?'':'，将所有手牌交给'+get.translation(player)+'，然后其可以交给你等量张牌')).set('choice',get.attitude(target,player)>0);
 					'step 1'
 					if(result.bool){
@@ -1462,6 +1463,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//界文聘
 			rezhenwei:{
+				audio:'zhenwei',
 				inherit:'zhenwei',
 				filter:function(event,player){
 					if(player==event.target) return false;
@@ -6111,7 +6113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
+					if(event.card.name=='sha'&&!game.hasNature(event.card)) return true;
 					return false;
 				},
 				audio:'lihuo',
@@ -6139,7 +6141,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ollihuo2:{
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
+					if(event.card.name!='sha'||!game.hasNature(event.card,'fire')) return false;
 					return game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&lib.filter.targetEnabled(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
 					});
@@ -7604,7 +7606,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadelihuo:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
+					if(event.card.name=='sha'&&!game.hasNature(event.card)) return true;
 					return false;
 				},
 				audio:'lihuo',
@@ -7630,7 +7632,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadelihuo2:{
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
+					if(event.card.name!='sha'||!game.hasNature(event.card,'fire')) return false;
 					return game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&player.canUse(event.card,current);
 					});
@@ -7660,7 +7662,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadelihuo3:{
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					return event.card.name=='sha'&&event.card.hasNature('fire')&&event.targets.length>1&&player.getHistory('sourceDamage',function(evt){
+					return event.card.name=='sha'&&game.hasNature(event.card,'fire')&&event.targets.length>1&&player.getHistory('sourceDamage',function(evt){
 						return evt.card==event.card;
 					}).length>0;
 				},
@@ -10330,21 +10332,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.storage.rehuashen&&player.storage.rehuashen.character.length>0;
 				},
 				banned:['lisu','sp_xiahoudun','xushao','zhoutai','old_zhoutai','shixie'],
+				bannedType:['Charlotte','主公技','觉醒技','限定技','隐匿技','使命技'],
 				addHuashen:function(player){
 					if(!player.storage.rehuashen) return;
 					if(!_status.characterlist){
 						lib.skill.pingjian.initList();
 					}
 					_status.characterlist.randomSort();
-					var bool=false;
-					for(var i=0;i<_status.characterlist.length;i++){
-						var name=_status.characterlist[i];
-						if(name.indexOf('zuoci')!=-1||name.indexOf('key')==0||lib.skill.rehuashen.banned.contains(name)||player.storage.rehuashen.character.contains(name)) continue;
-						var skills=lib.character[name][3];
-						for(var j=0;j<skills.length;j++){
-							var info=lib.skill[skills[j]];
-							if(info.charlotte||(info.unique&&!info.gainable)||info.juexingji||info.limited||info.zhuSkill||info.hiddenSkill||info.dutySkill) skills.splice(j--,1);
-						}
+					for(let i=0;i<_status.characterlist.length;i++){
+						let name=_status.characterlist[i];
+						if(name.indexOf('zuoci')!=-1||name.indexOf('key_')==0||name.indexOf('sp_key_')==0||lib.skill.rehuashen.banned.includes(name)||player.storage.rehuashen.character.includes(name)) continue;
+						let skills=lib.character[name][3].filter(skill=>{
+							const categories=get.skillCategoriesOf(skill);
+							return !categories.some(type=>lib.skill.rehuashen.bannedType.includes(type));
+						})
 						if(skills.length){
 							player.storage.rehuashen.character.push(name);
 							player.storage.rehuashen.map[name]=skills;
@@ -14425,40 +14426,69 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		translate:{
 			re_zhangliao:'界张辽',
-			re_huangyueying:'新黄月英',
+			re_zhangliao_prefix:'界',
 			re_simayi:'界司马懿',
+			re_simayi_prefix:'界',
 			re_xuzhu:'界许褚',
+			re_xuzhu_prefix:'界',
 			re_xiahoudun:'界夏侯惇',
+			re_xiahoudun_prefix:'界',
 			re_lvmeng:'界吕蒙',
+			re_lvmeng_prefix:'界',
 			re_zhouyu:'界周瑜',
+			re_zhouyu_prefix:'界',
 			re_luxun:'界陆逊',
+			re_luxun_prefix:'界',
 			re_zhaoyun:'界赵云',
+			re_zhaoyun_prefix:'界',
 			re_guanyu:'界关羽',
+			re_guanyu_prefix:'界',
 			re_zhangfei:'界张飞',
+			re_zhangfei_prefix:'界',
 			re_machao:'界马超',
+			re_machao_prefix:'界',
 			re_caocao:'界曹操',
+			re_caocao_prefix:'界',
 			re_guojia:'界郭嘉',
+			re_guojia_prefix:'界',
 			re_lvbu:'界吕布',
+			re_lvbu_prefix:'界',
 			re_huanggai:'界黄盖',
+			re_huanggai_prefix:'界',
 			re_daqiao:'界大乔',
+			re_daqiao_prefix:'界',
 			re_ganning:'界甘宁',
+			re_ganning_prefix:'界',
 			re_huatuo:'界华佗',
+			re_huatuo_prefix:'界',
 			re_liubei:'界刘备',
+			re_liubei_prefix:'界',
 
 			re_diaochan:'界貂蝉',
+			re_diaochan_prefix:'界',
 			re_huangyueying:'界黄月英',
+			re_huangyueying_prefix:'界',
 			re_sunquan:'界孙权',
+			re_sunquan_prefix:'界',
 			re_sunshangxiang:'界孙尚香',
+			re_sunshangxiang_prefix:'界',
 			re_zhugeliang:'界诸葛亮',
+			re_zhugeliang_prefix:'界',
 			re_zhenji:'界甄宓',
+			re_zhenji_prefix:'界',
 			re_huaxiong:"界华雄",
+			re_huaxiong_prefix:'界',
 			
-			"ol_sp_zhugeliang":"界卧龙",
-			xin_yuanshao:"手杀袁绍",
+			ol_sp_zhugeliang:"界卧龙",
+			ol_sp_zhugeliang_prefix:'界',
 			re_zhangjiao:'界张角',
+			re_zhangjiao_prefix:'界',
 			re_sunce:'界孙策',
+			re_sunce_prefix:'界',
 			ol_yuanshao:'界袁绍',
+			ol_yuanshao_prefix:'界',
 			ol_liushan:'界刘禅',
+			ol_liushan_prefix:'界',
 			
 			olfangquan:'放权',
 			olfangquan_info:'出牌阶段开始前，你可以跳过此阶段。若如此做，弃牌阶段开始时，你可以弃置一张手牌，令一名其他角色进行一个额外回合。',
@@ -14635,7 +14665,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rebotu_info:'每轮限X次。回合结束时，若本回合内置入弃牌堆的牌中包含至少四种花色，则你可获得一个额外的回合。（X为存活角色数且至多为3）',
 			
 			xin_yuji:'界于吉',
+			xin_yuji_prefix:'界',
 			re_zuoci:'界左慈',
+			re_zuoci_prefix:'界',
 			reguhuo:"蛊惑",
 			reguhuo_info:"每名角色的回合限一次，你可以扣置一张手牌当作一张基本牌或普通锦囊牌使用或打出。其他角色同时选择是否质疑。然后，你展示此牌。若有质疑的角色：若此牌为假，则此牌作废，且所有质疑者各摸一张牌；为真，则所有质疑角色于此牌结算完成后依次弃置一张牌或失去1点体力，并获得技能〖缠怨〗。",
 			reguhuo_guess:"蛊惑",
@@ -14654,8 +14686,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexinsheng:'新生',
 			rexinsheng_info:'当你受到1点伤害后，你可以获得一张新的化身牌。',
 			re_menghuo:'界孟获',
-			re_sunjian:'手杀孙坚',
+			re_menghuo_prefix:'界',
 			re_caopi:'界曹丕',
+			re_caopi_prefix:'界',
 			oljiuchi:'酒池',
 			oljiuchi_info:'你可以将一张黑桃手牌当做【酒】使用。锁定技，你使用【酒】无次数限制，且当你于回合内使用带有【酒】效果的【杀】造成伤害后，你令你的【崩坏】失效直到回合结束。',
 			repolu:'破虏',
@@ -14667,15 +14700,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezaiqi:'再起',
 			rezaiqi_info:'结束阶段开始时，你可以令至多X名角色选择一项：1.摸一张牌，2.令你回复1点体力（X为本回合进入弃牌堆的红色牌数）',
 			ol_jiangwei:'界姜维',
+			ol_jiangwei_prefix:'界',
 			ol_caiwenji:'界蔡琰',
-			re_baosanniang:'手杀鲍三娘',
+			ol_caiwenji_prefix:'界',
 			retuntian:'屯田',
 			rebeige:'悲歌',
 			retuntian_info:'①当你于回合外失去牌后，你可以判定。若判定结果为♥，你获得此判定牌。否则你将此牌置于你的武将牌上，称为“田”。②你计算与其他角色的距离时-X（X为你武将牌上“田”的数目）。',
 			rebeige_info:'当有角色受到【杀】造成的伤害后，你可以弃一张牌，并令其进行一次判定，若判定结果为：♥该角色回复X点体力(X为伤害点数)；♦︎该角色摸三张牌；♣伤害来源弃两张牌；♠伤害来源将其武将牌翻面',
-			re_liushan:'手杀刘禅',
-			re_sunben:'界孙笨',
-			re_zhangzhang:'手杀张昭张纮',
 			rehunzi:'魂姿',
 			rehunzi_info:'觉醒技，准备阶段，若你的体力值不大于2，你减1点体力上限，并获得技能〖英姿〗和〖英魂〗。',
 			rezhijian:'直谏',
@@ -14683,6 +14714,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refangquan:'放权',
 			refangquan_info:'你可跳过你的出牌阶段，若如此做，你本回合的手牌上限为你的体力上限，且回合结束时，你可以弃置一张手牌并令一名其他角色进行一个额外的回合。',
 			xin_gaoshun:'界高顺',
+			xin_gaoshun_prefix:'界',
 			repojun:'破军',
 			repojun2:'破军',
 			repojun3:'破军',
@@ -14694,23 +14726,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejinjiu2:'禁酒',
 			rejinjiu3:'禁酒',
 			ol_xiahouyuan:'界夏侯渊',
+			ol_xiahouyuan_prefix:'界',
 			shebian:'设变',
 			shebian_info:'当你的武将牌翻面后，你可以移动场上的一张装备牌。',
 			cangzhuo:'藏拙',
 			cangzhuo_info:'弃牌阶段开始时，若你本回合内没有使用过锦囊牌，则你的锦囊牌不计入手牌上限。',
 			re_zhangyi:'界张嶷',
+			re_zhangyi_prefix:'界',
 			rewurong:'怃戎',
 			rewurong_info:'出牌阶段限一次，你可以令一名其他角色与你同时展示一张手牌：若你展示的是【杀】且该角色展示的不是【闪】，则你对其造成1点伤害；若你展示的不是【杀】且该角色展示的是【闪】，则你获得其一张牌',
 			ol_pangtong:'界庞统',
+			ol_pangtong_prefix:'界',
 			olniepan:'涅槃',
 			olniepan_info:'限定技，当你处于濒死状态时，你可以弃置你区域内的所有牌并复原你的武将牌，然后摸三张牌并将体力回复至3点。然后你选择获得以下技能中的一个：〖八阵〗/〖火计〗/〖看破〗',
 			ol_weiyan:'界魏延',
+			ol_weiyan_prefix:'界',
 			reqimou:'奇谋',
 			reqimou_info:'限定技，出牌阶段，你可以失去任意点体力并摸等量的牌，然后直到回合结束，你计算与其他角色的距离时-X，且你可以多使用X张【杀】（X为你失去的体力值）',
 			ol_xiaoqiao:'界小乔',
+			ol_xiaoqiao_prefix:'界',
 			rehongyan:'红颜',
 			rehongyan_info:'锁定技，你区域内的黑桃牌和黑桃判定牌均视为红桃。当你于回合外正面朝上失去红桃牌后，若你的手牌数小于体力值，你摸一张牌。',
-			re_caozhi:'手杀曹植',
 			reluoying:'落英',
 			reluoying_discard:'落英',
 			reluoying_judge:'落英',
@@ -14724,16 +14760,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chengzhang:'成章',
 			chengzhang_info:'觉醒技，准备阶段开始时，若你造成伤害与受到伤害值之和累计7点或以上，则你回复1点体力并摸1张牌，然后改写〖酒诗〗。',
 			re_wuyi:'界吴懿',
+			re_wuyi_prefix:'界',
 			re_zhuran:'界朱然',
+			re_zhuran_prefix:'界',
 			re_quancong:'界全琮',
+			re_quancong_prefix:'界',
 			re_liaohua:'界廖化',
+			re_liaohua_prefix:'界',
 			re_guohuai:'界郭淮',
+			re_guohuai_prefix:'界',
 			re_chengpu:'界程普',
+			re_chengpu_prefix:'界',
 			rechunlao:'醇醪',
 			rechunlao2:'醇醪',
 			rechunlao_info:'出牌阶段结束时，若你没有“醇”，你可以将至少一张【杀】置于你的武将牌上，称为“醇”。当一名角色处于濒死状态时，你可以移去一张“醇”，视为该角色使用一张【酒】，然后若此“醇”的属性为：火，你回复1点体力、雷，你摸两张牌。',
 			re_caozhang:'界曹彰',
+			re_caozhang_prefix:'界',
 			yujin_yujin:'界于禁',
+			yujin_yujin_prefix:'界',
 			rexuanfeng:'旋风',
 			rexuanfeng_info:'当你失去装备区内的牌时，或于弃牌阶段弃置了两张或更多的手牌后，你可以依次弃置一至两名其他角色的共计两张牌，或将一名其他角色装备区内的一张牌移动到另一名其他角色的装备区内。',
 			olpaoxiao:'咆哮',
@@ -14748,24 +14792,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			regongji:'弓骑',
 			regongji_info:'出牌阶段限一次，你可以弃置一张非基本牌，然后弃置一名其他角色的一张牌。锁定技，当你的装备区内有坐骑牌时，你的攻击范围无限。',
 			ol_sunjian:'界孙坚',
+			ol_sunjian_prefix:'界',
 			wulie:'武烈',
 			wulie2:'武烈',
 			wulie_info:'限定技，结束阶段，你可以失去任意点体力并指定等量的其他角色。这些角色各获得一枚「烈」。有「烈」的角色受到伤害时，其移去一枚「烈」，然后防止此伤害。',
 			re_sunluban:'界孙鲁班',
+			re_sunluban_prefix:'界',
 			re_masu:'界马谡',
+			re_masu_prefix:'界',
 			ol_pangde:'界庞德',
+			ol_pangde_prefix:'界',
 			rejianchu:'鞬出',
 			rejianchu_info:'当你使用【杀】指定一名角色为目标后，你可以弃置其一张牌，若以此法弃置的牌不为基本牌，此【杀】不可被【闪】响应且你本回合使用【杀】的次数上限+1，为基本牌，该角色获得此【杀】',
 			re_taishici:'界太史慈',
+			re_taishici_prefix:'界',
 			hanzhan:'酣战',
 			hanzhan_gain:'酣战',
 			hanzhan_info:'①当你发起拼点时，或成为拼点的目标时，你可以令对方选择拼点牌的方式改为随机选择一张手牌。②当你拼点结束后，你可以获得本次拼点的拼点牌中点数最大的【杀】。',
 			re_jianyong:'界简雍',
+			re_jianyong_prefix:'界',
 			xin_xusheng:'界徐盛',
+			xin_xusheng_prefix:'界',
 			decadepojun:'破军',
 			decadepojun2:'破军',
 			decadepojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上（X为其体力值）。若这些牌中：有装备牌，你将这些装备牌中的一张置于弃牌堆；有锦囊牌，你摸一张牌。其于回合结束时获得其武将牌上的这些牌。',
 			re_wangyi:'界王异',
+			re_wangyi_prefix:'界',
 			guanzhang:'关兴张苞',
 			rezishou:'自守',
 			rezishou2:'自守',
@@ -14773,10 +14825,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezongshi:'宗室',
 			rezongshi_info:'锁定技，你的手牌上限+X（X为存活势力数）。准备阶段，若你的手牌数大于体力值，则你本回合内使用【杀】无次数限制。',
 			ol_dongzhuo:'界董卓',
+			ol_dongzhuo_prefix:'界',
 			olbaonue:'暴虐',
 			olbaonue_info:'主公技，其他群雄角色造成1点伤害后，你可进行判定，若为♠，你回复1点体力并获得判定牌。',
 			re_panzhangmazhong:'界潘璋马忠',
+			re_panzhangmazhong_prefix:'界',
 			re_hanhaoshihuan:'界韩浩史涣',
+			re_hanhaoshihuan_prefix:'界',
 			xinyicong:'义从',
 			xinyicong_info:'锁定技，你计算与其他角色的距离时-X，其他角色计算与你的距离时+Y。（X为你的体力值-1，Y为你的已损失体力值-1）',
 			oltianxiang:'天香',
@@ -14792,36 +14847,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadechunlao:'醇醪',
 			decadechunlao2:'醇醪',
 			decadechunlao_info:'你可以对其他角色使用【酒（使用方法②）】。当你需要使用【酒】时，若你的武将牌未横置，则你可以将武将牌横置，然后视为使用【酒】。当你受到或造成伤害后，若伤害值大于1且你的武将牌横置，则你可以重置武将牌。',
-			re_liru:'手杀李儒',
 			rejuece:'绝策',
 			rejuece_info:'结束阶段，你可以对一名本回合内失去过牌的角色造成1点伤害。',
 			remieji:'灭计',
 			remieji_info:'出牌阶段限一次，你可以将一张黑色锦囊牌置于牌堆顶，然后令一名有牌的其他角色选择一项：交给你一张锦囊牌，或依次弃置两张非锦囊牌。',
 			re_manchong:'界满宠',
+			re_manchong_prefix:'界',
 			rejunxing:'峻刑',
 			rejunxing_info:'出牌阶段限一次，你可以弃置任意张手牌并选择一名其他角色。该角色选择一项：1.弃置X张牌并失去1点体力。2.翻面并摸X张牌。（X为你弃置的牌数）',
-			re_gongsunzan:'OL公孙瓒',
+			re_gongsunzan:'界公孙瓒',
+			re_gongsunzan_prefix:'界',
 			reqiaomeng:'趫猛',
 			reqiaomeng_info:'当你使用【杀】对一名角色造成伤害后，你可以弃置该角色区域内的一张牌。若此牌为坐骑牌，则你于此弃置事件结算结束后获得此牌。',
 			ol_dengai:'界邓艾',
+			ol_dengai_prefix:'界',
 			oltuntian:'屯田',
 			olzaoxian:'凿险',
 			oltuntian_info:'①当你于回合外失去牌后，或于回合内因弃置而失去【杀】后，你可以判定。若判定结果不为♥，则你将此牌置于你的武将牌上，称为“田”。②你计算与其他角色的距离时-X（X为你武将牌上“田”的数目）。',
 			olzaoxian_info:'觉醒技，准备阶段，若你武将牌上“田”的数量达到3张或更多，则你减1点体力上限，并获得技能〖急袭〗。你于当前回合结束后进行一个额外的回合。',
 			re_sunxiu:'界孙休',
+			re_sunxiu_prefix:'界',
 			re_caoxiu:'界曹休',
+			re_caoxiu_prefix:'界',
 			xin_lingtong:'界凌统',
+			xin_lingtong_prefix:'界',
 			decadexuanfeng:'旋风',
 			decadexuanfeng_info:'当你于弃牌阶段弃置过至少两张牌，或当你失去装备区里的牌后，若场上没有处于濒死状态的角色，则你可以弃置至多两名其他角色的共计两张牌。若此时处于你的回合内，你可以对其中一名目标角色造成1点伤害。',
 			yongjin:'勇进',
 			yongjin_info:'限定技，出牌阶段，你可以依次移动场上的至多三张不同的装备牌。',
 			xin_liubiao:'界刘表',
+			xin_liubiao_prefix:'界',
 			decadezishou:'自守',
 			decadezishou_zhiheng:'自守',
 			decadezishou_info:'摸牌阶段，你可以多摸X张牌（X为存活势力数）；然后本回合你对其他角色造成伤害时，防止此伤害。结束阶段，若你本回合没有使用牌指定其他角色为目标，你可以弃置任意张花色不同的手牌，然后摸等量的牌。',
 			decadezongshi:'宗室',
 			decadezongshi_info:'锁定技，你的手牌上限+X（X为存活势力数）。你的回合外，若你的手牌数大于等于手牌上限，则当你成为延时类锦囊牌或无颜色的牌的目标后，你令此牌对你无效。',
 			re_fazheng:'界法正',
+			re_fazheng_prefix:'界',
 			reenyuan:'恩怨',
 			reenyuan1:'恩怨',
 			reenyuan2:'恩怨',
@@ -14829,14 +14891,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rexuanhuo:'眩惑',
 			rexuanhuo_info:'摸牌阶段结束时，你可以交给一名其他角色两张手牌，然后该角色选择一项：1. 视为对你选择的另一名角色使用任意一种【杀】或【决斗】，2. 交给你所有手牌。',
 			re_fuhuanghou:'界伏寿',
+			re_fuhuanghou_prefix:'界',
 			reqiuyuan:'求援',
 			reqiuyuan_info:'当你成为【杀】的目标时，你可选择另一名其他角色。除非该角色交给你一张除【杀】以外的基本牌，否则其也成为此【杀】的目标且该角色不能响应此【杀】。',
 			rezhuikong:'惴恐',
 			rezhuikong_info:'其他角色的回合开始时，若你已受伤，你可与其拼点：若你赢，本回合该角色只能对自己使用牌；若你没赢，你获得其拼点的牌，然后其视为对你使用一张【杀】。',
 			re_gongsunyuan:'界公孙渊',
+			re_gongsunyuan_prefix:'界',
 			rehuaiyi:'怀异',
 			rehuaiyi_info:'出牌阶段限一次，你可以展示所有手牌，若这些牌的颜色：全部相同，你摸一张牌，并将此技能于本阶段内改为“限两次”，然后终止此技能的结算流程；不全部相同，则你选择一种颜色并弃置该颜色的所有手牌，然后你可以获得至多X名角色的各一张牌（X为你以此法弃置的手牌数）。若你以此法得到的牌不少于两张，则你失去1点体力。',
 			re_caozhen:'界曹真',
+			re_caozhen_prefix:'界',
 			residi:'司敌',
 			residi_push:'司敌',
 			residi2:'司敌',
@@ -14844,7 +14909,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			residi_info:'结束阶段，你可以将一张非基本牌置于武将牌上，称为“司”。其他角色的出牌阶段开始时，你可以移去一张“司”。若如此做，其本阶段内不能使用或打出与“司”颜色相同的牌。此阶段结束时，若其于此阶段内未使用过：【杀】，你视为对其使用一张【杀】。锦囊牌，你摸两张牌。',
 			gz_re_xushu:'徐庶',
 			re_zhangchunhua:'界张春华',
+			re_zhangchunhua_prefix:'界',
 			xin_handang:'界韩当',
+			xin_handang_prefix:'界',
 			xingongji:'弓骑',
 			xingongji2:'弓骑',
 			xingongji_info:'出牌阶段限一次，你可以弃置一张牌，然后你的攻击范围视为无限且使用与此牌花色相同的【杀】无次数限制直到回合结束。若你以此法弃置的牌为装备牌，则你可以弃置一名其他角色的一张牌。',
@@ -14856,9 +14923,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gzpaiyi_backup:'排异',
 			gzpaiyi_info:'出牌阶段限一次。你可以移去一张“权”并选择一名角色。令其摸X张牌（X为你的“权”数且至多为7）。然后若其手牌数大于你，则你对其造成1点伤害。',
 			ol_zhurong:'界祝融',
+			ol_zhurong_prefix:'界',
 			changbiao:'长标',
 			changbiao_info:'出牌阶段限一次，你可以将任意张手牌当做【杀】使用（无距离限制）。若你因此【杀】对目标角色造成过伤害，则你于出牌阶段结束时摸X张牌（X为此【杀】对应的实体牌数量）。',
 			re_zhoucang:'界周仓',
+			re_zhoucang_prefix:'界',
 			rezhongyong:'忠勇',
 			rezhongyong_info:'当你使用【杀】后，你可以将此【杀】以及目标角色使用的【闪】交给一名其他角色，若其获得的牌中有红色，则其可以对你攻击范围内的角色使用一张【杀】。若其获得的牌中有黑色，其摸一张牌。',
 			ollihuo:'疠火',
@@ -14868,7 +14937,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ollihuo_info:'你使用普通的【杀】可以改为火【杀】，若此【杀】造成过伤害，你失去1点体力；你使用火【杀】可以多选择一个目标。你每回合使用的第一张牌如果是【杀】，则此【杀】结算完毕后可置于你的武将牌上。',
 			xinjiangchi:'将驰',
 			xinjiangchi_info:'出牌阶段开始时，你可选择：①摸一张牌。②摸两张牌，然后本回合内不能使用或打出【杀】。③弃置一张牌，然后本回合内可以多使用一张【杀】，且使用【杀】无距离限制。',
-			re_chenqun:'手杀陈群',
 			redingpin:'定品',
 			redingpin_info:'出牌阶段，你可以弃置一张本回合未使用过/弃置过的类型的牌并选择一名角色。其进行判定，若结果为：黑色，其摸X张牌（X为其体力值且至多为3）且本回合内不能再成为〖定品〗的目标；红桃，你令此次弃置的牌不计入〖定品〗弃置牌合法性的检测；方片，你将武将牌翻面。',
 			refaen:'法恩',
@@ -14878,10 +14946,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reshizhi:'矢志',
 			reshizhi_info:'锁定技，若你的体力值为1，则你的【闪】视为【杀】，且当你使用对应的实体牌为一张【闪】的非转化普通杀造成伤害后，你回复1点体力。',
 			re_guotufengji:'界郭图逢纪',
+			re_guotufengji_prefix:'界',
 			rejigong:'急攻',
 			rejigong2:'急攻',
 			rejigong_info:'出牌阶段开始时，你可以摸至多三张牌。若如此做，你本回合的手牌上限基数改为X，且弃牌阶段结束时，若X不小于Y，则你回复1点体力。（X为你本回合内造成的伤害值之和，Y为你本回合内因〖急攻〗摸牌而得到的牌的数量总和）',
 			ol_jiangwei:'界姜维',
+			ol_jiangwei_prefix:'界',
 			oltiaoxin:'挑衅',
 			oltiaoxin_info:'出牌阶段限一次，你可以选择一名攻击范围内包含你的角色。然后除非该角色对你使用一张【杀】且此【杀】对你造成伤害，否则你弃置其一张牌，然后将此技能于此出牌阶段内修改为出牌阶段限两次。 ',
 			olzhiji:'志继',
@@ -14891,16 +14961,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadejingce:'精策',
 			decadejingce_info:'结束阶段，若你本回合使用过的牌数不小于你的体力值，则你可执行一个摸牌阶段或出牌阶段；若这些牌包含的花色数也不小于你的体力值，则你将“或”改为“并”。',
 			re_guanping:'界关平',
+			re_guanping_prefix:'界',
 			relongyin:'龙吟',
 			relongyin_info:'当一名角色于其出牌阶段内使用【杀】时，你可弃置一张牌令此【杀】不计入出牌阶段使用次数。若此【杀】为红色，则你摸一张牌；若你以此法弃置的牌与此【杀】点数相同，则你重置“竭忠”。',
 			jiezhong:'竭忠',
 			jiezhong_info:'限定技，出牌阶段开始时，你可以将手牌补至体力上限（至多摸五张）。',
 			re_caifuren:'界蔡夫人',
+			re_caifuren_prefix:'界',
 			reqieting:'窃听',
 			reqieting_info:'其他角色的回合结束时，若其本回合内未造成过伤害，则你可将其装备区内的一张牌置于你的装备区内；若其本回合内未对其他角色使用过牌，则你可摸一张牌。',
 			rexianzhou:'献州',
 			rexianzhou_info:'限定技。出牌阶段，你可将装备区内的所有牌交给一名其他角色。你回复X点体力，然后对其攻击范围内的至多X名角色各造成1点伤害（X为你以此法给出的牌数）。',
 			xin_zhonghui:'界钟会',
+			xin_zhonghui_prefix:'界',
 			xinquanji:'权计',
 			xinquanji_info:'①当你受到1点伤害后，或其他角色不因你的赠予或交给而得到你的牌后，你可以摸一张牌，然后将一张手牌置于武将牌上，称为“权”。②你的手牌上限+X（X为“权”的数量）。',
 			xinzili:'自立',
@@ -14909,11 +14982,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinpaiyi_backup:'排异',
 			xinpaiyi_info:'出牌阶段每项各限一次，你可移去一张“权”并选择一项：①令一名角色摸X张牌。②对至多X名角色各造成1点伤害。（X为“权”数）',
 			re_guyong:'界顾雍',
+			re_guyong_prefix:'界',
 			reshenxing:'慎行',
 			reshenxing_info:'出牌阶段，你可以弃置X张牌（X为你本阶段内发动过〖慎行〗的次数且至少为0，至多为2），然后摸一张牌。',
 			rebingyi:'秉壹',
 			rebingyi_info:'结束阶段，你可展示所有手牌。若这些牌：颜色均相同，则你可以令至多X名角色各摸一张牌（X为你的手牌数）；点数均相同，则你摸一张牌。',
 			re_jiaxu:'界贾诩',
+			re_jiaxu_prefix:'界',
 			rewansha:'完杀',
 			rewansha_info:'锁定技。①你的回合内，不处于濒死状态的其他角色不能使用【桃】。②当有角色于你的回合内进入濒死状态时，你令其以外的所有其他角色的非锁定技失效直到此濒死状态结算结束。',
 			reluanwu:'乱武',
@@ -14921,6 +14996,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reweimu:'帷幕',
 			reweimu_info:'锁定技。①你不能成为黑色锦囊牌的目标。②当你于回合内受到伤害时，你防止此伤害并摸2X张牌（X为伤害值）。',
 			ol_lusu:'界鲁肃',
+			ol_lusu_prefix:'界',
 			olhaoshi:'好施',
 			olhaoshi_info:'摸牌阶段开始时，你可以多摸两张牌。然后摸牌阶段结束时，若你的手牌数大于5，则你将手牌数的一半（向下取整）交给一名手牌最少其他角色并获得如下效果直到你下回合开始：当你成为【杀】或普通锦囊牌的目标后，其可以交给你一张手牌。',
 			oldimeng:'缔盟',
@@ -14931,11 +15007,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejijiang2:'激将',
 			rejijiang_info:'主公技。①当你需要使用或打出【杀】时，你可以令其他蜀势力角色依次选择是否打出一张【杀】。若有角色响应，则你视为使用或打出了此【杀】。②每回合限一次。当有蜀势力角色于回合外使用或打出【杀】时，其可以令你摸一张牌。',
 			xin_yufan:'界虞翻',
+			xin_yufan_prefix:'界',
 			xinzongxuan:'纵玄',
 			xinzongxuan_info:'当你的牌因弃置而进入弃牌堆后，你可将其中的任意张牌置于牌堆顶。若剩余的牌中有锦囊牌，则你可以令一名其他角色获得其中的一张。',
 			xinzhiyan:'直言',
 			xinzhiyan_info:'结束阶段开始时，你可令一名角色摸一张牌（正面朝上移动）。若此牌为基本牌，则你摸一张牌。若此牌为装备牌，则其回复1点体力并使用此装备牌。',
 			re_xiahoushi:'界夏侯氏',
+			re_xiahoushi_prefix:'界',
 			reqiaoshi:'樵拾',
 			reqiaoshi_info:'其他角色的结束阶段开始时，若你的手牌数与其相等，则你可以与其各摸一张牌。若这两张牌花色相同，则你可以重复此步骤。',
 			reyanyu:'燕语',
@@ -14944,14 +15022,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehujia:'护驾',
 			rehujia_info:'主公技。①当你需要使用或打出一张【闪】时，你可以令其他魏势力角色选择是否打出一张【闪】。若有角色响应，则你视为使用或打出了一张【闪】。②每回合限一次。当有魏势力角色于回合外使用或打出【闪】时，其可以令你摸一张牌。',
 			ol_xuhuang:'界徐晃',
+			ol_xuhuang_prefix:'界',
 			olduanliang:'断粮',
 			olduanliang_info:'你可以将一张黑色非锦囊牌当做【兵粮寸断】使用。若你于当前回合内未造成过伤害，则你使用【兵粮寸断】无距离限制。',
 			oljiezi:'截辎',
 			oljiezi_info:'①当有角色跳过摸牌阶段后，你可选择一名角色。若该角色：手牌数为全场最少且没有“辎”，则其获得一枚“辎”。否则其摸一张牌。②一名角色的摸牌阶段结束时，若其有“辎”，则你移去其“辎”，然后令其获得一个额外的摸牌阶段。',
 			re_madai:'界马岱',
+			re_madai_prefix:'界',
 			reqianxi:'潜袭',
 			reqianxi_info:'准备阶段开始时，你可摸一张牌，然后弃置一张牌并选择一名距离为1的其他角色。该角色于本回合内：{不能使用或打出与此牌颜色相同的牌，且其装备区内与此牌颜色相同的防具牌无效，且当其回复体力时，你摸两张牌。}',
 			re_guohuanghou:'界郭皇后',
+			re_guohuanghou_prefix:'界',
 			rejiaozhao:'矫诏',
 			rejiaozhao_info:'出牌阶段限一次。你可以展示一张手牌，并令一名距离你最近的角色选择一种基本牌或普通锦囊牌的牌名。你可将此牌当做其声明的牌使用直到此阶段结束（你不是此牌的合法目标）。',
 			rejiaozhao_lv2:'矫诏·升级 Lv.1',
@@ -14961,6 +15042,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			redanxin:'殚心',
 			redanxin_info:'当你受到伤害后，你可以摸一张牌并升级〖矫诏〗。',
 			xin_wuguotai:'界吴国太',
+			xin_wuguotai_prefix:'界',
 			xinganlu:'甘露',
 			xinganlu_info:'出牌阶段限一次。你可以令两名角色交换装备区内的牌，然后若这两名角色装备区内牌数差的绝对值大于你已损失的体力值，则你弃置两张手牌。',
 			xinbuyi:'补益',
@@ -14971,6 +15053,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadejinjiu:'禁酒',
 			decadejinjiu_info:'锁定技。你的【酒】的牌名均视为【杀】且点数视为K；你的回合内，其他角色不能使用【酒】。',
 			dc_xushu:'界徐庶',
+			dc_xushu_prefix:'界',
 			rezhuhai:'诛害',
 			rezhuhai_info:'其他角色的回合结束时，若其本回合内造成过伤害，则你可以选择一项：⒈将一张手牌当做【杀】对其使用。⒉视为对其使用一张【过河拆桥】。',
 			xsqianxin:'潜心',
@@ -14978,29 +15061,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejianyan:'荐言',
 			rejianyan_info:'出牌阶段每项各限一次。你可选择一种颜色或一种牌的类别，然后系统从牌堆中检索出一张满足该条件的牌并展示之。然后你将此牌交给一名男性角色或Key势力角色。',
 			re_zhanghe:'界张郃',
+			re_zhanghe_prefix:'界',
 			reqiaobian:'巧变',
 			reqiaobian_info:'①游戏开始时，你获得两枚“变”。②判定阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段。③摸牌阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段，然后可以获得至多两名其他角色的各一张手牌。④出牌阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段，然后你可以移动场上的一张牌。⑤弃牌阶段开始时，你可弃置一张牌或一枚“变”并跳过此阶段。⑥结束阶段，若你的〖巧变⑥〗记录中不包含你的手牌数，则你获得一枚“变”并记录你的手牌数。',
 			olbeige:'悲歌',
 			olbeige_info:'当有角色受到渠道为【杀】的伤害后，若你有牌，你可令其进行判定。然后你可弃置一张牌，根据判定结果执行以下的一个选项：♥，其回复1点体力；♦，其摸两张牌；♣，伤害来源弃置两张牌️；♠，伤害来源将武将牌翻面。若你弃置的牌与判定结果：点数相同，则你获得你弃置的牌；花色相同，则你获得判定牌。',
 			dc_bulianshi:'界步练师',
+			dc_bulianshi_prefix:'界',
 			dcanxu:'安恤',
 			dcanxu_info:'出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之。然后若此牌不为黑桃，则你摸一张牌；若这两名角色手牌数相等，则你回复1点体力。',
 			dczhuiyi:'追忆',
 			dczhuiyi_info:'当你死亡时，你可以令一名不为击杀者的其他角色摸X张牌（X为存活角色数），然后其回复1点体力。',
 			re_jushou:'界沮授',
+			re_jushou_prefix:'界',
 			dcshibei:'矢北',
 			dcshibei_info:'锁定技，当你于一回合内第一次受到伤害后，你回复1点体力；当你于一回合内第二次受到伤害后，你失去1点体力。',
 			dcjianying:'渐营',
 			dcjianying_info:'当你使用与你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌。',
 			re_duji:'界杜畿',
+			re_duji_prefix:'界',
 			reandong:'安东',
 			reandong_info:'当你受到其他角色造成的伤害时，你可以令伤害来源选择一项：⒈防止此伤害。然后其♥牌不计入本回合的手牌上限；⒉你观看其手牌并获得其中的所有♥牌，若其没有手牌，则你下次发动〖安东〗时改为自行选择。',
 			reyingshi:'应势',
 			reyingshi_info:'出牌阶段开始时，你可以展示一张手牌，选择一名角色A和一名其他角色B。A可以对B使用一张【杀】，然后获得你展示的牌。若A因此【杀】造成过伤害，则A获得牌堆中与展示牌花色点数相同的其他牌。',
 			dcqiaomeng:'趫猛',
 			dcqiaomeng_info:'当你使用黑色牌指定第一个目标后，你可以弃置目标角色中一名其他角色的一张牌。若你以此法弃置的牌为：装备牌，你获得此牌；锦囊牌，你令此牌不可被响应。',
-			dc_gongsunzan:'界公孙瓒',
+			dc_gongsunzan:'新杀公孙瓒',
+			dc_gongsunzan_prefix:'新杀',
 			re_liuchen:'界刘谌',
+			re_liuchen_prefix:'界',
 			rezhanjue:'战绝',
 			rezhanjue_effect:'战绝',
 			rezhanjue_info:'出牌阶段，若你本阶段内因〖战绝〗得到过的牌数小于3，则你可以将所有不具有“勤王”标记的手牌当做【决斗】使用。此【决斗】使用结算结束后，你摸一张牌。然后所有因此【决斗】受到过伤害的角色也各摸一张牌。',
@@ -15009,28 +15098,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shizhan:'势斩',
 			shizhan_info:'出牌阶段限两次，你可以选择一名其他角色。该角色视为对你使用一张【决斗】。',
 			ol_xunyu:'界荀彧',
+			ol_xunyu_prefix:'界',
 			oljieming:'节命',
 			oljieming_info:'当你受到1点伤害后或死亡时，你可令一名角色摸X张牌。然后若其手牌数大于X，则其将手牌弃置至X张（X为其体力上限且至多为5）。',
 			re_liufeng:'界刘封',
+			re_liufeng_prefix:'界',
 			rexiansi:'陷嗣',
 			rexiansi2:'陷嗣',
 			rexiansi_info:'①准备阶段开始时，你可以将一至两名角色的各一张牌置于你的武将牌上，称为“逆”。②当一名角色需要对你使用【杀】时，其可以移去两张“逆”，然后视为对你使用一张【杀】。③若你的“逆”数大于体力值，则你可以移去一张“逆”并视为使用一张【杀】。',
 			re_sp_taishici:'界SP太史慈',
-			re_sp_taishici_ab:'太史慈',
+			re_sp_taishici_prefix:'界SP',
 			rejixu:"击虚",
 			rejixu_info:"出牌阶段限一次。若你有手牌，则你可以选择至多X名角色，令这些角色猜测你的手牌区中是否有【杀】。若你：有【杀】，则你本阶段使用【杀】的次数上限+Y，且当你于本阶段内使用【杀】指定目标后，你可以令这Y名角色也成为此【杀】的目标；没有【杀】，则你弃置这Y名角色的各一张牌。然后你摸Y张牌（X为你的体力值，Y为这些角色中猜错的角色数）。",
 			ol_dianwei:'界典韦',
+			ol_dianwei_prefix:'界',
 			olqiangxi:'强袭',
 			olqiangxi_info:'出牌阶段限两次。你可以弃置一张武器牌或受到1点无来源伤害，然后对一名本回合内未成为过〖强袭〗目标的其他角色造成1点伤害。',
 			olningwu:'狞恶',
 			olningwu_info:'锁定技。当一名角色A于一回合内第二次受到伤害后，若A或伤害来源为你，则你摸一张牌，然后弃置其装备区或判定区内的一张牌。',
 			re_zhuhuan:'界朱桓',
+			re_zhuhuan_prefix:'界',
 			refenli:'奋励',
 			refenli_info:'若你的手牌数为全场最多，你可以跳过判定阶段和摸牌阶段；若你的体力值为全场最多，你可以跳过出牌阶段；若你的装备区里有牌且数量为全场最多，你可以跳过弃牌阶段。',
 			//破界石不值钱了 就逮着免费突破硬削是吧
 			repingkou:'平寇',
 			repingkou_info:'回合结束时，你可以对至多X名其他角色各造成1点伤害（X为你本回合跳过的阶段数）。若你选择的角色数小于X，则你可以弃置其中一名角色装备区内的一张牌',
 			dc_liru:'界李儒',
+			dc_liru_prefix:'界',
 			dcmieji:'灭计',
 			dcmieji_info:'出牌阶段限一次，你可以展示一张武器牌或黑色锦囊牌。你将此牌置于牌堆顶，然后令一名有手牌的其他角色选择一项：⒈弃置一张锦囊牌；⒉依次弃置两张非锦囊牌。',
 			dcfencheng:'焚城',
@@ -15038,38 +15132,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oljiang:'激昂',
 			oljiang_info:'①当你使用【决斗】或红色【杀】指定第一个目标后，或成为【决斗】或红色【杀】的目标后，你可以摸一张牌。②当有【决斗】或红色【杀】于每回合内首次因弃置而进入弃牌堆后，你可以失去1点体力并获得这些牌。',
 			re_xunyou:'界荀攸',
+			re_xunyou_prefix:'界',
 			reqice:'奇策',
 			reqice_info:'出牌阶段限X次（X为你的“奇策”数+1），你可以将所有手牌当做任意一张普通锦囊牌使用。',
 			rezhiyu:'智愚',
 			rezhiyu_info:'当你受到伤害后，你可以摸一张牌，然后展示所有手牌，令伤害来源弃置一张手牌。若你展示的牌颜色均相同，你获得1枚“奇策”直到下回合结束且获得来源弃置的牌。',
 			re_caiyong:'界蔡邕',
+			re_caiyong_prefix:'界',
 			rebizhuan:'辟撰',
 			rebizhuan_bg:'书',
 			rebizhuan_info:'①当你使用♠牌时，或成为其他角色使用♠牌的目标后，你可以将牌堆顶的一张牌置于武将牌上，称为“书”（你至多拥有四张“书”）。②你的手牌上限+X（X为“书”数）。',
 			retongbo:'通博',
 			retongbo_info:'摸牌阶段结束时，你可以用任意手牌交换等量“书”。然后若“书”数至少为4，你可以将四张“书”任意交给其他角色。若你交出的牌花色各不相同，你回复1点体力且“书”的上限+1（至多增加等同存活角色数的上限）。',
 			re_chengong:'界陈宫',
+			re_chengong_prefix:'界',
 			remingce:'明策',
 			remingce_info:'出牌阶段限一次。你可以将一张【杀】或装备牌交给一名其他角色，其选择一项：1.视为对你选择的另一名角色使用一张【杀】，且若此牌造成伤害，则执行选项2；2.你与其各摸一张牌。',
 			re_sundeng:'界孙登',
+			re_sundeng_prefix:'界',
 			rekuangbi:'匡弼',
 			rekuangbi_info:'出牌阶段开始时，你可以令一名其他角色将至多三张牌置于你的武将牌上直到此阶段结束。然后当你使用牌时，若你：有与此牌花色相同的“匡弼”牌，你移去其中一张并与其各摸一张牌；没有与此牌花色相同的“匡弼”牌，你随机移去一张“匡弼”牌并摸一张牌。',
 			dc_chenqun:'界陈群',
+			dc_chenqun_prefix:'界',
 			repindi:'品第',
 			repindi_info:'出牌阶段每名角色限一次。你可以弃置一张本阶段未以此法弃置过的类型的牌并选择一名角色，你选择一项：1.其摸X张牌；2.其弃置X张牌（X为你本回合发动〖品第〗的次数）。然后若其已受伤，你横置或重置。',
 			re_mazhong:'界马忠',
+			re_mazhong_prefix:'界',
 			refuman:'抚蛮',
 			refuman_info:'出牌阶段每名角色限一次。你可以弃置一张牌，令一名其他角色从弃牌堆中获得一张【杀】。然后其于其下个回合结束前使用或打出此牌时，你与其各摸一张牌。',
 			re_guanzhang:'界关兴张苞',
+			re_guanzhang_prefix:'界',
 			retongxin:'同心',
 			retongxin_info:'锁定技。你的攻击范围+2。',
 			re_wenpin:'界文聘',
+			re_wenpin_prefix:'界',
 			rezhenwei:'镇卫',
 			rezhenwei_info:'当一名其他角色成为【杀】或黑色锦囊牌的目标时，若该角色的体力值不大于你且此牌的目标角色数为1，你可以弃置一张牌并选择一项：1.摸一张牌，然后将此【杀】或黑色锦囊牌的目标转移给你；2.令此【杀】或黑色锦囊牌无效且将此【杀】或黑色锦囊牌置于使用者的武将牌上，然后当前回合结束后，使用者获得这些牌。',
 			ol_huangzhong:'界黄忠',
+			ol_huangzhong_prefix:'界',
 			remoshi:'没矢',
 			remoshi_info:'锁定技。①当你使用【杀】对目标角色造成伤害后，若其装备区里有防具牌或坐骑牌，你将此【杀】对应的实体牌置于其武将牌上。②当有“没矢”牌的角色失去防具牌或坐骑牌后，你获得其“没矢”牌。',
 			dc_caozhi:'界曹植',
+			dc_caozhi_prefix:'界',
 			dcjiushi:'酒诗',
 			dcjiushi_info:'①当你需要使用【酒】时，若你的武将牌正面向上，你可以翻面，视为使用一张【酒】。②当你受到伤害后，若你的武将牌于受到伤害时背面向上，你可以翻面。③当你使用【酒】后，你使用【杀】的次数上限+1直到你的下个回合结束。',
 			olhuoji:'火计',
@@ -15079,44 +15183,53 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinwangxi:'忘隙',
 			xinwangxi_info:'当你对其他角色造成1点伤害后，或受到其他角色造成的1点伤害后，你可以摸两张牌，然后交给其一张牌。',
 			ol_yanwen:'界颜良文丑',
+			ol_yanwen_prefix:'界',
 			olshuangxiong:'双雄',
 			olshuangxiong_info:'①摸牌阶段结束时，你可以弃置一张牌。若如此做，你本回合内可以将一张与此牌颜色不同的牌当做【决斗】使用。②结束阶段，你从弃牌堆中获得本回合内对你造成伤害的所有牌。',
 			re_zhuzhi:'界朱治',
+			re_zhuzhi_prefix:'界',
 			reanguo:'安国',
 			reanguo_info:'出牌阶段限一次。你可以选择一名其他角色，若其：手牌数为全场最少，其摸一张牌；体力值为全场最低，其回复1点体力；装备区内牌数为全场最少，其随机使用一张装备牌。然后若该角色有未执行的效果且你满足条件，你执行之。若你与其执行了全部分支，你可以重铸任意张牌。',
 			dcyicong:'义从',
 			dcyicong_info:'锁定技。①你至其他角色的距离-1。②若你已损失的体力值不小于2，则其他角色至你的距离+1。',
 			re_zhangsong:'界张松',
+			re_zhangsong_prefix:'界',
 			rexiantu:'献图',
 			rexiantu_info:'其他角色的出牌阶段开始时，你可以摸两张牌，然后将两张牌交给该角色。然后此阶段结束时，若其于此阶段没有造成过伤害，你失去1点体力。',
 			re_jsp_huangyueying:'界SP黄月英',
-			re_jsp_huangyueying_ab:'黄月英',
+			re_jsp_huangyueying_prefix:'界SP',
 			rejiqiao:'机巧',
 			rejiqiao_info:'出牌阶段开始时，你可以弃置任意张牌，然后亮出牌堆顶X张牌（X为你以此法弃置的牌数与其中装备牌数之和），你获得其中所有非装备牌。',
 			relinglong:'玲珑',
 			relinglong_info:'锁定技。若你的装备区：有空置的防具栏，你视为拥有〖八卦阵〗；有空置的两种坐骑栏，你的手牌上限+2；有空置的宝物栏，你视为拥有〖奇才〗；以上均满足：你使用的【杀】或普通锦囊牌不可被响应。',
 			ol_zhangzhang:'界张昭张纮',
+			ol_zhangzhang_prefix:'界',
 			olzhijian:'直谏',
 			olzhijian_info:'出牌阶段，你可以将一张装备牌置于其他角色的装备区（可替换原装备），然后摸一张牌。',
 			olguzheng:'固政',
 			olguzheng_info:'每阶段限一次。当其他角色的至少两张牌因弃置而进入弃牌堆后，你可以令其获得其中一张牌，然后你可以获得剩余的牌。',
 			re_caochong:'界曹冲',
+			re_caochong_prefix:'界',
 			rechengxiang:'称象',
 			rechengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌。若你得到的牌点数之和为13，你复原武将牌。',
 			re_caorui:'界曹叡',
+			re_caorui_prefix:'界',
 			rexingshuai:'兴衰',
 			rexingshuai_info:'主公技，限定技。当你进入濒死状态时，你可令其他魏势力角色依次选择是否令你回复1点体力。然后这些角色依次受到1点伤害。有〖明鉴〗效果的角色于其回合内杀死角色后，你重置〖兴衰〗。',
 			xin_zhangliang:'界张梁',
+			xin_zhangliang_prefix:'界',
 			rejijun:'集军',
 			rejijun_info:'当你使用目标角色含有自己的牌结算完毕后，你可以进行一次判定并将判定牌置于武将牌上，称为“方”。',
 			refangtong:'方统',
 			refangtong_info:'结束阶段，你可以将一张手牌置于武将牌上，称为“方”。若如此做，你可以移去任意张“方”并对一名其他角色造成1点雷属性伤害（若你移去的“方”的点数和大于36，则改为造成3点雷属性伤害）。',
 			re_simalang:'界司马朗',
+			re_simalang_prefix:'界',
 			requji:'去疾',
 			requji_info:'出牌阶段限一次，你可以弃置至多X张牌并令等量名角色回复1点体力，然后仍处于受伤状态的目标角色摸一张牌，若你以此法弃置了黑色牌，你失去1点体力。',
 			rejunbing:'郡兵',
 			rejunbing_info:'一名角色的结束阶段，若其手牌数小于其体力值，其可以摸一张牌并将所有手牌交给你，然后你可以交给其等量的牌。',
 			re_zhugedan:'界诸葛诞',
+			re_zhugedan_prefix:'界',
 			regongao:'功獒',
 			regongao_info:'锁定技。一名其他角色首次进入濒死状态时，你增加1点体力上限，然后回复1点体力。',
 			rejuyi:'举义',
@@ -15124,8 +15237,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reweizhong:'威重',
 			reweizhong_info:'锁定技。当你的体力上限增加或减少时，你摸两张牌。',
 			re_zhongyao:'界钟繇',
+			re_zhongyao_prefix:'界',
 			rehuomo:'活墨',
 			rehuomo_info:'每种牌名每回合限一次。当你需要使用一张基本牌时，你可以将一张黑色非基本牌置于牌堆顶，视为使用此基本牌。',
+			zhoutai:'界周泰',
+			zhoutai_prefix:'界',
+			caoren:'界曹仁',
+			caoren_prefix:'界',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

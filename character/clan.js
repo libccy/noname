@@ -1076,7 +1076,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							try{
 								var cards=player.getCards('hs',cardx=>{
 									if(get.name(cardx)!='sha') return false;
-									return cardx.hasNature('linked');
+									return game.hasNature(cardx,'linked');
 								});
 								cards.map(i=>[i,get.effect(target,i,player,player)]);
 								cards.sort((a,b)=>b[1]-a[1]);
@@ -1096,7 +1096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.name(card)=='jiu'&&player.hasUseTarget(card);
 					})&&player.countCards('hs',card=>{
 						if(get.name(card)!='sha') return false;
-						return card.hasNature('linked');
+						return game.hasNature(card,'linked');
 					}));
 					'step 1'
 					if(result.bool){
@@ -1569,10 +1569,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var list=[],names=[];
 							for(var card of cards){
 								var name=get.name(card),nature=get.nature(card);
-								var namex=name+nature;
-								if(names.contains(namex)) continue;
-								if(nature.length) list.push([get.type(card),'',name,nature]);
-								else list.push([get.type(card),'',name]);
+								var namex=name;
+								if(nature&&nature.length){
+									namex+=nature;
+									if(names.contains(namex)) continue;
+									list.push([get.type(card),'',name,nature]);
+								}
+								else{
+									if(names.contains(namex)) continue;
+									list.push([get.type(card),'',name]);
+								}
 								names.push(namex);
 							}
 							list.sort((a,b)=>{
@@ -2250,7 +2256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterReplace:{
-			wuban:['dc_wuban','clan_wuban','wuban'],
+			wuban:['clan_wuban','dc_wuban','wuban'],
 		},
 		characterIntro:{
 			xunshu:'荀淑（83年～149年），字季和，为郎陵侯相，颍川颍阴人（今河南省许昌市）人。汉和帝至汉桓帝时人物，以品行高洁著称。有子八人，号八龙。年轻时有高尚的德行，学问渊博，不喜欢雕章琢句，徒在文字上用功，不注重实际的学识。因此，常常被俗儒看不起。但州里却称他有知人之明。安帝时，征召任为郎中，后来再升当涂长。离职还乡里。他的孙子荀彧是曹操部下著名的谋士。',
@@ -2277,6 +2283,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		translate:{
+			clan_wuxian_prefix:'族',
+			clan_wuban_prefix:'族',
+			clan_xunshu_prefix:'族',
+			clan_xunchen_prefix:'族',
+			clan_xuncai_prefix:'族',
+			clan_xuncan_prefix:'族',
+			clan_hanshao_prefix:'族',
+			clan_hanrong_prefix:'族',
+			clan_wukuang_prefix:'族',
+			clan_wangling_prefix:'族',
+			clan_zhongyan_prefix:'族',
+			clan_wangyun_prefix:'族',
+			clan_wanghun_prefix:'族',
+			clan_zhonghui_prefix:'族',
+			clan_zhongyu_prefix:'族',
+
 			clan_wuxian:'族吴苋',
 			clanyirong:'移荣',
 			clanyirong_info:'出牌阶段限两次。若你的手牌数：小于X，则你可以将手牌摸至X张（至多摸八张），然后X-1；大于X，则你可以将手牌弃置至X张，然后X+1。（X为你的手牌上限）',

@@ -1399,7 +1399,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:9,
 					result:{player:1},
 				},
-				group:'shanxie_exclude',
+				group:['shanxie_exclude','shanxie_shan'],
 				subSkill:{
 					exclude:{
 						trigger:{global:'useCard'},
@@ -1414,6 +1414,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							trigger.all_excluded=true;
 						},
+						sub:true
+					},
+					shan:{
+						trigger:{player:'useCardToPlayered'},
+						filter:function(event,player){
+							return event.target.isAlive()&&event.card.name=='sha';
+						},
+						silent:true,
+						content:function(){
+							trigger.target.addTempSkill('shanxie_banned');
+							trigger.target.storage.shanxie_banned={
+								card:trigger.card,
+								num:player.getAttackRange()*2
+							};
+						},
+						sub:true
+					},
+					banned:{
+						init:function(player){
+							player.storage.shanxie_banned={};
+						},
+						onremove:function(player){
+							delete player.storage.shanxie_banned;
+						},
+						trigger:{global:'useCardEnd'},
+						filter:function(event,player){
+							return event.card==player.storage.shanxie_banned.card;
+						},
+						silent:true,
+						content:function(){
+							player.removeSkill('shanxie_banned');
+						},
+						ai:{
+							effect:{
+								player:function(card,player,target){
+									if(get.name(card)=='shan'){
+										let num=get.number(card);
+										if(!num||num<=player.storage.shanxie_banned.num) return 'zeroplayertarget';
+									}
+								}
+							}
+						}
 					},
 				},
 			},
@@ -2236,7 +2278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					//特殊处理
 					if(player.isDead()){
-						player.useResult(event.result,event.getParent())
+						player.useResult(event.result,event.getParent()).forceDie=true;
 					}
 				},
 				ai:{
@@ -5808,6 +5850,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			spshanxi:{
 				audio:2,
+				init:function(player){
+					game.addGlobalSkill('spshanxi_bj');
+				},
+				onremove:function(player){
+					game.removeGlobalSkill('spshanxi_bj');
+				},
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -5866,6 +5914,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!result.bool) trigger.player.loseHp();
 					else trigger.player.give(result.cards,player);
 				},
+			},
+			spshanxi_bj:{
+				trigger:{player:'dieAfter'},
+				filter:function(event,player){
+					for(let i of game.players){
+						if(i.hasSkill('spshanxi_suoming')) return false;
+					}
+					return true;
+				},
+				silent:true,
+				forceDie:true,
+				charlotte:true,
+				content:function(){
+					game.removeGlobalSkill('spshanxi_bj');
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							let suoming=game.findPlayer(current=>current.hasSkill('spshanxi_suoming'));
+							if(suoming&&_status.event&&target===_status.event.dying&&target.hasMark('spshanxi')){
+								if(target.countCards('he')<2) return 'zerotarget';
+								return [1,get.attitude(target,suoming)>0?0:-1.2];
+							}
+						}
+					}
+				}
 			},
 			shameng:{
 				audio:2,
@@ -6300,30 +6374,55 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wujing:['sunce','sunben','wuguotai'],
 		},
 		characterReplace:{
-			wangcan:['tw_wangcan','wangcan','sp_wangcan'],
-			sunshao:['sp_sunshao','sunshao'],
-			xunchen:['re_xunchen','xunchen','tw_xunchen','sp_xunchen'],
+			wangcan:['wangcan','sp_wangcan','tw_wangcan'],
+			sunshao:['sunshao','sp_sunshao'],
+			xunchen:['xunchen','re_xunchen','sp_xunchen','tw_xunchen'],
 			xinpi:['xinpi','sp_xinpi'],
 			duyu:['duyu','dc_duyu','sp_duyu','pk_sp_duyu'],
-			zhangwen:['sp_zhangwen','zhangwen'],
-			ol_bianfuren:['ol_bianfuren','tw_bianfuren','sp_bianfuren'],
+			zhangwen:['zhangwen','sp_zhangwen'],
+			ol_bianfuren:['ol_bianfuren','sp_bianfuren','tw_bianfuren'],
 			wangshuang:['wangshuang','sp_wangshuang'],
 			huaman:['huaman','sp_huaman'],
-			gaolan:['dc_gaolan','gaolan','sp_gaolan'],
-			cuiyan:['sp_cuiyan','cuiyan'],
-			wujing:['tw_wujing','wujing'],
+			gaolan:['gaolan','dc_gaolan','sp_gaolan'],
+			cuiyan:['cuiyan','sp_cuiyan'],
+			wujing:['wujing','tw_wujing'],
 			zhouchu:['jin_zhouchu','zhouchu','tw_zhouchu'],
 			liuzhang:['liuzhang','tw_liuzhang'],
-			chenzhen:['tw_chenzhen','sp_chenzhen'],
-			feiyi:['tw_feiyi','feiyi'],
-			wangling:['tw_wangling','wangling'],
-			qiaogong:['tw_qiaogong','qiaogong'],
-			sp_chendong:['tw_chendong','sp_chendong','chendong'],
-			sp_jiangqing:['tw_jiangqing','sp_jiangqing','jiangqing'],
+			chenzhen:['sp_chenzhen','tw_chenzhen'],
+			feiyi:['feiyi','tw_feiyi'],
+			wangling:['wangling','tw_wangling'],
+			qiaogong:['qiaogong','tw_qiaogong'],
+			sp_chendong:['sp_chendong','tw_chendong','chendong'],
+			sp_jiangqing:['sp_jiangqing','tw_jiangqing','jiangqing'],
             kongrong:['sp_kongrong','jsrg_kongrong','kongrong'],
-			mifuren:['dc_mifuren','sp_mifuren'],
+			dc_mifuren:['dc_mifuren','sp_mifuren'],
 		},
 		translate:{
+			liuba_prefix:'手杀',
+			sp_zhujun_prefix:'手杀',
+			sp_huangfusong_prefix:'手杀',
+			sp_zhangchangpu_prefix:'手杀',
+			sp_cuiyan_prefix:'手杀',
+			sp_huaman_prefix:'手杀',
+			sp_gaolan_prefix:'手杀',
+			sunyi_prefix:'手杀',
+			sp_wangshuang_prefix:'手杀',
+			sp_zongyu_prefix:'手杀',
+			db_wenyang_prefix:'手杀',
+			sp_yanghu_prefix:'手杀',
+			sp_zhangwen_prefix:'手杀',
+			sp_xujing_prefix:'手杀',
+			sp_huaxin_prefix:'手杀',
+			zhouchu_prefix:'手杀',
+			sp_mifuren_prefix:'手杀',
+			sp_xinpi_prefix:'手杀',
+			sp_bianfuren_prefix:'手杀',
+			sp_duyu_prefix:'手杀',
+			luotong_prefix:'手杀',
+			sp_wangcan_prefix:'手杀',
+			sp_sunshao_prefix:'手杀',
+			sp_xunchen_prefix:'手杀',
+			
 			sp_wangcan:'手杀王粲',
 			spqiai:'七哀',
 			spqiai_info:'出牌阶段限一次，你可以将一张非基本牌交给一名其他角色。然后其选择一项：①你回复1点体力。②你摸两张牌。',
@@ -6525,7 +6624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dbquedi:'却敌',
 			dbquedi_info:'每回合限一次。当你使用【杀】或【决斗】指定唯一目标后，你可选择：①获得目标角色的一张手牌。②弃置一张基本牌，并令此牌的伤害值基数+1。③背水：减1点体力上限，然后依次执行上述所有选项。',
 			dbzhuifeng:'椎锋',
-			dbzhuifeng_info:'魏势力技。每回合限两次，你可以失去1点体力并视为使用一张【决斗】。当你因此【决斗】而受到伤害时，你防止此伤害并令此技能失效直到出牌阶段结束。',
+			dbzhuifeng_info:'魏势力技。每回合限两次，你可以失去1点体力并视为使用一张【决斗】（你死亡后仍然结算）。当你因此【决斗】而受到伤害时，你防止此伤害并令此技能失效直到出牌阶段结束。',
 			dbchongjian:'冲坚',
 			dbchongjian_backup:'冲坚',
 			dbchongjian_info:'吴势力技。你可以将一张装备牌当做一种【杀】（无距离限制且无视防具）或【酒】使用。当你以此法使用【杀】造成伤害后，你获得目标角色装备区内的X张牌（X为伤害值）。',

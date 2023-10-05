@@ -12135,14 +12135,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						prompt:get.prompt2('gzhuyuan'),
 						complexSelect:true,
 						ai1:function(card){
+							if(!_status.event.goon) return false;
 							var player=_status.event.player;
 							if(get.type(card)!='equip') return 0;
-							return 6-get.value(card);
+							return 7.5-get.value(card);
 						},
 						ai2:function(target){
+							if(!_status.event.goon) return false;
 							var player=_status.event.player,card=ui.selected.cards[0];
 							return get.effect(target,card,player,player);
 						},
+						goon:game.hasPlayer(function(current){
+							return get.effect(current,{name:'guohe_copy',position:'ej'},player,player)>0;
+						})
 					}).setHiddenSkill('gzhuyuan');
 					'step 1'
 					if(result.bool){
@@ -12169,7 +12174,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return target.hasCard(function(card){
 								return lib.filter.canBeDiscarded(card,player,target);
 							},'ej');
-						});
+						}).set('ai',function(target){
+							const player=_status.event.player;
+							return get.effect(target,{name:'guohe_copy',position:'ej'},player,player);
+						})
 					}
 					else event.finish();
 					'step 3'
@@ -14561,6 +14569,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzcongjian:'从谏',
 			gzcongjian_info:'锁定技，当你于回合外造成伤害，或于回合内受到伤害时，此伤害+1。',
 			gz_jun_caocao:'君曹操',
+			gz_jun_caocao_prefix:'君',
 			jianan:'建安',
 			jianan_info:'君主技，只要此武将处于明置状态，你便拥有“五子良将纛”。',
 			g_jianan:'五子良将纛',
@@ -14653,8 +14662,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"_mingzhisuodingji_info":"出牌阶段，你可以明置拥有“锁定技”的武将牌。",
 
 			gz_jun_liubei:'君刘备',
+			gz_jun_liubei_prefix:'君',
 			gz_jun_zhangjiao:'君张角',
+			gz_jun_zhangjiao_prefix:'君',
 			gz_jun_sunquan:'君孙权',
+			gz_jun_sunquan_prefix:'君',
 			gz_liqueguosi:'李傕郭汜',
 			gz_bianfuren:'卞夫人',
 			gz_lvfan:'吕范',

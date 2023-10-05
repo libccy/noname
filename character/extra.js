@@ -65,11 +65,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhugeliang:'字孔明、号卧龙，汉族，琅琊阳都人，三国时期蜀汉丞相、杰出的政治家、军事家、发明家、文学家。在世时被封为武乡侯，死后追谥忠武侯，后来东晋政权推崇诸葛亮军事才能，特追封他为武兴王。诸葛亮为匡扶蜀汉政权，呕心沥血、鞠躬尽瘁、死而后已。其代表作有《前出师表》、《后出师表》、《诫子书》等。曾发明木牛流马等，并改造连弩，可一弩十矢俱发。于234年在宝鸡五丈原逝世。',
 		},
 		characterReplace:{
-			shen_zhangliao:['shen_zhangliao','ol_zhangliao'],
+			shen_zhangliao:['ol_zhangliao','shen_zhangliao'],
 			shen_zhaoyun:['shen_zhaoyun','boss_zhaoyun'],
 			shen_guanyu:['shen_guanyu','tw_shen_guanyu'],
 			shen_sunquan:['shen_sunquan','junk_sunquan'],
-			shen_lvmeng:['tw_shen_lvmeng','shen_lvmeng'],
+			shen_lvmeng:['shen_lvmeng','tw_shen_lvmeng'],
 			shen_machao:['shen_machao','ps_shen_machao'],
 		},
 		characterFilter:{
@@ -266,7 +266,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								str+='、';
 							}
 							str=str.slice(0,str.length-1);
-							str+='；'
+							str+='；';
+							card.ai.equipValue=function(card,player){
+								let val=maxHp;
+								if(player.hasSkill('qiexie')) val*=0.4;
+								else val*=0.6;
+								return val+=skills.length;
+							};
 						}
 						str+='此牌离开你的装备区后，改为置入剩余武将牌牌堆。';
 						lib.translate['qiexie_'+name+'_info']=str;
@@ -584,7 +590,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'orange',
 				filter:function(event,player){
-					return player.getStorage('dctuoyu').length==3;
+					return true;
+					//return player.getStorage('dctuoyu').length==3;
 				},
 				content:function(){
 					'step 0'
@@ -592,6 +599,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					'step 1'
 					if(game.countPlayer()>2){
+						if(player==trigger.player&&!trigger.skill){
+							var evt=trigger.getParent();
+							if(evt.name=='phaseLoop'&&evt._isStandardLoop) evt.player=player.next;
+						}
 						player.chooseTarget(true,'请选择一名要更换座次的角色，将自己移动到该角色的上家位置',function(card,player,target){
 							return target!=player&&target!=player.next;
 						}).set('ai',function(target){
@@ -2437,6 +2448,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yingba:{
 				audio:2,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num>0&&_status.event&&_status.event.type=='phase'&&get.tag(card,'recover')){
+							if(player.needsToDiscard()) return num/3;
+							return 0;
+						}
+					}
+				},
 				enable:'phaseUse',
 				usable:1,
 				filter:(event,player)=>(game.hasPlayer((current)=>(current!=player&&current.maxHp>1))),
@@ -2896,6 +2915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else event.finish();
 							'step 2'
 							player.chooseToDiscard('h',true).logSkill=['tspowei_use',target];
+							if(get.mode()!='identity'||player.identity!='nei') player.addExpose(0.2);
 							target.damage();
 							'step 3'
 							player.addTempSkill('tspowei_inRange');
@@ -4293,24 +4313,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 1;
 					},
 					effect:{
-						target:function (card,player,target){
-							if(get.tag(card,'damage')){
+						target:function(card,player,target){
+							if(get.tag(card,'damage')&&target.hp>(player.hasSkillTag('damageBonus',true,{
+								card:card,
+								target:target
+							})?2:1)){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
-								if(target.hp==1) return 0.8;
-								if(target.isTurnedOver()) return [0,3];
-								var num=game.countPlayer(function(current){
-									if(current.countCards('he')&&current!=player&&get.attitude(player,current)<=0){
-										return true;
+								let gain=game.countPlayer(function(current){
+									if(target==current) return 0;
+									if(get.attitude(target,current)>0){
+										if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'new_guixin')&&get.effect(current,cardx,current,current)<0,'j')) return 1.3;
+										return 0;
 									}
-									if(current.countCards('j')&&current!=player&&get.attitude(player,current)>0){
-										return true;
-									}
+									if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'new_guixin')&&get.effect(current,cardx,current,current)>0,'e')) return 1.1;
+									if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'new_guixin'),'h')) return 0.9;
+									return 0;
 								});
-								if(num>2) return [0,1];
-								if(num==2) return [0.5,1];
+								if(target.isTurnedOver()) gain+=2.3;
+								else gain-=2.3;
+								return [1,Math.max(0,gain)];
 							}
-						},
-					},
+						}
+					}
 				},
 			},
 			ol_shenfen:{
@@ -4855,6 +4879,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jilue_zhiheng:{
 				audio:1,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num<=0||get.itemtype(card)!='card'||get.type(card)!='equip') return num;
+						let eq=player.getEquip(get.subtype(card));
+						if(eq&&get.equipValue(card)-get.equipValue(eq)<Math.max(1.2,6-player.hp)) return 0;
+					}
+				},
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -4892,7 +4923,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw(event.num+cards.length);
 				},
 				ai:{
-					order:1,
+					order:function(item,player){
+						if(player.hasCard((i)=>get.value(i)>Math.max(6,9-player.hp),'he')) return 1;
+						return 10;
+					},
 					result:{
 						player:function(player){
 							var num=0;
@@ -4906,6 +4940,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(cards.length==2&&player.storage.jilue>1);
 							return 0;
 						}
+					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return player.isPhaseUsing()&&!player.getStat().skill.jilue_zhiheng&&player.hasCard((card)=>get.name(card)!=='tao','h');
 					},
 					threaten:1.5
 				},
@@ -5229,20 +5267,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					effect:{
 						target:function(card,player,target){
-							if(get.tag(card,'damage')){
+							if(get.tag(card,'damage')&&target.hp>(player.hasSkillTag('damageBonus',true,{
+								card:card,
+								target:target
+							})?2:1)){
 								if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
-								if(target.hp==1) return 0.8;
-								if(target.isTurnedOver()) return [0,3];
-								var num=game.countPlayer(function(current){
-									if(current.countCards('he')&&current!=player&&get.attitude(player,current)<=0){
-										return true;
+								let gain=game.countPlayer(function(current){
+									if(target==current) return 0;
+									if(get.attitude(target,current)>0){
+										if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'guixin')&&get.effect(current,cardx,current,current)<0,'ej')) return 1.3;
+										return 0;
 									}
-									if(current.countCards('j')&&current!=player&&get.attitude(player,current)>0){
-										return true;
-									}
+									if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'guixin')&&get.effect(current,cardx,current,current)>0,'ej')) return 1.1;
+									if(current.hasCard((cardx)=>lib.filter.canBeGained(cardx,target,current,'guixin'),'h')) return 0.9;
+									return 0;
 								});
-								if(num>2) return [0,1];
-								if(num==2) return [0.5,1];
+								if(target.isTurnedOver()) gain+=2.3;
+								else gain-=2.3;
+								return [1,Math.max(0,gain)];
 							}
 						}
 					}
@@ -6172,7 +6214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(['trick','delay'].contains(lib.card[card.name].type)) return 'thunder';
 							},
 							cardUsable:function(card,player){
-								if(card.name=='sha'&&card.hasNature('thunder')) return Infinity;
+								if(card.name=='sha'&&game.hasNature(card,'thunder')) return Infinity;
 							},
 						},
 						ai:{
@@ -6400,6 +6442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				bannedList:[
 					'bifa','buqu','gzbuqu','songci','funan','xinfu_guhuo','reguhuo','huashen','rehuashen','old_guhuo','shouxi','xinpojun','taoluan','xintaoluan','yinbing','xinfu_yingshi','zhenwei','zhengnan','xinzhengnan','zhoufu',
 				],
+				logTarget:'player',
 				content:function(){
 					'step 0'
 					var list=[];
@@ -7083,6 +7126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		translate:{
 			"shen_luxun":"神陆逊",
+			shen_luxun_prefix:'神',
 			"nzry_junlve":"军略",
 			"nzry_junlve_info":"锁定技，当你受到或造成伤害后，你获得X个“军略”标记(X为伤害点数)",
 			"nzry_cuike":"摧克",
@@ -7090,13 +7134,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_dinghuo":"绽火",
 			"nzry_dinghuo_info":"限定技，出牌阶段，你可以移去全部“军略”标记，令至多等量的已横置角色弃置所有装备区内的牌。然后，你对其中一名角色造成1点火焰伤害。",
 			"shen_liubei":"神刘备",
+			shen_liubei_prefix:'神',
 			"nzry_longnu":"龙怒",
 			"nzry_longnu_info":"转换技，锁定技，阴：出牌阶段开始时，你失去1点体力并摸一张牌，然后本阶段内你的红色手牌均视为火【杀】且无距离限制。阳：出牌阶段开始时，你减1点体力上限并摸一张牌，然后本阶段内你的锦囊牌均视为雷【杀】且无使用次数限制。",
 			"nzry_jieying":"结营",
 			"nzry_jieying_info":"锁定技，游戏开始时或当你的武将牌重置时，你横置；所有已横置的角色手牌上限+2；结束阶段，你横置一名其他角色。",
 			
 			"shen_ganning":"神甘宁",
+			shen_ganning_prefix:'神',
 			"shen_zhangliao":"神张辽",
+			shen_zhangliao_prefix:'神',
 			
 			"drlt_poxi":"魄袭",
 			"drlt_poxi_info":"出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以弃置你与其手牌中的四张花色不同的牌。若如此做，根据此次弃置你的牌的数量执行以下效果：零张，扣减一点体力上限；一张，你结束出牌阶段且本回合手牌上限-1；三张，你回复一点体力；四张，你摸四张牌",
@@ -7111,13 +7158,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_zhiti_info":"锁定技，你攻击范围内已受伤的其他角色手牌上限-1；当你拼点或【决斗】胜利，或受到伤害后，你恢复一个装备栏",
 			
 			shen_zhaoyun:'神赵云',
+			shen_zhaoyun_prefix:'神',
 			shen_guanyu:'神关羽',
+			shen_guanyu_prefix:'神',
 			shen_lvmeng:'神吕蒙',
+			shen_lvmeng_prefix:'神',
 			shen_simayi:'神司马懿',
+			shen_simayi_prefix:'神',
 			shen_caocao:'神曹操',
+			shen_caocao_prefix:'神',
 			shen_zhugeliang:'神诸葛亮',
+			shen_zhugeliang_prefix:'神',
 			shen_zhouyu:'神周瑜',
+			shen_zhouyu_prefix:'神',
 			shen_lvbu:'神吕布',
+			shen_lvbu_prefix:'神',
 			xinjuejing:'绝境',
 			xinjuejing_info:'锁定技，你的手牌上限+2；当你进入或脱离濒死状态时，你摸一张牌。',
 			relonghun:'龙魂',
@@ -7205,12 +7260,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_guixin":"归心",
 			"new_guixin_info":"当你受到1点伤害后，你可以按照你选择的区域优先度随机获得每名其他角色区域里的一张牌，然后你翻面。",
 			ol_zhangliao:'OL神张辽',
+			ol_zhangliao_prefix:'OL神',
 			olduorui:'夺锐',
 			olduorui2:'夺锐',
 			olduorui_info:'当你于出牌阶段内对一名角色造成伤害后，你可以选择该角色武将牌上的一个技能。若如此做，你结束出牌阶段，且你令此技能于其下个回合结束之前无效。',
 			olzhiti:'止啼',
 			olzhiti_info:'锁定技，你攻击范围内已受伤角色的手牌上限-1。若场上已受伤的角色数：不小于1，你的手牌上限+1；不小于3，你于摸牌阶段开始时令额定摸牌数+1；不小于5，回合结束时，你废除一名角色的一个随机装备栏。',
 			shen_caopi:'神曹丕',
+			shen_caopi_prefix:'神',
 			chuyuan:'储元',
 			chuyuan_info:'一名角色受到伤害后，若你武将牌上「储」的数量小于体力上限，你可以令其摸一张牌。然后其将一张手牌置于你的武将牌上，称为「储」。',
 			//chuyuan_info:'一名角色受到伤害后，你可以令其摸一张牌。然后其将一张手牌置于你的武将牌上，称为「储」。你的手牌上限+X（X为你武将牌上的「储」数）。',
@@ -7219,6 +7276,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianxing:'天行',
 			tianxing_info:'觉醒技，准备阶段，若你武将牌上的「储」数不小于3，则你减1点体力上限并获得所有「储」，然后失去技能〖储元〗，选择获得以下技能中的一个：〖仁德〗/〖制衡〗/〖乱击〗/〖行动〗',
 			shen_zhenji:'神甄宓',
+			shen_zhenji_prefix:'神',
 			shenfu:'神赋',
 			shenfu_info:'回合结束时，若你的手牌数为：奇数，你可对一名其他角色造成1点雷属性伤害。若其死亡，你可重复此流程。偶数，你可选择一名角色，你令其摸一张牌或弃置一张手牌。若其手牌数等于体力值，你可重复此流程。',
 			qixian:'七弦',
@@ -7226,6 +7284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caopi_xingdong:'行动',
 			caopi_xingdong_info:'出牌阶段限一次，你可以将一张【杀】或普通锦囊牌交给一名其他角色，然后该角色选择一项：对除你以外的角色使用此牌并在此牌结算完成后和你各摸一张牌；或跳过下回合的判定阶段和摸牌阶段。',
 			shen_diaochan:'神貂蝉',
+			shen_diaochan_prefix:'神',
 			meihun:'魅魂',
 			meihun_info:'结束阶段或当你成为【杀】的目标后，你可以令一名其他角色交给你一张你声明的花色的手牌，若其没有则你观看其手牌然后弃置其中一张。',
 			huoxin_control:'惑心',
@@ -7233,12 +7292,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huoxin_info:'出牌阶段限一次，你可以展示两张花色相同的手牌并分别交给两名其他角色，然后令这两名角色拼点，没赢的角色获得1个“魅惑”标记。拥有2个或更多“魅惑”的角色回合即将开始时，该角色移去其所有“魅惑”，此回合改为由你操控。',
 			boss_zhaoyun:'高达一号',
 			boss_zhaoyun_ab:'神赵云',
+			boss_zhaoyun_prefix:'神',
 			boss_juejing:'绝境',
 			boss_juejing2:'绝境',
 			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你得到牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌摸至4张/弃置至4张。',
 			zhanjiang:'斩将',
 			zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之',
 			shen_guojia:'神郭嘉',
+			shen_guojia_prefix:'神',
 			shuishi:'慧识',
 			shuishi_info:'出牌阶段限一次，若你的体力上限小于10，则你可选择一名角色。你令其摸一张牌，若其以此法得到的牌：与该角色的其他手牌花色均不相同，则你加1点体力上限，若你的体力上限小于10，则你可以重复此流程；否则你减1点体力上限，且其展示所有手牌。',
 			stianyi:'天翊',
@@ -7249,6 +7310,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sghuishi:'辉逝',
 			sghuishi_info:'限定技，出牌阶段，你可以选择一名其他角色：若其有未发动过的觉醒技，则你令其发动这些觉醒技时无视原有条件；否则其摸四张牌。然后你减2点体力上限。',
 			shen_taishici:'神太史慈',
+			shen_taishici_prefix:'神',
 			dulie:'笃烈',
 			dulie_info:'锁定技。当你成为【杀】的目标时，若使用者的体力值大于你，则你进行判定。若结果为红桃，则取消此目标。',
 			tspowei:'破围',
@@ -7264,6 +7326,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qizhengxiangsheng:'奇正相生',
 			qizhengxiangsheng_info:'出牌阶段，对一名其他角色使用。你将目标角色标记为“奇兵”或“正兵”（对其他角色不可见）。然后目标角色可以打出一张【杀】或【闪】。若其是“奇兵”且未打出【杀】，则你对其造成1点伤害；若其是“正兵”且未打出【闪】，则你获得其一张牌。',
 			shen_xunyu:'神荀彧',
+			shen_xunyu_prefix:'神',
 			tianzuo:'天佐',
 			tianzuo_info:'锁定技。①游戏开始时，你将8张【奇正相生】加入牌堆。②【奇正相生】对你无效。',
 			lingce:'灵策',
@@ -7271,6 +7334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dinghan:'定汉',
 			dinghan_info:'①当你成为未记录过的普通锦囊牌的目标时，或有未记录过的延时锦囊牌进入你的判定区时，你记录此牌名并取消之。②准备阶段，你可在〖定汉①〗的记录中添加或减少一种锦囊牌的牌名。',
 			shen_sunce:'神孙策',
+			shen_sunce_prefix:'神',
 			yingba:'英霸',
 			yingba_info:'①出牌阶段限一次，你可令一名体力上限大于1的其他角色减少1点体力上限并获得“平定”标记，然后你减少1点体力上限。②你对拥有“平定”标记的角色使用牌没有距离限制。',
 			scfuhai:'覆海',
@@ -7278,6 +7342,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pinghe:'冯河',
 			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
 			shen_jiangwei:'神姜维',
+			shen_jiangwei_prefix:'神',
 			jiufa:'九伐',
 			jiufa_info:'①当你声明使用牌后或打出牌时，你记录此牌的牌名。②当你使用或打出的牌结算结束后，若你的〖九伐〗记录中包含至少⑨种不同的牌名，则你可以展示牌堆顶的⑨张牌，选择并获得其中任意张点数各不相同且{这九张牌中存在未被选择且和已选择的牌点数相同}的牌，清除所有的记录，将其余牌置入弃牌堆。',
 			tianren:'天任',
@@ -7285,6 +7350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pingxiang:'平襄',
 			pingxiang_info:'限定技。出牌阶段，若你的体力上限大于⑨，则你可减⑨点体力上限，视为使用至多⑨张火【杀】，然后失去〖九伐〗，并将手牌上限基数改为体力上限直到游戏结束。',
 			shen_sunquan:'神孙权',
+			shen_sunquan_prefix:'神',
 			dili:'帝力',
 			dili_info:'锁定技。游戏开始时，你随机获得一条<span style="font-family: yuanli">东吴命运线</span>。',
 			yuheng:'驭衡',
@@ -7316,6 +7382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			changandajian_equip5_info:'锁定技。你的手牌上限+2。当你失去装备区内的【长安大舰】后，你销毁之。然后你选择场上的一张牌。若此牌点数为字母，则你获得之，否则弃置之。',
 			changandajian_equip6_info:'锁定技。你至其他角色的距离-2，其他角色至你的距离+2。当你失去装备区内的【长安大舰】后，你销毁之。然后你选择场上的一张牌。若此牌点数为字母，则你获得之，否则弃置之。',
 			shen_machao:'神马超',
+			shen_machao_prefix:'神',
 			shouli:'狩骊',
 			shouli_backup:'狩骊',
 			shouli_info:'①游戏开始时，你令场上所有角色从你的下家起，依次使用牌堆中的一张不为赠物的坐骑牌。②你可以将场上的一张进攻坐骑牌当做【杀】（无任何次数限制），防御坐骑牌当做【闪】使用或打出。若此坐骑牌的拥有者不为你，则其非锁定技于本回合内失效。且当你或其于本回合内受到伤害时，此伤害+1且改为雷属性。',
@@ -7338,16 +7405,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hina_xingzhi:'幸凪',
 			hina_xingzhi_info:'键势力技。每回合限一次，你可以通过“助战”触发一张牌的全部应变效果，且响应助战的角色摸两张牌。',
 			tw_shen_guanyu:'TW神关羽',
+			tw_shen_guanyu_prefix:'TW神',
 			twwushen:'武神',
 			twwushen_info:'锁定技。①你的♥手牌均视为普【杀】。②你于每阶段使用的第一张【杀】不可被响应。③你使用♥【杀】无距离和次数限制。④当你使用♥【杀】选择目标后，你令所有拥有“梦魇”标记的角色均成为此【杀】的目标。',
 			twwuhun:'武魂',
 			twwuhun_info:'锁定技。①当你受到其他角色造成的1点伤害后，你令伤害来源获得1枚“梦魇”标记。②当你对有“梦魇”标记的其他角色造成伤害后，你令其获得一枚“梦魇”标记。③当你死亡时，你可进行判定。若结果不为【桃】或【桃园结义】，则你选择至少一名拥有“梦魇”标记的角色。令这些角色各自失去X点体力（X为其“梦魇”标记数）。',
 			shen_zhangfei:'神张飞',
+			shen_zhangfei_prefix:'神',
 			shencai:'神裁',
 			shencai_info:'出牌阶段限一次，你可以令一名其他角色进行判定。你获得此判定牌，然后若此判定牌：包含以下要素中的任意一个，则其失去已有的下列效果，并获得对应的效果：{⒈体力：当其受到伤害后，其失去等量的体力、⒉武器：其不能使用牌响应【杀】、⒊打出：当其失去手牌后，其再随机弃置一张手牌（不嵌套触发）、⒋距离：其的结束阶段开始时，其翻面}；若均不包含，你获得其区域里的一张牌，其获得一枚“死”并获得如下效果：其的角色手牌上限-X、其的回合结束时，若X大于场上存活人数，则其死亡（X为其“死”标记数）。',
 			xunshi:'巡使',
 			xunshi_info:'锁定技。①你手牌区内所有的多目标锦囊牌均视为花色为none的普【杀】。②你使用颜色为none的牌无距离和次数限制。③当你使用无颜色的牌选择目标后，你令你的〖神裁〗的发动次数上限+1（至多为5），然后可以为此牌增加任意个目标。',
 			shen_zhangjiao:'神张角',
+			shen_zhangjiao_prefix:'神',
 			yizhao:'异兆',
 			yizhao_info:'锁定技。当你使用或打出牌时，你获得等同于此牌点数枚“黄”标记。然后若“黄”的十位数发生变化，你获得牌堆中一张点数为你“黄”的十位数的牌。',
 			sijun:'肆军',
@@ -7356,13 +7426,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sanshou_info:'当你受到伤害时，你可以亮出牌堆顶三张牌。若其中有本回合未被使用过的牌的类型，防止此伤害。',
 			tianjie:'天劫',
 			tianjie_info:'一名角色的回合结束时，若本回合牌堆洗过牌，你可以选择至多三名其他角色。你依次对每名目标角色造成X点雷电伤害（X为其手牌中【闪】的数量，至少为1）。',
-			tw_shen_lvmeng: 'TW神吕蒙',
+			tw_shen_lvmeng:'TW神吕蒙',
+			tw_shen_lvmeng_prefix:'TW神',
 			twshelie:'涉猎',
 			twshelie_info:'①摸牌阶段，你可放弃摸牌并亮出牌堆顶的五张牌，然后选择获得其中每种花色的牌各一张。②每轮限一次。结束阶段，若你本回合使用的花色数不小于你的体力值，你执行一个额外的摸牌阶段或出牌阶段。',
 			twgongxin:'攻心',
 			twgongxin2:'攻心',
 			twgongxin_info:'出牌阶段限一次。你可以观看一名其他角色的手牌，然后你可以展示其中一张牌并选择一项：1.弃置此牌；2.将此牌置于牌堆顶。若该角色手牌中的花色数因此减少，你选择一种颜色，其于本回合不能使用或打出该颜色的牌。',
 			shen_dengai:'神邓艾',
+			shen_dengai_prefix:'神',
 			dctuoyu:'拓域',
 			dctuoyu_fengtian:'丰田',
 			dctuoyu_qingqu:'清渠',
@@ -7378,6 +7450,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dccuixin:'摧心',
 			dccuixin_info:'当你不因此技能使用的基本牌或普通锦囊牌结算结束后，若此牌的目标于你使用此牌指定第一个目标时包含你的上家或下家，则你可以视为对下家或上家再使用一张牌名和元素相同的牌。',
 			shen_dianwei:'神典韦',
+			shen_dianwei_prefix:'神',
 			juanjia:'捐甲',
 			juanjia_info:'锁定技。游戏开始时，你废除一个防具栏，然后获得一个额外的武器栏。',
 			qiexie:'挈挟',

@@ -958,6 +958,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.getParent().excluded.add(player);
 				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							let hs=player.getCards('h',i=>i!==card&&(!card.cards||!card.cards.contains(i))),num=player.getCardUsable('sha');
+							if(card.name!=='sha'&&card.name!=='juedou'||hs.length<target.countCards('h')) return 1;
+							if(game.hasPlayer2(function(current){
+								return current.getHistory('useCard',function(evt){
+									return evt.card&&['sha','juedou'].includes(evt.card.name)&&evt.targets.includes(player);
+								}).length>0;
+							})) return 1;
+							if(card.name==='sha') num--;
+							hs=hs.filter(i=>{
+								if(i.name==='juedou') return true;
+								if(num&&i.name==='sha'){
+									num--;
+									return true;
+								}
+								return false;
+							});
+							if(!hs.length) return 'zeroplayertarget';
+							num=1-2/3/hs.length;
+							return [num,0,num,0];
+						}
+					}
+				}
 			},
 			"drlt_qianjie":{
 				group:["drlt_qianjie_1","drlt_qianjie_2","drlt_qianjie_3"],
@@ -3312,19 +3337,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						target:function(card,player,target,current){
+						target_use:function(card,player,target,current){
 							if(card.name=='sha'&&get.attitude(player,target)<0){
 								if(_status.event.name=='xiangle') return;
+								if(get.attitude(player,target)>0&&current<0) return 'zerotarget';
 								var bs=player.getCards('h',{type:'basic'});
-								if(bs.length<2) return 0;
+								bs.remove(card);
+								if(card.cards) bs.removeArray(card.cards);
+								else bs.removeArray(ui.selected.cards);
+								if(!bs.length) return 'zerotarget';
 								if(player.hasSkill('jiu')||player.hasSkill('tianxianjiu')) return;
-								if(bs.length<=3&&player.countCards('h','sha')<=1){
+								if(bs.length<=2){
 									for(var i=0;i<bs.length;i++){
-										if(bs[i].name!='sha'&&get.value(bs[i])<7){
+										if(get.value(bs[i])<7){
 											return [1,0,1,-0.5];
 										}
 									}
-									return 0;
+									return [1,0,0.3,0];
 								}
 								return [1,0,1,-0.5];
 							}
@@ -4234,15 +4263,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						lib.skill.pingjian.initList();
 					}
 					_status.characterlist.randomSort();
-					var bool=false;
 					for(var i=0;i<_status.characterlist.length;i++){
-						var name=_status.characterlist[i];
-						if(name.indexOf('zuoci')!=-1||name.indexOf('key')==0||lib.skill.rehuashen.banned.contains(name)||player.storage.huashen.owned[name]) continue;
-						var skills=lib.character[name][3];
-						for(var j=0;j<skills.length;j++){
-							var info=lib.skill[skills[j]];
-							if(info.charlotte||(info.unique&&!info.gainable)||info.juexingji||info.limited||info.zhuSkill||info.hiddenSkill||info.dutySkill) skills.splice(j--,1);
-						}
+						let name=_status.characterlist[i];
+						if(name.indexOf('zuoci')!=-1||name.indexOf('key_')==0||name.indexOf('sp_key_')==0||lib.skill.rehuashen.banned.includes(name)||player.storage.huashen.owned[name]) continue;
+						let skills=lib.character[name][3].filter(skill=>{
+							const categories=get.skillCategoriesOf(skill);
+							return !categories.some(type=>lib.skill.rehuashen.bannedType.includes(type));
+						})
 						if(skills.length){
 							player.storage.huashen.owned[name]=skills;
 							_status.characterlist.remove(name);
@@ -7681,45 +7708,45 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterReplace:{
-			caoren:['caoren','new_caoren','old_caoren'],
+			caoren:['caoren','old_caoren','sb_caoren','new_caoren'],
 			sp_caoren:['sp_caoren','jsp_caoren'],
-			xiahouyuan:['ol_xiahouyuan','re_xiahouyuan','xiahouyuan'],
-			huangzhong:['ol_huangzhong','re_huangzhong','huangzhong'],
-			weiyan:['ol_weiyan','re_weiyan','weiyan'],
+			xiahouyuan:['re_xiahouyuan','ol_xiahouyuan','xiahouyuan'],
+			huangzhong:['re_huangzhong','ol_huangzhong','sb_huangzhong','huangzhong'],
+			weiyan:['re_weiyan','ol_weiyan','weiyan'],
 			zhoutai:['zhoutai','xin_zhoutai','old_zhoutai'],
-			xiaoqiao:['ol_xiaoqiao','re_xiaoqiao','xiaoqiao','old_xiaoqiao'],
+			xiaoqiao:['xiaoqiao','ol_xiaoqiao','re_xiaoqiao','old_xiaoqiao'],
 			yuji:['xin_yuji','re_yuji','yuji'],
-			zhangjiao:['re_zhangjiao','sp_zhangjiao','zhangjiao'],
-			dianwei:['ol_dianwei','re_dianwei','dianwei'],
-			xunyu:['ol_xunyu','re_xunyu','xunyu'],
-			sp_zhugeliang:['ol_sp_zhugeliang','re_sp_zhugeliang','sp_zhugeliang'],
-			pangtong:['ol_pangtong','re_pangtong','pangtong'],
+			zhangjiao:['sp_zhangjiao','re_zhangjiao','sb_zhangjiao','zhangjiao'],
+			dianwei:['dianwei','ol_dianwei','re_dianwei'],
+			xunyu:['xunyu','ol_xunyu','re_xunyu'],
+			sp_zhugeliang:['sp_zhugeliang','ol_sp_zhugeliang','re_sp_zhugeliang'],
+			pangtong:['pangtong','ol_pangtong','re_pangtong','sb_pangtong'],
 			re_jsp_pangtong:['re_jsp_pangtong','sp_pangtong'],
-			taishici:['re_taishici','taishici'],
-			re_yuanshao:['ol_yuanshao','re_yuanshao','xin_yuanshao'],
-			pangde:['ol_pangde','re_pangde','pangde'],
-			yanwen:['ol_yanwen','re_yanwen','yanwen'],
+			taishici:['taishici','re_taishici'],
+			re_yuanshao:['re_yuanshao','ol_yuanshao','xin_yuanshao','sb_yuanshao'],
+			pangde:['re_pangde','ol_pangde','pangde'],
+			yanwen:['yanwen','ol_yanwen','re_yanwen'],
 			caopi:['caopi','re_caopi','ps_caopi'],
-			xuhuang:['ol_xuhuang','re_xuhuang','xuhuang'],
-			menghuo:['re_menghuo','menghuo'],
-			zhurong:['re_zhurong','ol_zhurong','zhurong'],
-			sunjian:['ol_sunjian','re_sunjian','sunjian'],
-			jiaxu:['re_jiaxu','jiaxu','ns_jiaxu','ps_jiaxu'],
-			dongzhuo:['ol_dongzhuo','sp_dongzhuo','re_dongzhuo','dongzhuo','yj_dongzhuo'],
-			dengai:['re_dengai','ol_dengai','dengai'],
+			xuhuang:['re_xuhuang','ol_xuhuang','sb_xuhuang','xuhuang'],
+			menghuo:['menghuo','re_menghuo','sb_menghuo'],
+			zhurong:['zhurong','ol_zhurong','re_zhurong','sb_zhurong'],
+			sunjian:['sunjian','ol_sunjian','re_sunjian'],
+			jiaxu:['jiaxu','re_jiaxu','ns_jiaxu','ps_jiaxu'],
+			dongzhuo:['dongzhuo','ol_dongzhuo','re_dongzhuo','sp_dongzhuo','yj_dongzhuo'],
+			dengai:['dengai','ol_dengai','re_dengai'],
 			sp_ol_zhanghe:['sp_ol_zhanghe','yj_zhanghe','sp_zhanghe','jsrg_zhanghe'],
-			jiangwei:['ol_jiangwei','re_jiangwei','jiangwei'],
-			liushan:['ol_liushan','re_liushan','liushan'],
-			sunce:['re_sunben','re_sunce','sunce'],
-			zhangzhang:['ol_zhangzhang','re_zhangzhang','zhangzhang'],
-			zuoci:['re_zuoci','zuoci'],
-			caiwenji:['ol_caiwenji','re_caiwenji','caiwenji'],
-			xuyou:['sp_xuyou','xuyou','jsrg_xuyou','yj_xuyou','junk_xuyou'],
-			guanqiujian:['guanqiujian','tw_guanqiujian','re_guanqiujian','old_guanqiujian'],
-			chendao:['chendao','old_chendao','ns_chendao'],
+			jiangwei:['jiangwei','ol_jiangwei','re_jiangwei','sb_jiangwei'],
+			liushan:['liushan','ol_liushan','re_liushan'],
+			sunce:['sunce','re_sunce','re_sunben','sb_sunce'],
+			zhangzhang:['zhangzhang','ol_zhangzhang','re_zhangzhang'],
+			zuoci:['zuoci','re_zuoci'],
+			caiwenji:['caiwenji','ol_caiwenji','re_caiwenji'],
+			xuyou:['xuyou','sp_xuyou','jsrg_xuyou','yj_xuyou','junk_xuyou'],
+			guanqiujian:['guanqiujian','re_guanqiujian','tw_guanqiujian','old_guanqiujian'],
+			chendao:['chendao','ns_chendao','old_chendao'],
 			zhugezhan:['zhugezhan','old_zhugezhan'],
-			ol_lusu:['ol_lusu','re_lusu'],
-			zhanghe:['re_zhanghe','zhanghe'],
+			ol_lusu:['re_lusu','ol_lusu'],
+			zhanghe:['zhanghe','re_zhanghe','sb_zhanghe'],
 			yl_luzhi:['yl_luzhi','tw_yl_luzhi'],
 			sunliang:['sunliang','xin_sunliang'],
 		},
@@ -7739,8 +7766,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"zhugezhan":"诸葛瞻",
 			"lukang":"陆抗",
 			"haozhao":"郝昭",
-			"yl_yuanshu":"雷袁术",
-			yl_yuanshu_ab:"袁术",
+			yl_yuanshu:"新杀袁术",
+			yl_yuanshu_prefix:"新杀",
 			"zhangxiu":"张绣",
 			"chendao":"陈到",
 			"guanqiujian":"毌丘俭",
@@ -7921,6 +7948,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caopi:'曹丕',
 			re_xuhuang:'徐晃',
 			lusu:'旧鲁肃',
+			lusu_prefix:'旧',
 			sunjian:'孙坚',
 			dongzhuo:'董卓',
 			jiaxu:'贾诩',
@@ -7980,6 +8008,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			taishici:'太史慈',
 			yanwen:'颜良文丑',
 			yuanshao:'旧袁绍',
+			yuanshao_prefix:'旧',
 			re_pangde:'庞德',
 			huoji:'火计',
 			bazhen:'八阵',
@@ -8037,15 +8066,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_zhoutai:'周泰',
 			old_caoren:'曹仁',
 			xuhuang:'旧徐晃',
+			xuhuang_prefix:'旧',
 			pangde:'旧庞德',
+			pangde_prefix:'旧',
 			xiahouyuan:'旧夏侯渊',
-			caoren:'界曹仁',
+			xiahouyuan_prefix:'旧',
 			huangzhong:'旧黄忠',
+			huangzhong_prefix:'旧',
 			sp_zhangjiao:'张角',
 			weiyan:'旧魏延',
+			weiyan_prefix:'旧',
 			xiaoqiao:'小乔',
-			zhoutai:'界周泰',
 			zhangjiao:'旧张角',
+			zhangjiao_prefix:'旧',
 			//yuji:'于吉',
 			shensu:'神速',
 			shensu1:'神速',

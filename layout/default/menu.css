@@ -1019,7 +1019,7 @@ input.fileinput::-webkit-file-upload-button {
 }
 
 .config {
-	height: 25px;
+	/* height: 25px; */
 	line-height: 25px;
 	position: relative;
 }
@@ -1316,17 +1316,33 @@ input.fileinput::-webkit-file-upload-button {
 	margin-right: 3px;
 }
 
+.menu-buttons>.new_character>.die_audio {
+	position: absolute;
+	left: 12px;
+	top: 160px;
+	height: 45px;
+	width: calc(100% - 12px);
+}
+
+.menu-buttons>.new_character>.die_audio>input {
+	width: calc(100% - 100px);
+}
+
+.menu-buttons>.new_character>.die_audio>button {
+	margin-right: 12px;
+}
+
 .menu-buttons>.new_character>.add_skill {
 	position: absolute;
 	left: 12px;
-	top: 205px;
+	top: 250px;
 	text-align: left;
 	line-height: 20px;
 	white-space: nowrap;
 }
 
 .menu-buttons>.new_character>.add_skill.options {
-	top: 160px;
+	top: 205px;
 }
 
 .menu-buttons>.new_character>.add_skill.options>span {
@@ -1859,7 +1875,7 @@ input.fileinput::-webkit-file-upload-button {
 }
 
 #create-extension>.menu-buttons>.new_character>.skill_list {
-	top: 245px;
+	top: 290px;
 }
 
 #create-extension>.menu-buttons>.new_character>.skill_list>div:first-child {
@@ -1876,6 +1892,9 @@ input.fileinput::-webkit-file-upload-button {
 	margin-bottom: 3px;
 }
 
+div.popup-container.editor,div.popup-container.editor div{
+	transition: none;
+}
 .popup-container.editor>div {
 	width: 80%;
 	height: 90%;

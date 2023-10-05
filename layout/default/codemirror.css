@@ -468,14 +468,9 @@ div.cm-s-mdn-like span.CodeMirror-matchingbracket { outline:1px solid grey; colo
   display: block;
 }
 
-@media (max-width: 1000px) {
-  .CodeMirror-hints::-webkit-scrollbar {
-    width: 25px;
-  }
-}
-
 .CodeMirror-hints::-webkit-scrollbar-thumb {
   background-color: rgb(218, 215, 215);
+  border-radius: 5px;
   height: 50px;
 }
 
@@ -496,3 +491,28 @@ li.CodeMirror-hint-active {
   background: #08f;
   color: white;
 }
+
+.cm-completionIcon {
+  position: relative;
+  font-size: 90%;
+  font-family: monospace;
+  width: .8em;
+  display: inline-block;
+  text-align: center;
+  padding-right: .6em;
+  opacity: 0.6;
+  box-sizing: content-box;
+}
+
+.cm-completionIcon-function:after,
+.cm-completionIcon-method:after {content: 'ƒ';}
+.cm-completionIcon-class:after {content: '○';}
+.cm-completionIcon-interface:after {content: '◌';}
+.cm-completionIcon-variable:after {content: '𝑥';}
+.cm-completionIcon-constant:after {content: '𝐶';}
+.cm-completionIcon-type:after {content: '𝑡';}
+.cm-completionIcon-enum:after {content: '∪';}
+.cm-completionIcon-property:after {content: '□';}
+.cm-completionIcon-keyword:after {content: '🔑︎';}
+.cm-completionIcon-namespace:after {content: '▢';}
+.cm-completionIcon-text:after {content: 'abc'; font-size: 50%; vertical-align: middle;}

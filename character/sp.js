@@ -8,7 +8,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
 				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong','caoxi'],
 				sp_tianzhu:['niujin','hejin','hansui',"wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
-				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu','ol_xinxianying',"daxiaoqiao","jin_guohuai"],
+				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu',"daxiaoqiao","jin_guohuai"],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','zhangzhi','lushi'],
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
@@ -100,7 +100,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangchengyan:['male','qun',3,['guanxu','yashi']],
 			huangzu:['male','qun',4,['wangong']],
 			panshu:['female','wu',3,['weiyi','jinzhi']],
-			ol_xinxianying:['female','wei',3,['xincaishi','xinzhongjian']],
 			wolongfengchu:['male','shu',4,['youlong','luanfeng']],
 			sp_zhangliao:['male','qun',4,['mubing','ziqu','diaoling']],
 			caoshuang:['male','wei',4,['retuogu','shanzhuan']],
@@ -946,7 +945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else player.draw(3);
-					'step 2'
+					'step 1'
 					player.chooseToDiscard('h','技能：弃置至少一半手牌',[Math.floor(player.countCards('h')/2),Infinity],true).set('ai',card=>{
 						var player=_status.event.player;
 						if(player.hasSkill('skill_feiyi_B')&&player.countCards('h')-ui.selected.cards.length>1) return 1/(get.value(card)||0.5);
@@ -4168,7 +4167,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('hes')>1;
 				},
 				check:function(card){
-					return 0;
+					var player = _status.event.player;
+					if(game.countPlayer(function (current) {
+						return current != player && player.canUse('sha', current) && get.effect(current, {name: 'sha'}, player, player) > 0;
+					}) <= ui.selected.cards.length) return 0;
+					if(_status.event.player.countCards('hes') >= 3) return 8 - ui.selected.cards.length - get.value(card);
+					return 6 - ui.selected.cards.length - get.value(card);
 				},
 				position:'hes',
 				viewAs:{
@@ -4179,7 +4183,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('rekenshang_effect');
 				},
 				ai:{
-					order:1,
+					order:function(item,player){
+						if(player.countCards('hes') >= 3) return 6;
+						return 4;
+					},
+					result:{
+						target:function(player,target,card,isLink){
+							var eff = function () {
+								if(!isLink && player.hasSkill('jiu')) {
+									if(!target.hasSkillTag('filterDamage', null, {
+										player: player,
+										card: card,
+										jiu: true
+									})){
+										if(get.attitude(player, target) > 0) return -7;
+										return -4;
+									}
+									return -0.5;
+								}
+								return -1.5;
+							}();
+							if(!isLink && target.mayHaveShan() && !player.hasSkillTag('directHit_ai', true, {
+								target: target,
+								card: card
+							}, true)) return eff / 1.2;
+							return eff;
+						}
+					},
 					respondSha:true,
 					skillTagFilter:player=>player.countCards('hes')>1,
 				},
@@ -6944,44 +6974,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player,name){
 					player.storage[name]=[1,2,3,4];
 				},
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'damageEnd'},
+				filter:(event,player)=>player!=_status.currentPhase,
 				forced:true,
-				popup:false,
+				locked:false,
 				content:function(){
-					trigger._shanduan=(player.storage.shanduan||[1,2,3,4]).slice(0);
-					player.storage.shanduan=[1,2,3,4]
+					if(!player.storage.shanduan) player.storage.shanduan=[1,2,3,4];
+					var list=player.storage.shanduan;
+					for(var i=0;i<list.length;i++){
+						var num=list[i],add=true;
+						for(var j=0;j<list.length;j++){
+							if(list[j]<num){
+								add=false;
+								break;
+							}
+						}
+						if(add){
+							list[i]++;
+							break;
+						}
+					}
+					game.delayx();
 				},
-				group:['shanduan_draw','shanduan_use','shanduan_discard','shanduan_damage'],
+				group:['shanduan_draw','shanduan_use','shanduan_discard'],
 				ai:{
 					notemp:true,
 					threaten:3.6,
 				},
 				subSkill:{
-					damage:{
-						audio:'shanduan',
-						trigger:{player:'damageEnd'},
-						forced:true,
-						locked:false,
-						filter:(event,player)=>player!=_status.currentPhase,
-						content:function(){
-							if(!player.storage.shanduan) player.storage.shanduan=[1,2,3,4];
-							var list=player.storage.shanduan;
-							for(var i=0;i<list.length;i++){
-								var num=list[i],add=true;
-								for(var j=0;j<list.length;j++){
-									if(list[j]<num){
-										add=false;
-										break;
-									}
-								}
-								if(add){
-									list[i]++;
-									break;
-								}
-							}
-							game.delayx();
-						},
-					},
 					draw:{
 						audio:'shanduan',
 						trigger:{player:'phaseDrawBegin'},
@@ -6989,14 +7009,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						locked:false,
 						filter:function(event,player){
 							var list=event.getParent()._shanduan;
-							return list&&list.length>0;
+							return !list||list.length>0;
 						},
 						content:function(){
 							'step 0'
 							var list=trigger.getParent()._shanduan;
+							if(!list){
+								trigger.getParent()._shanduan=(player.storage.shanduan||[1,2,3,4]).slice(0);
+								player.storage.shanduan=[1,2,3,4];
+							}
+							'step 1'
+							var list=trigger.getParent()._shanduan;
 							if(list.length==1) event._result={index:0};
 							else player.chooseControl(list).set('prompt','善断：为摸牌阶段的摸牌数分配一个数值').set('choice',list.indexOf(Math.max.apply(Math,list))).set('ai',()=>_status.event.choice);
-							'step 1'
+							'step 2'
 							var list=trigger.getParent()._shanduan;
 							var num=list[result.index];
 							trigger.num=num;
@@ -7011,10 +7037,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						locked:false,
 						filter:function(event,player){
 							var list=event.getParent()._shanduan;
-							return list&&list.length>0;
+							return !list||list.length>0;
 						},
 						content:function(){
 							'step 0'
+							var list=trigger.getParent()._shanduan;
+							if(!list){
+								trigger.getParent()._shanduan=(player.storage.shanduan||[1,2,3,4]).slice(0);
+								player.storage.shanduan=[1,2,3,4];
+							}
+							'step 1'
 							var list=trigger.getParent()._shanduan;
 							if(list.length==1) event._result={index:0};
 							else player.chooseControl(list).set('prompt','善断：为攻击范围基数分配一个数值').set('list',list).set('ai',function(){
@@ -7041,7 +7073,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								return list.indexOf(Math.min.apply(Math,list));
 							});
-							'step 1'
+							'step 2'
 							var list=trigger.getParent()._shanduan;
 							var num=list[result.index];
 							if(!player.storage.shanduan_effect) player.storage.shanduan_effect={};
@@ -7066,7 +7098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								return list.indexOf(Math.min.apply(Math,list));
 							});
-							'step 2'
+							'step 3'
 							var list=trigger.getParent()._shanduan;
 							var num=list[result.index];
 							if(!player.storage.shanduan_effect) player.storage.shanduan_effect={};
@@ -7082,14 +7114,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						locked:false,
 						filter:function(event,player){
 							var list=event.getParent()._shanduan;
-							return list&&list.length>0;
+							return !list||list.length>0;
 						},
 						content:function(){
 							'step 0'
 							var list=trigger.getParent()._shanduan;
+							if(!list){
+								trigger.getParent()._shanduan=(player.storage.shanduan||[1,2,3,4]).slice(0);
+								player.storage.shanduan=[1,2,3,4];
+							}
+							'step 1'
+							var list=trigger.getParent()._shanduan;
 							if(list.length==1) event._result={index:0};
 							else player.chooseControl(list).set('prompt','善断：为手牌上限基数分配一个数值').set('choice',list.indexOf(Math.max.apply(Math,list))).set('ai',()=>_status.event.choice);
-							'step 1'
+							'step 2'
 							var list=trigger.getParent()._shanduan;
 							var num=list[result.index];
 							if(!player.storage.shanduan_effect) player.storage.shanduan_effect={};
@@ -10084,6 +10122,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				prompt2:'令其交给你一张手牌，并根据类型获得对应的标记',
+				check:function(event,player){
+					return get.attitude(_status.event.player,event.player)>0;
+				},
 				content:function(){
 					'step 0'
 					event.target=trigger.player;
@@ -13362,30 +13403,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.8,
 					effect:{
 						target:function(card,player,target,current){
-							if(player!=target||!player.isPhaseUsing()) return;
+							let used=(target.getHistory('useCard').length+target.getHistory('respond').length);
 							if(get.subtype(card)=='equip1'&&!get.cardtag(card,'gifts')){
-								var range0=player.getAttackRange();
-								var range=0;
-								var info=get.info(card);
+								if(player!=target||!player.isPhaseUsing()) return;
+								let range0=player.getAttackRange();
+								let range=0;
+								let info=get.info(card);
 								if(info&&info.distance&&info.distance.attackFrom){
 									range-=info.distance.attackFrom;
 								}
 								if(player.getEquip(1)){
-									var num=0;
-									var info=get.info(player.getEquip(1));
+									let num=0;
+									let info=get.info(player.getEquip(1));
 									if(info&&info.distance&&info.distance.attackFrom){
 										num-=info.distance.attackFrom;
 									}
 									range0-=num;
 								}
 								range0+=range;
-								var delta=range0-(player.getHistory('useCard').length+player.getHistory('respond').length);
+								let delta=range0-used;
 								if(delta<0) return;
-								var num=player.countCards('h',function(card){
+								let num=player.countCards('h',function(card){
 									return (get.cardtag(card,'gifts')||get.subtype(card)!='equip1')&&player.getUseValue(card)>0;
 								});
 								if(delta==2&&num>0) return [1,3];
 								if(num>=delta) return 'zeroplayertarget';
+							}
+							else if(get.tag(card,'respondShan')>0){
+								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveShan()){
+									return 0.6;
+								}
+							}
+							else if(get.tag(card,'respondSha')>0){
+								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveSha()){
+									return 0.6;
+								}
 							}
 						},
 					},
@@ -19348,7 +19400,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target,current){
 							if(card.name=='sha'){
-								if(card.hasNature('fire')||player.hasSkill('zhuque_skill')) return 2;
+								if(game.hasNature(card,'fire')||player.hasSkill('zhuque_skill')) return 2;
 							}
 							if(get.tag(card,'fireDamage')&&current<0) return 2;
 						}
@@ -19374,7 +19426,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hanyong:{
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian'||(event.card.name=='sha'&&!event.card.hasNature()&&get.suit(event.card)=='spade'))&&player.isDamaged();
+					return event.card&&(event.card.name=='nanman'||event.card.name=='wanjian'||(event.card.name=='sha'&&!game.hasNature(event.card)&&get.suit(event.card)=='spade'))&&player.isDamaged();
 				},
 				content:function(){
 					trigger.baseDamage++;
@@ -24354,53 +24406,53 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shixie:['shixie','dc_shixie'],
 			caoshuang:['caoshuang','ns_caoshuang'],
 			caoang:['caoang','yj_caoang','tw_caoang'],
-			caohong:['tw_re_caohong','caohong','tw_caohong','yj_caohong'],
-			xiahouba:['xiahouba','tw_xiahouba','dc_xiahouba'],
+			caohong:['caohong','tw_re_caohong','tw_caohong','yj_caohong'],
+			xiahouba:['xiahouba','dc_xiahouba','tw_xiahouba'],
 			maliang:['maliang','re_maliang','tw_maliang','ol_maliang','old_maliang'],
 			dingfeng:['dingfeng','tw_dingfeng','old_dingfeng'],
 			zumao:['zumao','tw_zumao'],
-			beimihu:['tw_beimihu','beimihu'],
-			panfeng:['re_panfeng','panfeng','std_panfeng'],
+			tw_beimihu:['beimihu','tw_beimihu'],
+			panfeng:['panfeng','re_panfeng','std_panfeng'],
 			sunluyu:['sunluyu','re_sunluyu'],
 			jin_simazhao:['jin_simazhao','simazhao','sp_simazhao'],
 			jin_wangyuanji:['jin_wangyuanji','wangyuanji','sp_wangyuanji'],
-			wangyun:['re_wangyun','wangyun','dc_wangyun','jsrg_wangyun','old_wangyun','pe_wangyun'],
+			wangyun:['wangyun','dc_wangyun','re_wangyun','jsrg_wangyun','old_wangyun','pe_wangyun'],
 			zhangliang:['re_zhangliang','zhangliang'],
 			lingju:['lingju','old_lingju'],
 			guansuo:['guansuo','ol_guansuo'],
 			zhangxingcai:['zhangxingcai','old_zhangxingcai'],
 			lisu:['ol_lisu','lisu'],
-			fuwan:['fuwan','sp_fuwan','tw_fuwan'],
+			fuwan:['fuwan','tw_fuwan','sp_fuwan'],
 			huaxin:['ol_huaxin','huaxin','sp_huaxin'],
-			xujing:['dc_xujing','xujing','tw_xujing','sp_xujing'],
-			zhaoxiang:['zhaoxiang','tw_zhaoxiang','dc_zhaoxiang'],
-			dengzhi:['ol_dengzhi','re_dengzhi','tw_dengzhi','dengzhi'],
-			wangrong:['wangrong','ol_wangrong'],
-			zongyu:['tw_zongyu','sp_zongyu','zongyu'],
+			xujing:['xujing','dc_xujing','sp_xujing','tw_xujing'],
+			zhaoxiang:['zhaoxiang','dc_zhaoxiang','tw_zhaoxiang'],
+			dengzhi:['ol_dengzhi','re_dengzhi','dengzhi','tw_dengzhi'],
+			wangrong:['ol_wangrong','wangrong'],
+			zongyu:['zongyu','sp_zongyu','tw_zongyu'],
 			ol_dongzhao:['ol_dongzhao','tw_dongzhao'],
-			mayunlu:['tw_mayunlu','mayunlu'],
+			mayunlu:['mayunlu','tw_mayunlu'],
 			zhuling:['ol_zhuling','dc_zhuling','zhuling'],
-			zangba:['tw_zangba','zangba'],
+			zangba:['zangba','tw_zangba'],
 			zhangbao:['zhangbao','re_zhangbao'],
 			jianggan:['jianggan','sp_jianggan'],
 			dc_jiben:['dc_jiben','sp_jiben'],
-			yangyi:['ol_yangyi','tw_yangyi','yangyi'],
-			tianyu:['tw_tianyu','tianyu'],
+			yangyi:['ol_yangyi','yangyi','tw_yangyi'],
+			tianyu:['tianyu','tw_tianyu'],
 			huangchengyan:['huangchengyan','dc_huangchengyan'],
-			puyuan:['puyuan','ol_puyuan'],
-			huangzu:['dc_huangzu','huangzu'],
-			huojun:['dc_huojun','huojun','tw_huojun'],
-			zhaoyǎn:['dc_zhaoyǎn','zhaoyǎn'],
-			furong:['ol_furong','tw_furong','furong'],
-			daxiaoqiao:['tw_daxiaoqiao','daxiaoqiao','dc_daxiaoqiao'],
-			zhugeguo:['tw_zhugeguo','zhugeguo'],
-			wanglang:['wanglang','ol_wanglang','old_wanglang'],
-			tengfanglan:['dc_tengfanglan','tengfanglan'],
+			puyuan:['ol_puyuan','puyuan'],
+			huangzu:['huangzu','dc_huangzu'],
+			huojun:['huojun','dc_huojun','tw_huojun'],
+			zhaoyǎn:['zhaoyǎn','dc_zhaoyǎn'],
+			furong:['ol_furong','furong','tw_furong'],
+			daxiaoqiao:['daxiaoqiao','dc_daxiaoqiao','tw_daxiaoqiao'],
+			zhugeguo:['zhugeguo','tw_zhugeguo'],
+			wanglang:['ol_wanglang','wanglang','old_wanglang'],
+			tengfanglan:['tengfanglan','dc_tengfanglan'],
 			zhangyì:['ol_zhangyì','zhangyì'],
 			yuantanyuanshang:['yuantanyuanshang','yuantanyuanxiyuanshang'],
-			ruiji:['dc_ruiji','ruiji'],
+			ruiji:['ruiji','dc_ruiji'],
 			jsp_huangyueying:['jsp_huangyueying','re_jsp_huangyueying'],
-			ganfuren:['dc_ganfuren','ganfuren'],
+			ganfuren:['ganfuren','dc_ganfuren'],
 			wenqin:['wenqin','pe_wenqin'],
 			zhouqun:['ol_zhouqun','zhouqun'],
 			qianzhao:['ol_qianzhao','qianzhao'],
@@ -24469,7 +24521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangren:'张任',
 			zoushi:'邹氏',
 			zangba:'臧霸',
-			jiling:'纪灵',
+			gz_jiling:'纪灵',
 			gz_sp_dongzhuo:'董卓',
 			gz_zhangjiao:'张角',
 			litong:'李通',
@@ -24477,74 +24529,92 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			buzhi:'步骘',
 			chenlin:'陈琳',
 			yuanshu:'SP袁术',
+			yuanshu_prefix:'SP',
 			gongsunzan:'公孙瓒',
 			sp_diaochan:'SP貂蝉',
+			sp_diaochan_prefix:'SP',
 			yangxiu:'杨修',
 			sp_zhaoyun:'SP赵云',
+			sp_zhaoyun_prefix:'SP',
 			caohong:'曹洪',
 			liuxie:'刘协',
 			xiahouba:'夏侯霸',
 			zhugejin:'诸葛瑾',
 			zhugeke:'诸葛恪',
 			guanyinping:'关银屏',
+			gz_ganfuren:'甘夫人',
 			ganfuren:'SP甘夫人',
+			ganfuren_prefix:'SP',
 			sunhao:'孙皓',
 			chengyu:'程昱',
 			simalang:'司马朗',
-			tianfeng:'田丰',
+			gz_tianfeng:'田丰',
 			sp_jiaxu:'SP贾诩',
+			sp_jiaxu_prefix:'SP',
 			maliang:'马良',
 			sp_caoren:'SP曹仁',
+			sp_caoren_prefix:'SP',
 			yuejin:'乐进',
 			mifuren:'糜夫人',
 			sp_dongzhuo:'SP董卓',
-			chendong:'陈武董袭',
-			jiangfei:'蒋琬费祎',
-			jiangqing:'蒋钦',
+			sp_dongzhuo_prefix:'SP',
+			gz_chendong:'陈武董袭',
+			gz_jiangfei:'蒋琬费祎',
+			gz_jiangqing:'蒋钦',
 			hetaihou:'何太后',
 			dingfeng:'丁奉',
 			zhangxingcai:'张星彩',
 			caoang:'曹昂',
-			kongrong:'孔融',
+			gz_kongrong:'孔融',
 			fuwan:'伏完',
 			sp_pangde:'SP庞德',
+			sp_pangde_prefix:'SP',
 			sp_sunshangxiang:'SP孙尚香',
+			sp_sunshangxiang_prefix:'SP',
 			zhugedan:'诸葛诞',
 			sp_machao:'SP马超',
+			sp_machao_prefix:'SP',
 			sp_jiangwei:'SP姜维',
-			zhangbao:'OL张宝',
+			sp_jiangwei_prefix:'SP',
+			zhangbao:'张宝',
 			yangxiou:'杨修',
 			shixie:'士燮',
 			mayunlu:'马云騄',
 			zhanglu:'张鲁',
 			wutugu:'兀突骨',
-			mateng:'马腾',
+			gz_mateng:'马腾',
 			sp_caiwenji:'SP蔡琰',
+			sp_caiwenji_prefix:'SP',
 			zhugeguo:'诸葛果',
 			lingcao:'凌操',
-			sunru:'手杀孙茹',
 			lingju:'灵雎',
 			lifeng:'李丰',
 			jsp_guanyu:'SP关羽',
+			jsp_guanyu_prefix:'SP',
 			zhuling:'朱灵',
 			sunluyu:'OL孙鲁育',
+			sunluyu_prefix:'OL',
 			hanba:'旱魃',
 			panfeng:'OL潘凤',
+			panfeng_prefix:'OL',
 			gz_panfeng:'潘凤',
 			zumao:'祖茂',
 			daxiaoqiao:'大乔小乔',
 			cuiyan:'崔琰',
 			wenpin:'文聘',
 			jsp_huangyueying:'SP黄月英',
+			jsp_huangyueying_prefix:'SP',
 			guansuo:'关索',
 			tadun:'蹋顿',
 			yanbaihu:'严虎',
 			wanglang:'王朗',
 			caochun:'曹纯',
 			dongbai:'OL董白',
+			dongbai_prefix:'OL',
 			zhaoxiang:'赵襄',
 			heqi:'贺齐',
 			kanze:'OL阚泽',
+			kanze_prefix:'OL',
 			dongyun:'董允',
 			mazhong:'马忠',
 			huangfusong:'皇甫嵩',
@@ -24564,8 +24634,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoying:"曹婴",
 			simahui:"司马徽",
 			baosanniang:"鲍三娘",
-			pangdegong:"手杀庞德公",
-			zhaotongzhaoguang:"手杀赵统赵广",
 			majun:"马钧",
 			simazhao:"司马昭",
 			wangyuanji:"王元姬",
@@ -24575,6 +24643,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hansui:'韩遂',
 			niujin:'牛金',
 			xujing:'OL许靖',
+			xujing_prefix:'OL',
 			yuantanyuanshang:'袁谭袁尚',
 			
 			xinfenyue:'奋钺',
@@ -25128,6 +25197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zlshoufu2:'授符',
 			zlshoufu_info:'出牌阶段限一次，你可摸一张牌，然后将一张手牌置于一名没有【箓】的角色的武将牌上，称为【箓】；其不能使用和打出与【箓】同类型的牌。该角色受到伤害后，或于弃牌阶段弃置至少两张与【箓】同类型的牌后，将【箓】置入弃牌堆。',
 			ol_zhangchangpu:'OL张昌蒲',
+			ol_zhangchangpu_prefix:'OL',
 			olxingshen:'省身',
 			olxingshen_info:'当你受到伤害后，你可以随机摸至多两张牌。若如此做，你获得X个“省”，且下一次发动〖严教〗展示牌时移去所有“省”并多展示等量的牌。（X为你已损失的体力值，且你至多拥有6个“省”）',
 			caoshuang:'曹爽',
@@ -25155,7 +25225,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luanfeng:'鸾凤',
 			//luanfeng_info_fullinfo:'限定技，一名角色进入濒死状态时，若其体力上限不小于你，你可令其回复至3点体力，恢复其被废除的装备栏，令其手牌补至6-X张（X为以此法恢复的装备栏数量），重置其因“改写”使用过的牌名。若该角色是你，重置你因“游龙”使用过的牌名。',
 			luanfeng_info:'限定技，一名角色进入濒死状态时，若其体力上限不小于你，你可令其回复至3点体力，恢复其被废除的装备栏，令其手牌补至6-X张（X为以此法恢复的装备栏数量）。若该角色是你，重置你因“游龙”使用过的牌名。',
-			ol_xinxianying:'辛宪英',
 			reluanzhan:'乱战',
 			reluanzhan_add:'乱战',
 			reluanzhan_remove:'乱战',
@@ -25175,6 +25244,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chengshang_info:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗得到过牌，则你可以从牌堆中获得所有与此牌花色点数相同的牌。',
 			chengshang_info_guozhan:'当你于出牌阶段内使用的牌结算完成后，若此牌未造成过伤害且此牌的目标包含其他角色且你本阶段内未因〖承赏〗得到过牌，则你可以从牌堆中获得所有与此牌花色点数相同的牌。',
 			panshu:'OL潘淑',
+			panshu_prefix:'OL',
 			weiyi:'威仪',
 			weiyi_info:'每名角色限一次。当有角色受到伤害后，你可选择：①若其体力值不小于你，则其失去1点体力。②若其体力值不大于你且其已受伤，则其回复1点体力。',
 			jinzhi:'锦织',
@@ -25183,11 +25253,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanxiao_card:'言笑',
 			yanxiao_global:'言笑',
 			yanxiao_card_info:'判定阶段开始时，你获得判定区内的所有牌。',
+			gz_huangzu:'黄祖',
 			huangzu:'OL黄祖',
+			huangzu_prefix:'OL',
 			wangong:'挽弓',
 			wangong2:'挽弓',
 			wangong_info:'锁定技，当你使用基本牌时，你获得如下效果：当你使用下一张牌时，若此牌为【杀】，则此牌无次数和距离限制且伤害+1。',
 			huangchengyan:'OL黄承彦',
+			huangchengyan_prefix:'OL',
 			guanxu:'观虚',
 			guanxu_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可将其中一张手牌与牌堆顶5张牌中的一张交换。若如此做，你弃置其手牌中3张花色相同的牌。',
 			yashi:'雅士',
@@ -25214,12 +25287,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuejian:'约俭',
 			yuejian_info:'每回合限两次。当其他角色对你使用的牌A结算结束后，你可展示所有手牌。若牌A有花色且你的手牌中没有同花色的牌，则你获得牌A对应的所有实体牌。',
 			ol_dengzhi:'OL邓芝',
+			ol_dengzhi_prefix:'OL',
 			olxiuhao:'修好',
 			olxiuhao_info:'每回合限一次。当你受到其他角色造成的伤害时，或对其他角色造成伤害时，你可防止此伤害，然后令伤害来源摸两张牌。',
 			olsujian:'素俭',
 			olsujian_given:'已分配',
 			olsujian_info:'锁定技。弃牌阶段开始前，你将此阶段的规则改为：{你选择一项：①将所有不为本回合得到的手牌分配给其他角色。②弃置这些手牌，然后弃置一名其他角色等量的牌}。',
 			ol_wangrong:'OL王荣',
+			ol_wangrong_prefix:'OL',
 			olfengzi:'丰姿',
 			olfengzi_info:'出牌阶段限一次。当你使用有目标的基本牌或普通锦囊牌时，你可弃置一张与此牌类型相同的牌，然后令此牌结算两次。',
 			oljizhan:'吉占',
@@ -25237,6 +25312,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldingcuo:'定措',
 			oldingcuo_info:'每回合限一次。当你受到或造成伤害后，你可摸两张牌。若这两张牌颜色不同，则你弃置一张手牌。',
 			fengfangnv:'OL冯妤',
+			fengfangnv_prefix:'OL',
 			zhuangshu:'妆梳',
 			zhuangshu_info:'①游戏开始时，你可将{【琼梳】，【犀梳】，【金梳】}中的一张牌置于装备区。②一名角色的回合开始时，若其宝物区为空，则你可以弃置一张牌，并根据此牌的类型，按如下关系将一张宝物牌置入该角色的装备区：{<基本牌,【琼梳】>，<锦囊牌，【犀梳】>，<装备牌，【金梳】>}。',
 			chuiti:'垂涕',
@@ -25257,15 +25333,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzaowang2:'造王',
 			olzaowang_info:'限定技。出牌阶段，你可以令一名角色加1点体力上限，回复1点体力并摸三张牌，且获得如下效果：主公死亡时，若其身份为忠臣，则其和主公交换身份牌；其死亡时，若其身份为反贼且伤害来源的身份为主公或忠臣，则以主忠胜利结束本局游戏。',
 			sp_ol_zhanghe:'SP张郃',
+			sp_ol_zhanghe_prefix:'SP',
 			spolzhouxuan:'周旋',
 			spolzhouxuan_info:'①弃牌阶段开始时，你可将任意张置于武将牌上，称为“旋”（你至多拥有五张“旋”）。②当你使用牌时，你随机将一张“旋”置入弃牌堆，然后摸一张牌（若你的手牌数不为全场唯一最多则额外摸X张牌，X为“旋”数）。③出牌阶段结束时，你将所有“旋”置入弃牌堆。',
 			wuyan:'吾彦',
 			lanjiang:'澜疆',
 			lanjiang_info:'结束阶段，你可以选择所有手牌数不小于你的角色。这些角色依次选择是否令你摸一张牌。然后你可以对其中一名手牌数等于你的角色造成1点伤害，随后可以对其中一名手牌数小于你的角色摸一张牌。',
 			ol_zhuling:'OL朱灵',
+			ol_zhuling_prefix:'OL',
 			jixian:'急陷',
 			jixian_info:'摸牌阶段结束时，你可以选择一名满足以下至少一项条件的角色：⒈装备区内有防具牌；⒉拥有的普通技能数大于你；⒊体力值等于体力上限。你视为对其使用一张【杀】，然后摸X张牌（X为其于此【杀】结算前满足的条件数）；若此【杀】未造成伤害，则你失去1点体力。',
 			ol_chendeng:'OL陈登',
+			ol_chendeng_prefix:'OL',
 			olfengji:'丰积',
 			olfengji_info:'摸牌阶段开始时，你选择：⒈本回合摸牌阶段的额定摸牌数-1，且令一名其他角色下回合摸牌阶段的额定摸牌数+2；⒉本回合摸牌阶段的额定摸牌数+1。然后你选择：⒈本回合使用【杀】的次数上限-1，且令一名其他角色下回合使用【杀】的次数上限+2；⒉本回合使用【杀】的次数上限+1。',
 			tianyu:'田豫',
@@ -25285,11 +25364,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qhzhangji:'长姬',
 			qhzhangji_info:'一名角色的回合结束时，若你本回合内：造成过伤害，则你可以令其摸两张牌；受到过伤害，则你可以令其弃置两张牌。',
 			sp_menghuo:'SP孟获',
+			sp_menghuo_prefix:'SP',
 			spmanwang:'蛮王',
 			spmanwang_info:'出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：⒈获得〖叛侵〗。⒉摸一张牌。⒊回复1点体力。⒋摸两张牌并失去〖叛侵〗。',
 			sppanqin:'叛侵',
 			sppanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌被使用时对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项。',
 			tengfanglan:'OL滕芳兰',
+			tengfanglan_prefix:'OL',
 			luochong:'落宠',
 			luochong_info:'准备阶段开始时/当你于一回合内首次受到伤害后，你可选择本轮内未选择过的一项（每名角色每轮限选一次）：⒈令一名角色回复1点体力。⒉令一名角色失去1点体力。⒊令一名角色弃置两张牌。⒋令一名角色摸两张牌。',
 			aichen:'哀尘',
@@ -25300,6 +25381,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liejie:'烈节',
 			liejie_info:'当你受到伤害后，你可以弃置至多三张牌，摸等量的牌，然后可弃置伤害来源的至多X张牌（X为你以此法弃置的红色牌的数量）。',
 			ruiji:'OL芮姬',
+			ruiji_prefix:'OL',
 			qiaoli:'巧力',
 			qiaoli_info:'出牌阶段各限一次，你可以将一张武器牌/非武器装备牌当作【决斗】使用。若此【决斗】对应的实体牌为武器牌，当你以此【决斗】对目标角色造成伤害后，你摸X张牌（X为此牌的攻击范围），且可以将其中任意张牌分配给其他角色；若此【决斗】对应的实体牌不为武器牌，此牌不可被响应，且你于结束阶段从牌堆中获得一张装备牌。',
 			qiaoli_given:'已分配',
@@ -25338,6 +25420,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuwangzhimian:'虚妄之冕',
 			xuwangzhimian_info:'锁定技，摸牌阶段，你令额定摸牌数+2；你的手牌上限-1。',
 			ol_puyuan:'OL蒲元',
+			ol_puyuan_prefix:'OL',
 			olshengong:'神工',
 			olshengong_info:'出牌阶段每项限一次。你可以弃置一张武器牌/防具牌/其他装备牌，并发起一次“锻造”。然后你从锻造结果中选择一张牌，置于一名角色的装备区内（可替换原装备）。当有因你发动〖神工〗而加入游戏的牌进入弃牌堆后，你将此牌移出游戏，然后你于当前回合结束后摸一张牌。',
 			olqisi:'奇思',
@@ -25345,11 +25428,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzhuiji:'追击',
 			olzhuiji_info:'锁定技。①你至体力值不大于你的角色的距离为1。②当你使用【杀】指定距离为1的角色为目标后，你令其选择一项：⒈弃置一张牌。⒉重铸装备区内的所有牌。',
 			zhaoyǎn:'OL赵俨',
+			zhaoyǎn_prefix:'OL',
 			tongxie:'同协',
 			tongxie_info:'出牌阶段开始时，你可以选择包括你在内的至多三名角色（你与这些角色均称为“同协角色”）。这些角色中手牌数唯一最少的角色摸一张牌，且你获得如下效果直到你下回合开始：①当有“同协角色”对唯一目标角色使用的【杀】结算结束后，其他“同协角色”可以依次对目标角色使用一张【杀】（无距离和次数限制，且不能再触发此效果）。②当有“同协角色”受到伤害时，其他“同协角色”（本回合内失去过体力的角色除外）可以防止此伤害，失去1点体力。',
 			jin_zhouchu:'周处',
 			shanduan:'善断',
-			shanduan_info:'锁定技。①回合开始时，你生成数组R=[1,2,3,4]。②摸牌阶段开始时，你从数组R中选择并移除一个数字A。你本阶段的额定摸牌数改为A。③出牌阶段开始时，你从数组R中选择并移除两个数字B和C。你将你本阶段内的攻击范围基数最小值和使用【杀】的次数上限基础值改为B和C。④弃牌阶段开始时，你从数组R中选择并移除一个数字D。你令你本回合的手牌上限基数改为D。⑤当你于回合外受到伤害后，你令下回合生成的R中最小的一个数字+1。',
+			shanduan_info:'锁定技。①摸牌/出牌/弃牌阶段开始时，你为本回合摸牌阶段摸牌数/攻击范围和使用【杀】的限制次数/手牌上限的默认值从数组R=[1，2，3，4]中分配数值。②当你于回合外受到伤害后，你令下回合〖善断①〗以此法分配的数值集合R中的最小值+1。',
 			yilie:'义烈',
 			yilie_info:'每轮每种牌名限一次。你可以将两张颜色相同的手牌当做任意一种基本牌使用。',
 			caoxiancaohua:'曹宪曹华',
@@ -25362,6 +25446,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jisi:'羁肆',
 			jisi_info:'限定技。准备阶段，你可以令一名其他角色获得你武将牌上的一个已发动过的其他技能。然后你弃置所有手牌，并视为对其使用一张【杀】（无距离关系的限制）。',
 			huojun:'OL霍峻',
+			huojun_prefix:'OL',
 			qiongshou:'穷守',
 			qiongshou_info:'锁定技。①游戏开始时，你废除所有装备栏并摸四张牌。②你的手牌上限+4。',
 			fenrui:'奋锐',
@@ -25397,6 +25482,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jueman:'蟨蛮',
 			jueman_info:'锁定技。一名角色的回合结束时，若本回合被使用过的基本牌数不小于2，且前两张基本牌的使用者：均不为你，你视为使用本回合被使用的第三张基本牌；有且仅有其中之一为你，你摸一张牌。',
 			ol_liuba:'OL刘巴',
+			ol_liuba_prefix:'OL',
 			oltongduo:'统度',
 			oltongduo_info:'准备阶段，你可以令一名角色交给你一张手牌，然后出牌阶段结束时，你将此牌置于牌堆顶。',
 			olzhubi:'铸币',
@@ -25440,9 +25526,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rekenshang:'垦伤',
 			rekenshang_info:'你可以将至少两张牌当【杀】使用，然后你可以将此牌目标改为等量名角色。此牌结算结束后，若此牌对应的实体牌数大于此牌造成过的伤害值，你摸一张牌。',
 			ol_zhujun:'OL朱儁',
+			ol_zhujun_prefix:'OL',
 			olcuipo:'摧破',
 			olcuipo_info:'锁定技。当你使用牌时，若此牌是你本回合使用的第X张牌（X为此牌牌名的字数），则：{若此牌为【杀】或伤害类锦囊牌，则此牌的伤害值基数+1，否则你摸一张牌}。',
 			ol_zhangyì:'OL张翼',
+			ol_zhangyì_prefix:'OL',
 			oldianjun:'殿军',
 			oldianjun_info:'锁定技。回合结束时，你受到1点无来源伤害，然后执行一个额外的出牌阶段。',
 			olkangrui:'亢锐',
@@ -25454,6 +25542,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olshilu:'失路',
 			olshilu_info:'锁定技。当你受到伤害后，你摸X张牌（X为你的体力值且至多为5）。然后你展示攻击范围内一名角色的一张手牌，令此牌的牌名视为【杀】。',
 			ol_huban:'OL胡班',
+			ol_huban_prefix:'OL',
 			olhuiyun:'晖云',
 			olhuiyun_tag:'invisible',
 			olhuiyun_info:'每轮每项各限一次。你可以将一张牌当【火攻】使用。此牌结算结束后，你选择一项，令目标角色选择是否执行：1.使用展示的牌，然后重铸所有手牌；2.使用一张手牌，然后重铸展示牌；3.摸一张牌。',
@@ -25477,6 +25566,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olleijie:'雷劫',
 			olleijie_info:'准备阶段，你可以令一名角色判定，若结果为♠2~9，其受到2点雷电伤害，否则其摸两张牌。',
 			ol_liuyan:'OL刘焉',
+			ol_liuyan_prefix:'OL',
 			olpianan:'偏安',
 			olpianan_info:'锁定技。游戏开始或弃牌阶段结束时，你弃置所有不为【闪】的手牌（没有则不弃）。若你的手牌数小于体力值，你获得牌堆或弃牌堆中的前X张【闪】（X为你的体力值与手牌数的差）。',
 			olyinji:'殷积',
@@ -25484,9 +25574,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olkuisi:'窥伺',
 			olkuisi_info:'锁定技。摸牌阶段开始时，你跳过此阶段，然后观看牌堆顶的四张牌并可以使用其中任意张。若你以此法使用的牌数不为2或3，你减1点体力上限。',
 			ol_wanglang:'OL王朗',
+			ol_wanglang_prefix:'OL',
 			oljici:'激词',
 			oljici_info:'当你的拼点牌亮出后，若点数不大于X，你可令点数+X并令〖鼓舌〗视为未发动过（X为你的“饶舌”标记数）。',
 			ol_mengda:'OL孟达',
+			ol_mengda_prefix:'OL',
 			olgoude:'苟得',
 			olgoude_info:'一名角色的回合结束时，若有与你势力相同的角色执行过以下项，则你可以执行这些角色未执行过的一项：1.摸一张牌；2.弃置一名角色的一张手牌；3.使用一张无对应实体牌的【杀】；4.变更势力。',
 			haopu:'郝普',
@@ -25532,6 +25624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olkuansai:'款塞',
 			olkuansai_info:'当一张牌指定第一个目标后，若目标数大于你的体力值，你可以令其中一个目标选择一项：1.交给你一张牌；2.令你回复1点体力。',
 			ol_luyusheng:'OL陆郁生',
+			ol_luyusheng_prefix:'OL',
 			olcangxin:'藏心',
 			olcangxin_info:'锁定技。①当你受到伤害时，你观看牌堆底的三张牌并弃置其中任意张牌，若你以此法弃置了红桃牌，则防止此伤害。②摸牌阶段开始时，你展示牌堆底的三张牌，然后摸X张牌（X为其中红桃牌的数量）。',
 			olrunwei:'润微',
@@ -25542,6 +25635,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oljianxuan:'谏旋',
 			oljianxuan_info:'当你受到伤害后，你可以令一名角色摸一张牌，然后若其手牌数等于你〖刚述①〗中的任意一项对应的数值，其重复此流程。',
 			ol_pengyang:'OL彭羕',
+			ol_pengyang_prefix:'OL',
 			olqifan:'器翻',
 			olqifan_info:'当你需要使用不为【无懈可击】的牌时，你可以观看牌堆底的X+1张牌并使用其中的一张。此牌结算结束时，你依次弃置以下前X个区域中的所有牌：⒈判定区、⒉装备区、⒊手牌区（X为你因此技能使用过的牌中包含的类型数）。',
 			oltuishi:'侻失',

@@ -781,7 +781,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(card.name=='sha'){
 								var equip1=player.getEquip('zhuque');
 								if(equip1&&equip1.name=='zhuque') return 1.9;
-								if(!card.hasNature()) return 'zerotarget';
+								if(!game.hasNature(card)) return 'zerotarget';
 							}
 						}
 					}
@@ -810,7 +810,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target,current){
 							if(card.name=='sha'){
-								if(card.hasNature('fire')) return 2;
+								if(game.hasNature(card,'fire')) return 2;
 								if(player.hasSkill('zhuque_skill')) return 1.9;
 							}
 							if(get.tag(card,'fireDamage')&&current<0) return 2;
@@ -830,7 +830,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:player,
 						card:event.card
 					})) return false;
-					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
+					if(event.card.name=='sha'&&!game.hasNature(event.card)) return true;
 					return false;
 				},
 				content:function(){
@@ -906,7 +906,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard1'},
 				//priority:7,
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
+					if(event.card.name=='sha'&&!game.hasNature(event.card)) return true;
 				},
 				audio:true,
 				check:function(event,player){

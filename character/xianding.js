@@ -133,7 +133,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 3'
-					var list=[];
+					var list=[],shown=[]
 					var piles=['cardPile','discardPile'];
 					for(var pile of piles){
 						for(var i=0;i<ui[pile].childNodes.length;i++){
@@ -141,19 +141,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var number=get.number(card,false);
 							if(!list.contains(card)&&number==8){
 								list.push(card);
-								if(list.length==cards.length) break;
+								if(pile=='discardPile') shown.push(card);
+								if(list.length>=cards.length) break;
 							}
 						}
+						if(list.length>=cards.length) break;
 					}
 					if(list.length){
-						player.gain(list,'gain2').gaintag.add('dcxiongmu_tag');
-						player.addSkill('dcxiongmu_tag');
+						var next=player.gain(list);
+						next.shown_cards=shown;
+						next.set('animate',function(event){
+							var player=event.player,cards=event.cards,shown=event.shown_cards;
+							if(shown.length<cards.length){
+								var num=cards.length-shown.length;
+								player.$draw(num);
+								game.log(player,'从牌堆获得了',num,'张点数为8的牌');
+							}
+							if(shown.length>0){
+								player.$gain2(shown,false);
+								game.log(player,'从弃牌堆获得了',shown);
+							}
+							return 500;
+						});
+						next.gaintag.add('dcxiongmu_tag');
+						player.addTempSkill('dcxiongmu_tag','roundStart');
 					}
 				},
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(target.countCards('h')>=target.getHp()||player.hasSkillTag('jueqing')) return;
+							if(target.countCards('h')>target.getHp()||player.hasSkillTag('jueqing')) return;
 							if(player._dcxiongmu_temp) return;
 							if(_status.event.getParent('useCard',true)||_status.event.getParent('_wuxie',true)) return;
 							if(get.tag(card,'damage')){
@@ -198,9 +215,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					minus:{
+						audio:'dcxiongmu',
 						trigger:{player:'damageBegin4'},
 						filter:function(event,player){
-							return player.countCards('h')<player.hp&&game.getGlobalHistory('everything',evt=>{
+							return player.countCards('h')<=player.getHp()&&game.getGlobalHistory('everything',evt=>{
 								return evt.name=='damage'&&evt.player==player;
 							},event).indexOf(event)==0;
 						},
@@ -3687,7 +3705,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var card={name:event.list.shift(),isCard:true};
-					if(player.canUse(card,target,false)) player.useCard(card,target,false);
+					if(target.isIn()&&player.canUse(card,target,false)) player.useCard(card,target,false);
 					if(event.list.length) event.redo();
 					'step 3'
 					player.removeSkill('dccansi_draw');
@@ -3801,7 +3819,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var num=ui.selected.buttons.filter(i=>get.owner(i.link)==target).length;
 						var val=get.buttonValue(button);
 						if(num>2) val/=Math.sqrt(num);
-						if(get.attitude(player,owner)>0) return -val;
+						if(get.attitude(player,target)>0) return -val;
 						return val;
 						//return -(get.position(card)!='h'?get.value(card,target):(4.5+Math.random()-0.2*(num>2?1:0)))*get.attitude(player,target);
 					});
@@ -6302,7 +6320,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.list=list;
 					player.draw(list[0]);
 					'step 1'
-					player.storage.dchuishu_effect=event.list[2];
 					player.addTempSkill('dchuishu_effect');
 					player.chooseToDiscard('h',true,event.list[1]);
 				},
@@ -6315,22 +6332,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					content:function(storage,player){
 						var list=lib.skill.dchuishu.getList(player);
-						return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得等同于本回合弃牌数的非基本牌。';
+						return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中获得['+list[2]+']张非基本牌。';
 					},
 				},
 				subSkill:{
 					effect:{
+						charlotte:true,
 						audio:'dchuishu',
 						trigger:{
 							player:'loseAfter',
 							global:'loseAsyncAfter',
 						},
-						forced:true,
-						popup:false,
-						charlotte:true,
-						onremove:true,
 						filter:function(event,player){
-							var num=player.storage.dchuishu_effect;
+							var num=lib.skill.dchuishu.getList(player)[2];
 							if(typeof num!='number') return false;
 							if(event.type!='discard'||event.getlx===false) return false;
 							var evt=event.getl(player);
@@ -6346,14 +6360,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							return prev>num;
 						},
+						forced:true,
+						popup:false,
+						firstDo:true,
 						content:function(){
-							player.removeSkill('dchuishu_effect');
-							var evt=trigger.getl(player);
-							var num=0;
-							player.getHistory('lose',function(evt){
-								if(evt.type!='discard') return false;
-								num+=evt.cards2.length;
-							});
+							var num=lib.skill.dchuishu.getList(player)[2];
 							var cards=[];
 							for(var i=0;i<num;i++){
 								var card=get.discardPile(function(card){
@@ -11806,6 +11817,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('zhafu_hf');
 					target.addMark('zhafu_hf',1);
 				},
+				ai:{
+					order:1,
+					result:{
+						player:function(player,target){
+							return Math.max(0,1+target.countCards('h')-game.countPlayer(current=>{
+								if(get.attitude(target,current)>0) return 0.3;
+								if(target.hasJudge('lebu')) return 0.6;
+								if(target.inRange(current)) return 1.5;
+								return 1;
+							}));
+						},
+						target:function(player,target){
+							return -Math.max(0,1+target.countCards('h')-game.countPlayer(current=>{
+								if(get.attitude(target,current)>0) return 0.3;
+								if(target.hasJudge('lebu')) return 0.6;
+								if(target.inRange(current)) return 1.5;
+								return 1;
+							}));
+						}
+					}
+				},
 				subSkill:{
 					hf:{
 						trigger:{
@@ -12179,7 +12211,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dchuishu:function(player){
 				var list=lib.skill.dchuishu.getList(player);
-				return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中随机获得等同于本回合弃牌数的非基本牌。';
+				return '摸牌阶段结束时，你可以摸['+list[0]+']张牌。若如此做：你弃置['+list[1]+']张手牌，且当你于本回合内弃置第['+list[2]+']+1张牌后，你从弃牌堆中随机获得〖慧淑〗第三个括号数字张非基本牌。';
 			},
 			dcshoutan:function(player){
 				if(player.storage.dcshoutan) return '转换技。出牌阶段限一次，阴：你可以弃置一张不为黑色的手牌。<span class="bluetext">阳：你可以弃置一张黑色手牌。</span>';
@@ -12198,9 +12230,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gexuan:['gexuan','tw_gexuan'],
 			panshu:['panshu','re_panshu'],
 			yangwan:['yangwan','sp_yangwan'],
-			sunyi:['re_sunyi','tw_sunyi','sunyi'],
-			fengfangnv:['re_fengfangnv','fengfangnv'],
-			luotong:['luotong','dc_luotong'],
+			sunyi:['re_sunyi','sunyi','tw_sunyi'],
+			fengfangnv:['fengfangnv','re_fengfangnv'],
+			luotong:['dc_luotong','luotong'],
 			dc_wangchang:['dc_wangchang','tw_wangchang'],
 			guozhao:['guozhao','xin_guozhao'],
 		},
@@ -12287,6 +12319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuwei:'余威',
 			yuwei_info:'主公技，锁定技，其他群雄角色的回合内，你将〖诗怨〗改为“每回合每项限两次”。',
 			re_xinxianying:'新杀辛宪英',
+			re_xinxianying_prefix:'新杀',
 			rezhongjian:'忠鉴',
 			rezhongjian2:'忠鉴',
 			rezhongjian_info:'出牌阶段限一次，你可以选择一名本回合内未选择过的角色。你令其获得一项效果直至你的下回合开始：①其下次造成伤害后弃置两张牌，然后你摸一张牌。②其下次受到伤害后摸两张牌，然后你摸一张牌。',
@@ -12345,7 +12378,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			syjiqiao_info:'出牌阶段开始时，你可将牌堆顶的X张牌置于你的武将牌上（X为你的体力上限）。当你于此出牌阶段内使用的牌结算结束后，你可以获得其中的一张牌，然后若剩余牌中红色牌和黑色牌的数量：不相等，你失去1点体力；相等，你回复1点体力。出牌阶段结束时，你将这些牌置入弃牌堆。',
 			syxiongyi:'凶疑',
 			syxiongyi_info:'限定技。当你处于濒死状态时，若剩余武将牌堆中：有“徐氏”，则你可以将体力值回复至3点，并将此武将牌替换为“徐氏”；没有“徐氏”，则你可以将体力值回复至1点并获得〖魂姿〗。',
-			re_zhangbao:'张宝',
+			re_zhangbao:'新杀张宝',
+			re_zhangbao_prefix:'新杀',
 			xinzhoufu:'咒缚',
 			xinzhoufu2:'咒缚',
 			xinzhoufu_info:'出牌阶段限一次。你可以将一张手牌置于一名其他角色的武将牌上并称为“咒”，且当其判定时，将其“咒”作为判定牌。',
@@ -12387,7 +12421,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjinggong_info:'你可以将一张装备牌当做无距离限制的【杀】使用。当你声明使用此【杀】后，你将此杀的伤害值基数改为X（X为你至此【杀】第一个目标角色的距离且至多为5）。',
 			dcxiaojuan:'骁隽',
 			dcxiaojuan_info:'当你使用牌指定其他角色为唯一目标后，你可以弃置其一半的手牌（向下取整）。若这些牌中有与你使用牌花色相同的牌，则你弃置一张手牌。',
-			dc_liuyu:'刘虞',
+			dc_liuyu:'新杀刘虞',
+			dc_liuyu_prefix:'新杀',
 			dcsuifu:'绥抚',
 			dcsuifu_info:'其他角色的结束阶段开始时，若你和一号位本回合内累计受到过的伤害值大于1，则你可以将该角色的所有手牌置于牌堆顶，然后视为使用一张【五谷丰登】。',
 			dcpijing:'辟境',
@@ -12436,7 +12471,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcpeiqi_info:'当你受到伤害后，你可以移动场上的一张牌。然后若场上所有角色均在彼此的攻击范围内，则你可以再移动场上的一张牌。',
 			quanhuijie:'全惠解',
 			dchuishu:'慧淑',
-			dchuishu_info:'摸牌阶段结束时，你可以摸[3]张牌。若如此做：你弃置[1]张手牌，且当你于本回合内弃置第[2]+1张牌后，你从弃牌堆中随机获得等同于本回合弃牌数的非基本牌。',
+			dchuishu_info:'摸牌阶段结束时，你可以摸[3]张牌。若如此做：你弃置[1]张手牌，且当你于本回合内弃置第[2]+1张牌后，你从弃牌堆中随机获得〖慧淑〗第三个括号数字张非基本牌。',
 			dcyishu:'易数',
 			dcyishu_info:'锁定技。当你不因出牌阶段而失去牌后，你同时令{〖慧淑〗的中括号内最小的一个数字+2}且{〖慧淑〗的中括号内最大的一个数字-1}。',
 			dcligong:'离宫',
@@ -12509,7 +12544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhanmeng:'占梦',
 			dczhanmeng_info:'当你使用牌时，你可以选择本回合未选择过的一项：1.上一回合内，若没有同名牌被使用过，你获得一张非伤害牌；2.下一回合内，当同名牌首次被使用后，你获得一张伤害牌；3.令一名其他角色弃置两张牌，若点数之和大于10，你对其造成1点火焰伤害。',
 			dc_wangyun:'新杀王允',
-			dc_wangyun_ab:'王允',
+			dc_wangyun_prefix:'新杀',
 			dclianji:'连计',
 			dclianji_info:'出牌阶段限一次。你可以弃置一张手牌并选择一名其他角色，其随机使用牌堆中的一张武器牌，然后其选择一项：1.对另一名其他角色使用一张【杀】，并将武器牌交给其中一个目标；2.令你视为对其使用一张【杀】，并将武器牌交给你。',
 			dcmoucheng:'谋逞',
@@ -12585,6 +12620,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dchuayi:'华衣',
 			dchuayi_info:'结束阶段，你可以判定，然后你获得如下效果直到你下回合开始时：红色，其他角色回合结束时，你摸一张牌；黑色，当你受到伤害后，你摸两张牌。',
 			wu_zhugeliang:'武诸葛亮',
+			wu_zhugeliang_prefix:'武',
 			dcjincui:'尽瘁',
 			dcjincui_info:'锁定技。①游戏开始时，你将手牌摸至七张。②准备阶段，你将体力值回复或失去至等同于牌堆中点数为7的牌数（你的体力值最低因此调整至1）。然后你观看牌堆顶X张牌，将这些牌以任意顺序置于牌堆顶或牌堆底（X为你的体力值）。',
 			dcqingshi:'情势',
@@ -12643,16 +12679,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcxiaoren:'绡刃',
 			dcxiaoren_info:'每回合限一次，当你造成伤害后，你可以进行判定，若结果为：红色，你可以令一名角色回复1点体力；黑色，你可以对受伤角色的上家或下家造成1点伤害，然后你可以重复此方向的伤害流程直到有角色因此死亡或下个目标角色为你。',
 			dc_daxiaoqiao:'新杀大乔小乔',
+			dc_daxiaoqiao_prefix:'新杀',
 			dcxingwu:'星舞',
 			dcxingwu_info:'弃牌阶段开始时，你可以将一张手牌置于武将牌上，称为“星舞”。若你的“星舞”牌达到三张，则你可移去三张“星舞”，弃置一名其他角色装备区里的所有牌，然后对其造成X点伤害（X为移去的“星舞”牌的花色数，若为女性角色则改为1点伤害）。',
 			dcluoyan:'落雁',
 			dcluoyan_info:'锁定技，若你有“星舞”牌，你视为拥有技能〖天香〗和〖流离〗。',
 			dc_xiahouba:'新杀夏侯霸',
+			dc_xiahouba_prefix:'新杀',
 			old_huangfusong:'新杀皇甫嵩',
+			old_huangfusong_prefix:'新杀',
 			dc_sp_machao:'群马超',
+			dc_sp_machao_prefix:'群',
 			dc_shixie:'新杀士燮',
+			dc_shixie_prefix:'新杀',
 			ol_guansuo:'新杀关索',
+			ol_guansuo_prefix:'新杀',
 			dc_zhaoxiang:'新杀赵襄',
+			dc_zhaoxiang_prefix:'新杀',
 			dc_xujing:'许靖',
 			dcshangyu:'赏誉',
 			dcshangyu_tag:'赏誉',
@@ -12660,6 +12703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dccaixia:'才瑕',
 			dccaixia_info:'当你造成或受到伤害后，若你没有“瑕”，你可以摸至多X张牌并获得X枚“瑕”，然后当你使用牌时，移去1枚“瑕”（X为本局游戏总角色数且至多为5）。',
 			wu_luxun:'武陆逊',
+			wu_luxun_prefix:'武',
 			dcxiongmu:'雄幕',
 			dcxiongmu_tag:'雄幕',
 			dcxiongmu_info:'①一轮游戏开始时，你可以将手牌摸至体力上限（若手牌数不小于体力上限则跳过），然后将任意张牌随机置入牌堆，从牌堆或弃牌堆中获得等量的点数为8的牌，且这些牌不计入手牌上限。②当你于一回合首次受到伤害时，若你的手牌数不大于你的体力值，此伤害-1。',

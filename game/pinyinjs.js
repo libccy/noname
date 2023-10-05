@@ -7,8 +7,6 @@ var pinyin_dict_polyphone = {
 	// noname's pinyin
 	// START
 	// 武将名
-	"乐蔡琰": "yuè  ",
-	"乐周妃": "yuè  fēi",
 	"用间": " jiàn",
 	
 	"乐进": "yuè ",
@@ -41583,17 +41581,21 @@ var pinyin_dict_withtone = "yī,dīng zhēng,kǎo qiǎo yú,qī,shàng,xià,hǎn
 			}
 			return result;
 		}
-		for (var i = 0; i < chinese.length; i++) {
+		var m=0;
+		for (var i = 0; i < chinese.length;(i++,m++)) {
 			temp = '';
 			for (var j = 0; j < max && (i + j) < chinese.length; j++) {
-				if (!/^[\u2E80-\u9FFF]+$/.test(chinese[i + j])) break; // 如果碰到非汉字直接停止本次查找
+				if (!dict.withtone[chinese[i]]) {
+					i+=(result[i].length-1);
+					break;
+				} // 如果碰到非汉字直接停止本次查找
 				temp += chinese[i + j];
 				var res = poly[temp];
 				if (res) // 如果找到了多音字词语
 				{
 					res = res.split(' ');
 					for (var k = 0; k <= j; k++) {
-						if (res[k]) result[i + k] = withtone ? res[k] : pinyinUtilx.removeTone(res[k]);
+						if (res[k]) result[m + k] = withtone ? res[k] : pinyinUtilx.removeTone(res[k]);
 					}
 					break;
 				}

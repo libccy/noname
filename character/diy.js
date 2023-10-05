@@ -178,6 +178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_chengpu:['male','wu',4,['decadelihuo','decadechunlao']],
 			ns_sundeng:['male','wu',4,['xinkuangbi']],
 			ns_duji:['male','wei',3,['xinfu_andong','xinyingshi']],
+			old_majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"],[]],
 			
 			old_jiakui:['male','wei',4,['tongqu','xinwanlan']],
 			ol_guohuai:['male','wei',3,['rejingce']],
@@ -220,7 +221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
 				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu",'ns_sundeng','ns_duji'],
 				diy_xushi:["diy_feishi","diy_hanlong","diy_liufu","diy_liuyan","diy_liuzan","diy_tianyu","diy_xizhenxihong","diy_yangyi","diy_zaozhirenjun"],
-				diy_default:["diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji"],
+				diy_default:["diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","old_majun"],
 				diy_noname:['noname'],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano","db_key_liyingxia","key_erika","key_satomi","key_iriya","key_fuuko"],
 				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','old_bulianshi','junk_sunquan','ol_maliang','junk_liubei','junk_huangyueying','junk_lidian','junk_duanwei','junk_xuyou'],
@@ -13988,7 +13989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-					get.translation(trigger.player.judging[0])+'，'+get.prompt('guidao'),'he',function(card){
+					get.translation(trigger.player.judging[0])+'，'+get.prompt('nswangfeng'),'he',function(card){
 						return get.color(card)=='red';
 					}).set('ai',function(card){
 						var trigger=_status.event.getTrigger();
@@ -17051,7 +17052,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			diy_jiaoxia:{
-				audio:['jiaoxia',2],
+				//audio:['jiaoxia',2],
 				trigger:{target:'useCardToBegin'},
 				filter:function(event,player){
 					return event.card&&get.color(event.card)=='red';
@@ -18049,6 +18050,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_nanhua_left:'幻身·左',
 			ns_nanhua_right:'幻身·右',
 			ns_huamulan:'SP花木兰',
+			ns_huamulan_prefix:'SP',
 			ns_huangzu:'黄祖',
 			ns_yanliang:'颜良',
 			ns_wenchou:'文丑',
@@ -18059,6 +18061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_wangyue:'王越',
 			ns_yuji:'于吉',
 			ns_caocaosp:'SP曹操',
+			ns_caocaosp_prefix:'SP',
 			ns_xinxianying:'辛宪英',
 			ns_sunjian:'孙坚',
 			ns_simazhao:'司马昭',
@@ -18079,6 +18082,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_luyusheng:'陆郁生',
 			
 			sp_key_yuri:'SP仲村由理',
+			sp_key_yuri_prefix:'SP',
 			key_lucia:'此花露西娅',
 			key_kyousuke:'枣恭介',
 			key_yuri:'仲村由理',
@@ -18119,6 +18123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_ao:'空门苍',
 			key_yuzuru:'音无结弦',
 			sp_key_kanade:'SP立华奏',
+			sp_key_kanade_prefix:'SP',
 			key_mio:'西园美鱼',
 			key_midori:'西园美鸟',
 			key_kyoko:'岬镜子',
@@ -18613,7 +18618,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			seira_yuanying_info:'出牌阶段限一次，你可选择两名角色。这两名角色成为“姻缘者”且获得〖姻缘〗直到你下次发动〖缘映〗。',
 			seira_yinyuan:'姻缘',
 			seira_yinyuan_info:'你的手牌对其他“姻缘者”可见。出牌阶段限一次，你可以获得一名其他“姻缘者”区域内的一张牌，然后其回复1点体力。',
-			key_kiyu:'露娜Q',
+			key_kiyu:'露娜Ｑ',
 			kiyu_yuling:'玉灵',
 			kiyu_yuling_info:'锁定技。你不是有距离限制的锦囊牌的合法目标；你成为【杀】的目标后，使用者需弃置X张牌（X为其至你的距离）。',
 			kiyu_xianyu:'先预',
@@ -18971,8 +18976,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nshanlang:'酣浪',
 			nshanlang_info:'准备阶段，你可以和至多三名角色拼点。然后若这些角色中有拼点牌唯一最大的角色，则你可以令该角色从牌堆中获得一张不符合“四象天阵”的牌。',
 			
-			junk_zhangrang:'四花张让',
-			junk_zhangrang_ab:'张让',
 			junktaoluan:'滔乱',
 			junktaoluan3:'滔乱',
 			junktaoluan4:'滔乱',
@@ -18992,12 +18995,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junkquandao_info:'锁定技。当你使用【杀】或普通锦囊牌时，若你手牌中的【杀】或普通锦囊牌的数量之差X不为0，则你弃置X张数量较多的一种牌，然后你摸一张牌。',
 			junkchigang:'持纲',
 			junkchigang_info:'转换技，锁定技。判定阶段开始前，你取消此阶段。然后你获得一个额外的：阴，摸牌阶段；阳，出牌阶段。',
-			junk_liubei:'削弱刘备',
-			junk_liubei_ab:'刘备',
 			junkrende:'仁德',
 			junkrende_info:'出牌阶段限一次，你可以将任意张手牌交给其他角色。若你给出的牌多于一张，则你回复1点体力。',
-			junk_huangyueying:'削弱黄月英',
-			junk_huangyueying_ab:'黄月英',
 			junkjizhi:'集智',
 			junkjizhi_info:'当你使用非转化的普通锦囊牌时，你可以展示牌堆顶的一张牌A。若A不为基本牌，则你获得A。否则你选择一项：⒈将A置入弃牌堆。⒉将一张手牌置于牌堆顶，然后获得A。',
 			junkqicai:'奇才',
@@ -19009,19 +19008,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junklangmie_info:'其他角色的结束阶段开始时，你可以选择一项：⒈若其本回合内使用过某种类型的牌超过一张，则你弃置一张牌并摸两张牌。⒉若其本回合累计造成过的伤害大于1，则你弃置一张牌，然后对其造成1点伤害。',
 			junkshicai:"恃才",
 			junkshicai_info:"当你使用牌结束完毕后，若此牌与你本回合使用的牌类型均不同，则你可以将此牌置于牌堆顶，然后摸一张牌。",
-			ol_guohuai_ab:'郭淮',
-			old_jiakui:'通渠贾逵',
-			ol_guohuai:'三血郭淮',
-			old_jiakui_ab:'贾逵',
-			old_bulianshi_ab:'步练师',
-			old_bulianshi:'削弱步练师',
-			ol_maliang:'削弱马良',
-			ol_maliang_ab:'马良',
-			junk_lidian:'削弱李典',
-			junk_lidian_ab:'李典',
-			junk_duanwei:'削弱段煨',
-			junk_duanwei_ab:'段煨',
+			junk_zhangrang:'新杀张让',
+			junk_zhangrang_prefix:'新杀',
+			old_jiakui:'手杀贾逵',
+			old_jiakui_prefix:'手杀',
+			ol_guohuai:'OL郭淮',
+			ol_guohuai_prefix:'OL',
+			old_bulianshi:'RE步练师',
+			old_bulianshi_prefix:'RE',
+			ol_maliang:'OL马良',
+			ol_maliang_prefix:'OL',
+			junk_lidian:'OL李典',
+			junk_lidian_prefix:'OL',
+			junk_duanwei:'新杀段煨',
+			junk_duanwei_prefix:'新杀',
 			junk_xuyou:'手杀许攸',
+			junk_xuyou_prefix:'手杀',
+			junk_liubei:'旧界刘备',
+			junk_liubei_prefix:'旧界',
+			junk_huangyueying:'旧界黄月英',
+			junk_huangyueying_prefix:'旧界',
+			old_majun:'骰子马钧',
+			old_majun_prefix:'骰子',
 			
 			diy_tieba:'吧友设计',
 			diy_xushi:'玩点论杀·虚实篇',
@@ -19125,7 +19133,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			远野美凪:['Toono','Minagi'],
 			樱庭星罗:['Sakuraba','Seira'],
 			坂上智代:['Sakagami','Tomoyo'],
-			冈崎汐:['Okazaki','Ushio']
+			冈崎汐:['Okazaki','Ushio'],
+			神山识:['Kamiyama','Shiki'],
+			佐藤雏:['Satou','Hina'],
 		},
 	};
 });

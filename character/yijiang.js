@@ -302,7 +302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else playerx.chooseButton([
 								`请选择要视为对${get.translation(player)}使用的牌`,
 								[names,'vcard'],
-							]).set('ai',(button)=>{
+							],true).set('ai',(button)=>{
 								return button.link[0][2]==_status.event.choice;
 							}).set('choice',function(){
 								var list=names.map(name=>{
@@ -6673,15 +6673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var num=0,cards=player.getEquips(1);
-					for(var card of cards){
-						var numz=1;
-						var info=get.info(card,false);
-						if(info&&info.distance&&info.distance.attackFrom){
-							numz-=info.distance.attackFrom;
-						}
-						num+=numz;
-					}
+					var num=player.getEquipRange();
 					if(trigger.player.countCards('h')<num){
 						event.directfalse=true;
 					}
@@ -7010,7 +7002,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lihuo:{
 				trigger:{player:'useCard1'},
 				filter:function(event,player){
-					if(event.card.name=='sha'&&!event.card.hasNature()) return true;
+					if(event.card.name=='sha'&&!game.hasNature(event.card)) return true;
 					return false;
 				},
 				audio:2,
@@ -7038,7 +7030,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lihuo2:{
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
-					if(event.card.name!='sha'||!event.card.hasNature('fire')) return false;
+					if(event.card.name!='sha'||!game.hasNature(event.card,'fire')) return false;
 					return game.hasPlayer(function(current){
 						return !event.targets.contains(current)&&player.canUse(event.card,current);
 					});
@@ -9547,13 +9539,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yanyu2:{
 				trigger:{player:'phaseUseEnd'},
-				direct:true,
 				filter:function(event,player){
-					return player.getHistory('lose',function(evt){
-						var evt2=evt.getParent();
-						return evt2.name=='useSkill'&&evt2.skill=='yanyu'&&evt.getParent(3)==event;
+					return player.getHistory('useSkill',function(evt){
+						return evt.event.getParent('phaseUse')==event&&evt.skill=='yanyu';
 					}).length>=2;
 				},
+				direct:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('yanyu'),'令一名男性角色摸两张牌',function(card,player,target){
@@ -11026,6 +11017,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				juexingji:true,
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
+				derivation:'paiyi',
 				filter:function(event,player){
 					return !player.hasSkill('paiyi')&&player.getExpansions('quanji').length>=3;
 				},
@@ -13274,7 +13266,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.player!=player&&event.player.hp<=0&&player.countCards('h')>0;
 				},
 				check:function(event,player){
-					if(get.attitude(player,event.player)<0) return false;
+					if(get.attitude(player,event.player)<=0) return false;
 					if(player.countCards('h',{name:['tao','jiu']})+event.player.hp<0) return false;
 					return true;
 				},
@@ -13897,79 +13889,80 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterReplace:{
-			caozhi:['re_caozhi','dc_caozhi','caozhi','ps_caozhi'],
-			zhangchunhua:['re_zhangchunhua','zhangchunhua','mini_zhangchunhua'],
-			yujin:['yujin_yujin','ol_yujin','xin_yujin','yujin','re_yujin'],
-			dc_xushu:['dc_xushu','re_xushu'],
+			caozhi:['caozhi','dc_caozhi','re_caozhi','ps_caozhi'],
+			zhangchunhua:['zhangchunhua','re_zhangchunhua'],
+			yujin:['yujin','yujin_yujin','ol_yujin','sb_yujin','xin_yujin','re_yujin'],
+			dc_xushu:['re_xushu','dc_xushu'],
 			xushu:['xin_xushu','xushu'],
-			fazheng:['re_fazheng','tw_re_fazheng','xin_fazheng','fazheng'],
+			fazheng:['xin_fazheng','re_fazheng','sb_fazheng','tw_re_fazheng','fazheng'],
 			masu:['xin_masu','re_masu','masu'],
-			xusheng:['xin_xusheng','re_xusheng','xusheng','old_xusheng'],
-			wuguotai:['xin_wuguotai','re_wuguotai','wuguotai'],
-			lingtong:['xin_lingtong','re_lingtong','lingtong','old_lingtong'],
-			gaoshun:['xin_gaoshun','re_gaoshun','gaoshun','old_gaoshun'],
-			zhonghui:['re_zhonghui','xin_zhonghui','zhonghui','old_zhonghui','pe_zhonghui'],
-			wangyi:['re_wangyi','wangyi','old_wangyi'],
-			caozhang:['re_caozhang','xin_caozhang','caozhang'],
-			guanzhang:['re_guanzhang','guanzhang','old_guanzhang'],
-			madai:['tw_madai','re_madai','old_madai','madai'],
-			liaohua:['xin_liaohua','re_liaohua','liaohua'],
-			bulianshi:['re_bulianshi','dc_bulianshi','bulianshi','old_bulianshi'],
-			handang:['tw_handang','xin_handang','re_handang','handang','old_handang'],
-			chengpu:['re_chengpu','tw_chengpu','ns_chengpu','chengpu','xin_chengpu'],
-			liubiao:['re_liubiao','xin_liubiao','liubiao','oldre_liubiao','old_liubiao'],
-			manchong:['re_manchong','manchong'],
-			caochong:['re_caochong','caochong','old_caochong'],
-			guohuai:['guohuai','tw_guohuai','re_guohuai','xin_guohuai','ol_guohuai'],
-			jianyong:['re_jianyong','xin_jianyong','jianyong'],
-			panzhangmazhong:['xin_panzhangmazhong','re_panzhangmazhong','panzhangmazhong'],
-			yufan:['xin_yufan','re_yufan','yufan'],
-			zhuran:['re_zhuran','xin_zhuran','zhuran','old_zhuran'],
-			liru:['re_liru','dc_liru','xin_liru','liru','yj_liru'],
-			fuhuanghou:['re_fuhuanghou','xin_fuhuanghou','fuhuanghou','old_fuhuanghou'],
-			chenqun:['dc_chenqun','chenqun','re_chenqun','old_chenqun'],
-			hanhaoshihuan:['re_hanhaoshihuan','hanhaoshihuan'],
-			caozhen:['re_caozhen','xin_caozhen','caozhen','old_caozhen'],
-			wuyi:['re_wuyi','xin_wuyi','wuyi'],
+			xusheng:['xusheng','xin_xusheng','re_xusheng','old_xusheng'],
+			wuguotai:['wuguotai','xin_wuguotai','re_wuguotai'],
+			lingtong:['lingtong','xin_lingtong','re_lingtong','old_lingtong'],
+			gaoshun:['gaoshun','xin_gaoshun','re_gaoshun','old_gaoshun'],
+			zhonghui:['zhonghui','xin_zhonghui','re_zhonghui','old_zhonghui','pe_zhonghui'],
+			wangyi:['wangyi','re_wangyi','old_wangyi'],
+			caozhang:['caozhang','re_caozhang','xin_caozhang'],
+			guanzhang:['guanzhang','re_guanzhang','old_guanzhang'],
+			madai:['old_madai','re_madai','tw_madai','madai'],
+			liaohua:['liaohua','re_liaohua','xin_liaohua'],
+			bulianshi:['bulianshi','dc_bulianshi','re_bulianshi','old_bulianshi'],
+			handang:['handang','xin_handang','re_handang','tw_handang','old_handang'],
+			chengpu:['chengpu','re_chengpu','xin_chengpu','tw_chengpu','ns_chengpu'],
+			liubiao:['liubiao','xin_liubiao','re_liubiao','sb_liubiao','oldre_liubiao','old_liubiao'],
+			manchong:['manchong','re_manchong'],
+			caochong:['caochong','re_caochong','old_caochong'],
+			guohuai:['guohuai','re_guohuai','xin_guohuai','tw_guohuai','ol_guohuai'],
+			jianyong:['jianyong','re_jianyong','xin_jianyong'],
+			panzhangmazhong:['panzhangmazhong','re_panzhangmazhong','xin_panzhangmazhong'],
+			yufan:['yufan','xin_yufan','re_yufan'],
+			zhuran:['zhuran','re_zhuran','xin_zhuran','old_zhuran'],
+			liru:['xin_liru','dc_liru','re_liru','yj_liru','+liru'],
+			fuhuanghou:['fuhuanghou','re_fuhuanghou','xin_fuhuanghou','old_fuhuanghou'],
+			chenqun:['chenqun','dc_chenqun','re_chenqun','old_chenqun'],
+			hanhaoshihuan:['hanhaoshihuan','re_hanhaoshihuan'],
+			caozhen:['caozhen','re_caozhen','xin_caozhen','old_caozhen'],
+			wuyi:['wuyi','re_wuyi','xin_wuyi'],
 			sunluban:['re_sunluban','xin_sunluban','sunluban'],
 			zhuhuan:['re_zhuhuan','xin_zhuhuan','zhuhuan','old_zhuhuan'],
-			caoxiu:['re_caoxiu','tw_caoxiu','xin_caoxiu','caoxiu','old_caoxiu'],
-			xiahoushi:['re_xiahoushi','xiahoushi'],
-			zhangyi:['xin_zhangyi','re_zhangyi','zhangyi'],
-			quancong:['old_quancong','re_quancong','xin_quancong','quancong'],
-			sunxiu:['re_sunxiu','xin_sunxiu','sunxiu'],
-			zhuzhi:['re_zhuzhi','zhuzhi','xin_zhuzhi','old_zhuzhi'],
-			liuyu:['dc_liuyu','liuyu','ol_liuyu'],
+			caoxiu:['caoxiu','re_caoxiu','xin_caoxiu','tw_caoxiu','old_caoxiu'],
+			xiahoushi:['xiahoushi','re_xiahoushi','sb_xiahoushi'],
+			zhangyi:['zhangyi','re_zhangyi','xin_zhangyi'],
+			quancong:['quancong','re_quancong','xin_quancong','old_quancong'],
+			sunxiu:['sunxiu','re_sunxiu','xin_sunxiu'],
+			zhuzhi:['zhuzhi','re_zhuzhi','xin_zhuzhi','old_zhuzhi'],
+			liuyu:['liuyu','dc_liuyu','ol_liuyu'],
 			zhangrang:['zhangrang','ol_zhangrang','junk_zhangrang'],
-			jikang:['re_jikang','jikang','dc_jikang'],
-			xinxianying:['re_xinxianying','xinxianying','ol_xinxianying','sp_xinxianying'],
-			gongsunyuan:['re_gongsunyuan','gongsunyuan'],
-			zhoucang:['re_zhoucang','xin_zhoucang','zhoucang'],
-			guotufengji:['re_guotufengji','guotufengji'],
-			guanping:['re_guanping','guanping'],
-			caifuren:['xin_caifuren','re_caifuren','caifuren'],
-			guyong:['guyong','re_guyong','tw_guyong','xin_guyong'],
-			yj_jushou:['re_jushou','xin_jushou','yj_jushou'],
-			guohuanghou:['re_guohuanghou','guohuanghou'],
-			liuchen:['re_liuchen','liuchen'],
-			liufeng:['re_liufeng','liufeng'],
-			sundeng:['re_sundeng','sundeng','ns_sundeng'],
-			caiyong:['re_caiyong','caiyong'],
-			chengong:['re_chengong','chengong'],
-			xunyou:['re_xunyou','xunyou'],
-			xuezong:['tw_xuezong','xuezong'],
+			jikang:['jikang','re_jikang','dc_jikang'],
+			xinxianying:['xinxianying','re_xinxianying','ol_xinxianying','sp_xinxianying'],
+			gongsunyuan:['gongsunyuan','re_gongsunyuan'],
+			zhoucang:['zhoucang','re_zhoucang','xin_zhoucang'],
+			guotufengji:['guotufengji','re_guotufengji'],
+			guanping:['guanping','re_guanping'],
+			caifuren:['caifuren','re_caifuren','xin_caifuren'],
+			guyong:['guyong','re_guyong','xin_guyong','tw_guyong'],
+			yj_jushou:['yj_jushou','re_jushou','xin_jushou'],
+			guohuanghou:['guohuanghou','re_guohuanghou'],
+			liuchen:['liuchen','re_liuchen'],
+			liufeng:['liufeng','re_liufeng'],
+			sundeng:['sundeng','re_sundeng','ns_sundeng'],
+			caiyong:['caiyong','re_caiyong'],
+			chengong:['chengong','re_chengong','sb_chengong'],
+			xunyou:['xunyou','re_xunyou'],
+			xuezong:['xuezong','tw_xuezong'],
             huanghao:['huanghao','dc_huanghao','old_huanghao'],
-			caorui:['re_caorui','caorui','old_caorui'],
-			sunziliufang:['dc_sunziliufang','sunziliufang'],
+			caorui:['caorui','re_caorui','old_caorui'],
+			sunziliufang:['sunziliufang','dc_sunziliufang'],
 			liyan:['liyan','old_liyan'],
-			zhangsong:['re_zhangsong','zhangsong'],
-			zhongyao:['re_zhongyao','zhongyao'],
+			zhangsong:['zhangsong','re_zhangsong'],
+			zhongyao:['zhongyao','re_zhongyao'],
 		},
 		translate:{
 			old_huaxiong:'将华雄',
-			old_huaxiong_ab:'华雄',
+			old_huaxiong_prefix:'将',
 			yufan:'虞翻',
 			xushu:'旧徐庶',
+			xushu_prefix:'旧',
 			caozhi:'曹植',
 			zhangchunhua:'张春华',
 			lingtong:'凌统',
@@ -13978,6 +13971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuran:'朱然',
 			yujin:'于禁',
 			masu:'旧马谡',
+			masu_prefix:'旧',
 			xin_masu:'马谡',
 			xin_fazheng:'法正',
 			wuguotai:'吴国太',
@@ -13991,6 +13985,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caifuren:'蔡夫人',
 			zhonghui:'钟会',
 			old_zhonghui:'旧钟会',
+			old_zhonghui_prefix:'旧',
 			sunluban:'孙鲁班',
 			chenqun:'陈群',
 			zhangsong:'张松',
@@ -14002,6 +13997,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			manchong:'满宠',
 			liufeng:'刘封',
 			liru:'旧李儒',
+			liru_prefix:'旧',
 			yj_jushou:'沮授',
 			zhuhuan:'朱桓',
 			xiahoushi:'夏侯氏',
@@ -14026,14 +14022,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gaoshun:'高顺',
 			xin_liru:'李儒',
 			guohuanghou:'郭皇后',
-			liuyu:'OL刘虞',
+			liuyu:'刘虞',
 			sundeng:'孙登',
 			liyan:'李严',
 			sunziliufang:'孙资刘放',
 			huanghao:'黄皓',
 			zhangrang:'张让',
 			cenhun:'岑昏',
-			xinxianying:'OL辛宪英',
+			xinxianying:'辛宪英',
 			wuxian:'吴苋',
 			xushi:'徐氏',
 			caojie:'曹节',
@@ -14516,6 +14512,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shiyong:'恃勇',
 			shiyong_info:'锁定技，当你受到一次红色【杀】或【酒】【杀】造成的伤害后，须减1点体力上限',
 			old_guanzhang:'旧关兴张苞',
+			old_guanzhang_prefix:'旧',
 			wangyi:'王异',
 			oldqianxi:'潜袭',
 			oldqianxi_info:'当你使用【杀】对距离为1的目标角色造成伤害时，你可以进行一次判定，若判定结果不为红桃，你防止此伤害，令其减1点体力上限',

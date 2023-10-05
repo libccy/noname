@@ -2332,7 +2332,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(get.population('zhong')+get.population('nei')==0||
 						get.population('zhong')+get.population('fan')==0){
 							game.broadcastAll(function(){
-								game.showIdentity();
+								if(game.showIdentity) game.showIdentity();
 								if(game.zhu&&game.zhu.isAlive()&&get.population('nei')==1&&get.config('nei_fullscreenpop')) game.me.$fullscreenpop('<span style="font-family:xinwei"><span data-nature="fire">主公</span><span data-nature="soil"> vs </span><span data-nature="thunder">内奸</span></span>',null,null,false);
 							});
 						}
@@ -2399,9 +2399,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var effect=0,c,shown;
 						var info=get.info(card);
 						if(info.ai&&info.ai.expose){
-							if(_status.event.name=='_wuxie'){
-								if(_status.event.source&&_status.event.source.ai.shown){
-									this.ai.shown+=0.2;
+							if(_status.event.name=='_wuxie'&&card.name=='wuxie'){
+								const infomap=_status.event._info_map;
+								if(infomap){
+									if(this!=infomap.target&&infomap.player&&infomap.player.ai.shown){
+										this.ai.shown+=0.2;
+									}
 								}
 							}
 							else{

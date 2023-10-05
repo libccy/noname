@@ -29,7 +29,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ddd_liangxi:['male','wei',3,['dddtongyu']],
 			ddd_wangkanglvkai:['male','shu',4,['dddbingjian']],
 			ddd_sunliang:['male','wu',3,['ddddiedang','dddanliu','dddguiying'],['zhu']],
-			ddd_lie:['male','wu',3,['dddyeshen','dddqiaoduan']],
+			ddd_lie:['female','wu',3,['dddyeshen','dddqiaoduan']],
 		},
 		characterFilter:{},
 		characterSort:{},
@@ -875,7 +875,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player,target=_status.event.getParent().target;
 						if(get.attitude(player,target)<0) return false;
 						if(!_status.event.colors.contains(get.color(card,player))) return 0;
-						if(card.hasNature()) return 1.2;
+						if(game.hasNature(card)) return 1.2;
 						return 1;
 					})
 					'step 3'
