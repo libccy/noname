@@ -1569,10 +1569,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var list=[],names=[];
 							for(var card of cards){
 								var name=get.name(card),nature=get.nature(card);
-								var namex=name+nature;
-								if(names.contains(namex)) continue;
-								if(nature.length) list.push([get.type(card),'',name,nature]);
-								else list.push([get.type(card),'',name]);
+								var namex=name;
+								if(nature&&nature.length){
+									namex+=nature;
+									if(names.contains(namex)) continue;
+									list.push([get.type(card),'',name,nature]);
+								}
+								else{
+									if(names.contains(namex)) continue;
+									list.push([get.type(card),'',name]);
+								}
 								names.push(namex);
 							}
 							list.sort((a,b)=>{

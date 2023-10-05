@@ -349,7 +349,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(!game.hasPlayer(target=>target!=player&&get.damageEffect(target,player,player,'thunder')>0)) return 0;
 						if(player.getExpansions('rejijun').reduce(function(num,card){
-							return num=card.number;
+							return num+get.number(card,false);
 						},0)>36) return 1/(get.value(card)||0.5);
 						else{
 							if(lib.skill.refangtong.thunderEffect(card,player)) return 10-get.value(card);
@@ -367,17 +367,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var cards=player.getExpansions('rejijun');
 						if(cards.reduce(function(num,card){
-							return num=card.number;
+							return num+get.number(card,false);
 						},0)<=36){
-							if(!ui.selected.buttons.length) return 1/button.link.number;
+							if(!ui.selected.buttons.length) return 1/get.number(button.link,false);
 							return 0;
 						}
 						else{
 							var num=0,list=[];
-							cards.sort((a,b)=>b.number-a.number);
+							cards.sort((a,b)=>get.number(b,false)-get.number(a,false));
 							for(var i=0;i<cards.length;i++){
 								list.push(cards[i]);
-								num+=cards[i].number;
+								num+=get.number(cards[i],false)
 								if(num>36) break;
 							}
 							return list.contains(button.link)?1:0;
@@ -386,7 +386,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(result.bool){
 						var bool=(result.links.reduce(function(num,card){
-							return num=card.number;
+							return num+get.number(card,false);
 						},0)>36);
 						event.bool=bool;
 						player.loseToDiscardpile(result.links);
@@ -404,13 +404,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=player.getExpansions('rejijun'),num=0;
 					cards.push(card);
 					if(cards.reduce(function(num,card){
-						return num=card.number;
+						return num+get.number(card,false);
 					},0)<=36) return false;
-					cards.sort((a,b)=>b.number-a.number);
+					cards.sort((a,b)=>get.number(b,false)-get.number(a,false));
 					var bool=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i]==card) bool=true;
-						num+=cards[i].number;
+						num+=get.number(cards[i],false);
 						if(num>36) break;
 					}
 					return bool;
@@ -440,6 +440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var target=trigger.player;
 					event.player=player;
+					event.target=target;
 					target.chooseBool(target==player?get.prompt('rejunbing'):'是否响应'+get.translation(player)+'的【郡兵】？','摸一张牌'+(target==player?'':'，将所有手牌交给'+get.translation(player)+'，然后其可以交给你等量张牌')).set('choice',get.attitude(target,player)>0);
 					'step 1'
 					if(result.bool){
