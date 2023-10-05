@@ -29,6 +29,7 @@
 			}
 		}
 	}
+	const nonameInitialized=localStorage.getItem('noname_inited');
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
@@ -115,10 +116,8 @@
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		mirrorURL:'https://raw.fgit.cf/libccy/noname',
 		hallURL:'47.99.105.222',
-		assetURL:(()=>{
-			const nonameInited=localStorage.getItem('noname_inited');
-			return typeof nonameInited=='string'&&nonameInited!=='nodejs'?nonameInited:'';
-		})(),
+		assetURL:typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized,
+		compatibleEdition:Boolean(typeof nonameInitialized=='string'&&nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//)),
 		changeLog:[],
 		updates:[],
 		canvasUpdates:[],
@@ -8235,14 +8234,15 @@
 					}
 				});
 				HTMLDivElement.prototype.setBackgroundDB=function(img){
-					var node=this;
-					game.getDB('image',img,function(src){
-						node.style.backgroundImage="url('"+src+"')";
-						node.style.backgroundSize="cover";
+					return game.getDB('image',img).then(src=>{
+						this.style.backgroundImage=`url('${src}')`;
+						this.style.backgroundSize="cover";
+						return this;
 					});
 				};
 				HTMLDivElement.prototype.setBackgroundImage=function(img){
-					this.style.backgroundImage='url("'+lib.assetURL+img+'")';
+					this.style.backgroundImage=`url("${lib.assetURL}${img}")`;
+					return this;
 				},
 				HTMLDivElement.prototype.listen=function(func){
 					if(lib.config.touchscreen){
@@ -33748,42 +33748,42 @@
 			}],
 			['TW神',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('TW')+get.prefixSpan('神')
+					return `${get.prefixSpan('TW')}${get.prefixSpan('神')}`
 				},
 			}],
 			['TW将',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('TW')+get.prefixSpan('将')
+					return `${get.prefixSpan('TW')}${get.prefixSpan('将')}`
 				},
 			}],
 			['OL神',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('OL')+get.prefixSpan('神')
+					return `${get.prefixSpan('OL')}${get.prefixSpan('神')}`
 				},
 			}],
 			['旧神',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('旧')+get.prefixSpan('神')
+					return `${get.prefixSpan('旧')}${get.prefixSpan('神')}`
 				},
 			}],
 			['旧晋',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('旧')+get.prefixSpan('晋')
+					return `${get.prefixSpan('旧')}${get.prefixSpan('晋')}`
 				},
 			}],
 			['新杀SP',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('新杀')+get.prefixSpan('SP')
+					return `${get.prefixSpan('新杀')}${get.prefixSpan('SP')}`
 				},
 			}],
 			['界SP',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('界')+get.prefixSpan('SP')
+					return `${get.prefixSpan('界')}${get.prefixSpan('SP')}`
 				},
 			}],
 			['S特神',{
 				getSpan:(prefix,name)=>{
-					return get.prefixSpan('★')+get.prefixSpan('神')
+					return `${get.prefixSpan('★')}${get.prefixSpan('神')}`
 				},
 			}],
 		]),
@@ -34059,48 +34059,34 @@
 			const backgroundMusicSetting=ui[aozhan?'aozhan_bgm':'background_music_setting'],config=backgroundMusicSetting._link.config;
 			config.updatex.call(backgroundMusicSetting,[]);
 		},
-		updateBackground:function(){
-			var background=(_status.tempBackground||lib.config.image_background);
+		updateBackground:()=>{
+			const background=_status.tempBackground||lib.config.image_background;
 			ui.background.delete();
-			ui.background=ui.create.div('.background');
-
+			const uiBackground=ui.background=ui.create.div('.background'),style=uiBackground.style;
 			if(lib.config.image_background_blur){
-				ui.background.style.filter='blur(8px)';
-				ui.background.style.webkitFilter='blur(8px)';
-				ui.background.style.transform='scale(1.05)';
+				style.filter='blur(8px)';
+				style.webkitFilter='blur(8px)';
+				style.transform='scale(1.05)';
 			}
-			else{
-				ui.background.style.filter='';
-				ui.background.style.webkitFilter='';
-				ui.background.style.transform='';
-			}
-
-			document.body.insertBefore(ui.background,document.body.firstChild);
-			if(background.startsWith('ext:')){
-				ui.background.setBackgroundImage('extension/'+background.slice(4));
-			}
+			document.body.insertBefore(uiBackground,document.body.firstChild);
+			if(background.startsWith('db:')) uiBackground.setBackgroundDB(background.slice(3));
+			else if(background.startsWith('ext:')) uiBackground.setBackgroundImage(`extension/${background.slice(4)}`);
 			else if(background=='default'){
-				ui.background.animate('start');
-				ui.background.style.backgroundImage="none";
+				uiBackground.animate('start');
+				style.backgroundImage='none';
 			}
 			else if(background.startsWith('custom_')){
-				ui.background.style.backgroundImage="none";
-				game.getDB('image',background,function(fileToLoad){
+				style.backgroundImage='none';
+				game.getDB('image',background).then(fileToLoad=>{
 					if(!fileToLoad) return;
-					var fileReader = new FileReader();
-					fileReader.onload = function(fileLoadedEvent)
-					{
-						var data = fileLoadedEvent.target.result;
-						ui.background.style.backgroundImage='url('+data+')';
-					};
+					const fileReader = new FileReader();
+					fileReader.onload=fileLoadedEvent=>style.backgroundImage=`url(${fileLoadedEvent.target.result})`;
 					fileReader.readAsDataURL(fileToLoad, "UTF-8");
 				});
 			}
-			else{
-				ui.background.setBackgroundImage('image/background/'+background+'.jpg');
-			}
-			ui.background.style.backgroundSize='cover';
-			ui.background.style.backgroundPosition='50% 50%';
+			else uiBackground.setBackgroundImage(`image/background/${background}.jpg`);
+			style.backgroundSize='cover';
+			style.backgroundPosition='50% 50%';
 		},
 		//Generate a beatmap using the given BPM, beats, and offset
 		//用给定的BPM、节拍和偏移生成谱面
@@ -35067,39 +35053,35 @@
 			};
 			ui.window.appendChild(audio);
 		},
-		playBackgroundMusic:function(){
+		playBackgroundMusic:()=>{
 			if(lib.config.background_music=='music_off'){
 				ui.backgroundMusic.src='';
+				return;
 			}
-			else if(_status._aozhan==true&&lib.config.mode_config.guozhan.aozhan_bgm!='disabled'){
-				var aozhan=_status.tempAozhan||lib.config.mode_config.guozhan.aozhan_bgm;
-				if(Array.isArray(aozhan)){
-					aozhan=aozhan.randomGet('disabled',_status.currentAozhan)||lib.config.mode_config.guozhan.aozhan_bgm;
-				}
-				if(aozhan=='random'){
-					aozhan=Object.keys(lib.mode.guozhan.config.aozhan_bgm.item).randomGet('disabled','random',_status.currentAozhan);
-				}
+			if(_status._aozhan){
+				const aozhanBGMConfiguration=lib.config.mode_config.guozhan.aozhan_bgm;
+				if(aozhanBGMConfiguration=='disabled') return;
+				let aozhan=_status.tempAozhan||aozhanBGMConfiguration;
+				if(Array.isArray(aozhan)) aozhan=aozhan.randomGet('disabled',_status.currentAozhan)||aozhanBGMConfiguration;
+				if(aozhan=='random') aozhan=Object.keys(lib.mode.guozhan.config.aozhan_bgm.item).randomGet('disabled','random',_status.currentAozhan);
 				_status.currentAozhan=aozhan;
-				ui.backgroundMusic.src=lib.assetURL+(aozhan.startsWith('ext:')?'extension/'+aozhan.slice(4):'audio/background/aozhan_'+aozhan+'.mp3');
+				if(aozhan.startsWith('db:')) game.getDB('image',aozhan.slice(3)).then(result=>ui.backgroundMusic.src=result);
+				else if(aozhan.startsWith('ext:')) ui.backgroundMusic.src=`${lib.assetURL}extension/${aozhan.slice(4)}`;
+				else ui.backgroundMusic.src=`${lib.assetURL}audio/background/aozhan_${aozhan}.mp3`;
+				return;
 			}
-			else{
-				var music=_status.tempMusic||lib.config.background_music;
-				if(Array.isArray(music)){
-					music=music.randomGet('music_off',_status.currentMusic)||lib.config.background_music;
-				}
-				if(music=='music_random'){
-					music=lib.config.all.background_music.randomGet('music_off','music_random',_status.currentMusic);
-				}
-				_status.currentMusic=music;
-				if(music=='music_custom'){
-					if(lib.config.background_music_src){
-						ui.backgroundMusic.src=lib.config.background_music_src;
-					}
-				}
-				else{
-					ui.backgroundMusic.src=lib.assetURL+(music.startsWith('ext:')?'extension/'+music.slice(4):'audio/background/'+music+'.mp3');
-				}
+			let music=_status.tempMusic||lib.config.background_music;
+			if(Array.isArray(music)) music=music.randomGet('music_off',_status.currentMusic)||lib.config.background_music;
+			if(music=='music_random') music=lib.config.all.background_music.randomGet('music_off','music_random',_status.currentMusic);
+			_status.currentMusic=music;
+			if(music=='music_custom'){
+				const backgroundMusicSourceConfiguration=lib.config.background_music_src;
+				if(backgroundMusicSourceConfiguration) ui.backgroundMusic.src=backgroundMusicSourceConfiguration;
+				return;
 			}
+			if(music.startsWith('db:')) game.getDB('image',music.slice(3)).then(result=>ui.backgroundMusic.src=result);
+			else if(music.startsWith('ext:')) ui.backgroundMusic.src=`${lib.assetURL}extension/${music.slice(4)}`;
+			else ui.backgroundMusic.src=`${lib.assetURL}audio/background/${music}.mp3`;
 		},
 		import:function(type,content,url){
 			if(type=='extension'){
@@ -57735,17 +57717,23 @@
 			}
 			return str2;
 		},
-		slimNameHorizontal:function(str){
-			var str2=lib.translate[str];
-			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
-			if(!str2) return '';
-			if(lib.translate[str+'_prefix']&&str2.startsWith(lib.translate[str+'_prefix'])){
+		slimNameHorizontal:str=>{
+			const slimName=lib.translate[`${str}_ab`]||lib.translate[str];
+			if(!slimName) return '';
+			const prefix=lib.translate[`${str}_prefix`];
+			if(prefix&&slimName.startsWith(prefix)){
 				//兼容版特化处理
-				return `${get.prefixSpan(lib.translate[str+'_prefix'],str)}<span>${str2.slice(lib.translate[str+'_prefix'].length)}　</span>`;
+				if(lib.compatibleEdition) return `${get.prefixSpan(prefix,str)}<span>${slimName.slice(prefix.length)}　</span>`;
+				return `${get.prefixSpan(prefix,str)}<span>${slimName.slice(prefix.length)}</span>`;
 			}
-			return str2;
+			return slimName;
 		},
-		prefixSpan:function(prefix,name){
+		/**
+		 * @param {string} prefix
+		 * @param {string} name
+		 * @returns {string}
+		 */
+		prefixSpan:(prefix,name)=>{
 			let color='#ffffff',nature=false;
 			const map=lib.namePrefix.get(prefix),config=lib.config.buttoncharacter_prefix;
 			if(config=='off') return '';
