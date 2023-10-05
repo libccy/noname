@@ -11,5 +11,6 @@ window.noname_update={
 	files:[
 		'character/extra.js',
 		'character/mobile.js',
+		'game/game.js',
 	]
 };
