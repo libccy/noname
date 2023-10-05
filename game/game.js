@@ -40224,6 +40224,7 @@
 		updateRoundNumber:()=>game.broadcastAll((num1,num2,top)=>{
 			if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=`${num1}轮 剩余牌: ${num2}`;
 			_status.pileTop=top;
+			event.trigger('updateRoundNumber');
 		},game.roundNumber,ui.cardPile.childNodes.length,ui.cardPile.firstChild),
 		asyncDraw:(players,num,drawDeck,bottom)=>players.forEach((value,index)=>{
 			let num2=1;
