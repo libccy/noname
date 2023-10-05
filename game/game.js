@@ -9188,7 +9188,7 @@
 					game.dynamicStyle.init();
 					lib.announce.init();
 					// node:path library alternative
-					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
+					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path",()=>{
 						lib.path=window._noname_path;
 						delete window._noname_path;
 					},e=>{
