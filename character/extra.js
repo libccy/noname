@@ -266,7 +266,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								str+='、';
 							}
 							str=str.slice(0,str.length-1);
-							str+='；'
+							str+='；';
+							card.ai.equipValue=function(card,player){
+								let val=maxHp;
+								if(player.hasSkill('qiexie')) val*=0.4;
+								else val*=0.6;
+								return val+=skills.length;
+							};
 						}
 						str+='此牌离开你的装备区后，改为置入剩余武将牌牌堆。';
 						lib.translate['qiexie_'+name+'_info']=str;
@@ -2909,6 +2915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else event.finish();
 							'step 2'
 							player.chooseToDiscard('h',true).logSkill=['tspowei_use',target];
+							if(get.mode()!='identity'||player.identity!='nei') player.addExpose(0.2);
 							target.damage();
 							'step 3'
 							player.addTempSkill('tspowei_inRange');
