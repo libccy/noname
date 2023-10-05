@@ -11017,6 +11017,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				juexingji:true,
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
+				derivation:'paiyi',
 				filter:function(event,player){
 					return !player.hasSkill('paiyi')&&player.getExpansions('quanji').length>=3;
 				},
