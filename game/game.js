@@ -60068,7 +60068,7 @@
 			if(_status.event.useCache){
 				return game.callFuncUseStepCache("get.useful_raw",get.useful_raw,[card,player]);
 			}
-			return this.useful_raw(card,player);
+			return get.useful_raw(card,player);
 		},
 		unuseful:function(card){
 			return -get.useful(card);
