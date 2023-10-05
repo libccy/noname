@@ -2278,7 +2278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					//特殊处理
 					if(player.isDead()){
-						player.useResult(event.result,event.getParent())
+						player.useResult(event.result,event.getParent()).forceDie=true;
 					}
 				},
 				ai:{

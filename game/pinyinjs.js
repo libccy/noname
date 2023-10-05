@@ -41586,7 +41586,7 @@ var pinyin_dict_withtone = "yī,dīng zhēng,kǎo qiǎo yú,qī,shàng,xià,hǎn
 			temp = '';
 			for (var j = 0; j < max && (i + j) < chinese.length; j++) {
 				if (!dict.withtone[chinese[i]]) {
-					m-=(result[i].length-1);
+					i+=(result[i].length-1);
 					break;
 				} // 如果碰到非汉字直接停止本次查找
 				temp += chinese[i + j];

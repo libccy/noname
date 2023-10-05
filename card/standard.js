@@ -1148,38 +1148,34 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					"step 3"
-					if(event.target.isDead()||event.player.isDead()){
-						event.finish();
-					}
-					else{
-						if(result.bool){
-							event.shaRequired--;
-							if(event.turn==target){
-								if(result.cards) event.targetCards.addArray(result.cards);
-								if(event.shaRequired>0) event.goto(2);
-								else{
-									event.turn=player;
-									event.goto(1);
-								}
-							}
+					if(result.bool){
+						event.shaRequired--;
+						if(event.turn==target){
+							if(result.cards) event.targetCards.addArray(result.cards);
+							if(event.shaRequired>0) event.goto(2);
 							else{
-								if(result.cards) event.playerCards.addArray(result.cards);
-								if(event.shaRequired>0) event.goto(2);
-								else{
-									event.turn=target;
-									event.goto(1);
-								}
+								event.turn=player;
+								event.goto(1);
 							}
 						}
 						else{
-							if(event.turn==target){
-								target.damage();
-							}
+							if(result.cards) event.playerCards.addArray(result.cards);
+							if(event.shaRequired>0) event.goto(2);
 							else{
-								player.damage(target);
+								event.turn=target;
+								event.goto(1);
 							}
 						}
 					}
+					else{
+						if(event.turn==target){
+							target.damage();
+						}
+						else{
+							player.damage(target);
+						}
+					}
+					event._result={};
 				},
 				ai:{
 					wuxie:function(target,card,player,viewer){

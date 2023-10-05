@@ -25152,24 +25152,25 @@
 				},
 				addJudgeNext:function(card,unlimited){
 					if(!card.expired){
-						if(!unlimited&&get.position(card,true)!=='o'&&get.position(card,true)!=='j'){
-			  				game.log('将',card,'移入',this.next,'的判定区失败');
+						let target=this.next;
+						const name=card.viewAs||card.name;
+						const cards=(get.itemtype(card)=='card')?[card]:card.cards;
+						if(get.itemtype(cards)!='cards') return;
+						let bool=false;
+						if(!unlimited&&cards.some(card=>{
+							const position=get.position(card,true);
+							return position!='j'&&position!='o';
+						})){
+			  				game.log(card,'已被移出处理区，无法置入判定区');
 							return;
 						}
-						var target=this.next;
-						var name=card.viewAs||card.name;
-						var bool=false;
-						for(var iwhile=0;iwhile<20;iwhile++){
+						for(let iwhile=0;iwhile<20;iwhile++){
 							if(target.canAddJudge(card)){
 								bool=true;break;
 							}
 							target=target.next;
 						}
-						if(!bool){
-							game.log(card,'进入了弃牌堆');
-							game.cardsDiscard(card);
-						}
-						else{
+						if(bool){
 							if(card.cards&&card.cards.length){
 								target.addJudge(name,card.cards[0]);
 							}
@@ -56223,7 +56224,7 @@
 				if(!extraInformations) return false;
 				for(const extraInformation of extraInformations){
 					if(!extraInformation.startsWith('doublegroup:')) continue;
-					return Boolean(array)&&extraInformation.split(':').slice(1);
+					return array?extraInformation.split(':').slice(1):true;
 				}
 				return false;
 			},
@@ -59018,6 +59019,10 @@
 						if(cardinfo&&cardinfo.cardPrompt) uiintro.add('<div><div class="skill">'+es[i].outerHTML+'</div><div>'+cardinfo.cardPrompt(es[i])+'</div></div>');
 						else uiintro.add('<div><div class="skill">'+es[i].outerHTML+'</div><div>'+lib.translate[es[i].name+'_info']+'</div></div>');
 						uiintro.content.lastChild.querySelector('.skill>.card').style.transform='';
+						
+						if(lib.translate[es[i].name+'_append']){
+							uiintro.add('<div class="text">'+lib.translate[es[i].name+'_append']+'</div>');
+						}
 					}
 					var js=node.getCards('j');
 					for(var i=0;i<js.length;i++){
