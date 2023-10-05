@@ -14816,7 +14816,8 @@
 					}
 					event.trigger('phaseDiscard');
 					"step 1"
-					player.chooseToDiscard(num,true);
+					player.chooseToDiscard(num,true)
+					.set('useCache',true);
 					"step 2"
 					event.cards=result.cards;
 				},
@@ -22594,6 +22595,20 @@
 					}
 					return skills;
 				},
+				getModableSkills:function(useCache){
+					var func = function(player){
+						var skills=player.getSkills().concat(lib.skill.global);
+						game.expandSkills(skills);
+						skills = skills.filter(function(skill){
+							var info = get.info(skill);
+							return info && info.mod;
+						});
+						skills.sort((a,b)=>get.priority(a)-get.priority(b));
+						return skills;
+					};
+					if(!useCache)return func(this);
+					return game.callFuncUseStepCache("player.getModableSkills",func,[this]);
+				},
 				getSkills:function(arg2,arg3,arg4){
 					var skills=this.skills.slice(0);
 					var es=[];
@@ -26213,12 +26228,14 @@
 				},
 				addInvisibleSkill:function(skill){
 					if(Array.isArray(skill)){
+						_status.event.clearStepCache();
 						for(var i=0;i<skill.length;i++){
 							this.addInvisibleSkill(skill[i]);
 						}
 					}
 					else{
 						if(this.invisibleSkills.contains(skill)) return;
+						_status.event.clearStepCache();
 						var info=lib.skill[skill];
 						if(!info) return;
 						this.invisibleSkills.add(skill);
@@ -26248,12 +26265,14 @@
 				},
 				addSkill:function(skill,checkConflict,nobroadcast,addToSkills){
 					if(Array.isArray(skill)){
+						_status.event.clearStepCache();
 						for(var i=0;i<skill.length;i++){
 							this.addSkill(skill[i]);
 						}
 					}
 					else{
 						if(this.skills.contains(skill)) return;
+						_status.event.clearStepCache();
 						var info=lib.skill[skill];
 						if(!info) return;
 						if(!addToSkills){
@@ -26338,6 +26357,7 @@
 						this.additionalSkills[skill].push(skills[i]);
 					}
 					this.checkConflict();
+					_status.event.clearStepCache();
 					return this;
 				},
 				removeAdditionalSkill:function(skill,target){
@@ -26361,6 +26381,7 @@
 							}
 						}
 					}
+					_status.event.clearStepCache();
 					return this;
 				},
 				awakenSkill:function(skill,nounmark){
@@ -26368,6 +26389,7 @@
 					this.disableSkill(skill+'_awake',skill);
 					this.awakenedSkills.add(skill);
 					if(this.storage[skill]===false) this.storage[skill]=true;
+					_status.event.clearStepCache();
 					return this;
 				},
 				restoreSkill:function(skill,nomark){
@@ -26375,6 +26397,7 @@
 					this.awakenedSkills.remove(skill);
 					this.enableSkill(skill+'_awake',skill);
 					if(!nomark) this.markSkill(skill);
+					_status.event.clearStepCache();
 					return this;
 				},
 				disableSkill:function(skill,skills){
@@ -26427,6 +26450,7 @@
 							this.disableSkill(skill,skills[i]);
 						}
 					}
+					_status.event.clearStepCache();
 					return this;
 				},
 				enableSkill:function(skill){
@@ -26436,6 +26460,7 @@
 							delete this.disabledSkills[i];
 						}
 					}
+					_status.event.clearStepCache();
 					return this;
 				},
 				checkMarks:function(){
@@ -29702,6 +29727,33 @@
 				},
 				finish:function(){
 					this.finished=true;
+				},
+				putStepCache:function(key,value){
+					if(!this._stepCache){
+						this._stepCache = {};
+					}
+					this._stepCache[key] = value;
+				},
+				getStepCache:function(key){
+					if(!this._stepCache)return undefined;
+					return this._stepCache[key];
+				},
+				clearStepCache:function(key){
+					if(key !==  undefined && key !== null){
+						delete this._stepCache[key];
+					}
+					delete this._stepCache;
+				},
+				callFuncUseStepCache:function(prefix,func,params){
+					if(typeof func != 'function')return;
+					if(_status.closeStepCache)return func.apply(null,params);
+					var cacheKey = "["+prefix+"]"+get.paramToCacheKey.apply(null,params);
+					var ret = this.getStepCache(cacheKey);
+					if(ret === undefined || ret === null){
+						ret = func.apply(null,params);
+						this.putStepCache(cacheKey,ret);
+					}
+					return ret;
 				},
 				putTempCache:function(key1,key2,value){
 					if(!this._tempCache){
@@ -34220,6 +34272,17 @@
 				for(var i in arg) next[i]=arg[i];
 			}
 			return next;
+		},
+		callFuncUseStepCache:function(prefix,func,params){
+			if(typeof func != 'function')return;
+			if(_status.closeStepCache || !_status.event)return func.apply(null,params);
+			var cacheKey = "["+prefix+"]"+get.paramToCacheKey.apply(null,params);
+			var ret = _status.event.getStepCache(cacheKey);
+			if(ret === undefined || ret === null){
+				ret = func.apply(null,params);
+				_status.event.putStepCache(cacheKey,ret);
+			}
+			return ret;
 		},
 		getRarity:function(name){
 			var rank=lib.rank.rarity;
@@ -38751,6 +38814,7 @@
 									_status,lib,game,ui,get,ai);
 							}
 						}
+						event.clearStepCache();
 						event.step++;
 					}
 				}
@@ -40472,17 +40536,12 @@
 		checkMod:function(){
 			const argumentArray=Array.from(arguments),name=argumentArray[argumentArray.length-2];
 			let skills=argumentArray[argumentArray.length-1];
-			if(skills.getSkills) skills=skills.getSkills();
-			skills=skills.concat(lib.skill.global);
-			game.expandSkills(skills);
-			skills=skills.filter(skill=>{
-				const info=get.info(skill);
-				return (info&&info.mod&&info.mod[name]);
-			})
-			skills.sort((a,b)=>get.priority(a)-get.priority(b));
+			if(skills.getSkills) skills=skills.getModableSkills(_status.event.useCache === true);
 			const arg=argumentArray.slice(0,-2);
 			skills.forEach(value=>{
-				const result=get.info(value).mod[name].apply(this,arg);
+				var mod = get.info(value).mod[name];
+				if(!mod)return;
+				const result=mod.apply(this,arg);
 				if(typeof arg[arg.length-1]!='object'&&result!=undefined) arg[arg.length-1]=result;
 			});
 			return arg[arg.length-1];
@@ -56031,6 +56090,27 @@
 			}
 			return str;
 		},
+		//用于将参数转换为字符串，作为缓存的key。
+		paramToCacheKey:function(){
+			var str = "";
+			for(var arg of arguments){
+				if(arg === null || arg === undefined){
+					str += (arg + "-");
+					continue;
+				}
+				if(arg.playerid){
+					str += "p:"+arg.playerid;
+				}else if(arg.cardid){
+					str += "c:"+arg.cardid;
+				}else if(arg.name){
+					str += "n:"+arg.name;
+				}else{
+					str += "s:"+arg;
+				}
+				str+="-";
+			}
+			return str;
+		},
 		yunjiao:function(str){
 			const util=window.pinyinUtilx;
 			if(util) str=util.removeTone(str)
@@ -59954,7 +60034,7 @@
 		sgnAttitude:function(){
 			return get.sgn(get.attitude.apply(this,arguments));
 		},
-		useful:function(card,player){
+		useful_raw:function(card,player){
 			if(get.position(card)=='j') return -1;
 			if(get.position(card)=='e') return get.equipValue(card);
 			if(card._modUseful){
@@ -59963,7 +60043,13 @@
 			var i=0;
 			if(!player) player=_status.event.player;
 			if(player){
-				i=player.getCards('h',card.name).indexOf(card);
+				if(_status.event.useCache){
+					i = game.callFuncUseStepCache("player.getCardsInUseful",function(player,position,cardname){
+						return player.getCards(position,cardname);
+					},[player,'h',card.name]).indexOf(card);
+				}else{
+					i=player.getCards('h',card.name).indexOf(card);
+				}
 				if(i<0) i=0;
 			}
 			var aii=get.info(card).ai;
@@ -59982,6 +60068,12 @@
 			else result=useful[useful.length-1];
 			result=game.checkMod(player,card,result,'aiUseful',player);
 			return result;
+		},
+		useful:function(card,player){
+			if(_status.event.useCache){
+				return game.callFuncUseStepCache("get.useful_raw",get.useful_raw,[card,player]);
+			}
+			return get.useful_raw(card,player);
 		},
 		unuseful:function(card){
 			return -get.useful(card);
