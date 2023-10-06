@@ -4868,8 +4868,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				check:function(event,player){
 					return (player.countCards('h')+2+event.num)<=5||game.hasPlayer(function(target){
-						return !game.hasPlayer(function(current){
-							return current!=player&&current!=target&&current.countCards('h')<target.countCards('h');
+						return player!==target&&!game.hasPlayer(function(current){
+							return current!==player&&current!==target&&current.countCards('h')<target.countCards('h');
 						})&&get.attitude(player,target)>0;
 					});
 				},
@@ -6268,22 +6268,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:[1,Infinity],
 				position:'hs',
 				check:function(card){
-					var player=_status.event.player;
-					if(ui.selected.cards.length){
-						var list=game.filterPlayer(function(current){
-							return current!=player&&player.canUse('sha',current,false)&&get.effect(current,{name:'sha'},player,player)>0;
-						}).sort(function(a,b){
-							return get.effect(b,{name:'sha'},player,player)-get.effect(a,{name:'sha'},player,player);
+					let player = _status.event.player;
+					if (ui.selected.cards.length) {
+						let list = game.filterPlayer(function (current) {
+							return current !== player && player.canUse('sha', current, false) && get.effect(current, {name: 'sha'}, player, player) > 0;
+						}).sort(function (a, b) {
+							return get.effect(b, {name: 'sha'}, player, player) - get.effect(a, {name: 'sha'}, player, player);
 						});
-						if(!list.length) return 0;
-						var target=list[0];
-						if(target.mayHaveShan()&&!player.hasSkillTag('directHit_ai',true,{
-							target:target,
-							card:card,
-						},true)) return 0;
-						return 6.5-get.value(card);
+						if (!list.length) return 0;
+						let target = list[0],
+							cards = ui.selected.cards.concat([card]),
+							color = [];
+						for (let i of cards) {
+							if (!color.includes(get.color(i, player))) color.add(get.color(i, player));
+						}
+						if (color.length !== 1) color[0] = 'none';
+						if (player.hasSkillTag(
+							'directHit_ai',
+							true,
+							{
+								target: target,
+								card: {name: 'sha', suit: 'none', color: color[0], cards: cards, isCard: true}
+							},
+							true
+						)) return 6.5 - get.value(card, player);
+						if (Math.random() * target.countCards('hs') < 1 || player.needsToDiscard(-ui.selected.cards.length)) return 6 - get.value(card, player);
+						return 0;
 					}
-					return 6.3-get.value(card);
+					return 6.3 - get.value(card);
 				},
 				onuse:function(result,player){
 					player.addTempSkill('changbiao_draw');
@@ -6315,6 +6327,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return card.name!='sha'&&get.value(card,player)<6.3;
 						},'hs')?1:0)>1?-1:1);
 					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep'){
+							let num=0;
+							if(arg&&(!arg.card||get.name(arg.card)!=='tao')) return false;
+							player.getHistory('sourceDamage',function(evxt){
+								let evt=evxt.getParent();
+								if(evt&&evt.name=='sha'&&evt.skill=='changbiao') num+=evt.cards.length;
+							});
+							return player.needsToDiscard(num)>0;
+						}
+					}
 				},
 			},
 			//国钟会
@@ -10861,34 +10885,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					useShan:true,
 					effect:{
 						target:function(card,player,target,current){
-							if(get.tag(card,'respondShan')&&!player.hasSkillTag('directHit_ai',true,{
-								target:target,
-								card:card,
-							},true)){
-								var hastarget=game.hasPlayer(function(current){
-									return get.attitude(target,current)<0;
-								});
-								var be=target.countCards('e',{color:'black'});
-								if(target.countCards('h','shan')&&be){
-									if(!target.hasSkill('xinguidao')) return 0;
-									return [0,hastarget?target.countCards('he')/2:0];
-								}
-								if(target.countCards('h','shan')&&target.countCards('h')>2){
-									if(!target.hasSkill('xinguidao')) return 0;
-									return [0,hastarget?target.countCards('h')/4:0];
-								}
-								if(target.countCards('h')>3||(be&&target.countCards('h')>=2)){
-									return [0,0];
-								}
-								if(target.countCards('h')==0){
-									return [1.5,0];
-								}
-								if(target.countCards('h')==1&&!be){
-									return [1.2,0];
-								}
-								if(!target.hasSkill('xinguidao')) return [1,0.05];
-								return [1,Math.min(0.5,(target.countCards('h')+be)/4)];
+							let name='sha';
+							if(typeof card=='object'){
+								if(card.viewAs) name=card.viewAs;
+								else name=get.name(card);
 							}
+							if(name=='shandian'||get.tag(card,'respondShan')&&!player.hasSkillTag('directHit_ai',true,{
+								target: target,
+								card: card
+							},true)){
+								let club=0,spade=0;
+								if(game.hasPlayer(function(current){
+									return get.attitude(target,current)<0&&get.damageEffect(current,target,target,'thunder')>0;
+								})){
+									club=2;
+									spade=4;
+								}
+								if(!target.isHealthy()) club+=2;
+								if(!club&&!spade) return 1;
+								if(!target.mayHaveShan(player)) return 1-0.1*Math.min(5,target.countCards('hs'));
+								if(!target.hasSkillTag('rejudge')) return [1,(club+spade)/4];
+								let pos=(player==target||player.hasSkillTag('viewHandcard',null,target,true))?'hes':'e',better=club>spade?'club':'spade',max=0;
+								target.hasCard(function(cardx){
+									if(get.suit(cardx)==better){
+										max=2;
+										return true;
+									}
+									if(spade&&get.color(cardx)=='black') max=1;
+								},pos);
+								if(max==2) return [1,Math.max(club,spade)];
+								if(max==1) return [1,Math.min(club,spade)];
+								if(pos=='e') return [1,Math.min(Math.max(1,target.countCards('hs'))*(club+spade)/4,Math.max(club,spade))];
+								return [1,(club+spade)/4];
+							}
+							if(name=='lebu'||name=='bingliang') return [target.hasSkillTag('rejudge')?0.4:1,2,target.hasSkillTag('rejudge')?0.4:1,0];
 						}
 					}
 				}
@@ -10924,6 +10954,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinguidao:{
 				audio:2,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num>0&&get.itemtype(card)=='card'&&get.color(card)=='black'&&get.type(card)=='equip') num*1.35;
+					},
+					aiValue:function(player,card,num){
+						if(num>0&&get.itemtype(card)=='card'&&get.color(card)=='black') return num*1.15;
+					},
+					aiUseful:function(player,card,num){
+						if(num>0&&get.itemtype(card)=='card'&&get.color(card)=='black') return num*1.35;
+					}
+				},
 				trigger:{global:'judge'},
 				filter:function(event,player){
 					return player.countCards('hes',{color:'black'})>0;
