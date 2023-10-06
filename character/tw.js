@@ -1100,20 +1100,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				check:function(event,player){
-					var att=get.attitude(event.player,player);
-					if(player.hasSkill('twzhiqu')){
-						var cnt=game.countPlayer(current=>get.distance(player,current)==2&&!player.inRange(current));
-						if(cnt>=2){
-							if(att<0) return true;
-							return false;
-						}
-						if(att<0&&cnt>=2||att>0&&!cnt) return true;
-						return false;
-					}
-					else{
-						if(att<0) return false;
-						return true;
-					}
+					let att=get.attitude(player,event.player);
+					if(att>0) return true;
+					if(!player.hasSkill('twzhiqu')) return false;
+					let cnt=game.countPlayer(current=>get.distance(player,current)===2);
+					if(cnt>2||cnt===2&&Math.abs(att)<2||cnt&&Math.abs(att)<1) return true;
+					return false;
 				},
 				content:function(){
 					'step 0'
@@ -1126,20 +1118,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.choice;
 					}).set('choice',function(){
 						var att=get.attitude(target,player);
-						if(att==0) return 0;
+						if(att===0) return 0;
 						if(player.hasSkill('twzhiqu')){
-							var cnt=game.countPlayer(current=>get.distance(player,current)==2&&!player.inRange(current));
-							if(cnt>=2){
-								if(att<0) return 1;
-								return 0;
+							var cnt=game.countPlayer(current=>get.distance(player,current)===2);
+							if(att>0){
+								if(cnt||player.needsToDiscard(1)) return 0;
+								return 1;
 							}
-							if(att<0&&cnt>=2||att>0&&!cnt) return 1;
+							if(!cnt) return 0;
+							if(cnt>=2||get.distance(target,player,'attack')===2||get.distance(target,player)===2) return 1;
 							return 0;
 						}
-						else{
-							if(att<0) return 0;
-							return [0,1].randomGet();
-						}
+						if(att<0||player.needsToDiscard(1)&&game.hasPlayer(function(current){
+							return current!==player&&current!==target&&!player.inRange(current);
+						})) return 0;
+						return [0,1].randomGet();
 					}());
 					'step 1'
 					if(result.index==0){
@@ -1360,6 +1353,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				direct:true,
 				onremove:true,
+				intro:{
+					content:'players'
+				},
 				filter:function(event,player){
 					return game.hasPlayer(current=>current!=player)&&(event.name!='phase'||game.phaseNumber==0);
 				},
@@ -11389,6 +11385,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twzhian:{
 				audio:2,
+				init:function(player){
+					game.addGlobalSkill('twzhian_ai');
+				},
+				onremove:function(player){
+					game.removeGlobalSkill('twzhian_ai');
+				},
 				usable:1,
 				trigger:{global:'useCardAfter'},
 				direct:true,
@@ -11468,6 +11470,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool&&target.getCards('ej').contains(trigger.cards[0])) player.gain(trigger.cards,target,'give','bySelf');
 				},
+				subSkill:{
+					ai:{
+						trigger:{player:'dieAfter'},
+						filter:function(event,player){
+							return !game.hasPlayer((current)=>current.hasSkill('twzhian'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:function(){
+							game.removeGlobalSkill('twzhian_ai');
+						},
+						ai:{
+							effect:{
+								player:function(card,player,target){
+									if(get.type(card)!=='delay'&&get.type(card)!=='equip') return 1;
+									let za=game.findPlayer((cur)=>cur.hasSkill('twzhian')&&(!cur.storage.counttrigger||!cur.storage.counttrigger.twzhian)&&get.attitude(player,cur)<=0);
+									if(za) return [0.5,-0.8];
+								}
+							}
+						}
+					}
+				}
 			},
 			twyujue:{
 				audio:2,
