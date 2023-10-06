@@ -1441,7 +1441,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return list2.randomGets(num).sort(lib.sort.character);
 						}
 						var getGroup=function(name){
-							if(lib.characterReplace[name]) return lib.character[lib.characterReplace[name][0]][1];
+							var characterReplace = lib.characterReplace[name];
+							if(characterReplace && characterReplace[0] && lib.character[characterReplace[0]]) return lib.character[characterReplace[0]][1];
 							return lib.character[name][1];
 						}
 						var list2x=list2.slice(0);
