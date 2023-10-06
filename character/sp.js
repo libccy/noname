@@ -3686,15 +3686,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					aiValue:function(player,card,num){
-						if(get.itemtype(card)!='card'||!card.hasGaintag('oldaili_tag')) return;
-						if(get.distance(_status.currentPhase,player,'absolute')==1&&!player.isTurnedOver()) return;
-						if(player.countCards('h',card=>{
+						if(num < 0 ||get.itemtype(card) != 'card' || !card.hasGaintag('oldaili_tag')) return;
+						if(get.distance(_status.currentPhase, player, 'absolute') == 1 && !player.isTurnedOver()) return;
+						let dai = player.countCards('h', (card) => {
 							return card.hasGaintag('oldaili_tag');
-						})%2==0&&!ui.selected.cards.some(card=>{
+						});
+						if(ui.selected.cards && ui.selected.cards.length) dai += ui.selected.cards.filter((card) => {
 							return card.hasGaintag('oldaili_tag');
-						})){
-							return num/10;
-						}
+						}).length;
+						if(dai % 2) return Math.sqrt(num);
+						return num + 6;
 					},
 					aiUseful:function(){
 						return lib.skill.oldaili.mod.aiValue.apply(this,arguments);
@@ -6113,9 +6114,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					threaten:1.2,
-					order:9,
+					order:9.1,
 					result:{
-						target:-1,
+						player:function(player){
+							let min=24;
+							player.countCards('he',function(card){
+								min=Math.min(min,get.value(card));
+							});
+							if(ui.selected.targets.length==1) return 1-min/6;
+							return 0.75-min/48;
+						},
+						target:function(player,target){
+							if(target.hasCard(function(card){
+								return lib.filter.cardDiscardable(card,player,'olqingyi');
+							},'he')) return -1;
+							return 0;
+						}
 					},
 				},
 				group:'olqingyi_gain',
@@ -8528,13 +8542,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player!=event.player&&event.player.isIn()&&player.countCards('h')>0&&!player.hasSkill('yuanzi_round',null,null,false);
 				},
 				check:function(event,player){
-					if(get.attitude(player,event.player)<=4) return false;
-					if(event.player.hasJudge('lebu')) return false;
+					if(event.player.hasJudge('lebu')||get.attitude(player,event.player)<2) return false;
 					return game.hasPlayer(function(current){
-						return event.player!=player&&game.hasPlayer(function(current){
-							return current!=player&&current!=event.player&&event.player.inRange(current)&&get.attitude(event.player,current)<0;
-						});
-					})
+						return current!==player&&current!==event.player&&event.player.inRange(current)&&get.attitude(event.player,current)<0;
+					});
 				},
 				content:function(){
 					var cards=player.getCards('h');
@@ -21635,6 +21646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						var nono=(get.damageEffect(trigger.player,player,trigger.player)>=0);
+						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.15);
 						trigger.player.chooseToDiscard('he','弃置一张装备牌并令'+get.translation(player)+'摸一张牌，或受到一点伤害',{type:'equip'}).set('ai',function(card){
 							if(_status.event.nono){
 								return 0;
@@ -21653,10 +21665,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						trigger.player.damage();
 					}
-				},
-				ai:{
-					expose:0.3,
-					threaten:1.3
 				}
 			},
 			suishi:{
