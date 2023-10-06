@@ -3863,6 +3863,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dcaichen:{
 				audio:2,
+				init:function(player){
+					game.addGlobalSkill('dcaichen_hit');
+				},
+				onremove:function(player){
+					game.removeGlobalSkill('dcaichen_hit');
+				},
 				trigger:{
 					player:['loseAfter','phaseDiscardBefore'],
 					global:'loseAsyncAfter',
@@ -3885,6 +3891,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						trigger.directHit.add(player);
 						game.log(player,'不可响应',trigger.card);
+					}
+				},
+				subSkill:{
+					hit:{
+						trigger:{player:'dieAfter'},
+						filter:function(event,player){
+							return !game.hasPlayer(current=>current.hasSkill('dcaichen'));
+						},
+						silent:true,
+						forceDie:true,
+						content:function(){
+							game.removeGlobalSkill('dcaichen_hit');
+						},
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(player,tag,arg){
+								return arg&&arg.card&&arg.target&&arg.target.hasSkill('dcaichen')&&ui.cardPile.childNodes.length<40&&get.suit(arg.card)==='spade';
+							}
+						}
 					}
 				}
 			},
