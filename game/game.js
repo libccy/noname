@@ -26747,6 +26747,7 @@
 				},
 				hasHistory:function(key,filter,last){
 					const history=this.getHistory(key);
+					if(!filter||typeof filter!="function") filter=lib.filter.all;
 					if(last){
 						const lastIndex=history.indexOf(last);
 						return history.some((event,index)=>{
