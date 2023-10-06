@@ -880,15 +880,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				check:function(event,player){
-					if(get.attitude(player,event.player)<5) return false;
-					if(player.maxHp-player.hp>=2) return false;
-					if(player.hp==1) return false;
-					if(player.hp==2&&player.countCards('h')<2) return false;
-					if(event.player.countCards('h')>=event.player.hp) return false;
-					return true;
+					if(get.attitude(_status.event.player,event.player)<1) return false;
+					return player.hp>1||player.hasCard(card=>(get.name(card)==='tao'||get.name(card)==='jiu')&&lib.filter.cardEnabled(card,player),'hs');
 				},
 				content:function(){
 					'step 0'
+					if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.2);
 					player.draw(2);
 					'step 1'
 					var cards=player.getCards('he');
@@ -906,7 +903,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.player.markAuto('rexiantu_check',[player]);
 				},
 				ai:{
-					threaten:1.1,
+					threaten:function(player,target){
+						return 1+game.countPlayer((current)=>{
+							if(current!=target&&get.attitude(target,current)>0) return 0.5;
+							return 0;
+						});
+					},
 					expose:0.3
 				},
 				subSkill:{
@@ -1981,6 +1983,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 13-num;
 						}
 					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return (!arg||arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&!player.getStat('skill').reqice&&player.hasCard((card)=>get.name(card)!='tao','h');
+					},
 					threaten:1.7,
 				},
 				subSkill:{
@@ -2725,6 +2731,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return -0.5;
 						}
+					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return (!arg||arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&player.countSkill('rezhanjue_draw')<3&&player.hasCard((card)=>get.name(card)!='tao'&&!card.hasGaintag('reqinwang'),'h');
 					}
 				},
 			},
@@ -7492,9 +7502,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					target.chooseToDiscard(cards.length,'弃置'+get.cnNumber(cards.length)+'张牌并失去1点体力，或点取消将武将牌翻面并摸'+get.cnNumber(cards.length)+'张牌','he').set('ai',function(card){
-						var player=_status.event.player;
-						if(player.isTurnedOver()) return -1;
-						return (player.hp*player.hp)-get.value(card);
+						if(cards.length>3||target.hasSkillTag('noturn')||target.isTurnedOver()||(get.name(card)=='tao'||get.name(card)=='jiu')&&lib.filter.cardSavable(card,target,target)) return -1;
+						if(target.hp<=1){
+							if(cards.length<target.getEnemies().length&&target.hasCard((cardx)=>{
+								return (get.name(cardx)=='tao'||get.name(cardx)=='jiu')&&lib.filter.cardSavable(cardx,target,target);
+							},'hs')) return 7-get.value(card);
+							return -1;
+						}
+						return 24-5*cards.length-2*Math.min(4,target.hp)-get.value(card);
 					});
 					"step 1"
 					if(!result.bool){
@@ -7505,7 +7520,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:2,
-					expose:0.3,
 					threaten:1.8,
 					result:{
 						target:function(player,target){
