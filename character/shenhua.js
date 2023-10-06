@@ -5030,6 +5030,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					re_sunyi:'gzyinghun_re_sunyi',
 					tw_ol_sunjian:'yinghun_ol_sunjian',
 				},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num>0&&_status.event&&_status.event.type=='phase'&&get.tag(card,'recover')){
+							if(player.needsToDiscard()) return num/3;
+							return 0;
+						}
+					}
+				},
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				preHidden:true,
@@ -5081,6 +5089,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.num>0) event.target.chooseToDiscard(event.num,true,'he');
 					}
 				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'damage')&&get.itemtype(player)==='player'&&target.hp>(player.hasSkillTag('damageBonus',true,{
+								target:target,
+								card:card
+							})?2:1)) return [1,1];
+						}
+					},
+					threaten:function(player,target){
+						return Math.max(0.5,target.getDamagedHp()/2);
+					},
+					maixie:true
+				}
 			},
 			gzyinghun:{
 				audio:'yinghun',
@@ -5088,6 +5110,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname2:{
 					re_sunyi:'gzyinghun_re_sunyi',
 					tw_ol_sunjian:'yinghun_ol_sunjian',
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num>0&&_status.event&&_status.event.type=='phase'&&get.tag(card,'recover')){
+							if(player.needsToDiscard()) return num/3;
+							return 0;
+						}
+					}
 				},
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
@@ -5143,13 +5173,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					threaten:function(player,target){
-						if(target.hp==target.maxHp) return 0.5;
-						if(target.hp==1) return 2;
-						if(target.hp==2) return 1.5;
-						return 0.5;
+					effect:{
+						target:function(card,player,target){
+							if(get.tag(card,'damage')&&get.itemtype(player)==='player'&&target.hp>(player.hasSkillTag('damageBonus',true,{
+								target:target,
+								card:card
+							})?2:1)) return [1,1];
+						}
 					},
-					maixie:true,
+					threaten:function(player,target){
+						return Math.max(0.5,target.getDamagedHp()/2);
+					},
+					maixie:true
 				}
 			},
 			yinghun_ol_sunjian:{audio:2},
