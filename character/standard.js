@@ -1459,6 +1459,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinzhiheng:{
 				audio:'zhiheng',
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num<=0||get.itemtype(card)!=='card'||get.type(card)!=='equip') return num;
+						let eq=player.getEquip(get.subtype(card));
+						if(eq&&get.equipValue(card)-get.equipValue(eq)<Math.max(1.2,6-player.hp)) return 0;
+					}
+				},
 				enable:'phaseUse',
 				// alter:true,
 				usable:1,
@@ -1503,9 +1510,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delay:{}
 				},
 				ai:{
-					order:1,
+					order:function(item,player){
+						if(player.hasCard((i)=>get.value(i)>Math.max(6,9-player.hp),'he')) return 1;
+						return 10;
+					},
 					result:{
 						player:1
+					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return (!arg||arg&&arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&!player.getStat().skill.xinzhiheng&&player.hasCard((card)=>get.name(card)!=='tao','h');
 					},
 					threaten:1.55
 				},
@@ -1513,6 +1527,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhiheng:{
 				audio:2,
 				audioname:['gz_jun_sunquan'],
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num<=0||get.itemtype(card)!=='card'||get.type(card)!=='equip') return num;
+						let eq=player.getEquip(get.subtype(card));
+						if(eq&&get.equipValue(card)-get.equipValue(eq)<Math.max(1.2,6-player.hp)) return 0;
+					}
+				},
 				enable:'phaseUse',
 				usable:1,
 				position:'he',
