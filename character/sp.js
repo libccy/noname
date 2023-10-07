@@ -16395,6 +16395,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xinyongsi:{
+				audio:'yongsi1',
 				group:['xinyongsi1','xinyongsi2'],
 				locked:true,
 			},
