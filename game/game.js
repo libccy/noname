@@ -58901,6 +58901,7 @@
 			if(node._nointro) return;
 			if(typeof node._customintro=='function'){
 				if(node._customintro(uiintro,evt)===false) return;
+				lib.placePoppedDialog(uiintro,evt);
 			}
 			else if(Array.isArray(node._customintro)){
 				var caption=node._customintro[0];
