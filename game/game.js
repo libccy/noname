@@ -25755,7 +25755,7 @@
 						delete this.marks[name];
 						ui.updatem(this);
 						var info=lib.skill[name];
-						if(info&&info.intro&&info.intro.onunmark){
+						if(!game.online&&info&&info.intro&&info.intro.onunmark){
 							if(info.intro.onunmark=='throw'){
 								if(get.itemtype(this.storage[name])=='cards'){
 									this.$throw(this.storage[name],1000);
