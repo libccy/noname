@@ -16359,14 +16359,14 @@
 				},
 				chooseButtonOL:function(){
 					'step 0'
-					ui.arena.classList.add('markhidden');
+					//ui.arena.classList.add('markhidden');
 					for(var i=0;i<event.list.length;i++){
 						var current=event.list[i];
 						current[0].wait();
 						if(current[0].isOnline()){
 							var target=current.shift();
 							target.send(function(args,callback,switchToAuto,processAI){
-								ui.arena.classList.add('markhidden');
+								//ui.arena.classList.add('markhidden');
 								var next=game.me.chooseButton.apply(game.me,args);
 								next.callback=callback;
 								next.switchToAuto=switchToAuto;
@@ -16415,9 +16415,9 @@
 						game.pause();
 					}
 					'step 6'
-					game.broadcastAll(function(){
+					/*game.broadcastAll(function(){
 						ui.arena.classList.remove('markhidden');
-					});
+					});*/
 					event.result=event.resultOL;
 				},
 				chooseCard:function(){
@@ -21433,7 +21433,7 @@
 							return true;
 						});
 						for(var i=0;i<skills.length;i++){
-							this.addSkill(skills[i]);
+							this.addSkill(skills[i],null,true);
 						}
 						this.checkConflict();
 					}
@@ -25697,7 +25697,7 @@
 					}
 					return true;
 				},
-				markSkill:function(name,info,card){
+				markSkill:function(name,info,card,nobroadcast){
 					if(info===true){
 						this.syncStorage(name);
 						info=null;
@@ -25708,10 +25708,8 @@
 					else{
 						game.addVideo('markSkill',this,[name]);
 					}
-					game.broadcastAll(function(storage,player,name,info,card){
-						if(storage!=undefined){
-							player.storage[name]=storage;
-						}
+					const func=function(storage,player,name,info,card){
+						player.storage[name]=storage;
 						if(!info){
 							if(player.marks[name]){
 								player.updateMarks();
@@ -25736,12 +25734,14 @@
 							}
 						}
 						player.updateMarks();
-					},this.storage[name],this,name,info,card);
+					};
+					func(this.storage[name],this,name,info,card);
+					if(!nobroadcast) game.broadcast(func,this.storage[name],this,name,info,card);
 					return this;
 				},
-				unmarkSkill:function(name){
+				unmarkSkill:function(name,nobroadcast){
 					game.addVideo('unmarkSkill',this,name);
-					game.broadcast(function(player,name){
+					if(!nobroadcast) game.broadcast(function(player,name){
 						if(player.marks[name]){
 							player.marks[name].delete();
 							player.marks[name].style.transform+=' scale(0.2)';
@@ -25772,11 +25772,11 @@
 					}
 					return this;
 				},
-				markSkillCharacter:function(id,target,name,content){
+				markSkillCharacter:function(id,target,name,content,broadcast){
 					if(typeof target=='object'){
 						target=target.name;
 					}
-					game.broadcastAll(function(player,target,name,content,id){
+					const func=function(player,target,name,content,id){
 						if(player.marks[id]){
 							player.marks[id].name=name+'_charactermark';
 							player.marks[id]._name=target;
@@ -25807,7 +25807,9 @@
 								target:target
 							});
 						}
-					},this,target,name,content,id);
+					}
+					func(this,target,name,content,id);
+					if(!nobroadcast) game.broadcastAll(func,this,target,name,content,id);
 					return this;
 				},
 				markCharacter:function(name,info,learn,learn2){
@@ -26252,14 +26254,14 @@
 						if(info.mark){
 							if(info.mark=='card'&&
 								get.itemtype(this.storage[skill])=='card'){
-									this.markSkill(skill,null,this.storage[skill]);
+									this.markSkill(skill,null,this.storage[skill],nobroadcast);
 							}
 							else if(info.mark=='card'&&
 								get.itemtype(this.storage[skill])=='cards'){
-									this.markSkill(skill,null,this.storage[skill][0]);
+									this.markSkill(skill,null,this.storage[skill][0],nobroadcast);
 							}
 							else if(info.mark=='image'){
-									this.markSkill(skill,null,ui.create.card(null,'noclick').init([null,null,skill]));
+									this.markSkill(skill,null,ui.create.card(null,'noclick').init([null,null,skill]),nobroadcast);
 							}
 							else if(info.mark=='character'){
 								var intro=info.intro.content;
@@ -26281,10 +26283,10 @@
 								else{
 									caption=get.translation(skill);
 								}
-								this.markSkillCharacter(skill,this.storage[skill],caption,intro);
+								this.markSkillCharacter(skill,this.storage[skill],caption,intro,nobroadcast);
 							}
 							else{
-								this.markSkill(skill);
+								this.markSkill(skill,null,null,nobroadcast);
 							}
 						}
 					}
