@@ -41,7 +41,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiuliju:['male','qun','4/6',['koulve','qljsuiren']],
 			re_hucheer:['male','qun',4,['redaoji','fuzhong']],
 			re_dongcheng:['male','qun',4,['xuezhao']],
-			tangji:['female','qun',3,['jielie','kangge']],
+			tangji:['female','qun',3,['kangge','jielie']],
 			zhangheng:['male','qun',8,['dangzai','liangjue']],
 			duanwei:['male','qun',4,['langmie']],
 			re_niujin:['male','wei',4,['recuorui','reliewei']],
