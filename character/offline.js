@@ -983,9 +983,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				filter:function(event,player){
 					if(get.type(event.card)!='equip') return false;
-					var gz=get.mode()=='guozhan';
-					if(gz&&event.player.isFriendOf(player)) return false;
-					return player.countMark('pkwuku')<(gz?2:3);
+					return player.countMark('pkwuku')<3;
 				},
 				content:function(){
 					player.addMark('pkwuku',1);
