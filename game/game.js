@@ -21448,7 +21448,7 @@
 							this._inits[i](this);
 						}
 					}
-					if(update!==false) this.update();
+					if(update!==false) this.$update();
 					return this;
 				},
 				initOL:function(name,character){
@@ -22031,14 +22031,18 @@
 				update:function(){
 					if(_status.video&&arguments.length==0) return;
 					if(this.hp>=this.maxHp) this.hp=this.maxHp;
-					var hp=this.node.hp;
-					hp.style.transition='none';
 					game.broadcast(function(player,hp,maxHp,hujia){
 						player.hp=hp;
 						player.maxHp=maxHp;
 						player.hujia=hujia;
-						player.update();
+						player.$update();
 					},this,this.hp,this.maxHp,this.hujia);
+					this.$update();
+				},
+				$update:function(){
+					if(this.hp>=this.maxHp) this.hp=this.maxHp;
+					var hp=this.node.hp;
+					hp.style.transition='none';
 					if(!_status.video){
 						if(this.hujia){
 							this.markSkill('ghujia');

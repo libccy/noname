@@ -753,7 +753,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(result.links[0]);
 							player.hp++;
 							player.maxHp++;
-							player.update();
+							player.$update();
 						}
 					});
 					"step 5"
