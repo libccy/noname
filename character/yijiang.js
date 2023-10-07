@@ -12566,13 +12566,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				audio:'qice_backup',
 				filter:function(event,player){
-					var hs=player.getCards('h');
+					const hs=player.getCards('h');
 					if(!hs.length) return false;
-					for(var i=0;i<hs.length;i++){
-						var mod2=game.checkMod(hs[i],player,'unchanged','cardEnabled2',player);
-					if(mod2===false) return false;
-					}
-					return true;
+					if(hs.some(card=>{
+						const mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+						return (mod2===false)
+					})) return false;
+					return lib.inpile.some(name=>{
+						if(get.type(name)!='trick') return false;
+						const card=get.autoViewAs({name},hs);
+						return event.filterCard(card,player,event);
+					});
 				},
 				chooseButton:{
 					dialog:function(player){
@@ -12583,7 +12587,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog(get.translation('qice'),[list,'vcard']);
 					},
 					filter:function(button,player){
-						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
+						const event=_status.event.getParent(),card=get.autoViewAs({
+							name:button.link[2],
+						},player.getCards('h'));
+						return event.filterCard(card,player,event);
 					},
 					check:function(button){
 						var player=_status.event.player;
