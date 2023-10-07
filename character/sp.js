@@ -17929,16 +17929,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.draw(3);
+					'step 1'
 					var list=lib.skill.zhengnan.derivation.filter(skill=>!player.hasSkill(skill));
 					if(list.length==1) event._result={control:list[0]};
-					else if(list.length){
+					else if(list.length>0){
 						player.chooseControl(list).set('prompt','选择获得一项技能').set('ai',function(){
 							if(_status.event.controls.contains('dangxian')) return 'dangxian';
 							return _status.event.controls[0];
 						});
 					}
 					else event.finish();
-					'step 1'
+					'step 2'
 					if(result.control){
 						player.addSkillLog(result.control);
 						player.popup(result.control);
