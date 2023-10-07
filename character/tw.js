@@ -320,10 +320,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'观看'+str+'的手牌并获得其一种花色的所有手牌',
 						]).set('ai',()=>{
 							var player=_status.event.player;
-							var target=_status.event.getParent().target;
+							var target=_status.event.target;
 							if(target.countCards('h')-player.countCards('h')>target.countCards('h')/4||get.attitude(player,target)>0) return 0;
 							return 1;
-						});
+						}).set('target',target);
 					}
 					'step 3'
 					if(result.index==0){

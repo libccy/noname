@@ -7131,6 +7131,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huguan:{
 				audio:2,
 				audioname:['wangyue'],
+				init:function(player){
+					game.addGlobalSkill('huguan_all');
+				},
+				onremove:function(player){
+					game.removeGlobalSkill('huguan_all');
+				},
 				trigger:{global:'useCard'},
 				direct:true,
 				filter:function(event,player){
@@ -7144,9 +7150,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseControl(lib.suit,'cancel2').set('prompt',get.prompt('huguan',trigger.player)).set('prompt2','令某种花色的手牌不计入其本回合的手牌上限').set('ai',function(){
-						var player=_status.event.player,target=_status.event.getTrigger().player;
-						if(get.attitude(player,target)<=0) return 'cancel2';
-						var list=lib.suit.slice(0);
+						var player=_status.event.player,target=_status.event.getTrigger().player,att=get.attitude(player,target);
+						if(att <= 0){
+							if (!player.hasSkill('yaopei') || player.hasAllHistory('useSkill',function(evt){
+								return evt.skill=='huguan'&&evt.targets.includes(target);
+							}) || target.needsToDiscard() - target.needsToDiscard(-target.countCards('h') / 4) > (att>-2?1.6:1)) return 'cancel2';
+						}
+						let list = lib.suit.slice(0);
+						if(att <= 0 && target.getStorage('huguan_add')) for(let i of target.getStorage('huguan_add')){
+							if (list.includes(i)) return i;
+						}
 						list.removeArray(target.getStorage('huguan_add'));
 						if(list.length) return list.randomGet();
 						return 'cancel2';
@@ -7174,6 +7187,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						intro:{content:'本回合$花色的牌不计入手牌上限'},
 					},
+					all:{
+						mod:{
+							aiValue:function(player, card, num){
+								if(player && player.storage.huguan_all > 0 && get.itemtype(card) == 'card' && get.color(card, player) == 'red') return num + player.storage.huguan_all;
+							}
+						},
+						trigger:{
+							player:['phaseUseBegin', 'useCard']
+						},
+						filter:function(event, player){
+							if(event.name === 'useCard') return player.storage.huguan_all;
+							return true;
+						},
+						silent:true,
+						charlotte:true,
+						content:function(){
+							'step 0'
+							if(trigger.name === 'useCard'){
+								player.storage.huguan_all = 0;
+								event.finish();
+							}
+							'step 1'
+							let num = -157;
+							game.countPlayer(function (current){
+								if(current.hasSkill('huguan')) num = Math.max(num, get.attitude(_status.event.player, current));
+							});
+							if(num === -157) game.removeGlobalSkill('huguan_all');
+							else if(num === 0) player.storage.huguan_all = 6;
+							else if(num > 0) player.storage.huguan_all = 9;
+						}
+					}
 				},
 			},
 			yaopei:{
@@ -7217,15 +7261,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return target==player||target==_status.event.getTrigger().player;
 						},
 						ai1:function(card){
-							return 8-get.value(card);
+							let player = _status.event.player, source = _status.event.getTrigger().player;
+							if(get.attitude(player, source) > 0 && (get.recoverEffect(player, player, player) > 0 || get.recoverEffect(source, player, player) > 0)) return 12 - get.value(card);
+							return 8 - get.value(card);
 						},
 						ai2:function(target){
-							var player=_status.event.player,source=_status.event.getTrigger().player;
-							var recoverer=(player==target?source:player);
-							if(recoverer.isHealthy()) return (get.attitude(player,target)>0?1:0);
-							if(get.recoverEffect(recoverer,player,player)>0&&get.attitude(player,target)>0) return 2;
+							let player = _status.event.player, source = _status.event.getTrigger().player;
+							let recoverer = player === target ? source : player;
+							if(recoverer.isHealthy()) return get.attitude(player, target);
+							let att = get.attitude(player, recoverer), rec = get.recoverEffect(recoverer, player, player);
+							if(rec > 0) return Math.abs(att) + get.attitude(player, target);
 							return 0;
-						},
+						}
 					});
 					'step 1'
 					if(result.bool){
@@ -7233,10 +7280,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('yaopei',target);
 						player.discard(result.cards);
 						if(player==result.targets[0]){
+							if(target.isDamaged()&&target.hp<player.hp&&(get.mode()!='identity'||player.identity!='nei')) player.addExpose(0.15);
 							target.recover();
 							player.draw(2);
 						}
 						else{
+							if((player.isHealthy()||player.hp>target.hp)&&(get.mode()!='identity'||player.identity!='nei')) player.addExpose(0.15);
 							target.draw(2);
 							player.recover();
 						}
@@ -7252,14 +7301,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
+					let he = player.getCards('he'),
+						disval = 0,
+						dis = 0,
+						spare = 30,
+						use = true;
+					for(let i of he){
+						let val = get.value(i, player);
+						if(val < 6 && get.position(i) == 'h'){
+							dis++;
+							disval += val;
+						}
+						else if(val < spare) spare = val;
+					}
+					if(!dis){
+						dis = 1;
+						disval = spare;
+						spare = -1;
+					}
+					let draw = Math.min(trigger.player.countCards('h'), 5 + dis - player.countCards('h'));
+					if(6 * draw < disval) use = false;
 					player.chooseToDiscard('he',get.prompt('mingluan'),'弃置任意张牌，并摸等同于'+get.translation(trigger.player)+'手牌数的牌（至多摸至五张）',[1,Infinity]).set('ai',function(card){
-						var player=_status.event.player;
-						var ph=player.countCards('h');
-						if(get.position(card)=='h') ph--;
-						var num=Math.min(_status.event.getTrigger().player.countCards('h'),5-ph);
-						if(num>0) return 3.5*num+0.01-get.value(card);
-						return 0.01-get.value(card);
-					}).logSkill=['mingluan',trigger.player];
+						let val = get.value(card, player);
+						if(val < 0 && card.name !== 'du') return 30;
+						if(!_status.event.use) return 0;
+						if(ui.selected.cards.length){
+							if (get.position(card) !== 'h') return 0;
+							return 6 - val;
+						}
+						if(_status.event.spare < 0 || get.position(card) === 'h') return 30 - val;
+						return 0;
+					}).set('spare',spare).set('use',use).logSkill=['mingluan',trigger.player];
 					'step 1'
 					if(result.bool){
 						var num=trigger.player.countCards('h'),num2=5-player.countCards('h');

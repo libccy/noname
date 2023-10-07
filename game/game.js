@@ -337,47 +337,50 @@
 			}],
 		},
 		announce:{
-			//推送一个对象给所有监听了key的订阅者。
-			publish:function(key,obj){
-				if(!_status.announce)return;
-				if(!_status.announce[key])return;
-				for(let subscriber of _status.announce[key]){
-					if(subscriber.onReceive){
-						subscriber.onReceive(key,obj);
+			init(){
+				_status._announce=document.createElement("Announce");
+				_status._announce_cache=new Map();
+				delete lib.announce.init;
+			},
+			//推送一个对象给所有监听了name的订阅者。
+			publish(name,values){
+				if(_status._announce) _status._announce.dispatchEvent(new CustomEvent(name,{
+					detail:values
+				}));
+				return values;
+			},
+			//订阅name相关的事件。
+			subscribe(name,method){
+				if(_status._announce&&_status._announce_cache) {
+					let subscribeFunction;
+					if(_status._announce_cache.has(method)){
+						let records=_status._announce_cache.get(method);
+						subscribeFunction=records.get("Listener");
+						records.get("EventTargets").add(name);
 					}
-				}
-			},
-			//订阅key相关的事件。
-			subscribe:function(key,subscriber){
-				if(typeof subscriber === 'function'){
-					let subs = {
-						onReceive:subscriber,
-						priority:0,
-					};
-					subscriber = subs;
-				}
-				if(!_status.announce)_status.announce = {};
-				if(!Array.isArray(_status.announce[key]))_status.announce[key] = [];
-				var inserted = false;
-				for(let i=0;i<_status.announce[key].length;i++){
-					let pri = _status.announce[key][i].priority;
-					if(pri <= subscriber.priority){
-						_status.announce[key].splice(i,0,subscriber);
-						inserted = true;
-						break;
+					else{
+						subscribeFunction=event=>method(event.detail);
+						let records=new Map();
+						records.set("Listener",subscribeFunction);
+						records.set("EventTargets",[name]);
+						_status._announce_cache.set(method,records);
 					}
+					_status._announce.addEventListener(name,subscribeFunction);
 				}
-				if(!inserted){
-					_status.announce[key].push(subscriber);
+				return method;
+			},
+			//取消对事件name的订阅
+			unsubscribe(name,method){
+				if(_status._announce&&_status._announce_cache&&_status._announce_cache.has(method)){
+					let records=_status._announce_cache.get(method);
+					const listener=records.get("Listener");
+					let eventTargets=records.get("EventTargets");
+					eventTargets.remove(name);
+					if(eventTargets.length<=0) _status._announce_cache.remove(method);
+					_status._announce.removeEventListener(name,listener);
 				}
-				return subscriber;
-			},
-			//取消对事件key的订阅，subscriber需要为上面lib.announce.subscribe返回的值。
-			unsubscribe:function(key,subscriber){
-				if(!_status.announce)return;
-				if(!_status.announce[key])return;
-				_status.announce[key].remove(subscriber);
-			},
+				return method;
+			}
 		},
 		objectURL:new Map(),
 		hookmap:{},
@@ -9183,8 +9186,9 @@
 
 					window.game=game;
 					game.dynamicStyle.init();
+					lib.announce.init();
 					// node:path library alternative
-					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path.min",()=>{
+					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path",()=>{
 						lib.path=window._noname_path;
 						delete window._noname_path;
 					},e=>{
@@ -16355,14 +16359,14 @@
 				},
 				chooseButtonOL:function(){
 					'step 0'
-					ui.arena.classList.add('markhidden');
+					//ui.arena.classList.add('markhidden');
 					for(var i=0;i<event.list.length;i++){
 						var current=event.list[i];
 						current[0].wait();
 						if(current[0].isOnline()){
 							var target=current.shift();
 							target.send(function(args,callback,switchToAuto,processAI){
-								ui.arena.classList.add('markhidden');
+								//ui.arena.classList.add('markhidden');
 								var next=game.me.chooseButton.apply(game.me,args);
 								next.callback=callback;
 								next.switchToAuto=switchToAuto;
@@ -16411,9 +16415,9 @@
 						game.pause();
 					}
 					'step 6'
-					game.broadcastAll(function(){
+					/*game.broadcastAll(function(){
 						ui.arena.classList.remove('markhidden');
-					});
+					});*/
 					event.result=event.resultOL;
 				},
 				chooseCard:function(){
@@ -21429,7 +21433,7 @@
 							return true;
 						});
 						for(var i=0;i<skills.length;i++){
-							this.addSkill(skills[i]);
+							this.addSkill(skills[i],null,true);
 						}
 						this.checkConflict();
 					}
@@ -21444,7 +21448,7 @@
 							this._inits[i](this);
 						}
 					}
-					if(update!==false) this.update();
+					if(update!==false) this.$update();
 					return this;
 				},
 				initOL:function(name,character){
@@ -22027,14 +22031,18 @@
 				update:function(){
 					if(_status.video&&arguments.length==0) return;
 					if(this.hp>=this.maxHp) this.hp=this.maxHp;
-					var hp=this.node.hp;
-					hp.style.transition='none';
 					game.broadcast(function(player,hp,maxHp,hujia){
 						player.hp=hp;
 						player.maxHp=maxHp;
 						player.hujia=hujia;
-						player.update();
+						player.$update();
 					},this,this.hp,this.maxHp,this.hujia);
+					this.$update();
+				},
+				$update:function(){
+					if(this.hp>=this.maxHp) this.hp=this.maxHp;
+					var hp=this.node.hp;
+					hp.style.transition='none';
 					if(!_status.video){
 						if(this.hujia){
 							this.markSkill('ghujia');
@@ -25693,7 +25701,7 @@
 					}
 					return true;
 				},
-				markSkill:function(name,info,card){
+				markSkill:function(name,info,card,nobroadcast){
 					if(info===true){
 						this.syncStorage(name);
 						info=null;
@@ -25704,10 +25712,8 @@
 					else{
 						game.addVideo('markSkill',this,[name]);
 					}
-					game.broadcastAll(function(storage,player,name,info,card){
-						if(storage!=undefined){
-							player.storage[name]=storage;
-						}
+					const func=function(storage,player,name,info,card){
+						player.storage[name]=storage;
 						if(!info){
 							if(player.marks[name]){
 								player.updateMarks();
@@ -25732,12 +25738,14 @@
 							}
 						}
 						player.updateMarks();
-					},this.storage[name],this,name,info,card);
+					};
+					func(this.storage[name],this,name,info,card);
+					if(!nobroadcast) game.broadcast(func,this.storage[name],this,name,info,card);
 					return this;
 				},
-				unmarkSkill:function(name){
+				unmarkSkill:function(name,nobroadcast){
 					game.addVideo('unmarkSkill',this,name);
-					game.broadcast(function(player,name){
+					if(!nobroadcast) game.broadcast(function(player,name){
 						if(player.marks[name]){
 							player.marks[name].delete();
 							player.marks[name].style.transform+=' scale(0.2)';
@@ -25751,7 +25759,7 @@
 						delete this.marks[name];
 						ui.updatem(this);
 						var info=lib.skill[name];
-						if(info&&info.intro&&info.intro.onunmark){
+						if(!game.online&&info&&info.intro&&info.intro.onunmark){
 							if(info.intro.onunmark=='throw'){
 								if(get.itemtype(this.storage[name])=='cards'){
 									this.$throw(this.storage[name],1000);
@@ -25768,11 +25776,11 @@
 					}
 					return this;
 				},
-				markSkillCharacter:function(id,target,name,content){
+				markSkillCharacter:function(id,target,name,content,broadcast){
 					if(typeof target=='object'){
 						target=target.name;
 					}
-					game.broadcastAll(function(player,target,name,content,id){
+					const func=function(player,target,name,content,id){
 						if(player.marks[id]){
 							player.marks[id].name=name+'_charactermark';
 							player.marks[id]._name=target;
@@ -25803,7 +25811,9 @@
 								target:target
 							});
 						}
-					},this,target,name,content,id);
+					}
+					func(this,target,name,content,id);
+					if(!nobroadcast) game.broadcastAll(func,this,target,name,content,id);
 					return this;
 				},
 				markCharacter:function(name,info,learn,learn2){
@@ -26107,60 +26117,72 @@
 					return list;
 				},
 				addSkillTrigger:function(skill,hidden,triggeronly){
-					let skills=game.expandSkills([skill]);
-					for(let skill of skills){
-						let info=lib.skill[skill];
-						if(!info){
-							console.trace(`Cannot find skill: ${skill}\nPlease check if game.expandSkills is overwritten`);
-							continue;
-						}
-						if(!triggeronly){
-							if(info.global&&(!hidden||info.globalSilent)){
-								if(typeof info.global=='string'){
-									game.addGlobalSkill(info.global,this);
-								}
-								else{
-									for(let j=0;j<info.global.length;j++){
-										game.addGlobalSkill(info.global[j],this);
-									}
-								}
-							}
-							if(this.initedSkills.contains(skill)) return this;
-							this.initedSkills.push(skill);
-							if(info.init&&!_status.video) info.init(this,skill);
-						}
-						if(info.trigger&&this.playerid){
-							let playerid=this.playerid;
-							let setTrigger=function(i,evt){
-								if(i=='global'){
-									if(!lib.hook.globaltrigger[evt]){
-										lib.hook.globaltrigger[evt]={};
-									}
-									if(!lib.hook.globaltrigger[evt][playerid]){
-										lib.hook.globaltrigger[evt][playerid]=[];
-									}
-									lib.hook.globaltrigger[evt][playerid].add(skill);
-								}
-								else{
-									let name=playerid+'_'+i+'_'+evt;
-									if(!lib.hook[name]) lib.hook[name]=[];
-									lib.hook[name].add(skill);
-								}
-								lib.hookmap[evt]=true;
-							}
-							for(let i in info.trigger){
-								if(typeof info.trigger[i]=='string') setTrigger(i,info.trigger[i]);
-								else if(Array.isArray(info.trigger[i])){
-									for(let trigger of info.trigger[i]) setTrigger(i,trigger);
-								}
-							}
-						}
-						if(info.hookTrigger){
-							if(!this._hookTrigger) this._hookTrigger=[];
-							this._hookTrigger.add(skill);
-						}
-						if(_status.event&&_status.event.addTrigger) _status.event.addTrigger(skill,this);
+					var info=lib.skill[skill];
+					if(!info) return;
+					if(typeof info.group=='string'){
+						this.addSkillTrigger(info.group,hidden);
 					}
+					else if(Array.isArray(info.group)){
+						for(var i=0;i<info.group.length;i++){
+							this.addSkillTrigger(info.group[i],hidden);
+						}
+					}
+					if(!triggeronly){
+						if(info.global&&(!hidden||info.globalSilent)){
+							if(typeof info.global=='string'){
+								game.addGlobalSkill(info.global,this);
+							}
+							else{
+								for(var j=0;j<info.global.length;j++){
+									game.addGlobalSkill(info.global[j],this);
+								}
+							}
+						}
+						if(this.initedSkills.contains(skill)) return this;
+						this.initedSkills.push(skill);
+						if(info.init&&!_status.video){
+							info.init(this,skill);
+						}
+					}
+					if(info.trigger&&this.playerid){
+						var playerid=this.playerid;
+						var setTrigger=function(i,evt){
+							if(i=='global'){
+								if(!lib.hook.globaltrigger[evt]){
+									lib.hook.globaltrigger[evt]={};
+								}
+								if(!lib.hook.globaltrigger[evt][playerid]){
+									lib.hook.globaltrigger[evt][playerid]=[];
+								}
+								lib.hook.globaltrigger[evt][playerid].add(skill);
+							}
+							else{
+								var name=playerid+'_'+i+'_'+evt;
+								if(!lib.hook[name]){
+									lib.hook[name]=[];
+								}
+								lib.hook[name].add(skill);
+							}
+							lib.hookmap[evt]=true;
+						}
+						for(var i in info.trigger){
+							if(typeof info.trigger[i]=='string'){
+								setTrigger(i,info.trigger[i]);
+							}
+							else if(Array.isArray(info.trigger[i])){
+								for(var j=0;j<info.trigger[i].length;j++){
+									setTrigger(i,info.trigger[i][j]);
+								}
+							}
+						}
+					}
+					if(info.hookTrigger){
+						if(!this._hookTrigger){
+							this._hookTrigger=[];
+						}
+						this._hookTrigger.add(skill);
+					}
+					if(_status.event&&_status.event.addTrigger) _status.event.addTrigger(skill,this);
 					return this;
 				},
 				addSkillLog:function(skill){
@@ -26236,14 +26258,14 @@
 						if(info.mark){
 							if(info.mark=='card'&&
 								get.itemtype(this.storage[skill])=='card'){
-									this.markSkill(skill,null,this.storage[skill]);
+									this.markSkill(skill,null,this.storage[skill],nobroadcast);
 							}
 							else if(info.mark=='card'&&
 								get.itemtype(this.storage[skill])=='cards'){
-									this.markSkill(skill,null,this.storage[skill][0]);
+									this.markSkill(skill,null,this.storage[skill][0],nobroadcast);
 							}
 							else if(info.mark=='image'){
-									this.markSkill(skill,null,ui.create.card(null,'noclick').init([null,null,skill]));
+									this.markSkill(skill,null,ui.create.card(null,'noclick').init([null,null,skill]),nobroadcast);
 							}
 							else if(info.mark=='character'){
 								var intro=info.intro.content;
@@ -26265,10 +26287,10 @@
 								else{
 									caption=get.translation(skill);
 								}
-								this.markSkillCharacter(skill,this.storage[skill],caption,intro);
+								this.markSkillCharacter(skill,this.storage[skill],caption,intro,nobroadcast);
 							}
 							else{
-								this.markSkill(skill);
+								this.markSkill(skill,null,null,nobroadcast);
 							}
 						}
 					}
@@ -26458,49 +26480,59 @@
 					return this;
 				},
 				removeSkillTrigger:function(skill,triggeronly){
-					let skills=game.expandSkills([skill]);
-					for(let skill of skills){
-						let info=lib.skill[skill];
-						if(!info){
-							console.trace(`Cannot find skill: ${skill}\nPlease check if game.expandSkills is overwritten`);
-							continue;
+					var info=lib.skill[skill];
+					if(!info) return;
+					if(typeof info.group=='string'){
+						this.removeSkillTrigger(info.group);
+					}
+					else if(Array.isArray(info.group)){
+						for(var i=0;i<info.group.length;i++){
+							this.removeSkillTrigger(info.group[i]);
 						}
-						if(!triggeronly) this.initedSkills.remove(skill);
-						if(info.trigger){
-							let playerid=this.playerid;
-							let removeTrigger=function(i,evt){
-								if(i=='global'){
-									for(let j in lib.hook.globaltrigger){
-										if(lib.hook.globaltrigger[j][playerid]){
-											lib.hook.globaltrigger[j][playerid].remove(skill);
-											if(lib.hook.globaltrigger[j][playerid].length==0){
-												delete lib.hook.globaltrigger[j][playerid];
-											}
-											if(get.is.empty(lib.hook.globaltrigger[j])){
-												delete lib.hook.globaltrigger[j];
-											}
+					}
+					if(!triggeronly) this.initedSkills.remove(skill);
+					if(info.trigger){
+						var playerid=this.playerid;
+						var removeTrigger=function(i,evt){
+							if(i=='global'){
+								for(var j in lib.hook.globaltrigger){
+									if(lib.hook.globaltrigger[j][playerid]){
+										lib.hook.globaltrigger[j][playerid].remove(skill);
+										if(lib.hook.globaltrigger[j][playerid].length==0){
+											delete lib.hook.globaltrigger[j][playerid];
+										}
+										if(get.is.empty(lib.hook.globaltrigger[j])){
+											delete lib.hook.globaltrigger[j];
 										}
 									}
 								}
-								else{
-									let name=playerid+'_'+i+'_'+evt;
-									if(lib.hook[name]){
-										lib.hook[name].remove(skill);
-										if(lib.hook[name].length==0) delete lib.hook[name];
+							}
+							else{
+								var name=playerid+'_'+i+'_'+evt;
+								if(lib.hook[name]){
+									lib.hook[name].remove(skill);
+									if(lib.hook[name].length==0){
+										delete lib.hook[name];
 									}
 								}
 							}
-							for(let i in info.trigger){
-								if(typeof info.trigger[i]=='string') removeTrigger(i,info.trigger[i]);
-								else if(Array.isArray(info.trigger[i])){
-									for(let trigger of info.trigger[i]) removeTrigger(i,trigger);
+						}
+						for(var i in info.trigger){
+							if(typeof info.trigger[i]=='string'){
+								removeTrigger(i,info.trigger[i]);
+							}
+							else if(Array.isArray(info.trigger[i])){
+								for(var j=0;j<info.trigger[i].length;j++){
+									removeTrigger(i,info.trigger[i][j]);
 								}
 							}
 						}
-						if(info.hookTrigger){
-							if(this._hookTrigger){
-								this._hookTrigger.remove(skill);
-								if(!this._hookTrigger.length) delete this._hookTrigger;
+					}
+					if(info.hookTrigger){
+						if(this._hookTrigger){
+							this._hookTrigger.remove(skill);
+							if(!this._hookTrigger.length){
+								delete this._hookTrigger;
 							}
 						}
 					}
@@ -26721,6 +26753,7 @@
 				},
 				hasHistory:function(key,filter,last){
 					const history=this.getHistory(key);
+					if(!filter||typeof filter!="function") filter=lib.filter.all;
 					if(last){
 						const lastIndex=history.indexOf(last);
 						return history.some((event,index)=>{
@@ -40247,7 +40280,7 @@
 			if(drawDeck&&drawDeck.drawDeck) players[0].draw(num2,drawDeck);
 			else players[0].draw(num2);
 		},
-		finishSkill:(i,history)=>{
+		finishSkill:(i,sub)=>{
 			const mode=get.mode(),info=lib.skill[i],iInfo=`${i}_info`;
 			if(info.alter){
 				lib.translate[`${iInfo}_origin`]=lib.translate[iInfo];
@@ -40290,25 +40323,14 @@
 				});
 			}
 			if(info.inherit){
-				var inheritHistory=[];
-				while(true){
-					if(!info.inherit) break;
-					if(inheritHistory.includes(info.inherit)){
-						console.trace(`Inherit Error: ${info.inherit} in ${i}'s inherit forms a deadlock`);
-						break;
-					}
-					inheritHistory.push(info.inherit);
-		
-					const inheritInfo=lib.skill[info.inherit];
-					if(inheritInfo) Object.keys(inheritInfo).forEach(value=>{
-						if(info[value]!=undefined) return;
-						if(value=='audio'&&(typeof info[value]=='number'||typeof info[value]=='boolean')) info[value]=info.inherit;
-						else info[value]=inheritInfo[value];
-					});
-					if(lib.translate[i]==undefined) lib.translate[i]=lib.translate[info.inherit];
-					if(lib.translate[`${i}_info`]==undefined) lib.translate[`${i}_info`]=lib.translate[`${info.inherit}_info`];
-					if(!inheritInfo||!inheritInfo.inherit) info.inherit=void 0;
-				}
+				const skill=lib.skill[info.inherit];
+				if(skill) Object.keys(skill).forEach(value=>{
+					if(info[value]!=undefined) return;
+					if(value=='audio'&&(typeof info[value]=='number'||typeof info[value]=='boolean')) info[value]=info.inherit;
+					else info[value]=skill[value];
+				});
+				if(lib.translate[i]==undefined) lib.translate[i]=lib.translate[info.inherit];
+				if(lib.translate[iInfo]==undefined) lib.translate[iInfo]=lib.translate[`${info.inherit}_info`];
 			}
 			if(info.limited){
 				if(info.mark===undefined) info.mark=true;
@@ -40317,26 +40339,16 @@
 				if(info.skillAnimation===undefined) info.skillAnimation=true;
 				if(info.init===undefined) info.init=(player,skill)=>player.storage[skill]=false;
 			}
-			if(info.subSkill){
-				let subSkillHistory=Array.isArray(history)?history:[];
-				for(let value in info.subSkill){
-					if(subSkillHistory.includes(value)){
-						console.trace(`SubSkill Error: ${value} in ${i} forms a deadlock`);
-						continue;
-					}
-					let history=subSkillHistory.slice(0);
-					history.push(value);
-					
-					const iValue=`${i}_${value}`;
-					lib.skill[iValue]=info.subSkill[value];
-					lib.skill[iValue].sub=true;
-					if(info.subSkill[value].name) lib.translate[iValue]=info.subSkill[value].name;
-					else lib.translate[iValue]=lib.translate[iValue]||lib.translate[i];
-					if(info.subSkill[value].description) lib.translate[`${iValue}_info`]=info.subSkill[value].description;
-					if(info.subSkill[value].marktext) lib.translate[`${iValue}_bg`]=info.subSkill[value].marktext;
-					game.finishSkill(iValue,history);
-				}
-			}
+			if(info.subSkill&&!sub) Object.keys(info.subSkill).forEach(value=>{
+				const iValue=`${i}_${value}`;
+				lib.skill[iValue]=info.subSkill[value];
+				lib.skill[iValue].sub=true;
+				if(info.subSkill[value].name) lib.translate[iValue]=info.subSkill[value].name;
+				else lib.translate[iValue]=lib.translate[iValue]||lib.translate[i];
+				if(info.subSkill[value].description) lib.translate[`${iValue}_info`]=info.subSkill[value].description;
+				if(info.subSkill[value].marktext) lib.translate[`${iValue}_bg`]=info.subSkill[value].marktext;
+				game.finishSkill(iValue,true);
+			});
 			if(info.round){
 				const k=`${i}_roundcount`;
 				if(typeof info.group=='string') info.group=[info.group,k];
@@ -41234,25 +41246,15 @@
 			if(!player.storage.skill_blocker||!player.storage.skill_blocker.length) return out;
 			return out.filter(value=>exclude&&exclude.includes(value)||!get.is.blocked(value,player));
 		},
-		expandSkills:(skill,oldHistory)=>{
-			let history=[];
-			if(oldHistory) history.addArray(oldHistory);
-			if(Array.isArray(skill)){
-				return skill.reduce((previous,current)=>previous.addArray(game.expandSkills(current,history)),[]);
+		expandSkills:skills=>skills.addArray(skills.reduce((previousValue,currentValue)=>{
+			const info=get.info(currentValue);
+			if(info){
+				if(Array.isArray(info.group)) previousValue.push(...info.group);
+				else if(info.group) previousValue.push(info.group);
 			}
-			
-			let info=get.info(skill);
-			if(!info){
-				console.trace(`Cannot find skill: ${skill}`);
-				return history;
-			}
-			history.add(skill);
-			if(info.group){
-				let group=Array.isArray(info.group)?info.group:[info.group];
-				history.addArray(game.expandSkills([].addArray(group.filter(skill=>!history.includes(skill))),history));
-			}
-			return history;
-		},
+			else console.log(currentValue);
+			return previousValue;
+		},[])),
 		css:style=>Object.keys(style).forEach(value=>{
 			let uiStyle=ui.style[value];
 			if(!uiStyle){

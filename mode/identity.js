@@ -753,7 +753,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.init(result.links[0]);
 							player.hp++;
 							player.maxHp++;
-							player.update();
+							player.$update();
 						}
 					});
 					"step 5"
@@ -1441,7 +1441,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return list2.randomGets(num).sort(lib.sort.character);
 						}
 						var getGroup=function(name){
-							if(lib.characterReplace[name]) return lib.character[lib.characterReplace[name][0]][1];
+							var characterReplace = lib.characterReplace[name];
+							if(characterReplace && characterReplace[0] && lib.character[characterReplace[0]]) return lib.character[characterReplace[0]][1];
 							return lib.character[name][1];
 						}
 						var list2x=list2.slice(0);
@@ -1852,6 +1853,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							zhu.identityShown=true;
 							zhu.identity=zhuid;
+							if(zhuid=='zhu') zhu.isZhu=true;
 							zhu.setIdentity();
 							zhu.node.identity.classList.remove('guessing');
 							me.setIdentity(identity);
@@ -1950,14 +1952,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var next=game.zhu.chooseButton(true);
 					next.set('selectButton',(lib.configOL.double_character?2:1));
 					next.set('createDialog',['选择角色',[list,'characterx']]);
-					next.set('callback',function(player,result){
-						player.init(result.links[0],result.links[1]);
-					});
 					next.set('ai',function(button){
 						return Math.random();
 					});
 					"step 1"
-					if(game.me!=game.zhu){
+					if(!game.zhu.name){
 						game.zhu.init(result.links[0],result.links[1])
 					}
 					event.list.remove(get.sourceCharacter(game.zhu.name1));
@@ -1971,7 +1970,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.zhu.update();
 					}
 					game.broadcast(function(zhu,name,name2,addMaxHp){
-						if(game.zhu!=game.me){
+						if(!zhu.name){
 							zhu.init(name,name2);
 						}
 						if(addMaxHp){

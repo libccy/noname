@@ -590,8 +590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'orange',
 				filter:function(event,player){
-					return true;
-					//return player.getStorage('dctuoyu').length==3;
+					return player.getStorage('dctuoyu').length==3;
 				},
 				content:function(){
 					'step 0'

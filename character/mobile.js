@@ -14881,7 +14881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhaotongzhaoguang:"手杀赵统赵广",
 			zhaotongzhaoguang_prefix:'手杀',
 			re_liru:'手杀李儒',
-			re_liru_prefix:'李儒',
+			re_liru_prefix:'手杀',
 			re_chenqun:'手杀陈群',
 			re_chenqun_prefix:'手杀',
 			old_yuanshu:'手杀袁术',
