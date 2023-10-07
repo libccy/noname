@@ -40257,6 +40257,7 @@
 		updateRoundNumber:()=>game.broadcastAll((num1,num2,top)=>{
 			if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=`${num1}轮 剩余牌: ${num2}`;
 			_status.pileTop=top;
+			event.trigger('updateRoundNumber');
 		},game.roundNumber,ui.cardPile.childNodes.length,ui.cardPile.firstChild),
 		asyncDraw:(players,num,drawDeck,bottom)=>players.forEach((value,index)=>{
 			let num2=1;
@@ -56037,7 +56038,7 @@
 		//Get the card name length
 		//获取此牌的字数
 		cardNameLength:(card,player)=>{
-			const actualCardName=lib.actualCardName,name=get.translation(get.name(card,player));
+			const actualCardName=lib.actualCardName,name=get.translation(typeof card=='string'?card:get.name(card,player));
 			return (actualCardName.has(name)?actualCardName.get(name):name).length;
 		},
 		//Yingbian
