@@ -2420,13 +2420,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var player=_status.event.player;
 								var target=_status.event.target;
 								var controls=_status.event.controls.slice();
-								controls.sort(function(a,b){
-									return [
-										get.effect(target,{name:'wuzhong'},player,player)/2,
-										get.effect(target,{name:'guohe_copy2'},player,player),
-										get.effect(target,{name:'kaihua'},player,player),
-									][['摸牌','弃牌','制衡'].indexOf(b)-['摸牌','弃牌','制衡'].indexOf(a)];
-								});
+								var map={
+									'摸牌':get.effect(target,{name:'wuzhong'},player,player)/2,
+									'弃牌':get.effect(target,{name:'guohe_copy2'},player,player),
+									'制衡':get.effect(target,{name:'kaihua'},player,player),
+								};
+								controls.sort((a,b)=>map[b]-map[a]);
 								return controls[0];
 							}).set('target',target);
 						}
