@@ -4545,131 +4545,131 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//唐姬
-			jielie:{
-				audio:2,
-				trigger:{player:'phaseBegin'},
-				direct:true,
-				filter:function(event,player){
-					return player.phaseNumber==1&&!player.storage.jielie&&game.hasPlayer(current=>current!=player);
-				},
-				content:function(){
-					'step 0'
-					player.chooseTarget('请选择【抗歌】的目标','其于回合外摸牌后，你摸等量的牌；其进入濒死状态时，你可令其回复体力至1点；其死亡后，你弃置所有牌并失去1点体力',lib.filter.notMe,true).set('ai',function(target){
-						return get.attitude(_status.event.player,target)>0;
-					});
-					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						player.logSkill('jielie',target);
-						player.addSkill('jielie_clear');
-						player.storage.jielie=target;
-						player.markSkill('jielie');
-						game.delayx();
-					}
-				},
-				intro:{content:'已指定$为目标'},
-				group:['jielie_draw','jielie_dying','jielie_die'],
-				subSkill:{
-					draw:{
-						audio:'jielie',
-						trigger:{
-							global:['gainAfter','loseAsyncAfter'],
-						},
-						forced:true,
-						filter:function(event,player){
-							if(player.countMark('jielie_draw')>=3) return false;
-							var target=player.storage.jielie;
-							return target&&target!=_status.currentPhase&&event.getg(target).length>0;
-						},
-						logTarget:'player',
-						content:function(){
-							var num=Math.min(3-player.countMark('jielie_draw'),trigger.getg(player.storage.jielie).length);
-							player.addMark('jielie_draw',num,false);
-							player.draw(num);
-						},
-					},
-					clear:{
-						trigger:{global:'phaseBeginStart'},
-						forced:true,
-						firstDo:true,
-						popup:false,
-						charlotte:true,
-						filter:function(event,player){
-							return player.countMark('jielie_draw')>0;
-						},
-						content:function(){
-							player.removeMark('jielie_draw',player.countMark('jielie_draw'),false);
-						},
-					},
-					dying:{
-						audio:'jielie',
-						trigger:{global:'dying'},
-						logTarget:'player',
-						filter:function(event,player){
-							return event.player==player.storage.jielie&&event.player.hp<1&&!player.hasSkill('jielie_temp');
-						},
-						check:function(event,player){
-							return get.attitude(player,event.player)>0;
-						},
-						prompt2:'令其将体力值回复至1点',
-						content:function(){
-							trigger.player.recover(1-trigger.player.hp);
-							player.addTempSkill('jielie_temp','roundStart');
-						},
-					},
-					temp:{},
-					die:{
-						audio:'jielie',
-						trigger:{global:'dieAfter'},
-						filter:function(event,player){
-							return event.player==player.storage.jielie;
-						},
-						forced:true,
-						content:function(){
-							var cards=player.getCards('he');
-							if(cards.length) player.discard(cards);
-							player.loseHp();
-						},
-					},
-				},
-				ai:{
-					threaten:2,
-				},
-			},
 			kangge:{
-				audio:2,
-				trigger:{player:'damageBegin4'},
-				direct:true,
-				filter:function(event,player){
-					return ((!event.source)||(event.source!=player&&event.source!=player.storage.jielie))&&player.storage.jielie&&player.storage.jielie.isIn();
-				},
-				content:function(){
-					'step 0'
-					player.chooseControl(lib.suit.slice(0),'cancel2').set('prompt',get.prompt('kangge')).set('prompt2','防止伤害并改为失去等量体力，且令'+get.translation(player.storage.jielie)+'从弃牌堆中获得等量的花色牌').set('ai',function(){
-						var player=_status.event.player;
-						if(get.attitude(player,player.storage.jielie)<=0) return 'cancel2';
-						return lib.suit.randomGet();
-					});
-					'step 1'
-					if(result.control!='cancel2'){
-						event.suit=result.control;
-						player.logSkill('kangge',player.storage.jielie);
-						trigger.cancel();
-						player.loseHp(trigger.num);
-					}
-					else event.finish();
-					'step 2'
-					var cards=[];
-					while(cards.length<trigger.num){
-						var card=get.discardPile(function(card){
-							return get.suit(card,false)==event.suit&&!cards.contains(card)
-						});
-						if(card) cards.push(card);
-						else break;
-					}
-					if(cards.length) player.storage.jielie.gain(cards,'gain2');
-				},
-			},
+        audio:2,
+        trigger:{player:'phaseBegin'},
+        direct:true,
+        filter:function(event,player){
+          return player.phaseNumber==1&&!player.storage.kangge&&game.hasPlayer(current=>current!=player);
+        },
+        content:function(){
+          'step 0'
+          player.chooseTarget('请选择【抗歌】的目标','其于回合外摸牌后，你摸等量的牌；其进入濒死状态时，你可令其回复体力至1点；其死亡后，你弃置所有牌并失去1点体力',lib.filter.notMe,true).set('ai',function(target){
+            return get.attitude(_status.event.player,target)>0;
+          });
+          'step 1'
+          if(result.bool){
+            var target=result.targets[0];
+            player.logSkill('kangge',target);
+            player.addSkill('kangge_clear');
+            player.storage.kangge=target;
+            player.markSkill('kangge');
+            game.delayx();
+          }
+        },
+        intro:{content:'已指定$为目标'},
+        group:['kangge_draw','kangge_dying','kangge_die'],
+        subSkill:{
+          draw:{
+            audio:'kangge',
+            trigger:{
+              global:['gainAfter','loseAsyncAfter'],
+            },
+            forced:true,
+            filter:function(event,player){
+              if(player.countMark('kangge_draw')>=3) return false;
+              var target=player.storage.kangge;
+              return target&&target!=_status.currentPhase&&event.getg(target).length>0;
+            },
+            logTarget:'player',
+            content:function(){
+              var num=Math.min(3-player.countMark('kangge_draw'),trigger.getg(player.storage.kangge).length);
+              player.addMark('kangge_draw',num,false);
+              player.draw(num);
+            },
+          },
+          clear:{
+            trigger:{global:'phaseBeginStart'},
+            forced:true,
+            firstDo:true,
+            popup:false,
+            charlotte:true,
+            filter:function(event,player){
+              return player.countMark('kangge_draw')>0;
+            },
+            content:function(){
+              player.removeMark('kangge_draw',player.countMark('kangge_draw'),false);
+            },
+          },
+          dying:{
+            audio:'kangge',
+            trigger:{global:'dying'},
+            logTarget:'player',
+            filter:function(event,player){
+              return event.player==player.storage.kangge&&event.player.hp<1&&!player.hasSkill('kangge_temp');
+            },
+            check:function(event,player){
+              return get.attitude(player,event.player)>0;
+            },
+            prompt2:'令其将体力值回复至1点',
+            content:function(){
+              trigger.player.recover(1-trigger.player.hp);
+              player.addTempSkill('kangge_temp','roundStart');
+            },
+          },
+          temp:{},
+          die:{
+            audio:'kangge',
+            trigger:{global:'dieAfter'},
+            filter:function(event,player){
+              return event.player==player.storage.kangge;
+            },
+            forced:true,
+            content:function(){
+              var cards=player.getCards('he');
+              if(cards.length) player.discard(cards);
+              player.loseHp();
+            },
+          },
+        },
+        ai:{
+          threaten:2,
+        },
+      },
+      jielie:{
+        audio:2,
+        trigger:{player:'damageBegin4'},
+        direct:true,
+        filter:function(event,player){
+          return ((!event.source)||(event.source!=player&&event.source!=player.storage.kangge))&&player.storage.kangge&&player.storage.kangge.isIn();
+        },
+        content:function(){
+          'step 0'
+          player.chooseControl(lib.suit.slice(0),'cancel2').set('prompt',get.prompt('jielie')).set('prompt2','防止伤害并改为失去等量体力，且令'+get.translation(player.storage.kangge)+'从弃牌堆中获得等量的花色牌').set('ai',function(){
+            var player=_status.event.player;
+            if(get.attitude(player,player.storage.kangge)<=0) return 'cancel2';
+            return lib.suit.randomGet();
+          });
+          'step 1'
+          if(result.control!='cancel2'){
+            event.suit=result.control;
+            player.logSkill('jielie',player.storage.kangge);
+            trigger.cancel();
+            player.loseHp(trigger.num);
+          }
+          else event.finish();
+          'step 2'
+          var cards=[];
+          while(cards.length<trigger.num){
+            var card=get.discardPile(function(card){
+              return get.suit(card,false)==event.suit&&!cards.contains(card)
+            });
+            if(card) cards.push(card);
+            else break;
+          }
+          if(cards.length) player.storage.kangge.gain(cards,'gain2');
+        },
+      },
 			//张横
 			dangzai:{
 				trigger:{player:'phaseUseBegin'},
@@ -10450,10 +10450,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liangjue:'粮绝',
 			liangjue_info:'锁定技，当有黑色牌进入或者离开你的判定区或装备区后，若你的体力值大于1，你失去1点体力，然后摸两张牌。',
 			tangji:'唐姬',
-			jielie:'抗歌',
-			jielie_info:'你的第一个回合开始时，选择一名其他角色，该角色每次于其回合外得到牌后，你摸等量的牌（每回合至多摸三张）；其进入濒死状态时，你可令其回复体力至1点（每轮限一次）。该角色死亡时，你弃置所有牌并失去1点体力。',
-			kangge:'节烈',
-			kangge_info:'当你受到除自己和“抗歌”角色以外的角色造成的伤害时，你可以防止此伤害并选择一种花色，然后你失去X点体力，令“抗歌”角色从弃牌堆中随机获得X张此花色的牌（X为伤害值）。',
+			kangge:'抗歌',
+			kangge_info:'你的第一个回合开始时，选择一名其他角色，该角色每次于其回合外得到牌后，你摸等量的牌（每回合至多摸三张）；其进入濒死状态时，你可令其回复体力至1点（每轮限一次）。该角色死亡时，你弃置所有牌并失去1点体力。',
+			jielie:'节烈',
+			jielie_info:'当你受到除自己和“抗歌”角色以外的角色造成的伤害时，你可以防止此伤害并选择一种花色，然后你失去X点体力，令“抗歌”角色从弃牌堆中随机获得X张此花色的牌（X为伤害值）。',
 			re_dongcheng:'董承',
 			xuezhao:'血诏',
 			xuezhao_info:'出牌阶段限一次，你可弃置一张手牌并选择至多X名其他角色(X为你的体力上限）。这些角色依次选择是否交给你一张牌，若选择是，该角色摸一张牌且你本回合可多使用一张【杀】；若选择否，该角色本回合无法响应你使用的牌。',
