@@ -35076,6 +35076,22 @@
 				if(fixedNum) audioInfo=Math.min(audioInfo, fixedNum);
 				game.playAudio('skill',`${audioName}${Math.floor(audioInfo*Math.random())+1}`);
 			}
+			//直接指定配音文件名的新格式
+			else if(typeof audioInfo=="object"&&"type" in audioInfo&&audioInfo.type=="direct"&&"files" in audioInfo){
+				let audioFiles=audioInfo.files;
+				if(typeof audioFiles!="object") return;
+				if(!Array.isArray(audioFiles)){
+					if(!player)return;
+					if(player.name&&player.name in audioFiles&&(!info.audioname2||!info.audioname2[player.name]))audioFiles=audioFiles[player.name];
+					else if(player.name1&&player.name1 in audioFiles&&(!info.audioname2||!info.audioname2[player.name1]))audioFiles=audioFiles[player.name1];
+					else if(player.name2&&player.name2 in audioFiles&&(!info.audioname2||!info.audioname2[player.name2]))audioFiles=audioFiles[player.name2];
+				}
+				if(!Array.isArray(audioFiles))return;
+				let length=audioFiles.length;
+				if(fixedNum)length=Math.min(length,fixedNum);
+				//game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}${+1}.${audioInfo[3]||'mp3'}`);
+				game.playAudio(audioFiles[Math.floor(length*Math.random())]);
+			}
 			else if(audioInfo) game.playAudio('skill',audioName);
 			else if(info.audio!==false) game.playSkillAudio(audioName);
 		},
@@ -54775,6 +54791,20 @@
 								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
 								game.playAudio('skill',audioname+getIndex(audioinfo));
 							}
+							else if(typeof audioinfo=="object"&&"type" in audioinfo&&audioinfo.type=="direct"&&"files" in audioinfo){
+								let audioFiles=audioinfo.files;
+								if(typeof audioFiles!="object") return;
+								if(!Array.isArray(audioFiles)){
+									if(!player)return;
+									if(player.name&&player.name in audioFiles&&(!info.audioname2||!info.audioname2[player.name]))audioFiles=audioFiles[player.name];
+									else if(player.name1&&player.name1 in audioFiles&&(!info.audioname2||!info.audioname2[player.name1]))audioFiles=audioFiles[player.name1];
+									else if(player.name2&&player.name2 in audioFiles&&(!info.audioname2||!info.audioname2[player.name2]))audioFiles=audioFiles[player.name2];
+								}
+								if(!Array.isArray(audioFiles))return;
+								const length=audioFiles.length;
+								//game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}${+1}.${audioInfo[3]||'mp3'}`);
+								game.playAudio(audioFiles[getIndex(length)-1]);
+							}
 							else if(audioinfo){
 								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
 								game.playAudio('skill',audioname);
@@ -55035,6 +55065,20 @@
 							if(typeof audioinfo=='number'){
 								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
 								game.playAudio('skill',audioname+getIndex(audioinfo));
+							}
+							else if(typeof audioinfo=="object"&&"type" in audioinfo&&audioinfo.type=="direct"&&"files" in audioinfo){
+								let audioFiles=audioinfo.files;
+								if(typeof audioFiles!="object") return;
+								if(!Array.isArray(audioFiles)){
+									if(!player)return;
+									if(player.name&&player.name in audioFiles&&(!info.audioname2||!info.audioname2[player.name]))audioFiles=audioFiles[player.name];
+									else if(player.name1&&player.name1 in audioFiles&&(!info.audioname2||!info.audioname2[player.name1]))audioFiles=audioFiles[player.name1];
+									else if(player.name2&&player.name2 in audioFiles&&(!info.audioname2||!info.audioname2[player.name2]))audioFiles=audioFiles[player.name2];
+								}
+								if(!Array.isArray(audioFiles))return;
+								const length=audioFiles.length;
+								//game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}${+1}.${audioInfo[3]||'mp3'}`);
+								game.playAudio(audioFiles[getIndex(length)-1]);
 							}
 							else if(audioinfo){
 								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
