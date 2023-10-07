@@ -326,7 +326,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.itemtype(card)=='card';
 						},
 						position:'hes',
-						filterTarget:lib.filter.targetEnabled,
+						filterTarget:lib.filter.filterTarget,
 						selectCard:1,
 						check:function(card){
 							var player=_status.event.player;
