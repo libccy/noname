@@ -54793,17 +54793,13 @@
 							}
 							else if(typeof audioinfo=="object"&&"type" in audioinfo&&audioinfo.type=="direct"&&"files" in audioinfo){
 								let audioFiles=audioinfo.files;
-								if(typeof audioFiles!="object") return;
-								if(!Array.isArray(audioFiles)){
-									if(!player)return;
-									if(player.name&&player.name in audioFiles&&(!info.audioname2||!info.audioname2[player.name]))audioFiles=audioFiles[player.name];
-									else if(player.name1&&player.name1 in audioFiles&&(!info.audioname2||!info.audioname2[player.name1]))audioFiles=audioFiles[player.name1];
-									else if(player.name2&&player.name2 in audioFiles&&(!info.audioname2||!info.audioname2[player.name2]))audioFiles=audioFiles[player.name2];
+								if(typeof audioFiles=="object"){
+									if(!Array.isArray(audioFiles)&&playername&&playername in audioFiles)audioFiles=audioFiles[playername];
+									if(Array.isArray(audioFiles)){
+										const length=audioFiles.length;
+										game.playAudio(audioFiles[getIndex(length)-1]);
+									}
 								}
-								if(!Array.isArray(audioFiles))return;
-								const length=audioFiles.length;
-								//game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}${+1}.${audioInfo[3]||'mp3'}`);
-								game.playAudio(audioFiles[getIndex(length)-1]);
 							}
 							else if(audioinfo){
 								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
@@ -55068,17 +55064,13 @@
 							}
 							else if(typeof audioinfo=="object"&&"type" in audioinfo&&audioinfo.type=="direct"&&"files" in audioinfo){
 								let audioFiles=audioinfo.files;
-								if(typeof audioFiles!="object") return;
-								if(!Array.isArray(audioFiles)){
-									if(!player)return;
-									if(player.name&&player.name in audioFiles&&(!info.audioname2||!info.audioname2[player.name]))audioFiles=audioFiles[player.name];
-									else if(player.name1&&player.name1 in audioFiles&&(!info.audioname2||!info.audioname2[player.name1]))audioFiles=audioFiles[player.name1];
-									else if(player.name2&&player.name2 in audioFiles&&(!info.audioname2||!info.audioname2[player.name2]))audioFiles=audioFiles[player.name2];
+								if(typeof audioFiles=="object"){
+									if(!Array.isArray(audioFiles)&&playername&&playername in audioFiles)audioFiles=audioFiles[playername];
+									if(Array.isArray(audioFiles)){
+										const length=audioFiles.length;
+										game.playAudio(audioFiles[getIndex(length)-1]);
+									}
 								}
-								if(!Array.isArray(audioFiles))return;
-								const length=audioFiles.length;
-								//game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}${+1}.${audioInfo[3]||'mp3'}`);
-								game.playAudio(audioFiles[getIndex(length)-1]);
 							}
 							else if(audioinfo){
 								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
