@@ -6468,14 +6468,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					check:{
 						charlotte:true,
-						trigger:{global:'damageBegin3'},
+						trigger:{source:'damage'},
 						filter:function(event,player){
-							return event.source&&event.source==player&&get.distance(player,event.player)<=1;
+							return get.distance(player,event.player)<=1;
 						},
 						firstDo:true,
-						priority:11+45+14,
-						forced:true,
-						popup:false,
+						silent:true,
 						content:function(){
 							trigger.kuangguCheck=true;
 						},
