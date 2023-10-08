@@ -8487,7 +8487,9 @@
 					enumerable:false,
 					writable:true,
 					value:function(){
-						for(const i of Array.from(arguments)) this.add(...i);
+						for(const arr of arguments){
+							for(const item of arr) this.add(item);
+						}
 						return this;
 					}
 				});

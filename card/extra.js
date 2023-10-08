@@ -225,7 +225,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						value:[3,1],
 						useful:1,
 					},
-					wuxie:function(target,card,player,current,state){
+					wuxie:function(target,card,player,viewer,state){
 						let att=get.attitude(viewer,target), eff=get.effect(target,card,player,target);
 						if(status*get.attitude(viewer,player)>0&&!player.isMad() || status*eff*att>=0) return 0;
 						if(get.attitude(viewer,player)>=0 || _status.event.getRand('huogong_wuxie')*4>player.countCards('h')) return 0;
