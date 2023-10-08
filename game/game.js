@@ -59120,7 +59120,7 @@
 					}
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=node.countCards('h');
+					td.innerHTML=`${node.countCards('h')}/${node.getHandcardLimit()}`;
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML=node.phaseNumber;
