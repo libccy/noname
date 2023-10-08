@@ -25776,7 +25776,7 @@
 					}
 					return this;
 				},
-				markSkillCharacter:function(id,target,name,content,broadcast){
+				markSkillCharacter:function(id,target,name,content,nobroadcast){
 					if(typeof target=='object'){
 						target=target.name;
 					}
@@ -25813,7 +25813,7 @@
 						}
 					}
 					func(this,target,name,content,id);
-					if(!nobroadcast) game.broadcastAll(func,this,target,name,content,id);
+					if(!nobroadcast) game.broadcast(func,this,target,name,content,id);
 					return this;
 				},
 				markCharacter:function(name,info,learn,learn2){
