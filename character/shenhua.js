@@ -5039,6 +5039,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
+				locked:false,
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				preHidden:true,
