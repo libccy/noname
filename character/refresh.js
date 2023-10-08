@@ -10972,6 +10972,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(num>0&&get.itemtype(card)=='card'&&get.color(card)=='black') return num*1.35;
 					}
 				},
+				locked:false,
 				trigger:{global:'judge'},
 				filter:function(event,player){
 					return player.countCards('hes',{color:'black'})>0;
