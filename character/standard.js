@@ -1466,6 +1466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(eq&&get.equipValue(card)-get.equipValue(eq)<Math.max(1.2,6-player.hp)) return 0;
 					}
 				},
+				locked:false,
 				enable:'phaseUse',
 				// alter:true,
 				usable:1,
