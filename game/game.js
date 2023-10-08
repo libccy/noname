@@ -35040,6 +35040,7 @@
 				if(Array.isArray(audioInfo)){
 					audioName=audioInfo[0];
 					if(!fixedNum) fixedNum=audioInfo[1];//数组会取第一个指定语音数
+					// TODO: 判断不完整，但现在无合适的方法，先放着 @kuangshen04
 					if(audioName in lib.skill) audioInfo=lib.skill[audioName].audio;
 					else audioInfo=parseInt(fixedNum);
 					continue;
