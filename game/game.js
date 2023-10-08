@@ -8487,7 +8487,7 @@
 					enumerable:false,
 					writable:true,
 					value:function(){
-						for(const i of arguments) this.add(...i);
+						for(const i of Array.from(arguments)) this.add(...i);
 						return this;
 					}
 				});
@@ -8509,7 +8509,7 @@
 					enumerable:false,
 					writable:true,
 					value:function(){
-						for(const i of arguments) this.add(...i);
+						for(const i of Array.from(arguments)) this.remove(...i);
 					}
 				});
 				Object.defineProperty(Array.prototype,"unique",{
