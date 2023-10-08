@@ -8417,7 +8417,7 @@
 					}
 				});
 				/*Map prototype end*/
-				Object.defineProperty(Array.prototype, "filterInD", {
+				Object.defineProperty(Array.prototype,"filterInD",{
 					configurable:true,
 					enumerable:false,
 					writable:true,
@@ -8426,7 +8426,7 @@
 						return this.filter(card=>pos.includes(get.position(card,true)));
 					}
 				});
-				Object.defineProperty(Array.prototype, "someInD", {
+				Object.defineProperty(Array.prototype,"someInD",{
 					configurable:true,
 					enumerable:false,
 					writable:true,
@@ -8435,132 +8435,159 @@
 						return this.some(card=>pos.includes(get.position(card,true)));
 					}
 				});
+				Object.defineProperty(Array.prototype,"everyInD",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(pos){
+						if(typeof pos!='string') pos='o';
+						return this.every(card=>pos.includes(get.position(card,true)));
+					}
+				});
 				/**
-				 * @legacy Use `Array.prototype.includes(searchElement)` instead.
+				*@legacy Use `Array.prototype.includes(searchElement)` instead.
 				 */
-				Object.defineProperty(Array.prototype, "contains", {
+				Object.defineProperty(Array.prototype,"contains",{
 					configurable:true,
 					enumerable:false,
 					writable:true,
 					value:Array.prototype.includes
 				});
-				Object.defineProperty(Array.prototype, "add", {
+				Object.defineProperty(Array.prototype,"containsSome",{
 					configurable:true,
 					enumerable:false,
 					writable:true,
 					value:function(){
-						for(var i=0;i<arguments.length;i++){
-							if(this.contains(arguments[i])){
-								return false;
-							}
-							this.push(arguments[i]);
-						}
-						return this;
+						return Array.from(arguments).some(i=>this.includes(i));
 					}
 				});
-				Object.defineProperty(Array.prototype, "addArray", {
-					configurable:true,
-					enumerable:false,
-					writable:true,
-					value:function(arr){
-						for(var i=0;i<arr.length;i++){
-							this.add(arr[i]);
-						}
-						return this;
-					}
-				});
-				Object.defineProperty(Array.prototype, "remove", {
-					configurable:true,
-					enumerable:false,
-					writable:true,
-					value:function(item){
-						/*if(Array.isArray(item)){
-							for(var i=0;i<item.length;i++) this.remove(item[i]);
-							return;
-						}*/
-						var pos=this.indexOf(item);
-						if(pos==-1){
-							return false;
-						}
-						this.splice(pos,1);
-						return this;
-					}
-				});
-				Object.defineProperty(Array.prototype, "removeArray", {
-					configurable:true,
-					enumerable:false,
-					writable:true,
-					value:function(arr){
-						for(var i=0;i<arr.length;i++){
-							this.remove(arr[i]);
-						}
-						return this;
-					}
-				});
-				Object.defineProperty(Array.prototype, "randomGet", {
+				Object.defineProperty(Array.prototype,"containsAll",{
 					configurable:true,
 					enumerable:false,
 					writable:true,
 					value:function(){
-						var arr=this.slice(0);
-						for(var i=0;i<arguments.length;i++) arr.remove(arguments[i]);
+						return Array.from(arguments).every(i=>this.includes(i));
+					}
+				});
+				
+				Object.defineProperty(Array.prototype,"add",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						for(const arg of arguments){
+							if(this.contains(arg)) continue;
+							this.push(arg);
+						}
+						return this;
+					}
+				});
+				Object.defineProperty(Array.prototype,"addArray",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						for(const i of Array.from(arguments)) this.add(...i);
+						return this;
+					}
+				});
+				Object.defineProperty(Array.prototype,"remove",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						for(const item of arguments){
+							const pos=this.indexOf(item);
+							if(pos==-1) continue;
+							this.splice(pos,1);
+						}
+						return this;
+					}
+				});
+				Object.defineProperty(Array.prototype,"removeArray",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						for(const i of Array.from(arguments)) this.remove(...i);
+						return this;
+					}
+				});
+				Object.defineProperty(Array.prototype,"unique",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						let uniqueArray=[...new Set(this)];
+						this.length=uniqueArray.length;
+						for(let i=0;i<uniqueArray.length;i++) this[i]=uniqueArray[i];
+						return this;
+					}
+				});
+				Object.defineProperty(Array.prototype,"toUniqued",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						return [...new Set(this)];
+					}
+				});
+				Object.defineProperty(Array.prototype,"randomGet",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						let arr=this.slice(0);
+						arr.removeArray(Array.from(arguments));
 						return arr[Math.floor(Math.random()*arr.length)];
 					}
 				});
-				Object.defineProperty(Array.prototype, "randomRemove", {
+				Object.defineProperty(Array.prototype,"randomGets",{
 					configurable:true,
 					enumerable:false,
 					writable:true,
 					value:function(num){
-						if(typeof num=='number'){
-							var list=[];
-							for(var i=0;i<num;i++){
-								if(this.length){
-									list.push(this.randomRemove());
-								}
-								else{
-									break;
-								}
-							}
-							return list;
-						}
-						else{
-							return this.splice(Math.floor(Math.random()*this.length),1)[0];
-						}
-					}
-				});
-				Object.defineProperty(Array.prototype, "randomSort", {
-					configurable:true,
-					enumerable:false,
-					writable:true,
-					value:function(){
-						var list=[];
-						while(this.length){
-							list.push(this.randomRemove());
-						}
-						for(var i=0;i<list.length;i++){
-							this.push(list[i]);
-						}
-						return this;
-					}
-				});
-				Object.defineProperty(Array.prototype, "randomGets", {
-					configurable:true,
-					enumerable:false,
-					writable:true,
-					value:function(num){
-						if(num>this.length){
-							num=this.length;
-						}
-						var arr=this.slice(0);
-						var list=[];
-						for(var i=0;i<num;i++){
+						if(num>this.length) num=this.length;
+						let arr=this.slice(0);
+						let list=[];
+						for(let i=0;i<num;i++){
 							list.push(arr.splice(Math.floor(Math.random()*arr.length),1)[0]);
 						}
 						return list;
 					}
 				});
-				Object.defineProperty(Array.prototype, "sortBySeat", {
+				Object.defineProperty(Array.prototype,"randomRemove",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(num){
+						if(typeof num=='number'){
+							let list=[];
+							for(let i=0;i<num;i++){
+								if(!this.length) break;
+								list.push(this.randomRemove());
+							}
+							return list;
+						}
+						return this.splice(Math.floor(Math.random()*this.length),1)[0];
+					}
+				});
+				Object.defineProperty(Array.prototype,"randomSort",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(){
+						let list=[];
+						while(this.length){
+							list.push(this.randomRemove());
+						}
+						for(let i=0;i<list.length;i++){
+							this.push(list[i]);
+						}
+						return this;
+					}
+				});
+				Object.defineProperty(Array.prototype,"sortBySeat",{
 					configurable:true,
 					enumerable:false,
 					writable:true,
@@ -8569,6 +8596,31 @@
 						this.sort(lib.sort.seat);
 						delete lib.tempSortSeat;
 						return this;
+					}
+				});
+				/**
+				*@description 从数组中寻找某个特征最大的，且通过筛选的第一个元素
+				 */
+				Object.defineProperty(Array.prototype,"maxBy",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(sortBy,filter){
+						let list=this.filter(filter||(()=>true));
+						if(sortBy&&typeof sortBy=='function') list.sort((a,b)=>sortBy(a)-sortBy(b));
+						else list.sort();
+						return list[list.length-1];
+					}
+				});
+				Object.defineProperty(Array.prototype,"minBy",{
+					configurable:true,
+					enumerable:false,
+					writable:true,
+					value:function(sortBy,filter){
+						let list=this.filter(filter||(()=>true));
+						if(sortBy&&typeof sortBy=='function') list.sort((a,b)=>sortBy(a)-sortBy(b));
+						else list.sort();
+						return list[0];
 					}
 				});
 				//!!!WARNING!!!
