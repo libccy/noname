@@ -30819,7 +30819,7 @@
 				}
 				var fullskills=game.expandSkills(player.getSkills(false).concat(lib.skill.global));
 				var info=get.info(skill);
-				if((info.noHidden||get.mode()!='guozhan')&&!fullskills.contains(skill)){
+				if(((info&&info.noHidden)||get.mode()!='guozhan')&&!fullskills.contains(skill)){
 					return false;
 				}
 				if(!info.trigger) return false;

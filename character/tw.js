@@ -4570,6 +4570,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				logTarget:'target',
 				init:function(player){
+					var target=_status.currentPhase;
+					if(!target||!target!=player) return;
 					if(!player.getStorage('twxiangyu_range').length){
 						var targets=game.filterPlayer(current=>{
 							return current.getHistory('lose').length;
@@ -4591,7 +4593,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					attackRange:function(player,num){
-						return num+player.getStorage('twxiangyu_range').length;
+						return num+Math.min(5,player.getStorage('twxiangyu_range').length);
 					},
 				},
 				subSkill:{
@@ -4622,7 +4624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						marktext:'羽',
 						intro:{
 							content:function(storage,player){
-								var num=storage?storage.length:0;
+								var num=Math.min(5,storage?storage.length:0);
 								return '攻击范围+'+num;
 							},
 						},
