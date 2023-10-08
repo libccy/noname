@@ -5121,6 +5121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
+				locked:false,
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
 					return player.getDamagedHp()>0;
