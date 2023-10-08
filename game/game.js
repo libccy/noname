@@ -35040,7 +35040,8 @@
 				if(Array.isArray(audioInfo)){
 					audioName=audioInfo[0];
 					if(!fixedNum) fixedNum=audioInfo[1];//数组会取第一个指定语音数
-					audioInfo=lib.skill[audioName].audio;
+					if(audioName in lib.skill) audioInfo=lib.skill[audioName].audio;
+					else audioInfo=parseInt(fixedNum);
 					continue;
 				}
 				break;
@@ -35077,7 +35078,8 @@
 				game.playAudio('skill',`${audioName}${Math.floor(audioInfo*Math.random())+1}`);
 			}
 			//直接指定配音文件名的新格式
-			else if(typeof audioInfo=="object"&&"type" in audioInfo&&audioInfo.type=="direct"&&"files" in audioInfo){
+			else if(typeof audioInfo=="object"){
+				if(!("type" in audioInfo&&audioInfo.type=="direct"&&"files" in audioInfo)) return;
 				let audioFiles=audioInfo.files;
 				if(typeof audioFiles!="object") return;
 				if(!Array.isArray(audioFiles)){
