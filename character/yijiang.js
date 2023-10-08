@@ -8483,6 +8483,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(target.countCards('h','sha')>1) return 'zeroplayertarget';
 							}
 						}
+					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return (!arg||arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&player.countSkill('zhanjue_draw')<2&&player.hasCard((card)=>get.name(card)!='tao','h');
 					}
 				}
 			},
@@ -12660,6 +12664,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							num*=Math.min(cards.length,player.hp);
 							return 12-num;
 						}
+					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return (!arg||arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&!player.getStat('skill').qice&&player.hasCard((card)=>get.name(card)!='tao','h');
 					},
 					threaten:1.6,
 				}

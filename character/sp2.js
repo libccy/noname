@@ -2814,9 +2814,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:true,
 				selectCard:[1,Infinity],
 				check:function(card){
-					var player=_status.event.player;
-					if(ui.selected.cards.length<=Math.max(1,player.needsToDiscard(),player.countCards('h')-4)) return 6-get.value(card);
-					return 4-get.value(card);
+					let player=_status.event.player,num=player.hasSkill('nifu')?15:8;
+					if(ui.selected.cards.length<=Math.max(1,player.needsToDiscard(),player.countCards('h')-4)) return num-get.value(card);
+					return num/2-get.value(card);
 				},
 				position:'h',
 				discard:false,
@@ -2870,7 +2870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						viewAs:{name:'juedou'},
 						position:'h',
 						filterTarget:lib.filter.targetEnabled,
-						check:(card)=>get.name(card)=='sha'?7:5.5-get.value(card),
+						check:(card)=>get.name(card)=='sha'?0:5.5-get.value(card);
 						log:false,
 						precontent:function(){
 							delete event.result.skill;

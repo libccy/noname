@@ -2149,7 +2149,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.cardsGotoOrdering(card);
 					'step 1'
 					if(player.countCards('he')>0){
-						player.chooseCard('he','天候：是否用一张牌交换牌堆顶的'+get.translation(card)+'?').set('promptx',[[card]]).set('ai',()=>-1)
+						player.chooseCard('he','天候：是否用一张牌交换牌堆顶的'+get.translation(card)+'?').set('promptx',[[card]]).set('card',card).set('ai',cardx=>{
+							let card=_status.event.card,val=get.value(card,player)-get.value(cardx,player);
+							if(val<0) return -val;
+							let suit=get.suit(card);
+							if(suit==='heart') return val+game.countPlayer((current)=>{
+								if(player!==current&&!game.hasPlayer((tar)=>tar.hp-current.hp>1)) return get.sgn(get.attitude(player,current));
+								return 0;
+							});
+							if(suit=='club') return val+game.countPlayer((current)=>{
+								if(player!==current&&(current.hp<2||!game.hasPlayer((tar)=>current.hp-tar.hp>1))) return get.sgn(get.attitude(player,current));
+								return 0;
+							});
+							return val+0.1;
+						});
 					}
 					else{
 						event._result={bool:false};
@@ -2206,6 +2219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var current of players){
 								current.removeAdditionalSkill(key);
 							}
+							game.removeGlobalSkill('oltianhou_'+player.playerid+'_ai');
 							game.broadcastAll(function(){
 								delete _status.tempBackground;
 								game.updateBackground();
@@ -2241,20 +2255,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						global:'oltianhou_spade_ai',
 					},
 					spade_ai:{
-						effect:{
-							player:function(card,player,target,current){
-								if(get.tag(card,'fireDamage')&&!player.hasSkill('oltianhou_spade')){
-									return 'zerotarget';
+						ai:{
+							effect:{
+								player:function(card,player,target,current){
+									if((typeof card=='object'&&game.hasNature(card,'fire')||get.tag(card,'fireDamage'))&&!player.hasSkill('oltianhou_spade')) return 'zeroplayertarget';
+									if((typeof card=='object'&&game.hasNature(card,'thunder')||get.tag(card,'thunderDamage'))){
+										var list=lib.skill.oltianhou_spade.logTarget({player:target});
+										var eff=list.reduce(function(eff,current){
+											eff+=get.effect(current,{name:'losehp'},player,player)/get.attitude(player,player);
+										},0);
+										return [1,eff];
+									}
 								}
-								else if(get.tag(card,'thunderDamage')){
-									var list=lib.skill.oltianhou_spade.logTarget({player:target});
-									var eff=list.reduce(function(eff,current){
-										eff+=get.effect(current,{name:'losehp'},player,player)
-									},0);
-									return [1,eff];
-								}
-							},
-						},
+							}
+						}
 					},
 					miehuo:{
 						audio:'oltianhou_spade',
@@ -2284,6 +2298,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							trigger.player.loseHp();
 						},
+						global:'oltianhou_heart_ai'
+					},
+					heart_ai:{
+						mod:{
+							aiOrder:function(player,card,num){
+								if(num>0&&_status.event&&_status.event.type=='phase'&&!player.hasSkill('oltianhou_heart')&&get.tag(card,'recover')&&!player.isMaxHp()&&player.needsToDiscard()<=1&&!game.hasPlayer(function(current){
+									return current.hp-player.hp>1;
+								})&&get.effect(player,{name:'losehp'},player,player)<0) return 0;
+							}
+						}
 					},
 					club:{
 						audio:true,
@@ -2301,6 +2325,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							trigger.player.loseHp();
 						},
+						global:'oltianhou_club_ai'
+					},
+					club_ai:{
+						ai:{
+							nokeep:true,
+							skillTagFilter:function(player,tag,arg){
+								return _status.event&&_status.event.type=='phase'&&(!arg||arg.card&&get.name(arg.card)==='tao')&&!player.hasSkill('oltianhou_club')&&player.isMinHp()&&get.effect(player,{name:'losehp'},player,player)<0;
+							}
+						}
 					},
 					diamond:{
 						audio:true,
@@ -2336,13 +2369,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						global:'oltianhou_diamond_ai',
 					},
 					diamond_ai:{
-						effect:{
-							target:function(card,player,target,current){
-								if(card.name=='sha'&&!player.hasSkill('oltianhou_diamond')){
-									if(target!=player.getNext()&&target!=player.getPrevious()) return 0.7;
+						ai:{
+							effect:{
+								player:function(card,player,target){
+									if(get.name(card)=='sha'&&!player.hasSkill('oltianhou_diamond')&&target!=player.getNext()&&target!=player.getPrevious()){
+										let num=get.number(card),max=_status.aiyh_MAXNUM||13;
+										return [num/max,0,num/max,0];
+									}
 								}
-							},
-						},
+							}
+						}
 					},
 				}
 			},
@@ -3650,15 +3686,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					aiValue:function(player,card,num){
-						if(get.itemtype(card)!='card'||!card.hasGaintag('oldaili_tag')) return;
-						if(get.distance(_status.currentPhase,player,'absolute')==1&&!player.isTurnedOver()) return;
-						if(player.countCards('h',card=>{
+						if(num < 0 ||get.itemtype(card) != 'card' || !card.hasGaintag('oldaili_tag')) return;
+						if(get.distance(_status.currentPhase, player, 'absolute') == 1 && !player.isTurnedOver()) return;
+						let dai = player.countCards('h', (card) => {
 							return card.hasGaintag('oldaili_tag');
-						})%2==0&&!ui.selected.cards.some(card=>{
+						});
+						if(ui.selected.cards && ui.selected.cards.length) dai += ui.selected.cards.filter((card) => {
 							return card.hasGaintag('oldaili_tag');
-						})){
-							return num/10;
-						}
+						}).length;
+						if(dai % 2) return Math.sqrt(num);
+						return num + 6;
 					},
 					aiUseful:function(){
 						return lib.skill.oldaili.mod.aiValue.apply(this,arguments);
@@ -6077,9 +6114,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					threaten:1.2,
-					order:9,
+					order:9.1,
 					result:{
-						target:-1,
+						player:function(player){
+							let min=24;
+							player.countCards('he',function(card){
+								min=Math.min(min,get.value(card));
+							});
+							if(ui.selected.targets.length==1) return 1-min/6;
+							return 0.75-min/48;
+						},
+						target:function(player,target){
+							if(target.hasCard(function(card){
+								return lib.filter.cardDiscardable(card,player,'olqingyi');
+							},'he')) return -1;
+							return 0;
+						}
 					},
 				},
 				group:'olqingyi_gain',
@@ -8492,13 +8542,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player!=event.player&&event.player.isIn()&&player.countCards('h')>0&&!player.hasSkill('yuanzi_round',null,null,false);
 				},
 				check:function(event,player){
-					if(get.attitude(player,event.player)<=4) return false;
-					if(event.player.hasJudge('lebu')) return false;
+					if(event.player.hasJudge('lebu')||get.attitude(player,event.player)<2) return false;
 					return game.hasPlayer(function(current){
-						return event.player!=player&&game.hasPlayer(function(current){
-							return current!=player&&current!=event.player&&event.player.inRange(current)&&get.attitude(event.player,current)<0;
-						});
-					})
+						return current!==player&&current!==event.player&&event.player.inRange(current)&&get.attitude(event.player,current)<0;
+					});
 				},
 				content:function(){
 					var cards=player.getCards('h');
@@ -17720,6 +17767,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhidao:{
 				audio:2,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num>0&&!player.hasSkill('zhidao2')&&!get.tag(card,'damage')&&(!lib.filter.targetEnabled(card,player,player)||get.effect(player,card,player)<=0)) return num+10;
+					}
+				},
 				trigger:{source:'damageSource'},
 				filter:function(event,player){
 					if(event._notrigger.contains(event.player)) return false;
@@ -21602,6 +21654,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						var nono=(get.damageEffect(trigger.player,player,trigger.player)>=0);
+						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.15);
 						trigger.player.chooseToDiscard('he','弃置一张装备牌并令'+get.translation(player)+'摸一张牌，或受到一点伤害',{type:'equip'}).set('ai',function(card){
 							if(_status.event.nono){
 								return 0;
@@ -21620,10 +21673,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						trigger.player.damage();
 					}
-				},
-				ai:{
-					expose:0.3,
-					threaten:1.3
 				}
 			},
 			suishi:{

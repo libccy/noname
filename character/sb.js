@@ -519,7 +519,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return event.filterCard(get.autoViewAs({name:'juedou'},hs));
 						},
-						ai:{order:0.001},
+						ai:{
+							order:0.001,
+							nokeep:true,
+							skillTagFilter:function(player,tag,arg){
+								if(tag==='nokeep'){
+									if(arg&&(!arg.card||get.name(arg.card)!=='tao')) return false;
+									let limit=player.hasMark('sbjiang')?(game.countPlayer(current=>{
+										return current.group=='wu'&&current!=player;
+									})+1):1;
+									return player.isPhaseUsing()&&(player.getStat('skill').sbjiang_qiben||0)<limit&&player.hasCard((card)=>get.name(card)!='tao','h');
+								}
+							}
+						},
 					}
 				},
 			},
@@ -3552,8 +3564,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0],card=result.cards[0];
 						player.logSkill('sbkurou',target);
+						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.15);
 						player.give(card,target);
 						player.loseHp(['tao','jiu'].contains(get.name(card,target))?2:1);
+					}
+				},
+				ai:{
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return (!arg||arg.card&&get.name(arg.card)==='tao')&&player.hp<=0&&player.isPhaseUsing();
 					}
 				},
 				subSkill:{
@@ -3627,6 +3646,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					draw:{
 						audio:'sbzhaxiang',
+						mod:{
+							aiOrder:function(player,card,num){
+								if(num>0&&_status.event&&_status.event.type=='phase'&&get.tag(card,'recover')) return num/5;
+							}
+						},
 						trigger:{player:'phaseDrawBegin2'},
 						forced:true,
 						filter:function(event,player){
@@ -3638,7 +3662,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							effect:{
 								target:function(card,player,target){
-									if(get.tag(card,'recover')&&target.hp>=target.maxHp-1&&target.maxHp>1) return [0,0];
+									if(get.tag(card,'recover')&&target.hp>0&&target.needsToDiscard()<1) return [0,0];
 								}
 							}
 						}
@@ -3649,6 +3673,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbzhiheng:{
 				audio:2,
 				audioname:['shen_caopi'],
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num<=0||get.itemtype(card)!=='card'||get.type(card)!=='equip') return num;
+						let eq=player.getEquip(get.subtype(card));
+						if(eq&&get.equipValue(card)-get.equipValue(eq)<Math.max(1.2,6-player.hp)) return 0;
+					}
+				},
 				enable:'phaseUse',
 				usable:1,
 				position:'he',
@@ -3690,9 +3721,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(all) player.removeMark('sbtongye',1);
 				},
 				ai:{
-					order:1,
+					order:function(item,player){
+						if(player.hasCard((i)=>get.value(i)>Math.max(6,9-player.hp),'he')) return 1;
+						return 10;
+					},
 					result:{
 						player:1
+					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return (!arg||arg&&arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&!player.getStat().skill.sbzhiheng&&player.hasCard((card)=>get.name(card)!=='tao','h');
 					},
 					threaten:1.56
 				},
@@ -3704,7 +3742,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				content:function(){
 					'step 0'
-					player.chooseControl('变化','不变').set('prompt','统业：猜测场上装备数是否于你下回合准备阶段前发生变化').set('ai',()=>Number((game.countPlayer()<=4?Math.random():1)<0.4));
+					player.chooseControl('变化','不变').set('prompt','统业：猜测场上装备数是否于你下回合准备阶段前发生变化').set('ai',()=>{
+						let player = _status.event.player;
+						if(game.countPlayer() > 3) return '变化';
+						if(game.countPlayer(function (current){
+							return current.hasCard({type: 'equip'}, 'e');
+						}) < game.countPlayer()) return '变化';
+						if(game.countPlayer() == 2 && game.countPlayer(function (current){
+							if (current != player) return current.countCards('e', {type: 'equip'}) + current.countDisabledSlot();
+						}) >= 5) return '不变';
+						if(Math.random() < 0.3) return '变化';
+						return '不变';
+					});
 					'step 1'
 					if(result.control=='变化'){
 						player.addSkill('sbtongye_change',1);

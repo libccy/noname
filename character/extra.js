@@ -2453,6 +2453,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.needsToDiscard()) return num/3;
 							return 0;
 						}
+					},
+					targetInRange:function(card,player,target){
+						if(target.hasMark('yingba_mark')) return true;
 					}
 				},
 				enable:'phaseUse',
@@ -2468,15 +2471,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				locked:false,
 				//global:'yingba_mark',
-				mod:{
-					targetInRange:function(card,player,target){
-						if(target.hasMark('yingba_mark')) return true;
-					},
-				},
 				ai:{
 					combo:'scfuhai',
 					threaten:3,
-					order:9,
+					order:11,
 					result:{
 						player:function(player,target){
 							if(player.maxHp==1) return -2.5;
