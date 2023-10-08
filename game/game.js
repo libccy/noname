@@ -77,11 +77,10 @@
 		over:false,
 		clicked:false,
 		auto:false,
-		event:{
-			finished:true,
-			next:[],
-			after:[]
-		},
+		/**
+		 * @type {typeof lib.element.Event}
+		 */
+		event:null,
 		ai:{},
 		lastdragchange:[],
 		skillaudio:[],
@@ -8234,9 +8233,7 @@
 				lib.ui=ui;
 				lib.ai=ai;
 				lib.game=game;
-				for(let i in lib.element.event){
-					_status.event[i]=lib.element.event[i];
-				}
+				_status.event=new lib.element.Event();
 
 				HTMLDivElement.prototype.animate=function(name,time){
 					var that;
@@ -30180,31 +30177,57 @@
 					_status.event.excludeButton.add(this);
 				}
 			},
-			event:{
-				changeToZero:function(){
+			Event:class {
+				/**
+				 * @param {string?} name
+				 * @param {false?} trigger
+				 */
+				constructor(name,trigger){
+					this.name=name;
+					this.step=0;
+					this.finished=false;
+					/**
+					 * @type {this[]}
+					 */
+					this.next=[];
+					/**
+					 * @type {this[]}
+					 */
+					this.after=[];
+					this.custom={
+						add:{},
+						replace:{}
+					};
+					this._aiexclude=[];
+					this._notrigger=[];
+					this._result={};
+					this._set=[];
+					if(trigger!==false&&!game.online) this._triggered=0;
+				}
+				changeToZero(){
 					this.num=0;
 					this.numFixed=true;
-				},
-				finish:function(){
+				}
+				finish(){
 					this.finished=true;
-				},
-				putStepCache:function(key,value){
+				}
+				putStepCache(key,value){
 					if(!this._stepCache){
 						this._stepCache = {};
 					}
 					this._stepCache[key] = value;
-				},
-				getStepCache:function(key){
+				}
+				getStepCache(key){
 					if(!this._stepCache)return undefined;
 					return this._stepCache[key];
-				},
-				clearStepCache:function(key){
+				}
+				clearStepCache(key){
 					if(key !==  undefined && key !== null){
 						delete this._stepCache[key];
 					}
 					delete this._stepCache;
-				},
-				callFuncUseStepCache:function(prefix,func,params){
+				}
+				callFuncUseStepCache(prefix,func,params){
 					if(typeof func != 'function')return;
 					if(_status.closeStepCache)return func.apply(null,params);
 					var cacheKey = "["+prefix+"]"+get.paramToCacheKey.apply(null,params);
@@ -30214,8 +30237,8 @@
 						this.putStepCache(cacheKey,ret);
 					}
 					return ret;
-				},
-				putTempCache:function(key1,key2,value){
+				}
+				putTempCache(key1,key2,value){
 					if(!this._tempCache){
 						this._tempCache = {};
 					}
@@ -30224,8 +30247,8 @@
 					}
 					this._tempCache[key1][key2] = value;
 					return value;
-				},
-				getTempCache:function(key1,key2){
+				}
+				getTempCache(key1,key2){
 					if(!this._tempCache){
 						return undefined;
 					}
@@ -30233,41 +30256,41 @@
 						return undefined;
 					}
 					return this._tempCache[key1][key2];
-				},
-				cancel:function(arg1,arg2,notrigger){
+				}
+				cancel(arg1,arg2,notrigger){
 					this.untrigger(arg1,arg2);
 					this.finish();
 					if(notrigger!='notrigger'){
 						this.trigger(this.name+'Cancelled');
 						if(this.player&&lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name)}
-				},
-				neutralize:function(event){
+				}
+				neutralize(event){
 					this.untrigger();
 					this.finish();
 					this._neutralized=true;
 					this.trigger('eventNeutralized');
 					this._neutralize_event=event||_status.event;
-				},
-				unneutralize:function(){
+				}
+				unneutralize(){
 					this.untrigger();
 					delete this._neutralized;
 					delete this.finished;
 					if(this.type=='card'&&this.card&&this.name=='sha') this.directHit=true;
-				},
-				goto:function(step){
+				}
+				goto(step){
 					this.step=step-1;
-				},
-				redo:function(){
+				}
+				redo(){
 					this.step--;
-				},
-				setHiddenSkill:function(skill){
+				}
+				setHiddenSkill(skill){
 					if(!this.player) return this;
 					var hidden=this.player.hiddenSkills.slice(0);
 					game.expandSkills(hidden);
 					if(hidden.contains(skill)) this.set('hsskill',skill);
 					return this;
-				},
-				set:function(key,value){
+				}
+				set(key,value){
 					if(arguments.length==1&&Array.isArray(arguments[0])){
 						for(var i=0;i<arguments[0].length;i++){
 							if(Array.isArray(arguments[0][i])){
@@ -30285,8 +30308,8 @@
 						this._set.push([key,value]);
 					}
 					return this;
-				},
-				setContent:function(item){
+				}
+				setContent(item){
 					switch(typeof item){
 						case "object":
 						case "function":
@@ -30306,15 +30329,15 @@
 							break;
 					}
 					return this;
-				},
-				getLogv:function(){
+				}
+				getLogv(){
 					for(var i=1;i<=3;i++){
 						var event=this.getParent(i);
 						if(event&&event.logvid) return event.logvid;
 					}
 					return null;
-				},
-				send:function(){
+				}
+				send(){
 					this.player.send(function(name,args,set,event,skills){
 						game.me.applySkills(skills);
 						var next=game.me[name].apply(game.me,args);
@@ -30330,13 +30353,13 @@
 					get.stringifiedResult(this.parent),get.skillState(this.player));
 					this.player.wait();
 					game.pause();
-				},
-				resume:function(){
+				}
+				resume(){
 					delete this._cardChoice;
 					delete this._targetChoice;
 					delete this._skillChoice;
-				},
-				getParent:function(level,forced){
+				}
+				getParent(level,forced){
 					var parent,historys=[];
 					if(this._modparent&&game.online){
 						parent=this._modparent;
@@ -30369,11 +30392,11 @@
 						return null;
 					}
 					return parent;
-				},
-				getTrigger:function(){
+				}
+				getTrigger(){
 					return this.getParent()._trigger;
-				},
-				getRand:function(name){
+				}
+				getRand(name){
 					if(name){
 						if(!this._rand_map) this._rand_map={};
 						if(!this._rand_map[name]) this._rand_map[name]=Math.random();
@@ -30381,16 +30404,16 @@
 					}
 					if(!this._rand) this._rand=Math.random();
 					return this._rand;
-				},
-				insert:function(func,map){
+				}
+				insert(func,map){
 					var next=game.createEvent(this.name+'Inserted',false,this);
 					next.setContent(func);
 					for(var i in map){
 						next.set(i,map[i]);
 					}
 					return next;
-				},
-				insertAfter:function(func,map){
+				}
+				insertAfter(func,map){
 					var next=game.createEvent(this.name+'Inserted',false,{next:[]});
 					this.after.push(next);
 					next.setContent(func);
@@ -30398,8 +30421,8 @@
 						next.set(i,map[i]);
 					}
 					return next;
-				},
-				backup:function(skill){
+				}
+				backup(skill){
 					this._backup={
 						filterButton:this.filterButton,
 						selectButton:this.selectButton,
@@ -30520,8 +30543,8 @@
 					delete this._cardChoice;
 					delete this._targetChoice;
 					delete this._skillChoice;
-				},
-				restore:function(){
+				}
+				restore(){
 					if(this._backup){
 						this.filterButton=this._backup.filterButton;
 						this.selectButton=this._backup.selectButton;
@@ -30546,22 +30569,22 @@
 					delete this.skill;
 					delete this.ignoreMod;
 					delete this.filterCard2;
-				},
-				isMine:function(){
+				}
+				isMine(){
 					return (this.player&&this.player==game.me&&!_status.auto&&!this.player.isMad()&&!game.notMe);
-				},
-				isOnline:function(){
+				}
+				isOnline(){
 					return (this.player&&this.player.isOnline());
-				},
-				notLink:function(){
+				}
+				notLink(){
 					return this.getParent().name!='_lianhuan'&&this.getParent().name!='_lianhuan2';
-				},
-				isPhaseUsing:function(player){
+				}
+				isPhaseUsing(player){
 					var evt=this.getParent('phaseUse');
 					if(!evt||evt.name!='phaseUse') return false;
 					return !player||player==evt.player;
-				},
-				addTrigger:function(skill,player){
+				}
+				addTrigger(skill,player){
 					if(!player||!skill) return;
 					var evt=this;
 					if(typeof skill=='string') skill=[skill];
@@ -30609,8 +30632,8 @@
 							func(skill[j]);
 						}
 					}
-				},
-				removeTrigger:function(skill,player){
+				}
+				removeTrigger(skill,player){
 					if(!player||!skill) return;
 					var evt=this;
 					if(typeof skill=='string') skill=[skill];
@@ -30645,8 +30668,8 @@
 							func(skill[j]);
 						}
 					}
-				},
-				trigger:function(name){
+				}
+				trigger(name){
 					if(_status.video) return;
 					if((this.name==='gain'||this.name==='lose')&&!_status.gameDrawed) return;
 					if(name==='gameDrawEnd') _status.gameDrawed=true;
@@ -30840,8 +30863,8 @@
 						//next.starter=start;
 						event._triggering=next;
 					}
-				},
-				untrigger:function(all,player){
+				}
+				untrigger(all,player){
 					if(typeof all=='undefined') all=true;
 					var evt=this._triggering;
 					if(all){
@@ -31198,6 +31221,9 @@
 					game.online=false;
 					game.ws=null;
 				}
+			},
+			get event(){
+				return this.Event.prototype;
 			}
 		},
 		card:{
@@ -38237,27 +38263,9 @@
 			next._trigger=event;
 			next.setContent('createTrigger');
 		},
-		createEvent:function(name,trigger,triggerevent){
-			var next={
-				name:name,
-				step:0,
-				finished:false,
-				next:[],
-				after:[],
-				custom:{
-					add:{},
-					replace:{}
-				},
-				_aiexclude:[],
-				_notrigger:[],
-				_result:{},
-				_set:[],
-			}
-			if(trigger!==false&&!game.online) next._triggered=0;
-			for(var i in lib.element.event){
-				next[i]=lib.element.event[i];
-			}
-			(triggerevent||_status.event).next.push(next);
+		createEvent:(name,trigger,triggerEvent)=>{
+			const next=new lib.element.Event(name,trigger);
+			(triggerEvent||_status.event).next.push(next);
 			return next;
 		},
 		addCharacter:(name,information)=>{
@@ -58212,34 +58220,27 @@
 			}
 			return func;
 		},
-		eventInfoOL:(item,level,nomore)=>{
-			if(Object.prototype.toString.call(item)=='[object Object]'){
-				var item2={};
-				for(var i in item){
-					if(i=='_trigger'){
-						if(nomore===false) continue;
-						else item2[i]=get.eventInfoOL(item[i],null,false);
-					}
-					else if(lib.element.event[i]||i=='content'||get.itemtype(item[i])=='event') continue;
-					else item2[i]=get.stringifiedResult(item[i],null,false);
-				}
-				return '_noname_event:'+JSON.stringify(item2);
+		eventInfoOL:(item,level,noMore)=>item instanceof lib.element.Event?`_noname_event:${JSON.stringify(Object.entries(item).reduce((stringifying,entry)=>{
+			const key=entry[0];
+			if(key=='_trigger'){
+				if(noMore!==false) stringifying[key]=get.eventInfoOL(entry[1],null,false);
 			}
-			else{
-				return '';
-			}
-		},
+			else if(!lib.element.event[key]&&key!='content'&&!(entry[1] instanceof lib.element.Event)) stringifying[key]=get.stringifiedResult(entry[1],null,false);
+			return stringifying;
+		},{}))}`:'',
+		/**
+		 * @param {string} item
+		 */
 		infoEventOL:item=>{
-			var evt;
+			const evt=new lib.element.Event();
 			try{
-				evt=JSON.parse(item.slice(14));
-				for(var i in evt){
-					evt[i]=get.parsedResult(evt[i]);
-				}
-				for(var i in lib.element.event) evt[i]=lib.element.event[i];
+				Object.entries(JSON.parse(item.slice(14))).forEach(entry=>{
+					const key=entry[0];
+					if(typeof evt[key]!='function') evt[key]=get.parsedResult(entry[1]);
+				});
 			}
-			catch(e){
-				console.log(e);
+			catch(error){
+				console.log(error);
 			}
 			return evt||item;
 		},
@@ -58457,7 +58458,7 @@
 				if(obj.classList.contains('dialog')) return 'dialog';
 			}
 			if(get.is.object(obj)){
-				if(obj.isMine==lib.element.event.isMine) return 'event';
+				if(obj instanceof lib.element.Event) return 'event';
 			}
 		},
 		equipNum:card=>{
