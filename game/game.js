@@ -25776,7 +25776,7 @@
 					}
 					return this;
 				},
-				markSkillCharacter:function(id,target,name,content,broadcast){
+				markSkillCharacter:function(id,target,name,content,nobroadcast){
 					if(typeof target=='object'){
 						target=target.name;
 					}
@@ -25813,7 +25813,7 @@
 						}
 					}
 					func(this,target,name,content,id);
-					if(!nobroadcast) game.broadcastAll(func,this,target,name,content,id);
+					if(!nobroadcast) game.broadcast(func,this,target,name,content,id);
 					return this;
 				},
 				markCharacter:function(name,info,learn,learn2){
@@ -30819,7 +30819,7 @@
 				}
 				var fullskills=game.expandSkills(player.getSkills(false).concat(lib.skill.global));
 				var info=get.info(skill);
-				if((info.noHidden||get.mode()!='guozhan')&&!fullskills.contains(skill)){
+				if(((info&&info.noHidden)||get.mode()!='guozhan')&&!fullskills.contains(skill)){
 					return false;
 				}
 				if(!info.trigger) return false;
@@ -35040,7 +35040,9 @@
 				if(Array.isArray(audioInfo)){
 					audioName=audioInfo[0];
 					if(!fixedNum) fixedNum=audioInfo[1];//数组会取第一个指定语音数
-					audioInfo=lib.skill[audioName].audio;
+					// TODO: 判断不完整，但现在无合适的方法，先放着 @kuangshen04
+					if(audioName in lib.skill) audioInfo=lib.skill[audioName].audio;
+					else audioInfo=parseInt(fixedNum);
 					continue;
 				}
 				break;
@@ -35075,6 +35077,23 @@
 			else if(typeof audioInfo=='number'){
 				if(fixedNum) audioInfo=Math.min(audioInfo, fixedNum);
 				game.playAudio('skill',`${audioName}${Math.floor(audioInfo*Math.random())+1}`);
+			}
+			//直接指定配音文件名的新格式
+			else if(typeof audioInfo=="object"){
+				if(!("type" in audioInfo&&audioInfo.type=="direct"&&"files" in audioInfo)) return;
+				let audioFiles=audioInfo.files;
+				if(typeof audioFiles!="object") return;
+				if(!Array.isArray(audioFiles)){
+					if(!player) return;
+					if(player.name&&player.name in audioFiles&&(!info.audioname2||!info.audioname2[player.name]))audioFiles=audioFiles[player.name];
+					else if(player.name1&&player.name1 in audioFiles&&(!info.audioname2||!info.audioname2[player.name1]))audioFiles=audioFiles[player.name1];
+					else if(player.name2&&player.name2 in audioFiles&&(!info.audioname2||!info.audioname2[player.name2]))audioFiles=audioFiles[player.name2];
+				}
+				if(!Array.isArray(audioFiles)) return;
+				let length=audioFiles.length;
+				if(fixedNum)length=Math.min(length,fixedNum);
+				//game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}${+1}.${audioInfo[3]||'mp3'}`);
+				game.playAudio(audioFiles[Math.floor(length*Math.random())]);
 			}
 			else if(audioInfo) game.playAudio('skill',audioName);
 			else if(info.audio!==false) game.playSkillAudio(audioName);
@@ -54775,6 +54794,16 @@
 								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
 								game.playAudio('skill',audioname+getIndex(audioinfo));
 							}
+							else if(typeof audioinfo=="object"&&"type" in audioinfo&&audioinfo.type=="direct"&&"files" in audioinfo){
+								let audioFiles=audioinfo.files;
+								if(typeof audioFiles=="object"){
+									if(!Array.isArray(audioFiles)&&playername&&playername in audioFiles)audioFiles=audioFiles[playername];
+									if(Array.isArray(audioFiles)){
+										const length=audioFiles.length;
+										game.playAudio(audioFiles[getIndex(length)-1]);
+									}
+								}
+							}
 							else if(audioinfo){
 								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
 								game.playAudio('skill',audioname);
@@ -55035,6 +55064,16 @@
 							if(typeof audioinfo=='number'){
 								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
 								game.playAudio('skill',audioname+getIndex(audioinfo));
+							}
+							else if(typeof audioinfo=="object"&&"type" in audioinfo&&audioinfo.type=="direct"&&"files" in audioinfo){
+								let audioFiles=audioinfo.files;
+								if(typeof audioFiles=="object"){
+									if(!Array.isArray(audioFiles)&&playername&&playername in audioFiles)audioFiles=audioFiles[playername];
+									if(Array.isArray(audioFiles)){
+										const length=audioFiles.length;
+										game.playAudio(audioFiles[getIndex(length)-1]);
+									}
+								}
 							}
 							else if(audioinfo){
 								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
@@ -56037,7 +56076,7 @@
 		//Get the card name length
 		//获取此牌的字数
 		cardNameLength:(card,player)=>{
-			const actualCardName=lib.actualCardName,name=get.translation(get.name(card,player));
+			const actualCardName=lib.actualCardName,name=get.translation(typeof card=='string'?card:get.name(card,player));
 			return (actualCardName.has(name)?actualCardName.get(name):name).length;
 		},
 		//Yingbian
@@ -58901,6 +58940,7 @@
 			if(node._nointro) return;
 			if(typeof node._customintro=='function'){
 				if(node._customintro(uiintro,evt)===false) return;
+				lib.placePoppedDialog(uiintro,evt);
 			}
 			else if(Array.isArray(node._customintro)){
 				var caption=node._customintro[0];
@@ -59120,7 +59160,7 @@
 					}
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=node.countCards('h');
+					td.innerHTML=`${node.countCards('h')}/${node.getHandcardLimit()}`;
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML=node.phaseNumber;

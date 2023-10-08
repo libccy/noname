@@ -16372,10 +16372,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yjixi:{
 				derivation:'rewangzun',
+				audio:'weidi',
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				filter:function(event,player){
-					return player.countMark('yjixi')>=3;
+					if(player.phaseNumber<3) return false;
+					var num=0;
+					for(var i=player.actionHistory.length-1;i>=0;i--){
+						if(!player.actionHistory[i].isMe) continue;
+						if(_status.globalHistory[i].changeHp.some(evt=>evt.player==player&&evt.getParent().name=='loseHp')) return false;
+						else{
+							num++;
+							if(num>=3) break;
+						}
+					}
+					return true;
 				},
 				skillAnimation:true,
 				animationColor:'gray',
@@ -16431,6 +16442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xinyongsi:{
+				audio:'yongsi1',
 				group:['xinyongsi1','xinyongsi2'],
 				locked:true,
 			},
@@ -16444,7 +16456,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.draw(game.countGroup());
 					trigger.changeToZero();
-				}
+				},
 			},
 			xinyongsi2:{
 				audio:'yongsi2',
@@ -16459,13 +16471,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 8-get.value(card);
 					};
 					'step 1'
-					if(!result.bool){
-						player.loseHp();
-						var num=player.countMark('yjixi');
-						if(num) player.removeMark('yjixi',num,false);
-					}
-					else player.addMark('yjixi',1,false);
-				}
+					if(!result.bool) player.loseHp();
+				},
 			},
 			lianzhu:{
 				audio:2,
@@ -24877,7 +24884,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refuhan:'扶汉',
 			refuhan_info:'限定技，回合开始时，你可以移去所有"梅影"标记并摸等量的牌，然后从X张蜀势力武将牌中选择并获得至多两个技能（限定技、觉醒技、隐匿技、使命技、主公技除外）。若此时你是体力值最低的角色，你回复1点体力（X为场上角色数，且X∈[4,+∞)）。',
 			yjixi:'觊玺',
-			yjixi_info:'觉醒技，结束阶段，若你连续三回合没有因〖庸肆〗而失去过体力，则你增加1点体力上限并回复1点体力，然后选择一项：获得技能〖妄尊〗；摸两张牌并获得当前主公的主公技。',
+			yjixi_info:'觉醒技，结束阶段，若你已连续三个自己回合未失去过体力，则你增加1点体力上限并回复1点体力，然后选择一项：获得技能〖妄尊〗；摸两张牌并获得当前主公的主公技。',
 			xinyongsi:'庸肆',
 			xinyongsi1:'庸肆',
 			xinyongsi2:'庸肆',

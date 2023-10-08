@@ -188,6 +188,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//族王浑
 			clanfuxun:{
+				mod:{
+					aiOrder:function(player,card,num){
+						if(player.isPhaseUsing()&&get.type(card)=='equip'&&get.equipValue(card,player)>0) return num+3;
+					},
+				},
+				locked:false,
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
@@ -205,6 +211,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player==target) return false;
 					if(!ui.selected.cards.length) return target.countGainableCards(player,'h')>0;
 					return true;
+				},
+				check:function(card){
+					var player=_status.event.player;
+					var evtx=_status.event.getParent('phaseUse');
+					var targets=game.filterPlayer(target=>target!=player&&lib.skill.clanfuxun.ai.result.target(player,target)!=0);
+					targets.sort((a,b)=>Math.abs(lib.skill.clanfuxun.ai.result.target(player,b))-Math.abs(lib.skill.clanfuxun.ai.result.target(player,a)));
+					if(evtx&&targets.length){
+						var target=targets[0];
+						if(!target.hasHistory('lose',evt=>{
+							return evt.getParent(3).name!='clanfuxun'&&evt.getParent('phaseUse')==evtx&&evt.cards2.length;
+						})&&!target.hasHistory('gain',evt=>{
+							return evt.getParent().name!='clanfuxun'&&evt.getParent('phaseUse')==evtx&&evt.cards.length;
+						})&&Math.abs(player.countCards('h')-target.countCards('h'))==2){
+							if(player.countCards('h')>target.countCards('h')) return 1/(get.value(card)||0.5);
+							return -1;
+						}
+						if(card.name=='du') return 20;
+						return -1;
+					}
+					if(card.name=='du') return 20;
+					return -1;
 				},
 				content:function(){
 					'step 0'
@@ -261,9 +288,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					order:2,
+					order:function(item,player){
+						var evtx=_status.event.getParent('phaseUse');
+						if(game.hasPlayer(current=>{
+							if(current==player||!evtx||get.attitude(player,current)==0) return false;
+							return !current.hasHistory('lose',evt=>{
+								return evt.getParent(3).name!='clanfuxun'&&evt.getParent('phaseUse')==evtx&&evt.cards2.length;
+							})&&!current.hasHistory('gain',evt=>{
+								return evt.getParent().name!='clanfuxun'&&evt.getParent('phaseUse')==evtx&&evt.cards.length;
+							})&&Math.abs(player.countCards('h')-current.countCards('h'))==2;
+						})) return 10;
+						return 2;
+					},
 					result:{
-						target:-1,
+						target:function(player,target){
+							var evtx=_status.event.getParent('phaseUse');
+							var num=get.sgn(get.attitude(player,target));
+							var targets=game.filterPlayer(current=>{
+								if(current==player||!evtx||get.attitude(player,current)==0) return false;
+								return !current.hasHistory('lose',evt=>{
+									return evt.getParent(3).name!='clanfuxun'&&evt.getParent('phaseUse')==evtx&&evt.cards2.length;
+								})&&!current.hasHistory('gain',evt=>{
+									return evt.getParent().name!='clanfuxun'&&evt.getParent('phaseUse')==evtx&&evt.cards.length;
+								})&&Math.abs(player.countCards('h')-current.countCards('h'))==2;
+							});
+							if(targets.contains(target)){
+								if(player.countCards('h')<target.countCards('h')) return get.sgn(num+0.5)*Math.sqrt(2-num);
+								else return num*(2+num);
+							}
+							return get.sgn(num+0.5)*(1-num)*0.25;
+						},
 					},
 				},
 				subSkill:{
@@ -272,9 +326,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.itemtype(card)=='card';
 						},
 						position:'hes',
-						filterTarget:lib.filter.targetEnabled,
+						filterTarget:lib.filter.filterTarget,
 						selectCard:1,
-						check:(card)=>6-get.value(card),
+						check:function(card){
+							var player=_status.event.player;
+							if(player.hasSkill('clanzhongliu')&&get.position(card)!='h') return 10-get.value(card);
+							return 5-get.value(card);
+						},
 						log:false,
 						precontent:function(){
 							delete event.result.skill;
