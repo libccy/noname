@@ -3156,13 +3156,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinkuanggu:{
-				trigger:{source:'damageSource'},
-				filter:function(event,player){
-					return get.distance(player,event.player)<=1&&event.num>0;
-				},
-				direct:true,
 				audio:'kuanggu',
 				audioname:['re_weiyan','ol_weiyan'],
+				trigger:{source:'damageSource'},
+				filter:function(event,player){
+					return event.kuangguCheck&&event.num>0;
+				},
+				direct:true,
 				preHidden:true,
 				content:function(){
 					'step 0'
@@ -3177,7 +3177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						choice='draw_card';
 					}
-					var next=player.chooseDrawRecover(get.prompt(event.name)).set('logSkill',event.name).set('prompt2','摸一张牌或回复1点体力');
+					var next=player.chooseDrawRecover('###'+get.prompt(event.name)+'###摸一张牌或回复1点体力').set('logSkill',event.name);
 					next.set('choice',choice);
 					next.set('ai',function(){
 						return _status.event.getParent().choice;
@@ -3190,7 +3190,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.goto(1);
 						}
 					}
-				}
+				},
+				group:'kuanggu_check',
 			},
 			xinliegong:{
 				shaRelated:true,
@@ -6458,11 +6459,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){
-					return get.distance(player,event.player)<=1&&player.isDamaged();
+					return event.kuangguCheck&&player.isDamaged();
 				},
 				content:function(){
 					player.recover(trigger.num);
-				}
+				},
+				group:'kuanggu_check',
+				subSkill:{
+					check:{
+						charlotte:true,
+						trigger:{global:'damageBegin3'},
+						filter:function(event,player){
+							return event.source&&event.source==player&&get.distance(player,event.player)<=1;
+						},
+						firstDo:true,
+						priority:11+45+14,
+						forced:true,
+						popup:false,
+						content:function(){
+							trigger.kuangguCheck=true;
+						},
+					},
+				},
 			},
 			tianxiang:{
 				audio:2,
@@ -8106,7 +8124,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinkuanggu:'狂骨',
 			gzbuqu:'不屈',
 			gzbuqu_info:'①当你扣减1点体力时，若你的体力值小于1，你可以将牌堆顶的一张牌置于你的武将牌上，称为“创”。②当你回复1点体力时，你移去一张“创”。③若你有“创”且点数均不相同，则你不结算濒死流程。',
-			xinkuanggu_info:'当你对距离1以内的一名角色造成1点伤害后，你可以回复1点体力或摸一张牌。',
+			xinkuanggu_info:'当你对造成1点伤害后，若受伤角色受到此伤害时你与其的距离不大于1，则你可以回复1点体力或摸一张牌。',
 			xinliegong_info:'①你使用【杀】可以选择你距离不大于此【杀】点数的角色为目标。②当你使用【杀】指定一个目标后，你可以根据下列条件执行相应的效果：1.其手牌数小于等于你的手牌数，此【杀】不可被响应，2.其体力值大于等于你的体力值，此【杀】伤害+1。',
 			jiewei_info:'当你的武将牌翻面后，你可以摸一张牌。然后你可以使用一张锦囊牌或装备牌，并可以在此牌结算后弃置场上一张同类型的牌',
 			releiji_info:'当你使用或打出一张【闪】时，你可令一名其他角色进行一次判定：若结果为梅花，其受到一点雷电伤害，然后你回复一点体力；若结果为黑桃，其受到两点雷电伤害。',
@@ -8115,7 +8133,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jushou_info:'结束阶段，你可以摸3张牌，并将武将牌翻面。',
 			moon_jushou_info:'结束阶段，你可以摸一张牌，并将武将牌翻面。',
 			liegong_info:'当你使用【杀】时，若目标的手牌数大于等于你的体力值，或小于等于你的攻击范围，你可令此【杀】不能被响应。',
-			kuanggu_info:'锁定技，当你造成伤害后，若受伤角色与你的距离不大于1，你回复X点体力（X为伤害值）。',
+			kuanggu_info:'锁定技，当你造成伤害后，若受伤角色受到此伤害时你与其的距离不大于1，你回复X点体力（X为伤害值）。',
 			tianxiang_info:'当你即将受到伤害时，你可以弃置一张♥手牌，将伤害转移给一名其他角色，然后该角色摸X张牌（X为其已损失的体力值）。',
 			hongyan_info:'锁定技，你区域内的黑桃牌和黑桃判定牌均视为红桃。',
 			buqu_info:'锁定技，当你处于濒死状态时，你亮出牌堆顶的一张牌并置于你的武将牌上，称之为“创”。若此牌的点数与你武将牌上已有的“创”点数均不同，则你回复至1体力。若点数相同，则将此牌置入弃牌堆。只要你的武将牌上有“创”，你的手牌上限便与“创”的数量相等。',
