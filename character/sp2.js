@@ -4553,19 +4553,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.phaseNumber==1&&!player.storage.kangge&&game.hasPlayer(current=>current!=player);
 				},
 				content:function(){
-				'step 0'
-				player.chooseTarget('请选择【抗歌】的目标','其于回合外摸牌后，你摸等量的牌；其进入濒死状态时，你可令其回复体力至1点；其死亡后，你弃置所有牌并失去1点体力',lib.filter.notMe,true).set('ai',function(target){
-					return get.attitude(_status.event.player,target)>0;
-				});
-				'step 1'
-				if(result.bool){
-					var target=result.targets[0];
-					player.logSkill('kangge',target);
-					player.addSkill('kangge_clear');
-					player.storage.kangge=target;
-					player.markSkill('kangge');
-					game.delayx();
-				}
+					'step 0'
+					player.chooseTarget('请选择【抗歌】的目标','其于回合外摸牌后，你摸等量的牌；其进入濒死状态时，你可令其回复体力至1点；其死亡后，你弃置所有牌并失去1点体力',lib.filter.notMe,true).set('ai',function(target){
+						return get.attitude(_status.event.player,target)>0;
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('kangge',target);
+						player.addSkill('kangge_clear');
+						player.storage.kangge=target;
+						player.markSkill('kangge');
+						game.delayx();
+					}
 				},
 				intro:{content:'已指定$为目标'},
 				group:['kangge_draw','kangge_dying','kangge_die'],
@@ -4577,7 +4577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						filter:function(event,player){
-						if(player.countMark('kangge_draw')>=3) return false;
+							if(player.countMark('kangge_draw')>=3) return false;
 							var target=player.storage.kangge;
 							return target&&target!=_status.currentPhase&&event.getg(target).length>0;
 						},
