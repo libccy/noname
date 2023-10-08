@@ -497,6 +497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						lib.translate['yichong_'+player.playerid+'_bg']='雀';
 					}
 				},
+				getLimit:1,
 				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
@@ -560,7 +561,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!player.storage.yichong) return false;
 							return game.hasPlayer(function(current){
 								if(!event.getg(current).length||!current.hasSkill('yichong_'+player.playerid)) return false;
-								if(current.countMark('yichong_'+player.playerid)>=5) return false;
+								if(current.countMark('yichong_'+player.playerid)>=lib.skill.yichong.getLimit) return false;
 								return event.getg(current).some(card=>get.suit(card,current)==player.storage.yichong&&lib.filter.canBeGained(card,current,player));
 							});
 						},
@@ -569,14 +570,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							var target=game.findPlayer(function(current){
 								if(!trigger.getg(current).length||!current.hasSkill('yichong_'+player.playerid)) return false;
-								if(current.countMark('yichong_'+player.playerid)>=5) return false;
+								if(current.countMark('yichong_'+player.playerid)>=lib.skill.yichong.getLimit) return false;
 								return trigger.getg(current).some(card=>get.suit(card,current)==player.storage.yichong&&lib.filter.canBeGained(card,current,player));
 							});
 							event.target=target;
 							var cards=trigger.getg(target).filter(card=>get.suit(card,target)==player.storage.yichong&&lib.filter.canBeGained(card,target,player));
-							if(cards.length<=5-target.countMark('yichong_'+player.playerid)) event._result={bool:true,links:cards};
+							if(cards.length<=lib.skill.yichong.getLimit-target.countMark('yichong_'+player.playerid)) event._result={bool:true,links:cards};
 							else{
-								var num=(5-target.countMark('yichong_'+player.playerid));
+								var num=(lib.skill.yichong.getLimit-target.countMark('yichong_'+player.playerid));
 								player.chooseButton(['易宠：获得其中的'+get.cnNumber(num)+'张牌',cards],num,true).set('ai',function(button){
 									return get.value(button.link);
 								});
@@ -613,7 +614,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=game.findPlayer(current=>current.hasSkill('yichong_'+player.playerid));
 					event.target=target;
 					if(trigger.name=='damage'){
-						player.chooseBool(get.prompt('wufei',target),'对'+get.translation(target)+'造成1点伤害').set('choice',get.damageEffect(target,player,player)>0);
+						player.chooseBool(get.prompt('wufei',target),'令'+get.translation(target)+'受到1点无来源伤害').set('choice',get.damageEffect(target,player,player)>0);
 					}
 					else{
 						player.logSkill('wufei',target);
@@ -625,7 +626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.logSkill('wufei',target);
-						target.damage();
+						target.damage('nosource');
 					}
 				},
 				subSkill:{
@@ -14851,9 +14852,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_guozhao:'手杀郭照',
 			xin_guozhao_prefix:'手杀',
 			yichong:'易宠',
-			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”得到五张牌）。',
+			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”得到一张牌）。',
 			wufei:'诬诽',
-			wufei_info:'若场上存在拥有“雀”标记的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于1且A的体力值大于你，则你可以对A造成1点伤害。',
+			wufei_info:'若场上存在拥有“雀”标记的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于1且A的体力值大于你，则你可以令A受到1点无来源伤害。',
 			yj_zhoubuyi:'☆周不疑',
 			yj_zhoubuyi_prefix:'☆',
 			mbhuiyao:'慧夭',
