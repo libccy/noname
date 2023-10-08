@@ -8510,6 +8510,7 @@
 					writable:true,
 					value:function(){
 						for(const i of Array.from(arguments)) this.remove(...i);
+						return this;
 					}
 				});
 				Object.defineProperty(Array.prototype,"unique",{
