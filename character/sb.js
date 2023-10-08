@@ -240,7 +240,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(get.prompt('sbzaiqi'),'选择任意名角色并消耗等量蓄力值，令这些角色选择一项：1.令你摸一张牌；2.弃置一张牌，然后你回复1点体力',[1,player.countMark('charge')]).set('ai',function(target){
 						var player=_status.event.player;
-						return get.attitude(player,target)+player.getDamagedHp()*3.5;
+						var att=get.attitude(player,target);
+						return 3-get.sgn(att)+Math.abs(att/1000);
 					});
 					'step 1'
 					if(result.bool){
