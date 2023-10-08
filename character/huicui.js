@@ -9382,6 +9382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return Math.max(0.12,num/25);
 					}
 				},
+				locked:false,
 				enable:['chooseToUse','chooseToRespond'],
 				usable:1,
 				hiddenCard:function(player,name){
