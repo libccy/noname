@@ -40546,7 +40546,17 @@
 		checkMod:function(){
 			const argumentArray=Array.from(arguments),name=argumentArray[argumentArray.length-2];
 			let skills=argumentArray[argumentArray.length-1];
-			if(skills.getSkills) skills=skills.getModableSkills(_status.event.useCache === true);
+			if(typeof skills.getModableSkills == 'function'){
+				skills=skills.getModableSkills(_status.event.useCache === true);
+			}else if(typeof skills.getSkills == 'function'){
+				skills=skills.getSkills().concat(lib.skill.global);
+				game.expandSkills(skills);
+				skills = skills.filter(function(skill){
+					var info = get.info(skill);
+					return info && info.mod;
+				});
+				skills.sort((a,b)=>get.priority(a)-get.priority(b));
+			}
 			const arg=argumentArray.slice(0,-2);
 			skills.forEach(value=>{
 				var mod = get.info(value).mod[name];
