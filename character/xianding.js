@@ -10550,6 +10550,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.draw(2+get.sgn(trigger.player.hp-player.hp));
 				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(get.itemtype(player)!=='player'||player===target) return 1;
+							let num=1,ds=2+get.sgn(player.hp-target.hp);
+							if(player===_status.currentPhase&&_status.currentPhase.group==='qun'&&target.hasZhuSkill('yuwei',player)) num=2;
+							if(target.getHistory('gain',function(evt){
+								return evt.getParent(2).name==='shiyuan'&&evt.cards.length===ds;
+							}).length>=num) return 1;
+							let name=get.name(card);
+							if(get.tag(card,'lose')||name==='huogong'||name==='juedou'||name==='tiesuo') return [1,ds];
+							if(!target.hasFriend()) return 1;
+							return [1,0.8*ds];
+						}
+					}
+				}
 			},
 			dushi:{
 				audio:2,
