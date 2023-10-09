@@ -2164,7 +2164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						str+=('摸'+get.cnNumber(Math.min(8,num2-num1))+'张牌，然后手牌上限-1。');
 					}
 					str+=('<br>※当前手牌上限：'+num2);
-					var num3=player.countMark('clanguixiang_count');
+					var num3=((_status.event.getParent().phaseIndex||0)+1);
 					if(num3>0){
 						str+=('；阶段数：'+num3)
 					}
@@ -2186,7 +2186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:function(item,player){
-						var num=player.getHandcardLimit(),numx=player.countMark('clanguixiang_count');
+						var num=player.getHandcardLimit(),numx=((_status.event.getParent().phaseIndex||0)+1);
 						if(num==5&&numx==4&&player.getStat('skill').clanyirong) return 0;
 						if(player.countCards('h')==num+1&&num!=2&&(num<=4||num>4&&numx>4)) return 10;
 						return 0.5;
@@ -2197,56 +2197,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanguixiang:{
 				audio:2,
-				init:function(player){
-					player.addSkill('clanguixiang_count');
-				},
-				onremove:function(player){
-					player.removeSkill('clanguixiang_count');
-					var event=_status.event.getParent('phase');
-					if(event) delete event._clanguixiang;
-				},
 				trigger:{
-					player:['phaseZhunbeiBefore','phaseJudgeBefore','phaseDrawBefore','phaseDiscardBefore','phaseJieshuBefore'],
+					player:'phaseChange',
 				},
 				forced:true,
 				filter:function(event,player){
-					var evt=event.getParent('phase');
-					if(!evt||!evt._clanguixiang) return false;
-					var num1=player.getHandcardLimit()-1,num2=player.countMark('clanguixiang_count');
+					if(event.phaseList[event.num].startsWith('phaseUse')) return false;
+					var num1=player.getHandcardLimit()-1,num2=event.num;
 					return num1==num2;
 				},
 				content:function(){
-					trigger.cancel(null,null,'notrigger');
-					var next=player.phaseUse();
-					event.next.remove(next);
-					trigger.getParent().next.unshift(next);
-				},
-				subSkill:{
-					count:{
-						trigger:{
-							player:['phaseZhunbeiBegin','phaseJudgeBegin','phaseDrawBegin','phaseDiscardBegin','phaseJieshuBegin','phaseUseBegin'],
-						},
-						forced:true,
-						popup:false,
-						lastDo:true,
-						priority:-Infinity,
-						content:function(){
-							player.addMark('clanguixiang_count',1,false);
-						},
-						group:'clanguixiang_clear',
-					},
-					clear:{
-						trigger:{player:'phaseBefore'},
-						forced:true,
-						charlotte:true,
-						popup:false,
-						firstDo:true,
-						priority:Infinity,
-						content:function(){
-							delete player.storage.clanguixiang_count;
-							trigger._clanguixiang=true;
-						},
-					},
+					trigger.phaseList[trigger.num]='phaseUse|clanguixiang';
+					game.delayx();
 				},
 			},
 			clanmuyin:{
