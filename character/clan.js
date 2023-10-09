@@ -2197,14 +2197,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanguixiang:{
 				audio:2,
-				init:function(player){
-					player.addSkill('clanguixiang_count');
-				},
-				onremove:function(player){
-					player.removeSkill('clanguixiang_count');
-					var event=_status.event.getParent('phase');
-					if(event) delete event._clanguixiang;
-				},
 				trigger:{
 					player:'phaseChange',
 				},
