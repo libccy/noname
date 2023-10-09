@@ -56322,6 +56322,11 @@
 		},
 	};
 	const get={
+		//possibility为0~1的一个数字，代表概率
+		mayDo:(possibility,success,fail)=>{
+			if(Math.random()<(possibility||0)) return (typeof success==='function')?success():(success||true);
+			return (typeof fail==='function')?fail():(fail||false);
+		},
 		//Generate an object URL from the Base64-encoded octet stream
 		//从Base64编码的八位字节流生成对象URL
 		objectURL:octetStream=>{
