@@ -4585,11 +4585,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//周宣
 			dcwumei:{
 				audio:2,
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseBeginStart'},
 				filter:function(event,player){
 					return !player.hasSkill('dcwumei_used');
 				},
-				priority:10,//离谱的优先机制
 				direct:true,
 				content:function(){
 					'step 0'
@@ -4616,6 +4615,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger._triggered=5;
 							var evt=player.insertPhase();
 							delete evt.skill;
+							game.broadcastAll(function(player){
+								player.classList.remove('glow_phase');
+								delete _status.currentPhase;
+							},player);
 						} 
 					}
 				},
