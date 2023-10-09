@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:['xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
+				mobile_default:['laimin','baoxin','jiangji','liwei','xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan','yj_zhoubuyi'],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua_feng:['re_xiaoqiao',"xin_zhoutai"],
@@ -26,6 +26,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			baoxin:['male','qun',4,['mutao','yimou'],['character:tw_baoxin','die:tw_baoxin']],
+			jiangji:['male','wei',3,['twjichou','jilun'],['character:tw_jiangji','die:tw_jiangji']],
+			liwei:['male','shu',4,['jiaohua'],['character:tw_liwei','die:tw_liwei']],
+			laimin:['male','shu',3,['laishou','luanqun']],
 			yj_zhoubuyi:['male','wei',3,['mbhuiyao','mbquesong']],
 			xin_guozhao:['female','wei',3,['yichong','wufei']],
 			xin_zhangyi:['male','shu',4,['xinwurong','shizhi']],
@@ -166,6 +170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			scs_gaowang:['male','qun','',['scsmiaoyu'],['unseen','sex:male_castrated']],
 		},
 		characterIntro:{
+			laimin:'来敏（165年—261年），字敬达，义阳新野人，东汉太中大夫来歙之后，司空来艳之子，三国时期蜀汉官员。东汉末年，逢董卓之乱，来敏跟随姐夫黄琬到荆州避难，黄琬是刘璋祖母的侄子，来敏又与姐姐来氏入蜀，被刘璋引为宾客。来敏喜欢读书，尤其喜欢《左氏春秋》。刘备平定益州后，以来敏为典学校尉，后立太子，来敏为家令。刘禅继位后，任命来敏为虎贲中郎将，诸葛亮驻汉中，请来敏为军祭酒、辅军将军。却因其口出狂言而被罢官，诸葛亮死后，来敏历任大长秋、光禄大夫、执慎将军等职，期间多次因说错话而被免官，蜀汉景耀年间，来敏去世，时年九十七岁。',
 			shichangshi:'十常侍，指中国东汉（公元25年—220年）灵帝时期（168年-189年）操纵政权的十二个宦官：张让、赵忠、夏恽、郭胜、孙璋、毕岚、栗嵩、段珪、高望、张恭、韩悝、宋典（在小说《三国演义》里，十常侍指的是指张让、赵忠、封谞、段珪、曹节、侯览、蹇硕、程旷、夏恽、郭胜十人），他们都任职中常侍。玩弄小皇帝于股掌之中，以至灵帝称“张常侍是我父，赵常侍是我母”。十常侍自己横征暴敛，卖官鬻爵，他们的父兄子弟遍布天下，横行乡里，祸害百姓，无官敢管。人民不堪剥削、压迫，纷纷起来反抗。当时一些比较清醒的官吏，已看出宦官集团的黑暗腐败，导致大规模农民起义的形势。郎中张钧在给皇帝的奏章中明确指出，黄巾起义是外戚宦官专权逼出来的，他说：“张角所以能兴兵作乱，万人所以乐附之者，其源皆由十常侍多放父兄、子弟、婚宗、宾客典据州郡，辜确财利，侵略百姓，百姓之怨无所告诉，故谋议不轨，聚为‘盗贼’。”后被曹操、袁绍所歼。',
 			sunzhang:'孙璋（？-189年？）东汉末期汉灵帝的宦官，官居中常侍，为十常侍之一，在张让、赵忠之下位居第三。光熹元年（189年），张让、赵忠、段珪等诛杀何进，袁绍率军入宫，诛杀孙璋。',
 			bilan:'毕岚（？—189），东汉宦官，十常侍之一。十常侍朋比为奸，祸乱朝纲，制造出党锢之祸，后被袁绍诛杀。另外，毕岚曾制造翻车，用于取河水洒路。',
@@ -380,6 +385,353 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//鲍信
+			mutao:{
+				audio:'twmutao',
+				inherit:'twmutao',
+				content:function(){
+					'step 0'
+					event.togive=target.getNext();
+					var cards=target.getCards('h',{name:'sha'});
+					if(!cards.length){
+						game.log('但',target,'没有','#y杀','！');
+						event.finish();
+					}
+					else target.addToExpansion(cards,target,'give').gaintag.add('mutao');
+					'step 1'
+					var card=target.getExpansions('mutao').randomGet();
+					target.give(card,event.togive);
+					'step 2'
+					if(target.getExpansions('mutao').length){
+						event.togive=event.togive.getNext();
+						event.goto(1);
+					}
+					else{
+						target.line(event.togive);
+						event.togive.damage(Math.min(3,event.togive.countCards('h',{name:'sha'})),target);
+					}
+				},
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+			},
+			yimou:{
+				audio:'twyimou',
+				inherit:'twyimou',
+				content:function(){
+					'step 0'
+					if(trigger.player!=player) player.addExpose(0.3);
+					var target=get.translation(trigger.player);
+					var choiceList=[
+						'令'+target+'获得牌堆里的一张【杀】',
+						'令'+target+'将一张牌交给另一名角色，然后'+target+'摸两张牌',
+					];
+					var list=['选项一'];
+					if(trigger.player.countCards('h')) list.push('选项二');
+					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+					player.chooseControl(list).set('prompt','毅谋：请选择一项').set('choiceList',choiceList).set('ai',function(){
+						var evt=_status.event.getTrigger(),list=_status.event.list;
+						var player=_status.event.player;
+						var target=evt.player;
+						if(target.countCards('h')&&list.contains('选项二')) return '选项二';
+						return '选项一';
+					}).set('list',list);
+					'step 1'
+					event.choice=result.control;
+					'step 2'
+					if(event.choice!='选项二'){
+						var card=get.cardPile2(function(card){
+							return card.name=='sha';
+						});
+						if(card) trigger.player.gain(card,'gain2');
+						else game.log('但牌堆里已经没有','#y杀','了！');
+						if(event.choice=='选项一') event.finish();
+					}
+					'step 3'
+					if(event.choice!='选项一'){
+						if(trigger.player.countCards('h')) trigger.player.chooseCardTarget({
+							prompt:'将一张手牌交给另一名其他角色并摸两张牌',
+							filterCard:true,
+							forced:true,
+							filterTarget:lib.filter.notMe,
+							ai1:function(card){
+								return 1/Math.max(0.1,get.value(card));
+							},
+							ai2:function(target){
+								var player=_status.event.player,att=get.attitude(player,target);
+								if(target.hasSkillTag('nogain')) att/=9;
+								return 4+att;
+							},
+						});
+						else event.finish();
+					}
+					'step 4'
+					var target=result.targets[0];
+					trigger.player.line(target);
+					trigger.player.give(result.cards,target);
+					trigger.player.draw(2);
+				},
+			},
+			//蒋济
+			jilun:{
+				audio:'twjilun',
+				inherit:'twjilun',
+				filter:function(event,player){
+					return player.hasSkill('twjichou');
+				},
+				content:function(){
+					'step 0'
+					var num=Math.min(Math.max(1,player.getStorage('twjichou').length),5);
+					event.num=num;
+					var choices=['选项一'];
+					var choiceList=[
+						'摸'+get.cnNumber(num)+'张牌',
+						'获得一个“机论”标记',
+					];
+					if(!player.getStorage('twjichou').length||!player.getStorage('twjichou').filter(function(name){
+						return !player.getStorage('jilun').contains(name)&&player.hasUseTarget({name:name});
+					}).length) choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+					else choices.push('选项二');
+					player.chooseControl(choices,'cancel2').set('choiceList',choiceList).set('prompt',get.prompt('jilun')).set('ai',()=>{
+						if(_status.event.choiceList.length==1||!player.getStorage('twjichou').length) return 0;
+						var val=_status.event.num>3?Math.min(1.5,1+(_status.event.num-3)*0.1):1;
+						for(var name of player.getStorage('twjichou')){
+							if(player.getStorage('jilun').contains(name)) continue;
+							if(player.getUseValue({name:name})>4*val) return 1;
+						}
+						return 0;
+					}).set('num',num);
+					'step 1'
+					if(result.control!='cancel2'){
+						player.logSkill('jilun');
+						if(result.control=='选项一') player.draw(num);
+						else player.addMark('jilun_mark',1);
+					}
+				},
+				group:'jilun_effect',
+				subSkill:{
+					mark:{
+						intro:{content:'mark'},
+					},
+					effect:{
+						audio:'twjilun',
+						trigger:{global:'phaseJieshuBegin'},
+						filter:function(event,player){
+							return player.hasMark('jilun_mark');
+						},
+						forced:true,
+						content:function(){
+							'step 0'
+							if(!player.getStorage('twjichou').length||!player.getStorage('twjichou').filter(function(name){
+								return !player.getStorage('jilun').contains(name)&&player.hasUseTarget({name:name});
+							}).length){
+								if(player.hasMark('jilun_mark')) player.removeMark('jilun_mark',player.countMark('jilun_mark'));
+								event.finish();
+								return;
+							}
+							var list=[];
+							for(var name of player.getStorage('twjichou')){
+								if(!player.getStorage('jilun').contains(name)){
+									list.push(['锦囊','',name]);
+								}
+							}
+							player.chooseButton(['###机论：请选择你要执行的选项###<div class="text center"><li>失去1枚“机论”标记，视为使用一张〖急筹〗已记录但〖机论〗未记录的普通锦囊牌<br><li>失去所有“机论”标记</div>',[list,'vcard']]).set('filterButton',function(button){
+								return _status.event.player.hasUseTarget({name:button.link[2]});
+							}).set('ai',function(button){
+								return _status.event.getParent().player.getUseValue({name:button.link[2]},null,true);
+							});
+							'step 1'
+							if(result.bool){
+								player.removeMark('jilun_mark',1);
+								var card={name:result.links[0][2],isCard:true};
+								player.chooseUseTarget(card,true);
+								player.markAuto('jilun',[card.name]);
+								player.syncStorage('jilun');
+							}
+							else{
+								player.removeMark('jilun_mark',player.countMark('jilun_mark'));
+								event.finish();
+							}
+							'step 2'
+							if(player.hasMark('jilun_mark')) event.goto(0);
+						},
+					},
+				},
+			},
+			//李遗
+			jiaohua:{
+				onremove:true,
+				audio:'twjiaohua',
+				enable:'phaseUse',
+				usable:3,
+				chooseButton:{
+					dialog:function(event,player){
+						return ui.create.dialog('###教化###选择一种牌的类型，令一名角色从牌堆获得此类型的一张牌');
+					},
+					chooseControl:function(event,player){
+						var list=['basic','trick','equip'].filter(type=>!player.getStorage('jiaohua').contains(type));
+						list.push('cancel2');
+						return list;
+					},
+					check:function(event,player){
+						var list=['trick','equip','basic'].filter(type=>!player.getStorage('jiaohua').contains(type));
+						return list[0];
+					},
+					backup:function(result,player){
+						return{
+							type:result.control,
+							audio:'twjiaohua',
+							filterTarget:true,
+							content:function(){
+								'step 0'
+								var type=lib.skill.jiaohua_backup.type;
+								var card=get.cardPile2(card=>get.type2(card)==type);
+								if(card) target.gain(card,'gain2');
+								else game.log('但牌堆里已经没有','#y'+get.translation(type)+'牌','了！');
+								'step 1'
+								player.markAuto('jiaohua',[lib.skill.jiaohua_backup.type]);
+								'step 2'
+								if(!['basic','trick','equip'].some(type=>!player.getStorage('jiaohua').contains(type))){
+									player.popup('教化');
+									player.unmarkAuto('jiaohua',player.getStorage('jiaohua'));
+									game.log(player,'清空了','#g【教化】','记录');
+								}
+							},
+							ai:{
+								result:{target:1},
+							},
+						}
+					},
+					prompt:function(result,player){
+						return '令一名角色从牌堆中获得一张'+get.translation(result.control)+'牌';
+					},
+				},
+				ai:{
+					order:7,
+					result:{player:1},
+				},
+				intro:{content:'已记录$牌'},
+			},
+			//来敏
+			laishou:{
+				audio:2,
+				trigger:{player:['damageBegin4','phaseZhunbeiBegin']},
+				filter:function(event,player){
+					var num=9;
+					if(event.name=='damage') return event.num>=player.getHp()&&player.maxHp<num;
+					return player.maxHp>=num;
+				},
+				forced:true,
+				content:function(){
+					if(trigger.name=='damage'){
+						player.gainMaxHp(trigger.num);
+						trigger.cancel();
+					}
+					else player.die();
+				},
+			},
+			luanqun:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.countCards('h');
+				},
+				usable:1,
+				content:function(){
+					'step 0'
+					var targets=game.filterPlayer(current=>current.countCards('h')).sortBySeat();
+					event.targets=targets;
+					var next=player.chooseCardOL(targets,'乱群：请选择要展示的牌',true).set('ai',function(card){
+						return -get.value(card);
+					}).set('source',player);
+					next.aiCard=function(target){
+						var hs=target.getCards('h');
+						return {bool:true,cards:[hs.randomGet()]};
+					};
+					next._args.remove('glow_result');
+					'step 1'
+					var cards=[];
+					event.videoId=lib.status.videoId++;
+					for(var i=0;i<targets.length;i++) cards.push(result[i].cards[0]);
+					event.cards=cards;
+					game.log(player,'展示了',targets,'的',cards);
+					game.broadcastAll(function(targets,cards,id,player){
+						var dialog=ui.create.dialog(get.translation(player)+'发动了【乱群】',cards);
+						dialog.videoId=id;
+						var getName=function(target){
+							if(target._tempTranslate) return target._tempTranslate;
+							var name=target.name;
+							if(lib.translate[name+'_ab']) return lib.translate[name+'_ab'];
+							return get.translation(name);
+						}
+						for(var i=0;i<targets.length;i++){
+							dialog.buttons[i].querySelector('.info').innerHTML=getName(targets[i])+get.translation(cards[i].suit);
+						}
+					},targets,cards,event.videoId,player);
+					game.delay(4);
+					'step 2'
+					game.broadcastAll('closeDialog',event.videoId);
+					var card=cards[targets.indexOf(player)];
+					var cardx=cards.filter(cardy=>cardy!=card&&get.color(cardy,targets[cards.indexOf(cardy)])==get.color(card,player));
+					if(cardx.length){
+						player.chooseButton(['乱群：是否获得其中的一张牌',cardx]).set('forceAuto',true).set('ai',function(button){
+							var cards=_status.event.list[0];
+							var targets=_status.event.list[1];
+							var player=_status.event.player;
+							if(get.attitude(player,targets[cards.indexOf(button.link)])) return 0;
+							return get.value(button.link,player);
+						}).set('list',[cards,targets]);
+					}
+					else event.goto(4);
+					'step 3'
+					if(result.bool){
+						var card=result.links[0];
+						player.gain(card,get.owner(card),'give');
+					}
+					'step 4'
+					var card=cards[targets.indexOf(player)];
+					targets=targets.filter(target=>get.color(cards[targets.indexOf(target)],target)!=get.color(card,player));
+					if(targets.length){
+						player.line(targets);
+						targets.forEach(target=>{
+							target.addTempSkill('luanqun_effect',{player:'phaseUseAfter'});
+							target.markAuto('luanqun_effect',[player]);
+						});
+					}
+				},
+				ai:{
+					order:9,
+					result:{
+						player:function(player,target){
+							if(player.hasSkill('laishou')) return 1;
+							return player.hp>=2?1:0;
+						},
+					},
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						intro:{content:'出牌阶段第一张【杀】只能指定$为目标，且此牌不可被响应'},
+						mod:{
+							playerEnabled:function(card,player,target){
+								if(!player.isPhaseUsing()) return;
+								if(card.name=='sha'&&player.getStorage('luanqun_effect').contains(target)) return false;
+							},
+						},
+						trigger:{player:'useCard1'},
+						filter:function(event,player){
+							return player.isPhaseUsing()&&event.card.name=='sha';
+						},
+						forced:true,
+						content:function(){
+							trigger.directHit.addArray(player.getStorage('luanqun_effect'));
+							player.removeSkill('luanqun_effect');
+						},
+					},
+				},
+			},
 			//☆周不疑
 			mbhuiyao:{
 				audio:2,
@@ -542,7 +894,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.markSkill('yichong');
 					game.broadcastAll(function(player,suit){
 						if(player.marks.yichong) player.marks.yichong.firstChild.innerHTML=get.translation(suit);
-					},player,suit)
+					},player,suit);
 					if(target.countCards('he',{suit:suit})) player.gain(target.getCards('he',{suit:suit}),target,'giveAuto');
 					game.countPlayer(function(current){
 						current.removeSkill('yichong_'+player.playerid);
@@ -14890,6 +15242,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_chenqun_prefix:'手杀',
 			old_yuanshu:'手杀袁术',
 			old_yuanshu_prefix:'手杀',
+			baoxin:'鲍信',
+			mutao:'募讨',
+			mutao_info:'出牌阶段限一次。你可以选择一名角色，令其将手牌中所有的【杀】置于武将牌上，然后将这些牌依次随机交给其下家开始的每一名角色。然后其对最后一名以此法获得【杀】的角色A造成X点伤害（X为A手牌中【杀】的数量且至多为3）。',
+			yimou:'毅谋',
+			yimou_info:'当一名角色受到伤害后，若其存活且你至其的距离不大于1，你可以选择一项：1.令其从牌堆中获得一张【杀】；2.令其将一张手牌交给另一名角色并摸两张牌。',
+			jiangji:'蒋济',
+			jilun:'机论',
+			jilun_info:'①当你受到伤害后，若你拥有技能〖急筹〗，则你可以一项：1.摸X张牌（X为〖急筹①〗记录数，且X且至少为1，至多为5）。2.获得1枚“机论”标记。②一名角色的结束阶段，若你拥有“机论”，则重复选择执行以下项直到你没有“机论”标记：1.失去1枚“机论”标记，视为使用一张〖急筹①〗记录过且未被〖机论②〗记录过的普通锦囊牌并记录此牌牌名。2.失去所有“机论”标记。',
+			liwei:'李遗',
+			jiaohua:'教化',
+			jiaohua_backup:'教化',
+			jiaohua_info:'出牌阶段限三次，你可以选择一个未被〖教化〗记录过的牌的类型，令一名角色从牌堆中获得一张此类型的牌，然后记录此类型，若基本、锦囊、装备均已被你发动〖教化〗记录，则你清空〖教化〗记录。',
+			laimin:'来敏',
+			laishou:'来寿',
+			laishou_info:'锁定技。①当你受到伤害值大于等于你的体力值的伤害时，若你的体力上限小于9，你防止此伤害并增加等量体力上限。②准备阶段，若你的体力上限不小于9，你死亡。',
+			luanqun:'乱群',
+			luanqun_info:'出牌阶段限一次，若你有手牌，则你可以令所有有手牌的角色同时展示一张手牌，然后你可以获得其中一张与你展示的牌颜色相同的展示牌，所有本次展示牌颜色与你展示的牌颜色不同的角色的下个出牌阶段使用的第一张【杀】只能对你使用，且此【杀】不可被响应。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',
