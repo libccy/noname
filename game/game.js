@@ -8493,14 +8493,16 @@
 						if(arguments.length>0){
 							//参数去重，防止出现addArray(arr ,arr ,arr)的问题
 							let args=[...new Set(arguments)];
-							//展开参数数组，并再次去除所有重复元素(没测试过concat的性能)
+							//this -> Set
+							let unique=new Set(this);
+							//展开参数数组，并再次去除所有重复元素(concat(arr)和push(...arr)好像差不多)
 							let all=Array.from(
 								new Set(
 									args.reduce((previous,current)=>previous.concat(current))
 								)
 							)
 							//与this去重
-							.filter(v=>!this.includes(v));
+							.filter(v=>!unique.has(v));
 							//添加元素
 							this.push(...all);   
 						}
