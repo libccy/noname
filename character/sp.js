@@ -4054,9 +4054,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.damage('nosource');
 					'step 1'
-					var next=player.phaseUse();
-					event.next.remove(next);
-					trigger.next.push(next);
+					trigger.phaseList.splice(trigger.num,0,'phaseUse|oldianjun');
 				},
 			},
 			olkangrui:{

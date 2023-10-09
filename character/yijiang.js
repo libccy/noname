@@ -2508,10 +2508,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					ol_guansuo:'dangxian_guansuo',
 				},
 				content:function(){
-					var next=player.phaseUse();
-					next.xindangxian=true;
-					event.next.remove(next);
-					trigger.next.push(next);
+					trigger.phaseList.splice(trigger.num,0,'phaseUse|xindangxian');
 				},
 				group:'xindangxian_rewrite',
 				subSkill:{
@@ -2520,7 +2517,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						popup:false,
 						filter:function(kagari){
-							return kagari.xindangxian==true;
+							return kagari._extraPhaseReason=='xindangxian';
 						},
 						content:function(){
 							'step 0'
@@ -7664,9 +7661,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['guansuo'],
 				content:function(){
-					var next=player.phaseUse();
-					event.next.remove(next);
-					trigger.next.push(next);
+					trigger.phaseList.splice(trigger.num,0,'phaseUse|dangxian');
 				}
 			},
 			longyin:{
