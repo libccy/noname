@@ -161,13 +161,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					heart:{
 						charlotte:true,
+						mark:true,
 						marktext:'♥︎',
 						intro:{content:'伤害转移术'},
 					},
 					diamond:{
 						charlotte:true,
+						mark:true,
 						marktext:'♦︎',
-						intro:{content:'上交保护费大法'},
+						intro:{content:'掳掠大法'},
 					},
 					draw:{
 						audio:'sbtianxiang',
@@ -186,43 +188,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							player.draw(num);
 						},
-						effect:{
-							trigger:{player:'damageBegin3'},
-							filter:function(event,player){
-								return game.hasPlayer(target=>target.getSkills().some(skill=>skill.indexOf('sbtianxiang_')==0));
-							},
-							direct:true,
-							content:function(){
-								'step 0'
-								player.chooseTarget(get.prompt('sbtianxiang'),'移去一名角色的“天香”标记并执行相应效果',function(card,player,target){
-									return target.getSkills().some(skill=>skill.indexOf('sbtianxiang_')==0);
-								}).set('ai',target=>{
-									var player=_status.event.player;
-									return -get.attitude(player,target)*target.getSkills().filter(skill=>skill.indexOf('sbtianxiang_')==0).length;
-								});
-								'step 1'
-								if(result.bool){
-									var target=result.targets[0];
-									event.target=target;
-									player.logSkill('sbtianxiang',target);
-									var skills=target.getSkills().filter(skill=>skill.indexOf('sbtianxiang_')==0);
-									target.removeSkill(skills);
-									if(skills.contains('sbtianxiang_heart')){
-										target.damage(trigger.source?trigger.source:'nosource');
-										trigger.cancel();
-									}
-									if(skills.contains('sbtianxiang_diamond')){
-										var cards=target.getCards('he');
-										if(!cards.length) event.finish();
-										else if(cards.length<=2) event._result={bool:true,cards:cards};
-										else target.chooseCarda('he',2,'天香：交给'+get.translation(player)+'两张牌',true);
-									}
-									else event.finish();
+					},
+					effect:{
+						trigger:{player:'damageBegin3'},
+						filter:function(event,player){
+							return game.hasPlayer(target=>target.getSkills().some(skill=>skill.indexOf('sbtianxiang_')==0));
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							player.chooseTarget(get.prompt('sbtianxiang'),'移去一名角色的“天香”标记并执行相应效果',function(card,player,target){
+								return target.getSkills().some(skill=>skill.indexOf('sbtianxiang_')==0);
+							}).set('ai',target=>{
+								var player=_status.event.player;
+								return -get.attitude(player,target)*target.getSkills().filter(skill=>skill.indexOf('sbtianxiang_')==0).length;
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								event.target=target;
+								player.logSkill('sbtianxiang',target);
+								var skills=target.getSkills().filter(skill=>skill.indexOf('sbtianxiang_')==0);
+								target.removeSkill(skills);
+								if(skills.contains('sbtianxiang_heart')){
+									target.damage(trigger.source?trigger.source:'nosource');
+									trigger.cancel();
+								}
+								if(skills.contains('sbtianxiang_diamond')){
+									var cards=target.getCards('he');
+									if(!cards.length) event.finish();
+									else if(cards.length<=2) event._result={bool:true,cards:cards};
+									else target.chooseCard('he',2,'天香：交给'+get.translation(player)+'两张牌',true);
 								}
 								else event.finish();
-								'step 2'
-								if(result.bool) player.gain(result.cards,target,'giveAuto');
-							},
+							}
+							else event.finish();
+							'step 2'
+							if(result.bool) player.gain(result.cards,target,'giveAuto');
 						},
 					},
 				},
@@ -5115,9 +5117,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbqiaobian:'巧变',
 			sbqiaobian_info:'每回合限一次。①你可以失去1点体力并跳过判定阶段，将判定区的所有牌移动给一名其他角色（无法置入其判定区的牌改为弃置之）。②你可以跳过摸牌阶段，于下个准备阶段摸两张牌并回复1点体力。③你可以将手牌数弃置至六张（若手牌数少于六张则跳过之）并跳过出牌阶段和弃牌阶段，然后移动场上的一张牌。',
 			sb_luzhi:'谋卢植',
+			sb_luzhi_prefix:'谋',
 			sbzhenliang:'贞良',
 			sbzhenliang_info:'转换技。阴：出牌阶段限一次，你可以弃置X张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害（X为你与其体力值值差且X至少为1）。阳：你的回合外，一名角色使用或打出牌结算完成后，若此牌与“任”类别相同，则你可以令一名角色摸一张牌。',
 			sb_xiaoqiao:'谋小乔',
+			sb_xiaoqiao_prefix:'谋',
 			sbtianxiang:'天香',
 			sbtianxiang_info:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸等量的牌。',
 
