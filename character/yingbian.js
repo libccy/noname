@@ -2592,10 +2592,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player!=event.player&&event.num<event.player.hp;
 				},
 				check:function(event,player){
-					if(get.attitude(player,event.player)>-2) return false;
-					if(player.hp>2) return true;
-					if(player.hp==2&&event.player.hp<3) return false;
-					return player.hp>1;
+					if(event.player.hasSkillTag('nodamage')) return false;
+					let tj = player.countCards('hs', function (card) {
+							return get.name(card) === 'tao' || get.name(card) === 'jiu';
+						}),
+						att = get.attitude(_status.event.player, event.player),
+						eff = get.damageEffect(event.player, player, _status.event.player, event.nature),
+						fd = event.player.hasSkillTag('filterDamage', null, {
+							player: player,
+							card: event.card
+						}),
+						hp = player.hp + tj;
+					if(player.storage.tairan2) hp -= player.storage.tairan2;
+					if(eff <= 0 || fd || att >= -2 || Math.abs(hp) <= 1) return false;
+					if(hp > 2 || event.player.isLinked() && event.nature && eff > 0) return true;
+					return !event.player.countCards('hs') || event.player.hp > 2 * event.num && !event.player.hasSkillTag('maixie');
 				},
 				logTarget:'player',
 				content:function(){
@@ -2604,6 +2615,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.yimie_num=trigger.player.hp-trigger.num;
 					trigger.num=trigger.player.hp;
 				},
+				ai:{
+					damageBonus:true,
+					skillTagFilter:function(player,tag,arg){
+						return arg && arg.target && arg.target.hp > 1 && player.hp > 1 && get.attitude(player, arg.target) < -2;
+					}
+				}
 			},
 			yimie2:{
 				trigger:{player:'damageEnd'},
