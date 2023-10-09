@@ -33973,6 +33973,16 @@
 		}
 	};
 	const game={
+		//添加前缀
+		addPrefix:(prefixname,characters,config)=>{
+			if(!config) config={
+				showName:prefixname,
+			}
+			lib.namePrefix.set(prefixname, config);
+			characters.forEach(i=>{
+				lib.translate[i+'_prefix']=prefixname
+			})
+		},
 		//添加新的属性杀
 		addNature:(nature,translation,config)=>{
 			if(!nature) throw new TypeError();
