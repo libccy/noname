@@ -6398,6 +6398,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								trigger.directHit.push(trigger.target);
 							}
 						},
+						ai:{
+							effect:{
+								player:function(card,player,target){
+									if(player!==target&&get.itemtype(target)==='player'&&(card.name==='sha'||get.type(card,false)==='trick')&&
+										target.countCards('he')&&!target.hasSkillTag('noh')) return [1,0,1,-1];
+								}
+							}
+						}
 					},
 				},
 			},

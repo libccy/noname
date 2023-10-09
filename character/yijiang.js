@@ -10583,6 +10583,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
+					if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.2);
 					player.draw(2);
 					"step 1"
 					player.chooseCard(2,'he',true,'交给'+get.translation(trigger.player)+'两张牌').set('ai',function(card){
@@ -10597,8 +10598,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.player.storage.xiantu4.push(player);
 				},
 				ai:{
-					threaten:1.1,
-					expose:0.3
+					threaten:1.1
 				}
 			},
 			xiantu1:{audio:true},
