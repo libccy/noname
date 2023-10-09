@@ -14372,7 +14372,7 @@
 					next.setContent(info.content);
 					next.skillHidden=event.skillHidden;
 					if(info.forceDie) next.forceDie=true;
-					if(info.forceOut||event.skill=='_turnover') next.includeOut=true;
+					if(info.forceOut) next.includeOut=true;
 					"step 4"
 					if(player._hookTrigger){
 						for(var i=0;i<player._hookTrigger.length;i++){
@@ -14634,6 +14634,201 @@
 					}
 				},
 				phase:function(){
+					'step 0'
+					//初始化阶段列表
+					if(!event.phaseList){
+						event.phaseList=['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'];
+					}
+					if(typeof event.num!='number'){
+						event.num=0;
+					}
+					//规则集中的“回合开始后①”，更新游戏轮数，触发“一轮游戏开始时”
+					var isRound=false;
+					if(!event.skill){
+						isRound=_status.roundSkipped;
+						if(_status.isRoundFilter){
+							isRound=_status.isRoundFilter(event,player);
+						}
+						else if(_status.seatNumSettled){
+							var seatNum=player.getSeatNum();
+							if(seatNum!=0){
+								if(typeof _status.lastSeatNum!='number'||seatNum<_status.lastSeatNum) isRound=true;
+								_status.lastSeatNum=seatNum;
+							}
+						}
+						else if(player==_status.roundStart) isRound=true;
+						if(isRound){
+							delete _status.roundSkipped;
+							game.roundNumber++;
+							event._roundStart=true;
+							game.updateRoundNumber();
+							for(var i=0;i<game.players.length;i++){
+								if(game.players[i].isOut()&&game.players[i].outCount>0){
+									game.players[i].outCount--;
+									if(game.players[i].outCount==0&&!game.players[i].outSkills){
+										game.players[i].in();
+									}
+								}
+							}
+							event.trigger('roundStart');
+						}
+					}
+					_status.globalHistory.push({
+						cardMove:[],
+						custom:[],
+						useCard:[],
+						changeHp:[],
+						everything:[],
+					});
+					var players=game.players.slice(0).concat(game.dead);
+					for(var i=0;i<players.length;i++){
+						var current=players[i];
+						current.actionHistory.push({useCard:[],respond:[],skipped:[],lose:[],gain:[],sourceDamage:[],damage:[],custom:[],useSkill:[]});
+						current.stat.push({card:{},skill:{}});
+						if(isRound){
+							current.getHistory().isRound=true;
+							current.getStat().isRound=true;
+						}
+					};
+					if(isRound){
+						game.getGlobalHistory().isRound=true;
+					}
+					'step 1'
+					//规则集中的“回合开始后②（1v1武将登场专用）”
+					event.trigger('phaseBeforeStart');
+					'step 2'
+					//规则集中的“回合开始后③（处理“游戏开始时”的时机）”
+					event.trigger('phaseBefore');
+					'step 3'
+					//规则集中的“回合开始后④（卑弥呼〖纵傀〗的时机）”
+					event.trigger('phaseBeforeEnd');
+					'step 4'
+					//规则集中的“回合开始后⑤”，进行翻面检测
+					if(player.isTurnedOver()&&!event._noTurnOver){
+						event.cancel();
+						player.turnOver();
+						player.phaseSkipped=true;
+					}
+					else{
+						player.phaseSkipped=false;
+						player.getHistory().isMe=true;
+						player.getStat().isMe=true;
+					}
+					'step 5'
+					//规则集中的“回合开始后⑥”，更新“当前回合角色”
+					while(ui.dialogs.length){
+						ui.dialogs[0].close();
+					}
+					game.phaseNumber++;
+					player.phaseNumber++;
+					game.broadcastAll(function(player,num,popup){
+						if(lib.config.glow_phase){
+							player.classList.add('glow_phase');
+						}
+						player.phaseNumber=num;
+						if(popup&&lib.config.show_phase_prompt) player.popup('回合开始',null,false);
+					},player,player.phaseNumber,!player.noPhaseDelay);
+					_status.currentPhase=player;
+					_status.discarded=[];
+					game.syncState();
+					game.addVideo('phaseChange',player);
+					if(game.phaseNumber==1){
+						delete player._start_cards;
+						if(lib.configOL.observe){
+							lib.configOL.observeReady=true;
+							game.send('server','config',lib.configOL);
+						}
+					}
+					game.log();
+					game.log(player,'的回合开始');
+					player._noVibrate=true;
+					if(get.config('identity_mode')!='zhong'&&get.config('identity_mode')!='purple'&&!_status.connectMode){
+						var num;
+						switch(get.config('auto_identity')){
+							case 'one':num=1;break;
+							case 'two':num=2;break;
+							case 'three':num=3;break;
+							case 'always':num=-1;break;
+							default:num=0;break;
+						}
+						if(num&&!_status.identityShown&&game.phaseNumber>game.players.length*num&&game.showIdentity){
+							if(!_status.video) player.popup('显示身份');
+							_status.identityShown=true;
+							game.showIdentity(false);
+						}
+					}
+					player.ai.tempIgnore=[];
+					if(ui.land&&ui.land.player==player){
+						game.addVideo('destroyLand');
+						ui.land.destroy();
+					}
+					'step 6'
+					//规则集中的“回合开始后⑦”，国战武将明置武将牌
+					event.trigger('phaseBeginStart');
+					'step 7'
+					//规则集中的“回合开始后⑨”，进行当先，化身等操作
+					//没有⑧ 因为⑧用不到
+					event.trigger('phaseBegin');
+					//阶段部分
+					'step 8'
+					if(player.isIn()&&num<event.phaseList.length){
+						//规则集中没有的新时机 可以用来插入额外阶段啥的
+						if(player.isIn()) event.trigger('phaseChange')
+					}
+					else event.goto(11);
+					'step 9'
+					if(player.isIn()&&num<event.phaseList.length){
+						var phase=event.phaseList[num].split('|');
+						event.currentPhase=phase[0];
+						var next=player[event.currentPhase]();
+						next.phaseIndex=num;
+						if(phase.length>1){
+							next._extraPhaseReason=phase[1];
+						}
+						if(event.currentPhase=='phaseDraw'||event.currentPhase=='phaseDiscard'){
+							if(!player.noPhaseDelay){
+								if(player==game.me){
+									game.delay();
+								}
+								else{
+									game.delayx();
+								}
+							}
+						}
+					}
+					'step 10'
+					if(event.currentPhase=='phaseUse'){
+						game.broadcastAll(function(){
+							if(ui.tempnowuxie){
+								ui.tempnowuxie.close();
+								delete ui.tempnowuxie;
+							}
+						});
+						delete player._noSkill;
+					}
+					event.num++;
+					'step 11'
+					if(event.num<event.phaseList.length){
+						event.goto(8);
+					}
+					else if(!event._phaseEndTriggered){
+						event._phaseEndTriggered=true;
+						event.trigger('phaseEnd');
+						event.redo();
+					}
+					'step 12'
+					event.trigger('phaseAfter');
+					'step 13'
+					//删除当前回合角色 此时处于“不属于任何角色的回合”的阶段
+					game.broadcastAll(function(player){
+						player.classList.remove('glow_phase');
+						delete _status.currentPhase;
+					},player);
+				},
+				/**
+				 * @deprecated
+				 */
+				phase_old:function(){
 					"step 0"
 					player.phaseZhunbei();
 					"step 1"
@@ -22911,21 +23106,23 @@
 					var next;
 					if(evt&&evt.parent&&evt.parent.next){
 						evt=evt.parent;
-						next=game.createEvent('phase',null,evt);
+						next=game.createEvent('phase',false,evt);
 					}
 					else if(_status.event.parent&&_status.event.parent.next){
 						evt=_status.event.parent;
-						next=game.createEvent('phase',null,evt);
+						next=game.createEvent('phase',false,evt);
 					}
 					else{
 						evt=null;
-						next=game.createEvent('phase');
+						next=game.createEvent('phase',false);
 					}
 					if(evt&&insert&&evt.next.contains(next)){
 						evt.next.remove(next);
 						evt.next.unshift(next);
 					}
 					next.player=this;
+					next.forceDie=true;
+					next.includeOut=true;
 					next.skill=skill||_status.event.name;
 					next.setContent('phase');
 					return next;
@@ -22947,7 +23144,7 @@
 					return next;
 				},
 				phase:function(skill){
-					var next=game.createEvent('phase');
+					var next=game.createEvent('phase',false);
 					next.player=this;
 					next.setContent('phase');
 					if(!_status.roundStart){
@@ -22956,6 +23153,8 @@
 					if(skill){
 						next.skill=skill;
 					}
+					next.forceDie=true;
+					next.includeOut=true;
 					return next;
 				},
 				phaseZhunbei:function(){
@@ -32301,7 +32500,10 @@
 					trigger.cancel();
 				},
 			},
-			_turnover:{
+			/**
+			 * @deprecated
+			 */
+			/*_turnover:{
 				trigger:{player:'phaseBefore'},
 				forced:true,
 				forceOut:true,
@@ -32372,7 +32574,7 @@
 						game.getGlobalHistory().isRound=true;
 					}
 				},
-			},
+			},*/
 			_usecard:{
 				trigger:{global:'useCardAfter'},
 				forced:true,
@@ -38793,7 +38995,9 @@
 					}
 					else if(event._triggered==1){
 						if(event.type=='card') event.trigger('useCardToBegin');
-						if(event.name=='phase'&&!event._begun){
+						event.trigger(event.name+'Begin');
+						event._triggered++;
+						/*if(event.name=='phase'&&!event._begun){
 							var next=game.createEvent('phasing',false,event);
 							next.player=event.player;
 							next.skill=event.skill;
@@ -38803,7 +39007,7 @@
 						else{
 							event.trigger(event.name+'Begin');
 							event._triggered++;
-						}
+						}*/
 					}
 					else{
 						if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){

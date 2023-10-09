@@ -3804,6 +3804,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				preHidden:true,
 				audioname:['sp_lvmeng','re_sunben','re_sunce'],
+				mod:{
+					aiOrder:function(player,card,num){
+						if(get.color(card)==='red'&&get.name(card)==='sha') return get.order({name: 'sha'})+0.15;
+					}
+				},
 				trigger:{
 					player:'useCardToPlayered',
 					target:'useCardToTargeted',
@@ -3812,6 +3817,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!(event.card.name=='juedou'||(event.card.name=='sha'&&get.color(event.card)=='red'))) return false;
 					return player==event.target||event.getParent().triggeredTargets3.length==1;
 				},
+				locked:false,
 				frequent:true,
 				content:function(){
 					player.draw();
@@ -4872,9 +4878,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				preHidden:true,
 				check:function(event,player){
-					if(player.countCards('h')<=1) return true;
-					return game.hasPlayer(function(current){
-						return current!=player&&current.isMinHandcard()&&get.attitude(player,current)>0;
+					return (player.countCards('h')+2+event.num)<=5||game.hasPlayer(function(target){
+						return player!==target&&!game.hasPlayer(function(current){
+							return current!==player&&current!==target&&current.countCards('h')<target.countCards('h');
+						})&&get.attitude(player,target)>0;
 					});
 				},
 				content:function(){
@@ -6276,30 +6283,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					useShan:true,
 					effect:{
 						target:function(card,player,target,current){
-							if(get.tag(card,'respondShan')){
-								var hastarget=game.hasPlayer(function(current){
-									return get.attitude(target,current)<0;
-								});
-								var be=target.countCards('e',{color:'black'});
-								if(target.countCards('h','shan')&&be){
-									if(!target.hasSkill('guidao')) return 0;
-									return [0,hastarget?target.countCards('he')/2:0];
+							if(get.tag(card,'respondShan')&&!player.hasSkillTag('directHit_ai',true,{
+								target: target,
+								card: card
+							},true)){
+								let club=0,spade=0;
+								if(game.hasPlayer(function(current){
+									return get.attitude(target,current)<0&&get.damageEffect(current,target,target,'thunder')>0;
+								})){
+									club=2;
+									spade=4;
 								}
-								if(target.countCards('h','shan')&&target.countCards('h')>2){
-									if(!target.hasSkill('guidao')) return 0;
-									return [0,hastarget?target.countCards('h')/4:0];
-								}
-								if(target.countCards('h')>3||(be&&target.countCards('h')>=2)){
-									return [0,0];
-								}
-								if(target.countCards('h')==0){
-									return [1.5,0];
-								}
-								if(target.countCards('h')==1&&!be){
-									return [1.2,0];
-								}
-								if(!target.hasSkill('guidao')) return [1,0.05];
-								return [1,Math.min(0.5,(target.countCards('h')+be)/4)];
+								if(!target.isHealthy()) club+=2;
+								if(!club&&!spade) return 1;
+								if(!target.mayHaveShan(player)) return 1-0.1*Math.min(5,target.countCards('hs'));
+								if(!target.hasSkillTag('rejudge')) return [1,(club+spade)/4];
+								let pos=player.hasSkillTag('viewHandcard',null,target,true)?'hes':'e',better=club>spade?'club':'spade',max=0;
+								target.hasCard(function(cardx){
+									if(get.suit(cardx)===better){
+										max=2;
+										return true;
+									}
+									if(spade&&get.color(cardx)==='black') max=1;
+								},pos);
+								if(max===2) return [1,Math.max(club,spade)];
+								if(max===1) return [1,Math.min(club,spade)];
+								if(pos==='e') return [1,Math.min(Math.max(1,target.countCards('hs'))*(club+spade)/4,Math.max(club,spade))];
+								return [1,(club+spade)/4];
 							}
 						}
 					}
@@ -7259,17 +7269,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					useShan:true,
 					effect:{
 						target:function(card,player,target,current){
-							if(get.tag(card,'respondShan')){
-								var hastarget=game.hasPlayer(function(current){
-									return get.attitude(target,current)<0;
-								});
-								if(target.countCards('h','shan')&&target.countCards('e',{suit:'spade'})){
-									return [0,hastarget?target.countCards('he')/2:0];
-								}
-								if(target.countCards('h','shan')){
-									return [1,hastarget?target.countCards('he')/2:0];
-								}
-								return [1,target.countCards('h')/4];
+							if(get.tag(card,'respondShan')&&!player.hasSkillTag('directHit_ai',true,{
+								target: target,
+								card: card
+							},true)&&game.hasPlayer(function(current){
+								return get.attitude(target,current)<0&&get.damageEffect(current,target,target,'thunder')>0;
+							})){
+								if(!target.mayHaveShan(player)) return 1-0.1*Math.min(5,target.countCards('hs'));
+								if(!target.hasSkillTag('rejudge')) return [1,1];
+								let pos=player.hasSkillTag('viewHandcard',null,target,true)?'hes':'e';
+								if(target.hasCard(function(cardx){
+									return get.suit(cardx)==='spade';
+								},pos)) return [1,4];
+								if(pos==='e') return [1,Math.min(4,1+0.75*Math.max(1,target.countCards('hs')))];
+								return [1,1];
 							}
 						}
 					}

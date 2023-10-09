@@ -201,7 +201,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chiying:{
-				trigger:{global:'damageBegin'},
+				trigger:{global:'damageBegin2'},
 				check:function(event,player){
 					return get.attitude(player,event.player)>0;
 				},
@@ -209,7 +209,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.num<=1) return false;
 					return true;
 				},
-				priority:-11,
 				content:function(){
 					trigger.num=1;
 					if(trigger.source){

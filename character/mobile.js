@@ -4595,7 +4595,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				viewAsFilter:function(player){
 					return player.hasCard({type:'equip'},'ehs');
 				},
-				check:(card)=>5-get.value(card),
+				check:function(card){
+					if(_status.event.type=='dying') return 1/(get.value(card)||0.5);
+					return 5-get.value(card);
+				},
 				locked:false,
 				mod:{
 					maxHandcard:function(player,num){
@@ -12165,7 +12168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"linkBefore",
 				},
 				forced:true,
-				priority:20,
+				//priority:20,
 				filter:function(event,player){
 					return !player.isLinked();
 				},
@@ -13179,7 +13182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					cancel:{
 						trigger:{player:'phaseUseEnd'},
-						priority:50,
+						firstDo:true,
 						silent:true,
 						charlotte:true,
 						content:function(){

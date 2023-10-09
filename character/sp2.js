@@ -8836,7 +8836,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zongkui:{
-				trigger:{player:'phaseBefore',global:'roundStart'},
+				trigger:{
+					player:'phaseBeforeEnd',
+					global:'roundStart',
+				},
 				direct:true,
 				audio:2,
 				audioname:['tw_beimihu'],
@@ -10208,7 +10211,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zongkui:'纵傀',
 			zongkui_mark:'纵傀',
 			zongkui_mark_bg:'傀',
-			zongkui_info:'回合开始时，你可以指定一名未拥有“傀”标记的其他角色，令其获得一枚“傀”标记。每轮游戏开始时，你指定一名体力值最少且没有“傀”标记的其他角色，令其获得一枚“傀”标记。',
+			zongkui_info:'回合开始前，你可以指定一名未拥有“傀”标记的其他角色，令其获得一枚“傀”标记。一轮游戏开始时，你指定一名体力值最少且没有“傀”标记的其他角色，令其获得一枚“傀”标记。',
 			guju:'骨疽',
 			guju_info:'锁定技，拥有“傀”标记的角色受到伤害后，你摸一张牌。',
 			baijia:'拜假',
