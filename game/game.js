@@ -33982,6 +33982,7 @@
 			characters.forEach(i=>{
 				lib.translate[i+'_prefix']=prefixname
 			})
+			return prefixname;
 		},
 		//添加新的属性杀
 		addNature:(nature,translation,config)=>{
