@@ -17986,6 +17986,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						nums.add(current.countCards('j'));
 					});
 					nums.sort((a,b)=>a-b);
+					var a=null,b=null,goon=false;
+					for(a of nums){
+						for(b of nums){
+							if((0.5*a*a)+(2.5*b)-game.roundNumber==game.countPlayer()){
+								goon=true;
+								break;
+							}
+						}
+						if(goon) break;
+					}
 					player.chooseButton(2,[
 						'蛮智：请选择让下列等式成立的A与B的值',
 						'<div class="text center">目标等式</div>',
@@ -17994,14 +18004,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						[nums.map(i=>{
 							return [
 								`A|${i}`,
-								i.toString(),
+								i==a?(`<span class="yellowtext">${i}</span>`):i,
 							]
 						}),'tdnodes'],
 						'<div class="text center">B的可选值</div>',
 						[nums.map(i=>{
 							return [
 								`B|${i}`,
-								i.toString(),
+								i==b?(`<span class="yellowtext">${i}</span>`):i,
 							]
 						}),'tdnodes'],
 					]).set('filterButton',function(button){
@@ -18009,16 +18019,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return button.link[0]!=ui.selected.buttons[0].link[0];
 					}).set('filterOk',function(){
 						if(ui.selected.buttons.length!=2) return false;
-						let a,b;
-						for(let i of ui.selected.buttons){
+						var a,b;
+						for(var i of ui.selected.buttons){
 							if(i.link[0]=='A') a=parseInt(i.link.slice(2));
 							else b=parseInt(i.link.slice(2));
 						}
 						return (0.5*a*a)+(2.5*b)-game.roundNumber==game.countPlayer();
+					}).set('choice',[a,b]).set('ai',(button)=>{
+						var choice=_status.event.choice;
+						if(button.link==`A|${choice[0]}`||button.link==`B|${choice[1]}`) return 1;
+						return 0;
 					});
 					'step 1'
 					if(result.bool){
+						var a,b;
+						for(var i of result.links){
+							if(i[0]=='A') a=parseInt(i.slice(2));
+							else b=parseInt(i.slice(2));
+						}
+						equals=`0.5×${a}²+2.5×${b}-${game.roundNumber}=${game.countPlayer()}`;
 						player.logSkill('nsmanzhi');
+						player.chat(equals);
+						game.log(player,'的计算结果为',equals);
 						player.draw(game.countPlayer());
 					}
 				},

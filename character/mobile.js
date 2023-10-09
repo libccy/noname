@@ -12165,7 +12165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"linkBefore",
 				},
 				forced:true,
-				priority:20,
+				//priority:20,
 				filter:function(event,player){
 					return !player.isLinked();
 				},
@@ -13179,7 +13179,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					cancel:{
 						trigger:{player:'phaseUseEnd'},
-						priority:50,
+						firstDo:true,
 						silent:true,
 						charlotte:true,
 						content:function(){
