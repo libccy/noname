@@ -8486,9 +8486,23 @@
 					configurable:true,
 					enumerable:false,
 					writable:true,
+					//与原来参数的对比:
+					//数据多，比原来的函数快
+					//数据少，比原来的函数稍慢
 					value:function(){
-						for(const arr of arguments){
-							for(const item of arr) this.add(item);
+						if(arguments.length>0){
+							//参数去重，防止出现addArray(arr ,arr ,arr)的问题
+							let args=[...new Set(arguments)];
+							//展开参数数组，并再次去除所有重复元素(没测试过concat的性能)
+							let all=Array.from(
+								new Set(
+									args.reduce((previous,current)=>previous.concat(current))
+								)
+							)
+							//与this去重
+							.filter(v=>!this.includes(v));
+							//添加元素
+							this.push(...all);   
 						}
 						return this;
 					}
