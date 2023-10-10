@@ -30301,8 +30301,27 @@
 					return ['c','d'].contains(get.position(this));
 				}
 			},
-			button:{
-				exclude:function(){
+			Button:class extends HTMLDivElement{
+				/**
+				 * @param {{}} item
+				 * @param {keyof typeof ui.create.buttonPresets | (item: {}, type: Function, position?: HTMLDivElement, noClick?: true, button?: HTMLDivElement) => HTMLDivElement} type
+				 * @param {HTMLDivElement} [position]
+				 * @param {true} [noClick]
+				 * @param {HTMLDivElement} [button]
+				 */
+				constructor(item,type,position,noClick,button){
+					if(ui.create.buttonPresets[type]) button=ui.create.buttonPresets[type](item,type,position,noClick,button);
+					else if(typeof type=='function') button=type(item,type,position,noClick,button);
+					Object.setPrototypeOf(button,lib.element.Button.prototype);
+					if(!noClick) button.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
+					else{
+						button.classList.add('noclick');
+						const intro=button.querySelector('.intro');
+						if(intro) intro.remove();
+					}
+					return button;
+				}
+				exclude(){
 					if(_status.event.excludeButton==undefined){
 						_status.event.excludeButton=[];
 					}
@@ -31444,6 +31463,12 @@
 			 */
 			get card(){
 				return this.Card.prototype;
+			},
+			/**
+			 * @legacy Use `lib.element.Button.prototype` instead.
+			 */
+			get button(){
+				return this.Button.prototype;
 			},
 			/**
 			 * @legacy Use `lib.element.Event.prototype` instead.
@@ -51931,27 +51956,7 @@
 					return node;
 				}
 			},
-			button:function(item,type,position,noclick,node){
-				if(ui.create.buttonPresets[type]){
-					node=ui.create.buttonPresets[type](item,type,position,noclick,node);
-				}
-				else if(typeof type=='function'){
-					node=type(item,type,position,noclick,node);
-				}
-				if(!noclick){
-					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-				}
-				else{
-					node.classList.add('noclick');
-					if(node.querySelector('.intro')){
-						node.querySelector('.intro').remove();
-					}
-				}
-				for(var i in lib.element.button){
-					node[i]=lib.element.button[i];
-				}
-				return node;
-			},
+			button:(item,type,position,noClick,button)=>new lib.element.Button(item,type,position,noClick,button),
 			buttons:function(list,type,position,noclick,zoom){
 				var buttons=[];
 				var pre=(typeof type=='string'&&type.slice(0,3)=='pre');
@@ -51993,10 +51998,8 @@
 					var next=dialog.add(str);
 					if(!noclick) next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
 					next.firstChild.link=link;
-					for(var j in lib.element.button){
-						next[j]=lib.element.button[j];
-					}
-					dialog.buttons.add(next.firstChild)
+					Object.setPrototypeOf(next,lib.element.Button.prototype);
+					dialog.buttons.add(next.firstChild);
 				}
 			},
 			player:(position,noclick)=>new lib.element.Player(position,noclick),
@@ -61454,6 +61457,7 @@
 	};
 	setAllPropertiesEnumerable(lib.element.Player.prototype);
 	setAllPropertiesEnumerable(lib.element.Card.prototype);
+	setAllPropertiesEnumerable(lib.element.Button.prototype);
 	setAllPropertiesEnumerable(lib.element.Event.prototype);
 	setAllPropertiesEnumerable(lib.element.Dialog.prototype);
 	setAllPropertiesEnumerable(lib.element.Control.prototype);
