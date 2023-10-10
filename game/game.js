@@ -10818,15 +10818,8 @@
 				}
 			},
 			connection:function(ws){
-				var client={
-					ws:ws,
-					id:ws.wsid||get.id(),
-					closed:false
-				};
+				const client=new lib.element.Client(ws);
 				lib.node.clients.push(client);
-				for(var i in lib.element.client){
-					client[i]=lib.element.client[i];
-				}
 				if(window.isNonameServer){
 					document.querySelector('#server_count').innerHTML=lib.node.clients.length;
 				}
@@ -31326,8 +31319,13 @@
 					return this;
 				}
 			},
-			client:{
-				send:function(){
+			Client:class{
+				constructor(ws){
+					this.ws=ws;
+					this.id=ws.wsid||get.id();
+					this.closed=false;
+				}
+				send(){
 					if(this.closed) return this;
 					var args=Array.from(arguments);
 					if(typeof args[0]=='function'){
@@ -31343,8 +31341,8 @@
 						this.ws.close();
 					}
 					return this;
-				},
-				close:function(){
+				}
+				close(){
 					lib.node.clients.remove(this);
 					lib.node.observing.remove(this);
 					if(ui.removeObserve&&!lib.node.observing.length){
@@ -31487,6 +31485,12 @@
 			 */
 			get control(){
 				return this.Control.prototype;
+			},
+			/**
+			 * @legacy Use `lib.element.Client.prototype` instead.
+			 */
+			get client(){
+				return this.Client.prototype;
 			}
 		},
 		card:{
@@ -35791,15 +35795,7 @@
 			for(var i in lib.element.nodews){
 				ws[i]=lib.element.nodews[i];
 			}
-			var client={
-				ws:ws,
-				id:ws.wsid,
-				closed:false
-			};
-			for(var i in lib.element.client){
-				client[i]=lib.element.client[i];
-			}
-			client.send(message);
+			new lib.element.Client(ws).send(message);
 		},
 		createServer:function(){
 			lib.node.clients=[];
