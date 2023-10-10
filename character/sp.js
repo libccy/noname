@@ -733,7 +733,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:{
 						viewAs:{name:'sha'},
 						filterCard:{color:'black'},
-						position:'he',
+						position:'hes',
 						check:function(card){
 							return 5-get.value(card);
 						},
@@ -741,7 +741,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							delete event.result.skill;
 							event.result.card.olsuji=true;
 							player.when('useCardAfter')
-							.filter((event,player)=>event.card.olsuji&&player.getHistory('sourceDamage',evt=>evt.card==event.card).length)
+							.filter((event,player)=>_status.currentPhase&&_status.currentPhase.isIn()&&event.card.olsuji&&player.getHistory('sourceDamage',evt=>evt.card==event.card).length)
 							.then(()=>{
 								player.gainPlayerCard(_status.currentPhase,'he',true);
 							});
@@ -908,7 +908,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget('狼蹈：为'+get.translation(trigger.card)+'增加'+get.cnNumber(num)+'个目标',true,function(card,player,target){
 						var trigger=_status.event.getTrigger();
 						return !trigger.targets.contains(target)&&player.canUse(trigger.card,target)&&get.effect(target,trigger.card,source,source)>0;
-					}).set('ai',target=>{
+					},Math.min(num,game.countPlayer(current=>{
+						return !trigger.targets.contains(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,source,source)>0;
+					}))).set('ai',target=>{
 						var trigger=_status.event.getTrigger();
 						return get.effect(target,trigger.card,player,player);
 					});
