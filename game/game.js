@@ -8729,8 +8729,9 @@
 						return list[0];
 					}
 				});
-				//!!!WARNING!!!
-				//Will be deprecated in next verision
+				/**
+				 * @deprecated !!!WARNING!!! Will be deprecated in next verision
+				 */
 				Object.defineProperty(Object.prototype,'hasNature',{
 					configurable:true,
 					enumerable:false,
@@ -20464,7 +20465,7 @@
 					game.delayx();
 				},
 			},
-			Player:class{
+			Player:class extends HTMLDivElement{
 				/**
 				 * @param {HTMLDivElement} [position]
 				 * @param {true} [noclick]
@@ -20472,7 +20473,7 @@
 				constructor(position,noclick){
 					const player=ui.create.div('.player',position);
 					Object.setPrototypeOf(player,lib.element.Player.prototype);
-					const node=this.node=player.node={
+					const node=player.node={
 						avatar:ui.create.div('.avatar',player,ui.click.avatar).hide(),
 						avatar2:ui.create.div('.avatar2',player,ui.click.avatar2).hide(),
 						turnedover:ui.create.div('.turned','<div>翻面<div>',player),
@@ -29157,8 +29158,8 @@
 							else{
 								// node=this.$throwordered(ui.create.div('.card.thrown'),true);
 								node=ui.create.div('.card.thrown');
-								node.moveTo=lib.element.card.moveTo;
-								node.moveDelete=lib.element.card.moveDelete;
+								node.moveTo=lib.element.Card.prototype.moveTo;
+								node.moveDelete=lib.element.Card.prototype.moveDelete;
 							}
 							node.fixed=true;
 							node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
@@ -29647,12 +29648,48 @@
 					}
 				}
 			},
-			card:{
-				hasNature:function(nature,player){
+			Card:class extends HTMLDivElement{
+				/**
+				 * @param {HTMLDivElement} [position]
+				 * @param {'noclick'} [info]
+				 * @param {true} [noclick]
+				 */
+				constructor(position,info,noclick){
+					const card=ui.create.div('.card',position);
+					Object.setPrototypeOf(card,lib.element.Card.prototype);
+					card.node={
+						image:ui.create.div('.image',card),
+						info:ui.create.div('.info',card),
+						name:ui.create.div('.name',card),
+						name2:ui.create.div('.name2',card),
+						background:ui.create.div('.background',card),
+						intro:ui.create.div('.intro',card),
+						range:ui.create.div('.range',card),
+						gaintag:ui.create.div('.gaintag',card),
+					}
+					card.node.intro.innerHTML=lib.config.intro;
+					if(!noclick) lib.setIntro(card);
+					card.storage={};
+					card.vanishtag=[];
+					card.gaintag=[];
+					card._uncheck=[];
+					if(info!='noclick'){
+						card.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.card);
+						if(lib.config.touchscreen){
+							card.addEventListener('touchstart',ui.click.cardtouchstart);
+							card.addEventListener('touchmove',ui.click.cardtouchmove);
+						}
+						if(lib.cardSelectObserver) lib.cardSelectObserver.observe(card,{
+							attributes:true
+						});
+					}
+					return card;
+				}
+				hasNature(nature,player){
 					return game.hasNature(this,nature,player);
-				},
+				}
 				//只针对【杀】起效果
-				addNature:function(nature){
+				addNature(nature){
 					let natures=[];
 					if(!this.nature) this.nature='';
 					else{
@@ -29677,8 +29714,8 @@
 					}
 					while(0);
 					return this.nature;
-				},
-				removeNature:function(nature){
+				}
+				removeNature(nature){
 					if(!this.nature) return;
 					let natures=get.natureList(this.nature);
 					natures.remove(nature);
@@ -29701,8 +29738,8 @@
 					}
 					while(0);
 					return this.nature;
-				},
-				addGaintag:function(gaintag){
+				}
+				addGaintag(gaintag){
 					if(Array.isArray(gaintag)) this.gaintag=gaintag.slice(0);
 					else this.gaintag.add(gaintag);
 					var str='';
@@ -29714,8 +29751,8 @@
 						}
 					}
 					this.node.gaintag.innerHTML=str;
-				},
-				removeGaintag:function(tag){
+				}
+				removeGaintag(tag){
 					if(tag===true){
 						if(this.gaintag&&this.gaintag.length||this.node.gaintag.innerHTML.length) this.addGaintag([]);
 					}
@@ -29723,11 +29760,11 @@
 						this.gaintag.remove(tag);
 						this.addGaintag(this.gaintag);
 					}
-				},
-				hasGaintag:function(tag){
+				}
+				hasGaintag(tag){
 					return this.gaintag&&this.gaintag.contains(tag);
-				},
-				init:function(card){
+				}
+				init(card){
 					if(Array.isArray(card)){
 						if(card[2]=='huosha'){
 							card[2]='sha';
@@ -30041,8 +30078,8 @@
 					}
 					if(info.subtype) this.classList.add(info.subtype);
 					if(this.inits){
-						for(var i=0;i<lib.element.card.inits.length;i++){
-							lib.element.card.inits[i](this);
+						for(var i=0;i<this.inits.length;i++){
+							this.inits[i](this);
 						}
 					}
 					if(typeof info.init=='function') info.init();
@@ -30110,8 +30147,8 @@
 						}
 					}
 					return this;
-				},
-				updateTransform:function(bool,delay){
+				}
+				updateTransform(bool,delay){
 					if(delay){
 						var that=this;
 						setTimeout(function(){
@@ -30132,19 +30169,19 @@
 							}
 						}
 					}
-				},
-				aiexclude:function(){
+				}
+				aiexclude(){
 					_status.event._aiexclude.add(this);
-				},
-				getSource:function(name){
+				}
+				getSource(name){
 					if(this.name==name) return true;
 					var info=lib.card[this.name];
 					if(info&&Array.isArray(info.source)){
 						return info.source.contains(name);
 					}
 					return false;
-				},
-				moveDelete:function(player){
+				}
+				moveDelete(player){
 					this.fixed=true;
 					if(!this._listeningEnd||this._transitionEnded){
 						this.moveTo(player);
@@ -30156,8 +30193,8 @@
 					else{
 						this._onEndMoveDelete=player;
 					}
-				},
-				moveTo:function(player){
+				}
+				moveTo(player){
 					this.fixed=true;
 					var dx,dy;
 					if(this.classList.contains('center')){
@@ -30190,8 +30227,8 @@
 						this.style.transform='translate('+dx+'px,'+dy+'px)';
 					}
 					return this;
-				},
-				copy:function(){
+				}
+				copy(){
 					var node=this.cloneNode(true);
 					node.style.transform='';
 					node.name=this.name;
@@ -30221,22 +30258,22 @@
 						else if(get.objtype(arguments[i])=='div') position=arguments[i];
 						else if(typeof arguments[i]=='boolean') clone=arguments[i];
 					}
-					node.moveTo=lib.element.card.moveTo;
-					node.moveDelete=lib.element.card.moveDelete;
+					node.moveTo=lib.element.Card.prototype.moveTo;
+					node.moveDelete=lib.element.Card.prototype.moveDelete;
 					if(clone) this.clone=node;
 					if(position) position.appendChild(node);
 					return node;
-				},
-				uncheck:function(skill){
+				}
+				uncheck(skill){
 					if(skill) this._uncheck.add(skill);
 					this.classList.add('uncheck');
-				},
-				recheck:function(skill){
+				}
+				recheck(skill){
 					if(skill) this._uncheck.remove(skill);
 					else this._uncheck.length=0;
 					if(this._uncheck.length==0) this.classList.remove('uncheck');
-				},
-				discard:function(bool){
+				}
+				discard(bool){
 					if(!this.destroyed){
 						ui.discardPile.appendChild(this);
 					}
@@ -30250,17 +30287,17 @@
 							_status.discarded.add(this);
 						}
 					}
-				},
-				hasTag:function(tag){
+				}
+				hasTag(tag){
 					if(this.cardid&&_status.cardtag&&_status.cardtag[tag]&&_status.cardtag[tag].contains(this.cardid)){
 						return true;
 					}
 					return false;
-				},
-				hasPosition:function(){
+				}
+				hasPosition(){
 					return ['h','e','j','s','x'].contains(get.position(this));
-				},
-				isInPile:function(){
+				}
+				isInPile(){
 					return ['c','d'].contains(get.position(this));
 				}
 			},
@@ -31322,6 +31359,12 @@
 			 */
 			get player(){
 				return this.Player.prototype;
+			},
+			/**
+			 * @legacy Use `lib.element.Card.prototype` instead.
+			 */
+			get card(){
+				return this.Card.prototype;
 			},
 			/**
 			 * @legacy Use `lib.element.Event.prototype` instead.
@@ -52124,41 +52167,7 @@
 					// ui.updatehl();
 				}
 			},
-			card:function(position,info,noclick){
-				var node=ui.create.div('.card',position);
-				node.node={
-					image:ui.create.div('.image',node),
-					info:ui.create.div('.info',node),
-					name:ui.create.div('.name',node),
-					name2:ui.create.div('.name2',node),
-					background:ui.create.div('.background',node),
-					intro:ui.create.div('.intro',node),
-					range:ui.create.div('.range',node),
-					gaintag:ui.create.div('.gaintag',node),
-				}
-				for(var i in lib.element.card){
-					node[i]=lib.element.card[i];
-				}
-				node.node.intro.innerHTML=lib.config.intro;
-				if(!noclick){
-					lib.setIntro(node);
-				}
-				node.storage={};
-				node.vanishtag=[];
-				node.gaintag=[];
-				node._uncheck=[];
-				if(info!='noclick'){
-					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.card);
-					if(lib.config.touchscreen){
-						node.addEventListener('touchstart',ui.click.cardtouchstart);
-						node.addEventListener('touchmove',ui.click.cardtouchmove);
-					}
-					if(lib.cardSelectObserver){
-						lib.cardSelectObserver.observe(node,{attributes:true});
-					}
-				}
-				return node;
-			},
+			card:(position,info,noclick)=>new lib.element.Card(position,info,noclick),
 			cardsAsync:function(){
 				if(lib.onfree){
 					_status.waitingForCards=Array.from(arguments);
@@ -57398,7 +57407,9 @@
 			}
 			return _card;
 		},
-		//deprecated
+		/**
+		 * @deprecated
+		 */
 		_autoViewAs:function(card,cards){
 			var info=get.info(card);
 			if(info.autoViewAs){
@@ -58255,7 +58266,7 @@
 			if(key=='_trigger'){
 				if(noMore!==false) stringifying[key]=get.eventInfoOL(entry[1],null,false);
 			}
-			else if(!lib.element.event[key]&&key!='content'&&!(entry[1] instanceof lib.element.Event)) stringifying[key]=get.stringifiedResult(entry[1],null,false);
+			else if(!lib.element.Event.prototype[key]&&key!='content'&&!(entry[1] instanceof lib.element.Event)) stringifying[key]=get.stringifiedResult(entry[1],null,false);
 			return stringifying;
 		},{}))}`:'',
 		/**
@@ -61470,7 +61481,8 @@
 		},{});
 		return object;
 	};
-	Object.setPrototypeOf(setAllPropertiesEnumerable(lib.element.Player.prototype),HTMLDivElement.prototype);
+	setAllPropertiesEnumerable(lib.element.Player.prototype);
+	setAllPropertiesEnumerable(lib.element.Card.prototype);
 	setAllPropertiesEnumerable(lib.element.Event.prototype);
 	if('__core-js_shared__' in window) lib.init.init();
 	else{
