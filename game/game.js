@@ -31188,8 +31188,52 @@
 					return this;
 				}
 			},
-			control:{
-				open:function(){
+			Control:class extends HTMLDivElement{
+				constructor(){
+					const nc=!ui.control.querySelector('div:not(.removing):not(.stayleft)');
+					const controls=Array.isArray(arguments[0])?arguments[0]:Array.from(arguments);
+					const control=ui.create.div('.control');
+					Object.setPrototypeOf(control,lib.element.Control.prototype);
+					ui.control.insertBefore(control,_status.createControl||ui.confirm);
+					controls.forEach(argument=>{
+						if(argument=='nozoom') return;
+						if(typeof argument=='function') control.custom=argument;
+						else if(argument=='stayleft'){
+							control.stayleft=true;
+							control.classList.add('stayleft');
+						}
+						else control.add(argument);
+					});
+					ui.controls.unshift(control);
+					if(nc) ui.control.animate('nozoom',100);
+					if(control.childNodes.length){
+						control.style.transition='opacity 0.5s';
+						control.animate('controlpressdownx',500);
+						ui.refresh(control);
+						if(!control.stayleft) control.style.transform=`translateX(-${control.offsetWidth/2}px)`;
+						control.style.opacity=1;
+						ui.refresh(control);
+						control.style.transition='';
+					}
+
+					control.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control2);
+
+					if(lib.config.button_press){
+						control.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(){
+							if(this.classList.contains('disabled')) return;
+							this.classList.add('controlpressdown');
+							if(typeof this._offset=='number') this.style.transform=`translateX(${this._offset}px) scale(0.97)`;
+						});
+						control.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
+							this.classList.remove('controlpressdown');
+							if(typeof this._offset=='number') this.style.transform=`translateX(${this._offset}px)`;
+						});
+					}
+
+					ui.updatec();
+					return control;
+				}
+				open(){
 					ui.control.insertBefore(this,_status.createControl||ui.confirm);
 					ui.controls.unshift(this);
 					if(this.childNodes.length){
@@ -31205,15 +31249,15 @@
 					}
 					ui.updatec();
 					return this;
-				},
-				add:function(item){
+				}
+				add(item){
 					var node=document.createElement('div');
 					this.appendChild(node);
 					node.link=item;
 					node.innerHTML=get.translation(item);
 					node.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control);
-				},
-				close:function(){
+				}
+				close(){
 					this.animate('controlpressdownx',500);
 
 					ui.controls.remove(this);
@@ -31226,8 +31270,8 @@
 					if(ui.skills==this) delete ui.skills;
 					if(ui.skills2==this) delete ui.skills2;
 					if(ui.skills3==this) delete ui.skills3;
-				},
-				replace:function(){
+				}
+				replace(){
 					// this.animate('controlpressdownx',500);
 					if(this.replaceTransition===false){
 						this.style.transitionProperty='none';
@@ -31412,6 +31456,12 @@
 			 */
 			get dialog(){
 				return this.Dialog.prototype;
+			},
+			/**
+			 * @legacy Use `lib.element.Control.prototype` instead.
+			 */
+			get control(){
+				return this.Control.prototype;
 			}
 		},
 		card:{
@@ -50775,88 +50825,7 @@
 				return caption;
 			},
 			control:function(){
-				var nc=!ui.control.querySelector('div:not(.removing):not(.stayleft)');
-				// for(var i=0;i<ui.control.childNodes.length;i++){
-				// 	if(ui.control.childNodes[i].classList.contains('removing')){
-				// 		var that=ui.control.childNodes[i];
-				// 		var width=that.offsetWidth;
-				// 		that.style.marginLeft=(-width/2)+'px';
-				// 		that.style.marginRight=(-width/2)+'px';
-				// 		that.style.transitionDuration=0.8*parseFloat(getComputedStyle(that).opacity)+'s';
-				// 	}
-				// }
-				var i,controls;
-				var nozoom=false;
-				if(Array.isArray(arguments[0])) controls=arguments[0];
-				else controls=arguments;
-				var control=ui.create.div('.control');
-				ui.control.insertBefore(control,_status.createControl||ui.confirm);
-				for(i in lib.element.control){
-					control[i]=lib.element.control[i];
-				}
-				for(i=0;i<controls.length;i++){
-					if(typeof controls[i]=='function'){
-						control.custom=controls[i];
-					}
-					else if(controls[i]=='nozoom'){
-						nozoom=true;
-					}
-					else if(controls[i]=='stayleft'){
-						control.stayleft=true;
-						control.classList.add('stayleft');
-					}
-					else{
-						control.add(controls[i]);
-					}
-				}
-				ui.controls.unshift(control);
-				if(nc){
-					ui.control.animate('nozoom',100);
-				}
-				// if(ui.control.classList.contains('nozoom')){
-				// 	nozoom=true;
-				// }
-				// if(nozoom){
-				// 	control.classList.add('nozoom');
-				// }
-				if(control.childNodes.length){
-					// if(nozoom||true){
-					control.style.transition='opacity 0.5s';
-					control.animate('controlpressdownx',500);
-					// }
-					// else{
-					// 	control.style.transition='';
-					// 	control.style.transform='scale(0.8)';
-					// }
-					ui.refresh(control);
-					if(!control.stayleft){
-						control.style.transform='translateX(-'+(control.offsetWidth/2)+'px)';
-					}
-					control.style.opacity=1;
-					ui.refresh(control);
-					control.style.transition='';
-				}
-
-				control.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.control2);
-
-				if(lib.config.button_press){
-					control.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',function(){
-						if(this.classList.contains('disabled')) return;
-						this.classList.add('controlpressdown');
-						if(typeof this._offset=='number'){
-							this.style.transform='translateX('+this._offset+'px) scale(0.97)';
-						}
-					});
-					control.addEventListener(lib.config.touchscreen?'touchend':'mouseup',function(){
-						this.classList.remove('controlpressdown');
-						if(typeof this._offset=='number'){
-							this.style.transform='translateX('+this._offset+'px)';
-						}
-					});
-				}
-
-				ui.updatec();
-				return control;
+				return new lib.element.Control(...arguments);
 			},
 			confirm:function(str,func){
 				if(ui.confirm&&ui.confirm.str==str){
@@ -61486,6 +61455,8 @@
 	setAllPropertiesEnumerable(lib.element.Player.prototype);
 	setAllPropertiesEnumerable(lib.element.Card.prototype);
 	setAllPropertiesEnumerable(lib.element.Event.prototype);
+	setAllPropertiesEnumerable(lib.element.Dialog.prototype);
+	setAllPropertiesEnumerable(lib.element.Control.prototype);
 	if('__core-js_shared__' in window) lib.init.init();
 	else{
 		const coreJSBundle=document.createElement('script');
