@@ -35458,13 +35458,14 @@
 			if(!lib.config.background_audio||get.type(card)=='equip'&&!lib.config.equip_audio) return;
 			var nature=get.natureList(card)[0];
 			if(lib.natureAudio[card.name]){
-				let shaAudio = lib.natureAudio.sha[nature];
-				if(shaAudio === 'default'){
+				let useAudio = lib.natureAudio[card.name][nature];
+				if(useAudio === 'default'){
 					game.playAudio('card',sex,`${card.name}_${nature}`);
-				}else if(shaAudio[sex]){
-					game.playAudio(shaAudio[sex]);
+					return;
+				}else if(useAudio && useAudio[sex]){
+					game.playAudio(useAudio[sex]);
+					return;
 				}
-				return;
 			}
 			const audio=lib.card[card.name].audio;
 			if(typeof audio=='string'){
