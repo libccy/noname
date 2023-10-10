@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','ol_lvboshe'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','lvboshe','zhangyan'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['ol_wanglang','ol_puyuan','ol_zhouqun'],
 				sp_zhongdan:["cuiyan","huangfusong"],
@@ -28,14 +28,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_dongzhao:function(mode){
 				return mode=='identity'&&['normal','zhong'].contains(_status.mode);
 			},
-			ol_lvboshe:function(mode){
+			lvboshe:function(mode){
 				return mode=='doudizhu';
 			},
 		},
 		character:{
+			zhangyan:['male','qun',4,['olsuji','ollangdao']],
 			ol_tw_zhangji:['male','wei',3,['skill_zhangji_A','skill_zhangji_B'],['unseen']],
 			ol_feiyi:['male','shu',3,['skill_feiyi_A','skill_feiyi_B'],['unseen']],
-			ol_lvboshe:['male','qun',4,['skill_lvboshe'],['unseen']],
+			lvboshe:['male','qun',4,['skill_lvboshe'],['unseen']],
 			ol_luyusheng:['female','wu',3,['olcangxin','olrunwei']],
 			caoxi:['male','wei',3,['olgangshu','oljianxuan']],
 			ol_pengyang:['male','shu',3,['olqifan','oltuishi','nzry_cunmu']],
@@ -203,6 +204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luzhi:['male','wei',3,['qingzhong','weijing']]
 		},
 		characterIntro:{
+			zhangyan:'张燕，本姓褚，生卒年不详，常山真定（今河北正定南）人，东汉末年黑山军首领。张燕剽捍，敏捷过人，军中称为“飞燕”。官渡之战时投降曹操，被任命为平北将军，封安国亭侯。死后其子张方袭爵。',
 			lushi:'卢氏，五斗米教主张衡妻，张鲁母，擅长驻颜之术，常年令自己保持少女的容颜。常拜访刘焉，与其交好。',
 			lvboshe:'吕伯奢，东汉成皋（今河南荥阳）人，曹操父亲曹嵩的故友。曹操与陈宫在逃离董卓避祸，返回乡里的途中借宿于吕伯奢家，未伤其人，有贼八人欲捉曹操，曹操杀之，明罗贯中在历史小说《三国演义》中将这段历史进行了丑化加工，也成为小说中曹操名言“宁教我负天下人，休教天下人负我”的出处。',
 			caoxi:'曹羲（？－249年），字昭叔。曹真之子，曹爽之弟。为人有学识，明律法。司马懿曾组织朝议改革九品中正制废除九品而留中正，曹羲认为此举并无区别，最终都是决定于人的人治。曹爽掌权后，受封中领军，掌握禁兵，封安乡侯。曹爽及诸兄弟轻视司马懿，恣意妄为，经常外出狩猎，曹羲屡次劝谏，不被采纳。249年，司马懿发动高平陵政变，被夷三族。',
@@ -704,6 +706,265 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//张燕
+			olsuji:{
+				audio:2,
+				trigger:{global:'phaseUseBegin'},
+				filter:function(event,player){
+					return event.player.isDamaged()&&player.countCards('he',card=>{
+						if(get.position(card)=='h'&&_status.connectMode) return true;
+						return get.color(card,player)=='black';
+					});
+				},
+				direct:true,
+				content:function(){
+					var next=player.chooseToUse();
+					next.logSkill='olsuji';
+					next.set('openskilldialog',get.prompt2('olsuji'));
+					next.set('norestore',true);
+					next.set('_backupevent','olsuji_backup');
+					next.set('custom',{
+						add:{},
+						replace:{window:function(){}}
+					});
+					next.backup('olsuji_backup');
+				},
+				subSkill:{
+					backup:{
+						viewAs:{name:'sha'},
+						filterCard:{color:'black'},
+						position:'he',
+						check:function(card){
+							return 5-get.value(card);
+						},
+						precontent:function(){
+							delete event.result.skill;
+							event.result.card.olsuji=true;
+							player.when('useCardAfter')
+							.filter((event,player)=>event.card.olsuji&&player.getHistory('sourceDamage',evt=>evt.card==event.card).length)
+							.then(()=>{
+								player.gainPlayerCard(_status.currentPhase,'he',true);
+							});
+						},
+					},
+				},
+			},
+			ollangdao:{
+				audio:2,
+				trigger:{player:'useCardToPlayer'},
+				filter:function(event,player){
+					if(!['1','2','3'].some(num=>!player.hasSkill('ollangdao_'+num))) return false;
+					return event.card.name=='sha'&&event.targets.length==1;
+				},
+				check:function(event,player){
+					return get.attitude(player,event.target)<0&&get.effect(event.target,event.card,player,player)>0;
+				},
+				logTarget:'target',
+				content:function(){
+					'step 0'
+					var target=trigger.target;
+					event.target=target;
+					var list=['1','2','3'].filter(num=>!player.hasSkill('ollangdao_'+num));
+					event.list=list.map(num=>['','','ollangdao_'+num]);
+					if(_status.connectMode){
+						player.chooseButtonOL([
+							[player,['狼蹈：请选择一项',[event.list,'vcard']],true],
+							[target,['狼蹈：请选择一项',[event.list,'vcard']],true],
+						],function(){
+							var trigger=_status.event.getTrigger();
+							var source=trigger.player,target=trigger.target;
+							var player=_status.event.player;
+							switch(num=button.link[2].slice(10)){
+								case '0':
+									var damageNum=trigger.getParent().baseDamage;
+									if(target.hasSkillTag('filterDamage',null,{
+										player:trigger.player,
+										card:trigger.card,
+									})) damageNum=1;
+									var list=[4,10];
+									if(lib.skill.ollangdao.yimie(trigger,source,target,damageNum)) list.reverse();
+									return list[[source,target].indexOf(player)];
+									break;
+								case '1':
+									var targets=game.filterPlayer(current=>{
+										return !trigger.targets.contains(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,source,source)>0;
+									});
+									if(player==source) return 2.5*Math.min(1,targets.length);
+									return targets.length?0:8;
+									break;
+								case '2':
+									var list=[0,7.5];
+									if(!trigger.getParent().directHit.contains(target)) list.reverse();
+									return list[[source,target].indexOf(player)];
+									break;
+							}
+						}).set('switchToAuto',function(){
+							_status.event.result='ai';
+						}).set('processAI',function(){
+							var buttons=_status.event.dialog.buttons;
+							return {
+								bool:true,
+								links:[buttons.randomGet().link],
+							}
+						});
+					}
+					'step 1'
+					if(_status.connectMode){
+						event.mes=result[player.playerid].links[0][2];
+						event.tes=result[target.playerid].links[0][2];
+						event.goto(4);
+					}
+					else{
+						player.chooseButton(['狼蹈：请选择一项',[event.list,'vcard']],true).set('ai',function(button){
+							var trigger=_status.event.getTrigger();
+							var source=trigger.player,target=trigger.target;
+							var player=_status.event.player;
+							switch(num=button.link[2].slice(10)){
+								case '0':
+									var damageNum=trigger.getParent().baseDamage;
+									if(target.hasSkillTag('filterDamage',null,{
+										player:trigger.player,
+										card:trigger.card,
+									})) damageNum=1;
+									var list=[4,10];
+									if(lib.skill.ollangdao.yimie(trigger,source,target,damageNum)) list.reverse();
+									return list[[source,target].indexOf(player)];
+									break;
+								case '1':
+									var targets=game.filterPlayer(current=>{
+										return !trigger.targets.contains(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,source,source)>0;
+									});
+									if(player==source) return 2.5*Math.min(1,targets.length);
+									return targets.length?0:8;
+									break;
+								case '2':
+									var list=[0,7.5];
+									if(!trigger.getParent().directHit.contains(target)) list.reverse();
+									return list[[source,target].indexOf(player)];
+									break;
+							}
+						});
+					}
+					'step 2'
+					event.mes=result.links[0][2];
+					target.chooseButton(['狼蹈：请选择一项',[event.list,'vcard']],true).set('ai',function(button){
+						var trigger=_status.event.getTrigger();
+						var source=trigger.player,target=trigger.target;
+						var player=_status.event.player;
+						switch(num=button.link[2].slice(10)){
+							case '0':
+								var damageNum=trigger.getParent().baseDamage;
+								if(target.hasSkillTag('filterDamage',null,{
+									player:trigger.player,
+									card:trigger.card,
+								})) damageNum=1;
+								var list=[4,10];
+								if(lib.skill.ollangdao.yimie(trigger,source,target,damageNum)) list.reverse();
+								return list[[source,target].indexOf(player)];
+								break;
+							case '1':
+								var targets=game.filterPlayer(current=>{
+									return !trigger.targets.contains(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,source,source)>0;
+								});
+								if(player==source) return 2.5*Math.min(1,targets.length);
+								return targets.length?0:8;
+								break;
+							case '2':
+								var list=[0,7.5];
+								if(!trigger.getParent().directHit.contains(target)) list.reverse();
+								return list[[source,target].indexOf(player)];
+								break;
+						}
+					});
+					'step 3'
+					event.tes=result.links[0][2];
+					'step 4'
+					player.popup(event.mes);
+					target.popup(event.tes);
+					game.log(player,'选择了','#g'+get.translation(event.mes));
+					game.log(target,'选择了','#g'+get.translation(event.tes));
+					'step 5'
+					var num=0;
+					for(var control of [event.mes,event.tes]){
+						if(control=='ollangdao_1'){
+							if(!trigger.getParent().baseDamage) trigger.getParent().baseDamage=0;
+							trigger.getParent().baseDamage++;
+							game.log(trigger.card,'伤害+1');
+						}
+						if(control=='ollangdao_2'){
+							num++;
+							game.log(trigger.card,'目标+1');
+						}
+						if(control=='ollangdao_3'){
+							trigger.getParent().directHit.addArray(game.players);
+							game.log(trigger.card,'不可被响应');
+						}
+					}
+					if(!num||!game.hasPlayer(current=>{
+						return !trigger.targets.contains(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,source,source)>0;
+					})) event.goto(8);
+					else event.num=num;
+					'step 6'
+					player.chooseTarget('狼蹈：为'+get.translation(trigger.card)+'增加'+get.cnNumber(num)+'个目标',true,function(card,player,target){
+						var trigger=_status.event.getTrigger();
+						return !trigger.targets.contains(target)&&player.canUse(trigger.card,target)&&get.effect(target,trigger.card,source,source)>0;
+					}).set('ai',target=>{
+						var trigger=_status.event.getTrigger();
+						return get.effect(target,trigger.card,player,player);
+					});
+					'step 7'
+					if(result.bool){
+						var targets=result.targets.sortBySeat();
+						player.line(targets);
+						trigger.targets.addArray(targets);
+						game.log(targets,'成为',trigger.card,'的额外目标');
+					}
+					'step 8'
+					var list=['1','2','3'].filter(num=>!player.hasSkill('ollangdao_'+num));
+					list=list.map(num=>'ollangdao_'+num);
+					list=list.filter(control=>event.mes==control||event.tes==control);
+					trigger.card.ollangdao=list;
+					player.when('useCardAfter')
+					.filter((event,player)=>event.card.ollangdao&&(!player.getHistory('sourceDamage',evt=>evt.card==event.card).length||!trigger.targets||!trigger.targets.some(target=>!target.isIn())))
+					.then(()=>{
+						var str='';
+						for(var i=0;i<trigger.card.ollangdao.length;i++){
+							str+=get.translation(trigger.card.ollangdao[i]);
+							str+='、';
+						}
+						str=str.slice(0,-1);
+						player.addSkill(trigger.card.ollangdao);
+						game.log(player,'移去了','#y'+str);
+					});
+				},
+				yimie:function(trigger,player,target,damageNum){
+					var hit=true;
+					var att=get.attitude(player,target);
+					if(get.type(trigger.card)=='trick'&&trigger.player.countCards('hs',{name:'wuxie'})) hit=false;
+					if(trigger.card.name=='huogong'&&trigger.player.countCards('h',function(card){
+						var list=[];
+						for(var i of player.getCards('h')) list.push(get.suit(i));
+						return !list.contains(get.suit(card));
+					})) hit=false;
+					var key;
+					switch (trigger.card.name){
+						case 'sha':case 'wanjian':key=['shan']; break;
+						case 'juedou':case 'nanman':case 'jiedao':key=['sha']; break;
+						default:key=[]; break;
+					}
+					if(get.type(trigger.card)=='trick') key.push('wuxie');
+					key.push('caochuan');
+					var bool1=((get.recoverEffect(target,player,player)>0)?1:-1);
+					var bool2=(((att>0&&!hit)||(target.countCards('hs',{name:key})&&!trigger.getParent().directHit.contains(target)))?1:-1);
+					if(att<=0&&target.hp-damageNum>0) return false;
+					return bool1=bool2&&att!=0;
+				},
+				subSkill:{
+					'1':{charlotte:true},
+					'2':{charlotte:true},
+					'3':{charlotte:true},
+				},
+			},
 			//张既
 			skill_zhangji_A:{
 				audio:2,
@@ -24456,6 +24717,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.skill_lvboshe) return '农民的回合结束时：阴，你可以令地主进行一个额外回合；<span class="bluetext">阳，你可以令其进行一个额外回合</span>。';
 				return '农民的回合结束时：<span class="bluetext">阴，你可以令地主进行一个额外回合</span>；阳，你可以令其进行一个额外回合。';
 			},
+			ollangdao:function(player){
+				var str='当你使用【杀】指定唯一目标后，你可以与其同时选择一项：';
+				if(player.hasSkill('ollangdao_1')) str+='<span style="text-decoration: line-through;">';
+				str+='令此牌的伤害值基数+1；';
+				if(player.hasSkill('ollangdao_1')) str+='</span>';
+				if(player.hasSkill('ollangdao_2')) str+='<span style="text-decoration: line-through;">';
+				str+='为此牌额外指定一个目标；';
+				if(player.hasSkill('ollangdao_2')) str+='</span>';
+				if(player.hasSkill('ollangdao_3')) str+='<span style="text-decoration: line-through;">';
+				str+='令此牌不可被响应。';
+				if(player.hasSkill('ollangdao_3')) str+='</span>';
+				str+='此牌结算后，若你未因此【杀】杀死过角色，则你移去此次选择的选项。';
+				return str;
+			},
 		},
 		characterReplace:{
 			shixie:['shixie','dc_shixie'],
@@ -25705,10 +25980,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			skill_feiyi_A_info:'出牌阶段各限一次，若你的手牌数为：①奇数，你可以摸三张牌，然后弃置至少一半手牌（向下取整）；②偶数，你可以弃置至少一半手牌，然后摸三张牌。',
 			skill_feiyi_B:'技能',
 			skill_feiyi_B_info:'每回合每项限一次，当你的手牌数变为1后，你可以展示此唯一手牌A并摸一张牌，然后你选择一项：①本回合使用点数大于A的点数的牌额外结算一次；②本回合使用点数小于A的点数的牌额外结算一次。',
-			ol_lvboshe:'吕伯奢',
+			lvboshe:'吕伯奢',
 			skill_lvboshe:'技能',
 			skill_lvboshe_info:'农民的回合结束时：阴，你可以令地主进行一个额外回合；阳，你可以令其进行一个额外回合。',
-			
+			zhangyan:'张燕',
+			olsuji:'肃疾',
+			olsuji_info:'已受伤角色的出牌阶段开始时，你可以将一张黑色牌当作【杀】使用，若你以此法造成伤害，你获得其一张牌。',
+			ollangdao:'狼蹈',
+			ollangdao_1:'伤害+1',
+			ollangdao_2:'目标+1',
+			ollangdao_3:'不可响应',
+			ollangdao_info:'当你使用【杀】指定唯一目标后，你可以与其同时选择一项：令此牌的伤害值基数+1；为此牌额外指定一个目标；令此牌不可被响应。此牌结算后，若你未因此【杀】杀死过角色，则你移去此次选择的选项。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
