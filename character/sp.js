@@ -824,17 +824,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<ai_targets.length;i++){
 							if(players.contains(ai_targets[i])){
 								var target=ai_targets[i];
-								var list=[0,1,2].filter(i=>!player.getStorage('ollangdao').includes(i));
+								var list=[0,1,2].removeArray(player.getStorage('ollangdao'));
 								var index=list[0];
 								if(get.attitude(target,player)<0){
 									if(!game.hasPlayer(current=>{
-										return player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)<0;
+										return !trigger.targets.includes(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)<0;
 									})) list.removeArray([0,2]);
 									if(player.getStorage('ollangdao').includes(2)) list.remove(0);
 								}
 								else{
 									if(!game.hasPlayer(current=>{
-										return player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)>0;
+										return !trigger.targets.includes(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)>0;
 									})) list.remove(1);
 									if(!list.includes(1)) list.remove(0);
 								}
@@ -848,17 +848,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							setTimeout(function(){
 								event.interval=setInterval(function(){
 									var target=ai_targets.shift();
-									var list=[0,1,2].filter(i=>!player.getStorage('ollangdao').includes(i));
+									var list=[0,1,2].removeArray(player.getStorage('ollangdao'));
 									var index=list[0];
 									if(get.attitude(target,player)<0){
 										if(!game.hasPlayer(current=>{
-											return player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)<0;
+											return !trigger.targets.includes(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)<0;
 										})) list.removeArray([0,2]);
 										if(player.getStorage('ollangdao').includes(2)) list.remove(0);
 									}
 									else{
 										if(!game.hasPlayer(current=>{
-											return player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)>0;
+											return !trigger.targets.includes(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)>0;
 										})) list.remove(1);
 										if(!list.includes(1)) list.remove(0);
 									}
