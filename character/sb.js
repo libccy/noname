@@ -79,6 +79,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card,player){
 					return get.color(card)==get.color(player.getExpansions('nzry_mingren')[0]);
 				},
+				selectCard:[1,Infinity],
 				complexSelect:true,
 				complexCard:true,
 				position:'he',
