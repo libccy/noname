@@ -25229,7 +25229,7 @@
 					this.removeSkill('mad');
 				},
 				tempHide:function(){
-					this.addTempSkill('qianxing',{player:'phaseBegin'});
+					this.addTempSkill('qianxing',{player:'phaseBeginStart'});
 				},
 				addExpose:function(num){
 					if(typeof this.ai.shown=='number'&&!this.identityShown&&this.ai.shown<1){
@@ -26860,7 +26860,7 @@
 					this.addSkill(skill,checkConflict,true,true);
 
 					if(!expire){
-						expire=['phaseAfter','phaseBefore'];
+						expire=['phaseAfter','phaseBeforeStart'];
 					}
 					this.tempSkills[skill]=expire;
 
@@ -32469,6 +32469,7 @@
 				silent:true,
 				charlotte:true,
 				priority:-100,
+				lastDo:true,
 				content:function(){
 					player.removeSkill('counttrigger');
 					delete player.storage.counttrigger;
@@ -32476,9 +32477,10 @@
 				group:'counttrigger_2',
 				subSkill:{
 					2:{
-						trigger:{global:'phaseBefore'},
+						trigger:{global:['phaseBeforeStart','roundStart']},
 						silent:true,
 						charlotte:true,
+						firstDo:true,
 						priority:100,
 						content:function(){
 							player.removeSkill('counttrigger');

@@ -2601,7 +2601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else game.delayx();
 					'step 3'
-					player.addTempSkill('nstuilun_effect',{player:'phaseBegin'});
+					player.addTempSkill('nstuilun_effect',{player:'phaseBeginStart'});
 				},
 				subSkill:{
 					effect:{
@@ -3562,7 +3562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countCards('h')>0) player.chooseToDiscard('h',true,player.countCards('h'));
 					player.recover();
 					trigger.cancel();
-					player.addTempSkill('kyou_duanfa_draw',{player:'phaseBegin'});
+					player.addTempSkill('kyou_duanfa_draw',{player:'phaseBeginStart'});
 				},
 				subSkill:{
 					draw:{
@@ -6372,9 +6372,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=game.roundNumber;
 					if(num&&typeof num=='number') player.draw(Math.min(3,num));
 					'step 1'
-					var next=player.phaseUse();
-					event.next.remove(next);
-					trigger.next.push(next);
+					trigger.phaseList.splice(trigger.num,0,'phaseUse|godan_yuanyi');
 				},
 			},
 			godan_feiqu:{
