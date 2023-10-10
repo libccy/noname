@@ -7484,6 +7484,9 @@
 			'<li>激昂：一名角色发动“昂扬技”标签技能后，此技能失效，直至从此刻至满足此技能“激昂”条件后。'+
 			''
 		},
+		/**
+		 * @type {import('path')}
+		 */
 		path:{},
 		getErrorTip:msg=>{
 			if(typeof msg!='string'){
@@ -31320,6 +31323,9 @@
 				}
 			},
 			Client:class{
+				/**
+				 * @param {InstanceType<typeof lib.element.NodeWS | typeof import('ws').WebSocket>} ws
+				 */
 				constructor(ws){
 					this.ws=ws;
 					this.id=ws.wsid||get.id();
@@ -31377,14 +31383,20 @@
 					return this;
 				}
 			},
-			nodews:{
-				send:function(message){
+			NodeWS:class{
+				/**
+				 * @param {string} id
+				 */
+				constructor(id){
+					this.wsid=id;
+				}
+				send(message){
 					game.send('server','send',this.wsid,message);
-				},
-				on:function(type,func){
+				}
+				on(type,func){
 					this['on'+type]=func;
-				},
-				close:function(){
+				}
+				close(){
 					game.send('server','close',this.wsid);
 				}
 			},
@@ -31491,6 +31503,12 @@
 			 */
 			get client(){
 				return this.Client.prototype;
+			},
+			/**
+			 * @legacy Use `lib.element.NodeWS.prototype` instead.
+			 */
+			get nodews(){
+				return this.NodeWS.prototype;
 			}
 		},
 		card:{
@@ -33682,14 +33700,7 @@
 						ui.connecting.firstChild.innerHTML='重连成功';
 					}
 				},
-				onconnection:function(id){
-					var ws={wsid:id};
-					for(var i in lib.element.nodews){
-						ws[i]=lib.element.nodews[i];
-					}
-					lib.wsOL[id]=ws;
-					lib.init.connection(ws);
-				},
+				onconnection:id=>lib.init.connection(lib.wsOL[id]=new lib.element.NodeWS(id)),
 				onmessage:function(id,message){
 					if(lib.wsOL[id]){
 						lib.wsOL[id].onmessage(message);
@@ -35790,13 +35801,7 @@
 				game.ws.send(JSON.stringify(get.stringifiedResult(args)));
 			}
 		},
-		sendTo:function(id,message){
-			var ws={wsid:id};
-			for(var i in lib.element.nodews){
-				ws[i]=lib.element.nodews[i];
-			}
-			new lib.element.Client(ws).send(message);
-		},
+		sendTo:(id,message)=>new lib.element.Client(new lib.element.NodeWS(id)).send(message),
 		createServer:function(){
 			lib.node.clients=[];
 			lib.node.banned=[];
