@@ -26,6 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			xin_wuban:['male','shu',4,['xinjintao'],['clan:陈留吴氏','character:wuban','die:wuban']],
 			baoxin:['male','qun',4,['mutao','yimou'],['character:tw_baoxin','die:tw_baoxin']],
 			jiangji:['male','wei',3,['twjichou','jilun'],['character:tw_jiangji','die:tw_jiangji']],
 			liwei:['male','shu',4,['jiaohua'],['character:tw_liwei','die:tw_liwei']],
@@ -385,6 +386,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//吴班
+			xinjintao:{
+				audio:'jintao',
+				inherit:'jintao',
+				content:function(){
+					var evt=trigger.getParent('phaseUse');
+					var index=player.getHistory('useCard',function(evtx){
+						return evtx.card.name=='sha'&&evtx.getParent('phaseUse')==evt;
+					}).indexOf(trigger);
+					if(index==0){
+						game.log(trigger.card,'不可被响应');
+						trigger.directHit.addArray(game.players);
+					}
+					else{
+						game.log(trigger.card,'伤害+1');
+						if(typeof trigger.baseDamage!='number') trigger.baseDamage=1;
+						trigger.baseDamage++;
+					}
+				},
+			},
 			//鲍信
 			mutao:{
 				audio:'twmutao',
@@ -15259,6 +15280,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			laishou_info:'锁定技。①当你受到伤害值大于等于你的体力值的伤害时，若你的体力上限小于9，你防止此伤害并增加等量体力上限。②准备阶段，若你的体力上限不小于9，你死亡。',
 			luanqun:'乱群',
 			luanqun_info:'出牌阶段限一次，若你有手牌，则你可以令所有有手牌的角色同时展示一张手牌，然后你可以获得其中一张与你展示的牌颜色相同的展示牌，所有本次展示牌颜色与你展示的牌颜色不同的角色的下个出牌阶段使用的第一张【杀】只能对你使用，且此【杀】不可被响应。',
+			xin_wuban:'吴班',
+			xinjintao:'进讨',
+			xinjintao_info:'锁定技，你使用【杀】无距离限制且次数上限+1。你于出牌阶段内使用的第一张【杀】不可被响应，第二张【杀】伤害+1。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',
