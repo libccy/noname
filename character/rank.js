@@ -961,6 +961,7 @@ window.noname_character_rank={
 		're_wenpin',
 		'yue_zhoufei',
 		'ns_mengyou',
+		'zhangyan',
 	],
 	b:[
 		'diy_feishi',

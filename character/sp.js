@@ -721,7 +721,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					(event,map)=>{
 						var player=map.player,trigger=map.trigger;
 						var next=player.chooseToUse();
-						next.set('openskilldialog',`###${get.prompt('olsuji')}###将一张黑色牌当【杀】使用。若${get.translation(trigger.player)}受到了此【杀】的伤害，你获得其一张牌。`);
+						next.set('openskilldialog',`###${get.prompt('olsuji')}###将一张黑色牌当【杀】使用${
+							player==trigger.player?'':`。若${get.translation(trigger.player)}受到了此【杀】的伤害，你获得其一张牌。`
+						}`);
 						next.set('norestore',true);
 						next.set('_backupevent','olsuji_backup');
 						next.set('addCount',false);
