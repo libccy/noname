@@ -31020,8 +31020,43 @@
 					}
 				}
 			},
-			dialog:{
-				add:function(item,noclick,zoom){
+			Dialog:class extends HTMLDivElement{
+				constructor(){
+					let hidden=false;
+					let noTouchScroll=false;
+					let forceButton=false;
+					let noForceButton=false;
+					const dialog=ui.create.div('.dialog');
+					Object.setPrototypeOf(dialog,lib.element.Dialog.prototype);
+					dialog.contentContainer=ui.create.div('.content-container',dialog);
+					dialog.content=ui.create.div('.content',dialog.contentContainer);
+					dialog.bar1=ui.create.div('.bar.top',dialog);
+					dialog.bar2=ui.create.div('.bar.bottom',dialog);
+					dialog.buttons=[];
+					Array.from(arguments).forEach(argument=>{
+						if(typeof argument=='boolean') dialog.static=argument;
+						else if(argument=='hidden') hidden=true;
+						else if(argument=='notouchscroll') noTouchScroll=true;
+						else if(argument=='forcebutton') forceButton=true;
+						else if(argument=='noforcebutton') noForceButton=true;
+						else dialog.add(argument);
+					});
+					if(!hidden) dialog.open();
+					if(!lib.config.touchscreen) dialog.contentContainer.onscroll=ui.update;
+					if(!noTouchScroll){
+						dialog.contentContainer.ontouchstart=ui.click.dialogtouchStart;
+						dialog.contentContainer.ontouchmove=ui.click.touchScroll;
+						dialog.contentContainer.style.WebkitOverflowScrolling='touch';
+						dialog.ontouchstart=ui.click.dragtouchdialog;
+					}
+					if(noForceButton) dialog.noforcebutton=true;
+					else if(forceButton){
+						dialog.forcebutton=true;
+						dialog.classList.add('forcebutton');
+					}
+					return dialog;
+				}
+				add(item,noclick,zoom){
 					if(typeof item=='string'){
 						if(item.startsWith('###')){
 							var items=item.slice(3).split('###');
@@ -31069,8 +31104,8 @@
 					}
 					ui.update();
 					return item;
-				},
-				addText:function(str,center){
+				}
+				addText(str,center){
 					if(str&&str.startsWith('<div')) this.add(str);
 					else if(center!==false){
 						this.add('<div class="text center">'+str+'</div>');
@@ -31079,19 +31114,19 @@
 						this.add('<div class="text">'+str+'</div>');
 					}
 					return this;
-				},
-				addSmall:function(item,noclick){
+				}
+				addSmall(item,noclick){
 					return this.add(item,noclick,true);
-				},
-				addAuto:function(content){
+				}
+				addAuto(content){
 					if(content&&content.length>4&&!this._hovercustomed){
 						this.addSmall(content);
 					}
 					else{
 						this.add(content);
 					}
-				},
-				open:function(){
+				}
+				open(){
 					if(this.noopen) return;
 					for(var i=0;i<ui.dialogs.length;i++){
 						if(ui.dialogs[i]==this){
@@ -31133,8 +31168,8 @@
 						that.style.transitionProperty='';
 					},500);
 					return this;
-				},
-				close:function(){
+				}
+				close(){
 					ui.dialogs.remove(this);
 					this.delete();
 					if(ui.dialogs.length>0){
@@ -31147,8 +31182,8 @@
 					// 	ui.arenalog.classList.remove('withdialog');
 					// }
 					return this;
-				},
-				setCaption:function(str){
+				}
+				setCaption(str){
 					this.querySelector('.caption').innerHTML=str;
 					return this;
 				}
@@ -31371,6 +31406,12 @@
 			 */
 			get event(){
 				return this.Event.prototype;
+			},
+			/**
+			 * @legacy Use `lib.element.Dialog.prototype` instead.
+			 */
+			get dialog(){
+				return this.Dialog.prototype;
 			}
 		},
 		card:{
@@ -50667,46 +50708,7 @@
 				return dialog;
 			},
 			dialog:function(){
-				var i;
-				var hidden=false;
-				var notouchscroll=false;
-				var forcebutton=false;
-				var noforcebutton=false;
-				var dialog=ui.create.div('.dialog');
-				dialog.contentContainer=ui.create.div('.content-container',dialog);
-				dialog.content=ui.create.div('.content',dialog.contentContainer);
-				dialog.bar1=ui.create.div('.bar.top',dialog);
-				dialog.bar2=ui.create.div('.bar.bottom',dialog);
-				dialog.buttons=[];
-				for(i in lib.element.dialog){
-					dialog[i]=lib.element.dialog[i];
-				}
-				for(i=0;i<arguments.length;i++){
-					if(typeof arguments[i]=='boolean') dialog.static=arguments[i];
-					else if(arguments[i]=='hidden') hidden=true;
-					else if(arguments[i]=='notouchscroll') notouchscroll=true;
-					else if(arguments[i]=='forcebutton') forcebutton=true;
-					else if(arguments[i]=='noforcebutton') noforcebutton=true;
-					else dialog.add(arguments[i]);
-				}
-				if(!hidden){
-					dialog.open();
-				}
-				if(!lib.config.touchscreen) dialog.contentContainer.onscroll=ui.update;
-				if(!notouchscroll){
-					dialog.contentContainer.ontouchstart=ui.click.dialogtouchStart;
-					dialog.contentContainer.ontouchmove = ui.click.touchScroll;
-					dialog.contentContainer.style.WebkitOverflowScrolling='touch';
-					dialog.ontouchstart=ui.click.dragtouchdialog;
-				}
-				if(noforcebutton){
-					dialog.noforcebutton=true;
-				}
-				else if(forcebutton){
-					dialog.forcebutton=true;
-					dialog.classList.add('forcebutton');
-				}
-				return dialog;
+				return new lib.element.Dialog(...arguments);
 			},
 			line2:function(){
 				var node=ui.create.line.apply(this,arguments);
