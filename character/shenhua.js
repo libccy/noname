@@ -2270,6 +2270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			nzry_mingren:{
 				audio:"nzry_mingren_1",
+				audioname:['sb_yl_luzhi'],
 				marktext:"任",
 				intro:{
 					content:'expansion',
@@ -2283,6 +2284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					1:{
 						audio:2,
+						audioname:['sb_yl_luzhi'],
 						trigger:{
 							global:'phaseBefore',
 							player:'enterGame',
@@ -2307,7 +2309,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					2:{
-						audio:2,
 						trigger:{
 							player:'phaseJieshuBegin',
 						},
@@ -2317,7 +2318,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						content:function(){
 							'step 0'
-							player.chooseCard('h','是否用一张手牌替换“任”（'+get.translation(player.getExpansions('nzry_mingren')[0])+'）？').set('ai',function(card){
+							player.chooseCard('h',get.prompt('nzry_mingren'),'选择一张手牌替换“任”（'+get.translation(player.getExpansions('nzry_mingren')[0])+'）').set('ai',function(card){
 								var player=_status.event.player;
 								var color=get.color(card);
 								if(color==get.color(player.getExpansions('nzry_mingren')[0])) return false;
@@ -6922,6 +6923,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinhongyan:{
 				audio:2,
+				audioname:['sb_xiaoqiao'],
 				mod:{
 					suit:function(card,suit){
 						if(suit=='spade') return 'heart';

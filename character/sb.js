@@ -38,6 +38,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_liubiao:['male','qun',3,['sbzishou','sbzongshi']],
 			sb_zhurong:['female','shu',4,['sblieren','sbjuxiang']],
 			sb_menghuo:['male','shu',4,['sbhuoshou','sbzaiqi']],
+			sb_yl_luzhi:['male','qun',3,['nzry_mingren','sbzhenliang']],
+			sb_xiaoqiao:['female','wu',3,['sbtianxiang','xinhongyan']],
 		},
 		characterSort:{
 			sb:{
@@ -49,6 +51,184 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//卢植
+			sbzhenliang:{
+				mark:true,
+				locked:false,
+				zhuanhuanji:true,
+				marktext:'☯',
+				intro:{
+					content:function(storage,player){
+						if(storage) return '你的回合外，一名角色使用或打出牌结算完成后，若此牌与“任”类别相同，则你可以令一名角色摸一张牌。';
+						return '出牌阶段限一次，你可以弃置一张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害。';
+					},
+				},
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					if(player.storage.sbzhenliang) return false;
+					var storage=player.getExpansions('nzry_mingren');
+					if(!storage.length) return false;
+					var color=get.color(storage[0]);
+					return game.hasPlayer(function(current){
+						return player.inRange(current)&&player.countCards('he',function(card){
+							return get.color(card)==color;
+						})>=Math.max(1,Math.abs(player.getHp()-current.getHp()));
+					});
+				},
+				filterCard:function(card,player){
+					return get.color(card)==get.color(player.getExpansions('nzry_mingren')[0]);
+				},
+				complexSelect:true,
+				complexCard:true,
+				position:'he',
+				filterTarget:function(card,player,target){
+					return player.inRange(target)&&ui.selected.cards.length==Math.max(1,Math.abs(player.getHp()-target.getHp()));
+				},
+				check:function(card){
+					return 6.5-get.value(card);
+				},
+				prompt:'弃置与攻击范围内的一名角色体力值之差（至少为1）张与“任”颜色相同的牌，对其造成1点伤害。',
+				content:function(){
+					player.changeZhuanhuanji('sbzhenliang');
+					target.damage('nocard');
+				},
+				ai:{
+					order:5,
+					result:{
+						player:function(player,target){
+							return get.damageEffect(target,player,player);
+						},
+					},
+				},
+				group:'sbzhenliang_draw',
+				subSkill:{
+					draw:{
+						trigger:{global:['useCardAfter','respondAfter']},
+						filter:function(event,player){
+							if(_status.currentPhase==player||!player.storage.sbzhenliang) return false;
+							var card=player.getExpansions('nzry_mingren')[0];
+							return card&&get.type2(event.card)==get.type2(card);
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							player.chooseTarget(get.prompt('sbzhenliang'),'令一名角色摸一张牌').set('ai',function(target){
+								if(target.hasSkillTag('nogain')) return 0.1;
+								var att=get.attitude(player,target);
+								return att*(Math.max(5-target.countCards('h'),2)+3);
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.changeZhuanhuanji('sbzhenliang');
+								player.logSkill('sbzhenliang',target);
+								target.draw();
+							}
+						},
+					},
+				},
+				ai:{combo:'nzry_mingren'},
+			},
+			//小乔
+			sbtianxiang:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.countCards('he',card=>lib.skill.sbtianxiang.filterCard(card,player))&&game.hasPlayer(target=>lib.skill.sbtianxiang.filterTarget(null,player,target));
+				},
+				filterCard:function(card,player){
+					return get.color(card,player)=='red';
+				},
+				filterTarget:function(card,player,target){
+					return target!=player&&!target.getSkills().some(skill=>skill.indexOf('sbtianxiang_')==0);
+				},
+				discard:false,
+				lose:false,
+				delay:0,
+				usable:3,
+				prompt:'将一张红色牌交给一名角色并令其获得此花色的“天香”标记',
+				content:function(){
+					player.give(cards,target);
+					var suit=get.suit(cards[0],player);
+					target.addSkill('sbtianxiang_'+suit);
+				},
+				ai:{
+					order:5,
+					result:{target:-1},
+				},
+				group:['sbtianxiang_draw','sbtianxiang_effect'],
+				subSkill:{
+					heart:{
+						charlotte:true,
+						mark:true,
+						marktext:'♥︎',
+						intro:{content:'伤害转移术'},
+					},
+					diamond:{
+						charlotte:true,
+						mark:true,
+						marktext:'♦︎',
+						intro:{content:'掳掠大法'},
+					},
+					draw:{
+						audio:'sbtianxiang',
+						trigger:{player:'phaseZhunbeiBegin'},
+						filter:function(event,player){
+							return game.hasPlayer(target=>target.getSkills().some(skill=>skill.indexOf('sbtianxiang_')==0));
+						},
+						forced:true,
+						locked:false,
+						content:function(){
+							var num=0;
+							game.countPlayer(target=>{
+								var skills=target.getSkills().filter(skill=>skill.indexOf('sbtianxiang_')==0);
+								target.removeSkill(skills);
+								num+=skills.length;
+							});
+							player.draw(num);
+						},
+					},
+					effect:{
+						trigger:{player:'damageBegin3'},
+						filter:function(event,player){
+							return game.hasPlayer(target=>target.getSkills().some(skill=>skill.indexOf('sbtianxiang_')==0));
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							player.chooseTarget(get.prompt('sbtianxiang'),'移去一名角色的“天香”标记并执行相应效果',function(card,player,target){
+								return target.getSkills().some(skill=>skill.indexOf('sbtianxiang_')==0);
+							}).set('ai',target=>{
+								var player=_status.event.player;
+								return -get.attitude(player,target)*target.getSkills().filter(skill=>skill.indexOf('sbtianxiang_')==0).length;
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								event.target=target;
+								player.logSkill('sbtianxiang',target);
+								var skills=target.getSkills().filter(skill=>skill.indexOf('sbtianxiang_')==0);
+								target.removeSkill(skills);
+								if(skills.contains('sbtianxiang_heart')){
+									target.damage(trigger.source?trigger.source:'nosource');
+									trigger.cancel();
+								}
+								if(skills.contains('sbtianxiang_diamond')){
+									var cards=target.getCards('he');
+									if(!cards.length) event.finish();
+									else if(cards.length<=2) event._result={bool:true,cards:cards};
+									else target.chooseCard('he',2,'天香：交给'+get.translation(player)+'两张牌',true);
+								}
+								else event.finish();
+							}
+							else event.finish();
+							'step 2'
+							if(result.bool) player.gain(result.cards,target,'giveAuto');
+						},
+					},
+				},
+			},
 			//张郃
 			sbqiaobian:{
 				audio:2,
@@ -4936,6 +5116,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_zhanghe:'谋张郃',
 			sbqiaobian:'巧变',
 			sbqiaobian_info:'每回合限一次。①你可以失去1点体力并跳过判定阶段，将判定区的所有牌移动给一名其他角色（无法置入其判定区的牌改为弃置之）。②你可以跳过摸牌阶段，于下个准备阶段摸两张牌并回复1点体力。③你可以将手牌数弃置至六张（若手牌数少于六张则跳过之）并跳过出牌阶段和弃牌阶段，然后移动场上的一张牌。',
+			sb_yl_luzhi:'谋卢植',
+			sb_yl_luzhi_prefix:'谋',
+			sbzhenliang:'贞良',
+			sbzhenliang_info:'转换技。阴：出牌阶段限一次，你可以弃置X张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害（X为你与其体力值值差且X至少为1）。阳：你的回合外，一名角色使用或打出牌结算完成后，若此牌与“任”类别相同，则你可以令一名角色摸一张牌。',
+			sb_xiaoqiao:'谋小乔',
+			sb_xiaoqiao_prefix:'谋',
+			sbtianxiang:'天香',
+			sbtianxiang_info:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸等量的牌。',
 
 			sb_zhi:'谋攻篇·知',
 			sb_shi:'谋攻篇·识',
