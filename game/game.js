@@ -35330,7 +35330,7 @@
 			}
 
 			let list=getAudioList(skill,player);
-			console.log(skill,lib.skill[skill]&&lib.skill[skill].audio,list);
+			// console.log(skill,lib.skill[skill]&&lib.skill[skill].audio,list);
 			if(!list.length) return;
 			// if(index) index=index%list.length||list.length;
 			// let audio=list[index?index-1:Math.floor(Math.random()*list.length)];
