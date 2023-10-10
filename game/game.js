@@ -14652,8 +14652,8 @@
 						else if(_status.seatNumSettled){
 							var seatNum=player.getSeatNum();
 							if(seatNum!=0){
-								if(typeof _status.lastSeatNum!='number'||seatNum<_status.lastSeatNum) isRound=true;
-								_status.lastSeatNum=seatNum;
+								if(get.itemtype(_status.lastPhasedPlayer)!='player'||seatNum<_status.lastPhasedPlayer.getSeatNum()) isRound=true;
+								_status.lastPhasedPlayer=player;
 							}
 						}
 						else if(player==_status.roundStart) isRound=true;
@@ -14771,7 +14771,7 @@
 					event.trigger('phaseBegin');
 					//阶段部分
 					'step 8'
-					if(player.isIn()&&num<event.phaseList.length){
+					if(num<event.phaseList.length){
 						//规则集中没有的新时机 可以用来插入额外阶段啥的
 						if(player.isIn()) event.trigger('phaseChange')
 					}
