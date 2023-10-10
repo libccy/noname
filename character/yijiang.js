@@ -12802,7 +12802,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return true;//player.countCards('h')>player.maxHp;
+					return player.countCards('h')>player.maxHp;
 				},
 				usable:1,
 				content:function(){
@@ -14508,7 +14508,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olddanshou_info:'当你造成伤害后，你可以摸一张牌。若如此做，终止一切结算，当前回合结束。',
 			xindanshou_info:'①每回合限一次，当你成为基本牌或锦囊牌的目标后，你可以摸X张牌（X为你本回合内成为过基本牌或锦囊牌的目标的次数）。②一名其他角色的结束阶段，若你本回合内没有发动过〖胆守①〗，则你可以弃置X张牌并对其造成1点伤害（X为其手牌数，无牌则不弃）。',
 			yizhong_info:'锁定技，当你的防具栏为空时，黑色的【杀】对你无效',
-			xinzhan_info:'出牌阶段限一次，你可以观看牌堆顶的3张牌，然后展示其中任意数量♥的牌并获得之。',
+			xinzhan_info:'出牌阶段限一次，若你的手牌数大于你的体力上限，你可以观看牌堆顶的三张牌，然后展示其中任意红桃牌并获得之。',
 			huilei_info:'锁定技，当你死亡时，杀死你的角色弃置所有的牌。',
 			enyuan_info:'锁定技。①当其他角色令你回复1点体力后，该角色摸一张牌。②当其他角色对你造成伤害后，其须交给你一张♥手牌，否则失去1点体力。',
 			xuanhuo_info:'出牌阶段限一次，你可以将一张红桃手牌交给一名其他角色，获得该角色的一张牌，然后交给除该角色外的一名其他角色',
