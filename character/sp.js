@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','ol_lvboshe'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','ol_lvboshe','zhangyan'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['ol_wanglang','ol_puyuan','ol_zhouqun'],
 				sp_zhongdan:["cuiyan","huangfusong"],
@@ -33,6 +33,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			zhangyan:['male','qun',4,['olsuji','ollangdao']],
 			ol_tw_zhangji:['male','wei',3,['skill_zhangji_A','skill_zhangji_B'],['unseen']],
 			ol_feiyi:['male','shu',3,['skill_feiyi_A','skill_feiyi_B'],['unseen']],
 			ol_lvboshe:['male','qun',4,['skill_lvboshe'],['unseen']],
@@ -203,6 +204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luzhi:['male','wei',3,['qingzhong','weijing']]
 		},
 		characterIntro:{
+			zhangyan:'张燕，本姓褚，生卒年不详，常山真定（今河北正定南）人，东汉末年黑山军首领。张燕剽捍，敏捷过人，军中称为“飞燕”。官渡之战时投降曹操，被任命为平北将军，封安国亭侯。死后其子张方袭爵。',
 			lushi:'卢氏，五斗米教主张衡妻，张鲁母，擅长驻颜之术，常年令自己保持少女的容颜。常拜访刘焉，与其交好。',
 			lvboshe:'吕伯奢，东汉成皋（今河南荥阳）人，曹操父亲曹嵩的故友。曹操与陈宫在逃离董卓避祸，返回乡里的途中借宿于吕伯奢家，未伤其人，有贼八人欲捉曹操，曹操杀之，明罗贯中在历史小说《三国演义》中将这段历史进行了丑化加工，也成为小说中曹操名言“宁教我负天下人，休教天下人负我”的出处。',
 			caoxi:'曹羲（？－249年），字昭叔。曹真之子，曹爽之弟。为人有学识，明律法。司马懿曾组织朝议改革九品中正制废除九品而留中正，曹羲认为此举并无区别，最终都是决定于人的人治。曹爽掌权后，受封中领军，掌握禁兵，封安乡侯。曹爽及诸兄弟轻视司马懿，恣意妄为，经常外出狩猎，曹羲屡次劝谏，不被采纳。249年，司马懿发动高平陵政变，被夷三族。',
@@ -704,6 +706,283 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//张燕
+			olsuji:{
+				audio:2,
+				trigger:{global:'phaseUseBegin'},
+				filter:function(event,player){
+					if(!event.player.isDamaged()) return false;
+					return _status.connectMode&&player.countCards('hes')||!_status.connectMode&&player.hasCard(card=>{
+						return get.color(card)=='black';
+					},'hes');
+				},
+				direct:true,
+				content:[
+					(event,map)=>{
+						var player=map.player,trigger=map.trigger;
+						var next=player.chooseToUse();
+						next.set('openskilldialog',`###${get.prompt('olsuji')}###将一张黑色牌当【杀】使用。若${get.translation(trigger.player)}受到了此【杀】的伤害，你获得其一张牌。`);
+						next.set('norestore',true);
+						next.set('_backupevent','olsuji_backup');
+						next.set('addCount',false);
+						next.set('logSkill','olsuji');
+						next.set('custom',{
+							add:{},
+							replace:{window:function(){}}
+						});
+						next.backup('olsuji_backup');
+					},
+					(event,map)=>{
+						if(map.result.bool){
+							var player=map.player,trigger=map.trigger;
+							if(trigger.player.isIn()&&trigger.player.hasHistory('damage',evt=>{
+								return evt.card&&evt.card.storage&&evt.card.storage.olsuji;
+							})&&trigger.player.countGainableCards(player,'he')) player.gainPlayerCard(trigger.player,'he',true);
+						}
+					},
+				],
+				subSkill:{
+					backup:{
+						filterCard:function(card){
+							return get.itemtype(card)=='card'&&get.color(card)=='black';
+						},
+						viewAs:{
+							name:'sha',
+							storage:{olsuji:true},
+						},
+						selectCard:1,
+						position:'hes',
+						ai1:function(card){
+							return 5-get.value(card);
+						},
+						precontent:function(){
+							delete event.result.skill;
+						},
+					},
+				},
+			},
+			ollangdao:{
+				audio:2,
+				trigger:{player:'useCardToPlayer'},
+				filter:function(event,player){
+					if(event.card.name!='sha') return false;
+					return event.isFirstTarget&&event.targets.length==1&&player.getStorage('ollangdao').length<3;
+				},
+				logTarget:'target',
+				onremove:true,
+				check:function(event,player){
+					if(get.attitude(player,event.target)>0){
+						if(player.getStorage('ollangdao').includes(1)&&game.hasPlayer(current=>{
+							return player.canUse(event.card,current)&&get.effect(current,event.card,player,player)>0;
+						})) return event.getRand()<0.5;
+						return false;
+					}
+					return event.target.getHp()<=2||player.getDamagedHp()>1||!player.hasCard({color:'black'},'hes');
+				},
+				content:function*(event,map){
+					var player=map.player,trigger=map.trigger,result=map.result;
+					var target=trigger.target;
+					var send=function(card,list){
+						var next=game.createEvent('ollangdao_choose',false);
+						next.setContent(lib.skill.ollangdao.contentx);
+						next.set('card',card);
+						next.set('list',list);
+						game.resume();
+					};
+					var sendback=function(result,player){
+						if(!result) result={};
+						if(typeof result.index!=='number'||result.index<0){
+							result.index=[0,1,2].find(i=>!event.player.getStorage('ollangdao').includes(i));
+						}
+						results.push([player,result]);
+					};
+					var ai_targets=[];
+					var results=[];
+					var players=[player,target];
+					var withme=false,withol=false,withai=false;
+					for(var i=0;i<players.length;i++){
+						if(_status.connectMode) players[i].showTimer();
+						var card=trigger.card,list=player.getStorage('ollangdao');
+						if(players[i].isOnline()){
+							withol=true;
+							players[i].send(send,card,list);
+							players[i].wait(sendback);
+						}
+						else if(players[i]==game.me){
+							withme=true;
+							var next=game.createEvent('ollangdao_choose',false);
+							next.setContent(lib.skill.ollangdao.contentx);
+							next.set('card',card);
+							next.set('list',list);
+							if(_status.connectMode) game.me.wait(sendback);
+						}
+						else{
+							ai_targets.push(players[i]);
+						}
+					}
+					if(ai_targets.length){
+						for(var i=0;i<ai_targets.length;i++){
+							if(players.contains(ai_targets[i])){
+								var target=ai_targets[i];
+								var list=[0,1,2].removeArray(player.getStorage('ollangdao'));
+								var index=list[0];
+								if(get.attitude(target,player)<0){
+									if(!game.hasPlayer(current=>{
+										return !trigger.targets.includes(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)<0;
+									})) list.removeArray([0,2]);
+									if(player.getStorage('ollangdao').includes(2)) list.remove(0);
+								}
+								else{
+									if(!game.hasPlayer(current=>{
+										return !trigger.targets.includes(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)>0;
+									})) list.remove(1);
+									if(!list.includes(1)) list.remove(0);
+								}
+								if(list.length) index=list.randomGet();
+								sendback({index:index},target);
+								ai_targets.splice(i--,1);
+							}
+						}
+						if(ai_targets.length){
+							ai_targets.randomSort();
+							setTimeout(function(){
+								event.interval=setInterval(function(){
+									var target=ai_targets.shift();
+									var list=[0,1,2].removeArray(player.getStorage('ollangdao'));
+									var index=list[0];
+									if(get.attitude(target,player)<0){
+										if(!game.hasPlayer(current=>{
+											return !trigger.targets.includes(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)<0;
+										})) list.removeArray([0,2]);
+										if(player.getStorage('ollangdao').includes(2)) list.remove(0);
+									}
+									else{
+										if(!game.hasPlayer(current=>{
+											return !trigger.targets.includes(current)&&player.canUse(trigger.card,current)&&get.effect(current,trigger.card,player,target)>0;
+										})) list.remove(1);
+										if(!list.includes(1)) list.remove(0);
+									}
+									if(list.length) index=list.randomGet();
+									sendback({index:index},target);
+									if(!ai_targets.length){
+										clearInterval(event.interval);
+										if(withai) game.resume();
+									}
+								},_status.connectMode?750:75);
+							},500);
+						}
+					}
+					if(withme){
+						result=yield next;
+						if(_status.connectMode){
+							game.me.unwait(result,game.me);
+						}
+						else{
+							if(!result) result={};
+							if(typeof result.index!=='number'||result.index<0){
+								result.index=[0,1,2].find(i=>!event.player.getStorage('ollangdao').includes(i));
+							}
+							results.push([player,result]);
+						}
+					}
+					if(withol&&!event.resultOL){
+						game.pause();
+						yield null;
+					}
+					if(ai_targets.length>0){
+						withai=true;
+						game.pause();
+						yield null;
+					}
+					if(_status.connectMode){
+						for(var i of [player,target]) i.hideTimer();
+					}
+					var chosenCount=[0,0,0];
+					results.sort((a,b)=>lib.sort.seat(a[0],b[0]));
+					player.when('useCardAfter')
+						.assign({
+							card:trigger.card
+						})
+						.then(()=>{
+							var card=get.info(event.name).card;
+							var dieEvts=game.getGlobalHistory('everything',evt=>evt.name=='die');
+							if(trigger.card==card&&!game.hasPlayer2(current=>{
+								for(var evt of dieEvts){
+									if(evt.player!=current) continue;
+									var evtx=evt.getParent(2);
+									if(evtx.name!='damage') continue;
+									if(evtx.card&&evtx.card==card) return true;
+								}
+								return false;
+							},true)){
+								var toRemove=card.storage.ollangdao_remove;
+								var list=[0,1,2].filter(i=>(toRemove>>i)&1);
+								if(!list.length) return;
+								player.markAuto('ollangdao',list);
+								game.log(player,'移去了','#g【狼蹈】','的','#y选项'+list.map(i=>{
+									return get.cnNumber(i+1,true);
+								}).join('、'));
+							}
+						});
+					if(!trigger.card.storage) trigger.card.storage={};
+					if(!trigger.card.storage.ollangdao_remove) trigger.card.storage.ollangdao_remove=0;
+					var config=[['伤害+1','fire'],['目标+1','wood'],['不能响应','water']];
+					for(var res of results){
+						var target=res[0],result=res[1];
+						if(!target||!result) continue;
+						var ind=result.index;
+						var conf=config[ind];
+						trigger.card.storage.ollangdao_remove|=1<<ind;
+						target.popup(conf[0],conf[1]);
+						game.log(target,'选择令',trigger.card,`#g${conf[0]}`);
+						chosenCount[ind]++;
+					}
+					game.delay();
+					var extraBaseDamage=chosenCount[0],extraTargetNum=chosenCount[1],directHit=chosenCount[2];
+					trigger.getParent().baseDamage+=extraBaseDamage;
+					if(directHit) trigger.directHit.addArray(game.players);
+					if(extraTargetNum<=0){
+						event.finish();
+						return;
+					}
+					result=yield player.chooseTarget(`狼蹈：为${get.translation(trigger.card)}额外指定至多${get.cnNumber(extraTargetNum)}个目标`,(card,player,target)=>{
+						return !_status.event.targets.includes(target)&&player.canUse(_status.event.card,target);
+					}).set('targets',trigger.targets).set('ai',target=>{
+						var player=_status.event.player;
+						return get.effect(target,_status.event.card,player,player);
+					}).set('card',trigger.card);
+					if(result.bool){
+						if(!event.isMine()&&!event.isOnline()) game.delayex();
+						var targets=result.targets;
+						player.line(targets);
+						trigger.targets.addArray(targets);
+						game.log(targets,'也成为了',trigger.card,'的目标');
+					}
+				},
+				contentx:function(){
+					'step 0'
+					var name=get.translation(card);
+					var choices=[],choiceList=[
+						`令${name}伤害基数+1`,
+						`令${name}可以多选择一个目标`,
+						`令${name}不可被响应`
+					];
+					[0,1,2].forEach((item,index)=>{
+						if(event.list.includes(item)){
+							choiceList[index]=`<span style="text-decoration: line-through; opacity:0.5; ">${choiceList[index]}</span>`
+						}
+						else choices.push(`选项${get.cnNumber(index+1,true)}`);
+					});
+					game.me.chooseControl(choices).set('prompt','狼蹈：请选择一项').set('choiceList',choiceList).set('ai',()=>{
+						return _status.event.controls.randomGet();
+					});
+					'step 1'
+					event.result={index:['选项一','选项二','选项三'].indexOf(result.control)};
+				},
+				intro:{
+					content:(storage,player)=>`已移除选项${storage.map(i=>get.cnNumber(i+1,true)).join('、')}`,
+				},
+			},
 			//张既
 			skill_zhangji_A:{
 				audio:2,
@@ -1225,7 +1504,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var info=lib.skill.olgangshu.getInfo(player);
-					player.chooseControl('攻击范围('+info[0]+')','摸牌数('+info[1]+')','使用【杀】的上限('+info[2]+')','cancel2').set('prompt',get.prompt('olgangshu')).set('prompt2','<div class="text center">令以下一个数值+1（每项至多+5）：<br>1.攻击范围；<br>2.下个摸牌阶段的摸牌数；<br>3.使用【杀】的次数上限。</div>').set('ai',()=>{
+					player.chooseControl('攻击范围('+info[0]+')','摸牌数('+info[1]+')','使用杀的上限('+info[2]+')','cancel2').set('prompt',get.prompt('olgangshu')).set('prompt2','<div class="text center">令以下一个数值+1（每项至多+5）：<br>1.攻击范围；<br>2.下个摸牌阶段的摸牌数；<br>3.使用【杀】的次数上限。</div>').set('ai',()=>{
 						return _status.event.choice;
 					}).set('choice',function(){
 						var info=lib.skill.olgangshu.getInfo(player);
@@ -24456,6 +24735,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.skill_lvboshe) return '农民的回合结束时：阴，你可以令地主进行一个额外回合；<span class="bluetext">阳，你可以令其进行一个额外回合</span>。';
 				return '农民的回合结束时：<span class="bluetext">阴，你可以令地主进行一个额外回合</span>；阳，你可以令其进行一个额外回合。';
 			},
+			ollangdao:function(player){
+				var str='当你使用【杀】指定唯一目标时，你可以与该目标角色同时选择一项：';
+				var list=[
+					'1.令此【杀】伤害基数+1；',
+					'2.令你可以为此【杀】多选择一个目标；',
+					'3.令此【杀】不可被响应。'
+				];
+				var storage=player.getStorage('ollangdao');
+				list.forEach((item,index)=>{
+					if(storage.includes(index)){
+						str+=`<span style="text-decoration: line-through;">${item}</span>`;
+					}
+					else str+=item;
+				})
+				str+='然后若没有角色因此【杀】死亡，你移除本次被选择的项。';
+				return str;
+			},
 		},
 		characterReplace:{
 			shixie:['shixie','dc_shixie'],
@@ -25708,6 +26004,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_lvboshe:'吕伯奢',
 			skill_lvboshe:'技能',
 			skill_lvboshe_info:'农民的回合结束时：阴，你可以令地主进行一个额外回合；阳，你可以令其进行一个额外回合。',
+			zhangyan:'张燕',
+			olsuji:'肃疾',
+			olsuji_info:'一名角色的出牌阶段开始时，若其已受伤，你可以将一张黑色牌当【杀】使用。若其受到此【杀】的伤害，你获得其一张牌。',
+			ollangdao:'狼蹈',
+			ollangdao_info:'当你使用【杀】指定唯一目标时，你可以与该目标角色同时选择一项：1.令此【杀】伤害基数+1；2.令你可以为此【杀】多选择一个目标；3.令此【杀】不可被响应。然后若没有角色因此【杀】死亡，你移除本次被选择的项。',
 			
 
 			sp_tianji:'天极·皇室宗亲',
