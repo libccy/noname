@@ -2270,7 +2270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			nzry_mingren:{
 				audio:"nzry_mingren_1",
-				audioname:['sb_luzhi'],
+				audioname:['sb_yl_luzhi'],
 				marktext:"任",
 				intro:{
 					content:'expansion',
@@ -2284,7 +2284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					1:{
 						audio:2,
-						audioname:['sb_luzhi'],
+						audioname:['sb_yl_luzhi'],
 						trigger:{
 							global:'phaseBefore',
 							player:'enterGame',
