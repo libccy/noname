@@ -3304,14 +3304,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dddduanbing:{
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.canAddJudge('bingliang')&&player.hasCard((card)=>lib.skill['dddduanbing'].filterCard(card,player),'h');
+					return player.canAddJudge('bingliang')&&player.hasCard((card)=>lib.skill['dddduanbing'].filterCard(card,player),'he');
 				},
 				filterCard:function(card,player){
 					if(get.color(card)!='black'||get.type2(card)=='trick') return false;
 					return player.canAddJudge(get.autoViewAs({name:'bingliang'},[card]));
 				},
 				check:function(card){
-					return 6-get.value(card);
+					return 8.2-get.value(card);
 				},
 				discard:false,
 				lose:false,

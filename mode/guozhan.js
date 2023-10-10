@@ -12950,7 +12950,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			_mingzhi1:{
 				trigger:{player:'phaseBeginStart'},
-				priority:19,
+				//priority:19,
+				ruleSkill:true,
 				forced:true,
 				popup:false,
 				filter:function(event,player){
