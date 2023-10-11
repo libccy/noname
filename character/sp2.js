@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_jikang:['male','wei',3,['new_qingxian','dcjuexiang']],
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
-			dc_zhangmancheng:['male','qun',4,['dclvecheng','dczhongji'],['unseen']],
+			dc_zhangmancheng:['male','qun',4,['dclvecheng','dczhongji']],
 			//dc_fuwan:['male','qun',4,['dcmoukui']],
 			guānning:['male','shu',3,['dcxiuwen','dclongsong']],
 			sunhuan:['male','wu',4,['dcniji'],['unseen']],
@@ -608,10 +608,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.addTempSkill('dclvecheng_xiongluan');
 					player.markAuto('dclvecheng_xiongluan',[target]);
+					var cards=player.getCards('h','sha');
+					if(cards.length) player.addGaintag(cards,'dclvecheng_xiongluan');
 				},
 				ai:{
-					threaten:2.1,
-					order:9,
+					threaten:3.1,
+					order:3.5,
 					expose:0.2,
 					result:{
 						target:function(player,target){
@@ -632,7 +634,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						forced:true,
 						popup:false,
-						onremove:true,
+						onremove:function(player,skill){
+							player.removeGaintag('dclvecheng_xiongluan');
+							delete player.storage[skill];
+						},
 						filter:function(event,player){
 							return player.getStorage('dclvecheng_xiongluan').some(i=>i.isIn());
 						},
@@ -673,11 +678,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.goto(1);
 						},
 						intro:{
-							content:'可以对$随意大喊大叫'
+							content:'对$使用“掠城”【杀】无任何次数限制',
 						},
 						mod:{
 							cardUsableTarget:function(card,player,target){
-								if(card.name=='sha'&&player.getStorage('dclvecheng_xiongluan').contains(target)) return true;
+								if(!card.cards||card.cards.length!=1) return;
+								if(card.name=='sha'&&card.cards[0].hasGaintag('dclvecheng_xiongluan')&&player.getStorage('dclvecheng_xiongluan').contains(target)) return true;
 							},
 						}
 					}
@@ -687,6 +693,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCard'},
 				filter:function(event,player){
+					if(player.countCards('h')>=player.maxHp) return false;
 					var suit=get.suit(event.card);
 					return !lib.suit.contains(suit)||!player.countCards('h',{suit:suit});
 				},
@@ -10130,6 +10137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mushun:['mushun','sp_mushun'],
 			wangjun:['dc_wangjun','wangjun'],
 			zoushi:['re_zoushi','jsrg_zoushi'],
+			zhangmancheng:['dc_zhangmancheng','tw_zhangmancheng'],
 		},
 		translate:{
 			lijue:"李傕",
@@ -10635,7 +10643,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclongsong_info:'出牌阶段开始时，你可以将一张红色牌交给一名其他角色。然后其须选择其所有的发动时机包含“出牌阶段”的技能，其于此阶段这些技能失效，你获得这些技能且至多可以发动一次。',
 			dc_zhangmancheng:'张曼成',
 			dclvecheng:'掠城',
-			dclvecheng_info:'出牌阶段限一次。你可以选择一名其他角色，你于本回合对其使用【杀】无次数限制。然后回合结束时，其展示所有手牌，若其中有【杀】，其可以选择对你依次使用其中所有的【杀】。',
+			dclvecheng_info:'出牌阶段限一次。你可以选择一名其他角色，你于本回合对其使用当前手牌中的【杀】无任何次数限制。然后回合结束时，其展示所有手牌，若其中有【杀】，其可以选择对你依次使用其中所有的【杀】。',
 			dczhongji:'螽集',
 			dczhongji_info:'当你使用牌时，若此牌无花色或你手牌区里没有与此牌花色相同的手牌，你可以将手牌摸至体力上限并弃置X张牌（X为本回合发动〖螽集〗的次数）。',
 			dc_mengda:'孟达',
