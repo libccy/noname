@@ -58513,6 +58513,7 @@
 			}
 			return card;
 		},
+		event:key=>key?_status.event[key]:_status.event,
 		player:()=>_status.event.player,
 		players:(sort,dead,out)=>{
 			var players=game.players.slice(0);
