@@ -141,6 +141,80 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"chendao":"陈到，字叔至，生卒年不详，豫州汝南（今河南驻马店平舆县）人。三国时期蜀汉将领，刘备帐下白毦兵统领，名位常亚于赵云，以忠勇著称。蜀汉建兴年间，任征西将军、永安都督，封亭侯。在任期间去世。",
 		},
 		skill:{
+			//庞统写法修改
+			lianhuan:{
+				audio:'lianhuan1',
+				hiddenCard:(player,name)=>{
+					return name=='tiesuo'&&player.hasCard(card=>get.suit(card)=='club','sh');
+				},
+				enable:'chooseToUse',
+				filter:function(event,player){
+					if(!player.hasCard(card=>get.suit(card)=='club','sh')) return false;
+					return (event.type=='phase'||event.filterCard({name:'tiesuo'},player,event));
+				},
+				position:'hs',
+				filterCard:function(card,player,event){
+					if(!event) event=_status.event;
+					if(get.suit(card)!='club') return false;
+					if(event.type=='phase'&&get.position(card)!='s'&&player.canRecast(card)){
+						return true;
+					}
+					else{
+						if(game.checkMod(card,player,'unchanged','cardEnabled2',player)===false) return false;
+						const cardx=get.autoViewAs({name:'tiesuo'},[card]);
+						return event._backup.filterCard(cardx,player,target);
+					}
+				},
+				filterTarget:function(fuck,player,target){
+					const card=ui.selected.cards[0],event=_status.event,backup=event._backup;
+					if(!card||game.checkMod(card,player,'unchanged','cardEnabled2',player)===false) return false;
+					const cardx=get.autoViewAs({name:'tiesuo'},[card]);
+					return (backup.filterCard(cardx,player,event)&&backup.filterTarget(cardx,player,target));
+				},
+				selectTarget:function(){
+					const card=ui.selected.cards[0],event=_status.event,player=event.player,backup=event._backup;
+					let recast=false,use=false;
+					const cardx=get.autoViewAs({name:'tiesuo'},[card]);
+					if(event.type=='phase'&&player.canRecast(card)) recast=true;
+					if(game.checkMod(card,player,'unchanged','cardEnabled2',player)!==false){
+						if(backup.filterCard(cardx,player,event)) use=true;
+					}
+					if(!use) return [0,0];
+					else{
+						const select=backup.selectTarget(cardx,player);
+						if(recast&&select[0]>0) select[0]=0;
+						return select;
+					}
+				},
+				filterOk:function(){
+					const card=ui.selected.cards[0],event=_status.event,player=event.player,backup=event._backup;
+					const selected=ui.selected.targets.length;
+					let recast=false,use=false;
+					const cardx=get.autoViewAs({name:'tiesuo'},[card]);
+					if(event.type=='phase'&&player.canRecast(card)) recast=true;
+					if(game.checkMod(card,player,'unchanged','cardEnabled2',player)!==false){
+						if(backup.filterCard(cardx,player,event)) use=true;
+					}
+					if(recast&&selected==0){
+						return true;
+					}
+					else if(use){
+						const select=backup.selectTarget(cardx,player);
+						if(select[0]<=-1) return true; 
+						return selected>=select[0]&&selected<=select[1];
+					}
+				},
+				discard:false,
+				lose:false,
+				delay:false,
+				precontent:function(){
+					var result=event.result;
+					if(result.targets.length>0) result.card=get.autoViewAs({name:'tiesuo'},result.cards);
+				},
+				content:function(){
+					player.recast(cards);
+				},
+			},
 			//新杀小加强 陈到
 			dcwanglie:{
 				audio:'drlt_wanglie',
@@ -2902,62 +2976,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			ollianhuan:{
-				audio:'xinlianhuan',
-				audioname:['ol_pangtong'],
-				group:['ollianhuan3','ollianhuan5','lianhuan4'],
-			},
-			ollianhuan5:{
-				inherit:'lianhuan2',
-				audioname:['ol_pangtong'],
-				audio:['xinlianhuan',2],
-				position:'he',
-				filter:function(event,player){
-					return player.countCards('he',{suit:'club'})>0;
-				},
-			},
-			ollianhuan3:{
-				audio:['xinlianhuan',1],
-				audioname:['ol_pangtong'],
-				enable:'chooseToUse',
-				filter:function(event,player){
-					return player.countCards('hes',{suit:'club'})>0;
-				},
-				filterCard:{suit:'club'},
-				viewAs:{name:'tiesuo'},
-				prompt:'将一张梅花牌当铁锁连环使用',
-				check:function(card){return 6-get.value(card)},
-				position:'hes',
-			},
-			xinlianhuan:{
-				audio:2,
-				audioname:['ol_pangtong'],
-				group:['lianhuan3','lianhuan5','lianhuan4'],
-			},
-			lianhuan5:{
-				inherit:'lianhuan2',
-				audioname:['ol_pangtong'],
-				audio:['xinlianhuan',2],
-			},
-			lianhuan3:{
-				audio:['xinlianhuan',1],
-				audioname:['ol_pangtong'],
-				enable:'chooseToUse',
-				filter:function(event,player){
-					return player.countCards('hs',{suit:'club'})>0;
-				},
-				filterCard:{suit:'club'},
-				viewAs:{name:'tiesuo'},
-				prompt:'将一张梅花牌当铁锁连环使用',
-				check:function(card){return 6-get.value(card)},
-			},
-			lianhuan4:{
-				mod:{
-					selectTarget:function(card,player,range){
-						if(card.name=='tiesuo'&&range[1]!=-1) range[1]++;
-					},
-				},
-			},
 			reluanji:{
 				audio:2,
 				enable:'phaseUse',
@@ -5451,7 +5469,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			huoji:{
 				audio:2,
-				enable:'phaseUse',
+				enable:'chooseToUse',
 				filterCard:function(card){
 					return get.color(card)=='red';
 				},
@@ -5462,7 +5480,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'hs',
 				prompt:'将一张红色牌当火攻使用',
 				check:function(card){
-					var player=_status.currentPhase;
+					var player=get.player();
 					if(player.countCards('h')>player.hp){
 						return 6-get.value(card);
 					}
@@ -5543,50 +5561,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 8-get.value(card)
 				},
 				threaten:1.2
-			},
-			lianhuan:{
-				audio:'lianhuan1',
-				group:['lianhuan1','lianhuan2']
-			},
-			lianhuan1:{
-				audio:2,
-				audioname:['re_pangtong'],
-				enable:'chooseToUse',
-				filter:function(event,player){
-					return player.countCards('hs',{suit:'club'})>0;
-				},
-				position:'hs',
-				filterCard:function(card){
-					return get.suit(card)=='club';
-				},
-				viewAs:{name:'tiesuo'},
-				prompt:'将一张梅花牌当铁锁连环使用',
-				check:function(card){return 4.5-get.value(card)}
-			},
-			lianhuan2:{
-				audio:2,
-				popup:'lianhuan',
-				enable:'phaseUse',
-				filter:(event,player)=>player.hasCard(card=>lib.skill.lianhuan2.filterCard(card,player),'h'),
-				filterCard:(card,player)=>get.suit(card)=='club'&&player.canRecast(card),
-				check:function(card){
-					return 5-get.useful(card);
-				},
-				content:function(){
-					player.recast(cards);
-				},
-				discard:false,
-				lose:false,
-				delay:false,
-				prompt:'将一张梅花牌置入弃牌堆并摸一张牌',
-				ai:{
-					basic:{
-						order:1
-					},
-					result:{
-						player:1
-					}
-				}
 			},
 			niepan:{
 				audio:2,
@@ -8081,14 +8055,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huoji:'火计',
 			bazhen:'八阵',
 			kanpo:'看破',
-			xinlianhuan:'连环',
-			ollianhuan:'连环',
-			lianhuan:'连环',
-			lianhuan1:'连环',
-			lianhuan3:'连环',
-			lianhuan2:'连铸',
-			lianhuan5:'连铸',
-			ollianhuan3:'连环',
 			niepan:'涅槃',
 			oldniepan:'涅槃',
 			quhu:'驱虎',
@@ -8101,12 +8067,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luanji:'乱击',
 			xueyi:'血裔',
 			mengjin:'猛进',
-			xinlianhuan_info:' 你可以将一张♣手牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标的上限数+1。',
-			ollianhuan_info:' 你可以将一张♣牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标的上限数+1。',
-			huoji_info:'出牌阶段，你可以将你的任意一张红色手牌当作【火攻】使用。',
+			huoji_info:'你可以将一张红色手牌当作【火攻】使用。',
 			bazhen_info:'锁定技，若你的防具栏内没有牌且没有被废除，则你视为装备着【八卦阵】。',
 			kanpo_info:'你可以将你的任意一张黑色手牌当做【无懈可击】使用。',
-			lianhuan_info:'出牌阶段，你可以将一张♣手牌当做【铁索连环】使用或重铸。',
 			niepan_info:'限定技，出牌阶段或当你处于濒死状态时，你可以弃置你区域内的所有牌并复原你的武将牌，然后摸三张牌并将体力回复至3点。',
 			oldniepan_info:'限定技，当你处于濒死状态时，你可以弃置你区域内的所有牌并复原你的武将牌，然后摸三张牌并将体力回复至3点。',
 			quhu_info:'出牌阶段限一次，你可以与一名体力值大于你的角色拼点，若你赢，则该角色对其攻击范围内另一名由你指定的角色造成1点伤害。若你没赢，该角色对你造成一点伤害。',
@@ -8220,6 +8183,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcwanglie_info:"①出牌阶段，你对其他角色使用的前两张牌无距离限制。②当你于出牌阶段内使用牌时，你可以令此牌不能被响应，然后你于本阶段内不能使用牌指定其他角色为目标。",
 			nzry_shicai:"恃才",
 			nzry_shicai_info:"当你使用非装备牌结算结束后，或成为自己使用装备牌的目标后，若此牌与你本回合使用的牌类型均不同，则你可以将此牌置于牌堆顶，然后摸一张牌。",
+			lianhuan:'连环',
+			lianhuan_info:'你可以将♣手牌当作【铁索连环】使用或重铸。',
 			
 			shenhua_feng:'神话再临·风',
 			shenhua_huo:'神话再临·火',

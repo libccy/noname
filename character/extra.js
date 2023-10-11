@@ -2629,12 +2629,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					game.addGlobalSkill('tianzuo_global');
+					var cards=[];
 					for(var i=2;i<10;i++){
-						var card=game.createCard2('qizhengxiangsheng',i%2?'club':'spade',i);
-						ui.cardPile.insertBefore(card,ui.cardPile.childNodes[get.rand(0,ui.cardPile.childNodes.length)]);
+						cards.push(game.createCard2('qizhengxiangsheng',i%2?'club':'spade',i));
 					}
 					game.broadcastAll(function(){lib.inpile.add('qizhengxiangsheng')});
-					game.updateRoundNumber();
+					game.cardsGotoPile(cards,()=>{
+						return ui.cardPile.childNodes[get.rand(0,ui.cardPile.childNodes.length-1)];
+					})
 				},
 				group:'tianzuo_remove',
 				subSkill:{
@@ -5572,7 +5574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:[0,4],
 				line:'fire',
 				check:function (){return -1},
-				selectTarget:function (){
+				selectTarget:function(){
 					if(ui.selected.cards.length==4) return [1,2];
 					if(ui.selected.cards.length==0) return [1,3];
 					game.uncheck('target');
@@ -5580,9 +5582,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				multitarget:true,
 				multiline:true,
-				content:function (){
-					"step 0"
+				contentBefore:function(){
 					player.awakenSkill('yeyan');
+				},
+				content:function(){
+					"step 0"
 					event.num=0;
 					targets.sortBySeat();
 					"step 1"

@@ -386,6 +386,55 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//庞统
+			xinlianhuan:{
+				audio:2,
+				audioname:['ol_pangtong'],
+				inherit:'lianhuan',
+				group:'xinlianhuan_add',
+				subSkill:{
+					add:{
+						audio:'xinlianhuan',
+						audioname:['ol_pangtong'],
+						trigger:{player:'useCard2'},
+						filter:function(event,player){
+							if(event.card.name!='tiesuo') return false;
+							var info=get.info(event.card);
+							if(info.allowMultiple==false) return false;
+							if(event.targets&&!info.multitarget){
+								if(game.hasPlayer(current=>{
+									return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current);
+								})) return true;
+							}
+							return false;
+						},
+						charlotte:true,
+						forced:true,
+						popup:false,
+						content:function(){
+							'step 0'
+							player.chooseTarget(get.prompt('xinlianhuan'),'为'+get.translation(trigger.card)+'额外指定一个目标',(card,player,target)=>{
+								return !_status.event.sourcex.contains(target)&&lib.filter.targetEnabled2(_status.event.card,player,target);
+							}).set('sourcex',trigger.targets).set('ai',function(target){
+								var player=_status.event.player;
+								return get.effect(target,_status.event.card,player,player);
+							}).set('card',trigger.card);
+							'step 1'
+							if(result.bool){
+								if(!event.isMine()&&!event.isOnline()) game.delayex();
+							}
+							else event.finish();
+							'step 2'
+							if(result.bool){
+								var targets=result.targets;
+								player.logSkill('xinlianhuan_add',targets);
+								trigger.targets.addArray(targets);
+								game.log(targets,'也成为了',trigger.card,'的目标');
+							}
+						},
+					},
+				},
+			},
 			//吴班
 			xinjintao:{
 				audio:'jintao',
@@ -15283,6 +15332,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_wuban:'吴班',
 			xinjintao:'进讨',
 			xinjintao_info:'锁定技，你使用【杀】无距离限制且次数上限+1。你于出牌阶段内使用的第一张【杀】不可被响应，第二张【杀】伤害+1。',
+			xinlianhuan:'连环',
+			xinlianhuan_info:'你可以将一张♣手牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标后，可以给此牌增加一个目标。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',

@@ -14745,6 +14745,7 @@
 							player.classList.add('glow_phase');
 						}
 						player.phaseNumber=num;
+						_status.currentPhase=player;
 						if(popup&&lib.config.show_phase_prompt) player.popup('回合开始',null,false);
 					},player,player.phaseNumber,!player.noPhaseDelay);
 					_status.currentPhase=player;

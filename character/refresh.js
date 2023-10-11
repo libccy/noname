@@ -167,6 +167,62 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			ollianhuan:{
+				audio:'xinlianhuan',
+				audioname:['ol_pangtong'],
+				hiddenCard:(player,name)=>{
+					return name=='tiesuo'&&player.hasCard(card=>get.suit(card)=='club','she');
+				},
+				filter:function(event,player){
+					if(!player.hasCard(card=>get.suit(card)=='club','she')) return false;
+					return (event.type=='phase'||event.filterCard({name:'tiesuo'},player,event));
+				},
+				position:'hes',
+				inherit:'lianhuan',
+				group:'ollianhuan_add',
+				subSkill:{
+					add:{
+						audio:'xinlianhuan',
+						audioname:['ol_pangtong'],
+						trigger:{player:'useCard2'},
+						filter:function(event,player){
+							if(event.card.name!='tiesuo') return false;
+							var info=get.info(event.card);
+							if(info.allowMultiple==false) return false;
+							if(event.targets&&!info.multitarget){
+								if(game.hasPlayer(current=>{
+									return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current);
+								})) return true;
+							}
+							return false;
+						},
+						charlotte:true,
+						forced:true,
+						popup:false,
+						content:function(){
+							'step 0'
+							player.chooseTarget(get.prompt('ollianhuan'),'为'+get.translation(trigger.card)+'额外指定一个目标',(card,player,target)=>{
+								return !_status.event.sourcex.contains(target)&&lib.filter.targetEnabled2(_status.event.card,player,target);
+							}).set('sourcex',trigger.targets).set('ai',function(target){
+								var player=_status.event.player;
+								return get.effect(target,_status.event.card,player,player);
+							}).set('card',trigger.card);
+							'step 1'
+							if(result.bool){
+								if(!event.isMine()&&!event.isOnline()) game.delayex();
+							}
+							else event.finish();
+							'step 2'
+							if(result.bool){
+								var targets=result.targets;
+								player.logSkill('ollianhuan_add',targets);
+								trigger.targets.addArray(targets);
+								game.log(targets,'也成为了',trigger.card,'的目标');
+							}
+						},
+					},
+				},
+			},
 			rehuomo:{
 				audio:'huomo',
 				audioname:['huzhao','re_zhongyao'],
@@ -11150,7 +11206,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				prompt:"将一张红色牌当火攻使用",
 				check:function (card){
-					var player=_status.currentPhase;
+					var player=get.player();
 					if(player.countCards('h')>player.hp){
 						return 6-get.value(card);
 					}
@@ -14599,7 +14655,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqiangxi:"强袭",
 			"reqiangxi_info":"出牌阶段对每名其他角色限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张武器牌并对你攻击范围内的一名其他角色造成一点伤害。",
 			rehuoji:"火计",
-			rehuoji_info:"出牌阶段，你可一张红色牌当作【火攻】使用。",
+			rehuoji_info:"你可一张红色牌当作【火攻】使用。",
 			rekanpo:"看破",
 			rekanpo_info:"你可以将一张黑色牌当作【无懈可击】使用。",
 			reshuangxiong:"双雄",
@@ -15322,6 +15378,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhoutai_prefix:'界',
 			caoren:'界曹仁',
 			caoren_prefix:'界',
+			ollianhuan:'连环',
+			ollianhuan_info:'你可以将一张♣牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标后，可以给此牌增加一个目标。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
