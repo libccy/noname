@@ -19926,8 +19926,10 @@
 									game.playAudio(path);
 								}
 							}
-							else if(lib.character[player.name]&&lib.character[player.name][4].contains('die_audio')){
-								game.playAudio('die',player.name);
+							else if(lib.character[player.name]&&lib.character[player.name][4].some(tag=>tag.startsWith('die_audio'))){
+								var tag=lib.character[player.name][4].find(tag=>tag.startsWith('die_audio'));
+								var list=tag.split(':').slice(1);
+								game.playAudio('die',list.length?list[0]:player.name);
 							}
 							else{
 								game.playAudio('die',player.name,function(){
