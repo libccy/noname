@@ -313,6 +313,7 @@ window.noname_character_rank={
 		'dc_sunquan',
 		'yuechen',
 		'sunli',
+		'dc_zhangmancheng',
 		'key_misuzu',
 		'key_sunohara',
 		'key_umi',
