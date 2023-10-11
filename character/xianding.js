@@ -94,8 +94,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
-				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi'],
-				sp2_qifu:['ol_guansuo','dc_zhaoxiang','dc_xujing'],
+				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi','dc_xujing'],
+				sp2_qifu:['ol_guansuo','dc_zhaoxiang'],
 				sp2_gaoshan:['wanglang','liuhui'],
 				sp2_wumiao:['wu_zhugeliang','wu_luxun'],
 			}

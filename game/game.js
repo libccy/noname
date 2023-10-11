@@ -282,6 +282,17 @@
 				if(lineColor.length) lib.lineColor.set(nature,lineColor);
 				lib.nature.set(nature,order);
 				if(background.length>0) lib.natureBg.set(nature,background);
+				if(config.audio){
+					for(let key in config.audio){
+						if(!lib.natureAudio[key]){
+							lib.natureAudio[key] = config.audio[key];
+						}else{
+							for(let key2 in config.audio[key]){
+								lib.natureAudio[key][key2] = config.audio[key][key2];
+							}
+						}
+					}
+				}
 
 				let color1,color2;
 				if (typeof config.color=="string"&&/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(config.color)){
@@ -18002,6 +18013,8 @@
 						cardaudio=false;
 					}
 					if(cardaudio) game.broadcastAll((player,card)=>{
+						game.playCardAudio(card,player);
+						/*
 						if(!lib.config.background_audio||get.type(card)=='equip'&&!lib.config.equip_audio) return;
 						const sex=player.sex=='female'?'female':'male';
 						var nature=get.natureList(card)[0];
@@ -18016,7 +18029,7 @@
 							else if(audio.startsWith('ext:')) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${card.name}_${sex}.${audioInfo[2]||'mp3'}`);
 							else game.playAudio('card',sex,`${audioInfo[0]}.${audioInfo[1]||'mp3'}`);
 						}
-						else game.playAudio('card',sex,card.name);
+						else game.playAudio('card',sex,card.name);*/
 					},player,card);
 					if(event.animate!=false&&event.line!=false){
 						if(card.name=='wuxie'&&event.getParent()._info_map){
@@ -18826,6 +18839,8 @@
 					}
 					else if(!event.nopopup) player.tryCardAnimate(card,card.name,'wood');
 					if(cardaudio&&event.getParent(3).name=='useCard') game.broadcastAll((player,card)=>{
+						game.playCardAudio(card,player);
+						/*
 						if(!lib.config.background_audio) return;
 						const sex=player.sex=='female'?'female':'male',audio=lib.card[card.name].audio;
 						if(typeof audio=='string'){
@@ -18834,7 +18849,7 @@
 							else if(audio.startsWith('ext:')) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${card.name}_${sex}.${audioInfo[2]||'mp3'}`);
 							else game.playAudio('card',sex,`${audioInfo[0]}.${audioInfo[1]||'mp3'}`);
 						}
-						else game.playAudio('card',sex,card.name);
+						else game.playAudio('card',sex,card.name);*/
 					},player,card);
 					if(event.skill){
 						if(player.stat[player.stat.length-1].skill[event.skill]==undefined){
@@ -19572,29 +19587,30 @@
 					event.trigger('damageBegin4');
 					"step 4"
 					//moved changeHujia to changeHp
-					if(['fire','thunder','ice'].contains(event.nature)){
-						if(player.hujia>0&&!player.hasSkillTag('nohujia')&&event.nature!='ice'){
-							game.broadcastAll(function(num){
-								if(lib.config.background_audio) game.playAudio('effect','hujia_damage_'+event.nature+(num>1?'2':''));
-							},num);
+					if(player.hujia>0 && !player.hasSkillTag('nohujia')){
+						var damageAudioInfo = lib.natureAudio.hujia_damage[event.nature];
+						if(!damageAudioInfo || damageAudioInfo == 'normal'){
+							damageAudioInfo = 'effect/hujia_damage'+(num>1?'2':'')+'.mp3';
+						}else if(damageAudioInfo == 'default'){
+							damageAudioInfo = 'effect/hujia_damage_'+event.nature+(num>1?'2':'')+'.mp3';
+						}else{
+							damageAudioInfo = damageAudioInfo[num >1 ?2:1];
 						}
-						else{
-							game.broadcastAll(function(num){
-								if(lib.config.background_audio) game.playAudio('effect','damage_'+event.nature+(num>1?'2':''));
-							},num);
+						game.broadcastAll(function(damageAudioInfo){
+							if(lib.config.background_audio) game.playAudio(damageAudioInfo);
+						},damageAudioInfo);
+					}else{
+						var damageAudioInfo = lib.natureAudio.damage[event.nature];
+						if(!damageAudioInfo || damageAudioInfo == 'normal'){
+							damageAudioInfo = 'effect/damage'+(num>1?'2':'')+'.mp3';
+						}else if(damageAudioInfo == 'default'){
+							damageAudioInfo = 'effect/damage_'+event.nature+(num>1?'2':'')+'.mp3';
+						}else{
+							damageAudioInfo = damageAudioInfo[num >1 ?2:1];
 						}
-					}
-					else{
-						if(player.hujia>0&&!player.hasSkillTag('nohujia')){
-							game.broadcastAll(function(num){
-								if(lib.config.background_audio) game.playAudio('effect','hujia_damage'+(num>1?'2':''));
-							},num);
-						}
-						else{
-							game.broadcastAll(function(num){
-								if(lib.config.background_audio) game.playAudio('effect','damage'+(num>1?'2':''));
-							},num);
-						}
+						game.broadcastAll(function(damageAudioInfo){
+							if(lib.config.background_audio) game.playAudio(damageAudioInfo);
+						},damageAudioInfo);
 					}
 					var str=event.unreal?'视为受到了':'受到了';
 					if(source) str+='来自<span class="bluetext">'+(source==player?'自己':get.translation(source))+'</span>的';
@@ -33966,6 +33982,45 @@
 			['stab',10],
 			['poison',50]
 		]),
+		natureAudio:{
+			damage:{
+				'fire':'default',//默认，即语音放置在audio/effect下，以damage_fire.mp3 damage_fire2.mp3命名。
+				'thunder':'default',
+				'ice':'default',
+				'stab':'normal',//正常，即与普通伤害音效相同。
+				/*
+				'example':{
+					1:'../extension/XXX/damage_example.mp3',//1点伤害。
+					2:'../extension/XXX/damage_example2.mp3',//2点及以上伤害
+				}
+				*/
+			},
+			hujia_damage:{
+				'fire':'default',//默认，即语音放置在audio/effect下，以hujia_damage_fire.mp3 hujia_damage_fire2.mp3命名。
+				'thunder':'default',
+				'ice':'normal',//正常，即与普通伤害音效相同。
+				/*
+				'example':{
+					1:'../extension/XXX/damage_example.mp3',//1点伤害。
+					2:'../extension/XXX/damage_example2.mp3',//2点及以上伤害
+				}
+				*/
+			},
+			sha:{
+				'fire':'default',//默认，即语音放置在audio/card/male与audio/card/female下，命名为sha_fire.mp3
+				'thunder':'default',
+				'ice':'default',
+				'stab':'default',
+				'poison':'normal',//正常，即播放“杀”的音效。
+				'kami':'normal',
+				/*
+				'example':{
+					'male':'../extension/XXXX/sha_example_male.mp3',
+					'female':'../extension/XXXX/sha_example_female.mp3'
+				}
+				*/
+			}
+		},
 		linked:['fire','thunder','kami','ice'],
 		natureBg:new Map([
 			['stab','image/card/cisha.png']
@@ -35283,102 +35338,86 @@
 			});
 			return audio;
 		},
-		trySkillAudio:function(skill,player,directaudio){
-			game.broadcast(game.trySkillAudio,skill,player,directaudio);
+		trySkillAudio:function(skill,player,directaudio,nobroadcast/*,index*/){
+			if(!nobroadcast) game.broadcast(game.trySkillAudio,skill,player,directaudio,nobroadcast/*,index*/);
 			var info=get.info(skill);
 			if(!info) return;
 			if(!lib.config.background_speak) return;
+			if(info.direct&&!directaudio) return;
+			if(lib.skill.global.includes(skill)&&!lib.skill[skill].forceaudio) return;
 			if(typeof player=='string') player={name:player};
-			else{
-				if(info.direct&&!directaudio) return;
-				if(lib.skill.global.includes(skill)&&!lib.skill[skill].forceaudio) return;
+		
+			function getAudioList(skill,player,history,fixedNum){
+				let info=lib.skill[skill];
+				if(!info) return [];
+				if(!history) history=[];
+				if(history.includes(skill)){//直接跳出
+					console.trace(`${skill} in ${history} forms a deadlock`);
+					if(info.audio!==false) return [[skill]];//标记为playSkillAudio
+					return [];
+				}
+				history.push(skill);
+		
+				let audioInfo=info.audio;
+				if(info.audioname2&&player){
+					if(info.audioname2[player.name]) audioInfo=info.audioname2[player.name];
+					else if(info.audioname2[player.name1]) audioInfo=info.audioname2[player.name1];
+					else if(info.audioname2[player.name2]) audioInfo=info.audioname2[player.name2];
+				}
+				if(typeof audioInfo=='function') audioInfo=audioInfo(player);
+				
+				let audioname='';
+				if(Array.isArray(info.audioname)&&player){
+					if(info.audioname.includes(player.name)) audioname=`_${player.name}`;
+					else if(info.audioname.includes(player.name1)) audioname=`_${player.name1}`;
+					else if(info.audioname.includes(player.name2)) audioname=`_${player.name2}`;
+				}
+		
+				let audioList=parseAudio(skill,audioInfo,audioname,player,history,fixedNum);		
+				if(fixedNum&&fixedNum<audioList.length) audioList.length=fixedNum;
+				if(audioList.length) return audioList;//所有要的音频地址
+				if(info.audio!==false) return [[skill]];//标记为playSkillAudio
+				return [];
 			}
-			var audioName=skill;
-			var audioInfo=info.audio;
-			var fixedNum;
-			if(info.audioname2){
-				if(info.audioname2[player.name]){
-					audioName+='_'+player.name;
-					audioInfo=info.audioname2[player.name];
-				}
-				else if(info.audioname2[player.name1]){
-					audioName+='_'+player.name1;
-					audioInfo=info.audioname2[player.name1];
-				}
-				else if(info.audioname2[player.name2]){
-					audioName+='_'+player.name2;
-					audioInfo=info.audioname2[player.name2];
-				}
-			}
-			var history=[];
-			while(true){//可以嵌套引用了
-				if(history.includes(audioName)) break;
-				history.push(audioName);
-				if(typeof audioInfo=='string'&&lib.skill[audioInfo]){
-					audioName=audioInfo;
-					audioInfo=lib.skill[audioName].audio;
-					continue;
-				}
+		
+			function parseAudio(skill,audioInfo,audioname,player,history,fixedNum){
 				if(Array.isArray(audioInfo)){
-					audioName=audioInfo[0];
-					if(!fixedNum) fixedNum=audioInfo[1];//数组会取第一个指定语音数
-					// TODO: 判断不完整，但现在无合适的方法，先放着 @kuangshen04
-					if(audioName in lib.skill) audioInfo=lib.skill[audioName].audio;
-					else audioInfo=parseInt(fixedNum);
-					continue;
+					if(typeof audioInfo[1]=='number'/* ||(typeof audioInfo[1]=='string'&&/^\d*$/.test(audioInfo[1])) */){//['XXX',num]
+						if(lib.skill[audioInfo[0]]) return getAudioList(audioInfo[0],player,history,fixedNum||audioInfo[1]);
+						return parseAudio(audioInfo[0],audioInfo[1],audioname,player,history,fixedNum||audioInfo[1]);
+					}
+					return audioInfo.reduce((total,i)=>total.addArray(parseAudio(skill,i,audioname,player,history,fixedNum)),[]);
 				}
-				break;
-			}
-			if(Array.isArray(info.audioname)&&player){
-				if(info.audioname.includes(player.name)&&(!info.audioname2||!info.audioname2[player.name])) audioName+='_'+player.name;
-				else if(info.audioname.includes(player.name1)&&(!info.audioname2||!info.audioname2[player.name1])) audioName+='_'+player.name1;
-				else if(info.audioname.includes(player.name2)&&(!info.audioname2||!info.audioname2[player.name2])) audioName+='_'+player.name2;
-			}
-			if(typeof audioInfo=='string'){
-				if(audioInfo.startsWith('db:')){
-					audioInfo=audioInfo.split(':');
-					if(audioInfo.length<4) return;
-					if(audioInfo[3]=='true') game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,audioInfo[2],`${audioName}.${audioInfo[4]||'mp3'}`);
+
+				if(!['string','number','boolean'].includes(typeof audioInfo)) return [];
+				if(audioInfo===false) return [];
+				if(typeof audioInfo=='string'&&lib.skill[audioInfo]) return getAudioList(audioInfo,player,history,fixedNum);
+				audioInfo=String(audioInfo);
+		
+				let audioList=[];
+				let list=audioInfo.match(/(?:(.*):|^)(true|\d*)(?::(.*)|$)/);
+				if(list&&list[2]){
+					list=list.slice(1);//形如[路径,number/true,格式]的形式
+					if(list[1]=='true') audioList.add(`${list[0]||'skill'}/${skill}${audioname}.${list[2]||'mp3'}`);
 					else{
-						audioInfo[3]=fixedNum?Math.min(parseInt(audioInfo[3]),fixedNum):parseInt(audioInfo[3]);
-						if(!audioInfo[3]) return;
-						game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,audioInfo[2],`${audioName}${Math.floor(audioInfo[3]*Math.random())+1}.${audioInfo[4]||'mp3'}`);
+						list[1]=parseInt(list[1]);
+						for(let i=1;i<=list[1];i++){
+							audioList.add(`${list[0]||'skill'}/${skill}${audioname}${i}.${list[2]||'mp3'}`);
+						}
 					}
 				}
-				else if(audioInfo.startsWith('ext:')){
-					audioInfo=audioInfo.split(':');
-					if(audioInfo.length<3) return;
-					if(audioInfo[2]=='true') game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}.${audioInfo[3]||'mp3'}`);
-					else{
-						audioInfo[2]=fixedNum?Math.min(parseInt(audioInfo[2]),fixedNum):parseInt(audioInfo[2]);
-						if(!audioInfo[2]) return;
-						game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}${Math.floor(audioInfo[2]*Math.random())+1}.${audioInfo[3]||'mp3'}`);
-					}
-				}
+				else audioList.add(`${/(?:^db:|^ext:|\/)/.test(audioInfo)?'':'skill/'}${audioInfo}`);
+				return audioList;
 			}
-			else if(typeof audioInfo=='number'){
-				if(fixedNum) audioInfo=Math.min(audioInfo, fixedNum);
-				game.playAudio('skill',`${audioName}${Math.floor(audioInfo*Math.random())+1}`);
-			}
-			//直接指定配音文件名的新格式
-			else if(typeof audioInfo=="object"){
-				if(!("type" in audioInfo&&audioInfo.type=="direct"&&"files" in audioInfo)) return;
-				let audioFiles=audioInfo.files;
-				if(typeof audioFiles!="object") return;
-				if(!Array.isArray(audioFiles)){
-					if(!player) return;
-					if(player.name&&player.name in audioFiles&&(!info.audioname2||!info.audioname2[player.name]))audioFiles=audioFiles[player.name];
-					else if(player.name1&&player.name1 in audioFiles&&(!info.audioname2||!info.audioname2[player.name1]))audioFiles=audioFiles[player.name1];
-					else if(player.name2&&player.name2 in audioFiles&&(!info.audioname2||!info.audioname2[player.name2]))audioFiles=audioFiles[player.name2];
-				}
-				if(!Array.isArray(audioFiles)) return;
-				let length=audioFiles.length;
-				if(fixedNum)length=Math.min(length,fixedNum);
-				//game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${audioName}${+1}.${audioInfo[3]||'mp3'}`);
-				game.playAudio(audioFiles[Math.floor(length*Math.random())]);
-			}
-			else if(audioInfo) game.playAudio('skill',audioName);
-			else if(info.audio!==false) game.playSkillAudio(audioName);
+
+			let list=getAudioList(skill,player);
+			// console.log(skill,lib.skill[skill]&&lib.skill[skill].audio,list);
+			if(!list.length) return;
+			// if(index) index=index%list.length||list.length;
+			// let audio=list[index?index-1:Math.floor(Math.random()*list.length)];
+			let audio=list[Math.floor(Math.random()*list.length)];
+			if(Array.isArray(audio)) return game.playSkillAudio(audio[0]);
+			return game.playAudio(audio);
 		},
 		playSkillAudio:function(name,index){
 			if(_status.video&&arguments[1]!='video') return;
@@ -35430,6 +35469,36 @@
 				Promise.resolve(this.play()).catch(()=>void 0);
 			};
 			ui.window.appendChild(audio);
+		},
+		playCardAudio:function(card,sex){
+			if(typeof card === 'string'){
+				card = {name:card};
+			}
+			if(get.itemtype(sex) === 'player'){
+				sex = (sex.sex == 'female'?'female':'male');
+			}else if(typeof sex == 'string'){
+				sex = (sex == 'female'?'female':'male');
+			}
+			if(!lib.config.background_audio||get.type(card)=='equip'&&!lib.config.equip_audio) return;
+			var nature=get.natureList(card)[0];
+			if(lib.natureAudio[card.name]){
+				let useAudio = lib.natureAudio[card.name][nature];
+				if(useAudio === 'default'){
+					game.playAudio('card',sex,`${card.name}_${nature}`);
+					return;
+				}else if(useAudio && useAudio[sex]){
+					game.playAudio(useAudio[sex]);
+					return;
+				}
+			}
+			const audio=lib.card[card.name].audio;
+			if(typeof audio=='string'){
+				const audioInfo=audio.split(':');
+				if(audio.startsWith('db:')) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,audioInfo[2],`${card.name}_${sex}.${audioInfo[3]||'mp3'}`);
+				else if(audio.startsWith('ext:')) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`,`${card.name}_${sex}.${audioInfo[2]||'mp3'}`);
+				else game.playAudio('card',sex,`${audioInfo[0]}.${audioInfo[1]||'mp3'}`);
+			}
+			else game.playAudio('card',sex,card.name);
 		},
 		playBackgroundMusic:()=>{
 			if(lib.config.background_music=='music_off'){
@@ -40832,7 +40901,17 @@
 		checkMod:function(){
 			const argumentArray=Array.from(arguments),name=argumentArray[argumentArray.length-2];
 			let skills=argumentArray[argumentArray.length-1];
-			if(skills.getSkills) skills=skills.getModableSkills(_status.event.useCache === true);
+			if(typeof skills.getModableSkills == 'function'){
+				skills=skills.getModableSkills(_status.event.useCache === true);
+			}else if(typeof skills.getSkills == 'function'){
+				skills=skills.getSkills().concat(lib.skill.global);
+				game.expandSkills(skills);
+				skills = skills.filter(function(skill){
+					var info = get.info(skill);
+					return info && info.mod;
+				});
+				skills.sort((a,b)=>get.priority(a)-get.priority(b));
+			}
 			const arg=argumentArray.slice(0,-2);
 			skills.forEach(value=>{
 				var mod = get.info(value).mod[name];
@@ -59280,7 +59359,7 @@
 			if(node._nointro) return;
 			if(typeof node._customintro=='function'){
 				if(node._customintro(uiintro,evt)===false) return;
-				lib.placePoppedDialog(uiintro,evt);
+				if(evt)lib.placePoppedDialog(uiintro,evt);
 			}
 			else if(Array.isArray(node._customintro)){
 				var caption=node._customintro[0];
