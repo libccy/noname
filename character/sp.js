@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','ol_lvboshe','zhangyan','ol_dingshangwan'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','lvboshe','zhangyan','ol_dingshangwan'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['ol_wanglang','ol_puyuan','ol_zhouqun'],
 				sp_zhongdan:["cuiyan","huangfusong"],
@@ -28,7 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_dongzhao:function(mode){
 				return mode=='identity'&&['normal','zhong'].contains(_status.mode);
 			},
-			ol_lvboshe:function(mode){
+			lvboshe:function(mode){
 				return mode=='doudizhu';
 			},
 		},
@@ -37,7 +37,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangyan:['male','qun',4,['olsuji','ollangdao']],
 			ol_tw_zhangji:['male','wei',3,['skill_zhangji_A','skill_zhangji_B'],['unseen']],
 			ol_feiyi:['male','shu',3,['skill_feiyi_A','skill_feiyi_B'],['unseen']],
-			ol_lvboshe:['male','qun',4,['skill_lvboshe'],['unseen']],
+			lvboshe:['male','qun',4,['skill_lvboshe'],['unseen']],
 			ol_luyusheng:['female','wu',3,['olcangxin','olrunwei']],
 			caoxi:['male','wei',3,['olgangshu','oljianxuan']],
 			ol_pengyang:['male','shu',3,['olqifan','oltuishi','nzry_cunmu']],
@@ -26041,7 +26041,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			skill_feiyi_A_info:'出牌阶段各限一次，若你的手牌数为：①奇数，你可以摸三张牌，然后弃置至少一半手牌（向下取整）；②偶数，你可以弃置至少一半手牌，然后摸三张牌。',
 			skill_feiyi_B:'技能',
 			skill_feiyi_B_info:'每回合每项限一次，当你的手牌数变为1后，你可以展示此唯一手牌A并摸一张牌，然后你选择一项：①本回合使用点数大于A的点数的牌额外结算一次；②本回合使用点数小于A的点数的牌额外结算一次。',
-			ol_lvboshe:'吕伯奢',
+			lvboshe:'吕伯奢',
 			skill_lvboshe:'技能',
 			skill_lvboshe_info:'农民的回合结束时：阴，你可以令地主进行一个额外回合；阳，你可以令其进行一个额外回合。',
 			zhangyan:'张燕',
