@@ -1,12 +1,12 @@
 "use strict";
 {
+	const userAgent=navigator.userAgent.toLowerCase();
 	if(!localStorage.getItem('gplv3_noname_alerted')){
 		if(confirm('①无名杀是一款基于GPLv3协议的开源软件！\n你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。\n点击“确定”即代表您认可并接受GPLv3协议↓️\nhttps://www.gnu.org/licenses/gpl-3.0.html\n②无名杀官方发布地址仅有GitHub仓库！\n其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！')){
 			localStorage.setItem('gplv3_noname_alerted',true);
 		}
 		else{
-			const ua=navigator.userAgent.toLowerCase();
-			const ios=ua.includes('iphone')||ua.includes('ipad')||ua.includes('macintosh');
+			const ios=userAgent.includes('iphone')||userAgent.includes('ipad')||userAgent.includes('macintosh');
 			//electron
 			if(typeof window.process=='object'&&typeof window.require=='function'){
 				const versions=window.process.versions;
@@ -117,6 +117,7 @@
 		mirrorURL:'https://raw.fgit.cf/libccy/noname',
 		hallURL:'47.99.105.222',
 		assetURL:typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized,
+		userAgent:userAgent,
 		compatibleEdition:Boolean(typeof nonameInitialized=='string'&&nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//)),
 		changeLog:[],
 		updates:[],
@@ -8875,7 +8876,7 @@
 				}
 				var noname_inited=localStorage.getItem('noname_inited');
 				if(noname_inited&&noname_inited!=='nodejs'){
-					var ua=navigator.userAgent.toLowerCase();
+					var ua=userAgent;
 					if(ua.includes('android')){
 						lib.device='android';
 					}
@@ -9041,7 +9042,7 @@
 						appearenceConfig.global_font.item.default='默认';
 					}
 
-					var ua=navigator.userAgent.toLowerCase();
+					var ua=userAgent;
 					if('ontouchstart' in document){
 						if(!lib.config.totouched){
 							game.saveConfig('totouched',true);
@@ -37319,7 +37320,7 @@
 			delete _status.waitingToReload;
 		},
 		exit:function(){
-			var ua=navigator.userAgent.toLowerCase();
+			var ua=userAgent;
 			var ios=ua.includes('iphone')||ua.includes('ipad')||ua.includes('macintosh');
 			//electron
 			if(typeof window.process=='object'&&typeof window.require=='function'){
@@ -56857,18 +56858,9 @@
 				}
 				return false;
 			},
-			banWords:str=>{
-				if(get.is.emoji(str)) return true;
-				for(var i of window.bannedKeyWords){
-					if(str.includes(i)) return true;
-				}
-				return false;
-			},
+			banWords:str=>get.is.emoji(str)||window.bannedKeyWords.some(item=>str.includes(item)),
 			converted:event=>!(event.card&&event.card.isCard),
-			safari:()=>{
-				const ua=navigator.userAgent.toLowerCase();
-				return ua.indexOf('safari'!=-1)&&ua.indexOf('chrome')==-1;
-			},
+			safari:()=>userAgent.indexOf('safari'!=-1)&&userAgent.indexOf('chrome')==-1,
 			freePosition:cards=>!cards.some(card=>!card.hasPosition||card.hasPosition()),
 			nomenu:(name,item)=>{
 				var menus=['system','menu'];
@@ -56904,11 +56896,14 @@
 				}
 				return true;
 			},
-			altered:skill=>{
+			altered:lib.filter.none,
+			/*
+			skill=>{
 				return false;
 				// if(_status.connectMode) return true;
 				// return !lib.config.vintageSkills.contains(skill);
 			},
+			*/
 			node:obj=>{
 				var str=Object.prototype.toString.call(obj);
 				if(str&&str.indexOf('[object HTML')) return true;
@@ -56939,10 +56934,7 @@
 			changban:()=>get.mode()=='single'&&_status.mode=='changban',
 			single:()=>get.mode()=='single'&&_status.mode=='normal',
 			mobileMe:player=>(game.layout=='mobile'||game.layout=='long')&&!game.chess&&player.dataset.position==0,
-			newLayout:()=>{
-				if(game.layout!='default') return true;
-				return false;
-			},
+			newLayout:()=>game.layout!='default',
 			phoneLayout:()=>{
 				if(!lib.config.phonelayout) return false;
 				return (game.layout=='mobile'||game.layout=='long'||game.layout=='long2'||game.layout=='nova');
@@ -57243,22 +57235,8 @@
 				return Math.floor(Math.random()*num);
 			}
 		},
-		sort(arr,method){
-			switch(method){
-				case 'seat':{
-					lib.tempSortSeat=arguments[2];
-					arr.sort(lib.sort.seat);
-					delete lib.tempSortSeat;
-					return arr;
-				}
-			}
-		},
-		sortSeat:(arr,target)=>{
-			lib.tempSortSeat=target;
-			arr.sort(lib.sort.seat);
-			delete lib.tempSortSeat;
-			return arr;
-		},
+		sort:(arr,method,arg)=>method=="seat"?arr.sortBySeat(arg):void 0,
+		sortSeat:(arr,target)=>arr.sortBySeat(target),
 		zip:callback=>{
 			if(!window.JSZip){
 				lib.init.js(lib.assetURL+'game','jszip',function(){
@@ -57312,10 +57290,7 @@
 			}
 		},
 		round:(num,f)=>{
-			var round=1;
-			for(var i=0;i<f;i++){
-				round*=10;
-			}
+			var round=10**f;
 			return Math.round(num*round)/round;
 		},
 		playerNumber:()=>{
@@ -57427,7 +57402,7 @@
 				return str;
 			}
 		},
-		copy:(obj)=>{
+		copy:obj=>{
 			if(get.objtype(obj)=='object'){
 				var copy={};
 				for(var i in obj){
@@ -57874,23 +57849,9 @@
 			}
 			return info;
 		},
-		infoTargets:info=>{
-			var targets=[];
-			for(var i=0;i<info.length;i++){
-				targets.push(game.playerMap[info[i]]);
-			}
-			return targets;
-		},
-		cardInfo:card=>{
-			return [card.suit,card.number,card.name,card.nature];
-		},
-		cardsInfo:cards=>{
-			var info=[];
-			for(var i=0;i<cards.length;i++){
-				info.push(get.cardInfo(cards[i]));
-			}
-			return info;
-		},
+		infoTargets:infos=>infos.map(info=>game.playerMap[info]),
+		cardInfo:card=>[card.suit,card.number,card.name,card.nature],
+		cardsInfo:cards=>cards.map(get.cardInfo),
 		infoCard:info=>{
 			var card=ui.create.card();
 			if(info[0]){
@@ -57898,13 +57859,7 @@
 			}
 			return card;
 		},
-		infoCards:info=>{
-			var cards=[];
-			for(var i=0;i<info.length;i++){
-				cards.push(get.infoCard(info[i]));
-			}
-			return cards;
-		},
+		infoCards:infos=>infos.map(get.infoCard),
 		cardInfoOL:card=>'_noname_card:'+JSON.stringify([card.cardid,card.suit,card.number,card.name,card.nature]),
 		infoCardOL:info=>{
 			if(!lib.cardOL) return info;
@@ -57934,39 +57889,12 @@
 			}
 			return card||info;
 		},
-		cardsInfoOL:cards=>{
-			var info=[];
-			for(var i=0;i<cards.length;i++){
-				info.push(get.cardInfoOL(cards[i]));
-			}
-			return info;
-		},
-		infoCardsOL:info=>{
-			var cards=[];
-			for(var i=0;i<info.length;i++){
-				cards.push(get.infoCardOL(info[i]));
-			}
-			return cards;
-		},
+		cardsInfoOL:cards=>cards.map(get.cardInfoOL),
+		infoCardsOL:infos=>infos.map(get.infoCardOL),
 		playerInfoOL:player=>'_noname_player:'+player.playerid,
-		infoPlayerOL:info=>{
-			if(!lib.playerOL) return info
-			return lib.playerOL[info.slice(15)]||info;
-		},
-		playersInfoOL:players=>{
-			var info=[];
-			for(var i=0;i<players.length;i++){
-				info.push(get.playerInfoOL(players[i]));
-			}
-			return info;
-		},
-		infoPlayersOL:info=>{
-			var players=[];
-			for(var i=0;i<info.length;i++){
-				players.push(get.infoPlayerOL(info[i]));
-			}
-			return players;
-		},
+		infoPlayerOL:info=>lib.playerOL?(lib.playerOL[info.slice(15)]||info):info,
+		playersInfoOL:players=>players.map(get.playerInfoOL),
+		infoPlayersOL:infos=>infos.map(get.infoPlayerOL),
 		funcInfoOL:func=>{
 			if(typeof func=='function'){
 				if(func._filter_args){
