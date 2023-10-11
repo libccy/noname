@@ -8236,7 +8236,7 @@
 				lib.ui=ui;
 				lib.ai=ai;
 				lib.game=game;
-				_status.event=new lib.element.Event();
+				_status.event=new lib.element.Event().finish();
 
 				HTMLDivElement.prototype.animate=function(name,time){
 					var that;
@@ -30354,45 +30354,49 @@
 				changeToZero(){
 					this.num=0;
 					this.numFixed=true;
+					return this;
 				}
 				finish(){
 					this.finished=true;
+					return this;
 				}
 				putStepCache(key,value){
 					if(!this._stepCache){
-						this._stepCache = {};
+						this._stepCache={};
 					}
-					this._stepCache[key] = value;
+					this._stepCache[key]=value;
+					return this;
 				}
 				getStepCache(key){
-					if(!this._stepCache)return undefined;
+					if(!this._stepCache) return undefined;
 					return this._stepCache[key];
 				}
 				clearStepCache(key){
-					if(key !==  undefined && key !== null){
+					if(key!==undefined&&key!==null){
 						delete this._stepCache[key];
 					}
 					delete this._stepCache;
+					return this;
 				}
 				callFuncUseStepCache(prefix,func,params){
-					if(typeof func != 'function')return;
-					if(_status.closeStepCache)return func.apply(null,params);
-					var cacheKey = "["+prefix+"]"+get.paramToCacheKey.apply(null,params);
-					var ret = this.getStepCache(cacheKey);
-					if(ret === undefined || ret === null){
-						ret = func.apply(null,params);
+					if(typeof func!='function') return;
+					if(_status.closeStepCache) return func.apply(null,params);
+					var cacheKey="["+prefix+"]"+get.paramToCacheKey.apply(null,params);
+					var ret=this.getStepCache(cacheKey);
+					if(ret===undefined||ret===null){
+						ret=func.apply(null,params);
 						this.putStepCache(cacheKey,ret);
 					}
 					return ret;
 				}
 				putTempCache(key1,key2,value){
 					if(!this._tempCache){
-						this._tempCache = {};
+						this._tempCache={};
 					}
 					if(!this._tempCache[key1]){
-						this._tempCache[key1] = {};
+						this._tempCache[key1]={};
 					}
-					this._tempCache[key1][key2] = value;
+					this._tempCache[key1][key2]=value;
 					return value;
 				}
 				getTempCache(key1,key2){
@@ -30409,7 +30413,9 @@
 					this.finish();
 					if(notrigger!='notrigger'){
 						this.trigger(this.name+'Cancelled');
-						if(this.player&&lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name)}
+						if(this.player&&lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name);
+					}
+					return this;
 				}
 				neutralize(event){
 					this.untrigger();
@@ -30417,18 +30423,22 @@
 					this._neutralized=true;
 					this.trigger('eventNeutralized');
 					this._neutralize_event=event||_status.event;
+					return this;
 				}
 				unneutralize(){
 					this.untrigger();
 					delete this._neutralized;
 					delete this.finished;
 					if(this.type=='card'&&this.card&&this.name=='sha') this.directHit=true;
+					return this;
 				}
 				goto(step){
 					this.step=step-1;
+					return this;
 				}
 				redo(){
 					this.step--;
+					return this;
 				}
 				setHiddenSkill(skill){
 					if(!this.player) return this;
@@ -30500,11 +30510,13 @@
 					get.stringifiedResult(this.parent),get.skillState(this.player));
 					this.player.wait();
 					game.pause();
+					return this;
 				}
 				resume(){
 					delete this._cardChoice;
 					delete this._targetChoice;
 					delete this._skillChoice;
+					return this;
 				}
 				getParent(level,forced){
 					var parent,historys=[];
@@ -30552,21 +30564,18 @@
 					if(!this._rand) this._rand=Math.random();
 					return this._rand;
 				}
-				insert(func,map){
-					var next=game.createEvent(this.name+'Inserted',false,this);
-					next.setContent(func);
-					for(var i in map){
-						next.set(i,map[i]);
-					}
+				insert(content,map){
+					const next=new lib.element.Event(`${this.name}Inserted`,false);
+					this.next.push(next);
+					next.setContent(content);
+					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
 					return next;
 				}
-				insertAfter(func,map){
-					var next=game.createEvent(this.name+'Inserted',false,{next:[]});
+				insertAfter(content,map){
+					const next=new lib.element.Event(`${this.name}Inserted`,false);
 					this.after.push(next);
-					next.setContent(func);
-					for(var i in map){
-						next.set(i,map[i]);
-					}
+					next.setContent(content);
+					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
 					return next;
 				}
 				backup(skill){
@@ -30690,6 +30699,7 @@
 					delete this._cardChoice;
 					delete this._targetChoice;
 					delete this._skillChoice;
+					return this;
 				}
 				restore(){
 					if(this._backup){
@@ -30716,6 +30726,7 @@
 					delete this.skill;
 					delete this.ignoreMod;
 					delete this.filterCard2;
+					return this;
 				}
 				isMine(){
 					return (this.player&&this.player==game.me&&!_status.auto&&!this.player.isMad()&&!game.notMe);
@@ -30732,13 +30743,13 @@
 					return !player||player==evt.player;
 				}
 				addTrigger(skill,player){
-					if(!player||!skill) return;
+					if(!player||!skill) return this;
 					var evt=this;
 					if(typeof skill=='string') skill=[skill];
 					game.expandSkills(skill);
 					while(true){
 						var evt=evt.getParent('arrangeTrigger');
-						if(!evt||evt.name!='arrangeTrigger'||!evt.map) return;
+						if(!evt||evt.name!='arrangeTrigger'||!evt.map) return this;
 						var filter=function(content){
 							if(typeof content=='string') return content==triggername;
 							return content.contains(triggername);
@@ -30752,7 +30763,7 @@
 								if(evt.map[i].player==player){map=evt.map[i];break;}
 							}
 						}
-						if(!map) return;
+						if(!map) return this;
 						var func=function(skillx){
 							var info=lib.skill[skillx];
 							var bool=false;
@@ -30774,6 +30785,43 @@
 							map.list.sort(function(a,b){
 								return b[2]-a[2];
 							});
+						}
+						for(var j=0;j<skill.length;j++){
+							func(skill[j]);
+						}
+					}
+					return this;
+				}
+				removeTrigger(skill,player){
+					if(!player||!skill) return;
+					var evt=this;
+					if(typeof skill=='string') skill=[skill];
+					game.expandSkills(skill);
+					while(true){
+						var evt=evt.getParent('arrangeTrigger');
+						if(!evt||evt.name!='arrangeTrigger'||!evt.map) return;
+						var filter=function(content){
+							if(typeof content=='string') return content==triggername;
+							return content.contains(triggername);
+						};
+						var trigger=evt._trigger;
+						var triggername=evt.triggername;
+						var map=false;
+						if(evt.doing&&evt.doing.player==player) map=evt.doing;
+						else{
+							for(var i=0;i<evt.map.length;i++){
+								if(evt.map[i].player==player){
+									map=evt.map[i];
+									break;
+								}
+							}
+						}
+						if(!map) return;
+						var func=function(skillx){
+							var toremove=map.list.filter(i=>{
+								return i[0]==skillx&&i[1]==player;
+							});
+							if(toremove.length>0) map.list.removeArray(toremove);
 						}
 						for(var j=0;j<skill.length;j++){
 							func(skill[j]);
@@ -30817,8 +30865,8 @@
 					}
 				}
 				trigger(name){
-					if(_status.video) return;
-					if((this.name==='gain'||this.name==='lose')&&!_status.gameDrawed) return;
+					if(_status.video) return this;
+					if((this.name==='gain'||this.name==='lose')&&!_status.gameDrawed) return this;
 					if(name==='gameDrawEnd') _status.gameDrawed=true;
 					if(name==='gameStart'){
 						lib.announce.publish('gameStart',{});
@@ -30831,8 +30879,8 @@
 						_status.gameStarted=true;
 						game.showHistory();
 					}
-					if(!lib.hookmap[name]&&!lib.config.compatiblemode) return;
-					if(!game.players||!game.players.length) return;
+					if(!lib.hookmap[name]&&!lib.config.compatiblemode) return this;
+					if(!game.players||!game.players.length) return this;
 					var event=this;
 					var start=false;
 					var starts=[_status.currentPhase,event.source,event.player,game.me,game.players[0]];
@@ -30841,7 +30889,7 @@
 							start=starts[i];break;
 						}
 					}
-					if(!start) return;
+					if(!start) return this;
 					if(!game.players.contains(start)&&!game.dead.contains(start)){
 						start=game.findNext(start);
 					}
@@ -31010,6 +31058,7 @@
 						//next.starter=start;
 						event._triggering=next;
 					}
+					return this;
 				}
 				untrigger(all,player){
 					if(typeof all=='undefined') all=true;
@@ -31024,15 +31073,14 @@
 						};
 						this._triggered=5;
 					}
-					else{
-						if(player){
-							this._notrigger.add(player);
-							if(!evt||!evt.map) return;
-							for(var i=0;i<evt.map.length;i++){
-								if(evt.map[i].player==player) evt.map[i].list.length=0;
-							}
+					else if(player){
+						this._notrigger.add(player);
+						if(!evt||!evt.map) return this;
+						for(var i=0;i<evt.map.length;i++){
+							if(evt.map[i].player==player) evt.map[i].list.length=0;
 						}
 					}
+					return this;
 				}
 			},
 			Dialog:class extends HTMLDivElement{
@@ -38523,6 +38571,9 @@
 			next._trigger=event;
 			next.setContent('createTrigger');
 		},
+		/**
+		 * @legacy Use `new lib.element.Event(name, trigger)` (and optionally `(triggerEvent || _status.event).next.push(next)`) instead.
+		 */
 		createEvent:(name,trigger,triggerEvent)=>{
 			const next=new lib.element.Event(name,trigger);
 			(triggerEvent||_status.event).next.push(next);
