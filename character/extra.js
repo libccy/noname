@@ -2453,6 +2453,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.needsToDiscard()) return num/3;
 							return 0;
 						}
+					},
+					targetInRange:function(card,player,target){
+						if(target.hasMark('yingba_mark')) return true;
 					}
 				},
 				enable:'phaseUse',
@@ -2468,15 +2471,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				locked:false,
 				//global:'yingba_mark',
-				mod:{
-					targetInRange:function(card,player,target){
-						if(target.hasMark('yingba_mark')) return true;
-					},
-				},
 				ai:{
 					combo:'scfuhai',
 					threaten:3,
-					order:9,
+					order:11,
 					result:{
 						player:function(player,target){
 							if(player.maxHp==1) return -2.5;
@@ -3588,7 +3586,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huoxin2:{
 				trigger:{
 					player:['phaseAfter','dieAfter'],
-					global:'phaseBefore',
+					global:'phaseBeforeStart',
 				},
 				lastDo:true,
 				charlotte:true,
@@ -5414,7 +5412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('dawu'),'令至多'+get.cnNumber(num)+'名角色获得“大雾”标记',
 					[1,num]).set('ai',function(target){
 						if(target.isMin()) return 0;
-						if(target.hasSkill('biantian2')) return 0;
+						if(target.hasSkill('biantian2')||target.hasSkill('dawu2')) return 0;
 						var att=get.attitude(player,target);
 						if(att>=4){
 							if(_status.event.allUse) return att;
@@ -5428,13 +5426,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})*2);
 					"step 1"
 					if(result.bool){
-						player.logSkill('dawu',result.targets,'thunder');
-						var length=result.targets.length;
-						for(var i=0;i<length;i++){
-							result.targets[i].addSkill('dawu2');
-						}
+						var targets=result.targets.sortBySeat();
+						player.logSkill('dawu',targets,'thunder');
+						var length=targets.length;
+						targets.forEach(target=>{
+							target.addAdditionalSkill(`dawu_${player.playerid}`,'dawu2');
+							target.markAuto('dawu2',[player]);
+						});
+						player.addTempSkill('dawu3',{player:'phaseBeginStart'})
 						player.chooseCardButton('选择弃置'+get.cnNumber(length)+'张“星”',length,player.getExpansions('qixing'),true);
-						player.addSkill('dawu3');
 					}
 					else{
 						event.finish();
@@ -5445,46 +5445,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{combo:'qixing'},
 			},
 			dawu2:{
-				trigger:{player:'damageBegin4'},
-				filter:function(event){
-					if(!event.hasNature('thunder')) return true;
-					return false;
-				},
-				mark:true,
-				forced:true,
 				charlotte:true,
-				content:function(){
-					trigger.cancel();
-				},
 				ai:{
 					nofire:true,
 					nodamage:true,
 					effect:{
 						target:function(card,player,target,current){
-							if(get.tag(card,'damage')&&!get.tag(card,'thunderDamage')) return [0,0];
+							if(get.tag(card,'damage')&&!get.tag(card,'thunderDamage')) return 'zeroplayertarget';
 						}
 					},
 				},
 				intro:{
-					markcount:()=>1,
-					content:'共有1个标记',
+					content:function(storage){
+						return `共有${storage.length}枚标记`;
+					},
 				}
 			},
 			dawu3:{
-				trigger:{player:['phaseBegin','dieBegin']},
-				silent:true,
+				trigger:{global:'damageBegin4'},
+				filter:function(event,player){
+					return !event.hasNature('thunder')&&event.player.getStorage('dawu2').includes(player);
+				},
+				forced:true,
 				charlotte:true,
+				logTarget:'player',
 				content:function(){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].hasSkill('dawu2')){
-							game.players[i].removeSkill('dawu2');
+					trigger.cancel();
+				},
+				onremove:function(player){
+					game.countPlayer2(current=>{
+						if(current.getStorage('dawu2').includes(player)){
+							current.unmarkAuto('dawu2',player);
+							current.removeAdditionalSkill(`dawu_${player.playerid}`);
 						}
-						if(game.players[i].hasSkill('kuangfeng2')){
-							game.players[i].removeSkill('kuangfeng2');
-						}
-					}
-					player.removeSkill('dawu3');
-				}
+					},true);
+				},
 			},
 			kuangfeng:{
 				unique:true,
@@ -5501,13 +5496,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool){
-						var length=result.targets.length;
-						for(var i=0;i<length;i++){
-							result.targets[i].addSkill('kuangfeng2');
-						}
-						player.logSkill('kuangfeng',result.targets,'fire');
-						player.chooseCardButton('弃置'+get.cnNumber(length)+'枚星',length,player.getExpansions('qixing'),true);
-						player.addSkill('dawu3');
+						var targets=result.targets.sortBySeat();
+						player.logSkill('kuangfeng',targets,'fire');
+						var length=targets.length;
+						targets.forEach(target=>{
+							target.addAdditionalSkill(`kuangfeng_${player.playerid}`,'kuangfeng2');
+							target.markAuto('kuangfeng2',[player]);
+						});
+						player.addTempSkill('kuangfeng3',{player:'phaseBeginStart'})
+						player.chooseCardButton('选择弃置'+get.cnNumber(length)+'张“星”',length,player.getExpansions('qixing'),true);
 					}
 					else{
 						event.finish();
@@ -5518,27 +5515,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{combo:'qixing'},
 			},
 			kuangfeng2:{
-				trigger:{player:'damageBegin3'},
-				filter:function(event){
-					if(event.hasNature('fire')) return true;
-					return false;
-				},
-				mark:true,
+				charlotte:true,
 				intro:{
-					markcount:()=>1,
-					content:'共有1个标记'
-				},
-				forced:true,
-				content:function(){
-					trigger.num++;
+					content:function(storage){
+						return `共有${storage.length}枚标记`;
+					},
 				},
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
-							if(get.tag(card,'fireDamage')) return 1.5;
+							if(get.tag(card,'fireDamage')&&current<0) return 1.5;
 						}
 					}
 				}
+			},
+			kuangfeng3:{
+				trigger:{global:'damageBegin3'},
+				filter:function(event){
+					return event.hasNature('fire')&&event.player.getStorage('kuangfeng2').includes(player);
+				},
+				charlotte:true,
+				forced:true,
+				logTarget:'player',
+				content:function(){
+					trigger.num++;
+				},
+				onremove:function(player){
+					game.countPlayer2(current=>{
+						if(current.getStorage('kuangfeng2').includes(player)){
+							current.unmarkAuto('kuangfeng2',player);
+							current.removeAdditionalSkill(`kuangfeng_${player.playerid}`);
+						}
+					},true);
+				},
 			},
 			yeyan:{
 				unique:true,

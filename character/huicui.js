@@ -3397,7 +3397,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							var val=0;
 							var bool1=!game.hasPlayer(current=>current.maxHp<target.maxHp),bool2=target.isMinHp(),bool3=target.isMinHandcard();
-							if(bool1) val+=5;
+							if(bool1) val+=6.5;
 							if(bool2){
 								if(bool1) target.maxHp++;
 								val+=Math.max(0,get.recoverEffect(target,player,player));
@@ -3872,7 +3872,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dcqizi:{
 				mod:{
-					playerEnabled:function(card,player,target){
+					cardSavable:function(card,player,target){
 						if(get.distance(player,target)>2&&card.name=='tao'&&target==_status.event.dying) return false;
 					},
 				}
@@ -4997,10 +4997,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				prompt2:'检索一张【无中生有】并置于牌堆顶',
-				check:function(event,player){
-					if(!_status.currentPhase) return false;
-					return get.attitude(player,_status.currentPhase.next)>0;
-				},
 				content:function(){
 					var card=get.cardPile(function(card){
 						return card.name=='wuzhong'&&get.suit(card)!='diamond';
@@ -6402,6 +6398,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								trigger.directHit.push(trigger.target);
 							}
 						},
+						ai:{
+							effect:{
+								player:function(card,player,target){
+									if(player!==target&&get.itemtype(target)==='player'&&(card.name==='sha'||get.type(card,false)==='trick')&&
+										target.countCards('he')&&!target.hasSkillTag('noh')) return [1,0,1,-1];
+								}
+							}
+						}
 					},
 				},
 			},
@@ -7631,9 +7635,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.push(suit);
 						}
 					}
-					if(list.length){
-						player.chooseControl(list,'cancel2').set('dialog',dialog);
-					}
+					if(list.length) player.chooseControl(list,'cancel2').set('dialog',dialog).set('list',list).set('map',map).set('ai',function(){
+						let max=0,res='cancel2';
+						for(let s of _status.event.list){
+							let temp=0;
+							for(let i of _status.event.map[s]){
+								temp+=get.value(i,_status.event.player)+get.sgn(get.attitude(_status.event.player,get.owner(i)))*(6-get.value(i,get.owner(i)));
+							}
+							for(let i in _status.event.map){
+								if(i===s) continue;
+								for(let j of _status.event.map[i]){
+									temp-=get.sgn(get.attitude(_status.event.player,get.owner(j)))*get.value(j,get.owner(j));
+								}
+							}
+							if(temp>max){
+								res=s;
+								max=temp;
+							}
+						}
+						return res;
+					});
 					else event.finish();
 					'step 3'
 					if(result.control!='cancel2'){
@@ -8390,6 +8411,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					effect:{
 						audio:'kuanshi',
+						mark:true,
+						intro:{
+							content:'每回合限一次，当$于一回合内受到第2点伤害后，其回复1点体力。'
+						},
 						trigger:{global:'damageEnd'},
 						forced:true,
 						charlotte:true,
@@ -9359,6 +9384,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dcdanying:{
 				audio:2,
+				mod:{
+					aiOrder:function(player,card,num){
+						if(num<=0 || card.name!=='sha'&&card.name!=='shan' || !player.hasCard(i=>i.hasGaintag('dcmiyun_tag'),'h')) return;
+						return Math.max(0.12,num/25);
+					}
+				},
+				locked:false,
 				enable:['chooseToUse','chooseToRespond'],
 				usable:1,
 				hiddenCard:function(player,name){
@@ -9435,11 +9467,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								target:function(card,player,target){
 									if(_status._dcdanying_aiChecking) return;
 									_status._dcdanying_aiChecking=true;
-									var eff=get.effect(target,{name:'guohe_copy2'},player,player);
+									let eff=get.effect(target,{name:'guohe_copy2'},player,player);
 									delete _status._dcdanying_aiChecking;
-									if(eff>0) eff=-1;
-									else eff=1;
-									return [1,eff];
+									return [1,get.sgn(eff)];
 								}
 							}
 						}
@@ -10068,6 +10098,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_jiaxu:['sp_jiaxu','dc_sp_jiaxu','yj_jiaxu'],
 			qiaorui:['qiaorui','tw_qiaorui'],
 			mamidi:['mamidi','xin_mamidi'],
+			mengyou:['mengyou','ns_mengyou'],
 		},
 		translate:{
 			re_panfeng:'潘凤',

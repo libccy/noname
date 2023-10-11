@@ -187,40 +187,40 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				equipSkill:true,
 				direct:true,
-   	content:function(){
-   		'step 0'
-   		player.chooseTarget(get.prompt2('xuelunyang'),function(card,player,target){
-   			var names=[];
-   			if(target.name&&!target.isUnseen(0)) names.add(target.name);
-   			if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
-   			if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
-   			var pss=player.getSkills();
-   			for(var i=0;i<names.length;i++){
-   				var info=lib.character[names[i]];
-   				if(info){
-   					var skills=info[3];
-   					for(var j=0;j<skills.length;j++){
-   						if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
-   							!lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
-   							return true;
-   						}
-   					}
-   				}
-   				return false;
-   			}
-   		}).set('ai',function(target){
-   			return Math.random();
-   		});
-   		'step 1'
-   		if(result.bool){
-   			event.target=result.targets[0];
-   			player.logSkill('xuelunyang',event.target);
-   		}
-   		else{
-   			event.finish();
-   		}
-   		'step 2'
-   		var names=[];
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('xuelunyang'),function(card,player,target){
+						var names=[];
+						if(target.name&&!target.isUnseen(0)) names.add(target.name);
+						if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
+						if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
+						var pss=player.getSkills();
+						for(var i=0;i<names.length;i++){
+							var info=lib.character[names[i]];
+							if(info){
+								var skills=info[3];
+								for(var j=0;j<skills.length;j++){
+									if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
+										!lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
+										return true;
+									}
+								}
+							}
+							return false;
+						}
+					}).set('ai',function(target){
+						return Math.random();
+					});
+					'step 1'
+					if(result.bool){
+						event.target=result.targets[0];
+						player.logSkill('xuelunyang',event.target);
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					var names=[];
 					var list=[];
 					if(target.name&&!target.isUnseen(0)) names.add(target.name);
 					if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
@@ -240,12 +240,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					player.chooseControl(list).set('prompt','选择获得一个技能').set('choice',get.max(list,get.skillRank,'item')).set('ai',function(){return _status.event.choice})
-   		'step 3'
-   		player.addTempSkill(result.control);
-   		player.popup(result.control);
-   		game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
-   	},
-   },
+					'step 3'
+					player.addTempSkill(result.control);
+					player.popup(result.control);
+					game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
+				},
+			},
 
 			"jiuwei":{
 				trigger:{

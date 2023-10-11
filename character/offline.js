@@ -944,6 +944,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(card.name==='sha'&&!game.hasNature(card)&&target.hasEmptySlot(2)) return 'zeroplayertarget';
+							if(get.subtype(card)=='equip2'&&target.isEmpty(2)) return [0.6,-0.8];
+						}
+					}
 				}
 			},
 			//战役篇蒋钦
@@ -983,9 +991,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				filter:function(event,player){
 					if(get.type(event.card)!='equip') return false;
-					var gz=get.mode()=='guozhan';
-					if(gz&&event.player.isFriendOf(player)) return false;
-					return player.countMark('pkwuku')<(gz?2:3);
+					return player.countMark('pkwuku')<3;
 				},
 				content:function(){
 					player.addMark('pkwuku',1);
@@ -1978,7 +1984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					skip:{
-						trigger:{player:'phaseBefore'},
+						trigger:{player:'phaseBeforeStart'},
 						forced:true,
 						priority:Infinity,
 						popup:false,

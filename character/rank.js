@@ -960,6 +960,8 @@ window.noname_character_rank={
 		'mengyou',
 		're_wenpin',
 		'yue_zhoufei',
+		'ns_mengyou',
+		'zhangyan',
 	],
 	b:[
 		'diy_feishi',
@@ -1969,6 +1971,7 @@ window.noname_character_rank={
 			'clan_zhonghui',
 			'zhoubuyi',
 			'dc_wangjun',
+			'ns_mengyou',
 			'key_kano',
 			'key_haruko',
 			'key_akiko',
