@@ -3872,7 +3872,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dcqizi:{
 				mod:{
-					playerEnabled:function(card,player,target){
+					cardSavable:function(card,player,target){
 						if(get.distance(player,target)>2&&card.name=='tao'&&target==_status.event.dying) return false;
 					},
 				}
