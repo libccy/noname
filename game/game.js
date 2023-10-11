@@ -11135,10 +11135,18 @@
 			},
 			parsex:function(item){
 				//by 诗笺、Tipx-L
+				/**
+				 * @param {Function} func 
+				 */
 				function Legacy(func){
 					//Remove all comments
 					//移除所有注释
 					var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^\/"'\\\s]*)/mg,'$2').trim();
+					//判断代码中是否有debugger
+					var regex=/event\.debugger\(\)/g;
+					var hasDebugger=regex.test(str);
+					var insertDebugger=`yield code=>eval(code);`;
+					str=str.replaceAll(regex,insertDebugger);
 					//获取第一个 { 后的所有字符
 					str=str.slice(str.indexOf('{')+1);
 					//func中要写步骤的话，必须要写step 0
@@ -11162,7 +11170,7 @@
 							copy=copy.slice(0,skip+result.index)+insertStr+copy.slice(skip+result.index+result[0].length);
 							//测试是否有错误
 							try{
-								new Function(copy);
+								new (hasDebugger?GeneratorFunction:Function)(copy);
 								str=copy;
 								skip+=result.index+insertStr.length;
 							}catch(error){
@@ -11172,7 +11180,7 @@
 						}
 						str=`if(event.step==${k}){event.finish();return;}`+str;
 					}
-					return (new Function('event','step','source','player','target','targets',
+					return (new (hasDebugger?GeneratorFunction:Function)('event','step','source','player','target','targets',
 						'card','cards','skill','forced','num','trigger','result',
 						'_status','lib','game','ui','get','ai',str));
 				}
@@ -39051,9 +39059,36 @@
 						else{
 							if(_status.withError||lib.config.compatiblemode||(_status.connectMode&&!lib.config.debug)){
 								try{
-									event.content(event,step,source,player,target,targets,
-										card,cards,skill,forced,num,trigger,result,
-										_status,lib,game,ui,get,ai);
+									if(event.content instanceof GeneratorFunction){
+										if(!event.debugging){
+											if(event.generatorContent) event.generatorContent.return();
+											event.generatorContent=event.content(event,step,source,player,target,targets,
+												card,cards,skill,forced,num,trigger,result,
+												_status,lib,game,ui,get,ai);
+										}else{
+											delete event.debugging;
+										}
+										var next=event.generatorContent.next();
+										if(typeof next.value=='function'&&next.value.toString()=='code=>eval(code)'){
+											//TODO:触发debugger
+											var inputCallback=inputResult=>{
+												if(inputResult===false){
+													event.debugging=true;
+													game.resume2();
+												}else{
+													alert(get.stringify(next.value(inputResult)));
+													game.prompt('','debugger调试',inputCallback);
+												}
+											}
+											game.prompt('','debugger调试',inputCallback);
+											return game.pause2();
+										}
+										if(event.finished) event.generatorContent.return();
+									}else{
+										event.content(event,step,source,player,target,targets,
+											card,cards,skill,forced,num,trigger,result,
+											_status,lib,game,ui,get,ai);
+									}
 								}
 								catch(e){
 									game.print('游戏出错：'+event.name);
@@ -39062,9 +39097,36 @@
 								}
 							}
 							else{
-								event.content(event,step,source,player,target,targets,
-									card,cards,skill,forced,num,trigger,result,
-									_status,lib,game,ui,get,ai);
+								if(event.content instanceof GeneratorFunction){
+									if(!event.debugging){
+										if(event.generatorContent) event.generatorContent.return();
+										event.generatorContent=event.content(event,step,source,player,target,targets,
+											card,cards,skill,forced,num,trigger,result,
+											_status,lib,game,ui,get,ai);
+									}else{
+										delete event.debugging;
+									}
+									var next=event.generatorContent.next();
+									if(typeof next.value=='function'&&next.value.toString()=='code=>eval(code)'){
+										//TODO:触发debugger
+										var inputCallback=inputResult=>{
+											if(inputResult===false){
+												event.debugging=true;
+												game.resume2();
+											}else{
+												alert(get.stringify(next.value(inputResult)));
+												game.prompt('','debugger调试',inputCallback);
+											}
+										}
+										game.prompt('','debugger调试',inputCallback);
+										return game.pause2();
+									}
+									if(event.finished) event.generatorContent.return();
+								}else{
+									event.content(event,step,source,player,target,targets,
+										card,cards,skill,forced,num,trigger,result,
+										_status,lib,game,ui,get,ai);
+								}
 							}
 						}
 						event.clearStepCache();
