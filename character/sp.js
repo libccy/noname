@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','ol_lvboshe','zhangyan'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','ol_lvboshe','zhangyan','ol_dingshangwan'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['ol_wanglang','ol_puyuan','ol_zhouqun'],
 				sp_zhongdan:["cuiyan","huangfusong"],
@@ -33,6 +33,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_dingshangwan:['female','wei',['olfudao','olfengyan']],
 			zhangyan:['male','qun',4,['olsuji','ollangdao']],
 			ol_tw_zhangji:['male','wei',3,['skill_zhangji_A','skill_zhangji_B'],['unseen']],
 			ol_feiyi:['male','shu',3,['skill_feiyi_A','skill_feiyi_B'],['unseen']],
@@ -706,6 +707,101 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//丁尚涴
+			olfudao:{
+				audio:2,
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
+				filter:function(event,player){
+					return event.name!='phase'||game.phaseNumber==0;
+				},
+				forced:true,
+				locked:false,
+				content:function(){
+					'step 0'
+					var list=[],num=player.countCards('he');
+					for(var i=-4;i<=4;i++){
+						if(num+i<0||i==0) continue;
+						list.push(i);
+					}
+					player.chooseControl(list).set('prompt','讽言：请选择一个数字').set('prompt2','令此数值作为调整的手牌数值').set('ai',function(){
+						var list=[],num=_status.event.player.countCards('he');
+						for(var i=-4;i<=4;i++){
+							if(num+i<0||i==0) continue;
+							if(i>0&&i!=4) continue;
+							list.push(i);
+						}
+						return list.randomGet();
+					});
+					'step 1'
+					var num=result.control
+					player.popup(num);
+					if(num>0) player.draw(num);
+					else player.chooseToDiscard('he',true,-num);
+					'step 2'
+					player.storage.olfudao=player.countCards('he');
+					player.markSkill('olfudao');
+				},
+				intro:{
+					content:'一名角色的回合结束时，若其手牌数等于#，你可以与其各摸一张牌。',
+				},
+				group:'olfudao_qiaoshi',
+				subSkill:{
+					qiaoshi:{
+						audio:'olfudao',
+						trigger:{global:'phaseEnd'},
+						filter:function(event,player){
+							if(typeof player.storage.olfudao!='number') return false;
+							return event.player.countCards('h')==player.storage.olfudao&&event.player.isIn();
+						},
+						check:function(event,player){
+							return get.attitude(player,event.player)>=0;
+						},
+						logTarget:'player',
+						prompt2:function(event,player){
+							return '与'+get.translation(event.player)+'各摸一张牌';
+						},
+						content:function(){
+							game.asyncDraw([trigger.player,player]);
+						},
+					},
+				},
+			},
+			olfengyan:{
+				audio:2,
+				trigger:{player:['damageEnd','useCard','respond']},
+				filter:function(event,player){
+					if(event.name=='damage') return event.source&&event.source.isIn()&&event.source!=player;
+					return Array.isArray(event.respondTo)&&event.respondTo[0]!=player;
+				},
+				logTarget:function(event,player){
+					if(event.name=='damage') return event.source;
+					return event.respondTo[0];
+				},
+				forced:true,
+				content:function(){
+					'step 0'
+					var target=lib.skill.olfengyan.logTarget(trigger,player);
+					if(trigger.name=='damage'){
+						event.target=target;
+						player.draw();
+					}
+					else{
+						target.draw();
+						target.chooseToDiscard(2,'he',true);
+						event.finish();
+					}
+					'step 1'
+					var num=player.countCards('he');
+					if(!num) event.finish();
+					else if(num==1) event._result={bool:true,cards:player.getCards('he')};
+					else player.chooseCard('he',true,'交给'+get.translation(target)+'一张牌');
+					'step 2'
+					if(result.bool) target.gain(result.cards,player,'giveAuto');
+				},
+			},
 			//张燕
 			olsuji:{
 				audio:2,
@@ -25953,6 +26049,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olsuji_info:'一名角色的出牌阶段开始时，若其已受伤，你可以将一张黑色牌当【杀】使用。若其受到此【杀】的伤害，你获得其一张牌。',
 			ollangdao:'狼蹈',
 			ollangdao_info:'当你使用【杀】指定唯一目标时，你可以与该目标角色同时选择一项：1.令此【杀】伤害基数+1；2.令你可以为此【杀】多选择一个目标；3.令此【杀】不可被响应。然后若没有角色因此【杀】死亡，你移除本次被选择的项。',
+			ol_dingshangwan:'OL丁尚涴',
+			ol_dingshangwan_prefix:'OL',
+			olfudao:'抚悼',
+			olfudao_info:'①游戏开始时，你选择弃置或摸至多四张牌，然后记录你的手牌数。②一名角色的回合结束时，若其手牌数和你发动〖抚悼①〗记录的数值相同，则你可以与其各摸一张牌。',
+			olfengyan:'讽言',
+			olfengyan_info:'锁定技。①当你受到其他角色造成的伤害后，你摸一张牌，然后交给其一张牌。②当你响应其他角色使用的牌时，其摸一张牌，然后弃置两张牌。',
 			
 
 			sp_tianji:'天极·皇室宗亲',
