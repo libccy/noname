@@ -27,8 +27,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		character:{
 			xin_wuban:['male','shu',4,['xinjintao'],['clan:陈留吴氏','character:wuban']],
-			baoxin:['male','qun',4,['mutao','yimou'],['character:tw_baoxin']],
-			jiangji:['male','wei',3,['twjichou','jilun'],['character:tw_jiangji']],
+			baoxin:['male','qun',4,['mutao','yimou'],['character:tw_baoxin','die_audio:tw_baoxin']],
+			jiangji:['male','wei',3,['twjichou','jilun'],['character:tw_jiangji','die_audio:tw_jiangji']],
 			liwei:['male','shu',4,['jiaohua'],['character:tw_liwei','die:tw_liwei']],
 			laimin:['male','shu',3,['laishou','luanqun']],
 			yj_zhoubuyi:['male','wei',3,['mbhuiyao','mbquesong']],
@@ -1027,7 +1027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var target=game.findPlayer(current=>current.hasSkill('yichong_'+player.playerid));
 					if(!target) return false;
-					if(event.name=='damage') return target.hp>Math.max(1,player.hp);
+					if(event.name=='damage') return target.hp>3;
 					return event.isFirstTarget&&(event.card.name=='sha'||(get.type(event.card)=='trick'&&get.tag(event.card,'damage')));
 				},
 				direct:true,
@@ -15279,7 +15279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yichong:'易宠',
 			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”得到一张牌）。',
 			wufei:'诬诽',
-			wufei_info:'若场上存在拥有“雀”标记的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于1且A的体力值大于你，则你可以令A受到1点无来源伤害。',
+			wufei_info:'若场上存在拥有“雀”标记的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于3，则你可以令A受到1点无来源伤害。',
 			yj_zhoubuyi:'☆周不疑',
 			yj_zhoubuyi_prefix:'☆',
 			mbhuiyao:'慧夭',

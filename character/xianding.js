@@ -12363,6 +12363,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luotong:['dc_luotong','luotong'],
 			dc_wangchang:['dc_wangchang','tw_wangchang'],
 			guozhao:['guozhao','xin_guozhao'],
+			dingshangwan:['dingshangwan','ol_dingshangwan'],
 		},
 		translate:{
 			puyuan:'蒲元',

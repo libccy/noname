@@ -457,9 +457,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backflow:{
 						audio:'sbzaiqi',
 						trigger:{
-							player:'enterGame',
+							//player:'enterGame',
 							source:'damageSource',
-							global:'phaseBefore',
+							//global:'phaseBefore',
 						},
 						usable:1,
 						filter:function(event,player){
@@ -5113,7 +5113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbhuoshou:'祸首',
 			sbhuoshou_info:'锁定技。①【南蛮入侵】对你无效。②当其他角色使用【南蛮入侵】指定第一个目标后，你代替其成为此牌的伤害来源。③出牌阶段开始时，你随机获得弃牌堆中的一张【南蛮入侵】。④出牌阶段，若你于此阶段使用过【南蛮入侵】，你不能使用【南蛮入侵】。',
 			sbzaiqi:'再起',
-			sbzaiqi_info:'蓄力技（3/7）。①弃牌阶段结束时，你可以消耗任意点蓄力值并选择等量名角色，然后令这些角色选择一项：1.令你摸一张牌；2.弃置一张牌，然后你回复1点体力。②每回合限一次。当你造成伤害后，你获得1点蓄力值。',
+			sbzaiqi_info:'蓄力技（0/7）。①弃牌阶段结束时，你可以消耗任意点蓄力值并选择等量名角色，然后令这些角色选择一项：1.令你摸一张牌；2.弃置一张牌，然后你回复1点体力。②每回合限一次。当你造成伤害后，你获得1点蓄力值。',
 			sb_zhanghe:'谋张郃',
 			sbqiaobian:'巧变',
 			sbqiaobian_info:'每回合限一次。①你可以失去1点体力并跳过判定阶段，将判定区的所有牌移动给一名其他角色（无法置入其判定区的牌改为弃置之）。②你可以跳过摸牌阶段，于下个准备阶段摸两张牌并回复1点体力。③你可以将手牌数弃置至六张（若手牌数少于六张则跳过之）并跳过出牌阶段和弃牌阶段，然后移动场上的一张牌。',
