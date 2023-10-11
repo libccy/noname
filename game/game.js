@@ -10520,7 +10520,8 @@
 											game.addSkill(j,lib.extensions[i][4].skill.skill[j],
 											lib.extensions[i][4].skill.translate[j],
 											lib.extensions[i][4].skill.translate[j+'_info'],
-											lib.extensions[i][4].skill.translate[j+'_append']);
+											lib.extensions[i][4].skill.translate[j+'_append'],
+											lib.extensions[i][4].skill.translate[j+'_ab']);
 										}
 									}
 								}
@@ -38140,7 +38141,7 @@
 				}
 			}
 		},
-		addSkill:function(name,info,translate,description,appendInfo){
+		addSkill:function(name,info,translate,description,appendInfo,abInfo){
 			if(lib.skill[name]){
 				return false;
 			}
@@ -38151,6 +38152,7 @@
 			lib.translate[name]=translate;
 			lib.translate[name+'_info']=description;
 			lib.translate[name+'_append']=appendInfo;
+			lib.translate[`${name}_ab`]=abInfo;
 			return true;
 		},
 		addMode:function(name,info,info2){
@@ -56508,7 +56510,7 @@
 			return info&&info.defaultYingbianEffect||null;
 		},
 		//优先度判断
-		priority:function(skill){
+		priority:skill=>{
 			const info=get.info(skill);
 			if(!info) return 0;
 			if(info.hasOwnProperty('_priority')) return info._priority;
@@ -56528,7 +56530,7 @@
 		//新装备栏相关
 		//获取一张装备牌实际占用的装备栏(君曹操六龙)
 		//用法同get.subtype，返回数组
-		subtypes:function(obj,player){
+		subtypes:(obj,player)=>{
 			if(typeof obj=='string') obj={name:obj};
 			if(typeof obj!='object') return;
 			var name=get.name(obj,player);
@@ -56548,7 +56550,7 @@
 			}
 			return pinyinUtilx.getPinyin(chinese,null,withTone,true);
 		},
-		yunmu:function(str){
+		yunmu:str=>{
 			//部分整体认读音节特化处理
 			const util=window.pinyinUtilx;
 			if(util&&lib.pinyins._metadata.zhengtirendu.contains(util.removeTone(str))){
@@ -56578,7 +56580,7 @@
 			return str;
 		},
 		//用于将参数转换为字符串，作为缓存的key。
-		paramToCacheKey:function(){
+		paramToCacheKey(){
 			var str = "";
 			for(var arg of arguments){
 				if(arg === null || arg === undefined){
@@ -56598,7 +56600,7 @@
 			}
 			return str;
 		},
-		yunjiao:function(str){
+		yunjiao:str=>{
 			const util=window.pinyinUtilx;
 			if(util) str=util.removeTone(str)
 			if(lib.pinyins._metadata.zhengtirendu.contains(str)){
@@ -56618,7 +56620,7 @@
 			}
 			return null;
 		},
-		skillCategoriesOf:function(skill,player){
+		skillCategoriesOf:(skill,player)=>{
 			var list=[],info=get.info(skill);
 			if(!info) return list;
 			if(get.is.locked(skill,player)) list.add('锁定技');
@@ -56641,54 +56643,44 @@
 			if(info.categories) list.addArray(info.categories(skill,player));
 			return list;
 		},
-		numOf:function(obj,item){
-			var num=0;
-			for(var i=0;i<obj.length;i++){
-				if(obj[i]==item) num++;
-			}
-			return num;
-		},
-		connectNickname:function(){
-			return typeof lib.config.connect_nickname=='string'?(lib.config.connect_nickname.slice(0,12)):'无名玩家';
-		},
-		zhinangs:function(filter){
+		numOf:(obj,item)=>obj.filter(element=>element==item).length,
+		connectNickname:()=>typeof lib.config.connect_nickname=='string'?(lib.config.connect_nickname.slice(0,12)):"无名玩家",
+		zhinangs:filter=>{
 			var list=(_status.connectMode?lib.configOL:lib.config).zhinang_tricks;
 			if(!list||!list.filter||!list.length) return get.inpile('trick','trick').randomGets(3);
 			if(filter===false) return list.slice(0);
-			list=list.filter(function(i){
-				return lib.inpile.contains(i);
-			});
+			list=list.filter(card=>lib.inpile.includes(card));
 			if(list.length) return list;
 			return get.inpile('trick','trick').randomGets(3);
 		},
-		sourceCharacter:function(str){
+		sourceCharacter:str=>{
 			if(str){
 				for(var i in lib.characterReplace){
-					if(lib.characterReplace[i].contains(str)) return i;
+					if(lib.characterReplace[i].includes(str)) return i;
 				}
 			}
 			return str;
 		},
-		isLuckyStar:function(player){
+		isLuckyStar:player=>{
 			if(player&&player.hasSkillTag('luckyStar')) return true;
 			if(_status.connectMode) return false;
 			return (!player||player==game.me||player.isUnderControl())&&lib.config.lucky_star==true;
 		},
-		infoHp:function(hp){
+		infoHp:hp=>{
 			if(typeof hp=='number') return hp;
 			else if(typeof hp=='string'&&hp.includes('/')){
 				return parseInt(hp.split('/')[0]);
 			}
 			return 0;
 		},
-		infoMaxHp:function(hp){
+		infoMaxHp:hp=>{
 			if(typeof hp=='number') return hp;
 			else if(typeof hp=='string'&&hp.includes('/')){
 				return parseInt(hp.split('/')[1]);
 			}
 			return 0;
 		},
-		infoHujia:function(hp){
+		infoHujia:hp=>{
 			if(typeof hp=='string'&&hp.includes('/')){
 				var splited=hp.split('/');
 				if(splited.length>2) return parseInt(splited[2]);
@@ -56701,7 +56693,7 @@
 			 * @param ...infos 要判断的属性列表 
 			 * @param every {boolean} 是否判断每一个传入的属性是否完全相同而不是存在部分相同
 			 */
-			sameNature:function(){
+			sameNature(){
 				let processedArguments=[],every=false;
 				Array.from(arguments).forEach(argument=>{
 					if(typeof argument=='boolean') every=argument;
@@ -56732,7 +56724,7 @@
 			 * @param ...infos 要判断的属性列表 
 			 * @param every {boolean} 是否判断每一个传入的属性是否完全不同而不是存在部分不同
 			 */
-			differentNature:function(){
+			differentNature(){
 				let processedArguments=[],every=false;
 				Array.from(arguments).forEach(argument=>{
 					if(typeof argument=='boolean') every=argument;
@@ -56771,7 +56763,7 @@
 			//是否是实体牌
 			ordinaryCard:card=>card.isCard&&("cards" in card)&&Array.isArray(card.cards)&&card.cards.length==1,
 			//押韵判断
-			yayun:function(str1,str2){
+			yayun:(str1,str2)=>{
 				if(str1==str2) return true;
 				var pinyin1=get.pinyin(str1,false),pinyin2=get.pinyin(str2,false);
 				if(!pinyin1.length||!pinyin2.length) return false;
@@ -56779,7 +56771,7 @@
 				if(pron1==pron2) return true;
 				return get.yunjiao(pron1)==get.yunjiao(pron2);
 			},
-			blocked:function(skill,player){
+			blocked:(skill,player)=>{
 				if(!player.storage.skill_blocker||!player.storage.skill_blocker.length) return false;
 				for(var i of player.storage.skill_blocker){
 					if(lib.skill[i]&&lib.skill[i].skillBlocker&&lib.skill[i].skillBlocker(skill,player)) return true;
@@ -56819,7 +56811,7 @@
 				return false;
 			},
 			yingbian:card=>get.is.yingbianConditional(card)||get.is.yingbianEffective(card),
-			emoji:function(substring){
+			emoji:substring=>{
 				if(substring){
 					var reg=new RegExp("[~#^$@%&!?%*]",'g');
 					if(substring.match(reg)){
@@ -56865,28 +56857,20 @@
 				}
 				return false;
 			},
-			banWords:function(str){
+			banWords:str=>{
 				if(get.is.emoji(str)) return true;
 				for(var i of window.bannedKeyWords){
 					if(str.includes(i)) return true;
 				}
 				return false;
 			},
-			converted:function(event){
-				return !(event.card&&event.card.isCard);
-			},
-			safari:function(){
-				var ua=navigator.userAgent.toLowerCase();
+			converted:event=>!(event.card&&event.card.isCard),
+			safari:()=>{
+				const ua=navigator.userAgent.toLowerCase();
 				return ua.indexOf('safari'!=-1)&&ua.indexOf('chrome')==-1;
 			},
-			freePosition:function(cards){
-				for(var i=0;i<cards.length;i++){
-					if(!cards[i].hasPosition) return false;
-					if(cards[i].hasPosition()) return false;
-				}
-				return true;
-			},
-			nomenu:function(name,item){
+			freePosition:cards=>!cards.some(card=>!card.hasPosition||card.hasPosition()),
+			nomenu:(name,item)=>{
 				var menus=['system','menu'];
 				var configs={
 					show_round_menu:lib.config.show_round_menu,
@@ -56920,34 +56904,26 @@
 				}
 				return true;
 			},
-			altered:function(skill){
+			altered:skill=>{
 				return false;
 				// if(_status.connectMode) return true;
 				// return !lib.config.vintageSkills.contains(skill);
 			},
-			node:function(obj){
+			node:obj=>{
 				var str=Object.prototype.toString.call(obj);
 				if(str&&str.indexOf('[object HTML')) return true;
 				return false;
 			},
-			div:function(obj){
-				return Object.prototype.toString.call(obj) === '[object HTMLDivElement]';
-			},
-			map:function(obj){
-				return Object.prototype.toString.call(obj) === '[object Map]';
-			},
-			set:function(obj){
-				return Object.prototype.toString.call(obj) === '[object Set]';
-			},
-			object:function(obj){
-				return Object.prototype.toString.call(obj) === '[object Object]';
-			},
-			singleSelect:function(func){
+			div:obj=>Object.prototype.toString.call(obj) === '[object HTMLDivElement]',
+			map:obj=>Object.prototype.toString.call(obj) === '[object Map]',
+			set:obj=>Object.prototype.toString.call(obj) === '[object Set]',
+			object:obj=>Object.prototype.toString.call(obj) === '[object Object]',
+			singleSelect:func=>{
 				if(typeof func=='function') return false;
 				var select=get.select(func);
 				return select[0]==1&&select[1]==1;
 			},
-			jun:function(name){
+			jun:name=>{
 				if(get.mode()=='guozhan'){
 					if(name&&typeof name=='object'){
 						if(name.isUnseen&&name.isUnseen(0)) return false;
@@ -56959,33 +56935,20 @@
 				}
 				return false;
 			},
-			versus:function(){
-				return !_status.connectMode&&get.mode()=='versus'&&_status.mode=='three';
-			},
-			changban:function(){
-				return get.mode()=='single'&&_status.mode=='changban';
-			},
-			single:function(){
-				return get.mode()=='single'&&_status.mode=='normal';
-			},
-			mobileMe:function(player){
-				return (game.layout=='mobile'||game.layout=='long')&&!game.chess&&player.dataset.position==0;
-			},
-			newLayout:function(){
+			versus:()=>!_status.connectMode&&get.mode()=='versus'&&_status.mode=='three',
+			changban:()=>get.mode()=='single'&&_status.mode=='changban',
+			single:()=>get.mode()=='single'&&_status.mode=='normal',
+			mobileMe:player=>(game.layout=='mobile'||game.layout=='long')&&!game.chess&&player.dataset.position==0,
+			newLayout:()=>{
 				if(game.layout!='default') return true;
 				return false;
 			},
-			phoneLayout:function(){
+			phoneLayout:()=>{
 				if(!lib.config.phonelayout) return false;
 				return (game.layout=='mobile'||game.layout=='long'||game.layout=='long2'||game.layout=='nova');
 			},
-			singleHandcard:function(){
-				if(game.singleHandcard||game.layout=='mobile'||game.layout=='long'||game.layout=='long2'||game.layout=='nova'){
-					return true;
-				}
-				return false;
-			},
-			linked2:function(player){
+			singleHandcard:()=>game.singleHandcard||game.layout=='mobile'||game.layout=='long'||game.layout=='long2'||game.layout=='nova',
+			linked2:player=>{
 				if(game.chess) return true;
 				if(lib.config.link_style2!='rotate') return true;
 				// if(game.chess) return false;
@@ -56995,14 +56958,9 @@
 				}
 				return false;
 			},
-			empty:function(obj){
-				for(var i in obj) return false;
-				return true;
-			},
-			pos:function(str){
-				return (str=='h'||str=='e'||str=='j'||str=='he'||str=='hj'||str=='ej'||str=='hej');
-			},
-			locked:function(skill,player){
+			empty:obj=>Object.keys(obj).length==0,
+			pos:str=>str=='h'||str=='e'||str=='j'||str=='he'||str=='hj'||str=='ej'||str=='hej',
+			locked:(skill,player)=>{
 				var info=lib.skill[skill];
 				if(typeof info.locked=='function') return info.locked(skill,player);
 				if(info.locked==false) return false;
@@ -57012,7 +56970,7 @@
 				return false;
 			},
 		},
-		bottomCards:function(num,putBack){
+		bottomCards:(num,putBack)=>{
 			if(_status.waitingForCards){
 				ui.create.cards.apply(ui.create,_status.waitingForCards);
 				delete _status.waitingForCards;
@@ -57043,21 +57001,13 @@
 			if(card) return list[0];
 			return list;
 		},
-		discarded:function(){
-			var list=_status.discarded.slice(0);
-			for(var i=0;i<list.length;i++){
-				if(list[i].parentNode!=ui.discardPile){
-					list.splice(i--,1);
-				}
-			}
-			return list;
-		},
-		cardOffset:function(){
+		discarded:()=>_status.discarded.filter(item=>item.parentNode==ui.discardPile),
+		cardOffset:()=>{
 			var x=ui.arena.getBoundingClientRect();
 			var y=ui.window.getBoundingClientRect();
 			return -y.width/2+(x.left+x.width/2);
 		},
-		colorspan:function(str){
+		colorspan:str=>{
 			if(str[0]=='#'){
 				var color;
 				switch(str[1]){
@@ -57071,7 +57021,7 @@
 			}
 			return str;
 		},
-		evtprompt:function(next,str){
+		evtprompt:(next,str)=>{
 			if(next.prompt){
 				next.set('prompt2',str);
 			}
@@ -57086,7 +57036,7 @@
 				}
 			}
 		},
-		autoViewAs:function(card,cards){
+		autoViewAs:(card,cards)=>{
 			let _card;
 			if(get.itemtype(card)=='card'){
 				_card={
@@ -57178,7 +57128,7 @@
 				return card;
 			}
 		},
-		max:function(list,func,type){
+		max:(list,func,type)=>{
 			list=list.slice(0);
 			if(typeof func=='string'){
 				var key=func;
@@ -57205,7 +57155,7 @@
 				return func(list[0]);
 			}
 		},
-		min:function(list,func,type){
+		min:(list,func,type)=>{
 			list=list.slice(0);
 			if(typeof func=='string'){
 				var key=func;
@@ -57232,7 +57182,7 @@
 				return func(list[0]);
 			}
 		},
-		character:function(name,num){
+		character:(name,num)=>{
 			let info=lib.character[name];
 			if(!info){
 				const pack=Object.keys(lib.characterPack).find(pack=>lib.characterPack[pack].hasOwnProperty(name));
@@ -57246,7 +57196,7 @@
 			}
 			return null;
 		},
-		characterIntro:function(name){
+		characterIntro:name=>{
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
 			var tags=get.character(name,4);
 			if(tags){
@@ -57272,7 +57222,7 @@
 			}
 			return raw?'':info[1]||'';
 		},
-		groupnature:function(group,method){
+		groupnature:(group,method)=>{
 			var nature=lib.groupnature[group];
 			if(!nature) return '';
 			if(method=='raw'){
@@ -57280,12 +57230,12 @@
 			}
 			return nature+'mm';
 		},
-		sgn:function(num){
+		sgn:num=>{
 			if(num>0) return 1;
 			if(num<0) return -1;
 			return 0;
 		},
-		rand:function(num,num2){
+		rand:(num,num2)=>{
 			if(typeof num2=='number'){
 				return num+Math.floor(Math.random()*(num2-num+1));
 			}
@@ -57293,7 +57243,7 @@
 				return Math.floor(Math.random()*num);
 			}
 		},
-		sort:function(arr,method){
+		sort(arr,method){
 			switch(method){
 				case 'seat':{
 					lib.tempSortSeat=arguments[2];
@@ -57303,13 +57253,13 @@
 				}
 			}
 		},
-		sortSeat:function(arr,target){
+		sortSeat:(arr,target)=>{
 			lib.tempSortSeat=target;
 			arr.sort(lib.sort.seat);
 			delete lib.tempSortSeat;
 			return arr;
 		},
-		zip:function(callback){
+		zip:callback=>{
 			if(!window.JSZip){
 				lib.init.js(lib.assetURL+'game','jszip',function(){
 					callback(new JSZip());
@@ -57319,7 +57269,7 @@
 				callback(new JSZip());
 			}
 		},
-		delayx:function(num,max){
+		delayx:(num,max)=>{
 			if(typeof num!='number') num=1;
 			if(typeof max!='number') max=Infinity;
 			switch(lib.config.game_speed){
@@ -57331,7 +57281,7 @@
 				default:return Math.min(max,num);
 			}
 		},
-		prompt:function(skill,target,player){
+		prompt:(skill,target,player)=>{
 			player=player||_status.event.player;
 			if(target){
 				var str=get.translation(target);
@@ -57344,12 +57294,12 @@
 				return '是否发动【'+get.skillTranslation(skill,player)+'】？';
 			}
 		},
-		prompt2:function(skill,target,player){
+		prompt2(skill,target,player){
 			var str=get.prompt.apply(this,arguments);
 			if(!lib.translate[skill+'_info']) return str;
 			return '###'+str+'###'+lib.translate[skill+'_info'];
 		},
-		url:function(master){
+		url:master=>{
 			var url=lib.config.updateURL||lib.updateURL;
 			if(url[url.length-1]!='/'){
 				url+='/';
@@ -57361,14 +57311,14 @@
 				return url+'v'+lib.version+'/';
 			}
 		},
-		round:function(num,f){
+		round:(num,f)=>{
 			var round=1;
 			for(var i=0;i<f;i++){
 				round*=10;
 			}
 			return Math.round(num*round)/round;
 		},
-		playerNumber:function(){
+		playerNumber:()=>{
 			var num;
 			if(_status.brawl&&_status.brawl.playerNumber){
 				num=_status.brawl.playerNumber
@@ -57378,7 +57328,7 @@
 			}
 			return parseInt(num)||2;
 		},
-		benchmark:function(func1,func2,iteration,arg){
+		benchmark:(func1,func2,iteration,arg)=>{
 			var tic,toc;
 			var key1,key2;
 			if(!arg) arg=[];
@@ -57420,7 +57370,7 @@
 			toc=get.utc();
 			console.log('time2: '+(toc-tic));
 		},
-		stringify:function(obj,level){
+		stringify:(obj,level)=>{
 			level=level||0;
 			var indent='';
 			var str;
@@ -57477,7 +57427,7 @@
 				return str;
 			}
 		},
-		copy:function(obj){
+		copy:(obj)=>{
 			if(get.objtype(obj)=='object'){
 				var copy={};
 				for(var i in obj){
@@ -57496,7 +57446,7 @@
 				return obj;
 			}
 		},
-		inpilefull:function(type){
+		inpilefull:(type)=>{
 			var list=[];
 			for(var i in lib.cardPile){
 				for(var j=0;j<lib.cardPile[i].length;j++){
@@ -57513,7 +57463,7 @@
 			}
 			return list;
 		},
-		inpile:function(type,filter){
+		inpile:(type,filter)=>{
 			var list=[];
 			if(filter=='trick'){
 				for(var i=0;i<lib.inpile.length;i++){
@@ -57540,10 +57490,8 @@
 			}
 			return list;
 		},
-		inpile2:function(type){
-			return get.inpile(type,'trick');
-		},
-		typeCard:function(type,filter){
+		inpile2:type=>get.inpile(type,'trick'),
+		typeCard:(type,filter)=>{
 			var list=[];
 			for(var i in lib.card){
 				if(lib.card[i].mode&&lib.card[i].mode.contains(get.mode())==false) continue;
@@ -57563,7 +57511,7 @@
 			}
 			return list;
 		},
-		libCard:function(filter){
+		libCard:filter=>{
 			var list=[];
 			for(var i in lib.card){
 				if(lib.card[i].mode&&lib.card[i].mode.contains(get.mode())==false) continue;
@@ -57577,7 +57525,7 @@
 			}
 			return list;
 		},
-		ip:function(){
+		ip:()=>{
 			if(!require) return '';
 			var interfaces = require('os').networkInterfaces();
 			for(var devName in interfaces){
@@ -57590,7 +57538,7 @@
 				}
 			}
 		},
-		modetrans:function(config,server){
+		modetrans:(config,server)=>{
 			if(config.mode=='doudizhu'){
 				switch(config.doudizhu_mode){
 					case 'kaihei':return '开黑斗地主';
@@ -57638,7 +57586,7 @@
 				}
 			}
 		},
-		charactersOL:function(func){
+		charactersOL:func=>{
 			var list=[];
 			var libCharacter={};
 			for(var i=0;i<lib.configOL.characterPack.length;i++){
@@ -57655,7 +57603,7 @@
 			}
 			return list;
 		},
-		trimip:function(str){
+		trimip:str=>{
 			var len=str.length-5;
 			if(str.lastIndexOf(':8080')==len){
 				str=str.slice(0,len);
@@ -57663,15 +57611,8 @@
 			return str;
 		},
 		mode:()=>lib[_status.connectMode?'configOL':'config'].mode,
-		idDialog:function(id){
-			for(var i=0;i<ui.dialogs.length;i++){
-				if(ui.dialogs[i].videoId==id){
-					return ui.dialogs[i];
-				}
-			}
-			return null;
-		},
-		arenaState:function(){
+		idDialog:id=>ui.dialogs.find(dialog=>dialog.videoId==id)||null,
+		arenaState:()=>{
 			var state={
 				number:ui.arena.dataset.number,
 				players:{},
@@ -57689,7 +57630,7 @@
 			}
 			return state;
 		},
-		skillState:function(player){
+		skillState:player=>{
 			var skills={
 				global:lib.skill.global
 			};
@@ -57716,10 +57657,8 @@
 			}
 			return skills;
 		},
-		id:function(){
-			return (Math.floor(1000000+9000000*Math.random())).toString()+(10+lib.status.globalId++);
-		},
-		zhu:function(player,skill,group){
+		id:()=>(Math.floor(1000000+9000000*Math.random())).toString()+(10+lib.status.globalId++),
+		zhu:(player,skill,group)=>{
 			if(typeof player=='string'){
 				skill=player;
 				player=null;
@@ -57764,12 +57703,12 @@
 			}
 			return null;
 		},
-		config:function(item,mode){
+		config:(item,mode)=>{
 			mode=mode||lib.config.mode;
 			if(!lib.config.mode_config[mode]) return;
 			return lib.config.mode_config[mode][item];
 		},
-		coinCoeff:function(list){
+		coinCoeff:list=>{
 			var num=0;
 			for(var i=0;i<list.length;i++){
 				var rank=get.rank(list[i]);
@@ -57788,7 +57727,7 @@
 			}
 			return num/list.length;
 		},
-		rank:function(name,num){
+		rank:(name,num)=>{
 			if(typeof name=='object'&&name.name){
 				name=name.name;
 			}
@@ -57834,7 +57773,7 @@
 			}
 			return num?Math.round(9*(num-1)/8+1):'x';
 		},
-		skillRank:function(skill,type,grouped){
+		skillRank:(skill,type,grouped)=>{
 			var info=lib.skill[skill];
 			var player=_status.event.skillRankPlayer||_status.event.player;
 			if(!info) return 0;
@@ -57928,48 +57867,46 @@
 			}
 			return num;
 		},
-		targetsInfo:function(targets){
+		targetsInfo:targets=>{
 			var info=[];
 			for(var i=0;i<targets.length;i++){
 				info.push(targets[i].dataset.position);
 			}
 			return info;
 		},
-		infoTargets:function(info){
+		infoTargets:info=>{
 			var targets=[];
 			for(var i=0;i<info.length;i++){
 				targets.push(game.playerMap[info[i]]);
 			}
 			return targets;
 		},
-		cardInfo:function(card){
+		cardInfo:card=>{
 			return [card.suit,card.number,card.name,card.nature];
 		},
-		cardsInfo:function(cards){
+		cardsInfo:cards=>{
 			var info=[];
 			for(var i=0;i<cards.length;i++){
 				info.push(get.cardInfo(cards[i]));
 			}
 			return info;
 		},
-		infoCard:function(info){
+		infoCard:info=>{
 			var card=ui.create.card();
 			if(info[0]){
 				card.init(info);
 			}
 			return card;
 		},
-		infoCards:function(info){
+		infoCards:info=>{
 			var cards=[];
 			for(var i=0;i<info.length;i++){
 				cards.push(get.infoCard(info[i]));
 			}
 			return cards;
 		},
-		cardInfoOL:function(card){
-			return '_noname_card:'+JSON.stringify([card.cardid,card.suit,card.number,card.name,card.nature]);
-		},
-		infoCardOL:function(info){
+		cardInfoOL:card=>'_noname_card:'+JSON.stringify([card.cardid,card.suit,card.number,card.name,card.nature]),
+		infoCardOL:info=>{
 			if(!lib.cardOL) return info;
 			var card;
 			try{
@@ -57997,42 +57934,40 @@
 			}
 			return card||info;
 		},
-		cardsInfoOL:function(cards){
+		cardsInfoOL:cards=>{
 			var info=[];
 			for(var i=0;i<cards.length;i++){
 				info.push(get.cardInfoOL(cards[i]));
 			}
 			return info;
 		},
-		infoCardsOL:function(info){
+		infoCardsOL:info=>{
 			var cards=[];
 			for(var i=0;i<info.length;i++){
 				cards.push(get.infoCardOL(info[i]));
 			}
 			return cards;
 		},
-		playerInfoOL:function(player){
-			return '_noname_player:'+player.playerid;
-		},
-		infoPlayerOL:function(info){
+		playerInfoOL:player=>'_noname_player:'+player.playerid,
+		infoPlayerOL:info=>{
 			if(!lib.playerOL) return info
 			return lib.playerOL[info.slice(15)]||info;
 		},
-		playersInfoOL:function(players){
+		playersInfoOL:players=>{
 			var info=[];
 			for(var i=0;i<players.length;i++){
 				info.push(get.playerInfoOL(players[i]));
 			}
 			return info;
 		},
-		infoPlayersOL:function(info){
+		infoPlayersOL:info=>{
 			var players=[];
 			for(var i=0;i<info.length;i++){
 				players.push(get.infoPlayerOL(info[i]));
 			}
 			return players;
 		},
-		funcInfoOL:function(func){
+		funcInfoOL:func=>{
 			if(typeof func=='function'){
 				if(func._filter_args){
 					return '_noname_func:'+JSON.stringify(get.stringifiedResult(func._filter_args,3));
@@ -58041,7 +57976,7 @@
 			}
 			return '';
 		},
-		infoFuncOL:function(info){
+		infoFuncOL:info=>{
 			var func;
 			try{
 				eval('func=('+info.slice(13)+');');
@@ -58054,7 +57989,7 @@
 			}
 			return func;
 		},
-		eventInfoOL:function(item,level,nomore){
+		eventInfoOL:(item,level,nomore)=>{
 			if(Object.prototype.toString.call(item)=='[object Object]'){
 				var item2={};
 				for(var i in item){
@@ -58071,7 +58006,7 @@
 				return '';
 			}
 		},
-		infoEventOL:function(item){
+		infoEventOL:item=>{
 			var evt;
 			try{
 				evt=JSON.parse(item.slice(14));
@@ -58085,7 +58020,7 @@
 			}
 			return evt||item;
 		},
-		stringifiedResult:function(item,level,nomore){
+		stringifiedResult:(item,level,nomore)=>{
 			if(!item) return item;
 			if(typeof item=='function'){
 				return get.funcInfoOL(item);
@@ -58135,7 +58070,7 @@
 				return item;
 			}
 		},
-		parsedResult:function(item){
+		parsedResult:item=>{
 			if(!item) return item;
 			if(typeof item=='string'){
 				if(item.startsWith('_noname_func:')){
@@ -58175,11 +58110,11 @@
 				return item;
 			}
 		},
-		verticalStr:function(str,sp){
+		verticalStr:(str,sp)=>{
 			if(typeof str!='string') return '';
 			return Array.from(str).filter(value=>value!='`').join('');
 		},
-		numStr:function(num,method){
+		numStr:(num,method)=>{
 			if(num==Infinity){
 				if(method=='card') return get.selectableCards().length+ui.selected.cards.length;
 				if(method=='target') return get.selectableTargets().length+ui.selected.targets.length;
@@ -58187,7 +58122,7 @@
 			}
 			return num.toString();
 		},
-		rawName:function(str){
+		rawName:str=>{
 			let str2=lib.translate[str];
 			if(lib.translate[str+'_ab']) str2=lib.translate[str+'_ab'];
 			if(!str2) return '';
@@ -58197,7 +58132,7 @@
 			return str2;
 		},
 		//作用修改：只读前缀 不读_ab
-		rawName2:function(str){
+		rawName2:str=>{
 			let str2=lib.translate[str];
 			if(!str2) return '';
 			if(lib.translate[str+'_prefix']&&str2.startsWith(lib.translate[str+'_prefix'])){
@@ -58234,10 +58169,8 @@
 			if(config=='simple') return `<span>${prefix}</span>`
 			return `<span style="color: ${color};"${nature?(`data-nature="${nature}"`):''}>${prefix}</span>`
 		},
-		slimName:function(str){
-			return get.verticalStr(get.slimNameHorizontal(str),true);
-		},
-		time:function(){
+		slimName:str=>get.verticalStr(get.slimNameHorizontal(str),true),
+		time:()=>{
 			if(lib.status.dateDelaying){
 				return lib.getUTC(lib.status.dateDelaying)-lib.getUTC(lib.status.date)-lib.status.dateDelayed;
 			}
@@ -58245,18 +58178,14 @@
 				return lib.getUTC(new Date())-lib.getUTC(lib.status.date)-lib.status.dateDelayed;
 			}
 		},
-		utc:function(){
-			return (new Date()).getTime();
-		},
-		evtDistance:function(e1,e2){
+		utc:()=>(new Date()).getTime(),
+		evtDistance:(e1,e2)=>{
 			var dx=(e1.clientX-e2.clientX)/game.documentZoom;
 			var dy=(e1.clientY-e2.clientY)/game.documentZoom;
 			return Math.sqrt(dx*dx+dy*dy);
 		},
-		xyDistance:function(from,to){
-			return Math.sqrt((from[0]-to[0])*(from[0]-to[0])+(from[1]-to[1])*(from[1]-to[1]));
-		},
-		itemtype:function(obj){
+		xyDistance:(from,to)=>Math.sqrt((from[0]-to[0])*(from[0]-to[0])+(from[1]-to[1])*(from[1]-to[1])),
+		itemtype:obj=>{
 			var i,j;
 			if(typeof obj=='string'){
 				if(obj.length<=5){
@@ -58308,13 +58237,13 @@
 				if(obj.isMine==lib.element.event.isMine) return 'event';
 			}
 		},
-		equipNum:function(card){
+		equipNum:card=>{
 			if(get.type(card)=='equip'){
 				return parseInt(get.subtype(card)[5]);
 			}
 			return 0;
 		},
-		objtype:function(obj){
+		objtype:obj=>{
 			if(Object.prototype.toString.call(obj) === '[object Array]') return 'array';
 			if(Object.prototype.toString.call(obj) === '[object Object]') return 'object';
 			if(Object.prototype.toString.call(obj) === '[object HTMLDivElement]') return 'div';
@@ -58323,7 +58252,7 @@
 			if(Object.prototype.toString.call(obj) === '[object HTMLTableCellElement]') return 'td';
 			if(Object.prototype.toString.call(obj) === '[object HTMLBodyElement]') return 'td';
 		},
-		type:function(obj,method,player){
+		type:(obj,method,player)=>{
 			if(typeof obj=='string') obj={name:obj};
 			if(typeof obj!='object') return;
 			var name=get.name(obj,player);
@@ -58331,22 +58260,20 @@
 			if(method=='trick'&&lib.card[name].type=='delay') return 'trick';
 			return lib.card[name].type;
 		},
-		type2:function(card,player){
-			return get.type(card,'trick',player);
-		},
-		subtype:function(obj,player){
+		type2:(card,player)=>get.type(card,'trick',player),
+		subtype:(obj,player)=>{
 			if(typeof obj=='string') obj={name:obj};
 			if(typeof obj!='object') return;
 			var name=get.name(obj,player);
 			if(!lib.card[name]) return;
 			return lib.card[name].subtype;
 		},
-		equiptype:function(card,player){
+		equiptype:(card,player)=>{
 			var subtype=get.subtype(card,player);
 			if(subtype.startsWith('equip')) return parseInt(subtype[5]);
 			return 0;
 		},
-		name:function(card,player){
+		name:(card,player)=>{
 			if(get.itemtype(player)=='player'||(player!==false&&get.position(card)=='h')){
 				var owner=player||get.owner(card);
 				if(owner){
@@ -58355,7 +58282,7 @@
 			}
 			return card.name;
 		},
-		suit:function(card,player){
+		suit:(card,player)=>{
 			if(!card) return;
 			if(Array.isArray(card)){
 				if(card.length==1) return get.suit(card[0],player);
@@ -58368,14 +58295,14 @@
 				if(player!==false){
 					const owner=player||get.owner(card);
 					if(owner){
-						return game.checkMod(card,card.suit,'suit',owner);
+						return game.checkMod(card,owner,game.checkMod(card,card.suit,'suit',owner),'cardsuit',owner);
 					}
 				}
 				if(lib.suits.contains(card.suit)) return card.suit;
 				return 'none';
 			}
 		},
-		color:function(card,player){
+		color:(card,player)=>{
 			if(!card) return;
 			if(Array.isArray(card)){
 				if(!card.length) return 'none';
@@ -58399,7 +58326,7 @@
 				return 'none';
 			}
 		},
-		number:function(card,player){
+		number:(card,player)=>{
 			if(!card) return;
 			//狗卡你是真敢出啊
 			var number=null;
@@ -58419,7 +58346,7 @@
 			return number;
 		},
 		//返回一张杀的属性。如有多种属性则用 lib.natureSeparator 分割开来。例：火雷【杀】的返回值为 fire|thunder
-		nature:function(card,player){
+		nature:(card,player)=>{
 			if(typeof card=='string') return card.split(lib.natureSeparator).sort(lib.sort.nature).join(lib.natureSeparator);
 			if(Array.isArray(card)) return card.sort(lib.sort.nature).join(lib.natureSeparator);
 			var nature=card.nature;
@@ -58432,7 +58359,7 @@
 			return nature;
 		},
 		//返回包含所有属性的数组
-		natureList:function(card,player){
+		natureList(card,player){
 			if(!card) return [];
 			if(get.itemtype(card)=='natures') return card.split(lib.natureSeparator);
 			if(get.itemtype(card)=='nature') return [card];
@@ -58440,7 +58367,7 @@
 			if(typeof natures!='string') return [];
 			return natures.split(lib.natureSeparator);
 		},
-		cards:function(num,putBack){
+		cards:(num,putBack)=>{
 			if(_status.waitingForCards){
 				ui.create.cards.apply(ui.create,_status.waitingForCards);
 				delete _status.waitingForCards;
@@ -58471,15 +58398,9 @@
 			if(card) return list[0];
 			return list;
 		},
-		judge:function(card){
-			if(card.viewAs) return lib.card[card.viewAs].judge;
-			return get.info(card).judge;
-		},
-		judge2:function(card){
-			if(card.viewAs) return lib.card[card.viewAs].judge2;
-			return get.info(card).judge2;
-		},
-		distance:function(from,to,method){
+		judge:card=>card.viewAs?lib.card[card.viewAs].judge:get.info(card).judge,
+		judge2:card=>card.viewAs?lib.card[card.viewAs].judge2:get.info(card).judge2,
+		distance:(from,to,method)=>{
 			if(from==to) return 0;
 			if(!game.players.contains(from)&&!game.dead.contains(from)) return Infinity;
 			if(!game.players.contains(to)&&!game.dead.contains(to)) return Infinity;
@@ -58558,7 +58479,7 @@
 			else if(method=='unchecked') return n;
 			return Math.max(1,n);
 		},
-		info:function(item,player){
+		info:(item,player)=>{
 			if(typeof item=='string'){
 				return lib.skill[item];
 			}
@@ -58568,13 +58489,13 @@
 				return lib.card[name];
 			}
 		},
-		select:function(select){
+		select:select=>{
 			if(typeof select=='number') return [select,select];
 			if(get.itemtype(select)=='select') return select;
 			if(typeof select=='function') return get.select(select());
 			return [1,1]
 		},
-		card:function(original){
+		card:original=>{
 			if(_status.event.skill){
 				var card=get.info(_status.event.skill).viewAs;
 				if(typeof card=='function') card=card(ui.selected.cards,_status.event.player);
@@ -58592,31 +58513,18 @@
 			}
 			return card;
 		},
-		player:function(){
-			return _status.event.player;
-		},
-		players:function(sort,dead,out){
+		player:()=>_status.event.player,
+		players:(sort,dead,out)=>{
 			var players=game.players.slice(0);
 			if(sort!=false){
-				if(typeof sort=='function'){
-					players.sort(sort);
-				}
-				else{
-					if(get.itemtype(sort)!='player') lib.tempSortSeat=_status.event.player;
-					else lib.tempSortSeat=sort;
-					players.sort(lib.sort.seat);
-					delete lib.tempSortSeat;
-				}
+				if(typeof sort=='function') players.sort(sort);
+				else players.sortBySeat(get.itemtype(sort)=="player"?sort:_status.event.player);
 			}
 			if(dead) players=players.concat(game.dead);
-			if(!out){
-				for(var i=0;i<players.length;i++){
-					if(players[i].isOut()) players.splice(i--,1);
-				}
-			}
+			if(!out) players=players.filter(current=>!current.isOut());
 			return players;
 		},
-		position:function(card,ordering){
+		position:(card,ordering)=>{
 			if(get.itemtype(card)=='player') return parseInt(card.dataset.position);
 			if(card.timeout&&card.destiny&&card.destiny.classList){
 				if(card.destiny.classList.contains('equips')) return 'e';
@@ -58640,7 +58548,7 @@
 			if(card.parentNode.id=='ordering') return ordering?'o':'d';
 			return null;
 		},
-		skillTranslation:function(str,player){
+		skillTranslation:(str,player)=>{
 			var str2;
 			if(str.startsWith('re')){
 				str2=str.slice(2);
@@ -58664,7 +58572,7 @@
 			}
 			return get.translation(str);
 		},
-		skillInfoTranslation:function(name,player){
+		skillInfoTranslation:(name,player)=>{
 			if(player&&lib.dynamicTranslate[name]) return lib.dynamicTranslate[name](player,name);
 			var str=lib.translate[name+'_info'];
 			if(!str) return '';
@@ -58677,7 +58585,7 @@
 			// 	replace(/阵法技/g,'<span class="bluetext">阵法技</span>').
 			// 	replace(/主公技/g,'<span class="firetext">主公技</span>');
 		},
-		translation:function(str,arg){
+		translation:(str,arg)=>{
 			if(str&&typeof str=='object'&&(str.name||str._tempTranslate)){
 				if(str._tempTranslate) return str._tempTranslate;
 				var str2;
@@ -58773,7 +58681,7 @@
 			}
 			return '';
 		},
-		strNumber:function(num){
+		strNumber:num=>{
 			switch(num){
 				case 1:return 'A';
 				case 11:return 'J';
@@ -58782,7 +58690,7 @@
 				default:return num.toString();
 			}
 		},
-		cnNumber:function(num,two){
+		cnNumber:(num,two)=>{
 			if(num==Infinity) return '∞';
 			if(isNaN(num)) return '';
 			if(typeof num!='number') return num;
@@ -58808,7 +58716,7 @@
 			var x=Math.floor(num/10);
 			return get.cnNumber(x,true)+'十'+(num>10*x?get.cnNumber(num-10*x,true):'');
 		},
-		selectableButtons:function(sort){
+		selectableButtons:sort=>{
 			if(!_status.event.player) return[];
 			var buttons=_status.event.dialog.buttons;
 			var selectable=[];
@@ -58823,7 +58731,7 @@
 			}
 			return selectable;
 		},
-		selectableCards:function(sort){
+		selectableCards:sort=>{
 			if(!_status.event.player) return[];
 			var cards=_status.event.player.getCards('hes');
 			var selectable=[];
@@ -58838,7 +58746,7 @@
 			}
 			return selectable;
 		},
-		skills:function(){
+		skills:()=>{
 			var skills=[];
 			if(ui.skills){
 				skills=skills.concat(ui.skills.skills);
@@ -58851,7 +58759,7 @@
 			}
 			return skills;
 		},
-		gainableSkills:function(func,player){
+		gainableSkills:(func,player)=>{
 			var list=[];
 			for(var i in lib.character){
 				if(lib.filter.characterDisabled(i)) continue;
@@ -58873,7 +58781,7 @@
 			}
 			return list;
 		},
-		gainableSkillsName:function(name, func){
+		gainableSkillsName:(name,func)=>{
 			var list=[];
 			if(name&&lib.character[name]){
 				if(lib.character[name][4]){
@@ -58892,7 +58800,7 @@
 			}
 			return list;
 		},
-		gainableCharacters:function(func){
+		gainableCharacters:func=>{
 			var list=[];
 			for(var i in lib.character){
 				var info=lib.character[i];
@@ -58912,7 +58820,7 @@
 			}
 			return list;
 		},
-		selectableTargets:function(sort){
+		selectableTargets:sort=>{
 			var selectable=[];
 			var players=game.players.slice(0);
 			if(_status.event.deadTarget) players.addArray(game.dead);
@@ -58928,7 +58836,7 @@
 			}
 			return selectable;
 		},
-		filter:function(filter,i){
+		filter(filter,i){
 			if(typeof filter=='function') return filter;
 			if(i==undefined) i=0;
 			var result=function(){
@@ -59025,29 +58933,13 @@
 			if(num==undefined) return 0;
 			return num;
 		},
-		owner:function(card,method){
-			var list=game.players.concat(game.dead);
-			for(var i=0;i<list.length;i++){
-				if(list[i].getCards('hejsx').contains(card)) return list[i];
-				if(list[i].judging[0]==card&&method!='judge') return list[i];
-			}
-			//for(var i=0;i<game.players.length;i++){
-			//	if(game.players[i].using&&game.players[i].using.contains(card)) return game.players[i];
-			//}
-		},
-		noSelected:function(){
-			return (ui.selected.buttons.length+ui.selected.cards.length+ui.selected.targets.length==0)
-		},
-		population:function(identity){
-			if(identity==undefined) return game.players.length+game.dead.length;
-			var i;
-			var num=0;
-			for(i=0;i<game.players.length;i++){
-				if(game.players[i].identity==identity) num++;
-			}
-			return num;
-		},
-		totalPopulation:function(identity){
+		owner:(card,method)=>game.players.concat(game.dead).find(current=>
+			current.getCards("hejsx").includes(card)||(current.judging[0]==card&&method!="judge")),
+		noSelected:()=>ui.selected.buttons.length+ui.selected.cards.length+ui.selected.targets.length==0,
+		population:identity=>identity==undefined?
+			game.players.length+game.dead.length:
+			game.players.filter(current=>current.identity==identity),
+		totalPopulation:identity=>{
 			if(identity==undefined) return game.players.length+game.dead.length;
 			var i,players=game.players.concat(game.dead);
 			var num=0;
@@ -59056,14 +58948,14 @@
 			}
 			return num;
 		},
-		cardtag:function(item,tag){
+		cardtag:(item,tag)=>{
 			if(item.cardid&&(get.itemtype(item)=='card'||!item.cards||!item.cards.length||item.name==item.cards[0].name)&&_status.cardtag&&_status.cardtag[tag]&&_status.cardtag[tag].contains(item.cardid)){
 				return true;
 			}
 			if(item.cardtags&&item.cardtags.contains(tag)) return true;
 			return false;
 		},
-		tag:function(item,tag,item2,bool){
+		tag:(item,tag,item2,bool)=>{
 			var result;
 			if(get.info(item)&&get.info(item).ai&&get.info(item).ai.tag){
 				result=get.info(item,bool).ai.tag[tag];
@@ -59071,7 +58963,7 @@
 			if(typeof result=='function') return result(item,item2);
 			return result;
 		},
-		sortCard:function(sort){
+		sortCard:sort=>{
 			var func;
 			if(sort=='type_sort'){
 				func=function(card){
@@ -59108,7 +59000,7 @@
 			}
 			return func;
 		},
-		difficulty:function(){
+		difficulty:()=>{
 			switch(get.config('difficulty')){
 				case 'easy':return 1;
 				case 'normal':return 2;
@@ -59116,7 +59008,7 @@
 				default: return 1;
 			}
 		},
-		cardPile:function(name,create){
+		cardPile:(name,create)=>{
 			var filter=function(card){
 				if(typeof name=='string'){
 					if(card.name==name){
@@ -59167,13 +59059,9 @@
 			}
 			return null;
 		},
-		cardPile2:function(name){
-			return get.cardPile(name,'cardPile');
-		},
-		discardPile:function(name){
-			return get.cardPile(name,'discardPile');
-		},
-		aiStrategy:function(){
+		cardPile2:name=>get.cardPile(name,'cardPile'),
+		discardPile:name=>get.cardPile(name,'discardPile'),
+		aiStrategy:()=>{
 			switch(get.config('ai_strategy')){
 				case 'ai_strategy_1':return 1;
 				case 'ai_strategy_2':return 2;
@@ -59184,7 +59072,7 @@
 				default: return 1;
 			}
 		},
-		skillintro:function(name,learn,learn2){
+		skillintro:(name,learn,learn2)=>{
 			var str='';
 			var infoitem=lib.character[name];
 			if(!infoitem){
@@ -59212,7 +59100,7 @@
 			}
 			return str;
 		},
-		intro:function(name){
+		intro:name=>{
 			var info=lib.character[name];
 			var str='性别：'+get.translation(info[0])+'<br/>';
 			str+='势力：'+get.translation(info[1])+'<br/>';
@@ -59226,7 +59114,7 @@
 			}
 			return str;
 		},
-		storageintro:function(type,content,player,dialog,skill){
+		storageintro:(type,content,player,dialog,skill)=>{
 			switch(type){
 				case 'mark':{
 					if(content>0){
@@ -59334,7 +59222,7 @@
 				}
 			}
 		},
-		nodeintro:function(node,simple,evt){
+		nodeintro:(node,simple,evt)=>{
 			var uiintro=ui.create.dialog('hidden','notouchscroll');
 			if(node.classList.contains('player')&&!node.name){
 				return uiintro;
@@ -60407,7 +60295,7 @@
 			}
 			return uiintro;
 		},
-		linkintro:function(dialog,content,player){
+		linkintro:(dialog,content,player)=>{
 			dialog.content.firstChild.remove();
 			dialog.add('<div class="text center">已横置</div>');
 			var list=[];
@@ -60420,10 +60308,8 @@
 				dialog.add(list,true,true);
 			}
 		},
-		groups:function(){
-			return ['wei','shu','wu','qun','jin','western','key'];
-		},
-		types:function(){
+		groups:()=>['wei','shu','wu','qun','jin','western','key'],
+		types:()=>{
 			var types=[];
 			for(var i in lib.card){
 				if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
@@ -60435,14 +60321,14 @@
 			}
 			return types;
 		},
-		links:function(buttons){
+		links:buttons=>{
 			var links=[];
 			for(var i=0;i<buttons.length;i++){
 				if(buttons[i].link!=undefined) links.push(buttons[i].link);
 			}
 			return links;
 		},
-		threaten:function(target,player,hp){
+		threaten:(target,player,hp)=>{
 			var threaten=1;
 			var skills=target.getSkills();
 			if(!player&&player!==false){
@@ -60474,7 +60360,7 @@
 			}
 			return threaten;
 		},
-		condition:function(player){
+		condition:player=>{
 			var num=player.hp;
 			if(num>4){
 				num=4+Math.sqrt(num-4);
@@ -60499,7 +60385,7 @@
 			}
 			return num;
 		},
-		attitude:function(from,to){
+		attitude(from,to){
 			if(!from||!to) return 0;
 			from=from._trueMe||from;
 			arguments[0]=from;
@@ -60525,10 +60411,10 @@
 			}
 			return att;
 		},
-		sgnAttitude:function(){
+		sgnAttitude(){
 			return get.sgn(get.attitude.apply(this,arguments));
 		},
-		useful_raw:function(card,player){
+		useful_raw:(card,player)=>{
 			if(get.position(card)=='j') return -1;
 			if(get.position(card)=='e') return get.equipValue(card);
 			if(card._modUseful){
@@ -60563,23 +60449,19 @@
 			result=game.checkMod(player,card,result,'aiUseful',player);
 			return result;
 		},
-		useful:function(card,player){
+		useful:(card,player)=>{
 			if(_status.event.useCache){
 				return game.callFuncUseStepCache("get.useful_raw",get.useful_raw,[card,player]);
 			}
 			return get.useful_raw(card,player);
 		},
-		unuseful:function(card){
-			return -get.useful(card);
-		},
-		unuseful2:function(card){
-			return 10-get.useful(card);
-		},
-		unuseful3:function(card){
+		unuseful:card=>-get.useful(card),
+		unuseful2:card=>10-get.useful(card),
+		unuseful3:card=>{
 			if(card.name=='du') return 20;
 			return 10-get.useful(card);
 		},
-		value:function(card,player,method){
+		value:(card,player,method)=>{
 			var result=0;
 			var value;
 			if(Array.isArray(card)){
@@ -60618,7 +60500,7 @@
 			result=game.checkMod(player,card,result,'aiValue',player);
 			return result;
 		},
-		equipResult:function(player,target,name){
+		equipResult:(player,target,name)=>{
 			var card=get.card();
 			if(!card||card.name!=name){
 				card={name:name};
@@ -60637,7 +60519,7 @@
 			}
 			return Math.max(0,value1-value2)/5;
 		},
-		equipValue:function(card,player){
+		equipValue:(card,player)=>{
 			if(player==undefined||get.itemtype(player)!='player') player=get.owner(card);
 			if(player==undefined||get.itemtype(player)!='player') player=_status.event.player;
 			var info=get.info(card);
@@ -60653,7 +60535,7 @@
 			if(typeof value=='function') return value(card,player,null,'raw2');
 			return 0;
 		},
-		equipValueNumber:function(card){
+		equipValueNumber:card=>{
 			var info=get.info(card);
 			if(info.ai){
 				if(typeof info.ai.equipValue=='number') return info.ai.equipValue;
@@ -60661,13 +60543,9 @@
 			}
 			return 0;
 		},
-		disvalue:function(card,player){
-			return -get.value(card,player);
-		},
-		disvalue2:function(card,player){
-			return -get.value(card,player,'raw');
-		},
-		skillthreaten:function(skill,player,target){
+		disvalue:(card,player)=>-get.value(card,player),
+		disvalue2:(card,player)=>-get.value(card,player,'raw'),
+		skillthreaten:(skill,player,target)=>{
 			if(!lib.skill[skill]) return 1;
 			if(!lib.skill[skill].ai) return 1;
 			var threaten=lib.skill[skill].ai.threaten;
@@ -60679,7 +60557,7 @@
 			}
 			return 1;
 		},
-		order:function(item){
+		order:item=>{
 			var info=get.info(item);
 			if(!info) return -1;
 			var aii=info.ai;
@@ -60697,7 +60575,7 @@
 			}
 			return num;
 		},
-		result:function(item,skill){
+		result:(item,skill)=>{
 			var result;
 			var info=get.info(item);
 			if(info.ai) result=get.copy(info.ai.result);
@@ -60714,7 +60592,7 @@
 			}
 			return result;
 		},
-		effect_use:function(target,card,player,player2,isLink){
+		effect_use:(target,card,player,player2,isLink)=>{
 			var event=_status.event;
 			var eventskill=null;
 			if(player==undefined) player=_status.event.player;
@@ -60908,7 +60786,7 @@
 			}
 			return final;
 		},
-		effect:function(target,card,player,player2,isLink){
+		effect:(target,card,player,player2,isLink)=>{
 			var event=_status.event;
 			var eventskill=null;
 			if(player==undefined) player=_status.event.player;
@@ -61081,7 +60959,7 @@
 			}
 			return final;
 		},
-		damageEffect:function(target,player,viewer,nature){
+		damageEffect:(target,player,viewer,nature)=>{
 			if(get.itemtype(nature)=='natures'){
 				var natures=get.natureList(nature);
 				return natures.map(n=>get.damageEffect(target,player,viewer,n)).reduce((p,c)=>p+c,0)/(natures.length||1);
@@ -61106,7 +60984,7 @@
 			if(eff>0&&target.hujia>0) return eff/1.3;
 			return eff;
 		},
-		recoverEffect:function(target,player,viewer){
+		recoverEffect:(target,player,viewer)=>{
 			if(target.hp==target.maxHp) return 0;
 			if(!player){
 				player=target;
@@ -61116,7 +60994,7 @@
 			}
 			return get.effect(target,{name:'recover'},player,viewer);
 		},
-		buttonValue:function(button){
+		buttonValue:button=>{
 			var card=button.link;
 			var player=get.owner(card);
 			if(!player) player=_status.event.player;
@@ -61150,9 +61028,7 @@
 				default:return 0.4;
 			}
 		},
-		attitude2:function(to){
-			return get.attitude(_status.event.player,to);
-		},
+		attitude2:to=>get.attitude(_status.event.player,to)
 	};
 	const ai={
 		basic:{
