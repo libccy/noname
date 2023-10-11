@@ -561,6 +561,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						prompt:'是否发动【赠毒】？',
 						prompt2:'将本次获得的【毒】交给其他角色',
 						ai1:function(card){
+							if(_status.event.player.hasSkillTag("usedu")) return 0;
 							if(!ui.selected.cards.length) return 1;
 							return 0;
 						},

@@ -105,7 +105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:12,
 				filter:function (event,player){
 				if(!player.countCards('h',{name:'sha'})) return false;
-					return event.card.name=='sha'||event.card.name=='juedou';
+					return event.card&&(event.card.name=='sha'||event.card.name=='juedou');
 				},
 				content:function(){	
 					player.addTempSkill('yxs_fanji2','shaAfter');   
