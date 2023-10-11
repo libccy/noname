@@ -215,6 +215,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recast(cards);
 				},
 			},
+			lianhuan1:{audio:2},
+			lianhuan2:{audio:2},
 			//新杀小加强 陈到
 			dcwanglie:{
 				audio:'drlt_wanglie',

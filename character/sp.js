@@ -23891,6 +23891,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						complexSelect:true,
 						complexTarget:true,
 						multitarget:true,
+						prompt:'移动场上的“龙印”或“凤印”',
 						targetprompt:['失去印','获得印'],
 						content:function(){
 							'step 0'
@@ -23907,6 +23908,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							skill.removeMark(mark,player,targets[0]);
 							skill.addMark(mark,player,targets[1]);
 							game.delayx();
+						},
+						ai:{
+							order:8,
+							result:{
+								target:function(player,target){
+									if(ui.selected.targets.length==0){
+										return get.attitude(player,target)<0?-999:-3;
+									}
+									else{
+										return target.countCards('h')+1;
+									}
+								},
+							},
+							expose:0.4,
+							threaten:3,
 						},
 					},
 					die:{

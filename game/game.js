@@ -26603,23 +26603,30 @@
 					return this;
 				},
 				removeAdditionalSkill:function(skill,target){
+					const player=this;
 					if(this.additionalSkills[skill]){
-						var additionalSkills=this.additionalSkills[skill];
+						const additionalSkills=this.additionalSkills[skill];
+						const hasAnotherSKill=function(skillkey,skill){
+							return (player.skills.contains(skill)||player.tempSkills[skill]||Object.keys(player.additionalSkills).some(key=>{
+								if(key===skillkey) return false;
+								if(Array.isArray(player.additionalSkills[key])) return player.additionalSkills[key].includes(skill);
+								return player.additionalSkills[key]==skill;
+							}))
+						}
 						if(Array.isArray(additionalSkills)&&typeof target=='string'){
 							if(additionalSkills.contains(target)){
 								additionalSkills.remove(target);
-								if(!this.skills.contains(target)&&!this.tempSkills[target]) this.removeSkill(target);
+								if(!hasAnotherSKill(skill,target)) this.removeSkill(target);
 							}
 						}
 						else{
 							delete this.additionalSkills[skill];
 							if(typeof additionalSkills=='string'){
-								if(!this.skills.contains(additionalSkills)&&!this.tempSkills[additionalSkills]) this.removeSkill(additionalSkills);
+								if(!hasAnotherSKill(skill,additionalSkills)) this.removeSkill(additionalSkills);
 							}
 							else if(Array.isArray(additionalSkills)){
-								for(var i=0;i<additionalSkills.length;i++){
-									if(!this.skills.contains(additionalSkills[i])&&!this.tempSkills[additionalSkills[i]]) this.removeSkill(additionalSkills[i]);
-								}
+								const skillsToRemove=additionalSkills.filter(target=>!hasAnotherSKill(skill,target))
+								this.removeSkill(skillsToRemove);
 							}
 						}
 					}
