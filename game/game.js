@@ -37476,14 +37476,16 @@
 						else if(e.keyCode==27){
 							clickCancel();
 						}
+						e.stopPropagation();
 					}
-					input.onkeyup=function(){
+					input.onkeyup=function(e){
 						if(input.value){
 							confirmNode.classList.remove('disabled');
 						}
 						else{
 							confirmNode.classList.remove('disabled');
 						}
+						e.stopPropagation();
 					}
 					input.focus();
 				}
