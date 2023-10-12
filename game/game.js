@@ -57975,9 +57975,9 @@
 			}
 			return info;
 		},
-		infoTargets:infos=>infos.map(info=>game.playerMap[info]),
+		infoTargets:infos=>Array.from(infos||[]).map(info=>game.playerMap[info]),
 		cardInfo:card=>[card.suit,card.number,card.name,card.nature],
-		cardsInfo:cards=>cards.map(get.cardInfo),
+		cardsInfo:cards=>Array.from(cards||[]).map(get.cardInfo),
 		infoCard:info=>{
 			var card=ui.create.card();
 			if(info[0]){
@@ -57985,7 +57985,7 @@
 			}
 			return card;
 		},
-		infoCards:infos=>infos.map(get.infoCard),
+		infoCards:infos=>Array.from(infos||[]).map(get.infoCard),
 		cardInfoOL:card=>'_noname_card:'+JSON.stringify([card.cardid,card.suit,card.number,card.name,card.nature]),
 		infoCardOL:info=>{
 			if(!lib.cardOL) return info;
@@ -58015,12 +58015,12 @@
 			}
 			return card||info;
 		},
-		cardsInfoOL:cards=>cards.map(get.cardInfoOL),
-		infoCardsOL:infos=>infos.map(get.infoCardOL),
+		cardsInfoOL:cards=>Array.from(cards||[]).map(get.cardInfoOL),
+		infoCardsOL:infos=>Array.from(infos||[]).map(get.infoCardOL),
 		playerInfoOL:player=>'_noname_player:'+player.playerid,
 		infoPlayerOL:info=>lib.playerOL?(lib.playerOL[info.slice(15)]||info):info,
-		playersInfoOL:players=>players.map(get.playerInfoOL),
-		infoPlayersOL:infos=>infos.map(get.infoPlayerOL),
+		playersInfoOL:players=>Array.from(players||[]).map(get.playerInfoOL),
+		infoPlayersOL:infos=>Array.from(infos||[]).map(get.infoPlayerOL),
 		funcInfoOL:func=>{
 			if(typeof func=='function'){
 				if(func._filter_args){
