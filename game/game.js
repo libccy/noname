@@ -58848,8 +58848,9 @@
 			result._filter_args=[filter,i];
 			return result;
 		},
-		cardCount:function(card,player){
+		cardCount:(card,player)=>{
 			var num;
+			if(player==undefined) player=_status.event.player;
 			if(card==true){
 				num=0;
 				var stat=player.getStat('card');
@@ -58858,7 +58859,6 @@
 				}
 				return num;
 			}
-			if(player==undefined) player=_status.event.player;
 			if(typeof card=='object'){
 				card=card.name;
 			}
@@ -58866,7 +58866,7 @@
 			if(num==undefined) return 0;
 			return num;
 		},
-		skillCount:function(skill,player){
+		skillCount:(skill,player)=>{
 			if(player==undefined) player=_status.event.player;
 			var num=player.getStat('skill')[skill];
 			if(num==undefined) return 0;
@@ -58881,13 +58881,9 @@
 		totalPopulation:identity=>identity==undefined?
 			game.players.length+game.dead.length:
 			game.players.concat(game.dead).filter(current=>current.identity==identity).length,
-		cardtag:(item,tag)=>{
-			if(item.cardid&&(get.itemtype(item)=='card'||!item.cards||!item.cards.length||item.name==item.cards[0].name)&&_status.cardtag&&_status.cardtag[tag]&&_status.cardtag[tag].contains(item.cardid)){
-				return true;
-			}
-			if(item.cardtags&&item.cardtags.contains(tag)) return true;
-			return false;
-		},
+		cardtag:(item,tag)=>
+			(item.cardid&&(get.itemtype(item)=='card'||!item.cards||!item.cards.length||item.name==item.cards[0].name)&&_status.cardtag&&_status.cardtag[tag]&&_status.cardtag[tag].contains(item.cardid))
+			||(item.cardtags&&item.cardtags.contains(tag)),
 		tag:(item,tag,item2,bool)=>{
 			var result;
 			if(get.info(item)&&get.info(item).ai&&get.info(item).ai.tag){
