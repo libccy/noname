@@ -633,6 +633,12 @@
 			general:{
 				name:'通用',
 				config:{
+					mount_combine:{
+						name:'合并坐骑栏',
+						init:false,
+						intro:'<li>将进攻坐骑栏和防御坐骑栏合并为同一个位置（重启后生效）。',
+						restart:true,
+					},
 					low_performance:{
 						name:'流畅模式',
 						init:false,
@@ -12342,17 +12348,33 @@
 					'step 0'
 					event.cards=[];
 					event.num=0;
-					event.slotsx=[...new Set(event.slots)].sort();
+					event.slotsx=[];
+					if(get.is.mountCombined()){
+						event.slots.forEach(type=>{
+							if(type=='equip3'||type=='equip4') event.slotsx.add('equip3_4');
+							else event.slotsx.add(type)
+						});
+					}
+					else{
+						event.slotsx.addArray(event.slots);
+					}
+					event.slotsx.sort();
 					if(!event.slots.length) event.finish();
 					'step 1'
 					var slot=event.slotsx[event.num];
-					var left=player.countEnabledSlot(slot),lose=Math.min(left,get.numOf(event.slots,slot));
+					var slot_key=slot;
+					var left=player.countEnabledSlot(slot),lose;
+					if(slot=='equip3_4'){
+						lose=Math.min(left,Math.max(get.numOf(event.slots,'equip3'),get.numOf(event.slots,'equip4')));
+						slot_key='equip3';
+					}
+					else lose=Math.min(left,get.numOf(event.slots,slot));
 					if(lose<=0) event.goto(3);
 					else{
 						game.log(player,'废除了'+get.cnNumber(lose)+'个','#g'+get.translation(slot)+'栏');
 						if(!player.disabledSlots) player.disabledSlots={};
-						if(!player.disabledSlots[slot]) player.disabledSlots[slot]=0;
-						player.disabledSlots[slot]+=lose;
+						if(!player.disabledSlots[slot_key]) player.disabledSlots[slot_key]=0;
+						player.disabledSlots[slot_key]+=lose;
 						var cards=player.getEquips(slot).filter(card=>!event.cards.contains(card));
 						if(cards.length>0){
 							if(lose>=left){
@@ -12367,6 +12389,7 @@
 								],true,[1,num]).set('filterOk',function(){
 									var evt=_status.event;
 									return ui.selected.buttons.reduce(function(num,button){
+										if(evt.slot=='equip3_4') return num+Math.max(get.numOf(get.subtypes(button.link,false),'equip3'),get.numOf(get.subtypes(button.link,false),'equip4'));
 										return num+get.numOf(get.subtypes(button.link,false),evt.slot)
 									},0)==evt.required;
 								}).set('required',num).set('slot',slot)
@@ -12402,13 +12425,27 @@
 				},
 				expandEquip:function(){
 					if(!event.slots.length) return;
-					var slotsx=[...new Set(event.slots)].sort();
+					var slotsx=[];
+					if(get.is.mountCombined()){
+						event.slots.forEach(type=>{
+							if(type=='equip3'||type=='equip4') slotsx.add('equip3_4');
+							else slotsx.add(type)
+						});
+					}
+					else{
+						slotsx.addArray(event.slots);
+					}
+					slotsx.sort();
 					for(var slot of slotsx){
-						var expand=get.numOf(event.slots,slot);
+						var expand=get.numOf(event.slots,slot),slot_key=slot;
+						if(slot=='equip3_4'){
+							expand=Math.max(get.numOf(event.slots,'equip3'),get.numOf(event.slots,'equip4'));
+							slot_key='equip3';
+						}
 						game.log(player,'获得了'+get.cnNumber(expand)+'个额外的','#g'+get.translation(slot)+'栏');
 						if(!player.expandedSlots) player.expandedSlots={};
-						if(!player.expandedSlots[slot]) player.expandedSlots[slot]=0;
-						player.expandedSlots[slot]+=expand;
+						if(!player.expandedSlots[slot_key]) player.expandedSlots[slot_key]=0;
+						player.expandedSlots[slot_key]+=expand;
 					}
 					player.$syncExpand();
 				},
@@ -12428,13 +12465,25 @@
 						else{
 							event.num=0;
 							event.slots=types;
-							event.slotsx=[...new Set(event.slots)].sort();
+							event.slotsx=[];
+							if(get.is.mountCombined()){
+								event.slots.forEach(type=>{
+									if(type=='equip3'||type=='equip4') event.slotsx.add('equip3_4');
+									else event.slotsx.add(type)
+								});
+							}
+							else{
+								event.slotsx.addArray(event.slots);
+							}
+							event.slotsx.sort();
 						}
 					}
 					else event.goto(4);
 					'step 1'
 					var slot=event.slotsx[event.num];
-					var left=player.countEquipableSlot(slot),lose=Math.min(left,get.numOf(event.slots,slot));
+					var left=player.countEquipableSlot(slot),lose;
+					if(slot=='equip3_4') lose=Math.min(left,Math.max(get.numOf(event.slots,'equip3'),get.numOf(event.slots,'equip4')));
+					else lose=Math.min(left,get.numOf(event.slots,slot));
 					if(lose<=0) event.goto(3);
 					else{
 						var cards=player.getEquips(slot).filter(card=>{
@@ -12453,6 +12502,7 @@
 								],true,[1,num]).set('filterOk',function(){
 									var evt=_status.event;
 									return ui.selected.buttons.reduce(function(num,button){
+										if(evt.slot=='equip3_4') return num+Math.max(get.numOf(get.subtypes(button.link,false),'equip3'),get.numOf(get.subtypes(button.link,false),'equip4'));
 										return num+get.numOf(get.subtypes(button.link,false),evt.slot)
 									},0)==evt.required;
 								}).set('required',num).set('slot',slot)
@@ -13557,7 +13607,7 @@
 						if(player.hasEnabledSlot(i)) list.push('equip'+i);
 					}
 					if(event.horse){
-						if(list.contains('equip3')&&list.contains('equip4')) list.push('equip3_4');
+						if(list.contains('equip3')&&(get.is.mountCombined()||list.contains('equip4'))) list.push('equip3_4');
 						list.remove('equip3');
 						list.remove('equip4');
 					}
@@ -20626,7 +20676,12 @@
 				//type为要判断的区域 若为空 则判断玩家是否有任意一个被废除的区域
 				hasDisabledSlot:function(type){
 					var player=this;
-					if(type=='horse') return player.hasDisabledSlot(3)&&player.hasDisabledSlot(4);
+					if(type=='horse'||type=='equip3_4'){
+						return player.hasDisabledSlot(3)&&(get.is.mountCombined()||player.hasDisabledSlot(4));
+					}
+					else if(get.is.mountCombined()&&type=='equip4'){
+						return false;
+					}
 					return player.countDisabledSlot(type)>0;
 				},
 				//判断一名角色的某个区域被废除的数量
@@ -20643,6 +20698,9 @@
 					}
 					else{
 						if(typeof type=='number') type=('equip'+type);
+						if(get.is.mountCombined()&&type=='equip4'){
+							return 0;
+						}
 						var num=map[type];
 						if(typeof num=='number'&&num>0) return num;
 						return 0;
@@ -20651,7 +20709,12 @@
 				//判断一名角色是否有某个装备栏空着
 				hasEmptySlot:function(type){
 					var player=this;
-					if(type=='horse') return player.hasEmptySlot(3)&&player.hasEmptySlot(4);
+					if(type=='horse'||type=='equip3_4'){
+						return player.hasEmptySlot(3)&&(get.is.mountCombined()||player.hasEmptySlot(4));
+					}
+					else if(get.is.mountCombined()&&type=='equip4'){
+						return false;
+					}
 					return player.countEmptySlot(type)>0;
 				},
 				//判断一名角色的某个装备栏空位的数量
@@ -20659,6 +20722,9 @@
 					if(!type) return 0;
 					var player=this;
 					if(typeof type=='number') type=('equip'+type);
+					else if(type=='equip3_4'){
+						type='equip3';
+					}
 					return Math.max(0,player.countEnabledSlot(type)-player.getEquips(type).reduce(function(num,card){
 						var types=get.subtypes(card,false);
 						return num+get.numOf(types,type);
@@ -20675,6 +20741,12 @@
 					if(!type) return 0;
 					var player=this;
 					if(typeof type=='number') type=('equip'+type);
+					else if(type=='equip3_4'){
+						type='equip3';
+					}
+					else if(get.is.mountCombined()&&type=='equip4'){
+						return 0;
+					}
 					return Math.max(0,player.countEnabledSlot(type)-player.getEquips(type).reduce(function(num,card){
 						var types=get.subtypes(card,false);
 						if(!lib.filter.canBeReplaced(card,player)) num+=get.numOf(types,type);
@@ -20685,7 +20757,15 @@
 				//type为要判断的区域 若为空 则判断玩家是否有任意一个未被废除的区域
 				hasEnabledSlot:function(type){
 					var player=this;
-					if(type=='horse') return player.hasEnabledSlot(3)&&player.hasEnabledSlot(4);
+					if(type=='horse'||type=='equip3_4'){
+						return player.hasEnabledSlot(3)&&(get.is.mountCombined()||player.hasEnabledSlot(4));
+					}
+					else if(type=='equip3_4'){
+						type='equip3';
+					}
+					else if(get.is.mountCombined()&&type=='equip4'){
+						return false;
+					}
 					return player.countEnabledSlot(type)>0;
 				},
 				//判断一名角色的某个区域未被废除的数量
@@ -20702,6 +20782,9 @@
 					}
 					else{
 						if(typeof type=='number') type=('equip'+type);
+						if(get.is.mountCombined()&&type=='equip4'){
+							return 0;
+						}
 						var slots=1;
 						var num=map[type];
 						if(typeof num=='number'&&num>0) slots+=num;
@@ -20715,7 +20798,13 @@
 					var type=(typeof subtype);
 					switch(type){
 						case 'string':
-							if(subtype.startsWith('equip')&&parseInt(subtype.slice(5))>0){
+							if(subtype=='equip3_4'){
+								const cards=[];
+								cards.addArray(this.getEquips(3));
+								cards.addArray(this.getEquips(4));
+								return cards;
+							}
+							else if(subtype.startsWith('equip')&&parseInt(subtype.slice(5))>0){
 								break;
 							}
 							else if(lib.card[subtype]){
@@ -20853,8 +20942,9 @@
 				},
 				//同步装备区废除牌显示状态
 				$syncDisable:function(map){
-					var player=this;
-					var suits={equip3:'+1马栏',equip4:'-1马栏',equip6:'特殊栏'};
+					const player=this;
+					const suits={equip3:'+1马栏',equip4:'-1马栏',equip6:'特殊栏'};
+					if(get.is.mountCombined()) suits.equip3='坐骑栏';
 					if(!map){
 						map=(player.disabledSlots||{});
 					}
@@ -20863,29 +20953,29 @@
 						player.disabledSlots=map;
 						player.$syncDisable(map);
 					},player,map)
-					var map2=get.copy(map);
-					var cards=Array.from(player.node.equips.childNodes);
-					for(var card of cards){
+					const map2=get.copy(map);
+					const cards=Array.from(player.node.equips.childNodes);
+					for(const card of cards){
 						if(card.name.startsWith('feichu_')){
-							var index=card.name.slice(7);
+							const index=card.name.slice(7);
 							if(!map2[index]) map2[index]=0;
 							map2[index]--;
 						}
 					}
-					for(var index in map2){
+					for(const index in map2){
 						if(!index.startsWith('equip')||!(parseInt(index.slice(5))>0)) continue;
-						var num=map2[index];
+						const num=map2[index];
 						if(num>0){
-							for(var i=0;i<num;i++){
-								var card=game.createCard('feichu_'+index,(suits[index]||(get.translation(index)+'栏')),'');
+							for(let i=0;i<num;i++){
+								const card=game.createCard('feichu_'+index,(suits[index]||(get.translation(index)+'栏')),'');
 								card.fix();
 								card.style.transform='';
 								card.classList.remove('drawinghidden');
 								card.classList.add('feichu');
 								delete card._transform;
-								var equipNum=get.equipNum(card);
-								var equipped=false;
-								for(var j=0;j<player.node.equips.childNodes.length;j++){
+								const equipNum=get.equipNum(card);
+								let equipped=false;
+								for(let j=0;j<player.node.equips.childNodes.length;j++){
 									if(get.equipNum(player.node.equips.childNodes[j])>=equipNum){
 										player.node.equips.insertBefore(card,player.node.equips.childNodes[j]);
 										equipped=true;
@@ -20901,8 +20991,8 @@
 							}
 						}
 						else if(num<0){
-							for(var i=0;i>num;i--){
-								var card=cards.find(card=>card.name=='feichu_'+index);
+							for(let i=0;i>num;i--){
+								const card=cards.find(card=>card.name=='feichu_'+index);
 								if(card){
 									player.node.equips.removeChild(card);
 									cards.remove(card);
@@ -20913,10 +21003,19 @@
 				},
 				//以下函数涉及到本次更新内容而进行修改
 				canEquip:function(name,replace){
-					var ranges=get.subtypes(name),rangex=[...new Set(ranges)],player=this;
-					for(var range of rangex){
-						var num=this.countEquipableSlot(range);
-						var num2=get.numOf(rangex,range);
+					const ranges=get.subtypes(name),rangex=[],player=this,combined=get.is.mountCombined();
+					if(combined){
+						ranges.forEach(type=>{
+							if(type=='equip3'||type=='equip4') rangex.add('equip3_4');
+							else rangex.add(type)
+						})
+					}
+					else{
+						rangex.push(...new Set(ranges));
+					}
+					for(let range of rangex){
+						let num=this.countEquipableSlot(range);
+						let num2=get.numOf(rangex,range);
 						if(!replace) num-=this.getEquips(range).filter(card=>lib.filter.canBeReplaced(card,player)).length;
 						if(num<num2) return false;
 					}
@@ -23538,7 +23637,7 @@
 						else if(get.itemtype(arguments[i])=='select'||typeof arguments[i]=='number') select=arguments[i];
 					}
 					for(var i=0;i<list.length;i++){
-						list[i]=[notype?'':(get.subtype(list[i])||get.type(list[i])),'',list[i]];
+						list[i]=[notype?'':(get.subtype(list[i],false)||get.type(list[i])),'',list[i]];
 					}
 					if(prompt==undefined) prompt='请选择卡牌';
 					return this.chooseButton(forced,select,'hidden',[prompt,[list,'vcard'],'hidden']);
@@ -29506,7 +29605,7 @@
 						this.classList.remove('gold');
 						this.classList.remove('unique');
 						this.style.background='';
-						var subtype=get.subtype(this);
+						var subtype=get.subtype(this,false);
 						if(subtype){
 							this.classList.remove(subtype);
 						}
@@ -29759,7 +29858,7 @@
 					}
 					if(typeof info.init=='function') info.init();
 					this.node.range.innerHTML='';
-					switch(get.subtype(this)){
+					switch(get.subtype(this,false)){
 						case 'equip1':
 							var added=false;
 							if(lib.card[this.name]&&lib.card[this.name].distance){
@@ -31568,7 +31667,7 @@
 					if(type=='trick') return 0;
 					if(type=='delay') return 1;
 					if(type=='equip'){
-						var type2=get.subtype(name);
+						var type2=get.subtype(name,false);
 						if(type2&&type2.slice) return 1+parseInt(type2.slice(5)||7);
 						return 8.5
 					}
@@ -31657,12 +31756,14 @@
 					content:function(storage,player){
 						storage=player.expandedSlots;
 						if(!storage) return '当前没有扩展装备栏';
-						var keys=Object.keys(storage).sort();
-						var str='';
-						for(var key of keys){
-							var num=storage[key];
+						const keys=Object.keys(storage).sort(),combined=get.is.mountCombined();
+						let str='';
+						for(const key of keys){
+							const num=storage[key];
 							if(typeof num=='number'&&num>0){
-								str+='<li>'+get.translation(key)+'栏：'+num+'个<br>'
+								let trans=get.translation(key);
+								if(combined&&key=='equip3') trans='坐骑栏';
+								str+='<li>'+trans+'栏：'+num+'个<br>'
 							}
 						}
 						if(str.length) return str.slice(0,str.length-4);
@@ -56546,8 +56647,14 @@
 			if(typeof obj!='object') return;
 			var name=get.name(obj,player);
 			if(!lib.card[name]) return [];
-			if(lib.card[name].subtypes) return get.copy(lib.card[name].subtypes);
-			else if(lib.card[name].subtype) return [lib.card[name].subtype];
+			if(lib.card[name].subtypes){
+				const subtypes=get.copy(lib.card[name].subtypes);
+				return subtypes;
+			}
+			else if(lib.card[name].subtype){
+				const subtype=lib.card[name].subtype;
+				return [subtype];
+			}
 			return [];
 		},
 		//装备栏 END
@@ -56699,6 +56806,15 @@
 			return 0;
 		},
 		is:{
+			/**
+			 * 判断坐骑栏是否被合并
+			 */
+			mountCombined:function(){
+				if(typeof _status.mountCombined!='boolean'){
+					_status.mountCombined=lib.config.mount_combine;
+				}
+				return _status.mountCombined;
+			},
 			/**
 			 * 判断传入的参数的属性是否相同（参数可以为卡牌、卡牌信息、属性等）
 			 * @param ...infos 要判断的属性列表 
@@ -58202,9 +58318,10 @@
 		subtype:(obj,player)=>{
 			if(typeof obj=='string') obj={name:obj};
 			if(typeof obj!='object') return;
-			var name=get.name(obj,player);
+			const name=get.name(obj,player);
 			if(!lib.card[name]) return;
-			return lib.card[name].subtype;
+			let subtype=lib.card[name].subtype;
+			return subtype;
 		},
 		equiptype:(card,player)=>{
 			var subtype=get.subtype(card,player);
@@ -59829,7 +59946,7 @@
 				else{
 					if(lib.translate[name+'_info']){
 						if(!uiintro.nosub){
-							if(get.subtype(name)=='equip1'){
+							if(get.subtype(name,false)=='equip1'){
 								var added=false;
 								if(lib.card[node.name]&&lib.card[node.name].distance){
 									var dist=lib.card[node.name].distance;
@@ -59842,8 +59959,8 @@
 									uiintro.add('<div class="text center">攻击范围：1</div>');
 								}
 							}
-							else if(get.subtype(name)){
-								uiintro.add('<div class="text center">'+get.translation(get.subtype(name))+'</div>');
+							else if(get.subtype(name,false)){
+								uiintro.add('<div class="text center">'+get.translation(get.subtype(name,false))+'</div>');
 							}
 							else if(lib.card[name]&&lib.card[name].addinfomenu){
 								uiintro.add('<div class="text center">'+lib.card[name].addinfomenu+'</div>');
