@@ -30297,6 +30297,9 @@
 					return ['c','d'].contains(get.position(this));
 				}
 			},
+			VCard:class{
+				constructor(){}
+			},
 			Button:class extends HTMLDivElement{
 				/**
 				 * @param {{}} item
@@ -58518,15 +58521,11 @@
 					if(isPosition) return 'divposition';
 				}
 			}
-			if(get.objtype(obj)=='div'){
-				if(obj.classList.contains('button')) return 'button';
-				if(obj.classList.contains('card')) return 'card';
-				if(obj.classList.contains('player')) return 'player';
-				if(obj.classList.contains('dialog')) return 'dialog';
-			}
-			if(get.is.object(obj)){
-				if(obj instanceof lib.element.Event) return 'event';
-			}
+			if(obj instanceof lib.element.Button) return 'button';
+			if(obj instanceof lib.element.Card) return 'card';
+			if(obj instanceof lib.element.Player) return 'player';
+			if(obj instanceof lib.element.Dialog) return 'dialog';
+			if(obj instanceof lib.element.Event) return 'event';
 		},
 		equipNum:card=>{
 			if(get.type(card)=='equip'){
@@ -61513,6 +61512,8 @@
 	setAllPropertiesEnumerable(lib.element.Event.prototype);
 	setAllPropertiesEnumerable(lib.element.Dialog.prototype);
 	setAllPropertiesEnumerable(lib.element.Control.prototype);
+	setAllPropertiesEnumerable(lib.element.Client.prototype);
+	setAllPropertiesEnumerable(lib.element.NodeWS.prototype);
 	if('__core-js_shared__' in window) lib.init.init();
 	else{
 		const coreJSBundle=document.createElement('script');
