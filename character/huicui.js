@@ -2264,7 +2264,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				forced:true,
 				content:function(){
-					if(Math.random()<1.25-0.25*get.distance(player,trigger.player)){
+					if(Math.random()<1.25-0.25*get.distance(player,trigger.player)||get.isLuckyStar(player)){
 						player.logSkill('dcyouqi');
 						player.gain(trigger.cards.filterInD('d'),'gain2');
 					}
@@ -10447,7 +10447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyouqi:'幽栖',
 			dcyouqi_info:'锁定技。当其他角色因〖引路〗标记弃置牌后，你有一定概率获得此牌。',
 			dcyouqi_faq:'〖幽栖〗概率<br>',
-			dcyouqi_faq_info:'当满足〖幽栖〗条件时，系统生成一个随机数X∈[0,1)。若X小于(1.25-0.25Y)，你获得此牌（Y为你至该角色的距离）。',
+			dcyouqi_faq_info:'当满足〖幽栖〗条件时，系统生成一个随机数X∈[0,1)。若X小于(1.25-0.25Y)，或幸运星模式已开启，你获得此牌（Y为你至该角色的距离）。',
 			dc_sunhanhua:'孙寒华',
 			dchuiling:'汇灵',
 			dchuiling_info:'锁定技。当你使用牌时，若此牌颜色为弃牌堆中数量较少的颜色，你获得1枚“灵”标记。若弃牌堆中：红色牌数大于黑色牌数，你回复1点体力；黑色牌数大于红色牌数，你可以弃置一名其他角色的一张牌。',
