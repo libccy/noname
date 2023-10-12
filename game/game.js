@@ -58877,7 +58877,7 @@
 		noSelected:()=>ui.selected.buttons.length+ui.selected.cards.length+ui.selected.targets.length==0,
 		population:identity=>identity==undefined?
 			game.players.length+game.dead.length:
-			game.players.filter(current=>current.identity==identity),
+			game.players.filter(current=>current.identity==identity).length,
 		totalPopulation:identity=>{
 			if(identity==undefined) return game.players.length+game.dead.length;
 			var i,players=game.players.concat(game.dead);
