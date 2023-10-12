@@ -33882,6 +33882,7 @@
 			['legend',[233,131,255]]
 		]),
 		phaseName:['phaseZhunbei','phaseJudge','phaseDraw','phaseUse','phaseDiscard','phaseJieshu'],
+		notshowSkillNamePinyin:['阵亡','胜利'],
 		quickVoice:[
 			'我从未见过如此厚颜无耻之人！',
 			'这波不亏',
@@ -54669,7 +54670,7 @@
 						this.classList.add('active');
 						var skillname=get.translation(this.link);
 						var skilltranslationinfo=get.skillInfoTranslation(this.link);
-						if((lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2')&&skillname!='阵亡'){
+						if((lib.config.show_skillnamepinyin=='showPinyin2'||lib.config.show_skillnamepinyin=='showCodeIdentifier2')&&!lib.notshowSkillNamePinyin.contains(skillname)){
 							var skillpinyin=lib.config.show_skillnamepinyin=='showCodeIdentifier2'?this.link:get.pinyin(skillname);
 							intro2.innerHTML='<span style="font-weight:bold;margin-right:5px">'+skillname+'</span>'+'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">'+'['+skillpinyin+']'+'</span>'+'  '+skilltranslationinfo;
 						}else{
@@ -54894,7 +54895,7 @@
 						const link=this.link,skillName=get.translation(link);
 						skillNameSpan.innerHTML=skillName;
 						const showSkillNamePinyin=lib.config.show_skillnamepinyin;
-						if(showSkillNamePinyin!='doNotShow'&&skillName!='阵亡'){
+						if(showSkillNamePinyin!='doNotShow'&&!lib.notshowSkillNamePinyin.contains(skillName)){
 							const ruby=document.createElement('ruby');
 							ruby.appendChild(skillNameSpan);
 							const leftParenthesisRP=document.createElement('rp');
