@@ -58878,15 +58878,9 @@
 		population:identity=>identity==undefined?
 			game.players.length+game.dead.length:
 			game.players.filter(current=>current.identity==identity).length,
-		totalPopulation:identity=>{
-			if(identity==undefined) return game.players.length+game.dead.length;
-			var i,players=game.players.concat(game.dead);
-			var num=0;
-			for(i=0;i<players.length;i++){
-				if(players[i].identity==identity) num++;
-			}
-			return num;
-		},
+		totalPopulation:identity=>identity==undefined?
+			game.players.length+game.dead.length:
+			game.players.concat(game.dead).filter(current=>current.identity==identity).length,
 		cardtag:(item,tag)=>{
 			if(item.cardid&&(get.itemtype(item)=='card'||!item.cards||!item.cards.length||item.name==item.cards[0].name)&&_status.cardtag&&_status.cardtag[tag]&&_status.cardtag[tag].contains(item.cardid)){
 				return true;
