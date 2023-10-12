@@ -58520,16 +58520,16 @@
 				m=game.checkMod(from,to,m,'attackFrom',from);
 				m=game.checkMod(from,to,m,'attackTo',to);
 				return m;
-				const attakRange=from.getEquipRange();
-				m+=(1-attakRange);
-				for(let i=0;i<equips2.length;i++){
-					let info=get.info(equips2[i]).distance;
-					if(!info) continue;
-					if(info.attaclTo){
-						m+=info.attaclTo;
-					}
-				}
-				return n;
+				// const attakRange=from.getEquipRange();
+				// m+=(1-attakRange);
+				// for(let i=0;i<equips2.length;i++){
+				// 	let info=get.info(equips2[i]).distance;
+				// 	if(!info) continue;
+				// 	if(info.attaclTo){
+				// 		m+=info.attaclTo;
+				// 	}
+				// }
+				// return n;
 			}
 			else if(method=='unchecked') return n;
 			return Math.max(1,n);

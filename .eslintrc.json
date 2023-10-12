@@ -1,5 +1,5 @@
 {
-	"extends": "chrome 46",
+    "extends": "chrome 46",
     "env": {
         "browser": true,
         "node": true,
