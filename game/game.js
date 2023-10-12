@@ -56906,7 +56906,7 @@
 				}
 				return true;
 			},
-			altered:lib.filter.none,
+			altered:()=>false,
 			/*
 			skill=>{
 				return false;
