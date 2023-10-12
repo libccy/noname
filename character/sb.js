@@ -4473,7 +4473,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//华雄
 			sbyangwei:{
-				audio:2,
+				audio:3,
 				enable:'phaseUse',
 				filter:function(event,player){
 					return !player.hasSkill('sbyangwei_counter',null,null,false);
