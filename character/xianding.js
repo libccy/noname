@@ -10605,8 +10605,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yuwei:{
+				audio:2,
+				trigger:{player:'shiyuanBegin'},
+				filter:function(event,player){
+					return _status.currentPhase.group=='qun';
+				},
 				zhuSkill:true,
-				locked:true,
+				forced:true,
+				content:function(){},
 				ai:{combo:'shiyuan'},
 			},
 			

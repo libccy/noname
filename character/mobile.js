@@ -685,7 +685,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//来敏
 			laishou:{
-				audio:2,
+				audio:3,
 				trigger:{player:['damageBegin4','phaseZhunbeiBegin']},
 				filter:function(event,player){
 					var num=9;
