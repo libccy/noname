@@ -203,7 +203,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard({suit:get.suit(event.card2)},function(card){
 						var evt=_status.event.getParent();
 						if(get.damageEffect(evt.target,evt.player,evt.player,'fire')>0){
-							return 7-get.value(card,evt.player);
+							return 6.2+Math.min(4,evt.player.hp)-get.value(card,evt.player);
 						}
 						return -1;
 					}).set('prompt',false);
@@ -225,8 +225,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						value:[3,1],
 						useful:1,
 					},
-					wuxie:function(target,card,player,current,state){
-						if(get.attitude(current,player)>=0&&state>0) return false;
+					wuxie:function(target,card,player,viewer,state){
+						let att=get.attitude(viewer,target), eff=get.effect(target,card,player,target);
+						if(status*get.attitude(viewer,player)>0&&!player.isMad() || status*eff*att>=0) return 0;
+						if(get.attitude(viewer,player)>=0 || _status.event.getRand('huogong_wuxie')*4>player.countCards('h')) return 0;
 					},
 					result:{
 						player:function(player){

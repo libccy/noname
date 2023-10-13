@@ -178,7 +178,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_chengpu:['male','wu',4,['decadelihuo','decadechunlao']],
 			ns_sundeng:['male','wu',4,['xinkuangbi']],
 			ns_duji:['male','wei',3,['xinfu_andong','xinyingshi']],
-			old_majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"],[]],
+			old_majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"]],
+			ns_mengyou:['male','qun',4,['nsmanzhi']],
 			
 			old_jiakui:['male','wei',4,['tongqu','xinwanlan']],
 			ol_guohuai:['male','wei',3,['rejingce']],
@@ -219,7 +220,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				"ns_chentai","ns_huangwudie","ns_sunyi","ns_zhangning","ns_yanghu"],
 				diy_yijiang3:['ns_ruanji','ns_zanghong','ns_limi','ns_zhonglimu','prp_zhugeliang','key_seira','key_kiyu','key_tomoyo','key_minagi','key_michiru'],
 				diy_tieba:["ns_zuoci","ns_lvzhi","ns_wangyun","ns_nanhua","ns_nanhua_left","ns_nanhua_right","ns_huamulan","ns_huangzu","ns_jinke","ns_yanliang","ns_wenchou","ns_caocao","ns_caocaosp","ns_zhugeliang","ns_wangyue","ns_yuji","ns_xinxianying","ns_guanlu","ns_simazhao","ns_sunjian","ns_duangui","ns_zhangbao","ns_masu","ns_zhangxiu","ns_lvmeng","ns_shenpei","ns_yujisp","ns_yangyi","ns_liuzhang","ns_xinnanhua","ns_luyusheng"],
-				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu",'ns_sundeng','ns_duji'],
+				diy_fakenews:["diy_wenyang","ns_zhangwei","ns_caimao","ns_chengpu",'ns_sundeng','ns_duji','ns_mengyou'],
 				diy_xushi:["diy_feishi","diy_hanlong","diy_liufu","diy_liuyan","diy_liuzan","diy_tianyu","diy_xizhenxihong","diy_yangyi","diy_zaozhirenjun"],
 				diy_default:["diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","old_majun"],
 				diy_noname:['noname'],
@@ -373,6 +374,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_zhangxiu:'#p本因坊神策',
 			ns_yangyi:'#p本因坊神策',
 			ns_liuzhang:'#r矮子剑薄荷糖',
+			ns_mengyou:'#g残昼厄夜',
 		},
 		card:{
 			kano_paibingbuzhen:{
@@ -678,7 +680,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(evt.gaintag_map[i].includes('fuuko_chuanyuan')) return true;
 								}
 							});
-							return false;
+							//return false;
 						},
 						content:function(){
 							trigger.addCount=false;
@@ -2599,7 +2601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else game.delayx();
 					'step 3'
-					player.addTempSkill('nstuilun_effect',{player:'phaseBegin'});
+					player.addTempSkill('nstuilun_effect',{player:'phaseBeginStart'});
 				},
 				subSkill:{
 					effect:{
@@ -3560,7 +3562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countCards('h')>0) player.chooseToDiscard('h',true,player.countCards('h'));
 					player.recover();
 					trigger.cancel();
-					player.addTempSkill('kyou_duanfa_draw',{player:'phaseBegin'});
+					player.addTempSkill('kyou_duanfa_draw',{player:'phaseBeginStart'});
 				},
 				subSkill:{
 					draw:{
@@ -6370,9 +6372,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=game.roundNumber;
 					if(num&&typeof num=='number') player.draw(Math.min(3,num));
 					'step 1'
-					var next=player.phaseUse();
-					event.next.remove(next);
-					trigger.next.push(next);
+					trigger.phaseList.splice(trigger.num,0,'phaseUse|godan_yuanyi');
 				},
 			},
 			godan_feiqu:{
@@ -17953,6 +17953,96 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			nsmanzhi:{
+				audio:'dcmanzhi',
+				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
+				direct:true,
+				filter:function(event,player){
+					var nums=[];
+					game.countPlayer(current=>{
+						nums.add(current.hp);
+						nums.add(current.maxHp);
+						nums.add(current.countCards('h'));
+						nums.add(current.countCards('e'));
+						nums.add(current.countCards('j'));
+					});
+					for(var a of nums){
+						for(var b of nums){
+							if((0.5*a*a)+(2.5*b)-game.roundNumber==game.countPlayer()) return true;
+						}
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var nums=[];
+					game.countPlayer(current=>{
+						nums.add(current.hp);
+						nums.add(current.maxHp);
+						nums.add(current.countCards('h'));
+						nums.add(current.countCards('e'));
+						nums.add(current.countCards('j'));
+					});
+					nums.sort((a,b)=>a-b);
+					var a=null,b=null,goon=false;
+					for(a of nums){
+						for(b of nums){
+							if((0.5*a*a)+(2.5*b)-game.roundNumber==game.countPlayer()){
+								goon=true;
+								break;
+							}
+						}
+						if(goon) break;
+					}
+					player.chooseButton(2,[
+						'蛮智：请选择让下列等式成立的A与B的值',
+						'<div class="text center">目标等式</div>',
+						`0.5 × A² + 2.5 × B - ${game.roundNumber} = ${game.countPlayer()}`,
+						'<div class="text center">A的可选值</div>',
+						[nums.map(i=>{
+							return [
+								`A|${i}`,
+								i==a?(`<span class="yellowtext">${i}</span>`):i,
+							]
+						}),'tdnodes'],
+						'<div class="text center">B的可选值</div>',
+						[nums.map(i=>{
+							return [
+								`B|${i}`,
+								i==b?(`<span class="yellowtext">${i}</span>`):i,
+							]
+						}),'tdnodes'],
+					]).set('filterButton',function(button){
+						if(!ui.selected.buttons.length) return true;
+						return button.link[0]!=ui.selected.buttons[0].link[0];
+					}).set('filterOk',function(){
+						if(ui.selected.buttons.length!=2) return false;
+						var a,b;
+						for(var i of ui.selected.buttons){
+							if(i.link[0]=='A') a=parseInt(i.link.slice(2));
+							else b=parseInt(i.link.slice(2));
+						}
+						return (0.5*a*a)+(2.5*b)-game.roundNumber==game.countPlayer();
+					}).set('choice',[a,b]).set('ai',(button)=>{
+						var choice=_status.event.choice;
+						if(button.link==`A|${choice[0]}`||button.link==`B|${choice[1]}`) return 1;
+						return 0;
+					});
+					'step 1'
+					if(result.bool){
+						var a,b;
+						for(var i of result.links){
+							if(i[0]=='A') a=parseInt(i.slice(2));
+							else b=parseInt(i.slice(2));
+						}
+						equals=`0.5×${a}²+2.5×${b}-${game.roundNumber}=${game.countPlayer()}`;
+						player.logSkill('nsmanzhi');
+						player.chat(equals);
+						game.log(player,'的计算结果为',equals);
+						player.draw(game.countPlayer());
+					}
+				},
+			},
 		},
 		dynamicTranslate:{
 			nsjiquan:function(player){
@@ -19030,6 +19120,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junk_huangyueying_prefix:'旧界',
 			old_majun:'骰子马钧',
 			old_majun_prefix:'骰子',
+			ns_mengyou:'数学孟优',
+			ns_mengyou_prefix:'数学',
+			ns_mengyou_ab:'孟优',
+			nsmanzhi:'蛮智',
+			nsmanzhi_info:'准备阶段或结束阶段开始时，你可以将场上出现的数字代入等式中的A和B。若此等式成立，你摸Y张牌。（等式为Y=0.5A²+2.5B-X，其中X为游戏轮数，Y为存活人数）',
+			ns_chengpu:'铁索程普',
+			ns_chengpu_prefix:'铁索',
+			ns_chengpu_ab:'程普',
+			ns_sundeng:'画饼孙登',
+			ns_sundeng_prefix:'画饼',
+			ns_sundeng_ab:'孙登',
+			ns_duji:'画饼杜畿',
+			ns_duji_prefix:'画饼',
+			ns_duji_ab:'杜畿',
 			
 			diy_tieba:'吧友设计',
 			diy_xushi:'玩点论杀·虚实篇',
@@ -19041,12 +19145,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_yijiang3:'设计比赛2022',
 			diy_fakenews:'杀海流言',
 			diy_trashbin:'垃圾桶',
-			ns_chengpu:'铁索程普',
-			ns_chengpu_ab:'程普',
-			ns_sundeng:'画饼孙登',
-			ns_sundeng_ab:'孙登',
-			ns_duji:'画饼杜畿',
-			ns_duji_ab:'杜畿',
 		},
 		pinyins:{
 			加藤うみ:['Kato','Umi'],

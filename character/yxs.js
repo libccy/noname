@@ -92,40 +92,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yxs_meixi:'妺喜，姓嬉（喜），生卒年不详，亦作妺嬉、末喜、末嬉，有施氏之女，夏朝最后一位君主夏桀的王后。根据先秦时代记述女子名时所用的全称和简称方式，妺喜应姓喜，即嬉（也作僖）。由于其名字的“妺”字与“妹妹”的“妹”字字形相似，且在《庄子》等作中也有以妺为妹的用法，因此常误作"妹喜"。',
 			yxs_lanlinwang:'高长恭（541年―573年），又名高孝瓘、高肃，祖籍渤海调蓨（今河北省景县），神武帝高欢之孙，文襄帝高澄第四子，生母不详，南北朝时期北齐宗室、将领，封爵兰陵郡王。高长恭貌柔心壮，音容兼美。为将躬勤细事，每得甘美，虽一瓜数果，必与将士分享。累次升任至并州刺史。突厥攻入晋阳，高长恭奋力将其击退。邙山之战，高长恭为中军，率领五百骑兵再入周军包围圈，直至金墉城下，因高长恭戴着头盔，城中的人不确定是敌军或是我军，直到高长恭把头盔脱下来城上的人才知道是高长恭，派弓箭手开始放箭保护他，之后高长恭成功替金墉解围，高长恭在此次战中威名大振，士兵们为此战而讴歌他，即后来知名的《兰陵王入阵曲》。',
 		},
-		characterTitle:{					 					 
-					 "yxs_qinqiong":"Sukincen",					
-									},
+		characterTitle:{
+			yxs_qinqiong:"Sukincen",
+		},
 		skill:{
 			yxs_fanji:{
-                audio:2,
-                trigger:{
-                    player:"damageEnd",
-                },
-                direct:true,
-                priority:12,
-                filter:function (event,player){      
-                if(!player.countCards('h',{name:'sha'})) return false;
-        return event.card.name=='sha'||event.card.name=='juedou';
-    },
-                content:function (){    
-                player.addTempSkill('yxs_fanji2','shaAfter');   
-         player.chooseToUse({name:'sha'},trigger.source,'反击：是否对'+get.translation(trigger.source)+'使用一张杀？').logSkill='yxs_fanji';
-    },
-            },
-               yxs_fanji2:{
-                audio:2,
-                trigger:{
-                    player:"shaBegin",
-                },
-                direct:true,              
-                filter:function (event,player){      
-        return event.card&&event.card.name=='sha'&&get.color(event.card)=='red';
-    },
-                content:function (){    
-               trigger.directHit=true;
-    },
-            },
-                                   		
+				audio:2,
+				trigger:{
+					player:"damageEnd",
+				},
+				direct:true,
+				priority:12,
+				filter:function (event,player){
+				if(!player.countCards('h',{name:'sha'})) return false;
+					return event.card&&(event.card.name=='sha'||event.card.name=='juedou');
+				},
+				content:function(){	
+					player.addTempSkill('yxs_fanji2','shaAfter');   
+					player.chooseToUse({name:'sha'},trigger.source,'反击：是否对'+get.translation(trigger.source)+'使用一张杀？').logSkill='yxs_fanji';
+				},
+			},
+			yxs_fanji2:{
+				audio:2,
+				trigger:{
+					player:"shaBegin",
+				},
+				direct:true,
+				filter:function (event,player){
+					return event.card&&event.card.name=='sha'&&get.color(event.card)=='red';
+				},
+				content:function (){	
+					trigger.directHit=true;
+				},
+			},
 			yxs_menshen3:{
 				trigger:{
 					player:['phaseBegin','dieBegin'],
@@ -133,78 +132,75 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
-            return current.hasSkill('yxs_menshen2');
-        });
+						return current.hasSkill('yxs_menshen2');
+					});
 				},
 				content:function(){
-				 for(var i=0;i<game.players.length;i++){
-            if(game.players[i].hasSkill('yxs_menshen2')){
-					game.players[i].removeSkill('yxs_menshen2');
-					}
+				 	for(var i=0;i<game.players.length;i++){
+						if(game.players[i].hasSkill('yxs_menshen2')){
+							game.players[i].removeSkill('yxs_menshen2');
+						}
 					}
 				},
-			},            
-                         
-            yxs_menshen:{
-                audio:2,
-                trigger:{
-                    player:"phaseEnd",
-                },
-                priority:15,                
-               	group:'yxs_menshen3',
-		           		onremove:true,
-                filter:function (event,player){
-        return game.players.length>1;
-    },
-                content:function (){
-              "step 0"
-     player.chooseTarget('选择【门神】的目标',lib.translate.yxs_menshen_info,true,function(card,player,target){
-             return target!=player;
-     }).set('ai',function(target){     
-             return get.attitude(player,target);            
-     });        
-     "step 1"
-     if(result.bool){           
-        var target=result.targets[0];
+			},	 
+			yxs_menshen:{
+				audio:2,
+				trigger:{
+					player:"phaseEnd",
+				},
+				priority:15,
+			   	group:'yxs_menshen3',
+				onremove:true,
+				filter:function (event,player){
+					return game.players.length>1;
+				},
+				content:function(){
+			  		"step 0"
+	 				player.chooseTarget('选择【门神】的目标',lib.translate.yxs_menshen_info,true,function(card,player,target){
+						return target!=player;
+					}).set('ai',function(target){
+						return get.attitude(player,target);
+					});
+					"step 1"
+					if(result.bool){		   
+						var target=result.targets[0];
 						player.line(target,'green');
 						game.log(target,'成为了','【门神】','的目标');
 						target.storage.yxs_menshen2=player;
 						target.addSkill('yxs_menshen2');
-     }
-    else {       
-            event.finish(); 
-    }                     
-   },      
-   ai:{
-       expose:0.5,
-   },               
-            },
-         
-           yxs_menshen2:{
-     audio:2,
-    	mark:'character',
+					}
+					else{
+						event.finish(); 
+					}
+				},
+				ai:{
+					expose:0.5,
+				},
+			},
+		   	yxs_menshen2:{
+				audio:2,
+				mark:'character',
 				intro:{
 					content:'当你成为【杀】或【决斗】的目标后，改为$成为目标'
 				},
 				nopop:true,
-				priority:15,      
-     trigger:{
-         target:["shaBegin","juedouBegin"],
-      },
-     forced:true,
+				priority:15,
+				trigger:{
+					target:["shaBegin","juedouBegin"],
+				},
+	 			forced:true,
 				popup:false,
 				filter:function(event,player){
 					return player.isAlive();
 				},
-                content:function (){                             
-          var target=player.storage.yxs_menshen2;
-		    			trigger.player.line(target,'green');
-			trigger.targets.remove(player);
-				  		trigger.targets.push(target);	
-								trigger.target = target;							
-    },
-       }, 
-	   
+				content:function (){
+					var target=player.storage.yxs_menshen2;
+					trigger.player.line(target,'green');
+					trigger.targets.remove(player);
+				  	trigger.targets.push(target);
+					trigger.target = target;
+				},
+	   		},
 			guimian:{
 				trigger:{source:'damageEnd'},
 				forced:true,
@@ -2938,12 +2934,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yxs_qinqiong:"秦琼",
 
 			yxs_fanji:"反击",
-            yxs_fanji2:"反击",
-            yxs_fanji_info:"当你受到【杀】或【决斗】造成的伤害后，你可以对伤害来源使用一张【杀】。若此【杀】为红色，其不可闪避",
-            yxs_menshen:"门神",
-            yxs_menshen2:"门神",
-            yxs_menshen3:"门神",
-            yxs_menshen_info:"回合结束阶段，你可选择一名其他角色，若如此做，直到你的下回合开始，所有角色对该角色使用的【杀】或【决斗】均视为对你使用",
+			yxs_fanji2:"反击",
+			yxs_fanji_info:"当你受到【杀】或【决斗】造成的伤害后，你可以对伤害来源使用一张【杀】。若此【杀】为红色，其不可闪避",
+			yxs_menshen:"门神",
+			yxs_menshen2:"门神",
+			yxs_menshen3:"门神",
+			yxs_menshen_info:"回合结束阶段，你可选择一名其他角色，若如此做，直到你的下回合开始，所有角色对该角色使用的【杀】或【决斗】均视为对你使用",
 			zhuxin:'诛心',
 			zhuxin_info:'出牌阶段限一次，你可以与一名其他角色拼点，若你赢，你对其造成一点伤害',
 			wlianhuan:'连环',

@@ -94,8 +94,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
-				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi'],
-				sp2_qifu:['ol_guansuo','dc_zhaoxiang','dc_xujing'],
+				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi','dc_xujing'],
+				sp2_qifu:['ol_guansuo','dc_zhaoxiang'],
 				sp2_gaoshan:['wanglang','liuhui'],
 				sp2_wumiao:['wu_zhugeliang','wu_luxun'],
 			}
@@ -2358,22 +2358,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('choice',(()=>{
 						var choicesx=choices.slice();
 						var cards=player.getCards('hs');
-						var bool1=get.tag(trigger.card,'damage')&&choicesx.contains('选项一')&&trigger.targets.some(current=>{
+						var bool1=get.tag(trigger.card,'damage')&&choicesx.includes('选项一')&&trigger.targets.some(current=>{
 							return get.attitude(player,current)<0;
-						}),bool2=choicesx.contains('选项二')&&game.countPlayer(current=>get.attitude(player,current)>0)>=1;
-						if(!bool1&&!bool2){
+						}),bool2=choicesx.includes('选项二');
+						if(bool2) bool2=game.countPlayer(function(current){
+							return player!=current&&get.attitude(player,current)>0;
+						});
+						else bool2=0;
+						if(bool1||bool2){
 							for(var i=0;i<cards.length;i++){
 								var name=get.name(cards[i]);
-								if(player.getStorage('dcqingshi_clear').contains(name)) continue;
+								if(player.getStorage('dcqingshi_clear').includes(name)) continue;
 								for(var j=i+1;j<cards.length;j++){
-									if(name==get.name(cards[j])&&get.position(cards[i])+get.position(cards[j])!='ss'&&player.hasValueTarget(cards[i])){
+									if(name===get.name(cards[j])&&get.position(cards[i])+get.position(cards[j])!=='ss'&&player.hasValueTarget(cards[i])){
 										choicesx.remove('选项三');
 										break;
 									}
 								}
 							}
 						}
-						if(choicesx.contains('选项三')) return '选项三';
+						if(bool2>2) return '选项二';
+						if(choicesx.includes('选项三')) return '选项三';
+						if(bool2===2) return '选项二';
 						if(bool1) return '选项一';
 						if(bool2) return '选项二';
 						return 'cancel2';
@@ -2486,6 +2492,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					effect:{
+						mod:{
+							aiOrder:function(player,card,num){
+								if(num>0&&get.itemtype(card)==='card'&&card.hasGaintag('dczhizhe')) return num+0.16;
+							},
+							aiValue:function(player,card,num){
+								if(num>0&&get.itemtype(card)==='card'&&card.hasGaintag('dczhizhe')) return 2*num;
+							},
+							aiUseful:function(player,card,num){
+								if(num>0&&!player._dczhizhe_mod&&get.itemtype(card)==='card'&&card.hasGaintag('dczhizhe')){
+									if(player.canIgnoreHandcard(card)) return Infinity;
+									player._dczhizhe_mod=true;
+									if(player.hp<3&&player.needsToDiscard(player.countCards('h',(cardx)=>{
+										if(player.canIgnoreHandcard(cardx)||get.useful(cardx)>6) return true;
+										return false;
+									}))) return num*1.5;
+									return num*10;
+								}
+							}
+						},
 						trigger:{player:['useCardAfter','respondAfter']},
 						charlotte:true,
 						forced:true,
@@ -2778,7 +2803,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:1,
 					result:{
 						target:function(player,target){
-							if(game.roundNumber==1&&ui.cardPile.childNodes.length>game.countPlayer()*5&&!game.hasPlayer(current=>current.hp<=2)&&!player.hasSkill('dcjijiao_risutoa')) return 0;
+							if(ui.cardPile.childNodes.length>game.players.length*5&&!player.hasSkill('dcjijiao_risutoa')&&
+							   !game.hasPlayer(current=>current.hp<=1)&&game.countPlayer(current=>current.hp===2&&current.countCards('hes')<3)<=1) return 0;
 							return 5;
 						}
 					}
@@ -3028,8 +3054,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},true);
 				},
 				ai:{
-					order:5.5,
-					result:{player:1}
+					order:function(){
+						return 0.9*get.order({name:'juedou'});
+					},
+					tag:{
+						respond:2,
+						respondSha:2,
+						damage:1,
+					},
+					result:{
+						player:function(player){
+							let target=null, maxval=0;
+							for(let i of game.players){
+								let jdeff=get.effect(i,{
+									name:'juedou',
+									isCard:true,
+									cards:ui.selected.cards,
+									storage:{dcctjiuxian:true}
+								},player,player);
+								if(i===player||!player.canUse({
+									name:'juedou',
+									isCard:true,
+									cards:ui.selected.cards,
+									storage:{dcctjiuxian:true}
+								},i)||jdeff<0) continue;
+								let receff=0;
+								game.filterPlayer(function(current){
+									if(player!=current&&i.inRange(current)&&current.isDamaged()) receff=Math.max(receff,get.recoverEffect(current,i,i));
+								});
+								if(jdeff+receff/5>maxval){
+									target=i;
+									maxval=jdeff+receff/5;
+								}
+							}
+							if(target) return maxval/80;
+							return 0;
+						}
+					}
 				},
 				subSkill:{
 					help:{
@@ -3609,6 +3670,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('dcyuandi',target);
 						if(result.control=='选项一'){
 							player.discardPlayerCard(target,'h',true);
+							if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.15);
 						}
 						else game.asyncDraw([target,player]);
 					}
@@ -3863,6 +3925,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dcaichen:{
 				audio:2,
+				init:function(player){
+					game.addGlobalSkill('dcaichen_hit');
+				},
+				onremove:function(player){
+					game.removeGlobalSkill('dcaichen_hit');
+				},
 				trigger:{
 					player:['loseAfter','phaseDiscardBefore'],
 					global:'loseAsyncAfter',
@@ -3885,6 +3953,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						trigger.directHit.add(player);
 						game.log(player,'不可响应',trigger.card);
+					}
+				},
+				subSkill:{
+					hit:{
+						trigger:{player:'dieAfter'},
+						filter:function(event,player){
+							return !game.hasPlayer(current=>current.hasSkill('dcaichen'));
+						},
+						silent:true,
+						forceDie:true,
+						content:function(){
+							game.removeGlobalSkill('dcaichen_hit');
+						},
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(player,tag,arg){
+								return arg&&arg.card&&arg.target&&arg.target.hasSkill('dcaichen')&&ui.cardPile.childNodes.length<40&&get.suit(arg.card)==='spade';
+							}
+						}
 					}
 				}
 			},
@@ -4348,7 +4435,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(cards.length){
 							player.chooseButton(['暗织：选择令'+get.translation(target)+'获得的牌',cards],true,Math.min(cards.length,2)).set('ai',button=>{
 								var player=_status.event.player,target=_status.event.getParent().target;
-								return get.sgnAttitude(player,target)*get.buttonValue(button);
+								return get.sgnAttitude(player,target)*get.value(button.link,target);
 							});
 						}
 					}else event.finish();
@@ -4498,11 +4585,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//周宣
 			dcwumei:{
 				audio:2,
-				trigger:{player:'phaseBegin'},
+				trigger:{player:'phaseBeginStart'},
 				filter:function(event,player){
 					return !player.hasSkill('dcwumei_used');
 				},
-				priority:10,//离谱的优先机制
 				direct:true,
 				content:function(){
 					'step 0'
@@ -4529,17 +4615,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger._triggered=5;
 							var evt=player.insertPhase();
 							delete evt.skill;
+							game.broadcastAll(function(player){
+								player.classList.remove('glow_phase');
+								delete _status.currentPhase;
+							},player);
 						} 
 					}
 				},
 				subSkill:{
 					used:{charlotte:true},
 					wake:{
+						init:function(player){
+							game.addGlobalSkill('dcwumei_all');
+						},
+						onremove:function(player){
+							game.removeGlobalSkill('dcwumei_all');
+							delete player.storage.dcwumei_wake;
+						},
 						trigger:{player:'phaseJieshuBegin'},
 						charlotte:true,
 						popup:false,
 						forced:true,
-						onremove:true,
 						filter:function(event,player){
 							return player.storage.dcwumei_wake&&player.storage.dcwumei_wake.length;
 						},
@@ -4572,17 +4668,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								return str;
 							}
+						}
+					},
+					all:{
+						trigger:{player:'dieAfter'},
+						filter:function(event,player){
+							return !game.hasPlayer(current=>current.hasSkill('dcwumei_wake'));
+						},
+						silent:true,
+						forceDie:true,
+						content:function(){
+							game.removeGlobalSkill('dcwumei_all');
 						},
 						ai:{
 							effect:{
 								player_use:function(card,player,target){
+									if(get.tag(card,'recover')&&target.hp>0) return 0;
 									if(get.tag(card,'damage')) return 0.5;
-								},
-								target:function(card,player,target){
-									if(_status.event.type!='phase') return;
-									if (get.tag(card,'recover')){
-										return [1,1-target.hp];
-									}
 								}
 							}
 						}
@@ -7722,6 +7824,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				subSkill:{
 					insert:{
+						mark:true,
+						intro:{
+							content:'players'
+						},
 						trigger:{global:'phaseAfter'},
 						forced:true,
 						charlotte:true,
@@ -10447,6 +10553,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.draw(2+get.sgn(trigger.player.hp-player.hp));
 				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(get.itemtype(player)!=='player'||player===target) return 1;
+							let num=1,ds=2+get.sgn(player.hp-target.hp);
+							if(player===_status.currentPhase&&_status.currentPhase.group==='qun'&&target.hasZhuSkill('yuwei',player)) num=2;
+							if(target.getHistory('gain',function(evt){
+								return evt.getParent(2).name==='shiyuan'&&evt.cards.length===ds;
+							}).length>=num) return 1;
+							let name=get.name(card);
+							if(get.tag(card,'lose')||name==='huogong'||name==='juedou'||name==='tiesuo') return [1,ds];
+							if(!target.hasFriend()) return 1;
+							return [1,0.8*ds];
+						}
+					}
+				}
 			},
 			dushi:{
 				audio:2,
@@ -10483,8 +10605,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			yuwei:{
+				audio:2,
+				trigger:{player:'shiyuanBegin'},
+				filter:function(event,player){
+					return _status.currentPhase.group=='qun';
+				},
 				zhuSkill:true,
-				locked:true,
+				forced:true,
+				content:function(){},
 				ai:{combo:'shiyuan'},
 			},
 			
@@ -10903,11 +11031,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(function(card){
 						var type=get.subtype(card);
 						return ['equip1','equip4','equip3','equip6'].contains(type)?6:-6;
-						switch(type){
-							case 'equip':return 4;
-							case 'trick':return -4;
-							default:return 0;
-						}
+						// switch(type){
+						// 	case 'equip':return 4;
+						// 	case 'trick':return -4;
+						// 	default:return 0;
+						// }
 					}).judge2=function(result){
 						return result.bool;
 					};
@@ -10986,7 +11114,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				viewAs:{name:'nanman'},
-				ai:{order:0.1},
+				ai:{
+					order:0.1,
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return (!arg||arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&!player.getStat('skill').mansi_viewas&&player.hasCard((card)=>get.name(card)!=='tao','h');
+					}
+				},
 			},
 			souying:{
 				audio:2,
@@ -12235,6 +12369,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luotong:['dc_luotong','luotong'],
 			dc_wangchang:['dc_wangchang','tw_wangchang'],
 			guozhao:['guozhao','xin_guozhao'],
+			dingshangwan:['dingshangwan','ol_dingshangwan'],
 		},
 		translate:{
 			puyuan:'蒲元',

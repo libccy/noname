@@ -227,7 +227,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.isOnline()){
 							player.storage.jsrgbashiing=true;
 							var list=['sha','shan'].filter(name=>trigger.filterCard({name:name},player,trigger));
-							var names=list.map(i=>'【'+i+'】').join('或');
+							var names=list.map(i=>'【'+get.translation(i)+'】').join('或');
 							var next=target.chooseToRespond('是否替'+get.translation(player)+'打出一张'+names+'？',{name:list});
 							next.set('ai',function(){
 								var event=_status.event;

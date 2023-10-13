@@ -268,7 +268,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target.countCards('h')>0&&game.hasPlayer(function(current){
 						return target.canCompare(current);
 					});
-					return ui.selected.targets[0].canCompare(target);
+					//return ui.selected.targets[0].canCompare(target);
 				},
 				filterAddedTarget:function(card,player,target,preTarget){
 					return target!=player&&preTarget.canCompare(target);

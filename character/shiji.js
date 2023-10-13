@@ -4715,7 +4715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player,evt=_status.event.getParent();
 						if(get.value(evt.card,evt.player)*get.attitude(player,evt.player)>0) return 0;
 						return Math.random()>(get.value(evt.card,evt.player)/6)?1:0;
-						return 1;
+						//return 1;
 					});
 					'step 2'
 					if(result.index+event.addIndex==0){
