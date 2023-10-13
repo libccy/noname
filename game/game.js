@@ -110,12 +110,12 @@
 		configprefix:'noname_0.9_',
 		versionOL:27,
 		updateURLS:{
-			coding:'https://ghproxy.com/https://raw.githubusercontent.com/Show-K/noname',
-			github:'https://raw.githubusercontent.com/Show-K/noname',
+			coding:'https://raw.fgit.cf/libccy/noname',
+			github:'https://raw.githubusercontent.com/libccy/noname',
 		},
-		updateURL:'https://raw.githubusercontent.com/Show-K/noname',
-		mirrorURL:'https://ghproxy.com/https://raw.githubusercontent.com/Show-K/noname',
-		hallURL:'unitedrhythmized.club',
+		updateURL:'https://raw.githubusercontent.com/libccy/noname',
+		mirrorURL:'https://raw.fgit.cf/libccy/noname',
+		hallURL:'47.99.105.222',
 		assetURL:typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized,
 		compatibleEdition:Boolean(typeof nonameInitialized=='string'&&nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//)),
 		changeLog:[],
@@ -1262,7 +1262,7 @@
 				config:{
 					theme:{
 						name:'主题',
-						init:'simple',
+						init:'woodden',
 						item:{},
 						visualMenu:function(node,link){
 							if(!node.menu){
@@ -4912,19 +4912,10 @@
 							'5':'五人',
 							'6':'六人',
 							'7':'七人',
-							'8':'八人',
-							'9':'九人',
-							'10':'十人'
+							'8':'八人'
 						},
 						frequent:true,
 						restart:true,
-					},
-					connect_unbalanced_mode:{
-						name:'阴间模式',
-						init:false,
-						frequent:true,
-						restart:true,
-						intro:'开启后游戏中将模仿三国杀客户端特有的游戏外机制等'
 					},
 					connect_limit_zhu:{
 						name:'常备主候选武将数',
@@ -5114,19 +5105,10 @@
 							'5':'五人',
 							'6':'六人',
 							'7':'七人',
-							'8':'八人',
-							'9':'九人',
-							'10':'十人'
+							'8':'八人'
 						},
 						frequent:true,
 						restart:true,
-					},
-					unbalanced_mode:{
-						name:'阴间模式',
-						init:false,
-						restart:true,
-						frequent:true,
-						intro:'开启后游戏中将模仿三国杀客户端特有的游戏外机制等'
 					},
 					double_nei:{
 						name:'双内奸',
@@ -5449,337 +5431,6 @@
 					},
 				}
 			},
-			th_mougong:{
-				name:'谋攻',
-				connect:{
-					update:function(config,map){
-						map.connect_double_character.show();
-						map.connect_player_number.show();
-						//map.connect_double_nei.hide();
-						//map.connect_zhong_card.hide();
-						//map.connect_special_identity.hide();
-					},
-					connect_player_number:{
-						name:'游戏人数',
-						init:'6',
-						item:{
-							'2':'两人',
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人',
-							'9':'九人',
-							'10':'十人'
-						},
-						frequent:true,
-						restart:true,
-					},
-					connect_double_character:{
-						name:'双将模式',
-						init:false,
-						frequent:true,
-						restart:true,
-					},
-					connect_change_card:{
-						name:'启用手气卡',
-						init:false,
-						frequent:true,
-						restart:true,
-					},
-				},
-				config:{
-					update:function(config,map){
-						map.continue_game.show();
-						map.player_number.show();
-						map.choice_zhu.show();
-						map.choice_zhong.show();
-						map.choice_nei.show();
-						map.choice_fan.show();
-						map.ban_identity.show();
-						if(config.ban_identity=='off'){
-							map.ban_identity2.hide();
-						}
-						else{
-							map.ban_identity2.show();
-						}
-						if(config.ban_identity=='off'||config.ban_identity2=='off'){
-							map.ban_identity3.hide();
-						}
-						else{
-							map.ban_identity3.show();
-						}
-						map.choose_group.show();
-						map.change_choice.show();
-						map.free_choose.show();
-						map.change_identity.show();
-						map.double_character.show();
-						if(config.double_character){
-							map.double_hp.show();
-						}
-						else{
-							map.double_hp.hide();
-						}
-					},
-					player_number:{
-						name:'游戏人数',
-						init:'6',
-						item:{
-							'2':'两人',
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人',
-							'9':'九人',
-							'10':'十人'
-						},
-						frequent:true,
-						restart:true,
-					},
-					choose_group:{
-						name:'神武将选择势力',
-						init:true,
-						restart:true,
-						frequent:true,
-						intro:'若开启此选项，选择神武将的玩家需在亮出自己的武将牌之前为自己选择一个势力。'
-					},
-					nei_fullscreenpop:{
-						name:'主内单挑特效',
-						intro:'在进入主内单挑时，弹出全屏文字特效',
-						init:true,
-						unfrequent:true,
-					},
-					double_character:{
-						name:'双将模式',
-						init:false,
-						frequent:true,
-						restart:true,
-					},
-					double_hp:{
-						name:'双将体力上限',
-						init:'pingjun',
-						item:{
-							hejiansan:'和减三',
-							pingjun:'平均值',
-							zuidazhi:'最大值',
-							zuixiaozhi:'最小值',
-							zonghe:'相加',
-						},
-						restart:true,
-					},
-					free_choose:{
-						name:'自由选将',
-						init:true,
-						onclick:function(bool){
-							game.saveConfig('free_choose',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
-							if(!ui.cheat2&&get.config('free_choose')) ui.create.cheat2();
-							else if(ui.cheat2&&!get.config('free_choose')){
-								ui.cheat2.close();
-								delete ui.cheat2;
-							}
-						}
-					},
-					change_identity:{
-						name:'自由选择身份和座位',
-						init:true,
-						onclick:function(bool){
-							game.saveConfig('change_identity',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
-							var dialog;
-							if(ui.cheat2&&ui.cheat2.backup) dialog=ui.cheat2.backup;
-							else dialog=_status.event.dialog;
-							if(!_status.brawl||!_status.brawl.noAddSetting){
-								if(!dialog.querySelector('table')&&get.config('change_identity')) _status.event.getParent().addSetting(dialog);
-								else _status.event.getParent().removeSetting(dialog);
-							}
-							ui.update();
-						}
-					},
-					change_choice:{
-						name:'开启换将卡',
-						init:true,
-						onclick:function(bool){
-							game.saveConfig('change_choice',bool,this._link.config.mode);
-							if(!_status.event.getParent().showConfig&&!_status.event.showConfig) return;
-							if(!ui.cheat&&get.config('change_choice')) ui.create.cheat();
-							else if(ui.cheat&&!get.config('change_choice')){
-								ui.cheat.close();
-								delete ui.cheat;
-							}
-						}
-					},
-					change_card:{
-						name:'开启手气卡',
-						init:'disabled',
-						item:{
-							disabled:'禁用',
-							once:'一次',
-							twice:'两次',
-							unlimited:'无限',
-						},
-					},
-					continue_game:{
-						name:'显示再战',
-						init:false,
-						onclick:function(bool){
-							game.saveConfig('continue_game',bool,this._link.config.mode);
-							if(get.config('continue_game')){
-								if(!ui.continue_game&&_status.over&&!_status.brawl&&!game.no_continue_game){
-									ui.continue_game=ui.create.control('再战',game.reloadCurrent);
-								}
-							}
-							else if(ui.continue_game){
-								ui.continue_game.close();
-								delete ui.continue_game;
-							}
-						},
-						intro:'游戏结束后可选择用相同的武将再进行一局游戏'
-					},
-					dierestart:{
-						name:'死亡后显示重来',
-						init:true,
-						onclick:function(bool){
-							game.saveConfig('dierestart',bool,this._link.config.mode);
-							if(get.config('dierestart')){
-								if(!ui.restart&&game.me.isDead()&&!_status.connectMode){
-									ui.restart=ui.create.control('restart',game.reload);
-								}
-							}
-							else if(ui.restart){
-								ui.restart.close();
-								delete ui.restart;
-							}
-						}
-					},
-					revive:{
-						name:'死亡后显示复活',
-						init:false,
-						onclick:function(bool){
-							game.saveConfig('revive',bool,this._link.config.mode);
-							if(get.config('revive')){
-								if(!ui.revive&&game.me.isDead()){
-									ui.revive=ui.create.control('revive',ui.click.dierevive);
-								}
-							}
-							else if(ui.revive){
-								ui.revive.close();
-								delete ui.revive;
-							}
-						}
-					},
-					ban_identity:{
-						name:'屏蔽身份',
-						init:'off',
-						item:{
-							off:'关闭',
-							zhu:'主公',
-							zhong:'忠臣',
-							nei:'内奸',
-							fan:'反贼',
-						},
-					},
-					ban_identity2:{
-						name:'屏蔽身份2',
-						init:'off',
-						item:{
-							off:'关闭',
-							zhu:'主公',
-							zhong:'忠臣',
-							nei:'内奸',
-							fan:'反贼',
-						},
-					},
-					ban_identity3:{
-						name:'屏蔽身份3',
-						init:'off',
-						item:{
-							off:'关闭',
-							zhu:'主公',
-							zhong:'忠臣',
-							nei:'内奸',
-							fan:'反贼',
-						},
-					},
-					ai_strategy:{
-						name:'内奸策略',
-						init:'ai_strategy_1',
-						item:{
-							ai_strategy_1:'均衡',
-							ai_strategy_2:'偏反',
-							ai_strategy_3:'偏忠',
-							ai_strategy_4:'酱油',
-							ai_strategy_5:'天使',
-							ai_strategy_6:'仇主',
-						},
-						intro:'设置内奸对主忠反的态度'
-					},
-					difficulty:{
-						name:'AI对人类态度',
-						init:'normal',
-						item:{
-							easy:'友好',
-							normal:'一般',
-							hard:'仇视',
-						},
-					},
-					choice_zhu:{
-						name:'主公候选武将数',
-						init:'3',
-						restart:true,
-						item:{
-							'3':'三',
-							'4':'四',
-							'5':'五',
-							'6':'六',
-							'8':'八',
-							'10':'十',
-						},
-					},
-					choice_zhong:{
-						name:'忠臣候选武将数',
-						init:'4',
-						restart:true,
-						item:{
-							'3':'三',
-							'4':'四',
-							'5':'五',
-							'6':'六',
-							'8':'八',
-							'10':'十',
-						},
-					},
-					choice_nei:{
-						name:'内奸候选武将数',
-						init:'5',
-						restart:true,
-						item:{
-							'3':'三',
-							'4':'四',
-							'5':'五',
-							'6':'六',
-							'8':'八',
-							'10':'十',
-						},
-					},
-					choice_fan:{
-						name:'反贼候选武将数',
-						init:'3',
-						restart:true,
-						item:{
-							'3':'三',
-							'4':'四',
-							'5':'五',
-							'6':'六',
-							'8':'八',
-							'10':'十',
-						},
-					},
-				}
-			},
 			guozhan:{
 				name:'国战',
 				connect:{
@@ -5804,19 +5455,10 @@
 							'5':'五人',
 							'6':'六人',
 							'7':'七人',
-							'8':'八人',
-							'9':'九人',
-							'10':'十人'
+							'8':'八人'
 						},
 						frequent:true,
 						restart:true,
-					},
-					connect_qunxionggeju:{
-						name:'群雄割据',
-						init:false,
-						frequent:true,
-						restart:true,
-						intro:'开放不同势力组合，以优先亮出的武将牌作为自己的势力，双势力武将则使用列表的第一个势力',
 					},
 					connect_initshow_draw:{
 						name:'首亮奖励',
@@ -5904,19 +5546,10 @@
 							'5':'五人',
 							'6':'六人',
 							'7':'七人',
-							'8':'八人',
-							'9':'九人',
-							'10':'十人'
+							'8':'八人'
 						},
 						frequent:true,
 						restart:true,
-					},
-					qunxionggeju:{
-						name:'群雄割据',
-						init:false,
-						frequent:true,
-						restart:true,
-						intro:'开放不同势力组合，以优先亮出的武将牌作为自己的势力，双势力武将则使用列表的第一个势力',
 					},
 					initshow_draw:{
 						name:'首亮奖励',
@@ -6769,100 +6402,6 @@
 						frequent:true,
 						intro:'在用户填写的IP地址没有直接指定使用WS/WSS协议的情况下，默认使用WSS协议，而非WS协议来连接到联机服务器。<br>请不要轻易勾选此项！',
 					},
-					ten_players:{
-						name:'十人房间',
-						input:false,
-						frequent:true,
-						intro:'你的房间游戏人数由最多八人提升至最多十人。<br>若开启此项，其他人必须也支持十人房间才能进入你的房间，否则会报错！<br>若关闭此项，你不能进入其他人创建的十人房间，否则会报错！'
-					},
-				}
-			},
-			huanhuazhizhan:{
-				name:'幻化',
-				connect:{
-					update:function(config,map){
-						map.connect_player_number.show();
-					},
-					connect_player_number:{
-						name:'游戏人数',
-						init:'8',
-						item:{
-							'2':'两人',
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人',
-							'9':'九人',
-							'10':'十人'
-						},
-						frequent:true,
-						restart:true,
-					},
-				},
-				config:{
-					update:function(config,map){
-						map.player_number.show();
-					},
-					player_number:{
-						name:'游戏人数',
-						init:'8',
-						item:{
-							'2':'两人',
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人',
-							'9':'九人',
-							'10':'十人'
-						},
-						frequent:true,
-						restart:true,
-					},
-					dierestart:{
-						name:'死亡后显示重来',
-						init:true,
-						onclick:function(bool){
-							game.saveConfig('dierestart',bool,this._link.config.mode);
-							if(get.config('dierestart')){
-								if(!ui.restart&&game.me.isDead()&&!_status.connectMode){
-									ui.restart=ui.create.control('restart',game.reload);
-								}
-							}
-							else if(ui.restart){
-								ui.restart.close();
-								delete ui.restart;
-							}
-						}
-					},
-					revive:{
-						name:'死亡后显示复活',
-						init:false,
-						onclick:function(bool){
-							game.saveConfig('revive',bool,this._link.config.mode);
-							if(get.config('revive')){
-								if(!ui.revive&&game.me.isDead()){
-									ui.revive=ui.create.control('revive',ui.click.dierevive);
-								}
-							}
-							else if(ui.revive){
-								ui.revive.close();
-								delete ui.revive;
-							}
-						}
-					},
-					difficulty:{
-						name:'AI对人类态度',
-						init:'normal',
-						item:{
-							easy:'友好',
-							normal:'一般',
-							hard:'仇视'
-						}
-					}
 				}
 			},
 			boss:{
@@ -6955,13 +6494,6 @@
 						restart:true,
 						frequent:true,
 					},
-					connect_unbalanced_mode:{
-						name:'阴间模式',
-						init:false,
-						frequent:true,
-						restart:true,
-						intro:'开启后游戏中将模仿三国杀客户端特有的游戏外机制等'
-					},
 					connect_double_character:{
 						name:'双将模式',
 						init:false,
@@ -7028,13 +6560,6 @@
 						},
 						restart:true,
 						frequent:true,
-					},
-					unbalanced_mode:{
-						name:'阴间模式',
-						init:false,
-						restart:true,
-						frequent:true,
-						intro:'开启后游戏中将模仿三国杀客户端特有的游戏外机制等'
 					},
 					double_character:{
 						name:'双将模式',
@@ -8742,7 +8267,7 @@
 								this.setBackgroundDB(dbimage.slice(3));
 								return this;
 							}
-							else if(mode!='huanhuazhizhan'&&modeimage) src=`image/mode/${modeimage}/character/${name}${ext}`;
+							else if(modeimage) src=`image/mode/${modeimage}/character/${name}${ext}`;
 							else if(type=='character'&&lib.config.skin[name]&&arguments[2]!='noskin') src=`image/skin/${name}/${lib.config.skin[name]}${ext}`;
 							else if(type=='character') src=`image/character/${gzbool?'gz_':''}${name}${ext}`;
 							else src=`image/${type}/${subfolder}/${name}${ext}`;
@@ -9529,20 +9054,22 @@
 								//lib.init.onload=backup_onload;
 								_status.evaluatingExtension=false;
 							}
-							else{
+							else if(lib.config.mode!='connect'||(!localStorage.getItem(lib.configprefix+'directstart')&&show_splash)){
 								extensionlist.push(lib.config.extensions[i]);
 							}
 						}
 					}
 					else{
-						var alerted=false;
-						for(var i=0;i<lib.config.extensions.length;i++){
-							if(window.bannedExtensions.contains(lib.config.extensions[i])){
-								//if(!alerted) alert('读取某些扩展时出现问题。');
-								alerted=true;
-								continue;
+						if(lib.config.mode!='connect'||(!localStorage.getItem(lib.configprefix+'directstart')&&show_splash)){
+							var alerted=false;
+							for(var i=0;i<lib.config.extensions.length;i++){
+								if(window.bannedExtensions.contains(lib.config.extensions[i])){
+									//if(!alerted) alert('读取某些扩展时出现问题。');
+									alerted=true;
+									continue;
+								}
+								game.import('extension',{name:lib.config.extensions[i]});
 							}
-							game.import('extension',{name:lib.config.extensions[i]});
 						}
 					}
 					const loadPack=()=>{
@@ -9671,7 +9198,7 @@
 					var styleLoaded=gnc.of(function*(){
 						--styleToLoad;
 						if(styleToLoad==0){
-							if(extensionlist.length){
+							if(extensionlist.length&&(lib.config.mode!='connect'||show_splash)){
 								_status.extensionLoading=[];
 								let extToLoad=extensionlist.length;
 								const extLoaded=gnc.of(function*(){
@@ -10992,26 +10519,32 @@
 						clickedNode=true;
 						lib.config.mode=this.link;
 						game.saveConfig('mode',this.link);
-						if(game.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)!==-1){
-							game.layout='mobile';
-							ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
+						if(this.link=='connect'){
+							localStorage.setItem(lib.configprefix+'directstart',true);
+							game.reload();
 						}
-						else if(game.layout=='mobile'&&lib.config.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)===-1){
-							game.layout=lib.config.layout;
-							if(game.layout=='default'){
-								ui.css.layout.href='';
-							}
-							else{
+						else{
+							if(game.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)!==-1){
+								game.layout='mobile';
 								ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
 							}
+							else if(game.layout=='mobile'&&lib.config.layout!='mobile'&&lib.layoutfixed.indexOf(lib.config.mode)===-1){
+								game.layout=lib.config.layout;
+								if(game.layout=='default'){
+									ui.css.layout.href='';
+								}
+								else{
+									ui.css.layout.href=lib.assetURL+'layout/'+game.layout+'/layout.css';
+								}
+							}
+							splash.delete(1000);
+							delete window.inSplash;
+							window.resetGameTimeout=setTimeout(lib.init.reset,10000);
+	
+							this.listenTransition(function(){
+								lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
+							},500);
 						}
-						splash.delete(1000);
-						delete window.inSplash;
-						window.resetGameTimeout=setTimeout(lib.init.reset,10000);
-
-						this.listenTransition(function(){
-							lib.init.js(lib.assetURL+'mode',lib.config.mode,proceed);
-						},500);
 					}
 					var downNode=function(){
 						this.classList.add('glow');
@@ -12371,8 +11904,6 @@
 			egg:'鸡蛋',
 			wine:'酒杯',
 			shoe:'拖鞋',
-			flowerSpam:'连续鲜花',
-			eggSpam:'连续鸡蛋',
 			yuxisx:'玉玺',
 			jiasuo:'枷锁',
 			junk:'平凡',
@@ -12513,8 +12044,6 @@
 			unknown5:'六号位',
 			unknown6:'七号位',
 			unknown7:'八号位',
-			unknown8:'九号位',
-			unknown9:'十号位',
 			
 			feichu_equip1:"已废除",
 			feichu_equip1_info:"武器栏已废除",
@@ -21925,7 +21454,6 @@
 				initOL:function(name,character){
 					this.node.avatar.setBackground(character,'character');
 					this.node.avatar.show();
-					name=`${[' - 离线',' - 托管'].contains(name.slice(-5))?'×':''}${name}`;
 					this.node.name.innerHTML=get.verticalStr(name);
 					this.nickname=name;
 					this.avatar=character;
@@ -21983,8 +21511,8 @@
 						this.hp=Math.min(this.maxHp,info[3]);
 						if(this.hp<this.maxHp||config.gameStarted) str+=('人数：'+this.hp+'/'+this.maxHp);
 						else str+=('人数：<span class="firetext">'+this.hp+'/'+this.maxHp+'</span>');
-						const nickname=info[0].slice(0,12);
-						str+=`　(${[' - 离线',' - 托管'].contains(nickname.slice(-5))?'×':''}${nickname}<span style="opacity: 0.5;">#${this.key}</span> 的房间)`;
+						
+						str+=('　('+info[0].slice(0,12)+' 的房间)');
 						if(config.mode!='guozhan'&&(config.mode!='doudizhu'||config.doudizhu_mode!='online')){
 							str+='【';
 							for(var i=0;i<config.cardPack.length;i++){
@@ -22265,34 +21793,6 @@
 				},
 				chat:function(str){
 					if(get.is.banWords(str)) return;
-					//URC addition
-					if(str[0]=='/'){
-						var chat=str.slice(1);
-						if(chat.indexOf(' ')!=-1){
-							chat=chat.split(' ');
-							var func=chat.shift();
-							if(func=='playAudio'&&chat.length){
-								var directory=chat.shift();
-								if((directory=='die'||directory=='skill')&&chat.length){
-									var filename=chat.shift();
-									game.broadcastAll(function(directory,filename){
-										game.playAudio(directory,filename);
-									},directory,filename);
-									if(chat.length){
-										str=chat.join(' ');
-									}
-									else{
-										var translation=filename;
-										while(translation==get.translation(translation)&&translation.length){
-											translation=translation.slice(0,-1);
-										}
-										str=translation.length?get.translation(translation):filename;
-									}
-								}
-							}
-						}
-					}
-					//URC addition end
 					lib.element.player.say.call(this,str);
 					game.broadcast(function(id,str){
 						if(lib.playerOL[id]){
@@ -34309,7 +33809,6 @@
 					}
 					if(simple) return '<span>手杀</span>';
 					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:xinwei;transform:scaleY(0.85);transform:scaleX(0.55);">手杀</span>`;
-					//return `<span style="font-family:NonameSuits">📱</span>`;
 				},
 			}],
 			['TW',{
@@ -35384,9 +34883,6 @@
 			if(!withport){
 				ip=ip+':8080';
 			}
-			if(ip=='47.99.105.222:8080'){
-				ip='unitedrhythmized.club:8080';
-			}
 			_status.connectCallback=callback;
 			try{
 				if(game.ws){
@@ -36191,7 +35687,7 @@
 				}
 				ui.updatehl();
 				for(var i=0;i<players.length;i++){
-					if(lib.config.mode=='identity'||lib.config.mode=='th_mougong'||lib.config.mode=='huanhuazhizhan'){
+					if(lib.config.mode=='identity'){
 						game.players[i].init(players[i].name,players[i].name2);
 						game.players[i].setIdentity(players[i].identity);
 					}
@@ -48494,7 +47990,7 @@
 							updatepx.style.whiteSpace='nowrap';
 							updatepx.style.marginTop='8px';
 							var buttonx=ui.create.node('button','访问项目主页',function(){
-								window.open('https://github.com/Show-K/noname');
+								window.open('https://github.com/libccy/noname');
 							});
 							updatepx.appendChild(buttonx);
 							ui.updateUpdate=function(){
@@ -51750,9 +51246,7 @@
 			},
 			connectPlayers:function(ip){
 				game.connectPlayers=[];
-				let max=8;
-				if(get.config('ten_players','connect')) max=10;
-				for(var i=0;i<max;i++){
+				for(var i=0;i<8;i++){
 					var player=ui.create.player(ui.window);
 					player.dataset.position=i;
 					player.classList.add('connect');
@@ -51787,6 +51281,14 @@
 						}
 					}
 					else{
+						var num=0;
+						for(var i of game.connectPlayers){
+							if(!i.nickname&&!i.classList.contains('unselectable2')) num++;
+						}
+						if(num>=lib.configOL.number-1){
+							alert('至少要有两名玩家才能开始游戏！');
+							return;
+						}
 						game.resume();
 					}
 					button.delete();
@@ -52025,7 +51527,7 @@
 					uiintro.classList.add('popped');
 					uiintro.classList.add('static');
 					uiintro.classList.add('onlineclient');
-					uiintro.style.width='360px';
+					uiintro.style.width='180px';
 					uiintro.style.height='300px';
 					uiintro.style.left='auto';
 					uiintro.style.right='20px';
@@ -52104,6 +51606,10 @@
 								deltaday+=7;
 							}
 							var utc=date2.getTime()+deltaday*24*3600000;
+							if(utc<date.getTime()){
+								alert('创建失败，时间已过');
+								return;
+							}
 							if(get.is.banWords(button.input.value)){
 								var eventnode=ui.create.div('.menubutton.videotext.onlineevent.pointerdiv',function(){
 									var that=this;
@@ -52247,7 +51753,8 @@
 									}
 									str+=(button.info[i].hour-12)+'点';
 								}
-								ui.create.div('',`创建者：${(button.info[i].nickname)}<span style="opacity: 0.5;">#${button.info[i].creator}</span>`,eventnode);
+								ui.create.div('','创建者：'+(button.info[i].nickname),eventnode);
+								//ui.create.div('','创建者：'+(button.info[i].nickname)+'<br>ID：'+button.info[i].creator,eventnode);
 								ui.create.div('','已有'+(button.info[i].members.length)+'人加入',eventnode);
 								ui.create.div('','时间：'+str,eventnode);
 								if(button.info[i].members.contains(game.onlineKey)){
@@ -52302,7 +51809,7 @@
 					uiintro.classList.add('popped');
 					uiintro.classList.add('static');
 					uiintro.classList.add('onlineclient');
-					uiintro.style.width='360px';
+					uiintro.style.width='180px';
 					uiintro.style.height='300px';
 					uiintro.style.left='auto';
 					uiintro.style.right='20px';
@@ -52364,16 +51871,14 @@
 						for(var i=0;i<button.info.length;i++){
 							var node=ui.create.div('.menubutton.videonode.pointerdiv',uiintro.content);
 							ui.create.div('.menubutton.videoavatar',node).setBackground(button.info[i][1]||'caocao','character');
-							const nickname=button.info[i][0]||'无名玩家';
-							const nicknameTest=`${[' - 离线',' - 托管'].contains(nickname.slice(-5))?'×':''}${nickname}<span style="opacity: 0.5;">#${button.info[i][5]}</span>`;
 							if(button.info[i][4]==game.wsid){
-								ui.create.div('.name',`<span class="thundertext thunderauto">${nicknameTest}`,node);node.isme=true;
+								ui.create.div('.name','<span class="thundertext thunderauto">'+(button.info[i][0]||'无名玩家'),node);node.isme=true;
 							}
 							else if(button.info[i][2]){
-								ui.create.div('.name',nicknameTest,node);
+								ui.create.div('.name',(button.info[i][0]||'无名玩家'),node);
 							}
 							else{
-								ui.create.div('.name',`<span style="opacity:0.6">${nicknameTest}`,node);
+								ui.create.div('.name','<span style="opacity:0.6">'+(button.info[i][0]||'无名玩家'),node);
 							}
 							//show ID
 							//ui.create.div('.videostatus',node,button.info[i][5]);
@@ -56699,7 +56204,9 @@
 			}
 			return num;
 		},
-		connectNickname:()=>`※${(typeof lib.config.connect_nickname=='string'?(lib.config.connect_nickname.slice(0,12)):'无名玩家')}`,
+		connectNickname:function(){
+			return typeof lib.config.connect_nickname=='string'?(lib.config.connect_nickname.slice(0,12)):'无名玩家';
+		},
 		zhinangs:function(filter){
 			var list=(_status.connectMode?lib.configOL:lib.config).zhinang_tricks;
 			if(!list||!list.filter||!list.length) return get.inpile('trick','trick').randomGets(3);
@@ -56915,6 +56422,7 @@
 				return false;
 			},
 			banWords:function(str){
+				if(get.is.emoji(str)) return true;
 				for(var i of window.bannedKeyWords){
 					if(str.includes(i)) return true;
 				}
@@ -57639,7 +57147,6 @@
 			}
 		},
 		modetrans:function(config,server){
-			if(config.qunxionggeju) return '群雄割据';
 			if(config.mode=='doudizhu'){
 				switch(config.doudizhu_mode){
 					case 'kaihei':return '开黑斗地主';
@@ -59688,28 +59195,20 @@
 					var click=function(){
 						if(_status.dragged) return;
 						if(_status.justdragged) return;
+						if(_status.throwEmotionWait) return;
 						var emotion=this.link;
 						if(game.online){
 							game.send('throwEmotion',node,emotion);
 						}
 						else game.me.throwEmotion(node,emotion);
-					};
-					var click2=function(){
-						if(_status.dragged) return;
-						if(_status.justdragged) return;
-						var emotion=this.link.slice(0,-4);
-						if(game.online){
-							game.send('throwEmotion',node,emotion);
-						}
-						else game.me.throwEmotion(node,emotion);
-						for(var i=0;i<15;i++){
-							setTimeout(function(){
-								if(game.online){
-									game.send('throwEmotion',node,emotion);
-								}
-								else game.me.throwEmotion(node,emotion);
-							},125*(i+1));
-						}
+						uiintro._close();
+						_status.throwEmotionWait=true;
+						setTimeout(function(){
+							_status.throwEmotionWait=false;
+							if(ui.throwEmotion){
+								for(var i of ui.throwEmotion) i.classList.remove('exclude');
+							}
+						},(emotion=='flower'||emotion=='egg')?500:5000)
 					};
 					var td;
 					var table=document.createElement('div');
@@ -59721,6 +59220,7 @@
 					for(var i=0;i<listi.length;i++){
 						td=ui.create.div('.menubutton.reduce_radius.pointerdiv.tdnode');
 						ui.throwEmotion.add(td);
+						if(_status.throwEmotionWait) td.classList.add('exclude');
 						td.link=listi[i];
 						table.appendChild(td);
 						td.innerHTML='<span>'+get.translation(listi[i])+'</span>';
@@ -59737,25 +59237,11 @@
 					for(var i=0;i<listi.length;i++){
 						td=ui.create.div('.menubutton.reduce_radius.pointerdiv.tdnode');
 						ui.throwEmotion.add(td);
+						if(_status.throwEmotionWait) td.classList.add('exclude');
 						td.link=listi[i];
 						table.appendChild(td);
 						td.innerHTML='<span>'+get.translation(listi[i])+'</span>';
 						td.addEventListener(lib.config.touchscreen?'touchend':'click',click);
-					}
-					uiintro.content.appendChild(table);
-					table=document.createElement('div');
-					table.classList.add('add-setting');
-					table.style.margin='0';
-					table.style.width='100%';
-					table.style.position='relative';
-					var listi=['flowerSpam','eggSpam'];
-					for(var i=0;i<listi.length;i++){
-						td=ui.create.div('.menubutton.reduce_radius.pointerdiv.tdnode');
-						ui.throwEmotion.add(td);
-						td.link=listi[i];
-						table.appendChild(td);
-						td.innerHTML='<span>'+get.translation(listi[i])+'</span>';
-						td.addEventListener(lib.config.touchscreen?'touchend':'click',click2);
 					}
 					uiintro.content.appendChild(table);
 				}
