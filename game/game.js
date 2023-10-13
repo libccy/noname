@@ -7946,7 +7946,7 @@
 		setScroll:function(node){
 			node.ontouchstart=ui.click.touchStart;
 			node.ontouchmove=ui.click.touchScroll;
-			node.style.WebkitOverflowScrolling='touch';
+			node.style.webkitOverflowScrolling='touch';
 			return node;
 		},
 		setMousewheel:function(node){
@@ -30298,7 +30298,38 @@
 				}
 			},
 			VCard:class{
-				constructor(){}
+				/**
+				 * @param {string | [string, number, string, string] | {
+				 * suit: string;
+				 * number: number;
+				 * name: string;
+				 * nature: string;
+				 * }} suitOrTupleOrStruct
+				 * @param {number} [number]
+				 * @param {string} [name]
+				 * @param {string} [nature]
+				 */
+				constructor(suitOrTupleOrStruct,number,name,nature){
+					if(Array.isArray(suitOrTupleOrStruct)){
+						this.suit=suitOrTupleOrStruct[0];
+						this.number=suitOrTupleOrStruct[1];
+						this.name=suitOrTupleOrStruct[2];
+						this.nature=suitOrTupleOrStruct[3];
+					}
+					else if(typeof suitOrTupleOrStruct=='object'){
+						this.suit=suitOrTupleOrStruct.suit;
+						this.number=suitOrTupleOrStruct.number;
+						this.name=suitOrTupleOrStruct.name;
+						this.nature=suitOrTupleOrStruct.nature;
+					}
+					else{
+						this.suit=suitOrTupleOrStruct;
+						this.number=number;
+						this.name=name;
+						this.nature=nature;
+					}
+					this.color=get.color();
+				}
 			},
 			Button:class extends HTMLDivElement{
 				/**
@@ -31112,7 +31143,7 @@
 					if(!noTouchScroll){
 						dialog.contentContainer.ontouchstart=ui.click.dialogtouchStart;
 						dialog.contentContainer.ontouchmove=ui.click.touchScroll;
-						dialog.contentContainer.style.WebkitOverflowScrolling='touch';
+						dialog.contentContainer.style.webkitOverflowScrolling='touch';
 						dialog.ontouchstart=ui.click.dragtouchdialog;
 					}
 					if(noForceButton) dialog.noforcebutton=true;
@@ -34706,96 +34737,135 @@
 			}],
 			['骰子',{
 				getSpan:()=>{
-					return `<span style="font-family:NonameSuits">🎲</span>`;
+					const span=document.createElement('span');
+					span.style.fontFamily='NonameSuits';
+					span.textContent='🎲';
+					return span.outerHTML;
 				}
 			}],
 			['SP',{
-				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">SP</span>`;
+				getSpan:()=>{
+					const span=document.createElement('span'),style=span.style;
+					style.writingMode=style.webkitWritingMode='horizontal-tb';
+					style.fontFamily='MotoyaLMaru';
+					style.transform='scaleY(0.85)';
+					span.textContent='SP';
+					return span.outerHTML;
 				},
 			}],
 			['OL',{
-				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">OL</span>`;
+				getSpan:()=>{
+					const span=document.createElement('span'),style=span.style;
+					style.writingMode=style.webkitWritingMode='horizontal-tb';
+					style.fontFamily='MotoyaLMaru';
+					style.transform='scaleY(0.85)';
+					span.textContent='OL';
+					return span.outerHTML;
 				},
 			}],
 			['RE',{
-				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">RE</span>`;
+				getSpan:()=>{
+					const span=document.createElement('span'),style=span.style;
+					style.writingMode=style.webkitWritingMode='horizontal-tb';
+					style.fontFamily='MotoyaLMaru';
+					style.transform='scaleY(0.85)';
+					span.textContent='RE';
+					return span.outerHTML;
 				},
 			}],
 			['手杀',{
 				getSpan:(prefix,name)=>{
-					const simple=(lib.config.buttoncharacter_prefix=='simple');
+					const simple=lib.config.buttoncharacter_prefix=='simple',span=document.createElement('span');
 					if(lib.characterPack.shiji&&name in lib.characterPack.shiji){
-						for(let i in lib.characterSort.shiji){
-							if(lib.characterSort.shiji[i].includes(name)){
-								prefix=get.translation(i).slice(-1);
-								break;
-							}
+						for(const entry of Object.entries(lib.characterSort.shiji)){
+							if(!entry[1].includes(name)) continue;
+							prefix=get.translation(entry[0]).slice(-1);
+							break;
 						}
-						if(simple) return `<span>${prefix}</span>`;
-						return `<span style="color:#def7ca" data-nature="watermm">${prefix}</span>`;
+						if(!simple){
+							span.style.color='#def7ca';
+							span.dataset.nature='watermm';
+						}
+						span.innerHTML=prefix;
 					}
-					if(simple) return '<span>手杀</span>';
-					return `<span style="font-family:NonameSuits">📱</span>`;
+					else if(simple) span.textContent='手杀';
+					else{
+						span.style.fontFamily='NonameSuits';
+						span.textContent='📱';
+					}
+					return span.outerHTML;
 				},
 			}],
 			['TW',{
-				getSpan:(prefix,name)=>{
-					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:MotoyaLMaru;transform:scaleY(0.85)">TW</span>`;
+				getSpan:()=>{
+					const span=document.createElement('span'),style=span.style;
+					style.writingMode=style.webkitWritingMode='horizontal-tb';
+					style.fontFamily='MotoyaLMaru';
+					style.transform='scaleY(0.85)';
+					span.textContent='TW';
+					return span.outerHTML;
 				},
 			}],
 			['TW神',{
-				getSpan:(prefix,name)=>{
-					return `${get.prefixSpan('TW')}${get.prefixSpan('神')}`
-				},
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('TW')}${get.prefixSpan('神')}`
 			}],
 			['TW将',{
-				getSpan:(prefix,name)=>{
-					return `${get.prefixSpan('TW')}${get.prefixSpan('将')}`
-				},
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('TW')}${get.prefixSpan('将')}`
 			}],
 			['OL神',{
-				getSpan:(prefix,name)=>{
-					return `${get.prefixSpan('OL')}${get.prefixSpan('神')}`
-				},
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('OL')}${get.prefixSpan('神')}`
 			}],
 			['旧神',{
-				getSpan:(prefix,name)=>{
-					return `${get.prefixSpan('旧')}${get.prefixSpan('神')}`
-				},
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('旧')}${get.prefixSpan('神')}`
 			}],
 			['旧晋',{
-				getSpan:(prefix,name)=>{
-					return `${get.prefixSpan('旧')}${get.prefixSpan('晋')}`
-				},
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('旧')}${get.prefixSpan('晋')}`
 			}],
 			['新杀SP',{
-				getSpan:(prefix,name)=>{
-					return `${get.prefixSpan('新杀')}${get.prefixSpan('SP')}`
-				},
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('新杀')}${get.prefixSpan('SP')}`
 			}],
 			['界SP',{
-				getSpan:(prefix,name)=>{
-					return `${get.prefixSpan('界')}${get.prefixSpan('SP')}`
-				},
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('界')}${get.prefixSpan('SP')}`
 			}],
 			['S特神',{
-				getSpan:(prefix,name)=>{
-					return `${get.prefixSpan('★')}${get.prefixSpan('神')}`
-				},
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('★')}${get.prefixSpan('神')}`
 			}],
 			['手杀界',{
-				getSpan:(prefix,name)=>{
-					return `${get.prefixSpan('手杀')}${get.prefixSpan('界')}`
-				},
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('手杀')}${get.prefixSpan('界')}`
 			}],
 			['战役篇神',{
-				getSpan:(prefix,name)=>{
-					return `${get.prefixSpan('战役篇')}${get.prefixSpan('神')}`
-				},
-			}],
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('战役篇')}${get.prefixSpan('神')}`
+			}]
 		]),
 		groupnature:{
 			shen:'shen',
@@ -42334,7 +42404,13 @@
 				return true;
 			});
 		},
+		/**
+		 * @type {InstanceType<typeof lib.element.Player>[]}
+		 */
 		players:[],
+		/**
+		 * @type {InstanceType<typeof lib.element.Player>[]}
+		 */
 		dead:[],
 		imported:[],
 		playerMap:{},
@@ -51355,7 +51431,7 @@
 
 				ui.sidebar.ontouchstart=ui.click.touchStart;
 				ui.sidebar.ontouchmove = ui.click.touchScroll;
-				ui.sidebar.style.WebkitOverflowScrolling='touch';
+				ui.sidebar.style.webkitOverflowScrolling='touch';
 
 				var zoom;
 				switch(lib.config.ui_zoom){
@@ -52177,8 +52253,8 @@
 				ui.handcards2Container.ontouchstart = ui.click.touchStart;
 				ui.handcards1Container.ontouchmove = ui.click.touchScroll;
 				ui.handcards2Container.ontouchmove = ui.click.touchScroll;
-				ui.handcards1Container.style.WebkitOverflowScrolling='touch';
-				ui.handcards2Container.style.WebkitOverflowScrolling='touch';
+				ui.handcards1Container.style.webkitOverflowScrolling='touch';
+				ui.handcards2Container.style.webkitOverflowScrolling='touch';
 
 				if(hasme&&game.me){
 					ui.handcards1=game.me.node.handcards1;
@@ -57404,7 +57480,7 @@
 				_card={
 					name:get.name(card),
 					suit:get.suit(card),
-					color:get.suit(card),
+					color:get.color(card),
 					number:get.number(card),
 					nature:get.nature(card),
 					isCard:true,
@@ -57774,6 +57850,11 @@
 				return str;
 			}
 		},
+		/**
+		 * @template T
+		 * @param {T} obj
+		 * @returns {T}
+		 */
 		copy:obj=>{
 			if(get.objtype(obj)=='object'){
 				var copy={};
@@ -58451,17 +58532,24 @@
 		 * @returns {string}
 		 */
 		prefixSpan:(prefix,name)=>{
-			let color='#ffffff',nature=false;
-			const map=lib.namePrefix.get(prefix),config=lib.config.buttoncharacter_prefix;
+			const config=lib.config.buttoncharacter_prefix;
 			if(config=='off') return '';
-			if(map){
-				if(map.getSpan) return map.getSpan(prefix,name);
-				if(map.color) color=map.color;
-				if(map.nature) nature=map.nature;
-				if(map.showName) prefix=map.showName;
+			if(config=='simple'){
+				const span=document.createElement('span');
+				span.innerHTML=prefix;
+				return span.outerHTML;
 			}
-			if(config=='simple') return `<span>${prefix}</span>`
-			return `<span style="color: ${color};"${nature?(`data-nature="${nature}"`):''}>${prefix}</span>`
+			const namePrefix=lib.namePrefix.get(prefix),exists=Boolean(namePrefix);
+			if(exists&&'getSpan' in namePrefix) return namePrefix.getSpan(prefix,name);
+			const span=document.createElement('span');
+			if(exists){
+				if('color' in namePrefix) span.style.color=namePrefix.color;
+				if('nature' in namePrefix) span.dataset.nature=namePrefix.nature;
+				if('showName' in namePrefix) prefix=namePrefix.showName;
+			}
+			else span.style.color='#ffffff';
+			span.innerHTML=prefix;
+			return span.outerHTML;
 		},
 		slimName:str=>get.verticalStr(get.slimNameHorizontal(str),true),
 		time:()=>{
@@ -58593,6 +58681,11 @@
 				return 'none';
 			}
 		},
+		/**
+		 * @param {*} card
+		 * @param {InstanceType<typeof lib.element.Player>} player
+		 * @returns {keyof typeof lib.color}
+		 */
 		color:(card,player)=>{
 			if(!card) return;
 			if(Array.isArray(card)){
