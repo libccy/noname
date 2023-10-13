@@ -9902,10 +9902,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var att=get.attitude(player,target);
 						return -att;
 						//if(cards.length==1) return -att;
-						if(player==target) att/=2;
-						if(target.hasSkill('pingkou')) att*=1.4;
-						att*=(1+target.countCards('j')/2);
-						return att;
+						// if(player==target) att/=2;
+						// if(target.hasSkill('pingkou')) att*=1.4;
+						// att*=(1+target.countCards('j')/2);
+						// return att;
 					});
 					"step 3"
 					if(result.bool){

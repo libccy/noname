@@ -8218,7 +8218,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return names.length>0&&player.hasCard(function(card){
 						return names.includes(get.name(card));
 					},'hs');
-					return false;
+					//return false;
 				},
 				group:'twchaofeng_compare',
 				chooseButton:{

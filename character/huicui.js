@@ -5044,7 +5044,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										if(evtx3.gaintag_map[i].contains('dcliuzhuan_tag')) return true;
 									}
 								});
-								return false;
+								//return false;
 							}
 							else if(event.name=='lose'){
 								if(event.player!=current||event.position!=ui.discardPile) return false;
@@ -5268,7 +5268,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(target.group!=current.group) return false;
 								if(!ui.selected.targets.length) return true;
 								return ui.selected.targets[0]==current;
-								return current==target;
+								//return current==target;
 							}).set('ai',function(target){
 								var player=_status.event.player;
 								return get.effect(target,{name:'sha'},player,player);

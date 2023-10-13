@@ -11025,11 +11025,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.judge(function(card){
 						var type=get.subtype(card);
 						return ['equip1','equip4','equip3','equip6'].contains(type)?6:-6;
-						switch(type){
-							case 'equip':return 4;
-							case 'trick':return -4;
-							default:return 0;
-						}
+						// switch(type){
+						// 	case 'equip':return 4;
+						// 	case 'trick':return -4;
+						// 	default:return 0;
+						// }
 					}).judge2=function(result){
 						return result.bool;
 					};

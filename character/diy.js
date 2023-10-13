@@ -680,7 +680,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(evt.gaintag_map[i].includes('fuuko_chuanyuan')) return true;
 								}
 							});
-							return false;
+							//return false;
 						},
 						content:function(){
 							trigger.addCount=false;

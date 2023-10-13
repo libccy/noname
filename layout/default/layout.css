@@ -5529,3 +5529,7 @@ div[data-decoration="bronze"]::after{
 ::-webkit-scrollbar {
 	display: none;
 }
+/* 火狐隐藏滚动条 */
+* {
+	scrollbar-width: none;
+}
