@@ -10539,11 +10539,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.setContent(lib.skill.rehuashen.content);
 				},
 			},
-			rexingsheng:{audio:2},
 			rexinsheng:{
-				//mode:['identity','single','doudizhu'],
 				unique:true,
-				audio:'rexingsheng',
+				audio:2,
 				trigger:{player:'damageEnd'},
 				frequent:true,
 				content:function(){
