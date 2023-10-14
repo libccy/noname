@@ -4871,11 +4871,9 @@
 					update:function(config,map){
 						if(config.connect_identity_mode=='mougong'){
 							map.connect_round1_use_nuqi.show();
-							map.connect_nuqi_seen_for_others.show();
 						}
 						else{
 							map.connect_round1_use_nuqi.hide();
-							map.connect_nuqi_seen_for_others.hide();
 						}
 						if(config.connect_identity_mode=='zhong'){
 							map.connect_player_number.hide();
@@ -5004,13 +5002,6 @@
 						restart:true,
 						intro:'谋攻篇规则为第二轮开始才可使用怒气强化卡牌，开启此选项从游戏开始即可强化卡牌。'
 					},
-					connect_nuqi_seen_for_others:{
-						name:'开启其他角色怒气可见',
-						init:false,
-						frequent:false,
-						restart:true,
-						intro:'谋攻篇实测效果为无法看见其他角色剩余怒气。开启此选项即可令所有角色的怒气值被其他玩家可见。'
-					},
 					// connect_ban_weak:{
 					// 	name:'屏蔽弱将',
 					// 	init:true,
@@ -5032,12 +5023,10 @@
 					update:function(config,map){
 						if(config.identity_mode=='mougong'){
 							map.round1_use_nuqi.show();
-							map.nuqi_seen_for_others.show();
 							map.nei_auto_mark_camouflage.show();
 						}
 						else{
 							map.round1_use_nuqi.hide();
-							map.nuqi_seen_for_others.hide();
 							map.nei_auto_mark_camouflage.hide();
 						}
 						if(config.identity_mode=='zhong'){
@@ -5372,13 +5361,6 @@
 						frequent:false,
 						restart:true,
 						intro:'谋攻篇规则为第二轮开始才可使用怒气强化卡牌，开启此选项从游戏开始即可强化卡牌。'
-					},
-					nuqi_seen_for_others:{
-						name:'开启其他角色怒气可见',
-						init:false,
-						frequent:false,
-						restart:true,
-						intro:'谋攻篇实测效果为无法看见其他角色剩余怒气。开启此选项即可令其他玩家的怒气值被你可见。'
 					},
 					nei_auto_mark_camouflage:{
 						name:'内奸自动标记伪装反贼',
@@ -34359,7 +34341,7 @@
 						return `<span style="color:#def7ca" data-nature="watermm">${prefix}</span>`;
 					}
 					if(simple) return '<span>手杀</span>';
-					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:xinwei;transform:scaleY(0.85);transform:scaleX(0.55);">手杀</span>`;
+					return `<span style="font-family:NonameSuits">📱</span>`;
 				},
 			}],
 			['TW',{

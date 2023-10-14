@@ -264,7 +264,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 				if(_status.connectMode){
 					_status.round1_use_nuqi=lib.configOL.round1_use_nuqi;
-					_status.nuqi_seen_for_others=lib.configOL.nuqi_seen_for_others;
 					if(!_status.postReconnect.mougong_reinit){
 						_status.postReconnect.mougong_reinit=[
 							function(){
@@ -279,7 +278,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				else{
 					_status.round1_use_nuqi=get.config('round1_use_nuqi');
-					_status.nuqi_seen_for_others=get.config('nuqi_seen_for_others');
 				}
 				for(var current of game.players){
 					if(current.identity=='zhu') current.addSkill('mougong_showZhu');
@@ -365,9 +363,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				});
 				for(var i=0;i<game.players.length;i++){
-					if(game.players[i]==game.me||_status.nuqi_seen_for_others){
-						game.addVideo('markSkill',game.players[i],['mougong_nuqi']);
-					}
+					game.addVideo('markSkill',game.players[i],['mougong_nuqi']);
 					game.players[i].ai.shown=0;
 				}
 				game.neiDoCamouflage();
@@ -440,7 +436,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(lib.configOL.identity_mode!='zhong'){
 					if(lib.configOL.identity_mode=='mougong'){
 						uiintro.add('<div class="text chat">首轮强化：'+(lib.configOL.round1_use_nuqi?'开启':'关闭'));
-						uiintro.add('<div class="text chat">怒气可见：'+(lib.configOL.nuqi_seen_for_others?'是':'否'));
 					}
 					else{
 						uiintro.add('<div class="text chat">双内奸：'+(lib.configOL.double_nei?'开启':'关闭'));
@@ -1307,13 +1302,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.players.forEach(current=>{
 						current.storage.zhibi=[];
 						current.storage.zhibi_for=[];
-						if(lib.configOL.nuqi_seen_for_others){
-							current.markSkill('mougong_nuqi');
-						}
-						else{
-							if(current==game.me) localMark('mougong_nuqi');
-							else if(current.isOnline()) current.send(localMark,'mougong_nuqi');
-						}
+						current.markSkill('mougong_nuqi');
 					});
 					
 					setTimeout(function(){
@@ -2130,9 +2119,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.players.forEach(i=>{
 							i.storage.zhibi=[];
 							i.storage.zhibi_for=[];
-							if(i.isUnderControl(true)||_status.nuqi_seen_for_others){
-								i.markSkill('mougong_nuqi')
-							}
+							i.markSkill('mougong_nuqi');
 						});
 					}
 					setTimeout(function(){
@@ -2659,15 +2646,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var del=player.storage.mougong_nuqi-tmp;
 					if(del===0) return;
 					game.log(player,del>=0?'获得了':'失去了',get.cnNumber(Math.abs(del))+'点<span class="firetext">怒气</span>');
-					if(player.storage.mougong_nuqi>=0&&del!=0){
-						if(player==game.me||_status.nuqi_seen_for_others){
-							player.markSkill('mougong_nuqi');
-						}
-						player.syncStorage('mougong_nuqi');
-						game.broadcast(function(player,num){
-							player.storage.mougong_nuqi=num;
-						},player,player.storage.mougong_nuqi);
-					}
+					player.markSkill('mougong_nuqi');
 				},
 				addExpose:function(num){
 					if(!game.zhu||!game.zhu.isZhu||!game.zhu.identityShown) return;
@@ -3862,6 +3841,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							global:'loseHpEnd',
 						},
 						filter:function(event,player){
+							if(event.player.identityShown) return false;
 							var source=event.source;
 							if(event.name=='loseHp'){
 								if(event.getParent()._trigger) source=event.getParent()._trigger.source;
