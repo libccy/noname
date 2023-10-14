@@ -34249,7 +34249,7 @@
 						return `<span style="color:#def7ca" data-nature="watermm">${prefix}</span>`;
 					}
 					if(simple) return '<span>手杀</span>';
-					return `<span style="font-family:NonameSuits">📱</span>`;
+					return `<span style="writing-mode:horizontal-tb;-webkit-writing-mode:horizontal-tb;font-family:xinwei;transform:scaleY(0.85);transform:scaleX(0.55);">手杀</span>`;
 				},
 			}],
 			['TW',{
@@ -34295,6 +34295,11 @@
 			['S特神',{
 				getSpan:(prefix,name)=>{
 					return `${get.prefixSpan('★')}${get.prefixSpan('神')}`
+				},
+			}],
+			['手杀界',{
+				getSpan:(prefix,name)=>{
+					return `${get.prefixSpan('手杀')}${get.prefixSpan('界')}`
 				},
 			}],
 		]),
