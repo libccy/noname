@@ -10789,7 +10789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(lib.filter.notMe,'是否令一名其他角色也获得【'+get.translation(skill)+'】？').set('ai',function(target){
 						var player=_status.event.player;
 						if(player.identity=='nei') return 0;
-						return get.attitude(player,target)-6;
+						return get.attitude(player,target);
 					});
 					'step 2'
 					if(result.bool){
@@ -14209,7 +14209,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twlingfa_info:'①第一轮游戏开始时，你可选择获得如下效果直到本轮结束：其他角色使用【杀】时，若其有牌，则其需弃置一张牌，否则受到你造成的1点伤害。②第二轮游戏开始时，你可选择获得如下效果直到本轮结束：其他角色使用【桃】结算结束后，若其有牌，则其需交给你一张牌，否则受到你造成的1点伤害。③第三轮游戏开始时，你失去〖令法〗并获得〖治暗〗。',
 			twzhian:'治暗',
 			twzhian_info:'每回合限一次。一名角色使用装备牌或延时锦囊牌后，你可选择：⒈弃置位于场上的此牌。⒉弃置一张手牌并获得位于场上的此牌。⒊对其造成1点伤害。',
-			tw_zhangmancheng:'张曼成',
+			tw_zhangmancheng:'TW张曼成',
+			tw_zhangmancheng_prefix:'TW',
 			twfengji:'蜂集',
 			twfengji_info:'出牌阶段开始时，若你没有“示”，则你可以将一张牌作为“示”置于武将牌上并施法：从牌堆中获得X张与“示”牌名相同的牌，然后移去“示”。',
 			twyiju:'蚁聚',
