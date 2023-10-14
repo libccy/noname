@@ -4869,6 +4869,14 @@
 				name:'身份',
 				connect:{
 					update:function(config,map){
+						if(config.connect_identity_mode=='mougong'){
+							map.connect_round1_use_nuqi.show();
+							map.connect_nuqi_seen_for_others.show();
+						}
+						else{
+							map.connect_round1_use_nuqi.hide();
+							map.connect_nuqi_seen_for_others.hide();
+						}
 						if(config.connect_identity_mode=='zhong'){
 							map.connect_player_number.hide();
 							map.connect_limit_zhu.hide();
@@ -4877,6 +4885,15 @@
 							map.connect_zhong_card.show();
 							map.connect_special_identity.hide();
 							map.connect_double_character.show();
+						}
+						else if(config.connect_identity_mode=='mougong'){
+							map.connect_double_character.show();
+							map.connect_player_number.show();
+							map.connect_limit_zhu.hide();
+							map.connect_enhance_zhu.hide();
+							map.connect_double_nei.hide();
+							map.connect_zhong_card.hide();
+							map.connect_special_identity.hide();
 						}
 						else if(config.connect_identity_mode=='purple'){
 							map.connect_player_number.hide();
@@ -4914,6 +4931,7 @@
 						item:{
 							normal:'标准',
 							zhong:'明忠',
+							mougong:'谋攻',
 							purple:'3v3v2',
 						},
 						restart:true,
@@ -4979,6 +4997,20 @@
 						frequent:true,
 						intro:'开启后游戏中将增加军师、大将、贼首三个身份'
 					},
+					connect_round1_use_nuqi:{
+						name:'开启首轮强化卡牌',
+						init:false,
+						frequent:false,
+						restart:true,
+						intro:'谋攻篇规则为第二轮开始才可使用怒气强化卡牌，开启此选项从游戏开始即可强化卡牌。'
+					},
+					connect_nuqi_seen_for_others:{
+						name:'开启其他角色怒气可见',
+						init:false,
+						frequent:false,
+						restart:true,
+						intro:'谋攻篇实测效果为无法看见其他角色剩余怒气。开启此选项即可令所有角色的怒气值被其他玩家可见。'
+					},
 					// connect_ban_weak:{
 					// 	name:'屏蔽弱将',
 					// 	init:true,
@@ -4998,6 +5030,16 @@
 				},
 				config:{
 					update:function(config,map){
+						if(config.identity_mode=='mougong'){
+							map.round1_use_nuqi.show();
+							map.nuqi_seen_for_others.show();
+							map.nei_auto_mark_camouflage.show();
+						}
+						else{
+							map.round1_use_nuqi.hide();
+							map.nuqi_seen_for_others.hide();
+							map.nei_auto_mark_camouflage.hide();
+						}
 						if(config.identity_mode=='zhong'){
 							map.player_number.hide();
 							map.enhance_zhu.hide();
@@ -5026,6 +5068,50 @@
 								map.double_hp.hide();
 							}
 							map.continue_game.show();
+						}
+						else if(config.identity_mode=='mougong'){
+							map.continue_game.show();
+							map.player_number.show();
+							map.enhance_zhu.hide();
+							map.auto_identity.hide();
+							if(config.player_number!='2'){
+								map.double_nei.show();
+							}
+							else{
+								map.double_nei.hide();
+							}
+							map.choice_zhu.show();
+							map.limit_zhu.hide();
+							map.choice_zhong.show();
+							map.choice_nei.show();
+							map.choice_fan.show();
+							map.ban_identity.show();
+							if(config.ban_identity=='off'){
+								map.ban_identity2.hide();
+							}
+							else{
+								map.ban_identity2.show();
+							}
+							if(config.ban_identity=='off'||config.ban_identity2=='off'){
+								map.ban_identity3.hide();
+							}
+							else{
+								map.ban_identity3.show();
+							}
+							map.zhong_card.hide();
+							map.choose_group.show();
+							map.auto_mark_identity.hide();
+							map.change_choice.show();
+							map.free_choose.show();
+							map.change_identity.show();
+							map.special_identity.hide();
+							map.double_character.show();
+							if(config.double_character){
+								map.double_hp.show();
+							}
+							else{
+								map.double_hp.hide();
+							}
 						}
 						else if(config.identity_mode=='purple'){
 							map.player_number.hide();
@@ -5107,11 +5193,12 @@
 						item:{
 							normal:'标准',
 							zhong:'明忠',
+							mougong:'谋攻',
 							purple:'3v3v2',
 						},
 						restart:true,
 						frequent:true,
-						intro:'明忠模式详见帮助'
+						intro:'明忠模式与谋攻模式详见帮助'
 					},
 					player_number:{
 						name:'游戏人数',
@@ -5278,6 +5365,26 @@
 							twice:'两次',
 							unlimited:'无限',
 						},
+					},
+					round1_use_nuqi:{
+						name:'开启首轮强化卡牌',
+						init:false,
+						frequent:false,
+						restart:true,
+						intro:'谋攻篇规则为第二轮开始才可使用怒气强化卡牌，开启此选项从游戏开始即可强化卡牌。'
+					},
+					nuqi_seen_for_others:{
+						name:'开启其他角色怒气可见',
+						init:false,
+						frequent:false,
+						restart:true,
+						intro:'谋攻篇实测效果为无法看见其他角色剩余怒气。开启此选项即可令其他玩家的怒气值被你可见。'
+					},
+					nei_auto_mark_camouflage:{
+						name:'内奸自动标记伪装反贼',
+						intro:'玩家内奸在游戏开始洞察结束后，自动将被洞察角色标记为反贼。',
+						init:false,
+						unfrequent:true,
 					},
 					continue_game:{
 						name:'显示再战',
@@ -27742,7 +27849,10 @@
 				isZhu2:function(){
 					var player=this,mode=get.mode();
 					if(!this.isZhu) return false;
-					if(mode=='identity') return true;
+					if(mode=='identity'){
+						if(_status.mode=='mougong'&&!this.identityShown) return false;
+						return true;
+					}
 					if(mode=='versus'&&(_status.mode=='four'||_status.mode=='guandu')) return true;
 					return false;
 				},
@@ -36162,8 +36272,17 @@
 				ui.updatehl();
 				for(var i=0;i<players.length;i++){
 					if(lib.config.mode=='identity'){
-						game.players[i].init(players[i].name,players[i].name2);
-						game.players[i].setIdentity(players[i].identity);
+						if(_status.mode=='mougong'){
+							game.players[i].init(players[i].name,players[i].name2);
+							game.players[i].identity=players[i].identity;
+							if(game.players[i].identity=='fan'&&game.players[i].isCamouflaged&&game.me.identity=='nei'||game.players[i]==game.me){
+								game.players[i].setIdentity(players[i].identity);
+							}
+						}
+						else{
+							game.players[i].init(players[i].name,players[i].name2);
+							game.players[i].setIdentity(players[i].identity);
+						}
 					}
 					else if(lib.config.mode=='doudizhu'||lib.config.mode=='single'){
 						game.players[i].init(players[i].name,players[i].name2);
@@ -36581,6 +36700,15 @@
 			updateActCount:function(player,content){
 				if(player&&content){
 					player.updateActCount(content[0],content[1],content[2]);
+				}
+				else{
+					console.log(player);
+				}
+			},
+			showIdentity:function(player,identity){
+				identity=identity||(player?player.identity:null);
+				if(player&&player.identity){
+					player.showIdentity(identity);
 				}
 				else{
 					console.log(player);
@@ -38730,7 +38858,7 @@
 					for(i=0;i<game.players.length;i++){
 						tr=document.createElement('tr');
 						td=document.createElement('td');
-						td.innerHTML=get.translation(game.players[i]);
+						td.innerHTML=get.translation(game.players[i])+(game.players[i].ai.mougong_camouflage?'(被伪装)':'');
 						tr.appendChild(td);
 						td=document.createElement('td');
 						num=0;
@@ -38800,7 +38928,7 @@
 					for(i=0;i<game.dead.length;i++){
 						tr=document.createElement('tr');
 						td=document.createElement('td');
-						td.innerHTML=get.translation(game.dead[i]);
+						td.innerHTML=get.translation(game.dead[i])+(game.dead[i].ai.mougong_camouflage?'(被伪装)':'');
 						tr.appendChild(td);
 						td=document.createElement('td');
 						num=0;
@@ -52728,6 +52856,7 @@
 				if(!game.getIdentityList) return;
 				if(_status.video) return;
 				if(this.parentNode.forceShown) return;
+				if(!_status.connectMode&&this.parentNode.ai.mougong_camouflage&&get.config('nei_auto_mark_camouflage')&&game.me.identity=='nei') return;
 				if(_status.clickingidentity){
 					for(var i=0;i<_status.clickingidentity[1].length;i++){
 						_status.clickingidentity[1][i].delete();
@@ -52748,8 +52877,9 @@
 					list2.push(list2[0]);
 					for(var i=0;i<list2.length;i++){
 						if(this.firstChild.innerHTML==list[list2[i]]){
-							this.firstChild.innerHTML=list[list2[i+1]];
-							this.dataset.color=list2[i+1];
+							var identity=list2[i+1];
+							this.firstChild.innerHTML=list[identity];
+							this.dataset.color=identity=='you'?'friend2':(identity=='di'?'enemy':identity);
 							break;
 						}
 					}
@@ -52803,7 +52933,7 @@
 								node.listen(function(){
 									var info=this.link;
 									info[0].firstChild.innerHTML=info[1];
-									info[0].dataset.color=info[2];
+									info[0].dataset.color=info[2]=='you'?'friend2':(info[2]=='di'?'enemy':info[2]);
 									_status.clicked=false;
 								});
 							}
@@ -57674,6 +57804,7 @@
 				switch(config.identity_mode){
 					case 'purple':return '三对三对二';
 					case 'zhong':return (config.double_character?'双将':'')+'忠胆英杰';
+					case 'mougong':return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'谋攻';
 					default:return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'身份';
 				}
 			}

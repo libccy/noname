@@ -234,11 +234,63 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.players[i].ai.shown=0;
 				}
 			}
+			var isMougong=_status.mode=='mougong';
+			if(isMougong){
+				var beginner;
+				if(_status.cheat_seat){
+					var seat=_status.cheat_seat.link;
+					beginner=seat==0?game.me:game.players[game.players.length-seat];
+					if(!beginner) beginner=game.me;
+					delete _status.cheat_seat;
+				}
+				else{
+					beginner=game.players[Math.floor(Math.random()*game.players.length)];
+				}
+				event.beginner=beginner;
+
+				_status.mougong_buff={
+					sha:[1,'require'],
+					shan:[1,'double'],
+					juedou:[2,'damage'],
+					huogong:[2,'damage'],
+					tao:[3,'double'],
+				};
+				game.broadcastAll(function(){
+					_status.mougong_nuqi_max=3;
+					var mougong_cardStyle=document.createElement('style');
+					document.head.appendChild(mougong_cardStyle);
+					mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:1;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
+					ui.css.mougong_cardStyle=mougong_cardStyle;
+				});
+				if(_status.connectMode){
+					_status.round1_use_nuqi=lib.configOL.round1_use_nuqi;
+					_status.nuqi_seen_for_others=lib.configOL.nuqi_seen_for_others;
+					if(!_status.postReconnect.mougong_reinit){
+						_status.postReconnect.mougong_reinit=[
+							function(){
+								_status.mougong_nuqi_max=3;
+								var mougong_cardStyle=document.createElement('style');
+								document.head.appendChild(mougong_cardStyle);
+								mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:1;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
+								ui.css.mougong_cardStyle=mougong_cardStyle;
+							},{}
+						];
+					}
+				}
+				else{
+					_status.round1_use_nuqi=get.config('round1_use_nuqi');
+					_status.nuqi_seen_for_others=get.config('nuqi_seen_for_others');
+				}
+				for(var current of game.players){
+					if(current.identity=='zhu') current.addSkill('mougong_showZhu');
+					if(current.identity=='fan') current.addSkill('mougong_showFan');
+				}
+			}
 			if(game.zhu==game.me&&game.zhu.identity!='zhu'&&_status.brawl&&_status.brawl.identityShown){
 				delete game.zhu;
 			}
 			else{
-				game.zhu.ai.shown=1;
+				if(!isMougong) game.zhu.ai.shown=1;
 				if(game.zhu2){
 					game.zhong=game.zhu;
 					game.zhu=game.zhu2;
@@ -252,10 +304,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				var enhance_zhu=false;
 				if(_status.connectMode){
-					enhance_zhu=(_status.mode!='zhong'&&_status.mode!='purple'&&lib.configOL.enhance_zhu&&get.population('fan')>=3);
+					enhance_zhu=(!['zhong','mougong','purple'].includes(_status.mode)&&lib.configOL.enhance_zhu&&get.population('fan')>=3);
 				}
 				else{
-					enhance_zhu=(_status.mode!='zhong'&&_status.mode!='purple'&&get.config('enhance_zhu')&&get.population('fan')>=3);
+					enhance_zhu=(!['zhong','mougong','purple'].includes(_status.mode)&&get.config('enhance_zhu')&&get.population('fan')>=3);
 				}
 				if(enhance_zhu){
 					var skill;
@@ -286,22 +338,49 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			var players=get.players(lib.sort.position);
 			var info=[];
 			for(var i=0;i<players.length;i++){
-				info.push({
+				var ifo={
 					name:players[i].name1,
 					name2:players[i].name2,
 					identity:players[i].identity
-				});
+				};
+				if(isMougong){
+					ifo.translate=lib.translate[game.players[i].name];
+					ifo.isCamouflaged=players[i].ai.mougong_camouflage;
+				}
+				info.push(ifo);
 			}
 			_status.videoInited=true;
 			game.addVideo('init',null,info);
+			if(isMougong){
+				game.addVideo('arrangeLib',null,{
+					skill:{
+						mougong_nuqi:{
+							mark:true,
+							marktext:'🔥',
+							intro:{
+								name:'怒气',
+								content:'当前怒气值：#/3',
+							},
+						},
+					},
+				});
+				for(var i=0;i<game.players.length;i++){
+					if(game.players[i]==game.me||_status.nuqi_seen_for_others){
+						game.addVideo('markSkill',game.players[i],['mougong_nuqi']);
+					}
+					game.players[i].ai.shown=0;
+				}
+				game.neiDoCamouflage();
+			}
 			"step 6"
-			game.gameDraw(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me,function(player){
+			if(_status.mode!='mougong') event.beginner=_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me;
+			game.gameDraw(event.beginner,function(player){
 				if(_status.mode=='purple'&&player.seatNum>5) return 5;
 				return 4;
 			});
 			if(_status.connectMode&&lib.configOL.change_card) game.replaceHandcards(game.players.slice(0));
 			"step 7"
-			game.phaseLoop(_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me);
+			game.phaseLoop(event.beginner);
 		},
 		game:{
 			canReplaceViewpoint:()=>true,
@@ -359,8 +438,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				uiintro.add('<div class="text chat">游戏模式：'+(lib.configOL.identity_mode=='zhong'?'明忠':'标准'));
 				uiintro.add('<div class="text chat">双将模式：'+(lib.configOL.double_character?'开启':'关闭'));
 				if(lib.configOL.identity_mode!='zhong'){
-					uiintro.add('<div class="text chat">双内奸：'+(lib.configOL.double_nei?'开启':'关闭'));
-					uiintro.add('<div class="text chat">加强主公：'+(lib.configOL.enhance_zhu?'开启':'关闭'));
+					if(lib.configOL.identity_mode=='mougong'){
+						uiintro.add('<div class="text chat">首轮强化：'+(lib.configOL.round1_use_nuqi?'开启':'关闭'));
+						uiintro.add('<div class="text chat">怒气可见：'+(lib.configOL.nuqi_seen_for_others?'是':'否'));
+					}
+					else{
+						uiintro.add('<div class="text chat">双内奸：'+(lib.configOL.double_nei?'开启':'关闭'));
+						uiintro.add('<div class="text chat">加强主公：'+(lib.configOL.enhance_zhu?'开启':'关闭'));
+					}
 				}
 				else{
 					uiintro.add('<div class="text chat">卡牌替换：'+(lib.configOL.zhong_card?'开启':'关闭'));
@@ -414,6 +499,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
+				else if(_status.mode=='mougong'){
+					if(game.zhu&&game.zhu.isZhu&&game.zhu.identityShown||game.me.identity=='zhu'){
+						return {
+							fan:'反',
+							zhong:'忠',
+							nei:'内',
+							di:'敌',
+							you:'友',
+							cai:'猜',
+						}
+					}
+					else{
+						return {
+							fan:'反',
+							zhong:'忠',
+							nei:'内',
+							zhu:'主',
+							di:'敌',
+							you:'友',
+							cai:'猜',
+						}
+					}
+				}
 				else{
 					return {
 						fan:'反',
@@ -430,6 +538,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						case 'zhong':list[i]='忠臣';break;
 						case 'nei':list[i]='内奸';break;
 						case 'zhu':list[i]='主公';break;
+						case 'di':list[i]='敌方';break;
+						case 'you':list[i]='友方';break;
 						case 'cai':case 'cai2':list[i]='未知';break;
 						case 'rZhong':case 'bZhong':list[i]='前锋';break;
 						case 'rNei':case 'bNei':list[i]='细作';break;
@@ -448,6 +558,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					switch(_status.mode){
 						case 'purple':str2='3v3v2 - '+(game.me.identity.indexOf('r')==0?'暖色':'冷色')+lib.translate[game.me.identity+'2'];break;
 						case 'zhong':str2='忠胆英杰 - '+lib.translate[game.me.identity+'2'];break;
+						case 'mougong':str2=get.cnNumber(get.playerNumber())+'人谋攻'+'-'+lib.translate[game.me.identity+'2'];
 						default:str2=get.cnNumber(get.playerNumber())+'人'+
 						get.translation(lib.config.mode)+' - '+lib.translate[game.me.identity+'2']
 					}
@@ -960,6 +1071,256 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},500);
 				});
 			},
+			chooseCharacterMougongOL:function(){
+				var next=game.createEvent('chooseCharacter');
+				next.setContent(function(){
+					'step 0'
+					ui.arena.classList.add('choose-character');
+					var i;
+					var identityList;
+					identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
+					if(lib.configOL.double_nei){
+						switch(lib.configOL.number){
+							case 8:
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+							case 7:
+							identityList.remove('zhong');
+							identityList.push('nei');
+							break;
+							case 6:
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+							case 5:
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+							case 4:
+							identityList.remove('zhong');
+							identityList.push('nei');
+							break;
+							case 3:
+							identityList.remove('fan');
+							identityList.push('nei');
+							break;
+						}
+					}
+					identityList.randomSort();
+					for(i=0;i<game.players.length;i++){
+						game.players[i].identity=identityList[i];
+						game.players[i].setIdentity('cai');
+						game.players[i].node.identity.classList.add('guessing');
+						if(identityList[i]=='zhu'){
+							game.zhu=game.players[i];
+						}
+						game.players[i].identityShown=false;
+					}
+
+					game.zhu.isZhu=(game.zhu.identity=='zhu');
+					game.me.setIdentity();
+					game.me.node.identity.classList.remove('guessing');
+
+					for(var i=0;i<game.players.length;i++){
+						game.players[i].send(function(zhu,zhuid,me,identity){
+							for(var i in lib.playerOL){
+								lib.playerOL[i].setIdentity('cai');
+								lib.playerOL[i].node.identity.classList.add('guessing');
+							}
+							zhu.identity=zhuid;
+							if(zhuid=='zhu') zhu.isZhu=true;
+							me.setIdentity(identity);
+							me.node.identity.classList.remove('guessing');
+							ui.arena.classList.add('choose-character');
+						},game.zhu,game.zhu.identity,game.players[i],game.players[i].identity);
+					}
+
+					var list;
+					var list3=[];
+					var list4=[];
+					event.list=[];
+					event.list2=[];
+
+					var libCharacter={};
+					for(var i=0;i<lib.configOL.characterPack.length;i++){
+						var pack=lib.characterPack[lib.configOL.characterPack[i]];
+						for(var j in pack){
+							if(lib.character[j]) libCharacter[j]=pack[j];
+						}
+					}
+					for(i in lib.characterReplace){
+						var ix=lib.characterReplace[i];
+						for(var j=0;j<ix.length;j++){
+							if(!libCharacter[ix[j]]||lib.filter.characterDisabled(ix[j])) ix.splice(j--,1);
+						}
+						if(ix.length){
+							event.list.push(i);
+							event.list2.push(i);
+							list4.addArray(ix);
+							list3.push(i);
+						}
+					}
+					game.broadcast(function(list){
+						for(var i in lib.characterReplace){
+							var ix=lib.characterReplace[i];
+							for(var j=0;j<ix.length;j++){
+								if(!list.contains(ix[j])) ix.splice(j--,1);
+							}
+						}
+					},list4);
+					for(i in libCharacter){
+						if(list4.contains(i)) continue;
+						if(lib.filter.characterDisabled(i,libCharacter)) continue;
+						event.list.push(i);
+						event.list2.push(i);
+						list4.push(i);
+						list3.push(i);
+					}
+					_status.characterlist=list4.slice(0);
+					list=list3.randomGets(5);
+					"step 1"
+					var list=[];
+					var selectButton=(lib.configOL.double_character?2:1);
+
+					var num,num2=0;
+					num=Math.floor(event.list.length/(game.players.length-1));
+					if(num>5){
+						num=5;
+					}
+					num2=event.list.length-num*(game.players.length-1);
+					if(lib.configOL.double_nei){
+						num2=Math.floor(num2/2);
+					}
+					if(num2>2){
+						num2=2;
+					}
+					for(var i=0;i<game.players.length;i++){
+						var num3=0;
+						if(game.players[i].identity=='nei'){
+							num3=num2;
+						}
+						var str='选择角色';
+						list.push([game.players[i],[str,[event.list.randomRemove(num+num3),'characterx']],selectButton,true]);
+					}
+					game.me.chooseButtonOL(list,function(player,result){
+						if(game.online||player==game.me) player.init(result.links[0],result.links[1]);
+					});
+					'step 2'
+					var shen=[];
+					for(var i in result){
+						if(result[i]&&result[i].links){
+							for(var j=0;j<result[i].links.length;j++){
+								event.list2.remove(get.sourceCharacter(result[i].links[j]));
+							}
+						}
+					}
+					for(var i in result){
+						if(result[i]=='ai'){
+							result[i]=event.list2.randomRemove(lib.configOL.double_character?2:1);
+							for(var j=0;j<result[i].length;j++){
+								var listx=lib.characterReplace[result[i][j]];
+								if(listx&&listx.length) result[i][j]=listx.randomGet();
+							}
+						}
+						else{
+							result[i]=result[i].links;
+						}
+						if(get.is.double(result[i][0])||
+						 lib.character[result[i][0]]&&lib.character[result[i][0]][1]=='shen'&&!lib.character[result[i][0]][4].contains('hiddenSkill')) shen.push(lib.playerOL[i]);
+					}
+					event.result2=result;
+					if(shen.length){
+						var list=['wei','shu','wu','qun','jin','key'];
+						for(var i=0;i<list.length;i++){
+							if(!lib.group.contains(list[i])) list.splice(i--,1);
+							else list[i]=['','','group_'+list[i]];
+						}
+						for(var i=0;i<shen.length;i++){
+							if(get.is.double(result[shen[i].playerid][0])){
+								shen[i]._groupChosen=true;
+								shen[i]=[shen[i],['请选择你的势力',[get.is.double(result[shen[i].playerid][0],true).map(function(i){
+									return ['','','group_'+i];
+								}),'vcard']],1,true];
+							}
+							else shen[i]=[shen[i],['请选择神武将的势力',[list,'vcard']],1,true];
+						}
+						game.me.chooseButtonOL(shen,function(player,result){
+							if(player==game.me) player.changeGroup(result.links[0][2].slice(6),false,false);
+						}).set('switchToAuto',function(){
+ 						_status.event.result='ai';
+ 					}).set('processAI',function(){
+ 						return {
+ 							bool:true,
+ 							links:[_status.event.dialog.buttons.randomGet().link],
+ 						}
+ 					});
+					}
+					else event._result={};
+					'step 3'
+					if(!result) result={};
+					for(var i in result){
+						if(result[i]&&result[i].links) result[i]=result[i].links[0][2].slice(6);
+						else if(result[i]=='ai') result[i]=function(){
+							return ['wei','shu','wu','qun','jin','key'].randomGet();
+						}();
+					}
+					var result2=event.result2;
+					game.broadcast(function(result,result2){
+						for(var i in result){
+							if(!lib.playerOL[i].name){
+								lib.playerOL[i].init(result[i][0],result[i][1]);
+							}
+							if(result2[i]&&result2[i].length) lib.playerOL[i].changeGroup(result2[i],false,false);
+						}
+						setTimeout(function(){
+							ui.arena.classList.remove('choose-character');
+						},500);
+					},result2,result);
+					
+					for(var i in result2){
+						if(!lib.playerOL[i].name){
+							lib.playerOL[i].init(result2[i][0],result2[i][1]);
+						}
+						if(result[i]&&result[i].length) lib.playerOL[i].changeGroup(result[i],false,false);
+					}
+					
+					for(var i=0;i<game.players.length;i++){
+						_status.characterlist.remove(game.players[i].name);
+						_status.characterlist.remove(game.players[i].name1);
+						_status.characterlist.remove(game.players[i].name2);
+					}
+					
+					var list=['mougong_nuqi','mougong_nuqi_dongcha','mougong_expose','mougong_addBuff','mougong_addBuff_sha','mougong_addBuff_shan','mougong_addBuff_tao','mougong_addBuff_damage','mougong_shanAi','mougong_cardEffect'];
+					for(var i=0;i<list.length;i++){
+						game.addGlobalSkill(list[i]);
+					}
+					var localMark=(skill)=>{
+						var name=skill,info;
+						if(player.marks[name]) player.updateMarks();
+						if(lib.skill[name]) info=lib.skill[name].intro;
+						if(!info) return;
+						if(player.marks[name]) player.marks[name].info=info;
+						else player.marks[name]=player.mark(name,info);
+						player.updateMarks();
+					}
+					game.players.forEach(current=>{
+						current.storage.zhibi=[];
+						current.storage.zhibi_for=[];
+						if(lib.configOL.nuqi_seen_for_others){
+							current.markSkill('mougong_nuqi');
+						}
+						else{
+							if(current==game.me) localMark('mougong_nuqi');
+							else if(current.isOnline()) current.send(localMark,'mougong_nuqi');
+						}
+					});
+					
+					setTimeout(function(){
+						ui.arena.classList.remove('choose-character');
+					},500);
+				});
+			},
 			chooseCharacter:function(){
 				if(_status.mode=='purple'){
 					game.chooseCharacterPurple();
@@ -983,6 +1344,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return;
 						}
 					}
+					var isMougong=_status.event.mougongmode;
 					if(_status.event.zhongmode){
 						var listc=list.slice(0,2);
 						for(var i=0;i<listc.length;i++){
@@ -1001,7 +1363,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.update();
 						}
 					}
-					else if(player.identity=='zhu'){
+					else if(player.identity=='zhu'&&!isMougong){
 						list2.randomSort();
 						var choice,choice2;
 						if(!_status.event.zhongmode&&Math.random()-0.8<0&&list2.length){
@@ -1029,7 +1391,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.update();
 						}
 					}
-					else if(player.identity=='zhong'&&(Math.random()<0.5||['sunliang','key_akane'].contains(game.zhu.name))){
+					else if(player.identity=='zhong'&&(Math.random()<0.5||['sunliang','key_akane'].contains(game.zhu.name))&&!isMougong){
 						var listc=list.slice(0);
 						for(var i=0;i<listc.length;i++){
 							var listx=lib.characterReplace[listc[i]];
@@ -1080,18 +1442,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var list=lib.group.slice(0);
 						list.remove('shen');
 						if(list.length) player.group=function(){
-						 if(_status.mode!='zhong'&&game.zhu&&game.zhu.group){
-						  if(['re_zhangjiao','liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu','sunce','re_sunben','ol_liushan','re_liushan','key_akane','dongzhuo','re_dongzhuo','ol_dongzhuo','jin_simashi','caomao'].contains(game.zhu.name)) return game.zhu.group;
-						  if(game.zhu.name=='yl_yuanshu'){
-						   if(player.identity=='zhong') list.remove('qun');
-						   else return 'qun';
-						  }
-						  if(['sunhao','xin_yuanshao','re_yuanshao','re_sunce','ol_yuanshao','yuanshu','jin_simazhao','liubian'].contains(game.zhu.name)){
-						   if(player.identity!='zhong') list.remove(game.zhu.group);
-						   else return game.zhu.group;
-						  }
-						 }
-						 return list.randomGet();
+							if(_status.mode!='zhong'&&game.zhu&&game.zhu.group){
+								if(['re_zhangjiao','liubei','re_liubei','caocao','re_caocao','sunquan','re_sunquan','zhangjiao','sp_zhangjiao','caopi','re_caopi','liuchen','caorui','sunliang','sunxiu','sunce','re_sunben','ol_liushan','re_liushan','key_akane','dongzhuo','re_dongzhuo','ol_dongzhuo','jin_simashi','caomao'].contains(game.zhu.name)) return game.zhu.group;
+								if(game.zhu.name=='yl_yuanshu'){
+									if(player.identity=='zhong') list.remove('qun');
+									else return 'qun';
+								}
+								if(['sunhao','xin_yuanshao','re_yuanshao','re_sunce','ol_yuanshao','yuanshu','jin_simazhao','liubian'].contains(game.zhu.name)){
+									if(player.identity!='zhong') list.remove(game.zhu.group);
+									else return game.zhu.group;
+								}
+							}
+							return list.randomGet();
 						}();
 					}
 					player.node.name.dataset.nature=get.groupnature(player.group);
@@ -1113,6 +1475,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						identityList=['zhu','zhong','mingzhong','nei','fan','fan','fan','fan'];
 					}
 					else{
+						if(_status.mode=='mougong') event.mougongmode=true;
 						identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
 						if(get.config('double_nei')){
 							switch(get.playerNumber()){
@@ -1143,7 +1506,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-
+					var isMougong=event.mougongmode;
+					
 					var addSetting=function(dialog){
 						dialog.add('选择身份').classList.add('add-setting');
 						var table=document.createElement('div');
@@ -1187,7 +1551,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(current){
 									current.classList.remove('bluebg');
 								}
-								current=seats.querySelector('.bluebg');
+								current=_status.cheat_seat||seats.querySelector('.bluebg');
 								if(current){
 									current.classList.remove('bluebg');
 								}
@@ -1223,6 +1587,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									node.remove();
 									game.uncheck();
 									game.check();
+									if(event.mougongmode) return;
 									for(var i=0;i<seats.childElementCount;i++){
 										if(get.distance(game.zhu,game.me,'absolute')===seats.childNodes[i].link){
 											seats.childNodes[i].classList.add('bluebg');
@@ -1232,13 +1597,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								_status.event=_status.event.parent;
 								_status.event.step=0;
 								_status.event.identity=link;
-								if(link!=(event.zhongmode?'mingzhong':'zhu')){
-									seats.previousSibling.style.display='';
-									seats.style.display='';
-								}
-								else{
-									seats.previousSibling.style.display='none';
-									seats.style.display='none';
+								if(!event.mougongmode){
+									if(link!=(event.zhongmode?'mingzhong':'zhu')){
+										seats.previousSibling.style.display='';
+										seats.style.display='';
+									}
+									else{
+										seats.previousSibling.style.display='none';
+										seats.style.display='none';
+									}
 								}
 								game.resume();
 							});
@@ -1251,32 +1618,46 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						seats.style.margin='0';
 						seats.style.width='100%';
 						seats.style.position='relative';
-						for(var i=2;i<=game.players.length;i++){
+						for(var i=isMougong?1:2;i<=game.players.length;i++){
 							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 							td.innerHTML=get.cnNumber(i,true);
 							td.link=i-1;
 							seats.appendChild(td);
-							if(get.distance(game.zhu,game.me,'absolute')===i-1){
+							if(!isMougong&&get.distance(game.zhu,game.me,'absolute')===i-1){
 								td.classList.add('bluebg');
 							}
 							td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
 								if(_status.dragged) return;
 								if(_status.justdragged) return;
-								if(get.distance(game.zhu,game.me,'absolute')==this.link) return;
-								var current=this.parentNode.querySelector('.bluebg');
-								if(current){
-									current.classList.remove('bluebg');
+								if(_status.cheat_seat){
+									_status.cheat_seat.classList.remove('bluebg');
+									if(_status.cheat_seat==this){
+										delete _status.cheat_seat;
+										return;
+									}
+									
 								}
-								this.classList.add('bluebg');
-								for(var i=0;i<game.players.length;i++){
-									if(get.distance(game.players[i],game.me,'absolute')==this.link){
-										game.swapSeat(game.zhu,game.players[i],false);return;
+								if(isMougong){
+									this.classList.add('bluebg');
+									_status.cheat_seat=this;
+								}
+								else{
+									if(get.distance(game.zhu,game.me,'absolute')==this.link) return;
+									var current=this.parentNode.querySelector('.bluebg');
+									if(current){
+										current.classList.remove('bluebg');
+									}
+									this.classList.add('bluebg');
+									for(var i=0;i<game.players.length;i++){
+										if(get.distance(game.players[i],game.me,'absolute')==this.link){
+											game.swapSeat(game.zhu,game.players[i],false);return;
+										}
 									}
 								}
 							});
 						}
 						dialog.content.appendChild(seats);
-						if(game.me==game.zhu){
+						if(!isMougong&&game.me==game.zhu){
 							seats.previousSibling.style.display='none';
 							seats.style.display='none';
 						}
@@ -1337,7 +1718,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(i=0;i<game.players.length;i++){
 						if(_status.brawl&&_status.brawl.identityShown){
 							if(game.players[i].identity=='zhu') game.zhu=game.players[i];
-							game.players[i].identityShown=true;
+							if(!isMougong) game.players[i].identityShown=true;
 						}
 						else{
 							game.players[i].node.identity.classList.add('guessing');
@@ -1360,7 +1741,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 
-					if(get.config('special_identity')&&!event.zhongmode&&game.players.length==8){
+					if(get.config('special_identity')&&!event.zhongmode&&!event.mougongmode&&game.players.length==8){
 						for(var i=0;i<game.players.length;i++){
 							delete game.players[i].special_identity;
 						}
@@ -1395,10 +1776,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					if(!game.zhu) game.zhu=game.me;
 					else{
-						game.zhu.setIdentity();
-						game.zhu.identityShown=true;
+						if(!isMougong){
+							game.zhu.setIdentity();
+							game.zhu.identityShown=true;
+							game.zhu.node.identity.classList.remove('guessing');
+						}
 						game.zhu.isZhu=(game.zhu.identity=='zhu');
-						game.zhu.node.identity.classList.remove('guessing');
 						game.me.setIdentity();
 						game.me.node.identity.classList.remove('guessing');
 					}
@@ -1411,13 +1794,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(ix.length){
 							event.list.push(i);
 							list4.addArray(ix);
-							var bool=false;
-							for(var j of ix){
-								if(lib.character[j][4]&&lib.character[j][4].contains('zhu')){
-									bool=true;break;
-								}
+							if(isMougong){
+								list3.push(i);
 							}
-							(bool?list2:list3).push(i);
+							else{
+								var bool=false;
+								for(var j of ix){
+									if(lib.character[j][4]&&lib.character[j][4].contains('zhu')){
+										bool=true;break;
+									}
+								}
+								(bool?list2:list3).push(i);
+							}
 						}
 					}
 					for(i in lib.character){
@@ -1426,7 +1814,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(lib.filter.characterDisabled(i)) continue;
 						event.list.push(i);
 						list4.push(i);
-						if(lib.character[i][4]&&lib.character[i][4].contains('zhu')){
+						if(!isMougong&&lib.character[i][4]&&lib.character[i][4].contains('zhu')){
 							list2.push(i);
 						}
 						else{
@@ -1434,6 +1822,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					};
 					var getZhuList=function(){
+						if(isMougong){
+							list2.sort(lib.sort.character);
+							return list2;
+						}
 						var limit_zhu=get.config('limit_zhu');
 						if(!limit_zhu||limit_zhu=='off') return list2.slice(0).sort(lib.sort.character);
 						if(limit_zhu!='group'){
@@ -1470,7 +1862,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							num=8;
 						}
 					}
-					if(game.zhu!=game.me){
+					if(isMougong){
+						list=event.list.slice(0,num);
+					}
+					else if(game.zhu!=game.me){
 						event.ai(game.zhu,event.list,getZhuList())
 						event.list.remove(get.sourceCharacter(game.zhu.name1));
 						event.list.remove(get.sourceCharacter(game.zhu.name2));
@@ -1704,13 +2099,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					event.list.remove(get.sourceCharacter(game.me.name1));
 					event.list.remove(get.sourceCharacter(game.me.name2));
-					if(game.me==game.zhu&&game.players.length>4){
+					if(!event.mougongmode&&game.me==game.zhu&&game.players.length>4){
 						game.me.hp++;
 						game.me.maxHp++;
 						game.me.update();
 					}
 					for(var i=0;i<game.players.length;i++){
-						if(game.players[i]!=game.zhu&&game.players[i]!=game.me){
+						if((event.mougongmode||game.players[i]!=game.zhu)&&game.players[i]!=game.me){
 							event.list.randomSort();
 							event.ai(game.players[i],event.list.splice(0,get.config('choice_'+game.players[i].identity)),null,event.list)
 						}
@@ -1727,6 +2122,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						_status.characterlist.remove(game.players[i].name2);
 					}
 					"step 4"
+					if(event.mougongmode){
+						var list=['mougong_nuqi','mougong_nuqi_dongcha','mougong_expose','mougong_addBuff','mougong_addBuff_sha','mougong_addBuff_shan','mougong_addBuff_tao','mougong_addBuff_damage','mougong_shanAi','mougong_cardEffect'];
+						for(var i=0;i<list.length;i++){
+							game.addGlobalSkill(list[i]);
+						}
+						game.players.forEach(i=>{
+							i.storage.zhibi=[];
+							i.storage.zhibi_for=[];
+							if(i.isUnderControl(true)||_status.nuqi_seen_for_others){
+								i.markSkill('mougong_nuqi')
+							}
+						});
+					}
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
@@ -1741,6 +2149,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			chooseCharacterOL:function(){
 				if(_status.mode=='purple'){
 					game.chooseCharacterPurpleOL();
+					return;
+				}
+				else if(_status.mode=='mougong'){
+					game.chooseCharacterMougongOL();
 					return;
 				}
 				var next=game.createEvent('chooseCharacter');
@@ -2159,6 +2571,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},500);
 				});
 			},
+			neiDoCamouflage:function(){
+				var next=game.createEvent('neiDoCamouflage');
+				next.players=game.players.slice();
+				if(_status.connectMode){
+					next.setContent('neiDoCamouflageOL');
+				}
+				else{
+					next.setContent('neiDoCamouflage');
+				}
+			},
 		},
 		translate:{
 			zhu:"主",
@@ -2190,6 +2612,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			nei2:"内奸",
 			fan2:"反贼",
 			random2:"随机",
+			di:'敌',
+			you:'友',
+			di2:'敌方',
+			you2:'友方',
 			identity_junshi_bg:'师',
 			identity_dajiang_bg:'将',
 			identity_zeishou_bg:'首',
@@ -2207,9 +2633,52 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			sheshen:'舍身',
 			sheshen_info:'锁定技，主公处于濒死状态即将死亡时，令主公+1体力上限，回复体力至X点（X为你的体力值数），获得你的所有牌，然后你死亡',
 			yexinbilu:'野心毕露',
+			mougong_nuqi:'怒气',
+			mougong_nuqi_dongcha:'洞察',
+			mougong_addBuff:'强化',
+			mougong_addBuff_info:'当你需要使用位于“强化表”内的非虚拟卡牌时，你可以消耗对应数量的怒气将其强化并使用。<br><br><span class="text" style="font-family:yuanli"><li>【杀】　：1点怒气。响应时所需【闪】数+1。<br><li>【闪】　：1点怒气。视为两张【闪】的效果。<br><li>【决斗】：2点怒气。对目标造成的伤害+1。<br><li>【火攻】：2点怒气。造成的伤害+1。<br><li>【桃】　：3点怒气。回复值+1。</span>',
+			mougong_nuqi_cost1:'1🔥',
+			mougong_nuqi_cost2:'2🔥',
+			mougong_nuqi_cost3:'3🔥',
 		},
 		element:{
 			player:{
+				dongcha:function(target){
+					var next=game.createEvent('mougongDongcha');
+					next.player=this;
+					next.target=target;
+					next.setContent('mougongDongcha');
+					return next;
+				},
+				changeNuqi:function(num){
+					var player=this;
+					if(!player.storage.mougong_nuqi) player.storage.mougong_nuqi=0;
+					var tmp=player.storage.mougong_nuqi;
+					player.storage.mougong_nuqi+=num;
+					player.storage.mougong_nuqi=Math.max(Math.min(player.storage.mougong_nuqi,_status.mougong_nuqi_max),0);
+					var del=player.storage.mougong_nuqi-tmp;
+					if(del===0) return;
+					game.log(player,del>=0?'获得了':'失去了',get.cnNumber(Math.abs(del))+'点<span class="firetext">怒气</span>');
+					if(player.storage.mougong_nuqi>=0&&del!=0){
+						if(player==game.me||_status.nuqi_seen_for_others){
+							player.markSkill('mougong_nuqi');
+						}
+						player.syncStorage('mougong_nuqi');
+						game.broadcast(function(player,num){
+							player.storage.mougong_nuqi=num;
+						},player,player.storage.mougong_nuqi);
+					}
+				},
+				addExpose:function(num){
+					if(!game.zhu||!game.zhu.isZhu||!game.zhu.identityShown) return;
+					if(typeof this.ai.shown=='number'&&!this.identityShown&&this.ai.shown<1){
+						this.ai.shown+=num;
+						if(this.ai.shown>0.95){
+							this.ai.shown=0.95;
+						}
+					}
+					return this;
+				},
 				yexinbilu:function(){
 					game.broadcastAll(function(player){
 						player.showIdentity();
@@ -2252,6 +2721,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				dieAfter2:function(source){
+					if(_status.mode=='mougong') return;
 					if(_status.mode=='purple'){
 						if(source){
  						if(this.identity=='rZhu'||this.identity=='bZhu'){
@@ -2391,6 +2861,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				logAi:function(targets,card){
 					if(this.ai.shown==1||this.isMad()) return;
+					var isMougong=get.mode()=='identity'&&_status.mode=='mougong';
+					if(isMougong&&(!game.zhu||!game.zhu.isZhu||!game.zhu.identityShown)) return;
 					if(typeof targets=='number'){
 						this.ai.shown+=targets;
 					}
@@ -2437,10 +2909,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else this.ai.shown-=0.1;
 						}
 					}
-					if(this!=game.me) this.ai.shown*=2;
+					if(!isMougong&&this!=game.me) this.ai.shown*=2;
 					if(this.ai.shown>0.95) this.ai.shown=0.95;
 					if(this.ai.shown<-0.5) this.ai.shown=-0.5;
 					if(_status.mode=='purple') return;
+					if(isMougong) return;
 
 					var marknow=(!_status.connectMode&&this!=game.me&&get.config('auto_mark_identity')&&this.ai.identity_mark!='finished');
 					// if(true){
@@ -2539,7 +3012,261 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						delete _status.clickingidentity;
 					}
 				}
-			}
+			},
+			content:{
+				mougongDongcha:function(event,map){
+					'step 0'
+					// var player=map.player,target=map.target;
+					if(!player.storage.mougong_nuqi){event.finish();return;}
+					// yield player.changeNuqi(-1);
+					player.changeNuqi(-1);
+					'step 1'
+					if(!player.storage.zhibi) player.storage.zhibi=[];
+					if(!player.storage.zhibi.contains(target)) player.storage.zhibi.push(target);
+					var res=get.dongchaResult(player,target);
+					event.dongcha_result=res;
+
+					event.videoId=lib.status.videoId++;
+					
+					var send=(target,res,id)=>{
+						var str=get.translation(target)+'是'+get.translation(res+'2')+'<br>';
+						var dialog=ui.create.dialog(str,'forcebutton');
+						new Promise((resolve)=>{
+							var imageName=`mougong_${res}`;
+							resolve(`${lib.assetURL}image/card/${imageName}.jpg`);
+						}).then(pth=>new Promise((resolve,reject)=>{
+							var image=new Image();
+							image.onload=()=>resolve(pth);
+							image.onerror=reject;
+							image.src=pth;
+						})).then(image=>{
+							var img=document.createElement('img');
+							dialog.content.appendChild(img);
+							img.setAttribute('src',image);
+							img.setAttribute('width','130');
+							img.setAttribute('height','185');
+							img.setAttribute('draggable',false);
+							img.style.transition='all 2s';
+							setTimeout(function(){
+								img.style.transform='rotateY(360deg)';
+							},100);
+							dialog.open();
+						}).catch(()=>{});
+						var control=ui.create.control('ok',()=>{
+							dialog.close();
+							control.close();
+							_status.imchoosing=false;
+							_status.event._result={bool:true};
+							game.resume();
+						});
+						dialog.videoId=id;
+						game.pause();
+						game.countChoose();
+					};
+					var hint=(player,target,id)=>{
+						if(player==game.me) return;
+						var str=get.translation(player)+'正在洞察'+get.translation(target)+'的阵营...<br>';
+						ui.create.dialog(str).videoId=id;
+					};
+					
+					game.broadcastAll(hint,player,target,event.videoId);
+					if(event.isMine()){
+						send(target,res,event.videoId);
+					}
+					else if(event.isOnline()){
+						event.player.send(send,target,res,event.videoId);
+						event.player.wait();
+						game.pause();
+					}
+					// yield next;
+					'step 2'
+					game.broadcastAll('closeDialog',event.videoId);
+					if(!_status.connectMode&&get.config('auto_mark_identity')&&!target.node.identity.firstChild.innerHTML.length){
+						target.setIdentity(event.dongcha_result);
+					}
+				},
+				neiDoCamouflage:function(){
+					'step 0'
+					var list=[];
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].identity=='fan'){
+							list.push(game.players[i]);
+						}
+					}
+					var target=list.randomGet();
+					event.target=target;
+					target.ai.mougong_camouflage=true;
+					var neis=game.filterPlayer(i=>i.identity=='nei');
+					if(event.players.includes(game.me)&&game.me.identity=='nei'){
+						var str=get.translation(target)+'是反贼<br>';
+						event.videoId=lib.status.videoId++;
+						var dialog=ui.create.dialog(str,'forcebutton');
+						new Promise((resolve)=>{
+							var imageName=`mougong_fan`;
+							resolve(`${lib.assetURL}image/card/${imageName}.jpg`);
+						}).then(pth=>new Promise((resolve,reject)=>{
+							var image=new Image();
+							image.onload=()=>resolve(pth);
+							image.onerror=reject;
+							image.src=pth;
+						})).then(image=>{
+							var img=document.createElement('img');
+							dialog.content.appendChild(img);
+							img.setAttribute('src',image);
+							img.setAttribute('width','130');
+							img.setAttribute('height','185');
+							img.setAttribute('draggable',false);
+							img.style.transition='all 2s';
+							setTimeout(function(){
+								img.style.transform='rotateY(360deg)';
+							},300);
+							dialog.open();
+						}).catch(()=>{});
+						dialog.videoId=event.videoId;
+						game.me.chooseControl('ok').set('dialog',dialog);
+					}
+					for(var current of neis){
+						if(!current.storage.zhibi) current.storage.zhibi=[];
+						if(!current.storage.zhibi.includes(target)) current.storage.zhibi.push(target);
+					}
+					'step 1'
+					if(game.me.identity=='nei'&&get.config('nei_auto_mark_camouflage')){
+						event.target.setIdentity();
+					}
+				},
+				neiDoCamouflageOL:function(){
+					'step 0'
+					var send=function(target,id){
+						if(game.me.identity=='nei'){
+							if(!game.me.storage.zhibi) game.me.storage.zhibi=[];
+							if(!game.me.storage.zhibi.contains(target)) game.me.storage.zhibi.push(target);
+							var str=get.translation(target)+'是反贼<br>';
+							var dialog=ui.create.dialog(str,'forcebutton');
+							new Promise((resolve)=>{
+								var imageName=`mougong_fan`;
+								resolve(`${lib.assetURL}image/card/${imageName}.jpg`);
+							}).then(pth=>new Promise((resolve,reject)=>{
+								var image=new Image();
+								image.onload=()=>resolve(pth);
+								image.onerror=reject;
+								image.src=pth;
+							})).then(image=>{
+								var img=document.createElement('img');
+								dialog.content.appendChild(img);
+								img.setAttribute('src',image);
+								img.setAttribute('width','130');
+								img.setAttribute('height','185');
+								img.setAttribute('draggable',false);
+								img.style.transition='all 2s';
+								setTimeout(function(){
+									img.style.transform='rotateY(360deg)';
+								},300);
+								dialog.open();
+							}).catch(()=>{});
+							dialog.videoId=id;
+							game.me.chooseControl('ok').set('dialog',dialog);
+						}
+						else{
+							var dialog=ui.create.dialog('请等待内奸身份确认...');
+							dialog.videoId=id;
+						}
+						game.resume();
+					};
+					var list=[];
+					for(var i=0;i<game.players.length;i++){
+						if(game.players[i].identity=='fan'){
+							list.push(game.players[i]);
+						}
+					}
+					var target=list.randomGet();
+					target.ai.mougong_camouflage=true;
+					event.videoId=lib.status.videoId++;
+					event.ai_targets=[];
+					var time=10000;
+					if(lib.configOL&&lib.configOL.choose_timeout) time=parseInt(lib.configOL.choose_timeout)*1000;
+					for(var i=0;i<event.players.length;i++){
+						event.players[i].showTimer(time);
+						if(event.players[i].isOnline()){
+							event.players[i].send(send,target,event.videoId);
+							event.players[i].wait();
+							if(event.players[i].identity=='nei'){
+								event.withol=true;
+							}
+						}
+						else if(event.players[i]==game.me){
+							event.withme=true;
+							if(game.me.identity=='nei'){
+								var str=get.translation(target)+'是反贼<br>';
+								var dialog=ui.create.dialog(str,'forcebutton');
+								new Promise((resolve)=>{
+									var imageName=`mougong_fan`;
+									resolve(`${lib.assetURL}image/card/${imageName}.jpg`);
+								}).then(pth=>new Promise((resolve,reject)=>{
+									var image=new Image();
+									image.onload=()=>resolve(pth);
+									image.onerror=reject;
+									image.src=pth;
+								})).then(image=>{
+									var img=document.createElement('img');
+									dialog.content.appendChild(img);
+									img.setAttribute('src',image);
+									img.setAttribute('width','130');
+									img.setAttribute('height','185');
+									img.setAttribute('draggable',false);
+									img.style.transition='all 2s';
+									setTimeout(function(){
+										img.style.transform='rotateY(360deg)';
+									},300);
+									dialog.open();
+								}).catch(()=>{});
+								dialog.videoId=event.videoId;
+								game.me.chooseControl('ok').set('dialog',dialog);
+								game.me.wait();
+							}
+							else{
+								var dialog=ui.create.dialog('请等待内奸身份确认...');
+								dialog.videoId=event.videoId;
+								event._result={bool:true};
+							}
+						}
+						else{
+							if(event.players[i].identity=='nei'){
+								event.ai_targets.push(event.players[i]);
+							}
+						}
+					}
+					if(event.ai_targets.length){
+						event.ai_targets.randomSort();
+						setTimeout(function(){
+							event.interval=setInterval(function(){
+								event.ai_targets.shift();
+								if(!event.ai_targets.length){
+									clearInterval(event.interval);
+									if(event.withai) game.resume();
+								}
+							},Math.ceil(100+500*Math.random()));
+						},Math.ceil(2500+1000*Math.random()))
+					}
+					'step 1'
+					if(event.withme){
+						game.me.unwait(result);
+					}
+					'step 2'
+					if(event.withol&&!event.resultOL){
+						game.pause();
+					}
+					'step 3'
+					if(event.ai_targets.length>0){
+						event.withai=true;
+						game.pause();
+					}
+					'step 4'
+					game.broadcastAll('closeDialog',event.videoId);
+					for(var i=0;i<event.players.length;i++){
+						event.players[i].hideTimer();
+					}
+				},
+			},
 		},
 		get:{
 			rawAttitude:function(from,to){
@@ -2561,6 +3288,92 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(from==to||to.identityShown||from.storage.zhibi&&from.storage.zhibi.contains(to)||(_status.yeconfirm&&['rYe','bYe'].contains(to.identity)&&['rYe','bYe'].contains(to.identity))) return real*1.1;
 					return ((to.ai.shown+0.1)*real+(from.identity.slice(0,1)==to.identity.slice(0,1)?3:-3)*(1-to.ai.shown))
 				}
+				else if(_status.mode=='mougong'){
+					var x=0,num=0,temp,i;
+					if(_status.ai.customAttitude){
+						for(i=0;i<_status.ai.customAttitude.length;i++){
+							temp=_status.ai.customAttitude[i](from,to);
+							if(temp!=undefined){
+								x+=temp;
+								num++;
+							}
+						}
+					}
+					if(num){
+						return x/num;
+					}
+					var real=get.realAttitude(from,to),zhibi=from.storage.zhibi,zhibi_for=from.storage.zhibi_for,followCamouflage=true;
+					if(to.ai.shown) return to.ai.shown*(real+(from.identity==to.identity||from.identity=='zhu'&&to.identity=='zhong'||from.identity=='zhong'&&to.identity=='zhu'||(to.identity=='nei'&&get.situation()<=0&&['zhu','zhong'].contains(from.identity)||get.situation()>=3&&from.identity=='fan')?3:-3))
+					if(from==to||to.identityShown||((zhibi_for&&zhibi_for.contains(to))||(zhibi&&zhibi.contains(to)))&&!to.ai.mougong_camouflage) return real*1.1;
+					if(from.identity=='nei'&&to.ai.mougong_camouflage) return real*1.1;
+					if(to.identity=='nei'){
+						if(from.identity=='fan'){
+							if(get.population('zhong')==0){
+								if(zhibi){
+									var dead=game.dead.slice();
+									for(var current of dead){
+										if(from.storage.zhibi.contains(current)&&current.ai.mougong_camouflage){
+											if(from.storage.zhibi_for&&from.storage.zhibi_for.contains(to)) return -7;
+										}
+									}
+									if(zhibi.contains(to)) return 3;
+								}
+							}
+						}
+					}
+					if(to.identity=='fan'&&from.identity=='nei'&&zhibi.contains(game.zhu)&&game.players.filter(i=>i!=from&&!zhibi.contains(i)).map(i=>i.identity).reduce((p,c)=>(!p.contains(c)?(p.push(c)&&p):p),[]).length==1) return real;
+					for(var fan of game.dead){
+						if(fan.identity!='fan'||!fan.storage.mougong_showFan) continue;
+						for(var current of fan.storage.zhibi_for){
+							if(to==current){
+								return real;
+							}
+						}
+					}
+					if(from.identity=='fan'&&to.identity=='fan'){
+						if(from.ai.mougong_camouflage){
+							var zhu=game.zhu&&game.zhu.isZhu&&game.zhu.identityShown?game.zhu:undefined;
+							if(zhu){
+								if(zhu.storage.zhibi_for&&zhu.storage.zhibi_for.contains(to)) return 0;
+							}
+							if(zhibi&&zhibi.contains(to)) return -7;
+						}
+						if(to.ai.mougong_camouflage){
+							var zhu=game.zhu&&game.zhu.isZhu&&game.zhu.identityShown?game.zhu:undefined;
+							if(zhu){
+								if(zhu.storage.zhibi_for&&zhu.storage.zhibi_for.contains(to)) return 0;
+							}
+							if(zhibi&&zhibi.contains(to)) return -7;
+						}
+					}
+					if(from.identity!='nei'&&zhibi&&zhibi.contains(to)&&!to.identityShown&&(followCamouflage&&to.ai.mougong_camouflage)) return -5;
+					if(from.identity!='nei'&&zhibi_for&&zhibi_for.contains(to)&&!to.identityShown) return -5;
+					if(zhibi){
+						for(var to2 of zhibi){
+							if(to2.storage.zhibi_for){
+								if(to2.ai.mougong_camouflage){
+									for(var to3 of to2.storage.zhibi_for){
+										if(zhibi.slice().addArray(zhibi_for).contains(to3)){
+											if(to==to2){
+												return real;
+											}
+										} else if(to==to3){
+											return Math.abs(real+10)/10;
+										}
+									}
+								}else{
+									for(var to3 of to2.storage.zhibi_for){
+										if(!zhibi.slice().addArray(zhibi_for).contains(to3)&&to==to3){
+											return get.rawAttitude(to3,to)*Math.sign(real);
+										}
+									}
+								}
+							}
+						}
+					}
+					return Math.max(-1,Math.min(-0.1,(-Math.min(5,to.countCards('hes')/2+1)/5-Math.max(0,5-to.hp)/4)/2));
+				}
+				//正常身份模式态度
 				var difficulty=0;
 				if(to==game.me) difficulty=2-get.difficulty();
 				if(from==to||to.identityShown||(from.storage.dongcha==to)||to.identityShown||from.storage.zhibi&&from.storage.zhibi.contains(to)){
@@ -2611,6 +3424,179 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return -7;
 					}
 				}
+				else if(_status.mode=='mougong'){
+					if(!game.zhu){
+						if(from.identity=='nei'||to.identity=='nei') return -1;
+						if(from.identity==to.identity) return 6;
+						return -6;
+					}
+					var situation=get.situation();
+					var identity=from.identity;
+					var identity2=to.identity;
+					if(identity2=='zhu'&&!to.isZhu){
+						identity2='zhong';
+						if(from==to) return 10;
+					}
+					if(from!=to&&to.identity=='nei'&&to.ai.shown<1&&(to.ai.identity_mark=='fan'||to.ai.identity_mark=='zhong')){
+						identity2=to.ai.identity_mark;
+					}
+					if(from.identity!='nei'&&from!=to&&get.population('fan')==0&&identity2=='zhong'){
+						for(var i=0;i<game.players.length;i++){
+							if(game.players[i].identity=='nei' &&
+								game.players[i].ai.identity_mark=='zhong' &&
+								game.players[i].ai.shown<1){
+								identity2='nei';break;
+							}
+						}
+					}
+					switch (identity){
+						case 'zhu':
+							switch (identity2){
+								case 'zhu':return 10;
+								case 'zhong':return 6;
+								case 'nei':
+									if(game.players.length==2) return -10;
+									if(to.identity=='zhong') return 0;
+									if(get.population('fan')==0){
+										if(to.ai.identity_mark=='zhong'&&to.ai.shown<1) return 0;
+										return -1;
+									}
+									if(get.population('fan')==1&&get.population('nei')==1&&game.players.length==3){
+										var fan;
+										for(var i=0;i<game.players.length;i++){
+											if(game.players[i].identity=='fan'){
+												fan=game.players[i];break;
+											}
+										}
+										if(fan){
+											if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
+												return -3;
+											}
+										}
+										return 0;
+									}
+									if(situation>1) return Math.max((situation-8)/3,-2);
+									return Math.min(3,get.population('fan'));
+								case 'fan':
+									if(get.population('fan')==1&&get.population('nei')==1&&game.players.length==3){
+										var nei;
+										for(var i=0;i<game.players.length;i++){
+											if(game.players[i].identity=='nei'){
+												nei=game.players[i];break;
+											}
+										}
+										if(nei){
+											if(nei.hp>1&&nei.hp>to.hp&&nei.countCards('he')>to.countCards('he')){
+												return 0;
+											}
+										}
+										return -3;
+									}
+									return -4;
+							}
+							break;
+						case 'zhong':
+							switch (identity2){
+								case 'zhu':return 10;
+								case 'zhong':
+									if(from==to) return 5;
+									if(get.population('zhong')>1) return 3;
+									return 4;
+								case 'nei':
+									if(get.population('fan')==0&&get.population('zhong')==1) return -2;
+									if(get.population('zhong')>=1) return Math.min(3,-situation);
+									return 3;
+								case 'fan':return -8;
+							}
+							break;
+						case 'nei':
+							if(identity2=='zhu'&&game.players.length==2) return -10;
+							if(from!=to&&identity2!='zhu'&&game.players.length==3) return -8;
+							var strategy=get.aiStrategy();
+							if(strategy==4){
+								if(from==to) return 10;
+								return 0;
+							}
+							var num;
+							switch (identity2){
+								case 'zhu':
+									if(strategy==6) return -1;
+									if(strategy==5) return 10;
+									if(to.hp<=0) return 10;
+									if(get.population('fan')==1){
+										var fan;
+										for(var i=0;i<game.players.length;i++){
+											if(game.players[i].identity=='fan'){
+												fan=game.players[i];break;
+											}
+										}
+										if(fan){
+											if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
+												return -3;
+											}
+										}
+										return 0;
+									}
+									else{
+										if(situation>1||get.population('fan')==0) num=0;
+										else num=get.population('fan')+Math.max(0,3-game.zhu.hp);
+									}
+									if(strategy==2) num--;
+									if(strategy==3) num++;
+									return num;
+								case 'zhong':
+									if(strategy==5) return Math.min(0,-situation);
+									if(strategy==6) return Math.max(-1,-situation);
+									if(get.population('fan')==0) num=-5;
+									else if(situation<=0) num=0;
+									else if(game.zhu&&game.zhu.hp<2) num=0;
+									else if(game.zhu&&game.zhu.hp==2) num=-1;
+									else if(game.zhu&&game.zhu.hp<=2&&situation>1) num=-1;
+									else num=-2;
+									if(strategy==2) num--;
+									if(strategy==3) num++;
+									return num;
+								case 'nei':
+									if(from==to) return 10;
+									if(from.ai.friend.contains(to)) return 5;
+									if(get.population('fan')+get.population('zhong')>0) return 0;
+									return -5;
+								case 'fan':
+									if(strategy==5) return Math.max(-1,situation);
+									if(strategy==6) return Math.min(0,situation);
+									if((game.zhu&&game.zhu.hp<=2&&situation<0)||situation<-1) num=-3;
+									else if(situation<0||get.population('zhong')==0) num=-2;
+									else if((game.zhu&&game.zhu.hp>=4&&situation>0)||situation>1) num=1;
+									else num=0;
+									if(strategy==2) num++;
+									if(strategy==3) num--;
+									return num;
+							}
+							break;
+						case 'fan':
+							switch (identity2){
+								case 'zhu':
+									if(get.population('nei')>0){
+										if(situation==1) return -6;
+										if(situation>1) return -5;
+									}
+									return -8;
+								case 'zhong':
+									if(game.zhu.hp>=3&&to.hp==1){
+										return -10;
+									}
+									return -7;
+								case 'nei':
+									if(get.population('fan')==1) return 0;
+									if(get.population('zhong')==0) return -2;
+									if(game.zhu&&game.zhu.hp<=2&&game.zhu.identityShown) return -1;
+									return 3;
+								case 'fan':
+									return 5;
+							}
+					}
+				}
+				//正常身份模式态度
 				if(!game.zhu){
 					if(from.identity=='nei'||to.identity=='nei') return -1;
 					if(from.identity==to.identity) return 6;
@@ -2841,8 +3827,445 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				return result;
 			},
+			dongchaResult:function(from,to){
+				var friend='you',enemy='di';
+				if(from.identity=='nei') return to.identity;
+				if(to.identity=='nei') return friend;
+				if(from.ai.mougong_camouflage||to.ai.mougong_camouflage) return enemy;
+				if(from.identity==to.identity||from.identity=='zhu'&&to.identity=='zhong'||from.identity=='zhong'&&to.identity=='zhu') return friend;
+				return enemy;
+			},
 		},
 		skill:{
+			mougong_nuqi:{
+				mark:true,
+				marktext:'🔥',
+				silent:true,
+				charlotte:true,
+				ruleSkill:true,
+				trigger:{
+					player:['phaseBegin','damageEnd'],
+				},
+				content:function(){
+					player.changeNuqi(trigger.name=='damage'?trigger.num:1);
+				},
+				intro:{
+					name:'怒气',
+					content:function(storage,player){
+						return '当前怒气值：'+(storage||0)+'/'+_status.mougong_nuqi_max;
+					},
+				},
+				subSkill:{
+					dongcha:{
+						trigger:{
+							source:'damageSource',
+							global:'loseHpEnd',
+						},
+						filter:function(event,player){
+							var source=event.source;
+							if(event.name=='loseHp'){
+								if(event.getParent()._trigger) source=event.getParent()._trigger.source;
+							}
+							return player==source&&player.storage.mougong_nuqi>0&&event.player&&event.player.isIn()&&event.player!=player;
+						},
+						logTarget:'player',
+						prompt2:function(event,player){
+							return '消耗1点怒气，洞察'+get.translation(event.player)+'的身份';
+						},
+						check:function(event,player){
+							if(player.storage.zhibi&&player.storage.zhibi.contains(event.player)||player.storage.zhibi_for&&player.storage.zhibi_for.contains(event.player)) return false;
+							if(get.population('zhong')==0&&player.identity=='fan') return false;
+							return Math.abs(get.attitude(player,event.player))<=1;
+						},
+						content:function(){
+							game.log(player,'洞察了',trigger.player,'与其的阵营关系');
+							player.dongcha(trigger.player);
+						},
+						ai:{
+							order:15,
+						}
+					},
+				}
+			},
+			mougong_showZhu:{
+				trigger:{
+					player:['dying','phaseBefore'],
+					global:'dieAfter',
+				},
+				forced:true,
+				priority:100,
+				popup:false,
+				unique:true,
+				firstDo:true,
+				silent:true,
+				charlotte:true,
+				ruleSkill:true,
+				filter:function(event,player){
+					if(player.storage.mougong_showZhu) return false;
+					if(player.identity=='zhu'){
+						if(event.player==player){
+							if(event.name=='dying') return true;
+							return game.roundNumber>=3;
+						}
+						if(event.name=='die') return game.dead.length>=2;
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					if(trigger.name=='dying') game.delayx();
+					'step 1'
+					player.storage.mougong_showZhu=true;
+					game.zhu=game.zhu||player;
+					game.broadcastAll(function(player){
+						game.zhu=player;
+						game.zhu.identityShown=true;
+						game.zhu.ai.shown=1;
+						game.zhu.setIdentity();
+						game.zhu.isZhu=true;
+						game.zhu.node.identity.classList.remove('guessing');
+						if(lib.config.animation&&!lib.config.low_performance) game.zhu.$legend();
+						if(_status.clickingidentity&&_status.clickingidentity[0]==game.zhu){
+							for(var i=0;i<_status.clickingidentity[1].length;i++){
+								_status.clickingidentity[1][i].delete();
+								_status.clickingidentity[1][i].style.transform='';
+							}
+							delete _status.clickingidentity;
+						}
+					},game.zhu);
+					game.addVideo('showIdentity',player,'zhu');
+					game.delay(2);
+					game.zhu.playerfocus(1000);
+					_status.event.trigger('zhuUpdate');
+					'step 2'
+					player.recover();
+					player.draw();
+					var skills=player.getStockSkills(true,true).filter(skill=>{
+						if(player.hasSkill(skill)) return false;
+						var info=get.info(skill);
+						return info&&info.zhuSkill;
+					});
+					if(skills.length){
+						for(var i of skills) player.addSkillLog(i);
+					}
+				}
+			},
+			mougong_showFan:{
+				trigger:{
+					player:'dying',
+				},
+				forced:true,
+				unique:true,
+				silent:true,
+				charlotte:true,
+				ruleSkill:true,
+				filter:function(event,player){
+					return player.ai.mougong_camouflage&&event.player==player&&!game.dead.length&&player.storage.mougong_nuqi>=2&&!player.storage.mougong_showFan;
+				},
+				content:function(){
+					'step 0'
+					game.delayx();
+					'step 1'
+					player.storage.mougong_showFan=true;
+					game.broadcastAll(function(player){
+						player.identityShown=true;
+						player.ai.shown=1;
+						player.setIdentity();
+						player.node.identity.classList.remove('guessing');
+						if(lib.config.animation&&!lib.config.low_performance) player.$thunder();
+					},player);
+					game.addVideo('showIdentity',player,'fan');
+					game.delay(2);
+					player.playerfocus(800);
+					'step 2'
+					player.changeNuqi(-player.storage.mougong_nuqi);
+					player.discard(player.getCards('hej'));
+					player.link(false);
+					player.turnOver(false);
+					player.recover(2-player.hp);
+					player.draw(3);
+				}
+			},
+			mougong_addBuff:{
+				enable:'chooseToUse',
+				filter:function(event,player){
+					if(!event.mougong_settings) return false;
+					if(game.roundNumber<2&&!event.mougong_settings.round1_use_nuqi) return false;
+					var cards=player.getCards('hs');
+					if(!event.mougong_settings.mougong_buff) return false;
+					var names=Object.keys(event.mougong_settings.mougong_buff);
+					if(!names.length) return false;
+					for(var card of cards){
+						if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) continue;
+						for(var name of names){
+							var myName=get.name(card,player),nature=get.nature(card,player);
+							if(name==myName){
+								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)){
+									if(player.storage.mougong_nuqi>=event.mougong_settings.mougong_buff[name][0])
+										return true;
+								}
+							}
+						}
+					}
+					return false;
+				},
+				onChooseToUse:function(event){
+					if(!event.mougong_settings&&!game.online){
+						event.set('mougong_settings',{
+							round1_use_nuqi:_status.round1_use_nuqi,
+							mougong_buff:_status.mougong_buff,
+						});
+					}
+				},
+				check:function(card){
+					var player=_status.event.player;
+					if(_status.event.type=='phase'){
+						var name=get.name(card,player);
+						if(name=='sha'){
+							if(game.hasPlayer(current=>{
+								return player.canUse(card,current)&&(player.storage.zhibi&&!player.storage.zhibi.contains(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(player.storage.mougong_nuqi||0)-1)))&&current.mayHaveShan()&&player.hasSkill('jiu');
+							})) return 1;
+							return 0;
+						} else if(name=='tao'){
+							if(player.hp<=2&&player.getDamagedHp()>=2) return 1;
+							return 0;
+						}
+						return 1;
+					}
+					else if(_status.event.type=='dying') return get.attitude(player,_status.event.dying)>3?1:0;
+					return (_status.event.getParent().shanRequired||1)>1&&get.damageEffect(player,_status.event.getParent().player||player,player)<0?1:0;
+				},
+				position:'hs',
+				filterCard:function(card,player,event){
+					event=event||_status.event;
+					var filter=event._backup.filterCard;
+					var names=Object.keys(event.mougong_settings.mougong_buff);
+					for(var name of names){
+						var myName=get.name(card,player),nature=get.nature(card,player);
+						if(name==myName){
+							if(filter({name:name,nature:nature,isCard:true,cards:[card]},player,_status.event)){
+								if(player.storage.mougong_nuqi>=event.mougong_settings.mougong_buff[name][0]){
+									return true;
+								}
+							}
+						}
+					}
+					return false;
+				},
+				viewAs:function(cards,player){
+					var name=get.name(cards[0],player);
+					var nature=get.nature(cards[0],player);
+					if(name){
+						return {
+							name:name,
+							nature:nature,
+							suit:get.suit(cards[0],player),
+							number:get.number(cards[0],player),
+							isCard:true,
+							cards:[cards[0]],
+							storage:{mougong_buffed:true},
+						};
+					}
+					return null;
+				},
+				precontent:function(){
+					'step 0'
+					player.changeNuqi(-_status.mougong_buff[event.result.card.name][0]);
+				},
+				ai:{
+					order:function(item,player){
+						var player=player||_status.event.player;
+						if(_status.event.type=='phase'){
+							var cards=player.getCards('hs');
+							for(var card of cards){
+								if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) continue;
+								var name=get.name(card,player);
+								if(name=='sha'){
+									if(game.hasPlayer(current=>{
+										return player.canUse(card,current)&&(player.storage.zhibi&&!player.storage.zhibi.contains(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(player.storage.mougong_nuqi||0)-1)))&&current.mayHaveShan();
+									})) return get.order(card,player)+0.5;
+								} else if(name=='tao'){
+									if(player.hp<=2&&player.getDamagedHp()>=2) return get.order(card,player)+0.5;
+								}
+								return 8;
+							}
+						}
+						return 3.5;
+					},
+				},
+				subSkill:{
+					sha:{
+						trigger:{player:'useCardToPlayered'},
+						forced:true,
+						silent:true,
+						popup:false,
+						charlotte:true,
+						filter:function(event,player){
+							return event.card.name=='sha'&&event.card.storage&&event.card.storage.mougong_buffed&&_status.mougong_buff['sha'][1]=='require'&&!event.getParent().directHit.contains(event.target);
+						},
+						content:function(){
+							if(!trigger.card.storage.mougong_logged){
+								game.log(player,'触发了强化杀的效果');
+								game.log('#y'+get.translation(trigger.card),'需要额外使用一张','#y【闪】','响应');
+								trigger.card.storage.mougong_logged=true;
+							}
+							var id=trigger.target.playerid;
+							var map=trigger.getParent().customArgs;
+							if(!map[id]) map[id]={};
+							if(typeof map[id].shanRequired=='number'){
+								map[id].shanRequired++;
+							}
+							else{
+								map[id].shanRequired=2;
+							}
+						},
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(player,tag,arg){
+								if(arg.card.name!='sha'||(arg.card&&arg.card.storage&&!arg.card.storage.mougong_buffed)||(arg.target.countCards('h','shan')>=1&&!arg.target.storage.mougong_nuqi)) return false;
+							},
+						},
+					},
+					shan:{
+						trigger:{
+							player:'shanEnd',
+						},
+						forced:true,
+						silent:true,
+						popup:false,
+						charlotte:true,
+						filter:function(event,player){
+							return event.getParent(3).name=='sha'&&event.getParent().card.storage&&event.getParent().card.storage.mougong_buffed&&_status.mougong_buff['shan'][1]=='double';
+						},
+						content:function(event,player){
+							if(!trigger.card.storage.mougong_logged){
+								game.log(player,'触发了强化闪的效果');
+								game.log('#y'+get.translation(trigger.card),'视为两张','#y【闪】','的效果');
+								trigger.card.storage.mougong_logged=true;
+							}
+							if(trigger.getParent(3).shanRequired) trigger.getParent(3).shanRequired--;
+						}
+					},
+					damage:{
+						trigger:{player:'damageBegin1'},
+						forced:true,
+						silent:true,
+						popup:false,
+						charlotte:true,
+						filter:function(event,player){
+							if(!event.card) return false;
+							var names=Object.keys(_status.mougong_buff),name=event.card.name;
+							return names.contains(name)&&event.getParent(2).player==event.source&&event.card.storage&&event.card.storage.mougong_buffed&&_status.mougong_buff[name][1]=='damage';
+						},
+						content:function(){
+							if(!trigger.card.storage.mougong_logged){
+								game.log(player,'触发了强化'+get.translation(trigger.card.name)+'的效果');
+								game.log('#y'+get.translation(trigger.card),'造成的伤害','#y+1');
+								trigger.card.storage.mougong_logged=true;
+							}
+							trigger.num++;
+						}
+					},
+					tao:{
+						trigger:{player:'useCard'},
+						filter:function(event,player){
+							return event.card.name=='tao'&&event.card.storage&&event.card.storage.mougong_buffed&&_status.mougong_buff['tao'][1]=='double';
+						},
+						forced:true,
+						silent:true,
+						popup:false,
+						charlotte:true,
+						content:function(){
+							if(!trigger.card.storage.mougong_logged){
+								game.log(player,'触发了强化桃的效果');
+								game.log('#y'+get.translation(trigger.card),'的回复值','#y+1');
+								trigger.card.storage.mougong_logged=true;
+							}
+							if(!trigger.baseDamage) trigger.baseDamage=1;
+							trigger.baseDamage++;
+						},
+					}
+				}
+			},
+			mougong_expose:{
+				trigger:{player:'useCard'},
+				forced:true,
+				silent:true,
+				popup:false,
+				filter:function(event,player){
+					if(event.targets[0]==player) return false;
+					return event.targets.length==1&&event.targets[0]&&((player.storage.zhibi.contains(event.targets[0])||event.targets[0].identityShown) ||
+						game.players.slice().concat(game.dead).filter(current=>(current.storage.mougong_showFan||current.storage.mougong_showZhu)&&current.identityShown&&current.storage.zhibi_for.contains(event.targets[0])).length);
+				},
+				content:function(){
+					if(!trigger.targets[0].storage.zhibi_for) trigger.targets[0].storage.zhibi_for=[];
+					if(!trigger.targets[0].storage.zhibi_for.contains(player)) trigger.targets[0].storage.zhibi_for.push(player);
+				}
+
+			},
+			mougong_shanAi:{
+				trigger:{
+					player:'chooseToUseBegin',
+				},
+				filter:function(event,player){
+					if(event.getParent().name!='sha') return false;
+					return event.getParent().target==player;
+				},
+				forced:true,
+				silent:true,
+				forced:true,
+				charlotte:true,
+				content:function(){
+					var evt=trigger.getParent();
+					trigger.set('prompt','请使用一张闪响应杀');
+					trigger.set('filterCard',function(card,player){
+						if(get.name(card)!='shan') return false;
+						return lib.filter.cardEnabled(card,player,'forceEnable');
+					});
+					var req=evt.shanRequired;
+					if(req>1){
+						trigger.set('prompt2','（共需使用'+req+'张普通闪，或'+Math.ceil(req/2)+'张强化闪）');
+					}
+					else if(evt.card.nature=='stab'){
+						trigger.set('prompt2','（在此之后仍需弃置一张手牌）');
+					}
+					trigger.set('ai1',function(card){
+						var target=_status.event.player;
+						var evt=_status.event.getParent(2);
+						var bool=true;
+						if(_status.event.getParent().shanRequired>1&&!get.is.object(card)&&(target.countCards('h','shan')<_status.event.getParent().shanRequired&&!(target.storage.mougong_nuqi>=1&&target.countCards('h','shan')==1&&_status.event.getParent().shanRequired<=2))){
+							bool=false;
+						}
+						else if(target.hasSkillTag('useShan')){
+							bool=true;
+						}
+						else if(get.damageEffect(target,evt.player,target,evt.card.nature)>=0) bool=false;
+						if(bool){
+							return get.order(card);
+						}
+						return 0;
+					}).set('shanRequired',evt.shanRequired);
+				},
+			},
+			mougong_cardEffect:{
+				trigger:{
+					player:['useCard1'],
+				},
+				forced:true,
+				silent:true,
+				forced:true,
+				charlotte:true,
+				filter:function(event,player,name){
+					return event.card&&event.card.storage&&event.card.storage.mougong_buffed&&event.cards.length;
+				},
+				content:function(){
+					game.broadcastAll(function(cards){
+						for(var i of cards){
+							i.clone.classList.add('mougong_nuqi_glow');
+						}
+					},trigger.cards);
+				}
+			},
 			yexinbilu:{
 				enable:'phaseUse',
 				filter:function(event,player){
@@ -3086,6 +4509,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'明忠模式':'<div style="margin:10px">明忠模式（忠胆英杰）</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
 			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
 			'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
+            '谋攻模式': `<div style="margin:10px">谋攻篇</div><ul style="margin-top:0">
+			<li>来自三国杀移动版，为六名玩家参与的全暗身份模式，加入“怒气”资源，玩家可以消耗怒气探查其他角色的身份是敌人或者队友，或使用怒气强化手牌，以达到识别出队友并击杀敌人的目标。<br></ul>
+            <br>
+            <div style="margin:10px">谋攻篇专属机制：</div><ul style="margin-top:0"><br>
+            <li>谋攻篇引入新机制“怒气”。一名角色在回合开始时或受到1点伤害后，将获得1点怒气，怒气上限为3。一名角色令其他角色扣减体力后，该角色可以消耗一点怒气，查探扣减体力的角色是敌或友。<br>
+            <li>各身份玩家的胜利条件与身份局中对应身份的胜利条件一致，且该模式下没有奖惩。<br>
+            <li>当主公进入濒死、场上有两名角色阵亡、第三轮的主公回合开始时，主公将会翻开身份牌，回复1点体力并摸一张牌，并获得武将牌上的主公技。<br>
+            <li>内奸在游戏开始时将会得知一名反贼的身份，并令该反贼被“伪装”。本局游戏内，被“伪装”的反贼在被任何人探查身份时，结果都提示为“敌人”。作为补偿，其第一次进入濒死时，若场上没有角色死亡且其怒气值不小于2，其弃置区域内所有牌，重置武将牌，将体力回复至2点并摸三张牌。<br>
+            <li>内奸在被所有角色探查时，都提示为“队友”。内奸在进行探查时，直接得知目标的身份。<br>
+            <li>在第二轮游戏开始后，当你需要使用一张“强化表”内的牌时，你可以通过消耗怒气将此牌强化。<br>
+            <li>可强化卡牌：<br><ul style="padding-left:20px;padding-top:5px">
+                <li>【杀】：消耗1点怒气进行强化，你令响应此杀所需使用的【闪】数+1。
+                <li>【闪】：消耗1点怒气进行强化，使用时视为两张【闪】的效果。
+                <li>【决斗】：消耗2点怒气进行强化，对此牌的目标造成伤害时，伤害+1。
+                <li>【火攻】：消耗2点怒气进行强化，造成的伤害+1。
+                <li>【桃】：消耗3点怒气进行强化，回复的体力+1。</ul>`,
 			'3v3v2':'<div style="margin:10px">3v3v2模式</div><ul style="margin-top:0"><li>游戏准备<br>本模式需要8名玩家进行游戏。游戏开始前，所有玩家随机分成两组，每组四人，分别称为「冷色阵营」和「暖色阵营」，然后分发身份牌，抽取到「主帅」身份的玩家亮出身份牌。'+
 			'<li>身份牌<br>每组的身份分为四种。<br>主帅（主）和前锋（忠）：联合对方阵营的细作，击杀己方细作，对方阵营的主帅和前锋以及所有的野心家。<br>细作（内）：帮助对方阵营的主帅和前锋，击杀对方细作，己方阵营的主帅和前锋以及所有的野心家。<br>野心家（野）：联合对方阵营中的野心家，击杀所有其他角色，成为最后的生还者。<br>'+
 			'<li>胜负判定<br>冷色主帅，先锋和暖色细作在所有野心家和对方主帅全部阵亡后视为胜利，在冷色主帅阵亡后视为游戏失败。<br>暖色主帅，先锋和冷色细作在所有野心家和对方主帅阵亡后视为胜利，在暖色主帅阵亡后视为失败。<br>野心家在所有不为野心家的角色阵亡后视为胜利，在双方主帅全部阵亡而有非野心家角色存活时失败。<br>当有角色阵亡后，若有角色满足胜利条件，游戏结束。若所有角色均满足失败条件，则游戏平局。若一名角色满足失败条件，即使其满足胜利条件，也视为游戏失败。<br>'+
