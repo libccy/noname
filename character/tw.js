@@ -10350,7 +10350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:"mark",
 				},
 				audio:2,
-				trigger:{player:"useCard"},
+				trigger:{player:"useCardAfter"},
 				filter:function(event,player){
 					var evt=event.getParent('phaseUse');
 					if(!evt||evt.player!=player) return false;
@@ -10381,13 +10381,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var choiceList=['令'+get.translation(trigger.source)+'本回合不能再使用或打出牌'];
-					if (trigger.source.countCards('h')) choiceList.push('令'+get.translation(trigger.source)+'弃置两张牌');
+					if (trigger.source.countCards('he')) choiceList.push('令'+get.translation(trigger.source)+'弃置两张牌');
 					player.chooseControl('cancel2').set('prompt2',get.prompt2('yuzhang')).set('choiceList',choiceList).set('ai',function(){
 						var player=_status.event.player,source=_status.event.source;
-						if(get.attitude(player,event.source)>0) return 'cancel2';
+						if(get.attitude(player,event.source)>=0) return 'cancel2';
 						if(source.hasSkillTag('noh')||source.hasSkillTag('noe')||source.countCards('h')>=4) return 0;
-						if(source.hp>1&&source.countCards('h')>1) return 1;
-						return 'cancel2';
+						if(source.hp>1&&source.countCards('he')>1) return 1;
+						return [0,1].randomGet();
 					}).set('source',trigger.source);
 					'step 1'
 					if(result.control!='cancel2'){
@@ -10402,17 +10402,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					skip:{
 						audio:'yuzhang',
 						trigger:{
-							player:["phaseJudgeBefore","phaseDrawBefore","phaseUseBefore","phaseDiscardBefore"],
+							player:['phaseZhunbeiBefore',"phaseJudgeBefore","phaseDrawBefore","phaseUseBefore","phaseDiscardBefore",'phaseJieshuBefore'],
 						},
 						filter:function(event,player){
 							return player.hasMark('twjingce');
 						},
-						"prompt2":function(event,player){
-							var str='弃置一枚“策”并跳过'
-							if(event.name=='phaseJudge') str+='判定';
-							if(event.name=='phaseDraw') str+='摸牌';
-							if(event.name=='phaseUse') str+='出牌';
-							if(event.name=='phaseDiscard') str+='弃牌';
+						prompt2:function(event,player){
+							var str='弃置一枚“策”并跳过';
+							var list=lib.skill.yuzhang.subSkill.skip.trigger.player.slice();
+							list=list.map(i=>i.slice(0,-6));
+							str+=['准备','判定','摸牌','出牌','弃牌','结束'][list.indexOf(event.name)];
 							str+='阶段';
 							return str;
 						},
@@ -10424,26 +10423,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.removeMark('twjingce',1);
 							trigger.cancel();
 						},
-						sub:true,
 					},
 					dontuse:{
 						charlotte:true,
 						mark:true,
 						mod:{
-							cardEnabled:function(card){
-								return false;
-							},
-							cardRespondable:function(card){
-								return false;
-							},
-							cardSavable:function(card){
+							cardEnabled2:function(card){
 								return false;
 							},
 						},
 						intro:{
 							content:"不能使用或打出牌",
 						},
-						sub:true,
 					},
 				},
 			},
@@ -10798,7 +10789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(lib.filter.notMe,'是否令一名其他角色也获得【'+get.translation(skill)+'】？').set('ai',function(target){
 						var player=_status.event.player;
 						if(player.identity=='nei') return 0;
-						return get.attitude(player,target)-6;
+						return get.attitude(player,target);
 					});
 					'step 2'
 					if(result.bool){
@@ -14218,7 +14209,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twlingfa_info:'①第一轮游戏开始时，你可选择获得如下效果直到本轮结束：其他角色使用【杀】时，若其有牌，则其需弃置一张牌，否则受到你造成的1点伤害。②第二轮游戏开始时，你可选择获得如下效果直到本轮结束：其他角色使用【桃】结算结束后，若其有牌，则其需交给你一张牌，否则受到你造成的1点伤害。③第三轮游戏开始时，你失去〖令法〗并获得〖治暗〗。',
 			twzhian:'治暗',
 			twzhian_info:'每回合限一次。一名角色使用装备牌或延时锦囊牌后，你可选择：⒈弃置位于场上的此牌。⒉弃置一张手牌并获得位于场上的此牌。⒊对其造成1点伤害。',
-			tw_zhangmancheng:'张曼成',
+			tw_zhangmancheng:'TW张曼成',
+			tw_zhangmancheng_prefix:'TW',
 			twfengji:'蜂集',
 			twfengji_info:'出牌阶段开始时，若你没有“示”，则你可以将一张牌作为“示”置于武将牌上并施法：从牌堆中获得X张与“示”牌名相同的牌，然后移去“示”。',
 			twyiju:'蚁聚',
@@ -14250,7 +14242,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_guohuai:'TW郭淮',
 			tw_guohuai_prefix:'TW',
 			twjingce:"精策",
-			twjingce_info:"当你于出牌阶段使用第X张牌时，你可以摸两张牌（X为你的体力值）。若此阶段你此前摸过牌或本回合造成过伤害，你获得一枚“策”标记。",
+			twjingce_info:"当你于出牌阶段使用第X张牌结算完毕后，你可以摸两张牌（X为你的体力值）。若此阶段你此前已摸过牌或本回合造成过伤害，你获得一枚“策”标记。",
 			yuzhang:"御嶂",
 			yuzhang_info:"你可以弃置一枚“策”标记，然后跳过一个阶段。当你受到伤害后，你可弃置一枚“策”标记，然后选择一项：⒈令伤害来源弃置两张牌；⒉令伤害来源本回合不能再使用或打出牌。",
 			tw_caozhao:'曹肇',
