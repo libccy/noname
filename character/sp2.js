@@ -620,7 +620,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.getStorage('dclvecheng_xiongluan').contains(target)) return 0;
 							if(target.getEquip('bagua')||target.getEquip('rewrite_bagua')) return -0.6;
 							var hs=player.countCards('h',card=>{
-								return get.name(card)=='sha'&&get.effect(target,card,player,player)!=0;
+								if(!player.canUse(card,target)) return false;
+								return get.name(card)=='sha'&&get.effect(target,card,player,player)>0;
 							});
 							var ts=target.hp;
 							if(hs>=ts&&ts>1) return -2;
