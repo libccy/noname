@@ -161,7 +161,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										return `<img src="${lib.assetURL+path}" width="65" height="93" draggable="false"></img>`;
 									}));
 								}).catch(()=>{
-									controls.addArray(list);
+									controls.addArray(list.map(i=>i+'2'));
 								}).then(()=>{
 									var dialog=ui.create.dialog('###炼魄：请选择一个身份###<div class="text center">你选择的身份对应的阵营角色数于本轮内视为+1</div>');
 									var controlsx=[];
