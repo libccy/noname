@@ -3476,7 +3476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				group:['yijin_upstart','yijin_die'],
 				filter:function(event,player){
-					if(!game.hasPlayer(current=>current!=player)) return false;
+					if(!game.hasPlayer(current=>current!=player && !lib.skill.yijin.getKane(current).length)) return false;
 					return lib.skill.yijin.getKane(player).length;
 				},
 				getKane:function(player){
