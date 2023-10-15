@@ -93,7 +93,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_guohuai:['male','wei',4,['mobilejingce']],
 			gongsunkang:['male','qun',4,['juliao','taomie']],
 			xin_zhangfei:['male','shu',4,['new_repaoxiao','liyong']],
-			xin_hansui:['male','qun',4,['xinniluan','xiaoxi_hansui']],
+			xin_hansui:['male','qun','4/4/1',['xinniluan','xiaoxi_hansui']],
 			hucheer:['male','qun',4,['daoji']],
 			re_lingtong:['male','wu',4,['rexuanfeng']],
 			re_liubiao:['male','qun',3,['zishou','rezongshi']],
