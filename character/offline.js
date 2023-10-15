@@ -6506,8 +6506,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yjluoshen:'洛神',
 			yjluoshen_info:'准备阶段，你可以判定并获得判定牌，且可重复此流程直到结果的颜色不同。',
 			//线下E系列 一战成名 战役篇官盗
-			shen_jiaxu:'神贾诩',
-			shen_jiaxu_prefix:'神',
+			shen_jiaxu:'战役篇神贾诩',
+			shen_jiaxu_prefix:'战役篇神',
 			zybishi:'避世',
 			zybishi_info:'当你成为【杀】的目标后，你可以令使用者摸一张牌，然后令此【杀】无效。',
 			zyjianbing:'谏兵',

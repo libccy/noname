@@ -18,10 +18,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
 				extra_tw:['tw_shen_guanyu','tw_shen_lvmeng'],
-				extra_offline:['shen_diaochan','boss_zhaoyun','shen_dianwei'],
+				extra_offline:['shen_diaochan','boss_zhaoyun','shen_dianwei','le_shen_jiaxu'],
 			},
 		},
 		character:{
+			le_shen_jiaxu:['male','shen',4,['jxlianpo','jxzhaoluan'],['qun']],
 			shen_dianwei:['male','shen',4,['juanjia','qiexie','cuijue'],['wei']],
 			shen_dengai:['male','shen',4,['dctuoyu','dcxianjin','dcqijing'],['wei']],
 			tw_shen_lvmeng:['male','shen',3,['twshelie','twgongxin'],['wu']],
@@ -71,6 +72,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_sunquan:['shen_sunquan','junk_sunquan'],
 			shen_lvmeng:['shen_lvmeng','tw_shen_lvmeng'],
 			shen_machao:['shen_machao','ps_shen_machao'],
+			shen_jiaxu:['le_shen_jiaxu','shen_jiaxu'],
 		},
 		characterFilter:{
 			shen_diaochan:function(mode){
@@ -81,8 +83,306 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(mode=='versus') return _status.mode!='three';
 				return true;
 			},
+			le_shen_jiaxu:function(mode){
+				return mode=='identity'&&_status.mode!='purple';
+			},
 		},
 		skill:{
+			//神贾诩
+			jxlianpo:{
+				audio:2,
+				trigger:{global:'dieAfter'},
+				filter:function(event,player){
+					if(lib.skill.jxlianpo.getMax().length<=1) return false;
+					return event.source&&event.source.isIn();
+				},
+				forced:true,
+				logTarget:'source',
+				global:'jxlianpo_global',
+				getMax:()=>{
+					var identities=[],population=0;
+					game.countPlayer(current=>{
+						var curPopulation=1+current.getFriends().length+game.countPlayer(currentx=>{
+							return currentx.countMark(`jxlianpo_mark_${current.identity}`);
+						});
+						if(curPopulation>=population){
+							if(curPopulation>population) identities=[];
+							var identity=current.identity;
+							if(identity=='zhong') identity='zhu';
+							identities.add(identity);
+							population=curPopulation;
+						}
+					});
+					return identities;
+				},
+				group:'jxlianpo_show',
+				content:function*(event,map){
+					var source=map.trigger.source;
+					source.draw(2);
+					source.recover();
+				},
+				mark:true,
+				intro:{
+					content:()=>`场上最大阵营为${lib.skill.jxlianpo.getMax().map(i=>{
+						if(i=='zhu') return '主忠';
+						if(i=='fan') return '反贼';
+						if(i=='nei') return '内奸';
+						return '';
+					}).join('、')}`,
+				},
+				subSkill:{
+					show:{
+						audio:'jxlianpo',
+						trigger:{global:'roundStart'},
+						filter:function(event,player){
+							var list=lib.config.mode_config.identity.identity.lastItem.slice();
+							list.removeArray(game.filterPlayer().map(i=>i.identity));
+							return list.length;
+						},
+						forced:true,
+						content:function*(event,map){
+							var player=map.player,trigger=map.trigger;
+							var list=lib.config.mode_config.identity.identity.lastItem.slice();
+							list.removeArray(game.filterPlayer().map(i=>i.identity)).unique();
+							var chooseControl=function(player,list){
+								var event=_status.event;
+								player=player||event.player;
+								var controls=[];
+								if(!event._result) event._result={};
+								Promise.all(list.map(identity=>new Promise((resolve,reject)=>{
+									var imageName=`mougong_${identity}`;
+									var pth=(`${lib.assetURL}image/card/${imageName}.jpg`);
+									var image=new Image();
+									image.onload=()=>resolve(pth);
+									image.onerror=reject;
+									image.src=pth;
+								}))).then(paths=>{
+									controls.addArray(paths.map(path=>{
+										return `<img src="${lib.assetURL+path}" width="65" height="93" draggable="false"></img>`;
+									}));
+								}).catch(()=>{
+									controls.addArray(list);
+								}).then(()=>{
+									var dialog=ui.create.dialog('###炼魄：请选择一个身份###<div class="text center">你选择的身份对应的阵营角色数于本轮内视为+1</div>');
+									var controlsx=[];
+									for(var control of controls){
+										controlsx.push(ui.create.control(control,function(link){
+											event._result.index=controls.indexOf(link);
+											dialog.close();
+											controlsx.forEach(control=>control.close());
+											_status.imchoosing=false;
+											game.resume();
+										}));
+									}
+									event.switchToAuto=function(){
+										event._result={index:get.rand(controls.length)};
+										dialog.close();
+										control.close();
+										_status.imchoosing=false;
+										game.resume();
+									};
+								});
+								game.pause();
+								game.countChoose();
+							}
+							if(event.isMine()){
+								chooseControl(player,list);
+							}
+							else if(event.isOnline()){
+								event.player.send(chooseControl,event.player,list);
+								event.player.wait();
+								game.pause();
+							}
+							else{
+								event._result={index:get.rand(list.length)};
+								_status.imchoosing=false;
+							}
+							yield null;
+							var index=event[event.result&&typeof event.result.index=='number'?'result':'_result'].index;
+							var choice=list[index],mark=`jxlianpo_mark_${choice}`;
+							player.when({global:'roundStart'})
+								.assign({
+									firstDo:true,
+								})
+								.filter(evt=>evt!=trigger)
+								.then(()=>{
+									for(var i in player.storage){
+										if(i.startsWith('jxlianpo_mark_')){
+											player.clearMark(i);
+										}
+									}
+								});
+							player.addMark(mark,1,false);
+							var videoId=lib.status.videoId++;
+							var createDialog=function(player,identity,id){
+								var dialog=ui.create.dialog(`${get.translation(player)}展示了${get.translation(identity+'2')}身份牌<br>`,'forcebutton');
+								dialog.videoId=id;
+								new Promise((resolve,reject)=>{
+									var imageName=`mougong_${identity}`;
+									var pth=(`${lib.assetURL}image/card/${imageName}.jpg`);
+									var image=new Image();
+									image.onload=()=>resolve(pth);
+									image.onerror=reject;
+									image.src=pth;
+								}).then(pth=>{
+									var img=document.createElement('img');
+									dialog.content.appendChild(img);
+									img.setAttribute('src',pth);
+									img.setAttribute('width','130');
+									img.setAttribute('height','185');
+									img.setAttribute('draggable',false);
+									dialog.open();
+								}).catch(()=>{});
+							};
+							game.broadcastAll(createDialog,player,choice,videoId);
+							var color='';
+							if(choice=='zhong') color='#y';
+							else if(choice=='fan') color='#g';
+							else if(choice=='nei') color='#b';
+							game.log(player,'展示了',`${color}${get.translation(choice+'2')}`,'身份牌');
+							yield game.delay(2);
+							game.broadcastAll('closeDialog',videoId);
+						}
+					},
+					global:{
+						mod:{
+							maxHandcard:function(player,num){
+								if(!lib.skill.jxlianpo.getMax().includes('fan')) return;
+								return num-game.countPlayer(current=>{
+									return current!=player&&current.hasSkill('jxlianpo');
+								});
+							},
+							cardUsable:function(card,player,num){
+								if(card.name=='sha'){
+									if(!lib.skill.jxlianpo.getMax().includes('fan')) return;
+									return num+game.countPlayer(current=>{
+										return current.hasSkill('jxlianpo');
+									});
+								}
+							},
+							attackRange:function(player,num){
+								if(!lib.skill.jxlianpo.getMax().includes('fan')) return;
+								return num+game.countPlayer(current=>{
+									return current.hasSkill('jxlianpo');
+								});
+							},
+							cardSavable:function(card,player){
+								if(card.name=='tao'){
+									if(!lib.skill.jxlianpo.getMax().includes('zhu')) return;
+									return false;
+								}
+							},
+							cardEnabled:function(card,player){
+								if(card.name=='tao'){
+									if(!lib.skill.jxlianpo.getMax().includes('zhu')) return;
+									return false;
+								}
+							}
+						},
+					},
+				},
+			},
+			jxzhaoluan:{
+				audio:2,
+				trigger:{global:'dieBegin'},
+				filter:function(event,player){
+					return event.getParent().name=='dying'&&event.player.isIn();
+				},
+				limited:true,
+				skillAnimation:true,
+				animationColor:'metal',
+				logTarget:'player',
+				check:function(event,player){
+					if(event.source&&event.source.isIn()&&get.attitude(player,event.source)>0&&player.identity=='fan') return false;
+					return get.attitude(player,event.player)>3.5;
+				},
+				content:function*(event,map){
+					var player=map.player,trigger=map.trigger;
+					var target=trigger.player;
+					player.awakenSkill('jxzhaoluan');
+					trigger.cancel();
+					target.getSkills(null,false,false).forEach(skill=>{
+						var info=get.info(skill);
+						if(info&&!info.charlotte&&!get.is.locked(skill)){
+							target.removeSkill(skill);
+						}
+					});
+					yield target.gainMaxHp(3);
+					var num=3-target.getHp(true);
+					if(num>0) yield target.recover(num);
+					target.draw(4);
+					player.addSkill('jxzhaoluan_effect');
+					player.markAuto('jxzhaoluan_effect',target);
+				},
+				ai:{
+					expose:0.5,
+					threaten:3,
+				},
+				subSkill:{
+					effect:{
+						audio:'jxzhaoluan',
+						enable:'phaseUse',
+						filter:function(event,player){
+							return player.getStorage('jxzhaoluan_effect').some(i=>i.isIn());
+						},
+						filterTarget:function(card,player,target){
+							return !player.getStorage('jxzhaoluan_hit').includes(target);
+						},
+						line:false,
+						locked:true,
+						charlotte:true,
+						promptfunc:function(){
+							var bodies=_status.event.player.getStorage('jxzhaoluan_effect').filter(i=>i.isIn());
+							return `选择一名角色，你令${get.translation(bodies)}${bodies.length>1?'中的一人':''}减1点体力上限，然后你对选择的角色造成1点伤害。`;
+						},
+						content:function(){
+							'step 0'
+							var bodies=player.getStorage('jxzhaoluan_effect').filter(i=>i.isIn());
+							if(bodies.length==1) event._result={bool:true,targets:bodies};
+							else{
+								player.chooseTarget('兆乱：请选择被减上限的傀儡',true,(card,player,target)=>{
+									return _status.event.targets.includes(target);
+								}).set('targets',bodies).set('ai',target=>{
+									return 8-get.attitude(_status.event.player,target);
+								});
+							}
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.line(target);
+								target.loseMaxHp();
+								game.delayex();
+							}
+							else event.finish();
+							'step 2'
+							player.line(target);
+							target.damage();
+							if(!player.storage.jxzhaoluan_hit){
+								player.when('phaseUseAfter')
+									.then(()=>{
+										delete player.storage.jxzhaoluan_hit;
+									});
+							}
+							player.markAuto('jxzhaoluan_hit',target);
+						},
+						ai:{
+							result:{
+								player:function(player){
+									var bodies=player.getStorage('jxzhaoluan_effect').filter(i=>i.isIn());
+									var body;
+									if(bodies.length==1) body=bodies[0];
+									else body=bodies.sort((a,b)=>get.attitude(player,a)-get.attitude(player,b))[0];
+									if(get.attitude(player,body)>4&&!body.isDamaged()&&body.getHp()<=2) return -10;
+									return 0;
+								},
+								target:function(player,target){
+									return Math.sign(get.damageEffect(target,player,target));
+								}
+							}
+						}
+					},
+				},
+			},
 			//神典韦
 			juanjia:{
 				trigger:{
@@ -7469,6 +7769,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiexie_info:'锁定技。准备阶段，你在剩余武将牌堆中随机观看五张牌，选择其中的任意张，将其按照如下规则转化为武器牌置入你的武器栏：{⒈此牌不具有花色，且其攻击范围和点数等于此武将牌的体力上限。⒉此武器牌的技能为该武将牌上所有描述中包含“【杀】”且不具有锁定技以外的标签的技能。⒊此武器牌离开你的装备区时，改为放回武将牌堆。}',
 			cuijue:'摧决',
 			cuijue_info:'每回合每名角色限一次。出牌阶段，你可以弃置一张牌，然后对攻击范围内距离最远的一名其他角色造成1点伤害（没有则不选）。',
+			le_shen_jiaxu:'神贾诩',
+			le_shen_jiaxu_prefix:'神',
+			jxlianpo:'炼魄',
+			jxlianpo_info:'锁定技。①若场上最大阵营为：反贼，其他角色的手牌上限-1，所有角色使用【杀】的次数上限和攻击范围+1；主忠，其他角色不能对其以外的角色使用【桃】。其他角色死亡后，若有多个最大阵营，来源摸两张牌并回复1点体力。②一轮游戏开始时，你展示一张未加入游戏或已死亡角色的身份牌，本轮视为该身份对应阵营的角色数+1。',
+			jxzhaoluan:'兆乱',
+			jxzhaoluan_info:'限定技。一名角色死亡前，若其此次进入过濒死状态，你可以取消之，令其加3点体力上限并失去所有非锁定技，回复体力至3点，摸四张牌。然后你获得如下效果：出牌阶段，你可以令一名成为过你〖兆乱〗目标的角色减1点体力上限，然后对一名此阶段未以此法选择过的角色造成1点伤害。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
