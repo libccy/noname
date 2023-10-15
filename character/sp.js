@@ -24813,7 +24813,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyun:['wangyun','dc_wangyun','re_wangyun','jsrg_wangyun','old_wangyun','pe_wangyun'],
 			zhangliang:['re_zhangliang','zhangliang'],
 			lingju:['lingju','old_lingju'],
-			guansuo:['guansuo','ol_guansuo'],
+			guansuo:['guansuo','dc_guansuo'],
 			zhangxingcai:['zhangxingcai','old_zhangxingcai'],
 			lisu:['ol_lisu','lisu'],
 			fuwan:['fuwan','tw_fuwan','sp_fuwan'],

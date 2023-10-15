@@ -2505,7 +2505,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'dangxian',
 				audioname:['guansuo','xin_liaohua','re_liaohua'],
 				audioname2:{
-					ol_guansuo:'dangxian_guansuo',
+					dc_guansuo:'dangxian_guansuo',
 				},
 				content:function(){
 					trigger.phaseList.splice(trigger.num,0,'phaseUse|xindangxian');
@@ -10178,7 +10178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'zhiman',
 				audioname:['guansuo','re_masu'],
 				audioname2:{
-					ol_guansuo:'zhiman_guansuo',
+					dc_guansuo:'zhiman_guansuo',
 				},
 				trigger:{source:'damageBegin2'},
 				filter:function(event,player){

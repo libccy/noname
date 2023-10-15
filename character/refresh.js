@@ -11685,7 +11685,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:"wusheng",
 				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo','re_guanzhang','dc_jsp_guanyu'],
 				audioname2:{
-					ol_guansuo:'wusheng_guansuo',
+					dc_guansuo:'wusheng_guansuo',
 				},
 				enable:["chooseToRespond","chooseToUse"],
 				filterCard:function(card,player){
