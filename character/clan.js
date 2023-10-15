@@ -1951,7 +1951,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									else list.push('选项'+get.cnNumber(ind+1,true));
 									return link;
 								});
-								if(!list.length){event.finish(); return;}
+								if(!list.length){
+									game.log(target, "没有能执行的选项");
+									event.finish();
+									return;
+								}
 								target.chooseControl(list).set('choiceList',choiceList).set('ai',()=>{
 									var controls=_status.event.controls.slice(),player=_status.event.player,user=_status.event.getParent().player;
 									if(controls.length==1) return controls[0];
