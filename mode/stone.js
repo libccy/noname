@@ -9458,7 +9458,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_zhaohuanchongwu:'动物伙伴',
 			spell_zhaohuanchongwu_info:'随机召唤一只野兽',
 			spell_zidanshangtang:'子弹上膛',
-			spell_zidanshangtang_info:'随机获得一张猎人职业法术牌，并获得技能【上膛】直到回合结束',
+			spell_zidanshangtang_info:'随机获得一张猎人职业法术牌，并获得技能〖上膛〗直到回合结束',
 			spell_duochongsheji:'多重射击',
 			spell_duochongsheji_info:'对两名随机敌方随从各造成两点伤害',
 
