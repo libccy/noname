@@ -1,5 +1,12 @@
 "use strict";
 {
+	/**
+	 * @typedef {InstanceType<typeof lib.element.Player>} Player
+	 * @typedef {InstanceType<typeof lib.element.Card>} Card
+	 * @typedef {InstanceType<typeof lib.element.VCard>} VCard
+	 * @typedef {InstanceType<typeof lib.element.Event>} GameEvent
+	 * @typedef {InstanceType<typeof lib.element.NodeWS>} NodeWS
+	 */
 	const userAgent=navigator.userAgent.toLowerCase();
 	if(!localStorage.getItem('gplv3_noname_alerted')){
 		if(confirm('①无名杀是一款基于GPLv3协议的开源软件！\n你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。\n点击“确定”即代表您认可并接受GPLv3协议↓️\nhttps://www.gnu.org/licenses/gpl-3.0.html\n②无名杀官方发布地址仅有GitHub仓库！\n其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！')){
@@ -78,7 +85,7 @@
 		clicked:false,
 		auto:false,
 		/**
-		 * @type {InstanceType<typeof lib.element.Event>}
+		 * @type {GameEvent}
 		 */
 		event:null,
 		ai:{},
@@ -20467,6 +20474,9 @@
 				 * @param {true} [noclick]
 				 */
 				constructor(position,noclick){
+					/**
+					 * @type {Player}
+					 */
 					const player=ui.create.div('.player',position);
 					Object.setPrototypeOf(player,lib.element.Player.prototype);
 					const node=player.node={
@@ -29760,6 +29770,14 @@
 				hasGaintag(tag){
 					return this.gaintag&&this.gaintag.contains(tag);
 				}
+				/**
+				 * @param {[string, number, string, string] | {
+				 * suit: string;
+				 * number: number;
+				 * name: string;
+				 * nature: string;
+				 * }} card
+				 */
 				init(card){
 					if(Array.isArray(card)){
 						if(card[2]=='huosha'){
@@ -30299,36 +30317,65 @@
 			},
 			VCard:class{
 				/**
-				 * @param {string | [string, number, string, string] | {
-				 * suit: string;
-				 * number: number;
-				 * name: string;
-				 * nature: string;
-				 * }} suitOrTupleOrStruct
-				 * @param {number} [number]
+				 * @param {string | [string, number, string, string] | Card | Record<string, string | number | boolean | any[]>} [suitOrCard]
+				 * @param {number | Card[]} [numberOrCards]
 				 * @param {string} [name]
 				 * @param {string} [nature]
 				 */
-				constructor(suitOrTupleOrStruct,number,name,nature){
-					if(Array.isArray(suitOrTupleOrStruct)){
-						this.suit=suitOrTupleOrStruct[0];
-						this.number=suitOrTupleOrStruct[1];
-						this.name=suitOrTupleOrStruct[2];
-						this.nature=suitOrTupleOrStruct[3];
+				constructor(suitOrCard,numberOrCards,name,nature){
+					if(typeof suitOrCard=='undefined'&&typeof numberOrCards=='undefined'&&typeof name=='undefined'&&typeof nature=='undefined') return;
+					if(Array.isArray(suitOrCard)){
+						this.suit=suitOrCard[0];
+						this.number=suitOrCard[1];
+						this.name=suitOrCard[2];
+						this.nature=suitOrCard[3];
 					}
-					else if(typeof suitOrTupleOrStruct=='object'){
-						this.suit=suitOrTupleOrStruct.suit;
-						this.number=suitOrTupleOrStruct.number;
-						this.name=suitOrTupleOrStruct.name;
-						this.nature=suitOrTupleOrStruct.nature;
+					else if(suitOrCard instanceof lib.element.Card){
+						this.name=get.name(suitOrCard);
+						this.suit=get.suit(suitOrCard);
+						this.color=get.color(suitOrCard);
+						this.number=get.number(suitOrCard);
+						this.nature=get.nature(suitOrCard);
+						this.isCard=true;
+						this.cardid=suitOrCard.cardid;
+						this.wunature=suitOrCard.wunature;
+						this.storage=get.copy(suitOrCard.storage);
+						if(Array.isArray(numberOrCards)) this.cards=numberOrCards.slice();
+						else this.cards=[suitOrCard];
 					}
-					else{
-						this.suit=suitOrTupleOrStruct;
-						this.number=number;
-						this.name=name;
-						this.nature=nature;
+					else if(typeof suitOrCard!='string'){
+						Object.keys(suitOrCard).forEach(key=>{
+							const propertyDescriptor=Object.getOwnPropertyDescriptor(suitOrCard,key),value=propertyDescriptor.value;
+							if(Array.isArray(value)) this[key]=value.slice();
+							else Object.defineProperty(this,key,propertyDescriptor);
+						});
+						if(Array.isArray(numberOrCards)){
+							const noCards=!this.hasOwnProperty('cards');
+							this.cards=numberOrCards.slice();
+							if(noCards){
+								if(!lib.suits.includes(this.suit)) this.suit=get.suit(this);
+								if(!Object.keys(lib.color).includes(this.color)) this.color=get.color(this);
+								if(!this.hasOwnProperty('number')) this.number=get.number(this);
+								if(!this.hasOwnProperty('nature')) this.nature=get.nature(this);
+							}
+						}
 					}
-					this.color=get.color();
+					if(typeof suitOrCard=='string') this.suit=suitOrCard;
+					if(typeof numberOrCards=='number') this.number=numberOrCards;
+					if(typeof name=='string') this.name=name;
+					if(typeof nature=='string') this.nature=nature;
+					if(this.hasOwnProperty('suit')&&!this.hasOwnProperty('color')) this.color=get.color(this);
+					if(!this.hasOwnProperty('storage'))
+						/**
+						 * @type {Record<string, any>}
+						 */
+						this.storage={};
+					if(!this.hasOwnProperty('cards'))
+						/**
+						 * @type {Card[]}
+						 */
+						this.cards=[];
+					const info=get.info(this,false);
 				}
 			},
 			Button:class extends HTMLDivElement{
@@ -31406,7 +31453,7 @@
 			},
 			Client:class{
 				/**
-				 * @param {InstanceType<typeof lib.element.NodeWS | typeof import('ws').WebSocket>} ws
+				 * @param {NodeWS | InstanceType<typeof import('ws').WebSocket>} ws
 				 */
 				constructor(ws){
 					this.ws=ws;
@@ -42405,11 +42452,11 @@
 			});
 		},
 		/**
-		 * @type {InstanceType<typeof lib.element.Player>[]}
+		 * @type {Player[]}
 		 */
 		players:[],
 		/**
-		 * @type {InstanceType<typeof lib.element.Player>[]}
+		 * @type {Player[]}
 		 */
 		dead:[],
 		imported:[],
@@ -57474,44 +57521,7 @@
 				}
 			}
 		},
-		autoViewAs:(card,cards)=>{
-			let _card;
-			if(get.itemtype(card)=='card'){
-				_card={
-					name:get.name(card),
-					suit:get.suit(card),
-					color:get.color(card),
-					number:get.number(card),
-					nature:get.nature(card),
-					isCard:true,
-					cardid:card.cardid,
-					wunature:card.wunature,
-					storage:get.copy(card.storage),
-				};
-				if(Array.isArray(cards)) _card.cards=cards.slice(0);
-				else _card.cards=[card];
-			}
-			else{
-				_card=get.copy(card);
-				if(Array.isArray(cards)){
-					if(_card.cards){
-						_card.cards=cards.slice(0);
-					}
-					else{
-						_card.cards=cards.slice(0);
-						if(!lib.suits.includes(_card.suit)) _card.suit=get.suit(_card);
-						if(!Object.keys(lib.color).includes(_card.color)) _card.color=get.color(_card);
-						if(!_card.hasOwnProperty('number')) _card.number=get.number(_card);
-						if(!_card.hasOwnProperty('nature')) _card.nature=(get.nature(_card)||false);
-					}
-				}
-			}
-			const info=get.info(_card,false);
-			if(info.autoViewAs){
-				_card.name=info.autoViewAs;
-			}
-			return _card;
-		},
+		autoViewAs:(card,cards)=>new lib.element.VCard(card,cards),
 		/**
 		 * @deprecated
 		 */
@@ -58652,6 +58662,12 @@
 			if(subtype.startsWith('equip')) return parseInt(subtype[5]);
 			return 0;
 		},
+		/**
+		 * 
+		 * @param {Card | VCard} card
+		 * @param {false | Player} [player]
+		 * @returns {string}
+		 */
 		name:(card,player)=>{
 			if(get.itemtype(player)=='player'||(player!==false&&get.position(card)=='h')){
 				var owner=player||get.owner(card);
@@ -58661,6 +58677,11 @@
 			}
 			return card.name;
 		},
+		/**
+		 * @param {Card | VCard | Card[] | VCard[]} card
+		 * @param {false | Player} [player]
+		 * @returns {string}
+		 */
 		suit:(card,player)=>{
 			if(!card) return;
 			if(Array.isArray(card)){
@@ -58682,17 +58703,17 @@
 			}
 		},
 		/**
-		 * @param {*} card
-		 * @param {InstanceType<typeof lib.element.Player>} player
-		 * @returns {keyof typeof lib.color}
+		 * @param {Card | VCard | Card[] | VCard[]} card
+		 * @param {false | Player} [player]
+		 * @returns {string}
 		 */
 		color:(card,player)=>{
 			if(!card) return;
 			if(Array.isArray(card)){
 				if(!card.length) return 'none';
-				const color=get.color(card[0],player);
-				for(let i=1;i<card.length;i++){
-					if(get.color(card[i],player)!=color) return 'none';
+				const cards=card.slice(),color=get.color(cards.shift(),player);
+				for(const anotherCard of cards){
+					if(get.color(anotherCard,player)!=color) return 'none';
 				}
 				return color;
 			}
@@ -58704,12 +58725,17 @@
 			}
 			else{
 				const suit=get.suit(card,player);
-				for(let i in lib.color){
-					if(lib.color[i].includes(suit)) return i;
+				for(const entry of Object.entries(lib.color)){
+					if(entry[1].includes(suit)) return entry[0];
 				}
 				return 'none';
 			}
 		},
+		/**
+		 * @param {Card | VCard} card
+		 * @param {false | Player} [player]
+		 * @returns {number}
+		 */
 		number:(card,player)=>{
 			if(!card) return;
 			//狗卡你是真敢出啊
@@ -58729,12 +58755,17 @@
 			}
 			return number;
 		},
-		//返回一张杀的属性。如有多种属性则用 lib.natureSeparator 分割开来。例：火雷【杀】的返回值为 fire|thunder
+		/**
+		 * 返回一张杀的属性。如有多种属性则用`lib.natureSeparator`分割开来。例：火雷【杀】的返回值为`fire|thunder`
+		 * @param {string | string[] | Card | VCard} card
+		 * @param {false | Player} [player]
+		 * @returns {string}
+		 */
 		nature:(card,player)=>{
 			if(typeof card=='string') return card.split(lib.natureSeparator).sort(lib.sort.nature).join(lib.natureSeparator);
 			if(Array.isArray(card)) return card.sort(lib.sort.nature).join(lib.natureSeparator);
 			var nature=card.nature;
-			if(get.itemtype(player)=='player'||player!==false){
+			if(player instanceof lib.element.Player||player!==false){
 				var owner=get.owner(card);
 				if(owner){
 					return game.checkMod(card,owner,nature,'cardnature',owner);
@@ -58742,12 +58773,17 @@
 			}
 			return nature;
 		},
-		//返回包含所有属性的数组
-		natureList(card,player){
+		/**
+		 * 返回包含所有属性的数组
+		 * @param {string[] | string} card
+		 * @param {false | Player} [player]
+		 * @returns {string[]}
+		 */
+		natureList:(card,player)=>{
 			if(!card) return [];
 			if(get.itemtype(card)=='natures') return card.split(lib.natureSeparator);
 			if(get.itemtype(card)=='nature') return [card];
-			var natures=get.nature.apply(this,arguments);
+			const natures=get.nature(card,player);
 			if(typeof natures!='string') return [];
 			return natures.split(lib.natureSeparator);
 		},
