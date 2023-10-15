@@ -1,7 +1,7 @@
-
+"use strict";
 module("get", [], (lib, game, ui, get, ai, _status) => {
     const userAgent=navigator.userAgent.toLowerCase();
-    
+
     const _get = {
         //Generate an object URL from the Base64-encoded octet stream
         //从Base64编码的八位字节流生成对象URL

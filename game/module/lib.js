@@ -1,4 +1,4 @@
-
+"use strict";
 module("lib", [], (lib, game, ui, get, ai, _status) => {
     const _lib = {
         listenEnd: function (node) {

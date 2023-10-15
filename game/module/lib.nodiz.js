@@ -1,4 +1,4 @@
-
+"use strict";
 module("lib.nodiz", ["lib"], (lib, game, ui, get, ai, _status) => {
     const libnodiz = {
         comparator: {

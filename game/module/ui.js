@@ -1,4 +1,4 @@
-
+"use strict";
 module("ui", [], (lib, game, ui, get, ai, _status) => {
     const gnc = lib.gnc;
 

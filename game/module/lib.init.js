@@ -1,4 +1,4 @@
-
+"use strict";
 module("lib.init", ["lib"], (lib, game, ui, get, ai, _status) => {
     const gnc = lib.gnc;
     const userAgent=navigator.userAgent.toLowerCase();

@@ -1,4 +1,4 @@
-
+"use strict";
 module("lib.element", ["lib"], (lib, game, ui, get, ai, _status) => {
     const element = {
         content:{

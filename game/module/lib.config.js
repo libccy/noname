@@ -1,4 +1,4 @@
-
+"use strict";
 module("lib.config", ["lib"], (lib, game, ui, get, ai, _status) => {
     const _lib = {
         quickVoice: [

@@ -1,4 +1,4 @@
-
+"use strict";
 module("ai", [], (lib, game, ui, get, ai, _status) => {
     const aiBasic = {
         chooseButton: function (check) {
