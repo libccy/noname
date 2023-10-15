@@ -15916,10 +15916,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var left=player.storage.nshuanxian_left;
 							var right=player.storage.nshuanxian_right;
 							if(left&&player.hasSkill(left)&&right&&player.hasSkill(right)){
-								str='令一名其他角色获得技能〖雷击〗和〖鬼道〗';
+								str='令一名其他角色获得技能【雷击】和【鬼道】';
 							}
 							else{
-								str='令一名其他角色获得技能〖雷击〗或〖鬼道〗';
+								str='令一名其他角色获得技能【雷击】或【鬼道】';
 							}
 							if(trigger.source){
 								str+='（'+get.translation(trigger.source)+'除外）';
