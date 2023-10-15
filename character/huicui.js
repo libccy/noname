@@ -4157,7 +4157,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i of game.players) i.hideTimer();
 					event.videoId=lib.status.videoId++;
 					game.broadcastAll(function(name,id,results){
-						var dialog=ui.create.dialog(name+'发动了技能【化归】','hidden','forcebutton');
+						var dialog=ui.create.dialog(name+'发动了技能〖化归〗','hidden','forcebutton');
 						dialog.videoId=id;
 						dialog.classList.add('scroll1');
 						dialog.classList.add('scroll2');

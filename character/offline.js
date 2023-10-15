@@ -5794,7 +5794,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init2:function(player){
 					game.broadcastAll(function(player){
 						player._mouduan_mark=player.mark('武',{
-							content:'拥有技能【激昂】、【谦逊】'
+							content:'拥有技能〖激昂〗、〖谦逊〗'
 						});
 					},player);
 					player.addAdditionalSkill('mouduan',['jiang','qianxun']);
@@ -5820,7 +5820,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player._mouduan_mark.name='文';
 						player._mouduan_mark.skill='文';
 						player._mouduan_mark.firstChild.innerHTML='文';
-						player._mouduan_mark.info.content='拥有技能【英姿】、【克己】';
+						player._mouduan_mark.info.content='拥有技能〖英姿〗、〖克己〗';
 					},player);
 					player.addAdditionalSkill('mouduan',['yingzi','keji']);
 				},
@@ -5846,7 +5846,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player._mouduan_mark.name='武';
 							player._mouduan_mark.skill='武';
 							player._mouduan_mark.firstChild.innerHTML='武';
-							player._mouduan_mark.info.content='拥有技能【激昂】、【谦逊】';
+							player._mouduan_mark.info.content='拥有技能〖激昂〗、〖谦逊〗';
 						},player);
 						player.addAdditionalSkill('mouduan',['jiang','qianxun']);
 					}

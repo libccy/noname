@@ -8332,7 +8332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				skillAnimation:true,
 				animationColor:'thunder',
-				prompt2:'（限定技）失去技能【劝封】，并获得该角色武将牌上的所有技能，然后加1点体力上限并回复1点体力',
+				prompt2:'（限定技）失去技能〖劝封〗，并获得该角色武将牌上的所有技能，然后加1点体力上限并回复1点体力',
 				content:function(){
 					player.awakenSkill('requanfeng');
 					player.removeSkill('hongyi');

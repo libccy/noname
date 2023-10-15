@@ -10285,10 +10285,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.countPlayer(function(current){
 						current.addSkill('twfeifu');
 					});
-					game.log(player,'令所有其他角色获得了技能','#g【非服】')
+					game.log(player,'令所有其他角色获得了技能','#g〖非服〗')
 					game.delayx();
 					'step 1'
-					player.chooseTarget('是否减1点体力上限，并令一名其他角色获得技能【复纂】？',lib.filter.notMe).set('ai',function(target){
+					player.chooseTarget('是否减1点体力上限，并令一名其他角色获得技能〖复纂〗？',lib.filter.notMe).set('ai',function(target){
 						var player=_status.event.player;
 						if(player.hasUnknown()&&!target.isZhu) return 0;
 						if(player.getEnemies().contains(target)) return 0;
