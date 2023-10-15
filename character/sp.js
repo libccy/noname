@@ -2170,7 +2170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!lib.skill.oltianhou.derivation.contains(skill)) event.finish();
 					else{
 						event.weather_skill=skill;
-						player.chooseTarget(true,'令一名角色获得技能〖'+get.translation(skill)+'〗',get.translation(skill+'_info')).set('ai',function(target){
+						player.chooseTarget(true,'令一名角色获得技能【'+get.translation(skill)+'】',get.translation(skill+'_info')).set('ai',function(target){
 							return get.attitude(_status.event.player,target);
 						});
 					}
