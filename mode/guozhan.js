@@ -14687,7 +14687,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			huangjintianbingfu:'黄巾天兵符',
 			huangjintianbingfu_ab:'兵符',
 			huangjintianbingfu_bg:'符',
-			huangjintianbingfu_info:'锁定技 ：当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<br>当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<br>与你势力相同的角色可将一张“天兵”当作【杀】使用或打出。',
+			huangjintianbingfu_info:'锁定技，当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<br>当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<br>与你势力相同的角色可将一张“天兵”当作【杀】使用或打出。',
 			wuhujiangdaqi:'五虎将大旗',
 			wuhujiangdaqi_ab:'将旗',
 			wuhujiangdaqi_bg:'旗',
