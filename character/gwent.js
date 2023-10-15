@@ -4623,7 +4623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwfusheng_info:'当一名未翻面的角色进入濒死状态时，你可以令其翻面并回复一点体力，然后你与其各摸一张牌',
 			gwqinwu:'琴舞',
 			gwqinwu2:'琴舞',
-			gwqinwu_info:'出牌阶段限一次，每当你使用一张基本牌，你可以令一名角色摸一张牌并获得技能【琴舞】直到其下一回合结束',
+			gwqinwu_info:'出牌阶段限一次，每当你使用一张基本牌，你可以令一名角色摸一张牌并获得技能〖琴舞〗直到其下一回合结束',
 			huanshu:'幻术',
 			huanshu2:'幻术',
 			huanshu3:'幻术',
