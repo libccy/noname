@@ -13534,7 +13534,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target,current){
 							if(target.countCards('h')) return;
-							if(get.tag(card,'natureDamage')) return 'zerotarget';
+							if(get.tag(card,'natureDamage')) return 'zeroplayertarget';
 							if(get.type(card)=='trick'&&get.tag(card,'damage')){
 								return 'zeroplayertarget';
 							}

@@ -10633,14 +10633,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						list.add(get.suit(card,false));
 					}
 					game.getGlobalHistory('cardMove',function(evt){
-						if(evt==event||evt.getParent()==event||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
+						if(evt.name!='lose'&&evt.name!='cardsDiscard') return false;
 						if(evt.name=='lose'&&evt.position!=ui.discardPile) return false;
+						if(evt==event||evt.getParent()==event) return false;
 						num+=evt.cards.length;
 						for(var i=0;i<evt.cards.length;i++){
 							var card=evt.cards[i];
-							list.remove(get.suit(card,false));
+							list.remove(get.suit(card,(evt.cards2&&evt.cards2.contains(card))?evt.player:false));
 						}
-					},event);
+					});
 					player.storage.refenyin_mark2=num;
 					return list.length>0;
 				},
@@ -10650,20 +10651,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=trigger.getd();
 					for(var i=0;i<cards.length;i++){
 						var card=cards[i];
-						var suit=get.suit(card,(trigger.cards2&&trigger.cards2.contains(card))?trigger.player:false);
+						var suit=get.suit(card,false);
 						list.add(suit);
 						list2.add(suit);
 					}
 					game.getGlobalHistory('cardMove',function(evt){
-						if(evt==trigger||evt.getParent()==trigger||(evt.name!='lose'&&evt.name!='cardsDiscard')) return false;
+						if(evt.name!='lose'&&evt.name!='cardsDiscard') return false;
 						if(evt.name=='lose'&&evt.position!=ui.discardPile) return false;
+						if(evt==trigger||evt.getParent()==trigger) return false;
 						for(var i=0;i<evt.cards.length;i++){
 							var card=evt.cards[i];
-							var suit=get.suit(card,(evt.cards2&&evt.cards2.contains(card))?evt.player:false);
+							var suit=get.suit(card,false);
 							list.remove(suit);
 							list2.add(suit);
 						}
-					},trigger);
+					});
 					list2.sort();
 					player.draw(list.length);
 					player.storage.refenyin_mark=list2;

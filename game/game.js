@@ -12661,7 +12661,7 @@
 					"step 4"
 					var info=get.info(card,false);
 					if(get.itemtype(result)=='cards'){
-						player.lose(result,false,'visible').set('type','equip').set('getlx',false).swapEquip=true;
+						player.lose(result,'visible').set('type','equip').set('getlx',false).swapEquip=true;
 						if(info.loseThrow){
 							player.$throw(result,1000);
 						}
@@ -26929,6 +26929,7 @@
 							this.addEquipTrigger(es[i]);
 						}
 					}
+					_status.event.clearStepCache();
 					return this;
 				},
 				removeEquipTrigger:function(card){
@@ -26954,6 +26955,7 @@
 							this.removeEquipTrigger(es[i]);
 						}
 					}
+					_status.event.clearStepCache();
 					return this;
 				},
 				removeSkillTrigger:function(skill,triggeronly){
@@ -27013,10 +27015,13 @@
 							}
 						}
 					}
+					if(_status.event&&_status.event.removeTrigger) _status.event.removeTrigger(skill,this);
+					_status.event.clearStepCache();
 					return this;
 				},
 				removeSkill:function(skill){
 					if(!skill) return;
+					_status.event.clearStepCache();
 					if(Array.isArray(skill)){
 						for(var i=0;i<skill.length;i++){
 							this.removeSkill(skill[i]);
@@ -30557,13 +30562,13 @@
 					return !player||player==evt.player;
 				},
 				addTrigger:function(skill,player){
-					if(!player) return;
+					if(!player||!skill) return;
 					var evt=this;
+					if(typeof skill=='string') skill=[skill];
+					game.expandSkills(skill);
 					while(true){
 						var evt=evt.getParent('arrangeTrigger');
 						if(!evt||evt.name!='arrangeTrigger'||!evt.map) return;
-						if(typeof skill=='string') skill=[skill];
-						game.expandSkills(skill);
 						var filter=function(content){
 							if(typeof content=='string') return content==triggername;
 							return content.contains(triggername);
@@ -30599,6 +30604,42 @@
 							map.list.sort(function(a,b){
 								return b[2]-a[2];
 							});
+						}
+						for(var j=0;j<skill.length;j++){
+							func(skill[j]);
+						}
+					}
+				},
+				removeTrigger:function(skill,player){
+					if(!player||!skill) return;
+					var evt=this;
+					if(typeof skill=='string') skill=[skill];
+					game.expandSkills(skill);
+					while(true){
+						var evt=evt.getParent('arrangeTrigger');
+						if(!evt||evt.name!='arrangeTrigger'||!evt.map) return;
+						var filter=function(content){
+							if(typeof content=='string') return content==triggername;
+							return content.contains(triggername);
+						};
+						var trigger=evt._trigger;
+						var triggername=evt.triggername;
+						var map=false;
+						if(evt.doing&&evt.doing.player==player) map=evt.doing;
+						else{
+							for(var i=0;i<evt.map.length;i++){
+								if(evt.map[i].player==player){
+									map=evt.map[i];
+									break;
+								}
+							}
+						}
+						if(!map) return;
+						var func=function(skillx){
+							var toremove=map.list.filter(i=>{
+								return i[0]==skillx&&i[1]==player;
+							});
+							if(toremove.length>0) map.list.removeArray(toremove);
 						}
 						for(var j=0;j<skill.length;j++){
 							func(skill[j]);
@@ -31299,6 +31340,7 @@
 				}
 				var fullskills=game.expandSkills(player.getSkills(false).concat(lib.skill.global));
 				var info=get.info(skill);
+				if(!info) console.log('缺少info的技能:',skill);
 				if(((info&&info.noHidden)||get.mode()!='guozhan')&&!fullskills.contains(skill)){
 					return false;
 				}
@@ -31539,6 +31581,7 @@
 			},
 			targetEnabledx:function(card,player,target){
 				if(!card) return false;
+				if(!target||!target.isIn()) return false;
 				var event=_status.event;
 				if(event._backup&&event._backup.filterCard==lib.filter.filterCard&&(!lib.filter.cardEnabled(card,player,event)||!lib.filter.cardUsable(card,player,event))) return false;
 				if(event.addCount_extra){
@@ -31550,6 +31593,7 @@
 			},
 			targetEnabled:function(card,player,target){
 				if(!card) return false;
+				if(!target||!target.isIn()) return false;
 				var info=get.info(card);
 				var filter=info.filterTarget;
 				if(!info.singleCard||ui.selected.targets.length==0){
@@ -31562,8 +31606,9 @@
 				if(typeof filter=='function') return Boolean(filter(card,player,target));
 			},
 			targetEnabled2:function(card,player,target){
-				if(lib.filter.targetEnabled(card,player,target)) return true;
 				if(!card) return false;
+				if(!target||!target.isIn()) return false;
+				if(lib.filter.targetEnabled(card,player,target)) return true;
 
 				if(game.checkMod(card,player,target,'unchanged','playerEnabled',player)==false) return false;
 				if(game.checkMod(card,player,target,'unchanged','targetEnabled',target)==false) return false;
@@ -31575,6 +31620,7 @@
 			},
 			targetEnabled3:function(card,player,target){
 				if(!card) return false;
+				if(!target||!target.isIn()) return false;
 				var info=get.info(card);
 
 				if(info.filterTarget==true) return true;
@@ -57538,7 +57584,7 @@
 			}
 		},
 		round:(num,f)=>{
-			var round=10**f;
+			var round=Math.pow(10,f);
 			return Math.round(num*round)/round;
 		},
 		playerNumber:()=>{

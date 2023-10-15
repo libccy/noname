@@ -363,7 +363,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				});
 				for(var i=0;i<game.players.length;i++){
-					game.addVideo('markSkill',game.players[i],['mougong_nuqi']);
+					//game.addVideo('markSkill',game.players[i],['mougong_nuqi']);
 					game.players[i].ai.shown=0;
 				}
 				game.neiDoCamouflage();

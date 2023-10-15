@@ -5723,9 +5723,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.number<7){
 						var source=trigger.source;
-						if(source&&source.isIn()&&source.countCards('h')>0){
+						if(source&&source.isIn()&&source.countCards('he')>0){
 							player.line(source);
-							source.chooseToDiscard('h',true);
+							source.chooseToDiscard('he',true);
 						}
 					}
 				},

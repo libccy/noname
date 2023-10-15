@@ -479,7 +479,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							numx=[0,1].randomGet();
 						}
 						if(numx<0) numx=0;
-						else if(numx>choices.length) numx=choices.length;
+						else if(numx>=choices.length) numx=choices.length-1;
 						return numx;
 					}());
 					'step 1'

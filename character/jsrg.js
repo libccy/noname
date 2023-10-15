@@ -2168,14 +2168,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt2:'你可以获得其他所有群势力角色的各一张牌',
 				logTarget:function(event,player){
 					return game.filterPlayer(current=>{
-						return current.group=='qun'&&current.countGainableCards(player,'h')>0&&current!=player;
+						return current.group=='qun'&&current.countGainableCards(player,'he')>0&&current!=player;
 					})
 				},
 				content:function(){
 					game.filterPlayer(current=>{
 						return current.group=='qun'&&current!=player;
 					}).sortBySeat().forEach(i=>{
-						player.gainPlayerCard(i,'h',true);
+						player.gainPlayerCard(i,'he',true);
 					});
 				},
 				group:'jsrgjulian_draw',

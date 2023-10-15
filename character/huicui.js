@@ -2627,7 +2627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var cards=trigger.cards.filterInD();
 									if(cards.length>0) player.gain(cards,'gain2');
 								}
-							})
+							});
 					}
 				},
 			},

@@ -88,14 +88,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(){
 					if(!_status.junkguixin){
 						_status.junkguixin=[];
-						for(var name in lib.character){
+						if(!_status.characterlist){
+							lib.skill.pingjian.initList();
+						}
+						for(const name of _status.characterlist){
 							if(!lib.character[name][3]) continue;
-							if(game.players.some(target=>{
-								if(target.name&&target.name==name) return true;
-								if(target.name1&&target.name1==name) return true;
-								if(target.name2&&target.name2==name) return true;
-								return false;
-							})) continue;
 							_status.junkguixin.addArray(lib.character[name][3].filter(skill=>{
 								var info=get.info(skill);
 								return info&&info.zhuSkill&&(!info.ai||!info.ai.combo);

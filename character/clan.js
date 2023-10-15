@@ -1640,7 +1640,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								names.push(namex);
 							}
 							list.sort((a,b)=>{
-								return 100*(lib.inpile.indexOf(a[2])-lib.inpile.indexOf(b[2]))+lib.inpile_nature.indexOf(a[3][0])-lib.inpile_nature.indexOf(b[3][0]);
+								var del1=lib.inpile.indexOf(a[2])-lib.inpile.indexOf(b[2]);
+								if(del1!=0) return del1;
+								var a1=0,a2=0;
+								if(a.length>3) a1=(lib.nature.get(a)||0);
+								if(b.length>3) b1=(lib.nature.get(b)||0);
+								return a1-b1;
 							})
 							player.chooseButton(['是否将'+get.cnNumber(cards.length)+'张牌当下列一张牌使用？',[list,'vcard']]).set('ai',function(button){
 								return _status.event.player.getUseValue({name:button.link[2],nature:button.link[3]});

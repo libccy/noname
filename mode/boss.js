@@ -2659,7 +2659,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(!player.hasEmptySlot('equip2')) return false;
 					if(event.card.name=='nanman') return true;
 					if(event.card.name=='wanjian') return true;
-					return event.card.name=='sha'&&game.hasNature(event.card);
+					return event.card.name=='sha'&&!game.hasNature(event.card);
 				},
 				content:function(){
 					trigger.cancel();
