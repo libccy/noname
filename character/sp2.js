@@ -5546,7 +5546,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var list=game.filterPlayer(function(current){
-						return current.name=='ol_guansuo'||current.name2=='ol_guansuo';
+						return current.name=='dc_guansuo'||current.name2=='dc_guansuo';
 					});
 					if(list.length) game.asyncDraw(list);
 					else event.finish();
@@ -5868,7 +5868,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				filter:function(event,player){
 					return event.decadexushen==true&&!game.hasPlayer(function(current){
-						return current.name=='ol_guansuo'||current.name2=='ol_guansuo';
+						return current.name=='dc_guansuo'||current.name2=='dc_guansuo';
 					});
 				},
 				content:function(){
@@ -5894,11 +5894,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.goto(4);
 					'step 3'
-					target.reinit(result.control,'ol_guansuo');
-					if(target.name=='ol_guansuo'&&target.group!='shu') target.changeGroup('shu');
+					target.reinit(result.control,'dc_guansuo');
+					if(target.name=='dc_guansuo'&&target.group!='shu') target.changeGroup('shu');
 					if(_status.characterlist){
 						_status.characterlist.add(result.control);
-						_status.characterlist.remove('ol_guansuo');
+						_status.characterlist.remove('dc_guansuo');
 					}
 					'step 4'
 					target.draw(3);

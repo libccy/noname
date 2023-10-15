@@ -11685,7 +11685,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:"wusheng",
 				audioname:['re_guanyu','guanzhang','jsp_guanyu','guansuo','re_guanzhang','dc_jsp_guanyu'],
 				audioname2:{
-					ol_guansuo:'wusheng_guansuo',
+					dc_guansuo:'wusheng_guansuo',
 				},
 				enable:["chooseToRespond","chooseToUse"],
 				filterCard:function(card,player){
@@ -14771,7 +14771,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qianxin_info:'觉醒技，当你造成一次伤害后，若你已受伤，你须减1点体力上限，并获得技能“荐言”。',
 			jianyan_info:'出牌阶段限一次，你可以声明一种牌的类别或颜色，并亮出牌库中第一张符合你声明的牌，然后你令一名男性角色获得此牌',
 			rekurou_info:'出牌阶段限一次，你可以弃置一张牌，然后失去1点体力。',
-			zhaxiang_info:'锁定技 每当你失去1点体力后，你摸三张牌。然后若此时是你的出牌阶段，则直到回合结束，你使用红色【杀】无距离限制且不能被【闪】响应，你可以额外使用一张【杀】。',
+			zhaxiang_info:'锁定技，每当你失去1点体力后，你摸三张牌。然后若此时是你的出牌阶段，则直到回合结束，你使用红色【杀】无距离限制且不能被【闪】响应，你可以额外使用一张【杀】。',
 			qiaomeng_info:'当你使用黑色【杀】对一名角色造成伤害后，你可以弃置该角色装备区里的一张牌，若此牌是坐骑牌，你于此牌置入弃牌堆后获得之。',
 			reyicong_info:'锁定技，你计算与其他角色的距离时-1。若你的体力值不大于2，则其他角色计算与你的距离时+1。',
 			refankui_info:'每当你受到1点伤害后，你可以获得伤害来源的一张牌。',
