@@ -963,7 +963,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			bingliang_bg:'粮',
 			bingliang_info:'出牌阶段，对一名距离为1的其他角色使用。目标角色于其判定阶段进行判定：若判定结果不为梅花，则其跳过下一个摸牌阶段。',
 			hualiu_bg:'+马',
-			hualiu_info:'你的防御距离+1',
+			hualiu_info:'锁定技，其他角色计算与你的距离+1。',
 			zhuque_bg:'扇',
 			zhuque_skill:'朱雀羽扇',
 			zhuque_info:'当你声明使用普【杀】后，你可以为此【杀】赋予火属性。',
