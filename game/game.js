@@ -34394,6 +34394,11 @@
 					return `${get.prefixSpan('手杀')}${get.prefixSpan('界')}`
 				},
 			}],
+			['战役篇神',{
+				getSpan:(prefix,name)=>{
+					return `${get.prefixSpan('战役篇')}${get.prefixSpan('神')}`
+				},
+			}],
 		]),
 		groupnature:{
 			shen:'shen',

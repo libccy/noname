@@ -1314,7 +1314,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					['scs_guosheng','scsniqu'],
 					['scs_gaowang','scsmiaoyu']
 				],
-				conflictMap:function(){
+				conflictMap:function(player){
 					if(!_status.changshiMap){
 						_status.changshiMap={
 							scs_zhangrang:[],
@@ -1328,10 +1328,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							scs_guosheng:['scs_duangui'],
 							scs_gaowang:[],
 						};
-						var list=lib.skill.mbdanggu.changshi.map(i=>i[0]);
-						for(var i of list){
-							var select=list.filter(scs=>scs!=i&&!_status.changshiMap[i].contains(i));
-							_status.changshiMap[i].addArray(select.randomGets(get.rand(0,select.length)));
+						if(!get.isLuckyStar(player)){
+							var list=lib.skill.mbdanggu.changshi.map(i=>i[0]);
+							for(var i of list){
+								var select=list.filter(scs=>scs!=i&&!_status.changshiMap[i].contains(i));
+								_status.changshiMap[i].addArray(select.randomGets(get.rand(0,select.length)));
+							}
 						}
 					}
 					return _status.changshiMap;
@@ -1368,7 +1370,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(others.length==1) event._result={bool:true,links:others};
 					else{
 						var conflictList=others.filter(changshi=>{
-							var map=lib.skill.mbdanggu.conflictMap();
+							var map=lib.skill.mbdanggu.conflictMap(player);
 							var names=map[first];
 							return names.contains(changshi);
 						}),list=others.slice();
@@ -1433,7 +1435,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				isSingleShichangshi:function(player){
-					var map=lib.skill.mbdanggu.conflictMap();
+					var map=lib.skill.mbdanggu.conflictMap(player);
 					return player.name=='shichangshi'&&(map[player.name1]&&map[player.name2]||map[player.name1]&&!player.name2||!player.name1&&!player.name2||player.name==player.name1&&!player.name2);
 				},
 				mod:{
