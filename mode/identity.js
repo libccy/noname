@@ -3061,7 +3061,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					game.broadcastAll('closeDialog',event.videoId);
 					if(!_status.connectMode&&get.config('auto_mark_identity')&&!target.node.identity.firstChild.innerHTML.length){
-						target.setIdentity(event.dongcha_result);
+						game.broadcastAll(function(player,target,event){
+							if(player.isUnderControl(true)) target.setIdentity(event.dongcha_result);
+						},player,target,event);
 					}
 				},
 				neiDoCamouflage:function(){

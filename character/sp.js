@@ -1501,7 +1501,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							var cards=get.bottomCards(3,true);
 							player.showCards(cards,get.translation(player)+'发动了【藏心】');
-							trigger.num+=cards.filter(card=>get.suit(card,false)=='heart').length;
+							var num=cards.filter(card=>get.suit(card,false)=='heart').length;
+							if(num) player.draw(num);
 						},
 					},
 				},
