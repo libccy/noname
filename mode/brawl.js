@@ -1119,10 +1119,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 											hhzz_kanade:'立华奏',
 											hhzz_takaramono1:'坚实宝箱',
 											hhzz_takaramono2:'普通宝箱',
-   								hhzz_toulianghuanzhu:'偷梁换柱',
-   								hhzz_fudichouxin:'釜底抽薪',
-   								hhzz_toulianghuanzhu_info:'出牌阶段，对一名角色使用，随机更换其一个技能。可重铸。',
-   								hhzz_fudichouxin_info:'出牌阶段，对一名角色使用，随机弃置其一个技能。',
+											hhzz_toulianghuanzhu:'偷梁换柱',
+											hhzz_fudichouxin:'釜底抽薪',
+											hhzz_toulianghuanzhu_info:'出牌阶段，对一名角色使用，随机更换其一个技能。可重铸。',
+											hhzz_fudichouxin_info:'出牌阶段，对一名角色使用，随机弃置其一个技能。',
 										},
 									});
 								});
