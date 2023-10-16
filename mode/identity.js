@@ -259,7 +259,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					_status.mougong_nuqi_max=3;
 					var mougong_cardStyle=document.createElement('style');
 					document.head.appendChild(mougong_cardStyle);
-					mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:1;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
+					mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:0.2;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
 					ui.css.mougong_cardStyle=mougong_cardStyle;
 				});
 				if(_status.connectMode){
@@ -270,7 +270,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								_status.mougong_nuqi_max=3;
 								var mougong_cardStyle=document.createElement('style');
 								document.head.appendChild(mougong_cardStyle);
-								mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:1;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
+								mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:0.2;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
 								ui.css.mougong_cardStyle=mougong_cardStyle;
 							},{}
 						];
