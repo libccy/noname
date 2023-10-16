@@ -20,17 +20,178 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wanghun:['male','jin',3,['clanfuxun','clanchenya','clanzhongliu'],['clan:太原王氏']],
 			clan_zhonghui:['male','wei','3/4',['clanyuzhi','clanxieshu','clanbaozu'],['clan:颍川钟氏']],
 			clan_zhongyu:['male','wei',3,['clanjiejian','clanhuanghan','clanbaozu'],['clan:颍川钟氏']],
+			clan_wanglun:['male','wei',3,['clanqiuxin','clanjianyuan','clanzhongliu'],['clan:太原王氏']],
 		},
 		characterSort:{
 			clan:{
 				clan_wu:['clan_wuxian','clan_wuban','clan_wukuang'],
 				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
 				clan_han:['clan_hanshao','clan_hanrong'],
-				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun'],
+				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun'],
 				clan_zhong:['clan_zhongyan','clan_zhonghui','clan_zhongyu'],
 			},
 		},
 		skill:{
+			//族王沦
+			clanqiuxin:{
+				audio:2,
+				enable:'phaseUse',
+				filterTarget:lib.filter.notMe,
+				usable:1,
+				content:function(){
+					'step 0'
+					var str=get.translation(player);
+					target.chooseControl().set('choiceList',[
+						str+'下次对你使用【杀】后，其视为对你使用任意普通锦囊牌',
+						str+'下次对你使用任意普通锦囊牌后，其视为对你使用【杀】',
+					]).set('ai',function(){
+						var target=_status.event.player;
+						var player=_status.event.target;
+						var num1=get.effect(target,get.autoViewAs({name:'sha'},[]),player,player);
+						if(!player.canUse(get.autoViewAs({name:'sha'},[]),target)) num1=0;
+						var num2=0;
+						for(var name of lib.inpile){
+							if(get.type(name)!='trick') continue;
+							if(!player.canUse(get.autoViewAs({name:name},[]),target)) continue;
+							if(num2<get.effect(target,get.autoViewAs({name:name},[]),player,player)) num2=get.effect(target,get.autoViewAs({name:name},[]),player,player);
+						}
+						return num1>=num2?1:0;
+					}).set('target',player);
+					'step 1'
+					player.addSkill('clanqiuxin_effect');
+					player.markAuto('clanqiuxin_effect',[[target,result.index]]);
+				},
+				ai:{
+					order:9,
+					result:{
+						target:function(player,target){
+							var cards=player.getCards('hs',card=>{
+								if(get.name(card,player)!='sha'&&get.type(card,player)!='trick') return false;
+								return player.hasValueTarget(card);
+							});
+							if(cards.some(card=>player.canUse(card,target)&&get.effect(target,card,player,player)>0)){
+								var att=get.attitude(player,target);
+								if(att>0) return 9;
+								if(att<0) return -6;
+								return 0;
+							}
+							else{
+								var att=get.attitude(player,target);
+								if(att<0) return -3;
+								if(att>0) return 1;
+								return 2;
+							}
+						},
+					},
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						intro:{
+							content:function(storage,player){
+								var str='';
+								for(var i=0;i<storage.length;i++){
+									var list=storage[i];
+									var strx=['【杀】','任意普通锦囊牌'];
+									if(list[1]) strx.reverse();
+									str+='对'+get.translation(list[0])+'使用'+strx[0]+'后，视为对其使用'+strx[1];
+									str+='<br>';
+								}
+								str=str.slice(0,-4);
+								return str;
+							},
+						},
+						trigger:{player:'useCardAfter'},
+						filter:function(event,player){
+							if(!event.targets||!event.targets.length) return false;
+							if(event.card.name=='sha') return event.targets.some(target=>{
+								return player.getStorage('clanqiuxin_effect').some(list=>list[0]==target&&list[1]==0);
+							});
+							if(get.type(event.card)=='trick') return event.targets.some(target=>{
+								return player.getStorage('clanqiuxin_effect').some(list=>list[0]==target&&list[1]==1);
+							});
+							return false;
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							'step 0'
+							var list;
+							if(trigger.card.name=='sha') list=player.getStorage('clanqiuxin_effect').filter(listx=>trigger.targets.contains(listx[0])&&listx[1]==0);
+							if(get.type(trigger.card)=='trick') list=player.getStorage('clanqiuxin_effect').filter(listx=>trigger.targets.contains(listx[0])&&listx[1]==1);
+							player.unmarkAuto('clanqiuxin_effect',list);
+							var targets=list.map(listx=>listx[0]);
+							event.targets=targets;
+							'step 1'
+							var target=event.targets.shift();
+							event.target=target;
+							var list=[];
+							for(var name of lib.inpile){
+								if(trigger.card.name=='sha'&&get.type(name)!='trick') continue;
+								if(name=='sha'&&get.type(trigger.card.name)!='trick') continue;
+								if(!player.canUse(get.autoViewAs({name:name},[]),target)) continue;
+								list.push([get.translation(get.type(name)),'',name]);
+								if(name=='sha'){
+									for(var nature of lib.inpile_nature){
+										if(!player.canUse(get.autoViewAs({name:name,nature,nature},[]),target)) continue;
+										list.push([get.translation(get.type(name)),'',name,nature]);
+									}
+								}
+							}
+							if(!list.length) event.goto(3);
+							else{
+								player.chooseButton(['求心：视为对'+get.translation(target)+'使用一张牌',[list,'vcard']],true).set('ai',function(button){
+									var player=_status.event.player;
+									var target=_status.event.target;
+									return get.effect(target,{name:button.link[2],nature:button.link[3]},player,player);
+								}).set('target',target);
+							}
+							'step 2'
+							if(result.bool){
+								var card={
+									name:result.links[0][2],
+									nature:result.links[0][2],
+								};
+								player.useCard(card,target,false);
+							}
+							'step 3'
+							if(event.targets.length) event.goto(1);
+							else if(!player.getStorage('clanqiuxin_effect').length) player.removeSkill('clanqiuxin_effect');
+						},
+					},
+				},
+			},
+			clanjianyuan:{
+				inherit:'clanchenya',
+				filter:function(event,player){
+					for(var phase of lib.phaseName){
+						var evt=event.getParent(phase);
+						if(evt&&evt.name==phase){
+							if(event.player.getHistory('useCard',evtx=>evtx.getParent(phase)==evt).length) return lib.skill.clanchenya.filter(event,player);
+						}
+					}
+					return false;
+				},
+				content:function(){
+					'step 0'
+					var num=0;
+					for(var phase of lib.phaseName){
+						var evt=trigger.getParent(phase);
+						if(evt&&evt.name==phase){
+							num+=trigger.player.getHistory('useCard',evtx=>evtx.getParent(phase)==evt).length;
+						}
+					}
+					trigger.player.chooseCard('是否重铸任意张牌名字数为'+num+'的牌？',[1,Infinity],'he',(card,player)=>_status.event.cards.contains(card)&&player.canRecast(card)).set('ai',card=>{
+						var val=get.value(card);
+						return 6-val;
+					}).set('cards',trigger.player.getCards('he',card=>{
+						return get.cardNameLength(card)==num;
+					}));
+					'step 1'
+					if(result.bool) trigger.player.recast(result.cards);
+				},
+			},
 			//族钟毓
 			clanjiejian:{
 				audio:2,
@@ -906,7 +1067,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanzhongliu:{
 				audio:2,
-				audioname:['clan_wangling','clan_wangyun','clan_wanghun'],
+				audioname:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun'],
 				trigger:{player:'useCard'},
 				forced:true,
 				clanSkill:true,
@@ -2296,6 +2457,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wukuang:'吴匡（生卒年不详），兖州陈留（今河南开封市）人。东汉末年大臣，大将军何进部将。光熹元年（公元189年），汉灵帝死后，十常侍干预朝政，大将军何进谋诛宦官，但失败被杀，吴匡联合曹操、袁绍等杀尽宦官，攻杀车骑将军何苗。兴平二年（公元195年）十月，李傕、郭汜后悔放汉献帝东归洛阳，于是联合起来追击，曹操遂起兵平乱，但在回朝后，曹操挟天子以令诸侯，实行专权，但遭到吴匡反对。',
 			wanghun:'王浑（223年～297年），字玄冲，太原郡晋阳县（今山西省太原市）人。魏晋时期名臣，曹魏司空王昶的儿子。王浑早年为大将军曹爽的掾吏，高平陵政变后，循例免官，出任怀县县令、散骑侍郎等职，袭封京陵县侯。西晋王朝建立后，加号扬烈将军，历任征虏将军、东中郎将、豫州刺史等职，积极筹划伐吴方略。咸宁五年（279年），配合镇南将军杜预灭亡吴国，迁征东大将军、左仆射、司徒公，晋爵京陵县公。晋惠帝司马衷即位，加任侍中衔。楚王司马玮发动政变，有意寻求支持，遭到严词拒绝。楚王司马玮死后，复任司徒、录尚书事。元康七年（297年），王浑去世，享年七十五岁，谥号为元。《唐会要》尊为“魏晋八君子”之一。',
 			zhongyu:'钟毓（？-263年），字稚叔，颍川长社（今河南长葛市）人。三国时期魏国大臣，太傅钟繇之子、司徒钟会之兄。出身颍川钟氏，机灵敏捷，有其父之遗风。十四岁时，起家散骑侍郎。太和初年，迁黄门侍郎，袭封定陵县侯。正始年间，拜散骑常侍，迁魏郡太守，入为侍中、御史中丞、廷尉 [5] 。随平诸葛诞的淮南叛乱，拜青州刺史、后将军，都督徐州、荆州诸军事。景元四年（263年），去世，追赠车骑将军，谥号为惠，著有文集五卷（见《隋书·经籍志》及《两唐书·经籍志》），传于世。',
+			wanglun:'王沦（233年－257年）字太冲，出身太原晋阳王姓世族（今山西省太原市），王昶三子，王浑、王深之弟，王湛之兄。醇粹简远，崇尚老庄之学，心思平淡。二十多时被举荐为孝廉，没有前往，后任大将军参军。257年，诸葛诞不满司马氏篡权而在寿春起义，王沦跟随司马昭征讨，遭遇疾疫去世，时年二十五，时人惜之，司马昭为他流泪。其兄著诔文《表德论》，表述其德行，说“因为畏惧帝王的典章制度，不能写墓志铭，于是撰写过往的事迹，刻在墓的背面。”',
 		},
 		dynamicTranslate:{
 			clanlianzhu:function(player){
@@ -2412,6 +2574,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanjiejian_info:'当你于一回合使用第X张牌指定第一个目标后，若此牌不为装备牌，则你可以令一名目标角色摸X张牌。（X为此牌牌名字数）',
 			clanhuanghan:'惶汗',
 			clanhuanghan_info:'当你受到牌造成的伤害后，你可以摸X张牌并弃置Y张牌（X为此牌牌名字数，Y为你已损失的体力值），然后若此次技能发动不为你本回合首次发动此技能，你重置技能〖保族〗。',
+			clan_wanglun:'族王沦',
+			clanqiuxin:'求心',
+			clanqiuxin_info:'出牌阶段限一次，你可以令一名其他角色选择一项：①你对其使用【杀】；②你对其使用任意普通锦囊牌。当你执行其选择的选项后，你视为执行另一项。',
+			clanjianyuan:'简远',
+			clanjianyuan_info:'当一名角色发动“出牌阶段限一次”的技能后，你可以令其重铸任意张牌名字数为X的牌（X为其本阶段的使用牌数）。',
 			
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
