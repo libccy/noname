@@ -259,7 +259,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					_status.mougong_nuqi_max=3;
 					var mougong_cardStyle=document.createElement('style');
 					document.head.appendChild(mougong_cardStyle);
-					mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:1;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
+					mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:0.2;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
 					ui.css.mougong_cardStyle=mougong_cardStyle;
 				});
 				if(_status.connectMode){
@@ -270,7 +270,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								_status.mougong_nuqi_max=3;
 								var mougong_cardStyle=document.createElement('style');
 								document.head.appendChild(mougong_cardStyle);
-								mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:1;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
+								mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:0.2;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
 								ui.css.mougong_cardStyle=mougong_cardStyle;
 							},{}
 						];
@@ -500,8 +500,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							fan:'反',
 							zhong:'忠',
 							nei:'内',
-							di:'敌',
-							you:'友',
+							enemy:'敌',
+							friend:'友',
 							cai:'猜',
 						}
 					}
@@ -511,8 +511,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							zhong:'忠',
 							nei:'内',
 							zhu:'主',
-							di:'敌',
-							you:'友',
+							enemy:'敌',
+							friend:'友',
 							cai:'猜',
 						}
 					}
@@ -533,8 +533,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						case 'zhong':list[i]='忠臣';break;
 						case 'nei':list[i]='内奸';break;
 						case 'zhu':list[i]='主公';break;
-						case 'di':list[i]='敌方';break;
-						case 'you':list[i]='友方';break;
+						case 'enemy':list[i]='敌方';break;
+						case 'friend':list[i]='友方';break;
 						case 'cai':case 'cai2':list[i]='未知';break;
 						case 'rZhong':case 'bZhong':list[i]='前锋';break;
 						case 'rNei':case 'bNei':list[i]='细作';break;
@@ -2599,10 +2599,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			nei2:"内奸",
 			fan2:"反贼",
 			random2:"随机",
-			di:'敌',
-			you:'友',
-			di2:'敌方',
-			you2:'友方',
+			enemy:'敌',
+			friend:'友',
+			enemy2:'敌方',
+			friend2:'友方',
 			identity_junshi_bg:'师',
 			identity_dajiang_bg:'将',
 			identity_zeishou_bg:'首',
@@ -3022,8 +3022,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var img=document.createElement('img');
 							dialog.content.appendChild(img);
 							img.setAttribute('src',image);
-							img.setAttribute('width','130');
-							img.setAttribute('height','185');
+							img.setAttribute('width','106');
+							img.setAttribute('height','150');
 							img.setAttribute('draggable',false);
 							img.style.transition='all 2s';
 							setTimeout(function(){
@@ -3094,8 +3094,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var img=document.createElement('img');
 							dialog.content.appendChild(img);
 							img.setAttribute('src',image);
-							img.setAttribute('width','130');
-							img.setAttribute('height','185');
+							img.setAttribute('width','106');
+							img.setAttribute('height','150');
 							img.setAttribute('draggable',false);
 							img.style.transition='all 2s';
 							setTimeout(function(){
@@ -3135,8 +3135,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								var img=document.createElement('img');
 								dialog.content.appendChild(img);
 								img.setAttribute('src',image);
-								img.setAttribute('width','130');
-								img.setAttribute('height','185');
+								img.setAttribute('width','106');
+								img.setAttribute('height','150');
 								img.setAttribute('draggable',false);
 								img.style.transition='all 2s';
 								setTimeout(function(){
@@ -3191,8 +3191,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									var img=document.createElement('img');
 									dialog.content.appendChild(img);
 									img.setAttribute('src',image);
-									img.setAttribute('width','130');
-									img.setAttribute('height','185');
+									img.setAttribute('width','106');
+									img.setAttribute('height','150');
 									img.setAttribute('draggable',false);
 									img.style.transition='all 2s';
 									setTimeout(function(){
@@ -3809,7 +3809,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				return result;
 			},
 			dongchaResult:function(from,to){
-				var friend='you',enemy='di';
+				var friend='friend',enemy='enemy';
 				if(from.identity=='nei') return to.identity;
 				if(to.identity=='nei') return friend;
 				if(from.ai.mougong_camouflage||to.ai.mougong_camouflage) return enemy;
@@ -4491,22 +4491,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'明忠模式':'<div style="margin:10px">明忠模式（忠胆英杰）</div><ul style="margin-top:0"><li>本模式需要8名玩家进行游戏，使用的身份牌为：1主公、2忠臣、4反贼和1内奸。游戏开始时，每名玩家随机获得一个身份，由系统随机选择一名忠臣身份的玩家亮出身份（将忠臣牌正面朝上放在面前），其他身份（包括主公）的玩家不亮出身份。<li>'+
 			'首先由亮出身份的忠臣玩家随机获得六张武将牌，挑选一名角色，并将选好的武将牌展示给其他玩家。之后其余每名玩家随机获得三张武将牌，各自从其中挑选一张同时亮出<li>'+
 			'亮出身份牌的忠臣增加1点体力上限。角色濒死和死亡的结算及胜利条件与普通身份局相同。',
-            '谋攻模式': `<div style="margin:10px">谋攻篇</div><ul style="margin-top:0">
-			<li>来自三国杀移动版，为六名玩家参与的全暗身份模式，加入“怒气”资源，玩家可以消耗怒气探查其他角色的身份是敌人或者队友，或使用怒气强化手牌，以达到识别出队友并击杀敌人的目标。<br></ul>
-            <br>
-            <div style="margin:10px">谋攻篇专属机制：</div><ul style="margin-top:0"><br>
-            <li>谋攻篇引入新机制“怒气”。一名角色在回合开始时或受到1点伤害后，将获得1点怒气，怒气上限为3。一名角色令其他角色扣减体力后，该角色可以消耗一点怒气，查探扣减体力的角色是敌或友。<br>
-            <li>各身份玩家的胜利条件与身份局中对应身份的胜利条件一致，且该模式下没有奖惩。<br>
-            <li>当主公进入濒死、场上有两名角色阵亡、第三轮的主公回合开始时，主公将会翻开身份牌，回复1点体力并摸一张牌，并获得武将牌上的主公技。<br>
-            <li>内奸在游戏开始时将会得知一名反贼的身份，并令该反贼被“伪装”。本局游戏内，被“伪装”的反贼在被任何人探查身份时，结果都提示为“敌人”。作为补偿，其第一次进入濒死时，若场上没有角色死亡且其怒气值不小于2，其弃置区域内所有牌，重置武将牌，将体力回复至2点并摸三张牌。<br>
-            <li>内奸在被所有角色探查时，都提示为“队友”。内奸在进行探查时，直接得知目标的身份。<br>
-            <li>在第二轮游戏开始后，当你需要使用一张“强化表”内的牌时，你可以通过消耗怒气将此牌强化。<br>
-            <li>可强化卡牌：<br><ul style="padding-left:20px;padding-top:5px">
-                <li>【杀】：消耗1点怒气进行强化，你令响应此杀所需使用的【闪】数+1。
-                <li>【闪】：消耗1点怒气进行强化，使用时视为两张【闪】的效果。
-                <li>【决斗】：消耗2点怒气进行强化，对此牌的目标造成伤害时，伤害+1。
-                <li>【火攻】：消耗2点怒气进行强化，造成的伤害+1。
-                <li>【桃】：消耗3点怒气进行强化，回复的体力+1。</ul>`,
+			'谋攻模式':'<div style="margin:10px">模式命名由来</div><ul style="margin-top:0"><li>《谋攻篇》一词出自《孙子兵法·谋攻篇》，是春秋时期兵法家孙武创作的一篇散文。《谋攻篇》故知胜有五：知可以战与不可以战者胜，识众寡之用者胜，上下同欲者胜，以虞待不虞者胜，将能而君不御者胜。</ul>'+
+			'<div style="margin:10px">游戏规则</div><ul style="margin-top:0"><li>谋攻篇模式为六名玩家参与的全暗身份模式，引入新机制“怒气”，玩家可以消耗怒气探查其他角色的身份是敌人或者队友，或使用怒气强化手牌，以达到识别出队友并击杀敌人的目标。'+
+			'<li>各身份玩家的胜利条件与身份局中对应身份的胜利条件一致，且该模式下没有奖惩。'+
+			'<li>当主公进入濒死、场上有两名角色阵亡、第三轮的主公回合开始时，主公将会翻开身份牌，回复1点体力并摸一张牌，并获得武将牌上的主公技。'+
+			'<li>内奸在游戏开始时将会得知一名反贼的身份，并令该反贼被“伪装”。本局游戏内，被“伪装”的反贼在被任何人探查身份时，结果都提示为“敌人”。作为补偿，其第一次进入濒死时，若场上没有角色死亡且其怒气值不小于2，其弃置区域内所有牌，重置武将牌，将体力回复至2点并摸三张牌。'+
+			'<li>特殊地，内奸在被所有角色探查时，都提示为“队友”；内奸在进行探查时，直接得知目标的身份。</ul>'+
+			'<div style="margin:10px">新机制“怒气”</div><ul style="margin-top:0"><li>一名角色在回合开始时或受到1点伤害后，将获得1点怒气；怒气上限为3。<li>一名角色令其他角色扣减体力后，该角色可以消耗1点怒气，查探扣减体力的角色是敌或友。</ul>'+
+			'<div style="margin:10px">强化卡牌规则</div><ul style="margin-top:0"><li>在第二轮游戏开始后，当你需要使用一张“强化表”内的牌时，你可以通过消耗怒气将此牌强化。'+
+			'<li>可强化卡牌<br><ul style="padding-left:20px;padding-top:5px">'+
+			'<li>【杀】：消耗1点怒气进行强化，你令响应此杀所需使用的【闪】数+1'+
+			'<li>【闪】：消耗1点怒气进行强化，使用时视为两张【闪】的效果'+
+			'<li>【决斗】：消耗2点怒气进行强化，对此牌的目标造成伤害时，伤害+1'+
+			'<li>【火攻】：消耗2点怒气进行强化，造成的伤害+1'+
+			'<li>【桃】：消耗3点怒气进行强化，回复的体力+1</ul></ul>',
 			'3v3v2':'<div style="margin:10px">3v3v2模式</div><ul style="margin-top:0"><li>游戏准备<br>本模式需要8名玩家进行游戏。游戏开始前，所有玩家随机分成两组，每组四人，分别称为「冷色阵营」和「暖色阵营」，然后分发身份牌，抽取到「主帅」身份的玩家亮出身份牌。'+
 			'<li>身份牌<br>每组的身份分为四种。<br>主帅（主）和前锋（忠）：联合对方阵营的细作，击杀己方细作，对方阵营的主帅和前锋以及所有的野心家。<br>细作（内）：帮助对方阵营的主帅和前锋，击杀对方细作，己方阵营的主帅和前锋以及所有的野心家。<br>野心家（野）：联合对方阵营中的野心家，击杀所有其他角色，成为最后的生还者。<br>'+
 			'<li>胜负判定<br>冷色主帅，先锋和暖色细作在所有野心家和对方主帅全部阵亡后视为胜利，在冷色主帅阵亡后视为游戏失败。<br>暖色主帅，先锋和冷色细作在所有野心家和对方主帅阵亡后视为胜利，在暖色主帅阵亡后视为失败。<br>野心家在所有不为野心家的角色阵亡后视为胜利，在双方主帅全部阵亡而有非野心家角色存活时失败。<br>当有角色阵亡后，若有角色满足胜利条件，游戏结束。若所有角色均满足失败条件，则游戏平局。若一名角色满足失败条件，即使其满足胜利条件，也视为游戏失败。<br>'+
