@@ -35,21 +35,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				node.style.left='calc(50% - 210px)';
 				node.style.top='calc(50% - 20px)';
 				node.style.whiteSpace='nowrap';
-				node.innerHTML=lib.config.last_ip||lib.hallURL;
+				node.textContent=lib.config.last_ip||lib.hallURL;
 				node.contentEditable=true;
 				node.style.webkitUserSelect='text';
 				node.style.textAlign='center';
 				node.style.overflow='hidden';
 
 				var connect=function(e){
-					event.textnode.innerHTML='正在连接...';
+					const info=lib.config.reconnect_info;
+					if(info&&info[0]==node.textContent){
+						game.onlineID=info[1];
+						if(typeof (game.roomId=info[2])=='string') game.roomIdServer=true;
+					}
+					event.textnode.textContent='正在连接...';
 					clearTimeout(event.timeout);
 					if(e) e.preventDefault();
-					game.saveConfig('last_ip',node.innerHTML);
-					game.connect(node.innerHTML,function(success){
+					game.saveConfig('last_ip',node.textContent=node.textContent);
+					game.connect(node.textContent,function(success){
 						if(!success&&event.textnode){
 							alert('连接失败');
-							event.textnode.innerHTML='输入联机地址';
+							event.textnode.textContent='输入联机地址';
 						}
 					});
 				};
@@ -82,7 +87,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ui.ipbutton=button;
 
 				ui.hall_button=ui.create.system('联机大厅',function(){
-					node.innerHTML=get.config('hall_ip')||lib.hallURL;
+					node.textContent=get.config('hall_ip')||lib.hallURL;
 					connect();
 				},true);
 				if(!get.config('hall_button')){
@@ -90,7 +95,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				ui.recentIP=ui.create.system('最近连接',null,true);
 				var clickLink=function(){
-					node.innerHTML=this.innerHTML;
+					node.textContent=this.textContent;
 					connect();
 				};
 				lib.setPopped(ui.recentIP,function(){
@@ -101,7 +106,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					var list=ui.create.div('.caption');
 					for(var i=0;i<lib.config.recentIP.length;i++){
-						ui.create.div('.text.textlink',list,clickLink).innerHTML=get.trimip(lib.config.recentIP[i]);
+						ui.create.div('.text.textlink',list,clickLink).textContent=get.trimip(lib.config.recentIP[i]);
 					}
 					uiintro.add(list);
 					var clear=uiintro.add('<div class="text center">清除</div>');
@@ -119,29 +124,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			if(window.isNonameServer){
 				game.connect(window.isNonameServerIp||'localhost');
 			}
-			else if(lib.config.reconnect_info){
-				var info=lib.config.reconnect_info;
-				game.onlineID=info[1];
-				game.roomId=info[2];
-				if(typeof game.roomId=='string'){
-					game.roomIdServer=true;
-				}
-				var n=5;
-				var connect=function(){
-					event.textnode.innerHTML='正在连接...';
-					game.connect(info[0],function(success){
-						if(!success&&n--){
-							createNode();
-							event.timeout=setTimeout(connect,1000);
-						}
-						else{
-							event.textnode.innerHTML='输入联机地址';
-						}
-					});
-				};
-				event.timeout=setTimeout(connect,500);
-				_status.createNodeTimeout=setTimeout(createNode,2000);
-			}
 			else{
 				createNode();
 			}
@@ -153,13 +135,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			}
 			_status.connectDenied=createNode;
-			for(var i in lib.element.event){
-				event.parent[i]=lib.element.event[i];
-			}
-			event.parent.custom={
-				add:{},
-				replace:{}
-			};
 			setTimeout(lib.init.onfree,1000);
 		}
 	};
