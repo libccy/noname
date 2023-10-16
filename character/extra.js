@@ -266,15 +266,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return current.hasSkill('jxlianpo');
 								});
 							},
-							cardSavable:function(card,player){
+							cardSavable:function(card,player,target){
 								if(card.name=='tao'){
 									if(!lib.skill.jxlianpo.getMax().includes('zhu')) return;
+									if(player==target) return;
 									return false;
 								}
 							},
-							cardEnabled:function(card,player){
+							playerEnabled:function(card,player,target){
 								if(card.name=='tao'){
 									if(!lib.skill.jxlianpo.getMax().includes('zhu')) return;
+									if(player==target) return;
 									return false;
 								}
 							}
@@ -366,6 +368,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.markAuto('jxzhaoluan_hit',target);
 						},
 						ai:{
+							order:9,
 							result:{
 								player:function(player){
 									var bodies=player.getStorage('jxzhaoluan_effect').filter(i=>i.isIn());
