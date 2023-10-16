@@ -11233,32 +11233,44 @@
 				function Legacy(func){
 					//Remove all comments
 					//移除所有注释
-					var str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^\/"'\\\s]*)/mg,'$2').trim();
-					//判断代码中是否有debugger
-					var regex=/event\.debugger\(\)/g;
-					var hasDebugger=regex.test(str);
-					var insertDebugger=`yield code=>eval(code);`;
-					str=str.replaceAll(regex,insertDebugger);
+					let str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^\/"'\\\s]*)/mg,'$2').trim();
 					//获取第一个 { 后的所有字符
 					str=str.slice(str.indexOf('{')+1);
+					//判断代码中是否有debugger
+					let regex=/event\.debugger\(\)/;
+					let hasDebugger=false;
+					let insertDebugger=`yield code=>eval(code);`;
+					let debuggerSkip=0;
+					let debuggerResult;
+					while((debuggerResult=str.slice(debuggerSkip).match(regex))!=null){
+						let debuggerCopy=str;
+						debuggerCopy=debuggerCopy.slice(0,debuggerSkip+debuggerResult.index)+insertDebugger+debuggerCopy.slice(debuggerSkip+debuggerResult.index+debuggerResult[0].length,-1);
+						//测试是否有错误
+						try {
+							new GeneratorFunction(debuggerCopy);
+							str=debuggerCopy+'}';
+							debuggerSkip+=debuggerResult.index+insertDebugger.length;
+							hasDebugger=true;
+						}catch(error){
+							debuggerSkip+=debuggerResult.index+debuggerResult[0].length;
+						}
+					}
 					//func中要写步骤的话，必须要写step 0
 					if(str.indexOf('step 0')==-1){
 						str='{if(event.step==1) {event.finish();return;}\n'+str;
 					}else{
-						var skip=0;
-						//每层最多找99个step
-						for (var k=0;k<99;k++) {
-							//正则表达式
-							var reg=new RegExp(`['"]step ${k}['"]`);
-							var result=str.slice(skip).match(reg);
-							if(result==null) break;
-							var insertStr;
+						let skip=0;
+						let k=0;
+						let result;
+						//去除99个step的限制
+						while((result=str.slice(skip).match(new RegExp(`['"]step ${k}['"]`)))!=null){
+							let insertStr;
 							if(k==0){
 								insertStr=`switch(step){case 0:`;
 							}else{
 								insertStr=`break;case ${k}:`;
 							}
-							var copy=str;
+							let copy=str;
 							copy=copy.slice(0,skip+result.index)+insertStr+copy.slice(skip+result.index+result[0].length);
 							//测试是否有错误
 							try{
@@ -11269,6 +11281,7 @@
 								k--;
 								skip+=result.index+result[0].length;
 							}
+							k++;
 						}
 						str=`if(event.step==${k}){event.finish();return;}`+str;
 					}
