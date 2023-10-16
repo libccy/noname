@@ -20495,6 +20495,18 @@
 					 */
 					const player=ui.create.div('.player',position);
 					Object.setPrototypeOf(player,lib.element.Player.prototype);
+					player.build(noclick);
+					return player;
+				}
+				build(noclick){
+					let player = this;
+					player.buildNode();
+					player.buildProperty();
+					player.buildExtra();
+					player.buildEventListener(noclick);
+				}
+				buildNode(){
+					let player = this;
 					const node=player.node={
 						avatar:ui.create.div('.avatar',player,ui.click.avatar).hide(),
 						avatar2:ui.create.div('.avatar2',player,ui.click.avatar2).hide(),
@@ -20521,7 +20533,19 @@
 						ui.create.div(node.chain.firstChild,'.cardbg').style.transform=`translateX(${repetition*5-5}px)`;
 					}
 					node.action=ui.create.div('.action',node.avatar);
-
+				}
+				buildExtra(){
+					let player = this;
+					let node = player.node;
+					node.link=player.mark(' ',{
+						mark:get.linkintro
+					});
+					node.link.firstChild.setBackgroundImage('image/card/tiesuo_mark.png');
+					node.link.firstChild.style.backgroundSize='cover';
+					ui.create.div(node.identity);
+				}
+				buildProperty(){
+					let player = this;
 					player.phaseNumber=0;
 					player.skipList=[];
 					player.skills=[];
@@ -20567,21 +20591,16 @@
 					};
 					player.queueCount=0;
 					player.outCount=0;
-
-					node.link=player.mark(' ',{
-						mark:get.linkintro
-					});
-					node.link.firstChild.setBackgroundImage('image/card/tiesuo_mark.png');
-					node.link.firstChild.style.backgroundSize='cover';
-					ui.create.div(node.identity);
+				}
+				buildEventListener(noclick){
+					let player = this;
+					let node = player.node;
 					if(noclick) player.noclick=true;
 					else{
 						player.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.target);
 						node.identity.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.identity);
 						if(lib.config.touchscreen) player.addEventListener('touchstart',ui.click.playertouchstart);
 					}
-
-					return player;
 				}
 				//新函数
 				/**
@@ -29679,22 +29698,18 @@
 				constructor(position,info,noclick){
 					const card=ui.create.div('.card',position);
 					Object.setPrototypeOf(card,lib.element.Card.prototype);
-					card.node={
-						image:ui.create.div('.image',card),
-						info:ui.create.div('.info',card),
-						name:ui.create.div('.name',card),
-						name2:ui.create.div('.name2',card),
-						background:ui.create.div('.background',card),
-						intro:ui.create.div('.intro',card),
-						range:ui.create.div('.range',card),
-						gaintag:ui.create.div('.gaintag',card),
-					}
-					card.node.intro.innerHTML=lib.config.intro;
-					if(!noclick) lib.setIntro(card);
-					card.storage={};
-					card.vanishtag=[];
-					card.gaintag=[];
-					card._uncheck=[];
+					card.build(info,noclick);
+					return card;
+				}
+				build(info,noclick){
+					let card = this;
+					card.buildNode();
+					card.buildIntro(noclick);
+					card.buildProperty();
+					card.buildEventListener(info);
+				}
+				buildEventListener(info){
+					let card = this;
 					if(info!='noclick'){
 						card.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.card);
 						if(lib.config.touchscreen){
@@ -29705,7 +29720,29 @@
 							attributes:true
 						});
 					}
-					return card;
+				}
+				buildProperty(){
+					let card = this;
+					card.storage={};
+					card.vanishtag=[];
+					card.gaintag=[];
+					card._uncheck=[];
+				}
+				buildNode(){
+					this.node = {
+						image:ui.create.div('.image',this),
+						info:ui.create.div('.info',this),
+						name:ui.create.div('.name',this),
+						name2:ui.create.div('.name2',this),
+						background:ui.create.div('.background',this),
+						intro:ui.create.div('.intro',this),
+						range:ui.create.div('.range',this),
+						gaintag:ui.create.div('.gaintag',this),
+					};
+					this.node.intro.innerHTML=lib.config.intro;
+				}
+				buildIntro(noclick){
+					if(!noclick) lib.setIntro(this);
 				}
 				hasNature(nature,player){
 					return game.hasNature(this,nature,player);
