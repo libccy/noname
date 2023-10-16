@@ -3002,7 +3002,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var str=get.translation(target)+'是'+get.translation(res+'2')+'<br>';
 						var dialog=ui.create.dialog(str,'forcebutton');
 						var card=ui.create.card();
-						card.classList.add('fullskin');
 						var buttons=ui.create.div('.buttons',dialog.content);
 						buttons.appendChild(card);
 						new Promise((resolve)=>{
@@ -3015,9 +3014,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								image.onerror=reject;
 								image.src=pth;
 							}).then(image=>{
+								card.classList.add('fullskin');
 								card.node.image.setBackgroundImage(image);
 							}).catch(()=>{
-								card.node.background.innerHTML=get.transition(res)[0];
+								card.node.background.innerHTML=get.translation(res)[0];
 							});
 						}).then(()=>{
 							if(lib.config.cardback_style!='default'){
@@ -3106,8 +3106,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var dialog=ui.create.dialog(str,'forcebutton');
 						var card=ui.create.card();
 						var buttons=ui.create.div('.buttons',dialog.content);
-						buttons.appendChild(card)
-						card.classList.add('fullskin');
+						buttons.appendChild(card);
 						new Promise((resolve)=>{
 							var imageName=`mougong_fan`;
 							resolve(`${lib.assetURL}image/card/${imageName}.jpg`);
@@ -3118,6 +3117,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								image.onerror=reject;
 								image.src=pth;
 							}).then(image=>{
+								card.classList.add('fullskin');
 								card.node.image.setBackgroundImage(image);
 							}).catch(()=>{
 								card.node.background.innerHTML='反';
@@ -3178,8 +3178,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var dialog=ui.create.dialog(str,'forcebutton');
 							var card=ui.create.card();
 							var buttons=ui.create.div('.buttons',dialog.content);
-							buttons.appendChild(card)
-							card.classList.add('fullskin');
+							buttons.appendChild(card);
 							new Promise((resolve)=>{
 								var imageName=`mougong_fan`;
 								resolve(`${lib.assetURL}image/card/${imageName}.jpg`);
@@ -3190,6 +3189,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									image.onerror=reject;
 									image.src=pth;
 								}).then(image=>{
+									card.classList.add('fullskin');
 									card.node.image.setBackgroundImage(image);
 								}).catch(()=>{
 									card.node.background.innerHTML='反';
