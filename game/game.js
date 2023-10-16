@@ -8559,7 +8559,7 @@
 					}
 				});
 				/**
-				*@legacy Use `Array.prototype.includes(searchElement)` instead.
+				*@legacy Use {@link Array#includes} instead.
 				 */
 				Object.defineProperty(Array.prototype,"contains",{
 					configurable:true,
@@ -8740,7 +8740,10 @@
 					}
 				});
 				/**
-				 * @deprecated !!!WARNING!!! Will be deprecated in next verision
+				 * @deprecated
+				 * !!!WARNING!!!
+				 * Will be deprecated in next verision!
+				 * Use {@link VCard#hasNature} instead.
 				 */
 				Object.defineProperty(Object.prototype,'hasNature',{
 					configurable:true,
@@ -30317,7 +30320,7 @@
 			},
 			VCard:class{
 				/**
-				 * @param {string | [string, number, string, string] | Card | Record<string, string | number | boolean | any[]>} [suitOrCard]
+				 * @param {any} [suitOrCard]
 				 * @param {number | Card[]} [numberOrCards]
 				 * @param {string} [name]
 				 * @param {string} [nature]
@@ -30325,9 +30328,21 @@
 				constructor(suitOrCard,numberOrCards,name,nature){
 					if(typeof suitOrCard=='undefined'&&typeof numberOrCards=='undefined'&&typeof name=='undefined'&&typeof nature=='undefined') return;
 					if(Array.isArray(suitOrCard)){
+						/**
+						 * @type {string}
+						 */
 						this.suit=suitOrCard[0];
+						/**
+						 * @type {number}
+						 */
 						this.number=suitOrCard[1];
+						/**
+						 * @type {string}
+						 */
 						this.name=suitOrCard[2];
+						/**
+						 * @type {string}
+						 */
 						this.nature=suitOrCard[3];
 					}
 					else if(suitOrCard instanceof lib.element.Card){
@@ -30339,9 +30354,17 @@
 						this.isCard=true;
 						this.cardid=suitOrCard.cardid;
 						this.wunature=suitOrCard.wunature;
+						/**
+						 * @type {Record<string, any>}
+						 */
 						this.storage=get.copy(suitOrCard.storage);
 						if(Array.isArray(numberOrCards)) this.cards=numberOrCards.slice();
 						else this.cards=[suitOrCard];
+						const info=get.info(this,false);
+						if(info){
+							const autoViewAs=info.autoViewAs;
+							if(typeof autoViewAs=='string') this.name=autoViewAs;
+						}
 					}
 					else if(typeof suitOrCard!='string'){
 						Object.keys(suitOrCard).forEach(key=>{
@@ -30351,6 +30374,9 @@
 						});
 						if(Array.isArray(numberOrCards)){
 							const noCards=!this.hasOwnProperty('cards');
+							/**
+							 * @type {Card[]}
+							 */
 							this.cards=numberOrCards.slice();
 							if(noCards){
 								if(!lib.suits.includes(this.suit)) this.suit=get.suit(this);
@@ -30359,23 +30385,28 @@
 								if(!this.hasOwnProperty('nature')) this.nature=get.nature(this);
 							}
 						}
+						const info=get.info(this,false);
+						if(info){
+							const autoViewAs=info.autoViewAs;
+							if(typeof autoViewAs=='string') this.name=autoViewAs;
+						}
 					}
 					if(typeof suitOrCard=='string') this.suit=suitOrCard;
 					if(typeof numberOrCards=='number') this.number=numberOrCards;
 					if(typeof name=='string') this.name=name;
 					if(typeof nature=='string') this.nature=nature;
 					if(this.hasOwnProperty('suit')&&!this.hasOwnProperty('color')) this.color=get.color(this);
-					if(!this.hasOwnProperty('storage'))
-						/**
-						 * @type {Record<string, any>}
-						 */
-						this.storage={};
-					if(!this.hasOwnProperty('cards'))
-						/**
-						 * @type {Card[]}
-						 */
-						this.cards=[];
-					const info=get.info(this,false);
+					if(!this.hasOwnProperty('storage')) this.storage={};
+					if(!this.hasOwnProperty('cards')) this.cards=[];
+				}
+				/**
+				 * @param {Player} player
+				 */
+				hasNature(nature,player){
+					const natures=get.natureList(this,player);
+					if(!nature) return natures.length>0;
+					if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
+					return get.is.sameNature(natures,nature);
 				}
 			},
 			Button:class extends HTMLDivElement{
@@ -31592,49 +31623,49 @@
 				}
 			},
 			/**
-			 * @legacy Use `lib.element.Player.prototype` instead.
+			 * @legacy Use {@link lib.element.Player.prototype} instead.
 			 */
 			get player(){
 				return this.Player.prototype;
 			},
 			/**
-			 * @legacy Use `lib.element.Card.prototype` instead.
+			 * @legacy Use {@link lib.element.Card.prototype} instead.
 			 */
 			get card(){
 				return this.Card.prototype;
 			},
 			/**
-			 * @legacy Use `lib.element.Button.prototype` instead.
+			 * @legacy Use {@link lib.element.Button.prototype} instead.
 			 */
 			get button(){
 				return this.Button.prototype;
 			},
 			/**
-			 * @legacy Use `lib.element.Event.prototype` instead.
+			 * @legacy Use {@link lib.element.Event.prototype} instead.
 			 */
 			get event(){
 				return this.Event.prototype;
 			},
 			/**
-			 * @legacy Use `lib.element.Dialog.prototype` instead.
+			 * @legacy Use {@link lib.element.Dialog.prototype} instead.
 			 */
 			get dialog(){
 				return this.Dialog.prototype;
 			},
 			/**
-			 * @legacy Use `lib.element.Control.prototype` instead.
+			 * @legacy Use {@link lib.element.Control.prototype} instead.
 			 */
 			get control(){
 				return this.Control.prototype;
 			},
 			/**
-			 * @legacy Use `lib.element.Client.prototype` instead.
+			 * @legacy Use {@link lib.element.Client.prototype} instead.
 			 */
 			get client(){
 				return this.Client.prototype;
 			},
 			/**
-			 * @legacy Use `lib.element.NodeWS.prototype` instead.
+			 * @legacy Use {@link lib.element.NodeWS.prototype} instead.
 			 */
 			get nodews(){
 				return this.NodeWS.prototype;
@@ -38692,7 +38723,7 @@
 			next.setContent('createTrigger');
 		},
 		/**
-		 * @legacy Use `new lib.element.Event(name, trigger)` (and optionally `(triggerEvent || _status.event).next.push(next)`) instead.
+		 * @legacy Use {@link lib.element.Event.constructor} instead.
 		 */
 		createEvent:(name,trigger,triggerEvent)=>{
 			const next=new lib.element.Event(name,trigger);
