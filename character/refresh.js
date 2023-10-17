@@ -167,6 +167,56 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//界凌统
+			olxuanfeng:{
+				audio:2,
+				audioname2:{
+					lingtong:'xuanfeng',
+				},
+				trigger:{
+					player:['loseAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+				},
+				filter:function(event,player){
+					var evt=event.getl(player);
+					return evt&&(evt.es.length||evt.cards2.length>1);
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					event.count=2;
+					event.logged=false;
+					'step 1'
+					player.chooseTarget(get.prompt('olxuanfeng'),'弃置一名其他角色的一张牌',function(card,player,target){
+						if(player==target) return false;
+						return target.countDiscardableCards(player,'he');
+					}).set('ai',function(target){
+						return -get.attitude(_status.event.player,target);
+					});
+					'step 2'
+					if(result.bool){
+						if(!event.logged){
+							player.logSkill('olxuanfeng',result.targets);
+							event.logged=true;
+						}
+						else player.line(result.targets[0],'green');
+						player.discardPlayerCard(result.targets[0],'he',true);
+						event.count--;
+					}
+					else event.finish();
+					'step 3'
+					if(event.count) event.goto(1);
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(get.type(card)=='equip'&&!get.cardtag(card,'gifts')) return [1,3];
+						}
+					},
+					reverseEquip:true,
+					noe:true
+				},
+			},
 			ollianhuan:{
 				audio:'xinlianhuan',
 				audioname:['ol_pangtong'],
@@ -15378,6 +15428,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoren_prefix:'界',
 			ollianhuan:'连环',
 			ollianhuan_info:'你可以将一张♣牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标后，可以给此牌增加一个目标。',
+			ol_lingtong:'OL界凌统',
+			ol_lingtong_prefix:'OL界',
+			olxuanfeng:'旋风',
+			olxuanfeng_info:'当你一次性失去超过两张牌后，或失去装备区的牌后，你可以依次弃置一至两名其他角色的共计两张牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
