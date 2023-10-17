@@ -130,6 +130,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '';
 					}).join('、')}`,
 				},
+				$createButton:function(item,type,position,noclick,node){
+					node=ui.create.identityCard(item,position,null,noclick);
+					node.link=item;
+					return node;
+				},
 				subSkill:{
 					show:{
 						audio:'jxlianpo',
@@ -140,66 +145,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return list.length;
 						},
 						forced:true,
-						content:function*(event,map){
-							var player=map.player,trigger=map.trigger;
+						content:function(){
+							'step 0'
 							var list=lib.config.mode_config.identity.identity.lastItem.slice();
 							list.removeArray(game.filterPlayer().map(i=>i.identity)).unique();
-							var chooseControl=function(player,list){
-								var event=_status.event;
-								player=player||event.player;
-								var controls=[];
-								if(!event._result) event._result={};
-								Promise.all(list.map(identity=>new Promise((resolve,reject)=>{
-									var imageName=`mougong_${identity}`;
-									var pth=(`${lib.assetURL}image/card/${imageName}.jpg`);
-									var image=new Image();
-									image.onload=()=>resolve(pth);
-									image.onerror=reject;
-									image.src=pth;
-								}))).then(paths=>{
-									controls.addArray(paths.map(path=>{
-										return `<img src="${lib.assetURL+path}" width="65" height="93" draggable="false"></img>`;
-									}));
-								}).catch(()=>{
-									controls.addArray(list.map(i=>i+'2'));
-								}).then(()=>{
-									var dialog=ui.create.dialog('###炼魄：请选择一个身份###<div class="text center">你选择的身份对应的阵营角色数于本轮内视为+1</div>');
-									var controlsx=[];
-									for(var control of controls){
-										controlsx.push(ui.create.control(control,function(link){
-											event._result.index=controls.indexOf(link);
-											dialog.close();
-											controlsx.forEach(control=>control.close());
-											_status.imchoosing=false;
-											game.resume();
-										}));
-									}
-									event.switchToAuto=function(){
-										event._result={index:get.rand(controls.length)};
-										dialog.close();
-										control.close();
-										_status.imchoosing=false;
-										game.resume();
-									};
-								});
-								game.pause();
-								game.countChoose();
-							}
-							if(event.isMine()){
-								chooseControl(player,list);
-							}
-							else if(event.isOnline()){
-								event.player.send(chooseControl,event.player,list);
-								event.player.wait();
-								game.pause();
-							}
-							else{
-								event._result={index:get.rand(list.length)};
-								_status.imchoosing=false;
-							}
-							yield null;
-							var index=event[event.result&&typeof event.result.index=='number'?'result':'_result'].index;
-							var choice=list[index],mark=`jxlianpo_mark_${choice}`;
+							player.chooseButton([
+								'###炼魄：请选择一个身份###<div class="text center">你选择的身份对应的阵营角色数于本轮内视为+1</div>',
+								[list,function(item,type,position,noclick,node){
+									return lib.skill.jxlianpo.$createButton(item,type,position,noclick,node);
+								}],
+							])
+							'step 1'
+							var choice=result.links[0],mark=`jxlianpo_mark_${choice}`;
 							player.when({global:'roundStart'})
 								.assign({
 									firstDo:true,
@@ -215,32 +172,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.addMark(mark,1,false);
 							var videoId=lib.status.videoId++;
 							var createDialog=function(player,identity,id){
-								var dialog=ui.create.dialog(`${get.translation(player)}展示了${get.translation(identity+'2')}身份牌<br>`,'forcebutton');
+								var dialog=ui.create.dialog(`${get.translation(player)}展示了“${get.translation(identity+'2')}”的身份牌<br>`,'forcebutton');
 								dialog.videoId=id;
-								new Promise((resolve,reject)=>{
-									var imageName=`mougong_${identity}`;
-									var pth=(`${lib.assetURL}image/card/${imageName}.jpg`);
-									var image=new Image();
-									image.onload=()=>resolve(pth);
-									image.onerror=reject;
-									image.src=pth;
-								}).then(pth=>{
-									var img=document.createElement('img');
-									dialog.content.appendChild(img);
-									img.setAttribute('src',pth);
-									img.setAttribute('width','130');
-									img.setAttribute('height','185');
-									img.setAttribute('draggable',false);
-									dialog.open();
-								}).catch(()=>{});
+								ui.create.spinningIdentityCard(identity,dialog);
 							};
 							game.broadcastAll(createDialog,player,choice,videoId);
 							var color='';
 							if(choice=='zhong') color='#y';
 							else if(choice=='fan') color='#g';
 							else if(choice=='nei') color='#b';
-							game.log(player,'展示了',`${color}${get.translation(choice+'2')}`,'身份牌');
-							yield game.delay(2);
+							game.log(player,'展示了',`${color}${get.translation(choice+'2')}`,'的身份牌');
+							game.delay(3);
+							'step 2'
 							game.broadcastAll('closeDialog',videoId);
 						}
 					},
@@ -337,6 +280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var bodies=_status.event.player.getStorage('jxzhaoluan_effect').filter(i=>i.isIn());
 							return `选择一名角色，你令${get.translation(bodies)}${bodies.length>1?'中的一人':''}减1点体力上限，然后你对选择的角色造成1点伤害。`;
 						},
+						delay:false,
 						content:function(){
 							'step 0'
 							var bodies=player.getStorage('jxzhaoluan_effect').filter(i=>i.isIn());

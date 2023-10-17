@@ -42556,6 +42556,70 @@
 			void window.getComputedStyle(node, null).getPropertyValue("opacity");
 		},
 		create:{
+			//创建身份牌实例
+			identityCard:function(identity,position,info,noclick){
+				const card=ui.create.card(position,info,noclick);
+				card._customintro=function(uiintro){
+					uiintro.add(`${get.translation(item+2)}的身份牌`);
+				}
+				const fileName=`image/card/identity_${identity}.jpg`;
+				new Promise((resolve,reject)=>{
+					const image=new Image();
+					image.onload=()=>resolve();
+					image.onerror=reject;
+					image.src=`${lib.assetURL}${fileName}`;
+				}).then(()=>{
+					card.classList.add('fullskin');
+					card.node.image.setBackgroundImage(fileName);
+				}).catch(()=>{
+					card.node.background.innerHTML=get.translation(identity)[0];
+				});
+				return card;
+			},
+			//让卡牌旋转
+			cardSpinning:function(card){
+				if(lib.config.cardback_style!='default'){
+					card.style.transitionProperty='none';
+					ui.refresh(card);
+					card.classList.add('infohidden');
+					ui.refresh(card);
+					card.style.transitionProperty='';
+				}
+				else{
+					card.classList.add('infohidden');
+				}
+				card.style.transition='all 0s';
+				card.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
+				const onEnd01=function(){
+					setTimeout(function(){
+						card.style.transition='all ease-in 0.3s';
+						card.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
+						var onEnd=function(){
+							card.classList.remove('infohidden');
+							card.style.transition='all 0s';
+							ui.refresh(card);
+							card.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
+							ui.refresh(card);
+							card.style.transition='';
+							ui.refresh(card);
+							card.style.transform='';
+						}
+						card.listenTransition(onEnd);
+					},300);
+				};
+				onEnd01();
+			},
+			//旋转的身份牌！
+			spinningIdentityCard:function(identity,dialog){
+				const card=ui.create.identityCard(identity);
+				const buttons=ui.create.div('.buttons',dialog.content);
+				buttons.appendChild(card);
+				setTimeout(()=>{
+					buttons.appendChild(card);
+					dialog.open();
+					ui.create.cardSpinning(card,time);
+				},50);
+			},
 			/**
 			 * 创建codemirror编辑器
 			 * @param {HTMLDivElement} container 

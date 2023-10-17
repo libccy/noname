@@ -2997,62 +2997,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.dongcha_result=res;
 
 					event.videoId=lib.status.videoId++;
-					
 					var send=(target,res,id)=>{
 						var str=get.translation(target)+'是'+get.translation(res+'2')+'<br>';
 						var dialog=ui.create.dialog(str,'forcebutton');
-						var card=ui.create.card();
-						var buttons=ui.create.div('.buttons',dialog.content);
-						buttons.appendChild(card);
-						new Promise((resolve)=>{
-							var imageName=`mougong_${res}`;
-							resolve(`${lib.assetURL}image/card/${imageName}.jpg`);
-						}).then(pth=>{
-							return new Promise((resolve,reject)=>{
-								var image=new Image();
-								image.onload=()=>resolve(pth);
-								image.onerror=reject;
-								image.src=pth;
-							}).then(image=>{
-								card.classList.add('fullskin');
-								card.node.image.setBackgroundImage(image);
-							}).catch(()=>{
-								card.node.background.innerHTML=get.translation(res)[0];
-							});
-						}).then(()=>{
-							if(lib.config.cardback_style!='default'){
-								card.style.transitionProperty='none';
-								ui.refresh(card);
-								card.classList.add('infohidden');
-								ui.refresh(card);
-								card.style.transitionProperty='';
-							}
-							else{
-								card.classList.add('infohidden');
-							}
-							buttons.appendChild(card);
-							card.style.transition='all 0s';
-							card.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
-							dialog.open();
-							var onEnd01=function(){
-								setTimeout(function(){
-									card.style.transition='all ease-in 0.3s';
-									card.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
-									var onEnd=function(){
-										card.classList.remove('infohidden');
-										card.style.transition='all 0s';
-										ui.refresh(card);
-										card.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
-										ui.refresh(card);
-										card.style.transition='';
-										ui.refresh(card);
-										card.style.transform='';
-									}
-									card.listenTransition(onEnd);
-								},300);
-							};
-							onEnd01();
-						});
+						ui.create.spinningIdentityCard(res,dialog);
 						var control=ui.create.control('ok',()=>{
 							dialog.close();
 							control.close();
@@ -3104,58 +3052,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var str=get.translation(target)+'是反贼<br>';
 						event.videoId=lib.status.videoId++;
 						var dialog=ui.create.dialog(str,'forcebutton');
-						var card=ui.create.card();
-						var buttons=ui.create.div('.buttons',dialog.content);
-						buttons.appendChild(card);
-						new Promise((resolve)=>{
-							var imageName=`mougong_fan`;
-							resolve(`${lib.assetURL}image/card/${imageName}.jpg`);
-						}).then(pth=>{
-							return new Promise((resolve,reject)=>{
-								var image=new Image();
-								image.onload=()=>resolve(pth);
-								image.onerror=reject;
-								image.src=pth;
-							}).then(image=>{
-								card.classList.add('fullskin');
-								card.node.image.setBackgroundImage(image);
-							}).catch(()=>{
-								card.node.background.innerHTML='反';
-							});
-						}).then(()=>{
-							if(lib.config.cardback_style!='default'){
-								card.style.transitionProperty='none';
-								ui.refresh(card);
-								card.classList.add('infohidden');
-								ui.refresh(card);
-								card.style.transitionProperty='';
-							}
-							else{
-								card.classList.add('infohidden');
-							}
-							buttons.appendChild(card);
-							dialog.open();
-							card.style.transition='all 0s';
-							card.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
-							var onEnd01=function(){
-								setTimeout(function(){
-									card.style.transition='all ease-in 0.3s';
-									card.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
-									var onEnd=function(){
-										card.classList.remove('infohidden');
-										card.style.transition='all 0s';
-										ui.refresh(card);
-										card.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
-										ui.refresh(card);
-										card.style.transition='';
-										ui.refresh(card);
-										card.style.transform='';
-									}
-									card.listenTransition(onEnd);
-								},300);
-							};
-							onEnd01();
-						});
+						ui.create.spinningIdentityCard('fan',dialog);
 						dialog.videoId=event.videoId;
 						game.me.chooseControl('ok').set('dialog',dialog);
 					}
@@ -3176,58 +3073,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(!game.me.storage.zhibi.contains(target)) game.me.storage.zhibi.push(target);
 							var str=get.translation(target)+'是反贼<br>';
 							var dialog=ui.create.dialog(str,'forcebutton');
-							var card=ui.create.card();
-							var buttons=ui.create.div('.buttons',dialog.content);
-							buttons.appendChild(card);
-							new Promise((resolve)=>{
-								var imageName=`mougong_fan`;
-								resolve(`${lib.assetURL}image/card/${imageName}.jpg`);
-							}).then(pth=>{
-								return new Promise((resolve,reject)=>{
-									var image=new Image();
-									image.onload=()=>resolve(pth);
-									image.onerror=reject;
-									image.src=pth;
-								}).then(image=>{
-									card.classList.add('fullskin');
-									card.node.image.setBackgroundImage(image);
-								}).catch(()=>{
-									card.node.background.innerHTML='反';
-								});
-							}).then(()=>{
-								if(lib.config.cardback_style!='default'){
-									card.style.transitionProperty='none';
-									ui.refresh(card);
-									card.classList.add('infohidden');
-									ui.refresh(card);
-									card.style.transitionProperty='';
-								}
-								else{
-									card.classList.add('infohidden');
-								}
-								buttons.appendChild(card);
-								dialog.open();
-								card.style.transition='all 0s';
-								card.style.transform='perspective(600px) rotateY(180deg) translateX(0)';
-								var onEnd01=function(){
-									setTimeout(function(){
-										card.style.transition='all ease-in 0.3s';
-										card.style.transform='perspective(600px) rotateY(270deg) translateX(52px)';
-										var onEnd=function(){
-											card.classList.remove('infohidden');
-											card.style.transition='all 0s';
-											ui.refresh(card);
-											card.style.transform='perspective(600px) rotateY(-90deg) translateX(52px)';
-											ui.refresh(card);
-											card.style.transition='';
-											ui.refresh(card);
-											card.style.transform='';
-										}
-										card.listenTransition(onEnd);
-									},300);
-								};
-								onEnd01();
-							});
+							ui.create.spinningIdentityCard('fan',dialog);
 							dialog.videoId=id;
 							game.me.chooseControl('ok').set('dialog',dialog);
 						}
@@ -3263,27 +3109,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(game.me.identity=='nei'){
 								var str=get.translation(target)+'是反贼<br>';
 								var dialog=ui.create.dialog(str,'forcebutton');
-								new Promise((resolve)=>{
-									var imageName=`mougong_fan`;
-									resolve(`${lib.assetURL}image/card/${imageName}.jpg`);
-								}).then(pth=>new Promise((resolve,reject)=>{
-									var image=new Image();
-									image.onload=()=>resolve(pth);
-									image.onerror=reject;
-									image.src=pth;
-								})).then(image=>{
-									var img=document.createElement('img');
-									dialog.content.appendChild(img);
-									img.setAttribute('src',image);
-									img.setAttribute('width','106');
-									img.setAttribute('height','150');
-									img.setAttribute('draggable',false);
-									img.style.transition='all 2s';
-									setTimeout(function(){
-										img.style.transform='rotateY(360deg)';
-									},300);
-									dialog.open();
-								}).catch(()=>{});
+								ui.create.spinningIdentityCard('fan',dialog);
 								dialog.videoId=event.videoId;
 								game.me.chooseControl('ok').set('dialog',dialog);
 								game.me.wait();
