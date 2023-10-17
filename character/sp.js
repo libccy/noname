@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','lvboshe','zhangyan','ol_dingshangwan'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','lvboshe','zhangyan','ol_dingshangwan','ol_liwan'],
 				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['ol_wanglang','ol_puyuan','ol_zhouqun'],
 				sp_zhongdan:["cuiyan","huangfusong"],
@@ -33,6 +33,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_liwan:['female','wei',3,['ollianju','olsilv']],
 			ol_dingshangwan:['female','wei',3,['olfudao','olfengyan']],
 			zhangyan:['male','qun',4,['olsuji','ollangdao']],
 			ol_tw_zhangji:['male','wei',3,['skill_zhangji_A','skill_zhangji_B'],['unseen']],
@@ -707,6 +708,118 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//李婉
+			ollianju:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				filter:function(event,player){
+					var history=player.getHistory('useCard');
+					if(!history.length) return false;
+					var evt=history[history.length-1];
+					return evt.cards&&evt.cards.filterInD('d').length;
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var history=player.getHistory('useCard');
+					var evt=history[history.length-1];
+					event.evt=evt;
+					player.chooseTarget(get.prompt('ollianju'),'令一名角色获得'+get.translation(evt.cards.filterInD('d'))+'并记录'+get.translation(evt.card.name),lib.filter.notMe).set('ai',target=>{
+						var player=_status.event.player,att=get.attitude(player,target);
+						var cards=_status.event.cards;
+						if(cards.filter(card=>get.name(card,false)=='du').length>=Math.ceil(cards.length/2)) att*=-1;
+						if(target.skipList.contains('phaseUse')||target.hasJudge('lebu')) return att/20;
+						return att;
+					}).set('cards',evt.cards.filterInD('d'));
+					'step 1'
+					if(result.bool){
+						var evt=event.evt;
+						var target=result.targets[0];
+						player.logSkill('oliandui',target);
+						target.gain(evt.cards.filterInD('d'),'gain2');
+						player.addSkill('ollianju_effect');
+						player.storage.ollianju=evt.card.name;
+						player.markSkill('ollianju');
+						if(!player.storage.ollianju_effect[target.playerid]) player.storage.ollianju_effect[target.playerid]=[];
+						player.storage.ollianju_effect[target.playerid].add(evt.card.name);
+					}
+				},
+				onunmark:true,
+				intro:{
+					content:function(storage,player){
+						var str='当前最后一次记录牌名：'+get.translation(storage);
+						if(player.storage.ollianju_effect){
+							for(var i in player.storage.ollianju_effect){
+								var target=game.findPlayer(target=>target.playerid==i);
+								if(!i) continue;
+								str+='<br>';
+								str+=get.translation(target)+'的下个结束阶段，其可令你获得其本回合使用的最后一张牌对应的所有位于弃牌堆的实体牌';
+								str+='，然后若此牌名为'+get.translation(player.storage.ollianju_effect[i])+'，则你失去1点体力';
+							}
+						}
+						return str;
+					},
+				},
+				subSkill:{
+					effect:{
+						init:function(player){
+							if(!player.storage.ollianju_effect) player.storage.ollianju_effect={};
+						},
+						charlotte:true,
+						trigger:{global:['phaseJieshuBegin','die']},
+						filter:function(event,player){
+							return player.storage.ollianju_effect[event.player.playerid];
+						},
+						direct:true,
+						content:function(){
+							'step 0'
+							if(trigger.name=='phaseJieshu') event.list=player.storage.ollianju_effect[trigger.player.playerid];
+							delete player.storage.ollianju_effect[trigger.player.playerid];
+							var history=trigger.player.getHistory('useCard');
+							var evt=history[history.length-1];
+							event.evt=evt;
+							if(trigger.name=='die'||!history.length||!evt.cards||!evt.cards.filterInD('d').length) event.finish();
+							'step 1'
+							var evt=event.evt;
+							trigger.player.chooseBool(get.prompt('ollianju',player),'令'+get.translation(player)+'获得'+get.translation(evt.cards.filterInD('d'))+(event.list.contains(evt.card.name)?'，然后'+get.translation(player)+'失去1点体力':'')).set('choice',get.attitude(trigger.player,player)>0&&(!event.list.contains(evt.card.name)||player.getHp()>1));
+							'step 2'
+							if(result.bool){
+								var evt=event.evt;
+								trigger.player.line(player);
+								player.gain(evt.cards.filterInD('d'),'gain2');
+								if(event.list.contains(evt.card.name)) player.loseHp();
+							}
+						},
+					},
+				},
+			},
+			olsilv:{
+				audio:2,
+				trigger:{
+					player:['loseAfter','gainAfter'],
+					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+				},
+				filter:function(event,player){
+					var name=player.storage.ollianju;
+					if(!name) return false;
+					if(event.getg) return event.getg(player).some(card=>card.name==name);
+					return event.getl(player).cards2.some(card=>card.name==name);
+				},
+				forced:true,
+				usable:1,
+				content:function(){
+					'step 0'
+					if(!trigger.visible){
+						var cards,name=player.storage.ollianju;
+						if(trigger.getg) cards=trigger.getg(player).filter(card=>card.name==name);
+						else cards=trigger.getl(player).cards2.filter(card=>card.name==name);
+						if(cards.length) player.showCards(cards,get.translation(player)+'发动了【思闾】');
+					}
+					'step 1'
+					player.draw();
+				},
+				ai:{combo:'ollianju'},
+			},
 			//丁尚涴
 			olfudao:{
 				audio:2,
@@ -26048,6 +26161,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olfudao_info:'①游戏开始时，你选择弃置或摸至多四张牌，然后记录你的手牌数。②一名角色的回合结束时，若其手牌数和你发动〖抚悼①〗记录的数值相同，则你可以与其各摸一张牌。',
 			olfengyan:'讽言',
 			olfengyan_info:'锁定技。①当你受到其他角色造成的伤害后，你摸一张牌，然后交给其一张牌。②当你响应其他角色使用的牌时，其摸一张牌，然后弃置两张牌。',
+			ol_liwan:'OL李婉',
+			ol_liwan_prefix:'OL',
+			ollianju:'联句',
+			ollianju_info:'结束阶段，你可以令一名其他角色获得你本回合使用的最后一张牌A对应的所有位于弃牌堆的实体牌并记录A的牌名，然后其下个结束阶段可以令你获得其本回合使用的最后一张牌B对应的所有位于弃牌堆的实体牌，且若A与B的牌名相同，则你失去1点体力。',
+			olsilv:'思闾',
+			olsilv_info:'锁定技，每回合限一次，当你获得或失去你发动〖联句〗记录的最后一次牌名的同名牌后，你展示这些牌，然后摸一张牌。',
 			
 
 			sp_tianji:'天极·皇室宗亲',
