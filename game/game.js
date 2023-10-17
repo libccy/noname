@@ -22637,7 +22637,7 @@
 						player.hujia=hujia;
 						player.$update();
 					},this,this.hp,this.maxHp,this.hujia);
-					this.$update();
+					this.$update(...arguments);
 				}
 				$update(){
 					if(this.hp>=this.maxHp) this.hp=this.maxHp;
@@ -36076,25 +36076,30 @@
 			}
 		},
 		playAudio:function(){
-			if(_status.video&&arguments[1]!='video') return;
 			let path='',emptyPath=true,notCheckDBPath=true,onError=null;
-			for(const argument of arguments){
-				if(typeof argument==='string'||typeof argument=='number'){
-					if(emptyPath) emptyPath=false;
-					else if(notCheckDBPath){
-						notCheckDBPath=false;
-						if(/^db:extension-[^:]*$/.test(path)) path+=':';
-						else path+='/';
-					}
-					else path+='/';
-					path+=argument;
-				}
-				else if(typeof argument=='function') onError=argument;
-				if(_status.video) break;
+			if(_status.video){
+				if(arguments[1]!='video') return;
+				path=arguments[0];
 			}
-			if(path.startsWith('ext:')) path=path.replace(/^ext:/,'extension/');
-			else if(!path.startsWith('db:')) path=`audio/${path}`;
-			if(!lib.config.repeat_audio&&_status.skillaudio.contains(path)) return;
+			else{
+				for(const argument of arguments){
+					if(typeof argument==='string'||typeof argument=='number'){
+						if(emptyPath) emptyPath=false;
+						else if(notCheckDBPath){
+							notCheckDBPath=false;
+							if(/^db:extension-[^:]*$/.test(path)) path+=':';
+							else path+='/';
+						}
+						else path+='/';
+						path+=argument;
+					}
+					else if(typeof argument=='function') onError=argument;
+					if(_status.video) break;
+				}
+				if(path.startsWith('ext:')) path=path.replace(/^ext:/,'extension/');
+				else if(!path.startsWith('db:')) path=`audio/${path}`;
+				if(!lib.config.repeat_audio&&_status.skillaudio.contains(path)) return;
+			}
 			_status.skillaudio.add(path);
 			game.addVideo('playAudio',null,path);
 			setTimeout(()=>_status.skillaudio.remove(path),1000);
