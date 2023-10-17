@@ -42565,7 +42565,7 @@
 			identityCard:function(identity,position,info,noclick){
 				const card=ui.create.card(position,info,noclick);
 				card._customintro=function(uiintro){
-					uiintro.add(`${get.translation(item+2)}的身份牌`);
+					uiintro.add(`${get.translation(identity+2)}的身份牌`);
 				}
 				const fileName=`image/card/identity_${identity}.jpg`;
 				new Promise((resolve,reject)=>{

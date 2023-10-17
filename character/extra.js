@@ -100,19 +100,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'source',
 				global:'jxlianpo_global',
 				getMax:()=>{
-					var identities=[],population=0;
-					game.countPlayer(current=>{
-						var curPopulation=1+current.getFriends().length+game.countPlayer(currentx=>{
-							return currentx.countMark(`jxlianpo_mark_${current.identity}`);
-						});
+					const map={
+						zhu:game.countPlayer(current=>{
+							const identity=current.identity;
+							let num=0;
+							if(identity=='zhu'||identity=='zhong'||identity=='mingzhong') num++;
+							num+=current.countMark('jxlianpo_mark_zhong');
+							return num;
+						}),
+						fan:game.countPlayer(current=>{
+							let num=0;
+							if(current.identity=='fan') num++;
+							num+=current.countMark('jxlianpo_mark_fan');
+							return num;
+						}),
+						nei:(game.hasPlayer(current=>current.identity=='nei')?0:1)+game.countPlayer(current=>{
+							return current.countMark('jxlianpo_mark_nei');
+						}),
+					};
+					let population=0,identities=[];
+					for(let i in map){
+						let curPopulation=map[i]
 						if(curPopulation>=population){
 							if(curPopulation>population) identities=[];
-							var identity=current.identity;
-							if(identity=='zhong') identity='zhu';
-							identities.add(identity);
+							identities.add(i);
 							population=curPopulation;
 						}
-					});
+					};
 					return identities;
 				},
 				group:'jxlianpo_show',
@@ -141,14 +155,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'roundStart'},
 						filter:function(event,player){
 							var list=lib.config.mode_config.identity.identity.lastItem.slice();
-							list.removeArray(game.filterPlayer().map(i=>i.identity));
+							list.removeArray(game.filterPlayer().map(i=>{
+								let identity=i.identity;
+								if(identity=='mingzhong') identity='zhong';
+								return identity;
+							}));
 							return list.length;
 						},
 						forced:true,
 						content:function(){
 							'step 0'
 							var list=lib.config.mode_config.identity.identity.lastItem.slice();
-							list.removeArray(game.filterPlayer().map(i=>i.identity)).unique();
+							list.removeArray(game.filterPlayer().map(i=>{
+								let identity=i.identity;
+								if(identity=='mingzhong') identity='zhong';
+								return identity;
+							})).unique();
 							player.chooseButton([
 								'###炼魄：请选择一个身份###<div class="text center">你选择的身份对应的阵营角色数于本轮内视为+1</div>',
 								[list,function(item,type,position,noclick,node){

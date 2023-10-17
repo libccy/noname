@@ -479,7 +479,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									if (get.attitude(current, target) > 0) return current.countCards('hs', 'tao');
 								}),
 								dis = 1,
-								t = _status.currentPhase;
+								t = _status.currentPhase||game.me;
 							while (t !== target) {
 								let att = get.attitude(player, t);
 								if (Math.abs(att) < 2) dis += 0.45;
