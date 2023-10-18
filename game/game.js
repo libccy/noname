@@ -30449,6 +30449,24 @@
 					if(!this.hasOwnProperty('storage')) this.storage={};
 					if(!this.hasOwnProperty('cards')) this.cards=[];
 				}
+				sameSuitAs(card){
+					return get.suit(this)==get.suit(card);
+				}
+				differentSuitFrom(card){
+					return get.suit(this)!=get.suit(card);
+				}
+				sameNumberAs(card){
+					return get.number(this)==get.number(card);
+				}
+				differentNumberFrom(card){
+					return get.number(this)!=get.number(card);
+				}
+				sameNameAs(card){
+					return get.name(this)==get.name(card);
+				}
+				differentNameFrom(card){
+					return get.name(this)!=get.name(card);
+				}
 				/**
 				 * @param {Player} player
 				 */
@@ -61786,7 +61804,10 @@
 		return object;
 	};
 	setAllPropertiesEnumerable(lib.element.Player.prototype);
-	setAllPropertiesEnumerable(lib.element.Card.prototype);
+	const cardPrototype=setAllPropertiesEnumerable(lib.element.Card.prototype),vCardPrototype=setAllPropertiesEnumerable(lib.element.VCard.prototype);
+	Object.keys(vCardPrototype).forEach(key=>{
+		Object.defineProperty(cardPrototype,key,Object.getOwnPropertyDescriptor(vCardPrototype,key));
+	});
 	setAllPropertiesEnumerable(lib.element.Button.prototype);
 	setAllPropertiesEnumerable(lib.element.Event.prototype);
 	setAllPropertiesEnumerable(lib.element.Dialog.prototype);
