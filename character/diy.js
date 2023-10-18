@@ -4483,37 +4483,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(list.length>=result.score) list=list.randomGets(result.score);
 					else list.addArray(list2.randomGets(result.score-list.length));
 					list.sort();
-					event.videoId=lib.status.videoId++;
-					var func=function(id,list){
-						var choiceList=ui.create.dialog('控物：请选择一项','forcebutton');
-						choiceList.videoId=id;
-						for(var ii=0;ii<list.length;ii++){
-							var i=list[ii];
-							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
-							var bool=lib.skill.yukito_kongwu.moves[i].filter(player);
-							if(!bool) str+='<div style="opacity:0.5">';
-							str+=lib.skill.yukito_kongwu.moves[i].prompt;
-							if(!bool) str+='</div>';
-							str+='</div>';
-							var next=choiceList.add(str);
-							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-							next.firstChild.link=i;
-							for(var j in lib.element.button){
-								next[j]=lib.element.button[j];
-							}
-							choiceList.buttons.add(next.firstChild);
-						}
-						return choiceList;
-					};
-					if(player.isOnline2()){
-						player.send(func,event.videoId,list);
-					}
-					event.dialog=func(event.videoId,list);
-					if(player!=game.me||_status.auto){
-						event.dialog.style.display='none';
-					}
-					var next=player.chooseButton();
-					next.set('dialog',event.videoId);
+					var next=player.chooseButton([
+						'控物：请选择一项',
+						[list.map(i=>{
+							return [i,lib.skill.yukito_kongwu.moves[i].prompt];
+						}),'textbutton'],
+					]);
 					next.set('forced',true);
 					next.set('filterButton',function(button){
 						return lib.skill.yukito_kongwu.moves[button.link].filter(_status.event.player);
@@ -4523,10 +4498,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return Math.random();
 					});
 					"step 2"
-					if(player.isOnline2()){
-						player.send('closeDialog',event.videoId);
-					}
-					event.dialog.close();
 					var num=result.links[0];
 					switch(num){
 						case 0:event.goto(3);break;
@@ -4944,35 +4915,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				chooseButton:{
 					dialog:function(event,player){
-						var dialog=ui.create.dialog('游凤','hidden');
+						const dialog=ui.create.dialog('游凤','hidden');
+						const equips=[];
 						if(player.storage.chihaya_youfeng){
-							var table=document.createElement('div');
-							table.classList.add('add-setting');
-							table.style.margin='0';
-							table.style.width='100%';
-							table.style.position='relative';
-							for(var i=1;i<6;i++){
+							for(let i=1;i<6;i++){
 								if(!player.hasEnabledSlot(i)) continue;
-								var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
-								td.innerHTML='<span>'+get.translation('equip'+i)+'</span>';
-								td.link=i;
-								td.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-								for(var j in lib.element.button){
-									td[j]=lib.element.button[i];
-								}
-								table.appendChild(td);
-								dialog.buttons.add(td);
+								equips.push([i,get.translation('equip'+i)]);
 							}
-							dialog.content.appendChild(table);
+							if(equips.length>0) dialog.add([equips,'tdnodes'])
 						}
-						var type=player.storage.chihaya_youfeng?'basic':'trick';
-						var list=[];
-						for(var name of lib.inpile){
+						const type=player.storage.chihaya_youfeng?'basic':'trick';
+						const list=[];
+						for(const name of lib.inpile){
 							if(get.type(name)!=type) continue;
 							if(event.filterCard({name:name,isCard:true},player,event)){
 								list.push([type,'',name]);
 								if(name=='sha'){
-									for(var j of lib.inpile_nature) list.push([type,'',name,j]);
+									for(let j of lib.inpile_nature) list.push([type,'',name,j]);
 								}
 							}
 						}

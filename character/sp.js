@@ -12350,24 +12350,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				chooseButton:{
 					dialog:function(event,player){
 						var dialog=ui.create.dialog('游龙','hidden');
-						var table=document.createElement('div');
-						table.classList.add('add-setting');
-						table.style.margin='0';
-						table.style.width='100%';
-						table.style.position='relative';
-						for(var i=1;i<6;i++){
+						const equips=[];
+						for(let i=1;i<6;i++){
 							if(!player.hasEnabledSlot(i)) continue;
-							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
-							td.innerHTML='<span>'+get.translation('equip'+i)+'</span>';
-							td.link=i;
-							td.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-							for(var j in lib.element.button){
-								td[j]=lib.element.button[j];
-							}
-							table.appendChild(td);
-							dialog.buttons.add(td);
+							equips.push([i,get.translation('equip'+i)]);
 						}
-						dialog.content.appendChild(table);
+						if(equips.length>0) dialog.add([equips,'tdnodes'])
 						var type=player.storage.youlong?'basic':'trick';
 						var list=[];
 						for(var name of lib.inpile){
@@ -20405,40 +20393,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event._result={bool:true,links:[0]};
 						return;
 					}
-					event.videoId=lib.status.videoId++;
-					var func=function(card,id,bool){
-						var list=[
-							'令自己摸一张牌',
-							'令XXX摸两张牌',
-							'令XXX回复1点体力',
-						];
-						var choiceList=ui.create.dialog('【礼下】：请选择一至两项','forcebutton');
-						choiceList.videoId=id;
-						for(var i=0;i<list.length;i++){
-							list[i]=list[i].replace(/XXX/g,card);
-							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
-							if(i==2&&!bool) str+='<div style="opacity:0.5">';
-							str+=list[i];
-							if(i==2&&!bool) str+='</div>';
-							str+='</div>';
-							var next=choiceList.add(str);
-							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-							next.firstChild.link=i;
-							for(var j in lib.element.button){
-								next[j]=lib.element.button[j];
-							}
-							choiceList.buttons.add(next.firstChild);
-						}
-						return choiceList;
-					};
-					if(player.isOnline2()){
-						player.send(func,get.translation(trigger.player),event.videoId,trigger.player.isDamaged());
-					}
-					event.dialog=func(get.translation(trigger.player),event.videoId,trigger.player.isDamaged());
-					if(player!=game.me||_status.auto){
-						event.dialog.style.display='none';
-					}
-					var next=player.chooseButton(true,[1,2]);
+					var list=[
+						'令自己摸一张牌',
+						'令XXX摸两张牌',
+						'令XXX回复1点体力',
+					];
+					var card=get.translation(trigger.player);
+					var next=player.chooseButton([
+						'【礼下】：请选择一至两项',
+						[list.map((item,index)=>{
+							return [index,item.replace(/XXX/g,card)]
+						}),'textbutton']
+					],true,[1,2]);
 					next.set('dialog',event.videoId);
 					next.set('filterButton',function(button){
 						if(button.link==2){
@@ -20454,12 +20420,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return button.link*Math.random();
 					});
 					"step 1"
-					if(event.videoId!=undefined){
-						if(player.isOnline2()){
-							player.send('closeDialog',event.videoId);
-						}
-						event.dialog.close();
-					}
 					var map=[
 						function(trigger,player,event){
 							player.draw();

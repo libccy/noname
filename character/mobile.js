@@ -5511,24 +5511,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var dialog=ui.create.dialog('集兵','hidden');
 						if(event.filterCard({name:'sha'},player,event)&&event.filterCard({name:'shan'},player,event)){
 							dialog._chooseButton=2;
-							var table=document.createElement('div');
-							table.classList.add('add-setting');
-							table.style.margin='0';
-							table.style.width='100%';
-							table.style.position='relative';
 							var list=['sha','shan'];
-							for(var i of list){
-								var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
-								td.innerHTML='<span>'+get.translation(i)+'</span>';
-								td.link=i;
-								td.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-								for(var j in lib.element.button){
-									td[j]=lib.element.button[j];
-								}
-								table.appendChild(td);
-								dialog.buttons.add(td);
-							}
-							dialog.content.appendChild(table);
+							dialog.add([list.map(i=>{
+								return [i,get.translation(i)];
+							}),'tdnodes']);
 						}
 						else dialog._cardName=event.filterCard({name:'sha'},player,event)?'sha':'shan';
 						dialog.add(player.getExpansions('jibing'));
@@ -13953,21 +13939,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'摸一张牌并视为使用一张【杀】',
 						];
 						var choiceList=ui.create.dialog('知略：失去1点体力并...','forcebutton','hidden');
-						for(var i=0;i<list.length;i++){
-							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
-							var bool=lib.skill.xinzhilve.chooseButton.filter({link:i},player);
-							if(!bool) str+='<div style="opacity:0.5">';
-							str+=list[i];
-							if(!bool) str+='</div>';
-							str+='</div>';
-							var next=choiceList.add(str);
-							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-							next.firstChild.link=i;
-							for(var j in lib.element.button){
-								next[j]=lib.element.button[i];
-							}
-							choiceList.buttons.add(next.firstChild);
-						}
+						choiceList.add([list.map((item,i)=>{
+							return [i,item];
+						}),'textbutton']);
 						return choiceList;
 					},
 					filter:function(button,player){

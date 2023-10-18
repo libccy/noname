@@ -4481,7 +4481,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 							"step 3"
 							if(!result.bool){
-								lib.element.player.die.apply(target,[]);
+								lib.element.Player.prototype.die.apply(target,[]);
 							}
 						},
 						sub:true,

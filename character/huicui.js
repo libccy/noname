@@ -4863,23 +4863,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						(player.isDisabledJudge()?list2:list1).push(-1);
 						var addTable=function(list,bool){
-							var table=document.createElement('div');
-							table.classList.add('add-setting');
-							table.style.margin='0';
-							table.style.width='100%';
-							table.style.position='relative';
+							const adds=[];
 							for(var i of list){
-								var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
-								td.innerHTML='<span>'+(i>0?get.translation('equip'+i)+'栏':'判定区')+'</span>';
-								td.link=[i,bool];
-								td.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-								for(var j in lib.element.button){
-									td[j]=lib.element.button[j];
-								}
-								table.appendChild(td);
-								dialog.buttons.add(td);
+								adds.push([[i,bool],(i>0?get.translation('equip'+i)+'栏':'判定区')]);
 							}
-							dialog.content.appendChild(table);
+							dialog.add([adds,'tdnodes'])
 						}
 						if(list1.length){
 							dialog.addText('未废除');
@@ -6061,38 +6049,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.cardname=player.storage.dunshi_damage;
 							player.removeSkill('dunshi_damage');
 							event.target=trigger.source;
-							event.videoId=lib.status.videoId++;
-							var func=function(card,id,card2,card3){
-								var list=[
-									'防止即将对'+card3+'造成的伤害，并令'+card+'获得一个技能名中包含“仁/义/礼/智/信”的技能',
-									'从〖遁世〗中删除【'+card2+'】并获得一枚“席”',
-									'减1点体力上限，然后摸等同于“席”数的牌',
-								];
-								var choiceList=ui.create.dialog('遁世：请选择两项');
-								choiceList.videoId=id;
-								for(var i=0;i<list.length;i++){
-									var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
-									str+=list[i];
-									str+='</div>';
-									var next=choiceList.add(str);
-									next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-									next.firstChild.link=i;
-									for(var j in lib.element.button){
-										next[j]=lib.element.button[j];
-									}
-									choiceList.buttons.add(next.firstChild);
-								}
-								return choiceList;
-							};
-							if(player.isOnline2()){
-								player.send(func,get.translation(trigger.source),event.videoId,get.translation(event.cardname),get.translation(trigger.player));
-							}
-							event.dialog=func(get.translation(trigger.source),event.videoId,get.translation(event.cardname),get.translation(trigger.player));
-							if(player!=game.me||_status.auto){
-								event.dialog.style.display='none';
-							}
-							var next=player.chooseButton();
-							next.set('dialog',event.videoId);
+							var card=get.translation(trigger.source),card2=get.translation(event.cardname),card3=get.translation(trigger.player);
+							var list=[
+								'防止即将对'+card3+'造成的伤害，并令'+card+'获得一个技能名中包含“仁/义/礼/智/信”的技能',
+								'从〖遁世〗中删除【'+card2+'】并获得一枚“席”',
+								'减1点体力上限，然后摸等同于“席”数的牌',
+							];
+							var next=player.chooseButton([
+								'遁世：请选择两项',
+								[list.map((item,i)=>{
+									return [i,item];
+								}),'textbutton']
+							]);
 							next.set('forced',true);
 							next.set('selectButton',2);
 							next.set('ai',function(button){
@@ -6113,10 +6081,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							});
 							'step 1'
-							if(player.isOnline2()){
-								player.send('closeDialog',event.videoId);
-							}
-							event.dialog.close();
 							event.links=result.links.sort();
 							for(var i of event.links){
 								game.log(player,'选择了','#g【遁世】','的','#y选项'+get.cnNumber(i+1,true));
@@ -10076,7 +10040,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					str+=strx;
 					if(i!='jiu') str+='/';
 				}
-				str+='，然后当前回合角色于本回合内下一次造成伤害时，你选择两项：⒈防止此伤害。系统从技能名中包含“仁/义/礼/智/信”字样的技能中随机选择三个其未拥有的技能，然后你令当前回合角色获得其中一个技能。⒉从〖遁世〗中删除你本次使用或打出的牌并获得一个“赂”。⒊减1点体力上限并摸X张牌（X为你的“赂”数）。';
+				str+='，然后当前回合角色于本回合内下一次造成伤害时，你选择两项：⒈防止此伤害。系统从技能名中包含“仁/义/礼/智/信”字样的技能中随机选择三个其未拥有的技能，然后你令当前回合角色获得其中一个技能。⒉从〖遁世〗中删除你本次使用或打出的牌并获得一个“席”。⒊减1点体力上限并摸X张牌（X为你的“席”数）。';
 				return str;
 			},
 			dcporui:function(player){

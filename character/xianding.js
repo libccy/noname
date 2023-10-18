@@ -9218,39 +9218,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.index==1) player.loseMaxHp();
 					else player.loseHp();
 					'step 2'
-					event.videoId=lib.status.videoId++;
-					var func=function(player,id){
-						var list=[
-							'选项一：摸两张牌',
-							'选项二：对一名其他角色造成1点伤害，且本回合对其使用【杀】无距离和次数限制',
-							'选项三：本回合手牌上限视为无限',
-							'选项四：获得一名其他角色区域内的一张牌',
-							'选项五：令一名其他角色将手牌数摸至体力上限（至多摸至五张）',
-						];
-						var choiceList=ui.create.dialog('玉陨：请选择一'+(player.getDamagedHp()>0?('至'+get.cnNumber(player.getDamagedHp()+1)):'')+'项');
-						choiceList.videoId=id;
-						for(var i=0;i<list.length;i++){
-							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
-							str+=list[i];
-							str+='</div>';
-							var next=choiceList.add(str);
-							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-							next.firstChild.link=i;
-							for(var j in lib.element.button){
-								next[j]=lib.element.button[j];
-							}
-							choiceList.buttons.add(next.firstChild);
-						}
-						return choiceList;
-					};
-					if(player.isOnline2()){
-						player.send(func,player,event.videoId);
-					}
-					event.dialog=func(player,event.videoId);
-					if(player!=game.me||_status.auto){
-						event.dialog.style.display='none';
-					}
-					var next=player.chooseButton();
+					var list=[
+						'选项一：摸两张牌',
+						'选项二：对一名其他角色造成1点伤害，且本回合对其使用【杀】无距离和次数限制',
+						'选项三：本回合手牌上限视为无限',
+						'选项四：获得一名其他角色区域内的一张牌',
+						'选项五：令一名其他角色将手牌数摸至体力上限（至多摸至五张）',
+					];
+					var next=player.chooseButton([
+						'玉陨：请选择一'+(player.getDamagedHp()>0?('至'+get.cnNumber(player.getDamagedHp()+1)):'')+'项',
+						[list.map((item,i)=>{
+							return [i,item];
+						}),'textbutton']
+					]);
 					next.set('dialog',event.videoId);
 					next.set('forced',true);
 					next.set('ai',function(button){
@@ -9293,10 +9273,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					if(player.getDamagedHp()>0) next.set('selectButton',[1,1+player.getDamagedHp()]);
 					'step 3'
-					if(player.isOnline2()){
-						player.send('closeDialog',event.videoId);
-					}
-					event.dialog.close();
 					result.links.sort();
 					for(var i of result.links) game.log(player,'选择了','#g【玉陨】','的','#y选项'+get.cnNumber(1+i,true))
 					event.links=result.links;
@@ -10246,26 +10222,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'选择手牌数大于你的一名角色',
 							'选择装备数大于你的一名角色',
 						];
-						var choiceList=ui.create.dialog('尊位：清选择一项','forcebutton','hidden');
-						for(var i=0;i<list.length;i++){
-							if(player.storage.zunwei&&player.storage.zunwei.contains(i)) continue;
-							var bool=game.hasPlayer(function(current){
-								return current!=player&&lib.skill.zunwei.backups[i].filterTarget(null,player,current);
-							});
-							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
-							if(!bool) str+='<div style="opacity:0.5">';
-							str+=list[i];
-							if(!bool) str+='</div>';
-							str+='</div>';
-							var next=choiceList.add(str);
-							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-							next.firstChild.link=i;
-							next.firstChild._filterButton=bool;
-							for(var j in lib.element.button){
-								next[j]=lib.element.button[j];
-							}
-							choiceList.buttons.add(next.firstChild);
-						}
+						var choiceList=ui.create.dialog('尊位：请选择一项','forcebutton','hidden');
+						choiceList.add([list.map((item,i)=>{
+							return [i,item];
+						}),'textbutton'])
 						return choiceList;
 					},
 					filter:function(button){

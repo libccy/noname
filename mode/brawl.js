@@ -3786,21 +3786,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
    					ui.arena.classList.add('choose-character');
    					var list=game.liangjunduilei;
    					var id=lib.status.videoId++;
-  						var choiceList=ui.create.dialog('请选择要游玩的剧情','forcebutton');
-  						choiceList.videoId=id;
-  						for(var i=0;i<list.length;i++){
-  							var str='<div class="popup text center" style="width:calc(100% - 10px);display:inline-block">';
-  							str+=list[i].name;
-  							str+='</div>';
-  							var next=choiceList.add(str);
-  							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-  							next.firstChild.link=i;
-  							for(var j in lib.element.button){
-  								next[j]=lib.element.button[i];
-  							}
-  							choiceList.buttons.add(next.firstChild);
-  						}
-  						game.me.chooseButton(true).set('dialog',id).set('onfree',true);
+					var choiceList=ui.create.dialog('请选择要游玩的剧情','forcebutton');
+					choiceList.videoId=id;
+					choiceList.add([list.map((item,i)=>{
+						return [i,`<div class="popup text center" style="width:calc(100% - 10px);display:inline-block">${item.name}</div>`];
+					}),'textbutton'])
+					game.me.chooseButton(true).set('dialog',id).set('onfree',true);
    					'step 1'
    					var pack=game.liangjunduilei[result.links[0]];
    					game.versusVideoName=pack.name;

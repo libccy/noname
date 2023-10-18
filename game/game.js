@@ -8991,7 +8991,7 @@
 					}
 				}
 
-				if(lib.assetURL.includes('com.widget.noname.qingyao')){
+				if(lib.assetURL.includes('com.widget.noname.qingyao')||lib.assetURL.includes('online.nonamekill.android')){
 					alert('您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。');
 				}
 
@@ -60048,7 +60048,8 @@
 					}
 					tr.appendChild(td);
 					td=document.createElement('td');
-					td.innerHTML=`${node.countCards('h')}/${node.getHandcardLimit()}`;
+					let handcardLimit=node.getHandcardLimit();
+					td.innerHTML=`${node.countCards('h')}/${handcardLimit>=114514?'∞':handcardLimit}`;
 					tr.appendChild(td);
 					td=document.createElement('td');
 					td.innerHTML=node.phaseNumber;

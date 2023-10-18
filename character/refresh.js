@@ -5523,19 +5523,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						table.style.width='100%';
 						table.style.position='relative';
 						var list=['摸牌','造成伤害'];
-						for(var i=0;i<list.length;i++){
-							if(player.hasSkill('xinpaiyi_'+i)) continue;
-							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
-							td.innerHTML='<span>'+(list[i])+'</span>';
-							td.link=i;
-							td.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-							for(var j in lib.element.button){
-								td[j]=lib.element.button[j];
-							}
-							table.appendChild(td);
-							dialog.buttons.add(td);
-						}
-						dialog.content.appendChild(table);
+						dialog.add([list.map((item,i)=>{
+							return [i,item];
+						}),'tdnodes']);
 						dialog.add(player.getExpansions('xinquanji'));
 						return dialog;
 					},
