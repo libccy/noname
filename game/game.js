@@ -30415,7 +30415,7 @@
 						 */
 						this.nature=suitOrCard[3];
 					}
-					else if(suitOrCard instanceof lib.element.Card){
+					else if(get.itemtype(suitOrCard)=='card'){
 						this.name=get.name(suitOrCard);
 						this.suit=get.suit(suitOrCard);
 						this.color=get.color(suitOrCard);
@@ -58780,12 +58780,12 @@
 			}
 			return func;
 		},
-		eventInfoOL:(item,level,noMore)=>item instanceof lib.element.Event?`_noname_event:${JSON.stringify(Object.entries(item).reduce((stringifying,entry)=>{
+		eventInfoOL:(item,level,noMore)=>get.itemtype(item)=='event'?`_noname_event:${JSON.stringify(Object.entries(item).reduce((stringifying,entry)=>{
 			const key=entry[0];
 			if(key=='_trigger'){
 				if(noMore!==false) stringifying[key]=get.eventInfoOL(entry[1],null,false);
 			}
-			else if(!lib.element.Event.prototype[key]&&key!='content'&&!(entry[1] instanceof lib.element.Event)) stringifying[key]=get.stringifiedResult(entry[1],null,false);
+			else if(!lib.element.Event.prototype[key]&&key!='content'&&get.itemtype(entry[1])!='event') stringifying[key]=get.stringifiedResult(entry[1],null,false);
 			return stringifying;
 		},{}))}`:'',
 		/**
@@ -59018,11 +59018,15 @@
 					if(isPosition) return 'divposition';
 				}
 			}
-			if(obj instanceof lib.element.Button) return 'button';
-			if(obj instanceof lib.element.Card) return 'card';
-			if(obj instanceof lib.element.Player) return 'player';
-			if(obj instanceof lib.element.Dialog) return 'dialog';
-			if(obj instanceof lib.element.Event) return 'event';
+			if(get.objtype(obj)=='div'){
+				if(obj.classList.contains('button')) return 'button';
+				if(obj.classList.contains('card')) return 'card';
+				if(obj.classList.contains('player')) return 'player';
+				if(obj.classList.contains('dialog')) return 'dialog';
+			}
+			if(get.is.object(obj)){
+				if(obj.isMine==lib.element.Event.prototype.isMine) return 'event';
+			}
 		},
 		equipNum:card=>{
 			if(get.type(card)=='equip'){
@@ -59164,7 +59168,7 @@
 			if(typeof card=='string') return card.split(lib.natureSeparator).sort(lib.sort.nature).join(lib.natureSeparator);
 			if(Array.isArray(card)) return card.sort(lib.sort.nature).join(lib.natureSeparator);
 			var nature=card.nature;
-			if(player instanceof lib.element.Player||player!==false){
+			if(get.itemtype(player)=='player'||player!==false){
 				var owner=get.owner(card);
 				if(owner){
 					return game.checkMod(card,owner,nature,'cardnature',owner);
