@@ -24958,6 +24958,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qianzhao:['ol_qianzhao','qianzhao'],
 			ol_pengyang:['ol_pengyang','sp_pengyang'],
 			ol_luyusheng:['ol_luyusheng','luyusheng'],
+			fanjiangzhangda:['fanjiangzhangda','jsrg_fanjiangzhangda'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",

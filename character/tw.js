@@ -14034,6 +14034,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterReplace:{
 			tw_caocao:['tw_caocao','jsrg_caocao','yj_caocao'],
 			mateng:['tw_mateng','mateng'],
+			xiahouen:['tw_xiahouen','jsrg_xiahouen'],
 		},
 		dynamicTranslate:{
 			twfeifu:function(player){

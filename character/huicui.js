@@ -10099,6 +10099,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiaorui:['qiaorui','tw_qiaorui'],
 			mamidi:['mamidi','xin_mamidi'],
 			mengyou:['mengyou','ns_mengyou'],
+			zhangchu:['zhangchu','jsrg_zhangchu'],
 		},
 		translate:{
 			re_panfeng:'潘凤',
