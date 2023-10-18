@@ -11297,10 +11297,11 @@
 					case "object":
 						if(Array.isArray(item)){
 							let lastEvent=null;
-							return (event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai)=>{
+							return function*(event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai){
 								if(step>=item.length) return event.finish();
 								var current=item[step];
-								lastEvent=current(event,{
+								if(typeof current!="function") throw new Error(`content ${step} of ${event.name} is not vaild: ${current}`);
+								var currentResult=current(event,{
 									event:event,
 									step:step,
 									source:source,
@@ -11315,11 +11316,14 @@
 									trigger:trigger,
 									result:result
 								},(lastEvent&&("result" in lastEvent))?lastEvent.result:null);
+								// TODO: use `event.debugger` to replace source
+								if(gnc.is.generator(currentResult)) lastEvent=yield* currentResult;
+								else lastEvent=currentResult;
 							}
 						}
 						else{
 							if(Symbol.iterator in item) return lib.init.parsex(Array.from(item));
-							if("toString" in item) return lib.init.parsex(item.toString());
+							if(item.toString !== Object.prototype.toString) return lib.init.parsex(item.toString());
 							if("render" in item) {
 								// TODO: Object Render Parse
 								throw new Error("NYI: Object Render Parse");
@@ -11330,7 +11334,8 @@
 					case "function":
 						if (gnc.is.generatorFunc(item)) {
 							let gen,lastEvent;
-							return (event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai)=>{
+							return function*(event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai){
+								event.step=NaN;
 								if(!gen)gen=item(event,{
 									event:event,
 									step:step,
@@ -11348,7 +11353,12 @@
 								});
 								var res=gen.next((lastEvent&&("result" in lastEvent))?lastEvent.result:null);
 								if(res.done) event.finish();
-								else lastEvent=res.value;
+								else {
+									var currentResult=res.value;
+									// TODO: use `event.debugger` to replace source
+									if(typeof currentResult=="function") yield currentResult;
+									else lastEvent=currentResult;
+								}
 							}
 						}
 					default:
