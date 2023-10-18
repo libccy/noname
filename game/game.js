@@ -34812,6 +34812,14 @@
 				color:'#c3f9ff',
 				nature:'thundermm',
 			}],
+			['转',{
+				color:'#c3f9ff',
+				nature:'thundermm',
+			}],
+			['梦',{
+				color:'#6affe2',
+				nature:'watermm',
+			}],
 			['用间',{
 				color:'#c3f9ff',
 				nature:'thundermm',
