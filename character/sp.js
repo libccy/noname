@@ -24768,6 +24768,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		dynamicTranslate:{
+			shanduan:function(player){
+				if(player.storage.shanduan) return '锁定技。①摸牌/出牌/弃牌阶段开始时，你为本回合摸牌阶段摸牌数/攻击范围和使用【杀】的限制次数/手牌上限的默认值从数组R=['+get.translation(player.storage.shanduan)+']中分配数值。②当你于回合外受到伤害后，你令下回合〖善断①〗以此法分配的数值集合R中的最小值+1。';
+				return '锁定技。①摸牌/出牌/弃牌阶段开始时，你为本回合摸牌阶段摸牌数/攻击范围和使用【杀】的限制次数/手牌上限的默认值从数组R=[1，2，3，4]中分配数值。②当你于回合外受到伤害后，你令下回合〖善断①〗以此法分配的数值集合R中的最小值+1。';
+			},
 			kunfen:function(player){
 				if(player.storage.kunfen) return '结束阶段开始时，你可以失去1点体力，然后摸两张牌。';
 				return '锁定技，结束阶段开始时，你失去1点体力，然后摸两张牌。';
