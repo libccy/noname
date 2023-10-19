@@ -5589,6 +5589,9 @@
 						frequent:true,
 						restart:true,
 					},
+					get connect_separatism(){
+						return lib.mode.guozhan.config.separatism;
+					},
 					connect_initshow_draw:{
 						name:'首亮奖励',
 						item:{
@@ -5678,6 +5681,13 @@
 						},
 						frequent:true,
 						restart:true,
+					},
+					separatism:{
+						name:'群雄割据',
+						init:false,
+						frequent:true,
+						restart:true,
+						intro:'开放不同势力组合，以优先亮出的武将牌作为自己的势力，双势力武将则使用列表的第一个势力'
 					},
 					initshow_draw:{
 						name:'首亮奖励',
@@ -7258,11 +7268,6 @@
 						init:true,
 						frequent:true
 					},
-					qunxionggeju:{
-						name:'群雄割据',
-						init:true,
-						frequent:true
-					},
 					duzhansanguo:{
 						name:'毒战三国',
 						init:true,
@@ -7577,8 +7582,6 @@
 				}else if(newMessage.includes("has already been declared")){
 					messageName=newMessage.replace('SyntaxError: Identifier ', '').replace(' has already been declared', '');
 					newMessage=messageName +"变量已经被声明过，不能被重新声明";
-				}else if(newMessage.includes("Invalid or unexpected token")){
-					newMessage="查询无效或意外的标记，可能是字符串的引号不成对，错误使用了转义序列，字符串在多行中解析异常";
 				}else if(newMessage.includes("Duplicate parameter name not allowed in this context")) {
 					newMessage="参数名不允许重复";
 				}else if(newMessage.includes("Unexpected reserved word")||newMessage.includes(
@@ -11112,10 +11115,10 @@
 				}
 			},
 			layout:function(layout,nosave){
-				const previousTransitionDuration=document.body.style.transitionDuration;
-				document.body.style.transitionDuration='1s';
-				const previousFilter=document.body.style.filter,previousWebkitFilter=document.body.style.webkitFilter;
-				document.body.style.filter=document.body.style.webkitFilter='brightness(0)';
+				const previousTransitionDuration=document.documentElement.style.transitionDuration;
+				document.documentElement.style.transitionDuration='1s';
+				const previousFilter=document.documentElement.style.filter,previousWebkitFilter=document.documentElement.style.webkitFilter;
+				document.documentElement.style.filter=document.documentElement.style.webkitFilter='brightness(0)';
 				if(layout=='default') layout='mobile';
 				if(!nosave) game.saveConfig('layout',layout);
 				game.layout=layout;
@@ -11226,14 +11229,14 @@
 					return new Promise(resolve=>setTimeout(resolve,500));
 				}).then(()=>{
 					ui.updatec();
-					if(previousFilter) document.body.style.filter=previousFilter;
-					else document.body.style.removeProperty('filter');
-					if(previousWebkitFilter) document.body.style.webkitFilter=previousWebkitFilter;
-					else document.body.style.removeProperty('-webkit-filter');
+					if(previousFilter) document.documentElement.style.filter=previousFilter;
+					else document.documentElement.style.removeProperty('filter');
+					if(previousWebkitFilter) document.documentElement.style.webkitFilter=previousWebkitFilter;
+					else document.documentElement.style.removeProperty('-webkit-filter');
 					return new Promise(resolve=>setTimeout(resolve,1000));
 				}).then(()=>{
-					if(previousTransitionDuration) document.body.style.transitionDuration=previousTransitionDuration;
-					else document.body.style.removeProperty('transition-duration');
+					if(previousTransitionDuration) document.documentElement.style.transitionDuration=previousTransitionDuration;
+					else document.documentElement.style.removeProperty('transition-duration');
 				});
 			},
 			background:function(){
@@ -42906,13 +42909,13 @@
 			player2.previousSeat=player.previousSeat;
 			player2.nextSeat.previousSeat=player2;
 			player2.previousSeat.nextSeat=player2;
-			const player3=player2.nextSeat;
+			let player3=player2.nextSeat;
 			while(player3.isDead()){
 				player3=player3.nextSeat;
 			}
 			player3.previous=player2;
 			player2.next=player3;
-			const player4=player2.previousSeat;
+			let player4=player2.previousSeat;
 			while(player4.isDead()){
 				player4=player4.previousSeat;
 			}
@@ -52936,22 +52939,22 @@
 				//单个人物的宽度。这里要设置玩家的实际的宽度
 				const temporaryPlayer=ui.create.div('.player',ui.arena).hide();
 				const computedStyle=getComputedStyle(temporaryPlayer);
-				const scale=8/numberOfPlayers;
+				const scale=6/numberOfPlayers;
 				//玩家顶部距离父容器上边缘的距离偏移的单位距离
-				const oneThirdHeight=parseFloat(computedStyle.height)/3*scale;
+				const quarterHeight=parseFloat(computedStyle.height)/4*scale;
 				const halfWidth=parseFloat(computedStyle.width)/2;
 				temporaryPlayer.remove();
 				//列数，即假如8人场，除去自己后，上面7个人占7列
 				const columnCount=numberOfPlayers-1;
-				const percentage=100/numberOfPlayers;
+				const percentage=90/(columnCount-1);
 				//仅当游戏人数大于8人，且玩家的座位号大于0时，设置玩家的位置。因为0号位是game.me在最下方，无需设置。
 				for(let ordinal=1;ordinal<numberOfPlayers;ordinal++){
 					const reversedOrdinal=columnCount-ordinal;
 					//动态计算玩家的top属性，实现拱桥的效果。只让两边的各两个人向下偏移一些
-					const top=Math.max(0,Math.round(numberOfPlayers/5)-Math.min(Math.abs(ordinal-1),Math.abs(reversedOrdinal)))*oneThirdHeight;
+					const top=Math.max(0,Math.round(numberOfPlayers/5)-Math.min(Math.abs(ordinal-1),Math.abs(reversedOrdinal)))*quarterHeight;
 					playerPositions.push(lib.init.sheet([
 						`#arena[data-number='${numberOfPlayers}']>.player[data-position='${ordinal}']{`,
-						`left:calc(${percentage*(reversedOrdinal+1)}% - ${halfWidth}px);`,
+						`left:calc(${percentage*reversedOrdinal+5}% - ${halfWidth}px);`,
 						`top:${top}px;`,
 						`transform:scale(${scale});`,
 						'}'
@@ -58716,8 +58719,9 @@
 					default:return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'身份';
 				}
 			}
-			else if(config.mode=='guozhan'&&config.guozhan_mode!='normal'){
-				switch(config.guozhan_mode){
+			else if(config.mode=='guozhan'){
+				if(config.separatism) return '群雄割据';
+				if(config.guozhan_mode!='normal') switch(config.guozhan_mode){
 					case 'yingbian':return '应变国战';
 					case 'old':return '怀旧国战';
 				}

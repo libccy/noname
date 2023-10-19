@@ -3802,9 +3802,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(player.identity=='zhu'){
 						if(event.player==player){
 							if(event.name=='dying') return true;
-							return game.roundNumber>=Math.max(Math.round(get.totalPopulation()/2),3);
+							return game.roundNumber>=Math.max(Math.round(get.population()/2),3);
 						}
-						if(event.name=='die') return game.dead.length>=Math.max(Math.round(get.totalPopulation()/3),2);
+						if(event.name=='die') return game.dead.length>=Math.max(Math.round(get.population()/3),2);
 					}
 					return false;
 				},
