@@ -35256,18 +35256,11 @@
 			 * Type used to declare the place to store css info.
 			 * 用来存CSS信息的空间的类型
 			 * 
-			 * @typedef {Object} DynamicStyleCache
+			 * @typedef {object} DynamicStyleCache
 			 * @property {Rule[]} rules 记录的规则
 			 * @property {HTMLStyleElement} style 全局Style标签
 			 * @property {CSSStyleSheet} sheet Style标签的Sheet
 			 */
-			/**
-			 * Place to store css info.
-			 * 存CSS信息的空间
-			 * 
-			 * @type {DynamicStyleCache}
-			 */
-			_cache;
 
 			/**
 			 * Initialize dynamicStyle.
@@ -35283,6 +35276,12 @@
 				cache.style.id="game.dynamicStyle";
 				document.head.appendChild(cache.style);
 				cache.sheet=cache.style.sheet;
+				/**
+				 * Place to store css info.
+				 * 存CSS信息的空间
+				 * 
+				 * @type {DynamicStyleCache}
+				 */
 				this._cache=cache;
 			}
 
