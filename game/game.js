@@ -35472,7 +35472,7 @@
 		},
 		hasAllGlobalHistory:function(key,filter,last){
 			if(!key||!filter) return;
-			const stopped=false;
+			let stopped=false;
 			_status.globalHistory.forEach(value=>{
 				if(value[key]){
 					if(last&&value[key].includes(last)&&!stopped){
@@ -35491,7 +35491,7 @@
 		},
 		checkAllGlobalHistory:function(key,filter,last){
 			if(!key||!filter) return;
-			const stopped=false;
+			let stopped=false;
 			_status.globalHistory.forEach(value=>{
 				if(value[key]){
 					if(last&&value[key].includes(last)&&!stopped){
