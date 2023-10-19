@@ -234,8 +234,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.players[i].ai.shown=0;
 				}
 			}
-			var isMougong=_status.mode=='mougong';
-			if(isMougong){
+			var stratagemMode=_status.mode=='stratagem';
+			if(stratagemMode){
 				var beginner;
 				if(_status.cheat_seat){
 					var seat=_status.cheat_seat.link;
@@ -248,47 +248,30 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				event.beginner=beginner;
 
-				_status.mougong_buff={
-					sha:[1,'require'],
-					shan:[1,'double'],
-					juedou:[2,'damage'],
-					huogong:[2,'damage'],
-					tao:[3,'double'],
+				var stratagemBroadcast=()=>{
+					_status.stratagemFuryMax=3;
+					ui.css.stratagemCardStyle=lib.init.sheet([
+						'.card.stratagem-fury-glow:before{',
+						'opacity:0.2;',
+						'box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;',
+						'background-color:yellow;',
+						'-webkit-filter:blur(5px);',
+						'filter:blur(5px);',
+						'}'
+					].join(''));
 				};
-				game.broadcastAll(function(){
-					_status.mougong_nuqi_max=3;
-					var mougong_cardStyle=document.createElement('style');
-					document.head.appendChild(mougong_cardStyle);
-					mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:0.2;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
-					ui.css.mougong_cardStyle=mougong_cardStyle;
-				});
-				if(_status.connectMode){
-					_status.round1_use_nuqi=lib.configOL.round1_use_nuqi;
-					if(!_status.postReconnect.mougong_reinit){
-						_status.postReconnect.mougong_reinit=[
-							function(){
-								_status.mougong_nuqi_max=3;
-								var mougong_cardStyle=document.createElement('style');
-								document.head.appendChild(mougong_cardStyle);
-								mougong_cardStyle.innerHTML='.card.mougong_nuqi_glow:before{opacity:0.2;box-shadow:rgba(0,0,0,0.2) 0 0 0 1px,rgb(255,109,12) 0 0 5px,rgb(255,0,0) 0 0 10px;background-color:yellow;-webkit-filter:blur(5px);filter:blur(5px);}';
-								ui.css.mougong_cardStyle=mougong_cardStyle;
-							},{}
-						];
-					}
-				}
-				else{
-					_status.round1_use_nuqi=get.config('round1_use_nuqi');
-				}
+				game.broadcastAll(stratagemBroadcast);
+				if(_status.connectMode&&!_status.postReconnect.stratagemReinit) _status.postReconnect.stratagemReinit=[stratagemBroadcast,{}];
 				for(var current of game.players){
-					if(current.identity=='zhu') current.addSkill('mougong_showZhu');
-					if(current.identity=='fan') current.addSkill('mougong_showFan');
+					if(current.identity=='zhu') current.addSkill('stratagem_show_zhu');
+					if(current.identity=='fan') current.addSkill('stratagem_show_fan');
 				}
 			}
 			if(game.zhu==game.me&&game.zhu.identity!='zhu'&&_status.brawl&&_status.brawl.identityShown){
 				delete game.zhu;
 			}
 			else{
-				if(!isMougong) game.zhu.ai.shown=1;
+				if(!stratagemMode) game.zhu.ai.shown=1;
 				if(game.zhu2){
 					game.zhong=game.zhu;
 					game.zhu=game.zhu2;
@@ -302,10 +285,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				var enhance_zhu=false;
 				if(_status.connectMode){
-					enhance_zhu=(!['zhong','mougong','purple'].includes(_status.mode)&&lib.configOL.enhance_zhu&&get.population('fan')>=3);
+					enhance_zhu=(!['zhong','stratagem','purple'].includes(_status.mode)&&lib.configOL.enhance_zhu&&get.population('fan')>=3);
 				}
 				else{
-					enhance_zhu=(!['zhong','mougong','purple'].includes(_status.mode)&&get.config('enhance_zhu')&&get.population('fan')>=3);
+					enhance_zhu=(!['zhong','stratagem','purple'].includes(_status.mode)&&get.config('enhance_zhu')&&get.population('fan')>=3);
 				}
 				if(enhance_zhu){
 					var skill;
@@ -341,18 +324,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					name2:players[i].name2,
 					identity:players[i].identity
 				};
-				if(isMougong){
+				if(stratagemMode){
 					ifo.translate=lib.translate[game.players[i].name];
-					ifo.isCamouflaged=players[i].ai.mougong_camouflage;
+					ifo.isCamouflaged=players[i].ai.stratagemCamouflage;
 				}
 				info.push(ifo);
 			}
 			_status.videoInited=true;
 			game.addVideo('init',null,info);
-			if(isMougong){
+			if(stratagemMode){
 				game.addVideo('arrangeLib',null,{
 					skill:{
-						mougong_nuqi:{
+						stratagem_fury:{
 							mark:true,
 							marktext:'🔥',
 							intro:{
@@ -363,13 +346,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				});
 				for(var i=0;i<game.players.length;i++){
-					//game.addVideo('markSkill',game.players[i],['mougong_nuqi']);
+					//game.addVideo('markSkill',game.players[i],['stratagem_fury']);
 					game.players[i].ai.shown=0;
 				}
 				game.neiDoCamouflage();
 			}
 			"step 6"
-			if(_status.mode!='mougong') event.beginner=_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me;
+			if(_status.mode!='stratagem') event.beginner=_status.firstAct2||game.zhong||game.zhu||_status.firstAct||game.me;
 			game.gameDraw(event.beginner,function(player){
 				if(_status.mode=='purple'&&player.seatNum>5) return 5;
 				return 4;
@@ -434,8 +417,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				uiintro.add('<div class="text chat">游戏模式：'+(lib.configOL.identity_mode=='zhong'?'明忠':'标准'));
 				uiintro.add('<div class="text chat">双将模式：'+(lib.configOL.double_character?'开启':'关闭'));
 				if(lib.configOL.identity_mode!='zhong'){
-					if(lib.configOL.identity_mode=='mougong'){
-						uiintro.add('<div class="text chat">首轮强化：'+(lib.configOL.round1_use_nuqi?'开启':'关闭'));
+					if(lib.configOL.identity_mode=='stratagem'){
+						uiintro.add('<div class="text chat">首轮强化：'+(lib.configOL.round_one_use_fury?'开启':'关闭'));
 					}
 					else{
 						uiintro.add('<div class="text chat">双内奸：'+(lib.configOL.double_nei?'开启':'关闭'));
@@ -494,7 +477,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
-				else if(_status.mode=='mougong'){
+				else if(_status.mode=='stratagem'){
 					if(game.zhu&&game.zhu.isZhu&&game.zhu.identityShown||game.me.identity=='zhu'){
 						return {
 							fan:'反',
@@ -553,7 +536,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					switch(_status.mode){
 						case 'purple':str2='3v3v2 - '+(game.me.identity.indexOf('r')==0?'暖色':'冷色')+lib.translate[game.me.identity+'2'];break;
 						case 'zhong':str2='忠胆英杰 - '+lib.translate[game.me.identity+'2'];break;
-						case 'mougong':str2=get.cnNumber(get.playerNumber())+'人谋攻'+'-'+lib.translate[game.me.identity+'2'];
+						case 'stratagem':str2=get.cnNumber(get.playerNumber())+'人谋攻'+'-'+lib.translate[game.me.identity+'2'];
 						default:str2=get.cnNumber(get.playerNumber())+'人'+
 						get.translation(lib.config.mode)+' - '+lib.translate[game.me.identity+'2']
 					}
@@ -1066,14 +1049,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},500);
 				});
 			},
-			chooseCharacterMougongOL:function(){
+			chooseCharacterStratagemOL:function(){
 				var next=game.createEvent('chooseCharacter');
 				next.setContent(function(){
 					'step 0'
 					ui.arena.classList.add('choose-character');
 					var i;
-					var identityList;
-					identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
+					var identityList=get.identityList(game.players.length);
 					if(lib.configOL.double_nei){
 						switch(lib.configOL.number){
 							case 8:
@@ -1286,14 +1268,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						_status.characterlist.remove(game.players[i].name2);
 					}
 					
-					var list=['mougong_nuqi','mougong_nuqi_dongcha','mougong_expose','mougong_addBuff','mougong_addBuff_sha','mougong_addBuff_shan','mougong_addBuff_tao','mougong_addBuff_damage','mougong_shanAi','mougong_cardEffect'];
+					var list=['stratagem_fury','stratagem_fury_insight','stratagem_expose','stratagem_shan_ai','stratagem_card_effect'];
 					for(var i=0;i<list.length;i++){
 						game.addGlobalSkill(list[i]);
 					}
 					game.players.forEach(current=>{
 						current.storage.zhibi=[];
 						current.storage.zhibi_for=[];
-						current.markSkill('mougong_nuqi');
+						current.markSkill('stratagem_fury');
 					});
 					
 					setTimeout(function(){
@@ -1309,8 +1291,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.addPlayer=function(player){
-					var list=lib.config.mode_config.identity.identity[game.players.length-3].slice(0);
-					var list2=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
+					var list=get.identityList(game.players.length-1);
+					var list2=get.identityList(game.players.length);
 					for(var i=0;i<list.length;i++) list2.remove(list[i]);
 					player.identity=list2[0];
 					player.setIdentity('cai');
@@ -1324,7 +1306,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return;
 						}
 					}
-					var isMougong=_status.event.mougongmode;
+					var stratagemMode=_status.event.stratagemMode;
 					if(_status.event.zhongmode){
 						var listc=list.slice(0,2);
 						for(var i=0;i<listc.length;i++){
@@ -1343,7 +1325,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.update();
 						}
 					}
-					else if(player.identity=='zhu'&&!isMougong){
+					else if(player.identity=='zhu'&&!stratagemMode){
 						list2.randomSort();
 						var choice,choice2;
 						if(!_status.event.zhongmode&&Math.random()-0.8<0&&list2.length){
@@ -1371,7 +1353,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.update();
 						}
 					}
-					else if(player.identity=='zhong'&&(Math.random()<0.5||['sunliang','key_akane'].contains(game.zhu.name))&&!isMougong){
+					else if(player.identity=='zhong'&&(Math.random()<0.5||['sunliang','key_akane'].contains(game.zhu.name))&&!stratagemMode){
 						var listc=list.slice(0);
 						for(var i=0;i<listc.length;i++){
 							var listx=lib.characterReplace[listc[i]];
@@ -1455,8 +1437,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						identityList=['zhu','zhong','mingzhong','nei','fan','fan','fan','fan'];
 					}
 					else{
-						if(_status.mode=='mougong') event.mougongmode=true;
-						identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
+						if(_status.mode=='stratagem') event.stratagemMode=true;
+						identityList=get.identityList(game.players.length);
 						if(get.config('double_nei')){
 							switch(get.playerNumber()){
 								case 8:
@@ -1486,7 +1468,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-					var isMougong=event.mougongmode;
+					var stratagemMode=event.stratagemMode;
 					
 					var addSetting=function(dialog){
 						dialog.add('选择身份').classList.add('add-setting');
@@ -1567,7 +1549,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									node.remove();
 									game.uncheck();
 									game.check();
-									if(event.mougongmode) return;
+									if(event.stratagemMode) return;
 									for(var i=0;i<seats.childElementCount;i++){
 										if(get.distance(game.zhu,game.me,'absolute')===seats.childNodes[i].link){
 											seats.childNodes[i].classList.add('bluebg');
@@ -1577,7 +1559,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								_status.event=_status.event.parent;
 								_status.event.step=0;
 								_status.event.identity=link;
-								if(!event.mougongmode){
+								if(!event.stratagemMode){
 									if(link!=(event.zhongmode?'mingzhong':'zhu')){
 										seats.previousSibling.style.display='';
 										seats.style.display='';
@@ -1598,12 +1580,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						seats.style.margin='0';
 						seats.style.width='100%';
 						seats.style.position='relative';
-						for(var i=isMougong?1:2;i<=game.players.length;i++){
+						for(var i=stratagemMode?1:2;i<=game.players.length;i++){
 							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 							td.innerHTML=get.cnNumber(i,true);
 							td.link=i-1;
 							seats.appendChild(td);
-							if(!isMougong&&get.distance(game.zhu,game.me,'absolute')===i-1){
+							if(!stratagemMode&&get.distance(game.zhu,game.me,'absolute')===i-1){
 								td.classList.add('bluebg');
 							}
 							td.addEventListener(lib.config.touchscreen?'touchend':'click',function(){
@@ -1617,7 +1599,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 									
 								}
-								if(isMougong){
+								if(stratagemMode){
 									this.classList.add('bluebg');
 									_status.cheat_seat=this;
 								}
@@ -1637,7 +1619,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							});
 						}
 						dialog.content.appendChild(seats);
-						if(!isMougong&&game.me==game.zhu){
+						if(!stratagemMode&&game.me==game.zhu){
 							seats.previousSibling.style.display='none';
 							seats.style.display='none';
 						}
@@ -1698,7 +1680,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(i=0;i<game.players.length;i++){
 						if(_status.brawl&&_status.brawl.identityShown){
 							if(game.players[i].identity=='zhu') game.zhu=game.players[i];
-							if(!isMougong) game.players[i].identityShown=true;
+							if(!stratagemMode) game.players[i].identityShown=true;
 						}
 						else{
 							game.players[i].node.identity.classList.add('guessing');
@@ -1721,7 +1703,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 
-					if(get.config('special_identity')&&!event.zhongmode&&!event.mougongmode&&game.players.length==8){
+					if(get.config('special_identity')&&!event.zhongmode&&!event.stratagemMode&&game.players.length==8){
 						for(var i=0;i<game.players.length;i++){
 							delete game.players[i].special_identity;
 						}
@@ -1756,7 +1738,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					if(!game.zhu) game.zhu=game.me;
 					else{
-						if(!isMougong){
+						if(!stratagemMode){
 							game.zhu.setIdentity();
 							game.zhu.identityShown=true;
 							game.zhu.node.identity.classList.remove('guessing');
@@ -1774,7 +1756,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(ix.length){
 							event.list.push(i);
 							list4.addArray(ix);
-							if(isMougong){
+							if(stratagemMode){
 								list3.push(i);
 							}
 							else{
@@ -1794,7 +1776,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(lib.filter.characterDisabled(i)) continue;
 						event.list.push(i);
 						list4.push(i);
-						if(!isMougong&&lib.character[i][4]&&lib.character[i][4].contains('zhu')){
+						if(!stratagemMode&&lib.character[i][4]&&lib.character[i][4].contains('zhu')){
 							list2.push(i);
 						}
 						else{
@@ -1802,7 +1784,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					};
 					var getZhuList=function(){
-						if(isMougong){
+						if(stratagemMode){
 							list2.sort(lib.sort.character);
 							return list2;
 						}
@@ -1842,7 +1824,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							num=8;
 						}
 					}
-					if(isMougong){
+					if(stratagemMode){
 						list=event.list.slice(0,num);
 					}
 					else if(game.zhu!=game.me){
@@ -2079,13 +2061,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					event.list.remove(get.sourceCharacter(game.me.name1));
 					event.list.remove(get.sourceCharacter(game.me.name2));
-					if(!event.mougongmode&&game.me==game.zhu&&game.players.length>4){
+					if(!event.stratagemMode&&game.me==game.zhu&&game.players.length>4){
 						game.me.hp++;
 						game.me.maxHp++;
 						game.me.update();
 					}
 					for(var i=0;i<game.players.length;i++){
-						if((event.mougongmode||game.players[i]!=game.zhu)&&game.players[i]!=game.me){
+						if((event.stratagemMode||game.players[i]!=game.zhu)&&game.players[i]!=game.me){
 							event.list.randomSort();
 							event.ai(game.players[i],event.list.splice(0,get.config('choice_'+game.players[i].identity)),null,event.list)
 						}
@@ -2102,15 +2084,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						_status.characterlist.remove(game.players[i].name2);
 					}
 					"step 4"
-					if(event.mougongmode){
-						var list=['mougong_nuqi','mougong_nuqi_dongcha','mougong_expose','mougong_addBuff','mougong_addBuff_sha','mougong_addBuff_shan','mougong_addBuff_tao','mougong_addBuff_damage','mougong_shanAi','mougong_cardEffect'];
+					if(event.stratagemMode){
+						var list=['stratagem_fury','stratagem_fury_insight','stratagem_expose','stratagem_shan_ai','stratagem_card_effect'];
 						for(var i=0;i<list.length;i++){
 							game.addGlobalSkill(list[i]);
 						}
 						game.players.forEach(i=>{
 							i.storage.zhibi=[];
 							i.storage.zhibi_for=[];
-							i.markSkill('mougong_nuqi');
+							i.markSkill('stratagem_fury');
 						});
 					}
 					setTimeout(function(){
@@ -2129,8 +2111,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.chooseCharacterPurpleOL();
 					return;
 				}
-				else if(_status.mode=='mougong'){
-					game.chooseCharacterMougongOL();
+				else if(_status.mode=='stratagem'){
+					game.chooseCharacterStratagemOL();
 					return;
 				}
 				var next=game.createEvent('chooseCharacter');
@@ -2144,7 +2126,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						identityList=['zhu','zhong','mingzhong','nei','fan','fan','fan','fan'];
 					}
 					else{
-						identityList=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
+						identityList=get.identityList(game.players.length);
 						if(lib.configOL.double_nei){
 							switch(lib.configOL.number){
 								case 8:
@@ -2611,33 +2593,31 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			sheshen:'舍身',
 			sheshen_info:'锁定技，主公处于濒死状态即将死亡时，令主公+1体力上限，回复体力至X点（X为你的体力值数），获得你的所有牌，然后你死亡。',
 			yexinbilu:'野心毕露',
-			mougong_nuqi:'怒气',
-			mougong_nuqi_dongcha:'洞察',
-			mougong_addBuff:'强化',
-			mougong_addBuff_info:'当你需要使用位于“强化表”内的非虚拟卡牌时，你可以消耗对应数量的怒气将其强化并使用。<br><br><span class="text" style="font-family:yuanli"><li>【杀】　：1点怒气。响应时所需【闪】数+1。<br><li>【闪】　：1点怒气。视为两张【闪】的效果。<br><li>【决斗】：2点怒气。对目标造成的伤害+1。<br><li>【火攻】：2点怒气。造成的伤害+1。<br><li>【桃】　：3点怒气。回复值+1。</span>',
-			mougong_nuqi_cost1:'1🔥',
-			mougong_nuqi_cost2:'2🔥',
-			mougong_nuqi_cost3:'3🔥',
+			stratagem_fury:'怒气',
+			stratagem_fury_insight:'洞察',
+			stratagem_fury_cost1:'1🔥',
+			stratagem_fury_cost2:'2🔥',
+			stratagem_fury_cost3:'3🔥',
 		},
 		element:{
 			player:{
-				dongcha:function(target){
-					var next=game.createEvent('mougongDongcha');
+				insightInto:function(target){
+					var next=game.createEvent('stratagemInsight');
 					next.player=this;
 					next.target=target;
-					next.setContent('mougongDongcha');
+					next.setContent('stratagemInsight');
 					return next;
 				},
-				changeNuqi:function(num){
+				changeFury:function(num){
 					var player=this;
-					if(!player.storage.mougong_nuqi) player.storage.mougong_nuqi=0;
-					var tmp=player.storage.mougong_nuqi;
-					player.storage.mougong_nuqi+=num;
-					player.storage.mougong_nuqi=Math.max(Math.min(player.storage.mougong_nuqi,_status.mougong_nuqi_max),0);
-					var del=player.storage.mougong_nuqi-tmp;
+					if(!player.storage.stratagem_fury) player.storage.stratagem_fury=0;
+					var tmp=player.storage.stratagem_fury;
+					player.storage.stratagem_fury+=num;
+					player.storage.stratagem_fury=Math.max(Math.min(player.storage.stratagem_fury,_status.stratagemFuryMax),0);
+					var del=player.storage.stratagem_fury-tmp;
 					if(del===0) return;
 					game.log(player,del>=0?'获得了':'失去了',get.cnNumber(Math.abs(del))+'点<span class="firetext">怒气</span>');
-					player.markSkill('mougong_nuqi');
+					player.markSkill('stratagem_fury');
 				},
 				addExpose:function(num){
 					if(!game.zhu||!game.zhu.isZhu||!game.zhu.identityShown) return;
@@ -2691,7 +2671,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				dieAfter2:function(source){
-					if(_status.mode=='mougong') return;
+					if(_status.mode=='stratagem') return;
 					if(_status.mode=='purple'){
 						if(source){
  						if(this.identity=='rZhu'||this.identity=='bZhu'){
@@ -2831,8 +2811,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				logAi:function(targets,card){
 					if(this.ai.shown==1||this.isMad()) return;
-					var isMougong=get.mode()=='identity'&&_status.mode=='mougong';
-					if(isMougong&&(!game.zhu||!game.zhu.isZhu||!game.zhu.identityShown)) return;
+					var stratagemMode=get.mode()=='identity'&&_status.mode=='stratagem';
+					if(stratagemMode&&(!game.zhu||!game.zhu.isZhu||!game.zhu.identityShown)) return;
 					if(typeof targets=='number'){
 						this.ai.shown+=targets;
 					}
@@ -2879,11 +2859,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else this.ai.shown-=0.1;
 						}
 					}
-					if(!isMougong&&this!=game.me) this.ai.shown*=2;
+					if(!stratagemMode&&this!=game.me) this.ai.shown*=2;
 					if(this.ai.shown>0.95) this.ai.shown=0.95;
 					if(this.ai.shown<-0.5) this.ai.shown=-0.5;
 					if(_status.mode=='purple') return;
-					if(isMougong) return;
+					if(stratagemMode) return;
 
 					var marknow=(!_status.connectMode&&this!=game.me&&get.config('auto_mark_identity')&&this.ai.identity_mark!='finished');
 					// if(true){
@@ -2984,17 +2964,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			content:{
-				mougongDongcha:function(event,map){
+				stratagemInsight:function(event,map){
 					'step 0'
 					// var player=map.player,target=map.target;
-					if(!player.storage.mougong_nuqi){event.finish();return;}
-					// yield player.changeNuqi(-1);
-					player.changeNuqi(-1);
+					if(!player.storage.stratagem_fury){event.finish();return;}
+					// yield player.changeFury(-1);
+					player.changeFury(-1);
 					'step 1'
 					if(!player.storage.zhibi) player.storage.zhibi=[];
 					if(!player.storage.zhibi.contains(target)) player.storage.zhibi.push(target);
-					var res=get.dongchaResult(player,target);
-					event.dongcha_result=res;
+					var res=get.insightResult(player,target);
+					event.insightResult=res;
 
 					event.videoId=lib.status.videoId++;
 					var send=(target,res,id)=>{
@@ -3032,7 +3012,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll('closeDialog',event.videoId);
 					if(!_status.connectMode&&get.config('auto_mark_identity')&&!target.node.identity.firstChild.innerHTML.length){
 						game.broadcastAll(function(player,target,event){
-							if(player.isUnderControl(true)) target.setIdentity(event.dongcha_result);
+							if(player.isUnderControl(true)) target.setIdentity(event.insightResult);
 						},player,target,event);
 					}
 				},
@@ -3046,7 +3026,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					var target=list.randomGet();
 					event.target=target;
-					target.ai.mougong_camouflage=true;
+					target.ai.stratagemCamouflage=true;
 					var neis=game.filterPlayer(i=>i.identity=='nei');
 					if(event.players.includes(game.me)&&game.me.identity=='nei'){
 						var str=get.translation(target)+'是反贼<br>';
@@ -3090,7 +3070,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					var target=list.randomGet();
-					target.ai.mougong_camouflage=true;
+					target.ai.stratagemCamouflage=true;
 					event.videoId=lib.status.videoId++;
 					event.ai_targets=[];
 					var time=10000;
@@ -3179,7 +3159,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(from==to||to.identityShown||from.storage.zhibi&&from.storage.zhibi.contains(to)||(_status.yeconfirm&&['rYe','bYe'].contains(to.identity)&&['rYe','bYe'].contains(to.identity))) return real*1.1;
 					return ((to.ai.shown+0.1)*real+(from.identity.slice(0,1)==to.identity.slice(0,1)?3:-3)*(1-to.ai.shown))
 				}
-				else if(_status.mode=='mougong'){
+				else if(_status.mode=='stratagem'){
 					var x=0,num=0,temp,i;
 					if(_status.ai.customAttitude){
 						for(i=0;i<_status.ai.customAttitude.length;i++){
@@ -3195,15 +3175,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					var real=get.realAttitude(from,to),zhibi=from.storage.zhibi,zhibi_for=from.storage.zhibi_for,followCamouflage=true;
 					if(to.ai.shown) return to.ai.shown*(real+(from.identity==to.identity||from.identity=='zhu'&&to.identity=='zhong'||from.identity=='zhong'&&to.identity=='zhu'||(to.identity=='nei'&&get.situation()<=0&&['zhu','zhong'].contains(from.identity)||get.situation()>=3&&from.identity=='fan')?3:-3))
-					if(from==to||to.identityShown||((zhibi_for&&zhibi_for.contains(to))||(zhibi&&zhibi.contains(to)))&&!to.ai.mougong_camouflage) return real*1.1;
-					if(from.identity=='nei'&&to.ai.mougong_camouflage) return real*1.1;
+					if(from==to||to.identityShown||((zhibi_for&&zhibi_for.contains(to))||(zhibi&&zhibi.contains(to)))&&!to.ai.stratagemCamouflage) return real*1.1;
+					if(from.identity=='nei'&&to.ai.stratagemCamouflage) return real*1.1;
 					if(to.identity=='nei'){
 						if(from.identity=='fan'){
 							if(get.population('zhong')==0){
 								if(zhibi){
 									var dead=game.dead.slice();
 									for(var current of dead){
-										if(from.storage.zhibi.contains(current)&&current.ai.mougong_camouflage){
+										if(from.storage.zhibi.contains(current)&&current.ai.stratagemCamouflage){
 											if(from.storage.zhibi_for&&from.storage.zhibi_for.contains(to)) return -7;
 										}
 									}
@@ -3214,7 +3194,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(to.identity=='fan'&&from.identity=='nei'&&zhibi.contains(game.zhu)&&game.players.filter(i=>i!=from&&!zhibi.contains(i)).map(i=>i.identity).reduce((p,c)=>(!p.contains(c)?(p.push(c)&&p):p),[]).length==1) return real;
 					for(var fan of game.dead){
-						if(fan.identity!='fan'||!fan.storage.mougong_showFan) continue;
+						if(fan.identity!='fan'||!fan.storage.stratagem_show_fan) continue;
 						for(var current of fan.storage.zhibi_for){
 							if(to==current){
 								return real;
@@ -3222,14 +3202,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(from.identity=='fan'&&to.identity=='fan'){
-						if(from.ai.mougong_camouflage){
+						if(from.ai.stratagemCamouflage){
 							var zhu=game.zhu&&game.zhu.isZhu&&game.zhu.identityShown?game.zhu:undefined;
 							if(zhu){
 								if(zhu.storage.zhibi_for&&zhu.storage.zhibi_for.contains(to)) return 0;
 							}
 							if(zhibi&&zhibi.contains(to)) return -7;
 						}
-						if(to.ai.mougong_camouflage){
+						if(to.ai.stratagemCamouflage){
 							var zhu=game.zhu&&game.zhu.isZhu&&game.zhu.identityShown?game.zhu:undefined;
 							if(zhu){
 								if(zhu.storage.zhibi_for&&zhu.storage.zhibi_for.contains(to)) return 0;
@@ -3237,12 +3217,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(zhibi&&zhibi.contains(to)) return -7;
 						}
 					}
-					if(from.identity!='nei'&&zhibi&&zhibi.contains(to)&&!to.identityShown&&(followCamouflage&&to.ai.mougong_camouflage)) return -5;
+					if(from.identity!='nei'&&zhibi&&zhibi.contains(to)&&!to.identityShown&&(followCamouflage&&to.ai.stratagemCamouflage)) return -5;
 					if(from.identity!='nei'&&zhibi_for&&zhibi_for.contains(to)&&!to.identityShown) return -5;
 					if(zhibi){
 						for(var to2 of zhibi){
 							if(to2.storage.zhibi_for){
-								if(to2.ai.mougong_camouflage){
+								if(to2.ai.stratagemCamouflage){
 									for(var to3 of to2.storage.zhibi_for){
 										if(zhibi.slice().addArray(zhibi_for).contains(to3)){
 											if(to==to2){
@@ -3315,7 +3295,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return -7;
 					}
 				}
-				else if(_status.mode=='mougong'){
+				else if(_status.mode=='stratagem'){
 					if(!game.zhu){
 						if(from.identity=='nei'||to.identity=='nei') return -1;
 						if(from.identity==to.identity) return 6;
@@ -3718,17 +3698,42 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				return result;
 			},
-			dongchaResult:function(from,to){
+			insightResult:function(from,to){
 				var friend='friend',enemy='enemy';
 				if(from.identity=='nei') return to.identity;
 				if(to.identity=='nei') return friend;
-				if(from.ai.mougong_camouflage||to.ai.mougong_camouflage) return enemy;
+				if(from.ai.stratagemCamouflage||to.ai.stratagemCamouflage) return enemy;
 				if(from.identity==to.identity||from.identity=='zhu'&&to.identity=='zhong'||from.identity=='zhong'&&to.identity=='zhu') return friend;
 				return enemy;
 			},
+			/**
+			 * @param {number} numberOfPlayers
+			 * @returns {string[]}
+			 */
+			identityList:numberOfPlayers=>{
+				const modeConfig=lib.config.mode_config;
+				if(modeConfig){
+					const identityConfig=modeConfig.identity;
+					if(identityConfig){
+						const identityLists=identityConfig.identity;
+						if(identityLists){
+							const identityList=identityLists[numberOfPlayers-2];
+							if(Array.isArray(identityList)) return identityList.slice();
+						}
+					}
+				}
+				const numberOfPlayersExceptLord=numberOfPlayers-1,numberOfLoyalists=Math.round(numberOfPlayersExceptLord*3/9),numberOfSpys=Math.round(numberOfPlayersExceptLord*2/9);
+				return ['zhu'].concat(Array.from({
+					length:numberOfLoyalists
+				},()=>'zhong'),Array.from({
+					length:numberOfSpys
+				},()=>'nei'),Array.from({
+					length:numberOfPlayersExceptLord-numberOfLoyalists-numberOfSpys
+				},()=>'fan'));
+			}
 		},
 		skill:{
-			mougong_nuqi:{
+			stratagem_fury:{
 				mark:true,
 				marktext:'🔥',
 				silent:true,
@@ -3738,16 +3743,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player:['phaseBegin','damageEnd'],
 				},
 				content:function(){
-					player.changeNuqi(trigger.name=='damage'?trigger.num:1);
+					player.changeFury(trigger.name=='damage'?trigger.num:1);
 				},
 				intro:{
 					name:'怒气',
 					content:function(storage,player){
-						return '当前怒气值：'+(storage||0)+'/'+_status.mougong_nuqi_max;
+						return '当前怒气值：'+(storage||0)+'/'+_status.stratagemFuryMax;
 					},
 				},
 				subSkill:{
-					dongcha:{
+					insight:{
 						trigger:{
 							source:'damageSource',
 							global:'loseHpEnd',
@@ -3758,7 +3763,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(event.name=='loseHp'){
 								if(event.getParent()._trigger) source=event.getParent()._trigger.source;
 							}
-							return player==source&&player.storage.mougong_nuqi>0&&event.player&&event.player.isIn()&&event.player!=player;
+							return player==source&&player.storage.stratagem_fury>0&&event.player&&event.player.isIn()&&event.player!=player;
 						},
 						logTarget:'player',
 						prompt2:function(event,player){
@@ -3771,7 +3776,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							game.log(player,'洞察了',trigger.player,'与其的阵营关系');
-							player.dongcha(trigger.player);
+							player.insightInto(trigger.player);
 						},
 						ai:{
 							order:15,
@@ -3779,7 +3784,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-			mougong_showZhu:{
+			stratagem_show_zhu:{
 				trigger:{
 					player:['dying','phaseBefore'],
 					global:'dieAfter',
@@ -3793,13 +3798,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				ruleSkill:true,
 				filter:function(event,player){
-					if(player.storage.mougong_showZhu) return false;
+					if(player.storage.stratagem_show_zhu) return false;
 					if(player.identity=='zhu'){
 						if(event.player==player){
 							if(event.name=='dying') return true;
-							return game.roundNumber>=3;
+							return game.roundNumber>=Math.max(Math.round(get.totalPopulation()/2),3);
 						}
-						if(event.name=='die') return game.dead.length>=2;
+						if(event.name=='die') return game.dead.length>=Math.max(Math.round(get.totalPopulation()/3),2);
 					}
 					return false;
 				},
@@ -3807,7 +3812,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					if(trigger.name=='dying') game.delayx();
 					'step 1'
-					player.storage.mougong_showZhu=true;
+					player.storage.stratagem_show_zhu=true;
 					game.zhu=game.zhu||player;
 					game.broadcastAll(function(player){
 						game.zhu=player;
@@ -3842,7 +3847,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-			mougong_showFan:{
+			stratagem_show_fan:{
 				trigger:{
 					player:'dying',
 				},
@@ -3852,13 +3857,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				ruleSkill:true,
 				filter:function(event,player){
-					return player.ai.mougong_camouflage&&event.player==player&&!game.dead.length&&player.storage.mougong_nuqi>=2&&!player.storage.mougong_showFan;
+					return player.ai.stratagemCamouflage&&event.player==player&&!game.dead.length&&player.storage.stratagem_fury>=2&&!player.storage.stratagem_show_fan;
 				},
 				content:function(){
 					'step 0'
 					game.delayx();
 					'step 1'
-					player.storage.mougong_showFan=true;
+					player.storage.stratagem_show_fan=true;
 					game.broadcastAll(function(player){
 						player.identityShown=true;
 						player.ai.shown=1;
@@ -3870,7 +3875,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.delay(2);
 					player.playerfocus(800);
 					'step 2'
-					player.changeNuqi(-player.storage.mougong_nuqi);
+					player.changeFury(-player.storage.stratagem_fury);
 					player.discard(player.getCards('hej'));
 					player.link(false);
 					player.turnOver(false);
@@ -3878,208 +3883,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.draw(3);
 				}
 			},
-			mougong_addBuff:{
-				enable:'chooseToUse',
-				filter:function(event,player){
-					if(!event.mougong_settings) return false;
-					if(game.roundNumber<2&&!event.mougong_settings.round1_use_nuqi) return false;
-					var cards=player.getCards('hs');
-					if(!event.mougong_settings.mougong_buff) return false;
-					var names=Object.keys(event.mougong_settings.mougong_buff);
-					if(!names.length) return false;
-					for(var card of cards){
-						if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) continue;
-						for(var name of names){
-							var myName=get.name(card,player),nature=get.nature(card,player);
-							if(name==myName){
-								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)){
-									if(player.storage.mougong_nuqi>=event.mougong_settings.mougong_buff[name][0])
-										return true;
-								}
-							}
-						}
-					}
-					return false;
-				},
-				onChooseToUse:function(event){
-					if(!event.mougong_settings&&!game.online){
-						event.set('mougong_settings',{
-							round1_use_nuqi:_status.round1_use_nuqi,
-							mougong_buff:_status.mougong_buff,
-						});
-					}
-				},
-				check:function(card){
-					var player=_status.event.player;
-					if(_status.event.type=='phase'){
-						var name=get.name(card,player);
-						if(name=='sha'){
-							if(game.hasPlayer(current=>{
-								return player.canUse(card,current)&&(player.storage.zhibi&&!player.storage.zhibi.contains(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(player.storage.mougong_nuqi||0)-1)))&&current.mayHaveShan()&&player.hasSkill('jiu');
-							})) return 1;
-							return 0;
-						} else if(name=='tao'){
-							if(player.hp<=2&&player.getDamagedHp()>=2) return 1;
-							return 0;
-						}
-						return 1;
-					}
-					else if(_status.event.type=='dying') return get.attitude(player,_status.event.dying)>3?1:0;
-					return (_status.event.getParent().shanRequired||1)>1&&get.damageEffect(player,_status.event.getParent().player||player,player)<0?1:0;
-				},
-				position:'hs',
-				filterCard:function(card,player,event){
-					event=event||_status.event;
-					var filter=event._backup.filterCard;
-					var names=Object.keys(event.mougong_settings.mougong_buff);
-					for(var name of names){
-						var myName=get.name(card,player),nature=get.nature(card,player);
-						if(name==myName){
-							if(filter({name:name,nature:nature,isCard:true,cards:[card]},player,_status.event)){
-								if(player.storage.mougong_nuqi>=event.mougong_settings.mougong_buff[name][0]){
-									return true;
-								}
-							}
-						}
-					}
-					return false;
-				},
-				viewAs:function(cards,player){
-					var name=get.name(cards[0],player);
-					var nature=get.nature(cards[0],player);
-					if(name){
-						return {
-							name:name,
-							nature:nature,
-							suit:get.suit(cards[0],player),
-							number:get.number(cards[0],player),
-							isCard:true,
-							cards:[cards[0]],
-							storage:{mougong_buffed:true},
-						};
-					}
-					return null;
-				},
-				precontent:function(){
-					'step 0'
-					player.changeNuqi(-_status.mougong_buff[event.result.card.name][0]);
-				},
-				ai:{
-					order:function(item,player){
-						var player=player||_status.event.player;
-						if(_status.event.type=='phase'){
-							var cards=player.getCards('hs');
-							for(var card of cards){
-								if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) continue;
-								var name=get.name(card,player);
-								if(name=='sha'){
-									if(game.hasPlayer(current=>{
-										return player.canUse(card,current)&&(player.storage.zhibi&&!player.storage.zhibi.contains(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(player.storage.mougong_nuqi||0)-1)))&&current.mayHaveShan();
-									})) return get.order(card,player)+0.5;
-								} else if(name=='tao'){
-									if(player.hp<=2&&player.getDamagedHp()>=2) return get.order(card,player)+0.5;
-								}
-								return 8;
-							}
-						}
-						return 3.5;
-					},
-				},
-				subSkill:{
-					sha:{
-						trigger:{player:'useCardToPlayered'},
-						forced:true,
-						silent:true,
-						popup:false,
-						charlotte:true,
-						filter:function(event,player){
-							return event.card.name=='sha'&&event.card.storage&&event.card.storage.mougong_buffed&&_status.mougong_buff['sha'][1]=='require'&&!event.getParent().directHit.contains(event.target);
-						},
-						content:function(){
-							if(!trigger.card.storage.mougong_logged){
-								game.log(player,'触发了强化杀的效果');
-								game.log('#y'+get.translation(trigger.card),'需要额外使用一张','#y【闪】','响应');
-								trigger.card.storage.mougong_logged=true;
-							}
-							var id=trigger.target.playerid;
-							var map=trigger.getParent().customArgs;
-							if(!map[id]) map[id]={};
-							if(typeof map[id].shanRequired=='number'){
-								map[id].shanRequired++;
-							}
-							else{
-								map[id].shanRequired=2;
-							}
-						},
-						ai:{
-							directHit_ai:true,
-							skillTagFilter:function(player,tag,arg){
-								if(arg.card.name!='sha'||(arg.card&&arg.card.storage&&!arg.card.storage.mougong_buffed)||(arg.target.countCards('h','shan')>=1&&!arg.target.storage.mougong_nuqi)) return false;
-							},
-						},
-					},
-					shan:{
-						trigger:{
-							player:'shanEnd',
-						},
-						forced:true,
-						silent:true,
-						popup:false,
-						charlotte:true,
-						filter:function(event,player){
-							return event.getParent(3).name=='sha'&&event.getParent().card.storage&&event.getParent().card.storage.mougong_buffed&&_status.mougong_buff['shan'][1]=='double';
-						},
-						content:function(event,player){
-							if(!trigger.card.storage.mougong_logged){
-								game.log(player,'触发了强化闪的效果');
-								game.log('#y'+get.translation(trigger.card),'视为两张','#y【闪】','的效果');
-								trigger.card.storage.mougong_logged=true;
-							}
-							if(trigger.getParent(3).shanRequired) trigger.getParent(3).shanRequired--;
-						}
-					},
-					damage:{
-						trigger:{player:'damageBegin1'},
-						forced:true,
-						silent:true,
-						popup:false,
-						charlotte:true,
-						filter:function(event,player){
-							if(!event.card) return false;
-							var names=Object.keys(_status.mougong_buff),name=event.card.name;
-							return names.contains(name)&&event.getParent(2).player==event.source&&event.card.storage&&event.card.storage.mougong_buffed&&_status.mougong_buff[name][1]=='damage';
-						},
-						content:function(){
-							if(!trigger.card.storage.mougong_logged){
-								game.log(player,'触发了强化'+get.translation(trigger.card.name)+'的效果');
-								game.log('#y'+get.translation(trigger.card),'造成的伤害','#y+1');
-								trigger.card.storage.mougong_logged=true;
-							}
-							trigger.num++;
-						}
-					},
-					tao:{
-						trigger:{player:'useCard'},
-						filter:function(event,player){
-							return event.card.name=='tao'&&event.card.storage&&event.card.storage.mougong_buffed&&_status.mougong_buff['tao'][1]=='double';
-						},
-						forced:true,
-						silent:true,
-						popup:false,
-						charlotte:true,
-						content:function(){
-							if(!trigger.card.storage.mougong_logged){
-								game.log(player,'触发了强化桃的效果');
-								game.log('#y'+get.translation(trigger.card),'的回复值','#y+1');
-								trigger.card.storage.mougong_logged=true;
-							}
-							if(!trigger.baseDamage) trigger.baseDamage=1;
-							trigger.baseDamage++;
-						},
-					}
-				}
-			},
-			mougong_expose:{
+			stratagem_expose:{
 				trigger:{player:'useCard'},
 				forced:true,
 				silent:true,
@@ -4087,7 +3891,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.targets[0]==player) return false;
 					return event.targets.length==1&&event.targets[0]&&((player.storage.zhibi.contains(event.targets[0])||event.targets[0].identityShown) ||
-						game.players.slice().concat(game.dead).filter(current=>(current.storage.mougong_showFan||current.storage.mougong_showZhu)&&current.identityShown&&current.storage.zhibi_for.contains(event.targets[0])).length);
+						game.players.slice().concat(game.dead).filter(current=>(current.storage.stratagem_show_fan||current.storage.stratagem_show_zhu)&&current.identityShown&&current.storage.zhibi_for.contains(event.targets[0])).length);
 				},
 				content:function(){
 					if(!trigger.targets[0].storage.zhibi_for) trigger.targets[0].storage.zhibi_for=[];
@@ -4095,7 +3899,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 
 			},
-			mougong_shanAi:{
+			stratagem_shan_ai:{
 				trigger:{
 					player:'chooseToUseBegin',
 				},
@@ -4125,7 +3929,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var target=_status.event.player;
 						var evt=_status.event.getParent(2);
 						var bool=true;
-						if(_status.event.getParent().shanRequired>1&&!get.is.object(card)&&(target.countCards('h','shan')<_status.event.getParent().shanRequired&&!(target.storage.mougong_nuqi>=1&&target.countCards('h','shan')==1&&_status.event.getParent().shanRequired<=2))){
+						if(_status.event.getParent().shanRequired>1&&!get.is.object(card)&&(target.countCards('h','shan')<_status.event.getParent().shanRequired&&!(target.storage.stratagem_fury>=1&&target.countCards('h','shan')==1&&_status.event.getParent().shanRequired<=2))){
 							bool=false;
 						}
 						else if(target.hasSkillTag('useShan')){
@@ -4139,7 +3943,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).set('shanRequired',evt.shanRequired);
 				},
 			},
-			mougong_cardEffect:{
+			stratagem_card_effect:{
 				trigger:{
 					player:['useCard1'],
 				},
@@ -4148,12 +3952,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				charlotte:true,
 				filter:function(event,player,name){
-					return event.card&&event.card.storage&&event.card.storage.mougong_buffed&&event.cards.length;
+					return event.card&&event.card.storage&&event.card.storage.stratagemBuffed&&event.cards.length;
 				},
 				content:function(){
 					game.broadcastAll(function(cards){
 						for(var i of cards){
-							i.clone.classList.add('mougong_nuqi_glow');
+							i.clone.classList.add('stratagem-fury-glow');
 						}
 					},trigger.cards);
 				}

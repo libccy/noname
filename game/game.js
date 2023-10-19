@@ -432,8 +432,11 @@
 				},
 			}
 		},
-		//Yingbian
-		//应变
+		/**
+		 * Yingbian
+		 * 
+		 * 应变
+		 */
 		yingbian:{
 			condition:{
 				color:new Map([
@@ -605,8 +608,32 @@
 				['all','无视条件执行所有选项']
 			])
 		},
-		//The actual card name
-		//实际的卡牌名称
+		/**
+		 * Stratagem buff
+		 * 
+		 * 谋攻强化
+		 */
+		stratagemBuff:{
+			buff:new Map([
+				['sha',[1,'require']],
+				['shan',[1,'double']],
+				['juedou',[2,'damage']],
+				['huogong',[2,'damage']],
+				['tao',[3,'double']]
+			]),
+			prompt:new Map([
+				['sha','响应时所需【闪】数+1。'],
+				['shan','视为两张【闪】的效果。'],
+				['juedou','对目标造成的伤害+1。'],
+				['huogong','造成的伤害+1。'],
+				['tao','回复值+1。']
+			])
+		},
+		/**
+		 * The actual card name
+		 * 
+		 * 实际的卡牌名称
+		 */
 		actualCardName:new Map([
 			['挟令','挟天子以令诸侯'],
 			['霹雳投石车','霹雳车']
@@ -4875,11 +4902,11 @@
 				name:'身份',
 				connect:{
 					update:function(config,map){
-						if(config.connect_identity_mode=='mougong'){
-							map.connect_round1_use_nuqi.show();
+						if(config.connect_identity_mode=='stratagem'){
+							map.connect_round_one_use_fury.show();
 						}
 						else{
-							map.connect_round1_use_nuqi.hide();
+							map.connect_round_one_use_fury.hide();
 						}
 						if(config.connect_identity_mode=='zhong'){
 							map.connect_player_number.hide();
@@ -4890,7 +4917,7 @@
 							map.connect_special_identity.hide();
 							map.connect_double_character.show();
 						}
-						else if(config.connect_identity_mode=='mougong'){
+						else if(config.connect_identity_mode=='stratagem'){
 							map.connect_double_character.show();
 							map.connect_player_number.show();
 							map.connect_limit_zhu.hide();
@@ -4935,7 +4962,7 @@
 						item:{
 							normal:'标准',
 							zhong:'明忠',
-							mougong:'谋攻',
+							stratagem:'谋攻',
 							purple:'3v3v2',
 						},
 						restart:true,
@@ -4945,14 +4972,8 @@
 					connect_player_number:{
 						name:'游戏人数',
 						init:'8',
-						item:{
-							'2':'两人',
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人'
+						get item(){
+							return lib.mode.identity.config.player_number.item;
 						},
 						frequent:true,
 						restart:true,
@@ -4980,7 +5001,9 @@
 						init:false,
 						restart:true,
 						// frequent:true,
-						intro:'开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
+						get intro(){
+							return lib.mode.identity.config.double_nei.intro;
+						}
 					},
 					connect_double_character:{
 						name:'双将模式',
@@ -5001,7 +5024,7 @@
 						frequent:true,
 						intro:'开启后游戏中将增加军师、大将、贼首三个身份'
 					},
-					connect_round1_use_nuqi:{
+					connect_round_one_use_fury:{
 						name:'开启首轮强化卡牌',
 						init:false,
 						frequent:false,
@@ -5027,12 +5050,12 @@
 				},
 				config:{
 					update:function(config,map){
-						if(config.identity_mode=='mougong'){
-							map.round1_use_nuqi.show();
+						if(config.identity_mode=='stratagem'){
+							map.round_one_use_fury.show();
 							map.nei_auto_mark_camouflage.show();
 						}
 						else{
-							map.round1_use_nuqi.hide();
+							map.round_one_use_fury.hide();
 							map.nei_auto_mark_camouflage.hide();
 						}
 						if(config.identity_mode=='zhong'){
@@ -5064,7 +5087,7 @@
 							}
 							map.continue_game.show();
 						}
-						else if(config.identity_mode=='mougong'){
+						else if(config.identity_mode=='stratagem'){
 							map.continue_game.show();
 							map.player_number.show();
 							map.enhance_zhu.hide();
@@ -5188,7 +5211,7 @@
 						item:{
 							normal:'标准',
 							zhong:'明忠',
-							mougong:'谋攻',
+							stratagem:'谋攻',
 							purple:'3v3v2',
 						},
 						restart:true,
@@ -5198,14 +5221,12 @@
 					player_number:{
 						name:'游戏人数',
 						init:'8',
-						item:{
-							'2':'两人',
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人'
+						get item(){
+							const minimumNumberOfPlayers=2,maximumNumberOfPlayers=Math.max(_status.maximumNumberOfPlayers||10,minimumNumberOfPlayers),item={};
+							for(let playerNumber=minimumNumberOfPlayers;playerNumber<=maximumNumberOfPlayers;playerNumber++){
+								item[playerNumber]=`${get.cnNumber(playerNumber)}人`;
+							}
+							return item;
 						},
 						frequent:true,
 						restart:true,
@@ -5215,7 +5236,7 @@
 						init:false,
 						restart:true,
 						frequent:true,
-						intro:'开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
+						intro:'若游戏人数不大于8，则开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
 					},
 					choose_group:{
 						name:'神武将选择势力',
@@ -5361,7 +5382,7 @@
 							unlimited:'无限',
 						},
 					},
-					round1_use_nuqi:{
+					round_one_use_fury:{
 						name:'开启首轮强化卡牌',
 						init:false,
 						frequent:false,
@@ -5562,13 +5583,8 @@
 					connect_player_number:{
 						name:'游戏人数',
 						init:'8',
-						item:{
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人'
+						get item(){
+							return lib.mode.guozhan.config.player_number.item;
 						},
 						frequent:true,
 						restart:true,
@@ -5653,13 +5669,12 @@
 					player_number:{
 						name:'游戏人数',
 						init:'8',
-						item:{
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人'
+						get item(){
+							const minimumNumberOfPlayers=3,maximumNumberOfPlayers=Math.max(_status.maximumNumberOfPlayers||10,minimumNumberOfPlayers),item={};
+							for(let playerNumber=minimumNumberOfPlayers;playerNumber<=maximumNumberOfPlayers;playerNumber++){
+								item[playerNumber]=`${get.cnNumber(playerNumber)}人`;
+							}
+							return item;
 						},
 						frequent:true,
 						restart:true,
@@ -11097,11 +11112,15 @@
 				}
 			},
 			layout:function(layout,nosave){
+				const previousTransitionDuration=document.body.style.transitionDuration;
+				document.body.style.transitionDuration='1s';
+				const previousFilter=document.body.style.filter,previousWebkitFilter=document.body.style.webkitFilter;
+				document.body.style.filter=document.body.style.webkitFilter='brightness(0)';
 				if(layout=='default') layout='mobile';
 				if(!nosave) game.saveConfig('layout',layout);
 				game.layout=layout;
 				ui.arena.hide();
-				setTimeout(function(){
+				new Promise(resolve=>setTimeout(resolve,500)).then(()=>{
 					if(game.layout=='default'){
 						ui.css.layout.href='';
 					}
@@ -11196,17 +11215,26 @@
 					}
 					ui.updatej();
 					ui.updatem();
-					setTimeout(function(){
-						ui.arena.show();
-						if(game.me) game.me.update();
-						setTimeout(function(){
-							ui.updatex();
-						},500);
-						setTimeout(function(){
-							ui.updatec();
-						},1000);
-					},100);
-				},500);
+					return new Promise(resolve=>setTimeout(resolve,100));
+				}).then(()=>{
+					ui.arena.show();
+					if(game.me) game.me.update();
+					return new Promise(resolve=>setTimeout(resolve,500));
+				}).then(()=>{
+					ui.updatex();
+					ui.create.playerPositions();
+					return new Promise(resolve=>setTimeout(resolve,500));
+				}).then(()=>{
+					ui.updatec();
+					if(previousFilter) document.body.style.filter=previousFilter;
+					else document.body.style.removeProperty('filter');
+					if(previousWebkitFilter) document.body.style.webkitFilter=previousWebkitFilter;
+					else document.body.style.removeProperty('-webkit-filter');
+					return new Promise(resolve=>setTimeout(resolve,1000));
+				}).then(()=>{
+					if(previousTransitionDuration) document.body.style.transitionDuration=previousTransitionDuration;
+					else document.body.style.removeProperty('transition-duration');
+				});
 			},
 			background:function(){
 				if(lib.config.image_background_random){
@@ -12302,6 +12330,7 @@
 			cooperation_use_info:'双方累计使用至少4种花色的牌',
 			charge:'蓄力值',
 			expandedSlots:'扩展装备栏',
+			_stratagem_add_buff:'强化'
 		},
 		element:{
 			content:{
@@ -27991,7 +28020,7 @@
 					var player=this,mode=get.mode();
 					if(!this.isZhu) return false;
 					if(mode=='identity'){
-						if(_status.mode=='mougong'&&!this.identityShown) return false;
+						if(_status.mode=='stratagem'&&!this.identityShown) return false;
 						return true;
 					}
 					if(mode=='versus'&&(_status.mode=='four'||_status.mode=='guandu')) return true;
@@ -30396,7 +30425,6 @@
 				 * @param {string} [nature]
 				 */
 				constructor(suitOrCard,numberOrCards,name,nature){
-					if(typeof suitOrCard=='undefined'&&typeof numberOrCards=='undefined'&&typeof name=='undefined'&&typeof nature=='undefined') return;
 					if(Array.isArray(suitOrCard)){
 						/**
 						 * @type {string}
@@ -32436,6 +32464,217 @@
 			}
 		},
 		skill:{
+			_stratagem_add_buff:{
+				enable:'chooseToUse',
+				filter:function(event,player){
+					if(!event.stratagemSettings) return false;
+					if(game.roundNumber<2&&!event.stratagemSettings.roundOneUseFury) return false;
+					var cards=player.getCards('hs');
+					var names=Array.from(lib.stratagemBuff.buff.keys());
+					if(!names.length) return false;
+					for(var card of cards){
+						if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) continue;
+						for(var name of names){
+							var myName=get.name(card,player),nature=get.nature(card,player);
+							if(name==myName){
+								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)){
+									if(player.storage.stratagem_fury>=lib.stratagemBuff.buff.get(name)[0])
+										return true;
+								}
+							}
+						}
+					}
+					return false;
+				},
+				onChooseToUse:function(event){
+					if(!event.stratagemSettings&&!game.online){
+						event.set('stratagemSettings',{
+							roundOneUseFury:_status.connectMode?lib.configOL.round_one_use_fury:get.config('round_one_use_fury')
+						});
+					}
+				},
+				check:function(card){
+					var player=_status.event.player;
+					if(_status.event.type=='phase'){
+						var name=get.name(card,player);
+						if(name=='sha'){
+							if(game.hasPlayer(current=>{
+								return player.canUse(card,current)&&(player.storage.zhibi&&!player.storage.zhibi.contains(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(player.storage.stratagem_fury||0)-1)))&&current.mayHaveShan()&&player.hasSkill('jiu');
+							})) return 1;
+							return 0;
+						} else if(name=='tao'){
+							if(player.hp<=2&&player.getDamagedHp()>=2) return 1;
+							return 0;
+						}
+						return 1;
+					}
+					else if(_status.event.type=='dying') return get.attitude(player,_status.event.dying)>3?1:0;
+					return (_status.event.getParent().shanRequired||1)>1&&get.damageEffect(player,_status.event.getParent().player||player,player)<0?1:0;
+				},
+				position:'hs',
+				filterCard:function(card,player,event){
+					event=event||_status.event;
+					var filter=event._backup.filterCard;
+					var names=Array.from(lib.stratagemBuff.buff.keys());
+					for(var name of names){
+						var myName=get.name(card,player),nature=get.nature(card,player);
+						if(name==myName){
+							if(filter({name:name,nature:nature,isCard:true,cards:[card]},player,_status.event)){
+								if(player.storage.stratagem_fury>=lib.stratagemBuff.buff.get(name)[0]){
+									return true;
+								}
+							}
+						}
+					}
+					return false;
+				},
+				viewAs:function(cards,player){
+					var name=get.name(cards[0],player);
+					var nature=get.nature(cards[0],player);
+					if(name){
+						return {
+							name:name,
+							nature:nature,
+							suit:get.suit(cards[0],player),
+							number:get.number(cards[0],player),
+							isCard:true,
+							cards:[cards[0]],
+							storage:{stratagemBuffed:1},
+						};
+					}
+					return null;
+				},
+				prompt:()=>{
+					const span=document.createElement('span');
+					span.classList.add('text');
+					span.style.fontFamily='yuanli';
+					const stratagemBuff=lib.stratagemBuff,buff=stratagemBuff.buff;
+					stratagemBuff.prompt.forEach((prompt,cardName)=>{
+						const li=document.createElement('li');
+						li.innerHTML=`【${get.translation(cardName)}】：${buff.get(cardName)[0]}点怒气。${prompt}`;
+						span.appendChild(li);
+					});
+					return `当你需要使用位于“强化表”内的非虚拟卡牌时，你可以消耗对应数量的怒气将其强化并使用。${document.createElement('hr').outerHTML}${span.outerHTML}`;
+				},
+				precontent:function(){
+					'step 0'
+					player.changeFury(-lib.stratagemBuff.buff.get(event.result.card.name)[0]);
+				},
+				ai:{
+					order:function(item,player){
+						var player=player||_status.event.player;
+						if(_status.event.type=='phase'){
+							var cards=player.getCards('hs');
+							for(var card of cards){
+								if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) continue;
+								var name=get.name(card,player);
+								if(name=='sha'){
+									if(game.hasPlayer(current=>{
+										return player.canUse(card,current)&&(player.storage.zhibi&&!player.storage.zhibi.contains(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(player.storage.stratagem_fury||0)-1)))&&current.mayHaveShan();
+									})) return get.order(card,player)+0.5;
+								} else if(name=='tao'){
+									if(player.hp<=2&&player.getDamagedHp()>=2) return get.order(card,player)+0.5;
+								}
+								return 8;
+							}
+						}
+						return 3.5;
+					},
+				},
+				subSkill:{
+					sha:{
+						trigger:{player:'useCardToPlayered'},
+						forced:true,
+						silent:true,
+						popup:false,
+						charlotte:true,
+						filter:function(event,player){
+							return event.card.name=='sha'&&event.card.storage&&event.card.storage.stratagemBuffed&&lib.stratagemBuff.buff.get('sha')[1]=='require'&&!event.getParent().directHit.contains(event.target);
+						},
+						content:function(){
+							if(!trigger.card.storage.stratagem_logged){
+								game.log(player,'触发了强化杀的效果');
+								game.log('#y'+get.translation(trigger.card),'需要额外使用一张','#y【闪】','响应');
+								trigger.card.storage.stratagem_logged=true;
+							}
+							var id=trigger.target.playerid;
+							var map=trigger.getParent().customArgs;
+							if(!map[id]) map[id]={};
+							if(typeof map[id].shanRequired=='number'){
+								map[id].shanRequired++;
+							}
+							else{
+								map[id].shanRequired=2;
+							}
+						},
+						ai:{
+							directHit_ai:true,
+							skillTagFilter:function(player,tag,arg){
+								if(arg.card.name!='sha'||(arg.card&&arg.card.storage&&!arg.card.storage.stratagemBuffed)||(arg.target.countCards('h','shan')>=1&&!arg.target.storage.stratagem_fury)) return false;
+							},
+						},
+					},
+					shan:{
+						trigger:{
+							player:'shanEnd',
+						},
+						forced:true,
+						silent:true,
+						popup:false,
+						charlotte:true,
+						filter:function(event,player){
+							return event.getParent(3).name=='sha'&&event.getParent().card.storage&&event.getParent().card.storage.stratagemBuffed&&lib.stratagemBuff.buff.get('shan')[1]=='double';
+						},
+						content:function(event,player){
+							if(!trigger.card.storage.stratagem_logged){
+								game.log(player,'触发了强化闪的效果');
+								game.log('#y'+get.translation(trigger.card),'视为两张','#y【闪】','的效果');
+								trigger.card.storage.stratagem_logged=true;
+							}
+							if(trigger.getParent(3).shanRequired) trigger.getParent(3).shanRequired--;
+						}
+					},
+					damage:{
+						trigger:{player:'damageBegin1'},
+						forced:true,
+						silent:true,
+						popup:false,
+						charlotte:true,
+						filter:function(event,player){
+							if(!event.card) return false;
+							var names=Array.from(lib.stratagemBuff.buff.keys()),name=event.card.name;
+							return names.contains(name)&&event.getParent(2).player==event.source&&event.card.storage&&event.card.storage.stratagemBuffed&&lib.stratagemBuff.buff.get(name)[1]=='damage';
+						},
+						content:function(){
+							if(!trigger.card.storage.stratagem_logged){
+								game.log(player,'触发了强化'+get.translation(trigger.card.name)+'的效果');
+								game.log('#y'+get.translation(trigger.card),'造成的伤害','#y+1');
+								trigger.card.storage.stratagem_logged=true;
+							}
+							trigger.num++;
+						}
+					},
+					tao:{
+						trigger:{player:'useCard'},
+						filter:function(event,player){
+							return event.card.name=='tao'&&event.card.storage&&event.card.storage.stratagemBuffed&&lib.stratagemBuff.buff.get('tao')[1]=='double';
+						},
+						forced:true,
+						silent:true,
+						popup:false,
+						charlotte:true,
+						content:function(){
+							if(!trigger.card.storage.stratagem_logged){
+								game.log(player,'触发了强化桃的效果');
+								game.log('#y'+get.translation(trigger.card),'的回复值','#y+1');
+								trigger.card.storage.stratagem_logged=true;
+							}
+							if(!trigger.baseDamage) trigger.baseDamage=1;
+							trigger.baseDamage++;
+						},
+					}
+				}
+			},
 			expandedSlots:{
 				markimage:'image/card/expandedSlots.png',
 				intro:{
@@ -37095,7 +37334,7 @@
 				ui.updatehl();
 				for(var i=0;i<players.length;i++){
 					if(lib.config.mode=='identity'){
-						if(_status.mode=='mougong'){
+						if(_status.mode=='stratagem'){
 							game.players[i].init(players[i].name,players[i].name2);
 							game.players[i].identity=players[i].identity;
 							if(game.players[i].identity=='fan'&&game.players[i].isCamouflaged&&game.me.identity=='nei'||game.players[i]==game.me){
@@ -39666,7 +39905,7 @@
 					for(i=0;i<game.players.length;i++){
 						tr=document.createElement('tr');
 						td=document.createElement('td');
-						td.innerHTML=get.translation(game.players[i])+(game.players[i].ai.mougong_camouflage?'(被伪装)':'');
+						td.innerHTML=get.translation(game.players[i])+(game.players[i].ai.stratagem_camouflage?'(被伪装)':'');
 						tr.appendChild(td);
 						td=document.createElement('td');
 						num=0;
@@ -39736,7 +39975,7 @@
 					for(i=0;i<game.dead.length;i++){
 						tr=document.createElement('tr');
 						td=document.createElement('td');
-						td.innerHTML=get.translation(game.dead[i])+(game.dead[i].ai.mougong_camouflage?'(被伪装)':'');
+						td.innerHTML=get.translation(game.dead[i])+(game.dead[i].ai.stratagem_camouflage?'(被伪装)':'');
 						tr.appendChild(td);
 						td=document.createElement('td');
 						num=0;
@@ -42807,6 +43046,10 @@
 		thrown:[],
 		touchlines:[],
 		todiscard:{},
+		/**
+		 * @type {HTMLStyleElement[]}
+		 */
+		playerPositions:[],
 		refresh:function(node){
 			void window.getComputedStyle(node, null).getPropertyValue("opacity");
 		},
@@ -51612,6 +51855,7 @@
 				}
 				ui.arena.setNumber=function(num){
 					this.dataset.number=num;
+					ui.create.playerPositions();
 					// if(game.layout=='nova'&&parseInt(num)<7){
 					// 	ui.arena.classList.add('player_autolong');
 					// }
@@ -52580,16 +52824,55 @@
 				}
 			},
 			player:(position,noclick)=>new lib.element.Player(position,noclick),
-			connectPlayers:function(ip){
+			/**
+			 * @author curpond
+			 * @author Tipx-L
+			 * @param {number} [numberOfPlayers]
+			 */
+			connectPlayerPositions:numberOfPlayers=>{
+				if(typeof numberOfPlayers!='number') numberOfPlayers=lib.configOL.number;
+				if(!numberOfPlayers) return;
+				const playerPositions=ui.playerPositions;
+				while(playerPositions.length){
+					playerPositions.pop().remove();
+				}
+				const temporaryPlayer=ui.create.div('.player.connect',ui.window).hide();
+				const computedStyle=getComputedStyle(temporaryPlayer);
+				const halfWidth=parseFloat(computedStyle.width)/2;
+				const halfHeight=parseFloat(computedStyle.height)/2;
+				temporaryPlayer.remove();
+				const halfNumberOfPlayers=Math.round(numberOfPlayers/2);
+				const upperPercentage=100/(halfNumberOfPlayers+1);
+				const scale=10/numberOfPlayers;
+				for(let ordinal=0;ordinal<halfNumberOfPlayers;ordinal++){
+					playerPositions.push(lib.init.sheet([
+						`#window>.player.connect[data-position='${ordinal}']{`,
+						`left:calc(${upperPercentage*(ordinal+1)}% - ${halfWidth}px);`,
+						`top:calc(${100/3}% - ${halfHeight}px);`,
+						scale<1?`transform:scale(${scale});`:'',
+						'}'
+					].join('')));
+				}
+				const lowerPercentage=100/(numberOfPlayers-halfNumberOfPlayers+1);
+				for(let ordinal=halfNumberOfPlayers;ordinal<numberOfPlayers;ordinal++){
+					playerPositions.push(lib.init.sheet([
+						`#window>.player.connect[data-position='${ordinal}']{`,
+						`left:calc(${lowerPercentage*(ordinal-halfNumberOfPlayers+1)}% - ${halfWidth}px);`,
+						`top:calc(${100*2/3}% - ${halfHeight}px);`,
+						scale<1?`transform:scale(${scale});`:'',
+						'}'
+					].join('')));
+				}
+			},
+			connectPlayers:ip=>{
+				ui.create.connectPlayerPositions();
 				game.connectPlayers=[];
-				for(var i=0;i<8;i++){
-					var player=ui.create.player(ui.window);
-					player.dataset.position=i;
+				const numberOfPlayers=lib.configOL.number;
+				for(let position=0;position<numberOfPlayers;position++){
+					const player=ui.create.player(ui.window);
+					player.dataset.position=position;
 					player.classList.add('connect');
 					game.connectPlayers.push(player);
-					if(i>=lib.configOL.number){
-						player.classList.add('unselectable2');
-					}
 				}
 
 				var bar=ui.create.div(ui.window);
@@ -52621,7 +52904,7 @@
 						for(var i of game.connectPlayers){
 							if(!i.nickname&&!i.classList.contains('unselectable2')) num++;
 						}
-						if(num>=lib.configOL.number-1){
+						if(num>=numberOfPlayers-1){
 							alert('至少要有两名玩家才能开始游戏！');
 							return;
 						}
@@ -52637,52 +52920,76 @@
 				ui.connectStartButton=button;
 				ui.connectStartBar=bar;
 			},
-			players:function(num){
-				if(num===0){
+			/**
+			 * @author curpond
+			 * @author Tipx-L
+			 * @param {number} [numberOfPlayers]
+			 */
+			playerPositions:numberOfPlayers=>{
+				if(typeof numberOfPlayers!='number') numberOfPlayers=ui.arena.dataset.number;
+				//当人数小于8时，还是用以前的布局。
+				if(!numberOfPlayers||numberOfPlayers<9) return;
+				const playerPositions=ui.playerPositions;
+				while(playerPositions.length){
+					playerPositions.pop().remove();
+				}
+				//单个人物的宽度。这里要设置玩家的实际的宽度
+				const temporaryPlayer=ui.create.div('.player',ui.arena).hide();
+				const computedStyle=getComputedStyle(temporaryPlayer);
+				const scale=8/numberOfPlayers;
+				//玩家顶部距离父容器上边缘的距离偏移的单位距离
+				const oneThirdHeight=parseFloat(computedStyle.height)/3*scale;
+				const halfWidth=parseFloat(computedStyle.width)/2;
+				temporaryPlayer.remove();
+				//列数，即假如8人场，除去自己后，上面7个人占7列
+				const columnCount=numberOfPlayers-1;
+				const percentage=100/numberOfPlayers;
+				//仅当游戏人数大于8人，且玩家的座位号大于0时，设置玩家的位置。因为0号位是game.me在最下方，无需设置。
+				for(let ordinal=1;ordinal<numberOfPlayers;ordinal++){
+					const reversedOrdinal=columnCount-ordinal;
+					//动态计算玩家的top属性，实现拱桥的效果。只让两边的各两个人向下偏移一些
+					const top=Math.max(0,Math.round(numberOfPlayers/5)-Math.min(Math.abs(ordinal-1),Math.abs(reversedOrdinal)))*oneThirdHeight;
+					playerPositions.push(lib.init.sheet([
+						`#arena[data-number='${numberOfPlayers}']>.player[data-position='${ordinal}']{`,
+						`left:calc(${percentage*(reversedOrdinal+1)}% - ${halfWidth}px);`,
+						`top:${top}px;`,
+						`transform:scale(${scale});`,
+						'}'
+					].join('')));
+				}
+			},
+			players:numberOfPlayers=>{
+				if(numberOfPlayers===0){
 					return;
 				}
-				if(num==undefined) num=lib.configOL.number;
-				if(num==undefined) num=get.playerNumber();
-				if(typeof num=='string'){
-					num=parseInt(num);
+				if(numberOfPlayers==undefined) numberOfPlayers=lib.configOL.number;
+				if(numberOfPlayers==undefined) numberOfPlayers=get.playerNumber();
+				if(typeof numberOfPlayers=='string'){
+					numberOfPlayers=parseInt(numberOfPlayers);
 				}
-				if(!num) num=5;
-				for(var i=0;i<num;i++){
-					var player=ui.create.player().animate('start');
+				if(!numberOfPlayers) numberOfPlayers=5;
+				for(let ordinal=0;ordinal<numberOfPlayers;ordinal++){
+					const player=ui.create.player().animate('start');
 					game.players.push(player);
-					player.dataset.position=i;
+					player.dataset.position=ordinal;
 				}
-				var players=game.players;
-				for(var i=0;i<players.length;i++){
-					if(i>0){
-						players[i].previous=players[i-1];
-						players[i].previousSeat=players[i-1];
+				const players=game.players;
+				for(let ordinal=0;ordinal<players.length;ordinal++){
+					if(ordinal>0){
+						players[ordinal].previous=players[ordinal-1];
+						players[ordinal].previousSeat=players[ordinal-1];
 					}
-					if(i<players.length-1){
-						players[i].next=players[i+1];
-						players[i].nextSeat=players[i+1];
+					if(ordinal<players.length-1){
+						players[ordinal].next=players[ordinal+1];
+						players[ordinal].nextSeat=players[ordinal+1];
 					}
 				}
 				players[0].previous=players[players.length-1];
 				players[0].previousSeat=players[players.length-1];
 				players[players.length-1].next=players[0];
 				players[players.length-1].nextSeat=players[0];
-				ui.arena.setNumber(num);
-				for(var i=0;i<num;i++){
-					ui.arena.appendChild(players[i]);
-				}
-				// ui.arena.classList.add('glass');
-				// for(var i=0;i<num;i++){
-				// 	var bg=ui.create.div('.glassbg');
-				// 	var bg2=ui.create.div(bg);
-				// 	ui.create.div(bg);
-				// 	var rect=players[i].getBoundingClientRect();
-				// 	bg2.style.backgroundImage='url("image/background/huangtian_bg.jpg")';
-				// 	bg2.style.width=ui.window.offsetWidth+'px';
-				// 	bg2.style.height=ui.window.offsetHeight+'px';
-				// 	bg2.style.transform='translate('+(-rect.left)+'px,'+(-rect.top)+'px)';
-				// 	players[i].insertBefore(bg,players[i].firstChild);
-				// }
+				ui.arena.setNumber(numberOfPlayers);
+				players.forEach(player=>ui.arena.appendChild(player));
 				return players;
 			},
 			me:function(hasme){
@@ -53487,7 +53794,7 @@
 				if(!game.getIdentityList) return;
 				if(_status.video) return;
 				if(this.parentNode.forceShown) return;
-				if(!_status.connectMode&&this.parentNode.ai.mougong_camouflage&&get.config('nei_auto_mark_camouflage')&&game.me.identity=='nei') return;
+				if(!_status.connectMode&&this.parentNode.ai.stratagem_camouflage&&get.config('nei_auto_mark_camouflage')&&game.me.identity=='nei') return;
 				if(_status.clickingidentity){
 					for(var i=0;i<_status.clickingidentity[1].length;i++){
 						_status.clickingidentity[1][i].delete();
@@ -58405,7 +58712,7 @@
 				switch(config.identity_mode){
 					case 'purple':return '三对三对二';
 					case 'zhong':return (config.double_character?'双将':'')+'忠胆英杰';
-					case 'mougong':return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'谋攻';
+					case 'stratagem':return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'谋攻';
 					default:return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'身份';
 				}
 			}
