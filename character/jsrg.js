@@ -6164,7 +6164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_zhangchu:'转张楚',
 			jsrg_zhangchu_prefix:'转',
 			jsrghuozhong:'惑众',
-			jsrghuozhong_info:'所有角色出牌阶段限一次。其可以将一张黑色非锦囊牌置于其判定区，然后令你摸两张牌。',
+			jsrghuozhong_info:'所有角色出牌阶段限一次。其可以将一张黑色非锦囊牌当【兵粮寸断】置于其判定区，然后令你摸两张牌。',
 			jsrgrihui:'日彗',
 			jsrgrihui_info:'①当你使用【杀】对目标角色造成伤害后，你可以令判定区有牌的其他角色各摸一张牌。②你于一回合内对判定区没有牌的角色使用的第一张【杀】无任何次数限制。',
 			jsrg_xiahouen:'转夏侯恩',
