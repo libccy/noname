@@ -21624,6 +21624,16 @@
 					emotion.style.top=top+'px';
 					var left2=getLeft(target)-width;
 					var top2=target.getTop()+target.offsetHeight/3-height;
+					if(['egg','flower','shoe'].contains(name)||rotate){
+						var num1=0.95+Math.random()*(1.1-0.95);
+						var num2=1+Math.random()*(3-1);
+						var left2=getLeft(target)/num1-width;
+						var top2=target.getTop()+target.offsetHeight/num2-height;
+					}
+					else{
+						var left2=getLeft(target)-width;
+						var top2=target.getTop()+target.offsetHeight/3-height;
+					}
 					emotion.style['z-index']=10;
 					emotion.style.transform='translateY('+(top2-top)+'px) translateX('+(left2-left)+'px)';
 					if(['egg','flower','shoe'].contains(name)||rotate) emotion.firstElementChild.style.transform='rotate(1440deg)';
