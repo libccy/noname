@@ -14,12 +14,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan",'old_caorui'],
 				old_yijiang5:["old_caoxiu","old_zhuzhi"],
 				old_yijiang67:["ol_zhangrang",'old_huanghao','old_liyan'],
-				old_sp:["old_wanglang","old_maliang","old_zhangxingcai","old_wangyun",'old_dingfeng'],
+				old_sp:["old_wanglang","old_maliang","old_zhangxingcai","old_wangyun",'old_dingfeng','old_guanyinping'],
 				old_yingbian:['junk_simayi','old_yangyan','old_yangzhi'],
 				old_mobile:["old_caochun"],
 			},
 		},
 		character:{
+			old_guanyinping:['female','shu',3,['xueji_old','oldhuxiao','oldwuji']],
 			old_caocao:['male','shen',3,['junkguixin','feiying'],['die_audio']],
 			old_chendao:['male','shu',4,['drlt_wanglie']],
 			old_liyan:['male','shu',3,['duliang','fulin']],
@@ -1136,6 +1137,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junkguixin_info:'回合结束时，你可以选择一项：①获得剩余武将牌堆的所有主公技的其中一个技能；②更改一名其他角色的势力。',
 			old_caochun:'旧曹纯',
 			old_caochun_prefix:'旧',
+			old_guanyinping:'旧关银屏',
+			old_guanyinping_prefix:'旧',
 			
 			old_standard:'标准包',
 			old_shenhua:'神话再临',

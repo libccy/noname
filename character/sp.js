@@ -22482,7 +22482,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xueji_old:{
-				audio:2,
+				audio:'xueji',
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -22529,6 +22529,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
+			},
+			//FW关银屏
+			oldhuxiao:{
+				shaRelated:true,
+				audio:'huxiao',
+				trigger:{player:'shaMiss'},
+				forced:true,
+				content:function(){
+					if(player.stat[player.stat.length-1].card.sha>0){
+						player.stat[player.stat.length-1].card.sha--;
+					}
+				},
+			},
+			oldwuji:{
+				unique:true,
+				audio:'wuji',
+				trigger:{player:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return player.getStat('damage')>=3&&!player.storage.oldwuji;
+				},
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'orange',
+				content:function(){
+					'step 0'
+					player.removeSkill('oldhuxiao');
+					player.gainMaxHp();
+					'step 1'
+					player.recover();
+					player.awakenSkill('oldwuji');
+				},
 			},
 			xueji:{
 				audio:2,
@@ -24863,6 +24895,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterReplace:{
+			guanyinping:['guanyinping','old_guanyinping'],
 			shixie:['shixie','dc_shixie'],
 			caoshuang:['caoshuang','ns_caoshuang'],
 			caoang:['caoang','yj_caoang','tw_caoang'],
@@ -26128,6 +26161,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ollianju_info:'结束阶段，你可以令一名其他角色获得你本回合使用的最后一张牌A对应的所有位于弃牌堆的实体牌并记录A的牌名，然后其下个结束阶段可以令你获得其本回合使用的最后一张牌B对应的所有位于弃牌堆的实体牌，且若A与B的牌名相同，则你失去1点体力。',
 			olsilv:'思闾',
 			olsilv_info:'锁定技，每回合限一次，当你获得或失去你发动〖联句〗记录的最后一次牌名的同名牌后，你展示这些牌，然后摸一张牌。',
+			xueji_old:'血祭',
+			xueji_old_info:'出牌阶段限一次，你可以弃置一张红色牌并对攻击范围内的至多X名角色各造成1点伤害（X为你已损失的体力值），然后这些角色各摸一张牌。',
+			oldhuxiao:'虎啸',
+			oldhuxiao_info:'锁定技，当你使用的【杀】被【闪】抵消后，你令此【杀】不计入使用次数。',
+			oldwuji:'武继',
+			oldwuji_info:'觉醒技，结束阶段，若你本回合造成了3点或更多伤害，你加1点体力上限并回复1点体力，并失去技能〖虎啸〗。',
 			
 
 			sp_tianji:'天极·皇室宗亲',
