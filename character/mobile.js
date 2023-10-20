@@ -787,7 +787,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mod:{
 							playerEnabled:function(card,player,target){
 								if(!player.isPhaseUsing()) return;
-								if(card.name=='sha'&&player.getStorage('luanqun_effect').contains(target)) return false;
+								if(card.name=='sha'&&!player.getStorage('luanqun_effect').contains(target)) return false;
 							},
 						},
 						trigger:{player:'useCard1'},
