@@ -754,11 +754,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					globalFrom:function(from,to,distance){
-						return distance+from.getExpansions('duwang').filter(i=>i.name!='sha').length;
+						return distance+Math.min(1,from.getExpansions('duwang').filter(i=>i.name!='sha').length);
 					},
 					globalTo:function(from,to,distance){
-						return distance+to.getExpansions('duwang').filter(i=>i.name!='sha').length;
-					}
+						return distance+Math.min(1,to.getExpansions('duwang').filter(i=>i.name!='sha').length);
+					},
 				},
 			},
 			cibei:{
@@ -14574,7 +14574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiangxi_info:'一名角色的回合结束时，若一号位于此回合内进入过濒死状态或未受到过伤害，你可以重置〖识命〗；若所有角色均未受到过伤害，你可以与当前回合角色各摸一张牌。',
 			hanlong:'韩龙',
 			duwang:'独往',
-			duwang_info:'锁定技。①游戏开始时，你从牌堆顶将五张不为【杀】的牌置于武将牌上，称为“刺”。②你至其他角色或其他角色至你的距离+X（X为不为【杀】的“刺”数）。',
+			duwang_info:'锁定技。①游戏开始时，你从牌堆顶将五张不为【杀】的牌置于武将牌上，称为“刺”。②若你有牌名不为【杀】“刺”，你至其他角色或其他角色至你的距离+1。',
 			cibei:'刺北',
 			cibei_info:'①当一名角色使用【杀】造成伤害且此牌对应的实体牌进入弃牌堆后，你可以将一张不为【杀】的“刺”置入弃牌堆，并将这些牌置入“刺”，然后弃置一名角色区域里的一张牌。②一名角色的回合结束时，若你的“刺”均为【杀】，你获得所有“刺”，且这些牌不能被弃置，且当你使用对应实体牌包含这些牌的牌时无次数和距离限制。',
 			wuanguo:'武安国',

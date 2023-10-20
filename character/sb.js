@@ -263,7 +263,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).setHiddenSkill('sbqiaobian');
 						break;
 						case 'phaseDraw':
-						player.chooseBool(get.prompt('sbqiaobian'),'跳过摸牌阶段，于下个准备阶段摸两张牌并回复1点体力').setHiddenSkill('sbqiaobian');
+						player.chooseBool(get.prompt('sbqiaobian'),'跳过摸牌阶段，于下个准备阶段摸五张牌并回复1点体力').setHiddenSkill('sbqiaobian');
 						break;
 						case 'phaseUse':
 						var num=(player.countCards('h')-6);
@@ -313,13 +313,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					draw:{
 						charlotte:true,
 						mark:true,
-						intro:{content:'准备阶段摸两张牌并回复1点体力'},
+						intro:{content:'准备阶段摸五张牌并回复1点体力'},
 						audio:'sbqiaobian',
 						trigger:{player:'phaseZhunbeiBegin'},
 						forced:true,
 						content:function(){
 							player.removeSkill('sbqiaobian_draw');
-							player.draw(2);
+							player.draw(5);
 							player.recover();
 						},
 					},
@@ -3267,8 +3267,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbguidao:{
 				audio:2,
 				trigger:{
-					global:['phaseBefore','damageEnd'],
-					player:'enterGame',
+					global:[/*'phaseBefore',*/'damageEnd'],
+					//player:'enterGame',
 				},
 				forced:true,
 				locked:false,
@@ -5010,7 +5010,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbleiji:'雷击',
 			sbleiji_info:'出牌阶段，你可以选择一名其他角色并弃4枚“道兵”，对其造成1点雷电伤害。',
 			sbguidao:'鬼道',
-			sbguidao_info:'①游戏开始时，你获得4枚“道兵”标记（“道兵”上限为8）。②一名角色受到属性伤害后，你获得2枚“道兵”。③当你受到伤害时，你可以弃2枚“道兵”并防止此伤害。然后若当前回合角色不为你，〖鬼道②〗于你下回合开始前无效。',
+			sbguidao_info:'①一名角色受到属性伤害后，你获得2枚“道兵”。②当你受到伤害时，你可以弃2枚“道兵”并防止此伤害。然后若当前回合角色不为你，〖鬼道①〗于你下回合开始前无效。③“道兵”上限为8。',
 			sbhuangtian:'黄天',
 			sbhuangtian_info:'主公技，锁定技。①回合开始时，若本回合为你的第一个回合且游戏轮数为1，且游戏内没有【太平要术】，你装备【太平要术】。②其他群势力角色造成伤害后，若你拥有〖鬼道〗，你获得1枚“道兵”（每轮你至多以此法获得4枚“道兵”）。',
 			sb_caocao:'谋曹操',
@@ -5116,7 +5116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbzaiqi_info:'蓄力技（0/7）。①弃牌阶段结束时，你可以消耗任意点蓄力值并选择等量名角色，然后令这些角色选择一项：1.令你摸一张牌；2.弃置一张牌，然后你回复1点体力。②每回合限一次。当你造成伤害后，你获得1点蓄力值。',
 			sb_zhanghe:'谋张郃',
 			sbqiaobian:'巧变',
-			sbqiaobian_info:'每回合限一次。①你可以失去1点体力并跳过判定阶段，将判定区的所有牌移动给一名其他角色（无法置入其判定区的牌改为弃置之）。②你可以跳过摸牌阶段，于下个准备阶段摸两张牌并回复1点体力。③你可以将手牌数弃置至六张（若手牌数少于六张则跳过之）并跳过出牌阶段和弃牌阶段，然后移动场上的一张牌。',
+			sbqiaobian_info:'每回合限一次。①你可以失去1点体力并跳过判定阶段，将判定区的所有牌移动给一名其他角色（无法置入其判定区的牌改为弃置之）。②你可以跳过摸牌阶段，于下个准备阶段摸五张牌并回复1点体力。③你可以将手牌数弃置至六张（若手牌数少于六张则跳过之）并跳过出牌阶段和弃牌阶段，然后移动场上的一张牌。',
 			sb_yl_luzhi:'谋卢植',
 			sb_yl_luzhi_prefix:'谋',
 			sbzhenliang:'贞良',

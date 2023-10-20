@@ -915,7 +915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mod:{
 							playerEnabled:function(card,player,target){
 								if(!player.isPhaseUsing()) return;
-								if(card.name=='sha'&&player.getStorage('luanqun_effect').contains(target)) return false;
+								if(card.name=='sha'&&!player.getStorage('luanqun_effect').contains(target)) return false;
 							},
 						},
 						trigger:{player:'useCard1'},
@@ -4445,16 +4445,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							ai1:function(card){
 								return 7-_status.event.player.getUseValue(card,null,true);
 							},
-							precontent:function(){
-								event.getParent().addCount=false;
-								var evtx=event.getParent(2);
-								if(player.hasHistory('useCard',function(evt){
-									return evt.skill=='xinjianying_backup'&&evt.getParent(2)==evtx;
-								})){
-									alert('检测到您安装了十周年UI等具有出牌特效的扩展。该扩展会导致【渐营】出现无视次数限制发动的bug。为避免无限循环，即将重启游戏。请卸载相关扩展以解决此问题。');
-									game.reload();
-								}
-							},
 						};
 						if(_status.event.xinjianying_suit) next.viewAs.suit=_status.event.xinjianying_suit;
 						return next;
@@ -4468,7 +4458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(_status.event.xinjianying_suit) return 16;
 						return 3;
 					},
-					result:{player:1},
+					result:{player:7},
 				},
 				subSkill:{
 					draw:{inherit:'jianying',audio:'xinjianying'},
@@ -15227,7 +15217,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_jushou:'手杀界沮授',
 			xin_jushou_prefix:'手杀界',
 			xinjianying:'渐营',
-			xinjianying_info:'①当你于出牌阶段内使用与此阶段你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌。②出牌阶段限一次，你可以将一张牌当做任意基本牌使用（不计入次数限制）。若你于此阶段内使用的上一张牌有花色，则此牌的花色视为上一张牌的花色。',
+			xinjianying_info:'①当你于出牌阶段内使用与此阶段你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌。②出牌阶段限一次，你可以将一张牌当做任意基本牌使用。若你于此阶段内使用的上一张牌有花色，则此牌的花色视为上一张牌的花色。',
 			re_xunyu:'手杀界荀彧',
 			re_xunyu_prefix:'手杀界',
 			rejieming:"节命",
