@@ -14293,7 +14293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard(get.prompt2('new_meibu',trigger.player),'he').set('ai',function(card){
 						if(_status.event.check) return 6-get.value(card);
 						return 0;
-					}).set('check',check).set('logSkill','new_meibu');
+					}).set('check',check).set('logSkill',['new_meibu',trigger.player]);
 					"step 1"
 					if(result.bool){
 						var target=trigger.player;
@@ -14301,8 +14301,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target,'green');
 						target.addTempSkill('new_zhixi','phaseUseAfter');
 						if(card.name!='sha'&&get.type(card)!='trick'&&get.color(card)!='black'){
-							target.addTempSkill('new_meibu_range','phaseUseEnd');
-							target.storage.meibu=player;
+							target.addTempSkill('new_meibu_range','phaseUseAfter');
+							target.markAuto('new_meibu_range',player);
 						}
 						target.markSkillCharacter('new_meibu',player,'魅步','锁定技，出牌阶段，你至多可使用X张牌，你使用了锦囊牌后不能再使用牌（X为你的体力值）。');
 					}
@@ -14312,9 +14312,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					range:{
+						onremove:true,
+						charlotte:true,
 						mod:{
 							globalFrom:function (from,to,num){
-								if(to==from.storage.meibu){
+								if(from.getStorage('new_meibu_range').includes(to)){
 									return -Infinity;
 								}
 							},
@@ -14328,10 +14330,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					player:"phaseUseBegin",
 				},
+				filter:function(event,player){
+					return game.hasPlayer(current=>{
+						if(current==player) return current.getEquips(2).length>0;
+						return current.countCards('e')>0;
+					});
+				},
 				direct:true,
 				content:function (){
 					'step 0'
-					player.chooseTarget(get.prompt('new_mumu'),'弃置一名角色装备区内的一张牌，或者获得一名角色装备区内的防具牌',function(card,player,target){
+					player.chooseTarget(get.prompt('new_mumu'),'弃置一名其他角色装备区内的一张牌，或者获得一名角色装备区内的防具牌',function(card,player,target){
 						if(target==player) return target.getEquips(2).length>0;
 						return target.countCards('e')>0;
 					}).set('ai',function(target){
@@ -14422,6 +14430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{presha:true,pretao:true,nokeep:true},
 			},
 			"new_mumu2":{
+				charlotte:true,
 				mod:{
 					cardEnabled:function(card){
 						if(card.name=='sha') return false;
@@ -24877,7 +24886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zumao:['zumao','tw_zumao'],
 			tw_beimihu:['beimihu','tw_beimihu'],
 			panfeng:['panfeng','re_panfeng','std_panfeng'],
-			sunluyu:['sunluyu','re_sunluyu'],
+			sunluyu:['sunluyu','re_sunluyu','mb_sunluyu'],
 			jin_simazhao:['jin_simazhao','simazhao','sp_simazhao'],
 			jin_wangyuanji:['jin_wangyuanji','wangyuanji','sp_wangyuanji'],
 			wangyun:['wangyun','dc_wangyun','re_wangyun','jsrg_wangyun','old_wangyun','pe_wangyun'],

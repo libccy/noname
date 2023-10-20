@@ -22,10 +22,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_yijiang5:['xin_zhangyi','xin_sunxiu','xin_quancong','xin_zhuzhi','xin_caoxiu'],
 				mobile_yijiang67:["re_jikang"],
 				mobile_changshi:['scs_zhangrang','scs_zhaozhong','scs_sunzhang','scs_bilan','scs_xiayun','scs_hankui','scs_lisong','scs_duangui','scs_guosheng','scs_gaowang'],
-				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui"],
+				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui",'mb_sunluyu'],
 			},
 		},
 		character:{
+			mb_sunluyu:['female','wu',3,['mbmeibu','mbmumu']],
 			xin_wuban:['male','shu',4,['xinjintao'],['clan:陈留吴氏','character:wuban']],
 			baoxin:['male','qun',4,['mutao','yimou'],['character:tw_baoxin','die_audio:tw_baoxin']],
 			jiangji:['male','wei',3,['twjichou','jilun'],['character:tw_jiangji','die_audio:tw_jiangji']],
@@ -386,6 +387,133 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//手杀差异化孙鲁育
+			mbmumu:{
+				audio:'mumu',
+				inherit:'new_mumu',
+				filter:function(event,player){
+					return game.hasPlayer(current=>{
+						return current.countCards('e')>0;
+					});
+				},
+				content:function (){
+					'step 0'
+					player.chooseTarget(get.prompt('mbmumu'),'弃置场上的一张装备牌，或者获得场上的一张防具牌。',function(card,player,target){
+						return target.countCards('e')>0;
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						var att=get.attitude(player,target)
+						if(target.getEquip(2)&&player.hasEmptySlot(2)){
+							return -2*att;
+						}
+						return -att;
+					});
+					'step 1'
+					if(result.bool&&result.targets&&result.targets.length){
+						event.target=result.targets[0];
+						player.logSkill('mbmumu',event.target);
+						player.line(event.target,'green');
+						var e=event.target.getEquips(2);
+						event.e=e;
+						if(e.length>0){
+							player.chooseControl('弃置一张装备牌','获得一张防具牌').set('ai',function(){
+								if(_status.event.player.getEquips(2).length>0){
+									return '弃置一张装备牌';
+								}
+								return '获得一张防具牌';
+							});
+						}
+						else{
+							event.choice='弃置一张装备牌';
+						}
+					}
+					else event.finish();
+					'step 2'
+					var choice=event.choice||result.control;
+					if(choice=='弃置一张装备牌'){
+						player.discardPlayerCard(event.target,'e',true);
+					}
+					else{
+						if(event.e){
+							player.gain(event.e,event.target,'give','bySelf');
+							player.addTempSkill('new_mumu2');
+						}
+					}
+				},
+			},
+			mbmeibu:{
+				inherit:'new_meibu',
+				derivation:['mbzhixi'],
+				content:function (){
+					"step 0"
+					var check=lib.skill.new_meibu.checkx(trigger,player);
+					player.chooseToDiscard(get.prompt2('mbmeibu',trigger.player),'he').set('ai',function(card){
+						if(_status.event.check) return 6-get.value(card);
+						return 0;
+					}).set('check',check).set('logSkill',['mbmeibu',trigger.player]);
+					"step 1"
+					if(result.bool){
+						var target=trigger.player;
+						var card=result.cards[0];
+						player.line(target,'green');
+						target.addTempSkill('mbzhixi','phaseUseAfter');
+						if(card.name!='sha'&&get.type(card)!='trick'&&get.color(card)!='black'){
+							target.addTempSkill('new_meibu_range','phaseUseAfter');
+							target.markAuto('new_meibu_range',player);
+						}
+						target.markSkillCharacter('mbmeibu',player,'魅步','锁定技。出牌阶段，若你于此阶段使用过的牌数不小于X，你不能使用牌（X为你的体力值）；当你使用锦囊牌时，你结束此阶段。');
+					}
+				},
+			},
+			mbzhixi:{
+				mod:{
+					cardEnabled:function(card,player){
+						if(player.countMark('mbzhixi')>=player.hp) return false;
+					},
+					cardUsable:function(card,player){
+						if(player.countMark('mbzhixi')>=player.hp) return false;
+					},
+					cardRespondable:function(card,player){
+						if(player.countMark('mbzhixi')>=player.hp) return false;
+					},
+					cardSavable:function(card,player){
+						if(player.countMark('mbzhixi')>=player.hp) return false;
+					},
+				},
+				trigger:{
+					player:"useCard1",
+				},
+				forced:true,
+				popup:false,
+				onremove:true,
+				firstDo:true,
+				init:function(player,skill){
+					player.storage[skill]=0;
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.player==player){
+						player.getHistory('useCard',function(evtx){
+							if(evtx.getParent('phaseUse')==evt){
+								player.storage[skill]++;
+							}
+						})
+					}
+				},
+				onremove:function(player){
+					player.unmarkSkill('mbmeibu');
+					delete player.storage.mbzhixi;
+				},
+				content:function(){
+					player.addMark('mbzhixi',1,false);
+					if(get.type2(trigger.card)=='trick'){
+						var evt=trigger.getParent('phaseUse');
+						if(evt&&evt.player==player){
+							evt.skipped=true;
+							game.log(player,'结束了出牌阶段');
+						}
+					}
+				},
+				ai:{presha:true,pretao:true,nokeep:true},
+			},
 			//庞统
 			xinlianhuan:{
 				audio:2,
@@ -15316,6 +15444,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjintao_info:'锁定技，你使用【杀】无距离限制且次数上限+1。你于出牌阶段内使用的第一张【杀】不可被响应，第二张【杀】伤害+1。',
 			xinlianhuan:'连环',
 			xinlianhuan_info:'你可以将一张♣手牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标后，可以给此牌增加一个目标。',
+			mb_sunluyu:'手杀孙鲁育',
+			mb_sunluyu_prefix:'手杀',
+			mbmumu:'穆穆',
+			mbmumu_info:'出牌阶段开始时，你可以选择一项：1.弃置场上的一张装备牌；2.获得场上的一张防具牌，然后你本回合不能使用或打出【杀】。',
+			mbmeibu:'魅步',
+			mbmeibu_info:'其他角色的出牌阶段开始时，若你在其攻击范围内，你可以弃置一张牌，令该角色于本回合内获得〖止息〗。若你以此法弃置的牌不是【杀】或黑色锦囊牌，则本回合其与你的距离视为1。',
+			mbzhixi:'止息',
+			mbzhixi_info:'锁定技。出牌阶段，若你于此阶段使用过的牌数不小于X，你不能使用牌（X为你的体力值）；当你使用锦囊牌时，你结束此阶段。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',

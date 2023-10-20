@@ -1106,6 +1106,7 @@ window.noname_character_rank={
 		're_caoxiu',
 		'xin _caoxiu',
 		'sunluyu',
+		'mb_sunluyu',
 		'sp_diaochan',
 		'liuxie',
 		'zhugejin',
