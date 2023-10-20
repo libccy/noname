@@ -9357,7 +9357,6 @@
 					delete _status.htmlbg;
 
 					window.game=game;
-					game.dynamicStyle.init();
 					lib.announce.init();
 					// node:path library alternative
 					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path",()=>{
@@ -35207,69 +35206,258 @@
 		setSimpleYingbianCondition:(yingbianCondition,condition)=>game.broadcastAll((yingbianCondition,condition)=>lib.yingbian.condition.simple.set(yingbianCondition,condition),yingbianCondition,condition),
 		setYingbianEffect:(yingbianEffect,effect)=>game.broadcastAll((yingbianEffect,effect)=>lib.yingbian.effect.set(yingbianEffect,effect),yingbianEffect,effect),
 		setYingbianPrompt:(yingbian,prompt)=>game.broadcastAll((yingbian,prompt)=>lib.yingbian.prompt.set(yingbian,prompt),yingbian,prompt),
-		//动态CSS from libnodiz
-		dynamicStyle:{
-			init:()=>{
-				const that=game.dynamicStyle;
-				that._cache={};
-				that._cache.rules=[];
-				that._cache.style=document.createElement("style");
-				that._cache.style.id="game.dynamicStyle";
-				document.head.appendChild(that._cache.style);
-				that._cache.sheet = that._cache.style.sheet;
-				delete game.dynamicStyle.init;
-				return true;
-			},
-			translate:style=>{
-				let result=[];
-				for(const name in style){
-					result.push(`${name.replace(/([A-Z])/g, match => `-${match.toLowerCase()}`)}: ${style[name]};`);
-				}
-				return result.join(" ");
-			},
-			generate:(name, style)=>[`${name} {`, game.dynamicStyle.translate(style), "}"].join(" "),
-			has:name=>game.dynamicStyle._cache.rules.some(item=>item[0]==name),
-			get:name=>game.dynamicStyle.find(item=>item[0]==name)[1],
-			find:fn=>game.dynamicStyle._cache.rules.find(fn),
-			size:()=>game.dynamicStyle._cache.rules.length,
-			indexOf:name=>{
-				for (let i=0;i<game.dynamicStyle._cache.rules.length;++i){
-					if(name==game.dynamicStyle._cache.rules[i][0]) return i;
+		/**
+		 * Dynamic Style Manager
+		 * 动态CSS管理对象
+		 * 
+		 * > No idea to write, it's just a tool to handle css.
+		 * > 暂时不知道写啥，反正就是个管CSS的工具
+		 * 
+		 * @example
+		 * // 为符合".content"的元素增加"text-align: center"的样式
+		 * game.dynamicStyle.add(".content", {
+		 * 	textAlign: "center"
+		 * });
+		 * 
+		 * // 在上一条的基础上，再为".content"增加"color: #FFFFFF"的样式
+		 * game.dynamicStyle.add(".content", {
+		 * 	color: "#FFFFFF"
+		 * });
+		 * 
+		 * @example
+		 * // 批量添加符合对应选择器元素的样式
+		 * game.dynamicStyle.addObject({
+		 * 	".content": {
+		 * 		textAlign: "center"
+		 * 	},
+		 * 	".ansory": {
+		 * 		fontSize: "16px"
+		 * 	}
+		 * });
+		 * 
+		 * @example
+		 * // 移除".content"元素的样式
+		 * game.dynamicStyle.remove(".content");
+		 * 
+		 * @example
+		 * // 移除".content"元素的"textAlign"样式
+		 * game.dynamicStyle.removeStyles(".content", ["textAligh"]);
+		 * 
+		 * @example
+		 * // 如果".content"元素的样式存在，则将".content"的样式修改为给定的样式
+		 * // 反之效果同`game.dynamicStyle.add`
+		 * game.dynamicStyle.update(".content", {
+		 * 	textAlign: "center"
+		 * });
+		 */
+		dynamicStyle:new class{
+			/**
+			 * Object of style
+			 * 表示样式的对象
+			 * 
+			 * @typedef {Record<string, string | number>} StyleObject
+			 */
+			/**
+			 * Rule to record style info.
+			 * 用于记录样式信息的规则
+			 * 
+			 * @typedef {[string, StyleObject]} Rule
+			 */
+			/**
+			 * Type used to declare the place to store css info.
+			 * 用来存CSS信息的空间的类型
+			 * 
+			 * @typedef {object} DynamicStyleCache
+			 * @property {Rule[]} rules 记录的规则
+			 * @property {HTMLStyleElement} style 全局Style标签
+			 * @property {CSSStyleSheet} sheet Style标签的Sheet
+			 */
+
+			/**
+			 * Initialize dynamicStyle.
+			 * 初始化数据
+			 */
+			constructor(){
+				/**
+				 * @type {DynamicStyleCache}
+				 */
+				let cache=Object.create(null);
+				cache.rules=new Array;
+				cache.style=document.createElement("style");
+				cache.style.id="game.dynamicStyle";
+				document.head.appendChild(cache.style);
+				cache.sheet=cache.style.sheet;
+				/**
+				 * Place to store css info.
+				 * 存CSS信息的空间
+				 * 
+				 * @type {DynamicStyleCache}
+				 */
+				this._cache=cache;
+			}
+
+			/**
+			 * Turn the Object Style to string format.
+			 * 将给定的对象样式转换成字符串的形式
+			 * 
+			 * @param {StyleObject} style 给定的对象样式
+			 * @returns {string} 样式的字符串形式
+			 */
+			translate(style){
+				return Object.entries(style).map(item =>
+					`${item[0].replace(/([A-Z])/g, match => 
+						`-${match.toLowerCase()}`)}: ${item[1]};`).join(" ");
+			}
+
+			/**
+			 * Generate the common css selector.
+			 * 生成标准的CSS样式
+			 * 
+			 * @param {string} name 选择器
+			 * @param {StyleObject} style 对象样式
+			 * @returns {string} 标准的CSS样式
+			 */
+			generate(name, style){
+				return `${name} { ${this.translate(style)} }`;
+			}
+
+			/**
+			 * Determine the selector is in rules.
+			 * 检查是否存在对应选择器的规则
+			 * 
+			 * @param {string} name 选择器
+			 * @returns {boolean}
+			 */
+			has(name){
+				return this._cache.rules.some(item=>item[0]==name);
+			}
+
+			/**
+			 * Get the style of given selector, or return null.
+			 * 获得对应选择器的样式对象，若不存在，则返回`null`
+			 * 
+			 * @param {string} name 选择器
+			 * @returns {?StyleObject}
+			 */
+			get(name){
+				const result = this.find(item=>item[0]==name);
+				return result ? result[1] : null;
+			}
+
+			/**
+			 * Callback of `DynamicStyle#find`, getting the rule wanted.
+ 			 * `DynamicStyle#find`的回调函数，用于获取符合要求的规则
+			 * 
+ 			 * @callback FindCallback
+ 			 * @param {Rule} rule 样式规则
+ 			 * @param {number} index 样式编号
+			 * @param {Rule[]} rules 规则集
+			 * @returns {boolean}
+ 			*/
+
+			/**
+			 * Get the rule wanted by given function.
+			 * 通过给定的函数，获取符合要求的规则
+			 * 
+			 * @param {FindCallback} fn 用于检查的函数
+			 * @returns {?StyleObject}
+			 */
+			find(fn){
+				return this._cache.rules.find(fn);
+			}
+
+			/**
+			 * Length of rules.
+			 * 规则集的长度
+			 * 
+			 * @returns {number}
+			 */
+			size(){
+				return this._cache.rules.length;
+			}
+
+			/**
+			 * Get the index of given selector, or return `-1`.
+			 * 获得对应选择器的位置，若不存在，则返回`-1`
+			 * 
+			 * @param {string} name 选择器
+			 * @returns {number}
+			 */
+			indexOf(name){
+				for (let i=0;i<this._cache.rules.length;++i){
+					if(name==this._cache.rules[i][0]) return i;
 				}
 				return -1;
-			},
-			add:(name,style)=>{
-				const that=game.dynamicStyle;
-				return that.update(name,that.has(name)?Object.assign({},that.get(name),style):style);
-			},
-			addObject:object=>{
-				const that=game.dynamicStyle;
-				let result=[];
-				for(const name in object){
-					result.push(that.add(name, object[name]));
-				}
-				return result;
-			},
-			remove:name=>{
-				const that=game.dynamicStyle;
-				if(!that.has(name)) return false;
-				const index=that.indexOf(name);
-				that._cache.rules.splice(index,1);
-				that._cache.sheet.deleteRule(index);
-				return true;
-			},
-			update:(name,style)=>{
-				const that=game.dynamicStyle;
+			}
+			
+			// 后面部分就不说明了，可以顾名思义
+			/**
+			 * @param {string} name 选择器
+			 * @param {StyleObject} style 要添加的样式对象
+			 * @returns {boolean} 添加的结果，为`true`则添加成功，为`false`则添加失败
+			 */
+			add(name,style){
+				return this.update(name,this.has(name)?Object.assign({},this.get(name),style):style);
+			}
+
+			/**
+			 * @param {Record<string, StyleObject>} object 以`name: style`存储的映射
+			 * @returns {boolean} 添加的结果，为`true`则添加成功，为`false`则添加失败
+			 */
+			addObject(object){
+				return Object.entries(object).map(item => this.add(item[0],item[1]));
+			}
+
+			/**
+			 * @param {string} name 要移除规则的选择器
+			 * @returns {boolean} 移除的结果，为`true`则移除成功，为`false`则移除失败
+			 */
+			remove(name){
+				if(!this.has(name)) return false;
 				try{
-					if(that.has(name)){
-						const index=that.indexOf(name);
-						that._cache.sheet.deleteRule(index);
-						that._cache.sheet.insertRule(that.generate(name,style),index);
-						that._cache.rules[index] = [name, style];
+					const index=this.indexOf(name);
+					this._cache.rules.splice(index,1);
+					this._cache.sheet.deleteRule(index);
+					return true;
+				}
+				catch(e){
+					console.log(e);
+					return false;
+				}
+			}
+
+			/**
+			 * @param {string} name 要移除规则的选择器
+			 * @param {string[]} styles 要移除的样式
+			 * @returns {boolean} 移除的结果，为`true`则移除成功，为`false`则移除失败
+			 */
+			removeStyles(name,styles){
+				if(!this.has(name)) return false;
+				const style=this.get(name);
+				styles.forEach(styleName=>{
+					delete style[styleName];
+				});
+				return this.update(name,style);
+			}
+
+			/**
+			 * 添加或修改一个规则所对应的样式
+			 * 
+			 * @param {string} name 要变更规则的选择器
+			 * @param {StyleObject} style 变更规则的样式
+			 * @returns {boolean} 更新的结果，为`true`则更新成功，为`false`则更新失败
+			 */
+			update(name,style){
+				try{
+					if(this.has(name)){
+						const index=this.indexOf(name);
+						this._cache.sheet.deleteRule(index);
+						this._cache.sheet.insertRule(this.generate(name,style),index);
+						this._cache.rules[index] = [name, style];
 					}else{
-						const index=that._cache.rules.length;
-						that._cache.rules.push([name,style]);
-						that._cache.sheet.insertRule(that.generate(name,style),index);
+						const index=this._cache.rules.length;
+						this._cache.rules.push([name,style]);
+						this._cache.sheet.insertRule(this.generate(name,style),index);
 					}
 					return true;
 				}
