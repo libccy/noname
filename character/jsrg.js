@@ -293,23 +293,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var reg=`【${get.translation(name)}】`;
 						if(name=='sha'){
 							if(str.includes(reg)){
-								if(checkCard&&checkCard.name==name) return true;
+								if(checkCard) return checkCard.name==name;
 								list.push([type,'',name]);
 							}
 							for(var nature of lib.inpile_nature){
 								var reg1=`【${get.translation(nature)+get.translation(name)}】`,reg2=`${get.translation(nature)}【${get.translation(name)}】`;
 								if(str.includes(reg1)||str.includes(reg2)){
-									if(checkCard&&checkCard.name==name&&checkCard.nature==nature) return true;
+									if(checkCard) return checkCard.name==name&&checkCard.nature==nature;
 									list.push([type,'',name,nature]);
 								}
 							}
 						}
 						else{
 							if(!str.includes(reg)) continue;
-							if(checkCard&&checkCard.name==name) return true;
+							if(checkCard) return checkCard.name==name;
 							list.push([type,'',name]);
 						}
 					}
+					if(checkCard) return false;
 					return list;
 				},
 				chooseButton:{
@@ -383,7 +384,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card.storage&&card.storage.jsrgzhenfeng) return Infinity;
 					},
 					targetInRange:function(card){
-						if(card.storage&&card.storage.jsrgzhenfeng) return Infinity;
+						if(card.storage&&card.storage.jsrgzhenfeng) return true;
 					},
 				},
 				ai:{
@@ -403,6 +404,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						onremove:true,
 						filter:function(event,player){
 							if(!event.card.storage||!event.card.storage.jsrgzhenfeng) return false;
+							debugger
 							var str=event.target.getSkills(null,false,false).map(skill=>{
 								var info=get.info(skill);
 								if(!info||info.charlotte) return;
@@ -445,6 +447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return current.inRange(trigger.player)&&player.canUse('sha',current,false);
 						});
 						if(targets.length){
+							game.delayex();
 							player.useCard({name:'sha',isCard:true,storage:{jsrgbaohe:0}},targets,false);
 							player.addTempSkill('jsrgbaohe_add');
 						}
@@ -498,6 +501,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return ui.selected.cards.length==ui.selected.targets.length;
 				},
 				check:function(card){
+					var player=get.player();
+					if(ui.selected.cards.length>=game.countPlayer(current=>{
+						return current!=player&&get.attitude(player,current)>0;
+					})) return 0;
 					return 5-get.value(card);
 				},
 				prompt:'按顺序选择卡牌和角色，并将卡牌交给对应顺序的角色。然后你获得两倍数量的【影】。',
@@ -535,6 +542,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							var card=ui.selected.cards[ui.selected.targets.length];
+							if(!card) return 0;
 							if(get.value(card)<0) return -1;
 							if(get.value(card)<1.5&&player.hasSkill('jsrgbaohe')) return (get.sgnAttitude(player,target)+0.01)/5;
 							return Math.sqrt(5-Math.min(4,target.countCards('h')));
@@ -1176,19 +1184,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					used:{charlotte:true},
 					swapback:{
 						audio:'jsrgguiji',
-						trigger:{global:'phaseUseEnd'},
+						trigger:{
+							global:['phaseUseEnd','dieAfter'],
+						},
 						filter:function(event,player){
 							return player.getStorage('jsrgguiji_swapback').includes(event.player);
 						},
 						charlotte:true,
-						prompt2:'与其交换手牌',
-						logTarget:'player',
+						direct:true,
 						check:function(event,player){
 							return player.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c)<event.player.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c)+4*Math.random();
 						},
 						content:function(){
-							player.swapHandcards(trigger.player);
-							player.unmarkAuto('jsrgguiji_swapback',[target]);
+							'step 0'
+							if(trigger.name=='phaseUse'){
+								player.chooseBool(get.prompt('jsrgguiji_swapback',trigger.player),'与其交换手牌。').set('ai',()=>{
+									return get.event('bool');
+								}).set('bool',lib.skill.jsrgguiji_swapback.check(trigger,player)>0);
+							}
+							else{
+								player.unmarkAuto('jsrgguiji_swapback',[trigger.player]);
+								event.finish();
+							}
+							'step 1'
+							if(result.bool){
+								player.logSkill('jsrgguiji_swapback',trigger.player);
+								player.swapHandcards(trigger.player);
+								player.unmarkAuto('jsrgguiji_swapback',[trigger.player]);
+							}
+						},
+						intro:{
+							content:'$的下个出牌阶段结束时，你可以与其交换手牌'
 						},
 					},
 				},
@@ -1533,6 +1559,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.event('damaged').length==game.countPlayer()) return 0;
 							return [0,1];
 						},
+						position:'he',
 						filterTarget:function(card,player,target){
 							var damaged=get.event('damaged');
 							return damaged.includes(target)^(ui.selected.cards.length>0);
@@ -6137,7 +6164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_zhangchu:'转张楚',
 			jsrg_zhangchu_prefix:'转',
 			jsrghuozhong:'惑众',
-			jsrghuozhong_info:'所有角色出牌阶段限一次。其可以将一张黑色非锦囊牌置于其判定区，然后令你摸两张牌。',
+			jsrghuozhong_info:'所有角色出牌阶段限一次。其可以将一张黑色非锦囊牌当【兵粮寸断】置于其判定区，然后令你摸两张牌。',
 			jsrgrihui:'日彗',
 			jsrgrihui_info:'①当你使用【杀】对目标角色造成伤害后，你可以令判定区有牌的其他角色各摸一张牌。②你于一回合内对判定区没有牌的角色使用的第一张【杀】无任何次数限制。',
 			jsrg_xiahouen:'转夏侯恩',
