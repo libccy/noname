@@ -21605,7 +21605,7 @@
 					next.setContent('chooseToGuanxing');
 					return next;
 				}
-				$throwEmotion(target,name){
+				$throwEmotion(target,name,rotate){
 					game.addVideo('throwEmotion',this,[target.dataset.position,name]);
 					var getLeft=function(player){
 						if(player==game.me&&!ui.fakeme&&!ui.chess) return player.getLeft()+player.node.avatar.offsetWidth/2;
@@ -21624,8 +21624,19 @@
 					emotion.style.top=top+'px';
 					var left2=getLeft(target)-width;
 					var top2=target.getTop()+target.offsetHeight/3-height;
+					if(['egg','flower','shoe'].contains(name)||rotate){
+						var num1=0.95+Math.random()*(1.1-0.95);
+						var num2=1+Math.random()*(3-1);
+						var left2=getLeft(target)/num1-width;
+						var top2=target.getTop()+target.offsetHeight/num2-height;
+					}
+					else{
+						var left2=getLeft(target)-width;
+						var top2=target.getTop()+target.offsetHeight/3-height;
+					}
 					emotion.style['z-index']=10;
 					emotion.style.transform='translateY('+(top2-top)+'px) translateX('+(left2-left)+'px)';
+					if(['egg','flower','shoe'].contains(name)||rotate) emotion.firstElementChild.style.transform='rotate(1440deg)';
 					if(lib.config.background_audio) game.playAudio('effect','throw_'+name+get.rand(1,2));
 					setTimeout(function(){
 						emotion.innerHTML=('<div style="text-align:center"> <img src="'+lib.assetURL+'image/emotion/throw_emotion/'+name+'2.png"> </div>');
@@ -22379,10 +22390,10 @@
 					game.playerMap[this.playerid]=this;
 					return this;
 				}
-				throwEmotion(target,emotion){
-					game.broadcastAll(function(player,target,emotion){
-						player.$throwEmotion(target,emotion);
-					},this,target,emotion);
+				throwEmotion(target,emotion,rotate){
+					game.broadcastAll(function(player,target,emotion,rotate){
+						player.$throwEmotion(target,emotion,rotate);
+					},this,target,emotion,rotate);
 				}
 				emotion(pack,id){
 					var str='<img src="##assetURL##image/emotion/'+pack+'/'+id+'.gif" width="50" height="50">';
@@ -33813,11 +33824,11 @@
 						}
 					}
 				},
-				throwEmotion:function(target,emotion){
+				throwEmotion:function(target,emotion,rotate){
 					if(lib.node.observing.contains(this)) return;
 					var player=lib.playerOL[this.id];
 					if(player){
-						player.throwEmotion(target,emotion);
+						player.throwEmotion(target,emotion,rotate);
 					}
 				},
 				emotion:function(id,pack,emotion){
