@@ -19504,7 +19504,6 @@
 						event.hujia=Math.min(-num,player.hujia);
 						event.getParent().hujia=event.hujia;
 						event.num+=event.hujia;
-						game.log(player,'的护甲抵挡了'+get.cnNumber(event.hujia)+'点伤害');
 						player.changeHujia(-event.hujia).type='damage';
 					}
 					//old part
@@ -19529,12 +19528,26 @@
 					event.trigger('changeHp');
 				},
 				changeHujia:function(){
+					if(-num>player.hujia){
+						num=-player.hujia;
+						event.num=num;
+					}
 					player.hujia+=num;
 					if(num>0){
 						game.log(player,'获得了'+get.cnNumber(num)+'点护甲');
 					}
-					if(player.hujia<0){
-						player.hujia=0;
+					// if(player.hujia<0){
+					// 	player.hujia=0;
+					// }
+					if(num<0){
+						switch(type){
+							case 'damage':
+								game.log(player,'的护甲抵挡了'+get.cnNumber(-num)+'点伤害');
+								break;
+							case 'lose':
+								game.log(player,'失去了'+get.cnNumber(-num)+'点护甲');
+								break;
+						}
 					}
 					player.update();
 				},
@@ -24778,9 +24791,13 @@
 					if(typeof num!='number'){
 						num=1;
 					}
+					if(typeof type!='string'){
+						if(num>=0) type='gain';
+						else type='lose';
+					}
 					next.num=num;
 					next.player=this;
-					if(type) next.type=type;
+					next.type=type;
 					next.setContent('changeHujia');
 					if(limit===true) limit=5;
 					if(typeof limit=='number'&&this.hujia+num>parseInt(limit)){
