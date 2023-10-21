@@ -34897,10 +34897,13 @@
 				nature:'black',
 			}],
 			['★SP',{
-				showName:'★',
+				showName:'SP',
 			}],
 			['☆SP',{
-				showName:'☆',
+				showName:'SP',
+			}],
+			['J.SP',{
+				showName:'SP',
 			}],
 			['K系列',{
 				showName:'Ｋ',
