@@ -34897,13 +34897,22 @@
 				nature:'black',
 			}],
 			['★SP',{
-				showName:'SP',
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('SP')}`
 			}],
 			['☆SP',{
-				showName:'SP',
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('SP')}`
 			}],
 			['J.SP',{
-				showName:'SP',
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('SP')}`
 			}],
 			['K系列',{
 				showName:'Ｋ',
