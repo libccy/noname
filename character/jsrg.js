@@ -284,29 +284,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				getInclusion:function(str,checkCard,player){
-					var list=[];
-					var names=Object.keys(lib.card);
-					for(var name of names){
-						var type=get.type(name);
+					let list=[];
+					const names=Object.keys(lib.card);
+					for(const name of names){
+						let type=get.type(name);
 						if(!['basic','trick'].includes(type)) continue;
 						if(player&&player.getStorage('jsrgzhenfeng_effect').includes(type)) continue;
-						var reg=`【${get.translation(name)}】`;
+						const reg=`【${get.translation(name)}】`;
 						if(name=='sha'){
 							if(str.includes(reg)){
-								if(checkCard) return checkCard.name==name;
+								if(checkCard&&checkCard.name==name) return true;
 								list.push([type,'',name]);
 							}
-							for(var nature of lib.inpile_nature){
-								var reg1=`【${get.translation(nature)+get.translation(name)}】`,reg2=`${get.translation(nature)}【${get.translation(name)}】`;
+							for(let nature of lib.inpile_nature){
+								const reg1=`【${get.translation(nature)+get.translation(name)}】`,reg2=`${get.translation(nature)}【${get.translation(name)}】`;
 								if(str.includes(reg1)||str.includes(reg2)){
-									if(checkCard) return checkCard.name==name&&checkCard.nature==nature;
+									if(checkCard&&checkCard.name==name&&checkCard.nature==nature) return true;
 									list.push([type,'',name,nature]);
 								}
 							}
 						}
 						else{
 							if(!str.includes(reg)) continue;
-							if(checkCard) return checkCard.name==name;
+							if(checkCard&&checkCard.name==name) return true;
 							list.push([type,'',name]);
 						}
 					}
@@ -882,7 +882,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					var next=player.chooseToUse();
-					next.set('openskilldialog',`###${get.prompt('olsuji')}###将一张牌当【杀】使用，且当一名角色受到此【杀】伤害时，此伤害+X（X为其本回合回复过的体力值）。`);
+					next.set('openskilldialog',`###${get.prompt('jsrgchuanxin')}###将一张牌当【杀】使用，且当一名角色受到此【杀】伤害时，此伤害+X（X为其本回合回复过的体力值）。`);
 					next.set('norestore',true);
 					next.set('_backupevent','jsrgchuanxin_backup');
 					next.set('addCount',false);
@@ -959,11 +959,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('摧锋',[list,'vcard']);
 					},
 					filter:function(button,player){
-						return _status.event.getParent().filterCard({name:button.link[2],nature:button.link[3],isCard:true},player,_status.event.getParent());
+						return _status.event.getParent().filterCard({name:button.link[2],nature:button.link[3],isCard:true,storage:{jsrgcuifeng:true},},player,_status.event.getParent());
 					},
 					check:function(button){
 						var player=_status.event.player;
-						var effect=player.getUseValue(button.link[2]);
+						var effect=player.getUseValue({name:button.link[2],nature:button.link[3],storage:{jsrgcuifeng:true}});
 						if(effect>0) return effect;
 						return 0;
 					},
@@ -973,27 +973,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							selectCard:-1,
 							filterCard:()=>false,
 							popname:true,
-							viewAs:{name:links[0][2],nature:links[0][3],isCard:true},
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+								isCard:true,
+								storage:{jsrgcuifeng:true},
+							},
 							precontent:function(){
 								player.logSkill('jsrgcuifeng');
 								player.awakenSkill('jsrgcuifeng');
 								delete event.result.skill;
-								player.when('phaseEnd').assign({card:event.result.card}).then(()=>{
-									var num=0,card=get.info(event.name).card;
+								if(!player.storage.jsrgcuifeng_check) player.when('phaseEnd').then(()=>{
+									var num=0;
 									player.checkHistory('sourceDamage',evt=>{
-										if(evt.card==card) num+=evt.num;
+										if(evt.card.storage.jsrgcuifeng) num+=evt.num;
 									});
 									if(num==0||num>1){
 										player.restoreSkill('jsrgcuifeng');
 										game.log(player,'重置了','#g【摧锋】');
-									}	
+									}
+									delete player.storage.jsrgcuifeng_check;
 								}).translation('摧锋');
+								player.setStorage('jsrgcuifeng_check',true);
 							}
 						}
 					},
 					prompt:function(links,player){
 						return '请选择'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+'的目标';
 					}
+				},
+				mod:{
+					targetInRange:card=>{
+						if(card.storage&&card.storage.jsrgcuifeng) return true;
+					},
 				},
 				ai:{
 					order:1.9,
@@ -1031,15 +1043,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							selectCard:-1,
 							filterCard:()=>false,
 							popname:true,
-							viewAs:{name:links[0][2],isCard:true},
+							viewAs:{
+								name:links[0][2],
+								isCard:true,
+								storage:{jsrgdengnan:true},
+							},
 							precontent:function(){
 								player.logSkill('jsrgdengnan');
 								player.awakenSkill('jsrgdengnan');
 								delete event.result.skill;
-								player.when('phaseEnd').assign({card:event.result.card}).then(()=>{
-									var targets=[],card=get.info(event.name).card;
+								if(!player.storage.jsrgdengnan_check) player.when('phaseEnd').then(()=>{
+									var targets=[];
 									player.checkHistory('useCard',evt=>{
-										if(evt.card==card) targets.addArray(evt.targets);
+										if(evt.card.storage.jsrgdengnan) targets.addArray(evt.targets);
 									});
 									if(targets.every(current=>{
 										return current.hasHistory('damage');
@@ -1047,7 +1063,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										player.restoreSkill('jsrgdengnan');
 										game.log(player,'重置了','#g【登难】');
 									}
+									delete player.storage.jsrgdengnan_check;
 								}).translation('登难');
+								player.setStorage('jsrgdengnan_check',true);
 							}
 						}
 					},
