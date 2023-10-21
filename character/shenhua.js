@@ -4150,7 +4150,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			beige:{
 				audio:2,
-				audioname:['re_caiwenji'],
+				audioname:['re_caiwenji','ol_caiwenji'],
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
 					return (event.card&&event.card.name=='sha'&&event.source&&
