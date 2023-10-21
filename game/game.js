@@ -34899,6 +34899,9 @@
 			['★SP',{
 				showName:'★',
 			}],
+			['☆SP',{
+				showName:'☆',
+			}],
 			['K系列',{
 				showName:'Ｋ',
 			}],
