@@ -7315,8 +7315,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=[1,2,3,4,5,6,7,8,9,10,11,12,13].filter(i=>lib.skill.dcgeyuan.filterNumber(player,i));
 						if(!list.length) return 0;
 						list=list.map(num=>{
-							var list=[1,11,12,13];
-							if(list.contains(num)) return ['A','J','Q','K'][list.indexOf(num)];
+							var list=[1,10,11,12,13];
+							if(list.contains(num)) return ['A','X','J','Q','K'][list.indexOf(num)];
 							return parseFloat(num);
 						});
 						return list.reduce((str,num)=>{
