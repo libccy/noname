@@ -38,6 +38,8 @@ var pinyin_dict_polyphone = {
 	"马日磾": " mì dī",
 	
 	"凯撒": " sà",
+	"梼杌": "táo ",
+	"地藏王": " zàng ",
 	
 	"乐无异": "yuè ",
 	"端蒙": " méng",
@@ -141,6 +143,7 @@ var pinyin_dict_polyphone = {
 	"膴仕": "wǔ ",
 	
 	"蒙斥": "méng ",
+	"奈落": " luò",
 	
 	"乐动": "yuè ",
 	"血凰": "xuè ",
