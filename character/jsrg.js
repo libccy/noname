@@ -541,7 +541,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:2.5,
 					result:{
 						target:function(player,target){
-							var card=ui.selected.cards[ui.selected.targets.length];
+							var card=ui.selected.cards.at(-1);
 							if(!card) return 0;
 							if(get.value(card)<0) return -1;
 							if(get.value(card)<1.5&&player.hasSkill('jsrgbaohe')) return (get.sgnAttitude(player,target)+0.01)/5;
