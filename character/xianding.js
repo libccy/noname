@@ -7311,8 +7311,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					name:'圆环之理',
 					markcount:function(storage,player){
-						if(!player.getStorage('dcgeyuan_homura').length) return 0;
-						var list=[1,2,3,4,5,6,7,8,9,10,11,12,13].filter(i=>lib.skill.dcgeyuan.filterNumber(player,i));
+						if(!player.storage.dcgeyuan||!player.getStorage('dcgeyuan_homura').length) return 0;
+						var list=player.storage.dcgeyuan.filter(i=>lib.skill.dcgeyuan.filterNumber(player,i));
 						if(!list.length) return 0;
 						list=list.map(num=>{
 							var list=[1,10,11,12,13];
