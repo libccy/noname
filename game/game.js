@@ -19540,7 +19540,7 @@
 					// 	player.hujia=0;
 					// }
 					if(num<0){
-						switch(type){
+						switch(event.type){
 							case 'damage':
 								game.log(player,'的护甲抵挡了'+get.cnNumber(-num)+'点伤害');
 								break;
