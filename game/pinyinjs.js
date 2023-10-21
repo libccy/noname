@@ -39,7 +39,7 @@ var pinyin_dict_polyphone = {
 	
 	"凯撒": " sà",
 	"梼杌": "táo ",
-	"地藏王": " zàng ",
+	"地藏王": "dì zàng wáng",
 	
 	"乐无异": "yuè ",
 	"端蒙": " méng",
