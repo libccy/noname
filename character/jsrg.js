@@ -720,7 +720,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function*(event,map){
 					var player=map.player,trigger=map.trigger;
 					var count=Math.ceil(game.countPlayer()/2);
-					var result=yield player.chooseTarget(get.prompt('jsrgfuni'),`选择至多${get.cnNumber(count)}名角色，令这些角色获得共计${get.cnNumber(count)}张【影】`,[1,count]).set('ai',target=>{
+					var result=yield player.chooseTarget(`伏匿：请选择至多${get.cnNumber(count)}名角色`,`令这些角色获得共计${get.cnNumber(count)}张【影】`,true,[1,count]).set('ai',target=>{
 						return get.attitude(get.player(),target);
 					});
 					if(result.bool){
@@ -877,7 +877,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('hes')&&game.hasPlayer(current=>player.canUse({
 						name:'sha',
 						storage:{jsrgchuanxin:true},
-					},current,false));
+					},current));
 				},
 				direct:true,
 				content:function(){
@@ -926,7 +926,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						charlotte:true,
-						conetnt:function(){
+						content:function(){
 							var num=game.getGlobalHistory('changeHp',evt=>{
 								return evt.getParent().name=='recover'&&evt.player==trigger.player;
 							}).map(evt=>evt.num).reduce((p,c)=>p+c);
@@ -6146,7 +6146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_zhangren:'转张任',
 			jsrg_zhangren_prefix:'转',
 			jsrgfuni:'伏匿',
-			jsrgfuni_info:'锁定技。①你的攻击范围终值为0。②一轮游戏开始时，你可以令任意名角色获得共计X张【影】（X为存活角色数的一半，向上取整）。③当有牌进入弃牌堆后，若其中有【影】，你于本回合使用牌无距离限制且不能被响应。',
+			jsrgfuni_info:'锁定技。①你的攻击范围终值为0。②一轮游戏开始时，你令任意名角色获得共计X张【影】（X为存活角色数的一半，向上取整）。③当有牌进入弃牌堆后，若其中有【影】，你于本回合使用牌无距离限制且不能被响应。',
 			jsrgchuanxin:'穿心',
 			jsrgchuanxin_info:'一名角色的结束阶段，你可以将一张牌当【杀】使用。当一名角色受到渠道为此【杀】的伤害时，此伤害+Y（Y为其本回合回复过的体力值）。',
 			jsrg_huangzhong:'转黄忠',
