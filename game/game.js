@@ -19366,7 +19366,7 @@
 								}
 							}
 						},natures,player);
-						var numx=Math.max(0,num-player.hujia);
+						var numx=player.hasSkillTag('nohujia')?num:Math.max(0,num-player.hujia);
 						player.$damagepop(-numx,natures[0]);
 					}
 					if(event.unreal) event.goto(6)
