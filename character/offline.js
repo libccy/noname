@@ -6323,7 +6323,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			splanggu_rewrite:'狼顾',
 			splanggu_info:'当你受到有来源的伤害后，你可以进行判定（此判定结果生效前，你可以打出一张手牌替换判定牌）。然后你可以观看伤害来源的手牌并弃置其中的任意张与判定结果花色相同的牌。',
 			spfuluan:'扶乱',
-			spfuluan_info:'出牌阶段限一次，你可以弃置三张花色相同的牌并选择攻击范围内的一名角色。若如此做，该角色翻面且你不能使用【杀】直到回合结束',
+			spfuluan_info:'出牌阶段限一次，你可以弃置三张花色相同的牌并选择攻击范围内的一名角色。若如此做，该角色翻面且你不能使用【杀】直到回合结束。',
 			spshude:'淑德',
 			spshude_info:'结束阶段开始时，你可以将手牌补至体力上限。',
 			spmingjian:'明鉴',
