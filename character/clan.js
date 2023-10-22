@@ -2489,6 +2489,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wanghun_prefix:'族',
 			clan_zhonghui_prefix:'族',
 			clan_zhongyu_prefix:'族',
+			clan_wanglun_prefix:'族',
 
 			clan_wuxian:'族吴苋',
 			clanyirong:'移荣',

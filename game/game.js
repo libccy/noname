@@ -42853,7 +42853,6 @@
 			spinningIdentityCard:function(identity,dialog){
 				const card=ui.create.identityCard(identity);
 				const buttons=ui.create.div('.buttons',dialog.content);
-				buttons.appendChild(card);
 				setTimeout(()=>{
 					buttons.appendChild(card);
 					dialog.open();

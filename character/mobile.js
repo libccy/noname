@@ -14546,7 +14546,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						try{
 							card.gnsheque_tag=true;
 						}catch(e){
-							alert('发生了一个导致【射却】无法正常触发无视防具效果的错误。请关闭十周年UI/手杀界UI等扩展以解决');
+							alert('发生了一个导致【射却】无法正常触发无视防具效果的错误。请关闭十周年UI/手杀ui等扩展以解决');
 						}
 					});
 				},
