@@ -400,6 +400,55 @@
 				return method;
 			}
 		},
+		versions:{
+			//获取某个扩展的版本号。
+			extensionVersion:function(extname){
+				var pack = lib.extensionPack[extname];
+				if(pack && pack.version){
+					return pack.version;
+				}
+				return "0";
+			},
+			//判断某个扩展是否支持本体的版本。扩展可设置{nonameCompact:{min:"2.1.0",max:"2.1.8"}}来限制支持的版本。
+			extensionSupport:function(extname){
+				var pack = lib.extensionPack[extname];
+				if(pack.nonameCompact){
+					let min = pack.nonameCompact.min;
+					let max = pack.nonameCompact.max;
+					if(min && lib.versions.compare(lib.version,min) < 0){
+						return false;
+					}
+					if(max && lib.versions.compare(lib.version,max) > 0){
+						return false;
+					}
+				}
+				return true;
+			},
+			//判断某个版本号是否合法。
+			valid:function(version){
+				if(!version)return false;
+				return /^[0-9]+(\.[0-9]+)*$/.test(version);
+			},
+			//比较两个版本号，如果a<b，返回-1；如果a>b，返回1；如果a=b，返回0。
+			compare:function(a,b){
+				if(!lib.versions.valid(a))a = "0";
+				if(!lib.versions.valid(b))b = "0";
+				var arr1 = a.split(".");
+				var arr2 = b.split(".");
+				for(var i=0;i<Math.min(arr1.length,arr2.length);i++){
+					var num1 = parseInt(arr1[i]);
+					var num2 = parseInt(arr2[i]);
+					if(num1 < num2)return -1;
+					if(num1 > num2)return 1;
+				}
+				if(arr1.length > arr2.length){
+					return 1;
+				}else if(arr1.length < arr2.length){
+					return -1;
+				}
+				return 0;
+			},
+		},
 		objectURL:new Map(),
 		hookmap:{},
 		imported:{},
@@ -36672,6 +36721,10 @@
 					precontent:precontent,
 					help:help,
 					config:objectConfig
+				}
+				if(!lib.versions.extensionSupport(name)){
+					alert("扩展《"+name+"》不适配当前无名杀版本，已停止加载。");
+					return;
 				}
 				if(precontent){
 					_status.extension=name;
