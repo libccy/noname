@@ -988,55 +988,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTargetAi:function(event,player){
 					let cache=_status.event.getTempCache('sblijian','targets');
 					if(Array.isArray(cache)) return cache.length;
-					let id=[null,0],players=game.filterPlayer(current=>current!==player),temp;
-					for(let i of players){
-						temp=get.attitude(event.player,i);
-						if(temp<id[1]) id=[i,temp];
+					let targets=[],cards=[0],sbbiyue=player.hasSkill('sbbiyue')?Math.max(0,3-game.countPlayer2(current=>{
+						return current.getHistory('damage').length>0;
+					})):0,alter=[null,1,1],temp;
+					for(let i of game.players){
+						if(player===i) continue;
+						temp=get.effect(i,new lib.element.VCard({name:'juedou',isCard:true}),get.copy(i),i);
+						if(temp){
+							let att=get.attitude(event.player,i);
+							if(!att&&sbbiyue||att*temp>0) targets.push([i,temp,att]);
+							else if(!alter[2]) continue;
+							else if(!att||att>0&&temp>-15&&i.hp>2||att<0&&temp<15) alter=[i,temp,att];
+						}
 					}
-					if(id[0]) id=id[0].identity;
-					else{
+					targets.sort((a,b)=>{
+						if(Boolean(a[2])!==Boolean(b[2])) return Math.abs(b[2])-Math.abs(a[2]);
+						return Math.abs(b[1])-Math.abs(a[1]);
+					});
+					if(targets.length<2&&alter[0]) targets.push(alter);
+					targets=targets.slice(0,1+player.countCards('he',card=>{
+						if(lib.filter.cardDiscardable(card,player,'sblijian')){
+							cards.push(get.value(card));
+							return true;
+						}
+						return false;
+					}));
+					cards.sort((a,b)=>a-b);
+					for(let i=0;i<targets.length;i++){
+						if(Math.abs(targets[i][1])<cards[i]/(1+sbbiyue)){
+							targets.splice(i,targets.length-i);
+							break;
+						}
+					}
+					if(targets.length<2){
 						event.putTempCache('sblijian','targets',[]);
 						return 0;
 					}
-					let target=[null,0],targets=[],vp=player.getEnemies();
-					if(vp.length>1){
-						let list=[game.createCard('sha'),game.createCard('shan')];
-						vp=ui.create.player().init('sunce');
-						vp.hp=2;
-						vp.skills=[];
-						game.players.push(vp);
-						if(typeof id==='string'){
-							if(id.endsWith('zhu')||id.endsWith('Zhu')) id=id.slice(0,-1)+'ong';
-							vp.identity=id;
-							vp.showIdentity();
-						}
-						else vp.side=id[0].side;
-						vp.directgain(list,false);
-						for(let i of players){
-							temp=get.effect(i,{name:'juedou',isCard:true},vp,event.player)+get.effect(vp,{name:'juedou',isCard:true},i,event.player);
-							if(temp>=0) targets.push([i,temp]);
-						}
-						game.cardsGotoSpecial(list);
-						game.players.remove(vp);
-					}
-					else{
-						vp=vp[0];
-						for(let i of players){
-							temp=get.effect(i,{name:'juedou',isCard:true},vp,event.player)+get.effect(vp,{name:'juedou',isCard:true},i,event.player);
-							if(temp>=0) targets.push([i,temp]);
-						}
-					}
-					for(let i=0;i<targets.length;i++){
-						temp=get.attitude(player,targets[i][0]);
-						if(temp>0&&targets[i][1]<2.5*temp&&targets.length>2) targets.splice(i--,1);
-						else targets[i].push(temp);
-					}
-					targets.sort((a,b)=>{
-						let att1=get.sgn(get.attitude(event.player,a[0])),att2=get.sgn(get.attitude(event.player,b[0]));
-						if(att1!==att2) return att1-att2;
-						return b[1]-a[1];
-					});
-					targets=targets.slice(0,player.countCards('he')+1);
 					event.putTempCache('sblijian','targets',targets);
 					return targets.length;
 				},
@@ -1052,34 +1039,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player,target){
 							let targets=_status.event.getTempCache('sblijian','targets');
-							if(!Array.isArray(targets)) return 0;
-							if(targets.length>2&&!player.hasSkill('sbbiyue')) return 0;
-							for(let i=0;i<targets.length;i++){
-								if(target===targets[i][0]&&targets[i][2]===0) return 1;
+							if(Array.isArray(targets)) for(let arr of targets){
+								if(target===arr[0]&&!arr[2]) return 1;
 							}
 							return 0;
 						},
 						target:function(player,target){
 							let targets=_status.event.getTempCache('sblijian','targets');
-							if(Array.isArray(targets)){
-								for(let i=0;i<targets.length;i++){
-									if(target===targets[i][0]){
-										if(targets[i][2]>0) return targets[i][1]/5;
-										return -targets[i][1];
-									}
-								}
-								return 0;
-							}
-							if(ui.selected.targets.length){
-								let tars=ui.selected.targets.concat([target]).sortBySeat();
-								for(let i=0;i<tars.length;i++){
-									if(target!==tars[i]) continue;
-									let eff;
-									if(i===0) eff=get.effect(target,{name:'juedou',isCard:true},tars[tars.length-1],target);
-									else eff=get.effect(target,{name:'juedou',isCard:true},tars[i-1],target);
-									if(i===tars.length-1) eff+=get.effect(tars[i-1],{name:'juedou',isCard:true},target,target);
-									else eff+=get.effect(tars[0],{name:'juedou',isCard:true},target,target);
-									return eff;
+							if(Array.isArray(targets)) for(let arr of targets){
+								if(target===arr[0]){
+									if(arr[1]*arr[2]<0) return get.sgn(arr[2]);
+									return arr[1];
 								}
 							}
 							return 0;
