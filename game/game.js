@@ -3372,6 +3372,18 @@
 							game.saveConfig('suits_font',bool);
 						}
 					},
+					font_format:{
+						name:'字体格式',
+						init:'woff2',
+						item:{
+							ttf:'.ttf',
+							woff2:'.woff2'
+						},
+						unfrequent:true,
+						onclick:function(item){
+							game.saveConfig('font_format',item);
+						}
+					},
 					update:function(config,map){
 						if(lib.config.custom_button){
 							map.custom_button_system_top.show();
@@ -9131,19 +9143,19 @@
 
 					if(pack.font){
 						ui.css.fontsheet=lib.init.sheet();
-						const appearenceConfig=lib.configMenu.appearence.config,fontSheet=ui.css.fontsheet.sheet,suitsFont=lib.config.suits_font;
+						const appearenceConfig=lib.configMenu.appearence.config,fontSheet=ui.css.fontsheet.sheet,suitsFont=lib.config.suits_font,fontFormat=lib.config.font_format;
 						Object.keys(pack.font).forEach(value=>{
 							const font=pack.font[value];
 							appearenceConfig.name_font.item[value]=font;
 							appearenceConfig.identity_font.item[value]=font;
 							appearenceConfig.cardtext_font.item[value]=font;
 							appearenceConfig.global_font.item[value]=font;
-							fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.woff2');}`,0);
-							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,0);
+							fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.${fontFormat}');}`,0);
+							if(suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.${fontFormat}');}`,0);
 						});
-						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: url('${lib.assetURL}font/suits.woff2');}`,0);
-						fontSheet.insertRule(`@font-face {font-family: 'NonameSuits'; src: url('${lib.assetURL}font/suits.woff2');}`,0);
-						fontSheet.insertRule(`@font-face {font-family: 'MotoyaLMaru'; src: url('${lib.assetURL}font/motoyamaru.woff2');}`,0)
+						if(suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: url('${lib.assetURL}font/suits.${fontFormat}');}`,0);
+						fontSheet.insertRule(`@font-face {font-family: 'NonameSuits'; src: url('${lib.assetURL}font/suits.${fontFormat}');}`,0);
+						fontSheet.insertRule(`@font-face {font-family: 'MotoyaLMaru'; src: url('${lib.assetURL}font/motoyamaru.${fontFormat}');}`,0)
 						appearenceConfig.cardtext_font.item.default='默认';
 						appearenceConfig.global_font.item.default='默认';
 					}
@@ -44863,7 +44875,7 @@
 											Object.keys(zip.files).forEach(file=>{
 												const parsedPath=lib.path.parse(file),directory=parsedPath.dir,fileExtension=parsedPath.ext.toLowerCase();
 												if(directory.startsWith('audio')&&(fileExtension=='.mp3'||fileExtension=='.ogg')) audios.push(file);
-												else if(directory.startsWith('font')&&fileExtension=='.woff2') fonts.push(file);
+												else if(directory.startsWith('font')&&(fileExtension=='.ttf'||fileExtension=='.woff2')) fonts.push(file);
 												else if(directory.startsWith('image')&&(fileExtension=='.jpg'||fileExtension=='.png')) images.push(file);
 												else return;
 												if(!directories[directory]){
