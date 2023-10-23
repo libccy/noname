@@ -19529,10 +19529,10 @@
 					event.trigger('changeHp');
 				},
 				changeHujia:function(){
-					if(num>=0){
+					if(num>0){
 						game.log(player,'获得了'+get.cnNumber(num)+'点护甲');
 					}
-					else{
+					else if(num<0){
 						if(-num>player.hujia){
 							num=-player.hujia;
 							event.num=num;
@@ -24793,8 +24793,9 @@
 						num=1;
 					}
 					if(typeof type!='string'){
-						if(num>=0) type='gain';
-						else type='lose';
+						if(num>0) type='gain';
+						else if(num<0) type='lose';
+						else type='null';
 					}
 					next.num=num;
 					next.player=this;
