@@ -2685,7 +2685,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wushuang_info:'锁定技，当你使用【杀】或【决斗】指定目标后，你令此牌需要依次使用或打出两张【闪】或【杀】响应。',
 			lijian_info:'出牌阶段限一次，你可以弃置一张牌，视为一名男性角色对另一名男性角色使用一张【决斗】（不可被【无懈可击】响应）。',
 			biyue_info:'结束阶段，你可以摸一张牌。',
-			xinbiyue_info:'结束阶段，你可以摸一张牌',
+			xinbiyue_info:'结束阶段，你可以摸一张牌。',
 			xinbiyue_info_alter:'结束阶段，你可以摸一张牌，如果你没有手牌，改为摸2张牌。',
 			yaowu:'耀武',
 			yaowu_info:'锁定技，一名角色使用红色【杀】对你造成伤害时，该角色回复1点体力或摸一张牌。',
