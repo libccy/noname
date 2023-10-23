@@ -15475,7 +15475,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_lingtong:'OL界凌统',
 			ol_lingtong_prefix:'OL界',
 			olxuanfeng:'旋风',
-			olxuanfeng_info:'当你一次性失去超过两张牌后，或失去装备区的牌后，你可以依次弃置一至两名其他角色的共计两张牌。',
+			olxuanfeng_info:'当你一次性失去至少两张牌后，或失去装备区的牌后，你可以依次弃置一至两名其他角色的共计两张牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
