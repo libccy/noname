@@ -19548,9 +19548,9 @@
 						}
 					}
 					player.hujia+=num;
-					/*if(player.hujia<0){
-						player.hujia=0;
-					}*/
+					//if(player.hujia<0){
+					//	player.hujia=0;
+					//}
 					player.update();
 				},
 				dying:function(){
@@ -24793,6 +24793,10 @@
 					if(typeof num!='number'){
 						num=1;
 					}
+					if(limit===true) limit=5;
+					if(typeof limit=='number'&&this.hujia+num>parseInt(limit)){
+						num=Math.max(0, parseInt(limit)-this.hujia);
+					}
 					if(typeof type!='string'){
 						if(num>0) type='gain';
 						else if(num<0) type='lose';
@@ -24802,12 +24806,6 @@
 					next.player=this;
 					next.type=type;
 					next.setContent('changeHujia');
-					if(limit===true) limit=5;
-					if(typeof limit=='number'&&this.hujia+num>parseInt(limit)){
-						var numx=parseInt(limit)-this.hujia;
-						if(numx>0) next.num=numx;
-						else _status.event.next.remove(next);
-					}
 					return next;
 				},
 				getBuff:function(){
