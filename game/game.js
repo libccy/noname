@@ -4,7 +4,7 @@
 	 * @typedef {InstanceType<typeof lib.element.Player>} Player
 	 * @typedef {InstanceType<typeof lib.element.Card>} Card
 	 * @typedef {InstanceType<typeof lib.element.VCard>} VCard
-	 * @typedef {InstanceType<typeof lib.element.Event>} GameEvent
+	 * @typedef {InstanceType<typeof lib.element.GameEvent>} GameEvent
 	 * @typedef {InstanceType<typeof lib.element.NodeWS>} NodeWS
 	 */
 	const userAgent=navigator.userAgent.toLowerCase();
@@ -614,19 +614,82 @@
 		 * 谋攻强化
 		 */
 		stratagemBuff:{
-			buff:new Map([
-				['sha',[1,'require']],
-				['shan',[1,'double']],
-				['juedou',[2,'damage']],
-				['huogong',[2,'damage']],
-				['tao',[3,'double']]
+			cost:new Map([
+				['sha',1],
+				['shan',1],
+				['juedou',2],
+				['huogong',2],
+				['tao',3]
+			]),
+			effect:new Map([
+				['sha',event=>{
+					if(event.step!=1) return;
+					game.log(event.player,'触发了强化效果');
+					game.log(event.card,'抵消所需要的',`#y【${get.translation('shan')}】`,'数+1');
+					const map=event.customArgs;
+					game.players.concat(game.dead).forEach(current=>{
+						const id=current.playerid;
+						if(!map[id]) map[id]={};
+						if(typeof map[id].shanRequired=='number') map[id].shanRequired++;
+						else map[id].shanRequired=2;
+					});
+				}],
+				['shan',event=>{
+					if(event.step!=1) return;
+					game.log(event.player,'触发了强化效果');
+					game.log(event.card,'视为两张',`#y【${get.translation('shan')}】`,'的效果');
+					event.getParent(2).decrease('shanRequired',1);
+				}],
+				['juedou',event=>{
+					if(event.step!=1) return;
+					game.log(event.player,'触发了强化效果');
+					game.log('对',event.card,'的目标造成伤害时，伤害+1');
+					event.player.when({
+						source:'damageBegin1'
+					}).filter(evt=>evt.getParent(2)==event&&event.targets.includes(evt.player)).then(()=>{
+						trigger.increase('num');
+					});
+				}],
+				['huogong',event=>{
+					if(event.step!=1) return;
+					game.log(event.player,'触发了强化效果');
+					game.log(event.card,'造成的伤害+1');
+					event.increase('baseDamage',1);
+				}],
+				['tao',event=>{
+					if(event.step!=1) return;
+					game.log(event.player,'触发了强化效果');
+					game.log(event.card,'回复的体力+1');
+					event.increase('baseDamage',1);
+				}]
 			]),
 			prompt:new Map([
-				['sha','响应时所需【闪】数+1。'],
-				['shan','视为两张【闪】的效果。'],
-				['juedou','对目标造成的伤害+1。'],
-				['huogong','造成的伤害+1。'],
-				['tao','回复值+1。']
+				[
+					'sha',
+					/**
+					 * @type {() => string}
+					 */
+					()=>`抵消所需要的【${get.translation('shan')}】数+1。`
+				],
+				[
+					'shan',
+					/**
+					 * @type {() => string}
+					 */
+					()=>`使用时视为两张【${get.translation('shan')}】的效果。`
+				],
+				[
+					'juedou',
+					()=>'对此牌的目标造成伤害时，伤害+1。'
+				],
+				[
+					'huogong',
+					()=>'造成的伤害+1。'
+				],
+				[
+					'tao',
+					()=>'回复的体力+1。'
+				]
 			])
 		},
 		/**
@@ -8261,7 +8324,7 @@
 				lib.ui=ui;
 				lib.ai=ai;
 				lib.game=game;
-				_status.event=new lib.element.Event().finish();
+				_status.event=lib.element.GameEvent.initialGameEvent();
 
 				HTMLDivElement.prototype.animate=function(name,time){
 					var that;
@@ -12333,6 +12396,7 @@
 			cooperation_use_info:'双方累计使用至少4种花色的牌',
 			charge:'蓄力值',
 			expandedSlots:'扩展装备栏',
+			stratagem_fury:'怒气',
 			_stratagem_add_buff:'强化'
 		},
 		element:{
@@ -20644,6 +20708,17 @@
 					}
 				}
 				//新函数
+				changeFury(amount,limit){
+					if(typeof this.storage.stratagem_fury!='number') this.storage.stratagem_fury=0;
+					if(!amount) return;
+					const furyBefore=this.storage.stratagem_fury;
+					if(limit===true&&typeof _status.stratagemFuryMax=='number') this.storage.stratagem_fury=Math.min(Math.max(furyBefore+amount,0),_status.stratagemFuryMax);
+					else this.storage.stratagem_fury=Math.max(furyBefore+amount,0);
+					const difference=this.storage.stratagem_fury-furyBefore;
+					if(!difference) return;
+					game.log(this,difference>0?'获得了':'失去了',get.cnNumber(Math.abs(difference)),'点','#r怒气');
+					this.markSkill('stratagem_fury');
+				}
 				/**
 				 * version 1.4
 				 * 
@@ -30348,11 +30423,15 @@
 					return this;
 				}
 				copy(){
+					/**
+					 * @type {Card}
+					 */
 					var node=this.cloneNode(true);
 					node.style.transform='';
 					node.name=this.name;
 					node.suit=this.suit;
 					node.number=this.number;
+					node.nature=this.nature;
 					node.classList.remove('hidden');
 					node.classList.remove('start');
 					node.classList.remove('thrown');
@@ -30467,14 +30546,14 @@
 							if(typeof autoViewAs=='string') this.name=autoViewAs;
 						}
 					}
-					else if(typeof suitOrCard!='string'){
+					else if(suitOrCard&&typeof suitOrCard!='string'){
 						Object.keys(suitOrCard).forEach(key=>{
 							const propertyDescriptor=Object.getOwnPropertyDescriptor(suitOrCard,key),value=propertyDescriptor.value;
 							if(Array.isArray(value)) this[key]=value.slice();
 							else Object.defineProperty(this,key,propertyDescriptor);
 						});
 						if(Array.isArray(numberOrCards)){
-							const noCards=!this.hasOwnProperty('cards');
+							const noCards=!('cards' in this);
 							/**
 							 * @type {Card[]}
 							 */
@@ -30482,8 +30561,8 @@
 							if(noCards){
 								if(!lib.suits.includes(this.suit)) this.suit=get.suit(this);
 								if(!Object.keys(lib.color).includes(this.color)) this.color=get.color(this);
-								if(!this.hasOwnProperty('number')) this.number=get.number(this);
-								if(!this.hasOwnProperty('nature')) this.nature=get.nature(this);
+								if(!('number' in this)) this.number=get.number(this);
+								if(!('nature' in this)) this.nature=get.nature(this);
 							}
 						}
 						const info=get.info(this,false);
@@ -30496,9 +30575,9 @@
 					if(typeof numberOrCards=='number') this.number=numberOrCards;
 					if(typeof name=='string') this.name=name;
 					if(typeof nature=='string') this.nature=nature;
-					if(this.hasOwnProperty('suit')&&!this.hasOwnProperty('color')) this.color=get.color(this);
-					if(!this.hasOwnProperty('storage')) this.storage={};
-					if(!this.hasOwnProperty('cards')) this.cards=[];
+					if('suit' in this&&!('color' in this)) this.color=get.color(this);
+					if(!('storage' in this)) this.storage={};
+					if(!('cards' in this)) this.cards=[];
 				}
 				sameSuitAs(card){
 					return get.suit(this)==get.suit(card);
@@ -30555,21 +30634,28 @@
 					_status.event.excludeButton.add(this);
 				}
 			},
-			Event:class{
+			GameEvent:class{
 				/**
 				 * @param {string} [name]
 				 * @param {false} [trigger]
 				 */
 				constructor(name,trigger){
-					this.name=name;
+					if(typeof name=='string'){
+						this.name=name;
+						const gameEvent=get.event();
+						if(gameEvent){
+							const type=`onNext${name[0].toUpperCase()}${name.slice(1)}`;
+							if(gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
+						}
+					}
 					this.step=0;
 					this.finished=false;
 					/**
-					 * @type {this[]}
+					 * @type {GameEvent[]}
 					 */
 					this.next=[];
 					/**
-					 * @type {this[]}
+					 * @type {GameEvent[]}
 					 */
 					this.after=[];
 					this.custom={
@@ -30581,6 +30667,105 @@
 					this._result={};
 					this._set=[];
 					if(trigger!==false&&!game.online) this._triggered=0;
+				}
+				static initialGameEvent(){
+					return new lib.element.GameEvent().finish();
+				}
+				/**
+				 * @param {keyof this} key
+				 * @param {number} [value]
+				 * @param {number} [baseValue]
+				 */
+				addNumber(key,value,baseValue){
+					if(typeof value!='number') value=0;
+					if(typeof this[key]=='number') this[key]+=value;
+					else{
+						if(typeof baseValue!='number') baseValue=0;
+						this[key]=baseValue+value;
+					}
+					return this;
+				}
+				/**
+				 * @param {keyof this} key
+				 * @param {number} [baseValue]
+				 */
+				decrease(key,baseValue){
+					if(typeof this[key]=='number') this[key]--;
+					else this.subtractNumber(key,1,baseValue);
+					return this;
+				}
+				/**
+				 * @param {keyof this} key
+				 * @param {number} [baseValue]
+				 */
+				increase(key,baseValue){
+					if(typeof this[key]=='number') this[key]++;
+					else this.addNumber(key,1,baseValue);
+					return this;
+				}
+				/**
+				 * @param {keyof this} key
+				 * @param {number} [value]
+				 * @param {number} [baseValue]
+				 */
+				subtractNumber(key,value,baseValue){
+					if(typeof value!='number') value=0;
+					if(typeof this[key]=='number') this[key]-=value;
+					else{
+						if(typeof baseValue!='number') baseValue=0;
+						this[key]=baseValue-value;
+					}
+					return this;
+				}
+				/**
+				 * @param {Parameters<typeof this.hasHandler>[0]} [type]
+				 * @param {GameEvent} [event]
+				 * @returns {this}
+				 */
+				callHandler(type,event){
+					if(this.hasHandler(type)){
+						if(!event) event=this;
+						this.getHandler(type).forEach(handler=>{
+							if(typeof handler=='function') handler(event);
+						});
+					}
+					return this;
+				}
+				getDefaultHandlerType(){
+					const eventName=this.name;
+					if(eventName) return `on${eventName[0].toUpperCase()}${eventName.slice(1)}`;
+				}
+				/**
+				 * @param {Parameters<typeof this.hasHandler>[0]} [type]
+				 * @returns {((event: GameEvent) => void)[]}
+				 */
+				getHandler(type){
+					if(!type) type=this.getDefaultHandlerType();
+					const currentHandler=this[type];
+					if(!currentHandler) this[type]=[];
+					else if(!Array.isArray(currentHandler)) this[type]=[currentHandler];
+					return this[type];
+				}
+				/**
+				 * @param {`on${Capitalize<string>}`} [type]
+				 */
+				hasHandler(type){
+					if(!type) type=this.getDefaultHandlerType();
+					return Boolean(this[type]&&this.getHandler(type).length);
+				}
+				/**
+				 * @overload
+				 * @param {...((event: GameEvent) => void)[]} handlers
+				 * @returns {number}
+				 */
+				/**
+				 * @overload
+				 * @param {Parameters<typeof this.hasHandler>[0]} type
+				 * @param {...((event: GameEvent) => void)[]} handlers
+				 * @returns {number}
+				 */
+				pushHandler(type){
+					return typeof type=='string'?this.getHandler(type).push(...Array.from(arguments).slice(1)):this.getHandler().push(...arguments);
 				}
 				changeToZero(){
 					this.num=0;
@@ -30796,14 +30981,14 @@
 					return this._rand;
 				}
 				insert(content,map){
-					const next=new lib.element.Event(`${this.name}Inserted`,false);
+					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
 					this.next.push(next);
 					next.setContent(content);
 					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
 					return next;
 				}
 				insertAfter(content,map){
-					const next=new lib.element.Event(`${this.name}Inserted`,false);
+					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
 					this.after.push(next);
 					next.setContent(content);
 					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
@@ -31313,6 +31498,56 @@
 					}
 					return this;
 				}
+				/**
+				 * @throws {'Do not call this method'}
+				 */
+				typeAnnotation(){
+					/**
+					 * @type {Player}
+					 */
+					this.source;
+					/**
+					 * @type {Player}
+					 */
+					this.player;
+					/**
+					 * @type {Player}
+					 */
+					this.target;
+					/**
+					 * @type {Player[]}
+					 */
+					this.targets;
+					/**
+					 * @type {Card}
+					 */
+					this.card;
+					/**
+					 * @type {Card[]}
+					 */
+					this.cards;
+					/**
+					 * @type {string}
+					 */
+					this.skill;
+					/**
+					 * @type {boolean}
+					 */
+					this.forced;
+					/**
+					 * @type {number}
+					 */
+					this.num;
+					/**
+					 * @type {GameEvent}
+					 */
+					this._trigger;
+					/**
+					 * @type {Record<string, any>}
+					 */
+					this._result;
+					throw 'Do not call this method';
+				}
 			},
 			Dialog:class extends HTMLDivElement{
 				constructor(){
@@ -31760,10 +31995,10 @@
 				return this.Button.prototype;
 			},
 			/**
-			 * @legacy Use {@link lib.element.Event.prototype} instead.
+			 * @legacy Use {@link lib.element.GameEvent.prototype} instead.
 			 */
 			get event(){
-				return this.Event.prototype;
+				return this.GameEvent.prototype;
 			},
 			/**
 			 * @legacy Use {@link lib.element.Dialog.prototype} instead.
@@ -32467,214 +32702,140 @@
 			}
 		},
 		skill:{
+			stratagem_fury:{
+				marktext:'🔥',
+				intro:{
+					name:'怒气',
+					content:(storage,player)=>{
+						const stratagemFuryMax=_status.stratagemFuryMax,fury=storage||0;
+						return `当前怒气值：${typeof stratagemFuryMax=='number'?`${fury}/${stratagemFuryMax}`:fury}`;
+					}
+				}
+			},
 			_stratagem_add_buff:{
+				log:false,
 				enable:'chooseToUse',
-				filter:function(event,player){
-					if(!event.stratagemSettings) return false;
-					if(game.roundNumber<2&&!event.stratagemSettings.roundOneUseFury) return false;
-					var cards=player.getCards('hs');
-					var names=Array.from(lib.stratagemBuff.buff.keys());
+				filter:(event,player)=>{
+					const fury=player.storage.stratagem_fury;
+					if(!fury) return false;
+					const stratagemSettings=event.stratagemSettings;
+					if(!stratagemSettings||!stratagemSettings.roundOneUseFury&&game.roundNumber<2) return false;
+					const cards=player.getCards('hs');
+					if(!cards.length) return false;
+					const cost=lib.stratagemBuff.cost,names=Array.from(cost.keys());
 					if(!names.length) return false;
-					for(var card of cards){
-						if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) continue;
-						for(var name of names){
-							var myName=get.name(card,player),nature=get.nature(card,player);
-							if(name==myName){
-								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)){
-									if(player.storage.stratagem_fury>=lib.stratagemBuff.buff.get(name)[0])
-										return true;
-								}
-							}
-						}
-					}
-					return false;
+					return cards.some(card=>game.checkMod(card,player,'unchanged','cardEnabled2',player)&&names.some(availableName=>availableName==get.name(card,player)&&event.filterCard(new lib.element.VCard({
+						name:availableName,
+						nature:get.nature(card,player),
+						isCard:true,
+						cards:[card]
+					}),player,event)&&fury>=cost.get(availableName)));
 				},
-				onChooseToUse:function(event){
-					if(!event.stratagemSettings&&!game.online){
-						event.set('stratagemSettings',{
-							roundOneUseFury:_status.connectMode?lib.configOL.round_one_use_fury:get.config('round_one_use_fury')
-						});
-					}
+				onChooseToUse:event=>{
+					const player=_status.event.player,fury=player.storage.stratagem_fury;
+					if(!fury) return;
+					if(!event.stratagemSettings&&!game.online) event.set('stratagemSettings',{
+						roundOneUseFury:_status.connectMode?lib.configOL.round_one_use_fury:get.config('round_one_use_fury')
+					});
+					const cost=lib.stratagemBuff.cost.get('shan');
+					if(typeof cost!='number'||!event.shanRequired) return;
+					event.addNumber('shanIgnored',Math.min(player.countCards(lib.skill._stratagem_add_buff.position,{
+						name:'shan'
+					}),Math.floor(fury/cost)));
 				},
-				check:function(card){
-					var player=_status.event.player;
+				check:card=>{
+					const player=_status.event.player;
 					if(_status.event.type=='phase'){
-						var name=get.name(card,player);
-						if(name=='sha'){
+						const cardName=get.name(card,player);
+						if(cardName=='sha'){
 							if(game.hasPlayer(current=>{
-								return player.canUse(card,current)&&(player.storage.zhibi&&!player.storage.zhibi.contains(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(player.storage.stratagem_fury||0)-1)))&&current.mayHaveShan()&&player.hasSkill('jiu');
+								if(!player.canUse(card,current)) return false;
+								const storage=player.storage,zhibi=storage.zhibi;
+								return (zhibi&&!zhibi.includes(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(storage.stratagem_fury||0)-1)))&&current.mayHaveShan()&&player.hasSkill('jiu');
 							})) return 1;
 							return 0;
-						} else if(name=='tao'){
+						}
+						if(cardName=='tao'){
 							if(player.hp<=2&&player.getDamagedHp()>=2) return 1;
 							return 0;
 						}
 						return 1;
 					}
-					else if(_status.event.type=='dying') return get.attitude(player,_status.event.dying)>3?1:0;
+					if(_status.event.type=='dying') return get.attitude(player,_status.event.dying)>3?1:0;
 					return (_status.event.getParent().shanRequired||1)>1&&get.damageEffect(player,_status.event.getParent().player||player,player)<0?1:0;
 				},
 				position:'hs',
-				filterCard:function(card,player,event){
-					event=event||_status.event;
-					var filter=event._backup.filterCard;
-					var names=Array.from(lib.stratagemBuff.buff.keys());
-					for(var name of names){
-						var myName=get.name(card,player),nature=get.nature(card,player);
-						if(name==myName){
-							if(filter({name:name,nature:nature,isCard:true,cards:[card]},player,_status.event)){
-								if(player.storage.stratagem_fury>=lib.stratagemBuff.buff.get(name)[0]){
-									return true;
-								}
-							}
-						}
-					}
-					return false;
+				filterCard:(card,player,event)=>{
+					if(!event) event=_status.event;
+					const filterCard=event._backup.filterCard;
+					const cost=lib.stratagemBuff.cost;
+					return Array.from(cost.keys()).some(availableName=>availableName==get.name(card,player)&&filterCard(new lib.element.VCard({
+						name:availableName,
+						nature:get.nature(card,player),
+						isCard:true,
+						cards:[card]
+					}),player,_status.event)&&player.storage.stratagem_fury>=cost.get(availableName));
 				},
-				viewAs:function(cards,player){
-					var name=get.name(cards[0],player);
-					var nature=get.nature(cards[0],player);
-					if(name){
-						return {
-							name:name,
-							nature:nature,
-							suit:get.suit(cards[0],player),
-							number:get.number(cards[0],player),
-							isCard:true,
-							cards:[cards[0]],
-							storage:{stratagemBuffed:1},
-						};
-					}
-					return null;
+				viewAs:(cards,player)=>{
+					const cardName=get.name(cards[0],player);
+					return cardName?new lib.element.VCard({
+						name:cardName,
+						nature:get.nature(cards[0],player),
+						suit:get.suit(cards[0],player),
+						number:get.number(cards[0],player),
+						isCard:true,
+						cards:[cards[0]],
+						storage:{
+							stratagem_buffed:1
+						}
+					}):new lib.element.VCard();
 				},
 				prompt:()=>{
 					const span=document.createElement('span');
 					span.classList.add('text');
 					span.style.fontFamily='yuanli';
-					const stratagemBuff=lib.stratagemBuff,buff=stratagemBuff.buff;
+					const stratagemBuff=lib.stratagemBuff,cost=stratagemBuff.cost;
 					stratagemBuff.prompt.forEach((prompt,cardName)=>{
 						const li=document.createElement('li');
-						li.innerHTML=`【${get.translation(cardName)}】：${buff.get(cardName)[0]}点怒气。${prompt}`;
+						li.innerHTML=`【${get.translation(cardName)}】：${cost.get(cardName)}点怒气。${prompt()}`;
 						span.appendChild(li);
 					});
 					return `当你需要使用位于“强化表”内的非虚拟卡牌时，你可以消耗对应数量的怒气将其强化并使用。${document.createElement('hr').outerHTML}${span.outerHTML}`;
 				},
-				precontent:function(){
-					'step 0'
-					player.changeFury(-lib.stratagemBuff.buff.get(event.result.card.name)[0]);
+				onuse:(result,player)=>{
+					player.logSkill(result.skill);
+					const stratagemBuff=lib.stratagemBuff,cardName=result.card.name;
+					player.changeFury(-stratagemBuff.cost.get(cardName),true);
+					const gameEvent=get.event(),effect=stratagemBuff.effect.get(cardName);
+					if(typeof effect=='function') gameEvent.pushHandler('onNextUseCard',effect);
+					gameEvent.pushHandler('onNextUseCard',event=>{
+						if(event.step==1) game.broadcastAll(cards=>cards.forEach(card=>card.clone.classList.add('stratagem-fury-glow')),event.cards);
+					});
 				},
 				ai:{
-					order:function(item,player){
-						var player=player||_status.event.player;
-						if(_status.event.type=='phase'){
-							var cards=player.getCards('hs');
-							for(var card of cards){
-								if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) continue;
-								var name=get.name(card,player);
-								if(name=='sha'){
-									if(game.hasPlayer(current=>{
-										return player.canUse(card,current)&&(player.storage.zhibi&&!player.storage.zhibi.contains(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(player.storage.stratagem_fury||0)-1)))&&current.mayHaveShan();
-									})) return get.order(card,player)+0.5;
-								} else if(name=='tao'){
-									if(player.hp<=2&&player.getDamagedHp()>=2) return get.order(card,player)+0.5;
-								}
-								return 8;
+					order:(item,player)=>{
+						if(!player) player=_status.event.player;
+						if(_status.event.type=='phase') for(const card of player.getCards('hs')){
+							if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) continue;
+							const cardName=get.name(card,player);
+							if(cardName=='sha'){
+								if(game.hasPlayer(current=>{
+									if(!player.canUse(card,current)) return false;
+									const storage=player.storage,zhibi=storage.zhibi;
+									return (zhibi&&!zhibi.contains(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(storage.stratagem_fury||0)-1)))&&current.mayHaveShan();
+								})) return get.order(card,player)+0.5;
 							}
+							else if(cardName=='tao'&&player.hp<=2&&player.getDamagedHp()>=2) return get.order(card,player)+0.5;
+							return 8;
 						}
 						return 3.5;
 					},
-				},
-				subSkill:{
-					sha:{
-						trigger:{player:'useCardToPlayered'},
-						forced:true,
-						silent:true,
-						popup:false,
-						charlotte:true,
-						filter:function(event,player){
-							return event.card.name=='sha'&&event.card.storage&&event.card.storage.stratagemBuffed&&lib.stratagemBuff.buff.get('sha')[1]=='require'&&!event.getParent().directHit.contains(event.target);
-						},
-						content:function(){
-							if(!trigger.card.storage.stratagem_logged){
-								game.log(player,'触发了强化杀的效果');
-								game.log('#y'+get.translation(trigger.card),'需要额外使用一张','#y【闪】','响应');
-								trigger.card.storage.stratagem_logged=true;
-							}
-							var id=trigger.target.playerid;
-							var map=trigger.getParent().customArgs;
-							if(!map[id]) map[id]={};
-							if(typeof map[id].shanRequired=='number'){
-								map[id].shanRequired++;
-							}
-							else{
-								map[id].shanRequired=2;
-							}
-						},
-						ai:{
-							directHit_ai:true,
-							skillTagFilter:function(player,tag,arg){
-								if(arg.card.name!='sha'||(arg.card&&arg.card.storage&&!arg.card.storage.stratagemBuffed)||(arg.target.countCards('h','shan')>=1&&!arg.target.storage.stratagem_fury)) return false;
-							},
-						},
-					},
-					shan:{
-						trigger:{
-							player:'shanEnd',
-						},
-						forced:true,
-						silent:true,
-						popup:false,
-						charlotte:true,
-						filter:function(event,player){
-							return event.getParent(3).name=='sha'&&event.getParent().card.storage&&event.getParent().card.storage.stratagemBuffed&&lib.stratagemBuff.buff.get('shan')[1]=='double';
-						},
-						content:function(event,player){
-							if(!trigger.card.storage.stratagem_logged){
-								game.log(player,'触发了强化闪的效果');
-								game.log('#y'+get.translation(trigger.card),'视为两张','#y【闪】','的效果');
-								trigger.card.storage.stratagem_logged=true;
-							}
-							if(trigger.getParent(3).shanRequired) trigger.getParent(3).shanRequired--;
-						}
-					},
-					damage:{
-						trigger:{player:'damageBegin1'},
-						forced:true,
-						silent:true,
-						popup:false,
-						charlotte:true,
-						filter:function(event,player){
-							if(!event.card) return false;
-							var names=Array.from(lib.stratagemBuff.buff.keys()),name=event.card.name;
-							return names.contains(name)&&event.getParent(2).player==event.source&&event.card.storage&&event.card.storage.stratagemBuffed&&lib.stratagemBuff.buff.get(name)[1]=='damage';
-						},
-						content:function(){
-							if(!trigger.card.storage.stratagem_logged){
-								game.log(player,'触发了强化'+get.translation(trigger.card.name)+'的效果');
-								game.log('#y'+get.translation(trigger.card),'造成的伤害','#y+1');
-								trigger.card.storage.stratagem_logged=true;
-							}
-							trigger.num++;
-						}
-					},
-					tao:{
-						trigger:{player:'useCard'},
-						filter:function(event,player){
-							return event.card.name=='tao'&&event.card.storage&&event.card.storage.stratagemBuffed&&lib.stratagemBuff.buff.get('tao')[1]=='double';
-						},
-						forced:true,
-						silent:true,
-						popup:false,
-						charlotte:true,
-						content:function(){
-							if(!trigger.card.storage.stratagem_logged){
-								game.log(player,'触发了强化桃的效果');
-								game.log('#y'+get.translation(trigger.card),'的回复值','#y+1');
-								trigger.card.storage.stratagem_logged=true;
-							}
-							if(!trigger.baseDamage) trigger.baseDamage=1;
-							trigger.baseDamage++;
-						},
+					directHit_ai:true,
+					skillTagFilter:(player,tag,arg)=>{
+						const card=arg.card;
+						if(card.name!='sha'||!card.storage.stratagem_buffed) return false;
+						const target=arg.target;
+						if(target.countCards('h','shan')>=1&&!target.storage.stratagem_fury) return false;
 					}
 				}
 			},
@@ -34540,11 +34701,7 @@
 									lib.characterPack[i]=mode.characterPack[i];
 								}
 							}
-							_status.event={
-								finished:true,
-								next:[],
-								after:[]
-							};
+							_status.event=lib.element.GameEvent.initialGameEvent();
 							_status.paused=false;
 							game.createEvent('game',false).setContent(lib.init.startOnline);
 							game.loop();
@@ -34805,11 +34962,7 @@
 						game.arrangePlayers();
 						ui.create.me(true);
 
-						_status.event={
-							finished:true,
-							next:[],
-							after:[]
-						};
+						_status.event=lib.element.GameEvent.initialGameEvent();
 						_status.paused=false;
 						_status.dying=get.parsedResult(state.dying)||[];
 
@@ -35353,6 +35506,11 @@
 		}
 	};
 	const game={
+		//Stratagem
+		//谋攻
+		setStratagemBuffCost:(cardName,cost)=>game.broadcastAll((clientCardName,clientCost)=>lib.stratagemBuff.cost.set(clientCardName,clientCost),cardName,cost),
+		setStratagemBuffEffect:(cardName,effect)=>game.broadcastAll((clientCardName,clientEffect)=>lib.stratagemBuff.cost.set(clientCardName,clientEffect),cardName,effect),
+		setStratagemBuffPrompt:(cardName,prompt)=>game.broadcastAll((clientCardName,clientPrompt)=>lib.stratagemBuff.cost.set(clientCardName,clientPrompt),cardName,prompt),
 		//添加新的属性杀
 		addNature:(nature,translation,config)=>{
 			if(!nature) throw new TypeError();
@@ -36100,6 +36258,7 @@
 			delete parsedPath.base;
 			if(!parsedPath.dir) parsedPath.dir='image/card/';
 			if(!parsedPath.ext) parsedPath.ext='.jpg';
+			const fileName=parsedPath.name;
 			game.broadcastAll((formattedPath,name,skill,player)=>{
 				const node=ui.create.div('.background.upper.land');
 				node.setBackgroundImage(formattedPath);
@@ -36138,7 +36297,7 @@
 					return uiIntro;
 				},200);
 				game.addGlobalSkill(skill);
-			},lib.path.format(parsedPath),parsedPath.name,`${name}_skill`,player);
+			},lib.path.format(parsedPath),fileName,`${fileName}_skill`,player);
 		},
 		checkFileList:function(updates,proceed){
 			var n=updates.length;
@@ -36305,6 +36464,12 @@
 				delete ui.currentpopped;
 			}
 		},
+		/**
+		 * @type {{
+		 * <T extends keyof typeof lib.message.client>(func: T, ...args: Parameters<typeof lib.message.client[T]>) => void;
+		 * <T extends any[]>(func: (...args: T) => void, ...args: T) => void;
+		 * }}
+		 */
 		broadcast:function(){
 			if(!lib.node||!lib.node.clients||game.online) return;
 			for(var i=0;i<lib.node.clients.length;i++){
@@ -36313,6 +36478,12 @@
 				}
 			}
 		},
+		/**
+		 * @type {{
+		 * <T extends keyof typeof lib.message.client>(func: T, ...args: Parameters<typeof lib.message.client[T]>) => void;
+		 * <T extends any[]>(func: (...args: T) => void, ...args: T) => void;
+		 * }}
+		 */
 		broadcastAll:function(){
 			if(game.online) return;
 			var argc=arguments.length;
@@ -39270,10 +39441,10 @@
 			next.setContent('createTrigger');
 		},
 		/**
-		 * @legacy Use {@link lib.element.Event.constructor} instead.
+		 * @legacy Use {@link lib.element.GameEvent.constructor} instead.
 		 */
 		createEvent:(name,trigger,triggerEvent)=>{
-			const next=new lib.element.Event(name,trigger);
+			const next=new lib.element.GameEvent(name,trigger);
 			(triggerEvent||_status.event).next.push(next);
 			return next;
 		},
@@ -40388,6 +40559,7 @@
 						}*/
 					}
 					else{
+						event.callHandler();
 						if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){
 							game.broadcastAll(function(){
 								while(_status.dieClose.length){
@@ -40483,6 +40655,7 @@
 						}
 						event.clearStepCache();
 						event.step++;
+						if(event.finished) event.callHandler();
 					}
 				}
 			}
@@ -41318,11 +41491,7 @@
 				//     lib.config.addedpile=pilecfg[1]||{};
 				// }
 
-				_status.event={
-					finished:true,
-					next:[],
-					after:[]
-				};
+				_status.event=lib.element.GameEvent.initialGameEvent();
 				_status.paused=false;
 
 				if(_status.connectMode&&lib.mode[name].connect){
@@ -42280,9 +42449,10 @@
 		log:function(){
 			let str='',str2='',logvid=null;
 			const color=new Map([
-				['b','blue'],
+				['r','fire'],
 				['y','yellow'],
-				['g','green']
+				['g','green'],
+				['b','blue']
 			]);
 			Array.from(arguments).forEach(value=>{
 				const itemtype=get.itemtype(value);
@@ -55940,49 +56110,52 @@
 					}
 				}
 			},
-			ok:function(node){
-				var event=_status.event;
-				if(event.custom&&event.custom.replace.confirm){
-					event.custom.replace.confirm(true);return;
+			ok:node=>{
+				const gameEvent=get.event(),custom=gameEvent.custom,replaceConfirm=custom.replace.confirm;
+				if(replaceConfirm){
+					replaceConfirm(true);
+					return;
 				}
-				event.result={
-					buttons:ui.selected.buttons.slice(0),
-					cards:ui.selected.cards.slice(0),
-					targets:ui.selected.targets.slice(0),
+				const result=gameEvent.result={
+					buttons:ui.selected.buttons.slice(),
+					cards:ui.selected.cards.slice(),
+					targets:ui.selected.targets.slice(),
 					confirm:'ok',
 					bool:true,
 					links:get.links(ui.selected.buttons)
 				};
-				if(node){
-					node.parentNode.close();
-				}
-				if(event.skill){
-					event.result.skill=event.skill;
-					if(typeof get.info(event.skill).viewAs=='function') event.result.card=get.info(event.skill).viewAs(event.result.cards,event.player);
-					else event.result.card=get.copy(get.info(event.skill).viewAs);
-					if(event.result.cards.length==1&&event.result.card){
-						if(!event.result.card.suit) event.result.card.suit=get.suit(event.result.cards[0]);
-						if(!event.result.card.number) event.result.card.number=get.number(event.result.cards[0]);
+				if(node) node.parentNode.close();
+				const skill=gameEvent.skill;
+				if(skill){
+					result.skill=skill;
+					const skillInformation=get.info(gameEvent.skill),viewAs=skillInformation.viewAs;
+					if(typeof viewAs=='function'){
+						const viewedAs=viewAs(result.cards,gameEvent.player);
+						if(viewedAs){
+							viewedAs.cards=result.cards;
+							result.card=get.autoViewAs(viewedAs);
+						}
 					}
-					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
-						event.skillDialog.close();
+					else if(viewAs){
+						viewAs.cards=result.cards;
+						result.card=get.autoViewAs(viewAs);
 					}
-					var cards=event.player.getCards('hej');
+					if(gameEvent.skillDialog&&get.objtype(gameEvent.skillDialog)=='div'){
+						gameEvent.skillDialog.close();
+					}
+					var cards=gameEvent.player.getCards('hej');
 					for(var i=0;i<cards.length;i++){
 						cards[i].recheck('useSkill');
 					}
-					event.restore();
+					gameEvent.restore();
 				}
-				else if(event.name=='chooseToUse'||event.name=='chooseToRespond'){
-					event.result.card=get.autoViewAs(event.result.cards[0]);
-				}
+				else if(['chooseToUse','chooseToRespond'].includes(gameEvent.name)) result.card=get.autoViewAs(result.cards[0]);
 				if(ui.skills) ui.skills.close();
 				if(ui.skills2) ui.skills2.close();
 				if(ui.skills3) ui.skills3.close();
 				game.uncheck();
-				if(event.custom.add.confirm){
-					event.custom.add.confirm(true);
-				}
+				const addConfirm=custom.add.confirm;
+				if(addConfirm) addConfirm(true);
 				game.resume();
 			},
 			cancel:function(node){
@@ -57657,6 +57830,31 @@
 		},
 	};
 	const get={
+		/**
+		 * @param {number} numberOfPlayers
+		 * @returns {string[]}
+		 */
+		identityList:numberOfPlayers=>{
+			const modeConfig=lib.config.mode_config;
+			if(modeConfig){
+				const identityConfig=modeConfig.identity;
+				if(identityConfig){
+					const identityLists=identityConfig.identity;
+					if(identityLists){
+						const identityList=identityLists[numberOfPlayers-2];
+						if(Array.isArray(identityList)) return identityList.slice();
+					}
+				}
+			}
+			const numberOfPlayersExceptLord=numberOfPlayers-1,numberOfLoyalists=Math.round(numberOfPlayersExceptLord*3/9),numberOfSpys=Math.round(numberOfPlayersExceptLord*2/9);
+			return ['zhu'].concat(Array.from({
+				length:numberOfLoyalists
+			},()=>'zhong'),Array.from({
+				length:numberOfSpys
+			},()=>'nei'),Array.from({
+				length:numberOfPlayersExceptLord-numberOfLoyalists-numberOfSpys
+			},()=>'fan'));
+		},
 		//Generate an object URL from the Base64-encoded octet stream
 		//从Base64编码的八位字节流生成对象URL
 		objectURL:octetStream=>{
@@ -59096,14 +59294,14 @@
 			if(key=='_trigger'){
 				if(noMore!==false) stringifying[key]=get.eventInfoOL(entry[1],null,false);
 			}
-			else if(!lib.element.Event.prototype[key]&&key!='content'&&get.itemtype(entry[1])!='event') stringifying[key]=get.stringifiedResult(entry[1],null,false);
+			else if(!lib.element.GameEvent.prototype[key]&&key!='content'&&get.itemtype(entry[1])!='event') stringifying[key]=get.stringifiedResult(entry[1],null,false);
 			return stringifying;
 		},{}))}`:'',
 		/**
 		 * @param {string} item
 		 */
 		infoEventOL:item=>{
-			const evt=new lib.element.Event();
+			const evt=new lib.element.GameEvent();
 			try{
 				Object.entries(JSON.parse(item.slice(14))).forEach(entry=>{
 					const key=entry[0];
@@ -59336,7 +59534,7 @@
 				if(obj.classList.contains('dialog')) return 'dialog';
 			}
 			if(get.is.object(obj)){
-				if(obj.isMine==lib.element.Event.prototype.isMine) return 'event';
+				if(obj.isMine==lib.element.GameEvent.prototype.isMine) return 'event';
 			}
 		},
 		equipNum:card=>{
@@ -59647,6 +59845,13 @@
 			}
 			return card;
 		},
+		/**
+		 * @template T
+		 * @type {{
+		 * (key: T) => GameEvent[T];
+		 * () => GameEvent;
+		 * }}
+		 */
 		event:key=>key?_status.event[key]:_status.event,
 		player:()=>_status.event.player,
 		players:(sort,dead,out)=>{
@@ -59720,6 +59925,9 @@
 			// 	replace(/阵法技/g,'<span class="bluetext">阵法技</span>').
 			// 	replace(/主公技/g,'<span class="firetext">主公技</span>');
 		},
+		/**
+		 * @returns {string}
+		 */
 		translation:(str,arg)=>{
 			if(str&&typeof str=='object'&&(str.name||str._tempTranslate)){
 				if(str._tempTranslate) return str._tempTranslate;
@@ -61722,6 +61930,7 @@
 			var event=_status.event;
 			var eventskill=null;
 			if(player==undefined) player=_status.event.player;
+			if(typeof card=='object') card=get.autoViewAs(card);
 			if(typeof card!='string'&&(typeof card!='object'||!card.name)){
 				var skillinfo=get.info(event.skill);
 				if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
@@ -61916,6 +62125,7 @@
 			var event=_status.event;
 			var eventskill=null;
 			if(player==undefined) player=_status.event.player;
+			if(typeof card=='object') card=get.autoViewAs(card);
 			if(typeof card!='string'&&(typeof card!='object'||!card.name)){
 				var skillinfo=get.info(event.skill);
 				if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
@@ -62356,7 +62566,7 @@
 		Object.defineProperty(cardPrototype,key,Object.getOwnPropertyDescriptor(vCardPrototype,key));
 	});
 	setAllPropertiesEnumerable(lib.element.Button.prototype);
-	setAllPropertiesEnumerable(lib.element.Event.prototype);
+	setAllPropertiesEnumerable(lib.element.GameEvent.prototype);
 	setAllPropertiesEnumerable(lib.element.Dialog.prototype);
 	setAllPropertiesEnumerable(lib.element.Control.prototype);
 	setAllPropertiesEnumerable(lib.element.Client.prototype);
