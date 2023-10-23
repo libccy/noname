@@ -4492,7 +4492,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_mojianjg:'魔箭',
 			boss_mojianjg_info:'出牌阶段开始时，你可以对所有敌方角色使用一张【万箭齐发】。',
 			boss_jiguan:'机关',
-			boss_jiguan_info:'锁定技，你不能成为【乐不思蜀】的目标',
+			boss_jiguan_info:'锁定技，你不能成为【乐不思蜀】的目标。',
 			boss_lingyu:'灵愈',
 			boss_lingyu_info:'结束阶段，你可以将自己的武将牌翻面，然后令所有已受伤的己方其他角色回复1点体力。',
 			boss_tianyun:'天陨',
