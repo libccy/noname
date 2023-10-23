@@ -11522,7 +11522,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var num=2;
 						if(target.hasSkill('twyujue_effect0')) num--;
 						if(target.hasSkill('twyujue_effect1')) num--;
-						num=Math.min(num,trigger.getl(target).cards2.length);
+						var cards=trigger.getg(player);
+						num=Math.min(num,trigger.getl(target).cards2.filter(i=>cards.includes(i)).length);
 						if(num>0) event.count=num;
 						else if(targets.length>0) event.redo();
 						else event.finish();
