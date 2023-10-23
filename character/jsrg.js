@@ -170,6 +170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player:'phaseBegin',
 						},
 						forced:true,
+						popup:false,
 						forceDie:true,
 						onremove:true,
 						filter:function(event,player){
@@ -177,10 +178,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return player==event.player||player.getStorage('jsrgqingzi_clear').contains(event.player);
 							}
 							return player.getStorage('jsrgqingzi_clear').length>0;
-						},
-						logTarget:function(event,player){
-							if(event.name!='phase') return event.player;
-							return player.getStorage('jsrgqingzi_clear');
 						},
 						content:function(){
 							'step 0'
@@ -205,7 +202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(targets.length>0){
 								event.redo();
 							}
-							else{
+							else if(!storage.length){
 								player.removeSkill('jsrgqingzi_clear');
 							}
 						},

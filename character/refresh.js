@@ -3269,6 +3269,60 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.draw();
 				},
+				group:'dcjianying_mark',
+				init:function(player){
+					var history=player.getAllHistory('useCard');
+					if(history.length){
+						var trigger=history[history.length-1];
+						if(get.suit(trigger.card,player)=='none'||typeof get.number(trigger.card,player)!='number') return;
+						player.storage.dcjianying_mark=trigger.card;
+						player.markSkill('dcjianying_mark');
+						game.broadcastAll(function(player,suit){
+							if(player.marks.dcjianying_mark) player.marks.dcjianying_mark.firstChild.innerHTML=get.translation(suit);
+						},player,get.suit(trigger.card,player));
+					}
+				},
+				onremove:function(player){
+					player.unmarkSkill('dcjianying_mark');
+					delete player.storage.dcjianying_mark;
+				},
+				subSkill:{
+					mark:{
+						charlotte:true,
+						trigger:{player:'useCard1'},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							if(get.suit(trigger.card,player)=='none'||typeof get.number(trigger.card,player)!='number') player.unmarkSkill('dcjianying_mark');
+							else{
+								player.storage.dcjianying_mark=trigger.card;
+								player.markSkill('dcjianying_mark');
+								game.broadcastAll(function(player,suit){
+									if(player.marks.dcjianying_mark) player.marks.dcjianying_mark.firstChild.innerHTML=get.translation(suit);
+								},player,get.suit(trigger.card,player));
+							}
+						},
+						intro:{
+							markcount:function(card,player){
+								var num=get.number(card,player);
+								var list=[1,11,12,13];
+								if(list.contains(num)) return ['A','J','Q','K'][list.indexOf(num)];
+								return parseFloat(num);
+							},
+							content:function(card,player){
+								var suit=get.suit(card,player);
+								var num=get.number(card,player);
+								var str='<li>上一张牌的花色：'+get.translation(suit);
+								str+='<br><li>上一张牌的点数：';
+								var list=[1,11,12,13];
+								if(list.contains(num)) str+=['A(1)','J(11)','Q(12)','K(13)'][list.indexOf(num)];
+								else str+=parseFloat(num);
+								return str;
+							},
+						},
+					},
+				},
 			},
 			//十周年步练师
 			dcanxu:{

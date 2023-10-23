@@ -1464,8 +1464,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard1'},
 				forced:true,
 				filter:function(event,player){
-					return event.card.name=='sha'&&event.cards.length==1&&player.getHistory('useCard',function(evt){
-						return evt.card.name=='sha'&&evt.cards.length==1;
+					if(event.card.name!='sha'||!event.cards||event.cards.length!=1) return false;
+					var evt=event.getParent('phaseUse');
+					return evt&&evt.player==player&&player.getHistory('useCard',function(evt2){
+						return evt2.card.name=='sha'&&evt.cards&&evt.cards.length==1&&evt2.getParent('phaseUse')==evt;
 					}).indexOf(event)==0;
 				},
 				content:function(){
@@ -3241,7 +3243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
-				group:['yizhu_use','yizhu_discard'],
+				group:'yizhu_use',
 				subSkill:{
 					use:{
 						audio:'yizhu',
@@ -3258,7 +3260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.effect(event.targets[0],event.card,event.player,player)<0;
 						},
 						prompt2:function(event,player){
-							return '令'+get.translation(event.card)+'无效并可重新使用';
+							return '令'+get.translation(event.card)+'无效';
 						},
 						content:function(){
 							trigger.cancel();
@@ -3269,26 +3271,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							player.unmarkAuto('yizhu',list);
 							game.delayx();
-							player.chooseUseTarget(trigger.card,trigger.cards,false,'nothrow');
-						},
-					},
-					discard:{
-						trigger:{
-							global:['loseAfter','cardsDiscardAfter','loseAsyncAfter','equipAfter'],
-						},
-						forced:true,
-						locked:false,
-						filter:function(event,player){
-							return player.storage.yizhu&&player.storage.yizhu.length&&event.getd().filter(function(i){
-								return player.storage.yizhu.contains(i);
-							}).length>0;
-						},
-						content:function(){
-							var list=trigger.getd().filter(function(i){
-								return player.storage.yizhu.contains(i);
-							});
-							player.unmarkAuto('yizhu',list);
-							player.draw();
 						},
 					},
 				},
@@ -6487,7 +6469,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			heji:'合击',
 			heji_info:'当有角色使用的【决斗】或红色【杀】结算完成后，若此牌对应的目标数为1，则你可以对相同的目标使用一张【杀】或【决斗】（无距离和次数限制）。若你以此法使用的牌不为转化牌，则你从牌堆中随机获得一张红色牌。',
 			liubing:'流兵',
-			liubing_info:'锁定技。①当你声明使用【杀】后，若此牌是你本回合使用的第一张有唯一对应实体牌的【杀】，则你将此牌的花色改为♦。②其他角色于其出牌阶段内使用的非转化黑色杀结算结束后，若此【杀】未造成伤害，则你获得之。',
+			liubing_info:'锁定技。①你于出牌阶段使用的第一张有唯一对应实体牌的【杀】的花色视为♦。②其他角色于其出牌阶段内使用的非转化黑色杀结算结束后，若此【杀】未造成伤害，则你获得之。',
 			sp_mifuren:'手杀糜夫人',
 			spcunsi:'存嗣',
 			spcunsi2:'存嗣',
@@ -6598,7 +6580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehuaibi_info:'主公技，锁定技，你的手牌上限+X（X为你因〖邀虎〗选择势力的角色数量)。',
 			qiaogong:'桥公',
 			yizhu:'遗珠',
-			yizhu_info:'①结束阶段，你摸两张牌，然后将两张牌随机插入牌堆前2X张牌的位置中（X为角色数，选择牌的牌名对其他角色可见）。②当有其他角色使用“遗珠”牌指定唯一目标时，你可清除对应的“遗珠”标记并取消此目标，然后你可使用此牌。③当有“遗珠”牌进入弃牌堆后，你摸一张牌并清除对应的“遗珠”标记。',
+			yizhu_info:'①结束阶段，你摸两张牌，然后将两张牌随机插入牌堆前2X张牌的位置中（X为角色数，选择牌的牌名对其他角色可见）。②其他角色使用“遗珠”牌指定唯一目标时，你可以取消此目标，然后你清除对应的“遗珠”标记。',
 			luanchou:'鸾俦',
 			luanchou_info:'出牌阶段限一次，你可令两名角色获得“姻”标记并清除原有标记。拥有“姻”标记的角色视为拥有技能〖共患〗。',
 			gonghuan:'共患',

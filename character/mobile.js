@@ -4385,7 +4385,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjianying:{
 				audio:2,
 				subfrequent:['draw'],
-				group:['xinjianying_draw'],
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
@@ -4433,8 +4432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						var next={
-							audio:'jianying',
-							audioname:['xin_jushou'],
+							audio:'xinjianying',
 							filterCard:true,
 							popname:true,
 							position:'he',
@@ -4459,6 +4457,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 3;
 					},
 					result:{player:7},
+				},
+				group:['xinjianying_draw','jianying_mark'],
+				init:function(player){
+					if(player.isPhaseUsing()){
+						var evt=_status.event.getParent('phaseUse');
+						var history=player.getHistory('useCard',function(evt2){
+							return evt2.getParent('phaseUse')==evt;
+						});
+						if(history.length){
+							var trigger=history[history.length-1];
+							player.storage.jianying_mark=trigger.card;
+							player.markSkill('jianying_mark');
+							game.broadcastAll(function(player,suit){
+								if(player.marks.jianying_mark) player.marks.jianying_mark.firstChild.innerHTML=get.translation(suit);
+							},player,get.suit(trigger.card,player));
+							player.when('phaseUseAfter').then(()=>{
+								player.unmarkSkill('jianying_mark');
+								delete player.storage.jianying_mark;
+							});
+						}
+					}
+				},
+				onremove:function(player){
+					player.unmarkSkill('jianying_mark');
+					delete player.storage.jianying_mark;
 				},
 				subSkill:{
 					draw:{inherit:'jianying',audio:'xinjianying'},
