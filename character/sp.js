@@ -1666,7 +1666,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player,name){
 							if(!event.card.olfushi_buff) return false;
 							if(name=='useCard2') return true;
-							return event.getParent().triggeredTargets3.length==event.targets.length&&event.card.olfushi_buff.length>1&&event.card.olfushi_buff.contains('伤害-1')&&!event.targets.some(target=>!event.targets.contains(target.getPrevious())||!event.targets.contains(target.getNext()));
+							return event.getParent().triggeredTargets3.length==event.targets.length&&event.card.olfushi_buff.length>1&&event.card.olfushi_buff.contains('伤害-1')&&!event.targets.some(target=>!event.targets.contains(target.getPrevious())&&!event.targets.contains(target.getNext()));
 						},
 						forced:true,
 						popup:false,
@@ -1787,7 +1787,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mode:['doudizhu'],
 				zhuanhuanji:true,
 				mark:true,
-				markcount:'☯',
+				marktext:'☯',
 				intro:{
 					content:function(storage){
 						if(storage) return '农民的回合结束时，其可以进行一个额外回合';
