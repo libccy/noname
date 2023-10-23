@@ -1118,7 +1118,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldqinqing:'寝情',
 			oldqinqing_info:'结束阶段，你可以选择一名攻击范围内含有主公的其他角色，然后你弃置该角色的一张牌（无牌则不弃），并令其摸一张牌。若该角色的手牌数大于主公，你摸一张牌。',
 			oldhuisheng:'贿生',
-			oldhuisheng_info:'每名角色限一次。当你受到其他角色对你造成的伤害时，你可以令其观看你任意数量的牌并令其选择一项：1.获得这些牌中的一张并防止此伤害；2.弃置等量的牌',
+			oldhuisheng_info:'每名角色限一次。当你受到其他角色对你造成的伤害时，你可以令其观看你任意数量的牌并令其选择一项：1.获得这些牌中的一张并防止此伤害；2.弃置等量的牌。',
 			old_dingfeng:'旧丁奉',
 			old_dingfeng_prefix:'旧',
 			junk_sunquan:'旧神孙权',

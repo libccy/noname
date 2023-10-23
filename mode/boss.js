@@ -9385,7 +9385,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_yingzhong:'映冢',
 			boss_yingzhong_info:'锁定技。你登场后的第一个回合开始时，你随机获得两个“阴间武将”的全部技能。',
 			boss_yingzhong_append:'<span style="font-family:yuanli">四季映姬到阴曹地府<br>——阴(映)到家了！</span>',
-					//孟婆:
+			//孟婆:
 			"boss_mengpo":"孟婆",
 			"boss_shiyou":"拾忧",
 			"boss_shiyou_info":"其他角色于弃牌阶段弃置的牌进入弃牌堆前，你可以选择其中任意张花色各不相同的牌获得之。",
@@ -9402,10 +9402,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"boss_wuliang":"无量",
 			"boss_wuliang_info":"锁定技，你登场时额外摸3张牌；结束阶段开始时，你摸两张牌；你的回合开始时，若你当前体力小于3，则回复至3。",
 			"boss_dayuan":"大愿",
-			"boss_dayuan_info":" 当一名角色判定牌最终生效前，你可以指定该判定牌的点数和花色",
+			"boss_dayuan_info":" 当一名角色判定牌最终生效前，你可以指定该判定牌的点数和花色。",
 			"boss_diting":"谛听",
 			"boss_diting_info":"锁定技，你的坐骑区被废除，你与别人计算距离时-1，别人与你计算距离时+1；你的坐骑牌均用于重铸。",
-			/*			
+			/*
 			//等阶
 			"boss_sdyl_playerlevel1":"一阶",
 			"boss_sdyl_playerlevel1_info":"",
