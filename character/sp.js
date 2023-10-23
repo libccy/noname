@@ -28,9 +28,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_dongzhao:function(mode){
 				return mode=='identity'&&['normal','zhong'].contains(_status.mode);
 			},
-			lvboshe:function(mode){
-				return mode=='doudizhu';
-			},
 		},
 		character:{
 			ol_liwan:['female','wei',3,['ollianju','olsilv']],
@@ -38,7 +35,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangyan:['male','qun',4,['olsuji','ollangdao']],
 			ol_tw_zhangji:['male','wei',3,['skill_zhangji_A','skill_zhangji_B'],['unseen']],
 			ol_feiyi:['male','shu',3,['skill_feiyi_A','skill_feiyi_B'],['unseen']],
-			lvboshe:['male','qun',4,['skill_lvboshe'],['unseen']],
+			lvboshe:['male','qun',4,['olfushi','oldongdao']],
 			ol_luyusheng:['female','wu',3,['olcangxin','olrunwei']],
 			caoxi:['male','wei',3,['olgangshu','oljianxuan']],
 			ol_pengyang:['male','shu',3,['olqifan','oltuishi','nzry_cunmu']],
@@ -1548,14 +1545,252 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//吕伯奢
-			skill_lvboshe:{
+			olfushi:{
+				audio:2,
+				trigger:{global:'useCardAfter'},
+				filter:function(event,player){
+					return event.player.isIn()&&event.card.name=='sha'&&event.cards&&event.cards.filterInD().length&&get.distance(player,event.player)<=1;
+				},
+				forced:true,
+				locked:false,
+				logTarget:'player',
+				content:function(){
+					player.addToExpansion(trigger.cards.filterInD(),'gain2').gaintag.add('olfushi');
+				},
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				group:'olfushi_wusheng',
+				subSkill:{
+					wusheng:{
+						enable:'chooseToUse',
+						filter:function(event,player){
+							if(event.olfushi) return false;
+							return player.getExpansions('olfushi').length;
+						},
+						filterCard:()=>false,
+						selectCard:-1,
+						viewAs:{name:'sha'},
+						prompt:'将任意“缚豕”牌置入弃牌堆并摸等量的牌，视为使用一张【杀】',
+						precontent:function(){
+							'step 0'
+							delete event.result.skill;
+							player.chooseButton([2,6],[
+								'将任意“缚豕”牌置入弃牌堆并摸等量的牌，并选择执行等量项',
+								player.getExpansions('olfushi'),
+								[['额外目标','伤害-1','伤害+1'],'tdnodes'],
+							]).set('filterOk',()=>{
+								if(!ui.selected.buttons.length) return false;
+								return ui.selected.buttons.filter(button=>typeof button.link=='string').length*2==ui.selected.buttons.length;
+							}).set('ai',function(button){
+								var player=_status.event.player;
+								var type=typeof button.link;
+								var trigger=_status.event.getParent();
+								var targets=game.filterPlayer(target=>{
+									return !trigger.targets.contains(target)&&player.canUse(trigger.card,target);
+								});
+								var num1=targets.filter(target=>get.effect(target,trigger.card,player,player)>0).length;
+								var num2=targets.length-num1;
+								if(type=='string'){
+									var list;
+									var num3=player.getExpansions('olfushi').length;
+									if((num1>0&&num2>0)||(num1==0&&num2==0)){
+										switch(num3){
+											case 1:
+												list=[['额外目标','伤害+1'].randomGet()];
+												break;
+											case 2:
+												list=[['额外目标','伤害+1'].randomGet(),'伤害-1'];
+												break;
+											default:
+												list=['额外目标','伤害-1','伤害+1'];
+												break;
+										}
+									}
+									else if(num1==0){
+										switch(num3){
+											case 1:
+												list=['伤害+1'];
+												break;
+											case 2:
+												list=['额外目标','伤害+1'];
+												break;
+											default:
+												list=['额外目标','伤害-1','伤害+1'];
+												break;
+										}
+									}
+									else if(num2==0){
+										list=['伤害+1','伤害-1'];
+									}
+									if(list.contains(button.link)) return 114514;
+									return 0;
+								}
+								else return 1/(get.value(button.link)||0.5);
+							});
+							'step 1'
+							if(result.bool){
+								var controls=result.links.filter(button=>typeof button=='string');
+								var cards=result.links.filter(button=>!controls.contains(button));
+								player.logSkill('olfushi');
+								player.recast(cards);
+								event.result.card.olfushi_buff=controls;
+								player.addTempSkill('olfushi_buff');
+							}
+							else{
+								event.getParent().olfushi=true;
+								event.getParent().goto(0);
+								return;
+							}
+						},
+						order:function(item,player){
+							if(player.getExpansions('olfushi').length>2) return 7;
+							return 1;
+						},
+						ai:{
+							respondSha:true,
+							skillTagFilter:function(player,tag,arg){
+								if(arg=='respond'||_status.event.olfushi) return false;
+								if(!player.getExpansions('olfushi').length) return false;
+							},
+						},
+					},
+					buff:{
+						charlotte:true,
+						trigger:{player:['useCard2','useCardToPlayered']},
+						filter:function(event,player,name){
+							if(!event.card.olfushi_buff) return false;
+							if(name=='useCard2') return true;
+							return event.getParent().triggeredTargets3.length==event.targets.length&&event.card.olfushi_buff.length>1&&event.card.olfushi_buff.contains('伤害-1')&&!event.targets.some(target=>!event.targets.contains(target.getPrevious())||!event.targets.contains(target.getNext()));
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							'step 0'
+							if(event.triggername=='useCardToPlayered'){
+								trigger.getParent().addCount=false;
+								if(player.stat[player.stat.length-1].card.sha>0){
+									player.stat[player.stat.length-1].card.sha--;
+								}
+								game.log(trigger.card,'不计入次数');
+								event.finish();
+								return;
+							}
+							var list=trigger.card.olfushi_buff;
+							event.list=list;
+							if(list.contains('额外目标')&&game.hasPlayer(target=>{
+								return !trigger.targets.contains(target)&&player.canUse(trigger.card,target);
+							})){
+								player.chooseTarget('请选择'+get.translation(trigger.card)+'的额外目标',function(card,player,target){
+									var trigger=_status.event.getTrigger();
+									return !trigger.targets.contains(target)&&player.canUse(trigger.card,target);
+								},true).set('ai',function(target){
+									var player=_status.event.player;
+									return get.attitude(player,target);
+								});
+							}
+							else event._result={bool:false};
+							'step 1'
+							if(result.bool){
+								var targets=result.targets.sortBySeat();
+								player.line(targets);
+								trigger.targets.addArray(targets);
+								game.log(targets,'成为了',trigger.card,'的额外目标');
+							}
+							'step 2'
+							if(event.list.contains('伤害-1')){
+								player.chooseTarget('请选择'+get.translation(trigger.card)+'伤害-1的目标',function(card,player,target){
+									var trigger=_status.event.getTrigger();
+									return trigger.targets.contains(target);
+								},true).set('ai',function(target){
+									var player=_status.event.player;
+									return get.attitude(player,target);
+								});
+							}
+							else event._result={bool:false};
+							'step 3'
+							if(result.bool){
+								var target=result.targets[0];
+								player.line(target);
+								game.log(target,'受到',trigger.card,'的伤害-1');
+								target.addTempSkill('olfushi_buff2');
+								target.markAuto('olfushi_buff2',[trigger.card]);
+							}
+							'step 4'
+							if(event.list.contains('伤害+1')){
+								player.chooseTarget('请选择'+get.translation(trigger.card)+'伤害+1的目标',function(card,player,target){
+									var trigger=_status.event.getTrigger();
+									return trigger.targets.contains(target);
+								},true).set('ai',function(target){
+									var player=_status.event.player;
+									return get.damageEffect(target,player,player);
+								});
+							}
+							else event.finish();
+							'step 5'
+							if(result.bool){
+								var target=result.targets[0];
+								player.line(target);
+								game.log(target,'受到',trigger.card,'的伤害+1');
+								target.addTempSkill('olfushi_buff3');
+								target.markAuto('olfushi_buff3',[trigger.card]);
+							}
+						},
+					},
+					buff2:{
+						charlotte:true,
+						onremove:true,
+						trigger:{player:'damageBegin2'},
+						filter:function(event,player){
+							return event.card&&player.getStorage('olfushi_buff2').contains(event.card);
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							trigger.num--;
+						},
+						ai:{
+							effect:{
+								target:function(card,player,target){
+									if(player.hasSkillTag('jueqing',false,target)) return;
+									if(!card||!player.getStorage('olfushi_buff2').contains(card)) return;
+									var num=get.tag(card,'damage');
+									if(num){
+										if(num>1) return 0.5;
+										return 0;
+									}
+								},
+							},
+						},
+					},
+					buff3:{
+						charlotte:true,
+						onremove:true,
+						trigger:{player:'damageBegin1'},
+						filter:function(event,player){
+							return event.card&&player.getStorage('olfushi_buff3').contains(event.card);
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							trigger.num++;
+						},
+					},
+				},
+			},
+			oldongdao:{
 				mode:['doudizhu'],
 				zhuanhuanji:true,
 				mark:true,
 				markcount:'☯',
 				intro:{
 					content:function(storage){
-						if(storage) return '农民的回合结束时，你可以令其进行一个额外回合';
+						if(storage) return '农民的回合结束时，其可以进行一个额外回合';
 						return '农民的回合结束时，你可以令地主进行一个额外回合';
 					},
 				},
@@ -1564,17 +1799,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.player.identity=='fan';
 				},
-				prompt2:function(event,player){
-					return '令'+get.translation(lib.skill.skill_lvboshe.logTarget(event,player))+'进行一个额外回合';
-				},
-				logTarget:function(event,player){
-					var storage=player.storage.skill_lvboshe;
-					return storage?event.player:game.zhu;
-				},
+				direct:true,
 				content:function(){
-					var target=lib.skill.skill_lvboshe.logTarget(trigger,player);
-					player.changeZhuanhuanji('skill_lvboshe');
-					target.insertPhase();
+					'step 0'
+					var target=(player.storage.oldongdao?trigger.player:game.zhu);
+					event.target=target;
+					var target2=(player.storage.oldongdao?trigger.player:player);
+					event.target2=target2;
+					target2.chooseBool(get.prompt('oldongdao'),'令'+get.translation(target)+'进行一个额外回合');
+					'step 1'
+					if(result.bool){
+						player.logSkill('oldongdao');
+						event.target2.line(target);
+						player.changeZhuanhuanji('oldongdao');
+						target.insertPhase();
+					}
 				},
 			},
 			//OL陆郁生
@@ -2190,6 +2429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.isFirstTarget&&event.targets.length>player.getHp();
 				},
 				direct:true,
+				usable:1,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('olkuansai'),'令其中一个目标选择一项：1.交给你一张牌；2.令你回复1点体力。',(card,player,target)=>{
@@ -2237,7 +2477,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return true;
 						}());
 					}
-					else event.finish();
+					else{
+						player.storage.counttrigger.olkuansai--;
+						event.finish();
+					}
 					'step 2'
 					if(result.bool){
 						target.give(result.cards,player);
@@ -24885,9 +25128,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.olsaogu) return '转换技。①出牌阶段，你可以。阴：弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】；<span class="bluetext">阳：摸一张牌</span>。②结束阶段，你可以弃置一张牌，令一名其他角色执行你当前〖扫谷①〗的分支。';
 				return '转换技。①出牌阶段，你可以。<span class="bluetext">阴：弃置两张牌（不能包含你本阶段弃置过的花色），然后使用其中的【杀】</span>；阳：摸一张牌。②结束阶段，你可以弃置一张牌，令一名其他角色执行你当前〖扫谷①〗的分支。';
 			},
-			skill_lvboshe:function(player){
-				if(player.storage.skill_lvboshe) return '农民的回合结束时：阴，你可以令地主进行一个额外回合；<span class="bluetext">阳，你可以令其进行一个额外回合</span>。';
-				return '农民的回合结束时：<span class="bluetext">阴，你可以令地主进行一个额外回合</span>；阳，你可以令其进行一个额外回合。';
+			oldongdao:function(player){
+				if(player.storage.oldongdao) return '农民的回合结束时：阴，你可以令地主进行一个额外回合；<span class="bluetext">阳，其可以进行一个额外回合</span>。';
+				return '农民的回合结束时：<span class="bluetext">阴，你可以令地主进行一个额外回合</span>；阳，其可以进行一个额外回合。';
 			},
 			ollangdao:function(player){
 				var str='当你使用【杀】指定唯一目标时，你可以与该目标角色同时选择一项：';
@@ -26126,7 +26369,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olweifu:'威抚',
 			olweifu_info:'出牌阶段，你可以弃置一张牌并判定。你本回合下次使用与结果类型相同的牌无距离限制，且可以额外指定一个目标。若你弃置的牌与判定牌类型相同，你摸一张牌。',
 			olkuansai:'款塞',
-			olkuansai_info:'当一张牌指定第一个目标后，若目标数大于你的体力值，你可以令其中一个目标选择一项：1.交给你一张牌；2.令你回复1点体力。',
+			olkuansai_info:'每回合限一次，当一张牌指定第一个目标后，若目标数大于你的体力值，你可以令其中一个目标选择一项：1.交给你一张牌；2.令你回复1点体力。',
 			ol_luyusheng:'OL陆郁生',
 			ol_luyusheng_prefix:'OL',
 			olcangxin:'藏心',
@@ -26155,8 +26398,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			skill_feiyi_B:'技能',
 			skill_feiyi_B_info:'每回合每项限一次，当你的手牌数变为1后，你可以展示此唯一手牌A并摸一张牌，然后你选择一项：①本回合使用点数大于A的点数的牌额外结算一次；②本回合使用点数小于A的点数的牌额外结算一次。',
 			lvboshe:'吕伯奢',
-			skill_lvboshe:'技能',
-			skill_lvboshe_info:'农民的回合结束时：阴，你可以令地主进行一个额外回合；阳，你可以令其进行一个额外回合。',
+			olfushi:'缚豕',
+			olfushi_info:'①一名角色使用【杀】结算完毕后，若你与其的距离不大于1，你将此【杀】对应的所有实体牌置于武将牌上。②你可以将任意张“缚豕“牌置入弃牌堆并摸等量的牌，视为使用一张具有以下等同于置入弃牌堆牌数量的效果的【杀】：1.此【杀】额外指定一个目标；2.此【杀】对其中一个目标角色造成的伤害-1；3.此【杀】对其中一个目标造成的伤害+1。且此【杀】指定最后一个目标后，若此【杀】选择的效果和选择的目标均相邻，则此【杀】不计入次数限制。',
+			oldongdao:'东道',
+			oldongdao_info:'农民的回合结束时：阴，你可以令地主进行一个额外回合；阳，其可以进行一个额外回合。',
 			zhangyan:'张燕',
 			olsuji:'肃疾',
 			olsuji_info:'一名角色的出牌阶段开始时，若其已受伤，你可以将一张黑色牌当【杀】使用。若其受到此【杀】的伤害，你获得其一张牌。',
