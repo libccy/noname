@@ -123,6 +123,7 @@ var pinyin_dict_polyphone = {
 	"度势": "duó ",
 	"诛綝": " chēn",
 	"大喝": "dà hè",
+	"暴喝": "bào hè",
 	"曲误": "qǔ ",
 	"媛丽": "yuán lì",
 	"调归": "diào ",
