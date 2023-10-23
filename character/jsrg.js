@@ -445,7 +445,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						if(targets.length){
 							game.delayex();
-							player.useCard({name:'sha',isCard:true,storage:{jsrgbaohe:0}},targets,false);
+							player.useCard({name:'sha',isCard:true,storage:{jsrgbaohe:true}},targets,false);
 							player.addTempSkill('jsrgbaohe_add');
 						}
 					}
@@ -460,7 +460,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						filter:function(event,player){
 							let evt=event.getParent(3),respondTo=event.respondTo;
-							if(evt.name!='useCard'||!Array.isArray(respondTo)||!respondTo[1].storage||typeof respondTo[1].storage.jsrgbaohe!='number') return false;
+							if(evt.name!='useCard'||!Array.isArray(respondTo)||!respondTo[1].storage||!respondTo[1].storage.jsrgbaohe) return false;
 							return evt.targets.length>evt.num+1;
 						},
 						logTarget:function(event){
@@ -471,7 +471,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							var evt=trigger.getParent(3);
 							var targets=evt.targets.slice(evt.num+1);
-							var map=trigger.customArgs;
+							var map=evt.customArgs;
 							for(var target of targets){
 								var id=target.playerid;
 								if(!map[id]) map[id]={};
@@ -6126,7 +6126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgzhenfeng_info:'出牌阶段每种类别各限一次。你可以视为使用一张存活角色的技能描述中包含的基本牌或普通锦囊牌（无距离和次数限制）。当此牌对技能描述中包含此牌的角色生效时，你对其造成1点伤害。',
 			jsrg_zhangfei:'转张飞',
 			jsrg_zhangfei_prefix:'转',
-			jsrgbaohe:'暴吓',
+			jsrgbaohe:'暴喝',
 			jsrgbaohe_info:'一名角色的出牌阶段结束时，你可以弃置两张牌，然后视为你对攻击范围内包含其的所有角色使用一张【杀】。当一名角色使用牌响应此【杀】后，此【杀】对后续目标角色造成的伤害+1。',
 			jsrgxushi:'虚势',
 			jsrgxushi_info:'出牌阶段限一次。你可以交给任意名角色各一张牌，然后你获得两倍数量的【影】。',
