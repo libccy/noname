@@ -1282,6 +1282,7 @@ window.noname_character_rank={
 		'yj_zhoubuyi',
 		'feiyao',
 		'jsrg_xiahouen',
+		'old_shen_zhaoyun',
 	],
 	bm:[
 		'diy_xizhenxihong',
