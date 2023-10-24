@@ -1051,7 +1051,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(hp==0||target.countCards('h')<hp) event._result={bool:false};
 						else{
 							var str=`是否弃置${get.cnNumber(hp)}张手牌并回复1点体力？或点击“取消”摸'${get.cnNumber(len)}张牌并复原武将牌。`;
-							target.chooseToDiscard(get.translation(player)+'对你发动了【雀颂】',str,forced,'h',hp).set('ai',card=>{
+							target.chooseToDiscard(get.translation(player)+'对你发动了【雀颂】',str,'h',hp).set('ai',card=>{
 								if(!get.event('goon')) return 0;
 								return 6-get.value(card);
 							}).set('goon',function(){
