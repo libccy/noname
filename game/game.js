@@ -4,7 +4,7 @@
 	 * @typedef {InstanceType<typeof lib.element.Player>} Player
 	 * @typedef {InstanceType<typeof lib.element.Card>} Card
 	 * @typedef {InstanceType<typeof lib.element.VCard>} VCard
-	 * @typedef {InstanceType<typeof lib.element.Event>} GameEvent
+	 * @typedef {InstanceType<typeof lib.element.GameEvent>} GameEvent
 	 * @typedef {InstanceType<typeof lib.element.NodeWS>} NodeWS
 	 */
 	const userAgent=navigator.userAgent.toLowerCase();
@@ -432,8 +432,11 @@
 				},
 			}
 		},
-		//Yingbian
-		//应变
+		/**
+		 * Yingbian
+		 * 
+		 * 应变
+		 */
 		yingbian:{
 			condition:{
 				color:new Map([
@@ -605,8 +608,101 @@
 				['all','无视条件执行所有选项']
 			])
 		},
-		//The actual card name
-		//实际的卡牌名称
+		/**
+		 * Stratagem buff
+		 * 
+		 * 谋攻强化
+		 */
+		stratagemBuff:{
+			cost:new Map([
+				['sha',1],
+				['shan',1],
+				['juedou',2],
+				['huogong',2],
+				['tao',3]
+			]),
+			effect:new Map([
+				['sha',event=>{
+					if(event.step!=1) return;
+					game.log(event.player,'触发了强化效果');
+					game.log(event.card,'抵消所需要的',new lib.element.VCard({
+						name:'shan'
+					}),'数+1');
+					const map=event.customArgs;
+					game.players.concat(game.dead).forEach(current=>{
+						const id=current.playerid;
+						if(!map[id]) map[id]={};
+						if(typeof map[id].shanRequired=='number') map[id].shanRequired++;
+						else map[id].shanRequired=2;
+					});
+				}],
+				['shan',event=>{
+					if(event.step!=1) return;
+					game.log(event.player,'触发了强化效果');
+					game.log('使用',event.card,'时视为两张',new lib.element.VCard({
+						name:'shan'
+					}),'的效果');
+					event.player.when('useCard').filter(evt=>evt==event).then(()=>{
+						trigger.getParent(2).decrease('shanRequired',1);
+					});
+				}],
+				['juedou',event=>{
+					if(event.step!=1) return;
+					game.log(event.player,'触发了强化效果');
+					game.log('对',event.card,'的目标造成伤害时，伤害+1');
+					event.player.when({
+						source:'damageBegin1'
+					}).filter(evt=>evt.getParent(2)==event&&event.targets.includes(evt.player)).then(()=>{
+						trigger.increase('num');
+					});
+				}],
+				['huogong',event=>{
+					if(event.step!=1) return;
+					game.log(event.player,'触发了强化效果');
+					game.log(event.card,'造成的伤害+1');
+					event.increase('baseDamage',1);
+				}],
+				['tao',event=>{
+					if(event.step!=1) return;
+					game.log(event.player,'触发了强化效果');
+					game.log(event.card,'回复的体力+1');
+					event.increase('baseDamage',1);
+				}]
+			]),
+			prompt:new Map([
+				[
+					'sha',
+					/**
+					 * @type {() => string}
+					 */
+					()=>`抵消所需要的【${get.translation('shan')}】数+1。`
+				],
+				[
+					'shan',
+					/**
+					 * @type {() => string}
+					 */
+					()=>`使用时视为两张【${get.translation('shan')}】的效果。`
+				],
+				[
+					'juedou',
+					()=>'对此牌的目标造成伤害时，伤害+1。'
+				],
+				[
+					'huogong',
+					()=>'造成的伤害+1。'
+				],
+				[
+					'tao',
+					()=>'回复的体力+1。'
+				]
+			])
+		},
+		/**
+		 * The actual card name
+		 * 
+		 * 实际的卡牌名称
+		 */
 		actualCardName:new Map([
 			['挟令','挟天子以令诸侯'],
 			['霹雳投石车','霹雳车']
@@ -4875,11 +4971,11 @@
 				name:'身份',
 				connect:{
 					update:function(config,map){
-						if(config.connect_identity_mode=='mougong'){
-							map.connect_round1_use_nuqi.show();
+						if(config.connect_identity_mode=='stratagem'){
+							map.connect_round_one_use_fury.show();
 						}
 						else{
-							map.connect_round1_use_nuqi.hide();
+							map.connect_round_one_use_fury.hide();
 						}
 						if(config.connect_identity_mode=='zhong'){
 							map.connect_player_number.hide();
@@ -4890,7 +4986,7 @@
 							map.connect_special_identity.hide();
 							map.connect_double_character.show();
 						}
-						else if(config.connect_identity_mode=='mougong'){
+						else if(config.connect_identity_mode=='stratagem'){
 							map.connect_double_character.show();
 							map.connect_player_number.show();
 							map.connect_limit_zhu.hide();
@@ -4935,7 +5031,7 @@
 						item:{
 							normal:'标准',
 							zhong:'明忠',
-							mougong:'谋攻',
+							stratagem:'谋攻',
 							purple:'3v3v2',
 						},
 						restart:true,
@@ -4945,14 +5041,8 @@
 					connect_player_number:{
 						name:'游戏人数',
 						init:'8',
-						item:{
-							'2':'两人',
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人'
+						get item(){
+							return lib.mode.identity.config.player_number.item;
 						},
 						frequent:true,
 						restart:true,
@@ -4980,7 +5070,9 @@
 						init:false,
 						restart:true,
 						// frequent:true,
-						intro:'开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
+						get intro(){
+							return lib.mode.identity.config.double_nei.intro;
+						}
 					},
 					connect_double_character:{
 						name:'双将模式',
@@ -5001,7 +5093,7 @@
 						frequent:true,
 						intro:'开启后游戏中将增加军师、大将、贼首三个身份'
 					},
-					connect_round1_use_nuqi:{
+					connect_round_one_use_fury:{
 						name:'开启首轮强化卡牌',
 						init:false,
 						frequent:false,
@@ -5027,12 +5119,12 @@
 				},
 				config:{
 					update:function(config,map){
-						if(config.identity_mode=='mougong'){
-							map.round1_use_nuqi.show();
+						if(config.identity_mode=='stratagem'){
+							map.round_one_use_fury.show();
 							map.nei_auto_mark_camouflage.show();
 						}
 						else{
-							map.round1_use_nuqi.hide();
+							map.round_one_use_fury.hide();
 							map.nei_auto_mark_camouflage.hide();
 						}
 						if(config.identity_mode=='zhong'){
@@ -5064,7 +5156,7 @@
 							}
 							map.continue_game.show();
 						}
-						else if(config.identity_mode=='mougong'){
+						else if(config.identity_mode=='stratagem'){
 							map.continue_game.show();
 							map.player_number.show();
 							map.enhance_zhu.hide();
@@ -5188,7 +5280,7 @@
 						item:{
 							normal:'标准',
 							zhong:'明忠',
-							mougong:'谋攻',
+							stratagem:'谋攻',
 							purple:'3v3v2',
 						},
 						restart:true,
@@ -5198,14 +5290,12 @@
 					player_number:{
 						name:'游戏人数',
 						init:'8',
-						item:{
-							'2':'两人',
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人'
+						get item(){
+							const minimumNumberOfPlayers=2,maximumNumberOfPlayers=Math.max(_status.maximumNumberOfPlayers||10,minimumNumberOfPlayers),item={};
+							for(let playerNumber=minimumNumberOfPlayers;playerNumber<=maximumNumberOfPlayers;playerNumber++){
+								item[playerNumber]=`${get.cnNumber(playerNumber)}人`;
+							}
+							return item;
 						},
 						frequent:true,
 						restart:true,
@@ -5215,7 +5305,7 @@
 						init:false,
 						restart:true,
 						frequent:true,
-						intro:'开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
+						intro:'若游戏人数不大于8，则开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
 					},
 					choose_group:{
 						name:'神武将选择势力',
@@ -5361,7 +5451,7 @@
 							unlimited:'无限',
 						},
 					},
-					round1_use_nuqi:{
+					round_one_use_fury:{
 						name:'开启首轮强化卡牌',
 						init:false,
 						frequent:false,
@@ -5562,16 +5652,14 @@
 					connect_player_number:{
 						name:'游戏人数',
 						init:'8',
-						item:{
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人'
+						get item(){
+							return lib.mode.guozhan.config.player_number.item;
 						},
 						frequent:true,
 						restart:true,
+					},
+					get connect_separatism(){
+						return lib.mode.guozhan.config.separatism;
 					},
 					connect_initshow_draw:{
 						name:'首亮奖励',
@@ -5653,16 +5741,22 @@
 					player_number:{
 						name:'游戏人数',
 						init:'8',
-						item:{
-							'3':'三人',
-							'4':'四人',
-							'5':'五人',
-							'6':'六人',
-							'7':'七人',
-							'8':'八人'
+						get item(){
+							const minimumNumberOfPlayers=3,maximumNumberOfPlayers=Math.max(_status.maximumNumberOfPlayers||10,minimumNumberOfPlayers),item={};
+							for(let playerNumber=minimumNumberOfPlayers;playerNumber<=maximumNumberOfPlayers;playerNumber++){
+								item[playerNumber]=`${get.cnNumber(playerNumber)}人`;
+							}
+							return item;
 						},
 						frequent:true,
 						restart:true,
+					},
+					separatism:{
+						name:'群雄割据',
+						init:false,
+						frequent:true,
+						restart:true,
+						intro:'开放不同势力组合，以优先亮出的武将牌作为自己的势力，双势力武将则使用列表的第一个势力'
 					},
 					initshow_draw:{
 						name:'首亮奖励',
@@ -7243,11 +7337,6 @@
 						init:true,
 						frequent:true
 					},
-					qunxionggeju:{
-						name:'群雄割据',
-						init:true,
-						frequent:true
-					},
 					duzhansanguo:{
 						name:'毒战三国',
 						init:true,
@@ -7562,8 +7651,6 @@
 				}else if(newMessage.includes("has already been declared")){
 					messageName=newMessage.replace('SyntaxError: Identifier ', '').replace(' has already been declared', '');
 					newMessage=messageName +"变量已经被声明过，不能被重新声明";
-				}else if(newMessage.includes("Invalid or unexpected token")){
-					newMessage="查询无效或意外的标记，可能是字符串的引号不成对，错误使用了转义序列，字符串在多行中解析异常";
 				}else if(newMessage.includes("Duplicate parameter name not allowed in this context")) {
 					newMessage="参数名不允许重复";
 				}else if(newMessage.includes("Unexpected reserved word")||newMessage.includes(
@@ -8243,7 +8330,7 @@
 				lib.ui=ui;
 				lib.ai=ai;
 				lib.game=game;
-				_status.event=new lib.element.Event().finish();
+				_status.event=lib.element.GameEvent.initialGameEvent();
 
 				HTMLDivElement.prototype.animate=function(name,time){
 					var that;
@@ -11097,11 +11184,15 @@
 				}
 			},
 			layout:function(layout,nosave){
+				const previousTransitionDuration=document.documentElement.style.transitionDuration;
+				document.documentElement.style.transitionDuration='1s';
+				const previousFilter=document.documentElement.style.filter,previousWebkitFilter=document.documentElement.style.webkitFilter;
+				document.documentElement.style.filter=document.documentElement.style.webkitFilter='brightness(0)';
 				if(layout=='default') layout='mobile';
 				if(!nosave) game.saveConfig('layout',layout);
 				game.layout=layout;
 				ui.arena.hide();
-				setTimeout(function(){
+				new Promise(resolve=>setTimeout(resolve,500)).then(()=>{
 					if(game.layout=='default'){
 						ui.css.layout.href='';
 					}
@@ -11196,17 +11287,26 @@
 					}
 					ui.updatej();
 					ui.updatem();
-					setTimeout(function(){
-						ui.arena.show();
-						if(game.me) game.me.update();
-						setTimeout(function(){
-							ui.updatex();
-						},500);
-						setTimeout(function(){
-							ui.updatec();
-						},1000);
-					},100);
-				},500);
+					return new Promise(resolve=>setTimeout(resolve,100));
+				}).then(()=>{
+					ui.arena.show();
+					if(game.me) game.me.update();
+					return new Promise(resolve=>setTimeout(resolve,500));
+				}).then(()=>{
+					ui.updatex();
+					ui.create.playerPositions();
+					return new Promise(resolve=>setTimeout(resolve,500));
+				}).then(()=>{
+					ui.updatec();
+					if(previousFilter) document.documentElement.style.filter=previousFilter;
+					else document.documentElement.style.removeProperty('filter');
+					if(previousWebkitFilter) document.documentElement.style.webkitFilter=previousWebkitFilter;
+					else document.documentElement.style.removeProperty('-webkit-filter');
+					return new Promise(resolve=>setTimeout(resolve,1000));
+				}).then(()=>{
+					if(previousTransitionDuration) document.documentElement.style.transitionDuration=previousTransitionDuration;
+					else document.documentElement.style.removeProperty('transition-duration');
+				});
 			},
 			background:function(){
 				if(lib.config.image_background_random){
@@ -12302,6 +12402,8 @@
 			cooperation_use_info:'双方累计使用至少4种花色的牌',
 			charge:'蓄力值',
 			expandedSlots:'扩展装备栏',
+			stratagem_fury:'怒气',
+			_stratagem_add_buff:'强化'
 		},
 		element:{
 			content:{
@@ -20612,6 +20714,17 @@
 					}
 				}
 				//新函数
+				changeFury(amount,limit){
+					if(typeof this.storage.stratagem_fury!='number') this.storage.stratagem_fury=0;
+					if(!amount) return;
+					const furyBefore=this.storage.stratagem_fury;
+					if(limit===true&&typeof _status.stratagemFuryMax=='number') this.storage.stratagem_fury=Math.min(Math.max(furyBefore+amount,0),_status.stratagemFuryMax);
+					else this.storage.stratagem_fury=Math.max(furyBefore+amount,0);
+					const difference=this.storage.stratagem_fury-furyBefore;
+					if(!difference) return;
+					game.log(this,difference>0?'获得了':'失去了',get.cnNumber(Math.abs(difference)),'点','#r怒气');
+					this.markSkill('stratagem_fury');
+				}
 				/**
 				 * version 1.4
 				 * 
@@ -25237,55 +25350,37 @@
 					return next;
 				}
 				damage(){
-					var next=game.createEvent('damage');
+					const next=game.createEvent('damage');
 					//next.forceDie=true;
 					next.player=this;
-					var nocard,nosource;
-					var event=_status.event;
-					for(var i=0;i<arguments.length;i++){
-						if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i].slice(0);
-						}
-						else if(get.itemtype(arguments[i])=='card'){
-							next.card=arguments[i];
-						}
-						else if(typeof arguments[i]=='number'){
-							next.num=arguments[i];
-						}
-						else if(get.itemtype(arguments[i])=='player'){
-							next.source=arguments[i];
-						}
-						else if(typeof arguments[i]=='object'&&arguments[i]&&arguments[i].name){
-							next.card=arguments[i];
-						}
-						else if(arguments[i]=='nocard'){
-							nocard=true;
-						}
-						else if(arguments[i]=='nosource'){
-							nosource=true;
-						}
-						else if(arguments[i]=='notrigger'){
+					let noCard,noSource;
+					const event=_status.event;
+					for(const argument of arguments){
+						if(get.itemtype(argument)=='cards') next.cards=argument.slice();
+						else if(get.itemtype(argument)=='card') next.card=argument;
+						else if(typeof argument=='number') next.num=argument;
+						else if(get.itemtype(argument)=='player') next.source=argument;
+						else if(argument&&typeof argument=='object'&&argument.name) next.card=argument;
+						else if(argument=='nocard') noCard=true;
+						else if(argument=='nosource') noSource=true;
+						else if(argument=='notrigger'){
 							next._triggered=null;
 							next.notrigger=true;
 						}
-						else if(arguments[i]=='unreal'){
-							next.unreal=true
-						}
-						else if(get.itemtype(arguments[i])=='nature'&&arguments[i]!='stab'){
-							next.nature=arguments[i];
-						}
-						else if(get.itemtype(arguments[i])=='natures'){
-							var natures=arguments[i].split(lib.natureSeparator);
-							natures.remove('stab');
+						else if(argument=='unreal') next.unreal=true;
+						else if(get.itemtype(argument)=='nature'&&argument!='stab') next.nature=argument;
+						else if(get.itemtype(argument)=='natures'){
+							const natures=argument.split(lib.natureSeparator).remove('stab');
 							if(natures.length) next.nature=natures.join(lib.natureSeparator);
 						}
 					}
-					if(next.card==undefined&&!nocard) next.card=event.card;
-					if(next.cards==undefined&&!nocard) next.cards=event.cards;
-					if(next.source==undefined&&!nosource) next.source=event.customSource||event.player;
-					if(next.source&&next.source.isDead()) delete next.source;
-					if(next.unreal==undefined) next.unreal=false;
-					if(next.num==undefined) next.num=(event.baseDamage||1)+(event.extraDamage||0);
+					if(!next.card&&!noCard) next.card=event.card;
+					if(!next.cards&&!noCard) next.cards=event.cards;
+					if(!next.source&&!noSource){
+						const source=event.customSource||event.player;
+						if(source&&!source.isDead()) next.source=source;
+					}
+					if(typeof next.num!='number') next.num=(event.baseDamage||1)+(event.extraDamage||0);
 					next.original_num=next.num;
 					next.change_history=[];
 					next.hasNature=function(nature){
@@ -27991,7 +28086,7 @@
 					var player=this,mode=get.mode();
 					if(!this.isZhu) return false;
 					if(mode=='identity'){
-						if(_status.mode=='mougong'&&!this.identityShown) return false;
+						if(_status.mode=='stratagem'&&!this.identityShown) return false;
 						return true;
 					}
 					if(mode=='versus'&&(_status.mode=='four'||_status.mode=='guandu')) return true;
@@ -30316,11 +30411,15 @@
 					return this;
 				}
 				copy(){
+					/**
+					 * @type {Card}
+					 */
 					var node=this.cloneNode(true);
 					node.style.transform='';
 					node.name=this.name;
 					node.suit=this.suit;
 					node.number=this.number;
+					node.nature=this.nature;
 					node.classList.remove('hidden');
 					node.classList.remove('start');
 					node.classList.remove('thrown');
@@ -30396,7 +30495,6 @@
 				 * @param {string} [nature]
 				 */
 				constructor(suitOrCard,numberOrCards,name,nature){
-					if(typeof suitOrCard=='undefined'&&typeof numberOrCards=='undefined'&&typeof name=='undefined'&&typeof nature=='undefined') return;
 					if(Array.isArray(suitOrCard)){
 						/**
 						 * @type {string}
@@ -30415,7 +30513,7 @@
 						 */
 						this.nature=suitOrCard[3];
 					}
-					else if(suitOrCard instanceof lib.element.Card){
+					else if(get.itemtype(suitOrCard)=='card'){
 						this.name=get.name(suitOrCard);
 						this.suit=get.suit(suitOrCard);
 						this.color=get.color(suitOrCard);
@@ -30436,14 +30534,14 @@
 							if(typeof autoViewAs=='string') this.name=autoViewAs;
 						}
 					}
-					else if(typeof suitOrCard!='string'){
+					else if(suitOrCard&&typeof suitOrCard!='string'){
 						Object.keys(suitOrCard).forEach(key=>{
 							const propertyDescriptor=Object.getOwnPropertyDescriptor(suitOrCard,key),value=propertyDescriptor.value;
 							if(Array.isArray(value)) this[key]=value.slice();
 							else Object.defineProperty(this,key,propertyDescriptor);
 						});
 						if(Array.isArray(numberOrCards)){
-							const noCards=!this.hasOwnProperty('cards');
+							const noCards=!('cards' in this);
 							/**
 							 * @type {Card[]}
 							 */
@@ -30451,8 +30549,8 @@
 							if(noCards){
 								if(!lib.suits.includes(this.suit)) this.suit=get.suit(this);
 								if(!Object.keys(lib.color).includes(this.color)) this.color=get.color(this);
-								if(!this.hasOwnProperty('number')) this.number=get.number(this);
-								if(!this.hasOwnProperty('nature')) this.nature=get.nature(this);
+								if(!('number' in this)) this.number=get.number(this);
+								if(!('nature' in this)) this.nature=get.nature(this);
 							}
 						}
 						const info=get.info(this,false);
@@ -30465,9 +30563,9 @@
 					if(typeof numberOrCards=='number') this.number=numberOrCards;
 					if(typeof name=='string') this.name=name;
 					if(typeof nature=='string') this.nature=nature;
-					if(this.hasOwnProperty('suit')&&!this.hasOwnProperty('color')) this.color=get.color(this);
-					if(!this.hasOwnProperty('storage')) this.storage={};
-					if(!this.hasOwnProperty('cards')) this.cards=[];
+					if('suit' in this&&!('color' in this)) this.color=get.color(this);
+					if(!('storage' in this)) this.storage={};
+					if(!('cards' in this)) this.cards=[];
 				}
 				sameSuitAs(card){
 					return get.suit(this)==get.suit(card);
@@ -30523,22 +30621,32 @@
 					}
 					_status.event.excludeButton.add(this);
 				}
+				get updateTransform(){
+					return lib.element.Card.prototype.updateTransform;
+				}
 			},
-			Event:class{
+			GameEvent:class{
 				/**
 				 * @param {string} [name]
 				 * @param {false} [trigger]
 				 */
 				constructor(name,trigger){
-					this.name=name;
+					if(typeof name=='string'){
+						this.name=name;
+						const gameEvent=get.event();
+						if(gameEvent){
+							const type=`onNext${name[0].toUpperCase()}${name.slice(1)}`;
+							if(gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
+						}
+					}
 					this.step=0;
 					this.finished=false;
 					/**
-					 * @type {this[]}
+					 * @type {GameEvent[]}
 					 */
 					this.next=[];
 					/**
-					 * @type {this[]}
+					 * @type {GameEvent[]}
 					 */
 					this.after=[];
 					this.custom={
@@ -30550,6 +30658,105 @@
 					this._result={};
 					this._set=[];
 					if(trigger!==false&&!game.online) this._triggered=0;
+				}
+				static initialGameEvent(){
+					return new lib.element.GameEvent().finish();
+				}
+				/**
+				 * @param {keyof this} key
+				 * @param {number} [value]
+				 * @param {number} [baseValue]
+				 */
+				addNumber(key,value,baseValue){
+					if(typeof value!='number') value=0;
+					if(typeof this[key]=='number') this[key]+=value;
+					else{
+						if(typeof baseValue!='number') baseValue=0;
+						this[key]=baseValue+value;
+					}
+					return this;
+				}
+				/**
+				 * @param {keyof this} key
+				 * @param {number} [baseValue]
+				 */
+				decrease(key,baseValue){
+					if(typeof this[key]=='number') this[key]--;
+					else this.subtractNumber(key,1,baseValue);
+					return this;
+				}
+				/**
+				 * @param {keyof this} key
+				 * @param {number} [baseValue]
+				 */
+				increase(key,baseValue){
+					if(typeof this[key]=='number') this[key]++;
+					else this.addNumber(key,1,baseValue);
+					return this;
+				}
+				/**
+				 * @param {keyof this} key
+				 * @param {number} [value]
+				 * @param {number} [baseValue]
+				 */
+				subtractNumber(key,value,baseValue){
+					if(typeof value!='number') value=0;
+					if(typeof this[key]=='number') this[key]-=value;
+					else{
+						if(typeof baseValue!='number') baseValue=0;
+						this[key]=baseValue-value;
+					}
+					return this;
+				}
+				/**
+				 * @param {Parameters<typeof this.hasHandler>[0]} [type]
+				 * @param {GameEvent} [event]
+				 * @returns {this}
+				 */
+				callHandler(type,event){
+					if(this.hasHandler(type)){
+						if(!event) event=this;
+						this.getHandler(type).forEach(handler=>{
+							if(typeof handler=='function') handler(event);
+						});
+					}
+					return this;
+				}
+				getDefaultHandlerType(){
+					const eventName=this.name;
+					if(eventName) return `on${eventName[0].toUpperCase()}${eventName.slice(1)}`;
+				}
+				/**
+				 * @param {Parameters<typeof this.hasHandler>[0]} [type]
+				 * @returns {((event: GameEvent) => void)[]}
+				 */
+				getHandler(type){
+					if(!type) type=this.getDefaultHandlerType();
+					const currentHandler=this[type];
+					if(!currentHandler) this[type]=[];
+					else if(!Array.isArray(currentHandler)) this[type]=[currentHandler];
+					return this[type];
+				}
+				/**
+				 * @param {`on${Capitalize<string>}`} [type]
+				 */
+				hasHandler(type){
+					if(!type) type=this.getDefaultHandlerType();
+					return Boolean(this[type]&&this.getHandler(type).length);
+				}
+				/**
+				 * @overload
+				 * @param {...((event: GameEvent) => void)[]} handlers
+				 * @returns {number}
+				 */
+				/**
+				 * @overload
+				 * @param {Parameters<typeof this.hasHandler>[0]} type
+				 * @param {...((event: GameEvent) => void)[]} handlers
+				 * @returns {number}
+				 */
+				pushHandler(type){
+					return typeof type=='string'?this.getHandler(type).push(...Array.from(arguments).slice(1)):this.getHandler().push(...arguments);
 				}
 				changeToZero(){
 					this.num=0;
@@ -30666,6 +30873,9 @@
 					}
 					return this;
 				}
+				/**
+				 * @param {ArrayLike<Function> | Function | keyof typeof lib.element.content} item
+				 */
 				setContent(item){
 					switch(typeof item){
 						case "object":
@@ -30765,14 +30975,14 @@
 					return this._rand;
 				}
 				insert(content,map){
-					const next=new lib.element.Event(`${this.name}Inserted`,false);
+					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
 					this.next.push(next);
 					next.setContent(content);
 					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
 					return next;
 				}
 				insertAfter(content,map){
-					const next=new lib.element.Event(`${this.name}Inserted`,false);
+					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
 					this.after.push(next);
 					next.setContent(content);
 					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
@@ -31282,6 +31492,85 @@
 					}
 					return this;
 				}
+				/**
+				 * @throws {'Do not call this method'}
+				 * @returns {never}
+				 */
+				typeAnnotation(){
+					/**
+					 * @type {Player}
+					 */
+					this.source;
+					/**
+					 * @type {Player}
+					 */
+					this.player;
+					/**
+					 * @type {Player}
+					 */
+					this.target;
+					/**
+					 * @type {Player[]}
+					 */
+					this.targets;
+					/**
+					 * @type {Card}
+					 */
+					this.card;
+					/**
+					 * @type {Card[]}
+					 */
+					this.cards;
+					/**
+					 * @type {string}
+					 */
+					this.skill;
+					/**
+					 * @type {boolean}
+					 */
+					this.forced;
+					/**
+					 * @type {number}
+					 */
+					this.num;
+					/**
+					 * @type {GameEvent}
+					 */
+					this._trigger;
+					/**
+					 * @type {Record<string, any>}
+					 */
+					this._result;
+					/**
+					 * @type {number}
+					 */
+					this.baseDamage;
+					/**
+					 * @type {Player}
+					 */
+					this.customSource;
+					/**
+					 * @type {number}
+					 */
+					this.extraDamage;
+					/**
+					 * @type {string}
+					 */
+					this.nature;
+					/**
+					 * @type {boolean}
+					 */
+					this.notrigger;
+					/**
+					 * @type {number}
+					 */
+					this.original_num;
+					/**
+					 * @type {boolean}
+					 */
+					this.unreal;
+					throw 'Do not call this method';
+				}
 			},
 			Dialog:class extends HTMLDivElement{
 				constructor(){
@@ -31729,10 +32018,10 @@
 				return this.Button.prototype;
 			},
 			/**
-			 * @legacy Use {@link lib.element.Event.prototype} instead.
+			 * @legacy Use {@link lib.element.GameEvent.prototype} instead.
 			 */
 			get event(){
-				return this.Event.prototype;
+				return this.GameEvent.prototype;
 			},
 			/**
 			 * @legacy Use {@link lib.element.Dialog.prototype} instead.
@@ -32436,6 +32725,143 @@
 			}
 		},
 		skill:{
+			stratagem_fury:{
+				marktext:'🔥',
+				intro:{
+					name:'怒气',
+					content:(storage,player)=>{
+						const stratagemFuryMax=_status.stratagemFuryMax,fury=storage||0;
+						return `当前怒气值：${typeof stratagemFuryMax=='number'?`${fury}/${stratagemFuryMax}`:fury}`;
+					}
+				}
+			},
+			_stratagem_add_buff:{
+				log:false,
+				enable:'chooseToUse',
+				filter:(event,player)=>{
+					const fury=player.storage.stratagem_fury;
+					if(!fury) return false;
+					const stratagemSettings=event.stratagemSettings;
+					if(!stratagemSettings||!stratagemSettings.roundOneUseFury&&game.roundNumber<2) return false;
+					const cards=player.getCards('hs');
+					if(!cards.length) return false;
+					const cost=lib.stratagemBuff.cost,names=Array.from(cost.keys());
+					if(!names.length) return false;
+					return cards.some(card=>game.checkMod(card,player,'unchanged','cardEnabled2',player)&&names.some(availableName=>availableName==get.name(card,player)&&event.filterCard(new lib.element.VCard({
+						name:availableName,
+						nature:get.nature(card,player),
+						isCard:true,
+						cards:[card]
+					}),player,event)&&fury>=cost.get(availableName)));
+				},
+				onChooseToUse:event=>{
+					const player=_status.event.player,fury=player.storage.stratagem_fury;
+					if(!fury) return;
+					if(!event.stratagemSettings&&!game.online) event.set('stratagemSettings',{
+						roundOneUseFury:_status.connectMode?lib.configOL.round_one_use_fury:get.config('round_one_use_fury')
+					});
+					const cost=lib.stratagemBuff.cost.get('shan');
+					if(typeof cost!='number'||!event.shanRequired) return;
+					event.addNumber('shanIgnored',Math.min(player.countCards(lib.skill._stratagem_add_buff.position,{
+						name:'shan'
+					}),Math.floor(fury/cost)));
+				},
+				check:card=>{
+					const player=_status.event.player;
+					if(_status.event.type=='phase'){
+						const cardName=get.name(card,player);
+						if(cardName=='sha'){
+							if(game.hasPlayer(current=>{
+								if(!player.canUse(card,current)) return false;
+								const storage=player.storage,zhibi=storage.zhibi;
+								return (zhibi&&!zhibi.includes(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(storage.stratagem_fury||0)-1)))&&current.mayHaveShan()&&player.hasSkill('jiu');
+							})) return 1;
+							return 0;
+						}
+						if(cardName=='tao'){
+							if(player.hp<=2&&player.getDamagedHp()>=2) return 1;
+							return 0;
+						}
+						return 1;
+					}
+					if(_status.event.type=='dying') return get.attitude(player,_status.event.dying)>3?1:0;
+					return (_status.event.getParent().shanRequired||1)>1&&get.damageEffect(player,_status.event.getParent().player||player,player)<0?1:0;
+				},
+				position:'hs',
+				filterCard:(card,player,event)=>{
+					if(!event) event=_status.event;
+					const filterCard=event._backup.filterCard;
+					const cost=lib.stratagemBuff.cost;
+					return Array.from(cost.keys()).some(availableName=>availableName==get.name(card,player)&&filterCard(new lib.element.VCard({
+						name:availableName,
+						nature:get.nature(card,player),
+						isCard:true,
+						cards:[card]
+					}),player,_status.event)&&player.storage.stratagem_fury>=cost.get(availableName));
+				},
+				viewAs:(cards,player)=>{
+					const cardName=get.name(cards[0],player);
+					return cardName?new lib.element.VCard({
+						name:cardName,
+						nature:get.nature(cards[0],player),
+						suit:get.suit(cards[0],player),
+						number:get.number(cards[0],player),
+						isCard:true,
+						cards:[cards[0]],
+						storage:{
+							stratagem_buffed:1
+						}
+					}):new lib.element.VCard();
+				},
+				prompt:()=>{
+					const span=document.createElement('span');
+					span.classList.add('text');
+					span.style.fontFamily='yuanli';
+					const stratagemBuff=lib.stratagemBuff,cost=stratagemBuff.cost;
+					stratagemBuff.prompt.forEach((prompt,cardName)=>{
+						const li=document.createElement('li');
+						li.innerHTML=`【${get.translation(cardName)}】：${cost.get(cardName)}点怒气。${prompt()}`;
+						span.appendChild(li);
+					});
+					return `当你需要使用位于“强化表”内的非虚拟卡牌时，你可以消耗对应数量的怒气将其强化并使用。${document.createElement('hr').outerHTML}${span.outerHTML}`;
+				},
+				onuse:(result,player)=>{
+					player.logSkill(result.skill);
+					const stratagemBuff=lib.stratagemBuff,cardName=result.card.name;
+					player.changeFury(-stratagemBuff.cost.get(cardName),true);
+					const gameEvent=get.event(),effect=stratagemBuff.effect.get(cardName);
+					if(typeof effect=='function') gameEvent.pushHandler('onNextUseCard',effect);
+					gameEvent.pushHandler('onNextUseCard',event=>{
+						if(event.step==1) game.broadcastAll(cards=>cards.forEach(card=>card.clone.classList.add('stratagem-fury-glow')),event.cards);
+					});
+				},
+				ai:{
+					order:(item,player)=>{
+						if(!player) player=_status.event.player;
+						if(_status.event.type=='phase') for(const card of player.getCards('hs')){
+							if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) continue;
+							const cardName=get.name(card,player);
+							if(cardName=='sha'){
+								if(game.hasPlayer(current=>{
+									if(!player.canUse(card,current)) return false;
+									const storage=player.storage,zhibi=storage.zhibi;
+									return (zhibi&&!zhibi.contains(current)||(get.effect(current,card,player,player)>=2-Math.max(0,(storage.stratagem_fury||0)-1)))&&current.mayHaveShan();
+								})) return get.order(card,player)+0.5;
+							}
+							else if(cardName=='tao'&&player.hp<=2&&player.getDamagedHp()>=2) return get.order(card,player)+0.5;
+							return 8;
+						}
+						return 3.5;
+					},
+					directHit_ai:true,
+					skillTagFilter:(player,tag,arg)=>{
+						const card=arg.card;
+						if(card.name!='sha'||!card.storage.stratagem_buffed) return false;
+						const target=arg.target;
+						if(target.countCards('h','shan')>=1&&!target.storage.stratagem_fury) return false;
+					}
+				}
+			},
 			expandedSlots:{
 				markimage:'image/card/expandedSlots.png',
 				intro:{
@@ -34298,11 +34724,7 @@
 									lib.characterPack[i]=mode.characterPack[i];
 								}
 							}
-							_status.event={
-								finished:true,
-								next:[],
-								after:[]
-							};
+							_status.event=lib.element.GameEvent.initialGameEvent();
 							_status.paused=false;
 							game.createEvent('game',false).setContent(lib.init.startOnline);
 							game.loop();
@@ -34563,11 +34985,7 @@
 						game.arrangePlayers();
 						ui.create.me(true);
 
-						_status.event={
-							finished:true,
-							next:[],
-							after:[]
-						};
+						_status.event=lib.element.GameEvent.initialGameEvent();
 						_status.paused=false;
 						_status.dying=get.parsedResult(state.dying)||[];
 
@@ -35111,6 +35529,11 @@
 		}
 	};
 	const game={
+		//Stratagem
+		//谋攻
+		setStratagemBuffCost:(cardName,cost)=>game.broadcastAll((clientCardName,clientCost)=>lib.stratagemBuff.cost.set(clientCardName,clientCost),cardName,cost),
+		setStratagemBuffEffect:(cardName,effect)=>game.broadcastAll((clientCardName,clientEffect)=>lib.stratagemBuff.cost.set(clientCardName,clientEffect),cardName,effect),
+		setStratagemBuffPrompt:(cardName,prompt)=>game.broadcastAll((clientCardName,clientPrompt)=>lib.stratagemBuff.cost.set(clientCardName,clientPrompt),cardName,prompt),
 		//添加新的属性杀
 		addNature:(nature,translation,config)=>{
 			if(!nature) throw new TypeError();
@@ -35858,6 +36281,7 @@
 			delete parsedPath.base;
 			if(!parsedPath.dir) parsedPath.dir='image/card/';
 			if(!parsedPath.ext) parsedPath.ext='.jpg';
+			const fileName=parsedPath.name;
 			game.broadcastAll((formattedPath,name,skill,player)=>{
 				const node=ui.create.div('.background.upper.land');
 				node.setBackgroundImage(formattedPath);
@@ -35896,7 +36320,7 @@
 					return uiIntro;
 				},200);
 				game.addGlobalSkill(skill);
-			},lib.path.format(parsedPath),parsedPath.name,`${name}_skill`,player);
+			},lib.path.format(parsedPath),fileName,`${fileName}_skill`,player);
 		},
 		checkFileList:function(updates,proceed){
 			var n=updates.length;
@@ -36063,6 +36487,12 @@
 				delete ui.currentpopped;
 			}
 		},
+		/**
+		 * @type {{
+		 * <T extends keyof typeof lib.message.client>(func: T, ...args: Parameters<typeof lib.message.client[T]>) => void;
+		 * <T extends any[]>(func: (...args: T) => void, ...args: T) => void;
+		 * }}
+		 */
 		broadcast:function(){
 			if(!lib.node||!lib.node.clients||game.online) return;
 			for(var i=0;i<lib.node.clients.length;i++){
@@ -36071,6 +36501,12 @@
 				}
 			}
 		},
+		/**
+		 * @type {{
+		 * <T extends keyof typeof lib.message.client>(func: T, ...args: Parameters<typeof lib.message.client[T]>) => void;
+		 * <T extends any[]>(func: (...args: T) => void, ...args: T) => void;
+		 * }}
+		 */
 		broadcastAll:function(){
 			if(game.online) return;
 			var argc=arguments.length;
@@ -37095,7 +37531,7 @@
 				ui.updatehl();
 				for(var i=0;i<players.length;i++){
 					if(lib.config.mode=='identity'){
-						if(_status.mode=='mougong'){
+						if(_status.mode=='stratagem'){
 							game.players[i].init(players[i].name,players[i].name2);
 							game.players[i].identity=players[i].identity;
 							if(game.players[i].identity=='fan'&&game.players[i].isCamouflaged&&game.me.identity=='nei'||game.players[i]==game.me){
@@ -39028,10 +39464,10 @@
 			next.setContent('createTrigger');
 		},
 		/**
-		 * @legacy Use {@link lib.element.Event.constructor} instead.
+		 * @legacy Use {@link lib.element.GameEvent.constructor} instead.
 		 */
 		createEvent:(name,trigger,triggerEvent)=>{
-			const next=new lib.element.Event(name,trigger);
+			const next=new lib.element.GameEvent(name,trigger);
 			(triggerEvent||_status.event).next.push(next);
 			return next;
 		},
@@ -39666,7 +40102,7 @@
 					for(i=0;i<game.players.length;i++){
 						tr=document.createElement('tr');
 						td=document.createElement('td');
-						td.innerHTML=get.translation(game.players[i])+(game.players[i].ai.mougong_camouflage?'(被伪装)':'');
+						td.innerHTML=get.translation(game.players[i])+(game.players[i].ai.stratagem_camouflage?'(被伪装)':'');
 						tr.appendChild(td);
 						td=document.createElement('td');
 						num=0;
@@ -39736,7 +40172,7 @@
 					for(i=0;i<game.dead.length;i++){
 						tr=document.createElement('tr');
 						td=document.createElement('td');
-						td.innerHTML=get.translation(game.dead[i])+(game.dead[i].ai.mougong_camouflage?'(被伪装)':'');
+						td.innerHTML=get.translation(game.dead[i])+(game.dead[i].ai.stratagem_camouflage?'(被伪装)':'');
 						tr.appendChild(td);
 						td=document.createElement('td');
 						num=0;
@@ -40146,6 +40582,7 @@
 						}*/
 					}
 					else{
+						event.callHandler();
 						if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){
 							game.broadcastAll(function(){
 								while(_status.dieClose.length){
@@ -40241,6 +40678,7 @@
 						}
 						event.clearStepCache();
 						event.step++;
+						if(event.finished) event.callHandler();
 					}
 				}
 			}
@@ -41076,11 +41514,7 @@
 				//     lib.config.addedpile=pilecfg[1]||{};
 				// }
 
-				_status.event={
-					finished:true,
-					next:[],
-					after:[]
-				};
+				_status.event=lib.element.GameEvent.initialGameEvent();
 				_status.paused=false;
 
 				if(_status.connectMode&&lib.mode[name].connect){
@@ -42038,9 +42472,10 @@
 		log:function(){
 			let str='',str2='',logvid=null;
 			const color=new Map([
-				['b','blue'],
+				['r','fire'],
 				['y','yellow'],
-				['g','green']
+				['g','green'],
+				['b','blue']
 			]);
 			Array.from(arguments).forEach(value=>{
 				const itemtype=get.itemtype(value);
@@ -42667,13 +43102,13 @@
 			player2.previousSeat=player.previousSeat;
 			player2.nextSeat.previousSeat=player2;
 			player2.previousSeat.nextSeat=player2;
-			const player3=player2.nextSeat;
+			let player3=player2.nextSeat;
 			while(player3.isDead()){
 				player3=player3.nextSeat;
 			}
 			player3.previous=player2;
 			player2.next=player3;
-			const player4=player2.previousSeat;
+			let player4=player2.previousSeat;
 			while(player4.isDead()){
 				player4=player4.previousSeat;
 			}
@@ -42807,6 +43242,10 @@
 		thrown:[],
 		touchlines:[],
 		todiscard:{},
+		/**
+		 * @type {HTMLStyleElement[]}
+		 */
+		playerPositions:[],
 		refresh:function(node){
 			void window.getComputedStyle(node, null).getPropertyValue("opacity");
 		},
@@ -42814,21 +43253,17 @@
 			//创建身份牌实例
 			identityCard:function(identity,position,info,noclick){
 				const card=ui.create.card(position,info,noclick);
-				card._customintro=function(uiintro){
-					uiintro.add(`${get.translation(identity+2)}的身份牌`);
-				}
+				card._customintro=uiintro=>uiintro.add(`${get.translation(`${identity}${2}`)}的身份牌`);
 				const fileName=`image/card/identity_${identity}.jpg`;
 				new Promise((resolve,reject)=>{
 					const image=new Image();
-					image.onload=()=>resolve();
+					image.onload=resolve;
 					image.onerror=reject;
 					image.src=`${lib.assetURL}${fileName}`;
 				}).then(()=>{
 					card.classList.add('fullskin');
 					card.node.image.setBackgroundImage(fileName);
-				}).catch(()=>{
-					card.node.background.innerHTML=get.translation(identity)[0];
-				});
+				},()=>card.node.background.innerHTML=get.translation(identity)[0]);
 				return card;
 			},
 			//让卡牌旋转
@@ -51612,6 +52047,7 @@
 				}
 				ui.arena.setNumber=function(num){
 					this.dataset.number=num;
+					ui.create.playerPositions();
 					// if(game.layout=='nova'&&parseInt(num)<7){
 					// 	ui.arena.classList.add('player_autolong');
 					// }
@@ -52580,16 +53016,55 @@
 				}
 			},
 			player:(position,noclick)=>new lib.element.Player(position,noclick),
-			connectPlayers:function(ip){
+			/**
+			 * @author curpond
+			 * @author Tipx-L
+			 * @param {number} [numberOfPlayers]
+			 */
+			connectPlayerPositions:numberOfPlayers=>{
+				if(typeof numberOfPlayers!='number') numberOfPlayers=lib.configOL.number;
+				if(!numberOfPlayers) return;
+				const playerPositions=ui.playerPositions;
+				while(playerPositions.length){
+					playerPositions.pop().remove();
+				}
+				const temporaryPlayer=ui.create.div('.player.connect',ui.window).hide();
+				const computedStyle=getComputedStyle(temporaryPlayer);
+				const halfWidth=parseFloat(computedStyle.width)/2;
+				const halfHeight=parseFloat(computedStyle.height)/2;
+				temporaryPlayer.remove();
+				const halfNumberOfPlayers=Math.round(numberOfPlayers/2);
+				const upperPercentage=100/(halfNumberOfPlayers+1);
+				const scale=10/numberOfPlayers;
+				for(let ordinal=0;ordinal<halfNumberOfPlayers;ordinal++){
+					playerPositions.push(lib.init.sheet([
+						`#window>.player.connect[data-position='${ordinal}']{`,
+						`left:calc(${upperPercentage*(ordinal+1)}% - ${halfWidth}px);`,
+						`top:calc(${100/3}% - ${halfHeight}px);`,
+						scale<1?`transform:scale(${scale});`:'',
+						'}'
+					].join('')));
+				}
+				const lowerPercentage=100/(numberOfPlayers-halfNumberOfPlayers+1);
+				for(let ordinal=halfNumberOfPlayers;ordinal<numberOfPlayers;ordinal++){
+					playerPositions.push(lib.init.sheet([
+						`#window>.player.connect[data-position='${ordinal}']{`,
+						`left:calc(${lowerPercentage*(ordinal-halfNumberOfPlayers+1)}% - ${halfWidth}px);`,
+						`top:calc(${100*2/3}% - ${halfHeight}px);`,
+						scale<1?`transform:scale(${scale});`:'',
+						'}'
+					].join('')));
+				}
+			},
+			connectPlayers:ip=>{
+				ui.create.connectPlayerPositions();
 				game.connectPlayers=[];
-				for(var i=0;i<8;i++){
-					var player=ui.create.player(ui.window);
-					player.dataset.position=i;
+				const numberOfPlayers=lib.configOL.number;
+				for(let position=0;position<numberOfPlayers;position++){
+					const player=ui.create.player(ui.window);
+					player.dataset.position=position;
 					player.classList.add('connect');
 					game.connectPlayers.push(player);
-					if(i>=lib.configOL.number){
-						player.classList.add('unselectable2');
-					}
 				}
 
 				var bar=ui.create.div(ui.window);
@@ -52621,7 +53096,7 @@
 						for(var i of game.connectPlayers){
 							if(!i.nickname&&!i.classList.contains('unselectable2')) num++;
 						}
-						if(num>=lib.configOL.number-1){
+						if(num>=numberOfPlayers-1){
 							alert('至少要有两名玩家才能开始游戏！');
 							return;
 						}
@@ -52637,52 +53112,76 @@
 				ui.connectStartButton=button;
 				ui.connectStartBar=bar;
 			},
-			players:function(num){
-				if(num===0){
+			/**
+			 * @author curpond
+			 * @author Tipx-L
+			 * @param {number} [numberOfPlayers]
+			 */
+			playerPositions:numberOfPlayers=>{
+				if(typeof numberOfPlayers!='number') numberOfPlayers=ui.arena.dataset.number;
+				//当人数小于8时，还是用以前的布局。
+				if(!numberOfPlayers||numberOfPlayers<9) return;
+				const playerPositions=ui.playerPositions;
+				while(playerPositions.length){
+					playerPositions.pop().remove();
+				}
+				//单个人物的宽度。这里要设置玩家的实际的宽度
+				const temporaryPlayer=ui.create.div('.player',ui.arena).hide();
+				const computedStyle=getComputedStyle(temporaryPlayer);
+				const scale=6/numberOfPlayers;
+				//玩家顶部距离父容器上边缘的距离偏移的单位距离
+				const quarterHeight=parseFloat(computedStyle.height)/4*scale;
+				const halfWidth=parseFloat(computedStyle.width)/2;
+				temporaryPlayer.remove();
+				//列数，即假如8人场，除去自己后，上面7个人占7列
+				const columnCount=numberOfPlayers-1;
+				const percentage=90/(columnCount-1);
+				//仅当游戏人数大于8人，且玩家的座位号大于0时，设置玩家的位置。因为0号位是game.me在最下方，无需设置。
+				for(let ordinal=1;ordinal<numberOfPlayers;ordinal++){
+					const reversedOrdinal=columnCount-ordinal;
+					//动态计算玩家的top属性，实现拱桥的效果。只让两边的各两个人向下偏移一些
+					const top=Math.max(0,Math.round(numberOfPlayers/5)-Math.min(Math.abs(ordinal-1),Math.abs(reversedOrdinal)))*quarterHeight;
+					playerPositions.push(lib.init.sheet([
+						`#arena[data-number='${numberOfPlayers}']>.player[data-position='${ordinal}']{`,
+						`left:calc(${percentage*reversedOrdinal+5}% - ${halfWidth}px);`,
+						`top:${top}px;`,
+						`transform:scale(${scale});`,
+						'}'
+					].join('')));
+				}
+			},
+			players:numberOfPlayers=>{
+				if(numberOfPlayers===0){
 					return;
 				}
-				if(num==undefined) num=lib.configOL.number;
-				if(num==undefined) num=get.playerNumber();
-				if(typeof num=='string'){
-					num=parseInt(num);
+				if(numberOfPlayers==undefined) numberOfPlayers=lib.configOL.number;
+				if(numberOfPlayers==undefined) numberOfPlayers=get.playerNumber();
+				if(typeof numberOfPlayers=='string'){
+					numberOfPlayers=parseInt(numberOfPlayers);
 				}
-				if(!num) num=5;
-				for(var i=0;i<num;i++){
-					var player=ui.create.player().animate('start');
+				if(!numberOfPlayers) numberOfPlayers=5;
+				for(let ordinal=0;ordinal<numberOfPlayers;ordinal++){
+					const player=ui.create.player().animate('start');
 					game.players.push(player);
-					player.dataset.position=i;
+					player.dataset.position=ordinal;
 				}
-				var players=game.players;
-				for(var i=0;i<players.length;i++){
-					if(i>0){
-						players[i].previous=players[i-1];
-						players[i].previousSeat=players[i-1];
+				const players=game.players;
+				for(let ordinal=0;ordinal<players.length;ordinal++){
+					if(ordinal>0){
+						players[ordinal].previous=players[ordinal-1];
+						players[ordinal].previousSeat=players[ordinal-1];
 					}
-					if(i<players.length-1){
-						players[i].next=players[i+1];
-						players[i].nextSeat=players[i+1];
+					if(ordinal<players.length-1){
+						players[ordinal].next=players[ordinal+1];
+						players[ordinal].nextSeat=players[ordinal+1];
 					}
 				}
 				players[0].previous=players[players.length-1];
 				players[0].previousSeat=players[players.length-1];
 				players[players.length-1].next=players[0];
 				players[players.length-1].nextSeat=players[0];
-				ui.arena.setNumber(num);
-				for(var i=0;i<num;i++){
-					ui.arena.appendChild(players[i]);
-				}
-				// ui.arena.classList.add('glass');
-				// for(var i=0;i<num;i++){
-				// 	var bg=ui.create.div('.glassbg');
-				// 	var bg2=ui.create.div(bg);
-				// 	ui.create.div(bg);
-				// 	var rect=players[i].getBoundingClientRect();
-				// 	bg2.style.backgroundImage='url("image/background/huangtian_bg.jpg")';
-				// 	bg2.style.width=ui.window.offsetWidth+'px';
-				// 	bg2.style.height=ui.window.offsetHeight+'px';
-				// 	bg2.style.transform='translate('+(-rect.left)+'px,'+(-rect.top)+'px)';
-				// 	players[i].insertBefore(bg,players[i].firstChild);
-				// }
+				ui.arena.setNumber(numberOfPlayers);
+				players.forEach(player=>ui.arena.appendChild(player));
 				return players;
 			},
 			me:function(hasme){
@@ -53487,7 +53986,7 @@
 				if(!game.getIdentityList) return;
 				if(_status.video) return;
 				if(this.parentNode.forceShown) return;
-				if(!_status.connectMode&&this.parentNode.ai.mougong_camouflage&&get.config('nei_auto_mark_camouflage')&&game.me.identity=='nei') return;
+				if(!_status.connectMode&&this.parentNode.ai.stratagem_camouflage&&get.config('nei_auto_mark_camouflage')&&game.me.identity=='nei') return;
 				if(_status.clickingidentity){
 					for(var i=0;i<_status.clickingidentity[1].length;i++){
 						_status.clickingidentity[1][i].delete();
@@ -53508,9 +54007,8 @@
 					list2.push(list2[0]);
 					for(var i=0;i<list2.length;i++){
 						if(this.firstChild.innerHTML==list[list2[i]]){
-							var identity=list2[i+1];
-							this.firstChild.innerHTML=list[identity];
-							this.dataset.color=identity=='you'?'friend2':(identity=='di'?'enemy':identity);
+							this.firstChild.innerHTML=list[list2[i+1]];
+							this.dataset.color=list2[i+1];
 							break;
 						}
 					}
@@ -53564,7 +54062,7 @@
 								node.listen(function(){
 									var info=this.link;
 									info[0].firstChild.innerHTML=info[1];
-									info[0].dataset.color=info[2]=='you'?'friend2':(info[2]=='di'?'enemy':info[2]);
+									info[0].dataset.color=info[2];
 									_status.clicked=false;
 								});
 							}
@@ -55630,49 +56128,52 @@
 					}
 				}
 			},
-			ok:function(node){
-				var event=_status.event;
-				if(event.custom&&event.custom.replace.confirm){
-					event.custom.replace.confirm(true);return;
+			ok:node=>{
+				const gameEvent=get.event(),custom=gameEvent.custom,replaceConfirm=custom.replace.confirm;
+				if(replaceConfirm){
+					replaceConfirm(true);
+					return;
 				}
-				event.result={
-					buttons:ui.selected.buttons.slice(0),
-					cards:ui.selected.cards.slice(0),
-					targets:ui.selected.targets.slice(0),
+				const result=gameEvent.result={
+					buttons:ui.selected.buttons.slice(),
+					cards:ui.selected.cards.slice(),
+					targets:ui.selected.targets.slice(),
 					confirm:'ok',
 					bool:true,
 					links:get.links(ui.selected.buttons)
 				};
-				if(node){
-					node.parentNode.close();
-				}
-				if(event.skill){
-					event.result.skill=event.skill;
-					if(typeof get.info(event.skill).viewAs=='function') event.result.card=get.info(event.skill).viewAs(event.result.cards,event.player);
-					else event.result.card=get.copy(get.info(event.skill).viewAs);
-					if(event.result.cards.length==1&&event.result.card){
-						if(!event.result.card.suit) event.result.card.suit=get.suit(event.result.cards[0]);
-						if(!event.result.card.number) event.result.card.number=get.number(event.result.cards[0]);
+				if(node) node.parentNode.close();
+				const skill=gameEvent.skill;
+				if(skill){
+					result.skill=skill;
+					const skillInformation=get.info(gameEvent.skill),viewAs=skillInformation.viewAs;
+					if(typeof viewAs=='function'){
+						const viewedAs=viewAs(result.cards,gameEvent.player);
+						if(viewedAs){
+							viewedAs.cards=result.cards;
+							result.card=get.autoViewAs(viewedAs);
+						}
 					}
-					if(event.skillDialog&&get.objtype(event.skillDialog)=='div'){
-						event.skillDialog.close();
+					else if(viewAs){
+						viewAs.cards=result.cards;
+						result.card=get.autoViewAs(viewAs);
 					}
-					var cards=event.player.getCards('hej');
+					if(gameEvent.skillDialog&&get.objtype(gameEvent.skillDialog)=='div'){
+						gameEvent.skillDialog.close();
+					}
+					var cards=gameEvent.player.getCards('hej');
 					for(var i=0;i<cards.length;i++){
 						cards[i].recheck('useSkill');
 					}
-					event.restore();
+					gameEvent.restore();
 				}
-				else if(event.name=='chooseToUse'||event.name=='chooseToRespond'){
-					event.result.card=get.autoViewAs(event.result.cards[0]);
-				}
+				else if(['chooseToUse','chooseToRespond'].includes(gameEvent.name)) result.card=get.autoViewAs(result.cards[0]);
 				if(ui.skills) ui.skills.close();
 				if(ui.skills2) ui.skills2.close();
 				if(ui.skills3) ui.skills3.close();
 				game.uncheck();
-				if(event.custom.add.confirm){
-					event.custom.add.confirm(true);
-				}
+				const addConfirm=custom.add.confirm;
+				if(addConfirm) addConfirm(true);
 				game.resume();
 			},
 			cancel:function(node){
@@ -57347,6 +57848,31 @@
 		},
 	};
 	const get={
+		/**
+		 * @param {number} numberOfPlayers
+		 * @returns {string[]}
+		 */
+		identityList:numberOfPlayers=>{
+			const modeConfig=lib.config.mode_config;
+			if(modeConfig){
+				const identityConfig=modeConfig.identity;
+				if(identityConfig){
+					const identityLists=identityConfig.identity;
+					if(identityLists){
+						const identityList=identityLists[numberOfPlayers-2];
+						if(Array.isArray(identityList)) return identityList.slice();
+					}
+				}
+			}
+			const numberOfPlayersExceptLord=numberOfPlayers-1,numberOfLoyalists=Math.round(numberOfPlayersExceptLord*3/9),numberOfSpys=Math.round(numberOfPlayersExceptLord*2/9);
+			return ['zhu'].concat(Array.from({
+				length:numberOfLoyalists
+			},()=>'zhong'),Array.from({
+				length:numberOfSpys
+			},()=>'nei'),Array.from({
+				length:numberOfPlayersExceptLord-numberOfLoyalists-numberOfSpys
+			},()=>'fan'));
+		},
 		//Generate an object URL from the Base64-encoded octet stream
 		//从Base64编码的八位字节流生成对象URL
 		objectURL:octetStream=>{
@@ -57583,8 +58109,8 @@
 			},
 			/**
 			 * 判断传入的参数的属性是否相同（参数可以为卡牌、卡牌信息、属性等）
-			 * @param ...infos 要判断的属性列表 
-			 * @param every {boolean} 是否判断每一个传入的属性是否完全相同而不是存在部分相同
+			 * @param {...} infos 要判断的属性列表
+			 * @param {boolean} every 是否判断每一个传入的属性是否完全相同而不是存在部分相同
 			 */
 			sameNature(){
 				let processedArguments=[],every=false;
@@ -58405,12 +58931,13 @@
 				switch(config.identity_mode){
 					case 'purple':return '三对三对二';
 					case 'zhong':return (config.double_character?'双将':'')+'忠胆英杰';
-					case 'mougong':return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'谋攻';
+					case 'stratagem':return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'谋攻';
 					default:return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'身份';
 				}
 			}
-			else if(config.mode=='guozhan'&&config.guozhan_mode!='normal'){
-				switch(config.guozhan_mode){
+			else if(config.mode=='guozhan'){
+				if(config.separatism) return '群雄割据';
+				if(config.guozhan_mode!='normal') switch(config.guozhan_mode){
 					case 'yingbian':return '应变国战';
 					case 'old':return '怀旧国战';
 				}
@@ -58780,19 +59307,19 @@
 			}
 			return func;
 		},
-		eventInfoOL:(item,level,noMore)=>item instanceof lib.element.Event?`_noname_event:${JSON.stringify(Object.entries(item).reduce((stringifying,entry)=>{
+		eventInfoOL:(item,level,noMore)=>get.itemtype(item)=='event'?`_noname_event:${JSON.stringify(Object.entries(item).reduce((stringifying,entry)=>{
 			const key=entry[0];
 			if(key=='_trigger'){
 				if(noMore!==false) stringifying[key]=get.eventInfoOL(entry[1],null,false);
 			}
-			else if(!lib.element.Event.prototype[key]&&key!='content'&&!(entry[1] instanceof lib.element.Event)) stringifying[key]=get.stringifiedResult(entry[1],null,false);
+			else if(!lib.element.GameEvent.prototype[key]&&key!='content'&&get.itemtype(entry[1])!='event') stringifying[key]=get.stringifiedResult(entry[1],null,false);
 			return stringifying;
 		},{}))}`:'',
 		/**
 		 * @param {string} item
 		 */
 		infoEventOL:item=>{
-			const evt=new lib.element.Event();
+			const evt=new lib.element.GameEvent();
 			try{
 				Object.entries(JSON.parse(item.slice(14))).forEach(entry=>{
 					const key=entry[0];
@@ -59018,11 +59545,15 @@
 					if(isPosition) return 'divposition';
 				}
 			}
-			if(obj instanceof lib.element.Button) return 'button';
-			if(obj instanceof lib.element.Card) return 'card';
-			if(obj instanceof lib.element.Player) return 'player';
-			if(obj instanceof lib.element.Dialog) return 'dialog';
-			if(obj instanceof lib.element.Event) return 'event';
+			if(get.objtype(obj)=='div'){
+				if(obj.classList.contains('button')) return 'button';
+				if(obj.classList.contains('card')) return 'card';
+				if(obj.classList.contains('player')) return 'player';
+				if(obj.classList.contains('dialog')) return 'dialog';
+			}
+			if(get.is.object(obj)){
+				if(obj.isMine==lib.element.GameEvent.prototype.isMine) return 'event';
+			}
 		},
 		equipNum:card=>{
 			if(get.type(card)=='equip'){
@@ -59164,7 +59695,7 @@
 			if(typeof card=='string') return card.split(lib.natureSeparator).sort(lib.sort.nature).join(lib.natureSeparator);
 			if(Array.isArray(card)) return card.sort(lib.sort.nature).join(lib.natureSeparator);
 			var nature=card.nature;
-			if(player instanceof lib.element.Player||player!==false){
+			if(get.itemtype(player)=='player'||player!==false){
 				var owner=get.owner(card);
 				if(owner){
 					return game.checkMod(card,owner,nature,'cardnature',owner);
@@ -59332,6 +59863,13 @@
 			}
 			return card;
 		},
+		/**
+		 * @template T
+		 * @type {{
+		 * (key: T) => GameEvent[T];
+		 * () => GameEvent;
+		 * }}
+		 */
 		event:key=>key?_status.event[key]:_status.event,
 		player:()=>_status.event.player,
 		players:(sort,dead,out)=>{
@@ -59405,6 +59943,9 @@
 			// 	replace(/阵法技/g,'<span class="bluetext">阵法技</span>').
 			// 	replace(/主公技/g,'<span class="firetext">主公技</span>');
 		},
+		/**
+		 * @returns {string}
+		 */
 		translation:(str,arg)=>{
 			if(str&&typeof str=='object'&&(str.name||str._tempTranslate)){
 				if(str._tempTranslate) return str._tempTranslate;
@@ -61407,6 +61948,7 @@
 			var event=_status.event;
 			var eventskill=null;
 			if(player==undefined) player=_status.event.player;
+			if(card&&typeof card=='object'&&'name' in card) card=get.autoViewAs(card);
 			if(typeof card!='string'&&(typeof card!='object'||!card.name)){
 				var skillinfo=get.info(event.skill);
 				if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
@@ -61601,6 +62143,7 @@
 			var event=_status.event;
 			var eventskill=null;
 			if(player==undefined) player=_status.event.player;
+			if(card&&typeof card=='object'&&'name' in card) card=get.autoViewAs(card);
 			if(typeof card!='string'&&(typeof card!='object'||!card.name)){
 				var skillinfo=get.info(event.skill);
 				if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
@@ -62020,7 +62563,7 @@
 				}
 			}
 		},
-		get:get
+		get
 	};
 	/**
 	 * @template T
@@ -62041,7 +62584,7 @@
 		Object.defineProperty(cardPrototype,key,Object.getOwnPropertyDescriptor(vCardPrototype,key));
 	});
 	setAllPropertiesEnumerable(lib.element.Button.prototype);
-	setAllPropertiesEnumerable(lib.element.Event.prototype);
+	setAllPropertiesEnumerable(lib.element.GameEvent.prototype);
 	setAllPropertiesEnumerable(lib.element.Dialog.prototype);
 	setAllPropertiesEnumerable(lib.element.Control.prototype);
 	setAllPropertiesEnumerable(lib.element.Client.prototype);

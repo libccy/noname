@@ -685,8 +685,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.addPlayer=function(player){
-					var list=lib.config.mode_config.identity.identity[game.players.length-3].slice(0);
-					var list2=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
+					var list=get.identityList(game.players.length-1);
+					var list2=get.identityList(game.players.length);
 					for(var i=0;i<list.length;i++) list2.remove(list[i]);
 					player.identity=list2[0];
 					player.setIdentity('cai');

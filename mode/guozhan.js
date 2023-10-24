@@ -99,11 +99,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(_status.brawl&&_status.brawl.submode){
 					_status.mode=_status.brawl.submode;
 				}
+				if(get.config('separatism')) _status.separatism=true;
 			}
 			"step 1"
 			if(_status.connectMode){
 				_status.mode=lib.configOL.guozhan_mode;
 				if(!['normal','yingbian','old'].contains(_status.mode)) _status.mode='normal';
+				if(lib.configOL.separatism) _status.separatism=true;
 				//决定牌堆
 				switch(_status.mode){
 					case 'old':lib.card.list=lib.guozhanPile_old.slice(0);break;
@@ -115,8 +117,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					default:lib.card.list=lib.guozhanPile.slice(0);break;
 				}
 				game.fixedPile=true;
-				game.broadcastAll(function(mode){
+				game.broadcastAll((mode,separatism)=>{
 					_status.mode=mode;
+					if(separatism) _status.separatism=true;
 					if(mode=='yingbian'){
 						delete lib.translate.shuiyanqijunx_info_guozhan;
 					}
@@ -145,7 +148,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					lib.characterReplace={};
-				},_status.mode);
+				},_status.mode,_status.separatism);
 				game.randomMapOL();
 			}
 			else{
@@ -13504,6 +13507,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				else{
 					num={mark:'标记',draw:'摸牌'}[lib.configOL.initshow_draw];
 				}
+				uiintro.add('<div class="text chat">群雄割据：'+(lib.configOL.separatism?'开启':'关闭'));
 				uiintro.add('<div class="text chat">首亮奖励：'+num);
 				uiintro.add('<div class="text chat">珠联璧合：'+(lib.configOL.zhulian?'开启':'关闭'));
 				uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
@@ -13585,7 +13589,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			getVideoName:function(){
 				var str=get.translation(game.me.name1)+'/'+get.translation(game.me.name2);
-				var str2=get.cnNumber(parseInt(get.config('player_number')))+'人'+
+				var str2=_status.separatism?get.modetrans({
+					mode:lib.config.mode,
+					separatism:true
+				}):get.cnNumber(parseInt(get.config('player_number')))+'人'+
 					get.translation(lib.config.mode);
 				if(game.me.identity=='ye'){
 					str2+=' - 野心家';
@@ -13689,6 +13696,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					var filterChoice=function(name1,name2){
+						if(_status.separatism) return true;
 						var group1=lib.character[name1][1];
 						var group2=lib.character[name2][1];
 						var doublex=get.is.double(name1,true);
@@ -13849,6 +13857,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							if(lib.character[button.link][4].contains('hiddenSkill')) return false;
 							var filterChoice=function(name1,name2){
+								if(_status.separatism) return true;
 								var group1=lib.character[name1][1];
 								var group2=lib.character[name2][1];
 								var doublex=get.is.double(name1,true);
@@ -14078,6 +14087,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						var filterChoice=function(name1,name2){
+							if(_status.separatism) return true;
 							var group1=lib.character[name1][1];
 							var group2=lib.character[name2][1];
 							var doublex=get.is.double(name1,true);
@@ -14113,13 +14123,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).set('processAI',function(){
 						var buttons=_status.event.dialog.buttons;
 						var filterChoice=function(name1,name2){
-							if(get.is.double(name1)) return false;
+							if(_status.separatism) return true;
 							var group1=lib.character[name1][1];
 							var group2=lib.character[name2][1];
-							if(group1=='ye') return group2!='ye';
-							var double=get.is.double(name2,true);
-							if(double) return double.contains(group1);
-							return group1==group2;
+							var doublex=get.is.double(name1,true);
+							if(doublex){
+								var double=get.is.double(name2,true);
+								if(double) return doublex.some(group=>double.contains(group));
+								return doublex.contains(group2);
+							}
+							else{
+								if(group1=='ye') return group2!='ye';
+								var double=get.is.double(name2,true);
+								if(double) return double.contains(group1);
+								return group1==group2;
+							}
 						};
 						for(var i=0;i<buttons.length-1;i++){
 							for(var j=i+1;j<buttons.length;j++){
@@ -16020,7 +16038,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(_status.yeidentity&&_status.yeidentity.contains(group)) return false;
 					if(get.zhu(this,null,group)) return true;
-					return get.totalPopulation(group)+1<=get.population()/2;
+					return get.totalPopulation(group)+1<=_status.separatism?Math.max(get.population()/2-1,1):get.population()/2;
 				},
 				perfectPair:function(choosing){
 					if(_status.connectMode){

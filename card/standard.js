@@ -141,7 +141,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var target=_status.event.player;
 							var evt=_status.event.getParent();
 							var bool=true;
-							if(_status.event.shanRequired>1&&!get.is.object(card)&&target.countCards('h','shan')<_status.event.shanRequired){
+							if(_status.event.shanRequired>1&&!get.is.object(card)&&target.countCards('h','shan')<_status.event.shanRequired-(_status.event.shanIgnored||0)){
 								bool=false;
 							}
 							else if(target.hasSkillTag('useShan')){
