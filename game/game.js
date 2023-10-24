@@ -625,7 +625,9 @@
 				['sha',event=>{
 					if(event.step!=1) return;
 					game.log(event.player,'触发了强化效果');
-					game.log(event.card,'抵消所需要的',`#y【${get.translation('shan')}】`,'数+1');
+					game.log(event.card,'抵消所需要的',new lib.element.VCard({
+						name:'shan'
+					}),'数+1');
 					const map=event.customArgs;
 					game.players.concat(game.dead).forEach(current=>{
 						const id=current.playerid;
@@ -637,8 +639,12 @@
 				['shan',event=>{
 					if(event.step!=1) return;
 					game.log(event.player,'触发了强化效果');
-					game.log(event.card,'视为两张',`#y【${get.translation('shan')}】`,'的效果');
-					event.getParent(2).decrease('shanRequired',1);
+					game.log('使用',event.card,'时视为两张',new lib.element.VCard({
+						name:'shan'
+					}),'的效果');
+					event.player.when('useCard').filter(evt=>evt==event).then(()=>{
+						trigger.getParent(2).decrease('shanRequired',1);
+					});
 				}],
 				['juedou',event=>{
 					if(event.step!=1) return;
@@ -25344,55 +25350,37 @@
 					return next;
 				}
 				damage(){
-					var next=game.createEvent('damage');
+					const next=game.createEvent('damage');
 					//next.forceDie=true;
 					next.player=this;
-					var nocard,nosource;
-					var event=_status.event;
-					for(var i=0;i<arguments.length;i++){
-						if(get.itemtype(arguments[i])=='cards'){
-							next.cards=arguments[i].slice(0);
-						}
-						else if(get.itemtype(arguments[i])=='card'){
-							next.card=arguments[i];
-						}
-						else if(typeof arguments[i]=='number'){
-							next.num=arguments[i];
-						}
-						else if(get.itemtype(arguments[i])=='player'){
-							next.source=arguments[i];
-						}
-						else if(typeof arguments[i]=='object'&&arguments[i]&&arguments[i].name){
-							next.card=arguments[i];
-						}
-						else if(arguments[i]=='nocard'){
-							nocard=true;
-						}
-						else if(arguments[i]=='nosource'){
-							nosource=true;
-						}
-						else if(arguments[i]=='notrigger'){
+					let noCard,noSource;
+					const event=_status.event;
+					for(const argument of arguments){
+						if(get.itemtype(argument)=='cards') next.cards=argument.slice();
+						else if(get.itemtype(argument)=='card') next.card=argument;
+						else if(typeof argument=='number') next.num=argument;
+						else if(get.itemtype(argument)=='player') next.source=argument;
+						else if(argument&&typeof argument=='object'&&argument.name) next.card=argument;
+						else if(argument=='nocard') noCard=true;
+						else if(argument=='nosource') noSource=true;
+						else if(argument=='notrigger'){
 							next._triggered=null;
 							next.notrigger=true;
 						}
-						else if(arguments[i]=='unreal'){
-							next.unreal=true
-						}
-						else if(get.itemtype(arguments[i])=='nature'&&arguments[i]!='stab'){
-							next.nature=arguments[i];
-						}
-						else if(get.itemtype(arguments[i])=='natures'){
-							var natures=arguments[i].split(lib.natureSeparator);
-							natures.remove('stab');
+						else if(argument=='unreal') next.unreal=true;
+						else if(get.itemtype(argument)=='nature'&&argument!='stab') next.nature=argument;
+						else if(get.itemtype(argument)=='natures'){
+							const natures=argument.split(lib.natureSeparator).remove('stab');
 							if(natures.length) next.nature=natures.join(lib.natureSeparator);
 						}
 					}
-					if(next.card==undefined&&!nocard) next.card=event.card;
-					if(next.cards==undefined&&!nocard) next.cards=event.cards;
-					if(next.source==undefined&&!nosource) next.source=event.customSource||event.player;
-					if(next.source&&next.source.isDead()) delete next.source;
-					if(next.unreal==undefined) next.unreal=false;
-					if(next.num==undefined) next.num=(event.baseDamage||1)+(event.extraDamage||0);
+					if(!next.card&&!noCard) next.card=event.card;
+					if(!next.cards&&!noCard) next.cards=event.cards;
+					if(!next.source&&!noSource){
+						const source=event.customSource||event.player;
+						if(source&&!source.isDead()) next.source=source;
+					}
+					if(typeof next.num!='number') next.num=(event.baseDamage||1)+(event.extraDamage||0);
 					next.original_num=next.num;
 					next.change_history=[];
 					next.hasNature=function(nature){
@@ -30882,6 +30870,9 @@
 					}
 					return this;
 				}
+				/**
+				 * @param {ArrayLike<Function> | Function | keyof typeof lib.element.content} item
+				 */
 				setContent(item){
 					switch(typeof item){
 						case "object":
@@ -31500,6 +31491,7 @@
 				}
 				/**
 				 * @throws {'Do not call this method'}
+				 * @returns {never}
 				 */
 				typeAnnotation(){
 					/**
@@ -31546,6 +31538,34 @@
 					 * @type {Record<string, any>}
 					 */
 					this._result;
+					/**
+					 * @type {number}
+					 */
+					this.baseDamage;
+					/**
+					 * @type {Player}
+					 */
+					this.customSource;
+					/**
+					 * @type {number}
+					 */
+					this.extraDamage;
+					/**
+					 * @type {string}
+					 */
+					this.nature;
+					/**
+					 * @type {boolean}
+					 */
+					this.notrigger;
+					/**
+					 * @type {number}
+					 */
+					this.original_num;
+					/**
+					 * @type {boolean}
+					 */
+					this.unreal;
 					throw 'Do not call this method';
 				}
 			},
@@ -53988,9 +54008,8 @@
 					list2.push(list2[0]);
 					for(var i=0;i<list2.length;i++){
 						if(this.firstChild.innerHTML==list[list2[i]]){
-							var identity=list2[i+1];
-							this.firstChild.innerHTML=list[identity];
-							this.dataset.color=identity=='you'?'friend2':(identity=='di'?'enemy':identity);
+							this.firstChild.innerHTML=list[list2[i+1]];
+							this.dataset.color=list2[i+1];
 							break;
 						}
 					}
@@ -54044,7 +54063,7 @@
 								node.listen(function(){
 									var info=this.link;
 									info[0].firstChild.innerHTML=info[1];
-									info[0].dataset.color=info[2]=='you'?'friend2':(info[2]=='di'?'enemy':info[2]);
+									info[0].dataset.color=info[2];
 									_status.clicked=false;
 								});
 							}
@@ -58091,8 +58110,8 @@
 			},
 			/**
 			 * 判断传入的参数的属性是否相同（参数可以为卡牌、卡牌信息、属性等）
-			 * @param ...infos 要判断的属性列表 
-			 * @param every {boolean} 是否判断每一个传入的属性是否完全相同而不是存在部分相同
+			 * @param {...} infos 要判断的属性列表
+			 * @param {boolean} every 是否判断每一个传入的属性是否完全相同而不是存在部分相同
 			 */
 			sameNature(){
 				let processedArguments=[],every=false;
@@ -61930,7 +61949,7 @@
 			var event=_status.event;
 			var eventskill=null;
 			if(player==undefined) player=_status.event.player;
-			if(typeof card=='object') card=get.autoViewAs(card);
+			if(card&&typeof card=='object'&&'name' in card) card=get.autoViewAs(card);
 			if(typeof card!='string'&&(typeof card!='object'||!card.name)){
 				var skillinfo=get.info(event.skill);
 				if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
@@ -62125,7 +62144,7 @@
 			var event=_status.event;
 			var eventskill=null;
 			if(player==undefined) player=_status.event.player;
-			if(typeof card=='object') card=get.autoViewAs(card);
+			if(card&&typeof card=='object'&&'name' in card) card=get.autoViewAs(card);
 			if(typeof card!='string'&&(typeof card!='object'||!card.name)){
 				var skillinfo=get.info(event.skill);
 				if(event.skill&&skillinfo.viewAs==undefined) card=_status.event.skill;
@@ -62545,7 +62564,7 @@
 				}
 			}
 		},
-		get:get
+		get
 	};
 	/**
 	 * @template T

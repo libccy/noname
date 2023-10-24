@@ -1271,7 +1271,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					['stratagem_gain','stratagem_insight','stratagem_expose'].forEach(globalSkill=>game.addGlobalSkill(globalSkill));
 					game.players.forEach(current=>{
 						current.storage.zhibi=[];
-						current.storage.zhibi_for=[];
+						current.storage.stratagem_expose=[];
 						current.markSkill('stratagem_fury');
 					});
 
@@ -2085,7 +2085,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						['stratagem_gain','stratagem_insight','stratagem_expose'].forEach(globalSkill=>game.addGlobalSkill(globalSkill));
 						game.players.forEach(i=>{
 							i.storage.zhibi=[];
-							i.storage.zhibi_for=[];
+							i.storage.stratagem_expose=[];
 							i.markSkill('stratagem_fury');
 						});
 					}
@@ -3159,9 +3159,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(num){
 						return x/num;
 					}
-					var real=get.realAttitude(from,to),zhibi=from.storage.zhibi,zhibi_for=from.storage.zhibi_for,followCamouflage=true;
+					var real=get.realAttitude(from,to),zhibi=from.storage.zhibi,stratagem_expose=from.storage.stratagem_expose,followCamouflage=true;
 					if(to.ai.shown) return to.ai.shown*(real+(from.identity==to.identity||from.identity=='zhu'&&to.identity=='zhong'||from.identity=='zhong'&&to.identity=='zhu'||(to.identity=='nei'&&get.situation()<=0&&['zhu','zhong'].contains(from.identity)||get.situation()>=3&&from.identity=='fan')?3:-3))
-					if(from==to||to.identityShown||((zhibi_for&&zhibi_for.contains(to))||(zhibi&&zhibi.contains(to)))&&!to.ai.stratagemCamouflage) return real*1.1;
+					if(from==to||to.identityShown||((stratagem_expose&&stratagem_expose.contains(to))||(zhibi&&zhibi.contains(to)))&&!to.ai.stratagemCamouflage) return real*1.1;
 					if(from.identity=='nei'&&to.ai.stratagemCamouflage) return real*1.1;
 					if(to.identity=='nei'){
 						if(from.identity=='fan'){
@@ -3170,7 +3170,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									var dead=game.dead.slice();
 									for(var current of dead){
 										if(from.storage.zhibi.contains(current)&&current.ai.stratagemCamouflage){
-											if(from.storage.zhibi_for&&from.storage.zhibi_for.contains(to)) return -7;
+											if(from.storage.stratagem_expose&&from.storage.stratagem_expose.contains(to)) return -7;
 										}
 									}
 									if(zhibi.contains(to)) return 3;
@@ -3181,7 +3181,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(to.identity=='fan'&&from.identity=='nei'&&zhibi.contains(game.zhu)&&game.players.filter(i=>i!=from&&!zhibi.contains(i)).map(i=>i.identity).reduce((p,c)=>(!p.contains(c)?(p.push(c)&&p):p),[]).length==1) return real;
 					for(var fan of game.dead){
 						if(fan.identity!='fan'||!fan.storage.stratagem_revitalization) continue;
-						for(var current of fan.storage.zhibi_for){
+						for(var current of fan.storage.stratagem_expose){
 							if(to==current){
 								return real;
 							}
@@ -3191,26 +3191,26 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(from.ai.stratagemCamouflage){
 							var zhu=game.zhu&&game.zhu.isZhu&&game.zhu.identityShown?game.zhu:undefined;
 							if(zhu){
-								if(zhu.storage.zhibi_for&&zhu.storage.zhibi_for.contains(to)) return 0;
+								if(zhu.storage.stratagem_expose&&zhu.storage.stratagem_expose.contains(to)) return 0;
 							}
 							if(zhibi&&zhibi.contains(to)) return -7;
 						}
 						if(to.ai.stratagemCamouflage){
 							var zhu=game.zhu&&game.zhu.isZhu&&game.zhu.identityShown?game.zhu:undefined;
 							if(zhu){
-								if(zhu.storage.zhibi_for&&zhu.storage.zhibi_for.contains(to)) return 0;
+								if(zhu.storage.stratagem_expose&&zhu.storage.stratagem_expose.contains(to)) return 0;
 							}
 							if(zhibi&&zhibi.contains(to)) return -7;
 						}
 					}
 					if(from.identity!='nei'&&zhibi&&zhibi.contains(to)&&!to.identityShown&&(followCamouflage&&to.ai.stratagemCamouflage)) return -5;
-					if(from.identity!='nei'&&zhibi_for&&zhibi_for.contains(to)&&!to.identityShown) return -5;
+					if(from.identity!='nei'&&stratagem_expose&&stratagem_expose.contains(to)&&!to.identityShown) return -5;
 					if(zhibi){
 						for(var to2 of zhibi){
-							if(to2.storage.zhibi_for){
+							if(to2.storage.stratagem_expose){
 								if(to2.ai.stratagemCamouflage){
-									for(var to3 of to2.storage.zhibi_for){
-										if(zhibi.slice().addArray(zhibi_for).contains(to3)){
+									for(var to3 of to2.storage.stratagem_expose){
+										if(zhibi.slice().addArray(stratagem_expose).contains(to3)){
 											if(to==to2){
 												return real;
 											}
@@ -3219,8 +3219,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										}
 									}
 								}else{
-									for(var to3 of to2.storage.zhibi_for){
-										if(!zhibi.slice().addArray(zhibi_for).contains(to3)&&to==to3){
+									for(var to3 of to2.storage.stratagem_expose){
+										if(!zhibi.slice().addArray(stratagem_expose).contains(to3)&&to==to3){
 											return get.rawAttitude(to3,to)*Math.sign(real);
 										}
 									}
@@ -3708,36 +3708,37 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stratagem_insight:{
 				trigger:{
 					source:'damageSource',
-					global:'loseHpEnd',
+					global:'loseHpEnd'
 				},
-				filter:function(event,player){
-					if(event.player.identityShown) return false;
-					var source=event.source;
+				filter:(event,player)=>{
+					if(!player.storage.stratagem_fury) return false;
+					const target=event.player;
+					if(target==player||!target.isIn()||target.identityShown) return false;
+					let source=event.source;
 					if(event.name=='loseHp'){
-						if(event.getParent()._trigger) source=event.getParent()._trigger.source;
+						const trigger=event.getParent()._trigger;
+						if(trigger) source=trigger.source;
 					}
-					return player==source&&player.storage.stratagem_fury>0&&event.player&&event.player.isIn()&&event.player!=player;
+					return player==source;
 				},
 				logTarget:'player',
-				prompt2:function(event,player){
-					return '消耗1点怒气，洞察'+get.translation(event.player)+'的身份';
-				},
-				check:function(event,player){
-					if(player.storage.zhibi&&player.storage.zhibi.contains(event.player)||player.storage.zhibi_for&&player.storage.zhibi_for.contains(event.player)) return false;
+				prompt2:event=>`消耗1点怒气，洞察${get.translation(event.player)}的身份`,
+				check:(event,player)=>{
+					const storage=player.storage,zhibi=storage.zhibi;
+					if(zhibi&&zhibi.includes(event.player)) return false;
+					const stratagemExpose=storage.stratagem_expose;
+					if(stratagemExpose&&stratagemExpose.includes(event.player)) return false;
 					if(get.population('zhong')==0&&player.identity=='fan') return false;
 					return Math.abs(get.attitude(player,event.player))<=1;
 				},
-				content:function(){
+				content:()=>{
 					player.changeFury(-1,true);
 					player.insightInto(trigger.player);
-				},
-				ai:{
-					order:15,
 				}
 			},
 			stratagem_monarchy:{
 				trigger:{
-					player:['dying','phaseBefore'],
+					player:['dying','phaseZhunbeiBegin'],
 					global:'dieAfter',
 				},
 				forced:true,
@@ -3748,54 +3749,46 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				charlotte:true,
 				ruleSkill:true,
-				filter:function(event,player){
-					if(player.storage.stratagem_monarchy) return false;
-					if(player.identity=='zhu'){
-						if(event.player==player){
-							if(event.name=='dying') return true;
-							return game.roundNumber>=Math.max(Math.round(get.population()/2),3);
-						}
-						if(event.name=='die') return game.dead.length>=Math.max(Math.round(get.population()/3),2);
-					}
-					return false;
+				filter:(event,player,name)=>{
+					if(player.storage.stratagem_monarchy||player.identity!='zhu') return false;
+					if(name=='dieAfter') return game.dead.length>=Math.max(Math.round(get.population()/3),2);
+					return name=='dying'||game.roundNumber>=Math.max(Math.round(get.population()/2),3);
 				},
-				content:function(){
+				content:()=>{
 					'step 0'
-					if(trigger.name=='dying') game.delayx();
+					if(event.triggername=='dying') game.delayx();
 					'step 1'
 					player.storage.stratagem_monarchy=true;
-					game.zhu=game.zhu||player;
-					game.broadcastAll(function(player){
-						game.zhu=player;
-						game.zhu.identityShown=true;
-						game.zhu.ai.shown=1;
-						game.zhu.setIdentity();
-						game.zhu.isZhu=true;
-						game.zhu.node.identity.classList.remove('guessing');
-						if(lib.config.animation&&!lib.config.low_performance) game.zhu.$legend();
-						if(_status.clickingidentity&&_status.clickingidentity[0]==game.zhu){
-							for(var i=0;i<_status.clickingidentity[1].length;i++){
-								_status.clickingidentity[1][i].delete();
-								_status.clickingidentity[1][i].style.transform='';
-							}
-							delete _status.clickingidentity;
-						}
-					},game.zhu);
+					game.broadcastAll(clientPlayer=>{
+						if(!game.zhu) game.zhu=clientPlayer;
+						clientPlayer.identityShown=true;
+						clientPlayer.ai.shown=1;
+						clientPlayer.setIdentity();
+						clientPlayer.isZhu=true;
+						clientPlayer.node.identity.classList.remove('guessing');
+						var config=lib.config;
+						if(config.animation&&!config.low_performance) clientPlayer.$legend();
+						var clickingIdentity=_status.clickingidentity;
+						if(!clickingIdentity||clickingIdentity[0]!=clientPlayer) return;
+						clickingIdentity[1].forEach(element=>{
+							element.delete();
+							element.style.transform='';
+						});
+						delete _status.clickingidentity;
+					},player);
 					game.addVideo('showIdentity',player,'zhu');
 					game.delay(2);
-					game.zhu.playerfocus(1000);
-					_status.event.trigger('zhuUpdate');
+					player.playerfocus(1000);
+					event.trigger('zhuUpdate');
 					'step 2'
 					player.recover();
 					player.draw();
-					var skills=player.getStockSkills(true,true).filter(skill=>{
-						if(player.hasSkill(skill)) return false;
-						var info=get.info(skill);
-						return info&&info.zhuSkill;
+					player.getStockSkills(true,true).forEach(stockSkill=>{
+						if(player.hasSkill(stockSkill)) return;
+						var info=get.info(stockSkill);
+						if(!info||!info.zhuSkill) return;
+						player.addSkillLog(stockSkill);
 					});
-					if(skills.length){
-						for(var i of skills) player.addSkillLog(i);
-					}
 				}
 			},
 			stratagem_revitalization:{
@@ -3807,20 +3800,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				silent:true,
 				charlotte:true,
 				ruleSkill:true,
-				filter:function(event,player){
-					return player.ai.stratagemCamouflage&&event.player==player&&game.dead.length<Math.max(Math.round(get.population()/6),1)&&player.storage.stratagem_fury>=2&&!player.storage.stratagem_revitalization;
+				filter:(event,player)=>{
+					const storage=player.storage;
+					return !storage.stratagem_revitalization&&player.ai.stratagemCamouflage&&game.dead.length<Math.max(Math.round(get.population()/6),1)&&storage.stratagem_fury>=2;
 				},
-				content:function(){
+				content:()=>{
 					'step 0'
 					game.delayx();
 					'step 1'
 					player.storage.stratagem_revitalization=true;
-					game.broadcastAll(function(player){
-						player.identityShown=true;
-						player.ai.shown=1;
-						player.setIdentity();
-						player.node.identity.classList.remove('guessing');
-						if(lib.config.animation&&!lib.config.low_performance) player.$thunder();
+					game.broadcastAll(clientPlayer=>{
+						clientPlayer.identityShown=true;
+						clientPlayer.ai.shown=1;
+						clientPlayer.setIdentity();
+						clientPlayer.node.identity.classList.remove('guessing');
+						if(lib.config.animation&&!lib.config.low_performance) clientPlayer.$thunder();
 					},player);
 					game.addVideo('showIdentity',player,'fan');
 					game.delay(2);
@@ -3839,14 +3833,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				silent:true,
 				popup:false,
-				filter:function(event,player){
-					if(event.targets[0]==player) return false;
-					return event.targets.length==1&&event.targets[0]&&((player.storage.zhibi.contains(event.targets[0])||event.targets[0].identityShown) ||
-						game.players.slice().concat(game.dead).filter(current=>(current.storage.stratagem_revitalization||current.storage.stratagem_monarchy)&&current.identityShown&&current.storage.zhibi_for.contains(event.targets[0])).length);
+				filter:(event,player)=>{
+					const targets=event.targets;
+					if(targets.length!=1) return false;
+					const target=targets[0];
+					return target==player&&(target.identityShown||player.storage.zhibi.includes(target)||game.hasPlayer2(current=>{
+						if(!current.identityShown) return false;
+						const storage=current.storage;
+						return (storage.stratagem_revitalization||storage.stratagem_monarchy)&&storage.stratagem_expose.includes(target);
+					}));
 				},
-				content:function(){
-					if(!trigger.targets[0].storage.zhibi_for) trigger.targets[0].storage.zhibi_for=[];
-					if(!trigger.targets[0].storage.zhibi_for.contains(player)) trigger.targets[0].storage.zhibi_for.push(player);
+				content:()=>{
+					var storage=trigger.targets[0].storage;
+					if(!storage.stratagem_expose) storage.stratagem_expose=[];
+					storage.stratagem_expose.add(player);
 				}
 			},
 			yexinbilu:{
@@ -4095,7 +4095,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'谋攻模式':'<div style="margin:10px">模式命名由来</div><ul style="margin-top:0"><li>《谋攻篇》一词出自《孙子兵法·谋攻篇》，是春秋时期兵法家孙武创作的一篇散文。《谋攻篇》故知胜有五：知可以战与不可以战者胜，识众寡之用者胜，上下同欲者胜，以虞待不虞者胜，将能而君不御者胜。</ul>'+
 			'<div style="margin:10px">游戏规则</div><ul style="margin-top:0"><li>谋攻篇模式为六名玩家参与的全暗身份模式，引入新机制“怒气”，玩家可以消耗怒气探查其他角色的身份是敌人或者队友，或使用怒气强化手牌，以达到识别出队友并击杀敌人的目标。'+
 			'<li>各身份玩家的胜利条件与身份局中对应身份的胜利条件一致，且该模式下没有奖惩。'+
-			'<li>当主公进入濒死、场上有两名角色阵亡、第三轮的主公回合开始时，主公将会翻开身份牌，回复1点体力并摸一张牌，并获得武将牌上的主公技。'+
+			'<li>当主公进入濒死、场上有两名角色阵亡、第三轮的主公准备阶段，主公将会翻开身份牌，回复1点体力并摸一张牌，并获得武将牌上的主公技。'+
 			'<li>内奸在游戏开始时将会得知一名反贼的身份，并令该反贼被“伪装”。本局游戏内，被“伪装”的反贼在被任何人探查身份时，结果都提示为“敌人”。作为补偿，其第一次进入濒死时，若场上没有角色死亡且其怒气值不小于2，其弃置区域内所有牌，重置武将牌，将体力回复至2点并摸三张牌。'+
 			'<li>特殊地，内奸在被所有角色探查时，都提示为“队友”；内奸在进行探查时，直接得知目标的身份。</ul>'+
 			'<div style="margin:10px">新机制“怒气”</div><ul style="margin-top:0"><li>一名角色在回合开始时或受到1点伤害后，将获得1点怒气；怒气上限为3。<li>一名角色令其他角色扣减体力后，该角色可以消耗1点怒气，查探扣减体力的角色是敌或友。</ul>'+
