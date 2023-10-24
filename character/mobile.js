@@ -1068,7 +1068,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else{
-						target.draw([1,2,3,4].reduce((p,c)=>p+target.countEmptySlot(c),0));
+						target.draw(Math.max(1,[1,2,3,4].reduce((p,c)=>p+target.countEmptySlot(c),0)));
 					}
 					'step 3'
 					target.link(false);
