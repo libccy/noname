@@ -42192,16 +42192,19 @@
 			if(info.forbid&&info.forbid.contains(mode)){
 				lib.skill[i]={};
 				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
+				if(lib.dynamicTranslate[i]) lib.dynamicTranslate[i]=()=>'此模式下不可用';
 				return;
 			}
 			if(info.mode&&info.mode.contains(mode)==false){
 				lib.skill[i]={};
 				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
+				if(lib.dynamicTranslate[i]) lib.dynamicTranslate[i]=()=>'此模式下不可用';
 				return;
 			}
 			if(info.available&&info.available(mode)==false){
 				lib.skill[i]={};
 				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
+				if(lib.dynamicTranslate[i]) lib.dynamicTranslate[i]=()=>'此模式下不可用';
 				return;
 			}
 			if(info.viewAs&&typeof info.viewAs!='function'){
