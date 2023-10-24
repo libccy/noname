@@ -1779,7 +1779,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:function(player,skill){
 					var cards=player.getExpansions(skill);
 					if(cards.length) player.loseToDiscardpile(cards);
-					delete player.storage.dcmingfa_info;
 				},
 				group:'dcshilie_die',
 				ai:{
@@ -1816,7 +1815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 3'
 							var cards=player.getExpansions('dcshilie');
 							if(cards.length>game.countPlayer()){
-								player.loseToDiscardpile(cards.slice(0,cards.length-game.countPlayer()));
+								player.loseToDiscardpile(cards.slice(game.countPlayer()));
 							}
 						},
 					},

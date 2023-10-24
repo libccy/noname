@@ -3545,6 +3545,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var cardsx=player.getExpansions('dcwangyuan').removeArray(cards);
 						if(cardsx.length<=1||get.color(cardsx)!='none'){
 							player.addTempSkill('dclingyin_effect');
+							player.addMark('dclingyin_effect',1,false);
 							game.log(player,'获得了','#g【铃音】','的后续效果');
 						}
 					}
@@ -3561,6 +3562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						viewAs:{name:'juedou'},
 						charlotte:true,
 						forced:true,
+						onremove:true,
 						prompt:'将一张武器牌或防具牌当【决斗】使用',
 						filterCard:function(card){
 							return get.subtype(card)=='equip1'||get.subtype(card)=='equip2';
@@ -3571,7 +3573,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.player!=player;
 						},
 						content:function(){
-							trigger.num++;
+							trigger.num+=player.countMark('dclingyin_effect');
 						},
 						ai:{
 							damageBonus:true,
