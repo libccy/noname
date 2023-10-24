@@ -30621,6 +30621,9 @@
 					}
 					_status.event.excludeButton.add(this);
 				}
+				get updateTransform(){
+					return lib.element.Card.prototype.updateTransform;
+				}
 			},
 			GameEvent:class{
 				/**
@@ -43250,21 +43253,17 @@
 			//创建身份牌实例
 			identityCard:function(identity,position,info,noclick){
 				const card=ui.create.card(position,info,noclick);
-				card._customintro=function(uiintro){
-					uiintro.add(`${get.translation(identity+2)}的身份牌`);
-				}
+				card._customintro=uiintro=>uiintro.add(`${get.translation(`${identity}${2}`)}的身份牌`);
 				const fileName=`image/card/identity_${identity}.jpg`;
 				new Promise((resolve,reject)=>{
 					const image=new Image();
-					image.onload=()=>resolve();
+					image.onload=resolve;
 					image.onerror=reject;
 					image.src=`${lib.assetURL}${fileName}`;
 				}).then(()=>{
 					card.classList.add('fullskin');
 					card.node.image.setBackgroundImage(fileName);
-				}).catch(()=>{
-					card.node.background.innerHTML=get.translation(identity)[0];
-				});
+				},()=>card.node.background.innerHTML=get.translation(identity)[0]);
 				return card;
 			},
 			//让卡牌旋转
