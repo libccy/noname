@@ -6473,25 +6473,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.choosePlayerCard(trigger.player,true,'h');
 					}
 					'step 1'
-					var card=result.cards[0];
-					event.card=card;
-					var str=get.translation(player);
-					if(player!=trigger.player) str+=('对'+get.translation(trigger.player));
-					str+='发动了【忧恤】';
-					player.showCards(card,str);
-					player.chooseTarget('令一名角色获得'+get.translation(card),'若其体力值为全场最少，则其回复1点体力',function(card,player,target){
-						return target!=_status.event.getTrigger().player;
-					}).set('ai',function(target){
-						var player=_status.event.player,att=get.attitude(player,target);
-						if(att<0) return 0;
-						if(target.isDamaged()&&target.isMinHp&&get.recoverEffect(target,player,player)>0) return 4*att;
-						return att;
-					});
+					if(result.bool){
+						var card=result.cards[0];
+						event.card=card;
+						var str=get.translation(player);
+						if(player!=trigger.player) str+=('对'+get.translation(trigger.player));
+						str+='发动了【忧恤】';
+						player.showCards(card,str);
+						player.chooseTarget('令一名角色获得'+get.translation(card),'若其体力值为全场最少，则其回复1点体力',function(card,player,target){
+							return target!=_status.event.getTrigger().player;
+						}).set('ai',function(target){
+							var player=_status.event.player,att=get.attitude(player,target);
+							if(att<0) return 0;
+							if(target.isDamaged()&&target.isMinHp&&get.recoverEffect(target,player,player)>0) return 4*att;
+							return att;
+						});
+					}
+					else event.finish();
 					'step 2'
-					var target=result.targets[0];
-					event.target=target;
-					player.line(target,'green');
-					target.gain(card,trigger.player,'give').giver=player;
+					if(result.bool){
+						var target=result.targets[0];
+						event.target=target;
+						player.line(target,'green');
+						target.gain(card,trigger.player,'give').giver=player;
+					}
+					else event.finish();
 					'step 3'
 					if(target.isMinHp()) target.recover();
 				},
