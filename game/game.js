@@ -36836,13 +36836,22 @@
 			if(lib.skill.global.includes(skill)&&!lib.skill[skill].forceaudio) return;
 			if(typeof player=='string') player={name:player};
 		
-			function getAudioList(skill,player,history,fixedNum){
+			/**
+			 * 处理 audioInfo 外的参数
+			 * @param {String} skill  技能名 
+			 * @param {Object} player  角色
+			 * @param {Array} audioname  audioname历史
+			 * @param {Array} history  判断deadlock
+			 * @param {Number} fixedNum  [audioname, number] 中的第二个参数，用来限制语音数
+			 * @returns {Array} 音频地址数组（有需要playSkillAudio的为[skillname])
+			 */
+			function getAudioList(skill,player,audioname,history,fixedNum){
 				let info=lib.skill[skill];
 				if(!info) return [];
 				if(!history) history=[];
-				if(history.includes(skill)){//直接跳出
+				if(history.includes(skill)){//判断deadlock
 					console.trace(`${skill} in ${history} forms a deadlock`);
-					if(info.audio!==false) return [[skill]];//标记为playSkillAudio
+					if(info.audio!==false) return [[skill]];
 					return [];
 				}
 				history.push(skill);
@@ -36855,50 +36864,61 @@
 				}
 				if(typeof audioInfo=='function') audioInfo=audioInfo(player);
 				
-				let audioname='';
-				if(Array.isArray(info.audioname)&&player){
-					if(info.audioname.includes(player.name)) audioname=`_${player.name}`;
-					else if(info.audioname.includes(player.name1)) audioname=`_${player.name1}`;
-					else if(info.audioname.includes(player.name2)) audioname=`_${player.name2}`;
-				}
+				if(!audioname) audioname=[];
+				if(Array.isArray(info.audioname)) audioname.addArray(info.audioname);
 		
 				let audioList=parseAudio(skill,audioInfo,audioname,player,history,fixedNum);		
 				if(fixedNum&&fixedNum<audioList.length) audioList.length=fixedNum;
-				if(audioList.length) return audioList;//所有要的音频地址
-				if(info.audio!==false) return [[skill]];//标记为playSkillAudio
+				if(audioList.length) return audioList;
+				if(info.audio!==false) return [[skill]];
 				return [];
 			}
 		
+			/**
+			 * 分析 audioInfo 获取音频地址数组
+			 * @param {String} skill  技能名 
+			 * @param {any} audioInfo  info.audio
+			 * @param {Array} audioname  要判断的audioname
+			 * @param {Object} player  角色
+			 * @param {Array} history  判断deadlock
+			 * @param {Number} fixedNum  [audioname, number] 中的第二个参数，用来限制语音数
+			 * @returns {Array} 音频地址数组（有需要playSkillAudio的为[skillname])
+			 */
 			function parseAudio(skill,audioInfo,audioname,player,history,fixedNum){
 				if(Array.isArray(audioInfo)){
-					if(typeof audioInfo[1]=='number'/* ||(typeof audioInfo[1]=='string'&&/^\d*$/.test(audioInfo[1])) */){//['XXX',num]
-						if(lib.skill[audioInfo[0]]) return getAudioList(audioInfo[0],player,history,fixedNum||audioInfo[1]);
+					if(typeof audioInfo[0]=='string'&&typeof audioInfo[1]=='number'){// [audioname, number]
+						if(lib.skill[audioInfo[0]]) return getAudioList(audioInfo[0],player,audioname,history,fixedNum||audioInfo[1]);
 						return parseAudio(audioInfo[0],audioInfo[1],audioname,player,history,fixedNum||audioInfo[1]);
 					}
 					return audioInfo.reduce((total,i)=>total.addArray(parseAudio(skill,i,audioname,player,history,fixedNum)),[]);
 				}
-
+		
 				if(!['string','number','boolean'].includes(typeof audioInfo)) return [];
 				if(audioInfo===false) return [];
-				if(typeof audioInfo=='string'&&lib.skill[audioInfo]) return getAudioList(audioInfo,player,history,fixedNum);
-				audioInfo=String(audioInfo);
+				if(typeof audioInfo=='string'&&lib.skill[audioInfo]) return getAudioList(audioInfo,player,audioname,history,fixedNum);
 		
 				let audioList=[];
+				audioInfo=String(audioInfo);
 				let list=audioInfo.match(/(?:(.*):|^)(true|\d*)(?::(.*)|$)/);
 				if(list&&list[2]){
-					list=list.slice(1);//形如[路径,number/true,格式]的形式
-					if(list[1]=='true') audioList.add(`${list[0]||'skill'}/${skill}${audioname}.${list[2]||'mp3'}`);
+					let _audioname='';
+					if(audioname.includes(player.name)) _audioname=`_${player.name}`;
+					else if(audioname.includes(player.name1)) _audioname=`_${player.name1}`;
+					else if(audioname.includes(player.name2)) _audioname=`_${player.name2}`;
+		
+					list=list.slice(1);//[路径,number/true,格式]
+					if(list[1]=='true') audioList.add(`${list[0]||'skill'}/${skill}${_audioname}.${list[2]||'mp3'}`);
 					else{
 						list[1]=parseInt(list[1]);
 						for(let i=1;i<=list[1];i++){
-							audioList.add(`${list[0]||'skill'}/${skill}${audioname}${i}.${list[2]||'mp3'}`);
+							audioList.add(`${list[0]||'skill'}/${skill}${_audioname}${i}.${list[2]||'mp3'}`);
 						}
 					}
 				}
 				else audioList.add(`${/(?:^db:|^ext:|\/)/.test(audioInfo)?'':'skill/'}${audioInfo}`);
 				return audioList;
 			}
-
+		
 			let list=getAudioList(skill,player);
 			// console.log(skill,lib.skill[skill]&&lib.skill[skill].audio,list);
 			if(!list.length) return;
