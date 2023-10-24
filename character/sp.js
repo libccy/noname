@@ -1580,63 +1580,75 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						precontent:function(){
 							'step 0'
 							delete event.result.skill;
-							player.chooseButton([2,6],[
-								'将任意“缚豕”牌置入弃牌堆并摸等量的牌，并选择执行等量项',
+							player.chooseButton([2,Infinity],[
+								'###缚豕###<div class="text center">将任意“缚豕”牌置入弃牌堆并摸等量的牌，并选择执行等量项（超过三张默认全部执行）</div>',
 								player.getExpansions('olfushi'),
 								[['额外目标','伤害-1','伤害+1'],'tdnodes'],
 							]).set('filterOk',()=>{
 								if(!ui.selected.buttons.length) return false;
-								return ui.selected.buttons.filter(button=>typeof button.link=='string').length*2==ui.selected.buttons.length;
+								var controls=ui.selected.buttons.filter(button=>typeof button.link=='string');
+								var cards=ui.selected.buttons.filter(button=>typeof button.link=='object');
+								return Math.min(cards.length,3)==controls.length;
 							}).set('ai',function(button){
 								var player=_status.event.player;
-								var type=typeof button.link;
-								var trigger=_status.event.getParent();
+								var trigger=_status.event.getParent().result;
 								var targets=game.filterPlayer(target=>{
 									return !trigger.targets.contains(target)&&player.canUse(trigger.card,target);
 								});
 								var num1=targets.filter(target=>get.effect(target,trigger.card,player,player)>0).length;
 								var num2=targets.length-num1;
-								if(type=='string'){
-									var list;
-									var num3=player.getExpansions('olfushi').length;
-									if((num1>0&&num2>0)||(num1==0&&num2==0)){
-										switch(num3){
-											case 1:
-												list=[['额外目标','伤害+1'].randomGet()];
-												break;
-											case 2:
-												list=[['额外目标','伤害+1'].randomGet(),'伤害-1'];
-												break;
-											default:
-												list=['额外目标','伤害-1','伤害+1'];
-												break;
-										}
+								var list;
+								var num3=player.getExpansions('olfushi').length;
+								if((num1>0&&num2>0)||(num1==0&&num2==0)){
+									switch(num3){
+										case 1:
+											list=[['额外目标','伤害+1'].randomGet()];
+											break;
+										case 2:
+											list=[['额外目标','伤害+1'].randomGet(),'伤害-1'];
+											break;
+										default:
+											list=['额外目标','伤害-1','伤害+1'];
+											break;
 									}
-									else if(num1==0){
-										switch(num3){
-											case 1:
-												list=['伤害+1'];
-												break;
-											case 2:
-												list=['额外目标','伤害+1'];
-												break;
-											default:
-												list=['额外目标','伤害-1','伤害+1'];
-												break;
-										}
-									}
-									else if(num2==0){
-										list=['伤害+1','伤害-1'];
-									}
-									if(list.contains(button.link)) return 114514;
-									return 0;
 								}
-								else return 1/(get.value(button.link)||0.5);
+								else if(num2==0){
+									switch(num3){
+										case 1:
+											list=['伤害+1'];
+											break;
+										case 2:
+											list=['额外目标','伤害+1'];
+											break;
+										default:
+											list=['额外目标','伤害-1','伤害+1'];
+											break;
+									}
+								}
+								else if(num1==0){
+									switch(num3){
+										case 1:
+											list=['伤害-1'];
+											break;
+										default:
+											list=['伤害-1','伤害+1'];
+											break;
+									}
+								}
+								if(typeof button.link=='string'){
+									if(list.contains(button.link)) return 114514;
+									return -1;
+								}
+								else{
+									var cards=ui.selected.buttons.filter(button=>typeof button.link=='object');
+									if(list.length==3||cards.length<list.length) return 1/(get.value(button.link)||0.5);
+									return -1;
+								}
 							});
 							'step 1'
 							if(result.bool){
 								var controls=result.links.filter(button=>typeof button=='string');
-								var cards=result.links.filter(button=>!controls.contains(button));
+								var cards=result.links.filter(button=>typeof button=='object');
 								player.logSkill('olfushi');
 								player.recast(cards);
 								event.result.card.olfushi_buff=controls;
@@ -1649,8 +1661,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 						order:function(item,player){
-							if(player.getExpansions('olfushi').length>2) return 7;
-							return 1;
+							return get.order({name:'sha'})+0.1;
 						},
 						ai:{
 							respondSha:true,
