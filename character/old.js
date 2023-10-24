@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			old:{
 				old_standard:['ol_yuanshu'],
-				old_shenhua:['old_caocao',"yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","old_xiaoqiao","pangde","xuhuang",'junk_sunquan',"huangzhong","new_caoren",'old_chendao'],
+				old_shenhua:['old_shen_zhaoyun','old_caocao',"yuji","zhangjiao","old_zhugezhan","old_guanqiujian","xiahouyuan","weiyan","old_xiaoqiao","pangde","xuhuang",'junk_sunquan',"huangzhong","new_caoren",'old_chendao'],
 				old_refresh:["old_zhangfei","old_huatuo","old_zhaoyun","ol_huaxiong",'old_re_lidian','old_guanyu'],
 				old_yijiang1:["masu","xushu","xin_yujin","old_xusheng","old_lingtong","fazheng",'old_gaoshun','re_yujin'],
 				old_yijiang2:["old_zhonghui","madai",'old_handang','old_liubiao','oldre_liubiao','old_guanzhang','old_wangyi'],
@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			old_shen_zhaoyun:['male','shen',2,['oldjuejing','oldlonghun'],['shu']],
 			old_guanyinping:['female','shu',3,['xueji_old','oldhuxiao','oldwuji']],
 			old_caocao:['male','shen',3,['junkguixin','feiying'],['die_audio']],
 			old_chendao:['male','shu',4,['drlt_wanglie']],
@@ -85,6 +86,69 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_yujin:['male','wei',4,['yizhong']],
 		},
 		skill:{
+			//山包初版神赵
+			oldjuejing:{
+				audio:'xinjuejing',
+				trigger:{player:'phaseDrawBegin2'},
+				filter:function(event,player){
+					return !event.numFixed&&player.getHp()<player.maxHp;
+				},
+				forced:true,
+				content:function(){
+					trigger.num+=(player.getDamagedHp());
+				},
+				mod:{
+					maxHandcard:(player,num)=>num+2,
+				},
+			},
+			oldlonghun:{
+				audio:'relonghun',
+				inherit:'xinlonghun',
+				prompt:()=>`将${get.cnNumber(Math.max(1,get.player().getHp()))}张♦牌当做杀，♥牌当做桃，♣牌当做闪，♠牌当做无懈可击使用或打出`,
+				selectCard:()=>Math.max(1,get.player().getHp()),
+				complexCard:true,
+				precontent:function(){
+					delete event.result.skill;
+					player.logSkill('oldlonghun');
+				},
+				ai:{
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter:function(player,tag){
+						var name;
+						switch(tag){
+							case 'respondSha':name='diamond';break;
+							case 'respondShan':name='club';break;
+							case 'save':name='heart';break;
+						}
+						if(!player.countCards('hes',{suit:name})) return false;
+					},
+					order:function(item,player){
+						if(player&&_status.event.type=='phase'){
+							var max=0;
+							var list=['sha','tao'];
+							var map={sha:'diamond',tao:'heart'}
+							for(var i=0;i<list.length;i++){
+								var name=list[i];
+								if(player.countCards('hes',function(card){
+									return (name!='sha'||get.value(card)<5)&&get.suit(card,player)==map[name];
+								})>=Math.max(1,player.getHp())&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
+									var temp=get.order({name:name,nature:name=='sha'?'fire':null});
+									if(temp>max) max=temp;
+								}
+							}
+							max/=1.1;
+							return max;
+						}
+						return 2;
+					},
+				},
+				hiddenCard:function(player,name){
+					if(name=='wuxie'&&_status.connectMode&&player.countCards('hes')>0) return true;
+					if(name=='wuxie') return player.countCards('hes',{suit:'spade'})>=Math.max(1,get.player().getHp());
+					if(name=='tao') return player.countCards('hes',{suit:'heart'})>=Math.max(1,get.player().getHp());
+				},
+			},
 			//魏武帝
 			junkguixin:{
 				init:function(){
@@ -1142,6 +1206,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_caochun_prefix:'旧',
 			old_guanyinping:'旧关银屏',
 			old_guanyinping_prefix:'旧',
+			old_shen_zhaoyun:'旧神赵云',
+			old_shen_zhaoyun_prefix:'旧神',
+			oldjuejing:'绝境',
+			oldjuejing_info:'锁定技。①摸牌阶段，你令额定摸牌数+X（X为你已损失的体力值）。②你的手牌上限+2。',
+			oldlonghun:'龙魂',
+			oldlonghun_info:'你可以将花色相同的Y张牌按下列规则使用或打出：♥当【桃】，♦当火【杀】，♣当【闪】，♠当普【无懈可击】（Y为你的体力值且至少为1）。',
 			
 			old_standard:'标准包',
 			old_shenhua:'神话再临',
