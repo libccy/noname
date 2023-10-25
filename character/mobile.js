@@ -11179,10 +11179,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('zhongzuo'),'令一名角色摸两张牌。若其已受伤，则你摸一张牌。').set('ai',function(target){
-						if(target.hasSkillTag('nogain')&&target!=_status.currentPhase) return target.isDamaged()?0:1;
-						var att=get.attitude(_status.event.player,target);
-						if(target.isDamaged()) att=att*1.2;
-						return att;
+						if(target.hasSkillTag('nogain')) return target.isDamaged()?0:1;
+						let att=get.attitude(_status.event.player,target);
+						if(att<=0) return 0;
+						if(target.isDamaged()) return 1+att/5;
+						return att/5;
 					});
 					'step 1'
 					if(result.bool){
