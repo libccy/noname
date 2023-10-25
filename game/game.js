@@ -15510,6 +15510,7 @@
 									next.set('ai',info.chooseButton.check||function(){return 1;});
 									next.set('filterButton',info.chooseButton.filter||function(){return true;});
 									next.set('selectButton',info.chooseButton.select||1);
+									next.set('filterOk',info.chooseButton.filterOk||(()=>true));
 									if(event.id) next._parent_id=event.id;
 									next.type='chooseToUse_button';
 								}
@@ -15693,6 +15694,7 @@
 									next.set('ai',info.chooseButton.check||function(){return 1;});
 									next.set('filterButton',info.chooseButton.filter||function(){return true;});
 									next.set('selectButton',info.chooseButton.select||1);
+									next.set('filterOk',info.chooseButton.filterOk||(()=>true));
 								}
 								event.buttoned=event.result.skill;
 							}
