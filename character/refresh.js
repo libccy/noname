@@ -935,6 +935,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var skills=player.additionalSkills['relinglong'];
 					return (skills&&skills.length>0)!=player.hasEmptySlot(5);
 				},
+				direct:true,
 				content:function(){
 					player.removeAdditionalSkill('relinglong');
 					if(player.hasEmptySlot(5)){
@@ -6206,7 +6207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//界曹彰
 			xinjiangchi:{
-				audio:'new_jiangchi',
+				audio:2,
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				content:function(){
