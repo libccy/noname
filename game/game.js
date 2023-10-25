@@ -36835,7 +36835,7 @@
 		*/
 		parseSkillAudio:function(skill,player){
 			if(typeof player=='string') player={name:player};
-			else player={};
+			else if(get.itemtype(player)!='player') player={};
 		
 			/**
 				* 处理 audioInfo 外的参数
