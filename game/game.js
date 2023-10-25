@@ -43274,6 +43274,7 @@
 			//创建身份牌实例
 			identityCard:function(identity,position,info,noclick){
 				const card=ui.create.card(position,info,noclick);
+				card.classList.add('button');
 				card._customintro=uiintro=>uiintro.add(`${get.translation(`${identity}${2}`)}的身份牌`);
 				const fileName=`image/card/identity_${identity}.jpg`;
 				new Promise((resolve,reject)=>{
