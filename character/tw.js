@@ -14036,6 +14036,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_caocao:['tw_caocao','jsrg_caocao','yj_caocao'],
 			mateng:['tw_mateng','mateng'],
 			xiahouen:['tw_xiahouen','jsrg_xiahouen'],
+			jiangji:['tw_jiangji','jiangji'],
+			baoxin:['tw_baoxin','baoxin'],
+			yanxiang:['yanxiang','tw_yanxiang'],
 		},
 		dynamicTranslate:{
 			twfeifu:function(player){
@@ -14500,7 +14503,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_liwei_prefix:'TW',
 			twjiaohua:'教化',
 			twjiaohua_info:'当你或体力值最小的其他角色因摸牌而得到牌后，你可以令该角色从牌堆或弃牌堆中获得一张本次未获得的类别的牌（每种类别每回合限一次）。',
-			tw_yanxiang:'阎象',
+			tw_yanxiang:'TW阎象',
+			tw_yanxiang_prefix:'TW',
 			twkujian:'苦谏',
 			twkujianx:'谏',
 			twkujian_info:'出牌阶段限一次。你可以将至多三张手牌交给一名其他角色，称为“谏”，你获得以下效果：当其他角色使用或打出牌后，若其中有“谏”，你与其各摸一张牌；当其他角色不因使用或打出而失去牌后，若其中有“谏”，你与其各弃置一张牌。',

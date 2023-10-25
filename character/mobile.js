@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:['xin_wuban','laimin','baoxin','jiangji','liwei','xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
+				mobile_default:['yanxiang','xin_wuban','laimin','baoxin','jiangji','liwei','xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan','yj_zhoubuyi'],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua_feng:['re_xiaoqiao',"xin_zhoutai"],
@@ -26,6 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			yanxiang:['male','qun',3,['kujian','twruilian'],['character:tw_yanxiang','die_audio:tw_yanxiang']],
 			mb_sunluyu:['female','wu',3,['mbmeibu','mbmumu']],
 			xin_wuban:['male','shu',4,['xinjintao'],['clan:陈留吴氏','character:wuban']],
 			baoxin:['male','qun',4,['mutao','yimou'],['character:tw_baoxin','die_audio:tw_baoxin']],
@@ -387,6 +388,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//阎象
+			kujian:{
+				audio:'twkujian',
+				inherit:'twkujian',
+				selectCard:[1,2],
+				content:function(){
+					player.give(cards,target).gaintag.add('twkujianx');
+					player.addSkill('kujian_draw');
+					player.addSkill('twkujian_discard');
+				},
+				subSkill:{
+					draw:{
+						charlotte:true,
+						audio:'twkujian',
+						trigger:{global:['useCardAfter','respondAfter']},
+						filter:function(event,player){
+							return event.player.hasHistory('lose',evt=>{
+								if(event!=evt.getParent()) return false;
+								for(var i in evt.gaintag_map){
+									if(evt.gaintag_map[i].contains('twkujianx')) return true;
+								}
+							});
+						},
+						forced:true,
+						logTarget:'player',
+						content:function(){
+							'step 0'
+							game.asyncDraw([player,trigger.player],2);
+							'step 1'
+							game.delayx();
+						},
+					},
+				},
+			},
 			//手杀差异化孙鲁育
 			mbmumu:{
 				audio:'mumu',
@@ -1086,14 +1121,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var suit=result.control;
+					event.suit=suit;
 					player.chat(get.translation(suit+2));
 					game.log(player,'选择了','#y'+get.translation(suit+2));
+					if(target.countCards('e',{suit:suit})) player.gain(target.getCards('e',{suit:suit}),target,'giveAuto');
+					'step 4'
+					var suit=event.suit;
+					if(target.countCards('h',{suit:suit})){
+						player.chooseButton(['选择获得其中一张牌',target.getCards('e',{suit:suit})],true).set('ai',button=>get.value(button.link));
+					}
+					else event.goto(6);
+					'step 5'
+					if(result.bool){
+						var card=result.links[0];
+						if(lib.filter.canBeGained(card,player,target)) player.gain(card,target,'giveAuto','bySelf');
+						else game.log('但',card,'不能被',player,'获得！');
+					}
+					'step 6'
+					var suit=event.suit;
 					player.storage.yichong=suit;
 					player.markSkill('yichong');
 					game.broadcastAll(function(player,suit){
 						if(player.marks.yichong) player.marks.yichong.firstChild.innerHTML=get.translation(suit);
 					},player,suit);
-					if(target.countCards('he',{suit:suit})) player.gain(target.getCards('he',{suit:suit}),target,'giveAuto');
 					game.countPlayer(function(current){
 						current.removeSkill('yichong_'+player.playerid);
 						if(current==target) target.addSkill('yichong_'+player.playerid);
@@ -15395,7 +15445,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_guozhao:'手杀郭照',
 			xin_guozhao_prefix:'手杀',
 			yichong:'易宠',
-			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”得到一张牌）。',
+			yichong_info:'①准备阶段，你可以选择一名其他角色并选择一个花色，然后你获得其所有此花色的装备牌和其一张此花色的手牌，移除场上的所有“雀”标记，令其获得“雀”标记直到你的下个回合开始。②拥有“雀”标记的角色获得你最后一次发动〖易宠①〗选择的花色的牌后，你获得这些牌（你至多通过每个“雀”得到一张牌）。',
 			wufei:'诬诽',
 			wufei_info:'若场上存在拥有“雀”标记的角色A，则：①当你使用【杀】或伤害类锦囊牌指定第一个目标后，你令A成为此牌伤害来源。②当你受到伤害后，若A的体力值大于3，则你可以令A受到1点无来源伤害。',
 			yj_zhoubuyi:'☆周不疑',
@@ -15466,6 +15516,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbmeibu_info:'其他角色的出牌阶段开始时，若你在其攻击范围内，你可以弃置一张牌，令该角色于本回合内获得〖止息〗。若你以此法弃置的牌不是【杀】或黑色锦囊牌，则本回合其与你的距离视为1。',
 			mbzhixi:'止息',
 			mbzhixi_info:'锁定技。出牌阶段，若你于此阶段使用过的牌数不小于X，你不能使用牌（X为你的体力值）；当你使用锦囊牌时，你结束此阶段。',
+			yanxiang:'阎象',
+			kujian:'苦谏',
+			kujian_info:'出牌阶段限一次，你可以将至多两张手牌称为“谏”并交给一名其他角色，然后你获得以下效果：当其他角色使用或打出牌后，若其中有“谏”，你与其各摸两张牌；当其他角色不因使用或打出而失去牌后，若其中有“谏”，你与其各弃置一张牌。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',

@@ -2446,7 +2446,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterReplace:{
-			wuban:['clan_wuban','dc_wuban','wuban'],
+			wuban:['clan_wuban','dc_wuban','wuban','xin_wuban'],
 		},
 		characterIntro:{
 			xunshu:'荀淑（83年～149年），字季和，为郎陵侯相，颍川颍阴人（今河南省许昌市）人。汉和帝至汉桓帝时人物，以品行高洁著称。有子八人，号八龙。年轻时有高尚的德行，学问渊博，不喜欢雕章琢句，徒在文字上用功，不注重实际的学识。因此，常常被俗儒看不起。但州里却称他有知人之明。安帝时，征召任为郎中，后来再升当涂长。离职还乡里。他的孙子荀彧是曹操部下著名的谋士。',
