@@ -11669,9 +11669,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.getParent().name=='sha';
 				},
-				check:function(event,player){
-					return player.isDamaged();
-				},
 				content:function(){
 					'step 0'
 					player.judge(function(card){
@@ -11718,14 +11715,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.chooseToDiscard('he',function(card,player){
 						return card!=player.getEquip('pyzhuren_diamond');
 					},get.prompt(event.name,trigger.player),'弃置一张牌，令即将对其造成的伤害+1');
+					next.set('target',trigger.player);
 					next.ai=function(card){
-						if(_status.event.goon) return 6-get.value(card);
+						if(_status.event.goon) return 30/(1+_status.event.target.hp)-get.value(card);
 						return -1;
 					};
 					next.set('goon',get.attitude(player,trigger.player)<0&&!trigger.player.hasSkillTag('filterDamage',null,{
 						player:player,
 						card:trigger.card,
-					}));
+					})&&get.damageEffect(trigger.player,player,player,trigger.nature)>0);
 					next.logSkill=[event.name,trigger.player];
 					'step 1'
 					if(result.bool) trigger.num++;
@@ -11801,10 +11799,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					jueqing:true,
 					unequip_ai:true,
 					skillTagFilter:function(player,tag,arg){
-						if(tag=='unequip_ai'){
-							if(arg&&arg.name=='sha'&&get.color(arg.card)=='black') return true;
-							return false;
-						}
+						if(tag=='unequip_ai') return arg&&arg.name==='sha;
 					}
 				},
 			},
