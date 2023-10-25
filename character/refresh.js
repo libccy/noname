@@ -72,7 +72,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_lingtong:['male','wu',4,['decadexuanfeng','yongjin']],
 			xin_liubiao:['male','qun',3,['decadezishou','decadezongshi']],
 			re_caoxiu:['male','wei',4,['qianju','reqingxi']],
-			re_sunxiu:['male','wu',3,['reyanzhu','rexingxue','xinzhaofu'],['zhu']],
+			re_sunxiu:['male','wu',3,['reyanzhu','rexingxue','zhaofu'],['zhu']],
 			ol_dengai:['male','wei',4,['oltuntian','olzaoxian']],
 			re_gongsunzan:['male','qun',4,['reqiaomeng','reyicong']],
 			re_manchong:['male','wei',3,['rejunxing','yuce']],
