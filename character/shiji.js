@@ -3331,16 +3331,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(_status.luanchou_judging) return;
-							_status.luanchou_judging=true;
 							if(get.tag(card,'damage')&&target.hasMark('luanchou')){
 								var other=game.findPlayer(function(current){
 									return current!=target&&current.hasMark('luanchou')&&current.hp>target.hp&&(!current.storage.counttrigger||!current.storage.counttrigger.gonghuan);
 								});
-								if(!other){
-									delete _status.luanchou_judging;
-									return;
-								};
-								var eff=[0,0,0,get.damageEffect(other,player,target,get.nature(card))];
+								if(!other) return;
+								_status.luanchou_judging=true;
+								var eff=[0,0,0,get.damageEffect(other,player,player,get.nature(card))/get.attitude(player,player)];
 								delete _status.luanchou_judging;
 								return eff;
 							}
