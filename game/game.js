@@ -36827,24 +36827,25 @@
 			});
 			return audio;
 		},
-		trySkillAudio:function(skill,player,directaudio,nobroadcast/*,index*/){
-			if(!nobroadcast) game.broadcast(game.trySkillAudio,skill,player,directaudio,nobroadcast/*,index*/);
-			var info=get.info(skill);
-			if(!info) return;
-			if(!lib.config.background_speak) return;
-			if(info.direct&&!directaudio) return;
-			if(lib.skill.global.includes(skill)&&!lib.skill[skill].forceaudio) return;
+		/**
+		* 根据skill中的audio,audioname,audioname2和player来获取音频地址列表
+		* @param {String} skill  技能名 
+		* @param {Player|String} player  角色/角色名
+		* @returns {Array} 分析完的语音地址列表
+		*/
+		parseSkillAudio:function(skill,player){
 			if(typeof player=='string') player={name:player};
+			else player={};
 		
 			/**
-			 * 处理 audioInfo 外的参数
-			 * @param {String} skill  技能名 
-			 * @param {Object} player  角色
-			 * @param {Array} audioname  audioname历史
-			 * @param {Array} history  判断deadlock
-			 * @param {Number} fixedNum  [audioname, number] 中的第二个参数，用来限制语音数
-			 * @returns {Array} 音频地址数组（有需要playSkillAudio的为[skillname])
-			 */
+				* 处理 audioInfo 外的参数
+				* @param {String} skill  技能名 
+				* @param {Object} player  角色
+				* @param {Array} audioname  audioname历史
+				* @param {Array} history  判断deadlock
+				* @param {Number} fixedNum  [audioname, number] 中的第二个参数，用来限制语音数
+				* @returns {Array} 音频地址数组（有需要playSkillAudio的为[skillname])
+				*/
 			function getAudioList(skill,player,audioname,history,fixedNum){
 				let info=lib.skill[skill];
 				if(!info) return [];
@@ -36857,7 +36858,7 @@
 				history.push(skill);
 		
 				let audioInfo=info.audio;
-				if(info.audioname2&&player){
+				if(info.audioname2){
 					if(info.audioname2[player.name]) audioInfo=info.audioname2[player.name];
 					else if(info.audioname2[player.name1]) audioInfo=info.audioname2[player.name1];
 					else if(info.audioname2[player.name2]) audioInfo=info.audioname2[player.name2];
@@ -36875,15 +36876,15 @@
 			}
 		
 			/**
-			 * 分析 audioInfo 获取音频地址数组
-			 * @param {String} skill  技能名 
-			 * @param {any} audioInfo  info.audio
-			 * @param {Array} audioname  要判断的audioname
-			 * @param {Object} player  角色
-			 * @param {Array} history  判断deadlock
-			 * @param {Number} fixedNum  [audioname, number] 中的第二个参数，用来限制语音数
-			 * @returns {Array} 音频地址数组（有需要playSkillAudio的为[skillname])
-			 */
+				* 分析 audioInfo 获取音频地址数组
+				* @param {String} skill  技能名 
+				* @param {any} audioInfo  info.audio
+				* @param {Array} audioname  要判断的audioname
+				* @param {Object} player  角色
+				* @param {Array} history  判断deadlock
+				* @param {Number} fixedNum  [audioname, number] 中的第二个参数，用来限制语音数
+				* @returns {Array} 音频地址数组（有需要playSkillAudio的为[skillname])
+				*/
 			function parseAudio(skill,audioInfo,audioname,player,history,fixedNum){
 				if(Array.isArray(audioInfo)){
 					if(typeof audioInfo[0]=='string'&&typeof audioInfo[1]=='number'){// [audioname, number]
@@ -36919,8 +36920,17 @@
 				return audioList;
 			}
 		
-			let list=getAudioList(skill,player);
-			// console.log(skill,lib.skill[skill]&&lib.skill[skill].audio,list);
+			return getAudioList(skill,player);
+		},
+		trySkillAudio:function(skill,player,directaudio,nobroadcast/*,index*/){
+			if(!nobroadcast) game.broadcast(game.trySkillAudio,skill,player,directaudio,nobroadcast/*,index*/);
+			var info=get.info(skill);
+			if(!info) return;
+			if(!lib.config.background_speak) return;
+			if(info.direct&&!directaudio) return;
+			if(lib.skill.global.includes(skill)&&!lib.skill[skill].forceaudio) return;
+		
+			let list=game.parseSkillAudio(skill,player);
 			if(!list.length) return;
 			// if(index) index=index%list.length||list.length;
 			// let audio=list[index?index-1:Math.floor(Math.random()*list.length)];
