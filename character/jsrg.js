@@ -718,7 +718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=map.player,trigger=map.trigger;
 					var count=Math.ceil(game.countPlayer()/2);
 					var result=yield player.chooseTarget(`伏匿：请选择至多${get.cnNumber(count)}名角色`,`令这些角色获得共计${get.cnNumber(count)}张【影】`,true,[1,count]).set('ai',target=>{
-						return get.attitude(get.player(),target);
+						return get.attitude(get.player(),target)+get.event().getRand(target.playerid);
 					});
 					if(result.bool){
 						var targets=result.targets.slice().sortBySeat(_status.currentPhase);
@@ -1189,8 +1189,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:6,
 					result:{
 						target:function(player,target){
-							var val=player.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c);
-							var val2=target.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c);
+							var val=player.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c,0);
+							var val2=target.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c,0);
 							return val-val2;
 						}
 					}
