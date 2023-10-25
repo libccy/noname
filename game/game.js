@@ -36831,7 +36831,7 @@
 		* 根据skill中的audio,audioname,audioname2和player来获取音频地址列表
 		* @param {String} skill  技能名 
 		* @param {Player|String} player  角色/角色名
-		* @returns {Array} 分析完的语音地址列表
+		* @returns {Array<string|[string]>} 分析完的语音地址列表
 		*/
 		parseSkillAudio:function(skill,player){
 			if(typeof player=='string') player={name:player};
@@ -36840,11 +36840,11 @@
 			/**
 				* 处理 audioInfo 外的参数
 				* @param {String} skill  技能名 
-				* @param {Object} player  角色
-				* @param {Array} audioname  audioname历史
-				* @param {Array} history  判断deadlock
+				* @param {Player|{name:string}} player  角色
+				* @param {Array<string>} audioname  audioname历史
+				* @param {Array<string>} history  判断deadlock
 				* @param {Number} fixedNum  [audioname, number] 中的第二个参数，用来限制语音数
-				* @returns {Array} 音频地址数组（有需要playSkillAudio的为[skillname])
+				* @returns {Array<string|[string]>} 音频地址数组（有需要playSkillAudio的为[skillname])
 				*/
 			function getAudioList(skill,player,audioname,history,fixedNum){
 				let info=lib.skill[skill];
@@ -36879,11 +36879,11 @@
 				* 分析 audioInfo 获取音频地址数组
 				* @param {String} skill  技能名 
 				* @param {any} audioInfo  info.audio
-				* @param {Array} audioname  要判断的audioname
-				* @param {Object} player  角色
-				* @param {Array} history  判断deadlock
+				* @param {Array<string>} audioname  要判断的audioname
+				* @param {Player|{name:string}} player  角色
+				* @param {Array<string>} history  判断deadlock
 				* @param {Number} fixedNum  [audioname, number] 中的第二个参数，用来限制语音数
-				* @returns {Array} 音频地址数组（有需要playSkillAudio的为[skillname])
+				* @returns {Array<string|[string]>} 音频地址数组（有需要playSkillAudio的为[skillname])
 				*/
 			function parseAudio(skill,audioInfo,audioname,player,history,fixedNum){
 				if(Array.isArray(audioInfo)){
