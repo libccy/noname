@@ -1128,7 +1128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					var suit=event.suit;
 					if(target.countCards('h',{suit:suit})){
-						player.chooseButton(['选择获得其中一张牌',target.getCards('e',{suit:suit})],true).set('ai',button=>get.value(button.link));
+						player.chooseButton(['选择获得其中一张牌',target.getCards('h',{suit:suit})],true).set('ai',button=>get.value(button.link));
 					}
 					else event.goto(5);
 					'step 4'
