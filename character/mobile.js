@@ -1125,19 +1125,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chat(get.translation(suit+2));
 					game.log(player,'选择了','#y'+get.translation(suit+2));
 					if(target.countCards('e',{suit:suit})) player.gain(target.getCards('e',{suit:suit}),target,'giveAuto');
-					'step 4'
+					'step 3'
 					var suit=event.suit;
 					if(target.countCards('h',{suit:suit})){
 						player.chooseButton(['选择获得其中一张牌',target.getCards('e',{suit:suit})],true).set('ai',button=>get.value(button.link));
 					}
-					else event.goto(6);
-					'step 5'
+					else event.goto(5);
+					'step 4'
 					if(result.bool){
 						var card=result.links[0];
 						if(lib.filter.canBeGained(card,player,target)) player.gain(card,target,'giveAuto','bySelf');
 						else game.log('但',card,'不能被',player,'获得！');
 					}
-					'step 6'
+					'step 5'
 					var suit=event.suit;
 					player.storage.yichong=suit;
 					player.markSkill('yichong');
