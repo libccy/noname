@@ -5742,7 +5742,7 @@
 						name:'游戏人数',
 						init:'8',
 						get item(){
-							const minimumNumberOfPlayers=3,maximumNumberOfPlayers=Math.max(_status.maximumNumberOfPlayers||10,minimumNumberOfPlayers),item={};
+							const minimumNumberOfPlayers=2,maximumNumberOfPlayers=Math.max(_status.maximumNumberOfPlayers||12,minimumNumberOfPlayers),item={};
 							for(let playerNumber=minimumNumberOfPlayers;playerNumber<=maximumNumberOfPlayers;playerNumber++){
 								item[playerNumber]=`${get.cnNumber(playerNumber)}人`;
 							}
@@ -23172,6 +23172,11 @@
 					}
 					return list;
 				}
+				/**
+				 * @param {string} [arg1='h']
+				 * @param {string | Record<string, any> | (card: Card) => boolean} [arg2]
+				 * @returns {Card[]}
+				 */
 				getCards(arg1,arg2){
 					if(typeof arg1!='string'){
 						arg1='h';
@@ -30585,7 +30590,7 @@
 							else Object.defineProperty(this,key,propertyDescriptor);
 						});
 						if(Array.isArray(numberOrCards)){
-							const noCards=!('cards' in this);
+							const noCards=!this.cards;
 							/**
 							 * @type {Card[]}
 							 */
@@ -30593,8 +30598,8 @@
 							if(noCards){
 								if(!lib.suits.includes(this.suit)) this.suit=get.suit(this);
 								if(!Object.keys(lib.color).includes(this.color)) this.color=get.color(this);
-								if(!('number' in this)) this.number=get.number(this);
-								if(!('nature' in this)) this.nature=get.nature(this);
+								if(typeof this.number!='number') this.number=get.number(this);
+								if(!this.nature) this.nature=get.nature(this);
 							}
 						}
 						const info=get.info(this,false);
@@ -30607,9 +30612,8 @@
 					if(typeof numberOrCards=='number') this.number=numberOrCards;
 					if(typeof name=='string') this.name=name;
 					if(typeof nature=='string') this.nature=nature;
-					if('suit' in this&&!('color' in this)) this.color=get.color(this);
-					if(!('storage' in this)) this.storage={};
-					if(!('cards' in this)) this.cards=[];
+					if(!this.storage) this.storage={};
+					if(!this.cards) this.cards=[];
 				}
 				sameSuitAs(card){
 					return get.suit(this)==get.suit(card);
@@ -31537,7 +31541,6 @@
 					return this;
 				}
 				/**
-				 * @throws {'Do not call this method'}
 				 * @returns {never}
 				 */
 				typeAnnotation(){
@@ -31613,7 +31616,7 @@
 					 * @type {boolean}
 					 */
 					this.unreal;
-					throw 'Do not call this method';
+					throw new Error('Do not call this method');
 				}
 			},
 			Dialog:class extends HTMLDivElement{
@@ -32899,7 +32902,7 @@
 					},
 					directHit_ai:true,
 					skillTagFilter:(player,tag,arg)=>{
-						const card=arg.card;
+						const card=get.autoViewAs(arg.card);
 						if(card.name!='sha'||!card.storage.stratagem_buffed) return false;
 						const target=arg.target;
 						if(target.countCards('h','shan')>=1&&!target.storage.stratagem_fury) return false;
@@ -56121,22 +56124,21 @@
 					const skillInformation=get.info(gameEvent.skill),viewAs=skillInformation.viewAs;
 					if(typeof viewAs=='function'){
 						const viewedAs=viewAs(result.cards,gameEvent.player);
-						if(viewedAs){
-							viewedAs.cards=result.cards;
-							result.card=get.autoViewAs(viewedAs);
+						if(viewedAs) result.card=get.autoViewAs(viewedAs);
+					}
+					else if(viewAs) result.card=get.autoViewAs(viewAs);
+					const resultCard=result.card;
+					if(resultCard){
+						const cards=result.cards;
+						if(cards.length==1){
+							const firstCard=cards[0];
+							if(!resultCard.suit) resultCard.suit=get.suit(firstCard);
+							if(!resultCard.number) resultCard.number=get.number(firstCard);
 						}
 					}
-					else if(viewAs){
-						viewAs.cards=result.cards;
-						result.card=get.autoViewAs(viewAs);
-					}
-					if(gameEvent.skillDialog&&get.objtype(gameEvent.skillDialog)=='div'){
-						gameEvent.skillDialog.close();
-					}
-					var cards=gameEvent.player.getCards('hej');
-					for(var i=0;i<cards.length;i++){
-						cards[i].recheck('useSkill');
-					}
+					const skillDialog=gameEvent.skillDialog;
+					if(skillDialog&&get.objtype(skillDialog)=='div') skillDialog.close();
+					gameEvent.player.getCards('hej').forEach(card=>card.recheck('useSkill'));
 					gameEvent.restore();
 				}
 				else if(['chooseToUse','chooseToRespond'].includes(gameEvent.name)) result.card=get.autoViewAs(result.cards[0]);
@@ -62616,7 +62618,7 @@
 				}
 			}
 		},
-		get
+		get:get
 	};
 	/**
 	 * @template T
