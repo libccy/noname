@@ -11184,10 +11184,10 @@
 				}
 			},
 			layout:function(layout,nosave){
-				const previousTransitionDuration=document.documentElement.style.transitionDuration;
-				document.documentElement.style.transitionDuration='1s';
-				const previousFilter=document.documentElement.style.filter,previousWebkitFilter=document.documentElement.style.webkitFilter;
-				document.documentElement.style.filter=document.documentElement.style.webkitFilter='brightness(0)';
+				const loadingScreen=ui.create.div('.loading-screen',document.body),loadingScreenStyle=loadingScreen.style;
+				loadingScreenStyle.animationDuration='1s';
+				loadingScreenStyle.animationFillMode='forwards';
+				loadingScreenStyle.animationName='opacity-0-1';
 				if(layout=='default') layout='mobile';
 				if(!nosave) game.saveConfig('layout',layout);
 				game.layout=layout;
@@ -11298,14 +11298,8 @@
 					return new Promise(resolve=>setTimeout(resolve,500));
 				}).then(()=>{
 					ui.updatec();
-					if(previousFilter) document.documentElement.style.filter=previousFilter;
-					else document.documentElement.style.removeProperty('filter');
-					if(previousWebkitFilter) document.documentElement.style.webkitFilter=previousWebkitFilter;
-					else document.documentElement.style.removeProperty('-webkit-filter');
-					return new Promise(resolve=>setTimeout(resolve,1000));
-				}).then(()=>{
-					if(previousTransitionDuration) document.documentElement.style.transitionDuration=previousTransitionDuration;
-					else document.documentElement.style.removeProperty('transition-duration');
+					loadingScreenStyle.animationName='opacity-1-0';
+					loadingScreen.addEventListener('animationend',animationEvent=>animationEvent.target.remove());
 				});
 			},
 			background:function(){
