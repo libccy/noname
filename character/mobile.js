@@ -941,6 +941,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.damage('nosource');
 					'step 1'
 					if(game.countPlayer()<2) event.finish();
+					if(game.countPlayer()==2) event._result={bool:true,targets:[game.findPlayer(i=>i!=player),player]};
 					else player.chooseTarget(`慧夭：请选择两名角色`,`令不为你的第一名角色视为对第二名角色造成过1点伤害。`,(card,player,target)=>{
 						if(!ui.selected.targets.length) return player!=target;
 						return true;
@@ -1050,7 +1051,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var len=Math.max(1,[1,2,3,4].reduce((p,c)=>p+target.countEmptySlot(c),0)),hp=target.getHp();
 						if(hp==0||target.countCards('h')<hp) event._result={bool:false};
 						else{
-							var str=`是否弃置${get.cnNumber(hp)}张手牌并回复1点体力？或点击“取消”摸'${get.cnNumber(len)}张牌并复原武将牌。`;
+							var str=`是否弃置${get.cnNumber(hp)}张手牌并回复1点体力？或点击“取消”摸${get.cnNumber(len)}张牌并复原武将牌。`;
 							target.chooseToDiscard(get.translation(player)+'对你发动了【雀颂】',str,'h',hp).set('ai',card=>{
 								if(!get.event('goon')) return 0;
 								return 6-get.value(card);
