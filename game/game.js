@@ -12334,6 +12334,10 @@
 			unknown5:'六号位',
 			unknown6:'七号位',
 			unknown7:'八号位',
+			unknown8:'九号位',
+			unknown9:'十号位',
+			unknown10:'十一号位',
+			unknown11:'十二号位',
 			
 			feichu_equip1:"已废除",
 			feichu_equip1_info:"武器栏已废除",
@@ -58042,6 +58046,11 @@
 	};
 	const get={
 		/**
+		 * 根据座次数n（从0开始）获取对应的“n+1号位”翻译
+		 * @param {number} seat
+		 */
+		seatTranslation:seat=>`${get.cnNumber(seat+1,true)}号位`,
+		/**
 		 * @param {number} numberOfPlayers
 		 * @returns {string[]}
 		 */
@@ -58328,7 +58337,8 @@
 				if(every) return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).every(testingNatures=>testingNatures.length==natures.length&&testingNatures.every(nature=>natures.includes(nature))));
 				return testingNaturesList.every((natures,index)=>{
 					const comparingNaturesList=naturesList.slice(index+1);
-					return natures.some(nature=>comparingNaturesList.every(testingNatures=>testingNatures.includes(nature)));
+					if(natures.length) return natures.some(nature=>comparingNaturesList.every(testingNatures=>testingNatures.includes(nature)));
+					return comparingNaturesList.every(testingNatures=>!testingNatures.length);
 				});
 			},
 			/**
@@ -58359,7 +58369,8 @@
 				if(every) return testingNaturesList.every((natures,index)=>naturesList.slice(index+1).every(testingNatures=>testingNatures.every(nature=>!natures.includes(nature))));
 				return testingNaturesList.every((natures,index)=>{
 					const comparingNaturesList=naturesList.slice(index+1);
-					return natures.some(nature=>comparingNaturesList.every(testingNatures=>testingNatures.some(testingNature=>testingNature!=nature)));
+					if(natures.length) return natures.some(nature=>comparingNaturesList.every(testingNatures=>!testingNatures.length||testingNatures.some(testingNature=>testingNature!=nature)));
+					return comparingNaturesList.every(testingNatures=>testingNatures.length);
 				});
 			},
 			//判断一张牌是否为明置手牌
