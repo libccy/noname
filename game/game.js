@@ -42238,8 +42238,8 @@
 			game.broadcastAll((roundNumber,pileTop)=>{
 				if(game.roundNumber!=roundNumber) game.roundNumber=roundNumber;
 				if(_status.pileTop!=pileTop) _status.pileTop=pileTop;
+				ui.updateRoundNumber(roundNumber);
 			},game.roundNumber,ui.cardPile.firstChild);
-			ui.updateRoundNumber();
 		},
 		asyncDraw:(players,num,drawDeck,bottom)=>players.forEach((value,index)=>{
 			let num2=1;
@@ -57931,9 +57931,9 @@
 				].join('')));
 			}
 		},
-		updateRoundNumber:()=>game.broadcastAll((roundNumber,cardPileNumber)=>{
+		updateRoundNumber:(cardPileNumber)=>{
 			if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=`${roundNumber}轮 剩余牌: ${cardPileNumber}`;
-		},game.roundNumber,ui.cardPile.childElementCount)
+		},
 	};
 	const get={
 		/**
