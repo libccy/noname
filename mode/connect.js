@@ -119,6 +119,45 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					return uiintro;
 				},220);
+				if (get.config('read_clipboard', 'connect')) {
+					var ced=false;
+					function read(text){
+						try{
+							var text2=text.split('\n')[2];
+							var ip=text2.slice(5);
+							if(ip.length>0&&text2.startsWith("联机地址:")&&(ced||confirm('是否根据剪贴板的邀请链接以进入联机地址和房间？'))){
+								node.innerHTML=ip;
+								event.textnode.innerHTML='正在连接...';
+								clearTimeout(event.timeout);
+								game.saveConfig('last_ip',node.innerHTML);
+								game.connect(node.innerHTML,function(success){
+									if(!success&&event.textnode){
+										alert('邀请链接解析失败');
+										event.textnode.innerHTML='输入联机地址';
+									}
+									if (success) _status.read_clipboard_text=text;
+								});
+							}
+						}catch(e){console.log(e);}
+					}
+					window.focus();
+					if (navigator.clipboard){
+						navigator.clipboard.readText().then(read).catch(_=>{});
+					}else{
+						var input=ui.create.node('textarea',ui.window,{opacity:'0'});
+						input.select();
+						var result=document.execCommand('paste');
+						input.blur();
+						ui.window.removeChild(input);
+						if(result) read(input.value);
+						//也就小b兼容版不支持直接读取了
+						else if(confirm('是否输入邀请链接以进入联机地址和房间？')){
+							ced=true;
+							var text=prompt('请输入邀请链接');
+							if(typeof text=='string'&&text.length>0) read(text);
+						}
+					}
+				}
 				lib.init.onfree();
 			}
 			if(window.isNonameServer){

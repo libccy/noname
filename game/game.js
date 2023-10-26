@@ -34861,6 +34861,37 @@
 								ui.rooms.push(player);
 							}
 						}
+						if(get.config('read_clipboard','connect')){
+							function read(text){
+								try{
+									var roomId=text.split('\n')[1].match(/\d+/);
+									var caption=ui.rooms.find(caption=>caption.key==roomId);
+									if (caption && (confirm(`是否通过复制的内容加入${roomId}房间？`) || _status.read_clipboard_text)){
+										ui.click.connectroom.call(caption);
+									}
+								}catch(e){console.log(e);}
+							}
+							if(_status.read_clipboard_text){
+								read(_status.read_clipboard_text);
+							}else{
+								window.focus();
+								if(navigator.clipboard){
+									navigator.clipboard.readText().then(read).catch(_=>{});
+								}else{
+									var input=ui.create.node('textarea',ui.window,{opacity:'0'});
+									input.select();
+									var result=document.execCommand('paste');
+									input.blur();
+									ui.window.removeChild(input);
+									if(result) read(input.value);
+									//也就小b兼容版不支持直接读取了
+									else if(confirm('是否输入邀请链接以加入房间？')){
+										var text=prompt('请输入邀请链接');
+										if(typeof text=='string'&&text.length>0) read(text);
+									}
+								}
+							}
+						}
 					}
 					lib.message.client.updateclients(clients,true);
 				},
@@ -35376,6 +35407,10 @@
 					if(ui.connectStartBar){
 						ui.connectStartBar.delete();
 						delete ui.connectStartBar;
+					}
+					if(ui.connectShareButton){
+						ui.connectShareButton.delete();
+						delete ui.connectShareButton;
 					}
 					if(ui.roomInfo){
 						ui.roomInfo.remove();
@@ -53410,13 +53445,37 @@
 					}
 					button.delete();
 					bar.delete();
+					shareButton.delete();
 					delete ui.connectStartButton;
 					delete ui.connectStartBar;
+					delete ui.connectShareButton;
 					button.clicked=true;
+				});
+
+				var shareButton=ui.create.div('.menubutton.large.highlight.connectbutton.connectbutton2.pointerdiv','分享房间',ui.window,function(){
+					var text=`无名杀-联机-${lib.translate[get.mode()]}-${game.connectPlayers.filter(p=>p.avatar).length}/${game.connectPlayers.filter(p=>!p.classList.contains('unselectable2')).length}\n${get.connectNickname()}邀请你加入${game.roomId}房间\n联机地址:${game.ip}\n请先通过游戏内菜单-开始-联机中启用“读取邀请链接”选项`;
+					window.focus();
+					if(navigator.clipboard){
+						navigator.clipboard.writeText(text).then(()=>{
+							game.alert(`分享内容复制成功`);
+						}).catch(e => {
+							game.alert(`分享内容复制失败${e||''}`);
+						});
+					}else{
+						var input=ui.create.node('textarea',ui.window,{opacity:'0'});
+						input.value=text;
+						input.focus();
+						input.select();
+						var result=document.execCommand('copy');
+						input.blur();
+						ui.window.removeChild(input);
+						game.alert(`分享内容复制${result?'成功':'失败'}`);
+					}
 				});
 
 				ui.connectStartButton=button;
 				ui.connectStartBar=bar;
+				ui.connectShareButton=shareButton;
 			},
 			players:numberOfPlayers=>{
 				if(numberOfPlayers===0){
