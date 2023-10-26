@@ -4765,12 +4765,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else return true;
 					}
 				},
-				direct:true,
+				frequent:true,
 				content:function(){
-					'step 0'
-					player.chooseToDiscard('he',get.prompt('langmie'),'弃置一张牌并摸两张牌').set('ai',(card)=>8-get.value(card)).logSkill='langmie';
-					'step 1'
-					if(result.bool) player.draw(2);
+					player.draw();
 				},
 				group:'langmie_damage',
 			},
@@ -10429,7 +10426,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanwei:'段煨',
 			langmie:'狼灭',
 			langmie_damage:'狼灭',
-			langmie_info:'其他角色的出牌阶段结束时，若其本阶段内使用过的牌中有类型相同的牌，则你可以弃置一张牌并摸两张牌；其他角色的结束阶段开始时，若其本回合内造成的伤害大于1，则你可以弃置一张牌并对其造成1点伤害。',
+			langmie_info:'其他角色的出牌阶段结束时，若其本阶段内使用过的牌中有类型相同的牌，则你可以摸一张牌；其他角色的结束阶段开始时，若其本回合内造成的伤害大于1，则你可以弃置一张牌并对其造成1点伤害。',
 			zhangheng:'张横',
 			dangzai:'挡灾',
 			dangzai_info:'出牌阶段开始时，你可将一名其他角色判定区内的一张牌移动至你的判定区内。',

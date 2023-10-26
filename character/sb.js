@@ -3237,8 +3237,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbguidao:{
 				audio:2,
 				trigger:{
-					global:[/*'phaseBefore',*/'damageEnd'],
-					//player:'enterGame',
+					global:['phaseBefore','damageEnd'],
+					player:'enterGame',
 				},
 				forced:true,
 				locked:false,
@@ -3320,9 +3320,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return true;
 						},
 						content:function(){
-							player.addMark('sbguidao',1);
+							var num=Math.min(8-player.countMark('sbhuangtian_count'),2);
+							player.addMark('sbguidao',num);
 							player.addTempSkill('sbhuangtian_count','roundStart');
-							player.addMark('sbhuangtian_count',1,false);
+							player.addMark('sbhuangtian_count',num,false);
 						}
 					},
 					count:{onremove:true}
@@ -4980,9 +4981,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbleiji:'雷击',
 			sbleiji_info:'出牌阶段，你可以选择一名其他角色并弃4枚“道兵”，对其造成1点雷电伤害。',
 			sbguidao:'鬼道',
-			sbguidao_info:'①一名角色受到属性伤害后，你获得2枚“道兵”。②当你受到伤害时，你可以弃2枚“道兵”并防止此伤害。然后若当前回合角色不为你，〖鬼道①〗于你下回合开始前无效。③“道兵”上限为8。',
+			sbguidao_info:'①游戏开始时/一名角色受到属性伤害后，你获得4/2枚“道兵”。②当你受到伤害时，你可以弃2枚“道兵”并防止此伤害。然后若当前回合角色不为你，〖鬼道①〗于你下回合开始前无效。③“道兵”上限为8。',
 			sbhuangtian:'黄天',
-			sbhuangtian_info:'主公技，锁定技。①回合开始时，若本回合为你的第一个回合且游戏轮数为1，且游戏内没有【太平要术】，你装备【太平要术】。②其他群势力角色造成伤害后，若你拥有〖鬼道〗，你获得1枚“道兵”（每轮你至多以此法获得4枚“道兵”）。',
+			sbhuangtian_info:'主公技，锁定技。①回合开始时，若本回合为你的第一个回合且游戏轮数为1，且游戏内没有【太平要术】，你装备【太平要术】。②其他群势力角色造成伤害后，若你拥有〖鬼道〗，你获得2枚“道兵”（每轮你至多以此法获得4枚“道兵”）。',
 			sb_caocao:'谋曹操',
 			sbjianxiong:'奸雄',
 			sbjianxiong_info:'①游戏开始时，你可获得至多2枚“治世”标记。②当你受到伤害后，你可获得伤害牌，摸1-X张牌（X为“治世”数），然后你可弃1枚“治世”。',

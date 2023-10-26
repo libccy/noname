@@ -10305,6 +10305,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qiaoshui:{
 				audio:2,
+				audioname2:{
+					re_jianyong:'reqiaoshui',
+					xin_jianyong:'xinqiaoshui',
+				},
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				filter:function(event,player){
@@ -10345,12 +10349,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qiaoshui3:{
+				charlotte:true,
+				audio:'qiaoshui',
+				audioname2:{
+					re_jianyong:'reqiaoshui',
+					xin_jianyong:'xinqiaoshui',
+				},
 				trigger:{player:'useCard2'},
-				direct:true,
 				filter:function(event,player){
 					var type=get.type(event.card);
 					return type=='basic'||type=='trick';
 				},
+				direct:true,
 				content:function(){
 					'step 0'
 					player.removeSkill('qiaoshui3');
@@ -10390,7 +10400,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(event.target){
-						player.logSkill('qiaoshui',event.target);
+						player.logSkill('qiaoshui3',event.target);
 						trigger.targets.add(event.target);
 					}
 					event.finish();
@@ -10405,7 +10415,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.targets=result.targets;
 						if(event.isMine()){
-							player.logSkill('qiaoshui',event.targets);
+							player.logSkill('qiaoshui3',event.targets);
 							event.finish();
 						}
 						for(var i=0;i<result.targets.length;i++){
@@ -10417,7 +10427,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 5'
-					player.logSkill('qiaoshui',event.targets);
+					player.logSkill('qiaoshui3',event.targets);
 				}
 			},
 			qiaoshui4:{
@@ -11877,6 +11887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			miji:{
 				audio:2,
+				audioname:['re_wangyi'],
 				mod:{
 					aiOrder:function(player,card,num){
 						if(num>0&&_status.event&&_status.event.type==='phase'&&get.tag(card,'recover')){
@@ -11944,6 +11955,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhenlie:{
 				audio:2,
+				audioname:['re_wangyi'],
 				filter:function(event,player){
 					return event.player!=player&&event.card&&(event.card.name=='sha'||get.type(event.card)=='trick');
 				},
@@ -12549,9 +12561,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qice:{
+				audio:2,
+				audioname:['clan_xunyou'],
 				enable:'phaseUse',
-				usable:1,
-				audio:'qice_backup',
 				filter:function(event,player){
 					const hs=player.getCards('h');
 					if(!hs.length) return false;
@@ -12565,6 +12577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return event.filterCard(card,player,event);
 					});
 				},
+				usable:1,
 				chooseButton:{
 					dialog:function(player){
 						var list=[];
@@ -12621,10 +12634,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
+							audio:'qice',
+							audioname:['clan_xunyou'],
 							filterCard:true,
 							selectCard:-1,
 							position:'h',
-							audio:2,
 							popname:true,
 							viewAs:{name:links[0][2]},
 						}
@@ -12655,7 +12669,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.6,
 				}
 			},
-			qice_backup:{audio:2},
 			zhiyu:{
 				audio:2,
 				trigger:{player:'damageEnd'},
@@ -14424,6 +14437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jyzongshi:'纵适',
 			jyzongshi_info:'当你拼点赢时，你可以获得对方此次拼点的牌；当你拼点没赢时，你可以收回你此次拼点的牌。',
 			qiaoshui:'巧说',
+			qiaoshui3:'巧说',
 			qiaoshui_info:'出牌阶段开始时，你可与一名其他角色拼点。若你赢，你使用的下一张基本牌或普通锦囊牌可以额外指定任意一名其他角色为目标或减少指定一个目标；若你没赢，你不能使用锦囊牌直到回合结束。',
 			reqiaoshui:'巧说',
 			reqiaoshui_info:'出牌阶段，你可与一名其他角色拼点。若你赢，你使用的下一张基本牌或普通锦囊牌可以额外指定任意一名其他角色为目标或减少指定一个目标；若你没赢，你结束出牌阶段且本回合内锦囊牌不计入手牌上限。',
