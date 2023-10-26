@@ -5151,7 +5151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player===current||current.hp>1||get.attitude(player,current)>=0) return false;
 							return player.inRange(current)&&player.countCards('hs','sha')&&player.getCardUsable('sha')||
 								player.countCards('hs',card=>get.name(card)!=='sha'&&get.tag(card,'damage'))>1;
-						}) return 9.2;
+						})) return 9.2;
 						return 0;
 					},
 					result:{
