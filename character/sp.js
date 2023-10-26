@@ -1971,24 +1971,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('choice',function(){
 						var info=lib.skill.olgangshu.getInfo(player);
 						if(info[1]==0) return 1;
-						if(player.hasCard(card=>{
+						if(info[2]<5&&player.hasCard(card=>{
 							return get.name(card)=='sha'&&player.hasValueTarget(card);
 						},'hs')&&!player.getCardUsable('sha')) return 2;
-						if(!game.hasPlayer(current=>{
+						if(info[0]<5&&!game.hasPlayer(current=>{
 							return player.inRange(current)&&get.effect(current,{name:'sha'},player,player)>0;
 						})) return 0;
 						var rand=Math.random();
-						if(rand<0.2) return 0;
-						if(rand<0.7) return 1;
-						if(rand<1.0) return 2;
-						return get.rand(0,2);
+						var list=[0,1,2].filter(i=>info[i]<5);
+						if(!list.length) return 'cancel2';
+						if(rand<0.2&&list.includes(0)) return 0;
+						if(rand<0.7&&list.includes(1)) return 1;
+						if(rand<1.0&&list.includes(2)) return 2;
+						return list.randomGet();
 					}());
 					'step 1'
 					if(result.control!='cancel2'){
 						player.logSkill('olgangshu');
 						player.addSkill('olgangshu_buff');
 						var info=lib.skill.olgangshu.getInfo(player);
-						info[result.index]=info[result.index]+1;
+						info[result.index]=Math.min(5,info[result.index]+1);
 						game.log(player,'的',result.control.slice(0,result.control.indexOf('(')),'#y+1');
 						player.markSkill('olgangshu_buff');
 					}
@@ -2026,7 +2028,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						mark:true,
 						intro:{
-							markcount:()=>0,
+							markcount:function(storage,player){
+								var info=lib.skill.olgangshu.getInfo(player);
+								var str='';
+								info.forEach(num=>str+=parseFloat(num));
+								return str;
+							},
 							content:function(storage,player){
 								var info=lib.skill.olgangshu.getInfo(player);
 								var str='';
@@ -26389,7 +26396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olrunwei_info:'其他角色的弃牌阶段开始时，若其已受伤，则你可以选择一项：①令其弃置一张牌，其本回合手牌上限+1；②令其摸一张牌，其本回合手牌上限-1。',
 			caoxi:'曹羲',
 			olgangshu:'刚述',
-			olgangshu_info:'①当你使用非基本牌结算结束后，你可以令以下一项数值+1：1.攻击范围；2.受〖刚述〗影响的下个摸牌阶段摸牌数；3.使用【杀】的次数上限。②当有牌被你抵消后，重置你〖刚述①〗增加的所有数值。',
+			olgangshu_info:'①当你使用非基本牌结算结束后，你可以令以下一项数值+1（每项至多加至5）：1.攻击范围；2.受〖刚述〗影响的下个摸牌阶段摸牌数；3.使用【杀】的次数上限。②当有牌被你抵消后，重置你〖刚述①〗增加的所有数值。',
 			oljianxuan:'谏旋',
 			oljianxuan_info:'当你受到伤害后，你可以令一名角色摸一张牌，然后若其手牌数等于你〖刚述①〗中的任意一项对应的数值，其重复此流程。',
 			ol_pengyang:'OL彭羕',
