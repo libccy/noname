@@ -19833,7 +19833,7 @@
 				damage:function(){
 					"step 0"
 					event.forceDie=true;
-					if(event.unreal) event.goto(4)
+					if(event.unreal){event.goto(4); return;}
 					event.trigger('damageBegin1');
 					"step 1"
 					event.trigger('damageBegin2');
