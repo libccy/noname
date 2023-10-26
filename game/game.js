@@ -20741,7 +20741,7 @@
 					this.markSkill('stratagem_fury');
 				}
 				/**
-				 * version 1.4
+				 * version 1.6
 				 * 
 				 * 链式创建一次性技能的api。
 				 *
@@ -20779,7 +20779,7 @@
 						//triggerNames = [ 'xxAfter', 'yyBegin' ]
 						if(triggerNames.every(t=>typeof t=='string')) trigger={player:triggerNames};
 						//triggerNames = [ {player: 'xxAfter'}, {global: 'yyBegin'} ]
-						//此处不做特殊的合并处理，由使用者自行把握
+						//此处不做特殊的合并处理，由使用者自行把握，同名属性后者覆盖前者
 						else if(triggerNames.every(t=>get.is.object(t))) trigger=triggerNames.reduce((pre,cur)=>Object.assign(pre,cur));
 					}
 					if(!trigger) throw 'player.when传参数类型错误:'+triggerNames;
@@ -20787,12 +20787,13 @@
 					do{
 						skillName='player_when_'+Math.random().toString(36).slice(-8);
 					}while(lib.skill[skillName]!=null);
-					let after=`${skillName}After`;
+					const after=`${skillName}After`;
 					if(!trigger.player) trigger.player=after;
 					else if(Array.isArray(trigger.player)) trigger.player.add(after);
 					else if(typeof trigger.player=='string') trigger.player=[trigger.player,after];
+					const vars={};
 					let skill={
-						trigger,
+						trigger:trigger,
 						forced:true,
 						charlotte:true,
 						popup:false,
@@ -20801,6 +20802,10 @@
 						//充分条件
 						filter2Funs:[],
 						contentFuns:[],
+						//外部变量
+						get vars() {
+							return vars;
+						},
 						get filter(){
 							return (event,player,name)=>{
 								if(name==`${skillName}After`){
@@ -20818,6 +20823,35 @@
 							};
 						}
 					};
+					const warnVars=['event','step','source','player','target','targets',
+						'card','cards','skill','forced','num','trigger','result'];
+					const errVars=['_status','lib','game','ui','get','ai'];
+					const createContent=()=>{
+						let varstr='';
+						for (const key in vars) {
+							if(warnVars.includes(key)) console.warn(`Variable '${key}' should not be referenced by vars objects`);
+							if(errVars.includes(key)) throw new Error(`Variable '${key}' should not be referenced by vars objects`);
+							varstr+=`var ${key}=lib.skill['${skillName}'].vars['${key}'];\n`;
+						}
+						let str=`
+							function content(){
+								${varstr}if(event.triggername=='${skillName}After'){
+									player.removeSkill('${skillName}');
+									delete lib.skill['${skillName}'];
+									delete lib.translate['${skillName}'];
+									return event.finish();
+								}
+						`;
+						for(let i=0;i<skill.contentFuns.length;i++){
+							const fun2=skill.contentFuns[i];
+							const a=fun2.toString();
+							//防止传入()=>xxx的情况
+							const begin=a.indexOf("{")==a.indexOf("}")&&a.indexOf("{")==-1?a.indexOf("=>")+2:a.indexOf("{")+1;
+							const str2=a.slice(begin,a.lastIndexOf("}")!=-1?a.lastIndexOf("}"):undefined).trim();
+							str+=`'step ${i}'\n\t${str2}\n\t`;
+						}
+						skill.content=eval(str+`\n};content;`);
+					};
 					Object.defineProperty(lib.skill,skillName,{
 						configurable:true,
 						//这类技能不需要被遍历到
@@ -20834,6 +20868,7 @@
 								forced:true,
 								charlotte:true,
 								popup:false,
+								vars:{},
 							}
 						});
 					},skillName);
@@ -20863,23 +20898,7 @@
 						then(fun){
 							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
 							skill.contentFuns.push(fun);
-							let str=`
-								function content(){
-									if(event.triggername=='${skillName}After'){
-										player.removeSkill('${skillName}');
-										delete lib.skill['${skillName}'];
-										delete lib.translate['${skillName}'];
-										return event.finish();
-									}
-							`;
-							for(let i=0;i<skill.contentFuns.length;i++){
-								let fun2=skill.contentFuns[i];
-								let a=fun2.toString();
-								let str2=a.slice(a.indexOf("{")+1,a.lastIndexOf("}")!=-1?a.lastIndexOf("}"):undefined).trim();
-								str+=`'step ${i}'\n\t${str2}\n\t`;
-							}
-							let result=eval(str+`\n};content;`);
-							skill.content=result;
+							createContent();
 							return this;
 						},
 						popup(str){
@@ -20895,9 +20914,16 @@
 							}
 							return this;
 						},
-						assign(obj) {
+						assign(obj){
 							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
 							if(typeof obj=='object'&&obj!==null) Object.assign(skill,obj);
+							return this;
+						},
+						vars(arg){
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
+							if(!get.is.object(arg)) throw 'vars的第一个参数必须为对象';
+							Object.assign(vars,arg);
+							createContent();
 							return this;
 						}
 					};
