@@ -13193,7 +13193,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										name:card.name,
 										target:target,
 										card:card,
-									}))){
+									})){
 										if(player&&player.hasSkillTag('damageBonus',true,{
 											target:target,
 											card:card
