@@ -668,7 +668,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var value=get.value(card);
 						if(value>=8) return -100;
 						return num-value;
-					}).set('rand', Math.random()<0.5).prompt2='若与'+get.translation(target)+'展示的牌相同，你弃置展示的牌，'+get.translation(target)+'失去一点体力';
+					}).set('rand', Math.random()<0.5).prompt2='若与'+get.translation(target)+'展示的牌相同，你弃置展示的牌，'+get.translation(target)+'失去1点体力';
 					"step 1"
 					event.card1=result.cards[0];
 					target.chooseCard('请展示一张手牌',true).set('ai',function(card){
@@ -683,7 +683,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var value=get.value(card);
 						if(value>=8) return -100;
 						return num-value;
-					}).set('rand', Math.random()<0.5).prompt2='若与'+get.translation(player)+'展示的牌相同，'+get.translation(player)+'弃置展示的牌，你失去一点体力';
+					}).set('rand', Math.random()<0.5).prompt2='若与'+get.translation(player)+'展示的牌相同，'+get.translation(player)+'弃置展示的牌，你失去1点体力';
 					"step 2"
 					event.card2=result.cards[0];
 					ui.arena.classList.add('thrownhighlight');
@@ -767,7 +767,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else{
-						target.chooseToDiscard({color:'black'},'弃置一张黑色手牌或受流失一点体力').ai=function(card){
+						target.chooseToDiscard({color:'black'},'弃置一张黑色手牌或受失去1点体力').ai=function(card){
 							return 8-get.value(card);
 						};
 					}
@@ -1351,7 +1351,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				nopop:true,
 				intro:{
 					content:function(storage,player){
-						return '结束阶段，若你的体力值为全场最少或之一，你获得一点护甲（剩余'+player.storage.liyutang_markcount+'回合）'
+						return '结束阶段，若你的体力值为全场最少或之一，你获得1点护甲（剩余'+player.storage.liyutang_markcount+'回合）'
 					}
 				},
 				content:function(){
@@ -1378,7 +1378,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				nopop:true,
 				intro:{
 					content:function(storage,player){
-						return '准备阶段，若你的体力值为全场最少或之一，你回复一点体力（剩余'+player.storage.yougeng_markcount+'回合）'
+						return '准备阶段，若你的体力值为全场最少或之一，你回复1点体力（剩余'+player.storage.yougeng_markcount+'回合）'
 					}
 				},
 				content:function(){
@@ -1529,7 +1529,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yunvyuanshen_skill:{
 				mark:'card',
 				intro:{
-					content:'下一进入濒死状态时回复一点体力'
+					content:'下一进入濒死状态时回复1点体力'
 				},
 				trigger:{player:'dying'},
 				forced:true,
@@ -1546,7 +1546,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			dinvxuanshuang_skill:{
 				mark:'card',
 				intro:{
-					content:'下个结束阶段获得一点护甲，若你体力值为全场最少之一，你摸一张牌'
+					content:'下个结束阶段获得1点护甲，若你体力值为全场最少之一，你摸一张牌'
 				},
 				trigger:{player:'phaseEnd'},
 				forced:true,
@@ -1803,9 +1803,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			longxugou:'龙须钩',
 			longxugou_info:'出牌阶段对一名装备区内有牌的其他角色使用，获得其装备区内的一张牌并装备之',
 			mianlijinzhen:'棉里针',
-			mianlijinzhen_info:'出牌阶段对一名体力值不小于你的角色使用，目标摸一张牌然后失去一点体力',
+			mianlijinzhen_info:'出牌阶段对一名体力值不小于你的角色使用，目标摸一张牌然后失去1点体力',
 			shenhuofeiya:'神火飞鸦',
-			shenhuofeiya_info:'出牌阶段对一名其他角色和其相邻角色使用，目标需打出一张闪，否则受到一点火属性伤害',
+			shenhuofeiya_info:'出牌阶段对一名其他角色和其相邻角色使用，目标需打出一张闪，否则受到1点火属性伤害',
 			// tuhunsha:'土魂砂',
 			// tuhunsha_info:'土魂砂',
 			// wenhuangsan:'瘟癀伞',
@@ -1815,16 +1815,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 
 			bingpotong:'天女散花',
 			bingpotong_ab:'散花',
-			bingpotong_info:'出牌阶段对至多3名角色使用，你与每个目标依次同时展示一张手牌，若颜色相同，你弃置展示的手牌，目标失去一点体力并终止结算',
+			bingpotong_info:'出牌阶段对至多3名角色使用，你与每个目标依次同时展示一张手牌，若颜色相同，你弃置展示的手牌，目标失去1点体力并终止结算',
 			feibiao:'飞镖',
-			feibiao_info:'出牌阶段，对一名距离1以外的角色使用，令其弃置一张黑色手牌或流失一点体力',
+			feibiao_info:'出牌阶段，对一名距离1以外的角色使用，令其弃置一张黑色手牌或失去1点体力',
 
 			dinvxuanshuang:'帝女玄霜',
 			dinvxuanshuang_skill:'帝女玄霜',
-			dinvxuanshuang_info:'对一名濒死状态的角色使用，目标回复一点体力，然后可以弃置任意张牌并摸等量的牌',
+			dinvxuanshuang_info:'对一名濒死状态的角色使用，目标回复1点体力，然后可以弃置任意张牌并摸等量的牌',
 			yunvyuanshen:'玉女元参',
 			yunvyuanshen_skill:'玉女元参',
-			yunvyuanshen_info:'出牌阶段对一名角色使用，目标在下一次进入濒死状态时回复一点体力',
+			yunvyuanshen_info:'出牌阶段对一名角色使用，目标在下一次进入濒死状态时回复1点体力',
 			ziyangdan:'紫阳丹',
 			ziyangdan_info:'出牌阶段对一名角色使用，目标获得3点护甲，此后每个准备阶段失去1点护甲，直到首次失去所有护甲或累计以此法失去3点护甲',
 			gjyuheng:'玉衡',
@@ -1846,9 +1846,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			mutoumianju_skill:'木杀',
 			mutoumianju_skill_info:'出牌阶段限一次，你可以将一张手牌当作杀使用',
 			heilonglinpian:'黑龙鳞片',
-			heilonglinpian_info:'出牌阶段对自己使用，获得一点护甲，直到下一回合开始，你的防御距离+1',
+			heilonglinpian_info:'出牌阶段对自己使用，获得1点护甲，直到下一回合开始，你的防御距离+1',
 			shatang:'沙棠',
-			shatang_info:'出牌阶段对一名角色使用，对目标造成一点火焰伤害，然后目标获得一点护甲',
+			shatang_info:'出牌阶段对一名角色使用，对目标造成1点火焰伤害，然后目标获得1点护甲',
 
 			food:'食物',
 			chunbing:'春饼',
@@ -1856,9 +1856,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			gudonggeng:'骨董羹',
 			gudonggeng_info:'当你下一次受到杀造成的伤害时，令伤害-1，持续三回合',
 			yougeng:'酉羹',
-			yougeng_info:'准备阶段，若你的体力值为全场最少或之一，你回复一点体力，持续两回合',
+			yougeng_info:'准备阶段，若你的体力值为全场最少或之一，你回复1点体力，持续两回合',
 			liyutang:'鲤鱼汤',
-			liyutang_info:'结束阶段，若你的体力值为全场最少或之一，你获得一点护甲，持续两回合',
+			liyutang_info:'结束阶段，若你的体力值为全场最少或之一，你获得1点护甲，持续两回合',
 			mizhilianou:'蜜汁藕',
 			mizhilianou_info:'你可以将一张红桃牌当作桃使用，持续四回合',
 			xiajiao:'虾饺',

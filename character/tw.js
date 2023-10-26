@@ -5685,7 +5685,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool) player.loseToDiscardpile(result.links);
 					else event.finish();
 					'step 5'
-					player.chooseTarget('星舞：选择一名其他角色','弃置其装备区内的所有牌。然后对其造成两点伤害（若其性别包含女性则改为1点）',true,lib.filter.notMe).set('ai',function(target){
+					player.chooseTarget('星舞：选择一名其他角色','弃置其装备区内的所有牌。然后对其造成2点伤害（若其性别包含女性则改为1点）',true,lib.filter.notMe).set('ai',function(target){
 						return get.damageEffect(target,player,player)*Math.sqrt(4+target.countCards('e',function(card){
 							return get.value(card,target)>0;
 						}))*(target.hasSex('female')?1:2);
@@ -13470,7 +13470,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.addTempSkill('twrangyi2');
 					'step 1'
 					target.chooseToUse({
-						prompt:'请使用得到的一张牌，或者受到来自'+get.translation(player)+'的一点伤害',
+						prompt:'请使用得到的一张牌，或者受到来自'+get.translation(player)+'的1点伤害',
 						filterCard:function(card,player){
 							if(get.itemtype(card)!='card'||!card.hasGaintag('twrangyi')) return false;
 							return lib.filter.filterCard(card,player,event);

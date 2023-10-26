@@ -49,7 +49,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else{
-						target.chooseToDiscard('he',{type:'equip'},'弃置一张装备牌或受到一点伤害').ai=function(card){
+						target.chooseToDiscard('he',{type:'equip'},'弃置一张装备牌或受到1点伤害').ai=function(card){
 							var player=_status.event.player;
 							var source=_status.event.getParent().player;
 							if(get.damageEffect(player,source,player)>0) return -1;
@@ -270,13 +270,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			"mianju":"漩涡面具",
 			"mianju_info":"<font color=#f00>锁定技</font> 你的武将牌不能被翻面。",
 			"shoulijian":"手里剑",
-			"shoulijian_info":"出牌阶段，对一名距离1以外的角色使用，令其弃置一张装备牌或受到一点伤害。",
+			"shoulijian_info":"出牌阶段，对一名距离1以外的角色使用，令其弃置一张装备牌或受到1点伤害。",
 			"kuwu":"苦无",
 			"kuwu_info":"<font color=#f00>锁定技</font> 每当你使用【杀】造成一次伤害，受伤角色须弃置一张牌。",
 			"xuelunyang":"写轮眼",
 			"xuelunyang_info":"回合开始阶段，你可以选择一名角色，然后获得其一项技能，直到回合结束。",
 			"jiuwei":"九尾",
-			"jiuwei_info":"（收集查克拉）回合结束时，若你已受伤，你可回复一点体力，否则摸一张牌。",
+			"jiuwei_info":"（收集查克拉）回合结束时，若你已受伤，你可回复1点体力，否则摸一张牌。",
 		},
 		list:[
 			["diamond","5","monkey"],

@@ -5550,7 +5550,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.target=result.targets[0];
 						player.line(event.target,'fire');
-						event.target.chooseToDiscard('he',{color:'red'},'弃置一张红色牌或受到一点火焰伤害').ai=function(card){
+						event.target.chooseToDiscard('he',{color:'red'},'弃置一张红色牌或受到1点火焰伤害').ai=function(card){
 							var player=_status.event.player;
 							var source=_status.event.parent.player;
 							if(get.damageEffect(player,source,player,'fire')>=0) return 0;
@@ -6036,8 +6036,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return rand;
 						}
 					}).set('prompt',get.prompt('boss_yuance')).set('choiceList',[
-						'若判定结果为黑色，'+playername+'失去一点体力，否则'+sourcename+'失去一点体力',
-						'若判定结果为红色，'+playername+'回复一点体力，否则'+sourcename+'回复一点体力'
+						'若判定结果为黑色，'+playername+'失去1点体力，否则'+sourcename+'失去1点体力',
+						'若判定结果为红色，'+playername+'回复1点体力，否则'+sourcename+'回复1点体力'
 					]);
 					'step 1'
 					var att1=get.attitude(player,trigger.player);
@@ -8037,7 +8037,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					"step 1"
 					if(result.bool){
-						player.chooseTarget(true,'选择一个目标令其失去一点体力',function(card,player,target){
+						player.chooseTarget(true,'选择一个目标令其失去1点体力',function(card,player,target){
 							return player!=target;
 						}).ai=function(target){
 							return Math.max(1,9-target.hp);
@@ -9063,7 +9063,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_guimou:'鬼谋',
 			boss_guimou_info:'结束阶段，你可以令一名随机的其他角色进入混乱状态直到其下一回合结束。',
 			boss_yuance:'远策',
-			boss_yuance_info:'每当一名角色受到其他角色的伤害，你可以选择一项并进行一次判定：1. 若结果为黑色，受伤害角色失去一点体力，否则伤害来源失去一点体力；2. 若结果为红色，受伤害角色回复一点体力，否则伤害来源回复一点体力。',
+			boss_yuance_info:'每当一名角色受到其他角色的伤害，你可以选择一项并进行一次判定：1. 若结果为黑色，受伤害角色失去1点体力，否则伤害来源失去1点体力；2. 若结果为红色，受伤害角色回复1点体力，否则伤害来源回复1点体力。',
 			boss_qizuo:'奇佐',
 			boss_qizuo_info:'你可以令你的普通锦囊牌额外结算一次。',
 			boss_guixin:'归心',
@@ -9071,7 +9071,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			xiongcai:'雄才',
 			xiongcai_info:'锁定技，你在回合结束后随机获得一个魏势力角色的所有技能。',
 			xiaoxiong:'枭雄',
-			xiaoxiong_info:'锁定技，每当一名其他角色使用一张基本牌或锦囊牌，你获得一张与之同名的牌；在一名其他角色的结束阶段，若其本回合没有使用牌，你对其造成一点伤害。',
+			xiaoxiong_info:'锁定技，每当一名其他角色使用一张基本牌或锦囊牌，你获得一张与之同名的牌；在一名其他角色的结束阶段，若其本回合没有使用牌，你对其造成1点伤害。',
 			boss_zhangwu:'章武',
 			boss_zhangwu_info:'每当你受到一次伤害，你可以弃置任意张牌并令伤害来源选择一项：弃置等量的牌，或受到等量的伤害。',
 			xiangxing:'禳星',
@@ -9083,10 +9083,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			xiangxing5_info:'此次受到的是雷属性伤害',
 			xiangxing4_info:'此次为失去体力',
 			xiangxing3_info:'一名其他角色有至少4件装备',
-			xiangxing2_info:'你的判定区内至少有2张牌',
+			xiangxing2_info:'你的判定区内至少有两张牌',
 			xiangxing1_info:'场上只有2名存活角色',
 			gaiming:'改命',
-			gaiming_info:'锁定技，在你的判定牌生效前，你观看牌堆顶的7张牌并选择一张作为判定结果，此结果不可更改。',
+			gaiming_info:'锁定技，在你的判定牌生效前，你观看牌堆顶的七张牌并选择一张作为判定结果，此结果不可更改。',
 			fengqi:'风起',
 			fengqi_info:'准备阶段和结束阶段，你可以视为使用任意一张普通锦囊牌。',
 
@@ -9100,7 +9100,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			yunshen2:'云身',
 			yunshen_info:'每当你使用或打出一张闪时，你可以令你的防御距离+1；准备阶段，你将累计的防御距离清零，然后摸等量的牌。',
 			lianji:'连计',
-			lianji_info:'出牌阶段限一次，你可以选择一张手牌并指定两名角色进行拼点，拼点赢的角色获得此牌，并对没赢的角色造成一点伤害。',
+			lianji_info:'出牌阶段限一次，你可以选择一张手牌并指定两名角色进行拼点，拼点赢的角色获得此牌，并对没赢的角色造成1点伤害。',
 			mazui:'麻醉',
 			mazui2:'麻醉',
 			mazui_info:'出牌阶段限一次，你可以将一张黑色手牌置于一名角色的武将牌上，该角色造成的下一次伤害-1，然后获得此牌。',
@@ -9129,7 +9129,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_qixiang_info:'乐不思蜀判定时，你的方块判定牌视为红桃；兵粮寸断判定时，你的黑桃判定牌视为草花。',
 
 			qiwu:'栖梧',
-			qiwu_info:'锁定技。每当你使用一张梅花牌，你回复一点体力。',
+			qiwu_info:'锁定技。每当你使用一张梅花牌，你回复1点体力。',
 			jizhen:'激阵',
 			jizhen_info:'结束阶段，你可以令所至多两名已受伤角色摸一张牌。',
 
@@ -9230,16 +9230,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_qiangzheng_info:'锁定技，结束阶段，你获得每个敌方角色的一张手牌。',
 			boss_baolin:'暴凌',
 			guizhen:'归真',
-			guizhen_info:'每当你失去最后一张手牌，你可以所有敌人失去全部手牌，没有手牌的角色失去一点体力（不触发技能）。',
+			guizhen_info:'每当你失去最后一张手牌，你可以所有敌人失去全部手牌，没有手牌的角色失去1点体力（不触发技能）。',
 			boss_shengshou:'圣手',
-			boss_shengshou_info:'每当你使用一张牌，你可以进行一次判定，若为红色，你回复一点体力。',
+			boss_shengshou_info:'每当你使用一张牌，你可以进行一次判定，若为红色，你回复1点体力。',
 			wuqin:'五禽戏',
 			wuqin_info:'结束阶段，若你没有手牌，可以摸三张牌。',
 
 			boss_konghun:'控心',
 			boss_konghun_info:'结束阶段，你可以指定一名敌人令其进入混乱状态（不受对方控制，并将队友视为敌人）直到下一回合开始。',
 			yuehun:'月魂',
-			yuehun_info:'结束阶段，你可以回复一点体力并摸两张牌。',
+			yuehun_info:'结束阶段，你可以回复1点体力并摸两张牌。',
 			fengwu:'风舞',
 			fengwu_info:'出牌阶段限一次，可令除你外的所有角色依次对与其距离最近的另一名角色使用一张【杀】，无法如此做者失去1点体力。',
 			boss_wange:'笙歌',
@@ -9248,23 +9248,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			huanhua_info:'锁定技，游戏开始时，你获得其他角色的所有技能，体力上限变为其他角色之和；其他角色于摸牌阶段摸牌时，你摸等量的牌；其他角色于弃牌阶段弃牌时，你弃置等量的手牌。',
 
 			boss_leiji:'雷击',
-			boss_leiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑色，其受到一点雷电伤害，然后你摸一张牌。',
+			boss_leiji_info:'每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑色，其受到1点雷电伤害，然后你摸一张牌。',
 			jidian:'亟电',
-			jidian_info:'每当你造成一次伤害，可以指定距离受伤害角色1以内的一名其他角色进行判定，若结果为黑色，该角色受到一点雷电伤害。',
+			jidian_info:'每当你造成一次伤害，可以指定距离受伤害角色1以内的一名其他角色进行判定，若结果为黑色，该角色受到1点雷电伤害。',
 
 			tinqin:'听琴',
 			boss_guihan:'归汉',
-			boss_guihan_info:'限定技，濒死阶段，你可以将体力回复至体力上限，摸4张牌，令所有敌人的技能恢复，失去技能〖悲歌〗和〖胡笳〗，并获得技能〖听琴〗、〖蕙质〗。',
+			boss_guihan_info:'限定技，濒死阶段，你可以将体力回复至体力上限，摸四张牌，令所有敌人的技能恢复，失去技能〖悲歌〗和〖胡笳〗，并获得技能〖听琴〗、〖蕙质〗。',
 			boss_huixin:'蕙质',
-			boss_huixin_info:'每当你于回合外失去牌，可以进行一次判定，若为黑色，当前回合角色失去一点体力，否则你回复一点体力并摸一张牌。',
+			boss_huixin_info:'每当你于回合外失去牌，可以进行一次判定，若为黑色，当前回合角色失去1点体力，否则你回复1点体力并摸一张牌。',
 			boss_hujia:'胡笳',
-			boss_hujia_info:'结束阶段，若你已受伤，可以弃置一张牌令一名其他角色的所有技能失效，若其所有技能已失效，改为令其失去一点体力上限。',
+			boss_hujia_info:'结束阶段，若你已受伤，可以弃置一张牌令一名其他角色的所有技能失效，若其所有技能已失效，改为令其失去1点体力上限。',
 			boss_honglian:'红莲',
-			boss_honglian_info:'锁定技，结束阶段，你摸两张牌，并对所有敌人造成一点火焰伤害。',
+			boss_honglian_info:'锁定技，结束阶段，你摸两张牌，并对所有敌人造成1点火焰伤害。',
 			huoshen:'火神',
 			huoshen_info:'锁定技，你防止即将受到的火焰伤害，改为回复1点体力。',
 			boss_xianyin:'仙音',
-			boss_xianyin_info:'每当你于回合外失去牌，你可以进行一次判定，若为红色，你令一名敌人失去一点体力。',
+			boss_xianyin_info:'每当你于回合外失去牌，你可以进行一次判定，若为红色，你令一名敌人失去1点体力。',
 
 			boss_yuhuo:'浴火',
 			boss_yuhuo_info:'觉醒技，在你涅槃后，你获得技能〖神威〗、〖朱羽〗。',
@@ -9279,15 +9279,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_gongshen_info:'锁定技，除你之外的角色没有装备区；你不能成为其他角色的延时锦囊牌的目标。',
 
 			fanghua:'芳华',
-			fanghua_info:'结束阶段，你可以令所有已翻面角色流失一点体力。',
+			fanghua_info:'结束阶段，你可以令所有已翻面角色失去1点体力。',
 			tashui:'踏水',
 			tashui_info:'每当你使用或打出一张黑色牌，你可以令一名其他角色翻面。',
 
 			boss_wuxin:'无心',
-			boss_wuxin_info:'锁定技，你防止即将受到的伤害，改为流失一点体力；你不能成为其他角色的延时锦囊的目标。',
+			boss_wuxin_info:'锁定技，你防止即将受到的伤害，改为失去1点体力；你不能成为其他角色的延时锦囊的目标。',
 			shangshix:'伤逝',
 			shangshix2:'伤逝',
-			shangshix_info:'锁定技，你的手牌数至少为4，结束阶段，若你的体力值大于1，你令场上所有角色流失一点体力。',
+			shangshix_info:'锁定技，你的手牌数至少为4，结束阶段，若你的体力值大于1，你令场上所有角色失去1点体力。',
 
 			boss_baonu:'暴怒',
 			boss_baonu_info:'锁定技，当你的体力值降至4或更低时，你变身为暴怒战神或神鬼无前，并立即开始你的回合。',
@@ -9400,7 +9400,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"boss_bufo":"不佛",
 			"boss_bufo_info":"锁定技，你的回合开始时，你对所有距离为1的其他角色造成1点火焰伤害；你受到大于等于2的伤害时，令此伤害-1。",
 			"boss_wuliang":"无量",
-			"boss_wuliang_info":"锁定技，你登场时额外摸3张牌；结束阶段开始时，你摸两张牌；你的回合开始时，若你当前体力小于3，则回复至3。",
+			"boss_wuliang_info":"锁定技，你登场时额外摸三张牌；结束阶段开始时，你摸两张牌；你的回合开始时，若你当前体力小于3，则回复至3。",
 			"boss_dayuan":"大愿",
 			"boss_dayuan_info":" 当一名角色判定牌最终生效前，你可以指定该判定牌的点数和花色。",
 			"boss_diting":"谛听",

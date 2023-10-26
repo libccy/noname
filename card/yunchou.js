@@ -441,7 +441,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event.source.storage.youdishenru=player;
 					event.source.addSkill('youdishenru');
 					'step 1'
-					var next=event.source.chooseToUse({name:'sha'},player,-1,'对'+get.translation(player)+'使用一张杀，或受到一点伤害').set('addCount',false);
+					var next=event.source.chooseToUse({name:'sha'},player,-1,'对'+get.translation(player)+'使用一张杀，或受到1点伤害').set('addCount',false);
 					next.ai2=function(){
 						return 1;
 					};
@@ -925,13 +925,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			shuiyanqijun:'水攻',
 			shuiyanqijun_info:'令所有有装备的角色各弃置一张装备牌。',
 			wangmeizhike:'望梅止渴',
-			wangmeizhike_info:'出牌阶段对一名角色使用，若没有角色体力比目标少，目标回复一点体力；若没有角色手牌比目标少，目标摸两张牌（若因此牌回复了体力则改为摸一张）。',
+			wangmeizhike_info:'出牌阶段对一名角色使用，若没有角色体力比目标少，目标回复1点体力；若没有角色手牌比目标少，目标摸两张牌（若因此牌回复了体力则改为摸一张）。',
 			chenhuodajie:'趁火打劫',
 			chenhuodajie_info:'任意一名其他角色受到伤害时对其使用，获得其一张牌。',
 			huoshan:'火山',
 			huoshan_info:'出牌阶段，对自己使用。若判定结果为红桃2~9，则目标角色受到2点火焰伤害，距离目标1以内的其他角色受到1点火焰伤害。若判定不为红桃2~9，将之移动到下家的判定区里。',
 			hongshui:'洪水',
-			hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置3张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去一点体力。',
+			hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置三张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去1点体力。',
 		},
 		list:[
 			['heart',6,'huoshan','fire'],

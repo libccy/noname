@@ -9680,7 +9680,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					trigger.all_excluded=true;
 					var str='弃置一张非基本牌';
-					if(player.hp>0) str+='，或点「取消」失去一点体力';
+					if(player.hp>0) str+='，或点「取消」失去1点体力';
 					var next=player.chooseToDiscard(str,function(card){
 						return get.type(card)!='basic';
 					},'he').set('ai',function(card){
@@ -14493,7 +14493,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard(true,'h',2);
 					player.turnOver();
 					'step 6'
-					player.chooseTarget('请选择【星舞】的目标','弃置其装备区内的所有牌。然后对其造成两点伤害（目标为女性角色则改为1点）',true,lib.filter.notMe).set('ai',function(target){
+					player.chooseTarget('请选择【星舞】的目标','弃置其装备区内的所有牌。然后对其造成2点伤害（目标为女性角色则改为1点）',true,lib.filter.notMe).set('ai',function(target){
 						return -get.attitude(_status.event.player,target)*Math.sqrt(4+target.countCards('e',function(card){
 							return get.value(card,target)>0;
 						}))*(target.hasSex('female')?1:2);
@@ -15881,7 +15881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.hp==1) return 1;
 							if(player.hp==2&&player.countCards('e')>=2) return 1;
 							return 0;
-						}).set('choiceList',['弃置装备区内的所有牌并失去一点体力',get.mode()=='guozhan'?'移除副将牌':'随机移除武将牌上的一个技能']);
+						}).set('choiceList',['弃置装备区内的所有牌并失去1点体力',get.mode()=='guozhan'?'移除副将牌':'随机移除武将牌上的一个技能']);
 					}
 					else{
 						event._result={index:1};
@@ -17207,7 +17207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseToDiscard('he','庸肆').set('prompt2','弃置一张牌，或取消并失去一点体力').ai=function(card){
+					player.chooseToDiscard('he','庸肆').set('prompt2','弃置一张牌，或取消并失去1点体力').ai=function(card){
 						return 8-get.value(card);
 					};
 					'step 1'
@@ -17566,7 +17566,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.chooseControl(function(){
 						if(_status.event.goon) return '选项二';
 						return '选项一';
-					}).set('goon',goon).set('prompt','定叛').set('choiceList',['令'+get.translation(player)+'弃置你装备区里的一张牌','获得你装备区内的所有牌并受到一点伤害']);
+					}).set('goon',goon).set('prompt','定叛').set('choiceList',['令'+get.translation(player)+'弃置你装备区里的一张牌','获得你装备区内的所有牌并受到1点伤害']);
 					'step 2'
 					if(result.control=='选项一'){
 						player.discardPlayerCard(target,true,'e');
@@ -19163,7 +19163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.unmarkSkill('xingwu');
 						player.chooseTarget(function(card,player,target){
 							return target!=player&&target.hasSex('male');
-						},'对一名男性角色造成两点伤害并弃置其装备区内的牌').set('ai',function(target){
+						},'对一名男性角色造成2点伤害并弃置其装备区内的牌').set('ai',function(target){
 							var player=_status.event.player;
 							if(get.attitude(player,target)>0) return -1;
 							return get.damageEffect(target,player,player)+target.countCards('e')/2;
@@ -19541,10 +19541,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.getExpansions('fentian').length>=2;
 				},
 				filterTarget:true,
-				prompt:'移去两张“焚”并令一名角色失去一点体力',
+				prompt:'移去两张“焚”并令一名角色失去1点体力',
 				content:function(){
 					'step 0'
-					player.chooseCardButton(2,'移去两张“焚”并令'+get.translation(target)+'失去一点体力',player.getExpansions('fentian'),true);
+					player.chooseCardButton(2,'移去两张“焚”并令'+get.translation(target)+'失去1点体力',player.getExpansions('fentian'),true);
 					'step 1'
 					if(result.bool){
 						player.loseToDiscardpile(result.links);
@@ -22367,7 +22367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var nono=(get.damageEffect(trigger.player,player,trigger.player)>=0);
 						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.15);
-						trigger.player.chooseToDiscard('he','弃置一张装备牌并令'+get.translation(player)+'摸一张牌，或受到一点伤害',{type:'equip'}).set('ai',function(card){
+						trigger.player.chooseToDiscard('he','弃置一张装备牌并令'+get.translation(player)+'摸一张牌，或受到1点伤害',{type:'equip'}).set('ai',function(card){
 							if(_status.event.nono){
 								return 0;
 							}
@@ -22434,10 +22434,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var str;
 					if(trigger.source==player){
-						str='随势：是否流失一点体力？';
+						str='随势：是否失去1点体力？';
 					}
 					else{
-						str='随势：是否令'+get.translation(player)+'流失一点体力？'
+						str='随势：是否令'+get.translation(player)+'失去1点体力？'
 					}
 					trigger.source.chooseBool(str).set('ai',function(){
 						return get.attitude(_status.event.player,_status.event.target)<0;
@@ -25228,7 +25228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"lingren_jianxiong":"奸雄",
 			"lingren_jianxiong_info":"当你受到伤害后，你可以获得对你造成伤害的牌并摸一张牌。",
 			"lingren_xingshang":"行殇",
-			"lingren_xingshang_info":"当有角色死亡后，你可以选择一项：1.回复一点体力。2.获得该角色的所有牌。",
+			"lingren_xingshang_info":"当有角色死亡后，你可以选择一项：1.回复1点体力。2.获得该角色的所有牌。",
 			"xinfu_fujian":"伏间",
 			"xinfu_fujian_info":"锁定技，结束阶段开始时，你观看一名随机的其他角色的随机X张手牌。(X为场上手牌最少的角色的手牌数)",
 			"xinfu_xionghuo":"凶镬",
@@ -25261,7 +25261,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_wuniang":"武娘",
 			"xinfu_wuniang_info":"当你使用或打出【杀】时，你可以获得一名其他角色的一张牌。若如此做，该角色和场上所有的“关索”各摸一张牌。",
 			"xinfu_xushen":"许身",
-			"xinfu_xushen_info":"限定技，当一名男性角色使用【桃】令你脱离濒死状态时，若场上没有“关索”，则其可以将自己的一张武将牌变更为“关索”。然后你回复一点体力，并获得技能〖镇南〗。",
+			"xinfu_xushen_info":"限定技，当一名男性角色使用【桃】令你脱离濒死状态时，若场上没有“关索”，则其可以将自己的一张武将牌变更为“关索”。然后你回复1点体力，并获得技能〖镇南〗。",
 			"xinfu_zhennan":"镇南",
 			"xinfu_zhennan_info":"当你成为【南蛮入侵】的目标时，你可以对一名其他角色造成1-3点随机伤害。",
 			"xinfu_falu":"法箓",
@@ -25477,9 +25477,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wuniang:"武娘",
 			wuniang_info:"你使用或打出【杀】时，你可以获得一名其他角色的一张牌，然后该角色摸一张牌；若“关索”在场，你可令“关索”也摸一张牌。",
 			zhennan:"镇南",
-			zhennan_info:"当你成为【南蛮入侵】的目标时，你可令一名其他角色随机受到一至三点伤害。",
+			zhennan_info:"当你成为【南蛮入侵】的目标时，你可令一名其他角色随机受到1至3点伤害。",
 			xushen:"许身",
-			xushen_info:"当其他男性角色令你脱离濒死状态时，若“关索”不在场，其可以选择是否用“关索”替换其武将牌，然后你回复一点体力并获得技能〖镇南〗。",
+			xushen_info:"当其他男性角色令你脱离濒死状态时，若“关索”不在场，其可以选择是否用“关索”替换其武将牌，然后你回复1点体力并获得技能〖镇南〗。",
 			
 			wanwei:'挽危',
 			wanwei_info:'当你因被其他角色获得或弃置而失去牌时，你可以改为自己选择失去的牌。',
@@ -25617,9 +25617,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhenlue:'缜略',
 			zhenlue_info:'锁定技，你使用的普通锦囊牌不能被【无懈可击】响应；你不能成为延时锦囊牌的目标。',
 			jianshu:'间书',
-			jianshu_info:'限定技，出牌阶段，你可以将一张黑色手牌交给一名其他角色，并选择另一名其他角色，然后令这两名角色拼点。赢的角色弃置两张牌，没赢的角色失去一点体力。',
+			jianshu_info:'限定技，出牌阶段，你可以将一张黑色手牌交给一名其他角色，并选择另一名其他角色，然后令这两名角色拼点。赢的角色弃置两张牌，没赢的角色失去1点体力。',
 			yongdi:'拥嫡',
-			yongdi_info:'限定技，准备阶段开始时，你可令一名其他男性角色增加一点体力上限并回复1点体力，然后若该角色的武将牌上有主公技且其不为主公，其获得此主公技。',
+			yongdi_info:'限定技，准备阶段开始时，你可令一名其他男性角色增加1点体力上限并回复1点体力，然后若该角色的武将牌上有主公技且其不为主公，其获得此主公技。',
 			regushe:'鼓舌',
 			regushe_info:'出牌阶段，若X小于7，则你可以用一张手牌与至多三名角色同时拼点，然后依次结算拼点结果，没赢的角色选择一项：1.弃置一张牌；2.令你摸一张牌。若你没赢，你获得一个“饶舌”标记。当你获得第7个“饶舌”标记时，你死亡。（X为你的“饶舌”标记数与本回合因“鼓舌”拼点而胜利的次数之和）',
 			rejici:'激词',
@@ -25671,7 +25671,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kuangfu:'狂斧',
 			kuangfu_info:'当你使用【杀】造成伤害时，你可以选择一项：弃置其装备区内的一张牌，或将其装备区内的一张牌移动到你的装备区内。',
 			xintan:'心惔',
-			xintan_info:'出牌阶段限一次，你可以移去两张「焚」并选择一名角色，该角色失去一点体力。',
+			xintan_info:'出牌阶段限一次，你可以移去两张「焚」并选择一名角色，该角色失去1点体力。',
 			fentian:'焚天',
 			fentian_info:'锁定技，结束阶段开始时，若你的手牌数少于体力值，你须选择一名攻击范围内的角色，将其一张牌置于你的武将牌上，称为「焚」。锁定技，你的攻击范围+X（X为「焚」的数量）。',
 			zhiri:'炙日',
@@ -25860,7 +25860,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldcihuai_info:'出牌阶段开始时，你可以展示手牌。若其中没有【杀】，则当你于此阶段内手牌数变化之前/有角色死亡之前需要使用【杀】时，你可以使用无对应实体牌的【杀】。',
 			cihuai:'刺槐',
 			cihuai_info:'出牌阶段开始时，若你的手牌中没有【杀】，则你可以展示你的手牌，视为对一名角色使用一张【杀】。',
-			gongao_info:'锁定技，当一名角色死亡后，你增加一点体力上限，回复一点体力。',
+			gongao_info:'锁定技，当一名角色死亡后，你增加1点体力上限，回复1点体力。',
 			juyi:'举义',
 			juyi_info:'觉醒技，准备阶段开始时，若你的体力上限大于存活角色数，你摸等同于体力上限张数的牌，然后获得技能〖崩坏〗和〖威重〗。',
 			weizhong:'威重',
@@ -25889,8 +25889,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldshenxian_info:'你的回合外，每当有其他角色因弃置而失去基本牌时，你可以摸一张牌。',
 			qiluan_info:'一名角色的回合结束时，你可以摸3X+Y张牌。（X为你本回合内杀死过的角色数，Y为本回合内其他角色杀死过的角色数）',
 			//qiluan_info_guozhan:'一名角色的回合结束时，若你于回合内杀死过角色，则你可以摸三张牌。',
-			zhendu_info:'一名角色的出牌阶段开始时，你可以弃置一张手牌，视为该角色使用了一张【酒】。若该角色不是你，你对其造成一点伤害。',
-			//zhendu_info_guozhan:'其他角色的出牌阶段开始时，你可以弃置一张手牌，视为该角色使用了一张【酒】。若如此做，你对其造成一点伤害。',
+			zhendu_info:'一名角色的出牌阶段开始时，你可以弃置一张手牌，视为该角色使用了一张【酒】。若该角色不是你，你对其造成1点伤害。',
+			//zhendu_info_guozhan:'其他角色的出牌阶段开始时，你可以弃置一张手牌，视为该角色使用了一张【酒】。若如此做，你对其造成1点伤害。',
 			shangyi_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后弃置其中的一张黑色牌。',
 			zniaoxiang_info:'锁定技，当你使用【杀】指定目标后，你令目标角色响应此【杀】所需要使用的【闪】的数目+1。',
 			shoucheng_info:'当一名角色于其回合外失去手牌时，若其没有手牌，则你可令该角色摸一张牌。',
@@ -25904,7 +25904,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌，然后你摸一张牌；2.受到你对其造成的1点伤害。',
 			sijian_info:'当你失去最后的手牌时，你可以弃置一名其他角色的一张牌。',
 			suishi_info:'当其他角色进入濒死状态时，伤害来源可以令你摸一张牌；当其他角色死亡时，伤害来源可以令你失去1点体力。',
-			quji_info:'出牌阶段限一次，你可以弃置X张牌（X为你已损失的体力值），然后令至多X名已受伤的角色各回复1点体力。若你以此法弃置的牌中有黑色牌，你失去一点体力。',
+			quji_info:'出牌阶段限一次，你可以弃置X张牌（X为你已损失的体力值），然后令至多X名已受伤的角色各回复1点体力。若你以此法弃置的牌中有黑色牌，你失去1点体力。',
 			junbing_info:'一名角色的结束阶段开始时，若其手牌数不大于1，该角色可以摸一张牌。若如此做，该角色将所有手牌交给你，然后你交给其等量的牌。',
 			xiongyi_info:'限定技，出牌阶段，你可以选择任意名角色，这些角色各摸三张牌。然后若你的体力值最小，你回复1点体力。',
 			xiongyi_info_guozhan:'限定技，出牌阶段，你可以令与你势力相同的所有角色各摸三张牌，然后若你的势力是角色最少的势力（或之一），则你回复1点体力。',
@@ -26020,7 +26020,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangchengyan:'OL黄承彦',
 			huangchengyan_prefix:'OL',
 			guanxu:'观虚',
-			guanxu_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可将其中一张手牌与牌堆顶5张牌中的一张交换。若如此做，你弃置其手牌中3张花色相同的牌。',
+			guanxu_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可将其中一张手牌与牌堆顶五张牌中的一张交换。若如此做，你弃置其手牌中三张花色相同的牌。',
 			yashi:'雅士',
 			yashi_info:'当你受到一次伤害后，你可选择一项：1. 令伤害来源的非锁定技无效直到其下个回合开始；2. 对一名其他角色发动〖观虚〗。',
 			olwuniang:'武娘',
@@ -26061,7 +26061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olfusong_info:'当你死亡时，你可以选择一名体力上限大于你的其他角色。其选择获得〖吉占〗或〖丰姿〗。',
 			zuofen:'左棻',
 			zhaosong:'诏颂',
-			zhaosong_info:'一名其他角色的摸牌阶段结束时，若其没有因〖诏颂〗而获得的标记，则你可令其正面向上交给你一张手牌。根据此牌的类型，该角色获得对应的标记和效果：<br>锦囊牌：“诔”标记。当拥有者进入濒死状态时，其可弃置所有“诔”，将体力回复至1点并摸1张牌。<br>装备牌：“赋”标记。拥有者的出牌阶段开始时，其可弃置所有“赋”，弃置一名角色区域内的至多两张牌。<br>基本牌：“颂”标记。当使用者使用仅指定一个目标的【杀】时，其可弃置“颂”，为此【杀】增加至多两个目标。',
+			zhaosong_info:'一名其他角色的摸牌阶段结束时，若其没有因〖诏颂〗而获得的标记，则你可令其正面向上交给你一张手牌。根据此牌的类型，该角色获得对应的标记和效果：<br>锦囊牌：“诔”标记。当拥有者进入濒死状态时，其可弃置所有“诔”，将体力回复至1点并摸一张牌。<br>装备牌：“赋”标记。拥有者的出牌阶段开始时，其可弃置所有“赋”，弃置一名角色区域内的至多两张牌。<br>基本牌：“颂”标记。当使用者使用仅指定一个目标的【杀】时，其可弃置“颂”，为此【杀】增加至多两个目标。',
 			lisi:'离思',
 			lisi_info:'当你于回合外使用的牌结算结束后，你可将其交给一名手牌数不大于你的其他角色。',
 			ol_yangyi:'杨仪',

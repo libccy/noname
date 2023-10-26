@@ -10013,7 +10013,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					event.addIndex=0;
 					var str=get.translation(target);
-					if(target.isDamaged()) list.push('令'+str+'回复一点体力');
+					if(target.isDamaged()) list.push('令'+str+'回复1点体力');
 					else event.addIndex++;
 					if(target.isLinked()||target.isTurnedOver()) list.push('令'+get.translation(target)+'复原武将牌');
 					if(!list.length) event.finish();
@@ -12398,7 +12398,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			souying:'薮影',
 			souying_info:'每回合限一次，当你对其他角色（或其他角色对你）使用【杀】或普通锦囊牌指定唯一目标后，若此牌不是本回合你对其（或其对你）使用的第一张【杀】或普通锦囊牌，你可以弃置一张牌，获得此牌对应的所有实体牌（或令此牌对你无效）。',
 			zhanyuan:'战缘',
-			zhanyuan_info:'觉醒技，准备阶段，若你已因蛮嗣累计获得超过7张牌，你加一点体力上限并回复1点体力，并可以选择一名男性角色，你与其获得技能〖系力〗，然后你失去技能〖蛮嗣〗。',
+			zhanyuan_info:'觉醒技，准备阶段，若你已因蛮嗣累计获得超过七张牌，你加1点体力上限并回复1点体力，并可以选择一名男性角色，你与其获得技能〖系力〗，然后你失去技能〖蛮嗣〗。',
 			hmxili:'系力',
 			hmxili_info:'每回合限一次，你的回合外，当其他拥有【系力】技能的角色在其回合内对没有【系力】技能的角色造成伤害时，你可以弃置一张牌，令此伤害+1，然后你与其各摸两张牌。',
 			wangshuang:'王双',

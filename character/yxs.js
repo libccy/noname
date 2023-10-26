@@ -2461,7 +2461,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					trigger.source.chooseCard('交出一张红桃牌或流失一点体力',function(card){
+					trigger.source.chooseCard('交出一张红桃牌或失去1点体力',function(card){
 						return get.suit(card)=='heart';
 					}).ai=function(card){
 						return 6-get.value(card);
@@ -2941,7 +2941,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yxs_menshen3:"门神",
 			yxs_menshen_info:"回合结束阶段，你可选择一名其他角色，若如此做，直到你的下回合开始，所有角色对该角色使用的【杀】或【决斗】均视为对你使用。",
 			zhuxin:'诛心',
-			zhuxin_info:'出牌阶段限一次，你可以与一名其他角色拼点，若你赢，你对其造成一点伤害。',
+			zhuxin_info:'出牌阶段限一次，你可以与一名其他角色拼点，若你赢，你对其造成1点伤害。',
 			wlianhuan:'连环',
 			wlianhuan_info:'你使用【杀】造成伤害时，可以弃置一张装备区内的牌并令伤害+1。',
 			liebo:'裂帛',
@@ -2952,7 +2952,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guimian_info:'锁定技，每当你在出牌阶段使用【杀】造成伤害，本阶段内出【杀】次数上限+1。',
 			lyuxue:'浴血',
 			lyuxue2:'浴血',
-			lyuxue_info:'锁定技，每当你造成一次伤害，若目标没有浴血标记，你令其获得一个浴血标记；当一名角色失去浴血标记时，其流失一点体力；准备阶段，若场上浴血标记的数量不少于存活角色数的一半（向下取整），你清空浴血标记；当你即将死亡时，你清空浴血标记。',
+			lyuxue_info:'锁定技，每当你造成一次伤害，若目标没有浴血标记，你令其获得一个浴血标记；当一名角色失去浴血标记时，其失去1点体力；准备阶段，若场上浴血标记的数量不少于存活角色数的一半（向下取整），你清空浴血标记；当你即将死亡时，你清空浴血标记。',
 			huli:'护理',
 			huli_info:'出牌阶段，你可以将一张红桃手牌当作【桃】对距离1以内的角色使用。',
 			yixin:'医心',
@@ -3000,9 +3000,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wumu:'武穆',
 			wumu_info:'锁定技，你的黑色【杀】无视距离，红色【杀】不计入回合内的出杀限制。',
 			ysheshen:'舍身',
-			ysheshen_info:'每当你受到一点伤害，可以观看牌堆顶的两张牌，并将其交给任意1~2名角色。',
+			ysheshen_info:'每当你受到1点伤害，可以观看牌堆顶的两张牌，并将其交给任意1~2名角色。',
 			sanbanfu:'三板斧',
-			sanbanfu_info:'当你对其他角色使用【杀】时，你可以使此【杀】有如下效果：若对方没有出【闪】，其受到2点伤害；若对方打出了一张【闪】，你与其各受到1点伤害；若对方打出了两张【闪】，你受到一点伤害。',
+			sanbanfu_info:'当你对其他角色使用【杀】时，你可以使此【杀】有如下效果：若对方没有出【闪】，其受到2点伤害；若对方打出了一张【闪】，你与其各受到1点伤害；若对方打出了两张【闪】，你受到1点伤害。',
 			bingsheng:'兵圣',
 			bingsheng_info:'出牌阶段限一次，你可以弃置两张花色不同的手牌，指定一名其他角色使其体力值与你相同（体力最多变化2点）。',
 			taolue:'韬略',
@@ -3014,7 +3014,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			biaoqi:'骠骑',
 			biaoqi_info:'锁定技，当你出【杀】指定目标后，若你的攻击范围大于目标体力值，则此【杀】不可闪避；若你的攻击范围小于目标体力值，你摸一张牌。',
 			wluoyan:'落雁',
-			wluoyan_info:'锁定技，你防止即将受到的伤害，改为流失一点体力。',
+			wluoyan_info:'锁定技，你防止即将受到的伤害，改为失去1点体力。',
 			heqin:'和亲',
 			heqin2:'和亲',
 			heqin3:'和亲',
@@ -3048,7 +3048,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhensha:'鸩杀',
 			zhensha_info:'当场上有角色进入濒死状态时，你可以弃置一张【酒】或两张黑色手牌，则该角色立即死亡。',
 			xumou:'蓄谋',
-			xumou_info:'结束阶段，你可以将武将牌翻面并摸3张牌。',
+			xumou_info:'结束阶段，你可以将武将牌翻面并摸三张牌。',
 			guifu:'鬼斧',
 			guifu_info:'出牌阶段限一次，你可以指定一名角色装备区内的一张牌，将其弃掉，自己和对方同时摸取一张牌。',
 			lshengong:'神工',
@@ -3088,7 +3088,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			feigong:'非攻',
 			feigong_info:'其他角色使用【杀】时，若你不是【杀】的目标，可以弃置一张【杀】取消之。',
 			jianai:'兼爱',
-			jianai_info:'每当你回复一点体力，可以令所有其他角色回复一点体力。',
+			jianai_info:'每当你回复1点体力，可以令所有其他角色回复1点体力。',
 			bolehuiyan:'慧眼',
 			bolehuiyan_info:'当一名有手牌的其他角色成为来源不为你的杀的目标时，你可以预言此杀能否命中，若预言正确，你摸一张牌，否则你须弃置一张牌。每回合限发动一次。',
 			xiangma:'相马',
@@ -3096,7 +3096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			seyou:'色诱',
 			seyou_info:'限定技，出牌阶段，你可以指定任意1名角色，其他所有男性角色需选择1项执行：（1）对你指定的角色出【杀】；（2）令你获得其一张牌。',
 			sheshi:'蛇噬',
-			sheshi_info:'每受到1次伤害，可以指定1种花色，依次展示牌堆顶的牌，直到出现指定花色的牌为止，你获得与指定花色不同花色的所有牌（最多展示4张牌）。',
+			sheshi_info:'每受到1次伤害，可以指定1种花色，依次展示牌堆顶的牌，直到出现指定花色的牌为止，你获得与指定花色不同花色的所有牌（最多展示四张牌）。',
 
 
 			fengyi:'凤仪',
@@ -3114,11 +3114,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jieyong2:'节用',
 			jieyong_info:'你使用的卡牌结算完成后，你可以弃置一张黑色牌并重新获得之。（每回合限一次）',
 			shangtong:'尚同',
-			shangtong_info:'每当你令其他角色恢复1点血量或掉1点血量时，你可以摸1张牌（摸牌上限为4）。',
+			shangtong_info:'每当你令其他角色恢复1点血量或掉1点血量时，你可以摸一张牌（摸牌上限为4）。',
 			feiming:'非命',
-			feiming_info:'其他角色对你造成伤害时，你可以令该角色须选择1项执行：1，将1张红桃花色手牌交给你；2，流失1点血量。',
+			feiming_info:'其他角色对你造成伤害时，你可以令该角色须选择1项执行：1，将1张红桃花色手牌交给你；2，失去1点血量。',
 			yxsrenwang:'人望',
-			yxsrenwang_info:'出牌阶段，你可以弃掉2张牌并指定一名手牌数大于你的角色，你摸牌至与该角色手牌数相等，每阶段限一次。',
+			yxsrenwang_info:'出牌阶段，你可以弃置两张牌并指定一名手牌数大于你的角色，你摸牌至与该角色手牌数相等，每阶段限一次。',
 			shiwei:'施威',
 			shiwei_info:'当其他角色失去最后一张手牌时，你可以将牌堆顶的一张牌背面朝上置于该角色面前，该角色回合，跳过出牌阶段并弃掉这张牌。',
 			yxswushuang:'无双',
