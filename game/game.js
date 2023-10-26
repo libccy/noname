@@ -56179,6 +56179,7 @@
 						}
 					}
 					else if(viewAs){
+						viewAs.cards=result.cards;
 						result.card=get.autoViewAs(viewAs);
 					}
 					if(gameEvent.skillDialog&&get.objtype(gameEvent.skillDialog)=='div'){
