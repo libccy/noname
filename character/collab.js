@@ -1156,8 +1156,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						player:function(card,player,target){
-							if(ui.selected.targets.length) return;
-							if(player!=target&&get.type2(card)=='trick') return [1,0,1,-2];
+							if(player!==target&&get.type2(card)==='trick'){
+								let tars=[target];
+								if(ui.selected.targets.length) tars.addArray(ui.selected.targets.filter(i=>i!==player&&i!==target));
+								if(tars.length<2) return [1,0,1,-2];
+								return [1,0,1,-2/tars.length];
+							}
 						},
 					},
 				},

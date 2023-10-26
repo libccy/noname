@@ -5143,6 +5143,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.removeMark('renjie',1);
 					player.addTempSkill('rewansha');
+				},
+				ai:{
+					order:()=>{
+						let player=_status.event.player;
+						if(game.hasPlayer(current=>{
+							if(player===current||current.hp>1||get.attitude(player,current)>=0) return false;
+							return player.inRange(current)&&player.countCards('hs','sha')&&player.getCardUsable('sha')||
+								player.countCards('hs',card=>get.name(card)!=='sha'&&get.tag(card,'damage'))>1;
+						}) return 9.2;
+						return 0;
+					},
+					result:{
+						player:1
+					},
+					effect:{
+						player:(card,player,target)=>{
+							if(player.hasSkill('rewansha')&&target.hp<=1&&get.tag(card,'damage')) return [1,0,1.5,-1.5];
+						}
+					}
 				}
 			},
 			jilue_zhiheng:{

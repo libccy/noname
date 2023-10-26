@@ -1169,14 +1169,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(event.shaRequired>1&&player.countCards('h','sha')<event.shaRequired) return 0;
 							if(event.player==target){
 								if(player.hasSkill('naman')) return -1;
-								if(get.attitude(target,player)<0||event.player.hp<=1){
+								if(get.attitude(target,player)<0||event.player.hp<=1&&get.damageEffect(target,player,event.player)<get.damageEffect(player,target,event.player)){
 									return get.order(card);
 								}
 								return -1;
 							}
 							else{
 								if(target.hasSkill('naman')) return -1;
-								if(get.attitude(player,target)<0||event.player.hp<=1){
+								if(get.attitude(player,target)<0||event.player.hp<=1&&get.damageEffect(target,player,event.player)>get.damageEffect(player,target,event.player)){
 									return get.order(card);
 								}
 								return -1;
