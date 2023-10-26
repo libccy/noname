@@ -4510,11 +4510,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_yuhuojg:'浴火',
 			boss_yuhuojg_info:'锁定技，每当你受到火焰伤害时，防止此伤害。',
 			boss_qiwu:'栖梧',
-			boss_qiwu_info:'每当你使用一张梅花牌，你可以令一名友方角色回复一点体力。',
+			boss_qiwu_info:'每当你使用一张梅花牌，你可以令一名友方角色回复1点体力。',
 			boss_tianyujg:'天狱',
 			boss_tianyujg_info:'锁定技，结束阶段，你令所有未横置的敌方角色横置。',
 			boss_gongshenjg:'工神',
-			boss_gongshenjg_info:'结束阶段，若已方器械已受伤，你可以为其回复一点体力；否则你可以对敌方器械造成一点火焰伤害。',
+			boss_gongshenjg_info:'结束阶段，若已方器械已受伤，你可以为其回复1点体力；否则你可以对敌方器械造成1点火焰伤害。',
 			boss_zhinang:'智囊',
 			boss_zhinang_info:'准备阶段，你可以亮出牌堆顶的五张牌，你可以将其中锦囊或装备牌交给一名己方角色。',
 			boss_jingmiao:'精妙',
@@ -7305,7 +7305,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'<li>胜利条件：满足一下任意条件游戏结束：（1）在新的一轮开始时，若你的势力获得的龙船至宝至少为4个，则你和队友获胜；（2）消灭所有敌人。'+
 			'</ul>'+
 			'<div style="margin:10px">2v2 替补模式</div><ul style="margin-top:0"><li>选将时额外选择一名替补武将，阵亡时使用自己的替补武将上场，无替补时改为用队友的替补武将，两人均无替补时游戏结束'+
-			'<li>杀死敌方武将摸3张牌，杀死友方武将弃置所有牌</ul>'+
+			'<li>杀死敌方武将摸三张牌，杀死友方武将弃置所有牌</ul>'+
 			'<div style="margin:10px">4v4</div><ul style="margin-top:0"><li>双方各有一名主公和三名忠臣，杀死对方主公获胜<li>'+
 			'8号位游戏开始时额外摸一张牌，7、8号位可在游戏开始时置换一次手牌<li>'+
 			'杀死对方忠臣摸2+x张牌，x为对方（含刚被杀的忠臣）与己方的存活人数之差；主公杀死己方忠臣须弃置所有牌',

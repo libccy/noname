@@ -233,7 +233,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player._temp_mtg_haidao=true;
 						player.chooseToDiscard('he','海岛').set('ai',function(card){
 							return 5-get.value(card);
-						}).set('prompt2','弃置一张牌并回复一点体力，或取消并获得一点护甲');
+						}).set('prompt2','弃置一张牌并回复1点体力，或取消并获得1点护甲');
 					}
 					'step 1'
 					if(result.bool){
@@ -665,7 +665,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			mtg_feixu_skill_info:'准备阶段，随机将弃牌堆的一张牌置于牌堆顶。',
 			mtg_haidao:'海岛',
 			mtg_haidao_skill:'海岛',
-			mtg_haidao_info:'选项一：获得一点护甲（无视地图效果）；选项二：弃置一张牌并回复一点体力。地图效果：锁定技，当你获得护甲时，若你已受伤，改为回复等量体力。',
+			mtg_haidao_info:'选项一：获得1点护甲（无视地图效果）；选项二：弃置一张牌并回复1点体力。地图效果：锁定技，当你获得护甲时，若你已受伤，改为回复等量体力。',
 			mtg_haidao_skill_info:'锁定技，当你获得护甲时，若你已受伤，改为回复等量体力。',
 			mtg_youlin:'幽林',
 			mtg_youlin_skill:'幽林',

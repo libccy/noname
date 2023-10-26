@@ -5742,7 +5742,7 @@
 						name:'游戏人数',
 						init:'8',
 						get item(){
-							const minimumNumberOfPlayers=3,maximumNumberOfPlayers=Math.max(_status.maximumNumberOfPlayers||10,minimumNumberOfPlayers),item={};
+							const minimumNumberOfPlayers=2,maximumNumberOfPlayers=Math.max(_status.maximumNumberOfPlayers||12,minimumNumberOfPlayers),item={};
 							for(let playerNumber=minimumNumberOfPlayers;playerNumber<=maximumNumberOfPlayers;playerNumber++){
 								item[playerNumber]=`${get.cnNumber(playerNumber)}人`;
 							}
@@ -7566,7 +7566,7 @@
 			'<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>',
 			'游戏名词':'<ul><li>智囊：无名杀默认为过河拆桥/无懈可击/无中生有/洞烛先机。牌堆中没有的智囊牌会被过滤。可在卡牌设置中自行增减。若没有可用的智囊，则改为随机选取的三种锦囊牌的牌名。'+
 			'<li>仁库：部分武将使用的游戏外共通区域。至多包含六张牌。当有新牌注入后，若牌数超过上限，则将最早进入仁库的溢出牌置入弃牌堆。'+
-			'<li>护甲：和体力类似，每点护甲可抵挡一点伤害，但不影响手牌上限。'+
+			'<li>护甲：和体力类似，每点护甲可抵挡1点伤害，但不影响手牌上限。'+
 			'<li>随从：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；随从死亡时自动切换回主武将。'+
 			'<li>发现：从三张随机亮出的牌中选择一张，若无特殊说明，则获得此牌。'+
 			'<li>蓄能技：发动时可以增大黄色的数字。若如此做，红色数字于技能的结算过程中改为原来的两倍。'+
@@ -11184,10 +11184,10 @@
 				}
 			},
 			layout:function(layout,nosave){
-				const previousTransitionDuration=document.documentElement.style.transitionDuration;
-				document.documentElement.style.transitionDuration='1s';
-				const previousFilter=document.documentElement.style.filter,previousWebkitFilter=document.documentElement.style.webkitFilter;
-				document.documentElement.style.filter=document.documentElement.style.webkitFilter='brightness(0)';
+				const loadingScreen=ui.create.div('.loading-screen',document.body),loadingScreenStyle=loadingScreen.style;
+				loadingScreenStyle.animationDuration='1s';
+				loadingScreenStyle.animationFillMode='forwards';
+				loadingScreenStyle.animationName='opacity-0-1';
 				if(layout=='default') layout='mobile';
 				if(!nosave) game.saveConfig('layout',layout);
 				game.layout=layout;
@@ -11294,18 +11294,12 @@
 					return new Promise(resolve=>setTimeout(resolve,500));
 				}).then(()=>{
 					ui.updatex();
-					ui.create.playerPositions();
+					ui.updatePlayerPositions();
 					return new Promise(resolve=>setTimeout(resolve,500));
 				}).then(()=>{
 					ui.updatec();
-					if(previousFilter) document.documentElement.style.filter=previousFilter;
-					else document.documentElement.style.removeProperty('filter');
-					if(previousWebkitFilter) document.documentElement.style.webkitFilter=previousWebkitFilter;
-					else document.documentElement.style.removeProperty('-webkit-filter');
-					return new Promise(resolve=>setTimeout(resolve,1000));
-				}).then(()=>{
-					if(previousTransitionDuration) document.documentElement.style.transitionDuration=previousTransitionDuration;
-					else document.documentElement.style.removeProperty('transition-duration');
+					loadingScreenStyle.animationName='opacity-1-0';
+					loadingScreen.addEventListener('animationend',animationEvent=>animationEvent.target.remove());
 				});
 			},
 			background:function(){
@@ -12273,7 +12267,7 @@
 			take_damage:'受伤害',
 			reset_character:'复原武将牌',
 			recover_hp:'回复体力',
-			lose_hp:'流失体力',
+			lose_hp:'失去体力',
 			get_damage:'受伤害',
 			weiColor:"#b0d0e2",
 			shuColor:"#ffddb9",
@@ -12395,7 +12389,7 @@
 			cooperation_damage:'同仇',
 			cooperation_damage_info:'双方累计造成至少4点伤害',
 			cooperation_draw:'并进',
-			cooperation_draw_info:'双方累计摸至少8张牌',
+			cooperation_draw_info:'双方累计摸至少八张牌',
 			cooperation_discard:'疏财',
 			cooperation_discard_info:'双方累计弃置至少4种花色的牌',
 			cooperation_use:'戮力',
@@ -23174,6 +23168,11 @@
 					}
 					return list;
 				}
+				/**
+				 * @param {string} [arg1='h']
+				 * @param {string | Record<string, any> | (card: Card) => boolean} [arg2]
+				 * @returns {Card[]}
+				 */
 				getCards(arg1,arg2){
 					if(typeof arg1!='string'){
 						arg1='h';
@@ -30593,7 +30592,7 @@
 							else Object.defineProperty(this,key,propertyDescriptor);
 						});
 						if(Array.isArray(numberOrCards)){
-							const noCards=!('cards' in this);
+							const noCards=!this.cards;
 							/**
 							 * @type {Card[]}
 							 */
@@ -30601,8 +30600,8 @@
 							if(noCards){
 								if(!lib.suits.includes(this.suit)) this.suit=get.suit(this);
 								if(!Object.keys(lib.color).includes(this.color)) this.color=get.color(this);
-								if(!('number' in this)) this.number=get.number(this);
-								if(!('nature' in this)) this.nature=get.nature(this);
+								if(typeof this.number!='number') this.number=get.number(this);
+								if(!this.nature) this.nature=get.nature(this);
 							}
 						}
 						const info=get.info(this,false);
@@ -30615,9 +30614,8 @@
 					if(typeof numberOrCards=='number') this.number=numberOrCards;
 					if(typeof name=='string') this.name=name;
 					if(typeof nature=='string') this.nature=nature;
-					if('suit' in this&&!('color' in this)) this.color=get.color(this);
-					if(!('storage' in this)) this.storage={};
-					if(!('cards' in this)) this.cards=[];
+					if(!this.storage) this.storage={};
+					if(!this.cards) this.cards=[];
 				}
 				sameSuitAs(card){
 					return get.suit(this)==get.suit(card);
@@ -31545,7 +31543,6 @@
 					return this;
 				}
 				/**
-				 * @throws {'Do not call this method'}
 				 * @returns {never}
 				 */
 				typeAnnotation(){
@@ -31621,7 +31618,7 @@
 					 * @type {boolean}
 					 */
 					this.unreal;
-					throw 'Do not call this method';
+					throw new Error('Do not call this method');
 				}
 			},
 			Dialog:class extends HTMLDivElement{
@@ -32907,7 +32904,7 @@
 					},
 					directHit_ai:true,
 					skillTagFilter:(player,tag,arg)=>{
-						const card=arg.card;
+						const card=get.autoViewAs(arg.card);
 						if(card.name!='sha'||!card.storage.stratagem_buffed) return false;
 						const target=arg.target;
 						if(target.countCards('h','shan')>=1&&!target.storage.stratagem_fury) return false;
@@ -42237,10 +42234,13 @@
 				}
 			});
 		},
-		updateRoundNumber:()=>game.broadcastAll((num1,num2,top)=>{
-			if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=`${num1}轮 剩余牌: ${num2}`;
-			_status.pileTop=top;
-		},game.roundNumber,ui.cardPile.childNodes.length,ui.cardPile.firstChild),
+		updateRoundNumber:()=>{
+			game.broadcastAll((roundNumber,pileTop)=>{
+				if(game.roundNumber!=roundNumber) game.roundNumber=roundNumber;
+				if(_status.pileTop!=pileTop) _status.pileTop=pileTop;
+			},game.roundNumber,ui.cardPile.firstChild);
+			ui.updateRoundNumber();
+		},
 		asyncDraw:(players,num,drawDeck,bottom)=>players.forEach((value,index)=>{
 			let num2=1;
 			if(typeof num=='number') num2=num;
@@ -52133,7 +52133,7 @@
 				}
 				ui.arena.setNumber=function(num){
 					this.dataset.number=num;
-					ui.create.playerPositions();
+					ui.updatePlayerPositions();
 					// if(game.layout=='nova'&&parseInt(num)<7){
 					// 	ui.arena.classList.add('player_autolong');
 					// }
@@ -53102,48 +53102,8 @@
 				}
 			},
 			player:(position,noclick)=>new lib.element.Player(position,noclick),
-			/**
-			 * @author curpond
-			 * @author Tipx-L
-			 * @param {number} [numberOfPlayers]
-			 */
-			connectPlayerPositions:numberOfPlayers=>{
-				if(typeof numberOfPlayers!='number') numberOfPlayers=lib.configOL.number;
-				if(!numberOfPlayers) return;
-				const playerPositions=ui.playerPositions;
-				while(playerPositions.length){
-					playerPositions.pop().remove();
-				}
-				const temporaryPlayer=ui.create.div('.player.connect',ui.window).hide();
-				const computedStyle=getComputedStyle(temporaryPlayer);
-				const halfWidth=parseFloat(computedStyle.width)/2;
-				const halfHeight=parseFloat(computedStyle.height)/2;
-				temporaryPlayer.remove();
-				const halfNumberOfPlayers=Math.round(numberOfPlayers/2);
-				const upperPercentage=100/(halfNumberOfPlayers+1);
-				const scale=10/numberOfPlayers;
-				for(let ordinal=0;ordinal<halfNumberOfPlayers;ordinal++){
-					playerPositions.push(lib.init.sheet([
-						`#window>.player.connect[data-position='${ordinal}']{`,
-						`left:calc(${upperPercentage*(ordinal+1)}% - ${halfWidth}px);`,
-						`top:calc(${100/3}% - ${halfHeight}px);`,
-						scale<1?`transform:scale(${scale});`:'',
-						'}'
-					].join('')));
-				}
-				const lowerPercentage=100/(numberOfPlayers-halfNumberOfPlayers+1);
-				for(let ordinal=halfNumberOfPlayers;ordinal<numberOfPlayers;ordinal++){
-					playerPositions.push(lib.init.sheet([
-						`#window>.player.connect[data-position='${ordinal}']{`,
-						`left:calc(${lowerPercentage*(ordinal-halfNumberOfPlayers+1)}% - ${halfWidth}px);`,
-						`top:calc(${100*2/3}% - ${halfHeight}px);`,
-						scale<1?`transform:scale(${scale});`:'',
-						'}'
-					].join('')));
-				}
-			},
 			connectPlayers:ip=>{
-				ui.create.connectPlayerPositions();
+				ui.updateConnectPlayerPositions();
 				game.connectPlayers=[];
 				const numberOfPlayers=lib.configOL.number;
 				for(let position=0;position<numberOfPlayers;position++){
@@ -53197,44 +53157,6 @@
 
 				ui.connectStartButton=button;
 				ui.connectStartBar=bar;
-			},
-			/**
-			 * @author curpond
-			 * @author Tipx-L
-			 * @param {number} [numberOfPlayers]
-			 */
-			playerPositions:numberOfPlayers=>{
-				if(typeof numberOfPlayers!='number') numberOfPlayers=ui.arena.dataset.number;
-				//当人数小于8时，还是用以前的布局。
-				if(!numberOfPlayers||numberOfPlayers<9) return;
-				const playerPositions=ui.playerPositions;
-				while(playerPositions.length){
-					playerPositions.pop().remove();
-				}
-				//单个人物的宽度。这里要设置玩家的实际的宽度
-				const temporaryPlayer=ui.create.div('.player',ui.arena).hide();
-				const computedStyle=getComputedStyle(temporaryPlayer);
-				const scale=6/numberOfPlayers;
-				//玩家顶部距离父容器上边缘的距离偏移的单位距离
-				const quarterHeight=parseFloat(computedStyle.height)/4*scale;
-				const halfWidth=parseFloat(computedStyle.width)/2;
-				temporaryPlayer.remove();
-				//列数，即假如8人场，除去自己后，上面7个人占7列
-				const columnCount=numberOfPlayers-1;
-				const percentage=90/(columnCount-1);
-				//仅当游戏人数大于8人，且玩家的座位号大于0时，设置玩家的位置。因为0号位是game.me在最下方，无需设置。
-				for(let ordinal=1;ordinal<numberOfPlayers;ordinal++){
-					const reversedOrdinal=columnCount-ordinal;
-					//动态计算玩家的top属性，实现拱桥的效果。只让两边的各两个人向下偏移一些
-					const top=Math.max(0,Math.round(numberOfPlayers/5)-Math.min(Math.abs(ordinal-1),Math.abs(reversedOrdinal)))*quarterHeight;
-					playerPositions.push(lib.init.sheet([
-						`#arena[data-number='${numberOfPlayers}']>.player[data-position='${ordinal}']{`,
-						`left:calc(${percentage*reversedOrdinal+5}% - ${halfWidth}px);`,
-						`top:${top}px;`,
-						`transform:scale(${scale});`,
-						'}'
-					].join('')));
-				}
 			},
 			players:numberOfPlayers=>{
 				if(numberOfPlayers===0){
@@ -56235,22 +56157,21 @@
 					const skillInformation=get.info(gameEvent.skill),viewAs=skillInformation.viewAs;
 					if(typeof viewAs=='function'){
 						const viewedAs=viewAs(result.cards,gameEvent.player);
-						if(viewedAs){
-							viewedAs.cards=result.cards;
-							result.card=get.autoViewAs(viewedAs);
+						if(viewedAs) result.card=get.autoViewAs(viewedAs);
+					}
+					else if(viewAs) result.card=get.autoViewAs(viewAs);
+					const resultCard=result.card;
+					if(resultCard){
+						const cards=result.cards;
+						if(cards.length==1){
+							const firstCard=cards[0];
+							if(!resultCard.suit) resultCard.suit=get.suit(firstCard);
+							if(!resultCard.number) resultCard.number=get.number(firstCard);
 						}
 					}
-					else if(viewAs){
-						viewAs.cards=result.cards;
-						result.card=get.autoViewAs(viewAs);
-					}
-					if(gameEvent.skillDialog&&get.objtype(gameEvent.skillDialog)=='div'){
-						gameEvent.skillDialog.close();
-					}
-					var cards=gameEvent.player.getCards('hej');
-					for(var i=0;i<cards.length;i++){
-						cards[i].recheck('useSkill');
-					}
+					const skillDialog=gameEvent.skillDialog;
+					if(skillDialog&&get.objtype(skillDialog)=='div') skillDialog.close();
+					gameEvent.player.getCards('hej').forEach(card=>card.recheck('useSkill'));
 					gameEvent.restore();
 				}
 				else if(['chooseToUse','chooseToRespond'].includes(gameEvent.name)) result.card=get.autoViewAs(result.cards[0]);
@@ -57932,6 +57853,87 @@
 			}
 			ui._recycle[key]=node;
 		},
+		/**
+		 * @author curpond
+		 * @author Tipx-L
+		 * @param {number} [numberOfPlayers]
+		 */
+		updateConnectPlayerPositions:numberOfPlayers=>{
+			if(typeof numberOfPlayers!='number') numberOfPlayers=lib.configOL.number;
+			if(!numberOfPlayers) return;
+			const playerPositions=ui.playerPositions;
+			while(playerPositions.length){
+				playerPositions.pop().remove();
+			}
+			const temporaryPlayer=ui.create.div('.player.connect',ui.window).hide();
+			const computedStyle=getComputedStyle(temporaryPlayer);
+			const halfWidth=parseFloat(computedStyle.width)/2;
+			const halfHeight=parseFloat(computedStyle.height)/2;
+			temporaryPlayer.remove();
+			const halfNumberOfPlayers=Math.round(numberOfPlayers/2);
+			const upperPercentage=100/(halfNumberOfPlayers+1);
+			const scale=10/numberOfPlayers;
+			for(let ordinal=0;ordinal<halfNumberOfPlayers;ordinal++){
+				playerPositions.push(lib.init.sheet([
+					`#window>.player.connect[data-position='${ordinal}']{`,
+					`left:calc(${upperPercentage*(ordinal+1)}% - ${halfWidth}px);`,
+					`top:calc(${100/3}% - ${halfHeight}px);`,
+					scale<1?`transform:scale(${scale});`:'',
+					'}'
+				].join('')));
+			}
+			const lowerPercentage=100/(numberOfPlayers-halfNumberOfPlayers+1);
+			for(let ordinal=halfNumberOfPlayers;ordinal<numberOfPlayers;ordinal++){
+				playerPositions.push(lib.init.sheet([
+					`#window>.player.connect[data-position='${ordinal}']{`,
+					`left:calc(${lowerPercentage*(ordinal-halfNumberOfPlayers+1)}% - ${halfWidth}px);`,
+					`top:calc(${100*2/3}% - ${halfHeight}px);`,
+					scale<1?`transform:scale(${scale});`:'',
+					'}'
+				].join('')));
+			}
+		},
+		/**
+		 * @author curpond
+		 * @author Tipx-L
+		 * @param {number} [numberOfPlayers]
+		 */
+		updatePlayerPositions:numberOfPlayers=>{
+			if(typeof numberOfPlayers!='number') numberOfPlayers=ui.arena.dataset.number;
+			//当人数小于8时，还是用以前的布局。
+			if(!numberOfPlayers||numberOfPlayers<9) return;
+			const playerPositions=ui.playerPositions;
+			while(playerPositions.length){
+				playerPositions.pop().remove();
+			}
+			//单个人物的宽度。这里要设置玩家的实际的宽度
+			const temporaryPlayer=ui.create.div('.player',ui.arena).hide();
+			const computedStyle=getComputedStyle(temporaryPlayer);
+			const scale=6/numberOfPlayers;
+			//玩家顶部距离父容器上边缘的距离偏移的单位距离
+			const quarterHeight=parseFloat(computedStyle.height)/4*scale;
+			const halfWidth=parseFloat(computedStyle.width)/2;
+			temporaryPlayer.remove();
+			//列数，即假如8人场，除去自己后，上面7个人占7列
+			const columnCount=numberOfPlayers-1;
+			const percentage=90/(columnCount-1);
+			//仅当游戏人数大于8人，且玩家的座位号大于0时，设置玩家的位置。因为0号位是game.me在最下方，无需设置。
+			for(let ordinal=1;ordinal<numberOfPlayers;ordinal++){
+				const reversedOrdinal=columnCount-ordinal;
+				//动态计算玩家的top属性，实现拱桥的效果。只让两边的各两个人向下偏移一些
+				const top=Math.max(0,Math.round(numberOfPlayers/5)-Math.min(Math.abs(ordinal-1),Math.abs(reversedOrdinal)))*quarterHeight;
+				playerPositions.push(lib.init.sheet([
+					`#arena[data-number='${numberOfPlayers}']>.player[data-position='${ordinal}']{`,
+					`left:calc(${percentage*reversedOrdinal+5}% - ${halfWidth}px);`,
+					`top:${top}px;`,
+					`transform:scale(${scale});`,
+					'}'
+				].join('')));
+			}
+		},
+		updateRoundNumber:()=>game.broadcastAll((roundNumber,cardPileNumber)=>{
+			if(ui.cardPileNumber) ui.cardPileNumber.innerHTML=`${roundNumber}轮 剩余牌: ${cardPileNumber}`;
+		},game.roundNumber,ui.cardPile.childElementCount)
 	};
 	const get={
 		/**
@@ -62649,7 +62651,7 @@
 				}
 			}
 		},
-		get
+		get:get
 	};
 	/**
 	 * @template T
