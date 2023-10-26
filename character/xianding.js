@@ -11801,7 +11801,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					jueqing:true,
 					unequip_ai:true,
 					skillTagFilter:function(player,tag,arg){
-						if(tag=='unequip_ai') return arg&&arg.name==='sha;
+						if(tag=='unequip_ai') return arg&&arg.name==='sha';
 					}
 				},
 			},
