@@ -12561,9 +12561,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			qice:{
+				audio:2,
+				audioname:['clan_xunyou'],
 				enable:'phaseUse',
-				usable:1,
-				audio:'qice_backup',
 				filter:function(event,player){
 					const hs=player.getCards('h');
 					if(!hs.length) return false;
@@ -12577,6 +12577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return event.filterCard(card,player,event);
 					});
 				},
+				usable:1,
 				chooseButton:{
 					dialog:function(player){
 						var list=[];
@@ -12633,10 +12634,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
+							audio:'qice',
+							audioname:['clan_xunyou'],
 							filterCard:true,
 							selectCard:-1,
 							position:'h',
-							audio:2,
 							popname:true,
 							viewAs:{name:links[0][2]},
 						}
@@ -12667,7 +12669,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.6,
 				}
 			},
-			qice_backup:{audio:2},
 			zhiyu:{
 				audio:2,
 				trigger:{player:'damageEnd'},

@@ -21,17 +21,91 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_zhonghui:['male','wei','3/4',['clanyuzhi','clanxieshu','clanbaozu'],['clan:颍川钟氏']],
 			clan_zhongyu:['male','wei',3,['clanjiejian','clanhuanghan','clanbaozu'],['clan:颍川钟氏']],
 			clan_wanglun:['male','wei',3,['clanqiuxin','clanjianyuan','clanzhongliu'],['clan:太原王氏']],
+			clan_xunyou:['male','wei',3,['clanbaichu','clandaojie'],['clan:颍川荀氏']],
 		},
 		characterSort:{
 			clan:{
 				clan_wu:['clan_wuxian','clan_wuban','clan_wukuang'],
-				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
+				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan','clan_xunyou'],
 				clan_han:['clan_hanshao','clan_hanrong'],
 				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun'],
 				clan_zhong:['clan_zhongyan','clan_zhonghui','clan_zhongyu'],
 			},
 		},
 		skill:{
+			//族荀攸
+			clanbaichu:{
+				derivation:'qice',
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					if(player.getStorage('clanbaichu').contains(event.card.name)) return true;
+					var str=(get.suit(event.card)+'、'+get.type2(event.card));
+					if(!player.getStorage('clanbaichu').contains(str)) return lib.inpile.some(name=>get.type(name)=='trick'&&!player.getStorage('clanbaichu').contains(name));
+					return !player.hasSkill('qice');
+				},
+				forced:true,
+				content:function(){
+					'step 0'
+					var str=(get.suit(trigger.card)+'+'+get.type2(trigger.card));
+					if(player.getStorage('clanbaichu').contains(trigger.card.name)){
+						event.draw=true;
+					}
+					if(player.getStorage('clanbaichu').contains(str)){
+						if(!player.hasSkill('qice')){
+							player.addTempSkill('qice','roundStart');
+							player.popup('奇策');
+							game.log(player,'获得了技能','#g【奇策】');
+						}
+						event.goto(2);
+					}
+					else{
+						player.markAuto('clanbaichu',[str]);
+						var dialog=['请选择【百出】记录的普通锦囊牌牌名',[lib.inpile.filter(name=>get.type(name)=='trick'&&!player.getStorage('clanbaichu').contains(name)),'vcard']];
+						player.chooseButton(dialog,true).set('ai',function(button){
+							var player=_status.event.player,name=button.link[2];
+							if(name=='wuxie') return 114514;
+							return get.effect(player,{name:name},player,player)*(1+player.countCards('hs',name));
+						});
+					}
+					'step 1'
+					if(result.bool){
+						var name=result.links[0][2];
+						player.markAuto('clanbaichu',[name]);
+						player.popup(get.translation(name));
+						game.log(player,'记录中了','#y'+get.translation(name));
+						game.delayx();
+					}
+					'step 2'
+					if(event.draw) player.chooseDrawRecover(true);
+				},
+				intro:{
+					markcount:()=>0,
+					content:function(storage){
+						var str='<span class="text center">';
+						var list=storage.filter(str=>str.includes('+'));
+						var cards=storage.filter(str=>!list.contains(str));
+						if(list.length){
+							str+='<li>已记录的花色点数组合：';
+							list.forEach(strx=>{
+								var listx=strx.split('+');
+								str+='<br>';
+								str+=get.translation(listx[0]);
+								str+='+';
+								str+=get.translation(listx[1]);
+							});
+						}
+						if(list.length&&cards.length) str+='<br>';
+						if(cards.length){
+							str+='<li>已记录的普通锦囊牌名：';
+							str+='<br>';
+							str+=get.translation(cards);
+						}
+						str+='</span>';
+						return str;
+					},
+				},
+			},
 			//族王沦
 			clanqiuxin:{
 				audio:2,
@@ -2191,7 +2265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clandaojie:{
 				audio:2,
-				audioname:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan'],
+				audioname:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan','clan_xunyou'],
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
 					return get.type(event.card,null,false)=='trick'&&!get.tag(event.card,'damage')&&event.cards.filterInD().length>0&&player.getHistory('useCard',evt=>{
@@ -2490,6 +2564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_zhonghui_prefix:'族',
 			clan_zhongyu_prefix:'族',
 			clan_wanglun_prefix:'族',
+			clan_xunyou_prefix:'族',
 
 			clan_wuxian:'族吴苋',
 			clanyirong:'移荣',
@@ -2580,6 +2655,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanqiuxin_info:'出牌阶段限一次，你可以令一名其他角色选择一项：①你对其使用【杀】；②你对其使用任意普通锦囊牌。当你执行其选择的选项后，你视为执行另一项。',
 			clanjianyuan:'简远',
 			clanjianyuan_info:'当一名角色发动“出牌阶段限一次”的技能后，你可以令其重铸任意张牌名字数为X的牌（X为其本阶段的使用牌数）。',
+			clan_xunyou:'族荀攸',
+			clanbaichu:'百出',
+			clanbaichu_info:'锁定技，当你使用一张牌结算完毕后，若你：未记录过此牌的点数和类型组合，则你记录此组合并记录一个普通锦囊牌名，否则你于本轮获得技能〖奇策〗；已记录此牌牌名，你回复1点体力或摸一张牌。',
 			
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
