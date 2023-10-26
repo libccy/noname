@@ -72,7 +72,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_lingtong:['male','wu',4,['decadexuanfeng','yongjin']],
 			xin_liubiao:['male','qun',3,['decadezishou','decadezongshi']],
 			re_caoxiu:['male','wei',4,['qianju','reqingxi']],
-			re_sunxiu:['male','wu',3,['reyanzhu','rexingxue','xinzhaofu'],['zhu']],
+			re_sunxiu:['male','wu',3,['reyanzhu','rexingxue','zhaofu'],['zhu']],
 			ol_dengai:['male','wei',4,['oltuntian','olzaoxian']],
 			re_gongsunzan:['male','qun',4,['reqiaomeng','reyicong']],
 			re_manchong:['male','wei',3,['rejunxing','yuce']],
@@ -935,6 +935,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var skills=player.additionalSkills['relinglong'];
 					return (skills&&skills.length>0)!=player.hasEmptySlot(5);
 				},
+				direct:true,
 				content:function(){
 					player.removeAdditionalSkill('relinglong');
 					if(player.hasEmptySlot(5)){
@@ -6206,7 +6207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//界曹彰
 			xinjiangchi:{
-				audio:'new_jiangchi',
+				audio:2,
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
 				content:function(){
@@ -11095,7 +11096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('xinleiji');
 						player.recover();
 					}
-					player.chooseTarget('雷击：是否对一名角色造成'+event.num+'点雷电伤害？',lib.filter.notMe).ai=function(target){
+					player.chooseTarget('雷击：是否对一名角色造成'+event.num+'点雷电伤害？').ai=function(target){
 						var player=_status.event.player;
 						return get.damageEffect(target,player,player,'thunder');
 					};
@@ -14736,7 +14737,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinleiji:'雷击',
 			xinleiji_misa:'雷击',
 			xinguidao:'鬼道',
-			xinleiji_info:'①当你使用【闪】或【闪电】，或打出【闪】时，你可以进行判定。②当你的判定的判定牌生效后，若结果为：黑桃，你可对一名其他角色造成2点雷电伤害；梅花：你回复1点体力并可对一名其他其他角色造成1点雷电伤害。',
+			xinleiji_info:'①当你使用【闪】或【闪电】，或打出【闪】时，你可以进行判定。②当你的判定的判定牌生效后，若结果为：黑桃，你可对一名角色造成2点雷电伤害；梅花：你回复1点体力并可对一名角色造成1点雷电伤害。',
 			xinleiji_append:'<span style="font-family:yuanli">不能触发〖雷击〗的判定：〖暴虐〗、〖助祭〗、<br>〖弘仪〗、〖孤影〗。</span>',
 			xinleiji_faq:'不能触发〖雷击〗的判定',
 			xinleiji_faq_info:'<br>董卓/界董卓〖暴虐〗<br>黄巾雷使〖助祭〗<br>羊徽瑜〖弘仪〗<br>鸣濑白羽〖孤影〗',
