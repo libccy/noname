@@ -5777,7 +5777,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				content:function(){
-					player.chooseDrawRecover(get.prompt('guizao'),'摸一张牌或回复一点体力').logSkill='guizao';
+					player.chooseDrawRecover(get.prompt('guizao'),'摸一张牌或回复1点体力').logSkill='guizao';
 				},
 			},
 			jiyu:{
@@ -9107,7 +9107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.targets.length){
 						var current=event.targets.shift();
 						if(current.group=='wei'){
-							current.chooseBool('是否令'+get.translation(player)+'回复一点体力？').set('ai',function(){
+							current.chooseBool('是否令'+get.translation(player)+'回复1点体力？').set('ai',function(){
 								return get.attitude(_status.event.player,_status.event.target)>2;
 							}).set('target',player);
 							event.current=current;
@@ -9123,7 +9123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.damages.push(event.current);
 						event.current.line(player,'green');
-						game.log(event.current,'令',player,'回复一点体力');
+						game.log(event.current,'令',player,'回复1点体力');
 						player.recover();
 					}
 					if(event.targets.length){
@@ -11109,7 +11109,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.delay();
 					"step 1"
 					target.chooseTarget([1,event.num],'令'+get.translation(player)+'回复'+
-						event.num+'点体力，或对攻击范围内的'+event.num+'名角色造成一点伤害',function(card,player,target2){
+						event.num+'点体力，或对攻击范围内的'+event.num+'名角色造成1点伤害',function(card,player,target2){
 						return _status.event.player.inRange(target2);
 					}).set('ai',function(target2){
 						var target=_status.event.player;
@@ -13344,7 +13344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.showCards(result.cards);
 						var type=get.type(result.cards[0],'trick');
 						if(trigger.source){
-							trigger.source.chooseToDiscard('弃置一张不为'+get.translation(type)+'牌的牌或令'+get.translation(player)+'回复一点体力',function(card){
+							trigger.source.chooseToDiscard('弃置一张不为'+get.translation(type)+'牌的牌或令'+get.translation(player)+'回复1点体力',function(card){
 								return get.type(card,'trick')!=_status.event.type;
 							}).set('ai',function(card){
 								if(get.recoverEffect(_status.event.getParent().player,_status.event.player,_status.event.player)<0){
@@ -14405,7 +14405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuhun2:'父魂',
 			fuhun_info:'你可以将两张手牌当做【杀】使用或打出；出牌阶段，若你以此法使用的【杀】造成了伤害，你获得技能〖武圣〗和〖咆哮〗直到回合结束。',
 			yuce:'御策',
-			yuce_info:'当你受到伤害后，你可以展示一张手牌，并令伤害来源选择一项：弃置一张与此牌类型不同的手牌，或令你回复一点体力。',
+			yuce_info:'当你受到伤害后，你可以展示一张手牌，并令伤害来源选择一项：弃置一张与此牌类型不同的手牌，或令你回复1点体力。',
 			xiansi:'陷嗣',
 			xiansix:'陷嗣',
 			xiansi_bg:'逆',
@@ -14554,9 +14554,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			anxu_info:'出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌多的角色将一张手牌交给手牌少的角色，然后若这两名角色手牌数相等，你摸一张牌或回复1点体力。',
 			old_anxu_info:'出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之。然后若此牌不为黑桃，则你摸一张牌。',
 			zongxuan_info:'当你的牌因弃置而进入弃牌堆后，你可以将其按任意顺序置于牌堆顶。',
-			zhiyan_info:'结束阶段，你可以令一名角色摸一张牌并展示之，若为装备牌，其使用此牌并回复一点体力。',
+			zhiyan_info:'结束阶段，你可以令一名角色摸一张牌并展示之，若为装备牌，其使用此牌并回复1点体力。',
 			miji_info:'结束阶段，若你已受伤，则可以摸X张牌，然后可以将等量的牌交给一名其他角色（X为你已损失的体力值）。',
-			zhenlie_info:'当你成为其他角色使用【杀】或普通锦囊牌的目标后，你可以失去一点体力并令此牌对你无效，然后弃置对方一张牌。',
+			zhenlie_info:'当你成为其他角色使用【杀】或普通锦囊牌的目标后，你可以失去1点体力并令此牌对你无效，然后弃置对方一张牌。',
 			chengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌。',
 			oldchengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于12的牌。',
 			renxin_info:'当体力值为1的一名其他角色受到伤害时，你可以将武将牌翻面并弃置一张装备牌，然后防止此伤害。',

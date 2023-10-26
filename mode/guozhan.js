@@ -7204,7 +7204,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					var list=['失去一点体力','令'+get.translation(player)+'摸两张牌'];
+					var list=['失去1点体力','令'+get.translation(player)+'摸两张牌'];
 					event.addIndex=0;
 					if(target.countCards('h',function(card){
 						return lib.filter.cardDiscardable(card,target,'gzlixia');
@@ -7801,7 +7801,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.targets=result.targets;
 					var choiceList=[];
 					choiceList.push('执行该军令');
-					choiceList.push('令'+get.translation(trigger.player)+(trigger.player==trigger.source?'（你）':'')+'回复一点体力');
+					choiceList.push('令'+get.translation(trigger.player)+(trigger.player==trigger.source?'（你）':'')+'回复1点体力');
 					trigger.source.chooseJunlingControl(player,result.junling,result.targets).set('prompt','补益').set('choiceList',choiceList).set('ai',function(){
 						if(get.recoverEffect(trigger.player,player,_status.event.player)>0) return 1;
 						return (get.attitude(trigger.source,trigger.player)<0&&get.junlingEffect(player,result.junling,trigger.source,result.targets,trigger.source)>=-2)?1:0;
@@ -8678,7 +8678,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(num<event.players.length) event.current=event.players[num];
 					if(event.current&&event.current.isAlive()){
 						event.showCharacter=false;
-						var choiceList=['执行该军令，增加一点体力上限，然后回复一点体力','不执行该军令'];
+						var choiceList=['执行该军令，增加1点体力上限，然后回复1点体力','不执行该军令'];
 						if(event.current.isFriendOf(player)) event.current.chooseJunlingControl(player,event.junling,targets).set('prompt','将略').set('choiceList',choiceList).set('ai',function(){return 0});
 						else if((event.filterName(event.current.name1)||event.filterName(event.current.name2))&&event.current.wontYe(player.identity)){
 							event.showCharacter=true;
@@ -8997,7 +8997,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							player.logSkill('enyuan_damage',trigger.source);
-							trigger.source.chooseCard('交给'+get.translation(player)+'一张手牌，或失去一点体力','h').set('ai',function(card){
+							trigger.source.chooseCard('交给'+get.translation(player)+'一张手牌，或失去1点体力','h').set('ai',function(card){
 								if(get.attitude(_status.event.player,_status.event.getParent().player)>0) return 11-get.value(card);
 								return 7-get.value(card);
 							});
@@ -12934,7 +12934,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						var nono=(get.damageEffect(trigger.player,player,trigger.player)>=0);
-						trigger.player.chooseToDiscard('弃置一张装备牌，或受到一点伤害','he',{type:'equip'}).set('ai',function(card){
+						trigger.player.chooseToDiscard('弃置一张装备牌，或受到1点伤害','he',{type:'equip'}).set('ai',function(card){
 							if(_status.event.nono){
 								return 0;
 							}
@@ -14321,13 +14321,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			junling:'军令',
 			junling1:'军令一',
 			junling1_bg:'令',
-			junling1_info:'若被执行，执行者对发起者指定的一名角色造成一点伤害。',
+			junling1_info:'若被执行，执行者对发起者指定的一名角色造成1点伤害。',
 			junling2:'军令二',
 			junling2_bg:'令',
 			junling2_info:'若被执行，执行者摸一张牌，然后依次交给发起者两张牌。',
 			junling3:'军令三',
 			junling3_bg:'令',
-			junling3_info:'若被执行，执行者失去一点体力。',
+			junling3_info:'若被执行，执行者失去1点体力。',
 			junling4:'军令四',
 			junling4_bg:'令',
 			junling4_info:'若被执行，直到回合结束，执行者不能使用或打出手牌且非锁定技全部失效。',
@@ -14367,7 +14367,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzzhuhai_info:'其他角色的结束阶段开始时，若其本回合内造成过伤害，则你可以对其使用一张【杀】（无距离限制）。若其本回合内对与你势力相同的角色造成过伤害，则此【杀】无视防具，且当其抵消此【杀】后，其须弃置一张牌。',
 			gzzhuosheng:'擢升',
 			gzzhuosheng2:'擢升',
-			gzzhuosheng_info:'当一名与你势力相同的角色受到伤害后，你可令其摸一张牌。然后直到其下个结束阶段前，其使用此牌根据类型执行以下效果：1. 基本牌，不计入次数且无距离限制；2. 普通锦囊牌，此牌目标可+1或-1；3. 装备牌，可摸1张牌。',
+			gzzhuosheng_info:'当一名与你势力相同的角色受到伤害后，你可令其摸一张牌。然后直到其下个结束阶段前，其使用此牌根据类型执行以下效果：1. 基本牌，不计入次数且无距离限制；2. 普通锦囊牌，此牌目标可+1或-1；3. 装备牌，可摸一张牌。',
 
 			gzzhaoxin:'昭心',
 			gzzhaoxin_info:'当你受到伤害后，你可展示所有手牌，然后与一名手牌数不大于你的其他角色交换手牌。',
@@ -14522,14 +14522,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzjieyue_info:'准备阶段开始时，你可以将一张手牌交给一名非魏势力角色，然后选择一个“军令”并令其选择一项：执行该军令，然后你摸一张牌；或令你于此回合摸牌阶段额外摸三张牌。',
 			gz_wangping:'王平',
 			jianglue:'将略',
-			jianglue_info:'限定技，出牌阶段，你可以选择一个“军令”，然后与你势力相同的其他角色可以执行该军令（未确定势力角色可以在此时明置一张单势力武将牌）。你与所有执行该军令的角色增加一点体力上限，然后回复一点体力，然后你摸X张牌（X为以此法回复了体力的角色数）。',
+			jianglue_info:'限定技，出牌阶段，你可以选择一个“军令”，然后与你势力相同的其他角色可以执行该军令（未确定势力角色可以在此时明置一张单势力武将牌）。你与所有执行该军令的角色增加1点体力上限，然后回复1点体力，然后你摸X张牌（X为以此法回复了体力的角色数）。',
 			gz_fazheng:'法正',
 			gzxuanhuo:'眩惑',
 			gzxuanhuo_info:'与你势力相同的其他角色的出牌阶段限一次，其可弃置一张手牌，然后选择获得以下一项技能直到回合结束：〖武圣〗、〖咆哮〗、〖龙胆〗、〖铁骑〗、〖烈弓〗、〖狂骨〗。',
 			gzenyuan:'恩怨',
 			gzenyuan_info:'锁定技，当其他角色对你使用【桃】时，该角色摸一张牌；当你受到伤害后，伤害来源须交给你一张手牌或失去1点体力。',
 			gzbuyi:'补益',
-			gzbuyi_info:'每回合限一次，当一名与你势力相同的角色脱离濒死状态后，你可以选择一个“军令”，令伤害来源选择一项：执行该军令，或令该脱离濒死状态的角色回复一点体力。',
+			gzbuyi_info:'每回合限一次，当一名与你势力相同的角色脱离濒死状态后，你可以选择一个“军令”，令伤害来源选择一项：执行该军令，或令该脱离濒死状态的角色回复1点体力。',
 			gz_lukang:'陆抗',
 			keshou:'恪守',
 			keshou_info:'当你受到伤害时，你发动此技能。你可弃置两张颜色相同的牌，若如此做，此伤害-1。你的势力已确定且场上没有与你势力相同的其他角色，则你进行判定，若结果为红色，你摸一张牌。',
@@ -14544,7 +14544,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			//gzyongsi_eff2:'玉玺',
 			gz_zhangxiu:'张绣',
 			gzfudi:'附敌',
-			gzfudi_info:'当你受到伤害后，你可以交给伤害来源一张手牌。若如此做，你对其势力中体力值最大且不小于你的一名角色造成一点伤害。',
+			gzfudi_info:'当你受到伤害后，你可以交给伤害来源一张手牌。若如此做，你对其势力中体力值最大且不小于你的一名角色造成1点伤害。',
 			gzcongjian:'从谏',
 			gzcongjian_info:'锁定技，当你于回合外造成伤害，或于回合内受到伤害时，此伤害+1。',
 			gz_jun_caocao:'君曹操',
@@ -14557,7 +14557,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			wuziliangjiangdao_bg:'纛',
 			wuziliangjiangdao_info:'魏势力角色的准备阶段开始时，其可以弃置一张牌。若如此做，其选择一张暗置的武将牌（若没有，则选择一张暗置），然后获得下列技能中的一项（其他角色已有的技能无法选择）且不能明置选择的武将牌直到你的下个回合开始：〖突袭〗，〖巧变〗，〖骁果〗，〖节钺〗，〖断粮〗。',
 			huibian:'挥鞭',
-			huibian_info:'出牌阶段限一次，你可以选择一名魏势力角色和另一名已受伤的魏势力角色。若如此做，你对前者造成一点伤害，然后其摸两张牌，然后后者回复一点体力。',
+			huibian_info:'出牌阶段限一次，你可以选择一名魏势力角色和另一名已受伤的魏势力角色。若如此做，你对前者造成1点伤害，然后其摸两张牌，然后后者回复1点体力。',
 			gzzongyu:'总御',
 			gzzongyu_info:'当【六龙骖驾】进入其他角色的装备区后，你可以将你装备区内所有坐骑牌（至少一张）与【六龙骖驾】交换位置。锁定技，当你使用坐骑牌后，若场上或弃牌堆中有【六龙骖驾】，则将【六龙骖驾】置入你的装备区。',
 			

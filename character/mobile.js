@@ -12605,7 +12605,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(result.bool){
 						trigger.player.gain(event.card,'give',player,'bySelf');
-						player.chooseBool('是否对'+get.translation(trigger.player)+'造成一点伤害？').ai=function(){
+						player.chooseBool('是否对'+get.translation(trigger.player)+'造成1点伤害？').ai=function(){
 							return get.damageEffect(trigger.player,player,player)>0
 						};
 					}
@@ -12951,7 +12951,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.ingame=game.hasPlayer(function(current){
 						return ['re_xushu','xin_xushu','xushu','dc_xushu'].contains(current.name)||['re_xushu','xin_xushu','xushu','dc_xushu'].contains(current.name2);
 					})?true:false;
-					var prompt='请选择一名角色，令其回复一点体力并摸一张牌';
+					var prompt='请选择一名角色，令其回复1点体力并摸一张牌';
 					prompt+=event.ingame?'，然后你摸一张牌。':'。';
 					player.chooseTarget(prompt).set('ai',function(target){
 						var player=_status.event.player;

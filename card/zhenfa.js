@@ -365,7 +365,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			longfeizhen:'龙飞阵',
 			huyizhen:'虎翼阵',
 			niaoxiangzhen:'鸟翔阵',
-			niaoxiangzhen_info:'令所有非你阵营的队列的角色今次打出一张闪，或者受到一点伤害。',
+			niaoxiangzhen_info:'令所有非你阵营的队列的角色今次打出一张闪，或者受到1点伤害。',
 			qixingzhen_info:'弃置所有围攻你的角色各一张牌，然后视为对所有你围攻的角色使用一张不计入出杀次数的杀。',
 			// longfeizhen_info:'弃置围攻你的角色各一张牌，然后摸一张牌。',
 			// qixingzhen_info:'令我方所有角色进入围攻状态。',

@@ -106,7 +106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xk_shenxiangyun:'沈湘芸',
 			xk_fujianhan:'傅剑寒',
 			zhongzhan:'重斩',
-			zhongzhan_info:'每当你即将造成伤害，你可流失一点体力令伤害+1。',
+			zhongzhan_info:'每当你即将造成伤害，你可失去1点体力令伤害+1。',
 			gzhenji:'震击',
 			gzhenji_info:'你使用杀造成伤害后，可以摸一张牌，并且本回合内可以额外使用一张杀。',
 			rouquan:'柔拳',

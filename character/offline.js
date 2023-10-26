@@ -5584,7 +5584,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.directfalse=true;
 						}
 						else{
-							target.chooseCard('交给'+get.translation(player)+'一张【闪】，或失去一点体力',function(card){
+							target.chooseCard('交给'+get.translation(player)+'一张【闪】，或失去1点体力',function(card){
 								return card.name=='shan';
 							}).set('ai',function(card){
 								if(_status.event.nshan>1) return 1;
@@ -6349,7 +6349,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsfeixiong:'飞熊',
 			nsfeixiong_info:'出牌阶段开始时，你可以和一名其他角色拼点。赢的角色对没赢的角色造成1点伤害。',
 			nscesuan:'策算',
-			nscesuan_info:'锁定技，当你受到伤害时，你防止此伤害并失去一点体力上限。若你因以此法失去体力上限导致体力值减少，则你摸一张牌。',
+			nscesuan_info:'锁定技，当你受到伤害时，你防止此伤害并失去1点体力上限。若你因以此法失去体力上限导致体力值减少，则你摸一张牌。',
 			nslulve:'掳掠',
 			nslulve_info:'出牌阶段限一次，你可以弃置X张牌并选择一名装备区内有牌的其他角色，然后对其造成1点伤害（X为其装备区内的牌数）。',
 			ns_fanchou:'SP樊稠',
@@ -6392,7 +6392,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinmanjuan_info:'锁定技，当你不因〖漫卷〗或〖醉乡〗而得到牌时，你将此牌置入弃牌堆。然后若此时处于你的回合内，则你可以从弃牌堆中选择获得一张与此牌点数相同的其他牌。',
 			zuixiang:'醉乡',
 			zuixiang2:'醉乡',
-			zuixiang_info:'限定技，准备阶段开始时，你可以展示牌堆顶的3张牌并置于你的武将牌上。你不能使用或打出与该些牌同类的牌，所有同类牌对你无效。之后的每个准备阶段，你须重复展示一次，直到这些牌中任意两张点数相同。然后，你获得这些牌。',
+			zuixiang_info:'限定技。准备阶段开始时，你可以展示牌堆顶的三张牌并置于你的武将牌上。你不能使用或打出与该些牌同类的牌，所有同类牌对你无效。之后的每个准备阶段，你须重复展示一次，直到这些牌中任意两张点数相同。然后，你获得这些牌。',
 			sp_daqiao:'☆SP大乔',
 			sp_daqiao_prefix:'☆SP',
 			yanxiao:'言笑',

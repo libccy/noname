@@ -1132,7 +1132,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			tafang_mech_weixingxianjing_skill_info:'每一轮令距离你2格以内的一名随机敌人翻面。',
 			tafang_mech_mutong:'木桶',
 			tafang_mech_mutong_skill:'飞滚',
-			tafang_mech_mutong_skill_info:'每一轮对距离3格以内的一名随机敌人造成一点伤害。',
+			tafang_mech_mutong_skill_info:'每一轮对距离3格以内的一名随机敌人造成1点伤害。',
 			tafang_mech_nengliangqiu:'能量球',
 			tafang_mech_nengliangqiu_skill:'充能',
 			tafang_mech_nengliangqiu_skill_info:'每一轮令距离3格以内的所有友方角色摸1张牌，距离1以内改为摸2张。',
@@ -1144,7 +1144,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			tafang_mech_gongchengche_skill_info:'每一轮对距离2格以内的一名随机敌方角色造成1点火焰伤害，并随机弃置其一张牌。',
 			tafang_mech_guangmingquan:'光明泉',
 			tafang_mech_guangmingquan_skill:'圣疗',
-			tafang_mech_guangmingquan_skill_info:'每一轮令距离2格以内的所有友方角色各回复一点体力。',
+			tafang_mech_guangmingquan_skill_info:'每一轮令距离2格以内的所有友方角色各回复1点体力。',
 
 			tafang_mech_dubiaoxianjing:'毒镖陷阱',
 			tafang_mech_dubiaoxianjing_skill:'毒镖',

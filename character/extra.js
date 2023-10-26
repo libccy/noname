@@ -6457,7 +6457,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player,skill){
 						if(player.storage.nzry_longnu==true) return '锁定技，出牌阶段开始时，你减1点体力上限并摸一张牌，然后本阶段内你的锦囊牌均视为雷杀且无使用次数限制';
-						return '锁定技，出牌阶段开始时，你流失一点体力并摸一张牌，然后本阶段内你的红色手牌均视为火杀且无距离限制';
+						return '锁定技，出牌阶段开始时，你失去1点体力并摸一张牌，然后本阶段内你的红色手牌均视为火杀且无距离限制';
 					},
 				},
 				audio:2,
@@ -6624,7 +6624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(player.countMark('nzry_junlve')%2==1){
-						player.chooseTarget('是否发动【摧克】，对一名角色造成一点伤害？').ai=function(target){
+						player.chooseTarget('是否发动【摧克】，对一名角色造成1点伤害？').ai=function(target){
 							return -get.attitude(player,target);
 						};
 					}
@@ -6648,7 +6648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countMark('nzry_junlve')>7){
 						player.chooseBool().set('ai',function(){
 							return true;
-						}).set('prompt','是否弃置所有“军略”标记并对所有其他角色造成一点伤害？');
+						}).set('prompt','是否弃置所有“军略”标记并对所有其他角色造成1点伤害？');
 					}else{
 						event.finish();
 					};
@@ -7430,7 +7430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_junlve":"军略",
 			"nzry_junlve_info":"锁定技，当你受到或造成伤害后，你获得X个“军略”标记(X为伤害点数)。",
 			"nzry_cuike":"摧克",
-			"nzry_cuike_info":"出牌阶段开始时，若“军略”标记的数量为奇数，你可以对一名角色造成一点伤害；若“军略”标记的数量为偶数，你可以横置一名角色并弃置其区域内的一张牌。然后，若“军略”标记的数量超过7个，你可以移去全部“军略”标记并对所有其他角色造成一点伤害。",
+			"nzry_cuike_info":"出牌阶段开始时，若“军略”标记的数量为奇数，你可以对一名角色造成1点伤害；若“军略”标记的数量为偶数，你可以横置一名角色并弃置其区域内的一张牌。然后，若“军略”标记的数量超过7个，你可以移去全部“军略”标记并对所有其他角色造成1点伤害。",
 			"nzry_dinghuo":"绽火",
 			"nzry_dinghuo_info":"限定技，出牌阶段，你可以移去全部“军略”标记，令至多等量的已横置角色弃置所有装备区内的牌。然后，你对其中一名角色造成1点火焰伤害。",
 			"shen_liubei":"神刘备",
@@ -7446,7 +7446,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhangliao_prefix:'神',
 			
 			"drlt_poxi":"魄袭",
-			"drlt_poxi_info":"出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以弃置你与其手牌中的四张花色不同的牌。若如此做，根据此次弃置你的牌的数量执行以下效果：零张，扣减一点体力上限；一张，你结束出牌阶段且本回合手牌上限-1；三张，你回复一点体力；四张，你摸四张牌。",
+			"drlt_poxi_info":"出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以弃置你与其手牌中的四张花色不同的牌。若如此做，根据此次弃置你的牌的数量执行以下效果：零张，扣减1点体力上限；一张，你结束出牌阶段且本回合手牌上限-1；三张，你回复1点体力；四张，你摸四张牌。",
 			"drlt_jieying":"劫营",
 			"drlt_jieying_info":"回合开始时，若场上没有拥有“营”标记的角色，你获得1个“营”标记；结束阶段，你可以将你的一个“营”标记交给一名角色；有“营”标记的角色摸牌阶段多摸一张牌，出牌阶段使用【杀】的次数上限+1，手牌上限+1。有“营”的其他角色回合结束时，其移去“营”标记，然后你获得其所有手牌。",
 			drlt_jieying_mark:"劫营",
@@ -7546,7 +7546,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baonu_bg:'暴',
 			baonu_info:'锁定技，游戏开始时，你获得两枚“暴怒”标记；锁定技，当你造成/受到1点伤害后，你获得1枚“暴怒”标记。',
 			shenfen:'神愤',
-			shenfen_info:'限定技，出牌阶段，你可以弃置6枚暴怒标记，对场上所有其他角色造成一点伤害，然后令其弃置4张牌。',
+			shenfen_info:'限定技，出牌阶段，你可以弃置6枚暴怒标记，对场上所有其他角色造成1点伤害，然后令其弃置四张牌。',
 			wuqian:'无前',
 			wuqian_info:'出牌阶段，你可以弃置两枚暴怒标记并获得技能〖无双〗直到回合结束。',
 			wumou:'无谋',
@@ -7640,7 +7640,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			scfuhai:'覆海',
 			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。若你本回合内以此法得到的牌数小于2，则你摸一张牌。②拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
 			pinghe:'冯河',
-			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
+			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减1点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
 			shen_jiangwei:'神姜维',
 			shen_jiangwei_prefix:'神',
 			jiufa:'九伐',

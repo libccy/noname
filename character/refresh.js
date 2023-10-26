@@ -648,7 +648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.targets.length){
 						var current=event.targets.shift();
 						if(current.group=='wei'){
-							current.chooseBool('是否令'+get.translation(player)+'回复一点体力？').set('ai',function(){
+							current.chooseBool('是否令'+get.translation(player)+'回复1点体力？').set('ai',function(){
 								return get.attitude(_status.event.player,_status.event.target)>2;
 							}).set('target',player);
 							event.current=current;
@@ -664,7 +664,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.damages.push(event.current);
 						event.current.line(player,'green');
-						game.log(event.current,'令',player,'回复一点体力');
+						game.log(event.current,'令',player,'回复1点体力');
 						player.recover();
 					}
 					if(event.targets.length){
@@ -5273,7 +5273,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					target.chooseToUse('乱武：使用一张杀或失去一点体力',function(card){
+					target.chooseToUse('乱武：使用一张杀或失去1点体力',function(card){
 						if(get.name(card)!='sha') return false;
 						return lib.filter.filterCard.apply(this,arguments)
 					},function(card,player,target){
@@ -11854,7 +11854,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(get.color(event.card2)=='red'){
 						player.gain(event.card2,target,'give','bySelf');
 						if(target.hp<target.maxHp){
-							player.chooseBool('是否让目标回复一点体力？').ai=function(event,player){
+							player.chooseBool('是否让目标回复1点体力？').ai=function(event,player){
 								return get.recoverEffect(target,player,player)>0;
 							};
 						}
@@ -13642,7 +13642,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else if(target.hp<target.maxHp){
-						player.chooseBool('是否让目标回复一点体力？').ai=function(event,player){
+						player.chooseBool('是否让目标回复1点体力？').ai=function(event,player){
 							return get.recoverEffect(target,player,player)>0;
 						};
 					}
@@ -14432,7 +14432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player;
 							if(player.isTurnedOver()||_status.event.getTrigger().player.getDamagedHp()>2) return -1;
 							return (player.hp*player.hp)-get.value(card);
-						}).set('prompt','弃置'+get.cnNumber(player.getDamagedHp())+'张牌并失去一点体力；或选择不弃置，将武将牌翻面并摸'+get.cnNumber(player.getDamagedHp())+'张牌。');
+						}).set('prompt','弃置'+get.cnNumber(player.getDamagedHp())+'张牌并失去1点体力；或选择不弃置，将武将牌翻面并摸'+get.cnNumber(player.getDamagedHp())+'张牌。');
 					}
 					else event.finish();
 					"step 2"
@@ -14626,7 +14626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.isHealthy()) event._result={index:0};
 					else event.current.chooseControl().set('choiceList',[
 						'摸一张牌',
-						'令'+get.translation(player)+'回复一点体力',
+						'令'+get.translation(player)+'回复1点体力',
 					]).set('ai',function(){
 						if(get.attitude(event.current,player)>0) return 1;
 						return 0;
@@ -14746,7 +14746,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinhuangtian2:'黄天',
 			xinhuangtian_info:'主公技。其他群势力角色的出牌阶段限一次，该角色可以交给一张【闪】或黑桃手牌。',
 			reqiangxi:"强袭",
-			"reqiangxi_info":"出牌阶段对每名其他角色限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张武器牌并对你攻击范围内的一名其他角色造成一点伤害。",
+			"reqiangxi_info":"出牌阶段对每名其他角色限一次，你可以选择一项：1. 失去1点体力并对你攻击范围内的一名其他角色造成1点伤害；2. 弃置一张武器牌并对你攻击范围内的一名其他角色造成1点伤害。",
 			rehuoji:"火计",
 			rehuoji_info:"你可一张红色牌当作【火攻】使用。",
 			rekanpo:"看破",
@@ -14757,7 +14757,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"reshuangxiong2_info":"",
 
 			reguanxing:'观星',
-			reguanxing_info:'准备阶段，你可以观看牌堆顶的5张牌（存活角色小于4时改为3张），并将其以任意顺序置于牌堆项或牌堆底，若你将〖观星〗的牌都放在了牌堆底，则你可以在结束阶段再次发动〖观星〗。',
+			reguanxing_info:'准备阶段，你可以观看牌堆顶的五张牌（存活角色小于4时改为三张），并将其以任意顺序置于牌堆项或牌堆底，若你将〖观星〗的牌都放在了牌堆底，则你可以在结束阶段再次发动〖观星〗。',
 			reluoshen:'洛神',
 			reluoshen_info:'准备阶段，你可以进行判定，若结果为黑色则获得此判定牌，且可重复此流程直到出现红色的判定结果。你通过〖洛神〗得到的牌不计入当前回合的手牌上限。',
 			reluoshen_info_guozhan:'准备阶段，你可以进行判定，若为黑色则可以继续判定，直到出现红色。然后你获得所有黑色的判定牌。你通过〖洛神〗得到的牌不计入当前回合的手牌上限（结果为黑色的判定牌于此过程中不会进入弃牌堆）。',
@@ -14772,7 +14772,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezhiheng:'制衡',
 			rezhiheng_info:'出牌阶段限一次，你可以弃置任意张牌并摸等量的牌，若你在发动〖制衡〗时弃置了所有手牌，则你多摸一张牌。',
 			rejiuyuan:'救援',
-			rejiuyuan_info:'主公技，其他吴势力角色对自己使用【桃】时，若其体力值大于你，则其可以选择令你回复1点体力，然后其摸1张牌。',
+			rejiuyuan_info:'主公技，其他吴势力角色对自己使用【桃】时，若其体力值大于你，则其可以选择令你回复1点体力，然后其摸一张牌。',
 
 			"new_yajiao":"涯角",
 			"new_yajiao_info":"每当你于回合外使用或打出牌时，你可以亮出牌堆顶的一张牌，并将其交给一名角色。若此牌与你此次使用或打出的牌类别不同，则你弃置一张牌。",
@@ -14791,7 +14791,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"new_rewusheng":"武圣",
 			"new_rewusheng_info":"你可以将一张红色牌当做【杀】使用或打出。你使用的方片杀没有距离限制。",
 			"new_yijue":"义绝",
-			"new_yijue_info":"出牌阶段限一次，你可以弃置一张牌并令一名有手牌的其他角色展示一张手牌。若此牌为黑色，则该角色不能使用或打出牌，非锁定技失效且受到来自你的红桃【杀】的伤害+1直到回合结束。若此牌为红色，则你可以获得此牌，并可以令其回复一点体力。",
+			"new_yijue_info":"出牌阶段限一次，你可以弃置一张牌并令一名有手牌的其他角色展示一张手牌。若此牌为黑色，则该角色不能使用或打出牌，非锁定技失效且受到来自你的红桃【杀】的伤害+1直到回合结束。若此牌为红色，则你可以获得此牌，并可以令其回复1点体力。",
 			"new_yijue2":"义绝",
 			"new_yijue2_info":"",
 			"new_repaoxiao":"咆哮",
@@ -14805,7 +14805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"qingjian_add":"清俭",
 			"qingjian_add_info":"",
 			"new_reqingnang":"青囊",
-			"new_reqingnang_info":"出牌阶段，你可以弃置一张手牌，令一名本回合内未成为过〖青囊〗的目标的角色回复一点体力。若你弃置的是黑色牌，则你本回合内不能再发动〖青囊〗。",
+			"new_reqingnang_info":"出牌阶段，你可以弃置一张手牌，令一名本回合内未成为过〖青囊〗的目标的角色回复1点体力。若你弃置的是黑色牌，则你本回合内不能再发动〖青囊〗。",
 			"new_reyaowu":"耀武",
 			"new_reyaowu_info":"锁定技，当一名角色使用【杀】对你造成伤害时，若此杀为红色，该角色回复1点体力或摸一张牌。否则你摸一张牌。",
 			reyaowu:'耀武',
@@ -14822,7 +14822,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyingzi:'英姿',
 			refanjian:'反间',
 			refanjian_card:'弃牌',
-			refanjian_hp:'流失体力',
+			refanjian_hp:'失去体力',
 			reqianxun:'谦逊',
 			reqianxun2:'谦逊',
 			relianying:'连营',
@@ -14871,7 +14871,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyicong_info:'锁定技，你计算与其他角色的距离时-1。若你的体力值不大于2，则其他角色计算与你的距离时+1。',
 			refankui_info:'每当你受到1点伤害后，你可以获得伤害来源的一张牌。',
 			retieji_info:'当你使用【杀】指定一名角色为目标后，你可以进行一次判定并令该角色的非锁定技失效直到回合结束，除非该角色弃置一张与判定结果花色相同的牌，否则不能使用【闪】抵消此【杀】。',
-			yijue_info:'出牌阶段限一次，你可以与一名其他角色拼点，若你赢，则直到回合结束，该角色不能使用或打出手牌且其非锁定技失效，若你没赢，你可令该角色回复一点体力。',
+			yijue_info:'出牌阶段限一次，你可以与一名其他角色拼点，若你赢，则直到回合结束，该角色不能使用或打出手牌且其非锁定技失效，若你没赢，你可令该角色回复1点体力。',
 			reyiji_info:'每当你受到1点伤害后，你可以摸两张牌。然后你可以在至多两名角色的武将牌旁边分别扣置至多两张手牌，这些角色的下个摸牌阶段开始时，该角色获得其武将牌旁的这些牌。',
 			rejianxiong_info:'每当你受到伤害后，你可以获得对你造成伤害的牌，然后摸一张牌。',
 			reyajiao_info:'每当你于回合外使用或打出一张手牌时，你可以亮出牌堆顶的一张牌，若此牌与你此次使用或打出的牌类别相同，你可以将之交给任意一名角色；若不同则你可以将之置入弃牌堆。',
@@ -14879,9 +14879,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqianxun_info:'每当一张延时类锦囊牌或其他角色使用的普通锦囊牌生效时，若你是此牌的唯一目标，你可以将所有手牌置于你的武将牌上，若如此做，此回合结束时，你获得你武将牌上的所有牌。',
 			relianying_info:'当你失去最后的手牌时，你可以令至多X名角色各摸一张牌（X为你此次失去的手牌数）。',
 			reyingzi_info:'锁定技，摸牌阶段摸牌时，你额外摸一张牌；你的手牌上限为你的体力上限。',
-			refanjian_info:'出牌阶段限一次，你可以展示一张手牌并将此牌交给一名其他角色。然后该角色选择一项：展示其手牌并弃置所有与此牌花色相同的牌，或失去一点体力。',
+			refanjian_info:'出牌阶段限一次，你可以展示一张手牌并将此牌交给一名其他角色。然后该角色选择一项：展示其手牌并弃置所有与此牌花色相同的牌，或失去1点体力。',
 			qingjian_info:'每当你于摸牌阶段外得到牌时，你可以将其中任意牌以任意顺序交给其他角色，每回合最多发动四次。',
-			qinxue_info:'觉醒技。准备阶段或结束阶段开始时，若你的手牌数减体力值大于1，则你减一点体力上限，回复1点体力或摸两张牌，获得技能〖攻心〗。',
+			qinxue_info:'觉醒技。准备阶段或结束阶段开始时，若你的手牌数减体力值大于1，则你减1点体力上限，回复1点体力或摸两张牌，获得技能〖攻心〗。',
 			retuxi_info:'摸牌阶段摸牌时，你可以少摸任意张牌，然后选择等量的手牌数大于或等于你的其他角色，获得这些角色的各一张手牌。',
 			reluoyi_info:'你可以跳过摸牌阶段，然后展示牌堆顶的三张牌，获得其中的基本牌、武器牌和【决斗】，若如此做，直到你的下回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。',
 			reganglie_info:'当你受到1点伤害后，你可进行判定，若结果为：红色，你对伤害来源造成1点伤害，；黑色，你弃置伤害来源一张牌。',
@@ -14985,7 +14985,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rejiushi_mark:'酒诗·改',
 			rejiushi_mark_info:'当你需要使用【酒】时，若你的武将牌正面向上，你可以翻面，视为使用一张【酒】。当你受到伤害后，若你的武将牌背面向上，你可以翻面。当你翻面时，你获得牌堆中的一张随机锦囊。',
 			chengzhang:'成章',
-			chengzhang_info:'觉醒技，准备阶段开始时，若你造成伤害与受到伤害值之和累计7点或以上，则你回复1点体力并摸1张牌，然后改写〖酒诗〗。',
+			chengzhang_info:'觉醒技，准备阶段开始时，若你造成伤害与受到伤害值之和累计7点或以上，则你回复1点体力并摸一张牌，然后改写〖酒诗〗。',
 			re_wuyi:'界吴懿',
 			re_wuyi_prefix:'界',
 			re_zhuran:'界朱然',

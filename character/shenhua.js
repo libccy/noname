@@ -1950,7 +1950,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.target=result.targets[0];
 						if(player.hasMark('nzry_huaiju')){
-							player.chooseControl().set('choiceList',['流失一点体力','移去一个“橘”']).set('ai',function(){
+							player.chooseControl().set('choiceList',['失去1点体力','移去一个“橘”']).set('ai',function(){
 								if(player.hp>2) return 0;
 								return 1;
 							});
@@ -2007,7 +2007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					event.num=cards.length;
 					event.str1='令至多'+event.num+'名角色摸一张牌';
-					event.str2='对任意名体力值之和为'+event.num+'的角色造成一点伤害';
+					event.str2='对任意名体力值之和为'+event.num+'的角色造成1点伤害';
 					player.chooseControl('cancel2').set('ai',function(){
 						if(game.countPlayer(function(current){return get.attitude(player,current)<0&&current.hp==event.num})>0&&event.num<=3) return 1;
 						return 0;
@@ -2549,14 +2549,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player,skill){
 						if(player.storage.nzry_shenshi==true) return '其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张';
-						return '出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张';
+						return '出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成1点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张';
 					},
 				},
 				group:["nzry_shenshi_1","nzry_shenshi_2"],
 				subSkill:{
 					'1':{
 						audio:2,
-						prompt:'出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张',
+						prompt:'出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成1点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张',
 						enable:'phaseUse',
 						usable:1,
 						filter:function(event,player){
@@ -5373,7 +5373,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					event.currented.push(event.current);
 					event.current.animate('target');
-					event.current.chooseToUse('乱武：使用一张杀或失去一点体力',function(card){
+					event.current.chooseToUse('乱武：使用一张杀或失去1点体力',function(card){
 						if(get.name(card)!='sha') return false;
 						return lib.filter.cardEnabled.apply(this,arguments)
 					},function(card,player,target){
@@ -7754,8 +7754,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '转换技，出牌阶段限一次，<span class="bluetext">阴：你可以摸一张牌，然后弃置两张手牌。</span>阳：你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制。';
 			},
 			nzry_shenshi:function(player){
-				if(player.storage.nzry_shenshi==true) return '转换技，阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。<span class="bluetext">阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张。</span>';
-				return '转换技，<span class="bluetext">阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。</span>阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张。';
+				if(player.storage.nzry_shenshi==true) return '转换技，阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成1点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。<span class="bluetext">阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张。</span>';
+				return '转换技，<span class="bluetext">阴：出牌阶段限一次，你可以将一张牌交给一名手牌数最多的角色，然后对其造成1点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。</span>阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张。';
 			},
 		},
 		characterReplace:{
@@ -7828,7 +7828,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_jianxiang_info":"当你成为其他角色使用牌的目标时，你可令手牌数最少的一名角色摸一张牌。",
 			"nzry_shenshi1":"审时",
 			"nzry_shenshi":"审时",
-			"nzry_shenshi_info":"转换技，阴：出牌阶段限一次，你可以将一张牌交给一名除你外手牌数最多的角色，然后对其造成一点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张。",
+			"nzry_shenshi_info":"转换技，阴：出牌阶段限一次，你可以将一张牌交给一名除你外手牌数最多的角色，然后对其造成1点伤害，若该角色因此死亡，则你可以令一名角色将手牌摸至四张。阳：其他角色对你造成伤害后，你可以观看该角色的手牌，然后交给其一张牌，当前角色回合结束时，若此牌仍在该角色的区域内，你将手牌摸至四张。",
 			"nzry_mingren":"明任",
 			"nzry_mingren_info":"游戏开始时，你摸两张牌，然后将一张手牌置于你的武将牌上，称为“任”。结束阶段，你可以用一张手牌替换“任”。",
 			"nzry_zhenliang":"贞良",
@@ -7839,7 +7839,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_cunmu":"寸目",
 			"nzry_cunmu_info":"锁定技，当你摸牌时，改为从牌堆底摸牌。",
 			"nzry_kuizhu":"溃诛",
-			"nzry_kuizhu_info":"弃牌阶段结束后，你可以选择一项：①令至多X名角色各摸一张牌。②对任意名体力值之和为X的角色造成一点伤害。（X为你此阶段弃置的牌数）",
+			"nzry_kuizhu_info":"弃牌阶段结束后，你可以选择一项：①令至多X名角色各摸一张牌。②对任意名体力值之和为X的角色造成1点伤害。（X为你此阶段弃置的牌数）",
 			"nzry_zhizheng":"掣政",
 			rechezheng:'掣政',
 			"nzry_zhizheng_info":"锁定技，你的出牌阶段内，当你对攻击范围内不包含你的其他角色造成伤害时，防止此伤害。出牌阶段结束时，若你本阶段内使用的牌数小于这些角色的数量，则你弃置其中一名角色的一张牌。",
@@ -7850,7 +7850,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_huaiju_info":"锁定技，游戏开始时，你获得3个“橘”标记。（有“橘”的角色受到伤害时，防止此伤害，然后移去一个“橘”；有“橘”的角色摸牌阶段额外摸一张牌）",
 			"tachibana_effect":"怀橘",
 			"nzry_yili":"遗礼",
-			"nzry_yili_info":"出牌阶段开始时，你可以失去一点体力或移去一个“橘”，然后令一名其他角色获得一个“橘”。",
+			"nzry_yili_info":"出牌阶段开始时，你可以失去1点体力或移去一个“橘”，然后令一名其他角色获得一个“橘”。",
 			"nzry_zhenglun":"整论",
 			"nzry_zhenglun_info":"若你没有“橘”，你可以跳过摸牌阶段然后获得一个“橘”。",
 			"nzry_feijun":"飞军",
@@ -7868,7 +7868,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"kongsheng2":"箜声",
 			"kongsheng2_info":"",
 			"xinfu_zuilun":"罪论",
-			"xinfu_zuilun_info":"结束阶段，你可以观看牌堆顶三张牌，你每满足以下一项便保留一张，然后以任意顺序放回其余的牌：1.你于此回合内造成过伤害；2.你于此回合内未弃置过牌；3.手牌数为全场最少。若均不满足，你与一名其他角色失去一点体力。",
+			"xinfu_zuilun_info":"结束阶段，你可以观看牌堆顶三张牌，你每满足以下一项便保留一张，然后以任意顺序放回其余的牌：1.你于此回合内造成过伤害；2.你于此回合内未弃置过牌；3.手牌数为全场最少。若均不满足，你与一名其他角色失去1点体力。",
 			"xinfu_fuyin":"父荫",
 			"xinfu_fuyin_info":"锁定技，你每回合第一次成为【杀】或【决斗】的目标后，若你的手牌数小于等于该角色，此牌对你无效。",
 			drlt_wanglie:"往烈",
@@ -7887,7 +7887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_jueyan":"决堰",
 			"drlt_jueyan_info":"出牌阶段限一次，你可以废除一种装备栏，然后执行对应一项：武器栏，你本回合内使用【杀】的次数上限+3；防具栏，你摸三张牌，且本回合手牌上限+3；坐骑栏，你本回合内使用牌无距离限制；宝物栏，你获得〖集智〗直到回合结束。",
 			"drlt_poshi":"破势",
-			"drlt_poshi_info":"觉醒技，准备阶段开始时，若你的装备栏均已被废除或体力值为1，则你减一点体力上限，将手牌摸至体力上限，失去〖决堰〗并获得〖怀柔〗。",
+			"drlt_poshi_info":"觉醒技，准备阶段开始时，若你的装备栏均已被废除或体力值为1，则你减1点体力上限，将手牌摸至体力上限，失去〖决堰〗并获得〖怀柔〗。",
 			"drlt_huairou":"怀柔",
 			"drlt_huairou_info":"出牌阶段，你可以重铸装备牌。",
 			"drlt_zhenggu":"镇骨",
@@ -7965,7 +7965,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjiewei_info:'你可以将装备区里的牌当【无懈可击】使用；当你的武将牌从背面翻至正面时，你可以弃置一张牌，然后移动场上的一张牌。',
 			xinjushou_info:'结束阶段，你可以翻面并摸四张牌，然后弃置一张手牌，若以此法弃置的是装备牌，则你改为使用之。',
 			jixi_info:'出牌阶段，你可以将任意一张“田”当作【顺手牵羊】使用。',
-			xinqiangxi_info:'出牌阶段各限一次，你可以选择一项：1. 失去一点体力并对你攻击范围内的一名其他角色造成一点伤害；2. 弃置一张装备牌并对你攻击范围内的一名其他角色造成一点伤害。',
+			xinqiangxi_info:'出牌阶段各限一次，你可以选择一项：1. 失去1点体力并对你攻击范围内的一名其他角色造成1点伤害；2. 弃置一张装备牌并对你攻击范围内的一名其他角色造成1点伤害。',
 			qimou_info:'限定技，出牌阶段，你可以失去任意点体力，然后直到回合结束，你计算与其他角色的距离时-X，且你可以多使用X张【杀】（X为你失去的体力值）。',
 			tiaoxin_info:'出牌阶段限一次，你可以指定一名攻击范围内包含你的角色，该角色需对你使用一张【杀】，否则你弃置其一张牌。',
 			zhiji_info:'觉醒技，准备阶段，若你没有手牌，你须回复1点体力或摸两张牌，然后减1点体力上限，并获得技能〖观星〗。',
@@ -8081,10 +8081,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kanpo_info:'你可以将你的任意一张黑色手牌当做【无懈可击】使用。',
 			niepan_info:'限定技，出牌阶段或当你处于濒死状态时，你可以弃置你区域内的所有牌并复原你的武将牌，然后摸三张牌并将体力回复至3点。',
 			oldniepan_info:'限定技，当你处于濒死状态时，你可以弃置你区域内的所有牌并复原你的武将牌，然后摸三张牌并将体力回复至3点。',
-			quhu_info:'出牌阶段限一次，你可以与一名体力值大于你的角色拼点，若你赢，则该角色对其攻击范围内另一名由你指定的角色造成1点伤害。若你没赢，该角色对你造成一点伤害。',
+			quhu_info:'出牌阶段限一次，你可以与一名体力值大于你的角色拼点，若你赢，则该角色对其攻击范围内另一名由你指定的角色造成1点伤害。若你没赢，该角色对你造成1点伤害。',
 			jieming_info:'当你受到1点伤害后，你可令一名角色将手牌摸至X张（X为其体力上限且至多为5）。',
-			qiangxi_info:'出牌阶段限一次，你可以失去一点体力或弃置一张武器牌，然后对你攻击范围内的一名其他角色造成一点伤害。',
-			qiangxix_info:'出牌阶段限两次，你可以失去一点体力或弃置一张武器牌，然后一名本阶段内未成为过〖强袭〗的目标的其他角色造成一点伤害。',
+			qiangxi_info:'出牌阶段限一次，你可以失去1点体力或弃置一张武器牌，然后对你攻击范围内的一名其他角色造成1点伤害。',
+			qiangxix_info:'出牌阶段限两次，你可以失去1点体力或弃置一张武器牌，然后一名本阶段内未成为过〖强袭〗的目标的其他角色造成1点伤害。',
 			tianyi_info:'出牌阶段限一次，你可以和一名其他角色拼点。若你赢，你获得以下技能效果直到回合结束：你使用【杀】没有距离限制；可额外使用一张【杀】；使用【杀】时可额外指定一个目标。若你没赢，你不能使用【杀】直到回合结束。',
 			shuangxiong_info:'摸牌阶段，你可以改为进行一次判定：你获得此判定牌，且你可以于此回合内将任意一张与此判定牌不同颜色的手牌当做【决斗】使用。',
 			luanji_info:'出牌阶段，你可以将任意两张相同花色的手牌当做【万箭齐发】使用。',
@@ -8149,18 +8149,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinkuanggu_info:'当你造成1点伤害后，若受伤角色受到此伤害时你与其的距离不大于1，则你可以回复1点体力或摸一张牌。',
 			xinliegong_info:'①你使用【杀】可以选择你距离不大于此【杀】点数的角色为目标。②当你使用【杀】指定一个目标后，你可以根据下列条件执行相应的效果：1.其手牌数小于等于你的手牌数，此【杀】不可被响应，2.其体力值大于等于你的体力值，此【杀】伤害+1。',
 			jiewei_info:'当你的武将牌翻面后，你可以摸一张牌。然后你可以使用一张锦囊牌或装备牌，并可以在此牌结算后弃置场上一张同类型的牌。',
-			releiji_info:'当你使用或打出一张【闪】时，你可令一名其他角色进行一次判定：若结果为梅花，其受到一点雷电伤害，然后你回复一点体力；若结果为黑桃，其受到两点雷电伤害。',
+			releiji_info:'当你使用或打出一张【闪】时，你可令一名其他角色进行一次判定：若结果为梅花，其受到1点雷电伤害，然后你回复1点体力；若结果为黑桃，其受到2点雷电伤害。',
 			tiangong_info:'锁定技，你防止即将受到的雷电伤害。每当你造成雷电伤害时，你摸一张牌。',
 			shensu_info:'你可以跳过判定阶段和摸牌阶段，或跳过出牌阶段并弃置一张装备牌。若如此做，则你可以视为对任意一名角色使用一张无距离限制的【杀】。',
-			jushou_info:'结束阶段，你可以摸3张牌，并将武将牌翻面。',
-			moon_jushou_info:'结束阶段，你可以摸一张牌，并将武将牌翻面。',
+			jushou_info:'结束阶段，你可以摸三张牌并翻面。',
+			moon_jushou_info:'结束阶段，你可以摸一张牌并翻面。',
 			liegong_info:'当你使用【杀】时，若目标的手牌数大于等于你的体力值，或小于等于你的攻击范围，你可令此【杀】不能被响应。',
 			kuanggu_info:'锁定技，当你造成伤害后，若受伤角色受到此伤害时你与其的距离不大于1，你回复X点体力（X为伤害值）。',
 			tianxiang_info:'当你即将受到伤害时，你可以弃置一张♥手牌，将伤害转移给一名其他角色，然后该角色摸X张牌（X为其已损失的体力值）。',
 			hongyan_info:'锁定技，你区域内的黑桃牌和黑桃判定牌均视为红桃。',
 			buqu_info:'锁定技，当你处于濒死状态时，你亮出牌堆顶的一张牌并置于你的武将牌上，称之为“创”。若此牌的点数与你武将牌上已有的“创”点数均不同，则你回复至1体力。若点数相同，则将此牌置入弃牌堆。只要你的武将牌上有“创”，你的手牌上限便与“创”的数量相等。',
 			buqu_info_guozhan:'锁定技，当你处于濒死状态时，你亮出牌堆顶的一张牌并置于你的武将牌上，称之为“创”。若此牌的点数与你武将牌上已有的“创”点数均不同，则你回复至1体力。若点数相同，则将此牌置入弃牌堆。',
-			leiji_info:'当你使用或打出一张【闪】时，你可令任意一名角色进行一次判定。若结果为黑桃，其受到两点雷电伤害。',
+			leiji_info:'当你使用或打出一张【闪】时，你可令任意一名角色进行一次判定。若结果为黑桃，其受到2点雷电伤害。',
 			guidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌替换之。',
 			huangtian_info:'主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或【闪电】。',
 			guhuo_info:'每名角色的回合限一次，你可以扣置一张手牌当一张基本牌或普通锦囊牌使用或打出。其他角色依次选择是否质疑。一旦有其他角色质疑则翻开此牌：若为假则此牌作废，若为真，则质疑角色获得技能“缠怨”（锁定技，你不能质疑于吉，只要你的体力值为1，你失去你的武将技能）。',
