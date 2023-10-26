@@ -2597,7 +2597,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.name(card) === 'tao' || get.name(card) === 'jiu';
 						}),
 						att = get.attitude(_status.event.player, event.player),
-						eff = get.damageEffect(event.player, player, _status.event.player, event.nature),
+						eff = get.damageEffect(event.player, player, _status.event.player, get.natureList(event)),
 						fd = event.player.hasSkillTag('filterDamage', null, {
 							player: player,
 							card: event.card
@@ -2605,7 +2605,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						hp = player.hp + tj;
 					if(player.storage.tairan2) hp -= player.storage.tairan2;
 					if(eff <= 0 || fd || att >= -2 || Math.abs(hp) <= 1) return false;
-					if(hp > 2 || event.player.isLinked() && event.nature && eff > 0) return true;
+					if(hp > 2 || eff > 0 && event.player.isLinked() && event.hasNature()) return true;
 					return !event.player.countCards('hs') || event.player.hp > 2 * event.num && !event.player.hasSkillTag('maixie');
 				},
 				logTarget:'player',
