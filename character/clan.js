@@ -40,6 +40,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
 					if(player.getStorage('clanbaichu').contains(event.card.name)) return true;
+					if(get.suit(event.card)=='none') return false;
 					var str=(get.suit(event.card)+'、'+get.type2(event.card));
 					if(!player.getStorage('clanbaichu').contains(str)) return true;
 					return !player.hasSkill('qice');
@@ -47,31 +48,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					'step 0'
-					var str=(get.suit(trigger.card)+'+'+get.type2(trigger.card));
 					if(player.getStorage('clanbaichu').contains(trigger.card.name)){
 						event.draw=true;
 					}
-					if(player.getStorage('clanbaichu').contains(str)){
-						if(!player.hasSkill('qice')){
-							player.addTempSkill('qice','roundStart');
-							player.popup('奇策');
-							game.log(player,'获得了技能','#g【奇策】');
+					if(get.suit(trigger.card)!='none'){
+						var str=(get.suit(trigger.card)+'+'+get.type2(trigger.card));
+						if(player.getStorage('clanbaichu').contains(str)){
+							if(!player.hasSkill('qice')){
+								player.addTempSkill('qice','roundStart');
+								player.popup('奇策');
+								game.log(player,'获得了技能','#g【奇策】');
+							}
+							event.goto(2);
 						}
-						event.goto(2);
-					}
-					else{
-						player.markAuto('clanbaichu',[str]);
-						var list=lib.inpile.filter(name=>get.type(name)=='trick'&&!player.getStorage('clanbaichu').contains(name));
-						if(list.length){
-							var dialog=['请选择【百出】记录的普通锦囊牌牌名',[list,'vcard']];
-							player.chooseButton(dialog,true).set('ai',function(button){
-								var player=_status.event.player,name=button.link[2];
-								if(name=='wuxie') return 114514;
-								return get.effect(player,{name:name},player,player)*(1+player.countCards('hs',name));
-							});
+						else{
+							player.markAuto('clanbaichu',[str]);
+							var list=lib.inpile.filter(name=>get.type(name)=='trick'&&!player.getStorage('clanbaichu').contains(name));
+							if(list.length){
+								var dialog=['请选择【百出】记录的普通锦囊牌牌名',[list,'vcard']];
+								player.chooseButton(dialog,true).set('ai',function(button){
+									var player=_status.event.player,name=button.link[2];
+									if(name=='wuxie') return 114514;
+									return get.effect(player,{name:name},player,player)*(1+player.countCards('hs',name));
+								});
+							}
+							else event.goto(2);
 						}
-						else event.goto(2);
 					}
+					else event.goto(2);
 					'step 1'
 					if(result.bool){
 						var name=result.links[0][2];
