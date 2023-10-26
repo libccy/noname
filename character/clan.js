@@ -41,7 +41,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(player.getStorage('clanbaichu').contains(event.card.name)) return true;
 					if(get.suit(event.card)=='none') return false;
-					var str=(get.suit(event.card)+'、'+get.type2(event.card));
+					var str=(get.suit(event.card)+'+'+get.type2(event.card));
 					if(!player.getStorage('clanbaichu').contains(str)) return true;
 					return !player.hasSkill('qice');
 				},
