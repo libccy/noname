@@ -1382,13 +1382,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:13,
 					result:{
-						target:function(player,target){
+						target:(player,target)=>{
 							if(target.getEquip('bagua')||target.getEquip('rewrite_bagua')) return 0;
-							var hs=player.countCards('h',function(card){
-								return ['sha','juedou'].contains(card.name)&&get.effect(target,card,player,player)!=0;
+							let hs=player.countCards('h',card=>{
+								if(!get.tag(card,'damage')||get.effect(target,card,player,player)<=0) return 0;
+								if(get.name(card,player)==='sha'){
+									if(target.getEquip('bagua')) return 0.5;
+									if(target.getEquip('rewrite_bagua')) return 0.25;
+								}
+								return 1;
+							}),ts=target.hp+target.hujia+game.countPlayer(current=>{
+								if(get.attitude(current,target)>0) return current.countCards('hs')/8;
+								return 0;
 							});
-							var ts=target.hp;
-							if(hs>=ts&&ts>1) return -1;
+							if(hs>=ts) return -hs;
 							return 0;
 						},
 					},
