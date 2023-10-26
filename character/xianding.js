@@ -11725,7 +11725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('goon',get.attitude(player,trigger.player)<0&&!trigger.player.hasSkillTag('filterDamage',null,{
 						player:player,
 						card:trigger.card,
-					})&&get.damageEffect(trigger.player,player,player,trigger.nature)>0);
+					})&&get.damageEffect(trigger.player,player,player,get.natureList(trigger))>0);
 					next.logSkill=[event.name,trigger.player];
 					'step 1'
 					if(result.bool) trigger.num++;
