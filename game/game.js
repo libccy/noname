@@ -15510,6 +15510,7 @@
 									next.set('ai',info.chooseButton.check||function(){return 1;});
 									next.set('filterButton',info.chooseButton.filter||function(){return true;});
 									next.set('selectButton',info.chooseButton.select||1);
+									next.set('filterOk',info.chooseButton.filterOk||(()=>true));
 									if(event.id) next._parent_id=event.id;
 									next.type='chooseToUse_button';
 								}
@@ -15693,6 +15694,7 @@
 									next.set('ai',info.chooseButton.check||function(){return 1;});
 									next.set('filterButton',info.chooseButton.filter||function(){return true;});
 									next.set('selectButton',info.chooseButton.select||1);
+									next.set('filterOk',info.chooseButton.filterOk||(()=>true));
 								}
 								event.buttoned=event.result.skill;
 							}
@@ -19831,7 +19833,7 @@
 				damage:function(){
 					"step 0"
 					event.forceDie=true;
-					if(event.unreal) event.goto(4)
+					if(event.unreal){event.goto(4); return;}
 					event.trigger('damageBegin1');
 					"step 1"
 					event.trigger('damageBegin2');
@@ -43330,6 +43332,7 @@
 			//创建身份牌实例
 			identityCard:function(identity,position,info,noclick){
 				const card=ui.create.card(position,info,noclick);
+				card.classList.add('button');
 				card._customintro=uiintro=>uiintro.add(`${get.translation(`${identity}${2}`)}的身份牌`);
 				const fileName=`image/card/identity_${identity}.jpg`;
 				new Promise((resolve,reject)=>{

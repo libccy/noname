@@ -1379,7 +1379,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						player.logSkill('xinfu_xunxian',result.targets[0]);
-						result.targets[0].gain(list,'gain2');
+						result.targets[0].gain(list,'gain2').giver=player;
 					}
 				},
 				ai:{

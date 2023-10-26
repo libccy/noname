@@ -562,7 +562,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var colors=Object.keys(lib.color).remove('none');
 					var result=yield player.chooseControl(colors,'cancel2').set('prompt',get.prompt('jsrgzhuiming')).set('prompt2',`声明一种颜色并令${get.translation(trigger.target)}弃置任意张牌`).set('ai',()=>{
 						var player=get.player(),target=get.event('target'),att=get.attitude(player,target)>0?1:-1;
-						var list=get.event('controls').map(i=>[i,target.getCards('he').map(get.value).reduce((p,c)=>p+c)]).sort((a,b)=>{
+						var list=get.event('controls').map(i=>[i,target.getCards('he').map(get.value).reduce((p,c)=>p+c,0)]).sort((a,b)=>{
 							return att*(a[1]-b[1]);
 						});
 						return list[0][0];
@@ -573,6 +573,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					player.logSkill('jsrgzhuiming',target);
+					player.popup(color,color=='red'?'fire':'thunder');
 					game.log(player,'声明了',color);
 					var prompt=`追命：${get.translation(player)}声明了${get.translation(color)}`,prompt2=`请弃置任意张牌，然后其展示你一张牌，若此牌颜色为${get.translation(color)}，此【杀】不计入次数限制、不可被响应且伤害+1`
 					yield target.chooseToDiscard(prompt,prompt2,[1,Infinity],'he',true).set('ai',card=>{
@@ -618,14 +619,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCardAfter'},
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
-					return event.targets.some(i=>i.isIn()&&i.hasHistory('lose'))&&player.getExpansions('jsrgshacheng').length;
+					return event.targets.some(i=>i.isIn()&&i.hasHistory('lose',evt=>evt.cards2.length))&&player.getExpansions('jsrgshacheng').length;
 				},
 				direct:true,
 				group:'jsrgshacheng_build',
 				content:function(){
 					'step 0'
 					if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
-					var targets=trigger.targets.filter(i=>i.isIn()&&i.hasHistory('lose'));
+					var targets=trigger.targets.filter(i=>i.isIn()&&i.hasHistory('lose',evt=>evt.cards2.length));
 					player.chooseTarget(get.prompt('jsrgshacheng'),'令一名目标角色摸X张牌，然后移去一张“城”（X为对应角色本回合失去过的牌数且至多为5）',(card,player,target)=>{
 						return get.event('targets').includes(target);
 					}).set('targets',targets).set('ai',target=>{
@@ -633,7 +634,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('targetx',(()=>{
 						var info=targets.map(target=>{
 							var att=get.attitude(player,target);
-							return [target,att*Math.sqrt(target.getHistory('lose').map(evt=>evt.cards.length).reduce((p,c)=>p+c))];
+							return [target,att*Math.sqrt(target.getHistory('lose').map(evt=>evt.cards2.length).reduce((p,c)=>p+c,0))];
 						}).sort((a,b)=>{
 							return b[1]-a[1];
 						})[0];
@@ -643,7 +644,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						event.target=result.targets[0];
-						player.chooseButton([`沙城：移去一张“城”`,player.getExpansions('jsrgshacheng')],true);
+						var cards=player.getExpansions('jsrgshacheng');
+						if(cards.length==1) event._result={bool:true,links:cards};
+						else player.chooseButton([`沙城：移去一张“城”`,cards],true);
 					}
 					else{
 						if(_status.connectMode){game.broadcastAll(function(){delete _status.noclearcountdown;game.stopCountChoose()});}
@@ -654,7 +657,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.logSkill('jsrgshacheng',target);
 						player.loseToDiscardpile(result.links);
-						target.draw(Math.min(5,target.getHistory('lose').map(evt=>evt.cards.length).reduce((p,c)=>p+c)));
+						target.draw(Math.min(5,target.getHistory('lose').map(evt=>evt.cards2.length).reduce((p,c)=>p+c,0)));
 					}
 				},
 				marktext:'城',
@@ -718,7 +721,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=map.player,trigger=map.trigger;
 					var count=Math.ceil(game.countPlayer()/2);
 					var result=yield player.chooseTarget(`伏匿：请选择至多${get.cnNumber(count)}名角色`,`令这些角色获得共计${get.cnNumber(count)}张【影】`,true,[1,count]).set('ai',target=>{
-						return get.attitude(get.player(),target);
+						return get.attitude(get.player(),target)+get.event().getRand(target.playerid);
 					});
 					if(result.bool){
 						var targets=result.targets.slice().sortBySeat(_status.currentPhase);
@@ -926,7 +929,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							var num=game.getGlobalHistory('changeHp',evt=>{
 								return evt.getParent().name=='recover'&&evt.player==trigger.player;
-							}).map(evt=>evt.num).reduce((p,c)=>p+c);
+							}).map(evt=>evt.num).reduce((p,c)=>p+c,0);
 							trigger.num+=num;
 							game.log(trigger.card,'的伤害+'+num);
 						},
@@ -1189,8 +1192,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:6,
 					result:{
 						target:function(player,target){
-							var val=player.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c);
-							var val2=target.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c);
+							var val=player.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c,0);
+							var val2=target.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c,0);
 							return val-val2;
 						}
 					}
@@ -1208,7 +1211,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						direct:true,
 						check:function(event,player){
-							return player.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c)<event.player.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c)+4*Math.random();
+							return player.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c,0)<event.player.getCards('h').map(i=>get.value(i)).reduce((p,c)=>p+c,0)+4*Math.random();
 						},
 						content:function(){
 							'step 0'
@@ -4645,7 +4648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							var eff=targets.reduce((p,c)=>{
 								return p+get.effect(c,{name:'guohe'},player,player);
-							})
+							},0)
 							if(ui.selected.cards.length) eff+=get.value(ui.selected.cards[0],target);
 							return eff;
 						}
