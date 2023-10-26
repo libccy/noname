@@ -118,7 +118,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					order:()=>{
 						if(_status.event.dying) return 9;
-						let sha=get.order(new lib.elementVCard({name:'sha'}));
+						let sha=get.order({name:'sha'});
 						if(sha>0) return sha+0.2;
 						return 0;
 					},
