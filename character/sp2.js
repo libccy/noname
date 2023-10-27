@@ -196,13 +196,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
 						})) return false;
 					},
-					order:function(item,player){
-						if(player&&_status.event.type=='phase'){
-							if(player.hasSkill('starsujin')&&Math.abs(player.countCards('h')-2*player.countCards('h',{type:'basic'}))==1) return 10;
-							return get.order({name:'sha'})+0.3;
-						}
-						return 2;
-					},
+					order:10,
 				},
 				group:'starlifeng_mark',
 				subSkill:{
