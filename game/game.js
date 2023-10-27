@@ -19632,6 +19632,11 @@
 							cards.splice(i--,1);
 							continue;
 						}
+						else if(event.getlx!==false&&cards[i].willBeDestroyed(event.position.id,null,event)){
+							cards[i].delete();
+							cards.splice(i--,1);
+							continue;
+						}
 						else if(cards[i].parentNode){
 							if(cards[i].parentNode.classList.contains('equips')){
 								cards[i].original='e';
