@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			star_caoren:['male','wei',4,['starsujun','starlifeng']],
 			dc_jikang:['male','wei',3,['new_qingxian','dcjuexiang']],
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
@@ -108,10 +109,124 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_xuzhou:['re_taoqian','caosong','zhangmiao','qiuliju'],
 				sp_zhongyuan:['re_hucheer','re_zoushi','caoanmin','re_dongcheng'],
 				sp_xiaohu:['haomeng','yanfuren','yanrou','dc_zhuling'],
+				sp_star:['star_caoren'],
 				sp_decade:['caobuxing','re_maliang','xin_baosanniang','dc_jikang'],
 			}
 		},
 		skill:{
+			//星曹仁
+			starsujun:{
+				audio:2,
+				trigger:{player:'useCard'},
+				filter:function(event,player){
+					return player.countCards('h',{type:'basic'})*2==player.countCards('h');
+				},
+				frequent:true,
+				locked:false,
+				content:function(){
+					player.draw(2);
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						var num=player.countCards('h')-2*player.countCards('h',{type:'basic'});
+						if(Math.abs(num)!=1) return;
+						if(num==1&&get.type(card)!='basic') return num+10;
+						if(num==-1&&get.type(card)=='basic') return num+10;
+					},
+				},
+			},
+			starlifeng:{
+				audio:2,
+				enable:'chooseToUse',
+				filter:function(event,player){
+					if(!event.filterCard({name:'sha'})&&!event.filterCard({name:'wuxie'})) return false;
+					return player.countCards('h',card=>{
+						return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
+					});
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[];
+						if(event.filterCard({name:'sha'},player,event)) list.push(['基本','','sha']);
+						if(event.filterCard({name:'wuxie'},player,event)) list.push(['锦囊','','wuxie']);
+						return ui.create.dialog('砺锋',[list,'vcard']);
+					},
+					check:function(button){
+						return _status.event.player.getUseValue({name:button.link[2],nature:button.link[3]});
+					},
+					backup:function(links,player){
+						return {
+							filterCard:function(card,player){
+								return !player.getStorage('starlifeng_count').contains(get.color(card,player));
+							},
+							precontent:function(){
+								delete event.result.skill;
+								player.logSkill('starlifeng');
+								event.getParent().addCount=false;
+							},
+							popname:true,
+							position:'h',
+							viewAs:{
+								name:links[0][2],
+							},
+							ai1:function(card){
+								var player=_status.event.player;
+								var num=player.countCards('h')-2*player.countCards('h',{type:'basic'});
+								if(player.hasSkill('starsujin')&&Math.abs(num)==1){
+									if(num==1&&get.type(card)!='basic') return 15-get.value(card);
+									if(num==-1&&get.type(card)=='basic') return 15-get.value(card);
+								}
+								return 7-get.value(card);
+							},
+						};
+					},
+					prompt:function(links){
+						return '将一张本回合未使用过的颜色的手牌当做【'+get.translation(links[0][2])+'】使用';
+					},
+				},
+				hiddenCard:function(player,name){
+					if(name=='wuxie') return player.countCards('h',card=>{
+						return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
+					});
+				},
+				ai:{
+					respondSha:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg=='respond') return false;
+						if(!player.countCards('h',card=>{
+							return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
+						})) return false;
+					},
+					order:function(item,player){
+						if(player&&_status.event.type=='phase'){
+							if(player.hasSkill('starsujin')&&Math.abs(player.countCards('h')-2*player.countCards('h',{type:'basic'}))==1) return 10;
+							return get.order({name:'sha'})+0.3;
+						}
+						return 2;
+					},
+				},
+				group:'starlifeng_mark',
+				subSkill:{
+					mark:{
+						charlotte:true,
+						trigger:{player:'useCard1'},
+						filter:function(event,player){
+							return !player.getStorage('starlifeng_count').contains(get.color(event.card));
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							player.addTempSkill('starlifeng_count');
+							player.markAuto('starlifeng_count',[get.color(trigger.card)]);
+						},
+					},
+					count:{
+						charlotte:true,
+						onremove:true,
+					},
+				},
+			},
 			//十周年嵇康
 			dcjuexiang: {
 				derivation: 'dccanyun',
@@ -10634,6 +10749,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjuexiang_info:'当你死亡时，杀死你的角色弃置其装备区内的所有牌并失去1点体力，然后你可以令一名其他角色获得〖残韵〗。',
 			dccanyun:'残韵',
 			dccanyun_info:'每名角色限一次。出牌阶段，你可以弃置一张牌并选择一名其他角色，然后若其装备区里的牌数：小于你，其回复1点体力；大于你，其失去1点体力；等于你，其摸一张牌。若你的体力值为1，你摸一张牌。',
+			star_caoren:'星曹仁',
+			star_caoren_prefix:'星',
+			starsujun:'肃军',
+			starsujun_info:'当你使用一张牌时，若你手牌中的基本牌和非基本牌的牌数相等，你可以摸两张牌。',
+			starlifeng:'砺锋',
+			starlifeng_info:'你可以将一张本回合未使用过的颜色的手牌当做不计入次数的【杀】或【无懈可击】使用。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
@@ -10651,6 +10772,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_xiaohu:'列传·虓虎悲歌',
 			sp_fenghuo:'烽火连天',
 			sp_danqi:'千里单骑',
+			sp_star:'将星系列',
 			sp_decade:'其他新服武将',
 		},
 		pinyins:{
