@@ -43447,6 +43447,7 @@
 			//创建身份牌实例
 			identityCard:function(identity,position,noclick){
 				const card=ui.create.card(position,'noclick',noclick);
+				card.removeEventListener(lib.config.touchscreen?'touchend':'click',ui.click.card);
 				card.classList.add('button');
 				card._customintro=uiintro=>uiintro.add(`${get.translation(`${identity}${2}`)}的身份牌`);
 				const fileName=`image/card/identity_${identity}.jpg`;
