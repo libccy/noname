@@ -35521,6 +35521,10 @@
 				 * @returns {string}
 				 */
 				getSpan:()=>`${get.prefixSpan('战役篇')}${get.prefixSpan('神')}`
+			}],
+			['星',{
+				color:'#ffd700',
+				nature:'glodenmm',
 			}]
 		]),
 		groupnature:{

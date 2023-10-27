@@ -4,10 +4,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			star_caoren:['male','wei',4,['starsujun','starlifeng']],
 			dc_jikang:['male','wei',3,['new_qingxian','dcjuexiang']],
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
-			dc_zhangmancheng:['male','qun',4,['dclvecheng','dczhongji']],
 			//dc_fuwan:['male','qun',4,['dcmoukui']],
 			guānning:['male','shu',3,['dcxiuwen','dclongsong']],
 			sunhuan:['male','wu',4,['dcniji'],['unseen']],
@@ -108,10 +108,124 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_xuzhou:['re_taoqian','caosong','zhangmiao','qiuliju'],
 				sp_zhongyuan:['re_hucheer','re_zoushi','caoanmin','re_dongcheng'],
 				sp_xiaohu:['haomeng','yanfuren','yanrou','dc_zhuling'],
+				sp_star:['star_caoren'],
 				sp_decade:['caobuxing','re_maliang','xin_baosanniang','dc_jikang'],
 			}
 		},
 		skill:{
+			//星曹仁
+			starsujun:{
+				audio:2,
+				trigger:{player:'useCard'},
+				filter:function(event,player){
+					return player.countCards('h',{type:'basic'})*2==player.countCards('h');
+				},
+				frequent:true,
+				locked:false,
+				content:function(){
+					player.draw(2);
+				},
+				mod:{
+					aiOrder:function(player,card,num){
+						var num=player.countCards('h')-2*player.countCards('h',{type:'basic'});
+						if(Math.abs(num)!=1) return;
+						if(num==1&&get.type(card)!='basic') return num+10;
+						if(num==-1&&get.type(card)=='basic') return num+10;
+					},
+				},
+			},
+			starlifeng:{
+				audio:2,
+				enable:'chooseToUse',
+				filter:function(event,player){
+					if(!event.filterCard({name:'sha'})&&!event.filterCard({name:'wuxie'})) return false;
+					return player.countCards('h',card=>{
+						return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
+					});
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						var list=[];
+						if(event.filterCard({name:'sha'},player,event)) list.push(['基本','','sha']);
+						if(event.filterCard({name:'wuxie'},player,event)) list.push(['锦囊','','wuxie']);
+						return ui.create.dialog('砺锋',[list,'vcard']);
+					},
+					check:function(button){
+						return _status.event.player.getUseValue({name:button.link[2],nature:button.link[3]});
+					},
+					backup:function(links,player){
+						return {
+							filterCard:function(card,player){
+								return !player.getStorage('starlifeng_count').contains(get.color(card,player));
+							},
+							precontent:function(){
+								delete event.result.skill;
+								player.logSkill('starlifeng');
+								event.getParent().addCount=false;
+							},
+							popname:true,
+							position:'h',
+							viewAs:{
+								name:links[0][2],
+							},
+							ai1:function(card){
+								var player=_status.event.player;
+								var num=player.countCards('h')-2*player.countCards('h',{type:'basic'});
+								if(player.hasSkill('starsujin')&&Math.abs(num)==1){
+									if(num==1&&get.type(card)!='basic') return 15-get.value(card);
+									if(num==-1&&get.type(card)=='basic') return 15-get.value(card);
+								}
+								return 7-get.value(card);
+							},
+						};
+					},
+					prompt:function(links){
+						return '将一张本回合未使用过的颜色的手牌当做【'+get.translation(links[0][2])+'】使用';
+					},
+				},
+				hiddenCard:function(player,name){
+					if(name=='wuxie') return player.countCards('h',card=>{
+						return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
+					});
+				},
+				ai:{
+					respondSha:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg=='respond') return false;
+						if(!player.countCards('h',card=>{
+							return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
+						})) return false;
+					},
+					order:function(item,player){
+						if(player&&_status.event.type=='phase'){
+							if(player.hasSkill('starsujin')&&Math.abs(player.countCards('h')-2*player.countCards('h',{type:'basic'}))==1) return 10;
+							return get.order({name:'sha'})+0.3;
+						}
+						return 2;
+					},
+				},
+				group:'starlifeng_mark',
+				subSkill:{
+					mark:{
+						charlotte:true,
+						trigger:{player:'useCard1'},
+						filter:function(event,player){
+							return !player.getStorage('starlifeng_count').contains(get.color(event.card));
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							player.addTempSkill('starlifeng_count');
+							player.markAuto('starlifeng_count',[get.color(trigger.card)]);
+						},
+					},
+					count:{
+						charlotte:true,
+						onremove:true,
+					},
+				},
+			},
 			//十周年嵇康
 			dcjuexiang: {
 				derivation: 'dccanyun',
@@ -597,142 +711,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					cardUsable:function(card){
 						if(get.color(card)=='none') return Infinity;
 					},
-				}
-			},
-			//张曼成
-			dclvecheng:{
-				audio:2,
-				enable:'phaseUse',
-				usable:1,
-				filterTarget:lib.filter.notMe,
-				content:function(){
-					player.addTempSkill('dclvecheng_xiongluan');
-					player.markAuto('dclvecheng_xiongluan',[target]);
-					var cards=player.getCards('h','sha');
-					if(cards.length) player.addGaintag(cards,'dclvecheng_xiongluan');
-				},
-				ai:{
-					threaten:3.1,
-					order:3.5,
-					expose:0.2,
-					result:{
-						target:function(player,target){
-							if(player.getStorage('dclvecheng_xiongluan').contains(target)) return 0;
-							if(target.getEquip('bagua')||target.getEquip('rewrite_bagua')) return -0.6;
-							var hs=player.countCards('h',card=>{
-								if(!player.canUse(card,target)) return false;
-								return get.name(card)=='sha'&&get.effect(target,card,player,player)>0;
-							});
-							var ts=target.hp;
-							if(hs>=ts&&ts>1) return -2;
-							return -1;
-						}
-					}
-				},
-				subSkill:{
-					xiongluan:{
-						trigger:{player:'phaseEnd'},
-						charlotte:true,
-						forced:true,
-						popup:false,
-						onremove:function(player,skill){
-							player.removeGaintag('dclvecheng_xiongluan');
-							delete player.storage[skill];
-						},
-						filter:function(event,player){
-							return player.getStorage('dclvecheng_xiongluan').some(i=>i.isIn());
-						},
-						content:function(){
-							'step 0'
-							event.targets=player.getStorage('dclvecheng_xiongluan').slice();
-							event.targets.sortBySeat();
-							'step 1'
-							if(!event.targets.length){
-								event.finish();
-								return;
-							}
-							var target=event.targets.shift();
-							event.target=target;
-							target.showHandcards();
-							var cards=target.getCards('h','sha');
-							if(!cards.length) event.redo();
-							else event.forced=false;
-							'step 2'
-							var forced=event.forced;
-							var prompt2=forced?'掠城：选择对'+get.translation(player)+'使用的【杀】':'掠城：是否依次对'+get.translation(player)+'使用所有的【杀】？';
-							target.chooseToUse(forced,function(card,player,event){
-								if(get.itemtype(card)!='card'||get.name(card)!='sha') return false;
-								return lib.filter.filterCard.apply(this,arguments);
-							},prompt2).set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
-								if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
-								return lib.filter.targetEnabled.apply(this,arguments);
-							}).set('sourcex',player);
-							'step 3'
-							if(result.bool){
-								if(target.countCards('h','sha')){
-									event.forced=true;
-									event.goto(2);
-									return;
-								}
-							}
-							event.forced=false;
-							event.goto(1);
-						},
-						intro:{
-							content:'对$使用“掠城”【杀】无任何次数限制',
-						},
-						mod:{
-							cardUsableTarget:function(card,player,target){
-								if(!card.cards||card.cards.length!=1) return;
-								if(card.name=='sha'&&card.cards[0].hasGaintag('dclvecheng_xiongluan')&&player.getStorage('dclvecheng_xiongluan').contains(target)) return true;
-							},
-						}
-					}
-				}
-			},
-			dczhongji:{
-				audio:2,
-				trigger:{player:'useCard'},
-				filter:function(event,player){
-					if(player.countCards('h')>=player.maxHp) return false;
-					var suit=get.suit(event.card);
-					return !lib.suit.contains(suit)||!player.countCards('h',{suit:suit});
-				},
-				check:function(event,player){
-					var num=Math.min(20,player.maxHp-player.countCards('h'));
-					if(num<=0) return false;
-					var numx=player.getHistory('useSkill',evt=>{
-						return evt.skill=='dczhongji';
-					}).length+1;
-					if(numx>num) return false;
-					if(_status.currentPhase!=player) return true;
-					if(player.hasCard(card=>{
-						var suit=get.suit(card);
-						return player.hasValueTarget(card)&&!player.hasCard(cardx=>{
-							return cardx!=card&&get.suit(cardx)==suit;
-						});
-					})) return false;
-					return true;
-				},
-				prompt2:function(event,player){
-					var num=Math.min(20,player.maxHp-player.countCards('h'));
-					var str=num>0?'摸'+get.cnNumber(num)+'张牌，然后':'';
-					return str+'弃置'+get.cnNumber(1+player.getHistory('useSkill',evt=>{
-						return evt.skill=='dczhongji';
-					}).length)+'张牌';
-				},
-				content:function(){
-					'step 0'
-					var num=Math.min(20,player.maxHp-player.countCards('h'));
-					if(num>0) player.draw(num);
-					'step 1'
-					var num=player.getHistory('useSkill',evt=>{
-						return evt.skill=='dczhongji';
-					}).length;
-					player.chooseToDiscard('螽集：请弃置'+get.cnNumber(num)+'张牌','he',true,num).set('ai',get.unuseful);
-				},
-				ai:{
-					threaten:3.2,
 				}
 			},
 			//关宁
@@ -10612,11 +10590,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldlongsong_info:'出牌阶段开始时，你可以将一张手牌交给一名其他角色。然后其须选择其所有的发动时机为出牌阶段内的空闲时间点且你至多能于此阶段发动一次的技能，其于此阶段这些技能失效，你获得这些技能。',
 			dclongsong:'龙颂',
 			dclongsong_info:'出牌阶段开始时，你可以将一张红色牌交给一名其他角色。然后其须选择其所有的发动时机包含“出牌阶段”的技能，其于此阶段这些技能失效，你获得这些技能且至多可以发动一次。',
-			dc_zhangmancheng:'张曼成',
-			dclvecheng:'掠城',
-			dclvecheng_info:'出牌阶段限一次。你可以选择一名其他角色，你于本回合对其使用当前手牌中的【杀】无任何次数限制。然后回合结束时，其展示所有手牌，若其中有【杀】，其可以选择对你依次使用其中所有的【杀】。',
-			dczhongji:'螽集',
-			dczhongji_info:'当你使用牌时，若此牌无花色或你手牌区里没有与此牌花色相同的手牌，你可以将手牌摸至体力上限并弃置X张牌（X为本回合发动〖螽集〗的次数）。',
 			dc_mengda:'孟达',
 			dclibang:'利傍',
 			dclibang_info:'出牌阶段限一次。你可以弃置一张牌，正面向上获得两名其他角色的各一张牌。然后你判定，若结果与这两张牌的颜色均不同，你交给其中一名角色两张牌或失去1点体力，否则你获得判定牌并视为对其中一名角色使用一张【杀】。',
@@ -10634,6 +10607,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjuexiang_info:'当你死亡时，杀死你的角色弃置其装备区内的所有牌并失去1点体力，然后你可以令一名其他角色获得〖残韵〗。',
 			dccanyun:'残韵',
 			dccanyun_info:'每名角色限一次。出牌阶段，你可以弃置一张牌并选择一名其他角色，然后若其装备区里的牌数：小于你，其回复1点体力；大于你，其失去1点体力；等于你，其摸一张牌。若你的体力值为1，你摸一张牌。',
+			star_caoren:'星曹仁',
+			star_caoren_prefix:'星',
+			starsujun:'肃军',
+			starsujun_info:'当你使用一张牌时，若你手牌中的基本牌和非基本牌的牌数相等，你可以摸两张牌。',
+			starlifeng:'砺锋',
+			starlifeng_info:'你可以将一张本回合未使用过的颜色的手牌当做不计入次数的【杀】或【无懈可击】使用。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
@@ -10651,6 +10630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_xiaohu:'列传·虓虎悲歌',
 			sp_fenghuo:'烽火连天',
 			sp_danqi:'千里单骑',
+			sp_star:'将星系列',
 			sp_decade:'其他新服武将',
 		},
 		pinyins:{
