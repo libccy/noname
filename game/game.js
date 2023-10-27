@@ -13719,7 +13719,7 @@
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('discardPile',null,event)){
-							cards[i].splice(i--,1);
+							cards[i].remove();
 							continue;
 						}
 						if(get.position(cards[i],true)=='c') withPile=true;
@@ -13739,7 +13739,7 @@
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('ordering',null,event)){
-							cards[i].splice(i--,1);
+							cards[i].remove();
 							continue;
 						}
 						if(get.position(cards[i],true)=='c') withPile=true;
@@ -13762,7 +13762,7 @@
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('special',null,event)){
-							cards[i].splice(i--,1);
+							cards[i].remove();
 							continue;
 						}
 						if(get.position(cards[i],true)=='c') withPile=true;
@@ -19632,11 +19632,6 @@
 							cards.splice(i--,1);
 							continue;
 						}
-						else if(event.getlx!==false&&cards[i].willBeDestroyed(event.position.id,null,event)){
-							cards[i].delete();
-							cards.splice(i--,1);
-							continue;
-						}
 						else if(cards[i].parentNode){
 							if(cards[i].parentNode.classList.contains('equips')){
 								cards[i].original='e';
@@ -19676,12 +19671,25 @@
 						cards[i].recheck();
 						
 						var info=lib.card[cards[i].name];
-						var destroyInfo=cards[i].hasOwnProperty('_destroy')?cards[i]._destroy:info.destroy;
-						if(destroyInfo){
-							cards[i].delete();
-							cards[i].destroyed=destroyInfo;
+						if(cards[i].hasOwnProperty('_destroy')){
+							if(cards[i]._destroy){
+								cards[i].delete();
+								cards[i].destroyed=card._destroy;
+								continue;
+							}
 						}
-						else if(event.position){
+						else if(cards[i].hasOwnProperty('destroyed')){
+							if(event.getlx!==false&&event.position&&cards[i].willBeDestroyed(event.position.id,null,event)){
+								cards[i].delete();
+								continue;
+							}
+						}
+						else if(info.destroy){
+							cards[i].delete();
+							cards[i].destroyed=info.destroy;
+							continue;
+						}
+						if(event.position){
 							if(_status.discarded){
 								if(event.position==ui.discardPile){
 									_status.discarded.add(cards[i]);
@@ -36305,7 +36313,7 @@
 			const pile=ui.cardPile;
 			for(let i=0;i<cards.length;i++){
 				if(cards[i].willBeDestroyed('cardPile',null,event)){
-					cards[i].splice(i--,1);
+					cards[i].remove();
 					continue;
 				}
 				if(event.insert_index){
