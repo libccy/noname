@@ -6609,6 +6609,12 @@
 						frequent:true,
 						intro:'在用户填写的IP地址没有直接指定使用WS/WSS协议的情况下，默认使用WSS协议，而非WS协议来连接到联机服务器。<br>请不要轻易勾选此项！',
 					},
+					read_clipboard:{
+						name:'读取邀请链接',
+						init:false,
+						frequent:true,
+						intro:'读取剪贴板以解析邀请链接自动加入联机房间',
+					}
 				}
 			},
 			boss:{
@@ -34866,16 +34872,17 @@
 								try{
 									var roomId=text.split('\n')[1].match(/\d+/);
 									var caption=ui.rooms.find(caption=>caption.key==roomId);
-									if (caption && (confirm(`是否通过复制的内容加入${roomId}房间？`) || _status.read_clipboard_text)){
+									if (caption&&(confirm(`是否通过复制的内容加入${roomId}房间？`)||_status.read_clipboard_text)){
 										ui.click.connectroom.call(caption);
+										delete _status.read_clipboard_text;
 									}
-								}catch(e){console.log(e);}
+								}catch(e){console.log(e)}
 							}
 							if(_status.read_clipboard_text){
 								read(_status.read_clipboard_text);
 							}else{
 								window.focus();
-								if(navigator.clipboard){
+								if(navigator.clipboard&&lib.node){
 									navigator.clipboard.readText().then(read).catch(_=>{});
 								}else{
 									var input=ui.create.node('textarea',ui.window,{opacity:'0'});
@@ -34883,7 +34890,7 @@
 									var result=document.execCommand('paste');
 									input.blur();
 									ui.window.removeChild(input);
-									if(result) read(input.value);
+									if(result||input.value.length>0) read(input.value);
 									//也就小b兼容版不支持直接读取了
 									else if(confirm('是否输入邀请链接以加入房间？')){
 										var text=prompt('请输入邀请链接');
@@ -53419,7 +53426,7 @@
 				ipbar.style.borderRadius='2px';
 				ipbar.style.position='relative';
 
-				var button=ui.create.div('.menubutton.large.highlight.connectbutton.pointerdiv',game.online?'退出联机':'开始游戏',ui.window,function(){
+				var button=ui.create.div('.menubutton.large.highlight.connectbutton.connectbutton1.pointerdiv',game.online?'退出联机':'开始游戏',ui.window,function(){
 					if(button.clicked) return;
 					if(game.online){
 						if(game.onlinezhu){
@@ -53455,10 +53462,10 @@
 				var shareButton=ui.create.div('.menubutton.large.highlight.connectbutton.connectbutton2.pointerdiv','分享房间',ui.window,function(){
 					var text=`无名杀-联机-${lib.translate[get.mode()]}-${game.connectPlayers.filter(p=>p.avatar).length}/${game.connectPlayers.filter(p=>!p.classList.contains('unselectable2')).length}\n${get.connectNickname()}邀请你加入${game.roomId}房间\n联机地址:${game.ip}\n请先通过游戏内菜单-开始-联机中启用“读取邀请链接”选项`;
 					window.focus();
-					if(navigator.clipboard){
+					if(navigator.clipboard&&lib.node){
 						navigator.clipboard.writeText(text).then(()=>{
 							game.alert(`分享内容复制成功`);
-						}).catch(e => {
+						}).catch(e=>{
 							game.alert(`分享内容复制失败${e||''}`);
 						});
 					}else{
@@ -53521,10 +53528,10 @@
 					ui.handcards1Container.onmousewheel=ui.click.mousewheel;
 					ui.handcards2Container.onmousewheel=ui.click.mousewheel;
 				}
-				ui.handcards1Container.ontouchstart = ui.click.touchStart;
-				ui.handcards2Container.ontouchstart = ui.click.touchStart;
-				ui.handcards1Container.ontouchmove = ui.click.touchScroll;
-				ui.handcards2Container.ontouchmove = ui.click.touchScroll;
+				ui.handcards1Container.ontouchstart=ui.click.touchStart;
+				ui.handcards2Container.ontouchstart=ui.click.touchStart;
+				ui.handcards1Container.ontouchmove=ui.click.touchScroll;
+				ui.handcards2Container.ontouchmove=ui.click.touchScroll;
 				ui.handcards1Container.style.webkitOverflowScrolling='touch';
 				ui.handcards2Container.style.webkitOverflowScrolling='touch';
 
