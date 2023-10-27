@@ -41,16 +41,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(player.getStorage('clanbaichu').contains(event.card.name)) return true;
 					if(get.suit(event.card)=='none') return false;
-					var str=(get.suit(event.card)+'、'+get.type2(event.card));
+					var str=(get.suit(event.card)+'+'+get.type2(event.card));
 					if(!player.getStorage('clanbaichu').contains(str)) return true;
 					return !player.hasSkill('qice');
 				},
 				forced:true,
 				content:function(){
 					'step 0'
-					if(player.getStorage('clanbaichu').contains(trigger.card.name)){
-						event.draw=true;
-					}
 					if(get.suit(trigger.card)!='none'){
 						var str=(get.suit(trigger.card)+'+'+get.type2(trigger.card));
 						if(player.getStorage('clanbaichu').contains(str)){
@@ -68,6 +65,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var dialog=['请选择【百出】记录的普通锦囊牌牌名',[list,'vcard']];
 								player.chooseButton(dialog,true).set('ai',function(button){
 									var player=_status.event.player,name=button.link[2];
+									if(name==_status.event.getTrigger().card.name) return 1919810;
 									if(name=='wuxie') return 114514;
 									return get.effect(player,{name:name},player,player)*(1+player.countCards('hs',name));
 								});
@@ -85,7 +83,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delayx();
 					}
 					'step 2'
-					if(event.draw) player.chooseDrawRecover(true);
+					if(player.getStorage('clanbaichu').contains(trigger.card.name)) player.chooseDrawRecover(true);
 				},
 				intro:{
 					markcount:()=>0,
@@ -233,7 +231,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								var card={
 									name:result.links[0][2],
-									nature:result.links[0][2],
+									nature:result.links[0][3],
 								};
 								player.useCard(card,target,false);
 							}

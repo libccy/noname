@@ -38,8 +38,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_liubiao:['male','qun',3,['sbzishou','sbzongshi']],
 			sb_zhurong:['female','shu',4,['sblieren','sbjuxiang']],
 			sb_menghuo:['male','shu',4,['sbhuoshou','sbzaiqi']],
-			sb_yl_luzhi:['male','qun',3,['nzry_mingren','sbzhenliang']],
-			sb_xiaoqiao:['female','wu',3,['sbtianxiang','xinhongyan']],
+			sb_yl_luzhi:['male','qun',3,['nzry_mingren','sbzhenliang'],['unseen']],
+			sb_xiaoqiao:['female','wu',3,['sbtianxiang','xinhongyan'],['unseen']],
 		},
 		characterSort:{
 			sb:{
