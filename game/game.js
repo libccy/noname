@@ -12744,14 +12744,9 @@
 						event.finish();
 						return;
 					}
-					if(card.destroyed){
-						if(player.hasSkill(card.destroyed)){
-							delete card.destroyed;
-						}
-						else{
-							event.finish();
-							return;
-						}
+					if(card.willBeDestroyed('equip',player,event)){
+						event.finish();
+						return;
 					}
 					else if(event.owner){
 						if(event.owner.getCards('hejsx').contains(card)){
@@ -13723,6 +13718,10 @@
 					game.getGlobalHistory().cardMove.push(event);
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
+						if(cards[i].willBeDestroyed('discardPile',null,event)){
+							cards[i].splice(i--,1);
+							continue;
+						}
 						if(get.position(cards[i],true)=='c') withPile=true;
 						cards[i].discard();
 					}
@@ -13739,6 +13738,10 @@
 					game.getGlobalHistory().cardMove.push(event);
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
+						if(cards[i].willBeDestroyed('ordering',null,event)){
+							cards[i].splice(i--,1);
+							continue;
+						}
 						if(get.position(cards[i],true)=='c') withPile=true;
 						cards[i].fix();
 						ui.ordering.appendChild(cards[i]);
@@ -13758,6 +13761,10 @@
 					game.getGlobalHistory().cardMove.push(event);
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
+						if(cards[i].willBeDestroyed('special',null,event)){
+							cards[i].splice(i--,1);
+							continue;
+						}
 						if(get.position(cards[i],true)=='c') withPile=true;
 						cards[i].fix();
 						ui.special.appendChild(cards[i]);
@@ -19256,13 +19263,8 @@
 					}
 					"step 1"
 					for(var i=0;i<cards.length;i++){
-						if(cards[i].destroyed){
-							if(player.hasSkill(cards[i].destroyed)){
-								delete cards[i].destroyed;
-							}
-							else{
-								cards.splice(i--,1);
-							}
+						if(cards[i].willBeDestroyed('handcard',player,event)){
+							cards.splice(i--,1);
 						}
 						else if(event.losing_map){
 							for(var id in event.losing_map){
@@ -19455,13 +19457,8 @@
 					}
 					"step 1"
 					for(var i=0;i<cards.length;i++){
-						if(cards[i].destroyed){
-							if(player.hasSkill(cards[i].destroyed)){
-								delete cards[i].destroyed;
-							}
-							else{
-								cards.splice(i--,1);
-							}
+						if(cards[i].willBeDestroyed('expansion',player,event)){
+							cards.splice(i--,1);
 						}
 						else if(event.losing_map){
 							for(var id in event.losing_map){
@@ -19674,9 +19671,10 @@
 						cards[i].recheck();
 						
 						var info=lib.card[cards[i].name];
-						if(info.destroy||cards[i]._destroy){
+						var destroyInfo=cards[i].hasOwnProperty('_destroy')?cards[i]._destroy:info.destroy;
+						if(destroyInfo){
 							cards[i].delete();
-							cards[i].destroyed=info.destroy||cards[i]._destroy;
+							cards[i].destroyed=destroyInfo;
 						}
 						else if(event.position){
 							if(_status.discarded){
@@ -19801,7 +19799,7 @@
 					"step 4"
 					if(event.toRenku){
 						_status.renku.addArray(cards.filter(function(card){
-							return !card.destroyed;
+							return !card.willBeDestroyed('renku',null,event);
 						}));
 						if(_status.renku.length>6){
 							var cards=_status.renku.splice(0,_status.renku.length-6);
@@ -20336,14 +20334,9 @@
 						else if(get.position(cards[0])=='c') event.updatePile=true;
 					}
 					"step 1"
-					if(cards[0].destroyed){
-						if(player.hasSkill(cards[0].destroyed)){
-							delete cards[0].destroyed;
-						}
-						else{
-							event.finish();
-							return;
-						}
+					if(cards[0].willBeDestroyed('judge',player,event)){
+						event.finish();
+						return;
 					}
 					else if(event.relatedLose){
 						var owner=event.relatedLose.player;
@@ -29910,6 +29903,26 @@
 				buildIntro(noclick){
 					if(!noclick) lib.setIntro(this);
 				}
+				//判断一张牌进入某个区域后是否会被销毁
+				willBeDestroyed(targetPosition,player,event){
+					const destroyed=this.destroyed;
+					if(typeof destroyed=='function'){
+						return destroyed(card,targetPosition,player,event);
+					}
+					else if(lib.skill[destroyed]){
+						if(player){
+							if(player.hasSkill(destroyed)){
+								delete this.destroyed;
+								return false;
+							}
+						}
+						return true;
+					}
+					else if(typeof destroyed=='string'){
+						return (destroyed==targetPosition);
+					}
+					return destroyed;
+				}
 				hasNature(nature,player){
 					return game.hasNature(this,nature,player);
 				}
@@ -30511,7 +30524,7 @@
 					if(this._uncheck.length==0) this.classList.remove('uncheck');
 				}
 				discard(bool){
-					if(!this.destroyed){
+					if(!this.willBeDestroyed('discardPile',null,event)){
 						ui.discardPile.appendChild(this);
 					}
 					this.fix();
@@ -36286,6 +36299,10 @@
 			const cards=event.cards;
 			const pile=ui.cardPile;
 			for(let i=0;i<cards.length;i++){
+				if(cards[i].willBeDestroyed('cardPile',null,event)){
+					cards[i].splice(i--,1);
+					continue;
+				}
 				if(event.insert_index){
 					cards[i].fix();
 					pile.insertBefore(cards[i],event.insert_index(event,cards[i]));
