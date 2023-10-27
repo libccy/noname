@@ -231,7 +231,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								var card={
 									name:result.links[0][2],
-									nature:result.links[0][2],
+									nature:result.links[0][3],
 								};
 								player.useCard(card,target,false);
 							}
