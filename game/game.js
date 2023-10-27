@@ -11323,6 +11323,18 @@
 				}
 			},
 			parsex:function(item){
+				//by 梦的原野
+				function processGen(gen){
+					//移除所有注释
+					var str=gen.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^\/"'\\\s]*)/mg,'$2').trim();
+					//获取第一个 { 后的所有字符
+					str=str.slice(str.indexOf('{')+1);
+					str=str.slice(0,-1);
+					str=str.replace(/(yield \S+)((?=\s+)|(?=;))/g,'[event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result]=$1');
+					return (new GeneratorFunction('event','step','source','player','target','targets',
+						'card','cards','skill','forced','num','trigger','result',
+						'_status','lib','game','ui','get','ai',str));
+				}
 				//by 诗笺、Tipx-L
 				/**
 				 * @param {Function} func 
@@ -11429,28 +11441,16 @@
 							let gen,lastEvent;
 							return function*(event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai){
 								event.step=NaN;
-								if(!gen)gen=item(event,{
-									event:event,
-									step:step,
-									source:source,
-									player:player,
-									target:target,
-									targets:targets,
-									card:card,
-									cards:cards,
-									skill:skill,
-									forced:forced,
-									num:num,
-									trigger:trigger,
-									result:result
-								});
-								var res=gen.next((lastEvent&&("result" in lastEvent))?lastEvent.result:null);
+								if(!gen){
+									gen=processGen(item);
+									gen=gen(event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result,_status,lib,game,ui,get,ai);
+								}
+								var res=gen.next([event,step,source,player,target,targets,card,cards,skill,forced,num,trigger,result]);
 								if(res.done) event.finish();
 								else {
 									var currentResult=res.value;
 									// TODO: use `event.debugger` to replace source
 									if(typeof currentResult=="function") yield currentResult;
-									else lastEvent=currentResult;
 								}
 							}
 						}
