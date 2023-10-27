@@ -451,16 +451,25 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							},true)) return 2;
 							let mode = get.mode();
 							if(target.hp>0){
-								let nd = player.needsToDiscard();
-								let keep = 0;
-								if(nd<2&&player.isPhaseUsing()){
+								let min = 7.2-1.2*Math.min(3,player.hp),
+									nd = player.needsToDiscard(-player.countCards('h',i=>get.value(i)<min)),
+									taos = player.countCards('hs',i=>get.name==='tao'&&lib.filter.cardEnabled(i,player)),
+									keep = 0;
+								if(nd>1&&taos>1&&player.hp<1+taos) return 2;
+								if(nd<3&&game.hasPlayer(current=>{
+									return current.identity==='zhu'&&current.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')&&get.attitude(player,current)>0;
+								})){
+									nd = 0;
+									keep = 3;
+								}
+								else if(nd<2&&player.isPhaseUsing()){
 									if(nd<1) keep = 3;
-									else if(target.hp>=2&&player.countCards('hs','tao')<=target.hp/2) keep = 1;
+									else if(target.hp>=2&&taos<=target.hp/2) keep = 1;
 								}
 								if(keep){
-									if(!nd || game.hasPlayer(current=>{
+									if(!nd || game.countPlayer(current=>{
 										if(player!==current&&current.hp<=2&&get.attitude(player,current)>2){
-											if(target.hp>=2&&current.identity==='zhu'&&(mode==='identity' || mode === 'versus' || mode === 'chess')){
+											if(target.hp>=2){
 												keep=3;
 												return true;
 											}
@@ -474,6 +483,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 										if(keep>2) return 0;
 									}
 								}
+								return 2;
 							}
 							if(target.isZhu2() || target===game.boss) return 2;
 							if(player!==target){
