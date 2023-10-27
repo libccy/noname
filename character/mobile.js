@@ -3362,36 +3362,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var num=1-trigger.player.hp;
 							if(num>0) trigger.player.recover(num);
 							'step 1'
-							if(player.hp==1&&player.maxHp==1){
-								event.finish(); return;
-							}
 							var hp=player.hp-1,maxhp=player.maxHp-1;
-							var choiceList=['失去'+hp+'点体力，令'+get.translation(trigger.player)+'获得'+hp+'点护甲','减'+maxhp+'点体力上限，令'+get.translation(trigger.player)+'获得'+maxhp+'点护甲'];
-							var choices=[];
-							if(hp>0) choices.push('选项一');
-							else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
-							if(maxhp>0) choices.push('选项二');
-							else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
-							player.chooseControl(choices).set('prompt','安国：请选择一项').set('choiceList',choiceList).set('ai',()=>{
-								var player=_status.event.player;
-								if(player.hp<=1||get.attitude(player,_status.event.getTrigger().player)>=4&&player.hp-1<0.4*(player.maxHp-1)&&player.maxHp>1) return '选项二';
-								return '选项一';
-							});
+							if(hp>0&&maxhp>0){
+								player.chooseControl(choices).set('prompt','安国：请选择一项').set('choiceList',[
+									'失去'+hp+'点体力，令'+get.translation(trigger.player)+'获得1点护甲',
+									'减'+maxhp+'点体力上限，令'+get.translation(trigger.player)+'获得1点护甲'
+								]).set('ai',()=>'选项一');
+							}
+							else if(hp>0) event._result={control:'选项一'};
+							else if(maxhp>0) event._result={control:'选项二'};
+							else event.finish();
 							'step 2'
 							if(result.control=='选项一'){
 								var num=player.hp-1;
-								if(num>0){
-									player.loseHp(num);
-									trigger.player.changeHujia(num);
-								}
+								if(num>0) player.loseHp(num);
 							}
-							else {
+							else{
 								var num=player.maxHp-1;
-								if(num>0){
-									player.loseMaxHp(num);
-									trigger.player.changeHujia(num);
-								}
+								if(num>0) player.loseMaxHp(num);
 							}
+							trigger.player.changeHujia(1,null,true);
 						}
 					}
 				}
@@ -4871,13 +4861,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mobilexingxue:{
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
+				filter:function(event,player){
+					var num=player.storage.mobileyanzhu?player.maxHp:player.hp;
+					return num>0;
+				},
 				direct:true,
 				content:function(){
 					'step 0'
-					var num=player.hp;
-					if(!player.hasSkill('mobileyanzhu')){
-						num=player.maxHp;
-					}
+					var num=player.storage.mobileyanzhu?player.maxHp:player.hp;
 					player.chooseTarget([1,num],get.prompt2('mobilexingxue')).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(target.countCards('he')) return att;
@@ -4904,7 +4895,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					if(event.current&&event.current.countCards('he')){
-						if(player.hasSkill('mobileyanzhu')||event.targets2.length==1) event.current.chooseCard('选择一张牌置于牌堆顶','he',true);
+						if(player.storage.mobileyanzhu||event.targets2.length==1) event.current.chooseCard('选择一张牌置于牌堆顶','he',true);
 						else event.current.chooseCardTarget({
 							prompt:'将一张牌置于牌堆顶，或交给其他目标角色',
 							filterCard:true,
@@ -4942,22 +4933,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 5'
 					event.goto(2);
-				}
+				},
+				derivation:'mobilexingxuex',
 			},
 			mobileyanzhu:{
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
-					return target.countCards('he')>0&&target!=player;
+					return target.countCards('hej')>0&&target!=player;
 				},
 				content:function(){
 					'step 0'
 					if(target.countCards('e')){
-						target.chooseBool('是否将装备区内的所有牌交给'+get.translation(player)+'？','若选择“取消”，则其将获得你的一张牌').set('ai',function(){
+						target.chooseBool('是否将装备区内的所有牌交给'+get.translation(player)+'？','若选择“取消”，则其将获得你区域里的一张牌').set('ai',function(){
+							if(_status.event.effect>0) return false;
 							if(_status.event.player.countCards('e')>=3) return false;
 							return true;
-						});
+						}).set('effect',get.effect(target,{name:'shunshou'},player,target));
 					}
 					else{
 						player.gainPlayerCard(target,true,'he');
@@ -4968,22 +4961,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var es=target.getCards('e');
 						target.give(es,player,'give');
 						player.removeSkill('mobileyanzhu');
+						player.storage.mobileyanzhu=true;
+						player.popup('兴学');
+						game.log(player,'修改了技能','【兴学】');
 					}
 					else{
-						player.gainPlayerCard(target,true,'he');
+						player.gainPlayerCard(target,true,'hej');
 					}
 				},
 				ai:{
 					order:6,
 					result:{
 						target:function(player,target){
-							var ne=target.countCards('e');
+							var ne=target.countCards('e'),nj=target.countCards('j');
+							if(nj) return 2.5;
 							if(!ne) return -2;
 							if(ne>=2) return -ne;
 							return 0;
-						}
-					}
-				}
+						},
+					},
+				},
 			},
 			//毛玠
 			bingqing:{
@@ -14678,6 +14675,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.countMark('spshidi')%2==0) return '转换技，锁定技。①准备阶段/结束阶段开始时，若你发动此分支的累计次数为奇数/偶数，则你获得一个“☯”。<span class="bluetext">②若你的“☯”数为偶数，则你至其他角色的距离-1，且你使用的黑色【杀】不可被响应。</span>③若你的“☯”数为奇数，则其他角色至你的距离+1，且你不可响应红色【杀】。';
 				return '转换技，锁定技。①准备阶段/结束阶段开始时，若你发动此分支的累计次数为奇数/偶数，则你获得一个“☯”。②若你的“☯”数为偶数，则你至其他角色的距离-1，且你使用的黑色【杀】不可被响应。<span class="bluetext">③若你的“☯”数为奇数，则其他角色至你的距离+1，且你不可响应红色【杀】。</span>';
 			},
+			mobilexingxue:function(player){
+				return lib.translate[(player.storage.mobileyanzhu?'mobilexingxuex':'mobilexingxue')+'_info'];
+			},
 		},
 		perfectPair:{
 			simazhao:['simayi','jin_simayi','jin_wangyuanji'],
@@ -15255,9 +15255,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_sunxiu:'手杀界孙休',
 			xin_sunxiu_prefix:'手杀界',
 			mobileyanzhu:'宴诛',
-			mobileyanzhu_info:'出牌阶段限一次，你可以令一名有牌的其他角色选择一项：①你获得其装备区里所有的牌，然后你失去技能〖宴诛〗。②你获得其一张牌。',
+			mobileyanzhu_info:'出牌阶段限一次，你可以令一名有牌的其他角色选择一项：①你获得其装备区里所有的牌，然后你失去技能〖宴诛〗并修改技能〖兴学〗。②你获得其区域里的一张牌。',
 			mobilexingxue:'兴学',
-			mobilexingxue_info:'结束阶段开始时，你可以令至多X名角色依次摸一张牌并将一张牌置于牌堆顶（X为你的体力值，若你未拥有〖宴诛〗，则将X改为你的体力上限，且其可以改为将一张牌交给一名其他目标角色）。',
+			mobilexingxue_info:'结束阶段开始时，你可以令至多X名角色依次摸一张牌并将一张牌置于牌堆顶（X为你的体力值）。',
+			mobilexingxuex:'兴学·改',
+			mobilexingxuex_info:'结束阶段开始时，你可以令至多X名角色依次摸一张牌并将一张牌置于牌堆顶或交给一名其他目标角色（X为你的体力上限）。',
 			re_wuguotai:'手杀界吴国太',
 			re_wuguotai_prefix:'手杀界',
 			reganlu:'甘露',
@@ -15347,7 +15349,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_zhuzhi:'手杀界朱治',
 			xin_zhuzhi_prefix:'手杀界',
 			sbanguo:'安国',
-			sbanguo_info:'①游戏开始时，你令一名其他角色获得1枚“安国”标记（有“安国”的角色手牌上限基数等于体力上限）。②出牌阶段开始时，你可以将一名有“安国”的角色的所有“安国”移动给一名本局游戏未获得过“安国”的其他角色。③当你受到伤害时，若有有“安国”的角色且伤害值不小于你的体力值且此伤害没有来源或来源没有“安国”，防止此伤害。④一名角色进入濒死状态时，若其有你因〖安国①〗获得的“安国”，你移去其该“安国”，令其将体力回复至1点。然后你选择一项：1.若你的体力值大于1，你失去体力至1点；2.若你的体力上限大于1，你将体力上限减至1。最后你令其获得X点护甲（X为你以此法失去的体力值或减少的体力上限）。',
+			sbanguo_info:'①游戏开始时，你令一名其他角色获得1枚“安国”标记（有“安国”的角色手牌上限基数等于体力上限）。②出牌阶段开始时，你可以将一名有“安国”的角色的所有“安国”移动给一名本局游戏未获得过“安国”的其他角色。③当你受到伤害时，若有有“安国”的角色且伤害值不小于你的体力值且此伤害没有来源或来源没有“安国”，防止此伤害。④一名角色进入濒死状态时，若其有你因〖安国①〗获得的“安国”，你移去其该“安国”，令其将体力回复至1点。然后你选择一项：1.若你的体力值大于1，你失去体力至1点；2.若你的体力上限大于1，你将体力上限减至1。最后你令其获得1点护甲。',
 			wangjun:'手杀王濬',
 			wangjun_prefix:'手杀',
 			zhujian:'筑舰',
