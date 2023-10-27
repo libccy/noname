@@ -399,98 +399,105 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.recover();
 				},
 				ai:{
-					basic: {
-						order: function (card, player) {
-							if (player.hasSkillTag('pretao')) return 9;
+					basic:{
+						order:(card,player)=>{
+							if(player.hasSkillTag('pretao')) return 9;
 							return 2;
 						},
-						useful: function (card, i) {
+						useful:(card,i)=>{
 							let player = _status.event.player;
-							if (player.isDamaged() && !game.checkMod(card, player, 'unchanged', 'cardEnabled2', player)) return 2 / (1 + i);
-							let fs = game.filterPlayer(function (current) {
-								return get.attitude(player, current) > 0 && current.hp <= 2;
+							if(player.isDamaged()&&!game.checkMod(card,player,'unchanged','cardEnabled2',player)) return 2/(1+i);
+							let fs = game.filterPlayer(current=>{
+								return get.attitude(player,current)>0&&current.hp<=2;
 							}), damaged = 0, needs = 0;
-							for (let f of fs) {
-								if (!lib.filter.cardSavable(card, player, f)) continue;
-								if (f.hp > 1) damaged++;
+							fs.forEach(f=>{
+								if(!lib.filter.cardSavable(card,player,f)) return;
+								if(f.hp>1) damaged++;
 								else needs++;
-							}
-							if (needs && damaged) return 5 * needs + 3 * damaged;
-							if (needs + damaged > 1 || player.hasSkillTag('maixie')) return 8;
-							if (player.hp / player.maxHp < 0.7) return 7 + Math.abs(player.hp / player.maxHp - 0.5);
-							if (needs) return 7;
-							if (damaged) return Math.max(3, 6.4 - i);
-							return 6.8 - Math.min(5, player.hp);
+							});
+							if(needs&&damaged) return 5*needs+3*damaged;
+							if(needs+damaged>1 || player.hasSkillTag('maixie')) return 8;
+							if(player.hp/player.maxHp<0.7) return 7+Math.abs(player.hp/player.maxHp-0.5);
+							if(needs) return 7;
+							if(damaged) return Math.max(3,6.4-i);
+							return 6.8-Math.min(5,player.hp);
 						},
-						value: function (card, player, i) {
-							let fs = game.filterPlayer(function (current) {
-								return get.attitude(_status.event.player, current) > 0;
+						value:(card,player,i)=>{
+							let fs = game.filterPlayer(current=>{
+								return get.attitude(_status.event.player,current)>0;
 							}), damaged = 0, needs = 0;
-							for (let i of fs) {
-								if (!player.canUse('tao', i)) continue;
-								if (i.hp <= 1) needs++;
-								else if (i.hp == 2) damaged++;
-							}
-							if (needs > 2) return 11;
-							if (needs > 1) return 10;
-							if ((needs && damaged) || player.hasSkillTag('maixie')) return 9;
-							if (needs || damaged > 1) return 8;
-							if (damaged) return 7.5;
-							return Math.max(1, 9.2 - player.hp);
+							fs.forEach(f=>{
+								if(!player.canUse('tao',f)) return;
+								if (f.hp<=1) needs++;
+								else if(f.hp==2) damaged++;
+							});
+							if(needs>2) return 11;
+							if(needs>1) return 10;
+							if(needs&&damaged || player.hasSkillTag('maixie')) return 9;
+							if(needs || damaged>1) return 8;
+							if(damaged) return 7.5;
+							return Math.max(1,9.2-player.hp);
 						}
 					},
-					result: {
-						target: function (player, target) {
-							if (target.hasSkillTag('maixie')) return 3;
+					result:{
+						target:(player,target)=>{
+							if(target.hasSkillTag('maixie')) return 3;
 							return 2;
 						},
-						target_use: function (player, target, card) {
-							if (player === _status.currentPhase && player.hasSkillTag('nokeep', true, {card:card,target:target}, true)) return 2;
+						target_use:(player,target,card)=>{
+							if(player===_status.currentPhase&&player.hasSkillTag('nokeep',true,{
+								card:card,
+								target:target
+							},true)) return 2;
 							let mode = get.mode();
-							if (target.hp > 0) {
+							if(target.hp>0){
 								let nd = player.needsToDiscard();
-								let keep = false;
-								if (player.isPhaseUsing()) {
-									if (nd <= 0 || (nd === 1 && target.hp >= 2 && player.countCards('hs', 'tao') <= 1)) keep = true;
+								let keep = 0;
+								if(nd<2&&player.isPhaseUsing()){
+									if(nd<1) keep = 3;
+									else if(target.hp>=2&&player.countCards('hs','tao')<=target.hp/2) keep = 1;
 								}
-								if (keep) {
-									if (!nd || nd < 2 && game.hasPlayer(function (current) {
-										if (current.hp <= 2 && player !== current && get.attitude(player, current) > 2) {
-											if(target.hp >= 2 && current.identity === 'zhu' && (mode === 'identity' || mode === 'versus' || mode === 'chess')){
-												keep=2;
+								if(keep){
+									if(!nd || game.hasPlayer(current=>{
+										if(player!==current&&current.hp<=2&&get.attitude(player,current)>2){
+											if(target.hp>=2&&current.identity==='zhu'&&(mode==='identity' || mode === 'versus' || mode === 'chess')){
+												keep=3;
 												return true;
 											}
-											if (player.hp > current.hp) return true;
+											if(player.hp>current.hp){
+												keep += player.hp-current.hp;
+												return true;
+											}
 										}
 										return false;
 									})){
-										if(keep>1) return 0;
+										if(keep>2) return 0;
 									}
 								}
 							}
 							if(target.isZhu2() || target===game.boss) return 2;
-							if(player !== target){
-								if (target.hp < 0 && player.countCards('hs', 'tao') + target.hp <= 0) return 0;
-								if (Math.abs(get.attitude(player, target)) < 1.2) return 0;
+							if(player!==target){
+								if(target.hp<0&&player.countCards('hs','tao')+target.hp<=0) return 0;
+								if(Math.abs(get.attitude(player, target))<1.2) return 0;
 							}
-							if (!player.getFriends().length) return 2;
+							if(!player.getFriends().length) return 2;
 							let tri = _status.event.getTrigger(),
-								num = game.countPlayer(function (current) {
-									if (get.attitude(current, target) > 0) return current.countCards('hs', 'tao');
+								num = game.countPlayer(current=>{
+									if(get.attitude(current,target)>0) return current.countCards('hs','tao');
 								}),
 								dis = 1,
 								t = _status.currentPhase||game.me;
-							while (t !== target) {
-								let att = get.attitude(player, t);
-								if (Math.abs(att) < 2) dis += 0.45;
-								else if (att < 0) dis++;
+							while(t!==target){
+								let att = get.attitude(player,t);
+								if(att<-2) dis++;
+								else if(att<1) dis += 0.45;
 								t = t.next;
 							}
-							if (mode === 'identity') {
-								if (tri && tri.name === 'dying') {
-									if (target.identity === 'fan') {
-										if (!tri.source && player !== target || tri.source && tri.source !== target && player.getFriends().includes(tri.source.identity)) {
-											if (num > dis || (player === target && player.countCards('hs', {type: 'basic'}) > 1.6 * dis)) return 2;
+							if(mode==='identity'){
+								if(tri&&tri.name==='dying'){
+									if(target.identity==='fan') {
+										if(!tri.source&&player!==target || tri.source&&tri.source!==target&&player.getFriends().includes(tri.source.identity)){
+											if(num>dis || player===target&&player.countCards('hs',{type:'basic'})>1.6*dis) return 2;
 											return 0;
 										}
 									}
@@ -498,13 +505,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 										(tri.source.countCards('he')>2||player===tri.source&&player.hasCard((i)=>i.name!='tao','he'))) return 2;
 									//if(player!==target&&!target.isZhu&&target.countCards('hs')<dis) return 0;
 								}
-								if (player.identity === 'zhu') {
-									if (player.hp <= 1 && player !== target && player.countCards('hs', 'tao') + player.countCards('hs', 'jiu') <= Math.min(dis, game.countPlayer(function (current) {
-										return current.identity === 'fan';
+								if(player.identity==='zhu'){
+									if(player.hp<=1&&player!==target&&player.countCards('hs','tao')+player.countCards('hs','jiu')<=Math.min(dis,game.countPlayer(current=>{
+										return current.identity==='fan';
 									}))) return 0;
 								}
 							}
-							else if (mode === 'stone' && target.isMin() && player !== target && tri && tri.name === 'dying' && player.side === target.side && tri.source !== target.getEnemy()) return 0;
+							else if(mode==='stone'&&target.isMin()&&player!==target&&tri&&tri.name==='dying'&&player.side===target.side&&tri.source!==target.getEnemy()) return 0;
 							return 2;
 						}
 					},
@@ -904,8 +911,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					basic:{
-						order:function(){
-							return 11;
+						order:(item,player)=>{
+							if(game.hasPlayer(current=>current.hp<=1&&get.recoverEffect(current,player,_status.event.player)<0) return 1;
+							return 10;
 						},
 						useful:[3,1],
 						value:0,
