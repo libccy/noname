@@ -39,18 +39,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					if(player.getStorage('clanbaichu').contains(event.card.name)) return true;
-					if(get.suit(event.card)=='none') return false;
-					var str=(get.suit(event.card)+'+'+get.type2(event.card));
-					if(!player.getStorage('clanbaichu').contains(str)) return true;
-					return !player.hasSkill('qice');
+					const storage=player.storage.clanbaichu||{};
+					if(Object.values(storage).contains(event.card.name)) return true;
+					const suit=get.suit(event.card);
+					if(suit=='none') return false;
+					if(!player.hasSkill('qice')) return true;
+					const key=`${suit}+${get.type2(event.card)}`;
+					return !(key in storage)
 				},
 				forced:true,
 				content:function(){
 					'step 0'
-					if(get.suit(trigger.card)!='none'){
-						var str=(get.suit(trigger.card)+'+'+get.type2(trigger.card));
-						if(player.getStorage('clanbaichu').contains(str)){
+					var storage=player.storage.clanbaichu||{},suit=get.suit(trigger.card);
+					if(suit!='none'){
+						var key=`${suit}+${get.type2(trigger.card)}`;
+						if(key in storage){
 							if(!player.hasSkill('qice')){
 								player.addTempSkill('qice','roundStart');
 								player.popup('奇策');
@@ -59,10 +62,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.goto(2);
 						}
 						else{
-							player.markAuto('clanbaichu',[str]);
-							var list=lib.inpile.filter(name=>get.type(name)=='trick'&&!player.getStorage('clanbaichu').contains(name));
-							if(list.length){
-								var dialog=['请选择【百出】记录的普通锦囊牌牌名',[list,'vcard']];
+							var list=lib.inpile.filter(name=>get.type(name)=='trick');
+							list.removeArray(Object.values(storage));
+							if(list.length>0){
+								var dialog=['百出：选择记录一种普通锦囊牌',[list,'vcard']];
 								player.chooseButton(dialog,true).set('ai',function(button){
 									var player=_status.event.player,name=button.link[2];
 									if(name==_status.event.getTrigger().card.name) return 1919810;
@@ -76,39 +79,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.goto(2);
 					'step 1'
 					if(result.bool){
-						var name=result.links[0][2];
-						player.markAuto('clanbaichu',[name]);
-						player.popup(get.translation(name));
-						game.log(player,'记录中了','#y'+get.translation(name));
+						var key=`${get.suit(trigger.card)}+${get.type2(trigger.card)}`,name=result.links[0][2];
+						if(!player.storage.clanbaichu) player.storage.clanbaichu={};
+						player.storage.clanbaichu[key]=name;
+						player.markSkill('clanbaichu');
+						game.log(player,'记录了','#y'+get.translation(name));
 						game.delayx();
 					}
 					'step 2'
-					if(player.getStorage('clanbaichu').contains(trigger.card.name)) player.chooseDrawRecover(true);
+					if(Object.values(player.getStorage('clanbaichu')).contains(trigger.card.name)){
+						player.chooseDrawRecover(true);
+					}
 				},
 				intro:{
-					markcount:()=>0,
+					markcount:(storage)=>{
+						return Object.keys(storage).length;
+					},
 					content:function(storage){
-						var str='<span class="text center">';
-						var list=storage.filter(str=>str.includes('+'));
-						var cards=storage.filter(str=>!list.contains(str));
-						if(list.length){
-							str+='<li>已记录的花色点数组合：';
-							list.forEach(strx=>{
-								var listx=strx.split('+');
-								str+='<br>';
-								str+=get.translation(listx[0]);
-								str+='+';
-								str+=get.translation(listx[1]);
-							});
-						}
-						if(list.length&&cards.length) str+='<br>';
-						if(cards.length){
-							str+='<li>已记录的普通锦囊牌名：';
-							str+='<br>';
-							str+=get.translation(cards);
-						}
-						str+='</span>';
-						return str;
+						if(!storage) return '当前暂无记录';
+						const keys=Object.keys(storage).map(i=>i.split('+'));
+						keys.sort((a,b)=>{
+							if(a[0]!=b[0]) return lib.suit.indexOf(b[0])-lib.suit.indexOf(a[0]);
+							return lib.sort.name(a[1],b[1]);
+						});
+						return keys.map(item=>{
+							return `<li>${get.translation(item[0])}+${get.translation(item[1])}:【${get.translation(storage[item.join('+')])}】`;
+						}).join('<br>');
 					},
 				},
 			},
@@ -2663,7 +2659,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanjianyuan_info:'当一名角色发动“出牌阶段限一次”的技能后，你可以令其重铸任意张牌名字数为X的牌（X为其本阶段的使用牌数）。',
 			clan_xunyou:'族荀攸',
 			clanbaichu:'百出',
-			clanbaichu_info:'锁定技，当你使用一张牌结算完毕后，若你：未记录过此牌的点数和类型组合，则你记录此组合并记录一个普通锦囊牌名，否则你于本轮获得技能〖奇策〗；已记录此牌牌名，你回复1点体力或摸一张牌。',
+			clanbaichu_info:'锁定技，当你使用一张牌结算完毕后，若你：未记录过此牌的花色和类型组合，则你记录此组合并记录一个普通锦囊牌名，否则你于本轮获得技能〖奇策〗；已记录此牌牌名，你回复1点体力或摸一张牌。',
 			
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
