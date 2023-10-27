@@ -34867,12 +34867,14 @@
 								ui.rooms.push(player);
 							}
 						}
-						if(get.config('read_clipboard','connect')){
+						if(!_status.requestReadClipboard&&get.config('read_clipboard','connect')){
+							//每次启动只请求一次
+							_status.requestReadClipboard=true;
 							function read(text){
 								try{
 									var roomId=text.split('\n')[1].match(/\d+/);
 									var caption=ui.rooms.find(caption=>caption.key==roomId);
-									if (caption&&(confirm(`是否通过复制的内容加入${roomId}房间？`)||_status.read_clipboard_text)){
+									if (caption&&(_status.read_clipboard_text||confirm(`是否通过复制的内容加入${roomId}房间？`))){
 										ui.click.connectroom.call(caption);
 										delete _status.read_clipboard_text;
 									}
@@ -34891,7 +34893,6 @@
 									input.blur();
 									ui.window.removeChild(input);
 									if(result||input.value.length>0) read(input.value);
-									//也就小b兼容版不支持直接读取了
 									else if(confirm('是否输入邀请链接以加入房间？')){
 										var text=prompt('请输入邀请链接');
 										if(typeof text=='string'&&text.length>0) read(text);

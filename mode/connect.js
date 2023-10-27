@@ -141,7 +141,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}catch(e){console.log(e);}
 					}
 					window.focus();
-					if (navigator.clipboard){
+					if (navigator.clipboard&&lib.node){
 						navigator.clipboard.readText().then(read).catch(_=>{});
 					}else{
 						var input=ui.create.node('textarea',ui.window,{opacity:'0'});
@@ -149,8 +149,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var result=document.execCommand('paste');
 						input.blur();
 						ui.window.removeChild(input);
-						if(result) read(input.value);
-						//也就小b兼容版不支持直接读取了
+						if(result||input.value.length>0) read(input.value);
 						else if(confirm('是否输入邀请链接以进入联机地址和房间？')){
 							ced=true;
 							var text=prompt('请输入邀请链接');
