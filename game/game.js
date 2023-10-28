@@ -19267,6 +19267,9 @@
 							}
 							event.relatedLose=next;
 						}
+						if(event.cardKnower){
+							game.addCardKnowner(cards,event.cardKnower);
+						}
 					}
 					else{
 						event.finish();
