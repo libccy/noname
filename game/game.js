@@ -30033,14 +30033,6 @@
 							card[2]='sha';
 							card[3]='thunder';
 						}
-						// else if(card[2]=='kamisha'){
-						// 	card[2]='sha';
-						// 	card[3]='kami';
-						// }
-						// else if(card[2]=='icesha'){
-						// 	card[2]='sha';
-						// 	card[3]='ice';
-						// }
 						else if(card[2]=='cisha'){
 							card[2]='sha';
 							card[3]='stab';
@@ -30066,9 +30058,7 @@
 					}
 					var cardnum=card[1]||'';
 					if(parseInt(cardnum)==cardnum) cardnum=parseInt(cardnum);
-					if(cardnum>0&&cardnum<14){
-						cardnum=['A','2','3','4','5','6','7','8','9','10','J','Q','K'][cardnum-1];
-					}
+					
 					if(!lib.card[card[2]]){
 						lib.card[card[2]]={};
 					}
@@ -30083,6 +30073,39 @@
 							game.addGlobalSkill(info.global);
 						}
 						delete info.global;
+					}
+					this.suit=card[0];
+					this.number=parseInt(card[1])||0;
+					this.name=card[2];
+
+					if(_status.connectMode&&!game.online&&lib.cardOL&&!this.cardid){
+						this.cardid=get.id();
+						lib.cardOL[this.cardid]=this;
+					}
+					if(!_status.connectMode&&!_status.video){
+						this.cardid=get.id();
+					}
+					
+					this.$init(card);
+					
+					if(this.inits){
+						for(var i=0;i<this.inits.length;i++){
+							this.inits[i](this);
+						}
+					}
+					if(typeof info.init=='function') info.init();
+
+					return this;
+				}
+				/**
+				 * @param {[string, number, string, string]} card
+				*/
+				$init(card){
+					var info=lib.card[card[2]];
+					var cardnum=card[1]||'';
+					if(parseInt(cardnum)==cardnum) cardnum=parseInt(cardnum);
+					if(cardnum>0&&cardnum<14){
+						cardnum=['A','2','3','4','5','6','7','8','9','10','J','Q','K'][cardnum-1];
 					}
 					if(this.name){
 						this.classList.remove('epic');
@@ -30322,9 +30345,6 @@
 						}
 					}
 					this.node.name2.innerHTML=get.translation(card[0])+cardnum+' '+name;
-					this.suit=card[0];
-					this.number=parseInt(card[1])||0;
-					this.name=card[2];
 					this.classList.add('card');
 					if(card[3]){
 						let natures=get.natureList(card[3]);
@@ -30336,12 +30356,6 @@
 						delete this.nature;
 					}
 					if(info.subtype) this.classList.add(info.subtype);
-					if(this.inits){
-						for(var i=0;i<this.inits.length;i++){
-							this.inits[i](this);
-						}
-					}
-					if(typeof info.init=='function') info.init();
 					this.node.range.innerHTML='';
 					switch(get.subtype(this,false)){
 						case 'equip1':
@@ -30369,13 +30383,6 @@
 							this.node.name2.innerHTML+='-';
 						}
 						break;
-					}
-					if(_status.connectMode&&!game.online&&lib.cardOL&&!this.cardid){
-						this.cardid=get.id();
-						lib.cardOL[this.cardid]=this;
-					}
-					if(!_status.connectMode&&!_status.video){
-						this.cardid=get.id();
 					}
 					var tags=[];
 					if(Array.isArray(card[4])){
