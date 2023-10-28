@@ -19317,9 +19317,15 @@
 					for(var num=0;num<cards.length;num++){
 						sort=lib.config.sort_card(cards[num]);
 						if(lib.config.reverse_sort) sort=-sort;
+						if(['o','d'].contains(get.position(cards[num],true))){
+							cards[num].addKnower('everyone');
+						}
 						cards[num].fix();
 						cards[num].style.transform='';
 						cards[num].addGaintag(event.gaintag);
+						if(event.knowers){
+							cards[num].addKnower(event.knowers);//添加事件设定的知情者。
+						}
 						if(_status.discarded){
 							_status.discarded.remove(cards[num]);
 						}
@@ -21015,6 +21021,10 @@
 					return this.countCards('h',function(card){
 						return card.isKnownBy(other) && filter(card);
 					}) > 0;
+				}
+				//数此角色被知道的牌。
+				countKnownCards(other,filter){
+					return this.getKnownCards(other,filter).length;
 				}
 				//Execute the delay card effect
 				//执行延时锦囊牌效果
@@ -30591,6 +30601,21 @@
 						}
 					}
 				}
+				removeKnower(player){
+					if(!this._knowers){
+						return;
+					}
+					if(typeof player == 'string'){
+						this._knowers.remove(player);
+					}else{
+						let type = get.itemtype(player);
+						if(type == 'player'){
+							this._knowers.remove(player.playerid);
+						}else if(type == 'players'){
+							player.forEach(p=>this._knowers.remove(p.playerid));
+						}
+					}
+				}
 				//清除此牌的知情者。
 				clearKnowers(){
 					if(this._knowers)delete this._knowers;
@@ -35843,6 +35868,7 @@
 			for(let i=0;i<ui.discardPile.childNodes.length;i++){
 				var currentcard=ui.discardPile.childNodes[i];
 				currentcard.vanishtag.length=0;
+				currentcard.clearKnowers();
 				if(get.info(currentcard).vanish||currentcard.storage.vanish){
 					currentcard.remove();
 					continue;
