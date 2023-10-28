@@ -167,9 +167,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							var list=lib.config.mode_config.identity.identity.lastItem.slice();
 							list.removeArray(game.filterPlayer().map(i=>{
-								let identity=i.identity;
-								if(identity=='mingzhong') identity='zhong';
-								return identity;
+								var identity=i.identity;
+								return identity=='mingzhong'?'zhong':identity;
 							})).unique();
 							player.chooseButton([
 								'###炼魄：请选择一个身份###<div class="text center">你选择的身份对应的阵营角色数于本轮内视为+1</div>',
