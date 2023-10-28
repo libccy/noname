@@ -1178,8 +1178,9 @@ body>.background.upper {
 	z-index: -4
 }
 body>.background.land {
+	background-position: center;
+	background-size: cover;
 	transition: all 2s;
-	background-size:cover;
 }
 
 .popup:not(.guanxing) {
@@ -3500,9 +3501,13 @@ div:not(.handcards)>.card>.info>span,
 	animation: config 0.5s;
 	-webkit-animation: config 0.5s;
 }
-.flash {
-	animation: flash 1s;
-	-webkit-animation: flash 1s;
+.flash,
+.flash-animation-iteration-count-infinite {
+	animation-name: flash;
+	animation-duration: 1s;
+}
+.flash-animation-iteration-count-infinite {
+	animation-iteration-count: infinite;
 }
 .flip {
 	animation: flip 1s;
@@ -3884,6 +3889,10 @@ div:hover>.intro {
 .player .identity[data-color="zhu"],
 .player .identity[data-color="truezhu"],
 .player .identity[data-color="enemy"],
+div[data-nature='zhu'],
+span[data-nature='zhu'],
+div[data-nature='enemy'],
+span[data-nature='enemy'],
 div[data-nature='fire'],
 span[data-nature='fire'] {
 	text-shadow: black 0 0 1px,rgba(232, 53, 53,1) 0 0 2px,rgba(232, 53, 53,1) 0 0 5px,rgba(232, 53, 53,1) 0 0 10px,
@@ -3936,6 +3945,8 @@ span[data-nature='firemx'] {
 .player .identity[data-color="qun"],
 .player .identity[data-color="neutral"],
 .player .identity[data-color="friend2"],
+div[data-nature='zhong'],
+span[data-nature='zhong'],
 div[data-nature='metal'],
 span[data-nature='metal'] {
 	text-shadow: black 0 0 1px,rgba(255, 203, 0,1) 0 0 2px,rgba(255, 203, 0,1) 0 0 5px,rgba(255, 203, 0,1) 0 0 10px,
@@ -4006,6 +4017,8 @@ span[data-nature='qunmm'] {
 .player .identity[data-color="rYe"],
 .player .identity[data-color="bYe"],
 .player .identity[data-color="jin"],
+div[data-nature='nei'],
+span[data-nature='nei'],
 div[data-nature='thunder'],
 span[data-nature='thunder'] {
 	text-shadow: rgba(100, 74, 139,1) 0 0 2px,rgba(100, 74, 139,1) 0 0 5px,rgba(100, 74, 139,1) 0 0 10px,
@@ -4041,6 +4054,8 @@ span[data-nature='kamimm'] {
 
 .player .identity[data-color="fan"],
 .player .identity[data-color="wu"],
+div[data-nature='fan'],
+span[data-nature='fan'],
 div[data-nature='wood'],
 span[data-nature='wood'] {
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 5px,rgba(57, 123, 4,1) 0 0 10px,
@@ -4065,6 +4080,8 @@ span[data-nature='woodmm'] {
 .player .identity[data-color="falsezhu"],
 .player .identity[data-color="friend"],
 .water,
+div[data-nature='friend'],
+span[data-nature='friend'],
 div[data-nature='water'],
 span[data-nature='water'] {
 	text-shadow: rgba(78, 117, 140,1) 0 0 2px,rgba(78, 117, 140,1) 0 0 5px,rgba(78, 117, 140,1) 0 0 10px,
@@ -5024,6 +5041,13 @@ div[data-decoration="bronze"]::after{
 	border-radius: 16px;
 }
 
+.loading-screen {
+	background-color: black;
+	height: 100%;
+	width: 100%;
+	z-index: 31415926;
+}
+
 /*--------动画--------*/
 @keyframes shadow_thunder {
 	0% {
@@ -5525,7 +5549,29 @@ div[data-decoration="bronze"]::after{
 		background-position: left center;
 	}
 }
+@keyframes opacity-0-1 {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+@keyframes opacity-1-0 {
+	from {
+		opacity: 1;
+	}
+
+	to {
+		opacity: 0;
+	}
+}
 /*--------其它--------*/
 ::-webkit-scrollbar {
 	display: none;
+}
+/* 火狐隐藏滚动条 */
+* {
+	scrollbar-width: none;
 }

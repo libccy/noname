@@ -128,7 +128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return card!=result.card&&card.name==result.card.name;
 					})){
 						event.current=result.card;
-						player.chooseTarget('是否改为对一名角色造成一点火属性伤害？').set('ai',function(target){
+						player.chooseTarget('是否改为对一名角色造成1点火属性伤害？').set('ai',function(target){
 							return get.damageEffect(target,null,player,player,'fire');
 						});
 					}
@@ -1915,7 +1915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<ui.cardPile.childElementCount;i++){
 						cards.push(ui.cardPile.childNodes[i]);
 					}
-					player.chooseCardButton('搏浪：将至多3张牌移至弃牌堆',[1,3],cards.slice(0,6)).ai=function(button){
+					player.chooseCardButton('搏浪：将至多三张牌移至弃牌堆',[1,3],cards.slice(0,6)).ai=function(button){
 						if(button.link==cards[0]||button.link==cards[1]){
 							return get.value(button.link)-5;
 						}
@@ -2238,7 +2238,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(player.hp==2&&player.hasShan()&&player.countCards('h')<=1) return 1;
 								return 0;
 							}).set('choiceList',[
-								'回复一点体力','从弃牌堆中获得一张非金法术'
+								'回复1点体力','从弃牌堆中获得一张非金法术'
 							]);
 						}
 					}
@@ -2547,7 +2547,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						frequent:true,
 						content:function(){
 							'step 0'
-							player.chooseTarget(get.prompt('魂墨：造成一点伤害')).ai=function(target){
+							player.chooseTarget(get.prompt('魂墨：造成1点伤害')).ai=function(target){
 								return get.damageEffect(target,player,player);
 							}
 							'step 1'
@@ -3172,10 +3172,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:function(storage,player){
 						var name=get.translation(player);
 						if(storage==1){
-							return '每当一名角色（'+name+'除外）受到一次伤害，该角色失去一点体力，'+name+'回复一点体力';
+							return '每当一名角色（'+name+'除外）受到一次伤害，该角色失去1点体力，'+name+'回复1点体力';
 						}
 						else if(storage==2){
-							return '每当一名角色（'+name+'除外）造成一次伤害，该角色失去一点体力，'+name+'（若不是受伤害角色）回复一点体力';
+							return '每当一名角色（'+name+'除外）造成一次伤害，该角色失去1点体力，'+name+'（若不是受伤害角色）回复1点体力';
 						}
 						else{
 							return '未发动';
@@ -3190,8 +3190,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					next.prompt=get.prompt('xuezhou');
 					next.choiceList=[
-						'每当一名其他角色在一个回合中首次受到伤害，该角色失去一点体力，你回复一点体力',
-						'每当一名其他角色在一个回合中首次造成伤害，该角色失去一点体力，你（若不是受伤害角色）回复一点体力'
+						'每当一名其他角色在一个回合中首次受到伤害，该角色失去1点体力，你回复1点体力',
+						'每当一名其他角色在一个回合中首次造成伤害，该角色失去1点体力，你（若不是受伤害角色）回复1点体力'
 					];
 					'step 1'
 					if(result.control=='cancel2'){
@@ -4037,7 +4037,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				notarget:true,
 				content:function(){
 					'step 0'
-					player.chooseToDiscard('he',[1,2],'弃置至多2张牌并摸弃牌数2倍的牌').set('ai',function(card){
+					player.chooseToDiscard('he',[1,2],'弃置至多两张牌并摸弃牌数2倍的牌').set('ai',function(card){
 						return 9-get.value(card);
 					});
 					'step 1'
@@ -4181,7 +4181,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var str1='令'+get.translation(target);
-					var str2='一点体力和体力上限'
+					var str2='1点体力和体力上限'
 					player.chooseControlList([str1+'增加'+str2,str1+'减少'+str2],function(){
 						if(get.attitude(player,target)>0) return 0;
 						return 1;
@@ -4229,7 +4229,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTarget:-1,
 				content:function(){
 					'step 0'
-					target.chooseToUse({name:'sha'},'使用一张杀，或失去一点体力');
+					target.chooseToUse({name:'sha'},'使用一张杀，或失去1点体力');
 					'step 1'
 					if(!result.bool){
 						target.loseHp();
@@ -4519,13 +4519,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// sqlongyin:'龙影',
 			// sqlongyin_info:'',
 			sqlongnu:'龙怒',
-			sqlongnu_info:'准备阶段，你可以发现一张牌堆中的牌，若你手牌中有同名牌，你可以改为造成一点火属性伤害锁定技。准备阶段开始时，你随机切换至一种形态',
+			sqlongnu_info:'准备阶段，你可以发现一张牌堆中的牌，若你手牌中有同名牌，你可以改为造成1点火属性伤害锁定技。准备阶段开始时，你随机切换至一种形态',
 			sqlonghuo:'龙火',
 			sqlonghuo_info:'出牌阶段限一次，你可以弃置所有手牌并摸等量的牌，若敌方角色手牌中与你弃置的牌同名的牌，则随机弃置其中一张。准备阶段开始时，你随机切换至一种形态',
 			sqlongwu:'龙舞',
 			sqlongwu_info:'结束阶段，你可以摸X张牌，然后可以使用一张牌，X为手牌中同名牌数最多的牌的数量。准备阶段开始时，你随机切换至一种形态',
 			kuanglie:'狂猎',
-			kuanglie_info:'锁定技，每当你使用黑色牌指定其他角色为目标后，目标随机弃置一张牌；每当你以此法累计弃置2张牌后，你摸一张牌',
+			kuanglie_info:'锁定技，每当你使用黑色牌指定其他角色为目标后，目标随机弃置一张牌；每当你以此法累计弃置两张牌后，你摸一张牌',
 			// kuanglie_info:'锁定技，每当一名敌方角色成为你的黑色牌的目标，你视为对其使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】的影响后，你随机获得一张【狂猎】牌',
 			lingshuang:'凛霜',
 			lingshuang_info:'每当你失去最后一张基本牌，你可以视为对距离2以内的所有敌方角色使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】影响时，你可以弃置一张手牌将其效果改为“摸牌数-2”',
@@ -4545,7 +4545,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwmaoxian_luoqi:'罗契',
 			gwmaoxian_luoqi_info:'选择一名角色视为对其使用一张不计入出杀次数的杀，然后所有其他角色可以对目标使用一张杀，然后结束出牌阶段',
 			gwmaoxian_jieluote:'杰洛特',
-			gwmaoxian_jieluote_info:'对一名角色造成一点伤害，若目标体力值大于2且为全场最多，改为造成2点伤害，然后结束出牌阶段',
+			gwmaoxian_jieluote_info:'对一名角色造成1点伤害，若目标体力值大于2且为全场最多，改为造成2点伤害，然后结束出牌阶段',
 			gwmaoxian_yenaifa:'叶奈法',
 			gwmaoxian_yenaifa_info:'对至多3名随机敌方角色施加一个随机负面效果，然后结束出牌阶段',
 			gwmaoxian_telisi:'特丽斯',
@@ -4553,9 +4553,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwmaoxian_hengsaite:'亨赛特',
 			gwmaoxian_hengsaite_info:'视为使用一张万箭齐发，每当有一名角色因此受到伤害，你获得一张杀，然后结束出牌阶段',
 			gwmaoxian_fuertaisite:'弗尔泰斯特',
-			gwmaoxian_fuertaisite_info:'令至多两名角色各获得一点护甲，然后结束出牌阶段',
+			gwmaoxian_fuertaisite_info:'令至多两名角色各获得1点护甲，然后结束出牌阶段',
 			gwmaoxian_laduoweide:'拉多维德',
-			gwmaoxian_laduoweide_info:'令一名角色的非锁定技失效直到其下一回合结束，并对其造成一点伤害，然后结束出牌阶段',
+			gwmaoxian_laduoweide_info:'令一名角色的非锁定技失效直到其下一回合结束，并对其造成1点伤害，然后结束出牌阶段',
 			gwmaoxian_enxier:'恩希尔',
 			gwmaoxian_enxier_info:'与一名手牌并不超过1的其他角色交换手牌，然后结束出牌阶段',
 			gwmaoxian_fulisi:'符里斯',
@@ -4563,23 +4563,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwmaoxian_kaerweite:'卡尔维特',
 			gwmaoxian_kaerweite_info:'获得至多两名角色各一张手牌，然后结束出牌阶段',
 			gwmaoxian_bulanwang:'布兰王',
-			gwmaoxian_bulanwang_info:'弃置至多2张牌并摸数量等于弃牌数2倍的牌，跳过弃牌阶段，然后结束出牌阶段',
+			gwmaoxian_bulanwang_info:'弃置至多两张牌并摸数量等于弃牌数2倍的牌，跳过弃牌阶段，然后结束出牌阶段',
 			gwmaoxian_kuite:'奎特',
 			gwmaoxian_kuite_info:'视为对一名手牌数不小于你的角色连续使用2张决斗，然后结束出牌阶段',
 			gwmaoxian_haluo:'哈洛',
-			gwmaoxian_haluo_info:'对所有体力值全场最少的角色造成一点伤害，然后结束出牌阶段',
+			gwmaoxian_haluo_info:'对所有体力值全场最少的角色造成1点伤害，然后结束出牌阶段',
 			gwmaoxian_dagong:'达贡',
 			gwmaoxian_dagong_info:'视为同时使用刺骨寒霜、蔽日浓雾和倾盆大雨，然后结束出牌阶段',
 			gwmaoxian_gaier:'盖尔',
-			gwmaoxian_gaier_info:'令一名角色增加或减少一点体力和体力上限，然后结束出牌阶段',
+			gwmaoxian_gaier_info:'令一名角色增加或减少1点体力和体力上限，然后结束出牌阶段',
 			gwmaoxian_airuiting:'艾瑞汀',
-			gwmaoxian_airuiting_info:'令所有其他角色选择一项：使用一张杀，或失去一点体力，然后结束出牌阶段',
+			gwmaoxian_airuiting_info:'令所有其他角色选择一项：使用一张杀，或失去1点体力，然后结束出牌阶段',
 			gwmaoxian_aisinie:'埃丝涅',
-			gwmaoxian_aisinie_info:'回复一点体力并获得任意一张银卡法术，然后结束出牌阶段',
+			gwmaoxian_aisinie_info:'回复1点体力并获得任意一张银卡法术，然后结束出牌阶段',
 			gwmaoxian_falanxisika:'法兰茜斯卡',
 			gwmaoxian_falanxisika_info:'随机观看3张金卡法术并使用其中一张，然后结束出牌阶段',
 			gwmaoxian_huoge:'霍格',
-			gwmaoxian_huoge_info:'观看牌堆顶的6张牌，使用至多2张，然后弃掉其余的牌，然后结束出牌阶段',
+			gwmaoxian_huoge_info:'观看牌堆顶的六张牌，使用至多两张，然后弃掉其余的牌，然后结束出牌阶段',
 			gwmaoxian:'冒险',
 			gwhuanbi:'幻笔',
 			gwhuanbi_info:'出牌阶段限一次，你可以弃置一张牌，并创造一张冒险牌，然后随机选择一名有手牌的角色，被选中的角色可以交给你一张手牌并获得一张该牌的复制',
@@ -4587,13 +4587,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwminxiang_old_info:'结束阶段，你可以选择一张本回合使用过的基本牌或普通锦囊牌并选择两名其他角色，令目标分别视为对对方使用一张此牌的复制',
 			gwminxiang_info:'出牌阶段限一次，你可以弃置一张基本牌或普通锦囊牌并摸一张牌，然后选择其他两名角色，令目标分别视为对对方使用一张你弃置的牌的同名牌',
 			gwlangshi:'狼噬',
-			gwlangshi_info:'每当你造成一次伤害，你可以对一名体力值不小于受伤害角色的其他角色造一点伤害',
+			gwlangshi_info:'每当你造成一次伤害，你可以对一名体力值不小于受伤害角色的其他角色造1点伤害',
 			gwjingshi:'血契',
 			gwjingshi_info:'出牌阶段限一次，你可以猜测手牌中黑色牌最多的角色是谁，若猜对，你可以观看所有其他角色的手牌并获得任意一张',
 			gwjingtian:'经天',
-			gwjingtian_info:'锁定技，牌堆顶的9张牌对你始终可见；你始终跳过摸牌阶段，改为获得3枚“经天”标记；每名角色的回合限一次，你可以在任意时间点移去一枚“经天”标记，然后获得牌堆顶的一张牌',
+			gwjingtian_info:'锁定技，牌堆顶的九张牌对你始终可见；你始终跳过摸牌阶段，改为获得3枚“经天”标记；每名角色的回合限一次，你可以在任意时间点移去一枚“经天”标记，然后获得牌堆顶的一张牌',
 			gwweitu:'卫土',
-			gwweitu_info:'锁定技，每当你弃置牌，若你的护甲数小于3，你获得一点护甲；每当你的护甲为你累计抵消3次伤害，你获得一张随机银卡法术',
+			gwweitu_info:'锁定技，每当你弃置牌，若你的护甲数小于3，你获得1点护甲；每当你的护甲为你累计抵消3次伤害，你获得一张随机银卡法术',
 			gwzhongmo:'终末',
 			gwzhongmo_info:'锁定技，你跳过摸牌阶段，改为获得两张随机的稀有度不同的法术牌',
 			gwfutian:'覆天',
@@ -4614,16 +4614,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangfan_info:'锁定技，每当你使用一张非装备牌，你随机重铸一张与其花色相同的手牌；若没有花色相同的手牌，改为随机重铸一张与其颜色相同的手牌',
 			gwchenshui:'沉睡',
 			gwchenshui_bg:'睡',
-			gwchenshui_info:'锁定技，你防止即将造成或受到的伤害，改为令伤害来随机源获得对方一张牌；结束阶段，若你自上次沉睡起累计发动了至少3次沉睡效果，你解除沉睡状态，对所有敌方角色造成一点伤害，然后切换至觉醒状态',
+			gwchenshui_info:'锁定技，你防止即将造成或受到的伤害，改为令伤害来随机源获得对方一张牌；结束阶段，若你自上次沉睡起累计发动了至少3次沉睡效果，你解除沉睡状态，对所有敌方角色造成1点伤害，然后切换至觉醒状态',
 			gwliedi:'裂地',
 			gwliedi_info:'锁定技，你造成的伤害+X，X为你到该角色距离的一半，向下取整；结束阶段，若你连续两轮未造成伤害，你切换至沉睡状态',
 			julian:'巨敛',
 			julian_info:'出牌阶段开始时，你可以摸若干张牌直到你的手牌数为全场最多或之一',
 			gwfusheng:'复生',
-			gwfusheng_info:'当一名未翻面的角色进入濒死状态时，你可以令其翻面并回复一点体力，然后你与其各摸一张牌',
+			gwfusheng_info:'当一名未翻面的角色进入濒死状态时，你可以令其翻面并回复1点体力，然后你与其各摸一张牌',
 			gwqinwu:'琴舞',
 			gwqinwu2:'琴舞',
-			gwqinwu_info:'出牌阶段限一次，每当你使用一张基本牌，你可以令一名角色摸一张牌并获得技能【琴舞】直到其下一回合结束',
+			gwqinwu_info:'出牌阶段限一次，每当你使用一张基本牌，你可以令一名角色摸一张牌并获得技能〖琴舞〗直到其下一回合结束',
 			huanshu:'幻术',
 			huanshu2:'幻术',
 			huanshu3:'幻术',
@@ -4631,7 +4631,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwjieyin:'结印',
 			gwjieyin_info:'出牌阶段，你可以视为使用瘟疫、燕子药水或昆恩法印（不能重复使用同一法术），技能两轮重置一次',
 			zhengjun:'整军',
-			zhengjun_info:'锁定技，每当你使用或打出一张卡牌，若这是你在本局游戏中使用或打出的第二张与之同名的牌，你增加一点体力和体力上限；结束阶段，你可以观看牌堆顶的X张牌并获得其中一张，X为你以此法增加的体力上限数',
+			zhengjun_info:'锁定技，每当你使用或打出一张卡牌，若这是你在本局游戏中使用或打出的第二张与之同名的牌，你增加1点体力和体力上限；结束阶段，你可以观看牌堆顶的X张牌并获得其中一张，X为你以此法增加的体力上限数',
 			gwxuezhan:'血战',
 			gwxuezhan_info:'准备阶段，若你的手牌数为全场最少或之一，你可以获得一张十字召唤',
 			jielue:'劫掠',
@@ -4643,16 +4643,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gwjushi2:'巨噬',
 			gwjushi_info:'出牌阶段限一次，你可以将一名距离1以内的其他角色的一张随机牌置于你的武将牌上；当你受到伤害后，令“巨噬”牌回到原来的位置；准备阶段，你获得武将牌上的“巨噬”牌',
 			bolang:'搏浪',
-			bolang_info:'准备阶段，你可以观看牌堆顶的6张牌，然后将其中至多3张移入弃牌堆；每当你造成一次伤害，你可以从弃牌堆中获得一张以此法移入弃牌堆的牌（每回合限发动一次）',
+			bolang_info:'准备阶段，你可以观看牌堆顶的六张牌，然后将其中至多3张移入弃牌堆；每当你造成一次伤害，你可以从弃牌堆中获得一张以此法移入弃牌堆的牌（每回合限发动一次）',
 			lingji:'灵计',
 			lingji_info:'出牌阶段限一次，你可以摸两张牌并弃置两张牌，若弃置的牌花色相同，你获得一张随机铜卡并展示；若弃置的牌点数相同，你获得一张随机银卡并展示',
 			gwjinyan:'金焰',
 			gwjinyan_info:'锁定技，准备阶段，若游戏轮数为3的倍数，你获得一张随机金卡；当游戏轮数不是3的倍数时，你防止所有伤害',
 			gwshenyu:'神愈',
-			gwshenyu_info:'准备阶段，你可以令一名角色选择一项：回复一点体力，或从弃牌堆中获得一张非金法术牌（直到洗牌入牌堆前该牌不能再以此法获得）',
+			gwshenyu_info:'准备阶段，你可以令一名角色选择一项：回复1点体力，或从弃牌堆中获得一张非金法术牌（直到洗牌入牌堆前该牌不能再以此法获得）',
 			junchi:'骏驰',
 			junchi_info:'每当一名其他角色使用一张杀，若目标不是你，你可以对杀的目标使用一张牌，并摸一张牌，每回合限一次',
-			junchi_old_info:'当一名其他角色使用杀对一个目标结算后，该角色可以交给你一张牌，然后你可以对杀的目标使用一张牌，若如此做，你回复一点体力，杀的使用者摸一张牌',
+			junchi_old_info:'当一名其他角色使用杀对一个目标结算后，该角色可以交给你一张牌，然后你可以对杀的目标使用一张牌，若如此做，你回复1点体力，杀的使用者摸一张牌',
 			gw_dudayuanshuai1:'杜达元帅',
 			gw_dudayuanshuai1_info:'当你成为其他角色使用牌的目标时，你可以使用此牌取消之，然后获得对你使用的牌',
 			gw_dudayuanshuai2:'杜达元帅',
@@ -4662,19 +4662,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shuijian:'水箭',
 			shuijian_info:'准备阶段，你可以弃置一张手牌视为对所有敌方角色使用一张万箭齐发',
 			yunhuo:'陨火',
-			yunhuo_info:'锁定技，准备阶段，若游戏轮数为4的倍数，你令所有敌方角色随机弃置一张手牌（若没有手牌改为受到一点火焰伤害），然后在此回合结束后获得一个额外回合',
+			yunhuo_info:'锁定技，准备阶段，若游戏轮数为4的倍数，你令所有敌方角色随机弃置一张手牌（若没有手牌改为受到1点火焰伤害），然后在此回合结束后获得一个额外回合',
 			yinzhang:'银杖',
 			yinzhang_info:'出牌阶段限一次，你可以弃置一张牌，然后发现一张银卡法术',
 			gwtianbian:'天变',
 			gwtianbian_info:'出牌阶段开始时，你可以选择一项：随机使用一张对全场有正面效果的牌；或随机使用一张对全场有负面效果的牌',
 			gwxiaoshou:'枭首',
-			gwxiaoshou_info:'出牌阶段限两次，你可以弃置一张牌对场上体力值最高（或之一）的一名角色造成一点伤害',
+			gwxiaoshou_info:'出牌阶段限两次，你可以弃置一张牌对场上体力值最高（或之一）的一名角色造成1点伤害',
 			gwjiquan:'集权',
 			gwjiquan_info:'出牌阶段限一次，你可以从任意名角色处各获得一张牌，每拿一张牌，被拿牌的角色视为对你使用一张杀',
 			nuhou:'怒吼',
-			nuhou_info:'每当你受到一次伤害，你可以弃置一张牌，然后对一名随机敌人造成一点伤害并随机弃置其一张牌',
+			nuhou_info:'每当你受到一次伤害，你可以弃置一张牌，然后对一名随机敌人造成1点伤害并随机弃置其一张牌',
 			shewu:'蛇舞',
-			shewu_info:'出牌阶段限一次，你可以弃置1至3张牌然后摸3张牌；若你弃置了至少2张牌，你本回合使用卡牌无视距离；若你弃置了3张牌，你回复一点体力',
+			shewu_info:'出牌阶段限一次，你可以弃置至多三张牌然后摸三张牌；若你弃置了至少两张牌，你本回合使用牌无视距离；若你弃置了三张牌，你回复1点体力',
 			gwzhanjiang:'斩将',
 			gwzhanjiang_info:'每轮限一次，在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张杀，出杀的角色在响应时摸一张牌，当有至少两名角色响应后终止结算',
 			gwchuanxin:'穿心',
@@ -4684,18 +4684,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huandie:'幻蝶',
 			huandie_info:'准备阶段，你可以摸一张牌，并令任意名其他角色摸两张牌，若如此做，此回合结束时，所有手牌数大于体力值的角色需弃置两张手牌',
 			xuezhou:'血咒',
-			xuezhou_info:'准备阶段，你可以选择一项效果直到下一回合开始：1. 每当一名其他角色在一个回合中首次受到伤害，该角色失去一点体力，你回复一点体力；2. 每当一名其他角色在一个回合中首次造成伤害，该角色失去一点体力，你（若不是受伤害角色）回复一点体力',
+			xuezhou_info:'准备阶段，你可以选择一项效果直到下一回合开始：1. 每当一名其他角色在一个回合中首次受到伤害，该角色失去1点体力，你回复1点体力；2. 每当一名其他角色在一个回合中首次造成伤害，该角色失去1点体力，你（若不是受伤害角色）回复1点体力',
 			fayin:'法印',
-			fayin_info:'每当你使用一张杀，你可以弃置一张牌并获得一个随机法印效果：1. 目标随机弃置两张牌；2. 目标进入混乱状态直到下一回合开始；3. 对目标造成一点火属性伤害；4. 获得一点护甲；5. 令目标翻面并摸一张牌',
+			fayin_info:'每当你使用一张杀，你可以弃置一张牌并获得一个随机法印效果：1. 目标随机弃置两张牌；2. 目标进入混乱状态直到下一回合开始；3. 对目标造成1点火属性伤害；4. 获得1点护甲；5. 令目标翻面并摸一张牌',
 			gwbaquan:'霸权',
-			gwbaquan_info:'出牌阶段限一次，你可以获得一名其他角色的所有牌，然后还给其等量的牌，若你归还的牌均为你得到的牌且该角色体力值不小于你，你对其造成一点伤害',
+			gwbaquan_info:'出牌阶段限一次，你可以获得一名其他角色的所有牌，然后还给其等量的牌，若你归还的牌均为你得到的牌且该角色体力值不小于你，你对其造成1点伤害',
 			hunmo:'魂墨',
 			hunmo_info:'出牌阶段，若你手牌数少于2，你可以选择一名手牌数小于2的其他角色，观看牌堆顶的两张牌，你获得一张并交给其另一张；若你手牌数不少2，你可以选择一名手牌数不少于2的其他角色，你弃置一张手牌，然后观看并弃置其一张手牌。每回合对同一名角色最多发动一次',
 			huihun:'回魂',
 			huihun_info:'结束阶段，你可以从弃牌堆中获得本回合使用的前两张红色牌',
 			lanquan:'远略',
 			lanquan_backup:'远略',
-			lanquan_info:'出牌阶段限一次，你可以观看牌堆顶的6张牌，并选择一张使用',
+			lanquan_info:'出牌阶段限一次，你可以观看牌堆顶的六张牌，并选择一张使用',
 
 			chaoyong:'潮涌',
 			chaoyong_info:'准备阶段，你可以弃置一张牌，视为对所有敌方角色使用一张南蛮入侵或万箭齐发',

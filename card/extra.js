@@ -99,69 +99,62 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					basic:{
-						useful:function(card,i){
+						useful:(card,i)=>{
 							if(_status.event.player.hp>1){
-								if(i==0) return 4;
+								if(i===0) return 4;
 								return 1;
 							}
-							if(i==0) return 7.3;
+							if(i===0) return 7.3;
 							return 3;
 						},
-						value:function(card,player,i){
+						value:(card,player,i)=>{
 							if(player.hp>1){
-								if(i==0) return 5;
+								if(i===0) return 5;
 								return 1;
 							}
-							if(i==0) return 7.3;
+							if(i===0) return 7.3;
 							return 3;
-						},
+						}
 					},
-					order:function(){
-						return get.order({name:'sha'})+0.2;
+					order:()=>{
+						if(_status.event.dying) return 9;
+						let sha=get.order({name:'sha'});
+						if(sha>0) return sha+0.2;
+						return 0;
 					},
 					result:{
-						target:function(player,target){
+						target:(player,target)=>{
 							if(target&&target.isDying()) return 2;
-							if(target&&!target.isPhaseUsing()) return 0;
-							if(lib.config.mode=='stone'&&!player.isMin()){
-								if(player.getActCount()+1>=player.actcount) return 0;
-							}
-							var shas=player.getCards('h','sha');
-							if(shas.length>1&&(player.getCardUsable('sha')>1||player.countCards('h','zhuge'))){
-								return 0;
-							}
-							shas.sort(function(a,b){
-								return get.order(b)-get.order(a);
-							})
-							var card;
-							if(shas.length){
-								for(var i=0;i<shas.length;i++){
-									if(lib.filter.filterCard(shas[i],target)){
-										card=shas[i];break;
-									}
-								}
-							}
-							else if(player.hasSha()&&player.needsToDiscard()){
-								if(player.countCards('h','hufu')!=1){
-									card={name:'sha'};
-								}
-							}
-							if(card){
-								if(game.hasPlayer(function(current){
-									return (get.attitude(target,current)<0&&
-										target.canUse(card,current,null,true)&&
-										!current.hasSkillTag('filterDamage',null,{
-											player:player,
-											card:card,
-											jiu:true,
-										})&&
-										get.effect(current,card,target)>0);
-								})){
+							if(!target || target._jiu_temp || !target.isPhaseUsing()) return 0;
+							if(!target.getCardUsable('sha') || lib.config.mode==='stone'&&!player.isMin()&&player.getActCount()+1>=player.actcount) return 0;
+							let shas = player.getCards('hs',card=>get.name(card)==='sha'&&!ui.selected.cards.includes(card)), card;
+							if(!shas.length || !target.hasSha() || shas.length>1&&(target.getCardUsable('sha')>1 || target.countCards('hs','zhuge'))) return 0;
+							target._jiu_temp = true;
+							shas.sort((a,b)=>get.order(b)-get.order(a));
+							for(let i=0; i<shas.length; i++){
+								let tars = [];
+								if(lib.filter.filterCard(shas[i],target)) tars = game.filterPlayer(current=>{
+									return get.attitude(target,current)<0&&target.canUse(shas[i],current,null,true)&&!current.hasSkillTag('filterDamage',null,{
+										player:target,
+										card:shas[i],
+										jiu:true
+									})&&get.effect(current,shas[i],target)>0;
+								});
+								if(!tars.length) continue;
+								tars.sort((a,b)=>{
+									return get.effect(b,shas[i],target)-get.effect(a,shas[i],target);
+								});
+								if(!tars[0].mayHaveShan(player,'use') || target.hasSkillTag('directHit_ai',true,{
+									target:tars[0],
+									card:shas[i]
+								},true) || target.needsToDiscard()>Math.max(0,3-target.hp)){
+									delete target._jiu_temp;
 									return 1;
 								}
 							}
+							delete target._jiu_temp;
 							return 0;
-						},
+						}
 					},
 					tag:{
 						save:1,
@@ -203,7 +196,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard({suit:get.suit(event.card2)},function(card){
 						var evt=_status.event.getParent();
 						if(get.damageEffect(evt.target,evt.player,evt.player,'fire')>0){
-							return 7-get.value(card,evt.player);
+							return 6.2+Math.min(4,evt.player.hp)-get.value(card,evt.player);
 						}
 						return -1;
 					}).set('prompt',false);
@@ -225,8 +218,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						value:[3,1],
 						useful:1,
 					},
-					wuxie:function(target,card,player,current,state){
-						if(get.attitude(current,player)>=0&&state>0) return false;
+					wuxie:function(target,card,player,viewer,state){
+						let att=get.attitude(viewer,target), eff=get.effect(target,card,player,target);
+						if(status*get.attitude(viewer,player)>0&&!player.isMad() || status*eff*att>=0) return 0;
+						if(get.attitude(viewer,player)>=0 || _status.event.getRand('huogong_wuxie')*4>player.countCards('h')) return 0;
 					},
 					result:{
 						player:function(player){
@@ -247,6 +242,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							if(target.hasSkill('huogong2')||target.countCards('h')==0) return 0;
 							if(player.countCards('h')<=1) return 0;
+							if(_status.event.player == player){
+								if(target.isAllCardsKnown(player)){
+									if(!target.countCards('h',card=>{
+										return player.countCards('h',card2=>{
+											return get.suit(card2) == get.suit(card);
+										});
+									})){
+										return 0;
+									}
+								}
+							}
 							if(target==player){
 								if(typeof _status.event.filterCard=='function'&&
 									_status.event.filterCard({name:'huogong'},player,_status.event)){
@@ -961,7 +967,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			bingliang_bg:'粮',
 			bingliang_info:'出牌阶段，对一名距离为1的其他角色使用。目标角色于其判定阶段进行判定：若判定结果不为梅花，则其跳过下一个摸牌阶段。',
 			hualiu_bg:'+马',
-			hualiu_info:'你的防御距离+1',
+			hualiu_info:'锁定技，其他角色计算与你的距离+1。',
 			zhuque_bg:'扇',
 			zhuque_skill:'朱雀羽扇',
 			zhuque_info:'当你声明使用普【杀】后，你可以为此【杀】赋予火属性。',

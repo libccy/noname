@@ -141,7 +141,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var target=_status.event.player;
 							var evt=_status.event.getParent();
 							var bool=true;
-							if(_status.event.shanRequired>1&&!get.is.object(card)&&target.countCards('h','shan')<_status.event.shanRequired){
+							if(_status.event.shanRequired>1&&!get.is.object(card)&&target.countCards('h','shan')<_status.event.shanRequired-(_status.event.shanIgnored||0)){
 								bool=false;
 							}
 							else if(target.hasSkillTag('useShan')){
@@ -479,7 +479,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									if (get.attitude(current, target) > 0) return current.countCards('hs', 'tao');
 								}),
 								dis = 1,
-								t = _status.currentPhase;
+								t = _status.currentPhase||game.me;
 							while (t !== target) {
 								let att = get.attitude(player, t);
 								if (Math.abs(att) < 2) dis += 0.45;
@@ -1169,14 +1169,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(event.shaRequired>1&&player.countCards('h','sha')<event.shaRequired) return 0;
 							if(event.player==target){
 								if(player.hasSkill('naman')) return -1;
-								if(get.attitude(target,player)<0||event.player.hp<=1){
+								if(get.attitude(target,player)<0||event.player.hp<=1&&get.damageEffect(target,player,event.player)<get.damageEffect(player,target,event.player)){
 									return get.order(card);
 								}
 								return -1;
 							}
 							else{
 								if(target.hasSkill('naman')) return -1;
-								if(get.attitude(player,target)<0||event.player.hp<=1){
+								if(get.attitude(player,target)<0||event.player.hp<=1&&get.damageEffect(target,player,event.player)>get.damageEffect(player,target,event.player)){
 									return get.order(card);
 								}
 								return -1;
@@ -3234,10 +3234,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			renwang_skill:'仁王盾',
 			hanbing_info:'当你因执行【杀】的效果而造成伤害时，若目标角色有能被弃置的牌，则你可以防止此伤害，然后依次弃置目标角色的两张牌。',
 			hanbing_skill_info:'当你因执行【杀】的效果而造成伤害时，若目标角色有能被弃置的牌，则你可以防止此伤害，然后依次弃置目标角色的两张牌。',
-			renwang_info:'锁定技，黑色【杀】对你无效',
-			renwang_skill_info:'锁定技，黑色【杀】对你无效',
+			renwang_info:'锁定技，黑色【杀】对你无效。',
+			renwang_skill_info:'锁定技，黑色【杀】对你无效。',
 			sha_info:'出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，否则你对其造成1点伤害。',
-			shan_info:'抵消一张【杀】',
+			shan_info:'抵消一张【杀】。',
 			tao_info:'①出牌阶段，对自己使用，目标角色回复1点体力。②当有角色处于濒死状态时，对该角色使用。目标角色回复1点体力。',
 			bagua_info:'当你需要使用或打出一张【闪】时，你可以进行判定。若结果为红色，则你视为使用或打出一张【闪】。',
 			bagua_skill_info:'当你需要使用或打出一张【闪】时，你可以进行判定。若结果为红色，则你视为使用或打出一张【闪】。',

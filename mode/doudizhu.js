@@ -685,8 +685,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				var next=game.createEvent('chooseCharacter');
 				next.showConfig=true;
 				next.addPlayer=function(player){
-					var list=lib.config.mode_config.identity.identity[game.players.length-3].slice(0);
-					var list2=lib.config.mode_config.identity.identity[game.players.length-2].slice(0);
+					var list=get.identityList(game.players.length-1);
+					var list2=get.identityList(game.players.length);
 					for(var i=0;i<list.length;i++) list2.remove(list[i]);
 					player.identity=list2[0];
 					player.setIdentity('cai');
@@ -3153,7 +3153,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		],
 		help:{
 			'斗地主':'<div style="margin:10px">游戏规则</div><ul style="margin-top:0"><li>游戏人数<br>游戏人数为3人（地主x1 + 农民x2）。<li>胜利条件<br>农民：地主死亡。<br>地主：所有农民死亡且自己存活。'+
-			'<li>死亡奖惩<br>当有农民死亡时，若另一名农民存活，则其可以选择摸两张牌或回复一点体力。<li>地主专属技能<br>地主可以使用专属技能【飞扬】和【跋扈】。<br>【飞扬】判定阶段开始时，若你的判定区有牌，则你可以弃置两张手牌，然后弃置你判定区的一张牌。每回合限一次。<br>【跋扈】锁定技，准备阶段开始时，你摸一张牌。出牌阶段，你可以多使用一张【杀】。</ul>',
+			'<li>死亡奖惩<br>当有农民死亡时，若另一名农民存活，则其可以选择摸两张牌或回复1点体力。<li>地主专属技能<br>地主可以使用专属技能〖飞扬〗和〖跋扈〗。<br>〖飞扬〗判定阶段开始时，若你的判定区有牌，则你可以弃置两张手牌，然后弃置你判定区的一张牌。每回合限一次。<br>〖跋扈〗锁定技，准备阶段开始时，你摸一张牌。出牌阶段，你可以多使用一张【杀】。</ul>',
 		}
 	};
 });

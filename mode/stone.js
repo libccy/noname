@@ -2856,7 +2856,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseControl('两点','一点').prompt='造成两点伤害，或造成一点伤害并从牌库中获得一张牌';
+					player.chooseControl('两点','一点').prompt='造成2点伤害，或造成1点伤害并从牌库中获得一张牌';
 					'step 1'
 					if(result.control=='一点'){
 						target.damage();
@@ -5745,7 +5745,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var target=player.getLeader();
 					var next=target.chooseControl('召唤树人','增强随从');
-					next.prompt='召唤两个嘲讽树人，或令所有其他随从增加一点体力和体力上限并摸两张牌';
+					next.prompt='召唤两个嘲讽树人，或令所有其他随从增加1点体力和体力上限并摸两张牌';
 					next.ai=function(){
 						if(target.countFellow()<=2) return '召唤树人';
 						return '增强随从';
@@ -6049,7 +6049,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.chooser=player.getLeader();
-					event.chooser.chooseTarget('普照：选择一名己方随从增加两点体力和体力上限',function(card,playerx,target){
+					event.chooser.chooseTarget('普照：选择一名己方随从增加2点体力和体力上限',function(card,playerx,target){
 						return player!=target&&player.side==target.side&&target.isMin();
 					}).ai=function(target){
 						return get.attitude(event.chooser,target)*Math.max(1,10-target.hp);
@@ -6077,7 +6077,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.chooser=player.getLeader();
-					event.chooser.chooseTarget('缩小：令一名随从减少两点体力上限',function(card,playerx,target){
+					event.chooser.chooseTarget('缩小：令一名随从减少2点体力上限',function(card,playerx,target){
 						return player!=target&&target.isMin()&&target.maxHp>1;
 					}).ai=function(target){
 						if(get.attitude(player,target)>=0) return 0;
@@ -6525,7 +6525,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.chooser=player.getLeader();
-					event.chooser.chooseTarget('保卫：令一名友方随从获得一点护甲',function(card,playerx,target){
+					event.chooser.chooseTarget('保卫：令一名友方随从获得1点护甲',function(card,playerx,target){
 						return player!=target&&player.side==target.side&&target.isMin();
 					}).ai=function(target){
 						return get.attitude(event.chooser,target);
@@ -6883,7 +6883,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				mark:true,
 				intro:{
-					content:'在你的下一准备阶段，令所有友方随从增加一点体力和体力上限并摸一张牌'
+					content:'在你的下一准备阶段，令所有友方随从增加1点体力和体力上限并摸一张牌'
 				},
 				content:function(){
 					player.removeSkill('paladin_zhengqianghaosheng');
@@ -7391,7 +7391,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ai2:function(target){
 							return get.damageEffect(target,player,player);
 						},
-						prompt:'偷袭：弃置一张装备区内的牌并对一名敌方角色一点伤害'
+						prompt:'偷袭：弃置一张装备区内的牌并对一名敌方角色1点伤害'
 					});
 					player.line(event.chooser);
 					"step 1"
@@ -7538,7 +7538,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.chooser=player.getLeader();
-					event.chooser.chooseTarget('监工：对一名随从造成一点伤害然后令其摸两张牌',function(card,playerx,target){
+					event.chooser.chooseTarget('监工：对一名随从造成1点伤害然后令其摸两张牌',function(card,playerx,target){
 						return player!=target&&target.isMin();
 					}).ai=function(target){
 						var att=get.attitude(event.chooser,target);
@@ -7868,7 +7868,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.chooser=player.getLeader();
-					event.chooser.chooseTarget('驯兽：选择一名己方随从增加一点体力和体力上限并摸两张牌',function(card,playerx,target){
+					event.chooser.chooseTarget('驯兽：选择一名己方随从增加1点体力和体力上限并摸两张牌',function(card,playerx,target){
 						return player!=target&&player.side==target.side&&target.isMin();
 					}).ai=function(target){
 						return get.attitude(event.chooser,target);
@@ -7992,7 +7992,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.chooser=player.getLeader();
-					event.chooser.chooseTarget('护卫：对一名对方随从造成一点伤害或弃置其所有牌并将其体力上限改为1',function(card,playerx,target){
+					event.chooser.chooseTarget('护卫：对一名对方随从造成1点伤害或弃置其所有牌并将其体力上限改为1',function(card,playerx,target){
 						return player.side!=target.side&&target.isMin();
 					}).ai=function(target){
 						return Math.max(1,10-target.hp);
@@ -8110,7 +8110,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.chooser=player.getLeader();
-					event.chooser.chooseTarget('火袭：对一名对方随从造成两点伤害',function(card,playerx,target){
+					event.chooser.chooseTarget('火袭：对一名对方随从造成2点伤害',function(card,playerx,target){
 						return player.side!=target.side&&target.isMin();
 					}).ai=function(target){
 						return Math.max(1,10-target.hp);
@@ -8186,8 +8186,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				usable:1,
 				prompt:function(event){
-					if(event.player.hasFellowSkill('priest_hunwu')) return '令目标流失一点体力';
-					return '回复一点体力';
+					if(event.player.hasFellowSkill('priest_hunwu')) return '令目标失去1点体力';
+					return '回复1点体力';
 				},
 				filterTarget:function(card,player,target){
 					if(player.hasFellowSkill('priest_hunwu')) return true;
@@ -8341,8 +8341,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				usable:1,
 				prompt:function(event){
-					if(event.player.hasFellowSkill('hunter_juji')) return '造成一点伤害';
-					return '对敌方主将造成一点伤害';
+					if(event.player.hasFellowSkill('hunter_juji')) return '造成1点伤害';
+					return '对敌方主将造成1点伤害';
 				},
 				selectTarget:function(){
 					if(_status.event.player.hasFellowSkill('hunter_juji')) return 1;
@@ -8661,7 +8661,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.chooser=player.getLeader();
-					event.chooser.chooseTarget('毒液：令一名敌方随从失去一点体力',function(card,playerx,target){
+					event.chooser.chooseTarget('毒液：令一名敌方随从失去1点体力',function(card,playerx,target){
 						return player.side!=target.side&&target.isMin();
 					}).ai=function(target){
 						return Math.max(1,10-target.hp);
@@ -8858,7 +8858,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					event.chooser=player.getLeader();
-					event.chooser.chooseTarget('火枪：对一名对方随从造成一点伤害',function(card,playerx,target){
+					event.chooser.chooseTarget('火枪：对一名对方随从造成1点伤害',function(card,playerx,target){
 						return player.side!=target.side&&target.isMin();
 					}).ai=function(target){
 						return Math.max(1,10-target.hp);
@@ -9352,7 +9352,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_fushi:'缚誓',
 			stone_fushi_info:'你出场时，为所有友方角色回复所有体力值',
 			stone_mieshi:'灭世',
-			stone_mieshi_info:'你出场时，对所有其他随从造成两点伤害，然后弃置己方主将的所有手牌',
+			stone_mieshi_info:'你出场时，对所有其他随从造成2点伤害，然后弃置己方主将的所有手牌',
 			stone_shixu:'时序',
 			stone_shixu_info:'你出场的回合内，己方主将获得4点行动值',
 			stone_chenshui:'沉睡',
@@ -9367,9 +9367,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_lianyu:'炼狱',
 			stone_lianyu_info:'你的职业技能改为召唤一个地狱火',
 			stone_lianji:'连击',
-			stone_lianji_info:'每当己方主将召唤一个随从，便增加一点体力和体力上限并摸一张牌',
+			stone_lianji_info:'每当己方主将召唤一个随从，便增加1点体力和体力上限并摸一张牌',
 			stone_shenyu:'神谕',
-			stone_shenyu_info:'你出场时，己方主将可以选择一项：召唤两个嘲讽树人，或令所有其他随从增加一点体力和体力上限并摸两张牌',
+			stone_shenyu_info:'你出场时，己方主将可以选择一项：召唤两个嘲讽树人，或令所有其他随从增加1点体力和体力上限并摸两张牌',
 			stone_fuchou:'复仇',
 			stone_fuchou_info:'你死亡后，视为己方主将使用了一张复仇之怒',
 			stone_shenyou:'神佑',
@@ -9378,7 +9378,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_jinu_info:'摸牌阶段，若你己受伤，则额外摸两张牌',
 
 			spell_shenshengxinxing:'神圣新星',
-			spell_shenshengxinxing_info:'对所有敌方角色造成一点伤害，令所有友方角色回复一点体力',
+			spell_shenshengxinxing_info:'对所有敌方角色造成1点伤害，令所有友方角色回复1点体力',
 			spell_shengguangzhadan:'圣光炸弹',
 			spell_shengguangzhadan_info:'对所有随从造成等同于其手牌数的伤害',
 			spell_maizang:'埋葬',
@@ -9386,21 +9386,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_xinlingshijie:'心灵视界',
 			spell_xinlingshijie_info:'将一张敌方主将手牌的复制置于你的手牌',
 			spell_naluzhiguang:'纳鲁之光',
-			spell_naluzhiguang_info:'恢复一点体力值，若目标仍处于受伤状态，则召唤一名圣光护卫',
+			spell_naluzhiguang_info:'恢复1点体力值，若目标仍处于受伤状态，则召唤一名圣光护卫',
 			spell_zhiliaozhihuan:'治疗之环',
-			spell_zhiliaozhihuan_info:'令所有随从回复三点体力',
+			spell_zhiliaozhihuan_info:'令所有随从回复3点体力',
 
 			spell_zhenyanshu:'真言术',
-			spell_zhenyanshu_info:'令一名随从增加一点体力和体力上限；从牌库中获得一张牌',
+			spell_zhenyanshu_info:'令一名随从增加1点体力和体力上限；从牌库中获得一张牌',
 			spell_enzeshu:'恩泽术',
-			spell_enzeshu_info:'令一名随从增加三点体力和体力上限',
+			spell_enzeshu_info:'令一名随从增加3点体力和体力上限',
 			spell_anyingxingtai:'暗影形态',
 			priest_anyingxingtai:'暗影形态',
-			spell_anyingxingtai_info:'你的职业技能改为造成一点伤害，若已进入暗影形态，则改为造成两点伤害',
+			spell_anyingxingtai_info:'你的职业技能改为造成1点伤害，若已进入暗影形态，则改为造成2点伤害',
 			spell_kuaisuzhiliao:'快速治疗',
-			spell_kuaisuzhiliao_info:'回复两点体力',
+			spell_kuaisuzhiliao_info:'回复2点体力',
 			spell_xinlinghanbao:'心灵撼爆',
-			spell_xinlinghanbao_info:'对敌方主将造成两点伤害',
+			spell_xinlinghanbao_info:'对敌方主将造成2点伤害',
 			spell_kongxinshu:'控心术',
 			spell_kongxinshu_info:'复制敌方牌库中的一张随从，将其置入战场',
 
@@ -9409,15 +9409,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			priest_shengguang_info:'每当一名随从获得治疗，摸一张牌',
 
 			spell_nuxi:'怒袭',
-			spell_nuxi_info:'造成一点伤害，获得两点护甲',
+			spell_nuxi_info:'造成1点伤害，获得2点护甲',
 			spell_dunpaimengji:'盾牌猛击',
 			spell_dunpaimengji_info:'对一名随从造成等同于你护甲值的伤害',
 			spell_zhansha:'斩杀',
 			spell_zhansha_info:'令一名已受伤的敌方随从死亡',
 			spell_nuhuozhongshao:'怒火中烧',
-			spell_nuhuozhongshao_info:'对一名随从造成一点伤害，然后令其摸两张牌',
+			spell_nuhuozhongshao_info:'对一名随从造成1点伤害，然后令其摸两张牌',
 			spell_xuanfengzhan:'旋风斩',
-			spell_xuanfengzhan_info:'对所有随从造成一点伤害',
+			spell_xuanfengzhan_info:'对所有随从造成1点伤害',
 			spell_juemingluandou:'绝命乱斗',
 			spell_juemingluandou_info:'随机保留一名随从，然后令所有其他随从死亡',
 
@@ -9428,22 +9428,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_chongfeng:'冲锋',
 			spell_chongfeng_info:'令一名武将牌背面朝上的友方随从摸三张牌，然后将武将牌翻至正面',
 			spell_fuchoudaji:'复仇打击',
-			spell_fuchoudaji_info:'对所有随从造成一点伤害，若你的体力值不大于2，改为造成三点伤害',
+			spell_fuchoudaji_info:'对所有随从造成1点伤害，若你的体力值不大于2，改为造成3点伤害',
 			spell_kuangbao:'狂暴',
 			spell_kuangbao_info:'令一名已受伤的友方随从摸四张牌',
 			spell_yingyongdaji:'英勇打击',
-			spell_yingyongdaji_info:'令一名敌方角色对你造成两点伤害，然后对其造成两点伤害',
+			spell_yingyongdaji_info:'令一名敌方角色对你造成2点伤害，然后对其造成2点伤害',
 
 			spell_dubiao:'毒镖',
-			spell_dubiao_info:'对一名随机敌方角色造成一点伤害',
+			spell_dubiao_info:'对一名随机敌方角色造成1点伤害',
 			spell_qiangfengsheji:'强风射击',
-			spell_qiangfengsheji_info:'对两名敌方随从各造成一点伤害，并弃置其两张手牌',
+			spell_qiangfengsheji_info:'对两名敌方随从各造成1点伤害，并弃置其两张手牌',
 			spell_tanxianmao:'探险帽',
 			hunter_tanxianmao:'探险帽',
 			hunter_tanxianmao_info:'你死亡时，将一张探险帽置入主将的手牌',
-			spell_tanxianmao_info:'令一名友方随从增加一点体力和体力上限并摸一张牌，当该随从死亡时，将一张探险帽置入你的手牌',
+			spell_tanxianmao_info:'令一名友方随从增加1点体力和体力上限并摸一张牌，当该随从死亡时，将一张探险帽置入你的手牌',
 			spell_shalumingling:'杀戮命令',
-			spell_shalumingling_info:'造成一点伤害，如果你控制任何野兽，则改为造成两点伤害',
+			spell_shalumingling_info:'造成1点伤害，如果你控制任何野兽，则改为造成2点伤害',
 			spell_zhuizongshu:'追踪术',
 			spell_zhuizongshu_info:'从牌库中随机选择三张牌，获得其中的一张',
 			spell_tianjiangzhuqun:'天降蛛群',
@@ -9452,15 +9452,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_lierenyinji:'猎人印记',
 			spell_lierenyinji_info:'将一名随从的体力上限降至1',
 			spell_kuaisusheji:'快速射击',
-			spell_kuaisusheji_info:'造成一点伤害，摸一张牌',
+			spell_kuaisusheji_info:'造成1点伤害，摸一张牌',
 			spell_guanmenfanggou:'关门放狗',
 			spell_guanmenfanggou_info:'每有一名敌方随从，便召唤一只猎狗',
 			spell_zhaohuanchongwu:'动物伙伴',
 			spell_zhaohuanchongwu_info:'随机召唤一只野兽',
 			spell_zidanshangtang:'子弹上膛',
-			spell_zidanshangtang_info:'随机获得一张猎人职业法术牌，并获得技能【上膛】直到回合结束',
+			spell_zidanshangtang_info:'随机获得一张猎人职业法术牌，并获得技能〖上膛〗直到回合结束',
 			spell_duochongsheji:'多重射击',
-			spell_duochongsheji_info:'对两名随机敌方随从各造成两点伤害',
+			spell_duochongsheji_info:'对两名随机敌方随从各造成2点伤害',
 
 			stone_liegou:'猎狗',
 			hunter_zidanshangtang:'上膛',
@@ -9472,18 +9472,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_xishengqiyue:'牺牲契约',
 			spell_xishengqiyue_info:'令双方各一名随从立即死亡',
 			spell_xiaoguibaopo:'小鬼爆破',
-			spell_xiaoguibaopo_info:'对一名随从造成1~3点伤害，每造成一点伤害，便召唤一只小鬼',
+			spell_xiaoguibaopo_info:'对一名随从造成1~3点伤害，每造成1点伤害，便召唤一只小鬼',
 			spell_anyinglieyan:'暗影裂焰',
 			spell_anyinglieyan_info:'杀死一名友方随从，并对所有敌方随从造成等于其体力值的伤害',
 			spell_liliangdaijia:'力量代价',
-			spell_liliangdaijia_info:'令一名友方随从摸4张牌，将体力值变为5，并在其下个回合结束后死亡',
+			spell_liliangdaijia_info:'令一名友方随从摸四张牌，将体力值变为5，并在其下个回合结束后死亡',
 			spell_emozhinu:'恶魔之怒',
-			spell_emozhinu_info:'对所有随从造成两点伤害',
+			spell_emozhinu_info:'对所有随从造成2点伤害',
 
 			spell_emozhixin:'恶魔之心',
-			spell_emozhixin_info:'对一名敌方随从造成四点伤害，或令一名友方随从摸四张牌',
+			spell_emozhixin_info:'对一名敌方随从造成4点伤害，或令一名友方随从摸四张牌',
 			spell_ansezhadan:'暗色炸弹',
-			spell_ansezhadan_info:'造成两点伤害',
+			spell_ansezhadan_info:'造成2点伤害',
 			spell_fushishu:'腐蚀术',
 			warlock_fushishu:'腐蚀',
 			warlock_fushishu_info:'下个回合结束后死亡',
@@ -9491,16 +9491,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_heianqiyue:'黑暗契约',
 			spell_heianqiyue_info:'随机令两名敌方随从死亡，随机弃置两张手牌',
 			spell_linghunhongxi:'灵魂虹吸',
-			spell_linghunhongxi_info:'令一名随从死亡，回复一点体力',
+			spell_linghunhongxi_info:'令一名随从死亡，回复1点体力',
 			spell_siwangchanrao:'死亡缠绕',
-			spell_siwangchanrao_info:'对一名随从造成一点伤害；若该随从死亡，从牌库中获得一张牌',
+			spell_siwangchanrao_info:'对一名随从造成1点伤害；若该随从死亡，从牌库中获得一张牌',
 
 			spell_wuyashenxiang:'乌鸦神像',
 			spell_wuyashenxiang_info:'从三张法术牌或随从牌中选择一张加入手牌',
 			spell_huotigenxu:'活体根须',
-			spell_huotigenxu_info:'造成一点伤害，或召唤两个树苗',
+			spell_huotigenxu_info:'造成1点伤害，或召唤两个树苗',
 			spell_hengsao:'横扫',
-			spell_hengsao_info:'对一名敌方角色造成两点伤害，然后对其他敌方角色造成一点伤害',
+			spell_hengsao_info:'对一名敌方角色造成2点伤害，然后对其他敌方角色造成1点伤害',
 			spell_yexingchengzhang:'野性成长',
 			spell_yexingchengzhang_info:'下个出牌阶段开始时获得三点额外行动值',
 			spell_ziranzhili:'自然之力',
@@ -9515,15 +9515,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			druid_conglinzhihun_info:'你死亡后召唤一个树人',
 			spell_conglinzhihun_info:'令所有友方随从获得技能树魂（你死亡后召唤一个树人）',
 			spell_ziyang:'滋养',
-			spell_ziyang_info:'下个出牌开始阶段获得四点额外行动值，或从牌库中获得三张牌',
+			spell_ziyang_info:'下个出牌开始阶段获得4点额外行动值，或从牌库中获得三张牌',
 			spell_fugen:'腐根',
 			spell_fugen_info:'令一名随从死亡，将一张随机随从置入对手的手牌',
 			spell_xingchenzhuiluo:'星辰坠落',
-			spell_xingchenzhuiluo_info:'对一名敌方随从造成五点伤害，或对所有敌方随从造成两点伤害',
+			spell_xingchenzhuiluo_info:'对一名敌方随从造成5点伤害，或对所有敌方随从造成2点伤害',
 			spell_fennu:'愤怒',
-			spell_fennu_info:'对一名随从造成两点伤害，或造成一点伤害并从牌库中获得一张牌',
+			spell_fennu_info:'对一名随从造成2点伤害，或造成1点伤害并从牌库中获得一张牌',
 			spell_heiandiyu:'黑暗低语',
-			spell_heiandiyu_info:'召唤若干个小精灵直到你的随从数达到4；或令一名随从增加一点体力和体力上限并摸三张牌',
+			spell_heiandiyu_info:'召唤若干个小精灵直到你的随从数达到4；或令一名随从增加1点体力和体力上限并摸三张牌',
 
 			druid_yexingchengzhang:'成长',
 			druid_yexingchengzhang_bg:'长',
@@ -9540,11 +9540,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_zibao_info:'结合结束后立即死亡',
 
 			spell_cigu:'刺骨',
-			spell_cigu_info:'造成一点伤害，你可以弃置一张装备区内的牌令伤害+1',
+			spell_cigu_info:'造成1点伤害，你可以弃置一张装备区内的牌令伤害+1',
 			spell_jianrenluanwu:'剑刃乱舞',
-			spell_jianrenluanwu_info:'弃置你的武器牌，并对所有敌方角色造成一点伤害',
+			spell_jianrenluanwu_info:'弃置你的武器牌，并对所有敌方角色造成1点伤害',
 			spell_daoshan:'刀扇',
-			spell_daoshan_info:'对所有敌方随从造成一点伤害，从牌库中获得一张牌',
+			spell_daoshan_info:'对所有敌方随从造成1点伤害，从牌库中获得一张牌',
 			spell_sijidaifa:'伺机待发',
 			spell_sijidaifa_info:'你使用下一张法术牌时获得X点行动值，X为该法术的行动值消耗且不超过3',
 			spell_cisha:'刺杀',
@@ -9557,7 +9557,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_anzhongpohuai:'暗中破坏',
 			spell_anzhongpohuai_info:'随机杀死一名敌方随从，随机弃置敌方的一张装备牌',
 			spell_beici:'背刺',
-			spell_beici_info:'令一名未受伤的随从流失一点体力',
+			spell_beici_info:'令一名未受伤的随从失去1点体力',
 			spell_weijisifu:'危机四伏',
 			spell_zhumo:'蛛魔',
 			stone_zhumo:'蛛魔',
@@ -9569,13 +9569,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_jipao_info:'从牌库中获得四张牌',
 
 			spell_fengxian:'奉献',
-			spell_fengxian_info:'对所有敌方角色造成一点伤害',
+			spell_fengxian_info:'对所有敌方角色造成1点伤害',
 			spell_fuchouzhinu:'复仇之怒',
 			spell_fuchouzhinu_info:'造成5点伤害，随机分配到所有敌方随从上',
 			spell_shengliaoshu:'圣疗术',
-			spell_shengliaoshu_info:'恢复两点体力，摸两张牌',
+			spell_shengliaoshu_info:'恢复2点体力，摸两张牌',
 			spell_fennuzhichui:'愤怒之锤',
-			spell_fennuzhichui_info:'造成一点伤害，从牌库中获得一张牌',
+			spell_fennuzhichui_info:'造成1点伤害，从牌库中获得一张牌',
 			spell_zuozhandongyuan:'作战动员',
 			spell_zuozhandongyuan_info:'召唤两个新兵，随机装备一把武器',
 			spell_liliangzhufu:'力量祝福',
@@ -9591,8 +9591,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_yongshizhufu_info:'令一名随从的手牌数翻倍',
 			spell_zhengqianghaosheng:'争强好胜',
 			paladin_zhengqianghaosheng:'争强好胜',
-			paladin_zhengqianghaosheng_info:'在你的下一准备阶段，令所有友方随从增加一点体力和体力上限并摸一张牌',
-			spell_zhengqianghaosheng_info:'在你的下一准备阶段，令所有友方随从增加一点体力和体力上限并摸一张牌',
+			paladin_zhengqianghaosheng_info:'在你的下一准备阶段，令所有友方随从增加1点体力和体力上限并摸一张牌',
+			spell_zhengqianghaosheng_info:'在你的下一准备阶段，令所有友方随从增加1点体力和体力上限并摸一张牌',
 			spell_zhihuizhufu:'智慧祝福',
 			paladin_zhihuizhufu:'智慧祝福',
 			spell_zhihuizhufu_info:'选择一名随从，在其每个准备阶段，你从牌库中获得一张牌',
@@ -9602,7 +9602,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shaman_fengnu_info:'回合结束后，你获得一个额外回合',
 			spell_fengnu_info:'令一名随从获得技能风怒（回合结束后，你获得一个额外回合）',
 			spell_rongyanbaolie:'熔岩爆裂',
-			spell_rongyanbaolie_info:'造成三点火焰伤害，流失一点体力',
+			spell_rongyanbaolie_info:'造成3点火焰伤害，失去1点体力',
 			spell_shihuawuqi:'石化武器',
 			shaman_shihuawuqi:'充能',
 			shaman_shihuawuqi_info:'准备阶段，你摸三张牌',
@@ -9629,7 +9629,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_shixue:'嗜血',
 			spell_shixue_info:'所有友方随从摸两张牌',
 			spell_chazhuangshandian:'叉状闪电',
-			spell_chazhuangshandian_info:'对两个随机敌方随从各造成一点雷电伤害',
+			spell_chazhuangshandian_info:'对两个随机敌方随从各造成1点雷电伤害',
 
 			stone_qingwa:'青蛙',
 			stone_youlinglang:'幽灵狼',
@@ -9640,13 +9640,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_xiaojingling:'小精灵',
 
 			spell_laojiuhuoba:'老旧火把',
-			spell_laojiuhuoba_info:'造成一点伤害，将一张炽热火把置入你的牌库',
+			spell_laojiuhuoba_info:'造成1点伤害，将一张炽热火把置入你的牌库',
 			spell_chirehuoba:'炽热火把',
-			spell_chirehuoba_info:'造成两点火焰伤害',
+			spell_chirehuoba_info:'造成2点火焰伤害',
 			spell_canying:'残影',
 			spell_canying_info:'复制你的所有随从，并将其置入你的手牌',
 			spell_yanbaoshu:'炎爆术',
-			spell_yanbaoshu_info:'造成四点火焰伤害（若目标为主将，伤害不能超过目标的当前体力值）',
+			spell_yanbaoshu_info:'造成4点火焰伤害（若目标为主将，伤害不能超过目标的当前体力值）',
 			spell_jingxiang:'镜像',
 			spell_jingxiang_info:'召唤两个具有嘲讽且摸牌阶段不摸牌的随从',
 			spell_aoshufeidan:'奥术飞弹',
@@ -9657,17 +9657,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_hanbingpingzhang_info:'令一名角色的体力值不能降到2以内，直到你的下一回合开始',
 
 			spell_hanbingjian:'寒冰箭',
-			spell_hanbingjian_info:'对一个随从造成两点伤害，然后将其翻面',
+			spell_hanbingjian_info:'对一个随从造成2点伤害，然后将其翻面',
 			spell_lieyanfengbao:'烈焰风暴',
-			spell_lieyanfengbao_info:'对所有敌方随从造成两点伤害',
+			spell_lieyanfengbao_info:'对所有敌方随从造成2点伤害',
 			spell_baofengxue:'暴风雪',
-			spell_baofengxue_info:'对所有敌方随从造成一点伤害，然后将其翻面',
+			spell_baofengxue_info:'对所有敌方随从造成1点伤害，然后将其翻面',
 			spell_aoshuzhihui:'奥术智慧',
 			spell_aoshuzhihui_info:'从牌库中获得两张牌',
 			spell_bianxingshu:'变形术',
 			spell_bianxingshu_info:'将一个随从变成一只绵羊',
 			spell_huoqiushu:'火球术',
-			spell_huoqiushu_info:'造成三点火焰伤害（若目标为主将，伤害不能超过目标的当前体力值）',
+			spell_huoqiushu_info:'造成3点火焰伤害（若目标为主将，伤害不能超过目标的当前体力值）',
 
 			stone_mianyang:'绵羊',
 			mage_mianyang:'绵羊',
@@ -9688,15 +9688,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_shenshengyongshi:'神圣勇士',
 
 			priest_puzhao:'普照',
-			priest_puzhao_info:'你出场时，己方主将可令一名其他友方随从增加两点体力和体力上限',
+			priest_puzhao_info:'你出场时，己方主将可令一名其他友方随从增加2点体力和体力上限',
 			priest_suoxiao:'缩小',
-			priest_suoxiao_info:'你出场时，己方主将可令一名其他随从减少两点体力上限（不能小于1)',
+			priest_suoxiao_info:'你出场时，己方主将可令一名其他随从减少2点体力上限（不能小于1)',
 			priest_shengshui:'圣水',
-			priest_shengshui_info:'你跳过摸牌阶段；在你的准备阶段，令一名随机友方角色回复两点体力',
+			priest_shengshui_info:'你跳过摸牌阶段；在你的准备阶段，令一名随机友方角色回复2点体力',
 			priest_muguang:'暮光',
-			priest_muguang_info:'你出场时，若主将手牌中有随从牌，则增加一点体力和体力上限',
+			priest_muguang_info:'你出场时，若主将手牌中有随从牌，则增加1点体力和体力上限',
 			priest_shixin:'蚀心',
-			priest_shixin_info:'每当己方主将使用一次职业技能，对双方主将各造成一点伤害',
+			priest_shixin_info:'每当己方主将使用一次职业技能，对双方主将各造成1点伤害',
 
 			priest_shengliao:'圣疗',
 			priest_shengliao_info:'每当一名随从回复体力，己方主将从牌库中获得一张牌',
@@ -9705,11 +9705,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			priest_xundao:'训导',
 			priest_xundao_info:'你出场时，若己方主将手牌中有随从牌，则摸一张牌并获得嘲讽',
 			priest_hunwu:'魂舞',
-			priest_hunwu_info:'己方主将的职业技能及法术的治疗效果改为令目标流失等量体力',
+			priest_hunwu_info:'己方主将的职业技能及法术的治疗效果改为令目标失去等量体力',
 			priest_faxian:'发现',
 			priest_faxian_info:'你出场时，己方主将从三张随机随从牌中选择一张加入手牌',
 			priest_zhufu:'献身',
-			priest_zhufu_info:'你死亡时，令一名随机友方随从增加一点体力和体力上限',
+			priest_zhufu_info:'你死亡时，令一名随机友方随从增加1点体力和体力上限',
 
 			stone_daomufeizei:'盗墓匪贼',
 			stone_haidao:'海盗',
@@ -9729,9 +9729,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			rogue_duxing:'独行',
 			rogue_duxing_info:'每当敌方主将召唤一名随从，便获得潜行',
 			rogue_shoudao:'授道',
-			rogue_shoudao_info:'在己方主将的结束阶段，令一名随机友方随从增加一点体力和体力上限并摸一张牌',
+			rogue_shoudao_info:'在己方主将的结束阶段，令一名随机友方随从增加1点体力和体力上限并摸一张牌',
 			rogue_lifa:'理发',
-			rogue_lifa_info:'为己方主将装备一把武器，若已有武器，改为对敌方主将造成一点伤害',
+			rogue_lifa_info:'为己方主将装备一把武器，若已有武器，改为对敌方主将造成1点伤害',
 			rogue_fusheng:'复生',
 			rogue_fusheng_info:'你出场时，体力值和体力上限变为X，X为场上体力最高的随从的体力值',
 			rogue_jielue:'劫掠',
@@ -9746,9 +9746,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			rogue_cisha:'刺杀',
 			rogue_cisha_info:'每当你对一名随从造成伤害，受伤害随从立即死亡',
 			rogue_touxi:'偷袭',
-			rogue_touxi_info:'你出场时，己方主将可弃置一张装备区内的牌并对一名敌方角色造成一点伤害',
+			rogue_touxi_info:'你出场时，己方主将可弃置一张装备区内的牌并对一名敌方角色造成1点伤害',
 			rogue_qiancang:'潜藏',
-			rogue_qiancang_info:'你出场时，对所有未受伤害的敌方随从造成一点伤害',
+			rogue_qiancang_info:'你出场时，对所有未受伤害的敌方随从造成1点伤害',
 			rogue_zhaomu:'结伙',
 			rogue_zhaomu_info:'你出场时，召唤一个海盗',
 
@@ -9776,18 +9776,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			warrior_chuanci:'穿刺',
 			warrior_chuanci_info:'每当你对一名敌方随从造成伤害，对另一名随机敌方随从造成等量的伤害',
 			warrior_zhifu:'掷斧',
-			warrior_zhifu_info:'每当你受到一次伤害，对敌方主将造成一点伤害',
+			warrior_zhifu_info:'每当你受到一次伤害，对敌方主将造成1点伤害',
 
 			warrior_tongling:'统领',
 			warrior_tongling_info:'每当你召唤一个初始手牌数不大于2的随从，令其获得冲锋',
 			warrior_baoluan:'暴乱',
 			warrior_baoluan_info:'每当一名随从受到一次伤害，摸一张牌',
 			warrior_jiangong:'监工',
-			warrior_jiangong_info:'你出场时，己方主将可对一名随从造成一点伤害，然后令该随从摸两张牌',
+			warrior_jiangong_info:'你出场时，己方主将可对一名随从造成1点伤害，然后令该随从摸两张牌',
 			warrior_zhujia:'铸甲',
-			warrior_zhujia_info:'每当你受到一次伤害，己方主将获得一点护甲',
+			warrior_zhujia_info:'每当你受到一次伤害，己方主将获得1点护甲',
 			warrior_tidun:'提盾',
-			warrior_tidun_info:'你出场时，己方主将获得两点护甲',
+			warrior_tidun_info:'你出场时，己方主将获得2点护甲',
 
 			stone_lieyanxiaogui:'烈焰小鬼',
 			stone_xiaoguishouling:'小鬼首领',
@@ -9812,11 +9812,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			warlock_huanmeng:'幻梦',
 			warlock_huanmeng_info:'你出场时，己方主将随机弃置一张手牌',
 			warlock_tongku:'痛苦',
-			warlock_tongku_info:'每当你造成一次伤害，令己方主将回复一点体力',
+			warlock_tongku_info:'每当你造成一次伤害，令己方主将回复1点体力',
 			warlock_tunshi:'吞噬',
 			warlock_tunshi_info:'你出场时，己方主将须令一名其他友方随从死亡，然后你获得其全部的手牌和体力值',
 			warlock_shijie:'视界',
-			warlock_shijie_info:'每当己方主将受到一次伤害，你增加一点体力和体力上限并摸一张牌',
+			warlock_shijie_info:'每当己方主将受到一次伤害，你增加1点体力和体力上限并摸一张牌',
 
 			warlock_nonghuo:'弄火',
 			warlock_nonghuo_info:'你出场时，对己方主将造成1点火焰伤害',
@@ -9825,7 +9825,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			warlock_yongsheng:'永生',
 			warlock_yongsheng_info:'你死亡后，召唤一匹恐惧战马',
 			warlock_yuhuo:'狱火',
-			warlock_yuhuo_info:'你出场时，对所有其他随从造成一点伤害',
+			warlock_yuhuo_info:'你出场时，对所有其他随从造成1点伤害',
 			warlock_zaihuo:'灾祸',
 			warlock_zaihuo_info:'你出场时，随机弃置主将的两张手牌',
 
@@ -9844,15 +9844,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_xunmashi:'训马师',
 
 			paladin_baowei:'保卫',
-			paladin_baowei_info:'你出场时，己方主将可令一名其他随从获得一点护甲',
+			paladin_baowei_info:'你出场时，己方主将可令一名其他随从获得1点护甲',
 			paladin_tuxi:'吐息',
-			paladin_tuxi_info:'你出场时，己方主将进行一次判定，若为红色，则回复一点体力',
+			paladin_tuxi_info:'你出场时，己方主将进行一次判定，若为红色，则回复1点体力',
 			paladin_miying:'秘影',
 			paladin_miying_info:'你出场时，依次将牌堆中的所有不重名的判定牌置入敌方主将的判定区',
 			paladin_huashi:'化石',
 			paladin_huashi_info:'你出场时，己方主将可将一名其他随从的体力值及体力上限变为2',
 			paladin_jinghua:'净化',
-			paladin_jinghua_info:'你出场时，对所有手牌数大于1的随从造成两点伤害',
+			paladin_jinghua_info:'你出场时，对所有手牌数大于1的随从造成2点伤害',
 			paladin_moma:'秣马',
 			paladin_moma2:'秣马',
 			paladin_moma_info:'所有友方新兵摸牌阶段摸牌数+1',
@@ -9861,13 +9861,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			paladin_zhaohuan2:'召唤',
 			paladin_zhaohuan_info:'你出场后，你的主将在使用下一张随从牌时获得两点行动值',
 			paladin_shouwei:'守卫',
-			paladin_shouwei_info:'你出场时，你的主将回复两点体力值',
+			paladin_shouwei_info:'你出场时，你的主将回复2点体力值',
 			paladin_chidun:'持盾',
 			paladin_chidun_info:'你出场时，己方主将可以弃置对方一名随从的所有牌',
 			paladin_buji:'补给',
-			paladin_buji_info:'你出场时，所有友方新兵增加一点体力和体力上限并摸两张牌',
+			paladin_buji_info:'你出场时，所有友方新兵增加1点体力和体力上限并摸两张牌',
 			paladin_hudun:'护盾',
-			paladin_hudun_info:'你出场时，获得一点护甲值',
+			paladin_hudun_info:'你出场时，获得1点护甲值',
 			paladin_zhaochao:'招潮',
 			paladin_zhaochao_info:'每当你的主将使用一次英雄技能，便摸两张牌',
 
@@ -9892,7 +9892,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			mage_gushou:'固守',
 			mage_gushou_info:'每当己方主将受到多于1伤害时，防止其余伤害',
 			mage_yufa:'驭法',
-			mage_yufa_info:'每当己方主将使用一次职业技能，令其获得一点行动值',
+			mage_yufa_info:'每当己方主将使用一次职业技能，令其获得1点行动值',
 			mage_yanshu:'炎术',
 			mage_yanshu_info:'你出场时，造成X点火焰伤害，随机分配到敌方随从上，X为己方主将装备区内装备牌的数量',
 			mage_pingxu:'冯虚',
@@ -9905,9 +9905,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			mage_tunfa:'吞法',
 			mage_tunfa_info:'每当己方主将使用一张法术牌，摸一张牌',
 			mage_lieyan:'烈焰',
-			mage_lieyan_info:'每当己方主将使用一张法术牌，对一名随机敌方角色造成一点火焰伤害',
+			mage_lieyan_info:'每当己方主将使用一张法术牌，对一名随机敌方角色造成1点火焰伤害',
 			mage_zhufa:'助法',
-			mage_zhufa_info:'每当己方主将使用一张法术牌，令其获得一点行动值',
+			mage_zhufa_info:'每当己方主将使用一张法术牌，令其获得1点行动值',
 			mage_bingdong:'冰冻',
 			mage_bingdong_info:'每当你对一个随从造成伤害，该随从将武将牌翻至背面',
 
@@ -9928,9 +9928,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			hunter_jiewang:'结网',
 			hunter_jiewang_info:'你死亡时，己方主将获得一张随机野兽牌',
 			hunter_xunshou:'驯兽',
-			hunter_xunshou_info:'你出场时，己方主将可选择一名其他友方随从令其增加一点体力和体力上限，摸两张牌并获得嘲讽',
+			hunter_xunshou_info:'你出场时，己方主将可选择一名其他友方随从令其增加1点体力和体力上限，摸两张牌并获得嘲讽',
 			hunter_nuhou:'怒吼',
-			hunter_nuhou_info:'当你死亡时，对所有敌方角色造成一点伤害',
+			hunter_nuhou_info:'当你死亡时，对所有敌方角色造成1点伤害',
 			hunter_zhanhuo:'战火',
 			hunter_zhanhuo2:'战火',
 			hunter_zhanhuo_info:'其他友方随从摸牌阶段的摸牌数+1',
@@ -9963,7 +9963,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_huoshanxiemu:'火山邪木',
 
 			druid_renya:'刃牙',
-			druid_renya_info:'你出场时，己方主将可以选择一项：令你摸一张牌并将武将牌翻至正面，或令你增加一点体力上限并获得技能潜行',
+			druid_renya_info:'你出场时，己方主将可以选择一项：令你摸一张牌并将武将牌翻至正面，或令你增加1点体力上限并获得技能潜行',
 			druid_yuehuo:'月火',
 			druid_yuehuo_info:'所有锦囊牌造成的伤害+1',
 			druid_qicheng:'骑乘',
@@ -9973,17 +9973,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			druid_yeyou:'夜游',
 			druid_yeyou_info:'双方主将各从牌库中获得一张牌',
 			druid_juhuo:'举火',
-			druid_juhuo_info:'己方主将回合内，每有一名随从死亡，令己方主将获得一点行动值',
+			druid_juhuo_info:'己方主将回合内，每有一名随从死亡，令己方主将获得1点行动值',
 
 			stone_chongfeng:'冲锋',
 			stone_chongfeng_info:'你出场时，立即将武将牌翻至正面',
 			druid_nuhuo:'怒火',
-			druid_nuhuo_info:'每当己方主将使用一次职业技能，便对一名随机敌人造成一点伤害',
+			druid_nuhuo_info:'每当己方主将使用一次职业技能，便对一名随机敌人造成1点伤害',
 			druid_chengzhang:'成长',
 			druid_chengzhang2:'成长',
-			druid_chengzhang_info:'你出场时，己方主将获得一点行动值；你死亡时，己方主将需弃置一张手牌',
+			druid_chengzhang_info:'你出场时，己方主将获得1点行动值；你死亡时，己方主将需弃置一张手牌',
 			druid_huwei:'护卫',
-			druid_huwei_info:'你出场时，己方主将可以选择一项：对一名随从造成一点伤害，或弃置一名随从的所有牌并将其体力上限改为2',
+			druid_huwei_info:'你出场时，己方主将可以选择一项：对一名随从造成1点伤害，或弃置一名随从的所有牌并将其体力上限改为2',
 
 
 			stone_fachao:'法潮图腾',
@@ -10003,19 +10003,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shaman_anhun:'暗魂',
 			shaman_anhun_info:'每当一名友方随从死亡，令主将从牌库中获得一张牌',
 			shaman_zoushi:'走石',
-			shaman_zoushi_info:'每当己方主将使用一张随从牌，对一名随机敌方角色造成一点伤害',
+			shaman_zoushi_info:'每当己方主将使用一张随从牌，对一名随机敌方角色造成1点伤害',
 			shaman_zhuhuo:'逐火',
 			shaman_zhuhuo_info:'你出场时，摸1~3张牌',
 			shaman_peiyu:'培育',
 			shaman_peiyu_info:'你出场时，增加X点体力和体力上限，X为友方图腾数',
 			shaman_huoli:'活力',
-			shaman_huoli_info:'己方主将出牌阶段开始时，你令其获得一点行动值',
+			shaman_huoli_info:'己方主将出牌阶段开始时，你令其获得1点行动值',
 			shaman_xueju:'穴居',
 			shaman_xueju_info:'每当己主将使用一张随从牌，摸一张牌',
 			shaman_huoxi:'火袭',
-			shaman_huoxi_info:'你出场时，己方主将可以对对方一名随从造成两点火焰伤害',
+			shaman_huoxi_info:'你出场时，己方主将可以对对方一名随从造成2点火焰伤害',
 			shaman_fachao:'法潮',
-			shaman_fachao_info:'己方主将在其每个回合结束阶从牌库中获得一张牌并回复一点体力',
+			shaman_fachao_info:'己方主将在其每个回合结束阶从牌库中获得一张牌并回复1点体力',
 			shaman_huoshe:'火舌',
 			shaman_huoshe_info:'其他友方随从造成的伤害始终+1',
 
@@ -10026,20 +10026,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shaman_fali:'空气',
 			shaman_fali_info:'已方主将使用的法术牌伤害+1',
 			shaman_zhiliao:'治疗',
-			shaman_zhiliao_info:'在你的结束阶段，令所有友方随从回复一点体力',
+			shaman_zhiliao_info:'在你的结束阶段，令所有友方随从回复1点体力',
 			shaman_zhuore:'灼热',
-			shaman_zhuore_info:'已方主将的结束阶段，对一名随机敌方随从造成一点伤害',
+			shaman_zhuore_info:'已方主将的结束阶段，对一名随机敌方随从造成1点伤害',
 
 			_shaman_skill:'图腾',
 			_shaman_skill_info:'召唤一个随机图腾',
 			_mage_skill:'火冲',
-			_mage_skill_info:'对一名随从造成一点火焰伤害',
+			_mage_skill_info:'对一名随从造成1点火焰伤害',
 			_priest_skill:'治疗',
-			_priest_skill_info:'回复一点体力',
+			_priest_skill_info:'回复1点体力',
 			_priest_skillx:'心刺',
-			_priest_skillx_info:'造成一点伤害',
+			_priest_skillx_info:'造成1点伤害',
 			_warrior_skill:'战甲',
-			_warrior_skill_info:'获得一点护甲（不能超过3点）',
+			_warrior_skill_info:'获得1点护甲（不能超过3点）',
 			_warlock_skill:'分流',
 			_warlock_skill_info:'从牌库中获得两张牌',
 			_warlock_skillx:'炼狱',
@@ -10049,7 +10049,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			_paladin_skill:'动员',
 			_paladin_skill_info:'召唤一名士兵',
 			_hunter_skill:'射击',
-			_hunter_skill_info:'对敌方主将造成一点伤害',
+			_hunter_skill_info:'对敌方主将造成1点伤害',
 			_druid_skill:'猛击',
 			_druid_skill_info:'视为使用一张不计入出杀次数的杀',
 
@@ -10068,7 +10068,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_zhucangzhe1_info:'你出场时，己方主将可以令己方一名其他角色摸一张牌',
 			stone_huoqiangshou:'火枪手',
 			stone_huoqiangshou1:'火枪',
-			stone_huoqiangshou1_info:'你出场时，己方主将可以对对方一名随从造成一点伤害',
+			stone_huoqiangshou1_info:'你出场时，己方主将可以对对方一名随从造成1点伤害',
 
 			stone_lansaizhanshi:'蓝腮战士',
 			stone_kutongsiseng:'苦痛侍僧',
@@ -10117,17 +10117,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_mingguangjisi:'明光祭司',
 			stone_nianqingjisi:'年轻祭司',
 			stone_zhufu:'祝福',
-			stone_zhufu_info:'己方主将的结束阶段，你令一名随机的受伤友方随从回复一点体力',
+			stone_zhufu_info:'己方主将的结束阶段，你令一名随机的受伤友方随从回复1点体力',
 			stone_aomishouwei:'奥秘守卫',
 			stone_yanjingshe:'眼镜蛇',
 			stone_yanjingshe1:'毒噬',
 			stone_yanjingshe1_info:'你出场时，若敌方随从数不少于己方，则随机杀死一名随从',
 			stone_zhiyuzhe:'治愈者',
 			stone_zhiyu:'治愈',
-			stone_zhiyu_info:'你出场时，令所有友方随从回复一点体力',
+			stone_zhiyu_info:'你出场时，令所有友方随从回复1点体力',
 			stone_mafengzhuru:'麻风侏儒',
 			stone_mafengzhuru1:'麻风',
-			stone_mafengzhuru1_info:'杀死你的随从失去一点体力',
+			stone_mafengzhuru1_info:'杀死你的随从失去1点体力',
 			stone_fatiaozhuru:'发条侏儒',
 			stone_fatiaozhuru1:'发条',
 			stone_fatiaozhuru1_info:'结束阶段，若你没有手牌，你摸两张牌',
@@ -10149,19 +10149,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_binghuan:'冰环',
 			spell_binghuan_info:'将场上所有随从翻面',
 			spell_morizaihuo:'末日灾祸',
-			spell_morizaihuo_info:'令场上所有随从立即死亡，回复两点体力',
+			spell_morizaihuo_info:'令场上所有随从立即死亡，回复2点体力',
 			spell_zhiliaozhichu:'治疗之触',
 			spell_zhiliaozhichu_info:'令目标随从恢复所有体力值并获得嘲讽',
 			lschaofeng:'嘲讽',
 			lschaofeng_info:'同阵营的无嘲讽角色不以能成为杀的目标',
 			spell_wangzhezhufu:'王者祝福',
-			spell_wangzhezhufu_info:'令一名随从增加两点体力和体力上限并摸两张牌',
+			spell_wangzhezhufu_info:'令一名随从增加2点体力和体力上限并摸两张牌',
 			spell_diyulieyan:'地狱烈焰',
-			spell_diyulieyan_info:'所有角色失去一点体力',
+			spell_diyulieyan_info:'所有角色失去1点体力',
 			spell_chenmo:'沉默',
 			spell_chenmo_info:'弃置一名随从的所有牌，并令其体力上限减至2',
 			spell_zhiliaoshui:'治疗水',
-			spell_zhiliaoshui_info:'出牌阶段对自己使用，恢复两点体力值；或于濒死阶段对一名角色使用，令目标恢复一点体力',
+			spell_zhiliaoshui_info:'出牌阶段对自己使用，恢复2点体力值；或于濒死阶段对一名角色使用，令目标恢复1点体力',
 			spell_yanmie:'极恶之咒',
 			spell_yanmie_info:'交换你与敌方主将的装备区，并摸若干张牌直到你的手牌数与敌方主将相等',
 			spell_xiaoshi:'消失',
@@ -10180,13 +10180,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'<li>每名角色使用一套卡组，卡组用完后会重新补满'+
 			'<li>卡组与职业绑定，每个职业有一个专属技能，每回合限用一次，消耗两点行动值</ul>'+
 			'<div style="margin:10px">职业技能</div><ul style="margin-top:0"><li>祭司：召唤一个随机图腾'+
-			'<li>法师：对一名随从造成一点火焰伤害'+
-			'<li>牧师：回复一点体力'+
-			'<li>战士：获得一点护甲（不能超过3点）'+
+			'<li>法师：对一名随从造成1点火焰伤害'+
+			'<li>牧师：回复1点体力'+
+			'<li>战士：获得1点护甲（不能超过3点）'+
 			'<li>术士：牌库中摸两张牌'+
 			'<li>潜行者：装备一把武器和一个随机非武器装备'+
 			'<li>圣骑士：召唤一名士兵'+
-			'<li>猎人：对敌方主将造成一点伤害'+
+			'<li>猎人：对敌方主将造成1点伤害'+
 			'<li>德鲁伊：视为使用一张不计入出杀次数的杀</ul>'+
 			'<div style="margin:10px">怒气值</div><ul style="margin-top:0"><li>每当友方随从受到伤害获得3点怒气值，主将受到伤害获得6点怒气值'+
 			'<li>每有一个友方随从死亡，获得10点怒气值，主将死亡获得20点怒气值'+

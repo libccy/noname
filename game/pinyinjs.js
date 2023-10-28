@@ -38,6 +38,8 @@ var pinyin_dict_polyphone = {
 	"马日磾": " mì dī",
 	
 	"凯撒": " sà",
+	"梼杌": "táo ",
+	"地藏王": "dì zàng wáng",
 	
 	"乐无异": "yuè ",
 	"端蒙": " méng",
@@ -123,6 +125,7 @@ var pinyin_dict_polyphone = {
 	"度势": "duó ",
 	"诛綝": " chēn",
 	"大喝": "dà hè",
+	"暴喝": "bào hè",
 	"曲误": "qǔ ",
 	"媛丽": "yuán lì",
 	"调归": "diào ",
@@ -141,6 +144,7 @@ var pinyin_dict_polyphone = {
 	"膴仕": "wǔ ",
 	
 	"蒙斥": "méng ",
+	"奈落": " luò",
 	
 	"乐动": "yuè ",
 	"血凰": "xuè ",
@@ -41586,7 +41590,7 @@ var pinyin_dict_withtone = "yī,dīng zhēng,kǎo qiǎo yú,qī,shàng,xià,hǎn
 			temp = '';
 			for (var j = 0; j < max && (i + j) < chinese.length; j++) {
 				if (!dict.withtone[chinese[i]]) {
-					i+=(result[i].length-1);
+					i+=(result[m].length-1);
 					break;
 				} // 如果碰到非汉字直接停止本次查找
 				temp += chinese[i + j];

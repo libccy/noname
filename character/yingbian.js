@@ -2592,10 +2592,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player!=event.player&&event.num<event.player.hp;
 				},
 				check:function(event,player){
-					if(get.attitude(player,event.player)>-2) return false;
-					if(player.hp>2) return true;
-					if(player.hp==2&&event.player.hp<3) return false;
-					return player.hp>1;
+					if(event.player.hasSkillTag('nodamage')) return false;
+					let tj = player.countCards('hs', function (card) {
+							return get.name(card) === 'tao' || get.name(card) === 'jiu';
+						}),
+						att = get.attitude(_status.event.player, event.player),
+						eff = get.damageEffect(event.player, player, _status.event.player, get.natureList(event)),
+						fd = event.player.hasSkillTag('filterDamage', null, {
+							player: player,
+							card: event.card
+						}),
+						hp = player.hp + tj;
+					if(player.storage.tairan2) hp -= player.storage.tairan2;
+					if(eff <= 0 || fd || att >= -2 || Math.abs(hp) <= 1) return false;
+					if(hp > 2 || eff > 0 && event.player.isLinked() && event.hasNature()) return true;
+					return !event.player.countCards('hs') || event.player.hp > 2 * event.num && !event.player.hasSkillTag('maixie');
 				},
 				logTarget:'player',
 				content:function(){
@@ -2604,6 +2615,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.yimie_num=trigger.player.hp-trigger.num;
 					trigger.num=trigger.player.hp;
 				},
+				ai:{
+					damageBonus:true,
+					skillTagFilter:function(player,tag,arg){
+						return arg && arg.target && arg.target.hp > 1 && player.hp > 1 && get.attitude(player, arg.target) < -2;
+					}
+				}
 			},
 			yimie2:{
 				trigger:{player:'damageEnd'},
@@ -2872,7 +2889,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					target.chooseToUse({
 						preTarget:event.target2,
-						prompt:'请对'+get.translation(event.target2)+'使用一张【杀】，或受到来自'+get.translation(player)+'的一点伤害',
+						prompt:'请对'+get.translation(event.target2)+'使用一张【杀】，或受到来自'+get.translation(player)+'的1点伤害',
 						filterCard:function(card,player){
 							return get.name(card)=='sha'&&lib.filter.filterCard.apply(this,arguments);
 						},
@@ -3389,7 +3406,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.removeMark('xijue',1);
 						var nono=(get.damageEffect(trigger.player,player,trigger.player)>=0);
-						trigger.player.chooseToDiscard('he','弃置一张装备牌并令'+get.translation(player)+'摸一张牌，或受到一点伤害',{type:'equip'}).set('ai',function(card){
+						trigger.player.chooseToDiscard('he','弃置一张装备牌并令'+get.translation(player)+'摸一张牌，或受到1点伤害',{type:'equip'}).set('ai',function(card){
 							if(_status.event.nono){
 								return 0;
 							}
@@ -3711,7 +3728,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			weiguan:'卫瓘',
 			zhongyun:'忠允',
 			zhongyun2:'忠允',
-			zhongyun_info:'锁定技。每名角色的回合限一次，你受伤/回复体力后，若你的体力值与手牌数相等，你回复一点体力或对你攻击范围内的一名角色造成1点伤害；每名角色的回合限一次，你获得手牌或失去手牌后，若你的体力值与手牌数相等，你摸一张牌或弃置一名其他角色一张牌。',
+			zhongyun_info:'锁定技。每名角色的回合限一次，你受伤/回复体力后，若你的体力值与手牌数相等，你回复1点体力或对你攻击范围内的一名角色造成1点伤害；每名角色的回合限一次，你获得手牌或失去手牌后，若你的体力值与手牌数相等，你摸一张牌或弃置一名其他角色一张牌。',
 			shenpin:'神品',
 			shenpin_info:'当一名角色的判定牌生效前，你可以打出一张与判定牌颜色不同的牌代替之。',
 			zhongyan:'钟琰',

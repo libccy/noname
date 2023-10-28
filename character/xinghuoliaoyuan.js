@@ -1379,7 +1379,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						player.logSkill('xinfu_xunxian',result.targets[0]);
-						result.targets[0].gain(list,'gain2');
+						result.targets[0].gain(list,'gain2').giver=player;
 					}
 				},
 				ai:{
@@ -1592,7 +1592,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_zhanji":"展骥",
 			"xinfu_zhanji_info":"锁定技。你的出牌阶段内，当你因摸牌且不是因为此技能效果而得到牌后，你摸一张牌。",
 			"xinfu_songsang":"送丧",
-			"xinfu_songsang_info":"限定技，其他角色死亡时，你可以回复一点体力（若你未受伤，则改为加一点体力上限）；然后获得技能〖展骥〗。",
+			"xinfu_songsang_info":"限定技，其他角色死亡时，你可以回复1点体力（若你未受伤，则改为加1点体力上限）；然后获得技能〖展骥〗。",
 			"xinfu_jixu":"击虚",
 			"xinfu_jixu_info":"出牌阶段限一次，若你有手牌，你可以令任意名体力值相等的其他角色猜测你的手牌中是否有【杀】。然后，你摸X张牌（X为猜错的角色数）。若你有【杀】，则你本回合内使用【杀】时，所有这些角色均成为【杀】的目标；若你没有【杀】，则你弃置所有这些角色的各一张牌。若X为零，你结束出牌阶段。",
 			"jixu_sha":"击虚",

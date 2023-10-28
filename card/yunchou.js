@@ -268,7 +268,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target.countCards('h')>0&&game.hasPlayer(function(current){
 						return target.canCompare(current);
 					});
-					return ui.selected.targets[0].canCompare(target);
+					//return ui.selected.targets[0].canCompare(target);
 				},
 				filterAddedTarget:function(card,player,target,preTarget){
 					return target!=player&&preTarget.canCompare(target);
@@ -441,7 +441,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event.source.storage.youdishenru=player;
 					event.source.addSkill('youdishenru');
 					'step 1'
-					var next=event.source.chooseToUse({name:'sha'},player,-1,'对'+get.translation(player)+'使用一张杀，或受到一点伤害').set('addCount',false);
+					var next=event.source.chooseToUse({name:'sha'},player,-1,'对'+get.translation(player)+'使用一张杀，或受到1点伤害').set('addCount',false);
 					next.ai2=function(){
 						return 1;
 					};
@@ -903,35 +903,35 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		translate:{
 			diaobingqianjiang:'调兵遣将',
-			diaobingqianjiang_info:'出牌阶段，对你及其他有手牌的角色使用。你摸一张牌，然后亮出牌堆顶的X张牌（X为存活角色数的一半，向上取整），目标可以用一张手牌替换其中的一张牌。结算后，你可以将剩余的牌中的任意张以任意顺序置于牌堆顶',
+			diaobingqianjiang_info:'出牌阶段，对你及其他有手牌的角色使用。你摸一张牌，然后亮出牌堆顶的X张牌（X为存活角色数的一半，向上取整），目标可以用一张手牌替换其中的一张牌。结算后，你可以将剩余的牌中的任意张以任意顺序置于牌堆顶。',
 			caochuanjiejian:'草船借箭',
-			caochuanjiejian_info:'出牌阶段对一名有手牌的其他角色使用，目标选择一项：将手牌中的所有杀（至少1张）交给你，并视为对你使用一张杀；或展示手牌并令你弃置任意张',
+			caochuanjiejian_info:'出牌阶段对一名有手牌的其他角色使用，目标选择一项：将手牌中的所有杀（至少1张）交给你，并视为对你使用一张杀；或展示手牌并令你弃置任意张。',
 			// xiaolicangdao:'笑里藏刀',
-			// xiaolicangdao_info:'出牌阶段，对一名其他角色使用。你将此【笑里藏刀】交给目标，然后弃置其一张手牌，若这两张牌牌名相同，你对其造成1点伤害',
+			// xiaolicangdao_info:'出牌阶段，对一名其他角色使用。你将此【笑里藏刀】交给目标，然后弃置其一张手牌，若这两张牌牌名相同，你对其造成1点伤害。',
 			shezhanqunru:'舌战群儒',
-			shezhanqunru_info:'出牌阶段，对你使用。你请求所有有手牌的其他角色响应，然后同时与响应的角色拼点。若有角色响应且结果中你赢的次数更多，或若没有角色响应，你摸三张牌',
+			shezhanqunru_info:'出牌阶段，对你使用。你请求所有有手牌的其他角色响应，然后同时与响应的角色拼点。若有角色响应且结果中你赢的次数更多，或若没有角色响应，你摸三张牌。',
 			youdishenru:'诱敌深入',
-			youdishenru_info:'当以你为目标的【杀】生效前，对此【杀】使用。抵消此【杀】，然后此【杀】的使用者需对你使用【杀】（在此【杀】结算结束之后，若此【杀】未对你造成伤害，其重复此流程），否则受到你造成的1点伤害',
+			youdishenru_info:'当以你为目标的【杀】生效前，对此【杀】使用。抵消此【杀】，然后此【杀】的使用者需对你使用【杀】（在此【杀】结算结束之后，若此【杀】未对你造成伤害，其重复此流程），否则受到你造成的1点伤害。',
 			suolianjia:'锁链甲',
-			suolianjia_info:'锁定技，你防止即将受到的属性伤害，当装备时进入连环状态，当卸下时解除连环状态',
+			suolianjia_info:'锁定技，你防止即将受到的属性伤害，当装备时进入连环状态，当卸下时解除连环状态。',
 			suolianjia_bg:'链',
 			geanguanhuo:'隔岸观火',
-			geanguanhuo_info:'出牌阶段对一名其他角色使用，令目标与一名你指定的另一名角色拼点，赢的角色获得对方的一张牌；若点数相同，目标可弃置你一张牌（存活角色不超过2时可重铸）',
+			geanguanhuo_info:'出牌阶段对一名其他角色使用，令目标与一名你指定的另一名角色拼点，赢的角色获得对方的一张牌；若点数相同，目标可弃置你一张牌（存活角色不超过2时可重铸）。',
 			toulianghuanzhu:'偷梁换柱',
-			toulianghuanzhu_info:'出牌阶段对一名其他角色使用，你观看其手牌，然后可以用一张手牌替牌其中的一张；若两张牌颜色相同，你摸一张牌',
+			toulianghuanzhu_info:'出牌阶段对一名其他角色使用，你观看其手牌，然后可以用一张手牌替牌其中的一张；若两张牌颜色相同，你摸一张牌。',
 			toulianghuanzhu_bg:'柱',
 			fudichouxin:'釜底抽薪',
-			fudichouxin_info:'与一名角色进行拼点，若成功则获得双方拼点牌',
+			fudichouxin_info:'与一名角色进行拼点，若成功则获得双方拼点牌。',
 			shuiyanqijun:'水攻',
-			shuiyanqijun_info:'令所有有装备的角色各弃置一张装备牌',
+			shuiyanqijun_info:'令所有有装备的角色各弃置一张装备牌。',
 			wangmeizhike:'望梅止渴',
-			wangmeizhike_info:'出牌阶段对一名角色使用，若没有角色体力比目标少，目标回复一点体力；若没有角色手牌比目标少，目标摸两张牌（若因此牌回复了体力则改为摸一张）',
+			wangmeizhike_info:'出牌阶段对一名角色使用，若没有角色体力比目标少，目标回复1点体力；若没有角色手牌比目标少，目标摸两张牌（若因此牌回复了体力则改为摸一张）。',
 			chenhuodajie:'趁火打劫',
-			chenhuodajie_info:'任意一名其他角色受到伤害时对其使用，获得其一张牌',
+			chenhuodajie_info:'任意一名其他角色受到伤害时对其使用，获得其一张牌。',
 			huoshan:'火山',
 			huoshan_info:'出牌阶段，对自己使用。若判定结果为红桃2~9，则目标角色受到2点火焰伤害，距离目标1以内的其他角色受到1点火焰伤害。若判定不为红桃2~9，将之移动到下家的判定区里。',
 			hongshui:'洪水',
-			hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置3张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去一点体力',
+			hongshui_info:'出牌阶段，对自己使用。若判定结果为梅花2~9，该角色随机弃置三张牌，距离该角色为X的角色随机弃置3-X张牌，若没有牌则失去1点体力。',
 		},
 		list:[
 			['heart',6,'huoshan','fire'],

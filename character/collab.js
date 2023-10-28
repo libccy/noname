@@ -1156,8 +1156,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						player:function(card,player,target){
-							if(ui.selected.targets.length) return;
-							if(player!=target&&get.type2(card)=='trick') return [1,0,1,-2];
+							if(player!==target&&get.type2(card)==='trick'){
+								let tars=[target];
+								if(ui.selected.targets.length) tars.addArray(ui.selected.targets.filter(i=>i!==player&&i!==target));
+								if(tars.length<2) return [1,0,1,-2];
+								return [1,0,1,-2/tars.length];
+							}
 						},
 					},
 				},
@@ -1584,7 +1588,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsitian_info:'出牌阶段，你可以弃置两张颜色不同的手牌。系统从所有天气中随机选择两个，你观看这些天气并选择一个执行。<br><li>烈日：你对其他角色依次造成1点火属性伤害。<br><li>雷电：你令其他角色各进行一次判定。若结果为♠2~9，则其受到3点无来源雷属性伤害。<br><li>大浪：你弃置其他角色装备区内的所有牌（装备区内没有牌的角色改为失去1点体力）。<br><li>暴雨：你弃置一名角色的所有手牌。若其没有手牌，则改为令其失去1点体力。<br><li>大雾：你令所有其他角色获得如下效果：当其使用下一张锦囊牌时，取消之。',
 			sunyang:'孙杨',
 			clbshuijian:'水箭',
-			clbshuijian_info:'摸牌阶段开始时，你可以令额定摸牌数+X（X为你装备区内牌数的一半+1，且向下取整）',
+			clbshuijian_info:'摸牌阶段开始时，你可以令额定摸牌数+X（X为你装备区内牌数的一半+1，且向下取整）。',
 			yeshiwen:'叶诗文',
 			clbjisu:'急速',
 			clbjisu_info:'判定阶段开始前，你可以跳过本回合的判定阶段和摸牌阶段，视为对一名其他角色使用一张【杀】。',
