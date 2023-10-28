@@ -1660,7 +1660,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<game.players.length;i++){
 						if(!game.players[i].node.name_seat){
-							game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate['unknown'+get.distance(_status.firstAct,game.players[i],'absolute')]),game.players[i]);
+							game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(get.seatTranslation(_status.firstAct,game.players[i],'absolute')),game.players[i]);
 							game.players[i].node.name_seat.style.opacity=1;
 						}
 					}
