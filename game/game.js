@@ -8395,9 +8395,10 @@
 
 					var that=this;
 					this.timeout=setTimeout(function(){
-						if(!that.destroyed){
+						if(!that._selfDestroyed){
 							position.appendChild(that);
 						}
+						else that.remove();
 						that.classList.remove('removing');
 						delete that.destiny;
 					},time);
@@ -12745,6 +12746,7 @@
 						return;
 					}
 					if(card.willBeDestroyed('equip',player,event)){
+						card.selfDestroy(event);
 						event.finish();
 						return;
 					}
@@ -13719,7 +13721,7 @@
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('discardPile',null,event)){
-							cards[i].remove();
+							cards[i].selfDestroy(event);
 							continue;
 						}
 						if(get.position(cards[i],true)=='c') withPile=true;
@@ -13739,7 +13741,7 @@
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('ordering',null,event)){
-							cards[i].remove();
+							cards[i].selfDestroy(event);
 							continue;
 						}
 						if(get.position(cards[i],true)=='c') withPile=true;
@@ -13762,7 +13764,7 @@
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('special',null,event)){
-							cards[i].remove();
+							cards[i].selfDestroy(event);
 							continue;
 						}
 						if(get.position(cards[i],true)=='c') withPile=true;
@@ -19264,6 +19266,7 @@
 					"step 1"
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('handcard',player,event)){
+							cards[i].selfDestroy(event);
 							cards.splice(i--,1);
 						}
 						else if(event.losing_map){
@@ -19458,6 +19461,7 @@
 					"step 1"
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('expansion',player,event)){
+							cards[i].selfDestroy(event);
 							cards.splice(i--,1);
 						}
 						else if(event.losing_map){
@@ -19680,8 +19684,7 @@
 						}
 						else if(cards[i].hasOwnProperty('destroyed')){
 							if(event.getlx!==false&&event.position&&cards[i].willBeDestroyed(event.position.id,null,event)){
-								cards[i].delete();
-								continue;
+								cards[i].selfDestroy(event);
 							}
 						}
 						else if(info.destroy){
@@ -20348,6 +20351,7 @@
 					}
 					"step 1"
 					if(cards[0].willBeDestroyed('judge',player,event)){
+						cards[0].selfDestroy(event);
 						event.finish();
 						return;
 					}
@@ -29980,6 +29984,17 @@
 				buildIntro(noclick){
 					if(!noclick) lib.setIntro(this);
 				}
+				//执行销毁一张牌的钩子函数
+				selfDestroy(event){
+					if(this._selfDestroyed) return;
+					this._selfDestroyed=true;
+					this.fix();
+					this.delete();
+					const info=get.info(this,false);
+					if(!info) return;
+					if(info.destroyLog!==false) game.log(this,'被销毁了');
+					if(info.onDestroy) info.onDestroy(this,event);
+				}
 				//判断一张牌进入某个区域后是否会被销毁
 				willBeDestroyed(targetPosition,player,event){
 					const destroyed=this.destroyed;
@@ -30141,6 +30156,10 @@
 					this.suit=card[0];
 					this.number=parseInt(card[1])||0;
 					this.name=card[2];
+
+					if(info.destroy&&(typeof info.destroy!='boolean'&&!lib.skill[info.destroy])){
+						this.destroyed=info.destroy;
+					}
 
 					if(_status.connectMode&&!game.online&&lib.cardOL&&!this.cardid){
 						this.cardid=get.id();
@@ -30608,9 +30627,6 @@
 					if(this._uncheck.length==0) this.classList.remove('uncheck');
 				}
 				discard(bool){
-					if(!this.willBeDestroyed('discardPile',null,event)){
-						ui.discardPile.appendChild(this);
-					}
 					this.fix();
 					this.classList.remove('glow');
 					if(bool===false){
@@ -36384,7 +36400,7 @@
 			const pile=ui.cardPile;
 			for(let i=0;i<cards.length;i++){
 				if(cards[i].willBeDestroyed('cardPile',null,event)){
-					cards[i].remove();
+					cards[i].selfDestroy(event);
 					continue;
 				}
 				if(event.insert_index){

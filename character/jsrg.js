@@ -77,7 +77,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(typeof count!='number') count=1;
 					while(count--){
 						let card=game.createCard('ying','spade',1);
-						card.destroyed='discardPile';
 						cards.push(card);
 					}
 					return cards;
