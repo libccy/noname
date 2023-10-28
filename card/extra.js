@@ -242,6 +242,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:function(player,target){
 							if(target.hasSkill('huogong2')||target.countCards('h')==0) return 0;
 							if(player.countCards('h')<=1) return 0;
+							if(_status.event.player == player){
+								if(target.isAllCardsKnown(player)){
+									if(!target.countCards('h',card=>{
+										return player.countCards('h',card2=>{
+											return get.suit(card2) == get.suit(card);
+										});
+									})){
+										return 0;
+									}
+								}
+							}
 							if(target==player){
 								if(typeof _status.event.filterCard=='function'&&
 									_status.event.filterCard({name:'huogong'},player,_status.event)){
