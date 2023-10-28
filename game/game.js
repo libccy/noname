@@ -622,8 +622,8 @@
 				['tao',3]
 			]),
 			effect:new Map([
-				['sha',event=>{
-					if(event.step!=1) return;
+				['sha',(event,option)=>{
+					if(event.step!=0||option.state!='end') return;
 					game.log(event.player,'触发了强化效果');
 					game.log(event.card,'抵消所需要的',new lib.element.VCard({
 						name:'shan'
@@ -636,8 +636,8 @@
 						else map[id].shanRequired=2;
 					});
 				}],
-				['shan',event=>{
-					if(event.step!=1) return;
+				['shan',(event,option)=>{
+					if(event.step!=0||option.state!='end') return;
 					game.log(event.player,'触发了强化效果');
 					game.log('使用',event.card,'时视为两张',new lib.element.VCard({
 						name:'shan'
@@ -646,8 +646,8 @@
 						trigger.getParent(2).decrease('shanRequired',1);
 					});
 				}],
-				['juedou',event=>{
-					if(event.step!=1) return;
+				['juedou',(event,option)=>{
+					if(event.step!=0||option.state!='end') return;
 					game.log(event.player,'触发了强化效果');
 					game.log('对',event.card,'的目标造成伤害时，伤害+1');
 					event.player.when({
@@ -656,14 +656,14 @@
 						trigger.increase('num');
 					});
 				}],
-				['huogong',event=>{
-					if(event.step!=1) return;
+				['huogong',(event,option)=>{
+					if(event.step!=0||option.state!='end') return;
 					game.log(event.player,'触发了强化效果');
 					game.log(event.card,'造成的伤害+1');
 					event.increase('baseDamage',1);
 				}],
-				['tao',event=>{
-					if(event.step!=1) return;
+				['tao',(event,option)=>{
+					if(event.step!=0||option.state!='end') return;
 					game.log(event.player,'触发了强化效果');
 					game.log(event.card,'回复的体力+1');
 					event.increase('baseDamage',1);
@@ -30963,17 +30963,17 @@
 					return this;
 				}
 				/**
-				 * @param {Parameters<typeof this.hasHandler>[0]} [type]
-				 * @param {GameEvent} [event]
+				 * @param {Parameters<typeof this.hasHandler>[0]} type
+				 * @param {GameEvent} event
+				 * @param {{
+				 * state?: 'begin' | 'end';
+				 * }} option
 				 * @returns {this}
 				 */
-				callHandler(type,event){
-					if(this.hasHandler(type)){
-						if(!event) event=this;
-						this.getHandler(type).forEach(handler=>{
-							if(typeof handler=='function') handler(event);
-						});
-					}
+				callHandler(type,event,option){
+					if(this.hasHandler(type)) this.getHandler(type).forEach(handler=>{
+						if(typeof handler=='function') handler(event,option);
+					});
 					return this;
 				}
 				getDefaultHandlerType(){
@@ -30982,7 +30982,9 @@
 				}
 				/**
 				 * @param {Parameters<typeof this.hasHandler>[0]} [type]
-				 * @returns {((event: GameEvent) => void)[]}
+				 * @returns {((event: GameEvent, option: {
+				 * state?: 'begin' | 'end';
+				 * }) => void)[]}
 				 */
 				getHandler(type){
 					if(!type) type=this.getDefaultHandlerType();
@@ -31000,13 +31002,17 @@
 				}
 				/**
 				 * @overload
-				 * @param {...((event: GameEvent) => void)[]} handlers
+				 * @param {...((event: GameEvent, option: {
+				 * state?: 'begin' | 'end';
+				 * }) => void)[]} handlers
 				 * @returns {number}
 				 */
 				/**
 				 * @overload
 				 * @param {Parameters<typeof this.hasHandler>[0]} type
-				 * @param {...((event: GameEvent) => void)[]} handlers
+				 * @param {...((event: GameEvent, option: {
+				 * state?: 'begin' | 'end';
+				 * }) => void)[]} handlers
 				 * @returns {number}
 				 */
 				pushHandler(type){
@@ -33084,8 +33090,8 @@
 					player.changeFury(-stratagemBuff.cost.get(cardName),true);
 					const gameEvent=get.event(),effect=stratagemBuff.effect.get(cardName);
 					if(typeof effect=='function') gameEvent.pushHandler('onNextUseCard',effect);
-					gameEvent.pushHandler('onNextUseCard',event=>{
-						if(event.step==1) game.broadcastAll(cards=>cards.forEach(card=>card.clone.classList.add('stratagem-fury-glow')),event.cards);
+					gameEvent.pushHandler('onNextUseCard',(event,option)=>{
+						if(event.step==0&&option.state=='end') game.broadcastAll(cards=>cards.forEach(card=>card.clone.classList.add('stratagem-fury-glow')),event.cards);
 					});
 				},
 				ai:{
@@ -40887,7 +40893,9 @@
 						}*/
 					}
 					else{
-						event.callHandler();
+						event.callHandler(event.getDefaultHandlerType(),event,{
+							state:'begin'
+						});
 						if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){
 							game.broadcastAll(function(){
 								while(_status.dieClose.length){
@@ -40982,8 +40990,10 @@
 							}
 						}
 						event.clearStepCache();
+						event.callHandler(event.getDefaultHandlerType(),event,{
+							state:'end'
+						});
 						event.step++;
-						if(event.finished) event.callHandler();
 					}
 				}
 			}
