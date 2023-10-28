@@ -22078,31 +22078,11 @@
 					}
 					var skills=info[3].slice(0);
 					this.clearSkills(true);
-					this.classList.add('fullskin');
-					if(!game.minskin&&get.is.newLayout()&&!info[4].contains('minskin')){
-						this.classList.remove('minskin');
-						this.node.avatar.setBackground(character,'character');
-					}
-					else{
-						this.node.avatar.setBackground(character,'character');
-						if(info[4].contains('minskin')){
-							this.classList.add('minskin');
-						}
-						else if(game.minskin){
-							this.classList.add('minskin');
-						}
-						else{
-							this.classList.remove('minskin');
-						}
-					}
 
 					var hp1=get.infoHp(info[2]);
 					var maxHp1=get.infoMaxHp(info[2]);
 					var hujia1=get.infoHujia(info[2]);
 					
-					this.node.avatar.show();
-					this.node.count.show();
-					this.node.equips.show();
 					this.name=character;
 					this.name1=character;
 					this.sex=info[0];
@@ -22121,14 +22101,8 @@
 						if(!this.hiddenSkills) this.hiddenSkills=[];
 						this.hiddenSkills.addArray(skills);
 						skills=[];
-						this.classList.add(_status.video?'unseen_v':'unseen');
 						this.name='unknown';
-						if(!this.node.name_seat&&!_status.video){
-							this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(get.translation(this.name)),this);
-							this.node.name_seat.dataset.nature=get.groupnature(this.group);
-						}
 						this.sex='male';
-						//this.group='unknown';
 						this.storage.nohp=true;
 						skills.add('g_hidden_ai');
 					}
@@ -22140,10 +22114,7 @@
 						if(!info2[4]){
 							info2[4]=[];
 						}
-						this.classList.add('fullskin2');
-						this.node.avatar2.setBackground(character2,'character');
 
-						this.node.avatar2.show();
 						this.name2=character2;
 						var hp2=get.infoHp(info2[2]);
 						var maxHp2=get.infoMaxHp(info2[2]);
@@ -22183,17 +22154,13 @@
 								this.hp=hp1+hp2-3;
 							};
 						}
-						this.node.count.classList.add('p2');
 						if(info2[4].contains('hiddenSkill')&&!this.noclick){
 							if(!this.hiddenSkills) this.hiddenSkills=[];
 							this.hiddenSkills.addArray(info2[3]);
-							this.classList.add(_status.video?'unseen2_v':'unseen2');
 							this.storage.nohp=true;
 							skills.add('g_hidden_ai');
 						}
 						else skills=skills.concat(info2[3]);
-
-						this.node.name2.innerHTML=get.slimName(character2);
 					}
 					if(this.storage.nohp){
 						this.storage.rawHp=this.hp;
@@ -22214,6 +22181,9 @@
 						this.checkConflict();
 					}
 					lib.group.add(this.group);
+
+					this.$init(character,character2);
+
 					if(this.inits){
 						for(var i=0;i<this.inits.length;i++){
 							this.inits[i](this);
@@ -22225,6 +22195,76 @@
 						}
 					}
 					if(update!==false) this.$update();
+					return this;
+				}
+				$init(character,character2){
+					this.classList.add('fullskin');
+					var info=lib.character[character];
+					if(!info){
+						info=['','',1,[],[]];
+					}
+					if(!info[4]){
+						info[4]=[];
+					}
+
+					if(!game.minskin&&get.is.newLayout()&&!info[4].contains('minskin')){
+						this.classList.remove('minskin');
+						this.node.avatar.setBackground(character,'character');
+					}
+					else{
+						this.node.avatar.setBackground(character,'character');
+						if(info[4].contains('minskin')){
+							this.classList.add('minskin');
+						}
+						else if(game.minskin){
+							this.classList.add('minskin');
+						}
+						else{
+							this.classList.remove('minskin');
+						}
+					}
+					
+					this.node.avatar.show();
+					this.node.count.show();
+					this.node.equips.show();
+					
+					this.node.intro.innerHTML=lib.config.intro;
+					this.node.name.dataset.nature=get.groupnature(this.group);
+					lib.setIntro(this);
+					this.node.name.innerHTML=get.slimName(character);
+					if(this.classList.contains('minskin')&&this.node.name.querySelectorAll('br').length>=4){
+						this.node.name.classList.add('long');
+					}
+					if(info[4].contains('hiddenSkill')&&!this.noclick){
+						this.classList.add(_status.video?'unseen_v':'unseen');
+						if(!this.node.name_seat&&!_status.video){
+							this.node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(get.translation(this.name)),this);
+							this.node.name_seat.dataset.nature=get.groupnature(this.group);
+						}
+					}
+					if(character2&&lib.character[character2]){
+						var info2=lib.character[character2];
+						if(!info2){
+							info2=['','',1,[],[]];
+						}
+						if(!info2[4]){
+							info2[4]=[];
+						}
+						this.classList.add('fullskin2');
+						this.node.avatar2.setBackground(character2,'character');
+						this.node.avatar2.show();
+						this.name2=character2;
+
+						this.node.count.classList.add('p2');
+						if(info2[4].contains('hiddenSkill')&&!this.noclick){
+							this.classList.add(_status.video?'unseen2_v':'unseen2');
+						}
+						this.node.name2.innerHTML=get.slimName(character2);
+					}
+					if(this.storage.nohp){
+						this.node.hp.hide();
+					}
+					
 					return this;
 				}
 				initOL(name,character){
@@ -22317,35 +22357,21 @@
 				reinit(from,to,maxHp,online){
 					var info1=lib.character[from];
 					var info2=lib.character[to];
-					var smooth=true;
+					var smooth=true,replaced=null;
 					if(maxHp=='nosmooth'){
 						smooth=false;
 						maxHp=null;
 					}
 					if(this.name2==from){
 						this.name2=to;
-						if(this.isUnseen(0)&&!this.isUnseen(1)){
-							this.sex=info2[0];
-							this.name=to;
-						}
-						if(smooth) this.smoothAvatar(true);
-						this.node.avatar2.setBackground(to,'character');
-						this.node.name2.innerHTML=get.slimName(to);
 					}
 					else if(this.name==from||this.name1==from){
 						if(this.name1==from){
 							this.name1=to;
 						}
-						if(!this.classList.contains('unseen2')){
+						if(!this.isUnseen(1)){
 							this.name=to;
 							this.sex=info2[0];
-						}
-						if(smooth) this.smoothAvatar(false);
-						this.node.avatar.setBackground(to,'character');
-						this.node.name.innerHTML=get.slimName(to);
-
-						if(this==game.me&&ui.fakeme){
-							ui.fakeme.style.backgroundImage=this.node.avatar.style.backgroundImage;
 						}
 					}
 					else{
@@ -22409,11 +22435,75 @@
 						hp:this.maxHp,
 						avatar2:this.name2==to
 					});
+
+					this.$reinit(from,to,maxHp,online);
 					this.update();
+				}
+				$reinit(from,to,maxHp,online){
+					var smooth=true;
+					if(maxHp=='nosmooth'){
+						smooth=false;
+						maxHp=null;
+					}
+					if(this.name2==to){
+						if(smooth) this.smoothAvatar(true);
+						this.node.avatar2.setBackground(to,'character');
+						this.node.name2.innerHTML=get.slimName(to);
+					}
+					else if(this.name==to||this.name1==to){
+						if(smooth) this.smoothAvatar(false);
+						this.node.avatar.setBackground(to,'character');
+						this.node.name.innerHTML=get.slimName(to);
+
+						if(this==game.me&&ui.fakeme){
+							ui.fakeme.style.backgroundImage=this.node.avatar.style.backgroundImage;
+						}
+					}
 				}
 				uninit(){
 					this.expandedSlots={};
 					this.disabledSlots={};
+					
+					delete this.name;
+					delete this.name1;
+					delete this.sex;
+					delete this.group;
+					delete this.hp;
+					delete this.maxHp;
+					delete this.hujia;
+					this.clearSkills(true);
+					
+					if(this.name2){
+						delete this.singleHp;
+						delete this.name2;
+					}
+					for(var mark in this.marks){
+						this.marks[mark].remove();
+					}
+					ui.updatem(this);
+
+					this.skipList=[];
+					this.skills=this.skills.filter(skill=>{
+						return lib.skill[skill]&&lib.skill[skill].superCharlotte;
+					});
+					this.initedSkills=[];
+					this.additionalSkills={};
+					this.disabledSkills={};
+					this.hiddenSkills=[];
+					this.awakenedSkills=[];
+					this.forbiddenSkills={};
+					this.phaseNumber=0;
+					this.stat=[{card:{},skill:{}}];
+					this.tempSkills={};
+					this.storage={};
+					this.marks={};
+					this.ai={friend:[],enemy:[],neutral:[]};
+
+					this.$uninit();
+
+					return this;
+				}
+				$uninit(){
 					this.$syncDisable();
 					if(this.isDisabledJudge()){
 						game.broadcastAll(function(player){
@@ -22435,51 +22525,25 @@
 						this.node.name_seat.remove();
 						delete this.node.name_seat;
 					}
-					if(this.storage.nohp) this.node.hp.show();
+					this.node.hp.show();
 					this.classList.remove('unseen');
 					this.classList.remove('unseen2');
-					delete this.name;
-					delete this.name1;
-					delete this.sex;
-					delete this.group;
-					delete this.hp;
-					delete this.maxHp;
-					delete this.hujia;
-					this.clearSkills(true);
+
 					this.node.identity.style.backgroundColor='';
 					this.node.intro.innerHTML='';
 					this.node.name.innerHTML='';
 					this.node.hp.innerHTML='';
 					this.node.count.innerHTML='0';
-					if(this.name2){
-						delete this.singleHp;
-						this.node.avatar2.hide();
-						this.node.name2.innerHTML='';
-						this.classList.remove('fullskin2')
-						delete this.name2;
-						this.node.count.classList.remove('p2');
-					}
+					
+					this.node.avatar2.hide();
+					this.node.name2.innerHTML='';
+					this.classList.remove('fullskin2');
+					this.node.count.classList.remove('p2');
+
 					for(var mark in this.marks){
 						this.marks[mark].remove();
 					}
 					ui.updatem(this);
-
-					this.skipList=[];
-					this.skills=this.skills.contains('cangji_yozuru')?['cangji_yozuru']:[];
-					this.initedSkills=[];
-					this.additionalSkills={};
-					this.disabledSkills={};
-					this.hiddenSkills=[];
-					this.awakenedSkills=[];
-					this.forbiddenSkills={};
-					this.phaseNumber=0;
-					this.stat=[{card:{},skill:{}}];
-					this.tempSkills={};
-					this.storage={};
-					this.marks={};
-					this.ai={friend:[],enemy:[],neutral:[]};
-
-					return this;
 				}
 				getLeft(){
 					return this.offsetLeft;
