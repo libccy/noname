@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'refresh',
 		characterSort:{
 			refresh:{
-				refresh_standard:["re_caocao","re_simayi","re_guojia","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong",'re_gongsunzan'],
+				refresh_standard:["re_caocao","re_simayi","re_guojia","re_zhangliao","re_xuzhu","re_xiahoudun","re_zhangfei","re_zhaoyun","re_guanyu","re_machao","re_zhouyu","re_lvmeng","re_ganning","re_luxun","re_daqiao","re_huanggai","re_lvbu","re_huatuo","re_liubei","re_diaochan","re_huangyueying","re_sunquan","re_sunshangxiang","re_zhenji","re_zhugeliang","re_huaxiong",'re_gongsunzan',"re_lidian","re_xushu"],
 				refresh_feng:['caoren','ol_xiahouyuan','ol_weiyan','ol_xiaoqiao','zhoutai','re_zhangjiao','xin_yuji','ol_huangzhong'],
 				refresh_huo:["ol_sp_zhugeliang","ol_xunyu","ol_dianwei","ol_yanwen","ol_pangtong","ol_yuanshao","ol_pangde","re_taishici"],
 				refresh_lin:['re_menghuo','ol_sunjian','re_caopi','ol_xuhuang','ol_dongzhuo','ol_zhurong','re_jiaxu','ol_lusu'],
@@ -20,6 +20,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
+			re_xushu:['male','shu',4,['zhuhai','qianxin']],
+			re_lidian:['male','wei',3,['xunxun','xinwangxi']],
 			re_zhongyao:['male','wei',3,['rehuomo','zuoding'],['clan:颍川钟氏']],
 			xin_zhangliang:['male','qun',4,['rejijun','refangtong'],['unseen']],
 			re_simalang:['male','wei',3,['requji','rejunbing'],['unseen']],
@@ -15279,8 +15281,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadexianzhen_info:'每回合限一次。出牌阶段，你可以和一名其他角色拼点。若你赢：本回合你无视该角色的防具，且对其使用牌没有次数和距离限制，且本回合对其使用牌造成伤害时，此伤害+1（每种牌名每回合限一次）；若你没赢：你本回合内不能使用【杀】，且【杀】不计入手牌上限。',
 			decadejinjiu:'禁酒',
 			decadejinjiu_info:'锁定技。你的【酒】的牌名均视为【杀】且点数视为K；你的回合内，其他角色不能使用【酒】。',
-			dc_xushu:'界徐庶',
-			dc_xushu_prefix:'界',
+			dc_xushu:'新杀徐庶',
+			dc_xushu_prefix:'新杀',
 			rezhuhai:'诛害',
 			rezhuhai_info:'其他角色的回合结束时，若其本回合内造成过伤害，则你可以选择一项：⒈将一张手牌当做【杀】对其使用。⒉视为对其使用一张【过河拆桥】。',
 			xsqianxin:'潜心',
@@ -15477,6 +15479,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_lingtong_prefix:'OL界',
 			olxuanfeng:'旋风',
 			olxuanfeng_info:'当你一次性失去至少两张牌后，或失去装备区的牌后，你可以依次弃置一至两名其他角色的共计两张牌。',
+			re_lidian:'界李典',
+			re_lidian_prefix:'界',
+			re_xushu:'界徐庶',
+			re_xushu_prefix:'界',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

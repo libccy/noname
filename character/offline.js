@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connectBanned:['zhangliang'],
 		characterSort:{
 			offline:{
-				offline_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei","old_machao","zhangliang","jsp_caoren"],
+				offline_star:['jsp_ganfuren',"sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei","old_machao","zhangliang","jsp_caoren"],
 				offline_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
 				offline_yijiang:['ol_xinxianying'],
 				offline_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
@@ -19,6 +19,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			jsp_ganfuren:['female','shu',3,['shushen','shenzhi'],['character:gz_ganfuren']],
 			ol_xinxianying:['female','wei',3,['xincaishi','xinzhongjian']],
 			zhangliang:["male","qun",4,["old_jijun","old_fangtong"]],
 			jsp_caoren:['male','wei',4,['kuiwei','yanzheng']],
@@ -6683,6 +6684,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_machao_prefix:'J.SP',
 			jsp_caoren:'☆SP曹仁',
 			jsp_caoren_prefix:'☆SP',
+			jsp_ganfuren:'☆SP甘夫人',
+			jsp_ganfuren_prefix:'☆SP',
 			zhangliang:'SP张梁',
 			zhangliang_prefix:'SP',
 			ol_xinxianying:'将辛宪英',

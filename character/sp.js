@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			sp:{
-				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ganfuren","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
+				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
 				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong','caoxi'],
 				sp_tianzhu:['niujin','hejin','hansui',"wutugu","yanbaihu","shamoke","panfeng","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
 				sp_nvshi:["lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu',"daxiaoqiao","jin_guohuai"],
@@ -182,7 +182,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kanze:['male','wu',3,['xiashu','kuanshi']],
 			heqi:['male','wu',4,['olqizhou','olshanxi']],
 
-			ganfuren:['female','shu',3,['shushen','shenzhi']],
 			//mifuren:['female','shu',3,['guixiu','cunsi']],
 			yuejin:['male','wei',4,['xiaoguo']],
 			sp_dongzhuo:['male','qun',5,['hengzheng']],
@@ -11258,13 +11257,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//邓芝
 			olxiuhao:{
 				audio:2,
-				trigger:{
-					player:'damageBegin4',
-					source:'damageBegin2',
-				},
+				trigger:{global:'damageBegin4'},
 				usable:1,
 				filter:function(event,player){
-					return event.source&&event.source.isIn()&&event.source!=event.player;
+					return event.source&&event.source.isIn()&&[event.source,event.player].contains(player)&&event.source!=event.player;
 				},
 				logTarget:function(event,player){
 					return player==event.player?event.source:event.player;
@@ -25263,7 +25259,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuantanyuanshang:['yuantanyuanshang','yuantanyuanxiyuanshang'],
 			ruiji:['ruiji','dc_ruiji'],
 			jsp_huangyueying:['jsp_huangyueying','re_jsp_huangyueying'],
-			ganfuren:['ganfuren','dc_ganfuren'],
+			ganfuren:['ganfuren','dc_ganfuren','jsp_ganfuren'],
 			wenqin:['wenqin','pe_wenqin'],
 			zhouqun:['ol_zhouqun','zhouqun'],
 			qianzhao:['ol_qianzhao','qianzhao'],
@@ -25351,9 +25347,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugejin:'诸葛瑾',
 			zhugeke:'诸葛恪',
 			guanyinping:'关银屏',
-			gz_ganfuren:'甘夫人',
-			ganfuren:'SP甘夫人',
-			ganfuren_prefix:'SP',
 			sunhao:'孙皓',
 			chengyu:'程昱',
 			simalang:'司马朗',
@@ -26098,7 +26091,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_dengzhi:'OL邓芝',
 			ol_dengzhi_prefix:'OL',
 			olxiuhao:'修好',
-			olxiuhao_info:'每回合限一次。当你受到其他角色造成的伤害时，或对其他角色造成伤害时，你可防止此伤害，然后令伤害来源摸两张牌。',
+			olxiuhao_info:'每回合限一次。当你受到其他角色造成的伤害时，或其他角色受到你造成的伤害时，你可防止此伤害，然后令伤害来源摸两张牌。',
 			olsujian:'素俭',
 			olsujian_given:'已分配',
 			olsujian_info:'锁定技。弃牌阶段开始前，你将此阶段的规则改为：{你选择一项：①将所有不为本回合得到的手牌分配给其他角色。②弃置这些手牌，然后弃置一名其他角色等量的牌}。',
