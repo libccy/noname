@@ -8398,7 +8398,6 @@
 						if(!that._selfDestroyed){
 							position.appendChild(that);
 						}
-						else that.remove();
 						that.classList.remove('removing');
 						delete that.destiny;
 					},time);
@@ -30051,7 +30050,7 @@
 				willBeDestroyed(targetPosition,player,event){
 					const destroyed=this.destroyed;
 					if(typeof destroyed=='function'){
-						return destroyed(card,targetPosition,player,event);
+						return destroyed(this,targetPosition,player,event);
 					}
 					else if(lib.skill[destroyed]){
 						if(player){
