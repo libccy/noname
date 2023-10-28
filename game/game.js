@@ -8827,23 +8827,6 @@
 						return list[0];
 					}
 				});
-				/**
-				 * @deprecated
-				 * !!!WARNING!!!
-				 * Will be deprecated in next verision!
-				 * Use {@link VCard#hasNature} instead.
-				 */
-				Object.defineProperty(Object.prototype,'hasNature',{
-					configurable:true,
-					enumerable:false,
-					writable:true,
-					value:function(nature,player){
-						var natures=get.natureList(this,player);
-						if(!nature) return natures.length>0;
-						if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
-						return get.is.sameNature(natures,nature);
-					}
-				});
 				window.onkeydown=function(e){
 					if(!ui.menuContainer||!ui.menuContainer.classList.contains('hidden')){
 						if(e.keyCode==116||((e.ctrlKey||e.metaKey)&&e.keyCode==82)){
