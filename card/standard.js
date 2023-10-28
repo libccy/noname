@@ -428,7 +428,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}), damaged = 0, needs = 0;
 							fs.forEach(f=>{
 								if(!player.canUse('tao',f)) return;
-								if (f.hp<=1) needs++;
+								if(f.hp<=1) needs++;
 								else if(f.hp==2) damaged++;
 							});
 							if(needs>2) return 11;
@@ -449,51 +449,44 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								card:card,
 								target:target
 							},true)) return 2;
-							let mode = get.mode();
+							let mode = get.mode(),
+								taos = player.countCards('hs',i=>get.name==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable'));
 							if(target.hp>0){
 								let min = 7.2-1.2*Math.min(3,player.hp),
 									nd = player.needsToDiscard(-player.countCards('h',i=>get.value(i)<min)),
-									taos = player.countCards('hs',i=>get.name==='tao'&&lib.filter.cardEnabled(i,player)),
 									keep = 0;
-								if(nd>1&&taos>1&&player.hp<1+taos) return 2;
+								if(nd>1&&taos>1&&player.hp<1+taos || target.identity==='zhu'&&target.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')) return 2;
 								if(nd<3&&game.hasPlayer(current=>{
-									return current.identity==='zhu'&&current.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')&&get.attitude(player,current)>0;
+									return player!==current&&current.identity==='zhu'&&current.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')&&get.attitude(player,current)>0;
 								})){
-									nd = 0;
-									keep = 3;
+									nd=0;
+									keep=3;
 								}
-								else if(nd<2&&player.isPhaseUsing()){
+								else if(nd<2 || !player.isPhaseUsing()){
 									if(nd<1) keep = 3;
 									else if(target.hp>=2&&taos<=target.hp/2) keep = 1;
 								}
 								if(keep){
 									if(!nd || game.countPlayer(current=>{
-										if(player!==current&&current.hp<=2&&get.attitude(player,current)>2){
-											if(target.hp>=2){
-												keep=3;
-												return true;
-											}
-											if(player.hp>current.hp){
-												keep += player.hp-current.hp;
-												return true;
-											}
+										if(player!==current&&current.hp<3&&player.hp>current.hp&&get.attitude(player,current)>2){
+											keep += player.hp-current.hp;
+											return true;
 										}
 										return false;
 									})){
 										if(keep>2) return 0;
 									}
 								}
-								return 2;
 							}
 							if(target.isZhu2() || target===game.boss) return 2;
 							if(player!==target){
-								if(target.hp<0&&player.countCards('hs','tao')+target.hp<=0) return 0;
-								if(Math.abs(get.attitude(player, target))<1.2) return 0;
+								if(target.hp<0&&taos+target.hp<=0) return 0;
+								if(Math.abs(get.attitude(player,target))<1) return 0;
 							}
 							if(!player.getFriends().length) return 2;
 							let tri = _status.event.getTrigger(),
 								num = game.countPlayer(current=>{
-									if(get.attitude(current,target)>0) return current.countCards('hs','tao');
+									if(get.attitude(current,target)>0) return current.countCards('hs',i=>get.name==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable'));
 								}),
 								dis = 1,
 								t = _status.currentPhase||game.me;
@@ -512,11 +505,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 										}
 									}
 									else if(tri.source&&tri.source.isZhu&&(target.identity==='zhong'||target.identity==='mingzhong')&&
-										(tri.source.countCards('he')>2||player===tri.source&&player.hasCard((i)=>i.name!='tao','he'))) return 2;
+										(tri.source.countCards('he')>2||player===tri.source&&player.hasCard((i)=>i.name!=='tao','he'))) return 2;
 									//if(player!==target&&!target.isZhu&&target.countCards('hs')<dis) return 0;
 								}
 								if(player.identity==='zhu'){
-									if(player.hp<=1&&player!==target&&player.countCards('hs','tao')+player.countCards('hs','jiu')<=Math.min(dis,game.countPlayer(current=>{
+									if(player.hp<=1&&player!==target&&taos+player.countCards('hs','jiu')<=Math.min(dis,game.countPlayer(current=>{
 										return current.identity==='fan';
 									}))) return 0;
 								}
@@ -1499,6 +1492,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.discardPlayerCard(target,pos,true,'visible');
 				},
 				ai:{
+					wuxie:(target,card,player,viewer,status)=>{
+						if(status*get.attitude(viewer,player)>0&&!player.isMad() || target.hp>2&&!target.hasCard(i=>{
+							return get.value(i,target)>3+Math.min(5,target.hp);
+						},'e')&&target.countCards('h')*_status.event.getRand('guohe_wuxie')>1.57) return 0;
+					},
 					basic:{
 						order:9,
 						useful:5,
