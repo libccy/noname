@@ -138,7 +138,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				filter:function(event,player){
-					if(!event.filterCard({name:'sha'})&&!event.filterCard({name:'wuxie'})) return false;
+					if(!event.filterCard({name:'sha'},player,event)&&!event.filterCard({name:'wuxie'},player,event)) return false;
 					return player.countCards('h',card=>{
 						return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
 					});
@@ -151,7 +151,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('砺锋',[list,'vcard']);
 					},
 					check:function(button){
-						return _status.event.player.getUseValue({name:button.link[2],nature:button.link[3]});
+						var player=_status.event.player;
+						return _status.event.getParent().type=='phase'?player.getUseValue({name:button.link[2]}):1
 					},
 					backup:function(links,player){
 						return {
@@ -197,6 +198,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						})) return false;
 					},
 					order:10,
+					result:{player:1},
 				},
 				group:'starlifeng_mark',
 				subSkill:{
