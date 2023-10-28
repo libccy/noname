@@ -19260,15 +19260,11 @@
 							var next=owner.lose(map[i][0],ui.special).set('type','gain').set('forceDie',true).set('getlx',false);
 							if(event.visible==true){
 								next.visible=true;
-								game.addCardKnower(map[i][0],'everyone');
-							}else{
-								game.addCardKnower(map[i][1],owner);
-								game.addCardKnower(map[i][2],'everyone');
 							}
 							event.relatedLose=next;
-						}
-						if(event.cardKnower){
-							game.addCardKnower(cards,event.cardKnower);
+							if(event.cardKnower){
+								next.set('cardKnower',event.cardKnower);
+							}
 						}
 					}
 					else{
@@ -19286,6 +19282,8 @@
 									var hs=source.getCards('hejsx');
 									if(hs.contains(cards[i])){
 										cards.splice(i--,1);
+									}else{
+										cards[i].addKnower(event.visible?'everyone':source);
 									}
 								}
 							}
