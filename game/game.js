@@ -18050,7 +18050,7 @@
 					else{
 						game.log(player,'展示了',cards);
 					}
-					game.addCardKnowner(cards,'everyone');
+					game.addCardKnower(cards,'everyone');
 					game.delayx(event.delay_time||2.5);
 					game.addVideo('showCards',player,[event.str,get.cardsInfo(cards)]);
 					"step 1"
@@ -18059,7 +18059,7 @@
 				},
 				viewCards:function(){
 					"step 0"
-					game.addCardKnowner(event.cards,player);
+					game.addCardKnower(event.cards,player);
 					if(player==game.me){
 						event.dialog=ui.create.dialog(event.str,event.cards);
 						if(event.isMine()){
@@ -19260,15 +19260,15 @@
 							var next=owner.lose(map[i][0],ui.special).set('type','gain').set('forceDie',true).set('getlx',false);
 							if(event.visible==true){
 								next.visible=true;
-								game.addCardKnowner(map[i][0],'everyone');
+								game.addCardKnower(map[i][0],'everyone');
 							}else{
-								game.addCardKnowner(map[i][1],owner);
-								game.addCardKnowner(map[i][2],'everyone');
+								game.addCardKnower(map[i][1],owner);
+								game.addCardKnower(map[i][2],'everyone');
 							}
 							event.relatedLose=next;
 						}
 						if(event.cardKnower){
-							game.addCardKnowner(cards,event.cardKnower);
+							game.addCardKnower(cards,event.cardKnower);
 						}
 					}
 					else{
@@ -20620,8 +20620,8 @@
 					for(i=0;i<bottom.length;i++){
 						ui.cardPile.appendChild(bottom[i]);
 					}
-					game.addCardKnowner(top,player);
-					game.addCardKnowner(bottom,player);
+					game.addCardKnower(top,player);
+					game.addCardKnower(bottom,player);
 					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
 					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
 					game.updateRoundNumber();
@@ -30485,7 +30485,7 @@
 					_status.event._aiexclude.add(this);
 				}
 				//为此牌添加知情者。参数可为数组，若参数为字符串'everyone'，则所有玩家均为知情者。
-				addKnowner(player){
+				addKnower(player){
 					if(!this._knowers){
 						this._knowers = [];
 					}
@@ -36147,11 +36147,11 @@
 			}
 		},
 		//为牌添加知情者。
-		addCardKnowner:function(cards,players){
+		addCardKnower:function(cards,players){
 			if(get.itemtype(cards) == 'card'){
 				cards = [cards];
 			}
-			cards.forEach(card=>card.addKnowner(players));
+			cards.forEach(card=>card.addKnower(players));
 		},
 		//移除牌的所有知情者。
 		clearCardKnowers:function(cards){
