@@ -17968,12 +17968,10 @@
 					if(!event.chooseonly){
 						if(event.delay!==false){
 							var next=player.gain(event.cards,target,event.visibleMove?'give':'giveAuto','bySelf');
-							next.set('cardKnower',event.visibleMove?['everyone']:[target]);
 							event.done=next;
 						}
 						else{
 							var next=player.gain(event.cards,target,'bySelf');
-							next.set('cardKnower',event.visibleMove?['everyone']:[target]);
 							event.done=next;
 							target[event.visibleMove?'$give':'$giveAuto'](cards,player);
 							if(event.visibleMove) next.visible=true;
@@ -19262,9 +19260,6 @@
 								next.visible=true;
 							}
 							event.relatedLose=next;
-							if(event.cardKnower){
-								next.set('cardKnower',event.cardKnower);
-							}
 						}
 					}
 					else{
