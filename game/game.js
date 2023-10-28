@@ -8395,6 +8395,7 @@
 
 					var that=this;
 					this.timeout=setTimeout(function(){
+						console.log(that,that._selfDestroyed)
 						if(!that._selfDestroyed){
 							position.appendChild(that);
 						}
@@ -19694,6 +19695,7 @@
 						else if(cards[i].hasOwnProperty('destroyed')){
 							if(event.getlx!==false&&event.position&&cards[i].willBeDestroyed(event.position.id,null,event)){
 								cards[i].selfDestroy(event);
+								continue;
 							}
 						}
 						else if(info.destroy){
@@ -19779,7 +19781,7 @@
 					event.xs=xs;
 					game.clearCardKnowers(hs);
 					if(hs.length && !event.visible){
-						this.getCards('h').forEach(hcard=>{hcard.clearKnowers();});
+						player.getCards('h').forEach(hcard=>{hcard.clearKnowers();});
 					}
 					"step 2"
 					if(num<cards.length){
@@ -30713,7 +30715,10 @@
 					if(this._uncheck.length==0) this.classList.remove('uncheck');
 				}
 				discard(bool){
-					this.fix();
+					if(!this._selfDestroyed){
+						this.fix();
+						ui.discardPile.appendChild(this);
+					}
 					this.classList.remove('glow');
 					if(bool===false){
 						ui.cardPile.insertBefore(this,ui.cardPile.childNodes[Math.floor(Math.random()*ui.cardPile.childNodes.length)]);

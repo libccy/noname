@@ -192,8 +192,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.gameDraw(event.playerx);
 			game.broadcastAll(function(player){
 				for(var i=0;i<game.players.length;i++){
-					game.players[i].name=get.seatTranslation(get.distance(player,game.players[i],'absolute'));
-					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[game.players[i].name]),game.players[i]);
+					var seatNum=get.distance(player,game.players[i],'absolute');
+					game.players[i].name=`unknown${seatNum}`;
+					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.seatTranslation(seatNum),game.players[i]);
 					// if(game.players[i]==game.me){
 					// 	lib.translate[game.players[i].name]+='（你）';
 					// }
