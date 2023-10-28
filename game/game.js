@@ -19779,6 +19779,9 @@
 					event.ss=ss;
 					event.xs=xs;
 					game.clearCardKnowers(hs);
+					if(hs.length && !event.visible){
+						this.getCards('h').forEach(hcard=>{hcard.clearKnowers();});
+					}
 					"step 2"
 					if(num<cards.length){
 						if(event.es.contains(cards[num])){
