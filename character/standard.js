@@ -6,15 +6,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			standard:{
 				standard_2008:["caocao","simayi","xiahoudun","zhangliao","xuzhu","guojia","zhenji","liubei","guanyu","zhangfei","zhugeliang","zhaoyun","machao","huangyueying","sunquan","ganning","lvmeng","huanggai","zhouyu","daqiao","luxun","sunshangxiang","huatuo","lvbu","diaochan"],
-				standard_2013:["huaxiong","re_yuanshu","re_xushu","re_lidian"],
+				standard_2013:['old_re_lidian',"huaxiong","re_yuanshu"],
 				standard_2019:["gongsunzan","xf_yiji"],
-				standard_2023:["std_panfeng"],
+				standard_2023:["std_panfeng",'ganfuren'],
 			},
 		},
 		character:{
+			old_re_lidian:['male','wei',3,['xunxun','wangxi']],
+			ganfuren:['female','shu',3,['stdshushen','shenzhi']],
 			std_panfeng:['male','qun',4,['stdkuangfu']],
-			re_lidian:['male','wei',3,['xunxun','xinwangxi']],
-			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			caocao:['male','wei',4,['jianxiong','hujia'],['zhu']],
 			simayi:['male','wei',3,['fankui','guicai']],
 			xiahoudun:['male','wei',4,['ganglie']],
@@ -94,6 +94,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guanyu:['zhangfei','liaohua'],
 		},
 		skill:{
+			//标准版甘夫人
+			stdshushen:{
+				audio:'shushen',
+				trigger:{player:'recoverEnd'},
+				direct:true,
+				content:function(){
+					'step 0'
+					event.num=trigger.num||1;
+					'step 1'
+					player.chooseTarget(get.prompt2('stdshushen'),lib.filter.notMe).set('ai',function(target){
+						return get.attitude(_status.event.player,target);
+					});
+					'step 2'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('stdshushen',target);
+						target.draw(target.countCards('h')?1:2);
+						if(event.num>1&&player.hasSkill('stdshushen')){
+							event.num--;
+							event.goto(1);
+						}
+					}
+				},
+				ai:{threaten:0.8,expose:0.1},
+			},
 			stdkuangfu:{
 				audio:'xinkuangfu',
 				trigger:{source:'damageSource'},
@@ -2713,11 +2738,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rewangzun_info:'锁定技，一名其他角色的准备阶段开始时，若其体力值大于你，你摸一张牌。然后若其身份为主公/主帅/君主/地主且明置，则你摸一张牌，且其本回合的手牌上限-1。',
 			retongji:'同疾',
 			retongji_info:'攻击范围内包含你的角色成为【杀】的目标时，若你不是此【杀】的使用者或目标，其可弃置一张牌，然后将此【杀】转移给你。',
-			re_xushu:'徐庶',
-			re_lidian:'李典',
 			std_panfeng:'潘凤',
 			stdkuangfu:'狂斧',
 			stdkuangfu_info:'锁定技。出牌阶段限一次。当你使用【杀】对其他角色造成伤害后，若其体力值：小于你，你摸两张牌；不小于你，你失去1点体力。',
+			ganfuren:'甘夫人',
+			stdshushen:'淑慎',
+			stdshushen_info:'当你回复1点体力时，你可以令一名其他角色摸一张牌（若其没有手牌则改为摸两张牌）。',
+			old_re_lidian:'李典',
 			
 			standard_2008:"2008版标准包",
 			standard_2013:"2013版标准包",

@@ -8395,9 +8395,10 @@
 
 					var that=this;
 					this.timeout=setTimeout(function(){
-						if(!that.destroyed){
+						if(!that._selfDestroyed){
 							position.appendChild(that);
 						}
+						else that.remove();
 						that.classList.remove('removing');
 						delete that.destiny;
 					},time);
@@ -12745,6 +12746,7 @@
 						return;
 					}
 					if(card.willBeDestroyed('equip',player,event)){
+						card.selfDestroy(event);
 						event.finish();
 						return;
 					}
@@ -13719,7 +13721,7 @@
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('discardPile',null,event)){
-							cards[i].remove();
+							cards[i].selfDestroy(event);
 							continue;
 						}
 						if(get.position(cards[i],true)=='c') withPile=true;
@@ -13739,7 +13741,7 @@
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('ordering',null,event)){
-							cards[i].remove();
+							cards[i].selfDestroy(event);
 							continue;
 						}
 						if(get.position(cards[i],true)=='c') withPile=true;
@@ -13762,7 +13764,7 @@
 					var withPile=false;
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('special',null,event)){
-							cards[i].remove();
+							cards[i].selfDestroy(event);
 							continue;
 						}
 						if(get.position(cards[i],true)=='c') withPile=true;
@@ -18048,6 +18050,7 @@
 					else{
 						game.log(player,'展示了',cards);
 					}
+					game.addCardKnower(cards,'everyone');
 					game.delayx(event.delay_time||2.5);
 					game.addVideo('showCards',player,[event.str,get.cardsInfo(cards)]);
 					"step 1"
@@ -18056,6 +18059,7 @@
 				},
 				viewCards:function(){
 					"step 0"
+					game.addCardKnower(event.cards,player);
 					if(player==game.me){
 						event.dialog=ui.create.dialog(event.str,event.cards);
 						if(event.isMine()){
@@ -19254,7 +19258,9 @@
 						for(var i in map){
 							var owner=(_status.connectMode?lib.playerOL:game.playerMap)[i];
 							var next=owner.lose(map[i][0],ui.special).set('type','gain').set('forceDie',true).set('getlx',false);
-							if(event.visible==true) next.visible=true;
+							if(event.visible==true){
+								next.visible=true;
+							}
 							event.relatedLose=next;
 						}
 					}
@@ -19264,6 +19270,7 @@
 					"step 1"
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('handcard',player,event)){
+							cards[i].selfDestroy(event);
 							cards.splice(i--,1);
 						}
 						else if(event.losing_map){
@@ -19273,6 +19280,8 @@
 									var hs=source.getCards('hejsx');
 									if(hs.contains(cards[i])){
 										cards.splice(i--,1);
+									}else{
+										cards[i].addKnower(event.visible?'everyone':source);
 									}
 								}
 							}
@@ -19458,6 +19467,7 @@
 					"step 1"
 					for(var i=0;i<cards.length;i++){
 						if(cards[i].willBeDestroyed('expansion',player,event)){
+							cards[i].selfDestroy(event);
 							cards.splice(i--,1);
 						}
 						else if(event.losing_map){
@@ -19680,8 +19690,7 @@
 						}
 						else if(cards[i].hasOwnProperty('destroyed')){
 							if(event.getlx!==false&&event.position&&cards[i].willBeDestroyed(event.position.id,null,event)){
-								cards[i].delete();
-								continue;
+								cards[i].selfDestroy(event);
 							}
 						}
 						else if(info.destroy){
@@ -19765,6 +19774,10 @@
 					event.js=js;
 					event.ss=ss;
 					event.xs=xs;
+					game.clearCardKnowers(hs);
+					if(hs.length && !event.visible){
+						this.getCards('h').forEach(hcard=>{hcard.clearKnowers();});
+					}
 					"step 2"
 					if(num<cards.length){
 						if(event.es.contains(cards[num])){
@@ -20348,6 +20361,7 @@
 					}
 					"step 1"
 					if(cards[0].willBeDestroyed('judge',player,event)){
+						cards[0].selfDestroy(event);
 						event.finish();
 						return;
 					}
@@ -20606,6 +20620,8 @@
 					for(i=0;i<bottom.length;i++){
 						ui.cardPile.appendChild(bottom[i]);
 					}
+					game.addCardKnower(top,player);
+					game.addCardKnower(bottom,player);
 					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
 					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
 					game.updateRoundNumber();
@@ -20968,6 +20984,32 @@
 					return this.getCards('h',function(card){
 						return get.is.shownCard(card);
 					});
+				}
+				//获取该角色被other所知的牌。
+				getKnownCards(other,filter){
+					if(!other)other = _status.event.player;
+					if(!other)other = this;
+					if(!filter)filter = (card)=>{return true};
+					return this.getCards('h',function(card){
+						return card.isKnownBy(other) && filter(card);
+					});
+				}
+				//判断此角色的手牌是否已经被看光了。
+				isAllCardsKnown(other){
+					if(!other)other = _status.event.player;
+					if(!other)other = this;
+					return this.countCards('h',function(card){
+						return !card.isKnownBy(other);
+					}) == 0;
+				}
+				//判断此角色是否有被知的牌。
+				hasKnownCards(other,filter){
+					if(!other)other = _status.event.player;
+					if(!other)other = this;
+					if(!filter)filter = (card)=>{return true};
+					return this.countCards('h',function(card){
+						return card.isKnownBy(other) && filter(card);
+					}) > 0;
 				}
 				//Execute the delay card effect
 				//执行延时锦囊牌效果
@@ -28350,8 +28392,13 @@
 					let cards,selected=get.copy(ui.selected.cards);
 					if(get.itemtype(ignore)==='cards') selected.addArray(ignore);
 					else if(get.itemtype(ignore)==='card') selected.add(ignore);
-					if(this===viewer||get.itemtype(viewer)==='player'&&viewer.hasSkillTag('viewHandcard',null,this,true)) cards=this.getCards('h');
-					else cards=this.getShownCards();
+					/*if(this===viewer||get.itemtype(viewer)==='player'&&viewer.hasSkillTag('viewHandcard',null,this,true)) cards=this.getCards('h');
+					else cards=this.getShownCards();*/
+					if(this === viewer || get.itemtype(viewer) == 'player'){
+						cards = this.getKnownCards(viewer);
+					}else{
+						cards = this.getShownCards();
+					}
 					if(cards.some(card=>{
 						if(selected.includes(card)) return false;
 						let name=get.name(card,this);
@@ -28372,8 +28419,13 @@
 					let cards,selected=get.copy(ui.selected.cards);
 					if(get.itemtype(ignore)==='cards') selected.addArray(ignore);
 					else if(get.itemtype(ignore)==='card') selected.add(ignore);
-					if(this===viewer||get.itemtype(viewer)==='player'&&viewer.hasSkillTag('viewHandcard',null,this,true)) cards=this.getCards('h');
-					else cards=this.getShownCards();
+					/*if(this===viewer||get.itemtype(viewer)==='player'&&viewer.hasSkillTag('viewHandcard',null,this,true)) cards=this.getCards('h');
+					else cards=this.getShownCards();*/
+					if(this === viewer || get.itemtype(viewer) == 'player'){
+						cards = this.getKnownCards(viewer);
+					}else{
+						cards = this.getShownCards();
+					}
 					if(cards.some(card=>{
 						if(selected.includes(card)) return false;
 						let name=get.name(card,this);
@@ -29980,6 +30032,17 @@
 				buildIntro(noclick){
 					if(!noclick) lib.setIntro(this);
 				}
+				//执行销毁一张牌的钩子函数
+				selfDestroy(event){
+					if(this._selfDestroyed) return;
+					this._selfDestroyed=true;
+					this.fix();
+					this.delete();
+					const info=get.info(this,false);
+					if(!info) return;
+					if(info.destroyLog!==false) game.log(this,'被销毁了');
+					if(info.onDestroy) info.onDestroy(this,event);
+				}
 				//判断一张牌进入某个区域后是否会被销毁
 				willBeDestroyed(targetPosition,player,event){
 					const destroyed=this.destroyed;
@@ -30141,6 +30204,10 @@
 					this.suit=card[0];
 					this.number=parseInt(card[1])||0;
 					this.name=card[2];
+
+					if(info.destroy&&(typeof info.destroy!='boolean'&&!lib.skill[info.destroy])){
+						this.destroyed=info.destroy;
+					}
 
 					if(_status.connectMode&&!game.online&&lib.cardOL&&!this.cardid){
 						this.cardid=get.id();
@@ -30503,6 +30570,41 @@
 				aiexclude(){
 					_status.event._aiexclude.add(this);
 				}
+				//为此牌添加知情者。参数可为数组，若参数为字符串'everyone'，则所有玩家均为知情者。
+				addKnower(player){
+					if(!this._knowers){
+						this._knowers = [];
+					}
+					if(typeof player == 'string'){
+						this._knowers.add(player);
+					}else{
+						let type = get.itemtype(player);
+						if(type == 'player'){
+							this._knowers.add(player.playerid);
+						}else if(type == 'players'){
+							player.forEach(p=>this._knowers.add(p.playerid));
+						}
+					}
+				}
+				//清除此牌的知情者。
+				clearKnowers(){
+					if(this._knowers)delete this._knowers;
+				}
+				//判断玩家对此牌是否知情。
+				isKnownBy(player){
+					if(['e','j'].includes(get.position(this)))return true;//装备区或者判定区的牌，必知情。
+					let owner = get.owner(this);
+					if(owner){
+						if(owner == player)return true;//是牌主，必知情。
+						if(player.hasSkillTag('viewHandcard',null,owner,true))return true;//有viewHandcard标签，必知情。
+						if(owner.isUnderControl(true,player))return true;//被操控，必知情。
+					}
+					if(get.is.shownCard(this))return true;//此牌是明置牌，必知情。
+					if(this._knowers){
+						return this._knowers.includes('everyone') || this._knowers.includes(player.playerid);
+					}
+					return false;
+				}
 				getSource(name){
 					if(this.name==name) return true;
 					var info=lib.card[this.name];
@@ -30608,9 +30710,6 @@
 					if(this._uncheck.length==0) this.classList.remove('uncheck');
 				}
 				discard(bool){
-					if(!this.willBeDestroyed('discardPile',null,event)){
-						ui.discardPile.appendChild(this);
-					}
 					this.fix();
 					this.classList.remove('glow');
 					if(bool===false){
@@ -36130,6 +36229,20 @@
 				if(i.storage.renku) i.markSkill('renku');
 			}
 		},
+		//为牌添加知情者。
+		addCardKnower:function(cards,players){
+			if(get.itemtype(cards) == 'card'){
+				cards = [cards];
+			}
+			cards.forEach(card=>card.addKnower(players));
+		},
+		//移除牌的所有知情者。
+		clearCardKnowers:function(cards){
+			if(get.itemtype(cards) == 'card'){
+				cards = [cards];
+			}
+			cards.forEach(card=>card.clearKnowers());
+		},
 		loseAsync:function(arg){
 			var next=game.createEvent('loseAsync');
 			next.forceDie=true;
@@ -36384,7 +36497,7 @@
 			const pile=ui.cardPile;
 			for(let i=0;i<cards.length;i++){
 				if(cards[i].willBeDestroyed('cardPile',null,event)){
-					cards[i].remove();
+					cards[i].selfDestroy(event);
 					continue;
 				}
 				if(event.insert_index){

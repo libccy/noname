@@ -696,7 +696,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				mode:['guozhan'],
-				global:['g_chiling1','g_chiling2','g_chiling3'],
+				//global:['g_chiling1','g_chiling2','g_chiling3'],
 				filterTarget:function(card,player,target){
 					return target.isUnseen();
 				},
@@ -753,6 +753,27 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.showCharacter(1);
 					}
 					target.draw();
+				},
+				destroy:function(card,targetPosition,player,event){
+					if(event.name!='lose'||event.name!='cardsDiscard'||targetPosition!='discardPile') return false;
+					var evt=event.getParent().relatedEvent;
+					if(evt&&evt.name=='useCard') return false;
+					
+					return true;
+				},
+				onDestroy:function(){
+					var currentPhase=_status.currentPhase;
+					if(currentPhase){
+						_status.chiling=true;
+						currentPhase.addTempSkill('g_chiling3');
+					}
+					if(!lib.inpile.contains('zhaoshu')){
+						lib.inpile.push('zhaoshu');
+						var card=game.createCard2('zhaoshu','club',3);
+						game.log(card,'被置于了牌堆底');
+						ui.cardPile.appendChild(card);
+						game.updateRoundNumber();
+					}
 				},
 				ai:{
 					order:6,
@@ -1570,50 +1591,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			g_chiling1:{
-				mode:['guozhan'],
-				trigger:{
-					player:'loseEnd',
-					global:'cardsDiscardEnd',
-				},
-				filter:function(event,player){
-					var evt=event.getParent().relatedEvent;
-					if(evt&&evt.name=='useCard') return false;
-					for(var i=0;i<event.cards.length;i++){
-						if(event.cards[i].name=='chiling'&&get.position(event.cards[i],true)=='d'){
-							return true;
-						}
-					}
-					return false;
-				},
-				forced:true,
-				popup:false,
-				content:function(){
-					var cards=[];
-					for(var i=0;i<trigger.cards.length;i++){
-						if(trigger.cards[i].name=='chiling'&&get.position(trigger.cards[i],true)=='d'){
-							cards.push(trigger.cards[i]);
-						}
-					}
-					if(cards.length){
-						game.cardsGotoSpecial(cards);
-						game.log(cards,'已被移出游戏');
-						_status.chiling=true;
-						if(player&&player.popup) player.popup('敕令');
-					}
-					if(!lib.inpile.contains('zhaoshu')){
-						lib.inpile.push('zhaoshu');
-						var card=game.createCard2('zhaoshu','club',3);
-						game.log(card,'被置于了牌堆底');
-						ui.cardPile.appendChild(card);
-						game.updateRoundNumber();
-					}
-				},
-			},
-			g_chiling2:{},
 			g_chiling3:{
 				mode:['guozhan'],
-				trigger:{player:'phaseAfter'},
+				trigger:{player:'phaseEnd'},
 				forced:true,
 				popup:false,
 				filter:function(){
