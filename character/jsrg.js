@@ -71,12 +71,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'basic',
 				enable:false,
-				global:'ying_destory',
+				destroy:'discardPile',
 				getYing:function(count){
 					var cards=[];
 					if(typeof count!='number') count=1;
 					while(count--){
-						cards.push(game.createCard('ying','spade',1));
+						let card=game.createCard('ying','spade',1);
+						card.destroyed='discardPile';
+						cards.push(card);
 					}
 					return cards;
 				},
@@ -95,24 +97,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			//江山如故·转
-			//白牌
-			ying_destory:{
-				trigger:{
-					player:'loseAfter',
-					global:['loseAsyncAfter','cardsDiscardAfter','equipAfter'],
-				},
-				cardSkill:true,
-				forced:true,
-				popup:false,
-				filter:function(event,player){
-					return event.getd().some(i=>get.name(i,false)=='ying'&&get.position(i,true)=='d');
-				},
-				content:function(){
-					var cards=trigger.getd().filter(i=>get.name(i,false)=='ying'&&get.position(i,true)=='d');
-					game.cardsGotoSpecial(cards);
-					game.log(cards,'被移出了游戏');
-				},
-			},
 			//404郭嘉
 			jsrgqingzi:{
 				audio:2,

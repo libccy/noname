@@ -11609,7 +11609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 7-get.value(card);
 				},
 				content:function(){
-					player.addSkill('pyzhuren_destroy');
+					//player.addSkill('pyzhuren_destroy');
 					if(!_status.pyzhuren) _status.pyzhuren={};
 					var rand=0.85;
 					var num=get.number(cards[0]);
@@ -11627,7 +11627,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						_status.pyzhuren[name]=true;
-						player.gain(game.createCard(name,cards[0].name=='shandian'?'spade':cards[0].suit,1),'gain2')
+						var card=game.createCard(name,cards[0].name=='shandian'?'spade':cards[0].suit,1);
+						card.destroyed='discardPile';
+						player.gain(card,'gain2')
 					}
 				},
 				ai:{
@@ -11635,32 +11637,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:1,
 					},
-				},
-			},
-			pyzhuren_destroy:{
-				trigger:{global:['loseEnd','cardsDiscardEnd']},
-				forced:true,
-				charlotte:true,
-				filter:function(event,player){
-					var cs=event.cards;
-					for(var i=0;i<cs.length;i++){
-						if(cs[i].name.indexOf('pyzhuren_')==0&&get.position(cs[i],true)=='d') return true;
-					}
-					return false;
-				},
-				forceDie:true,
-				content:function(){
-					if(!_status.pyzhuren) _status.pyzhuren={};
-					var list=[];
-					var cs=trigger.cards;
-					for(var i=0;i<cs.length;i++){
-						if(cs[i].name.indexOf('pyzhuren_')==0&&get.position(cs[i],true)=='d'){
-							_status.pyzhuren[cs[i].name]=false;
-							list.push(cs[i]);
-						}
-					}
-					game.log(list,'已被移出游戏');
-					game.cardsGotoSpecial(list);
 				},
 			},
 			pyzhuren_heart:{
