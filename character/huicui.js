@@ -4485,7 +4485,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:{audio:'dcquanjian'},
 					damage:{
 						audio:'dcquanjian',
-						charlotte:true,
 						selectTarget:2,
 						filterTarget:function(card,player,target){
 							if(!ui.selected.targets.length) return target!=player;
@@ -4530,7 +4529,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					draw:{
 						audio:'dcquanjian',
-						charlotte:true,
 						filterTarget:function(card,player,target){
 							if(target==player) return false;
 							var num=target.countCards('h');
