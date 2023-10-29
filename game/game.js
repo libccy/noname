@@ -11037,7 +11037,7 @@
 					return;
 				}
 				if(Array.isArray(file)){
-					return file.forEach(value=>lib.init.js(path,value,onLoad,onError));
+					return file.forEach(value=>lib.init.jsSync(path,value,onLoad,onError));
 				}
 				let scriptSource;
 				if(!file) scriptSource=path;
