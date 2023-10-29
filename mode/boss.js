@@ -8823,14 +8823,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							return false;
 						}
-						var keysArray=["length","players","player","element"];
+						var keysArray=["length","players","Player","element"];
 						for(var i=0;i<game[keysArray[1]][keysArray[0]];i++){
 							var node=game[keysArray[1]][i];
-							for(var a in lib[keysArray[3]][keysArray[2]]){
+							for(var a in Object.keys(lib[keysArray[3]][keysArray[2]].prototype)){
 								var opd=Object.getOwnPropertyDescriptor(node,a);
 								if (isDefined(opd)) _status.taoni_over(lib.translate[node.name] + '触发了〖讨逆〗，游戏已被终止。');
 								//还原函数	
-								node[a]=lib[keysArray[3]][keysArray[2]][a];	
+								node[a]=lib[keysArray[3]][keysArray[2]].prototype[a];	
 								var playerKeysArray=['classList','hp','maxHp','skills'];
 								for(var b=0;b<playerKeysArray.length;b++){
 									var opd2=Object.getOwnPropertyDescriptor(node,playerKeysArray[b]);
