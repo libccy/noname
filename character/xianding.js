@@ -6255,7 +6255,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						filterCard:()=>false,
 						selectCard:-1,
-						charlotte:true,
 						content:function(){
 							'step 0'
 							player.addTempSkill('dcfengyan_gain','phaseUseAfter');
@@ -6281,7 +6280,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						filterCard:()=>false,
 						selectCard:-1,
-						charlotte:true,
 						content:function(){
 							player.addTempSkill('dcfengyan_sha','phaseUseAfter');
 							player.useCard({

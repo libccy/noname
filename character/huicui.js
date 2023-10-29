@@ -4485,7 +4485,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:{audio:'dcquanjian'},
 					damage:{
 						audio:'dcquanjian',
-						charlotte:true,
 						selectTarget:2,
 						filterTarget:function(card,player,target){
 							if(!ui.selected.targets.length) return target!=player;
@@ -4530,7 +4529,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					draw:{
 						audio:'dcquanjian',
-						charlotte:true,
 						filterTarget:function(card,player,target){
 							if(target==player) return false;
 							var num=target.countCards('h');
@@ -5751,9 +5749,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
-				filterTarget:function(card,player,target){
-					return target!=player;
-				},
+				filterTarget:lib.filter.notMe,
 				content:function(){
 					var skills=target.getSkills(null,false,false).filter(function(i){
 						if(i=='bazhen') return;
@@ -5799,6 +5795,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mark:true,
 						marktext:'阵',
 						intro:{
+							markcount:()=>0,
 							content:function(storage,player,skill){
 								if(storage.length) return '失效技能：'+get.translation(storage);
 								return '无失效技能';
@@ -5817,7 +5814,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						onremove:true,
 						filter:function(event,player){
 							if(event.name=='die'){
-								return player==event.player||player.getStorage('dcjiezhen_clear').contains(event.player);
+								return player.getStorage('dcjiezhen_clear').contains(event.player);
 							}
 							else if(event.name=='judge'){
 								return event.skill=='bagua'&&player.getStorage('dcjiezhen_clear').contains(event.player);
@@ -5831,14 +5828,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							var targets=player.getStorage('dcjiezhen_clear');
-							if(trigger.name=='die'&&player==trigger.player){
-								for(var target of targets){
-									target.removeSkill('dcjiezhen_blocker');
-								}
-								player.removeSkill('dcjiezhen_clear');
-								event.finish();
-								return;
-							}
 							if(trigger.name=='phase') event.targets=targets.slice(0).sortBySeat();
 							else event.targets=[trigger.player];
 							'step 1'
