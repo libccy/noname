@@ -25209,7 +25209,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			guanyinping:['guanyinping','old_guanyinping'],
-			shixie:['shixie','dc_shixie'],
+			shixie:['shixie','dc_shixie','old_shixie'],
 			caoshuang:['caoshuang','ns_caoshuang'],
 			caoang:['caoang','yj_caoang','tw_caoang'],
 			caohong:['caohong','tw_re_caohong','tw_caohong','yj_caohong'],
