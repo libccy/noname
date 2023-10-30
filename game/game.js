@@ -58146,13 +58146,13 @@
 		 */
 		updatePlayerPositions:numberOfPlayers=>{
 			if(typeof numberOfPlayers!='number') numberOfPlayers=ui.arena.dataset.number;
-			//当人数小于8时，还是用以前的布局。
-			if(!numberOfPlayers||numberOfPlayers<9) return;
+			//当人数不超过8人时，还是用以前的布局
+			if(!numberOfPlayers||numberOfPlayers<=8) return;
 			const playerPositions=ui.playerPositions;
 			while(playerPositions.length){
 				playerPositions.pop().remove();
 			}
-			//单个人物的宽度。这里要设置玩家的实际的宽度
+			//单个人物的宽度，这里要设置玩家的实际的宽度
 			const temporaryPlayer=ui.create.div('.player',ui.arena).hide();
 			const computedStyle=getComputedStyle(temporaryPlayer);
 			const scale=6/numberOfPlayers;
@@ -58163,10 +58163,10 @@
 			//列数，即假如8人场，除去自己后，上面7个人占7列
 			const columnCount=numberOfPlayers-1;
 			const percentage=90/(columnCount-1);
-			//仅当游戏人数大于8人，且玩家的座位号大于0时，设置玩家的位置。因为0号位是game.me在最下方，无需设置。
+			//仅当游戏人数大于8人，且玩家的座位号大于0时，设置玩家的位置；因为0号位是game.me在最下方，无需设置
 			for(let ordinal=1;ordinal<numberOfPlayers;ordinal++){
 				const reversedOrdinal=columnCount-ordinal;
-				//动态计算玩家的top属性，实现拱桥的效果。只让两边的各两个人向下偏移一些
+				//动态计算玩家的top属性，实现拱桥的效果；只让两边的各两个人向下偏移一些
 				const top=Math.max(0,Math.round(numberOfPlayers/5)-Math.min(Math.abs(ordinal-1),Math.abs(reversedOrdinal)))*quarterHeight;
 				playerPositions.push(lib.init.sheet([
 					`#arena[data-number='${numberOfPlayers}']>.player[data-position='${ordinal}']{`,
