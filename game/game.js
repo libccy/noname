@@ -622,8 +622,8 @@
 				['tao',3]
 			]),
 			effect:new Map([
-				['sha',event=>{
-					if(event.step!=1) return;
+				['sha',(event,option)=>{
+					if(event.step!=0||option.state!='end') return;
 					game.log(event.player,'触发了强化效果');
 					game.log(event.card,'抵消所需要的',new lib.element.VCard({
 						name:'shan'
@@ -636,8 +636,8 @@
 						else map[id].shanRequired=2;
 					});
 				}],
-				['shan',event=>{
-					if(event.step!=1) return;
+				['shan',(event,option)=>{
+					if(event.step!=0||option.state!='end') return;
 					game.log(event.player,'触发了强化效果');
 					game.log('使用',event.card,'时视为两张',new lib.element.VCard({
 						name:'shan'
@@ -646,8 +646,8 @@
 						trigger.getParent(2).decrease('shanRequired',1);
 					});
 				}],
-				['juedou',event=>{
-					if(event.step!=1) return;
+				['juedou',(event,option)=>{
+					if(event.step!=0||option.state!='end') return;
 					game.log(event.player,'触发了强化效果');
 					game.log('对',event.card,'的目标造成伤害时，伤害+1');
 					event.player.when({
@@ -656,14 +656,14 @@
 						trigger.increase('num');
 					});
 				}],
-				['huogong',event=>{
-					if(event.step!=1) return;
+				['huogong',(event,option)=>{
+					if(event.step!=0||option.state!='end') return;
 					game.log(event.player,'触发了强化效果');
 					game.log(event.card,'造成的伤害+1');
 					event.increase('baseDamage',1);
 				}],
-				['tao',event=>{
-					if(event.step!=1) return;
+				['tao',(event,option)=>{
+					if(event.step!=0||option.state!='end') return;
 					game.log(event.player,'触发了强化效果');
 					game.log(event.card,'回复的体力+1');
 					event.increase('baseDamage',1);
@@ -8395,6 +8395,7 @@
 
 					var that=this;
 					this.timeout=setTimeout(function(){
+						console.log(that,that._selfDestroyed)
 						if(!that._selfDestroyed){
 							position.appendChild(that);
 						}
@@ -8824,23 +8825,6 @@
 						if(sortBy&&typeof sortBy=='function') list.sort((a,b)=>sortBy(a)-sortBy(b));
 						else list.sort();
 						return list[0];
-					}
-				});
-				/**
-				 * @deprecated
-				 * !!!WARNING!!!
-				 * Will be deprecated in next verision!
-				 * Use {@link VCard#hasNature} instead.
-				 */
-				Object.defineProperty(Object.prototype,'hasNature',{
-					configurable:true,
-					enumerable:false,
-					writable:true,
-					value:function(nature,player){
-						var natures=get.natureList(this,player);
-						if(!nature) return natures.length>0;
-						if(nature=='linked') return natures.some(n=>lib.linked.includes(n));
-						return get.is.sameNature(natures,nature);
 					}
 				});
 				window.onkeydown=function(e){
@@ -11036,7 +11020,7 @@
 					return;
 				}
 				if(Array.isArray(file)){
-					return file.forEach(value=>lib.init.js(path,value,onLoad,onError));
+					return file.forEach(value=>lib.init.jsSync(path,value,onLoad,onError));
 				}
 				let scriptSource;
 				if(!file) scriptSource=path;
@@ -19316,9 +19300,15 @@
 					for(var num=0;num<cards.length;num++){
 						sort=lib.config.sort_card(cards[num]);
 						if(lib.config.reverse_sort) sort=-sort;
+						if(['o','d'].contains(get.position(cards[num],true))){
+							cards[num].addKnower('everyone');
+						}
 						cards[num].fix();
 						cards[num].style.transform='';
 						cards[num].addGaintag(event.gaintag);
+						if(event.knowers){
+							cards[num].addKnower(event.knowers);//添加事件设定的知情者。
+						}
 						if(_status.discarded){
 							_status.discarded.remove(cards[num]);
 						}
@@ -19694,6 +19684,7 @@
 						else if(cards[i].hasOwnProperty('destroyed')){
 							if(event.getlx!==false&&event.position&&cards[i].willBeDestroyed(event.position.id,null,event)){
 								cards[i].selfDestroy(event);
+								continue;
 							}
 						}
 						else if(info.destroy){
@@ -19779,7 +19770,7 @@
 					event.xs=xs;
 					game.clearCardKnowers(hs);
 					if(hs.length && !event.visible){
-						this.getCards('h').forEach(hcard=>{hcard.clearKnowers();});
+						player.getCards('h').forEach(hcard=>{hcard.clearKnowers();});
 					}
 					"step 2"
 					if(num<cards.length){
@@ -21013,6 +21004,10 @@
 					return this.countCards('h',function(card){
 						return card.isKnownBy(other) && filter(card);
 					}) > 0;
+				}
+				//数此角色被知道的牌。
+				countKnownCards(other,filter){
+					return this.getKnownCards(other,filter).length;
 				}
 				//Execute the delay card effect
 				//执行延时锦囊牌效果
@@ -30589,6 +30584,21 @@
 						}
 					}
 				}
+				removeKnower(player){
+					if(!this._knowers){
+						return;
+					}
+					if(typeof player == 'string'){
+						this._knowers.remove(player);
+					}else{
+						let type = get.itemtype(player);
+						if(type == 'player'){
+							this._knowers.remove(player.playerid);
+						}else if(type == 'players'){
+							player.forEach(p=>this._knowers.remove(p.playerid));
+						}
+					}
+				}
 				//清除此牌的知情者。
 				clearKnowers(){
 					if(this._knowers)delete this._knowers;
@@ -30713,7 +30723,10 @@
 					if(this._uncheck.length==0) this.classList.remove('uncheck');
 				}
 				discard(bool){
-					this.fix();
+					if(!this._selfDestroyed){
+						this.fix();
+						ui.discardPile.appendChild(this);
+					}
 					this.classList.remove('glow');
 					if(bool===false){
 						ui.cardPile.insertBefore(this,ui.cardPile.childNodes[Math.floor(Math.random()*ui.cardPile.childNodes.length)]);
@@ -30958,17 +30971,17 @@
 					return this;
 				}
 				/**
-				 * @param {Parameters<typeof this.hasHandler>[0]} [type]
-				 * @param {GameEvent} [event]
+				 * @param {Parameters<typeof this.hasHandler>[0]} type
+				 * @param {GameEvent} event
+				 * @param {{
+				 * state?: 'begin' | 'end';
+				 * }} option
 				 * @returns {this}
 				 */
-				callHandler(type,event){
-					if(this.hasHandler(type)){
-						if(!event) event=this;
-						this.getHandler(type).forEach(handler=>{
-							if(typeof handler=='function') handler(event);
-						});
-					}
+				callHandler(type,event,option){
+					if(this.hasHandler(type)) this.getHandler(type).forEach(handler=>{
+						if(typeof handler=='function') handler(event,option);
+					});
 					return this;
 				}
 				getDefaultHandlerType(){
@@ -30977,7 +30990,9 @@
 				}
 				/**
 				 * @param {Parameters<typeof this.hasHandler>[0]} [type]
-				 * @returns {((event: GameEvent) => void)[]}
+				 * @returns {((event: GameEvent, option: {
+				 * state?: 'begin' | 'end';
+				 * }) => void)[]}
 				 */
 				getHandler(type){
 					if(!type) type=this.getDefaultHandlerType();
@@ -30995,13 +31010,17 @@
 				}
 				/**
 				 * @overload
-				 * @param {...((event: GameEvent) => void)[]} handlers
+				 * @param {...((event: GameEvent, option: {
+				 * state?: 'begin' | 'end';
+				 * }) => void)[]} handlers
 				 * @returns {number}
 				 */
 				/**
 				 * @overload
 				 * @param {Parameters<typeof this.hasHandler>[0]} type
-				 * @param {...((event: GameEvent) => void)[]} handlers
+				 * @param {...((event: GameEvent, option: {
+				 * state?: 'begin' | 'end';
+				 * }) => void)[]} handlers
 				 * @returns {number}
 				 */
 				pushHandler(type){
@@ -33079,8 +33098,8 @@
 					player.changeFury(-stratagemBuff.cost.get(cardName),true);
 					const gameEvent=get.event(),effect=stratagemBuff.effect.get(cardName);
 					if(typeof effect=='function') gameEvent.pushHandler('onNextUseCard',effect);
-					gameEvent.pushHandler('onNextUseCard',event=>{
-						if(event.step==1) game.broadcastAll(cards=>cards.forEach(card=>card.clone.classList.add('stratagem-fury-glow')),event.cards);
+					gameEvent.pushHandler('onNextUseCard',(event,option)=>{
+						if(event.step==0&&option.state=='end') game.broadcastAll(cards=>cards.forEach(card=>card.clone.classList.add('stratagem-fury-glow')),event.cards);
 					});
 				},
 				ai:{
@@ -35838,6 +35857,7 @@
 			for(let i=0;i<ui.discardPile.childNodes.length;i++){
 				var currentcard=ui.discardPile.childNodes[i];
 				currentcard.vanishtag.length=0;
+				currentcard.clearKnowers();
 				if(get.info(currentcard).vanish||currentcard.storage.vanish){
 					currentcard.remove();
 					continue;
@@ -40882,7 +40902,9 @@
 						}*/
 					}
 					else{
-						event.callHandler();
+						event.callHandler(event.getDefaultHandlerType(),event,{
+							state:'begin'
+						});
 						if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){
 							game.broadcastAll(function(){
 								while(_status.dieClose.length){
@@ -40977,8 +40999,10 @@
 							}
 						}
 						event.clearStepCache();
+						event.callHandler(event.getDefaultHandlerType(),event,{
+							state:'end'
+						});
 						event.step++;
-						if(event.finished) event.callHandler();
 					}
 				}
 			}

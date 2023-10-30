@@ -466,8 +466,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return _status.event.choice;
 					}).set('choice',function(){
 						var num=trigger.player.countCards('h',card=>get.type2(card)==type);
+						var knownNum = trigger.player.countKnownCards(_status.event.player,card=>get.type2(card)==type);
+						if(trigger.player.isAllCardsKnown(_status.event.player)){
+							return knownNum;
+						}
+						var restNum = num - knownNum;
 						var numx;
-						if(type=='basic') numx=num+(Math.random()<0.2?(Math.random()>0.5?1:-1):0);
+						if(type=='basic') numx=num+Math.floor(Math.random()*restNum+1);
 						else if(type=='trick'){
 							if(num>2) numx=2;
 							else numx=1;
@@ -478,7 +483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							numx=[0,1].randomGet();
 						}
-						if(numx<0) numx=0;
+						if(numx<knownNum) numx=knownNum;
 						else if(numx>=choices.length) numx=choices.length-1;
 						return numx;
 					}());

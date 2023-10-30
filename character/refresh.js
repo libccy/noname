@@ -2538,6 +2538,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					targets[event.num].chooseBool("是否押杀？").ai=function(event,player){
 						var evt=_status.event.getParent();
 						if(get.attitude(targets[event.num],evt.player)>0) return evt.player.countCards('h','sha')?false:true;
+						if(evt.player.hasKnownCards(targets[event.num],c=>{return c.name == 'sha';})){
+							return true;
+						}
 						return Math.random()<0.5;
 					};
 					"step 2"
