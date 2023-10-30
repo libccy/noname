@@ -450,12 +450,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								target:target
 							},true)) return 2;
 							let mode = get.mode(),
-								taos = player.countCards('hs',i=>get.name==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable'));
+								taos = player.getCards('hs',i=>get.name(i)==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable'));
 							if(target.hp>0){
 								let min = 7.2-1.2*Math.min(3,player.hp),
-									nd = player.needsToDiscard(-player.countCards('h',i=>get.value(i)<min)),
+									nd = player.needsToDiscard(-player.countCards('h',i=>!taos.includes(i)&&get.value(i)<min)),
 									keep = 0;
-								if(nd>1&&taos>1&&player.hp<1+taos || target.identity==='zhu'&&target.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')) return 2;
+								if(taos.length>1&&(nd>1||nd&&player.hp<1+taos.length) || target.identity==='zhu'&&target.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')) return 2;
 								if(nd<3&&game.hasPlayer(current=>{
 									return player!==current&&current.identity==='zhu'&&current.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')&&get.attitude(player,current)>0;
 								})){
@@ -464,7 +464,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								}
 								else if(nd<2 || !player.isPhaseUsing()){
 									if(nd<1) keep = 3;
-									else if(target.hp>=2&&taos<=target.hp/2) keep = 1;
+									else if(target.hp>=2&&taos.length<=target.hp/2) keep = 1;
 								}
 								if(keep){
 									if(!nd || game.countPlayer(current=>{
@@ -480,13 +480,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							if(target.isZhu2() || target===game.boss) return 2;
 							if(player!==target){
-								if(target.hp<0&&taos+target.hp<=0) return 0;
+								if(target.hp<0&&taos.length+target.hp<=0) return 0;
 								if(Math.abs(get.attitude(player,target))<1) return 0;
 							}
 							if(!player.getFriends().length) return 2;
 							let tri = _status.event.getTrigger(),
 								num = game.countPlayer(current=>{
-									if(get.attitude(current,target)>0) return current.countCards('hs',i=>get.name==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable'));
+									if(get.attitude(current,target)>0) return current.countCards('hs',i=>get.name(i)==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable'));
 								}),
 								dis = 1,
 								t = _status.currentPhase||game.me;
