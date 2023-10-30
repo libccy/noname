@@ -1213,6 +1213,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldlonghun_info:'你可以将花色相同的Y张牌按下列规则使用或打出：♥当【桃】，♦当火【杀】，♣当【闪】，♠当普【无懈可击】（Y为你的体力值且至少为1）。',
 			panfeng:'旧潘凤',
 			panfeng_prefix:'旧',
+			old_shixie:'旧士燮',
+			old_shixie_prefix:'旧',
 			
 			old_standard:'标准包',
 			old_shenhua:'神话再临',
