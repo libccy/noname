@@ -5658,6 +5658,13 @@
 						frequent:true,
 						restart:true,
 					},
+					connect_aozhan:{
+						name:'鏖战模式',
+						init:true,
+						intro:'若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。',
+						frequent:true,
+						restart:true,
+					},
 					get connect_separatism(){
 						return lib.mode.guozhan.config.separatism;
 					},
@@ -5671,13 +5678,6 @@
 						init:'mark',
 						frequent:true,
 						intro:'第一个明置武将牌的角色可获得首亮奖励'
-					},
-					connect_aozhan:{
-						name:'鏖战模式',
-						init:true,
-						intro:'若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。',
-						frequent:true,
-						restart:true,
 					},
 					connect_viewnext:{
 						name:'观看下家副将',
