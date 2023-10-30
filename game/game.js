@@ -51009,7 +51009,10 @@
 						var node=ui.create.div('.menubutton.large','录像',start.firstChild,clickMode);
 						node.type='video';
 						lib.videos=[];
-						ui.create.videoNode=(video,before)=>lib.videos[before===true?'unshift':'push'](video);
+						ui.create.videoNode=(video,before)=>{
+							lib.videos.remove(video);
+							lib.videos[before===true?'unshift':'push'](video);
+						};
 						node._initLink=function(){
 							node.link=page;
 							var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
