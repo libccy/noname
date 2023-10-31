@@ -19185,7 +19185,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			伊座并杏子:['Izanami','Kyouko'],
 			加纳天善:['Kano','Tenzen'],
 			冰室忧希:['Himuro','Yuuki'],
-			露娜Q:['Lunar','Q'],
+			露娜Ｑ:['Lunar','Q'],
 			远野小满:['Toono','Michiru'],
 			远野美凪:['Toono','Minagi'],
 			樱庭星罗:['Sakuraba','Seira'],
