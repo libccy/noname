@@ -49,7 +49,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else{
-						target.chooseToDiscard('he',{type:'equip'},'弃置一张装备牌或受到一点伤害').ai=function(card){
+						target.chooseToDiscard('he',{type:'equip'},'弃置一张装备牌或受到1点伤害').ai=function(card){
 							var player=_status.event.player;
 							var source=_status.event.getParent().player;
 							if(get.damageEffect(player,source,player)>0) return -1;
@@ -187,40 +187,40 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				equipSkill:true,
 				direct:true,
-   	content:function(){
-   		'step 0'
-   		player.chooseTarget(get.prompt2('xuelunyang'),function(card,player,target){
-   			var names=[];
-   			if(target.name&&!target.isUnseen(0)) names.add(target.name);
-   			if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
-   			if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
-   			var pss=player.getSkills();
-   			for(var i=0;i<names.length;i++){
-   				var info=lib.character[names[i]];
-   				if(info){
-   					var skills=info[3];
-   					for(var j=0;j<skills.length;j++){
-   						if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
-   							!lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
-   							return true;
-   						}
-   					}
-   				}
-   				return false;
-   			}
-   		}).set('ai',function(target){
-   			return Math.random();
-   		});
-   		'step 1'
-   		if(result.bool){
-   			event.target=result.targets[0];
-   			player.logSkill('xuelunyang',event.target);
-   		}
-   		else{
-   			event.finish();
-   		}
-   		'step 2'
-   		var names=[];
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('xuelunyang'),function(card,player,target){
+						var names=[];
+						if(target.name&&!target.isUnseen(0)) names.add(target.name);
+						if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
+						if(target.name2&&!target.isUnseen(1)) names.add(target.name2);
+						var pss=player.getSkills();
+						for(var i=0;i<names.length;i++){
+							var info=lib.character[names[i]];
+							if(info){
+								var skills=info[3];
+								for(var j=0;j<skills.length;j++){
+									if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
+										!lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
+										return true;
+									}
+								}
+							}
+							return false;
+						}
+					}).set('ai',function(target){
+						return Math.random();
+					});
+					'step 1'
+					if(result.bool){
+						event.target=result.targets[0];
+						player.logSkill('xuelunyang',event.target);
+					}
+					else{
+						event.finish();
+					}
+					'step 2'
+					var names=[];
 					var list=[];
 					if(target.name&&!target.isUnseen(0)) names.add(target.name);
 					if(target.name1&&!target.isUnseen(0)) names.add(target.name1);
@@ -240,12 +240,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					player.chooseControl(list).set('prompt','选择获得一个技能').set('choice',get.max(list,get.skillRank,'item')).set('ai',function(){return _status.event.choice})
-   		'step 3'
-   		player.addTempSkill(result.control);
-   		player.popup(result.control);
-   		game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
-   	},
-   },
+					'step 3'
+					player.addTempSkill(result.control);
+					player.popup(result.control);
+					game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
+				},
+			},
 
 			"jiuwei":{
 				trigger:{
@@ -266,17 +266,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 		},
 		translate:{
 			"monkey":"猴子",
-			"monkey_info":"猴子偷桃：当场上有其他角色使用【桃】时，你可以弃掉【猴子】，阻止【桃】的结算并将其收为手牌",
+			"monkey_info":"猴子偷桃：当场上有其他角色使用【桃】时，你可以弃掉【猴子】，阻止【桃】的结算并将其收为手牌。",
 			"mianju":"漩涡面具",
-			"mianju_info":"<font color=#f00>锁定技</font> 你的武将牌不能被翻面",
+			"mianju_info":"<font color=#f00>锁定技</font> 你的武将牌不能被翻面。",
 			"shoulijian":"手里剑",
-			"shoulijian_info":"出牌阶段，对一名距离1以外的角色使用，令其弃置一张装备牌或受到一点伤害",
+			"shoulijian_info":"出牌阶段，对一名距离1以外的角色使用，令其弃置一张装备牌或受到1点伤害。",
 			"kuwu":"苦无",
-			"kuwu_info":"<font color=#f00>锁定技</font> 每当你使用【杀】造成一次伤害，受伤角色须弃置一张牌",
+			"kuwu_info":"<font color=#f00>锁定技</font> 每当你使用【杀】造成一次伤害，受伤角色须弃置一张牌。",
 			"xuelunyang":"写轮眼",
-			"xuelunyang_info":"回合开始阶段，你可以选择一名角色，然后获得其一项技能，直到回合结束",
+			"xuelunyang_info":"回合开始阶段，你可以选择一名角色，然后获得其一项技能，直到回合结束。",
 			"jiuwei":"九尾",
-			"jiuwei_info":"（收集查克拉）回合结束时，若你已受伤，你可回复一点体力，否则摸一张牌",
+			"jiuwei_info":"（收集查克拉）回合结束时，若你已受伤，你可回复1点体力，否则摸一张牌。",
 		},
 		list:[
 			["diamond","5","monkey"],

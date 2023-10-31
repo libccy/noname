@@ -1464,8 +1464,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard1'},
 				forced:true,
 				filter:function(event,player){
-					return event.card.name=='sha'&&event.cards.length==1&&player.getHistory('useCard',function(evt){
-						return evt.card.name=='sha'&&evt.cards.length==1;
+					if(event.card.name!='sha'||!event.cards||event.cards.length!=1) return false;
+					var evt=event.getParent('phaseUse');
+					return evt&&evt.player==player&&player.getHistory('useCard',function(evt2){
+						return evt2.card.name=='sha'&&evt.cards&&evt.cards.length==1&&evt2.getParent('phaseUse')==evt;
 					}).indexOf(event)==0;
 				},
 				content:function(){
@@ -3241,7 +3243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
-				group:['yizhu_use','yizhu_discard'],
+				group:'yizhu_use',
 				subSkill:{
 					use:{
 						audio:'yizhu',
@@ -3258,7 +3260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.effect(event.targets[0],event.card,event.player,player)<0;
 						},
 						prompt2:function(event,player){
-							return '令'+get.translation(event.card)+'无效并可重新使用';
+							return '令'+get.translation(event.card)+'无效';
 						},
 						content:function(){
 							trigger.cancel();
@@ -3269,26 +3271,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							player.unmarkAuto('yizhu',list);
 							game.delayx();
-							player.chooseUseTarget(trigger.card,trigger.cards,false,'nothrow');
-						},
-					},
-					discard:{
-						trigger:{
-							global:['loseAfter','cardsDiscardAfter','loseAsyncAfter','equipAfter'],
-						},
-						forced:true,
-						locked:false,
-						filter:function(event,player){
-							return player.storage.yizhu&&player.storage.yizhu.length&&event.getd().filter(function(i){
-								return player.storage.yizhu.contains(i);
-							}).length>0;
-						},
-						content:function(){
-							var list=trigger.getd().filter(function(i){
-								return player.storage.yizhu.contains(i);
-							});
-							player.unmarkAuto('yizhu',list);
-							player.draw();
 						},
 					},
 				},
@@ -3349,16 +3331,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(_status.luanchou_judging) return;
-							_status.luanchou_judging=true;
 							if(get.tag(card,'damage')&&target.hasMark('luanchou')){
 								var other=game.findPlayer(function(current){
 									return current!=target&&current.hasMark('luanchou')&&current.hp>target.hp&&(!current.storage.counttrigger||!current.storage.counttrigger.gonghuan);
 								});
-								if(!other){
-									delete _status.luanchou_judging;
-									return;
-								};
-								var eff=[0,0,0,get.damageEffect(other,player,target,get.nature(card))];
+								if(!other) return;
+								_status.luanchou_judging=true;
+								var eff=[0,0,0,get.damageEffect(other,player,player,get.nature(card))/get.attitude(player,player)];
 								delete _status.luanchou_judging;
 								return eff;
 							}
@@ -4715,7 +4694,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player,evt=_status.event.getParent();
 						if(get.value(evt.card,evt.player)*get.attitude(player,evt.player)>0) return 0;
 						return Math.random()>(get.value(evt.card,evt.player)/6)?1:0;
-						return 1;
+						//return 1;
 					});
 					'step 2'
 					if(result.index+event.addIndex==0){
@@ -4765,21 +4744,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'将两张牌交给一名其他角色并获得其装备区内的一张牌',
 						];
 						var choiceList=ui.create.dialog('睦阵：请选择一项','hidden');
-						for(var i=0;i<list.length;i++){
-							var str='<div class="popup text" style="width:calc(100% - 10px);display:inline-block">';
-							var bool=lib.skill.muzhen.chooseButton.filter({link:i},player);
-							if(!bool) str+='<div style="opacity:0.5">';
-							str+=list[i];
-							if(!bool) str+='</div>';
-							str+='</div>';
-							var next=choiceList.add(str);
-							next.firstChild.addEventListener(lib.config.touchscreen?'touchend':'click',ui.click.button);
-							next.firstChild.link=i;
-							for(var j in lib.element.button){
-								next[j]=lib.element.button[j];
-							}
-							choiceList.buttons.add(next.firstChild);
-						}
+						choiceList.add([list.map((item,i)=>{
+							return [i,item];
+						}),'textbutton']);
 						return choiceList;
 					},
 					filter:function(button,player){
@@ -6499,7 +6466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			heji:'合击',
 			heji_info:'当有角色使用的【决斗】或红色【杀】结算完成后，若此牌对应的目标数为1，则你可以对相同的目标使用一张【杀】或【决斗】（无距离和次数限制）。若你以此法使用的牌不为转化牌，则你从牌堆中随机获得一张红色牌。',
 			liubing:'流兵',
-			liubing_info:'锁定技。①当你声明使用【杀】后，若此牌是你本回合使用的第一张有唯一对应实体牌的【杀】，则你将此牌的花色改为♦。②其他角色于其出牌阶段内使用的非转化黑色杀结算结束后，若此【杀】未造成伤害，则你获得之。',
+			liubing_info:'锁定技。①你于出牌阶段使用的第一张有唯一对应实体牌的【杀】的花色视为♦。②其他角色于其出牌阶段内使用的非转化黑色杀结算结束后，若此【杀】未造成伤害，则你获得之。',
 			sp_mifuren:'手杀糜夫人',
 			spcunsi:'存嗣',
 			spcunsi2:'存嗣',
@@ -6509,7 +6476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingyu:'清玉',
 			qingyu_info:'使命技。①当你受到伤害时，你弃置两张牌，然后防止此伤害。②使命：准备阶段，若你的体力值等于体力上限且你没有手牌，则你获得〖悬存〗。③失败：当你进入濒死状态时，你减1点体力上限。',
 			xuancun:'悬存',
-			xuancun_info:'其他角色的回合结束时，若你的手牌数小于体力值，则你可以令其摸X张牌（X为你的体力值与手牌数之差且至多为2）',
+			xuancun_info:'其他角色的回合结束时，若你的手牌数小于体力值，则你可以令其摸X张牌（X为你的体力值与手牌数之差且至多为2）。',
 			xinlirang:'礼让',
 			xinlirang_info:'①其他角色的摸牌阶段开始时，若你没有“谦”标记，则你可以获得一枚“谦”标记。若如此做，其额定摸牌数+2，且本回合的弃牌阶段开始时，你可以获得其弃置的至多两张牌。②摸牌阶段开始时，若你有“谦”标记，则你跳过此摸牌阶段并移除“谦”标记。',
 			xinmingshi:'名仕',
@@ -6610,7 +6577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehuaibi_info:'主公技，锁定技，你的手牌上限+X（X为你因〖邀虎〗选择势力的角色数量)。',
 			qiaogong:'桥公',
 			yizhu:'遗珠',
-			yizhu_info:'①结束阶段，你摸两张牌，然后将两张牌随机插入牌堆前2X张牌的位置中（X为角色数，选择牌的牌名对其他角色可见）。②当有其他角色使用“遗珠”牌指定唯一目标时，你可清除对应的“遗珠”标记并取消此目标，然后你可使用此牌。③当有“遗珠”牌进入弃牌堆后，你摸一张牌并清除对应的“遗珠”标记。',
+			yizhu_info:'①结束阶段，你摸两张牌，然后将两张牌随机插入牌堆前2X张牌的位置中（X为角色数，选择牌的牌名对其他角色可见）。②其他角色使用“遗珠”牌指定唯一目标时，你可以取消此目标，然后你清除对应的“遗珠”标记。',
 			luanchou:'鸾俦',
 			luanchou_info:'出牌阶段限一次，你可令两名角色获得“姻”标记并清除原有标记。拥有“姻”标记的角色视为拥有技能〖共患〗。',
 			gonghuan:'共患',
@@ -6664,7 +6631,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spxiangzhen:'象阵',
 			spxiangzhen_info:'锁定技。①【南蛮入侵】对你无效。②当有角色使用的【南蛮入侵】结算结束后，若有角色因此牌受到过伤害，则你和使用者各摸一张牌。',
 			spfangzong:'芳踪',
-			spfangzong_info:'锁定技。①你不能于回合内使用具有伤害标签的牌指定攻击范围内的角色为目标。②攻击范围内包含你的角色不能使用具有伤害标签的牌指定你为目标。③结束阶段，你将手牌摸至X张（X为场上存活人数且至多为8）',
+			spfangzong_info:'锁定技。①你不能于回合内使用具有伤害标签的牌指定攻击范围内的角色为目标。②攻击范围内包含你的角色不能使用具有伤害标签的牌指定你为目标。③结束阶段，你将手牌摸至X张（X为场上存活人数且至多为8）。',
 			spxizhan:'嬉战',
 			spxizhan_info:'其他角色的回合开始时，你须选择一项：①失去1点体力。②弃置一张牌并令〖芳踪〗于本回合失效，然后若此牌的花色为：♠，其视为使用一张【酒】；♥，你视为使用一张【无中生有】；♣，你视为对其使用【铁索连环】；♦：你视为对其使用火【杀】（无距离限制）。',
 			sp_cuiyan:'手杀崔琰',
@@ -6700,7 +6667,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spshiji:'势击',
 			spshiji_info:'当你对其他角色造成属性伤害时，若你的手牌数不为全场唯一最多，则你可以观看其手牌。你令其弃置其中的所有红色牌，然后摸等量的牌。',
 			sptaoluan:'讨乱',
-			sptaoluan_info:'每回合限一次。一名角色的判定结果确定时，若结果的花色为♠，则你可以终止导致此判定发生的上级事件。然后选择一项：①获得判定牌对应的实体牌。②视为对判定角色使用一张火【杀】（无距离和次数限制）',
+			sptaoluan_info:'每回合限一次。一名角色的判定结果确定时，若结果的花色为♠，则你可以终止导致此判定发生的上级事件。然后选择一项：①获得判定牌对应的实体牌。②视为对判定角色使用一张火【杀】（无距离和次数限制）。',
 			sp_zhujun:'手杀朱儁',
 			yangjie:'佯解',
 			yangjie_info:'出牌阶段限一次，你可以摸一张牌并和一名其他角色A拼点。当你以此法展示你的拼点牌时，你令此牌点数-X（X为你已损失的体力值）。若你没赢，则你可以令另一名其他角色B获得两张拼点牌，然后其视为对A使用一张火【杀】。',

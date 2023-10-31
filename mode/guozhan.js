@@ -99,11 +99,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(_status.brawl&&_status.brawl.submode){
 					_status.mode=_status.brawl.submode;
 				}
+				if(get.config('separatism')) _status.separatism=true;
 			}
 			"step 1"
 			if(_status.connectMode){
 				_status.mode=lib.configOL.guozhan_mode;
 				if(!['normal','yingbian','old'].contains(_status.mode)) _status.mode='normal';
+				if(lib.configOL.separatism) _status.separatism=true;
 				//决定牌堆
 				switch(_status.mode){
 					case 'old':lib.card.list=lib.guozhanPile_old.slice(0);break;
@@ -115,8 +117,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					default:lib.card.list=lib.guozhanPile.slice(0);break;
 				}
 				game.fixedPile=true;
-				game.broadcastAll(function(mode){
+				game.broadcastAll((mode,separatism)=>{
 					_status.mode=mode;
+					if(separatism) _status.separatism=true;
 					if(mode=='yingbian'){
 						delete lib.translate.shuiyanqijunx_info_guozhan;
 					}
@@ -145,7 +148,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					lib.characterReplace={};
-				},_status.mode);
+				},_status.mode,_status.separatism);
 				game.randomMapOL();
 			}
 			else{
@@ -189,8 +192,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.gameDraw(event.playerx);
 			game.broadcastAll(function(player){
 				for(var i=0;i<game.players.length;i++){
-					game.players[i].name='unknown'+get.distance(player,game.players[i],'absolute');
-					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.verticalStr(lib.translate[game.players[i].name]),game.players[i]);
+					var seatNum=get.distance(player,game.players[i],'absolute');
+					game.players[i].name=`unknown${seatNum}`;
+					game.players[i].node.name_seat=ui.create.div('.name.name_seat',get.seatTranslation(seatNum),game.players[i]);
 					// if(game.players[i]==game.me){
 					// 	lib.translate[game.players[i].name]+='（你）';
 					// }
@@ -7201,7 +7205,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					var list=['失去一点体力','令'+get.translation(player)+'摸两张牌'];
+					var list=['失去1点体力','令'+get.translation(player)+'摸两张牌'];
 					event.addIndex=0;
 					if(target.countCards('h',function(card){
 						return lib.filter.cardDiscardable(card,target,'gzlixia');
@@ -7798,7 +7802,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.targets=result.targets;
 					var choiceList=[];
 					choiceList.push('执行该军令');
-					choiceList.push('令'+get.translation(trigger.player)+(trigger.player==trigger.source?'（你）':'')+'回复一点体力');
+					choiceList.push('令'+get.translation(trigger.player)+(trigger.player==trigger.source?'（你）':'')+'回复1点体力');
 					trigger.source.chooseJunlingControl(player,result.junling,result.targets).set('prompt','补益').set('choiceList',choiceList).set('ai',function(){
 						if(get.recoverEffect(trigger.player,player,_status.event.player)>0) return 1;
 						return (get.attitude(trigger.source,trigger.player)<0&&get.junlingEffect(player,result.junling,trigger.source,result.targets,trigger.source)>=-2)?1:0;
@@ -8675,7 +8679,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(num<event.players.length) event.current=event.players[num];
 					if(event.current&&event.current.isAlive()){
 						event.showCharacter=false;
-						var choiceList=['执行该军令，增加一点体力上限，然后回复一点体力','不执行该军令'];
+						var choiceList=['执行该军令，增加1点体力上限，然后回复1点体力','不执行该军令'];
 						if(event.current.isFriendOf(player)) event.current.chooseJunlingControl(player,event.junling,targets).set('prompt','将略').set('choiceList',choiceList).set('ai',function(){return 0});
 						else if((event.filterName(event.current.name1)||event.filterName(event.current.name2))&&event.current.wontYe(player.identity)){
 							event.showCharacter=true;
@@ -8994,7 +8998,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							player.logSkill('enyuan_damage',trigger.source);
-							trigger.source.chooseCard('交给'+get.translation(player)+'一张手牌，或失去一点体力','h').set('ai',function(card){
+							trigger.source.chooseCard('交给'+get.translation(player)+'一张手牌，或失去1点体力','h').set('ai',function(card){
 								if(get.attitude(_status.event.player,_status.event.getParent().player)>0) return 11-get.value(card);
 								return 7-get.value(card);
 							});
@@ -12931,7 +12935,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(result.bool){
 						var nono=(get.damageEffect(trigger.player,player,trigger.player)>=0);
-						trigger.player.chooseToDiscard('弃置一张装备牌，或受到一点伤害','he',{type:'equip'}).set('ai',function(card){
+						trigger.player.chooseToDiscard('弃置一张装备牌，或受到1点伤害','he',{type:'equip'}).set('ai',function(card){
 							if(_status.event.nono){
 								return 0;
 							}
@@ -12950,7 +12954,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			_mingzhi1:{
 				trigger:{player:'phaseBeginStart'},
-				priority:19,
+				//priority:19,
+				ruleSkill:true,
 				forced:true,
 				popup:false,
 				filter:function(event,player){
@@ -13503,6 +13508,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				else{
 					num={mark:'标记',draw:'摸牌'}[lib.configOL.initshow_draw];
 				}
+				uiintro.add('<div class="text chat">群雄割据：'+(lib.configOL.separatism?'开启':'关闭'));
 				uiintro.add('<div class="text chat">首亮奖励：'+num);
 				uiintro.add('<div class="text chat">珠联璧合：'+(lib.configOL.zhulian?'开启':'关闭'));
 				uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
@@ -13584,7 +13590,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 			getVideoName:function(){
 				var str=get.translation(game.me.name1)+'/'+get.translation(game.me.name2);
-				var str2=get.cnNumber(parseInt(get.config('player_number')))+'人'+
+				var str2=_status.separatism?get.modetrans({
+					mode:lib.config.mode,
+					separatism:true
+				}):get.cnNumber(parseInt(get.config('player_number')))+'人'+
 					get.translation(lib.config.mode);
 				if(game.me.identity=='ye'){
 					str2+=' - 野心家';
@@ -13688,6 +13697,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					var filterChoice=function(name1,name2){
+						if(_status.separatism) return true;
 						var group1=lib.character[name1][1];
 						var group2=lib.character[name2][1];
 						var doublex=get.is.double(name1,true);
@@ -13848,6 +13858,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							if(lib.character[button.link][4].contains('hiddenSkill')) return false;
 							var filterChoice=function(name1,name2){
+								if(_status.separatism) return true;
 								var group1=lib.character[name1][1];
 								var group2=lib.character[name2][1];
 								var doublex=get.is.double(name1,true);
@@ -14036,6 +14047,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					game.broadcastAll(function(){
 						ui.arena.classList.add('choose-character');
+						for(var i=0;i<game.players.length;i++){
+							game.players[i].classList.add('unseen');
+							game.players[i].classList.add('unseen2');
+						}
 					});
 					var list=[];
 					for(var i in lib.characterPack.mode_guozhan){
@@ -14073,6 +14088,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						var filterChoice=function(name1,name2){
+							if(_status.separatism) return true;
 							var group1=lib.character[name1][1];
 							var group2=lib.character[name2][1];
 							var doublex=get.is.double(name1,true);
@@ -14108,13 +14124,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).set('processAI',function(){
 						var buttons=_status.event.dialog.buttons;
 						var filterChoice=function(name1,name2){
-							if(get.is.double(name1)) return false;
+							if(_status.separatism) return true;
 							var group1=lib.character[name1][1];
 							var group2=lib.character[name2][1];
-							if(group1=='ye') return group2!='ye';
-							var double=get.is.double(name2,true);
-							if(double) return double.contains(group1);
-							return group1==group2;
+							var doublex=get.is.double(name1,true);
+							if(doublex){
+								var double=get.is.double(name2,true);
+								if(double) return doublex.some(group=>double.contains(group));
+								return doublex.contains(group2);
+							}
+							else{
+								if(group1=='ye') return group2!='ye';
+								var double=get.is.double(name2,true);
+								if(double) return double.contains(group1);
+								return group1==group2;
+							}
 						};
 						for(var i=0;i<buttons.length-1;i++){
 							for(var j=i+1;j<buttons.length;j++){
@@ -14207,59 +14231,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(!result) result={};
 					var result2=event.result2;
-					for(var i in result){
-						if(result[i]&&result[i].links) result[i]=result[i].links[0][2].slice(6);
-						else if(result[i]=='ai') result[i]=function(){
-							var player=lib.playerOL[i];
-							var name1=result2[i][0],name2=result2[i][1];
-							if(get.is.double(name1,true)) return get.is.double(name2,true).filter(group=>get.is.double(name1,true).contains(group)).randomGet();
-							if(lib.character[name1][1]=='ye') return get.is.double(name2,true).randomGet();
-						}();
-					}
-					game.broadcast(function(result,result2){
-						for(var i in result){
-							if(!lib.playerOL[i].name){
-								lib.playerOL[i].init(result[i][0],result[i][1],false);
-							}
-							if(result2[i]&&result2[i].length) lib.playerOL[i].trueIdentity=result2[i];
-						}
-						setTimeout(function(){
-							ui.arena.classList.remove('choose-character');
-						},500);
-					},result2,result);
-					for(var i in result2){
-						if(!lib.playerOL[i].name){
-							lib.playerOL[i].init(result2[i][0],result2[i][1],false);
-						}
-						if(result[i]&&result[i].length) lib.playerOL[i].trueIdentity=result[i];
-					}
-					for(var i=0;i<game.players.length;i++){
-						_status.characterlist.remove(game.players[i].name);
-						_status.characterlist.remove(game.players[i].name2);
-						game.players[i].hiddenSkills=lib.character[game.players[i].name1][3].slice(0);
-						var hiddenSkills2=lib.character[game.players[i].name2][3];
-						for(var j=0;j<hiddenSkills2.length;j++){
-							game.players[i].hiddenSkills.add(hiddenSkills2[j]);
-						}
-						for(var j=0;j<game.players[i].hiddenSkills.length;j++){
-							if(!lib.skill[game.players[i].hiddenSkills[j]]){
-								game.players[i].hiddenSkills.splice(j--,1);
-							}
-						}
-						for(var j=0;j<game.players[i].hiddenSkills.length;j++){
-							game.players[i].name1=game.players[i].name;
-							game.players[i].addSkillTrigger(game.players[i].hiddenSkills[j],true);
-						}
-					}
-					game.broadcastAll(function(result){
-						for(var i in result){
-							if(!lib.playerOL[i].name){
-								lib.playerOL[i].init(result[i][0],result[i][1],false);
-							}
-						}
+					game.broadcastAll(function(result,result2){
 						for(var i=0;i<game.players.length;i++){
-							game.players[i].classList.add('unseen');
-							game.players[i].classList.add('unseen2');
+							var current=game.players[i],id=current.playerid;
+							if(result[id]&&!current.name){
+								current.init(result[id][0],result[id][1],false);
+							}
+							if(result2[id]&&result2[id].length){
+								current.trueIdentity=result2[id][0][2].slice(6);
+							}
 							if(game.players[i]!=game.me){
 								game.players[i].node.identity.firstChild.innerHTML='猜';
 								game.players[i].node.identity.dataset.color='unknown';
@@ -14286,7 +14266,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						setTimeout(function(){
 							ui.arena.classList.remove('choose-character');
 						},500);
-					},result2);
+					},result2,result);
 				});
 			}
 		},
@@ -14342,13 +14322,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			junling:'军令',
 			junling1:'军令一',
 			junling1_bg:'令',
-			junling1_info:'若被执行，执行者对发起者指定的一名角色造成一点伤害。',
+			junling1_info:'若被执行，执行者对发起者指定的一名角色造成1点伤害。',
 			junling2:'军令二',
 			junling2_bg:'令',
 			junling2_info:'若被执行，执行者摸一张牌，然后依次交给发起者两张牌。',
 			junling3:'军令三',
 			junling3_bg:'令',
-			junling3_info:'若被执行，执行者失去一点体力。',
+			junling3_info:'若被执行，执行者失去1点体力。',
 			junling4:'军令四',
 			junling4_bg:'令',
 			junling4_info:'若被执行，直到回合结束，执行者不能使用或打出手牌且非锁定技全部失效。',
@@ -14388,14 +14368,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzzhuhai_info:'其他角色的结束阶段开始时，若其本回合内造成过伤害，则你可以对其使用一张【杀】（无距离限制）。若其本回合内对与你势力相同的角色造成过伤害，则此【杀】无视防具，且当其抵消此【杀】后，其须弃置一张牌。',
 			gzzhuosheng:'擢升',
 			gzzhuosheng2:'擢升',
-			gzzhuosheng_info:'当一名与你势力相同的角色受到伤害后，你可令其摸一张牌。然后直到其下个结束阶段前，其使用此牌根据类型执行以下效果：1. 基本牌，不计入次数且无距离限制；2. 普通锦囊牌，此牌目标可+1或-1；3. 装备牌，可摸1张牌。',
+			gzzhuosheng_info:'当一名与你势力相同的角色受到伤害后，你可令其摸一张牌。然后直到其下个结束阶段前，其使用此牌根据类型执行以下效果：1. 基本牌，不计入次数且无距离限制；2. 普通锦囊牌，此牌目标可+1或-1；3. 装备牌，可摸一张牌。',
 
 			gzzhaoxin:'昭心',
 			gzzhaoxin_info:'当你受到伤害后，你可展示所有手牌，然后与一名手牌数不大于你的其他角色交换手牌。',
 			gzsuzhi:'夙智',
 			gzsuzhi_info:'锁定技，每回合累计限三次；①当你于回合内因执行【杀】或【决斗】造成伤害时，此伤害+1；②你于回合内使用非转化的锦囊牌时摸一张牌，且无距离限制；③当有其他角色于你的回合内弃置牌后，你获得该角色的一张牌；④结束阶段，你获得〖反馈〗直到下回合开始。',
 			gzhuaiyi:'怀异',
-			gzhuaiyi_info:'出牌阶段限一次，你可以展示所有手牌。若其中包含两种颜色，则你可以弃置其中一种颜色的所有牌，然后获得至多等量名角色的各一张牌。然后你将以此法得到的装备牌置于武将牌上，称为“异”',
+			gzhuaiyi_info:'出牌阶段限一次，你可以展示所有手牌。若其中包含两种颜色，则你可以弃置其中一种颜色的所有牌，然后获得至多等量名角色的各一张牌。然后你将以此法得到的装备牌置于武将牌上，称为“异”。',
 			gzzisui:'恣睢',
 			gzzisui_info:'锁定技，摸牌阶段，你多摸X张牌。结束阶段开始时，若X大于你的体力上限，你死亡（X为“异”数）。',
 
@@ -14444,7 +14424,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzweimeng_zongheng:'危盟·纵横',
 			gzweimeng_zongheng_info:'出牌阶段限一次，你可以获得一名其他角色的一张手牌，然后交给其一张牌。',
 			gzjuejue:'决绝',
-			gzjuejue_info:'①弃牌阶段开始时，你可失去1点体力。然后若你于此阶段内弃置过你的牌，则你令其他角色各选择一项：1.将X张手牌置入弃牌堆（X为你于此阶段内弃置过的牌数）；2.受到你造成的1点伤害。②你杀死与你势力相同的角色不执行奖惩。 ',
+			gzjuejue_info:'①弃牌阶段开始时，你可失去1点体力。然后若你于此阶段内弃置过你的牌，则你令其他角色各选择一项：1.将X张手牌置入弃牌堆（X为你于此阶段内弃置过的牌数）；2.受到你造成的1点伤害。②你杀死与你势力相同的角色不执行奖惩。',
 			gzfangyuan:'方圆',
 			gzfangyuan_info:'阵法技，若你在一个围攻关系中：①是围攻角色，则所有围攻角色的手牌上限+1且被围攻角色手牌上限-1；②是被围攻角色，则结束阶段开始时，你视为对一名围攻角色使用【杀】。',
 			daming:'达命',
@@ -14452,13 +14432,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			xiaoni:'嚣逆',
 			xiaoni_info:'锁定技，当你使用牌时，或成为其他角色使用牌的目标后，若场上存在其他己方角色且这些角色的手牌数均不大于你，则目标角色/你不可响应此牌。',
 			gztongduo:'统度',
-			gztongduo_info:'己方角色的结束阶段开始时，其可以摸X张牌（X为其本回合弃牌阶段弃置的牌数且至多为3）。 ',
+			gztongduo_info:'己方角色的结束阶段开始时，其可以摸X张牌（X为其本回合弃牌阶段弃置的牌数且至多为3）。',
 			qingyin:'清隐',
 			qingyin_info:'限定技，出牌阶段，你可令所有己方角色将体力值回满，然后移除此武将牌。',
 			gzlianpian:'联翩',
 			gzlianpian_info:'①结束阶段开始时，若你于此回合内弃置过所有角色的牌数之和大于你的体力值，你可令一名与你势力相同的角色将手牌补至X张（X为其体力上限）。②其他角色的结束阶段开始时，若其于此回合内弃置过所有角色的牌数之和大于你的体力值，其可选择：1.弃置你的一张牌；2.令你回复1点体力。',
 			gzyusui:'玉碎',
-			gzyusui_info:'当你成为其他势力的角色使用黑色牌的目标后，你可以失去1点体力，然后选择一项：①令其弃置X张手牌（X为其体力上限）；②令其失去Y点体力（Y为其的体力值减去你的体力值，不为正时不可选择）',
+			gzyusui_info:'当你成为其他势力的角色使用黑色牌的目标后，你可以失去1点体力，然后选择一项：①令其弃置X张手牌（X为其体力上限）；②令其失去Y点体力（Y为其的体力值减去你的体力值，不为正时不可选择）。',
 			gzboyan:'驳言',
 			gzboyan_info:'出牌阶段限一次，你可令一名其他角色将手牌摸至体力上限（至多摸五张），然后其本回合不能使用或打出手牌。',
 			gzboyan_zongheng:'驳言·纵横',
@@ -14543,14 +14523,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzjieyue_info:'准备阶段开始时，你可以将一张手牌交给一名非魏势力角色，然后选择一个“军令”并令其选择一项：执行该军令，然后你摸一张牌；或令你于此回合摸牌阶段额外摸三张牌。',
 			gz_wangping:'王平',
 			jianglue:'将略',
-			jianglue_info:'限定技，出牌阶段，你可以选择一个“军令”，然后与你势力相同的其他角色可以执行该军令（未确定势力角色可以在此时明置一张单势力武将牌）。你与所有执行该军令的角色增加一点体力上限，然后回复一点体力，然后你摸X张牌（X为以此法回复了体力的角色数）。',
+			jianglue_info:'限定技，出牌阶段，你可以选择一个“军令”，然后与你势力相同的其他角色可以执行该军令（未确定势力角色可以在此时明置一张单势力武将牌）。你与所有执行该军令的角色增加1点体力上限，然后回复1点体力，然后你摸X张牌（X为以此法回复了体力的角色数）。',
 			gz_fazheng:'法正',
 			gzxuanhuo:'眩惑',
 			gzxuanhuo_info:'与你势力相同的其他角色的出牌阶段限一次，其可弃置一张手牌，然后选择获得以下一项技能直到回合结束：〖武圣〗、〖咆哮〗、〖龙胆〗、〖铁骑〗、〖烈弓〗、〖狂骨〗。',
 			gzenyuan:'恩怨',
 			gzenyuan_info:'锁定技，当其他角色对你使用【桃】时，该角色摸一张牌；当你受到伤害后，伤害来源须交给你一张手牌或失去1点体力。',
 			gzbuyi:'补益',
-			gzbuyi_info:'每回合限一次，当一名与你势力相同的角色脱离濒死状态后，你可以选择一个“军令”，令伤害来源选择一项：执行该军令，或令该脱离濒死状态的角色回复一点体力。',
+			gzbuyi_info:'每回合限一次，当一名与你势力相同的角色脱离濒死状态后，你可以选择一个“军令”，令伤害来源选择一项：执行该军令，或令该脱离濒死状态的角色回复1点体力。',
 			gz_lukang:'陆抗',
 			keshou:'恪守',
 			keshou_info:'当你受到伤害时，你发动此技能。你可弃置两张颜色相同的牌，若如此做，此伤害-1。你的势力已确定且场上没有与你势力相同的其他角色，则你进行判定，若结果为红色，你摸一张牌。',
@@ -14565,7 +14545,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			//gzyongsi_eff2:'玉玺',
 			gz_zhangxiu:'张绣',
 			gzfudi:'附敌',
-			gzfudi_info:'当你受到伤害后，你可以交给伤害来源一张手牌。若如此做，你对其势力中体力值最大且不小于你的一名角色造成一点伤害。',
+			gzfudi_info:'当你受到伤害后，你可以交给伤害来源一张手牌。若如此做，你对其势力中体力值最大且不小于你的一名角色造成1点伤害。',
 			gzcongjian:'从谏',
 			gzcongjian_info:'锁定技，当你于回合外造成伤害，或于回合内受到伤害时，此伤害+1。',
 			gz_jun_caocao:'君曹操',
@@ -14578,7 +14558,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			wuziliangjiangdao_bg:'纛',
 			wuziliangjiangdao_info:'魏势力角色的准备阶段开始时，其可以弃置一张牌。若如此做，其选择一张暗置的武将牌（若没有，则选择一张暗置），然后获得下列技能中的一项（其他角色已有的技能无法选择）且不能明置选择的武将牌直到你的下个回合开始：〖突袭〗，〖巧变〗，〖骁果〗，〖节钺〗，〖断粮〗。',
 			huibian:'挥鞭',
-			huibian_info:'出牌阶段限一次，你可以选择一名魏势力角色和另一名已受伤的魏势力角色。若如此做，你对前者造成一点伤害，然后其摸两张牌，然后后者回复一点体力。',
+			huibian_info:'出牌阶段限一次，你可以选择一名魏势力角色和另一名已受伤的魏势力角色。若如此做，你对前者造成1点伤害，然后其摸两张牌，然后后者回复1点体力。',
 			gzzongyu:'总御',
 			gzzongyu_info:'当【六龙骖驾】进入其他角色的装备区后，你可以将你装备区内所有坐骑牌（至少一张）与【六龙骖驾】交换位置。锁定技，当你使用坐骑牌后，若场上或弃牌堆中有【六龙骖驾】，则将【六龙骖驾】置入你的装备区。',
 			
@@ -14639,7 +14619,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"baka_hunshang":"魂殇",
 			"baka_hunshang_info":"副将技，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值不大于1，则你获得〖英姿〗和〖英魂〗直到回合结束。",
 			"baka_yinghun":"英魂",
-			"baka_yinghun_info":"准备阶段开始时，你可令一名其他角色执行一项：摸X张牌，然后弃置一张牌；或摸一张牌，然后弃置X张牌（X为你已损失的体力值）",
+			"baka_yinghun_info":"准备阶段开始时，你可令一名其他角色执行一项：摸X张牌，然后弃置一张牌；或摸一张牌，然后弃置X张牌（X为你已损失的体力值）。",
 			"baka_yingzi":"英姿",
 			"baka_yingzi_info":"锁定技，摸牌阶段摸，你多摸一张牌；你的手牌上限+X（X为你已损失的体力值）。",
 			gzyiji:"遗计",
@@ -14716,23 +14696,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			yuanjiangfenghuotu_ab:'江图',
 			yuanjiangfenghuotu_bg:'图',
 			wuxin:'悟心',
-			wuxin_info:'摸牌阶段开始时，你可以观看牌堆顶的X张牌（X为群势力角色的数量），然后将这些牌以任意顺序置于牌堆顶',
+			wuxin_info:'摸牌阶段开始时，你可以观看牌堆顶的X张牌（X为群势力角色的数量），然后将这些牌以任意顺序置于牌堆顶。',
 			hongfa:'弘法',
 			hongfa_use:'天兵',
 			hongfa_respond:'天兵',
-			hongfa_info:'君主技，锁定技，此武将牌明置时，你获得“黄巾天兵符”；准备阶段开始时，若没有“天兵”，你将牌堆顶的X张牌置于“黄巾天兵符”上，称为“天兵”（X为群势力角色的数量）',
+			hongfa_info:'君主技，锁定技，此武将牌明置时，你获得“黄巾天兵符”；准备阶段开始时，若没有“天兵”，你将牌堆顶的X张牌置于“黄巾天兵符”上，称为“天兵”（X为群势力角色的数量）。',
 			wendao:'问道',
 			wendao_info:'出牌阶段限一次，你可以弃置一张不为【太平要术】的红色牌，然后获得弃牌堆或场上的一张【太平要术】。',
 			huangjintianbingfu:'黄巾天兵符',
 			huangjintianbingfu_ab:'兵符',
 			huangjintianbingfu_bg:'符',
-			huangjintianbingfu_info:'锁定技 ：当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<br>当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<br>与你势力相同的角色可将一张“天兵”当作【杀】使用或打出。',
+			huangjintianbingfu_info:'锁定技，当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<br>当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<br>与你势力相同的角色可将一张“天兵”当作【杀】使用或打出。',
 			wuhujiangdaqi:'五虎将大旗',
 			wuhujiangdaqi_ab:'将旗',
 			wuhujiangdaqi_bg:'旗',
 			wuhujiangdaqi_info:'存活的蜀势力角色的技能按以下规则改动：<br><strong>武圣</strong>：将“红色牌”改为“任意牌”<br><strong>咆哮</strong>：增加描述“你使用的【杀】无视其他角色的防具”<br><strong>龙胆</strong>：增加描述“你发动〖龙胆〗使用或打出牌时摸一张牌”<br><strong>烈弓</strong>：增加描述“你的攻击范围+1”<br><strong>铁骑</strong>：将“一张明置的武将牌”改为“所有明置的武将牌”',
 			zhangwu:'章武',
-			zhangwu_info:'锁定技。当【飞龙夺凤】进入弃牌堆或其他角色的装备区后，你获得之。当你不因使用而失去【飞龙夺风】时，你展示此牌，将此牌置于牌堆底并摸两张牌',
+			zhangwu_info:'锁定技。当【飞龙夺凤】进入弃牌堆或其他角色的装备区后，你获得之。当你不因使用而失去【飞龙夺风】时，你展示此牌，将此牌置于牌堆底并摸两张牌。',
 			shouyue:'授钺',
 			shouyue_info:'君主技。只要此武将牌处于明置状态，你便拥有“五虎将大旗”。',
 			jizhao:'激诏',
@@ -14749,11 +14729,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzsuishi2:'随势',
 			gzsuishi_info:'锁定技，其他角色进入濒死状态时，若伤害来源与你势力相同，你摸一张牌；其他角色死亡时，若其与你势力相同，你失去1点体力。',
 			baoling:'暴凌',
-			baoling_info:'主将技，锁定技，出牌阶段结束时，若你有副将，则你移除副将，然后加3点体力上限，回复3点体力，失去技能〖暴凌〗并获得〖崩坏〗',
+			baoling_info:'主将技，锁定技，出牌阶段结束时，若你有副将，则你移除副将，然后加3点体力上限，回复3点体力，失去技能〖暴凌〗并获得〖崩坏〗。',
 			yingyang:'鹰扬',
 			yingyang_info:'当你的拼点牌亮出后，你可以令此牌的点数+3或-3（至多为K，至少为1）。',
 			hunshang:'魂殇',
-			hunshang_info:'副将技，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值不大于1，则你本回合获得“英姿”和“英魂”',
+			hunshang_info:'副将技，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值不大于1，则你本回合获得“英姿”和“英魂”。',
 			gzguixiu:'闺秀',
 			gzguixiu_info:'当你明置此武将牌时，你可以摸两张牌；当你移除此武将牌时，你可以回复1点体力。',
 			gzcunsi:'存嗣',
@@ -14761,7 +14741,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzyongjue:'勇决',
 			gzyongjue_info:'与你势力相同的一名角色于其回合内使用【杀】结算完成后，若此牌是其本回合内使用的第一张牌，则其可以获得此牌对应的所有实体牌。',
 			gzqianxi:'潜袭',
-			gzqianxi_info:'准备阶段开始时，你可以进行判定，然后你选择距离为1的一名角色，直到回合结束，该角色不能使用或打出与结果颜色相同的手牌',
+			gzqianxi_info:'准备阶段开始时，你可以进行判定，然后你选择距离为1的一名角色，直到回合结束，该角色不能使用或打出与结果颜色相同的手牌。',
 			gzshangyi:'尚义',
 			gzshangyi_info:'出牌阶段限一次，你可以令一名其他角色观看你的手牌。若如此做，你选择一项：1.观看其手牌并可以弃置其中的一张黑色牌；2.观看其所有暗置的武将牌。',
 			niaoxiang:'鸟翔',
@@ -14776,7 +14756,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			tianfu:'天覆',
 			tianfu_info:'主将技，阵法技，若当前回合角色与你处于同一队列，则你视为拥有技能〖看破〗。',
 			ziliang:'资粮',
-			ziliang_info:'副将技，当与你势力相同的一名角色受到伤害后，你可以将一张“田”交给该角色 ',
+			ziliang_info:'副将技，当与你势力相同的一名角色受到伤害后，你可以将一张“田”交给该角色。',
 			gzjixi:'急袭',
 			gzjixi_info:'主将技，此武将牌减少半个阴阳鱼。你可以将一张“田”当作【顺手牵羊】使用。',
 			huyuan:'护援',
@@ -14806,11 +14786,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzqianxun:'谦逊',
 			gzqianxun_info:'锁定技，当你成为【顺手牵羊】的目标时，或有【乐不思蜀】进入你的判定区时，取消之。',
 			gzkongcheng:'空城',
-			gzkongcheng_info:'锁定技，当你成为【杀】或【决斗】的目标时，若你没有手牌，则取消之',
+			gzkongcheng_info:'锁定技，当你成为【杀】或【决斗】的目标时，若你没有手牌，则取消之。',
 			gzxiaoji:'枭姬',
 			gzxiaoji_info:'当你失去装备区里的牌后，你可以摸一张牌。若你不是当前回合角色，则你改为摸三张牌。',
 			gzrende:'仁德',
-			gzrende_info:'出牌阶段，你可以将任意张手牌交给其他角色，然后若你于此阶段内给出第三张“仁德”牌时，你回复1点体力',
+			gzrende_info:'出牌阶段，你可以将任意张手牌交给其他角色，然后若你于此阶段内给出第三张“仁德”牌时，你回复1点体力。',
 			gzzhiheng:'制衡',
 			gzzhiheng_info:'出牌阶段限一次，你可以弃置至多X张牌（X为你的体力上限），然后摸等量的牌。',
 			duoshi:'度势',
@@ -14843,7 +14823,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzpozhu:'破竹',
 			gzpozhu_info:'主将技。此武将牌减少半个阴阳鱼。出牌阶段，你可以移去一枚“陈”并将一张手牌当做【出其不意】使用。若你未因此牌造成过伤害，则你不能再发动〖破竹〗直到回合结束。',
 			gzyimie:'夷灭',
-			gzyimie_info:'主将技，此武将牌减少一整个阴阳鱼。每轮限一次，当你对其他角色造成伤害时，若伤害值X小于Y，则你可失去1点体力，将伤害值改为Y。此伤害结算结束后，其回复(Y-X)点体力。（Y为其体力值）’',
+			gzyimie_info:'主将技，此武将牌减少一整个阴阳鱼。每轮限一次，当你对其他角色造成伤害时，若伤害值X小于Y，则你可失去1点体力，将伤害值改为Y。此伤害结算结束后，其回复(Y-X)点体力。（Y为其体力值）',
 			gztairan:'泰然',
 			gztairan_info:'出牌阶段开始时，你可以失去任意点体力并弃置任意张牌（弃牌数不能大于你已损失的体力值）。若如此做，本回合结束时，你回复等量的体力并摸等量的牌。',
 			gzxuanbei:'选备',
@@ -16059,7 +16039,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					if(_status.yeidentity&&_status.yeidentity.contains(group)) return false;
 					if(get.zhu(this,null,group)) return true;
-					return get.totalPopulation(group)+1<=get.population()/2;
+					return get.totalPopulation(group)+1<=_status.separatism?Math.max(get.population()/2-1,1):get.population()/2;
 				},
 				perfectPair:function(choosing){
 					if(_status.connectMode){
@@ -16472,7 +16452,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			'<div style="margin:10px">声明</div><ul style="margin-top:0"><li>以下所有规则均为根据公开爆料整理，经村规改动后制定的临时规则。不代表任何官方意见。请以后续发布的官方规则作为标准。</ul>'
 			+'<div style="margin:10px">双势力武将</div><ul style="margin-top:0"><li>双势力武将牌可以和野心家武将牌/包含势力单武将牌/含有重叠势力的其他双势力武将牌组合，若你的主将为双势力武将，则：若你的副将为单势力武将牌，你的势力视为此势力；若你的副将为双势力武将，你的势力视为两张武将牌上的重叠势力（若重叠势力不止一个则需在游戏开始时选择一个作为自己的势力）；野心家武将牌为主将，双势力武将牌为副将时，游戏开始时需选择一个副将所含势力作为副将的势力。<br><li>变更副将时，可以选择包含原势力的双势力武将牌。左慈发动【役鬼】时，可以使用双势力武将牌同时指定两个不同势力的角色为目标。<br><li>特殊地，“冈崎汐”作为多势力武将牌，结算流程和规则与其他双势力武将相同。</ul>'
 			+'<div style="margin:10px">野心家武将</div><ul style="margin-top:0"><li>野心家武将只能放在主将位置。副将可以为任意非野心家武将牌。<br><li>选择了野心家武将牌的角色（以下简称“野心家角色”）仅明置副将时，若副将为单势力武将牌，则势力暂时视为与该武将牌相同。若副将为双势力武将牌，则势力视为游戏开始时选择的副将代表的势力。<br><li>野心家角色明置主将时，其势力改为野心家。若其是首次明置该武将牌，则其获得一个“野心家”标记。<br><li>“野心家”标记可以当做“先驱”标记，“阴阳鱼”标记或是“珠联璧合”标记使用。当同时拥有两种标记时，优先弃置原装标记，下次发动时才弃置“野心家”标记。<br><li>野心家角色变更副将时，若其主将未明置过，则按照副将的势力进行变更。若主将已经明置过，则可以选择所有的非野心家武将牌。左慈发动【役鬼】时，可以使用野心家武将牌同时指定所有势力的角色为目标。'
-			+'<br><li>当场上触发了胜利条件时，若这些角色中存在未明置过主将的野心家角色，则这些野心家角色选择是否“暴露野心”。若无人选择“是”且场上存在非野心家角色存活，则所有非野心家角色胜利，野心家角色失败。若有人选择“是”，则这些角色明置主将，然后选择是否发起“拉拢人心”<br><li>选择发起“拉拢人心”的野心家角色选择一个新的势力作为自己的势力，弃置“野心家”标记，令所有其他非野心家角色且非君主且非已“结盟”角色依次选择是否和该野心家角色“结盟”。选择“是”的角色将势力改为和该野心家势力相同。此次“拉拢人心”对所有其他角色询问结束后，所有选择“否”的角色将手牌摸至四张并回复1点体力。</ul>'
+			+'<br><li>当场上触发了胜利条件时，若这些角色中存在未明置过主将的野心家角色，则这些野心家角色选择是否“暴露野心”。若无人选择“是”且场上存在非野心家角色存活，则所有非野心家角色胜利，野心家角色失败。若有人选择“是”，则这些角色明置主将，然后选择是否发起“拉拢人心”。<br><li>选择发起“拉拢人心”的野心家角色选择一个新的势力作为自己的势力，弃置“野心家”标记，令所有其他非野心家角色且非君主且非已“结盟”角色依次选择是否和该野心家角色“结盟”。选择“是”的角色将势力改为和该野心家势力相同。此次“拉拢人心”对所有其他角色询问结束后，所有选择“否”的角色将手牌摸至四张并回复1点体力。</ul>'
 			+'<div style="margin:10px">纵横捭阖</div><ul style="margin-top:0"><li>当一名角色对目标角色发动具有拥有“纵横”衍生技的技能时，其可以令对方获得“纵横”衍生技直到其下回合结束。</ul>',
 		},
 	};

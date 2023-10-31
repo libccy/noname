@@ -18,10 +18,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
 				extra_tw:['tw_shen_guanyu','tw_shen_lvmeng'],
-				extra_offline:['shen_diaochan','boss_zhaoyun','shen_dianwei'],
+				extra_offline:['shen_diaochan','boss_zhaoyun','shen_dianwei','le_shen_jiaxu'],
 			},
 		},
 		character:{
+			le_shen_jiaxu:['male','shen',4,['jxlianpo','jxzhaoluan'],['qun']],
 			shen_dianwei:['male','shen',4,['juanjia','qiexie','cuijue'],['wei']],
 			shen_dengai:['male','shen',4,['dctuoyu','dcxianjin','dcqijing'],['wei']],
 			tw_shen_lvmeng:['male','shen',3,['twshelie','twgongxin'],['wu']],
@@ -66,11 +67,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			shen_zhangliao:['ol_zhangliao','shen_zhangliao'],
-			shen_zhaoyun:['shen_zhaoyun','boss_zhaoyun'],
+			shen_zhaoyun:['shen_zhaoyun','old_shen_zhaoyun','boss_zhaoyun'],
 			shen_guanyu:['shen_guanyu','tw_shen_guanyu'],
 			shen_sunquan:['shen_sunquan','junk_sunquan'],
 			shen_lvmeng:['shen_lvmeng','tw_shen_lvmeng'],
 			shen_machao:['shen_machao','ps_shen_machao'],
+			shen_jiaxu:['le_shen_jiaxu','shen_jiaxu'],
 		},
 		characterFilter:{
 			shen_diaochan:function(mode){
@@ -81,8 +83,274 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(mode=='versus') return _status.mode!='three';
 				return true;
 			},
+			le_shen_jiaxu:function(mode){
+				return mode=='identity'&&_status.mode!='purple';
+			},
 		},
 		skill:{
+			//神贾诩
+			jxlianpo:{
+				audio:2,
+				trigger:{global:'dieAfter'},
+				filter:function(event,player){
+					if(lib.skill.jxlianpo.getMax().length<=1) return false;
+					return event.source&&event.source.isIn();
+				},
+				forced:true,
+				logTarget:'source',
+				global:'jxlianpo_global',
+				getMax:()=>{
+					const map={
+						zhu:game.countPlayer(current=>{
+							const identity=current.identity;
+							let num=0;
+							if(identity=='zhu'||identity=='zhong'||identity=='mingzhong') num++;
+							num+=current.countMark('jxlianpo_mark_zhong');
+							return num;
+						}),
+						fan:game.countPlayer(current=>{
+							let num=0;
+							if(current.identity=='fan') num++;
+							num+=current.countMark('jxlianpo_mark_fan');
+							return num;
+						}),
+						nei:(game.hasPlayer(current=>current.identity=='nei')?0:1)+game.countPlayer(current=>{
+							return current.countMark('jxlianpo_mark_nei');
+						}),
+					};
+					let population=0,identities=[];
+					for(let i in map){
+						let curPopulation=map[i]
+						if(curPopulation>=population){
+							if(curPopulation>population) identities=[];
+							identities.add(i);
+							population=curPopulation;
+						}
+					};
+					return identities;
+				},
+				group:'jxlianpo_show',
+				content:function*(event,map){
+					var source=map.trigger.source;
+					source.draw(2);
+					source.recover();
+				},
+				mark:true,
+				intro:{
+					content:()=>`场上最大阵营为${lib.skill.jxlianpo.getMax().map(i=>{
+						if(i=='zhu') return '主忠';
+						if(i=='fan') return '反贼';
+						if(i=='nei') return '内奸';
+						return '';
+					}).join('、')}`,
+				},
+				$createButton:function(item,type,position,noclick,node){
+					node=ui.create.identityCard(item,position,noclick);
+					node.link=item;
+					return node;
+				},
+				subSkill:{
+					show:{
+						audio:'jxlianpo',
+						trigger:{global:'roundStart'},
+						filter:function(event,player){
+							var list=lib.config.mode_config.identity.identity.lastItem.slice();
+							list.removeArray(game.filterPlayer().map(i=>{
+								let identity=i.identity;
+								if(identity=='mingzhong') identity='zhong';
+								return identity;
+							}));
+							return list.length;
+						},
+						forced:true,
+						content:function(){
+							'step 0'
+							var list=lib.config.mode_config.identity.identity.lastItem.slice();
+							list.removeArray(game.filterPlayer().map(i=>{
+								var identity=i.identity;
+								return identity=='mingzhong'?'zhong':identity;
+							})).unique();
+							player.chooseButton([
+								'###炼魄：请选择一个身份###<div class="text center">你选择的身份对应的阵营角色数于本轮内视为+1</div>',
+								[list,function(item,type,position,noclick,node){
+									return lib.skill.jxlianpo.$createButton(item,type,position,noclick,node);
+								}],
+							],true);
+							'step 1'
+							var choice=result.links[0],mark=`jxlianpo_mark_${choice}`;
+							player.when({global:'roundStart'})
+								.assign({
+									firstDo:true,
+								})
+								.filter(evt=>evt!=trigger)
+								.then(()=>{
+									for(var i in player.storage){
+										if(i.startsWith('jxlianpo_mark_')){
+											player.clearMark(i);
+										}
+									}
+								});
+							player.addMark(mark,1,false);
+							event.videoId=lib.status.videoId++;
+							var createDialog=function(player,identity,id){
+								var dialog=ui.create.dialog(`${get.translation(player)}展示了“${get.translation(identity+'2')}”的身份牌<br>`,'forcebutton');
+								dialog.videoId=id;
+								ui.create.spinningIdentityCard(identity,dialog);
+							};
+							game.broadcastAll(createDialog,player,choice,event.videoId);
+							var color='';
+							if(choice=='zhong') color='#y';
+							else if(choice=='fan') color='#g';
+							else if(choice=='nei') color='#b';
+							game.log(player,'展示了',`${color}${get.translation(choice+'2')}`,'的身份牌');
+							game.delay(3);
+							'step 2'
+							game.broadcastAll('closeDialog',event.videoId);
+						}
+					},
+					global:{
+						mod:{
+							maxHandcard:function(player,num){
+								if(!lib.skill.jxlianpo.getMax().includes('fan')) return;
+								return num-game.countPlayer(current=>{
+									return current!=player&&current.hasSkill('jxlianpo');
+								});
+							},
+							cardUsable:function(card,player,num){
+								if(card.name=='sha'){
+									if(!lib.skill.jxlianpo.getMax().includes('fan')) return;
+									return num+game.countPlayer(current=>{
+										return current.hasSkill('jxlianpo');
+									});
+								}
+							},
+							attackRange:function(player,num){
+								if(!lib.skill.jxlianpo.getMax().includes('fan')) return;
+								return num+game.countPlayer(current=>{
+									return current.hasSkill('jxlianpo');
+								});
+							},
+							cardSavable:function(card,player,target){
+								if(card.name=='tao'){
+									if(!lib.skill.jxlianpo.getMax().includes('zhu')) return;
+									if(player==target) return;
+									return false;
+								}
+							},
+							playerEnabled:function(card,player,target){
+								if(card.name=='tao'){
+									if(!lib.skill.jxlianpo.getMax().includes('zhu')) return;
+									if(player==target) return;
+									return false;
+								}
+							}
+						},
+					},
+				},
+			},
+			jxzhaoluan:{
+				audio:2,
+				trigger:{global:'dieBegin'},
+				filter:function(event,player){
+					return event.getParent().name=='dying'&&event.player.isIn();
+				},
+				limited:true,
+				skillAnimation:true,
+				animationColor:'metal',
+				logTarget:'player',
+				check:function(event,player){
+					if(event.source&&event.source.isIn()&&get.attitude(player,event.source)>0&&player.identity=='fan') return false;
+					return get.attitude(player,event.player)>3.5;
+				},
+				content:function*(event,map){
+					var player=map.player,trigger=map.trigger;
+					var target=trigger.player;
+					player.awakenSkill('jxzhaoluan');
+					trigger.cancel();
+					target.getSkills(null,false,false).forEach(skill=>{
+						var info=get.info(skill);
+						if(info&&!info.charlotte&&!get.is.locked(skill)){
+							target.removeSkill(skill);
+						}
+					});
+					yield target.gainMaxHp(3);
+					var num=3-target.getHp(true);
+					if(num>0) yield target.recover(num);
+					target.draw(4);
+					player.addSkill('jxzhaoluan_effect');
+					player.markAuto('jxzhaoluan_effect',target);
+				},
+				ai:{
+					expose:0.5,
+					threaten:3,
+				},
+				subSkill:{
+					effect:{
+						audio:'jxzhaoluan',
+						enable:'phaseUse',
+						filter:function(event,player){
+							return player.getStorage('jxzhaoluan_effect').some(i=>i.isIn());
+						},
+						filterTarget:function(card,player,target){
+							return !player.getStorage('jxzhaoluan_hit').includes(target);
+						},
+						line:false,
+						locked:true,
+						charlotte:true,
+						promptfunc:function(){
+							var bodies=_status.event.player.getStorage('jxzhaoluan_effect').filter(i=>i.isIn());
+							return `选择一名角色，你令${get.translation(bodies)}${bodies.length>1?'中的一人':''}减1点体力上限，然后你对选择的角色造成1点伤害。`;
+						},
+						delay:false,
+						content:function(){
+							'step 0'
+							var bodies=player.getStorage('jxzhaoluan_effect').filter(i=>i.isIn());
+							if(bodies.length==1) event._result={bool:true,targets:bodies};
+							else{
+								player.chooseTarget('兆乱：请选择被减上限的傀儡',true,(card,player,target)=>{
+									return _status.event.targets.includes(target);
+								}).set('targets',bodies).set('ai',target=>{
+									return 8-get.attitude(_status.event.player,target);
+								});
+							}
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.line(target);
+								target.loseMaxHp();
+								game.delayex();
+							}
+							else event.finish();
+							'step 2'
+							player.line(target);
+							target.damage();
+							if(!player.storage.jxzhaoluan_hit){
+								player.when('phaseUseAfter')
+									.then(()=>{
+										delete player.storage.jxzhaoluan_hit;
+									});
+							}
+							player.markAuto('jxzhaoluan_hit',target);
+						},
+						ai:{
+							order:9,
+							result:{
+								player:function(player){
+									var bodies=player.getStorage('jxzhaoluan_effect').filter(i=>i.isIn());
+									var body;
+									if(bodies.length==1) body=bodies[0];
+									else body=bodies.sort((a,b)=>get.attitude(player,a)-get.attitude(player,b))[0];
+									if(get.attitude(player,body)>4&&!body.isDamaged()&&body.getHp()<=2) return -10;
+									return 0;
+								},
+								target:function(player,target){
+									return Math.sign(get.damageEffect(target,player,target));
+								}
+							}
+						}
+					},
+				},
+			},
 			//神典韦
 			juanjia:{
 				trigger:{
@@ -2453,6 +2721,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.needsToDiscard()) return num/3;
 							return 0;
 						}
+					},
+					targetInRange:function(card,player,target){
+						if(target.hasMark('yingba_mark')) return true;
 					}
 				},
 				enable:'phaseUse',
@@ -2468,15 +2739,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				locked:false,
 				//global:'yingba_mark',
-				mod:{
-					targetInRange:function(card,player,target){
-						if(target.hasMark('yingba_mark')) return true;
-					},
-				},
 				ai:{
 					combo:'scfuhai',
 					threaten:3,
-					order:9,
+					order:11,
 					result:{
 						player:function(player,target){
 							if(player.maxHp==1) return -2.5;
@@ -2631,12 +2897,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					game.addGlobalSkill('tianzuo_global');
+					var cards=[];
 					for(var i=2;i<10;i++){
-						var card=game.createCard2('qizhengxiangsheng',i%2?'club':'spade',i);
-						ui.cardPile.insertBefore(card,ui.cardPile.childNodes[get.rand(0,ui.cardPile.childNodes.length)]);
+						cards.push(game.createCard2('qizhengxiangsheng',i%2?'club':'spade',i));
 					}
 					game.broadcastAll(function(){lib.inpile.add('qizhengxiangsheng')});
-					game.updateRoundNumber();
+					game.cardsGotoPile(cards,()=>{
+						return ui.cardPile.childNodes[get.rand(0,ui.cardPile.childNodes.length-1)];
+					})
 				},
 				group:'tianzuo_remove',
 				subSkill:{
@@ -3588,7 +3856,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huoxin2:{
 				trigger:{
 					player:['phaseAfter','dieAfter'],
-					global:'phaseBefore',
+					global:'phaseBeforeStart',
 				},
 				lastDo:true,
 				charlotte:true,
@@ -4212,7 +4480,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 							"step 3"
 							if(!result.bool){
-								lib.element.player.die.apply(target,[]);
+								lib.element.Player.prototype.die.apply(target,[]);
 							}
 						},
 						sub:true,
@@ -4874,6 +5142,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.removeMark('renjie',1);
 					player.addTempSkill('rewansha');
+				},
+				ai:{
+					order:()=>{
+						let player=_status.event.player;
+						if(game.hasPlayer(current=>{
+							if(player===current||current.hp>1||get.attitude(player,current)>=0) return false;
+							return player.inRange(current)&&player.countCards('hs','sha')&&player.getCardUsable('sha')||
+								player.countCards('hs',card=>get.name(card)!=='sha'&&get.tag(card,'damage'))>1;
+						})) return 9.2;
+						return 0;
+					},
+					result:{
+						player:1
+					},
+					effect:{
+						player:(card,player,target)=>{
+							if(player.hasSkill('rewansha')&&target.hp<=1&&get.tag(card,'damage')) return [1,0,1.5,-1.5];
+						}
+					}
 				}
 			},
 			jilue_zhiheng:{
@@ -5414,7 +5701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('dawu'),'令至多'+get.cnNumber(num)+'名角色获得“大雾”标记',
 					[1,num]).set('ai',function(target){
 						if(target.isMin()) return 0;
-						if(target.hasSkill('biantian2')) return 0;
+						if(target.hasSkill('biantian2')||target.hasSkill('dawu2')) return 0;
 						var att=get.attitude(player,target);
 						if(att>=4){
 							if(_status.event.allUse) return att;
@@ -5428,13 +5715,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})*2);
 					"step 1"
 					if(result.bool){
-						player.logSkill('dawu',result.targets,'thunder');
-						var length=result.targets.length;
-						for(var i=0;i<length;i++){
-							result.targets[i].addSkill('dawu2');
-						}
+						var targets=result.targets.sortBySeat();
+						player.logSkill('dawu',targets,'thunder');
+						var length=targets.length;
+						targets.forEach(target=>{
+							target.addAdditionalSkill(`dawu_${player.playerid}`,'dawu2');
+							target.markAuto('dawu2',[player]);
+						});
+						player.addTempSkill('dawu3',{player:'phaseBeginStart'})
 						player.chooseCardButton('选择弃置'+get.cnNumber(length)+'张“星”',length,player.getExpansions('qixing'),true);
-						player.addSkill('dawu3');
 					}
 					else{
 						event.finish();
@@ -5445,46 +5734,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{combo:'qixing'},
 			},
 			dawu2:{
-				trigger:{player:'damageBegin4'},
-				filter:function(event){
-					if(!event.hasNature('thunder')) return true;
-					return false;
-				},
-				mark:true,
-				forced:true,
 				charlotte:true,
-				content:function(){
-					trigger.cancel();
-				},
 				ai:{
 					nofire:true,
 					nodamage:true,
 					effect:{
 						target:function(card,player,target,current){
-							if(get.tag(card,'damage')&&!get.tag(card,'thunderDamage')) return [0,0];
+							if(get.tag(card,'damage')&&!get.tag(card,'thunderDamage')) return 'zeroplayertarget';
 						}
 					},
 				},
 				intro:{
-					markcount:()=>1,
-					content:'共有1个标记',
+					content:function(storage){
+						return `共有${storage.length}枚标记`;
+					},
 				}
 			},
 			dawu3:{
-				trigger:{player:['phaseBegin','dieBegin']},
-				silent:true,
+				trigger:{global:'damageBegin4'},
+				filter:function(event,player){
+					return !event.hasNature('thunder')&&event.player.getStorage('dawu2').includes(player);
+				},
+				forced:true,
 				charlotte:true,
+				logTarget:'player',
 				content:function(){
-					for(var i=0;i<game.players.length;i++){
-						if(game.players[i].hasSkill('dawu2')){
-							game.players[i].removeSkill('dawu2');
+					trigger.cancel();
+				},
+				onremove:function(player){
+					game.countPlayer2(current=>{
+						if(current.getStorage('dawu2').includes(player)){
+							current.unmarkAuto('dawu2',player);
+							current.removeAdditionalSkill(`dawu_${player.playerid}`);
 						}
-						if(game.players[i].hasSkill('kuangfeng2')){
-							game.players[i].removeSkill('kuangfeng2');
-						}
-					}
-					player.removeSkill('dawu3');
-				}
+					},true);
+				},
 			},
 			kuangfeng:{
 				unique:true,
@@ -5501,13 +5785,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 1"
 					if(result.bool){
-						var length=result.targets.length;
-						for(var i=0;i<length;i++){
-							result.targets[i].addSkill('kuangfeng2');
-						}
-						player.logSkill('kuangfeng',result.targets,'fire');
-						player.chooseCardButton('弃置'+get.cnNumber(length)+'枚星',length,player.getExpansions('qixing'),true);
-						player.addSkill('dawu3');
+						var targets=result.targets.sortBySeat();
+						player.logSkill('kuangfeng',targets,'fire');
+						var length=targets.length;
+						targets.forEach(target=>{
+							target.addAdditionalSkill(`kuangfeng_${player.playerid}`,'kuangfeng2');
+							target.markAuto('kuangfeng2',[player]);
+						});
+						player.addTempSkill('kuangfeng3',{player:'phaseBeginStart'})
+						player.chooseCardButton('选择弃置'+get.cnNumber(length)+'张“星”',length,player.getExpansions('qixing'),true);
 					}
 					else{
 						event.finish();
@@ -5518,27 +5804,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{combo:'qixing'},
 			},
 			kuangfeng2:{
-				trigger:{player:'damageBegin3'},
-				filter:function(event){
-					if(event.hasNature('fire')) return true;
-					return false;
-				},
-				mark:true,
+				charlotte:true,
 				intro:{
-					markcount:()=>1,
-					content:'共有1个标记'
-				},
-				forced:true,
-				content:function(){
-					trigger.num++;
+					content:function(storage){
+						return `共有${storage.length}枚标记`;
+					},
 				},
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
-							if(get.tag(card,'fireDamage')) return 1.5;
+							if(get.tag(card,'fireDamage')&&current<0) return 1.5;
 						}
 					}
 				}
+			},
+			kuangfeng3:{
+				trigger:{global:'damageBegin3'},
+				filter:function(event){
+					return event.hasNature('fire')&&event.player.getStorage('kuangfeng2').includes(player);
+				},
+				charlotte:true,
+				forced:true,
+				logTarget:'player',
+				content:function(){
+					trigger.num++;
+				},
+				onremove:function(player){
+					game.countPlayer2(current=>{
+						if(current.getStorage('kuangfeng2').includes(player)){
+							current.unmarkAuto('kuangfeng2',player);
+							current.removeAdditionalSkill(`kuangfeng_${player.playerid}`);
+						}
+					},true);
+				},
 			},
 			yeyan:{
 				unique:true,
@@ -5563,7 +5861,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:[0,4],
 				line:'fire',
 				check:function (){return -1},
-				selectTarget:function (){
+				selectTarget:function(){
 					if(ui.selected.cards.length==4) return [1,2];
 					if(ui.selected.cards.length==0) return [1,3];
 					game.uncheck('target');
@@ -5571,9 +5869,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				multitarget:true,
 				multiline:true,
-				content:function (){
-					"step 0"
+				contentBefore:function(){
 					player.awakenSkill('yeyan');
+				},
+				content:function(){
+					"step 0"
 					event.num=0;
 					targets.sortBySeat();
 					"step 1"
@@ -6156,7 +6456,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player,skill){
 						if(player.storage.nzry_longnu==true) return '锁定技，出牌阶段开始时，你减1点体力上限并摸一张牌，然后本阶段内你的锦囊牌均视为雷杀且无使用次数限制';
-						return '锁定技，出牌阶段开始时，你流失一点体力并摸一张牌，然后本阶段内你的红色手牌均视为火杀且无距离限制';
+						return '锁定技，出牌阶段开始时，你失去1点体力并摸一张牌，然后本阶段内你的红色手牌均视为火杀且无距离限制';
 					},
 				},
 				audio:2,
@@ -6323,7 +6623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(player.countMark('nzry_junlve')%2==1){
-						player.chooseTarget('是否发动【摧克】，对一名角色造成一点伤害？').ai=function(target){
+						player.chooseTarget('是否发动【摧克】，对一名角色造成1点伤害？').ai=function(target){
 							return -get.attitude(player,target);
 						};
 					}
@@ -6347,7 +6647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countMark('nzry_junlve')>7){
 						player.chooseBool().set('ai',function(){
 							return true;
-						}).set('prompt','是否弃置所有“军略”标记并对所有其他角色造成一点伤害？');
+						}).set('prompt','是否弃置所有“军略”标记并对所有其他角色造成1点伤害？');
 					}else{
 						event.finish();
 					};
@@ -7127,9 +7427,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"shen_luxun":"神陆逊",
 			shen_luxun_prefix:'神',
 			"nzry_junlve":"军略",
-			"nzry_junlve_info":"锁定技，当你受到或造成伤害后，你获得X个“军略”标记(X为伤害点数)",
+			"nzry_junlve_info":"锁定技，当你受到或造成伤害后，你获得X个“军略”标记(X为伤害点数)。",
 			"nzry_cuike":"摧克",
-			"nzry_cuike_info":"出牌阶段开始时，若“军略”标记的数量为奇数，你可以对一名角色造成一点伤害；若“军略”标记的数量为偶数，你可以横置一名角色并弃置其区域内的一张牌。然后，若“军略”标记的数量超过7个，你可以移去全部“军略”标记并对所有其他角色造成一点伤害",
+			"nzry_cuike_info":"出牌阶段开始时，若“军略”标记的数量为奇数，你可以对一名角色造成1点伤害；若“军略”标记的数量为偶数，你可以横置一名角色并弃置其区域内的一张牌。然后，若“军略”标记的数量超过7个，你可以移去全部“军略”标记并对所有其他角色造成1点伤害。",
 			"nzry_dinghuo":"绽火",
 			"nzry_dinghuo_info":"限定技，出牌阶段，你可以移去全部“军略”标记，令至多等量的已横置角色弃置所有装备区内的牌。然后，你对其中一名角色造成1点火焰伤害。",
 			"shen_liubei":"神刘备",
@@ -7145,7 +7445,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhangliao_prefix:'神',
 			
 			"drlt_poxi":"魄袭",
-			"drlt_poxi_info":"出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以弃置你与其手牌中的四张花色不同的牌。若如此做，根据此次弃置你的牌的数量执行以下效果：零张，扣减一点体力上限；一张，你结束出牌阶段且本回合手牌上限-1；三张，你回复一点体力；四张，你摸四张牌",
+			"drlt_poxi_info":"出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以弃置你与其手牌中的四张花色不同的牌。若如此做，根据此次弃置你的牌的数量执行以下效果：零张，扣减1点体力上限；一张，你结束出牌阶段且本回合手牌上限-1；三张，你回复1点体力；四张，你摸四张牌。",
 			"drlt_jieying":"劫营",
 			"drlt_jieying_info":"回合开始时，若场上没有拥有“营”标记的角色，你获得1个“营”标记；结束阶段，你可以将你的一个“营”标记交给一名角色；有“营”标记的角色摸牌阶段多摸一张牌，出牌阶段使用【杀】的次数上限+1，手牌上限+1。有“营”的其他角色回合结束时，其移去“营”标记，然后你获得其所有手牌。",
 			drlt_jieying_mark:"劫营",
@@ -7154,7 +7454,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_duorui":"夺锐",
 			"drlt_duorui_info":"当你于出牌阶段内对一名其他角色造成伤害后，你可以废除你装备区内的一个装备栏（若已全部废除则可以跳过此步骤），然后获得该角色的一个技能直到其的下回合结束或其死亡(觉醒技，限定技，主公技，隐匿技，使命技等特殊技能除外)。若如此做，该角色该技能失效且你不能再发动〖夺锐〗直到你失去以此法获得的技能。",
 			"drlt_zhiti":"止啼",
-			"drlt_zhiti_info":"锁定技，你攻击范围内已受伤的其他角色手牌上限-1；当你拼点或【决斗】胜利，或受到伤害后，你恢复一个装备栏",
+			"drlt_zhiti_info":"锁定技，你攻击范围内已受伤的其他角色手牌上限-1；当你拼点或【决斗】胜利，或受到伤害后，你恢复一个装备栏。",
 			
 			shen_zhaoyun:'神赵云',
 			shen_zhaoyun_prefix:'神',
@@ -7173,7 +7473,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_lvbu:'神吕布',
 			shen_lvbu_prefix:'神',
 			xinjuejing:'绝境',
-			xinjuejing_info:'锁定技，你的手牌上限+2；当你进入或脱离濒死状态时，你摸一张牌。',
+			xinjuejing_info:'锁定技。①你的手牌上限+2。②当你进入或脱离濒死状态时，你摸一张牌。',
 			relonghun:'龙魂',
 			relonghun_info:'你可以将同花色的一至两张牌按下列规则使用或打出：红桃当【桃】，方块当火【杀】，梅花当【闪】，黑桃当普【无懈可击】。若你以此法使用了两张红色牌，则此牌回复值或伤害值+1。若你以此法使用了两张黑色牌，则你弃置当前回合角色一张牌。',
 			xinlonghun:'龙魂',
@@ -7184,8 +7484,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			longhun3:'龙魂♠︎',
 			longhun4:'龙魂♣︎',
 			juejing:'绝境',
-			longhun_info:'你可以将同花色的X张牌按下列规则使用或打出：红桃当【桃】，方块当具火焰伤害的【杀】，梅花当【闪】，黑桃当【无懈可击】（X为你当前的体力值且至少为1）',
-			juejing_info:'锁定技，摸牌阶段，你摸牌的数量改为你已损失的体力值+2；你的手牌上限+2。',
+			longhun_info:'你可以将同花色的X张牌按下列规则使用或打出：红桃当【桃】，方块当具火焰伤害的【杀】，梅花当【闪】，黑桃当【无懈可击】（X为你当前的体力值且至少为1）。',
+			juejing_info:'锁定技。①摸牌阶段，你令额定摸牌数+X（X为你已损失的体力值）。②你的手牌上限+2。',
 			wushen:'武神',
 			wushen_info:'锁定技，你的红桃手牌均视为【杀】；锁定技，你使用红桃【杀】无距离和次数限制且不可被响应。',
 			wuhun:'武魂',
@@ -7193,9 +7493,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wuhun22:'武魂',
 			wuhun23:'武魂',
 			wuhun2:'武魂',
-			wuhun3:'武魂',		
+			wuhun3:'武魂',
 			wuhun_info_alter:'锁定技，当你受到1点伤害后，你令伤害来源获得1枚“梦魇”标记；当你死亡时，你令拥有最多“梦魇”标记的一名其他角色判定，若结果不为【桃】或【桃园结义】，则该角色死亡。',
-			wuhun_info:'锁定技，杀死你的角色立即进入濒死状态',
+			wuhun_info:'锁定技，杀死你的角色立即进入濒死状态。',
 			shelie:'涉猎',
 			gongxin:'攻心',
 			gongxin_discard:'弃置',
@@ -7204,7 +7504,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			renjie2:'忍戒',
 			renjie_info:'锁定技，当你受到1点伤害后，你获得一枚“忍”标记；锁定技，当你于弃牌阶段内弃置牌后，你获得等同于失去的牌数量的“忍”标记。',
 			sbaiyin:'拜印',
-			sbaiyin_info:'觉醒技，准备阶段开始时，若你的“忍”标记数不小于4，你减1点体力上限，然后获得〖极略〗',
+			sbaiyin_info:'觉醒技，准备阶段开始时，若你的“忍”标记数不小于4，你减1点体力上限，然后获得〖极略〗。',
 			jilue:'极略',
 			jilue_info:'当一名角色的判定牌生效前，你可以弃1枚“忍”标记并发动〖鬼才〗；每当你受到伤害后，你可以弃1枚“忍”标记并发动〖放逐〗；当你使用锦囊牌时，你可以弃1枚“忍”标记并发动〖集智〗；出牌阶段限一次，你可以弃1枚“忍”标记并发动〖制衡〗；出牌阶段，你可以弃1枚“忍”标记并获得〖完杀〗直到回合结束。',
 			jilue_guicai:'鬼才',
@@ -7219,8 +7519,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yeyan:'业炎',
 			shelie_info:'摸牌阶段，你可以改为从牌堆顶亮出五张牌，然后选择获得不同花色的牌各一张。',
 			gongxin_info:'出牌阶段限一次，你可以观看一名其他角色的手牌，并可以展示其中一张红桃牌，然后将其弃置或置于牌堆顶。',
-			guixin_info:'当你受到1点伤害后，你可以获得每名其他角色区域里的一张牌，然后你翻面',
-			guixin_info_alter:'当你受到1点伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面',
+			guixin_info:'当你受到1点伤害后，你可以获得每名其他角色区域里的一张牌，然后你翻面。',
+			guixin_info_alter:'当你受到1点伤害后，你可以随机获得每名其他角色区域里的一张牌，然后你翻面。',
 			qinyin_info:'弃牌阶段结束时，若你于此阶段内弃置过两张或更多的牌，则你可以选择一项：1. 令所有角色各回复1点体力；2. 令所有角色各失去1点体力。',
 			// qinyin_info:'每当你于弃牌阶段内因你的弃置而失去第X张手牌时（X至少为2），你可以选择一项：1.令所有角色各回复1点体力；2.令所有角色各失去1点体力。每阶段限一次。',
 			yeyan_info:'限定技，出牌阶段，你可以对一至三名角色造成至多共3点火焰伤害（你可以任意分配每名目标角色受到的伤害点数），若你将对一名角色分配2点或更多的火焰伤害，你须先弃置四张不同花色的手牌再失去3点体力。',
@@ -7245,9 +7545,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baonu_bg:'暴',
 			baonu_info:'锁定技，游戏开始时，你获得两枚“暴怒”标记；锁定技，当你造成/受到1点伤害后，你获得1枚“暴怒”标记。',
 			shenfen:'神愤',
-			shenfen_info:'限定技，出牌阶段，你可以弃置6枚暴怒标记，对场上所有其他角色造成一点伤害，然后令其弃置4张牌',
+			shenfen_info:'限定技，出牌阶段，你可以弃置6枚暴怒标记，对场上所有其他角色造成1点伤害，然后令其弃置四张牌。',
 			wuqian:'无前',
-			wuqian_info:'出牌阶段，你可以弃置两枚暴怒标记并获得技能【无双】直到回合结束',
+			wuqian_info:'出牌阶段，你可以弃置两枚暴怒标记并获得技能〖无双〗直到回合结束。',
 			wumou:'无谋',
 			wumou_info:'锁定技，当你使用普通锦囊牌时，你选择一项：1.弃置1枚“暴怒”标记；2.失去1点体力。',
 			ol_wuqian:'无前',
@@ -7271,9 +7571,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chuyuan_info:'一名角色受到伤害后，若你武将牌上「储」的数量小于体力上限，你可以令其摸一张牌。然后其将一张手牌置于你的武将牌上，称为「储」。',
 			//chuyuan_info:'一名角色受到伤害后，你可以令其摸一张牌。然后其将一张手牌置于你的武将牌上，称为「储」。你的手牌上限+X（X为你武将牌上的「储」数）。',
 			dengji:'登极',
-			dengji_info:'觉醒技，准备阶段，若你武将牌上的「储」数不小于3，则你减1点体力上限并获得所有「储」，然后获得技能〖天行〗和〖奸雄〗',
+			dengji_info:'觉醒技，准备阶段，若你武将牌上的「储」数不小于3，则你减1点体力上限并获得所有「储」，然后获得技能〖天行〗和〖奸雄〗。',
 			tianxing:'天行',
-			tianxing_info:'觉醒技，准备阶段，若你武将牌上的「储」数不小于3，则你减1点体力上限并获得所有「储」，然后失去技能〖储元〗，选择获得以下技能中的一个：〖仁德〗/〖制衡〗/〖乱击〗/〖行动〗',
+			tianxing_info:'觉醒技，准备阶段，若你武将牌上的「储」数不小于3，则你减1点体力上限并获得所有「储」，然后失去技能〖储元〗，选择获得以下技能中的一个：〖仁德〗/〖制衡〗/〖乱击〗/〖行动〗。',
 			shen_zhenji:'神甄宓',
 			shen_zhenji_prefix:'神',
 			shenfu:'神赋',
@@ -7296,7 +7596,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			boss_juejing2:'绝境',
 			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你得到牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌摸至4张/弃置至4张。',
 			zhanjiang:'斩将',
-			zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之',
+			zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之。',
 			shen_guojia:'神郭嘉',
 			shen_guojia_prefix:'神',
 			shuishi:'慧识',
@@ -7339,7 +7639,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			scfuhai:'覆海',
 			scfuhai_info:'锁定技。①当你使用牌指定目标后，若目标角色有“平定”标记，则其不可响应此牌。若你本回合内以此法得到的牌数小于2，则你摸一张牌。②拥有“平定”标记的角色死亡时，你增加X点体力上限并摸X张牌。（X为其拥有的“平定”标记数）。',
 			pinghe:'冯河',
-			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减一点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
+			pinghe_info:'锁定技。①你的手牌上限基数等于你已损失的体力值。②当你受到其他角色造成的伤害时，若你有牌且你的体力上限大于1，则你防止此伤害，减1点体力上限并将一张手牌交给一名其他角色。然后若你拥有〖英霸〗，则伤害来源获得一个“平定”标记。',
 			shen_jiangwei:'神姜维',
 			shen_jiangwei_prefix:'神',
 			jiufa:'九伐',
@@ -7384,7 +7684,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_machao_prefix:'神',
 			shouli:'狩骊',
 			shouli_backup:'狩骊',
-			shouli_info:'①游戏开始时，你令场上所有角色从你的下家起，依次使用牌堆中的一张不为赠物的坐骑牌。②你可以将场上的一张进攻坐骑牌当做【杀】（无任何次数限制），防御坐骑牌当做【闪】使用或打出。若此坐骑牌的拥有者不为你，则其非锁定技于本回合内失效。且当你或其于本回合内受到伤害时，此伤害+1且改为雷属性。',
+			shouli_info:'①锁定技，游戏开始时，你令场上所有角色从你的下家起，依次使用牌堆中的一张不为赠物的坐骑牌。②你可以将场上的一张进攻坐骑牌当做【杀】（无任何次数限制），防御坐骑牌当做【闪】使用或打出。若此坐骑牌的拥有者不为你，则其非锁定技于本回合内失效。且当你或其于本回合内受到伤害时，此伤害+1且改为雷属性。',
 			hengwu:'横骛',
 			hengwu_info:'当你使用或打出有花色的牌时，若你的手牌区内没有与此牌花色相同的牌，则你可以摸X张牌（X为场上装备区内花色与此牌相同的牌数）。',
 			hengwu_append:'<span style="font-family: yuanli">棘手，怀念，摧毁！</span>',
@@ -7456,6 +7756,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiexie_info:'锁定技。准备阶段，你在剩余武将牌堆中随机观看五张牌，选择其中的任意张，将其按照如下规则转化为武器牌置入你的武器栏：{⒈此牌不具有花色，且其攻击范围和点数等于此武将牌的体力上限。⒉此武器牌的技能为该武将牌上所有描述中包含“【杀】”且不具有锁定技以外的标签的技能。⒊此武器牌离开你的装备区时，改为放回武将牌堆。}',
 			cuijue:'摧决',
 			cuijue_info:'每回合每名角色限一次。出牌阶段，你可以弃置一张牌，然后对攻击范围内距离最远的一名其他角色造成1点伤害（没有则不选）。',
+			le_shen_jiaxu:'神贾诩',
+			le_shen_jiaxu_prefix:'神',
+			jxlianpo:'炼魄',
+			jxlianpo_info:'锁定技。①若场上最大阵营为：反贼，其他角色的手牌上限-1，所有角色使用【杀】的次数上限和攻击范围+1；主忠，其他角色不能对其以外的角色使用【桃】。其他角色死亡后，若有多个最大阵营，来源摸两张牌并回复1点体力。②一轮游戏开始时，你展示一张未加入游戏或已死亡角色的身份牌，本轮视为该身份对应阵营的角色数+1。',
+			jxzhaoluan:'兆乱',
+			jxzhaoluan_info:'限定技。一名角色死亡前，若其此次进入过濒死状态，你可以取消之，令其加3点体力上限并失去所有非锁定技，回复体力至3点，摸四张牌。然后你获得如下效果：出牌阶段，你可以令一名成为过你〖兆乱〗目标的角色减1点体力上限，然后对一名此阶段未以此法选择过的角色造成1点伤害。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',

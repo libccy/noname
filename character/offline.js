@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connectBanned:['zhangliang'],
 		characterSort:{
 			offline:{
-				offline_star:["sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei","old_machao","zhangliang","jsp_caoren"],
+				offline_star:['jsp_ganfuren',"sp_xiahoushi","jsp_zhaoyun","huangjinleishi","sp_pangtong","sp_daqiao","sp_ganning","sp_xiahoudun","sp_lvmeng","sp_zhangfei","sp_liubei","old_machao","zhangliang","jsp_caoren"],
 				offline_sticker:['sp_gongsunzan','sp_simazhao','sp_wangyuanji','sp_xinxianying','sp_liuxie'],
 				offline_yijiang:['ol_xinxianying'],
 				offline_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
@@ -19,6 +19,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			jsp_ganfuren:['female','shu',3,['shushen','shenzhi'],['character:gz_ganfuren']],
 			ol_xinxianying:['female','wei',3,['xincaishi','xinzhongjian']],
 			zhangliang:["male","qun",4,["old_jijun","old_fangtong"]],
 			jsp_caoren:['male','wei',4,['kuiwei','yanzheng']],
@@ -944,6 +945,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target){
+							if(card.name==='sha'&&!game.hasNature(card)&&target.hasEmptySlot(2)) return 'zeroplayertarget';
+							if(get.subtype(card)=='equip2'&&target.isEmpty(2)) return [0.6,-0.8];
+						}
+					}
 				}
 			},
 			//战役篇蒋钦
@@ -983,9 +992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				filter:function(event,player){
 					if(get.type(event.card)!='equip') return false;
-					var gz=get.mode()=='guozhan';
-					if(gz&&event.player.isFriendOf(player)) return false;
-					return player.countMark('pkwuku')<(gz?2:3);
+					return player.countMark('pkwuku')<3;
 				},
 				content:function(){
 					player.addMark('pkwuku',1);
@@ -1978,7 +1985,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					skip:{
-						trigger:{player:'phaseBefore'},
+						trigger:{player:'phaseBeforeStart'},
 						forced:true,
 						priority:Infinity,
 						popup:false,
@@ -5578,7 +5585,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.directfalse=true;
 						}
 						else{
-							target.chooseCard('交给'+get.translation(player)+'一张【闪】，或失去一点体力',function(card){
+							target.chooseCard('交给'+get.translation(player)+'一张【闪】，或失去1点体力',function(card){
 								return card.name=='shan';
 							}).set('ai',function(card){
 								if(_status.event.nshan>1) return 1;
@@ -6317,7 +6324,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			splanggu_rewrite:'狼顾',
 			splanggu_info:'当你受到有来源的伤害后，你可以进行判定（此判定结果生效前，你可以打出一张手牌替换判定牌）。然后你可以观看伤害来源的手牌并弃置其中的任意张与判定结果花色相同的牌。',
 			spfuluan:'扶乱',
-			spfuluan_info:'出牌阶段限一次，你可以弃置三张花色相同的牌并选择攻击范围内的一名角色。若如此做，该角色翻面且你不能使用【杀】直到回合结束',
+			spfuluan_info:'出牌阶段限一次，你可以弃置三张花色相同的牌并选择攻击范围内的一名角色。若如此做，该角色翻面且你不能使用【杀】直到回合结束。',
 			spshude:'淑德',
 			spshude_info:'结束阶段开始时，你可以将手牌补至体力上限。',
 			spmingjian:'明鉴',
@@ -6343,7 +6350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsfeixiong:'飞熊',
 			nsfeixiong_info:'出牌阶段开始时，你可以和一名其他角色拼点。赢的角色对没赢的角色造成1点伤害。',
 			nscesuan:'策算',
-			nscesuan_info:'锁定技，当你受到伤害时，你防止此伤害并失去一点体力上限。若你因以此法失去体力上限导致体力值减少，则你摸一张牌。',
+			nscesuan_info:'锁定技，当你受到伤害时，你防止此伤害并失去1点体力上限。若你因以此法失去体力上限导致体力值减少，则你摸一张牌。',
 			nslulve:'掳掠',
 			nslulve_info:'出牌阶段限一次，你可以弃置X张牌并选择一名装备区内有牌的其他角色，然后对其造成1点伤害（X为其装备区内的牌数）。',
 			ns_fanchou:'SP樊稠',
@@ -6365,8 +6372,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinfu_yanyu2:"燕语",
 			xinfu_xiaode:"孝德",
 			xinfu_xiaode_info:"其他角色死亡后，你可以声明该角色武将牌上的一个技能（主公技、觉醒技、隐匿技、使命技除外）。若如此做，你获得此技能且不能再发动〖孝德〗直到你的回合结束。",
-			jsp_zhaoyun:'★SP赵云',
-			jsp_zhaoyun_prefix:'★SP',
+			jsp_zhaoyun:'J.SP赵云',
+			jsp_zhaoyun_prefix:'J.SP',
 			chixin:'赤心',
 			chixin1:'赤心',
 			chixin2:'赤心',
@@ -6378,55 +6385,55 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fulu_info:'当你声明使用普通【杀】后，你可以将此【杀】改为雷【杀】。',
 			fuji:'助祭',
 			fuji_info:'当一名角色造成雷属性伤害时，你可以令其进行判定，若结果为黑色，此伤害+1；若结果为红色，该角色获得判定牌。',
-			sp_pangtong:'SP庞统',
-			sp_pangtong_prefix:'SP',
+			sp_pangtong:'☆SP庞统',
+			sp_pangtong_prefix:'☆SP',
 			manjuan:'漫卷',
 			manjuan_info:'其他角色的牌因弃置而进入弃牌堆后，你可以弃置一张花色与之不同的牌，然后获得此牌。',
 			xinmanjuan:'漫卷',
 			xinmanjuan_info:'锁定技，当你不因〖漫卷〗或〖醉乡〗而得到牌时，你将此牌置入弃牌堆。然后若此时处于你的回合内，则你可以从弃牌堆中选择获得一张与此牌点数相同的其他牌。',
 			zuixiang:'醉乡',
 			zuixiang2:'醉乡',
-			zuixiang_info:'限定技，准备阶段开始时，你可以展示牌堆顶的3张牌并置于你的武将牌上。你不能使用或打出与该些牌同类的牌，所有同类牌对你无效。之后的每个准备阶段，你须重复展示一次，直到这些牌中任意两张点数相同。然后，你获得这些牌。',
-			sp_daqiao:'★SP大乔',
-			sp_daqiao_prefix:'★SP',
+			zuixiang_info:'限定技。准备阶段开始时，你可以展示牌堆顶的三张牌并置于你的武将牌上。你不能使用或打出与该些牌同类的牌，所有同类牌对你无效。之后的每个准备阶段，你须重复展示一次，直到这些牌中任意两张点数相同。然后，你获得这些牌。',
+			sp_daqiao:'☆SP大乔',
+			sp_daqiao_prefix:'☆SP',
 			yanxiao:'言笑',
 			yanxiao_info:'出牌阶段，你可以将一张♦牌置于一名角色的判定区内。判定区内有〖言笑〗牌的角色下个判定阶段开始时，其获得判定区里的所有牌。',
 			anxian:'安娴',
 			anxian_info:'当你使用【杀】对目标角色造成伤害时，你可以防止此伤害，令其弃置一张手牌，然后你摸一张牌；当你成为【杀】的目标后，你可以弃置一张手牌，令此【杀】对你无效，然后此【杀】的使用者摸一张牌。',
-			sp_ganning:'★SP甘宁',
-			sp_ganning_prefix:'★SP',
+			sp_ganning:'☆SP甘宁',
+			sp_ganning_prefix:'☆SP',
 			yinling:'银铃',
 			yinling_bg:'锦',
 			yinling_info:'出牌阶段，若你的“锦”小于四张，你可以弃置一张黑色牌并指定一名其他角色。若如此做，你将其的一张牌置于你的武将牌上，称为“锦”。',
 			junwei:'军威',
 			junwei2:'军威',
 			junwei_info:'结束阶段开始时，你可以移去三张“锦”。若如此做，你须指定一名角色并令其选择一项：1.展示一张【闪】，然后你将此【闪】交给一名其他角色。2.该角色失去1点体力，然后你将其装备区内的一张牌移出游戏。该角色的回合结束后，将以此法移出游戏的装备牌移回原处。',
-			sp_xiahoudun:'★SP夏侯惇',
-			sp_xiahoudun_prefix:'★SP',
+			sp_xiahoudun:'☆SP夏侯惇',
+			sp_xiahoudun_prefix:'☆SP',
 			fenyong:'愤勇',
 			fenyong2:'愤勇',
 			fenyong2_bg:'勇',
 			fenyong_info:'每当你受到一次伤害后，你可以获得一枚「愤勇」标记；当你拥有「愤勇」标记时，防止你受到的所有伤害。',
 			xuehen:'雪恨',
 			xuehen_info:'每个角色的结束阶段开始时，若你有愤勇标记，你弃置之，然后选择一项：1.弃置当前回合角色X张牌（X为你已损失的体力值）；2.视为对一名任意角色使用一张【杀】。',
-			sp_lvmeng:'★SP吕蒙',
-			sp_lvmeng_prefix:'★SP',
+			sp_lvmeng:'☆SP吕蒙',
+			sp_lvmeng_prefix:'☆SP',
 			tanhu:'探虎',
 			tanhu2:'探虎',
 			tanhu3:'探虎',
 			tanhu_info:'出牌阶段限一次，你可以与一名其他角色拼点。若你赢，你获得以下效果直到回合结束：你与该角色的距离为1，你对该角色使用的普通锦囊牌不能被【无懈可击】响应。',
 			mouduan:'谋断',
 			mouduan_info:'游戏开始时，你获得标记“武”并获得技能〖激昂〗和〖谦逊〗。当你失去手牌后，若手牌数不大于2，你须将你的标记变为“文”，将这两项技能改为〖英姿〗和〖克己〗。一名角色的回合开始前，你可弃一张牌将标记翻回。',
-			sp_zhangfei:'★SP张飞',
-			sp_zhangfei_prefix:'★SP',
+			sp_zhangfei:'☆SP张飞',
+			sp_zhangfei_prefix:'☆SP',
 			jie:'嫉恶',
 			jie_info:'锁定技，当你使用红色【杀】造成伤害时，此伤害+1。',
 			dahe:'大喝',
 			dahe2:'大喝',
 			dahe2_bg:'喝',
 			dahe_info:'出牌阶段限一次，你可以与一名其他角色拼点。若你赢，该角色不能使用或打出不为♥花色的【闪】直到回合结束，且你可将该角色拼点的牌交给场上一名体力不多于你的角色。若你没赢，你须展示手牌并弃置其中的一张。',
-			sp_liubei:'★SP刘备',
-			sp_liubei_prefix:'★SP',
+			sp_liubei:'☆SP刘备',
+			sp_liubei_prefix:'☆SP',
 			zhaolie:'昭烈',
 			zhaolie_info:'摸牌阶段摸牌时，你可以少摸一张牌并指定攻击范围内的一名角色。你展示牌堆顶的三张牌，将其中的非基本牌和【桃】置于弃牌堆，然后该角色选择一项：1.你对其造成X点伤害，然后其获得这些基本牌；2.其弃置X张牌，然后你获得这些基本牌。（X为其中非基本牌的数量）',
 			shichou:'誓仇',
@@ -6500,8 +6507,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yjluoshen:'洛神',
 			yjluoshen_info:'准备阶段，你可以判定并获得判定牌，且可重复此流程直到结果的颜色不同。',
 			//线下E系列 一战成名 战役篇官盗
-			shen_jiaxu:'神贾诩',
-			shen_jiaxu_prefix:'神',
+			shen_jiaxu:'战役篇神贾诩',
+			shen_jiaxu_prefix:'战役篇神',
 			zybishi:'避世',
 			zybishi_info:'当你成为【杀】的目标后，你可以令使用者摸一张牌，然后令此【杀】无效。',
 			zyjianbing:'谏兵',
@@ -6673,10 +6680,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
             vtbmeiniang_info:'其他角色的出牌阶段开始时，你可以令其视为使用一张无次数限制且不计入次数的【酒】。',
             vtbyaoli:'媱丽',
             vtbyaoli_info:'其他角色于其出牌阶段内使用【酒】后，你可以令其于本回合内使用的下一张【杀】不能被响应且可以额外指定一个目标。',
-			old_machao:'★SP马超',
-			old_machao_prefix:'★SP',
-			jsp_caoren:'★SP曹仁',
-			jsp_caoren_prefix:'★SP',
+			old_machao:'J.SP马超',
+			old_machao_prefix:'J.SP',
+			jsp_caoren:'☆SP曹仁',
+			jsp_caoren_prefix:'☆SP',
+			jsp_ganfuren:'SP甘夫人',
+			jsp_ganfuren_prefix:'SP',
 			zhangliang:'SP张梁',
 			zhangliang_prefix:'SP',
 			ol_xinxianying:'将辛宪英',

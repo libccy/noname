@@ -45,9 +45,11 @@ var pinyin_dict_polyphone = {
 	"洛欧塞布": "  sài ",
 	"塞纳留斯": "sài   ",
 	"半藏": " zàng",
+	"地藏王": "dì zàng wáng",
 	"查莉娅": "zhā  ",
 	"单小小": "shàn  ",
 	"少微": "shào ",
+	"少昊": "shào ",
 	"欧阳少恭": "  shào ",
 	"卡尔维特": "kǎ   ",
 	"卡西尔": "kǎ  ",
@@ -57,6 +59,7 @@ var pinyin_dict_polyphone = {
 	"卡利莫斯": "kǎ   ",
 	"安卡": " kǎ",
 	"卡玛": "kǎ ",
+	"梼杌": "táo ",
 	
 	"库特莉亚芙卡": "     kǎ",
 	"露娜": "lù ",
@@ -123,6 +126,7 @@ var pinyin_dict_polyphone = {
 	"度势": "duó ",
 	"诛綝": " chēn",
 	"大喝": "dà hè",
+	"暴喝": "bào hè",
 	"曲误": "qǔ ",
 	"媛丽": "yuán lì",
 	"调归": "diào ",
@@ -150,6 +154,7 @@ var pinyin_dict_polyphone = {
 	"血逐": "xuè ",
 	"血咒": "xuè ",
 	"血殇": "xuè ",
+	"血池": "xuè ",
 	"越行": " xíng",
 	"劫行": " xíng",
 	"割发": " fà",
@@ -157,6 +162,7 @@ var pinyin_dict_polyphone = {
 	"落石": "luò ",
 	"落刀": "luò ",
 	"星落": " luò",
+	"奈落": " luò",
 	"舍身": "shě ",
 	"舍愿": "shě ",
 	"月露": " lù",
@@ -41586,7 +41592,7 @@ var pinyin_dict_withtone = "yī,dīng zhēng,kǎo qiǎo yú,qī,shàng,xià,hǎn
 			temp = '';
 			for (var j = 0; j < max && (i + j) < chinese.length; j++) {
 				if (!dict.withtone[chinese[i]]) {
-					i+=(result[i].length-1);
+					i+=(result[m].length-1);
 					break;
 				} // 如果碰到非汉字直接停止本次查找
 				temp += chinese[i + j];

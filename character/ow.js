@@ -334,7 +334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player){
 						if(storage){
-							return '每当你使用一张杀，你摸一张牌或回复一点体力';
+							return '每当你使用一张杀，你摸一张牌或回复1点体力';
 						}
 						else if(player.hasSkill('bshaowei')&&player.storage.bshaowei){
 							return '你的杀无视距离和防具、无数量限制且不可闪避；你不能闪避杀';
@@ -961,7 +961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case 2:num=60;break;
 							case 3:num=100;break;
 						}
-						return '结束阶段，有'+num+'%机率对一名随机敌人造成一点火焰伤害';
+						return '结束阶段，有'+num+'%机率对一名随机敌人造成1点火焰伤害';
 					}
 				},
 				init:function(player){
@@ -2399,7 +2399,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				mark:true,
 				intro:{
-					content:'下个准备阶段令一名距离1以内的角色回复一点体力或摸两张牌'
+					content:'下个准备阶段令一名距离1以内的角色回复1点体力或摸两张牌'
 				},
 				content:function(){
 					'step 0'
@@ -2600,7 +2600,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				intro:{
 					content:function(storage,player){
-						var str='每隔六回合回复一点体力，直到'+get.translation(storage)+'死亡';
+						var str='每隔六回合回复1点体力，直到'+get.translation(storage)+'死亡';
 						if(typeof player.storage.xie=='number'){
 							var num=game.phaseNumber-player.storage.xie;
 							num=num%6;
@@ -2691,7 +2691,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luan2:{
 				mark:true,
 				intro:{
-					content:'受到的伤害后流失一点体力，直到首次进入濒死状态'
+					content:'受到的伤害后失去1点体力，直到首次进入濒死状态'
 				},
 				trigger:{player:'damageEnd'},
 				forced:true,
@@ -2731,7 +2731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				intro:{
 					content:function(storage,player){
-						var str='每隔六回合失去一点体力，直到'+get.translation(storage)+'死亡';
+						var str='每隔六回合失去1点体力，直到'+get.translation(storage)+'死亡';
 						if(typeof player.storage.luan=='number'){
 							var num=game.phaseNumber-player.storage.luan;
 							num=num%6;
@@ -3226,7 +3226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guangshu_heart:{
 				mark:true,
 				intro:{
-					content:'下次受到伤害时回复一点体力'
+					content:'下次受到伤害时回复1点体力'
 				},
 				trigger:{player:'damageEnd'},
 				priority:6,
@@ -3256,7 +3256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guangshu_spade:{
 				mark:true,
 				intro:{
-					content:'下个结束阶段受到一点无来源的雷电伤害'
+					content:'下个结束阶段受到1点无来源的雷电伤害'
 				},
 				trigger:{player:'phaseEnd'},
 				forced:true,
@@ -3466,7 +3466,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			woliu2:'涡流',
 			woliu_info:'结束阶段，你可以选择至多两名角色，当你或目标中的任意一名角色成为杀的目标时，其余角色也将被追加为目标，直到你死亡或下一回合开始',
 			qianggu:'强固',
-			qianggu_info:'出牌阶段限一次，你可以弃置两张牌并获得两点护甲，若如此做，直到你的下个回合开始，其他角色对你使用杀时需要弃置一张基本牌，否则杀对你无效',
+			qianggu_info:'出牌阶段限一次，你可以弃置两张牌并获得2点护甲，若如此做，直到你的下个回合开始，其他角色对你使用杀时需要弃置一张基本牌，否则杀对你无效',
 			qianggu2:'强固',
 			qianggu2_bg:'固',
 			qianggu2_info:'其他角色对你使用杀时需要弃置一张基本牌，否则杀对你无效',
@@ -3483,11 +3483,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bshaowei:'哨卫',
 			bshaowei_info:'结束阶段，你可以切换至哨卫模式。当处于此模式时，你的杀无视距离和防具、无数量限制且不可闪避；你不能闪避杀',
 			zhencha:'侦查',
-			zhencha_info:'结束阶段，你可以切换至侦查模式。当处于此模式时，每当你使用一张杀，你摸一张牌或回复一点体力',
+			zhencha_info:'结束阶段，你可以切换至侦查模式。当处于此模式时，每当你使用一张杀，你摸一张牌或回复1点体力',
 			liangou:'链钩',
 			liangou_info:'出牌阶段限一次，你可以弃置一张牌，指定一名其他角色并进行一次判定，若结果不为红桃，该角色与你距离为1且受到的首次伤害+1直到回合结束',
 			xiyang:'吸氧',
-			xiyang_info:'结束阶段，若你武将牌正面朝上，你可以翻面并回复两点体力',
+			xiyang_info:'结束阶段，若你武将牌正面朝上，你可以翻面并回复2点体力',
 			qinru:'侵入',
 			qinru_info:'每当你使用杀指定目标时，你可以令其进行一次判定，若结果不为红桃，该角色的非锁定技失效直到其下一回合结束',
 			yinshen:'隐身',
@@ -3498,19 +3498,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			maichong_info_alter:'准备阶段，你可以令最近两名被你侵入的角色各随机弃置一张牌',
 			lichang:'力场',
 			lichang2:'力场',
-			lichang_info:'结束阶段，你可以弃置一张红色牌，若如此做，你可以在下个准备阶段令一名距离1以内的角色回复一点体力或摸两张牌',
+			lichang_info:'结束阶段，你可以弃置一张红色牌，若如此做，你可以在下个准备阶段令一名距离1以内的角色回复1点体力或摸两张牌',
 			mengji:'猛击',
 			mengji_info:'锁定技，若你已发动重盾，当你没有护甲时，你的杀造成的伤害+1',
 			zhongdun:'重盾',
-			zhongdun_info:'游戏开始时，你获得8点护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
-			zhongdun_info_alter:'游戏开始时，你获得6点护甲；出牌阶段限一次，你可以弃置一张牌并将一点护甲分给一名没有护甲的其他角色',
+			zhongdun_info:'游戏开始时，你获得8点护甲；出牌阶段限一次，你可以弃置一张牌并将1点护甲分给一名没有护甲的其他角色',
+			zhongdun_info_alter:'游戏开始时，你获得6点护甲；出牌阶段限一次，你可以弃置一张牌并将1点护甲分给一名没有护甲的其他角色',
 			paotai:'炮台',
 			paotai2:'炮台',
-			paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；结束阶段，炮台有一定机率对一名随机敌人造成一点火焰伤害；每当你受到一点伤害，炮台降低一级',
+			paotai_info:'出牌阶段，你可以弃置一张杀布置或升级一个炮台（最高3级）；结束阶段，炮台有一定机率对一名随机敌人造成1点火焰伤害；每当你受到1点伤害，炮台降低一级',
 			maoding:'铆钉',
 			maoding2:'铆钉',
-			maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌阶段，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
-			maoding_info_alter:'每当你造成一次伤害，你可以获得一个零件；出牌阶段，你可以弃置两张零件牌令一名没有护甲的角色获得一点护甲',
+			maoding_info:'每当你造成或受到一次伤害，你可以获得一个零件；出牌阶段，你可以弃置两张零件牌令一名没有护甲的角色获得1点护甲',
+			maoding_info_alter:'每当你造成一次伤害，你可以获得一个零件；出牌阶段，你可以弃置两张零件牌令一名没有护甲的角色获得1点护甲',
 			bfengshi:'风矢',
 			bfengshi2:'风矢',
 			bfengshi_info:'锁定技，在一合内每当你使用一张牌，你的攻击范围+1；你的首张杀增加20%的概率强制命中；你的首张杀造成伤害后增加20%的概率令伤害+1',
@@ -3536,7 +3536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mianzhen_info:'出牌阶段限一次，你可以弃置一张牌并令一名其他角色打出一张闪，否则该角色不能使用或打出卡牌直到其受到伤害或下一回合结束',
 			aqianghua:'强化',
 			aqianghua2:'强化',
-			aqianghua_info:'出牌阶段限一次，你可以将你的全部手牌（至少一张）交给一名其他角色，该角色获得一点护甲且下一次造成的伤害+1',
+			aqianghua_info:'出牌阶段限一次，你可以将你的全部手牌（至少一张）交给一名其他角色，该角色获得1点护甲且下一次造成的伤害+1',
 			aqianghua_info_alter:'出牌阶段限一次，你可以将你的全部手牌（至少一张）交给一名其他角色，该角色下一次造成的伤害+1',
 			zhiyuan:'支援',
 			zhiyuan_info:'每当你即将造成伤害，你可以防止此伤害，改为令目标回复等量的体力',
@@ -3551,7 +3551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuagou_info:'出牌阶段限一次，你可以弃置一张手牌并将你的座位移到任意位置',
 			dulei:'诡雷',
 			dulei2:'诡雷',
-			dulei_info:'出牌阶段，若你武将牌上没有牌，你可以将一张牌背面朝上置于你的武将牌上，当一名角色使用与该牌花色相同的牌指定你为目标时，你展示并移去此牌，然后该角色失去一点体力并随机弃置一张牌',
+			dulei_info:'出牌阶段，若你武将牌上没有牌，你可以将一张牌背面朝上置于你的武将牌上，当一名角色使用与该牌花色相同的牌指定你为目标时，你展示并移去此牌，然后该角色失去1点体力并随机弃置一张牌',
 			shuangqiang:'霜枪',
 			shuangqiang_info:'每当你对一名未翻面的角色造成伤害，你可以令伤害-1，然后令受伤害角色翻面',
 			baoxue:'暴雪',
@@ -3568,8 +3568,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bingqiang5_bg:'障',
 			bingqiang_info:'出牌阶段，你可以弃置X张红色牌令一名角色和其相邻角色的防御离+X，或弃置X张黑色牌令一名角色和其相邻角色的进攻离-X，效果持续到你的下个回合开始',
 			jidong:'急冻',
-			jidong_info:'在一名角色的结束阶段，若你的体力值为1且未翻面，你可以翻面并回复两点体力，在你的武将牌翻至正面前，你防止所有伤害，也不能成为其他角色卡牌的目标',
-			jidong_info_alter:'在一名角色的结束阶段，若你的体力值为1，你可以翻面并回复两点体力',
+			jidong_info:'在一名角色的结束阶段，若你的体力值为1且未翻面，你可以翻面并回复2点体力，在你的武将牌翻至正面前，你防止所有伤害，也不能成为其他角色卡牌的目标',
+			jidong_info_alter:'在一名角色的结束阶段，若你的体力值为1，你可以翻面并回复2点体力',
 			jijia:'机甲',
 			jijia_info:'锁定技，游戏开始时，你获得一个体力为4的机甲；你的手牌上限为你和机甲的体力之和；你受到的伤害由机甲承担',
 			zihui:'自毁',
@@ -3596,19 +3596,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhanlong_info:'限定技，准备阶段，若你体力值为1，你可以弃置所有牌（至少一张），然后将三张杀置入你的手牌，若如此做，你本回合使用杀无次数限制',
 			xie:'谐',
 			xie2:'谐',
-			xie_info:'出牌阶段，你可以弃置一张红桃手牌并指定一名角色，该角色自其下一回合开始每隔六回合回复一点体力，直到你死亡。同一时间只能对一人发动',
+			xie_info:'出牌阶段，你可以弃置一张红桃手牌并指定一名角色，该角色自其下一回合开始每隔六回合回复1点体力，直到你死亡。同一时间只能对一人发动',
 			luan:'乱',
 			luan2:'乱',
-			luan_old_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色自其下一回合开始每隔六回合失去一点体力，直到你死亡。同一时间只能对一人发动',
-			luan_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色受到伤害后流失一点体力，直到你死亡或其首次进入濒死状态。同一时间只能对一人发动',
+			luan_old_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色自其下一回合开始每隔六回合失去1点体力，直到你死亡。同一时间只能对一人发动',
+			luan_info:'出牌阶段，你可以弃置一张黑桃手牌并指定一名角色，该角色受到伤害后失去1点体力，直到你死亡或其首次进入濒死状态。同一时间只能对一人发动',
 			sheng:'圣',
-			sheng_info:'限定技，出牌阶段，你可以将你的武将牌翻面，然后令任意名角色回复一点体力，若如此做，你不能成为其他角色的卡牌目标直到下一回合开始',
+			sheng_info:'限定技，出牌阶段，你可以将你的武将牌翻面，然后令任意名角色回复1点体力，若如此做，你不能成为其他角色的卡牌目标直到下一回合开始',
 			xiandan:'霰弹',
 			xiandan_info:'每当你使用一张杀，你可以弃置一张红色牌令此杀不可闪避，或弃置一张黑色牌令此杀伤害+1',
 			yihun:'移魂',
 			yihun_info:'结束阶段，你可以弃置一张黑色牌并指定一名其他角色，你在该角色下一准备阶段视为对其使用一张杀；在此之前，你不能使用卡牌，也不能成为卡牌的目标',
 			feidan:'飞弹',
-			feidan_info:'你的杀只能对距离1以外的角色使用；每当你使用杀造成伤害后，你可以弃置一张牌对距离目标1以内的其他角色各造成一点伤害',
+			feidan_info:'你的杀只能对距离1以外的角色使用；每当你使用杀造成伤害后，你可以弃置一张牌对距离目标1以内的其他角色各造成1点伤害',
 			huoyu:'火雨',
 			huoyu_info:'限定技，出牌阶段，你可以弃置两张红色牌，视为使用两张炽羽袭',
 			yuedong:'乐动',
@@ -3623,17 +3623,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guangshu_spade:'光塔',
 			guangshu_club:'光井',
 			guangshu_diamond:'光流',
-			guangshu_info:'出牌阶段，你可以弃置一张牌，并指定一名角色，根据弃置牌的花色执行如下效果：♥该角色下次受到伤害时回复一点体力；♦︎该角色下次造成伤害时摸两张牌；♣该角色无法使用杀直到下一回合结束；♠该角色于下个结束阶段受到一点无来源的雷电伤害',
+			guangshu_info:'出牌阶段，你可以弃置一张牌，并指定一名角色，根据弃置牌的花色执行如下效果：♥该角色下次受到伤害时回复1点体力；♦︎该角色下次造成伤害时摸两张牌；♣该角色无法使用杀直到下一回合结束；♠该角色于下个结束阶段受到1点无来源的雷电伤害',
 			ziyu:'自愈',
-			ziyu_info:'在一名角色的结束阶段，你可以回复一点体力或摸一张牌，每隔四回合发动一次',
-			ziyu_info_alter:'在一名角色的结束阶段，你可以回复一点体力或摸一张牌，每隔六回合发动一次',
+			ziyu_info:'在一名角色的结束阶段，你可以回复1点体力或摸一张牌，每隔四回合发动一次',
+			ziyu_info_alter:'在一名角色的结束阶段，你可以回复1点体力或摸一张牌，每隔六回合发动一次',
 			shouhu:'守护',
-			shouhu_info:'你不能使用杀；出牌阶段，你可以弃置一张杀令一名其他角色回复一点体力',
+			shouhu_info:'你不能使用杀；出牌阶段，你可以弃置一张杀令一名其他角色回复1点体力',
 			shanxian:'闪现',
 			shanxian_info:'在一名其他角色的回合开始前，若你的武将牌正面朝上，你可以摸一张牌并进行一个额外回合，并在回合结束后将武将牌翻至背面。若如此做，你对其使用卡牌无视距离直到回合结束。',
 			shanxian_info_alter:'在一名其他角色的回合开始前，若你的武将牌正面朝上，你可以进行一个额外回合，并在回合结束后将武将牌翻至背面。若如此做，你对其使用卡牌无视距离直到回合结束。',
 			shanhui:'闪回',
-			shanhui_info:'当你造成或受到伤害后，你可以将你的牌重置为上次发动闪现时的状态，若你的牌数因此而减少，你回复一点体力',
+			shanhui_info:'当你造成或受到伤害后，你可以将你的牌重置为上次发动闪现时的状态，若你的牌数因此而减少，你回复1点体力',
 			ow_liekong:'猎空',
 			ow_sishen:'死神',
 			ow_tianshi:'天使',

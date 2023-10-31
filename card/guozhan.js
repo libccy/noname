@@ -696,7 +696,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				mode:['guozhan'],
-				global:['g_chiling1','g_chiling2','g_chiling3'],
+				//global:['g_chiling1','g_chiling2','g_chiling3'],
 				filterTarget:function(card,player,target){
 					return target.isUnseen();
 				},
@@ -753,6 +753,27 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.showCharacter(1);
 					}
 					target.draw();
+				},
+				destroy:function(card,targetPosition,player,event){
+					if(event.name!='lose'||event.name!='cardsDiscard'||targetPosition!='discardPile') return false;
+					var evt=event.getParent().relatedEvent;
+					if(evt&&evt.name=='useCard') return false;
+					
+					return true;
+				},
+				onDestroy:function(){
+					var currentPhase=_status.currentPhase;
+					if(currentPhase){
+						_status.chiling=true;
+						currentPhase.addTempSkill('g_chiling3');
+					}
+					if(!lib.inpile.contains('zhaoshu')){
+						lib.inpile.push('zhaoshu');
+						var card=game.createCard2('zhaoshu','club',3);
+						game.log(card,'被置于了牌堆底');
+						ui.cardPile.appendChild(card);
+						game.updateRoundNumber();
+					}
 				},
 				ai:{
 					order:6,
@@ -1570,50 +1591,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			g_chiling1:{
-				mode:['guozhan'],
-				trigger:{
-					player:'loseEnd',
-					global:'cardsDiscardEnd',
-				},
-				filter:function(event,player){
-					var evt=event.getParent().relatedEvent;
-					if(evt&&evt.name=='useCard') return false;
-					for(var i=0;i<event.cards.length;i++){
-						if(event.cards[i].name=='chiling'&&get.position(event.cards[i],true)=='d'){
-							return true;
-						}
-					}
-					return false;
-				},
-				forced:true,
-				popup:false,
-				content:function(){
-					var cards=[];
-					for(var i=0;i<trigger.cards.length;i++){
-						if(trigger.cards[i].name=='chiling'&&get.position(trigger.cards[i],true)=='d'){
-							cards.push(trigger.cards[i]);
-						}
-					}
-					if(cards.length){
-						game.cardsGotoSpecial(cards);
-						game.log(cards,'已被移出游戏');
-						_status.chiling=true;
-						if(player&&player.popup) player.popup('敕令');
-					}
-					if(!lib.inpile.contains('zhaoshu')){
-						lib.inpile.push('zhaoshu');
-						var card=game.createCard2('zhaoshu','club',3);
-						game.log(card,'被置于了牌堆底');
-						ui.cardPile.appendChild(card);
-						game.updateRoundNumber();
-					}
-				},
-			},
-			g_chiling2:{},
 			g_chiling3:{
 				mode:['guozhan'],
-				trigger:{player:'phaseAfter'},
+				trigger:{player:'phaseEnd'},
 				forced:true,
 				popup:false,
 				filter:function(){
@@ -1791,13 +1771,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			yuxi_skill:'玉玺',
 			yuxi_skill2:'玉玺',
 			yuxi:'玉玺',
-			yuxi_info:'锁定技。若你有明置的武将牌，则：①你的势力视为唯一的大势力。②摸牌阶段开始时，你令额定摸牌数+1。③出牌阶段开始时，你视为使用【知己知彼】',
+			yuxi_info:'锁定技。若你有明置的武将牌，则：①你的势力视为唯一的大势力。②摸牌阶段开始时，你令额定摸牌数+1。③出牌阶段开始时，你视为使用【知己知彼】。',
 			xietianzi:'挟令',
 			xietianzi_info:'出牌阶段，对自己使用。你结束出牌阶段。本回合的弃牌阶段结束时，你可以弃置一张手牌，获得一个额外的回合。',
 			xietianzi_info_guozhan:'出牌阶段，对身为大势力角色的自己使用。你结束出牌阶段。本回合的弃牌阶段结束时，你可以弃置一张手牌，获得一个额外的回合。',
 			shuiyanqijunx:'水淹七军',
-			shuiyanqijunx_info:'出牌阶段，对一名其他角色使用。目标角色选择一项：⒈弃置装备区里的所有牌（至少一张）。⒉受到你造成的1点雷电伤害',
-			shuiyanqijunx_info_guozhan:'出牌阶段，对一名装备区里有牌的其他角色使用。目标角色选择一项：⒈弃置装备区里的所有牌。⒉受到你造成的1点雷电伤害',
+			shuiyanqijunx_info:'出牌阶段，对一名其他角色使用。目标角色选择一项：⒈弃置装备区里的所有牌（至少一张）。⒉受到你造成的1点雷电伤害。',
+			shuiyanqijunx_info_guozhan:'出牌阶段，对一名装备区里有牌的其他角色使用。目标角色选择一项：⒈弃置装备区里的所有牌。⒉受到你造成的1点雷电伤害。',
 			lulitongxin:'勠力同心',
 			lulitongxin_info:'出牌阶段，对所有大势力角色或所有小势力角色使用。若目标角色：未横置，则其横置；已横置，则其摸一张牌。',
 			lulitongxin_info_versus:'出牌阶段，对所有己方角色或所有敌方角色使用。若目标角色：未横置，则其横置；已横置，则其摸一张牌。',
@@ -1831,7 +1811,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			sanjian_skill:'三尖两刃刀',
 			jingfanma_bg:'-马',
 			jingfanma:'惊帆',
-			jingfanma_info:'你的进攻距离+1',
+			jingfanma_info:'锁定技，你计算与其他角色的距离-1。',
 			huxinjing_bg:'镜',
 			huxinjing:'护心镜',
 			huxinjing_info:'此牌可对其他角色使用。当你受到伤害时，若伤害值大于1或大于等于你的体力值，则你可以将所有【护心镜】置入弃牌堆，然后防止此伤害。',

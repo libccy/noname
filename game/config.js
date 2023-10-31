@@ -169,6 +169,8 @@ window.config={
 				['zhu','zhong','nei','fan','fan','fan'],
 				['zhu','zhong','zhong','nei','fan','fan','fan'],
 				['zhu','zhong','zhong','nei','fan','fan','fan','fan'],
+				['zhu','zhong','zhong','zhong','nei','fan','fan','fan','fan'],
+				['zhu','zhong','zhong','zhong','nei','nei','fan','fan','fan','fan'],
 			],
 			choice:{
 				zhu:3,
