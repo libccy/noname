@@ -17486,7 +17486,7 @@
 						event.dialog.addText(event.prompt2);
 					}
 					var expand_length=0;
-					var directh=!lib.config.unauto_choose;
+					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getCards('h');
@@ -17547,17 +17547,17 @@
 					if(event.dialog.buttons.length==0){
 						event.finish();
 						return;
-					}
+					}var directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectButton!='function'&&event.filterButton==lib.filter.all);
 					var cs=target.getCards(event.position);
 					var select=get.select(event.selectButton);
-					if(event.forced&&select[0]>=cs.length){
+					if(directFilter&&select[0]>=cs.length){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons,
 							links:cs
 						}
 					}
-					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1]){
+					else if(directFilter&&directh&&!event.isOnline()&&select[0]==select[1]){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons.randomGets(select[0]),
@@ -17703,16 +17703,17 @@
 						event.finish();
 						return;
 					}
+					var directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectButton!='function'&&event.filterButton==lib.filter.all);
 					var cs=target.getCards(event.position);
 					var select=get.select(event.selectButton);
-					if(event.forced&&select[0]>=cs.length){
+					if(directFilter&&select[0]>=cs.length){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons,
 							links:cs
 						}
 					}
-					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1]){
+					else if(directFilter&&directh&&!event.isOnline()&&select[0]==select[1]){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons.randomGets(select[0]),
@@ -17885,14 +17886,15 @@
 					}
 					var cs=target.getCards(event.position);
 					var select=get.select(event.selectButton);
-					if(event.forced&&select[0]>=cs.length){
+					var directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectButton!='function'&&event.filterButton==lib.filter.all);
+					if(directFilter&&select[0]>=cs.length){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons,
 							links:cs
 						}
 					}
-					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1]){
+					else if(directFilter&&directh&&!event.isOnline()&&select[0]==select[1]){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons.randomGets(select[0]),
