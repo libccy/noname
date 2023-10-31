@@ -16,7 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			re_huangzhong:['male','shu',4,['xinliegong']],
 			old_zhoutai:['male','wu',4,['gzbuqu']],
-			old_caoren:['male','wei',4,['moon_jushou','jiewei']],
+			old_caoren:['male','wei',4,['jushou']],
 			re_xuhuang:['male','wei',4,['duanliang','jiezi']],
 			re_pangde:['male','qun',4,['mashu','jianchu']],
 			re_xiahouyuan:['male','wei',4,['xinshensu']],

@@ -204,7 +204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					mark:{
 						charlotte:true,
-						trigger:{player:'useCard1'},
+						trigger:{global:'useCard1'},
 						filter:function(event,player){
 							return !player.getStorage('starlifeng_count').contains(get.color(event.card));
 						},
@@ -10605,7 +10605,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starsujun:'肃军',
 			starsujun_info:'当你使用一张牌时，若你手牌中的基本牌和非基本牌的牌数相等，你可以摸两张牌。',
 			starlifeng:'砺锋',
-			starlifeng_info:'你可以将一张本回合未使用过的颜色的手牌当做不计入次数的【杀】或【无懈可击】使用。',
+			starlifeng_info:'你可以将一张本回合未有角色使用过的颜色的手牌当做不计入次数的【杀】或【无懈可击】使用。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
