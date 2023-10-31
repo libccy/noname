@@ -735,12 +735,6 @@
 			general:{
 				name:'通用',
 				config:{
-					mount_combine:{
-						name:'合并坐骑栏',
-						init:false,
-						intro:'<li>将进攻坐骑栏和防御坐骑栏合并为同一个位置（重启后生效）。',
-						restart:true,
-					},
 					low_performance:{
 						name:'流畅模式',
 						init:false,
@@ -3650,6 +3644,12 @@
 							map.show_extensionshare.hide();
 						}
 					},
+					mount_combine:{
+						name:'合并坐骑栏',
+						init:false,
+						intro:'<li>将进攻坐骑栏和防御坐骑栏合并为同一个位置（重启后生效）。',
+						restart:true,
+					},
 					show_history:{
 						name:'出牌记录栏',
 						init:'off',
@@ -5658,6 +5658,13 @@
 						frequent:true,
 						restart:true,
 					},
+					connect_aozhan:{
+						name:'鏖战模式',
+						init:true,
+						intro:'若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。',
+						frequent:true,
+						restart:true,
+					},
 					get connect_separatism(){
 						return lib.mode.guozhan.config.separatism;
 					},
@@ -5671,13 +5678,6 @@
 						init:'mark',
 						frequent:true,
 						intro:'第一个明置武将牌的角色可获得首亮奖励'
-					},
-					connect_aozhan:{
-						name:'鏖战模式',
-						init:true,
-						intro:'若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。',
-						frequent:true,
-						restart:true,
 					},
 					connect_viewnext:{
 						name:'观看下家副将',
@@ -5751,6 +5751,13 @@
 						frequent:true,
 						restart:true,
 					},
+					aozhan:{
+						name:'鏖战模式',
+						init:true,
+						frequent:true,
+						restart:true,
+						intro:'若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。',
+					},
 					separatism:{
 						name:'群雄割据',
 						init:false,
@@ -5768,13 +5775,6 @@
 						init:'mark',
 						frequent:true,
 						intro:'第一个明置身份牌的角色可获得摸牌奖励'
-					},
-					aozhan:{
-						name:'鏖战模式',
-						init:true,
-						frequent:true,
-						restart:true,
-						intro:'若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。',
 					},
 					viewnext:{
 						name:'观看下家副将',
@@ -51009,7 +51009,10 @@
 						var node=ui.create.div('.menubutton.large','录像',start.firstChild,clickMode);
 						node.type='video';
 						lib.videos=[];
-						ui.create.videoNode=(video,before)=>lib.videos[before===true?'unshift':'push'](video);
+						ui.create.videoNode=(video,before)=>{
+							lib.videos.remove(video);
+							lib.videos[before===true?'unshift':'push'](video);
+						};
 						node._initLink=function(){
 							node.link=page;
 							var store=lib.db.transaction(['video'],'readwrite').objectStore('video');
@@ -58146,13 +58149,13 @@
 		 */
 		updatePlayerPositions:numberOfPlayers=>{
 			if(typeof numberOfPlayers!='number') numberOfPlayers=ui.arena.dataset.number;
-			//当人数小于8时，还是用以前的布局。
-			if(!numberOfPlayers||numberOfPlayers<9) return;
+			//当人数不超过8人时，还是用以前的布局
+			if(!numberOfPlayers||numberOfPlayers<=8) return;
 			const playerPositions=ui.playerPositions;
 			while(playerPositions.length){
 				playerPositions.pop().remove();
 			}
-			//单个人物的宽度。这里要设置玩家的实际的宽度
+			//单个人物的宽度，这里要设置玩家的实际的宽度
 			const temporaryPlayer=ui.create.div('.player',ui.arena).hide();
 			const computedStyle=getComputedStyle(temporaryPlayer);
 			const scale=6/numberOfPlayers;
@@ -58163,10 +58166,10 @@
 			//列数，即假如8人场，除去自己后，上面7个人占7列
 			const columnCount=numberOfPlayers-1;
 			const percentage=90/(columnCount-1);
-			//仅当游戏人数大于8人，且玩家的座位号大于0时，设置玩家的位置。因为0号位是game.me在最下方，无需设置。
+			//仅当游戏人数大于8人，且玩家的座位号大于0时，设置玩家的位置；因为0号位是game.me在最下方，无需设置
 			for(let ordinal=1;ordinal<numberOfPlayers;ordinal++){
 				const reversedOrdinal=columnCount-ordinal;
-				//动态计算玩家的top属性，实现拱桥的效果。只让两边的各两个人向下偏移一些
+				//动态计算玩家的top属性，实现拱桥的效果；只让两边的各两个人向下偏移一些
 				const top=Math.max(0,Math.round(numberOfPlayers/5)-Math.min(Math.abs(ordinal-1),Math.abs(reversedOrdinal)))*quarterHeight;
 				playerPositions.push(lib.init.sheet([
 					`#arena[data-number='${numberOfPlayers}']>.player[data-position='${ordinal}']{`,
