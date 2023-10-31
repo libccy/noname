@@ -53357,14 +53357,19 @@
 			},
 			player:(position,noclick)=>new lib.element.Player(position,noclick),
 			connectPlayers:ip=>{
-				ui.updateConnectPlayerPositions();
 				game.connectPlayers=[];
-				const numberOfPlayers=lib.configOL.number;
+				let numberOfPlayers=lib.configOL.number;
+				const gameMode=lib.configOL.mode;
+				if(gameMode=='guozhan'||(gameMode=='identity'&&(lib.configOL.identity_mode!='zhong'&&lib.configOL.identity_mode!='purple'))){
+					numberOfPlayers=10;
+				}
+				ui.updateConnectPlayerPositions(numberOfPlayers);
 				for(let position=0;position<numberOfPlayers;position++){
 					const player=ui.create.player(ui.window);
 					player.dataset.position=position;
 					player.classList.add('connect');
 					game.connectPlayers.push(player);
+					if(position>=lib.configOL.number) player.classList.add('unselectable2');
 				}
 
 				var bar=ui.create.div(ui.window);
