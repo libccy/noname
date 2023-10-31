@@ -19677,7 +19677,7 @@
 						if(cards[i].hasOwnProperty('_destroy')){
 							if(cards[i]._destroy){
 								cards[i].delete();
-								cards[i].destroyed=card._destroy;
+								cards[i].destroyed=cards[i]._destroy;
 								continue;
 							}
 						}
@@ -43638,7 +43638,7 @@
 				setTimeout(()=>{
 					buttons.appendChild(card);
 					dialog.open();
-					ui.create.cardSpinning(card,time);
+					ui.create.cardSpinning(card);
 				},50);
 			},
 			/**
