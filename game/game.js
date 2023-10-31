@@ -8395,7 +8395,6 @@
 
 					var that=this;
 					this.timeout=setTimeout(function(){
-						console.log(that,that._selfDestroyed)
 						if(!that._selfDestroyed){
 							position.appendChild(that);
 						}
@@ -46272,7 +46271,7 @@
 							var cfgnode=createConfig({
 								name:'开启',
 								_name:mode,
-								init:lib.config.characters.contains(mode),
+								init:connectMenu?(!lib.config.connect_characters.contains(mode)):(lib.config.characters.contains(mode)),
 								onclick:togglePack
 							});
 							var cfgnodeAI=createConfig({
