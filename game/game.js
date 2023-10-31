@@ -33154,7 +33154,7 @@
 							const num=storage[key];
 							if(typeof num=='number'&&num>0){
 								let trans=get.translation(key);
-								if(combined&&key=='equip3') trans='坐骑栏';
+								if(combined&&key=='equip3') trans='坐骑';
 								str+='<li>'+trans+'栏：'+num+'个<br>'
 							}
 						}
