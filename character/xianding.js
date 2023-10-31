@@ -381,11 +381,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							var cards=trigger.getd().filter(card=>{
 								return get.position(card)=='d'&&player.getStorage('dcshangyu').includes(card);
-							});
+							}),targets=game.filterPlayer(current=>{
+								return !player.getStorage('dcshangyu_transfer').includes(current);
+							}).sortBySeat(_status.currentPhase);
 							event.cards=cards;
 							player.chooseTarget(`赏誉：将${get.translation(cards)}交给一名可选角色`,(card,player,target)=>{
 								return !player.getStorage('dcshangyu_transfer').includes(target);
-							},true);
+							},true).set('ai',target=>{
+								let att=get.sgn(get.attitude(_status.event.player,target)),idx=1+_status.event.targets.indexOf(target);
+								if(att<0) return -idx;
+								return att+1/idx;
+							}).set('targets',targets);
 							'step 1'
 							if(result.bool){
 								var target=result.targets[0];
@@ -447,17 +453,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseControl(choices,'cancel2').set('prompt',get.prompt('dccaixia')).set('prompt2','你可以摸至多'+get.cnNumber(choices.length)+'张牌，但是你此后需要再使用等量的牌才可再发动本技能。').set('ai',()=>{
 						return _status.event.choice;
 					}).set('choice',function(){
-						if(player.isPhaseUsing()){
-							if(!player.hasCard(card=>{
-								return get.tag(card,'damage')&&player.hasValueTarget(card);
-							},'hs')) return 0;
-							var cards=player.getCards('hs',card=>{
-								return player.hasValueTarget(card);
-							});
-							if(!cards.some(card=>get.tag(card,'damage'))) return 0;
-							return Math.min(choices.length,cards.filter(card=>!get.tag(card,'damage')).length+1);
+						var cards=player.getCards('hs',card=>get.name(card,player)!=='sha'&&player.hasValueTarget(card));
+						var damage=Math.min(player.getCardUsable({name:'sha'}),player.countCards('hs','sha'))+cards.filter(i=>get.tag(i,'damage')).length;
+						if(player.isPhaseUsing()||player.hp+player.hujia+player.countCards('hs',i=>get.tag(card,'recover'))>2){
+							if(damage) return Math.min(choices.length-1,cards.length-damage);
+							return Math.min(choices.length-1,cards.length-1);
 						}
-						return choices.length;
+						return choices.length-1;
 					}());
 					'step 1'
 					if(result.control!='cancel2'){
@@ -471,7 +473,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					aiOrder:function(player,card,num){
 						if(!get.tag(card,'damage')) return;
-						if(player.countMark('dccaixia_clear')>1) return num/2;
+						if(player.countMark('dccaixia_clear')>1) return num/3;
 						return num+6;
 					},
 				},
@@ -11699,7 +11701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('goon',get.attitude(player,trigger.player)<0&&!trigger.player.hasSkillTag('filterDamage',null,{
 						player:player,
 						card:trigger.card,
-					})&&get.damageEffect(trigger.player,player,player,trigger.nature)>0);
+					})&&get.damageEffect(trigger.player,player,player,get.natureList(trigger))>0);
 					next.logSkill=[event.name,trigger.player];
 					'step 1'
 					if(result.bool) trigger.num++;
