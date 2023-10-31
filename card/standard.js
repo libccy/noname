@@ -915,7 +915,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					basic:{
 						order:(item,player)=>{
-							if(game.hasPlayer(current=>current.hp<=1&&get.recoverEffect(current,player,_status.event.player)<0) return 1;
+							if(game.hasPlayer(current=>current.hp<=1&&get.recoverEffect(current,player,_status.event.player)<0)) return 1;
 							return 10;
 						},
 						useful:[3,1],
