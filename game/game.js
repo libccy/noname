@@ -735,6 +735,12 @@
 			general:{
 				name:'通用',
 				config:{
+					mount_combine:{
+						name:'合并坐骑栏',
+						init:false,
+						intro:'<li>将进攻坐骑栏和防御坐骑栏合并为同一个位置（重启后生效）。',
+						restart:true,
+					},
 					low_performance:{
 						name:'流畅模式',
 						init:false,
@@ -3643,12 +3649,6 @@
 						else{
 							map.show_extensionshare.hide();
 						}
-					},
-					mount_combine:{
-						name:'合并坐骑栏',
-						init:false,
-						intro:'<li>将进攻坐骑栏和防御坐骑栏合并为同一个位置（重启后生效）。',
-						restart:true,
 					},
 					show_history:{
 						name:'出牌记录栏',
