@@ -44901,6 +44901,11 @@
 										init:false,
 										connect:true
 									};
+									infoconfig.connect_mount_combine={
+										name:'合并坐骑栏',
+										init:false,
+										connect:true
+									};
 								}
 								for(var j in infoconfig){
 									if(j==='update'){
@@ -58444,7 +58449,10 @@
 			 * 判断坐骑栏是否被合并
 			 */
 			mountCombined:function(){
-				if(typeof _status.mountCombined!='boolean'){
+				if(lib.configOL){
+					return lib.configOL.mount_combine;
+				}
+				else if(typeof _status.mountCombined!='boolean'){
 					_status.mountCombined=lib.config.mount_combine;
 				}
 				return _status.mountCombined;
