@@ -145,7 +145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						[Object.values(map),'tdnodes'],
 						[[
 							['wangsheng','<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【妄生】</div><div>被选择势力角色每回合首次造成的伤害+1且计算与其他角色间的距离-1</div></div>'],
-							['xiangsi','<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【向死】</div><div>被选择势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效</div></div>']
+							['xiangsi','<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【向死】</div><div>其他被选择势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效</div></div>']
 						],'textbutton']
 					],2,true).set('filterButton',function(button){
 						var list=['wangsheng','xiangsi'];
@@ -155,9 +155,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var map=_status.event.map,list=['wangsheng','xiangsi'];
 						var getNum=function(group,effect){
-							var num=0,sgn=effect=='wangsheng'?1:-1;
+							var num=0,sgn=effect=='wangsheng'?1.05:-1;
 							game.countPlayer(function(current){
-								num+=get.sgn(get.attitude(player,current))*sgn;
+								if(!(current==player&&sgn==-1)) num+=get.sgn(get.attitude(player,current))*sgn;
 							});
 							return num;
 						};
@@ -218,7 +218,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						onremove:true,
 						trigger:{global:'recoverEnd'},
 						filter:function(event,player){
-							if(!player.getStorage('starcanxi_xiangsi').includes(event.player.group)) return false;
+							if(!player.getStorage('starcanxi_xiangsi').includes(event.player.group)||event.player==player) return false;
 							return game.getGlobalHistory('changeHp',function(evt){
 								return evt.getParent().name=='recover'&&evt.player==event.player;
 							}).length==1;
@@ -230,13 +230,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						group:['starcanxi_remove','starcanxi_cancel'],
 						global:'starcanxi_effect',
-						intro:{content:'$势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效'},
+						intro:{content:'其他$势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效'},
 					},
 					cancel:{
 						charlotte:true,
 						trigger:{global:'useCard'},
 						filter:function(event,player){
-							if(!event.targets||!event.targets.includes(player)||!player.getStorage('starcanxi_xiangsi').includes(event.player.group)) return false;
+							if(!event.targets||!event.targets.includes(player)||!player.getStorage('starcanxi_xiangsi').includes(event.player.group)||event.player==player) return false;
 							return event.player.getHistory('useCard',evt=>evt.targets&&evt.targets.includes(player)).indexOf(event)==0;
 						},
 						forced:true,
@@ -254,7 +254,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							effect:{
 								player_use:function(card,player,target){
-									var targets=game.filterPlayer(target=>target.getStorage('starcanxi_xiangsi').includes(player.group));
+									var targets=game.filterPlayer(targetx=>targetx!=player&&targetx.getStorage('starcanxi_xiangsi').includes(player.group));
 									if(!targets.length) return;
 									if(get.tag(card,'recover')&&target==player&&target.hp>2) return 0;
 									if(get.tag(card,'damage')&&targets.includes(target)) return 0.5;
@@ -10811,7 +10811,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starcanxi_wangsheng:'妄生',
 			starcanxi_xiangsi:'向死',
 			starcanxi_cancel:'向死',
-			starcanxi_info:'锁定技。游戏开始时，你获得场上所有角色的势力对应的“玺角”标记，然后选择一个“玺角”对应势力并选择以下一项；一轮开始时，你选择一个“玺角”对应势力并选择以下一项：①妄生：本轮被选择势力角色每回合首次造成的伤害+1且计算与其他角色间的距离-1；②向死：本轮被选择势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效。',
+			starcanxi_info:'锁定技。游戏开始时，你获得场上所有角色的势力对应的“玺角”标记，然后选择一个“玺角”对应势力并选择以下一项；一轮开始时，你选择一个“玺角”对应势力并选择以下一项：①妄生：本轮被选择势力角色每回合首次造成的伤害+1且计算与其他角色间的距离-1；②向死：本轮其他被选择势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效。',
 			starpizhi:'圮秩',
 			starpizhi_info:'锁定技。①一名角色死亡后，若你拥有该角色对应的“玺角”标记，你失去之并摸X张牌。②结束阶段，你摸X张牌。（X为你本局游戏失去的“玺角”标记数）',
 			starzhonggu:'冢骨',
