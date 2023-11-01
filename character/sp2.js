@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			star_yuanshu:['male','qun',4,['starcanxi','starpizhi','starzhonggu'],['zhu']],
 			star_caoren:['male','wei',4,['starsujun','starlifeng']],
 			dc_jikang:['male','wei',3,['new_qingxian','dcjuexiang']],
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
@@ -108,11 +109,209 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_xuzhou:['re_taoqian','caosong','zhangmiao','qiuliju'],
 				sp_zhongyuan:['re_hucheer','re_zoushi','caoanmin','re_dongcheng'],
 				sp_xiaohu:['haomeng','yanfuren','yanrou','dc_zhuling'],
-				sp_star:['star_caoren'],
+				sp_star:['star_caoren','star_yuanshu'],
 				sp_decade:['caobuxing','re_maliang','xin_baosanniang','dc_jikang'],
 			}
 		},
 		skill:{
+			//星袁术
+			starcanxi:{
+				audio:2,
+				trigger:{
+					global:['phaseBefore','roundStart'],
+					player:'enterGame',
+				},
+				filter:function(event,player,name){
+					if(name=='roundStart') return player.getSkills().some(skill=>skill.indexOf('starcanxi_')==0);
+					return event.name!='phase'||game.phaseNumber==0;
+				},
+				forced:true,
+				content:function(){
+					'step 0'
+					if(event.triggername!='roundStart'){
+						var list=game.filterPlayer().reduce((list,target)=>list.add(target.group),[]);
+						list.sort((a,b)=>lib.group.indexOf(a)-lib.group.indexOf(b));
+						list.forEach(group=>lib.skill.starcanxi.create(group,player));
+					}
+					'step 1'
+					var groups=player.getSkills().filter(skill=>skill.indexOf('starcanxi_')==0);
+					groups=groups.map(group=>group.slice(10));
+					groups.sort((a,b)=>lib.group.indexOf(a)-lib.group.indexOf(b));
+					var map={};
+					groups.forEach(group=>map[group]=get.translation(group+'2'));
+					event.map=map;
+					player.chooseButton([
+						'###残玺###<div class="text center">请选择势力和效果</div>',
+						[Object.values(map),'tdnodes'],
+						[[
+							['wangsheng','<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【妄生】</div><div>被选择势力角色每回合首次造成的伤害+1且计算与其他角色间的距离-1</div></div>'],
+							['xiangsi','<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【向死】</div><div>被选择势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效</div></div>']
+						],'textbutton']
+					],2,true).set('filterButton',function(button){
+						var list=['wangsheng','xiangsi'];
+						if(!ui.selected.buttons.length) return true;
+						return list.includes(ui.selected.buttons[0].link)!=list.includes(button.link);
+					}).set('ai',function(button){
+						var player=_status.event.player;
+						var map=_status.event.map,list=['wangsheng','xiangsi'];
+						var getNum=function(group,effect){
+							var num=0,sgn=effect=='wangsheng'?1:-1;
+							game.countPlayer(function(current){
+								num+=get.sgn(get.attitude(player,current))*sgn;
+							});
+							return num;
+						};
+						var listx=[];
+						Object.keys(map).forEach(group=>list.forEach(effect=>listx.add([group,effect])));
+						listx.sort((a,b)=>getNum(b[0],b[1])-getNum(a[0],a[1]));
+						if(button.link==map[listx[0][0]]||button.link==listx[0][1]) return 1;
+						return 0;
+					}).set('map',map);
+					'step 2'
+					if(result.bool){
+						if(!Object.keys(event.map).some(group=>event.map[group]==result.links[0])) result.links.reverse();
+						player.popup(result.links[0]);
+						var group=Object.keys(event.map).find(group=>event.map[group]==result.links[0]);
+						var skill='starcanxi_'+result.links[1];
+						player.popup(skill);
+						game.log(player,'选择了','#g'+result.links[0],'、','#y'+get.translation(skill));
+						player.addTempSkill(skill,'roundStart');
+						player.markAuto(skill,[group]);
+					}
+				},
+				create:function(group,player){
+					if(!lib.skill['starcanxi_'+group]){
+						lib.skill['starcanxi_'+group]={
+							mark:true,
+							charlotte:true,
+							onremove:function(player){
+								player.addMark('starpizhi',1,false);
+							},
+							intro:{content:'玉玺的一角'},
+						};
+						lib.translate['starcanxi_'+group]='残玺·'+get.translation(group+'2');
+						lib.skill['starcanxi_'+group].marktext=get.translation(group);
+						lib.translate['starcanxi_'+group+'_bg']=get.translation(group);
+					}
+					player.addSkill('starcanxi_'+group);
+				},
+				subSkill:{
+					wangsheng:{
+						charlotte:true,
+						onremove:true,
+						trigger:{global:'damageBegin1'},
+						filter:function(event,player){
+							if(!event.source||!player.getStorage('starcanxi_wangsheng').includes(event.source.group)) return false;
+							return !event.source.getHistory('sourceDamage').length;
+						},
+						forced:true,
+						logTarget:'source',
+						content:function(){
+							trigger.num++;
+						},
+						group:'starcanxi_remove',
+						global:'starcanxi_effect',
+						intro:{content:'$势力角色每回合首次造成的伤害+1且计算与其他角色间的距离-1'},
+					},
+					xiangsi:{
+						charlotte:true,
+						onremove:true,
+						trigger:{global:'recoverEnd'},
+						filter:function(event,player){
+							if(!player.getStorage('starcanxi_xiangsi').includes(event.player.group)) return false;
+							return game.getGlobalHistory('changeHp',function(evt){
+								return evt.getParent().name=='recover'&&evt.player==event.player;
+							}).length==1;
+						},
+						forced:true,
+						logTarget:'player',
+						content:function(){
+							trigger.player.loseHp();
+						},
+						group:['starcanxi_remove','starcanxi_cancel'],
+						global:'starcanxi_effect',
+						intro:{content:'$势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效'},
+					},
+					cancel:{
+						charlotte:true,
+						trigger:{global:'useCard'},
+						filter:function(event,player){
+							if(!event.targets||!event.targets.includes(player)||!player.getStorage('starcanxi_xiangsi').includes(event.player.group)) return false;
+							return event.player.getHistory('useCard',evt=>evt.targets&&evt.targets.includes(player)).indexOf(event)==0;
+						},
+						forced:true,
+						logTarget:'player',
+						content:function(){
+							trigger.excluded.add(player);
+						},
+					},
+					effect:{
+						mod:{
+							globalFrom:function(from,to,distance){
+								if(game.hasPlayer(target=>target.getStorage('starcanxi_wangsheng').includes(from.group))) return distance-1;
+							},
+						},
+						ai:{
+							effect:{
+								player_use:function(card,player,target){
+									var targets=game.filterPlayer(target=>target.getStorage('starcanxi_xiangsi').includes(player.group));
+									if(!targets.length) return;
+									if(get.tag(card,'recover')&&target==player&&target.hp>2) return 0;
+									if(get.tag(card,'damage')&&targets.includes(target)) return 0.5;
+								},
+							},
+						},
+					},
+					remove:{
+						charlotte:true,
+						trigger:{player:'die'},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						forceDie:true,
+						content:function(){
+							player.removeSkill('starcanxi_wangsheng');
+							player.removeSkill('starcanxi_xiangsi');
+						},
+					},
+				},
+			},
+			starpizhi:{
+				audio:2,
+				trigger:{player:'phaseEnd',global:'die'},
+				filter:function(event,player){
+					if(event.name=='phase') return player.hasMark('starpizhi');
+					var groups=player.getSkills().filter(skill=>skill.indexOf('starcanxi_')==0);
+					groups=groups.map(group=>group.slice(10));
+					return groups.includes(event.player.group);
+				},
+				forced:true,
+				content:function(){
+					'step 0'
+					if(trigger.name=='die'){
+						var skills=player.getSkills().filter(skill=>skill.indexOf('starcanxi_')==0&&skill.slice(10)==trigger.player.group);
+						player.removeSkill(skills);
+					}
+					'step 1'
+					player.draw(player.countMark('starpizhi'));
+				},
+				intro:{content:'已失去#个“玺角”'},
+				ai:{combo:'starcanxi'},
+			},
+			starzhonggu:{
+				unique:true,
+				audio:2,
+				trigger:{player:'phaseDrawBegin2'},
+				filter:function(event,player){
+					return !event.numFixed;
+				},
+				forced:true,
+				zhuSkill:true,
+				content:function(){
+					var num=(game.roundNumber>=game.countPlayer(current=>current.group=='qun')?2:-1);
+					trigger.num+=num;
+				},
+			},
 			//星曹仁
 			starsujun:{
 				audio:2,
@@ -10606,6 +10805,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starsujun_info:'当你使用一张牌时，若你手牌中的基本牌和非基本牌的牌数相等，你可以摸两张牌。',
 			starlifeng:'砺锋',
 			starlifeng_info:'你可以将一张本回合未有角色使用过的颜色的手牌当做不计入次数的【杀】或【无懈可击】使用。',
+			star_yuanshu:'星袁术',
+			star_yuanshu_prefix:'星',
+			starcanxi:'残玺',
+			starcanxi_wangsheng:'妄生',
+			starcanxi_xiangsi:'向死',
+			starcanxi_cancel:'向死',
+			starcanxi_info:'锁定技。游戏开始时，你获得场上所有角色的势力对应的“玺角”标记，然后选择一个“玺角”对应势力并选择以下一项；一轮开始时，你选择一个“玺角”对应势力并选择以下一项：①妄生：本轮被选择势力角色每回合首次造成的伤害+1且计算与其他角色间的距离-1；②向死：本轮被选择势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效。',
+			starpizhi:'圮秩',
+			starpizhi_info:'锁定技。①一名角色死亡后，若你拥有该角色对应的“玺角”标记，你失去之并摸X张牌。②结束阶段，你摸X张牌。（X为你本局游戏失去的“玺角”标记数）',
+			starzhonggu:'冢骨',
+			starzhonggu_info:'主公技，锁定技。摸牌阶段，若游戏轮数大于等于场上的群势力角色数，则你额外摸两张牌，否则你少摸一张牌。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
