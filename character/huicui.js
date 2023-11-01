@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			dc_sunchen:['male','wu',4,['dczigu','dczuowei'],['unseen']],
 			dc_zhangmancheng:['male','qun',4,['dclvecheng','dczhongji']],
 			yue_zhoufei:['female','wu',3,['dclingkong','dcxianshu']],
 			dc_wuban:['male','shu',4,['dcyouzhan'],['clan:陈留吴氏','unseen']],
