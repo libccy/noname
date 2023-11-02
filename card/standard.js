@@ -455,7 +455,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								let min = 7.2-1.2*Math.min(3,player.hp),
 									nd = player.needsToDiscard(-player.countCards('h',i=>!taos.includes(i)&&get.value(i)<min)),
 									keep = 0;
-								if(taos.length>1&&(nd>1||nd&&player.hp<1+taos.length) || target.identity==='zhu'&&target.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')) return 2;
+								if(!player.hasFriend() || taos.length>1&&(nd>1||nd&&player.hp<1+taos.length) || target.identity==='zhu'&&target.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')) return 2;
 								if(nd<3&&game.hasPlayer(current=>{
 									return player!==current&&current.identity==='zhu'&&current.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')&&get.attitude(player,current)>0;
 								})){
@@ -477,6 +477,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 										if(keep>2) return 0;
 									}
 								}
+								return 2;
 							}
 							if(target.isZhu2() || target===game.boss) return 2;
 							if(player!==target){
