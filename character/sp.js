@@ -1859,7 +1859,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.target=target;
 					var target2=(player.storage.oldongdao?trigger.player:player);
 					event.target2=target2;
-					target2.chooseBool(get.prompt('oldongdao'),'令'+get.translation(target)+'进行一个额外回合');
+					target2.chooseBool(get.prompt('oldongdao'),'令'+get.translation(target)+'进行一个额外回合').set('ai',()=>{
+						var event=_status.event.getParent();
+						return get.attitude(event.target2,event.target)>0;
+					})
 					'step 1'
 					if(result.bool){
 						player.logSkill('oldongdao');

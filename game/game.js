@@ -8395,7 +8395,6 @@
 
 					var that=this;
 					this.timeout=setTimeout(function(){
-						console.log(that,that._selfDestroyed)
 						if(!that._selfDestroyed){
 							position.appendChild(that);
 						}
@@ -17486,7 +17485,7 @@
 						event.dialog.addText(event.prompt2);
 					}
 					var expand_length=0;
-					var directh=!lib.config.unauto_choose;
+					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
 					for(var i=0;i<event.position.length;i++){
 						if(event.position[i]=='h'){
 							var hs=target.getCards('h');
@@ -17547,17 +17546,17 @@
 					if(event.dialog.buttons.length==0){
 						event.finish();
 						return;
-					}
+					}var directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectButton!='function'&&event.filterButton==lib.filter.all);
 					var cs=target.getCards(event.position);
 					var select=get.select(event.selectButton);
-					if(event.forced&&select[0]>=cs.length){
+					if(directFilter&&select[0]>=cs.length){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons,
 							links:cs
 						}
 					}
-					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1]){
+					else if(directFilter&&directh&&!event.isOnline()&&select[0]==select[1]){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons.randomGets(select[0]),
@@ -17703,16 +17702,17 @@
 						event.finish();
 						return;
 					}
+					var directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectButton!='function'&&event.filterButton==lib.filter.all);
 					var cs=target.getCards(event.position);
 					var select=get.select(event.selectButton);
-					if(event.forced&&select[0]>=cs.length){
+					if(directFilter&&select[0]>=cs.length){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons,
 							links:cs
 						}
 					}
-					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1]){
+					else if(directFilter&&directh&&!event.isOnline()&&select[0]==select[1]){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons.randomGets(select[0]),
@@ -17885,14 +17885,15 @@
 					}
 					var cs=target.getCards(event.position);
 					var select=get.select(event.selectButton);
-					if(event.forced&&select[0]>=cs.length){
+					var directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectButton!='function'&&event.filterButton==lib.filter.all);
+					if(directFilter&&select[0]>=cs.length){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons,
 							links:cs
 						}
 					}
-					else if(event.forced&&directh&&!event.isOnline()&&select[0]==select[1]){
+					else if(directFilter&&directh&&!event.isOnline()&&select[0]==select[1]){
 						event.result={
 							bool:true,
 							buttons:event.dialog.buttons.randomGets(select[0]),
@@ -19677,7 +19678,7 @@
 						if(cards[i].hasOwnProperty('_destroy')){
 							if(cards[i]._destroy){
 								cards[i].delete();
-								cards[i].destroyed=card._destroy;
+								cards[i].destroyed=cards[i]._destroy;
 								continue;
 							}
 						}
@@ -33152,7 +33153,7 @@
 							const num=storage[key];
 							if(typeof num=='number'&&num>0){
 								let trans=get.translation(key);
-								if(combined&&key=='equip3') trans='坐骑栏';
+								if(combined&&key=='equip3') trans='坐骑';
 								str+='<li>'+trans+'栏：'+num+'个<br>'
 							}
 						}
@@ -43638,7 +43639,7 @@
 				setTimeout(()=>{
 					buttons.appendChild(card);
 					dialog.open();
-					ui.create.cardSpinning(card,time);
+					ui.create.cardSpinning(card);
 				},50);
 			},
 			/**
@@ -46270,7 +46271,7 @@
 							var cfgnode=createConfig({
 								name:'开启',
 								_name:mode,
-								init:lib.config.characters.contains(mode),
+								init:connectMenu?(!lib.config.connect_characters.contains(mode)):(lib.config.characters.contains(mode)),
 								onclick:togglePack
 							});
 							var cfgnodeAI=createConfig({
@@ -53357,14 +53358,19 @@
 			},
 			player:(position,noclick)=>new lib.element.Player(position,noclick),
 			connectPlayers:ip=>{
-				ui.updateConnectPlayerPositions();
 				game.connectPlayers=[];
-				const numberOfPlayers=lib.configOL.number;
+				let numberOfPlayers=lib.configOL.number;
+				const gameMode=lib.configOL.mode;
+				if(gameMode=='guozhan'||(gameMode=='identity'&&(lib.configOL.identity_mode!='zhong'&&lib.configOL.identity_mode!='purple'))){
+					numberOfPlayers=10;
+				}
+				ui.updateConnectPlayerPositions(numberOfPlayers);
 				for(let position=0;position<numberOfPlayers;position++){
 					const player=ui.create.player(ui.window);
 					player.dataset.position=position;
 					player.classList.add('connect');
 					game.connectPlayers.push(player);
+					if(position>=lib.configOL.number) player.classList.add('unselectable2');
 				}
 
 				var bar=ui.create.div(ui.window);
