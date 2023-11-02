@@ -511,7 +511,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.when('useCardAfter').filter(evt=>evt==trigger).then(()=>{
 								if(trigger.targets){
 									var card={
-										name:get.name(result.cards[0],player),
+										name:trigger.card.name,
 										isCard:true,
 									};
 									var targets=trigger.targets.filter(i=>i.isIn());
@@ -548,7 +548,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player,name=button.link[2];
 						if(get.attitude(player,trigger.player)<=0) return 0;
 						if(!get.cardPile2(card=>card.name==name)) return 0;
-						return get.value(name);
+						return get.value({name:name});
 					});
 					'step 1'
 					if(result.bool){
