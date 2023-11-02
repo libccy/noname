@@ -406,12 +406,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						},
 						useful:(card,i)=>{
 							let player = _status.event.player;
-							if(player.isDamaged()&&!game.checkMod(card,player,'unchanged','cardEnabled2',player)) return 2/(1+i);
+							if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) return 2/(1+i);
 							let fs = game.filterPlayer(current=>{
 								return get.attitude(player,current)>0&&current.hp<=2;
 							}), damaged = 0, needs = 0;
 							fs.forEach(f=>{
-								if(!lib.filter.cardSavable(card,player,f)) return;
+								if(f.hp>3 || !lib.filter.cardSavable(card,player,f)) return;
 								if(f.hp>1) damaged++;
 								else needs++;
 							});
@@ -419,8 +419,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(needs+damaged>1 || player.hasSkillTag('maixie')) return 8;
 							if(player.hp/player.maxHp<0.7) return 7+Math.abs(player.hp/player.maxHp-0.5);
 							if(needs) return 7;
-							if(damaged) return Math.max(3,6.4-i);
-							return 6.8-Math.min(5,player.hp);
+							if(damaged) return Math.max(3,7.8-i);
+							return Math.max(1,7.2-i);
 						},
 						value:(card,player,i)=>{
 							let fs = game.filterPlayer(current=>{
@@ -436,7 +436,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(needs&&damaged || player.hasSkillTag('maixie')) return 9;
 							if(needs || damaged>1) return 8;
 							if(damaged) return 7.5;
-							return Math.max(1,9.2-player.hp);
+							return Math.max(5,9.2-player.hp);
 						}
 					},
 					result:{
