@@ -338,7 +338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				filter:function(event,player){
 					if(!event.filterCard({name:'sha'},player,event)&&!event.filterCard({name:'wuxie'},player,event)) return false;
-					return player.countCards('h',card=>{
+					return player.countCards('hs',card=>{
 						return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
 					});
 				},
@@ -364,7 +364,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								event.getParent().addCount=false;
 							},
 							popname:true,
-							position:'h',
 							viewAs:{
 								name:links[0][2],
 							},
@@ -384,7 +383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				hiddenCard:function(player,name){
-					if(name=='wuxie') return player.countCards('h',card=>{
+					if(name=='wuxie') return player.countCards('hs',card=>{
 						return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
 					});
 				},
@@ -392,7 +391,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					respondSha:true,
 					skillTagFilter:function(player,tag,arg){
 						if(arg=='respond') return false;
-						if(!player.countCards('h',card=>{
+						if(!player.countCards('hs',card=>{
 							return !player.getStorage('starlifeng_count').contains(get.color(card,player))||_status.connectMode;
 						})) return false;
 					},

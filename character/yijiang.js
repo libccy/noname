@@ -419,6 +419,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						onremove:true,
 						filter:function(event,player){
+							if(!lib.suit.includes(get.suit(event.card))) return false;
 							return player.getStorage('qingbei_effect').length;
 						},
 						direct:true,
