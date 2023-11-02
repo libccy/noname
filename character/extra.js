@@ -5704,6 +5704,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(target.hasSkill('biantian2')||target.hasSkill('dawu2')) return 0;
 						var att=get.attitude(player,target);
 						if(att>=4){
+							if(target.hp>2&&(target.isHealthy()||target.hasSkillTag('maixie'))) return 0;
 							if(_status.event.allUse) return att;
 							if(target.hp==1) return att;
 							if(target.hp==2&&target.countCards('he')<=2) return att*0.7;
