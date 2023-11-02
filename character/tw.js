@@ -538,7 +538,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var list=lib.inpile.filter(name=>!player.getStorage('twshenyi').includes(name));
-					var dialog=['###'+get.prompt('twbaichu',trigger.player)+'###选择一个牌名，从牌堆中将此一张此牌名的牌称为“侠义”置于武将牌上',[list,'vcard']];
+					var dialog=['###'+get.prompt('twshenyi',trigger.player)+'###选择一个牌名，从牌堆中将此一张此牌名的牌称为“侠义”置于武将牌上',[list,'vcard']];
 					player.chooseButton(dialog).set('ai',function(button){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player,name=button.link[2];
