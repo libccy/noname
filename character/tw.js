@@ -294,6 +294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return player.canCompare(target);
 				},
+				usable:1,
 				selectTarget:[1,3],
 				multitarget:true,
 				multiline:true,
