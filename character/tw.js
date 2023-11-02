@@ -537,7 +537,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					var list=lib.inpile.filter(name=>!player.getStorage('twshenyi').includes(name));
+					var list=lib.inpile.filter(name=>{
+						var type=get.type2(name);
+						if(type!='basic'&&type!='trick') return false;
+						return !player.getStorage('twshenyi').includes(name);
+					});
 					var dialog=['###'+get.prompt('twshenyi',trigger.player)+'###选择一个牌名，从牌堆中将此一张此牌名的牌称为“侠义”置于武将牌上',[list,'vcard']];
 					player.chooseButton(dialog).set('ai',function(button){
 						var trigger=_status.event.getTrigger();
@@ -685,7 +689,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							global:['equipEnd','addJudgeEnd','gainEnd','loseAsyncEnd','addToExpansionEnd'],
 						},
 						filter:function(event,player){
-							return (player.getExpansions('twshenyi').length&&(!player.countCards('h')||player.isDying()))||player.hasSkill('twxinghan_in');
+							return (player.getExpansions('twshenyi').length&&(!player.countCards('h')||player.isDying()))^player.hasSkill('twxinghan_in');
 						},
 						forced:true,
 						firstDo:true,
@@ -716,15 +720,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						locked:false,
 						silent:true,
 						content:function(){
+							'step 0'
+							var cards2=player.getCards('s',card=>card.hasGaintag('twxinghan'));
+							if(player.isOnline2()){
+								player.send(function(cards,player){
+									cards.forEach(i=>i.delete());
+									if(player==game.me) ui.updatehl();
+								},cards2,player);
+							}
+							cards2.forEach(i=>i.delete());
+							if(player==game.me) ui.updatehl();
+							'step 1'
 							var cards=player.getExpansions('twshenyi');
-							var idList=player.getCards('s',card=>card.hasGaintag('twxinghan')).map(i=>i._cardid);
-							var cards2=cards.map(card=>{
+							var cardsx=cards.map(card=>{
 								var cardx=ui.create.card();
 								cardx.init(get.cardInfo(card));
 								cardx._cardid=card.cardid;
 								return cardx;
 							});
-							player.directgains(cards2,null,'twxinghan');
+							player.directgains(cardsx,null,'twxinghan');
 						},
 						onremove:function(player){
 							var cards2=player.getCards('s',card=>card.hasGaintag('twxinghan'));
@@ -753,7 +767,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						firstDo:true,
 						content:function(){
 							var idList=player.getCards('s',card=>card.hasGaintag('twxinghan')).map(i=>i._cardid);
-							var cards=player.getCards('s',card=>card.hasGaintag('twxinghan'));
+							var cards=player.getExpansions('twshenyi');
 							var cards2=[];
 							for(var card of trigger.cards){
 								var cardx=cards.find(cardx=>cardx.cardid==card._cardid);
