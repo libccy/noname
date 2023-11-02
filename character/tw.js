@@ -550,6 +550,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var name=result.links[0][2];
 						player.logSkill('twshenyi',trigger.player);
 						player.popup(name);
+						player.markAuto('twshenyi',[name]);
 						game.log(player,'声明了','#y'+get.translation(name));
 						var card=get.cardPile2(card=>card.name==name);
 						if(card) player.addToExpansion([card],'gain2').gaintag.add('twshenyi');
