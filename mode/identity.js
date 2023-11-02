@@ -1667,7 +1667,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(ban_identity.length){
 							var identityList2=identityList.slice(0);
 							for(var i=0;i<ban_identity.length;i++){
-								while(identityList2.remove(ban_identity[i]));
+								while(identityList2.includes(ban_identity[i])){
+									identityList2.remove(ban_identity[i]);
+								}
 							}
 							ban_identity=identityList2.randomGet();
 							identityList.remove(ban_identity);
