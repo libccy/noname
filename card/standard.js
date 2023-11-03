@@ -406,12 +406,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						},
 						useful:(card,i)=>{
 							let player = _status.event.player;
-							if(player.isDamaged()&&!game.checkMod(card,player,'unchanged','cardEnabled2',player)) return 2/(1+i);
+							if(!game.checkMod(card,player,'unchanged','cardEnabled2',player)) return 2/(1+i);
 							let fs = game.filterPlayer(current=>{
 								return get.attitude(player,current)>0&&current.hp<=2;
 							}), damaged = 0, needs = 0;
 							fs.forEach(f=>{
-								if(!lib.filter.cardSavable(card,player,f)) return;
+								if(f.hp>3 || !lib.filter.cardSavable(card,player,f)) return;
 								if(f.hp>1) damaged++;
 								else needs++;
 							});
@@ -419,8 +419,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(needs+damaged>1 || player.hasSkillTag('maixie')) return 8;
 							if(player.hp/player.maxHp<0.7) return 7+Math.abs(player.hp/player.maxHp-0.5);
 							if(needs) return 7;
-							if(damaged) return Math.max(3,6.4-i);
-							return 6.8-Math.min(5,player.hp);
+							if(damaged) return Math.max(3,7.8-i);
+							return Math.max(1,7.2-i);
 						},
 						value:(card,player,i)=>{
 							let fs = game.filterPlayer(current=>{
@@ -436,7 +436,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(needs&&damaged || player.hasSkillTag('maixie')) return 9;
 							if(needs || damaged>1) return 8;
 							if(damaged) return 7.5;
-							return Math.max(1,9.2-player.hp);
+							return Math.max(5,9.2-player.hp);
 						}
 					},
 					result:{
@@ -455,7 +455,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								let min = 7.2-1.2*Math.min(3,player.hp),
 									nd = player.needsToDiscard(-player.countCards('h',i=>!taos.includes(i)&&get.value(i)<min)),
 									keep = 0;
-								if(taos.length>1&&(nd>1||nd&&player.hp<1+taos.length) || target.identity==='zhu'&&target.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')) return 2;
+								if(!player.hasFriend() || taos.length>1&&(nd>1||nd&&player.hp<1+taos.length) || target.identity==='zhu'&&target.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')) return 2;
 								if(nd<3&&game.hasPlayer(current=>{
 									return player!==current&&current.identity==='zhu'&&current.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')&&get.attitude(player,current)>0;
 								})){
@@ -477,6 +477,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 										if(keep>2) return 0;
 									}
 								}
+								return 2;
 							}
 							if(target.isZhu2() || target===game.boss) return 2;
 							if(player!==target){
