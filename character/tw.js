@@ -319,7 +319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var hs=player.getCards('h').sort((a,b)=>b.number-a.number);
 							var ts=target.getCards('h').sort((a,b)=>b.number-a.number);
 							if(!hs.length||!ts.length) return 0;
-							if(Math.min(13,hs[0].number+Math.min(3,game.countPlayer(targetx=>get.damageEffect(targetx,player,player)>0)))>ts[0].number) return -get.damageEffect(target,player,player);
+							if(Math.min(13,hs[0].number+player.getDamagedHp())>ts[0].number) return -get.damageEffect(target,player,player);
 							return 0;
 						},
 					},
@@ -329,12 +329,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						trigger:{player:'compare'},
 						filter:function(event,player){
-							return event.getParent().name=='twdanlie'&&!event.iwhile;
+							return event.getParent().name=='twdanlie'&&!event.iwhile&&player.isDamaged();
 						},
 						forced:true,
 						popup:false,
 						content:function(){
-							var num=trigger.lose_list.length;
+							var num=player.getDamagedHp();
 							trigger.num1+=num;
 							if(trigger.num1>13) trigger.num1=13;
 							game.log(player,'的拼点牌点数+',num);
@@ -461,7 +461,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer(target=>lib.skill.twchengxi.filterTarget(null,player,target));
 				},
 				filterTarget:function(card,player,target){
-					if(player.getStorage('twchengxi_used').contains(target)) return false;
+					if(player.getStorage('twchengxi_used').contains(target)||target==player) return false;
 					return !player.hasSkillTag('noCompareSource')&&target.countCards('h')>0&&!target.hasSkillTag('noCompareTarget');
 				},
 				content:function(){
@@ -15211,7 +15211,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xia_xiahoudun:'侠夏侯惇',
 			xia_xiahoudun_prefix:'侠',
 			twdanlie:'胆烈',
-			twdanlie_info:'出牌阶段限一次，你可以与至多三名其他角色同时拼点，且你此次的拼点牌点数+X（X为拼点人数）。若你赢，你对这些角色各造成1点伤害；若你没赢，你失去1点体力。',
+			twdanlie_info:'出牌阶段限一次，你可以与至多三名其他角色同时拼点，且你此次的拼点牌点数+X（X为你已损失的体力值）。若你赢，你对这些角色各造成1点伤害；若你没赢，你失去1点体力。',
 			xia_zhangwei:'张葳',
 			twhuzhong:'护众',
 			twhuzhong_info:'当你于出牌阶段使用无属性【杀】指定唯一目标角色时，你可以选择一项：①弃置一张手牌，然后你可以为此牌额外选择一个目标；②令其弃置一张手牌，此牌结算完毕后，若此牌造成过伤害，则你摸一张牌且本阶段可以额外使用一张【杀】，否则其对你造成1点伤害。',
