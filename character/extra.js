@@ -4670,7 +4670,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				derivation:'wushuang',
 				filter:function(event,player){
-					return player.countMark('baonu')>=2;
+					return player.countMark('baonu')>=2&&game.hasPlayer(target=>lib.skill.ol_wuqian.filterTarget(null,player,target));
 				},
 				filterTarget:function(card,player,target){
 					return target!=player&&!target.hasSkill('ol_wuqian_targeted');
@@ -4678,29 +4678,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.removeMark('baonu',2);
 					player.addTempSkill('wushuang');
-					player.storage.ol_wuqian_target=target;
-					player.addTempSkill('ol_wuqian_target');
+					player.popup('无双');
+					game.log(player,'获得了技能','#g【无双】');
 					target.addTempSkill('ol_wuqian_targeted');
 				},
-				subSkill:{
-					equip:{
-						ai:{
-							unequip:true,
-							skillTagFilter:function(player,tag,arg){
-								if(arg&&arg.target&&arg.target.hasSkill('ol_wuqian_targeted')) return true;
-								return false;
-							}
-						}
-					},
-					targeted:{ai:{unequip2:true}},
-					target:{
-						mark:'character',
-						onremove:true,
-						intro:{
-							content:'获得无双且$防具失效直到回合结束'
+				ai:{
+					order:9,
+					result:{
+						target:function(player,target){
+							if(player.countCards('hs',card=>{
+								if(!player.getCardUsable({name:card.name})) return false;
+								if(!player.canUse(card,target)) return false;
+								var eff1=get.effect(target,card,player,player);
+								_status.baonuCheck=true;
+								var eff2=get.effect(target,card,player,player);
+								delete _status.baonuCheck;
+								return eff2>Math.max(0,eff1);
+							})) return -1;
+							return 0;
 						},
-					}
-				}
+					},
+				},
+				global:'ol_wuqian_ai',
+				subSkill:{
+					targeted:{
+						charlotte:true,
+						ai:{unequip2:true},
+					},
+					ai:{
+						ai:{
+							unequip2:true,
+							skillTagFilter:function(player){
+								if(!_status.baonuCheck) return false;
+							},
+						},
+					},
+				},
 			},
 			wumou:{
 				audio:2,

@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				tw_yunchouyong:['tw_zongyu','tw_chendong','tw_sunyi'],
 				tw_yunchouyan:['tw_jiangqing'],
 				tw_zhu:['tw_beimihu','tw_ol_sunjian','ol_liuyu','tw_menghuo'],
-				tw_swordsman:['xia_xushu','xia_wangyue','xia_liyàn','xia_tongyuan','xia_lusu','xia_dianwei','xia_zhaoe','xia_xiahouzie'],
+				tw_swordsman:['xia_liubei','xia_xiahousone','xia_xiahoudun','xia_zhangwei','xia_xushu','xia_wangyue','xia_liyàn','xia_tongyuan','xia_lusu','xia_dianwei','xia_zhaoe','xia_xiahouzie'],
 				tw_mobile:['nashime','tw_gexuan','tw_zhugeguo'],
 				tw_mobile2:['tw_chengpu','tw_guohuai','old_quancong','tw_caoxiu','tw_guanqiujian','tw_re_fazheng','tw_madai','tw_zhangfei','tw_guyong','tw_handang','tw_xuezong','tw_yl_luzhi'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
@@ -20,6 +20,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			xia_liubei:['male','shu',4,['twshenyi','twxinghan']],
+			xia_xiahousone:['female','qun',3,['twchengxi']],
+			xia_xiahoudun:['male','qun',4,['twdanlie']],
+			xia_zhangwei:['female','qun',3,['twhuzhong','twfenwang']],
 			tw_zhanghong:['male','wu',3,['twquanqian','twrouke']],
 			tw_zhangzhao:['male','wu',3,['twlijian','twchungang']],
 			tw_ol_sunjian:['male','wu','4/5',['gzyinghun','wulie','twpolu'],['zhu']],
@@ -123,6 +127,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			xiahousone:'三国杀集换式卡牌游戏《阵面对决》中的裂土系列卡牌。游卡桌游官方原创的三国时期女性角色。',
+			zhangwei:'三国杀集换式卡牌游戏《阵面对决》中的帝畿系列卡牌。游卡桌游官方原创的三国时期女性角色。',
 			nashime:'难升米（なしめ，或なんしょうまい）是倭国大夫。景初二年六月，受女王卑弥呼之命，与都市牛利出使魏国，被魏国拜为率善中郎将。',
 			jiachong:'贾充（217年—282年），字公闾，平阳襄陵（今山西襄汾）人，三国曹魏至西晋时期大臣，曹魏豫州刺史贾逵之子。西晋王朝的开国元勋。出身平阳贾氏。曾参与镇压淮南二叛和弑杀魏帝曹髦，因此深得司马氏信任，其女儿贾褒（一名荃）及贾南风分别嫁予司马炎弟司马攸及次子司马衷，与司马氏结为姻亲，地位显赫。晋朝建立后，转任车骑将军、散骑常侍、尚书仆射，后升任司空、太尉等要职。更封鲁郡公。咸宁末，为使持节、假黄钺、大都督征讨吴国。吴国平定后，增邑八千户。太康三年（282年），贾充去世。西晋朝廷追赠他为太宰，礼官议谥曰荒，司马炎不采纳，改谥为武。有集五卷。',
 			duosidawang:'朵思大王是《三国演义》中人物，南蛮秃龙洞的元帅，孟获弟弟孟优的朋友，据说是南蛮第一智者。',
@@ -278,6 +284,510 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//夏侯惇
+			twdanlie:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return game.hasPlayer(target=>player.canCompare(target));
+				},
+				filterTarget:function(card,player,target){
+					return player.canCompare(target);
+				},
+				usable:1,
+				selectTarget:[1,3],
+				multitarget:true,
+				multiline:true,
+				content:function(){
+					'step 0'
+					player.addTempSkill('twdanlie_effect');
+					player.chooseToCompare(targets).setContent('chooseToCompareMeanwhile');
+					'step 1'
+					if(result.winner&&result.winner==player){
+						player.line(targets);
+						targets.forEach(target=>target.damage());
+					}
+					else player.loseHp();
+				},
+				ai:{
+					order:10,
+					result:{
+						target:function(player,target){
+							var att=get.attitude(player,target);
+							if(att>=0) return 0;
+							if(player.getHp()>2) return -get.damageEffect(target,player,player)-10/target.countCards('h');
+							var hs=player.getCards('h').sort((a,b)=>b.number-a.number);
+							var ts=target.getCards('h').sort((a,b)=>b.number-a.number);
+							if(!hs.length||!ts.length) return 0;
+							if(Math.min(13,hs[0].number+player.getDamagedHp())>ts[0].number) return -get.damageEffect(target,player,player);
+							return 0;
+						},
+					},
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						trigger:{player:'compare'},
+						filter:function(event,player){
+							return event.getParent().name=='twdanlie'&&!event.iwhile&&player.isDamaged();
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							var num=player.getDamagedHp();
+							trigger.num1+=num;
+							if(trigger.num1>13) trigger.num1=13;
+							game.log(player,'的拼点牌点数+',num);
+						},
+					},
+				},
+			},
+			//张葳
+			twhuzhong:{
+				audio:2,
+				trigger:{player:'useCardToPlayer'},
+				filter:function(event,player){
+					return event.card.name=='sha'&&!game.hasNature(event.card,'linked')&&event.targets.length==1&&player.isPhaseUsing()&&((player.countCards('h')&&game.hasPlayer(target=>!event.targets.includes(target)&&player.canUse(event.card,target)))||event.target.countCards('h')>0);
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					var target=trigger.target;
+					event.target=target;
+					var list=['cancel2'];
+					var choiceList=[
+						'弃置一张手牌，令此【杀】可以额外指定一个目标',
+						'令其弃置一张手牌，若此【杀】造成伤害，则你摸一张牌且本阶段可以额外使用一张【杀】；若此【杀】未造成伤害，你受到其对你造成的1点伤害',
+					];
+					if(target.countCards('h')) list.unshift('其弃置');
+					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+					if(player.countCards('h')&&game.hasPlayer(targetx=>!trigger.targets.includes(targetx)&&player.canUse(trigger.card,targetx))) list.unshift('你弃置');
+					else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
+					player.chooseControl(list).set('choiceList',choiceList).set('ai',()=>{
+						var controls=_status.event.controls;
+						var trigger=_status.event.getTrigger();
+						var player=trigger.player;
+						var target=trigger.target;
+						if(controls.contains('其弃置')&&_status.event.goon) return '其弃置';
+						if(controls.contains('你弃置')){
+							if(game.hasPlayer(targetx=>!trigger.targets.includes(targetx)&&player.canUse(trigger.card,targetx)&&get.effect(targetx,trigger.card,player,player)>0)) return '你弃置';
+						}
+						return 'cancel2';
+					}).set('goon',function(){
+						var d1=true;
+						if(player.hasSkill('jueqing')||player.hasSkill('gangzhi')) d1=false;
+						if(!target.mayHaveShan()||player.hasSkillTag('directHit_ai',true,{
+							target:target,
+							card:trigger.card,
+						},true)){
+							if(!target.hasSkill('gangzhi')) d1=false;
+							if(!target.hasSkillTag('filterDamage',null,{
+								player:player,
+								card:trigger.card,
+							})&&get.attitude(player,target)<0) return true;
+						}
+						if(d1) return get.damageEffect(player,player,player)>0;
+						return false;
+					}());
+					'step 1'
+					if(result.control!='cancel2'){
+						player.logSkill('twhuzhong',target);
+						if(result.control=='其弃置'){
+							target.chooseToDiscard('h',true);
+							player.when('useCardAfter').filter(evt=>evt==trigger.getParent()).then(()=>{
+								if(player.getHistory('sourceDamage',evt=>evt.card==trigger.card).length){
+									player.draw();
+									player.addTempSkill('shenzhu_more','phaseUseAfter');
+									player.addMark('shenzhu_more',1,false);
+								}
+								else{
+									target.line(player);
+									player.damage(1,target);
+								}
+							}).vars({target:target});
+							event.finish();
+						}
+						else{
+							player.chooseToDiscard('h',true);
+							player.chooseTarget('请选择'+get.translation(trigger.card)+'的额外目标',function(card,player,target){
+								var trigger=_status.event.getTrigger();
+								return !trigger.targets.includes(target)&&player.canUse(trigger.card,target);
+							}).set('ai',function(target){
+								var player=_status.event.player;
+								var trigger=_status.event.getTrigger();
+								return get.effect(target,trigger.card,player,player);
+							});
+						}
+					}
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						player.line(result.targets);
+						trigger.getParent().targets.addArray(result.targets);
+						game.log(result.targets,'成为了',trigger.card,'的额外目标');
+					}
+				},
+			},
+			twfenwang:{
+				audio:2,
+				trigger:{source:'damageBegin2',player:'damageBegin4'},
+				filter:function(event,player,name){
+					if(name=='damageBegin2'){
+						return !event.hasNature()&&player.countCards('h')>event.player.countCards('h');
+					}
+					return event.hasNature();
+				},
+				forced:true,
+				content:function(){
+					'step 0'
+					if(event.triggername=='damageBegin2'){
+						player.line(trigger.player);
+						trigger.num++;
+						event.finish();
+					}
+					else player.chooseToDiscard('h','弃置一张手牌，或令此伤害+1').set('ai',function(card){
+						return 8-get.value(card);
+					});
+					'step 1'
+					if(!result.bool) trigger.num++;
+				},
+			},
+			//夏侯子萼
+			//差点和夏侯紫萼搞混
+			twchengxi:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return game.hasPlayer(target=>lib.skill.twchengxi.filterTarget(null,player,target));
+				},
+				filterTarget:function(card,player,target){
+					if(player.getStorage('twchengxi_used').contains(target)||target==player) return false;
+					return !player.hasSkillTag('noCompareSource')&&target.countCards('h')>0&&!target.hasSkillTag('noCompareTarget');
+				},
+				content:function(){
+					'step 0'
+					if(!player.storage.twchengxi_used){
+						player.when('phaseUseAfter').then(()=>delete player.storage.twchengxi_used);
+					}
+					player.markAuto('twchengxi_used',[target]);
+					player.draw();
+					'step 1'
+					if(player.canCompare(target)) player.chooseToCompare(target);
+					else event.finish();
+					'step 2'
+					if(result.bool){
+						player.addSkill('twchengxi_effect');
+					}
+					else{
+						var card={name:'sha',isCard:true};
+						if(target.canUse(card,player,false)) target.useCard(card,player,false);
+					}
+				},
+				ai:{
+					order:8,
+					result:{
+						target:function(player,target){
+							if(player.hasSkill('twchengxi_effect')) return 0;
+							var hs=player.getCards('h').sort((a,b)=>b.number-a.number);
+							var ts=target.getCards('h').sort((a,b)=>b.number-a.number);
+							if(!hs.length||!ts.length) return 0;
+							if(hs[0].number>ts[0].number) return -3;
+							if(!target.canUse({name:'sha',isCard:true},player,false)) return -1;
+							return 0;
+						},
+					},
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						trigger:{player:'useCard'},
+						filter:function(event,player){
+							return get.type(event.card)=='basic'||get.type(event.card)=='trick';
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							player.removeSkill('twchengxi_effect');
+							player.when('useCardAfter').filter(evt=>evt==trigger).then(()=>{
+								if(trigger.targets){
+									var card={
+										name:trigger.card.name,
+										isCard:true,
+									};
+									var targets=trigger.targets.filter(i=>i.isIn());
+									if(targets.length) player.useCard(card,targets,false);
+								}
+							});
+						},
+						mark:true,
+						marktext:'袭',
+						intro:{content:'使用的下一张基本牌或非延时锦囊牌结算完毕后视为对相同目标再使用一张无次数限制的同名牌'},
+					},
+				},
+			},
+			//侠刘备
+			twshenyi:{
+				audio:2,
+				trigger:{global:'damageEnd'},
+				filter:function(event,player){
+					if(!event.player.isIn()) return false;
+					return event.player==player||player.inRange(event.player);
+				},
+				usable:1,
+				direct:true,
+				content:function(){
+					'step 0'
+					var list=lib.inpile.filter(name=>{
+						var type=get.type2(name);
+						if(type!='basic'&&type!='trick') return false;
+						return !player.getStorage('twshenyi').includes(name);
+					});
+					var dialog=['###'+get.prompt('twshenyi',trigger.player)+'###选择一个牌名，从牌堆中将此一张此牌名的牌称为“侠义”置于武将牌上',[list,'vcard']];
+					player.chooseButton(dialog).set('ai',function(button){
+						var trigger=_status.event.getTrigger();
+						var player=_status.event.player,name=button.link[2];
+						if(get.attitude(player,trigger.player)<=0) return 0;
+						if(!get.cardPile2(card=>card.name==name)) return 0;
+						return get.value({name:name});
+					});
+					'step 1'
+					if(result.bool){
+						var name=result.links[0][2];
+						player.logSkill('twshenyi',trigger.player);
+						player.popup(name);
+						player.markAuto('twshenyi',[name]);
+						game.log(player,'声明了','#y'+get.translation(name));
+						var card=get.cardPile2(card=>card.name==name);
+						if(card) player.addToExpansion([card],'gain2').gaintag.add('twshenyi');
+						else{
+							player.chat('无牌可得？！');
+							game.log('但是牌堆中已经没有','#y'+get.translation(name),'了！');
+						}
+						if(trigger.player!=player&&player.countCards('h')){
+							var skill='twshenyi_'+player.playerid;
+							if(!lib.skill[skill]){
+								lib.skill[skill]={charlotte:true};
+								lib.translate[skill]='义·'+get.translation(player.name);
+							}
+							player.give(player.getCards('h'),trigger.player).gaintag.add(skill);
+							player.addSkill('twshenyi_draw');
+						}
+					}
+					else player.storage.counttrigger.twshenyi--;
+				},
+				marktext:'义',
+				intro:{
+					name:'侠义',
+					content:'expansion',
+					markcount:'expansion',
+				},
+				onremove:function(player,skill){
+					delete player.storage[skill];
+					//var cards=player.getExpansions(skill);
+					//if(cards.length) player.loseToDiscardpile(cards);
+				},
+				subSkill:{
+					draw:{
+						charlotte:true,
+						audio:'twshenyi',
+						trigger:{
+							global:['loseAfter','equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+						},
+						filter:function(event,player){
+							var skill='twshenyi_'+player.playerid;
+							return game.hasPlayer(target=>{
+								var evt=event.getl(target);
+								if(!evt||!evt.hs||!evt.hs.length) return false;
+								if(event.name=='lose'){
+									for(var i in event.gaintag_map){
+										if(event.gaintag_map[i].contains(skill)) return true;
+									}
+									return false;
+								}
+								return target.hasHistory('lose',function(evt){
+									if(event!=evt.getParent()) return false;
+									for(var i in evt.gaintag_map){
+										if(evt.gaintag_map[i].contains(skill)) return true;
+									}
+									return false;
+								});
+							});
+						},
+						forced:true,
+						content:function(){
+							var skill='twshenyi_'+player.playerid;
+							var targets=game.filterPlayer(target=>{
+								var evt=trigger.getl(target);
+								if(!evt||!evt.hs||!evt.hs.length) return false;
+								if(trigger.name=='lose'){
+									for(var i in trigger.gaintag_map){
+										if(trigger.gaintag_map[i].contains(skill)) return true;
+									}
+									return false;
+								}
+								return target.hasHistory('lose',function(evt){
+									if(trigger!=evt.getParent()) return false;
+									for(var i in evt.gaintag_map){
+										if(evt.gaintag_map[i].contains(skill)) return true;
+									}
+									return false;
+								});
+							}),num=0;
+							targets.forEach(target=>{
+								var cards=trigger.getl(target).hs;
+								if(trigger.name=='lose'){
+									for(var i in trigger.gaintag_map){
+										if(trigger.gaintag_map[i].contains(skill)) num++;
+									}
+								}
+								else target.getHistory('lose',function(evt){
+									if(trigger!=evt.getParent()) return false;
+									for(var i in evt.gaintag_map){
+										if(evt.gaintag_map[i].contains(skill)) num++;
+									}
+								});
+							});
+							if(num>0) player.draw(num);
+						},
+					},
+				},
+			},
+			twxinghan:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter:function(event,player){
+					return player.getExpansions('twshenyi').length>game.countPlayer();
+				},
+				check:function(event,player){
+					return player.getExpansions('twshenyi').some(card=>player.hasValueTarget(card));
+				},
+				prompt2:function(event,player){
+					return '依次使用武将牌上的“侠义”牌，回合结束时弃置所有手牌并将失去X点体力（X为你的体力值-1且X至少为1）';
+				},
+				content:function*(event,map){
+					var player=map.player;
+					while(player.getExpansions('twshenyi').some(card=>player.hasValueTarget(card))){
+						var result=yield player.chooseButton(['兴汉：请选择其中的一张牌使用',player.getExpansions('twshenyi').filter(card=>player.hasValueTarget(card))]).set('ai',function(button){
+							return _status.event.player.getUseValue(button.link);
+						});
+						if(result.bool){
+							player.chooseToUse(true,result.links[0],false);
+						}
+					}
+					player.when('phaseEnd').then(()=>{
+						if(player.countCards('h')) player.discard(player.getCards('h'));
+						var num=Math.max(1,player.getHp()-1);
+						player.loseHp(num);
+					});
+				},
+				group:'twxinghan_init',
+				subSkill:{
+					init:{
+						audio:'twxinghan',
+						trigger:{
+							player:['loseEnd','dying','dyingAfter'],
+							global:['equipEnd','addJudgeEnd','gainEnd','loseAsyncEnd','addToExpansionEnd'],
+						},
+						filter:function(event,player){
+							return (player.getExpansions('twshenyi').length&&(!player.countCards('h')||player.isDying()))^player.hasSkill('twxinghan_in');
+						},
+						forced:true,
+						firstDo:true,
+						silent:true,
+						content:function(){
+							if(player.getExpansions('twshenyi').length&&(!player.countCards('h')||player.isDying())){
+								var cards=player.getExpansions('twshenyi');
+								var cardsx=cards.map(card=>{
+									var cardx=ui.create.card();
+									cardx.init(get.cardInfo(card));
+									cardx._cardid=card.cardid;
+									return cardx;
+								});
+								player.directgains(cardsx,null,'twxinghan');
+								player.addSkill('twxinghan_in');
+							}
+							else player.removeSkill('twxinghan_in');
+						},
+					},
+					in:{
+						charlotte:true,
+						audio:'twxinghan',
+						trigger:{player:'addToExpansionEnd'},
+						filter:function(event,player){
+							return event.gaintag.contains('twshenyi');
+						},
+						forced:true,
+						locked:false,
+						silent:true,
+						content:function(){
+							'step 0'
+							var cards2=player.getCards('s',card=>card.hasGaintag('twxinghan'));
+							if(player.isOnline2()){
+								player.send(function(cards,player){
+									cards.forEach(i=>i.delete());
+									if(player==game.me) ui.updatehl();
+								},cards2,player);
+							}
+							cards2.forEach(i=>i.delete());
+							if(player==game.me) ui.updatehl();
+							'step 1'
+							var cards=player.getExpansions('twshenyi');
+							var cardsx=cards.map(card=>{
+								var cardx=ui.create.card();
+								cardx.init(get.cardInfo(card));
+								cardx._cardid=card.cardid;
+								return cardx;
+							});
+							player.directgains(cardsx,null,'twxinghan');
+						},
+						onremove:function(player){
+							var cards2=player.getCards('s',card=>card.hasGaintag('twxinghan'));
+							if(player.isOnline2()){
+								player.send(function(cards,player){
+									cards.forEach(i=>i.delete());
+									if(player==game.me) ui.updatehl();
+								},cards2,player);
+							}
+							cards2.forEach(i=>i.delete());
+							if(player==game.me) ui.updatehl();
+						},
+						group:'twxinghan_use',
+					},
+					use:{
+						charlotte:true,
+						trigger:{player:['useCardBefore','respondBefore']},
+						filter:function(event,player){
+							var cards=player.getCards('s',card=>card.hasGaintag('twxinghan')&&card._cardid);
+							return event.cards&&event.cards.some(card=>{
+								return cards.includes(card);
+							});
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							var idList=player.getCards('s',card=>card.hasGaintag('twxinghan')).map(i=>i._cardid);
+							var cards=player.getExpansions('twshenyi');
+							var cards2=[];
+							for(var card of trigger.cards){
+								var cardx=cards.find(cardx=>cardx.cardid==card._cardid);
+								if(cardx) cards2.push(cardx);
+							}
+							var cards3=trigger.cards.slice();
+							trigger.cards=cards2;
+							trigger.card.cards=cards2;
+							if(player.isOnline2()){
+								player.send(function(cards,player){
+									cards.forEach(i=>i.delete());
+									if(player==game.me) ui.updatehl();
+								},cards3,player);
+							}
+							cards3.forEach(i=>i.delete());
+							if(player==game.me) ui.updatehl();
+						},
+					},
+				},
+			},
 			//张纮
 			twquanqian:{
 				audio:2,
@@ -14698,6 +15208,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kaisa:"凯撒",
 			zhengfu:"征服",
 			zhengfu_info:"当你使用【杀】指定目标时，你可以选择一种牌的类别，然后除非目标角色交给你一种该类别的牌，否则其不能闪避此【杀】。",
+			xia_xiahoudun:'侠夏侯惇',
+			xia_xiahoudun_prefix:'侠',
+			twdanlie:'胆烈',
+			twdanlie_info:'出牌阶段限一次，你可以与至多三名其他角色同时拼点，且你此次的拼点牌点数+X（X为你已损失的体力值）。若你赢，你对这些角色各造成1点伤害；若你没赢，你失去1点体力。',
+			xia_zhangwei:'张葳',
+			twhuzhong:'护众',
+			twhuzhong_info:'当你于出牌阶段使用无属性【杀】指定唯一目标角色时，你可以选择一项：①弃置一张手牌，然后你可以为此牌额外选择一个目标；②令其弃置一张手牌，此牌结算完毕后，若此牌造成过伤害，则你摸一张牌且本阶段可以额外使用一张【杀】，否则其对你造成1点伤害。',
+			twfenwang:'焚亡',
+			twfenwang_info:'①当你受到属性伤害时，你须弃置一张牌或令此伤害+1。②当你对其他角色造成非属性伤害时，若你的手牌数大于其，则此伤害+1。',
+			xia_xiahousone:'夏侯子萼',
+			twchengxi:'承袭',
+			twchengxi_info:'出牌阶段每名角色限一次，你可以摸一张牌并与一名其他角色拼点。若你赢，你使用的下一张基本牌或非延时锦囊牌结算完毕后，你视为对原目标使用一张无次数限制的同名牌；若你没赢，其视为对你使用一张无距离限制的【杀】。',
+			xia_liubei:'侠刘备',
+			xia_liubei_prefix:'侠',
+			twshenyi:'伸义',
+			twshenyi_info:'每回合限一次，当你或你攻击范围内的一名角色受到伤害后，你可以声明一个基本牌或锦囊牌的牌名（每种牌名限一次），然后从牌堆中将一张同名牌称为“侠义”置于武将牌上，然后若受伤角色不为你，则你将所有手牌交给其，且当其失去一张你以此法交给其的牌后，你摸一张牌。',
+			twxinghan:'兴汉',
+			twxinghan_info:'①当你没有手牌时或你处于濒死状态时，你可以如手牌般使用或打出你武将牌上的“侠义”牌。②准备阶段，若你武将牌上的“侠义”牌数大于场上的存活角色数，则你可以依次使用其中所有可以使用的牌，然后于回合结束时弃置所有手牌并失去X点体力（X为你的体力值-1且X至少为1）。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',
