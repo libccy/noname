@@ -1479,6 +1479,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(stat==0) return Math.random()<0.7;
 							return false;
 					}
+					return false;
 				},
 				prompt:function(event,player){
 					return '焚心：是否与'+get.translation(event.player)+'交换身份？';
