@@ -614,8 +614,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					var event=_status.event,evt=event;
 					if(event._backup) evt=event._backup;
-					var equip3=target.getCards('e',card=>get.subtype(card,false)=='equip3');
-					var equip4=target.getCards('e',card=>get.subtype(card,false)=='equip4');
+					var equip3=target.getCards('e',card=>get.is.defendingMount(card,false));
+					var equip4=target.getCards('e',card=>get.is.attackingMount(card,false));
 					if(equip3.length&&equip3.some(card=>evt.filterCard(get.autoViewAs({
 						name:'shan',
 						storage:{psshouli:true},
@@ -639,8 +639,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var evt=event.getParent(2);
 					evt.set('psshouli',true);
 					var list=[];
-					var equip3=target.getCards('e',card=>get.subtype(card,false)=='equip3');
-					var equip4=target.getCards('e',card=>get.subtype(card,false)=='equip4');
+					var equip3=target.getCards('e',card=>get.is.defendingMount(card,false));
+					var equip4=target.getCards('e',card=>get.is.attackingMount(card,false));
 					var backupx=_status.event;
 					_status.event=evt;
 					try{
@@ -680,13 +680,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).set('cards',cards)
 					}
 					else player.choosePlayerCard(true,target,'e').set('filterButton',function(button){
-						var type=get.subtype(button.link);
-						return type=='equip3'||type=='equip4';
+						var card=button.link;
+						return get.is.attackingMount(card)||get.is.defendingMount(card);
 					});
 					'step 1'
 					var evt=event.getParent(2);
 					if(result.bool&&result.links&&result.links.length){
-						var name=(event.cardName||(get.subtype(result.links[0])=='equip4'?'sha':'shan'));
+						var name=(event.cardName||(get.is.attackingMount(result.links[0])?'sha':'shan'));
 						if(evt.name=='chooseToUse'){
 							game.broadcastAll(function(result,name){
 								lib.skill.psshouli_backup.viewAs={
@@ -728,9 +728,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					respondSha:true,
 					respondShan:true,
 					skillTagFilter:function(player,tag){
-						var subtype=(tag=='respondSha'?'equip4':'equip3');
+						var func=get.is[tag=='respondSha'?'attackingMount':'defendingMount'];
 						return game.hasPlayer(function(current){
-							return current.getEquip(subtype);
+							return current.hasCard(card=>func(card,false),'e');
 						});
 					},
 					order:2,

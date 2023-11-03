@@ -58517,6 +58517,38 @@
 		},
 		is:{
 			/**
+			 * 判断是否为进攻坐骑
+			 * @param {Card | VCard | Card[] | VCard[]} card
+			 * @param {false | Player} [player]
+			 * @returns {boolean}
+			 */
+			attackingMount:(card,player)=>{
+				const subtype=get.subtype(card,player);
+				if(subtype=='equip4') return true;
+				else if(subtype=='equip6'){
+					const info=get.info(card,player),distance=info.distance;
+					if(!distance) return false;
+					if(distance.globalFrom&&!info.notMount) return true;
+				}
+				return false;
+			},
+			/**
+			 * 判断是否为防御坐骑
+			 * @param {Card | VCard | Card[] | VCard[]} card
+			 * @param {false | Player} [player]
+			 * @returns {boolean}
+			 */
+			defendingMount:(card,player)=>{
+				const subtype=get.subtype(card,player);
+				if(subtype=='equip3') return true;
+				else if(subtype=='equip6'){
+					const info=get.info(card,player),distance=info.distance;
+					if(!distance) return false;
+					if(distance.globalTo&&!info.notMount) return true;
+				}
+				return false;
+			},
+			/**
 			 * 判断坐骑栏是否被合并
 			 */
 			mountCombined:function(){
