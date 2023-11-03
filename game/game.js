@@ -27968,11 +27968,11 @@
 									if(func&&!func(target)) return false;
 									return target.identity!='fan';
 								});break;
-                                case 'commoner':targets=game.filterPlayer(function(target){
-                                    if(func&&!func(target)) return false;
-                                    if(num>=3) return target.identity!='fan';
-                                    return target.identity=='fan';
-                                }); break;
+								case 'commoner':targets=game.filterPlayer(function(target){
+									if(func&&!func(target)) return false;
+									if(num>=3) return target.identity!='fan';
+									return target.identity=='fan';
+								}); break;
 							}
 						}
 					}
@@ -28043,10 +28043,10 @@
 									if(func&&!func(target)) return false;
 									return target.identity=='fan';
 								});break;
-                                case 'commoner':targets=game.filterPlayer(function(target){
-                                    if(func&&!func(target)) return false;
-                                    return true;
-                                }); break;
+								case 'commoner':targets=game.filterPlayer(function(target){
+									if(func&&!func(target)) return false;
+									return true;
+								}); break;
 							}
 						}
 					}
