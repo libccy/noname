@@ -470,10 +470,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(lib.configOL.identity_mode=='stratagem'){
 						uiintro.add('<div class="text chat">首轮强化：'+(lib.configOL.round_one_use_fury?'开启':'关闭'));
 					}
-					else{
-						uiintro.add('<div class="text chat">平民身份：'+(lib.configOL.enable_commoner?'开启':'关闭'));
+					else if(lib.configOL.identity_mode!='purple'){
 						uiintro.add('<div class="text chat">双内奸：'+(lib.configOL.double_nei?'开启':'关闭'));
-						uiintro.add('<div class="text chat">加强主公：'+(lib.configOL.enhance_zhu?'开启':'关闭'));
+						if(lib.configOL.identity_mode!='stratagem'){
+							uiintro.add('<div class="text chat">加强主公：'+(lib.configOL.enhance_zhu?'开启':'关闭'));
+							uiintro.add('<div class="text chat">平民身份：'+(lib.configOL.enable_commoner?'开启':'关闭'));
+						}
+						uiintro.add('<div class="text chat">年机制：'+(lib.configOL.enable_year_limit?'开启':'关闭'));
 					}
 				}
 				else{

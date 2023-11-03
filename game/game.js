@@ -59354,7 +59354,8 @@
 					case 'purple':return '三对三对二';
 					case 'zhong':return (config.double_character?'双将':'')+'忠胆英杰';
 					case 'stratagem':return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'谋攻';
-					default:return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'身份';
+					debugger
+					default:return `${get.cnNumber(parseInt(config.number))}人${config.double_nei?'双内':''}${config.enable_commoner?'带民':''}${config.double_character?'双将':''}身份`;
 				}
 			}
 			else if(config.mode=='guozhan'){
