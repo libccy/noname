@@ -621,6 +621,7 @@ window.noname_character_rank={
 		'jsrg_xiahourong',
 		'jsrg_sunshangxiang',
 		'jsrg_machao',
+		'sunyu',
 	],
 	bp:[
 		'chess_diaochan',
