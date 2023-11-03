@@ -114,8 +114,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							num+=current.countMark('jxlianpo_mark_fan');
 							return num;
 						}),
-						nei:(game.hasPlayer(current=>current.identity=='nei')?0:1)+game.countPlayer(current=>{
-							return current.countMark('jxlianpo_mark_nei');
+						nei:game.countPlayer(current=>{
+							let num=0;
+							if(current.identity=='nei') num++;
+							num+=current.countMark('jxlianpo_mark_nei');
+							return num;
+						}),
+						commoner:game.countPlayer(current=>{
+							let num=0;
+							if(current.identity=='commoner') num++;
+							num+=current.countMark('jxlianpo_mark_commoner');
+							return num;
 						}),
 					};
 					let population=0,identities=[];
@@ -139,9 +148,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:()=>`场上最大阵营为${lib.skill.jxlianpo.getMax().map(i=>{
 						if(i=='zhu') return '主忠';
-						if(i=='fan') return '反贼';
-						if(i=='nei') return '内奸';
-						return '';
+						return get.translation(i+'2');
 					}).join('、')}`,
 				},
 				$createButton:function(item,type,position,noclick,node){
