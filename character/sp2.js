@@ -4731,7 +4731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget('请选择【抗歌】的目标','其于回合外摸牌后，你摸等量的牌；其进入濒死状态时，你可令其回复体力至1点；其死亡后，你弃置所有牌并失去1点体力',lib.filter.notMe,true).set('ai',function(target){
-						return get.attitude(_status.event.player,target)>0;
+						return get.attitude(_status.event.player,target);
 					});
 					'step 1'
 					if(result.bool){

@@ -28,7 +28,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangjinyun:['female','shu',3,['dchuizhi','dcjijiao']],
 			huanfan:['male','wei',3,['dcjianzheng','dcfumou']],
 			chentai:['male','wei',4,['dcctjiuxian','dcchenyong']],
-			sunyu:['male','wu',3,['dcquanshou','dcshexue'],['unseen']],
+			sunyu:['male','wu',3,['dcquanshou','dcshexue']],
 			xizheng:['male','shu',3,['dcdanyi','dcwencan']],
 			dc_ruiji:['female','wu',4,['dcwangyuan','dclingyin','dcliying']],
 			zerong:['male','qun',4,['dccansi','dcfozong']],
@@ -3145,11 +3145,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseBegin'},
 				filter:function(event,player){
-					return event.player.countCards('h')<event.player.maxHp;
+					return event.player.countCards('h')<=event.player.maxHp;
 				},
 				logTarget:'player',
 				check:function(event,player){
-					return get.attitude(player,event.player)>0||event.player.maxHp-event.player.countCards('h')<=2;
+					if(get.attitude(player,event.player)>0) return true;
+					const draw=event.player.maxHp-event.player.countCards('h');
+					return draw<=2&&event.player.getHp(true)-draw>=1;
 				},
 				content:function(){
 					'step 0'
@@ -3161,7 +3163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var draw=Math.min(5,Math.max(0,trigger.player.maxHp-trigger.player.countCards('h')));
 						if(get.attitude(trigger.player,player)>0){
 							if(draw>=3||trigger.player.getCardUsable('sha')>1) return '选项一';
-							if(draw<=1&&trigger.player.countCards('hs',card=>{
+							if(!draw||draw<=1&&trigger.player.countCards('hs',card=>{
 								return get.name(card)=='sha'&&trigger.player.hasValueTarget(card);
 							})) return '选项二';
 							return '选项一';
@@ -3212,7 +3214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						popup:false,
 						charlotte:true,
 						onremove:true,
-						marktext:'守',
+						marktext:'<span style="text-decoration: line-through;">守</span>',
 						intro:{content:'本回合使用的牌被抵消后，$摸一张牌'},
 						content:function(){
 							var targets=player.getStorage('dcquanshou_respond');
@@ -3232,7 +3234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseUseBegin'},
 				filter:function(event,player){
 					var card=lib.skill.dcshexue.getLast();
-					return card&&player.hasUseTarget(card);
+					return card&&player.hasUseTarget(card,false);
 				},
 				getLast:function(){
 					for(var current of game.filterPlayer()){
@@ -3258,10 +3260,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card=lib.skill.dcshexue.getLast();
 					game.broadcastAll(function(card){
 						lib.skill.dcshexue_backup.viewAs=card;
-						lib.skill.dcshexue_backup.prompt='设学：是否将一张牌当做'+get.translation(card)+'使用？';
 					},card);
 					var next=player.chooseToUse();
-					next.set('openskilldialog','设学：是否将一张牌当做'+get.translation(card)+'使用？');
+					next.set('openskilldialog',`###${get.prompt('dcshexue')}###将一张牌当做${get.translation(card.nature)||''}【${get.translation(card.name)}】使用`);
 					next.set('norestore',true);
 					next.set('addCount',false);
 					next.set('_backupevent','dcshexue_backup');
@@ -3277,6 +3278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterCard:function(card){
 							return get.itemtype(card)=='card';
 						},
+						filterTarget:lib.filter.targetEnabled,
 						position:'hes',
 						selectCard:1,
 						check:(card)=>6-get.value(card),
@@ -3297,6 +3299,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var card=history[history.length-1].card;
 							return '令下一回合的角色于其出牌阶段开始时选择是否将一张牌当做'+(get.translation(card.nature)||'')+'【'+get.translation(card.name)+'】使用';
 						},
+						check:function(event,player){
+							let evt=event.getParent('phase').getParent();
+							let nextPlayer=player.getNext();
+							if(evt&&evt.next&&evt.next.length){
+								nextPlayer=evt.next[0].player;
+							}
+							return get.attitude(player,nextPlayer)>0;
+						},
 						content:function(){
 							var history=player.getHistory('useCard',evt=>{
 								return evt.getParent('phaseUse')==trigger&&(get.type(evt.card)=='basic'||get.type(evt.card)=='trick');
@@ -3311,7 +3321,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					study:{
 						trigger:{player:'phaseUseBegin'},
 						filter:function(event,player){
-							return player.getStorage('dcshexue_study').some(i=>event.player.hasUseTarget(i));
+							return player.getStorage('dcshexue_study').some(i=>event.player.hasUseTarget(i,false));
 						},
 						onremove:true,
 						charlotte:true,
@@ -3321,13 +3331,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.cards=player.getStorage('dcshexue_study');
 							'step 1'
 							var card=cards.pop();
-							if(trigger.player.hasUseTarget(card)){
+							if(trigger.player.hasUseTarget(card,false)){
 								game.broadcastAll(function(card){
 									lib.skill.dcshexue_backup.viewAs=card;
 									lib.skill.dcshexue_backup.prompt='设学：是否将一张牌当做'+get.translation(card)+'使用？';
 								},card);
 								var next=trigger.player.chooseToUse();
-								next.set('openskilldialog','设学：是否将一张牌当做'+get.translation(card)+'使用？');
+								next.set('openskilldialog',`###${get.prompt('dcshexue_study')}###将一张牌当做${get.translation(card.nature)||''}【${get.translation(card.name)}】使用`);
 								next.set('norestore',true);
 								next.set('addCount',false);
 								next.set('_backupevent','dcshexue_backup');
@@ -12686,9 +12696,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcchenyong_info:'结束阶段，你可以摸X张牌（X为本回合你使用过的牌的类型数）。',
 			sunyu:'孙瑜',
 			dcquanshou:'劝守',
-			dcquanshou_info:'一名角色的回合开始时，若其手牌数小于其体力上限，你可以令其选择一项：1.将手牌摸至体力上限，然后本回合使用【杀】的次数上限-1（至多摸五张）；2.其本回合使用牌被抵消后，你摸一张牌。',
+			dcquanshou_info:'一名角色的回合开始时，若其手牌数不大于其体力上限，你可以令其选择一项：1.将手牌摸至体力上限，然后本回合使用【杀】的次数上限-1（至多摸五张）；2.其本回合使用牌被抵消后，你摸一张牌。',
 			dcshexue:'设学',
-			dcshexue_info:'①出牌阶段开始时，你可以将一张牌当做于上回合的角色于其出牌阶段内使用的最后一张基本牌或普通锦囊牌使用。②出牌阶段结束时，你可以令下回合的角色于其出牌阶段开始时可以将一张牌当做你于此阶段内使用的最后一张基本牌或普通锦囊牌使用。',
+			dcshexue_info:'①出牌阶段开始时，你可以将一张牌当做上回合的角色于其出牌阶段内使用的最后一张基本牌或普通锦囊牌使用。②出牌阶段结束时，你可以令下回合的角色于其出牌阶段开始时可以将一张牌当做你于此阶段内使用的最后一张基本牌或普通锦囊牌使用（一名角色因〖设学〗使用的牌均无距离和次数限制）。',
 			xizheng:'郤正',
 			dcdanyi:'耽意',
 			dcdanyi_info:'当你使用牌指定第一个目标后，若此牌的目标与你使用的上一张牌目标相同，你可以摸X张牌（X为此牌目标数）。',
