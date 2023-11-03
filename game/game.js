@@ -27566,7 +27566,8 @@
 						}
 						else{
 							for(var i in this.forbiddenSkills){
-								if(this.forbiddenSkills[i].remove(skill)){
+								if(this.forbiddenSkills[i].includes(skill)){
+									this.forbiddenSkills[i].remove(skill)
 									if(!this.forbiddenSkills[i].length){
 										delete this.forbiddenSkills[i];
 									}
