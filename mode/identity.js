@@ -3575,7 +3575,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								return Math.min(3,-situation);
 							case 'fan': return -8;
                             case 'commoner':
-                                return Math.max(-3,situation);
+                                return Math.min(3,Math.max(-3,situation));
 						}
 						break;
 					case 'nei':
