@@ -4836,7 +4836,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseButton([get.prompt('sphantong'),player.storage.sphantong],function(button){return -1});
+					player.chooseButton([get.prompt('sphantong'),player.storage.sphantong],function(button){
+						var player=_status.event.player;
+						if(_status.currentPhase==player){
+							//血裔
+							if((player.hasJudge('lebu')||player.skipList.includes('phaseUse'))&&game.hasPlayer(function(current){
+								return current!=player&&current.group=='qun';
+							})) return 1;
+							//激将
+							if(!player.hasJudge('lebu')&&!player.skipList.includes('phaseUse')&&game.hasPlayer(function(current){
+								return current!=player&&current.group=='shu'&&current.hasSha()&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
+							})&&game.hasPlayer(function(target){
+								return player.canUse({name:'sha'},target)&&get.effect(target,{name:'sha'},player,player)>0;
+							})) return 1;
+						}
+						//护驾
+						else if(!player.hasShan()&&game.hasPlayer(function(current){
+							return current!=player&&current.group=='wei'&&current.mayHaveShan()&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
+						})) return 1;
+						return -1;
+					});
 					'step 1'
 					if(result.bool){
 						player.logSkill('sphantong');
@@ -4848,31 +4867,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.cardsDiscard(card);
 						var list=['hujia','jijiang','jiuyuan','xueyi'];
 						for(var i=0;i<list.length;i++){
-							if(player.hasZhuSkill(list[i])) list.splice(i--,1);
+							if(player.hasSkill(list[i])) list.splice(i--,1);
 						}
-						if(list.length>0) player.chooseControl(list).set('prompt','选择获得以下技能中的一个');
+						if(list.length){
+							player.chooseControl(list).set('prompt','选择获得以下技能中的一个').set('ai',function(){
+								var player=_status.event.player;
+								if(_status.currentPhase==player){
+									//血裔
+									if((player.hasJudge('lebu')||player.skipList.includes('phaseUse'))&&game.hasPlayer(function(current){
+										return current!=player&&current.group=='qun';
+									})) return 'xueyi';
+									//激将
+									if(!player.hasJudge('lebu')&&!player.skipList.includes('phaseUse')&&game.hasPlayer(function(current){
+										return current!=player&&current.group=='shu'&&current.hasSha()&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
+									})&&game.hasPlayer(function(target){
+										return player.canUse({name:'sha'},target)&&get.effect(target,{name:'sha'},player,player)>0;
+									})) return 'jijiang';
+								}
+								//护驾
+								else if(!player.hasShan()&&game.hasPlayer(function(current){
+									return current!=player&&current.group=='wei'&&current.mayHaveShan()&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
+								})) return 'hujia';
+							});
+						}
 						else event.finish();
 					}
 					else event.finish();
 					'step 2'
 					var skill=result.control;
 					player.addTempSkill(skill);
-					if(!player.storage.zhuSkill_sphantong) player.storage.zhuSkill_sphantong=[];
-					player.storage.zhuSkill_sphantong.add(skill);
 					player.popup(skill,'wood');
 					game.log(player,'获得了技能','#g【'+get.translation(skill)+'】');
-					var next=game.createEvent('sphantong_clear',false);
-					event.next.remove(next);
-					trigger.after.push(next);
-					next.player=player;
-					next.skill=skill;
-					next.setContent(function(){
-						if(player.storage.zhuSkill_sphantong) player.storage.zhuSkill_sphantong.remove(event.skill);
-					})
 				},
 			},
 			sphuangen:{
-			trigger:{global:'useCardToPlayered'},
+				trigger:{global:'useCardToPlayered'},
 				filter:function(event,player){
 					if(!event.isFirstTarget) return false;
 					if(get.type(event.card)!='trick') return false;
