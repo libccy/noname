@@ -24255,7 +24255,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xionghuo:{
 				marktext:"戾",
-				mark:true,
 				intro:{
 					name:'暴戾',
 					content:"mark",
