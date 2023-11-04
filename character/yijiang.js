@@ -2043,6 +2043,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('paoxiao');
 					}
 				},
+				derivation:['wusheng','paoxiao'],
 			},
 			shiyong:{
 				audio:2,
@@ -13780,7 +13781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				unique:true,
-				derivation:['zyexin','zzili'],
+				derivation:['zyexin','zzili','zpaiyi'],
 				filter:function(event,player){
 					return player.countCards('e')>=2;
 				},

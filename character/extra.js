@@ -4987,7 +4987,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					maixie:true,
 					maixie_hp:true,
 					combo:'sbaiyin',
-					/*effect:{
+					effect:{
 						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 							if(get.tag(card,'damage')){
@@ -5011,7 +5011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 'zeroplayertarget';
 							}
 						}
-					}*/
+					}
 				}
 			},
 			renjie2:{
@@ -5046,7 +5046,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('jilue');
 					player.awakenSkill('sbaiyin');
 				},
-				derivation:'jilue',
+				derivation:['jilue','reguicai','fangzhu','rejizhi','rezhiheng','wansha'],
 			},
 			jilue:{
 				unique:true,

@@ -3851,6 +3851,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					player.addSkill('rejianyan');
 				},
+				derivation:'rejianyan',
 			},
 			rejianyan:{
 				audio:2,
