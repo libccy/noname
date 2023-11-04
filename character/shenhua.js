@@ -7719,12 +7719,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillBlocker:function(skill,player){
 					return skill!='chanyuan'&&skill!='rechanyuan'&&!lib.skill[skill].charlotte&&player.hp==1;
 				},
-				audio:2,
-				trigger:{player:'changeHp'},
-				filter:function(event,player){
-					return event.num<0&&player.hp==1;
-				},
-				content:function(){},
 				mark:true,
 				intro:{
 					content:function(storage,player,skill){
