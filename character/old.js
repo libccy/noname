@@ -520,7 +520,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			old_guhuo:{
 				audio:2,
-				group:['old_guhuo_guess'],
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
 					return (lib.inpile.contains(name)&&player.countCards('hs')>0);
@@ -636,6 +635,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							precontent:function(){
 								player.logSkill('old_guhuo');
+								player.addTempSkill('old_guhuo_guess');
 								var card=event.result.cards[0];
 								event.result.card.suit=get.suit(card);
 								event.result.card.number=get.number(card);

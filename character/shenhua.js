@@ -7458,7 +7458,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinfu_guhuo:{
 				audio:'guhuo_guess',
 				derivation:['chanyuan'],
-				group:['guhuo_guess'],
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
 					return (lib.inpile.contains(name)&&player.countCards('hs')>0&&!player.hasSkill('guhuo_phase'));
@@ -7554,6 +7553,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							precontent:function(){
 								player.logSkill('xinfu_guhuo');
+								player.addTempSkill('guhuo_guess');
 								var card=event.result.cards[0];
 								event.result.card.suit=get.suit(card);
 								event.result.card.number=get.number(card);
@@ -7709,13 +7709,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			chanyuan:{
 				init:function(player,skill){
+					if(player.hp==1) player.logSkill(skill);
 					player.addSkillBlocker(skill);
 				},
 				onremove:function(player,skill){
 					player.removeSkillBlocker(skill);
 				},
-				charlotte:true,
-				locked:true,
 				skillBlocker:function(skill,player){
 					return skill!='chanyuan'&&skill!='rechanyuan'&&!lib.skill[skill].charlotte&&player.hp==1;
 				},
@@ -7734,8 +7733,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						if(list.length) str+=('<br><li>失效技能：'+get.translation(list))
 						return str;
-					}
-				}
+					},
+				},
+				audio:2,
+				trigger:{player:'changeHp'},
+				filter:function(event,player){
+					return player.hp==1;
+				},
+				forced:true,
+				content:function(){},
 			},
 			guhuo_phase:{},
 		},
