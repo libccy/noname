@@ -10241,7 +10241,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return !player.storage.zunwei||player.storage.zunwei.length<3;
+					let storage=player.getStorage('zunwei');
+					return storage.length<3&&game.hasPlayer(current=>{
+						return player.isDamaged()&&current.getHp()>player.getHp()&&!storage.includes(0)||
+							current.countCards('h')>player.countCards('h')&&!storage.includes(1)||
+							current.countCards('e')>player.countCards('e')&&!storage.includes(2);
+					});
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -10252,12 +10257,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						];
 						var choiceList=ui.create.dialog('尊位：请选择一项','forcebutton','hidden');
 						choiceList.add([list.map((item,i)=>{
+							if(player.getStorage('zunwei').includes(i)) item=`<span style="text-decoration: line-through;">${item}</span>`;
 							return [i,item];
 						}),'textbutton'])
 						return choiceList;
 					},
 					filter:function(button){
-						return button._filterButton;
+						const player=get.player();
+						if(player.getStorage('zunwei').includes(button.link)) return false;
+						if(button.link==0){
+							if(!player.isDamaged()) return false;
+							return game.hasPlayer(current=>{
+								return current.getHp()>player.getHp();
+							});
+						}
+						if(button.link==1){
+							return game.hasPlayer(current=>{
+								return current.countCards('h')>player.countCards('h');
+							});
+						}
+						if(button.link==2){
+							return game.hasPlayer(current=>{
+								return current.countCards('e')>player.countCards('e');
+							});
+						}
 					},
 					backup:function(links){
 						var next=get.copy(lib.skill.zunwei.backups[links[0]]);
