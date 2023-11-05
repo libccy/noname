@@ -405,8 +405,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.when('useCardAfter').filter(evt=>evt==trigger.getParent()).then(()=>{
 								if(player.getHistory('sourceDamage',evt=>evt.card==trigger.card).length){
 									player.draw();
-									player.addTempSkill('shenzhu_more','phaseUseAfter');
-									player.addMark('shenzhu_more',1,false);
+									player.addTempSkill('twhuzhong_sha','phaseUseAfter');
+									player.addMark('twhuzhong_sha',1,false);
 								}
 								else{
 									target.line(player);
@@ -435,6 +435,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(result.targets,'成为了',trigger.card,'的额外目标');
 					}
 				},
+				subSkill:{
+					sha:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							cardUsable:function(card,player,num){
+								if(card.name=='sha') return num+player.countMark('twhuzhong_sha');
+							},
+						},
+					}
+				}
 			},
 			twfenwang:{
 				audio:2,
