@@ -5465,7 +5465,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filterCard:{suit:'diamond'},
-				filterTarget:true,
+				filterTarget:function(card,player,target){
+					return target.canAddJudge({name:'yanxiao_card'});
+				},
 				check:function(card){
 					return 7-get.value(card);
 				},
