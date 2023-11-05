@@ -16233,6 +16233,9 @@
 					'step 4'
 					player.$compareMultiple(event.card1,targets,cards);
 					game.log(player,'的拼点牌为',event.card1);
+					event.cardlist.forEach((card,index)=>{
+						game.log(targets[index],'的拼点牌为',card);
+					});
 					player.animate('target');
 					game.delay(0,1000);
 					'step 5'
@@ -16244,7 +16247,6 @@
 						event.target.animate('target');
 						event.card2=event.cardlist[event.iwhile];
 						event.num2=event.getNum(event.card2);
-						game.log(event.target,'的拼点牌为',event.card2);
 						//event.tempplayer.line(event.target);
 						delete event.player;
 						event.trigger('compare');
