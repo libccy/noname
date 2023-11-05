@@ -1506,7 +1506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(type=='equip'&&game.hasPlayer(current=>{
 							return current.canEquip(card);
 						})||type=='delay'&&game.hasPlayer(current=>{
-							return !current.storage._disableJudge&&!current.hasJudge(card.name);
+							return !current.storage._disableJudge&&current.canAddJudge(card);
 						})) choices.unshift('场上');
 						player.chooseControl(choices).set('prompt','请选择要将'+get.translation(card)+'置于的位置').set('ai',()=>{
 							return _status.event.choice;
@@ -1526,7 +1526,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return _status.event.targets.contains(target);
 						}).set('targets',game.filterPlayer(current=>{
 							if(type=='equip') return current.canEquip(card);
-							if(type=='delay') return !current.storage._disableJudge&&!current.hasJudge(card.name);
+							if(type=='delay') return !current.storage._disableJudge&&current.canAddJudge(card);
 							return false;
 						})).set('ai',target=>{
 							var player=_status.event.player;
@@ -1539,7 +1539,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						player.$throw(card,1000);
-						var next=player.lose(card,ui.cardPile);
+						var next=player.lose(card,ui.cardPile,'visible');
 						if(result.control=='牌堆顶') next.insert_card=true;
 						game.log(player,'将',card,'置于了','#y'+result.control);
 					}
@@ -1555,7 +1555,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.addJudge(card);
 						}
 					}
-					if(event.count<4) event.goto(1);
 					'step 5'
 					game.countPlayer(current=>{
 						var count=current.countCards('e');
@@ -1564,7 +1563,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							current.link(false);
 							current.turnOver(false);
 						}
+						event.equipCount[current.playerid]=count;
 					});
+					if(event.count<4) event.goto(1);
 				}
 			},
 			//杜预
