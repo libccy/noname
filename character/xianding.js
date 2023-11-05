@@ -155,7 +155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(shown.length<cards.length){
 								var num=cards.length-shown.length;
 								player.$draw(num);
-								game.log(player,'从牌堆获得了',num,'张点数为8的牌');
+								game.log(player,'从牌堆获得了',get.cnNumber(num),'张点数为8的牌');
 							}
 							if(shown.length>0){
 								player.$gain2(shown,false);
@@ -1506,7 +1506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(type=='equip'&&game.hasPlayer(current=>{
 							return current.canEquip(card);
 						})||type=='delay'&&game.hasPlayer(current=>{
-							return !current.storage._disableJudge&&current.canAddJudge(card);
+							return current.canAddJudge(card);
 						})) choices.unshift('场上');
 						player.chooseControl(choices).set('prompt','请选择要将'+get.translation(card)+'置于的位置').set('ai',()=>{
 							return _status.event.choice;
@@ -1526,7 +1526,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return _status.event.targets.contains(target);
 						}).set('targets',game.filterPlayer(current=>{
 							if(type=='equip') return current.canEquip(card);
-							if(type=='delay') return !current.storage._disableJudge&&current.canAddJudge(card);
+							if(type=='delay') return current.canAddJudge(card);
 							return false;
 						})).set('ai',target=>{
 							var player=_status.event.player;
