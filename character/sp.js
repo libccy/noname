@@ -5690,7 +5690,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var cards1=list[0][1].slice(),cards2=list[1][1].slice();
 						var card1=cards1.sort((a,b)=>get.value(b)-get.value(a))[0];
 						var card2=cards2.sort((a,b)=>get.value(a)-get.value(b))[0];
-						if(get.value(card1)>get.value(card2)){
+						if(card1&&card2&&get.value(card1)>get.value(card2)){
 							cards1.remove(card1);
 							cards2.remove(card2);
 							cards1.push(card2);
