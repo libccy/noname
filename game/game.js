@@ -58262,6 +58262,26 @@
 	};
 	const get={
 		/**
+		 * 返回 VCard[] 形式的所有牌，用于印卡将遍历
+		 * @param {Function} filter
+		 * @returns {string[][]}
+		 */
+		inpileVCardList:filter=>{
+			let list=[];
+			for(const name of lib.inpile){
+				const type=get.type(name);
+				const info=[type,'',name];
+				if(!filter||filter(info)) list.push(info);
+				if(name=='sha'){
+					for(const nature of lib.inpile_nature){
+						const info=[type,'',name,nature];
+						if(!filter||filter(info)) list.push(info);
+					}
+				}
+			}
+			return list;
+		},
+		/**
 		 * 根据座次数n（从0开始）获取对应的“n+1号位”翻译
 		 * @param {number} seat
 		 */
@@ -58518,7 +58538,7 @@
 		is:{
 			/**
 			 * 判断是否为进攻坐骑
-			 * @param {Card | VCard | Card[] | VCard[]} card
+			 * @param {Card | VCard} card
 			 * @param {false | Player} [player]
 			 * @returns {boolean}
 			 */
@@ -58534,7 +58554,7 @@
 			},
 			/**
 			 * 判断是否为防御坐骑
-			 * @param {Card | VCard | Card[] | VCard[]} card
+			 * @param {Card | VCard} card
 			 * @param {false | Player} [player]
 			 * @returns {boolean}
 			 */
