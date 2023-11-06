@@ -359,8 +359,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return card!=card2&&get.number(card2,player)<num;
 						})
 					}).set('ai',function(card){
-					 var player=_status.event.player;
-					 return 1+Math.max(0,player.getUseValue(card,null,true))
+						var player=_status.event.player;
+						return 1+Math.max(0,player.getUseValue(card,null,true))
 					})
 					'step 1'
 					if(result.bool){
@@ -819,11 +819,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target.isIn()){
 								var num=target.countCards('e');
 								if(num>0){
-								 player.discardPlayerCard(target,true,'e',num)
+									player.discardPlayerCard(target,true,'e',num)
 								}
 								else{
-								 target.loseHp();
-								 game.delayex();
+									target.loseHp();
+									game.delayex();
 								}
 							}
 							if(targets.length>0) event.redo();
@@ -860,11 +860,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.line(target,'green');
 								var num=target.countCards('h');
 								if(num>0){
-								 player.discardPlayerCard(target,true,'h',num)
+									player.discardPlayerCard(target,true,'h',num)
 								}
 								else{
-								 target.loseHp();
-								 game.delayex();
+									target.loseHp();
+									game.delayex();
 								}
 							}
 						},

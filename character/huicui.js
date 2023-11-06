@@ -4138,7 +4138,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var cards=evt.cards.filterInD();
 							return get.value(cards,evt.player)*get.attitude(player,evt.player);
 						}
-						return 0;
 					})
 					'step 1'
 					if(result.bool){
@@ -5781,7 +5780,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					blocker:{
-						charlotte:true,
 						init:function(player,skill){
 							player.addSkillBlocker(skill);
 						},
@@ -10165,7 +10163,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterTitle:{
 		},
-		perfectPair:{},
 		characterFilter:{
 		},
 		dynamicTranslate:{

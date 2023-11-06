@@ -630,7 +630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return game.hasPlayer(function(current){
 								return evt.filterTarget(sha,player,current);
 							})
-						};
+						}
 					})
 				},
 				prompt:'将场上的一张坐骑牌当做【杀】或【闪】使用或打出',
@@ -665,8 +665,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return false;
 						})){
 							list.push('sha');
-						};
-					}catch(e){game.print(e)};
+						}
+					}catch(e){game.print(e)}
 					_status.event=backupx;
 					if(list.length==1){
 						event.cardName=list[0];
@@ -1533,7 +1533,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.addToExpansion(result.cards[0],'give',player).gaintag.add('psshiyin');
 								var card=player.getExpansions('psshiyin')[0];
 								if(card) player.gain(card,'gain2');
-							};
+							}
 						},
 					}
 				}
@@ -1654,7 +1654,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card.name=='du') addi-=5;
 						if(get.color(card)=='black') addi-=6;
 						if(player==event.player){
-							if(Boolean(event.small)){
+							if(event.small){
 								return -getn(card)-get.value(card)/2+addi;
 							}
 							return getn(card)-get.value(card)/2+addi;
@@ -2670,9 +2670,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return '没有“戮”';
 						}
 					},
-					content:function(storage,player){
-						return '共有'+get.cnNumber(storage.length)+'张“戮”';
-					},
+					// content:function(storage,player){
+					// 	return '共有'+get.cnNumber(storage.length)+'张“戮”';
+					// },
 				},
 				group:'zyshilu_zhiheng',
 				subSkill:{
@@ -4096,7 +4096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								list.push(['基本','','sha']);
 							}
 							for(var i of lib.inpile_nature){
-							 if(lib.filter.cardUsable({name:'sha',nature:i},player,event.getParent('chooseToUse'))&&game.hasPlayer(function(current){
+								if(lib.filter.cardUsable({name:'sha',nature:i},player,event.getParent('chooseToUse'))&&game.hasPlayer(function(current){
 										return player.canUse({name:'sha',nature:i},current);
 									})){
 									list.push(['基本','','sha',i]);
@@ -4594,14 +4594,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(cards.length) player.gain(cards,'gain2','log');
 					'step 5'
 					if(event.count>0&&player.hasSkill('spyinzhi')){
-					 player.chooseBool(get.prompt2('spyinzhi')).set('frequentSkill','spyinzhi');
+						player.chooseBool(get.prompt2('spyinzhi')).set('frequentSkill','spyinzhi');
 					}
 					else event.finish();
 					'step 6'
 					if(result.bool){
 						player.logSkill('spyinzhi');
 						event.goto(1);
-					};
+					}
 				},
 			},
 			spmingjian:{

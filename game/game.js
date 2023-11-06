@@ -11492,6 +11492,7 @@
 								}
 							}
 						}
+						// falls through
 					default:
 						return Legacy(item);
 				}
@@ -14588,11 +14589,11 @@
 							event._result={bool:true};
 							event._direct=true;
 						}
-						else if(info.direct){
+						else if(info.direct&&player.isOnline()){
 							event._result={bool:true};
 							event._direct=true;
 						}
-						else if(info.direct&&player.isOnline()){
+						else if(info.direct){
 							event._result={bool:true};
 							event._direct=true;
 						}
@@ -21244,9 +21245,9 @@
 					if(type=='horse'||type=='equip3_4'){
 						return player.hasEnabledSlot(3)&&(get.is.mountCombined()||player.hasEnabledSlot(4));
 					}
-					else if(type=='equip3_4'){
-						type='equip3';
-					}
+					// else if(type=='equip3_4'){
+					// 	type='equip3';
+					// }
 					else if(get.is.mountCombined()&&type=='equip4'){
 						return false;
 					}
@@ -21980,7 +21981,7 @@
 						txy=to.getXY();
 						n=Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);
 					}
-					else if(to.isMin(true)||from.isMin(true)){}
+					else if(to.isMin(true)||from.isMin(true)){/* empty */}
 					else{
 						var length=game.players.length;
 						var totalPopulation=game.players.length+game.dead.length+1;
@@ -25751,7 +25752,7 @@
 						case 1:this.draw(nodelay?'nodelay':1);break;
 						case 2:this.recover();break;
 						case 3:this.changeHujia();break;
-						case 4:this.tempHide();
+						case 4:this.tempHide();break;
 						case 5:this.discard(this.getCards('j')).delay=(!nodelay);break;
 						case 6:{
 							if(this.isLinked()) this.link();

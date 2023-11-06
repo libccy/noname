@@ -295,7 +295,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
-				logTarget:'target',
 				marktext:'嫕',
 				intro:{
 					markcount:'expansion',
@@ -531,7 +530,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(trigger.name=='lose'){
 						for(var i in trigger.gaintag_map){
 							if(trigger.gaintag_map[i].contains('huaiyuanx')) num++;
-						};
+						}
 					}
 					else player.getHistory('lose',function(evt){
 						if(trigger!=evt.getParent()) return false;
@@ -588,7 +587,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						locked:false,
 						filter:function(event,player){
-						 return (event.name!='phase'||game.phaseNumber==0)&&player.countCards('h')>0;
+							return (event.name!='phase'||game.phaseNumber==0)&&player.countCards('h')>0;
 						},
 						content:function(){
 							var hs=player.getCards('h');
@@ -2671,7 +2670,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var type=get.type(card);
 					return (type=='basic'||type=='trick');
 				},
-				log:false,
 				visible:true,
 				filterTarget:function(card,player,target){
 					return target!=player&&target.hasZhuSkill('ruilve',player)&&!target.hasSkill('ruilve3');
@@ -3590,7 +3588,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangxiang:'王祥（184年，一作180年－268年4月30日），字休徵。琅邪临沂（今山东省临沂市西孝友村）人。三国曹魏及西晋时大臣。王祥于东汉末隐居二十年，在曹魏，先后任县令、大司农、司空、太尉等职，封爵睢陵侯。西晋建立，拜太保，进封睢陵公。泰始四年四月戊戌日（268年4月30日）去世，年八十五（一作八十九），谥号“元”。有《训子孙遗令》一文传世。王祥侍奉后母朱氏极孝，为传统文化中二十四孝之一“卧冰求鲤”的主人翁。',
 		},
 		characterTitle:{},
-		perfectPair:{},
 		characterFilter:{},
 		dynamicTranslate:{},
 		perfectPair:{

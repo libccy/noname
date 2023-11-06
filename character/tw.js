@@ -972,10 +972,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						switch(get.sgn(att)){
 							case 1:
 								return [cards,[]];
-								break;
 							case 0:
 								return [cardx,cardy];
-								break;
 							case -1:
 								var num=Math.ceil(cards.length/2)+(cards.length%2==0?1:0);
 								if(num>1&&player.hasSkill('twchungang')) num--;
@@ -985,7 +983,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								cardy.sort((a,b)=>get.value(b)-get.value(a));
 								cardx.addArray(cardy.slice(num,cardy.length));
 								return [cardx,cardy.slice(0,num)];
-								break;
 						}
 					}).set('cards',cards);
 					'step 1'
@@ -5736,7 +5733,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return false;
 					});
 				},
-				direct:true,
 				content:function(){
 					'step 0'
 					var target=lib.skill.twenyuan1.logTarget(trigger,player)[0];
@@ -6018,7 +6014,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})){
 						event.finish();
 						return;
-					};
+					}
 					player.chooseTarget(get.prompt('twzhengrong'),'将一名其他角色的一张牌置于武将牌上，称为“荣”',function(card,player,target){
 						return target!=player&&target.countCards('he');
 					}).set('ai',function(target){
@@ -6447,7 +6443,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.addToExpansion(result.cards[0],'log','give',player).gaintag.add('twmingren');
 								var card=player.getExpansions('twmingren')[0];
 								if(card) player.gain(card,'gain2');
-							};
+							}
 						},
 					},
 				},
@@ -8839,7 +8835,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return 6+get.effect(player,card,target,target);
 								}
 								return get.effect(target,{name:'guohe_copy2'},player,player)/2+get.effect(target,card,player,player);
-							});;
+							});
 							'step 1'
 							if(result.bool){
 								event.targets=result.targets;
@@ -9761,42 +9757,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					cardEnabled:function(card,player){
 						if(game.hasPlayer(function(current){
- 						var list=current.storage.twgongsun_shadow;
- 						if(!list) return false;
- 						for(var i=0;i<list.length;i++){
- 							if(list[i][0]==player&&list[i][1]==card.suit) return true;
- 						}
- 						return false;
+							var list=current.storage.twgongsun_shadow;
+							if(!list) return false;
+							for(var i=0;i<list.length;i++){
+								if(list[i][0]==player&&list[i][1]==card.suit) return true;
+							}
+							return false;
 						})) return false;
 					},
 					cardSavable:function(card,player){
 						if(game.hasPlayer(function(current){
- 						var list=current.storage.twgongsun_shadow;
- 						if(!list) return false;
- 						for(var i=0;i<list.length;i++){
- 							if(list[i][0]==player&&list[i][1]==card.suit) return true;
- 						}
- 						return false;
+							var list=current.storage.twgongsun_shadow;
+							if(!list) return false;
+							for(var i=0;i<list.length;i++){
+								if(list[i][0]==player&&list[i][1]==card.suit) return true;
+							}
+							return false;
 						})) return false;
 					},
 					cardRespondable:function(card,player){
 						if(game.hasPlayer(function(current){
- 						var list=current.storage.twgongsun_shadow;
- 						if(!list) return false;
- 						for(var i=0;i<list.length;i++){
- 							if(list[i][0]==player&&list[i][1]==card.suit) return true;
- 						}
- 						return false;
+							var list=current.storage.twgongsun_shadow;
+							if(!list) return false;
+							for(var i=0;i<list.length;i++){
+								if(list[i][0]==player&&list[i][1]==card.suit) return true;
+							}
+							return false;
 						})) return false;
 					},
 					cardDiscardable:function(card,player){
 						if(game.hasPlayer(function(current){
- 						var list=current.storage.twgongsun_shadow;
- 						if(!list) return false;
- 						for(var i=0;i<list.length;i++){
- 							if(list[i][0]==player&&list[i][1]==card.suit) return true;
- 						}
- 						return false;
+							var list=current.storage.twgongsun_shadow;
+							if(!list) return false;
+							for(var i=0;i<list.length;i++){
+								if(list[i][0]==player&&list[i][1]==card.suit) return true;
+							}
+							return false;
 						})) return false;
 					},
 				},
@@ -10377,8 +10373,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('twfenghan',targets);
 						if(targets.length>1) game.asyncDraw(targets);
 						else{
-						 targets[0].draw();
-						 event.finish();
+							targets[0].draw();
+							event.finish();
 						}
 					}
 					else{
@@ -10759,20 +10755,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 						},
 						content:function(){
-						 'step 0'
-						 player.chooseTarget(lib.skill.twfuzuan.filterTarget,get.prompt('twfuzuan'),'变更一名角色的一个转换技的状态').set('ai',function(target){
-						 	var player=_status.event.player;
-						 	return get.effect(target,'twfuzuan',player,player);
-						 });
-						 'step 1'
-						 if(result.bool){
-						  var target=result.targets[0];
-						  player.logSkill('twfuzuan',target);
-						  var next=game.createEvent('twfuzuan');
-						  next.player=player;
-						  next.target=target;
-						  next.setContent(lib.skill.twfuzuan.content);
-						 }
+							'step 0'
+							player.chooseTarget(lib.skill.twfuzuan.filterTarget,get.prompt('twfuzuan'),'变更一名角色的一个转换技的状态').set('ai',function(target){
+								var player=_status.event.player;
+								return get.effect(target,'twfuzuan',player,player);
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.logSkill('twfuzuan',target);
+								var next=game.createEvent('twfuzuan');
+								next.player=player;
+								next.target=target;
+								next.setContent(lib.skill.twfuzuan.content);
+							}
 						},
 					},
 				},
@@ -11212,7 +11208,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							content:function(storage){
 								if(storage){
-								 return '经过'+storage[1]+'个“回合结束时”后，若有“示”，则从牌堆中获得'+storage[0]+'张和“示”名称相同的牌';
+									return '经过'+storage[1]+'个“回合结束时”后，若有“示”，则从牌堆中获得'+storage[0]+'张和“示”名称相同的牌';
 								}
 								return '未指定施法效果';
 							},
@@ -11386,7 +11382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							content:function(storage){
 								if(storage){
-								 return '经过'+storage[1]+'个“回合结束时”后，回复'+storage[0]+'点体力';
+									return '经过'+storage[1]+'个“回合结束时”后，回复'+storage[0]+'点体力';
 								}
 								return '未指定施法效果';
 							},
@@ -11462,7 +11458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							content:function(storage){
 								if(storage){
-								 return '经过'+storage[1]+'个“回合结束时”后，摸'+storage[0]*2+'张牌';
+									return '经过'+storage[1]+'个“回合结束时”后，摸'+storage[0]*2+'张牌';
 								}
 								return '未指定施法效果';
 							},
@@ -11542,7 +11538,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							content:function(storage){
 								if(storage){
-								 return '经过'+storage[1]+'个“回合结束时”后，获得'+storage[0]+'层“防止一次伤害”的效果';
+									return '经过'+storage[1]+'个“回合结束时”后，获得'+storage[0]+'层“防止一次伤害”的效果';
 								}
 								return '未指定施法效果';
 							},
@@ -11764,7 +11760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var checkx=get.color(card,player)==get.color(judging);
 								if(checkx>0) return checkx;
 								return 0;
-							};
+							}
 							return result*(attitude>0?1:-1);
 						}).set('judging',trigger.player.judging[0]);
 					'step 1'
@@ -13120,7 +13116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								});
 							}).sortBySeat();
 							for(var i of list){
-							 i.discardPlayerCard(player,true,'he').boolline=true;
+								i.discardPlayerCard(player,true,'he').boolline=true;
 							}
 						},
 					},

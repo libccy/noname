@@ -5351,7 +5351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							for(j=0;j<storage[i].handcards2.length;j++){
 								if(storage[i].handcards2[j].parentNode==ui.discardPile||
-														 storage[i].handcards2[j].parentNode==ui.cardPile){
+									storage[i].handcards2[j].parentNode==ui.cardPile){
 									player.node.handcards2.appendChild(storage[i].handcards2[j]);
 								}
 								else{
@@ -5360,7 +5360,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							for(j=0;j<storage[i].equips.length;j++){
 								if(storage[i].equips[j].parentNode==ui.discardPile||
-														 storage[i].equips[j].parentNode==ui.cardPile){
+									storage[i].equips[j].parentNode==ui.cardPile){
 									storage[i].equips[j].style.transform='';
 									player.$equip(storage[i].equips[j]);
 								}
