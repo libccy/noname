@@ -4982,6 +4982,8 @@
 							map.connect_limit_zhu.hide();
 							map.connect_enhance_zhu.hide();
 							map.connect_double_nei.hide();
+							map.connect_enable_commoner.hide();
+							map.connect_enable_year_limit.show();
 							map.connect_zhong_card.show();
 							map.connect_special_identity.hide();
 							map.connect_double_character.show();
@@ -4992,6 +4994,8 @@
 							map.connect_limit_zhu.hide();
 							map.connect_enhance_zhu.hide();
 							map.connect_double_nei.hide();
+							map.connect_enable_commoner.hide();
+							map.connect_enable_year_limit.show();
 							map.connect_zhong_card.hide();
 							map.connect_special_identity.hide();
 						}
@@ -5000,6 +5004,8 @@
 							map.connect_limit_zhu.hide();
 							map.connect_enhance_zhu.hide();
 							map.connect_double_nei.hide();
+							map.connect_enable_commoner.hide();
+							map.connect_enable_year_limit.hide();
 							map.connect_zhong_card.hide();
 							map.connect_special_identity.hide();
 							map.connect_double_character.hide();
@@ -5009,12 +5015,9 @@
 							map.connect_player_number.show();
 							map.connect_limit_zhu.show();
 							map.connect_enhance_zhu.show();
-							if(config.connect_player_number!='2'){
-								map.connect_double_nei.show();
-							}
-							else{
-								map.connect_double_nei.hide();
-							}
+							map.connect_double_nei[config.connect_player_number!='2'&&!config.connect_enable_commoner?'show':'hide']();
+							map.connect_enable_commoner[config.connect_player_number!='2'&&!config.connect_double_nei?'show':'hide']();
+							map.connect_enable_year_limit.show();
 							map.connect_zhong_card.hide();
 
 							if(config.connect_player_number=='8'){
@@ -5074,6 +5077,15 @@
 							return lib.mode.identity.config.double_nei.intro;
 						}
 					},
+					connect_enable_commoner:{
+						name:'启用平民',
+						init:false,
+						restart:true,
+						frequent:false,
+						get intro(){
+							return lib.mode.identity.config.enable_commoner.intro;
+						}
+					},
 					connect_double_character:{
 						name:'双将模式',
 						init:false,
@@ -5092,6 +5104,15 @@
 						restart:true,
 						frequent:true,
 						intro:'开启后游戏中将增加军师、大将、贼首三个身份'
+					},
+					connect_enable_year_limit:{
+						name:'启用年机制',
+						init:false,
+						restart:true,
+						frequent:false,
+						get intro(){
+							return lib.mode.identity.config.enable_year_limit.intro;
+						}
 					},
 					connect_round_one_use_fury:{
 						name:'开启首轮强化卡牌',
@@ -5137,6 +5158,9 @@
 							map.choice_zhong.hide();
 							map.choice_nei.hide();
 							map.choice_fan.hide();
+							map.enable_commoner.hide();
+							map.choice_commoner.hide();
+							map.enable_year_limit.show();
 							map.ban_identity.hide();
 							map.ban_identity2.hide();
 							map.ban_identity3.hide();
@@ -5172,6 +5196,9 @@
 							map.choice_zhong.show();
 							map.choice_nei.show();
 							map.choice_fan.show();
+							map.enable_commoner.hide();
+							map.choice_commoner.hide();
+							map.enable_year_limit.show();
 							map.ban_identity.show();
 							if(config.ban_identity=='off'){
 								map.ban_identity2.hide();
@@ -5210,6 +5237,9 @@
 							map.choice_zhong.hide();
 							map.choice_nei.hide();
 							map.choice_fan.hide();
+							map.enable_commoner.hide();
+							map.choice_commoner.hide();
+							map.enable_year_limit.hide();
 							map.ban_identity.hide();
 							map.ban_identity2.hide();
 							map.ban_identity3.hide();
@@ -5229,17 +5259,15 @@
 							map.player_number.show();
 							map.enhance_zhu.show();
 							map.auto_identity.show();
-							if(config.player_number!='2'){
-								map.double_nei.show();
-							}
-							else{
-								map.double_nei.hide();
-							}
+							map.double_nei[config.player_number!='2'&&!config.enable_commoner?'show':'hide']();
 							map.choice_zhu.show();
 							map.limit_zhu.show();
 							map.choice_zhong.show();
 							map.choice_nei.show();
 							map.choice_fan.show();
+							map.enable_commoner[config.player_number!='2'&&!config.double_nei?'show':'hide']();
+							map.choice_commoner[config.enable_commoner?'show':'hide']();
+							map.enable_year_limit.show();
 							map.ban_identity.show();
 							if(config.ban_identity=='off'){
 								map.ban_identity2.hide();
@@ -5305,7 +5333,7 @@
 						init:false,
 						restart:true,
 						frequent:true,
-						intro:'若游戏人数不大于8，则开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
+						intro:'若游戏人数不大于9，则开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
 					},
 					choose_group:{
 						name:'神武将选择势力',
@@ -5631,6 +5659,33 @@
 							'8':'八',
 							'10':'十',
 						},
+					},
+					enable_commoner:{
+						name:'启用平民',
+						init:false,
+						restart:true,
+						frequent:false,
+						intro:'开启后游戏中将有一个平民（身份）加入游戏。<br>具体规则请查看帮助。',
+					},
+					choice_commoner:{
+						name:'平民候选武将数',
+						init:'4',
+						restart:true,
+						item:{
+							'3':'三',
+							'4':'四',
+							'5':'五',
+							'6':'六',
+							'8':'八',
+							'10':'十',
+						},
+					},
+					enable_year_limit:{
+						name:'启用年机制',
+						init:false,
+						restart:true,
+						frequent:false,
+						intro:'开启后将会加入年机制。<br>年机制的具体规则请查看帮助。',
 					},
 				}
 			},
@@ -27572,7 +27627,8 @@
 						}
 						else{
 							for(var i in this.forbiddenSkills){
-								if(this.forbiddenSkills[i].remove(skill)){
+								if(this.forbiddenSkills[i].includes(skill)){
+									this.forbiddenSkills[i].remove(skill)
 									if(!this.forbiddenSkills[i].length){
 										delete this.forbiddenSkills[i];
 									}
@@ -27919,6 +27975,11 @@
 									if(func&&!func(target)) return false;
 									return target.identity!='fan';
 								});break;
+								case 'commoner':targets=game.filterPlayer(function(target){
+									if(func&&!func(target)) return false;
+									if(num>=3) return target.identity!='fan';
+									return target.identity=='fan';
+								}); break;
 							}
 						}
 					}
@@ -27989,6 +28050,10 @@
 									if(func&&!func(target)) return false;
 									return target.identity=='fan';
 								});break;
+								case 'commoner':targets=game.filterPlayer(function(target){
+									if(func&&!func(target)) return false;
+									return true;
+								}); break;
 							}
 						}
 					}
@@ -59357,7 +59422,8 @@
 					case 'purple':return '三对三对二';
 					case 'zhong':return (config.double_character?'双将':'')+'忠胆英杰';
 					case 'stratagem':return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'谋攻';
-					default:return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'身份';
+					debugger
+					default:return `${get.cnNumber(parseInt(config.number))}人${config.double_nei?'双内':''}${config.enable_commoner?'带民':''}${config.double_character?'双将':''}身份`;
 				}
 			}
 			else if(config.mode=='guozhan'){

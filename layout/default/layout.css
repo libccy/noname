@@ -4076,6 +4076,12 @@ span[data-nature='woodmm'] {
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 2px,
 		rgba(57, 123, 4,1) 0 0 2px,black 0 0 1px;
 }
+.player .identity[data-color="commoner"],
+div[data-nature='commoner'],
+span[data-nature='commoner'] {
+	text-shadow: rgb(135, 135, 135, 1) 0 0 2px,rgba(135, 135, 135, 1) 0 0 5px,rgba(135, 135, 135, 1) 0 0 10px,
+		rgba(135, 135, 135, 1) 0 0 10px,rgba(135, 135, 135, 1) 0 0 20px,rgba(135, 135, 135, 1) 0 0 20px,black 0 0 1px;
+}
 
 .player .identity[data-color="cai"],
 .player .identity[data-color="bZhu"],

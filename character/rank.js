@@ -124,6 +124,8 @@ window.noname_character_rank={
 		'db_key_liyingxia',
 		'key_kiyu',
 		'jsrg_pangtong',
+		'star_caoren',
+		'clan_xunyou',
 	],
 	a:[
 		'diy_zaozhirenjun',
@@ -339,6 +341,7 @@ window.noname_character_rank={
 		'key_kotarou',
 		'key_kyou',
 		'key_tomoyo',
+		'star_yuanshu',
 	],
 	am:[
 		'diy_caiwenji',
@@ -976,6 +979,8 @@ window.noname_character_rank={
 		'zhangyan',
 		'jsrg_huangzhong',
 		'jsrg_zhangchu',
+		'ol_dingshangwan',
+		'ol_liwan',
 	],
 	b:[
 		'diy_feishi',
@@ -2023,6 +2028,9 @@ window.noname_character_rank={
 			'key_kotomi',
 			'db_key_liyingxia',
 			'key_iriya',
+			'star_caoren',
+			'star_yuanshu',
+			'clan_xunyou',
 		],
 		rare:[
 			'luoxian',
@@ -2486,6 +2494,8 @@ window.noname_character_rank={
 			'ol_wenqin',
 			'clan_wanghun',
 			'yue_zhoufei',
+			'ol_dingshangwan',
+			'ol_liwan',
 		],
 		junk:[
 			'sunshao',
