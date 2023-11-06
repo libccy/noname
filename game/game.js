@@ -31534,43 +31534,6 @@
 							func(skill[j]);
 						}
 					}
-					return this;
-				}
-				removeTrigger(skill,player){
-					if(!player||!skill) return;
-					var evt=this;
-					if(typeof skill=='string') skill=[skill];
-					game.expandSkills(skill);
-					while(true){
-						var evt=evt.getParent('arrangeTrigger');
-						if(!evt||evt.name!='arrangeTrigger'||!evt.map) return;
-						var filter=function(content){
-							if(typeof content=='string') return content==triggername;
-							return content.contains(triggername);
-						};
-						var trigger=evt._trigger;
-						var triggername=evt.triggername;
-						var map=false;
-						if(evt.doing&&evt.doing.player==player) map=evt.doing;
-						else{
-							for(var i=0;i<evt.map.length;i++){
-								if(evt.map[i].player==player){
-									map=evt.map[i];
-									break;
-								}
-							}
-						}
-						if(!map) return;
-						var func=function(skillx){
-							var toremove=map.list.filter(i=>{
-								return i[0]==skillx&&i[1]==player;
-							});
-							if(toremove.length>0) map.list.removeArray(toremove);
-						}
-						for(var j=0;j<skill.length;j++){
-							func(skill[j]);
-						}
-					}
 				}
 				removeTrigger(skill,player){
 					if(!player||!skill) return;
