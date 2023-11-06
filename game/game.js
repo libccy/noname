@@ -61036,7 +61036,12 @@
 				for(i=0;i<skills.length;i++){
 					if(lib.skill[skills[i]]&&(lib.skill[skills[i]].nopop||lib.skill[skills[i]].equipSkill)) continue;
 					if(lib.translate[skills[i]+'_info']){
-						translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
+						if(lib.translate[skills[i]+'_ab']) translation=lib.translate[skills[i]+'_ab'];
+						else{
+							translation=get.translation(skills[i]);
+							if(!lib.skill[skills[i]].nobracket) translation=translation.slice(0,2);
+						}
+
 						if(node.forbiddenSkills[skills[i]]){
 							var forbidstr='<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>';
 							if(node.forbiddenSkills[skills[i]].length){
@@ -61119,9 +61124,6 @@
 								intronode.classList.add('pointerdiv');
 								intronode.listen(ui.click.skillbutton);
 							}
-						}
-						else if(lib.skill[skills[i]].nobracket){
-							uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
 						}
 						else{
 							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
@@ -61818,13 +61820,14 @@
 					var skills=infoitem[3];
 					for(i=0;i<skills.length;i++){
 						if(lib.translate[skills[i]+'_info']){
-							translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
-							if(lib.skill[skills[i]]&&lib.skill[skills[i]].nobracket){
-								uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
-							}
+							if(lib.translate[skills[i]+'_ab']) translation=lib.translate[skills[i]+'_ab'];
 							else{
-								uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+								translation=get.translation(skills[i]);
+								if(!lib.skill[skills[i]].nobracket) translation=translation.slice(0,2);
 							}
+
+							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+
 							if(lib.translate[skills[i]+'_append']){
 								uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
 							}
