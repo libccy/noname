@@ -6,6 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			star_yuanshu:['male','qun',4,['starcanxi','starpizhi','starzhonggu'],['zhu']],
 			star_caoren:['male','wei',4,['starsujun','starlifeng']],
+			mp_liuling:['male','jin',3,['mpjiusong','mpmaotao','mpbishi'],['doublegroup:wei:qun:jin']],
 			dc_jikang:['male','wei',3,['new_qingxian','dcjuexiang']],
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
@@ -56,7 +57,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dongxie:['female','qun',4,['dcjiaoxia','dchumei']],
 			wangrong:['female','qun',3,['minsi','jijing','zhuide']],
 			ol_dingyuan:['male','qun',4,['cixiao','xianshuai']],
-			xin_baosanniang:['female','shu',3,['decadewuniang','decadexushen']],
 			re_hejin:['male','qun',4,['spmouzhu','spyanhuo']],
 			re_hansui:['male','qun',4,['spniluan','spweiwu']],
 			liuhong:['male','qun',4,['yujue','tuxing']],
@@ -110,7 +110,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongyuan:['re_hucheer','re_zoushi','caoanmin','re_dongcheng'],
 				sp_xiaohu:['haomeng','yanfuren','yanrou','dc_zhuling'],
 				sp_star:['star_caoren','star_yuanshu'],
-				sp_decade:['caobuxing','re_maliang','xin_baosanniang','dc_jikang'],
+				mini_qixian:['mp_liuling'],
+				sp_decade:['caobuxing','re_maliang','dc_jikang'],
 			}
 		},
 		skill:{
@@ -419,6 +420,94 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						onremove:true,
 					},
 				},
+			},
+			//小程序刘伶
+			mpjiusong:{
+				audio:2,
+				trigger:{global:'useCard'},
+				filter:function(event,player){
+					return event.card.name=='jiu'&&player.countMark('mpjiusong')<3;
+				},
+				forced:true,
+				locked:false,
+				content:function(){
+					player.addMark('mpjiusong');
+				},
+				marktext:'醉',
+				intro:{
+					name:'醉(酒颂/酕醄)',
+					name2:'醉',
+					content:'mark',
+				}
+			},
+			mpmaotao:{
+				audio:2,
+				trigger:{global:'useCardToPlayer'},
+				filter:function(event,player){
+					if(event.targets.length!=1||!event.isFirstTarget) return false;
+					return event.player!=player&&player.countMark('mpjiusong');
+				},
+				prompt2:function(event,player){
+					let list;
+					if(get.type(event.card)!='delay') list=game.filterPlayer(current=>{
+						return lib.filter.targetEnabled2(event.card,event.player,current);
+					});
+					else list=game.filterPlayer(current=>current.canAddJudge(event.card));
+					return `移去1枚“醉”，${list.length>1?`令${get.translation(event.card)}目标改为${get.translation(list)}中的一名随机角色。若新目标与原目标相同，你`:''}获得牌堆中的一张【酒】。`
+				},
+				check:function(event,player){
+					const eff=get.effect(event.target,event.card,player,player);
+					let list;
+					if(get.type(event.card)!='delay') list=game.filterPlayer(current=>{
+						return lib.filter.targetEnabled2(event.card,event.player,current);
+					});
+					else list=game.filterPlayer(current=>current.canAddJudge(event.card));
+					let list2=list.filter(current=>get.effect(current,event.card,player,player)>eff);
+					let list3=list.filter(current=>get.effect(current,event.card,player,player)>0);
+					return list2.length>=list.length/2||player.countMark('mpjiusong')>=2&&list3.length>=list.length/2;
+				},
+				content:function(){
+					player.removeMark('mpjiusong',1);
+					var list,oriTarget=trigger.target;
+					trigger.targets.remove(oriTarget);
+					trigger.getParent().triggeredTargets1.remove(oriTarget);
+					trigger.untrigger();
+					game.delayx();
+					if(get.type(trigger.card)!='delay') list=game.filterPlayer(current=>{
+						return lib.filter.targetEnabled2(trigger.card,trigger.player,current);
+					});
+					else list=game.filterPlayer(current=>current.canAddJudge(trigger.card));
+					if(list.length) target=list.randomGet();
+					trigger.targets.push(target);
+					trigger.player.line(target,'thunder');
+					game.log(trigger.card,'的目标被改为',target);
+					if(target==oriTarget){
+						var card=get.cardPile2('jiu');
+						if(card) player.gain(card,'gain2');
+						else{
+							player.chat('没酒了！');
+							game.log('但是牌堆中已经没有','#y酒','了!');
+						}
+					}
+				},
+			},
+			mpbishi:{
+				audio:2,
+				forced:true,
+				trigger:{global:'useCard1'},
+				filter:function(event,player){
+					if(get.type2(event.card)!='trick'||!get.tag(event.card,'damage')) return false;
+					if(!lib.skill.xunshi.isXunshi(event.card)) return false;
+					const targets=event.targets.slice();
+					targets.remove(event.player);
+					return targets.length==game.countPlayer()-2;
+				},
+				content:function*(){},
+				mod:{
+					targetEnabled:function(card){
+						if(get.type2(card)=='trick'&&get.tag(card,'damage')>0) return false;
+					}
+				}
 			},
 			//十周年嵇康
 			dcjuexiang: {
@@ -10204,6 +10293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guānning:'关宁，《三国演义》的虚构人物，为关定之子，关平的哥哥，学文。关羽前往冀州寻找刘备时曾居于关定庄，关定命关宁、关平二子出拜。后关羽同刘备回到关定庄时，关羽向刘备介绍关宁、关平二人，关定即提出让关平拜关羽为义父。',
 			mushun:'穆顺，小说《三国演义》中的人物，男，东汉末宦官。献帝欲修书与国舅伏完，共谋图曹公。因顺为宦官中之忠义可托者，乃命顺往送书。顺藏书于发中，潜出禁宫，径至完宅，将书呈上。及完回书付顺，顺乃藏于头髻内，辞完回宫。然公闻信，先于宫门等候，顺回遇公，公喝左右，遍搜身上，并无夹带，放行。忽然风吹落其帽。公又唤回，取帽视之，遍观无物，还帽令戴。顺双手倒戴其帽。公心疑，令左右搜其头发中，搜出伏完书来。公见书大怒，执下顺于密室问之，顺不肯招。当晚将顺、完等宗族二百余口，皆斩于市。',
 			jsp_guanyu:'关羽，字云长。曾水淹七军、擒于禁、斩庞德、威震华夏，吓得曹操差点迁都躲避，但是东吴偷袭荆州，关羽兵败被害。后传说吕蒙因关羽之魂索命而死。',
+			liuling:'刘伶（约221年-约300年），字伯伦，西晋沛国（治今安徽濉溪县西北）人，竹林七贤之一，中国魏晋时期作家，名士。<br>刘伶自幼便失去了父爱，因其父亲身材矮小，及至长大成人后，刘伶身高也不过六尺。魏齐王曹芳正始之末（249年），刘伶已成为当世名重一时的名士，并且常与嵇康、阮籍、阮咸集会于山阳竹林之下，饮酒赋诗，弹琴作歌。晋武帝司马炎泰始初年（265年）前后，曾做过一段时间的建威参军，不久朝廷下诏，入宫中策问。他大谈老庄，强调无为而治，非但没有得到重用，反而连参军之职也被罢免了，从此再无仕进。晋惠帝司马衷永康元年（300年）前后，以寿而终。<br>刘伶有“品酒第一人”的美称，也被酒行业传颂至今，后人以古瀑河边上的井水酿酒，还取刘伶墓地的黄土垒成窖池酿酒，为了纪念刘伶，当地百姓也将“润泉涌”更名为“刘伶醉”。其传世作品仅有《酒德颂》《北芒客舍》两篇，其中《酒德颂》所表现出的藐视一切存在的气概，敌视礼教之士的反抗精神，既高扬了人格的力量，批判了当时的黑暗政治，同时也抒发了压抑的愤世之情，充满了浪漫色彩，气魄豪迈，用辞又骈偶间行，有无意追求而自至的特点，对后代影响极大。',
 		},
 		characterTitle:{
 			chunyuqiong:'#b对决限定武将',
@@ -10798,6 +10888,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjuexiang_info:'当你死亡时，杀死你的角色弃置其装备区内的所有牌并失去1点体力，然后你可以令一名其他角色获得〖残韵〗。',
 			dccanyun:'残韵',
 			dccanyun_info:'每名角色限一次。出牌阶段，你可以弃置一张牌并选择一名其他角色，然后若其装备区里的牌数：小于你，其回复1点体力；大于你，其失去1点体力；等于你，其摸一张牌。若你的体力值为1，你摸一张牌。',
+			mp_liuling:'刘伶',
+			mpjiusong:'酒颂',
+			mpjiusong_info:'当一名角色使用【酒】时，你获得1枚“醉”标记（“醉”数至多为3）。',
+			mpmaotao:'酕醄',
+			mpmaotao_info:'当其他角色使用牌指定唯一目标时，你可以移去1枚“醉”，令此牌的目标改为随机一名合法角色（无距离限制）。若目标角色与原目标相同，你从牌堆中获得一张【酒】。',
+			mpbishi:'避世',
+			mpbishi_info:'锁定技。你不能成为伤害类锦囊牌的目标。',
 			star_caoren:'星曹仁',
 			star_caoren_prefix:'星',
 			starsujun:'肃军',
@@ -10834,6 +10931,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_danqi:'千里单骑',
 			sp_star:'将星系列',
 			sp_decade:'其他新服武将',
+			mini_qixian:'小程序·竹林七贤',
 		},
 		pinyins:{
 			卑弥呼:['Himiko']
