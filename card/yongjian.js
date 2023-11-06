@@ -561,13 +561,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						prompt:'是否发动【赠毒】？',
 						prompt2:'将本次获得的【毒】交给其他角色',
 						ai1:function(card){
-     var player = _status.event.player;
-							if(player.hasSkillTag("usedu")||get.effect(player,{name: "losehp"}, player, player)>0) return 0;
+							var player=get.player();
+							if(['usedu','keepdu'].some(tag=>player.hasSkillTag(tag))||get.effect(player,{name:"losehp"},player,player)>0) return 0;
 							if(!ui.selected.cards.length) return 1;
 							return 0;
 						},
 						ai2:function(target){
-							if (target.hasSkillTag("usedu")) return get.attitude(_status.event.player,target)-0.01;
+							if(['usedu','keepdu'].some(tag=>target.hasSkillTag(tag))) return get.attitude(_status.event.player,target)-0.01;
 							return -get.attitude(_status.event.player,target)+0.01;
 						},
 					});

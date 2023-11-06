@@ -982,6 +982,7 @@ window.noname_character_rank={
 		'jsrg_zhangchu',
 		'ol_dingshangwan',
 		'ol_liwan',
+		'chengjichengcui',
 	],
 	b:[
 		'diy_feishi',
