@@ -1526,7 +1526,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return _status.event.targets.contains(target);
 						}).set('targets',game.filterPlayer(current=>{
 							if(type=='equip') return current.canEquip(card);
-							if(type=='delay') return current.canAddJudge(card);
+							if(type=='delay') return !current.storage._disableJudge&&!current.hasJudge(card.name);
 							return false;
 						})).set('ai',target=>{
 							var player=_status.event.player;
