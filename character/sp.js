@@ -25218,7 +25218,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jin_simazhao:['jin_simazhao','simazhao','sp_simazhao'],
 			jin_wangyuanji:['jin_wangyuanji','wangyuanji','sp_wangyuanji'],
 			wangyun:['wangyun','dc_wangyun','re_wangyun','jsrg_wangyun','old_wangyun','pe_wangyun'],
-			zhangliang:['re_zhangliang','zhangliang'],
+			zhangliang:['xin_zhangliang','re_zhangliang','zhangliang'],
 			lingju:['lingju','old_lingju'],
 			guansuo:['guansuo','dc_guansuo'],
 			zhangxingcai:['zhangxingcai','old_zhangxingcai'],
@@ -25260,6 +25260,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_pengyang:['ol_pengyang','sp_pengyang'],
 			ol_luyusheng:['ol_luyusheng','luyusheng'],
 			fanjiangzhangda:['fanjiangzhangda','jsrg_fanjiangzhangda'],
+			simalang:['re_simalang','simalang'],
+			zhugedan:['re_zhugedan','zhugedan'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
