@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
 			//dc_fuwan:['male','qun',4,['dcmoukui']],
 			guānning:['male','shu',3,['dcxiuwen','dclongsong']],
-			sunhuan:['male','wu',4,['dcniji'],['unseen']],
+			sunhuan:['male','wu',4,['dcniji']],
 			sunlang:['male','shu',4,['dctingxian','dcbenshi']],
 			shiyi:['male','wu',3,['dccuichuan','dczhengxu']],
 			dc_hujinding:['female','shu','3/6',['dcdeshi','dcwuyuan','huaizi']],

@@ -32,7 +32,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baoxin:['male','qun',4,['mutao','yimou'],['character:tw_baoxin','die_audio:tw_baoxin']],
 			jiangji:['male','wei',3,['twjichou','jilun'],['character:tw_jiangji','die_audio:tw_jiangji']],
 			liwei:['male','shu',4,['jiaohua'],['character:tw_liwei','die:tw_liwei']],
-			laimin:['male','shu',3,['laishou','luanqun'],['unseen']],
+			laimin:['male','shu',3,['laishou','luanqun']],
 			yj_zhoubuyi:['male','wei',3,['mbhuiyao','mbquesong']],
 			xin_guozhao:['female','wei',3,['yichong','wufei']],
 			xin_zhangyi:['male','shu',4,['xinwurong','shizhi']],
