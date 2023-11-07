@@ -7764,7 +7764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangzhong:['re_huangzhong','ol_huangzhong','sb_huangzhong','huangzhong','jsrg_huangzhong'],
 			weiyan:['re_weiyan','ol_weiyan','weiyan'],
 			zhoutai:['zhoutai','xin_zhoutai','old_zhoutai'],
-			xiaoqiao:['xiaoqiao','ol_xiaoqiao','re_xiaoqiao','old_xiaoqiao'],
+			xiaoqiao:['xiaoqiao','ol_xiaoqiao','re_xiaoqiao','sb_xiaoqiao','old_xiaoqiao'],
 			yuji:['xin_yuji','re_yuji','yuji'],
 			zhangjiao:['sp_zhangjiao','re_zhangjiao','sb_zhangjiao','zhangjiao'],
 			dianwei:['dianwei','ol_dianwei','re_dianwei'],
@@ -7797,7 +7797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugezhan:['zhugezhan','old_zhugezhan'],
 			ol_lusu:['re_lusu','ol_lusu'],
 			zhanghe:['zhanghe','re_zhanghe','sb_zhanghe'],
-			yl_luzhi:['yl_luzhi','tw_yl_luzhi'],
+			yl_luzhi:['yl_luzhi','sb_yl_luzhi','tw_yl_luzhi'],
 			sunliang:['sunliang','xin_sunliang'],
 		},
 		translate:{
