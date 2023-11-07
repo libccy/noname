@@ -435,6 +435,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						evt.finish();
 						evt._triggered=null;
+						if(evt.name.startsWith('pre_')){
+							var evtx=evt.getParent();
+							evtx.finish();
+							evtx._triggered=null;
+						}
 						var nexts=trigger.next.slice();
 						for(var next of nexts){
 							if(next.name=='judgeCallback') trigger.next.remove(next);

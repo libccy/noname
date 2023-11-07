@@ -3167,7 +3167,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return x/num;
 					}
 					var real=get.realAttitude(from,to),zhibi=from.storage.zhibi,stratagem_expose=from.storage.stratagem_expose,followCamouflage=true;
-					if(to.ai.shown) return to.ai.shown*(real+(from.identity==to.identity||from.identity=='zhu'&&to.identity=='zhong'||from.identity=='zhong'&&to.identity=='zhu'||(to.identity=='nei'&&get.situation()<=0&&['zhu','zhong'].contains(from.identity)||get.situation()>=3&&from.identity=='fan')?3:-3))
+					if(to.ai.shown) return to.ai.shown*(real+(from.identity==to.identity||from.identity=='zhu'&&to.identity=='zhong'||from.identity=='zhong'&&to.identity=='zhu'||from.identity=='nei'&&to.identity=='zhu'&&get.situation()<=1||(to.identity=='nei'&&get.situation()<=0&&['zhu','zhong'].contains(from.identity)||get.situation()>=3&&from.identity=='fan')?2.9:-2.9))
 					if(from==to||to.identityShown||((stratagem_expose&&stratagem_expose.contains(to))||(zhibi&&zhibi.contains(to)))&&!to.ai.stratagemCamouflage) return real*1.1;
 					if(from.identity=='nei'&&to.ai.stratagemCamouflage) return real*1.1;
 					if(to.identity=='nei'){

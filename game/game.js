@@ -16234,6 +16234,9 @@
 					'step 4'
 					player.$compareMultiple(event.card1,targets,cards);
 					game.log(player,'的拼点牌为',event.card1);
+					event.cardlist.forEach((card,index)=>{
+						game.log(targets[index],'的拼点牌为',card);
+					});
 					player.animate('target');
 					game.delay(0,1000);
 					'step 5'
@@ -16245,7 +16248,6 @@
 						event.target.animate('target');
 						event.card2=event.cardlist[event.iwhile];
 						event.num2=event.getNum(event.card2);
-						game.log(event.target,'的拼点牌为',event.card2);
 						//event.tempplayer.line(event.target);
 						delete event.player;
 						event.trigger('compare');
@@ -58225,6 +58227,26 @@
 	};
 	const get={
 		/**
+		 * 返回 VCard[] 形式的所有牌，用于印卡将遍历
+		 * @param {Function} filter
+		 * @returns {string[][]}
+		 */
+		inpileVCardList:filter=>{
+			let list=[];
+			for(const name of lib.inpile){
+				const type=get.type(name);
+				const info=[type,'',name];
+				if(!filter||filter(info)) list.push(info);
+				if(name=='sha'){
+					for(const nature of lib.inpile_nature){
+						const info=[type,'',name,nature];
+						if(!filter||filter(info)) list.push(info);
+					}
+				}
+			}
+			return list;
+		},
+		/**
 		 * 根据座次数n（从0开始）获取对应的“n+1号位”翻译
 		 * @param {number} seat
 		 */
@@ -58479,6 +58501,38 @@
 			return 0;
 		},
 		is:{
+			/**
+			 * 判断是否为进攻坐骑
+			 * @param {Card | VCard} card
+			 * @param {false | Player} [player]
+			 * @returns {boolean}
+			 */
+			attackingMount:(card,player)=>{
+				const subtype=get.subtype(card,player);
+				if(subtype=='equip4') return true;
+				else if(subtype=='equip6'){
+					const info=get.info(card,player),distance=info.distance;
+					if(!distance) return false;
+					if(distance.globalFrom&&!info.notMount) return true;
+				}
+				return false;
+			},
+			/**
+			 * 判断是否为防御坐骑
+			 * @param {Card | VCard} card
+			 * @param {false | Player} [player]
+			 * @returns {boolean}
+			 */
+			defendingMount:(card,player)=>{
+				const subtype=get.subtype(card,player);
+				if(subtype=='equip3') return true;
+				else if(subtype=='equip6'){
+					const info=get.info(card,player),distance=info.distance;
+					if(!distance) return false;
+					if(distance.globalTo&&!info.notMount) return true;
+				}
+				return false;
+			},
 			/**
 			 * 判断坐骑栏是否被合并
 			 */
