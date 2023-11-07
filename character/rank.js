@@ -1496,6 +1496,7 @@ window.noname_character_rank={
 		'huanfan',
 		'jsrg_xugong',
 		'old_xiaoqiao',
+		'old_guanyu',
 	],
 	c:[
 		'xiahoudun',
