@@ -8577,7 +8577,7 @@
 							else src=`image/${type}/${subfolder}/${name}${ext}`;
 						}
 						else src=`image/${name}${ext}`;
-						return new Promise((resolve,reject)=>{
+						new Promise((resolve,reject)=>{
 							const image=new Image();
 							image.src=`${lib.assetURL}${src}`;
 							image.onload=resolve;
@@ -8607,6 +8607,7 @@
 							this.style.backgroundPositionX='center';
 							this.style.backgroundSize='cover';
 						}));
+						return this;
 					}
 				});
 				HTMLDivElement.prototype.setBackgroundDB=function(img){
