@@ -238,7 +238,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip5',
-				loseDelay:false,
 				skills:['tianjitu_skill'],
 				onLose:function(){
 					player.addTempSkill('tianjitu_skill_lose')

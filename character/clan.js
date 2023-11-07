@@ -210,7 +210,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								list.push([get.translation(get.type(name)),'',name]);
 								if(name=='sha'){
 									for(var nature of lib.inpile_nature){
-										if(!player.canUse(get.autoViewAs({name:name,nature,nature},[]),target)) continue;
+										if(!player.canUse(get.autoViewAs({name:name,nature:nature},[]),target)) continue;
 										list.push([get.translation(get.type(name)),'',name,nature]);
 									}
 								}

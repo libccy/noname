@@ -526,7 +526,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var skill={
 							viewAs:{
 								name:links[0][2],
-								isCard:true,
 								suit:'none',
 								number:null,
 								isCard:true,
@@ -1697,7 +1696,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dddxunxun:{
 				inherit:"xunxun",
-				audio:"ext:3D8测试包:2",
+				audio:2,
 			},
 			dddfusi:{
 				mod:{
@@ -3381,7 +3380,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//轲比能
 			dddxiaoxing:{
 				audio:2,
-				forced:true,
 				trigger:{global:'gameDrawBegin'},
 				forced:true,
 				group:'dddxiaoxing_remove',
