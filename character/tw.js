@@ -14579,6 +14579,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiangji:['tw_jiangji','jiangji'],
 			baoxin:['tw_baoxin','baoxin'],
 			yanxiang:['yanxiang','tw_yanxiang'],
+			liwei:['liwei','tw_liwei'],
 		},
 		dynamicTranslate:{
 			twfeifu:function(player){
