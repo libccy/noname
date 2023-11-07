@@ -793,6 +793,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('mashu');
 					player.addSkill('dcnuchen');
 					player.awakenSkill('dcdanji');
+				},
+				ai:{
+					maixie:true,
+					skillTagFilter:(player,tag,arg)=>{
+						if(tag==='maixie') return player.hp>=2&&!player.storage.dcdanji&&!player.hasSkill('dcnuchen')&&player.countCards('h')===player.hp;
+					},
+					effect:{
+						target:(card,player,target)=>{
+							let hs=target.countCards('h');
+							if(target.hp<3||target.storage.dcdanji||target.hasSkill('dcnuchen')||hs>target.hp+1) return;
+							if(get.tag(card,'draw')) return 1.6;
+							if(get.tag(card,'lose')||get.tag(card,'discard')) return [1,-0.8];
+							if(hs===target.hp&&get.tag(card,'damage')) return [1,target.hp/3];
+							if(hs>target.hp&&target.hp>3&&(card.name==='shan'||card.name==='wuxie')) return 'zeroplayertarget';
+						}
+					}
 				}
 			},
 			dcnuchen:{

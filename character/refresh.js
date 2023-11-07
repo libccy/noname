@@ -4416,6 +4416,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countMark('redanxin')<2) player.addMark('redanxin',1,false);
 				},
 				intro:{content:'当前升级等级。：Lv#'},
+				ai:{
+					maixie:true,
+					effect:{
+						target:(card,player,target)=>{
+							if(!get.tag(card,'damage')) return;
+							if(target.hp<2&&target.countCards('hs')<3||player.hasSkillTag('jueqing',false,target)) return -2;
+							if(target.countMark('redanxin')>1) return [1,1];
+							return [1,Math.min(3.2,0.8*target.hp)];
+						}
+					}
+				}
 			},
 			//马岱
 			reqianxi:{
