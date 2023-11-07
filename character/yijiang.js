@@ -3304,7 +3304,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					'step 0'
-					player.chooseTarget(get.prompt2('rezhenjun')).ai=function(target){
+					player.chooseTarget(get.prompt2('rezhenjun'),(card,player,target)=>{
+						return target.countCards('he');
+					}).ai=function(target){
 						return -get.attitude(_status.event.player,target)*(target.countCards('e')+1);
 					};
 					'step 1'
@@ -6120,6 +6122,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(player,'更改了','【矫诏】','的描述');
 						player.popup('更改描述');
 						player.addMark('xindanxin',1,false);
+					}
+				},
+				ai:{
+					maixie:true,
+					effect:{
+						target:(card,player,target)=>{
+							if(!get.tag(card,'damage')) return;
+							if(target.hp<2||player.hasSkillTag('jueqing',false,target)) return -1.5;
+							return [1,1];
+						}
 					}
 				}
 			},
