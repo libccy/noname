@@ -21849,12 +21849,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			moukui:{
+				audio:2,
+				audioname:['sp_mushun'],
 				trigger:{player:'useCardToPlayered'},
 				direct:true,
 				filter:function(event,player){
 					return event.card.name=='sha';
 				},
-				audio:2,
 				content:function(){
 					"step 0"
 					var controls=['draw_card'];
@@ -24247,7 +24248,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xionghuo:{
 				marktext:"戾",
-				mark:true,
 				intro:{
 					name:'暴戾',
 					content:"mark",

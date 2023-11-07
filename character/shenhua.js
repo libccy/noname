@@ -1117,17 +1117,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					switch(result.control){
 						case 'equip1':
-							player.addTempSkill('drlt_jueyan1',{player:'phaseAfter'});
+							player.addTempSkill('drlt_jueyan1');
 							break;
 						case 'equip2':
 							player.draw(3);
-							player.addTempSkill('drlt_jueyan3',{player:'phaseAfter'});
+							player.addTempSkill('drlt_jueyan3');
 							break;
 						case 'equip3_4':
-							player.addTempSkill('drlt_jueyan2',{player:'phaseAfter'});
+							player.addTempSkill('drlt_jueyan2');
 							break;
 						case 'equip5':
-							player.addTempSkill('rejizhi',{player:'phaseAfter'});
+							player.addTempSkill('rejizhi');
 							break;
 					}
 				},
@@ -1146,6 +1146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				derivation:'rejizhi',
 			},
 			'drlt_jueyan1':{
 				mod:{
@@ -7457,7 +7458,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinfu_guhuo:{
 				audio:'guhuo_guess',
 				derivation:['chanyuan'],
-				group:['guhuo_guess'],
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
 					return (lib.inpile.contains(name)&&player.countCards('hs')>0&&!player.hasSkill('guhuo_phase'));
@@ -7553,6 +7553,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							precontent:function(){
 								player.logSkill('xinfu_guhuo');
+								player.addTempSkill('guhuo_guess');
 								var card=event.result.cards[0];
 								event.result.card.suit=get.suit(card);
 								event.result.card.number=get.number(card);
@@ -7708,22 +7709,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			chanyuan:{
 				init:function(player,skill){
+					if(player.hp==1) player.logSkill(skill);
 					player.addSkillBlocker(skill);
 				},
 				onremove:function(player,skill){
 					player.removeSkillBlocker(skill);
 				},
-				charlotte:true,
-				locked:true,
 				skillBlocker:function(skill,player){
 					return skill!='chanyuan'&&skill!='rechanyuan'&&!lib.skill[skill].charlotte&&player.hp==1;
 				},
-				audio:2,
-				trigger:{player:'changeHp'},
-				filter:function(event,player){
-					return event.num<0&&player.hp==1;
-				},
-				content:function(){},
 				mark:true,
 				intro:{
 					content:function(storage,player,skill){
@@ -7733,8 +7727,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						if(list.length) str+=('<br><li>失效技能：'+get.translation(list))
 						return str;
-					}
-				}
+					},
+				},
+				audio:2,
+				trigger:{player:'changeHp'},
+				filter:function(event,player){
+					return player.hp==1;
+				},
+				forced:true,
+				content:function(){},
 			},
 			guhuo_phase:{},
 		},
@@ -7873,6 +7874,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			drlt_wanglie:"往烈",
 			drlt_wanglie_info:"①出牌阶段，你使用的第一张牌无距离限制。②当你于出牌阶段内使用牌时，你可以令此牌不能被响应，然后你于本阶段内不能再使用牌。",
 			"drlt_xiongluan":"雄乱",
+			drlt_xiongluan1:'雄乱',
 			"drlt_xiongluan_info":"限定技，出牌阶段，你可以废除你的判定区和装备区，然后指定一名其他角色。直到回合结束，你对其使用牌无距离和次数限制，其不能使用和打出手牌。",
 			"drlt_congjian":"从谏",
 			"drlt_congjian_info":"当你成为锦囊牌的目标时，若此牌的目标数大于1，则你可以交给其中一名其他目标角色一张牌，然后摸一张牌，若你给出的是装备牌，改为摸两张牌。",

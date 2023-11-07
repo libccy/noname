@@ -4739,7 +4739,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xingtu:{
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					var num1=get.number(event.card),num2=player.storage.xingtu;
+					var evt=lib.skill.dcjianying.getLastUsed(player,event);
+					if(!evt||!evt.card) return false;
+					var num1=get.number(event.card),num2=get.number(evt.card);
 					return typeof num1=='number'&&typeof num2=='number'&&num2%num1==0;
 				},
 				forced:true,
@@ -4748,29 +4750,73 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					cardUsable:function(card,player){
-						var num1=get.number(card),num2=player.storage.xingtu;
-						if(typeof num1=='number'&&typeof num2=='number'&&num1%num2==0) return Infinity;
+						if(typeof card=='object'){
+							var evt=lib.skill.dcjianying.getLastUsed(player);
+							if(!evt||!evt.card) return;
+							var num1=get.number(card),num2=get.number(evt.card);
+							if(typeof num1=='number'&&typeof num2=='number'&&num1%num2==0) return Infinity;
+						}
 					},
 					aiOrder:function(player,card,num){
-						var num1=get.number(card),num2=player.storage.xingtu;
-						if(typeof num1=='number'&&typeof num2=='number'&&num2%num1==0) return num+5;
+						if(typeof card=='object'){
+							var evt=lib.skill.dcjianying.getLastUsed(player);
+							if(!evt||!evt.card) return;
+							var num1=get.number(card),num2=num2=get.number(evt.card);
+							if(typeof num1=='number'&&typeof num2=='number'&&num2%num1==0) return num+5;
+						}
 					},
 				},
-				group:'xingtu_record',
-				intro:{
-					content:'当前记录：X=#',
+				init:function(player){
+					player.addSkill('xingtu_mark');
+					var history=player.getAllHistory('useCard');
+					if(history.length){
+						var trigger=history[history.length-1],num=get.number(trigger.card);
+						player.storage.xingtu_mark=num;
+						player[typeof num!='number'?'unmarkSkill':'markSkill']('xingtu_mark');
+					}
+				},
+				onremove:function(player){
+					player.removeSkill('xingtu_mark');
+					player.removeGaintag('xingtu1');
+					player.removeGaintag('xingtu2');
+					delete player.storage.xingtu_mark;
 				},
 				subSkill:{
-					record:{
-						trigger:{player:'useCardAfter'},
-						forced:true,
-						filter:function(event,player){
-							return typeof get.number(event.card)=='number';
+					mark:{
+						charlotte:true,
+						trigger:{
+							player:['useCard1','gainAfter'],
+							global:'loseAsyncAfter',
 						},
+						filter:function(event,player,name){
+							if(!player.countCards('h')) return false;
+							return name=='useCard1'||event.getg(player).length;
+						},
+						direct:true,
+						firstDo:true,
 						content:function(){
-							player.storage.xingtu=get.number(trigger.card);
-							player.markSkill('xingtu');
+							'step 0'
+							player.removeGaintag('xingtu1');
+							player.removeGaintag('xingtu2');
+							if(event.triggername=='useCard1'){
+								var num=get.number(trigger.card,player);
+								player.storage.xingtu_mark=num;
+								player[typeof num!='number'?'unmarkSkill':'markSkill']('xingtu_mark');
+								if(typeof num!='number') event.finish();
+							}
+							'step 1'
+							var cards1=[],cards2=[],num=player.storage.xingtu_mark;
+							player.getCards('h').forEach(card=>{
+								var numx=get.number(card,player);
+								if(typeof numx=='number'){
+									if(numx%num==0) cards1.push(card);
+									if(num%numx==0) cards2.push(card);
+								}
+							});
+							player.addGaintag(cards1,'xingtu1');
+							player.addGaintag(cards2,'xingtu2');
 						},
+						intro:{content:'上一张牌的点数：#'},
 					},
 				},
 			},
@@ -4784,7 +4830,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectCard:[2,Infinity],
 				check:function(card){
 					if(ui.selected.cards.length>1) return 0;
-					return 4-get.value(card);
+					var player=_status.event.player;
+					if(player.hasSkill('xingtu')&&player.storage.xingtu){
+						var cards=player.getCards('he');
+						var num=player.storage.xingtu,stop=false;
+						for(var i=0;i<=cards.length;i++){
+							if(i!=cards.length){
+								var num1=get.number(cards[i],player);
+								if(typeof num1!='number') continue;
+								for(var j=0;j<cards.length;j++){
+									if(i==j) continue;
+									var num2=get.number(cards[j],player);
+									if(typeof num2!='number') continue;
+									var sum=num1+num2;
+									if(sum%num==0||num%sum==0){
+										stop=true;
+										break;
+									}
+								}
+								if(stop) break;
+							}
+						}
+						if(i!=cards.length){
+							var cardx=[cards[i],cards[j]];
+							if(cardx.includes(card)) return 10-get.value(card);
+						}
+					}
+					return 5-get.value(card);
 				},
 				content:function(){
 					var num=0;
@@ -15272,9 +15344,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_gaoshun_prefix:'手杀界',
 			peixiu:'裴秀',
 			xingtu:'行图',
-			xingtu_info:'锁定技。①当你使用有点数的牌结算结束后，你将此牌点数记录为X。②当你使用牌时，若X÷Y的余数为0，则你摸一张牌（Y为此牌的点数）。③你使用Y÷X的余数为0的牌无次数限制（Y为此牌的点数）。',
+			xingtu1:'倍数',
+			xingtu2:'约数',
+			xingtu_info:'锁定技。你使用点数为X的倍数的牌无次数限制，你使用点数为X的约数的牌时摸一张牌（X为你本局游戏使用的上一张牌的点数）。',
 			juezhi:'爵制',
-			juezhi_info:'出牌阶段，你可以弃置至少两张牌，然后从牌堆中获得一张点数为X的牌（X为这些牌的点数和除以13后的余数，且当余数为0时X为13）。',
+			juezhi_info:'出牌阶段，你可以弃置至少两张牌，然后从牌堆中获得一张点数为Y的牌（Y为这些牌的点数和对13取余，余数为0时Y取13）。',
 			sp_jianggan:'手杀蒋干',
 			sp_jianggan_prefix:'手杀',
 			spdaoshu:'盗书',

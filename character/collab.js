@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_fuhuanghou:['female','qun',3,['spcangni','spmixin']],
 			sp_fuwan:['male','qun',3,['spfengyin','spchizhong']],
 			old_lingju:['female','qun',3,['jieyuan','fenxin_old']],
-			sp_mushun:['male','qun',4,['dcmoukui']],
+			sp_mushun:['male','qun',4,['moukui']],
 		},
 		characterFilter:{
 			old_lingju:function(mode){
@@ -598,31 +598,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
-				content_old:function(){
-					'step 0'
-					if(lib.skill.dcshixian.filterx(trigger)){
-						player.chooseControl('cancel2').set('choiceList',[
-							'摸一张牌',
-							'令'+get.translation(trigger.card)+'额外结算一次',
-						]).set('prompt',get.prompt('dcsitian'));
+				init:function(player){
+					player.addSkill('dcshixian_yayun');
+					var history=player.getAllHistory('useCard');
+					if(history.length){
+						player.addGaintag(player.getCards('h',card=>{
+							return get.is.yayun(get.translation(card.name),get.translation(history[history.length-1].card.name));
+						}),'dcshixian_yayun');
 					}
-					else{
-						player.chooseBool('是否发动【诗仙】摸一张牌？').set('frequentSkill','dcshixian');
-					}
-					'step 1'
-					if(result.control){
-						if(result.index==0){
-							player.logSkill('dcshixian');
-							player.draw();
-						}
-						else if(result.index==1){
-							trigger.effectCount++;
-						}
-					}
-					else if(result.bool){
-						player.logSkill('dcshixian');
-						player.draw();
-					}
+				},
+				onremove:function(player){
+					player.removeSkill('dcshixian_yayun');
+					player.removeGaintag('dcshixian_yayun');
+				},
+				subSkill:{
+					yayun:{
+						charlotte:true,
+						trigger:{player:'useCard1'},
+						filter:function(event,player){
+							return player.countCards('h');
+						},
+						direct:true,
+						priority:11+45+14+19+19+810,
+						content:function(){
+							'step 0'
+							player.removeGaintag('dcshixian_yayun');
+							'step 1'
+							player.addGaintag(player.getCards('h',card=>{
+								return get.is.yayun(get.translation(card.name),get.translation(trigger.card.name));
+							}),'dcshixian_yayun');
+						},
+					},
 				},
 			},
 			//龙王
@@ -1281,9 +1287,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseDrawRecover('###'+get.prompt('spcangni')+'###摸两张牌或回复1点体力，然后将武将牌翻面',2).set('ai',function(){
-						return 'cancel2';
-					}).logSkill='spcangni';
+					player.chooseDrawRecover('###'+get.prompt('spcangni')+'###摸两张牌或回复1点体力，然后将武将牌翻面',2).logSkill='spcangni';
 					'step 1'
 					if(result.control!='cancel2') player.turnOver();
 				},
@@ -1566,6 +1570,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclbjiuxian:'酒仙',
 			dclbjiuxian_info:'①你可以将额定目标数大于1的锦囊牌当做【酒】使用。②你使用【酒】无次数限制。',
 			dcshixian:'诗仙',
+			dcshixian_yayun:'押韵',
 			dcshixian_info:'当你使用一张牌时，若此牌的牌名与你于本局游戏使用的上一张牌的牌名押韵，则你可以摸一张牌，并令此牌额外结算一次。',
 			taoshen:'涛神',
 			dcnutao:'怒涛',

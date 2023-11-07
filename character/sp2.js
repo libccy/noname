@@ -3805,7 +3805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:1,
 					},
 				},
-				derivation:['releiji','rebiyue','new_retuxi','mingce','xinzhiyan','nhyinbing','nhhuoqi','nhguizhu','nhxianshou','nhlundao','nhguanyue','nhyanzheng'],
+				derivation:['releiji','rebiyue','new_retuxi','remingce','xinzhiyan','nhyinbing','nhhuoqi','nhguizhu','nhxianshou','nhlundao','nhguanyue','nhyanzheng'],
 				subSkill:{
 					clear:{
 						onremove:function(player){

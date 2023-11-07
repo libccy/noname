@@ -4989,7 +4989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					maixie:true,
 					maixie_hp:true,
 					combo:'sbaiyin',
-					/*effect:{
+					effect:{
 						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 							if(get.tag(card,'damage')){
@@ -5013,7 +5013,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 'zeroplayertarget';
 							}
 						}
-					}*/
+					}
 				}
 			},
 			renjie2:{
@@ -5030,7 +5030,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.addMark('renjie',trigger.getl(player).cards2.length);
-				}
+				},
 			},
 			sbaiyin:{
 				skillAnimation:'epic',
@@ -5048,11 +5048,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('jilue');
 					player.awakenSkill('sbaiyin');
 				},
-				derivation:'jilue',
+				derivation:['jilue','reguicai','fangzhu','rejizhi','rezhiheng','rewansha'],
 			},
 			jilue:{
 				unique:true,
-				group:['jilue_guicai','jilue_fangzhu','jilue_wansha','jilue_zhiheng','jilue_jizhi','jilue_jizhi_clear']
+				group:['jilue_guicai','jilue_fangzhu','jilue_wansha','jilue_zhiheng','jilue_jizhi'],
 			},
 			jilue_guicai:{
 				audio:1,
@@ -5253,7 +5253,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					skillTagFilter:function(player,tag,arg){
 						if(tag==='nokeep') return player.isPhaseUsing()&&!player.getStat().skill.jilue_zhiheng&&player.hasCard((card)=>get.name(card)!=='tao','h');
 					},
-					threaten:1.5
 				},
 			},
 			jilue_jizhi:{
@@ -5261,9 +5260,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				filter:function(event,player){
 					return (get.type(event.card,'trick')=='trick'&&event.card.isCard&&player.hasMark('renjie'));
-				},
-				init:function(player){
-					player.storage.jilue_jizhi=0;
 				},
 				content:function(){
 					'step 0'
@@ -5279,33 +5275,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						player.discard(event.card);
-						player.storage.jilue_jizhi++;
-						if(_status.currentPhase==player){
-							player.markSkill('jilue_jizhi');
-						}
+						player.addTempSkill('jilue_jizhi_clear');
+						player.addMark('jilue_jizhi_clear',1,false);
 					}
-				},
-				ai:{
-					threaten:1.4
-				},
-				mod:{
-					maxHandcard:function(player,num){
-						return num+player.storage.jilue_jizhi;
-					}
-				},
-				intro:{
-					content:'本回合手牌上限+#',
 				},
 				subSkill:{
 					clear:{
-						trigger:{global:'phaseAfter'},
-						silent:true,
-						content:function(){
-							player.storage.jilue_jizhi=0;
-							player.unmarkSkill('jilue_jizhi');
-						}
-					}
-				}
+						charlotte:true,
+						onremove:true,
+						mod:{
+							maxHandcard:function(player,num){
+								return num+player.countMark('jilue_jizhi_clear');
+							},
+						},
+						intro:{content:'手牌上限+#'},
+					},
+				},
 			},
 			wushen:{
 				mod:{
