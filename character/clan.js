@@ -208,6 +208,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(name=='sha'&&get.type(trigger.card.name)!='trick') continue;
 								if(!player.canUse(get.autoViewAs({name:name},[]),target)) continue;
 								list.push([get.translation(get.type(name)),'',name]);
+								if(name=='sha'){
+									for(var nature of lib.inpile_nature){
+										if(!player.canUse(get.autoViewAs({name:name,nature:nature},[]),target)) continue;
+										list.push([get.translation(get.type(name)),'',name,nature]);
+									}
+								}
 							}
 							if(!list.length) event.goto(3);
 							else{
