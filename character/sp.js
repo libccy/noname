@@ -19625,6 +19625,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('mashu');
 					player.addSkill('nuzhan');
 					player.awakenSkill('danji');
+				},
+				ai:{
+					maixie:true,
+					skillTagFilter:(player,tag,arg)=>{
+						if(tag==='maixie'){
+							if(player.hp<2||player.storage.danji||player.hasSkill('nuzhan')||player.countCards('h')!==player.hp) return false;
+							let zhu=get.zhu(player);
+							if(zhu&&zhu.isZhu){
+								let name=zhu.name;
+								while(name.indexOf('_')!==-1){
+									name=name.slice(name.indexOf('_')+1);
+								}
+								if(name.indexOf('liubei')==0) return false;
+							}
+							return true;
+						}
+					},
+					effect:{
+						target:(card,player,target)=>{
+							let hs=target.countCards('h');
+							if(target.hp<3||target.storage.danji||target.hasSkill('nuzhan')||hs>target.hp+1) return;
+							let zhu=get.zhu(target);
+							if(zhu&&zhu.isZhu){
+								let name=zhu.name;
+								while(name.indexOf('_')!==-1){
+									name=name.slice(name.indexOf('_')+1);
+								}
+								if(name.indexOf('liubei')==0) return;
+							}
+							if(get.tag(card,'draw')) return 1.6;
+							if(get.tag(card,'lose')||get.tag(card,'discard')) return [1,-0.8];
+							if(hs===target.hp&&get.tag(card,'damage')) return [1,target.hp/3];
+							if(hs>target.hp&&target.hp>3&&(card.name==='shan'||card.name==='wuxie')) return 'zeroplayertarget';
+						}
+					}
 				}
 			},
 			nuzhan:{
