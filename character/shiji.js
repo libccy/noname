@@ -435,6 +435,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						evt.finish();
 						evt._triggered=null;
+						if(evt.name.startsWith('pre_')){
+							var evtx=evt.getParent();
+							evtx.finish();
+							evtx._triggered=null;
+						}
 						var nexts=trigger.next.slice();
 						for(var next of nexts){
 							if(next.name=='judgeCallback') trigger.next.remove(next);
@@ -2053,7 +2058,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!list.contains(type)){
 									list.push(type);
 									cards.push(ui.cardPile.childNodes[i])
-								};
+								}
 							}
 							player.gain(cards,'gain2').gaintag.add('zhangming');
 							player.addTempSkill('zhangming_keep');
@@ -4860,7 +4865,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!list.contains(type)){
 							list.push(type);
 							cards.push(ui.cardPile.childNodes[i])
-						};
+						}
 					}
 					player.gain(cards,'gain2');
 				}
@@ -4960,8 +4965,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					onunmark:'throw',
 				},
 				ai:{
-				 order:1,
-				 result:{target:-1},
+					order:1,
+					result:{target:-1},
 				},
 				subSkill:{
 					equip:{
@@ -6286,10 +6291,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							};
 							if(!targets.length){
 								if(get.attitude(player,target)<0){
-								 if(target.countCards('e',function(card){
+									if(target.countCards('e',function(card){
 										return get.value(card,target)<=0;
 									})) return 1;
-								 if(game.hasPlayer(function(current){
+									if(game.hasPlayer(function(current){
 										return current.countCards('h',fh)==target.countCards('h',fh)-2;
 									})) return -2;
 									if(game.hasPlayer(function(current){

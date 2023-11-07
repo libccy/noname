@@ -400,6 +400,52 @@
 				return method;
 			}
 		},
+		handler:{
+			_handlers:{},
+			getHandler:function(name,type){
+				if(!type)type = this.getDefaultHandlerType(name);
+				if(!this._handlers[name])return null;
+				if(!this._handlers[name][type])return null;
+				return this._handlers[name][type];
+			},
+			ensureHandlerList:function(name,type){
+				if(!type)type = this.getDefaultHandlerType(name);
+				if(!this._handlers[name])this._handlers[name] = {};
+				if(!this._handlers[name][type])this._handlers[name][type] = [];
+				return this._handlers[name][type];
+			},
+			removeHandler:function(name,type,func){
+				var list = this.ensureHandlerList(name,type);
+				list.remove(func);
+				if(list.length == 0){
+					delete this._handlers[name][type];
+					if(Object.keys(this._handlers[name]) == 0){
+						delete this._handlers[name];
+					}
+				}
+			},
+			pushHandler:function(name,type){
+				let functions = (typeof type == 'string' ? arguments.slice(2):arguments.slice(1));
+				type = (typeof type == 'string'?type:this.getDefaultHandlerType(name));
+				this.ensureHandlerList(name,type).addArray(functions);
+			},
+			getDefaultHandlerType:(name)=>{
+				return `on${name[0].toUpperCase()}${name.slice(1)}`;
+			},
+			addHandlerToEvent:function(event){
+				if(typeof event.name == 'string'){
+					let handlerMap = this._handlers[event.name];
+					if(handlerMap){
+						Object.keys(handlerMap).forEach((key)=>{
+							let list = handlerMap[key];
+							if(list){
+								list.forEach(handler=>event.pushHandler(key,handler));
+							}
+						});
+					}
+				}
+			}
+		},
 		objectURL:new Map(),
 		hookmap:{},
 		imported:{},
@@ -4982,6 +5028,8 @@
 							map.connect_limit_zhu.hide();
 							map.connect_enhance_zhu.hide();
 							map.connect_double_nei.hide();
+							map.connect_enable_commoner.hide();
+							map.connect_enable_year_limit.show();
 							map.connect_zhong_card.show();
 							map.connect_special_identity.hide();
 							map.connect_double_character.show();
@@ -4992,6 +5040,8 @@
 							map.connect_limit_zhu.hide();
 							map.connect_enhance_zhu.hide();
 							map.connect_double_nei.hide();
+							map.connect_enable_commoner.hide();
+							map.connect_enable_year_limit.show();
 							map.connect_zhong_card.hide();
 							map.connect_special_identity.hide();
 						}
@@ -5000,6 +5050,8 @@
 							map.connect_limit_zhu.hide();
 							map.connect_enhance_zhu.hide();
 							map.connect_double_nei.hide();
+							map.connect_enable_commoner.hide();
+							map.connect_enable_year_limit.hide();
 							map.connect_zhong_card.hide();
 							map.connect_special_identity.hide();
 							map.connect_double_character.hide();
@@ -5009,12 +5061,9 @@
 							map.connect_player_number.show();
 							map.connect_limit_zhu.show();
 							map.connect_enhance_zhu.show();
-							if(config.connect_player_number!='2'){
-								map.connect_double_nei.show();
-							}
-							else{
-								map.connect_double_nei.hide();
-							}
+							map.connect_double_nei[config.connect_player_number!='2'&&!config.connect_enable_commoner?'show':'hide']();
+							map.connect_enable_commoner[config.connect_player_number!='2'&&!config.connect_double_nei?'show':'hide']();
+							map.connect_enable_year_limit.show();
 							map.connect_zhong_card.hide();
 
 							if(config.connect_player_number=='8'){
@@ -5074,6 +5123,15 @@
 							return lib.mode.identity.config.double_nei.intro;
 						}
 					},
+					connect_enable_commoner:{
+						name:'启用平民',
+						init:false,
+						restart:true,
+						frequent:false,
+						get intro(){
+							return lib.mode.identity.config.enable_commoner.intro;
+						}
+					},
 					connect_double_character:{
 						name:'双将模式',
 						init:false,
@@ -5092,6 +5150,15 @@
 						restart:true,
 						frequent:true,
 						intro:'开启后游戏中将增加军师、大将、贼首三个身份'
+					},
+					connect_enable_year_limit:{
+						name:'启用年机制',
+						init:false,
+						restart:true,
+						frequent:false,
+						get intro(){
+							return lib.mode.identity.config.enable_year_limit.intro;
+						}
 					},
 					connect_round_one_use_fury:{
 						name:'开启首轮强化卡牌',
@@ -5137,6 +5204,9 @@
 							map.choice_zhong.hide();
 							map.choice_nei.hide();
 							map.choice_fan.hide();
+							map.enable_commoner.hide();
+							map.choice_commoner.hide();
+							map.enable_year_limit.show();
 							map.ban_identity.hide();
 							map.ban_identity2.hide();
 							map.ban_identity3.hide();
@@ -5172,6 +5242,9 @@
 							map.choice_zhong.show();
 							map.choice_nei.show();
 							map.choice_fan.show();
+							map.enable_commoner.hide();
+							map.choice_commoner.hide();
+							map.enable_year_limit.show();
 							map.ban_identity.show();
 							if(config.ban_identity=='off'){
 								map.ban_identity2.hide();
@@ -5210,6 +5283,9 @@
 							map.choice_zhong.hide();
 							map.choice_nei.hide();
 							map.choice_fan.hide();
+							map.enable_commoner.hide();
+							map.choice_commoner.hide();
+							map.enable_year_limit.hide();
 							map.ban_identity.hide();
 							map.ban_identity2.hide();
 							map.ban_identity3.hide();
@@ -5229,17 +5305,15 @@
 							map.player_number.show();
 							map.enhance_zhu.show();
 							map.auto_identity.show();
-							if(config.player_number!='2'){
-								map.double_nei.show();
-							}
-							else{
-								map.double_nei.hide();
-							}
+							map.double_nei[config.player_number!='2'&&!config.enable_commoner?'show':'hide']();
 							map.choice_zhu.show();
 							map.limit_zhu.show();
 							map.choice_zhong.show();
 							map.choice_nei.show();
 							map.choice_fan.show();
+							map.enable_commoner[config.player_number!='2'&&!config.double_nei?'show':'hide']();
+							map.choice_commoner[config.enable_commoner?'show':'hide']();
+							map.enable_year_limit.show();
 							map.ban_identity.show();
 							if(config.ban_identity=='off'){
 								map.ban_identity2.hide();
@@ -5305,7 +5379,7 @@
 						init:false,
 						restart:true,
 						frequent:true,
-						intro:'若游戏人数不大于8，则开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
+						intro:'若游戏人数不大于9，则开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）'
 					},
 					choose_group:{
 						name:'神武将选择势力',
@@ -5631,6 +5705,33 @@
 							'8':'八',
 							'10':'十',
 						},
+					},
+					enable_commoner:{
+						name:'启用平民',
+						init:false,
+						restart:true,
+						frequent:false,
+						intro:'开启后游戏中将有一个平民（身份）加入游戏。<br>具体规则请查看帮助。',
+					},
+					choice_commoner:{
+						name:'平民候选武将数',
+						init:'4',
+						restart:true,
+						item:{
+							'3':'三',
+							'4':'四',
+							'5':'五',
+							'6':'六',
+							'8':'八',
+							'10':'十',
+						},
+					},
+					enable_year_limit:{
+						name:'启用年机制',
+						init:false,
+						restart:true,
+						frequent:false,
+						intro:'开启后将会加入年机制。<br>年机制的具体规则请查看帮助。',
 					},
 				}
 			},
@@ -6456,7 +6557,7 @@
 								else{
 									lib.codeMirrorReady(node,editor);
 								}
-							};
+							}
 						},
 					},
 					reset_character_three:{
@@ -6548,7 +6649,7 @@
 								else{
 									lib.codeMirrorReady(node,editor);
 								}
-							};
+							}
 						},
 					},
 					reset_character_four:{
@@ -7002,7 +7103,7 @@
 								else{
 									lib.codeMirrorReady(node,editor);
 								}
-							};
+							}
 						},
 					},
 					reset_character:{
@@ -7639,9 +7740,9 @@
 				}else if(newMessage.includes("Invalid regular expression flags")){
 					newMessage="无效的正则表达式的标记";
 				}else if(newMessage.includes("missing ) after argument list")){
-					newMessage="参数列表后面缺少 \')\' (丢失运算符或者转义字符等)";
+					newMessage="参数列表后面缺少 ')' (丢失运算符或者转义字符等)";
 				}else if(newMessage.includes("Invalid shorthand property initializer")){
-					newMessage="在定义一个{}对象时，应该使用\':\'而不是\'=\'";
+					newMessage="在定义一个{}对象时，应该使用':'而不是'='";
 				}else if(newMessage.includes("Missing initializer in const declaration")){
 					newMessage="在使用const定义一个对象时，必须指定初始值";
 				}else if(newMessage.includes("Unexpected number")||newMessage.includes("Unexpected string")){
@@ -7668,11 +7769,11 @@
 				}else if(newMessage.includes("Cannot read property")){
 					messageName=newMessage.replace('TypeError: Cannot read property ', '').replace(' of null', '').replace(' of undefined', '');
 					let ofName=newMessage.slice(newMessage.indexOf(" of ")+4);
-					newMessage="无法读取\'"+ofName+"\'的属性值"+messageName;
+					newMessage="无法读取'"+ofName+"'的属性值"+messageName;
 				}else if(newMessage.includes("Cannot read properties")){
 					messageName=newMessage.slice(newMessage.indexOf("reading '")+9,-2);
 					let ofName=newMessage.slice(newMessage.indexOf(" of ")+4,newMessage.indexOf("(")-1);
-					newMessage="无法读取\'"+ofName+"\'的属性值"+messageName;
+					newMessage="无法读取'"+ofName+"'的属性值"+messageName;
 				}else if(newMessage.includes("Property description must be an object")){
 					messageName=newMessage.replace('TypeError: Property description must be an object: ', '');
 					newMessage=messageName+"是非对象类型的值";
@@ -7685,7 +7786,7 @@
 					messageName=newMessage.slice(newMessage.indexOf('\'')+1);
 					messageName=messageName.slice(0,messageName.indexOf('\''));
 					let obj=newMessage.slice(newMessage.indexOf(messageName)+16);
-					newMessage=obj+"不能添加或修改\'"+messageName+"\'属性，任何 Primitive 值都不允许有property";
+					newMessage=obj+"不能添加或修改'"+messageName+"'属性，任何 Primitive 值都不允许有property";
 				}else if(newMessage.includes("Can't add property")&&newMessage.includes("is not extensible")){
 					newMessage="对象不可添加属性（不可扩展）";
 				}else if(newMessage.includes("Cannot redefine property")){
@@ -7755,10 +7856,10 @@
 					code=node.editor.getValue();
 				}else if(node.textarea){
 					code=node.textarea.value;
-				};
+				}
 				//动态绑定文本
 				if(code.length&&change.origin=="+input" &&
-					/{|}|\s|=|;|:|,|，|。|？|！|\!|\?|&|#|%|@|‘|’|；/.test(change.text[0])==false&&
+					/{|}|\s|=|;|:|,|，|。|？|！|!|\?|&|#|%|@|‘|’|；/.test(change.text[0])==false&&
 					change.text.length==1) {
 					//输入了代码，并且不包括空格，{}，=， ; ， : ， 逗号等，才可以自动提示
 					node.editor.showHint();
@@ -7887,7 +7988,7 @@
 			}
 			function javascriptHint(editor,options){
 				return scriptHint(editor,javascriptKeywords,function(e,cur){return e.getTokenAt(cur);},options);
-			};
+			}
 			//覆盖原本的javascript提示
 			CodeMirror.registerHelper("hint","javascript",javascriptHint);
 			const stringProps=Object.getOwnPropertyNames(String.prototype);
@@ -8081,7 +8182,7 @@
 		run:function(time){
 			lib.status.time=time;
 			for(var i=0;i<lib.updates.length;i++){
-				if(!lib.updates[i].hasOwnProperty('_time')){
+				if(!Object.prototype.hasOwnProperty.call(lib.updates[i], '_time')){
 					lib.updates[i]._time=time;
 				}
 				if(lib.updates[i](time-lib.updates[i]._time-lib.status.delayed)===false){
@@ -8951,7 +9052,7 @@
 					str+=`\n行号: ${line}`;
 					str+=`\n列号: ${column}`;
 					const version=lib.version||'';
-					const reg=/[^\d\.]/;
+					const reg=/[^\d.]/;
 					const match=version.match(reg)!=null;
 					str+='\n'+`${match?'游戏':'无名杀'}版本: ${version||'未知版本'}`;
 					if(match) str+='\n⚠️您使用的游戏代码不是源于libccy/noname无名杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！';
@@ -8990,7 +9091,7 @@
 					}
 					str+='\n-------------';
 					if(typeof line=='number'&&(typeof game.readFile=='function'||location.origin!='file://')){
-						function createShowCode(lines){
+						const createShowCode=function(lines){
 							let showCode='';
 							if(lines.length>=10){ 
 								if(line>4){ 
@@ -11313,7 +11414,7 @@
 				function Legacy(func){
 					//Remove all comments
 					//移除所有注释
-					let str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^\/"'\\\s]*)/mg,'$2').trim();
+					let str=func.toString().replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^/"'\\\s]*)/mg,'$2').trim();
 					//获取第一个 { 后的所有字符
 					str=str.slice(str.indexOf('{')+1);
 					//判断代码中是否有debugger
@@ -11437,6 +11538,7 @@
 								}
 							}
 						}
+						// falls through
 					default:
 						return Legacy(item);
 				}
@@ -11447,7 +11549,7 @@
 				}
 				else if(typeof func=='object'){
 					for(var i in func){
-						if(func.hasOwnProperty(i)){
+						if(Object.prototype.hasOwnProperty.call(func, i)){
 							func[i]=lib.init.eval(func[i]);
 						}
 					}
@@ -14414,7 +14516,7 @@
 							event.finish();
 							return;
 						}
-					};
+					}
 					event.doing=event.map.shift();
 					'step 3'
 					event.num=0;
@@ -14533,11 +14635,11 @@
 							event._result={bool:true};
 							event._direct=true;
 						}
-						else if(info.direct){
+						else if(info.direct&&player.isOnline()){
 							event._result={bool:true};
 							event._direct=true;
 						}
-						else if(info.direct&&player.isOnline()){
+						else if(info.direct){
 							event._result={bool:true};
 							event._direct=true;
 						}
@@ -14966,7 +15068,7 @@
 							current.getHistory().isRound=true;
 							current.getStat().isRound=true;
 						}
-					};
+					}
 					if(isRound){
 						game.getGlobalHistory().isRound=true;
 					}
@@ -16130,7 +16232,7 @@
 							result[0].cards=lib.skill[result[0].skill].onCompare(player)
 						}
 						else lose_list.push([player,result[0].cards]);
-					};
+					}
 					for(var j=0; j<targets.length; j++){
 						if(event.list.contains(targets[j])){
 							var i=event.list.indexOf(targets[j]);
@@ -16178,6 +16280,9 @@
 					'step 4'
 					player.$compareMultiple(event.card1,targets,cards);
 					game.log(player,'的拼点牌为',event.card1);
+					event.cardlist.forEach((card,index)=>{
+						game.log(targets[index],'的拼点牌为',card);
+					});
 					player.animate('target');
 					game.delay(0,1000);
 					'step 5'
@@ -16189,7 +16294,6 @@
 						event.target.animate('target');
 						event.card2=event.cardlist[event.iwhile];
 						event.num2=event.getNum(event.card2);
-						game.log(event.target,'的拼点牌为',event.card2);
 						//event.tempplayer.line(event.target);
 						delete event.player;
 						event.trigger('compare');
@@ -16295,7 +16399,7 @@
 							result[0].cards=lib.skill[result[0].skill].onCompare(player)
 						}
 						else lose_list.push([player,result[0].cards]);
-					};
+					}
 					for(var j=0;j<targets.length;j++){
 						if(event.list.contains(targets[j])){
 							var i=event.list.indexOf(targets[j]);
@@ -16486,7 +16590,7 @@
 							}
 							else event.lose_list.push([player,event.resultOL[player.playerid].cards[0]]);
 							event.card1=event.resultOL[player.playerid].cards[0];
-						};
+						}
 						if(!event.card2){
 							if(event.resultOL[target.playerid].skill&&lib.skill[event.resultOL[target.playerid].skill]&&lib.skill[event.resultOL[target.playerid].skill].onCompare){
 								target.logSkill(event.resultOL[target.playerid].skill);
@@ -18626,7 +18730,7 @@
 						next.cards=cards;
 						next.player=player;
 						return;
-					};
+					}
 					var next=game.createEvent(card.name);
 					next.setContent(info.content);
 					next.targets=targets;
@@ -19675,14 +19779,14 @@
 						cards[i].recheck();
 						
 						var info=lib.card[cards[i].name];
-						if(cards[i].hasOwnProperty('_destroy')){
+						if(Object.prototype.hasOwnProperty.call(cards[i], '_destroy')){
 							if(cards[i]._destroy){
 								cards[i].delete();
 								cards[i].destroyed=cards[i]._destroy;
 								continue;
 							}
 						}
-						else if(cards[i].hasOwnProperty('destroyed')){
+						else if(Object.prototype.hasOwnProperty.call(cards[i], 'destroyed')){
 							if(event.getlx!==false&&event.position&&cards[i].willBeDestroyed(event.position.id,null,event)){
 								cards[i].selfDestroy(event);
 								continue;
@@ -20497,7 +20601,7 @@
 					if(event.judge2){
 						var judge2=event.judge2(event.result);
 						if(typeof judge2=='boolean') player.tryJudgeAnimate(judge2);
-					};
+					}
 					if(event.clearArena!=false){
 						game.broadcastAll(ui.clear);
 					}
@@ -21189,9 +21293,9 @@
 					if(type=='horse'||type=='equip3_4'){
 						return player.hasEnabledSlot(3)&&(get.is.mountCombined()||player.hasEnabledSlot(4));
 					}
-					else if(type=='equip3_4'){
-						type='equip3';
-					}
+					// else if(type=='equip3_4'){
+					// 	type='equip3';
+					// }
 					else if(get.is.mountCombined()&&type=='equip4'){
 						return false;
 					}
@@ -21925,7 +22029,7 @@
 						txy=to.getXY();
 						n=Math.abs(fxy[0]-txy[0])+Math.abs(fxy[1]-txy[1]);
 					}
-					else if(to.isMin(true)||from.isMin(true)){}
+					else if(to.isMin(true)||from.isMin(true)){/* empty */}
 					else{
 						var length=game.players.length;
 						var totalPopulation=game.players.length+game.dead.length+1;
@@ -22193,7 +22297,7 @@
 							default:{
 								this.maxHp=maxHp1+maxHp2-3;
 								this.hp=hp1+hp2-3;
-							};
+							}
 						}
 						if(info2[4].contains('hiddenSkill')&&!this.noclick){
 							if(!this.hiddenSkills) this.hiddenSkills=[];
@@ -24027,19 +24131,19 @@
 							var player=_status.event.player;
 							var event=_status.event.getParent();
 							var getn=function(card){
-								if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13*(Boolean(event.small)?-1:1);
-								return get.number(card)*(Boolean(event.small)?-1:1);
+								if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13*(event.small?-1:1);
+								return get.number(card)*(event.small?-1:1);
 							}
 							if(source&&source!=player){
 								if(get.attitude(player,source)>1){
-									if(Boolean(event.small)) return getn(card)-get.value(card)/2+addi;
+									if(event.small) return getn(card)-get.value(card)/2+addi;
 									return -getn(card)-get.value(card)/2+addi;
 								}
-								if(Boolean(event.small)) return -getn(card)-get.value(card)/2+addi;
+								if(event.small) return -getn(card)-get.value(card)/2+addi;
 								return getn(card)-get.value(card)/2+addi;
 							}
 							else{
-								if(Boolean(event.small)) return -getn(card)-get.value(card)/2+addi;
+								if(event.small) return -getn(card)-get.value(card)/2+addi;
 								return getn(card)-get.value(card)/2+addi;
 							}
 						}
@@ -24063,7 +24167,7 @@
 							var addi=(get.value(card)>=8&&get.type(card)!='equip')?-6:0;
 							if(card.name=='du') addi-=5;
 							if(player==event.player){
-								if(Boolean(event.small)){
+								if(event.small){
 									return -getn(card)-get.value(card)/2+addi;
 								}
 								return getn(card)-get.value(card)/2+addi;
@@ -25291,7 +25395,7 @@
 						}
 					}
 					if(next.animate=='gain2'||next.animate=='draw2'){
-						if(!next.hasOwnProperty('log')){
+						if(!Object.prototype.hasOwnProperty.call(next, 'log')){
 							next.log=true;
 						}
 					}
@@ -25378,7 +25482,7 @@
 						}
 					}
 					if(next.animate=='gain2'||next.animate=='draw2'||next.animate=='give'){
-						if(!next.hasOwnProperty('log')){
+						if(!Object.prototype.hasOwnProperty.call(next, 'log')){
 							next.log=true;
 						}
 					}
@@ -25696,7 +25800,7 @@
 						case 1:this.draw(nodelay?'nodelay':1);break;
 						case 2:this.recover();break;
 						case 3:this.changeHujia();break;
-						case 4:this.tempHide();
+						case 4:this.tempHide();break;
 						case 5:this.discard(this.getCards('j')).delay=(!nodelay);break;
 						case 6:{
 							if(this.isLinked()) this.link();
@@ -26001,7 +26105,7 @@
 							const position=get.position(card,true);
 							return position!='j'&&position!='o';
 						})){
-			  				game.log(card,'已被移出处理区，无法置入判定区');
+							game.log(card,'已被移出处理区，无法置入判定区');
 							return;
 						}
 						for(let iwhile=0;iwhile<20;iwhile++){
@@ -26182,7 +26286,7 @@
 					}
 					clearTimeout(lib.node.torespondtimeout[this.playerid]);
 					delete lib.node.torespondtimeout[this.playerid];
-					if(!lib.node.torespond.hasOwnProperty(this.playerid)){
+					if(!Object.prototype.hasOwnProperty.call(lib.node.torespond, this.playerid)){
 						return;
 					}
 					var noresume=false;
@@ -26209,7 +26313,7 @@
 					else if(_status.paused&&!noresume) game.resume();
 				}
 				tempUnwait(result){
-					if(!lib.node.torespond.hasOwnProperty(this.playerid)){
+					if(!Object.prototype.hasOwnProperty.call(lib.node.torespond, this.playerid)){
 						return;
 					}
 					var proceed;
@@ -27566,7 +27670,8 @@
 						}
 						else{
 							for(var i in this.forbiddenSkills){
-								if(this.forbiddenSkills[i].remove(skill)){
+								if(this.forbiddenSkills[i].includes(skill)){
+									this.forbiddenSkills[i].remove(skill)
 									if(!this.forbiddenSkills[i].length){
 										delete this.forbiddenSkills[i];
 									}
@@ -27913,6 +28018,11 @@
 									if(func&&!func(target)) return false;
 									return target.identity!='fan';
 								});break;
+								case 'commoner':targets=game.filterPlayer(function(target){
+									if(func&&!func(target)) return false;
+									if(num>=3) return target.identity!='fan';
+									return target.identity=='fan';
+								}); break;
 							}
 						}
 					}
@@ -27983,6 +28093,10 @@
 									if(func&&!func(target)) return false;
 									return target.identity=='fan';
 								});break;
+								case 'commoner':targets=game.filterPlayer(function(target){
+									if(func&&!func(target)) return false;
+									return true;
+								}); break;
 							}
 						}
 					}
@@ -30901,6 +31015,7 @@
 							const type=`onNext${name[0].toUpperCase()}${name.slice(1)}`;
 							if(gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
 						}
+						lib.handler.addHandlerToEvent(this);
 					}
 					this.step=0;
 					this.finished=false;
@@ -31224,7 +31339,6 @@
 							parent=parent.parent;
 							if(historys.contains(parent)) return toreturn;
 						}
-						if(!parent) return toreturn;
 					}
 					if(toreturn===null){
 						return null;
@@ -31456,7 +31570,7 @@
 								for(var i=0;i<map.list2.length;i++){
 									if(map.list2[i][0]==toadd[0]&&map.list2[i][1]==toadd[1]) return;
 								}
-							};
+							}
 							for(var i=0;i<map.list.length;i++){
 								if(map.list[i][0]==toadd[0]&&map.list[i][1]==toadd[1]) return;
 							}
@@ -31464,43 +31578,6 @@
 							map.list.sort(function(a,b){
 								return b[2]-a[2];
 							});
-						}
-						for(var j=0;j<skill.length;j++){
-							func(skill[j]);
-						}
-					}
-					return this;
-				}
-				removeTrigger(skill,player){
-					if(!player||!skill) return;
-					var evt=this;
-					if(typeof skill=='string') skill=[skill];
-					game.expandSkills(skill);
-					while(true){
-						var evt=evt.getParent('arrangeTrigger');
-						if(!evt||evt.name!='arrangeTrigger'||!evt.map) return;
-						var filter=function(content){
-							if(typeof content=='string') return content==triggername;
-							return content.contains(triggername);
-						};
-						var trigger=evt._trigger;
-						var triggername=evt.triggername;
-						var map=false;
-						if(evt.doing&&evt.doing.player==player) map=evt.doing;
-						else{
-							for(var i=0;i<evt.map.length;i++){
-								if(evt.map[i].player==player){
-									map=evt.map[i];
-									break;
-								}
-							}
-						}
-						if(!map) return;
-						var func=function(skillx){
-							var toremove=map.list.filter(i=>{
-								return i[0]==skillx&&i[1]==player;
-							});
-							if(toremove.length>0) map.list.removeArray(toremove);
 						}
 						for(var j=0;j<skill.length;j++){
 							func(skill[j]);
@@ -31749,7 +31826,7 @@
 							}
 							evt.list=[];
 							if(evt.doing) evt.doing.list=[];
-						};
+						}
 						this._triggered=5;
 					}
 					else if(player){
@@ -37515,7 +37592,7 @@
 				}
 				const blob=zip.generate({
 					type:'blob'
-				}),fileNameToSaveAs=`${exportExtension.replace(/\\|\/|\:|\?|\"|\*|<|>|\|/g,'-')}.zip`;
+				}),fileNameToSaveAs=`${exportExtension.replace(/\\|\/|:|\?|"|\*|<|>|\|/g,'-')}.zip`;
 
 				if(lib.device){
 					const directory=lib.device=='android'?cordova.file.externalDataDirectory:cordova.file.documentsDirectory;
@@ -37561,7 +37638,7 @@
 				const config=game.importedPack.config;
 				Object.keys(config).forEach(value=>{
 					const configObject=config[value];
-					if(configObject&&configObject.hasOwnProperty('init')) game.saveConfig(`extension_${extensionName}_${value}`,configObject.init);
+					if(configObject&&Object.prototype.hasOwnProperty.call(configObject, 'init')) game.saveConfig(`extension_${extensionName}_${value}`,configObject.init);
 				});
 				if(game.download){
 					const files=zip.files,hiddenFileFlags=['.','_'],fileList=Object.keys(files).filter(key=>!files[key].dir&&!hiddenFileFlags.includes(key[0])).reverse();
@@ -37639,7 +37716,7 @@
 		export:function(textToWrite,name){
 			var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
 			var fileNameToSaveAs = name||'noname';
-			fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|\:|\?|\"|\*|<|>|\|/g,'.');
+			fileNameToSaveAs=fileNameToSaveAs.replace(/\\|\/|:|\?|"|\*|<|>|\|/g,'.');
 
 			if(lib.device){
 				var directory;
@@ -42001,7 +42078,7 @@
 			config.num=config.num||num||3;
 			config.ratio=config.ratio||ratio||1.2;
 			config.update=config.update||update;
-			if(!config.hasOwnProperty('first')){
+			if(!Object.prototype.hasOwnProperty.call(config, 'first')){
 				if(typeof first=='boolean'){
 					config.first=first;
 				}
@@ -42615,10 +42692,10 @@
 			}
 			if(info.marktext) lib.translate[`${i}_bg`]=info.marktext;
 			if(info.silent){
-				if(!info.hasOwnProperty('forced')) info.forced=true;
-				if(!info.hasOwnProperty('popup')) info.popup=false;
+				if(!Object.prototype.hasOwnProperty.call(info, 'forced')) info.forced=true;
+				if(!Object.prototype.hasOwnProperty.call(info, 'popup')) info.popup=false;
 			}
-			if(!info.hasOwnProperty('_priority')){
+			if(!Object.prototype.hasOwnProperty.call(info, '_priority')){
 				let priority=0;
 				if(info.priority){
 					priority=info.priority*100;
@@ -43037,7 +43114,7 @@
 						game.reload2();
 						reject(event);
 					}
-				};;
+				};
 				record.onsuccess=event=>{
 					if(typeof onSuccess=='function'){
 						_status.dburgent=true;
@@ -43077,7 +43154,7 @@
 						game.reload2();
 						reject(event);
 					}
-				};;
+				};
 				idbRequest.onsuccess=event=>{
 					const result=event.target.result;
 					if(typeof onSuccess=='function'){
@@ -43101,7 +43178,7 @@
 						game.reload2();
 						reject(event);
 					}
-				};;
+				};
 				idbRequest.onsuccess=event=>{
 					const result=event.target.result;
 					if(result){
@@ -43162,7 +43239,7 @@
 					request.onerror=event=>{
 						game.reload2();
 						reject(event);
-					};;
+					};
 					request.onsuccess=event=>{
 						game.reload2();
 						resolve(event);
@@ -44915,7 +44992,7 @@
 									var cfg=copyObj(infoconfig[j]);
 									cfg._name=j;
 									cfg.mode=mode;
-									if(!config.hasOwnProperty(j)){
+									if(!Object.prototype.hasOwnProperty.call(config, j)){
 										game.saveConfig(j,cfg.init,mode);
 									}
 									else{
@@ -45383,7 +45460,7 @@
 									}
 									var cfg=copyObj(info.config[j]);
 									cfg._name=j;
-									if(!config.hasOwnProperty(j)){
+									if(!Object.prototype.hasOwnProperty.call(config, j)){
 										if(cfg.type!='autoskill'&&cfg.type!='banskill'){
 											game.saveConfig(j,cfg.init);
 										}
@@ -45501,7 +45578,7 @@
 												}
 												var link=(game.writeFile?'cdv_':'custom_')+name;
 												if(lib.config.customBackgroundMusic[link]){
-													if(!confirm('已经存在文件名称相同的背景音乐，是否仍然要继续导入？')){_status.music_importing=false;return};
+													if(!confirm('已经存在文件名称相同的背景音乐，是否仍然要继续导入？')){_status.music_importing=false;return}
 													for(var i=1;i<1000;i++){
 														if(!lib.config.customBackgroundMusic[link+'_'+i]){
 															link=link+'_'+i;break;
@@ -47257,7 +47334,7 @@
 									j=mode+'_'+i+'_playpackconfig';
 								}
 								cfg._name=j;
-								if(!lib.config.hasOwnProperty(j)){
+								if(!Object.prototype.hasOwnProperty.call(lib.config, j)){
 									game.saveConfig(j,cfg.init);
 								}
 								else{
@@ -48510,7 +48587,7 @@
 									editnode.classList.add('disabled');
 									delnode.innerHTML='取消';
 									delete delnode.button;
-									container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+									container.code='card={\n    \n}\n\n/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
 								}
 
 								newCard=ui.create.div('.new_character',page);
@@ -48709,7 +48786,7 @@
 									delete window.saveNonameInput;
 								};
 								var editor=ui.create.editor(container,saveInput);
-								container.code='card={\n    \n}\n\n\/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+								container.code='card={\n    \n}\n\n/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
 
 								var editnode=ui.create.div('.menubutton.large.new_card.disabled','创建卡牌',newCard,function(){
 									var name=page.querySelector('input.new_name').value;
@@ -49060,7 +49137,7 @@
 									editnode.classList.add('disabled');
 									delnode.innerHTML='取消';
 									delete delnode.button;
-									container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+									container.code='skill={\n    \n}\n\n/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
 									if(page.fromchar=='add'){
 										page.fromchar=true;
 									}
@@ -49146,7 +49223,7 @@
 									delete window.saveNonameInput;
 								};
 								var editor=ui.create.editor(container,saveInput);
-								container.code='skill={\n    \n}\n\n\/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+								container.code='skill={\n    \n}\n\n/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
 
 								var citebutton=document.createElement('button');
 								citebutton.innerHTML='引用代码';
@@ -49374,10 +49451,10 @@
 										}
 									}
 									else{
-										dashes.content.node.code='function(config,pack){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-										dashes.precontent.node.code='function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-										dashes.config.node.code='config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n    name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
-										dashes.help.node.code='help={\n    \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/';
+										dashes.content.node.code='function(config,pack){\n    \n}\n\n/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
+										dashes.precontent.node.code='function(){\n    \n}\n\n/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
+										dashes.config.node.code='config={\n    \n}\n\n/*\n示例：\nconfig={\n    switcher_example:{\n    name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
+										dashes.help.node.code='help={\n    \n}\n\ns/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
 									}
 								};
 								var dashes={};
@@ -49483,10 +49560,10 @@
 									}
 								};
 								page.content={}
-								createCode('主','主代码',page,clickCode,'content','function(config,pack){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-								createCode('启','启动代码',page,clickCode,'precontent','function(){\n    \n}\n\n\/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-								createCode('选','选项代码',page,clickCode,'config','config={\n    \n}\n\n\/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n     	  item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
-								createCode('帮','帮助代码',page,clickCode,'help','help={\n    \n}\n\n\/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*\/');
+								createCode('主','主代码',page,clickCode,'content','function(config,pack){\n    \n}\n\n/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*/');
+								createCode('启','启动代码',page,clickCode,'precontent','function(){\n    \n}\n\n/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*/');
+								createCode('选','选项代码',page,clickCode,'config','config={\n    \n}\n\n/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n     	  item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*/');
+								createCode('帮','帮助代码',page,clickCode,'help','help={\n    \n}\n\n/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*/');
 
 								return page;
 							}());
@@ -49650,7 +49727,7 @@
 												game.saveConfig('extension_'+extname+'_enable',true);
 												game.saveConfig('extension_'+extname+'_version',that.info.version);
 												for(var i in game.importedPack.config){
-													if(game.importedPack.config[i]&&game.importedPack.config[i].hasOwnProperty('init')){
+													if(game.importedPack.config[i]&&Object.prototype.hasOwnProperty.call(game.importedPack.config[i], 'init')){
 														game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
 													}
 												}
@@ -56891,7 +56968,7 @@
 							if(!information) {
 								resolve(`${lib.assetURL}image/card/${imageName}.png`)
 								return;
-							};
+							}
 							const image=information.image;
 							if(!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
 							else if(image.startsWith('db:')) game.getDB('image',image.slice(3)).then(resolve,reject);
@@ -58197,6 +58274,26 @@
 	};
 	const get={
 		/**
+		 * 返回 VCard[] 形式的所有牌，用于印卡将遍历
+		 * @param {Function} filter
+		 * @returns {string[][]}
+		 */
+		inpileVCardList:filter=>{
+			let list=[];
+			for(const name of lib.inpile){
+				const type=get.type(name);
+				const info=[type,'',name];
+				if(!filter||filter(info)) list.push(info);
+				if(name=='sha'){
+					for(const nature of lib.inpile_nature){
+						const info=[type,'',name,nature];
+						if(!filter||filter(info)) list.push(info);
+					}
+				}
+			}
+			return list;
+		},
+		/**
 		 * 根据座次数n（从0开始）获取对应的“n+1号位”翻译
 		 * @param {number} seat
 		 */
@@ -58270,7 +58367,7 @@
 		priority:skill=>{
 			const info=get.info(skill);
 			if(!info) return 0;
-			if(info.hasOwnProperty('_priority')) return info._priority;
+			if(Object.prototype.hasOwnProperty.call(info, '_priority')) return info._priority;
 			let priority=0;
 			if(info.priority){
 				priority=info.priority*100;
@@ -58451,6 +58548,38 @@
 			return 0;
 		},
 		is:{
+			/**
+			 * 判断是否为进攻坐骑
+			 * @param {Card | VCard} card
+			 * @param {false | Player} [player]
+			 * @returns {boolean}
+			 */
+			attackingMount:(card,player)=>{
+				const subtype=get.subtype(card,player);
+				if(subtype=='equip4') return true;
+				else if(subtype=='equip6'){
+					const info=get.info(card,player),distance=info.distance;
+					if(!distance) return false;
+					if(distance.globalFrom&&!info.notMount) return true;
+				}
+				return false;
+			},
+			/**
+			 * 判断是否为防御坐骑
+			 * @param {Card | VCard} card
+			 * @param {false | Player} [player]
+			 * @returns {boolean}
+			 */
+			defendingMount:(card,player)=>{
+				const subtype=get.subtype(card,player);
+				if(subtype=='equip3') return true;
+				else if(subtype=='equip6'){
+					const info=get.info(card,player),distance=info.distance;
+					if(!distance) return false;
+					if(distance.globalTo&&!info.notMount) return true;
+				}
+				return false;
+			},
 			/**
 			 * 判断坐骑栏是否被合并
 			 */
@@ -58918,7 +59047,7 @@
 		character:(name,num)=>{
 			let info=lib.character[name];
 			if(!info){
-				const pack=Object.keys(lib.characterPack).find(pack=>lib.characterPack[pack].hasOwnProperty(name));
+				const pack=Object.keys(lib.characterPack).find(pack=>Object.prototype.hasOwnProperty.call(lib.characterPack[pack], name));
 				if(pack) info=lib.characterPack[pack][name];
 			}
 			if(info){
@@ -59117,7 +59246,7 @@
 					}
 					num=Math.floor(num/4);
 					for(i=0;i<num-level;i++){
-						str=str.replace(/\n    /g,'\n');
+						str=str.replace(/\n {4}/g,'\n');
 					}
 				}
 				else{
@@ -59290,7 +59419,7 @@
 					case 'purple':return '三对三对二';
 					case 'zhong':return (config.double_character?'双将':'')+'忠胆英杰';
 					case 'stratagem':return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'谋攻';
-					default:return get.cnNumber(parseInt(config.number))+'人'+(config.double_character?'双将':'')+'身份';
+					default:return `${get.cnNumber(parseInt(config.number))}人${config.double_nei?'双内':''}${config.enable_commoner?'带民':''}${config.double_character?'双将':''}身份`;
 				}
 			}
 			else if(config.mode=='guozhan'){
@@ -59976,7 +60105,7 @@
 				if(card.length==1) return get.suit(card[0],player);
 				return 'none';
 			}
-			else if(!card.hasOwnProperty('suit')&&Array.isArray(card.cards)){
+			else if(!Object.prototype.hasOwnProperty.call(card, 'suit')&&Array.isArray(card.cards)){
 				return get.suit(card.cards,player);
 			}
 			else{
@@ -60028,7 +60157,7 @@
 			if(!card) return;
 			//狗卡你是真敢出啊
 			var number=null;
-			if(card.hasOwnProperty('number')){
+			if(Object.prototype.hasOwnProperty.call(card, 'number')){
 				number=card.number;
 				if(typeof number!='number') number=null;
 			}
@@ -60561,7 +60690,7 @@
 			var result=function(){
 				if(filter==arguments[i]) return true;
 				for(var j in filter){
-					if(filter.hasOwnProperty(j)){
+					if(Object.prototype.hasOwnProperty.call(filter, j)){
 						if(get.itemtype(arguments[i])=='card'){
 							if(j=='name'){
 								if(Array.isArray(filter[j])){
@@ -61008,7 +61137,12 @@
 				for(i=0;i<skills.length;i++){
 					if(lib.skill[skills[i]]&&(lib.skill[skills[i]].nopop||lib.skill[skills[i]].equipSkill)) continue;
 					if(lib.translate[skills[i]+'_info']){
-						translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
+						if(lib.translate[skills[i]+'_ab']) translation=lib.translate[skills[i]+'_ab'];
+						else{
+							translation=get.translation(skills[i]);
+							if(!lib.skill[skills[i]].nobracket) translation=translation.slice(0,2);
+						}
+
 						if(node.forbiddenSkills[skills[i]]){
 							var forbidstr='<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>';
 							if(node.forbiddenSkills[skills[i]].length){
@@ -61091,9 +61225,6 @@
 								intronode.classList.add('pointerdiv');
 								intronode.listen(ui.click.skillbutton);
 							}
-						}
-						else if(lib.skill[skills[i]].nobracket){
-							uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
 						}
 						else{
 							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
@@ -61790,13 +61921,14 @@
 					var skills=infoitem[3];
 					for(i=0;i<skills.length;i++){
 						if(lib.translate[skills[i]+'_info']){
-							translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
-							if(lib.skill[skills[i]]&&lib.skill[skills[i]].nobracket){
-								uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
-							}
+							if(lib.translate[skills[i]+'_ab']) translation=lib.translate[skills[i]+'_ab'];
 							else{
-								uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+								translation=get.translation(skills[i]);
+								if(!lib.skill[skills[i]].nobracket) translation=translation.slice(0,2);
 							}
+
+							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+
 							if(lib.translate[skills[i]+'_append']){
 								uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
 							}

@@ -1574,7 +1574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						chooseButton:{
 							dialog:function(event,player){
 								return ui.create.dialog(
-									'###缚豕###<div class="text center">重铸任意“缚豕”牌，视为使用一张【杀】并执行等量项</div>',
+									'###缚豕###<div class="text center">将任意“缚豕”牌置入弃牌堆，视为使用一张【杀】并执行等量项</div>',
 									player.getExpansions('olfushi'),
 									[['额外目标','伤害-1','伤害+1'],'tdnodes'],
 									'hidden'
@@ -1686,7 +1686,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										delete event.result.skill;
 										event.result.card=new lib.element.VCard(lib.skill.olfushi_wusheng_backup.viewAs);
 										event.result.cards=[];
-										player.recast(cards);
+										player.loseToDiscardpile(cards);
 										event.result.card.storage.olfushi_buff=controls;
 										player.addTempSkill('olfushi_buff');
 									}
@@ -1695,7 +1695,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							prompt:function(links,player){
 								let controls=links.filter(button=>typeof button=='string');
 								if(!controls.length) controls=['额外目标','伤害-1','伤害+1'];
-								return `选择【杀】的目标（${controls.join('、')}）`;
+								return `请选择【杀】的目标（${controls.join('、')}）`;
 							}
 						},
 						ai:{
@@ -1937,17 +1937,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						switch(get.sgn(get.attitude(player,target))){
 							case 0:
 								return 2;
-								break;
 							case 1:
 								if(num1-1>=num2) return 0;
 								if(num1+1<=num2) return 1;
 								return 2;
-								break;
 							case -1:
 								if(num1-2<=num2) return 0;
 								if(num1+3>=num2) return 1;
 								return 2;
-								break;
 						}
 					}).set('prompt',get.prompt('olrunwei',trigger.player));
 					'step 1'
@@ -5690,7 +5687,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var cards1=list[0][1].slice(),cards2=list[1][1].slice();
 						var card1=cards1.sort((a,b)=>get.value(b)-get.value(a))[0];
 						var card2=cards2.sort((a,b)=>get.value(a)-get.value(b))[0];
-						if(get.value(card1)>get.value(card2)){
+						if(card1&&card2&&get.value(card1)>get.value(card2)){
 							cards1.remove(card1);
 							cards2.remove(card2);
 							cards1.push(card2);
@@ -6253,7 +6250,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								else used.push(name);
 							}
 							else used.push(name);
-						};
+						}
 						if(info.isRound) break;
 					}
 					var vcards=[];
@@ -7261,7 +7258,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(evt.card.nature) natures.remove(evt.card.nature);
 							}
 							else tricks.remove(name);
-						};
+						}
 						if(info.isRound) break;
 					}
 					var vcards=[];
@@ -11567,11 +11564,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target.countCards('h')!=ui.selected.targets[0].countCards('h');
 					}).set('complexTarget',true).set('ai',function(target){
 						if(!ui.selected.targets.length){
-						 var player=_status.event.player,hs=target.countCards('h');
-						 if(game.hasPlayer(function(current){
-						 	return current!=player&&current!=target&&current.countCards('h')>hs&&!current.hasMark('quxi_gain')&&!current.hasMark('quxi_lose');
-						 })) return get.attitude(player,target)/(Math.sqrt(1+target.countCards('h')));
-						 return 0;
+							var player=_status.event.player,hs=target.countCards('h');
+							if(game.hasPlayer(function(current){
+								return current!=player&&current!=target&&current.countCards('h')>hs&&!current.hasMark('quxi_gain')&&!current.hasMark('quxi_lose');
+							})) return get.attitude(player,target)/(Math.sqrt(1+target.countCards('h')));
+							return 0;
 						}
 						if(target.countCards('h')>ui.selected.targets[0].countCards('h')) return -get.attitude(_status.event.player,target);
 						return 0;
@@ -11837,7 +11834,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						popup:false,
 						filter:function(event,player){
-						 return player.storage.juguan_draw&&player.storage.juguan_draw.contains(event.source);
+							return player.storage.juguan_draw&&player.storage.juguan_draw.contains(event.source);
 						},
 						content:function(){
 							player.unmarkAuto('juguan_draw',[trigger.source]);
@@ -12689,10 +12686,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 5-val;
 							}
 							switch(button.link){
-								case 3:return 4.5;break;
-								case 4:return 4.4;break;
-								case 5:return 4.3;break;
-								case 2:return (3-player.hp)*1.5;break;
+								case 3:return 4.5;
+								case 4:return 4.4;
+								case 5:return 4.3;
+								case 2:return (3-player.hp)*1.5;
 								case 1:{
 									if(game.hasPlayer(function(current){
 										return (get.realAttitude||get.attitude)(player,current)<0&&get.distance(player,current)>1;
@@ -12913,7 +12910,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterCard:{color:'black'},
 				position:'hes',
-				audio:'niluan',
 				viewAsFilter:function(player){
 					return player.countCards('hes',lib.skill.spniluan.filterCard)>0;
 				},
@@ -13422,7 +13418,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:function(links,player){
 						return {
 							audio:'jingong',
-							filterCard:true,
 							popname:true,
 							position:'hes',
 							viewAs:{name:links[0][2]},
@@ -14707,7 +14702,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				popup:false,
-				onremove:true,
 				firstDo:true,
 				init:function(player,skill){
 					player.storage[skill]=0;
@@ -15627,7 +15621,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:function(links,player){
 						return {
 							audio:'jingong',
-							filterCard:true,
 							popname:true,
 							position:'hes',
 							viewAs:{name:links[0][2]},
@@ -17089,16 +17082,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var map={sha:'shan',tao:'jiu',jiu:'tao'}
 								for(var i=0;i<list.length;i++){
 									var name=list[i];
-				 				if(player.countCards('hs',map[name])>(name=='jiu'?1:0)&&player.getUseValue({name:name})>0){
-				 					var temp=get.order({name:name});
-				 					if(temp>max){
-				 						max=temp;
-				 						name2=map[name];
-				 					}
-				 				}
-				 			}
-				 			if(name2==get.name(card,player)) return 1;
-				 			return 0;
+									if(player.countCards('hs',map[name])>(name=='jiu'?1:0)&&player.getUseValue({name:name})>0){
+										var temp=get.order({name:name});
+										if(temp>max){
+											max=temp;
+											name2=map[name];
+										}
+									}
+								}
+								if(name2==get.name(card,player)) return 1;
+								return 0;
 							}
 							return 1;
 						},
@@ -17123,7 +17116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						onrespond:function(){return this.onuse.apply(this,arguments)},
 						onuse:function(result,player){
-			 			player.removeMark('fanghun',1);
+							player.removeMark('fanghun',1);
 						},
 						ai:{
 							respondSha:true,
@@ -17144,13 +17137,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var map={sha:'shan',tao:'jiu',jiu:'tao'}
 									for(var i=0;i<list.length;i++){
 										var name=list[i];
-					 				if(player.countCards('hs',map[name])>(name=='jiu'?1:0)&&player.getUseValue({name:name})>0){
-					 					var temp=get.order({name:name});
-					 					if(temp>max) max=temp;
-					 				}
-					 			}
-					 			if(max>0) max+=((player.storage.refuhan||player.storage.twfuhan)?0.3:-0.3);
-					 			return max;
+										if(player.countCards('hs',map[name])>(name=='jiu'?1:0)&&player.getUseValue({name:name})>0){
+											var temp=get.order({name:name});
+											if(temp>max) max=temp;
+										}
+									}
+									if(max>0) max+=((player.storage.refuhan||player.storage.twfuhan)?0.3:-0.3);
+									return max;
 								}
 								if(!player) player=_status.event.player;
 								return (player.storage.refuhan||player.storage.twfuhan)?4:1;
@@ -20721,7 +20714,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('filterButton',function(button){
 						if(button.link==2){
 							return _status.event.bool1;
-						};
+						}
 						return true;
 					});
 					next.set('bool1',trigger.player.isDamaged());
@@ -22600,9 +22593,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 0"
 					event.target=player;
 					event.player=trigger.player;
-				 var prompt;
-				 if(player==event.player) prompt='是否发动【郡兵】摸一张牌？';
-				 else prompt=('###是否对'+get.translation(event.target)+'发动【郡兵】？###'+(event.player==event.target?'摸一张牌':'摸一张牌，将所有手牌交给该角色，然后该角色交给你等量的手牌'));
+					var prompt;
+					if(player==event.player) prompt='是否发动【郡兵】摸一张牌？';
+					else prompt=('###是否对'+get.translation(event.target)+'发动【郡兵】？###'+(event.player==event.target?'摸一张牌':'摸一张牌，将所有手牌交给该角色，然后该角色交给你等量的手牌'));
 					event.player.chooseBool(prompt).set('choice',lib.skill.junbing.checkx(event.target,event.player));
 					"step 1"
 					if(!result.bool){event.finish();return}
@@ -22621,7 +22614,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 4"
 					target.give(result.cards,player);
 				},
-				audio:2,
 			},
 			xiongyi:{
 				skillAnimation:true,
@@ -26454,7 +26446,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			skill_feiyi_B_info:'每回合每项限一次，当你的手牌数变为1后，你可以展示此唯一手牌A并摸一张牌，然后你选择一项：①本回合使用点数大于A的点数的牌额外结算一次；②本回合使用点数小于A的点数的牌额外结算一次。',
 			lvboshe:'吕伯奢',
 			olfushi:'缚豕',
-			olfushi_info:'①一名角色使用【杀】结算结束后，若你至其的距离不大于1，你将此【杀】对应的所有实体牌置于武将牌上。②当你需要使用一张【杀】时，你可以重铸任意张“缚豕”牌，视为使用一张【杀】并选择X项（X为你以此法重铸的牌数且至多为3）：1.你为此【杀】额外指定一个目标；2.你选择此【杀】的一个目标角色，此牌对其造成的伤害-1；3.你选择此【杀】的一个目标角色，此【杀】对其造成的伤害+1。当此【杀】指定最后一个目标后，若此牌被选择的效果选项相邻且此牌的目标角色座位连续，则此【杀】不计入次数限制。',
+			olfushi_info:'①一名角色使用【杀】结算结束后，若你至其的距离不大于1，你将此【杀】对应的所有实体牌置于武将牌上。②当你需要使用一张【杀】时，你可以将任意张“缚豕”牌置入弃牌堆，视为使用一张【杀】并选择X项（X为你以此法重铸的牌数且至多为3）：1.你为此【杀】额外指定一个目标；2.你选择此【杀】的一个目标角色，此牌对其造成的伤害-1；3.你选择此【杀】的一个目标角色，此【杀】对其造成的伤害+1。当此【杀】指定最后一个目标后，若此牌被选择的效果选项相邻且此牌的目标角色座位连续，则此【杀】不计入次数限制。',
 			oldongdao:'东道',
 			oldongdao_info:'农民的回合结束时：阴，你可以令地主进行一个额外回合；阳，其可以进行一个额外回合。',
 			zhangyan:'张燕',

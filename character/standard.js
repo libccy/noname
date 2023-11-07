@@ -1114,9 +1114,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			paoxiao:{
 				audio:2,
 				firstDo:true,
-				audioname2:{old_guanzhang:'old_fuhun'},
 				audioname:['re_zhangfei','guanzhang','xiahouba'],
-				audioname2:{
+				audioname2: {
+					old_guanzhang:'old_fuhun',
 					dc_xiahouba:'paoxiao_xiahouba',
 				},
 				trigger:{player:'useCard1'},

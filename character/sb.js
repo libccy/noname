@@ -101,6 +101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.damageEffect(target,player,player);
 						},
 					},
+					combo:'nzry_mingren',
 				},
 				group:'sbzhenliang_draw',
 				subSkill:{
@@ -129,7 +130,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
-				ai:{combo:'nzry_mingren'},
 			},
 			//小乔
 			sbtianxiang:{
@@ -1289,7 +1289,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sblianhuan:{
 				audio:2,
 				enable:'phaseUse',
-				filterCard:{suit:'club'},
 				filter:(event,player)=>player.hasCard(card=>lib.skill.sblianhuan.filterCard(card,player),lib.skill.sblianhuan.position),
 				filterTarget:function(card,player,target){
 					if(player.hasSkill('sblianhuan_blocker')) return false;

@@ -415,21 +415,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					effect:{
 						audio:'qingbei',
-						trigger:{
-							player:'useCardAfter',
-						},
-						forced:true,
+						trigger:{player:'useCardAfter'},
 						charlotte:true,
 						onremove:true,
 						filter:function(event,player){
+							if(!lib.suit.includes(get.suit(event.card))) return false;
 							return player.getStorage('qingbei_effect').length;
 						},
+						direct:true,
+						firstDo:true,
 						content:function(){
 							player.draw(player.getStorage('qingbei_effect').length);
 						},
 						mark:true,
 						intro:{
-							content:(storage)=>`本轮内不能使用${get.translation(storage)}花色的牌，且使用牌后摸${get.cnNumber(storage.length)}张牌`,
+							content:(storage)=>`本轮内不能使用${get.translation(storage)}花色的牌，且使用一张有花色的牌后摸${get.cnNumber(storage.length)}张牌`,
 						},
 						mod:{
 							cardEnabled:function(card,player){
@@ -1514,7 +1514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					unlimit:{
 						mod:{
 							cardUsable:function(card,player){
-					 		var list=lib.skill.lkbushi.getBushi(player);
+								var list=lib.skill.lkbushi.getBushi(player);
 								if(list[0]==get.suit(card)) return Infinity;
 							},
 						},
@@ -2210,7 +2210,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('filterButton',function(button){
 						if(button.link==0){
 							return _status.event.bool1;
-						};
+						}
 						return true;
 					});
 					next.set('bool1',lib.skill.xinbenxi.filterx(trigger,player));
@@ -3151,7 +3151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var i=0;i<storage.length;i++){
 								str+='、';
 								str+=get.translation(storage[i]);
-							};
+							}
 							str=str.slice(1);
 							str2+=('<br><li>已对'+str+'发动过〖残韵〗');
 						}
@@ -4169,7 +4169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!player.storage.juexiang_lie){
 									event.finish();
 									return;
-								};
+								}
 								player.storage.juexiang_lie--;
 							}
 							player.chooseTarget(get.prompt2('juexiang_lie'),function(card,player,target){
@@ -5409,8 +5409,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					skillTagFilter:function(player){
 						if(!player.countCards('hes')||player.hasSkill('taoluan3')) return false;
-						if(!player.storage.taoluan.contains('tao')){}
-						else if(player.isDying()&&!player.storage.taoluan.contains('jiu')){}
+						if(!player.storage.taoluan.contains('tao')){ /* empty */ }
+						else if(player.isDying()&&!player.storage.taoluan.contains('jiu')){ /* empty */ }
 						else return false;
 					},
 					order:4,
@@ -6473,7 +6473,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return current!=player;
 							}).sortBySeat(player);
 							for(var target of players){
-								if(get.damageEffect(target,player,target,'fire')>=0){num=0;continue};
+								if(get.damageEffect(target,player,target,'fire')>=0){num=0;continue}
 								var shao=false;
 								num++;
 								if(target.countCards('he',function(card){
@@ -8766,10 +8766,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							switch(button.link[2]){
 								case 'tao':return 5;
 								case 'jiu':return 3.01;
-								case 'shan':return 3.01;
 								case 'sha':
 									if(button.link[3]=='fire') return 2.95;
-									else if(button.link[3]=='fire') return 2.92;
+									else if(button.link[3]=='thunder') return 2.92;
 									else return 2.9;
 								case 'shan':return 1;
 							}
@@ -10057,7 +10056,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				filter:function(event,player){
-				 return player!=event.player;
+					return player!=event.player;
 				},
 				logTarget:'player',
 				content:function(){
@@ -11072,11 +11071,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								order:10,
 								result:{
 									target:function(player,target){
-	  							if(player!=target) return 0;
-	  							if(player.hasSkill('requanji')||(player.countCards('h')+2<=player.hp+player.getExpansions('quanji').length)) return 1;
-	  							return 0;
-	  						}
-	  					},
+										if(player!=target) return 0;
+										if(player.hasSkill('requanji')||(player.countCards('h')+2<=player.hp+player.getExpansions('quanji').length)) return 1;
+										return 0;
+									}
+								},
 							},
 						}
 					},
@@ -13537,7 +13536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['xin_jushou'],
 				check:function(event,player){
-				 return player.getHistory('damage').indexOf(event)==0;
+					return player.getHistory('damage').indexOf(event)==0;
 				},
 				content:function(){
 					if(player.getHistory('damage').indexOf(trigger)>0){
@@ -14696,7 +14695,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			cuguo_info:'锁定技。当你于一回合使用牌首次被抵消后，你弃置一张牌，视为对此牌的目标角色使用一张该被抵消的牌。此牌结算结束后，若此牌被抵消，你失去1点体力。',
 			chenshi:'陈式',
 			qingbei:'擎北',
-			qingbei_info:'一轮游戏开始时，你可以选择任意种花色，你不能于本轮内使用这些花色的牌。然后当你于本轮使用牌结算结束后，你摸等同于你上一次〖擎北〗选择过的花色数的牌。',
+			qingbei_info:'一轮游戏开始时，你可以选择任意种花色，你不能于本轮内使用这些花色的牌。然后当你于本轮使用一张有花色的牌结算结束后，你摸等同于你上一次〖擎北〗选择过的花色数的牌。',
 			feiyao:'费曜',
 			zhenfeng:'镇锋',
 			zhenfeng_info:'每回合限一次。当其他角色于其回合内使用牌时，若其手牌数不大于其体力值，你可以猜测其手牌中与此牌类别相同的牌数。若你猜对，你摸X张牌并视为对其使用一张【杀】（X为你连续猜对的次数且至多为5）；若你猜错且差值大于1，其视为对你使用一张【杀】。',

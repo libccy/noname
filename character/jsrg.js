@@ -384,7 +384,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						onremove:true,
 						filter:function(event,player){
 							if(!event.card.storage||!event.card.storage.jsrgzhenfeng) return false;
-							debugger
+							// debugger
 							var str=event.target.getSkills(null,false,false).map(skill=>{
 								var info=get.info(skill);
 								if(!info||info.charlotte) return;
@@ -1992,7 +1992,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					undist:{
 						group:'undist',
-						charlotte:true,
 						trigger:{
 							player:['useCardAfter','damageEnd'],
 						},
@@ -2954,7 +2953,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(count==1) return true;
 								for(var i=0;i<ui.selected.buttons.length;i++){
 									if(get.owner(button.link)==get.owner(ui.selected.buttons[i].link)) return false;
-								};
+								}
 								return true;
 							}).set('count',targets.length).set('ai',button=>{
 								var player=_status.event.player;
@@ -4390,7 +4389,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var ind=skillx.lastIndexOf('_');
 									if(ind==-1) break;
 									skillx=skillx.slice(0,ind);
-								};
+								}
 							}
 							if(popup!=false&&!infox.silent) infox.forced=false;
 							if(!infox.charlotte&&infox.mod) delete infox.mod;

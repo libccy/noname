@@ -136,7 +136,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				content:function(){
-				 	for(var i=0;i<game.players.length;i++){
+					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].hasSkill('yxs_menshen2')){
 							game.players[i].removeSkill('yxs_menshen2');
 						}
@@ -149,14 +149,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseEnd",
 				},
 				priority:15,
-			   	group:'yxs_menshen3',
+				group:'yxs_menshen3',
 				onremove:true,
 				filter:function (event,player){
 					return game.players.length>1;
 				},
 				content:function(){
-			  		"step 0"
-	 				player.chooseTarget('选择【门神】的目标',lib.translate.yxs_menshen_info,true,function(card,player,target){
+					"step 0"
+					player.chooseTarget('选择【门神】的目标',lib.translate.yxs_menshen_info,true,function(card,player,target){
 						return target!=player;
 					}).set('ai',function(target){
 						return get.attitude(player,target);
@@ -177,7 +177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.5,
 				},
 			},
-		   	yxs_menshen2:{
+			yxs_menshen2:{
 				audio:2,
 				mark:'character',
 				intro:{
@@ -188,7 +188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					target:["shaBegin","juedouBegin"],
 				},
-	 			forced:true,
+				forced:true,
 				popup:false,
 				filter:function(event,player){
 					return player.isAlive();
@@ -197,10 +197,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=player.storage.yxs_menshen2;
 					trigger.player.line(target,'green');
 					trigger.targets.remove(player);
-				  	trigger.targets.push(target);
+					trigger.targets.push(target);
 					trigger.target = target;
 				},
-	   		},
+			},
 			guimian:{
 				trigger:{source:'damageEnd'},
 				forced:true,
