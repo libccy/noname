@@ -400,6 +400,52 @@
 				return method;
 			}
 		},
+		handler:{
+			_handlers:{},
+			getHandler:function(name,type){
+				if(!type)type = this.getDefaultHandlerType(name);
+				if(!this._handlers[name])return null;
+				if(!this._handlers[name][type])return null;
+				return this._handlers[name][type];
+			},
+			ensureHandlerList:function(name,type){
+				if(!type)type = this.getDefaultHandlerType(name);
+				if(!this._handlers[name])this._handlers[name] = {};
+				if(!this._handlers[name][type])this._handlers[name][type] = [];
+				return this._handlers[name][type];
+			},
+			removeHandler:function(name,type,func){
+				var list = this.ensureHandlerList(name,type);
+				list.remove(func);
+				if(list.length == 0){
+					delete this._handlers[name][type];
+					if(Object.keys(this._handlers[name]) == 0){
+						delete this._handlers[name];
+					}
+				}
+			},
+			pushHandler:function(name,type){
+				let functions = (typeof type == 'string' ? arguments.slice(2):arguments.slice(1));
+				type = (typeof type == 'string'?type:this.getDefaultHandlerType(name));
+				this.ensureHandlerList(name,type).addArray(functions);
+			},
+			getDefaultHandlerType:(name)=>{
+				return `on${name[0].toUpperCase()}${name.slice(1)}`;
+			},
+			addHandlerToEvent:function(event){
+				if(typeof event.name == 'string'){
+					let handlerMap = this._handlers[event.name];
+					if(handlerMap){
+						Object.keys(handlerMap).forEach((key)=>{
+							let list = handlerMap[key];
+							if(list){
+								list.forEach(handler=>event.pushHandler(key,handler));
+							}
+						});
+					}
+				}
+			}
+		},
 		objectURL:new Map(),
 		hookmap:{},
 		imported:{},
@@ -30969,6 +31015,7 @@
 							const type=`onNext${name[0].toUpperCase()}${name.slice(1)}`;
 							if(gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
 						}
+						lib.handler.addHandlerToEvent(this);
 					}
 					this.step=0;
 					this.finished=false;
