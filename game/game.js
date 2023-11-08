@@ -6710,6 +6710,12 @@
 						frequent:true,
 						intro:'在用户填写的IP地址没有直接指定使用WS/WSS协议的情况下，默认使用WSS协议，而非WS协议来连接到联机服务器。<br>请不要轻易勾选此项！',
 					},
+					read_clipboard:{
+						name:'读取邀请链接',
+						init:false,
+						frequent:true,
+						intro:'读取剪贴板以解析邀请链接自动加入联机房间',
+					}
 				}
 			},
 			boss:{
@@ -11435,7 +11441,13 @@
 					localStorage.removeItem(lib.configprefix+'background');
 				}
 			},
-			parsex:function(item){
+			/**
+			 * 
+			 * @param {*} item 
+			 * @param {Function} [scope] 作用域
+			 * @returns 
+			 */
+			parsex:function(item,scope){
 				//by 诗笺、Tipx-L
 				/**
 				 * @param {Function} func 
@@ -11495,9 +11507,15 @@
 						}
 						str=`if(event.step==${k}){event.finish();return;}`+str;
 					}
-					return (new (hasDebugger?GeneratorFunction:Function)('event','step','source','player','target','targets',
+					if(!scope){
+						return (new (hasDebugger?GeneratorFunction:Function)('event','step','source','player','target','targets',
 						'card','cards','skill','forced','num','trigger','result',
 						'_status','lib','game','ui','get','ai',str));
+					}else{
+						return scope(`function${hasDebugger?'*':''} anonymous(event,step,source,player,target,targets,
+							card,cards,skill,forced,num,trigger,result,
+							_status,lib,game,ui,get,ai){${str}}; anonymous;`);
+					}
 				}
 				switch(typeof item){
 					case "object":
@@ -11566,7 +11584,7 @@
 									else lastEvent=currentResult;
 								}
 							}
-						}
+						}else if(item._parsed) return item;
 						// falls through
 					default:
 						return Legacy(item);
@@ -20887,11 +20905,24 @@
 					this.markSkill('stratagem_fury');
 				}
 				/**
-				 * version 1.6
+				 * version 1.7
 				 * 
 				 * 链式创建一次性技能的api。
 				 *
 				 * 使用者只需要关注技能的效果，而不是技能的本身。
+				 * 
+				 * v1.7 可传递作用域
+				 * @example
+				 * ```js
+				 * (function () {
+				 * 	let _var = 1;
+				 * 	let me = player;
+				 * 	player.when('drawAfter')
+				 * 		.apply(code => eval(code))
+				 * 		.then(() => console.log(_var))
+				 * 		.then('me.gainMaxHp(5)');
+				 * })();
+				 * ```
 				 */
 				when(){
 					if(!_status.postReconnect.player_when) _status.postReconnect.player_when=[
@@ -20938,6 +20969,11 @@
 					else if(Array.isArray(trigger.player)) trigger.player.add(after);
 					else if(typeof trigger.player=='string') trigger.player=[trigger.player,after];
 					const vars={};
+					/**
+					 * 作用域
+					 * @type { (code: string) => any }
+					 */
+					let scope;
 					let skill={
 						trigger:trigger,
 						forced:true,
@@ -20992,11 +21028,12 @@
 							const fun2=skill.contentFuns[i];
 							const a=fun2.toString();
 							//防止传入()=>xxx的情况
-							const begin=a.indexOf("{")==a.indexOf("}")&&a.indexOf("{")==-1?a.indexOf("=>")+2:a.indexOf("{")+1;
+							const begin=a.indexOf("{")==a.indexOf("}")&&a.indexOf("{")==-1&&a.indexOf("=>")>-1?a.indexOf("=>")+2:a.indexOf("{")+1;
 							const str2=a.slice(begin,a.lastIndexOf("}")!=-1?a.lastIndexOf("}"):undefined).trim();
 							str+=`'step ${i}'\n\t${str2}\n\t`;
 						}
-						skill.content=eval(str+`\n};content;`);
+						skill.content=lib.init.parsex((scope||eval)(str+`\n};content;`),scope);
+						skill.content._parsed=true;
 					};
 					Object.defineProperty(lib.skill,skillName,{
 						configurable:true,
@@ -21070,6 +21107,21 @@
 							if(!get.is.object(arg)) throw 'vars的第一个参数必须为对象';
 							Object.assign(vars,arg);
 							createContent();
+							return this;
+						},
+						/**
+						 * 传递外部作用域
+						 * 
+						 * 一般是传递一个 code=>eval(code) 函数
+						 * 
+						 * 传递后可在then中使用外部变量(vars的上位替代)
+						 * 
+						 * @param {Function} _scope 
+						 */
+						apply(_scope){
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
+							scope=_scope;
+							if(skill.contentFuns.length>0) createContent();
 							return this;
 						}
 					};
@@ -34971,6 +35023,39 @@
 								ui.rooms.push(player);
 							}
 						}
+						if(!_status.requestReadClipboard&&get.config('read_clipboard','connect')){
+							//每次启动只请求一次
+							_status.requestReadClipboard=true;
+							function read(text){
+								try{
+									var roomId=text.split('\n')[1].match(/\d+/);
+									var caption=ui.rooms.find(caption=>caption.key==roomId);
+									if (caption&&(_status.read_clipboard_text||confirm(`是否通过复制的内容加入${roomId}房间？`))){
+										ui.click.connectroom.call(caption);
+										delete _status.read_clipboard_text;
+									}
+								}catch(e){console.log(e)}
+							}
+							if(_status.read_clipboard_text){
+								read(_status.read_clipboard_text);
+							}else{
+								window.focus();
+								if(navigator.clipboard&&lib.node){
+									navigator.clipboard.readText().then(read).catch(_=>{});
+								}else{
+									var input=ui.create.node('textarea',ui.window,{opacity:'0'});
+									input.select();
+									var result=document.execCommand('paste');
+									input.blur();
+									ui.window.removeChild(input);
+									if(result||input.value.length>0) read(input.value);
+									else if(confirm('是否输入邀请链接以加入房间？')){
+										var text=prompt('请输入邀请链接');
+										if(typeof text=='string'&&text.length>0) read(text);
+									}
+								}
+							}
+						}
 					}
 					lib.message.client.updateclients(clients,true);
 				},
@@ -35486,6 +35571,10 @@
 					if(ui.connectStartBar){
 						ui.connectStartBar.delete();
 						delete ui.connectStartBar;
+					}
+					if(ui.connectShareButton){
+						ui.connectShareButton.delete();
+						delete ui.connectShareButton;
 					}
 					if(ui.roomInfo){
 						ui.roomInfo.remove();
@@ -53494,7 +53583,7 @@
 				ipbar.style.borderRadius='2px';
 				ipbar.style.position='relative';
 
-				var button=ui.create.div('.menubutton.large.highlight.connectbutton.pointerdiv',game.online?'退出联机':'开始游戏',ui.window,function(){
+				var button=ui.create.div('.menubutton.large.highlight.connectbutton.connectbutton1.pointerdiv',game.online?'退出联机':'开始游戏',ui.window,function(){
 					if(button.clicked) return;
 					if(game.online){
 						if(game.onlinezhu){
@@ -53520,13 +53609,37 @@
 					}
 					button.delete();
 					bar.delete();
+					shareButton.delete();
 					delete ui.connectStartButton;
 					delete ui.connectStartBar;
+					delete ui.connectShareButton;
 					button.clicked=true;
+				});
+
+				var shareButton=ui.create.div('.menubutton.large.highlight.connectbutton.connectbutton2.pointerdiv','分享房间',ui.window,function(){
+					var text=`无名杀-联机-${lib.translate[get.mode()]}-${game.connectPlayers.filter(p=>p.avatar).length}/${game.connectPlayers.filter(p=>!p.classList.contains('unselectable2')).length}\n${get.connectNickname()}邀请你加入${game.roomId}房间\n联机地址:${game.ip}\n请先通过游戏内菜单-开始-联机中启用“读取邀请链接”选项`;
+					window.focus();
+					if(navigator.clipboard&&lib.node){
+						navigator.clipboard.writeText(text).then(()=>{
+							game.alert(`分享内容复制成功`);
+						}).catch(e=>{
+							game.alert(`分享内容复制失败${e||''}`);
+						});
+					}else{
+						var input=ui.create.node('textarea',ui.window,{opacity:'0'});
+						input.value=text;
+						input.focus();
+						input.select();
+						var result=document.execCommand('copy');
+						input.blur();
+						ui.window.removeChild(input);
+						game.alert(`分享内容复制${result?'成功':'失败'}`);
+					}
 				});
 
 				ui.connectStartButton=button;
 				ui.connectStartBar=bar;
+				ui.connectShareButton=shareButton;
 			},
 			players:numberOfPlayers=>{
 				if(numberOfPlayers===0){
@@ -53572,10 +53685,10 @@
 					ui.handcards1Container.onmousewheel=ui.click.mousewheel;
 					ui.handcards2Container.onmousewheel=ui.click.mousewheel;
 				}
-				ui.handcards1Container.ontouchstart = ui.click.touchStart;
-				ui.handcards2Container.ontouchstart = ui.click.touchStart;
-				ui.handcards1Container.ontouchmove = ui.click.touchScroll;
-				ui.handcards2Container.ontouchmove = ui.click.touchScroll;
+				ui.handcards1Container.ontouchstart=ui.click.touchStart;
+				ui.handcards2Container.ontouchstart=ui.click.touchStart;
+				ui.handcards1Container.ontouchmove=ui.click.touchScroll;
+				ui.handcards2Container.ontouchmove=ui.click.touchScroll;
 				ui.handcards1Container.style.webkitOverflowScrolling='touch';
 				ui.handcards2Container.style.webkitOverflowScrolling='touch';
 
