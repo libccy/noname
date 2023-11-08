@@ -119,7 +119,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					return uiintro;
 				},220);
-				if (get.config('read_clipboard', 'connect')) {
+				if (get.config('read_clipboard','connect')){
 					var ced=false;
 					function read(text){
 						try{

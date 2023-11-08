@@ -11441,7 +11441,13 @@
 					localStorage.removeItem(lib.configprefix+'background');
 				}
 			},
-			parsex:function(item){
+			/**
+			 * 
+			 * @param {*} item 
+			 * @param {Function} [scope] 作用域
+			 * @returns 
+			 */
+			parsex:function(item,scope){
 				//by 诗笺、Tipx-L
 				/**
 				 * @param {Function} func 
@@ -11501,9 +11507,15 @@
 						}
 						str=`if(event.step==${k}){event.finish();return;}`+str;
 					}
-					return (new (hasDebugger?GeneratorFunction:Function)('event','step','source','player','target','targets',
+					if(!scope){
+						return (new (hasDebugger?GeneratorFunction:Function)('event','step','source','player','target','targets',
 						'card','cards','skill','forced','num','trigger','result',
 						'_status','lib','game','ui','get','ai',str));
+					}else{
+						return scope(`function${hasDebugger?'*':''} anonymous(event,step,source,player,target,targets,
+							card,cards,skill,forced,num,trigger,result,
+							_status,lib,game,ui,get,ai){${str}}; anonymous;`);
+					}
 				}
 				switch(typeof item){
 					case "object":
@@ -11572,7 +11584,7 @@
 									else lastEvent=currentResult;
 								}
 							}
-						}
+						}else if(item._parsed) return item;
 						// falls through
 					default:
 						return Legacy(item);
@@ -20893,11 +20905,24 @@
 					this.markSkill('stratagem_fury');
 				}
 				/**
-				 * version 1.6
+				 * version 1.7
 				 * 
 				 * 链式创建一次性技能的api。
 				 *
 				 * 使用者只需要关注技能的效果，而不是技能的本身。
+				 * 
+				 * v1.7 可传递作用域
+				 * @example
+				 * ```js
+				 * (function () {
+				 * 	let _var = 1;
+				 * 	let me = player;
+				 * 	player.when('drawAfter')
+				 * 		.apply(code => eval(code))
+				 * 		.then(() => console.log(_var))
+				 * 		.then('me.gainMaxHp(5)');
+				 * })();
+				 * ```
 				 */
 				when(){
 					if(!_status.postReconnect.player_when) _status.postReconnect.player_when=[
@@ -20944,6 +20969,11 @@
 					else if(Array.isArray(trigger.player)) trigger.player.add(after);
 					else if(typeof trigger.player=='string') trigger.player=[trigger.player,after];
 					const vars={};
+					/**
+					 * 作用域
+					 * @type { (code: string) => any }
+					 */
+					let scope;
 					let skill={
 						trigger:trigger,
 						forced:true,
@@ -20998,11 +21028,12 @@
 							const fun2=skill.contentFuns[i];
 							const a=fun2.toString();
 							//防止传入()=>xxx的情况
-							const begin=a.indexOf("{")==a.indexOf("}")&&a.indexOf("{")==-1?a.indexOf("=>")+2:a.indexOf("{")+1;
+							const begin=a.indexOf("{")==a.indexOf("}")&&a.indexOf("{")==-1&&a.indexOf("=>")>-1?a.indexOf("=>")+2:a.indexOf("{")+1;
 							const str2=a.slice(begin,a.lastIndexOf("}")!=-1?a.lastIndexOf("}"):undefined).trim();
 							str+=`'step ${i}'\n\t${str2}\n\t`;
 						}
-						skill.content=eval(str+`\n};content;`);
+						skill.content=lib.init.parsex((scope||eval)(str+`\n};content;`),scope);
+						skill.content._parsed=true;
 					};
 					Object.defineProperty(lib.skill,skillName,{
 						configurable:true,
@@ -21076,6 +21107,21 @@
 							if(!get.is.object(arg)) throw 'vars的第一个参数必须为对象';
 							Object.assign(vars,arg);
 							createContent();
+							return this;
+						},
+						/**
+						 * 传递外部作用域
+						 * 
+						 * 一般是传递一个 code=>eval(code) 函数
+						 * 
+						 * 传递后可在then中使用外部变量(vars的上位替代)
+						 * 
+						 * @param {Function} _scope 
+						 */
+						apply(_scope){
+							if(lib.skill[skillName]!=skill) throw `This skill has been destroyed`;
+							scope=_scope;
+							if(skill.contentFuns.length>0) createContent();
 							return this;
 						}
 					};
