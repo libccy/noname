@@ -565,6 +565,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt2('dcmanzhi'),(card,player,target)=>{
 						if(player==target) return false;
 						return !player.hasSkill('dcmanzhi_1')&&target.countCards('he')||!player.hasSkill('dcmanzhi_2')&&target.countCards('hej');
+					}).set('ai',target=>{
+						return 1-get.attitude(get.player(),target);
 					});
 					'step 1'
 					if(result.bool){

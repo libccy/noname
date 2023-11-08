@@ -2694,7 +2694,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.directHit.add(target);
 					player.chooseToDuiben(target).set('title','谋弈').set('namelist',[
 						'出阵迎战','拱卫中军','直取敌营','扰阵疲敌'
-					]);
+					]).set('ai',button=>{
+						var source=get.event().getParent().player,target=get.event().getParent().target;
+						if(!target.countCards('he')&&button.link[2]=='db_def2') return 10;
+						if(!target.countCards('he')&&get.attitude(target,source)<=0&&button.link[2]=='db_atk1') return 10;
+						return 1+Math.random();
+					});
 					'step 1'
 					if(result.bool){
 						if(result.player=='db_def1') player.gainPlayerCard(target,'he',true);
@@ -4696,7 +4701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return player.hasSkill('splveying')&&(get.type(event.card)=='trick'&&!get.tag(event.card,'damage'))&&player.countMark('splveying')>1;
+					return player.hasSkill('splveying',null,false,false)&&(get.type(event.card)=='trick'&&!get.tag(event.card,'damage'))&&player.countMark('splveying')>1;
 				},
 				content:function(){
 					player.removeMark('splveying',2);

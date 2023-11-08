@@ -1472,7 +1472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.card.name!='sha'||!event.cards||event.cards.length!=1) return false;
 					var evt=event.getParent('phaseUse');
 					return evt&&evt.player==player&&player.getHistory('useCard',function(evt2){
-						return evt2.card.name=='sha'&&evt.cards&&evt.cards.length==1&&evt2.getParent('phaseUse')==evt;
+						return evt2.card.name=='sha'&&evt2.cards&&evt2.cards.length==1&&evt2.getParent('phaseUse')==evt;
 					}).indexOf(event)==0;
 				},
 				content:function(){
