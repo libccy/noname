@@ -750,7 +750,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(player,trigger.player);
 						player.logSkill('drlt_zhenrong');
 						player.addToExpansion(result.links,trigger.player,'give','log').gaintag.add('drlt_zhenrong');
-					};
+					}
 				},
 			},
 			"drlt_hongju":{
@@ -822,11 +822,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var cards=result.links;
 						for(var i=0;i<cards.length;i++){
 							player.storage.drlt_zhenrong.remove(cards[i]);
-						};
+						}
 						player.syncStorage('drlt_zhenrong');
 						player.$throw(cards);
 						player.discardPlayerCard(target,'ej',1,true);
-					};
+					}
 				},
 				ai:{
 					order:13,
@@ -1117,17 +1117,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					switch(result.control){
 						case 'equip1':
-							player.addTempSkill('drlt_jueyan1',{player:'phaseAfter'});
+							player.addTempSkill('drlt_jueyan1');
 							break;
 						case 'equip2':
 							player.draw(3);
-							player.addTempSkill('drlt_jueyan3',{player:'phaseAfter'});
+							player.addTempSkill('drlt_jueyan3');
 							break;
 						case 'equip3_4':
-							player.addTempSkill('drlt_jueyan2',{player:'phaseAfter'});
+							player.addTempSkill('drlt_jueyan2');
 							break;
 						case 'equip5':
-							player.addTempSkill('rejizhi',{player:'phaseAfter'});
+							player.addTempSkill('rejizhi');
 							break;
 					}
 				},
@@ -1146,6 +1146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				derivation:'rejizhi',
 			},
 			'drlt_jueyan1':{
 				mod:{
@@ -1268,7 +1269,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								player.addTempSkill('drlt_yongsi1',{player:'phaseDiscardAfter'});
-							};
+							}
 						},
 					},
 				},
@@ -1482,7 +1483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var num=1;
 						if(get.type(result.cards[0])=='equip') num=2;
 						player.draw(num);
-					};
+					}
 				},
 			},
 			drlt_wanglie:{
@@ -1820,7 +1821,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},'选择一名装备区里牌数大于你的角色').ai=function(target){
 							return -get.attitude(player,target)
 						};
-					};
+					}
 					'step 2'
 					if(result.bool){
 						event.target=result.targets[0];
@@ -1846,7 +1847,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(result.bool){
 						target.give(result.cards,player);
-					};
+					}
 				},
 				ai:{
 					order:11,
@@ -1958,14 +1959,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else event._result={index:0};
 					}else{
 						event.finish();
-					};
+					}
 					'step 2'
 					player.logSkill('nzry_yili',target);
 					if(result.index==1){
 						player.removeMark('nzry_huaiju',1);
 					}else{
 						player.loseHp();
-					};
+					}
 					target.addMark('nzry_huaiju',1);
 					target.addSkill('nzry_huaiju_ai');
 				},
@@ -2024,7 +2025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var num=0;
 							for(var i=0;i<targets.length;i++){
 								num+=targets[i].hp;
-							};
+							}
 							return num+target.hp<=_status.event.num;
 						}).set('ai',function(target){
 							if(ui.selected.targets[0]!=undefined) return -1;
@@ -2043,7 +2044,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseTarget('请选择〖溃诛〗的目标',[1,event.num]).ai=function(target){
 							return get.attitude(player,target);
 						};
-					};
+					}
 					'step 3'
 					if(result.bool){
 						var targets=result.targets.sortBySeat();
@@ -2056,7 +2057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var num=0;
 							for(var i=0;i<targets.length;i++){
 								num+=targets[i].hp;
-							};
+							}
 							if(num<event.num){
 								event.bool=false;
 								event.goto(2);
@@ -2066,11 +2067,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.logSkill('nzry_kuizhu',targets);
 								for(var i=0;i<targets.length;i++){
 									targets[i].damage();
-								};
+								}
 								//if(targets.length>=2) player.loseHp();
-							};
-						};
-					};
+							}
+						}
+					}
 				},
 			},
 			rechezheng:{
@@ -2122,7 +2123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						player.line(result.targets);
 						player.discardPlayerCard(result.targets[0],'he',1,true);
-					};
+					}
 				},
 				group:'rechezheng',
 			},
@@ -2234,7 +2235,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.markSkill('nzry_chenglve');
 						player.addTempSkill('nzry_chenglve1');
-					};
+					}
 				},
 				ai:{
 					order:2.7,
@@ -2252,13 +2253,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var cards=player.storage.nzry_chenglve1;
 						for(var i=0;i<cards.length;i++){
 							if(cards[i]==get.suit(card)) return Infinity;
-						};
+						}
 					},
 					targetInRange:function(card,player){
 						var cards=player.storage.nzry_chenglve1;
 						for(var i=0;i<cards.length;i++){
 							if(cards[i]==get.suit(card)) return true;
-						};
+						}
 					}
 				},
 				onremove:true,
@@ -2388,7 +2389,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 2'
 							if(result.bool){
 								player.addToExpansion(result.cards[0],player,'give','log').gaintag.add('nzry_mingren');
-							};
+							}
 						},
 					},
 					2:{
@@ -2425,7 +2426,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.addToExpansion(result.cards[0],'log','give',player).gaintag.add('nzry_mingren');
 								var card=player.getExpansions('nzry_mingren')[0];
 								if(card) player.gain(card,'gain2');
-							};
+							}
 						},
 					},
 				},
@@ -2591,12 +2592,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								event.finish();
-							};
+							}
 							'step 2'
 							if(result.bool){
 								player.line(result.targets);
 								result.targets[0].draw(4-result.targets[0].countCards('h'))
-							};
+							}
 						},
 						ai:{
 							order:1,
@@ -2633,7 +2634,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								trigger.source.storage.nzry_shenshi1=result.cards[0];
 								trigger.source.storage.nzry_shenshi2=player;
 								trigger.source.addSkill('nzry_shenshi1');
-							};
+							}
 						},
 					},
 				},
@@ -2654,7 +2655,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.getCards('he').contains(card)&&4-pl.countCards('h')>0){
 						pl.draw(4-pl.countCards('h'));
 						pl.logSkill('nzry_shenshi');
-					};
+					}
 					player.removeSkill('nzry_shenshi1');
 					delete player.storage.nzry_shenshi1;
 					delete player.storage.nzry_shenshi2;
@@ -3698,7 +3699,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(!result.bool&&!event.directbool){
 						return;
-					};
+					}
 					player.addToExpansion(event.card,'gain2').gaintag.add('tuntian');
 				},
 				callback:function(){
@@ -3731,7 +3732,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				locked:false,
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
@@ -6233,7 +6233,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0";
 					player.chooseTarget(get.prompt2('releiji'),function(card,player,target){
-					 return target!=player;
+						return target!=player;
 					}).ai=function(target){
 						if(target.hasSkill('hongyan')) return 0;
 						return get.damageEffect(target,_status.event.player,_status.event.player,'thunder');
@@ -7080,7 +7080,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(cards[i]!=card&&get.number(cards[i])==num){
 							player.loseToDiscardpile(card);
 							return;
-						};
+						}
 					}
 					trigger.cancel();
 					trigger.result={bool:true};
@@ -7458,7 +7458,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinfu_guhuo:{
 				audio:'guhuo_guess',
 				derivation:['chanyuan'],
-				group:['guhuo_guess'],
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
 					return (lib.inpile.contains(name)&&player.countCards('hs')>0&&!player.hasSkill('guhuo_phase'));
@@ -7554,6 +7553,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							precontent:function(){
 								player.logSkill('xinfu_guhuo');
+								player.addTempSkill('guhuo_guess');
 								var card=event.result.cards[0];
 								event.result.card.suit=get.suit(card);
 								event.result.card.number=get.number(card);
@@ -7709,22 +7709,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			chanyuan:{
 				init:function(player,skill){
+					if(player.hp==1) player.logSkill(skill);
 					player.addSkillBlocker(skill);
 				},
 				onremove:function(player,skill){
 					player.removeSkillBlocker(skill);
 				},
-				charlotte:true,
-				locked:true,
 				skillBlocker:function(skill,player){
 					return skill!='chanyuan'&&skill!='rechanyuan'&&!lib.skill[skill].charlotte&&player.hp==1;
 				},
-				audio:2,
-				trigger:{player:'changeHp'},
-				filter:function(event,player){
-					return event.num<0&&player.hp==1;
-				},
-				content:function(){},
 				mark:true,
 				intro:{
 					content:function(storage,player,skill){
@@ -7734,8 +7727,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						if(list.length) str+=('<br><li>失效技能：'+get.translation(list))
 						return str;
-					}
-				}
+					},
+				},
+				audio:2,
+				trigger:{player:'changeHp'},
+				filter:function(event,player){
+					return player.hp==1;
+				},
+				forced:true,
+				content:function(){},
 			},
 			guhuo_phase:{},
 		},
@@ -7765,7 +7765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangzhong:['re_huangzhong','ol_huangzhong','sb_huangzhong','huangzhong','jsrg_huangzhong'],
 			weiyan:['re_weiyan','ol_weiyan','weiyan'],
 			zhoutai:['zhoutai','xin_zhoutai','old_zhoutai'],
-			xiaoqiao:['xiaoqiao','ol_xiaoqiao','re_xiaoqiao','old_xiaoqiao'],
+			xiaoqiao:['xiaoqiao','ol_xiaoqiao','re_xiaoqiao','sb_xiaoqiao','old_xiaoqiao'],
 			yuji:['xin_yuji','re_yuji','yuji'],
 			zhangjiao:['sp_zhangjiao','re_zhangjiao','sb_zhangjiao','zhangjiao'],
 			dianwei:['dianwei','ol_dianwei','re_dianwei'],
@@ -7798,7 +7798,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugezhan:['zhugezhan','old_zhugezhan'],
 			ol_lusu:['re_lusu','ol_lusu'],
 			zhanghe:['zhanghe','re_zhanghe','sb_zhanghe'],
-			yl_luzhi:['yl_luzhi','tw_yl_luzhi'],
+			yl_luzhi:['yl_luzhi','sb_yl_luzhi','tw_yl_luzhi'],
 			sunliang:['sunliang','xin_sunliang'],
 		},
 		translate:{
@@ -7874,6 +7874,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			drlt_wanglie:"往烈",
 			drlt_wanglie_info:"①出牌阶段，你使用的第一张牌无距离限制。②当你于出牌阶段内使用牌时，你可以令此牌不能被响应，然后你于本阶段内不能再使用牌。",
 			"drlt_xiongluan":"雄乱",
+			drlt_xiongluan1:'雄乱',
 			"drlt_xiongluan_info":"限定技，出牌阶段，你可以废除你的判定区和装备区，然后指定一名其他角色。直到回合结束，你对其使用牌无距离和次数限制，其不能使用和打出手牌。",
 			"drlt_congjian":"从谏",
 			"drlt_congjian_info":"当你成为锦囊牌的目标时，若此牌的目标数大于1，则你可以交给其中一名其他目标角色一张牌，然后摸一张牌，若你给出的是装备牌，改为摸两张牌。",

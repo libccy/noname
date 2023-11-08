@@ -2103,7 +2103,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				equipSkill:true,
 				filter:function(event,player){
-				 return lib.skill.toushiche_skill.logTarget(null,player).length>0;
+					return lib.skill.toushiche_skill.logTarget(null,player).length>0;
 				},
 				logTarget:function(event,player){
 					var hs=player.countCards('h');

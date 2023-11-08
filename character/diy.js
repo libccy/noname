@@ -294,7 +294,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_inari:'#bSummer Pockets',
 			key_saya:'#bLittle Busters!',
 			key_harukakanata:'#bLittle Busters!',
-			key_tsumugi:'#bSummer Pockets',
 			key_yui:'#rAngel Beats!',
 			key_yoshino:'#bRewrite',
 			key_kengo:'#bLittle Busters!',
@@ -753,8 +752,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(map[1]){
 						if(map[1].length==len&&len>4){
 							for(var i=0;i<map[1].length-1;i++){
-							 if(map[1][i+1]-map[1][i]!=1) return null;
-							 if(map[1][i+1]==15) return null;
+								if(map[1][i+1]-map[1][i]!=1) return null;
+								if(map[1][i+1]==15) return null;
 							}
 							return ['单顺',nums[0],len];
 						}
@@ -764,7 +763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else if(map[3]&&map[1].length==map[3].length&&len==map[1].length*4){
 							if(map[3].length==1) return ['三带一',map[3][0],1];
 							for(var i=0;i<map[3].length-1;i++){
-							 if(map[3][i+1]-map[3][i]!=1) return null;
+								if(map[3][i+1]-map[3][i]!=1) return null;
 							}
 							return ['单带飞机',map[3][0],map[3].length];
 						}
@@ -773,8 +772,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(map[2]){
 						if(map[2].length*2==len&&len>5){
 							for(var i=0;i<map[2].length-1;i++){
-							 if(map[2][i+1]-map[2][i]!=1) return null;
-							 if(map[2][i+1]==15) return null;
+								if(map[2][i+1]-map[2][i]!=1) return null;
+								if(map[2][i+1]==15) return null;
 							}
 							return ['双顺',nums[0],len];
 						}
@@ -784,8 +783,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else if(map[3]&&map[2].length==map[3].length&&len==map[2].length*5){
 							if(map[3].length==1) return ['三带二',map[3][0],1];
 							for(var i=0;i<map[3].length-1;i++){
-							 if(map[3][i+1]-map[3][i]!=1) return null;
-							 if(map[3][i+1]==15) return null;
+								if(map[3][i+1]-map[3][i]!=1) return null;
+								if(map[3][i+1]==15) return null;
 							}
 							return ['双带飞机',map[3][0],map[3].length];
 						}
@@ -794,8 +793,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(map[3]){
 						if(map[3].length*3==len&&len>5){
 							for(var i=0;i<map[3].length-1;i++){
-							 if(map[3][i+1]-map[3][i]!=1) return null;
-							 if(map[3][i+1]==15) return null;
+								if(map[3][i+1]-map[3][i]!=1) return null;
+								if(map[3][i+1]==15) return null;
 							}
 							return ['三顺',nums[0],len];
 						}
@@ -2934,9 +2933,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target.hasCard(function(card){
 						return get.name(card,target)=='shan';
 					},'h')){
-					 player.discardPlayerCard(target,true,'h','visible').set('filterButton',function(button){
-					  return get.name(button.link)=='shan';
-					 });
+						player.discardPlayerCard(target,true,'h','visible').set('filterButton',function(button){
+							return get.name(button.link)=='shan';
+						});
 					}
 					else if(player.countCards('he')>0) player.chooseToDiscard('he',true);
 				},
@@ -3008,7 +3007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				content:function(){
-				 player.draw();
+					player.draw();
 				},
 				mod:{
 					maxHandcard:function(player,num){
@@ -3793,7 +3792,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseButton(['选择获得一张“兴”',player.getExpansions('tenzen_yixing')],true);
 							'step 1'
 							if(result.bool){
-								player.gain(result.links,'gain2');;
+								player.gain(result.links,'gain2');
 							}
 							var next=game.createEvent('tenzen_yixing_insert');
 							event.next.remove(next);
@@ -3968,9 +3967,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,kyouko,hina){
 					if(kyouko==hina||kyouko.getStorage('kyouko_gongmian').contains(hina)) return false;
-				 var hs=hina.countCards('he');
-				 if(hs==0) return kyouko.countCards('h')==0;
-				 return true;
+					var hs=hina.countCards('he');
+					if(hs==0) return kyouko.countCards('h')==0;
+					return true;
 				},
 				content:function(){
 					'step 0'
@@ -4958,10 +4957,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							switch(button.link){
-								case 3:return 4.5;break;
-								case 4:return 4.4;break;
-								case 5:return 4.3;break;
-								case 2:return (3-player.hp)*1.5;break;
+								case 3:return 4.5;
+								case 4:return 4.4;
+								case 5:return 4.3;
+								case 2:return (3-player.hp)*1.5;
 								case 1:{
 									if(game.hasPlayer(function(current){
 										return (get.realAttitude||get.attitude)(player,current)<0&&get.distance(player,current)>1;
@@ -6122,7 +6121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.popup('花绽',get.groupnature(name.slice(12)));
 								game.log(player,'发动了技能',lib.translate[name].replace(/魔物/g,'【花绽】'));
 								player.removeMark(name,1,false);
-								;game.log(player,'移去了一个',lib.translate[name].replace(/魔物/g,'【魔物】'));
+								game.log(player,'移去了一个',lib.translate[name].replace(/魔物/g,'【魔物】'));
 							},
 						}
 					}
@@ -6388,7 +6387,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{source:'damageBefore'},
 						forced:true,
 						charlotte:true,
-						audio:'abyusa_jueqing',
 						filter:function(event,player){
 							return player.storage.abyusa_jueqing_rewrite==true;
 						},
@@ -9106,7 +9104,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				filterCard:true,
-				log:false,
 				filterTarget:function(card,player,target){
 					return target!=player&&target.hasZhuSkill('akane_yifu',player)&&!target.hasSkill('akane_yifu3');
 				},
@@ -9349,7 +9346,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<targets.length;i++){
 						if(targets[i].differentSexFrom(player)){
 							bool=true;break;
-						};
+						}
 					}
 					if(bool) player.loseHp();
 				},
@@ -9807,10 +9804,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					backup:function(links,player){
 						return {
-							filterCard:true,
 							audio:'haruka_shuangche',
-							selectCard:-1,
 							filterCard:function(){return false},
+							selectCard:-1,
 							popname:true,
 							check:function(card){
 								return 6-get.value(card);
@@ -11986,7 +11982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})){
 						event.finish();
 						return;
-					};
+					}
 					_status.currentPhase.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
 					get.translation(trigger.player.judging[0])+'，请打出一张手牌进行改判','h',true,function(card){
 						var player=_status.event.player;
@@ -13140,11 +13136,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(n==1){
 						player.addTempSkill("releiji",{player:"phaseUseBegin"}); 
 						player.markSkill("releiji",{player:"phaseUseBegin"});							
-					};
+					}
 					if(n==2){
 						player.addTempSkill("guidao",{player:"phaseUseBegin"});   
 						player.markSkill("guidao",{player:"phaseUseBegin"});							
-					};
+					}
 				},
 			},
 			ns_xiandao2:{

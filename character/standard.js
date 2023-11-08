@@ -1114,9 +1114,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			paoxiao:{
 				audio:2,
 				firstDo:true,
-				audioname2:{old_guanzhang:'old_fuhun'},
 				audioname:['re_zhangfei','guanzhang','xiahouba'],
-				audioname2:{
+				audioname2: {
+					old_guanzhang:'old_fuhun',
 					dc_xiahouba:'paoxiao_xiahouba',
 				},
 				trigger:{player:'useCard1'},
@@ -2539,7 +2539,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_zhangliao:['sp_zhangliao','yj_zhangliao','jsrg_zhangliao'],
 			xiahoudun:['xiahoudun','re_xiahoudun','xin_xiahoudun'],
 			liubei:['liubei','re_liubei','sb_liubei','dc_liubei','junk_liubei'],
-			guanyu:['guanyu','re_guanyu','ps_guanyu'],
+			guanyu:['guanyu','re_guanyu','ps_guanyu','old_guanyu'],
 			zhangfei:['zhangfei','re_zhangfei','old_zhangfei','xin_zhangfei','sb_zhangfei','tw_zhangfei','jsrg_zhangfei','yj_zhangfei'],
 			zhaoyun:['zhaoyun','re_zhaoyun','old_zhaoyun','sb_zhaoyun','ps2063_zhaoyun','ps2067_zhaoyun'],
 			sp_zhaoyun:['sp_zhaoyun','jsp_zhaoyun'],

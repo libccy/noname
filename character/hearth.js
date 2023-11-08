@@ -1959,7 +1959,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								case 'jiu':return 3.01;
 								case 'sha':
 									if(button.link[3]=='fire') return 2.95;
-									else if(button.link[3]=='fire') return 2.92;
+									else if(button.link[3]=='thunder') return 2.92;
 									else return 2.9;
 								default:return 2+_status.event.getRand()*2;
 							}

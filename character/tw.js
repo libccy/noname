@@ -127,8 +127,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
-			xiahousone:'三国杀集换式卡牌游戏《阵面对决》中的裂土系列卡牌。游卡桌游官方原创的三国时期女性角色。',
-			zhangwei:'三国杀集换式卡牌游戏《阵面对决》中的帝畿系列卡牌。游卡桌游官方原创的三国时期女性角色。',
+			xiahousone:'夏侯子萼，游卡桌游《三国杀阵面对决》中虚构的人物。在《阵面对决》中，设定为在貂蝉不在时血婆娑的实际首领。在海外服中，设定为夏侯惇的养女，继承了夏侯紫萼的血婆娑，之后“夏侯紫萼”这个名字就被隐匿于历史之中，而“夏侯子萼”则成为了血婆娑的首领“血蔷薇”的固定名号。',
+			zhangwei:'张葳，游卡桌游《三国杀阵面对决》中虚构的人物。在《阵面对决》中，设定为被夏侯子萼救下后加入的血婆娑成员。在海外服中，设定为张奂的养女，张奂为宦官迫害时与其失散，为神秘女子所救并学得武艺，后与夏侯紫萼一起建立血婆娑。在李儒分成时为了保护百姓而牺牲。',
 			nashime:'难升米（なしめ，或なんしょうまい）是倭国大夫。景初二年六月，受女王卑弥呼之命，与都市牛利出使魏国，被魏国拜为率善中郎将。',
 			jiachong:'贾充（217年—282年），字公闾，平阳襄陵（今山西襄汾）人，三国曹魏至西晋时期大臣，曹魏豫州刺史贾逵之子。西晋王朝的开国元勋。出身平阳贾氏。曾参与镇压淮南二叛和弑杀魏帝曹髦，因此深得司马氏信任，其女儿贾褒（一名荃）及贾南风分别嫁予司马炎弟司马攸及次子司马衷，与司马氏结为姻亲，地位显赫。晋朝建立后，转任车骑将军、散骑常侍、尚书仆射，后升任司空、太尉等要职。更封鲁郡公。咸宁末，为使持节、假黄钺、大都督征讨吴国。吴国平定后，增邑八千户。太康三年（282年），贾充去世。西晋朝廷追赠他为太宰，礼官议谥曰荒，司马炎不采纳，改谥为武。有集五卷。',
 			duosidawang:'朵思大王是《三国演义》中人物，南蛮秃龙洞的元帅，孟获弟弟孟优的朋友，据说是南蛮第一智者。',
@@ -298,9 +298,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				selectTarget:[1,3],
 				multitarget:true,
 				multiline:true,
+				group:'twdanlie_add',
 				content:function(){
 					'step 0'
-					player.addTempSkill('twdanlie_effect');
 					player.chooseToCompare(targets).setContent('chooseToCompareMeanwhile');
 					'step 1'
 					if(result.winner&&result.winner==player){
@@ -325,18 +325,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				subSkill:{
-					effect:{
-						charlotte:true,
-						trigger:{player:'compare'},
+					add:{
+						audio:'twdanlie',
+						trigger:{player:'compare',target:'compare'},
 						filter:function(event,player){
-							return event.getParent().name=='twdanlie'&&!event.iwhile&&player.isDamaged();
+							if(!player.isDamaged()) return false;
+							if(player!=event.target&&event.iwhile) return false;
+							return true;
 						},
 						forced:true,
-						popup:false,
+						locked:false,
 						content:function(){
 							var num=player.getDamagedHp();
-							trigger.num1+=num;
-							if(trigger.num1>13) trigger.num1=13;
+							if(player==trigger.player){
+								trigger.num1+=num;
+								if(trigger.num1>13) trigger.num1=13;
+							}
+							else{
+								trigger.num2+=num;
+								if(trigger.num2>13) trigger.num2=13;
+							}
 							game.log(player,'的拼点牌点数+',num);
 						},
 					},
@@ -397,8 +405,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.when('useCardAfter').filter(evt=>evt==trigger.getParent()).then(()=>{
 								if(player.getHistory('sourceDamage',evt=>evt.card==trigger.card).length){
 									player.draw();
-									player.addTempSkill('shenzhu_more','phaseUseAfter');
-									player.addMark('shenzhu_more',1,false);
+									player.addTempSkill('twhuzhong_sha','phaseUseAfter');
+									player.addMark('twhuzhong_sha',1,false);
 								}
 								else{
 									target.line(player);
@@ -427,6 +435,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(result.targets,'成为了',trigger.card,'的额外目标');
 					}
 				},
+				subSkill:{
+					sha:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							cardUsable:function(card,player,num){
+								if(card.name=='sha') return num+player.countMark('twhuzhong_sha');
+							},
+						},
+					}
+				}
 			},
 			twfenwang:{
 				audio:2,
@@ -500,7 +519,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					effect:{
 						charlotte:true,
-						trigger:{player:'useCard'},
+						trigger:{player:'useCard1'},
 						filter:function(event,player){
 							return get.type(event.card)=='basic'||get.type(event.card)=='trick';
 						},
@@ -514,7 +533,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										name:trigger.card.name,
 										isCard:true,
 									};
-									var targets=trigger.targets.filter(i=>i.isIn());
+									var targets=trigger.targets.filter(i=>i.isIn()&&player.canUse(card,i,false));
 									if(targets.length) player.useCard(card,targets,false);
 								}
 							});
@@ -531,49 +550,64 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
 					if(!event.player.isIn()) return false;
+					if(event.player.getHistory('damage').indexOf(event)!=0) return false;
 					return event.player==player||player.inRange(event.player);
 				},
 				usable:1,
 				direct:true,
 				content:function(){
 					'step 0'
-					var list=lib.inpile.filter(name=>{
-						var type=get.type2(name);
-						if(type!='basic'&&type!='trick') return false;
-						return !player.getStorage('twshenyi').includes(name);
+					var list=get.inpileVCardList(info=>{
+						return ['basic','trick','delay'].includes(info[0])&&!player.getStorage('twshenyi').includes(info[2]);
 					});
-					var dialog=['###'+get.prompt('twshenyi',trigger.player)+'###选择一个牌名，从牌堆中将此一张此牌名的牌称为“侠义”置于武将牌上',[list,'vcard']];
+					var dialog=[`###${get.prompt('twshenyi',trigger.player)}###<div class="text center">从牌堆中将一张牌作为“侠义”置于武将牌上${player!=trigger.player&&player.countCards('h')?'，然后将所有手牌交给其':''}</div>`,[list,'vcard']];
 					player.chooseButton(dialog).set('ai',function(button){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player,name=button.link[2];
 						if(get.attitude(player,trigger.player)<=0) return 0;
 						if(!get.cardPile2(card=>card.name==name)) return 0;
-						return get.value({name:name});
+						var value=get.value({name:name});
+						if(['tao','jiu','caochuan','wuxie'].includes(name)&&get.event().getRand()>0.4) return value*2;
+						return value;
 					});
 					'step 1'
 					if(result.bool){
-						var name=result.links[0][2];
+						var name=result.links[0][2],nature=result.links[0][3];
+						var cardx={name:name,nature:nature};
 						player.logSkill('twshenyi',trigger.player);
-						player.popup(name);
+						player.popup(cardx);
 						player.markAuto('twshenyi',[name]);
-						game.log(player,'声明了','#y'+get.translation(name));
-						var card=get.cardPile2(card=>card.name==name);
+						game.log(player,'声明了',`#y${get.translation(cardx)}`);
+						var card=get.cardPile2(card=>get.name(card,false)==name&&get.nature(card,false)==nature);
 						if(card) player.addToExpansion([card],'gain2').gaintag.add('twshenyi');
 						else{
 							player.chat('无牌可得？！');
 							game.log('但是牌堆中已经没有','#y'+get.translation(name),'了！');
 						}
 						if(trigger.player!=player&&player.countCards('h')){
+							game.delayex();
 							var skill='twshenyi_'+player.playerid;
-							if(!lib.skill[skill]){
-								lib.skill[skill]={charlotte:true};
-								lib.translate[skill]='义·'+get.translation(player.name);
-							}
+							game.broadcastAll(lib.skill.twshenyi.createGainTag,skill,player.name);
+							game.addVideo('skill',player,['twshenyi',[skill,player.name]]);
 							player.give(player.getCards('h'),trigger.player).gaintag.add(skill);
 							player.addSkill('twshenyi_draw');
 						}
 					}
 					else player.storage.counttrigger.twshenyi--;
+				},
+				video:(player,info)=>lib.skill.twshenyi.createGainTag(info[0],info[1]),
+				createGainTag:function(skill,name){
+					if(!lib.skill[skill]){
+						lib.skill[skill]={charlotte:true};
+						lib.translate[skill]='义·'+get.translation(name);
+					}
+					if(!_status.postReconnect.twshenyi){
+						_status.postReconnect.twshenyi=[
+							lib.skill.twshenyi.createGainTag,[],[]
+						];
+					}
+					_status.postReconnect.twshenyi[1].add(skill);
+					_status.postReconnect.twshenyi[2].add(name);
 				},
 				marktext:'义',
 				intro:{
@@ -598,56 +632,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return game.hasPlayer(target=>{
 								var evt=event.getl(target);
 								if(!evt||!evt.hs||!evt.hs.length) return false;
-								if(event.name=='lose'){
-									for(var i in event.gaintag_map){
-										if(event.gaintag_map[i].contains(skill)) return true;
-									}
-									return false;
+								for(let i in evt.gaintag_map){
+									if(evt.gaintag_map[i].includes(skill)) return true;
 								}
-								return target.hasHistory('lose',function(evt){
-									if(event!=evt.getParent()) return false;
-									for(var i in evt.gaintag_map){
-										if(evt.gaintag_map[i].contains(skill)) return true;
-									}
-									return false;
-								});
+								return false;
 							});
 						},
 						forced:true,
+						direct:true,
 						content:function(){
 							var skill='twshenyi_'+player.playerid;
+							var num=0;
 							var targets=game.filterPlayer(target=>{
 								var evt=trigger.getl(target);
+								var numx=0;
 								if(!evt||!evt.hs||!evt.hs.length) return false;
-								if(trigger.name=='lose'){
-									for(var i in trigger.gaintag_map){
-										if(trigger.gaintag_map[i].contains(skill)) return true;
-									}
-									return false;
+								for(var i in evt.gaintag_map){
+									if(evt.gaintag_map[i].includes(skill)) numx++;
 								}
-								return target.hasHistory('lose',function(evt){
-									if(trigger!=evt.getParent()) return false;
-									for(var i in evt.gaintag_map){
-										if(evt.gaintag_map[i].contains(skill)) return true;
-									}
-									return false;
-								});
-							}),num=0;
-							targets.forEach(target=>{
-								var cards=trigger.getl(target).hs;
-								if(trigger.name=='lose'){
-									for(var i in trigger.gaintag_map){
-										if(trigger.gaintag_map[i].contains(skill)) num++;
-									}
-								}
-								else target.getHistory('lose',function(evt){
-									if(trigger!=evt.getParent()) return false;
-									for(var i in evt.gaintag_map){
-										if(evt.gaintag_map[i].contains(skill)) num++;
-									}
-								});
+								if(numx>0) return num+=numx;
+								return false;
 							});
-							if(num>0) player.draw(num);
+							if(num>0){
+								player.logSkill('twshenyi_draw',targets);
+								player.draw(num);
+							}
 						},
 					},
 				},
@@ -659,23 +668,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.getExpansions('twshenyi').length>game.countPlayer();
 				},
 				check:function(event,player){
+					if(player.hp>=3||(player.countCards('h')>=4&&player.getExpansions('twshenyi').every(card=>!player.hasValueTarget(card)||!get.tag(card,'damage')||!lib.skill.xunshi.isXunshi(card)))) return false;
 					return player.getExpansions('twshenyi').some(card=>player.hasValueTarget(card));
 				},
-				prompt2:function(event,player){
-					return '依次使用武将牌上的“侠义”牌，回合结束时弃置所有手牌并将失去X点体力（X为你的体力值-1且X至少为1）';
-				},
+				direct:true,
 				content:function*(event,map){
 					var player=map.player;
-					while(player.getExpansions('twshenyi').some(card=>player.hasValueTarget(card))){
-						var result=yield player.chooseButton(['兴汉：请选择其中的一张牌使用',player.getExpansions('twshenyi').filter(card=>player.hasValueTarget(card))]).set('ai',function(button){
-							return _status.event.player.getUseValue(button.link);
-						});
-						if(result.bool){
-							player.chooseToUse(true,result.links[0],false);
-						}
+					var result=yield player.chooseBool().set('createDialog',[
+						get.prompt('twxinghan'),
+						`<div class="text center">按顺序使用以下“侠义”牌。但是回合结束时你须弃置所有手牌并失去X点体力（X为你的体力值-1且X至少为1）</div>`,
+						player.getExpansions('twshenyi').filter(card=>player.hasUseTarget(card)).reverse(),
+						'hidden',
+					]).set('choice',lib.skill.twxinghan.check(null,player));
+					if(!result.bool){
+						event.finish();
+						return;
+					}
+					while(true){
+						var cards=player.getExpansions('twshenyi').filter(card=>player.hasUseTarget(card)).reverse();
+						if(!cards.length) break;
+						yield player.chooseUseTarget(true,cards[0],false);
 					}
 					player.when('phaseEnd').then(()=>{
-						if(player.countCards('h')) player.discard(player.getCards('h'));
+						if(player.countCards('h')) player.chooseToDiscard(player.countCards('h'),true);
 						var num=Math.max(1,player.getHp()-1);
 						player.loseHp(num);
 					});
@@ -685,17 +700,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					init:{
 						audio:'twxinghan',
 						trigger:{
-							player:['loseEnd','dying','dyingAfter'],
+							player:['loseEnd','dying','die','dyingAfter'],
 							global:['equipEnd','addJudgeEnd','gainEnd','loseAsyncEnd','addToExpansionEnd'],
 						},
 						filter:function(event,player){
-							return (player.getExpansions('twshenyi').length&&(!player.countCards('h')||player.isDying()))^player.hasSkill('twxinghan_in');
+							return (player.getExpansions('twshenyi').length&&event.name!='die'&&(!player.countCards('h')||player.isDying()))^player.hasSkill('twxinghan_in');
 						},
 						forced:true,
 						firstDo:true,
 						silent:true,
+						forceDie:true,
 						content:function(){
-							if(player.getExpansions('twshenyi').length&&(!player.countCards('h')||player.isDying())){
+							if(player.getExpansions('twshenyi').length&&trigger.name!='die'&&(!player.countCards('h')||player.isDying())){
 								var cards=player.getExpansions('twshenyi');
 								var cardsx=cards.map(card=>{
 									var cardx=ui.create.card();
@@ -972,10 +988,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						switch(get.sgn(att)){
 							case 1:
 								return [cards,[]];
-								break;
 							case 0:
 								return [cardx,cardy];
-								break;
 							case -1:
 								var num=Math.ceil(cards.length/2)+(cards.length%2==0?1:0);
 								if(num>1&&player.hasSkill('twchungang')) num--;
@@ -985,7 +999,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								cardy.sort((a,b)=>get.value(b)-get.value(a));
 								cardx.addArray(cardy.slice(num,cardy.length));
 								return [cardx,cardy.slice(0,num)];
-								break;
 						}
 					}).set('cards',cards);
 					'step 1'
@@ -5736,7 +5749,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return false;
 					});
 				},
-				direct:true,
 				content:function(){
 					'step 0'
 					var target=lib.skill.twenyuan1.logTarget(trigger,player)[0];
@@ -6018,7 +6030,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})){
 						event.finish();
 						return;
-					};
+					}
 					player.chooseTarget(get.prompt('twzhengrong'),'将一名其他角色的一张牌置于武将牌上，称为“荣”',function(card,player,target){
 						return target!=player&&target.countCards('he');
 					}).set('ai',function(target){
@@ -6447,7 +6459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.addToExpansion(result.cards[0],'log','give',player).gaintag.add('twmingren');
 								var card=player.getExpansions('twmingren')[0];
 								if(card) player.gain(card,'gain2');
-							};
+							}
 						},
 					},
 				},
@@ -8839,7 +8851,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return 6+get.effect(player,card,target,target);
 								}
 								return get.effect(target,{name:'guohe_copy2'},player,player)/2+get.effect(target,card,player,player);
-							});;
+							});
 							'step 1'
 							if(result.bool){
 								event.targets=result.targets;
@@ -9761,42 +9773,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					cardEnabled:function(card,player){
 						if(game.hasPlayer(function(current){
- 						var list=current.storage.twgongsun_shadow;
- 						if(!list) return false;
- 						for(var i=0;i<list.length;i++){
- 							if(list[i][0]==player&&list[i][1]==card.suit) return true;
- 						}
- 						return false;
+							var list=current.storage.twgongsun_shadow;
+							if(!list) return false;
+							for(var i=0;i<list.length;i++){
+								if(list[i][0]==player&&list[i][1]==card.suit) return true;
+							}
+							return false;
 						})) return false;
 					},
 					cardSavable:function(card,player){
 						if(game.hasPlayer(function(current){
- 						var list=current.storage.twgongsun_shadow;
- 						if(!list) return false;
- 						for(var i=0;i<list.length;i++){
- 							if(list[i][0]==player&&list[i][1]==card.suit) return true;
- 						}
- 						return false;
+							var list=current.storage.twgongsun_shadow;
+							if(!list) return false;
+							for(var i=0;i<list.length;i++){
+								if(list[i][0]==player&&list[i][1]==card.suit) return true;
+							}
+							return false;
 						})) return false;
 					},
 					cardRespondable:function(card,player){
 						if(game.hasPlayer(function(current){
- 						var list=current.storage.twgongsun_shadow;
- 						if(!list) return false;
- 						for(var i=0;i<list.length;i++){
- 							if(list[i][0]==player&&list[i][1]==card.suit) return true;
- 						}
- 						return false;
+							var list=current.storage.twgongsun_shadow;
+							if(!list) return false;
+							for(var i=0;i<list.length;i++){
+								if(list[i][0]==player&&list[i][1]==card.suit) return true;
+							}
+							return false;
 						})) return false;
 					},
 					cardDiscardable:function(card,player){
 						if(game.hasPlayer(function(current){
- 						var list=current.storage.twgongsun_shadow;
- 						if(!list) return false;
- 						for(var i=0;i<list.length;i++){
- 							if(list[i][0]==player&&list[i][1]==card.suit) return true;
- 						}
- 						return false;
+							var list=current.storage.twgongsun_shadow;
+							if(!list) return false;
+							for(var i=0;i<list.length;i++){
+								if(list[i][0]==player&&list[i][1]==card.suit) return true;
+							}
+							return false;
 						})) return false;
 					},
 				},
@@ -10377,8 +10389,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('twfenghan',targets);
 						if(targets.length>1) game.asyncDraw(targets);
 						else{
-						 targets[0].draw();
-						 event.finish();
+							targets[0].draw();
+							event.finish();
 						}
 					}
 					else{
@@ -10759,20 +10771,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 						},
 						content:function(){
-						 'step 0'
-						 player.chooseTarget(lib.skill.twfuzuan.filterTarget,get.prompt('twfuzuan'),'变更一名角色的一个转换技的状态').set('ai',function(target){
-						 	var player=_status.event.player;
-						 	return get.effect(target,'twfuzuan',player,player);
-						 });
-						 'step 1'
-						 if(result.bool){
-						  var target=result.targets[0];
-						  player.logSkill('twfuzuan',target);
-						  var next=game.createEvent('twfuzuan');
-						  next.player=player;
-						  next.target=target;
-						  next.setContent(lib.skill.twfuzuan.content);
-						 }
+							'step 0'
+							player.chooseTarget(lib.skill.twfuzuan.filterTarget,get.prompt('twfuzuan'),'变更一名角色的一个转换技的状态').set('ai',function(target){
+								var player=_status.event.player;
+								return get.effect(target,'twfuzuan',player,player);
+							});
+							'step 1'
+							if(result.bool){
+								var target=result.targets[0];
+								player.logSkill('twfuzuan',target);
+								var next=game.createEvent('twfuzuan');
+								next.player=player;
+								next.target=target;
+								next.setContent(lib.skill.twfuzuan.content);
+							}
 						},
 					},
 				},
@@ -11212,7 +11224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							content:function(storage){
 								if(storage){
-								 return '经过'+storage[1]+'个“回合结束时”后，若有“示”，则从牌堆中获得'+storage[0]+'张和“示”名称相同的牌';
+									return '经过'+storage[1]+'个“回合结束时”后，若有“示”，则从牌堆中获得'+storage[0]+'张和“示”名称相同的牌';
 								}
 								return '未指定施法效果';
 							},
@@ -11386,7 +11398,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							content:function(storage){
 								if(storage){
-								 return '经过'+storage[1]+'个“回合结束时”后，回复'+storage[0]+'点体力';
+									return '经过'+storage[1]+'个“回合结束时”后，回复'+storage[0]+'点体力';
 								}
 								return '未指定施法效果';
 							},
@@ -11462,7 +11474,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							content:function(storage){
 								if(storage){
-								 return '经过'+storage[1]+'个“回合结束时”后，摸'+storage[0]*2+'张牌';
+									return '经过'+storage[1]+'个“回合结束时”后，摸'+storage[0]*2+'张牌';
 								}
 								return '未指定施法效果';
 							},
@@ -11542,7 +11554,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							content:function(storage){
 								if(storage){
-								 return '经过'+storage[1]+'个“回合结束时”后，获得'+storage[0]+'层“防止一次伤害”的效果';
+									return '经过'+storage[1]+'个“回合结束时”后，获得'+storage[0]+'层“防止一次伤害”的效果';
 								}
 								return '未指定施法效果';
 							},
@@ -11764,7 +11776,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var checkx=get.color(card,player)==get.color(judging);
 								if(checkx>0) return checkx;
 								return 0;
-							};
+							}
 							return result*(attitude>0?1:-1);
 						}).set('judging',trigger.player.judging[0]);
 					'step 1'
@@ -13120,7 +13132,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								});
 							}).sortBySeat();
 							for(var i of list){
-							 i.discardPlayerCard(player,true,'he').boolline=true;
+								i.discardPlayerCard(player,true,'he').boolline=true;
 							}
 						},
 					},
@@ -14567,6 +14579,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiangji:['tw_jiangji','jiangji'],
 			baoxin:['tw_baoxin','baoxin'],
 			yanxiang:['yanxiang','tw_yanxiang'],
+			liwei:['liwei','tw_liwei'],
 		},
 		dynamicTranslate:{
 			twfeifu:function(player){
@@ -15211,7 +15224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xia_xiahoudun:'侠夏侯惇',
 			xia_xiahoudun_prefix:'侠',
 			twdanlie:'胆烈',
-			twdanlie_info:'出牌阶段限一次，你可以与至多三名其他角色同时拼点，且你此次的拼点牌点数+X（X为你已损失的体力值）。若你赢，你对这些角色各造成1点伤害；若你没赢，你失去1点体力。',
+			twdanlie_info:'①出牌阶段限一次。你可以与至多三名其他角色共同拼点。若你赢，你对没赢的角色依次造成1点伤害；若你没赢，你失去1点体力。②你的拼点牌点数+X（X为你已损失的体力值）。',
 			xia_zhangwei:'张葳',
 			twhuzhong:'护众',
 			twhuzhong_info:'当你于出牌阶段使用无属性【杀】指定唯一目标角色时，你可以选择一项：①弃置一张手牌，然后你可以为此牌额外选择一个目标；②令其弃置一张手牌，此牌结算完毕后，若此牌造成过伤害，则你摸一张牌且本阶段可以额外使用一张【杀】，否则其对你造成1点伤害。',
@@ -15223,9 +15236,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xia_liubei:'侠刘备',
 			xia_liubei_prefix:'侠',
 			twshenyi:'伸义',
-			twshenyi_info:'每回合限一次，当你或你攻击范围内的一名角色受到伤害后，你可以声明一个基本牌或锦囊牌的牌名（每种牌名限一次），然后从牌堆中将一张同名牌称为“侠义”置于武将牌上，然后若受伤角色不为你，则你将所有手牌交给其，且当其失去一张你以此法交给其的牌后，你摸一张牌。',
+			twshenyi_info:'每回合限一次。当你或你攻击范围内的一名角色于一回合内首次受到伤害后，你可以声明一种基本牌或锦囊牌（每种牌名限一次），然后从牌堆中将一张同名牌称为“侠义”置于武将牌上。若受伤角色不为你，则你将所有手牌交给其，且当其失去一张你以此法交给其的牌后，你摸一张牌。',
 			twxinghan:'兴汉',
-			twxinghan_info:'①当你没有手牌时或你处于濒死状态时，你可以如手牌般使用或打出你武将牌上的“侠义”牌。②准备阶段，若你武将牌上的“侠义”牌数大于场上的存活角色数，则你可以依次使用其中所有可以使用的牌，然后于回合结束时弃置所有手牌并失去X点体力（X为你的体力值-1且X至少为1）。',
+			twxinghan_info:'①当你没有手牌时或你处于濒死状态时，你可以如手牌般使用或打出“侠义”牌。②准备阶段，若“侠义”牌数大于存活角色数，则你可以依次使用其中所有可以使用的牌。然后你获得如下效果：回合结束时，你弃置所有手牌并失去X点体力（X为你的体力值-1且X至少为1）。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',

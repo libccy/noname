@@ -1514,7 +1514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					unlimit:{
 						mod:{
 							cardUsable:function(card,player){
-					 		var list=lib.skill.lkbushi.getBushi(player);
+								var list=lib.skill.lkbushi.getBushi(player);
 								if(list[0]==get.suit(card)) return Infinity;
 							},
 						},
@@ -2043,6 +2043,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('paoxiao');
 					}
 				},
+				derivation:['wusheng','paoxiao'],
 			},
 			shiyong:{
 				audio:2,
@@ -2210,7 +2211,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('filterButton',function(button){
 						if(button.link==0){
 							return _status.event.bool1;
-						};
+						}
 						return true;
 					});
 					next.set('bool1',lib.skill.xinbenxi.filterx(trigger,player));
@@ -3151,7 +3152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var i=0;i<storage.length;i++){
 								str+='、';
 								str+=get.translation(storage[i]);
-							};
+							}
 							str=str.slice(1);
 							str2+=('<br><li>已对'+str+'发动过〖残韵〗');
 						}
@@ -3304,7 +3305,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					'step 0'
-					player.chooseTarget(get.prompt2('rezhenjun')).ai=function(target){
+					player.chooseTarget(get.prompt2('rezhenjun'),(card,player,target)=>{
+						return target.countCards('he');
+					}).ai=function(target){
 						return -get.attitude(_status.event.player,target)*(target.countCards('e')+1);
 					};
 					'step 1'
@@ -4167,7 +4170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!player.storage.juexiang_lie){
 									event.finish();
 									return;
-								};
+								}
 								player.storage.juexiang_lie--;
 							}
 							player.chooseTarget(get.prompt2('juexiang_lie'),function(card,player,target){
@@ -5407,8 +5410,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					skillTagFilter:function(player){
 						if(!player.countCards('hes')||player.hasSkill('taoluan3')) return false;
-						if(!player.storage.taoluan.contains('tao')){}
-						else if(player.isDying()&&!player.storage.taoluan.contains('jiu')){}
+						if(!player.storage.taoluan.contains('tao')){ /* empty */ }
+						else if(player.isDying()&&!player.storage.taoluan.contains('jiu')){ /* empty */ }
 						else return false;
 					},
 					order:4,
@@ -6121,6 +6124,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.popup('更改描述');
 						player.addMark('xindanxin',1,false);
 					}
+				},
+				ai:{
+					maixie:true,
+					effect:{
+						target:(card,player,target)=>{
+							if(!get.tag(card,'damage')) return;
+							if(target.hp<2||player.hasSkillTag('jueqing',false,target)) return -1.5;
+							return [1,1];
+						}
+					}
 				}
 			},
 			zongzuo:{
@@ -6461,7 +6474,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return current!=player;
 							}).sortBySeat(player);
 							for(var target of players){
-								if(get.damageEffect(target,player,target,'fire')>=0){num=0;continue};
+								if(get.damageEffect(target,player,target,'fire')>=0){num=0;continue}
 								var shao=false;
 								num++;
 								if(target.countCards('he',function(card){
@@ -8754,10 +8767,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							switch(button.link[2]){
 								case 'tao':return 5;
 								case 'jiu':return 3.01;
-								case 'shan':return 3.01;
 								case 'sha':
 									if(button.link[3]=='fire') return 2.95;
-									else if(button.link[3]=='fire') return 2.92;
+									else if(button.link[3]=='thunder') return 2.92;
 									else return 2.9;
 								case 'shan':return 1;
 							}
@@ -10045,7 +10057,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				filter:function(event,player){
-				 return player!=event.player;
+					return player!=event.player;
 				},
 				logTarget:'player',
 				content:function(){
@@ -11060,11 +11072,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								order:10,
 								result:{
 									target:function(player,target){
-	  							if(player!=target) return 0;
-	  							if(player.hasSkill('requanji')||(player.countCards('h')+2<=player.hp+player.getExpansions('quanji').length)) return 1;
-	  							return 0;
-	  						}
-	  					},
+										if(player!=target) return 0;
+										if(player.hasSkill('requanji')||(player.countCards('h')+2<=player.hp+player.getExpansions('quanji').length)) return 1;
+										return 0;
+									}
+								},
 							},
 						}
 					},
@@ -13525,7 +13537,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['xin_jushou'],
 				check:function(event,player){
-				 return player.getHistory('damage').indexOf(event)==0;
+					return player.getHistory('damage').indexOf(event)==0;
 				},
 				content:function(){
 					if(player.getHistory('damage').indexOf(trigger)>0){
@@ -13780,7 +13792,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				unique:true,
-				derivation:['zyexin','zzili'],
+				derivation:['zyexin','zzili','zpaiyi'],
 				filter:function(event,player){
 					return player.countCards('e')>=2;
 				},

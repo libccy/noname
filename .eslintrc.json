@@ -1,5 +1,5 @@
 {
-    "extends": "chrome 46",
+    "extends": "eslint:recommended",
     "env": {
         "browser": true,
         "node": true,
@@ -10,6 +10,12 @@
         "no-console": 0,
         "no-unused-vars": 0,
         "no-undef": 0,
-        "no-redeclare": 0
+        "no-redeclare": 0,
+        "no-prototype-builtins": 0,
+        "require-yield": 0,
+        "no-irregular-whitespace": ["error", { "skipStrings": true, "skipTemplates": true }],
+        "no-constant-condition": ["error", { "checkLoops": false }]/* ,
+        "comma-dangle": ["error", "only-multiline"],
+        "complexity": ["error",100] */
     }
 }

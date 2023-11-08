@@ -365,7 +365,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			mode_guozhan:{
 				guozhan_default:["gz_caocao","gz_simayi","gz_xiahoudun","gz_zhangliao","gz_xuzhu","gz_guojia","gz_zhenji","gz_xiahouyuan","gz_zhanghe","gz_xuhuang","gz_caoren","gz_dianwei","gz_xunyu","gz_caopi","gz_yuejin","gz_liubei","gz_guanyu","gz_zhangfei","gz_zhugeliang","gz_zhaoyun","gz_machao","gz_huangyueying","gz_huangzhong","gz_weiyan","gz_pangtong","gz_sp_zhugeliang","gz_liushan","gz_menghuo","gz_zhurong","gz_ganfuren","gz_sunquan","gz_ganning","gz_lvmeng","gz_huanggai","gz_zhouyu","gz_daqiao","gz_luxun","gz_sunshangxiang","gz_sunjian","gz_xiaoqiao","gz_taishici","gz_zhoutai","gz_re_lusu","gz_zhangzhang","gz_dingfeng","gz_huatuo","gz_lvbu","gz_diaochan","gz_re_yuanshao","gz_yanwen","gz_jiaxu","gz_pangde","gz_zhangjiao","gz_caiwenji","gz_mateng","gz_kongrong","gz_jiling","gz_tianfeng","gz_panfeng","gz_zoushi",],
 				guozhan_zhen:["gz_dengai","gz_caohong","gz_jiangfei","gz_jiangwei","gz_xusheng","gz_jiangqing","gz_hetaihou","gz_yuji"],
-				guozhan_shi:[,"gz_re_lidian","gz_zangba","gz_madai","gz_mifuren","gz_sunce","gz_chendong","gz_sp_dongzhuo","gz_zhangren"],
+				guozhan_shi:["gz_re_lidian","gz_zangba","gz_madai","gz_mifuren","gz_sunce","gz_chendong","gz_sp_dongzhuo","gz_zhangren"],
 				guozhan_bian:["gz_liqueguosi","gz_zuoci","gz_bianfuren","gz_xunyou","gz_lingtong","gz_lvfan","gz_masu","gz_shamoke",],
 				guozhan_quan:["gz_cuimao","gz_yujin","gz_wangping","gz_fazheng","gz_wuguotai","gz_lukang","gz_yuanshu","gz_zhangxiu"],
 				guozhan_jun:["gz_jun_caocao","gz_jun_sunquan","gz_jun_liubei","gz_jun_zhangjiao"],
@@ -1485,7 +1485,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				group:'gzgongjian_gain',
 				subSkill:{
 					gain:{
-					 audio:'gongjian',
+						audio:'gongjian',
 						trigger:{
 							global:['loseAfter','loseAsyncAfter'],
 						},
@@ -1911,7 +1911,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return get.suit(card)=='diamond'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'lebu'},[card]),event.target);
 					},'he')||player.hasCard(function(card){
 						return get.suit(card)=='club'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'bingliang'},[card]),event.target,false);
-					}),'he') return true;
+					},'he')) return true;
 					return false;
 				},
 				check:function(event,player){
@@ -2427,8 +2427,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					mark:{
 						marktext:'祸',
 						intro:{
-		 				content:'mark',
-		 				onunmark:true,
+							content:'mark',
+							onunmark:true,
 						},
 					},
 				},
@@ -2809,25 +2809,25 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(double) groups=double.slice(0);
 					else groups=[lib.character[character][1]];
 					event.groups=groups;
- 				event.videoId=lib.status.videoId++;
- 				game.broadcastAll(function(player,id,character){
- 					ui.create.dialog(get.translation(player)+'发动了【博览】',[[character],'character']).videoId=id;
- 				},player,event.videoId,character);
- 				game.delay(3);
- 				'step 1'
- 				game.broadcastAll('closeDialog',event.videoId);
- 				var list1=['wei','shu','wu','qun','jin'],list2=['gzqice','tiaoxin','gzzhiheng','new_chuli','gzsanchen'];
- 				var skills=[];
- 				for(var i=0;i<list1.length;i++){
- 					if(event.groups.contains(list1[i])) skills.push(list2[i]);
- 				}
- 				if(!skills.length) event.finish();
- 				else if(skills.length==1) event._result={control:skills[0]};
- 				else player.chooseControl(skills).set('prompt','选择获得一个技能直到回合结束');
- 				'step 2'
- 				var skill=result.control;
- 				player.addTempSkill(skill);
- 				game.log(player,'获得了技能','#g【'+get.translation(skill)+'】');
+					event.videoId=lib.status.videoId++;
+					game.broadcastAll(function(player,id,character){
+						ui.create.dialog(get.translation(player)+'发动了【博览】',[[character],'character']).videoId=id;
+					},player,event.videoId,character);
+					game.delay(3);
+					'step 1'
+					game.broadcastAll('closeDialog',event.videoId);
+					var list1=['wei','shu','wu','qun','jin'],list2=['gzqice','tiaoxin','gzzhiheng','new_chuli','gzsanchen'];
+					var skills=[];
+					for(var i=0;i<list1.length;i++){
+						if(event.groups.contains(list1[i])) skills.push(list2[i]);
+					}
+					if(!skills.length) event.finish();
+					else if(skills.length==1) event._result={control:skills[0]};
+					else player.chooseControl(skills).set('prompt','选择获得一个技能直到回合结束');
+					'step 2'
+					var skill=result.control;
+					player.addTempSkill(skill);
+					game.log(player,'获得了技能','#g【'+get.translation(skill)+'】');
 				},
 				derivation:['gzqice','tiaoxin','gzzhiheng','new_chuli','gzsanchen'],
 				ai:{
@@ -4103,9 +4103,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return '没有“戮”';
 						}
 					},
-					content:function(storage,player){
-							return '共有'+get.cnNumber(storage.length)+'张“戮”';
-					},
+					// content:function(storage,player){
+					// 	return '共有'+get.cnNumber(storage.length)+'张“戮”';
+					// },
 				},
 				group:'gzshilu_zhiheng',
 				subSkill:{
@@ -4853,7 +4853,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				selectTarget:-1,
-				filterTarget:function(card,player,target){;
+				filterTarget:function(card,player,target){
 					if(player==target) return true;
 					if(player.identity=='unknown'){
 						var group='shu';
@@ -7806,7 +7806,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					trigger.source.chooseJunlingControl(player,result.junling,result.targets).set('prompt','补益').set('choiceList',choiceList).set('ai',function(){
 						if(get.recoverEffect(trigger.player,player,_status.event.player)>0) return 1;
 						return (get.attitude(trigger.source,trigger.player)<0&&get.junlingEffect(player,result.junling,trigger.source,result.targets,trigger.source)>=-2)?1:0;
-						return 0;
 					});
 					'step 2'
 					if(result.index==0) trigger.source.carryOutJunling(player,event.junling,targets);
@@ -8800,8 +8799,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.log(player,'获得了技能','#g【'+get.translation(result.control)+'】');
 							game.delay();
 						},
-						forceaudio:true,
-						audio:['xuanhuo',2],
+						// forceaudio:true,
+						// audio:['xuanhuo',2],
 						ai:{
 							order:8,
 							result:{player:1},
@@ -8809,7 +8808,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 					//used:{},
 				},
-				audio:['xuanhuo',2],
+				// audio:['xuanhuo',2],
 			},
 			fz_gzpaoxiao:{
 				audio:true,
@@ -10383,8 +10382,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							case '珠联(桃)': return get.copy(lib.skill._zhulianbihe_mark_tao);
 							case '珠联(摸牌)': return {
 								content:function(){
-								 player.draw(2);
-								 player.removeMark(player.hasMark('zhulianbihe_mark')?'zhulianbihe_mark':'yexinjia_mark',1);
+									player.draw(2);
+									player.removeMark(player.hasMark('zhulianbihe_mark')?'zhulianbihe_mark':'yexinjia_mark',1);
 								},
 							};
 							case '阴阳鱼': return {
@@ -11132,7 +11131,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					backup:function(links,player){
 						return {
 							filterCard:true,
-							audio:"qice",
+							audio:'qice_backup',
 							selectCard:-1,
 							position:'h',
 							selectTarget:function(){
@@ -11154,7 +11153,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 								return lib.filter.filterTarget(card,player,target);
 							},
-							audio:'qice_backup',
 							popname:true,
 							viewAs:{name:links[0][2]},
 							ai1:function(){
@@ -11887,7 +11885,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							return false;
 						})
-					};
+					}
 					if(trigger.name=='lose'){
 						for(var i of trigger.cards){
 							if(i.name=='feilongduofeng'&&get.position(i,true)=='d') cards.push(i);
@@ -12342,7 +12340,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return player.siege(event.target)&&event.player.siege(event.target);
 				},
 				forced:true,
-				audio:'zniaoxiang',
 				forceaudio:true,
 				logTarget:'target',
 				content:function(){
@@ -12661,7 +12658,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<skills.length;i++){
 						list.add(skills[i]);
 						var info=lib.skill[skills[i]];
-						if(info.charlotte){list.splice(i--);continue};
+						if (info.charlotte) {
+							list.splice(i--);
+							continue;
+						}
 						if(typeof info.derivation=='string'){
 							list.add(info.derivation);
 						}
@@ -14219,13 +14219,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.me.chooseButtonOL(chosen,function(player,result){
 							if(player==game.me) player.trueIdentity=result.links[0][2].slice(6);
 						}).set('switchToAuto',function(){
- 							_status.event.result='ai';
- 						}).set('processAI',function(){
- 							return {
- 								bool:true,
- 								links:[_status.event.dialog.buttons.randomGet().link],
- 							}
- 						});
+							_status.event.result='ai';
+						}).set('processAI',function(){
+							return {
+								bool:true,
+								links:[_status.event.dialog.buttons.randomGet().link],
+							}
+						});
 					}
 					else event._result={};
 					'step 2'

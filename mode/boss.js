@@ -2172,21 +2172,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard('he',get.prompt('noda_axe',trigger.target),2,'弃置两张牌，令'+get.translation(trigger.target)+'本回合内不能使用或打出牌且防具技能无效。',function(card,player){
 						return card!=player.getEquip(1);
 					}).set('logSkill',['noda_axe',trigger.target]).set('goon',function(event,player){
- 					if(player.hasSkill('noda_axe2')) return false;
- 					if(event.getParent().excluded.contains(player)) return false;
- 					if(get.attitude(event.player,player)>0){
- 						return false;
- 					}
- 					if(get.type(event.card)=='trick'&&event.player.hasWuxie()) return true;
- 					if(get.tag(event.card,'respondSha')){
- 						if(!player.hasSha()) return false;
- 						return true;
- 					}
- 					else if(get.tag(event.card,'respondShan')){
- 						if(!player.hasShan()) return false;
- 						return true;
- 					}
- 					return false;
+						if(player.hasSkill('noda_axe2')) return false;
+						if(event.getParent().excluded.contains(player)) return false;
+						if(get.attitude(event.player,player)>0){
+							return false;
+						}
+						if(get.type(event.card)=='trick'&&event.player.hasWuxie()) return true;
+						if(get.tag(event.card,'respondSha')){
+							if(!player.hasSha()) return false;
+							return true;
+						}
+						else if(get.tag(event.card,'respondShan')){
+							if(!player.hasShan()) return false;
+							return true;
+						}
+						return false;
 					}(trigger,trigger.target)).set('ai',function(card){
 						if(_status.event.goon) return 7.5-get.value(card);
 						return 0;
@@ -2268,7 +2268,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(current!=player&&current.countCards('e')){
 							player.line(current);
 							current.discard(current.getCards('e'));
-						};
+						}
 					});
 				},
 			},
@@ -8266,7 +8266,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(target.classList.contains('turnedover')) return -1;
 							return 5-target.getDamagedHp();
 						}
-						return 1;
 					}
 					"step 1"
 					if(result.bool){

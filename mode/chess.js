@@ -5435,7 +5435,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					for(var i=1;i<6;i++){
 						player.$disableEquip('equip'+i);
-					};
+					}
 				},
 				check:function(card){
 					var player=_status.currentPhase;
