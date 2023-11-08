@@ -135,7 +135,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							identities.add(i);
 							population=curPopulation;
 						}
-					};
+					}
 					return identities;
 				},
 				group:'jxlianpo_show',
@@ -620,7 +620,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						})){
 							goon=6;
 						}
-					}catch(e){}
+					}catch(e){
+						console.trace(e);
+					}
 					ui.selected.cards.remove(card);
 					return goon-get.value(card);
 				},
@@ -1722,13 +1724,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.responded||event.shouli||event.type=='wuxie') return false;
 					if(game.hasPlayer(function(current){
-						return current.getCards('e',card=>get.subtype(card)=='equip4').length>0;
+						return current.getCards('e',card=>get.is.attackingMount(card)).length>0;
 					})&&event.filterCard({
 						name:'sha',
 						storage:{shouli:true},
 					},player,event)) return true;
 					if(game.hasPlayer(function(current){
-						return current.getCards('e',card=>get.subtype(card)=='equip3').length>0;
+						return current.getCards('e',card=>get.is.defendingMount(card)).length>0;
 					})&&event.filterCard({
 						name:'shan',
 						storage:{shouli:true},
@@ -1740,8 +1742,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					var event=_status.event,evt=event;
 					if(event._backup) evt=event._backup;
-					var equip3=target.getCards('e',card=>get.subtype(card,false)=='equip3');
-					var equip4=target.getCards('e',card=>get.subtype(card,false)=='equip4');
+					var equip3=target.getCards('e',card=>get.is.defendingMount(card,false));
+					var equip4=target.getCards('e',card=>get.is.attackingMount(card,false));
 					if(equip3.length&&equip3.some(card=>evt.filterCard(get.autoViewAs({
 						name:'shan',
 						storage:{shouli:true},
@@ -1756,7 +1758,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return game.hasPlayer(function(current){
 								return evt.filterTarget(sha,player,current);
 							})
-						};
+						}
 					})
 				},
 				prompt:'将场上的一张坐骑牌当做【杀】或【闪】使用或打出',
@@ -1765,8 +1767,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var evt=event.getParent(2);
 					evt.set('shouli',true);
 					var list=[];
-					var equip3=target.getCards('e',card=>get.subtype(card,false)=='equip3');
-					var equip4=target.getCards('e',card=>get.subtype(card,false)=='equip4');
+					var equip3=target.getCards('e',card=>get.is.defendingMount(card,false));
+					var equip4=target.getCards('e',card=>get.is.attackingMount(card,false));
 					var backupx=_status.event;
 					_status.event=evt;
 					try{
@@ -1791,8 +1793,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return false;
 						})){
 							list.push('sha');
-						};
-					}catch(e){game.print(e)};
+						}
+					}catch(e){game.print(e)}
 					_status.event=backupx;
 					if(list.length==1){
 						event.cardName=list[0];
@@ -1806,13 +1808,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).set('cards',cards)
 					}
 					else player.choosePlayerCard(true,target,'e').set('filterButton',function(button){
-						var type=get.subtype(button.link);
-						return type=='equip3'||type=='equip4';
+						var card=button.link;
+						return get.is.attackingMount(card)||get.is.defendingMount(card);
 					});
 					'step 1'
 					var evt=event.getParent(2);
 					if(result.bool&&result.links&&result.links.length){
-						var name=(event.cardName||(get.subtype(result.links[0])=='equip4'?'sha':'shan'));
+						var name=(event.cardName||(get.is.attackingMount(result.links[0])?'sha':'shan'));
 						if(evt.name=='chooseToUse'){
 							game.broadcastAll(function(result,name){
 								lib.skill.shouli_backup.viewAs={
@@ -1854,9 +1856,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					respondSha:true,
 					respondShan:true,
 					skillTagFilter:function(player,tag){
-						var subtype=(tag=='respondSha'?'equip4':'equip3');
+						var func=get.is[tag=='respondSha'?'attackingMount':'defendingMount'];
 						return game.hasPlayer(function(current){
-							return current.hasCard(card=>get.subtype(card,false)==subtype,'e');
+							return current.hasCard(card=>func(card,false),'e');
 						});
 					},
 					order:2,
@@ -4400,14 +4402,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=[];
 						for(var i in player.disabledSkills){
 							if(player.disabledSkills[i].contains(skill)) list.push(i);
-						};
+						}
 						if(list.length){
 							var str='失效技能：';
 							for(var i=0;i<list.length;i++){
 								if(lib.translate[list[i]+'_info']) str+=get.translation(list[i])+'、';
-							};
+							}
 							return str.slice(0,str.length-1);
-						};
+						}
 					},
 				},
 			},
@@ -4987,7 +4989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					maixie:true,
 					maixie_hp:true,
 					combo:'sbaiyin',
-					/*effect:{
+					effect:{
 						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
 							if(get.tag(card,'damage')){
@@ -5011,7 +5013,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 'zeroplayertarget';
 							}
 						}
-					}*/
+					}
 				}
 			},
 			renjie2:{
@@ -5028,7 +5030,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.addMark('renjie',trigger.getl(player).cards2.length);
-				}
+				},
 			},
 			sbaiyin:{
 				skillAnimation:'epic',
@@ -5046,11 +5048,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('jilue');
 					player.awakenSkill('sbaiyin');
 				},
-				derivation:'jilue',
+				derivation:['jilue','reguicai','fangzhu','rejizhi','rezhiheng','rewansha'],
 			},
 			jilue:{
 				unique:true,
-				group:['jilue_guicai','jilue_fangzhu','jilue_wansha','jilue_zhiheng','jilue_jizhi','jilue_jizhi_clear']
+				group:['jilue_guicai','jilue_fangzhu','jilue_wansha','jilue_zhiheng','jilue_jizhi'],
 			},
 			jilue_guicai:{
 				audio:1,
@@ -5251,7 +5253,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					skillTagFilter:function(player,tag,arg){
 						if(tag==='nokeep') return player.isPhaseUsing()&&!player.getStat().skill.jilue_zhiheng&&player.hasCard((card)=>get.name(card)!=='tao','h');
 					},
-					threaten:1.5
 				},
 			},
 			jilue_jizhi:{
@@ -5259,9 +5260,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				filter:function(event,player){
 					return (get.type(event.card,'trick')=='trick'&&event.card.isCard&&player.hasMark('renjie'));
-				},
-				init:function(player){
-					player.storage.jilue_jizhi=0;
 				},
 				content:function(){
 					'step 0'
@@ -5277,33 +5275,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						player.discard(event.card);
-						player.storage.jilue_jizhi++;
-						if(_status.currentPhase==player){
-							player.markSkill('jilue_jizhi');
-						}
+						player.addTempSkill('jilue_jizhi_clear');
+						player.addMark('jilue_jizhi_clear',1,false);
 					}
-				},
-				ai:{
-					threaten:1.4
-				},
-				mod:{
-					maxHandcard:function(player,num){
-						return num+player.storage.jilue_jizhi;
-					}
-				},
-				intro:{
-					content:'本回合手牌上限+#',
 				},
 				subSkill:{
 					clear:{
-						trigger:{global:'phaseAfter'},
-						silent:true,
-						content:function(){
-							player.storage.jilue_jizhi=0;
-							player.unmarkSkill('jilue_jizhi');
-						}
-					}
-				}
+						charlotte:true,
+						onremove:true,
+						mod:{
+							maxHandcard:function(player,num){
+								return num+player.countMark('jilue_jizhi_clear');
+							},
+						},
+						intro:{content:'手牌上限+#'},
+					},
+				},
 			},
 			wushen:{
 				mod:{
@@ -5380,7 +5367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wuhun2:{
 				trigger:{
-				player:'dieBegin',
+					player:'dieBegin',
 				},
 				forced:true,
 				popup:false,
@@ -5405,8 +5392,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return -ai.get.attitude(_status.event.player,target);
 					});
 					"step 1"
-						player.line(result.targets[0],'fire');
-						result.targets[0].addSkill('wuhun3')
+					player.line(result.targets[0],'fire');
+					result.targets[0].addSkill('wuhun3')
 				},
 				ai:{
 					threaten:0.5,
@@ -5965,7 +5952,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(player.countCards('he',{suit:'heart'})<Math.max(1,player.hp)) return false;
 								break;
 							}
-							default:return true;break;
+							default:return true;
 						}
 					},
 					maixie:true,
@@ -6501,7 +6488,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						player.addTempSkill('nzry_longnu_1','phaseUseAfter');
-					};
+					}
 				},
 				subSkill:{
 					'1':{
@@ -6607,7 +6594,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								result.targets[0].link(true);
 							}else{
 								event.finish();
-							};
+							}
 						},
 					},
 				},
@@ -6662,8 +6649,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							result.targets[0].link(true);
 							player.discardPlayerCard(result.targets[0],1,'hej',true);
-						};
-					};
+						}
+					}
 					'step 2'
 					if(player.countMark('nzry_junlve')>7){
 						player.chooseBool().set('ai',function(){
@@ -6671,7 +6658,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).set('prompt','是否弃置所有“军略”标记并对所有其他角色造成1点伤害？');
 					}else{
 						event.finish();
-					};
+					}
 					'step 3'
 					if(result.bool){
 						var players=game.players.slice(0).sortBySeat();
@@ -6679,8 +6666,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.removeMark('nzry_junlve',player.countMark('nzry_junlve'));
 						for(var i=0;i<players.length;i++){
 							if(players[i]!=player) players[i].damage();
-						};
-					};
+						}
+					}
 				},
 			},
 			"nzry_dinghuo":{
@@ -6833,14 +6820,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=[];
 						for(var i in player.disabledSkills){
 							if(player.disabledSkills[i].contains(skill)) list.push(i);
-						};
+						}
 						if(list.length){
 							var str='失效技能：';
 							for(var i=0;i<list.length;i++){
 								if(lib.translate[list[i]+'_info']) str+=get.translation(list[i])+'、';
-							};
+							}
 							return str.slice(0,str.length-1);
-						};
+						}
 					},
 				},
 			},
@@ -6969,7 +6956,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					chooseButton.set('filterButton',function(button){
 						for(var i=0;i<ui.selected.buttons.length;i++){
 							if(get.suit(button.link)==get.suit(ui.selected.buttons[i].link)) return false;
-						};
+						}
 						return true;
 					});
 					'step 1'
@@ -6980,8 +6967,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								event.list1.push(list[i]);
 							}else{
 								event.list2.push(list[i]);
-							};
-						};
+							}
+						}
 						if(event.list1.length&&event.list2.length){
 							game.loseAsync({
 								lose_list:[
@@ -6995,7 +6982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.discard(event.list2);
 						}
 						else player.discard(event.list1);
-					};
+					}
 					'step 2'
 					if(event.list1.length+event.list2.length==4){
 						if(event.list1.length==0) player.loseMaxHp();
@@ -7006,13 +6993,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(evt.name=='phaseUse'){
 								evt.skipped=true;
 									break;
-								};
-							};
+								}
+							}
 							player.addTempSkill('drlt_poxi1',{player:'phaseAfter'});
-						};
+						}
 						if(event.list1.length==3) player.recover();
 						if(event.list1.length==4) player.draw(4);
-					};
+					}
 				},
 				ai:{
 					order:13,
@@ -7123,7 +7110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var mark=player.countMark('drlt_jieying_mark');
 								player.removeMark('drlt_jieying_mark',mark);
 								target.addMark('drlt_jieying_mark',mark);
-							};
+							}
 						},
 					},
 					'3':{

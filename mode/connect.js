@@ -50,7 +50,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.textnode.textContent='正在连接...';
 					clearTimeout(event.timeout);
 					if(e) e.preventDefault();
-					game.saveConfig('last_ip',node.textContent=node.textContent);
+					game.saveConfig('last_ip',node.textContent);
 					game.connect(node.textContent,function(success){
 						if(!success&&event.textnode){
 							alert('连接失败');

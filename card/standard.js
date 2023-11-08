@@ -1685,10 +1685,22 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						useful:1,
 					},
 					result:{
-						target:-1.5,
+						target:function(player,target){
+							if(ui.selected.targets.length){
+								const preTarget=ui.selected.targets.lastItem;
+								const eff=get.effect(target,{name:'sha'},preTarget,player);
+								return Math.sign(eff)*get.sgnAttitude(player,target);
+							}
+							const filter=get.info({name:'jiedao'}).filterAddedTarget;
+							if(game.hasPlayer(current=>{
+								return filter(null,null,current,target)&&get.effect(current,{name:'sha'},target,player)>=0;
+							})) return -1;
+							if(target.mayHaveSha(player,'use')) return 0.25;
+							return -1;
+						},
 						player:function(player){
 							if(player.getCards('he',{subtype:'equip1'}).length) return 0;
-							return 1.5;
+							return 1.25;
 						},
 					},
 					tag:{

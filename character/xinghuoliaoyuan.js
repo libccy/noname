@@ -811,7 +811,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				limited:true,
 				enable:"phaseUse",
-				filter:function(event,player){;
+				filter:function(event,player){
 					return player.countCards('e')>0;
 				},
 				filterTarget:lib.filter.notMe,

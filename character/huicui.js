@@ -4,16 +4,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
-			dc_sunchen:['male','wu',4,['dczigu','dczuowei'],['unseen']],
+			dc_sunchen:['male','wu',4,['dczigu','dczuowei']],
 			dc_zhangmancheng:['male','qun',4,['dclvecheng','dczhongji']],
 			yue_zhoufei:['female','wu',3,['dclingkong','dcxianshu']],
-			dc_wuban:['male','shu',4,['dcyouzhan'],['clan:陈留吴氏','unseen']],
+			dc_wuban:['male','shu',4,['dcyouzhan'],['clan:陈留吴氏']],
 			yue_caiwenji:['female','qun',3,['dcshuangjia','dcbeifen']],
 			liuchongluojun:['male','qun',3,['dcminze','dcjini']],
 			yuechen:['male','wei',4,['dcporui','dcgonghu']],
 			zhangkai:['male','qun',4,['dcxiangshu']],
 			gaoxiang:['male','shu',4,['dcchiying']],
-			yuanyin:['male','qun',3,['dcmoshou','dcyunjiu'],['unseen']],
+			yuanyin:['male','qun',3,['dcmoshou','dcyunjiu']],
 			dongwan:['female','qun',3,['dcshengdu','dcjieling']],
 			zhangchu:['female','qun',3,['dcjizhong','dcrihui','dcguangshi']],
 			peiyuanshao:['male','qun',4,['dcmoyu']],
@@ -4138,7 +4138,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var cards=evt.cards.filterInD();
 							return get.value(cards,evt.player)*get.attitude(player,evt.player);
 						}
-						return 0;
 					})
 					'step 1'
 					if(result.bool){
@@ -5781,7 +5780,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					blocker:{
-						charlotte:true,
 						init:function(player,skill){
 							player.addSkillBlocker(skill);
 						},
@@ -10165,7 +10163,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterTitle:{
 		},
-		perfectPair:{},
 		characterFilter:{
 		},
 		dynamicTranslate:{
