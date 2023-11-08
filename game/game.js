@@ -31390,14 +31390,18 @@
 					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
 					this.next.push(next);
 					next.setContent(content);
-					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
+					if(map){
+						Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
+					}
 					return next;
 				}
 				insertAfter(content,map){
 					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
 					this.after.push(next);
 					next.setContent(content);
-					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
+					if(map){
+						Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
+					}
 					return next;
 				}
 				backup(skill){
