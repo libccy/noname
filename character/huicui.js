@@ -1738,7 +1738,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.useCard({name:'sha',isCard:true},trigger.player,false).set('shanReq',num).set('oncard',card=>{
 							var evt=_status.event;
 							evt.baseDamage++;
-							for(var target of evt.targets){
+							for(var target of game.filterPlayer(null,null,true)){
 								var id=target.playerid;
 								var map=evt.customArgs;
 								if(!map[id]) map[id]={};

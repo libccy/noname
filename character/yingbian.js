@@ -85,7 +85,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						shanReq:cards.length,
 						oncard:()=>{
 							var evt=get.event();
-							for(var target of evt.targets){
+							for(var target of game.filterPlayer(null,null,true)){
 								var id=target.playerid;
 								var map=evt.customArgs;
 								if(!map[id]) map[id]={};
