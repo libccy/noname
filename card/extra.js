@@ -433,10 +433,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return Math.max(0.1,equipValue-value);
 					},
 					equipValue:function(card,player){
+						if(player._tengjiaEv_temp) return Math.max(1,6-player.hp);
 						if(player.hasSkillTag('maixie')&&player.hp>1) return 0;
 						if(player.hasSkillTag('noDirectDamage')) return 10;
-						if(get.damageEffect(player,player,player,'fire')>=0) return 10;
-						var num=4-game.countPlayer(function(current){
+						player._tengjiaEv_temp=true;
+						let eff=get.damageEffect(player,player,player,'fire');
+						delete player._tengjiaEv_temp;
+						if(eff>=0) return 10;
+						let num=4-game.countPlayer(function(current){
 							if(get.attitude(current,player)<0){
 								if(current.hasSkillTag('fireAttack',null,null,true)) return 3;
 								return 1;
