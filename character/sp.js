@@ -17979,7 +17979,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.awakenSkill('yongdi');
 						target.gainMaxHp();
 						target.recover();
-						var mode=get.mode();
 						var skills=target.getStockSkills(true,true).filter(skill=>{
 							if(target.hasSkill(skill)) return false;
 							var info=get.info(skill);
@@ -17988,6 +17987,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(skills.length){
 							for(var i of skills) target.addSkillLog(i);
 						}
+						if(target.isZhu2()) event.trigger('zhuUpdate');
 					}
 				},
 				ai:{expose:0.2},
