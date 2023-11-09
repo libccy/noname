@@ -49,7 +49,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			haopu:['male','shu',4,['olzhenying']],
 			ol_mengda:['male','shu',4,['olgoude']],
 			ol_wanglang:['male','wei',3,['gushe','oljici']],
-			ol_liuyan:['male','qun','4/6',['olpianan','olyinji','olkuisi'],['unseen']],
+			ol_liuyan:['male','qun','4/6',['olpianan','olyinji','olkuisi']],
 			lushi:['female','qun',3,['olzhuyan','olleijie']],
 			zhangshiping:['male','shu',3,['olhongji','olxinggu']],
 			sunhong:['male','wu',3,['olxianbi','olzenrun']],
@@ -21884,12 +21884,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			moukui:{
+				audio:2,
+				audioname:['sp_mushun'],
 				trigger:{player:'useCardToPlayered'},
 				direct:true,
 				filter:function(event,player){
 					return event.card.name=='sha';
 				},
-				audio:2,
 				content:function(){
 					"step 0"
 					var controls=['draw_card'];
@@ -24282,7 +24283,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xionghuo:{
 				marktext:"戾",
-				mark:true,
 				intro:{
 					name:'暴戾',
 					content:"mark",
@@ -25253,7 +25253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jin_simazhao:['jin_simazhao','simazhao','sp_simazhao'],
 			jin_wangyuanji:['jin_wangyuanji','wangyuanji','sp_wangyuanji'],
 			wangyun:['wangyun','dc_wangyun','re_wangyun','jsrg_wangyun','old_wangyun','pe_wangyun'],
-			zhangliang:['re_zhangliang','zhangliang'],
+			zhangliang:['xin_zhangliang','re_zhangliang','zhangliang'],
 			lingju:['lingju','old_lingju'],
 			guansuo:['guansuo','dc_guansuo'],
 			zhangxingcai:['zhangxingcai','old_zhangxingcai'],
@@ -25295,6 +25295,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_pengyang:['ol_pengyang','sp_pengyang'],
 			ol_luyusheng:['ol_luyusheng','luyusheng'],
 			fanjiangzhangda:['fanjiangzhangda','jsrg_fanjiangzhangda'],
+			simalang:['re_simalang','simalang'],
+			zhugedan:['re_zhugedan','zhugedan'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",

@@ -23,10 +23,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			re_lidian:['male','wei',3,['xunxun','xinwangxi']],
 			re_zhongyao:['male','wei',3,['rehuomo','zuoding'],['clan:颍川钟氏']],
-			xin_zhangliang:['male','qun',4,['rejijun','refangtong'],['unseen']],
-			re_simalang:['male','wei',3,['requji','rejunbing'],['unseen']],
-			re_zhugedan:['male','wei',4,['regongao','rejuyi'],['unseen']],
-			re_caorui:['male','wei',3,['huituo','mingjian','rexingshuai'],['unseen','zhu']],
+			xin_zhangliang:['male','qun',4,['rejijun','refangtong']],
+			re_simalang:['male','wei',3,['requji','rejunbing']],
+			re_zhugedan:['male','wei',4,['regongao','rejuyi']],
+			re_caorui:['male','wei',3,['huituo','mingjian','rexingshuai'],['zhu']],
 			re_caochong:['male','wei',3,['rechengxiang','renxin']],
 			ol_zhangzhang:['male','wu',3,['olzhijian','olguzheng']],
 			re_jsp_huangyueying:['female','qun',3,['rejiqiao','relinglong']],
@@ -3850,6 +3850,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					player.addSkill('rejianyan');
 				},
+				derivation:'rejianyan',
 			},
 			rejianyan:{
 				audio:2,
@@ -10752,6 +10753,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							precontent:function(){
 								player.logSkill('reguhuo');
+								player.addTempSkill('reguhuo_guess');
 								var card=event.result.cards[0];
 								event.result.card.suit=get.suit(card);
 								event.result.card.number=get.number(card);
@@ -10775,7 +10777,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					threaten:1.3,
 				},
-				group:['reguhuo_shan','reguhuo_wuxie','reguhuo_guess'],
+				group:['reguhuo_shan','reguhuo_wuxie'],
 			},
 			reguhuo_shan:{
 				enable:['chooseToUse','chooseToRespond'],
@@ -10812,6 +10814,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				precontent:function(){
 					player.logSkill('reguhuo');
+					player.addTempSkill('reguhuo_guess');
 					var card=event.result.cards[0];
 					event.result.card.suit=get.suit(card);
 					event.result.card.number=get.number(card);
@@ -10852,6 +10855,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				precontent:function(){
 					player.logSkill('reguhuo');
+					player.addTempSkill('reguhuo_guess');
 					var card=event.result.cards[0];
 					event.result.card.suit=get.suit(card);
 					event.result.card.number=get.number(card);
@@ -10979,7 +10983,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(!result.bool) target.loseHp();
 					'step 2'
-					target.addSkill('rechanyuan');
+					target.addSkillLog('rechanyuan');
 					if(targets.length) event.goto(0);
 				},
 			},
@@ -10987,13 +10991,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reguhuo_phase:{},
 			rechanyuan:{
 				init:function(player,skill){
+					if(player.hp<=1){
+						player.logSkill(skill);
+						player.addSkill('rechanyuan_log');
+					}
 					player.addSkillBlocker(skill);
 				},
 				onremove:function(player,skill){
+					player.removeSkill('rechanyuan_log');
 					player.removeSkillBlocker(skill);
 				},
-				charlotte:true,
-				locked:true,
 				skillBlocker:function(skill,player){
 					return skill!='chanyuan'&&skill!='rechanyuan'&&!lib.skill[skill].charlotte&&player.hp<=1;
 				},
@@ -11006,8 +11013,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						if(list.length) str+=('<br><li>失效技能：'+get.translation(list))
 						return str;
+					},
+				},
+				audio:2,
+				trigger:{player:'changeHp'},
+				filter:function(event,player){
+					return (player.hp<=1)!=(player.hasSkill('rechanyuan_log'));
+				},
+				direct:true,
+				locked:true,
+				content:function(){
+					if(player.hp<=1){
+						player.logSkill('rechanyuan');
+						player.addSkill('rechanyuan_log');
 					}
-				}
+					else player.removeSkill('rechanyuan_log');
+				},
+				subSkill:{
+					log:{charlotte:true},
+				},
 			},
 			botu:{
 				audio:2,
