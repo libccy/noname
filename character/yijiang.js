@@ -6723,15 +6723,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jieyue:{
-				group:'jieyue1'
-			},
-			jieyue1:{
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
-				filter:function(event,player){
-					return !player.getExpansions('jieyue2').length;
-				},
 				content:function(){
 					'step 0'
 					player.chooseCardTarget({
@@ -6749,7 +6743,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						player.logSkill('jieyue1',result.targets);
+						player.logSkill('jieyue',result.targets);
 						player.discard(result.cards);
 						var target=result.targets[0];
 						event.target=target;
@@ -6774,18 +6768,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(result.bool&&result.cards&&result.cards.length){
-						player.addToExpansion(result.cards,'give',target).gaintag.add('jieyue2');
-						player.addSkill('jieyue2');
+						player.addToExpansion(result.cards,'give',target).gaintag.add('jieyue');
 					}
 					else if(event.target.countCards('he')){
 						player.discardPlayerCard(event.target,true);
 					}
 				},
-				ai:{
-					expose:0.1
-				},
-			},
-			jieyue2:{
+				ai:{expose:0.1},
+				marktext:'节',
 				intro:{
 					content:'expansion',
 					markcount:'expansion',
@@ -6794,58 +6784,62 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=player.getExpansions(skill);
 					if(cards.length) player.loseToDiscardpile(cards);
 				},
-				marktext:'钺',
-				audio:true,
-				enable:'chooseToUse',
-				filterCard:function(card){
-					return get.color(card)=='black';
-				},
-				viewAsFilter:function(player){
-					return player.countCards('hs',{color:'black'})>0;
-				},
-				position:'hs',
-				viewAs:{name:'wuxie'},
-				prompt:'将一张黑色手牌当无懈可击使用',
-				check:function(card){return 8-get.value(card)},
-				threaten:1.2,
-				charlotte:true,
-				group:['jieyue3','jieyue4']
-			},
-			jieyue3:{
-				enable:['chooseToRespond','chooseToUse'],
-				filterCard:function(card){
-					return get.color(card)=='red';
-				},
-				viewAs:{name:'shan'},
-				position:'hs',
-				viewAsFilter:function(player){
-					if(!player.countCards('hs',{color:'red'})) return false;
-				},
-				audio:true,
-				prompt:'将一张红色手牌当闪使用或打出',
-				check:function(){return 1},
-				ai:{
-					respondShan:true,
-					skillTagFilter:function(player){
-						if(!player.countCards('h',{color:'red'})) return false;
+				group:['jieyue_wuxie','jieyue_shan','jieyue_gain'],
+				subSkill:{
+					wuxie:{
+						audio:true,
+						enable:'chooseToUse',
+						filterCard:function(card){
+							return get.color(card)=='black';
+						},
+						viewAsFilter:function(player){
+							return player.getExpansions('jieyue').length&&player.countCards('hs',{color:'black'})>0;
+						},
+						position:'hs',
+						viewAs:{name:'wuxie'},
+						prompt:'将一张黑色手牌当无懈可击使用',
+						check:function(card){
+							return 8-get.value(card);
+						},
 					},
-					effect:{
-						target:function(card,player,target,current){
-							if(get.tag(card,'respondShan')&&current<0) return 0.8
-						}
-					}
-				}
-			},
-			jieyue4:{
-				trigger:{player:'phaseZhunbeiBegin'},
-				forced:true,
-				content:function(){
-					'step 0'
-					var cards=player.getExpansions('jieyue2');
-					if(cards.length) player.gain(cards,'gain2');
-					'step 1'
-					player.removeSkill('jieyue2');
-				}
+					shan:{
+						audio:true,
+						enable:['chooseToRespond','chooseToUse'],
+						filterCard:function(card){
+							return get.color(card)=='red';
+						},
+						position:'hs',
+						viewAs:{name:'shan'},
+						viewAsFilter:function(player){
+							return player.getExpansions('jieyue').length&&player.countCards('hs',{color:'red'})>0;
+						},
+						prompt:'将一张红色手牌当闪使用或打出',
+						check:()=>1,
+						ai:{
+							respondShan:true,
+							skillTagFilter:function(player){
+								if(!player.getExpansions('jieyue').length||!player.countCards('hs',{color:'red'})) return false;
+							},
+							effect:{
+								target:function(card,player,target,current){
+									if(get.tag(card,'respondShan')&&current<0) return 0.8
+								},
+							},
+						},
+					},
+					gain:{
+						audio:'jieyue',
+						trigger:{player:'phaseZhunbeiBegin'},
+						filter:function(event,player){
+							return player.getExpansions('jieyue').length;
+						},
+						forced:true,
+						content:function(){
+							var cards=player.getExpansions('jieyue');
+							if(cards.length) player.gain(cards,'gain2');
+						},
+					},
+				},
 			},
 			jinjiu:{
 				mod:{
@@ -12018,7 +12012,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			wuyan:{
 				audio:2,
-				audio:'wuyan',
 				trigger:{target:'useCardToBefore',player:'useCardToBefore'},
 				forced:true,
 				check:function(event,player){
@@ -14286,11 +14279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqingxi:'倾袭',
 			reqingxi_info:'当你使用【杀】或【决斗】指定目标后，你可以令其选择一项：1、弃置X张手牌（X为你攻击范围内的角色数，且当你装备区内有武器牌/没有武器牌时至多为4/2），若如此做，其弃置你的此武器牌；2、令此牌的伤害值+1且你进行判定，若结果为红色，则其不能响应此牌。',
 			jieyue:'节钺',
-			jieyue1:'节钺',
-			jieyue2:'节钺',
-			jieyue3:'节钺',
-			jieyue4:'节钺',
-			jieyue_info:'结束阶段开始时，你可以弃置一张手牌，然后令一名其他角色选择一项：将一张牌置于你的武将牌上（称之为“节”）；或令你弃置其一张牌。当你你武将牌上有“节”时，你可以将红色手牌当作【闪】、黑色的手牌当作【无懈可击】使用或打出。准备阶段开始时，你获得你武将牌上的“节”。',
+			jieyue_info:'①结束阶段，你可以弃置一张手牌，然后令一名其他角色选择一项：1.将一张牌置于你的武将牌上,称之为“节”；2.令你弃置其一张牌。②若你有“节”，你可以将红色/黑色手牌当作【闪】/【无懈可击】使用或打出。③准备阶段，若你有“节”，则你获得之。',
 			xianzhen:'陷阵',
 			xianzhen_info:'出牌阶段限一次，你可以与一名角色拼点。若你赢，你获得以下效果直到回合结束：无视与该角色的距离；无视该角色的防具且对其使用【杀】没有次数限制。若你没赢，你不能使用【杀】直到回合结束。',
 			xinxianzhen:'陷阵',
