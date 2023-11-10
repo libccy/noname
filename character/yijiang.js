@@ -12016,12 +12016,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.3
 				}
 			},
-			wuyan:{audio:2},
-			xswuyan:{
+			wuyan:{
+				audio:2,
 				audio:'wuyan',
 				trigger:{target:'useCardToBefore',player:'useCardToBefore'},
 				forced:true,
-				priority:15,
 				check:function(event,player){
 					return get.effect(event.target,event.card,event.player,player)<0;
 				},
@@ -12040,15 +12039,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						player:function(card,player,target,current){
 							if(get.type(card)=='trick'&&player!=target) return 'zeroplayertarget';
-						}
-					}
-				}
+						},
+					},
+				},
 			},
 			xinwuyan:{
 				audio:2,
 				trigger:{source:'damageBegin2',player:'damageBegin4'},
 				forced:true,
-				//priority:15,
 				check:function(event,player){
 					if(player==event.player) return true;
 					return false;
@@ -12939,47 +12937,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			enyuan:{
-				audio:'enyuan1',
+				audio:2,
 				locked:true,
 				group:['enyuan1','enyuan2'],
-				ai:{
-					maixie_defend:true,
-					effect:{
-						target:function(card,player,target){
-							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
-							if(!target.hasFriend()) return;
-							if(get.tag(card,'damage')) return [1,0,0,-1];
-						}
-					}
-				}
 			},
 			enyuan1:{
-				trigger:{player:'recoverEnd'},
-				forced:true,
-				audio:2,
-				logTarget:'source',
-				filter:function(event,player){
-					return event.source&&event.source!=player;
-				},
-				content:function(){
-					'step 0'
-					event.num=trigger.num;
-					'step 1'
-					if(event.num>0){
-						player.logSkill('enyuan1',trigger.source);
-						trigger.source.draw();
-						event.num--;
-						event.redo();
-					}
-				}
-			},
-			enyuan2:{
+				audio:true,
 				trigger:{player:'damageEnd'},
 				forced:true,
-				audio:2,
 				filter:function(event,player){
-					return event.source&&event.source!=player;
+					return event.source&&event.source!=player&&event.source.isIn();
 				},
+				logTarget:'source',
 				content:function(){
 					'step 0'
 					trigger.source.chooseCard('选择一张红桃牌交给'+get.translation(player)+'，或点“取消”失去1点体力',function(card){
@@ -12997,7 +12966,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						trigger.source.loseHp();
 					}
-				}
+				},
+				ai:{
+					maixie_defend:true,
+					effect:{
+						target:function(card,player,target){
+							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
+							if(!target.hasFriend()) return;
+							if(get.tag(card,'damage')) return [1,0,0,-1];
+						},
+					},
+				},
+			},
+			enyuan2:{
+				audio:true,
+				trigger:{player:'recoverEnd'},
+				forced:true,
+				logTarget:'source',
+				filter:function(event,player){
+					return event.source&&event.source!=player&&event.source.isIn();
+				},
+				content:function(){
+					'step 0'
+					event.num=trigger.num;
+					'step 1'
+					if(event.num>0){
+						player.logSkill('enyuan1',trigger.source);
+						trigger.source.draw();
+						event.num--;
+						event.redo();
+					}
+				},
 			},
 			xuanhuo:{
 				audio:2,
@@ -14473,7 +14472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjunxing:'峻刑',
 			xinjunxing_info:'出牌阶段限一次，你可以弃置至少一张手牌并选择一名其他角色，该角色需弃置一张与你弃置的牌类别均不同的手牌，否则其先将其武将牌翻面，然后将手牌摸至四张。',
 
-			xswuyan:'无言',
+			wuyan:'无言',
 			xinwuyan:'无言',
 			jujian:'举荐',
 			xinjujian:'举荐',
@@ -14590,7 +14589,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldrenxin_info:'其他角色进入濒死状态时，你可以将所有手牌交给该角色并翻面，然后该角色回复1点体力。',
 			jingce_info:'出牌阶段结束时，若你本回合使用的牌数量大于或等于你的当前体力值，你可以摸两张牌。',
 			xinjingce_info:'结束阶段，若你本回合使用的牌数量大于或等于你的当前体力值，你可以摸两张牌。',
-			xswuyan_info:'锁定技，你使用的普通锦囊牌对其他角色无效；其他角色使用的普通锦囊牌对你无效。',
+			wuyan_info:'锁定技，你使用的普通锦囊牌对其他角色无效；其他角色使用的普通锦囊牌对你无效。',
 			xinwuyan_info:'锁定技，当你使用锦囊牌造成伤害时，你防止此伤害；锁定技，当你受到锦囊牌对你造成的伤害时，你防止此伤害。',
 			jujian_info:'出牌阶段限一次，你可以弃至多三张牌，然后令一名其他角色摸等量的牌。若你以此法弃牌不少于三张且均为同一类别，你回复1点体力。',
 			xinjujian_info:'结束阶段开始时，你可以弃置一张非基本牌并选择一名其他角色，令其选择一项：1.摸两张牌；2.回复1点体力；3.将其武将牌翻转至正面朝上并重置之。',
