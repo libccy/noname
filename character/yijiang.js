@@ -30,7 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugeshang:['male','shu',3,['sangu','yizu']],
 			kebineng:['male','qun',4,['kousheng']],
 			lukai:['male','wu',4,['lkbushi','lkzhongzhuang']],
-			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
+			xin_fazheng:['male','shu',3,['xinxuanhuo','xinenyuan']],
 			guanzhang:['male','shu',4,['fuhun']],
 			wangyi:['female','wei',3,['zhenlie','miji']],
 			caozhang:['male','wei',4,['new_jiangchi']],
@@ -12866,6 +12866,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinenyuan:{
+				audio:2,
+				group:['xinenyuan1','xinenyuan2'],
+			},
+			xinenyuan1:{
+				audio:true,
+				trigger:{player:'gainEnd'},
+				filter:function(event,player){
+					return event.source&&event.source.isIn()&&event.source!=player&&event.cards.length>=2;
+				},
+				logTarget:'source',
+				check:function(event,player){
+					return get.attitude(player,event.source)>0;
+				},
+				prompt2:function(event,player){
+					return '令'+get.translation(event.source)+'摸一张牌';
+				},
+				content:function(){
+					trigger.source.draw();
+				},
+			},
+			xinenyuan2:{
 				audio:true,
 				trigger:{player:'damageEnd'},
 				check:function(event,player){
@@ -12880,17 +12901,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.source&&event.source!=player&&event.num>0&&event.source.isIn();
 				},
 				logTarget:'source',
+				prompt2:function(event,player){
+					return '令'+get.translation(event.source)+'交给你一张手牌或失去1点体力';
+				},
 				content:function(){
-					"step 0"
+					'step 0'
 					event.num=trigger.num;
-					"step 1"
+					'step 1'
 					trigger.source.chooseCard('选择一张手牌交给'+get.translation(player)+'，或点“取消”失去1点体力').set('ai',function(card){
 						var player=_status.event.getParent().player,source=_status.event.player;
 						if(get.effect(source,{name:'losehp'},source,source)>=0) return 0;
 						if(get.attitude(player,source)>0) return 11-get.value(card);
 						return 7-get.value(card);
 					});
-					"step 2"
+					'step 2'
 					if(result.bool){
 						trigger.source.give(result.cards,player);
 					}
@@ -12910,24 +12934,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-1.5];
 							if(!target.hasFriend()) return;
 							if(get.tag(card,'damage')) return [1,0,0,-0.7];
-						}
-					}
+						},
+					},
 				},
-				group:'xinenyuan2'
-			},
-			xinenyuan2:{
-				audio:true,
-				trigger:{player:'gainEnd'},
-				filter:function(event,player){
-					return event.source&&event.source.isIn()&&event.source!=player&&event.cards.length>=2;
-				},
-				logTarget:'source',
-				check:function(event,player){
-					return get.attitude(player,event.source)>0;
-				},
-				content:function(){
-					trigger.source.draw();
-				}
 			},
 			enyuan:{
 				audio:'enyuan1',
@@ -14414,6 +14423,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jianying:'渐营',
 			jianying_info:'当你于出牌阶段内使用与此阶段你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌。',
 			xinenyuan:'恩怨',
+			xinenyuan1:'恩怨',
 			xinenyuan2:'恩怨',
 			xinenyuan_info:'当你获得一名其他角色两张或更多的牌后，你可以令其摸一张牌；当你受到1点伤害后，你可以令伤害来源选择一项：1、将一张手牌交给你；2、失去1点体力。',
 			xinxuanhuo:'眩惑',
