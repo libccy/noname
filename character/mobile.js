@@ -11169,18 +11169,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:1,
 					result:{
-						target:function(player,target){
-							if(target.skipList.contains('phaseDraw')||target.hasSkill('pingkou')) return 0;
-							var hs=player.getCards('h').sort(function(a,b){
-								return b.number-a.number;
+						player:(player,target)=>{
+							let hs=player.getCards('h').sort(function(a,b){
+								return get.number(b)-get.number(a);
 							});
-							var ts=target.getCards('h').sort(function(a,b){
-								return b.number-a.number;
-							});
-							if(!hs.length||!ts.length) return 0;
-							if(hs[0].number>ts[0].number) return -1;
-							return 0;
+							if(!hs.length) return 0;
+							let a=get.number(hs[0]),b=4;
+							if(player.getDamagedHp()) b=2;
+							return -b*(1-Math.pow((a-1)/13,target.countCards('h')));
 						},
+						target:(player,target)=>{
+							if(target.skipList.includes('phaseDraw')||target.hasSkill('pingkou')||target.hasSkill('xinpingkou')) return 0;
+							let hs=player.getCards('h').sort(function(a,b){
+								return get.number(b)-get.number(a);
+							});
+							if(!hs.length) return 0;
+							return -Math.pow((get.number(hs[0])-1)/13,target.countCards('h'))*2;
+						}
 					},
 				},
 			},
