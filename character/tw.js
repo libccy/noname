@@ -10906,7 +10906,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if (trigger.source.countCards('he')) choiceList.push('令'+get.translation(trigger.source)+'弃置两张牌');
 					player.chooseControl('cancel2').set('prompt2',get.prompt2('yuzhang')).set('choiceList',choiceList).set('ai',function(){
 						var player=_status.event.player,source=_status.event.source;
-						if(get.attitude(player,event.source)>=0) return 'cancel2';
+						if(get.attitude(player,source)>=0) return 'cancel2';
 						if(source.hasSkillTag('noh')||source.hasSkillTag('noe')||source.countCards('h')>=4) return 0;
 						if(source.hp>1&&source.countCards('he')>1) return 1;
 						return [0,1].randomGet();
