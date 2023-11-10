@@ -422,7 +422,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(damaged) return Math.max(3,7.8-i);
 							return Math.max(1,7.2-i);
 						},
-						value:(card,player,i)=>{
+						value:(card,player)=>{
 							let fs = game.filterPlayer(current=>{
 								return get.attitude(_status.event.player,current)>0;
 							}), damaged = 0, needs = 0;
@@ -431,9 +431,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								if(f.hp<=1) needs++;
 								else if(f.hp==2) damaged++;
 							});
-							if(needs>2) return 11;
-							if(needs>1) return 10;
-							if(needs&&damaged || player.hasSkillTag('maixie')) return 9;
+							if(needs&&damaged || player.hasSkillTag('maixie')) return Math.max(9,5*needs+3*damaged);
 							if(needs || damaged>1) return 8;
 							if(damaged) return 7.5;
 							return Math.max(5,9.2-player.hp);
@@ -452,30 +450,26 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							let mode = get.mode(),
 								taos = player.getCards('hs',i=>get.name(i)==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable'));
 							if(target.hp>0){
-								let min = 7.2-1.2*Math.min(3,player.hp),
+								if(!player.isPhaseUsing()) return 0;
+								let min = 7.2-4*player.hp/player.maxHp,
 									nd = player.needsToDiscard(-player.countCards('h',i=>!taos.includes(i)&&get.value(i)<min)),
-									keep = 0;
-								if(!player.hasFriend() || taos.length>1&&(nd>1||nd&&player.hp<1+taos.length) || target.identity==='zhu'&&target.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')) return 2;
-								if(nd<3&&game.hasPlayer(current=>{
+									keep = nd?0:2;
+								if(nd>2 || taos.length>1&&(nd>1||nd&&player.hp<1+taos.length) || target.identity==='zhu'&&(nd||target.hp<3)&&(mode==='identity'||mode==='versus'||mode==='chess') || !player.hasFriend()) return 2;
+								if(game.hasPlayer(current=>{
 									return player!==current&&current.identity==='zhu'&&current.hp<3&&(mode==='identity'||mode==='versus'||mode==='chess')&&get.attitude(player,current)>0;
-								})){
-									nd=0;
-									keep=3;
-								}
-								else if(nd<2 || !player.isPhaseUsing()){
-									if(nd<1) keep = 3;
-									else if(target.hp>=2&&taos.length<=target.hp/2) keep = 1;
-								}
-								if(keep){
-									if(!nd || game.countPlayer(current=>{
-										if(player!==current&&current.hp<3&&player.hp>current.hp&&get.attitude(player,current)>2){
-											keep += player.hp-current.hp;
-											return true;
-										}
-										return false;
-									})){
-										if(keep>2) return 0;
+								})) keep = 3;
+								else if(nd===2||player.hp<2) return 2;
+								if(nd===2&&player.hp<=1) return 2;
+								if(keep===3) return 0;
+								if(taos.length<=player.hp/2) keep = 1;
+								if(keep&&game.countPlayer(current=>{
+									if(player!==current&&current.hp<3&&player.hp>current.hp&&get.attitude(player,current)>2){
+										keep += player.hp-current.hp;
+										return true;
 									}
+									return false;
+								})){
+									if(keep>2) return 0;
 								}
 								return 2;
 							}
