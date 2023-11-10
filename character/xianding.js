@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			malingli:['female','shu',3,['dclima','dcxiaoyin','dchuahuo']],
 			wu_luxun:['male','wu',3,['dcxiongmu','dczhangcai','dcruxian']],
 			dc_xujing:['male','shu',3,['dcshangyu','dccaixia']],
 			dc_zhaoxiang:['female','shu',4,['refanghun','refuhan']],
@@ -93,7 +94,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan'],
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
-				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi'],
+				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi','dc_xujing'],
 				sp2_qifu:['dc_guansuo','xin_baosanniang','dc_zhaoxiang'],
@@ -102,6 +103,208 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//马伶俐
+			dclima:{
+				audio:2,
+				mod:{
+					globalFrom:function(from,to,distance){
+						return distance-Math.max(1,game.countPlayer(current=>{
+							return current.countCards('e',card=>{
+								return get.is.attackingMount(card)||get.is.defendingMount(card);
+							});
+						}));
+					}
+				}
+			},
+			dcxiaoyin:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter:function(event,player){
+					return game.hasPlayer(current=>get.distance(player,current)<=1);
+				},
+				group:'dcxiaoyin_damage',
+				prompt2:function(event,player){
+					return `亮出牌堆顶的${get.cnNumber(game.countPlayer(current=>get.distance(player,current)<=1))}张牌，获得其中的红色牌，将其中任意张黑色牌置于等量名座次连续的其他角色的武将牌上。`;
+				},
+				check:()=>true,
+				content:function*(event,map){
+					var player=map.player;
+					var count=game.countPlayer(current=>get.distance(player,current)<=1);
+					var cards=game.cardsGotoOrdering(get.cards(count)).cards;
+					yield player.showCards(cards,`${get.translation(player)}【硝引】亮出`);
+					player.gain(cards.filter(i=>get.color(i,false)=='red'),'gain2');
+					var blackOnes=cards.filter(i=>get.color(i,false)=='black');
+					if(!blackOnes.length) return event.finish();
+					event.videoId=lib.status.videoId++;
+					var func=(cards,id)=>{
+						var dialog=ui.create.dialog('硝引：剩余的黑色牌',`<div class="text center">请选择至多${get.cnNumber(cards.length)}名座次连续的其他角色，然后将以下这些牌置于这些角色的武将牌上。</div>`,cards);
+						dialog.videoId=id;
+						return dialog;
+					};
+					if(player==game.me) func(blackOnes,event.videoId);
+					else if(player.isOnline2()){
+						player.send(func,blackOnes,event.videoId);
+					}
+					var result=yield player.chooseTarget([1,blackOnes.length],true,(card,player,target)=>{
+						if(player==target) return false;
+						var selected=ui.selected.targets;
+						if(!selected.length) return true;
+						for(var i of selected){
+							if(i.getNext()==target||i.getPrevious()==target) return true;
+						}
+						return false;
+					}).set('complexSelect',true).set('complexTarget',true).set('multitarget',true).set('multiline',true).set('ai',target=>{
+						if(get.event('aiTargets').includes(target)) return 10;
+						return 0.1;
+					}).set('aiTargets',(()=>{
+						var targets=game.filterPlayer(i=>i!=player).sortBySeat(player);
+						var maxEff=-Infinity,aiTargets=[];
+						for(var i=0;i<targets.length;i++){
+							for(var j=0;j<blackOnes.length;j++){
+								if(targets.length<i+j) break;
+								var targetsx=targets.slice(i,j);
+								var tmpEff=targetsx.map(current=>{
+									return get.damageEffect(current,current,player,'fire');
+								}).reduce((p,c)=>{
+									return p+c;
+								},0);
+								if(tmpEff>maxEff){
+									maxEff=tmpEff;
+									aiTargets=targetsx;
+								}
+							}
+						}
+						return aiTargets;
+					})()).set('prompt',false);
+					if(!result.bool){
+						event.finish();
+						return;
+					}
+					var func=(num,id)=>{
+						var dialog=get.idDialog(id);
+						if(dialog) dialog.content.childNodes[1].innerHTML=`<div class="text center">将${get.cnNumber(num)}张黑色牌按照选择的角色的座次顺序置于这些角色武将牌上</div>`;
+					};
+					var targets=result.targets.slice().sortBySeat(player);
+					var num=targets.length;
+					if(player==game.me) func(num,event.videoId);
+					else if(player.isOnline2()) player.send(func,event.videoId);
+					if(blackOnes.length==1) var result={bool:true,links:blackOnes};
+					else var result=yield player.chooseButton(true,num).set('dialog',event.videoId).set('ai',()=>1);
+					game.broadcastAll('closeDialog',event.videoId);
+					if(result.bool){
+						var cards=result.links;
+						player.line(targets);
+						targets.forEach((current,ind)=>{
+							current.addToExpansion(cards[ind],'gain2').gaintag.add('dcxiaoyin');
+							game.log(current,'将',cards[ind],'当“硝引”置于了武将牌上');
+						});
+					}
+				},
+				marktext:'硝',
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+				subSkill:{
+					damage:{
+						audio:'dcxiaoyin',
+						trigger:{global:'damageBegin3'},
+						filter:function(event,player){
+							if(!event.source||!event.source.isIn()) return false;
+							return event.player.getExpansions('dcxiaoyin').length;
+						},
+						direct:true,
+						content:function*(event,map){
+							var player=map.player,trigger=map.trigger;
+							var source=trigger.source,target=trigger.player;
+							var cards=target.getExpansions('dcxiaoyin');
+							if(trigger.hasNature('fire')){
+								var types=cards.map(i=>get.type2(i,false));
+								var str=get.translation(types).replace(/(.*)、/, '$1或');
+								var result=yield source.chooseCard(`硝引：是否弃置一张${str}牌？`,`若如此做，将${get.translation(target)}的所有“硝引”牌置入弃牌堆，令你对其造成的伤害+1`,'he',function(card,player){
+									if(!get.event('types').includes(get.type2(card))) return false;
+									return lib.filter.cardDiscardable.apply(this,arguments);
+								}).set('types',types).set('ai',card=>{
+									if(get.event('goon')) return 7-get.value(card);
+									return 0;
+								}).set('goon',get.damageEffect(target,player,player,'fire')>0&&get.attitude(player,target)<=0);
+								if(result.bool){
+									player.logSkill('dcxiaoyin_damage',source);
+									source.line(target,'fire');
+									source.discard(result.cards).discarder=source;
+									game.delayex();
+									target.loseToDiscardpile(cards);
+									trigger.addNumber('num',1);
+								}
+							}
+							else{
+								var result=yield source.chooseBool(`###是否响应${get.translation(player)}的【硝引】？###获得${get.translation(target)}的“硝引”牌（${get.translation(cards)}），然后将你对其造成的此次伤害改为火焰伤害。`).set('choice',(()=>{
+									if(get.damageEffect(target,source,source,'fire')<get.damageEffect(target,source,source)-5) return false;
+									if(cards.map(i=>get.value(i)).reduce((p,c)=>p+c,0)>0) return true;
+									return false;
+								})());
+								if(result.bool){
+									player.logSkill('dcxiaoyin_damage',source);
+									source.line(target,'fire');
+									source.gain(cards,target,'give');
+									game.setNature(trigger,'fire');
+								}
+							}
+						},
+					},
+				},
+				ai:{
+					threaten:4,
+				},
+			},
+			dchuahuo:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				viewAs:{
+					name:'sha',
+					nature:'fire',
+					storage:{dchuahuo:true},
+				},
+				filterCard:{color:'red'},
+				position:'hs',
+				filter:function(event,player){
+					return player.countCards('hs',{color:'red'});
+				},
+				check:function(card){
+					return 6-get.value(card);
+				},
+				precontent:function(){
+					event.getParent().addCount=false;
+					player.when('useCardToPlayer').filter(evt=>evt.card.storage&&evt.card.storage.dchuahuo).then(()=>{
+						if(trigger.target.getExpansions('dcxiaoyin').length){
+							var targets=game.filterPlayer(current=>{
+								return current.getExpansions('dcxiaoyin').length;
+							});
+							player.chooseBool(`是否更改${get.translation(trigger.card)}的目标？`,`将此牌的目标改为所有有“硝引”的角色（${get.translation(targets)}）。`)
+								.set('choice',targets.map(current=>get.effect(current,trigger.card,player,player)).reduce((p,c)=>p+c,0)>get.effect(trigger.target,trigger.card,player,player));
+						}
+						else event.finish();
+					}).then(()=>{
+						if(result.bool){
+							trigger.targets.length=0;
+							trigger.getParent().triggeredTargets1.length=0;
+							trigger.untrigger();
+							var targets=game.filterPlayer(current=>{
+								return current.getExpansions('dcxiaoyin').length;
+							});
+							player.line(targets,'fire');
+							trigger.targets.addArray(targets);
+							game.log(targets,'成为了',trigger.card,'的新目标');
+							game.delayx();
+						}
+					})
+				},
+				ai:{
+					order:()=>get.order({name:'sha'})+0.2,
+					result:{player:1},
+				}
+			},
 			//武陆逊
 			dcxiongmu:{
 				audio:2,
@@ -12264,6 +12467,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunlingluan:'孙翎鸾，孙坚与妾室丁氏的女儿，孙策的妹妹，孙权、孙尚香的姐姐。孙翎年幼时曾得杜夔点化，窥得音律玄妙，丝竹八音，擅长琵琶，每次弹奏琵琶时，经常引来百鸟，称为奇观。早年孙翎鸾出游，山林巧遇葛玄，葛玄观其面相为吉，特传授修行辟谷之法，可令其身心洗涤，容颜久存。孙翎鸾有恋人名张奋，两人情投意合，可惜造化弄人，张奋病死外域，孙翎鸾倚楼盼归，日复一日、年复一年。后有五彩孔雀自东南而来，绕楼而鸣，其声如慕，孙翎鸾泪染笑靥，与孔雀耳语几句后乘翎而去。',
 			zhoubuyi:'周不疑（192年—208年），字元直（或作“文直”），零陵重安（今湖南衡阳县）人，刘表别驾刘先的外甥，少有异才，聪明敏达，在十七岁时就著有文论四首。曹冲死后，曹操怀疑曹丕无法驾驭周不疑，于是派人杀了周不疑。',
 			tianshangyi:'田尚衣，一作陈尚衣，魏文帝曹丕宫中著名宫人。能歌善舞，一时冠绝于世，私以为比之汉宫飞燕也不遑多让。',
+			malingli:'马伶俐，游卡桌游原创角色，设定上为，马超之女，其身形虽娇小，却继承了马超英勇略带冲动的个性，活泼阳光，调皮伶俐，爱摆弄爆竹烟花一类的小器具，包包里经常放置用五色彩纸包装的小炸弹球。马伶俐从小跟随马超和马云騄学习战斗技巧，战斗力超强，坚强的意志和勇气也得到了提升，同时擅长马术，有一匹可爱的小白马伴随其身边。后马伶俐成年，嫁与刘备之子刘理，获封梁王妃。两人琴瑟相和，极为恩爱，常结伴出游，被人誉为天作之合。',
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',
@@ -12825,6 +13029,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhangcai_info:'当你使用或打出点数为8的牌时，你可以摸X张牌（X为你手牌区里点数为8的牌数且至少为1）。',
 			dcruxian:'儒贤',
 			dcruxian_info:'限定技。出牌阶段，你可以令你〖彰才〗的点数限制取消，且摸牌数改为等同于你手牌区内与此牌点数相同的牌数且至少为1，直到你的下回合开始。',
+			malingli:'马伶俐',
+			dclima:'骊马',
+			dclima_info:'锁定技。你计算至其他角色的距离-X（X为场上的坐骑牌数且至少为1）。',
+			dcxiaoyin:'硝引',
+			dcxiaoyin_info:'①准备阶段，你可以亮出牌堆顶的Y张牌（Y为你距离1以内的角色数），获得其中的红色牌，将其中任意张黑色牌置于等量名座次连续的其他角色的武将牌上，称为“硝引”。②当一名有“硝引”牌的角色受到伤害时，若此伤害为：火焰伤害，来源可以弃置一张其“硝引”牌包含的类型的牌，将其“硝引”置入弃牌堆，令此伤害+1；非火焰伤害，来源可以获得其“硝引”牌，将此伤害改为火焰伤害。',
+			dchuahuo:'花火',
+			dchuahuo_info:'出牌阶段限一次。你可以将一张红色手牌当不计入次数的火【杀】使用。然后当你使用此牌指定第一个目标后，若目标角色有“硝引”牌，你可以将此【杀】的目标改为所有有“硝引”牌的角色。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',

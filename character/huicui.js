@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			dc_jiachong:['male','wei',3,['dcbeini','dcshizong']],
 			dc_sunchen:['male','wu',4,['dczigu','dczuowei']],
 			dc_zhangmancheng:['male','qun',4,['dclvecheng','dczhongji']],
 			yue_zhoufei:['female','wu',3,['dclingkong','dcxianshu']],
@@ -99,12 +100,266 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_taiping:['guanhai','liupi','peiyuanshao','zhangchu','zhangkai','dc_zhangmancheng'],
 				sp_yanhan:['dc_liuba','dc_huangquan','furongfuqian','xianglang','dc_huojun','gaoxiang','dc_wuban'],
 				sp_jishi:['dc_jiben','zhenghun','dc_sunhanhua','liuchongluojun'],
-				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen'],
+				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
 				sp_yijun:['gongsundu','mengyou'],
 				sp_zhengyin:['yue_caiwenji','yue_zhoufei'],
 			}
 		},
 		skill:{
+			//魏贾充
+			dcbeini:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filterCard:function(card,player){
+					const delt=player.countCards('h')-player.maxHp;
+					return delt>0;
+				},
+				selectCard:function(){
+					const player=get.player();
+					const delt=player.countCards('h')-player.maxHp;
+					return delt>0?delt:-1;
+				},
+				promptfunc:()=>{
+					const player=get.player();
+					const delt=player.countCards('h')-player.maxHp;
+					let str='';
+					if(delt>0) str+=`弃置${get.cnNumber(delt)}张牌`;
+					else if(delt==0) str+=`点击“确定”`;
+					else str+=`摸${get.cnNumber(-delt)}张牌`;
+					return `${str}，然后选择两名角色，前者视为对后者使用一张【杀】，且这两者的非锁定技失效。`;
+				},
+				content:function*(event,map){
+					var player=map.player;
+					if(player.countCards('h')<player.maxHp) yield player.drawTo(player.maxHp);
+					if(game.countPlayer()<2){
+						event.finish();
+						return;
+					}
+					var result=yield player.chooseTarget('悖逆：请选择两名角色','前者视为对后者使用一张【杀】，且这两名角色的非锁定技失效直到回合结束。',true,2,(card,player,target)=>{
+						var sha=new lib.element.VCard({name:'sha',isCard:true});
+						if(ui.selected.targets.length){
+							var targetx=ui.selected.targets[0];
+							return targetx.canUse(sha,target,false);
+						}
+						return lib.filter.cardEnabled(sha,target);
+					}).set('targetprompt',['打人','被打']).set('multitarget',true).set('ai',target=>{
+						var aiTargets=get.event('aiTargets');
+						if(aiTargets){
+							return aiTargets[ui.selected.targets.length]==target?10:0;
+						}
+						return 0;
+					}).set('aiTargets',(()=>{
+						var targets=[],eff=0;
+						var sha=new lib.element.VCard({name:'sha',isCard:true});
+						for(var user of game.filterPlayer()){
+							for(var target of game.filterPlayer()){
+								if(user==target) continue;
+								var targetsx=[user,target];
+								targetsx.forEach(i=>i.addSkill('dcbeini_fengyin'));
+								var effx=get.effect(target,sha,user,player);
+								targetsx.forEach(i=>i.removeSkill('dcbeini_fengyin'));
+								if(user==player) effx+=1;
+								if(get.attitude(player,user)>0) effx-=0.1;
+								if(effx>eff){
+									eff=effx;
+									targets=targetsx;
+								}
+							}
+						}
+						if(targets.length) return targets;
+						return null;
+					})());
+					if(result.bool){
+						var user=result.targets[0],target=result.targets[1];
+						result.targets.forEach(i=>i.addTempSkill('dcbeini_fengyin'));
+						var sha=new lib.element.VCard({name:'sha',isCard:true});
+						if(user.canUse(sha,target,false)) user.useCard(sha,target,false,'noai');
+					}
+				},
+				ai:{
+					order:0.1,
+					result:{
+						player:function(player){
+							if(player.countCards('h')-player.maxHp>=3) return 1;
+							return game.hasPlayer(current=>get.attitude(player,current)<=0)?1:0;
+						}
+					},
+				},
+				subSkill:{
+					fengyin:{
+						inherit:'fengyin',
+					},
+				}
+			},
+			dcshizong:{
+				audio:2,
+				enable:'chooseToUse',
+				hiddenCard:function(player,name){
+					if(get.type(name)!='basic') return false;
+					return player.countCards('he')>=player.countMark('dcshizong')+1;
+				},
+				filter:function(event,player){
+					if(event.type=='wuxie'||event.dcshizong) return false;
+					if(player.countCards('he')<player.countMark('dcshizong')+1) return false;
+					for(const name of lib.inpile){
+						if(get.type(name)!='basic') continue;
+						const card={name:name,isCard:true};
+						if(event.filterCard(card,player,event)) return true;
+						if(name=='sha'){
+							for(const nature of lib.inpile_nature){
+								card.nature=nature;
+								if(event.filterCard(card,player,event)) return true;
+							}
+						}
+					}
+					return false;
+				},
+				chooseButton:{
+					dialog:function(event,player){
+						const vcards=get.inpileVCardList(info=>{
+							if(info[0]!='basic') return;
+							const card={name:info[2],nature:info[3],isCard:true};
+							return event.filterCard(card,player,event);
+						})
+						return ui.create.dialog('恃纵',[vcards,'vcard'],'hidden');
+					},
+					check:function(button){
+						if(get.event().getParent().type!='phase') return 1;
+						const player=get.player();
+						const card={name:button.link[2],nature:button.link[3]};
+						if(game.hasPlayer(current=>{
+							return player.canUse(card,current)&&get.effect(current,card,player,player)>0;
+						})){
+							switch(button.link[2]){
+								case 'tao':return 5;
+								case 'jiu':return 3.01;
+								case 'sha':
+									if(button.link[3]=='fire') return 2.95;
+									else if(button.link[3]=='thunder') return 2.92;
+									else return 2.9;
+							}
+						}
+						return 0;
+					},
+					backup:function(links,player){
+						return {
+							filterCard:true,
+							filterTarget:lib.filter.notMe,
+							selectTarget:1,
+							selectCard:()=>get.player().countMark('dcshizong')+1,
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+								suit:'none',
+								number:null,
+								isCard:true,
+							},
+							position:'he',
+							popname:true,
+							ignoreMod:true,
+							ai1:function(card){
+								return 1/(1.1+Math.max(-1,get.value(card)));
+							},
+							ai2:function(target){
+								const att=get.attitude(get.player(),target);
+								const value=ui.selected.cards.map(card=>get.value(card)).reduce((p,c)=>{
+									return p+c;
+								},0);
+								if(value>0||player.getHp()<=1) return att;
+								return -att;
+							},
+							precontent:function*(event,map){
+								var player=map.player,target=event.result.targets[0];
+								player.logSkill('dcshizong',target);
+								if(!player.countMark('dcshizong')) player.when({global:'phaseAfter'}).then(()=>delete player.storage.dcshizong);
+								player.addMark('dcshizong',1,false);
+								yield player.give(event.result.cards.slice(),target);
+								var viewAs=new lib.element.VCard({name:event.result.card.name,nature:event.result.card.nature,isCard:true});
+								var result=yield target.chooseCard('恃纵：是否将一张牌置于牌堆底？',`若如此做，${get.translation(player)}视为使用一张${get.translation(viewAs.nature)}【${get.translation(viewAs.name)}】`,'he').set('ai',card=>{
+									if(get.event('goon')) return 7-get.value(card);
+									return 0;
+								}).set('goon',get.attitude(target,player)*(player.getUseValue(viewAs)||1)>=1);
+								var card=event.result.cards[0];
+								if(result.bool){
+									var card=result.cards[0];
+									game.delayex();
+									var next=target.loseToDiscardpile(card,ui.cardPile);
+									next.log=false;
+									if(get.position(card)=='e'){
+										game.log(target,'将',card,'置于了牌堆底');
+									}
+									else{
+										next.blank=true;
+										game.log(target,'将一张牌置于了牌堆底');
+									}
+									result=yield next;
+									game.broadcastAll(viewAs=>{
+										lib.skill.dcshizong_backup2.viewAs=viewAs;
+									},lib.skill.dcshizong_backup.viewAs);
+									var evt=event.getParent();
+									evt.set('_backupevent','dcshizong_backup2');
+									evt.set('openskilldialog',`请选择${get.translation(viewAs.nature)}${get.translation(viewAs.name)}的目标`);
+									evt.backup('dcshizong_backup2');
+									evt.set('norestore',true);
+									evt.set('custom',{
+										add:{},
+										replace:{window:function(){}}
+									});
+									evt.goto(0);
+								}
+								else{
+									target.chat('不放！');
+									game.log(target,'选择不将牌置于牌堆底');
+									var evt=event.getParent();
+									evt.set('dcshizong',true);
+									evt.goto(0);
+								}
+								game.delayx();
+							},
+							ai:{
+								order:10,
+							},
+						}
+					},
+					prompt:function(links,player){
+						return `###恃纵：选择要交出的牌和目标角色###将${get.cnNumber(player.countMark('dcshizong')+1)}张牌交给一名其他角色，其可以选择将一张牌置于牌堆底，视为你使用一张${get.translation(links[0][3]||'')}${get.translation(links[0][2])}。`;
+					}
+				},
+				ai:{
+					order:function(){
+						const player=get.player(),event=get.event();
+						if(event.filterCard({name:'jiu'},player,event)&&get.effect(player,{name:'jiu'})>0){
+							return get.order({name:'jiu'})+0.1;
+						}
+						return get.order({name:'sha'})+0.1;
+					},
+					respondSha:true,
+					fireAttack:true,
+					respondShan:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag=='fireAttack') return true;
+						if(player.countCards('he')<player.countMark('dcshizong')+1) return false;
+						if(tag=='respondSha'&&arg!='use') return false;
+					},
+					result:{
+						player:function(player){
+							if(_status.event.dying) return get.attitude(player,_status.event.dying);
+							return 1;
+						},
+					}
+				},
+				subSkill:{
+					backup:{},
+					backup2:{
+						filterCard:()=>false,
+						selectCard:-1,
+						precontent:function(){
+							delete event.result.skill;
+						}
+					},
+				},
+			},
 			//张曼成
 			dclvecheng:{
 				audio:2,
@@ -10632,6 +10887,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclvecheng_info:'出牌阶段限一次。你可以选择一名其他角色，你于本回合对其使用当前手牌中的【杀】无任何次数限制。然后回合结束时，其展示所有手牌，若其中有【杀】，其可以选择对你依次使用其中所有的【杀】。',
 			dczhongji:'螽集',
 			dczhongji_info:'当你使用牌时，若此牌无花色或你手牌区里没有与此牌花色相同的手牌，你可以将手牌摸至体力上限并弃置X张牌（X为本回合发动〖螽集〗的次数）。',
+			dc_jiachong:'贾充',
+			dcbeini:'悖逆',
+			dcbeini_info:'出牌阶段限一次。你可以将手牌调整至体力上限，然后令一名角色视为对另一名角色使用一张【杀】，且这些角色的非锁定技失效直到回合结束。',
+			dcshizong:'恃纵',
+			dcshizong_info:'当你需要使用一张基本牌时，你可以交给一名其他角色X张牌，然后其可以将一张牌置于牌堆底，视为你使用之。若其不为当前回合角色，此技能失效直到回合结束（X为你本回合发动〖恃纵〗的次数）。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
