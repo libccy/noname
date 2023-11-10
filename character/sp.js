@@ -23626,8 +23626,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chongzhen:{
-				group:['chongzhen1','chongzhen2'],
 				audio:'chongzhen1',
+				trigger:{player:['useCard','respond']},
+				filter:function(event,player){
+					if(event.card.name!='sha'&&event.card.name!='shan') return false;
+					if(!event.skill||event.skill.indexOf('fanghun')+event.skill.indexOf('longdan')==-2) return false;
+					var target=lib.skill.chongzhen.logTarget(event,player);
+					return target&&target.countGainableCards(player,'h')>0;
+				},
+				logTarget:function(event,player){
+					if(event.name=='respond') return event.source;
+					if(event.card.name=='sha') return event.targets[0];
+					return event.respondTo[0];
+				},
+				prompt2:function(event,player){
+					var target=lib.skill.chongzhen.logTarget(event,player);
+					return '获得'+get.translation(target)+'的一张手牌';
+				},
+				content:function(){
+					var target=lib.skill.chongzhen.logTarget(trigger,player);
+					player.gainPlayerCard(target,'h',true);
+				},
 				ai:{
 					combo:'ollongdan',
 					mingzhi:false,
@@ -23644,41 +23663,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 					},
-				}
-			},
-			chongzhen1:{
-				audio:2,
-				trigger:{player:'useCard'},
-				filter:function(event,player){
-					if((event.card.name!='sha'&&event.card.name!='shan')||(event.skill!='longdan_shan'&&event.skill!='longdan_sha'&&
-					event.skill!='fanghun_shan'&&event.skill!='fanghun_sha'&&event.skill!='ollongdan')) return false;
-					var target=lib.skill.chongzhen1.logTarget(event,player);
-					return target&&target.countGainableCards(player,'h')>0;
 				},
-				logTarget:function(event,player){
-					if(event.card.name=='sha') return event.targets[0];
-					return event.respondTo[0];
-				},
-				prompt2:'当你因发动〖龙胆〗而使用或打出【杀】或【闪】时，你可以获得对方的一张手牌。',
-				content:function(){
-					var target=lib.skill.chongzhen1.logTarget(trigger,player);
-					player.gainPlayerCard(target,'h',true);
-				}
 			},
-			chongzhen2:{
-				audio:2,
-				trigger:{player:'respond'},
-				filter:function(event,player){
-					if(event.skill!='longdan_shan'&&event.skill!='longdan_sha'&&
-					event.skill!='fanghun_shan'&&event.skill!='fanghun_sha'&&event.skill!='ollongdan') return false;
-					return event.source&&event.source.countGainableCards(player,'h')>0;
-				},
-				logTarget:'source',
-				prompt2:'当你因发动〖龙胆〗而使用或打出【杀】或【闪】时，你可以获得对方的一张手牌。',
-				content:function(){
-					player.gainPlayerCard(trigger.source,'h',true);
-				}
-			},
+			chongzhen1:{audio:2},
 			lihun:{
 				audio:2,
 				enable:'phaseUse',
@@ -25854,8 +25841,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baobian:'豹变',
 			lihun:'离魂',
 			chongzhen:'冲阵',
-			chongzhen1:'冲阵',
-			chongzhen2:'冲阵',
 			yuanhu:'援护',
 			tianming:'天命',
 			mizhao:'密诏',
