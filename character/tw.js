@@ -10939,7 +10939,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						check:function(event,player){
 							if(event.name=='phaseDiscard') return player.needsToDiscard();
-							return event.name=='phaseJudge';
+							if(event.name=='phaseJudge') return player.countCards('j');
+							return false;
 						},
 						content:function(){
 							player.removeMark('twjingce',1);
