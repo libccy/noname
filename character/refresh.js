@@ -14749,7 +14749,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinguidao_info:'一名角色的判定牌生效前，你可以打出一张黑色牌作为判定牌并获得原判定牌。若你以此法打出的牌为黑桃2-9，则你摸一张牌。',
 			xinhuangtian:'黄天',
 			xinhuangtian2:'黄天',
-			xinhuangtian_info:'主公技。其他群势力角色的出牌阶段限一次，该角色可以交给一张【闪】或黑桃手牌。',
+			xinhuangtian_info:'主公技。其他群势力角色的出牌阶段限一次，该角色可以交给你一张【闪】或黑桃手牌。',
 			reqiangxi:"强袭",
 			"reqiangxi_info":"出牌阶段对每名其他角色限一次，你可以选择一项：1. 失去1点体力并对你攻击范围内的一名其他角色造成1点伤害；2. 弃置一张武器牌并对你攻击范围内的一名其他角色造成1点伤害。",
 			rehuoji:"火计",
