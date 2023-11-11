@@ -1312,7 +1312,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				group:'dcniji_discard',
 				content:function(){
-					player.draw().gaintag=['dcniji'];
+					var next=player.draw();
+					var evt=trigger.getParent('dcniji_discard');
+					if(!evt||evt.player!=player) next.gaintag=['dcniji'];
 					player.addTempSkill('dcniji_clear');
 				},
 				subSkill:{
@@ -1326,15 +1328,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'dcniji',
 						trigger:{global:'phaseJieshuBegin'},
 						filter:function(event,player){
-							return player.hasCard(card=>card.hasGaintag('dcniji'),'h');
+							return player.hasCard(card=>card.hasGaintag('dcniji')&&lib.filter.cardDiscardable(card,player,'dcniji'),'h');
 						},
 						forced:true,
-						loced:false,
+						locked:false,
 						content:function(){
 							'step 0'
-							var cards=player.getCards('h',card=>card.hasGaintag('dcniji'));
+							var cards=player.getCards('h',card=>card.hasGaintag('dcniji')&&lib.filter.cardDiscardable(card,player,'dcniji'));
 							event.cards=cards;
-							if(cards.length>=player.hp){
+							// if(cards.length>=player.hp){
+							if(cards.some(card=>player.hasUseTarget(card))){
 								player.chooseToUse({
 									prompt:'是否使用一张“逆击”牌？',
 									filterCard:function(card,player){
@@ -1342,12 +1345,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										return lib.filter.filterCard.apply(this,arguments);
 									},
 									ai1:function(card){
-										return _status.event.player.getUseValue(card);
+										return get.player().getUseValue(card);
 									},
 								});
 							}
+							// }
 							'step 1'
-							player.discard(cards.filter(card=>get.owner(card)==player&&get.position(card)=='h'));
+							if(result.bool) game.delayex();
+							var cards=cards.filter(card=>get.owner(card)==player&&get.position(card)=='h'&&lib.filter.cardDiscardable(card,player,'dcniji'));
+							if(cards.length) player.discard(cards);
 						}
 					}
 				}
@@ -10867,7 +10873,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcbenshi_info:'锁定技。①你的攻击范围+1。②你的攻击范围基数不受装备区内武器牌的影响。③由你使用的【杀】的牌面信息中的“使用目标”产生的规则改为“攻击范围内的所有角色”。',
 			sunhuan:'孙桓',
 			dcniji:'逆击',
-			dcniji_info:'①当你成为非装备牌的目标后，你可以摸一张牌，称为“逆击”。②一名角色的结束阶段，若你于本回合获得的“逆击”数不小于你的体力值，你可以使用一张“逆击”。你弃置所有“逆击”。',
+			dcniji_info:'①当你成为非装备牌的目标后，你可以摸一张牌。②一名角色的结束阶段，你可以使用一张“逆击”牌，然后弃置所有“逆击”牌。',
 			//dc_fuwan:'新杀伏完',
 			//dc_fuwan_prefix:'新杀',
 			//dc_fuwan_ab:'伏完',
