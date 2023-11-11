@@ -17252,7 +17252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xinyongsi:{
-				audio:'yongsi1',
+				audio:'yongsi',
 				group:['xinyongsi1','xinyongsi2'],
 				locked:true,
 			},
@@ -23394,15 +23394,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			yongsi:{
-				audio:'yongsi1',
+				audio:2,
 				group:['yongsi1','yongsi2'],
 				locked:true,
 				ai:{
-					threaten:2.2
+					threaten:3.2
 				}
 			},
 			yongsi1:{
-				audio:2,
+				audio:true,
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				filter:function(event,player){
@@ -23413,7 +23413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			yongsi2:{
-				audio:2,
+				audio:true,
 				trigger:{player:'phaseDiscardBegin'},
 				forced:true,
 				content:function(){
