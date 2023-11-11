@@ -85,7 +85,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						shanReq:cards.length,
 						oncard:()=>{
 							var evt=get.event();
-							for(var target of evt.targets){
+							for(var target of game.filterPlayer(null,null,true)){
 								var id=target.playerid;
 								var map=evt.customArgs;
 								if(!map[id]) map[id]={};
@@ -152,8 +152,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!evt._olchuming) return;
 								var target=evt[evt.source==player?'player':'source'];
 								if(!target.isIn()) return;
+								var cards=evt.cards.filterInD('d');
+								if(!cards.length) return;
 								if(!mapx[target.playerid]) mapx[target.playerid]=[];
-								mapx[target.playerid].addArray(evt.cards.filterInD('d'));
+								mapx[target.playerid].addArray(cards);
 							});
 							var entries=Object.entries(mapx).map(entry=>{
 								return [(_status.connectMode?lib.playerOL:game.playerMap)[entry[0]],entry[1]];
