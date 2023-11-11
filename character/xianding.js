@@ -126,6 +126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				prompt2:function(event,player){
 					return `亮出牌堆顶的${get.cnNumber(game.countPlayer(current=>get.distance(player,current)<=1))}张牌，获得其中的红色牌，将其中任意张黑色牌置于等量名座次连续的其他角色的武将牌上。`;
 				},
+				frequent:true,
 				check:()=>true,
 				content:function*(event,map){
 					var player=map.player;
@@ -145,7 +146,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(player.isOnline2()){
 						player.send(func,blackOnes,event.videoId);
 					}
-					var result=yield player.chooseTarget([1,blackOnes.length],true,(card,player,target)=>{
+					var targets=game.filterPlayer(current=>current!=player);
+					if(targets.length==1) var result={bool:true,targets:targets};
+					else var result=yield player.chooseTarget([1,blackOnes.length],true,(card,player,target)=>{
 						if(player==target) return false;
 						var selected=ui.selected.targets;
 						if(!selected.length) return true;
@@ -187,7 +190,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var targets=result.targets.slice().sortBySeat(player);
 					var num=targets.length;
 					if(player==game.me) func(num,event.videoId);
-					else if(player.isOnline2()) player.send(func,event.videoId);
+					else if(player.isOnline2()) player.send(func,num,event.videoId);
 					if(blackOnes.length==1) var result={bool:true,links:blackOnes};
 					else var result=yield player.chooseButton(true,num).set('dialog',event.videoId).set('ai',()=>1);
 					game.broadcastAll('closeDialog',event.videoId);
