@@ -63,7 +63,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					basic:{
 						order:7.5,
-						useful:(card,player,i)=>3.6/(2+i),
+						useful:(card,i)=>9.6/(2+i),
 						value:(card,player)=>{
 							let max=0;
 							game.countPlayer(cur=>{

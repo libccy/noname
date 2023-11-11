@@ -372,7 +372,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:3,
 					basic:{
-						useful:[7,5.1,2],
+						useful:(card,i)=>{
+							let player = _status.event.player, basic = [7, 5.1, 2], num = basic[Math.min(2, i)];
+							if(player.hp>2&&player.hasSkillTag('maixie')) num *= 0.57;
+							if(player.getEquip('bagua') || player.getEquip('rewrite_bagua') || player.getEquip('renwang') || player.getEquip('rewrite_renwang')) num *= 0.8;
+							return num;
+						},
 						value:[7,5.1,2],
 					},
 					result:{player:1},
@@ -1303,7 +1308,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					basic:{
 						order:7.5,
-						useful:(card,player,i)=>3.6/(2+i),
+						useful:(card,i)=>8/(3+i),
 						value:(card,player)=>{
 							let max=0;
 							game.countPlayer(cur=>{
@@ -1584,7 +1589,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					basic:{
 						order:9,
-						useful:(card,player,i)=>9/(3+i),
+						useful:(card,i)=>10/(3+i),
 						value:(card,player)=>{
 							let max=0;
 							game.countPlayer(cur=>{
