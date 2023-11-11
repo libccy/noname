@@ -23626,7 +23626,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chongzhen:{
-				audio:'chongzhen1',
+				audio:2,
 				trigger:{player:['useCard','respond']},
 				filter:function(event,player){
 					if(event.card.name!='sha'&&event.card.name!='shan') return false;
@@ -23665,7 +23665,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			chongzhen1:{audio:2},
 			lihun:{
 				audio:2,
 				enable:'phaseUse',
