@@ -19,18 +19,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				defaultYingbianEffect:'add',
 				content:function(){
 					var dist=get.distance(player,target);
-					if(dist>1||card.yingbian_all) player.discardPlayerCard(target,'hej',true);
-					if(dist<=1||card.yingbian_all) player.gainPlayerCard(target,'hej',true);
+					if(dist>1||card.yingbian_all) player.discardPlayerCard(target,'hej',true).set('target',target).set('ai',lib.card.guohe.ai.button);
+					if(dist<=1||card.yingbian_all) player.gainPlayerCard(target,'hej',true).set('target',target).set('ai',lib.card.shunshou.ai.button);
 				},
 				fullskin:true,
 				postAi:function(targets){
 					return targets.length==1&&targets[0].countCards('j');
 				},
 				ai:{
-					wuxie:function(target,card,player,viewer){
-						if(get.attitude(viewer,player)>0&&get.attitude(viewer,target)>0){
-							return 0;
-						}
+					wuxie:function(target,card,player,viewer,status){
+						if(status*get.attitude(viewer,player)>0&&!player.isMad()) return 0;
+						if(!card.yingbian_all&&get.distance(player,target)>1&&!target.hasCard(i=>{
+							let val=get.value(i,target),subtypes=get.subtypes(i);
+							if(val<8&&target.hp<2&&!subtypes.includes('equip2')&&!subtypes.includes('equip5')) return false;
+							return val>3+Math.min(5,target.hp);
+						},'e')&&target.countCards('h')*_status.event.getRand('guohe_wuxie')>1.57) return 0;
 					},
 					yingbian:function(card,player,targets,viewer){
 						if(get.attitude(viewer,player)<=0) return 0;
@@ -60,8 +63,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					basic:{
 						order:7.5,
-						useful:4,
-						value:9
+						useful:(card,i)=>9.6/(2+i),
+						value:(card,player)=>{
+							let max=0;
+							game.countPlayer(cur=>{
+								let dist=get.distance(player,cur);
+								if(dist>1||card.yingbian_all) max=Math.max(max,lib.card.shunshou.ai.result.target(player,cur)*get.attitude(player,cur));
+								else max=Math.max(max,lib.card.guohe.ai.result.target(player,cur)*get.attitude(player,cur));
+							});
+							if(max<=0) return 7;
+							if(card.yingbian_all) return 0.75*max;
+							return 0.6*max;
+						}
 					},
 					result:{
 						target:function(player,target){
