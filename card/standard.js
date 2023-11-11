@@ -310,7 +310,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 1;
 						},
 						natureDamage:function(card){
-							if(game.hasNature(card)) return 1;
+							if(game.hasNature(card,'linked')) return 1;
 						},
 						fireDamage:function(card,nature){
 							if(game.hasNature(card,'fire')) return 1;

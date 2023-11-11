@@ -85,37 +85,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					filterDamage:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg&&arg.player&&arg.player.hasSkillTag('jueqing',false,player)) return false;
+					},
 					effect:{
 						target:function(card,player,target){
-							if(player.hasSkillTag('jueqing')) return;
+							if(player.hasSkillTag('jueqing',false,target)) return;
 							if(player._dcsantou_temp) return;
-							if(get.event().getParent('useCard',true)||get.event().getParent('_wuxie',true)) return;
 							if(get.tag(card,'damage')){
 								const hp=target.getHp();
-								if(hp>=3&&target.hasHistory('useSkill',evt=>evt.skill=='dcsantou'&&evt.event.getTrigger().source==player)||hp==2&&get.tag(card,'natureDamage')||hp==1&&get.color(card)=='red'&&get.itemtype(card)=='card') return [1,-2];
-								else if(get.attitude(player,target)<0){
-									if(card.name=='sha') return;
-									let sha=false;
-									player._dcsantou_temp=true;
-									let num=player.countCards('h',card=>{
-										if(card.name=='sha'){
-											if(sha) return false;
-											else sha=true;
+								if(hp>=3){
+									if(target.hasHistory('useSkill',evt=>evt.skill=='dcsantou'&&evt.event.getTrigger().source==player)) return [1,-2];
+									else if(get.attitude(player,target)<0){
+										if(card.name=='sha') return;
+										let sha=false;
+										player._dcsantou_temp=true;
+										let num=player.countCards('h',card=>{
+											if(card.name=='sha'){
+												if(sha) return false;
+												else sha=true;
+											}
+											return get.tag(card,'damage')&&player.canUse(card,target)&&get.effect(target,card,player,player)>0;
+										});
+										delete player._dcsantou_temp;
+										if(player.hasSkillTag('damage')){
+											num++;
 										}
-										return get.tag(card,'damage')&&player.canUse(card,target)&&get.effect(target,card,player,player)>0;
-									});
-									delete player._dcsantou_temp;
-									if(player.hasSkillTag('damage')){
-										num++;
-									}
-									if(num<2){
-										var enemies=player.getEnemies();
-										if(enemies.length==1&&enemies[0]==target&&player.needsToDiscard()){
-											return;
+										if(num<2){
+											var enemies=player.getEnemies();
+											if(enemies.length==1&&enemies[0]==target&&player.needsToDiscard()){
+												return;
+											}
+											return 0;
 										}
-										return 0;
 									}
 								}
+								else if(hp==2&&get.tag(card,'natureDamage')||hp==1&&get.color(card)=='red'&&get.itemtype(card)=='card') return [1,-2];
+								else return 0;
 							}
 						}
 					}
