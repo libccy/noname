@@ -62,7 +62,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_guanyu:['male','shu',4,['wusheng','yijue']],
 			old_caochun:['male','wei',4,['shanjia']],
 			masu:['male','shu',3,['xinzhan','huilei']],
-			xushu:['male','shu',3,['xswuyan','jujian'],['border:wei']],
+			xushu:['male','shu',3,['wuyan','jujian'],['border:wei']],
 			liru:['male','qun',3,['juece','mieji','fencheng']],
 			xin_yujin:['male','wei',4,['jieyue']],
 			//lusu:['male','wu',3,['haoshi','dimeng']],

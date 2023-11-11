@@ -11388,12 +11388,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function (card){return 8-get.value(card)},
 			},
 			reshuangxiong:{
+				audio:"shuangxiong",
+				audioname:['re_yanwen'],
+				group:['reshuangxiong1',"reshuangxiong2"],
+			},
+			reshuangxiong1:{
+				audio:"shuangxiong1",
+				audioname:['re_yanwen'],
 				trigger:{
 					player:"phaseDrawBegin1",
 				},
-				group:"reshuangxiong2",
-				audio:"shuangxiong",
-				audioname:['re_yanwen'],
 				check:function (event,player){
 					if(player.countCards('h')>player.hp) return true;
 					if(player.countCards('h')>3) return true;
@@ -11402,7 +11406,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return !event.numFixed;
 				},
-				content:function (){
+				prompt2:function(){
+					return '放弃摸牌，然后展示牌堆顶的两张牌并选择获得其中的一张。本回合内可以将与此牌颜色不同的一张手牌当做【决斗】使用';
+				},
+				content:function(){
 					"step 0"
 					trigger.changeToZero();
 					event.cards=get.cards(2);
@@ -11450,10 +11457,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var card2=event.card2;
 					player.gain(card2,'gain2');
 					player.addTempSkill('shuangxiong2');
-					player.storage.shuangxiong=get.color(card2);
+					player.markAuto('shuangxiong2',[get.color(card2,false)]);
 				},
 			},
-			"reshuangxiong2":{
+			reshuangxiong2:{
 				trigger:{
 					player:"damageEnd",
 				},
@@ -14790,9 +14797,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rekanpo:"看破",
 			rekanpo_info:"你可以将一张黑色牌当作【无懈可击】使用。",
 			reshuangxiong:"双雄",
-			"reshuangxiong_info":"摸牌阶段，你可以放弃摸牌。若如此做，你展示牌堆顶的两张牌并选择获得其中的一张。然后，你本回合内可以将与此牌颜色不同的一张手牌当做【决斗】使用。当你受到【决斗】造成的伤害时，你可以获得对方于此决斗中打出的所有【杀】。",
-			"reshuangxiong2":"双雄",
-			"reshuangxiong2_info":"",
+			reshuangxiong1:"双雄",
+			reshuangxiong2:"双雄",
+			reshuangxiong_info:"摸牌阶段，你可以放弃摸牌。若如此做，你展示牌堆顶的两张牌并选择获得其中的一张。然后，你本回合内可以将与此牌颜色不同的一张手牌当做【决斗】使用。当你受到【决斗】造成的伤害时，你可以获得对方于此决斗中打出的所有【杀】。",
 
 			reguanxing:'观星',
 			reguanxing_info:'准备阶段，你可以观看牌堆顶的五张牌（存活角色小于4时改为三张），并将其以任意顺序置于牌堆项或牌堆底，若你将〖观星〗的牌都放在了牌堆底，则你可以在结束阶段再次发动〖观星〗。',

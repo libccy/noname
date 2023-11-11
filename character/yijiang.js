@@ -30,7 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugeshang:['male','shu',3,['sangu','yizu']],
 			kebineng:['male','qun',4,['kousheng']],
 			lukai:['male','wu',4,['lkbushi','lkzhongzhuang']],
-			xin_fazheng:['male','shu',3,['xinenyuan','xinxuanhuo'],['die_audio']],
+			xin_fazheng:['male','shu',3,['xinxuanhuo','xinenyuan']],
 			guanzhang:['male','shu',4,['fuhun']],
 			wangyi:['female','wei',3,['zhenlie','miji']],
 			caozhang:['male','wei',4,['new_jiangchi']],
@@ -6723,15 +6723,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jieyue:{
-				group:'jieyue1'
-			},
-			jieyue1:{
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
-				filter:function(event,player){
-					return !player.getExpansions('jieyue2').length;
-				},
 				content:function(){
 					'step 0'
 					player.chooseCardTarget({
@@ -6749,7 +6743,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
-						player.logSkill('jieyue1',result.targets);
+						player.logSkill('jieyue',result.targets);
 						player.discard(result.cards);
 						var target=result.targets[0];
 						event.target=target;
@@ -6774,18 +6768,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(result.bool&&result.cards&&result.cards.length){
-						player.addToExpansion(result.cards,'give',target).gaintag.add('jieyue2');
-						player.addSkill('jieyue2');
+						player.addToExpansion(result.cards,'give',target).gaintag.add('jieyue');
 					}
 					else if(event.target.countCards('he')){
 						player.discardPlayerCard(event.target,true);
 					}
 				},
-				ai:{
-					expose:0.1
-				},
-			},
-			jieyue2:{
+				ai:{expose:0.1},
+				marktext:'节',
 				intro:{
 					content:'expansion',
 					markcount:'expansion',
@@ -6794,58 +6784,62 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=player.getExpansions(skill);
 					if(cards.length) player.loseToDiscardpile(cards);
 				},
-				marktext:'钺',
-				audio:true,
-				enable:'chooseToUse',
-				filterCard:function(card){
-					return get.color(card)=='black';
-				},
-				viewAsFilter:function(player){
-					return player.countCards('hs',{color:'black'})>0;
-				},
-				position:'hs',
-				viewAs:{name:'wuxie'},
-				prompt:'将一张黑色手牌当无懈可击使用',
-				check:function(card){return 8-get.value(card)},
-				threaten:1.2,
-				charlotte:true,
-				group:['jieyue3','jieyue4']
-			},
-			jieyue3:{
-				enable:['chooseToRespond','chooseToUse'],
-				filterCard:function(card){
-					return get.color(card)=='red';
-				},
-				viewAs:{name:'shan'},
-				position:'hs',
-				viewAsFilter:function(player){
-					if(!player.countCards('hs',{color:'red'})) return false;
-				},
-				audio:true,
-				prompt:'将一张红色手牌当闪使用或打出',
-				check:function(){return 1},
-				ai:{
-					respondShan:true,
-					skillTagFilter:function(player){
-						if(!player.countCards('h',{color:'red'})) return false;
+				group:['jieyue_wuxie','jieyue_shan','jieyue_gain'],
+				subSkill:{
+					wuxie:{
+						audio:true,
+						enable:'chooseToUse',
+						filterCard:function(card){
+							return get.color(card)=='black';
+						},
+						viewAsFilter:function(player){
+							return player.getExpansions('jieyue').length&&player.countCards('hs',{color:'black'})>0;
+						},
+						position:'hs',
+						viewAs:{name:'wuxie'},
+						prompt:'将一张黑色手牌当无懈可击使用',
+						check:function(card){
+							return 8-get.value(card);
+						},
 					},
-					effect:{
-						target:function(card,player,target,current){
-							if(get.tag(card,'respondShan')&&current<0) return 0.8
-						}
-					}
-				}
-			},
-			jieyue4:{
-				trigger:{player:'phaseZhunbeiBegin'},
-				forced:true,
-				content:function(){
-					'step 0'
-					var cards=player.getExpansions('jieyue2');
-					if(cards.length) player.gain(cards,'gain2');
-					'step 1'
-					player.removeSkill('jieyue2');
-				}
+					shan:{
+						audio:true,
+						enable:['chooseToRespond','chooseToUse'],
+						filterCard:function(card){
+							return get.color(card)=='red';
+						},
+						position:'hs',
+						viewAs:{name:'shan'},
+						viewAsFilter:function(player){
+							return player.getExpansions('jieyue').length&&player.countCards('hs',{color:'red'})>0;
+						},
+						prompt:'将一张红色手牌当闪使用或打出',
+						check:()=>1,
+						ai:{
+							respondShan:true,
+							skillTagFilter:function(player){
+								if(!player.getExpansions('jieyue').length||!player.countCards('hs',{color:'red'})) return false;
+							},
+							effect:{
+								target:function(card,player,target,current){
+									if(get.tag(card,'respondShan')&&current<0) return 0.8
+								},
+							},
+						},
+					},
+					gain:{
+						audio:'jieyue',
+						trigger:{player:'phaseZhunbeiBegin'},
+						filter:function(event,player){
+							return player.getExpansions('jieyue').length;
+						},
+						forced:true,
+						content:function(){
+							var cards=player.getExpansions('jieyue');
+							if(cards.length) player.gain(cards,'gain2');
+						},
+					},
+				},
 			},
 			jinjiu:{
 				mod:{
@@ -12016,12 +12010,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.3
 				}
 			},
-			wuyan:{audio:2},
-			xswuyan:{
-				audio:'wuyan',
+			wuyan:{
+				audio:2,
 				trigger:{target:'useCardToBefore',player:'useCardToBefore'},
 				forced:true,
-				priority:15,
 				check:function(event,player){
 					return get.effect(event.target,event.card,event.player,player)<0;
 				},
@@ -12040,15 +12032,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						player:function(card,player,target,current){
 							if(get.type(card)=='trick'&&player!=target) return 'zeroplayertarget';
-						}
-					}
-				}
+						},
+					},
+				},
 			},
 			xinwuyan:{
 				audio:2,
 				trigger:{source:'damageBegin2',player:'damageBegin4'},
 				forced:true,
-				//priority:15,
 				check:function(event,player){
 					if(player==event.player) return true;
 					return false;
@@ -12866,6 +12857,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			xinenyuan:{
+				audio:2,
+				group:['xinenyuan1','xinenyuan2'],
+			},
+			xinenyuan1:{
+				audio:true,
+				trigger:{player:'gainEnd'},
+				filter:function(event,player){
+					return event.source&&event.source.isIn()&&event.source!=player&&event.cards.length>=2;
+				},
+				logTarget:'source',
+				check:function(event,player){
+					return get.attitude(player,event.source)>0;
+				},
+				prompt2:function(event,player){
+					return '令'+get.translation(event.source)+'摸一张牌';
+				},
+				content:function(){
+					trigger.source.draw();
+				},
+			},
+			xinenyuan2:{
 				audio:true,
 				trigger:{player:'damageEnd'},
 				check:function(event,player){
@@ -12880,17 +12892,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.source&&event.source!=player&&event.num>0&&event.source.isIn();
 				},
 				logTarget:'source',
+				prompt2:function(event,player){
+					return '令'+get.translation(event.source)+'交给你一张手牌或失去1点体力';
+				},
 				content:function(){
-					"step 0"
+					'step 0'
 					event.num=trigger.num;
-					"step 1"
+					'step 1'
 					trigger.source.chooseCard('选择一张手牌交给'+get.translation(player)+'，或点“取消”失去1点体力').set('ai',function(card){
 						var player=_status.event.getParent().player,source=_status.event.player;
 						if(get.effect(source,{name:'losehp'},source,source)>=0) return 0;
 						if(get.attitude(player,source)>0) return 11-get.value(card);
 						return 7-get.value(card);
 					});
-					"step 2"
+					'step 2'
 					if(result.bool){
 						trigger.source.give(result.cards,player);
 					}
@@ -12910,67 +12925,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-1.5];
 							if(!target.hasFriend()) return;
 							if(get.tag(card,'damage')) return [1,0,0,-0.7];
-						}
-					}
+						},
+					},
 				},
-				group:'xinenyuan2'
-			},
-			xinenyuan2:{
-				audio:true,
-				trigger:{player:'gainEnd'},
-				filter:function(event,player){
-					return event.source&&event.source.isIn()&&event.source!=player&&event.cards.length>=2;
-				},
-				logTarget:'source',
-				check:function(event,player){
-					return get.attitude(player,event.source)>0;
-				},
-				content:function(){
-					trigger.source.draw();
-				}
 			},
 			enyuan:{
-				audio:'enyuan1',
+				audio:2,
 				locked:true,
 				group:['enyuan1','enyuan2'],
-				ai:{
-					maixie_defend:true,
-					effect:{
-						target:function(card,player,target){
-							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
-							if(!target.hasFriend()) return;
-							if(get.tag(card,'damage')) return [1,0,0,-1];
-						}
-					}
-				}
 			},
 			enyuan1:{
-				trigger:{player:'recoverEnd'},
-				forced:true,
-				audio:2,
-				logTarget:'source',
-				filter:function(event,player){
-					return event.source&&event.source!=player;
-				},
-				content:function(){
-					'step 0'
-					event.num=trigger.num;
-					'step 1'
-					if(event.num>0){
-						player.logSkill('enyuan1',trigger.source);
-						trigger.source.draw();
-						event.num--;
-						event.redo();
-					}
-				}
-			},
-			enyuan2:{
+				audio:true,
 				trigger:{player:'damageEnd'},
 				forced:true,
-				audio:2,
 				filter:function(event,player){
-					return event.source&&event.source!=player;
+					return event.source&&event.source!=player&&event.source.isIn();
 				},
+				logTarget:'source',
 				content:function(){
 					'step 0'
 					trigger.source.chooseCard('选择一张红桃牌交给'+get.translation(player)+'，或点“取消”失去1点体力',function(card){
@@ -12988,7 +12959,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						trigger.source.loseHp();
 					}
-				}
+				},
+				ai:{
+					maixie_defend:true,
+					effect:{
+						target:function(card,player,target){
+							if(player.hasSkillTag('jueqing',false,target)) return [1,-2];
+							if(!target.hasFriend()) return;
+							if(get.tag(card,'damage')) return [1,0,0,-1];
+						},
+					},
+				},
+			},
+			enyuan2:{
+				audio:true,
+				trigger:{player:'recoverEnd'},
+				forced:true,
+				logTarget:'source',
+				filter:function(event,player){
+					return event.source&&event.source!=player&&event.source.isIn();
+				},
+				content:function(){
+					'step 0'
+					event.num=trigger.num;
+					'step 1'
+					if(event.num>0){
+						player.logSkill('enyuan1',trigger.source);
+						trigger.source.draw();
+						event.num--;
+						event.redo();
+					}
+				},
 			},
 			xuanhuo:{
 				audio:2,
@@ -14278,11 +14279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reqingxi:'倾袭',
 			reqingxi_info:'当你使用【杀】或【决斗】指定目标后，你可以令其选择一项：1、弃置X张手牌（X为你攻击范围内的角色数，且当你装备区内有武器牌/没有武器牌时至多为4/2），若如此做，其弃置你的此武器牌；2、令此牌的伤害值+1且你进行判定，若结果为红色，则其不能响应此牌。',
 			jieyue:'节钺',
-			jieyue1:'节钺',
-			jieyue2:'节钺',
-			jieyue3:'节钺',
-			jieyue4:'节钺',
-			jieyue_info:'结束阶段开始时，你可以弃置一张手牌，然后令一名其他角色选择一项：将一张牌置于你的武将牌上（称之为“节”）；或令你弃置其一张牌。当你你武将牌上有“节”时，你可以将红色手牌当作【闪】、黑色的手牌当作【无懈可击】使用或打出。准备阶段开始时，你获得你武将牌上的“节”。',
+			jieyue_info:'①结束阶段，你可以弃置一张手牌，然后令一名其他角色选择一项：1.将一张牌置于你的武将牌上,称之为“节”；2.令你弃置其一张牌。②若你有“节”，你可以将红色/黑色手牌当作【闪】/【无懈可击】使用或打出。③准备阶段，若你有“节”，则你获得之。',
 			xianzhen:'陷阵',
 			xianzhen_info:'出牌阶段限一次，你可以与一名角色拼点。若你赢，你获得以下效果直到回合结束：无视与该角色的距离；无视该角色的防具且对其使用【杀】没有次数限制。若你没赢，你不能使用【杀】直到回合结束。',
 			xinxianzhen:'陷阵',
@@ -14414,6 +14411,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jianying:'渐营',
 			jianying_info:'当你于出牌阶段内使用与此阶段你使用的上一张牌点数或花色相同的牌时，你可以摸一张牌。',
 			xinenyuan:'恩怨',
+			xinenyuan1:'恩怨',
 			xinenyuan2:'恩怨',
 			xinenyuan_info:'当你获得一名其他角色两张或更多的牌后，你可以令其摸一张牌；当你受到1点伤害后，你可以令伤害来源选择一项：1、将一张手牌交给你；2、失去1点体力。',
 			xinxuanhuo:'眩惑',
@@ -14463,7 +14461,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinjunxing:'峻刑',
 			xinjunxing_info:'出牌阶段限一次，你可以弃置至少一张手牌并选择一名其他角色，该角色需弃置一张与你弃置的牌类别均不同的手牌，否则其先将其武将牌翻面，然后将手牌摸至四张。',
 
-			xswuyan:'无言',
+			wuyan:'无言',
 			xinwuyan:'无言',
 			jujian:'举荐',
 			xinjujian:'举荐',
@@ -14580,7 +14578,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldrenxin_info:'其他角色进入濒死状态时，你可以将所有手牌交给该角色并翻面，然后该角色回复1点体力。',
 			jingce_info:'出牌阶段结束时，若你本回合使用的牌数量大于或等于你的当前体力值，你可以摸两张牌。',
 			xinjingce_info:'结束阶段，若你本回合使用的牌数量大于或等于你的当前体力值，你可以摸两张牌。',
-			xswuyan_info:'锁定技，你使用的普通锦囊牌对其他角色无效；其他角色使用的普通锦囊牌对你无效。',
+			wuyan_info:'锁定技，你使用的普通锦囊牌对其他角色无效；其他角色使用的普通锦囊牌对你无效。',
 			xinwuyan_info:'锁定技，当你使用锦囊牌造成伤害时，你防止此伤害；锁定技，当你受到锦囊牌对你造成的伤害时，你防止此伤害。',
 			jujian_info:'出牌阶段限一次，你可以弃至多三张牌，然后令一名其他角色摸等量的牌。若你以此法弃牌不少于三张且均为同一类别，你回复1点体力。',
 			xinjujian_info:'结束阶段开始时，你可以弃置一张非基本牌并选择一名其他角色，令其选择一项：1.摸两张牌；2.回复1点体力；3.将其武将牌翻转至正面朝上并重置之。',
