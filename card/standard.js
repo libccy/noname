@@ -723,7 +723,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player.chooseControl('顺时针','逆时针',function(event,player){
 							if(get.event('isVersus')&&player.next.side==player.side||get.attitude(player,player.next)>get.attitude(player,player.previous)) return '逆时针';
 							return '顺时针';
-						}).set('prompt','选择'+get.translation(card)+'的结算方向').set('isVersus');
+						}).set('prompt','选择'+get.translation(card)+'的结算方向').set('isVersus',get.is.versus());
 					}
 					else{
 						event.goto(2);
