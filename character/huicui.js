@@ -5407,6 +5407,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					gain:{
+						audio:'dcliuzhuan',
 						trigger:{global:['loseAfter','loseAsyncAfter','cardsDiscardAfter']},
 						forced:true,
 						logTarget:()=>_status.currentPhase,
