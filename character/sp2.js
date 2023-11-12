@@ -1531,6 +1531,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							player.draw(trigger.getl(player).cards2.length);
+						},
+						ai:{
+							effect:{
+								target:(card,player,target)=>{
+									if((get.tag(card,'lose')||get.tag(card,'discard'))&&target.getHistory('damage').length&&!target.hasHistory('useSkill',evt=>evt.skill=='dczhengxu_lose')) return [1,1];
+								}
+							}
 						}
 					},
 					damage:{
@@ -1549,10 +1556,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						ai:{
 							effect:{
-								target:function(card,player,target){
-									if(player.hasSkillTag('jueqing',false,target)) return;
-									if(target.hasHistory('useSkill',evt=>evt.skill=='dczhengxu_damage')) return;
-									if(get.tag(card,'damage')) return 0.6;
+								target:(card,player,target)=>{
+									if(player.hasSkillTag('jueqing',false,target)||!get.tag(card,'damage')) return;
+									if(target.hasHistory('useSkill',evt=>evt.skill=='dczhengxu_damage')||!target.hasHistory('lose',evt=>evt.cards2&&evt.cards2.length)) return;
+									if(get.attitude(player,target)>=0) return 'zeroplayertarget';
+									let num=0,shas=player.getCardUsable('sha'),hs=player.getCards('hs',i=>{
+										if(i===card||card.cards&&card.cards.includes(i)||!get.tag(i,'damage')||!player.canUse(i,target)) return false;
+										if(get.name(i)==='sha'){
+											num++;
+											return false;
+										}
+										return true;
+									});
+									if(card.name==='sha') shas--;
+									num=Math.min(num,shas);
+									num+=hs.length;
+									if(!num) return 'zeroplayertarget';
+									num=1-2/3/num;
+									return [num,0,num,0];
 								}
 							}
 						}
