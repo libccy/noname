@@ -719,11 +719,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.finish();
 						return;
 					}
-					if(get.is.versus()){
+					if(card.storage&&card.storage.chooseDirection||get.is.versus()){
 						player.chooseControl('顺时针','逆时针',function(event,player){
-							if(player.next.side==player.side) return '逆时针';
+							if(get.event('isVersus')&&player.next.side==player.side||get.attitude(player,player.next)>get.attitude(player,player.previous)) return '逆时针';
 							return '顺时针';
-						}).set('prompt','选择'+get.translation(card)+'的结算方向');
+						}).set('prompt','选择'+get.translation(card)+'的结算方向').set('isVersus');
 					}
 					else{
 						event.goto(2);
