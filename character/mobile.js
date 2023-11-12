@@ -711,7 +711,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'twjilun',
 				inherit:'twjilun',
 				filter:function(event,player){
-					return player.hasSkill('twjichou');
+					return player.hasSkill('twjichou',null,false,false);
 				},
 				content:function(){
 					'step 0'
@@ -815,6 +815,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return{
 							type:result.control,
 							audio:'twjiaohua',
+							filterCard:()=>false,
+							selectCard:-1,
 							filterTarget:true,
 							content:function(){
 								'step 0'

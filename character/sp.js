@@ -749,7 +749,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!i) continue;
 								str+='<br>';
 								str+=get.translation(target)+'的下个结束阶段，其可令你获得其本回合使用的最后一张牌对应的所有位于弃牌堆的实体牌';
-								str+='，然后若此牌名为'+get.translation(player.storage.ollianju_effect[i])+'，则你失去1点体力';
+								str+='，然后若此牌名为'+get.translation(player.storage.ollianju_effect[i])+'，则你失去1点体力，否则你可以视为使用'+get.translation(player.storage.ollianju_effect[i]);
 							}
 						}
 						return str;
@@ -779,10 +779,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.player.chooseBool(get.prompt('ollianju',player),'令'+get.translation(player)+'获得'+get.translation(evt.cards.filterInD('d'))+(event.list.contains(evt.card.name)?'，然后'+get.translation(player)+'失去1点体力':'')).set('choice',get.attitude(trigger.player,player)>0&&(!event.list.contains(evt.card.name)||player.getHp()>1));
 							'step 2'
 							if(result.bool){
-								var evt=event.evt;
+								var evt=event.evt,cards=evt.cards.filterInD('d');
 								trigger.player.line(player);
-								player.gain(evt.cards.filterInD('d'),'gain2');
+								player.gain(cards,'gain2');
 								if(event.list.contains(evt.card.name)) player.loseHp();
+								else{
+									var card={
+										name:evt.card.name,
+										isCard:true,
+									};
+									if(player.hasUseTarget(card)) player.chooseUseTarget(card,false);
+								}
 							}
 						},
 					},
@@ -797,13 +804,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var name=player.storage.ollianju;
 					if(!name) return false;
-					if(event.getg) return event.getg(player).some(card=>card.name==name);
-					return event.getl(player).cards2.some(card=>card.name==name);
+					if(event.getg) return event.getg(player).some(card=>card.name==name)&&!player.hasSkill('olsilv_gain');
+					return event.getl(player).cards2.some(card=>card.name==name)&&!player.hasSkill('olsilv_lose');
 				},
 				forced:true,
-				usable:1,
 				content:function(){
 					'step 0'
+					player.addTempSkill('olsilv'+(trigger.getg?'gain':'lose'));
 					if(!trigger.visible){
 						var cards,name=player.storage.ollianju;
 						if(trigger.getg) cards=trigger.getg(player).filter(card=>card.name==name);
@@ -814,6 +821,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw();
 				},
 				ai:{combo:'ollianju'},
+				subSkill:{
+					gain:{charlotte:true},
+					lose:{charlotte:true},
+				},
 			},
 			//丁尚涴
 			olfudao:{
@@ -829,27 +840,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				content:function(){
 					'step 0'
-					var list=[],num=player.countCards('he');
-					for(var i=-4;i<=4;i++){
-						if(num+i<0||i==0) continue;
-						list.push(i);
-					}
-					player.chooseControl(list).set('prompt','讽言：请选择一个数字').set('prompt2','令此数值作为调整的手牌数值').set('ai',function(){
-						var list=[],num=_status.event.player.countCards('he');
-						for(var i=-4;i<=4;i++){
-							if(num+i<0||i==0) continue;
-							if(i>0&&i!=4) continue;
-							list.push(i);
-						}
-						return list.randomGet();
-					});
+					player.draw(3);
 					'step 1'
-					var num=result.control
-					player.popup(num);
-					if(num>0) player.draw(num);
-					else player.chooseToDiscard('he',true,-num);
+					var num=player.countCards('h');
+					if(num>0){
+						player.chooseCardTarget({
+							prompt:'抚悼：将至多三手张牌交给一名其他角色',
+							selectCard:[1,3],
+							filterCard:true,
+							filterTarget:lib.filter.notMe,
+							position:'h',
+							forced:true,
+							ai1:function(card){
+								if(card.name=='du') return 10;
+								else if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
+								var player=_status.event.player;
+								if(ui.selected.cards.length>4||!game.hasPlayer(function(current){
+									return get.attitude(player,current)>0&&!current.hasSkillTag('nogain');
+								})) return 0;
+								return 1/Math.max(0.1,get.value(card));
+							},
+							ai2:function(target){
+								var player=_status.event.player,att=get.attitude(player,target);
+								if(ui.selected.cards[0].name=='du') return -att;
+								if(target.hasSkillTag('nogain')) att/=6;
+								return att;
+							},
+						});
+					}
+					else event.goto(3);
 					'step 2'
-					player.storage.olfudao=player.countCards('he');
+					if(result.bool){
+						player.give(result.cards,result.targets[0]);
+					}
+					'step 3'
+					var num=player.countCards('h');
+					if(num>0) player.chooseToDiscard('h',[1,num],'抚悼：弃置任意张手牌，然后记录手牌数');
+					'step 4'
+					player.storage.olfudao=player.countCards('h');
 					player.markSkill('olfudao');
 				},
 				intro:{
@@ -17224,7 +17252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			xinyongsi:{
-				audio:'yongsi1',
+				audio:'yongsi',
 				group:['xinyongsi1','xinyongsi2'],
 				locked:true,
 			},
@@ -17979,7 +18007,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.awakenSkill('yongdi');
 						target.gainMaxHp();
 						target.recover();
-						var mode=get.mode();
 						var skills=target.getStockSkills(true,true).filter(skill=>{
 							if(target.hasSkill(skill)) return false;
 							var info=get.info(skill);
@@ -17988,6 +18015,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(skills.length){
 							for(var i of skills) target.addSkillLog(i);
 						}
+						if(target.isZhu2()) event.trigger('zhuUpdate');
 					}
 				},
 				ai:{expose:0.2},
@@ -23366,15 +23394,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			yongsi:{
-				audio:'yongsi1',
+				audio:2,
 				group:['yongsi1','yongsi2'],
 				locked:true,
 				ai:{
-					threaten:2.2
+					threaten:3.2
 				}
 			},
 			yongsi1:{
-				audio:2,
+				audio:true,
 				trigger:{player:'phaseDrawBegin2'},
 				forced:true,
 				filter:function(event,player){
@@ -23385,7 +23413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			yongsi2:{
-				audio:2,
+				audio:true,
 				trigger:{player:'phaseDiscardBegin'},
 				forced:true,
 				content:function(){
@@ -23598,8 +23626,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			chongzhen:{
-				group:['chongzhen1','chongzhen2'],
-				audio:'chongzhen1',
+				audio:2,
+				trigger:{player:['useCard','respond']},
+				filter:function(event,player){
+					if(event.card.name!='sha'&&event.card.name!='shan') return false;
+					if(!event.skill||event.skill.indexOf('fanghun')+event.skill.indexOf('longdan')==-2) return false;
+					var target=lib.skill.chongzhen.logTarget(event,player);
+					return target&&target.countGainableCards(player,'h')>0;
+				},
+				logTarget:function(event,player){
+					if(event.name=='respond') return event.source;
+					if(event.card.name=='sha') return event.targets[0];
+					return event.respondTo[0];
+				},
+				prompt2:function(event,player){
+					var target=lib.skill.chongzhen.logTarget(event,player);
+					return '获得'+get.translation(target)+'的一张手牌';
+				},
+				content:function(){
+					var target=lib.skill.chongzhen.logTarget(trigger,player);
+					player.gainPlayerCard(target,'h',true);
+				},
 				ai:{
 					combo:'ollongdan',
 					mingzhi:false,
@@ -23616,40 +23663,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 					},
-				}
-			},
-			chongzhen1:{
-				audio:2,
-				trigger:{player:'useCard'},
-				filter:function(event,player){
-					if((event.card.name!='sha'&&event.card.name!='shan')||(event.skill!='longdan_shan'&&event.skill!='longdan_sha'&&
-					event.skill!='fanghun_shan'&&event.skill!='fanghun_sha'&&event.skill!='ollongdan')) return false;
-					var target=lib.skill.chongzhen1.logTarget(event,player);
-					return target&&target.countGainableCards(player,'h')>0;
 				},
-				logTarget:function(event,player){
-					if(event.card.name=='sha') return event.targets[0];
-					return event.respondTo[0];
-				},
-				prompt2:'当你因发动〖龙胆〗而使用或打出【杀】或【闪】时，你可以获得对方的一张手牌。',
-				content:function(){
-					var target=lib.skill.chongzhen1.logTarget(trigger,player);
-					player.gainPlayerCard(target,'h',true);
-				}
-			},
-			chongzhen2:{
-				audio:2,
-				trigger:{player:'respond'},
-				filter:function(event,player){
-					if(event.skill!='longdan_shan'&&event.skill!='longdan_sha'&&
-					event.skill!='fanghun_shan'&&event.skill!='fanghun_sha'&&event.skill!='ollongdan') return false;
-					return event.source&&event.source.countGainableCards(player,'h')>0;
-				},
-				logTarget:'source',
-				prompt2:'当你因发动〖龙胆〗而使用或打出【杀】或【闪】时，你可以获得对方的一张手牌。',
-				content:function(){
-					player.gainPlayerCard(trigger.source,'h',true);
-				}
 			},
 			lihun:{
 				audio:2,
@@ -25826,8 +25840,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			baobian:'豹变',
 			lihun:'离魂',
 			chongzhen:'冲阵',
-			chongzhen1:'冲阵',
-			chongzhen2:'冲阵',
 			yuanhu:'援护',
 			tianming:'天命',
 			mizhao:'密诏',
@@ -26494,15 +26506,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_dingshangwan:'OL丁尚涴',
 			ol_dingshangwan_prefix:'OL',
 			olfudao:'抚悼',
-			olfudao_info:'①游戏开始时，你选择弃置或摸至多四张牌，然后记录你的手牌数。②一名角色的回合结束时，若其手牌数和你发动〖抚悼①〗记录的数值相同，则你可以与其各摸一张牌。',
+			olfudao_info:'①游戏开始时，你摸三张牌并将至多三张手牌交给一名其他角色，然后弃置任意张手牌并记录你的手牌数。②一名角色的回合结束时，若其手牌数和你发动〖抚悼①〗记录的数值相同，则你可以与其各摸一张牌。',
 			olfengyan:'讽言',
 			olfengyan_info:'锁定技。①当你受到其他角色造成的伤害后，你摸一张牌，然后交给其一张牌。②当你响应其他角色使用的牌时，其摸一张牌，然后弃置两张牌。',
 			ol_liwan:'OL李婉',
 			ol_liwan_prefix:'OL',
 			ollianju:'联句',
-			ollianju_info:'结束阶段，你可以令一名其他角色获得你本回合使用的最后一张牌A对应的所有位于弃牌堆的实体牌并记录A的牌名，然后其下个结束阶段可以令你获得其本回合使用的最后一张牌B对应的所有位于弃牌堆的实体牌，且若A与B的牌名相同，则你失去1点体力。',
+			ollianju_info:'结束阶段，你可以令一名其他角色获得你本回合使用的最后一张牌A对应的所有位于弃牌堆的实体牌并记录A的牌名，然后其下个结束阶段可以令你获得其本回合使用的最后一张牌B对应的所有位于弃牌堆的实体牌，然后若A与B的牌名相同，则你失去1点体力；若A与B的牌名不同，则你可以视为使用A。',
 			olsilv:'思闾',
-			olsilv_info:'锁定技，每回合限一次，当你获得或失去你发动〖联句〗记录的最后一次牌名的同名牌后，你展示这些牌，然后摸一张牌。',
+			olsilv_info:'锁定技，每回合每项限一次，当你获得或失去你发动〖联句〗记录的最后一次牌名的同名牌后，你展示这些牌，然后摸一张牌。',
 			xueji_old:'血祭',
 			xueji_old_info:'出牌阶段限一次，你可以弃置一张红色牌并对攻击范围内的至多X名角色各造成1点伤害（X为你已损失的体力值），然后这些角色各摸一张牌。',
 			oldhuxiao:'虎啸',

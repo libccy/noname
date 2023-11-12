@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// yuji:['male','qun',3,['guhuo']],
 			// xin_yuji:['male','qun',3,['guhuo']],
 
-			sp_zhugeliang:['male','shu',3,['huoji','bazhen','kanpo']],
+			sp_zhugeliang:['male','shu',3,['bazhen','huoji','kanpo']],
 			pangtong:['male','shu',3,['lianhuan','oldniepan']],
 			xunyu:['male','wei',3,['quhu','jieming'],['clan:颍川荀氏']],
 			dianwei:['male','wei',4,['qiangxix']],
@@ -143,7 +143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//庞统写法修改
 			lianhuan:{
-				audio:'lianhuan1',
+				audio:2,
 				hiddenCard:(player,name)=>{
 					return name=='tiesuo'&&player.hasCard(card=>get.suit(card)=='club','sh');
 				},
@@ -215,8 +215,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recast(cards);
 				},
 			},
-			lianhuan1:{audio:2},
-			lianhuan2:{audio:2},
 			//新杀小加强 陈到
 			dcwanglie:{
 				audio:'drlt_wanglie',
@@ -6025,6 +6023,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 			},
 			shuangxiong:{
+				audio:2,
+				audioname:['re_yanwen'],
+				group:'shuangxiong1',
+			},
+			shuangxiong1:{
 				audio:true,
 				audioname:['re_yanwen'],
 				trigger:{player:'phaseDrawBegin1'},
@@ -6037,39 +6040,53 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !event.numFixed;
 				},
 				preHidden:true,
+				prompt2:()=>'进行一次判定，本回合可以将一张与此牌颜色不同的手牌当作【决斗】使用',
 				content:function(){
-					player.judge().set('callback',lib.skill.shuangxiong.callback);
+					player.judge().set('callback',lib.skill.shuangxiong1.callback);
 					trigger.changeToZero();
 				},
 				callback:function(){
 					player.gain(card,'gain2');
 					player.addTempSkill('shuangxiong2');
-					player.storage.shuangxiong=event.judgeResult.color;
+					player.markAuto('shuangxiong2',[event.judgeResult.color]);
 				},
 			},
 			shuangxiong2:{
+				charlotte:true,
+				onremove:true,
 				audio:true,
 				audioname:['re_yanwen'],
 				enable:'chooseToUse',
-				prompt:function(){
-					var player=_status.event.player;
-					var str='将一张'+(player.storage.shuangxiong!='red'?'红':'黑')+'色手牌当做【决斗】使用';
-					return str;
-				},
 				viewAs:{name:'juedou'},
 				position:'hs',
-				onremove:true,
+				viewAsFilter:function(player){
+					return player.hasCard(card=>lib.skill.shuangxiong2.filterCard(card,player),'hs');
+				},
 				filterCard:function(card,player){
-					return get.color(card)!=player.storage.shuangxiong;
+					var color=get.color(card),colors=player.getStorage('shuangxiong2');
+					for(var i of colors){
+						if(color!=i) return true;
+					}
+					return false;
+				},
+				prompt:function(){
+					var colors=_status.event.player.getStorage('shuangxiong2');
+					var str='将一张颜色';
+					for(var i=0;i<colors.length;i++){
+						if(i>0) str+='或';
+						str+='不为';
+						str+=get.translation(colors[i]);
+					}
+					str+='的牌当做【决斗】使用';
+					return str;
 				},
 				check:function(card){
-					return 8-get.value(card);
+					var player=_status.event.player;
+					var raw=player.getUseValue(card,null,true);
+					var eff=player.getUseValue(get.autoViewAs({name:'juedou'},[card]));
+					return eff-raw;
 				},
-				ai:{
-					basic:{
-						order:10
-					}
-				}
+				ai:{order:7},
 			},
 			luanji:{
 				audio:2,
@@ -8074,6 +8091,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiangxi:'强袭',
 			tianyi:'天义',
 			shuangxiong:'双雄',
+			shuangxiong1:'双雄',
 			shuangxiong2:'双雄',
 			luanji:'乱击',
 			xueyi:'血裔',
