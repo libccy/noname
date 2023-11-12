@@ -1727,7 +1727,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					'2':{
-						audio:2,
+						audio:"nzry_juzhan_1",
 						trigger:{
 							player:'useCardToPlayered'
 						},
@@ -2486,7 +2486,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					2:{
-						audio:2,
 						trigger:{
 							player:['useCardAfter','respondAfter'],
 						},
@@ -2607,7 +2606,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					'2':{
-						audio:2,
+						audio:'nzry_shenshi_1',
 						trigger:{
 							player:'damageEnd',
 						},
