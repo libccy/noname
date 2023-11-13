@@ -13662,8 +13662,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i of map[sides[0]]){
 							if(isYe(i)) return;
 						}
-						for(var i of hiddens){
-							if(isYe(i)||i.getGuozhanGroup(2)!=identity||!i.wontYe()) return;
+						for(var ind=0;ind<hiddens.length;ind++){
+							var current=hiddens[ind];
+							if(isYe(current)||current.getGuozhanGroup(2)!=identity||!current.wontYe(null,ind+1)) return;
 						}
 						game.broadcastAll(function(id){
 							game.winner_id=id;
@@ -16032,14 +16033,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					game.tryResult();
 				},
-				wontYe:function(group){
+				wontYe:function(group,numOfReadyToShow){
 					if(!group){
 						if(this.trueIdentity) group=this.trueIdentity;
 						else group=lib.character[this.name1][1];
 					}
 					if(_status.yeidentity&&_status.yeidentity.contains(group)) return false;
 					if(get.zhu(this,null,group)) return true;
-					return get.totalPopulation(group)+1<=_status.separatism?Math.max(get.population()/2-1,1):get.population()/2;
+					if(!numOfReadyToShow) numOfReadyToShow=1;
+					return get.totalPopulation(group)+numOfReadyToShow<=(_status.separatism?Math.max(get.population()/2-1,1):get.population()/2);
 				},
 				perfectPair:function(choosing){
 					if(_status.connectMode){
