@@ -1168,26 +1168,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						var next=event.turn.chooseToRespond({name:'sha'});
-						if(event.shaRequired>1){
-							next.set('prompt2','共需打出'+event.shaRequired+'张杀')
-						}
+						if(event.shaRequired>1) next.set('prompt2','共需打出'+event.shaRequired+'张杀');
 						next.set('ai',function(card){
-							var event=_status.event;
-							var player=event.splayer;
-							var target=event.starget;
-							if(player.hasSkillTag('notricksource')) return 0;
-							if(target.hasSkillTag('notrick')) return 0;
+							let event=_status.event,player=event.splayer,target=event.starget;
+							if(player.hasSkillTag('notricksource')||target.hasSkillTag('notrick')) return 0;
 							if(event.shaRequired>1&&player.countCards('h','sha')<event.shaRequired) return 0;
-							if(event.player==target){
-								if(player.hasSkill('naman')) return -1;
-								if(get.attitude(target,player)<0||event.player.hp<=1&&get.damageEffect(target,player,event.player)<get.damageEffect(player,target,event.player)){
+							if(event.player===target){
+								if(_status.event.tdamage>=0||player.hasSkill('naman')) return -1;
+								if(get.attitude(target,player)<=0||event.player.hp<=1&&_status.event.tdamage<_status.event.pdamage){
 									return get.order(card);
 								}
 								return -1;
 							}
 							else{
-								if(target.hasSkill('naman')) return -1;
-								if(get.attitude(player,target)<0||event.player.hp<=1&&get.damageEffect(target,player,event.player)>get.damageEffect(player,target,event.player)){
+								if(_status.event.pdamage>=0||target.hasSkill('naman')) return -1;
+								if(get.attitude(player,target)<=0||event.player.hp<=1&&_status.event.tdamage>_status.event.pdamage){
 									return get.order(card);
 								}
 								return -1;
@@ -1195,6 +1190,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						});
 						next.set('splayer',player);
 						next.set('starget',target);
+						next.set('pdamage',get.damageEffect(player,target,event.turn));
+						next.set('tdamage',get.damageEffect(target,player,event.turn));
 						next.set('shaRequired',event.shaRequired);
 						next.autochoose=lib.filter.autoRespondSha;
 						if(event.turn==target){
