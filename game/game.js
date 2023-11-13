@@ -18233,29 +18233,32 @@
 				},
 				moveCard:function(){
 					'step 0'
-					if(!player.canMoveCard(null,event.nojudge)){
+					if(!player.canMoveCard(null,event.nojudge,event.sourceTargets,event.aimTargets,event.filter)){
 						event.finish();
 						return;
 					}
 					var next=player.chooseTarget(2,function(card,player,target){
+						var filterCard=get.event('filter');
 						if(ui.selected.targets.length){
+							if(!get.event('aimTargets').includes(target)) return false;
 							var from=ui.selected.targets[0];
-							var js=from.getCards('j');
+							var js=from.getCards('j',filterCard);
 							for(var i=0;i<js.length;i++){
 								if(_status.event.nojudge) break;
 								if(target.canAddJudge(js[i])) return true;
 							}
 							if(target.isMin()) return false;
-							var es=from.getCards('e');
+							var es=from.getCards('e',filterCard);
 							for(var i=0;i<es.length;i++){
 								if(target.canEquip(es[i])) return true;
 							}
 							return false;
 						}
 						else{
+							if(!get.event('sourceTargets').includes(target)) return false;
 							var range='ej';
 							if(_status.event.nojudge) range='e';
-							return target.countCards(range)>0;
+							return target.countCards(range,filterCard)>0;
 						}
 					});
 					next.set('nojudge',event.nojudge||false);
@@ -18311,6 +18314,9 @@
 					next.set('multitarget',true);
 					next.set('targetprompt',_status.event.targetprompt||['被移走','移动目标']);
 					next.set('prompt',event.prompt||'移动场上的一张牌');
+					next.set('filter',event.filter);
+					next.set('sourceTargets',event.sourceTargets||game.filterPlayer());
+					next.set('aimTargets',event.aimTargets||game.filterPlayer());
 					if(event.prompt2) next.set('prompt2',event.prompt2);
 					if(event.forced) next.set('forced',true);
 					'step 1'
@@ -18341,6 +18347,7 @@
 							}
 						},targets[0]).set('nojudge',event.nojudge||false).set('targets0',targets[0]).set('targets1',targets[1]).set('filterButton',function(button){
 							var targets1=_status.event.targets1;
+							if(!get.event('filter')(button.link)) return false;
 							if(get.position(button.link)=='j'){
 								if(_status.event.nojudge) return false;
 								return targets1.canAddJudge(button.link);
@@ -18348,7 +18355,7 @@
 							else{
 								return targets1.canEquip(button.link);
 							}
-						});
+						}).set('filter',event.filter);
 					}
 					else{
 						event.finish();
@@ -24878,13 +24885,33 @@
 					}
 				}
 				canMoveCard(withatt,nojudge){
-					var player=this;
-					return game.hasPlayer(function(current){
-						var att=get.sgn(get.attitude(player,current));
+					const player=this;
+					const args=Array.from(arguments).slice(2);
+					let sourceTargets,aimTargets,filterCard;
+					args.forEach(arg=>{
+						if(get.itemtype(arg)=='players'){
+							if(!sourceTargets) sourceTargets=arg;
+							else if(!aimTargets) aimTargets=arg;
+						}
+						else if(get.itemtype(arg)=='player'){
+							if(!sourceTargets) sourceTargets=[arg];
+							else if(!aimTargets) aimTargets=[arg];
+						}
+						else if(typeof arg=='function'){
+							filterCard=arg;
+						}
+						else if(typeof arg=='object'&&arg){
+							filterCard=get.filter(arg);
+						}
+					});
+					if(!sourceTargets) sourceTargets=game.filterPlayer();
+					if(!aimTargets) aimTargets=game.filterPlayer();
+					return sourceTargets.some(current=>{
+						const att=get.sgn(get.attitude(player,current));
 						if(!withatt||att!=0){
-							var es=current.getCards('e');
+							var es=current.getCards('e',filterCard);
 							for(var i=0;i<es.length;i++){
-								if(game.hasPlayer(function(current2){
+								if(aimTargets.some(current2=>{
 									if(withatt){
 										if(get.sgn(get.value(es[i],current))!=-att) return false;
 										var att2=get.sgn(get.attitude(player,current2));
@@ -24897,7 +24924,7 @@
 							}
 						}
 						if(!nojudge&&(!withatt||att>0)){
-							var js=current.getCards('j');
+							var js=current.getCards('j',filterCard);
 							for(var i=0;i<js.length;i++){
 								if(game.hasPlayer(function(current2){
 									if(withatt){
@@ -24919,6 +24946,14 @@
 						if(typeof arguments[i]=='boolean'){
 							next.forced=arguments[i];
 						}
+						else if(get.itemtype(arguments[i])=='players'){
+							if(!next.sourceTargets) next.sourceTargets=arguments[i];
+							else if(!next.aimTargets) next.aimTargets=arguments[i];
+						}
+						else if(get.itemtype(arguments[i])=='player'){
+							if(!next.sourceTargets) next.sourceTargets=[arguments[i]];
+							else if(!next.aimTargets) next.aimTargets=[arguments[i]];
+						}
 						else if(typeof arguments[i]=='string'){
 							get.evtprompt(next,arguments[i]);
 						}
@@ -24930,7 +24965,16 @@
 								next.targetprompt=arguments[i];
 							}
 						}
+						else if(typeof arguments[i]=='function'){
+							next.filter=arguments[i];
+						}
+						else if(typeof arguments[i]=='object'&&arguments[i]){
+							next.filter=get.filter(arguments[i]);
+						}
 					}
+					if(!next.sourceTargets) next.sourceTargets=game.filterPlayer();
+					if(!next.aimTargets) next.aimTargets=game.filterPlayer();
+					if(next.filter==undefined) next.filter=lib.filter.all;
 					next.setContent('moveCard');
 					next._args=Array.from(arguments);
 					return next;
