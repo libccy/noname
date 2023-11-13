@@ -1727,7 +1727,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					'2':{
-						audio:2,
+						audio:"nzry_juzhan_1",
 						trigger:{
 							player:'useCardToPlayered'
 						},
@@ -2486,7 +2486,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					2:{
-						audio:2,
 						trigger:{
 							player:['useCardAfter','respondAfter'],
 						},
@@ -2607,7 +2606,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					'2':{
-						audio:2,
+						audio:'nzry_shenshi_1',
 						trigger:{
 							player:'damageEnd',
 						},
@@ -3494,167 +3493,99 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qiaobian:{
 				audio:2,
-				group:['qiaobian1','qiaobian2','qiaobian3','qiaobian4'],
+				trigger:{player:['phaseJudgeBefore','phaseDrawBefore','phaseUseBefore','phaseDiscardBefore']},
+				filter:function(event,player){
+					return player.countCards('h')>0;
+				},
+				direct:true,
 				preHidden:true,
-				ai:{
-					threaten:3
-				}
-			},
-			qiaobian1:{
-				audio:2,
-				trigger:{player:'phaseJudgeBefore'},
-				filter:function(event,player){
-					return player.countCards('h')>0;
-				},
-				direct:true,
-				frequent:true,
 				content:function(){
-					"step 0"
-					if(player.countCards('j')==0&&!event.isOnline()&&(!event.isMine()||!lib.config.autoskilllist.contains('qiaobian1'))){
-						event.finish();
-					}
-					else{
-						var next=player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过判定阶段');
-						next.set('ai',get.unuseful2);
-						next.set('logSkill','qiaobian1');
-						next.setHiddenSkill('qiaobian');
-					}
-					"step 1"
-					if(result.bool){
-						trigger.cancel();
-					}
-				}
-			},
-			qiaobian2:{
-				audio:2,
-				trigger:{player:'phaseDrawBefore'},
-				filter:function(event,player){
-					return player.countCards('h')>0;
-				},
-				direct:true,
-				content:function(){
-					"step 0"
-					var check,i,num=0,num2=0,players=game.filterPlayer();
-					for(i=0;i<players.length;i++){
-						if(player!=players[i]&&players[i].countCards('h')){
-							var att=get.attitude(player,players[i]);
-							if(att<=0){
-								num++;
+					'step 0'
+					var check,str='弃置一张手牌并跳过';
+					str+=['判定','摸牌','出牌','弃牌'][lib.skill.qiaobian.trigger.player.indexOf(event.triggername)];
+					str+='阶段';
+					if(trigger.name=='phaseDraw') str+='，然后可以获得至多两名角色各一张手牌';
+					if(trigger.name=='phaseUse') str+='，然后可以移动场上的一张牌';
+					switch(trigger.name){
+						case 'phaseJudge':
+							check=player.countCards('j');
+							break;
+						case 'phaseDraw':
+							var i,num=0,num2=0,players=game.filterPlayer();
+							for(i=0;i<players.length;i++){
+								if(player!=players[i]&&players[i].countCards('h')){
+									var att=get.attitude(player,players[i]);
+									if(att<=0){
+										num++;
+									}
+									if(att<0){
+										num2++;
+									}
+								}
 							}
-							if(att<0){
-								num2++;
+							check=(num>=2&&num2>0);
+							break;
+						case 'phaseUse':
+							if(!player.canMoveCard(true)){
+								check=false;
 							}
-						}
+							else{
+								check=game.hasPlayer(function(current){
+									return get.attitude(player,current)>0&&current.countCards('j');
+								});
+								if(!check){
+									if(player.countCards('h')>player.hp+1){
+										check=false;
+									}
+									else if(player.countCards('h',{name:['wuzhong']})){
+										check=false;
+									}
+									else{
+										check=true;
+									}
+								}
+							}
+							break;
+						case 'phaseDiscard':
+							check=player.needsToDiscard();
+							break;
 					}
-					check=(num>=2&&num2>0);
-
-					player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过摸牌阶段，然后可以获得至多两名角色各一张手牌',lib.filter.cardDiscardable).set('ai',function(card){
-						if(!_status.event.check) return 0;
+					player.chooseToDiscard(get.prompt('qiaobian'),str,lib.filter.cardDiscardable).set('ai',card=>{
+						if(!_status.event.check) return -1;
 						return 7-get.value(card);
-					}).set('check',check).set('logSkill','qiaobian2').setHiddenSkill('qiaobian');
-					"step 1"
+					}).set('check',check).set('logSkill','qiaobian').setHiddenSkill('qiaobian');
+					'step 1'
 					if(result.bool){
 						trigger.cancel();
-						player.chooseTarget([1,2],'获得至多两名角色各一张手牌',function(card,player,target){
-							return target!=player&&target.countCards('h');
-						}).set('ai',function(target){
-							return 1-get.attitude(_status.event.player,target);
-						})
+						game.log(player,'跳过了','#y'+['判定','摸牌','出牌','弃牌'][lib.skill.qiaobian.trigger.player.indexOf(event.triggername)]+'阶段');
+						if(trigger.name=='phaseUse'){
+							if(player.canMoveCard()) player.moveCard();
+							event.finish();
+						}
+						else if(trigger.name=='phaseDraw'){
+							player.chooseTarget([1,2],'获得至多两名角色各一张手牌',function(card,player,target){
+								return target!=player&&target.countCards('h');
+							}).set('ai',function(target){
+								return 1-get.attitude(_status.event.player,target);
+							});
+						}
+						else event.finish();
 					}
-					else{
-						event.finish();
-					}
-					"step 2"
+					else event.finish();
+					'step 2'
 					if(result.bool){
 						result.targets.sortBySeat();
 						player.line(result.targets,'green');
 						event.targets=result.targets;
 						if(!event.targets.length) event.finish();
 					}
-					else{
-						event.finish();
-					}
-					"step 3"
+					else event.finish();
+					'step 3'
 					player.gainMultiple(event.targets);
-					"step 4"
+					'step 4'
 					game.delay();
 				},
-				ai:{
-					expose:0.2
-				}
-			},
-			qiaobian3:{
-				audio:2,
-				trigger:{player:'phaseUseBefore'},
-				filter:function(event,player){
-					return player.countCards('h')>0;
-				},
-				direct:true,
-				content:function(){
-					"step 0"
-					var check;
-					if(!player.canMoveCard(true)){
-						check=false;
-					}
-					else{
-						check=game.hasPlayer(function(current){
-							return get.attitude(player,current)>0&&current.countCards('j');
-						});
-						if(!check){
-							if(player.countCards('h')>player.hp+1){
-								check=false;
-							}
-							else if(player.countCards('h',{name:['wuzhong']})){
-								check=false;
-							}
-							else{
-								check=true;
-							}
-						}
-					}
-					player.chooseToDiscard(get.prompt('qiaobian'),'弃置一张手牌并跳过出牌阶段，然后可以移动场上的一张牌',lib.filter.cardDiscardable).set('ai',function(card){
-						if(!_status.event.check) return 0;
-						return 7-get.value(card);
-					}).set('check',check).set('logSkill','qiaobian3').setHiddenSkill('qiaobian');
-					"step 1"
-					if(result.bool){
-						trigger.cancel();
-						player.moveCard();
-					}
-					else{
-						event.finish();
-					}
-				},
-				ai:{
-					expose:0.2
-				}
-			},
-			qiaobian4:{
-				audio:2,
-				trigger:{player:'phaseDiscardBefore'},
-				direct:true,
-				filter:function(event,player){
-					return player.countCards('h')>0;
-				},
-				content:function(){
-					"step 0"
-					var discard=player.countCards('h')>player.hp;
-					var next=player.chooseToDiscard(get.prompt('qiaobian4'),'弃置一张手牌并跳过弃牌阶段');
-					next.setHiddenSkill('qiaobian');
-					next.logSkill='qiaobian';
-					next.ai=function(card){
-						if(discard){
-							return 100-get.useful(card);
-						}
-						else{
-							return -1;
-						}
-					};
-					"step 1"
-					if(result.bool){
-						trigger.cancel();
-					}
-				}
+				ai:{threaten:3},
 			},
 			tuntian:{
 				audio:2,
@@ -7953,10 +7884,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fangquan:'放权',
 			ruoyu:'若愚',
 			qiaobian:'巧变',
-			qiaobian1:'巧变·判定',
-			qiaobian2:'巧变·摸牌',
-			qiaobian3:'巧变·出牌',
-			qiaobian4:'巧变·弃牌',
 			tuntian:'屯田',
 			tuntian_bg:'田',
 			zaoxian:'凿险',
@@ -7990,7 +7917,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiangle_info:'锁定技，当其他角色使用【杀】指定你为目标时，其需弃置一张基本牌，否则此【杀】对你无效。',
 			fangquan_info:'你可跳过你的出牌阶段，若如此做，回合结束时，你可以弃置一张手牌并令一名其他角色进行一个额外的回合。',
 			ruoyu_info:'主公技，觉醒技，准备阶段，若你的体力是全场最少的(或之一)，你须增加1点体力上限并回复1点体力，然后获得技能〖激将〗。',
-			qiaobian_info:'你可以弃置一张手牌并跳过自己的一个阶段(准备阶段和结束阶段除外)；若你以此法跳过了摸牌阶段，则你可以获得至多两名其他角色的各一张手牌；若你以此法跳过了出牌阶段，则你可以移动场上的一张牌。',
+			qiaobian_info:'你可以弃置一张手牌并跳过自己的一个阶段（准备阶段和结束阶段除外）。若你以此法跳过了摸牌阶段，则你可以获得至多两名其他角色的各一张手牌；若你以此法跳过了出牌阶段，则你可以移动场上的一张牌。',
 			tuntian_info:'①当你于回合外失去牌后，你可以判定。若判定结果不为♥，则你将此牌置于你的武将牌上，称为“田”。②你计算与其他角色的距离时-X（X为你武将牌上“田”的数目）。',
 			zaoxian_info:'觉醒技，准备阶段，若你武将牌上“田”的数量达到3张或更多，则你减1点体力上限，并获得技能〖急袭〗。',
 			jiang_info:'每当你使用（指定目标后）或被使用（成为目标后）一张【决斗】或红色的【杀】时，你可以摸一张牌。',

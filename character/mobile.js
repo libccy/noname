@@ -14646,6 +14646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			gnjinfan_gain:{
+				audio:'gnjinfan',
 				trigger:{player:'loseAfter'},
 				forced:true,
 				filter:function(event,player){
