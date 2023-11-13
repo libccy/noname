@@ -2797,7 +2797,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},_status.firstAct);
 
 					var filterChoice=function(name){
-						if(name=='zuoci'||name=='miheng') return true;
+						// if(name=='zuoci'||name=='miheng') return true;
 						if(!lib.choiceFour.contains(name)){
 							return true;
 						}
