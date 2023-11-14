@@ -3816,7 +3816,7 @@
 						name:'显示状态栏',
 						init:false,
 						unfrequent:true,
-						content:function(bool){
+						onclick:function(bool){
 							game.saveConfig('show_statusbar',bool);
 							if(window.StatusBar&&lib.device=='android'){
 								if(bool){
@@ -8188,7 +8188,7 @@
 		run:function(time){
 			lib.status.time=time;
 			for(var i=0;i<lib.updates.length;i++){
-				if(!('_time' in lib.updates[i])){
+				if(!Object.prototype.hasOwnProperty.call(lib.updates[i], '_time')){
 					lib.updates[i]._time=time;
 				}
 				if(lib.updates[i](time-lib.updates[i]._time-lib.status.delayed)===false){
@@ -8583,39 +8583,36 @@
 							else src=`image/${type}/${subfolder}/${name}${ext}`;
 						}
 						else src=`image/${name}${ext}`;
-						this.style.backgroundPositionX='center';
-						this.style.backgroundSize='cover';
-						if(type=='character'){
-							new Promise((resolve,reject)=>{
-								const image=new Image();
-								image.src=`${lib.assetURL}${src}`;
-								image.onload=resolve;
-								if(type=='character') image.onerror=reject;
-							}).then(()=>{
-								this.setBackgroundImage(src);
-							}).catch(()=>new Promise((resolve,reject)=>{
-								const nameinfo=get.character(name);
-								const sex=nameinfo[0];
-								src=`image/character/default_silhouette_${sex}${ext}`;
-								const image=new Image();
-								image.src=`${lib.assetURL}${src}`;
-								image.onload=()=>resolve(src);
-								image.onerror=reject;
-							}).catch(()=>new Promise((resolve,reject)=>{
-								const nameinfo=get.character(name);
-								const sex=nameinfo[0];
-								src=`image/character/default_silhouette_${sex=='female'?'female':'male'}${ext}`;
-								const image=new Image();
-								image.src=`${lib.assetURL}${src}`;
-								image.onload=()=>resolve(src);
-								image.onerror=reject;
-							})).then((src)=>{
-								this.setBackgroundImage(src);
-							}));
-						}
-						else{
+						new Promise((resolve,reject)=>{
+							const image=new Image();
+							image.src=`${lib.assetURL}${src}`;
+							image.onload=resolve;
+							if(type=='character') image.onerror=reject;
+						}).then(()=>{
 							this.setBackgroundImage(src);
-						}
+							this.style.backgroundPositionX='center';
+							this.style.backgroundSize='cover';
+						}).catch(()=>new Promise((resolve,reject)=>{
+							const nameinfo=get.character(name);
+							const sex=nameinfo[0];
+							src=`image/character/default_silhouette_${sex}${ext}`;
+							const image=new Image();
+							image.src=`${lib.assetURL}${src}`;
+							image.onload=()=>resolve(src);
+							image.onerror=reject;
+						}).catch(()=>new Promise((resolve,reject)=>{
+							const nameinfo=get.character(name);
+							const sex=nameinfo[0];
+							src=`image/character/default_silhouette_${sex=='female'?'female':'male'}${ext}`;
+							const image=new Image();
+							image.src=`${lib.assetURL}${src}`;
+							image.onload=()=>resolve(src);
+							image.onerror=reject;
+						})).then((src)=>{
+							this.setBackgroundImage(src);
+							this.style.backgroundPositionX='center';
+							this.style.backgroundSize='cover';
+						}));
 						return this;
 					}
 				});
@@ -19829,14 +19826,14 @@
 						cards[i].recheck();
 						
 						var info=lib.card[cards[i].name];
-						if('_destroy' in cards[i]){
+						if(Object.prototype.hasOwnProperty.call(cards[i], '_destroy')){
 							if(cards[i]._destroy){
 								cards[i].delete();
 								cards[i].destroyed=cards[i]._destroy;
 								continue;
 							}
 						}
-						else if('destroyed' in cards[i]){
+						else if(Object.prototype.hasOwnProperty.call(cards[i], 'destroyed')){
 							if(event.getlx!==false&&event.position&&cards[i].willBeDestroyed(event.position.id,null,event)){
 								cards[i].selfDestroy(event);
 								continue;
@@ -25479,7 +25476,7 @@
 						}
 					}
 					if(next.animate=='gain2'||next.animate=='draw2'){
-						if(!('log' in next)){
+						if(!Object.prototype.hasOwnProperty.call(next, 'log')){
 							next.log=true;
 						}
 					}
@@ -25566,7 +25563,7 @@
 						}
 					}
 					if(next.animate=='gain2'||next.animate=='draw2'||next.animate=='give'){
-						if(!('log' in next)){
+						if(!Object.prototype.hasOwnProperty.call(next, 'log')){
 							next.log=true;
 						}
 					}
@@ -26370,7 +26367,7 @@
 					}
 					clearTimeout(lib.node.torespondtimeout[this.playerid]);
 					delete lib.node.torespondtimeout[this.playerid];
-					if(!(this.playerid in lib.node.torespond)){
+					if(!Object.prototype.hasOwnProperty.call(lib.node.torespond, this.playerid)){
 						return;
 					}
 					var noresume=false;
@@ -26397,7 +26394,7 @@
 					else if(_status.paused&&!noresume) game.resume();
 				}
 				tempUnwait(result){
-					if(!(this.playerid in lib.node.torespond)){
+					if(!Object.prototype.hasOwnProperty.call(lib.node.torespond, this.playerid)){
 						return;
 					}
 					var proceed;
@@ -31445,18 +31442,14 @@
 					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
 					this.next.push(next);
 					next.setContent(content);
-					if(map){
-						Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
-					}
+					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
 					return next;
 				}
 				insertAfter(content,map){
 					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
 					this.after.push(next);
 					next.setContent(content);
-					if(map){
-						Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
-					}
+					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
 					return next;
 				}
 				backup(skill){
@@ -37763,7 +37756,7 @@
 				const config=game.importedPack.config;
 				Object.keys(config).forEach(value=>{
 					const configObject=config[value];
-					if(configObject&&('init' in configObject)) game.saveConfig(`extension_${extensionName}_${value}`,configObject.init);
+					if(configObject&&Object.prototype.hasOwnProperty.call(configObject, 'init')) game.saveConfig(`extension_${extensionName}_${value}`,configObject.init);
 				});
 				if(game.download){
 					const files=zip.files,hiddenFileFlags=['.','_'],fileList=Object.keys(files).filter(key=>!files[key].dir&&!hiddenFileFlags.includes(key[0])).reverse();
@@ -42203,7 +42196,7 @@
 			config.num=config.num||num||3;
 			config.ratio=config.ratio||ratio||1.2;
 			config.update=config.update||update;
-			if(!('first' in config)){
+			if(!Object.prototype.hasOwnProperty.call(config, 'first')){
 				if(typeof first=='boolean'){
 					config.first=first;
 				}
@@ -42817,10 +42810,10 @@
 			}
 			if(info.marktext) lib.translate[`${i}_bg`]=info.marktext;
 			if(info.silent){
-				if(!('forced' in info)) info.forced=true;
-				if(!('popup' in info)) info.popup=false;
+				if(!Object.prototype.hasOwnProperty.call(info, 'forced')) info.forced=true;
+				if(!Object.prototype.hasOwnProperty.call(info, 'popup')) info.popup=false;
 			}
-			if(!('_priority' in info)){
+			if(!Object.prototype.hasOwnProperty.call(info, '_priority')){
 				let priority=0;
 				if(info.priority){
 					priority=info.priority*100;
@@ -45117,7 +45110,7 @@
 									var cfg=copyObj(infoconfig[j]);
 									cfg._name=j;
 									cfg.mode=mode;
-									if(!(j in config)){
+									if(!Object.prototype.hasOwnProperty.call(config, j)){
 										game.saveConfig(j,cfg.init,mode);
 									}
 									else{
@@ -45585,7 +45578,7 @@
 									}
 									var cfg=copyObj(info.config[j]);
 									cfg._name=j;
-									if(!(j in config)){
+									if(!Object.prototype.hasOwnProperty.call(config, j)){
 										if(cfg.type!='autoskill'&&cfg.type!='banskill'){
 											game.saveConfig(j,cfg.init);
 										}
@@ -47459,7 +47452,7 @@
 									j=mode+'_'+i+'_playpackconfig';
 								}
 								cfg._name=j;
-								if(!(j in lib.config)){
+								if(!Object.prototype.hasOwnProperty.call(lib.config, j)){
 									game.saveConfig(j,cfg.init);
 								}
 								else{
@@ -47741,9 +47734,7 @@
 									for(var i in dash2.content.image){
 										extension[i]=dash2.content.image[i];
 									}
-									game.readFile('LICENSE',function(data){
-										extension['LICENSE']=data;
-										game.writeFile(data,'extension/'+page.currentExtension,'LICENSE',function(){})
+									var callback=()=>{
 										if(exportext){
 											var proexport=function(){
 												game.importExtension(extension,null,page.currentExtension,{
@@ -47769,9 +47760,19 @@
 												exportExtLine.style.display='';
 											});
 										}
-									},function(){
-										alert('许可证文件丢失，无法导出扩展');
-									});
+									};
+									//兼容网页版情况
+									if(typeof game.readFile=="function") {
+										game.readFile('LICENSE',function(data){
+											extension['LICENSE']=data;
+											game.writeFile(data,'extension/'+page.currentExtension,'LICENSE',function(){})
+											callback();
+										},function(){
+											alert('许可证文件丢失，无法导出扩展');
+										});
+									}else{
+										callback();
+									}
 								},500);
 							};
 							var buttonConfirm=document.createElement('button');
@@ -49852,7 +49853,7 @@
 												game.saveConfig('extension_'+extname+'_enable',true);
 												game.saveConfig('extension_'+extname+'_version',that.info.version);
 												for(var i in game.importedPack.config){
-													if(game.importedPack.config[i]&&('init' in game.importedPack.config[i])){
+													if(game.importedPack.config[i]&&Object.prototype.hasOwnProperty.call(game.importedPack.config[i], 'init')){
 														game.saveConfig('extension_'+extname+'_'+i,game.importedPack.config[i].init);
 													}
 												}
@@ -58516,7 +58517,7 @@
 		priority:skill=>{
 			const info=get.info(skill);
 			if(!info) return 0;
-			if('_priority' in info) return info._priority;
+			if(Object.prototype.hasOwnProperty.call(info, '_priority')) return info._priority;
 			let priority=0;
 			if(info.priority){
 				priority=info.priority*100;
@@ -59196,7 +59197,7 @@
 		character:(name,num)=>{
 			let info=lib.character[name];
 			if(!info){
-				const pack=Object.keys(lib.characterPack).find(pack=>name in lib.characterPack[pack]);
+				const pack=Object.keys(lib.characterPack).find(pack=>Object.prototype.hasOwnProperty.call(lib.characterPack[pack], name));
 				if(pack) info=lib.characterPack[pack][name];
 			}
 			if(info){
@@ -60254,7 +60255,7 @@
 				if(card.length==1) return get.suit(card[0],player);
 				return 'none';
 			}
-			else if(!('suit' in card)&&Array.isArray(card.cards)){
+			else if(!Object.prototype.hasOwnProperty.call(card, 'suit')&&Array.isArray(card.cards)){
 				return get.suit(card.cards,player);
 			}
 			else{
@@ -60306,7 +60307,7 @@
 			if(!card) return;
 			//狗卡你是真敢出啊
 			var number=null;
-			if('number' in card){
+			if(Object.prototype.hasOwnProperty.call(card, 'number')){
 				number=card.number;
 				if(typeof number!='number') number=null;
 			}
