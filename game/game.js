@@ -27725,39 +27725,16 @@
 					if(this.hasSkill(skill)&&this.tempSkills[skill]==undefined) return;
 					this.addSkill(skill,checkConflict,true,true);
 
-					if(!expire){
-						expire=['phaseAfter','phaseBeforeStart'];
-					}
+					if(!expire) expire={global:['phaseAfter','phaseBeforeStart']};
+					else if(typeof expire=='string'||Array.isArray(expire)) expire={global:expire};
 					this.tempSkills[skill]=expire;
 
-					if(typeof expire=='string'){
-						lib.hookmap[expire]=true;
-					}
-					else if(Array.isArray(expire)){
-						for(var i=0;i<expire.length;i++){
-							lib.hookmap[expire[i]]=true;
-						}
-					}
-					else if(get.objtype(expire)=='object'){
-						var roles=['player','source','target'];
-						for(var i=0;i<roles.length;i++){
-							if(typeof expire[roles[i]]=='string'){
-								lib.hookmap[expire[roles[i]]]=true;
-							}
-							else if(Array.isArray(expire[roles[i]])){
-								for(var j=0;j<expire[roles[i]].length;j++){
-									lib.hookmap[expire[roles[i]][j]]=true;
-								}
-							}
-						}
-						if(expire.global){
-							if(typeof expire.global=='string'){
-								lib.hookmap[expire.global]=true;
-							}
-							else if(Array.isArray(expire.global)){
-								for(var i=0;i<expire.global.length;i++){
-									lib.hookmap[expire.global[i]]=true;
-								}
+					if(get.objtype(expire)=='object'){
+						const roles=['player','source','target','global'];
+						for(const i of roles){
+							if(typeof expire[i]=='string') lib.hookmap[expire[i]]=true;
+							else if(Array.isArray(expire[i])){
+								expire[i].forEach(trigger=>lib.hookmap[trigger]=true);
 							}
 						}
 					}
@@ -31841,21 +31818,23 @@
 						for(var j in player.additionalSkills){
 							if(!j.startsWith('hidden:')) notemp.addArray(player.additionalSkills[j]);
 						}
-						for(var j in player.tempSkills){
-							if(notemp.contains(j)) continue;
-							var expire=player.tempSkills[j];
-							if(expire===name||
-								(Array.isArray(expire)&&expire.contains(name))||
-								(typeof expire==='function'&&expire(event,player,name))){
-								delete player.tempSkills[j];
-								player.removeSkill(j);
+						for(const skill in player.tempSkills){
+							if(notemp.contains(skill)) continue;
+							const expire=player.tempSkills[skill];
+							if(typeof expire==='function'&&expire(event,player,name)){
+								delete player.tempSkills[skill];
+								player.removeSkill(skill);
 							}
 							else if(get.objtype(expire)==='object'){
-								for(var i=0;i<roles.length;i++){
-									if(expire[roles[i]]&&player===event[roles[i]]&&
-										(expire[roles[i]]===name||(Array.isArray(expire[roles[i]])&&expire[roles[i]].contains(name)))){
-										delete player.tempSkills[j];
-										player.removeSkill(j);
+								if(expire.global===name||(Array.isArray(expire.global)&&expire.global.contains(name))){
+									delete player.tempSkills[skill];
+									player.removeSkill(skill);
+								}
+								else for(const i of roles){
+									if(player!==event[i]) continue;
+									if(expire[i]===name||(Array.isArray(expire[i])&&expire[i].contains(name))){
+										delete player.tempSkills[skill];
+										player.removeSkill(skill);
 									}
 								}
 							}
@@ -37419,7 +37398,7 @@
 		
 				let audioList=[];
 				audioInfo=String(audioInfo);
-				let list=audioInfo.match(/(?:(.*):|^)(true|\d*)(?::(.*)|$)/);
+				let list=audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/);
 				if(list&&list[2]){
 					let _audioname='';
 					if(audioname.includes(player.name)) _audioname=`_${player.name}`;
