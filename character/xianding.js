@@ -5146,11 +5146,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						target:function(card,player,target){
-							if(player==target) return;
+						target:(card,player,target)=>{
+							if(player===target) return;
 							if(game.hasPlayer2(current=>{
 								return current.hasHistory('useCard',evt=>evt.card.name==card.name&&evt.targets&&evt.targets.contains(player));
-							})) return 'zerotarget';
+							})) return 'zeroplayertarget';
 						}
 					}
 				}

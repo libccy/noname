@@ -15689,7 +15689,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jingong3:{charlotte:true},
 			weikui:{
-				audio:'kuiwei',
+				audio:2,
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -15735,7 +15735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			lizhan:{
-				audio:'yanzheng',
+				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){

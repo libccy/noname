@@ -6379,7 +6379,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:["nzry_jieying_1","nzry_jieying_2"],
 				subSkill:{
 					'1':{
-						audio:2,
+						audio:'nzry_jieying',
 						trigger:{
 							player:['linkBefore','enterGame'],
 							global:'phaseBefore',
@@ -6395,7 +6395,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},	
 					},
 					'2':{
-						audio:2,
+						audio:'nzry_jieying',
 						trigger:{
 							player:'phaseJieshuBegin',
 						},
