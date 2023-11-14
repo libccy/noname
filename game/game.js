@@ -37398,7 +37398,7 @@
 		
 				let audioList=[];
 				audioInfo=String(audioInfo);
-				let list=audioInfo.match(/(?:(.*):|^)(true|\d*)(?::(.*)|$)/);
+				let list=audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/);
 				if(list&&list[2]){
 					let _audioname='';
 					if(audioname.includes(player.name)) _audioname=`_${player.name}`;
