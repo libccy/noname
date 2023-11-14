@@ -768,7 +768,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							event.dialog=ui.dialogs[i];break;
 						}
 					}
-					if(!event.dialog){
+					if(!event.dialog || event.dialog.buttons.length == 0){
 						event.finish();
 						return;
 					}
