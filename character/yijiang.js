@@ -13248,7 +13248,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					next.set('maxNum',event.name=='oldchengxiang'?12:13);
 					next.set('ai',function(button){
-						return get.value(button.link,_status.event.player);
+						let player=_status.event.player,name=get.name(button.link),val=get.value(button.link,player);
+						if(name==='tao') return val + 2*Math.min(3,1+player.getDamagedHp());
+						if(name==='jiu'&&player.hp<3) return val + 2*(2.8-player.hp);
+						if(name==='wuxie'&&player.countCards('j')&&!player.hasWuxie()) return val + 5;
+						if(player.hp>1&&player.hasSkill('renxin')&&player.hasFriend()&&get.type(button.link)==='equip') return val + 4;
+						return val;
 					});
 					"step 2"
 					if(result.bool&&result.links){
