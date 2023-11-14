@@ -1607,10 +1607,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var others=list.randomGets(4);
 					if(others.length==1) event._result={bool:true,links:others};
 					else{
+						var map={
+							'scs_bilan':'scs_hankui',
+							'scs_hankui':'scs_bilan',
+							'scs_duangui':'scs_guosheng',
+							'scs_guosheng':'scs_duangui',
+						},map2=lib.skill.mbdanggu.conflictMap(player);
 						var conflictList=others.filter(changshi=>{
-							var map=lib.skill.mbdanggu.conflictMap(player);
-							var names=map[first];
-							return names.contains(changshi);
+							if(map[first]&&others.some(changshi2=>map[first]==changshi2)) return map[first]==changshi;
+							else return map2[first].includes(changshi);
 						}),list=others.slice();
 						if(conflictList.length){
 							var conflict=conflictList.randomGet();
