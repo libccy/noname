@@ -58446,6 +58446,23 @@
 	};
 	const get={
 		/**
+		 * 获取当前内核版本信息
+		 * 
+		 * 目前仅考虑`chrome`, `firefox`和`safari`三种浏览器的信息，其余均归于其他范畴
+		 * 
+		 * > 其他后续或许会增加，但`IE`永无可能
+		 * 
+		 * @returns {["firefox" | "chrome" | "safari" | "other", number]}
+		 */
+		coreInfo(){
+			const regex=/(firefox|chrome|safari)\/([\d.]+)/;
+			let result;
+			if (!(result=userAgent.match(regex))) return ["other",NaN];
+			if (result[1]!="safari") return [result[1],parseInt(result[2])];
+			result=userAgent.match(/version\/([\d.]+).*safari/);
+			return ["safari",parseInt(result[1])];
+		},
+		/**
 		 * 返回 VCard[] 形式的所有牌，用于印卡将遍历
 		 * @param {Function} filter
 		 * @returns {string[][]}
