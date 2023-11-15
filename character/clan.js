@@ -1172,6 +1172,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							delete player.storage[skill+'_roundcount'];
 							resetSkills.add(skill);
 						}
+						if(player.storage[`temp_ban_${skill}`]){
+							delete player.storage[`temp_ban_${skill}`];
+						}
 						if(player.awakenedSkills.contains(skill)){
 							player.restoreSkill(skill);
 							resetSkills.add(skill);
