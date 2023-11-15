@@ -354,25 +354,39 @@
 				}
 			}],
 		},
-		announce:{
-			init(){
-				_status._announce=document.createElement("Announce");
-				_status._announce_cache=new Map();
-				delete lib.announce.init;
-			},
-			//推送一个对象给所有监听了name的订阅者。
+		/**
+		 * 
+		 */
+		announce:new class{
+			constructor(){
+				/**
+				 * @type {HTMLElement}
+				 */
+				this._announce=document.createElement("Announce");
+				/**
+				 * @type {Map<string, any>}
+				 */
+				this._announce_cache=new Map();
+			}
+
+			/**
+			 * 推送一个对象给所有监听了name的订阅者
+			 */
 			publish(name,values){
-				if(_status._announce) _status._announce.dispatchEvent(new CustomEvent(name,{
+				if(this._announce) this._announce.dispatchEvent(new CustomEvent(name,{
 					detail:values
 				}));
 				return values;
-			},
-			//订阅name相关的事件。
+			}
+
+			/**
+			 * 订阅name相关的事件
+			 */
 			subscribe(name,method){
-				if(_status._announce&&_status._announce_cache) {
+				if(this._announce&&this._announce_cache) {
 					let subscribeFunction;
-					if(_status._announce_cache.has(method)){
-						let records=_status._announce_cache.get(method);
+					if(this._announce_cache.has(method)){
+						let records=this._announce_cache.get(method);
 						subscribeFunction=records.get("Listener");
 						records.get("EventTargets").add(name);
 					}
@@ -381,21 +395,24 @@
 						let records=new Map();
 						records.set("Listener",subscribeFunction);
 						records.set("EventTargets",[name]);
-						_status._announce_cache.set(method,records);
+						this._announce_cache.set(method,records);
 					}
-					_status._announce.addEventListener(name,subscribeFunction);
+					this._announce.addEventListener(name,subscribeFunction);
 				}
 				return method;
-			},
-			//取消对事件name的订阅
+			}
+
+			/**
+			 * 取消对事件name的订阅
+			 */
 			unsubscribe(name,method){
-				if(_status._announce&&_status._announce_cache&&_status._announce_cache.has(method)){
-					let records=_status._announce_cache.get(method);
+				if(this._announce&&this._announce_cache&&this._announce_cache.has(method)){
+					let records=this._announce_cache.get(method);
 					const listener=records.get("Listener");
 					let eventTargets=records.get("EventTargets");
 					eventTargets.remove(name);
-					if(eventTargets.length<=0) _status._announce_cache.remove(method);
-					_status._announce.removeEventListener(name,listener);
+					if(eventTargets.length<=0) this._announce_cache.remove(method);
+					this._announce.removeEventListener(name,listener);
 				}
 				return method;
 			}
@@ -9566,7 +9583,6 @@
 					delete _status.htmlbg;
 
 					window.game=game;
-					lib.announce.init();
 					// node:path library alternative
 					if (typeof module!="object"||typeof module.exports!="object") lib.init.js(`${lib.assetURL}game`,"path",()=>{
 						lib.path=window._noname_path;
