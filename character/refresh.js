@@ -15521,6 +15521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olxuanfeng:'旋风',
 			olxuanfeng_info:'当你一次性失去至少两张牌后，或失去装备区的牌后，你可以依次弃置一至两名其他角色的共计两张牌。',
 			re_lidian:'界李典',
+			gz_re_lidian:'李典',
 			re_lidian_prefix:'界',
 			re_xushu:'界徐庶',
 			re_xushu_prefix:'界',

@@ -1554,6 +1554,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					return !player.wontYe('wei')||!game.hasPlayer(current=>current.identity=='wei')
 				},
+				check:function(event,player,name){
+					return name!='damageBegin1';
+				},
 				content:function(){
 					trigger.num++;
 				},
@@ -6258,7 +6261,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return !player.getHistory('useCard').length||!player.getHistory('sourceDamage').length;
 				},
-				check:()=>false,
+				check:function(event,player){
+					return !player.getHistory('useCard').length;
+				},
 				content:function(){
 					lib.skill.rekuangcai.change(player,player.getHistory('useCard').length?-1:1);
 				},
