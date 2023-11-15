@@ -1069,15 +1069,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
+					if(!game.hasPlayer(target=>target.countCards('e',card=>get.subtype(card)!='equip5')<3||target.isLinked()||target.isTurnedOver()||target.isDamaged())) return false;
 					return player.getHistory('damage').length;
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt2('mbquesong')).set('ai',target=>{
+					player.chooseTarget(get.prompt2('mbquesong'),(card,player,target)=>{
+						return target.countCards('e',card=>get.subtype(card)!='equip5')<3||target.isLinked()||target.isTurnedOver()||target.isDamaged();
+					}).set('ai',target=>{
 						var player=_status.event.player;
 						if(get.attitude(player,target)<=0) return 0;
-						var len=Math.max(1,[1,2,3,4].reduce((p,c)=>p+target.countEmptySlot(c),0)),hp=target.getHp();
+						var len=Math.max(1,3-target.countCards('e',card=>get.subtype(card)!='equip5')),hp=target.getHp();
 						return len+target.isTurnedOver()*2+1.5*Math.min(4,target.getDamagedHp())/(hp+1);
 					});
 					'step 1'
@@ -1085,29 +1088,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.logSkill('mbquesong',target);
-						var len=Math.max(1,[1,2,3,4].reduce((p,c)=>p+target.countEmptySlot(c),0)),hp=target.getHp();
-						if(hp==0||target.countCards('h')<hp) event._result={bool:false};
+						var len=Math.max(1,3-target.countCards('e',card=>get.subtype(card)!='equip5'));
+						if(target.isHealthy()) event._result={index:0};
 						else{
-							var str=`是否弃置${get.cnNumber(hp)}张手牌并回复1点体力？或点击“取消”摸${get.cnNumber(len)}张牌并复原武将牌。`;
-							target.chooseToDiscard(get.translation(player)+'对你发动了【雀颂】',str,'h',hp).set('ai',card=>{
-								if(!get.event('goon')) return 0;
-								return 6-get.value(card);
-							}).set('goon',function(){
-								var _hp=hp+target.isTurnedOver()*1.5;
-								if(_hp+player.countCards('hs',card=>get.tag(card,'recover'))<=2-len/4) return true;
-								return len<=_hp;
-							}());
+							target.chooseControl().set('choiceList',[
+								'摸'+get.cnNumber(len)+'张牌并复原武将牌',
+								'回复1点体力',
+							]).set('prompt','雀颂：请选择一项').set('ai',()=>{
+								var player=_status.event.player;
+								var len=_status.event.len;
+								return get.effect(player,{name:'wuzhong'},player,player)*len/2>=get.recoverEffect(player,player,player)?0:1;
+							}).set('len',len);
 						}
 					}
 					else event.finish();
 					'step 2'
-					if(result.bool){
+					if(result.index==1){
 						target.recover();
 						event.finish();
 					}
-					else{
-						target.draw(Math.max(1,[1,2,3,4].reduce((p,c)=>p+target.countEmptySlot(c),0)));
-					}
+					else target.draw(Math.max(1,3-target.countCards('e',card=>get.subtype(card)!='equip5')));
 					'step 3'
 					target.link(false);
 					'step 4'
@@ -15601,7 +15601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbhuiyao:'慧夭',
 			mbhuiyao_info:'出牌阶段限一次。你可以受到1点无来源伤害，然后你选择一名其他角色，令其视为对另一名角色造成过1点伤害。',
 			mbquesong:'雀颂',
-			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸等同于其装备区中非宝物栏中空栏的数量的牌并复原武将牌（至少摸一张牌）；2.弃置等同于其体力值的手牌并回复1点体力。',
+			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸X张牌并复原武将牌（X为3-其装备区非宝物牌牌数，且X至少为1）；2.回复1点体力。',
 			xin_yuanshao:'手杀界袁绍',
 			xin_yuanshao_prefix:'手杀界',
 			re_baosanniang:'手杀鲍三娘',
