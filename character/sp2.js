@@ -5529,7 +5529,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,current,isLink){
-							if(isLink||!player.isPhaseUsing()) return;
+							if(isLink||typeof card!=='object'||!player.isPhaseUsing()) return;
 							var num;
 							var evt=_status.event.getParent('useCard'),evt2=_status.event.getParent('phaseUse');
 							if(evt.card==card){
@@ -5541,8 +5541,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return evt.getParent('phaseUse')==evt2;
 							}).length;
 							if(num<0||num>1) return;
-							if(num==0&&get.tag(card,'damage')) return 'zerotarget';
-							if(num==1&&get.color(card)=='black') return 'zeroplayertarget';
+							if(num===0&&get.tag(card,'damage')){
+								if(target.hasSkillTag('filterDamage',null,{
+									player:player,
+									card:card
+								})||!player.hasSkillTag('damageBonus',true,{
+									target:target,
+									card:card
+								})) return 'zerotarget';
+								return [0.5,0,0.5,0];
+							}
+							if(num===1&&get.color(card)=='black') return 'zeroplayertarget';
 						},
 					},
 				},
