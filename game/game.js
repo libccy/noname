@@ -53758,19 +53758,15 @@ new Promise(resolve=>{
 			},
 			player:(position,noclick)=>new lib.element.Player(position,noclick),
 			connectPlayers:ip=>{
+				ui.updateConnectPlayerPositions();
 				game.connectPlayers=[];
-				let numberOfPlayers=lib.configOL.number;
-				const gameMode=lib.configOL.mode;
-				if(gameMode=='guozhan'||(gameMode=='identity'&&(lib.configOL.identity_mode!='zhong'&&lib.configOL.identity_mode!='purple'))){
-					numberOfPlayers=10;
-				}
-				ui.updateConnectPlayerPositions(numberOfPlayers);
+				const configOL=lib.configOL;
+				const numberOfPlayers=parseInt(configOL.player_number)||configOL.number;
 				for(let position=0;position<numberOfPlayers;position++){
 					const player=ui.create.player(ui.window);
 					player.dataset.position=position;
 					player.classList.add('connect');
 					game.connectPlayers.push(player);
-					if(position>=lib.configOL.number) player.classList.add('unselectable2');
 				}
 
 				var bar=ui.create.div(ui.window);
@@ -53802,7 +53798,7 @@ new Promise(resolve=>{
 						for(var i of game.connectPlayers){
 							if(!i.nickname&&!i.classList.contains('unselectable2')) num++;
 						}
-						if(num>=numberOfPlayers-1){
+						if(num>=lib.configOL.number-1){
 							alert('至少要有两名玩家才能开始游戏！');
 							return;
 						}
@@ -58543,7 +58539,10 @@ new Promise(resolve=>{
 		 * @param {number} [numberOfPlayers]
 		 */
 		updateConnectPlayerPositions:numberOfPlayers=>{
-			if(typeof numberOfPlayers!='number') numberOfPlayers=lib.configOL.number;
+			if(typeof numberOfPlayers!='number'){
+				const configOL=lib.configOL;
+				numberOfPlayers=parseInt(configOL.player_number)||configOL.number;
+			}
 			if(!numberOfPlayers) return;
 			const playerPositions=ui.playerPositions;
 			playerPositions.forEach((position) => {
