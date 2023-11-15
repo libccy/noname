@@ -12941,7 +12941,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(target.hasSkillTag('unequip2')) return;
+							if(typeof card!=='object'||target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
 								target:player,
@@ -12951,7 +12951,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								target:player,
 								card:card
 							})) return;
-							if(card.name=='sha'&&['spade','club','heart'].contains(get.suit(card))) return 'zerotarget';
+							if(card.name=='sha'&&['spade','club','heart'].contains(get.suit(card))) return 'zeroplayertarget';
 						},
 					},
 				},

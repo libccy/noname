@@ -1531,7 +1531,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								target:target,
 								card:card
 							})) return;
-							if(get.tag(card,'natureDamage')) return 'zerotarget';
+							if(get.tag(card,'natureDamage')) return 'zeroplayertarget';
 							if(card.name=='tiesuo'){
 								return [0,0];
 							}
