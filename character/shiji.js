@@ -1469,15 +1469,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard1'},
 				forced:true,
 				filter:function(event,player){
-					if(event.card.name!='sha'||!event.cards||event.cards.length!=1) return false;
+					if(event.card.name!='sha'||!event.cards||!event.cards.length) return false;
 					var evt=event.getParent('phaseUse');
 					return evt&&evt.player==player&&player.getHistory('useCard',function(evt2){
-						return evt2.card.name=='sha'&&evt.cards&&evt.cards.length==1&&evt2.getParent('phaseUse')==evt;
+						return evt2.card.name=='sha'&&evt2.cards&&evt2.cards.length&&evt2.getParent('phaseUse')==evt;
 					}).indexOf(event)==0;
 				},
 				content:function(){
 					game.log(player,'将',trigger.card,'的花色改为','#y♦');
 					trigger.card.suit='diamond';
+					trigger.card.color='red';
 				},
 				group:'liubing_gain',
 				subSkill:{
@@ -6471,7 +6472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			heji:'合击',
 			heji_info:'当有角色使用的【决斗】或红色【杀】结算完成后，若此牌对应的目标数为1，则你可以对相同的目标使用一张【杀】或【决斗】（无距离和次数限制）。若你以此法使用的牌不为转化牌，则你从牌堆中随机获得一张红色牌。',
 			liubing:'流兵',
-			liubing_info:'锁定技。①你于出牌阶段使用的第一张有唯一对应实体牌的【杀】的花色视为♦。②其他角色于其出牌阶段内使用的非转化黑色杀结算结束后，若此【杀】未造成伤害，则你获得之。',
+			liubing_info:'锁定技。①你于出牌阶段使用的第一张非虚拟【杀】的花色视为♦。②其他角色于其出牌阶段内使用的非转化黑色杀结算结束后，若此【杀】未造成伤害，则你获得之。',
 			sp_mifuren:'手杀糜夫人',
 			spcunsi:'存嗣',
 			spcunsi2:'存嗣',

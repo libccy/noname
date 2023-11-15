@@ -3374,7 +3374,12 @@ div:not(.handcards)>.card>.info>span,
 .connectbutton {
 	top: calc(400% / 7 - 35px);
 	width: 130px;
-	left: calc(50% - 70px);
+}
+.connectbutton1 {
+	left: calc(50% - 200px);
+}
+.connectbutton2 {
+	left: calc(50% + 60px);
 }
 .connectevents {
 	left: auto;

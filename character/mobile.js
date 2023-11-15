@@ -711,7 +711,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'twjilun',
 				inherit:'twjilun',
 				filter:function(event,player){
-					return player.hasSkill('twjichou');
+					return player.hasSkill('twjichou',null,false,false);
 				},
 				content:function(){
 					'step 0'
@@ -815,6 +815,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return{
 							type:result.control,
 							audio:'twjiaohua',
+							filterCard:()=>false,
+							selectCard:-1,
 							filterTarget:true,
 							content:function(){
 								'step 0'
@@ -970,32 +972,95 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
-				filterTarget:lib.filter.notMe,
+				// filterTarget:lib.filter.notMe,
 				content:function(){
+					'step 0'
 					player.damage('nosource');
-					target.damage('unreal');
+					'step 1'
+					if(game.countPlayer()<2) event.finish();
+					if(game.countPlayer()==2) event._result={bool:true,targets:[game.findPlayer(i=>i!=player),player]};
+					else player.chooseTarget(`慧夭：请选择两名角色`,`令不为你的第一名角色视为对第二名角色造成过1点伤害。`,(card,player,target)=>{
+						if(!ui.selected.targets.length) return player!=target;
+						return true;
+					},2,true).set('multitarget',true).set('targetprompt',['伤害来源','受伤角色']).set('ai',target=>{
+						return target==get.event('aiTargets')[ui.selected.targets.length]?10:0;
+					}).set('aiTargets',lib.skill.mbhuiyao.getUnrealDamageTargets(player,[game.filterPlayer(i=>i!=player),game.filterPlayer()],true));
+					'step 2'
+					if(result.bool){
+						var targets=result.targets;
+						player.line2(targets,'green');
+						game.delaye();
+						targets[1].damage(targets[0],'unreal');
+					}
+				},
+				getUnrealDamageTargets:(player,lists,forced)=>{
+					const targets=[null,null];
+					let sourceList,targetList;
+					if(lists.length==2&&lists.every(l=>Array.isArray(l))){
+						sourceList=lists[0]; targetList=lists[1];
+					}
+					else{
+						sourceList=lists.slice(); targetList=lists.slice();
+					}
+					const list=targetList.map(current=>{
+						const _hp=current.hp,_maxhp=current.maxHp;
+						current.hp=100; current.maxHp=100;
+						const att=-get.sgnAttitude(player,current);
+						let val=get.damageEffect(current,player,current)*att;
+						current.getSkills(null,false,false).forEach(skill=>{
+							const info=get.info(skill);
+							if(info&&info.ai&&(info.ai.maixie||info.ai.maixie_hp||info.ai.maixie_defend)) val=Math[val>0?'max':'min'](val>0?0.1:-0.1,val+2*att);
+						});
+						const eff=100/val+15;
+						current.hp=_hp; current.maxHp=_maxhp;
+						return [current,eff];
+					}).sort((a,b)=>b[1]-a[1])[0];
+					if(list[1]<0&&!forced) return targets;
+					const targetx=list[0];
+					targets[1]=targetx;
+					const list2=sourceList.filter(i=>i!=targetx).map(current=>{
+						const _hp=targetx.hp,_maxhp=targetx.maxHp;
+						targetx.hp=100; targetx.maxHp=100;
+						const att=-get.sgnAttitude(player,current);
+						const eff=get.damageEffect(targetx,current,current)*att;
+						targetx.hp=_hp; targetx.maxHp=_maxhp;
+						return [current,eff];
+					}).sort((a,b)=>b[1]-a[1])[0];
+					if(!list2) return targets;
+					targets[0]=list2[0];
+					return targets;
 				},
 				ai:{
 					order:6,
 					result:{
-						target:function(player,target){
-							if(player.getHp()+player.countCards('hs',card=>player.canSaveCard(card,player))<1) return 0;
-							var _hp=target.hp,_maxhp=target.maxHp;
-							target.hp=10; target.maxHp=10;
-							var att=-get.sgnAttitude(player,target);
-							var val=get.damageEffect(target,player,target)*att;
-							target.getSkills(null,false,false).forEach(skill=>{
-								var info=get.info(skill);
-								if(info&&info.ai&&(info.ai.maixie||info.ai.maixie_hp||info.ai.maixie_defend)) val=Math[val>0?'max':'min'](val>0?0.1:-0.1,val+2*att);
-							});
-							var eff=100/val;
-							target.hp=_hp; target.maxHp=_maxhp;
-							var limit=17.5;
-							if(player.hasSkill('mbquesong')){
-								if(!player.getStat().damaged) limit+=7.5;
+						player:function(player){
+							if(player.getHp()+player.countCards('hs',card=>player.canSaveCard(card,player))<=1) return 0;
+							var limit=25;
+							var quesong=player.hasSkill('mbquesong')&&!player.getStat().damaged;
+							if(quesong){
+								limit-=7.5;
 							}
-							if(eff<limit) return 0;
-							return eff/30;
+							if(quesong&&game.hasPlayer(target=>{
+								var att=get.attitude(player,target);
+								if(att<0) return false;
+								return att*Math.sqrt(Math.max(1,[1,2,3,4].reduce((p,c)=>p+target.countEmptySlot(c),0)))>=10||target.getHp()<=2;
+							})) return 1;
+							if(!quesong&&game.hasPlayer(target=>{
+								if(target==player) return false;
+								var _hp=target.hp,_maxhp=target.maxHp;
+								target.hp=100; target.maxHp=100;
+								var att=-get.sgnAttitude(player,target);
+								var val=get.damageEffect(target,player,target)*att;
+								target.getSkills(null,false,false).forEach(skill=>{
+									var info=get.info(skill);
+									if(info&&info.ai&&(info.ai.maixie||info.ai.maixie_hp||info.ai.maixie_defend)) val=Math[val>0?'max':'min'](val>0?0.1:-0.1,val+2*att);
+								});
+								var eff=100/val;
+								target.hp=_hp; target.maxHp=_maxhp;
+								if(eff<limit) return false;
+								return true;
+							})) return 1;
+							return 0;
 						}
 					}
 				},
@@ -1012,7 +1077,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt2('mbquesong')).set('ai',target=>{
 						var player=_status.event.player;
 						if(get.attitude(player,target)<=0) return 0;
-						var len=[1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0);hp=target.getHp();
+						var len=Math.max(1,[1,2,3,4].reduce((p,c)=>p+target.countEmptySlot(c),0)),hp=target.getHp();
 						return len+target.isTurnedOver()*2+1.5*Math.min(4,target.getDamagedHp())/(hp+1);
 					});
 					'step 1'
@@ -1020,22 +1085,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.logSkill('mbquesong',target);
-						var len=[1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0);hp=target.getHp();
-						var forced=false;
-						if(len==0) forced=true;
-						if(hp==0||target.countCards('h')<hp){
-							if(forced) event.finish();
-							else event._result={bool:false};
-						}
+						var len=Math.max(1,[1,2,3,4].reduce((p,c)=>p+target.countEmptySlot(c),0)),hp=target.getHp();
+						if(hp==0||target.countCards('h')<hp) event._result={bool:false};
 						else{
-							var str=`${forced?'请':'是否'}弃置${get.cnNumber(hp)}张手牌并回复1点体力${forced?'':'？或点击“取消”摸'+get.cnNumber(len)+'张牌并复原武将牌'}。`;
-							target.chooseToDiscard(get.translation(player)+'对你发动了【雀颂】',str,forced,'h',hp).set('ai',card=>{
-								if(!_status.event.goon) return 0;
+							var str=`是否弃置${get.cnNumber(hp)}张手牌并回复1点体力？或点击“取消”摸${get.cnNumber(len)}张牌并复原武将牌。`;
+							target.chooseToDiscard(get.translation(player)+'对你发动了【雀颂】',str,'h',hp).set('ai',card=>{
+								if(!get.event('goon')) return 0;
 								return 6-get.value(card);
 							}).set('goon',function(){
 								var _hp=hp+target.isTurnedOver()*1.5;
-								if(forced||_hp+player.countCards('hs',card=>get.tag(card,'recover'))<=2-len/4) return true;
-								return len>_hp;
+								if(_hp+player.countCards('hs',card=>get.tag(card,'recover'))<=2-len/4) return true;
+								return len<=_hp;
 							}());
 						}
 					}
@@ -1046,12 +1106,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else{
-						target.draw([1,2,3,4,5].reduce((p,c)=>p+target.countEmptySlot(c),0));
+						target.draw(Math.max(1,[1,2,3,4].reduce((p,c)=>p+target.countEmptySlot(c),0)));
 					}
 					'step 3'
-					player.link(false);
+					target.link(false);
 					'step 4'
-					player.turnOver(false);
+					target.turnOver(false);
 				},
 				ai:{
 					expose:0.2,
@@ -1547,10 +1607,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var others=list.randomGets(4);
 					if(others.length==1) event._result={bool:true,links:others};
 					else{
+						var map={
+							'scs_bilan':'scs_hankui',
+							'scs_hankui':'scs_bilan',
+							'scs_duangui':'scs_guosheng',
+							'scs_guosheng':'scs_duangui',
+						},map2=lib.skill.mbdanggu.conflictMap(player);
 						var conflictList=others.filter(changshi=>{
-							var map=lib.skill.mbdanggu.conflictMap(player);
-							var names=map[first];
-							return names.contains(changshi);
+							if(map[first]&&others.some(changshi2=>map[first]==changshi2)) return map[first]==changshi;
+							else return map2[first].includes(changshi);
 						}),list=others.slice();
 						if(conflictList.length){
 							var conflict=conflictList.randomGet();
@@ -11169,18 +11234,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:1,
 					result:{
-						target:function(player,target){
-							if(target.skipList.contains('phaseDraw')||target.hasSkill('pingkou')) return 0;
-							var hs=player.getCards('h').sort(function(a,b){
-								return b.number-a.number;
+						player:(player,target)=>{
+							let hs=player.getCards('h').sort(function(a,b){
+								return get.number(b)-get.number(a);
 							});
-							var ts=target.getCards('h').sort(function(a,b){
-								return b.number-a.number;
-							});
-							if(!hs.length||!ts.length) return 0;
-							if(hs[0].number>ts[0].number) return -1;
-							return 0;
+							if(!hs.length) return 0;
+							let a=get.number(hs[0]),b=4;
+							if(player.getDamagedHp()) b=2;
+							return -b*(1-Math.pow((a-1)/13,target.countCards('h')));
 						},
+						target:(player,target)=>{
+							if(target.skipList.includes('phaseDraw')||target.hasSkill('pingkou')||target.hasSkill('xinpingkou')) return 0;
+							let hs=player.getCards('h').sort(function(a,b){
+								return get.number(b)-get.number(a);
+							});
+							if(!hs.length) return 0;
+							return -Math.pow((get.number(hs[0])-1)/13,target.countCards('h'))*2;
+						}
 					},
 				},
 			},
@@ -11298,10 +11368,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('zhongzuo'),'令一名角色摸两张牌。若其已受伤，则你摸一张牌。').set('ai',function(target){
-						if(target.hasSkillTag('nogain')&&target!=_status.currentPhase) return target.isDamaged()?0:1;
-						var att=get.attitude(_status.event.player,target);
-						if(target.isDamaged()) att=att*1.2;
-						return att;
+						if(target.hasSkillTag('nogain')) return target.isDamaged()?0:1;
+						let att=get.attitude(_status.event.player,target);
+						if(att<=0) return 0;
+						if(target.isDamaged()) return 1+att/5;
+						return att/5;
 					});
 					'step 1'
 					if(result.bool){
@@ -12615,7 +12686,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(result.bool){
 						trigger.player.gain(event.card,'give',player,'bySelf');
-						player.chooseBool('是否对'+get.translation(trigger.player)+'造成一点伤害？').ai=function(){
+						player.chooseBool('是否对'+get.translation(trigger.player)+'造成1点伤害？').ai=function(){
 							return get.damageEffect(trigger.player,player,player)>0
 						};
 					}
@@ -12961,7 +13032,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.ingame=game.hasPlayer(function(current){
 						return ['re_xushu','xin_xushu','xushu','dc_xushu'].contains(current.name)||['re_xushu','xin_xushu','xushu','dc_xushu'].contains(current.name2);
 					})?true:false;
-					var prompt='请选择一名角色，令其回复一点体力并摸一张牌';
+					var prompt='请选择一名角色，令其回复1点体力并摸一张牌';
 					prompt+=event.ingame?'，然后你摸一张牌。':'。';
 					player.chooseTarget(prompt).set('ai',function(target){
 						var player=_status.event.player;
@@ -14639,6 +14710,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			gnjinfan_gain:{
+				audio:'gnjinfan',
 				trigger:{player:'loseAfter'},
 				forced:true,
 				filter:function(event,player){
@@ -15527,9 +15599,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yj_zhoubuyi:'☆周不疑',
 			yj_zhoubuyi_prefix:'☆',
 			mbhuiyao:'慧夭',
-			mbhuiyao_info:'出牌阶段限一次。你可以受到1点无来源伤害，视为对一名其他角色造成过1点伤害。',
+			mbhuiyao_info:'出牌阶段限一次。你可以受到1点无来源伤害，然后你选择一名其他角色，令其视为对另一名角色造成过1点伤害。',
 			mbquesong:'雀颂',
-			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸等同于其装备区中空栏的数量的牌并复原武将牌；2.弃置等同于其体力值的手牌并回复1点体力。',
+			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸等同于其装备区中非宝物栏中空栏的数量的牌并复原武将牌（至少摸一张牌）；2.弃置等同于其体力值的手牌并回复1点体力。',
 			xin_yuanshao:'手杀界袁绍',
 			xin_yuanshao_prefix:'手杀界',
 			re_baosanniang:'手杀鲍三娘',
