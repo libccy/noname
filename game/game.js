@@ -1,5 +1,15 @@
 "use strict";
-{
+const nonameInitialized=localStorage.getItem('noname_inited');
+const assetURL=typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized;
+new Promise(resolve=>{
+	if('__core-js_shared__' in window) resolve();
+	else{
+		const coreJSBundle=document.createElement('script');
+		coreJSBundle.onerror=coreJSBundle.onload=resolve;
+		coreJSBundle.src=`${assetURL}game/core-js-bundle.js`;
+		document.head.appendChild(coreJSBundle);
+	}
+}).then(()=>{
 	/**
 	 * @typedef {InstanceType<typeof lib.element.Player>} Player
 	 * @typedef {InstanceType<typeof lib.element.Card>} Card
@@ -36,7 +46,6 @@
 			}
 		}
 	}
-	const nonameInitialized=localStorage.getItem('noname_inited');
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
@@ -122,7 +131,7 @@
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		mirrorURL:'https://raw.fgit.cf/libccy/noname',
 		hallURL:'47.99.105.222',
-		assetURL:typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized,
+		assetURL:assetURL,
 		userAgent:userAgent,
 		compatibleEdition:Boolean(typeof nonameInitialized=='string'&&nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//)),
 		changeLog:[],
@@ -32533,7 +32542,7 @@
 					}
 					if(game.online||game.onlineroom){
 						if((game.servermode||game.onlinehall)&&_status.over){
-
+							void 0;
 						}
 						else{
 							localStorage.setItem(lib.configprefix+'directstart',true);
@@ -35147,9 +35156,7 @@
 							}
 						}
 						if(!_status.requestReadClipboard&&get.config('read_clipboard','connect')){
-							//每次启动只请求一次
-							_status.requestReadClipboard=true;
-							function read(text){
+							const read=text=>{
 								try{
 									var roomId=text.split('\n')[1].match(/\d+/);
 									var caption=ui.rooms.find(caption=>caption.key==roomId);
@@ -35159,6 +35166,8 @@
 									}
 								}catch(e){console.log(e)}
 							}
+							//每次启动只请求一次
+							_status.requestReadClipboard=true;
 							if(_status.read_clipboard_text){
 								read(_status.read_clipboard_text);
 							}else{
@@ -37423,7 +37432,7 @@
 			ui.create.chat();
 
 			if(game.onlineroom){
-
+				void 0;
 			}
 			else{
 				var WebSocketServer=require('ws').Server;
@@ -44904,7 +44913,7 @@
 							config.item=config.item();
 						}
 						if(Array.isArray(config.init)){
-
+							void 0;
 						}
 						else{
 							node.classList.add('switcher');
@@ -44982,7 +44991,7 @@
 						}
 					}
 					else if(config.range){
-
+						void 0;
 					}
 					else if(config.clear){
 						if(node.innerHTML.length>=15) node.style.height='auto';
@@ -63444,11 +63453,5 @@
 	setAllPropertiesEnumerable(lib.element.Control.prototype);
 	setAllPropertiesEnumerable(lib.element.Client.prototype);
 	setAllPropertiesEnumerable(lib.element.NodeWS.prototype);
-	if('__core-js_shared__' in window) lib.init.init();
-	else{
-		const coreJSBundle=document.createElement('script');
-		coreJSBundle.onerror=coreJSBundle.onload=lib.init.init;
-		coreJSBundle.src=`${lib.assetURL}game/core-js-bundle.js`;
-		document.head.appendChild(coreJSBundle);
-	}
-}
+	lib.init.init();
+});
