@@ -594,46 +594,43 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						player:function(card,player,target){
-							if(typeof card!='object'||!target||get.name(card)!='sha'&&(get.type(card)!='trick'||(get.color(card)!='black'&&!get.tag(card,'damage')))) return;
-							var info=get.info(card);
-							var targets=[];
+							if(typeof card!=='object'||!target||get.name(card)!=='sha'&&(get.type(card)!=='trick'||get.color(card)!=='black'&&!get.tag(card,'damage'))) return;
+							if(!target.hasSkill('heiguangkai_skill')||target.hasSkillTag('unequip2')||player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:target,
+								card:card,
+							})||player.hasSkillTag('unequip_ai',false,{
+								name:card?card.name:null,
+								target:target,
+								card:card,
+							})) return;
+							let targets=[],evt=_status.event.getParent('useCard');
 							targets.addArray(ui.selected.targets);
-							var evt=_status.event.getParent('useCard');
 							if(evt&&evt.card==card) targets.addArray(evt.targets);
 							if(targets.length){
-								if(!targets.contains(target)){
-									if(target.hasSkill('heiguangkai_skill')&&!target.hasSkillTag('unequip2')&&!player.hasSkillTag('unequip',false,{
-										name:card?card.name:null,
-										target:target,
-										card:card,
-									})&&!player.hasSkillTag('unequip_ai',false,{
-										name:card?card.name:null,
-										target:target,
-										card:card,
-									})) return 'zerotarget';
-								}
-								else{
-									if(targets.length>1) return;
-									if(info.selectTarget!=-1&&targets[0].hasSkill('heiguangkai_skill')&&!targets[0].hasSkillTag('unequip2')&&!player.hasSkillTag('unequip',false,{
-										name:card?card.name:null,
-										target:targets[0],
-										card:card,
-									})&&!player.hasSkillTag('unequip_ai',false,{
-										name:card?card.name:null,
-										target:targets[0],
-										card:card,
-									})) return 'zerotarget';
-								}
+								if(targets.length>1||!targets.includes(target)) return 'zeroplayertarget';
+								return;
 							}
-							if(target.hasSkill('heiguangkai_skill')&&!target.hasSkillTag('unequip2')&&!player.hasSkillTag('unequip',false,{
-								name:card?card.name:null,
-								target:target,
-								card:card,
-							})&&!player.hasSkillTag('unequip_ai',false,{
-								name:card?card.name:null,
-								target:target,
-								card:card,
-							})) return [1,0,0.7,0];
+							let info=get.info(card);
+							if(!info||info.notarget||!info.filterTarget) return;
+							let range,select=get.copy(info.selectTarget),filter;
+							if(select===undefined) range=[1,1];
+							else if(typeof select==='number') range=[select,select];
+							else if(get.itemtype(select)==='select') range=select;
+							else if(typeof select==='function') range=select(card,player);
+							if(info.singleCard) range=[1,1];
+							game.checkMod(card,player,range,'selectTarget',player);
+							if(range[1]<-1) range=[1, 1];
+							else if(range[0]<0){
+								if(info.filterTarget===true) filter=game.players.length;
+								else filter=game.countPlayer(current=>{
+									return info.filterTarget(card,player,current);
+								});
+								range=[filter,filter];
+							}
+							if(!range) return;
+							if(range[0]>1&&range[1]>1) return 'zeroplayertarget';
+							return [1,0,0.7,0];
 						},
 					},
 				},

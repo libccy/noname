@@ -2216,7 +2216,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(target.hasSkillTag('unequip2')) return;
+							if(typeof card!=='object'||target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
 								target:target,
@@ -2226,7 +2226,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								target:target,
 								card:card
 							})) return;
-							if(card.name=='sha'&&get.color(card)=='black') return 'zerotarget';
+							if(card.name=='sha'&&get.color(card)=='black') return 'zeroplayertarget';
 						}
 					}
 				}

@@ -949,7 +949,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(card.name==='sha'&&!game.hasNature(card)&&target.hasEmptySlot(2)) return 'zeroplayertarget';
+							if(card.name==='sha'&&game.hasNature(card)&&target.hasEmptySlot(2)) return 'zeroplayertarget';
 							if(get.subtype(card)=='equip2'&&target.isEmpty(2)) return [0.6,-0.8];
 						}
 					}
