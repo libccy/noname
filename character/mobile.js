@@ -914,7 +914,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var cards=_status.event.list[0];
 							var targets=_status.event.list[1];
 							var player=_status.event.player;
-							if(get.attitude(player,targets[cards.indexOf(button.link)])) return 0;
+							if(get.attitude(player,targets[cards.indexOf(button.link)])>0) return 0;
 							return get.value(button.link,player);
 						}).set('list',[cards,targets]);
 					}
