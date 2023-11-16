@@ -20024,6 +20024,27 @@
 					player.syncStorage(marks);
 					player.markSkill(marks);	
 				},
+				removeMark:function(){
+					"step 0"
+					if(event.removeMarkTrigger!==false) event.trigger("removeMark");
+					"step 1"
+					var marks=event.markname
+					var log=event.log
+					var num=event.num
+					if(typeof num!='number'||!num) num=1;
+					if(typeof player.storage[marks]!='number'||!player.storage[marks]) return;
+					if(num>player.storage[marks]) num=player.storage[marks];
+					player.storage[marks]-=num;
+					if(log!==false){
+						var str=false;
+						var info=get.info(marks);
+						if(info&&info.intro&&(info.intro.name||info.intro.name2)) str=info.intro.name2||info.intro.name;
+						else str=lib.translate[marks];
+						if(str) game.log(player,'移去了',get.cnNumber(num),'个','#g【'+str+'】');
+					}
+					player.syncStorage(marks);
+					player[(player.storage[marks]||(lib.skill[marks]&&lib.skill[marks].mark))?'markSkill':'unmarkSkill'](marks);
+				},
 				damage:function(){
 					"step 0"
 					event.forceDie=true;
@@ -23257,19 +23278,13 @@
 					if(num>0) this.removeMark(i,num,log)
 				}
 				removeMark(i,num,log){
-					if(typeof num!='number'||!num) num=1;
-					if(typeof this.storage[i]!='number'||!this.storage[i]) return;
-					if(num>this.storage[i]) num=this.storage[i];
-					this.storage[i]-=num;
-					if(log!==false){
-						var str=false;
-						var info=get.info(i);
-						if(info&&info.intro&&(info.intro.name||info.intro.name2)) str=info.intro.name2||info.intro.name;
-						else str=lib.translate[i];
-						if(str) game.log(this,'移去了',get.cnNumber(num),'个','#g【'+str+'】');
-					}
-					this.syncStorage(i);
-					this[(this.storage[i]||(lib.skill[i]&&lib.skill[i].mark))?'markSkill':'unmarkSkill'](i);
+					var next=game.createEvent('removeMark');
+					next.player=this;
+					next.num=num;
+					next.markname=i;
+					next.log=log;
+					next.setContent('removeMark');
+					return next;
 				}
 				addMark(i,num,log){
 					var next=game.createEvent('addMark');
