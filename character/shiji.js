@@ -14,9 +14,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		character:{
 			liuba:['male','shu',3,['duanbi','tongduo']],
-			sp_zhujun:['male','qun',4,['yangjie','zjjuxiang','houfeng']],
+			sp_zhujun:['male','qun',4,['xinyangjie','xinjuxiang','houfeng']],
 			sp_huangfusong:['male','qun',4,['spzhengjun','spshiji','sptaoluan']],
-			sp_lvfan:['male','wu',3,['spdiaodu','spdiancai','spyanji']],
+			sp_lvfan:['male','wu',3,['mbdiaodu','mbdiancai','spyanji']],
 			sp_jiangqing:['male','wu',4,['spjianyi','spshangyi']],
 			sp_jiangwan:['male','shu',3,['spzhenting','spjincui']],
 			sp_zhangchangpu:['female','wei',3,['spdifei','spyanjiao']],
@@ -243,6 +243,68 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(trigger.player.maxHp>0) player.draw(trigger.player.maxHp);
 				},
 				ai:{expose:10},
+			},
+			xinyangjie: {
+				audio: 'yangjie',
+				enable: 'phaseUse',
+				filter: function (event, player) {
+					return game.hasPlayer(function (target) {
+						return player.canCompare(target);
+					});
+				},
+				filterTarget: function (card, player, target) {
+					return player.canCompare(target);
+				},
+				usable: 1,
+				content: function () {
+					'step 0'
+					player.chooseToCompare(target).set('small', true);
+					'step 1'
+					if (!result.bool && game.hasPlayer(function (current) {
+						return current != player && current != target && current.canUse({ name: 'sha', nature: 'fire', isCard: true }, target, false);
+					})) {
+						player.chooseTarget('佯解：是否选择另一名其他角色？', '令其视为对' + get.translation(target) + '使用一张火【杀】', function (card, player, target) {
+							return target != player && target != _status.event.getParent().target;
+						}).set('ai', function (target) {
+							var player = _status.event.player, target2 = _status.event.getParent().target;
+							return get.effect(target2, { name: 'sha', nature: 'fire', isCard: true }, target, player);
+						});
+					}
+					else event.finish();
+					'step 2'
+					if (result.bool) {
+						var source = result.targets[0];
+						player.line(source);
+						game.log(player, '选择了', source);
+						var card = { name: 'sha', nature: 'fire', isCard: true };
+						if (target.isIn() && source.isIn() && source.canUse(card, target, false)) source.useCard(card, target, false, 'noai');
+					}
+				},
+				ai: {
+					order: 3,
+					result: {
+						target: function (player, target) {
+							var hs = player.getCards('h').sort(function (a, b) {
+								return a.number - b.number;
+							});
+							var ts = target.getCards('h').sort(function (a, b) {
+								return a.number - b.number;
+							});
+							if (!hs.length || !ts.length) return 0;
+							if (hs[0].number <= ts[0].number) return -3;
+							if (player.countCards('h') >= target.countCards('h')) return -10;
+							return -1;
+						},
+					},
+				},
+			},
+			xinjuxiang: {
+				audio: 'zjjuxiang',
+				inherit: 'zjjuxiang',
+				content: function () {
+					player.awakenSkill('xinjuxiang');
+					trigger.player.damage();
+				},
 			},
 			houfeng:{
 				audio:3,
@@ -580,6 +642,109 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					game.delayx();
+				},
+			},
+			mbdiaodu: {
+				audio: 'spdiaodu',
+				trigger: { player: 'phaseZhunbeiBegin' },
+				filter: function (event, player) {
+					return game.hasPlayer(function (target) {
+						return target.countCards('e', function (card) {
+							return game.hasPlayer(function (current) {
+								return current != player && current != target && current.canEquip(card);
+							});
+						});
+					});
+				},
+				direct: true,
+				content: function () {
+					'step 0'
+					player.chooseTarget(get.prompt2('mbdiaodu'), function (card, player, target) {
+						return target.countCards('e', function (card) {
+							return game.hasPlayer(function (current) {
+								return current != player && current != target && current.canEquip(card);
+							});
+						});
+					}).set('ai', function (target) {
+						var player = _status.event.player, att = get.attitude(player, target);
+						if (att > 0) {
+							if (target.hasCard(function (card) {
+								if (get.value(card, target) <= 0 && game.hasPlayer(function (current) {
+									return current != player && current != target && current.canEquip(card, false) && get.effect(current, card, player, player) > 0;
+								})) return true;
+								return false;
+							}, 'e')) return 2 * att;
+						}
+						else if (att < 0) {
+							if (target.hasCard(function (card) {
+								if (get.value(card, target) >= 4.5 && game.hasPlayer(function (current) {
+									return current != player && current != target && current.canEquip(card) && get.effect(current, card, player, player) > 0;
+								})) return true;
+								return false;
+							}, 'e')) return -att;
+						}
+						return 0;
+					})
+					'step 1'
+					if (result.bool) {
+						var target = result.targets[0];
+						event.target = target;
+						player.logSkill('mbdiaodu', target);
+					}
+					else event.finish();
+					'step 2'
+					var es = target.getCards('e', function (card) {
+						return game.hasPlayer(function (current) {
+							return current != target && current.canEquip(card);
+						})
+					});
+					if (es.length == 1) event._result = { bool: true, links: es };
+					else player.chooseButton(['移动' + get.translation(target) + '的一张装备牌', es], true).set('ai', function (button) {
+						var player = _status.event.player, target = _status.event.getParent().target, card = button.link;
+						if (game.hasPlayer(function (current) {
+							return current != player && current != target && current.canEquip(card) && get.effect(current, card, player, player) > 0;
+						})) return -get.value(card, target) * get.attitude(player, target);
+						return 0;
+					});
+					'step 3'
+					if (result.bool) {
+						event.card = result.links[0];
+						player.chooseTarget('请选择' + get.translation(event.card) + '的移动目标', true, function (card, player, target) {
+							return target != player && target.canEquip(_status.event.card);
+						}).set('card', event.card).set('ai', function (target) {
+							var evt = _status.event;
+							return get.effect(target, evt.getParent().card, evt.player, evt.player);
+						});
+					}
+					else event.finish();
+					'step 4'
+					if (result.bool) {
+						var target2 = result.targets[0];
+						target.line(target2);
+						target.$give(card, target2);
+						game.delay(0.5);
+						target2.equip(card);
+					}
+					else event.finish();
+					'step 5'
+					target.draw();
+				},
+			},
+			mbdiancai: {
+				audio: 'spdiancai',
+				trigger: { global: 'phaseUseEnd' },
+				filter: function (event, player) {
+					if (_status.currentPhase == player) return false;
+					var num = 0;
+					player.getHistory('lose', function (evt) {
+						if (evt.cards2 && evt.getParent('phaseUse') == event) num += evt.cards2.length;
+					});
+					return num >= player.hp && player.countCards('h') < player.maxHp;
+				},
+				frequent: true,
+				content: function () {
+					var num = player.maxHp - player.countCards('h');
+					if (num > 0) player.draw(num);
 				},
 			},
 			spyanji:{
@@ -6665,6 +6830,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spdiaodu_info:'准备阶段，你可令一名角色摸一张牌，然后移动其装备区内的一张牌。',
 			spdiancai:'典财',
 			spdiancai_info:'其他角色的结束阶段开始时，你可以令至多X名角色各摸一张牌（X为你本回合失去的手牌数）。',
+			mbdiaodu:'调度',
+			mbdiaodu_info:'准备阶段，你可以移动一名角色装备区内的一张牌（不能移动给自己），然后其摸一张牌。',
+			mbdiancai:'典财',
+			mbdiancai_info:'其他角色的出牌阶段阶段结束后，若你本阶段失去的牌数不小于你的体力值，则你可将手牌数补至体力上限。',
 			spyanji:'严纪',
 			spyanji_info:'出牌阶段开始时，你可以进行“整肃”。',
 			sp_huangfusong:'手杀皇甫嵩',
@@ -6679,6 +6848,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangjie_info:'出牌阶段限一次，你可以摸一张牌并和一名其他角色A拼点。当你以此法展示你的拼点牌时，你令此牌点数-X（X为你已损失的体力值）。若你没赢，则你可以令另一名其他角色B获得两张拼点牌，然后其视为对A使用一张火【杀】。',
 			zjjuxiang:'拒降',
 			zjjuxiang_info:'限定技。一名其他角色脱离濒死状态时，你可以对其造成1点伤害，然后摸X张牌（X为其体力上限且至多为5）。',
+			xinyangjie:'佯解',
+			xinyangjie_info:'出牌阶段限一次，你可以与一名其他角色A拼点。若你没赢，则你可以令另一名其他角色B视为对A使用一张火【杀】。',
+			xinjuxiang:'拒降',
+			xinjuxiang_info:'限定技，一名其他角色脱离濒死状态时，你可以对其造成1点伤害。',
 			houfeng:'厚俸',
 			houfeng_info:'每轮限一次。一名其他角色的出牌阶段开始时，若其在你的攻击范围内，则你可以令其进行“整肃”。然后当其于本回合内因整肃而摸牌或回复体力后，你获得相同的整肃奖励。',
 			liuba:'手杀刘巴',
