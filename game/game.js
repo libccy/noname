@@ -8412,11 +8412,10 @@
 				req:(str,master)=>new Promise((resolve,reject)=>lib.init.req(str,resolve,reject,master)),
 
 				/**
-				 * Promise版的`lib.init.req`
+				 * Promise版的`lib.init.json`
 				 * 
-				 * @param {string} str - 要读取的地址
-				 * @param {string} [master]
-				 * @returns {Promise<ProgressEvent>}
+				 * @param {string} url - 要读取的地址
+				 * @returns {Promise<object>}
 				 */
 				json:(url)=>new Promise((resolve,reject)=>lib.init.json(url,resolve,reject)),
 
