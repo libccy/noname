@@ -1109,7 +1109,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCard'},
 				filter:function(event,player){
-					return !player.hasSkill('dczuowei_ban')&&_status.currentPhase==player;
+					if(_status.currentPhase!=player) return false;
+					if(!player.hasSkill('dczuowei_ban')) return true;
+					return Math.sign(player.countCards('h')-Math.max(1,player.countCards('e')))>=0;
 				},
 				direct:true,
 				locked:false,
@@ -1123,7 +1125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(sign==0) player.chooseTarget(get.prompt('dczuowei'),'对一名其他角色造成1点伤害',lib.filter.notMe).set('ai',target=>{
 							return get.damageEffect(target,_status.event.player,_status.event.player);
 						});
-					else player.chooseBool(get.prompt('dczuowei'),'摸两张牌，然后此技能于本回合失效').set('ai',()=>1);
+					else player.chooseBool(get.prompt('dczuowei'),'摸两张牌，然后本回合你不能再触发该分支').set('ai',()=>1);
 					'step 1'
 					if(!result.bool) event.finish()
 					else if(event.sign<=0&&!event.isMine()&&!event.isOnline()) game.delayx();
@@ -1149,18 +1151,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					ban:{charlotte:true}
 				},
 				mod:{
+					aiValue:function(player,card,num){
+						if(_status.currentPhase!=player) return;
+						const event=get.event();
+						if(!player.isPhaseUsing()) return;
+						if(event.type!='phase') return;
+						const cardsh=[],cardse=[];
+						for(const cardx of ui.selected.cards){
+							const pos=get.position(cardx);
+							if(pos=='h') cardsh.add(cardx);
+                            else if(pos=='e') cardse.add(cardx);
+						}
+						const hs=player.countCards('h')-cardsh.length,es=Math.max(1,player.countCards('e')-cardse.length);
+						const delt=hs-es;
+						if(delt<=0) return;
+						if(get.position(card)=='h'&&delt==1) return num/1.25;
+					},
+					aiUseful:function(){
+						return lib.skill.dczuowei.mod.aiValue.apply(this,arguments);
+					},
 					aiOrder:function(player,card,num){
 						if(player.hasSkill('dczuowei_ban')||_status.currentPhase!=player) return;
-						var cardsh=[],cardse=[];
-						if(Array.isArray(card.cards)){
-							cardsh.addArray(card.cards.filter(i=>get.position(i)=='h'));
-							cardse.addArray(card.cards.filter(i=>get.position(i)=='e'));
-						}
-						if(_status.currentPhase==player){
-							if(get.tag(card,'draw')||get.tag(card,'gain')){
-								if(player.countCards('h')-cardsh.length<=Math.max(1,player.countCards('e'))-cardse.length+(get.type(card)=='equip')) return num+10;
-								return num/5;
-							}
+						const cardsh=[],cardse=[];
+						const pos=get.position(card);
+						if(pos=='h') cardsh.add(card);
+						else if(pos=='e') cardse.add(card);
+						if(get.tag(card,'draw')||get.tag(card,'gain')){
+							const hs=player.countCards('h')-cardsh.length,es=Math.max(1,player.countCards('e')-cardse.length+(get.type(card)=='equip'));
+							if(player.hasSkill('dczuowei_ban')&&hs<es||hs==es) return num+10;
+							return num/5;
 						}
 					},
 				},
@@ -1169,7 +1188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					reverseEquip:true,
 					effect:{
 						player_use:function(card,player,target,current){
-							if(player.hasSkill('dczuowei_ban')||_status.currentPhase!=player) return;
+							if(_status.currentPhase!=player) return;
 							if(get.type(card)=='equip'&&get.cardtag(card,'gifts')) return;
 							if(player.countCards('h')>Math.max(1,player.countCards('e'))) return [1,3];
 						}
@@ -11017,7 +11036,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczigu:'自固',
 			dczigu_info:'出牌阶段限一次。你可以弃置一张牌，然后获得场上的一张装备牌。若你没有因此获得其他角色的牌，你摸一张牌。',
 			dczuowei:'作威',
-			dczuowei_info:'当你于回合内使用牌时，你可以根据你的手牌数执行对应效果：大于X，令此牌不可被响应；等于X，对一名其他角色造成1点伤害；小于X，摸两张牌并令此技能于本回合失效（X为你装备区里牌的数量且至少为1）。',
+			dczuowei_info:'当你于回合内使用牌时，你可以根据你的手牌数执行对应效果：大于X，令此牌不可被响应；等于X，对一名其他角色造成1点伤害；小于X，摸两张牌且不能于本回合再触发该选项（X为你装备区里牌的数量且至少为1）。',
 			liuchongluojun:'刘宠骆俊',
 			dcminze:'悯泽',
 			dcminze_info:'①出牌阶段每名角色限一次。你可以将至多两张牌名不同的牌交给一名手牌数小于你的角色，若其因此手牌数大于你，〖悯泽①〗于此阶段失效。②结束阶段，你将手牌摸至X张（X为你本回合因〖悯泽①〗失去过的牌的牌名数且至多为5）。',

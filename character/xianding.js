@@ -216,7 +216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'targets',
 				content:function*(event,map){
 					const player=map.player,trigger=map.trigger,target=trigger.targets[0];
-					yield player.useCard(new lib.element.VCard({name:'sha'}),target).oncard=()=>{
+					yield player.useCard(new lib.element.VCard({name:'sha'}),target,false).oncard=()=>{
 						get.event().customArgs.default.customSource={
 							isDead:()=>true,
 						}
