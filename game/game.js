@@ -8375,6 +8375,27 @@
 			}
 		},
 		init:{
+			// Promise Method
+			promises:{
+				/**
+				 * Promise版的`lib.init.js`
+				 */
+				js:(path,file)=>new Promise((resolve,reject)=>lib.init.js(path,file,resolve,reject)),
+				css:(path,file,before)=>new Promise((resolve,reject)=>{
+					const style=lib.init.css(path,file,before);
+					style.addEventListener("load",()=>resolve(style));
+					style.addEventListener("error",reject);
+				}),
+				req:(str,master)=>new Promise((resolve,reject)=>lib.init.req(str,resolve,reject,master)),
+				json:(url)=>new Promise((resolve,reject)=>lib.init.js(url,resolve,reject)),
+				sheet(){
+					return new Promise((resolve,reject)=>{
+						const style=lib.init.sheet.apply(lib.init,arguments);
+						style.addEventListener("load",()=>resolve(style));
+						style.addEventListener("error",reject);
+					})
+				}
+			},
 			init:function(){
 				if(typeof __dirname==='string'&&__dirname.length){
 					var dirsplit=__dirname.split('/');
