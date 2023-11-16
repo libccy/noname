@@ -41293,7 +41293,7 @@
 						event.callHandler(event.getDefaultHandlerType(),event,{
 							state:'end'
 						});
-						event.step++;
+						if(typeof event.step=="number") ++event.step;
 					}
 				}
 			}
