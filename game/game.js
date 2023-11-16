@@ -11595,12 +11595,16 @@
 									result:result
 								});
 								var res=gen.next((lastEvent&&("result" in lastEvent))?lastEvent.result:null);
-								if(res.done) event.finish();
-								else {
-									var currentResult=res.value;
-									// TODO: use `event.debugger` to replace source
-									if(typeof currentResult=="function") yield currentResult;
-									else lastEvent=currentResult;
+								if(res.done) return event.finish();
+								var currentResult=res.value;
+								// TODO: use `event.debugger` to replace source
+								if(typeof currentResult=="function") yield currentResult;
+								else{
+									if(Array.isArray(currentResult)){
+										event.step=currentResult[1];
+										currentResult=currentResult[0];
+									}
+									lastEvent=currentResult;
 								}
 							}
 						}else if(item._parsed) return item;
