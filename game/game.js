@@ -61911,18 +61911,18 @@
 									uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivationpack+'_card_config')+'包</div>');
 								}
 							}
-							var ybtype='';
+							let typeinfo='';
 							if(lib.card[name].unique){
-								ybtype+=('特殊'+get.translation(lib.card[name].type)+'牌');
+								typeinfo+=('特殊'+get.translation(lib.card[name].type)+'牌');
 							}
-							else{
-								if(lib.card[name].type&&lib.translate[lib.card[name].type]) ybtype+=(get.translation(lib.card[name].type)+'牌');
+							else if(lib.card[name].type&&lib.translate[lib.card[name].type]){
+								typeinfo+=(get.translation(lib.card[name].type)+'牌');
 							}
 							if(get.subtype(name,false)){
-								ybtype+=('-'+get.translation(get.subtype(name,false)));
+								typeinfo+=('-'+get.translation(get.subtype(name,false)));
 							}
-							if(ybtype){
-								uiintro.add('<div class="text center">'+ybtype+'</div>');
+							if(typeinfo){
+								uiintro.add('<div class="text center">'+typeinfo+'</div>');
 							}
 							if(lib.card[name].unique&&lib.card[name].type=='equip'){
 								if(lib.cardPile.guozhan&&lib.cardPack.guozhan.contains(name)){
