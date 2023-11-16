@@ -20004,6 +20004,26 @@
 						}
 					}
 				},
+				addMark:function(){
+					"step 0"
+					if(event.addMarkTrigger!==false) event.trigger("addMark");
+					"step 1"
+					var marks=event.markname
+					var log=event.log
+					var num=event.num
+					if(typeof num!='number'||!num) num=1;
+					if(typeof player.storage[marks]!='number') player.storage[marks]=0;
+					player.storage[marks]+=num;
+					if(log!==false){
+						var str=false;
+						var info=get.info(marks);
+						if(info&&info.intro&&(info.intro.name||info.intro.name2)) str=info.intro.name2||info.intro.name;
+						else str=lib.translate[marks];
+						if(str) game.log(player,'获得了',get.cnNumber(num),'个','#g【'+str+'】');
+					}
+					player.syncStorage(marks);
+					player.markSkill(marks);	
+				},
 				damage:function(){
 					"step 0"
 					event.forceDie=true;
@@ -23252,18 +23272,13 @@
 					this[(this.storage[i]||(lib.skill[i]&&lib.skill[i].mark))?'markSkill':'unmarkSkill'](i);
 				}
 				addMark(i,num,log){
-					if(typeof num!='number'||!num) num=1;
-					if(typeof this.storage[i]!='number') this.storage[i]=0;
-					this.storage[i]+=num;
-					if(log!==false){
-						var str=false;
-						var info=get.info(i);
-						if(info&&info.intro&&(info.intro.name||info.intro.name2)) str=info.intro.name2||info.intro.name;
-						else str=lib.translate[i];
-						if(str) game.log(this,'获得了',get.cnNumber(num),'个','#g【'+str+'】');
-					}
-					this.syncStorage(i);
-					this.markSkill(i);
+					var next=game.createEvent('addMark');
+					next.player=this;
+					next.num=num;
+					next.markname=i;
+					next.log=log
+					next.setContent('addMark');
+					return next;
 				}
 				setMark(name,num,log){
 					const count=this.countMark(name);
