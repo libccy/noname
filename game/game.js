@@ -8375,19 +8375,56 @@
 			}
 		},
 		init:{
-			// Promise Method
+			/**
+			 * 部分函数的Promise版本
+			 */
 			promises:{
 				/**
 				 * Promise版的`lib.init.js`
+				 * 
+				 * @param {string} path - 文件路径
+				 * @param {string | string[]} [file] - 文件名或文件名组，忽略则直接读取`path`的内容
+				 * @returns {Promise<Event>}
 				 */
 				js:(path,file)=>new Promise((resolve,reject)=>lib.init.js(path,file,resolve,reject)),
+
+				/**
+				 * Promise版的`lib.init.css`
+				 * 
+				 * @param {string} path - 文件路径
+				 * @param {string | string[]} [file] - 文件名或文件名组，忽略则直接读取`path`的内容
+				 * @param {Element} [before] 新样式dom的位置
+				 * @returns {Promise<HTMLLinkElement>}
+				 */
 				css:(path,file,before)=>new Promise((resolve,reject)=>{
 					const style=lib.init.css(path,file,before);
 					style.addEventListener("load",()=>resolve(style));
 					style.addEventListener("error",reject);
 				}),
+
+				/**
+				 * Promise版的`lib.init.req`
+				 * 
+				 * @param {string} str - 要读取的地址
+				 * @param {string} [master]
+				 * @returns {Promise<ProgressEvent>}
+				 */
 				req:(str,master)=>new Promise((resolve,reject)=>lib.init.req(str,resolve,reject,master)),
-				json:(url)=>new Promise((resolve,reject)=>lib.init.js(url,resolve,reject)),
+
+				/**
+				 * Promise版的`lib.init.req`
+				 * 
+				 * @param {string} str - 要读取的地址
+				 * @param {string} [master]
+				 * @returns {Promise<ProgressEvent>}
+				 */
+				json:(url)=>new Promise((resolve,reject)=>lib.init.json(url,resolve,reject)),
+
+				/**
+				 * Promise版的`lib.init.sheet`
+				 * 
+				 * @returns {Promise<HTMLStyleElement>}
+				 */
 				sheet(){
 					return new Promise((resolve,reject)=>{
 						const style=lib.init.sheet.apply(lib.init,arguments);
