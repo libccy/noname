@@ -61903,6 +61903,38 @@
 				else{
 					if(lib.translate[name+'_info']){
 						if(!uiintro.nosub){
+							if(lib.card[name]&&lib.card[name].derivation){
+								if(typeof lib.card[name].derivation=='string'){
+									uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivation)+'</div>');
+								}
+								else if(lib.card[name].derivationpack){
+									uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivationpack+'_card_config')+'包</div>');
+								}
+							}
+							let typeinfo='';
+							if(lib.card[name].unique){
+								typeinfo+=('特殊'+get.translation(lib.card[name].type)+'牌');
+							}
+							else if(lib.card[name].type&&lib.translate[lib.card[name].type]){
+								typeinfo+=(get.translation(lib.card[name].type)+'牌');
+							}
+							if(get.subtype(name,false)){
+								typeinfo+=('-'+get.translation(get.subtype(name,false)));
+							}
+							if(typeinfo){
+								uiintro.add('<div class="text center">'+typeinfo+'</div>');
+							}
+							if(lib.card[name].unique&&lib.card[name].type=='equip'){
+								if(lib.cardPile.guozhan&&lib.cardPack.guozhan.contains(name)){
+									uiintro.add('<div class="text center">专属装备</div>').style.marginTop='-5px';
+								}
+								else{
+									uiintro.add('<div class="text center">特殊装备</div>').style.marginTop='-5px';
+								}
+							}
+							if(lib.card[name]&&lib.card[name].addinfomenu){
+								uiintro.add('<div class="text center">'+lib.card[name].addinfomenu+'</div>');
+							}
 							if(get.subtype(name,false)=='equip1'){
 								var added=false;
 								if(lib.card[node.name]&&lib.card[node.name].distance){
@@ -61914,36 +61946,6 @@
 								}
 								if(!added){
 									uiintro.add('<div class="text center">攻击范围：1</div>');
-								}
-							}
-							else if(get.subtype(name,false)){
-								uiintro.add('<div class="text center">'+get.translation(get.subtype(name,false))+'</div>');
-							}
-							else if(lib.card[name]&&lib.card[name].addinfomenu){
-								uiintro.add('<div class="text center">'+lib.card[name].addinfomenu+'</div>');
-							}
-							else if(lib.card[name]&&lib.card[name].derivation){
-								if(typeof lib.card[name].derivation=='string'){
-									uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivation)+'</div>');
-								}
-								else if(lib.card[name].derivationpack){
-									uiintro.add('<div class="text center">来源：'+get.translation(lib.card[name].derivationpack+'_card_config')+'包</div>');
-								}
-							}
-							else{
-								if(lib.card[name].unique){
-									uiintro.add('<div class="text center">特殊'+get.translation(lib.card[name].type)+'牌</div>');
-								}
-								else{
-									if(lib.card[name].type&&lib.translate[lib.card[name].type]) uiintro.add('<div class="text center">'+get.translation(lib.card[name].type)+'牌</div>');
-								}
-							}
-							if(lib.card[name].unique&&lib.card[name].type=='equip'){
-								if(lib.cardPile.guozhan&&lib.cardPack.guozhan.contains(name)){
-									uiintro.add('<div class="text center">专属装备</div>').style.marginTop='-5px';
-								}
-								else{
-									uiintro.add('<div class="text center">特殊装备</div>').style.marginTop='-5px';
 								}
 							}
 						}
