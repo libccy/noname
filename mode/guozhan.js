@@ -19,8 +19,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			for(var i in lib.character){
 				if(lib.character[i][1]=='shen'){
 					if(lib.character[i][4]){
-						var group=lib.character[i][4].find(group=>lib.group.contains(group)||group=='key');
-						if(group) lib.character[i][1]=group;
+						var group=lib.character[i][4].find(group=>lib.group.contains(group)||group=='key'||group.startsWith('gzgroup:'));
+						if(group){
+							if(group.startsWith('gzgroup:')) lib.character[i][1]=group.slice(8);
+							else lib.character[i][1]=group;
+						}
 						else lib.character[i][1]='qun';
 					}
 					else lib.character[i][1]='qun';
