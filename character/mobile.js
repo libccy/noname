@@ -797,7 +797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				audio:'twjiaohua',
 				enable:'phaseUse',
-				usable:3,
+				usable:2,
 				chooseButton:{
 					dialog:function(event,player){
 						return ui.create.dialog('###教化###选择一种牌的类型，令一名角色从牌堆获得此类型的一张牌');
@@ -1069,18 +1069,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					if(!game.hasPlayer(target=>target.countCards('e',card=>get.subtype(card)!='equip5')<3||target.isLinked()||target.isTurnedOver()||target.isDamaged())) return false;
 					return player.getHistory('damage').length;
 				},
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt2('mbquesong'),(card,player,target)=>{
-						return target.countCards('e',card=>get.subtype(card)!='equip5')<3||target.isLinked()||target.isTurnedOver()||target.isDamaged();
-					}).set('ai',target=>{
+					player.chooseTarget(get.prompt2('mbquesong')).set('ai',target=>{
 						var player=_status.event.player;
 						if(get.attitude(player,target)<=0) return 0;
-						var len=Math.max(1,3-target.countCards('e',card=>get.subtype(card)!='equip5')),hp=target.getHp();
+						var len=lib.skill.mbquesong.getNum(target),hp=target.getHp();
 						return len+target.isTurnedOver()*2+1.5*Math.min(4,target.getDamagedHp())/(hp+1);
 					});
 					'step 1'
@@ -1088,7 +1085,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.logSkill('mbquesong',target);
-						var len=Math.max(1,3-target.countCards('e',card=>get.subtype(card)!='equip5'));
+						var len=lib.skill.mbquesong.getNum(target);
 						if(target.isHealthy()) event._result={index:0};
 						else{
 							target.chooseControl().set('choiceList',[
@@ -1107,11 +1104,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.recover();
 						event.finish();
 					}
-					else target.draw(Math.max(1,3-target.countCards('e',card=>get.subtype(card)!='equip5')));
+					else target.draw(lib.skill.mbquesong.getNum(target));
 					'step 3'
 					target.link(false);
 					'step 4'
 					target.turnOver(false);
+				},
+				getNum:function(player){
+					return Math.max(1,4+player.countCards('e'));
 				},
 				ai:{
 					expose:0.2,
@@ -15601,7 +15601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbhuiyao:'慧夭',
 			mbhuiyao_info:'出牌阶段限一次。你可以受到1点无来源伤害，然后你选择一名其他角色，令其视为对另一名角色造成过1点伤害。',
 			mbquesong:'雀颂',
-			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸X张牌并复原武将牌（X为3-其装备区非宝物牌牌数，且X至少为1）；2.回复1点体力。',
+			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸X张牌并复原武将牌（X为4+其装备区牌数，且X至少为1）；2.回复1点体力。',
 			xin_yuanshao:'手杀界袁绍',
 			xin_yuanshao_prefix:'手杀界',
 			re_baosanniang:'手杀鲍三娘',
@@ -15645,7 +15645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liwei:'李遗',
 			jiaohua:'教化',
 			jiaohua_backup:'教化',
-			jiaohua_info:'出牌阶段限三次，你可以选择一个未被〖教化〗记录过的牌的类型，令一名角色从牌堆中获得一张此类型的牌，然后记录此类型，若基本、锦囊、装备均已被你发动〖教化〗记录，则你清空〖教化〗记录。',
+			jiaohua_info:'出牌阶段限两次，你可以选择一个未被〖教化〗记录过的牌的类型，令一名角色从牌堆中获得一张此类型的牌，然后记录此类型，若基本、锦囊、装备均已被你发动〖教化〗记录，则你清空〖教化〗记录。',
 			laimin:'来敏',
 			laishou:'来寿',
 			laishou_info:'锁定技。①当你受到伤害值大于等于你的体力值的伤害时，若你的体力上限小于9，你防止此伤害并增加等量体力上限。②准备阶段，若你的体力上限不小于9，你死亡。',
