@@ -1449,6 +1449,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					][player.countCards('h')%2];
 				},
 				check:function(card){
+					var player=_status.event.player;
 					if(player.hasSkill('hezhong')){
 						if(player.countCards('h')-ui.selected.cards.length>1) return 1/(get.value(card)||0.5);
 						return 0;
