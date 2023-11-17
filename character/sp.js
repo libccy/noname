@@ -34,7 +34,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_dingshangwan:['female','wei',3,['olfudao','olfengyan']],
 			zhangyan:['male','qun',4,['olsuji','ollangdao']],
 			ol_tw_zhangji:['male','wei',3,['skill_zhangji_A','skill_zhangji_B'],['unseen']],
-			ol_feiyi:['male','shu',3,['skill_feiyi_A','skill_feiyi_B'],['unseen']],
+			ol_feiyi:['male','shu',3,['yanru','hezhong']],
 			lvboshe:['male','qun',4,['olfushi','oldongdao']],
 			ol_luyusheng:['female','wu',3,['olcangxin','olrunwei']],
 			caoxi:['male','wei',3,['olgangshu','oljianxuan']],
@@ -1424,24 +1424,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//费祎
-			skill_feiyi_A:{
+			yanru:{
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
 					var num=player.countCards('h')%2;
-					if(num==0&&!player.countCards('h')) return false;
-					return !player.hasSkill('skill_feiyi_A_'+num);
+					return !player.hasSkill('yanru_'+num);
 				},
 				filterCard:function(card,player){
-					return player.countCards('h')%2==0;
+					if(player.countCards('h')&&player.countCards('h')%2==0) return lib.filter.cardDiscardable(card,player);
+					return false;
 				},
 				selectCard:function(){
 					var player=_status.event.player;
-					if(player.countCards('h')%2==0) return [player.countCards('h')/2,Infinity];
+					if(player.countCards('h')&&player.countCards('h')%2==0) return [player.countCards('h')/2,Infinity];
 					return -1;
 				},
+				prompt:function(){
+					var player=_status.event.player;
+					return [
+						(player.countCards('h')?'弃置至少一半的手牌，然后':'')+'摸三张牌',
+						'摸三张牌，然后弃置至少一半的手牌',
+						
+					][player.countCards('h')%2];
+				},
 				check:function(card){
-					if(player.hasSkill('skill_feiyi_B')){
+					if(player.hasSkill('hezhong')){
 						if(player.countCards('h')-ui.selected.cards.length>1) return 1/(get.value(card)||0.5);
 						return 0;
 					}
@@ -1449,20 +1457,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 0;
 				},
 				complexCard:true,
+				discard:false,
+				lose:false,
 				delay:0,
 				content:function(){
 					'step 0'
-					player.addTempSkill('skill_feiyi_A_'+(cards.length?'0':'1'),'phaseUseAfter');
-					if(cards.length){
-						player.draw(3)
-						event.finish();
-					}
-					else player.draw(3);
+					var bool=player.countCards('h')%2;
+					if(cards) player.discard(cards);
+					player.addTempSkill('yanru_'+bool,'phaseUseAfter');
+					player.draw(3);
+					if(!bool) event.finish();
 					'step 1'
-					player.chooseToDiscard('h','技能：弃置至少一半手牌',[Math.floor(player.countCards('h')/2),Infinity],true).set('ai',card=>{
+					player.chooseToDiscard('h','宴如：弃置至少一半手牌',[Math.floor(player.countCards('h')/2),Infinity],true).set('ai',card=>{
 						var player=_status.event.player;
-						if(player.hasSkill('skill_feiyi_B')&&player.countCards('h')-ui.selected.cards.length>1) return 1/(get.value(card)||0.5);
-						if(!player.hasSkill('skill_feiyi_B')&&ui.selected.cards.length<Math.floor(player.countCards('h')/2)) return 1/(get.value(card)||0.5);
+						if(player.hasSkill('hezhong')&&player.countCards('h')-ui.selected.cards.length>1) return 1/(get.value(card)||0.5);
+						if(!player.hasSkill('hezhong')&&ui.selected.cards.length<Math.floor(player.countCards('h')/2)) return 1/(get.value(card)||0.5);
 						return 0;
 					});
 				},
@@ -1475,7 +1484,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{player:1},
 				},
 			},
-			skill_feiyi_B:{
+			hezhong:{
 				audio:2,
 				trigger:{
 					player:'loseAfter',
@@ -1483,19 +1492,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(player.countCards('h')!=1||typeof get.number(player.getCards('h')[0],player)!='number') return false;
-					if(player.hasSkill('skill_feiyi_B_0')&&player.hasSkill('skill_feiyi_B_1')) return false;
+					if(player.hasSkill('hezhong_0')&&player.hasSkill('hezhong_1')) return false;
+					if(event.getg) return event.getg(player).length;
 					var evt=event.getl(player);
 					return evt&&evt.player==player&&evt.hs&&evt.hs.length>0;
 				},
 				prompt2:function(event,player){
 					var str='展示最后一张手牌并摸一张牌';
-					if(!player.hasSkill('skill_feiyi_B_0')||!player.hasSkill('skill_feiyi_B_0')){
+					if(!player.hasSkill('hezhong_0')||!player.hasSkill('hezhong_0')){
 						str+='，然后令本回合使用点数';
-						if(!player.hasSkill('skill_feiyi_B_0')) str+='大于';
-						if(!player.hasSkill('skill_feiyi_B_0')&&!player.hasSkill('skill_feiyi_B_0')) str+='或';
-						if(!player.hasSkill('skill_feiyi_B_1')) str+='小于';
+						if(!player.hasSkill('hezhong_0')) str+='大于';
+						if(!player.hasSkill('hezhong_0')&&!player.hasSkill('hezhong_0')) str+='或';
+						if(!player.hasSkill('hezhong_1')) str+='小于';
 						str+=get.number(player.getCards('h')[0],player);
-						str+='的牌额外结算一次';
+						str+='的普通锦囊牌额外结算一次';
 					}
 					return str;
 				},
@@ -1507,23 +1517,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					player.draw();
 					'step 2'
-					if(player.hasSkill('skill_feiyi_B_0')) event._result={index:1};
-					else if(player.hasSkill('skill_feiyi_B_1')) event._result={index:0};
+					if(player.hasSkill('hezhong_0')) event._result={index:1};
+					else if(player.hasSkill('hezhong_1')) event._result={index:0};
 					else{
 						player.chooseControl().set('choiceList',[
-							'本回合使用点数大于'+num+'的牌额外结算一次',
-							'本回合使用点数小于'+num+'的牌额外结算一次',
+							'本回合使用点数大于'+num+'的普通锦囊牌额外结算一次',
+							'本回合使用点数小于'+num+'的普通锦囊牌额外结算一次',
 						]).set('ai',()=>{
 							var player=_status.event.player;
 							var num=_status.event.player;
 							if(player.getCards('h').reduce(function(num,card){
-								return num=(get.number(card,player)||0);
+								return num+(get.number(card,player)||0);
 							},0)>num*2) return 0;
 							return 1;
 						}).set('num',num);
 					}
 					'step 3'
-					var skill='skill_feiyi_B_'+result.index;
+					var skill='hezhong_'+result.index;
 					player.addTempSkill(skill);
 					player.markAuto(skill,[num]);
 				},
@@ -1531,41 +1541,69 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'0':{
 						charlotte:true,
 						onremove:true,
-						marktext:'技',
+						marktext:'＞',
 						intro:{
-							markcount:()=>0,
-							content:'使用点数大于$的牌额外结算一次',
+							markcount:(list)=>{
+								var list2=[1,11,12,13];
+								return list.reduce((str,num)=>{
+									if(list2.includes(num)) return str+['A','J','Q','K'][list2.indexOf(num)];
+									return str+parseFloat(num);
+								},'');
+							},
+							content:'使用点数大于$的普通锦囊牌额外结算一次',
 						},
-						audio:'skill_feiyi_B',
+						audio:'hezhong',
 						trigger:{player:'useCard'},
 						filter:function(event,player){
+							if(get.type(event.card)!='trick') return false;
 							var num=get.number(event.card,player);
-							return typeof num=='number'&&player.getStorage('skill_feiyi_B_0').some(numx=>num>numx);
+							return typeof num=='number'&&player.getStorage('hezhong_0').some(numx=>num>numx);
 						},
 						forced:true,
 						content:function(){
 							trigger.effectCount++;
 							game.log(trigger.card,'额外结算一次');
+						},
+						ai:{
+							effect:{
+								player:function(card,player,target){
+									if(card.name=='tiesuo') return 'zerotarget';
+								},
+							},
 						},
 					},
 					'1':{
 						charlotte:true,
 						onremove:true,
-						marktext:'能',
+						marktext:'<',
 						intro:{
-							markcount:()=>0,
-							content:'使用点数小于$的牌额外结算一次',
+							markcount:(list)=>{
+								var list2=[1,11,12,13];
+								return list.reduce((str,num)=>{
+									if(list2.includes(num)) return str+['A','J','Q','K'][list2.indexOf(num)];
+									return str+parseFloat(num);
+								},'');
+							},
+							content:'使用点数小于$的普通锦囊牌额外结算一次',
 						},
-						audio:'skill_feiyi_B',
+						audio:'hezhong',
 						trigger:{player:'useCard'},
 						filter:function(event,player){
+							if(get.type(event.card)!='trick') return false;
 							var num=get.number(event.card,player);
-							return typeof num=='number'&&player.getStorage('skill_feiyi_B_1').some(numx=>num<numx);
+							return typeof num=='number'&&player.getStorage('hezhong_1').some(numx=>num<numx);
 						},
 						forced:true,
 						content:function(){
 							trigger.effectCount++;
 							game.log(trigger.card,'额外结算一次');
+						},
+						ai:{
+							effect:{
+								player:function(card,player,target){
+									if(card.name=='tiesuo') return 'zerotarget';
+								},
+							},
 						},
 					},
 				},
@@ -26490,10 +26528,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			skill_zhangji_B:'技能',
 			skill_zhangji_B_info:'当你受到1点伤害后，你可令一名手牌数小于体力上限的角色摸三张牌，然后其将手牌数弃置至其体力上限数；当你进入濒死状态时，你可令一名其他角色观看五张魏势力武将牌，其可以选择其中一张代替自己的武将牌（体力和体力上限不变）。',
 			ol_feiyi:'费祎',
-			skill_feiyi_A:'技能',
-			skill_feiyi_A_info:'出牌阶段各限一次，若你的手牌数为：①奇数，你可以摸三张牌，然后弃置至少一半手牌（向下取整）；②偶数，你可以弃置至少一半手牌，然后摸三张牌。',
-			skill_feiyi_B:'技能',
-			skill_feiyi_B_info:'每回合每项限一次，当你的手牌数变为1后，你可以展示此唯一手牌A并摸一张牌，然后你选择一项：①本回合使用点数大于A的点数的牌额外结算一次；②本回合使用点数小于A的点数的牌额外结算一次。',
+			yanru:'宴如',
+			yanru_info:'出牌阶段各限一次，若你的手牌数为：①奇数，你可以摸三张牌，然后弃置至少一半手牌（向下取整）；②偶数，你可以弃置至少一半手牌，然后摸三张牌。',
+			hezhong:'和衷',
+			hezhong_info:'每回合每项限一次，当你的手牌数变为1后，你可以展示此唯一手牌A并摸一张牌，然后你选择一项：①本回合使用点数大于A的点数的普通锦囊牌额外结算一次；②本回合使用点数小于A的点数的普通锦囊牌额外结算一次。',
 			lvboshe:'吕伯奢',
 			olfushi:'缚豕',
 			olfushi_info:'①一名角色使用【杀】结算结束后，若你至其的距离不大于1，你将此【杀】对应的所有实体牌置于武将牌上。②当你需要使用一张【杀】时，你可以将任意张“缚豕”牌置入弃牌堆并摸等量的牌，视为使用一张【杀】并选择X项（X为你以此法重铸的牌数且至多为3）：1.你为此【杀】额外指定一个目标；2.你选择此【杀】的一个目标角色，此牌对其造成的伤害-1；3.你选择此【杀】的一个目标角色，此【杀】对其造成的伤害+1。当此【杀】指定最后一个目标后，若此牌被选择的效果选项相邻且此牌的目标角色座位连续，则此【杀】不计入次数限制。',
