@@ -345,6 +345,7 @@ window.noname_character_rank={
 		'jiangji',
 		'tianshangyi',
 		'malingli',
+		'caoyi',
 	],
 	am:[
 		'diy_caiwenji',
@@ -631,6 +632,7 @@ window.noname_character_rank={
 		'yanxiang',
 		'nezha',
 		'dc_jiachong',
+		'pangshanmin',
 	],
 	bp:[
 		'chess_diaochan',
@@ -997,6 +999,7 @@ window.noname_character_rank={
 		'xin_wuban',
 		'ol_liuyan',
 		'sunhuan',
+		'yue_caiyong',
 	],
 	b:[
 		'diy_feishi',

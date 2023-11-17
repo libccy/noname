@@ -27803,6 +27803,23 @@
 
 					return skill;
 				}
+				tempBanSkill(skill,expire,log){
+					if(!this.hasSkill(skill)||this.hasStorage(`temp_ban_${skill}`)) return;
+					this.setStorage(`temp_ban_${skill}`,true);
+					
+					if(log!==false) game.log(this,'的技能',`#g【${get.translation(skill)}】`,'暂时失效了');
+
+					if(!expire) expire={global:['phaseAfter','phaseBeforeStart']};
+					else if(typeof expire=='string'||Array.isArray(expire)) expire={global:expire};
+					this.when(expire).assign({
+						firstDo:true,
+					}).vars({
+						bannedSkill:skill,
+					}).then(()=>{
+						delete player.storage[`temp_ban_${bannedSkill}`];
+					})
+					return skill;
+				}
 				attitudeTo(target){
 					if(typeof get.attitude=='function') return get.attitude(this,target);
 					return 0;
@@ -32732,6 +32749,7 @@
 				if(info.round&&(info.round-(game.roundNumber-player.storage[skill+'_roundcount'])>0)){
 					return false;
 				}
+				if(player.storage[`temp_ban_${skill}`]===true) return false;
 				return true;
 			},
 			characterDisabled:function(i,libCharacter){
@@ -41634,6 +41652,7 @@
 							if(info.usable&&get.skillCount(skills2[i])>=info.usable) enable=false;
 							if(info.chooseButton&&_status.event.noButton) enable=false;
 							if(info.round&&(info.round-(game.roundNumber-player.storage[skills2[i]+'_roundcount'])>0)) enable=false;
+							if(player.storage[`temp_ban_${skills2[i]}`]===true) enable=false;
 						}
 						if(enable){
 							if(event.isMine()||!event._aiexclude.contains(skills2[i])){

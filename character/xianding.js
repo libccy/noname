@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			caoyi:['female','wei',4,['dcmiyi','dcyinjun']],
 			malingli:['female','shu',3,['dclima','dcxiaoyin','dchuahuo']],
 			wu_luxun:['male','wu',3,['dcxiongmu','dczhangcai','dcruxian']],
 			dc_xujing:['male','shu',3,['dcshangyu','dccaixia']],
@@ -92,7 +93,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen'],
-				sp2_yinyu:['zhouyi','luyi','sunlingluan'],
+				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
@@ -103,6 +104,128 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//曹轶
+			dcmiyi:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				content:function*(event,map){
+					const player=map.player;
+					if(_status.connectMode) game.broadcastAll(()=>{_status.noclearcountdown=true});
+					let result=yield player.chooseControl(['回复体力','受到伤害'],'cancel2').set('choiceList',[
+						'令你即将选择的角色各回复1点体力',
+						'令你即将选择的角色各受到你造成的1点伤害'
+					]).set('prompt',get.prompt('dcmiyi')).set('ai',()=>{
+						return get.event('choice');
+					}).set('choice',(()=>{
+						let damage=0;
+						game.countPlayer(current=>{
+							let eff=get.damageEffect(current,player,player);
+							if(!current.isDamaged()){
+								if(eff>0) eff=-eff;
+							}
+							else if(current.hasSkillTag('maixie')){
+								if(get.attitude(player,current)<=0){
+									if(current.getHp(true)>=2) eff=0;
+									else eff/=10;
+								}
+								else if(current.getHp(true)>=2){
+									eff+=30;
+								}
+							}
+							else eff/=3;
+							damage+=eff;
+						})
+						if(damage<-20) return 0;
+						if(damage>5) return 1;
+						if(lib.skill.mbhuiyao.getUnrealDamageTargets(player,[[player],game.filterPlayer()])) return 0;
+						return 'cancel2';
+					})());
+					if(result.control=='cancel2'){
+						if(_status.connectMode){game.broadcastAll(()=>{delete _status.noclearcountdown;game.stopCountChoose()})}
+						return event.finish();
+					}
+					const func=['recover','damage'],ind=result.index;
+					const fn=func[ind];
+					result=yield player.chooseTarget(`蜜饴：令任意名角色${result.control.slice(0,2)}1点${result.control.slice(2)}`,[1,Infinity]).set('ai',target=>{
+						const toDamage=get.event('toDamage');
+						let eff=get.damageEffect(target,player,player);
+						if(toDamage){
+							if(target.hasSkillTag('maixie')){
+								if(get.attitude(player,target)<=0){
+									if(target.getHp(true)>=2) eff=0;
+									else eff/=10;
+								}
+								else if(target.getHp(true)>=2){
+									eff+=30;
+								}
+							}
+							return eff;
+						}
+						if(!target.isDamaged()){
+							eff*=-2;
+						}
+						if(target.getHp(true)>=2) return -eff;
+						return 0;
+					}).set('toDamage',result.index==1);
+					if(_status.connectMode){game.broadcastAll(()=>{delete _status.noclearcountdown;game.stopCountChoose()})}
+					if(!result.bool) return event.finish();
+					const targets=result.targets.slice().sortBySeat();
+					player.logSkill('dcmiyi',targets,fn=='damage'?'fire':'green');
+					while(targets.length){
+						const target=targets.shift();
+						if(!target.isIn()) continue;
+						target[fn]();
+						target.when({global:'phaseJieshuBegin'}).vars({
+							fn:func[ind^1],
+							source:player,
+						}).then(()=>{
+							if(source.isIn()){
+								if(!trigger._dcmiyi_logged){
+									source.logSkill('dcmiyi');
+									trigger._dcmiyi_logged=true;
+								}
+								source.line(player,fn=='damage'?'fire':'green');
+							}
+							player[fn](source);
+						});
+					}
+				},
+			},
+			dcyinjun:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					if(get.name(event.card,false)!='sha'&&get.type2(event.card)!='trick') return false;
+					if(event.targets.length!=1||!event.targets[0].isIn()) return false;
+					if(!player.canUse(new lib.element.VCard({name:'sha'}),event.targets[0])) return false;
+					return player.hasHistory('lose',evt=>{
+						if(evt.getParent()!=event) return false;
+						return event.cards.every(card=>{
+							return evt.hs.includes(card);
+						});
+					});
+				},
+				prompt2:function(event,player){
+					return `视为对${get.translation(event.targets)}使用一张无伤害来源的【杀】`;
+				},
+				check:function(event,player){
+					const sha=new lib.element.VCard({name:'sha'});
+					return Math.max(...[event.targets[0],player].map(source=>get.effect(event.targets[0],sha,source,player)))>0;
+				},
+				logTarget:'targets',
+				content:function*(event,map){
+					const player=map.player,trigger=map.trigger,target=trigger.targets[0];
+					yield player.useCard(new lib.element.VCard({name:'sha'}),target,false).oncard=()=>{
+						get.event().customArgs.default.customSource={
+							isDead:()=>true,
+						}
+					};
+					if(player.getHistory('useSkill',evt=>evt.skill=='dcyinjun').length>player.getHp()){
+						player.tempBanSkill('dcyinjun');
+					}
+				}
+			},
 			//马伶俐
 			dclima:{
 				audio:2,
@@ -13039,6 +13162,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcxiaoyin_info:'①准备阶段，你可以亮出牌堆顶的Y张牌（Y为你距离1以内的角色数），获得其中的红色牌，将其中任意张黑色牌置于等量名座次连续的其他角色的武将牌上，称为“硝引”。②当一名有“硝引”牌的角色受到伤害时，若此伤害为：火焰伤害，来源可以弃置一张其“硝引”牌包含的类型的牌，将其“硝引”置入弃牌堆，令此伤害+1；非火焰伤害，来源可以获得其“硝引”牌，将此伤害改为火焰伤害。',
 			dchuahuo:'花火',
 			dchuahuo_info:'出牌阶段限一次。你可以将一张红色手牌当不计入次数的火【杀】使用。然后当你使用此牌指定第一个目标后，若目标角色有“硝引”牌，你可以将此【杀】的目标改为所有有“硝引”牌的角色。',
+			caoyi:'曹轶',
+			dcmiyi:'蜜饴',
+			dcmiyi_info:'准备阶段，你可以选择一项：1.回复1点体力；2.受到你造成的1点伤害。然后你令任意名角色执行该项。若如此做，这些角色于结束阶段执行另一项。',
+			dcyinjun:'寅君',
+			dcyinjun_info:'当你使用对应实体牌均为你的手牌的【杀】或锦囊牌结算结束后，若此牌目标为1，你可以视为对该目标使用一张无伤害来源的【杀】。然后若你本回合发动〖寅君〗的次数大于你的体力值，〖寅君〗失效直到回合结束。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
