@@ -1068,6 +1068,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbquesong:{
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return player.getHistory('damage').length;
+				},
 				direct:true,
 				content:function(){
 					'step 0'
