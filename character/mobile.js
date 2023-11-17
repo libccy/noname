@@ -797,7 +797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				audio:'twjiaohua',
 				enable:'phaseUse',
-				usable:3,
+				usable:2,
 				chooseButton:{
 					dialog:function(event,player){
 						return ui.create.dialog('###教化###选择一种牌的类型，令一名角色从牌堆获得此类型的一张牌');
@@ -15645,7 +15645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liwei:'李遗',
 			jiaohua:'教化',
 			jiaohua_backup:'教化',
-			jiaohua_info:'出牌阶段限三次，你可以选择一个未被〖教化〗记录过的牌的类型，令一名角色从牌堆中获得一张此类型的牌，然后记录此类型，若基本、锦囊、装备均已被你发动〖教化〗记录，则你清空〖教化〗记录。',
+			jiaohua_info:'出牌阶段限两次，你可以选择一个未被〖教化〗记录过的牌的类型，令一名角色从牌堆中获得一张此类型的牌，然后记录此类型，若基本、锦囊、装备均已被你发动〖教化〗记录，则你清空〖教化〗记录。',
 			laimin:'来敏',
 			laishou:'来寿',
 			laishou_info:'锁定技。①当你受到伤害值大于等于你的体力值的伤害时，若你的体力上限小于9，你防止此伤害并增加等量体力上限。②准备阶段，若你的体力上限不小于9，你死亡。',
