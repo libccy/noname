@@ -58520,9 +58520,10 @@
 			if(typeof numberOfPlayers!='number') numberOfPlayers=lib.configOL.number;
 			if(!numberOfPlayers) return;
 			const playerPositions=ui.playerPositions;
-			while(playerPositions.length){
-				playerPositions.pop().remove();
-			}
+			playerPositions.forEach((position) => {
+				game.dynamicStyle.remove(position);
+			});
+			playerPositions.length = 0;
 			const temporaryPlayer=ui.create.div('.player.connect',ui.window).hide();
 			const computedStyle=getComputedStyle(temporaryPlayer);
 			const halfWidth=parseFloat(computedStyle.width)/2;
@@ -58532,23 +58533,29 @@
 			const upperPercentage=100/(halfNumberOfPlayers+1);
 			const scale=10/numberOfPlayers;
 			for(let ordinal=0;ordinal<halfNumberOfPlayers;ordinal++){
-				playerPositions.push(lib.init.sheet([
-					`#window>.player.connect[data-position='${ordinal}']{`,
-					`left:calc(${upperPercentage*(ordinal+1)}% - ${halfWidth}px);`,
-					`top:calc(${100/3}% - ${halfHeight}px);`,
-					scale<1?`transform:scale(${scale});`:'',
-					'}'
-				].join('')));
+				const selector = `#window>.player.connect[data-position='${ordinal}']`;
+				const css = {
+					left: `calc(${upperPercentage*(ordinal+1)}% - ${halfWidth}px)`,
+					top: `calc(${100/3}% - ${halfHeight}px)`
+				};
+				if (scale<1) 
+					css["transform"] = `scale(${scale})`;
+
+				game.dynamicStyle.add(selector, css);
+				playerPositions.push(selector);
 			}
 			const lowerPercentage=100/(numberOfPlayers-halfNumberOfPlayers+1);
 			for(let ordinal=halfNumberOfPlayers;ordinal<numberOfPlayers;ordinal++){
-				playerPositions.push(lib.init.sheet([
-					`#window>.player.connect[data-position='${ordinal}']{`,
-					`left:calc(${lowerPercentage*(ordinal-halfNumberOfPlayers+1)}% - ${halfWidth}px);`,
-					`top:calc(${100*2/3}% - ${halfHeight}px);`,
-					scale<1?`transform:scale(${scale});`:'',
-					'}'
-				].join('')));
+				const selector = `#window>.player.connect[data-position='${ordinal}']`;
+				const css = {
+					left: `calc(${lowerPercentage*(ordinal-halfNumberOfPlayers+1)}% - ${halfWidth}px)`,
+					top: `calc(${100*2/3}% - ${halfHeight}px)`
+				};
+				if (scale < 1)
+					css["transform"] = `scale(${scale})`;
+
+				game.dynamicStyle.add(selector, css);
+				playerPositions.push(selector);
 			}
 		},
 		/**
@@ -58561,9 +58568,10 @@
 			//当人数不超过8人时，还是用以前的布局
 			if(!numberOfPlayers||numberOfPlayers<=8) return;
 			const playerPositions=ui.playerPositions;
-			while(playerPositions.length){
-				playerPositions.pop().remove();
-			}
+			playerPositions.forEach((position) => {
+				game.dynamicStyle.remove(position);
+			});
+			playerPositions.length = 0;
 			//单个人物的宽度，这里要设置玩家的实际的宽度
 			const temporaryPlayer=ui.create.div('.player',ui.arena).hide();
 			const computedStyle=getComputedStyle(temporaryPlayer);
@@ -58580,13 +58588,13 @@
 				const reversedOrdinal=columnCount-ordinal;
 				//动态计算玩家的top属性，实现拱桥的效果；只让两边的各两个人向下偏移一些
 				const top=Math.max(0,Math.round(numberOfPlayers/5)-Math.min(Math.abs(ordinal-1),Math.abs(reversedOrdinal)))*quarterHeight;
-				playerPositions.push(lib.init.sheet([
-					`#arena[data-number='${numberOfPlayers}']>.player[data-position='${ordinal}']{`,
-					`left:calc(${percentage*reversedOrdinal+5}% - ${halfWidth}px);`,
-					`top:${top}px;`,
-					`transform:scale(${scale});`,
-					'}'
-				].join('')));
+				const selector = `#arena[data-number='${numberOfPlayers}']>.player[data-position='${ordinal}']`;
+				game.dynamicStyle.add(selector, {
+					left: `calc(${percentage*reversedOrdinal+5}% - ${halfWidth}px)`,
+					top: `${top}px`,
+					transform: `scale(${scale})`
+				});
+				playerPositions.push(selector);
 			}
 		},
 		updateRoundNumber:(roundNumber,cardPileNumber)=>{
