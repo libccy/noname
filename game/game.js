@@ -27742,10 +27742,10 @@
 					return skill;
 				}
 				tempBanSkill(skill,expire,log){
-					if(!this.hasSkill(skill)||this.hasStorage(`temp_ban_${skill}`)) return;
+					if(this.isTempBanned(skill)) return;
 					this.setStorage(`temp_ban_${skill}`,true);
 					
-					if(log!==false) game.log(this,'的技能',`#g【${get.translation(skill)}】`,'暂时失效了');
+					if(log!==false&&this.hasSkill(skill)) game.log(this,'的技能',`#g【${get.translation(skill)}】`,'暂时失效了');
 
 					if(!expire) expire={global:['phaseAfter','phaseBeforeStart']};
 					else if(typeof expire=='string'||Array.isArray(expire)) expire={global:expire};
@@ -27757,6 +27757,9 @@
 						delete player.storage[`temp_ban_${bannedSkill}`];
 					})
 					return skill;
+				}
+				isTempBanned(skill){
+					return this.hasStorage(`temp_ban_${skill}`);
 				}
 				attitudeTo(target){
 					if(typeof get.attitude=='function') return get.attitude(this,target);
