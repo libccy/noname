@@ -23,7 +23,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			shen_huatuo:['male','shen',3,['wuling','youyi'],['qun','unseen']],
+			shen_huatuo:['male','shen',3,['wuling','youyi'],['qun']],
 			le_shen_jiaxu:['male','shen',4,['jxlianpo','jxzhaoluan'],['qun']],
 			shen_dianwei:['male','shen',4,['juanjia','qiexie','cuijue'],['wei']],
 			shen_dengai:['male','shen',4,['dctuoyu','dcxianjin','dcqijing'],['wei']],

@@ -5,9 +5,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sb',
 		connect:true,
 		character:{
-			sb_huangyueying:['female','shu',3,['sbqicai','sbjizhi'],['unseen']],
-			sb_sp_zhugeliang:['male','shu',3,['sbhuoji','sbkanpo'],['unseen']],
-			sb_zhugeliang:['male','shu',3,['sbguanxing','sbkongcheng'],['unseen']],
+			sb_huangyueying:['female','shu',3,['sbqicai','sbjizhi']],
+			sb_sp_zhugeliang:['male','shu',3,['sbhuoji','sbkanpo']],
+			sb_zhugeliang:['male','shu',3,['sbguanxing','sbkongcheng']],
 			sb_zhanghe:['male','wei',4,['sbqiaobian']],
 			sb_yujin:['male','wei',4,['sbxiayuan','sbjieyue']],
 			sb_huaxiong:['male','qun','3/4/1',['new_reyaowu','sbyangwei']],
@@ -265,7 +265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				derivation:['sbguanxing','sbkongcheng'],
-				group:['sbhuoji_achieve','sbhuoji_fail'],
+				group:['sbhuoji_achieve','sbhuoji_fail','sbhuoji_mark'],
 				subSkill:{
 					achieve:{
 						audio:'sbhuoji',
@@ -280,9 +280,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							player.awakenSkill('sbhuoji');
 							game.log(player,'成功完成使命');
-							player.removeSkill(['sbhuoji','sbkanpo']);
-							player.addSkill(['sbguanxing','sbkongcheng']);
-							player.reinit('sb_sp_zhugeliang','sb_zhugeliang');
+							var list=[];
+							if(player.name&&get.character(player.name)[1].includes('sbhuoji')) list.add(player.name);
+							if(player.name1&&get.character(player.name1)[1].includes('sbhuoji')) list.add(player.name1);
+							if(player.name2&&get.character(player.name2)[1].includes('sbhuoji')) list.add(player.name2);
+							if(list.length) list.forEach(name=>player.reinit(name,'sb_zhugeliang'));
+							else{
+								player.removeSkill(['sbhuoji','sbkanpo']);
+								player.addSkill(['sbguanxing','sbkongcheng']);
+							}
 						},
 					},
 					fail:{
@@ -294,6 +300,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.awakenSkill('sbhuoji');
 							game.log(player,'使命失败');
 						},
+					},
+					mark:{
+						charlotte:true,
+						trigger:{source:'damage'},
+						filter:function(event,player){
+							return event.hasNature('fire');
+						},
+						firstDo:true,
+						forced:true,
+						popup:false,
+						content:function(){
+							player.addTempSkill('sbhuoji_count',{player:['sbhuoji_achieveBegin','sbhuoji_failBegin']});
+							player.storage.sbhuoji_count=player.getAllHistory('sourceDamage',evt=>evt.hasNature('fire')).reduce((num,evt)=>num+evt.num,0);
+							player.markSkill('sbhuoji_count');
+						},
+					},
+					count:{
+						charlotte:true,
+						intro:{content:'本局游戏已造成过#点火属性伤害'},
 					},
 				},
 			},
@@ -393,6 +418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.$gain2(cards2,false);
 					game.log(player,'将',cards2,'置于了武将牌上');
 					player.loseToSpecial(cards2,'sbguanxing').visible=true;
+					player.markSkill('sbguanxing');
 					'step 1'
 					var cards=player.getCards('s',card=>card.hasGaintag('sbguanxing'));
 					if(cards.length){
@@ -428,7 +454,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else if(trigger.name=='phaseBegin') player.addTempSkill('sbguanxing_on');
 				},
-				subSkill:{on:{charlotte:true}},
+				group:'sbguanxing_unmark',
+				subSkill:{
+					on:{charlotte:true},
+					unmark:{
+						trigger:{player:'loseAfter'},
+						filter:function(event,player){
+							if(!event.ss||!event.ss.length) return false;
+							return !player.countCards('s',card=>card.hasGaintag('sbguanxing'));
+						},
+						charlotte:true,
+						forced:true,
+						silent:true,
+						content:function(){
+							player.unmarkSkill('sbguanxing');
+						},
+					},
+				},
 				marktext:'星',
 				intro:{
 					mark:function(dialog,storage,player){
@@ -5520,12 +5562,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_xiaoqiao_prefix:'谋',
 			sbtianxiang:'天香',
 			sbtianxiang_info:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸等量的牌。',
-			sb_sp_zhugeliang:'谋诸葛亮',
+			sb_sp_zhugeliang:'谋卧龙',
 			sb_sp_zhugeliang_prefix:'谋',
 			sb_zhugeliang:'谋诸葛亮',
 			sb_zhugeliang_prefix:'谋',
 			sbhuoji:'火计',
-			sbhuoji_info:'使命技。①使命：出牌阶段限一次，你可以选择一名其他角色，对其和所有势力与其势力相同的其他角色造成1点火属性伤害。②成功：准备阶段，若你本局游戏已造成的火属性伤害大于等于游戏人数，则你失去〖火计〗和〖看破〗，获得〖观星〗和〖空城〗。③失败：使命成功前进入濒死状态。',
+			sbhuoji_info:'使命技。①使命：出牌阶段限一次，你可以选择一名其他角色，对其和所有势力与其势力相同的其他角色造成1点火属性伤害。②成功：准备阶段，若你本局游戏已造成的火属性伤害大于等于游戏人数，则你将武将牌更换为谋诸葛亮（若你没有拥有此技能的武将牌则改为失去〖火计〗和〖看破〗，然后获得〖观星〗和〖空城〗）。③失败：使命成功前进入濒死状态。',
 			sbkanpo:'看破',
 			sbkanpo_info:'①一轮开始时，你清除“看破”记录的牌名，然后你可以记录三个非此次移去的牌名的牌名。②一名其他角色使用你“看破”记录的牌名的牌时，你可以从“看破”中移去此牌名，令此牌无效。',
 			sbguanxing:'观星',
