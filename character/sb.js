@@ -5,7 +5,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sb',
 		connect:true,
 		character:{
-			sb_zhugeliang:['male','shu',3,['sbhuoji','sbkanpo'],['unseen']],
+			sb_sp_zhugeliang:['male','shu',3,['sbhuoji','sbkanpo'],['unseen']],
+			sb_zhugeliang:['male','shu',3,['sbguanxing','sbkongcheng'],['unseen']],
 			sb_zhanghe:['male','wei',4,['sbqiaobian']],
 			sb_yujin:['male','wei',4,['sbxiayuan','sbjieyue']],
 			sb_huaxiong:['male','qun','3/4/1',['new_reyaowu','sbyangwei']],
@@ -54,39 +55,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//诸葛亮
 			sbhuoji:{
-				audio:3,
-				derivation:['sbguanxing','sbkongcheng'],
-				group:['sbhuoji_effect','sbhuoji_achieve','sbhuoji_fail'],
-				subSkill:{
-					effect:{
-						audio:'sbhuoji1',
-						enable:'phaseUse',
-						filterTarget:lib.filter.notMe,
-						prompt:'选择一名其他角色，对其与其势力相同的所有其他角色各造成1点火属性伤害',
-						usable:1,
-						content:function(){
-							var targets=game.filterPlayer(current=>{
+				audio:2,
+				enable:'phaseUse',
+				filterTarget:lib.filter.notMe,
+				prompt:'选择一名其他角色，对其与其势力相同的所有其他角色各造成1点火属性伤害',
+				usable:1,
+				line:false,
+				content:function(){
+					var targets=game.filterPlayer(current=>{
+						if(current==player) return false;
+						return current.group==target.group;
+					});
+					player.line(targets);
+					targets.forEach(i=>i.damage(1,'fire'));
+				},
+				ai:{
+					order:7,
+					result:{
+						target:function(player,target){
+							var att=get.attitude(player,target);
+							return get.sgn(att)*game.filterPlayer(current=>{
 								if(current==player) return false;
 								return current.group==target.group;
-							});
-							player.line(targets);
-							targets.forEach(i=>i.damage(1,'fire'));
-						},
-						ai:{
-							order:7,
-							result:{
-								target:function(player,target){
-									var att=get.attitude(player,target);
-									return get.sgn(att)*game.filterPlayer(current=>{
-										if(current==player) return false;
-										return current.group==target.group;
-									}).reduce((num,current)=>num+get.damageEffect(current,player,player,'fire'),0);
-								},
-							},
+							}).reduce((num,current)=>num+get.damageEffect(current,player,player,'fire'),0);
 						},
 					},
+				},
+				derivation:['sbguanxing','sbkongcheng'],
+				group:['sbhuoji_achieve','sbhuoji_fail'],
+				subSkill:{
 					achieve:{
-						audio:'sbhuoji2',
+						audio:'sbhuoji',
 						trigger:{player:'phaseZhunbeiBegin'},
 						filter:function(event,player){
 							return player.getAllHistory('sourceDamage',evt=>evt.hasNature('fire')).reduce((num,evt)=>num+evt.num,0)>=game.players.length+game.dead.length;
@@ -100,10 +99,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.log(player,'成功完成使命');
 							player.removeSkill(['sbhuoji','sbkanpo']);
 							player.addSkill(['sbguanxing','sbkongcheng']);
+							player.reinit('sb_sp_zhugeliang','sb_zhugeliang');
 						},
 					},
 					fail:{
-						audio:'sbhuoji3',
+						audio:'sbhuoji',
 						trigger:{player:'dying'},
 						forced:true,
 						locked:false,
@@ -114,9 +114,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			sbhuoji1:{audio:true},
-			sbhuoji2:{audio:true},
-			sbhuoji3:{audio:true},
 			sbkanpo:{
 				audio:2,
 				trigger:{global:'roundStart'},
@@ -5340,6 +5337,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_xiaoqiao_prefix:'谋',
 			sbtianxiang:'天香',
 			sbtianxiang_info:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸等量的牌。',
+			sb_sp_zhugeliang:'谋诸葛亮',
+			sb_sp_zhugeliang_prefix:'谋',
 			sb_zhugeliang:'谋诸葛亮',
 			sb_zhugeliang_prefix:'谋',
 			sbhuoji:'火计',
