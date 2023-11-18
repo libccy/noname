@@ -5,6 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sb',
 		connect:true,
 		character:{
+			sb_huangyueying:['female','shu',3,['sbqicai','sbjizhi'],[]],
 			sb_sp_zhugeliang:['male','shu',3,['sbhuoji','sbkanpo'],['unseen']],
 			sb_zhugeliang:['male','shu',3,['sbguanxing','sbkongcheng'],['unseen']],
 			sb_zhanghe:['male','wei',4,['sbqiaobian']],
@@ -53,6 +54,188 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//黄月英
+			sbqicai:{
+				mod:{
+					targetInRange:function(card,player,target){
+						if(get.type2(card)=='trick') return true;
+					},
+				},
+				init:function(player){
+					var skill='sbqicai_'+player.playerid;
+					if(!lib.skill[skill]){
+						lib.skill[skill]={
+							onremove:true,
+							mark:true,
+							marktext:'奇',
+							intro:{
+								markcount:function(storage){
+									return (storage||0).toString();
+								},
+								content:function(storage){
+									return '已被掠夺'+(storage||0)+'张普通锦囊牌';
+								},
+							},
+						};
+						lib.translate[skill]='奇才';
+						lib.translate[skill+'_bg']='奇';
+					}
+				},
+				getLimit:3,
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					if(!game.hasPlayer(target=>target!=player&&target.hasEmptySlot(2))) return false;
+					return player.countCards('h',card=>lib.skill.sbqicai.filterCardx(card,player))||Array.from(ui.discardPile.childNodes).some(card=>lib.skill.sbqicai.filterCardx(card,player));
+				},
+				filterCardx:function(card,player){
+					if(player.getStorage('sbqicai').includes(card.name)) return false;
+					return get.type(card)=='equip'&&get.subtype(card)=='equip2';
+				},
+				usable:1,
+				chooseButton:{
+					dialog:function(event,player){
+						var list1=player.getCards('h',card=>lib.skill.sbqicai.filterCardx(card,player));
+						var list2=Array.from(ui.discardPile.childNodes).filter(card=>lib.skill.sbqicai.filterCardx(card,player));
+						var dialog=ui.create.dialog('###奇才###<div class="text center">请选择一张防具牌置入一名其他角色的装备区</div>');
+						if(list1.length){
+							dialog.add('<div class="text center">手牌区</div>');
+							dialog.add(list1);
+						}
+						if(list2.length){
+							dialog.add('<div class="text center">弃牌堆</div>');
+							dialog.add(list2);
+						}
+						return dialog;
+					},
+					check:function(button){
+						var player=_status.event.player;
+						var num=get.value(button.link);
+						if(!game.hasPlayer(target=>target!=player&&target.hasEmptySlot(2)&&get.attitude(player,target)>0)) num=1/(get.value(button.link)||0.5);
+						if(get.owner(button.link)) return num;
+						return num*5;
+					},
+					backup:function(links,player){
+						return {
+							audio:'sbqicai',
+							card:links[0],
+							filterCard:function(card,player){
+								var cardx=lib.skill.sbqicai_backup.card;
+								if(get.owner(cardx)) return card==cardx;
+								return false;
+							},
+							selectCard:-1,
+							filterTarget:function(card,player,target){
+								return target!=player&&target.canEquip(lib.skill.sbqicai_backup.card);
+							},
+							check:()=>1,
+							discard:false,
+							lose:false,
+							prepare:function(cards,player,targets){
+								if(cards&&cards.length) player.$give(cards,targets[0],false);
+							},
+							content:function(){
+								if(!cards||!cards.length){
+									cards=[lib.skill.sbqicai_backup.card];
+									target.$gain2(cards);
+									game.delayx();
+								}
+								player.markAuto('sbqicai',[cards[0].name]);
+								target.equip(cards[0]);
+								player.addSkill('sbqicai_gain');
+								target.addSkill('sbqicai_'+player.playerid);
+							},
+							ai:{
+								result:{
+									target:function(player,target){
+										var att=get.attitude(player,target);
+										if(att>0) return 3;
+										if(att<0) return -1;
+										return 0;
+									},
+								},
+							},
+						}
+					},
+					prompt:function(links,player){
+						return '请选择置入'+get.translation(links)+'的角色';
+					},
+				},
+				ai:{
+					order:7,
+					result:{
+						player:function(player){
+							if(!game.hasPlayer(target=>target!=player&&target.hasEmptySlot(2)&&get.attitude(player,target)!=0)) return 0;
+							return 1;
+						},
+					},
+				},
+				intro:{content:'已使用$发动过此技能'},
+				subSkill:{
+					gain:{
+						audio:'sbqicai',
+						trigger:{global:['gainAfter','loseAsyncAfter']},
+						filter:function(event,player){
+							return game.hasPlayer(function(current){
+								if(!event.getg(current).length||!current.hasSkill('sbqicai_'+player.playerid)) return false;
+								if(current.countMark('sbqicai_'+player.playerid)>=lib.skill.sbqicai.getLimit) return false;
+								return event.getg(current).some(card=>get.type(card)=='trick'&&lib.filter.canBeGained(card,current,player));
+							});
+						},
+						forced:true,
+						content:function(){
+							'step 0'
+							var target=game.findPlayer(function(current){
+								if(!trigger.getg(current).length||!current.hasSkill('sbqicai_'+player.playerid)) return false;
+								if(current.countMark('sbqicai_'+player.playerid)>=lib.skill.sbqicai.getLimit) return false;
+								return trigger.getg(current).some(card=>get.type(card)=='trick'&&lib.filter.canBeGained(card,current,player));
+							});
+							event.target=target;
+							var cards=trigger.getg(target).filter(card=>get.type(card)=='trick'&&lib.filter.canBeGained(card,target,player));
+							if(cards.length<=lib.skill.sbqicai.getLimit-target.countMark('sbqicai_'+player.playerid)) event._result={bool:true,links:cards};
+							else{
+								var num=(lib.skill.sbqicai.getLimit-target.countMark('sbqicai_'+player.playerid));
+								target.chooseButton(['奇才：将其中'+get.cnNumber(num)+'张牌交给'+get.translation(player),cards],num,true).set('ai',function(button){
+									return get.value(button.link)*get.sgn(_status.event.att);
+								}).set('att',get.attitude(target,player));
+							}
+							'step 1'
+							if(result.bool){
+								target.give(result.links,player);
+								target.addMark('sbqicai_'+player.playerid,result.links.length,false);
+							}
+						},
+					},
+				},
+			},
+			sbjizhi:{
+				audio:2,
+				trigger:{player:'useCard'},
+				filter:function(event,player){
+					return get.type(event.card)=='trick';
+				},
+				forced:true,
+				content:function(){
+					player.draw().gaintag=['sbjizhi'];
+					player.addTempSkill('sbjizhi_mark')
+				},
+				subSkill:{
+					mark:{
+						charlotte:true,
+						onremove:function(player){
+							player.removeGaintag('sbjizhi');
+						},
+						mod:{
+							ignoredHandcard:function(card,player){
+								if(card.hasGaintag('sbjizhi')) return true;
+							},
+							cardDiscardable:function(card,player,name){
+								if(name=='phaseDiscard'&&card.hasGaintag('sbjizhi')) return false;
+							},
+						},
+					},
+				},
+			},
 			//诸葛亮
 			sbhuoji:{
 				audio:2,
@@ -5349,6 +5532,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbguanxing_info:'①准备阶段，你将武将牌上所有“星”置入弃牌堆，将牌堆顶的X张牌称为“星”置于你的武将牌上（X为你此次移去的“星”数+1且至多为7，若本次为第一次发动〖观星〗则X为7），然后你可以将任意张“星”置于牌堆顶，若你未将任意“星”置于牌堆顶，你可以于结束阶段将任意张“星”置于牌堆顶。②你可以如手牌般使用或打出“星”。',
 			sbkongcheng:'空城',
 			sbkongcheng_info:'锁定技，当你受到伤害时，若你拥有技能〖观星〗，则：若你有“星”，你进行一次判定，若判定结果点数小于等于你的“星”，则此伤害-1；没有“星”，此伤害+1。',
+			sb_huangyueying:'谋黄月英',
+			sb_huangyueying_prefix:'谋',
+			sbqicai:'奇才',
+			sbqicai_backup:'奇才',
+			sbqicai_info:'①出牌阶段限一次，你可以将手牌中或弃牌堆中的一张防具牌置于一名其他角色的装备栏，然后其须将之后获得的前三张基本锦囊牌交给你。②你使用锦囊牌无距离限制。',
+			sbjizhi:'集智',
+			sbjizhi_info:'锁定技，当你使用一张普通锦囊牌时，你摸一张牌，且此牌本回合不计入你的手牌上限。',
 
 			sb_zhi:'谋攻篇·知',
 			sb_shi:'谋攻篇·识',
