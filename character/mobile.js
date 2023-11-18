@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:['yanxiang','xin_wuban','laimin','baoxin','jiangji','liwei','xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
+				mobile_default:['re_xianglang','yanxiang','xin_wuban','laimin','baoxin','jiangji','liwei','xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan','yj_zhoubuyi'],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua_feng:['re_xiaoqiao',"xin_zhoutai"],
@@ -26,6 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			re_xianglang:['male','shu',3,['naxue','yijie'],[]],
 			yanxiang:['male','qun',3,['kujian','twruilian'],['character:tw_yanxiang','die_audio:tw_yanxiang']],
 			mb_sunluyu:['female','wu',3,['mbmeibu','mbmumu']],
 			xin_wuban:['male','shu',4,['xinjintao'],['clan:陈留吴氏','character:wuban']],
@@ -388,6 +389,78 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//向朗
+			naxue:{
+				audio:2,
+				trigger:{player:'phaseUseBefore'},
+				check:function(event,player){
+					var cards=player.getCards('h',card=>player.hasValueTarget(card));
+					if(!cards.length) return true;
+					if(!(player.hp>=2&&player.countCards('h')<=player.hp+1)) return false;
+					return game.hasPlayer(function(target){
+						if(target.hasJudge('lebu')||target==player) return false;
+						if(get.attitude(player,target)>4){
+							return (get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1)>0);
+						}
+						return false;
+					});
+				},
+				content:function*(event,map){
+					var player=map.player;
+					map.trigger.cancel();
+					var num=player.countDiscardableCards(player,'he');
+					if(num){
+						var result=yield player.chooseToDiscard('纳学：弃置任意张牌并摸等量的牌',[1,num],true).set('ai',lib.skill.zhiheng.check);
+						if(result.bool) player.draw(result.cards.length);
+					}
+					if(player.countCards('he')){
+						var result2=yield player.chooseCardTarget({
+							prompt:'纳学：将至多两张牌交给一名其他角色',
+							selectCard:[1,2],
+							filterCard:true,
+							filterTarget:lib.filter.notMe,
+							forced:true,
+							position:'he',
+							ai1:function(card){
+								if(card.name=='du') return 10;
+								else if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
+								var player=_status.event.player;
+								if(ui.selected.cards.length>4||!game.hasPlayer(function(current){
+									return get.attitude(player,current)>0&&!current.hasSkillTag('nogain');
+								})) return 0;
+								return 1/Math.max(0.1,get.value(card));
+							},
+							ai2:function(target){
+								var player=_status.event.player,att=get.attitude(player,target);
+								if(ui.selected.cards[0].name=='du') return -att;
+								if(target.hasSkillTag('nogain')) att/=6;
+								return att;
+							},
+						});
+						if(result2.bool) player.give(result2.cards,result2.targets[0]);
+					}
+				},
+			},
+			yijie:{
+				audio:2,
+				trigger:{player:'die'},
+				filter:function(event,player){
+					return game.hasPlayer(target=>target!=player);
+				},
+				forced:true,
+				forceDie:true,
+				content:function(){
+					var targets=game.filterPlayer(target=>target!=player);
+					var sum=targets.reduce((num,target)=>num+=target.hp,0);
+					sum=Math.max(1,Math.floor(sum/targets.length));
+					targets.forEach(target=>{
+						if(target.hp!=sum){
+							game.log(target,'将体力从',target.hp,'改为',sum);
+							target.changeHp(sum-target.hp)._triggered=null;
+						}
+					});
+				},
+			},
 			//阎象
 			kujian:{
 				audio:'twkujian',
@@ -15667,6 +15740,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanxiang:'阎象',
 			kujian:'苦谏',
 			kujian_info:'出牌阶段限一次，你可以将至多两张手牌称为“谏”并交给一名其他角色，然后你获得以下效果：当其他角色使用或打出牌后，若其中有“谏”，你与其各摸两张牌；当其他角色不因使用或打出而失去牌后，若其中有“谏”，你与其各弃置一张牌。',
+			re_xianglang:'手杀向朗',
+			re_xianglang_prefix:'手杀',
+			naxue:'纳学',
+			naxue_info:'你可以跳过出牌阶段。若如此做，你弃置任意张牌并摸等量的牌，然后交给一名其他角色至多两张牌。',
+			yijie:'遗诫',
+			yijie_info:'锁定技，当你死亡时，所有其他角色将体力调整为X（X为所有其他角色的体力值之和除以所有其他角色数，向下取整，且X至少为1）。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',
