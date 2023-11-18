@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sb',
 		connect:true,
 		character:{
-			sb_huangyueying:['female','shu',3,['sbqicai','sbjizhi'],[]],
+			sb_huangyueying:['female','shu',3,['sbqicai','sbjizhi'],['unseen']],
 			sb_sp_zhugeliang:['male','shu',3,['sbhuoji','sbkanpo'],['unseen']],
 			sb_zhugeliang:['male','shu',3,['sbguanxing','sbkongcheng'],['unseen']],
 			sb_zhanghe:['male','wei',4,['sbqiaobian']],
