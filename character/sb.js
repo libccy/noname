@@ -281,9 +281,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.awakenSkill('sbhuoji');
 							game.log(player,'成功完成使命');
 							var list=[];
-							if(player.name&&get.character(player.name)[1].includes('sbhuoji')) list.add(player.name);
-							if(player.name1&&get.character(player.name1)[1].includes('sbhuoji')) list.add(player.name1);
-							if(player.name2&&get.character(player.name2)[1].includes('sbhuoji')) list.add(player.name2);
+							if(player.name&&get.character(player.name)[3].includes('sbhuoji')) list.add(player.name);
+							if(player.name1&&get.character(player.name1)[3].includes('sbhuoji')) list.add(player.name1);
+							if(player.name2&&get.character(player.name2)[3].includes('sbhuoji')) list.add(player.name2);
 							if(list.length) list.forEach(name=>player.reinit(name,'sb_zhugeliang'));
 							else{
 								player.removeSkill(['sbhuoji','sbkanpo']);
