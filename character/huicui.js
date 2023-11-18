@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			kuaiqi:['male','wei',3,['dcliangxiu','dcxunjie']],
 			yue_caiyong:['male','qun',3,['dcjiaowei','dcfeibai']],
 			pangshanmin:['male','wei',3,['dccaisi','dczhuoli']],
 			dc_jiachong:['male','wei',3,['dcbeini','dcshizong']],
@@ -93,7 +94,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			huicui:{
 				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie','dc_caiyang','zhoushan'],
-				sp_caizijiaren:['re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin'],
+				sp_caizijiaren:['re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
 				sp_zhilan:['liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen'],
 				sp_guixin:['re_kanze','re_chendeng','caimaozhangyun','dc_lvkuanglvxiang','dc_gaolan','yinfuren','chengui','chenjiao','dc_sp_jiaxu','qinlang'],
 				sp_daihan:['mamidi','dc_jiling','zhangxun','dc_yuejiu','wanglie','leibo','qiaorui','dongwan','yuanyin'],
@@ -108,6 +109,162 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//蒯祺
+			dcliangxiu:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.hasCard(card=>{
+						const type=get.type2(card,player);
+						return player.hasCard(cardx=>{
+							if(card==cardx) return false;
+							return get.type2(cardx,player)!=type;
+						},'he');
+					},'he');
+				},
+				filterCard:function(card,player){
+					if(!ui.selected.cards.length) return true;
+					return get.type2(ui.selected.cards[0],player)!=get.type2(card,player);
+				},
+				selectCard:2,
+				check:function(card){
+					const player=get.player();
+					const bannedTypes=[];
+					bannedTypes.addArray(player.getStorage('dcliangxiu'));
+					if(!ui.selected.cards.length){
+						let val=get.value(card);
+						if(val>5.5) return 0;
+						if(bannedTypes.includes(get.type2(card,player))) return 7.5-val;
+						return 5.5-val;
+					}
+					bannedTypes.addArray(ui.selected.cards.map(card=>get.type2(card,player)));
+					bannedTypes.add(get.type2(card,player));
+					const filter=card=>!bannedTypes.includes(get.type2(card,player));
+					if(!get.cardPile(filter)) return 0;
+					return 6-get.value(card);
+				},
+				position:'he',
+				complexCard:true,
+				onremove:true,
+				content:function*(event,map){
+					const player=map.player;
+					const cards=[];
+					const bannedTypes=[];
+					bannedTypes.addArray(event.cards.map(card=>get.type2(card,player)));
+					bannedTypes.addArray(player.getStorage('dcliangxiu'));
+
+					const filter=card=>!bannedTypes.includes(get.type2(card,player));
+					const piles=['cardPile','discardPile'];
+					for(const pile of piles){
+						for(let i=0;i<ui[pile].childNodes.length;i++){
+							const card=ui[pile].childNodes[i];
+							if(filter(card)){
+								cards.add(card);
+								if(cards.length>=2) break;
+							}
+						}
+						if(cards.length>=2) break;
+					}
+					let result;
+					if(!cards.length){
+						player.chat('没牌了…');
+						game.log('但是哪里都找不到没有符合条件的牌！');
+						event.finish();
+						return;
+					}
+					else if(cards.length==1) result={bool:true,links:cards};
+					else result=yield player.chooseButton(['良秀：获得一张牌',cards],true).set('ai',get.buttonValue);
+					if(result.bool){
+						const toGain=result.links;
+						player.markAuto('dcliangxiu',get.type2(toGain[0],false));
+						player.when({global:'phaseChange'}).then(()=>{
+							player.unmarkSkill('dcliangxiu');
+						});
+						player.gain(toGain,'gain2');
+					}
+				},
+				intro:{
+					content:'已因此技能获得过$牌',
+					onunmark:true,
+				},
+				ai:{
+					order:2,
+					result:{player:1},
+				},
+			},
+			dcxunjie:{
+				audio:2,
+				trigger:{global:'phaseEnd'},
+				filter:function(event,player){
+					if(['handcard','hp'].every(i=>player.isTempBanned(`dcxunjie_${i}`))) return false;
+					return player.hasHistory('gain',evt=>{
+						return !evt.getParent('phaseDraw',true);
+					});
+				},
+				direct:true,
+				content:function*(event,map){
+					const player=map.player;
+					const choices=[];
+					const choiceList=[
+						'令一名角色将手牌数摸或弃置至与其体力值相同',
+						'令一名角色将体力值回复或失去至与其手牌数相同',
+					];
+					if(!player.isTempBanned('dcxunjie_handcard')) choices.push('选项一');
+					else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'（已被选择过）</span>';
+					if(!player.isTempBanned('dcxunjie_hp')) choices.push('选项二');
+					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'（已被选择过）</span>';
+					let result;
+					if(_status.connectMode) game.broadcastAll(()=>{_status.noclearcountdown=true});
+					if(choices.length==1) result={control:choices[0]};
+                    else result=yield player.chooseControl(choices,'cancel2').set('choiceList',choiceList).set('prompt',get.prompt('dcxunjie')).set('ai',()=>{
+						return get.event('choice');
+					}).set('choice',(()=>{
+						const getValue=(index,target)=>{
+							let att=get.attitude(player,target);
+							att=Math.sign(att)*Math.sqrt(Math.abs(att));
+							let delt=target.getHp(true)-target.countCards('h');
+							if(index==1&&delt<0) delt=0;
+							return (1-3*index)*att*delt;
+						}
+						const list=game.filterPlayer().map(current=>{
+							const val0=getValue(0,current),val1=getValue(1,current);
+							return [val0,val1,Math.max(val0,val1)];
+						}).sort((a,b)=>{
+							return b[2]-a[2];
+						});
+						const toChoose=list[0];
+						if(toChoose[2]<=0) return 'cancel2';
+						return toChoose[0]>toChoose[1]?0:1;
+					})());
+					if(result.control=='cancel2'){
+						if(_status.connectMode){game.broadcastAll(()=>{delete _status.noclearcountdown;game.stopCountChoose()})}
+						return event.finish();
+					}
+					let prompt='';
+					const choice=result.control,index=choice=='选项一'?0:1;
+					if(choices.length==1){
+						prompt=`###${get.prompt('dcxunjie')}###<div class="text center">${choiceList[index]}</div>`;
+					}
+					else prompt=`###殉节：请选择一名角色###<div class="text center">${choiceList[index].replace('一名','该')}</div>`;
+					result=yield player.chooseTarget(prompt).set('ai',target=>{
+						const player=get.player(),index=get.event('index');
+						let att=get.attitude(player,target);
+						att=Math.sign(att)*Math.sqrt(Math.abs(att));
+						let delt=target.getHp(true)-target.countCards('h');
+						if(index==1&&delt<0) delt=0;
+						return (1-2*index)*att*delt;
+					}).set('index',index);
+					if(_status.connectMode){game.broadcastAll(()=>{delete _status.noclearcountdown;game.stopCountChoose()})}
+					if(!result.bool) return event.finish();
+					const target=result.targets[0];
+					player.logSkill('dcxunjie',target);
+					player.tempBanSkill(`dcxunjie_${index==0?'handcard':'hp'}`,'roundStart',false);
+					const delt=(target.getHp(true)-target.countCards('h'))*(1-2*index);
+					if(delt==0) event.finish();
+					else if(index==0) target[delt>0?'draw':'chooseToDiscard'](Math.abs(delt),true);
+					else target[delt>0?'recover':'loseHp'](Math.abs(delt));
+				}
+			},
 			//乐蔡邕
 			dcjiaowei:{
 				audio:2,
@@ -1160,7 +1317,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(const cardx of ui.selected.cards){
 							const pos=get.position(cardx);
 							if(pos=='h') cardsh.add(cardx);
-                            else if(pos=='e') cardse.add(cardx);
+							else if(pos=='e') cardse.add(cardx);
 						}
 						const hs=player.countCards('h')-cardsh.length,es=Math.max(1,player.countCards('e')-cardse.length);
 						const delt=hs-es;
@@ -10597,6 +10754,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mengyou:'孟优，《三国演义》里的人物，南蛮王孟获之弟。与诸葛亮的南征军交战，向败战的兄长推荐朵思大王，劝兄长借助朵思之力与蜀汉军对抗。后来与兄长一起发誓归顺蜀汉。',
 			liuchongluojun:'刘宠（?~197年），汉明帝刘庄玄孙，陈敬王刘羡曾孙，陈顷王刘崇之孙，陈孝王刘承之子，陈国第六位国君，也是东汉陈国的最后一位国君。骆俊（?-197），字孝远，东汉末年扬州会稽郡乌伤县（今浙江义乌）人。宗室陈王刘宠的国相，在任期间励精图治，深得民众爱戴。刘宠勇猛过人，善使弓弩，箭法高超。在其父刘承死后，继承陈王爵位。中平年间，黄巾军起义，郡县官兵都弃城逃走，刘宠于是征兵自守卫。当时天下饥荒，诸王侯都已不再享有租赋，反屡遭抢掠，有的甚至流离在外，死于荒野。只有陈国仍很富强，邻郡百姓纷纷前去投靠，陈国拥有部众达十余万人。初平元年（190年），各州郡起兵讨伐董卓，刘宠率军屯驻阳夏，自称辅汉大将军。建安二年（197年），袁术向陈国求取粮草，遭陈国国相骆俊拒绝，袁术大为生气，便派刺客张闿假装路过陈国，乘机杀死骆俊和刘宠。',
 			yuechen:'乐綝（195~257年），字号不详，阳平郡卫国县（今河南省清丰县）人。三国时期曹魏将领，右将军乐进的儿子。果毅坚毅，袭封广昌亭侯，累迁扬州刺史。甘露二年，为叛乱的征东大将军诸葛诞所杀，追赠卫尉。',
+			kuaiqi:'蒯祺（?~219年），南郡中卢人，荆州望族子弟，与荆州牧刘表帐下谋士蒯良、蒯越为同族，东汉末年房陵太守。建安二十四年（219年），汉中王刘备遣宜都太守孟达从秭归北攻房陵，蒯祺于战斗中被孟达所部士兵所杀。清朝任兆麟《心斋十种》中的《襄阳记》辑本引用《万历襄阳府志》“（蒯）钦从祖祺妇，即诸葛孔明之姊也”，称蒯祺娶故兖州泰山郡丞诸葛珪长女，即他是知名政治家、蜀汉丞相诸葛亮的姐夫。但在任兆麟之前的《襄阳记》辑本中，并没有这一条。',
 		},
 		characterTitle:{
 		},
@@ -11086,6 +11244,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjiaowei_info:'锁定技。①游戏开始时，你将所有手牌标记为“弦”。②你的“弦”牌不计入手牌上限。③当你受到伤害时，若来源的手牌数不大于你的“弦”牌数，防止此伤害。',
 			dcfeibai:'飞白',
 			dcfeibai_info:'每回合限一次。当你使用牌结算结束后，若你本回合使用过至少两张牌，你可以随机获得一张字数为X的牌。若你的“弦”数不大于X，你重置〖飞白〗（X为此牌与你使用的上一张牌的字数之和）。',
+			kuaiqi:'蒯祺',
+			dcliangxiu:'良秀',
+			dcliangxiu_info:'出牌阶段，你可以弃置两张不同类型的牌，然后从两张与你弃置的牌类型均不同的牌中选择一张获得之（每阶段每种类型限一次）。',
+			dcxunjie:'殉节',
+			dcxunjie_info:'每轮每项限一次。一名角色的回合结束时，若你本回合于摸牌阶段外得到过牌，你可以选择一项：1.令一名角色将手牌数摸或弃置至与其体力值相同；2.令一名角色将体力值回复或失去至与其手牌数相同。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',

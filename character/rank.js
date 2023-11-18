@@ -633,6 +633,7 @@ window.noname_character_rank={
 		'nezha',
 		'dc_jiachong',
 		'pangshanmin',
+		'kuaiqi',
 	],
 	bp:[
 		'chess_diaochan',
