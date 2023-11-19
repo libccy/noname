@@ -8656,36 +8656,33 @@
 							else src=`image/${type}/${subfolder}/${name}${ext}`;
 						}
 						else src=`image/${name}${ext}`;
-						new Promise((resolve,reject)=>{
-							const image=new Image();
-							image.src=`${lib.assetURL}${src}`;
-							image.onload=resolve;
-							if(type=='character') image.onerror=reject;
-						}).then(()=>{
-							this.setBackgroundImage(src);
-							this.style.backgroundPositionX='center';
-							this.style.backgroundSize='cover';
-						}).catch(()=>new Promise((resolve,reject)=>{
-							const nameinfo=get.character(name);
-							const sex=nameinfo[0];
-							src=`image/character/default_silhouette_${sex}${ext}`;
-							const image=new Image();
-							image.src=`${lib.assetURL}${src}`;
-							image.onload=()=>resolve(src);
-							image.onerror=reject;
-						}).catch(()=>new Promise((resolve,reject)=>{
-							const nameinfo=get.character(name);
-							const sex=nameinfo[0];
-							src=`image/character/default_silhouette_${sex=='female'?'female':'male'}${ext}`;
-							const image=new Image();
-							image.src=`${lib.assetURL}${src}`;
-							image.onload=()=>resolve(src);
-							image.onerror=reject;
-						})).then((src)=>{
-							this.setBackgroundImage(src);
-							this.style.backgroundPositionX='center';
-							this.style.backgroundSize='cover';
-						}));
+						this.setBackgroundImage(src);
+						this.style.backgroundPositionX='center';
+						this.style.backgroundSize='cover';
+						if(type=='character'){
+							new Promise((_,reject)=>{
+								const image=new Image();
+								image.src=`${lib.assetURL}${src}`;
+								image.onerror=reject;
+							}).catch(()=>new Promise((_,reject)=>{
+								const nameinfo=get.character(name);
+								if(!nameinfo) reject('noinfo');
+								const sex=nameinfo[0];
+								src=`image/character/default_silhouette_${sex}${ext}`;
+								const image=new Image();
+								image.src=`${lib.assetURL}${src}`;
+								image.onload=()=>this.setBackgroundImage(src);
+								image.onerror=()=>reject(`sex:${sex}`);
+							})).catch(reason=>{
+								let sex;
+								if(reason=='noinfo') sex='male';
+								else sex=reason.slice(4);
+								src=`image/character/default_silhouette_${sex=='female'?'female':'male'}${ext}`;
+								const image=new Image();
+								image.src=`${lib.assetURL}${src}`;
+								image.onload=()=>this.setBackgroundImage(src);
+							});
+						}
 						return this;
 					}
 				});
