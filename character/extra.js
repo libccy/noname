@@ -143,11 +143,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:function(storage){
 								var str='<li>当前效果：'+storage;
-								var list=lib.skill.wuling.wuqinxiMap;
-								var list1=list.map(str2=>str2.slice(0,1));
-								var list2=list.map(str2=>str2.slice(2));
+								var list=lib.skill.wuling.wuqinxiMap.map(str2=>str2.slice(2));
 								str+='<br><li>';
-								str+=list2[list1.indexOf(storage)];
+								str+=list[lib.skill.wuling.wuqinxi.indexOf(storage)];
 								return str;
 							},
 						},
@@ -166,8 +164,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(event.name=='phase') return true;
 							switch(name){
 								case 'damageBegin1':
-									if(wuqinxi!='虎') return false;
-									return event.card&&event.targets&&event.targets.length==1&&event.targets.includes(event.player);
+									if(wuqinxi!='虎'||!event.card) return false;
+									var evt=event.getParent('useCard');
+									return evt.targets&&evt.targets.length==1&&evt.targets.includes(event.player);
 									break;
 								case 'damageBegin2':
 									return wuqinxi=='熊';
@@ -234,7 +233,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							effect:{
 								target:function(card,player,target){
 									var wuqinxi=target.storage.wuling_wuqinxi;
-									if(!wuqinxi&&wuqinxi!='熊') return;
+									if(!wuqinxi||wuqinxi!='熊') return;
 									if(player.hasSkillTag('jueqing',false,target)) return;
 									var num=get.tag(card,'damage');
 									if(num){
