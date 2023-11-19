@@ -8551,6 +8551,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jiwu:{
+				derivation:['qiangxix','retieji','olxuanfeng','rewansha'],
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
