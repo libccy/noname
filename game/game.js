@@ -59778,14 +59778,14 @@ new Promise(resolve=>{
 					case 'guandu':return '官渡之战';
 				}
 			}
-			else if(config.mode=='single'){
+			if(config.mode=='single'){
 				switch(config.single_mode){
 					case 'normal':return '新１ｖ１';
 					case 'changban':return '血战长坂坡';
 					case 'dianjiang':return '点将单挑';
 				}
 			}
-			else if(config.mode=='identity'){
+			if(config.mode=='identity'){
 				switch(config.identity_mode){
 					case 'purple':return '三对三对二';
 					case 'zhong':return (config.double_character?'双将':'')+'忠胆英杰';
@@ -59793,20 +59793,18 @@ new Promise(resolve=>{
 					default:return `${get.cnNumber(parseInt(config.number))}人${config.double_nei?'双内':''}${config.enable_commoner?'带民':''}${config.double_character?'双将':''}身份`;
 				}
 			}
-			else if(config.mode=='guozhan'){
+			if(config.mode=='guozhan'){
 				if(config.separatism) return '群雄割据';
 				if(config.guozhan_mode!='normal') switch(config.guozhan_mode){
 					case 'yingbian':return '应变国战';
 					case 'old':return '怀旧国战';
 				}
 			}
+			if(server){
+				return get.translation(config.mode)+'模式';
+			}
 			else{
-				if(server){
-					return get.translation(config.mode)+'模式';
-				}
-				else{
-					return get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode);
-				}
+				return get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode);
 			}
 		},
 		charactersOL:func=>{
