@@ -10490,9 +10490,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(red>2&&black>2) return 4-get.value(card);
 					if(red==0||black==0) return 8-get.value(card);
-					var color=get.color(red);
+					var color=get.color(card);
 					if(black<=red) return ((color=='black'&&get.position(card)=='h')?8:4)-get.value(card);
-					return ((color=='red'&&get.position(card)=='h'?8:4))-get.value(card);
+					return (color=='red'&&get.position(card)=='h'?8:4)-get.value(card);
 				},
 				content:function(){
 					player.draw();
