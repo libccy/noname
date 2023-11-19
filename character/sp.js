@@ -8149,8 +8149,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('义烈',[list,'vcard'],'hidden')
 					},
 					check:function(button){
+						let player=_status.event.player,hs=player.getCards('h',card=>{
+							return get.name(card)!==button.link[2]&&(!button.link[3]||get.hasNature(card,button.link[3]));
+						}),bool=false,map={};
+						for(let i of hs){
+							let color=get.color(i);
+							if(!map[color]) map[color]=true;
+							else{
+								bool=true;
+								break;
+							}
+						}
+						if(!bool) return 0;
 						if(button.link[2]=='shan') return 3;
-						var player=_status.event.player;
 						if(button.link[2]=='jiu'){
 							if(player.getUseValue({name:'jiu'})<=0) return 0;
 							if(player.countCards('h','sha')) return player.getUseValue({name:'jiu'});
@@ -8171,7 +8182,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							position:'hs',
 							complexCard:true,
-							check:(card)=>8-get.value(card),
+							check:(card)=>{
+								if(get.name(card)===lib.skill.yilie_backup.viewAs.name&&(!lib.skill.yilie_backup.viewAs.nature||game.hasNature(card,lib.skill.yilie_backup.viewAs.nature))) return -1;
+								return 8-get.value(card);
+							},
 							popname:true,
 							viewAs:{
 								name:links[0][2],
