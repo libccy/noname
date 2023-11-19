@@ -42,17 +42,20 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				node.style.overflow='hidden';
 
 				var connect=function(e){
-					const info=lib.config.reconnect_info;
-					if(info&&info[0]==node.textContent){
-						game.onlineID=info[1];
-						if(typeof (game.roomId=info[2])=='string') game.roomIdServer=true;
-					}
 					event.textnode.textContent='正在连接...';
 					clearTimeout(event.timeout);
 					if(e) e.preventDefault();
 					game.saveConfig('last_ip',node.textContent);
 					game.connect(node.textContent,function(success){
-						if(!success&&event.textnode){
+						if(success){
+							var info=lib.config.reconnect_info;
+							if(info&&info[0]==_status.ip){
+								game.onlineID=info[1];
+								if(typeof (game.roomId=info[2])=='string') game.roomIdServer=true;
+							}
+							return;
+						}
+						if(event.textnode){
 							alert('连接失败');
 							event.textnode.textContent='输入联机地址';
 						}
@@ -121,7 +124,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},220);
 				if (get.config('read_clipboard','connect')){
 					var ced=false;
-					function read(text){
+					var read=text=>{
 						try{
 							var text2=text.split('\n')[2];
 							var ip=text2.slice(5);
