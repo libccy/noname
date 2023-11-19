@@ -355,6 +355,83 @@
 			}],
 		},
 		/**
+		 * **无名杀频道推送机制**
+		 * 
+		 * 模拟`Golang`的`channel`，仅保留部分特征
+		 * 
+		 * @template T
+		 */
+		channel: class {
+			constructor() {
+				/**
+				 * @type {"active" | "receiving" | "sending"}
+				 */
+				this.status = "active";
+
+				/**
+				 * @type {Promise<T> | [T, Promise<void>] | null}
+				 */
+				this._buffer = null;
+			}
+
+			/**
+			 * @param {T} value
+			 * @returns {Promise<void>}
+			 */
+			send(value) {
+				return new Promise((resolve, reject) => {
+					switch (this.status) {
+						case "sending":
+							// TODO: handle the error.
+							reject(new Error());
+							break;
+						case "receiving":
+							/**
+							 * @type {Promise<T>}
+							 */
+							const buffer = this._buffer;
+							this._buffer = null;
+							buffer(value);
+							this.status = "active";
+							resolve();
+							break ;
+						case "active":
+							this.status = "sending";
+							this._buffer = [value, resolve];
+							break;
+					}
+				});
+			}
+
+			/**
+			 * @returns {Promise<T>}
+			 */
+			receive() {
+				return new Promise((resolve, reject) => {
+					switch (this.status) {
+						case "receiving":
+							// TODO: handle the error.
+							reject(new Error());
+							break;
+						case "sending":
+							/**
+							 * @type {[T, Promise<void>]}
+							 */
+							const buffer = this._buffer;
+							this._buffer = null;
+							resolve(buffer[0]);
+							this.status = "active";
+							buffer[1]();
+							break ;
+						case "active":
+							this.status = "receiving";
+							this._buffer = resolve;
+							break;
+					}
+				});
+			}
+		},
+		/**
 		 * **无名杀消息推送库**
 		 * 
 		 * 通过`EventTarget`机制，实现消息推送和接收的解耦，
