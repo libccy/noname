@@ -364,7 +364,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							return event.player!=player&&player.getStorage('sbkanpo').includes(event.card.name);
 						},
-						prompt:function(event,player){
+						prompt2:function(event,player){
 							return '移除'+get.translation(event.card.name)+'，令'+get.translation(event.card)+'失效';
 						},
 						check:function(event,player){
@@ -414,7 +414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(cards.length) player.loseToDiscardpile(cards);
 					var bool=player.getAllHistory('useSkill',evt=>evt.skill=='sbguanxing').length>1;
 					var num=Math.min(7,bool?cards.length+1:7);
-					var cards2=get.cards(num+1);
+					var cards2=get.cards(num);
 					player.$gain2(cards2,false);
 					game.log(player,'将',cards2,'置于了武将牌上');
 					player.loseToSpecial(cards2,'sbguanxing').visible=true;

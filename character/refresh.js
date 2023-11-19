@@ -171,9 +171,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//界凌统
 			olxuanfeng:{
-				audio:2,
+				audio:'xuanfeng',
+				audioname:['boss_lvbu3'],
 				audioname2:{
 					lingtong:'xuanfeng',
+					ol_lingtong:'rexuanfeng',
 				},
 				trigger:{
 					player:['loseAfter'],
@@ -5222,7 +5224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//贾诩
 			rewansha:{
 				audio:'wansha',
-				audioname:['re_jiaxu','shen_simayi','boss_lvbu2'],
+				audioname:['re_jiaxu','shen_simayi','boss_lvbu3'],
 				global:'rewansha_global',
 				trigger:{global:'dyingBegin'},
 				forced:true,
