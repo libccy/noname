@@ -27370,8 +27370,19 @@
 				}
 				addSkillLog(skill){
 					this.addSkill(skill);
-					this.popup(skill);
-					game.log(this,'获得了技能','#g【'+get.translation(skill)+'】');
+					if(!Array.isArray(skill)) skill=[skill];
+					skill.forEach(i=>{
+						this.popup(i);
+						game.log(this,'获得了技能','#g【'+get.translation(i)+'】');
+					});
+				}
+				removeSkillLog(skill,popop){
+					this.removeSkill(skill);
+					if(!Array.isArray(skill)) skill=[skill];
+					skill.forEach(i=>{
+						if(popop===true) this.popup(i);
+						game.log(this,'失去了技能','#g【'+get.translation(i)+'】');
+					});
 				}
 				addInvisibleSkill(skill){
 					if(Array.isArray(skill)){
@@ -27859,7 +27870,7 @@
 							this.removeAdditionalSkill(i);
 						}
 					}
-					this.removeSkill(list);
+					this[all?'removeSkill':'removeSkillLog'](list);
 					this.checkConflict();
 					this.checkMarks();
 					return list;
