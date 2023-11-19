@@ -5477,14 +5477,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						player.addTempSkill('taoluan3');
-						var next=player.loseHp();
-						event.next.remove(next);
-						event.getParent('phase').after.push(next);
+						player.loseHp();
 					}
 				}
 			},
 			taoluan3:{charlotte:true},
 			taoluan4:{
+				audio:'taoluan',
 				prompt:'将一张牌当做闪使用',
 				enable:'chooseToUse',
 				filter:function(event,player){
@@ -14238,11 +14237,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lianhuo:'链祸',
 			lianhuo_info:'锁定技，当你受到火焰伤害时，若你的武将牌处于横置状态且此伤害不为连环伤害，则此伤害+1。',
 			taoluan:'滔乱',
+			taoluan_backup:'滔乱',
 			taoluan4:'滔乱',
 			taoluan5:'滔乱',
 			taoluan_backup:'滔乱',
-			taoluan_info:'你可以将一张牌当做任意一张基本牌或普通锦囊牌使用（此牌不得是本局游戏你以此法使用过的牌），然后你令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别不同的牌；2.你于回合结束时失去1点体力且〖滔乱〗无效直到回合结束。',
+			taoluan_info:'你可以将一张牌当做任意一张基本牌或普通锦囊牌使用（此牌不得是本局游戏你以此法使用过的牌），然后你令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别不同的牌；2.你失去1点体力且〖滔乱〗无效直到回合结束。',
 			xintaoluan:'滔乱',
+			xintaoluan_backup:'滔乱',
 			xintaoluan4:'滔乱',
 			xintaoluan5:'滔乱',
 			xintaoluan_backup:'滔乱',
