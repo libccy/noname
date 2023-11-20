@@ -1,7 +1,7 @@
 "use strict";
-const nonameInitialized=localStorage.getItem('noname_inited');
-const assetURL=typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized;
 new Promise(resolve=>{
+	const nonameInitialized=localStorage.getItem('noname_inited');
+	const assetURL=typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized;
 	if('__core-js_shared__' in window) resolve();
 	else{
 		const coreJSBundle=document.createElement('script');
@@ -10,6 +10,8 @@ new Promise(resolve=>{
 		document.head.appendChild(coreJSBundle);
 	}
 }).then(()=>{
+	const nonameInitialized=localStorage.getItem('noname_inited');
+	const assetURL=typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized;
 	/**
 	 * @typedef {InstanceType<typeof lib.element.Player>} Player
 	 * @typedef {InstanceType<typeof lib.element.Card>} Card
