@@ -3256,38 +3256,6 @@ div:not(.handcards)>.card>.info>span,
 	left: calc(50% - 106px);
 }
 
-#window>.player.connect[data-position='0'] {
-	left: calc(25% - 120px);
-	top: calc(300% / 7 - 155px);
-}
-#window>.player.connect[data-position='1'] {
-	left: calc(50% - 60px);
-	top: calc(300% / 7 - 155px);
-}
-#window>.player.connect[data-position='2'] {
-	left: calc(75% - 0px);
-	top: calc(300% / 7 - 155px);
-}
-#window>.player.connect[data-position='3'] {
-	left: calc(25% - 120px);
-	top: calc(400% / 7 - 75px);
-}
-#window>.player.connect[data-position='4'] {
-	left: calc(75% - 0px);
-	top: calc(400% / 7 - 75px);
-}
-#window>.player.connect[data-position='5'] {
-	left: calc(25% - 120px);
-	top: calc(500% / 7 + 5px);
-}
-#window>.player.connect[data-position='6'] {
-	left: calc(50% - 60px);
-	top: calc(500% / 7 + 5px);
-}
-#window>.player.connect[data-position='7'] {
-	left: calc(75% - 0px);
-	top: calc(500% / 7 + 5px);
-}
 #window>.player.connect[data-position='c0'] {
 	left: calc(50% - 120px);
 	top: calc(50% - 200px)

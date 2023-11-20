@@ -115,8 +115,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'虎：使用仅指定唯一目标的牌对目标角色造成的伤害+1',
 					'鹿：回复1点体力并弃置判定区的所有牌；不能成为延时锦囊牌的目标',
 					'熊：受到伤害时，此伤害-1',
-					'猿：出牌阶段开始时，摸两张牌',
-					'鹤：出牌阶段开始时，选择一名角色，随机获得其装备区里的一张牌',
+					'猿：出牌阶段开始时，选择一名角色，随机获得其装备区里的一张牌',
+					'鹤：出牌阶段开始时，摸两张牌',
 				],
 				updateMark:function(player){
 					var wuqinxi=player.storage.wuling_wuqinxi;
@@ -143,11 +143,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:function(storage){
 								var str='<li>当前效果：'+storage;
-								var list=lib.skill.wuling.wuqinxiMap;
-								var list1=list.map(str2=>str2.slice(0,1));
-								var list2=list.map(str2=>str2.slice(2));
+								var list=lib.skill.wuling.wuqinxiMap.map(str2=>str2.slice(2));
 								str+='<br><li>';
-								str+=list2[list1.indexOf(storage)];
+								str+=list[lib.skill.wuling.wuqinxi.indexOf(storage)];
 								return str;
 							},
 						},
@@ -166,8 +164,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(event.name=='phase') return true;
 							switch(name){
 								case 'damageBegin1':
-									if(wuqinxi!='虎') return false;
-									return event.card&&event.targets&&event.targets.length==1&&event.targets.includes(event.player);
+									if(wuqinxi!='虎'||!event.card) return false;
+									var evt=event.getParent('useCard');
+									return evt.targets&&evt.targets.length==1&&evt.targets.includes(event.player);
 									break;
 								case 'damageBegin2':
 									return wuqinxi=='熊';
@@ -234,7 +233,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							effect:{
 								target:function(card,player,target){
 									var wuqinxi=target.storage.wuling_wuqinxi;
-									if(!wuqinxi&&wuqinxi!='熊') return;
+									if(!wuqinxi||wuqinxi!='熊') return;
 									if(player.hasSkillTag('jueqing',false,target)) return;
 									var num=get.tag(card,'damage');
 									if(num){
@@ -7809,8 +7808,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			'<br><li>虎：你使用仅指定唯一目标的牌对目标角色造成的伤害+1'+
 			'<br><li>鹿：获得或更换至此效果时，回复1点体力并弃置判定区的所有牌；你不能成为延时锦囊牌的目标'+
 			'<br><li>熊：当你受到伤害时，此伤害-1'+
-			'<br><li>猿：出牌阶段开始时，你摸两张牌'+
-			'<br><li>鹤：出牌阶段开始时，你选择一名角色，随机获得其装备区里的一张牌',
+			'<br><li>猿：出牌阶段开始时，你选择一名角色，随机获得其装备区里的一张牌'+
+			'<br><li>鹤：出牌阶段开始时，你摸两张牌',
 			youyi:'游医',
 			youyi_info:'①弃牌阶段结束时，你可以将所有于此阶段进入弃牌堆的牌置入仁区。②出牌阶段限一次，你可以将仁区的所有牌置入弃牌堆，然后令所有角色各回复1点体力。',
 			

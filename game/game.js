@@ -1,5 +1,15 @@
 "use strict";
-{
+const nonameInitialized=localStorage.getItem('noname_inited');
+const assetURL=typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized;
+new Promise(resolve=>{
+	if('__core-js_shared__' in window) resolve();
+	else{
+		const coreJSBundle=document.createElement('script');
+		coreJSBundle.onerror=coreJSBundle.onload=resolve;
+		coreJSBundle.src=`${assetURL}game/core-js-bundle.js`;
+		document.head.appendChild(coreJSBundle);
+	}
+}).then(()=>{
 	/**
 	 * @typedef {InstanceType<typeof lib.element.Player>} Player
 	 * @typedef {InstanceType<typeof lib.element.Card>} Card
@@ -36,7 +46,6 @@
 			}
 		}
 	}
-	const nonameInitialized=localStorage.getItem('noname_inited');
 	const GeneratorFunction=(function*(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
@@ -122,7 +131,7 @@
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
 		mirrorURL:'https://raw.fgit.cf/libccy/noname',
 		hallURL:'47.99.105.222',
-		assetURL:typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized,
+		assetURL:assetURL,
 		userAgent:userAgent,
 		compatibleEdition:Boolean(typeof nonameInitialized=='string'&&nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//)),
 		changeLog:[],
@@ -8656,36 +8665,33 @@
 							else src=`image/${type}/${subfolder}/${name}${ext}`;
 						}
 						else src=`image/${name}${ext}`;
-						new Promise((resolve,reject)=>{
-							const image=new Image();
-							image.src=`${lib.assetURL}${src}`;
-							image.onload=resolve;
-							if(type=='character') image.onerror=reject;
-						}).then(()=>{
-							this.setBackgroundImage(src);
-							this.style.backgroundPositionX='center';
-							this.style.backgroundSize='cover';
-						}).catch(()=>new Promise((resolve,reject)=>{
-							const nameinfo=get.character(name);
-							const sex=nameinfo[0];
-							src=`image/character/default_silhouette_${sex}${ext}`;
-							const image=new Image();
-							image.src=`${lib.assetURL}${src}`;
-							image.onload=()=>resolve(src);
-							image.onerror=reject;
-						}).catch(()=>new Promise((resolve,reject)=>{
-							const nameinfo=get.character(name);
-							const sex=nameinfo[0];
-							src=`image/character/default_silhouette_${sex=='female'?'female':'male'}${ext}`;
-							const image=new Image();
-							image.src=`${lib.assetURL}${src}`;
-							image.onload=()=>resolve(src);
-							image.onerror=reject;
-						})).then((src)=>{
-							this.setBackgroundImage(src);
-							this.style.backgroundPositionX='center';
-							this.style.backgroundSize='cover';
-						}));
+						this.setBackgroundImage(src);
+						this.style.backgroundPositionX='center';
+						this.style.backgroundSize='cover';
+						if(type=='character'){
+							new Promise((_,reject)=>{
+								const image=new Image();
+								image.src=`${lib.assetURL}${src}`;
+								image.onerror=reject;
+							}).catch(()=>new Promise((_,reject)=>{
+								const nameinfo=get.character(name);
+								if(!nameinfo) reject('noinfo');
+								const sex=nameinfo[0];
+								src=`image/character/default_silhouette_${sex}${ext}`;
+								const image=new Image();
+								image.src=`${lib.assetURL}${src}`;
+								image.onload=()=>this.setBackgroundImage(src);
+								image.onerror=()=>reject(`sex:${sex}`);
+							})).catch(reason=>{
+								let sex;
+								if(reason=='noinfo') sex='male';
+								else sex=reason.slice(4);
+								src=`image/character/default_silhouette_${sex=='female'?'female':'male'}${ext}`;
+								const image=new Image();
+								image.src=`${lib.assetURL}${src}`;
+								image.onload=()=>this.setBackgroundImage(src);
+							});
+						}
 						return this;
 					}
 				});
@@ -27370,8 +27376,19 @@
 				}
 				addSkillLog(skill){
 					this.addSkill(skill);
-					this.popup(skill);
-					game.log(this,'获得了技能','#g【'+get.translation(skill)+'】');
+					if(!Array.isArray(skill)) skill=[skill];
+					skill.forEach(i=>{
+						this.popup(i);
+						game.log(this,'获得了技能','#g【'+get.translation(i)+'】');
+					});
+				}
+				removeSkillLog(skill,popop){
+					this.removeSkill(skill);
+					if(!Array.isArray(skill)) skill=[skill];
+					skill.forEach(i=>{
+						if(popop===true) this.popup(i);
+						game.log(this,'失去了技能','#g【'+get.translation(i)+'】');
+					});
 				}
 				addInvisibleSkill(skill){
 					if(Array.isArray(skill)){
@@ -27859,7 +27876,7 @@
 							this.removeAdditionalSkill(i);
 						}
 					}
-					this.removeSkill(list);
+					this[all?'removeSkill':'removeSkillLog'](list);
 					this.checkConflict();
 					this.checkMarks();
 					return list;
@@ -32533,7 +32550,7 @@
 					}
 					if(game.online||game.onlineroom){
 						if((game.servermode||game.onlinehall)&&_status.over){
-
+							void 0;
 						}
 						else{
 							localStorage.setItem(lib.configprefix+'directstart',true);
@@ -35147,9 +35164,7 @@
 							}
 						}
 						if(!_status.requestReadClipboard&&get.config('read_clipboard','connect')){
-							//每次启动只请求一次
-							_status.requestReadClipboard=true;
-							function read(text){
+							const read=text=>{
 								try{
 									var roomId=text.split('\n')[1].match(/\d+/);
 									var caption=ui.rooms.find(caption=>caption.key==roomId);
@@ -35159,6 +35174,8 @@
 									}
 								}catch(e){console.log(e)}
 							}
+							//每次启动只请求一次
+							_status.requestReadClipboard=true;
 							if(_status.read_clipboard_text){
 								read(_status.read_clipboard_text);
 							}else{
@@ -37423,7 +37440,7 @@
 			ui.create.chat();
 
 			if(game.onlineroom){
-
+				void 0;
 			}
 			else{
 				var WebSocketServer=require('ws').Server;
@@ -44904,7 +44921,7 @@
 							config.item=config.item();
 						}
 						if(Array.isArray(config.init)){
-
+							void 0;
 						}
 						else{
 							node.classList.add('switcher');
@@ -44982,7 +44999,7 @@
 						}
 					}
 					else if(config.range){
-
+						void 0;
 					}
 					else if(config.clear){
 						if(node.innerHTML.length>=15) node.style.height='auto';
@@ -53749,19 +53766,15 @@
 			},
 			player:(position,noclick)=>new lib.element.Player(position,noclick),
 			connectPlayers:ip=>{
+				ui.updateConnectPlayerPositions();
 				game.connectPlayers=[];
-				let numberOfPlayers=lib.configOL.number;
-				const gameMode=lib.configOL.mode;
-				if(gameMode=='guozhan'||(gameMode=='identity'&&(lib.configOL.identity_mode!='zhong'&&lib.configOL.identity_mode!='purple'))){
-					numberOfPlayers=10;
-				}
-				ui.updateConnectPlayerPositions(numberOfPlayers);
+				const configOL=lib.configOL;
+				const numberOfPlayers=parseInt(configOL.player_number)||configOL.number;
 				for(let position=0;position<numberOfPlayers;position++){
 					const player=ui.create.player(ui.window);
 					player.dataset.position=position;
 					player.classList.add('connect');
 					game.connectPlayers.push(player);
-					if(position>=lib.configOL.number) player.classList.add('unselectable2');
 				}
 
 				var bar=ui.create.div(ui.window);
@@ -53793,7 +53806,7 @@
 						for(var i of game.connectPlayers){
 							if(!i.nickname&&!i.classList.contains('unselectable2')) num++;
 						}
-						if(num>=numberOfPlayers-1){
+						if(num>=lib.configOL.number-1){
 							alert('至少要有两名玩家才能开始游戏！');
 							return;
 						}
@@ -58534,7 +58547,10 @@
 		 * @param {number} [numberOfPlayers]
 		 */
 		updateConnectPlayerPositions:numberOfPlayers=>{
-			if(typeof numberOfPlayers!='number') numberOfPlayers=lib.configOL.number;
+			if(typeof numberOfPlayers!='number'){
+				const configOL=lib.configOL;
+				numberOfPlayers=parseInt(configOL.player_number)||configOL.number;
+			}
 			if(!numberOfPlayers) return;
 			const playerPositions=ui.playerPositions;
 			playerPositions.forEach((position) => {
@@ -59770,14 +59786,14 @@
 					case 'guandu':return '官渡之战';
 				}
 			}
-			else if(config.mode=='single'){
+			if(config.mode=='single'){
 				switch(config.single_mode){
 					case 'normal':return '新１ｖ１';
 					case 'changban':return '血战长坂坡';
 					case 'dianjiang':return '点将单挑';
 				}
 			}
-			else if(config.mode=='identity'){
+			if(config.mode=='identity'){
 				switch(config.identity_mode){
 					case 'purple':return '三对三对二';
 					case 'zhong':return (config.double_character?'双将':'')+'忠胆英杰';
@@ -59785,20 +59801,18 @@
 					default:return `${get.cnNumber(parseInt(config.number))}人${config.double_nei?'双内':''}${config.enable_commoner?'带民':''}${config.double_character?'双将':''}身份`;
 				}
 			}
-			else if(config.mode=='guozhan'){
+			if(config.mode=='guozhan'){
 				if(config.separatism) return '群雄割据';
 				if(config.guozhan_mode!='normal') switch(config.guozhan_mode){
 					case 'yingbian':return '应变国战';
 					case 'old':return '怀旧国战';
 				}
 			}
+			if(server){
+				return get.translation(config.mode)+'模式';
+			}
 			else{
-				if(server){
-					return get.translation(config.mode)+'模式';
-				}
-				else{
-					return get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode);
-				}
+				return get.cnNumber(parseInt(config.number))+'人'+get.translation(config.mode);
 			}
 		},
 		charactersOL:func=>{
@@ -63444,11 +63458,5 @@
 	setAllPropertiesEnumerable(lib.element.Control.prototype);
 	setAllPropertiesEnumerable(lib.element.Client.prototype);
 	setAllPropertiesEnumerable(lib.element.NodeWS.prototype);
-	if('__core-js_shared__' in window) lib.init.init();
-	else{
-		const coreJSBundle=document.createElement('script');
-		coreJSBundle.onerror=coreJSBundle.onload=lib.init.init;
-		coreJSBundle.src=`${lib.assetURL}game/core-js-bundle.js`;
-		document.head.appendChild(coreJSBundle);
-	}
-}
+	lib.init.init();
+});
