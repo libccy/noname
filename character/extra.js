@@ -128,7 +128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(wuqinxi=='鹿'){
 						player.logSkill('wuling_wuqinxi');
 						player.recover();
-						player.discard(player.getCards('j'));
+						player.discard(player.getCards('j')).discarder=player;
 					}
 				},
 				ai:{
@@ -156,7 +156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						trigger:{
 							source:'damageBegin1',
-							player:['phaseBegin','damageBegin2','phaseUseBegin'],
+							player:['phaseBegin','damageBegin4','phaseUseBegin'],
 						},
 						filter:function(event,player,name){
 							var wuqinxi=player.storage.wuling_wuqinxi;
@@ -167,15 +167,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(wuqinxi!='虎'||!event.card) return false;
 									var evt=event.getParent('useCard');
 									return evt.targets&&evt.targets.length==1&&evt.targets.includes(event.player);
-									break;
-								case 'damageBegin2':
+								case 'damageBegin4':
 									return wuqinxi=='熊';
-									break;
 								default:
 									if(wuqinxi=='鹤') return true;
 									if(wuqinxi!='猿') return false;
 									return game.hasPlayer(target=>target.countGainableCards(player,'e'));
-									break;
 							}
 						},
 						forced:true,
@@ -197,7 +194,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										trigger.num++;
 										event.finish();
 										break;
-									case 'damageBegin2':
+									case 'damageBegin4':
 										trigger.num--;
 										event.finish();
 										break;
@@ -259,11 +256,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var cards=_status.renku.slice();
-					game.cardsDiscard(cards);
+					game.cardsDiscard(cards).fromRenku=true;
 					_status.renku.removeArray(cards);
 					player.$throw(cards,1000);
 					game.updateRenku();
-					game.log(cards,'被置入了弃牌堆');
+					game.log(cards,'从仁库进入了弃牌堆');
 					'step 1'
 					var targets=game.filterPlayer();
 					player.line(targets);

@@ -411,7 +411,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=player.countDiscardableCards(player,'he');
 					if(num){
 						var result=yield player.chooseToDiscard('纳学：弃置任意张牌并摸等量的牌',[1,num],true).set('ai',lib.skill.zhiheng.check);
-						if(result.bool) player.draw(result.cards.length);
+						if(result.bool) yield player.draw(result.cards.length);
 					}
 					if(player.countCards('he')){
 						var result2=yield player.chooseCardTarget({
@@ -449,16 +449,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				forceDie:true,
+				skillAnimation:true,
+				animationColor:'orange',
+				logTarget:function(event,player){
+					return game.filterPlayer(target=>target!=player);
+				},
 				content:function(){
+					'step 0'
 					var targets=game.filterPlayer(target=>target!=player);
 					var sum=targets.reduce((num,target)=>num+=target.hp,0);
 					sum=Math.max(1,Math.floor(sum/targets.length));
-					targets.forEach(target=>{
-						if(target.hp!=sum){
-							game.log(target,'将体力从',target.hp,'改为',sum);
-							target.changeHp(sum-target.hp)._triggered=null;
-						}
-					});
+					event.num=sum;
+					event.targets=targets;
+					'step 1'
+					var target=targets.shift();
+					var delta=target.hp-num;
+					if(delta!=0){
+						target[delta>0?'loseHp':'recover'](Math.abs(delta));
+					}
+					if(targets.length) event.redo();
 				},
 			},
 			//阎象
@@ -15745,7 +15754,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			naxue:'纳学',
 			naxue_info:'你可以跳过出牌阶段。若如此做，你弃置任意张牌并摸等量的牌，然后交给一名其他角色至多两张牌。',
 			yijie:'遗诫',
-			yijie_info:'锁定技，当你死亡时，所有其他角色将体力调整为X（X为所有其他角色的体力值之和除以所有其他角色数，向下取整，且X至少为1）。',
+			yijie_info:'锁定技。当你死亡时，你令所有其他角色将体力回复或失去至X（X为所有其他角色的体力之和除以所有其他角色数，向下取整，且X至少为1）。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',

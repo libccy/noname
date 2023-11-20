@@ -61,32 +61,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.type2(card)=='trick') return true;
 					},
 				},
-				init:function(player){
-					var skill='sbqicai_'+player.playerid;
-					if(!lib.skill[skill]){
-						lib.skill[skill]={
-							onremove:true,
-							mark:true,
-							marktext:'奇',
-							intro:{
-								markcount:function(storage){
-									return (storage||0).toString();
-								},
-								content:function(storage){
-									return '已被掠夺'+(storage||0)+'张普通锦囊牌';
-								},
-							},
-						};
-						lib.translate[skill]='奇才';
-						lib.translate[skill+'_bg']='奇';
-					}
-				},
 				getLimit:3,
 				audio:2,
 				enable:'phaseUse',
+				onChooseToUse:function(event){
+					if(!event.sbqicai&&!game.online){
+						const player=get.player();
+						const cards=Array.from(ui.discardPile.childNodes).filter(card=>lib.skill.sbqicai.filterCardx(card,player));
+						event.set('sbqicai',cards);
+					}
+				},
 				filter:function(event,player){
 					if(!game.hasPlayer(target=>target!=player&&target.hasEmptySlot(2))) return false;
-					return player.countCards('h',card=>lib.skill.sbqicai.filterCardx(card,player))||Array.from(ui.discardPile.childNodes).some(card=>lib.skill.sbqicai.filterCardx(card,player));
+					return player.countCards('h',card=>lib.skill.sbqicai.filterCardx(card,player))||event.sbqicai&&event.sbqicai.length;
 				},
 				filterCardx:function(card,player){
 					if(player.getStorage('sbqicai').includes(card.name)) return false;
@@ -95,8 +82,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				chooseButton:{
 					dialog:function(event,player){
-						var list1=player.getCards('h',card=>lib.skill.sbqicai.filterCardx(card,player));
-						var list2=Array.from(ui.discardPile.childNodes).filter(card=>lib.skill.sbqicai.filterCardx(card,player));
+						const list1=player.getCards('h',card=>lib.skill.sbqicai.filterCardx(card,player));
+						const list2=event.sbqicai;
 						var dialog=ui.create.dialog('###奇才###<div class="text center">请选择一张防具牌置入一名其他角色的装备区</div>');
 						if(list1.length){
 							dialog.add('<div class="text center">手牌区</div>');
@@ -105,6 +92,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(list2.length){
 							dialog.add('<div class="text center">弃牌堆</div>');
 							dialog.add(list2);
+							if(list1.length) dialog.classList.add('fullheight');
 						}
 						return dialog;
 					},
@@ -143,7 +131,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.markAuto('sbqicai',[cards[0].name]);
 								target.equip(cards[0]);
 								player.addSkill('sbqicai_gain');
-								target.addSkill('sbqicai_'+player.playerid);
+								lib.skill.sbqicai.updateCounter(player,target,0);
 							},
 							ai:{
 								result:{
@@ -161,6 +149,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return '请选择置入'+get.translation(links)+'的角色';
 					},
 				},
+				updateCounter:function(player,target,num){
+					const skill=`sbqicai_${player.playerid}`;
+					game.broadcastAll(lib.skill.sbqicai.initSkill,skill);
+					if(!target.hasSkill(skill)) target.addSkill(skill);
+					if(num==0) target.clearMark(skill,false);
+					else if(num>0) target.addMark(skill,num,false);
+					if(target.countMark(skill)>=lib.skill.sbqicai.getLimit) target.removeSkill(skill);
+					if(!_status.postReconnect.sbqicai){
+						_status.postReconnect.sbqicai=[
+							lib.skill.sbqicai.initSkill,
+							[]
+						];
+					}
+					_status.postReconnect.sbqicai[1].add(skill);
+				},
+				initSkill:skill=>{
+					if(!lib.skill[skill]){
+						lib.skill[skill]={
+							onremove:true,
+							mark:true,
+							marktext:'奇',
+							intro:{
+								markcount:function(storage){
+									return (storage||0).toString();
+								},
+								content:function(storage){
+									return '已被掠夺'+get.cnNumber(storage||0)+'张普通锦囊牌';
+								},
+							},
+						};
+						lib.translate[skill]='奇才';
+						lib.translate[skill+'_bg']='奇';
+					}
+				},
 				ai:{
 					order:7,
 					result:{
@@ -170,6 +192,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				marktext:'才',
 				intro:{content:'已使用$发动过此技能'},
 				subSkill:{
 					gain:{
@@ -183,14 +206,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 						},
 						forced:true,
+						direct:true,
+						charlotte:true,
 						content:function(){
 							'step 0'
+							if(!event.checkedTargets) event.checkedTargets=[];
 							var target=game.findPlayer(function(current){
 								if(!trigger.getg(current).length||!current.hasSkill('sbqicai_'+player.playerid)) return false;
+								if(event.checkedTargets.includes(current)) return false;
 								if(current.countMark('sbqicai_'+player.playerid)>=lib.skill.sbqicai.getLimit) return false;
 								return trigger.getg(current).some(card=>get.type(card)=='trick'&&lib.filter.canBeGained(card,current,player));
 							});
+							if(!target){
+								event.finish();
+                                return;
+							}
 							event.target=target;
+							player.logSkill('sbqicai_gain',target);
+							event.checkedTargets.add(target);
 							var cards=trigger.getg(target).filter(card=>get.type(card)=='trick'&&lib.filter.canBeGained(card,target,player));
 							if(cards.length<=lib.skill.sbqicai.getLimit-target.countMark('sbqicai_'+player.playerid)) event._result={bool:true,links:cards};
 							else{
@@ -201,9 +234,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							'step 1'
 							if(result.bool){
+								game.delaye(0.5);
 								target.give(result.links,player);
-								target.addMark('sbqicai_'+player.playerid,result.links.length,false);
+								lib.skill.sbqicai.updateCounter(player,target,result.links.length);
 							}
+							event.goto(0);
 						},
 					},
 				},
@@ -365,7 +400,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.player!=player&&player.getStorage('sbkanpo').includes(event.card.name);
 						},
 						prompt2:function(event,player){
-							return '移除'+get.translation(event.card.name)+'，令'+get.translation(event.card)+'失效';
+							return '移除'+get.translation(event.card.name)+'的记录，令'+get.translation(event.card)+'无效';
 						},
 						check:function(event,player){
 							var effect=0;
@@ -423,12 +458,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=player.getCards('s',card=>card.hasGaintag('sbguanxing'));
 					if(cards.length){
 						player.chooseToMove().set('list',[
-							['“星”',cards],
+							['你的“星”',cards],
 							['牌堆顶'],
 						]).set('prompt','观星：点击将牌移动到牌堆顶').set('processAI',function(list){
 							var cards=list[0][1].slice(),player=_status.event.player;
 							var name=_status.event.getTrigger().name;
-							var target=(name=='phaseBegin'?player:target);
+							var target=(name=='phaseZhunbei'?player:target);
 							var top=[],att=get.sgn(get.attitude(player,target));
 							if(att!=0&&(target!=player||!player.hasWuxie())){
 								for(var i=0;i<judges.length;i++){
@@ -447,12 +482,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						var cards=result.moved[1];
-						player.$throw(cards,1000);
-						for(var i=cards.length-1;i>=0;i--){
-							player.lose([cards[i]],ui.cardPile,'insert');
-						}
+						player.loseToDiscardpile(cards,ui.cardPile,'insert').log=false;
+						game.log(player,'将',cards,'置于了牌堆顶');
 					}
-					else if(trigger.name=='phaseBegin') player.addTempSkill('sbguanxing_on');
+					else if(trigger.name=='phaseZhunbei') player.addTempSkill('sbguanxing_on');
 				},
 				group:'sbguanxing_unmark',
 				subSkill:{
@@ -495,22 +528,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbkongcheng:{
 				audio:2,
-				trigger:{player:'damageBegin2'},
-				filter:function(event,player){
+				trigger:{player:['damageBegin3','damageBegin4']},
+				filter:function(event,player,name){
 					return player.hasSkill('sbguanxing');
 				},
 				forced:true,
 				content:function(){
 					'step 0'
 					var num=player.countCards('s',card=>card.hasGaintag('sbguanxing'));
-					event.num=num;
-					if(!num){
-						trigger.num++;
-						event.finish();
+					if(!num&&event.triggername=='damageBegin3'){
+						trigger.increase('num');
 					}
-					else player.judge();
-					'step 1'
-					if(result.number<=num) trigger.num--;
+					else if(num&&event.triggername=='damageBegin4'){
+						player.judge(function(result){
+							if(get.number(result)<=get.player().countCards('s',card=>card.hasGaintag('sbguanxing'))) return 2;
+							return -1;
+						}).set('judge2',result=>result.bool).set('callback',function(){
+							if(event.judgeResult.number<=player.countCards('s',card=>card.hasGaintag('sbguanxing'))){
+								event.getParent('sbkongcheng').getTrigger().decrease('num');
+							}
+						});
+					}
 				},
 			},
 			//卢植
@@ -5571,14 +5609,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbkanpo:'看破',
 			sbkanpo_info:'①一轮开始时，你清除“看破”记录的牌名，然后你可以记录三个非此次移去的牌名的牌名。②一名其他角色使用你“看破”记录的牌名的牌时，你可以从“看破”中移去此牌名，令此牌无效。',
 			sbguanxing:'观星',
-			sbguanxing_info:'①准备阶段，你将武将牌上所有“星”置入弃牌堆，将牌堆顶的X张牌称为“星”置于你的武将牌上（X为你此次移去的“星”数+1且至多为7，若本次为第一次发动〖观星〗则X为7），然后你可以将任意张“星”置于牌堆顶，若你未将任意“星”置于牌堆顶，你可以于结束阶段将任意张“星”置于牌堆顶。②你可以如手牌般使用或打出“星”。',
+			sbguanxing_info:'①准备阶段，你将所有“星”置入弃牌堆，将牌堆顶的X张牌置于你的武将牌上，称为“星”。然后你可以将任意张“星”置于牌堆顶（X为你此次移去的“星”数+1且至多为7，若你此前未发动过〖观星①〗则X为7）。②结束阶段，若你未于本回合的准备阶段将“星”置于过牌堆顶，你可以将任意张“星”置于牌堆顶。③你可以如手牌般使用或打出“星”。',
 			sbkongcheng:'空城',
-			sbkongcheng_info:'锁定技，当你受到伤害时，若你拥有技能〖观星〗，则：若你有“星”，你进行一次判定，若判定结果点数小于等于你的“星”，则此伤害-1；没有“星”，此伤害+1。',
+			sbkongcheng_info:'锁定技。当你受到伤害时，若你有〖观星〗，且若你：有“星”，你判定，若结果点数不大于你的“星”数，此伤害-1；没有“星”，此伤害+1。',
 			sb_huangyueying:'谋黄月英',
 			sb_huangyueying_prefix:'谋',
 			sbqicai:'奇才',
 			sbqicai_backup:'奇才',
-			sbqicai_info:'①出牌阶段限一次，你可以将手牌中或弃牌堆中的一张防具牌置于一名其他角色的装备栏，然后其须将之后获得的前三张基本锦囊牌交给你。②你使用锦囊牌无距离限制。',
+			sbqicai_info:'①出牌阶段限一次。你可以将手牌中或弃牌堆中的一张防具牌置于一名其他角色的防具栏，然后其获得如下效果：当其得到普通锦囊牌后，其将此牌交给你（限三张）。②你使用锦囊牌无距离限制。',
 			sbjizhi:'集智',
 			sbjizhi_info:'锁定技，当你使用一张普通锦囊牌时，你摸一张牌，且此牌本回合不计入你的手牌上限。',
 

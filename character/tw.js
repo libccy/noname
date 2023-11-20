@@ -956,7 +956,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.checkGlobalHistory('cardMove',function(evt){
 						if(evt.name=='cardsDiscard'&&evt.getParent('phaseDiscard')==event) cards.addArray(evt.cards);
 					});
-					return cards;
+					return cards.filterInD('d');
 				},
 				audio:2,
 				sunbenSkill:true,
