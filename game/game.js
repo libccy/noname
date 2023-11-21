@@ -28761,7 +28761,7 @@ new Promise(resolve=>{
 						if(selected.includes(card)) return false;
 						let name=get.name(card,this);
 						if(name==='shan'||name==='hufu'){
-							if(type==='use') return lib.filter.cardEnabled(card,this);
+							if(type==='use') return lib.filter.cardEnabled(card,this,'forceEnable');
 							if(type==='respond') return lib.filter.cardRespondable(card,this);
 							return true;
 						}
