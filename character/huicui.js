@@ -10798,7 +10798,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mamidi:['mamidi','xin_mamidi'],
 			mengyou:['mengyou','ns_mengyou'],
 			zhangchu:['zhangchu','jsrg_zhangchu'],
-			xianglang:['xianglang','re_xianglang'],
+			xianglang:['xianglang','mb_xianglang'],
 		},
 		translate:{
 			re_panfeng:'潘凤',
