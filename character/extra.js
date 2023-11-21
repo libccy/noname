@@ -274,14 +274,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					die:{
 						trigger:{player:'die'},
 						filter:function(event,player){
-							return game.hasPlayer(current=>current.additionalSkills(`wuling_${player.playerid}`));
+							return game.hasPlayer(current=>current.additionalSkills[`wuling_${player.playerid}`]);
 						},
 						forced:true,
 						locked:false,
 						forceDie:true,
 						content:function(){
 							var targets=game.filterPlayer(current=>{
-								return current.additionalSkills(`wuling_${player.playerid}`);
+								return current.additionalSkills[`wuling_${player.playerid}`];
 							});
 							player.line(targets);
 							targets.forEach(current=>current.removeAdditionalSkill(`wuling_${player.playerid}`));
