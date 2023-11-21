@@ -410,17 +410,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					map.trigger.cancel();
 					var num=player.countDiscardableCards(player,'he');
 					if(num){
-						var result=yield player.chooseToDiscard('纳学：弃置任意张牌并摸等量的牌',[1,num],true).set('ai',lib.skill.zhiheng.check);
+						var result=yield player.chooseToDiscard('纳学：是否弃置任意张牌并摸等量的牌？','he',[1,num]).set('ai',lib.skill.zhiheng.check);
 						if(result.bool) yield player.draw(result.cards.length);
 					}
-					if(player.countCards('he')){
+					if(player.countCards('h')){
 						var result2=yield player.chooseCardTarget({
-							prompt:'纳学：将至多两张牌交给一名其他角色',
+							prompt:'是否交给至多两名其他角色各一张手牌？',
+							prompt2:'先按顺序选中所有要给出的牌，然后再按顺序选择等量的目标角色。',
 							selectCard:[1,2],
 							filterCard:true,
 							filterTarget:lib.filter.notMe,
-							forced:true,
-							position:'he',
+							selectTarget:function(){
+								return ui.selected.cards.length;
+							},
+							filterOk:()=>{
+								return ui.selected.cards.length==ui.selected.targets.length;
+							},
+							position:'h',
 							ai1:function(card){
 								if(card.name=='du') return 10;
 								else if(ui.selected.cards.length&&ui.selected.cards[0].name=='du') return 0;
@@ -437,7 +443,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return att;
 							},
 						});
-						if(result2.bool) player.give(result2.cards,result2.targets[0]);
+						if(result2.bool){
+							const list=[];
+							for(let i=0;i<result2.targets.length;i++){
+								list.push([result2.targets[i],result2.cards[i]]);
+								player.line(result2.targets[i]);
+							}
+							game.loseAsync({
+								gain_list:list,
+								player:player,
+								cards:result2.cards,
+								giver:player,
+								animate:'giveAuto',
+							}).setContent('gaincardMultiple');
+						}
 					}
 				},
 			},
@@ -15752,7 +15771,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_xianglang:'手杀向朗',
 			re_xianglang_prefix:'手杀',
 			naxue:'纳学',
-			naxue_info:'你可以跳过出牌阶段。若如此做，你弃置任意张牌并摸等量的牌，然后交给一名其他角色至多两张牌。',
+			naxue_given:'已分配',
+			naxue_info:'你可以跳过出牌阶段。若如此做，你可以弃置任意张牌并摸等量的牌，然后你可以交给至多两名其他角色各一张手牌。',
 			yijie:'遗诫',
 			yijie_info:'锁定技。当你死亡时，你令所有其他角色将体力回复或失去至X（X为所有其他角色的体力之和除以所有其他角色数，向下取整，且X至少为1）。',
 			
