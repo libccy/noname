@@ -386,9 +386,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const event=get.event();
 						const controls=[link=>{
 							const evt=get.event();
-							let result=evt.result;
-							if(!result) result={};
-							if(link=='cancel2') result.bool=false;
+							if(link=='cancel2') ui.click.cancel();
 							else{
 								if(evt.dialog&&evt.dialog.buttons){
 									for(let i=0;i<evt.dialog.buttons.length;i++){
@@ -405,9 +403,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								return;
 							}
-							event.controls.forEach(i=>i.close());
-							game.resume();
-							_status.imchoosing=false;
 						}];
 						event.controls=['清除选择','cancel2'].map(control=>{
 							return ui.create.control(controls.concat(control=='清除选择'?[control,'stayleft']:control));
@@ -438,8 +433,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						add:{
 							confirm:function(bool){
 								if(bool!=true) return;
-								const event=get.event().getParent();
+								const event=get.event().parent;
 								if(event.controls) event.controls.forEach(i=>i.close());
+								if(ui.confirm) ui.confirm.close();
+								game.uncheck();
 							},
 							button:function(){
 								const event=get.event();
@@ -454,7 +451,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									}
 								}
 								if(!ui.selected.buttons.length){
-									const evt=event.getParent();
+									const evt=event.parent;
 									if(evt.controls) evt.controls[0].hide();
 								}
 							},
@@ -462,7 +459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						replace:{
 							button:function(button){
 								const event=get.event();
-								if(!_status.event.isMine()) return;
+								if(!event.isMine()) return;
 								if(button.classList.contains('selectable')==false) return;
 								if(ui.selected.buttons.length>=lib.skill.sbkanpo.getNumber) return false;
 								button.classList.add('selected');
@@ -471,7 +468,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(counterNode){
 									counterNode.innerHTML=`<span style="font-size:24px; font-family:xinwei; text-shadow:#FFF 0 0 5px;">×${ui.selected.buttons.filter(i=>i==button).length}</span>`;
 								}
-								const evt=get.event().getParent();
+								const evt=event.parent;
 								if(evt.controls) evt.controls[0].show();
 								game.check();
 							},
