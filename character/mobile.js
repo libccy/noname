@@ -15771,7 +15771,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mb_xianglang:'手杀向朗',
 			mb_xianglang_prefix:'手杀',
 			naxue:'纳学',
-			naxue_given:'已分配',
 			naxue_info:'你可以跳过出牌阶段。若如此做，你可以弃置任意张牌并摸等量的牌，然后你可以交给至多两名其他角色各一张手牌。',
 			yijie:'遗诫',
 			yijie_info:'锁定技。当你死亡时，你令所有其他角色将体力回复或失去至X（X为所有其他角色的体力之和除以所有其他角色数，向下取整，且X至少为1）。',
