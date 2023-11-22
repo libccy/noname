@@ -101,38 +101,91 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !target.hasSkill('wuling_wuqinxi');
 				},
 				usable:1,
+				prompt:'选择一名角色，向其传授“五禽戏”',
+				group:'wuling_die',
 				content:function(){
 					'step 0'
-					target.addSkill('wuling_wuqinxi');
-					player.chooseControl(lib.skill.wuling.wuqinxi).set('prompt','五灵：请选择'+get.translation(target)+'的初始五禽戏效果').set('ai',()=>['鹿','熊'].randomGet()).set('choiceList',lib.skill.wuling.wuqinxiMap);
+					target.addAdditionalSkill(`wuling_${player.playerid}`,'wuling_wuqinxi');
+					var next=player.chooseToMove(`五灵：调整向${get.translation(target)}传授的“五禽戏”顺序`);
+					next.set('list',[
+						['',[lib.skill.wuling.wuqinxi,(item,type,position,noclick,node)=>{
+							node=ui.create.buttonPresets.vcard(item,type,position,noclick);
+							node._customintro=[
+								node=>`五禽戏：${node.link[2]}`,
+								node=>lib.skill.wuling.wuqinxiMap[lib.skill.wuling.wuqinxi.indexOf(node.link[2])].slice(2)
+							];
+							return node;
+						}]]
+					]);
+					next.set('processAI',()=>{
+						const event=get.event().getParent(),player=event.player,target=event.target;
+						const spirits=[];
+						let nextPlayer=player;
+						do{
+							nextPlayer=nextPlayer.getNext();
+							if(get.attitude(player,nextPlayer)<0){
+								spirits.add('熊');
+								break;
+							}
+						}
+						while(nextPlayer!=target);
+						if(!spirits.length) spirits.add('猿');
+						if(get.recoverEffect(target,player,player)>0||target.hasCard(card=>{
+							return get.effect(target,{
+								name:card.viewAs||card.name,
+								cards:[card],
+							},target,target)<-1;
+						},'j')) spirits.add('鹿');
+						const others=lib.skill.wuling.wuqinxi.slice().removeArray(spirits);
+						do{
+							others.randomSort();
+						}
+						while(others.length>1&&others[0]=='鹿');
+						return [spirits.concat(others).map(i=>['','',i])];
+					})
 					'step 1'
-					player.popup(result.control);
-					target.storage.wuling_wuqinxi=result.control;
+					var sortedWuqinxi=result.moved[0].map(i=>i[2]);
+					game.log(target,'习得的五禽戏顺序为','#g'+sortedWuqinxi.join('、'));
+					sortedWuqinxi.unshift(sortedWuqinxi[0]);
+					target.storage.wuling_wuqinxi=sortedWuqinxi;
 					lib.skill.wuling.updateMark(target);
 				},
 				wuqinxi:['虎','鹿','熊','猿','鹤'],
 				wuqinxiMap:[
-					'虎：使用仅指定唯一目标的牌对目标角色造成的伤害+1',
-					'鹿：回复1点体力并弃置判定区的所有牌；不能成为延时锦囊牌的目标',
-					'熊：受到伤害时，此伤害-1',
-					'猿：出牌阶段开始时，选择一名角色，随机获得其装备区里的一张牌',
-					'鹤：出牌阶段开始时，摸两张牌',
+					'虎：当你使用指定唯一目标的牌对目标角色造成伤害时，此伤害+1。',
+					'鹿：①当你获得此效果时，你回复1点体力并弃置判定区的所有牌。②你不能成为延时锦囊牌的目标。',
+					'熊：当你受到伤害时，此伤害-1。',
+					'猿：出牌阶段开始时，你选择一名角色，随机获得其装备区里的一张牌。',
+					'鹤：出牌阶段开始时，你摸两张牌。',
 				],
 				updateMark:function(player){
 					var wuqinxi=player.storage.wuling_wuqinxi;
-					game.log(player,'获得了','#g【'+wuqinxi+'】','标记');
+					if(!wuqinxi) return;
+					var prevMark=wuqinxi.shift();
+					// wuqinxi.push(prevMark);
+					var curMark=wuqinxi[0];
+					if(!curMark){
+						for(var skill in player.additionalSkills){
+							if(!skill.startsWith('wuling_')) continue;
+							player.removeAdditionalSkill(skill);
+						}
+						game.log(player,'完成了五禽戏的操练');
+						return;
+					}
+					game.log(player,'获得了','#g【'+curMark+'】','标记');
 					player.markSkill('wuling_wuqinxi');
-					game.broadcastAll(function(player,wuqinxi){
-						if(player.marks.wuling_wuqinxi) player.marks.wuling_wuqinxi.firstChild.innerHTML=wuqinxi;
-					},player,wuqinxi);
-					if(wuqinxi=='鹿'){
+					game.broadcastAll(function(player,curMark){
+						if(player.marks.wuling_wuqinxi) player.marks.wuling_wuqinxi.firstChild.innerHTML=curMark;
+					},player,curMark);
+					if(curMark=='鹿'){
 						player.logSkill('wuling_wuqinxi');
 						player.recover();
-						player.discard(player.getCards('j'));
+						player.discard(player.getCards('j')).discarder=player;
 					}
 				},
 				ai:{
 					order:7,
+					threaten:5,
 					result:{target:1},
 				},
 				derivation:'wuling_wuqinxi',
@@ -141,51 +194,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						nopop:true,
 						charlotte:true,
 						intro:{
-							content:function(storage){
-								var str='<li>当前效果：'+storage;
-								var list=lib.skill.wuling.wuqinxiMap.map(str2=>str2.slice(2));
-								str+='<br><li>';
-								str+=list[lib.skill.wuling.wuqinxi.indexOf(storage)];
-								return str;
+							markcount:()=>0,
+							mark:function(dialog,storage){
+								const wuqinxiMap=lib.skill.wuling.wuqinxiMap;
+								const str=`<li>当前效果：${storage[0]}<br><li>${wuqinxiMap.find(str=>storage[0]==str[0]).slice(2)}<br>`;
+								dialog.addText(str,false);
+								const str2='<div class="text center">“五禽戏”顺序：<br>'+storage.join(' ')+'</div>';
+								dialog.addText(str2);
+								if(storage.length>1){
+									const str3=`<div class="text" style="font-size:10px; ">[下一效果] ${wuqinxiMap.find(str=>storage[1]==str[0])}<br></div>`;
+									dialog.add(str3);
+								}
 							},
 						},
 						mod:{
 							targetEnabled:function(card,player,target){
-								if(get.type(card)=='delay'&&target.storage.wuling_wuqinxi&&target.storage.wuling_wuqinxi=='鹿') return false;
+								if(get.type(card)=='delay'&&target.storage.wuling_wuqinxi&&target.storage.wuling_wuqinxi[0]=='鹿') return false;
 							},
 						},
 						trigger:{
 							source:'damageBegin1',
-							player:['phaseBegin','damageBegin2','phaseUseBegin'],
+							player:['phaseZhunbeiBegin','damageBegin4','phaseUseBegin'],
 						},
 						filter:function(event,player,name){
-							var wuqinxi=player.storage.wuling_wuqinxi;
+							const wuqinxi=player.storage.wuling_wuqinxi&&player.storage.wuling_wuqinxi[0];
 							if(!wuqinxi) return false;
-							if(event.name=='phase') return true;
+							if(event.name=='phaseZhunbei') return true;
 							switch(name){
 								case 'damageBegin1':
 									if(wuqinxi!='虎'||!event.card) return false;
 									var evt=event.getParent('useCard');
 									return evt.targets&&evt.targets.length==1&&evt.targets.includes(event.player);
-									break;
-								case 'damageBegin2':
+								case 'damageBegin4':
 									return wuqinxi=='熊';
-									break;
 								default:
 									if(wuqinxi=='鹤') return true;
 									if(wuqinxi!='猿') return false;
 									return game.hasPlayer(target=>target.countGainableCards(player,'e'));
-									break;
 							}
 						},
 						forced:true,
+						onremove:true,
 						content:function(){
 							'step 0'
-							var wuqinxi=player.storage.wuling_wuqinxi;
-							if(trigger.name=='phase'){
-								var num=lib.skill.wuling.wuqinxi.indexOf(wuqinxi)+1;
-								if(num>=lib.skill.wuling.wuqinxi.length) num-=lib.skill.wuling.wuqinxi.length;
-								player.storage.wuling_wuqinxi=lib.skill.wuling.wuqinxi[num];
+							var wuqinxi=player.storage.wuling_wuqinxi[0];
+							if(trigger.name=='phaseZhunbei'){
 								lib.skill.wuling.updateMark(player);
 								event.finish();
 							}
@@ -197,7 +250,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										trigger.num++;
 										event.finish();
 										break;
-									case 'damageBegin2':
+									case 'damageBegin4':
 										trigger.num--;
 										event.finish();
 										break;
@@ -232,8 +285,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							effect:{
 								target:function(card,player,target){
-									var wuqinxi=target.storage.wuling_wuqinxi;
-									if(!wuqinxi||wuqinxi!='熊') return;
+									const wuqinxi=target.storage.wuling_wuqinxi;
+									if(!wuqinxi||!wuqinxi.length) return;
+									const curWuqinxi=wuqinxi[0];
+									const nextWuqinxi=wuqinxi[1];
+									if(nextWuqinxi=='鹿'&&get.type(card)=='delay') return 'zerotarget';
+									if(curWuqinxi!='熊') return;
 									if(player.hasSkillTag('jueqing',false,target)) return;
 									var num=get.tag(card,'damage');
 									if(num){
@@ -242,6 +299,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									}
 								}
 							}
+						},
+					},
+					die:{
+						trigger:{player:'die'},
+						filter:function(event,player){
+							return game.hasPlayer(current=>current.additionalSkills[`wuling_${player.playerid}`]);
+						},
+						forced:true,
+						locked:false,
+						forceDie:true,
+						content:function(){
+							var targets=game.filterPlayer(current=>{
+								return current.additionalSkills[`wuling_${player.playerid}`];
+							});
+							player.line(targets);
+							targets.forEach(current=>current.removeAdditionalSkill(`wuling_${player.playerid}`));
 						},
 					},
 				},
@@ -259,11 +332,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var cards=_status.renku.slice();
-					game.cardsDiscard(cards);
+					game.cardsDiscard(cards).fromRenku=true;
 					_status.renku.removeArray(cards);
 					player.$throw(cards,1000);
 					game.updateRenku();
-					game.log(cards,'被置入了弃牌堆');
+					game.log(cards,'从仁库进入了弃牌堆');
 					'step 1'
 					var targets=game.filterPlayer();
 					player.line(targets);
@@ -7802,16 +7875,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_huatuo:'神华佗',
 			shen_huatuo_prefix:'神',
 			wuling:'五灵',
-			wuling_info:'出牌阶段限一次，你可以令一名没有“五禽戏”的角色获得“五禽戏”，然后你为其指定一个“五禽戏”的初始效果。',
+			wuling_info:'①出牌阶段限一次。你可以选择一名没有“五禽戏”的角色，按照你选择的顺序向其传授“五禽戏”，且其获得如下效果：其获得你选择的第一种“五禽戏”的效果，并在其每个准备阶段移除当前“五禽戏”的效果并切换为下一种。②当你死亡时，你令场上的角色失去你传授的“五禽戏”。',
 			wuling_wuqinxi:'五禽戏',
-			wuling_wuqinxi_info:'<br><li>“五禽戏”分为“虎、鹿、熊、猿、鹤”五个不同的效果，有“五禽戏”的角色的准备阶段，将自己“五禽戏”的效果更换为“五禽戏”顺序的下一种效果'+
-			'<br><li>虎：你使用仅指定唯一目标的牌对目标角色造成的伤害+1'+
-			'<br><li>鹿：获得或更换至此效果时，回复1点体力并弃置判定区的所有牌；你不能成为延时锦囊牌的目标'+
-			'<br><li>熊：当你受到伤害时，此伤害-1'+
-			'<br><li>猿：出牌阶段开始时，你选择一名角色，随机获得其装备区里的一张牌'+
-			'<br><li>鹤：出牌阶段开始时，你摸两张牌',
+			wuling_wuqinxi_info:'<br><li>“五禽戏”分为“虎、鹿、熊、猿、鹤”五个不同的效果：'+
+			'<br><li>虎：当你使用指定唯一目标的牌对目标角色造成伤害时，此伤害+1。'+
+			'<br><li>鹿：①当你获得此效果时，你回复1点体力并弃置判定区的所有牌。②你不能成为延时锦囊牌的目标。'+
+			'<br><li>熊：当你受到伤害时，此伤害-1。'+
+			'<br><li>猿：出牌阶段开始时，你选择一名角色，随机获得其装备区里的一张牌。'+
+			'<br><li>鹤：出牌阶段开始时，你摸两张牌。',
 			youyi:'游医',
-			youyi_info:'①弃牌阶段结束时，你可以将所有于此阶段进入弃牌堆的牌置入仁区。②出牌阶段限一次，你可以将仁区的所有牌置入弃牌堆，然后令所有角色各回复1点体力。',
+			youyi_info:'①弃牌阶段结束时，你可以将所有于此阶段弃置的牌置入仁区。②出牌阶段限一次。你可以将仁区的所有牌置入弃牌堆，令所有角色各回复1点体力。',
 			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
