@@ -4222,13 +4222,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{content:'上次受到伤害的花色：$'},
 				ai:{
 					effect:{
-						target:function(card,player,target){
-							if(get.tag(card,'damage')){
-								var color=get.suit(card);
-								if(color=='none') return;
-								var all=target.getAllHistory('damage');
+						target:(card,player,target)=>{
+							if(typeof card==='object'&&get.tag(card,'damage')){
+								let suit=get.suit(card);
+								if(suit==='none') return;
+								let all=target.getAllHistory('damage');
 								if(!all.length||!all[all.length-1].card) return;
-								if(get.suit(all[all.length-1].card)==color) return 'zerotarget';
+								if(get.suit(all[all.length-1].card)===suit) return 'zeroplayertarget';
 							}
 						},
 					},
