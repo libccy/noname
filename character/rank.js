@@ -637,6 +637,7 @@ window.noname_character_rank={
 		'pangshanmin',
 		'kuaiqi',
 		'shen_huatuo',
+		'dc_guansuo',
 	],
 	bp:[
 		'chess_diaochan',
@@ -1317,6 +1318,7 @@ window.noname_character_rank={
 		'laimin',
 		'baoxin',
 		'mb_xianglang',
+		'lvboshe',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1798,6 +1800,7 @@ window.noname_character_rank={
 			'ol_wanglang',
 			'xin_guozhao',
 			'shichangshi',
+			'dc_guansuo',
 		],
 		epic:[
 			'ol_pengyang',
@@ -2062,6 +2065,8 @@ window.noname_character_rank={
 			'star_caoren',
 			'star_yuanshu',
 			'clan_xunyou',
+			'lvboshe',
+			'yj_zhoubuyi',
 		],
 		rare:[
 			'luoxian',
