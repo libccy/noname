@@ -1,15 +1,20 @@
 "use strict";
-const nonameInitialized=localStorage.getItem('noname_inited');
-const assetURL=typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized;
 new Promise(resolve=>{
-	if('__core-js_shared__' in window) resolve();
+	const nonameInitialized=localStorage.getItem('noname_inited');
+	const assetURL=typeof nonameInitialized!='string'||nonameInitialized=='nodejs'?'':nonameInitialized;
+	const callback = () => {
+		resolve([nonameInitialized,assetURL]);
+	};
+	if('__core-js_shared__' in window) callback();
 	else{
 		const coreJSBundle=document.createElement('script');
-		coreJSBundle.onerror=coreJSBundle.onload=resolve;
+		coreJSBundle.onerror=coreJSBundle.onload=callback;
 		coreJSBundle.src=`${assetURL}game/core-js-bundle.js`;
 		document.head.appendChild(coreJSBundle);
 	}
-}).then(()=>{
+}).then((variables)=>{
+	const nonameInitialized=variables[0];
+	const assetURL=variables[1];
 	/**
 	 * @typedef {InstanceType<typeof lib.element.Player>} Player
 	 * @typedef {InstanceType<typeof lib.element.Card>} Card
