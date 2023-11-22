@@ -956,7 +956,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.checkGlobalHistory('cardMove',function(evt){
 						if(evt.name=='cardsDiscard'&&evt.getParent('phaseDiscard')==event) cards.addArray(evt.cards);
 					});
-					return cards;
+					return cards.filterInD('d');
 				},
 				audio:2,
 				sunbenSkill:true,
@@ -4976,13 +4976,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:{
-						target:function(card,player,target){
-							if(get.tag(card,'damage')){
-								var color=get.color(card);
-								if(color=='none') return;
-								var all=target.getAllHistory('damage');
+						target:(card,player,target)=>{
+							if(typeof card==='object'&&get.tag(card,'damage')){
+								let color=get.color(card);
+								if(color==='none') return;
+								let all=target.getAllHistory('damage');
 								if(!all.length||!all[all.length-1].card) return;
-								if(get.color(all[all.length-1].card)==color) return 'zerotarget';
+								if(get.color(all[all.length-1].card)===color) return 'zeroplayertarget';
 							}
 						},
 					},

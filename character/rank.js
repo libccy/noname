@@ -346,6 +346,8 @@ window.noname_character_rank={
 		'tianshangyi',
 		'malingli',
 		'caoyi',
+		'sb_sp_zhugeliang',
+		'sb_zhugeliang',
 	],
 	am:[
 		'diy_caiwenji',
@@ -634,6 +636,7 @@ window.noname_character_rank={
 		'dc_jiachong',
 		'pangshanmin',
 		'kuaiqi',
+		'shen_huatuo',
 	],
 	bp:[
 		'chess_diaochan',
@@ -1001,6 +1004,7 @@ window.noname_character_rank={
 		'ol_liuyan',
 		'sunhuan',
 		'yue_caiyong',
+		'sb_huangyueying',
 	],
 	b:[
 		'diy_feishi',
@@ -1312,6 +1316,7 @@ window.noname_character_rank={
 		're_simalang',
 		'laimin',
 		'baoxin',
+		'mb_xianglang',
 	],
 	bm:[
 		'diy_xizhenxihong',

@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','ol_dingshangwan','ol_liwan'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','ol_dingshangwan','ol_liwan','ol_liuyan'],
 			},
 		},
 		characterFilter:{

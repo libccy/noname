@@ -204,8 +204,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.target=target;
 							var list=[];
 							for(var name of lib.inpile){
+								if(name!='sha'&&get.type(name)!='trick') continue;
 								if(trigger.card.name=='sha'&&get.type(name)!='trick') continue;
-								if(name=='sha'&&get.type(trigger.card.name)!='trick') continue;
+								if(name=='sha'&&get.type(trigger.card)!='trick') continue;
 								if(!player.canUse(get.autoViewAs({name:name},[]),target)) continue;
 								list.push([get.translation(get.type(name)),'',name]);
 							}

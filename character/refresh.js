@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
+			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong','unseen']],
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			re_lidian:['male','wei',3,['xunxun','xinwangxi']],
 			re_zhongyao:['male','wei',3,['rehuomo','zuoding'],['clan:颍川钟氏']],
@@ -175,7 +176,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['boss_lvbu3'],
 				audioname2:{
 					lingtong:'xuanfeng',
-					ol_lingtong:'rexuanfeng',
+					ol_lingtong:'xuanfeng_re_lingtong',
 				},
 				trigger:{
 					player:['loseAfter'],
@@ -221,6 +222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					noe:true
 				},
 			},
+			xuanfeng_re_lingtong:{audio:2},
 			ollianhuan:{
 				audio:'xinlianhuan',
 				audioname:['ol_pangtong'],
@@ -10667,12 +10669,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				derivation:'rechanyuan',
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
-					return (lib.inpile.contains(name)&&player.countCards('h')>0&&!player.hasSkill('reguhuo_phase'));
+					return lib.inpile.contains(name)&&player.countCards('h')>0&&!player.hasSkill('reguhuo_phase');
 				},
 				filter:function(event,player){
 					if(!player.countCards('hs')||player.hasSkill('reguhuo_phase')) return false;
 					for(var i of lib.inpile){
-						if(i=='shan'||i=='wuxie') continue;
 						var type=get.type(i);
 						if((type=='basic'||type=='trick')&&event.filterCard({name:i},player,event)) return true;
 						if(i=='sha'){
@@ -10687,7 +10688,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					dialog:function(){
 						var list=[];
 						for(var i of lib.inpile){
-							if(i=='shan'||i=='wuxie') continue;
 							var type=get.type(i);
 							if(type=='basic'||type=='trick') list.push([type,'',i]);
 							if(i=='sha'){
@@ -10778,96 +10778,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:1,
 					},
 					threaten:1.3,
-				},
-				group:['reguhuo_shan','reguhuo_wuxie'],
-			},
-			reguhuo_shan:{
-				enable:['chooseToUse','chooseToRespond'],
-				viewAs:{
-					name:'shan',
-					suit:'none',
-					number:null,
-				},
-				filterCard:function(card,player,target){
-					var result=true;
-					var suit=card.suit,number=card.number;
-					card.suit='none';card.number=null;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-					if(mod!='unchanged') result=mod;
-					card.suit=suit;card.number=number;
-					return result;
-				},
-				position:'hs',
-				ignoreMod:true,
-				viewAsFilter:function(player){
-					return player.countCards('hs')&&!player.hasSkill('reguhuo_phase');
-				},
-				check:function(card){
-					var player=_status.event.player;
-					var hasEnemy=game.hasPlayer(function(current){
-						return current!=player&&!current.hasSkill('rechanyuan')&&(get.realAttitude||get.attitude)(current,player)<0;
-					});
-					var cardx='shan';
-					if(hasEnemy){
-						if(card.name==cardx) return 10;
-						return 0;
-					}
-					return 6-get.value(card);
-				},
-				precontent:function(){
-					player.logSkill('reguhuo');
-					player.addTempSkill('reguhuo_guess');
-					var card=event.result.cards[0];
-					event.result.card.suit=get.suit(card);
-					event.result.card.number=get.number(card);
-				},
-				prompt:'将一张牌当做【闪】使用或打出',
-				ai:{
-					order:4,
-				},
-			},
-			reguhuo_wuxie:{
-				enable:'chooseToUse',
-				viewAs:{
-					name:'wuxie',
-					suit:'none',
-					number:null,
-				},
-				filterCard:function(card,player,target){
-					var result=true;
-					var suit=card.suit,number=card.number;
-					card.suit='none';card.number=null;
-					var mod=game.checkMod(card,player,'unchanged','cardEnabled2',player);
-					if(mod!='unchanged') result=mod;
-					card.suit=suit;card.number=number;
-					return result;
-				},
-				ignoreMod:true,
-				check:function(card){
-					var player=_status.event.player;
-					var hasEnemy=game.hasPlayer(function(current){
-						return current!=player&&!current.hasSkill('rechanyuan')&&(get.realAttitude||get.attitude)(current,player)<0;
-					});
-					var cardx='wuxie';
-					if(hasEnemy){
-						if(card.name==cardx) return 10;
-						return 0;
-					}
-					return 6-get.value(card);
-				},
-				precontent:function(){
-					player.logSkill('reguhuo');
-					player.addTempSkill('reguhuo_guess');
-					var card=event.result.cards[0];
-					event.result.card.suit=get.suit(card);
-					event.result.card.number=get.number(card);
-				},
-				viewAsFilter:function(player){
-					return player.countCards('hs')&&!player.hasSkill('reguhuo_phase');
-				},
-				prompt:'将一张牌当做【无懈可击】使用',
-				ai:{
-					order:4,
 				},
 			},
 			reguhuo_guess:{
@@ -14948,9 +14858,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reguhuo_guess_info:"",
 			rechanyuan:"缠怨",
 			rechanyuan_info:"锁定技，你不能于〖蛊惑〗的结算流程中进行质疑。当你的体力值不大于1时，你的其他技能失效。",
-			reguhuo_sha:"蛊惑",
-			reguhuo_shan:"蛊惑",
-			reguhuo_wuxie:"蛊惑",
 			reguhuo_ally:'信任',
 			reguhuo_betray:'质疑',
 			reguhuo_ally_bg:'真',
