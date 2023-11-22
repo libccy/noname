@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
-			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong','unseen']],
+			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong']],
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			re_lidian:['male','wei',3,['xunxun','xinwangxi']],
 			re_zhongyao:['male','wei',3,['rehuomo','zuoding'],['clan:颍川钟氏']],
@@ -176,7 +176,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['boss_lvbu3'],
 				audioname2:{
 					lingtong:'xuanfeng',
-					ol_lingtong:'rexuanfeng',
+					ol_lingtong:'xuanfeng_re_lingtong',
 				},
 				trigger:{
 					player:['loseAfter'],
@@ -222,6 +222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					noe:true
 				},
 			},
+			xuanfeng_re_lingtong:{audio:2},
 			ollianhuan:{
 				audio:'xinlianhuan',
 				audioname:['ol_pangtong'],

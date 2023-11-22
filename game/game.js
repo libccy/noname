@@ -36083,6 +36083,12 @@ new Promise(resolve=>{
 			['星',{
 				color:'#ffd700',
 				nature:'glodenmm',
+			}],
+			['OL界',{
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('OL')}${get.prefixSpan('界')}`
 			}]
 		]),
 		groupnature:{
