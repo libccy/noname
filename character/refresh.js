@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
-			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong']],
+			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong','unseen']],
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			re_lidian:['male','wei',3,['xunxun','xinwangxi']],
 			re_zhongyao:['male','wei',3,['rehuomo','zuoding'],['clan:颍川钟氏']],
