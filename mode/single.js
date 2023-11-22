@@ -215,6 +215,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].getId();
 				}
+				if(_status.brawl&&_status.brawl.chooseCharacterBefore){
+					_status.brawl.chooseCharacterBefore();
+				}
 				game.chooseCharacter();
 			}
 			"step 3"
