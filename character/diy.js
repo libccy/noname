@@ -12626,32 +12626,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//十周年削弱版张让
 			junktaoluan:{
+				hiddenCard:function(player,name){
+					return !player.getStorage('junktaoluan').includes(name)&&player.countCards('hes',card=>!player.getStorage('junktaoluan2').includes(get.suit(card)))>0&&!player.hasSkill('junktaoluan3')&&lib.inpile.includes(name);
+				},
 				audio:'taoluan',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return event.type!='wuxie'&&event.type!='respondShan'&&!player.hasSkill('junktaoluan3')&&player.countCards('hes',function(card){
-						return !player.storage.junktaoluan2.contains(get.suit(card));
+					return !player.hasSkill('junktaoluan3')&&player.countCards('hes',card=>{
+						return lib.inpile.some(name=>{
+							if(player.getStorage('junktaoluan2').includes(get.suit(card))) return false;
+							if(player.getStorage('junktaoluan').includes(name)) return false;
+							if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
+							if(event.filterCard({name:name,isCard:true,cards:[card]})) return true;
+							if(name=='sha'){
+								for(var nature of lib.inpile_nature){
+									if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]})) return true;
+								}
+							}
+							return false;
+						});
 					})>0;
-				},
-				init:function(player){
-					if(!player.storage.junktaoluan) player.storage.junktaoluan=[];
-					if(!player.storage.junktaoluan2) player.storage.junktaoluan2=[];
 				},
 				chooseButton:{
 					dialog:function(event,player){
-					var list=[];
-						for(var i=0;i<lib.inpile.length;i++){
-							var name=lib.inpile[i];
-							if(player.storage.junktaoluan.contains(name)) continue;
-							if(name=='sha'){
-								list.push(['基本','','sha']);
-								for(var j of lib.inpile_nature) list.push(['基本','',name,j]);
+						var list=[];
+						for(var name of lib.inpile){
+							if(get.type(name)=='basic'||get.type(name)=='trick'){
+								if(player.getStorage('junktaoluan').includes(name)) continue;
+								list.push([get.translation(get.type(name)),'',name]);
+								if(name=='sha'){
+									for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
+								}
 							}
-							else if(get.type(name)=='trick') list.push(['锦囊','',name]);
-							else if(get.type(name)=='basic') list.push(['基本','',name]);
-						}
-						if(list.length==0){
-							return ui.create.dialog('滔乱已无可用牌');
 						}
 						return ui.create.dialog('滔乱',[list,'vcard']);
 					},
@@ -12660,27 +12666,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					check:function(button){
 						var player=_status.event.player;
-						if(player.countCards('sh',button.link[2])>0) return 0;
-						if(button.link[2]=='wugu') return;
-						var effect=player.getUseValue(button.link[2]);
-						if(effect>0) return effect;
-						return 0;
+						var card={name:button.link[2],nature:button.link[3]};
+						if(player.countCards('hes',cardx=>cardx.name==card.name)) return 0;
+						return _status.event.getParent().type=='phase'?player.getUseValue(card):1;
 					},
 					backup:function(links,player){
 						return {
 							filterCard:function(card,player){
-								return !player.storage.junktaoluan2.contains(get.suit(card));
+								return !player.getStorage('junktaoluan2').includes(get.suit(card));
 							},
 							audio:'taoluan',
-							selectCard:1,
 							popname:true,
 							check:function(card){
-								return 6-get.value(card);
+								return 7-get.value(card);
 							},
 							position:'hse',
 							viewAs:{name:links[0][2],nature:links[0][3]},
 							onuse:function(result,player){
-								player.storage.junktaoluan2.add(get.suit(result.cards[0],player));
+								player.markAuto('junktaoluan2',[get.suit(result.cards[0],player)]);
 								var evt=_status.event.getParent('phase');
 								if(evt&&evt.name=='phase'&&!evt.junktaoluan){
 									evt.junktaoluan=true;
@@ -12689,11 +12692,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									evt.after.push(next);
 									next.player=player;
 									next.setContent(function(){
-										//player.storage.junktaoluan=[];
-										player.storage.junktaoluan2=[];
+										delete player.storage.junktaoluan2;
 									});
 								}
-								player.storage.junktaoluan.add(result.card.name);
+								player.markAuto('junktaoluan',[result.card.name]);
 							},
 						}
 					},
@@ -12703,6 +12705,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:4,
+					save:true,
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter:function(player,tag,arg){
+						if(!player.countCards('hes',card=>!player.getStorage('junktaoluan2').includes(get.suit(card)))||player.hasSkill('taoluan3')) return false;
+						if(tag=='respondSha'||tag=='respondShan'){
+							if(arg=='respond') return false;
+							return !player.getStorage('taoluan').includes(tag=='respondSha'?'sha':'shan');
+						}
+						return !player.getStorage('taoluan').includes('tao')||(!player.getStorage('taoluan').includes('jiu')&&arg==player);
+					},
 					result:{
 						player:function(player){
 							var players=game.filterPlayer();
@@ -12716,7 +12729,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					threaten:1.9,
 				},
-				group:['junktaoluan2','junktaoluan4','junktaoluan5']
+				group:'junktaoluan2',
 			},
 			junktaoluan2:{
 				trigger:{player:['useCardAfter','respondAfter']},
@@ -12725,7 +12738,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				filter:function(event,player){
 					if(!game.hasPlayer(current=>current!=player)) return false;
-					return event.skill=='junktaoluan_backup'||event.skill=='junktaoluan5'||event.skill=='junktaoluan4';
+					return event.skill=='junktaoluan_backup';
 				},
 				content:function(){
 					'step 0'
@@ -12764,115 +12777,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			junktaoluan3:{
+				charlotte:true,
 				trigger:{player:'phaseEnd'},
 				forced:true,
 				popup:false,
-				charlotte:true,
 				content:function(){
 					player.loseHp();
-				},
-			},
-			junktaoluan4:{
-				audio:'taoluan',
-				prompt:'将一张牌当做闪使用',
-				enable:'chooseToUse',
-				filter:function(event,player){
-					return player.countCards('hes',function(card){
-						return !player.storage.junktaoluan2.contains(get.suit(card));
-					})&&!player.storage.junktaoluan.contains('shan')&&!player.hasSkill('junktaoluan3');
-				},
-				onuse:function(result,player){
-					player.storage.junktaoluan2.add(get.suit(result.cards[0],player));
-					var evt=_status.event.getParent('phase');
-					if(evt&&evt.name=='phase'&&!evt.junktaoluan){
-						var next=game.createEvent('taoluan_clear');
-						_status.event.next.remove(next);
-						evt.after.push(next);
-						evt.junktaoluan=true;
-						next.player=player;
-						next.setContent(function(){
-							//player.storage.junktaoluan=[];
-							player.storage.junktaoluan2=[];
-						});
-					}
-					player.storage.junktaoluan.add('shan');
-				},
-				filterCard:function(card,player){
-					return !player.storage.junktaoluan2.contains(get.suit(card));
-				},
-				position:'hes',
-				selectCard:1,
-				viewAs:{name:'shan'},
-				check:function(card){
-					var player=_status.event.player;
-					var allshown=true,players=game.filterPlayer();
-					for(var i=0;i<players.length;i++){
-						if(players[i].ai.shown==0){
-							allshown=false;
-						}
-						if(players[i]!=player&&players[i].countCards('he')&&get.attitude(player,players[i])>0){
-							return 6-get.value(card);
-						}
-					}
-					return 0;
-				},
-				ai:{
-					skillTagFilter:function(player){
-						return player.countCards('hse')&&!player.storage.junktaoluan.contains('shan')&&!player.hasSkill('junktaoluan3');
-					},
-					threaten:1.5,
-					respondShan:true,
-				}
-			},
-			junktaoluan5:{
-				audio:'taoluan',
-				enable:'chooseToUse',
-				prompt:'将一张牌当做无懈可击使用',
-				filter:function(event,player){
-					return player.countCards('hes',function(card){
-						return !player.storage.junktaoluan2.contains(get.suit(card));
-					})&&(!player.storage.junktaoluan.contains('wuxie'))&&!player.hasSkill('junktaoluan3');
-				},
-				viewAsFilter:function(player){
-					return player.countCards('hes',function(card){
-						return !player.storage.junktaoluan2.contains(get.suit(card));
-					})&&(!player.storage.junktaoluan.contains('wuxie'))&&!player.hasSkill('junktaoluan3');
-				},
-				onuse:function(result,player){
-					player.storage.junktaoluan2.add(get.suit(result.cards[0],player));
-					var evt=_status.event.getParent('phase');
-					if(evt&&evt.name=='phase'&&!evt.junktaoluan){
-						evt.junktaoluan=true;
-						var next=game.createEvent('taoluan_clear');
-						_status.event.next.remove(next);
-						evt.after.push(next);
-						next.player=player;
-						next.setContent(function(){
-							//player.storage.junktaoluan=[];
-							player.storage.junktaoluan2=[];
-						});
-					}
-					player.storage.junktaoluan.add('wuxie');
-				},
-				filterCard:function(card,player){
-					return !player.storage.junktaoluan2.contains(get.suit(card));
-				},
-				position:'hse',
-				selectCard:1,
-				viewAs:{name:'wuxie'},
-				check:function(card){
-					var player=_status.event.player;
-					if(player.isPhaseUsing()) return 0;
-					var allshown=true,players=game.filterPlayer();
-					for(var i=0;i<players.length;i++){
-						if(players[i].ai.shown==0){
-							allshown=false;
-						}
-						if(players[i]!=player&&players[i].countCards('he')&&get.attitude(player,players[i])>0){
-							return 6-get.value(card);
-						}
-					}
-					return 0;
 				},
 			},
 			junktaoluan_backup:{charlotte:true},
@@ -19022,9 +18932,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nshanlang_info:'准备阶段，你可以和至多三名角色拼点。然后若这些角色中有拼点牌唯一最大的角色，则你可以令该角色从牌堆中获得一张不符合“四象天阵”的牌。',
 			
 			junktaoluan:'滔乱',
-			junktaoluan3:'滔乱',
-			junktaoluan4:'滔乱',
-			junktaoluan5:'滔乱',
 			junktaoluan_backup:'滔乱',
 			junktaoluan_info:'你可将一张牌当做任意一张基本牌或普通锦囊牌使用（此牌不得是本局游戏你以此法使用过的牌，且每回合每种花色限一次），然后你令一名其他角色选择一项：1.交给你一张与“滔乱”声明的牌类别不同的牌；2.本回合“滔乱”失效且回合结束时你失去1点体力。',
 			ns_caimao:'蔡瑁',
