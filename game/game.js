@@ -63458,5 +63458,12 @@ new Promise(resolve=>{
 	setAllPropertiesEnumerable(lib.element.Control.prototype);
 	setAllPropertiesEnumerable(lib.element.Client.prototype);
 	setAllPropertiesEnumerable(lib.element.NodeWS.prototype);
+	const coreAndVersion=get.coreInfo();
+	const core=coreAndVersion[0],version=coreAndVersion[1];
+	if(core=='chrome'&&!isNaN(version)&&version<77){
+		const tip='检测到您的浏览器内核版本小于77，请及时升级浏览器或手机webview内核！';
+		console.warn(tip);
+		game.print(tip);
+	}
 	lib.init.init();
 });
