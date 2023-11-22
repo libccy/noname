@@ -404,6 +404,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var suits=result.links.map(i=>i[2].slice(6));
+						player.logSkill('qingbei');
 						player.addTempSkill('qingbei_effect','roundStart');
 						player.setStorage('qingbei_effect',suits);
 						player.markSkill('qingbei_effect');
@@ -418,12 +419,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'useCardAfter'},
 						charlotte:true,
 						onremove:true,
+						forced:true,
 						filter:function(event,player){
 							if(!lib.suit.includes(get.suit(event.card))) return false;
 							return player.getStorage('qingbei_effect').length;
 						},
-						direct:true,
-						firstDo:true,
 						content:function(){
 							player.draw(player.getStorage('qingbei_effect').length);
 						},
