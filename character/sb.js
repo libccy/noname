@@ -395,7 +395,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										button.classList.remove('selected');
 										const counterNode=button.querySelector('.caption');
 										if(counterNode){
-											counterNode.innerText=``;
+											counterNode.childNodes[0].innerHTML=``;
 										}
 									}
 									ui.selected.buttons.length=0;
@@ -410,22 +410,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					if(event.isMine()) func();
 					else if(event.isOnline()) event.player.send(func);
-					var result=yield player.chooseButton(['看破：是否记录三个牌名？',[
-						list,function(item,type,position,noclick,node){
-							return lib.skill.sbkanpo.$createButton(item,type,position,noclick,node);
-						}
-					]],[1,3],true).set('ai',function(button){
+					var result=yield player.chooseButton(['看破：是否记录三个牌名？',[list,'vcard']],[1,3],true).set('ai',function(button){
 						switch(button.link[2]){
 							case 'wuxie':return 5+Math.random();
 							case 'sha':return 5+Math.random();
 							case 'tao':return 4+Math.random();
+							case 'jiu':return 3+Math.random();
 							case 'lebu':return 3+Math.random();
 							case 'shan':return 4.5+Math.random();
 							case 'wuzhong':return 4+Math.random();
-							case 'shunshou':return 3+Math.random();
+							case 'shunshou':return 2.7+Math.random();
 							case 'nanman':return 2+Math.random();
-							case 'wanjian':return 2+Math.random();
-							default:return Math.random();
+							case 'wanjian':return 1.6+Math.random();
+							default:return 1.5+Math.random();
 						}
 					}).set('filterButton',button=>{
 						return !_status.event.names.includes(button.link[2]);
@@ -439,14 +436,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								game.uncheck();
 							},
 							button:function(){
+								if(ui.selected.buttons.length) return;
 								const event=get.event();
 								if(event.dialog&&event.dialog.buttons){
 									for(let i=0;i<event.dialog.buttons.length;i++){
 										const button=event.dialog.buttons[i];
-										if(ui.selected.buttons.includes(button)) continue;
 										const counterNode=button.querySelector('.caption');
 										if(counterNode){
-											counterNode.innerText=``;
+											counterNode.childNodes[0].innerHTML=``;
 										}
 									}
 								}
@@ -464,9 +461,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(ui.selected.buttons.length>=lib.skill.sbkanpo.getNumber) return false;
 								button.classList.add('selected');
 								ui.selected.buttons.push(button);
-								const counterNode=button.querySelector('.caption');
+								let counterNode=button.querySelector('.caption');
+								const count=ui.selected.buttons.filter(i=>i==button).length;
 								if(counterNode){
-									counterNode.innerHTML=`<span style="font-size:24px; font-family:xinwei; text-shadow:#FFF 0 0 5px;">×${ui.selected.buttons.filter(i=>i==button).length}</span>`;
+									counterNode=counterNode.childNodes[0];
+									counterNode.innerHTML=`×${count}`;
+								}
+								else{
+									counterNode=ui.create.caption(`<span style="font-size:24px; font-family:xinwei; text-shadow:#FFF 0 0 4px, #FFF 0 0 4px, rgba(74,29,1,1) 0 0 3px;">×${count}</span>`,button);
+									counterNode.style.right='5px';
+									counterNode.style.bottom='2px';
 								}
 								const evt=event.parent;
 								if(evt.controls) evt.controls[0].show();
@@ -479,13 +483,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.setStorage('sbkanpo',names);
 						player.markSkill('sbkanpo');
 					}
-				},
-				$createButton:function(item,type,position,noclick,node){
-					node=ui.create.buttonPresets.vcard(item,type,position,noclick);
-					const counterNode=ui.create.caption(`<div class="text"></div>`,node);
-					counterNode.style.right='5px';
-					counterNode.style.bottom='2px';
-					return node;
 				},
 				marktext:'破',
 				intro:{

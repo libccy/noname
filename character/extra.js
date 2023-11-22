@@ -111,27 +111,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						['',[lib.skill.wuling.wuqinxi,(item,type,position,noclick,node)=>{
 							node=ui.create.buttonPresets.vcard(item,type,position,noclick);
 							node._customintro=[
-								node=>{
-									return `五禽戏：${node.link[2]}`;
-								},
-								node=>{
-									return lib.skill.wuling.wuqinxiMap[lib.skill.wuling.wuqinxi.indexOf(node.link[2])].slice(2);
-								}
+								node=>`五禽戏：${node.link[2]}`,
+								node=>lib.skill.wuling.wuqinxiMap[lib.skill.wuling.wuqinxi.indexOf(node.link[2])].slice(2)
 							];
 							return node;
 						}]]
 					]);
 					next.set('processAI',()=>{
 						const event=get.event().getParent(),player=event.player,target=event.target;
-						let first;
-						if(get.recoverEffect(target,player,player)>0) first=['鹿','熊'].randomGet();
-						else first='熊';
-						return [[first].concat(lib.skill.wuling.wuqinxi.slice().remove(first).randomSort()).map(i=>['','',i])];
+						const spirits=[];
+						let nextPlayer=player;
+						do{
+							nextPlayer=nextPlayer.getNext();
+							if(get.attitude(player,nextPlayer)<0){
+								spirits.add('熊');
+								break;
+							}
+						}
+						while(nextPlayer!=target);
+						if(!spirits.length) spirits.add('猿');
+						if(get.recoverEffect(target,player,player)>0||target.hasCard(card=>{
+							return get.effect(target,{
+								name:card.viewAs||card.name,
+								cards:[card],
+							},target,target)<-1;
+						},'j')) spirits.add('鹿');
+						const others=lib.skill.wuling.wuqinxi.slice().removeArray(spirits);
+						do{
+							others.randomSort();
+						}
+						while(others.length>1&&others[0]=='鹿');
+						return [spirits.concat(others).map(i=>['','',i])];
 					})
 					'step 1'
 					var sortedWuqinxi=result.moved[0].map(i=>i[2]);
 					game.log(target,'习得的五禽戏顺序为','#g'+sortedWuqinxi.join('、'));
-					sortedWuqinxi.unshift(sortedWuqinxi.pop());
+					sortedWuqinxi.unshift(sortedWuqinxi[0]);
 					target.storage.wuling_wuqinxi=sortedWuqinxi;
 					lib.skill.wuling.updateMark(target);
 				},
@@ -147,8 +162,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var wuqinxi=player.storage.wuling_wuqinxi;
 					if(!wuqinxi) return;
 					var prevMark=wuqinxi.shift();
-					wuqinxi.push(prevMark);
+					// wuqinxi.push(prevMark);
 					var curMark=wuqinxi[0];
+					if(!curMark){
+						for(var skill in player.additionalSkills){
+							if(!skill.startsWith('wuling_')) continue;
+							player.removeAdditionalSkill(skill);
+						}
+						game.log(player,'完成了五禽戏的操练');
+						return;
+					}
 					game.log(player,'获得了','#g【'+curMark+'】','标记');
 					player.markSkill('wuling_wuqinxi');
 					game.broadcastAll(function(player,curMark){
@@ -178,8 +201,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								dialog.addText(str,false);
 								const str2='<div class="text center">“五禽戏”顺序：<br>'+storage.join(' ')+'</div>';
 								dialog.addText(str2);
-								const str3=`<div class="text" style="font-size:10px; ">[下一效果] ${wuqinxiMap.find(str=>storage[1]==str[0])}<br></div>`;
-								dialog.add(str3);
+								if(storage.length>1){
+									const str3=`<div class="text" style="font-size:10px; ">[下一效果] ${wuqinxiMap.find(str=>storage[1]==str[0])}<br></div>`;
+									dialog.add(str3);
+								}
 							},
 						},
 						mod:{
@@ -209,6 +234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 						forced:true,
+						onremove:true,
 						content:function(){
 							'step 0'
 							var wuqinxi=player.storage.wuling_wuqinxi[0];
@@ -259,8 +285,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							effect:{
 								target:function(card,player,target){
-									var wuqinxi=target.storage.wuling_wuqinxi&&target.storage.wuling_wuqinxi[0];
-									if(!wuqinxi||wuqinxi!='熊') return;
+									const wuqinxi=target.storage.wuling_wuqinxi;
+									if(!wuqinxi||!wuqinxi.length) return;
+									const curWuqinxi=wuqinxi[0];
+									const nextWuqinxi=wuqinxi[1];
+									if(nextWuqinxi=='鹿'&&get.type(card)=='delay') return 'zerotarget';
+									if(curWuqinxi!='熊') return;
 									if(player.hasSkillTag('jueqing',false,target)) return;
 									var num=get.tag(card,'damage');
 									if(num){
@@ -7845,7 +7875,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_huatuo:'神华佗',
 			shen_huatuo_prefix:'神',
 			wuling:'五灵',
-			wuling_info:'①出牌阶段限一次。你可以选择一名没有“五禽戏”的角色，按照你选择的顺序向其传授“五禽戏”，且其获得你选择的第一种“五禽戏”的效果，并在其每个准备阶段切换为下一种。②当你死亡时，你令场上的角色失去你传授的“五禽戏”。',
+			wuling_info:'①出牌阶段限一次。你可以选择一名没有“五禽戏”的角色，按照你选择的顺序向其传授“五禽戏”，且其获得如下效果：其获得你选择的第一种“五禽戏”的效果，并在其每个准备阶段移除当前“五禽戏”的效果并切换为下一种。②当你死亡时，你令场上的角色失去你传授的“五禽戏”。',
 			wuling_wuqinxi:'五禽戏',
 			wuling_wuqinxi_info:'<br><li>“五禽戏”分为“虎、鹿、熊、猿、鹤”五个不同的效果：'+
 			'<br><li>虎：当你使用指定唯一目标的牌对目标角色造成伤害时，此伤害+1。'+
