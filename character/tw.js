@@ -9860,7 +9860,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var target=trigger.player;
 							event.target=target;
 							if(player.storage.twzhengjian){
-								player.chooseBool('征建：是否对'+get.translation(target)+'造成1点伤害？').set('ai',()=>_status.event.goon).set('goon',get.damageEffect(target,player,player)>0);
+								player.chooseBool('征建：是否对'+get.translation(target)+'造成1点伤害？').set('ai',()=>_status.event.goon).set('goon',get.damageEffect(target,player,_status.event.player)>0);
 							}
 							else{
 								target.chooseCard('he',true,'交给'+get.translation(player)+'一张牌');
@@ -9872,7 +9872,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								else target.damage();
 							}
-							player.chooseBool('是否变更【征建】的效果？');
+							player.chooseBool('是否变更【征建】的效果？').set('ai',()=>Math.random()>0.5);
 							'step 2'
 							if(result.bool){
 								player.removeSkill('twzhengjian_eff0');
@@ -9908,7 +9908,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var target=trigger.player;
 							event.target=target;
 							if(player.storage.twzhengjian){
-								player.chooseBool('征建：是否对'+get.translation(target)+'造成1点伤害？');
+								player.chooseBool('征建：是否对'+get.translation(target)+'造成1点伤害？').set('ai',()=>_status.event.goon).set('goon',get.damageEffect(target,player,_status.event.player)>0);
 							}
 							else{
 								target.chooseCard('he',true,'交给'+get.translation(player)+'一张牌');

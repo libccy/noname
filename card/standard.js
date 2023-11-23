@@ -227,18 +227,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var base=0,hit=false;
 						if(get.cardtag(card,'yingbian_hit')){
 							hit=true;
-							if(targets.filter(function(target){
-								return target.hasShan()&&get.attitude(viewer,target)<0&&get.damageEffect(target,player,viewer,get.nature(card))>0;
+							if(targets.some(target=>{
+								return target.mayHaveShan(viewer)&&get.attitude(viewer,target)<0&&get.damageEffect(target,player,viewer,get.natureList(card))>0;
 							})) base+=5;
 						}
-						if(get.cardtag(card,'yingbian_all')){
+						if(get.cardtag(card,'yingbian_add')){
 							if(game.hasPlayer(function(current){
 								return !targets.contains(current)&&lib.filter.targetEnabled2(card,player,current)&&get.effect(current,card,player,player)>0;
 							})) base+=5;
 						}
 						if(get.cardtag(card,'yingbian_damage')){
-							if(targets.filter(function(target){
-								return get.attitude(player,target)<0&&(hit||!target.mayHaveShan()||player.hasSkillTag('directHit_ai',true,{
+							if(targets.some(target=>{
+								return get.attitude(player,target)<0&&(hit||!target.mayHaveShan(viewer)||player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:card,
 								},true))&&!target.hasSkillTag('filterDamage',null,{

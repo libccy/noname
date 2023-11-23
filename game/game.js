@@ -28712,9 +28712,15 @@ new Promise(resolve=>{
 					}
 					return false;
 				}
-				needsToDiscard(num){
-					if(typeof num!='number') num=0;
-					return Math.max(0,num+this.countCards('h',card=>!this.canIgnoreHandcard(card))-this.getHandcardLimit());
+				needsToDiscard(filter,add){
+					let cards=this.getCards('h',card=>!this.canIgnoreHandcard(card)),num=0;
+					if(get.itemtype(add)==='cards') cards.addArray(add);
+					else if(get.itemtype(add)==='card') cards.push(add);
+					if(typeof filter==='number') num=filter;
+					else if(typeof filter==='function') cards=cards.filter(card=>{
+						return filter(card);
+					});
+					return Math.max(0,num+cards.length-this.getHandcardLimit());
 				}
 				distanceTo(target,method){
 					return get.distance(this,target,method);
