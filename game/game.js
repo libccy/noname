@@ -28219,7 +28219,7 @@ new Promise(resolve=>{
 						});
 						equips.forEach(card=>{
 							const info=get.info(card,false).distance;
-							if(ininfo&&info.globalFrom){
+							if(info&&info.globalFrom){
 								range+=info.globalFrom;
 							}
 						})
