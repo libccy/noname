@@ -51330,7 +51330,7 @@ new Promise(resolve=>{
 						node._initLink=function(){
 							node.link=page;
 							page.classList.add('menu-sym');
-							var text=document.createElement('div');
+							const text=document.createElement('div');
 							text.style.width='194px';
 							text.style.height='124px';
 							text.style.padding='3px';
@@ -51343,7 +51343,7 @@ new Promise(resolve=>{
 							text.style.left='30px';
 							text.style.top='50px';
 							text.style.wordBreak='break-all';
-							var pre=ui.create.node('pre.fullsize',text);
+							const pre=ui.create.node('pre.fullsize',text);
 							pre.style.margin=0;
 							pre.style.padding=0;
 							pre.style.position='relative';
@@ -51357,7 +51357,7 @@ new Promise(resolve=>{
 							// caption.style.width='120px';
 							// caption.style.top='129px';
 							// caption.style.left='64px';
-							var text2=document.createElement('input');
+							const text2=document.createElement('input');
 							text2.style.width='200px';
 							text2.style.height='20px';
 							text2.style.padding='0';
@@ -51368,15 +51368,85 @@ new Promise(resolve=>{
 							text2.style.border='none';
 							text2.style.borderRadius='2px';
 							text2.style.boxShadow='rgba(0, 0, 0, 0.2) 0 0 0 1px';
-							var g={};
-							var logs=[];
-							var logindex=-1;
-							var cheat=lib.cheat;
-							//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
-							var reg=/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/;
+							const g={};
+							const logs=[];
+							let logindex=-1;
+							let proxyWindow=Object.assign({},window,{
+								_status:_status,
+								lib:lib,
+								game:game,
+								ui:ui,
+								get:get,
+								ai:ai,
+								cheat:lib.cheat
+							});
+							Object.defineProperties(proxyWindow, {
+								'_status':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'lib':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'game':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'ui':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'get':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'ai':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'cheat':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								}
+							});
+							if(typeof window.Proxy=='function'){
+								proxyWindow=new Proxy(proxyWindow,{
+									set(target,prop,newValue) {
+										if (!['_status','lib','game','ui','get','ai','cheat'].includes(prop)){
+											Reflect.set(window, prop, newValue);
+										}
+										return Reflect.set(target,prop,newValue);
+									}
+								});
+							}
 							//使用new Function隔绝作用域，避免在控制台可以直接访问到runCommand等变量
-							var fun=(new Function('reg','value','_status','lib','game','ui','get','ai',`"use strict";\nreturn eval(reg.test(value)?('('+value+')'):value)`));
-							var runCommand=function(e){
+							/**
+							 * @type { (value:string)=>any }
+							 */
+							const fun=(new Function('window',`
+								const _status=window._status;
+								const lib=window.lib;
+								const game=window.game;
+								const ui=window.ui;
+								const get=window.get;
+								const ai=window.ai;
+								const cheat=window.lib.cheat;
+								//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
+								const reg=/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/;
+								return function(value){ 
+									"use strict";
+									return eval(reg.test(value)?('('+value+')'):value);
+								}
+							`))(proxyWindow);
+							const runCommand=function(e){
 								if(text2.value&&!['up','down'].contains(text2.value)){
 									logindex=-1;
 									logs.unshift(text2.value);
@@ -51417,7 +51487,7 @@ new Promise(resolve=>{
 										try{
 											var value=text2.value.trim();
 											if(value.endsWith(";")) value=value.slice(0,-1).trim();
-											var result=fun(reg,value,_status,lib,game,ui,get,ai);
+											var result=fun(value);
 											game.print(result);
 										}
 										catch(e){
@@ -63540,6 +63610,7 @@ new Promise(resolve=>{
 				}
 			}
 		},
+		//我愚蠢的弟弟呦，这是最后一次兼容46内核兼容版了
 		get:get
 	};
 	/**
