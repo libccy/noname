@@ -574,7 +574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						]).set('prompt','观星：点击将牌移动到牌堆顶').set('processAI',function(list){
 							var cards=list[0][1].slice(),player=_status.event.player;
 							var name=_status.event.getTrigger().name;
-							var target=(name=='phaseZhunbei'?player:target);
+							var target=(name=='phaseZhunbei'?player:player.getNext());
 							var judges=target.getCards('j');
 							var top=[],att=get.sgn(get.attitude(player,target));
 							if(judges.length&&att!=0&&(target!=player||!player.hasWuxie())){
