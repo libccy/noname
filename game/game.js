@@ -51390,44 +51390,48 @@ new Promise(resolve=>{
 						node._initLink=function(){
 							node.link=page;
 							page.classList.add('menu-sym');
+
 							const text=document.createElement('div');
-							text.style.width='194px';
-							text.style.height='124px';
-							text.style.padding='3px';
-							text.style.borderRadius='2px';
-							text.style.boxShadow='rgba(0, 0, 0, 0.2) 0 0 0 1px';
-							text.style.textAlign='left';
-							text.style.webkitUserSelect='initial';
-							text.style.overflow='scroll';
-							text.style.position='absolute';
-							text.style.left='30px';
-							text.style.top='50px';
-							text.style.wordBreak='break-all';
+							text.css({
+								'width':'194px',
+								'height':'124px',
+								'padding':'3px',
+								'borderRadius':'2px',
+								'boxShadow':'rgba(0, 0, 0, 0.2) 0 0 0 1px',
+								'textAlign':'left',
+								'webkitUserSelect':'initial',
+								'overflow':'scroll',
+								'position':'absolute',
+								'left':'30px',
+								'top':'50px',
+								'wordBreak':'break-all'
+							});
+							
 							const pre=ui.create.node('pre.fullsize',text);
-							pre.style.margin=0;
-							pre.style.padding=0;
-							pre.style.position='relative';
-							pre.style.webkitUserSelect = pre.style.userSelect = 'text';
+							text.css.call(pre,{
+								'margin':'0',
+								'padding':'0',
+								'position':'relative',
+								'webkitUserSelect': 'text',
+								'userSelect':'text'
+							});
 							lib.setScroll(pre);
 							page.appendChild(text);
-
-							// var caption=ui.create.div('','输入命令',page);
-							// caption.style.margin='6px';
-							// caption.style.position='absolute';
-							// caption.style.width='120px';
-							// caption.style.top='129px';
-							// caption.style.left='64px';
+							
 							const text2=document.createElement('input');
-							text2.style.width='200px';
-							text2.style.height='20px';
-							text2.style.padding='0';
-							text2.style.position='absolute';
-							text2.style.top='15px';
-							text2.style.left='30px';
-							text2.style.resize='none';
-							text2.style.border='none';
-							text2.style.borderRadius='2px';
-							text2.style.boxShadow='rgba(0, 0, 0, 0.2) 0 0 0 1px';
+							text.css.call(text2,{
+								'width':'200px',
+								'height':'20px',
+								'padding':'0',
+								'position': 'absolute',
+								'top':'15px',
+								'left':'30px',
+								'resize':'none',
+								'border':'none',
+								'borderRadius':'2px',
+								'boxShadow':'rgba(0, 0, 0, 0.2) 0 0 0 1px'
+							});
+
 							const g={};
 							const logs=[];
 							let logindex=-1;
@@ -51506,7 +51510,7 @@ new Promise(resolve=>{
 									return eval(reg.test(value)?('('+value+')'):value);
 								}
 							`))(proxyWindow);
-							const runCommand=function(e){
+							const runCommand=()=>{
 								if(text2.value&&!['up','down'].contains(text2.value)){
 									logindex=-1;
 									logs.unshift(text2.value);
@@ -51545,10 +51549,9 @@ new Promise(resolve=>{
 								else{
 									if(!game.observe&&!game.online){
 										try{
-											var value=text2.value.trim();
+											let value=text2.value.trim();
 											if(value.endsWith(";")) value=value.slice(0,-1).trim();
-											var result=fun(value);
-											game.print(result);
+											game.print(fun(value));
 										}
 										catch(e){
 											game.print(e);
@@ -51557,7 +51560,7 @@ new Promise(resolve=>{
 									text2.value='';
 								}
 							}
-							text2.addEventListener('keydown',function(e){
+							text2.addEventListener('keydown',e=>{
 								if(e.keyCode==13){
 									runCommand();
 								}
@@ -51632,13 +51635,11 @@ new Promise(resolve=>{
 								text.scrollTop=text.scrollHeight;
 							}
 							if(_status.toprint){
-								for(var i=0;i<_status.toprint.length;i++){
-									game.print.apply(this,_status.toprint[i]);
-								}
+								game.print(...status.toprint);
 								delete _status.toprint;
 							}
 							runButton.listen(runCommand);
-							clearButton.listen(function(){
+							clearButton.listen(()=>{
 								pre.innerHTML='';
 							});
 						};
