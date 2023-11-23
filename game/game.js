@@ -9885,6 +9885,62 @@ new Promise(resolve=>{
 					ui.css.default=lib.init.css(lib.assetURL+'layout/default','layout');
 					proceed2();
 				})};
+				
+				const initGamePromises=function(){
+					game.promises.download=function(url,folder,dev,onprogress){
+						return new Promise((resolve,reject)=>{
+							game.download(url,folder,resolve,reject,dev,onprogress);
+						});
+					};
+
+					game.promises.readFile=function(filename){
+						return new Promise((resolve,reject)=>{
+							game.readFile(filename,resolve,reject);
+						});
+					};
+
+					game.promises.readFileAsText=function(filename){
+						return new Promise((resolve,reject)=>{
+							game.readFileAsText(filename,resolve,reject);
+						});
+					};
+
+					game.promises.writeFile=function(data,path,name){
+						return (new Promise((resolve,reject)=>{
+							game.writeFile(data,path,name,resolve);
+						})).then(result=>{
+							return new Promise((resolve,reject)=>{
+								if(result instanceof Error){
+									reject(result);
+								}else{
+									resolve(result);
+								}
+							});
+						});
+					};
+
+					game.promises.removeFile=function(dir){
+						return (new Promise((resolve,reject)=>{
+							game.removeFile(dir,resolve);
+						})).then(result=>{
+							return new Promise((resolve,reject)=>{
+								if(result instanceof Error){
+									reject(result);
+								}else{
+									resolve(result);
+								}
+							});
+						});
+					};
+
+					game.promises.getFileList=function(dir){
+						return new Promise((resolve,reject)=>{
+							game.getFileList(dir,resolve,reject);
+						});
+					};
+
+					game.promises.ensureDirectory=game.ensureDirectory;
+				};
 
 				if(lib.device){
 					lib.init.cordovaReady=function(){
@@ -9931,7 +9987,7 @@ new Promise(resolve=>{
 							if(!url.startsWith('http')){
 								url=get.url(dev)+url;
 							}
-							var fileTransfer = new FileTransfer();
+							var fileTransfer=new FileTransfer();
 							folder=lib.assetURL+folder;
 							if(onprogress){
 								fileTransfer.onprogress=function(progressEvent){
@@ -9952,8 +10008,8 @@ new Promise(resolve=>{
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
 								entry.getFile(filename,{},function(fileEntry){
 									fileEntry.file(function(fileToLoad){
-										var fileReader = new FileReader();
-										fileReader.onload = function(e){
+										var fileReader=new FileReader();
+										fileReader.onload=function(e){
 											callback(e.target.result);
 										};
 										fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
@@ -9965,8 +10021,8 @@ new Promise(resolve=>{
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
 								entry.getFile(filename,{},function(fileEntry){
 									fileEntry.file(function(fileToLoad){
-										var fileReader = new FileReader();
-										fileReader.onload = function(e){
+										var fileReader=new FileReader();
+										fileReader.onload=function(e){
 											callback(e.target.result);
 										};
 										fileReader.readAsText(fileToLoad, "UTF-8");
@@ -9977,33 +10033,31 @@ new Promise(resolve=>{
 						game.writeFile=function(data,path,name,callback){
 							game.ensureDirectory(path,function(){
 								if(Object.prototype.toString.call(data)=='[object File]'){
-								var fileReader = new FileReader();
-								fileReader.onload = function(e){
-									game.writeFile(e.target.result,path,name,callback);
-								};
-								fileReader.readAsArrayBuffer(data, "UTF-8");
-							}
-							else{
-								window.resolveLocalFileSystemURL(lib.assetURL+path,function(entry){
-									entry.getFile(name,{create:true},function(fileEntry){
-										fileEntry.createWriter(function(fileWriter){
-											fileWriter.onwriteend=callback;
-											fileWriter.write(data);
-										});
-									});
-								});
-							}
+									var fileReader=new FileReader();
+									fileReader.onload=function(e){
+										game.writeFile(e.target.result,path,name,callback);
+									};
+									fileReader.readAsArrayBuffer(data,"UTF-8");
+								}
+								else{
+									window.resolveLocalFileSystemURL(lib.assetURL+path,function(entry){
+										entry.getFile(name,{create:true},function(fileEntry){
+											fileEntry.createWriter(function(fileWriter){
+												fileWriter.onwriteend=callback;
+												fileWriter.write(data);
+											},callback);
+										},callback);
+									},callback);
+								}
 							});
 						};
 						game.removeFile=function(dir,callback){
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
 								entry.getFile(dir,{},function(fileEntry){
 									fileEntry.remove();
-									if(callback){
-										callback();
-									}
-								});
-							});
+									if(callback) callback();
+								},callback||function(){});
+							},callback||function(){});
 						};
 						game.getFileList=(dir,success,failure)=>{
 							var files=[],folders=[];
@@ -10055,6 +10109,7 @@ new Promise(resolve=>{
 								createDirectory();
 							},reject));
 						};
+						initGamePromises();
 						if(ui.updateUpdate){
 							ui.updateUpdate();
 						}
@@ -10239,6 +10294,7 @@ new Promise(resolve=>{
 							createDirectory();
 						});
 					};
+					initGamePromises();
 					if(ui.updateUpdate){
 						ui.updateUpdate();
 					}
@@ -36248,6 +36304,10 @@ new Promise(resolve=>{
 		}
 	};
 	const game={
+		/**
+		 * @type { { [key: string]: (...args:[])=>Promise } }
+		 */
+		promises:{},
 		globalEventHandlers: new class {
 			constructor() {
 				this._handlers = {};
