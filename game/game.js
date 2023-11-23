@@ -51610,7 +51610,7 @@ new Promise(resolve=>{
 										}
 										else if(typeof arg=='object'){
 											let msg='';
-											for(const name in arg){
+											for(const name of Object.getOwnPropertyNames(arg)){
 												msg+=`${name}: ${parse(arg[name])}<br>`;
 											}
 											return `<details><summary>${parse(arg)}</summary>${msg}</details>`;
