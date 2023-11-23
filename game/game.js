@@ -9885,6 +9885,62 @@ new Promise(resolve=>{
 					ui.css.default=lib.init.css(lib.assetURL+'layout/default','layout');
 					proceed2();
 				})};
+				
+				const initGamePromises=function(){
+					game.promises.download=function(url,folder,dev,onprogress){
+						return new Promise((resolve,reject)=>{
+							game.download(url,folder,resolve,reject,dev,onprogress);
+						});
+					};
+
+					game.promises.readFile=function(filename){
+						return new Promise((resolve,reject)=>{
+							game.readFile(filename,resolve,reject);
+						});
+					};
+
+					game.promises.readFileAsText=function(filename){
+						return new Promise((resolve,reject)=>{
+							game.readFileAsText(filename,resolve,reject);
+						});
+					};
+
+					game.promises.writeFile=function(data,path,name){
+						return (new Promise((resolve,reject)=>{
+							game.writeFile(data,path,name,resolve);
+						})).then(result=>{
+							return new Promise((resolve,reject)=>{
+								if(result instanceof Error){
+									reject(result);
+								}else{
+									resolve(result);
+								}
+							});
+						});
+					};
+
+					game.promises.removeFile=function(dir){
+						return (new Promise((resolve,reject)=>{
+							game.removeFile(dir,resolve);
+						})).then(result=>{
+							return new Promise((resolve,reject)=>{
+								if(result instanceof Error){
+									reject(result);
+								}else{
+									resolve(result);
+								}
+							});
+						});
+					};
+
+					game.promises.getFileList=function(dir){
+						return new Promise((resolve,reject)=>{
+							game.getFileList(dir,resolve,reject);
+						});
+					};
+
+					game.promises.ensureDirectory=game.ensureDirectory;
+				};
 
 				if(lib.device){
 					lib.init.cordovaReady=function(){
@@ -9931,7 +9987,7 @@ new Promise(resolve=>{
 							if(!url.startsWith('http')){
 								url=get.url(dev)+url;
 							}
-							var fileTransfer = new FileTransfer();
+							var fileTransfer=new FileTransfer();
 							folder=lib.assetURL+folder;
 							if(onprogress){
 								fileTransfer.onprogress=function(progressEvent){
@@ -9952,8 +10008,8 @@ new Promise(resolve=>{
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
 								entry.getFile(filename,{},function(fileEntry){
 									fileEntry.file(function(fileToLoad){
-										var fileReader = new FileReader();
-										fileReader.onload = function(e){
+										var fileReader=new FileReader();
+										fileReader.onload=function(e){
 											callback(e.target.result);
 										};
 										fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
@@ -9965,8 +10021,8 @@ new Promise(resolve=>{
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
 								entry.getFile(filename,{},function(fileEntry){
 									fileEntry.file(function(fileToLoad){
-										var fileReader = new FileReader();
-										fileReader.onload = function(e){
+										var fileReader=new FileReader();
+										fileReader.onload=function(e){
 											callback(e.target.result);
 										};
 										fileReader.readAsText(fileToLoad, "UTF-8");
@@ -9977,33 +10033,31 @@ new Promise(resolve=>{
 						game.writeFile=function(data,path,name,callback){
 							game.ensureDirectory(path,function(){
 								if(Object.prototype.toString.call(data)=='[object File]'){
-								var fileReader = new FileReader();
-								fileReader.onload = function(e){
-									game.writeFile(e.target.result,path,name,callback);
-								};
-								fileReader.readAsArrayBuffer(data, "UTF-8");
-							}
-							else{
-								window.resolveLocalFileSystemURL(lib.assetURL+path,function(entry){
-									entry.getFile(name,{create:true},function(fileEntry){
-										fileEntry.createWriter(function(fileWriter){
-											fileWriter.onwriteend=callback;
-											fileWriter.write(data);
-										});
-									});
-								});
-							}
+									var fileReader=new FileReader();
+									fileReader.onload=function(e){
+										game.writeFile(e.target.result,path,name,callback);
+									};
+									fileReader.readAsArrayBuffer(data,"UTF-8");
+								}
+								else{
+									window.resolveLocalFileSystemURL(lib.assetURL+path,function(entry){
+										entry.getFile(name,{create:true},function(fileEntry){
+											fileEntry.createWriter(function(fileWriter){
+												fileWriter.onwriteend=callback;
+												fileWriter.write(data);
+											},callback);
+										},callback);
+									},callback);
+								}
 							});
 						};
 						game.removeFile=function(dir,callback){
 							window.resolveLocalFileSystemURL(lib.assetURL,function(entry){
 								entry.getFile(dir,{},function(fileEntry){
 									fileEntry.remove();
-									if(callback){
-										callback();
-									}
-								});
-							});
+									if(callback) callback();
+								},callback||function(){});
+							},callback||function(){});
 						};
 						game.getFileList=(dir,success,failure)=>{
 							var files=[],folders=[];
@@ -10055,6 +10109,7 @@ new Promise(resolve=>{
 								createDirectory();
 							},reject));
 						};
+						initGamePromises();
 						if(ui.updateUpdate){
 							ui.updateUpdate();
 						}
@@ -10239,6 +10294,7 @@ new Promise(resolve=>{
 							createDirectory();
 						});
 					};
+					initGamePromises();
 					if(ui.updateUpdate){
 						ui.updateUpdate();
 					}
@@ -28219,7 +28275,7 @@ new Promise(resolve=>{
 						});
 						equips.forEach(card=>{
 							const info=get.info(card,false).distance;
-							if(ininfo&&info.globalFrom){
+							if(info&&info.globalFrom){
 								range+=info.globalFrom;
 							}
 						})
@@ -36248,6 +36304,10 @@ new Promise(resolve=>{
 		}
 	};
 	const game={
+		/**
+		 * @type { { [key: string]: (...args:[])=>Promise } }
+		 */
+		promises:{},
 		globalEventHandlers: new class {
 			constructor() {
 				this._handlers = {};
@@ -51330,53 +51390,127 @@ new Promise(resolve=>{
 						node._initLink=function(){
 							node.link=page;
 							page.classList.add('menu-sym');
-							var text=document.createElement('div');
-							text.style.width='194px';
-							text.style.height='124px';
-							text.style.padding='3px';
-							text.style.borderRadius='2px';
-							text.style.boxShadow='rgba(0, 0, 0, 0.2) 0 0 0 1px';
-							text.style.textAlign='left';
-							text.style.webkitUserSelect='initial';
-							text.style.overflow='scroll';
-							text.style.position='absolute';
-							text.style.left='30px';
-							text.style.top='50px';
-							text.style.wordBreak='break-all';
-							var pre=ui.create.node('pre.fullsize',text);
-							pre.style.margin=0;
-							pre.style.padding=0;
-							pre.style.position='relative';
-							pre.style.webkitUserSelect = pre.style.userSelect = 'text';
+
+							const text=document.createElement('div');
+							text.css({
+								'width':'194px',
+								'height':'124px',
+								'padding':'3px',
+								'borderRadius':'2px',
+								'boxShadow':'rgba(0, 0, 0, 0.2) 0 0 0 1px',
+								'textAlign':'left',
+								'webkitUserSelect':'initial',
+								'overflow':'scroll',
+								'position':'absolute',
+								'left':'30px',
+								'top':'50px',
+								'wordBreak':'break-all'
+							});
+							
+							const pre=ui.create.node('pre.fullsize',text);
+							text.css.call(pre,{
+								'margin':'0',
+								'padding':'0',
+								'position':'relative',
+								'webkitUserSelect': 'text',
+								'userSelect':'text'
+							});
 							lib.setScroll(pre);
 							page.appendChild(text);
+							
+							const text2=document.createElement('input');
+							text.css.call(text2,{
+								'width':'200px',
+								'height':'20px',
+								'padding':'0',
+								'position': 'absolute',
+								'top':'15px',
+								'left':'30px',
+								'resize':'none',
+								'border':'none',
+								'borderRadius':'2px',
+								'boxShadow':'rgba(0, 0, 0, 0.2) 0 0 0 1px'
+							});
 
-							// var caption=ui.create.div('','输入命令',page);
-							// caption.style.margin='6px';
-							// caption.style.position='absolute';
-							// caption.style.width='120px';
-							// caption.style.top='129px';
-							// caption.style.left='64px';
-							var text2=document.createElement('input');
-							text2.style.width='200px';
-							text2.style.height='20px';
-							text2.style.padding='0';
-							text2.style.position='absolute';
-							text2.style.top='15px';
-							text2.style.left='30px';
-							text2.style.resize='none';
-							text2.style.border='none';
-							text2.style.borderRadius='2px';
-							text2.style.boxShadow='rgba(0, 0, 0, 0.2) 0 0 0 1px';
-							var g={};
-							var logs=[];
-							var logindex=-1;
-							var cheat=lib.cheat;
-							//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
-							var reg=/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/;
+							const g={};
+							const logs=[];
+							let logindex=-1;
+							let proxyWindow=Object.assign({},window,{
+								_status:_status,
+								lib:lib,
+								game:game,
+								ui:ui,
+								get:get,
+								ai:ai,
+								cheat:lib.cheat
+							});
+							Object.defineProperties(proxyWindow, {
+								'_status':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'lib':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'game':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'ui':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'get':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'ai':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								},
+								'cheat':{
+									configurable:false,
+									enumerable:true,
+									writable:false
+								}
+							});
+							if(typeof window.Proxy=='function'){
+								proxyWindow=new Proxy(proxyWindow,{
+									set(target,prop,newValue) {
+										if (!['_status','lib','game','ui','get','ai','cheat'].includes(prop)){
+											Reflect.set(window, prop, newValue);
+										}
+										return Reflect.set(target,prop,newValue);
+									}
+								});
+							}
 							//使用new Function隔绝作用域，避免在控制台可以直接访问到runCommand等变量
-							var fun=(new Function('reg','value','_status','lib','game','ui','get','ai',`"use strict";\nreturn eval(reg.test(value)?('('+value+')'):value)`));
-							var runCommand=function(e){
+							/**
+							 * @type { (value:string)=>any }
+							 */
+							const fun=(new Function('window',`
+								const _status=window._status;
+								const lib=window.lib;
+								const game=window.game;
+								const ui=window.ui;
+								const get=window.get;
+								const ai=window.ai;
+								const cheat=window.lib.cheat;
+								//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
+								const reg=/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/;
+								return function(value){ 
+									"use strict";
+									return eval(reg.test(value)?('('+value+')'):value);
+								}
+							`))(proxyWindow);
+							const runCommand=()=>{
 								if(text2.value&&!['up','down'].contains(text2.value)){
 									logindex=-1;
 									logs.unshift(text2.value);
@@ -51415,10 +51549,9 @@ new Promise(resolve=>{
 								else{
 									if(!game.observe&&!game.online){
 										try{
-											var value=text2.value.trim();
+											let value=text2.value.trim();
 											if(value.endsWith(";")) value=value.slice(0,-1).trim();
-											var result=fun(reg,value,_status,lib,game,ui,get,ai);
-											game.print(result);
+											game.print(fun(value));
 										}
 										catch(e){
 											game.print(e);
@@ -51427,7 +51560,7 @@ new Promise(resolve=>{
 									text2.value='';
 								}
 							}
-							text2.addEventListener('keydown',function(e){
+							text2.addEventListener('keydown',e=>{
 								if(e.keyCode==13){
 									runCommand();
 								}
@@ -51450,26 +51583,51 @@ new Promise(resolve=>{
 							});
 							page.appendChild(text2);
 							game.print=function(){
-								var args=[].slice.call(arguments);
-								var printResult=args.map(arg=>{
-									if(get.is.object(arg)||typeof arg=='function'){
-										var argi=get.stringify(arg);
-										if(argi/*&&argi.length<5000*/){
-											return argi.replace(/&/g, '&amp;')
-												.replace(/</g, '&lt;')
-												.replace(/>/g, '&gt;')
-												.replace(/"/g, '&quot;')
-												.replace(/'/g, '&#39;');
+								const args=[...arguments];
+								const printResult=args.map(arg=>{
+									if(typeof arg!='string'){
+										const parse=(obj)=>{
+											if(Array.isArray(obj)){
+												return `[${obj.map(v=>parse(v))}]`;
+											}else if(typeof obj=='function'){
+												return `Function`;
+											}else if(typeof obj!='string'){
+												return String(obj);
+											}else{
+												return `'${String(obj)}'`;
+											}
+										};
+										if(typeof arg=='function'){
+											let argi;
+											try{
+												argi=get.stringify(arg);
+												if(argi==='') argi=arg.toString();
+											}catch(_){
+												argi=arg.toString();
+											}
+											return argi.replace(/&/g,'&amp;')
+												.replace(/</g,'&lt;')
+												.replace(/>/g,'&gt;')
+												.replace(/"/g,'&quot;')
+												.replace(/'/g,'&#39;');
 										}
-										else return arg.toString();
+										else if(typeof arg=='object'){
+											let msg='';
+											for(const name of Object.getOwnPropertyNames(arg)){
+												msg+=`${name}: ${parse(arg[name])}<br>`;
+											}
+											return `<details><summary>${parse(arg)}</summary>${msg}</details>`;
+										}else{
+											return parse(arg);
+										}
 									}else{
-										var str=String(arg);
-										if (!/<[a-zA-Z]+[^>]*?\/?>.*?(?=<\/[a-zA-Z]+[^>]*?>|$)/.exec(str)) return String(arg)
-											.replace(/&/g, '&amp;')
-											.replace(/</g, '&lt;')
-											.replace(/>/g, '&gt;')
-											.replace(/"/g, '&quot;')
-											.replace(/'/g, '&#39;');
+										const str=String(arg);
+										if (!/<[a-zA-Z]+[^>]*?\/?>.*?(?=<\/[a-zA-Z]+[^>]*?>|$)/.exec(str)) return str
+											.replace(/&/g,'&amp;')
+											.replace(/</g,'&lt;')
+											.replace(/>/g,'&gt;')
+											.replace(/"/g,'&quot;')
+											.replace(/'/g,'&#39;');
 										else return str;
 									}
 								}).join(' ');
@@ -51477,13 +51635,11 @@ new Promise(resolve=>{
 								text.scrollTop=text.scrollHeight;
 							}
 							if(_status.toprint){
-								for(var i=0;i<_status.toprint.length;i++){
-									game.print.apply(this,_status.toprint[i]);
-								}
+								game.print(...status.toprint);
 								delete _status.toprint;
 							}
 							runButton.listen(runCommand);
-							clearButton.listen(function(){
+							clearButton.listen(()=>{
 								pre.innerHTML='';
 							});
 						};
@@ -63540,6 +63696,7 @@ new Promise(resolve=>{
 				}
 			}
 		},
+		//我愚蠢的弟弟呦，这是最后一次兼容46内核兼容版了
 		get:get
 	};
 	/**
