@@ -51585,7 +51585,7 @@ new Promise(resolve=>{
 									if(typeof arg!='string'){
 										const parse=(obj)=>{
 											if(Array.isArray(obj)){
-												return `[${String(obj)}]`;
+												return `[${obj.map(v=>parse(v))}]`;
 											}else if(typeof obj=='function'){
 												return `Function`;
 											}else if(typeof obj!='string'){
