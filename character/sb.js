@@ -575,8 +575,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var cards=list[0][1].slice(),player=_status.event.player;
 							var name=_status.event.getTrigger().name;
 							var target=(name=='phaseZhunbei'?player:target);
+							var judges=target.getCards('j');
 							var top=[],att=get.sgn(get.attitude(player,target));
-							if(att!=0&&(target!=player||!player.hasWuxie())){
+							if(judges.length&&att!=0&&(target!=player||!player.hasWuxie())){
 								for(var i=0;i<judges.length;i++){
 									var judge=get.judge(judges[i])*att;
 									cards.sort((a,b)=>judge(b)-judge(a));
