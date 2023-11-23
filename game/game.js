@@ -51580,26 +51580,51 @@ new Promise(resolve=>{
 							});
 							page.appendChild(text2);
 							game.print=function(){
-								var args=[].slice.call(arguments);
-								var printResult=args.map(arg=>{
-									if(get.is.object(arg)||typeof arg=='function'){
-										var argi=get.stringify(arg);
-										if(argi/*&&argi.length<5000*/){
-											return argi.replace(/&/g, '&amp;')
-												.replace(/</g, '&lt;')
-												.replace(/>/g, '&gt;')
-												.replace(/"/g, '&quot;')
-												.replace(/'/g, '&#39;');
+								const args=[...arguments];
+								const printResult=args.map(arg=>{
+									if(typeof arg!='string'){
+										const parse=(obj)=>{
+											if(Array.isArray(obj)){
+												return `[${String(obj)}]`;
+											}else if(typeof obj=='function'){
+												return `Function`;
+											}else if(typeof obj!='string'){
+												return String(obj);
+											}else{
+												return `'${String(obj)}'`;
+											}
+										};
+										if(typeof arg=='function'){
+											let argi;
+											try{
+												argi=get.stringify(arg);
+												if(argi==='') argi=arg.toString();
+											}catch(_){
+												argi=arg.toString();
+											}
+											return argi.replace(/&/g,'&amp;')
+												.replace(/</g,'&lt;')
+												.replace(/>/g,'&gt;')
+												.replace(/"/g,'&quot;')
+												.replace(/'/g,'&#39;');
 										}
-										else return arg.toString();
+										else if(typeof arg=='object'){
+											let msg='';
+											for(const name in arg){
+												msg+=`${name}: ${parse(arg[name])}<br>`;
+											}
+											return `<details><summary>${parse(arg)}</summary>${msg}</details>`;
+										}else{
+											return parse(arg);
+										}
 									}else{
-										var str=String(arg);
-										if (!/<[a-zA-Z]+[^>]*?\/?>.*?(?=<\/[a-zA-Z]+[^>]*?>|$)/.exec(str)) return String(arg)
-											.replace(/&/g, '&amp;')
-											.replace(/</g, '&lt;')
-											.replace(/>/g, '&gt;')
-											.replace(/"/g, '&quot;')
-											.replace(/'/g, '&#39;');
+										const str=String(arg);
+										if (!/<[a-zA-Z]+[^>]*?\/?>.*?(?=<\/[a-zA-Z]+[^>]*?>|$)/.exec(str)) return str
+											.replace(/&/g,'&amp;')
+											.replace(/</g,'&lt;')
+											.replace(/>/g,'&gt;')
+											.replace(/"/g,'&quot;')
+											.replace(/'/g,'&#39;');
 										else return str;
 									}
 								}).join(' ');
