@@ -1212,7 +1212,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.turnOver(false);
 				},
 				getNum:function(player){
-					return Math.max(1,4+player.countCards('e'));
+					return Math.max(2,Math.floor(4-player.countCards('e',card=>get.subtype(card)!='equip5')/2));
 				},
 				ai:{
 					expose:0.2,
@@ -15702,7 +15702,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbhuiyao:'慧夭',
 			mbhuiyao_info:'出牌阶段限一次。你可以受到1点无来源伤害，然后你选择一名其他角色，令其视为对另一名角色造成过1点伤害。',
 			mbquesong:'雀颂',
-			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸X张牌并复原武将牌（X为4+其装备区牌数，且X至少为1）；2.回复1点体力。',
+			mbquesong_info:'一名角色的结束阶段，若你于本回合受到过伤害，你可以令一名角色选择一项：1.摸X张牌并复原武将牌（X为4-其装备区非宝物牌牌数的一半，X向下取整且至少为2）；2.回复1点体力。',
 			xin_yuanshao:'手杀界袁绍',
 			xin_yuanshao_prefix:'手杀界',
 			re_baosanniang:'手杀鲍三娘',

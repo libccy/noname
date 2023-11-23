@@ -1428,6 +1428,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
+					if(!player.countCards('h')) return false;
 					var num=player.countCards('h')%2;
 					return !player.hasSkill('yanru_'+num);
 				},

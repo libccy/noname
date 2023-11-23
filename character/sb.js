@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sb',
 		connect:true,
 		character:{
-			sb_huangyueying:['female','shu',3,['sbqicai','sbjizhi']],
+			sb_huangyueying:['female','shu',3,['sbjizhi','sbqicai']],
 			sb_sp_zhugeliang:['male','shu',3,['sbhuoji','sbkanpo']],
 			sb_zhugeliang:['male','shu',3,['sbguanxing','sbkongcheng'],['unseen']],
 			sb_zhanghe:['male','wei',4,['sbqiaobian']],
@@ -574,9 +574,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						]).set('prompt','观星：点击将牌移动到牌堆顶').set('processAI',function(list){
 							var cards=list[0][1].slice(),player=_status.event.player;
 							var name=_status.event.getTrigger().name;
-							var target=(name=='phaseZhunbei'?player:target);
+							var target=(name=='phaseZhunbei'?player:player.getNext());
+							var judges=target.getCards('j');
 							var top=[],att=get.sgn(get.attitude(player,target));
-							if(att!=0&&(target!=player||!player.hasWuxie())){
+							if(judges.length&&att!=0&&(target!=player||!player.hasWuxie())){
 								for(var i=0;i<judges.length;i++){
 									var judge=get.judge(judges[i])*att;
 									cards.sort((a,b)=>judge(b)-judge(a));
@@ -762,7 +763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				discard:false,
 				lose:false,
 				delay:0,
-				usable:3,
+				usable:2,
 				prompt:'将一张红色牌交给一名角色并令其获得此花色的“天香”标记',
 				content:function(){
 					player.give(cards,target);
@@ -5714,7 +5715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_xiaoqiao:'谋小乔',
 			sb_xiaoqiao_prefix:'谋',
 			sbtianxiang:'天香',
-			sbtianxiang_info:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸等量的牌。',
+			sbtianxiang_info:'①出牌阶段限两次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸等量的牌。',
 			sb_sp_zhugeliang:'谋诸葛亮',
 			sb_sp_zhugeliang_prefix:'谋',
 			sb_zhugeliang:'谋诸葛亮',
