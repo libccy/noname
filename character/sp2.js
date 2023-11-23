@@ -424,8 +424,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//小程序刘伶
 			mpjiusong:{
 				audio:2,
+				enable:'chooseToUse',
 				trigger:{global:'useCard'},
+				filterCard:function(card){
+					return get.type2(card)=='trick';
+				},
+				viewAs:{name:'jiu'},
+				position:'hs',
+				viewAsFilter:function(player){
+					return player.hasCard(card=>get.type2(card)=='trick','hs');
+				},
+				check:function(card){
+					if(get.event().type=='dying') return 1/Math.max(0.1,get.value(card));
+					return 4-get.value(card);
+				},
+				prompt:'将一张锦囊牌当【酒】使用',
 				filter:function(event,player){
+					if(event.name=='chooseToUse') return player.hasCard(card=>get.type2(card)=='trick','hs');
 					return event.card.name=='jiu'&&player.countMark('mpjiusong')<3;
 				},
 				forced:true,
@@ -445,6 +460,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCardToPlayer'},
 				filter:function(event,player){
 					if(event.targets.length!=1||!event.isFirstTarget) return false;
+					if(!['basic','trick'].includes(get.type(event.card))) return false;
 					return event.player!=player&&player.countMark('mpjiusong');
 				},
 				prompt2:function(event,player){
@@ -10935,9 +10951,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dccanyun_info:'每名角色限一次。出牌阶段，你可以弃置一张牌并选择一名其他角色，然后若其装备区里的牌数：小于你，其回复1点体力；大于你，其失去1点体力；等于你，其摸一张牌。若你的体力值为1，你摸一张牌。',
 			mp_liuling:'刘伶',
 			mpjiusong:'酒颂',
-			mpjiusong_info:'当一名角色使用【酒】时，你获得1枚“醉”标记（“醉”数至多为3）。',
+			mpjiusong_info:'①你可以将一张锦囊牌当【酒】使用。②当一名角色使用【酒】时，你获得1枚“醉”标记（“醉”数至多为3）。',
 			mpmaotao:'酕醄',
-			mpmaotao_info:'当其他角色使用牌指定唯一目标时，你可以移去1枚“醉”，令此牌的目标改为随机一名合法角色（无距离限制）。若目标角色与原目标相同，你从牌堆中获得一张【酒】。',
+			mpmaotao_info:'当其他角色使用基本牌或普通锦囊牌指定唯一目标时，你可以移去1枚“醉”，令此牌的目标改为随机一名合法角色（无距离限制）。若目标角色与原目标相同，你从牌堆中获得一张【酒】。',
 			mpbishi:'避世',
 			mpbishi_info:'锁定技。你不能成为伤害类锦囊牌的目标。',
 			star_caoren:'星曹仁',
