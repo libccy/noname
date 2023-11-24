@@ -595,9 +595,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:3,
-				filter:function(event,player){
-					return !player.hasSkill('shuojian_ban');
-				},
 				filterTarget:lib.filter.notMe,
 				filterCard:true,
 				position:'he',
@@ -611,7 +608,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.give(cards,target);
 					'step 1'
-					var num=3-get.skillCount('shuojian');
+					var num=3-get.skillCount('shuojian')+1;
 					event.num=num;
 					event.num2=num;
 					if(event.num==0) event.finish();
@@ -624,19 +621,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(evt.name=='chooseTarget') evt=evt.getParent();
 						if(!evt.goon) return 0;
 						return get.effect_use.apply(this,arguments);
-					}).set('goon',target.getUseValue({name:'guohe'})>player.getUseValue({name:'wuzhong'})/(1.8-num*0.3));
+					}).set('goon',target.getUseValue({name:'guohe'})>get.sgnAttitude(target,player)*player.getUseValue({name:'wuzhong'})/(2-num*0.4));
 					'step 3'
 					if(!result.bool){
 						player.draw(num);
+						if(num>1) player.chooseToDiscard('he',num-1,true);
 						event.finish();
 					}
 					'step 4'
 					if(--event.num2>0){
 						event.goto(2);
 					}
-					else player.addTempSkill('shuojian_ban');
+					else player.tempBanSkill('shuojian');
 				},
-				subSkill:{ban:{charlotte:true}},
 				ai:{
 					expose:0.15,
 					order:8,
@@ -14546,7 +14543,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			biejun_info:'①其他角色的出牌阶段限一次。其可以将一张手牌交给你。②每回合限一次。当你受到伤害时，若你手牌中没有本回合因〖别君①〗得到的牌，你可以翻面并防止此伤害。',
 			yj_sufei:'苏飞',
 			shuojian:'数谏',
-			shuojian_info:'出牌阶段限三次。你可以交给一名其他角色一张牌，其选择一项：1.令你摸X张牌；2.视为使用X张【过河拆桥】，然后此技能本回合失效（X为此技能本阶段剩余发动次数）。',
+			shuojian_info:'出牌阶段限三次。你可以交给一名其他角色一张牌，其选择一项：1.令你摸X张牌并弃置X-1张牌；2.视为使用X张【过河拆桥】，然后此技能本回合失效（X为此技能本阶段剩余发动次数+1）。',
 			yj_qiaozhou:'谯周',
 			shiming:'识命',
 			shiming_info:'每轮限一次。一名角色的摸牌阶段，你可以观看牌堆顶的两张牌，并可以将其中一张置于牌堆底。然后该角色可以改为对自己造成1点伤害，然后从牌堆底摸三张牌。',
