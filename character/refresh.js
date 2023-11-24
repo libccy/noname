@@ -2856,7 +2856,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					nokeep:true,
 					skillTagFilter:function(player,tag,arg){
-						if(tag==='nokeep') return (!arg||arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&player.countSkill('rezhanjue_draw')<3&&player.hasCard((card)=>get.name(card)!='tao'&&!card.hasGaintag('reqinwang'),'h');
+						if(tag==='nokeep') return (!arg||arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&player.countSkill('rezhanjue_draw')<3&&player.hasCard((card)=>{
+							return get.name(card)!=='tao'&&!card.hasGaintag('reqinwang');
+						},'h');
 					}
 				},
 			},
