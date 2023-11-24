@@ -27397,7 +27397,14 @@ new Promise(resolve=>{
 								subplayer:true
 							}
 						}
-						lib.character[skill]=[cfg.sex,cfg.group,cfg.maxHp,cfg.skills,['character:'+cfg.name]];
+						lib.character[skill]=[cfg.sex,cfg.group,cfg.maxHp,cfg.skills,[]];
+						if(Array.isArray(cfg.image)){
+							cfg.image.forEach(image=>lib.character[skill][4].push(image));
+						}else if(typeof cfg.image=='string'){
+							lib.character[skill][4].push(cfg.image);
+						}else{
+							lib.character[skill][4].push('character:'+cfg.name);
+						}
 						lib.translate[skill]=cfg.caption||get.rawName(cfg.name);
 						player.storage[skill]=cfg;
 					},this,skill,cfg);
@@ -61443,7 +61450,7 @@ new Promise(resolve=>{
 			||(item.cardtags&&item.cardtags.contains(tag)),
 		tag:(item,tag,item2,bool)=>{
 			var result;
-			if(get.info(item)&&get.info(item).ai&&get.info(item).ai.tag){
+			if(get.info(item,bool)&&get.info(item,bool).ai&&get.info(item,bool).ai.tag){
 				result=get.info(item,bool).ai.tag[tag];
 			}
 			if(typeof result=='function') return result(item,item2);
