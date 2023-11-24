@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			dc_dongzhao:['male','wei',3,['dcyijia','dcdingji']],
 			kuaiqi:['male','wei',3,['dcliangxiu','dcxunjie']],
 			yue_caiyong:['male','qun',3,['dcjiaowei','dcfeibai']],
 			pangshanmin:['male','wei',3,['dccaisi','dczhuoli']],
@@ -96,7 +97,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie','dc_caiyang','zhoushan'],
 				sp_caizijiaren:['re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
 				sp_zhilan:['liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen'],
-				sp_guixin:['re_kanze','re_chendeng','caimaozhangyun','dc_lvkuanglvxiang','dc_gaolan','yinfuren','chengui','chenjiao','dc_sp_jiaxu','qinlang'],
+				sp_guixin:['re_kanze','re_chendeng','caimaozhangyun','dc_lvkuanglvxiang','dc_gaolan','yinfuren','chengui','chenjiao','dc_sp_jiaxu','qinlang','dc_dongzhao'],
 				sp_daihan:['mamidi','dc_jiling','zhangxun','dc_yuejiu','wanglie','leibo','qiaorui','dongwan','yuanyin'],
 				sp_jianghu:['guanning','huzhao','dc_huangchengyan','mengjie'],
 				sp_zongheng:['huaxin','luyusheng','re_xunchen','re_miheng','fengxi','re_dengzhi','dc_yanghu','zongyu'],
@@ -109,6 +110,106 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//董昭
+			dcyijia:{
+				audio:2,
+				trigger:{global:'damageEnd'},
+				filter:function(event,player){
+					if(!event.player.isIn()) return false;
+					if(get.distance(player,event.player)>1) return false;
+					return player.canMoveCard(null,true,game.filterPlayer(i=>i!=event.player),event.player,'canReplace');
+				},
+				check:function(event,player){
+					return player.canMoveCard(true,true,game.filterPlayer(i=>i!=event.player),event.player,'canReplace');
+				},
+				prompt2:function(event,player){
+					return `将场上一张装备牌移动至${get.translation(event.player)}的装备区内（替换原装备）。然后若其因此脱离了一名角色的攻击范围，你摸一张牌。`;
+				},
+				logTarget:'player',
+				line:false,
+				content:function*(event,map){
+					const player=map.player,trigger=map.trigger,target=trigger.player;
+					const inRangeList=game.filterPlayer(current=>current.inRange(target));
+					yield player.moveCard(true,game.filterPlayer(i=>i!=target),target,'canReplace');
+					const leaveSomeone=inRangeList.some(current=>!current.inRange(target));
+					if(leaveSomeone) player.draw();
+				},
+				ai:{
+					maixie:true,
+					expose:0.2,
+					threaten:3.3,
+				},
+			},
+			dcdingji:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				content:function*(event,map){
+					const player=map.player;
+					let result;
+					result=yield player.chooseTarget(get.prompt2('dcdingji')).set('ai',target=>{
+						const att=get.attitude(get.player(),target)/2;
+						const delta=5-target.countCards('h');
+						let fix=1;
+						const hs=target.getCards('h');
+						outer:for(let i=0;i<hs.length-1;i++){
+							const name1=get.name(hs[i]);
+							for(let j=i+1;j<hs.length;j++){
+								const name2=get.name(hs[j]);
+								if(name1==name2){
+									fix=0.5; break outer;
+								}
+							}
+						}
+						if(delta>0){
+							if(target.hasSkillTag('nogain')) att/=3;
+							return Math.sqrt(delta)*att*fix;
+						}
+						if(delta>-2&&att>0) return fix==0.5?0.1:-1;
+						return -Math.sqrt(-delta)*att/2;
+					});
+					if(!result.bool) return event.finish();
+					const target=result.targets[0];
+					player.logSkill('dcdingji',target);
+					if(target!=player) player.addExpose(0.3);
+					const delta=5-target.countCards('h');
+					if(delta!=0){
+						yield target[delta>0?'draw':'chooseToDiscard'](Math.abs(delta),true);
+					}
+					target.showHandcards();
+					const hs=target.getCards('h');
+					let hasSame=false;
+					outer:for(let i=0;i<hs.length-1;i++){
+						const name1=get.name(hs[i]);
+						for(let j=i+1;j<hs.length;j++){
+							const name2=get.name(hs[j]);
+							if(name1==name2){
+								hasSame=true; break outer;
+							}
+						}
+					}
+					game.delayex();
+					if(hasSame) return event.finish();
+					const list=get.inpileVCardList(info=>{
+						if(!['basic','trick'].includes(info[0])) return false;
+						if(!target.hasUseTarget(new lib.element.VCard({name:info[2],nature:info[3],isCard:true}))) return false;
+						return hs.some(card=>{
+							return get.name(card)==info[2]&&get.is.sameNature([card,info[3]],true);
+						});
+					});
+					if(!list.length) return event.finish();
+					result=yield target.chooseButton(['是否视为使用其中一张牌？',[list,'vcard']]).set('ai',button=>{
+						return get.player().getUseValue({name:button.link[2]});
+					});
+					if(result.bool){
+						target.chooseUseTarget(new lib.element.VCard({
+							name:result.links[0][2],
+							nature:result.links[0][3],
+							isCard:true,
+						}),true,false);
+					}
+				},
+			},
 			//蒯祺
 			dcliangxiu:{
 				audio:2,
@@ -11250,6 +11351,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcliangxiu_info:'出牌阶段，你可以弃置两张不同类型的牌，然后从两张与你弃置的牌类型均不同的牌中选择一张获得之（每阶段每种类型限一次）。',
 			dcxunjie:'殉节',
 			dcxunjie_info:'每轮每项限一次。一名角色的回合结束时，若你本回合于摸牌阶段外得到过牌，你可以选择一项：1.令一名角色将手牌数摸或弃置至与其体力值相同；2.令一名角色将体力值回复或失去至与其手牌数相同。',
+			dc_dongzhao:'董昭',
+			dcyijia:'移驾',
+			dcyijia_info:'当你距离1以内的角色受到伤害后，你可以将场上一张装备牌移动至其对应装备栏（替换原装备）。若其因此脱离了一名角色的攻击范围，你摸一张牌。',
+			dcdingji:'定基',
+			dcdingji_info:'准备阶段，你可以令一名角色将手牌摸或弃置至五张，然后其展示手牌。若牌名均不同，则其可以视为使用其中一张基本或普通锦囊牌。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
