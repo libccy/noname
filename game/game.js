@@ -14497,6 +14497,7 @@ new Promise(resolve=>{
 						},true);
 						next.set('_get_card',card);
 						next.set('preTarget',targets[num]);
+						next.set('ai',target=>get.effect(target,get.card(),player,_status.event.player));
 					}
 					else{
 						event.addedTargets[num]=false;

@@ -1838,23 +1838,39 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						useful:1,
 					},
 					result:{
-						target:function(player,target){
-							if(ui.selected.targets.length){
-								const preTarget=ui.selected.targets.lastItem;
-								const eff=get.effect(target,{name:'sha'},preTarget,player);
-								return Math.sign(eff)*get.sgnAttitude(player,target);
+						player:(player,target)=>{
+							if(!target.hasSkillTag('noe')&&get.attitude(player,target)>0) return 0;
+							return (player.hasSkillTag('noe')?0.32:0.15)*target.getEquips(1).reduce((num,i)=>{
+								return num+get.value(i,player);
+							},0);
+						},
+						target:(player,target)=>{
+							let targets=get.copy(ui.selected.targets);
+							if(_status.event.preTarget) targets.add(_status.event.preTarget);
+							if(targets.length){
+								let preTarget=targets.lastItem,pre=_status.event.getTempCache('jiedao_result',preTarget);
+								if(pre&&pre.target.isIn()) return target===pre.target?pre.eff:0;
+								return get.effect(target,{name:'sha'},preTarget,player)/get.attitude(player,target);
 							}
-							const filter=get.info({name:'jiedao'}).filterAddedTarget;
-							if(game.hasPlayer(current=>{
-								return filter(null,null,current,target)&&get.effect(current,{name:'sha'},target,player)>=0;
-							})) return -1;
-							if(target.mayHaveSha(player,'use')) return 0.25;
-							return -1;
-						},
-						player:function(player){
-							if(player.getCards('he',{subtype:'equip1'}).length) return 0;
-							return 1.25;
-						},
+							let arms=(target.hasSkillTag('noe')?0.32:-0.15)*target.getEquips(1).reduce((num,i)=>{
+								return num+get.value(i,target);
+							},0);
+							if(!target.mayHaveSha(player,'use')) return arms;
+							let sha=game.filterPlayer(get.info({name:'jiedao'}).filterAddedTarget),addTar=null;
+							sha=sha.reduce((num,current)=>{
+								let eff=get.effect(current,{name:'sha'},target,player);
+								if(eff<=num) return num;
+								addTar=current;
+								return eff;
+							},-100);
+							if(!addTar) return arms;
+							sha/=get.attitude(player,target);
+							_status.event.putTempCache('jiedao_result',target,{
+								target:addTar,
+								eff:sha
+							});
+							return Math.max(arms,sha);
+						}
 					},
 					tag:{
 						gain:1,
