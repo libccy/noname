@@ -4493,7 +4493,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.syncStorage('huashen');
 					player.updateMarks('huashen');
 					'step 2'
-					if(--event.num>0) player.chooseBool(get.prompt2('xinsheng')).set('frequentSkill','xinsheng');
+					if(--event.num>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
+						player.chooseBool(get.prompt2('xinsheng')).set('frequentSkill',event.name);
+					}
 					else event.finish();
 					'step 3'
 					if(result.bool&&player.hasSkill('xinsheng')){

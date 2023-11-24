@@ -4593,8 +4593,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 4'
 					if(cards.length) player.gain(cards,'gain2','log');
 					'step 5'
-					if(event.count>0&&player.hasSkill('spyinzhi')){
-						player.chooseBool(get.prompt2('spyinzhi')).set('frequentSkill','spyinzhi');
+					if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
+						player.chooseBool(get.prompt2('spyinzhi')).set('frequentSkill',event.name);
 					}
 					else event.finish();
 					'step 6'

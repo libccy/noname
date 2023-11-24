@@ -10852,8 +10852,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('quanji');
 					}
 					"step 4"
-					if(event.count>0&&player.hasSkill('quanji')){
-						player.chooseBool(get.prompt2('quanji')).set('frequentSkill','quanji');
+					if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
+						player.chooseBool(get.prompt2('quanji')).set('frequentSkill',event.name);
 					}
 					else event.finish();
 					"step 5"
