@@ -2856,7 +2856,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					nokeep:true,
 					skillTagFilter:function(player,tag,arg){
-						if(tag==='nokeep') return (!arg||arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&player.countSkill('rezhanjue_draw')<3&&player.hasCard((card)=>get.name(card)!='tao'&&!card.hasGaintag('reqinwang'),'h');
+						if(tag==='nokeep') return (!arg||arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&player.countSkill('rezhanjue_draw')<3&&player.hasCard((card)=>{
+							return get.name(card)!=='tao'&&!card.hasGaintag('reqinwang');
+						},'h');
 					}
 				},
 			},
@@ -5510,8 +5512,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addToExpansion(result.cards,'giveAuto',player).gaintag.add('xinquanji');
 					}
 					'step 4'
-					if(event.count>0&&player.hasSkill('xinquanji')){
-						player.chooseBool(get.prompt2('xinquanji')).set('frequentSkill','xinquanji');
+					if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
+						player.chooseBool(get.prompt2('xinquanji')).set('frequentSkill',event.name);
 					}
 					else event.finish();
 					'step 5'

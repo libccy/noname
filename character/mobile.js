@@ -6840,8 +6840,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addToExpansion(result.cards,player,'give').gaintag.add('quanji');
 					}
 					"step 4"
-					if(event.count>0&&player.hasSkill('requanji')){
-						player.chooseBool(get.prompt2('requanji')).set('frequentSkill','requanji');
+					if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
+						player.chooseBool(get.prompt2('requanji')).set('frequentSkill',event.name);
 					}
 					else event.finish();
 					"step 5"
@@ -12909,8 +12909,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw();
 					event.count--;
 					"step 2"
-					if(event.count){
-			 		player.chooseBool(get.prompt2('mingzhe')).set('frequentSkill',event.name);
+					if(event.count&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
+			 			player.chooseBool(get.prompt2('mingzhe')).set('frequentSkill',event.name);
 					}
 					else event.finish();
 					"step 3"

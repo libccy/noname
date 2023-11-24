@@ -649,7 +649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						animate:'draw',
 					}).setContent('gaincardMultiple');
 					'step 6'
-					if(event.count>0&&player.hasSkill(event.name)){
+					if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
 						player.chooseBool(get.prompt2(event.name)).set('frequentSkill',event.name);
 					}
 					else event.finish();
@@ -1937,7 +1937,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.count--;
 					player.draw(2);
 					"step 2"
-					if(event.count>0){
+					if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
 						player.chooseBool(get.prompt2('xiaoji')).set('frequentSkill','xiaoji').ai=lib.filter.all;
 					}
 					"step 3"

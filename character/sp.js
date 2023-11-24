@@ -23349,8 +23349,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw();
 					event.count--;
 					"step 2"
-					if(event.count){
-						player.chooseBool(get.prompt2('mingzhe')).set('frequentSkill','mingzhe');
+					if(event.count&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
+						player.chooseBool(get.prompt2('mingzhe')).set('frequentSkill',event.name);
 					}
 					else event.finish();
 					"step 3"
