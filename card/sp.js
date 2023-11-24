@@ -314,8 +314,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							let hs=player.getCards('h');
-							if(hs.length<=1 || !hs.some(i=>{
-								return get.value(hs[i])<5.5;
+							if(hs.length<=1||!hs.some(i=>{
+								return get.value(i)<5.5;
 							})) return 0;
 							let targets=get.copy(ui.selected.targets);
 							if(_status.event.preTarget) targets.add(_status.event.preTarget);
