@@ -18507,15 +18507,20 @@ new Promise(resolve=>{
 						var player=_status.event.player;
 						var att=get.attitude(player,target);
 						var sgnatt=get.sgn(att);
+						var aimTargets=get.event('aimTargets'),filterCard=get.event('filter');
 						if(ui.selected.targets.length==0){
 							if(att>0){
 								if(!_status.event.nojudge&&target.countCards('j',function(card){
+									if(!filterCard(card)) return false;
 									return game.hasPlayer(function(current){
+										if(!aimTargets.includes(current)) return false;
 										return current!=target&&current.canAddJudge(card)&&get.attitude(player,current)<0;
 									})
 								})) return 14;
 								if(target.countCards('e',function(card){
+									if(!filterCard(card)) return false;
 									return get.value(card,target)<0&&game.hasPlayer(function(current){
+										if(!aimTargets.includes(current)) return false;
 										return current!=target&&get.attitude(player,current)<0&&current.canEquip(card,_status.event.canReplace)&&get.effect(target,card,player,player)<0;
 									});
 								})>0) return 9;
@@ -18523,9 +18528,9 @@ new Promise(resolve=>{
 							else if(att<0){
 								if(game.hasPlayer(function(current){
 									if(current!=target&&get.attitude(player,current)>0){
-										var es=target.getCards('e');
+										var es=target.getCards('e',filterCard);
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.canEquip(es[i],_status.event.canReplace)&&get.effect(current,es[i],player,player)>0) return true;
+											if(get.value(es[i],target)>0&&current.canEquip(es[i],_status.event.canReplace)&&get.effect(current,es[i],player,player)>_status.event.canReplace?get.effect(target,es[i],player,player):0) return true;
 										}
 									}
 								})){
@@ -18534,7 +18539,7 @@ new Promise(resolve=>{
 							}
 							return 0;
 						}
-						var es=ui.selected.targets[0].getCards('e');
+						var es=ui.selected.targets[0].getCards('e',filterCard);
 						var i;
 						var att2=get.sgn(get.attitude(player,ui.selected.targets[0]));
 						for(i=0;i<es.length;i++){
@@ -18546,6 +18551,7 @@ new Promise(resolve=>{
 							}
 						}
 						if(i==es.length&&(_status.event.nojudge||!ui.selected.targets[0].countCards('j',function(card){
+							if(!filterCard(card)) return false;
 							return target.canAddJudge(card);
 						})||att2<=0)){
 							return 0;
@@ -25160,7 +25166,10 @@ new Promise(resolve=>{
 									if(withatt){
 										if(get.sgn(get.value(es[i],current))!=-att) return false;
 										var att2=get.sgn(get.attitude(player,current2));
-										if(att==att2||att2!=get.sgn(get.effect(current2,es[i],player,current2))) return false;
+										if(!canReplace||att<0&&current2.countEquipableSlot(get.subtype(es[i]))){
+											if(att==att2||att2!=get.sgn(get.effect(current2,es[i],player,current2))) return false;
+										}
+										// if((!canReplace||!current2.countEquipableSlot(get.subtype(es[i]))&&current2.canEquip(es[i],true))&&(att==att2||att2!=get.sgn(get.effect(current2,es[i],player,current2)))) return false;
 									}
 									return current!=current2&&!current2.isMin()&&current2.canEquip(es[i],canReplace);
 								})){
