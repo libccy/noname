@@ -3539,29 +3539,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									return -3;
 								}
 								return -4;
-								case 'commoner':
-									if(to.identity=='zhong') return 0;
-									if(get.population('fan')==0){
-										if(to.ai.identity_mark=='zhong'&&to.ai.shown<1) return 0;
-										return -0.5;
-									}
-									if(zhongmode&&to.ai.sizhong&&to.ai.shown<1) return 6;
-									if(game.players.length==3){
-										var fan;
-										for(var i=0; i<game.players.length; i++){
-											if(game.players[i].identity=='fan'){
-												fan=game.players[i]; break;
-											}
+							case 'commoner':
+								if(to.identity=='zhong') return 0;
+								if(get.population('fan')==0){
+									if(to.ai.identity_mark=='zhong'&&to.ai.shown<1) return 0;
+									return -0.5;
+								}
+								if(zhongmode&&to.ai.sizhong&&to.ai.shown<1) return 6;
+								if(game.players.length==3){
+									var fan;
+									for(var i=0; i<game.players.length; i++){
+										if(game.players[i].identity=='fan'){
+											fan=game.players[i]; break;
 										}
-										if(fan){
-											if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
-												return -3;
-											}
-										}
-										return 3;
 									}
-									if(situation<0&&game.zhu&&game.zhu.hp<=2) return -3.8;
-									return 2-get.population('fan');
+									if(fan){
+										if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
+											return -3;
+										}
+									}
+									return 3;
+								}
+								if(situation<0&&game.zhu&&game.zhu.hp<=2) return -3.8;
+								return Math.max(-4,2-get.population('fan'));
 						}
 						break;
 					case 'zhong':case 'mingzhong':
@@ -3574,7 +3574,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								return Math.min(3,-situation);
 							case 'fan': return -8;
                             case 'commoner':
-                                return Math.min(3,Math.max(-3,situation));
+                                return Math.min(3,Math.max(-3,situation-0.2));
 						}
 						break;
 					case 'nei':
@@ -3684,7 +3684,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								return Math.min(3,situation);
 							case 'fan': return 5;
                             case 'commoner':
-                                return 2*get.population('fan')-2;
+                                return 2*get.population('fan')-3;
 						}
 						break;
 					case 'commoner':
