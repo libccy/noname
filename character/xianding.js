@@ -4047,7 +4047,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.recover(player.getDamagedHp(raw));
+					player.recover(player.getDamagedHp(true));
 					player.drawTo(player.maxHp);
 					'step 1'
 					var check=0;
