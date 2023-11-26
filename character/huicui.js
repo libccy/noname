@@ -308,7 +308,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const choices=[];
 					const choiceList=[
 						'令一名角色将手牌数摸或弃置至与其体力值相同',
-						'令一名角色将体力值回复或失去至与其手牌数相同',
+						'令一名角色将体力回复或失去至与其手牌数相同',
 					];
 					if(!player.isTempBanned('dcxunjie_handcard')) choices.push('选项一');
 					else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'（已被选择过）</span>';
@@ -11351,7 +11351,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcliangxiu:'良秀',
 			dcliangxiu_info:'出牌阶段，你可以弃置两张不同类型的牌，然后从两张与你弃置的牌类型均不同的牌中选择一张获得之（每阶段每种类型限一次）。',
 			dcxunjie:'殉节',
-			dcxunjie_info:'每轮每项限一次。一名角色的回合结束时，若你本回合于摸牌阶段外得到过牌，你可以选择一项：1.令一名角色将手牌数摸或弃置至与其体力值相同；2.令一名角色将体力值回复或失去至与其手牌数相同。',
+			dcxunjie_info:'每轮每项限一次。一名角色的回合结束时，若你本回合于摸牌阶段外得到过牌，你可以选择一项：1.令一名角色将手牌数摸或弃置至与其体力值相同；2.令一名角色将体力回复或失去至与其手牌数相同。',
 			dc_dongzhao:'董昭',
 			dcyijia:'移驾',
 			dcyijia_info:'一名角色受到伤害后，若你至其的距离不大于1，你可以将场上一张装备牌移动至其对应装备栏（替换原装备）。若其因此脱离了一名角色的攻击范围，你摸一张牌。',
