@@ -1863,7 +1863,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.includeOut=true;
 					}
 				},
-				ai:{combo:'mbdanggu'},
+				ai:{
+					combo:'mbdanggu',
+					neg:true
+				},
 				dieContent:function(){
 					'step 0'
 					event.forceDie=true;
@@ -9181,6 +9184,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'thunder',
 				prompt2:'（限定技）失去技能【劝封】，并获得该角色武将牌上的所有技能，然后加1点体力上限并回复1点体力',
+				check:(event,player)=>{
+					if(event.player.getStockSkills('仲村由理','天下第一').filter(skill=>{
+						let info=get.info(skill);
+						return info&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte;
+					}).some(i=>{
+						let info=get.info(i);
+						if(info&&info.ai) return info.ai.neg||info.ai.halfneg;
+					})) return false;
+					return true;
+				},
 				content:function(){
 					player.awakenSkill('requanfeng');
 					player.removeSkill('hongyi');
