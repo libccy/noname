@@ -498,12 +498,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					canLink:function(player,target,card){
 						if(!target.isLinked()||player.hasSkill('jueqing')||target.hasSkill('gangzhi')||player.hasSkill('gangzhi')) return false;
-						var es=target.countCards('e');
-						if(!es) return true;
-						if(target.hp>=3&&es>=2){
-							return true;
+						let es=target.getCards('e'),val=0;
+						if(!es.length) return true;
+						for(let i of es){
+							if(i.name=='baiyin'&&target.isDamaged()&&get.recoverEffect(target)) val+=get.value({name:'tao'},target);
+							else val-=get.value(i,target);
 						}
-						return false;
+						if(0.15*val>2*get.sgn(get.damageEffect(target,player,target,'thunder'))) return false;
+						return true;
 					},
 					order:6,
 					value:4,

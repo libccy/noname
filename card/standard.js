@@ -1977,14 +1977,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						ignoreStatus:true,
-						target:function(player,target){
-							var num=target.hp-target.countCards('h')-2;
-							if(num>-1) return -0.01;
-							if(target.hp<3) num--;
-							if(target.isTurnedOver()) num/=2;
-							var dist=get.distance(player,target,'absolute');
+						target:(player,target)=>{
+							if(target===_status.currentPhase&&target.skipList.includes('phaseUse')){
+								let evt=_status.event.getParent('phase');
+								if(evt&&evt.phaseList.indexOf('phaseJudge')<=evt.num) return 0;
+							}
+							let num=target.needsToDiscard(3),cf=Math.pow(get.threaten(target,player),2);
+							if(!num) return -0.01*cf;
+							if(target.hp>2) num--;
+							let dist=Math.sqrt(get.distance(player,target,'absolute'));
 							if(dist<1) dist=1;
-							return num/Math.sqrt(dist)*get.threaten(target,player);
+							if(target.isTurnedOver()) dist++;
+							return num*cf/dist;
 						}
 					},
 					tag:{
