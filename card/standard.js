@@ -1988,7 +1988,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							let dist=Math.sqrt(get.distance(player,target,'absolute'));
 							if(dist<1) dist=1;
 							if(target.isTurnedOver()) dist++;
-							return num*cf/dist;
+							return Math.min(-0.1,-num)*cf/dist;
 						}
 					},
 					tag:{
