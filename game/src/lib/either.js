@@ -43,22 +43,22 @@ export class Either {
 
     /**
      *
-     * @param {ThenContent} callback
+     * @param {ThenContent} [callback]
      * @returns {Either<T, U>}
      */
     then(callback) {
-        if (this.#value instanceof Failure)
+        if (this.#value instanceof Failure || typeof callback == "undefined")
             return this;
         return new Either(callback(this.#value));
     }
 
     /**
      *
-     * @param {ElseContent} callback
+     * @param {ElseContent} [callback]
      * @returns {Either<T, U>}
      */
     else(callback) {
-        if (this.#value instanceof Failure)
+        if (this.#value instanceof Failure && typeof callback != "undefined")
             return new Either(callback(this.#value));
         return this;
     }
