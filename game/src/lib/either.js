@@ -1,6 +1,6 @@
 // TODO: 添加文件描述
 
-import { Failure } from "./failure";
+import { Failure } from "./failure.js";
 
 /**
  * @template T
