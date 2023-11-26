@@ -4580,15 +4580,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					record:{
-						trigger:{player:'showCardsEnd'},
+						trigger:{global:'showCardsEnd'},
 						forced:true,
 						charlotte:true,
 						popup:false,
 						firstDo:true,
+						filter:function(event,player){
+							return event.cards.some(i=>get.owner(i)==player);
+						},
 						content:function(){
 							game.broadcastAll(function(cards){
 								cards.forEach(card=>card.addGaintag('oldaili_tag'));
-							},trigger.cards);
+							},trigger.cards.filter(i=>get.owner(i)==player));
+							player.markSkill('oldaili');
 						}
 					},
 				}
