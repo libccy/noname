@@ -3830,7 +3830,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 5*draw/dis+12/(1+target.getCardUsable('sha',true));
 						case 'jinmi':
 							if(target.hasJudge('lebu')&&!target.hasCard({name:'wuxie'},'hs')) return draw*target.needsToDiscard(2.2)/dis;
-							return get.effect(target,{name:'lebu'},target,target)+draw*target.needsToDiscard(2.2)/dis;
+							return get.effect(target,{name:'lebu'},player,target)+draw*target.needsToDiscard(2.2)/dis;
 						case 'guxiong':
 							if(target.hasJudge('lebu')) return -draw*target.needsToDiscard(3)/dis;
 							return get.effect(target,{name:'losehp'},target,target)*2/dis-draw*target.needsToDiscard(3)/dis;
