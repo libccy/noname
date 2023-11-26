@@ -725,6 +725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										replace:{window:function(){}}
 									});
 									evt.goto(0);
+									if(target!=_status.currentPhase) player.tempBanSkill('dcshizong');
 								}
 								else{
 									target.chat('不放！');
