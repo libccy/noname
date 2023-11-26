@@ -13662,7 +13662,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				intro:{
 					name:'内伐 - 基本牌',
-					content:'本回合内不能使用锦囊牌和装备牌，且使用【杀】选择目标时可以多选择1个目标，且使用【杀】的目标次数上限+#。',
+					content:'本回合内不能使用锦囊牌和装备牌，使用【杀】选择目标时可以额外指定一个目标且使用【杀】的目标次数上限+#。',
 				},
 				mod:{
 					cardEnabled:function(card,player){
@@ -13722,7 +13722,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				intro:{
 					name:'内伐 - 非基本牌',
-					content:'本回合内不能使用基本牌，且使用普通锦囊牌选择目标时可以多选择1个目标，且本回合的出牌阶段内前两次使用装备牌时摸#张牌。'
+					content:'本回合内不能使用基本牌，使用普通锦囊牌选择目标时可以增加或减少一个目标，且本回合的出牌阶段内前两次使用装备牌时摸#张牌。'
 				},
 				filter:function(event,player){
 					if(get.type(event.card)!='trick') return false;
