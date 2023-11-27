@@ -615,13 +615,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('targets',targets).set('ai',target=>{
 						return target==get.event('targetx')?1:0;
 					}).set('targetx',(()=>{
-						var info=targets.map(target=>{
-							var att=get.attitude(player,target);
-							return [target,att*Math.sqrt(target.getHistory('lose').map(evt=>evt.cards2.length).reduce((p,c)=>p+c,0))];
-						}).sort((a,b)=>{
+						let info=[];
+						targets.filter(target=>{
+							let att=get.attitude(player,target);
+							if(att<=0) return false;
+							if(Math.abs(att)>1) att=Math.sign(att)*Math.sqrt(Math.abs(att));
+							info.push([target,att*target.getHistory('lose').map(evt=>evt.cards2.length).reduce((p,c)=>p+c,0)]);
+							return false;
+						});
+						if(!info.length) return null;
+						info=info.sort((a,b)=>{
 							return b[1]-a[1];
 						})[0];
-						if(info[1]<0) return null;
+						if(info[1]<=0) return null;
 						return info[0];
 					})());
 					'step 1'
@@ -687,11 +693,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					frozen:{
 						mod:{
 							cardnature:function(card,player){
-								if(get.suit(card)=='club'&&card.name=='sha') return 'ice';
+								if(card.name==='sha'&&get.suit(card)==='club') return 'ice';
 							},
+							aiOrder:(player,card,num)=>{
+								if(num&&card.name==='sha'&&game.hasNature(card,'ice')){
+									let lg=game.findPlayer(current=>current.hasSkill('jsrgninghan'));
+									if(lg) return num+0.15*Math.sign(get.attitude(player,lg));
+								}
+							}
 						}
 					},
 				},
+				ai:{
+					combo:'jsrgshacheng'
+				}
 			},
 			//张任
 			jsrgfuni:{
