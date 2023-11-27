@@ -1563,25 +1563,30 @@ new Promise(resolve=>{
 								node.menu=ui.create.div(node,'','<div></div><div></div><div></div><div></div>');
 							}
 						},
-						onclick:function(theme){
+						onclick:gnc.of(function*(theme){
 							game.saveConfig('theme',theme);
 							ui.arena.hide();
 							lib.init.background();
 							if(lib.config.autostyle){
-								if(theme=='simple'){
-									lib.configMenu.appearence.config.player_border.onclick('slim');
+								if(theme === "simple"){
+									lib.configMenu.appearence.config.player_border.onclick("slim");
 								}
 								else{
-									lib.configMenu.appearence.config.player_border.onclick('normal');
+									lib.configMenu.appearence.config.player_border.onclick("normal");
 								}
 							}
-							setTimeout(function(){
-								var theme=ui.css.theme;
-								ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style');
-								theme.remove();
-								setTimeout(function(){ui.arena.show();},100);
-							},500);
-						}
+							lib.announce.publish("Noname.Apperaence.Theme.onChanging", theme);
+							yield new Promise(resolve => setTimeout(resolve, 500));
+
+							const deletingTheme = ui.css.theme;
+							ui.css.theme=lib.init.css(lib.assetURL+'theme/'+lib.config.theme,'style');
+							deletingTheme.remove();
+							lib.announce.publish("Noname.Apperaence.Theme.onChanged", theme);
+							yield new Promise(resolve => setTimeout(resolve, 100));
+
+							ui.arena.show();
+							lib.announce.publish("Noname.Apperaence.Theme.onChangeFinished", theme);
+						})
 					},
 					layout:{
 						name:'布局',
