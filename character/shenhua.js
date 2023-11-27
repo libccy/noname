@@ -4461,9 +4461,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.updateMarks('huashen');
 							var skills=game.expandSkills([skill]);
 							skills.forEach(skillx=>{
-								if(lib.skill.rehuashen.checkAudio(character,skillx,'zuoci')){
-									lib.skill.rehuashen.createAudio(character,skillx,'zuoci');
-								}
+								lib.skill.rehuashen.createAudio(character,skillx,'zuoci');
 							});
 						}
 					}

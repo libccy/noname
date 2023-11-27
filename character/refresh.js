@@ -10550,9 +10550,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.updateMarks('rehuashen');
 						var skills=game.expandSkills([link]);
 						skills.forEach(skill=>{
-							if(lib.skill.rehuashen.checkAudio(event.card,skill,'re_zuoci')){
-								lib.skill.rehuashen.createAudio(event.card,skill,'re_zuoci');
-							}
+							lib.skill.rehuashen.createAudio(event.card,skill,'re_zuoci');
 						});
 					}
 				},
@@ -10669,20 +10667,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return node;
 				},
-				checkAudio:(character,skill,name)=>{
-					var info=get.info(skill);
-					if(!info||((!info.audioname||!info.audioname.includes(character))&&(!info.audioname2||!info.audioname2[character]))) return false;
-					return !info.audioname2||!info.audioname2[name];
-				},
 				createAudio:(character,skill,name)=>{
 					var info=lib.skill[skill];
+					if(!info) return;
 					if(!info.audioname2) info.audioname2={};
 					if(info.audioname&&info.audioname.includes(character)){
 						if(info.audio&&typeof info.audio=='string') skill=info.audio;
 						if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
 						info.audioname2[name]=(skill+'_'+character);
 					}
-					else info.audioname2[name]=info.audioname2[character];
+					else if(info.audioname2[character]){
+						info.audioname2[name]=info.audioname2[character];
+					}
+					else{
+						if(info.audio&&typeof info.audio=='string') skill=info.audio;
+						info.audioname2[name]=skill;
+					}
 				},
 				mark:true,
 				intro:{
