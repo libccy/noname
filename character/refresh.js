@@ -5820,6 +5820,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relongyin:{
 				audio:2,
 				shaRelated:true,
+				init:(player)=>{
+					game.addGlobalSkill('relongyin_order');
+				},
+				onremove:(player)=>{
+					game.removeGlobalSkill('relongyin_order');
+				},
 				trigger:{global:'useCard'},
 				direct:true,
 				filter:function(event,player){
@@ -5892,6 +5898,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.2
+				},
+				subSkill:{
+					order:{
+						mod:{
+							aiOrder:(player,card,num)=>{
+								if(num&&card.name==='sha'&&get.color(card)==='red'){
+									let gp=game.findPlayer(current=>{
+										return current.hasSkill('relongyin')&&current.hasCard(i=>true,'h');
+									});
+									if(gp) return num+0.15*Math.sign(get.attitude(player,gp));
+								}
+							}
+						},
+						trigger:{player:'dieAfter'},
+						filter:(event,player)=>{
+							return !game.hasPlayer(current=>current.hasSkill('relongyin'));
+						},
+						silent:true,
+						forceDie:true,
+						charlotte:true,
+						content:()=>{
+							game.removeGlobalSkill('relongyin_order');
+						}
+					}
 				}
 			},
 			jiezhong:{
