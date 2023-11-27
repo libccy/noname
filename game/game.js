@@ -9767,6 +9767,10 @@ new Promise(resolve=>{
 									--extToLoad;
 									if(extToLoad==0){
 										yield Promise.allSettled(_status.extensionLoading);
+										_status.extensionLoaded.filter(Boolean).forEach(name => {
+											lib.announce.publish("Noname.Init.Extension.onLoad", name);
+											lib.announce.publish(`Noname.Init.Extension.${name}.onLoad`, void 0);
+										});
 										delete _status.extensionLoading;
 										loadPack();
 									}
@@ -37928,7 +37932,12 @@ new Promise(resolve=>{
 		},
 		import:function(type,content,url){
 			if(type=='extension'){
-				const promise=game.loadExtension(content);
+				const promise=game.loadExtension(content).then((name) => {
+					if (typeof _status.extensionLoaded == "undefined")
+						_status.extensionLoaded = [];
+					_status.extensionLoaded.add(name);
+					return name;
+				});
 				if(typeof _status.extensionLoading=="undefined")_status.extensionLoading=[];
 				_status.extensionLoading.add(promise);
 				return promise;
@@ -38059,6 +38068,8 @@ new Promise(resolve=>{
 			catch(e){
 				console.log(e);
 			}
+
+			return name;
 		}),
 		createDir:(directory,successCallback,errorCallback)=>{
 			const paths=directory.split('/').reverse();
@@ -40657,6 +40668,28 @@ new Promise(resolve=>{
 			}
 			ui.clear();
 		},
+		
+		/**
+		 * @param {string} extensionName
+		 */
+		hasExtension(extensionName) {
+			return this.hasExtensionInstalled(extensionName) && lib.config[`extension_${extensionName}_enable`];
+		},
+
+		/**
+		 * @param {string} extensionName
+		 */
+		hasExtensionInstalled(extensionName) {
+			return lib.config.extensions.includes(extensionName);
+		},
+
+		/**
+		 * @param {string} extensionName
+		 */
+		hasExtensionLoaded(extensionName) {
+			return extensionName !== void 0 && _status.extensionLoaded.includes(extensionName);
+		},
+		
 		removeExtension:(extensionName,keepFile)=>{
 			const prefix=`extension_${extensionName}`;
 			Object.keys(lib.config).forEach(key=>{
@@ -40691,6 +40724,7 @@ new Promise(resolve=>{
 			}
 			else new Promise((resolve,reject)=>window.resolveLocalFileSystemURL(`${lib.assetURL}extension/${extensionName}`,resolve,reject)).then(directoryEntry=>directoryEntry.removeRecursively());
 		},
+
 		addRecentCharacter:function(){
 			var list=get.config('recentCharacter')||[];
 			for(var i=0;i<arguments.length;i++){
