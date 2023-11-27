@@ -7639,7 +7639,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							aiOrder:(player,card,num)=>{
 								if(num&&card.name==='sha'&&get.color(card)==='red'){
 									let gp=game.findPlayer(current=>{
-										return current.hasSkill('longyin')&&current.hasCard(i=>true,'h');
+										return current.hasSkill('longyin')&&current.hasCard(i=>true,'he');
 									});
 									if(gp) return num+0.15*Math.sign(get.attitude(player,gp));
 								}
