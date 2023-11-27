@@ -2247,14 +2247,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:8,
 					result:{
-						target:function(player,target){
-							var num=target.countCards('h')-player.countCards('h');
-							var cnt=player.countCards('h',card=>{
-								return get.value(card)<5;
+						target:(player,target)=>{
+							let num=player.countCards('h')-target.countCards('h'),
+								eff=get.effect(target,{name:'sha',nature:'stab'},player,target),
+								val=0,
+								ph=_status.event.getTempCache('jsrgqingxi_result','ph');
+							if(!ph){
+								ph=player.getCards('h').sort((a,b)=>{
+									return get.value(a)-get.value(b);
+								});
+								_status.event.putTempCache('jsrgqingxi_result','ph',ph);
+							}
+							ph.slice(0,num).forEach(i=>{
+								val+=get.value(i,player);
 							});
-							if(cnt<num) return 0;
-							var eff=get.effect(target,{name:'sha',nature:'stab'},player,target);
-							return Math.sign(eff)/Math.sqrt(num);
+							eff=Math.sign(eff)*Math.sqrt(Math.abs(eff));
+							if(val>2*Math.abs(eff)) return 0;
+							return eff/num;
 						}
 					}
 				},
