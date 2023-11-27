@@ -532,7 +532,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseDrawBegin2'},
 				check:function(event,player){
-					if(player.countCards('h')<3) return false;
+					if(player.skipList.includes('phaseUse')||player.countCards('h')<3) return false;
 					if(!player.hasSha()) return false;
 					return game.hasPlayer(function(current){
 						return get.attitude(player,current)<0&&player.canUse('sha',current);
