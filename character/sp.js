@@ -7378,7 +7378,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							storage:{cihuang:true},
 						};
 						event.card=card;
-						player.chooseCard('he','雌黄：将一张牌当'+get.translation(card)+'对'+get.translation(trigger.player)+'使用',function(card,player){
+						player.chooseCard('hes','雌黄：将一张牌当'+get.translation(card)+'对'+get.translation(trigger.player)+'使用',function(card,player){
 							return player.canUse(get.autoViewAs(_status.event.getParent().card,[card]),_status.event.target,false);
 						}).set('target',trigger.player).set('ai',function(card){
 							if(get.effect(_status.event.target,get.autoViewAs(_status.event.getParent().card,[card]),player)<=0) return false;
