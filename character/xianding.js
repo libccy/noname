@@ -4047,7 +4047,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.recover(player.getDamagedHp());
+					player.recover(player.getDamagedHp(true));
 					player.drawTo(player.maxHp);
 					'step 1'
 					var check=0;
@@ -12126,6 +12126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					return get.attitude(player,event.target)<=0;
 				},
+				equipSkill:true,
 				logTarget:'target',
 				content:function(){
 					var num=player.getHistory('useSkill',function(evt){
@@ -12150,6 +12151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					return get.attitude(player,event.target)<=0;
 				},
+				equipSkill:true,
 				logTarget:'target',
 				content:function(){
 					'step 0'

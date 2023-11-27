@@ -784,7 +784,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							name:card?card.name:null,
 							target:target,
 							card:card
-						})) return false;
+						})){
+							const cards=player.getEquips('yexingyi');
+							if(player.hasSkill('yexingyi_skill',null,false)||!card.cards||!cards.some(cardx=>card.cards.includes(cardx)||ui.selected.cards.includes(cardx))) return false;
+						}
 					},
 				},
 			},

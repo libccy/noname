@@ -1635,17 +1635,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(targets.length){
 						choices.push('选项一');
 						choiceList[0]+='（'+get.translation(targets)+'）';
-					} else choiceList[0]='<span style="opacity:0.5; ">'+choiceList[0]+'</span>';
+					}
+					else choiceList[0]='<span style="opacity:0.5; ">'+choiceList[0]+'</span>';
 					if(targets2.length){
 						choices.push('选项二');
 						choiceList[1]+='（'+get.translation(targets2)+'）';
-					} else choiceList[1]='<span style="opacity:0.5; ">'+choiceList[1]+'</span>';
+					}
+					else choiceList[1]='<span style="opacity:0.5; ">'+choiceList[1]+'</span>';
 					if(!choices.length) event.finish();
 					else player.chooseControl(choices,'cancel2').set('prompt',get.prompt('dczuojian')).set('choiceList',choiceList).set('ai',()=>{
 						var controls=_status.event.controls,choice=_status.event.choice;
 						if(!controls.contains('选项一')||controls.contains('选项二')&&choice==1) return '选项二';
 						return '选项一';
-					}).set('choice',eff<0&&eff2<0?'cancel2':(eff>eff2?0:1));
+					}).set('choice',eff<=0&&eff2<=0?'cancel2':(eff>-eff2?0:1));
 					'step 1'
 					if(result.control=='选项一'){
 						player.logSkill('dczuojian',targets);

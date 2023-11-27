@@ -6961,8 +6961,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.count=trigger.num;
 							'step 1'
 							event.count--;
-							if((player.hp+player.getExpansions('gzbuqu').length)>1){
-								player.chooseCardButton('不屈：移去一张“创”',true,player.getExpansions('gzbuqu')).set('ai',function(button){
+							var cards=player.getExpansions('gzbuqu'),count=cards.length;
+							if(count>0&&(player.hp+count)>1){
+								if(count==1) event._result={links:cards};
+								else player.chooseCardButton('不屈：移去一张“创”',true,cards).set('ai',function(button){
 									var buttons=get.selectableButtons();
 									for(var i=0;i<buttons.length;i++){
 										if(buttons[i]!=button&&
@@ -6974,6 +6976,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return 0;
 								});
 							}
+							else event.finish();
 							'step 2'
 							var cards=result.links;
 							player.loseToDiscardpile(cards);
