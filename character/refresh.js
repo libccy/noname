@@ -10678,6 +10678,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var info=lib.skill[skill];
 					if(!info.audioname2) info.audioname2={};
 					if(info.audioname&&info.audioname.includes(character)){
+						if(info.audio&&typeof info.audio=='string') skill=info.audio;
 						if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
 						info.audioname2[name]=(skill+'_'+character);
 					}
