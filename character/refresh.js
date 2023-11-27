@@ -1155,8 +1155,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseToDiscard('he',get.prompt('olshuangxiong'),'弃置一张牌，然后你本回合内可以将一张与此牌颜色不同的牌当做【决斗】使用').set('ai',function(card){
-						if(!_status.event.goon) return 0.01-get.value(card);
-						var player=_status.event.player,color=get.color(card),effect=0,cards=player.getCards('hes'),sha=false;
+						let  player=_status.event.player;
+						if(!_status.event.goon||player.skipList.includes('phaseUse')) return -get.value(card);
+						let color=get.color(card),effect=0,cards=player.getCards('hes'),sha=false;
 						for(var cardx of cards){
 							if(cardx==card||get.color(cardx)==color) continue;
 							var cardy=get.autoViewAs({name:'juedou'},[cardx]),eff1=player.getUseValue(cardy);
@@ -5819,6 +5820,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relongyin:{
 				audio:2,
 				shaRelated:true,
+				init:(player)=>{
+					game.addGlobalSkill('relongyin_order');
+				},
+				onremove:(player)=>{
+					game.removeGlobalSkill('relongyin_order');
+				},
 				trigger:{global:'useCard'},
 				direct:true,
 				filter:function(event,player){
@@ -5891,6 +5898,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.2
+				},
+				subSkill:{
+					order:{
+						mod:{
+							aiOrder:(player,card,num)=>{
+								if(num&&card.name==='sha'&&get.color(card)==='red'){
+									let gp=game.findPlayer(current=>{
+										return current.hasSkill('relongyin')&&current.hasCard(i=>true,'he');
+									});
+									if(gp) return num+0.15*Math.sign(get.attitude(player,gp));
+								}
+							}
+						},
+						trigger:{player:'dieAfter'},
+						filter:(event,player)=>{
+							return !game.hasPlayer(current=>current.hasSkill('relongyin'));
+						},
+						silent:true,
+						forceDie:true,
+						charlotte:true,
+						content:()=>{
+							game.removeGlobalSkill('relongyin_order');
+						}
+					}
 				}
 			},
 			jiezhong:{

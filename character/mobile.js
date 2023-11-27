@@ -1863,7 +1863,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.includeOut=true;
 					}
 				},
-				ai:{combo:'mbdanggu'},
+				ai:{
+					combo:'mbdanggu',
+					neg:true
+				},
 				dieContent:function(){
 					'step 0'
 					event.forceDie=true;
@@ -3821,30 +3824,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				derivation:['yijin_wushi','yijin_jinmi','yijin_guxiong','yijin_tongshen','yijin_yongbi','yijin_houren'],
 				getValue:function(player,mark,target){
-					var att=get.attitude(player,target);
-					var dis=Math.sqrt(get.distance(player,target,'absolute'));
-					switch (mark.slice(6)){
+					let dis=Math.sqrt(get.distance(player,target,'absolute'));
+					if(target.isTurnedOver()) dis++;
+					let draw=get.effect(target,{name:'wuzhong'},target,target)/2;
+					switch(mark.slice(6)){
 						case 'wushi':
-							return get.effect(target,{name:'wuzhong'},player,player)*2.5/dis;
+							if(target.hasJudge('bingliang')) return 12/(1+target.getCardUsable('sha',true));
+							return 5*draw/dis+12/(1+target.getCardUsable('sha',true));
 						case 'jinmi':
-							if(target.hasJudge('lebu')&&!target.hasCard({name:'wuxie'},'hs')) return 1;
-							return get.effect(target,{name:'lebu'},player,player)/dis;
+							if(target.hasJudge('lebu')&&!target.hasCard({name:'wuxie'},'hs')) return draw*target.needsToDiscard(2.2)/dis;
+							return get.effect(target,{name:'lebu'},player,target)+draw*target.needsToDiscard(2.2)/dis;
 						case 'guxiong':
-							return get.effect(target,{name:'losehp'},player,player)*2/dis;
+							if(target.hasJudge('lebu')) return -draw*target.needsToDiscard(3)/dis;
+							return get.effect(target,{name:'losehp'},target,target)*2/dis-draw*target.needsToDiscard(3)/dis;
 						case 'tongshen':
 							if(target.isMin()) return 0;
-							var eff=get.damageEffect(target,player,target);
-							if(eff>=0) return 0;
-							if(att>=4){
-								if(target.hp==1) return att*5/Math.max(0.1,5-dis);
-								if(target.hp==2&&target.countCards('he')<=2) return att*3/Math.max(0.1,5-dis);
-							}
-							if(att>0) return 0;
-							return -eff/5*dis;
+							var eff=-get.damageEffect(target,player,target);
+							if(eff<=0) return 0;
+							if(target.hp<2) return eff*dis*2;
+							if(target.hp<3&&target.countCards('he')<3) return eff*dis*1.5;
+							if(target.hp>3) return eff*dis/target.hp;
+							return eff*dis;
 						case 'yongbi':
-							return get.effect(target,{name:'bingliang'},player,player)*2;
+							if(target.hasJudge('bingliang')&&!target.hasCard({name:'wuxie'},'hs')) return 0;
+							return get.effect(target,{name:'bingliang'},player,target)*2/dis;
 						case 'houren':
-							return get.recoverEffect(target,player,player)/dis;
+							return Math.min(5,2+target.getDamagedHp())*get.recoverEffect(target,player,target)/dis;
 					}
 				},
 				content:function(){
@@ -3852,8 +3857,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget('亿金：令一名其他角色获得1枚“金”',true,(card,player,target)=>{
 						return player!=target&&!lib.skill.yijin.getKane(target).length;
 					}).set('ai',target=>{
-						var player=_status.event.player,kane=lib.skill.yijin.getKane(player);
-						return Math.abs(Math.max.apply(Math.max,kane.map(i=>lib.skill.yijin.getValue(player,i,target))));
+						let player=_status.event.player,att=get.attitude(player,target),kane=lib.skill.yijin.getKane(player);
+						if(Math.abs(att)>1) att=Math.sign(att)*Math.sqrt(Math.abs(att));
+						return Math.max.apply(Math.max,kane.map(i=>{
+							return att*lib.skill.yijin.getValue(player,i,target);
+						}));
 					});
 					'step 1'
 					if(result.bool){
@@ -3866,8 +3874,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								'<div>'+get.skillInfoTranslation(i,player)+'</div>';
 						});
 						player.chooseControl(kane).set('choiceList',choiceList).set('displayIndex',false).set('prompt','选择令'+get.translation(target)+'获得的“金”').set('ai',()=>{
-							var controls=_status.event.controls,player=_status.event.player,target=_status.event.getParent().target;
-							var list=controls.map(i=>[i,lib.skill.yijin.getValue(player,i,target)])//.filter(i=>i[1]>=0);
+							let controls=_status.event.controls,player=_status.event.player,target=_status.event.getParent().target,att=get.attitude(player,target);
+							if(Math.abs(att)>1) att=Math.sign(att)*Math.sqrt(Math.abs(att));
+							let list=controls.map(i=>{
+								return [i,att*lib.skill.yijin.getValue(player,i,target)];
+							});
 							list.sort((a,b)=>b[1]-a[1]);
 							if(list.length) return list[0][0];
 							return controls.randomGet();
@@ -9173,6 +9184,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'thunder',
 				prompt2:'（限定技）失去技能【劝封】，并获得该角色武将牌上的所有技能，然后加1点体力上限并回复1点体力',
+				check:(event,player)=>{
+					if(event.player.getStockSkills('仲村由理','天下第一').filter(skill=>{
+						let info=get.info(skill);
+						return info&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte;
+					}).some(i=>{
+						let info=get.info(i);
+						if(info&&info.ai) return info.ai.neg||info.ai.halfneg;
+					})) return false;
+					return true;
+				},
 				content:function(){
 					player.awakenSkill('requanfeng');
 					player.removeSkill('hongyi');
