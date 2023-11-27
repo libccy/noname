@@ -12,16 +12,28 @@ export class Announce {
 	/**
 	 * @type {EventTarget}
 	 */
-	#handler;
+	#eventTarget;
 
 	/**
 	 * @type {WeakMap<function(any): void, AnnounceSubscriber>}
 	 */
 	#records;
 
-	constructor() {
-		this.#handler = new EventTarget();
-		this.#records = new WeakMap();
+	/**
+	 * @type {FunctionConstructor}
+	 */
+	#SubscriberType;
+
+	/**
+	 *
+	 * @param {EventTarget} eventTarget
+	 * @param {WeakMap<function(any): void, AnnounceSubscriber>} records
+	 * @param {FunctionConstructor} [SubscriberType]
+	 */
+	constructor(eventTarget, records, SubscriberType = AnnounceSubscriber) {
+		this.#eventTarget = eventTarget;
+		this.#records = records;
+		this.#SubscriberType = SubscriberType;
 	}
 
 	/**
@@ -35,7 +47,7 @@ export class Announce {
 	 * @returns {T}
 	 */
 	publish(name, values) {
-		this.#handler.dispatchEvent(new CustomEvent(name, {
+		this.#eventTarget.dispatchEvent(new CustomEvent(name, {
 			detail: [values, name]
 		}));
 		return values;
@@ -58,7 +70,7 @@ export class Announce {
 		if (this.#records.has(method))
 			subscriber = this.#records.get(method);
 		else {
-			subscriber = new AnnounceSubscriber(method, this.#handler);
+			subscriber = new this.#SubscriberType(method, this.#eventTarget);
 			this.#records.set(method, subscriber);
 		}
 		subscriber.subscribe(name);
