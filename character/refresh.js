@@ -10677,8 +10677,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				createAudio:(character,skill,name)=>{
 					var info=lib.skill[skill];
 					if(!info.audioname2) info.audioname2={};
-					if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
-					info.audioname2[name]=(skill+'_'+character);
+					if(info.audioname&&info.audioname.includes(character)){
+						if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
+						info.audioname2[name]=(skill+'_'+character);
+					}
+					else info.audioname2[name]=info.audioname2[character];
 				},
 				mark:true,
 				intro:{
