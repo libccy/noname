@@ -10548,10 +10548,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.popup(link);
 						player.syncStorage('rehuashen');
 						player.updateMarks('rehuashen');
-						var skills=game.expandSkills([link]);
-						skills.forEach(skill=>{
-							lib.skill.rehuashen.createAudio(event.card,skill,'re_zuoci');
-						});
+						lib.skill.rehuashen.createAudio(event.card,link,'re_zuoci');
 					}
 				},
 				init:function(player,skill){
@@ -10667,22 +10664,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return node;
 				},
-				createAudio:(character,skill,name)=>{
-					var info=lib.skill[skill];
-					if(!info) return;
-					if(!info.audioname2) info.audioname2={};
-					if(info.audioname&&info.audioname.includes(character)){
-						if(info.audio&&typeof info.audio=='string') skill=info.audio;
-						if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
-						info.audioname2[name]=(skill+'_'+character);
+				createAudio:(character,skillx,name)=>{
+					var skills=game.expandSkills([skillx]);
+					skills=skills.filter(skill=>get.info(skill));
+					if(!skills.length) return;
+					var skillss=skills.filter(skill=>get.info(skill).derivation);
+					if(skillss.length){
+						skillss.forEach(skill=>{
+							var derivationSkill=get.info(skill).derivation;
+							skills[Array.isArray(derivationSkill)?'addArray':'add'](derivationSkill);
+						});
 					}
-					else if(info.audioname2[character]){
-						info.audioname2[name]=info.audioname2[character];
-					}
-					else{
-						if(info.audio&&typeof info.audio=='string') skill=info.audio;
-						info.audioname2[name]=skill;
-					}
+					skills.forEach(skill=>{
+						var info=lib.skill[skill];
+						if(!info.audioname2) info.audioname2={};
+						if(info.audioname&&info.audioname.includes(character)){
+							if(info.audio&&typeof info.audio=='string') skill=info.audio;
+							if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
+							info.audioname2[name]=(skill+'_'+character);
+						}
+						else if(info.audioname2[character]){
+							info.audioname2[name]=info.audioname2[character];
+						}
+						else{
+							if(info.audio&&typeof info.audio=='string') skill=info.audio;
+							info.audioname2[name]=skill;
+						}
+					});
 				},
 				mark:true,
 				intro:{

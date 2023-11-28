@@ -4459,10 +4459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.popup(skill);
 							player.syncStorage('huashen');
 							player.updateMarks('huashen');
-							var skills=game.expandSkills([skill]);
-							skills.forEach(skillx=>{
-								lib.skill.rehuashen.createAudio(character,skillx,'zuoci');
-							});
+							lib.skill.rehuashen.createAudio(character,skill,'zuoci');
 						}
 					}
 				}
