@@ -40690,6 +40690,19 @@ new Promise(resolve=>{
 			return extensionName !== void 0 && _status.extensionLoaded.includes(extensionName);
 		},
 		
+		runAfterExtensionLoaded(extensionName,runnable) {
+			if(game.hasExtensionLoaded(extensionName)){
+				runnable();
+			}else{
+				let eventName = `Noname.Init.Extension.${extensionName}.onLoad`;
+				let callback = ()=>{
+					lib.announce.unsubscribe(eventName,callback);
+					runnable();
+				};
+				lib.announce.subscribe(eventName,callback);
+			}
+		},
+
 		removeExtension:(extensionName,keepFile)=>{
 			const prefix=`extension_${extensionName}`;
 			Object.keys(lib.config).forEach(key=>{
