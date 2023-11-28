@@ -1802,6 +1802,7 @@ window.noname_character_rank={
 			'xin_guozhao',
 			'shichangshi',
 			'dc_guansuo',
+			'dc_xujing',
 		],
 		epic:[
 			'ol_pengyang',

@@ -4163,12 +4163,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'huashen2',
 				unique:true,
 				init:function(player){
-					player.storage.huashen={
-						shown:[],
-						owned:{}
+					if(!player.storage.huashen){
+						player.storage.huashen={
+							shown:[],
+							owned:{}
+						};
 					}
 				},
-				group:['huashen1','huashen2'],
 				intro:{
 					content:function(storage,player){
 						var str='';
@@ -4196,7 +4197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.push(i);
 						}
 						if(list.length){
-							dialog.addSmall([list,'character']);
+							dialog.addSmall([list,(item,type,position,noclick,node)=>lib.skill.rehuashen.$createButton(item,type,position,noclick,node)]);
 						}
 						for(var i=0;i<dialog.buttons.length;i++){	
 							if(!player.isUnderControl(true)){
@@ -4249,46 +4250,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(name) list.push(name);
 					}
 					if(list.length){
-						game.log(player,'获得了',get.cnNumber(list.length)+'张','#g化身')
+						player.syncStorage('huashen');
+						player.markSkill('huashen');
+						game.log(player,'获得了',get.cnNumber(list.length)+'张','#g化身');
 						lib.skill.rehuashen.drawCharacter(player,list);
 					}
 				},
-			},
-			huashen1:{
 				trigger:{
 					global:'phaseBefore',
-					player:'enterGame',
-				},
-				forced:true,
-				popup:false,
-				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0);
-				},
-				content:function(){
-					var next=game.createEvent('huashen');
-					next.player=player;
-					next._trigger=trigger;
-					next.triggername='huashen';
-					next.setContent(lib.skill.huashen2.content);
-				},
-			},
-			huashen2:{
-				audio:2,
-				trigger:{
-					player:['phaseBegin','phaseEnd','huashen'],
+					player:['enterGame','phaseBegin','phaseEnd'],
 				},
 				filter:function(event,player,name){
+					if(event.name!='phase') return true;
+					if(name=='phaseBefore') return game.phaseNumber==0;
 					return !get.is.empty(player.storage.huashen.owned);
 				},
-				forced:true,
 				direct:true,
 				content:function(){
 					'step 0'
-					if(event.triggername=='huashen'){
+					var name=event.triggername;
+					if(trigger.name!='phase'||(name=='phaseBefore'&&game.phaseNumber==0)){
 						player.logSkill('huashen');
 						lib.skill.huashen.addHuashens(player,2);
-						player.syncStorage('huashen');
-						player.markSkill('huashen');
 						event.logged=true;
 					}
 					var cards=[];
@@ -4326,7 +4309,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player=player||event.player;
 						if(!event._result) event._result={};
 						var prompt=forced?'化身：选择获得一项技能':get.prompt('huashen');
-						var dialog=ui.create.dialog(prompt,[list,'character']);
+						var dialog=ui.create.dialog(prompt,[list,(item,type,position,noclick,node)=>lib.skill.rehuashen.$createButton(item,type,position,noclick,node)]);
 						event.dialog=dialog;
 						event.forceMine=true;
 						event.button=null;
@@ -4425,10 +4408,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.countChoose();
 					};
 					if(event.isMine()){
-						chooseButton(player,cards,event.triggername=='huashen');
+						chooseButton(player,cards,event.logged);
 					}
 					else if(event.isOnline()){
-						event.player.send(chooseButton,event.player,cards,event.triggername=='huashen');
+						event.player.send(chooseButton,event.player,cards,event.logged);
 						event.player.wait();
 						game.pause();
 					}
@@ -4476,10 +4459,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.popup(skill);
 							player.syncStorage('huashen');
 							player.updateMarks('huashen');
+							lib.skill.rehuashen.createAudio(character,skill,'zuoci');
 						}
 					}
 				}
 			},
+			huashen2:{audio:2},
 			xinsheng:{
 				audio:2,
 				unique:true,
@@ -4490,8 +4475,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.num=trigger.num;
 					'step 1'
 					lib.skill.huashen.addHuashens(player,1);
-					player.syncStorage('huashen');
-					player.updateMarks('huashen');
 					'step 2'
 					if(--event.num>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
 						player.chooseBool(get.prompt2('xinsheng')).set('frequentSkill',event.name);
@@ -7904,8 +7887,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanchang:'断肠',
 			// fushen:'附身',
 			huashen:'化身',
-			huashen1:'化身',
-			huashen2:'化身',
 			xinsheng:'新生',
 			qimou:'奇谋',
 			xinqiangxi:'强袭',

@@ -10405,11 +10405,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olzhiba3:{},
 			rehuashen:{
-				audio:2,
 				unique:true,
+				audio:2,
+				trigger:{
+					global:'phaseBefore',
+					player:['enterGame','phaseBegin','phaseEnd','rehuashen'],
+				},
+				filter:function(event,player,name){
+					if(event.name!='phase') return true;
+					if(name=='phaseBefore') return game.phaseNumber==0;
+					return player.storage.rehuashen&&player.storage.rehuashen.character.length>0;
+				},
 				direct:true,
 				content:function(){
 					"step 0"
+					var name=event.triggername;
+					if(trigger.name!='phase'||(name=='phaseBefore'&&game.phaseNumber==0)){
+						player.logSkill('rehuashen');
+						lib.skill.rehuashen.addHuashens(player,3);
+						event.logged=true;
+					}
 					_status.noclearcountdown=true;
 					event.videoId=lib.status.videoId++;
 					var cards=player.storage.rehuashen.character.slice(0);
@@ -10431,16 +10446,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.aiChoice==player.storage.rehuashen.current2||get.skillRank(event.aiChoice,cond)<1) choice='弃置化身';
 					if(player.isOnline2()){
 						player.send(function(cards,id){
-							var dialog=ui.create.dialog('是否发动【化身】？',[cards,'character']);
+							var dialog=ui.create.dialog('是否发动【化身】？',[cards,(item,type,position,noclick,node)=>lib.skill.rehuashen.$createButton(item,type,position,noclick,node)]);
 							dialog.videoId=id;
 						},cards,event.videoId);
 					}
-					event.dialog=ui.create.dialog(get.prompt('rehuashen'),[cards,'character']);
+					event.dialog=ui.create.dialog(get.prompt('rehuashen'),[cards,(item,type,position,noclick,node)=>lib.skill.rehuashen.$createButton(item,type,position,noclick,node)]);
 					event.dialog.videoId=event.videoId;
 					if(!event.isMine()){
 						event.dialog.style.display='none';
 					}
-					if(event.triggername=='rehuashen') event._result={control:'更换技能'};
+					if(event.logged) event._result={control:'更换技能'};
 					else player.chooseControl('弃置化身','更换技能','cancel2').set('ai',function(){
 						return _status.event.choice;
 					}).set('choice',choice);
@@ -10564,6 +10579,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.popup(link);
 						player.syncStorage('rehuashen');
 						player.updateMarks('rehuashen');
+						lib.skill.rehuashen.createAudio(event.card,link,'re_zuoci');
 					}
 				},
 				init:function(player,skill){
@@ -10572,14 +10588,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						map:{},
 					}
 				},
-				group:'rehuashen_init',
-				trigger:{
-					player:['phaseBegin','phaseEnd','rehuashen'],
-				},
-				filter:function(event,player,name){
-					return player.storage.rehuashen&&player.storage.rehuashen.character.length>0;
-				},
-				banned:['lisu','sp_xiahoudun','xushao','zhoutai','old_zhoutai','shixie'],
+				banned:['lisu','sp_xiahoudun','xushao','jsrg_xushao','zhoutai','old_zhoutai','shixie','xin_zhoutai','dc_shixie','old_shixie'],
 				bannedType:['Charlotte','主公技','觉醒技','限定技','隐匿技','使命技'],
 				addHuashen:function(player){
 					if(!player.storage.rehuashen) return;
@@ -10589,7 +10598,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					_status.characterlist.randomSort();
 					for(let i=0;i<_status.characterlist.length;i++){
 						let name=_status.characterlist[i];
-						if(name.indexOf('zuoci')!=-1||name.indexOf('key_')==0||name.indexOf('sp_key_')==0||lib.skill.rehuashen.banned.includes(name)||player.storage.rehuashen.character.includes(name)) continue;
+						if(name.indexOf('zuoci')!=-1||name.indexOf('key_')==0||name.indexOf('sp_key_')==0||get.is.double(name)||lib.skill.rehuashen.banned.includes(name)||player.storage.rehuashen.character.includes(name)) continue;
 						let skills=lib.character[name][3].filter(skill=>{
 							const categories=get.skillCategoriesOf(skill);
 							return !categories.some(type=>lib.skill.rehuashen.bannedType.includes(type));
@@ -10609,7 +10618,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(name) list.push(name);
 					}
 					if(list.length){
-						game.log(player,'获得了',get.cnNumber(list.length)+'张','#g化身')
+						player.syncStorage('rehuashen');
+						player.updateMarks('rehuashen');
+						game.log(player,'获得了',get.cnNumber(list.length)+'张','#g化身');
 						lib.skill.rehuashen.drawCharacter(player,list);
 					}
 				},
@@ -10635,6 +10646,91 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},player,list);
 				},
+				$createButton:function(item,type,position,noclick,node){
+					node=ui.create.buttonPresets.character(item,'character',position,noclick);
+					const info=lib.character[item];
+					const skills=info[3].filter(function(skill){
+						const categories=get.skillCategoriesOf(skill);
+						return !categories.some(type=>lib.skill.rehuashen.bannedType.includes(type));
+					});
+					if(skills.length){
+						const skillstr=skills.map(i=>`[${get.translation(i)}]`).join('<br>');
+						const skillnode=ui.create.caption(
+							`<div class="text" data-nature=${get.groupnature(info[1],'raw')
+								}m style="font-family: ${(lib.config.name_font||'xinwei')
+								},xinwei">${skillstr}</div>`,node);
+						skillnode.style.left='2px';
+						skillnode.style.bottom='2px';
+					}
+					node._customintro=function(uiintro,evt){
+						const character=node.link,characterInfo=get.character(node.link);
+						let capt=get.translation(character);
+						if(characterInfo){
+							capt+=`&nbsp;&nbsp;${get.translation(characterInfo[0])}`;
+							let charactergroup;
+							const charactergroups=get.is.double(character,true);
+							if(charactergroups) charactergroup=charactergroups.map(i=>get.translation(i)).join('/');
+							else charactergroup=get.translation(characterInfo[1]);
+							capt+=`&nbsp;&nbsp;${charactergroup}`;
+						}
+						uiintro.add(capt);
+
+						if(lib.characterTitle[node.link]){
+							uiintro.addText(get.colorspan(lib.characterTitle[node.link]));
+						}
+						for(let i=0;i<skills.length;i++){
+							if(lib.translate[skills[i]+'_info']){
+								let translation=lib.translate[skills[i]+'_ab']||get.translation(skills[i]).slice(0,2);
+								if(lib.skill[skills[i]]&&lib.skill[skills[i]].nobracket){
+									uiintro.add('<div><div class="skilln">'+get.translation(skills[i])+'</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+								}
+								else{
+									uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
+								}
+								if(lib.translate[skills[i]+'_append']){
+									uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
+								}
+							}
+						}
+					}
+					return node;
+				},
+				createAudio:(character,skillx,name)=>{
+					var skills=game.expandSkills([skillx]);
+					skills=skills.filter(skill=>get.info(skill));
+					if(!skills.length) return;
+					var skillss=skills.filter(skill=>get.info(skill).derivation);
+					if(skillss.length){
+						skillss.forEach(skill=>{
+							var derivationSkill=get.info(skill).derivation;
+							skills[Array.isArray(derivationSkill)?'addArray':'add'](derivationSkill);
+						});
+					}
+					skills.forEach(skill=>{
+						var info=lib.skill[skill];
+						if(info){
+							if(!info.audioname2) info.audioname2={};
+							if(info.audioname&&info.audioname.includes(character)){
+								if(info.audio){
+									if(typeof info.audio=='string') skill=info.audio;
+									if(Array.isArray(info.audio)) skill=info.audio[0];
+								}
+								if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
+								info.audioname2[name]=(skill+'_'+character);
+							}
+							else if(info.audioname2[character]){
+								info.audioname2[name]=info.audioname2[character];
+							}
+							else{
+								if(info.audio){
+									if(typeof info.audio=='string') skill=info.audio;
+									if(Array.isArray(info.audio)) skill=info.audio[0];
+								}
+								info.audioname2[name]=skill;
+							}
+						}
+					});
+				},
 				mark:true,
 				intro:{
 					onunmark:function(storage,player){
@@ -10642,11 +10738,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						storage.character=[];
 					},
 					mark:function(dialog,storage,player){
-						if(storage&&storage.current) dialog.addSmall([[storage.current],'character']);
+						if(storage&&storage.current) dialog.addSmall([[storage.current],(item,type,position,noclick,node)=>lib.skill.rehuashen.$createButton(item,type,position,noclick,node)]);
 						if(storage&&storage.current2) dialog.add('<div><div class="skill">【'+get.translation(lib.translate[storage.current2+'_ab']||get.translation(storage.current2).slice(0,2))+'】</div><div>'+get.skillInfoTranslation(storage.current2,player)+'</div></div>');
 						if(storage&&storage.character.length){
 							if(player.isUnderControl(true)){
-								dialog.addSmall([storage.character,'character']);
+								dialog.addSmall([storage.character,(item,type,position,noclick,node)=>lib.skill.rehuashen.$createButton(item,type,position,noclick,node)]);
 							}
 							else{
 								dialog.addText('共有'+get.cnNumber(storage.character.length)+'张“化身”');
@@ -10665,36 +10761,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			rehuashen_init:{
-				trigger:{
-					global:'phaseBefore',
-					player:'enterGame',
-				},
-				forced:true,
-				popup:false,
-				filter:function(event,player){
-					return (event.name!='phase'||game.phaseNumber==0);
-				},
-				content:function(){
-					lib.skill.rehuashen.addHuashens(player,3);
-					player.syncStorage('rehuashen');
-					player.markSkill('rehuashen');
-					var next=game.createEvent('rehuashen');
-					next.player=player;
-					next._trigger=trigger;
-					next.triggername='rehuashen';
-					next.setContent(lib.skill.rehuashen.content);
-				},
-			},
 			rexinsheng:{
 				unique:true,
 				audio:2,
 				trigger:{player:'damageEnd'},
 				frequent:true,
 				content:function(){
-					lib.skill.rehuashen.addHuashens(player,trigger.num);
-					player.syncStorage('rehuashen');
-					player.updateMarks('rehuashen');
+					'step 0'
+					event.num=trigger.num;
+					'step 1'
+					lib.skill.rehuashen.addHuashens(player,1);
+					'step 2'
+					if(--event.num>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
+						player.chooseBool(get.prompt2('rexinsheng')).set('frequentSkill',event.name);
+					}
+					else event.finish();
+					'step 3'
+					if(result.bool&&player.hasSkill('rexinsheng')){
+						player.logSkill('rexinsheng');
+						event.goto(1);
+					}
 				},
 			},
 			reguhuo:{

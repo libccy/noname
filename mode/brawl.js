@@ -1833,6 +1833,18 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						target.hp++;
 						target.maxHp++;
 						target.update();
+						if(get.config('choose_group')){
+							var list=lib.group.slice(0);
+							list.remove('shen');
+							game.players.forEach(i=>{
+								if(i.group=='shen'&&i!=game.me){
+									var group=list.randomGet();
+									i.group=group;
+									i.node.name.dataset.nature=get.groupnature(group);
+									i.update();
+								}
+							});
+						}
 					},
 					chooseCharacterAi:function(player,list,list2,back){
 						if(player==game.zhu){
