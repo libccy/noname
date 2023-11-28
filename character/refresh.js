@@ -10677,18 +10677,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					skills.forEach(skill=>{
 						var info=lib.skill[skill];
-						if(!info.audioname2) info.audioname2={};
-						if(info.audioname&&info.audioname.includes(character)){
-							if(info.audio&&typeof info.audio=='string') skill=info.audio;
-							if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
-							info.audioname2[name]=(skill+'_'+character);
-						}
-						else if(info.audioname2[character]){
-							info.audioname2[name]=info.audioname2[character];
-						}
-						else{
-							if(info.audio&&typeof info.audio=='string') skill=info.audio;
-							info.audioname2[name]=skill;
+						if(info){
+							if(!info.audioname2) info.audioname2={};
+							if(info.audioname&&info.audioname.includes(character)){
+								if(info.audio){
+									if(typeof info.audio=='string') skill=info.audio;
+									if(Array.isArray(info.audio)) skill=info.audio[0];
+								}
+								if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
+								info.audioname2[name]=(skill+'_'+character);
+							}
+							else if(info.audioname2[character]){
+								info.audioname2[name]=info.audioname2[character];
+							}
+							else{
+								if(info.audio){
+									if(typeof info.audio=='string') skill=info.audio;
+									if(Array.isArray(info.audio)) skill=info.audio[0];
+								}
+								info.audioname2[name]=skill;
+							}
 						}
 					});
 				},
