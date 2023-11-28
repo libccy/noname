@@ -10557,7 +10557,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						map:{},
 					}
 				},
-				banned:['lisu','sp_xiahoudun','xushao','zhoutai','old_zhoutai','shixie'],
+				banned:['lisu','sp_xiahoudun','xushao','jsrg_xushao','zhoutai','old_zhoutai','shixie','xin_zhoutai','dc_shixie','old_shixie'],
 				bannedType:['Charlotte','主公技','觉醒技','限定技','隐匿技','使命技'],
 				addHuashen:function(player){
 					if(!player.storage.rehuashen) return;
@@ -10567,7 +10567,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					_status.characterlist.randomSort();
 					for(let i=0;i<_status.characterlist.length;i++){
 						let name=_status.characterlist[i];
-						if(name.indexOf('zuoci')!=-1||name.indexOf('key_')==0||name.indexOf('sp_key_')==0||lib.skill.rehuashen.banned.includes(name)||player.storage.rehuashen.character.includes(name)) continue;
+						if(name.indexOf('zuoci')!=-1||name.indexOf('key_')==0||name.indexOf('sp_key_')==0||get.is.double(name)||lib.skill.rehuashen.banned.includes(name)||player.storage.rehuashen.character.includes(name)) continue;
 						let skills=lib.character[name][3].filter(skill=>{
 							const categories=get.skillCategoriesOf(skill);
 							return !categories.some(type=>lib.skill.rehuashen.bannedType.includes(type));
