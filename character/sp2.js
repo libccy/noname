@@ -8297,9 +8297,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('pingjian_check');
 					if(!player.storage.pingjian_check) player.storage.pingjian_check={};
 				},
-				onremove:function(player){
-					player.removeSkill('pingjian_check');
-				},
 				audio:2,
 				trigger:{player:['damageEnd','phaseJieshuBegin']},
 				frequent:true,
@@ -8359,12 +8356,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(list.length>2) break;
 					}
-					if(skills.length) player.chooseControl(skills).set('dialog',['评鉴：请选择尝试发动的技能',[list,'character']]);
+					if(skills.length){
+						event.list=list;
+						player.chooseControl(skills).set('dialog',['评鉴：请选择尝试发动的技能',[list,'character']]);
+					}
 					else event.finish();
 					'step 1'
 					player.markAuto('pingjian',[result.control]);
 					player.addTempSkill(result.control);
 					player.storage.pingjian_check[result.control]=(trigger.name=='damage'?trigger:'phaseJieshu');
+					var name=event.list.find(name=>lib.character[name][3].includes(result.control));
+					if(name) lib.skill.rehuashen.createAudio(name,result.control,'xushao');
 				},
 				group:'pingjian_use',
 				phaseUse_special:[],
@@ -8442,12 +8444,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(list.length>2) break;
 					}
-					if(skills.length) player.chooseControl(skills).set('dialog',['评鉴：请选择尝试发动的技能',[list,'character']]);
+					if(skills.length){
+						event.list=list;
+						player.chooseControl(skills).set('dialog',['评鉴：请选择尝试发动的技能',[list,'character']]);
+					}
 					else event.finish();
 					'step 1'
 					player.markAuto('pingjian',[result.control]);
 					player.addTempSkill(result.control);
 					player.storage.pingjian_check[result.control]='phaseUse';
+					var name=event.list.find(name=>lib.character[name][3].includes(result.control));
+					if(name) lib.skill.rehuashen.createAudio(name,result.control,'xushao');
 				},
 				ai:{order:12,result:{player:1}},
 			},
@@ -8455,7 +8462,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 				trigger:{player:['useSkill','logSkillBegin']},
 				filter:function(event,player){
-					if(get.info(event.skill).charlotte) return false;
+					var info=get.info(event.skill);
+					if(info&&info.charlotte) return false;
 					var skill=event.sourceSkill||event.skill;
 					return player.storage.pingjian_check[skill];
 				},
