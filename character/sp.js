@@ -19901,7 +19901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.mode()=='identity'){
 						event._result={
 							bool:true,
-							links:[trigger.player.identity],
+							links:['fenxin_'+trigger.player.identity],
 						};
 					}
 					else{
@@ -19919,7 +19919,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var ideitity=result.links[0];
-						player.addSkill('fenxin_'+identity);
+						player.addSkill(identity);
 						player.markSkill('fenxin');
 					}
 				},
