@@ -43166,25 +43166,23 @@ new Promise(resolve=>{
 				lib.translate[`${iInfo}_origin`]=lib.translate[iInfo];
 				if(!lib.config.vintageSkills.contains(i)) lib.translate[iInfo]=lib.translate[`${iInfo}_alter`];
 			}
+			else if(_status.mode&&lib.translate[iInfo+'_'+mode+'_'+_status.mode]) lib.translate[iInfo]=lib.translate[iInfo+'_'+mode+'_'+_status.mode];
 			else if(lib.translate[`${iInfo}_${mode}`]) lib.translate[iInfo]=lib.translate[`${iInfo}_${mode}`];
 			else if(lib.translate[`${iInfo}_zhu`]&&(mode=='identity'||mode=='guozhan'&&_status.mode=='four')) lib.translate[iInfo]=lib.translate[`${iInfo}_zhu`];
 			else if(lib.translate[`${iInfo}_combat`]&&get.is.versus()) lib.translate[iInfo]=lib.translate[`${iInfo}_combat`];
-			if(info.forbid&&info.forbid.contains(mode)){
-				lib.skill[i]={};
+			var deleteSkill=function(skill,iInfo){
+				var skillx={},info=get.info(skill);
+				if(info){
+					['audio','audioname','audioname2'].forEach(name=>{
+						if(info[name]) skillx[name]=info[name];
+					});
+				}
+				lib.skill[skill]=skillx;
 				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
-				if(lib.dynamicTranslate[i]) lib.dynamicTranslate[i]=()=>'此模式下不可用';
-				return;
-			}
-			if(info.mode&&info.mode.contains(mode)==false){
-				lib.skill[i]={};
-				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
-				if(lib.dynamicTranslate[i]) lib.dynamicTranslate[i]=()=>'此模式下不可用';
-				return;
-			}
-			if(info.available&&info.available(mode)==false){
-				lib.skill[i]={};
-				if(lib.translate[iInfo]) lib.translate[iInfo]='此模式下不可用';
-				if(lib.dynamicTranslate[i]) lib.dynamicTranslate[i]=()=>'此模式下不可用';
+				if(lib.dynamicTranslate[skill]) lib.dynamicTranslate[skill]=()=>'此模式下不可用';
+			};
+			if((info.forbid&&info.forbid.contains(mode))||(info.mode&&info.mode.contains(mode)==false)||(info.available&&info.available(mode)==false)){
+				deleteSkill(i,iInfo);
 				return;
 			}
 			if(info.viewAs&&typeof info.viewAs!='function'){
@@ -43192,8 +43190,7 @@ new Promise(resolve=>{
 					name:info.viewAs
 				};
 				if(!lib.card[info.viewAs.name]){
-					lib.skill[i]={};
-					lib.translate[iInfo]='技能不可用';
+					deleteSkill(i,iInfo);
 					return;
 				}
 				if(info.ai==undefined) info.ai={};

@@ -3731,7 +3731,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								list.remove('锁定技');
 								if(list.length>0) continue;
 								var info=get.info(skill);
-								if(info&&(!info.unique||info.gainable)) skills.add(skill);
+								if(info&&(!info.unique||info.gainable)){
+									lib.skill.rehuashen.createAudio(name,skill,'jsrg_xushao');
+									skills.add(skill);
+								}
 							}
 						}
 					}

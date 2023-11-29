@@ -10596,6 +10596,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olzaowang:{
 				mode:['identity'],
+				available:function(mode){
+					if(mode=='identity'&&_status.mode=='purple') return false;
+				},
 				audio:2,
 				enable:'phaseUse',
 				limited:true,
@@ -17668,7 +17671,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else num=get.population('fan');
 					}
 					else if(mode=='versus'){
-						num=player.getEnemies().length;
+						if(!_status.mode||_status.mode!='two') num=player.getEnemies().length;
+						else{
+							var target=game.findPlayer(x=>{
+								var num=x.getFriends().length;
+								return !game.hasPlayer(y=>{
+									return x!=y&&y.getFriends().length>num;
+								});
+							});
+							num=(target?target.getFriends(true).length:1);
+						}
 					}
 					else{
 						num=1;
@@ -19871,18 +19883,45 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			fenxin:{
-				mode:['identity'],
+				mode:['identity','versus'],
 				available:function(mode){
 					if(mode=='identity'&&_status.mode=='purple') return false;
+					if(mode=='versus'&&_status.mode!='two') return false;
 				},
-				trigger:{global:'dieAfter'},
+				trigger:{global:['dieAfter','damageEnd']},
 				filter:function(event,player){
-					return ['fan','zhong','nei'].contains(event.player.identity)&&!player.hasSkill('fenxin_'+event.player.identity);
+					var list=['fan','zhong','nei'];
+					if(get.mode()=='identity') return event.name=='die'&&list.includes(event.player.identity)&&!player.hasSkill('fenxin_'+event.player.identity);
+					return event.name=='damage'&&event.player!=player&&list.some(identity=>!player.hasSkill('fenxin_'+identity))&&event.player.getHistory('damage').indexOf(event)==0;
 				},
 				forced:true,
+				logTarget:'player',
 				content:function(){
-					player.addSkill('fenxin_'+trigger.player.identity);
-					player.markSkill('fenxin');
+					'step 0'
+					if(get.mode()=='identity'){
+						event._result={
+							bool:true,
+							links:['fenxin_'+trigger.player.identity],
+						};
+					}
+					else{
+						player.chooseButton([
+							'焚心：请选择〖竭缘〗的升级方式',
+							[[
+								['fenxin_fan','发动〖竭缘〗增加伤害无体力值限制'],
+								['fenxin_zhong','发动〖竭缘〗减少伤害无体力值限制'],
+								['fenxin_nei','将〖竭缘〗中的黑色手牌和红色手牌改为一张牌'],
+							].filter(list=>!player.hasSkill(list[0])),'textbutton']
+						],true).set('ai',function(button){
+							return ['fenxin_fan','fenxin_zhong','fenxin_nei'].indexOf(button.link)+1;
+						});
+					}
+					'step 1'
+					if(result.bool){
+						var ideitity=result.links[0];
+						player.addSkill(identity);
+						player.markSkill('fenxin');
+					}
 				},
 				intro:{
 					mark:function(dialog,content,player){
@@ -19902,9 +19941,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					zhong:{charlotte:true},
 					nei:{charlotte:true}
 				},
-				ai:{
-					combo:'jieyuan'
-				}
+				ai:{combo:'jieyuan'},
 			},
 			xisheng:{
 				enable:'chooseToUse',
@@ -25754,6 +25791,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hongde_info:'当你一次获得或失去至少两张牌后，你可以令一名其他角色摸一张牌。',
 			dingpan:'定叛',
 			dingpan_info_identity:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的反贼数）',
+			dingpan_info_versus_two:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的最大阵营角色数）',
 			dingpan_info_versus:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的敌方角色数）',
 			dingpan_info:'出牌阶段限一次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。',
 			weidi:'伪帝',
@@ -25842,6 +25880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jieyuan_info:'当你对一名其他角色造成伤害时，若其体力值大于或等于你的体力值，你可弃置一张黑色手牌，令此伤害+1；当你受到一名其他角色造成的伤害时，若其体力值大于或等于你的体力值，你可弃置一张红色手牌，令此伤害-1。',
 			fenxin:'焚心',
 			fenxin_info:'锁定技，一名其他角色死亡后，若其身份为：忠臣，你本局内发动〖竭缘〗减少伤害时无视体力值限制；反贼，你本局内发动〖竭缘〗增加伤害时无视体力值限制；内奸，你本局内选择发动〖竭缘〗的牌时无颜色和区域限制。',
+			fenxin_info_versus:'锁定技，一名其他角色首次受到伤害后，你选择本局游戏未选择过的一项：1.发动〖竭缘〗减少伤害时无视体力值限制；2.发动〖竭缘〗增加伤害时无视体力值限制；3.发动〖竭缘〗选择的牌时无颜色和区域限制。',
 			qingyi:'轻逸',
 			qingyi1:'轻逸',
 			qingyi2:'轻逸',
