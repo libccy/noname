@@ -43166,6 +43166,7 @@ new Promise(resolve=>{
 				lib.translate[`${iInfo}_origin`]=lib.translate[iInfo];
 				if(!lib.config.vintageSkills.contains(i)) lib.translate[iInfo]=lib.translate[`${iInfo}_alter`];
 			}
+			else if(_status.mode&&lib.translate[iInfo+'_'+mode+'_'+_status.mode]) lib.translate[iInfo]=lib.translate[iInfo+'_'+mode+'_'+_status.mode];
 			else if(lib.translate[`${iInfo}_${mode}`]) lib.translate[iInfo]=lib.translate[`${iInfo}_${mode}`];
 			else if(lib.translate[`${iInfo}_zhu`]&&(mode=='identity'||mode=='guozhan'&&_status.mode=='four')) lib.translate[iInfo]=lib.translate[`${iInfo}_zhu`];
 			else if(lib.translate[`${iInfo}_combat`]&&get.is.versus()) lib.translate[iInfo]=lib.translate[`${iInfo}_combat`];
