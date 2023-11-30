@@ -15951,7 +15951,6 @@ new Promise(resolve=>{
 					else if(event._sendskill){
 						event.result._sendskill=event._sendskill;
 					}
-					debugger
 					if((!event.result||!event.result.bool||event.result._noHidingTimer)&&(event.result.skill||event.logSkill)){
 						var info=get.info(event.result.skill||event.logSkill);
 						if(info.direct&&!info.clearTime){
@@ -15960,7 +15959,6 @@ new Promise(resolve=>{
 					}
 					if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
 					if(!_status.noclearcountdown){
-						debugger
 						game.stopCountChoose();
 					}
 					"step 5"
@@ -26969,7 +26967,6 @@ new Promise(resolve=>{
 					}
 				}
 				showTimer(time){
-					debugger
 					if(!time&&lib.configOL){
 						time=parseInt(lib.configOL.choose_timeout)*1000;
 					}
@@ -37581,7 +37578,6 @@ new Promise(resolve=>{
 			}
 		},
 		stopCountChoose:function(){
-			debugger
 			if(_status.countDown){
 				clearInterval(_status.countDown);
 				delete _status.countDown;
