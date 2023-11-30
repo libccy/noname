@@ -15714,7 +15714,7 @@ new Promise(resolve=>{
 							info.onChooseToUse(event);
 						}
 					}
-					_status.noclearcountdown=true;
+					if(_status.noclearcountdown!=='direct') _status.noclearcountdown=true;
 					if(event.type=='phase'){
 						if(event.isMine()){
 							event.endButton=ui.create.control('结束回合','stayleft',function(){
@@ -15951,8 +15951,16 @@ new Promise(resolve=>{
 					else if(event._sendskill){
 						event.result._sendskill=event._sendskill;
 					}
+					debugger
+					if((!event.result||!event.result.bool||event.result._noHidingTimer)&&(event.result.skill||event.logSkill)){
+						var info=get.info(event.result.skill||event.logSkill);
+						if(info.direct&&!info.clearTime){
+							_status.noclearcountdown='direct';
+						}
+					}
 					if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
 					if(!_status.noclearcountdown){
+						debugger
 						game.stopCountChoose();
 					}
 					"step 5"
@@ -15974,7 +15982,7 @@ new Promise(resolve=>{
 							info.onChooseToRespond(event);
 						}
 					}
-					_status.noclearcountdown=true;
+					if(_status.noclearcountdown!=='direct') _status.noclearcountdown=true;
 					if(!_status.connectMode&&lib.config.skip_shan&&event.autochoose&&event.autochoose()){
 						event.result={bool:false};
 					}
@@ -16133,7 +16141,7 @@ new Promise(resolve=>{
 						}
 						if(event.result.skill){
 							if(info.direct&&!info.clearTime){
-								_status.noclearcountdown=true;
+								_status.noclearcountdown='direct';
 							}
 						}
 						if(event.logSkill){
@@ -25261,9 +25269,9 @@ new Promise(resolve=>{
 						if(info.onuse){
 							info.onuse(result,this);
 						}
-						if(info.direct&&!info.clearTime){
-							_status.noclearcountdown=true;
-						}
+						// if(info.direct&&!info.clearTime){
+						// 	_status.noclearcountdown=true;
+						// }
 					}
 					if(event.logSkill){
 						if(typeof event.logSkill=='string'){
@@ -26661,7 +26669,7 @@ new Promise(resolve=>{
 								}
 								player._hide_all_timer=true;
 							}
-							else if(!_status.event._global_waiting){
+							else if(!_status.event._global_waiting&&_status.noclearcountdown!=='direct'){
 								player.showTimer(time);
 							}
 							lib.node.torespondtimeout[this.playerid]=setTimeout(function(){
@@ -26678,7 +26686,7 @@ new Promise(resolve=>{
 							game.players[i].hideTimer();
 						}
 					}
-					else if(!_status.event._global_waiting){
+					else if(!get.event('_global_waiting')&&(_status.noclearcountdown!=='direct'||get.event('name')=='chooseToUse'&&result&&result.bool)&&!(result&&result._noHidingTimer)){
 						this.hideTimer();
 					}
 					clearTimeout(lib.node.torespondtimeout[this.playerid]);
@@ -26961,6 +26969,7 @@ new Promise(resolve=>{
 					}
 				}
 				showTimer(time){
+					debugger
 					if(!time&&lib.configOL){
 						time=parseInt(lib.configOL.choose_timeout)*1000;
 					}
@@ -37572,6 +37581,7 @@ new Promise(resolve=>{
 			}
 		},
 		stopCountChoose:function(){
+			debugger
 			if(_status.countDown){
 				clearInterval(_status.countDown);
 				delete _status.countDown;
@@ -57188,6 +57198,10 @@ new Promise(resolve=>{
 				const skill=gameEvent.skill;
 				if(skill){
 					result.skill=skill;
+					const info=get.info(skill);
+					if(info&&info.direct&&!info.clearTime){
+						result._noHidingTimer=true;
+					}
 					const skillInformation=get.info(gameEvent.skill),viewAs=skillInformation.viewAs;
 					if(typeof viewAs=='function'){
 						const viewedAs=viewAs(result.cards,gameEvent.player);

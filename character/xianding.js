@@ -116,6 +116,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function*(event,map){
 					const player=map.player;
+					event.pushHandler('onNextMoveCard',(event,option)=>{
+						if(_status.connectMode&&event.step==1&&event._result.bool&&option.state=='end'){
+							game.broadcastAll(()=>{
+								delete _status.noclearcountdown;
+								game.stopCountChoose();
+							});
+						}
+					});
 					let result=yield player.moveCard(false,`###琼英###移动场上的一张牌，然后弃置一张与此牌花色相同的手牌（若没有则展示手牌）。`).set('logSkill','dcqiongying').set('custom',{
 						add:{},
 						replace:{
@@ -151,6 +159,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
+				filter:function(event,player){
+					return game.hasPlayer(current=>current.countCards('e'));
+				},
 				content:function*(event,map){
 					const player=map.player;
 					let result=yield player.chooseTarget(get.prompt('dcnuanhui'),'选择一名装备区有牌的角色，该角色可以依次使用X张基本牌（X为其装备区牌数）。',(card,player,target)=>{
