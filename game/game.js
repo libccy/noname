@@ -15924,6 +15924,11 @@ new Promise(resolve=>{
 							if(game.online){
 								event._sendskill=[event.buttoned+'_backup',lib.skill[event.buttoned+'_backup']];
 							}
+							else{
+								game.broadcast((skill,audio)=>{
+									lib.skill[skill].audio=audio
+								},event.buttoned+'_backup',lib.skill[event.buttoned+'_backup'].audio);
+							}
 							event.backup(event.buttoned+'_backup');
 							if(info.prompt){
 								event.openskilldialog=info.prompt(info.chooseControl?result:result.links,player);
