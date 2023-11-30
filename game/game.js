@@ -9979,7 +9979,7 @@ new Promise(resolve=>{
 										'是否退出游戏？',
 										function(index){
 											switch(index){
-												case 2:game.saveConfig('null');game.reload();break;
+												case 2:game.reload();break;
 												case 3:navigator.app.exitApp();break;
 											}
 										},
@@ -9991,6 +9991,17 @@ new Promise(resolve=>{
 									navigator.app.exitApp();
 								}
 							});
+							if ("cordova" in window && "plugins" in window.cordova && "permissions" in window.cordova.plugins) {
+								const permissions = cordova.plugins.permissions;
+								const requests = ["WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"]
+								requests.forEach((request) => {
+									permissions.checkPermission(permissions[request], (status) => {
+										if (!status.hasPermission) {
+											permissions.requestPermission(permissions[request], lib.other.ignore, lib.other.ignore);
+										}
+									}, lib.other.ignore);
+								});
+							}
 						}
 						game.download=function(url,folder,onsuccess,onerror,dev,onprogress){
 							if(!url.startsWith('http')){
@@ -10151,7 +10162,7 @@ new Promise(resolve=>{
 						else{
 							showbar();
 						}
-					}
+					};
 				}
 				else if(typeof window.require=='function'){
 					lib.node={
