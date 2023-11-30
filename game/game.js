@@ -60981,29 +60981,47 @@ new Promise(resolve=>{
 		},
 		cnNumber:(num,two)=>{
 			if(num==Infinity) return '∞';
+			if(typeof num!='number'&&typeof num!='string') return num;
 			if(isNaN(num)) return '';
-			if(typeof num!='number') return num;
-			if(num<0||num>99) return num;
-			if(num<=10){
-				switch(num){
-					case 0:return '〇';
-					case 1:return '一';
-					case 2:return two?'二':'两';
-					case 3:return '三';
-					case 4:return '四';
-					case 5:return '五';
-					case 6:return '六';
-					case 7:return '七';
-					case 8:return '八';
-					case 9:return '九';
-					case 10:return '十';
+			let numStr=num.toString();
+			if(!/^\d+$/.test(numStr)) return num;
+
+			const chars = ['零','一','二','三','四','五','六','七','八','九'];
+			const units = ['','十','百','千'];
+
+			if(numStr.length<=2){//两位数以下单独处理保证效率
+				if(numStr.length==1) return two&&num==2?'两':chars[num];
+				return (numStr[0]=='1'?'':chars[numStr[0]])+'十'+(numStr[1]=='0'?'':chars[numStr[1]]);
+			}
+
+			numStr=numStr.replace(/(?=(\d{4})+$)/g,',').split(',').filter(Boolean);
+			const handleZero=str=>str.replace(/零{2,}/g,'零').replace(/零+$/g,'');
+			const _transform=str=>{
+				if(str==='0000') return '零';
+				if(!two&&str==='2') return '两';
+				let result='';
+				for(let i=0;i<str.length;i++){
+					let char=chars[+str[i]];
+					const unitIndex=str.length-1-i;
+					let unit=units[unitIndex];
+					if(!two&&char==='二'&&unitIndex>1) char='两'; 
+					if(char==='零') unit='';
+					result+=char+unit;
 				}
+				result=handleZero(result);
+				return result;
 			}
-			if(num<20){
-				return '十'+get.cnNumber(num-10,true);
+			let result='';
+			for(let i=0;i<numStr.length;i++){
+				const part=numStr[i];
+				let char=_transform(part);
+				const unitIndex=numStr.length-1-i;
+				let unit=unitIndex%2?'万':'亿'.repeat(unitIndex/2);
+				if(char==='零') unit='';
+				result+=char+unit;
 			}
-			var x=Math.floor(num/10);
-			return get.cnNumber(x,true)+'十'+(num>10*x?get.cnNumber(num-10*x,true):'');
+			result=handleZero(result);
+			return result;
 		},
 		selectableButtons:sort=>{
 			if(!_status.event.player) return[];
