@@ -18539,7 +18539,7 @@ new Promise(resolve=>{
 									if(current!=target&&get.attitude(player,current)>0){
 										var es=target.getCards('e',filterCard);
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.canEquip(es[i],_status.event.canReplace)&&get.effect(current,es[i],player,player)>_status.event.canReplace?get.effect(target,es[i],player,player):0) return true;
+											if(get.value(es[i],target)>0&&current.canEquip(es[i],_status.event.canReplace)&&get.effect(current,es[i],player,player)>(_status.event.canReplace?get.effect(target,es[i],player,player):0)) return true;
 										}
 									}
 								})){
@@ -18574,12 +18574,14 @@ new Promise(resolve=>{
 					next.set('sourceTargets',event.sourceTargets||game.filterPlayer());
 					next.set('aimTargets',event.aimTargets||game.filterPlayer());
 					next.set('canReplace',event.canReplace);
+					next.set('custom',get.copy(event.custom));
 					if(event.prompt2) next.set('prompt2',event.prompt2);
 					if(event.forced) next.set('forced',true);
 					'step 1'
 					event.result=result;
 					if(result.bool){
-						player.line2(result.targets,'green');
+						if(event.logSkill) player.logSkill(event.logSkill,result.targets,'green');
+						else player.line2(result.targets,'green');
 						event.targets=result.targets;
 					}
 					else{
@@ -18612,7 +18614,7 @@ new Promise(resolve=>{
 							else{
 								return targets1.canEquip(button.link,_status.event.canReplace);
 							}
-						}).set('filter',event.filter).set('canReplace',event.canReplace);
+						}).set('filter',event.filter).set('canReplace',event.canReplace).set('custom',get.copy(event.custom));
 					}
 					else{
 						event.finish();
@@ -25178,7 +25180,6 @@ new Promise(resolve=>{
 										if(!canReplace||att<0&&current2.countEquipableSlot(get.subtype(es[i]))){
 											if(att==att2||att2!=get.sgn(get.effect(current2,es[i],player,current2))) return false;
 										}
-										// if((!canReplace||!current2.countEquipableSlot(get.subtype(es[i]))&&current2.canEquip(es[i],true))&&(att==att2||att2!=get.sgn(get.effect(current2,es[i],player,current2)))) return false;
 									}
 									return current!=current2&&!current2.isMin()&&current2.canEquip(es[i],canReplace);
 								})){
