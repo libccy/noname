@@ -639,6 +639,7 @@ window.noname_character_rank={
 		'shen_huatuo',
 		'dc_guansuo',
 		'dc_dongzhao',
+		'zhugeruoxue',
 	],
 	bp:[
 		'chess_diaochan',

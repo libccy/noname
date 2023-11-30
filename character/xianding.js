@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			zhugeruoxue:['female','wei',3,['dcqiongying','dcnuanhui']],
 			caoyi:['female','wei',4,['dcmiyi','dcyinjun']],
 			malingli:['female','shu',3,['dclima','dcxiaoyin','dchuahuo']],
 			wu_luxun:['male','wu',3,['dcxiongmu','dczhangcai','dcruxian']],
@@ -92,7 +93,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji'],
 				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
-				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen'],
+				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli'],
@@ -104,6 +105,141 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//诸葛若雪
+			dcqiongying:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				direct:true,
+				filter:function(event,player){
+					return player.canMoveCard();
+				},
+				content:function*(event,map){
+					const player=map.player;
+					let result=yield player.moveCard(false,`###琼英###移动场上的一张牌，然后弃置一张与此牌花色相同的手牌（若没有则展示手牌）。`).set('logSkill','dcqiongying').set('custom',{
+						add:{},
+						replace:{
+							window:()=>{
+								if(get.event().name=='chooseTarget') ui.click.cancel();
+							}
+						},
+					});
+					if(result.bool){
+						const card=result.card,suit=get.suit(card);
+						if(!player.hasCard({suit:suit})) player.showHandcards();
+						else player.chooseToDiscard({suit:suit},true,`请弃置一张${get.translation(suit)}手牌`);
+					}
+					else{
+						player.getStat('skill').dcqiongying--;
+					}
+				},
+				ai:{
+					expose:0.2,
+					order:function(item,player){
+						if(player.countCards('h')<=4) return 0.5;
+						return 9;
+					},
+					result:{
+						player:function(player){
+							if(player.canMoveCard(true)) return 1;
+							return 0;
+						}
+					}
+				}
+			},
+			dcnuanhui:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				direct:true,
+				content:function*(event,map){
+					const player=map.player;
+					let result=yield player.chooseTarget(get.prompt('dcnuanhui'),'选择一名装备区有牌的角色，该角色可以依次使用X张基本牌（X为其装备区牌数）。',(card,player,target)=>{
+						return target.countCards('e');
+					}).set('ai',target=>{
+						return get.event('aiTarget')==target?10:0;
+					}).set('aiTarget',(()=>{
+						const player=get.player();
+						const list=get.inpileVCardList(info=>{
+							return info[0]=='basic';
+						});
+						if(!list.length) return null;
+						const getUseValue=target=>{
+							if(get.attitude(player,target)<=0) return -1;
+							const toUse=[];
+							const hp=target.hp;
+							let eff=0,count=target.countCards('e');
+							while(count--){
+								target.hp=Math.min(target.maxHp,target.hp+toUse.filter(card=>card.name=='tao').length);
+								const listx=list.map(info=>{
+									const card=new lib.element.VCard({name:info[2],nature:info[3],isCard:true});
+									return [card,target.getUseValue(card)];
+								}).sort((a,b)=>{
+									return b[1]-a[1];
+								});
+								const mostValuablePair=listx[0].slice();
+								if(mostValuablePair[1]<=0) mostValuablePair[1]=0;
+								eff+=mostValuablePair[1];
+								toUse.push(mostValuablePair[0]);
+								target.hp=hp;
+							}
+							if(toUse.length>1&&eff>0){
+								eff-=target.getCards('e',card=>{
+									return lib.filter.cardDiscardable(card,target,'dcnuanhui');
+								}).map(card=>{
+									return get.value(card,target);
+								}).reduce((p,c)=>{
+									return p+c;
+								},0);
+							}
+							return eff;
+						}
+						const playerList=game.filterPlayer(current=>{
+							return current.countCards('e');
+						}).map(current=>[current,getUseValue(current)]).sort((a,b)=>{
+							return b[1]-a[1];
+						});
+						if(playerList[0][1]<=0) return null;
+						return playerList[0][0];
+					})());
+					if(!result.bool) return event.finish();
+					const target=result.targets[0];
+					player.logSkill('dcnuanhui',target);
+					if(!target.isUnderControl(true)&&!target.isOnline()) game.delayx();
+					const total=target.countCards('e');
+					let count=0,forced=false;
+					while(count<total){
+						const basicList=get.inpileVCardList(info=>{
+							return info[0]=='basic'&&target.hasUseTarget({name:info[2],nature:info[3],isCard:true});
+						});
+						if(!basicList.length){
+							game.log('但是',target,'无牌可出！');
+							break;
+						}
+						const str=forced?'视为使用一张基本牌':'是否视为使用一张基本牌？';
+						result=yield target.chooseButton([str,[basicList,'vcard']],forced).set('ai',button=>{
+							return get.player().getUseValue({name:button.link[2],nature:button.link[3],isCard:true});
+						});
+						if(!result.bool){
+							game.log('但是',target,'不愿出牌！');
+							break;
+						}
+						forced=true;
+						const card=new lib.element.VCard({name:result.links[0][2],nature:result.links[0][3],isCard:true});
+						yield target.chooseUseTarget(card,true,false);
+						count++;
+					}
+					if(count>1){
+						const cards=target.getCards('e',card=>{
+							return lib.filter.cardDiscardable(card,target,'dcnuanhui');
+						});
+						if(cards.length) target.discard(cards).discarder=target;
+					}
+				},
+				ai:{
+					expose:0.3,
+					threaten:3.7,
+				},
+			},
 			//曹轶
 			dcmiyi:{
 				audio:2,
@@ -12596,6 +12732,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhoubuyi:'周不疑（192年—208年），字元直（或作“文直”），零陵重安（今湖南衡阳县）人，刘表别驾刘先的外甥，少有异才，聪明敏达，在十七岁时就著有文论四首。曹冲死后，曹操怀疑曹丕无法驾驭周不疑，于是派人杀了周不疑。',
 			tianshangyi:'田尚衣，一作陈尚衣，魏文帝曹丕宫中著名宫人。能歌善舞，一时冠绝于世，私以为比之汉宫飞燕也不遑多让。',
 			malingli:'马伶俐，游卡桌游原创角色，设定上为，马超之女，其身形虽娇小，却继承了马超英勇略带冲动的个性，活泼阳光，调皮伶俐，爱摆弄爆竹烟花一类的小器具，包包里经常放置用五色彩纸包装的小炸弹球。马伶俐从小跟随马超和马云騄学习战斗技巧，战斗力超强，坚强的意志和勇气也得到了提升，同时擅长马术，有一匹可爱的小白马伴随其身边。后马伶俐成年，嫁与刘备之子刘理，获封梁王妃。两人琴瑟相和，极为恩爱，常结伴出游，被人誉为天作之合。',
+			zhugeruoxue:'诸葛氏（“若雪”为网络小说虚构），诸葛亮的二姐，庞山民之妻。',
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',
@@ -13169,6 +13306,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmiyi_info:'准备阶段，你可以选择一项：1.回复1点体力；2.受到你造成的1点伤害。然后你令任意名角色执行该项。若如此做，这些角色于结束阶段执行另一项。',
 			dcyinjun:'寅君',
 			dcyinjun_info:'当你使用对应实体牌均为你的手牌的【杀】或锦囊牌结算结束后，若此牌目标为1，你可以视为对该目标使用一张无伤害来源的【杀】。然后若你本回合发动〖寅君〗的次数大于你的体力值，〖寅君〗失效直到回合结束。',
+			zhugeruoxue:'诸葛若雪',
+			dcqiongying:'琼英',
+			dcqiongying_info:'出牌阶段限一次。你可以移动场上的一张牌，然后你弃置一张与此牌花色相同的手牌（若没有该花色的手牌则改为展示所有手牌）。',
+			dcnuanhui:'暖惠',
+			dcnuanhui_info:'结束阶段，你可以选择一名装备区有牌的角色，其可以视为依次使用X张基本牌（X为其装备区牌数）。若其以此法使用了至少两张牌，其弃置装备区里的所有牌。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
