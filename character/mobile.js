@@ -5111,8 +5111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				filter:function(event,player){
-					var num=player.storage.mobileyanzhu?player.maxHp:player.hp;
-					return num>0;
+					return (player.storage.mobileyanzhu?player.maxHp:player.hp)>0;
 				},
 				direct:true,
 				content:function(){
@@ -5144,7 +5143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					if(event.current&&event.current.countCards('he')){
-						if(player.storage.mobileyanzhu||event.targets2.length==1) event.current.chooseCard('选择一张牌置于牌堆顶','he',true);
+						if(!player.storage.mobileyanzhu||event.targets2.length==1) event.current.chooseCard('选择一张牌置于牌堆顶','he',true);
 						else event.current.chooseCardTarget({
 							prompt:'将一张牌置于牌堆顶，或交给其他目标角色',
 							filterCard:true,
@@ -5212,7 +5211,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.removeSkill('mobileyanzhu');
 						player.storage.mobileyanzhu=true;
 						player.popup('兴学');
-						game.log(player,'修改了技能','【兴学】');
+						game.log(player,'修改了技能','#g【兴学】');
 					}
 					else{
 						player.gainPlayerCard(target,true,'hej');
