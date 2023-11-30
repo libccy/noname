@@ -37447,6 +37447,12 @@ new Promise(resolve=>{
 					if(info.audioname2[player.name]) audioInfo=info.audioname2[player.name];
 					else if(info.audioname2[player.name1]) audioInfo=info.audioname2[player.name1];
 					else if(info.audioname2[player.name2]) audioInfo=info.audioname2[player.name2];
+					else if(player.tempname){
+						let tempname=player.tempname;
+						if(!Array.isArray(tempname)) tempname=[tempname];
+						const name=tempname.find(i=>info.audioname2[i]);
+						if(name) audioInfo=info.audioname2[name];
+					}
 				}
 				if(typeof audioInfo=='function') audioInfo=audioInfo(player);
 				
@@ -37491,6 +37497,12 @@ new Promise(resolve=>{
 					if(audioname.includes(player.name)) _audioname=`_${player.name}`;
 					else if(audioname.includes(player.name1)) _audioname=`_${player.name1}`;
 					else if(audioname.includes(player.name2)) _audioname=`_${player.name2}`;
+					else if(player.tempname){
+						let tempname=player.tempname;
+						if(!Array.isArray(tempname)) tempname=[tempname];
+						const name=tempname.find(i=>audioname.includes(i));
+						if(name) _audioname=`_${name}`;
+					}
 		
 					list=list.slice(1);//[路径,number/true,格式]
 					if(list[1]=='true') audioList.add(`${list[0]||'skill'}/${skill}${_audioname}.${list[2]||'mp3'}`);
