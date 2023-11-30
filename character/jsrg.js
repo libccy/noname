@@ -1226,8 +1226,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								player.logSkill('jsrgguiji_swapback',trigger.player);
 								player.swapHandcards(trigger.player);
-								player.unmarkAuto('jsrgguiji_swapback',[trigger.player]);
 							}
+							player.unmarkAuto('jsrgguiji_swapback',[trigger.player]);
 						},
 						intro:{
 							content:'$的下个出牌阶段结束时，你可以与其交换手牌'
