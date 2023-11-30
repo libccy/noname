@@ -31794,7 +31794,7 @@ new Promise(resolve=>{
 								return info.trigger[i]==evt.triggername;
 							})) continue;
 
-							const playerMap=game.players.concat(game.dead).sortBySeat(evt.doingList[1].player);	
+							const playerMap=game.players.concat(game.dead).sortBySeat(evt.starter);	
 							const priority=get.priority(skill);
 							const toadd={
 								skill:skill,
@@ -31953,7 +31953,7 @@ new Promise(resolve=>{
 						next.doingList=doingList;
 						next._trigger=event;
 						next.triggername=name;
-						//next.starter=start;
+						next.starter=start;
 						event._triggering=next;
 					}
 					return this;
