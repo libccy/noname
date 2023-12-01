@@ -8155,7 +8155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					check:function(button){
 						let player=_status.event.player,hs=player.getCards('h',card=>{
-							return get.name(card)!==button.link[2]&&(!button.link[3]||get.hasNature(card,button.link[3]));
+							return get.name(card)!==button.link[2]&&(!button.link[3]||game.hasNature(card,button.link[3]));
 						}),bool=false,map={};
 						for(let i of hs){
 							let color=get.color(i);
