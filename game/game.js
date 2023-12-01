@@ -18596,8 +18596,8 @@ new Promise(resolve=>{
 					'step 1'
 					event.result=result;
 					if(result.bool){
-						if(event.logSkill) player.logSkill(event.logSkill,result.targets,'green');
-						else player.line2(result.targets,'green');
+						if(event.logSkill) player.logSkill(event.logSkill,result.targets,false);
+						player.line2(result.targets,'green');
 						event.targets=result.targets;
 					}
 					else{
