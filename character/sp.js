@@ -8092,7 +8092,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				hiddenCard:function(player,name){
-					if(get.type(name)=='basic'&&lib.inpile.contains(name)&&!player.getStorage('yilie_count').contains(name)){
+					if(get.type(name)=='basic'&&lib.inpile.contains(name)&&!player.getStorage('yilie_count').includes(name)){
 						var hs=player.getCards('hs');
 						if(hs.length<2) return false;
 						var bool=false,map={};
@@ -8123,7 +8123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(!bool) return false;
 					for(var name of lib.inpile){
-						if(get.type(name)!='basic'||list.contains(name)) continue;
+						if(get.type(name)!='basic'||list.includes(name)) continue;
 						var card={name:name};
 						if(event.filterCard(card,player,event)) return true;
 						if(name=='sha'){
@@ -8138,10 +8138,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				chooseButton:{
 					dialog:function(event,player){
 						var list=[];
-						var storage=player.storage.yilie_count;
+						var storage=player.getStorage('yilie_count');
 						for(var i of lib.inpile){
-							if(get.type(i)!='basic') continue;
-							if(storage&&storage.contains(i)) continue;
+							if(get.type(i)!='basic'||storage.includes(i)) continue;
 							var card={name:i,isCard:true};
 							if(event.filterCard(card,player,event)) list.push(['基本','',i]);
 							if(i=='sha'){
@@ -8154,25 +8153,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('义烈',[list,'vcard'],'hidden')
 					},
 					check:function(button){
-						let player=_status.event.player,hs=player.getCards('h',card=>{
-							return get.name(card)!==button.link[2]&&(!button.link[3]||get.hasNature(card,button.link[3]));
-						}),bool=false,map={};
-						for(let i of hs){
-							let color=get.color(i);
-							if(!map[color]) map[color]=true;
-							else{
-								bool=true;
-								break;
+						var player=_status.event.player;
+						var evt=_status.event.getParent();
+						var name=button.link[2],card={name:name,nature:button.link[3]};
+						if(name=='shan') return 2;
+						if(evt.type=='dying'){
+							if(get.attitude(player,evt.dying)<2) return 0;
+							if(name=='jiu') return 2.1;
+							return 1.9;
+						}
+						if(evt.type=='phase'){
+							if(button.link[2]=='jiu'){
+								if(player.getUseValue({name:'jiu'})<=0) return 0;
+								if(player.countCards('hs',name=>get.name(card)=='sha')) return player.getUseValue({name:'jiu'});
+								return 0;
 							}
+							return player.getUseValue(card)/4;
 						}
-						if(!bool) return 0;
-						if(button.link[2]=='shan') return 3;
-						if(button.link[2]=='jiu'){
-							if(player.getUseValue({name:'jiu'})<=0) return 0;
-							if(player.countCards('h','sha')) return player.getUseValue({name:'jiu'});
-							return 0;
-						}
-						return player.getUseValue({name:button.link[2],nature:button.link[3]})/4;
+						return 1;
 					},
 					backup:function(links,player){
 						return {
@@ -8188,7 +8186,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							position:'hs',
 							complexCard:true,
 							check:(card)=>{
-								if(get.name(card)===lib.skill.yilie_backup.viewAs.name&&(!lib.skill.yilie_backup.viewAs.nature||game.hasNature(card,lib.skill.yilie_backup.viewAs.nature))) return -1;
 								return 8-get.value(card);
 							},
 							popname:true,
@@ -8211,12 +8208,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:function(item,player){
-						return 2.6;
+						if(player&&_status.event.type=='phase'){
+							var add=false,max=0;
+							var names=lib.inpile.filter(name=>get.type(name)=='basic'&&!player.getStorage('yilie_count').includes(name));
+							if(names.includes('sha')) add=true;
+							names=names.map(namex=>{return {name:namex}});
+							if(add) lib.inpile_nature.forEach(nature=>names.push({name:'sha',nature:nature}));
+							names.forEach(card=>{
+								if(player.getUseValue(card)>0){
+									var temp=get.order(card);
+									if(temp>max) max=temp;
+								}
+							});
+							if(max>0) max-=0.001;
+							return max;
+						}
+						return 0.5;
 					},
 					respondShan:true,
 					respondSha:true,
 					fireAttack:true,
-					skillTagFilter:function(player,tag){
+					skillTagFilter:function(player,tag,arg){
+						if(arg=='respond') return false;
 						var hs=player.getCards('hs');
 						if(hs.length<2) return false;
 						var bool=false,map={};
