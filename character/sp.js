@@ -12790,25 +12790,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						var name=button.link[2];
 						var evt=_status.event.getParent();
-						if(get.type(name)=='basic'){
+						if(evt.type=='phase'){
+							var card={name:name,nature:button.link[3],isCard:true};
 							if(name=='shan') return 2;
 							if(evt.type=='dying'){
 								if(get.attitude(player,evt.dying)<2) return false;
 								if(name=='jiu') return 2.1;
 								return 1.9;
 							}
-							if(evt.type=='phase') return player.getUseValue({name:name,nature:button.link[3],isCard:true});
-							return 1;
+							return player.getUseValue(card);
 						}
-						if(!['chuqibuyi','shuiyanqijunx','juedou','nanman','wanjian','shunshou','zhujinqiyuan'].contains(name)) return 0;
-						var card={name:name,isCard:true};
-						if(['shunshou','zhujinqiyuan'].contains(card.name)){
-							if(!game.hasPlayer(function(current){
-								return get.attitude(player,current)!=0&&get.distance(player,current)<=1&&player.canUse(card,current)&&get.effect(current,card,player,player)>0;
-							})) return 0;
-							return player.getUseValue(card)-7;
-						}
-						return player.getUseValue(card)-4;
+						return 1;
 					},
 					backup:function(links,player){
 						if(typeof links[1]=='number') links.reverse();
@@ -12852,10 +12844,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var name=(tag=='respondSha'?'sha':'shan');
 						return !player.storage.youlong2.contains(name);
 					},
-					order:1,
-					result:{
-						player:1,
+					order:function(item,player){
+						if(player&&_status.event.type=='phase'){
+							var max=0,add=false;
+							var type=player.storage.youlong?'basic':'trick';
+							var list=lib.inpile.filter(name=>get.type(name)==type&&!player.storage.youlong2.includes(name));
+							if(list.includes('sha')) add=true;
+							list=list.map(namex=>{return {name:namex,isCard:true}});
+							if(add) lib.inpile_nature.forEach(naturex=>list.push({name:'sha',nature:naturex,isCard:true}));
+							for(var card of list){
+								if(player.getUseValue(card)>0){
+									var temp=get.order(card);
+									if(temp>max) max=temp;
+								}
+							}
+							if(max>0) max+=0.3;
+							return max;
+						}
+						return 1;
 					},
+					result:{player:1},
 				},
 			},
 			youlong_true:{charlotte:true},
