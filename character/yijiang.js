@@ -5114,7 +5114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jyzongshi:{
 				audio:2,
-				audioname:['re_jianyong'],
+				audioname:['re_jianyong','ol_jianyong'],
 				trigger:{player:['chooseToCompareAfter','compareMultipleAfter'],target:['chooseToCompareAfter','compareMultipleAfter']},
 				filter:function(event,player){
 					if(event.preserve) return false;
@@ -10272,6 +10272,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname2:{
 					re_jianyong:'reqiaoshui',
 					xin_jianyong:'xinqiaoshui',
+					ol_jianyong:'olqiaoshui',
 				},
 				trigger:{player:'useCard2'},
 				filter:function(event,player){
@@ -13910,7 +13911,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			masu:['xin_masu','re_masu','masu'],
 			xusheng:['xusheng','xin_xusheng','re_xusheng','old_xusheng'],
 			wuguotai:['wuguotai','xin_wuguotai','re_wuguotai'],
-			lingtong:['lingtong','xin_lingtong','re_lingtong','old_lingtong'],
+			lingtong:['lingtong','xin_lingtong','ol_lingtong','re_lingtong','old_lingtong'],
 			gaoshun:['gaoshun','xin_gaoshun','re_gaoshun','old_gaoshun'],
 			zhonghui:['zhonghui','xin_zhonghui','re_zhonghui','old_zhonghui','pe_zhonghui'],
 			wangyi:['wangyi','re_wangyi','old_wangyi'],
@@ -13925,7 +13926,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			manchong:['manchong','re_manchong'],
 			caochong:['caochong','re_caochong','old_caochong'],
 			guohuai:['guohuai','re_guohuai','xin_guohuai','tw_guohuai','ol_guohuai'],
-			jianyong:['jianyong','re_jianyong','xin_jianyong'],
+			jianyong:['jianyong','ol_jianyong','re_jianyong','xin_jianyong'],
 			panzhangmazhong:['panzhangmazhong','re_panzhangmazhong','xin_panzhangmazhong'],
 			yufan:['yufan','xin_yufan','re_yufan'],
 			zhuran:['zhuran','re_zhuran','xin_zhuran','old_zhuran'],
