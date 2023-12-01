@@ -4165,7 +4165,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					if(!player.storage.huashen){
 						player.storage.huashen={
-							shown:[],
 							owned:{}
 						};
 					}
@@ -4173,11 +4172,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player){
 						var str='';
-						var slist=storage.owned;
-						var list=[];
-						for(var i in slist){
-							list.push(i);
-						}
+						var list=Object.keys(storage.owned);
 						if(list.length){
 							str+=get.translation(list[0]);
 							for(var i=1;i<list.length;i++){
@@ -4190,36 +4185,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return str;
 					},
+					onunmark:function(storage,player){
+						_status.characterlist.addArray(Object.keys(storage.owned));
+						storage.owned=[];
+					},
 					mark:function(dialog,content,player){
-						var slist=content.owned;
-						var list=[];
-						for(var i in slist){
-							list.push(i);
-						}
+						var list=Object.keys(content.owned);
 						if(list.length){
-							dialog.addSmall([list,(item,type,position,noclick,node)=>lib.skill.rehuashen.$createButton(item,type,position,noclick,node)]);
-						}
-						for(var i=0;i<dialog.buttons.length;i++){	
-							if(!player.isUnderControl(true)){
-								if(!content.shown.contains(dialog.buttons[i].link)){
-									dialog.buttons[i].node.group.remove();
-									dialog.buttons[i].node.hp.remove();
-									dialog.buttons[i].node.intro.remove();
-									dialog.buttons[i].node.name.innerHTML=get.verticalStr('未知');
-									dialog.buttons[i].node.name.dataset.nature='';
-									dialog.buttons[i].style.background='';
-									dialog.buttons[i]._nointro=true;
-									dialog.buttons[i].classList.add('menubg');
-								}
+							var skill=player.storage.huashen.current2;
+							var character=player.storage.huashen.current;
+							if(skill&&character){
+								dialog.addSmall([[character],(item,type,position,noclick,node)=>lib.skill.rehuashen.$createButton(item,type,position,noclick,node)]);
+								dialog.add('<div><div class="skill">【'+get.translation(lib.translate[skill+'_ab']||get.translation(skill).slice(0,2))+'】</div>'+
+								'<div>'+get.skillInfoTranslation(skill,player)+'</div></div>');
 							}
-							if(dialog.buttons[i].link==player.storage.huashen.current){
-								dialog.buttons[i].classList.add('glow2');
+							if(player.isUnderControl(true)){
+								dialog.addSmall([list,(item,type,position,noclick,node)=>lib.skill.rehuashen.$createButton(item,type,position,noclick,node)]);
+							}
+							else{
+								dialog.addText('共有'+get.cnNumber(list.length)+'张“化身”');
 							}
 						}
-						var skill=player.storage.huashen.current2;
-						if(skill){
-							dialog.add('<div><div class="skill">【'+get.translation(lib.translate[skill+'_ab']||get.translation(skill).slice(0,2))+'】</div>'+
-							'<div>'+get.skillInfoTranslation(skill,player)+'</div></div>');
+						else{
+							return '没有化身';
 						}
 					}
 				},
@@ -4425,7 +4413,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var skill=map.skill,character=map.character;
 						if(character!=player.storage.huashen.current){
 							player.storage.huashen.current=character;
-							player.storage.huashen.shown.add(character);
 							player.markSkill('huashen');
 							game.broadcastAll(function(character,player){
 								player.sex=lib.character[character][0];
