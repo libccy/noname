@@ -9022,7 +9022,12 @@ new Promise(resolve=>{
 					writable:true,
 					value:function(){
 						for(const item of arguments){
-							const pos=this.indexOf(item);
+							let pos=-1;
+							if (typeof item=='number'&&isNaN(item)){
+								pos=this.findIndex(v=>isNaN(v))
+							}else{
+								pos=this.indexOf(item);
+							}
 							if(pos==-1) continue;
 							this.splice(pos,1);
 						}
