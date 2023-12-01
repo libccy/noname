@@ -15928,6 +15928,7 @@ new Promise(resolve=>{
 							}
 							else{
 								game.broadcast((skill,audio)=>{
+									if(!lib.skill[skill]) lib.skill[skill]={};
 									lib.skill[skill].audio=audio;
 								},event.buttoned+'_backup',lib.skill[event.buttoned+'_backup'].audio);
 							}
@@ -16121,6 +16122,7 @@ new Promise(resolve=>{
 							}
 							else{
 								game.broadcast((skill,audio)=>{
+									if(!lib.skill[skill]) lib.skill[skill]={};
 									lib.skill[skill].audio=audio;
 								},event.buttoned+'_backup',lib.skill[event.buttoned+'_backup'].audio);
 							}
