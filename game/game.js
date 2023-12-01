@@ -14784,13 +14784,16 @@ new Promise(resolve=>{
 					'step 0'
 					event.noDirectUse=info=>!lib.skill[info.skill].silent&&lib.translate[info.skill];//是否触发同顺序选择
 					'step 1'
-					if(!event.doingList.length) return event.finish();
-					event.doing=event.doingList.shift();
-					// console.log(event.triggername,event.doing,event.doingList)
+					if(event.doing&&event.doing.todoList.length) return;
+					if(event.doingList.length) return event.doing=event.doingList.shift();
+					event.finish();
 					'step 2'
 					if(trigger.filterStop&&trigger.filterStop()) return event.finish();
 					const current=event.doing.todoList.find(info=>lib.filter.filterTrigger(trigger,info.player,event.triggername,info.skill));
-					if(!current) return event.goto(1);
+					if(!current){
+						event.doing.todoList=[];
+						return event.goto(1);
+					}
 					event.doing.todoList=event.doing.todoList.filter(i=>i.priority<=current.priority);
 					event.num=event.doing.todoList.indexOf(current);
 					if(!event.noDirectUse(current)) return event.goto(5);
@@ -14816,7 +14819,7 @@ new Promise(resolve=>{
 					event.doing.doneList.push(info);
 					event.doing.todoList.splice(event.num,1);
 					game.createTrigger(event.triggername,info.skill,info.player,trigger);
-					event.goto(event.doing.todoList.length?2:1);
+					event.goto(1);
 				},
 				createTrigger:function(){
 					"step 0"
@@ -31782,9 +31785,9 @@ new Promise(resolve=>{
 							if(evt.doing&&evt.doing.player==player) return evt.doing;
 							return evt.doingList.find(i=>i.player==player);
 						})();
-						if(!doing) return this;
-						const firstDo=evt.doingList[0];
-						const lastDo=evt.doingList[evt.doingList.length-1];
+						// if(!doing) return this;
+						const firstDo=evt.doingList.find(i=>i.player=="firstDo");
+						const lastDo=evt.doingList.find(i=>i.player=="lastDo");
 						
 						for(const skill of skills){
 							const info=lib.skill[skill];
@@ -31794,7 +31797,7 @@ new Promise(resolve=>{
 								return info.trigger[i]==evt.triggername;
 							})) continue;
 
-							const playerMap=game.players.concat(game.dead).sortBySeat(evt.doingList[1].player);	
+							const playerMap=game.players.concat(game.dead).sortBySeat(evt.starter);	
 							const priority=get.priority(skill);
 							const toadd={
 								skill:skill,
@@ -31802,6 +31805,7 @@ new Promise(resolve=>{
 								priority:priority,
 							}
 							const map=info.firstDo?firstDo:info.lastDo?lastDo:doing;
+							if(!map) continue;
 							if(map.doneList&&map.doneList.some(i=>i.skill==toadd.skill&&i.player==toadd.player)) continue;
 							if(map.todoList.some(i=>i.skill==toadd.skill&&i.player==toadd.player)) continue;
 							map.todoList.add(toadd);
@@ -31821,17 +31825,16 @@ new Promise(resolve=>{
 							if(evt.doing&&evt.doing.player==player) return evt.doing;
 							return evt.doingList.find(i=>i.player==player);
 						})();
-						if(!doing) return this;
-						const firstDo=evt.doingList[0];
-						const lastDo=evt.doingList[evt.doingList.length-1];
+						// if(!doing) return this;
+						const firstDo=evt.doingList.find(i=>i.player=="firstDo");
+						const lastDo=evt.doingList.find(i=>i.player=="lastDo");
 
 						for(const skill of skills){
-							const toremove=doing.todoList.filter(i=>i.skill==skill&&i.player==player);
-							if(toremove.length>0) doing.todoList.removeArray(toremove);
-							const toremoveFirst=firstDo.todoList.filter(i=>i.skill==skill&&i.player==player);
-							if(toremoveFirst.length>0) firstDo.todoList.removeArray(toremove);
-							const toremoveLast=lastDo.todoList.filter(i=>i.skill==skill&&i.player==player);
-							if(toremoveLast.length>0) lastDo.todoList.removeArray(toremove);
+							[doing,firstDo,lastDo].forEach(map=>{
+								if(!map) return;
+								const toremove=map.todoList.filter(i=>i.skill==skill&&i.player==player);
+								if(toremove.length>0) map.todoList.removeArray(toremove);
+							});
 						}
 					}
 				}
@@ -31856,12 +31859,12 @@ new Promise(resolve=>{
 						player:"firstDo",
 						todoList:[],
 						doneList:[],
-					};
+					}
 					const lastDo={
 						player:"lastDo",
 						todoList:[],
 						doneList:[],
-					};
+					}
 					const doingList=[];
 					let allbool=false;
 					const roles=['player','source','target','global'];
@@ -31893,7 +31896,7 @@ new Promise(resolve=>{
 							listAdded:{},
 							addList:addList,
 						}
-						const notemp=player.skills.slice(0);
+						const notemp=player.skills.slice();
 						for(const j in player.additionalSkills){
 							if(!j.startsWith('hidden:')) notemp.addArray(player.additionalSkills[j]);
 						}
@@ -31953,7 +31956,7 @@ new Promise(resolve=>{
 						next.doingList=doingList;
 						next._trigger=event;
 						next.triggername=name;
-						//next.starter=start;
+						next.starter=start;
 						event._triggering=next;
 					}
 					return this;
@@ -60990,7 +60993,7 @@ new Promise(resolve=>{
 			const units = ['','十','百','千'];
 
 			if(numStr.length<=2){//两位数以下单独处理保证效率
-				if(numStr.length==1) return two&&num==2?'两':chars[num];
+				if(numStr.length==1) return !two&&num==2?'两':chars[num];
 				return (numStr[0]=='1'?'':chars[numStr[0]])+'十'+(numStr[1]=='0'?'':chars[numStr[1]]);
 			}
 
