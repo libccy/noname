@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_zhangliang:['male','qun',4,['rejijun','refangtong']],
 			re_simalang:['male','wei',3,['requji','rejunbing']],
 			re_zhugedan:['male','wei',4,['regongao','rejuyi']],
-			re_caorui:['male','wei',3,['huituo','mingjian','rexingshuai'],['zhu']],
+			re_caorui:['male','wei',3,['huituo','remingjian','rexingshuai'],['zhu']],
 			re_caochong:['male','wei',3,['rechengxiang','renxin']],
 			ol_zhangzhang:['male','wu',3,['olzhijian','olguzheng']],
 			re_jsp_huangyueying:['female','qun',3,['rejiqiao','relinglong']],
@@ -625,6 +625,63 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//堪比界曹冲的界曹叡
+			remingjian:{
+				inherit:'mingjian',
+				content:function(){
+					player.give(cards,target);
+					target.addTempSkill('remingjian_buff',{player:'phaseAfter'});
+					if(!target.storage.remingjian_buff) target.storage.remingjian_buff=[];
+					target.storage.remingjian_buff.push(player);
+					target.markSkill('remingjian_buff');
+				},
+				subSkill:{
+					buff:{
+						charlotte:true,
+						mark:true,
+						marktext:'鉴',
+						intro:{
+							content:(storage,player)=>{
+								const num=storage.length;
+								return `<li>被${get.translation(storage.toUniqued())}鉴识<li>手牌上限+${num}，出杀次数+${num}`;
+							},
+						},
+						onremove:true,
+						trigger:{
+							source:'damageSource',
+						},
+						filter:function(event,player){
+							if(_status.currentPhase!=player) return false;
+							return player.getHistory('sourceDamage').indexOf(event)==0&&player.getStorage('remingjian_buff').some(i=>i.isIn());
+						},
+						content:function*(event,map){
+							const player=map.player;
+							const masters=player.getStorage('remingjian_buff').filter(i=>i.isIn()).toUniqued().sortBySeat(_status.currentPhase);
+							while(masters.length){
+								const master=masters.shift();
+								if(!master.isIn()) continue;
+								const result=yield player.chooseBool(`是否令${get.translation(master)}发动一次〖恢拓〗？`).set('choice',get.attitude(player,master)>0);
+								if(!result.bool) continue;
+								if(!player.isUnderControl(true)&&!event.isOnline()) game.delayx();
+								player.logSkill('remingjian_buff',master);
+								const next=game.createEvent('huituo');
+								next.setContent(lib.skill.huituo.content);
+								next.player=master;
+								next.forced=true;
+								next._trigger=map.trigger;
+								yield next;
+							}
+						},
+						mod:{
+							maxHandcard:function(player,num){
+								return num+player.getStorage('remingjian_buff').length;
+							},
+							cardUsable:function(card,player,num){
+								if(card.name=='sha') return num+player.getStorage('remingjian_buff').length;
+							}
+						},
+					}
+				},
+			},
 			rexingshuai:{
 				audio:2,
 				skillAnimation:true,
@@ -15512,6 +15569,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rechengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌。若你得到的牌点数之和为13，你复原武将牌。',
 			re_caorui:'界曹叡',
 			re_caorui_prefix:'界',
+			remingjian:'明鉴',
+			remingjian_info:'出牌阶段限一次。你可以将所有手牌交给一名其他角色，然后该角色于其下个回合获得如下效果：1.手牌上限与使用【杀】的次数上限+1；2.当该角色首次造成伤害后，其可以令你发动一次〖恢拓〗。',
 			rexingshuai:'兴衰',
 			rexingshuai_info:'主公技，限定技。当你进入濒死状态时，你可令其他魏势力角色依次选择是否令你回复1点体力。然后这些角色依次受到1点伤害。有〖明鉴〗效果的角色于其回合内杀死角色后，你重置〖兴衰〗。',
 			xin_zhangliang:'界张梁',

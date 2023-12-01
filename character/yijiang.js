@@ -9060,7 +9060,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			mingjian:{
 				audio:2,
-				audioname:['re_caorui'],
 				enable:'phaseUse',
 				usable:1,
 				filterTarget:function(card,player,target){
@@ -9178,7 +9177,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt2('huituo')).set('ai',function(target){
+					var forced=event.forced===undefined?false:event.forced;
+					var info=get.skillInfoTranslation('huituo',player);
+					var str=`###${forced?'恢拓：请选择一名角色':get.prompt('huituo')}###令一名角色判定。若结果为红色，其回复1点体力；若结果为黑色，其摸${get.cnNumber(trigger.num)}张牌`;
+					player.chooseTarget(str,event.forced).set('ai',function(target){
 						var player=_status.event.player;
 						if(get.attitude(player,target)>0){
 							return get.recoverEffect(target,player,player)+1;
@@ -14280,7 +14282,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huituo_info:'当你受到伤害后，你可以令一名角色进行一次判定，若结果为红色，该角色回复1点体力；若结果为黑色，该角色摸X张牌（X为此次伤害的伤害点数）。',
 			mingjian:'明鉴',
 			mingjian2:'明鉴',
-			mingjian_info:'出牌阶段限一次，你可以将所有手牌交给一名其他角色，若如此做，该角色于其下个回合的手牌上限+1，且使用【杀】的次数上限+1。',
+			mingjian_info:'出牌阶段限一次。你可以将所有手牌交给一名其他角色，然后该角色于其下个回合的手牌上限+1，且使用【杀】的次数上限+1。',
 			xingshuai:'兴衰',
 			xingshuai_info:'主公技，限定技，当你进入濒死状态时，其他魏势力角色可依次令你回复1点体力，然后这些角色依次受到1点伤害。',
 			reduodao:'夺刀',
