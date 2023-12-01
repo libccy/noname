@@ -13909,7 +13909,9 @@ new Promise(resolve=>{
 							bool:true,
 							targets:event.targets2||result.targets,
 						};
-						var next=player.useCard(card,event.targets2||result.targets);
+						var args=[card,event.targets2||result.targets];
+						if(cards) args.push(cards.slice());
+						var next=player.useCard(...args);
 						next.oncard=event.oncard;
 						if(cards) next.cards=cards.slice(0);
 						if(event.nopopup) next.nopopup=true;
@@ -61211,8 +61213,8 @@ new Promise(resolve=>{
 							str2+='·'+tagstr;
 						}
 					}
-					if(str.suit&&str.number){
-						var cardnum=str.number||'';
+					if(str.suit&&str.number||str.isCard){
+						var cardnum=get.number(str,false)||'';
 						if([1,11,12,13].contains(cardnum)){
 							cardnum={'1':'A','11':'J','12':'Q','13':'K'}[cardnum]
 						}
@@ -61220,7 +61222,7 @@ new Promise(resolve=>{
 							str2+='（'+get.translation(str)+'）';
 						}
 						else{
-							str2+='【'+get.translation(str.suit)+cardnum+'】';
+							str2+='【'+get.translation(get.suit(str,false))+cardnum+'】';
 							// var len=str2.length-1;
 							// str2=str2.slice(0,len)+'<span style="letter-spacing: -2px">'+str2[len]+'·</span>'+get.translation(str.suit)+str.number;
 						}
