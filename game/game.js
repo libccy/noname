@@ -22446,6 +22446,7 @@ new Promise(resolve=>{
 					
 					this.name=character;
 					this.name1=character;
+					this.tempname=[];
 					this.sex=info[0];
 					this.group=info[1];
 					this.hp=hp1;
@@ -37451,9 +37452,7 @@ new Promise(resolve=>{
 					else if(info.audioname2[player.name1]) audioInfo=info.audioname2[player.name1];
 					else if(info.audioname2[player.name2]) audioInfo=info.audioname2[player.name2];
 					else if(player.tempname){
-						let tempname=player.tempname;
-						if(!Array.isArray(tempname)) tempname=[tempname];
-						const name=tempname.find(i=>info.audioname2[i]);
+						const name=player.tempname.find(i=>info.audioname2[i]);
 						if(name) audioInfo=info.audioname2[name];
 					}
 				}
@@ -37501,9 +37500,7 @@ new Promise(resolve=>{
 					else if(audioname.includes(player.name1)) _audioname=`_${player.name1}`;
 					else if(audioname.includes(player.name2)) _audioname=`_${player.name2}`;
 					else if(player.tempname){
-						let tempname=player.tempname;
-						if(!Array.isArray(tempname)) tempname=[tempname];
-						const name=tempname.find(i=>audioname.includes(i));
+						const name=player.tempname.find(i=>audioname.includes(i));
 						if(name) _audioname=`_${name}`;
 					}
 		

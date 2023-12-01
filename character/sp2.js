@@ -8366,7 +8366,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill(result.control);
 					player.storage.pingjian_check[result.control]=(trigger.name=='damage'?trigger:'phaseJieshu');
 					var name=event.list.find(name=>lib.character[name][3].includes(result.control));
-					if(name) lib.skill.rehuashen.createAudio(name,result.control,'xushao');
+					// if(name) lib.skill.rehuashen.createAudio(name,result.control,'xushao');
+					if(name) game.broadcastAll((player,name)=>player.tempname.add(name),player,name);
 				},
 				group:'pingjian_use',
 				phaseUse_special:[],
@@ -8454,7 +8455,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill(result.control);
 					player.storage.pingjian_check[result.control]='phaseUse';
 					var name=event.list.find(name=>lib.character[name][3].includes(result.control));
-					if(name) lib.skill.rehuashen.createAudio(name,result.control,'xushao');
+					// if(name) lib.skill.rehuashen.createAudio(name,result.control,'xushao');
+					if(name) game.broadcastAll((player,name)=>player.tempname.add(name),player,name);
 				},
 				ai:{order:12,result:{player:1}},
 			},
@@ -8473,6 +8475,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var skill=trigger.sourceSkill||trigger.skill;
 					player.removeSkill(skill);
+					const names=player.tempname&&player.tempname.filter(i=>lib.character[i][3].includes(skill));
+					if(names) game.broadcastAll((player,names)=>player.tempname.removeArray(names),player,names);
 					delete player.storage.pingjian_check[skill];
 				},
 				group:'pingjian_check2',
@@ -8495,6 +8499,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player.storage.pingjian_check[skill]==trigger;
 					});
 					player.removeSkill(skills);
+					const names=player.tempname&&player.tempname.filter(i=>skills.some(skill=>lib.character[i][3].includes(skill)));
+					if(names) game.broadcastAll((player,names)=>player.tempname.removeArray(names),player,names);
 					for(var skill of skills) delete player.storage.pingjian_check[skill];
 				},
 			},
