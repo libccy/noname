@@ -15926,7 +15926,7 @@ new Promise(resolve=>{
 							}
 							else{
 								game.broadcast((skill,audio)=>{
-									lib.skill[skill].audio=audio
+									lib.skill[skill].audio=audio;
 								},event.buttoned+'_backup',lib.skill[event.buttoned+'_backup'].audio);
 							}
 							event.backup(event.buttoned+'_backup');
@@ -16117,6 +16117,11 @@ new Promise(resolve=>{
 							if(game.online){
 								event._sendskill=[event.buttoned+'_backup',lib.skill[event.buttoned+'_backup']];
 							}
+							else{
+								game.broadcast((skill,audio)=>{
+									lib.skill[skill].audio=audio;
+								},event.buttoned+'_backup',lib.skill[event.buttoned+'_backup'].audio);
+							}
 							event.backup(event.buttoned+'_backup');
 							if(info.prompt){
 								event.openskilldialog=info.prompt(info.chooseControl?result:result.links,player);
@@ -16142,7 +16147,7 @@ new Promise(resolve=>{
 						if(event.onresult){
 							event.onresult(event.result);
 						}
-						if(event.result.skill){
+						if((!event.result||!event.result.bool||event.result._noHidingTimer)&&(event.result.skill||event.logSkill)){
 							if(info.direct&&!info.clearTime){
 								_status.noclearcountdown='direct';
 							}
@@ -26689,7 +26694,7 @@ new Promise(resolve=>{
 							game.players[i].hideTimer();
 						}
 					}
-					else if(!get.event('_global_waiting')&&(_status.noclearcountdown!=='direct'||get.event('name')=='chooseToUse'&&result&&result.bool)&&!(result&&result._noHidingTimer)){
+					else if(!get.event('_global_waiting')&&(_status.noclearcountdown!=='direct'||result&&result.bool)&&!(result&&result._noHidingTimer)){
 						this.hideTimer();
 					}
 					clearTimeout(lib.node.torespondtimeout[this.playerid]);
