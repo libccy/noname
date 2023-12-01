@@ -13920,7 +13920,9 @@ new Promise(resolve=>{
 							bool:true,
 							targets:event.targets2||result.targets,
 						};
-						var next=player.useCard(card,event.targets2||result.targets);
+						var args=[card,event.targets2||result.targets];
+						if(cards) args.push(cards.slice());
+						var next=player.useCard(...args);
 						next.oncard=event.oncard;
 						if(cards) next.cards=cards.slice(0);
 						if(event.nopopup) next.nopopup=true;
@@ -15725,7 +15727,7 @@ new Promise(resolve=>{
 							info.onChooseToUse(event);
 						}
 					}
-					_status.noclearcountdown=true;
+					if(_status.noclearcountdown!=='direct') _status.noclearcountdown=true;
 					if(event.type=='phase'){
 						if(event.isMine()){
 							event.endButton=ui.create.control('结束回合','stayleft',function(){
@@ -15935,6 +15937,12 @@ new Promise(resolve=>{
 							if(game.online){
 								event._sendskill=[event.buttoned+'_backup',lib.skill[event.buttoned+'_backup']];
 							}
+							else{
+								game.broadcast((skill,audio)=>{
+									if(!lib.skill[skill]) lib.skill[skill]={};
+									lib.skill[skill].audio=audio;
+								},event.buttoned+'_backup',lib.skill[event.buttoned+'_backup'].audio);
+							}
 							event.backup(event.buttoned+'_backup');
 							if(info.prompt){
 								event.openskilldialog=info.prompt(info.chooseControl?result:result.links,player);
@@ -15962,6 +15970,12 @@ new Promise(resolve=>{
 					else if(event._sendskill){
 						event.result._sendskill=event._sendskill;
 					}
+					if((!event.result||!event.result.bool||event.result._noHidingTimer)&&(event.result.skill||event.logSkill)){
+						var info=get.info(event.result.skill||event.logSkill);
+						if(info.direct&&!info.clearTime){
+							_status.noclearcountdown='direct';
+						}
+					}
 					if(event.dialog&&typeof event.dialog=='object') event.dialog.close();
 					if(!_status.noclearcountdown){
 						game.stopCountChoose();
@@ -15985,7 +15999,7 @@ new Promise(resolve=>{
 							info.onChooseToRespond(event);
 						}
 					}
-					_status.noclearcountdown=true;
+					if(_status.noclearcountdown!=='direct') _status.noclearcountdown=true;
 					if(!_status.connectMode&&lib.config.skip_shan&&event.autochoose&&event.autochoose()){
 						event.result={bool:false};
 					}
@@ -16117,6 +16131,12 @@ new Promise(resolve=>{
 							if(game.online){
 								event._sendskill=[event.buttoned+'_backup',lib.skill[event.buttoned+'_backup']];
 							}
+							else{
+								game.broadcast((skill,audio)=>{
+									if(!lib.skill[skill]) lib.skill[skill]={};
+									lib.skill[skill].audio=audio;
+								},event.buttoned+'_backup',lib.skill[event.buttoned+'_backup'].audio);
+							}
 							event.backup(event.buttoned+'_backup');
 							if(info.prompt){
 								event.openskilldialog=info.prompt(info.chooseControl?result:result.links,player);
@@ -16142,9 +16162,9 @@ new Promise(resolve=>{
 						if(event.onresult){
 							event.onresult(event.result);
 						}
-						if(event.result.skill){
+						if((!event.result||!event.result.bool||event.result._noHidingTimer)&&(event.result.skill||event.logSkill)){
 							if(info.direct&&!info.clearTime){
-								_status.noclearcountdown=true;
+								_status.noclearcountdown='direct';
 							}
 						}
 						if(event.logSkill){
@@ -18550,7 +18570,7 @@ new Promise(resolve=>{
 									if(current!=target&&get.attitude(player,current)>0){
 										var es=target.getCards('e',filterCard);
 										for(var i=0;i<es.length;i++){
-											if(get.value(es[i],target)>0&&current.canEquip(es[i],_status.event.canReplace)&&get.effect(current,es[i],player,player)>_status.event.canReplace?get.effect(target,es[i],player,player):0) return true;
+											if(get.value(es[i],target)>0&&current.canEquip(es[i],_status.event.canReplace)&&get.effect(current,es[i],player,player)>(_status.event.canReplace?get.effect(target,es[i],player,player):0)) return true;
 										}
 									}
 								})){
@@ -18585,11 +18605,13 @@ new Promise(resolve=>{
 					next.set('sourceTargets',event.sourceTargets||game.filterPlayer());
 					next.set('aimTargets',event.aimTargets||game.filterPlayer());
 					next.set('canReplace',event.canReplace);
+					next.set('custom',get.copy(event.custom));
 					if(event.prompt2) next.set('prompt2',event.prompt2);
 					if(event.forced) next.set('forced',true);
 					'step 1'
 					event.result=result;
 					if(result.bool){
+						if(event.logSkill) player.logSkill(event.logSkill,result.targets,false);
 						player.line2(result.targets,'green');
 						event.targets=result.targets;
 					}
@@ -18623,7 +18645,7 @@ new Promise(resolve=>{
 							else{
 								return targets1.canEquip(button.link,_status.event.canReplace);
 							}
-						}).set('filter',event.filter).set('canReplace',event.canReplace);
+						}).set('filter',event.filter).set('canReplace',event.canReplace).set('custom',get.copy(event.custom));
 					}
 					else{
 						event.finish();
@@ -25189,7 +25211,6 @@ new Promise(resolve=>{
 										if(!canReplace||att<0&&current2.countEquipableSlot(get.subtype(es[i]))){
 											if(att==att2||att2!=get.sgn(get.effect(current2,es[i],player,current2))) return false;
 										}
-										// if((!canReplace||!current2.countEquipableSlot(get.subtype(es[i]))&&current2.canEquip(es[i],true))&&(att==att2||att2!=get.sgn(get.effect(current2,es[i],player,current2)))) return false;
 									}
 									return current!=current2&&!current2.isMin()&&current2.canEquip(es[i],canReplace);
 								})){
@@ -25271,9 +25292,9 @@ new Promise(resolve=>{
 						if(info.onuse){
 							info.onuse(result,this);
 						}
-						if(info.direct&&!info.clearTime){
-							_status.noclearcountdown=true;
-						}
+						// if(info.direct&&!info.clearTime){
+						// 	_status.noclearcountdown=true;
+						// }
 					}
 					if(event.logSkill){
 						if(typeof event.logSkill=='string'){
@@ -26671,7 +26692,7 @@ new Promise(resolve=>{
 								}
 								player._hide_all_timer=true;
 							}
-							else if(!_status.event._global_waiting){
+							else if(!_status.event._global_waiting&&_status.noclearcountdown!=='direct'){
 								player.showTimer(time);
 							}
 							lib.node.torespondtimeout[this.playerid]=setTimeout(function(){
@@ -26688,7 +26709,7 @@ new Promise(resolve=>{
 							game.players[i].hideTimer();
 						}
 					}
-					else if(!_status.event._global_waiting){
+					else if(!get.event('_global_waiting')&&(_status.noclearcountdown!=='direct'||result&&result.bool)&&!(result&&result._noHidingTimer)){
 						this.hideTimer();
 					}
 					clearTimeout(lib.node.torespondtimeout[this.playerid]);
@@ -57198,6 +57219,10 @@ new Promise(resolve=>{
 				const skill=gameEvent.skill;
 				if(skill){
 					result.skill=skill;
+					const info=get.info(skill);
+					if(info&&info.direct&&!info.clearTime){
+						result._noHidingTimer=true;
+					}
 					const skillInformation=get.info(gameEvent.skill),viewAs=skillInformation.viewAs;
 					if(typeof viewAs=='function'){
 						const viewedAs=viewAs(result.cards,gameEvent.player);
@@ -61201,8 +61226,8 @@ new Promise(resolve=>{
 							str2+='·'+tagstr;
 						}
 					}
-					if(str.suit&&str.number){
-						var cardnum=str.number||'';
+					if(str.suit&&str.number||str.isCard){
+						var cardnum=get.number(str,false)||'';
 						if([1,11,12,13].contains(cardnum)){
 							cardnum={'1':'A','11':'J','12':'Q','13':'K'}[cardnum]
 						}
@@ -61210,7 +61235,7 @@ new Promise(resolve=>{
 							str2+='（'+get.translation(str)+'）';
 						}
 						else{
-							str2+='【'+get.translation(str.suit)+cardnum+'】';
+							str2+='【'+get.translation(get.suit(str,false))+cardnum+'】';
 							// var len=str2.length-1;
 							// str2=str2.slice(0,len)+'<span style="letter-spacing: -2px">'+str2[len]+'·</span>'+get.translation(str.suit)+str.number;
 						}

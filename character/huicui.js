@@ -1039,6 +1039,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:['loseAfter','equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				forced:true,
+				direct:true,
 				filter:function(event,player){
 					if(player!=_status.currentPhase) return false;
 					return game.hasPlayer(current=>{
@@ -1058,7 +1059,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.logSkill('dcyouzhan',targets);
 					'step 1'
 					var target=targets.shift();
-					player.draw();
+					player.draw().gaintag=['dcyouzhan'];
+					player.addTempSkill('dcyouzhan_limit');
 					target.addTempSkill('dcyouzhan_effect');
 					target.addMark('dcyouzhan_effect',1,false);
 					target.addTempSkill('dcyouzhan_draw');
@@ -1066,8 +1068,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.redo();
 					}
 				},
+				ai:{
+					damageBonus:true,
+					skillTagFilter:function(player,tag,arg){
+						if(!arg||!arg.target||!arg.target.hasSkill('dcyouzhan_effect')) return false;
+					}
+				},
 				subSkill:{
 					effect:{
+						audio:'dcyouzhan',
 						trigger:{
 							player:'damageBegin3',
 						},
@@ -1087,7 +1096,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							content:'本回合下一次受到的伤害+#',
 						},
 						ai:{
-							damageBonus:true,
 							effect:{
 								target:function(card,player,target){
 									if(get.tag(card,'damage')) return 1+0.5*target.countMark('dcyouzhan_effect');
@@ -1105,9 +1113,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return !player.getHistory('damage').length;
 						},
 						content:function(){
-							player.draw(player.getHistory('lose').length);
+							player.draw(Math.min(3,player.getHistory('lose').length));
 						},
 					},
+					limit:{
+						charlotte:true,
+						onremove:function(player){
+							player.removeGaintag('dcyouzhan');
+						},
+						mod:{
+							ignoredHandcard:function(card,player){
+								if(card.hasGaintag('dcyouzhan')) return true;
+							},
+							cardDiscardable:function(card,player,name){
+								if(name=='phaseDiscard'&&card.hasGaintag('dcyouzhan')) return false;
+							},
+						},
+					}
 				}
 			},
 			//乐蔡文姬
@@ -11317,7 +11339,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcbeifen_info:'锁定技。①当你失去牌后，若这些牌中有“胡笳”牌，你获得与你手牌中“胡笳”牌花色均不同的每种花色的牌各一张。②若你手牌中“胡笳”牌数小于不为“胡笳”牌的牌数，你使用牌无距离和次数限制。',
 			dc_wuban:'吴班',
 			dcyouzhan:'诱战',
-			dcyouzhan_info:'锁定技。当其他角色于你的回合内失去牌后，你摸一张牌，且其获得如下效果：1.其于此回合下一次受到的伤害+1；2.结束阶段，若其于此回合未受到过伤害，其摸X张牌（X为其此回合失去过牌的次数）。',
+			dcyouzhan_info:'锁定技。当其他角色于你的回合内失去牌后，你摸一张牌（不计入本回合的手牌上限），且其获得如下效果：1.其于此回合下一次受到的伤害+1；2.结束阶段，若其于此回合未受到过伤害，其摸X张牌（X为其此回合失去过牌的次数且至多为3）。',
 			yue_zhoufei:'乐周妃',
 			yue_zhoufei_prefix:'乐',
 			dclingkong:'灵箜',
