@@ -123,34 +123,58 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 0;
 					},
 					result:{
-						target:(player,target)=>{
+						target:(player,target,card)=>{
 							if(target&&target.isDying()) return 2;
 							if(!target || target._jiu_temp || !target.isPhaseUsing()) return 0;
-							if(!target.getCardUsable('sha') || lib.config.mode==='stone'&&!player.isMin()&&player.getActCount()+1>=player.actcount) return 0;
-							let shas = player.getCards('hs',card=>get.name(card)==='sha'&&!ui.selected.cards.includes(card)), card;
-							if(!shas.length || !target.hasSha() || shas.length>1&&(target.getCardUsable('sha')>1 || target.countCards('hs','zhuge'))) return 0;
-							target._jiu_temp = true;
-							shas.sort((a,b)=>get.order(b)-get.order(a));
-							for(let i=0; i<shas.length; i++){
-								let tars = [];
-								if(lib.filter.filterCard(shas[i],target)) tars = game.filterPlayer(current=>{
-									return get.attitude(target,current)<0&&target.canUse(shas[i],current,null,true)&&!current.hasSkillTag('filterDamage',null,{
+							let usable=target.getCardUsable('sha');
+							if(!usable || lib.config.mode==='stone'&&!player.isMin()&&player.getActCount()+1>=player.actcount || !target.mayHaveSha(player,'use',card)) return 0;
+							let effs=_status.event.getTempCache('jiu_result','effs');
+							if(effs&&effs[card.cardid]){
+								for(let i in effs){
+									if(effs[i].target&&effs[i].target.isIn()&&effs[i].eff>0) return 1;
+								}
+								return 0;
+							}
+							effs={};
+							let shas=target.getCards('hs',i=>{
+								if(get.name(i)!=='sha' || ui.selected.cards.includes(i)) return false;
+								effs[i.cardid]={
+									target:null,
+									eff:0
+								};
+								return true;
+							}),eff,id;
+							for(let i of shas){
+								id=i.cardid;
+								if(!lib.filter.filterCard(i,target)) continue;
+								game.filterPlayer(current=>{
+									if(get.attitude(target,current)>=0 || !target.canUse(i,current,null,true) || current.hasSkillTag('filterDamage',null,{
 										player:target,
-										card:shas[i],
+										card:i,
 										jiu:true
-									})&&get.effect(current,shas[i],target)>0;
+									})) return false;
+									eff=get.effect(current,i,target,player);
+									if(eff<=effs[id].eff) return false;
+									effs[id].target=current;
+									effs[id].eff=eff;
+									return false;
 								});
-								if(!tars.length) continue;
-								tars.sort((a,b)=>{
-									return get.effect(b,shas[i],target)-get.effect(a,shas[i],target);
-								});
-								if(!tars[0].mayHaveShan(player,'use') || target.hasSkillTag('directHit_ai',true,{
-									target:tars[0],
-									card:shas[i]
-								},true) || target.needsToDiscard()>Math.max(0,3-target.hp)){
+								if(effs[id].target&&(target.hasSkillTag('directHit_ai',true,{
+									target:effs[id].target,
+									card:i
+								},true) || target.needsToDiscard()>Math.max(0,3-target.hp) || !effs[id].target.mayHaveShan(player,'use'))){
+									if(card.cardid){
+										effs[card.cardid]={target:null};
+										_status.event.putTempCache('jiu_result','effs',effs);
+									}
 									delete target._jiu_temp;
 									return 1;
 								}
+								delete effs[id];
+							}
+							if(card.cardid){
+								effs[card.cardid]={target:null};
+								_status.event.putTempCache('jiu_result','effs',effs);
 							}
 							delete target._jiu_temp;
 							return 0;
