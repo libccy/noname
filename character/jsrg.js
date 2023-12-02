@@ -3130,7 +3130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var keys=['filterTarget','selectTarget','ai2'];
 						for(var key of keys) delete next[key];
 						for(var i in trigger){
-							if(!next.hasOwnProperty(i)) next[i]=trigger[i];
+							if(!(i in next)) next[i]=trigger[i];
 						}
 						next.filterTargetx=trigger.filterTarget||(()=>false);
 						next.filterTarget=function(card,player,target){
@@ -3732,7 +3732,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(list.length>0) continue;
 								var info=get.info(skill);
 								if(info&&(!info.unique||info.gainable)){
-									lib.skill.rehuashen.createAudio(name,skill,'jsrg_xushao');
+									// lib.skill.rehuashen.createAudio(name,skill,'jsrg_xushao');
 									skills.add(skill);
 								}
 							}
@@ -3744,6 +3744,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkillBlocker('sbyingmen');
 					game.log(player,'将','#y'+get.translation(characters),'加入了','#g“访客”');
 					game.broadcastAll(function(player,characters){
+						player.tempname.addArray(characters);
 						player.$draw(characters.map(function(name){
 							var cardname='huashen_card_'+name;
 							lib.card[cardname]={
@@ -3764,6 +3765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var characters2=player.getStorage('sbyingmen').slice(0);
 					characters2.removeArray(characters);
 					skills.removeArray(lib.skill.sbyingmen.getSkills(characters2,player));
+					game.broadcastAll((player,characters)=>player.tempname.removeArray(characters),player,characters);
 					player.unmarkAuto('sbyingmen',characters);
 					_status.characterlist.addArray(characters);
 					player.removeInvisibleSkill(skills);

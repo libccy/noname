@@ -4412,9 +4412,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!event.logged) player.logSkill('huashen');
 						var skill=map.skill,character=map.character;
 						if(character!=player.storage.huashen.current){
+							const old=player.storage.huashen.current;
 							player.storage.huashen.current=character;
 							player.markSkill('huashen');
-							game.broadcastAll(function(character,player){
+							game.broadcastAll(function(player,character,old){
+								player.tempname.remove(old);
+								player.tempname.add(character);
 								player.sex=lib.character[character][0];
 								//player.group=lib.character[character][1];
 								//player.node.name.dataset.nature=get.groupnature(player.group);
@@ -4434,7 +4437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										},50);
 									},200);
 								}
-							},character,player);
+							},player,character,old);
 							game.log(player,'将性别变为了','#y'+get.translation(lib.character[character][0])+'性');
 							player.changeGroup(lib.character[character][1]);
 						}
@@ -4446,7 +4449,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.popup(skill);
 							player.syncStorage('huashen');
 							player.updateMarks('huashen');
-							lib.skill.rehuashen.createAudio(character,skill,'zuoci');
+							// lib.skill.rehuashen.createAudio(character,skill,'zuoci');
 						}
 					}
 				}

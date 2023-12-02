@@ -8203,7 +8203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						hs:get.cards(4)
 					});
 					player.callSubPlayer(player.storage.huanfeng_end);
-					// game.createTrigger('phaseBegin','shengdun',player,trigger);
+					// if(lib.filter.filterTrigger(trigger,player,'phaseBegin','shengdun')) game.createTrigger('phaseBegin','shengdun',player,trigger);
 				},
 				// group:'huanfeng_end',
 				subSkill:{

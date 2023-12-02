@@ -100,7 +100,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw(3);
 					player.addSkill('shuiyun');
 					'step 1'
-					game.createTrigger('phaseEnd','shuiyun',player,trigger);
+					if(lib.filter.filterTrigger(trigger,player,'phaseEnd','shuiyun')) game.createTrigger('phaseEnd','shuiyun',player,trigger);
 				},
 			},
 			shenwu:{
