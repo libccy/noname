@@ -764,6 +764,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						trigger:{global:'phaseEnd'},
 						filter:function(event,player){
+							var cards=player.getStorage('clanmingjie_record').slice();
+							cards=cards.filterInD('d');
+							if(!cards.length) return false;
 							var history=player.getHistory('useSkill',evt=>evt.skill=='clanmingjie');
 							if(history.length){
 								var targets=history.reduce((list,evt)=>list.addArray(evt.targets),[]);
@@ -788,10 +791,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							var cards=player.getStorage('clanmingjie_record').slice();
 							cards=cards.filterInD('d');
-							if(cards.length){
-								event.cards=cards;
-							}
-							else event.goto(4);
+							event.cards=cards;
 							'step 1'
 							player.chooseButton(['铭戒：是否使用这些牌？',cards]).set('filterButton',button=>{
 								return _status.event.player.hasUseTarget(button.link);
@@ -806,7 +806,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								game.delayx();
 								player.chooseUseTarget(card,true);
 							}
-							else event.goto(4);
+							else event.finish();
 							'step 3'
 							if(event.cards.filter(card=>{
 								return get.position(card,true)=='d'&&player.hasUseTarget(card);
