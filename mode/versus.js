@@ -583,8 +583,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					uiintro.add('<div class="text chat">侯选人数：'+lib.configOL.choice_num+'人');
 					uiintro.add('<div class="text chat">替补人数：'+lib.configOL.replace_number+'人');
 				}
-				else if(lib.configOL.versus_mode=='2v2'||lib.configOL.versus_mode=='3v3'){
-					uiintro.add('<div class="text chat">四号位换牌：'+(lib.configOL.replace_handcard?'开启':'关闭'));
+				if(lib.configOL.versus_mode=='2v2'||lib.configOL.versus_mode=='3v3'){
+					uiintro.add('<div class="text chat">四号位保护：'+(lib.configOL.replace_handcard?'开启':'关闭'));
+					if(lib.configOL.versus_mode=='2v2') uiintro.add('<div class="text chat">四号位【飞扬】：'+(lib.configOL.olfeiyang_four?'开启':'关闭'));
 				}
 				var last=uiintro.add('<div class="text chat">出牌时限：'+lib.configOL.choose_timeout+'秒');
 				// uiintro.add('<div class="text chat">屏蔽弱将：'+(lib.configOL.ban_weak?'开启':'关闭'));
@@ -1427,7 +1428,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
-
+					if(lib.configOL.olfeiyang_four){
+						var target=_status.firstAct.previous;
+						if(target.isIn()) target.addSkill('olfeiyang');
+					}
 					game.addGlobalSkill('versus_viewHandcard');
 					if(get.config('two_phaseswap')){
 						game.addGlobalSkill('autoswap');
@@ -3384,6 +3388,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
+					if(get.config('olfeiyang_four')){
+						var target=_status.firstAct.previous;
+						if(target.isIn()) target.addSkill('olfeiyang');
+					}
 					game.addGlobalSkill('versus_viewHandcard');
 				});
 			},

@@ -6267,6 +6267,12 @@ new Promise(resolve=>{
 						frequent:true,
 						intro:'最后行动的角色起始手牌数+1'
 					},
+					connect_olfeiyang_four:{
+						name:'四号位获得【飞扬】',
+						init:true,
+						frequent:true,
+						intro:'最后行动的角色获得技能【飞扬】（准备阶段，你可以弃置三张牌，然后弃置判定区的一张牌）',
+					},
 					connect_choice_num:{
 						name:'侯选武将数',
 						init:'20',
@@ -6370,12 +6376,14 @@ new Promise(resolve=>{
 						}
 						if(config.versus_mode=='two'){
 							map.replace_handcard_two.show();
+							map.olfeiyang_four.show();
 							map.replace_character_two.show();
 							map.two_assign.show();
 							map.two_phaseswap.show();
 						}
 						else{
 							map.replace_handcard_two.hide();
+							map.olfeiyang_four.hide();
 							map.replace_character_two.hide();
 							map.two_assign.hide();
 							map.two_phaseswap.hide();
@@ -6549,6 +6557,12 @@ new Promise(resolve=>{
 						init:true,
 						frequent:true,
 						intro:'最后行动的角色起始手牌+1'
+					},
+					olfeiyang_four:{
+						name:'四号位获得【飞扬】',
+						init:true,
+						frequent:true,
+						intro:'最后行动的角色获得技能【飞扬】（准备阶段，你可以弃置三张牌，然后弃置判定区的一张牌）',
 					},
 					replace_character_two:{
 						name:'替补模式',

@@ -703,6 +703,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//OL飞扬
+			olfeiyang:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter:function(event,player){
+					return player.countCards('he',card=>{
+						if(_status.connectMode&&get.position(card)=='h') return true;
+						return lib.filter.cardDiscardable(card,player);
+					})>=3&&player.countCards('j');
+				},
+				direct:true,
+				//limited:true,
+				//skillAnimation:true,
+				//animationColor:'orange',
+				content:function(){
+					'step 0'
+					player.chooseToDiscard(get.prompt2('olfeiyang'),'he',3).set('ai',function(card){
+						var player=_status.event.player;
+						if(player.hasCard(function(card){
+							return get.effect(player,{
+								name:card.viewAs||card.name,
+								cards:[card],
+							},player,player)<0;
+						},'j')) return 6-get.value(card);
+						return 0;
+					}).set('logSkill','olfeiyang');
+					'step 1'
+					if(result.bool){
+						//player.awakenSkill('olfeiyang');
+						player.discardPlayerCard(player,'j',true);
+					}
+				},
+			},
 			//李婉
 			ollianju:{
 				audio:2,
@@ -8165,7 +8197,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(evt.type=='phase'){
 							if(button.link[2]=='jiu'){
 								if(player.getUseValue({name:'jiu'})<=0) return 0;
-								if(player.countCards('hs',name=>get.name(card)=='sha')) return player.getUseValue({name:'jiu'});
+								var cards=player.getCards('hs',cardx=>get.value(cardx)<8);
+								cards.sort((a,b)=>get.value(a)-get.value(b));
+								if(cards.some(cardx=>get.name(cardx)=='sha'&&!cards.slice(0,2).includes(cardx))) return player.getUseValue({name:'jiu'});
 								return 0;
 							}
 							return player.getUseValue(card)/4;
@@ -8185,9 +8219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							position:'hs',
 							complexCard:true,
-							check:(card)=>{
-								return 8-get.value(card);
-							},
+							check:(card)=>8-get.value(card),
 							popname:true,
 							viewAs:{
 								name:links[0][2],
@@ -8217,6 +8249,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							names.forEach(card=>{
 								if(player.getUseValue(card)>0){
 									var temp=get.order(card);
+									if(card.name=='jiu'){
+										var cards=player.getCards('hs',cardx=>get.value(cardx)<8);
+										cards.sort((a,b)=>get.value(a)-get.value(b));
+										if(!cards.some(cardx=>get.name(cardx)=='sha'&&!cards.slice(0,2).includes(cardx))) temp=0;
+									}
 									if(temp>max) max=temp;
 								}
 							});
@@ -26641,6 +26678,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldhuxiao_info:'锁定技，当你使用的【杀】被【闪】抵消后，你令此【杀】不计入使用次数。',
 			oldwuji:'武继',
 			oldwuji_info:'觉醒技，结束阶段，若你本回合造成了3点或更多伤害，你加1点体力上限并回复1点体力，并失去技能〖虎啸〗。',
+			olfeiyang:'飞扬',
+			//olfeiyang_info:'限定技。准备阶段，你可以弃置两张牌，然后弃置判定区的一张牌。',
+			olfeiyang_info:'准备阶段，你可以弃置三张牌，然后弃置判定区的一张牌。',
 			
 
 			sp_tianji:'天极·皇室宗亲',
