@@ -1428,7 +1428,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
-					if(lib.configOL.olfeiyang_four){
+					if(get.config('olfeiyang_four')){
 						var target=_status.firstAct.previous;
 						if(target.isIn()) target.addSkill('olfeiyang');
 					}
@@ -3388,7 +3388,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
-					if(get.config('olfeiyang_four')){
+					if(lib.configOL.olfeiyang_four){
 						var target=_status.firstAct.previous;
 						if(target.isIn()) target.addSkill('olfeiyang');
 					}
