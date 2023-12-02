@@ -13909,7 +13909,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:["changeHp"],
 				},
 				audio:2,
-				audioname:{gongsunzan:'yicong'},
+				audioname2:{gongsunzan:'yicong'},
 				forced:true,
 				filter:function(event,player){
 					return get.sgn(player.hp-2.5)!=get.sgn(player.hp-2.5-event.num);
