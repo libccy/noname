@@ -7068,10 +7068,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(this.replacetwo){
 									game.replacePlayerTwo(this,this.replacetwo);
 									delete this.replacetwo;
+									if(get.config('olfeiyang_four')&&this==_status.firstAct.previous){
+										this.addSkill('olfeiyang');
+									}
 								}
 								else if(friend&&friend.replacetwo){
 									game.replacePlayerTwo(this,friend.replacetwo);
 									delete friend.replacetwo;
+									if(get.config('olfeiyang_four')&&friend==_status.firstAct.previous){
+										friend.addSkill('olfeiyang');
+									}
 								}
 								else{
 									game.over(this.side!=me.side);
