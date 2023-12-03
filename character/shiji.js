@@ -5591,17 +5591,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			fyjianyu:{
-				init:function(player){
-					if(!lib.skill['fyjianyu_'+player.playerid]){
-						lib.skill['fyjianyu_'+player.playerid]={
+				initSkill:function(skill){
+					if(!lib.skill[skill]){
+						lib.skill[skill]={
 							marktext:'喻',
 							intro:{
 								markcount:()=>1,
 								content:'指定另一名有“喻”的角色为目标时，其摸一张牌',
 							},
 						};
-						lib.translate['fyjianyu_'+player.playerid]='谏喻';
-						lib.translate['fyjianyu_'+player.playerid+'_bg']='喻';
+						lib.translate[skill]='谏喻';
+						lib.translate[skill+'_bg']='喻';
 					}
 				},
 				audio:2,
@@ -5617,8 +5617,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:2,
 				content:function(){
+					var skill='fyjianyu_'+player.playerid;
+					game.broadcastAll(lib.skill.fyjianyu.initSkill,skill);
 					player.addTempSkill('fyjianyu_draw',{player:'phaseBegin'});
-					target.addMark('fyjianyu_'+player.playerid,1);
+					target.addMark(skill,1);
 				},
 				ai:{
 					order:0.1,

@@ -2102,7 +2102,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterTarget:()=>true,
 						filterCard:()=>false,
 						selectCard:-1,
-						charlotte:true,
 						content:function(){
 							'step 0'
 							target.draw();
@@ -2130,7 +2129,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						filterCard:()=>false,
 						selectCard:-1,
-						charlotte:true,
 						content:function(){
 							'step 0'
 							target.chooseToDiscard('he',true,'谏国：请弃置一张牌');

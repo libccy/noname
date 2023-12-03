@@ -1224,9 +1224,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//郭照
 			yichong:{
-				init:function(player){
-					if(!lib.skill['yichong_'+player.playerid]){
-						lib.skill['yichong_'+player.playerid]={
+				initSkill:function(skill){
+					if(!lib.skill[skill]){
+						lib.skill[skill]={
+							charlotte:true,
 							onremove:true,
 							mark:true,
 							marktext:'雀',
@@ -1239,8 +1240,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 							},
 						};
-						lib.translate['yichong_'+player.playerid]='易宠';
-						lib.translate['yichong_'+player.playerid+'_bg']='雀';
+						lib.translate[skill]='易宠';
+						lib.translate[skill+'_bg']='雀';
 					}
 				},
 				getLimit:1,
@@ -1302,6 +1303,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var suit=event.suit;
 					player.storage.yichong=suit;
 					player.markSkill('yichong');
+					var skill='yichong_'+player.playerid;
+					game.broadcastAll(lib.skill.yichong.initSkill,skill);
 					game.broadcastAll(function(player,suit){
 						if(player.marks.yichong) player.marks.yichong.firstChild.innerHTML=get.translation(suit);
 					},player,suit);

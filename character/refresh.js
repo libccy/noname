@@ -5556,10 +5556,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinquanji:{
 				audio:2,
 				trigger:{
-					global:'gainAfter',
-					player:['damageEnd','loseAsyncAfter'],
+					player:['damageEnd'],
+					global:['gainAfter','loseAsyncAfter'],
 				},
-				frequent:true,
 				filter:function(event,player){
 					if(event.name=='damage') return true;
 					if(event.name=='loseAsync'){
@@ -5579,6 +5578,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var evt=event.getl(player);
 					return evt&&evt.cards2&&evt.cards2.length>0;
 				},
+				frequent:true,
 				content:function(){
 					'step 0'
 					event.count=(trigger.name=='damage'?trigger.num:1);
@@ -5693,7 +5693,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					select:2,
 					filter:function(button,player){
-						if(ui.selected.buttons.length) return (typeof ui.selected.buttons[0].link)!=(typeof button.link)
+						if(typeof button.link=='number'&&player.hasSkill('xinpaiyi_'+button.link)) return false;
+						if(ui.selected.buttons.length) return (typeof ui.selected.buttons[0].link)!=(typeof button.link);
 						return true;
 					},
 					backup:function(links){
