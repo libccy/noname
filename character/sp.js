@@ -703,6 +703,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//OL飞扬
+			olfeiyang:{
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter:function(event,player){
+					return player.countCards('he',card=>{
+						if(_status.connectMode&&get.position(card)=='h') return true;
+						return lib.filter.cardDiscardable(card,player);
+					})>=3&&player.countCards('j');
+				},
+				direct:true,
+				//limited:true,
+				//skillAnimation:true,
+				//animationColor:'orange',
+				content:function(){
+					'step 0'
+					player.chooseToDiscard(get.prompt2('olfeiyang'),'he',3).set('ai',function(card){
+						var player=_status.event.player;
+						if(player.hasCard(function(card){
+							return get.effect(player,{
+								name:card.viewAs||card.name,
+								cards:[card],
+							},player,player)<0;
+						},'j')) return 6-get.value(card);
+						return 0;
+					}).set('logSkill','olfeiyang');
+					'step 1'
+					if(result.bool){
+						//player.awakenSkill('olfeiyang');
+						player.discardPlayerCard(player,'j',true);
+					}
+				},
+			},
 			//李婉
 			ollianju:{
 				audio:2,
@@ -8092,7 +8124,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				hiddenCard:function(player,name){
-					if(get.type(name)=='basic'&&lib.inpile.contains(name)&&!player.getStorage('yilie_count').contains(name)){
+					if(get.type(name)=='basic'&&lib.inpile.contains(name)&&!player.getStorage('yilie_count').includes(name)){
 						var hs=player.getCards('hs');
 						if(hs.length<2) return false;
 						var bool=false,map={};
@@ -8123,7 +8155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(!bool) return false;
 					for(var name of lib.inpile){
-						if(get.type(name)!='basic'||list.contains(name)) continue;
+						if(get.type(name)!='basic'||list.includes(name)) continue;
 						var card={name:name};
 						if(event.filterCard(card,player,event)) return true;
 						if(name=='sha'){
@@ -8138,10 +8170,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				chooseButton:{
 					dialog:function(event,player){
 						var list=[];
-						var storage=player.storage.yilie_count;
+						var storage=player.getStorage('yilie_count');
 						for(var i of lib.inpile){
-							if(get.type(i)!='basic') continue;
-							if(storage&&storage.contains(i)) continue;
+							if(get.type(i)!='basic'||storage.includes(i)) continue;
 							var card={name:i,isCard:true};
 							if(event.filterCard(card,player,event)) list.push(['基本','',i]);
 							if(i=='sha'){
@@ -8154,25 +8185,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('义烈',[list,'vcard'],'hidden')
 					},
 					check:function(button){
-						let player=_status.event.player,hs=player.getCards('h',card=>{
-							return get.name(card)!==button.link[2]&&(!button.link[3]||get.hasNature(card,button.link[3]));
-						}),bool=false,map={};
-						for(let i of hs){
-							let color=get.color(i);
-							if(!map[color]) map[color]=true;
-							else{
-								bool=true;
-								break;
+						var player=_status.event.player;
+						var evt=_status.event.getParent();
+						var name=button.link[2],card={name:name,nature:button.link[3]};
+						if(name=='shan') return 2;
+						if(evt.type=='dying'){
+							if(get.attitude(player,evt.dying)<2) return 0;
+							if(name=='jiu') return 2.1;
+							return 1.9;
+						}
+						if(evt.type=='phase'){
+							if(button.link[2]=='jiu'){
+								if(player.getUseValue({name:'jiu'})<=0) return 0;
+								var cards=player.getCards('hs',cardx=>get.value(cardx)<8);
+								cards.sort((a,b)=>get.value(a)-get.value(b));
+								if(cards.some(cardx=>get.name(cardx)=='sha'&&!cards.slice(0,2).includes(cardx))) return player.getUseValue({name:'jiu'});
+								return 0;
 							}
+							return player.getUseValue(card)/4;
 						}
-						if(!bool) return 0;
-						if(button.link[2]=='shan') return 3;
-						if(button.link[2]=='jiu'){
-							if(player.getUseValue({name:'jiu'})<=0) return 0;
-							if(player.countCards('h','sha')) return player.getUseValue({name:'jiu'});
-							return 0;
-						}
-						return player.getUseValue({name:button.link[2],nature:button.link[3]})/4;
+						return 1;
 					},
 					backup:function(links,player){
 						return {
@@ -8187,10 +8219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							position:'hs',
 							complexCard:true,
-							check:(card)=>{
-								if(get.name(card)===lib.skill.yilie_backup.viewAs.name&&(!lib.skill.yilie_backup.viewAs.nature||game.hasNature(card,lib.skill.yilie_backup.viewAs.nature))) return -1;
-								return 8-get.value(card);
-							},
+							check:(card)=>8-get.value(card),
 							popname:true,
 							viewAs:{
 								name:links[0][2],
@@ -8211,12 +8240,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:function(item,player){
-						return 2.6;
+						if(player&&_status.event.type=='phase'){
+							var add=false,max=0;
+							var names=lib.inpile.filter(name=>get.type(name)=='basic'&&!player.getStorage('yilie_count').includes(name));
+							if(names.includes('sha')) add=true;
+							names=names.map(namex=>{return {name:namex}});
+							if(add) lib.inpile_nature.forEach(nature=>names.push({name:'sha',nature:nature}));
+							names.forEach(card=>{
+								if(player.getUseValue(card)>0){
+									var temp=get.order(card);
+									if(card.name=='jiu'){
+										var cards=player.getCards('hs',cardx=>get.value(cardx)<8);
+										cards.sort((a,b)=>get.value(a)-get.value(b));
+										if(!cards.some(cardx=>get.name(cardx)=='sha'&&!cards.slice(0,2).includes(cardx))) temp=0;
+									}
+									if(temp>max) max=temp;
+								}
+							});
+							if(max>0) max-=0.001;
+							return max;
+						}
+						return 0.5;
 					},
 					respondShan:true,
 					respondSha:true,
 					fireAttack:true,
-					skillTagFilter:function(player,tag){
+					skillTagFilter:function(player,tag,arg){
+						if(arg=='respond') return false;
 						var hs=player.getCards('hs');
 						if(hs.length<2) return false;
 						var bool=false,map={};
@@ -26628,6 +26678,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldhuxiao_info:'锁定技，当你使用的【杀】被【闪】抵消后，你令此【杀】不计入使用次数。',
 			oldwuji:'武继',
 			oldwuji_info:'觉醒技，结束阶段，若你本回合造成了3点或更多伤害，你加1点体力上限并回复1点体力，并失去技能〖虎啸〗。',
+			olfeiyang:'飞扬',
+			//olfeiyang_info:'限定技。准备阶段，你可以弃置两张牌，然后弃置判定区的一张牌。',
+			olfeiyang_info:'准备阶段，你可以弃置三张牌，然后弃置判定区的一张牌。',
 			
 
 			sp_tianji:'天极·皇室宗亲',

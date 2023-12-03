@@ -31,7 +31,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			yingbian:{
 				yingbian_pack1:['jin_simayi','jin_zhangchunhua','ol_lisu','simazhou','cheliji','ol_huaxin'],
-				yingbian_pack2:['jin_simashi','jin_xiahouhui','zhanghuyuechen','shibao','jin_yanghuiyu'],
+				yingbian_pack2:['jin_simashi','jin_xiahouhui','zhanghuyuechen','shibao','jin_yanghuiyu','chengjichengcui'],
 				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan','xuangongzhu'],
 				yingbian_pack4:['zhongyan','xinchang','jin_jiachong','wangxiang'],
 				yingbian_pack5:['yangyan','yangzhi'],

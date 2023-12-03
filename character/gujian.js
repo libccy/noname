@@ -803,7 +803,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						content:function(){
 							player.exitSubPlayer(true);
-							game.createTrigger('phaseAfter','lianjing',player,trigger);
+							if(lib.filter.filterTrigger(trigger,player,'phaseAfter','lianjing')) game.createTrigger('phaseAfter','lianjing',player,trigger);
 						}
 					}
 				},

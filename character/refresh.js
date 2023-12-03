@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
+			ol_jianyong:['male','shu',3,['olqiaoshui','jyzongshi'],['unseen']],
 			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong','unseen']],
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			re_lidian:['male','wei',3,['xunxun','xinwangxi']],
@@ -170,6 +171,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//界简雍
+			olqiaoshui:{
+				audio:2,
+				inherit:'reqiaoshui',
+				filter:function(event,player){
+					return player.countCards('h')>0&&!player.hasSkill('olqiaoshui_used');
+				},
+				content:function(){
+					'step 0'
+					player.chooseToCompare(target);
+					'step 1'
+					if(result.bool) player.addTempSkill('qiaoshui3',{player:'phaseUseAfter'});
+					else{
+						player.addTempSkill('qiaoshui2');
+						player.addTempSkill('olqiaoshui_used');
+					}
+				},
+				subSkill:{
+					used:{
+						charlotte:true,
+						mark:true,
+						marktext:'<span style="text-decoration: line-through;">说</span>',
+						intro:{content:'被迫闭嘴'},
+					},
+				},
+			},
 			//界凌统
 			olxuanfeng:{
 				audio:'xuanfeng',
@@ -10620,10 +10647,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(event.control=='弃置化身') return;
 					if(player.storage.rehuashen.current!=event.card){
+						const old=player.storage.rehuashen.current;
 						player.storage.rehuashen.current=event.card;
-						game.broadcastAll(function(player,sex){
-							player.sex=sex;
-						},player,lib.character[event.card][0]);
+						game.broadcastAll(function(player,character,old){
+							player.tempname.remove(old);
+							player.tempname.add(character);
+							player.sex=lib.character[event.card][0];
+						},player,event.card,old);
 						game.log(player,'将性别变为了','#y'+get.translation(lib.character[event.card][0])+'性');
 						player.changeGroup(lib.character[event.card][1]);
 					}
@@ -10636,7 +10666,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.popup(link);
 						player.syncStorage('rehuashen');
 						player.updateMarks('rehuashen');
-						lib.skill.rehuashen.createAudio(event.card,link,'re_zuoci');
+						// lib.skill.rehuashen.createAudio(event.card,link,'re_zuoci');
 					}
 				},
 				init:function(player,skill){
@@ -10752,42 +10782,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return node;
 				},
-				createAudio:(character,skillx,name)=>{
-					var skills=game.expandSkills([skillx]);
-					skills=skills.filter(skill=>get.info(skill));
-					if(!skills.length) return;
-					var skillss=skills.filter(skill=>get.info(skill).derivation);
-					if(skillss.length){
-						skillss.forEach(skill=>{
-							var derivationSkill=get.info(skill).derivation;
-							skills[Array.isArray(derivationSkill)?'addArray':'add'](derivationSkill);
-						});
-					}
-					skills.forEach(skill=>{
-						var info=lib.skill[skill];
-						if(info){
-							if(!info.audioname2) info.audioname2={};
-							if(info.audioname&&info.audioname.includes(character)){
-								if(info.audio){
-									if(typeof info.audio=='string') skill=info.audio;
-									if(Array.isArray(info.audio)) skill=info.audio[0];
-								}
-								if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
-								info.audioname2[name]=(skill+'_'+character);
-							}
-							else if(info.audioname2[character]){
-								info.audioname2[name]=info.audioname2[character];
-							}
-							else{
-								if(info.audio){
-									if(typeof info.audio=='string') skill=info.audio;
-									if(Array.isArray(info.audio)) skill=info.audio[0];
-								}
-								info.audioname2[name]=skill;
-							}
-						}
-					});
-				},
+				// createAudio:(character,skillx,name)=>{
+				// 	var skills=game.expandSkills([skillx]);
+				// 	skills=skills.filter(skill=>get.info(skill));
+				// 	if(!skills.length) return;
+				// 	var skillss=skills.filter(skill=>get.info(skill).derivation);
+				// 	if(skillss.length){
+				// 		skillss.forEach(skill=>{
+				// 			var derivationSkill=get.info(skill).derivation;
+				// 			skills[Array.isArray(derivationSkill)?'addArray':'add'](derivationSkill);
+				// 		});
+				// 	}
+				// 	skills.forEach(skill=>{
+				// 		var info=lib.skill[skill];
+				// 		if(info){
+				// 			if(!info.audioname2) info.audioname2={};
+				// 			if(info.audioname&&info.audioname.includes(character)){
+				// 				if(info.audio){
+				// 					if(typeof info.audio=='string') skill=info.audio;
+				// 					if(Array.isArray(info.audio)) skill=info.audio[0];
+				// 				}
+				// 				if(!lib.skill[skill+'_'+character]) lib.skill[skill+'_'+character]={audio:2};
+				// 				info.audioname2[name]=(skill+'_'+character);
+				// 			}
+				// 			else if(info.audioname2[character]){
+				// 				info.audioname2[name]=info.audioname2[character];
+				// 			}
+				// 			else{
+				// 				if(info.audio){
+				// 					if(typeof info.audio=='string') skill=info.audio;
+				// 					if(Array.isArray(info.audio)) skill=info.audio[0];
+				// 				}
+				// 				info.audioname2[name]=skill;
+				// 			}
+				// 		}
+				// 	});
+				// },
 				mark:true,
 				intro:{
 					onunmark:function(storage,player){
@@ -13882,7 +13912,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:["changeHp"],
 				},
 				audio:2,
-				audioname:{gongsunzan:'yicong'},
+				audioname2:{gongsunzan:'yicong'},
 				forced:true,
 				filter:function(event,player){
 					return get.sgn(player.hp-2.5)!=get.sgn(player.hp-2.5-event.num);
@@ -15612,6 +15642,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_lidian_prefix:'界',
 			re_xushu:'界徐庶',
 			re_xushu_prefix:'界',
+			ol_jianyong:'OL界简雍',
+			ol_jianyong_prefix:'OL界',
+			olqiaoshui:'巧说',
+			olqiaoshui_info:'出牌阶段，你可与一名其他角色拼点。若你赢，你使用的下一张基本牌或普通锦囊牌可以额外指定任意一名其他角色为目标或减少指定一个目标；若你没赢，此技能于本回合失效且本回合你不能使用锦囊牌。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

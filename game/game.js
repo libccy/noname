@@ -181,7 +181,7 @@ new Promise(resolve=>{
 		extensions:[],
 		extensionPack:{},
 		cardType:{},
-		hook:{globaltrigger:{},globalskill:{}},
+		hook:{globalskill:{}},
 		//函数钩子
 		hooks:{
 			// 本体势力的颜色
@@ -417,7 +417,7 @@ new Promise(resolve=>{
 							// TODO: handle the error.
 							reject(new Error());
 							break;
-						case "receiving":
+						case "receiving":{
 							/**
 							 * @type {PromiseResolve<T>}
 							 */
@@ -427,6 +427,7 @@ new Promise(resolve=>{
 							this.status = "active";
 							resolve();
 							break ;
+						}
 						case "active":
 							this.status = "sending";
 							this._buffer = [value, resolve];
@@ -447,7 +448,7 @@ new Promise(resolve=>{
 							// TODO: handle the error.
 							reject(new Error());
 							break;
-						case "sending":
+						case "sending":{
 							/**
 							 * @type {[T, PromiseResolve<void>]}
 							 */
@@ -457,6 +458,7 @@ new Promise(resolve=>{
 							this.status = "active";
 							buffer[1]();
 							break ;
+						}
 						case "active":
 							this.status = "receiving";
 							this._buffer = resolve;
@@ -6267,6 +6269,12 @@ new Promise(resolve=>{
 						frequent:true,
 						intro:'最后行动的角色起始手牌数+1'
 					},
+					connect_olfeiyang_four:{
+						name:'四号位获得【飞扬】',
+						init:true,
+						frequent:true,
+						intro:'最后行动的角色获得技能【飞扬】（准备阶段，你可以弃置三张牌，然后弃置判定区的一张牌）',
+					},
 					connect_choice_num:{
 						name:'侯选武将数',
 						init:'20',
@@ -6370,12 +6378,14 @@ new Promise(resolve=>{
 						}
 						if(config.versus_mode=='two'){
 							map.replace_handcard_two.show();
+							map.olfeiyang_four.show();
 							map.replace_character_two.show();
 							map.two_assign.show();
 							map.two_phaseswap.show();
 						}
 						else{
 							map.replace_handcard_two.hide();
+							map.olfeiyang_four.hide();
 							map.replace_character_two.hide();
 							map.two_assign.hide();
 							map.two_phaseswap.hide();
@@ -6549,6 +6559,12 @@ new Promise(resolve=>{
 						init:true,
 						frequent:true,
 						intro:'最后行动的角色起始手牌+1'
+					},
+					olfeiyang_four:{
+						name:'四号位获得【飞扬】',
+						init:true,
+						frequent:true,
+						intro:'最后行动的角色获得技能【飞扬】（准备阶段，你可以弃置三张牌，然后弃置判定区的一张牌）',
 					},
 					replace_character_two:{
 						name:'替补模式',
@@ -14798,270 +14814,142 @@ new Promise(resolve=>{
 				},
 				arrangeTrigger:function(){
 					'step 0'
-					event.filter1=function(info){
-						if(info[1].isDead()&&!lib.skill[info[0]].forceDie) return false;
-						if(info[1].isOut()&&!lib.skill[info[0]].forceOut) return false;
-						return lib.filter.filterTrigger(trigger,info[1],event.triggername,info[0]);
-					}
-					event.filter2=function(info2){
-						var info=lib.skill[info2[0]];
-						if(!lib.translate[info2[0]]||info.silent) return false;
-						return true;
-					}
-					event.filter3=function(info,info2){
-						return event.filter2(info2)&&event.filter1(info2)&&info2[1]==info[1]&&info[2]==info2[2]&&(lib.skill.global.contains(info2[0])||info[1].hasSkill(info2[0],true));
-					}
+					event.noDirectUse=info=>!lib.skill[info.skill].silent&&lib.translate[info.skill];//是否触发同顺序选择
 					'step 1'
-					if(trigger.filterStop&&trigger.filterStop()){
-						event.finish();
-					}
-					else if(event.list.length){
-						var info=event.list.shift();
-						game.createTrigger(event.triggername,info[0],info[1],trigger);
-						event.redo();
-					}
+					if(event.doing&&event.doing.todoList.length) return;
+					if(event.doingList.length) return event.doing=event.doingList.shift();
+					event.finish();
 					'step 2'
-					if(!event.map.length){
-						if(event.list2.length){
-							var info=event.list2.shift();
-							game.createTrigger(event.triggername,info[0],info[1],trigger);
-							event.redo();
-						}
-						else{
-							if(trigger._triggering==this){
-								delete trigger._triggering;
-							}
-							event.finish();
-							return;
-						}
+					if(trigger.filterStop&&trigger.filterStop()) return event.finish();
+					const current=event.doing.todoList.find(info=>lib.filter.filterTrigger(trigger,info.player,event.triggername,info.skill));
+					if(!current){
+						event.doing.todoList=[];
+						return event.goto(1);
 					}
-					event.doing=event.map.shift();
+					event.doing.todoList=event.doing.todoList.filter(i=>i.priority<=current.priority);
+					event.num=event.doing.todoList.indexOf(current);
+					if(!event.noDirectUse(current)) return event.goto(5);
+					event.choice=event.doing.todoList.filter(info=>{
+						if(!lib.filter.filterTrigger(trigger,info.player,event.triggername,info.skill)) return false;
+						if(!event.noDirectUse(info)) return false;
+						if(current.skill!=info.skill) return false;
+						if(current.player!=info.player) return false;
+						return lib.skill.global.includes(info.skill)||current.player.hasSkill(info.skill,true);
+					});
+					if(event.choice.length<2) event.goto(5);
 					'step 3'
-					event.num=0;
-					var bool=false;
-					var list=event.doing.list;
-					for(var i=0;i<list.length;i++){
-						if(event.filter1(list[i])){
-							event.num=i;
-							bool=true;
-							break;
-						}
-					}
-					if(!bool){event.goto(2);return;}
-					var priority=list[event.num][2];
-					for(var i=0;i<event.num;i++){
-						if(event.doing.list[i][2]>priority){
-							event.doing.list.splice(i--,1);
-							event.num--;
-						}
-					}
-					event.choice=[];
-					if(event.num<event.doing.list.length-1&&event.filter2(event.doing.list[event.num])){
-						var current=event.doing.list[event.num];
-						event.choice.push(current);
-						for(var i=event.num+1;i<event.doing.list.length;i++){
-							if(event.filter3(current,event.doing.list[i])) event.choice.push(event.doing.list[i]);
-						}
-					}
-					if(event.choice.length<2) event.goto(6);
+					const next=event.choice[0].player.chooseControl(event.choice.map(i=>i.skill));
+					next.set('prompt','选择下一个触发的技能');
+					next.set('forceDie',true);
+					next.set('arrangeSkill',true);
+					next.set('includeOut',true);
 					'step 4'
-					var controls=[];
-					event.current=event.choice[0][1]
-					for(var i=0;i<event.choice.length;i++){
-						controls.push(event.choice[i][0]);
-					}
-					event.current.chooseControl(controls)
-					.set('prompt','选择下一个触发的技能').set('forceDie',true).set('arrangeSkill',true).set('includeOut',true)
+					if(result.control) event.num=event.doing.todoList.findIndex(info=>info.skill==result.control&&info.player==event.choice[0].player);
 					'step 5'
-					if(result.control){
-						for(var i=0;i<event.doing.list.length;i++){
-							if(event.doing.list[i][0]==result.control&&event.doing.list[i][1]==event.current){
-								event.num=i;break;
-							}
-						}
-					}
-					'step 6'
-					var info=event.doing.list[event.num];
-					if(info){
-						event.doing.list2.push(info);
-						event.doing.list.splice(event.num,1);
-						game.createTrigger(event.triggername,info[0],info[1],trigger);
-					}
-					'step 7'
-					if(trigger.filterStop&&trigger.filterStop()){
-						event.finish();
-					}
-					else event.goto(event.doing.list.length?3:2);
+					const info=event.doing.todoList[event.num];
+					if(!info) return;
+					event.doing.doneList.push(info);
+					event.doing.todoList.splice(event.num,1);
+					game.createTrigger(event.triggername,info.skill,info.player,trigger);
+					event.goto(1);
 				},
 				createTrigger:function(){
 					"step 0"
-					//console.log('triggering: ' + player.name+ ' \'s skill: ' + event.skill+' in ' + event.triggername)
-					if(lib.filter.filterTrigger(trigger,player,event.triggername,event.skill)){
-						var fullskills=game.expandSkills(player.getSkills().concat(lib.skill.global));
-						if(!fullskills.contains(event.skill)){
-							var info=get.info(event.skill);
-							var hidden=player.hiddenSkills.slice(0);
-							var invisible=player.invisibleSkills.slice(0);
-							game.expandSkills(hidden);
-							game.expandSkills(invisible);
-							if(hidden.contains(event.skill)){
-								if(!info.silent&&player.hasSkillTag('nomingzhi',false,null,true)){
-									event.finish();
-								}
-								else if(!info.direct){
-									event.trigger('triggerHidden');
-								}
-								else{
-									event.skillHidden=true;
-								}
-							}
-							else if(invisible.contains(event.skill)){
-								event.trigger('triggerInvisible');
-							}
-							else{
-								var keep=false;
-								for(var i in player.additionalSkills){
-									if(i.startsWith('hidden:')&&game.expandSkills(player.additionalSkills[i]).contains(event.skill)){
-										keep=true;break;
-									}
-								}
-								if(!keep){
-									event.finish();
-								}
-							}
-						}
+					// console.log('triggering: ' + player.name+ ' \'s skill: ' + event.skill+' in ' + event.triggername)
+					if(game.expandSkills(player.getSkills().concat(lib.skill.global)).includes(event.skill)) return;
+					var info=get.info(event.skill);
+					let hidden=player.hiddenSkills.slice(0);
+					let invisible=player.invisibleSkills.slice(0);
+					game.expandSkills(hidden);
+					game.expandSkills(invisible);
+					if(hidden.includes(event.skill)){
+						if(!info.silent&&player.hasSkillTag('nomingzhi',false,null,true)) event.finish();
+						else if(!info.direct) event.trigger('triggerHidden');
+						else event.skillHidden=true;
+					}
+					else if(invisible.includes(event.skill)) event.trigger('triggerInvisible');
+					else if(Object.keys(player.additionalSkills).every(i=>{
+						if(i.startsWith('hidden:')) return true;
+						return !game.expandSkills(player.additionalSkills[i]).includes(event.skill);
+					})) event.finish();
+					"step 1"
+					if(event.cancelled) return event.finish();
+					var info=get.info(event.skill);
+					if(event.revealed||info.forced) return;
+					const checkFrequent=function(info){
+						if(player.hasSkillTag('nofrequent',false,event.skill)) return false;
+						if(typeof info.frequent=='boolean') return info.frequent;
+						if(typeof info.frequent=='function') return info.frequent(trigger,player);
+						if(info.frequent=='check'&&typeof info.check=='function') return info.check(trigger,player);
+						return false;
+					}
+					if(info.direct){
+						if(player.isUnderControl()) game.swapPlayerAuto(player);
+						if(player.isOnline()) void 0;
+						event._result={bool:true};
+						event._direct=true;
 					}
 					else{
-						event.finish();
-					}
-					"step 1"
-					if(event.cancelled){
-						event.finish();
-						return;
-					}
-					var info=get.info(event.skill);
-					if(!event.revealed&&!info.forced){
-						var checkFrequent=function(info){
-							if(player.hasSkillTag('nofrequent',false,event.skill)) return false;
-							if(typeof info.frequent=='boolean') return info.frequent;
-							if(typeof info.frequent=='function') return info.frequent(trigger,player);
-							if(info.frequent=='check'&&typeof info.check=='function') return info.check(trigger,player);
-							return false;
+						if(checkFrequent(info)) event.frequentSkill=true;
+						var str;
+						var check=info.check;
+						if(info.prompt) str=info.prompt;
+						else if(typeof info.logTarget=='string') str=get.prompt(event.skill,trigger[info.logTarget],player);
+						else if(typeof info.logTarget=='function'){
+							const logTarget=info.logTarget(trigger,player);
+							if(get.itemtype(logTarget).startsWith('player')) str=get.prompt(event.skill,logTarget,player);
 						}
-						if(info.direct&&player.isUnderControl()){
-							game.swapPlayerAuto(player);
-							event._result={bool:true};
-							event._direct=true;
+						else str=get.prompt(event.skill,null,player);
+						if(typeof str=='function') str=str(trigger,player);
+			
+						var next=player.chooseBool(str);
+						if(event.frequentSkill) next.set('frequentSkill',event.skill);
+						next.set('forceDie',true);
+						next.set('includeOut',true);
+						next.ai=()=>!check||check(trigger,player);
+			
+						if(typeof info.prompt2=='function') next.set('prompt2',info.prompt2(trigger,player));
+						else if(typeof info.prompt2=='string') next.set('prompt2',info.prompt2);
+						else if(info.prompt2!=false){
+							if(lib.dynamicTranslate[event.skill]) next.set('prompt2',lib.dynamicTranslate[event.skill](player,event.skill));
+							else if(lib.translate[event.skill+'_info']) next.set('prompt2',lib.translate[event.skill+'_info']);
 						}
-						else if(info.direct&&player.isOnline()){
-							event._result={bool:true};
-							event._direct=true;
-						}
-						else if(info.direct){
-							event._result={bool:true};
-							event._direct=true;
-						}
-						else{
-							if(checkFrequent(info)){
-								event.frequentSkill=true;
-							}
-							var str;
-							var check=info.check;
-							if(info.prompt) str=info.prompt;
-							else{
-								if(typeof info.logTarget=='string'){
-									str=get.prompt(event.skill,trigger[info.logTarget],player);
-								}
-								else if(typeof info.logTarget=='function'){
-									var logTarget=info.logTarget(trigger,player);
-									if(get.itemtype(logTarget).startsWith('player')) str=get.prompt(event.skill,logTarget,player);
-								}
-								else{
-									str=get.prompt(event.skill,null,player);
-								}
-							}
-							if(typeof str=='function'){str=str(trigger,player)}
-							var next=player.chooseBool(str);
-							if(event.frequentSkill) next.set('frequentSkill',event.skill);
-							next.set('forceDie',true);
-							next.set('includeOut',true);
-							next.ai=function(){
-								return !check||check(trigger,player);
-							};
-							if(typeof info.prompt2=='function'){
-								next.set('prompt2',info.prompt2(trigger,player));
-							}
-							else if(typeof info.prompt2=='string'){
-								next.set('prompt2',info.prompt2);
-							}
-							else if(info.prompt2!=false){
-								if(lib.dynamicTranslate[event.skill]) next.set('prompt2',lib.dynamicTranslate[event.skill](player,event.skill));
-								else if(lib.translate[event.skill+'_info']) next.set('prompt2',lib.translate[event.skill+'_info']);
-							}
-							if(trigger.skillwarn){
-								if(next.prompt2){
-									next.set('prompt2','<span class="thundertext">'+trigger.skillwarn+'。</span>'+next.prompt2);
-								}
-								else{
-									next.set('prompt2',trigger.skillwarn);
-								}
-							}
+			
+						if(trigger.skillwarn){
+							if(next.prompt2) next.set('prompt2','<span class="thundertext">'+trigger.skillwarn+'。</span>'+next.prompt2);
+							else next.set('prompt2',trigger.skillwarn);
 						}
 					}
 					"step 2"
 					var info=get.info(event.skill);
-					if(result&&result.bool!=false){
-						var autodelay=info.autodelay;
-						if(typeof autodelay=='function'){
-							autodelay=autodelay(trigger,player);
-						}
-						if(autodelay&&(info.forced||!event.isMine())){
-							if(typeof autodelay=='number'){
-								game.delayx(autodelay);
-							}
-							else{
-								game.delayx();
-							}
-						}
+					if(!result||!result.bool) return;
+					var autodelay=info.autodelay;
+					if(typeof autodelay=='function') autodelay=autodelay(trigger,player);
+					if(autodelay&&(info.forced||!event.isMine())){
+						if(typeof autodelay=='number') game.delayx(autodelay);
+						else game.delayx();
 					}
 					"step 3"
 					var info=get.info(event.skill);
 					if(result&&result.bool==false){
 						if(info.oncancel) info.oncancel(trigger,player);
-						event.finish();
-						return;
+						return event.finish();
 					}
 					if(info.popup!=false&&!info.direct){
 						if(info.popup){
 							player.popup(info.popup);
 							game.log(player,'发动了','【'+get.skillTranslation(event.skill,player)+'】');
 						}
-						else{
-							if(info.logTarget&&info.logLine!==false){
-								if(typeof info.logTarget=='string'){
-									player.logSkill(event.skill,trigger[info.logTarget],info.line);
-								}
-								else if(typeof info.logTarget=='function'){
-									player.logSkill(event.skill,info.logTarget(trigger,player),info.line);
-								}
-							}
-							else{
-								player.logSkill(event.skill,false,info.line);
-							}
-						}
+						else if(!info.logTarget||info.logLine===false) player.logSkill(event.skill,false,info.line);
+						else if(typeof info.logTarget=='string') player.logSkill(event.skill,trigger[info.logTarget],info.line);
+						else if(typeof info.logTarget=='function') player.logSkill(event.skill,info.logTarget(trigger,player),info.line);
 					}
 					var next=game.createEvent(event.skill);
 					if(typeof info.usable=='number'){
 						player.addSkill('counttrigger');
-						if(!player.storage.counttrigger){
-							player.storage.counttrigger={};
-						}
-						if(!player.storage.counttrigger[event.skill]){
-							player.storage.counttrigger[event.skill]=1;
-						}
-						else{
-							player.storage.counttrigger[event.skill]++;
-						}
+						if(!player.storage.counttrigger) player.storage.counttrigger={};
+						if(!player.storage.counttrigger[event.skill]) player.storage.counttrigger[event.skill]=1;
+						else player.storage.counttrigger[event.skill]++;
 					}
 					next.player=player;
 					next._trigger=trigger;
@@ -15071,17 +14959,11 @@ new Promise(resolve=>{
 					if(info.forceDie) next.forceDie=true;
 					if(info.forceOut) next.includeOut=true;
 					"step 4"
-					if(player._hookTrigger){
-						for(var i=0;i<player._hookTrigger.length;i++){
-							var info=lib.skill[player._hookTrigger[i]].hookTrigger;
-							if(info){
-								if(info.after&&info.after(event,player,event.triggername)){
-									event.trigger('triggerAfter');
-									break;
-								}
-							}
-						}
-					}
+					if(!player._hookTrigger) return;
+					if(player._hookTrigger.some(i=>{
+						const info=lib.skill[i].hookTrigger;
+						return info&&info.after&&info.after(event,player,event.triggername);
+					})) event.trigger('triggerAfter');
 				},
 				playVideoContent:function(){
 					'step 0'
@@ -22616,6 +22498,7 @@ new Promise(resolve=>{
 					
 					this.name=character;
 					this.name1=character;
+					this.tempname=[];
 					this.sex=info[0];
 					this.group=info[1];
 					this.hp=hp1;
@@ -27535,90 +27418,64 @@ new Promise(resolve=>{
 					}
 					return list;
 				}
-				addSkillTrigger(skill,hidden,triggeronly){
-					var info=lib.skill[skill];
-					if(!info) return;
-					if(typeof info.group=='string'){
-						this.addSkillTrigger(info.group,hidden);
-					}
-					else if(Array.isArray(info.group)){
-						for(var i=0;i<info.group.length;i++){
-							this.addSkillTrigger(info.group[i],hidden);
+				addSkillTrigger(skills,hidden,triggeronly){
+					if(typeof skills=='string') skills=[skills];
+					game.expandSkills(skills);
+					for(const skill of skills){
+						const info=lib.skill[skill];
+						if(!info) {
+							console.error(new ReferenceError(`Cannot find ${skill} in lib.skill, failed to add ${skill}'s trigger to ${this.name}`));
+							continue;
 						}
-					}
-					if(!triggeronly){
-						if(info.global&&(!hidden||info.globalSilent)){
-							if(typeof info.global=='string'){
-								game.addGlobalSkill(info.global,this);
+						if(!triggeronly){
+							if(info.global&&(!hidden||info.globalSilent)){
+								let global=info.global;
+								if(!Array.isArray(global)) global=[global];
+								global.forEach(skill=>game.addGlobalSkill(skill,this));
 							}
-							else{
-								for(var j=0;j<info.global.length;j++){
-									game.addGlobalSkill(info.global[j],this);
-								}
-							}
+							if(this.initedSkills.includes(skill)) continue;
+							this.initedSkills.push(skill);
+							if(info.init&&!_status.video) info.init(this,skill);
 						}
-						if(this.initedSkills.contains(skill)) return this;
-						this.initedSkills.push(skill);
-						if(info.init&&!_status.video){
-							info.init(this,skill);
-						}
-					}
-					if(info.trigger&&this.playerid){
-						var playerid=this.playerid;
-						var setTrigger=function(i,evt){
-							if(i=='global'){
-								if(!lib.hook.globaltrigger[evt]){
-									lib.hook.globaltrigger[evt]={};
-								}
-								if(!lib.hook.globaltrigger[evt][playerid]){
-									lib.hook.globaltrigger[evt][playerid]=[];
-								}
-								lib.hook.globaltrigger[evt][playerid].add(skill);
-							}
-							else{
-								var name=playerid+'_'+i+'_'+evt;
-								if(!lib.hook[name]){
-									lib.hook[name]=[];
-								}
+						if(info.trigger&&this.playerid){
+							const setTrigger=(role,evt)=>{
+								const name=this.playerid+'_'+role+'_'+evt;
+								if(!lib.hook[name]) lib.hook[name]=[];
 								lib.hook[name].add(skill);
+								lib.hookmap[evt]=true;
 							}
-							lib.hookmap[evt]=true;
-						}
-						for(var i in info.trigger){
-							if(typeof info.trigger[i]=='string'){
-								setTrigger(i,info.trigger[i]);
-							}
-							else if(Array.isArray(info.trigger[i])){
-								for(var j=0;j<info.trigger[i].length;j++){
-									setTrigger(i,info.trigger[i][j]);
-								}
+							for(const role in info.trigger){
+								let evts=info.trigger[role];
+								if(!Array.isArray(evts)) evts=[evts];
+								evts.forEach(evt=>setTrigger(role,evt));
 							}
 						}
+						if(info.hookTrigger){
+							if(!this._hookTrigger) this._hookTrigger=[];
+							this._hookTrigger.add(skill);
+						}
+						if(_status.event&&_status.event.addTrigger) _status.event.addTrigger(skill,this);
+						_status.event.clearStepCache();
 					}
-					if(info.hookTrigger){
-						if(!this._hookTrigger){
-							this._hookTrigger=[];
-						}
-						this._hookTrigger.add(skill);
-					}
-					if(_status.event&&_status.event.addTrigger) _status.event.addTrigger(skill,this);
 					return this;
 				}
 				addSkillLog(skill){
+					if(!skill) return this;
 					this.addSkill(skill);
-					if(!Array.isArray(skill)) skill=[skill];
-					skill.forEach(i=>{
+					if(!Array.isArray(skill)) skill=[skill];					
+					game.log(this,'获得了技能',...skill.map(i=>{
 						this.popup(i);
-						game.log(this,'获得了技能','#g【'+get.translation(i)+'】');
-					});
+						return '#g【'+get.translation(i)+'】';
+					}));
 				}
-				removeSkillLog(skill,popop){
+				removeSkillLog(skill,popup){
+					if(!skill) return this;
 					this.removeSkill(skill);
-					if(!Array.isArray(skill)) skill=[skill];
-					skill.forEach(i=>{
-						if(popop===true) this.popup(i);
-						game.log(this,'失去了技能','#g【'+get.translation(i)+'】');
-					});
+					if(!Array.isArray(skill)) skill=[skill];					
+					game.log(this,'失去了技能',...skill.map(i=>{
+						if(popup===true) this.popup(i);
+						return '#g【'+get.translation(i)+'】';
+					}));
 				}
 				addInvisibleSkill(skill){
 					if(Array.isArray(skill)){
@@ -27918,65 +27775,45 @@ new Promise(resolve=>{
 					_status.event.clearStepCache();
 					return this;
 				}
-				removeSkillTrigger(skill,triggeronly){
-					var info=lib.skill[skill];
-					if(!info) return;
-					if(typeof info.group=='string'){
-						this.removeSkillTrigger(info.group);
-					}
-					else if(Array.isArray(info.group)){
-						for(var i=0;i<info.group.length;i++){
-							this.removeSkillTrigger(info.group[i]);
+				removeSkillTrigger(skills,triggeronly){
+					if(typeof skills=='string') skills=[skills];
+					game.expandSkills(skills);
+					for(const skill of skills){
+						const info=lib.skill[skill];
+						if(!info) {
+							console.error(new ReferenceError(`Cannot find ${skill} in lib.skill, failed to remove ${skill}'s trigger to ${this.name}`));
+							continue;
 						}
-					}
-					if(!triggeronly) this.initedSkills.remove(skill);
-					if(info.trigger){
-						var playerid=this.playerid;
-						var removeTrigger=function(i,evt){
-							if(i=='global'){
-								for(var j in lib.hook.globaltrigger){
-									if(lib.hook.globaltrigger[j][playerid]){
-										lib.hook.globaltrigger[j][playerid].remove(skill);
-										if(lib.hook.globaltrigger[j][playerid].length==0){
-											delete lib.hook.globaltrigger[j][playerid];
-										}
-										if(get.is.empty(lib.hook.globaltrigger[j])){
-											delete lib.hook.globaltrigger[j];
-										}
-									}
-								}
+						if(!triggeronly){
+							if(info.global){
+								let global=info.global;
+								if(!Array.isArray(global)) global=[global];
+								global.forEach(skill=>game.removeGlobalSkill(skill,this));
 							}
-							else{
-								var name=playerid+'_'+i+'_'+evt;
-								if(lib.hook[name]){
-									lib.hook[name].remove(skill);
-									if(lib.hook[name].length==0){
-										delete lib.hook[name];
-									}
-								}
+							if(!this.initedSkills.includes(skill)) continue;
+							this.initedSkills.remove(skill);
+							// if(info.onremove&&!_status.video) info.onremove(this,skill);
+						}
+						if(info.trigger&&this.playerid){
+							const removeTrigger=(role,evt)=>{
+								const name=this.playerid+'_'+role+'_'+evt;
+								if(lib.hook[name]) return;
+								lib.hook[name].remove(skill);
+								if(lib.hook[name].length==0) delete lib.hook[name];
+							}
+							for(const role in info.trigger){
+								let evts=info.trigger[role];
+								if(!Array.isArray(evts)) evts=[evts];
+								evts.forEach(evt=>removeTrigger(role,evt));
 							}
 						}
-						for(var i in info.trigger){
-							if(typeof info.trigger[i]=='string'){
-								removeTrigger(i,info.trigger[i]);
-							}
-							else if(Array.isArray(info.trigger[i])){
-								for(var j=0;j<info.trigger[i].length;j++){
-									removeTrigger(i,info.trigger[i][j]);
-								}
-							}
-						}
-					}
-					if(info.hookTrigger){
-						if(this._hookTrigger){
+						if(info.hookTrigger&&this._hookTrigger){
 							this._hookTrigger.remove(skill);
-							if(!this._hookTrigger.length){
-								delete this._hookTrigger;
-							}
+							if(!this._hookTrigger.length) delete this._hookTrigger;
 						}
+						if(_status.event&&_status.event.removeTrigger) _status.event.removeTrigger(skill,this);
+						_status.event.clearStepCache();
 					}
-					if(_status.event&&_status.event.removeTrigger) _status.event.removeTrigger(skill,this);
-					_status.event.clearStepCache();
 					return this;
 				}
 				removeSkill(skill){
@@ -28055,10 +27892,9 @@ new Promise(resolve=>{
 					if(get.objtype(expire)=='object'){
 						const roles=['player','source','target','global'];
 						for(const i of roles){
-							if(typeof expire[i]=='string') lib.hookmap[expire[i]]=true;
-							else if(Array.isArray(expire[i])){
-								expire[i].forEach(trigger=>lib.hookmap[trigger]=true);
-							}
+							let triggers=expire[i];
+							if(!Array.isArray(triggers)) triggers=[triggers];
+							triggers.forEach(trigger=>lib.hookmap[trigger]=true);
 						}
 					}
 
@@ -31989,88 +31825,68 @@ new Promise(resolve=>{
 					if(!evt||evt.name!='phaseUse') return false;
 					return !player||player==evt.player;
 				}
-				addTrigger(skill,player){
-					if(!player||!skill) return this;
-					var evt=this;
-					if(typeof skill=='string') skill=[skill];
-					game.expandSkills(skill);
+				addTrigger(skills,player){
+					if(!player||!skills) return this;
+					let evt=this;
+					if(typeof skills=='string') skills=[skills];
+					game.expandSkills(skills);
 					while(true){
-						var evt=evt.getParent('arrangeTrigger');
-						if(!evt||evt.name!='arrangeTrigger'||!evt.map) return this;
-						var filter=function(content){
-							if(typeof content=='string') return content==triggername;
-							return content.contains(triggername);
-						};
-						var trigger=evt._trigger;
-						var triggername=evt.triggername;
-						var map=false;
-						if(evt.doing&&evt.doing.player==player) map=evt.doing;
-						else{
-							for(var i=0;i<evt.map.length;i++){
-								if(evt.map[i].player==player){map=evt.map[i];break;}
+						evt=evt.getParent('arrangeTrigger');
+						if(!evt||evt.name!='arrangeTrigger'||!evt.doingList) return this;
+						const doing=(()=>{
+							if(evt.doing&&evt.doing.player==player) return evt.doing;
+							return evt.doingList.find(i=>i.player==player);
+						})();
+						// if(!doing) return this;
+						const firstDo=evt.doingList.find(i=>i.player=="firstDo");
+						const lastDo=evt.doingList.find(i=>i.player=="lastDo");
+						
+						for(const skill of skills){
+							const info=lib.skill[skill];
+							if(!info.trigger) continue;
+							if(!Object.keys(info.trigger).some(i=>{
+								if(Array.isArray(info.trigger[i])) return info.trigger[i].includes(evt.triggername);
+								return info.trigger[i]==evt.triggername;
+							})) continue;
+
+							const playerMap=game.players.concat(game.dead).sortBySeat(evt.starter);	
+							const priority=get.priority(skill);
+							const toadd={
+								skill:skill,
+								player:player,
+								priority:priority,
 							}
-						}
-						if(!map) return this;
-						var func=function(skillx){
-							var info=lib.skill[skillx];
-							var bool=false;
-							for(var i in info.trigger){
-								if(filter(info.trigger[i])){bool=true;break}
-							}
-							if(!bool) return;
-							var priority=get.priority(skill);
-							var toadd=[skillx,player,priority];
-							if(map.list2){
-								for(var i=0;i<map.list2.length;i++){
-									if(map.list2[i][0]==toadd[0]&&map.list2[i][1]==toadd[1]) return;
-								}
-							}
-							for(var i=0;i<map.list.length;i++){
-								if(map.list[i][0]==toadd[0]&&map.list[i][1]==toadd[1]) return;
-							}
-							map.list.add(toadd);
-							map.list.sort(function(a,b){
-								return b[2]-a[2];
-							});
-						}
-						for(var j=0;j<skill.length;j++){
-							func(skill[j]);
+							const map=info.firstDo?firstDo:info.lastDo?lastDo:doing;
+							if(!map) continue;
+							if(map.doneList&&map.doneList.some(i=>i.skill==toadd.skill&&i.player==toadd.player)) continue;
+							if(map.todoList.some(i=>i.skill==toadd.skill&&i.player==toadd.player)) continue;
+							map.todoList.add(toadd);
+							map.todoList.sort((a,b)=>(b.priority-a.priority)||(playerMap.indexOf(a)-playerMap.indexOf(b)));
 						}
 					}
 				}
-				removeTrigger(skill,player){
-					if(!player||!skill) return;
-					var evt=this;
-					if(typeof skill=='string') skill=[skill];
-					game.expandSkills(skill);
+				removeTrigger(skills,player){
+					if(!player||!skills) return this;
+					let evt=this;
+					if(typeof skills=='string') skills=[skills];
+					game.expandSkills(skills);
 					while(true){
-						var evt=evt.getParent('arrangeTrigger');
-						if(!evt||evt.name!='arrangeTrigger'||!evt.map) return;
-						var filter=function(content){
-							if(typeof content=='string') return content==triggername;
-							return content.contains(triggername);
-						};
-						var trigger=evt._trigger;
-						var triggername=evt.triggername;
-						var map=false;
-						if(evt.doing&&evt.doing.player==player) map=evt.doing;
-						else{
-							for(var i=0;i<evt.map.length;i++){
-								if(evt.map[i].player==player){
-									map=evt.map[i];
-									break;
-								}
-							}
-						}
-						if(!map) return;
-						var func=function(skillx){
-							var toremove=map.list.filter(i=>{
-								return i[0]==skillx&&i[1]==player;
+						evt=evt.getParent('arrangeTrigger');
+						if(!evt||evt.name!='arrangeTrigger'||!evt.doingList) return this;
+						const doing=(()=>{
+							if(evt.doing&&evt.doing.player==player) return evt.doing;
+							return evt.doingList.find(i=>i.player==player);
+						})();
+						// if(!doing) return this;
+						const firstDo=evt.doingList.find(i=>i.player=="firstDo");
+						const lastDo=evt.doingList.find(i=>i.player=="lastDo");
+
+						for(const skill of skills){
+							[doing,firstDo,lastDo].forEach(map=>{
+								if(!map) return;
+								const toremove=map.todoList.filter(i=>i.skill==skill&&i.player==player);
+								if(toremove.length>0) map.todoList.removeArray(toremove);
 							});
-							if(toremove.length>0) map.list.removeArray(toremove);
-						}
-						for(var j=0;j<skill.length;j++){
-							func(skill[j]);
 						}
 					}
 				}
@@ -32080,104 +31896,73 @@ new Promise(resolve=>{
 					if(name==='gameDrawEnd') _status.gameDrawed=true;
 					if(name==='gameStart'){
 						lib.announce.publish('gameStart',{});
-						if(_status.brawl&&_status.brawl.gameStart){
-							_status.brawl.gameStart();
-						}
-						if(lib.config.show_cardpile){
-							ui.cardPileButton.style.display='';
-						}
+						if(_status.brawl&&_status.brawl.gameStart) _status.brawl.gameStart();
+						if(lib.config.show_cardpile) ui.cardPileButton.style.display='';
 						_status.gameStarted=true;
 						game.showHistory();
 					}
 					if(!lib.hookmap[name]&&!lib.config.compatiblemode) return this;
 					if(!game.players||!game.players.length) return this;
-					var event=this;
-					var start=false;
-					var starts=[_status.currentPhase,event.source,event.player,game.me,game.players[0]];
-					for(var i=0;i<starts.length;i++){
-						if(get.itemtype(starts[i])=='player'){
-							start=starts[i];break;
-						}
-					}
+					const event=this;
+					let start=[_status.currentPhase,event.source,event.player,game.me,game.players[0]].find(i=>get.itemtype(i)=='player');
 					if(!start) return this;
-					if(!game.players.contains(start)&&!game.dead.contains(start)){
-						start=game.findNext(start);
+					if(!game.players.includes(start)&&!game.dead.includes(start)) start=game.findNext(start);
+					const firstDo={
+						player:"firstDo",
+						todoList:[],
+						doneList:[],
 					}
-					var list=[];
-					var list2=[];
-					var mapx=[];
-					var allbool=false;
-					var roles=['player','source','target'];
-					var listAdded;
-					var mapxx;
-					var addList=function(skill,player){
-						if(listAdded[skill]) return;
+					const lastDo={
+						player:"lastDo",
+						todoList:[],
+						doneList:[],
+					}
+					const doingList=[];
+					let allbool=false;
+					const roles=['player','source','target','global'];
+					const playerMap=game.players.concat(game.dead).sortBySeat(start);
+					function addList(skill,player){
+						if(this.listAdded[skill]) return;
+						this.listAdded[skill]=true;
 						if(player.forbiddenSkills[skill]) return;
 						if(player.disabledSkills[skill]) return;
-						listAdded[skill]=true;
-						var info=lib.skill[skill];
-						var num=0;
-						if(info.priority){
-							num=info.priority*100;
-						}
-						if(info.silent){
-							num++;
-						}
-						if(info.equipSkill) num-=30;
-						if(info.ruleSkill) num-=30;
-						if(info.firstDo){
-							list.push([skill,player,num]);
-							list.sort(function(a,b){
-								return b[2]-a[2];
-							});
-							allbool=true;
-							return;
-						}
-						else if(info.lastDo){
-							list2.push([skill,player,num]);
-							list2.sort(function(a,b){
-								return b[2]-a[2];
-							});
-							allbool=true;
-							return;
-						}
-						mapxx.list.push([skill,player,num]);
-						mapxx.list.sort(function(a,b){
-							return b[2]-a[2];
-						});
-						allbool=true;
-					};
-					var totalPopulation=game.players.length+game.dead.length+1;
-					var player=start;
-					var globalskill='global_'+name;
-					var map=_status.connectMode?lib.playerOL:game.playerMap;
-					for(var iwhile=0;iwhile<totalPopulation;iwhile++){
-						var id=player.playerid;
-						var mapxx={
+
+						const info=lib.skill[skill];
+						const list=info.firstDo?firstDo.todoList:info.lastDo?lastDo.todoList:this.todoList;
+						const priority=get.priority(skill);
+						list.push({
+							skill:skill,
 							player:player,
-							list:[],
-							list2:[],
-						};
-						listAdded={};
-						var notemp=player.skills.slice(0);
-						for(var j in player.additionalSkills){
+							priority:priority,
+						});
+						if(typeof list.player=='string') list.sort((a,b)=>(b.priority-a.priority)||(playerMap.indexOf(a)-playerMap.indexOf(b)));
+						else list.sort((a,b)=>b.priority-a.priority);
+						allbool=true;
+					}
+					let player=start;
+					do{
+						const doing={
+							player:player,
+							todoList:[],
+							doneList:[],
+							listAdded:{},
+							addList:addList,
+						}
+						const notemp=player.skills.slice();
+						for(const j in player.additionalSkills){
 							if(!j.startsWith('hidden:')) notemp.addArray(player.additionalSkills[j]);
 						}
 						for(const skill in player.tempSkills){
-							if(notemp.contains(skill)) continue;
+							if(notemp.includes(skill)) continue;
 							const expire=player.tempSkills[skill];
 							if(typeof expire==='function'&&expire(event,player,name)){
 								delete player.tempSkills[skill];
 								player.removeSkill(skill);
 							}
 							else if(get.objtype(expire)==='object'){
-								if(expire.global===name||(Array.isArray(expire.global)&&expire.global.contains(name))){
-									delete player.tempSkills[skill];
-									player.removeSkill(skill);
-								}
-								else for(const i of roles){
-									if(player!==event[i]) continue;
-									if(expire[i]===name||(Array.isArray(expire[i])&&expire[i].contains(name))){
+								for(const role of roles){
+									if(role!=='global'&&player!==event[role]) continue;
+									if(expire[role]===name||(Array.isArray(expire[role])&&expire[role].includes(name))){
 										delete player.tempSkills[skill];
 										player.removeSkill(skill);
 									}
@@ -32185,89 +31970,45 @@ new Promise(resolve=>{
 							}
 						}
 						if(lib.config.compatiblemode){
-							(function(){
-								var skills=player.getSkills('invisible').concat(lib.skill.global);
-								game.expandSkills(skills);
-								for(var i=0;i<skills.length;i++){
-									var info=get.info(skills[i]);
-									if(info&&info.trigger){
-										var trigger=info.trigger;
-										var add=false;
-										if(trigger.player){
-											if(typeof trigger.player==='string'){
-												if(trigger.player===name) add=true;
-											}
-											else if(trigger.player.contains(name)) add=true;
-										}
-										if(trigger.target){
-											if(typeof trigger.target==='string'){
-												if(trigger.target===name) add=true;
-											}
-											else if(trigger.target.contains(name)) add=true;
-										}
-										if(trigger.source){
-											if(typeof trigger.source==='string'){
-												if(trigger.source===name) add=true;
-											}
-											else if(trigger.source.contains(name)) add=true;
-										}
-										if(trigger.global){
-											if(typeof trigger.global==='string'){
-												if(trigger.global===name) add=true;
-											}
-											else if(trigger.global.contains(name)) add=true;
-										}
-										if(add){
-											addList(skills[i],player);
-										}
-									}
-								}
-							}());
+							let skills=player.getSkills('invisible').concat(lib.skill.global);
+							game.expandSkills(skills);
+							for(const skill of skills){
+								const info=get.info(skill);
+								if(!info||!info.trigger) continue;
+								if (roles.some(role=>{
+									if(info.trigger[role]===name) return true;
+									if(Array.isArray(info.trigger[role])&&info.trigger[role].includes(name)) return true;
+								})) doing.addList(skill, player);
+							}
 						}
 						else{
-							for(var i=0;i<roles.length;i++){
-								var triggername=player.playerid+'_'+roles[i]+'_'+name;
+							for(const role of roles){
+								const globalTriggername=role+'_'+name;
+								if (lib.hook.globalskill[globalTriggername]){
+									lib.hook.globalskill[globalTriggername].forEach(skill=>doing.addList(skill,player));
+								}
+								const triggername=player.playerid+'_'+role+'_'+name;
 								if(lib.hook[triggername]){
-									for(var j=0;j<lib.hook[triggername].length;j++){
-										addList(lib.hook[triggername][j],player);
-									}
-								}
-								triggername=roles[i]+'_'+name;
-								if(lib.hook.globalskill[triggername]){
-									for(var j=0;j<lib.hook.globalskill[triggername].length;j++){
-										addList(lib.hook.globalskill[triggername][j],player);
-									}
-								}
-							}
-							if(lib.hook.globalskill[globalskill]){
-								for(var j=0;j<lib.hook.globalskill[globalskill].length;j++){
-									addList(lib.hook.globalskill[globalskill][j],player);
-								}
-							}
-							for(var i in lib.hook.globaltrigger[name]){
-								if(map[i]===player){
-									for(var j=0;j<lib.hook.globaltrigger[name][i].length;j++){
-										addList(lib.hook.globaltrigger[name][i][j],map[i]);
-									}
+									lib.hook[triggername].forEach(skill=>doing.addList(skill,player));
 								}
 							}
 						}
-						mapx.push(mapxx);
+						delete doing.listAdded;
+						delete doing.addList;
+						doingList.push(doing);
 						player=player.nextSeat;
-						if(!player||player===start){
-							break;
-						}
-					}
-					
+					}while(player&&player!==start)
+					doingList.unshift(firstDo);
+					doingList.push(lastDo);
+					// console.log(name,event.player,doingList.map(i=>({player:i.player,todoList:i.todoList.slice(),doneList:i.doneList.slice()})))
+
 					if(allbool){
 						var next=game.createEvent('arrangeTrigger',false,event);
 						next.setContent('arrangeTrigger');
-						next.list=list;
-						next.list2=list2;
-						next.map=mapx;
+						next.doingList=doingList;
 						next._trigger=event;
 						next.triggername=name;
-						//next.starter=start;
+						next.starter=start;
 						event._triggering=next;
 					}
 					return this;
@@ -32276,21 +32017,18 @@ new Promise(resolve=>{
 					if(typeof all=='undefined') all=true;
 					var evt=this._triggering;
 					if(all){
-						if(evt&&evt.map){
-							for(var i=0;i<evt.map.length;i++){
-								evt.map[i].list=[];
-							}
+						if(evt&&evt.doingList){
+							evt.doingList.forEach(doing=>doing.todoList=[]);
 							evt.list=[];
-							if(evt.doing) evt.doing.list=[];
+							if(evt.doing) evt.doing.todoList=[];
 						}
 						this._triggered=5;
 					}
 					else if(player){
 						this._notrigger.add(player);
-						if(!evt||!evt.map) return this;
-						for(var i=0;i<evt.map.length;i++){
-							if(evt.map[i].player==player) evt.map[i].list.length=0;
-						}
+						if(!evt||!evt.doingList) return this;
+						const doing=evt.doingList.find(doing=>doing.player==player);
+						if(doing) doing.todoList=[];
 					}
 					return this;
 				}
@@ -32981,48 +32719,32 @@ new Promise(resolve=>{
 				return savable;
 			},
 			filterTrigger:function(event,player,name,skill){
-				if(player._hookTrigger){
-					for(var i=0;i<player._hookTrigger.length;i++){
-						var info=lib.skill[player._hookTrigger[i]].hookTrigger;
-						if(info){
-							if(info.block&&info.block(event,player,name,skill)){
-								return false;
-							}
-						}
-					}
-				}
-				var fullskills=game.expandSkills(player.getSkills(false).concat(lib.skill.global));
-				var info=get.info(skill);
-				if(!info) console.log('缺少info的技能:',skill);
-				if(((info&&info.noHidden)||get.mode()!='guozhan')&&!fullskills.contains(skill)){
-					return false;
+				if(player._hookTrigger&&player._hookTrigger.some(i=>{
+					const info=lib.skill[i].hookTrigger;
+					return info&&info.block&&info.block(event,player,name,skill);
+				})) return false;
+				const fullskills=game.expandSkills(player.getSkills(false).concat(lib.skill.global));
+				const info=get.info(skill);
+				if(!info) return console.log('缺少info的技能:',skill);
+				if(!fullskills.includes(skill)){
+					if(get.mode()!='guozhan') return false;
+					if(info&&info.noHidden) return false;
 				}
 				if(!info.trigger) return false;
-				var bool=false;
-				var has=function(obj){
-					if(typeof obj=='string') return obj==name;
-					else if(obj.contains(name)) return true;
-					return false;
-				}
-				for(var i in info.trigger){
-					if((i=='global'||player==event[i])&&has(info.trigger[i])){
-						bool=true;break;
-					}
-				}
-				if(!bool) return false;
-				if(info.filter&&!info.filter(event,player,name)){
-					return false;
-				}
-				if(event._notrigger.contains(player)&&!lib.skill.global.contains(skill)){
-					return false;
-				}
+				if(!info.forceDie&&player.isDead()) return false;
+				if(!info.forceOut&&player.isOut()) return false;
+				if(!Object.keys(info.trigger).some(i=>{
+					if(i!='global'&&player!=event[i]) return false;
+					if(Array.isArray(info.trigger[i])) return info.trigger[i].includes(name);
+					return info.trigger[i]==name;
+				})) return false;
+				if(info.filter&&!info.filter(event,player,name)) return false;
+				if(event._notrigger.includes(player)&&!lib.skill.global.includes(skill)) return false;
 				if(typeof info.usable=='number'&&player.hasSkill('counttrigger')&&
 					player.storage.counttrigger&&player.storage.counttrigger[skill]>=info.usable){
 					return false;
 				}
-				if(info.round&&(info.round-(game.roundNumber-player.storage[skill+'_roundcount'])>0)){
-					return false;
-				}
+				if(info.round&&(info.round-(game.roundNumber-player.storage[skill+'_roundcount'])>0)) return false;
 				if(player.storage[`temp_ban_${skill}`]===true) return false;
 				return true;
 			},
@@ -37780,6 +37502,10 @@ new Promise(resolve=>{
 					if(info.audioname2[player.name]) audioInfo=info.audioname2[player.name];
 					else if(info.audioname2[player.name1]) audioInfo=info.audioname2[player.name1];
 					else if(info.audioname2[player.name2]) audioInfo=info.audioname2[player.name2];
+					else if(player.tempname){
+						const name=player.tempname.find(i=>info.audioname2[i]);
+						if(name) audioInfo=info.audioname2[name];
+					}
 				}
 				if(typeof audioInfo=='function') audioInfo=audioInfo(player);
 				
@@ -37824,6 +37550,10 @@ new Promise(resolve=>{
 					if(audioname.includes(player.name)) _audioname=`_${player.name}`;
 					else if(audioname.includes(player.name1)) _audioname=`_${player.name1}`;
 					else if(audioname.includes(player.name2)) _audioname=`_${player.name2}`;
+					else if(player.tempname){
+						const name=player.tempname.find(i=>audioname.includes(i));
+						if(name) _audioname=`_${name}`;
+					}
 		
 					list=list.slice(1);//[路径,number/true,格式]
 					if(list[1]=='true') audioList.add(`${list[0]||'skill'}/${skill}${_audioname}.${list[2]||'mp3'}`);
@@ -51622,7 +51352,7 @@ new Promise(resolve=>{
 								const ai=window.ai;
 								const cheat=window.lib.cheat;
 								//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
-								const reg=/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/;
+								const reg=${/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/};
 								return function(value){ 
 									"use strict";
 									return eval(reg.test(value)?('('+value+')'):value);
@@ -61306,29 +61036,47 @@ new Promise(resolve=>{
 		},
 		cnNumber:(num,two)=>{
 			if(num==Infinity) return '∞';
+			if(typeof num!='number'&&typeof num!='string') return num;
 			if(isNaN(num)) return '';
-			if(typeof num!='number') return num;
-			if(num<0||num>99) return num;
-			if(num<=10){
-				switch(num){
-					case 0:return '〇';
-					case 1:return '一';
-					case 2:return two?'二':'两';
-					case 3:return '三';
-					case 4:return '四';
-					case 5:return '五';
-					case 6:return '六';
-					case 7:return '七';
-					case 8:return '八';
-					case 9:return '九';
-					case 10:return '十';
+			let numStr=num.toString();
+			if(!/^\d+$/.test(numStr)) return num;
+
+			const chars = ['零','一','二','三','四','五','六','七','八','九'];
+			const units = ['','十','百','千'];
+
+			if(numStr.length<=2){//两位数以下单独处理保证效率
+				if(numStr.length==1) return !two&&num==2?'两':chars[num];
+				return (numStr[0]=='1'?'':chars[numStr[0]])+'十'+(numStr[1]=='0'?'':chars[numStr[1]]);
+			}
+
+			numStr=numStr.replace(/(?=(\d{4})+$)/g,',').split(',').filter(Boolean);
+			const handleZero=str=>str.replace(/零{2,}/g,'零').replace(/零+$/g,'');
+			const _transform=str=>{
+				if(str==='0000') return '零';
+				if(!two&&str==='2') return '两';
+				let result='';
+				for(let i=0;i<str.length;i++){
+					let char=chars[+str[i]];
+					const unitIndex=str.length-1-i;
+					let unit=units[unitIndex];
+					if(!two&&char==='二'&&unitIndex>1) char='两'; 
+					if(char==='零') unit='';
+					result+=char+unit;
 				}
+				result=handleZero(result);
+				return result;
 			}
-			if(num<20){
-				return '十'+get.cnNumber(num-10,true);
+			let result='';
+			for(let i=0;i<numStr.length;i++){
+				const part=numStr[i];
+				let char=_transform(part);
+				const unitIndex=numStr.length-1-i;
+				let unit=unitIndex%2?'万':'亿'.repeat(unitIndex/2);
+				if(char==='零') unit='';
+				result+=char+unit;
 			}
-			var x=Math.floor(num/10);
-			return get.cnNumber(x,true)+'十'+(num>10*x?get.cnNumber(num-10*x,true):'');
+			result=handleZero(result);
+			return result;
 		},
 		selectableButtons:sort=>{
 			if(!_status.event.player) return[];
