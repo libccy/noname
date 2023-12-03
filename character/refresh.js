@@ -5693,7 +5693,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					select:2,
 					filter:function(button,player){
-						if(ui.selected.buttons.length) return (typeof ui.selected.buttons[0].link)!=(typeof button.link)
+						if(typeof button.link=='number'&&player.hasSkill('xinpaiyi_'+button.link)) return false;
+						if(ui.selected.buttons.length) return (typeof ui.selected.buttons[0].link)!=(typeof button.link);
 						return true;
 					},
 					backup:function(links){
