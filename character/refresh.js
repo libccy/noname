@@ -5556,8 +5556,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinquanji:{
 				audio:2,
 				trigger:{
-					player:['damageEnd','gainAfter'],
-					global:'loseAsyncAfter',
+					player:['damageEnd'],
+					global:['gainAfter','loseAsyncAfter'],
 				},
 				filter:function(event,player){
 					if(event.name=='damage') return true;
