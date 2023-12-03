@@ -5376,11 +5376,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(player._jsrgzhenqiao_aiChecking) return;
-							if(target==player&&get.subtype(card)=='equip1'&&!player.getEquip(1)){
-								player._jsrgzhenqiao_aiChecking=true;
-								var eff=get.effect(target,card,player,player);
-								delete player._jsrgzhenqiao_aiChecking;
-								if(eff<3) return 'zerotarget';
+							if(target===player&&get.subtype(card)==='equip1'&&!player.getEquip(1)){
+								if(card.name!=='zhuge'||target.getCardUsable('sha')||!target.needsToDiscard()) return;
+								if(target.countCards('hs',i=>{
+									return get.name(i)==='sha'&&lib.filter.cardEnabled(i,target);
+								})>1) return 'zeroplayertarget';
 							}
 						}
 					}
