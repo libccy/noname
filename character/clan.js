@@ -662,7 +662,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanmingjie:{
 				init:function(player){
-					var skill='clanmingjie_'+player.playerid;
+					player.addSkill('clanmingjie_record');
+				},
+				initSkill:function(skill){
 					if(!lib.skill[skill]){
 						lib.skill[skill]={
 							charlotte:true,
@@ -673,7 +675,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						lib.translate[skill]='铭戒';
 						lib.translate[skill+'_bg']='戒';
 					}
-					player.addSkill('clanmingjie_record');
 				},
 				onremove:function(player){
 					player.removeSkill('clanmingjie_record');
@@ -690,6 +691,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('clanmingjie');
 					player.addSkill('clanmingjie_effect');
 					var skill='clanmingjie_'+player.playerid;
+					game.broadcastAll(lib.skill.clanmingjie.initSkill,skill);
 					target.addTempSkill(skill,{player:'phaseAfter'});
 					target.storage[skill]=player;
 				},
