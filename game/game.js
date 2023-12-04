@@ -7838,6 +7838,7 @@ new Promise(resolve=>{
 		/**
 		 * @type {import('path')}
 		 */
+		// @ts-ignore
 		path:{},
 		getErrorTip:msg=>{
 			if(typeof msg!='string'){
@@ -9915,62 +9916,6 @@ new Promise(resolve=>{
 					ui.css.default=lib.init.css(lib.assetURL+'layout/default','layout');
 					proceed2();
 				})};
-				
-				const initGamePromises=function(){
-					game.promises.download=function(url,folder,dev,onprogress){
-						return new Promise((resolve,reject)=>{
-							game.download(url,folder,resolve,reject,dev,onprogress);
-						});
-					};
-
-					game.promises.readFile=function(filename){
-						return new Promise((resolve,reject)=>{
-							game.readFile(filename,resolve,reject);
-						});
-					};
-
-					game.promises.readFileAsText=function(filename){
-						return new Promise((resolve,reject)=>{
-							game.readFileAsText(filename,resolve,reject);
-						});
-					};
-
-					game.promises.writeFile=function(data,path,name){
-						return (new Promise((resolve,reject)=>{
-							game.writeFile(data,path,name,resolve);
-						})).then(result=>{
-							return new Promise((resolve,reject)=>{
-								if(result instanceof Error){
-									reject(result);
-								}else{
-									resolve(result);
-								}
-							});
-						});
-					};
-
-					game.promises.removeFile=function(dir){
-						return (new Promise((resolve,reject)=>{
-							game.removeFile(dir,resolve);
-						})).then(result=>{
-							return new Promise((resolve,reject)=>{
-								if(result instanceof Error){
-									reject(result);
-								}else{
-									resolve(result);
-								}
-							});
-						});
-					};
-
-					game.promises.getFileList=function(dir){
-						return new Promise((resolve,reject)=>{
-							game.getFileList(dir,resolve,reject);
-						});
-					};
-
-					game.promises.ensureDirectory=game.ensureDirectory;
-				};
 
 				if(lib.device){
 					lib.init.cordovaReady=function(){
@@ -10015,8 +9960,8 @@ new Promise(resolve=>{
 							if ("cordova" in window && "plugins" in window.cordova && "permissions" in window.cordova.plugins) {
 								const permissions = cordova.plugins.permissions;
 								const requests = ["WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"]
-								requests.forEach((request) => {
-									permissions.checkPermission(permissions[request], (status) => {
+								requests.forEach(request => {
+									permissions.checkPermission(permissions[request], status => {
 										if (!status.hasPermission) {
 											permissions.requestPermission(permissions[request], lib.other.ignore, lib.other.ignore);
 										}
@@ -10150,7 +10095,6 @@ new Promise(resolve=>{
 								createDirectory();
 							},reject));
 						};
-						initGamePromises();
 						if(ui.updateUpdate){
 							ui.updateUpdate();
 						}
@@ -10335,20 +10279,38 @@ new Promise(resolve=>{
 							createDirectory();
 						});
 					};
-					initGamePromises();
 					if(ui.updateUpdate){
 						ui.updateUpdate();
 					}
 				}
 				else{
-					window.onbeforeunload=function(){
-						if(lib.config.confirm_exit&&!_status.reloading){
+					//为其他自定义平台提供文件读写函数赋值的一种方式。
+					//但这种方式只能修改game的文件读写函数。
+					if(window.initReadWriteFunction){
+						const g={};
+						const ReadWriteFunctionName=['download','readFile','readFileAsText','writeFile','removeFile','getFileList','ensureDirectory','createDir'];
+						ReadWriteFunctionName.forEach(prop=>{
+							Object.defineProperty(g,prop,{
+								configurable:true,
+								get(){ return undefined; },
+								set(newValue) {
+									if(typeof newValue=='function'){
+										delete g[prop];
+										g[prop]=game[prop]=newValue;
+									}
+								}
+							})
+						});
+						window.initReadWriteFunction(g);
+					}
+					window.onbeforeunload = function () {
+						if (lib.config.confirm_exit && !_status.reloading) {
 							return '是否离开游戏？'
 						}
-						else{
+						else {
 							return null;
 						}
-					}
+					};
 				}
 
 				lib.config=window.config;
@@ -36105,10 +36067,95 @@ new Promise(resolve=>{
 		}
 	};
 	const game={
-		/**
-		 * @type { { [key: string]: (...args:[])=>Promise } }
-		 */
-		promises:{},
+		promises:{
+			/**
+			 * 模仿h5的prompt，用于显示可提示用户进行输入的对话框
+			 * 
+			 * 注: 由于参数列表是随意的，在这里我准备限制一下这个函数的参数顺序
+			 * 
+			 * @type {{
+			 *	(title: string, forced?: boolean): Promise<string>;
+			*	(alertOption: 'alert', title: string, forced?: boolean): Promise<string>;
+			 * }}
+			 * 
+			 * @param { string } title 设置prompt标题与input内容
+			 * @param { boolean } [forced] 为true的话将没有"取消按钮"
+			 * @param { string } alertOption 设置prompt是否模拟alert
+			 * @example
+			 * ```js
+			 * // 只设置标题(但是input的初始值就变成了undefined)
+			 * game.promises.prompt('###prompt标题').then(value => console.log(value));
+			 * // 设置标题和input初始内容
+			 * game.promises.prompt('###prompt标题###input初始内容').then(value => console.log(value));
+			 * ```
+			 * @returns { Promise<string> }
+			 */
+			prompt(alertOption,title,forced){
+				return new Promise((resolve,reject)=>{
+					if(alertOption!='alert'){
+						forced=title||false;
+						title=option;
+						game.prompt(title,forced,resolve);
+					}else{
+						game.prompt(alertOption,title,forced,resolve);
+					}
+				});
+			},
+			/**
+			 * 模仿h5的alert，用于显示信息的对话框
+			 * 
+			 * @param { string } title 
+			 * @example
+			 * ```js
+			 * await game.promises.alert('弹窗内容');
+			 * ```
+			 * @returns { Promise<true> }
+			 */
+			alert(title){
+				return new Promise((resolve,reject)=>{
+					game.prompt('alert',title,resolve);
+				});
+			},
+			// 读写函数promises化(不用考虑其对应函数是否存在)
+			download(url,folder,dev,onprogress){
+				return new Promise((resolve,reject)=>{
+					game.download(url,folder,resolve,reject,dev,onprogress);
+				});
+			},
+			readFile(filename){
+				return new Promise((resolve,reject)=>{
+					game.readFile(filename,resolve,reject);
+				});
+			},
+			readFileAsText(filename){
+				return new Promise((resolve,reject)=>{
+					game.readFileAsText(filename,resolve,reject);
+				});
+			},
+			writeFile(data,path,name){
+				return (new Promise((resolve,reject)=>{
+					game.writeFile(data,path,name,resolve);
+				})).then(result=>{
+					return new Promise((resolve,reject)=>{
+						if(result instanceof Error){
+							reject(result);
+						}else{
+							resolve(result);
+						}
+					});
+				});
+			},
+			ensureDirectory(list,callback,file){
+				return new Promise((resolve,reject)=>{
+					game.ensureDirectory(list,callback,file).then(resolve).catch(reject);
+				});
+			},
+			createDir(directory) {
+				return new Promise((resolve,reject)=>{
+					game.createDir(directory,resolve,reject);
+				});
+			},
+		},
 		globalEventHandlers: new class {
 			constructor() {
 				this._handlers = {};
@@ -39660,7 +39707,6 @@ new Promise(resolve=>{
 			for(var i=0;i<arguments.length;i++){
 				if(arguments[i]=='alert'){
 					forced=true;
-					callback=function(){};
 					noinput=true;
 				}
 				else if(typeof arguments[i]=='string'){
@@ -39679,7 +39725,7 @@ new Promise(resolve=>{
 				}
 			}
 			if(!callback){
-				return;
+				callback=function(){};
 			}
 			//try{
 			//	if(noinput){
@@ -39710,16 +39756,18 @@ new Promise(resolve=>{
 				var controls=ui.create.div(dialog);
 				var clickConfirm=function(){
 					if(noinput){
+						//给一个返回值使promise化正常使用
+						callback(true);
 						promptContainer.remove();
 					}
-					else if(input.value){
+					else{
 						callback(input.value);
 						promptContainer.remove();
 					}
 				}
 				var clickCancel=function(){
+					callback(false);
 					if(!forced){
-						callback(false);
 						promptContainer.remove();
 					}
 				}
@@ -39727,7 +39775,7 @@ new Promise(resolve=>{
 				if(!forced){
 					ui.create.div('.menubutton.large','取消',controls,clickCancel);
 				}
-				if(noinput){
+				if(noinput||(str2&&str2.length>0)){
 					confirmNode.classList.remove('disabled');
 				}
 				else{
