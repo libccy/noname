@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			zhangjian:['male','qun',105,['dc_zj_a','dc_zj_b']],
 			zhugeruoxue:['female','wei',3,['dcqiongying','dcnuanhui']],
 			caoyi:['female','wei',4,['dcmiyi','dcyinjun']],
 			malingli:['female','shu',3,['dclima','dcxiaoyin','dchuahuo']],
@@ -100,11 +101,71 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi','dc_xujing'],
 				sp2_qifu:['dc_guansuo','xin_baosanniang','dc_zhaoxiang'],
-				sp2_gaoshan:['wanglang','liuhui'],
+				sp2_gaoshan:['wanglang','liuhui','zhangjian'],
 				sp2_wumiao:['wu_zhugeliang','wu_luxun'],
 			}
 		},
 		skill:{
+			//张臶
+			dc_zj_a:{
+				audio:2,
+				trigger:{player:'damageBegin2'},
+				filter:function(event,player){
+					return event.getParent().type=='card';
+				},
+				forced:true,
+				content:function(){
+					var num=get.number(trigger.card);
+					if(typeof num=='number'&&num>0) trigger.num=num;
+					else trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card,player,target,current){
+							if(get.tag(card,'damage')&&typeof get.number(card)!='number') return 'zeroplayertarget';
+						},
+					},
+				},
+			},
+			dc_zj_b:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				filter:function(event,player){
+					return player.countDiscardableCards(player,'he');
+				},
+				direct:true,
+				content:function*(event,map){
+					var player=map.player;
+					var result=yield player.chooseTarget(get.prompt2('dc_zj_b'),lib.filter.notMe).set('ai',target=>{
+						var player=_status.event.player;
+						if(!player.hasFriend()) return 0;
+						return -game.countPlayer(current=>current.inRange(target)&&get.attitude(current,target)<0&&get.damageEffect(target,current,current)>0);
+					});
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('dc_zj_b',target);
+						player.discard(player.getCards('he')).discarder=player;
+						target.addSkill('dc_zj_a');
+						target.addSkill('dc_zj_b_threaten');
+						player.when('phaseBegin').then(()=>{
+							if(target.isIn()){
+								target.removeSkill('dc_zj_a');
+								target.removeSkill('dc_zj_b_threaten');
+							}
+						}).vars({target:target});
+					}
+				},
+				subSkill:{
+					//定要将你赶尽杀绝
+					threaten:{
+						charlotte:true,
+						mark:true,
+						marktext:'噩',
+						intro:{content:'已经开始汗流浃背了'},
+						ai:{threaten:114514*1919810},
+					},
+				},
+			},
 			//诸葛若雪
 			dcqiongying:{
 				audio:2,
@@ -12691,6 +12752,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterIntro:{
+			zhangjian:'张臶（136年－240年），字子明，钜鹿人。汉末三国时期隐士、音乐家，精通谶纬之学。张臶生活的年代从东汉一直到曹魏齐王时期，受到朝廷多次征召，一直回避，不愿做官。他活了一百零五岁，是三国时期有可靠记载的最长寿的人之一。',
 			puyuan:'蒲元是三国时蜀汉杰出的工匠。为诸葛亮造刀三千口，并且制作木牛流马。后来姜维为他写过两部传记《蒲元传》《蒲元别传》。',
 			guanlu:"管辂（209年－256年），字公明，平原（今山东德州平原县）人。三国时期曹魏术士。年八九岁，便喜仰观星辰。成人后，精通《周易》，善于卜筮、相术，习鸟语，相传每言辄中，出神入化。体性宽大，常以德报怨。正元初，为少府丞。北宋时被追封为平原子。管辂是历史上著名的术士，被后世奉为卜卦观相的祖师。",
 			gexuan:"葛玄（164年-244年），汉族，吴丹阳郡句容县都乡吉阳里人（今句容市），祖籍山东琅琊，三国著名高道，道教灵宝派祖师。字孝先，号仙翁，被尊称为“葛天师”。道教尊为葛仙翁，又称太极仙翁，与张道陵、许逊、萨守坚共为四大天师。为汉下邳僮侯葛艾后裔，祖葛矩，安平太守，黄门郎；从祖葛弥，豫章第五郡太守。父葛焉，字德儒，州主簿，山阴令，散骑常侍，大尚书。随左慈学道，得《太清丹经》、《黄帝九鼎神丹经》、《金液丹经》等道经。曾采药海山，吴嘉禾二年（233年），在閤皂山修道建庵，筑坛立炉，修炼九转金丹。喜好遨游山川，去过括苍山、南岳山、罗浮山。编撰《灵宝经诰》，精研上清、灵宝等道家真经，并嘱弟子世世箓传。",
@@ -13317,6 +13379,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqiongying_info:'出牌阶段限一次。你可以移动场上的一张牌，然后你弃置一张与此牌花色相同的手牌（若没有该花色的手牌则改为展示所有手牌）。',
 			dcnuanhui:'暖惠',
 			dcnuanhui_info:'结束阶段，你可以选择一名装备区有牌的角色，其可以视为依次使用X张基本牌（X为其装备区牌数）。若其以此法使用了至少两张牌，其弃置装备区里的所有牌。',
+			zhangjian:'张臶',
+			dc_zj_a:'技能',
+			dc_zj_a_info:'锁定技。当你受到牌造成的伤害时，若此牌有点数，则你将此伤害值改为此牌点数，否则你防止此伤害。',
+			dc_zj_b:'技能',
+			dc_zj_b_info:'结束阶段，你可以弃置所有牌并令一名其他角色获得〖技能〗直到你的下个回合开始。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
