@@ -1,3 +1,4 @@
+// @ts-nocheck
 // TODO: 补充一点描述
 
 /**
