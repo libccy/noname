@@ -4,9 +4,7 @@ https://spmario233.github.io/noname/index.html (图片素材加载速度较慢�
 
 客户端下载戳这里：
 
-GitHub： https://github.com/libccy/noname/releases/tag/SSS
-
-Coding： https://nakamurayuri.coding.net/p/noname/d/noname/git/releases/SSS
+GitHub： https://github.com/libccy/noname/releases/tag/chromium77-client
 
 网页端推荐使用Chrome系内核浏览器游玩，不推荐使用低版本Firefox浏览器
 

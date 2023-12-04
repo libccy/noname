@@ -950,7 +950,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:['gainAfter','loseAsyncAfter']},
 						forced:true,
 						filter:(event,player)=>{
-							if(player==_status.currentPhase) return false;
+							// if(player==_status.currentPhase) return false;
+							if(event.getParent('phaseDraw',true)) return false;
+							const evt=player.getHistory('gain')[0];
+							if(!evt) return false;
+							if(event.name=='gain'){
+								if(evt!=event||event.getlx===false) return false;
+							}
+							else if(evt.getParent()!=event) return false;
 							const hs=player.getCards('h');
 							if(!hs.length) return false;
 							const cards=event.getg(player);
@@ -998,16 +1005,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.give(cards,target,true);
 					event.color=get.color(cards[0],player);
 					'step 1'
+					if(target.isIn()){
+						var num=Math.min(Math.abs(target.getHp()-player.getHp()),5);
+						if(num>0) player.draw(num);
+					}
+					'step 2'
 					if(event.color=='red'){
 						if(target.getHp()<=player.getHp()&&target.isDamaged()) target.recover();
 					}
 					else if(event.color=='black'){
 						if(target.getHp()>=player.getHp()) target.loseHp()
-					}
-					'step 2'
-					if(target.isIn()){
-						var num=Math.min(Math.abs(target.getHp()-player.getHp()),5);
-						if(num>0) player.draw(num);
 					}
 				},
 				ai:{
@@ -1944,16 +1951,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.draw(2);
 					'step 1'
 					var marked=target.hasMark('dcjizhong');
+					var cards=target.getCards('h');
 					if(marked){
-						if(target.countCards('h')) target.chooseToDiscard('集众：弃置三张手牌',3,true);
-						event.finish();
+						if(cards.length<=3) event._result={bool:true,cards:cards};
+						else target.chooseCard(`集众：交给${get.translation(player)}三张手牌`,3,true);
 					}
 					else{
-						target.chooseToDiscard('集众：弃置三张手牌，或点击“取消”获得“信众”标记',3);
+						target.chooseCard(`集众：交给${get.translation(player)}三张手牌，或点击“取消”获得“信众”标记`,3).set('ai',card=>{
+							if(get.event('goon')) return 20-get.value(card);
+							return 1-get.value(card);
+						}).set('goon',get.attitude(target,player)>0);
 					}
 					'step 2'
 					if(!result.bool){
 						target.addMark('dcjizhong',1);
+					}
+					else{
+						target.give(result.cards,player);
 					}
 				},
 				marktext:'信',
@@ -2035,8 +2049,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				content:function(){
-					player.loseHp();
 					player.draw(2);
+					player.loseHp();
 				}
 			},
 			//董绾
@@ -11291,11 +11305,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmoyu_info:'出牌阶段每名角色限一次。你可以获得一名其他角色区域里的一张牌，然后其可以对你使用一张无距离限制的【杀】，且此【杀】伤害基数为X（X为你于本回合发动此技能的次数）。若此【杀】对你造成了伤害，你令此技能于本回合失效。',
 			zhangchu:'张楚',
 			dcjizhong:'集众',
-			dcjizhong_info:'出牌阶段限一次。你可以令一名其他角色摸两张牌，然后其选择一项：1.若其没有“信众”标记，其获得“信众”标记；2.弃置三张手牌。',
+			dcjizhong_info:'出牌阶段限一次。你可以令一名其他角色摸两张牌，然后其选择一项：1.若其没有“信众”标记，其获得“信众”标记；2.交给你三张手牌。',
 			dcrihui:'日彗',
 			dcrihui_info:'每回合限一次。当你使用普通锦囊牌或黑色基本牌结算结束后，若此牌的目标数为1且目标不为你，且其：没有“信众”，则所有有“信众”的角色依次视为对其使用一张与此牌牌名和属性相同的牌；有“信众”，则你可以获得其区域里的一张牌。',
 			dcguangshi:'光噬',
-			dcguangshi_info:'锁定技。准备阶段，若所有其他角色均有“信众”，你失去1点体力并摸两张牌。',
+			dcguangshi_info:'锁定技。准备阶段，若所有其他角色均有“信众”，你摸两张牌并失去1点体力。',
 			dongwan:'董绾',
 			dcshengdu:'生妒',
 			dcshengdu_info:'回合开始时，你可以选择一名其他角色。当其于其的下个摸牌阶段得到牌后，你摸等量的牌。',
@@ -11344,9 +11358,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yue_zhoufei_prefix:'乐',
 			dclingkong:'灵箜',
 			dclingkong_tag:'箜篌',
-			dclingkong_info:'锁定技。①游戏开始时，你将所有手牌标记为“箜篌”。②你的“箜篌”牌不计入手牌上限。③当你于回合外获得牌后，系统随机将其中的一张牌标记为“箜篌”。',
+			dclingkong_info:'锁定技。①游戏开始时，你将所有手牌标记为“箜篌”。②你的“箜篌”牌不计入手牌上限。③当你于一回合内首次于摸牌阶段外得到牌后，系统随机将其中的一张牌标记为“箜篌”。',
 			dcxianshu:'贤淑',
-			dcxianshu_info:'出牌阶段，你可以将一张“箜篌”正面向上交给一名其他角色。若此牌为红色，且该角色的体力值不大于你，则其回复1点体力；若此牌为黑色，且该角色的体力值不小于你，则其失去1点体力。此技能结算完成后，你摸X张牌（X为你与其的体力值之差且至多为5）。',
+			dcxianshu_info:'出牌阶段，你可以将一张“箜篌”正面向上交给一名其他角色，然后你摸X张牌（X为你与其的体力值之差且至多为5）。若此牌为红色，且该角色的体力值不大于你，则其回复1点体力；若此牌为黑色，且该角色的体力值不小于你，则其失去1点体力。',
 			dc_zhangmancheng:'张曼成',
 			dclvecheng:'掠城',
 			dclvecheng_info:'出牌阶段限一次。你可以选择一名其他角色，你于本回合对其使用当前手牌中的【杀】无任何次数限制。然后回合结束时，其展示所有手牌，若其中有【杀】，其可以选择对你依次使用其中所有的【杀】。',

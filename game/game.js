@@ -125,11 +125,11 @@ new Promise(resolve=>{
 		configprefix:'noname_0.9_',
 		versionOL:27,
 		updateURLS:{
-			coding:'https://raw.fgit.cf/libccy/noname',
+			coding:'https://gitcode.net/sinat_33405273/noname/-/raw/',
 			github:'https://raw.githubusercontent.com/libccy/noname',
 		},
 		updateURL:'https://raw.githubusercontent.com/libccy/noname',
-		mirrorURL:'https://raw.fgit.cf/libccy/noname',
+		mirrorURL:'https://gitcode.net/sinat_33405273/noname/-/raw/',
 		hallURL:'47.99.105.222',
 		assetURL:assetURL,
 		userAgent:userAgent,
@@ -1344,7 +1344,7 @@ new Promise(resolve=>{
 						init:'coding',
 						unfrequent:true,
 						item:{
-							coding:'FastGit',
+							coding:'CSDN',
 							github:'GitHub',
 						},
 						onclick:function(item){
@@ -63673,6 +63673,10 @@ new Promise(resolve=>{
 		const tip='检测到您的浏览器内核版本小于77，请及时升级浏览器或手机webview内核！';
 		console.warn(tip);
 		game.print(tip);
+		const redirect_tip='您使用的浏览器或无名杀客户端内核版本过低，将在未来的版本被废弃！\n点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。';
+		if(confirm(redirect_tip)){
+			window.open('https://github.com/libccy/noname/releases/tag/chromium77-client');
+		}
 	}
 	lib.init.init();
 });
