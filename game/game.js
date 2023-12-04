@@ -22880,6 +22880,7 @@ new Promise(resolve=>{
 					
 					delete this.name;
 					delete this.name1;
+					delete this.tempname;
 					delete this.sex;
 					delete this.group;
 					delete this.hp;
@@ -27797,7 +27798,7 @@ new Promise(resolve=>{
 						if(info.trigger&&this.playerid){
 							const removeTrigger=(role,evt)=>{
 								const name=this.playerid+'_'+role+'_'+evt;
-								if(lib.hook[name]) return;
+								if(!lib.hook[name]) return;
 								lib.hook[name].remove(skill);
 								if(lib.hook[name].length==0) delete lib.hook[name];
 							}
