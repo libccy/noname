@@ -841,15 +841,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					nothunder:true,
 					effect:{
 						target:function(card,player,target,current){
+							if(target.hasSkillTag('unequip2')) return;
 							if(player.hasSkillTag('unequip',false,{
 								name:card?card.name:null,
 								target:player,
 								card:card
+							})||player.hasSkillTag('unequip_ai',false,{
+								name:card?card.name:null,
+								target:target,
+								card:card
 							})) return;
-							if(get.tag(card,'natureDamage')) return 'zerotarget';
-							if(card.name=='tiesuo'){
-								return [0,0];
-							}
+							if(card.name=='tiesuo'||get.tag(card,'natureDamage')) return 'zeroplayertarget';
 						}
 					}
 				}

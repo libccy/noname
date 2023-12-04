@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'collab',
 		connect:true,
 		character:{
+			nezha:['male','qun',2,['dcsantou','dcfaqi']],
 			dc_caocao:['male','wei',4,['dcjianxiong']],
 			dc_liubei:['male','shu',4,['dcrende']],
 			dc_sunquan:['male','wu',4,['dczhiheng']],
@@ -20,7 +21,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_fuhuanghou:['female','qun',3,['spcangni','spmixin']],
 			sp_fuwan:['male','qun',3,['spfengyin','spchizhong']],
 			old_lingju:['female','qun',3,['jieyuan','fenxin_old']],
-			sp_mushun:['male','qun',4,['dcmoukui']],
+			sp_mushun:['male','qun',4,['moukui']],
 		},
 		characterFilter:{
 			old_lingju:function(mode){
@@ -33,10 +34,134 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				collab_tongque:["sp_fuwan","sp_fuhuanghou","sp_jiben","old_lingju",'sp_mushun'],
 				collab_duanwu:['sunwukong','longwang','taoshen'],
 				collab_decade:['libai','xiaoyuehankehan','zhutiexiong','wu_zhutiexiong'],
-				collab_remake:['dc_caocao','dc_liubei','dc_sunquan'],
+				collab_remake:['dc_caocao','dc_liubei','dc_sunquan','nezha'],
 			},
 		},
 		skill:{
+			//哪吒
+			dcsantou:{
+				audio:2,
+				trigger:{player:'damageBegin4'},
+				forced:true,
+				group:'dcsantou_gain',
+				content:function*(event,map){
+					var player=map.player,trigger=map.trigger;
+					var source=trigger.source;
+					trigger.cancel();
+					var hp=player.getHp();
+					var lose=false;
+					if(hp>=3){
+						if(player.hasHistory('useSkill',evt=>{
+							var evtx=evt.event;
+							return evt.skill=='dcsantou'&&evtx.getTrigger().source==source&&evtx.getParent(2)!=trigger;
+						})) lose=true;
+					}
+					else if(hp==2){
+						if(trigger.hasNature()) lose=true;
+					}
+					else if(hp==1){
+						if(trigger.card&&get.color(trigger.card)=='red') lose=true;
+					}
+					if(lose) player.loseHp();
+				},
+				subSkill:{
+					gain:{
+						audio:'dcsantou',
+						trigger:{
+							global:'phaseBefore',
+							player:'enterGame',
+						},
+						forced:true,
+						filter:function(event,player){
+							if(player.maxHp>=3) return false;
+							return (event.name!='phase'||game.phaseNumber==0);
+						},
+						content:function*(event,map){
+							var player=map.player;
+							yield player.gainMaxHp(3-player.maxHp);
+							var num=3-player.getHp(true);
+							if(num>0) player.recover(num);
+						}
+					}
+				},
+				ai:{
+					filterDamage:true,
+					skillTagFilter:function(player,tag,arg){
+						if(arg&&arg.player&&arg.player.hasSkillTag('jueqing',false,player)) return false;
+					},
+					effect:{
+						target:function(card,player,target){
+							if(player.hasSkillTag('jueqing',false,target)) return;
+							if(player._dcsantou_temp) return;
+							if(get.tag(card,'damage')){
+								const hp=target.getHp();
+								if(hp>=3){
+									if(target.hasHistory('useSkill',evt=>evt.skill=='dcsantou'&&evt.event.getTrigger().source==player)) return [1,-2];
+									else if(get.attitude(player,target)<0){
+										if(card.name=='sha') return;
+										let sha=false;
+										player._dcsantou_temp=true;
+										let num=player.countCards('h',card=>{
+											if(card.name=='sha'){
+												if(sha) return false;
+												else sha=true;
+											}
+											return get.tag(card,'damage')&&player.canUse(card,target)&&get.effect(target,card,player,player)>0;
+										});
+										delete player._dcsantou_temp;
+										if(player.hasSkillTag('damage')){
+											num++;
+										}
+										if(num<2){
+											var enemies=player.getEnemies();
+											if(enemies.length==1&&enemies[0]==target&&player.needsToDiscard()){
+												return;
+											}
+											return 0;
+										}
+									}
+								}
+								else if(hp==2&&get.tag(card,'natureDamage')||hp==1&&get.color(card)=='red'&&get.itemtype(card)=='card') return [1,-2];
+								else return 0;
+							}
+						}
+					}
+				},
+			},
+			dcfaqi:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					if(get.type(event.card)!='equip') return false;
+					if(!player.isPhaseUsing()) return false;
+					for(const name of lib.inpile){
+						if(get.type(name)!='trick') continue;
+						if(!player.hasStorage('dcfaqi',name)&&player.hasUseTarget({name:name,isCard:true})) return true;
+					}
+					return false;
+				},
+				direct:true,
+				content:function*(event,map){
+					var player=map.player;
+					var list=get.inpileVCardList(info=>{
+						if(info[0]!='trick') return false;
+						var name=info[2];
+						return !player.hasStorage('dcfaqi',name)&&player.hasUseTarget({name:name,isCard:true});
+					});
+					if(list.length){
+						var result=yield player.chooseButton(['法器：视为使用一张普通锦囊牌',[list,'vcard']],true).set('ai',button=>{
+							return get.player().getUseValue({name:button.link[2]});
+						});
+						if(result.bool){
+							var name=result.links[0][2];
+							if(!player.storage.dcfaqi) player.when({global:'phaseAfter'}).then(()=>delete player.storage.dcfaqi);
+							player.markAuto('dcfaqi',name);
+							player.chooseUseTarget({name:name,isCard:true},true,false).logSkill='dcfaqi';
+						}
+					}
+					else event.finish();
+				}
+			},
 			//隅泣曹操
 			dcjianxiong:{
 				audio:'rejianxiong',
@@ -359,8 +484,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return card!=card2&&get.number(card2,player)<num;
 						})
 					}).set('ai',function(card){
-					 var player=_status.event.player;
-					 return 1+Math.max(0,player.getUseValue(card,null,true))
+						var player=_status.event.player;
+						return 1+Math.max(0,player.getUseValue(card,null,true))
 					})
 					'step 1'
 					if(result.bool){
@@ -598,31 +723,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
-				content_old:function(){
-					'step 0'
-					if(lib.skill.dcshixian.filterx(trigger)){
-						player.chooseControl('cancel2').set('choiceList',[
-							'摸一张牌',
-							'令'+get.translation(trigger.card)+'额外结算一次',
-						]).set('prompt',get.prompt('dcsitian'));
+				init:function(player){
+					player.addSkill('dcshixian_yayun');
+					var history=player.getAllHistory('useCard');
+					if(history.length){
+						player.addGaintag(player.getCards('h',card=>{
+							return get.is.yayun(get.translation(card.name),get.translation(history[history.length-1].card.name));
+						}),'dcshixian_yayun');
 					}
-					else{
-						player.chooseBool('是否发动【诗仙】摸一张牌？').set('frequentSkill','dcshixian');
-					}
-					'step 1'
-					if(result.control){
-						if(result.index==0){
-							player.logSkill('dcshixian');
-							player.draw();
-						}
-						else if(result.index==1){
-							trigger.effectCount++;
-						}
-					}
-					else if(result.bool){
-						player.logSkill('dcshixian');
-						player.draw();
-					}
+				},
+				onremove:function(player){
+					player.removeSkill('dcshixian_yayun');
+					player.removeGaintag('dcshixian_yayun');
+				},
+				subSkill:{
+					yayun:{
+						charlotte:true,
+						trigger:{player:'useCard1'},
+						filter:function(event,player){
+							return player.countCards('h');
+						},
+						direct:true,
+						priority:11+45+14+19+19+810,
+						content:function(){
+							'step 0'
+							player.removeGaintag('dcshixian_yayun');
+							'step 1'
+							player.addGaintag(player.getCards('h',card=>{
+								return get.is.yayun(get.translation(card.name),get.translation(trigger.card.name));
+							}),'dcshixian_yayun');
+						},
+					},
 				},
 			},
 			//龙王
@@ -819,11 +950,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target.isIn()){
 								var num=target.countCards('e');
 								if(num>0){
-								 player.discardPlayerCard(target,true,'e',num)
+									player.discardPlayerCard(target,true,'e',num)
 								}
 								else{
-								 target.loseHp();
-								 game.delayex();
+									target.loseHp();
+									game.delayex();
 								}
 							}
 							if(targets.length>0) event.redo();
@@ -860,11 +991,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.line(target,'green');
 								var num=target.countCards('h');
 								if(num>0){
-								 player.discardPlayerCard(target,true,'h',num)
+									player.discardPlayerCard(target,true,'h',num)
 								}
 								else{
-								 target.loseHp();
-								 game.delayex();
+									target.loseHp();
+									game.delayex();
 								}
 							}
 						},
@@ -1281,9 +1412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseDrawRecover('###'+get.prompt('spcangni')+'###摸两张牌或回复1点体力，然后将武将牌翻面',2).set('ai',function(){
-						return 'cancel2';
-					}).logSkill='spcangni';
+					player.chooseDrawRecover('###'+get.prompt('spcangni')+'###摸两张牌或回复1点体力，然后将武将牌翻面',2).logSkill='spcangni';
 					'step 1'
 					if(result.control!='cancel2') player.turnOver();
 				},
@@ -1479,6 +1608,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(stat==0) return Math.random()<0.7;
 							return false;
 					}
+					return false;
 				},
 				prompt:function(event,player){
 					return '焚心：是否与'+get.translation(event.player)+'交换身份？';
@@ -1508,6 +1638,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiben:'吉本（？—218年），东汉末年太医令。建安二十三年春正月，时金祎自以世为汉臣，睹汉祚将移，谓可季兴，乃喟然发愤，遂与太医令本、少府耿纪、司直韦晃、本子邈、邈弟穆等结谋攻许，杀曹公长史王必，南援刘备。后必营，必与典农中郎将严匡讨斩之。在《三国演义》中，吉本在此为吉平或吉太，因字称平，故又唤作吉平。曾参与董承等人刺杀曹操的计划，并企图在为曹操治病时毒死曹操，但被曹操识破而遭处刑。之后其子吉邈和吉穆都参与了由耿纪和韦晃等人所发动的反叛曹操的行动，但都失败被杀。',
 			xiaoyuehankehan:'小约翰可汗，知乎答主，<style type="text/css">#xiaoyuehankehan_bilibili:link, #xiaoyuehankehan_bilibili:visited {color:white;}</style><a id="xiaoyuehankehan_bilibili" href="https://space.bilibili.com/23947287" target="_blank">bilibili知识区up主</a>，其视频以介绍冷门国家和名人为主，因其视频极具特色的幽默风格而知名。代表作包括《奇葩小国》系列和《硬核狠人》系列。昵称里的“小约翰”来源于《纸牌屋》里的主角弗朗西斯·厄克特的外号Little John。家乡在内蒙古通辽市，在《奇葩小国》系列视频中，介绍小国面积和人口时，常用通辽市的面积和人口作为计量单位，后简化为T。1T=6万平方公里或287万人（如：阿富汗面积约为64万平方公里，超过10T）。此梗成为该系列视频的特色之一，可汗也因此被称为“通辽可汗”。',
 			zhutiexiong:'朱铁雄，福建莆田人，1994年出生，短视频创作者。中国魔法少年的英雄梦，国风变装的热血与浪漫。抖音年度高光时刻作者，国风变装现象级人物。创玩节期间化身三国杀武将，来一场热血变身！',
+			nezha:'哪吒是中国神话中的民俗神之一，在古典名著《西游记》《封神演义》等及其衍生作品中也多有登场。传说中，哪吒是托塔天王李靖的第三子。哪吒之母怀胎三年，而哪吒出生之时是一个肉球，李靖惊怒之下，用剑劈开了肉球，而哪吒就在肉球中。哪吒广泛流传于道教以及民间传说中，被称为三坛海会大神、威灵显圣大将军、中坛元帅等，民间俗称“三太子”，又常冠其父姓，称为“李哪吒”。哪吒的原型为佛教护法神“那咤”。在不同作品的设定中，哪吒的师承关系有所不同，比如《封神演义》中，哪吒是太乙真人的弟子、元始天尊的徒孙，而《西游记》之中，哪吒则是释迦牟尼（如来佛祖）的弟子。在传说中，哪吒的形象常被形容为可化作三头六臂（封神之中是三头八臂），使用多种武器战斗。比如，《封神演义》中哪吒使用的武器（法宝）为乾坤圈、混天绫、火尖枪和风火轮等，西游记中是斩妖剑、砍妖刀、缚妖索、降妖杵、绣球儿、火轮儿。而哪吒第一次死后被其师父（太乙真人或如来佛祖）以莲花和莲藕复活。',
 		},
 		card:{
 			ruyijingubang:{
@@ -1565,6 +1696,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclbjiuxian:'酒仙',
 			dclbjiuxian_info:'①你可以将额定目标数大于1的锦囊牌当做【酒】使用。②你使用【酒】无次数限制。',
 			dcshixian:'诗仙',
+			dcshixian_yayun:'押韵',
 			dcshixian_info:'当你使用一张牌时，若此牌的牌名与你于本局游戏使用的上一张牌的牌名押韵，则你可以摸一张牌，并令此牌额外结算一次。',
 			taoshen:'涛神',
 			dcnutao:'怒涛',
@@ -1615,6 +1747,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_sunquan_prefix:'经典',
 			dczhiheng:'制衡',
 			dczhiheng_info:'①出牌阶段限一次。你可以弃置任意张牌并摸等量的牌，若你在发动〖制衡〗时弃置了所有手牌，则你多摸一张牌。②每回合每名角色限一次。当你对其他角色造成伤害后，你令〖制衡①〗于此回合发动次数上限+1。',
+			nezha:'哪吒',
+			dcsantou:'三头',
+			dcsantou_info:'锁定技。①当你受到伤害时，防止之，然后若以下有条件成立，你失去1点体力：1.你于本回合此前以此法防止过该伤害来源的伤害，且你的体力值不小于3；2.本次伤害为属性伤害，且你的体力值为2；3.本次伤害的渠道为红色的牌，且你的体力值为1。②游戏开始时，若你的体力上限小于3，你将体力上限加至3并将体力回复至3。',
+			dcfaqi:'法器',
+			dcfaqi_info:'当你于出牌阶段使用装备牌结算结束后，你视为使用一张本回合未以此法使用过的普通锦囊牌。',
 			
 			collab_olympic:'OL·伦敦奥运会',
 			collab_tongque:'OL·铜雀台',

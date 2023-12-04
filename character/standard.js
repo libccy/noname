@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			old_re_lidian:['male','wei',3,['xunxun','wangxi']],
+			old_re_lidian:['male','wei',3,['xunxun','wangxi'],['die_audio:lidian']],
 			ganfuren:['female','shu',3,['stdshushen','shenzhi']],
 			std_panfeng:['male','qun',4,['stdkuangfu']],
 			caocao:['male','wei',4,['jianxiong','hujia'],['zhu']],
@@ -532,7 +532,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseDrawBegin2'},
 				check:function(event,player){
-					if(player.countCards('h')<3) return false;
+					if(player.skipList.includes('phaseUse')||player.countCards('h')<3) return false;
 					if(!player.hasSha()) return false;
 					return game.hasPlayer(function(current){
 						return get.attitude(player,current)<0&&player.canUse('sha',current);
@@ -649,7 +649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						animate:'draw',
 					}).setContent('gaincardMultiple');
 					'step 6'
-					if(event.count>0&&player.hasSkill(event.name)){
+					if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
 						player.chooseBool(get.prompt2(event.name)).set('frequentSkill',event.name);
 					}
 					else event.finish();
@@ -1114,9 +1114,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			paoxiao:{
 				audio:2,
 				firstDo:true,
-				audioname2:{old_guanzhang:'old_fuhun'},
 				audioname:['re_zhangfei','guanzhang','xiahouba'],
-				audioname2:{
+				audioname2: {
+					old_guanzhang:'old_fuhun',
 					dc_xiahouba:'paoxiao_xiahouba',
 				},
 				trigger:{player:'useCard1'},
@@ -1937,7 +1937,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.count--;
 					player.draw(2);
 					"step 2"
-					if(event.count>0){
+					if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
 						player.chooseBool(get.prompt2('xiaoji')).set('frequentSkill','xiaoji').ai=lib.filter.all;
 					}
 					"step 3"
@@ -2539,14 +2539,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_zhangliao:['sp_zhangliao','yj_zhangliao','jsrg_zhangliao'],
 			xiahoudun:['xiahoudun','re_xiahoudun','xin_xiahoudun'],
 			liubei:['liubei','re_liubei','sb_liubei','dc_liubei','junk_liubei'],
-			guanyu:['guanyu','re_guanyu','ps_guanyu'],
+			guanyu:['guanyu','re_guanyu','ps_guanyu','old_guanyu'],
 			zhangfei:['zhangfei','re_zhangfei','old_zhangfei','xin_zhangfei','sb_zhangfei','tw_zhangfei','jsrg_zhangfei','yj_zhangfei'],
 			zhaoyun:['zhaoyun','re_zhaoyun','old_zhaoyun','sb_zhaoyun','ps2063_zhaoyun','ps2067_zhaoyun'],
 			sp_zhaoyun:['sp_zhaoyun','jsp_zhaoyun'],
 			machao:['machao','re_machao','sb_machao','ps_machao'],
 			sp_machao:['sp_machao','dc_sp_machao','jsrg_machao','old_machao'],
-			zhugeliang:['zhugeliang','re_zhugeliang','ps2066_zhugeliang','ps_zhugeliang'],
-			huangyueying:['huangyueying','re_huangyueying','junk_huangyueying'],
+			zhugeliang:['zhugeliang','re_zhugeliang','ps2066_zhugeliang','ps_zhugeliang','sb_zhugeliang'],
+			huangyueying:['huangyueying','re_huangyueying','junk_huangyueying','sb_huangyueying'],
 			sunquan:['sunquan','re_sunquan','sb_sunquan','dc_sunquan'],
 			zhouyu:['zhouyu','re_zhouyu','sb_zhouyu','ps1062_zhouyu','ps2080_zhouyu'],
 			luxun:['luxun','re_luxun'],

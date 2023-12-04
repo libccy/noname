@@ -48,7 +48,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return get.type(card)=='equip'&&!cards.contains(card);
 						});
 						if(cardx) cards.push(cardx);
-					};
+					}
 					if(!cards.length){
 						event.finish();
 						event.getParent().excluded.addArray(game.players);
@@ -115,11 +115,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(dialog.buttons[i].link==card){
 							button=dialog.buttons[i];
 							button.querySelector('.info').innerHTML=function(target){
- 							if(target._tempTranslate) return target._tempTranslate;
- 							var name=target.name;
- 							if(lib.translate[name+'_ab']) return lib.translate[name+'_ab'];
- 							return get.translation(name);
- 						}(target);
+								if(target._tempTranslate) return target._tempTranslate;
+								var name=target.name;
+								if(lib.translate[name+'_ab']) return lib.translate[name+'_ab'];
+								return get.translation(name);
+							}(target);
 							dialog.buttons.remove(button);
 							break;
 						}
@@ -701,7 +701,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							player.$throw(card);
 							game.log(card,'进入了弃牌堆');
 							delete _status.jinhe[es[i].cardid];
-						};
+						}
 					}
 					game.broadcastAll(function(jinhe){
 						_status.jinhe=jinhe;
@@ -784,7 +784,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							name:card?card.name:null,
 							target:target,
 							card:card
-						})) return false;
+						})){
+							const cards=player.getEquips('yexingyi');
+							if(player.hasSkill('yexingyi_skill',null,false)||!card.cards||!cards.some(cardx=>card.cards.includes(cardx)||ui.selected.cards.includes(cardx))) return false;
+						}
 					},
 				},
 			},

@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'yingbian',
 		connect:true,
 		character:{
+			chengjichengcui:['male','jin',6,['oltousui','olchuming']],
 			wangxiang:['male','jin',3,['bingxin']],
 			jin_jiachong:['male','jin',3,['xiongshu','jianhui']],
 			xuangongzhu:['female','jin',3,['gaoling','qimei','ybzhuiji'],['hiddenSkill']],
@@ -30,13 +31,160 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			yingbian:{
 				yingbian_pack1:['jin_simayi','jin_zhangchunhua','ol_lisu','simazhou','cheliji','ol_huaxin'],
-				yingbian_pack2:['jin_simashi','jin_xiahouhui','zhanghuyuechen','shibao','jin_yanghuiyu'],
+				yingbian_pack2:['jin_simashi','jin_xiahouhui','zhanghuyuechen','shibao','jin_yanghuiyu','chengjichengcui'],
 				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan','xuangongzhu'],
 				yingbian_pack4:['zhongyan','xinchang','jin_jiachong','wangxiang'],
 				yingbian_pack5:['yangyan','yangzhi'],
 			},
 		},
 		skill:{
+			//二成
+			oltousui:{
+				audio:2,
+				enable:'chooseToUse',
+				viewAsFilter:function(player){
+					return player.countCards('he');
+				},
+				viewAs:{
+					name:'sha',
+					suit:'none',
+					number:null,
+					isCard:true,
+				},
+				filterCard:true,
+				selectCard:[1,Infinity],
+				position:'he',
+				check:function(card){
+					const player=get.player();
+					return 4.5+(player.hasSkill('olchuming')?1:0)-1.5*ui.selected.cards.length-get.value(card);
+				},
+				popname:true,
+				ignoreMod:true,
+				precontent:function*(event,map){
+					var player=map.player;
+					var evt=event.getParent();
+					if(evt.dialog&&typeof evt.dialog=='object') evt.dialog.close();
+					player.logSkill('oltousui');
+					delete event.result.skill;
+					var cards=event.result.cards;
+					player.loseToDiscardpile(cards,ui.cardPile,false,'blank').log=false;
+					var shownCards=cards.filter(i=>get.position(i)=='e'),handcardsLength=cards.length-shownCards.length;
+					if(shownCards.length){
+						player.$throw(shownCards,null);
+						game.log(player,'将',shownCards,'置于了牌堆底');
+					}
+					if(handcardsLength>0){
+						player.$throw(handcardsLength,null);
+						game.log(player,'将',get.cnNumber(handcardsLength),'张牌置于了牌堆底');
+					}
+					game.delayex();
+					var viewAs=new lib.element.VCard({name:event.result.card.name,isCard:true});
+					event.result.card=viewAs;
+					event.result.cards=[];
+					event.result._apply_args={
+						shanReq:cards.length,
+						oncard:()=>{
+							var evt=get.event();
+							for(var target of game.filterPlayer(null,null,true)){
+								var id=target.playerid;
+								var map=evt.customArgs;
+								if(!map[id]) map[id]={};
+								map[id].shanRequired=evt.shanReq;
+							}
+						}
+					};
+				},
+				ai:{
+					order:function(item,player){
+						return get.order({name:'sha'})+0.1;
+					},
+					result:{player:1},
+					keepdu:true,
+					respondSha:true,
+					skillTagFilter:(player,tag,arg)=>{
+						if(tag=='respondSha'&&arg!='use') return false;
+					},
+				},
+			},
+			olchuming:{
+				audio:2,
+				trigger:{
+					source:'damageBegin1',
+					player:'damageBegin3',
+				},
+				filter:function(event,player){
+					return event.source!=event.player;
+				},
+				forced:true,
+				content:function*(event,map){
+					var player=map.player,trigger=map.trigger;
+					if(!trigger.card||!trigger.cards.length){
+						trigger.num++;
+						event.finish();
+						return;
+					}
+					else{
+						var target=trigger[trigger.source==player?'player':'source'];
+						trigger._olchuming=true;
+						target.addTempSkill('olchuming_effect');
+					}
+				},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(!get.tag(card,'damage')) return;
+							if(!lib.card[card.name]||!card.cards||!card.cards.length) return [1,0,1,-1];
+							return [1,-1];
+						},
+					},
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						trigger:{global:'phaseEnd'},
+						forced:true,
+						popup:false,
+						content:function*(event,map){
+							var player=map.player;
+							var mapx={};
+							var history=player.getHistory('damage').concat(player.getHistory('sourceDamage'));
+							history.forEach(evt=>{
+								if(!evt._olchuming) return;
+								var target=evt[evt.source==player?'player':'source'];
+								if(!target.isIn()) return;
+								var cards=evt.cards.filterInD('d');
+								if(!cards.length) return;
+								if(!mapx[target.playerid]) mapx[target.playerid]=[];
+								mapx[target.playerid].addArray(cards);
+							});
+							var entries=Object.entries(mapx).map(entry=>{
+								return [(_status.connectMode?lib.playerOL:game.playerMap)[entry[0]],entry[1]];
+							});
+							if(!entries.length){
+								event.finish();
+								return;
+							}
+							player.logSkill('olchuming_effect',entries.map(i=>i[0]));
+							entries.sort((a,b)=>lib.sort.seat(a[0],b[0]));
+							for(var entry of entries){
+								var current=entry[0],cards=entry[1];
+								var list=['jiedao','guohe'].filter(i=>player.canUse(new lib.element.VCard({name:i,cards:cards}),current,false));
+								if(!list.length) return;
+								var result=({});
+								if(list.length==1) result={bool:true,links:[['','',list[0]]]};
+								else result=yield player.chooseButton([`畜鸣：请选择要对${get.translation(current)}使用的牌`,[list,'vcard']],true).set('ai',button=>{
+									var player=get.player();
+									return get.effect(get.event('currentTarget'),{name:button.link[2]},player,player);
+								}).set('currentTarget',current);
+								if(result.bool){
+									var card=get.autoViewAs({name:result.links[0][2]},cards);
+									if(player.canUse(card,current,false)) player.useCard(card,cards,current,false);
+								}
+							}
+						}
+					}
+				}
+			},
 			bingxin:{
 				audio:2,
 				enable:'chooseToUse',
@@ -295,7 +443,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
-				logTarget:'target',
 				marktext:'嫕',
 				intro:{
 					markcount:'expansion',
@@ -531,7 +678,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(trigger.name=='lose'){
 						for(var i in trigger.gaintag_map){
 							if(trigger.gaintag_map[i].contains('huaiyuanx')) num++;
-						};
+						}
 					}
 					else player.getHistory('lose',function(evt){
 						if(trigger!=evt.getParent()) return false;
@@ -588,7 +735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						locked:false,
 						filter:function(event,player){
-						 return (event.name!='phase'||game.phaseNumber==0)&&player.countCards('h')>0;
+							return (event.name!='phase'||game.phaseNumber==0)&&player.countCards('h')>0;
 						},
 						content:function(){
 							var hs=player.getCards('h');
@@ -2671,7 +2818,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var type=get.type(card);
 					return (type=='basic'||type=='trick');
 				},
-				log:false,
 				visible:true,
 				filterTarget:function(card,player,target){
 					return target!=player&&target.hasZhuSkill('ruilve',player)&&!target.hasSkill('ruilve3');
@@ -3588,9 +3734,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xuangongzhu:'高陵宣公主（？—？）司马氏，晋宣帝司马懿第二女。司马氏下嫁杜预。其侄司马炎登基时，司马氏已经去世。泰始年间（265年—274年）追赠高陵公主。',
 			jin_guohuai:'郭槐（237年-296年），字媛韶，太原阳曲（今山西太原）人，魏晋权臣贾充的妻子。父亲是曹魏城阳郡太守郭配，伯父是曹魏名将郭淮。出身太原郭氏。二十一岁时，嫁贾充作继室，生二女二子，长女贾南风，次女贾午，一子贾黎民。贾南风是西晋惠帝司马衷皇后，干预国政，专权误国，直接导致“八王之乱”和西晋亡国。',
 			wangxiang:'王祥（184年，一作180年－268年4月30日），字休徵。琅邪临沂（今山东省临沂市西孝友村）人。三国曹魏及西晋时大臣。王祥于东汉末隐居二十年，在曹魏，先后任县令、大司农、司空、太尉等职，封爵睢陵侯。西晋建立，拜太保，进封睢陵公。泰始四年四月戊戌日（268年4月30日）去世，年八十五（一作八十九），谥号“元”。有《训子孙遗令》一文传世。王祥侍奉后母朱氏极孝，为传统文化中二十四孝之一“卧冰求鲤”的主人翁。',
+			chengjichengcui:'成倅、成济（？～260年6月21日），扬州丹阳（今安徽省宣城市）人。三国时期曹魏将领。依附于司马氏家族，得到司马昭的心腹贾充指使，刺死魏帝曹髦。司马昭为平息众怒，将成倅、成济兄弟二人杀死。据《魏氏春秋》记载，成济兄弟不服罪，光着身子跑到屋顶，大骂司马昭，被军士从下乱箭射杀。',
 		},
 		characterTitle:{},
-		perfectPair:{},
 		characterFilter:{},
 		dynamicTranslate:{},
 		perfectPair:{
@@ -3805,6 +3951,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiaoyan_info:'锁定技，当你于回合外受到其他角色造成的伤害时，若你：有“珠”，则你令伤害来源获得“珠”；没有“珠”，则你防止此伤害，然后摸一张牌，并将一张牌正面朝上置于武将牌上，称为“珠”。',
 			xianzhu:'献珠',
 			xianzhu_info:'锁定技，出牌阶段开始时，你令一名角色A获得“珠”。若A不为你自己，则你选择A攻击范围内的一名角色B，视为A对B使用一张【杀】。',
+			chengjichengcui:'成济成倅',
+			oltousui:'透髓',
+			oltousui_info:'你可以将任意张牌置于牌堆底，视为使用一张需使用等量张【闪】抵消的【杀】。',
+			olchuming:'畜鸣',
+			olchuming_info:'锁定技。当你对其他角色造成伤害时，或当你受到其他角色造成的伤害时，若此伤害的渠道不为牌或没有对应的实体牌，此伤害+1，否则其于本回合结束时将所有以此法造成伤害的牌当【借刀杀人】或【过河拆桥】对你使用。',
 
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',

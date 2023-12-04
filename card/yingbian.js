@@ -19,18 +19,21 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				defaultYingbianEffect:'add',
 				content:function(){
 					var dist=get.distance(player,target);
-					if(dist>1||card.yingbian_all) player.discardPlayerCard(target,'hej',true);
-					if(dist<=1||card.yingbian_all) player.gainPlayerCard(target,'hej',true);
+					if(dist>1||card.yingbian_all) player.discardPlayerCard(target,'hej',true).set('target',target).set('ai',lib.card.guohe.ai.button);
+					if(dist<=1||card.yingbian_all) player.gainPlayerCard(target,'hej',true).set('target',target).set('ai',lib.card.shunshou.ai.button);
 				},
 				fullskin:true,
 				postAi:function(targets){
 					return targets.length==1&&targets[0].countCards('j');
 				},
 				ai:{
-					wuxie:function(target,card,player,viewer){
-						if(get.attitude(viewer,player)>0&&get.attitude(viewer,target)>0){
-							return 0;
-						}
+					wuxie:function(target,card,player,viewer,status){
+						if(status*get.attitude(viewer,player)>0&&!player.isMad()) return 0;
+						if(!card.yingbian_all&&get.distance(player,target)>1&&!target.hasCard(i=>{
+							let val=get.value(i,target),subtypes=get.subtypes(i);
+							if(val<8&&target.hp<2&&!subtypes.includes('equip2')&&!subtypes.includes('equip5')) return false;
+							return val>3+Math.min(5,target.hp);
+						},'e')&&target.countCards('h')*_status.event.getRand('guohe_wuxie')>1.57) return 0;
 					},
 					yingbian:function(card,player,targets,viewer){
 						if(get.attitude(viewer,player)<=0) return 0;
@@ -60,8 +63,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					basic:{
 						order:7.5,
-						useful:4,
-						value:9
+						useful:(card,i)=>9.6/(2+i),
+						value:(card,player)=>{
+							let max=0;
+							game.countPlayer(cur=>{
+								let dist=get.distance(player,cur);
+								if(dist>1||card.yingbian_all) max=Math.max(max,lib.card.shunshou.ai.result.target(player,cur)*get.attitude(player,cur));
+								else max=Math.max(max,lib.card.guohe.ai.result.target(player,cur)*get.attitude(player,cur));
+							});
+							if(max<=0) return 7;
+							if(card.yingbian_all) return 0.75*max;
+							return 0.6*max;
+						}
 					},
 					result:{
 						target:function(player,target){
@@ -238,7 +251,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip5',
-				loseDelay:false,
 				skills:['tianjitu_skill'],
 				onLose:function(){
 					player.addTempSkill('tianjitu_skill_lose')
@@ -582,46 +594,43 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						player:function(card,player,target){
-							if(typeof card!='object'||!target||get.name(card)!='sha'&&(get.type(card)!='trick'||(get.color(card)!='black'&&!get.tag(card,'damage')))) return;
-							var info=get.info(card);
-							var targets=[];
+							if(typeof card!=='object'||!target||get.name(card)!=='sha'&&(get.type(card)!=='trick'||get.color(card)!=='black'&&!get.tag(card,'damage'))) return;
+							if(!target.hasSkill('heiguangkai_skill')||target.hasSkillTag('unequip2')||player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:target,
+								card:card,
+							})||player.hasSkillTag('unequip_ai',false,{
+								name:card?card.name:null,
+								target:target,
+								card:card,
+							})) return;
+							let targets=[],evt=_status.event.getParent('useCard');
 							targets.addArray(ui.selected.targets);
-							var evt=_status.event.getParent('useCard');
 							if(evt&&evt.card==card) targets.addArray(evt.targets);
 							if(targets.length){
-								if(!targets.contains(target)){
-									if(target.hasSkill('heiguangkai_skill')&&!target.hasSkillTag('unequip2')&&!player.hasSkillTag('unequip',false,{
-										name:card?card.name:null,
-										target:target,
-										card:card,
-									})&&!player.hasSkillTag('unequip_ai',false,{
-										name:card?card.name:null,
-										target:target,
-										card:card,
-									})) return 'zerotarget';
-								}
-								else{
-									if(targets.length>1) return;
-									if(info.selectTarget!=-1&&targets[0].hasSkill('heiguangkai_skill')&&!targets[0].hasSkillTag('unequip2')&&!player.hasSkillTag('unequip',false,{
-										name:card?card.name:null,
-										target:targets[0],
-										card:card,
-									})&&!player.hasSkillTag('unequip_ai',false,{
-										name:card?card.name:null,
-										target:targets[0],
-										card:card,
-									})) return 'zerotarget';
-								}
+								if(targets.length>1||!targets.includes(target)) return 'zeroplayertarget';
+								return;
 							}
-							if(target.hasSkill('heiguangkai_skill')&&!target.hasSkillTag('unequip2')&&!player.hasSkillTag('unequip',false,{
-								name:card?card.name:null,
-								target:target,
-								card:card,
-							})&&!player.hasSkillTag('unequip_ai',false,{
-								name:card?card.name:null,
-								target:target,
-								card:card,
-							})) return [1,0,0.7,0];
+							let info=get.info(card);
+							if(!info||info.notarget||!info.filterTarget) return;
+							let range,select=get.copy(info.selectTarget),filter;
+							if(select===undefined) range=[1,1];
+							else if(typeof select==='number') range=[select,select];
+							else if(get.itemtype(select)==='select') range=select;
+							else if(typeof select==='function') range=select(card,player);
+							if(info.singleCard) range=[1,1];
+							game.checkMod(card,player,range,'selectTarget',player);
+							if(range[1]<-1) range=[1, 1];
+							else if(range[0]<0){
+								if(info.filterTarget===true) filter=game.players.length;
+								else filter=game.countPlayer(current=>{
+									return info.filterTarget(card,player,current);
+								});
+								range=[filter,filter];
+							}
+							if(!range) return;
+							if(range[0]>1&&range[1]>1) return 'zeroplayertarget';
+							return [1,0,0.7,0];
 						},
 					},
 				},

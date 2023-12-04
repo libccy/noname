@@ -68,6 +68,7 @@ window.noname_source_list=[
 	'game/pressure.js',
 	'game/source.js',
 	'game/update.js',
+	'game/src/lib/announce.js',
 	'image/card/cardtempname_bg.png',
 	'image/flappybird/BG.png',
 	'image/flappybird/botpipe.png',

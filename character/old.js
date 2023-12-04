@@ -411,12 +411,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'jiefan',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return event.type=='dying'&&_status.currentPhase&&_status.currentPhase.isIn()&&!event.oldjiefan;
+					return event.type=='dying'&&_status.currentPhase&&_status.currentPhase.isIn();
 				},
 				direct:true,
 				content:function(){
-					'step 0'
-					if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
 					player.chooseToUse(function(card,player,event){
 						if(get.name(card)!='sha') return false;
 						return lib.filter.filterCard.apply(this,arguments);
@@ -425,13 +423,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return lib.filter.filterTarget.apply(this,arguments);
 					}).set('logSkill','oldjiefan').set('oncard',function(){
 						_status.event.player.addTempSkill('oldjiefan_recover');
+					}).set('custom',{
+						add:{},
+						replace:{
+							window:()=>{
+								ui.click.cancel();
+							}
+						},
 					});
-					'step 1'
-					if(!result.bool){
-						var evt=event.getParent(2);
-						evt.oldjiefan=true;
-						evt.goto(0);
-					}
 				},
 				ai:{
 					save:true,
@@ -440,7 +439,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					recover:{
-						audio:'jiefan',
+						// audio:'jiefan',
 						trigger:{source:'damageBegin2'},
 						filter:function(event,player){
 							return event.getParent(4).name=='oldjiefan';
@@ -520,7 +519,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			old_guhuo:{
 				audio:2,
-				group:['old_guhuo_guess'],
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
 					return (lib.inpile.contains(name)&&player.countCards('hs')>0);
@@ -636,6 +634,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							precontent:function(){
 								player.logSkill('old_guhuo');
+								player.addTempSkill('old_guhuo_guess');
 								var card=event.result.cards[0];
 								event.result.card.suit=get.suit(card);
 								event.result.card.number=get.number(card);

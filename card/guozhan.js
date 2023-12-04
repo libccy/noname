@@ -474,12 +474,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					else target.chooseControl('discard_card','take_damage',function(event,player){
-						if(get.damageEffect(player,event.player,player,'thunder')>=0){
-							return 'take_damage';
-						}
-						if(player.hp>=3&&player.countCards('e')>=2){
-							return 'take_damage';
-						}
+						let eff=get.damageEffect(player,event.player,player,'thunder');
+						if(eff>0) return 'take_damage';
+						if(player.hasSkillTag('noe')) return 'discard_card';
+						if(!eff) return 'take_damage';
+						if(player.isDamaged()&&player.hasCard((card)=>get.name(card)=='baiyin'&&get.recoverEffect(player,player,_status.event.player)>0,'e')) return 'discard_card';
+						if(player.hasCard((card)=>get.value(card,player)<=0,'e')&&!player.hasCard((card)=>get.value(card,player)>Math.max(7,12-player.hp),'e')) return 'discard_card';
+						if(player.hp>2&&player.countCards('e')>2||player.hp>1&&player.countCards('e')>3) return 'take_damage';
 						return 'discard_card';
 					}).set('prompt','水淹七军').set('prompt2','请选择一项：⒈弃置装备区里的所有牌；⒉受到'+get.translation(player)+'造成的1点雷电伤害。');
 					'step 1'
@@ -497,12 +498,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					canLink:function(player,target,card){
 						if(!target.isLinked()||player.hasSkill('jueqing')||target.hasSkill('gangzhi')||player.hasSkill('gangzhi')) return false;
-						var es=target.countCards('e');
-						if(!es) return true;
-						if(target.hp>=3&&es>=2){
-							return true;
+						let es=target.getCards('e'),val=0;
+						if(!es.length) return true;
+						for(let i of es){
+							if(i.name=='baiyin'&&target.isDamaged()&&get.recoverEffect(target)) val+=get.value({name:'tao'},target);
+							else val-=get.value(i,target);
 						}
-						return false;
+						if(0.15*val>2*get.sgn(get.damageEffect(target,player,target,'thunder'))) return false;
+						return true;
 					},
 					order:6,
 					value:4,
@@ -534,12 +537,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target,card,isLink){
-							if(isLink) return -1.5;
-							var es=target.getCards('e');
-							if(!es.length) return -1.5;
-							var val=0;
-							for(var i of es) val+=get.value(i,target);
-							return -Math.min(1.5,val/5);
+							let es=target.getCards('e'), eff=2*get.sgn(get.damageEffect(target,player,target,'thunder'));
+							if(isLink || !es.length) return eff;
+							let val=0;
+							for(let i of es){
+								if(i.name=='baiyin'&&target.isDamaged()&&get.recoverEffect(target)) val+=6;
+								else val-=get.value(i,target);
+							}
+							return Math.max(eff,0.15*val);
 						}
 					}
 				}
@@ -1531,7 +1536,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								target:target,
 								card:card
 							})) return;
-							if(get.tag(card,'natureDamage')) return 'zerotarget';
+							if(get.tag(card,'natureDamage')) return 'zeroplayertarget';
 							if(card.name=='tiesuo'){
 								return [0,0];
 							}

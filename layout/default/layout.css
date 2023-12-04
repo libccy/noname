@@ -3256,38 +3256,6 @@ div:not(.handcards)>.card>.info>span,
 	left: calc(50% - 106px);
 }
 
-#window>.player.connect[data-position='0'] {
-	left: calc(25% - 120px);
-	top: calc(300% / 7 - 155px);
-}
-#window>.player.connect[data-position='1'] {
-	left: calc(50% - 60px);
-	top: calc(300% / 7 - 155px);
-}
-#window>.player.connect[data-position='2'] {
-	left: calc(75% - 0px);
-	top: calc(300% / 7 - 155px);
-}
-#window>.player.connect[data-position='3'] {
-	left: calc(25% - 120px);
-	top: calc(400% / 7 - 75px);
-}
-#window>.player.connect[data-position='4'] {
-	left: calc(75% - 0px);
-	top: calc(400% / 7 - 75px);
-}
-#window>.player.connect[data-position='5'] {
-	left: calc(25% - 120px);
-	top: calc(500% / 7 + 5px);
-}
-#window>.player.connect[data-position='6'] {
-	left: calc(50% - 60px);
-	top: calc(500% / 7 + 5px);
-}
-#window>.player.connect[data-position='7'] {
-	left: calc(75% - 0px);
-	top: calc(500% / 7 + 5px);
-}
 #window>.player.connect[data-position='c0'] {
 	left: calc(50% - 120px);
 	top: calc(50% - 200px)
@@ -3374,7 +3342,12 @@ div:not(.handcards)>.card>.info>span,
 .connectbutton {
 	top: calc(400% / 7 - 35px);
 	width: 130px;
-	left: calc(50% - 70px);
+}
+.connectbutton1 {
+	left: calc(50% - 200px);
+}
+.connectbutton2 {
+	left: calc(50% + 60px);
 }
 .connectevents {
 	left: auto;
@@ -4070,6 +4043,12 @@ div[data-nature='woodmm'],
 span[data-nature='woodmm'] {
 	text-shadow: rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 2px,rgba(57, 123, 4,1) 0 0 2px,
 		rgba(57, 123, 4,1) 0 0 2px,black 0 0 1px;
+}
+.player .identity[data-color="commoner"],
+div[data-nature='commoner'],
+span[data-nature='commoner'] {
+	text-shadow: rgb(135, 135, 135, 1) 0 0 2px,rgba(135, 135, 135, 1) 0 0 5px,rgba(135, 135, 135, 1) 0 0 10px,
+		rgba(135, 135, 135, 1) 0 0 10px,rgba(135, 135, 135, 1) 0 0 20px,rgba(135, 135, 135, 1) 0 0 20px,black 0 0 1px;
 }
 
 .player .identity[data-color="cai"],

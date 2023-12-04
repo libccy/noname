@@ -384,7 +384,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						onremove:true,
 						filter:function(event,player){
 							if(!event.card.storage||!event.card.storage.jsrgzhenfeng) return false;
-							debugger
+							// debugger
 							var str=event.target.getSkills(null,false,false).map(skill=>{
 								var info=get.info(skill);
 								if(!info||info.charlotte) return;
@@ -615,13 +615,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('targets',targets).set('ai',target=>{
 						return target==get.event('targetx')?1:0;
 					}).set('targetx',(()=>{
-						var info=targets.map(target=>{
-							var att=get.attitude(player,target);
-							return [target,att*Math.sqrt(target.getHistory('lose').map(evt=>evt.cards2.length).reduce((p,c)=>p+c,0))];
-						}).sort((a,b)=>{
+						let info=[];
+						targets.filter(target=>{
+							let att=get.attitude(player,target);
+							if(att<=0) return false;
+							if(Math.abs(att)>1) att=Math.sign(att)*Math.sqrt(Math.abs(att));
+							info.push([target,att*target.getHistory('lose').map(evt=>evt.cards2.length).reduce((p,c)=>p+c,0)]);
+							return false;
+						});
+						if(!info.length) return null;
+						info=info.sort((a,b)=>{
 							return b[1]-a[1];
 						})[0];
-						if(info[1]<0) return null;
+						if(info[1]<=0) return null;
 						return info[0];
 					})());
 					'step 1'
@@ -687,11 +693,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					frozen:{
 						mod:{
 							cardnature:function(card,player){
-								if(get.suit(card)=='club'&&card.name=='sha') return 'ice';
+								if(card.name==='sha'&&get.suit(card)==='club') return 'ice';
 							},
+							aiOrder:(player,card,num)=>{
+								if(num&&card.name==='sha'&&game.hasNature(card,'ice')){
+									let lg=game.findPlayer(current=>current.hasSkill('jsrgninghan'));
+									if(lg) return num+0.15*Math.sign(get.attitude(player,lg));
+								}
+							}
 						}
 					},
 				},
+				ai:{
+					combo:'jsrgshacheng'
+				}
 			},
 			//张任
 			jsrgfuni:{
@@ -1211,8 +1226,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								player.logSkill('jsrgguiji_swapback',trigger.player);
 								player.swapHandcards(trigger.player);
-								player.unmarkAuto('jsrgguiji_swapback',[trigger.player]);
 							}
+							player.unmarkAuto('jsrgguiji_swapback',[trigger.player]);
 						},
 						intro:{
 							content:'$的下个出牌阶段结束时，你可以与其交换手牌'
@@ -1992,7 +2007,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					undist:{
 						group:'undist',
-						charlotte:true,
 						trigger:{
 							player:['useCardAfter','damageEnd'],
 						},
@@ -2233,14 +2247,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:8,
 					result:{
-						target:function(player,target){
-							var num=target.countCards('h')-player.countCards('h');
-							var cnt=player.countCards('h',card=>{
-								return get.value(card)<5;
+						target:(player,target)=>{
+							let num=player.countCards('h')-target.countCards('h'),
+								eff=get.effect(target,{name:'sha',nature:'stab'},player,target),
+								val=0,
+								ph=_status.event.getTempCache('jsrgqingxi_result','ph');
+							if(!ph){
+								ph=player.getCards('h').sort((a,b)=>{
+									return get.value(a)-get.value(b);
+								});
+								_status.event.putTempCache('jsrgqingxi_result','ph',ph);
+							}
+							ph.slice(0,num).forEach(i=>{
+								val+=get.value(i,player);
 							});
-							if(cnt<num) return 0;
-							var eff=get.effect(target,{name:'sha',nature:'stab'},player,target);
-							return Math.sign(eff)/Math.sqrt(num);
+							eff=Math.sign(eff)*Math.sqrt(Math.abs(eff));
+							if(val>2*Math.abs(eff)) return 0;
+							return eff/num;
 						}
 					}
 				},
@@ -2954,7 +2977,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(count==1) return true;
 								for(var i=0;i<ui.selected.buttons.length;i++){
 									if(get.owner(button.link)==get.owner(ui.selected.buttons[i].link)) return false;
-								};
+								}
 								return true;
 							}).set('count',targets.length).set('ai',button=>{
 								var player=_status.event.player;
@@ -3107,7 +3130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var keys=['filterTarget','selectTarget','ai2'];
 						for(var key of keys) delete next[key];
 						for(var i in trigger){
-							if(!next.hasOwnProperty(i)) next[i]=trigger[i];
+							if(!(i in next)) next[i]=trigger[i];
 						}
 						next.filterTargetx=trigger.filterTarget||(()=>false);
 						next.filterTarget=function(card,player,target){
@@ -3708,7 +3731,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								list.remove('锁定技');
 								if(list.length>0) continue;
 								var info=get.info(skill);
-								if(info&&(!info.unique||info.gainable)) skills.add(skill);
+								if(info&&(!info.unique||info.gainable)){
+									// lib.skill.rehuashen.createAudio(name,skill,'jsrg_xushao');
+									skills.add(skill);
+								}
 							}
 						}
 					}
@@ -3718,6 +3744,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkillBlocker('sbyingmen');
 					game.log(player,'将','#y'+get.translation(characters),'加入了','#g“访客”');
 					game.broadcastAll(function(player,characters){
+						player.tempname.addArray(characters);
 						player.$draw(characters.map(function(name){
 							var cardname='huashen_card_'+name;
 							lib.card[cardname]={
@@ -3738,6 +3765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var characters2=player.getStorage('sbyingmen').slice(0);
 					characters2.removeArray(characters);
 					skills.removeArray(lib.skill.sbyingmen.getSkills(characters2,player));
+					game.broadcastAll((player,characters)=>player.tempname.removeArray(characters),player,characters);
 					player.unmarkAuto('sbyingmen',characters);
 					_status.characterlist.addArray(characters);
 					player.removeInvisibleSkill(skills);
@@ -4390,7 +4418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var ind=skillx.lastIndexOf('_');
 									if(ind==-1) break;
 									skillx=skillx.slice(0,ind);
-								};
+								}
 							}
 							if(popup!=false&&!infox.silent) infox.forced=false;
 							if(!infox.charlotte&&infox.mod) delete infox.mod;

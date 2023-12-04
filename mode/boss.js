@@ -895,7 +895,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				boss_dizangwang:['male','qun',8,['boss_bufo','boss_wuliang','boss_dayuan','boss_diting'],['shu','hiddenboss','bossallowed']],
 				//boss_shikieiki:['female','qun',8,['boss_yingzhong'],['qun','hiddenboss','bossallowed']],
 
-				boss_lvbu1:['male','shen',8,['mashu','wushuang','boss_baonu','boss_jingjia','boss_aozhan'],['qun','boss','bossallowed'],'wei'],
+				boss_lvbu1:['male','shen',8,['mashu','wushuang','boss_baonu','boss_jingjia','boss_aozhan'],['qun','boss','bossallowed'],'qun'],
 				boss_lvbu2:['male','shen',6,['mashu','wushuang','xiuluo','shenwei','shenji'],['qun','hiddenboss','bossallowed'],'qun'],
 				boss_lvbu3:['male','shen',6,['wushuang','shenqu','jiwu'],['qun','hiddenboss','bossallowed'],'qun'],
 
@@ -2172,21 +2172,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard('he',get.prompt('noda_axe',trigger.target),2,'弃置两张牌，令'+get.translation(trigger.target)+'本回合内不能使用或打出牌且防具技能无效。',function(card,player){
 						return card!=player.getEquip(1);
 					}).set('logSkill',['noda_axe',trigger.target]).set('goon',function(event,player){
- 					if(player.hasSkill('noda_axe2')) return false;
- 					if(event.getParent().excluded.contains(player)) return false;
- 					if(get.attitude(event.player,player)>0){
- 						return false;
- 					}
- 					if(get.type(event.card)=='trick'&&event.player.hasWuxie()) return true;
- 					if(get.tag(event.card,'respondSha')){
- 						if(!player.hasSha()) return false;
- 						return true;
- 					}
- 					else if(get.tag(event.card,'respondShan')){
- 						if(!player.hasShan()) return false;
- 						return true;
- 					}
- 					return false;
+						if(player.hasSkill('noda_axe2')) return false;
+						if(event.getParent().excluded.contains(player)) return false;
+						if(get.attitude(event.player,player)>0){
+							return false;
+						}
+						if(get.type(event.card)=='trick'&&event.player.hasWuxie()) return true;
+						if(get.tag(event.card,'respondSha')){
+							if(!player.hasSha()) return false;
+							return true;
+						}
+						else if(get.tag(event.card,'respondShan')){
+							if(!player.hasShan()) return false;
+							return true;
+						}
+						return false;
 					}(trigger,trigger.target)).set('ai',function(card){
 						if(_status.event.goon) return 7.5-get.value(card);
 						return 0;
@@ -2268,7 +2268,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(current!=player&&current.countCards('e')){
 							player.line(current);
 							current.discard(current.getCards('e'));
-						};
+						}
 					});
 				},
 			},
@@ -8266,7 +8266,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(target.classList.contains('turnedover')) return -1;
 							return 5-target.getDamagedHp();
 						}
-						return 1;
 					}
 					"step 1"
 					if(result.bool){
@@ -8552,20 +8551,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			jiwu:{
+				derivation:['qiangxix','retieji','olxuanfeng','rewansha'],
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
 					if(player.countCards('h')==0) return false;
 					if(!player.hasSkill('qiangxix')) return true;
 					if(!player.hasSkill('retieji')) return true;
-					if(!player.hasSkill('rexuanfeng')) return true;
-					if(!player.hasSkill('wansha')) return true;
+					if(!player.hasSkill('olxuanfeng')) return true;
+					if(!player.hasSkill('rewansha')) return true;
 					return false;
 				},
 				filterCard:true,
 				position:'he',
 				check:function(card){
-					if(get.position(card)=='e'&&_status.event.player.hasSkill('rexuanfeng')) return 16-get.value(card);
+					if(get.position(card)=='e'&&_status.event.player.hasSkill('olxuanfeng')) return 16-get.value(card);
 					return 7-get.value(card);
 				},
 				content:function(){
@@ -8573,30 +8573,30 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					if(!player.hasSkill('qiangxix')) list.push('qiangxix');
 					if(!player.hasSkill('retieji')) list.push('retieji');
-					if(!player.hasSkill('rexuanfeng')) list.push('rexuanfeng');
-					if(!player.hasSkill('wansha')) list.push('wansha');
+					if(!player.hasSkill('olxuanfeng')) list.push('olxuanfeng');
+					if(!player.hasSkill('rewansha')) list.push('rewansha');
 					if(list.length==1){
 						player.addTempSkill(list[0]);
 						event.finish();
 					}
 					else{
 						player.chooseControl(list,function(){
-							if(list.contains('rexuanfeng')&&player.countCards('he',{type:'equip'})) return 'rexuanfeng';
+							if(list.contains('olxuanfeng')&&player.countCards('he',{type:'equip'})) return 'olxuanfeng';
 							if(!player.getStat().skill.qiangxix){
-								if(player.hasSkill('qiangxix')&&player.getEquip(1)&&list.contains('rexuanfeng')) return 'rexuanfeng';
-								if(list.contains('wansha')||list.contains('qiangxix')){
+								if(player.hasSkill('qiangxix')&&player.getEquip(1)&&list.contains('olxuanfeng')) return 'olxuanfeng';
+								if(list.contains('rewansha')||list.contains('qiangxix')){
 									var players=game.filterPlayer();
 									for(var i=0;i<players.length;i++){
 										if(players[i].hp==1&&get.attitude(player,players[i])<0){
-											if(list.contains('wansha')) return 'wansha';
+											if(list.contains('rewansha')) return 'rewansha';
 											if(list.contains('qiangxix')) return 'qiangxix';
 										}
 									}
 								}
 							}
 							if(list.contains('qiangxix')) return 'qiangxix';
-							if(list.contains('wansha')) return 'wansha';
-							if(list.contains('rexuanfeng')) return 'rexuanfeng';
+							if(list.contains('rewansha')) return 'rewansha';
+							if(list.contains('olxuanfeng')) return 'olxuanfeng';
 							return 'retieji';
 						}).set('prompt','选择获得一项技能直到回合结束');
 					}
@@ -8609,8 +8609,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(player.countCards('e',{type:'equip'})) return 10;
 						if(!player.getStat().skill.qiangxix){
-							if(player.hasSkill('qiangxix')&&player.getEquip(1)&&!player.hasSkill('rexuanfeng')) return 10;
-							if(player.hasSkill('wansha')) return 1;
+							if(player.hasSkill('qiangxix')&&player.getEquip(1)&&!player.hasSkill('olxuanfeng')) return 10;
+							if(player.hasSkill('rewansha')) return 1;
 							var players=game.filterPlayer();
 							for(var i=0;i<players.length;i++){
 								if(players[i].hp==1&&get.attitude(player,players[i])<0) return 10;
@@ -8622,8 +8622,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player:function(player){
 							if(player.countCards('e',{type:'equip'})) return 1;
 							if(!player.getStat().skill.qiangxix){
-								if(player.hasSkill('qiangxix')&&player.getEquip(1)&&!player.hasSkill('rexuanfeng')) return 1;
-								if(!player.hasSkill('wansha')||!player.hasSkill('qiangxix')){
+								if(player.hasSkill('qiangxix')&&player.getEquip(1)&&!player.hasSkill('olxuanfeng')) return 1;
+								if(!player.hasSkill('rewansha')||!player.hasSkill('qiangxix')){
 									var players=game.filterPlayer();
 									for(var i=0;i<players.length;i++){
 										if(players[i].hp==1&&get.attitude(player,players[i])<0) return 1;
@@ -9294,11 +9294,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shenwei:'神威',
 			shenwei_info:'锁定技，摸牌阶段，你额外摸X张牌，你的手牌上限+X（X为场上其他角色的数目且至多为3）。',
 			xiuluo:'修罗',
-			xiuluo_info:'准备阶段，你可以弃置一张牌，然后弃置你判定区内一张同花色的牌。你可以重复此流程。',
+			xiuluo_info:'准备阶段，你可以弃置一张牌，然后弃置你判定区内一张同花色的牌，然后你可以重复此流程。',
 			shenqu:'神躯',
 			shenqu_info:'每名角色的准备阶段，若你的手牌数少于或等于你的体力上限数，你可以摸两张牌；当你受到伤害后，你可以使用一张【桃】。',
 			jiwu:'极武',
-			jiwu_info:'出牌阶段，你可以弃置一张牌，然后获得一项：“强袭”、“铁骑”(界)、“旋风”、“完杀”，直到回合结束。',
+			jiwu_info:'出牌阶段，你可以弃置一张牌，然后获得获得以下一项技能直到回合结束：〖强袭〗、〖铁骑〗、〖旋风〗、〖完杀〗。',
 			
 			"boss_jingjia":"精甲",
 			"boss_jingjia_info":"锁定技，游戏开始时，将本局游戏中加入的装备随机置入你的装备区。",
