@@ -10286,10 +10286,10 @@ new Promise(resolve=>{
 				else{
 					//为其他自定义平台提供文件读写函数赋值的一种方式。
 					//但这种方式只能修改game的文件读写函数。
-					if(window.initRWFunction){
+					if(window.initReadWriteFunction){
 						const g={};
-						const RWFunctionName=['download','readFile','readFileAsText','writeFile','removeFile','getFileList','ensureDirectory','createDir'];
-						RWFunctionName.forEach(prop=>{
+						const ReadWriteFunctionName=['download','readFile','readFileAsText','writeFile','removeFile','getFileList','ensureDirectory','createDir'];
+						ReadWriteFunctionName.forEach(prop=>{
 							Object.defineProperty(g,prop,{
 								configurable:true,
 								get(){ return undefined; },
@@ -10301,7 +10301,7 @@ new Promise(resolve=>{
 								}
 							})
 						});
-						window.initRWFunction(g);
+						window.initReadWriteFunction(g);
 					}
 					window.onbeforeunload = function () {
 						if (lib.config.confirm_exit && !_status.reloading) {
