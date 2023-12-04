@@ -4197,7 +4197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var check=0;
 					if(player.hasHistory('gain',evt=>{
-						return evt.getParent(2)==event&&evt.cards.length>=2;
+						return evt.getParent(2)==event&&evt.cards.length>=3;
 					})) check|=1;
 					if(game.getGlobalHistory('changeHp',evt=>{
 						return evt.getParent().name=='recover'&&evt.getParent(2)==event;
@@ -4223,7 +4223,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							if((player.storage.dcxinyou_effect&1)>0) player.loseHp();
-							if((player.storage.dcxinyou_effect&2)>0) player.chooseToDiscard('心幽：弃置两张牌',2,true,'he');
+							if((player.storage.dcxinyou_effect&2)>0) player.chooseToDiscard('心幽：请弃置一张牌',1,true,'he');
 						}
 					}
 				}
@@ -4547,43 +4547,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					if(lib.skill.dcjinjie.hasPhase(player)){
-						player.chooseBool(get.prompt('dcjinjie',trigger.player),'令其摸一张牌').set('ai',()=>{
-							return get.attitude(_status.event.player,_status.event.getTrigger().player)>0;
-						});
-					}
-					else{
-						var num=0;
-						var history=player.actionHistory;
-						for(var i=history.length-1;i>=0;i--){
-							for(var evt of history[i].useSkill){
-								if(evt.skill=='dcjinjie') num++;
-							}
-							if(history[i].isRound) break;
-						}
-						if(num==0){
-							player.chooseBool(get.prompt('dcjinjie',trigger.player),'令其回复1点体力').set('ai',()=>{
-								var player=_status.event.player;
-								return get.effect(_status.event.getTrigger().player,{name:'tao'},player,player)>0;
-							});
-						}
-						else{
-							player.chooseToDiscard(get.prompt('dcjinjie',trigger.player),'弃置'+get.cnNumber(num)+'张牌，令其回复1点体力','he',num).set('ai',card=>{
-								if(_status.event.eff>0) return get.value({name:'tao'})-get.value(card);
-								return 0;
-							}).set('eff',get.effect(trigger.player,{name:'tao'},player,player)).set('logSkill',['dcjinjie',trigger.player]);
-						}
-						event.goto(2);
-					}
+					player.chooseBool(get.prompt('dcjinjie',trigger.player),'令其摸一张牌').set('ai',()=>{
+						return get.attitude(_status.event.player,_status.event.getTrigger().player)>0;
+					});
 					'step 1'
 					if(result.bool){
 						player.logSkill('dcjinjie',trigger.player);
 						trigger.player.draw();
 					}
-					event.finish();
+					else event.finish();
+					if(lib.skill.dcjinjie.hasPhase(player)) event.finish();
 					'step 2'
+					var num=0;
+					var history=player.actionHistory;
+					for(var i=history.length-1;i>=0;i--){
+						for(var evt of history[i].useSkill){
+							if(evt.skill=='dcjinjie') num++;
+						}
+						if(history[i].isRound) break;
+					}
+					if(num==0){
+						player.chooseBool(get.prompt('dcjinjie',trigger.player),'令其回复1点体力').set('ai',()=>{
+							var player=_status.event.player;
+							return get.effect(_status.event.getTrigger().player,{name:'tao'},player,player)>0;
+						});
+					}
+					else{
+						player.chooseToDiscard(get.prompt('dcjinjie',trigger.player),'弃置'+get.cnNumber(num)+'张牌，令其回复1点体力','he',num).set('ai',card=>{
+							if(_status.event.eff>0) return get.value({name:'tao'})-get.value(card);
+							return 0;
+						}).set('eff',get.effect(trigger.player,{name:'tao'},player,player));
+					}
+					'step 3'
 					if(result.bool){
-						if(!result.cards||!result.cards.length) player.logSkill('dcjinjie',trigger.player);
+						player.line(trigger.player,'green');
 						trigger.player.recover();
 					}
 				},
@@ -4593,12 +4590,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				direct:true,
 				filter:function(event,player){
-					return game.hasPlayer(current=>current.isHealthy()&&player.canUse('sha',current,false));
+					return game.hasPlayer(current=>(current.getHp()>player.getHp()||current.countCards('h')>player.countCards('h'))&&player.canUse('sha',current,false));
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt('dcjue'),'视为对一名未受伤的角色使用一张【杀】',(card,player,target)=>{
-						return player.canUse('sha',target,false)&&target.isHealthy();
+					player.chooseTarget(get.prompt('dcjue'),'视为对一名体力值或手牌数大于你的角色使用一张【杀】',(card,player,target)=>{
+						return player.canUse('sha',target,false)&&(target.getHp()>player.getHp()||target.countCards('h')>player.countCards('h'));
 					}).set('ai',target=>{
 						return get.effect(target,{name:'sha'},_status.event.player);
 					});
@@ -13155,7 +13152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhaohan:'昭汉',
 			dczhaohan_info:'摸牌阶段，你可以多摸两张牌，然后你于得到牌后选择一项：1.将两张手牌交给一名没有手牌的角色；2.弃置两张手牌。',
 			dcjinjie:'尽节',
-			dcjinjie_info:'当一名角色进入濒死状态时，若你本轮：进行过回合，你可以令其摸一张牌；未进行过回合，你可以弃置X张手牌令其回复1点体力（X为本轮你发动过〖尽节〗的次数）。',
+			dcjinjie_info:'当一名角色进入濒死状态时，可以令其摸一张牌。然后若你本轮未进行过回合，你可以弃置X张手牌令其回复1点体力（X为本轮你发动过〖尽节〗的次数）。',
 			dcjue:'举讹',
 			dcjue_info:'准备阶段，你可以视为对一名未受伤的角色使用一张【杀】。',
 			dc_tengfanglan:'滕芳兰',
@@ -13167,7 +13164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyuandi:'元嫡',
 			dcyuandi_info:'当其他角色于其出牌阶段使用第一张牌时，若此牌仅指定其为目标，你可以选择一项：1.弃置其一张手牌；2.你与其各摸一张牌。',
 			dcxinyou:'心幽',
-			dcxinyou_info:'出牌阶段限一次。你可以将体力回复至上限并将手牌补至体力上限。若你以此法：获得了至少两张牌，你于结束阶段失去1点体力；回复了体力，你于结束阶段弃置两张牌。',
+			dcxinyou_info:'出牌阶段限一次。你可以将体力回复至上限并将手牌补至体力上限。若你以此法：获得了至少三张牌，你于结束阶段失去1点体力；回复了体力，你于结束阶段弃置一张牌。',
 			zerong:'笮融',
 			dccansi:'残肆',
 			dccansi_info:'锁定技。准备阶段，你回复1点体力，然后选择一名其他角色，其回复1点体力，你视为对其依次使用以下能使用的牌：【杀】（无距离限制）、【决斗】、【火攻】。当其以此法受到1点伤害后，你摸两张牌。',
