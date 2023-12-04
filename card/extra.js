@@ -128,53 +128,40 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(!target || target._jiu_temp || !target.isPhaseUsing()) return 0;
 							let usable=target.getCardUsable('sha');
 							if(!usable || lib.config.mode==='stone'&&!player.isMin()&&player.getActCount()+1>=player.actcount || !target.mayHaveSha(player,'use',card)) return 0;
-							let effs=_status.event.getTempCache('jiu_result','effs');
-							if(effs&&effs[card.cardid]){
-								for(let i in effs){
-									if(effs[i].target&&effs[i].target.isIn()&&effs[i].eff>0) return 1;
-								}
-								return 0;
-							}
-							effs={};
-							let shas=target.getCards('hs',i=>{
+							let effs={order:0},temp;
+							target.getCards('hs',i=>{
 								if(get.name(i)!=='sha' || ui.selected.cards.includes(i)) return false;
+								temp=get.order(i,target);
+								if(temp<effs.order) return false;
+								if(temp>effs.order) effs={order:temp};
 								effs[i.cardid]={
+									card:i,
 									target:null,
 									eff:0
 								};
-								return true;
-							}),eff,id;
-							for(let i of shas){
-								id=i.cardid;
-								if(!lib.filter.filterCard(i,target)) continue;
+							});
+							delete effs.order;
+							for(let i in effs){
+								if(!lib.filter.filterCard(effs[i].card,target)) continue;
 								game.filterPlayer(current=>{
-									if(get.attitude(target,current)>=0 || !target.canUse(i,current,null,true) || current.hasSkillTag('filterDamage',null,{
+									if(get.attitude(target,current)>=0 || !target.canUse(effs[i].card,current,null,true) || current.hasSkillTag('filterDamage',null,{
 										player:target,
-										card:i,
+										card:effs[i].card,
 										jiu:true
 									})) return false;
-									eff=get.effect(current,i,target,player);
-									if(eff<=effs[id].eff) return false;
-									effs[id].target=current;
-									effs[id].eff=eff;
+									temp=get.effect(current,effs[i].card,target,player);
+									if(temp<=effs[i].eff) return false;
+									effs[i].target=current;
+									effs[i].eff=temp;
 									return false;
 								});
-								if(effs[id].target&&(target.hasSkillTag('directHit_ai',true,{
-									target:effs[id].target,
+								if(effs[i].target&&(target.hasSkillTag('directHit_ai',true,{
+									target:effs[i].target,
 									card:i
-								},true) || target.needsToDiscard()>Math.max(0,3-target.hp) || !effs[id].target.mayHaveShan(player,'use'))){
-									if(card.cardid){
-										effs[card.cardid]={target:null};
-										_status.event.putTempCache('jiu_result','effs',effs);
-									}
+								},true) || target.needsToDiscard()>Math.max(0,3-target.hp) || !effs[i].target.mayHaveShan(player,'use'))){
 									delete target._jiu_temp;
 									return 1;
 								}
-								delete effs[id];
-							}
-							if(card.cardid){
-								effs[card.cardid]={target:null};
-								_status.event.putTempCache('jiu_result','effs',effs);
 							}
 							delete target._jiu_temp;
 							return 0;
