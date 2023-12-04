@@ -10284,14 +10284,33 @@ new Promise(resolve=>{
 					}
 				}
 				else{
-					window.onbeforeunload=function(){
-						if(lib.config.confirm_exit&&!_status.reloading){
+					//为其他自定义平台提供文件读写函数赋值的一种方式。
+					//但这种方式只能修改game的文件读写函数。
+					if(window.initRWFunction){
+						const g={};
+						const RWFunctionName=['download','readFile','readFileAsText','writeFile','removeFile','getFileList','ensureDirectory','createDir'];
+						RWFunctionName.forEach(prop=>{
+							Object.defineProperty(g,prop,{
+								configurable:true,
+								get(){ return undefined; },
+								set(newValue) {
+									if(typeof newValue=='function'){
+										delete g[prop];
+										g[prop]=game[prop]=newValue;
+									}
+								}
+							})
+						});
+						window.initRWFunction(g);
+					}
+					window.onbeforeunload = function () {
+						if (lib.config.confirm_exit && !_status.reloading) {
 							return '是否离开游戏？'
 						}
-						else{
+						else {
 							return null;
 						}
-					}
+					};
 				}
 
 				lib.config=window.config;
