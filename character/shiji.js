@@ -3151,7 +3151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingyu:{
 				audio:3,
 				dutySkill:true,
-				locked:true,
+				locked:false,
 				group:['qingyu_achieve','qingyu_fail','qingyu_defend'],
 				subSkill:{
 					defend:{
