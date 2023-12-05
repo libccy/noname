@@ -59128,7 +59128,7 @@ new Promise(resolve=>{
 			 * 判断坐骑栏是否被合并
 			 */
 			mountCombined:function(){
-				if(lib.configOL){
+				if(lib.configOL.mount_combine){
 					return lib.configOL.mount_combine;
 				}
 				else if(typeof _status.mountCombined!='boolean'){
