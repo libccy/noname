@@ -457,6 +457,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.hasNature();
 				},
 				forced:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					if(event.triggername=='damageBegin2'){
