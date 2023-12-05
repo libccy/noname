@@ -941,6 +941,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				skillAnimation:true,
 				animationColor:'orange',
+				locked:false,
 				chooseButton:{
 					dialog:function(event,player){
 						var list=[];
