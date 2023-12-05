@@ -2447,6 +2447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCard'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					if(player.group!='shu') return false;
 					return game.hasPlayer(current=>{
