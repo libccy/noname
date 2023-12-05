@@ -14585,7 +14585,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		dynamicTranslate:{
 			twfeifu:function(player){
-				var str='转换技。';
+				var str='锁定技，转换技。';
 				if(!player.storage.twfeifu) str+='<span class="bluetext">';
 				str+='阴：当你成为【杀】的唯一目标后；';
 				if(!player.storage.twfeifu) str+='</span>';
