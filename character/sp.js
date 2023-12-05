@@ -13082,6 +13082,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			spweiwu:{
 				audio:2,
+				locked:false,
 				enable:'phaseUse',
 				usable:1,
 				viewAs:{
