@@ -1321,6 +1321,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (player.countCards('h')==0)^player.hasSkill('jsrgmanjuan_in');
 				},
 				forced:true,
+				locked:false,
 				firstDo:true,
 				silent:true,
 				content:function(){
