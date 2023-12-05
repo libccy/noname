@@ -7662,6 +7662,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return targets.length>=2;
 				},
 				forced:true,
+				locked:false,
 				dutySkill:true,
 				skillAnimation:true,
 				animationColor:'wood',
