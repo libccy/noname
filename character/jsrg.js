@@ -3792,6 +3792,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbpingjian:{
 				trigger:{player:['useSkill','logSkillBegin']},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					var skill=event.sourceSkill||event.skill;
 					return player.invisibleSkills.contains(skill)&&lib.skill.sbyingmen.getSkills(player.getStorage('sbyingmen'),player).contains(skill);
