@@ -1260,7 +1260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spxizhan:{
 				audio:4,
 				group:'spxizhan_effect',
-				locked:true,
+				locked:false,
 				subSkill:{
 					spfangzong:{charlotte:true},
 					effect:{
