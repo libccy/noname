@@ -1381,6 +1381,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if (get.tag(card, 'damage') > 0 && target.storage.twchongwangx.contains(player)) return false;
 					},
 				},
+				locked:false,
 				unique: true,
 				onremove: true,
 				global: 'twchongwang_global',
