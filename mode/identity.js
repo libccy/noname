@@ -555,12 +555,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 				else{
-					return {
-						fan:'反',
-						zhong:'忠',
-						nei:'内',
-                        commoner:'民',
-						cai:'猜',
+					if(get.config('enable_commoner')){
+						return {
+							fan:'反',
+							zhong:'忠',
+							nei:'内',
+							commoner:'民',
+							cai:'猜',
+						}
+					}
+					else{
+						return {
+							fan:'反',
+							zhong:'忠',
+							nei:'内',
+							cai:'猜',
+						}
 					}
 				}
 			},
