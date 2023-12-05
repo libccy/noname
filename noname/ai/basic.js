@@ -1,24 +1,32 @@
-import { status as _status } from "../../noname.js";
+import { Game } from "../game.js";
+import { Get } from "../get.js";
+import { status } from "../status.js";
+import { Click } from "../ui/click.js";
+import { selected } from "../ui/selected.js";
 
-export class BasicAI {
+export class Basic {
+	constructor() {
+		throw new TypeError(`${new.target.name} is not a constructor`);
+	}
+
 	static chooseButton(check) {
-		var event = _status.event;
+		var event = status.event;
 		var i, j, range, buttons, buttons2;
 		var ok = false, forced = event.forced;
 		var iwhile = 100;
 		while (iwhile--) {
-			range = get.select(event.selectButton);
-			if (ui.selected.buttons.length >= range[0]) {
+			range = Get.select(event.selectButton);
+			if (selected.buttons.length >= range[0]) {
 				ok = true;
 			}
 			if (range[1] <= -1) {
 				j = 0;
-				for (i = 0; i < ui.selected.buttons.length; i++) {
-					j += check(ui.selected.buttons[i]);
+				for (i = 0; i < selected.buttons.length; i++) {
+					j += check(selected.buttons[i]);
 				}
 				return (j > 0);
 			}
-			buttons = get.selectableButtons();
+			buttons = Get.selectableButtons();
 			if (buttons.length == 0) {
 				return ok;
 			}
@@ -41,40 +49,41 @@ export class BasicAI {
 				}
 			}
 			buttons[ix].classList.add('selected');
-			ui.selected.buttons.add(buttons[ix]);
-			game.check();
-			if (ui.selected.buttons.length >= range[0]) {
+			selected.buttons.add(buttons[ix]);
+			Game.check();
+			if (selected.buttons.length >= range[0]) {
 				ok = true;
 			}
-			if (ui.selected.buttons.length == range[1]) {
+			if (selected.buttons.length == range[1]) {
 				return true;
 			}
 		}
 	}
+
 	static chooseCard(check) {
-		var event = _status.event;
+		var event = status.event;
 		if (event.filterCard == undefined) return (check() > 0);
 		var i, j, range, cards, cards2, skills, check, effect;
 		var ok = false, forced = event.forced;
 		var iwhile = 100;
 		while (iwhile--) {
-			range = get.select(event.selectCard);
-			if (ui.selected.cards.length >= range[0]) {
+			range = Get.select(event.selectCard);
+			if (selected.cards.length >= range[0]) {
 				ok = true;
 			}
 			if (range[1] <= -1) {
-				if (ui.selected.cards.length == 0) return true;
+				if (selected.cards.length == 0) return true;
 				j = 0;
-				for (i = 0; i < ui.selected.cards.length; i++) {
-					effect = check(ui.selected.cards[i]);
+				for (i = 0; i < selected.cards.length; i++) {
+					effect = check(selected.cards[i]);
 					if (effect < 0) j -= Math.sqrt(-effect);
 					else j += Math.sqrt(effect);
 				}
 				return (j > 0);
 			}
-			cards = get.selectableCards();
-			if (!_status.event.player._noSkill) {
-				cards = cards.concat(get.skills());
+			cards = Get.selectableCards();
+			if (!status.event.player._noSkill) {
+				cards = cards.concat(Get.skills());
 			}
 			if (cards.length == 0) {
 				return ok;
@@ -98,11 +107,11 @@ export class BasicAI {
 				}
 			}
 			if (typeof cards[ix] == 'string') {
-				ui.click.skill(cards[ix]);
-				var info = get.info(event.skill);
+				Click.skill(cards[ix]);
+				var info = Get.info(event.skill);
 				if (info.filterCard) {
-					check = info.check || get.unuseful2;
-					return (ai.basic.chooseCard(check));
+					check = info.check || Get.unuseful2;
+					return (this.chooseCard(check));
 				}
 				else {
 					return true;
@@ -110,32 +119,33 @@ export class BasicAI {
 			}
 			else {
 				cards[ix].classList.add('selected');
-				ui.selected.cards.add(cards[ix]);
-				game.check();
-				if (ui.selected.cards.length >= range[0]) {
+				selected.cards.add(cards[ix]);
+				Game.check();
+				if (selected.cards.length >= range[0]) {
 					ok = true;
 				}
-				if (ui.selected.cards.length == range[1]) {
+				if (selected.cards.length == range[1]) {
 					return true;
 				}
 			}
 		}
 	}
+
 	static chooseTarget(check) {
-		var event = _status.event;
+		var event = status.event;
 		if (event.filterTarget == undefined) return (check() > 0);
 		var i, j, range, targets, targets2, effect;
 		var ok = false, forced = event.forced;
 		var iwhile = 100;
 		while (iwhile--) {
-			range = get.select(event.selectTarget);
-			if (ui.selected.targets.length >= range[0]) {
+			range = Get.select(event.selectTarget);
+			if (selected.targets.length >= range[0]) {
 				ok = true;
 			}
 			if (range[1] <= -1) {
 				j = 0;
-				for (i = 0; i < ui.selected.targets.length; i++) {
-					effect = check(ui.selected.targets[i]);
+				for (i = 0; i < selected.targets.length; i++) {
+					effect = check(selected.targets[i]);
 					if (effect < 0) j -= Math.sqrt(-effect);
 					else j += Math.sqrt(effect);
 				}
@@ -144,7 +154,7 @@ export class BasicAI {
 			else if (range[1] == 0) {
 				return check() > 0
 			}
-			targets = get.selectableTargets();
+			targets = Get.selectableTargets();
 			if (targets.length == 0) {
 				return range[0] == 0 || ok;
 			}
@@ -167,12 +177,12 @@ export class BasicAI {
 				}
 			}
 			targets[ix].classList.add('selected');
-			ui.selected.targets.add(targets[ix]);
-			game.check();
-			if (ui.selected.targets.length >= range[0]) {
+			selected.targets.add(targets[ix]);
+			Game.check();
+			if (selected.targets.length >= range[0]) {
 				ok = true;
 			}
-			if (ui.selected.targets.length == range[1]) {
+			if (selected.targets.length == range[1]) {
 				return true;
 			}
 		}

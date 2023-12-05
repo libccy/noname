@@ -1,3 +1,3 @@
-interface AnimateCard extends Record<string, Function> { }
+interface Card extends Record<string, Function> { }
 
-export const animateCard: AnimateCard;
+export const card: Card;

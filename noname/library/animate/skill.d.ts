@@ -1,3 +1,3 @@
-interface AnimateSkill extends Record<string, Function> { }
+interface Skill extends Record<string, Function> { }
 
-export const animateSkill: AnimateSkill;
+export const skill: Skill;

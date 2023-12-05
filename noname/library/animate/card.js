@@ -1,1 +1,1 @@
-export const animateCard = {};
+export const card = {};

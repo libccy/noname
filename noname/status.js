@@ -1,4 +1,4 @@
-import { Library as lib } from "../noname.js";
+import { GameEvent } from "./library/element/game-event.js";
 import { aiStatus } from "./status/ai.js";
 import { cardTag } from "./status/card-tag.js";
 import { postReconnect } from "./status/post-reconnect.js";
@@ -10,7 +10,7 @@ export const status = {
 	over: false,
 	clicked: false,
 	auto: false,
-	event: lib.element.GameEvent.initialGameEvent(),
+	event: GameEvent.initialGameEvent(),
 	ai: aiStatus,
 	lastdragchange: [],
 	skillaudio: [],
@@ -30,5 +30,5 @@ export const status = {
 	cardtag: cardTag,
 	renku: [],
 	prehidden_skills: [],
-	postReconnect: postReconnect
+	postReconnect
 }

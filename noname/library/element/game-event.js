@@ -1,4 +1,5 @@
-import { Get as get } from "../../../noname.js";
+import { Game } from "../../game.js";
+import { Get } from "../../get.js";
 
 export class GameEvent {
 	/**
@@ -8,24 +9,24 @@ export class GameEvent {
 	constructor(name, trigger) {
 		if (typeof name == 'string') {
 			this.name = name;
-			const gameEvent = get.event();
+			const gameEvent = Get.event();
 
 			if (gameEvent) {
 				const type = `onNext${name[0].toUpperCase()}${name.slice(1)}`;
 				if (gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
 			}
 
-			game.globalEventHandlers.addHandlerToEvent(this);
+			Game.globalEventHandlers.addHandlerToEvent(this);
 		}
 
 		this.step = 0;
 		this.finished = false;
 		/**
-		 * @type {GameEvent[]}
+		 * @type {this[]}
 		 */
 		this.next = [];
 		/**
-		 * @type {GameEvent[]}
+		 * @type {this[]}
 		 */
 		this.after = [];
 		this.custom = {
@@ -36,7 +37,7 @@ export class GameEvent {
 		this._notrigger = [];
 		this._result = {};
 		this._set = [];
-		if (trigger !== false && !game.online) this._triggered = 0;
+		if (trigger !== false && !Game.online) this._triggered = 0;
 	}
 
 	static initialGameEvent() {

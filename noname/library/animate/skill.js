@@ -1,1 +1,1 @@
-export const animateSkill = {};
+export const skill = {};

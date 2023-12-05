@@ -1,7 +1,7 @@
-import { Get } from "../noname.js";
-import { BasicAI } from "./ai/basic.js";
+import { Basic } from "./ai/basic.js";
+import { Get } from "./get.js";
 
 export const ai = {
-	basic: BasicAI,
+	basic: Basic,
 	get: Get
 };
