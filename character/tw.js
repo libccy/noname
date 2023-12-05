@@ -3559,6 +3559,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				group:['twmibei_mark','twmibei_fail'],
 				forced:true,
+				locked:false,
 				direct:true,
 				dutySkill:true,
 				derivation:'twmouli',
