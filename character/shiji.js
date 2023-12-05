@@ -2715,6 +2715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				dutySkill:true,
 				forced:true,
+				locked:false,
 				direct:true,
 				filter:function(event,player){
 					if(!player.storage.xingqi||!player.storage.xingqi.length) return false;
