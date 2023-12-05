@@ -9080,6 +9080,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
+				locked:false,
 				audio:"duanliang1",
 				enable:"chooseToUse",
 				filterCard:function(card){
