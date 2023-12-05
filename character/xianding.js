@@ -2168,6 +2168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				direct:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					var targets=trigger.targets.filter(target=>{
