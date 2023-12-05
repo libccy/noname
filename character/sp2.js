@@ -241,7 +241,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				zhuSkill:true,
 				content:function*(event,map){
-					var player=map.player,target=map.trigger.target;
+					var player=map.player,target=map.trigger.player;
 					var result=yield target.chooseBool(get.prompt('star_dz_c',player),'令'+get.translation(player)+'回复1点体力').set('choice',get.recoverEffect(player,target,target)>0);
 					if(result.bool){
 						target.line(player);
