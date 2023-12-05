@@ -10880,6 +10880,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				forceunique:true,
 				lordSkill:true,
+				locked:false,
 				audio:2,
 				derivation:'yuanjiangfenghuotu',
 				mark:true,
