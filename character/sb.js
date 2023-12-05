@@ -61,6 +61,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.type2(card)=='trick') return true;
 					},
 				},
+				locked:false,
 				getLimit:3,
 				audio:2,
 				enable:'phaseUse',
