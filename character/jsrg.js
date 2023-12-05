@@ -1712,6 +1712,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jsrgrihui:{
 				audio:'dcrihui',
+				locked:false,
 				trigger:{source:'damageSource'},
 				filter:function(event,player){
 					return event.getParent().type=='card'&&event.card&&event.card.name=='sha'&&game.hasPlayer(current=>{
