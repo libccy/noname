@@ -11807,6 +11807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			miji:{
 				audio:2,
 				audioname:['re_wangyi'],
+				locked:false,
 				mod:{
 					aiOrder:function(player,card,num){
 						if(num>0&&_status.event&&_status.event.type==='phase'&&get.tag(card,'recover')){
