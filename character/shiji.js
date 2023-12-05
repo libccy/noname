@@ -2134,7 +2134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rechuhai:{
 				audio:'chuhai',
 				dutySkill:true,
-				locked:true,
+				locked:false,
 				group:['rechuhai_add','rechuhai_achieve','rechuhai_fail','rechuhai_chuhai'],
 				derivation:'zhangming',
 				subSkill:{
