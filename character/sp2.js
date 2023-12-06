@@ -183,7 +183,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player;
 							if(get.attitude(player,target)>=0) return 0;
 							return get.effect(target,_status.event.card,player,player);
-						}).set('card',{name:choice?'guohe_copy2':'loseHp'});
+						}).set('card',{name:choice?'guohe_copy2':'losehp'});
 						if(result2.bool){
 							var targets=result2.targets.sortBySeat();
 							player.logSkill('starzhangrong',targets);
