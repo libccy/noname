@@ -47,6 +47,7 @@ new Promise(resolve=>{
 		}
 	}
 	const GeneratorFunction=(function*(){}).constructor;
+	const AsyncFunction=(async function(){}).constructor;
 	// gnc: GeNCoroutine
 	const gnc={
 		of:fn=>gnc.is.generatorFunc(fn)?function genCoroutine(){
@@ -21030,6 +21031,22 @@ new Promise(resolve=>{
 					};
 					player.queueCount=0;
 					player.outCount=0;
+					/**
+					 * 这部分应该用d.ts写。目前只给出大概类型
+					 * @type { {[key in keyof Player]: (...args) => Promise<GameEvent> & GameEvent} }
+					 */
+					player.promises=new Proxy({},{
+						get(target,prop){
+							const eventKeys=Object.keys(lib.element.player).filter(key=>typeof lib.element.player[key]=='function');
+							if (eventKeys.includes(prop)){
+								return function (...args) {
+									/** @type { GameEvent } */
+									const event=player[prop](...args);
+									return event.toPromise();
+								};
+							}
+						}
+					});
 				}
 				buildEventListener(noclick){
 					let player = this;
@@ -31288,6 +31305,14 @@ new Promise(resolve=>{
 					this._notrigger=[];
 					this._result={};
 					this._set=[];
+					/** 
+					 * @type {boolean} 这个事件是否使用异步函数处理 
+					 **/
+					this.async=false;
+					/**
+					 * @type {null|(event: GameEvent)=>any} 这个异步事件对应Promise的resolve函数
+					 **/
+					this.resolve=null;
 					if(trigger!==false&&!game.online) this._triggered=0;
 				}
 				static initialGameEvent(){
@@ -31517,7 +31542,10 @@ new Promise(resolve=>{
 					switch(typeof item){
 						case "object":
 						case "function":
-							this.content=lib.init.parsex(item);
+							if(item instanceof AsyncFunction){
+								this.content=item;
+							}
+							else this.content=lib.init.parsex(item);
 							break;
 						default:
 							try{
@@ -32072,6 +32100,87 @@ new Promise(resolve=>{
 					 */
 					this.unreal;
 					throw new Error('Do not call this method');
+				}
+				/**
+				 * 事件转为Promise化
+				 * 
+				 * 注: 该函数在async content中执行时，必须在所有setxx函数执行后执行。
+				 * @returns { Promise<GameEvent> & GameEvent }
+				 */
+				toPromise(){
+					if(this.async&&this.resolve){
+						throw new TypeError('This event has been converted into a promise');
+					}
+					return new lib.element.GameEventPromise(this);
+				}
+			},
+			GameEventPromise:class extends Promise{
+				// 我谢谢你，这里是必须有的
+				static get [Symbol.species]() { 
+					return Promise;
+				}
+				/**
+				 * @param { GameEvent } event 
+				 * @returns { Promise<GameEvent> & GameEvent }
+				 */
+				constructor(event){
+					super(resolve=>{
+						// 设置为异步事件
+						event.async=true;
+						// 事件结束后触发resolve
+						event.resolve=resolve;
+						//如果父级事件也是一个异步的话，那应该立即执行这个事件的
+						if(_status.event.next.includes(event)&&_status.event.content instanceof AsyncFunction){
+							// console.log(event, '的父级事件也是一个异步,立即执行这个事件');
+							if (_status.event != event) {
+								event.parent = _status.event;
+								_status.event = event;
+								game.getGlobalHistory('everything').push(event);
+							}
+							game.loop(event);
+						}
+					});
+					return new Proxy(this,{
+						get(target,prop,receiver){
+							const thisValue=Reflect.get(target,prop);
+							if(thisValue){
+								if(typeof thisValue=='function') {
+									return thisValue.bind(target);
+								}
+								return thisValue;
+							}
+							const eventValue=Reflect.get(event,prop);
+							// 返回值如果是event，则修改为GameEventPromise
+							if(typeof eventValue=='function') return (function(...args){
+								const returnValue=eventValue.call(event,...args);
+								return returnValue==event?receiver:returnValue;
+							}).bind(event);
+							return eventValue;
+						},
+						set(target,prop,newValue){
+							return Reflect.set(event,prop,newValue);
+						},
+						deleteProperty(target,prop){
+							return Reflect.set(event,prop);
+						},
+						defineProperty(target,prop,attributes){
+							return Reflect.defineProperty(event,prop,attributes);
+						},
+						has(target,prop){
+							return Reflect.has(event,prop);
+						},
+						ownKeys(target,prop){
+							return Reflect.ownKeys(event,prop);
+						},
+					});
+				}
+				/**
+				 * TODO: 实现debugger
+				 */
+				async debugger(){
+					return new Promise(resolve=>{
+						resolve(null);
+					});
 				}
 			},
 			Dialog:class extends HTMLDivElement{
@@ -41263,217 +41372,222 @@ new Promise(resolve=>{
 				setTimeout(game.reload,15000)
 			}
 		},
-		loop:function(){
-			while(true){
-				var event=_status.event;
-				var step=event.step;
-				var source=event.source;
-				var player=event.player;
-				var target=event.target;
-				var targets=event.targets;
-				var card=event.card;
-				var cards=event.cards;
-				var skill=event.skill;
-				var forced=event.forced;
-				var num=event.num;
-				var trigger=event._trigger;
-				var result=event._result;
-				if(_status.paused2||_status.imchoosing){
-					if(!lib.status.dateDelaying){
-						lib.status.dateDelaying=new Date();
+		/**
+		 * @param { GameEvent } [belongAsyncEvent]
+		 */
+		loop:function(belongAsyncEvent){
+			if(belongAsyncEvent){
+				game.belongAsyncEvent=belongAsyncEvent;
+			}else if(game.belongAsyncEvent){
+				return game.loop(game.belongAsyncEvent);
+			}
+			return new Promise(async resolve=>{
+				while(true){
+					let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
+					let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
+					const _resolve=()=>{
+						if(event.async){
+							if(typeof event.resolve=='function'){
+								event.resolve(event);
+							}else{
+								throw new TypeError('异步事件的event.resolve未赋值，使用await时将会被永久等待');
+							}
+						}
+					};
+					if(_status.paused2||_status.imchoosing){
+						if(!lib.status.dateDelaying){
+							lib.status.dateDelaying=new Date();
+						}
 					}
-				}
-				if(_status.paused||_status.paused2||_status.over){
-					return;
-				}
-				if(_status.paused3){
-					_status.paused3='paused';
-					return;
-				}
-				if(lib.status.dateDelaying){
-					lib.status.dateDelayed+=lib.getUTC(new Date())-lib.getUTC(lib.status.dateDelaying);
-					delete lib.status.dateDelaying;
-				}
-				if(event.next.length>0){
-					var next=event.next.shift();
-					if(next.player&&next.player.skipList.contains(next.name)){
-						event.trigger(next.name+'Skipped');
-						next.player.skipList.remove(next.name);
-						if(lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name);
+					if(_status.paused||_status.paused2||_status.over){
+						return;
 					}
-					else{
-						next.parent=event;
-						_status.event=next;
-						game.getGlobalHistory('everything').push(next);
+					if(_status.paused3){
+						_status.paused3='paused';
+						return;
 					}
-				}
-				else if(event.finished){
-					if(event._triggered==1){
-						if(event.type=='card') event.trigger('useCardToOmitted');
-						event.trigger(event.name+'Omitted');
-						event._triggered=4;
+					if(lib.status.dateDelaying){
+						lib.status.dateDelayed+=lib.getUTC(new Date())-lib.getUTC(lib.status.dateDelaying);
+						delete lib.status.dateDelaying;
 					}
-					else if(event._triggered==2){
-						if(event.type=='card') event.trigger('useCardToEnd');
-						event.trigger(event.name+'End');
-						event._triggered=3;
+					if (belongAsyncEvent) {
+						console.log('-----------------------');
+						console.log(event);
+						console.log('event.finished', event.finished);
+						console.log('event.after:', [...event.after]);
+						console.log('event.next:', [...event.next]);
 					}
-					else if(event._triggered==3){
-						if(event.type=='card') event.trigger('useCardToAfter');
-						event.trigger(event.name+'After');
-						event._triggered++;
-					}
-					else if(event.after&&event.after.length){
-						var next=event.after.shift();
+					if(event.next.length>0){
+						var next=event.next.shift();
 						if(next.player&&next.player.skipList.contains(next.name)){
 							event.trigger(next.name+'Skipped');
 							next.player.skipList.remove(next.name);
-							if(lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name)
+							if(lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name);
 						}
 						else{
 							next.parent=event;
 							_status.event=next;
+							game.getGlobalHistory('everything').push(next);
 						}
 					}
-					else{
-						if(event.parent){
-							if(event.result){
-								event.parent._result=event.result;
-							}
-							_status.event=event.parent;
+					else if(event.finished){
+						if(event._triggered==1){
+							if(event.type=='card') event.trigger('useCardToOmitted');
+							event.trigger(event.name+'Omitted');
+							event._triggered=4;
 						}
-						else{
-							return;
+						else if(event._triggered==2){
+							if(event.type=='card') event.trigger('useCardToEnd');
+							event.trigger(event.name+'End');
+							event._triggered=3;
 						}
-					}
-				}
-				else{
-					if(event._triggered==0){
-						if(event.type=='card') event.trigger('useCardToBefore');
-						event.trigger(event.name+'Before');
-						event._triggered++;
-					}
-					else if(event._triggered==1){
-						if(event.type=='card') event.trigger('useCardToBegin');
-						event.trigger(event.name+'Begin');
-						event._triggered++;
-						/*if(event.name=='phase'&&!event._begun){
-							var next=game.createEvent('phasing',false,event);
-							next.player=event.player;
-							next.skill=event.skill;
-							next.setContent('phasing');
-							event._begun=true;
-						}
-						else{
-							event.trigger(event.name+'Begin');
+						else if(event._triggered==3){
+							if(event.type=='card') event.trigger('useCardToAfter');
+							event.trigger(event.name+'After');
 							event._triggered++;
-						}*/
-					}
-					else{
-						event.callHandler(event.getDefaultHandlerType(),event,{
-							state:'begin'
-						});
-						if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){
-							game.broadcastAll(function(){
-								while(_status.dieClose.length){
-									_status.dieClose.shift().close();
-								}
-							});
-							if(event._oncancel){
-								event._oncancel();
-							}
-							event.finish();
 						}
-						else if(player&&player.removed&&event.name!='phaseLoop'){
-							event.finish();
-						}
-						else if(player&&player.isOut()&&event.name!='phaseLoop'&&!event.includeOut){
-							if(event.name=='phase'&&player==_status.roundStart&&!event.skill){
-								_status.roundSkipped=true;
+						else if(event.after&&event.after.length){
+							var next=event.after.shift();
+							if(next.player&&next.player.skipList.contains(next.name)){
+								event.trigger(next.name+'Skipped');
+								next.player.skipList.remove(next.name);
+								if(lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name)
 							}
-							event.finish();
+							else{
+								next.parent=event;
+								_status.event=next;
+							}
 						}
 						else{
-							if(_status.withError||lib.config.compatiblemode||(_status.connectMode&&!lib.config.debug)){
-								try{
-									if(event.content instanceof GeneratorFunction){
-										if(!event.debugging){
-											if(event.generatorContent) event.generatorContent.return();
-											event.generatorContent=event.content(event,step,source,player,target,targets,
-												card,cards,skill,forced,num,trigger,result,
-												_status,lib,game,ui,get,ai);
-										}else{
-											delete event.debugging;
-										}
-										var next=event.generatorContent.next();
-										if(typeof next.value=='function'&&next.value.toString()=='code=>eval(code)'){
-											//触发debugger
-											var inputCallback=inputResult=>{
-												if(inputResult===false){
-													event.debugging=true;
-													game.resume2();
-												}else{
-													alert(get.stringify(next.value(inputResult)));
-													game.prompt('','debugger调试',inputCallback);
-												}
-											}
-											game.prompt('','debugger调试',inputCallback);
-											return game.pause2();
-										}
-										if(event.finished) event.generatorContent.return();
-									}else{
-										event.content(event,step,source,player,target,targets,
-											card,cards,skill,forced,num,trigger,result,
-											_status,lib,game,ui,get,ai);
-									}
+							if(event.parent){
+								if(event.result){
+									event.parent._result=event.result;
 								}
-								catch(e){
-									game.print('游戏出错：'+event.name);
-									game.print(e.toString());
-									console.log(e);
+								_status.event=event.parent;
+								if(game.belongAsyncEvent==event){
+									delete game.belongAsyncEvent;
+									resolve();
+								}
+								_resolve();
+								// 此时应该退出了
+								if (belongAsyncEvent && belongAsyncEvent.parent == _status.event){
+									return;
 								}
 							}
 							else{
-								if(event.content instanceof GeneratorFunction){
-									if(!event.debugging){
-										if(event.generatorContent) event.generatorContent.return();
-										event.generatorContent=event.content(event,step,source,player,target,targets,
-											card,cards,skill,forced,num,trigger,result,
-											_status,lib,game,ui,get,ai);
-									}else{
-										delete event.debugging;
-									}
-									var next=event.generatorContent.next();
-									if(typeof next.value=='function'&&next.value.toString()=='code=>eval(code)'){
-										//触发debugger
-										var inputCallback=inputResult=>{
-											if(inputResult===false){
-												event.debugging=true;
-												game.resume2();
-											}else{
-												alert(get.stringify(next.value(inputResult)));
-												game.prompt('','debugger调试',inputCallback);
-											}
-										}
-										game.prompt('','debugger调试',inputCallback);
-										return game.pause2();
-									}
-									if(event.finished) event.generatorContent.return();
-								}else{
-									event.content(event,step,source,player,target,targets,
-										card,cards,skill,forced,num,trigger,result,
-										_status,lib,game,ui,get,ai);
+								if(game.belongAsyncEvent==event){
+									delete game.belongAsyncEvent;
+									resolve();
 								}
+								return _resolve();
 							}
 						}
-						event.clearStepCache();
-						event.callHandler(event.getDefaultHandlerType(),event,{
-							state:'end'
-						});
-						if(typeof event.step=="number") ++event.step;
+					}
+					else{
+						if(event._triggered==0){
+							if(event.type=='card') event.trigger('useCardToBefore');
+							event.trigger(event.name+'Before');
+							event._triggered++;
+						}
+						else if(event._triggered==1){
+							if(event.type=='card') event.trigger('useCardToBegin');
+							event.trigger(event.name+'Begin');
+							event._triggered++;
+						}
+						else{
+							event.callHandler(event.getDefaultHandlerType(),event,{
+								state:'begin'
+							});
+							const after=()=>{
+								event.clearStepCache();
+								event.callHandler(event.getDefaultHandlerType(),event,{
+									state:'end'
+								});
+								if(typeof event.step=="number") ++event.step;
+							};
+							if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){
+								game.broadcastAll(function(){
+									while(_status.dieClose.length){
+										_status.dieClose.shift().close();
+									}
+								});
+								if(event._oncancel){
+									event._oncancel();
+								}
+								event.finish();
+								after();
+							}
+							else if(player&&player.removed&&event.name!='phaseLoop'){
+								event.finish();
+								after();
+							}
+							else if(player&&player.isOut()&&event.name!='phaseLoop'&&!event.includeOut){
+								if(event.name=='phase'&&player==_status.roundStart&&!event.skill){
+									_status.roundSkipped=true;
+								}
+								event.finish();
+								after();
+							}
+							else{
+								await game.runContent(belongAsyncEvent).catch(e=>{
+									if(_status.withError||lib.config.compatiblemode||(_status.connectMode&&!lib.config.debug)){
+										game.print('游戏出错：'+event.name);
+										game.print(e.toString());
+										console.log(e);
+									}
+									else throw e;
+								}).then(after);
+							}
+						}
 					}
 				}
-			}
+			});
+		},
+		runContent(belongAsyncEvent) {
+			return new Promise(resolve=>{
+				let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
+				let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
+				if (event.content instanceof GeneratorFunction) {
+					if (!event.debugging) {
+						if (event.generatorContent) event.generatorContent.return();
+						event.generatorContent = event.content(event, step, source, player, target, targets,
+							card, cards, skill, forced, num, trigger, result,
+							_status, lib, game, ui, get, ai);
+					} else {
+						delete event.debugging;
+					}
+					var next = event.generatorContent.next();
+					if (typeof next.value == 'function' && next.value.toString() == 'code=>eval(code)') {
+						//触发debugger
+						var inputCallback = inputResult => {
+							if (inputResult === false) {
+								event.debugging = true;
+								game.resume2();
+							} else {
+								alert(get.stringify(next.value(inputResult)));
+								game.prompt('', 'debugger调试', inputCallback);
+							}
+						}
+						game.prompt('', 'debugger调试', inputCallback);
+						return game.pause2();
+					}
+					if (event.finished) event.generatorContent.return();
+					resolve();
+				}
+				else if (event.content instanceof AsyncFunction) {
+					// _status,lib,game,ui,get,ai六个变量由game.import提供
+					event.content(event, trigger, player).then(() => {
+						event.finish();
+						resolve();
+					});
+				}
+				else {
+					event.content(event, step, source, player, target, targets,
+						card, cards, skill, forced, num, trigger, result,
+						_status, lib, game, ui, get, ai);
+					resolve();
+				}
+			});
 		},
 		pause:function(){
 			clearTimeout(_status.timeout);
