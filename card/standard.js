@@ -306,7 +306,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(zhu) eff*=Math.max(1,9/target.hp/target.hp);
 							if(isLink){
 								let rate=_status.event.getTempCache('sha_result','mayShan');
-								if(rate&&JSON.stringify(card)===JSON.stringify(rate.card)) rate=rate.rate;
+								if(rate){
+									if(JSON.stringify(card)===JSON.stringify(rate.card)) rate=rate.rate;
+									else delete _status.event._tempCache['sha_result']['mayShan'];
+								}
 								delete target._sha_result_temp;
 								if(typeof rate==='boolean'||typeof rate==='number'){
 									if(rate>=1) return eff;
