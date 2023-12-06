@@ -9495,6 +9495,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=lib.skill.yuqi.getInfo(player);
 					return event.player.isIn()&&get.distance(player,event.player)<=list[0];
 				},
+				changeText: function(list){
+					return ['<span class=thundertext>距离('+list[0]+')</span>','<span class=firetext>观看数量('+list[1]+')</span>','<span class=greentext>交给受伤角色牌的数量('+list[2]+')</span>','<span class=yellowtext>自己获得牌的数量('+list[3]+')</span>']
+				},
+				change: function(player){
+					var list=lib.skill.yuqi.getInfo(player);
+					return player.chooseControl(...lib.skill.yuqi.changeText(list),'cancel2').set('ai',function(){
+						var player=_status.event.player,info=lib.skill.yuqi.getInfo(player);
+						if(info[0]<info[3]&&game.countPlayer(function(current){
+							return get.distance(player,current)<=info[0];
+						})<Math.min(3,game.countPlayer())) return 0;
+						if(info[3]<info[1]-1) return 3;
+						if(info[1]<5) return 1;
+						if(info[0]<5&&game.hasPlayer(function(current){
+							return current!=player&&get.distance(player,current)>info[0];
+						})) return 0;
+						return 2;
+					})
+				},
 				logTarget:'player',
 				content:function(){
 					'step 0'
@@ -9505,7 +9523,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var next=player.chooseToMove(true,'隅泣（若对话框显示不完整，可下滑操作）');
 					next.set('list',[
 						['牌堆顶的牌',cards],
-						['交给'+get.translation(trigger.player)+'（至少一张'+(event.list[2]>1?('，至多'+get.cnNumber(event.list[2])+'张'):'')+'）'],
+						['交给'+get.translation(trigger.player)+(event.list[2]>0?('，至多'+get.cnNumber(event.list[2])+'张'):'')+'）'],
 						['交给自己（至多'+get.cnNumber(event.list[3])+'张）'],
 					]);
 					next.set('filterMove',function(from,to,moved){
@@ -9526,7 +9544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return [cards,[card2],cards1];
 					});
 					next.set('filterOk',function(moved){
-						return moved[1].length>0;
+						return moved[2].length>0;
 					});
 					'step 1'
 					if(result.bool){
@@ -9549,7 +9567,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player){
 						var info=lib.skill.yuqi.getInfo(player);
-						return '<div class="text center"><span class=thundertext>蓝色：'+info[0]+'</span>　<span class=firetext>红色：'+info[1]+'</span><br><span class=greentext>绿色：'+info[2]+'</span>　<span class=yellowtext>黄色：'+info[3]+'</span></div>'
+						var text = "";
+						lib.skill.yuqi.changeText(info).forEach((item)=>{
+							text+=item+'<br>'
+						})
+						return '<div class="text center">'+text+'</div>'
 					},
 				},
 				ai:{
@@ -9565,19 +9587,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.goon=!player.hasAllHistory('sourceDamage',function(evt){
 						return evt.player==trigger.player;
 					});
-					var list=lib.skill.yuqi.getInfo(player);
-					player.chooseControl('<span class=thundertext>蓝色('+list[0]+')</span>','<span class=firetext>红色('+list[1]+')</span>','<span class=greentext>绿色('+list[2]+')</span>','<span class=yellowtext>黄色('+list[3]+')</span>','cancel2').set('prompt',get.prompt('shanshen')).set('prompt2','令〖隅泣〗中的一个数字+2'+(event.goon?'并回复1点体力':'')).set('ai',function(){
-						var player=_status.event.player,info=lib.skill.yuqi.getInfo(player);
-						if(info[0]<info[3]&&game.countPlayer(function(current){
-							return get.distance(player,current)<=info[0];
-						})<Math.min(3,game.countPlayer())) return 0;
-						if(info[3]<info[1]-1) return 3;
-						if(info[1]<5) return 1;
-						if(info[0]<5&&game.hasPlayer(function(current){
-							return current!=player&&get.distance(player,current)>info[0];
-						})) return 0;
-						return 2;
-					});
+					lib.skill.yuqi.change(player).set('prompt',get.prompt('shanshen')).set('prompt2','令〖隅泣〗中的一个数字+2'+(event.goon?'并回复1点体力':''));
 					'step 1'
 					if(result.control!='cancel2'){
 						player.logSkill('shanshen',trigger.player);
@@ -9595,19 +9605,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					var list=lib.skill.yuqi.getInfo(player);
-					player.chooseControl('<span class=thundertext>蓝色('+list[0]+')</span>','<span class=firetext>红色('+list[1]+')</span>','<span class=greentext>绿色('+list[2]+')</span>','<span class=yellowtext>黄色('+list[3]+')</span>','cancel2').set('prompt',get.prompt('xianjing')).set('prompt2','令〖隅泣〗中的一个数字+1').set('ai',function(){
-						var player=_status.event.player,info=lib.skill.yuqi.getInfo(player);
-						if(info[0]<info[3]&&game.countPlayer(function(current){
-							return get.distance(player,current)<=info[0];
-						})<Math.min(3,game.countPlayer())) return 0;
-						if(info[3]<info[1]-1) return 3;
-						if(info[1]<5) return 1;
-						if(info[0]<5&&game.hasPlayer(function(current){
-							return current!=player&&get.distance(player,current)>info[0];
-						})) return 0;
-						return 2;
-					});
+					lib.skill.yuqi.change(player).set('prompt',get.prompt('xianjing')).set('prompt2','令〖隅泣〗中的一个数字+1');
 					'step 1'
 					if(result.control!='cancel2'){
 						player.logSkill('xianjing');
@@ -9619,19 +9617,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					var list=lib.skill.yuqi.getInfo(player);
-					player.chooseControl('<span class=thundertext>蓝色('+list[0]+')</span>','<span class=firetext>红色('+list[1]+')</span>','<span class=greentext>绿色('+list[2]+')</span>','<span class=yellowtext>黄色('+list[3]+')</span>','cancel2').set('prompt','是否令〖隅泣〗中的一个数字+1？').set('ai',function(){
-						var player=_status.event.player,info=lib.skill.yuqi.getInfo(player);
-						if(info[0]<info[3]&&game.countPlayer(function(current){
-							return get.distance(player,current)<=info[0];
-						})<Math.min(3,game.countPlayer())) return 0;
-						if(info[3]<info[1]-1) return 3;
-						if(info[1]<5) return 1;
-						if(info[0]<5&&game.hasPlayer(function(current){
-							return current!=player&&get.distance(player,current)>info[0];
-						})) return 0;
-						return 2;
-					});
+					lib.skill.yuqi.change(player);
 					'step 3'
 					if(result.control!='cancel2'){
 						var list=lib.skill.yuqi.getInfo(player);
