@@ -19976,7 +19976,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(result.bool){
-						var ideitity=result.links[0];
+						var identity=result.links[0];
 						player.addSkill(identity);
 						player.markSkill('fenxin');
 					}
