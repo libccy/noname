@@ -1,4 +1,4 @@
-import { CharacterInformation } from "./character-information";
+import { CharacterInformation } from "./character-information.js";
 
 interface CharacterPack extends Record<string, Record<string, CharacterInformation>> { }
 

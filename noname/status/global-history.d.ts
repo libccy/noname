@@ -2,7 +2,7 @@ import { GameEvent } from "../library/element/game-event";
 
 export interface GlobalHistory {
 	cardMove: GameEvent[];
-	custom: any[];
+	custom: unknown[];
 	useCard: GameEvent[];
 	changeHp: GameEvent[];
 	everything: GameEvent[];

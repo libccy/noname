@@ -1,7 +1,7 @@
 import { Game } from "../../../../game.js";
 import { UI } from "../../../../ui.js";
 
-export const lowPerformance = {
+export const LOW_PERFORMANCE = {
 	name: "流畅模式",
 	init: false,
 	intro: "减少部分游戏特效，提高游戏速度",

@@ -1,5 +1,5 @@
 import { GameEvent } from "./library/element/game-event.js";
-import { aiStatus } from "./status/ai.js";
+import { ai } from "./status/ai.js";
 import { cardTag } from "./status/card-tag.js";
 import { postReconnect } from "./status/post-reconnect.js";
 
@@ -11,7 +11,7 @@ export const status = {
 	clicked: false,
 	auto: false,
 	event: GameEvent.initialGameEvent(),
-	ai: aiStatus,
+	ai,
 	lastdragchange: [],
 	skillaudio: [],
 	dieClose: [],

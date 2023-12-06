@@ -1,3 +1,3 @@
-export const aiStatus = {
+export const ai = {
 	customAttitude: []
 };
