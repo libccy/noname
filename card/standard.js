@@ -307,14 +307,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(isLink){
 								let rate=_status.event.getTempCache('sha_result','mayShan');
 								if(rate){
-									if(JSON.stringify(card)===JSON.stringify(rate.card)) rate=rate.rate;
-									else delete _status.event._tempCache['sha_result']['mayShan'];
+									if(card.cardid||rate.card.cardid){
+										if(card.cardid==rate.card.cardid) rate=rate.rate;
+									}
+									else if(JSON.stringify(card)===JSON.stringify(rate.card)) rate=rate.rate;
 								}
 								delete target._sha_result_temp;
 								if(typeof rate==='boolean'||typeof rate==='number'){
 									if(rate>=1) return eff;
 									return basic*eff*(1.3-0.9*rate);
 								}
+								else delete _status.event._tempCache['sha_result']['mayShan'];
 								return basic*eff;
 							}
 							let mayShan;
