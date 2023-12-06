@@ -8701,7 +8701,7 @@ window.noname_asset_list=[
 	'image/mode/boss/card/shanrangzhaoshu.png',
 	'image/mode/boss/card/xingtianpojunfu.png',
 	'image/mode/boss/card/niaobaidaowenha.png',
-	
+  
 	'image/mode/boss/character/boss_baihu.jpg',
 	'image/mode/boss/character/boss_baimangshilian.jpg',
 	'image/mode/boss/character/boss_baiwuchang.jpg',
