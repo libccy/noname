@@ -286,7 +286,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return res;
 					},
 					result:{
-						target:function(player,target,card,isLink){
+						target:(player,target,card,isLink)=>{
 							if(target._sha_result_temp) return -1.5;
 							target._sha_result_temp=true;
 							let basic=1,eff=-1.5,zhu=target.isZhu&&target.identityShown;
@@ -306,10 +306,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(zhu) eff*=Math.max(1,9/target.hp/target.hp);
 							if(isLink){
 								let rate=_status.event.getTempCache('sha_result','mayShan');
-								if(rate&&rate.card===card) rate=rate.rate;
+								if(rate&&JSON.stringify(card)===JSON.stringify(rate.card)) rate=rate.rate;
 								delete target._sha_result_temp;
 								if(typeof rate==='boolean'||typeof rate==='number'){
-									if(!rate) return basic*eff*1.3;
 									if(rate>=1) return eff;
 									return basic*eff*(1.3-0.9*rate);
 								}
@@ -334,7 +333,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								rate:mayShan
 							});
 							delete target._sha_result_temp;
-							if(!mayShan) return basic*eff;
 							if(mayShan>=1) return eff;
 							return basic*eff*(1.3-0.9*mayShan);
 						},
