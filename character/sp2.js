@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
-			star_dongzhuo:['male','qun',5,['star_dz_a','star_dz_b','star_dz_c'],['zhu']],
+			star_dongzhuo:['male','qun',5,['starweilin','starzhangrong','starhaoshou'],['zhu']],
 			star_yuanshu:['male','qun',4,['starcanxi','starpizhi','starzhonggu'],['zhu']],
 			star_caoren:['male','wei',4,['starsujun','starlifeng']],
 			mp_liuling:['male','jin',3,['mpjiusong','mpmaotao','mpbishi'],['doublegroup:wei:qun:jin']],
@@ -117,7 +117,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			//星董卓
-			star_dz_a:{
+			starweilin:{
 				audio:2,
 				trigger:{source:'damageBegin1'},
 				filter:function(event,player){
@@ -129,7 +129,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.num++;
 				},
 			},
-			star_dz_b:{
+			starzhangrong:{
 				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
@@ -149,28 +149,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})) list.unshift('弃牌');
 					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
 					list.unshift('扣血');
-					var result=yield player.chooseControl(list).set('prompt','###'+get.prompt('star_dz_b')+'###选择其中一项令任意名符合条件的角色执行，然后你摸等量的牌，回合结束时，若这些角色中有本回合未受到过伤害的角色，则你失去1点体力').set('ai',()=>{
+					var result=yield player.chooseControl(list).set('prompt','###'+get.prompt('starzhangrong')+'###选择其中一项令任意名符合条件的角色执行，然后你摸等量的牌，回合结束时，若这些角色中有本回合未受到过伤害的角色，则你失去1点体力').set('ai',()=>{
 						var player=_status.event.player;
 						var controls=_status.event.controls.slice();
+						/*
 						var cards=player.getCards('hes',card=>get.tag(card,'damage')&&player.hasValueTarget(card));
 						var cardx=cards.filter(card=>get.name(card)=='sha');
 						cardx.sort((a,b)=>player.getUseValue(b)-player.getUseValue(a));
 						cardx=cardx.slice(Math.min(cardx.length,player.getCardUsable('sha')),cardx.length);
 						cards.removeArray(cardx);
-						var targets1=game.filterPlayer(target=>get.attitude(player,target)<0&&target.getHp()>=player.getHp()&&get.effect(target,{name:'losehp'},player,player)>0&&cards.some(card=>player.canUse(card,target)));
-						_status.star_dz_b_check=true;
-						var targets2=game.filterPlayer(target=>get.attitude(player,target)<0&&target.countCards('h')>=Math.max(1,player.countCards('h'))&&get.effect(target,{name:'guohe_copy2'},player,player)>0&&cards.some(card=>player.canUse(card,target)));
-						delete _status.star_dz_b_check;
+						*/
+						var targets1=game.filterPlayer(target=>get.attitude(player,target)<0&&target.getHp()>=player.getHp()&&get.effect(target,{name:'losehp'},player,player)>0/*&&cards.some(card=>player.canUse(card,target))*/);
+						_status.starzhangrong_check=true;
+						var targets2=game.filterPlayer(target=>get.attitude(player,target)<0&&target.countCards('h')>=Math.max(1,player.countCards('h'))&&get.effect(target,{name:'guohe_copy2'},player,player)>0/*&&cards.some(card=>player.canUse(card,target))*/);
+						delete _status.starzhangrong_check;
 						[targets1,targets2].forEach(list=>{
 							list.sort((a,b)=>get.damageEffect(b)-get.damageEffect(a));
-							list=list.slice(0,Math.min(player.getHp(),cards.length));
+							list=list.slice(0,Math.min(player.getHp()/*,cards.length*/));
 						});
 						if(!controls.includes('弃牌')) return 1-get.sgn(targets1.length);
 						return Math.max(0,get.sgn(targets2.length-targets1.length));
 					}).set('choiceList',choiceList);
 					if(result.control!='cancel2'){
 						var choice=result.index;
-						var result2=yield player.chooseTarget([1,player.getHp()],'请选择【技能】的目标','令至多'+str+'名'+(choice?'手牌数':'体力值')+'大于你的角色各'+(choice?'弃置一张手牌':'失去1点体力'),(card,player,target)=>{
+						var result2=yield player.chooseTarget([1,player.getHp()],'请选择【掌戎】的目标','令至多'+str+'名'+(choice?'手牌数':'体力值')+'大于你的角色各'+(choice?'弃置一张手牌':'失去1点体力'),(card,player,target)=>{
 							var name=_status.event.card.name;
 							if(name=='guohe_copy2'){
 								if(target==player) return player.countCards('h',card=>lib.filter.cardDiscardable(card,player));
@@ -184,15 +186,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).set('card',{name:choice?'guohe_copy2':'loseHp'});
 						if(result2.bool){
 							var targets=result2.targets.sortBySeat();
-							player.logSkill('star_dz_b',targets);
+							player.logSkill('starzhangrong',targets);
 							targets.forEach(target=>{
-								target.addTempSkill('star_dz_b_threaten');
+								target.addTempSkill('starzhangrong_threaten');
 								if(choice) target.chooseToDiscard('h',true);
 								else target.loseHp();
 							});
 							player.draw(targets.length);
 							player.when('phaseEnd').then(()=>{
-								targets.forEach(target=>target.removeSkill('star_dz_b_threaten'));
+								targets.forEach(target=>target.removeSkill('starzhangrong_threaten'));
 								var targetx=targets.filter(target=>!target.getHistory('damage').length);
 								if(targetx.length){
 									targetx.forEach(target=>target.chat('乐'));
@@ -205,13 +207,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				global:'star_dz_b_check',
+				global:'starzhangrong_check',
 				subSkill:{
 					check:{
 						mod:{
 							canBeDiscarded:function(card,player,target){
-								if(!_status.star_dz_b_check) return;
-								if(player.hasSkill('star_dz_b')&&get.position(card)!='h') return false;
+								if(!_status.starzhangrong_check) return;
+								if(player.hasSkill('starzhangrong')&&get.position(card)!='h') return false;
 							},
 						},
 					},
@@ -222,7 +224,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						popup:false,
 						content:function(){
-							player.removeSkill('star_dz_b_threaten');
+							player.removeSkill('starzhangrong_threaten');
 						},
 						ai:{threaten:114514+1919810},
 						mark:true,
@@ -231,7 +233,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			star_dz_c:{
+			starhaoshou:{
 				unique:true,
 				audio:2,
 				trigger:{global:'useCardAfter'},
@@ -242,24 +244,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				zhuSkill:true,
 				content:function*(event,map){
 					var player=map.player,target=map.trigger.player;
-					var result=yield target.chooseBool(get.prompt('star_dz_c',player),'令'+get.translation(player)+'回复1点体力').set('choice',get.recoverEffect(player,target,target)>0);
+					var result=yield target.chooseBool(get.prompt('starhaoshou',player),'令'+get.translation(player)+'回复1点体力').set('choice',get.recoverEffect(player,target,target)>0);
 					if(result.bool){
 						target.line(player);
-						player.logSkill('star_dz_c');
+						player.logSkill('starhaoshou');
 						player.recover();
 					}
 				},
-				global:'star_dz_c_global',
+				//global:'starhaoshou_global',
 				subSkill:{
 					global:{
-						audio:'star_dz_c',
+						audio:'starhaoshou',
 						forceaudio:true,
 						filter:function(event,player){
 							if(!player.countCards('hes',card=>{
 								if(get.position(card)=='h'&&_status.connectMode) return true;
 								return get.name(card)=='jiu';
 							})) return false;
-							return event.type=='dying'&&event.dying&&event.dying!=player&&event.dying.hp<=0&&event.dying.hasZhuSkill('star_dz_c')&&player.group=='qun';
+							return event.type=='dying'&&event.dying&&event.dying!=player&&event.dying.hp<=0&&event.dying.hasZhuSkill('starhaoshou')&&player.group=='qun';
 						},
 						filterCard:function(card,player){
 							return get.name(card)=='jiu';
@@ -276,7 +278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!player.countCards('hes',card=>{
 									if(get.position(card)=='h'&&_status.connectMode) return true;
 									return get.name(card)=='jiu';
-								})||player==target||!target.hasSkill('star_dz_c')||player.group!='qun') return false;
+								})||player==target||!target.hasSkill('starhaoshou')||player.group!='qun') return false;
 							},
 						},
 					},
@@ -11158,12 +11160,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starzhonggu_info:'主公技，锁定技。摸牌阶段，若游戏轮数大于等于场上的群势力角色数，则你额外摸两张牌，否则你少摸一张牌。',
 			star_dongzhuo:'星董卓',
 			star_dongzhuo_prefix:'星',
-			star_dz_a:'技能',
-			star_dz_a_info:'锁定技。当你于回合内对一名其他角色造成伤害时，若其本回合未受到过伤害，且你本回合使用的牌数大于等于其体力值，则此伤害+1。',
-			star_dz_b:'技能',
-			star_dz_b_info:'准备阶段，你可以选择令至多X名体力值大于等于你的角色各失去1点体力或令至多X名手牌数大于等于你的角色各弃置一张手牌。若如此做，你摸等同于选择角色数的牌，且本回合结束时，若这些角色中存在本回合未受到过伤害的角色，则你失去1点体力。',
-			star_dz_c:'技能',
-			star_dz_c_info:'主公技。①其他群势力角色使用【酒】结算完毕后，其可以令你回复1点体力。②当你处于濒死状态时，其他群势力角色可以将【酒】当作【桃】对你使用。',
+			starweilin:'威临',
+			starweilin_info:'锁定技。当你于回合内对一名其他角色造成伤害时，若其本回合未受到过伤害，且你本回合使用的牌数大于等于其体力值，则此伤害+1。',
+			starzhangrong:'掌戎',
+			starzhangrong_info:'准备阶段，你可以选择令至多X名体力值大于等于你的角色各失去1点体力或令至多X名手牌数大于等于你的角色各弃置一张手牌。若如此做，你摸等同于选择角色数的牌，且本回合结束时，若这些角色中存在本回合未受到过伤害的角色，则你失去1点体力。',
+			starhaoshou:'豪首',
+			//starhaoshou_info:'主公技。①其他群势力角色使用【酒】结算完毕后，其可以令你回复1点体力。②当你处于濒死状态时，其他群势力角色可以将【酒】当作【桃】对你使用。',
+			starhaoshou_info:'主公技。其他群势力角色使用【酒】结算完毕后，其可以令你回复1点体力。。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
