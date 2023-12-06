@@ -32131,7 +32131,6 @@ new Promise(resolve=>{
 						event.resolve=resolve;
 						//如果父级事件也是一个异步的话，那应该立即执行这个事件的
 						if(_status.event.next.includes(event)&&_status.event.content instanceof AsyncFunction){
-							// console.log(event, '的父级事件也是一个异步,立即执行这个事件');
 							if (_status.event != event) {
 								event.parent = _status.event;
 								_status.event = event;
@@ -41409,13 +41408,6 @@ new Promise(resolve=>{
 					if(lib.status.dateDelaying){
 						lib.status.dateDelayed+=lib.getUTC(new Date())-lib.getUTC(lib.status.dateDelaying);
 						delete lib.status.dateDelaying;
-					}
-					if (belongAsyncEvent) {
-						console.log('-----------------------');
-						console.log(event);
-						console.log('event.finished', event.finished);
-						console.log('event.after:', [...event.after]);
-						console.log('event.next:', [...event.next]);
 					}
 					if(event.next.length>0){
 						var next=event.next.shift();
