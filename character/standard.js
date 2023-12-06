@@ -586,17 +586,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				frequent:true,
 				filter:function(event){
-					return (event.num>0)
+					return event.num>0;
 				},
 				async content(event, trigger, player) {
 					event.count = trigger.num;
+					// event.goto -> while
 					while (event.count > 0) {
 						event.count--;
 						const { cards } = await game.cardsGotoOrdering(get.cards(2)).toPromise();
 						if (_status.connectMode) game.broadcastAll(function () { _status.noclearcountdown = true });
 						event.given_map = {};
-
 						if (!cards.length) return;
+						// event.goto -> do while
 						do {
 							const { result: { bool, links } } =
 								cards.length == 1 ?
