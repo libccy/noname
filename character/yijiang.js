@@ -44,7 +44,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuran:['male','wu',4,['danshou']],
 			xusheng:['male','wu',4,['xinpojun']],
 			wuguotai:['female','wu',3,['ganlu','buyi']],
-			lingtong:['male','wu',4,['olxuanfeng']],
+			lingtong:['male','wu',4,['xuanfeng']],
 			liubiao:['male','qun',3,['rezishou','zongshi']],
 			yufan:['male','wu',3,['zhiyan','zongxuan']],
 			chengong:['male','qun',3,['mingce','zhichi']],
