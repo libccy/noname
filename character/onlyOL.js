@@ -93,6 +93,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num==player.getHp()) str+='和';
 					if(num<=player.getHp()) str+='【诈降】';
 					str+='。将手牌数调整至手牌或将体力值调整为体力上限。然后你不能回复体力直到你杀死角色。';
+					return str;
 				},
 				content:function*(event,map){
 					var player=map.player;
