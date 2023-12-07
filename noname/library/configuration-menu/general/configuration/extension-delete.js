@@ -1,15 +1,15 @@
 import { Game } from "../../../../game.js";
 import { UI } from "../../../../ui.js";
-import { config } from "../../../config.js";
+import { configuration } from "../../../configuration.js";
 
 export const EXTENSION_DELETE = {
 	name: "删除当前扩展地址",
 	clear: true,
 	unfrequent: true,
 	onclick() {
-		var bool = false, map = config.extension_sources;
+		var bool = false, map = configuration.extension_sources;
 		for (var i in map) {
-			if (i != config.extension_source) {
+			if (i != configuration.extension_source) {
 				bool = true;
 				break;
 			}
@@ -18,7 +18,7 @@ export const EXTENSION_DELETE = {
 			alert("不能删除最后一个扩展地址！");
 			return;
 		}
-		var name = config.extension_source;
+		var name = configuration.extension_source;
 		Game.saveConfig("extension_source", i);
 		delete map[name];
 		Game.saveConfig("extension_sources", map);

@@ -1,7 +1,7 @@
 import { Game } from "../../../../game.js";
 import { UI } from "../../../../ui.js";
 import { Create } from "../../../../ui/create.js";
-import { config } from "../../../config.js";
+import { configuration } from "../../../configuration.js";
 
 export const EXTENSION_CREATE = {
 	name: "添加获取扩展地址",
@@ -11,7 +11,7 @@ export const EXTENSION_CREATE = {
 		Game.prompt("请输入地址名称", str => {
 			if (!str) return;
 
-			var map = config.extension_sources;
+			var map = configuration.extension_sources;
 			Game.prompt(`请输入${str}的地址`, str2 => {
 				if (!str2) return;
 

@@ -1,7 +1,7 @@
 import { Game } from "../../../../game.js";
 import { UI } from "../../../../ui.js";
 import { Click } from "../../../../ui/click.js";
-import { config } from "../../../config.js";
+import { configuration } from "../../../configuration.js";
 
 export const MOUSE_WHEEL = {
 	name: "滚轮控制手牌",
@@ -10,8 +10,8 @@ export const MOUSE_WHEEL = {
 	intro: "开启后滚轮可使手牌横向滚动，在mac等可横向滚动的设备上建议关闭",
 	onclick(bool) {
 		Game.saveConfig("mousewheel", bool);
-		if (config.touchscreen) return;
-		if (config.mousewheel) {
+		if (configuration.touchscreen) return;
+		if (configuration.mousewheel) {
 			UI.handcards1Container.onmousewheel = Click.mousewheel;
 			UI.handcards2Container.onmousewheel = Click.mousewheel;
 		}

@@ -1,5 +1,5 @@
 import { Get } from "../get.js";
-import { config } from "./config.js";
+import { configuration } from "./configuration.js";
 
 export class CharacterDialogGroup {
 	constructor() {
@@ -7,7 +7,7 @@ export class CharacterDialogGroup {
 	}
 
 	static 收藏(name, capt) {
-		return config.favouriteCharacter.includes(name) ? capt : null;
+		return configuration.favouriteCharacter.includes(name) ? capt : null;
 	}
 
 	static 最近(name, capt) {

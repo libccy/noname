@@ -10,7 +10,7 @@ import { characterPack } from "./library/character-pack.js";
 import { characterReplace } from "./library/character-replace.js";
 import { characterSort } from "./library/character-sort.js";
 import { characterTitle } from "./library/character-title.js";
-import { configMenu } from "./library/config-menu.js";
+import { CONFIGURATION_MENU } from "./library/configuration-menu.js";
 import { dynamicTranslate } from "./library/dynamic-translate.js";
 import { element } from "./library/element.js";
 import { emotionList } from "./library/emotion-list.js";
@@ -100,7 +100,7 @@ export class Library {
 		["霹雳投石车", "霹雳车"]
 	])
 	static characterDialogGroup = CharacterDialogGroup;
-	static configMenu = configMenu;
+	static configMenu = CONFIGURATION_MENU;
 
 	constructor() {
 		throw new TypeError(`${new.target.name} is not a constructor`);
