@@ -32188,7 +32188,7 @@ new Promise(resolve=>{
 							return Reflect.set(event,prop,newValue);
 						},
 						deleteProperty(target,prop){
-							return Reflect.set(event,prop);
+							return Reflect.deleteProperty(event,prop);
 						},
 						defineProperty(target,prop,attributes){
 							return Reflect.defineProperty(event,prop,attributes);
