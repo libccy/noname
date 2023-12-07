@@ -8586,14 +8586,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!event.isFirstTarget||!get.tag(event.card,'damage')) return false;
 					return !player.hasSkillTag('noCompareSource')&&game.hasPlayer(target=>{
-						return target!=player&&target.countCards('h')>0&&!target.hasSkillTag('noCompareTarget');
+						return player.canCompare(target,true);
 					});
 				},
 				direct:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('twzhenhu'),[1,3],function(card,player,target){
-						return target!=player&&target.countCards('h')>0&&!target.hasSkillTag('noCompareTarget');
+						return player.canCompare(target,true);
 					}).set('ai',function(target){
 						var player=_status.event.player,targets=_status.event.getTrigger().targets;
 						var num=0;

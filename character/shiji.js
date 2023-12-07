@@ -2276,11 +2276,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return !player.hasSkillTag('noCompareSource');
+					return game.hasPlayer(target=>player.canCompare(target,true));
 				},
 				filterTarget:function(card,player,target){
-					return target!=player&&target.countCards('h')>0&&
-					!target.hasSkillTag('noCompareTarget');
+					return player.canCompare(target,true);
 				},
 				content:function(){
 					'step 0'

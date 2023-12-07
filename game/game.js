@@ -22383,9 +22383,9 @@ new Promise(resolve=>{
 					next.setContent('swapEquip');
 					return next;
 				}
-				canCompare(target){
+				canCompare(target,goon,bool){
 					if(this==target) return false;
-					if(!this.countCards('h')||!target.countCards('h')) return false;
+					if((!this.countCards('h')&&goon!==true)||(!target.countCards('h')&&bool!==true)) return false;
 					if(this.hasSkillTag('noCompareSource')||target.hasSkillTag('noCompareTarget')) return false;
 					return true;
 				}
