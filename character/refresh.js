@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
+			ol_caozhang:['male','wei',4,['oljiangchi'],['unseen']],
 			ol_jianyong:['male','shu',3,['olqiaoshui','jyzongshi'],['unseen']],
 			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong','unseen']],
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
@@ -171,6 +172,73 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
+			//界曹彰
+			oljiangchi:{
+				audio:2,
+				trigger:{player:'phaseDrawEnd'},
+				direct:true,
+				content:function*(event,map){
+					var player=map.player;
+					var choiceList=[
+						'摸一张牌，本回合使用【杀】的次数上限-1，且【杀】不计入手牌上限。',
+						'重铸一张牌，本回合使用【杀】无距离限制，且使用【杀】的次数上限+1。',
+					],list=['cancel2'];
+					if(player.countCards('he',card=>player.canRecast(card))) list.unshift('重铸，+1');
+					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+					list.unshift('摸牌，-1');
+					var result=yield player.chooseControl(list).set('ai',()=>{
+						var player=_status.event.player;
+						var controls=_status.event.controls.slice();
+						if(controls.includes('重铸，+1')&&player.countCards('hs',card=>get.name(card)=='sha'&&player.hasValueTarget(card))>=2) return '重铸，+1';
+						return '摸牌，-1';
+					}).set('choiceList',choiceList).set('prompt',get.prompt('oljiangchi'));
+					if(result.control!='cancel2'){
+						player.logSkill('oljiangchi');
+						if(result.control=='摸牌，-1'){
+							player.draw();
+							player.addTempSkill('oljiangchi_less');
+							player.addMark('oljiangchi_less',1,false);
+						}
+						else{
+							var result2=yield player.chooseCard('he','将驰：请重铸一张牌',true,(card,player)=>player.canRecast(card));
+							if(resulg2.bool){
+								player.recast(result2.cards);
+								player.addTempSkill('oljiangchi_more');
+								player.addMark('oljiangchi_more',1,false);
+							}
+						}
+					}
+				},
+				subSkill:{
+					less:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							cardUsable:function(card,player,num){
+								if(card.name=='sha') return num-player.countMark('oljiangchi_less');
+							},
+							ignoredHandcard:function(card,player){
+								if(card.name=='sha') return true;
+							},
+							cardDiscardable:function(card,player,name){
+								if(name=='phaseDiscard'&&card.name=='sha') return false;
+							},
+						},
+					},
+					more:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							cardUsable:function(card,player,num){
+								if(card.name=='sha') return num+player.countMark('oljiangchi_more');
+							},
+							targetInRange:function (card,player){
+								if(card.name=='sha') return true;
+							},
+						},
+					},
+				},
+			},
 			//界简雍
 			olqiaoshui:{
 				audio:2,
@@ -15647,6 +15715,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_jianyong_prefix:'OL界',
 			olqiaoshui:'巧说',
 			olqiaoshui_info:'出牌阶段，你可与一名其他角色拼点。若你赢，你使用的下一张基本牌或普通锦囊牌可以额外指定任意一名其他角色为目标或减少指定一个目标；若你没赢，此技能于本回合失效且本回合你不能使用锦囊牌。',
+			ol_caozhang:'OL界曹彰',
+			ol_caozhang_prefix:'OL界',
+			oljiangchi:'将驰',
+			oljiangchi_info:'摸牌阶段结束时，你可以选择一项：①摸一张牌，本回合使用【杀】的次数上限-1，且【杀】不计入手牌上限。②重铸一张牌，本回合使用【杀】无距离限制，且使用【杀】的次数上限+1。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
