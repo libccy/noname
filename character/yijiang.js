@@ -13915,7 +13915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gaoshun:['gaoshun','xin_gaoshun','re_gaoshun','old_gaoshun'],
 			zhonghui:['zhonghui','xin_zhonghui','re_zhonghui','old_zhonghui','pe_zhonghui'],
 			wangyi:['wangyi','re_wangyi','old_wangyi'],
-			caozhang:['caozhang','re_caozhang','xin_caozhang'],
+			caozhang:['caozhang','ol_caozhang','re_caozhang','xin_caozhang'],
 			guanzhang:['guanzhang','re_guanzhang','old_guanzhang'],
 			madai:['old_madai','re_madai','tw_madai','madai'],
 			liaohua:['liaohua','re_liaohua','xin_liaohua'],
