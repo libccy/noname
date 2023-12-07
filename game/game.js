@@ -32104,7 +32104,6 @@ new Promise(resolve=>{
 				/**
 				 * 事件转为Promise化
 				 * 
-				 * 注: 该函数在async content中执行时，必须在所有setxx函数执行后执行。
 				 * @returns { Promise<GameEvent> & GameEvent }
 				 */
 				toPromise(){
@@ -32114,8 +32113,30 @@ new Promise(resolve=>{
 					return new lib.element.GameEventPromise(this);
 				}
 			},
+			/**
+			 * 对于事件Promise化后，需要既能使用await等待事件完成，
+			 * 又需要在执行之前对事件进行配置。
+			 * 
+			 * 所以这个类的实例集成了事件和Promise二者的所有属性，
+			 * 且Promise的原有属性无法被修改，一切对这个类实例的属性修改，删除，
+			 * 再配置等操作都会转发到事件对应的属性中。
+			 * 
+			 * @todo 需要完成异步事件的debugger方法
+			 * 
+			 * @example
+			 * 使用toPromise()函数将普通事件转换为异步事件：
+			 * ```js
+			 * await game.xxx().toPromise().setContent('yyy').set(zzz, 'i');
+			 * ```
+			 * 使用player.promises.xxx()函数将对于player的普通事件转换为异步事件：
+			 * ```js
+			 * await player.draw(2);
+			 * game.log('等待', player, '摸牌完成执行log');
+			 * ```
+			 */
 			GameEventPromise:class extends Promise{
 				// 我谢谢你，这里是必须有的
+				// 否则Promise的方法对其子类无效
 				static get [Symbol.species]() { 
 					return Promise;
 				}
@@ -32129,27 +32150,32 @@ new Promise(resolve=>{
 						event.async=true;
 						// 事件结束后触发resolve
 						event.resolve=resolve;
-						//如果父级事件也是一个异步的话，那应该立即执行这个事件的
+						// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
+						// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
 						if(_status.event.next.includes(event)&&_status.event.content instanceof AsyncFunction){
-							if (_status.event != event) {
-								event.parent = _status.event;
-								_status.event = event;
+							if (_status.event!=event) {
+								event.parent=_status.event;
+								_status.event=event;
 								game.getGlobalHistory('everything').push(event);
 							}
-							game.loop(event);
+							// 异步执行game.loop
+							// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
+							// 再执行game.loop是因为原有的game.loop被await卡住了，
+							// 得新执行一个只执行这个异步事件的game.loop
+							Promise.resolve().then(()=>game.loop(event));
 						}
 					});
 					return new Proxy(this,{
 						get(target,prop,receiver){
 							const thisValue=Reflect.get(target,prop);
 							if(thisValue){
-								if(typeof thisValue=='function') {
+								if(typeof thisValue=='function'){
 									return thisValue.bind(target);
 								}
 								return thisValue;
 							}
 							const eventValue=Reflect.get(event,prop);
-							// 返回值如果是event，则修改为GameEventPromise
+							// 返回值如果是event，则修改为GameEventPromise类实例
 							if(typeof eventValue=='function') return (function(...args){
 								const returnValue=eventValue.call(event,...args);
 								return returnValue==event?receiver:returnValue;
@@ -41374,166 +41400,164 @@ new Promise(resolve=>{
 		/**
 		 * @param { GameEvent } [belongAsyncEvent]
 		 */
-		loop:function(belongAsyncEvent){
+		async loop(belongAsyncEvent){
 			if(belongAsyncEvent){
 				game.belongAsyncEvent=belongAsyncEvent;
 			}else if(game.belongAsyncEvent){
 				return game.loop(game.belongAsyncEvent);
 			}
-			return new Promise(async resolve=>{
-				while(true){
-					let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
-					let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
-					const _resolve=()=>{
-						if(event.async){
-							if(typeof event.resolve=='function'){
-								event.resolve(event);
-							}else{
-								throw new TypeError('异步事件的event.resolve未赋值，使用await时将会被永久等待');
-							}
-						}
-					};
-					if(_status.paused2||_status.imchoosing){
-						if(!lib.status.dateDelaying){
-							lib.status.dateDelaying=new Date();
+			while (true) {
+				let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
+				let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
+				const _resolve = () => {
+					if (event.async) {
+						if (typeof event.resolve == 'function') {
+							event.resolve(event);
+						} else {
+							throw new TypeError('异步事件的event.resolve未赋值，使用await时将会被永久等待');
 						}
 					}
-					if(_status.paused||_status.paused2||_status.over){
-						return;
+				};
+				if (_status.paused2 || _status.imchoosing) {
+					if (!lib.status.dateDelaying) {
+						lib.status.dateDelaying = new Date();
 					}
-					if(_status.paused3){
-						_status.paused3='paused';
-						return;
+				}
+				if (_status.paused || _status.paused2 || _status.over) {
+					return;
+				}
+				if (_status.paused3) {
+					_status.paused3 = 'paused';
+					return;
+				}
+				if (lib.status.dateDelaying) {
+					lib.status.dateDelayed += lib.getUTC(new Date()) - lib.getUTC(lib.status.dateDelaying);
+					delete lib.status.dateDelaying;
+				}
+				if (event.next.length > 0) {
+					var next = event.next.shift();
+					if (next.player && next.player.skipList.contains(next.name)) {
+						event.trigger(next.name + 'Skipped');
+						next.player.skipList.remove(next.name);
+						if (lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name);
 					}
-					if(lib.status.dateDelaying){
-						lib.status.dateDelayed+=lib.getUTC(new Date())-lib.getUTC(lib.status.dateDelaying);
-						delete lib.status.dateDelaying;
+					else {
+						next.parent = event;
+						_status.event = next;
+						game.getGlobalHistory('everything').push(next);
 					}
-					if(event.next.length>0){
-						var next=event.next.shift();
-						if(next.player&&next.player.skipList.contains(next.name)){
-							event.trigger(next.name+'Skipped');
+				}
+				else if (event.finished) {
+					if (event._triggered == 1) {
+						if (event.type == 'card') event.trigger('useCardToOmitted');
+						event.trigger(event.name + 'Omitted');
+						event._triggered = 4;
+					}
+					else if (event._triggered == 2) {
+						if (event.type == 'card') event.trigger('useCardToEnd');
+						event.trigger(event.name + 'End');
+						event._triggered = 3;
+					}
+					else if (event._triggered == 3) {
+						if (event.type == 'card') event.trigger('useCardToAfter');
+						event.trigger(event.name + 'After');
+						event._triggered++;
+					}
+					else if (event.after && event.after.length) {
+						var next = event.after.shift();
+						if (next.player && next.player.skipList.contains(next.name)) {
+							event.trigger(next.name + 'Skipped');
 							next.player.skipList.remove(next.name);
-							if(lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name);
+							if (lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name)
 						}
-						else{
-							next.parent=event;
-							_status.event=next;
-							game.getGlobalHistory('everything').push(next);
-						}
-					}
-					else if(event.finished){
-						if(event._triggered==1){
-							if(event.type=='card') event.trigger('useCardToOmitted');
-							event.trigger(event.name+'Omitted');
-							event._triggered=4;
-						}
-						else if(event._triggered==2){
-							if(event.type=='card') event.trigger('useCardToEnd');
-							event.trigger(event.name+'End');
-							event._triggered=3;
-						}
-						else if(event._triggered==3){
-							if(event.type=='card') event.trigger('useCardToAfter');
-							event.trigger(event.name+'After');
-							event._triggered++;
-						}
-						else if(event.after&&event.after.length){
-							var next=event.after.shift();
-							if(next.player&&next.player.skipList.contains(next.name)){
-								event.trigger(next.name+'Skipped');
-								next.player.skipList.remove(next.name);
-								if(lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name)
-							}
-							else{
-								next.parent=event;
-								_status.event=next;
-							}
-						}
-						else{
-							if(event.parent){
-								if(event.result){
-									event.parent._result=event.result;
-								}
-								_status.event=event.parent;
-								if(game.belongAsyncEvent==event){
-									delete game.belongAsyncEvent;
-									resolve();
-								}
-								_resolve();
-								// 此时应该退出了
-								if (belongAsyncEvent && belongAsyncEvent.parent == _status.event){
-									return;
-								}
-							}
-							else{
-								if(game.belongAsyncEvent==event){
-									delete game.belongAsyncEvent;
-									resolve();
-								}
-								return _resolve();
-							}
+						else {
+							next.parent = event;
+							_status.event = next;
 						}
 					}
-					else{
-						if(event._triggered==0){
-							if(event.type=='card') event.trigger('useCardToBefore');
-							event.trigger(event.name+'Before');
-							event._triggered++;
+					else {
+						if (event.parent) {
+							if (event.result) {
+								event.parent._result = event.result;
+							}
+							_status.event = event.parent;
+							if (game.belongAsyncEvent == event) {
+								delete game.belongAsyncEvent;
+								//resolve();
+							}
+							_resolve();
+							// 此时应该退出了
+							if (belongAsyncEvent && belongAsyncEvent.parent == _status.event) {
+								return;
+							}
 						}
-						else if(event._triggered==1){
-							if(event.type=='card') event.trigger('useCardToBegin');
-							event.trigger(event.name+'Begin');
-							event._triggered++;
-						}
-						else{
-							event.callHandler(event.getDefaultHandlerType(),event,{
-								state:'begin'
-							});
-							const after=()=>{
-								event.clearStepCache();
-								event.callHandler(event.getDefaultHandlerType(),event,{
-									state:'end'
-								});
-								if(typeof event.step=="number") ++event.step;
-							};
-							if(player&&player.classList.contains('dead')&&!event.forceDie&&event.name!='phaseLoop'){
-								game.broadcastAll(function(){
-									while(_status.dieClose.length){
-										_status.dieClose.shift().close();
-									}
-								});
-								if(event._oncancel){
-									event._oncancel();
-								}
-								event.finish();
-								after();
+						else {
+							if (game.belongAsyncEvent == event) {
+								delete game.belongAsyncEvent;
+								//resolve();
 							}
-							else if(player&&player.removed&&event.name!='phaseLoop'){
-								event.finish();
-								after();
-							}
-							else if(player&&player.isOut()&&event.name!='phaseLoop'&&!event.includeOut){
-								if(event.name=='phase'&&player==_status.roundStart&&!event.skill){
-									_status.roundSkipped=true;
-								}
-								event.finish();
-								after();
-							}
-							else{
-								await game.runContent(belongAsyncEvent).catch(e=>{
-									if(_status.withError||lib.config.compatiblemode||(_status.connectMode&&!lib.config.debug)){
-										game.print('游戏出错：'+event.name);
-										game.print(e.toString());
-										console.log(e);
-									}
-									else throw e;
-								}).then(after);
-							}
+							return _resolve();
 						}
 					}
 				}
-			});
+				else {
+					if (event._triggered == 0) {
+						if (event.type == 'card') event.trigger('useCardToBefore');
+						event.trigger(event.name + 'Before');
+						event._triggered++;
+					}
+					else if (event._triggered == 1) {
+						if (event.type == 'card') event.trigger('useCardToBegin');
+						event.trigger(event.name + 'Begin');
+						event._triggered++;
+					}
+					else {
+						event.callHandler(event.getDefaultHandlerType(), event, {
+							state: 'begin'
+						});
+						const after = () => {
+							event.clearStepCache();
+							event.callHandler(event.getDefaultHandlerType(), event, {
+								state: 'end'
+							});
+							if (typeof event.step == "number") ++event.step;
+						};
+						if (player && player.classList.contains('dead') && !event.forceDie && event.name != 'phaseLoop') {
+							game.broadcastAll(function () {
+								while (_status.dieClose.length) {
+									_status.dieClose.shift().close();
+								}
+							});
+							if (event._oncancel) {
+								event._oncancel();
+							}
+							event.finish();
+							after();
+						}
+						else if (player && player.removed && event.name != 'phaseLoop') {
+							event.finish();
+							after();
+						}
+						else if (player && player.isOut() && event.name != 'phaseLoop' && !event.includeOut) {
+							if (event.name == 'phase' && player == _status.roundStart && !event.skill) {
+								_status.roundSkipped = true;
+							}
+							event.finish();
+							after();
+						}
+						else {
+							await game.runContent(belongAsyncEvent).catch(e => {
+								if (_status.withError || lib.config.compatiblemode || (_status.connectMode && !lib.config.debug)) {
+									game.print('游戏出错：' + event.name);
+									game.print(e.toString());
+									console.log(e);
+								}
+								else throw e;
+							}).then(after);
+						}
+					}
+				}
+			}
 		},
 		runContent(belongAsyncEvent) {
 			return new Promise(resolve=>{

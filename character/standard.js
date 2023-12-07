@@ -644,7 +644,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							gain_list: list,
 							giver: player,
 							animate: 'draw',
-						}).setContent('gaincardMultiple').toPromise();
+						}).toPromise().setContent('gaincardMultiple');
 						if (event.count > 0 && player.hasSkill(event.name) && !get.is.blocked(event.name, player)) {
 							const { result: { bool: repeat } } = await player.promises.chooseBool(get.prompt2(event.name)).set('frequentSkill', event.name);
 							if (repeat) {
