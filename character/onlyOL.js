@@ -52,7 +52,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('olsbzhuri',target);
 						var result2=yield player.chooseToCompare(target);
 						if(result2.bool){
-							var cards=[result.player,result.target].filterInD('d');
+							var cards=[result2.player,result2.target].filterInD('d');
 							cards=cards.filter(card=>player.hasUseTarget(card));
 							if(cards.length){
 								var result3=yield player.chooseButton(['是否使用其中的牌？',cards]).set('ai',button=>_status.event.player.getUseValue(button.link));
