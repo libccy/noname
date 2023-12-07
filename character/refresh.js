@@ -20,9 +20,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
-			ol_caozhang:['male','wei',4,['oljiangchi'],['unseen']],
-			ol_jianyong:['male','shu',3,['olqiaoshui','jyzongshi'],['unseen']],
-			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong','unseen']],
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			re_lidian:['male','wei',3,['xunxun','xinwangxi']],
 			re_zhongyao:['male','wei',3,['rehuomo','zuoding'],['clan:颍川钟氏']],
@@ -172,152 +169,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
-			//界曹彰
-			oljiangchi:{
-				audio:2,
-				trigger:{player:'phaseDrawEnd'},
-				direct:true,
-				content:function*(event,map){
-					var player=map.player;
-					var choiceList=[
-						'摸一张牌，本回合使用【杀】的次数上限-1，且【杀】不计入手牌上限。',
-						'重铸一张牌，本回合使用【杀】无距离限制，且使用【杀】的次数上限+1。',
-					],list=['cancel2'];
-					if(player.countCards('he',card=>player.canRecast(card))) list.unshift('重铸，+1');
-					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
-					list.unshift('摸牌，-1');
-					var result=yield player.chooseControl(list).set('ai',()=>{
-						var player=_status.event.player;
-						var controls=_status.event.controls.slice();
-						if(controls.includes('重铸，+1')&&player.countCards('hs',card=>get.name(card)=='sha'&&player.hasValueTarget(card))>=2) return '重铸，+1';
-						return '摸牌，-1';
-					}).set('choiceList',choiceList).set('prompt',get.prompt('oljiangchi'));
-					if(result.control!='cancel2'){
-						player.logSkill('oljiangchi');
-						if(result.control=='摸牌，-1'){
-							player.draw();
-							player.addTempSkill('oljiangchi_less');
-							player.addMark('oljiangchi_less',1,false);
-						}
-						else{
-							var result2=yield player.chooseCard('he','将驰：请重铸一张牌',true,(card,player)=>player.canRecast(card));
-							if(resulg2.bool){
-								player.recast(result2.cards);
-								player.addTempSkill('oljiangchi_more');
-								player.addMark('oljiangchi_more',1,false);
-							}
-						}
-					}
-				},
-				subSkill:{
-					less:{
-						charlotte:true,
-						onremove:true,
-						mod:{
-							cardUsable:function(card,player,num){
-								if(card.name=='sha') return num-player.countMark('oljiangchi_less');
-							},
-							ignoredHandcard:function(card,player){
-								if(card.name=='sha') return true;
-							},
-							cardDiscardable:function(card,player,name){
-								if(name=='phaseDiscard'&&card.name=='sha') return false;
-							},
-						},
-					},
-					more:{
-						charlotte:true,
-						onremove:true,
-						mod:{
-							cardUsable:function(card,player,num){
-								if(card.name=='sha') return num+player.countMark('oljiangchi_more');
-							},
-							targetInRange:function (card,player){
-								if(card.name=='sha') return true;
-							},
-						},
-					},
-				},
-			},
-			//界简雍
-			olqiaoshui:{
-				audio:2,
-				inherit:'reqiaoshui',
-				filter:function(event,player){
-					return player.countCards('h')>0&&!player.hasSkill('olqiaoshui_used');
-				},
-				content:function(){
-					'step 0'
-					player.chooseToCompare(target);
-					'step 1'
-					if(result.bool) player.addTempSkill('qiaoshui3',{player:'phaseUseAfter'});
-					else{
-						player.addTempSkill('qiaoshui2');
-						player.addTempSkill('olqiaoshui_used');
-					}
-				},
-				subSkill:{
-					used:{
-						charlotte:true,
-						mark:true,
-						marktext:'<span style="text-decoration: line-through;">说</span>',
-						intro:{content:'被迫闭嘴'},
-					},
-				},
-			},
-			//界凌统
-			olxuanfeng:{
-				audio:'xuanfeng',
-				audioname:['boss_lvbu3'],
-				audioname2:{
-					lingtong:'xuanfeng',
-					ol_lingtong:'xuanfeng_re_lingtong',
-				},
-				trigger:{
-					player:['loseAfter'],
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
-				},
-				filter:function(event,player){
-					var evt=event.getl(player);
-					return evt&&(evt.es.length||evt.cards2.length>1);
-				},
-				direct:true,
-				content:function(){
-					'step 0'
-					event.count=2;
-					event.logged=false;
-					'step 1'
-					player.chooseTarget(get.prompt('olxuanfeng'),'弃置一名其他角色的一张牌',function(card,player,target){
-						if(player==target) return false;
-						return target.countDiscardableCards(player,'he');
-					}).set('ai',function(target){
-						return -get.attitude(_status.event.player,target);
-					});
-					'step 2'
-					if(result.bool){
-						if(!event.logged){
-							player.logSkill('olxuanfeng',result.targets);
-							event.logged=true;
-						}
-						else player.line(result.targets[0],'green');
-						player.discardPlayerCard(result.targets[0],'he',true);
-						event.count--;
-					}
-					else event.finish();
-					'step 3'
-					if(event.count) event.goto(1);
-				},
-				ai:{
-					effect:{
-						target:function(card,player,target,current){
-							if(get.type(card)=='equip'&&!get.cardtag(card,'gifts')) return [1,3];
-						}
-					},
-					reverseEquip:true,
-					noe:true
-				},
-			},
-			xuanfeng_re_lingtong:{audio:2},
 			ollianhuan:{
 				audio:'xinlianhuan',
 				audioname:['ol_pangtong'],
@@ -15702,10 +15553,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoren_prefix:'界',
 			ollianhuan:'连环',
 			ollianhuan_info:'你可以将一张♣牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标后，可以给此牌增加一个目标。',
-			ol_lingtong:'OL界凌统',
-			ol_lingtong_prefix:'OL界',
-			olxuanfeng:'旋风',
-			olxuanfeng_info:'当你一次性失去至少两张牌后，或失去装备区的牌后，你可以依次弃置一至两名其他角色的共计两张牌。',
 			re_lidian:'界李典',
 			gz_re_lidian:'李典',
 			re_lidian_prefix:'界',
