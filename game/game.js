@@ -32114,7 +32114,9 @@ new Promise(resolve=>{
 				}
 			},
 			/**
-			 * 对于事件Promise化后，需要既能使用await等待事件完成，
+			 * 将事件Promise化以使用async异步函数来执行事件。
+			 * 
+			 * 事件Promise化后，需要既能使用await等待事件完成，
 			 * 又需要在执行之前对事件进行配置。
 			 * 
 			 * 所以这个类的实例集成了事件和Promise二者的所有属性，
@@ -32128,9 +32130,9 @@ new Promise(resolve=>{
 			 * ```js
 			 * await game.xxx().toPromise().setContent('yyy').set(zzz, 'i');
 			 * ```
-			 * 使用player.promises.xxx()函数将对于player的普通事件转换为异步事件：
+			 * 使用player.promises.xxx()函数将对于player的普通事件转换为异步事件并执行：
 			 * ```js
-			 * await player.draw(2);
+			 * await player.promises.draw(2);
 			 * game.log('等待', player, '摸牌完成执行log');
 			 * ```
 			 */
