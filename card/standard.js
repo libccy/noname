@@ -305,19 +305,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							else if(target.hp<2) basic*=3;
 							if(zhu) eff*=Math.max(1,9/target.hp/target.hp);
 							if(isLink){
-								let rate=_status.event.getTempCache('sha_result','mayShan');
-								if(rate){
-									if(card.cardid||rate.card.cardid){
-										if(card.cardid==rate.card.cardid) rate=rate.rate;
-									}
-									else if(JSON.stringify(card)===JSON.stringify(rate.card)) rate=rate.rate;
-								}
+								if(rate&&rate.id===card.sha_ai_id) rate=rate.rate;
 								delete target._sha_result_temp;
 								if(typeof rate==='boolean'||typeof rate==='number'){
 									if(rate>=1) return eff;
 									return basic*eff*(1.3-0.9*rate);
 								}
-								else delete _status.event._tempCache['sha_result']['mayShan'];
+								delete _status.event._tempCache['sha_result']['mayShan'];
 								return basic*eff;
 							}
 							let mayShan;
@@ -334,10 +328,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								})) mayShan=true;
 								else mayShan=1-Math.pow(0.7,(target.hasSkillTag('respondShan',true,'use',true)?1:0)+target.countCards('hs')-temp.length);
 							}
-							_status.event.putTempCache('sha_result','mayShan',{
-								card:card,
-								rate:mayShan
-							});
+							if(game.hasNature(card,'linked',player)){
+								if(!_status.sha_ai_id) _status.sha_ai_id=1;
+								else _status.sha_ai_id++;
+								card.sha_ai_id=_status.sha_ai_id;
+								_status.event.putTempCache('sha_result','mayShan',{
+									id:_status.sha_ai_id,
+									rate:mayShan
+								});
+							}
 							delete target._sha_result_temp;
 							if(mayShan>=1) return eff;
 							return basic*eff*(1.3-0.9*mayShan);
