@@ -36016,6 +36016,12 @@ new Promise(resolve=>{
 				 * @returns {string}
 				 */
 				getSpan:()=>`${get.prefixSpan('OL')}${get.prefixSpan('谋')}`
+			}],
+			['新杀谋',{
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('新杀')}${get.prefixSpan('谋')}`
 			}]
 		]),
 		groupnature:{
