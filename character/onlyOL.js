@@ -123,7 +123,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var trigger=map.trigger;
 					player.awakenSkill('olsbranji');
 					var num=lib.skill.olsbranji.getNum(trigger,player);
-					if(num>=player.getHp()) player.addSkillLog('kunfen');
+					if(num>=player.getHp()){
+						player.addSkillLog('kunfen');
+						player.storage.kunfen=true;
+					}
 					if(num<=player.getHp()) player.addSkillLog('zhaxiang');
 					if(player.countCards('h')!=player.getHandcardLimit()||player.isDamaged()){
 						var result,num1=player.countCards('h')-player.getHandcardLimit();
@@ -152,7 +155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.when('olsbranjiAfter').then(()=>player.addSkill('olsbranji_norecover'));
 					player.when({source:'dieAfter'}).then(()=>player.removeSkill('olsbranji_norecover'));
 				},
-				derivation:['kunfen','zhaxiang'],
+				derivation:['kunfenx','zhaxiang'],
 				getList:function(event){
 					return event.getParent().phaseList.map(list=>list.split('|')[0]);
 				},
@@ -347,7 +350,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olsbzhuri:'逐日',
 			olsbzhuri_info:'你的阶段结束时，若你本阶段失去过手牌或得到过牌，则你可以与一名角色拼点。若你赢，你可以使用其中一张拼点牌；若你没赢，你失去1点体力或令此技能于本回合无效。',
 			olsbranji:'燃己',
-			olsbranji_info:'限定技，结束阶段。若你本回合使用过牌的阶段数大于等于/小于等于体力值，你可以获得技能〖困奋〗/〖诈降〗（同时满足则都获得）。若如此做，你将手牌数调整至手牌上限或将体力值回复至体力上限，然后你不能回复体力直到你杀死角色。',
+			olsbranji_info:'限定技，结束阶段。若你本回合使用过牌的阶段数大于等于/小于等于体力值，你可以获得技能〖困奋〗/〖诈降〗（同时满足则都获得，以此法获得的〖困奋〗直接修改为非锁定技）。若如此做，你将手牌数调整至手牌上限或将体力值回复至体力上限，然后你不能回复体力直到你杀死角色。',
+			kunfenx:'困奋',
+			kunfenx_info:'结束阶段开始时，你可以失去1点体力，然后摸两张牌。',
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_sb:'OL专属·上兵伐谋',

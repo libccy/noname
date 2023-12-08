@@ -13922,15 +13922,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'loseHpEnd'},
 				forced:true,
 				content:function(){
-					var num=trigger.num;
-					player.draw(3*num);
-					if(_status.currentPhase==player){
-						if(!player.storage.zhaxiang2) player.storage.zhaxiang2=0;
-						player.storage.zhaxiang2+=num;
-						player.addTempSkill('zhaxiang2',{player:'phaseAfter'});
+					'step 0'
+					event.count=trigger.num;
+					'step 1'
+					event.count--;
+					player.draw(3);
+					if(player.isPhaseUsing()){
+						player.addTempSkill('zhaxiang2');
+						player.addMark('zhaxiang2',1,false);
 					}
-					else{
-						game.trySkillAudio('zhaxiang',player);
+					'step 2'
+					if(event.count>0&&player.hasSkill('zhaxiang')&&!get.is.blocked('zhaxiang',player)){
+						player.logSkill('zhaxiang');
+						event.goto(1);
 					}
 				},
 				ai:{
@@ -13966,13 +13970,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'zhaxiang',
 				audioname:['ol_sb_jiangwei'],
 				trigger:{player:'useCard'},
-				forced:true,
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&get.color(event.card)=='red';
 				},
+				forced:true,
 				content:function(){
 					trigger.directHit.addArray(game.players);
 				},
+				intro:{content:'<li>使用【杀】的次数上限+#<br><li>使用红色【杀】无距离限制且不能被【闪】响应'},
 				ai:{
 					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
@@ -14953,7 +14958,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qianxin_info:'觉醒技，当你造成一次伤害后，若你已受伤，你须减1点体力上限，并获得技能“荐言”。',
 			jianyan_info:'出牌阶段限一次，你可以声明一种牌的类别或颜色，并亮出牌库中第一张符合你声明的牌，然后你令一名男性角色获得此牌。',
 			rekurou_info:'出牌阶段限一次，你可以弃置一张牌，然后失去1点体力。',
-			zhaxiang_info:'锁定技，每当你失去1点体力后，你摸三张牌。然后若此时是你的出牌阶段，则直到回合结束，你使用红色【杀】无距离限制且不能被【闪】响应，你可以额外使用一张【杀】。',
+			zhaxiang_info:'锁定技。当你失去1点体力后，你摸三张牌。然后若此时是你的出牌阶段，则你本回合获得此下效果：使用【杀】的次数上限+1，使用红色【杀】无距离限制且不能被【闪】响应。',
 			qiaomeng_info:'当你使用黑色【杀】对一名角色造成伤害后，你可以弃置该角色装备区里的一张牌，若此牌是坐骑牌，你于此牌置入弃牌堆后获得之。',
 			reyicong_info:'锁定技，你计算与其他角色的距离时-1。若你的体力值不大于2，则其他角色计算与你的距离时+1。',
 			refankui_info:'每当你受到1点伤害后，你可以获得伤害来源的一张牌。',
