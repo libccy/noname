@@ -113,7 +113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					var num=lib.skill.olsbranji.getNum(event,player);
 					if(num==player.getHp()) return true;
-					return player.getHandcardLimit()-player.countCards('h')>=3&&player.getDamagedHp()>=2;
+					return player.getHandcardLimit()-player.countCards('h')>=3||player.getDamagedHp()>=2;
 				},
 				limited:true,
 				skillAnimation:true,
