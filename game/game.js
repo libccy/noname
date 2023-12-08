@@ -1756,6 +1756,7 @@ new Promise(resolve=>{
 					},
 					splash_style:{
 						name:'启动页',
+						init:'style1',
 						item:{
 							style1:'样式一',
 							style2:'样式二',
