@@ -14,6 +14,7 @@ import { CONFIGURATION_MENU } from "./library/configuration-menu.js";
 import { dynamicTranslate } from "./library/dynamic-translate.js";
 import { element } from "./library/element.js";
 import { emotionList } from "./library/emotion-list.js";
+import { extensionMenu } from "./library/extension-menu.js";
 import { extensionPack } from "./library/extension-pack.js";
 import { hookMap } from "./library/hook-map.js";
 import { hook } from "./library/hook.js";
@@ -101,6 +102,7 @@ export class Library {
 	])
 	static characterDialogGroup = CharacterDialogGroup;
 	static configMenu = CONFIGURATION_MENU;
+	static extensionMenu = extensionMenu;
 
 	constructor() {
 		throw new TypeError(`${new.target.name} is not a constructor`);
