@@ -497,7 +497,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.hp>0){
 								if(!player.isPhaseUsing()) return 0;
 								let min = 7.2-4*player.hp/player.maxHp,
-									nd = player.needsToDiscard(-player.countCards('h',i=>!taos.includes(i)&&get.value(i)<min)),
+									nd = player.needsToDiscard(i=>taos.includes(i)||get.value(i)>=min),
 									keep = nd?0:2;
 								if(nd>2 || taos.length>1&&(nd>1||nd&&player.hp<1+taos.length) || target.identity==='zhu'&&(nd||target.hp<3)&&(mode==='identity'||mode==='versus'||mode==='chess') || !player.hasFriend()) return 2;
 								if(game.hasPlayer(current=>{
