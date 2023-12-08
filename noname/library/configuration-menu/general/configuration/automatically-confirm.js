@@ -1,4 +1,4 @@
-export const AUTO_CONFIRM = {
+export const AUTOMATICALLY_CONFIRM = {
 	name: "自动确认",
 	init: true,
 	unfrequent: true,

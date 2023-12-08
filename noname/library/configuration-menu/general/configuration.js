@@ -1,7 +1,7 @@
 import { Is } from "../../../get/is.js";
 import { Library } from "../../../library.js";
-import { AUTO_CHECK_UPDATE } from "./configuration/auto-check-update.js";
-import { AUTO_CONFIRM } from "./configuration/auto-confirm.js";
+import { AUTOMATICALLY_CHECK_UPDATE } from "./configuration/automatically-check-update.js";
+import { AUTOMATICALLY_CONFIRM } from "./configuration/automatically-confirm.js";
 import { COMPATIBLE_MODE } from "./configuration/compatible-mode.js";
 import { CONFIRM_EXIT } from "./configuration/confirm-exit.js";
 import { DEVELOPER } from "./configuration/developer.js";
@@ -39,7 +39,7 @@ import { SWIPE } from "./configuration/swipe.js";
 import { SYNCHRONIZE_SPEED } from "./configuration/synchronize-speed.js";
 import { TAO_ENEMY } from "./configuration/tao-enemy.js";
 import { TOUCHSCREEN } from "./configuration/touchscreen.js";
-import { UN_AUTO_CHOOSE } from "./configuration/un-auto-choose.js";
+import { UN_AUTOMATICALLY_CHOOSE } from "./configuration/un-automatically-choose.js";
 import { UPDATE_LINK } from "./configuration/update-link.js";
 import { VIDEO } from "./configuration/video.js";
 import { WUXIE_SELF } from "./configuration/wuxie-self.js";
@@ -50,9 +50,9 @@ export const CONFIGURATION = {
 	compatiblemode: COMPATIBLE_MODE,
 	confirm_exit: CONFIRM_EXIT,
 	keep_awake: KEEP_AWAKE,
-	auto_confirm: AUTO_CONFIRM,
+	auto_confirm: AUTOMATICALLY_CONFIRM,
 	skip_shan: SKIP_SHAN,
-	unauto_choose: UN_AUTO_CHOOSE,
+	unauto_choose: UN_AUTOMATICALLY_CHOOSE,
 	wuxie_self: WUXIE_SELF,
 	tao_enemy: TAO_ENEMY,
 	enable_drag: ENABLE_DRAG,
@@ -79,7 +79,7 @@ export const CONFIGURATION = {
 	video: VIDEO,
 	max_loadtime: MAXIMUM_LOAD_TIME,
 	mousewheel: MOUSE_WHEEL,
-	auto_check_update: AUTO_CHECK_UPDATE,
+	auto_check_update: AUTOMATICALLY_CHECK_UPDATE,
 	lucky_star: LUCKY_STAR,
 	dev: DEVELOPER,
 	fuck_sojson: FUCK_SO_JSON,

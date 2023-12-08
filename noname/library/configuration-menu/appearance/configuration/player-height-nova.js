@@ -1,12 +1,13 @@
+import { Game } from "../../../../game.js";
 import { UI } from "../../../../ui.js";
-import { ITEM } from "./player-height-nova/item.js";
+import { PLAYER_HEIGHT_ITEM } from "./player-height-item.js";
 
 export const PLAYER_HEIGHT_NOVA = {
 	name: "角色高度",
 	init: "short",
-	item: ITEM,
+	item: PLAYER_HEIGHT_ITEM,
 	onclick(item) {
-		game.saveConfig("player_height_nova", item);
+		Game.saveConfig("player_height_nova", item);
 		UI.arena.dataset.player_height_nova = item;
 	}
 };

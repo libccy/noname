@@ -1,4 +1,4 @@
-export const UN_AUTO_CHOOSE = {
+export const UN_AUTOMATICALLY_CHOOSE = {
 	name: "拆顺手牌选择",
 	init: false,
 	unfrequent: true,

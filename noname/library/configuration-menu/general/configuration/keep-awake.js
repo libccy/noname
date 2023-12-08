@@ -1,10 +1,14 @@
 import { Game } from "../../../../game.js";
 
+const introduction = document.createElement("body");
+introduction.append("防止屏幕自动关闭", document.createElement("br"));
+introduction.append("注：旧版本通过NoSleep.js实现的屏幕常亮可能会影响外置音频的音量");
+
 export const KEEP_AWAKE = {
 	name: "屏幕常亮",
 	init: false,
 	unfrequent: true,
-	intro: `防止屏幕自动关闭${document.createElement("br").outerHTML}注：旧版本通过NoSleep.js实现的屏幕常亮可能会影响外置音频的音量`,
+	intro: introduction.innerHTML,
 	onclick(bool) {
 		Game.saveConfig("keep_awake", bool);
 		if (bool) {
