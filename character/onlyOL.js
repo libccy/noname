@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(player.hasSkill('olsbzhuri_block')) return false;
 					if(!game.hasPlayer(target=>player.canCompare(target))) return false;
-					return player.getHistory('gain',evt=>evt.getParent(event.name)==event).length+player.getHistory('lose',evt=>evt.getParent(event.name)==event).length;
+					return player.getHistory('gain',evt=>evt.getParent(event.name)==event).length+player.getHistory('lose',evt=>evt.getParent(event.name)==event&&evt.hs.length).length;
 				},
 				direct:true,
 				content:function*(event,map){
@@ -344,7 +344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sb_jiangwei:'OL谋姜维',
 			ol_sb_jiangwei_prefix:'OL谋',
 			olsbzhuri:'逐日',
-			olsbzhuri_info:'你的阶段结束时，若你本阶段失去或得到过牌，则你可以与一名角色拼点。若你赢，你可以使用其中一张拼点牌；若你没赢，你失去1点体力或令此技能于本回合无效。',
+			olsbzhuri_info:'你的阶段结束时，若你本阶段失去过手牌或得到过牌，则你可以与一名角色拼点。若你赢，你可以使用其中一张拼点牌；若你没赢，你失去1点体力或令此技能于本回合无效。',
 			olsbranji:'燃己',
 			olsbranji_info:'限定技，结束阶段。若你本回合使用过牌的阶段数大于等于/小于等于体力值，你可以获得技能〖困奋〗/〖诈降〗（同时满足则都获得）。若如此做，你将手牌数调整至手牌上限或将体力值回复至体力上限，然后你不能回复体力直到你杀死角色。',
 
