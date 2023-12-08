@@ -39,12 +39,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var ts=target.getCards('h').sort((a,b)=>get.number(a)-get.number(b));
 						if(get.attitude(player,target)<0){
-							if(get.effect(player,{name:'losehp'},player,player)>0) return Math.random()*0.8;
 							var hs=player.getCards('h').sort((a,b)=>get.number(b)-get.number(a));
 							var ts=target.getCards('h').sort((a,b)=>get.number(b)-get.number(a));
-							if(get.value(hs[0])>6) return 0;
 							if(get.number(hs[0])>get.number(ts[0])) return 1;
-							return Math.random()+0.2;
+							if(get.effect(player,{name:'losehp'},player,player)>0) return Math.random()+0.2;
+							if(player.getHp()>2) return Math.random()-0.5;
+							return 0;
 						}
 						return 0;
 					});
@@ -69,7 +69,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var list=lib.skill.olsbranji.getList(trigger);
 							var result3=yield player.chooseControl('失去体力','技能失效').set('prompt','逐日：失去1点体力，或令此技能于本回合失效').set('ai',()=>{
 								var player=_status.event.player;
-								if(player.getHp>2){
+								if(player.getHp()>2){
 									var list=_status.event.list;
 									list.removeArray(player.skipList);
 									if(list.includes('phaseDraw')||list.includes('phaseUse')) return '失去体力';
@@ -115,6 +115,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num==player.getHp()) return true;
 					return player.getHandcardLimit()-player.countCards('h')>=3&&player.getDamagedHp()>=2;
 				},
+				limited:true,
 				skillAnimation:true,
 				animationColor:'fire',
 				content:function*(event,map){
