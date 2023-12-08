@@ -3952,9 +3952,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target.isMin()) return false;
 					return player!=target&&target.canEquip(card);
 				},
-				content:function(){
-					target.equip(cards[0]);
-					player.draw();
+				async content(event, trigger, player){
+					await event.target.promises.equip(event.cards[0]);
+					await player.promises.draw();
 				},
 				discard:false,
 				lose:false,
