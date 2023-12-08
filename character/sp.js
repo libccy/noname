@@ -21110,6 +21110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			kunfen:{
 				audio:2,
+				audioname:['ol_sb_jiangwei'],
 				trigger:{player:'phaseJieshuBegin'},
 				locked:function(skill,player){
 					if(!player||!player.storage.kunfen) return true;

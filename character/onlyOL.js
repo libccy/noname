@@ -11,7 +11,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			onlyOL:{
-				onlyOL_standard:[],
 				onlyOL_yijiang1:['ol_caozhang','ol_jianyong','ol_lingtong'],
 				onlyOL_sb:['ol_sb_jiangwei'],
 			},
@@ -33,17 +32,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function*(event,map){
 					var player=map.player;
+					var trigger=map.trigger;
 					var result=yield player.chooseTarget(get.prompt('olsbzhuri'),'与一名角色进行拼点，若你赢，你可以使用其中的一张拼点牌；若你没赢，你失去1点体力或令此技能于本回合失效',(card,player,target)=>{
 						return player.canCompare(target);
 					}).set('ai',target=>{
 						var player=_status.event.player;
 						var ts=target.getCards('h').sort((a,b)=>get.number(a)-get.number(b));
 						if(get.attitude(player,target)<0){
-							var hs=player.getCards('h').sort((a,b)=>get.number(a)-get.number(b));
-							if(!hs.length||!ts.length) return 0;
+							if(get.effect(player,{name:'losehp'},player,player)>0) return Math.random()*0.8;
+							var hs=player.getCards('h').sort((a,b)=>get.number(b)-get.number(a));
+							var ts=target.getCards('h').sort((a,b)=>get.number(b)-get.number(a));
 							if(get.value(hs[0])>6) return 0;
 							if(get.number(hs[0])>get.number(ts[0])) return 1;
-							return Math.random()-0.7;
+							return Math.random()+0.2;
 						}
 						return 0;
 					});
@@ -65,11 +66,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						else{
+							var list=lib.skill.olsbranji.getList(trigger);
 							var result3=yield player.chooseControl('失去体力','技能失效').set('prompt','逐日：失去1点体力，或令此技能于本回合失效').set('ai',()=>{
 								var player=_status.event.player;
+								if(player.getHp>2){
+									var list=_status.event.list;
+									list.removeArray(player.skipList);
+									if(list.includes('phaseDraw')||list.includes('phaseUse')) return '失去体力';
+								}
 								if(get.effect(player,{name:'losehp'},player,player)>0) return '失去体力';
 								return '技能失效';
-							});
+							}).set('list',list.slice(trigger.getParent().num,list.length));
 							player[result3.control=='失去体力'?'loseHp':'addTempSkill'](result3.control=='失去体力'?1:'olsbzhuri_block');
 						}
 					}
@@ -88,12 +95,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJieshuBegin'},
 				prompt2:function(event,player){
 					var str='获得技能';
-					var num=event.getParent().phaseList.slice(0,event.getParent().num).filter(name=>player.getHistory('useCard',evt=>evt.getParent(name).name==name).length).length;
+					var num=lib.skill.olsbranji.getNum(event,player);
 					if(num>=player.getHp()) str+='【困奋】';
 					if(num==player.getHp()) str+='和';
 					if(num<=player.getHp()) str+='【诈降】';
-					str+='。将手牌数调整至手牌或将体力值调整为体力上限。然后你不能回复体力直到你杀死角色。';
+					str+='，然后';
+					var num1=(player.countCards('h')-player.getHandcardLimit());
+					if(num1||player.isDamaged()){
+						if(num1) str+=(num1<0?'摸'+get.cnNumber(-num1)+'张牌':'弃置'+get.cnNumber(num1)+'张牌');
+						if(num1&&player.isDamaged()) str+='或';
+						if(player.isDamaged()) str+=('回复'+player.getDamagedHp()+'点体力');
+						str+='，最后';
+					}
+					str+='你不能回复体力直到你杀死角色。';
 					return str;
+				},
+				check:function(event,player){
+					var num=lib.skill.olsbranji.getNum(event,player);
+					if(num==player.getHp()) return true;
+					return player.getHandcardLimit()-player.countCards('h')>=3&&player.getDamagedHp()>=2;
 				},
 				skillAnimation:true,
 				animationColor:'fire',
@@ -101,54 +121,53 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=map.player;
 					var trigger=map.trigger;
 					player.awakenSkill('olsbranji');
-					var num=trigger.getParent().phaseList.slice(0,trigger.getParent().num).filter(name=>player.getHistory('useCard',evt=>evt.getParent(name).name==name).length).length;
+					var num=lib.skill.olsbranji.getNum(trigger,player);
 					if(num>=player.getHp()) player.addSkillLog('kunfen');
 					if(num<=player.getHp()) player.addSkillLog('zhaxiang');
-					if(player.countCards('h')!=player.getHandcardLimit()||player.hp!=player.maxHp){
-						var result;
-						if(player.countCards('h')==player.getHandcardLimit()) result={index:1};
-						else if(player.hp==player.maxHp) result={index:0};
+					if(player.countCards('h')!=player.getHandcardLimit()||player.isDamaged()){
+						var result,num1=player.countCards('h')-player.getHandcardLimit();
+						if(!num1) result={index:1};
+						else if(player.isHealthy()) result={index:0};
 						else{
-							var num1=player.countCards('h')<player.getHandcardLimit();
-							var num2=player.hp<player.maxHp;
 							result=yield player.chooseControl('手牌数','体力值').set('choiceList',[
 								num1<0?'摸'+get.cnNumber(-num1)+'张牌':'弃置'+get.cnNumber(num1)+'张牌',
-								num2<0?'回复'+(-num2)+'点体力':'失去'+(num2)+'点体力',
+								'回复'+(player.getDamagedHp())+'点体力',
 							]).set('ai',()=>{
 								var player=_status.event.player;
 								var list=_status.event.list;
 								var num1=get.effect(player,{name:'wuzhong'},player,player)/2;
 								var num2=get.recoverEffect(player,player,player);
 								return num1*list[0]>num2*list[1]?0:1;
-							}).set('list',[-num1,-num2]);
+							}).set('list',[-num1,player.getDamagedHp()]);
 						}
 						if(result.index==0){
-							if(player.countCards('h')<player.getHandcardLimit()) player.draw(player.getHandcardLimit()-player.countCards('h'));
-							else player.chooseToDiscard(player.countCards('h')-player.getHandcardLimit(),'h',true);
+							if(num1<0) player.drawTo(player.getHandcardLimit());
+							else player.chooseToDiscard(num1,'h',true);
 						}
 						else{
-							var num=player.maxHp-player.hp;
-							player[num>0?'recover':'loseHp'](Math.abs(num));
+							player.recover(player.maxHp-player.hp);
 						}
 					}
-					player.addSkill('olsbranji_norecover');
+					player.when('olsbranjiAfter').then(()=>player.addSkill('olsbranji_norecover'));
+					player.when({source:'dieAfter'}).then(()=>player.removeSkill('olsbranji_norecover'));
 				},
 				derivation:['kunfen','zhaxiang'],
+				getList:function(event){
+					return event.getParent().phaseList.map(list=>list.split('|')[0]);
+				},
+				getNum:function(event,player){
+					return lib.skill.olsbranji.getList(event).slice(0,event.getParent().num).filter(name=>player.getHistory('useCard',evt=>evt.getParent(name).name==name).length).length;
+				},
 				subSkill:{
 					norecover:{
 						charlotte:true,
 						mark:true,
-						intro:{content:'不能回复体力直到杀死角色'},
-						trigger:{
-							player:'recoverBefore',
-							source:'dieAfter',
-						},
+						intro:{content:'不能回复体力'},
+						trigger:{player:'recoverBefore'},
 						forced:true,
-						popup:false,
 						firstDo:true,
 						content:function(){
-							if(trigger.name=='recover') trigger.cancel();
-							else player.removeSkill('olsbranji_norecover');
+							trigger.cancel();
 						},
 						ai:{
 							effect:{
@@ -325,11 +344,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sb_jiangwei:'OL谋姜维',
 			ol_sb_jiangwei_prefix:'OL谋',
 			olsbzhuri:'逐日',
-			olsbzhuri_info:'你的回合阶段结束时，若你本阶段失去或得到过牌，则你可以与一名角色拼点。若你赢，你可以使用其中一张拼点牌；若你没赢，你失去1点体力或令此技能于本回合无效。',
+			olsbzhuri_info:'你的阶段结束时，若你本阶段失去或得到过牌，则你可以与一名角色拼点。若你赢，你可以使用其中一张拼点牌；若你没赢，你失去1点体力或令此技能于本回合无效。',
 			olsbranji:'燃己',
-			olsbranji_info:'限定技，结束阶段。若你本回合使用过牌的阶段数大于等于/小于等于体力值，你获得技能〖困奋〗/〖诈降〗（同时满足则都获得），然后你将手牌数调整至手牌上限或将体力值调整为体力上限，最后你不能回复体力直到你杀死角色。',
+			olsbranji_info:'限定技，结束阶段。若你本回合使用过牌的阶段数大于等于/小于等于体力值，你可以获得技能〖困奋〗/〖诈降〗（同时满足则都获得）。若如此做，你将手牌数调整至手牌上限或将体力值回复至体力上限，然后你不能回复体力直到你杀死角色。',
 
-			onlyOL_standard:'OL专属·标准',
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_sb:'OL专属·上兵伐谋',
 		},

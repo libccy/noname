@@ -13917,9 +13917,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhaxiang:{
+				audio:2,
+				audioname:['ol_sb_jiangwei'],
 				trigger:{player:'loseHpEnd'},
 				forced:true,
-				audio:2,
 				content:function(){
 					var num=trigger.num;
 					player.draw(3*num);
@@ -13960,7 +13961,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card.name=='sha') return num+player.storage.zhaxiang2;
 					}
 				},
+				charlotte:true,
 				onremove:true,
+				audio:'zhaxiang',
+				audioname:['ol_sb_jiangwei'],
 				trigger:{player:'useCard'},
 				forced:true,
 				filter:function(event,player){
