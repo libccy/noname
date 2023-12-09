@@ -136,10 +136,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.player.hp>player.hp;
 				},
 				logTarget:'player',
-				content:function(){
-					player.draw();
-					var zhu=false;
-					var target=trigger.player;
+				async content(event,trigger,player){
+					await player.promises.draw();
+					let zhu=false;
+					const target=trigger.player;
 					switch(get.mode()){
 						case 'identity':{
 							zhu=target.isZhu;
@@ -159,7 +159,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(zhu){
-						player.draw();
+						await player.promises.draw();
 						target.addTempSkill('rewangzun2');
 						target.addMark('rewangzun2',1,false);
 					}
