@@ -516,7 +516,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card&&(event.card.name=='sha'||event.card.name=='juedou')&&event.notLink();
 				},
 				forced:true,
-				content:function(){
+				async content(event,trigger,player){
 					trigger.num++;
 				},
 				ai:{
