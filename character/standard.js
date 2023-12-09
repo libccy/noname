@@ -835,14 +835,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 10-get.value(card);
 				},
-				content:function(){
-					player.give(cards,target);
-					var evt2=event.getParent(3);
-					var num=0;
-					player.getHistory('lose',function(evt){
+				async content(event,trigger,player){
+					const evt2=event.getParent(3);
+					let num=0;
+					player.getHistory('lose',evt=>{
 						if(evt.getParent(2).name=='rende'&&evt.getParent(5)==evt2) num+=evt.cards.length;
 					});
-					if(num<2&&num+cards.length>1) player.recover();
+					await player.promises.give(event.cards,event.target);
+					if(num<2&&num+event.cards.length>1) await player.promises.recover();
 				},
 				ai:{
 					order:function(skill,player){
