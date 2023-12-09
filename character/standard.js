@@ -121,8 +121,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.isPhaseUsing()&&event.card&&event.card.name=='sha'&&event.player!=player&&event.player.isIn();
 				},
 				async content(event,trigger,player){
-					if(trigger.player.hp<player.hp) player.promises.draw(2);
-					else player.promises.loseHp();
+					if(trigger.player.hp<player.hp) await player.promises.draw(2);
+					else await player.promises.loseHp();
 				},
 				ai:{
 					halfneg:true,
