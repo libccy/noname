@@ -59934,11 +59934,59 @@ new Promise(resolve=>{
 			if(get.objtype(obj)=='object'){
 				str='{\n';
 				for(var i in obj){
+					var insertDefaultString;
+					var insertFunctionString=indent+'    '+get.stringify(obj[i],level+1)+',\n';
+					var parseFunction=i=>{
+						var string=obj[i].toString();
+						var execResult;
+						if(obj[i] instanceof GeneratorFunction){
+							// *content(){}
+							execResult=new RegExp(`\\*\\s*${i}[\\s\\S]*?\\(`).exec(obj[i]);
+							if(execResult&&execResult.index===0){
+								return insertFunctionString;
+							}
+							// content:function*(){}
+							else{
+								return insertDefaultString;
+							}
+						}
+						else if(obj[i] instanceof AsyncFunction){
+							execResult=new RegExp(`async\\s*${i}[\\s\\S]*?\\(`).exec(obj[i]);
+							// async content(){}
+							if(execResult&&execResult.index===0){
+								return insertFunctionString;
+							}
+							// content:async function(){}
+							else{
+								return insertDefaultString;
+							}
+						}else{
+							execResult=new RegExp(`${i}[\\s\\S]*?\\(`).exec(obj[i]);
+							// content(){}
+							if(execResult&&execResult.index===0){
+								return insertFunctionString;
+							}
+							// content:function(){}
+							else{
+								return insertDefaultString;
+							}
+						}
+					};
 					if(/[^a-zA-Z]/.test(i)){
-						str+=indent+'    "'+i+'":'+get.stringify(obj[i],level+1)+',\n';
+						insertDefaultString=indent+'    "'+i+'":'+get.stringify(obj[i],level+1)+',\n';
+						if(typeof obj[i]!=='function'){
+							str+=insertDefaultString;
+						}else{
+							str+=parseFunction(i);
+						}
 					}
 					else{
-						str+=indent+'    '+i+':'+get.stringify(obj[i],level+1)+',\n';
+						insertDefaultString=indent+'    '+i+':'+get.stringify(obj[i],level+1)+',\n';
+						if(typeof obj[i]!=='function'){
+							str+=insertDefaultString;
+						}else{
+							str+=parseFunction(i);
+						}
 					}
 				}
 				str+=indent+'}';
