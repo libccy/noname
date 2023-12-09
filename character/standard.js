@@ -333,22 +333,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.countCards(get.mode()=='guozhan'?'hes':'hs')>0;
 				},
-				content:function(){
-					"step 0"
-					player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
-					get.translation(trigger.player.judging[0])+'，'+get.prompt('guicai'),get.mode()=='guozhan'?'hes':'hs',function(card){
-						var player=_status.event.player;
-						var mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
+				async content(event,trigger,player){
+					const {result:{bool:chooseCardResultBool,cards:chooseCardResultCards}}=await player.promises.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
+					get.translation(trigger.player.judging[0])+'，'+get.prompt('guicai'),get.mode()=='guozhan'?'hes':'hs',card=>{
+						const player=_status.event.player;
+						const mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
 						if(mod2!='unchanged') return mod2;
-						var mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
+						const mod=game.checkMod(card,player,'unchanged','cardRespondable',player);
 						if(mod!='unchanged') return mod;
 						return true;
-					}).set('ai',function(card){
-						var trigger=_status.event.getTrigger();
-						var player=_status.event.player;
-						var judging=_status.event.judging;
-						var result=trigger.judge(card)-trigger.judge(judging);
-						var attitude=get.attitude(player,trigger.player);
+					}).set('ai',card=>{
+						const trigger=_status.event.getTrigger();
+						const player=_status.event.player;
+						const judging=_status.event.judging;
+						const result=trigger.judge(card)-trigger.judge(judging);
+						const attitude=get.attitude(player,trigger.player);
 						if(attitude==0||result==0) return 0;
 						if(attitude>0){
 							return result-get.value(card)/2;
@@ -357,30 +356,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return -result-get.value(card)/2;
 						}
 					}).set('judging',trigger.player.judging[0]).setHiddenSkill('guicai');
-					"step 1"
-					if(result.bool){
-						player.respond(result.cards,'guicai','highlight','noOrdering');
+					if(!chooseCardResultBool) return;
+					await player.promises.respond(chooseCardResultCards,'guicai','highlight','noOrdering');
+					if(trigger.player.judging[0].clone){
+						trigger.player.judging[0].clone.classList.remove('thrownhighlight');
+						game.broadcast(function(card){
+							if(card.clone){
+								card.clone.classList.remove('thrownhighlight');
+							}
+						},trigger.player.judging[0]);
+						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 					}
-					else{
-						event.finish();
-					}
-					"step 2"
-					if(result.bool){
-						if(trigger.player.judging[0].clone){
-							trigger.player.judging[0].clone.classList.remove('thrownhighlight');
-							game.broadcast(function(card){
-								if(card.clone){
-									card.clone.classList.remove('thrownhighlight');
-								}
-							},trigger.player.judging[0]);
-							game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
-						}
-						game.cardsDiscard(trigger.player.judging[0]);
-						trigger.player.judging[0]=result.cards[0];
-						trigger.orderingCards.addArray(result.cards);
-						game.log(trigger.player,'的判定牌改为',result.cards[0]);
-						game.delay(2);
-					}
+					await game.cardsDiscard(trigger.player.judging[0]).toPromise();
+					trigger.player.judging[0]=chooseCardResultCards[0];
+					trigger.orderingCards.addArray(chooseCardResultCards);
+					game.log(trigger.player,'的判定牌改为',chooseCardResultCards[0]);
+					game.delay(2);
 				},
 				ai:{
 					rejudge:true,
