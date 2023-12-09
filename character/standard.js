@@ -691,44 +691,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				// alter:true,
 				trigger:{player:'phaseZhunbeiBegin'},
 				frequent:true,
-				content:function(){
-					"step 0"
-					if(event.cards==undefined) event.cards=[];
-					player.judge(function(card){
-						if(get.color(card)=='black') return 1.5;
-						return -1.5;
-					},ui.special).judge2=function(result){
-						return result.bool;
-					};
-					"step 1"
-					if(result.judge>0){
-						event.cards.push(result.card);
-						if(lib.config.autoskilllist.contains('luoshen')){
-							player.chooseBool('是否再次发动【洛神】？');
+				async content(event,trigger,player){
+					while(true){
+						if(event.cards==undefined) event.cards=[];
+						const judgeEvent=player.promises.judge(card=>{
+							if(get.color(card)=='black') return 1.5;
+							return -1.5;
+						},ui.special);
+						judgeEvent.judge2=result=>result.bool;
+						const {result:{judge,card}}=await judgeEvent;
+						let bool;
+						if(judge>0){
+							event.cards.push(card);
+							bool=lib.config.autoskilllist.contains('luoshen')?(await player.promises.chooseBool('是否再次发动【洛神】？')).result.bool:true;
 						}
 						else{
-							event._result={bool:true};
-						}
-					}
-					else{
-						for(var i=0;i<event.cards.length;i++){
-							if(get.position(event.cards[i])!='s'){
-								event.cards.splice(i,1);i--;
+							for(let i=0;i<event.cards.length;i++){
+								if(get.position(event.cards[i])!='s'){
+									event.cards.splice(i,1);
+									i--;
+								}
 							}
-						}
-						player.gain(event.cards,'gain2');
-						player.storage.xinluoshen=event.cards.slice(0);
-						event.finish();
-					}
-					"step 2"
-					if(result.bool){
-						event.goto(0);
-					}
-					else{
-						if(event.cards.length){
-							player.gain(event.cards,'gain2');
+							await player.promises.gain(event.cards,'gain2');
 							player.storage.xinluoshen=event.cards.slice(0);
+							return;
 						}
+						if(!bool){
+							if(event.cards.length){
+								await player.promises.gain(event.cards,'gain2');
+								player.storage.xinluoshen=event.cards.slice(0);
+								return;
+							}
+						};
 					}
 				},
 				mod:{
@@ -743,7 +737,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					clear:{
 						trigger:{player:'phaseAfter'},
 						silent:true,
-						content:function(){
+						async content(event,trigger,player){
 							delete player.storage.xinluoshen;
 						}
 					}
