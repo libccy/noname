@@ -2718,7 +2718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							var trigger=event.getParent().getTrigger();
 							if(trigger.name=='useCard'){
-								var target=lib.skill.chongzhen1.logTarget(trigger,player);
+								var target=lib.skill.chongzhen.logTarget(trigger,player);
 							}
 							else{
 								var target=trigger.source;
