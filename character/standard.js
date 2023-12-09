@@ -1033,10 +1033,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				discard:false,
 				lose:false,
-				content:function(){
+				async content(event,trigger,player){
 					player.awakenSkill('zhongyi');
 					player.addTempSkill('zhongyi2','roundStart');
-					player.addToExpansion(player,'give',cards).gaintag.add('zhongyi2');
+					await player.promise.addToExpansion(player,'give',event.cards).gaintag.add('zhongyi2');
 				},
 			},
 			zhongyi2:{
