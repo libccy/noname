@@ -31323,7 +31323,7 @@ new Promise(resolve=>{
 					return parent;
 				}
 				getTrigger(){
-					return this.getParent()._trigger;
+					return this.getParent('arrangeTrigger')._trigger;
 				}
 				getRand(name){
 					if(name){
