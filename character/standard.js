@@ -390,25 +390,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (get.attitude(player,event.source)<=0);
 				},
 				logTarget:'source',
-				content:function(){
-					"step 0"
-					player.judge(function(card){
+				async content(event,trigger,player){
+					const judgeEvent=player.promises.judge(card=>{
 						if(get.suit(card)=='heart') return -2;
 						return 2;
-					}).judge2=function(result){
-						return result.bool;
-					};
-					"step 1"
-					if(result.judge<2){
-						event.finish();return;
-					}
-					trigger.source.chooseToDiscard(2).set('ai',function(card){
+					});
+					judgeEvent.judge2=result=>result.bool;
+					const {result:{judge}}=await judgeEvent;
+					if(judge<2) return;
+					const {result:{bool}}=await trigger.source.promises.chooseToDiscard(2)
+					.set('ai',card=>{
 						if(card.name=='tao') return -10;
 						if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
 						return get.unuseful(card)+2.5*(5-get.owner(card).hp);
 					});
-					"step 2"
-					if(result.bool==false){
+					if(bool==false){
 						trigger.source.damage();
 					}
 				},
