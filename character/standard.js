@@ -1340,54 +1340,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				// alter:true,
 				filter:function(event){
-					if(!get.is.altered('xinjizhi')&&get.type(event.card)=='delay') return false;
+					if(get.type(event.card)=='delay') return false;
 					return (get.type(event.card,'trick')=='trick'&&event.cards[0]&&event.cards[0]==event.card);
 				},
-				init:function(player){
-					player.storage.xinjizhi=0;
-				},
 				async content(event, trigger, player){
-					const {result}=await player.promises.draw();
-					if(get.is.altered('xinjizhi')&&get.type(result[0])=='basic'){
-						event.card=result[0];
-						const {result:{bool}}=await player.promises.chooseBool('是否弃置'+get.translation(event.card)+'并令本回合手牌上限+1？').set('ai',(evt,player)=>{
-							return _status.currentPhase==player&&player.needsToDiscard(-3)&&_status.event.value<6;
-						}).set('value',get.value(event.card,player));
-						if(bool){
-							player.discard(event.card);
-							player.storage.xinjizhi++;
-							if(_status.currentPhase==player){
-								player.markSkill('xinjizhi');
-							}
-						}
-					}
+					await player.promises.draw();
 				},
 				ai:{
 					threaten:1.4,
 					noautowuxie:true,
 				},
-				mod:{
-					maxHandcard:function(player,num){
-						if(get.is.altered('xinjizhi')&&_status.currentPhase==player){
-							return num+player.storage.xinjizhi;
-						}
-						return num;
-					}
-				},
-				intro:{
-					content:'本回合手牌上限+#'
-				},
-				group:'xinjizhi_clear',
-				subSkill:{
-					clear:{
-						trigger:{global:'phaseAfter'},
-						silent:true,
-						async content(event, trigger, player){
-							player.storage.xinjizhi=0;
-							player.unmarkSkill('xinjizhi');
-						}
-					}
-				}
 			},
 			qicai:{
 				mod:{
