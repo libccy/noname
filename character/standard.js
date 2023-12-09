@@ -310,8 +310,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return (event.source&&event.source.countGainableCards(player,event.source!=player?'he':'e')&&event.num>0);
 				},
-				content:function(){
-					player.gainPlayerCard(true,trigger.source,trigger.source!=player?'he':'e');
+				async content(event,trigger,player){
+					await player.promises.gainPlayerCard(true,trigger.source,trigger.source!=player?'he':'e');
 				},
 				ai:{
 					maixie_defend:true,
