@@ -484,7 +484,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.logSkill('tuxi',targets);
 					await player.promises.gainMultiple(targets);
 					trigger.changeToZero();
-					game.delay();
+					await game.asyncDelay();
 				},
 				ai:{
 					threaten:2,
