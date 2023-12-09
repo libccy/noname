@@ -1396,7 +1396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:0,
 				async content(event,trigger,player){
 					if(!player.hasSkill('xinzhiheng_delay')) await game.asyncDelayx();
-					await player.draw(event.cards.length);
+					await player.promises.draw(event.cards.length);
 				},
 				group:'xinzhiheng_draw',
 				subSkill:{
