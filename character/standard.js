@@ -1438,11 +1438,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 6-get.value(card)
 				},
 				delay:0,
-				content:function(){
-					'step 0'
-					if(!player.hasSkill('xinzhiheng_delay')) game.delayx();
-					'step 1'
-					player.draw(cards.length);
+				async content(event,trigger,player){
+					if(!player.hasSkill('xinzhiheng_delay')) await game.asyncDelayx();
+					await player.draw(event.cards.length);
 				},
 				group:'xinzhiheng_draw',
 				subSkill:{
@@ -1458,7 +1456,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return false;
 						},
-						content:function(){
+						async content(event,trigger,player){
 							player.draw();
 							player.addTempSkill('xinzhiheng_delay','xinzhihengAfter');
 						}
