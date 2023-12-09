@@ -1326,8 +1326,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event){
 					return (get.type(event.card)=='trick'&&event.card.isCard);
 				},
-				content:function(){
-					player.draw();
+				async content(event,trigger,player){
+					await player.promises.draw();
 				},
 				ai:{
 					threaten:1.4,
