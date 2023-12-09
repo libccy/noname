@@ -932,7 +932,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete trigger.skill;
 					trigger.getParent().set('jijiang',true);
 					while(true){
-						let bool,card,cards;
 						if(event.current==undefined) event.current=player.next;
 						if(event.current==player){
 							player.addTempSkill('jijiang3');
@@ -941,17 +940,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return;
 						}
 						else if(event.current.group=='shu'){
-							const next=event.current.promises.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
-							next.set('ai',()=>{
+							const chooseToRespondEvent=event.current.promises.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
+							chooseToRespondEvent.set('ai',()=>{
 								const event=_status.event;
 								return (get.attitude(event.player,event.source)-2);
 							});
-							next.set('source',player);
-							next.set('jijiang',true);
-							next.set('skillwarn','替'+get.translation(player)+'打出一张杀');
-							next.noOrdering=true;
-							next.autochoose=lib.filter.autoRespondSha;
-							({bool,card,cards}=(await next).result);
+							chooseToRespondEvent.set('source',player);
+							chooseToRespondEvent.set('jijiang',true);
+							chooseToRespondEvent.set('skillwarn','替'+get.translation(player)+'打出一张杀');
+							chooseToRespondEvent.noOrdering=true;
+							chooseToRespondEvent.autochoose=lib.filter.autoRespondSha;
+							const {bool,card,cards}=(await chooseToRespondEvent).result;
 							if(bool){
 								trigger.card=card;
 								trigger.cards=cards;
