@@ -1678,22 +1678,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							current!=player&&lib.filter.targetEnabled(event.card,event.player,current);
 					});
 				},
-				content:function(){
-					"step 0"
-					var next=player.chooseCardTarget({
+				async content(event,trigger,player){
+					const {result:{bool,targets,cards}}=await player.promises.chooseCardTarget({
 						position:'he',
 						filterCard:lib.filter.cardDiscardable,
-						filterTarget:function(card,player,target){
-							var trigger=_status.event;
+						filterTarget:(card,player,target)=>{
+							const trigger=_status.event;
 							if(player.inRange(target)&&target!=trigger.source){
 								if(lib.filter.targetEnabled(trigger.card,trigger.source,target)) return true;
 							}
 							return false;
 						},
-						ai1:function(card){
-							return get.unuseful(card)+9;
-						},
-						ai2:function(target){
+						ai1:card=>get.unuseful(card)+9,
+						ai2:target=>{
 							if(_status.event.player.countCards('h','shan')){
 								return -get.attitude(_status.event.player,target);
 							}
@@ -1713,12 +1710,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						source:trigger.player,
 						card:trigger.card,
 					}).setHiddenSkill(event.name);
-					"step 1"
-					if(result.bool){
-						var target=result.targets[0];
+					if(bool){
+						const target=targets[0];
 						player.logSkill(event.name,target);
-						player.discard(result.cards);
-						var evt=trigger.getParent();
+						await player.promises.discard(cards);
+						const evt=trigger.getParent();
 						evt.triggeredTargets2.remove(player);
 						evt.targets.remove(player);
 						evt.targets.push(target);
