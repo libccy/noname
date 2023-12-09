@@ -183,12 +183,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card.name=='sha'&&event.player!=player&&!event.targets.contains(player)&&
 					event.target.inRange(player)&&event.target.countCards('he')>0;
 				},
-				content:function(){
-					'step 0'
-					trigger.target.chooseCard('he','是否对'+get.translation(player)+'发动【同疾】？','弃置一张牌，将'+get.translation(trigger.card)+'转移给'+get.translation(player)).set('ai',function(card){
+				async content(event,trigger,player){
+					const {result:{bool,cards}}=await trigger.promises.target.chooseCard('he','是否对'+get.translation(player)+'发动【同疾】？','弃置一张牌，将'+get.translation(trigger.card)+'转移给'+get.translation(player))
+					.set('ai',card=>{
 						if(!_status.event.check) return -1;
 						return get.unuseful(card)+9;
-					}).set('check',function(){
+					})
+					.set('check',(()=>{
 						if(trigger.target.countCards('h','shan')){
 							return -get.attitude(trigger.target,player);
 						}
@@ -202,12 +203,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 8-get.attitude(trigger.target,player);
 						}
 						return -1;
-					}()>0);
-					'step 1'
-					if(result.bool){	
+					})()>0);
+					if(bool){	
 						player.logSkill('retongji',trigger.target);
-						trigger.target.discard(result.cards);
-						var evt=trigger.getParent();
+						await trigger.target.promises.discard(cards);
+						const evt=trigger.getParent();
 						evt.triggeredTargets2.remove(trigger.target);
 						evt.targets.remove(trigger.target);
 						evt.targets.push(player);
