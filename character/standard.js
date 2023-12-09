@@ -233,42 +233,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(get.damageEffect(player,event.player,player)>=0) return false;
 					return true;
 				},
-				content:function(){
-					"step 0"
-					if(event.current==undefined) event.current=player.next;
-					if(event.current==player){
-						event.finish();
-					}
-					else if(event.current.group=='wei'){
-						if((event.current==game.me&&!_status.auto)||(
-							get.attitude(event.current,player)>2)||
-							event.current.isOnline()){
-							player.storage.hujiaing=true;
-							var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张闪？',{name:'shan'});
-							next.set('ai',function(){
-								var event=_status.event;
-								return (get.attitude(event.player,event.source)-2);
-							});
-							next.set('skillwarn','替'+get.translation(player)+'打出一张闪');
-							next.autochoose=lib.filter.autoRespondShan;
-							next.set('source',player);
+				async content(event,trigger,player){
+					while(true){
+						let bool;
+						if(!event.current) event.current=player.next;
+						if(event.current==player) return;
+						else if(event.current.group=='wei'){
+							if((event.current==game.me&&!_status.auto)||(
+								get.attitude(event.current,player)>2)||
+								event.current.isOnline()){
+								player.storage.hujiaing=true;
+								const next=event.current.promises.chooseToRespond('是否替'+get.translation(player)+'打出一张闪？',{name:'shan'});
+								next.set('ai',()=>{
+									const event=_status.event;
+									return (get.attitude(event.player,event.source)-2);
+								});
+								next.set('skillwarn','替'+get.translation(player)+'打出一张闪');
+								next.autochoose=lib.filter.autoRespondShan;
+								next.set('source',player);
+								bool=(await next).result.bool;
+							}
 						}
-					}
-					"step 1"
-					player.storage.hujiaing=false;
-					if(result.bool){
-						event.finish();
-						trigger.result={bool:true,card:{name:'shan',isCard:true}};
-						trigger.responded=true;
-						trigger.animate=false;
-						if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
-							event.current.ai.shown+=0.3;
-							if(event.current.ai.shown>0.95) event.current.ai.shown=0.95;
+						player.storage.hujiaing=false;
+						if(bool){
+							trigger.result={bool:true,card:{name:'shan',isCard:true}};
+							trigger.responded=true;
+							trigger.animate=false;
+							if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
+								event.current.ai.shown+=0.3;
+								if(event.current.ai.shown>0.95) event.current.ai.shown=0.95;
+							}
+							return;
 						}
-					}
-					else{
-						event.current=event.current.next;
-						event.goto(0);
+						else{
+							event.current=event.current.next;
+						}
 					}
 				},
 				ai:{
