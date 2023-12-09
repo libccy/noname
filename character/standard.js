@@ -1365,12 +1365,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					targetInRange:function(card,player,target,now){
 						var type=get.type(card);
 						if(type=='trick'||type=='delay') return true;
-					},
-					canBeDiscarded:function(card){
-						if(get.is.altered('xinqicai')&&get.position(card)=='e') return false;
-					},
-					cardDiscardable:function(card){
-						if(get.is.altered('xinqicai')&&get.position(card)=='e') return false;
 					}
 				},
 			},
