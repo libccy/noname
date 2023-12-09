@@ -540,8 +540,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return get.position(event.result.card,true)=='o';
 				},
-				content:function(){
-					player.gain(trigger.result.card,'gain2');
+				async content(event,trigger,player){
+					await player.promises.gain(trigger.result.card,'gain2');
 				}
 			},
 			yiji:{
