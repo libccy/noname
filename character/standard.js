@@ -2117,10 +2117,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card.name=='juedou';
 				},
 				//priority:-1,
-				content:function(){
-					var id=(player==trigger.player?trigger.target:trigger.player)['playerid'];
-					var idt=trigger.target.playerid;
-					var map=trigger.getParent().customArgs;
+				async content(event,trigger,player){
+					const id=(player==trigger.player?trigger.target:trigger.player)['playerid'];
+					const idt=trigger.target.playerid;
+					const map=trigger.getParent().customArgs;
 					if(!map[idt]) map[idt]={};
 					if(!map[idt].shaReq) map[idt].shaReq={};
 					if(!map[idt].shaReq[id]) map[idt].shaReq[id]=1;
