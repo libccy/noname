@@ -1092,31 +1092,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				frequent:true,
 				preHidden:true,
-				content:function(){
-					"step 0"
-					var num=Math.min(5,game.countPlayer());
-					if(player.hasSkill('yizhi')&&player.hasSkill('guanxing')){
-						num=5;
-					}
-					var cards=get.cards(num);
-					game.cardsGotoOrdering(cards);
-					var next=player.chooseToMove();
+				async content(event,trigger,player){
+					const num=player.hasSkill('yizhi')&&player.hasSkill('guanxing')?5:Math.min(5,game.countPlayer());
+					const cards=get.cards(num);
+					await game.cardsGotoOrdering(cards).toPromise();
+					const next=player.promises.chooseToMove();
 					next.set('list',[
 						['牌堆顶',cards],
 						['牌堆底'],
 					]);
 					next.set('prompt','观星：点击将牌移动到牌堆顶或牌堆底');
-					next.processAI=function(list){
-						var cards=list[0][1],player=_status.event.player;
-						var top=[];
-						var judges=player.getCards('j');
-						var stopped=false;
+					next.processAI=list=>{
+						const cards=list[0][1],player=_status.event.player;
+						const top=[];
+						const judges=player.getCards('j');
+						let stopped=false;
 						if(!player.hasWuxie()){
-							for(var i=0;i<judges.length;i++){
-								var judge=get.judge(judges[i]);
-								cards.sort(function(a,b){
-									return judge(b)-judge(a);
-								});
+							for(let i=0;i<judges.length;i++){
+								const judge=get.judge(judges[i]);
+								cards.sort((a,b)=>judge(b)-judge(a));
 								if(judge(cards[0])<0){
 									stopped=true;break;
 								}
@@ -1125,11 +1119,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 						}
-						var bottom;
+						let bottom;
 						if(!stopped){
-							cards.sort(function(a,b){
-								return get.value(b,player)-get.value(a,player);
-							});
+							cards.sort((a,b)=>get.value(b,player)-get.value(a,player));
 							while(cards.length){
 								if(get.value(cards[0],player)<=5) break;
 								top.unshift(cards.shift());
@@ -1138,22 +1130,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						bottom=cards;
 						return [top,bottom];
 					}
-					"step 1"
-					var top=result.moved[0];
-					var bottom=result.moved[1];
+					const {result:{moved}}=await next;
+					const top=moved[0];
+					const bottom=moved[1];
 					top.reverse();
-					game.cardsGotoPile(
+					await game.cardsGotoPile(
 						top.concat(bottom),
 						['top_cards',top],
-						function(event,card){
+						(event,card)=>{
 							if(event.top_cards.includes(card)) return ui.cardPile.firstChild;
 							return null;
 						}
-					)
+					).toPromise();
 					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
 					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
-					"step 2"
-					game.delayx();
+					await game.asyncDelayx();
 				},
 				ai:{
 					threaten:1.2
