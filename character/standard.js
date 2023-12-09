@@ -1294,9 +1294,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'target',
 				preHidden:true,
-				content:function(){
-					"step 0"
-					player.judge(function(card){
+				async content(event,trigger,player){
+					const judgeEvent=player.promises.judge(card=>{
 						if(get.zhu(_status.event.player,'shouyue')){
 							if(get.suit(card)!='spade') return 2;
 						}
@@ -1304,11 +1303,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.color(card)=='red') return 2;
 						}
 						return -0.5;
-					}).judge2=function(result){
-						return result.bool;
-					};
-					"step 1"
-					if(result.bool){
+					});
+					judgeEvent.judge2=result=>result.bool;
+					const {result:{bool}}=await judgeEvent;
+					if(bool){
 						trigger.getParent().directHit.add(trigger.target);
 					}
 				},
