@@ -2144,11 +2144,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target.isFriendOf(player);
 					}).length>0
 				},
-				content:function(){
+				async content(event,trigger,player){
 					player.awakenSkill('zhanshen');
-					var card=player.getEquips(1);
-					if(cards.length) player.discard(card);
-					player.loseMaxHp();
+					const cards=player.getEquips(1);
+					if(cards.length) await player.promises.discard(cards);
+					await player.promises.loseMaxHp();
 					player.addSkill('mashu');
 					player.addSkill('shenji');
 				},
