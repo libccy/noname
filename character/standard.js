@@ -423,38 +423,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'ganglie',
 				trigger:{player:'damageEnd'},
 				direct:true,
-				content:function(){
-					"step 0"
-					player.chooseTarget(get.prompt2('ganglie_three'),function(card,player,target){
+				async content(event,trigger,player){
+					const {result:{bool:chooseTargetResultBool,targets:chooseTargetResultTargets}}=await player.promises.chooseTarget(get.prompt2('ganglie_three'),(card,player,target)=>{
 						return target.isEnemyOf(player);
-					}).set('ai',function(target){
+					}).set('ai',target=>{
 						return -get.attitude(_status.event.player,target)/(1+target.countCards('h'));
 					});
-					"step 1"
-					if(result.bool){
-						event.target=result.targets[0];
-						player.logSkill('ganglie_three',target);
-					}
-					else event.finish();
-					"step 2"
-					player.judge(function(card){
+					if(!chooseTargetResultBool) return;
+					event.target=chooseTargetResultTargets[0];
+					player.logSkill('ganglie_three',event.target);
+					const judgeEvent=player.promises.judge(card=>{
 						if(get.suit(card)=='heart') return -2;
 						return 2;
-					}).judge2=function(result){
-						return result.bool;
-					};
-					"step 3"
-					if(result.judge<2){
-						event.finish();return;
-					}
-					target.chooseToDiscard(2).set('ai',function(card){
+					});
+					judgeEvent.judge2=result=>result.bool;
+					const {result:{judge}}=await judgeEvent;
+					if(judge<2) return;
+					const {result:{bool:chooseToDiscardResultBool}}=await player.promises.chooseToDiscard(2).set('ai',card=>{
 						if(card.name=='tao') return -10;
 						if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
 						return get.unuseful(card)+2.5*(5-get.owner(card).hp);
 					});
-					"step 4"
-					if(result.bool==false){
-						target.damage();
+					if(chooseToDiscardResultBool==false){
+						event.target.damage();
 					}
 				},
 				ai:{
