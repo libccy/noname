@@ -1036,7 +1036,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					player.awakenSkill('zhongyi');
 					player.addTempSkill('zhongyi2','roundStart');
-					await player.promise.addToExpansion(player,'give',event.cards).gaintag.add('zhongyi2');
+					await player.promises.addToExpansion(player,'give',event.cards).gaintag.add('zhongyi2');
 				},
 			},
 			zhongyi2:{
@@ -1047,7 +1047,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.getParent().name=='sha'&&event.source&&event.source.isFriendOf(player);
 				},
-				content:function(){trigger.num++},
+				async content(event,trigger,player){trigger.num++},
 				intro:{content:'expansion',markcount:'expansion'},
 				onremove:function(player,skill){
 					var cards=player.getExpansions(skill);
