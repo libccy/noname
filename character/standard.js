@@ -99,23 +99,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'shushen',
 				trigger:{player:'recoverEnd'},
 				direct:true,
-				content:function(){
-					'step 0'
+				async content(event,trigger,player){
 					event.num=trigger.num||1;
-					'step 1'
-					player.chooseTarget(get.prompt2('stdshushen'),lib.filter.notMe).set('ai',function(target){
-						return get.attitude(_status.event.player,target);
-					});
-					'step 2'
-					if(result.bool){
-						var target=result.targets[0];
+					while(player.hasSkill('stdshushen')){
+						const {result:{targets}}=await player.promises.chooseTarget(get.prompt2('stdshushen'),lib.filter.notMe)
+							.set('ai',target=>get.attitude(_status.event.player,target));
+						const target=targets[0];
 						player.logSkill('stdshushen',target);
-						target.draw(target.countCards('h')?1:2);
-						if(event.num>1&&player.hasSkill('stdshushen')){
-							event.num--;
-							event.goto(1);
-						}
-					}
+						await target.promises.draw(target.countCards('h')?1:2);
+						if(--event.num<1) break;
+					};
 				},
 				ai:{threaten:0.8,expose:0.1},
 			},
