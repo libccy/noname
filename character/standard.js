@@ -288,8 +288,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return get.itemtype(event.cards)=='cards'&&get.position(event.cards[0],true)=='o';
 				},
-				content:function(){
-					player.gain(trigger.cards,'gain2');
+				async content(event,trigger,player){
+					await player.promises.gain(trigger.cards,'gain2');
 				},
 				ai:{
 					maixie:true,
