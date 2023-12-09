@@ -1498,8 +1498,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){
 					return 6-get.value(card)
 				},
-				content:function(){
-					player.draw(cards.length);
+				async content(event,trigger,player){
+					player.draw(event.cards.length);
 				},
 				ai:{
 					order:1,
