@@ -975,7 +975,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event){
 					return event.skill!='jijiang'&&event.skill!='qinwang';
 				},
-				content:function(){
+				async content(event,trigger,player){
 					player.removeSkill('jijiang3');
 				}
 			},
