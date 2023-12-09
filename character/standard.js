@@ -1346,25 +1346,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					player.storage.xinjizhi=0;
 				},
-				content:function(){
-					'step 0'
-					player.draw();
-					'step 1'
+				async content(event, trigger, player){
+					const {result}=await player.promises.draw();
 					if(get.is.altered('xinjizhi')&&get.type(result[0])=='basic'){
 						event.card=result[0];
-						player.chooseBool('是否弃置'+get.translation(event.card)+'并令本回合手牌上限+1？').set('ai',function(evt,player){
+						const {result:{bool}}=await player.promises.chooseBool('是否弃置'+get.translation(event.card)+'并令本回合手牌上限+1？').set('ai',(evt,player)=>{
 							return _status.currentPhase==player&&player.needsToDiscard(-3)&&_status.event.value<6;
 						}).set('value',get.value(event.card,player));
-					}
-					else{
-						event.finish();
-					}
-					'step 2'
-					if(result.bool){
-						player.discard(event.card);
-						player.storage.xinjizhi++;
-						if(_status.currentPhase==player){
-							player.markSkill('xinjizhi');
+						if(bool){
+							player.discard(event.card);
+							player.storage.xinjizhi++;
+							if(_status.currentPhase==player){
+								player.markSkill('xinjizhi');
+							}
 						}
 					}
 				},
@@ -1388,7 +1382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					clear:{
 						trigger:{global:'phaseAfter'},
 						silent:true,
-						content:function(){
+						async content(event, trigger, player){
 							player.storage.xinjizhi=0;
 							player.unmarkSkill('xinjizhi');
 						}
