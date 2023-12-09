@@ -2189,9 +2189,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				targetprompt:['先出杀','后出杀'],
 				selectTarget:2,
 				multitarget:true,
-				content:function(){
-					targets[1].useCard({name:'juedou',isCard:true},'nowuxie',targets[0],'noai').animate=false;
-					game.delay(0.5);
+				async content(event,trigger,player){
+					const useCardEvent=event.targets[1].useCard({name:'juedou',isCard:true},'nowuxie',event.targets[0],'noai');
+					useCardEvent.animate = false;
+					await useCardEvent;
+					await game.asyncDelay(0.5);
 				},
 				ai:{
 					order:8,
