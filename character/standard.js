@@ -1842,9 +1842,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target==player) return false;
 					return true;
 				},
-				content:function(){
-					player.recover();
-					target.recover();
+				async content(event,trigger,player){
+					await player.promises.recover();
+					await event.target.promises.recover();
 				},
 				ai:{
 					order:5.5,
