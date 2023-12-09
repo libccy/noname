@@ -2087,9 +2087,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				//priority:-1,
 				logTarget:'target',
-				content:function(){
-					var id=trigger.target.playerid;
-					var map=trigger.getParent().customArgs;
+				async content(event,trigger,player){
+					const id=trigger.target.playerid;
+					const map=trigger.getParent().customArgs;
 					if(!map[id]) map[id]={};
 					if(typeof map[id].shanRequired=='number'){
 						map[id].shanRequired++;
