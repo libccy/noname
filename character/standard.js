@@ -1198,8 +1198,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!get.zhu(player,'shouyue')) return false;
 							return event.skill=='longdan_sha'||event.skill=='longdan_shan';
 						},
-						content:function(){
-							player.draw();
+						async content(event,trigger,player){
+							await player.promises.draw();
 							player.storage.fanghun2++;
 						}
 					},
