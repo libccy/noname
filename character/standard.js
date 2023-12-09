@@ -1455,7 +1455,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 6-get.value(card)
 				},
 				async content(event,trigger,player){
-					player.draw(event.cards.length);
+					await player.promises.draw(event.cards.length);
 				},
 				ai:{
 					order:1,
