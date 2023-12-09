@@ -120,9 +120,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.isPhaseUsing()&&event.card&&event.card.name=='sha'&&event.player!=player&&event.player.isIn();
 				},
-				content:function(){
-					if(trigger.player.hp<player.hp) player.draw(2);
-					else player.loseHp();
+				async content(event,trigger,player){
+					if(trigger.player.hp<player.hp) player.promises.draw(2);
+					else player.promises.loseHp();
 				},
 				ai:{
 					halfneg:true,
