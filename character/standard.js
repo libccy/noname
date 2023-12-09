@@ -466,31 +466,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return !event.numFixed;
 				},
-				content:function(){
-					"step 0"
-					var check;
-					var i,num=game.countPlayer(function(current){
+				async content(event,trigger,player){
+					let check;
+					let i,num=game.countPlayer(function(current){
 						return current!=player&&current.countCards('h')&&get.attitude(player,current)<=0;
 					});
 					check=(num>=2);
-					player.chooseTarget(get.prompt('tuxi'),'获得其他一至两名角色的各一张手牌',[1,2],function(card,player,target){
+					const {result:{bool,targets}}=await player.promises.chooseTarget(get.prompt('tuxi'),'获得其他一至两名角色的各一张手牌',[1,2],(card,player,target)=>{
 						return target.countCards('h')>0&&player!=target;
-					},function(target){
+					},target=>{
 						if(!_status.event.aicheck) return 0;
-						var att=get.attitude(_status.event.player,target);
+						const att=get.attitude(_status.event.player,target);
 						if(target.hasSkill('tuntian')) return att/10;
 						return 1-att;
 					}).set('aicheck',check);
-					"step 1"
-					if(result.bool){
-						player.logSkill('tuxi',result.targets);
-						player.gainMultiple(result.targets);
-						trigger.changeToZero();
-					}
-					else{
-						event.finish();
-					}
-					"step 2"
+					if(!bool) return;
+					player.logSkill('tuxi',targets);
+					await player.promises.gainMultiple(targets);
+					trigger.changeToZero();
 					game.delay();
 				},
 				ai:{
