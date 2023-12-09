@@ -1901,23 +1901,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						discard:false,
 						delay:0,
 						lose:false,
-						content:function(){
-							'step 0'
+						async content(event,trigger,player){
+							const {cards,target}=event;
 							if(get.position(cards[0])=='e'){
 								player.$give(cards,target);
-								target.equip(cards[0]);
+								await target.promises.equip(cards[0]);
 							}
 							else{
-								player.discard(cards);
+								await player.promises.discard(cards);
 							}
-							'step 1'
 							if(player.hp>target.hp){
-								player.draw();
-								if(target.isDamaged()) target.recover();
+								await player.promises.draw();
+								if(target.isDamaged()) await target.promises.recover();
 							}
 							else if(player.hp<target.hp){
-								target.draw();
-								if(player.isDamaged()) player.recover();
+								await target.promises.draw();
+								if (player.isDamaged()) await player.promises.recover();
 							}
 						},
 						ai:{
@@ -1981,9 +1980,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(target==player) return false;
 							return true;
 						},
-						content:function(){
-							player.recover();
-							target.recover();
+						async content(event,trigger,player){
+							await player.promises.recover();
+							await event.target.promises.recover();
 						},
 						ai:{
 							order:5.5,
