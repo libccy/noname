@@ -2316,13 +2316,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:"phaseUse",
 				usable:1,
 				audio:2,
-				content:function(){
-					'step 0'
-					var card=get.bottomCards()[0];
-					game.cardsGotoOrdering(card);
+				async content(event,trigger,player){
+					const card=get.bottomCards()[0];
+					await game.cardsGotoOrdering(card).toPromise();
 					event.card=card;
-					player.chooseTarget(true).set('ai',function(target){
-						var att=get.attitude(_status.event.player,target);
+					const {result:{bool,targets}}=await player.promises.chooseTarget(true).set('ai',target=>{
+						let att=get.attitude(_status.event.player,target);
 						if(_status.event.du){
 							if(target.hasSkillTag('nodu')) return 0.5;
 							return -att;
@@ -2336,12 +2335,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'机捷：选择一名角色获得此牌',
 						[card]
 					]);
-					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
+					if(bool){
+						const target=targets[0];
 						player.line(target,'green');
-						var next=target.gain(card,'draw');
-						next.giver=player;
+						const gainEvent=target.promises.gain(card,'draw');
+						gainEvent.giver=player;
+						await gainEvent;
 					}
 				},
 				ai:{
