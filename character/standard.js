@@ -1571,11 +1571,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				prompt:'失去1点体力并摸两张牌',
-				content:function(){
-					"step 0"
-					player.loseHp(1);
-					"step 1"
-					player.draw(2);
+				async content(event,trigger,player){
+					await player.promises.loseHp(1);
+					await player.promises.draw(2);
 				},
 				ai:{
 					basic:{
