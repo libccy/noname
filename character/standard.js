@@ -2013,8 +2013,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target.hp>=target.maxHp) return false;
 					return true;
 				},
-				content:function(){
-					target.recover();
+				async content(event,trigger,player){
+					await event.target.promises.recover();
 				},
 				ai:{
 					order:9,
