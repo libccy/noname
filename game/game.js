@@ -49655,8 +49655,7 @@ new Promise(resolve=>{
 									}
 									newSkill.querySelector('.new_description').value=page.content.pack.translate[this.link+'_info'];
 									var info=page.content.pack.skill[this.link];
-									container.code='skill='+get.stringify(info);
-
+									container.code='skill='+get.stringify(Object.defineProperty({...info}, '_priority', {enumerable:false,writable:true,configurable:true}));
 									toggle.innerHTML='编辑技能 <div>&gt;</div>';
 									editnode.innerHTML='编辑技能';
 									editnode.classList.remove('disabled');
@@ -49872,7 +49871,7 @@ new Promise(resolve=>{
 									skillopt.style.display='none';
 									addSkillButton.style.display='none';
 									cancelSkillButton.style.display='none';
-									container.code='skill='+get.stringify(lib.skill[skillopt.value]);
+									container.code='skill='+get.stringify(Object.defineProperty({...lib.skill[skillopt.value]}, '_priority', {enumerable:false,writable:true,configurable:true}));
 									editbutton.onclick.call(editbutton);
 									if(lib.translate[skillopt.value+'_info']){
 										newSkill.querySelector('input.new_description').value=lib.translate[skillopt.value+'_info'];
