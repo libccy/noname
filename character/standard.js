@@ -1767,8 +1767,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var evt=event.getl(player);
 					return evt&&evt.player==player&&evt.hs&&evt.hs.length>0;
 				},
-				content:function(){
-					player.draw();
+				async content(event,trigger,player){
+					await player.promises.draw();
 				},
 				ai:{
 					threaten:0.8,
