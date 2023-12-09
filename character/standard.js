@@ -646,45 +646,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				frequent:true,
 				preHidden:true,
-				content:function(){
-					"step 0"
-					if(event.cards==undefined) event.cards=[];
-					var next=player.judge(function(card){
-						if(get.color(card)=='black') return 1.5;
-						return -1.5;
-					});
-					next.judge2=function(result){
-						return result.bool;
-					};
-					if(get.mode()!='guozhan'&&!player.hasSkillTag('rejudge')) next.set('callback',function(){
-						if(event.judgeResult.color=='black'&&get.position(card,true)=='o') player.gain(card,'gain2');
-					});
-					else next.set('callback',function(){
-						if(event.judgeResult.color=='black') event.getParent().orderingCards.remove(card);
-					});
-					"step 1"
-					if(result.judge>0){
-						event.cards.push(result.card);
-						player.chooseBool('是否再次发动【洛神】？').set('frequentSkill','luoshen');
-					}
-					else{
-						for(var i=0;i<event.cards.length;i++){
-							if(get.position(event.cards[i],true)!='o'){
-								event.cards.splice(i,1);i--;
+				async content(event,trigger,player){
+					while(true){
+						if(event.cards==undefined) event.cards=[];
+						const judgeEvent=player.promises.judge(card=>{
+							if(get.color(card)=='black') return 1.5;
+							return -1.5;
+						});
+						judgeEvent.judge2=result=>result.bool;
+						if(get.mode()!='guozhan'&&!player.hasSkillTag('rejudge')) judgeEvent.set('callback',async event=>{
+							if(event.judgeResult.color=='black'&&get.position(event.card,true)=='o') await player.promises.gain(event.card,'gain2');
+						});
+						else judgeEvent.set('callback',async event=>{
+							if(event.judgeResult.color=='black') event.getParent().orderingCards.remove(event.card);
+						});
+						const {result:{judge,card}}=await judgeEvent;
+						let bool;
+						if(judge>0){
+							event.cards.push(card);
+							bool=(await player.promises.chooseBool('是否再次发动【洛神】？').set('frequentSkill','luoshen')).result.bool;
+						}
+						else{
+							for(let i=0;i<event.cards.length;i++){
+								if(get.position(event.cards[i],true)!='o'){
+									event.cards.splice(i,1);i--;
+								}
 							}
+							if(event.cards.length){
+								await player.promises.gain(event.cards,'gain2');
+							}
+							return;
 						}
-						if(event.cards.length){
-							player.gain(event.cards,'gain2');
-						}
-						event.finish();
-					}
-					"step 2"
-					if(result.bool){
-						event.goto(0);
-					}
-					else{
-						if(event.cards.length){
-							player.gain(event.cards,'gain2');
+						if(!bool){
+							if(event.cards.length){
+								await player.promises.gain(event.cards,'gain2');
+							}
+							return;
 						}
 					}
 				}
