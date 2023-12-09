@@ -1613,9 +1613,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return player!=target;
 				},
-				content:function(){
-					"step 0"
-					target.chooseControl('heart2','diamond2','club2','spade2').set('ai',function(event){
+				async content(event,trigger,player){
+					const target=event.target;
+					const {result:{control}}=await target.promises.chooseControl('heart2','diamond2','club2','spade2').set('ai',event=>{
 						switch(Math.floor(Math.random()*6)){
 							case 0:return 'heart2';
 							case 1:case 4:case 5:return 'diamond2';
@@ -1623,13 +1623,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case 3:return 'spade2';
 						}
 					});
-					"step 1"
-					game.log(target,'选择了'+get.translation(result.control));
-					event.choice=result.control;
+					game.log(target,'选择了'+get.translation(control));
+					event.choice=control;
 					target.chat('我选'+get.translation(event.choice));
-					target.gainPlayerCard(player,true,'h');
-					"step 2"
-					if(result.bool&&get.suit(result.cards[0],player)+'2'!=event.choice) target.damage('nocard');
+					const {result:{bool,cards}}=await target.promises.gainPlayerCard(player,true,'h');
+					if(bool&&get.suit(cards[0],player)+'2'!=event.choice) await target.promises.damage('nocard');
 				},
 				ai:{
 					order:1,
