@@ -2225,12 +2225,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJieshuBegin'},
 				frequent:true,
 				// alter:true,
-				content:function(){
-					var num=1;
-					if(get.is.altered('xinbiyue')&&!player.countCards('h')){
-						num=2;
-					}
-					player.draw(num);
+				async content(event,trigger,player){
+					await player.promise.draw(1);
 				},
 			},
 			yaowu:{
