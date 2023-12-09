@@ -1540,8 +1540,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.player.group!='wu') return false;
 					return true;
 				},
-				content:function(){
-					player.recover();
+				async content(event,trigger,player){
+					await player.promises.recover();
 				},
 				global:'xinjiuyuan2',
 			},
