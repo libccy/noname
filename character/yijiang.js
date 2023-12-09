@@ -3588,13 +3588,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(event.num2){
+						event.targetCardNum=target.countCards('he');
 						event.target.chooseToDiscard(event.num2,true,'he');
 					}
 					else{
 						event.finish();
 					}
 					'step 3'
-					if(result.bool&&result.autochoose&&result.cards.length==result.rawcards.length){
+					if(result.bool&&result.cards.length==event.targetCardNum){
 						player.removeSkill('jiexun');
 						player.addSkill('funan_jiexun');
 					}
@@ -3637,13 +3638,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 2'
 					if(event.num2){
+						event.targetCardNum=target.countCards('he');
 						event.target.chooseToDiscard(event.num2,true,'he');
 					}
 					else{
 						event.finish();
 					}
 					'step 3'
-					if(result.bool&&result.autochoose&&result.cards.length==result.rawcards.length){
+					if(result.bool&&result.cards.length==event.targetCardNum){
 						player.removeMark('xinjiexun',player.countMark('xinjiexun'),false);
 						player.addSkill('funan_jiexun');
 					}

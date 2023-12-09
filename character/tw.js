@@ -4340,10 +4340,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 3'
-					if(event.num2) target.chooseToDiscard(event.num2,true,'he');
+					if(event.num2){
+						event.targetCardNum=target.countCards('he');
+						target.chooseToDiscard(event.num2,true,'he');
+					}
 					else event.finish();
 					'step 4'
-					if(result.bool&&result.autochoose&&result.cards.length==result.rawcards.length&&!player.hasSkill('funan_jiexun')){
+					if(result.bool&&result.cards.length==event.targetCardNum&&!player.hasSkill('funan_jiexun')){
 						player.chooseControl().set('choiceList',[
 							'摸'+get.cnNumber(event.num2)+'张牌，将【诫训】的发动次数归零',
 							'修改【复难】和【诫训】'

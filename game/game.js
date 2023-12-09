@@ -14776,44 +14776,41 @@ new Promise(resolve=>{
 				},
 				arrangeTrigger:function(){
 					'step 0'
-					event.noDirectUse=info=>!lib.skill[info.skill].silent&&lib.translate[info.skill];//是否触发同顺序选择
-					'step 1'
 					if(event.doing&&event.doing.todoList.length) return;
 					if(event.doingList.length) return event.doing=event.doingList.shift();
 					event.finish();
-					'step 2'
+					'step 1'
 					if(trigger.filterStop&&trigger.filterStop()) return event.finish();
-					const current=event.doing.todoList.find(info=>lib.filter.filterTrigger(trigger,info.player,event.triggername,info.skill));
-					if(!current){
+					event.current=event.doing.todoList.find(info=>lib.filter.filterTrigger(trigger,info.player,event.triggername,info.skill));
+					if(!event.current){
 						event.doing.todoList=[];
-						return event.goto(1);
+						return event.goto(0);
 					}
-					event.doing.todoList=event.doing.todoList.filter(i=>i.priority<=current.priority);
-					event.num=event.doing.todoList.indexOf(current);
-					if(!event.noDirectUse(current)) return event.goto(5);
+					event.doing.todoList=event.doing.todoList.filter(i=>i.priority<=event.current.priority);
+
+					const directUse=info=>lib.skill[info.skill].silent||!lib.translate[info.skill];//是否不触发同顺序选择
+					if(directUse(event.current)) return event.goto(4);
 					event.choice=event.doing.todoList.filter(info=>{
 						if(!lib.filter.filterTrigger(trigger,info.player,event.triggername,info.skill)) return false;
-						if(!event.noDirectUse(info)) return false;
-						if(current.skill!=info.skill) return false;
-						if(current.player!=info.player) return false;
-						return lib.skill.global.includes(info.skill)||current.player.hasSkill(info.skill,true);
+						if(directUse(info)) return false;
+						if(event.current.player!=info.player) return false;
+						return lib.skill.global.includes(info.skill)||event.current.player.hasSkill(info.skill,true);
 					});
-					if(event.choice.length<2) event.goto(5);
-					'step 3'
+					if(event.choice.length<2) return event.goto(4);
+					'step 2'
 					const next=event.choice[0].player.chooseControl(event.choice.map(i=>i.skill));
 					next.set('prompt','选择下一个触发的技能');
 					next.set('forceDie',true);
 					next.set('arrangeSkill',true);
 					next.set('includeOut',true);
+					'step 3'
+					if(result.control) event.current=event.doing.todoList.find(info=>info.skill==result.control&&info.player==event.choice[0].player);
 					'step 4'
-					if(result.control) event.num=event.doing.todoList.findIndex(info=>info.skill==result.control&&info.player==event.choice[0].player);
-					'step 5'
-					const info=event.doing.todoList[event.num];
-					if(!info) return;
-					event.doing.doneList.push(info);
-					event.doing.todoList.splice(event.num,1);
-					game.createTrigger(event.triggername,info.skill,info.player,trigger);
-					event.goto(1);
+					if(!event.current||!event.doing.todoList.includes(event.current)) return;
+					event.doing.doneList.push(event.current);
+					event.doing.todoList.remove(event.current);
+					game.createTrigger(event.triggername,event.current.skill,event.current.player,trigger);
+					event.goto(0);
 				},
 				createTrigger:function(){
 					"step 0"
@@ -16048,153 +16045,6 @@ new Promise(resolve=>{
 						game.stopCountChoose();
 					}
 				},
-				chooseToDiscard:function(){
-					"step 0"
-					if(event.autochoose()){
-						event.result={
-							bool:true,
-							autochoose:true,
-							cards:player.getCards(event.position),
-							rawcards:player.getCards(event.position),
-						}
-						for(var i=0;i<event.result.cards.length;i++){
-							if(!lib.filter.cardDiscardable(event.result.cards[i],player,event)){
-								event.result.cards.splice(i--,1);
-							}
-						}
-					}
-					else{
-						// &&!lib.filter.wuxieSwap(trigger)
-						if(game.modeSwapPlayer&&!_status.auto&&player.isUnderControl()){
-							game.modeSwapPlayer(player);
-						}
-						event.rangecards=player.getCards(event.position);
-						for(var i=0;i<event.rangecards.length;i++){
-							if(lib.filter.cardDiscardable(event.rangecards[i],player,event)){
-								event.rangecards.splice(i--,1);
-							}
-							else{
-								event.rangecards[i].uncheck('chooseToDiscard');
-							}
-						}
-						var range=get.select(event.selectCard);
-						if(event.isMine()){
-							game.check();
-							if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
-								ui.click.cancel();
-								return;
-							}
-							game.pause();
-							if(range[1]>1&&typeof event.selectCard!='function'){
-								event.promptdiscard=ui.create.control('AI代选',function(){
-									ai.basic.chooseCard(event.ai);
-									if(_status.event.custom&&_status.event.custom.add.card){
-										_status.event.custom.add.card();
-									}
-									for(var i=0;i<ui.selected.cards.length;i++){
-										ui.selected.cards[i].updateTransform(true);
-									}
-								});
-							}
-							if(Array.isArray(event.dialog)){
-								event.dialog=ui.create.dialog.apply(this,event.dialog);
-								event.dialog.open();
-								event.dialog.classList.add('noselect');
-							}
-							else if(event.prompt!=false){
-								var str;
-								if(typeof(event.prompt)=='string') str=event.prompt;
-								else{
-									str='请弃置';
-									if(range[0]==range[1]) str+=get.cnNumber(range[0]);
-									else if(range[1]==Infinity) str+='至少'+get.cnNumber(range[0]);
-									else str+=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
-									str+='张';
-									if(event.position=='h'||event.position==undefined) str+='手';
-									if(event.position=='e') str+='装备';
-									str+='牌';
-								}
-								event.dialog=ui.create.dialog(str);
-								if(event.prompt2){
-									event.dialog.addText(event.prompt2,event.prompt2.length<=20);
-								}
-								if(Array.isArray(event.selectCard)){
-									event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
-									event.custom.add.card=function(){
-										_status.event.promptbar.innerHTML=
-										ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1],'card');
-									}
-								}
-							}
-							else if(get.itemtype(event.dialog)=='dialog'){
-								event.dialog.style.display='';
-								event.dialog.open();
-							}
-						}
-						else if(event.isOnline()){
-							event.send();
-						}
-						else{
-							event.result='ai';
-						}
-					}
-					"step 1"
-					if(event.result=='ai'){
-						game.check();
-						if((ai.basic.chooseCard(event.ai)||forced)&&(!event.filterOk||event.filterOk())){
-							ui.click.ok();
-						}
-						else if(event.skill){
-							var skill=event.skill;
-							ui.click.cancel();
-							event._aiexclude.add(skill);
-							event.redo();
-							game.resume();
-						}
-						else{
-							ui.click.cancel();
-						}
-					}
-					if(event.rangecards){
-						for(var i=0;i<event.rangecards.length;i++){
-							event.rangecards[i].recheck('chooseToDiscard');
-						}
-					}
-					"step 2"
-					event.resume();
-					if(event.promptdiscard){
-						event.promptdiscard.close();
-					}
-					"step 3"
-					if(event.result.bool&&event.result.cards&&event.result.cards.length&&
-						!game.online&&event.autodelay&&!event.isMine()){
-						if(typeof event.autodelay=='number'){
-							game.delayx(event.autodelay);
-						}
-						else{
-							game.delayx();
-						}
-					}
-					"step 4"
-					if(event.logSkill&&event.result.bool&&!game.online){
-						if(typeof event.logSkill=='string'){
-							player.logSkill(event.logSkill);
-						}
-						else if(Array.isArray(event.logSkill)){
-							player.logSkill.apply(player,event.logSkill);
-						}
-					}
-					if(!game.online){
-						if(typeof event.delay=='boolean'){
-							event.done=player.discard(event.result.cards).set('delay',event.delay);
-						}
-						else{
-							event.done=player.discard(event.result.cards);
-						}
-						event.done.discarder=player;
-					}
-					if(event.dialog&&event.dialog.close) event.dialog.close();
-				},
 				gaincardMultiple:function(){
 					'step 0'
 					event.type='gain';
@@ -17235,62 +17085,83 @@ new Promise(resolve=>{
 				},
 				chooseCard:function(){
 					"step 0"
+					event.result={
+						bool:true,
+						confirm:'ok',
+						buttons:[],
+						links:[],
+						cards:[],
+						targets:[],
+					}
 					if(event.directresult){
-						event.result={
-							buttons:[],
-							cards:event.directresult.slice(0),
-							targets:[],
-							confirm:'ok',
-							bool:true,
-							links:[]
-						};
+						event.result.cards=event.directresult.slice(0);
+						event.goto(2);
+						return;
+					}
+					const directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectCard!='function'&&!event.complexCard);
+					const cards=directFilter?player.getCards(event.position).filter(card=>!card.classList.contains('uncheck')&&lib.filter.cardAiIncluded(card)&&event.filterCard(card,player)):[];
+					const range=get.select(event.selectCard);
+					if(directFilter&&(range[0]>=cards.length||range[1]<=-1)){
+						if(player.isOut()) event.result.cards=[];
+						else event.result.cards=cards;
+					}
+					else if(event.isMine()){
+						game.check();
+						if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+							ui.click.cancel();
+							return;
+						}
+						game.pause();
+						if(range[1]>1&&typeof event.selectCard!='function'){
+							event.aiChoose=ui.create.control('AI代选',function(){
+								ai.basic.chooseCard(event.ai);
+								if(_status.event.custom&&_status.event.custom.add.card){
+									_status.event.custom.add.card();
+								}
+								ui.selected.cards.forEach(i=>i.updateTransform(true));
+							});
+						}
+						if(Array.isArray(event.dialog)){
+							event.dialog=ui.create.dialog.apply(this,event.dialog);
+							event.dialog.open();
+							event.dialog.classList.add('noselect');
+						}
+						else if(event.prompt!=false){
+							let prompt;
+							if(typeof event.prompt =='string') prompt=event.prompt;
+							else{
+								let select;
+								if(range[0]==range[1]) select=get.cnNumber(range[0]);
+								else if(range[1]==Infinity) select='至少'+get.cnNumber(range[0]);
+								else select=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
+								const position=event.position=='h'?'手':event.position=='e'?'装备':'';
+								prompt=`请选择${select}张${position}牌`;
+							}
+							event.dialog=ui.create.dialog(prompt);
+							if(event.prompt2){
+								event.dialog.addText(event.prompt2,event.prompt2.length<=20);
+							}
+							if(Array.isArray(event.promptx)){
+								event.promptx.forEach(i=>event.dialog.add(i));
+							}
+							if(Array.isArray(event.selectCard)){
+								event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
+								event.custom.add.card=function(){
+									_status.event.promptbar.innerHTML=
+									ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1],'card');
+								}
+							}
+						}
+						else if(get.itemtype(event.dialog)=='dialog'){
+							event.dialog.style.display='';
+							event.dialog.open();
+						}
+					}
+					else if(event.isOnline()){
+						event.send();
 					}
 					else{
-						if(event.isMine()){
-							game.check();
-							game.pause();
-							if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
-								ui.click.cancel();
-								return;
-							}
-							if(event.prompt!=false){
-								var str;
-								if(typeof event.prompt=='string') str=event.prompt;
-								else{
-									str='请选择'
-									var range=get.select(event.selectCard);
-									if(range[0]==range[1]) str+=get.cnNumber(range[0]);
-									else if(range[1]==Infinity) str+='至少'+get.cnNumber(range[0]);
-									else str+=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
-									str+='张';
-									if(event.position=='h'||event.position==undefined) str+='手';
-									if(event.position=='e') str+='装备';
-									str+='牌';
-								}
-								event.dialog=ui.create.dialog(str);
-								if(event.prompt2){
-									event.dialog.addText(event.prompt2,event.prompt2.length<=20);
-								}
-								if(Array.isArray(event.promptx)){
-									for(var i=0;i<event.promptx.length;i++){
-										event.dialog.add(event.promptx[i]);
-									}
-								}
-								if(Array.isArray(event.selectCard)){
-									event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
-									event.custom.add.card=function(){
-										_status.event.promptbar.innerHTML=
-										ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1],'card');
-									}
-								}
-							}
-						}
-						else if(event.isOnline()){
-							event.send();
-						}
-						else{
-							event.result='ai';
-						}
+						event.result='ai';
 					}
 					"step 1"
 					if(event.result=='ai'){
@@ -17299,9 +17170,8 @@ new Promise(resolve=>{
 							ui.click.ok();
 						}
 						else if(event.skill){
-							var skill=event.skill;
 							ui.click.cancel();
-							event._aiexclude.add(skill);
+							event._aiexclude.add(event.skill);
 							event.redo();
 							game.resume();
 						}
@@ -17311,12 +17181,100 @@ new Promise(resolve=>{
 					}
 					"step 2"
 					event.resume();
+					if(event.aiChoose) event.aiChoose.close();
 					if(event.glow_result&&event.result.cards&&!event.directresult){
-						for(var i=0;i<event.result.cards.length;i++){
-							event.result.cards[i].classList.add('glow');
-						}
+						event.result.cards.forEach(i=>i.classList.add('glow'));
 					}
 					if(event.dialog) event.dialog.close();
+				},
+				chooseToDiscard:function(){
+					"step 0"
+					const next=player.chooseCard(...event._args).set(event._set);
+					if(event.prompt==undefined){
+						const range=get.select(event.selectCard);
+						let select;
+						if(range[0]==range[1]) select=get.cnNumber(range[0]);
+						else if(range[1]==Infinity) select='至少'+get.cnNumber(range[0]);
+						else select=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
+						const position=event.position=='h'?'手':event.position=='e'?'装备':'';
+						event.prompt=`请弃置${select}张${position}牌`;
+					}
+					next.set("prompt",event.prompt);
+					next.set("filterCard",(event=>{
+						const filterCard=event.filterCard;
+						return function(card,player){
+							if(!lib.filter.cardDiscardable(card,player,this)) return false;
+							return filterCard.call(this,card,player);
+						}
+					})(event));
+					"step 1"
+					event.result=Object.create(result);
+					for(const i in event.result){
+						if(Array.isArray(event.result[i])) event.result[i]=event.result[i].slice(0);
+					}
+					if(event.result.bool&&event.result.cards&&!game.online){
+						event.cards=event.result.cards.slice(0);
+						if(event.logSkill){
+							if(Array.isArray(event.logSkill)) player.logSkill(...event.logSkill);
+							else player.logSkill(event.logSkill);
+						}
+						if(event.autodelay&&!event.isMine()){
+							if(typeof event.autodelay=='number') game.delayx(event.autodelay);
+							else game.delayx();
+						}
+					}
+					else event.finish();
+					"step 2"
+					event.done=player.discard(event.result.cards);
+					event.done.discarder=player;
+					if(typeof event.delay=='boolean') event.done.set('delay',event.delay);
+				},
+				chooseToGive:function(){
+					"step 0"
+					const next=player.chooseCard(...event._args).set(event._set);
+					if(event.prompt==undefined){
+						const range=get.select(event.selectCard);
+						let select;
+						if(range[0]==range[1]) select=get.cnNumber(range[0]);
+						else if(range[1]==Infinity) select='至少'+get.cnNumber(range[0]);
+						else select=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
+						const position=event.position=='h'?'手':event.position=='e'?'装备':'';
+						event.prompt=`请交给${get.translation(target)}${select}张${position}牌`;
+					}
+					next.set("prompt",event.prompt);
+					next.set("filterCard",(event=>{
+						const filterCard=event.filterCard;
+						return function(card,player){
+							if(!lib.filter.canBeGained(card,this.target,player)) return false;
+							return filterCard.call(this,card,player);
+						}
+					})(event));
+					"step 1"
+					event.result=Object.create(result);
+					for(const i in event.result){
+						if(Array.isArray(event.result[i])) event.result[i]=event.result[i].slice(0);
+					}
+					if(event.result.bool&&event.result.cards&&!game.online){
+						event.cards=event.result.cards.slice(0);
+						if(event.logSkill){
+							if(Array.isArray(event.logSkill)) player.logSkill(...event.logSkill);
+							else player.logSkill(event.logSkill);
+						}
+						if(event.autodelay&&!event.isMine()){
+							if(typeof event.autodelay=='number') game.delayx(event.autodelay);
+							else game.delayx();
+						}
+					}
+					else event.finish();
+					"step 2"
+					if(event.boolline) player.line(target,'green');
+					event.done=target.gain(event.cards,player);
+					event.done.giver=player;
+					if(event.delay!==false) event.done.animate=event.visibleMove?'give':'giveAuto';
+					else{
+						target[event.visibleMove?'$give':'$giveAuto'](cards,player);
+						if(event.visibleMove) event.done.visible=true;
+					}
 				},
 				chooseTarget:function(){
 					"step 0"
@@ -17755,27 +17713,33 @@ new Promise(resolve=>{
 				},
 				choosePlayerCard:function(){
 					"step 0"
+					event.result={
+						bool:true,
+						confirm:'ok',
+						buttons:[],
+						links:[],
+						cards:[],
+						targets:[],
+					}
+					if(event.directresult){
+						event.result.links=event.directresult.slice(0);
+						event.result.cards=event.directresult.slice(0);
+						event.cards=event.directresult.slice(0);
+						event.goto(2);
+						return;
+					}
 					if(!event.dialog) event.dialog=ui.create.dialog('hidden');
-					else if(!event.isMine()){
-						event.dialog.style.display='none';
-					}
-					if(event.prompt){
-						event.dialog.add(event.prompt);
-					}
-					else{
-						event.dialog.add('选择'+get.translation(target)+'的一张牌');
-					}
-					if(event.prompt2){
-						event.dialog.addText(event.prompt2);
-					}
-					var expand_length=0;
-					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
-					for(var i=0;i<event.position.length;i++){
-						if(event.position[i]=='h'){
-							var hs=target.getCards('h');
+					else if(!event.isMine()) event.dialog.style.display='none';
+					event.dialog.add(event.prompt||`选择${get.translation(target)}的一张牌`);
+					if(event.prompt2) event.dialog.addText(event.prompt2);
+					let expand_length=0;
+					let directh=!lib.config.unauto_choose;
+					for(const position of event.position){
+						if(position=='h'){
+							const hs=target.getCards('h');
 							if(hs.length){
 								expand_length+=Math.ceil(hs.length/6);
-								var title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
+								let title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
 								title.style.margin='0px';
 								title.style.padding='0px';
 								hs.randomSort();
@@ -17784,10 +17748,10 @@ new Promise(resolve=>{
 									directh=false;
 								}
 								else{
-									var shown=hs.filter(card=>get.is.shownCard(card));
+									let shown=hs.filter(card=>get.is.shownCard(card));
 									if(shown.length){
-										var hidden=hs.filter(card=>!shown.includes(card));
-										var buttons=ui.create.div('.buttons',event.dialog.content);
+										let hidden=hs.filter(card=>!shown.includes(card));
+										let buttons=ui.create.div('.buttons',event.dialog.content);
 										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(shown,'card',buttons));
 										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(hidden,'blank',buttons));
 										if(event.dialog.forcebutton!==false) event.dialog.forcebutton=true;
@@ -17804,22 +17768,22 @@ new Promise(resolve=>{
 								}
 							}
 						}
-						else if(event.position[i]=='e'){
-							var es=target.getCards('e');
+						else if(position=='e'){
+							const es=target.getCards('e');
 							if(es.length){
 								expand_length+=Math.ceil(es.length/6);
-								var title=event.dialog.add('<div class="text center" style="margin: 0px;">装备区</div>');
+								let title=event.dialog.add('<div class="text center" style="margin: 0px;">装备区</div>');
 								title.style.margin='0px';
 								title.style.padding='0px';
 								event.dialog.add(es);
 								directh=false;
 							}
 						}
-						else if(event.position[i]=='j'){
-							var js=target.getCards('j');
+						else if(position=='j'){
+							const js=target.getCards('j');
 							if(js.length){
 								expand_length+=Math.ceil(js.length/6);
-								var title=event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
+								let title=event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
 								title.style.margin='0px';
 								title.style.padding='0px';
 								event.dialog.add(js);
@@ -17828,27 +17792,18 @@ new Promise(resolve=>{
 						}
 					}
 					if(event.dialog.buttons.length==0){
+						event.dialog.close();
 						event.finish();
 						return;
-					}var directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectButton!='function'&&event.filterButton==lib.filter.all);
-					var cs=target.getCards(event.position);
-					var select=get.select(event.selectButton);
-					if(directFilter&&select[0]>=cs.length){
-						event.result={
-							bool:true,
-							buttons:event.dialog.buttons,
-							links:cs
-						}
 					}
-					else if(directFilter&&directh&&!event.isOnline()&&select[0]==select[1]){
-						event.result={
-							bool:true,
-							buttons:event.dialog.buttons.randomGets(select[0]),
-							links:[]
-						}
-						for(var i=0;i<event.result.buttons.length;i++){
-							event.result.links[i]=event.result.buttons[i].link;
-						}
+					const directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectButton!='function'&&!event.complexSelect);
+					const buttons=directFilter?event.dialog.buttons.filter(button=>event.filterButton(button,player)&&lib.filter.buttonIncluded(button)):[];
+					const range=get.select(event.selectButton);
+					if(directFilter&&(range[0]>=buttons.length||range[1]<=-1)){
+						event.result.buttons=buttons;
+					}
+					else if(directFilter&&directh&&!event.isOnline()&&range[0]==range[1]){
+						event.result.buttons=buttons.randomGets(range[0]);
 					}
 					else{
 						if(event.isMine()){
@@ -17878,9 +17833,11 @@ new Promise(resolve=>{
 						else ui.click.cancel();
 					}
 					event.dialog.close();
-					if(event.result.links){
+					if(event.result.buttons){
+						event.result.links=event.result.buttons.map(i=>i.link);
 						event.result.cards=event.result.links.slice(0);
 					}
+					"step 2"
 					event.resume();
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-player-card');
@@ -17888,370 +17845,101 @@ new Promise(resolve=>{
 				},
 				discardPlayerCard:function(){
 					"step 0"
-					if(event.directresult){
-						event.result={
-							buttons:[],
-							cards:event.directresult.slice(0),
-							links:event.directresult.slice(0),
-							targets:[],
-							confirm:'ok',
-							bool:true
-						};
-						event.cards=event.directresult.slice(0);
-						event.goto(2);
-						return;
-					}
-					if(!event.dialog) event.dialog=ui.create.dialog('hidden');
-					else if(!event.isMine()){
-						event.dialog.style.display='none';
-					}
+					const next=player.choosePlayerCard(...event._args).set(event._set);
 					if(event.prompt==undefined){
-						var str='弃置'+get.translation(target);
-						var range=get.select(event.selectButton);
-						if(range[0]==range[1]) str+=get.cnNumber(range[0]);
-						else if(range[1]==Infinity) str+='至少'+get.cnNumber(range[0]);
-						else str+=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
-						str+='张';
-						if(event.position=='h'||event.position==undefined) str+='手';
-						if(event.position=='e') str+='装备';
-						str+='牌';
-						event.prompt=str;
+						const range=get.select(event.selectButton);
+						let select;
+						if(range[0]==range[1]) select=get.cnNumber(range[0]);
+						else if(range[1]==Infinity) select='至少'+get.cnNumber(range[0]);
+						else select=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
+						const position=event.position=='h'?'手':event.position=='e'?'装备':'';
+						event.prompt=`弃置${get.translation(target)}${select}张${position}牌`;
 					}
-					if(event.prompt){
-						event.dialog.add(event.prompt);
-					}
-					if(event.prompt2){
-						event.dialog.addText(event.prompt2);
-					}
-					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
-					var expand_length=0;
-					for(var i=0;i<event.position.length;i++){
-						if(event.position[i]=='h'){
-							var hs=target.getDiscardableCards(player,'h');
-							expand_length+=Math.ceil(hs.length/6);
-							if(hs.length){
-								var title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
-								title.style.margin='0px';
-								title.style.padding='0px';
-								hs.randomSort();
-								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
-									event.dialog.add(hs);
-									directh=false;
-								}
-								else{
-									var shown=hs.filter(card=>get.is.shownCard(card));
-									if(shown.length){
-										var hidden=hs.filter(card=>!shown.includes(card));
-										var buttons=ui.create.div('.buttons',event.dialog.content);
-										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(shown,'card',buttons));
-										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(hidden,'blank',buttons));
-										if(event.dialog.forcebutton!==false) event.dialog.forcebutton=true;
-										if(event.dialog.buttons.length>3){
-											event.dialog.classList.remove('forcebutton-auto');
-										}
-										else if(!event.dialog.noforcebutton){
-											event.dialog.classList.add('forcebutton-auto');
-										}
-									}
-									else{
-										event.dialog.add([hs,'blank']);
-									}
-								}
-							}
+					next.set("prompt",event.prompt);
+					next.set("filterButton",(event=>{
+						const filterButton=event.filterButton;
+						return function(button,player){
+							if(!lib.filter.canBeDiscarded(button.link,player,this.target)) return false;
+							return filterButton.call(this,button,player);
 						}
-						else if(event.position[i]=='e'){
-							var es=target.getDiscardableCards(player,'e');
-							if(es.length){
-								expand_length+=Math.ceil(es.length/6);
-								var title=event.dialog.add('<div class="text center" style="margin: 0px;">装备区</div>');
-								title.style.margin='0px';
-								title.style.padding='0px';
-								event.dialog.add(es);
-								directh=false;
-							}
-						}
-						else if(event.position[i]=='j'){
-							var js=target.getDiscardableCards(player,'j');
-							if(js.length){
-								expand_length+=Math.ceil(js.length/6);
-								var title=event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
-								title.style.margin='0px';
-								title.style.padding='0px';
-								event.dialog.add(js);
-								directh=false;
-							}
-						}
-					}
-					if(event.dialog.buttons.length==0){
-						event.finish();
-						return;
-					}
-					var directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectButton!='function'&&event.filterButton==lib.filter.all);
-					var cs=target.getCards(event.position);
-					var select=get.select(event.selectButton);
-					if(directFilter&&select[0]>=cs.length){
-						event.result={
-							bool:true,
-							buttons:event.dialog.buttons,
-							links:cs
-						}
-					}
-					else if(directFilter&&directh&&!event.isOnline()&&select[0]==select[1]){
-						event.result={
-							bool:true,
-							buttons:event.dialog.buttons.randomGets(select[0]),
-							links:[]
-						}
-						for(var i=0;i<event.result.buttons.length;i++){
-							event.result.links[i]=event.result.buttons[i].link;
-						}
-					}
-					else{
-						if(event.isMine()){
-							event.dialog.open();
-							game.check();
-							game.pause();
-							if(expand_length>2){
-								ui.arena.classList.add('discard-player-card');
-								event.dialog.classList.add('fullheight');
-							}
-						}
-						else if(event.isOnline()){
-							event.send();
-						}
-						else{
-							event.result='ai';
-						}
-					}
+					})(event));
 					"step 1"
-					if(event.result=='ai'){
-						game.check();
-						if((ai.basic.chooseButton(event.ai)||forced)&&(!event.filterOk||event.filterOk())) ui.click.ok();
-						else ui.click.cancel();
+					event.result=Object.create(result);
+					for(const i in event.result){
+						if(Array.isArray(event.result[i])) event.result[i]=event.result[i].slice(0);
 					}
-					event.dialog.close();
-					"step 2"
-					event.resume();
-					setTimeout(function(){
-						ui.arena.classList.remove('discard-player-card');
-					},500);
 					if(event.result.bool&&event.result.links&&!game.online){
+						event.cards=event.result.links.slice(0);
 						if(event.logSkill){
-							if(typeof event.logSkill=='string'){
-								player.logSkill(event.logSkill);
-							}
-							else if(Array.isArray(event.logSkill)){
-								player.logSkill.apply(player,event.logSkill);
-							}
+							if(Array.isArray(event.logSkill)) player.logSkill(...event.logSkill);
+							else player.logSkill(event.logSkill);
 						}
-						var cards=[];
-						for(var i=0;i<event.result.links.length;i++){
-							cards.push(event.result.links[i]);
+						if(event.autodelay&&!event.isMine()){
+							if(typeof event.autodelay=='number') game.delayx(event.autodelay);
+							else game.delayx();
 						}
-						event.result.cards=event.result.links.slice(0);
-						event.cards=cards;
 						event.trigger("rewriteDiscardResult");
 					}
-					"step 3"
-					if(event.boolline){
-						player.line(target,'green');
-					}
-					if(!event.chooseonly){
-						var next=target.discard(event.cards);
-						if(player!=target) next.notBySelf=true;
-						next.discarder=player;
-						event.done=next;
-						if(event.delay===false){
-							next.set('delay',false);
-						}
+					else event.finish();
+					"step 2"
+					if(event.boolline) player.line(target,'green');
+					if(event.chooseonly) void 0;
+					else{
+						event.done=target.discard(event.cards);
+						event.done.discarder=player;
+						if(player!=target) event.done.notBySelf=true;
+						if(event.delay===false) event.done.set('delay',false);
 					}
 				},
 				gainPlayerCard:function(){
 					"step 0"
-					if(event.directresult){
-						event.result={
-							buttons:[],
-							cards:event.directresult.slice(0),
-							links:event.directresult.slice(0),
-							targets:[],
-							confirm:'ok',
-							bool:true
-						};
-						event.cards=event.directresult.slice(0);
-						event.goto(2);
-						return;
-					}
-					if(!event.dialog) event.dialog=ui.create.dialog('hidden');
-					else if(!event.isMine()){
-						event.dialog.style.display='none';
-					}
+					const next=player.choosePlayerCard(...event._args).set(event._set);
 					if(event.prompt==undefined){
-						var str='获得'+get.translation(target);
-						var range=get.select(event.selectButton);
-						if(range[0]==range[1]) str+=get.cnNumber(range[0]);
-						else if(range[1]==Infinity) str+='至少'+get.cnNumber(range[0]);
-						else str+=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
-						str+='张';
-						if(event.position=='h'||event.position==undefined) str+='手';
-						if(event.position=='e') str+='装备';
-						str+='牌';
-						event.prompt=str;
+						const range=get.select(event.selectButton);
+						let select;
+						if(range[0]==range[1]) select=get.cnNumber(range[0]);
+						else if(range[1]==Infinity) select='至少'+get.cnNumber(range[0]);
+						else select=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
+						const position=event.position=='h'?'手':event.position=='e'?'装备':'';
+						event.prompt=`获得${get.translation(target)}${select}张${position}牌`;
 					}
-					if(event.prompt){
-						event.dialog.add(event.prompt);
-					}
-					if(event.prompt2){
-						event.dialog.addText(event.prompt2);
-					}
-					var expand_length=0;
-					var directh=(!lib.config.unauto_choose&&!event.complexSelect);
-					for(var i=0;i<event.position.length;i++){
-						if(event.position[i]=='h'){
-							var hs=target.getGainableCards(player,'h');
-							if(hs.length){
-								expand_length+=Math.ceil(hs.length/6);
-								var title=event.dialog.add('<div class="text center" style="margin: 0px;">手牌区</div>');
-								title.style.margin='0px';
-								title.style.padding='0px';
-								hs.randomSort();
-								if(event.visible||target.isUnderControl(true)||player.hasSkillTag('viewHandcard',null,target,true)){
-									event.dialog.add(hs);
-									directh=false;
-								}
-								else{
-									var shown=hs.filter(card=>get.is.shownCard(card));
-									if(shown.length){
-										var hidden=hs.filter(card=>!shown.includes(card));
-										var buttons=ui.create.div('.buttons',event.dialog.content);
-										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(shown,'card',buttons));
-										event.dialog.buttons=event.dialog.buttons.concat(ui.create.buttons(hidden,'blank',buttons));
-										if(event.dialog.forcebutton!==false) event.dialog.forcebutton=true;
-										if(event.dialog.buttons.length>3){
-											event.dialog.classList.remove('forcebutton-auto');
-										}
-										else if(!event.dialog.noforcebutton){
-											event.dialog.classList.add('forcebutton-auto');
-										}
-									}
-									else{
-										event.dialog.add([hs,'blank']);
-									}
-								}
-							}
+					next.set("prompt",event.prompt);
+					next.set("filterButton",(event=>{
+						const filterButton=event.filterButton;
+						return function(button,player){
+							if(!lib.filter.canBeGained(button.link,player,this.target)) return false;
+							return filterButton.call(this,button,player);
 						}
-						else if(event.position[i]=='e'){
-							var es=target.getGainableCards(player,'e');
-							if(es.length){
-								expand_length+=Math.ceil(es.length/6);
-								var title=event.dialog.add('<div class="text center" style="margin: 0px;">装备区</div>');
-								title.style.margin='0px';
-								title.style.padding='0px';
-								event.dialog.add(es);
-								directh=false;
-							}
-						}
-						else if(event.position[i]=='j'){
-							var js=target.getGainableCards(player,'j');
-							if(js.length){
-								expand_length+=Math.ceil(js.length/6);
-								var title=event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
-								title.style.margin='0px';
-								title.style.padding='0px';
-								event.dialog.add(js);
-								directh=false;
-							}
-						}
-					}
-					if(event.dialog.buttons.length==0){
-						event.dialog.close();
-						event.finish();
-						return;
-					}
-					var cs=target.getCards(event.position);
-					var select=get.select(event.selectButton);
-					var directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectButton!='function'&&event.filterButton==lib.filter.all);
-					if(directFilter&&select[0]>=cs.length){
-						event.result={
-							bool:true,
-							buttons:event.dialog.buttons,
-							links:cs
-						}
-					}
-					else if(directFilter&&directh&&!event.isOnline()&&select[0]==select[1]){
-						event.result={
-							bool:true,
-							buttons:event.dialog.buttons.randomGets(select[0]),
-							links:[]
-						}
-						for(var i=0;i<event.result.buttons.length;i++){
-							event.result.links[i]=event.result.buttons[i].link;
-						}
-					}
-					else{
-						if(event.isMine()){
-							event.dialog.open();
-							game.check();
-							game.pause();
-							if(expand_length>2){
-								ui.arena.classList.add('gain-player-card');
-								event.dialog.classList.add('fullheight');
-							}
-						}
-						else if(event.isOnline()){
-							event.send();
-						}
-						else{
-							event.result='ai';
-						}
-					}
+					})(event));
 					"step 1"
-					if(event.result=='ai'){
-						game.check();
-						if((ai.basic.chooseButton(event.ai)||forced)&&(!event.filterOk||event.filterOk())) ui.click.ok();
-						else ui.click.cancel();
+					event.result=Object.create(result);
+					for(const i in event.result){
+						if(Array.isArray(event.result[i])) event.result[i]=event.result[i].slice(0);
 					}
-					event.dialog.close();
+					if(event.result.bool&&event.result.links&&!game.online){
+						event.cards=event.result.links.slice(0);
+						if(event.logSkill){
+							if(Array.isArray(event.logSkill)) player.logSkill(...event.logSkill);
+							else player.logSkill(event.logSkill);
+						}
+						if(event.autodelay&&!event.isMine()){
+							if(typeof event.autodelay=='number') game.delayx(event.autodelay);
+							else game.delayx();
+						}
+						event.trigger("rewriteGainResult");
+					}
+					else event.finish();
 					"step 2"
-					event.resume();
-					setTimeout(function(){
-						ui.arena.classList.remove('gain-player-card');
-					},500);
-					if(game.online||!event.result.bool){
-						event.finish();
-					}
-					"step 3"
-					if(event.logSkill&&event.result.bool&&!game.online){
-						if(typeof event.logSkill=='string'){
-							player.logSkill(event.logSkill);
-						}
-						else if(Array.isArray(event.logSkill)){
-							player.logSkill.apply(player,event.logSkill);
-						}
-					}
-					var cards=[];
-					for(var i=0;i<event.result.links.length;i++){
-						cards.push(event.result.links[i]);
-					}
-					event.result.cards=event.result.links.slice(0);
-					event.cards=cards;
-					event.trigger("rewriteGainResult");
-					"step 4"
-					if(event.boolline){
-						player.line(target,'green');
-					}
-					if(!event.chooseonly){
-						if(event.delay!==false){
-							var next=player.gain(event.cards,target,event.visibleMove?'give':'giveAuto','bySelf');
-							event.done=next;
-						}
-						else{
-							var next=player.gain(event.cards,target,'bySelf');
-							event.done=next;
+					if(event.boolline) player.line(target,'green');
+					if(event.chooseonly) target[event.visibleMove?'$give':'$giveAuto'](cards,player);
+					else{
+						event.done=player.gain(event.cards,target,'bySelf');
+						if(event.delay===false){
 							target[event.visibleMove?'$give':'$giveAuto'](cards,player);
-							if(event.visibleMove) next.visible=true;
+							if(event.visibleMove) event.done.visible=true;
 						}
+						else event.done.animate=event.visibleMove?'give':'giveAuto';
 					}
-					else target[event.visibleMove?'$give':'$giveAuto'](cards,player);
 				},
 				showHandcards:function(){
 					"step 0"
@@ -23616,18 +23304,18 @@ new Promise(resolve=>{
 					return list;
 				}
 				/**
-				 * @param {string} [arg1='h']
-				 * @param {string | Record<string, any> | (card: Card) => boolean} [arg2]
+				 * @param {string} [positions='h']
+				 * @param {string | Record<string, any> | (card: Card) => boolean} [filter]
 				 * @returns {Card[]}
 				 */
-				getCards(arg1,arg2){
-					if(typeof arg1!='string'){
-						arg1='h';
+				getCards(positions,filter){
+					if(typeof positions!='string'){
+						positions='h';
 					}
 					var cards=[],cards1=[];
 					var i,j;
-					for(i=0;i<arg1.length;i++){
-						if(arg1[i]=='h'){
+					for(i=0;i<positions.length;i++){
+						if(positions[i]=='h'){
 							for(j=0;j<this.node.handcards1.childElementCount;j++){
 								if(!this.node.handcards1.childNodes[j].classList.contains('removing')&&!this.node.handcards1.childNodes[j].classList.contains('glows')){
 									cards.push(this.node.handcards1.childNodes[j]);
@@ -23639,7 +23327,7 @@ new Promise(resolve=>{
 								}
 							}
 						}
-						else if(arg1[i]=='s'){
+						else if(positions[i]=='s'){
 							for(j=0;j<this.node.handcards1.childElementCount;j++){
 								if(!this.node.handcards1.childNodes[j].classList.contains('removing')&&this.node.handcards1.childNodes[j].classList.contains('glows')){
 									cards.push(this.node.handcards1.childNodes[j]);
@@ -23651,14 +23339,14 @@ new Promise(resolve=>{
 								}
 							}
 						}
-						else if(arg1[i]=='e'){
+						else if(positions[i]=='e'){
 							for(j=0;j<this.node.equips.childElementCount;j++){
 								if(!this.node.equips.childNodes[j].classList.contains('removing')&&!this.node.equips.childNodes[j].classList.contains('feichu')){
 									cards.push(this.node.equips.childNodes[j]);
 								}
 							}
 						}
-						else if(arg1[i]=='j'){
+						else if(positions[i]=='j'){
 							for(j=0;j<this.node.judges.childElementCount;j++){
 								if(!this.node.judges.childNodes[j].classList.contains('removing')&&!this.node.judges.childNodes[j].classList.contains('feichu')){
 									cards.push(this.node.judges.childNodes[j]);
@@ -23670,7 +23358,7 @@ new Promise(resolve=>{
 								}
 							}
 						}
-						else if(arg1[i]=='x'){
+						else if(positions[i]=='x'){
 							for(j=0;j<this.node.expansions.childElementCount;j++){
 								if(!this.node.expansions.childNodes[j].classList.contains('removing')){
 									cards.push(this.node.expansions.childNodes[j]);
@@ -23681,17 +23369,17 @@ new Promise(resolve=>{
 					if(arguments.length==1){
 						return cards;
 					}
-					if(arg2){
-						if(typeof arg2=='string'){
+					if(filter){
+						if(typeof filter=='string'){
 							for(i=0;i<cards.length;i++){
-								if(get.name(cards[i])!=arg2){
+								if(get.name(cards[i])!=filter){
 									cards.splice(i,1);i--;
 								}
 							}
 						}
-						else if(typeof arg2=='object'){
+						else if(typeof filter=='object'){
 							for(i=0;i<cards.length;i++){
-								for(j in arg2){
+								for(j in filter){
 									var value;
 									if(j=='type'||j=='subtype'||j=='color'||j=='suit'||j=='number'){
 										value=get[j](cards[i]);
@@ -23699,16 +23387,16 @@ new Promise(resolve=>{
 									else{
 										value=cards[i][j];
 									}
-									if((typeof arg2[j]=='string'&&value!=arg2[j])||
-										(Array.isArray(arg2[j])&&!arg2[j].contains(value))){
+									if((typeof filter[j]=='string'&&value!=filter[j])||
+										(Array.isArray(filter[j])&&!filter[j].contains(value))){
 										cards.splice(i--,1);break;
 									}
 								}
 							}
 						}
-						else if(typeof arg2=='function'){
+						else if(typeof filter=='function'){
 							for(i=0;i<cards.length;i++){
-								if(!arg2(cards[i])){
+								if(!filter(cards[i])){
 									cards.splice(i--,1);
 								}
 							}
@@ -23722,23 +23410,20 @@ new Promise(resolve=>{
 					}
 					return cards;
 				}
-				getDiscardableCards(player,arg1,arg2){
-					var cards=this.getCards(arg1,arg2);
-					for(var i=0;i<cards.length;i++){
-						if(!lib.filter.canBeDiscarded(cards[i],player,this)){
-							cards.splice(i--,1);
-						}
-					}
-					return cards;
+				getDiscardableCards(player,positions,filter){
+					return this.getCards(positions,filter).filter(card=>lib.filter.canBeDiscarded(card,player,this));
 				}
-				getGainableCards(player,arg1,arg2){
-					var cards=this.getCards(arg1,arg2);
-					for(var i=0;i<cards.length;i++){
-						if(!lib.filter.canBeGained(cards[i],player,this)){
-							cards.splice(i--,1);
-						}
-					}
-					return cards;
+				getGainableCards(player,positions,filter){
+					return this.getCards(positions,filter).filter(card=>lib.filter.canBeGained(card,player,this));
+				}
+				countCards(positions,filter){
+					return this.getCards(positions,filter).length;
+				}
+				countDiscardableCards(player,positions,filter){
+					return this.getDiscardableCards(player,positions,filter).length;
+				}
+				countGainableCards(player,positions,filter){
+					return this.getGainableCards(player,positions,filter).length;
 				}
 				getGainableSkills(func){
 					var list=[];
@@ -23747,15 +23432,6 @@ new Promise(resolve=>{
 						list.addArray(get.gainableSkillsName(names[i],func));
 					}
 					return list;
-				}
-				countCards(arg1,arg2){
-					return this.getCards(arg1,arg2).length;
-				}
-				countDiscardableCards(player,arg1,arg2){
-					return this.getDiscardableCards(player,arg1,arg2).length;
-				}
-				countGainableCards(player,arg1,arg2){
-					return this.getGainableCards(player,arg1,arg2).length;
 				}
 				getOriginalSkills(){
 					var skills=[];
@@ -24286,63 +23962,9 @@ new Promise(resolve=>{
 							next.prompt=str;
 						}
 					}
-					next.position='hs';
+					if(next.position==undefined) next.position='hs';
 					if(next.ai2==undefined) next.ai2=(()=>1);
 					next.setContent('chooseToRespond');
-					next._args=Array.from(arguments);
-					return next;
-				}
-				chooseToDiscard(){
-					var next=game.createEvent('chooseToDiscard');
-					next.player=this;
-					for(var i=0;i<arguments.length;i++){
-						if(typeof arguments[i]=='number'){
-							next.selectCard=[arguments[i],arguments[i]];
-						}
-						else if(get.itemtype(arguments[i])=='select'){
-							next.selectCard=arguments[i];
-						}
-						else if(get.itemtype(arguments[i])=='dialog'){
-							next.dialog=arguments[i];
-							next.prompt=false;
-						}
-						else if(typeof arguments[i]=='boolean'){
-							next.forced=arguments[i];
-						}
-						else if(get.itemtype(arguments[i])=='position'){
-							next.position=arguments[i];
-						}
-						else if(typeof arguments[i]=='function'){
-							if(next.filterCard) next.ai=arguments[i];
-							else next.filterCard=arguments[i];
-						}
-						else if(typeof arguments[i]=='object'&&arguments[i]){
-							next.filterCard=get.filter(arguments[i]);
-						}
-						else if(typeof arguments[i]=='string'){
-							get.evtprompt(next,arguments[i]);
-						}
-						if(arguments[i]===null){
-							for(var i=0;i<arguments.length;i++){
-								console.log(arguments[i]);
-							}
-						}
-					}
-					if(next.isMine()==false&&next.dialog) next.dialog.style.display='none';
-					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
-					if(next.selectCard==undefined) next.selectCard=[1,1];
-					if(next.ai==undefined) next.ai=get.unuseful;
-					next.autochoose=function(){
-						if(!this.forced) return false;
-						if(typeof this.selectCard=='function') return false;
-						var cards=this.player.getCards(this.position);
-						var num=cards.length;
-						for(var i=0;i<cards.length;i++){
-							if(!lib.filter.cardDiscardable(cards[i],this.player,this)) num--;
-						}
-						return get.select(this.selectCard)[0]>=num;
-					}
-					next.setContent('chooseToDiscard');
 					next._args=Array.from(arguments);
 					return next;
 				}
@@ -24546,48 +24168,141 @@ new Promise(resolve=>{
 					next._args.add('glow_result');
 					return next;
 				}
-				chooseCard(choose){
-					var next=game.createEvent('chooseCard');
+				chooseCard(...args){
+					const next=game.createEvent('chooseCard');
 					next.player=this;
-					if(arguments.length==1&&get.is.object(choose)){
-						for(var i in choose){
-							next[i]=choose[i];
+					if(args.length==1&&get.is.object(args[0])){
+						for(const i in args[0]) next[i]=args[0][i];
+					}
+					else for(const arg of args){
+						if(typeof arg=='number'){
+							next.selectCard=[arg,arg];
+						}
+						else if(get.itemtype(arg)=='select'){
+							next.selectCard=arg;
+						}
+						else if(get.itemtype(arg)=='dialog'){
+							next.dialog=arg;
+							next.prompt=false;
+						}
+						else if(typeof arg=='boolean'){
+							next.forced=arg;
+						}
+						else if(get.itemtype(arg)=='position'){
+							next.position=arg;
+						}
+						else if(typeof arg=='function'){
+							if(next.filterCard) next.ai=arg;
+							else next.filterCard=arg;
+						}
+						else if(typeof arg=='object'&&arg){
+							next.filterCard=get.filter(arg);
+						}
+						else if(arg=='glow_result'){
+							next.glow_result=true;
+						}
+						else if(typeof arg=='string'){
+							get.evtprompt(next,arg);
 						}
 					}
-					else{
-						for(var i=0;i<arguments.length;i++){
-							if(typeof arguments[i]=='number'){
-								next.selectCard=[arguments[i],arguments[i]];
-							}
-							else if(get.itemtype(arguments[i])=='select'){
-								next.selectCard=arguments[i];
-							}
-							else if(typeof arguments[i]=='boolean'){
-								next.forced=arguments[i];
-							}
-							else if(get.itemtype(arguments[i])=='position'){
-								next.position=arguments[i];
-							}
-							else if(typeof arguments[i]=='function'){
-								if(next.filterCard) next.ai=arguments[i];
-								else next.filterCard=arguments[i];
-							}
-							else if(typeof arguments[i]=='object'&&arguments[i]){
-								next.filterCard=get.filter(arguments[i]);
-							}
-							else if(arguments[i]=='glow_result'){
-								next.glow_result=true;
-							}
-							else if(typeof arguments[i]=='string'){
-								get.evtprompt(next,arguments[i]);
-							}
-						}
-					}
+					if(next.isMine()==false&&next.dialog) next.dialog.style.display='none';
 					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
 					if(next.selectCard==undefined) next.selectCard=[1,1];
+					if(next.position==undefined) next.position='h';
 					if(next.ai==undefined) next.ai=get.unuseful3;
 					next.setContent('chooseCard');
-					next._args=Array.from(arguments);
+					next._args=args;
+					return next;
+				}
+				chooseToDiscard(...args){
+					const next=game.createEvent('chooseToDiscard');
+					next.player=this;
+					if(args.length==1&&get.is.object(args[0])){
+						for(const i in args[0]) next[i]=args[0][i];
+					}
+					else for(const arg of args){
+						if(typeof arg=='number'){
+							next.selectCard=[arg,arg];
+						}
+						else if(get.itemtype(arg)=='selesct'){
+							next.selectCard=arg;
+						}
+						else if(get.itemtype(arg)=='dialog'){
+							next.dialog=arg;
+							next.prompt=false;
+						}
+						else if(typeof arg=='boolean'){
+							next.forced=arg;
+						}
+						else if(get.itemtype(arg)=='position'){
+							next.position=arg;
+						}
+						else if(typeof arg=='function'){
+							if(next.filterCard) next.ai=arg;
+							else next.filterCard=arg;
+						}
+						else if(typeof arg=='object'&&arg){
+							next.filterCard=get.filter(arg);
+						}
+						else if(typeof arg=='string'){
+							get.evtprompt(next,arg);
+						}
+						if(arg===null) console.log(args);
+					}
+					if(next.isMine()==false&&next.dialog) next.dialog.style.display='none';
+					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
+					if(next.selectCard==undefined) next.selectCard=[1,1];
+					if(next.position==undefined) next.position='h';
+					if(next.ai==undefined) next.ai=get.unuseful;
+					next.setContent('chooseToDiscard');
+					next._args=args;
+					return next;
+				}
+				chooseToGive(...args){
+					const next=game.createEvent('chooseToGive');
+					next.player=this;
+					if(args.length==1&&get.is.object(args[0])){
+						for(const i in args[0]) next[i]=args[0][i];
+					}
+					else for(const arg of args){
+						if(get.itemtype(arg)=='player'){
+							next.target=arg;
+						}
+						else if(typeof arg=='number'){
+							next.selectCard=[arg,arg];
+						}
+						else if(get.itemtype(arg)=='select'){
+							next.selectCard=arg;
+						}
+						else if(get.itemtype(arg)=='dialog'){
+							next.dialog=arg;
+							next.prompt=false;
+						}
+						else if(typeof arg=='boolean'){
+							next.forced=arg;
+						}
+						else if(get.itemtype(arg)=='position'){
+							next.position=arg;
+						}
+						else if(typeof arg=='function'){
+							if(next.filterCard) next.ai=arg;
+							else next.filterCard=arg;
+						}
+						else if(typeof arg=='object'&&arg){
+							next.filterCard=get.filter(arg);
+						}
+						else if(typeof arg=='string'){
+							get.evtprompt(next,arg);
+						}
+						if(arg===null) console.log(args);
+					}
+					if(next.isMine()==false&&next.dialog) next.dialog.style.display='none';
+					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
+					if(next.selectCard==undefined) next.selectCard=[1,1];
+					if(next.position==undefined) next.position='h';
+					if(next.ai==undefined) next.ai=get.unuseful;
+					next.setContent('chooseToGive');
+					next._args=args;
 					return next;
 				}
 				chooseUseTarget(){
@@ -24843,89 +24558,95 @@ new Promise(resolve=>{
 					next.setContent('chooseDrawRecover');
 					return next;
 				}
-				choosePlayerCard(){
-					var next=game.createEvent('choosePlayerCard');
+				choosePlayerCard(...args){
+					const next=game.createEvent('choosePlayerCard');
 					next.player=this;
-					for(var i=0;i<arguments.length;i++){
-						if(get.itemtype(arguments[i])=='player'){
-							next.target=arguments[i];
+					if(args.length==1&&get.is.object(args[0])){
+						for(const i in args[0]) next[i]=args[0][i];
+					}
+					else for(const arg of args){
+						if(get.itemtype(arg)=='player'){
+							next.target=arg;
 						}
-						else if(typeof arguments[i]=='number'){
-							next.selectButton=[arguments[i],arguments[i]];
+						else if(typeof arg=='number'){
+							next.selectButton=[arg,arg];
 						}
-						else if(get.itemtype(arguments[i])=='select'){
-							next.selectButton=arguments[i];
+						else if(get.itemtype(arg)=='select'){
+							next.selectButton=arg;
 						}
-						else if(typeof arguments[i]=='boolean'){
-							next.forced=arguments[i];
+						else if(typeof arg=='boolean'){
+							next.forced=arg;
 						}
-						else if(get.itemtype(arguments[i])=='position'){
-							next.position=arguments[i];
+						else if(get.itemtype(arg)=='position'){
+							next.position=arg;
 						}
-						else if(arguments[i]=='visible'){
+						else if(arg=='visible'){
 							next.visible=true;
 						}
-						else if(typeof arguments[i]=='function'){
-							if(next.ai) next.filterButton=arguments[i];
-							else next.ai=arguments[i];
+						else if(typeof arg=='function'){
+							if(next.ai) next.filterButton=arg;
+							else next.ai=arg;
 						}
-						else if(typeof arguments[i]=='object'&&arguments[i]){
-							next.filterButton=get.filter(arguments[i]);
+						else if(typeof arg=='object'&&arg){
+							next.filterButton=get.filter(arg);
 						}
-						else if(typeof arguments[i]=='string'){
-							next.prompt=arguments[i];
+						else if(typeof arg=='string'){
+							next.prompt=arg;
 						}
 					}
 					if(next.filterButton==undefined) next.filterButton=lib.filter.all;
 					if(next.position==undefined) next.position='he';
 					if(next.selectButton==undefined) next.selectButton=[1,1];
 					if(next.ai==undefined) next.ai=function(button){
-						var val=get.buttonValue(button);
+						const val=get.buttonValue(button);
 						if(get.attitude(_status.event.player,get.owner(button.link))>0) return -val;
 						return val;
 					};
 					next.setContent('choosePlayerCard');
-					next._args=Array.from(arguments);
+					next._args=args;
 					return next;
 				}
-				discardPlayerCard(){
-					var next=game.createEvent('discardPlayerCard');
+				discardPlayerCard(...args){
+					const next=game.createEvent('discardPlayerCard');
 					next.player=this;
-					for(var i=0;i<arguments.length;i++){
-						if(get.itemtype(arguments[i])=='player'){
-							next.target=arguments[i];
+					if(args.length==1&&get.is.object(args[0])){
+						for(const i in args[0]) next[i]=args[0][i];
+					}
+					else for(const arg of args){
+						if(get.itemtype(arg)=='player'){
+							next.target=arg;
 						}
-						else if(typeof arguments[i]=='number'){
-							next.selectButton=[arguments[i],arguments[i]];
+						else if(typeof arg=='number'){
+							next.selectButton=[arg,arg];
 						}
-						else if(get.itemtype(arguments[i])=='select'){
-							next.selectButton=arguments[i];
+						else if(get.itemtype(arg)=='select'){
+							next.selectButton=arg;
 						}
-						else if(typeof arguments[i]=='boolean'){
-							next.forced=arguments[i];
+						else if(typeof arg=='boolean'){
+							next.forced=arg;
 						}
-						else if(get.itemtype(arguments[i])=='position'){
-							next.position=arguments[i];
+						else if(get.itemtype(arg)=='position'){
+							next.position=arg;
 						}
-						else if(arguments[i]=='visible'){
+						else if(arg=='visible'){
 							next.visible=true;
 						}
-						else if(typeof arguments[i]=='function'){
-							if(next.ai) next.filterButton=arguments[i];
-							else next.ai=arguments[i];
+						else if(typeof arg=='function'){
+							if(next.ai) next.filterButton=arg;
+							else next.ai=arg;
 						}
-						else if(typeof arguments[i]=='object'&&arguments[i]){
-							next.filterButton=get.filter(arguments[i]);
+						else if(typeof arg=='object'&&arg){
+							next.filterButton=get.filter(arg);
 						}
-						else if(typeof arguments[i]=='string'){
-							next.prompt=arguments[i];
+						else if(typeof arg=='string'){
+							next.prompt=arg;
 						}
 					}
 					if(next.filterButton==undefined) next.filterButton=lib.filter.all;
 					if(next.position==undefined) next.position='he';
 					if(next.selectButton==undefined) next.selectButton=[1,1];
 					if(next.ai==undefined) next.ai=function(button){
-						var val=get.buttonValue(button);
+						const val=get.buttonValue(button);
 						if(get.attitude(_status.event.player,get.owner(button.link))>0) return -val;
 						return val;
 					};
@@ -24933,47 +24654,50 @@ new Promise(resolve=>{
 					next._args=Array.from(arguments);
 					return next;
 				}
-				gainPlayerCard(){
-					var next=game.createEvent('gainPlayerCard');
+				gainPlayerCard(...args){
+					const next=game.createEvent('gainPlayerCard');
 					next.player=this;
-					for(var i=0;i<arguments.length;i++){
-						if(get.itemtype(arguments[i])=='player'){
-							next.target=arguments[i];
+					if(args.length==1&&get.is.object(args[0])){
+						for(const i in args[0]) next[i]=args[0][i];
+					}
+					else for(const arg of args){
+						if(get.itemtype(arg)=='player'){
+							next.target=arg;
 						}
-						else if(typeof arguments[i]=='number'){
-							next.selectButton=[arguments[i],arguments[i]];
+						else if(typeof arg=='number'){
+							next.selectButton=[arg,arg];
 						}
-						else if(get.itemtype(arguments[i])=='select'){
-							next.selectButton=arguments[i];
+						else if(get.itemtype(arg)=='select'){
+							next.selectButton=arg;
 						}
-						else if(typeof arguments[i]=='boolean'){
-							next.forced=arguments[i];
+						else if(typeof arg=='boolean'){
+							next.forced=arg;
 						}
-						else if(get.itemtype(arguments[i])=='position'){
-							next.position=arguments[i];
+						else if(get.itemtype(arg)=='position'){
+							next.position=arg;
 						}
-						else if(arguments[i]=='visible'){
+						else if(arg=='visible'){
 							next.visible=true;
 						}
-						else if(arguments[i]=='visibleMove'){
+						else if(arg=='visibleMove'){
 							next.visibleMove=true;
 						}
-						else if(typeof arguments[i]=='function'){
-							if(next.ai) next.filterButton=arguments[i];
-							else next.ai=arguments[i];
+						else if(typeof arg=='function'){
+							if(next.ai) next.filterButton=arg;
+							else next.ai=arg;
 						}
-						else if(typeof arguments[i]=='object'&&arguments[i]){
-							next.filterButton=get.filter(arguments[i]);
+						else if(typeof arg=='object'&&arg){
+							next.filterButton=get.filter(arg);
 						}
-						else if(typeof arguments[i]=='string'){
-							next.prompt=arguments[i];
+						else if(typeof arg=='string'){
+							next.prompt=arg;
 						}
 					}
 					if(next.filterButton==undefined) next.filterButton=lib.filter.all;
 					if(next.position==undefined) next.position='he';
 					if(next.selectButton==undefined) next.selectButton=[1,1];
 					if(next.ai==undefined) next.ai=function(button){
-						var val=get.buttonValue(button);
+						const val=get.buttonValue(button);
 						if(get.attitude(_status.event.player,get.owner(button.link))>0) return -val;
 						return val;
 					};
@@ -31796,36 +31520,34 @@ new Promise(resolve=>{
 					while(true){
 						evt=evt.getParent('arrangeTrigger');
 						if(!evt||evt.name!='arrangeTrigger'||!evt.doingList) return this;
+
 						const doing=(()=>{
 							if(evt.doing&&evt.doing.player==player) return evt.doing;
 							return evt.doingList.find(i=>i.player==player);
 						})();
-						// if(!doing) return this;
 						const firstDo=evt.doingList.find(i=>i.player=="firstDo");
 						const lastDo=evt.doingList.find(i=>i.player=="lastDo");
-						
-						for(const skill of skills){
+						const playerMap=game.players.concat(game.dead).sortBySeat(evt.starter);	
+
+						skills.forEach(skill=>{
 							const info=lib.skill[skill];
-							if(!info.trigger) continue;
+							if(!info.trigger) return;
 							if(!Object.keys(info.trigger).some(i=>{
 								if(Array.isArray(info.trigger[i])) return info.trigger[i].includes(evt.triggername);
 								return info.trigger[i]==evt.triggername;
-							})) continue;
-
-							const playerMap=game.players.concat(game.dead).sortBySeat(evt.starter);	
-							const priority=get.priority(skill);
+							})) return;
 							const toadd={
 								skill:skill,
 								player:player,
-								priority:priority,
+								priority:get.priority(skill),
 							}
 							const map=info.firstDo?firstDo:info.lastDo?lastDo:doing;
-							if(!map) continue;
-							if(map.doneList&&map.doneList.some(i=>i.skill==toadd.skill&&i.player==toadd.player)) continue;
-							if(map.todoList.some(i=>i.skill==toadd.skill&&i.player==toadd.player)) continue;
+							if(!map) return;
+							if(map.doneList&&map.doneList.some(i=>i.skill==toadd.skill&&i.player==toadd.player)) return;
+							if(map.todoList.some(i=>i.skill==toadd.skill&&i.player==toadd.player)) return;
 							map.todoList.add(toadd);
 							map.todoList.sort((a,b)=>(b.priority-a.priority)||(playerMap.indexOf(a)-playerMap.indexOf(b)));
-						}
+						});
 					}
 				}
 				removeTrigger(skills,player){
@@ -31836,21 +31558,19 @@ new Promise(resolve=>{
 					while(true){
 						evt=evt.getParent('arrangeTrigger');
 						if(!evt||evt.name!='arrangeTrigger'||!evt.doingList) return this;
+
 						const doing=(()=>{
 							if(evt.doing&&evt.doing.player==player) return evt.doing;
 							return evt.doingList.find(i=>i.player==player);
 						})();
-						// if(!doing) return this;
 						const firstDo=evt.doingList.find(i=>i.player=="firstDo");
 						const lastDo=evt.doingList.find(i=>i.player=="lastDo");
 
-						for(const skill of skills){
-							[doing,firstDo,lastDo].forEach(map=>{
-								if(!map) return;
-								const toremove=map.todoList.filter(i=>i.skill==skill&&i.player==player);
-								if(toremove.length>0) map.todoList.removeArray(toremove);
-							});
-						}
+						skills.forEach(skill=>[doing,firstDo,lastDo].forEach(map=>{
+							if(!map) return;
+							const toremove=map.todoList.filter(i=>i.skill==skill&&i.player==player);
+							if(toremove.length>0) map.todoList.removeArray(toremove);
+						}));
 					}
 				}
 				trigger(name){
@@ -31892,11 +31612,10 @@ new Promise(resolve=>{
 
 						const info=lib.skill[skill];
 						const list=info.firstDo?firstDo.todoList:info.lastDo?lastDo.todoList:this.todoList;
-						const priority=get.priority(skill);
 						list.push({
 							skill:skill,
 							player:player,
-							priority:priority,
+							priority:get.priority(skill),
 						});
 						if(typeof list.player=='string') list.sort((a,b)=>(b.priority-a.priority)||(playerMap.indexOf(a)-playerMap.indexOf(b)));
 						else list.sort((a,b)=>b.priority-a.priority);
@@ -31935,14 +31654,14 @@ new Promise(resolve=>{
 						if(lib.config.compatiblemode){
 							let skills=player.getSkills('invisible').concat(lib.skill.global);
 							game.expandSkills(skills);
-							for(const skill of skills){
+							skills.filter(skill=>{
 								const info=get.info(skill);
-								if(!info||!info.trigger) continue;
-								if (roles.some(role=>{
+								if(!info||!info.trigger) return false;
+								return roles.some(role=>{
 									if(info.trigger[role]===name) return true;
 									if(Array.isArray(info.trigger[role])&&info.trigger[role].includes(name)) return true;
-								})) doing.addList(skill, player);
-							}
+								});
+							}).forEach(skill=>doing.addList(skill, player));
 						}
 						else{
 							for(const role of roles){
@@ -31976,8 +31695,7 @@ new Promise(resolve=>{
 					}
 					return this;
 				}
-				untrigger(all,player){
-					if(typeof all=='undefined') all=true;
+				untrigger(all=true,player){
 					var evt=this._triggering;
 					if(all){
 						if(evt&&evt.doingList){
@@ -34020,9 +33738,9 @@ new Promise(resolve=>{
 			},
 			autoswap:{
 				firstDo:true,
-				trigger:{player:['playercontrol','chooseToUseBegin','chooseToRespondBegin','chooseToDiscardBegin','chooseToCompareBegin',
+				trigger:{player:['playercontrol','chooseToUseBegin','chooseToRespondBegin','chooseToCompareBegin',
 				'chooseButtonBegin','chooseCardBegin','chooseTargetBegin','chooseCardTargetBegin','chooseControlBegin',
-				'chooseBoolBegin','choosePlayerCardBegin','discardPlayerCardBegin','gainPlayerCardBegin','chooseToMoveBegin','chooseToPlayBeatmapBegin']},
+				'chooseBoolBegin','choosePlayerCardBegin','chooseToMoveBegin','chooseToPlayBeatmapBegin']},
 				forced:true,
 				priority:100,
 				forceDie:true,
