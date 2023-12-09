@@ -2243,8 +2243,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(){
 					return false;
 				},
-				content:function(){
-					trigger.source.chooseDrawRecover(true);
+				async content(event,trigger,player){
+					await trigger.source.promise.chooseDrawRecover(true);
 				},
 				ai:{
 					effect:{
