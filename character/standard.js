@@ -371,7 +371,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.player.judging[0]=chooseCardResultCards[0];
 					trigger.orderingCards.addArray(chooseCardResultCards);
 					game.log(trigger.player,'的判定牌改为',chooseCardResultCards[0]);
-					game.delay(2);
+					await game.asyncDelay(2);
 				},
 				ai:{
 					rejudge:true,

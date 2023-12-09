@@ -41664,6 +41664,39 @@ new Promise(resolve=>{
 			}
 			return game.delay(time,time2);
 		},
+		/**
+		 * 在async content中对game.delay的代替使用方法
+		 * 
+		 * 因为async content里不应该使用game.pause和game.resume
+		 */
+		asyncDelay:function(time,time2){
+			// if(_status.paused) return;
+			// game.pause();
+			if(typeof time!='number') time=1;
+			if(typeof time2!='number') time2=0;
+			time=time*lib.config.duration+time2;
+			if(lib.config.speed=='vvfast') time/=3;
+			//_status.timeout=setTimeout(game.resume,time);
+			return new Promise(resolve=>{
+				setTimeout(resolve,time);
+			});
+		},
+		/**
+		 * 在async content中对game.delayx的代替使用方法
+		 * 
+		 * 因为async content里不应该使用game.pause和game.resume
+		 */
+		asyncDelayx:function(time,time2){
+			if(typeof time!='number') time=1;
+			switch(lib.config.game_speed){
+				case 'vslow':time*=2.5;break;
+				case 'slow':time*=1.5;break;
+				case 'fast':time*=0.7;break;
+				case 'vfast':time*=0.4;break;
+				case 'vvfast':time*=0.2;break;
+			}
+			return game.asyncDelay(time,time2);
+		},
 		check:function(event){
 			var i,j,range;
 			if(event==undefined) event=_status.event;
