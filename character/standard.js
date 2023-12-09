@@ -1521,7 +1521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.player.group!='wu') return false;
 					return true;
 				},
-				content:function(){
+				async content(event,trigger,player){
 					trigger.baseDamage++;
 				}
 			},
