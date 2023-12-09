@@ -1557,29 +1557,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				direct:true,
-				content:function(){
-					'step 0'
-					var list=game.filterPlayer(function(target){
-						return player!=target&&target.isDamaged()&&target.hp<player.hp&&target.hasZhuSkill('xinjiuyuan',player);
-					});
-					list.sortBySeat();
-					event.list=list;
-					'step 1'
-					if(event.list.length){
-						var current=event.list.shift();
+				async content(event,trigger,player){
+					event.list=game.filterPlayer(target=>player!=target&&target.isDamaged()&&target.hp<player.hp&&target.hasZhuSkill('xinjiuyuan',player)).sortBySeat();
+					while(event.list.length>0){
+						const current=event.list.shift();
 						event.current=current;
-						player.chooseBool(get.prompt('xinjiuyuan',current)).set('choice',get.attitude(player,current)>0);
+						const {result:{bool}}=await player.promises.chooseBool(get.prompt('xinjiuyuan',current)).set('choice',get.attitude(player,current)>0);
+						if(bool){
+							player.logSkill('xinjiuyuan',event.current);
+							await event.current.promises.recover();
+							await player.promises.draw();
+						}
 					}
-					else{
-						event.finish();
-					}
-					'step 2'
-					if(result.bool){
-						player.logSkill('xinjiuyuan',event.current);
-						event.current.recover();
-						player.draw();
-					}
-					event.goto(1);
 				}
 			},
 			qixi:{
