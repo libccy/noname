@@ -2216,8 +2216,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJieshuBegin'},
 				frequent:true,
 				preHidden:true,
-				content:function(){
-					player.draw();
+				async content(event,trigger,player){
+					await player.promise.draw();
 				},
 			},
 			xinbiyue:{
