@@ -1067,7 +1067,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return !event.audioed&&event.card.name=='sha'&&player.countUsed('sha',true)>1&&event.getParent().type=='phase';
 				},
-				content:function(){
+				async content(event,trigger,player){
 					trigger.audioed=true;
 				},
 				mod:{
