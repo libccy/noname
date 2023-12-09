@@ -2366,25 +2366,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				direct:true,
-				content:function(){
-					'step 0'
+				async content(event,trigger,player){
 					if(trigger.name!='loseAsync') event.targets=[trigger.player];
-					else event.targets=game.filterPlayer(function(current){
-						return current!=player&&trigger.getg(current).length>0;
-					});
-					'step 1'
-					var target=event.targets.shift();
-					event.target=target;
-					player.chooseBool(get.prompt2('xinfu_jiyuan',target)).set('ai',function(){
-						var evt=_status.event;
-						return get.attitude(player,evt.getParent().target)>0;
-					});
-					'step 2'
-					if(result.bool){
-						player.logSkill('xinfu_jiyuan',target);
-						target.draw();
-					}
-					if(targets.length>0) event.goto(1);
+					else event.targets=game.filterPlayer(current=>current!=player&&trigger.getg(current).length>0);
+					do{
+						const target=event.targets.shift();
+						event.target=target;
+						const {result:{bool}}=await player.promises.chooseBool(get.prompt2('xinfu_jiyuan',target)).set('ai',()=>{
+							const evt=_status.event;
+							return get.attitude(player,evt.getParent().target)>0;
+						});
+						if(bool){
+							player.logSkill('xinfu_jiyuan',target);
+							await target.promises.draw();
+						}
+					}while(event.targets.length>0);
 				},
 			},
 		},
