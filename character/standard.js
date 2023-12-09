@@ -2185,7 +2185,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				multitarget:true,
 				async content(event,trigger,player){
 					const useCardEvent=event.targets[1].useCard({name:'juedou',isCard:true},'nowuxie',event.targets[0],'noai');
-					useCardEvent.animate = false;
+					useCardEvent.animate=false;
 					await useCardEvent;
 					await game.asyncDelay(0.5);
 				},
