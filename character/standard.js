@@ -887,7 +887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rende1:{
 				trigger:{player:'phaseUseBegin'},
 				silent:true,
-				content:function(){
+				async content(event,trigger,player){
 					player.storage.rende=0;
 				}
 			},
