@@ -1596,7 +1596,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return !event.numFixed;
 				},
-				content:function(){
+				async content(event,trigger,player){
 					trigger.num++;
 				},
 				ai:{
