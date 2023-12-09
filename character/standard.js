@@ -1563,7 +1563,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return true;
 				},
-				content:function(){
+				async content(event,trigger,player){
 					trigger.cancel();
 				}
 			},
