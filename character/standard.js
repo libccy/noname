@@ -2217,7 +2217,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				preHidden:true,
 				async content(event,trigger,player){
-					await player.promise.draw();
+					await player.promises.draw();
 				},
 			},
 			xinbiyue:{
@@ -2226,7 +2226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				// alter:true,
 				async content(event,trigger,player){
-					await player.promise.draw(1);
+					await player.promises.draw(1);
 				},
 			},
 			yaowu:{
@@ -2244,7 +2244,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				async content(event,trigger,player){
-					await trigger.source.promise.chooseDrawRecover(true);
+					await trigger.source.promises.chooseDrawRecover(true);
 				},
 				ai:{
 					effect:{
@@ -2262,13 +2262,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseDrawEnd",
 				},
 				direct:true,
-				content:function (){
-					"step 0"
-					var list=['弃牌','摸牌','取消'];
+				async content(event,trigger,player){
+					const list=['弃牌','摸牌','取消'];
 					if(!player.countCards('he')) list.remove('弃牌');
-					player.chooseControl(list,function(){
-						var player=_status.event.player;
-						if(list.contains('弃牌')){
+					const {result:{control}}=await player.promises.chooseControl(list,()=>{
+						const player=_status.event.player;
+						if(list.includes('弃牌')){
 							if(player.countCards('h')>3&&player.countCards('h','sha')>1){
 								return '弃牌';
 							}
@@ -2281,14 +2280,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return 'cancel2';
 					}).set('prompt',get.prompt2('new_jiangchi'));
-					"step 1"
-					if(result.control=='弃牌'){
-						player.chooseToDiscard(true,'he');
+					if(control=='弃牌'){
+						await player.promises.chooseToDiscard(true,'he');
 						player.addTempSkill('jiangchi2','phaseUseEnd');
 						player.logSkill('new_jiangchi');
 					}
-					else if(result.control=='摸牌'){
-						player.draw();
+					else if(control=='摸牌'){
+						await player.promises.draw();
 						player.addTempSkill('new_jiangchi3','phaseEnd');
 						player.logSkill('new_jiangchi');
 					}
