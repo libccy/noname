@@ -554,7 +554,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					event.count=trigger.num;
 					// event.goto -> while
-					while(event.count>0){
+					while(true){
 						event.count--;
 						const {cards}=await game.cardsGotoOrdering(get.cards(2)).toPromise();
 						if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
@@ -1797,20 +1797,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var evt=event.getl(player);
 					return evt&&evt.player==player&&evt.es&&evt.es.length>0;
 				},
-				content:function(){
-					"step 0"
+				async content(event,trigger,player){
 					event.count=trigger.getl(player).es.length;
-					"step 1"
-					event.count--;
-					player.draw(2);
-					"step 2"
-					if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
-						player.chooseBool(get.prompt2('xiaoji')).set('frequentSkill','xiaoji').ai=lib.filter.all;
-					}
-					"step 3"
-					if(result.bool){
-						player.logSkill('xiaoji');
-						event.goto(1);
+					while(true){
+						event.count--;
+						await player.promises.draw(2);
+						if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
+							const chooseBoolEvent=player.promises.chooseBool(get.prompt2('xiaoji')).set('frequentSkill','xiaoji');
+							chooseBoolEvent.ai=lib.filter.all;
+							const {result:{bool}}=await chooseBoolEvent;
+							if(bool){
+								player.logSkill('xiaoji');
+							}else break;
+						}
 					}
 				},
 				ai:{
