@@ -586,77 +586,72 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				frequent:true,
 				filter:function(event){
-					return (event.num>0)
+					return event.num>0;
 				},
-				content:function(){
-					'step 0'
-					event.count=trigger.num;
-					'step 1'
-					event.count--;
-					event.cards=game.cardsGotoOrdering(get.cards(2)).cards;
-					if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
-					event.given_map={};
-					'step 2'
-					if(event.cards.length>1){
-						player.chooseCardButton('遗计：请选择要分配的牌',true,event.cards,[1,event.cards.length]).set('ai',function(button){
-							if(ui.selected.buttons.length==0) return 1;
-							return 0;
-						});
-					}
-					else if(event.cards.length==1){
-						event._result={links:event.cards.slice(0),bool:true};
-					}
-					else{
-						event.finish();
-					}
-					'step 3'
-					if(result.bool){
-						event.cards.removeArray(result.links);
-						event.togive=result.links.slice(0);
-						player.chooseTarget('选择一名角色获得'+get.translation(result.links),true).set('ai',function(target){
-							var att=get.attitude(_status.event.player,target);
-							if(_status.event.enemy){
-								return -att;
+				async content(event, trigger, player) {
+					event.count = trigger.num;
+					// event.goto -> while
+					while (event.count > 0) {
+						event.count--;
+						const { cards } = await game.cardsGotoOrdering(get.cards(2)).toPromise();
+						if (_status.connectMode) game.broadcastAll(function () { _status.noclearcountdown = true });
+						event.given_map = {};
+						if (!cards.length) return;
+						// event.goto -> do while
+						do {
+							const { result: { bool, links } } =
+								cards.length == 1 ?
+									{ result: { links: cards.slice(0), bool: true } } :
+									await player.promises.chooseCardButton('遗计：请选择要分配的牌', true, cards, [1, cards.length])
+										.set('ai', function (button) {
+											if (ui.selected.buttons.length == 0) return 1;
+											return 0;
+										});
+							if (!bool) return;
+							cards.removeArray(links);
+							event.togive = links.slice(0);
+							const { result: { targets } } = await player.promises.chooseTarget('选择一名角色获得' + get.translation(links), true)
+								.set('ai', function (target) {
+									var att = get.attitude(_status.event.player, target);
+									if (_status.event.enemy) {
+										return -att;
+									}
+									else if (att > 0) {
+										return att / (1 + target.countCards('h'));
+									}
+									else {
+										return att / 100;
+									}
+								})
+								.set('enemy', get.value(event.togive[0], player, 'raw') < 0);
+							if (targets.length) {
+								const id = targets[0].playerid,
+									map = event.given_map;
+								if (!map[id]) map[id] = [];
+								map[id].addArray(event.togive);
 							}
-							else if(att>0){
-								return att/(1+target.countCards('h'));
-							}
-							else{
-								return att/100;
-							}
-						}).set('enemy',get.value(event.togive[0],player,'raw')<0);
-					}
-					'step 4'
-					if(result.targets.length){
-						var id=result.targets[0].playerid,map=event.given_map;
-						if(!map[id]) map[id]=[];
-						map[id].addArray(event.togive);
-					}
-					if(cards.length>0) event.goto(2);
-					'step 5'
-					if(_status.connectMode){
-						game.broadcastAll(function(){delete _status.noclearcountdown;game.stopCountChoose()});
-					}
-					var list=[];
-					for(var i in event.given_map){
-						var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
-						player.line(source,'green');
-						list.push([source,event.given_map[i]]);
-					}
-					game.loseAsync({
-						gain_list:list,
-						giver:player,
-						animate:'draw',
-					}).setContent('gaincardMultiple');
-					'step 6'
-					if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
-						player.chooseBool(get.prompt2(event.name)).set('frequentSkill',event.name);
-					}
-					else event.finish();
-					'step 7'
-					if(result.bool){
-						player.logSkill(event.name);
-						event.goto(1);
+						} while (cards.length > 0);
+						if (_status.connectMode) {
+							game.broadcastAll(function () { delete _status.noclearcountdown; game.stopCountChoose() });
+						}
+						const list = [];
+						for (const i in event.given_map) {
+							const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i];
+							player.line(source, 'green');
+							list.push([source, event.given_map[i]]);
+						}
+						await game.loseAsync({
+							gain_list: list,
+							giver: player,
+							animate: 'draw',
+						}).toPromise().setContent('gaincardMultiple');
+						if (event.count > 0 && player.hasSkill(event.name) && !get.is.blocked(event.name, player)) {
+							const { result: { bool: repeat } } = await player.promises.chooseBool(get.prompt2(event.name)).set('frequentSkill', event.name);
+							if (repeat) {
+								player.logSkill(event.name);
+							} else return;
+						}
+						else return;
 					}
 				},
 				ai:{
