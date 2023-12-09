@@ -928,48 +928,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.skill=='jijiang';
 				},
 				forced:true,
-				content:function(){
-					"step 0"
+				async content(event,trigger,player){
 					delete trigger.skill;
 					trigger.getParent().set('jijiang',true);
-					"step 1"
-					if(event.current==undefined) event.current=player.next;
-					if(event.current==player){
-						player.addTempSkill('jijiang3');
-						event.finish();
-						trigger.cancel();
-						trigger.getParent().goto(0);
-					}
-					else if(event.current.group=='shu'){
-						var next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
-						next.set('ai',function(){
-							var event=_status.event;
-							return (get.attitude(event.player,event.source)-2);
-						});
-						next.set('source',player);
-						next.set('jijiang',true);
-						next.set('skillwarn','替'+get.translation(player)+'打出一张杀');
-						next.noOrdering=true;
-						next.autochoose=lib.filter.autoRespondSha;
-					}
-					else{
-						event.current=event.current.next;
-						event.redo();
-					}
-					"step 2"
-					if(result.bool){
-						event.finish();
-						trigger.card=result.card;
-						trigger.cards=result.cards;
-						trigger.throw=false;
-						if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
-							event.current.ai.shown+=0.3;
-							if(event.current.ai.shown>0.95) event.current.ai.shown=0.95;
+					while(true){
+						let bool,card,cards;
+						if(event.current==undefined) event.current=player.next;
+						if(event.current==player){
+							player.addTempSkill('jijiang3');
+							trigger.cancel();
+							trigger.getParent().goto(0);
+							return;
 						}
-					}
-					else{
-						event.current=event.current.next;
-						event.goto(1);
+						else if(event.current.group=='shu'){
+							const next=event.current.promises.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
+							next.set('ai',()=>{
+								const event=_status.event;
+								return (get.attitude(event.player,event.source)-2);
+							});
+							next.set('source',player);
+							next.set('jijiang',true);
+							next.set('skillwarn','替'+get.translation(player)+'打出一张杀');
+							next.noOrdering=true;
+							next.autochoose=lib.filter.autoRespondSha;
+							({bool,card,cards}=(await next).result);
+							if(bool){
+								trigger.card=card;
+								trigger.cards=cards;
+								trigger.throw=false;
+								if(typeof event.current.ai.shown=='number'&&event.current.ai.shown<0.95){
+									event.current.ai.shown+=0.3;
+									if(event.current.ai.shown>0.95) event.current.ai.shown=0.95;
+								}
+								return;
+							}
+							else event.current=event.current.next;
+						}
+						else event.current=event.current.next;
 					}
 				}
 			},
