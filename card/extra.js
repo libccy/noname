@@ -155,10 +155,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									effs[i].eff=temp;
 									return false;
 								});
-								if(effs[i].target&&(target.hasSkillTag('directHit_ai',true,{
+								if(!effs[i].target) continue;
+								if(target.hasSkillTag('directHit_ai',true,{
 									target:effs[i].target,
 									card:i
-								},true) || target.needsToDiscard()>Math.max(0,3-target.hp) || !effs[i].target.mayHaveShan(player,'use'))){
+								},true) || usable===1&&(target.needsToDiscard()>Math.max(0,3-target.hp) || !effs[i].target.mayHaveShan(player,'use'))){
 									delete target._jiu_temp;
 									return 1;
 								}
