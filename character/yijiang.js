@@ -2681,10 +2681,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.hasSkill('xintaoluan3')&&player.countCards('hes',card=>lib.inpile.some(name=>{
 						if(player.getStorage('xintaoluan').includes(name)) return false;
 						if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
-						if(event.filterCard({name:name,isCard:true,cards:[card]})) return true;
+						if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
 						if(name=='sha'){
 							for(var nature of lib.inpile_nature){
-								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]})) return true;
+								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)) return true;
 							}
 						}
 						return false;
@@ -5263,10 +5263,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.hasSkill('taoluan3')&&player.countCards('hes',card=>lib.inpile.some(name=>{
 						if(player.getStorage('taoluan').includes(name)) return false;
 						if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
-						if(event.filterCard({name:name,isCard:true,cards:[card]})) return true;
+						if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
 						if(name=='sha'){
 							for(var nature of lib.inpile_nature){
-								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]})) return true;
+								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)) return true;
 							}
 						}
 						return false;
