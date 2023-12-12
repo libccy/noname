@@ -102,11 +102,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					event.num=trigger.num||1;
 					while(player.hasSkill('stdshushen')){
-						const {result:{targets}}=await player.promises.chooseTarget(get.prompt2('stdshushen'),lib.filter.notMe)
+						const {result:{targets}}=await player.chooseTarget(get.prompt2('stdshushen'),lib.filter.notMe)
 							.set('ai',target=>get.attitude(_status.event.player,target));
 						const target=targets[0];
 						player.logSkill('stdshushen',target);
-						await target.promises.draw(target.countCards('h')?1:2);
+						await target.draw(target.countCards('h')?1:2);
 						if(--event.num<1) break;
 					};
 				},
@@ -121,8 +121,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.isPhaseUsing()&&event.card&&event.card.name=='sha'&&event.player!=player&&event.player.isIn();
 				},
 				async content(event,trigger,player){
-					if(trigger.player.hp<player.hp) await player.promises.draw(2);
-					else await player.promises.loseHp();
+					if(trigger.player.hp<player.hp) await player.draw(2);
+					else await player.loseHp();
 				},
 				ai:{
 					halfneg:true,
@@ -137,7 +137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				async content(event,trigger,player){
-					await player.promises.draw();
+					await player.draw();
 					let zhu=false;
 					const target=trigger.player;
 					switch(get.mode()){
@@ -159,7 +159,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					if(zhu){
-						await player.promises.draw();
+						await player.draw();
 						target.addTempSkill('rewangzun2');
 						target.addMark('rewangzun2',1,false);
 					}
@@ -184,7 +184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.target.inRange(player)&&event.target.countCards('he')>0;
 				},
 				async content(event,trigger,player){
-					const {result:{bool,cards}}=await trigger.promises.target.chooseCard('he','是否对'+get.translation(player)+'发动【同疾】？','弃置一张牌，将'+get.translation(trigger.card)+'转移给'+get.translation(player))
+					const {result:{bool,cards}}=await trigger.target.chooseCard('he','是否对'+get.translation(player)+'发动【同疾】？','弃置一张牌，将'+get.translation(trigger.card)+'转移给'+get.translation(player))
 					.set('ai',card=>{
 						if(!_status.event.check) return -1;
 						return get.unuseful(card)+9;
@@ -206,7 +206,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})()>0);
 					if(bool){	
 						player.logSkill('retongji',trigger.target);
-						await trigger.target.promises.discard(cards);
+						await trigger.target.discard(cards);
 						const evt=trigger.getParent();
 						evt.triggeredTargets2.remove(trigger.target);
 						evt.targets.remove(trigger.target);
@@ -243,7 +243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								get.attitude(event.current,player)>2)||
 								event.current.isOnline()){
 								player.storage.hujiaing=true;
-								const next=event.current.promises.chooseToRespond('是否替'+get.translation(player)+'打出一张闪？',{name:'shan'});
+								const next=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张闪？',{name:'shan'});
 								next.set('ai',()=>{
 									const event=_status.event;
 									return (get.attitude(event.player,event.source)-2);
@@ -289,7 +289,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.itemtype(event.cards)=='cards'&&get.position(event.cards[0],true)=='o';
 				},
 				async content(event,trigger,player){
-					await player.promises.gain(trigger.cards,'gain2');
+					await player.gain(trigger.cards,'gain2');
 				},
 				ai:{
 					maixie:true,
@@ -311,7 +311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (event.source&&event.source.countGainableCards(player,event.source!=player?'he':'e')&&event.num>0);
 				},
 				async content(event,trigger,player){
-					await player.promises.gainPlayerCard(true,trigger.source,trigger.source!=player?'he':'e');
+					await player.gainPlayerCard(true,trigger.source,trigger.source!=player?'he':'e');
 				},
 				ai:{
 					maixie_defend:true,
@@ -334,7 +334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards(get.mode()=='guozhan'?'hes':'hs')>0;
 				},
 				async content(event,trigger,player){
-					const {result:{bool:chooseCardResultBool,cards:chooseCardResultCards}}=await player.promises.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
+					const {result:{bool:chooseCardResultBool,cards:chooseCardResultCards}}=await player.chooseCard(get.translation(trigger.player)+'的'+(trigger.judgestr||'')+'判定为'+
 					get.translation(trigger.player.judging[0])+'，'+get.prompt('guicai'),get.mode()=='guozhan'?'hes':'hs',card=>{
 						const player=_status.event.player;
 						const mod2=game.checkMod(card,player,'unchanged','cardEnabled2',player);
@@ -357,7 +357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}).set('judging',trigger.player.judging[0]).setHiddenSkill('guicai');
 					if(!chooseCardResultBool) return;
-					await player.promises.respond(chooseCardResultCards,'guicai','highlight','noOrdering');
+					await player.respond(chooseCardResultCards,'guicai','highlight','noOrdering');
 					if(trigger.player.judging[0].clone){
 						trigger.player.judging[0].clone.classList.remove('thrownhighlight');
 						game.broadcast(function(card){
@@ -367,7 +367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},trigger.player.judging[0]);
 						game.addVideo('deletenode',player,get.cardsInfo([trigger.player.judging[0].clone]));
 					}
-					await game.cardsDiscard(trigger.player.judging[0]).toPromise();
+					await game.cardsDiscard(trigger.player.judging[0]);
 					trigger.player.judging[0]=chooseCardResultCards[0];
 					trigger.orderingCards.addArray(chooseCardResultCards);
 					game.log(trigger.player,'的判定牌改为',chooseCardResultCards[0]);
@@ -391,14 +391,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'source',
 				async content(event,trigger,player){
-					const judgeEvent=player.promises.judge(card=>{
+					const judgeEvent=player.judge(card=>{
 						if(get.suit(card)=='heart') return -2;
 						return 2;
 					});
 					judgeEvent.judge2=result=>result.bool;
 					const {result:{judge}}=await judgeEvent;
 					if(judge<2) return;
-					const {result:{bool}}=await trigger.source.promises.chooseToDiscard(2)
+					const {result:{bool}}=await trigger.source.chooseToDiscard(2)
 					.set('ai',card=>{
 						if(card.name=='tao') return -10;
 						if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
@@ -424,7 +424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				direct:true,
 				async content(event,trigger,player){
-					const {result:{bool:chooseTargetResultBool,targets:chooseTargetResultTargets}}=await player.promises.chooseTarget(get.prompt2('ganglie_three'),(card,player,target)=>{
+					const {result:{bool:chooseTargetResultBool,targets:chooseTargetResultTargets}}=await player.chooseTarget(get.prompt2('ganglie_three'),(card,player,target)=>{
 						return target.isEnemyOf(player);
 					}).set('ai',target=>{
 						return -get.attitude(_status.event.player,target)/(1+target.countCards('h'));
@@ -432,14 +432,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!chooseTargetResultBool) return;
 					event.target=chooseTargetResultTargets[0];
 					player.logSkill('ganglie_three',event.target);
-					const judgeEvent=player.promises.judge(card=>{
+					const judgeEvent=player.judge(card=>{
 						if(get.suit(card)=='heart') return -2;
 						return 2;
 					});
 					judgeEvent.judge2=result=>result.bool;
 					const {result:{judge}}=await judgeEvent;
 					if(judge<2) return;
-					const {result:{bool:chooseToDiscardResultBool}}=await player.promises.chooseToDiscard(2).set('ai',card=>{
+					const {result:{bool:chooseToDiscardResultBool}}=await player.chooseToDiscard(2).set('ai',card=>{
 						if(card.name=='tao') return -10;
 						if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
 						return get.unuseful(card)+2.5*(5-get.owner(card).hp);
@@ -472,7 +472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current!=player&&current.countCards('h')&&get.attitude(player,current)<=0;
 					});
 					check=(num>=2);
-					const {result:{bool,targets}}=await player.promises.chooseTarget(get.prompt('tuxi'),'获得其他一至两名角色的各一张手牌',[1,2],(card,player,target)=>{
+					const {result:{bool,targets}}=await player.chooseTarget(get.prompt('tuxi'),'获得其他一至两名角色的各一张手牌',[1,2],(card,player,target)=>{
 						return target.countCards('h')>0&&player!=target;
 					},target=>{
 						if(!_status.event.aicheck) return 0;
@@ -482,7 +482,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('aicheck',check);
 					if(!bool) return;
 					player.logSkill('tuxi',targets);
-					await player.promises.gainMultiple(targets);
+					await player.gainMultiple(targets);
 					trigger.changeToZero();
 					await game.asyncDelay();
 				},
@@ -541,7 +541,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.position(event.result.card,true)=='o';
 				},
 				async content(event,trigger,player){
-					await player.promises.gain(trigger.result.card,'gain2');
+					await player.gain(trigger.result.card,'gain2');
 				}
 			},
 			yiji:{
@@ -556,7 +556,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					// event.goto -> while
 					while(true){
 						event.count--;
-						const {cards}=await game.cardsGotoOrdering(get.cards(2)).toPromise();
+						const {cards}=await game.cardsGotoOrdering(get.cards(2));
 						if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
 						event.given_map={};
 						if(!cards.length) return;
@@ -565,7 +565,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const {result:{bool,links}} =
 								cards.length==1?
 									{result:{links:cards.slice(0),bool: true}}:
-									await player.promises.chooseCardButton('遗计：请选择要分配的牌',true,cards,[1,cards.length])
+									await player.chooseCardButton('遗计：请选择要分配的牌',true,cards,[1,cards.length])
 										.set('ai',button=>{
 											if(ui.selected.buttons.length==0) return 1;
 											return 0;
@@ -573,7 +573,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!bool) return;
 							cards.removeArray(links);
 							event.togive=links.slice(0);
-							const {result:{targets}}=await player.promises.chooseTarget('选择一名角色获得'+get.translation(links),true)
+							const {result:{targets}}=await player.chooseTarget('选择一名角色获得'+get.translation(links),true)
 								.set('ai',target=>{
 									const att=get.attitude(_status.event.player,target);
 									if(_status.event.enemy){
@@ -607,9 +607,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							gain_list:list,
 							giver:player,
 							animate:'draw',
-						}).toPromise().setContent('gaincardMultiple');
+						}).setContent('gaincardMultiple');
 						if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name, player)){
-							const {result:{bool:chooseBoolResultBool}}=await player.promises.chooseBool(get.prompt2(event.name)).set('frequentSkill',event.name);
+							const {result:{bool:chooseBoolResultBool}}=await player.chooseBool(get.prompt2(event.name)).set('frequentSkill',event.name);
 							if(chooseBoolResultBool) player.logSkill(event.name);
 							else return;
 						}
@@ -649,13 +649,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					while(true){
 						if(event.cards==undefined) event.cards=[];
-						const judgeEvent=player.promises.judge(card=>{
+						const judgeEvent=player.judge(card=>{
 							if(get.color(card)=='black') return 1.5;
 							return -1.5;
 						});
 						judgeEvent.judge2=result=>result.bool;
 						if(get.mode()!='guozhan'&&!player.hasSkillTag('rejudge')) judgeEvent.set('callback',async event=>{
-							if(event.judgeResult.color=='black'&&get.position(event.card,true)=='o') await player.promises.gain(event.card,'gain2');
+							if(event.judgeResult.color=='black'&&get.position(event.card,true)=='o') await player.gain(event.card,'gain2');
 						});
 						else judgeEvent.set('callback',async event=>{
 							if(event.judgeResult.color=='black') event.getParent().orderingCards.remove(event.card);
@@ -664,7 +664,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						let bool;
 						if(judge>0){
 							event.cards.push(card);
-							bool=(await player.promises.chooseBool('是否再次发动【洛神】？').set('frequentSkill','luoshen')).result.bool;
+							bool=(await player.chooseBool('是否再次发动【洛神】？').set('frequentSkill','luoshen')).result.bool;
 						}
 						else{
 							for(let i=0;i<event.cards.length;i++){
@@ -673,13 +673,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							if(event.cards.length){
-								await player.promises.gain(event.cards,'gain2');
+								await player.gain(event.cards,'gain2');
 							}
 							return;
 						}
 						if(!bool){
 							if(event.cards.length){
-								await player.promises.gain(event.cards,'gain2');
+								await player.gain(event.cards,'gain2');
 							}
 							return;
 						}
@@ -694,7 +694,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					while(true){
 						if(event.cards==undefined) event.cards=[];
-						const judgeEvent=player.promises.judge(card=>{
+						const judgeEvent=player.judge(card=>{
 							if(get.color(card)=='black') return 1.5;
 							return -1.5;
 						},ui.special);
@@ -703,7 +703,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						let bool;
 						if(judge>0){
 							event.cards.push(card);
-							bool=lib.config.autoskilllist.contains('luoshen')?(await player.promises.chooseBool('是否再次发动【洛神】？')).result.bool:true;
+							bool=lib.config.autoskilllist.contains('luoshen')?(await player.chooseBool('是否再次发动【洛神】？')).result.bool:true;
 						}
 						else{
 							for(let i=0;i<event.cards.length;i++){
@@ -712,13 +712,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									i--;
 								}
 							}
-							await player.promises.gain(event.cards,'gain2');
+							await player.gain(event.cards,'gain2');
 							player.storage.xinluoshen=event.cards.slice(0);
 							return;
 						}
 						if(!bool){
 							if(event.cards.length){
-								await player.promises.gain(event.cards,'gain2');
+								await player.gain(event.cards,'gain2');
 								player.storage.xinluoshen=event.cards.slice(0);
 								return;
 							}
@@ -841,8 +841,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.getHistory('lose',evt=>{
 						if(evt.getParent(2).name=='rende'&&evt.getParent(5)==evt2) num+=evt.cards.length;
 					});
-					await player.promises.give(event.cards,event.target);
-					if(num<2&&num+event.cards.length>1) await player.promises.recover();
+					await player.give(event.cards,event.target);
+					if(num<2&&num+event.cards.length>1) await player.recover();
 				},
 				ai:{
 					order(skill,player){
@@ -940,7 +940,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return;
 						}
 						else if(event.current.group=='shu'){
-							const chooseToRespondEvent=event.current.promises.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
+							const chooseToRespondEvent=event.current.chooseToRespond('是否替'+get.translation(player)+'打出一张杀？',{name:'sha'});
 							chooseToRespondEvent.set('ai',()=>{
 								const event=_status.event;
 								return (get.attitude(event.player,event.source)-2);
@@ -1035,7 +1035,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					player.awakenSkill('zhongyi');
 					player.addTempSkill('zhongyi2','roundStart');
-					await player.promises.addToExpansion(player,'give',event.cards).gaintag.add('zhongyi2');
+					await player.addToExpansion(player,'give',event.cards).gaintag.add('zhongyi2');
 				},
 			},
 			zhongyi2:{
@@ -1094,8 +1094,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					const num=player.hasSkill('yizhi')&&player.hasSkill('guanxing')?5:Math.min(5,game.countPlayer());
 					const cards=get.cards(num);
-					await game.cardsGotoOrdering(cards).toPromise();
-					const next=player.promises.chooseToMove();
+					await game.cardsGotoOrdering(cards);
+					const next=player.chooseToMove();
 					next.set('list',[
 						['牌堆顶',cards],
 						['牌堆底'],
@@ -1140,7 +1140,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(event.top_cards.includes(card)) return ui.cardPile.firstChild;
 							return null;
 						}
-					).toPromise();
+					);
 					player.popup(get.cnNumber(top.length)+'上'+get.cnNumber(bottom.length)+'下');
 					game.log(player,'将'+get.cnNumber(top.length)+'张牌置于牌堆顶');
 					await game.asyncDelayx();
@@ -1198,7 +1198,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.skill=='longdan_sha'||event.skill=='longdan_shan';
 						},
 						async content(event,trigger,player){
-							await player.promises.draw();
+							await player.draw();
 							player.storage.fanghun2++;
 						}
 					},
@@ -1294,7 +1294,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'target',
 				preHidden:true,
 				async content(event,trigger,player){
-					const judgeEvent=player.promises.judge(card=>{
+					const judgeEvent=player.judge(card=>{
 						if(get.zhu(_status.event.player,'shouyue')){
 							if(get.suit(card)!='spade') return 2;
 						}
@@ -1326,7 +1326,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (get.type(event.card)=='trick'&&event.card.isCard);
 				},
 				async content(event,trigger,player){
-					await player.promises.draw();
+					await player.draw();
 				},
 				ai:{
 					threaten:1.4,
@@ -1343,7 +1343,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (get.type(event.card,'trick')=='trick'&&event.cards[0]&&event.cards[0]==event.card);
 				},
 				async content(event, trigger, player){
-					await player.promises.draw();
+					await player.draw();
 				},
 				ai:{
 					threaten:1.4,
@@ -1395,7 +1395,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:0,
 				async content(event,trigger,player){
 					if(!player.hasSkill('xinzhiheng_delay')) await game.asyncDelayx();
-					await player.promises.draw(event.cards.length);
+					await player.draw(event.cards.length);
 				},
 				group:'xinzhiheng_draw',
 				subSkill:{
@@ -1454,7 +1454,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return 6-get.value(card)
 				},
 				async content(event,trigger,player){
-					await player.promises.draw(event.cards.length);
+					await player.draw(event.cards.length);
 				},
 				ai:{
 					order:1,
@@ -1496,7 +1496,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				async content(event,trigger,player){
-					await player.promises.recover();
+					await player.recover();
 				},
 				global:'xinjiuyuan2',
 			},
@@ -1517,11 +1517,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					while(event.list.length>0){
 						const current=event.list.shift();
 						event.current=current;
-						const {result:{bool}}=await player.promises.chooseBool(get.prompt('xinjiuyuan',current)).set('choice',get.attitude(player,current)>0);
+						const {result:{bool}}=await player.chooseBool(get.prompt('xinjiuyuan',current)).set('choice',get.attitude(player,current)>0);
 						if(bool){
 							player.logSkill('xinjiuyuan',event.current);
-							await event.current.promises.recover();
-							await player.promises.draw();
+							await event.current.recover();
+							await player.draw();
 						}
 					}
 				}
@@ -1565,8 +1565,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				prompt:'失去1点体力并摸两张牌',
 				async content(event,trigger,player){
-					await player.promises.loseHp(1);
-					await player.promises.draw(2);
+					await player.loseHp(1);
+					await player.draw(2);
 				},
 				ai:{
 					basic:{
@@ -1608,7 +1608,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				async content(event,trigger,player){
 					const target=event.target;
-					const {result:{control}}=await target.promises.chooseControl('heart2','diamond2','club2','spade2').set('ai',event=>{
+					const {result:{control}}=await target.chooseControl('heart2','diamond2','club2','spade2').set('ai',event=>{
 						switch(Math.floor(Math.random()*6)){
 							case 0:return 'heart2';
 							case 1:case 4:case 5:return 'diamond2';
@@ -1619,8 +1619,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.log(target,'选择了'+get.translation(control));
 					event.choice=control;
 					target.chat('我选'+get.translation(event.choice));
-					const {result:{bool,cards}}=await target.promises.gainPlayerCard(player,true,'h');
-					if(bool&&get.suit(cards[0],player)+'2'!=event.choice) await target.promises.damage('nocard');
+					const {result:{bool,cards}}=await target.gainPlayerCard(player,true,'h');
+					if(bool&&get.suit(cards[0],player)+'2'!=event.choice) await target.damage('nocard');
 				},
 				ai:{
 					order:1,
@@ -1672,7 +1672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				async content(event,trigger,player){
-					const {result:{bool,targets,cards}}=await player.promises.chooseCardTarget({
+					const {result:{bool,targets,cards}}=await player.chooseCardTarget({
 						position:'he',
 						filterCard:lib.filter.cardDiscardable,
 						filterTarget:(card,player,target)=>{
@@ -1706,7 +1706,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(bool){
 						const target=targets[0];
 						player.logSkill(event.name,target);
-						await player.promises.discard(cards);
+						await player.discard(cards);
 						const evt=trigger.getParent();
 						evt.triggeredTargets2.remove(player);
 						evt.targets.remove(player);
@@ -1761,7 +1761,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return evt&&evt.player==player&&evt.hs&&evt.hs.length>0;
 				},
 				async content(event,trigger,player){
-					await player.promises.draw();
+					await player.draw();
 				},
 				ai:{
 					threaten:0.8,
@@ -1794,9 +1794,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.count=trigger.getl(player).es.length;
 					while(true){
 						event.count--;
-						await player.promises.draw(2);
+						await player.draw(2);
 						if(event.count>0&&player.hasSkill(event.name)&&!get.is.blocked(event.name,player)){
-							const chooseBoolEvent=player.promises.chooseBool(get.prompt2('xiaoji')).set('frequentSkill','xiaoji');
+							const chooseBoolEvent=player.chooseBool(get.prompt2('xiaoji')).set('frequentSkill','xiaoji');
 							chooseBoolEvent.ai=lib.filter.all;
 							const {result:{bool}}=await chooseBoolEvent;
 							if(bool){
@@ -1836,8 +1836,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				async content(event,trigger,player){
-					await player.promises.recover();
-					await event.target.promises.recover();
+					await player.recover();
+					await event.target.recover();
 				},
 				ai:{
 					order:5.5,
@@ -1898,18 +1898,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const {cards,target}=event;
 							if(get.position(cards[0])=='e'){
 								player.$give(cards,target);
-								await target.promises.equip(cards[0]);
+								await target.equip(cards[0]);
 							}
 							else{
-								await player.promises.discard(cards);
+								await player.discard(cards);
 							}
 							if(player.hp>target.hp){
-								await player.promises.draw();
-								if(target.isDamaged()) await target.promises.recover();
+								await player.draw();
+								if(target.isDamaged()) await target.recover();
 							}
 							else if(player.hp<target.hp){
-								await target.promises.draw();
-								if (player.isDamaged()) await player.promises.recover();
+								await target.draw();
+								if (player.isDamaged()) await player.recover();
 							}
 						},
 						ai:{
@@ -1974,8 +1974,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return true;
 						},
 						async content(event,trigger,player){
-							await player.promises.recover();
-							await event.target.promises.recover();
+							await player.recover();
+							await event.target.recover();
 						},
 						ai:{
 							order:5.5,
@@ -2007,7 +2007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				async content(event,trigger,player){
-					await event.target.promises.recover();
+					await event.target.recover();
 				},
 				ai:{
 					order:9,
@@ -2140,8 +2140,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					player.awakenSkill('zhanshen');
 					const cards=player.getEquips(1);
-					if(cards.length) await player.promises.discard(cards);
-					await player.promises.loseMaxHp();
+					if(cards.length) await player.discard(cards);
+					await player.loseMaxHp();
 					player.addSkill('mashu');
 					player.addSkill('shenji');
 				},
@@ -2210,7 +2210,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				preHidden:true,
 				async content(event,trigger,player){
-					await player.promises.draw();
+					await player.draw();
 				},
 			},
 			xinbiyue:{
@@ -2219,7 +2219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				// alter:true,
 				async content(event,trigger,player){
-					await player.promises.draw(1);
+					await player.draw(1);
 				},
 			},
 			yaowu:{
@@ -2235,7 +2235,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				check(){return false;},
 				async content(event,trigger,player){
-					await trigger.source.promises.chooseDrawRecover(true);
+					await trigger.source.chooseDrawRecover(true);
 				},
 				ai:{
 					effect:{
@@ -2256,7 +2256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					const list=['弃牌','摸牌','取消'];
 					if(!player.countCards('he')) list.remove('弃牌');
-					const {result:{control}}=await player.promises.chooseControl(list,()=>{
+					const {result:{control}}=await player.chooseControl(list,()=>{
 						const player=_status.event.player;
 						if(list.includes('弃牌')){
 							if(player.countCards('h')>3&&player.countCards('h','sha')>1){
@@ -2272,12 +2272,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 'cancel2';
 					}).set('prompt',get.prompt2('new_jiangchi'));
 					if(control=='弃牌'){
-						await player.promises.chooseToDiscard(true,'he');
+						await player.chooseToDiscard(true,'he');
 						player.addTempSkill('jiangchi2','phaseUseEnd');
 						player.logSkill('new_jiangchi');
 					}
 					else if(control=='摸牌'){
-						await player.promises.draw();
+						await player.draw();
 						player.addTempSkill('new_jiangchi3','phaseEnd');
 						player.logSkill('new_jiangchi');
 					}
@@ -2309,9 +2309,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				async content(event,trigger,player){
 					const card=get.bottomCards()[0];
-					await game.cardsGotoOrdering(card).toPromise();
+					await game.cardsGotoOrdering(card);
 					event.card=card;
-					const {result:{bool,targets}}=await player.promises.chooseTarget(true).set('ai',target=>{
+					const {result:{bool,targets}}=await player.chooseTarget(true).set('ai',target=>{
 						let att=get.attitude(_status.event.player,target);
 						if(_status.event.du){
 							if(target.hasSkillTag('nodu')) return 0.5;
@@ -2329,7 +2329,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(bool){
 						const target=targets[0];
 						player.line(target,'green');
-						const gainEvent=target.promises.gain(card,'draw');
+						const gainEvent=target.gain(card,'draw');
 						gainEvent.giver=player;
 						await gainEvent;
 					}
@@ -2363,13 +2363,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					do{
 						const target=event.targets.shift();
 						event.target=target;
-						const {result:{bool}}=await player.promises.chooseBool(get.prompt2('xinfu_jiyuan',target)).set('ai',()=>{
+						const {result:{bool}}=await player.chooseBool(get.prompt2('xinfu_jiyuan',target)).set('ai',()=>{
 							const evt=_status.event;
 							return get.attitude(player,evt.getParent().target)>0;
 						});
 						if(bool){
 							player.logSkill('xinfu_jiyuan',target);
-							await target.promises.draw();
+							await target.draw();
 						}
 					}while(event.targets.length>0);
 				},

@@ -15,6 +15,7 @@ new Promise(resolve=>{
 	 * @typedef {InstanceType<typeof lib.element.Card>} Card
 	 * @typedef {InstanceType<typeof lib.element.VCard>} VCard
 	 * @typedef {InstanceType<typeof lib.element.GameEvent>} GameEvent
+	 * @typedef {InstanceType<typeof lib.element.GameEventPromise>} GameEventPromise
 	 * @typedef {InstanceType<typeof lib.element.NodeWS>} NodeWS
 	 */
 	const userAgent=navigator.userAgent.toLowerCase();
@@ -21031,22 +21032,6 @@ new Promise(resolve=>{
 					};
 					player.queueCount=0;
 					player.outCount=0;
-					/**
-					 * 这部分应该用d.ts写。目前只给出大概类型
-					 * @type { {[key in keyof Player]: (...args) => Promise<GameEvent> & GameEvent} }
-					 */
-					player.promises=new Proxy({},{
-						get(target,prop){
-							const eventKeys=Object.keys(lib.element.player).filter(key=>typeof lib.element.player[key]=='function');
-							if (eventKeys.includes(prop)){
-								return function (...args) {
-									/** @type { GameEvent } */
-									const event=player[prop](...args);
-									return event.toPromise();
-								};
-							}
-						}
-					});
 				}
 				buildEventListener(noclick){
 					let player = this;
@@ -31273,6 +31258,7 @@ new Promise(resolve=>{
 				}
 			},
 			GameEvent:class{
+				#promise;
 				/**
 				 * @param {string} [name]
 				 * @param {false} [trigger]
@@ -31293,6 +31279,24 @@ new Promise(resolve=>{
 					 * @type {GameEvent[]}
 					 */
 					this.next=[];
+					Object.defineProperty(this.next,'remove',{
+						enumerable:false,
+						value:function(){
+							for(const item of arguments){
+								let pos=-1;
+								if (typeof item=='number'&&isNaN(item)){
+									pos=this.findIndex(v=>isNaN(v))
+								}else if(item instanceof lib.element.GameEventPromise){
+									pos=this.indexOf(item.toEvent());
+								}else{
+									pos=this.indexOf(item);
+								}
+								if(pos==-1) continue;
+								this.splice(pos,1);
+							}
+							return this;
+						}
+					});
 					/**
 					 * @type {GameEvent[]}
 					 */
@@ -31316,7 +31320,7 @@ new Promise(resolve=>{
 					if(trigger!==false&&!game.online) this._triggered=0;
 				}
 				static initialGameEvent(){
-					return new lib.element.GameEvent().finish();
+					return new lib.element.GameEvent().finish().toPromise();
 				}
 				/**
 				 * @param {keyof this} key
@@ -31643,14 +31647,14 @@ new Promise(resolve=>{
 					this.next.push(next);
 					next.setContent(content);
 					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
-					return next;
+					return next.toPromise();
 				}
 				insertAfter(content,map){
 					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
 					this.after.push(next);
 					next.setContent(content);
 					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
-					return next;
+					return next.toPromise();
 				}
 				backup(skill){
 					this._backup={
@@ -32104,13 +32108,13 @@ new Promise(resolve=>{
 				/**
 				 * 事件转为Promise化
 				 * 
-				 * @returns { Promise<GameEvent> & GameEvent }
+				 * @returns { Promise<GameEvent> & GameEvent & GameEventPromise }
 				 */
 				toPromise(){
-					if(this.async&&this.resolve){
-						throw new TypeError('This event has been converted into a promise');
+					if(!this.#promise){
+						this.#promise=new lib.element.GameEventPromise(this);
 					}
-					return new lib.element.GameEventPromise(this);
+					return this.#promise;
 				}
 			},
 			/**
@@ -32126,13 +32130,13 @@ new Promise(resolve=>{
 			 * @todo 需要完成异步事件的debugger方法
 			 * 
 			 * @example
-			 * 使用toPromise()函数将普通事件转换为异步事件：
+			 * 使用await xx()等待异步事件执行：
 			 * ```js
-			 * await game.xxx().toPromise().setContent('yyy').set(zzz, 'i');
+			 * await game.xxx().setContent('yyy').set(zzz, 'i');
 			 * ```
-			 * 使用player.promises.xxx()函数将对于player的普通事件转换为异步事件并执行：
+			 * 使用await player.xxx()等待异步事件执行：
 			 * ```js
-			 * await player.promises.draw(2);
+			 * await player.draw(2);
 			 * game.log('等待', player, '摸牌完成执行log');
 			 * ```
 			 */
@@ -32142,6 +32146,7 @@ new Promise(resolve=>{
 				static get [Symbol.species]() { 
 					return Promise;
 				}
+				#event;
 				/**
 				 * @param { GameEvent } event 
 				 * @returns { Promise<GameEvent> & GameEvent }
@@ -32154,7 +32159,7 @@ new Promise(resolve=>{
 						event.resolve=resolve;
 						// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
 						// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
-						if(_status.event.next.includes(event)&&_status.event.content instanceof AsyncFunction){
+						if(_status.event&&_status.event.next.includes(event)&&_status.event.content instanceof AsyncFunction){
 							if (_status.event!=event) {
 								event.parent=_status.event;
 								_status.event=event;
@@ -32167,6 +32172,7 @@ new Promise(resolve=>{
 							Promise.resolve().then(()=>game.loop(event));
 						}
 					});
+					this.#event=event;
 					return new Proxy(this,{
 						get(target,prop,receiver){
 							const thisValue=Reflect.get(target,prop);
@@ -32182,7 +32188,7 @@ new Promise(resolve=>{
 								const returnValue=eventValue.call(event,...args);
 								return returnValue==event?receiver:returnValue;
 							}).bind(event);
-							return eventValue;
+							return eventValue==event?receiver:eventValue;
 						},
 						set(target,prop,newValue){
 							return Reflect.set(event,prop,newValue);
@@ -32200,6 +32206,10 @@ new Promise(resolve=>{
 							return Reflect.ownKeys(event,prop);
 						},
 					});
+				}
+				/** 获取原事件对象 */
+				toEvent(){
+					return this.#event;
 				}
 				/**
 				 * TODO: 实现debugger
@@ -40357,7 +40367,7 @@ new Promise(resolve=>{
 		createEvent:(name,trigger,triggerEvent)=>{
 			const next=new lib.element.GameEvent(name,trigger);
 			(triggerEvent||_status.event).next.push(next);
-			return next;
+			return next.toPromise();
 		},
 		addCharacter:(name,information)=>{
 			const extensionName=_status.extension||information.extension,character=[
