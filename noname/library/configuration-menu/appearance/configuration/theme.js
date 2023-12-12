@@ -1,5 +1,5 @@
 import { Game } from "../../../../game.js";
-import { gnc } from "../../../../gnc.js";
+import { GNC } from "../../../../gnc.js";
 import { Library } from "../../../../library.js";
 import { UI } from "../../../../ui.js";
 import { Create } from "../../../../ui/create.js";
@@ -19,7 +19,7 @@ export const THEME = {
 			node.menu = Create.div(node, "", "<div></div><div></div><div></div><div></div>");
 		}
 	},
-	onclick: gnc.of(function* (theme) {
+	onclick: GNC.of(function* (theme) {
 		Game.saveConfig("theme", theme);
 		UI.arena.hide();
 		Initialization.background();

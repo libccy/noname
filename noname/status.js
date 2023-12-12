@@ -1,7 +1,7 @@
 import { GameEvent } from "./library/element/game-event.js";
-import { ai } from "./status/ai.js";
-import { cardTag } from "./status/card-tag.js";
-import { postReconnect } from "./status/post-reconnect.js";
+import { ai } from "./game-status/ai.js";
+import { cardTag } from "./game-status/card-tag.js";
+import { postReconnect } from "./game-status/post-reconnect.js";
 
 export const status = {
 	paused: false,
@@ -11,14 +11,14 @@ export const status = {
 	clicked: false,
 	auto: false,
 	event: GameEvent.initialGameEvent(),
-	ai,
+	ai: ai,
 	lastdragchange: [],
 	skillaudio: [],
 	dieClose: [],
 	dragline: [],
 	dying: [],
 	/**
-	 * @type {import("./status/global-history.js").GlobalHistory[]}
+	 * @type {import("./game-status/global-history.js").GlobalHistory[]}
 	 */
 	globalHistory: [{
 		cardMove: [],

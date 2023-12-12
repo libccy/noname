@@ -1,8 +1,12 @@
-import { Is } from "./gnc/is.js";
+const GeneratorFunction = (function* () { }).constructor;
 
-export const gnc = {
-	of(fn) {
-		return Is.generatorFunc(fn) ? function genCoroutine() {
+export class GNC {
+	constructor() {
+		throw new TypeError(`${new.target.name} is not a constructor`);
+	}
+
+	static of(fn) {
+		return this.isGeneratorFunc(fn) ? function genCoroutine() {
 			let gen = fn.apply(this, arguments);
 			gen.status = "next";
 			gen.state = undefined;
@@ -33,6 +37,20 @@ export const gnc = {
 			}
 			return new Promise(callback);
 		} : (() => { throw new TypeError("gnc.of needs a GeneratorFunction.") })();
-	},
-	is: Is
-};
+	}
+
+	static isCoroutine(item) {
+		return typeof item == "function" && item.name == "genCoroutine";
+	}
+
+	/**
+	 * @returns {item is GeneratorFunction}
+	 */
+	static isGeneratorFunc(item) {
+		return item instanceof GeneratorFunction;
+	}
+
+	static isGenerator(item) {
+		return typeof item == "object" && "constructor" in item && item.constructor && "constructor" in item.constructor && item.constructor.constructor === GeneratorFunction;
+	}
+}
