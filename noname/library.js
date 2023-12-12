@@ -1,7 +1,7 @@
 import { Game } from "./game.js";
 import { Get } from "./get.js";
 import { GNC } from "./gnc.js";
-import { InternalLibrary } from "./internal/internal-library.js";
+import { InternalLibrary } from "./internal.js";
 import { animate } from "./library/animate.js";
 import { announce } from "./library/announce.js";
 import { cardPack } from "./library/card-pack.js";
