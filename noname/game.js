@@ -1,3 +1,4 @@
+import { GNC as gnc } from "./gnc.js";
 export class Game {
 	static promises = {
 		/**

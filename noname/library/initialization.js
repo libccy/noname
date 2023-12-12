@@ -1,4 +1,6 @@
 import { Promises } from "./initialization/promises.js";
+import { GNC as gnc } from "../gnc.js";
+import { Library as lib } from "../library.js";
 
 export class Initialization {
 	static promises = Promises;
