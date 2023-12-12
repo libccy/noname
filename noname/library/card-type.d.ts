@@ -1,3 +1,4 @@
-interface CardType extends Record<string, number> { }
+interface CardType extends Record<string, number> {
+}
 
 export const cardType: CardType;

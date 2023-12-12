@@ -1,3 +1,4 @@
-interface Skill extends Record<string, Function> { }
+interface Skill extends Record<string, Function> {
+}
 
 export const skill: Skill;

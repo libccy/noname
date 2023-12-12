@@ -1,3 +1,4 @@
-interface CSS extends Record<string, HTMLStyleElement> { }
+interface CSS extends Record<string, HTMLStyleElement> {
+}
 
 export const css: CSS;

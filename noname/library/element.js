@@ -637,7 +637,7 @@ export const element = {
 				var dialog = ui.create.dialog("forcebutton", "hidden");
 				event.dialog = dialog;
 				event.dialog.textPrompt = event.dialog.add(`<div class="text center">${beatmap.prompt || "在音符滑条和底部判定区重合时点击屏幕！"}</div>`);
-				event.switchToAuto = function () { };
+				event.switchToAuto = () => void 0;
 				event.dialog.classList.add("fixed");
 				event.dialog.classList.add("scroll1");
 				event.dialog.classList.add("scroll2");
@@ -1171,7 +1171,7 @@ export const element = {
 				player.chooseButtonOL([
 					[player, [event.title + "：请选择一种策略", [[["", "", "db_def2"], ["", "", "db_def1"]], "vcard"]], true],
 					[target, [event.title + "：请选择一种策略", [[["", "", "db_atk1"], ["", "", "db_atk2"]], "vcard"]], true]
-				], function () { }, event.ai).set("switchToAuto", function () {
+				], () => void 0, event.ai).set("switchToAuto", function () {
 					_status.event.result = "ai";
 				}).set("processAI", function () {
 					var buttons = _status.event.dialog.buttons;
@@ -1250,7 +1250,7 @@ export const element = {
 				player.chooseButtonOL([
 					[player, ["猜拳：请选择一种手势", [[["", "", "pss_stone"], ["", "", "pss_scissor"], ["", "", "pss_paper"]], "vcard"]], true],
 					[target, ["猜拳：请选择一种手势", [[["", "", "pss_stone"], ["", "", "pss_scissor"], ["", "", "pss_paper"]], "vcard"]], true]
-				], function () { }, function () { return 1 + Math.random() }).set("switchToAuto", function () {
+				], () => void 0, function () { return 1 + Math.random() }).set("switchToAuto", function () {
 					_status.event.result = "ai";
 				}).set("processAI", function () {
 					var buttons = _status.event.dialog.buttons;
@@ -5487,7 +5487,7 @@ export const element = {
 				return;
 			}
 			var cards = player.getCards("h");
-			player.showCards(cards).setContent(function () { });
+			player.showCards(cards).setContent(() => void 0);
 			var str = get.translation(player.name) + "的手牌";
 			if (typeof event.prompt == "string") {
 				str = event.prompt;

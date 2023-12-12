@@ -3978,7 +3978,7 @@ export class Game {
 			}
 		}
 		if (!callback) {
-			callback = function () { };
+			callback = () => void 0;
 		}
 		var promptContainer = ui.create.div(".popup-container", ui.window, function () {
 			if (this.clicked) {

@@ -1,3 +1,4 @@
-interface EmotionList extends Record<string, number> { }
+interface EmotionList extends Record<string, number> {
+}
 
 export const emotionList: EmotionList;

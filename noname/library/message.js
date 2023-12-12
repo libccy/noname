@@ -498,7 +498,7 @@ export const message = {
 					} else {
 						window.focus();
 						if (navigator.clipboard && lib.node) {
-							navigator.clipboard.readText().then(read).catch(_ => { });
+							navigator.clipboard.readText().then(read).catch(() => void 0);
 						} else {
 							var input = ui.create.node("textarea", ui.window, { opacity: "0" });
 							input.select();

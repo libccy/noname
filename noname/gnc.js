@@ -1,4 +1,5 @@
-const GeneratorFunction = (function* () { }).constructor;
+const GeneratorFunction = (function* () {
+}).constructor;
 
 export class GNC {
 	constructor() {

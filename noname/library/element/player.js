@@ -886,8 +886,10 @@ export class Player {
 		return this.countEnabledSlot(num) > this.getEquips(num).length;
 	}
 	//以下函数将被废弃
-	$disableEquip() { }
-	$enableEquip() { }
+	$disableEquip() {
+	}
+	$enableEquip() {
+	}
 	//装备区End
 	chooseToDebate() {
 		var next = game.createEvent("chooseToDebate");

@@ -1,3 +1,4 @@
-interface UpdateURLs extends Record<string, string> { }
+interface UpdateURLs extends Record<string, string> {
+}
 
 export const updateURLs: UpdateURLs;

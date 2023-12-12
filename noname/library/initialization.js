@@ -1470,8 +1470,8 @@ export class Initialization {
 						entry.getFile(dir, {}, function (fileEntry) {
 							fileEntry.remove();
 							if (callback) callback();
-						}, callback || function () { });
-					}, callback || function () { });
+						}, callback || (() => void 0));
+					}, callback || (() => void 0));
 				};
 				game.getFileList = (dir, success, failure) => {
 					var files = [], folders = [];
@@ -1644,7 +1644,7 @@ export class Initialization {
 				});
 			};
 			game.removeFile = function (filename, callback) {
-				lib.node.fs.unlink(__dirname + "/" + filename, callback || function () { });
+				lib.node.fs.unlink(__dirname + "/" + filename, callback || (() => void 0));
 			};
 			game.getFileList = (dir, success, failure) => {
 				var files = [], folders = [];
@@ -1655,7 +1655,7 @@ export class Initialization {
 					};
 				}
 				else if (failure == null) {
-					failure = () => { };
+					failure = () => void 0;
 				}
 				try {
 					lib.node.fs.readdir(dir, (err, filelist) => {
