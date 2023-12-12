@@ -102,9 +102,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					event.num=trigger.num||1;
 					while(player.hasSkill('stdshushen')){
-						const {result:{targets}}=await player.chooseTarget(get.prompt2('stdshushen'),lib.filter.notMe)
+						const {result:{bool,targets}}=await player.chooseTarget(get.prompt2('stdshushen'),lib.filter.notMe)
 							.set('ai',target=>get.attitude(_status.event.player,target));
-						const target=targets[0];
+						if(!bool) break;
+						const target = targets[0];
 						player.logSkill('stdshushen',target);
 						await target.draw(target.countCards('h')?1:2);
 						if(--event.num<1) break;
