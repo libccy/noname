@@ -3,5 +3,6 @@ export class Other {
 		throw new TypeError(`${new.target.name} is not a constructor`);
 	}
 
-	static ignore() { }
+	static ignore() {
+	}
 }
