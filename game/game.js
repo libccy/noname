@@ -31277,29 +31277,11 @@ new Promise(resolve=>{
 					this.step=0;
 					this.finished=false;
 					/**
-					 * @type {GameEvent[]}
+					 * @type {(Promise<GameEvent> & GameEvent & GameEventPromise)[]}
 					 */
 					this.next=[];
-					// Object.defineProperty(this.next,'remove',{
-					// 	enumerable:false,
-					// 	value:function(){
-					// 		for(const item of arguments){
-					// 			let pos=-1;
-					// 			if (typeof item=='number'&&isNaN(item)){
-					// 				pos=this.findIndex(v=>isNaN(v))
-					// 			}else if(item instanceof lib.element.GameEventPromise){
-					// 				pos=this.indexOf(item.toEvent());
-					// 			}else{
-					// 				pos=this.indexOf(item);
-					// 			}
-					// 			if(pos==-1) continue;
-					// 			this.splice(pos,1);
-					// 		}
-					// 		return this;
-					// 	}
-					// });
 					/**
-					 * @type {GameEvent[]}
+					 * @type {(Promise<GameEvent> & GameEvent & GameEventPromise)[]}
 					 */
 					this.after=[];
 					this.custom={
