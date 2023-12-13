@@ -9080,6 +9080,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
+				locked:false,
 				audio:"duanliang1",
 				enable:"chooseToUse",
 				filterCard:function(card){
@@ -9738,6 +9739,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return player.hp<=1;
 				},
 				forced:true,
+				locked:false,
 				//priority:3,
 				content:function(){
 					player.addTempSkill('baka_yingzi','phaseAfter');
@@ -10878,6 +10880,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				forceunique:true,
 				lordSkill:true,
+				locked:false,
 				audio:2,
 				derivation:'yuanjiangfenghuotu',
 				mark:true,

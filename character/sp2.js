@@ -531,6 +531,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio: 'juexiang',
 				trigger: { player: 'die' },
 				forced: true,
+				locked:false,
 				forceDie: true,
 				skillAnimation: true,
 				animationColor: 'water',
@@ -627,6 +628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				audio:2,
+				locked:false,
 				trigger:{player:'phaseUseBegin'},
 				filter:function(event,player){
 					return player.countCards('h');

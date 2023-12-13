@@ -941,6 +941,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				limited:true,
 				skillAnimation:true,
 				animationColor:'orange',
+				locked:false,
 				chooseButton:{
 					dialog:function(event,player){
 						var list=[];
@@ -1320,6 +1321,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return (player.countCards('h')==0)^player.hasSkill('jsrgmanjuan_in');
 				},
 				forced:true,
+				locked:false,
 				firstDo:true,
 				silent:true,
 				content:function(){
@@ -1710,6 +1712,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jsrgrihui:{
 				audio:'dcrihui',
+				locked:false,
 				trigger:{source:'damageSource'},
 				filter:function(event,player){
 					return event.getParent().type=='card'&&event.card&&event.card.name=='sha'&&game.hasPlayer(current=>{
@@ -2444,6 +2447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCard'},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					if(player.group!='shu') return false;
 					return game.hasPlayer(current=>{
@@ -3792,6 +3796,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbpingjian:{
 				trigger:{player:['useSkill','logSkillBegin']},
 				forced:true,
+				locked:false,
 				filter:function(event,player){
 					var skill=event.sourceSkill||event.skill;
 					return player.invisibleSkills.contains(skill)&&lib.skill.sbyingmen.getSkills(player.getStorage('sbyingmen'),player).contains(skill);

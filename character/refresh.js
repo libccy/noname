@@ -8680,6 +8680,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.getEquips(3).length>0||player.getEquips(4).length>0) return Infinity;
 					},
 				},
+				locked:false,
 				enable:'phaseUse',
 				usable:1,
 				position:'he',

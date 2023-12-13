@@ -61,6 +61,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.type2(card)=='trick') return true;
 					},
 				},
+				locked:false,
 				getLimit:3,
 				audio:2,
 				enable:'phaseUse',
@@ -4446,6 +4447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbzhiheng:{
 				audio:2,
 				audioname:['shen_caopi'],
+				locked:false,
 				mod:{
 					aiOrder:function(player,card,num){
 						if(num<=0||get.itemtype(card)!=='card'||get.type(card)!=='equip') return num;

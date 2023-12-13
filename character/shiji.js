@@ -1260,7 +1260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spxizhan:{
 				audio:4,
 				group:'spxizhan_effect',
-				locked:true,
+				locked:false,
 				subSkill:{
 					spfangzong:{charlotte:true},
 					effect:{
@@ -2134,7 +2134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rechuhai:{
 				audio:'chuhai',
 				dutySkill:true,
-				locked:true,
+				locked:false,
 				group:['rechuhai_add','rechuhai_achieve','rechuhai_fail','rechuhai_chuhai'],
 				derivation:'zhangming',
 				subSkill:{
@@ -2715,6 +2715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				dutySkill:true,
 				forced:true,
+				locked:false,
 				direct:true,
 				filter:function(event,player){
 					if(!player.storage.xingqi||!player.storage.xingqi.length) return false;
@@ -3151,7 +3152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingyu:{
 				audio:3,
 				dutySkill:true,
-				locked:true,
+				locked:false,
 				group:['qingyu_achieve','qingyu_fail','qingyu_defend'],
 				subSkill:{
 					defend:{

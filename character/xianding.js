@@ -924,6 +924,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.hasMark('dccaixia_clear');
 				},
 				direct:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					var choices=Array.from({length:Math.min(5,game.players.length+game.dead.length)}).map((_,i)=>get.cnNumber(i+1,true));
@@ -2168,6 +2169,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				direct:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					var targets=trigger.targets.filter(target=>{
