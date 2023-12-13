@@ -80,7 +80,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_liuzan:['male','wu',4,['refenyin','liji']],
 			wenyang:['male','wei',5,['xinlvli','choujue']],
 			wangshuang:['male','wei',8,['spzhuilie']],
-			huaman:['female','shu',3,['hmmanyi','mansi','souying','zhanyuan']],
+			huaman:['female','shu',3,['manyi','mansi','souying','zhanyuan']],
 			puyuan:['male','shu',4,['pytianjiang','pyzhuren']],
 			guanlu:['male','wei',3,['tuiyan','busuan','mingjie']],
 			gexuan:['male','wu',3,['gxlianhua','zhafu']],
@@ -11613,18 +11613,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//花鬘
 			manyi:{
 				audio:2,
-				audioname:['mengyou'],
-			},
-			hmmanyi:{
+				audioname:['mengyou','menghuo','zhurong'],
 				trigger:{target:'useCardToBefore'},
-				forced:true,
-				audio:'manyi',
-				audioname:['mengyou'],
 				filter:function(event,player){
 					return event.card.name=='nanman';
 				},
+				forced:true,
 				content:function(){
 					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card){
+							if(card.name=='nanman') return 'zerotarget';
+						},
+					},
+				},
+				group:'manyi_single',
+				subSkill:{
+					single:{
+						trigger:{
+							player:'enterGame',
+							global:'gameDrawAfter',
+						},
+						filter:function(event,player){
+							return get.mode()=='single'&&_status.mode=='normal';
+						},
+						direct:true,
+						content:function(){
+							player.chooseUseTarget('nanman',get.prompt('manyi'),'视为使用一张【南蛮入侵】').logSkill='manyi';
+						},
+					},
 				},
 			},
 			mansi:{
@@ -12931,8 +12950,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wlcuorui_info_identity:'出牌阶段开始时，你可以弃置一名你至其的距离不大于1的角色区域里的一张牌，然后你选择一项：1.弃置另一名其他角色装备区里至多两张与此牌颜色相同的牌；2.展示另一名其他角色的至多两张手牌，然后获得其中与此牌颜色相同的牌。',
 			wlcuorui_info_guozhan:'出牌阶段开始时，你可以弃置一名你至其的距离不大于1的角色区域里的一张牌，然后你选择一项：1.弃置另一名其他角色装备区里至多两张与此牌颜色相同的牌；2.展示另一名其他角色的至多两张手牌，然后获得其中与此牌颜色相同的牌。',
 			huaman:'花鬘',
-			hmmanyi:'蛮裔',
-			hmmanyi_info:'锁定技，【南蛮入侵】对你无效。',
+			manyi:'蛮裔',
+			manyi_info:'锁定技，【南蛮入侵】对你无效。',
+			manyi_info_single_normal:'锁定技，【南蛮入侵】对你无效。当你登场时，你可以视为使用一张【南蛮入侵】。',
 			mansi_viewas:'蛮嗣',
 			mansi:'蛮嗣',
 			mansi_info:'出牌阶段限一次，你可以将所有手牌当做【南蛮入侵】使用；当有角色受到【南蛮入侵】的伤害后，你摸一张牌。',
