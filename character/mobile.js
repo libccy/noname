@@ -9690,7 +9690,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damage'},
 				forced:true,
 				popup:false,
-				//locked:false,
+				locked:false,
 				audio:'jiuchi',
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&event.getParent(2).jiu==true&&!player.hasSkill('rejiuchi_air');
@@ -15288,7 +15288,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_dongzhuo:'手杀界董卓',
 			re_dongzhuo_prefix:'手杀界',
 			rejiuchi:'酒池',
-			rejiuchi_info:'你可以将一张黑桃手牌当做【酒】使用。锁定技，当你于回合内使用带有【酒】效果的【杀】造成伤害时，你令你的【崩坏】失效直到回合结束。',
+			rejiuchi_info:'你可以将一张黑桃手牌当做【酒】使用。当你于回合内使用带有【酒】效果的【杀】造成伤害时，你令你的〖崩坏〗失效直到回合结束。',
 			furong:'手杀傅肜',
 			furong_prefix:'手杀',
 			xuewei:'血卫',

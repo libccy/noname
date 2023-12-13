@@ -14657,7 +14657,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.5,
 				},
 				trigger:{source:'damageEnd'},
-				locked:true,
+				locked:false,
 				forced:true,
 				filter:function(event,player){
 					if(event.name=='chooseToUse') return player.hasCard(card=>get.suit(card)=='spade','hs');
@@ -15007,7 +15007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_caopi:'界曹丕',
 			re_caopi_prefix:'界',
 			oljiuchi:'酒池',
-			oljiuchi_info:'你可以将一张黑桃手牌当做【酒】使用。锁定技，你使用【酒】无次数限制，且当你于回合内使用带有【酒】效果的【杀】造成伤害后，你令你的〖崩坏〗失效直到回合结束。',
+			oljiuchi_info:'你可以将一张黑桃手牌当做【酒】使用。你使用【酒】无次数限制，且当你于回合内使用带有【酒】效果的【杀】造成伤害后，你令你的〖崩坏〗失效直到回合结束。',
 			repolu:'破虏',
 			repolu_info:'当你杀死一名角色/死亡时，你可以令任意名角色摸X+1张牌。（X为你此前发动过〖破虏〗的次数）',
 			rexingshang:'行殇',
