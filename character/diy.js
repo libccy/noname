@@ -12637,10 +12637,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.getStorage('junktaoluan2').includes(get.suit(card))) return false;
 							if(player.getStorage('junktaoluan').includes(name)) return false;
 							if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
-							if(event.filterCard({name:name,isCard:true,cards:[card]})) return true;
+							if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
 							if(name=='sha'){
 								for(var nature of lib.inpile_nature){
-									if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]})) return true;
+									if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)) return true;
 								}
 							}
 							return false;

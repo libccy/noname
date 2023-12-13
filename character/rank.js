@@ -348,6 +348,8 @@ window.noname_character_rank={
 		'caoyi',
 		'sb_sp_zhugeliang',
 		'sb_zhugeliang',
+		'ol_jianyong',
+		'ol_sb_jiangwei',
 	],
 	am:[
 		'diy_caiwenji',
@@ -1321,6 +1323,8 @@ window.noname_character_rank={
 		'baoxin',
 		'mb_xianglang',
 		'lvboshe',
+		'ol_caozhang',
+		'ol_lingtong',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -2070,8 +2074,12 @@ window.noname_character_rank={
 			'clan_xunyou',
 			'lvboshe',
 			'yj_zhoubuyi',
+			'ol_jianyong',
+			'ol_sb_jiangwei',
 		],
 		rare:[
+			'ol_caozhang',
+			'ol_lingtong',
 			'luoxian',
 			'ol_mengda',
 			'tw_menghuo',

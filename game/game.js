@@ -22385,9 +22385,9 @@ new Promise(resolve=>{
 					next.setContent('swapEquip');
 					return next;
 				}
-				canCompare(target){
+				canCompare(target,goon,bool){
 					if(this==target) return false;
-					if(!this.countCards('h')||!target.countCards('h')) return false;
+					if((!this.countCards('h')&&goon!==true)||(!target.countCards('h')&&bool!==true)) return false;
 					if(this.hasSkillTag('noCompareSource')||target.hasSkillTag('noCompareTarget')) return false;
 					return true;
 				}
@@ -36139,6 +36139,18 @@ new Promise(resolve=>{
 				 * @returns {string}
 				 */
 				getSpan:()=>`${get.prefixSpan('OL')}${get.prefixSpan('界')}`
+			}],
+			['OL谋',{
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('OL')}${get.prefixSpan('谋')}`
+			}],
+			['新杀谋',{
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('新杀')}${get.prefixSpan('谋')}`
 			}]
 		]),
 		groupnature:{

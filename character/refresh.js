@@ -20,8 +20,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		connect:true,
 		character:{
-			ol_jianyong:['male','shu',3,['olqiaoshui','jyzongshi'],['unseen']],
-			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong','unseen']],
 			re_xushu:['male','shu',4,['zhuhai','qianxin']],
 			re_lidian:['male','wei',3,['xunxun','xinwangxi']],
 			re_zhongyao:['male','wei',3,['rehuomo','zuoding'],['clan:颍川钟氏']],
@@ -171,85 +169,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_guohuai:['xiahouyuan','zhanghe'],
 		},
 		skill:{
-			//界简雍
-			olqiaoshui:{
-				audio:2,
-				inherit:'reqiaoshui',
-				filter:function(event,player){
-					return player.countCards('h')>0&&!player.hasSkill('olqiaoshui_used');
-				},
-				content:function(){
-					'step 0'
-					player.chooseToCompare(target);
-					'step 1'
-					if(result.bool) player.addTempSkill('qiaoshui3',{player:'phaseUseAfter'});
-					else{
-						player.addTempSkill('qiaoshui2');
-						player.addTempSkill('olqiaoshui_used');
-					}
-				},
-				subSkill:{
-					used:{
-						charlotte:true,
-						mark:true,
-						marktext:'<span style="text-decoration: line-through;">说</span>',
-						intro:{content:'被迫闭嘴'},
-					},
-				},
-			},
-			//界凌统
-			olxuanfeng:{
-				audio:'xuanfeng',
-				audioname:['boss_lvbu3'],
-				audioname2:{
-					lingtong:'xuanfeng',
-					ol_lingtong:'xuanfeng_re_lingtong',
-				},
-				trigger:{
-					player:['loseAfter'],
-					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
-				},
-				filter:function(event,player){
-					var evt=event.getl(player);
-					return evt&&(evt.es.length||evt.cards2.length>1);
-				},
-				direct:true,
-				content:function(){
-					'step 0'
-					event.count=2;
-					event.logged=false;
-					'step 1'
-					player.chooseTarget(get.prompt('olxuanfeng'),'弃置一名其他角色的一张牌',function(card,player,target){
-						if(player==target) return false;
-						return target.countDiscardableCards(player,'he');
-					}).set('ai',function(target){
-						return -get.attitude(_status.event.player,target);
-					});
-					'step 2'
-					if(result.bool){
-						if(!event.logged){
-							player.logSkill('olxuanfeng',result.targets);
-							event.logged=true;
-						}
-						else player.line(result.targets[0],'green');
-						player.discardPlayerCard(result.targets[0],'he',true);
-						event.count--;
-					}
-					else event.finish();
-					'step 3'
-					if(event.count) event.goto(1);
-				},
-				ai:{
-					effect:{
-						target:function(card,player,target,current){
-							if(get.type(card)=='equip'&&!get.cardtag(card,'gifts')) return [1,3];
-						}
-					},
-					reverseEquip:true,
-					noe:true
-				},
-			},
-			xuanfeng_re_lingtong:{audio:2},
 			ollianhuan:{
 				audio:'xinlianhuan',
 				audioname:['ol_pangtong'],
@@ -13999,19 +13918,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			zhaxiang:{
+				audio:2,
+				audioname:['ol_sb_jiangwei'],
 				trigger:{player:'loseHpEnd'},
 				forced:true,
-				audio:2,
 				content:function(){
-					var num=trigger.num;
-					player.draw(3*num);
-					if(_status.currentPhase==player){
-						if(!player.storage.zhaxiang2) player.storage.zhaxiang2=0;
-						player.storage.zhaxiang2+=num;
-						player.addTempSkill('zhaxiang2',{player:'phaseAfter'});
+					'step 0'
+					event.count=trigger.num;
+					'step 1'
+					event.count--;
+					player.draw(3);
+					if(player.isPhaseUsing()){
+						player.addTempSkill('zhaxiang2');
+						player.addMark('zhaxiang2',1,false);
 					}
-					else{
-						game.trySkillAudio('zhaxiang',player);
+					'step 2'
+					if(event.count>0&&player.hasSkill('zhaxiang')&&!get.is.blocked('zhaxiang',player)){
+						player.logSkill('zhaxiang');
+						event.goto(1);
 					}
 				},
 				ai:{
@@ -14042,15 +13966,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card.name=='sha') return num+player.storage.zhaxiang2;
 					}
 				},
+				charlotte:true,
 				onremove:true,
+				audio:'zhaxiang',
+				audioname:['ol_sb_jiangwei'],
 				trigger:{player:'useCard'},
-				forced:true,
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&get.color(event.card)=='red';
 				},
+				forced:true,
 				content:function(){
 					trigger.directHit.addArray(game.players);
 				},
+				intro:{content:'<li>使用【杀】的次数上限+#<br><li>使用红色【杀】无距离限制且不能被【闪】响应'},
 				ai:{
 					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
@@ -15031,7 +14959,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qianxin_info:'觉醒技，当你造成一次伤害后，若你已受伤，你须减1点体力上限，并获得技能“荐言”。',
 			jianyan_info:'出牌阶段限一次，你可以声明一种牌的类别或颜色，并亮出牌库中第一张符合你声明的牌，然后你令一名男性角色获得此牌。',
 			rekurou_info:'出牌阶段限一次，你可以弃置一张牌，然后失去1点体力。',
-			zhaxiang_info:'锁定技，每当你失去1点体力后，你摸三张牌。然后若此时是你的出牌阶段，则直到回合结束，你使用红色【杀】无距离限制且不能被【闪】响应，你可以额外使用一张【杀】。',
+			zhaxiang_info:'锁定技。当你失去1点体力后，你摸三张牌。然后若此时是你的出牌阶段，则你本回合获得此下效果：使用【杀】的次数上限+1，使用红色【杀】无距离限制且不能被【闪】响应。',
 			qiaomeng_info:'当你使用黑色【杀】对一名角色造成伤害后，你可以弃置该角色装备区里的一张牌，若此牌是坐骑牌，你于此牌置入弃牌堆后获得之。',
 			reyicong_info:'锁定技，你计算与其他角色的距离时-1。若你的体力值不大于2，则其他角色计算与你的距离时+1。',
 			refankui_info:'每当你受到1点伤害后，你可以获得伤害来源的一张牌。',
@@ -15635,10 +15563,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoren_prefix:'界',
 			ollianhuan:'连环',
 			ollianhuan_info:'你可以将一张♣牌当【铁索连环】使用或重铸。你使用【铁索连环】选择目标后，可以给此牌增加一个目标。',
-			ol_lingtong:'OL界凌统',
-			ol_lingtong_prefix:'OL界',
-			olxuanfeng:'旋风',
-			olxuanfeng_info:'当你一次性失去至少两张牌后，或失去装备区的牌后，你可以依次弃置一至两名其他角色的共计两张牌。',
 			re_lidian:'界李典',
 			gz_re_lidian:'李典',
 			re_lidian_prefix:'界',
@@ -15648,6 +15572,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_jianyong_prefix:'OL界',
 			olqiaoshui:'巧说',
 			olqiaoshui_info:'出牌阶段，你可与一名其他角色拼点。若你赢，你使用的下一张基本牌或普通锦囊牌可以额外指定任意一名其他角色为目标或减少指定一个目标；若你没赢，此技能于本回合失效且本回合你不能使用锦囊牌。',
+			ol_caozhang:'OL界曹彰',
+			ol_caozhang_prefix:'OL界',
+			oljiangchi:'将驰',
+			oljiangchi_info:'摸牌阶段结束时，你可以选择一项：①摸一张牌，本回合使用【杀】的次数上限-1，且【杀】不计入手牌上限。②重铸一张牌，本回合使用【杀】无距离限制，且使用【杀】的次数上限+1。',
 			
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

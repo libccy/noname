@@ -150,12 +150,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else lib.character[i][1]='qun';
 						}
 					}
-					lib.characterReplace={};
+					//lib.characterReplace={};
 				},_status.mode,_status.separatism);
 				game.randomMapOL();
 			}
 			else{
-				lib.characterReplace={};
+				//lib.characterReplace={};
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].node.name.hide();
 					game.players[i].node.name2.hide();

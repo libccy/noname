@@ -4222,7 +4222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					player.chooseToDiscard(get.prompt('jsrgjuelie',trigger.target),'当你使用【杀】指定一名角色为目标后，你可以弃置任意张牌，然后弃置其等量的牌，然后若你的手牌数或体力值最小，此【杀】对其的伤害基数+1。',[1,Infinity],'he').set('ai',card=>{
+					player.chooseToDiscard(get.prompt('jsrgjuelie',trigger.target),'当你使用【杀】指定一名角色为目标后，你可以弃置任意张牌，然后弃置其等量的牌',[1,Infinity],'he').set('ai',card=>{
 						if(ui.selected.cards.length>=_status.event.max) return 0;
 						if(_status.event.goon) return 4.5-get.value(card);
 						return 0;
@@ -4232,6 +4232,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var num=result.cards.length;
 						if(trigger.target.countDiscardableCards(player,'he')) player.discardPlayerCard('平讨：弃置'+get.translation(trigger.target)+get.cnNumber(num)+'张牌',num,'he',trigger.target,true);
 					}
+					/*
 					else event.finish();
 					'step 2'
 					if(player.isMinHandcard()||player.isMinHp()){
@@ -4243,6 +4244,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						map[id].extraDamage++;
 					}
+					*/
 				},
 				shaRelated:true,
 				ai:{
@@ -4254,6 +4256,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return card&&get.value(card)>0&&player.hasCard(cardx=>{
 							return lib.filter.cardDiscardable(cardx,player,'jsrgjuelie_discard')&&get.value(cardx)<5;
 						});
+					},
+				},
+				group:'jsrgjuelie_pojun',
+				subSkill:{
+					pojun:{
+						trigger:{source:'damageBegin1'},
+						filter:function(event,player){
+							if(!player.isMinHandcard()&&!player.isMinHp()) return false;
+							return event.getParent().name=='sha';
+						},
+						forced:true,
+						locked:false,
+						logTarget:'player',
+						content:function(){
+							trigger.num++;
+						},
 					},
 				},
 			},
@@ -5714,14 +5732,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				forced:true,
 				trigger:{
-					player:'enterGame',
-					global:'phaseBefore',
+					//player:'enterGame',
+					//global:'phaseBefore',
+					global:'roundStart',
 				},
 				filter:function(event,player){
 					if(game.hasPlayer(function(current){
 						return current.countCards('hej','taipingyaoshu');
 					})) return false;
-					return event.name!='phase'||game.phaseNumber==0;
+					return true;
+					//return event.name!='phase'||game.phaseNumber==0;
 				},
 				direct:true,
 				group:'jsrgshoushu_destroy',
@@ -5973,7 +5993,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgpingtao:'平讨',
 			jsrgpingtao_info:'出牌阶段限一次。你可以令一名其他角色选择一项：1.交给你一张牌，然后你于此回合使用【杀】的次数上限+1；2.令你视为对其使用一张【杀】。',
 			jsrgjuelie:'绝烈',
-			jsrgjuelie_info:'当你使用【杀】指定一名角色为目标后，你可以弃置任意张牌并弃置其等量的牌，然后若你的手牌数或体力值最小，此【杀】对其的伤害基数+1。',
+			jsrgjuelie_info:'①当你使用【杀】指定一名角色为目标后，你可以弃置任意张牌并弃置其等量的牌。②若你的手牌数或体力值为全场最小，则你使用【杀】造成的伤害+1。',
 			jsrg_huangfusong:'起皇甫嵩',
 			jsrg_huangfusong_prefix:'起',
 			jsrgguanhuo:'观火',
@@ -6048,7 +6068,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_nanhualaoxian:'起南华老仙',
 			jsrg_nanhualaoxian_prefix:'起',
 			jsrgshoushu:'授术',
-			jsrgshoushu_info:'锁定技。①游戏开始时，若场上没有【太平要术】，你可以从游戏外将【太平要术】置于一名角色的装备区内。②当【太平要术】离开一名角色的装备区后，你令此牌销毁。',
+			jsrgshoushu_info:'锁定技。①一轮游戏开始时，若场上没有【太平要术】，你可以从游戏外将【太平要术】置于一名角色的装备区内。②当【太平要术】离开一名角色的装备区后，你令此牌销毁。',
 			jsrgxundao:'寻道',
 			jsrgxundao_info:'当你的判定牌生效前，你可以令至多两名角色依次弃置一张牌，然后你选择一张以此法弃置且位于弃牌堆中的牌代替此判定牌。',
 			jsrglinghua:'灵化',
