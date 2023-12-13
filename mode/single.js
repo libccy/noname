@@ -143,6 +143,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		},
 		start:function(){
 			"step 0"
+			_status.mode=_status.connectMode?lib.configOL.single_mode:get.config('single_mode');
 			var playback=localStorage.getItem(lib.configprefix+'playback');
 			if(playback){
 				ui.create.me();
@@ -172,7 +173,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			}
 			"step 2"
-			_status.mode=_status.connectMode?lib.configOL.single_mode:get.config('single_mode');
 			if(_status.mode=='normal'){
 				lib.card.list=lib.singlePile.slice(0);
 				game.fixedPile=true;
