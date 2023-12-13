@@ -24552,6 +24552,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delayx();
 					}
 				},
+				ai:{
+					threaten:3,
+				},
 				hasMark:(mark,player,target)=>{
 					if(!target) return player.getStorage('jianjie_'+mark).length>0;
 					return target.getStorage('jianjie_'+mark).contains(player);
@@ -24625,17 +24628,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 							},
 							expose:0.4,
-							threaten:3,
 						},
 					},
 					die:{
 						audio:'xinfu_jianjie',
 						trigger:{global:'die'},
-						forced:true,
 						filter:function(event,player){
 							const skill=lib.skill.jianjie;
 							return skill.hasMark('huoji',player,event.player)||skill.hasMark('lianhuan',player,event.player);
 						},
+						forced:true,
+						logTarget:'player',
 						content:function(){
 							'step 0'
 							if(lib.skill.jianjie.hasMark('huoji',player,trigger.player)){
@@ -24643,7 +24646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return get.attitude(get.player(),target);
 								});
 							}
-							else event.goto(3);
+							else event.goto(2);
 							'step 1'
 							if(result.bool){
 								var target=result.targets[0];
@@ -24668,7 +24671,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								game.delayx();
 							}
 						},
-						logTarget:'player',
 					},
 					huoji:{
 						marktext:'龙',
