@@ -31258,6 +31258,7 @@ new Promise(resolve=>{
 				}
 			},
 			GameEvent:class{
+				/** @type { Promise<GameEvent> & GameEvent & GameEventPromise } */
 				#promise;
 				/**
 				 * @param {string} [name]
@@ -31279,24 +31280,24 @@ new Promise(resolve=>{
 					 * @type {GameEvent[]}
 					 */
 					this.next=[];
-					Object.defineProperty(this.next,'remove',{
-						enumerable:false,
-						value:function(){
-							for(const item of arguments){
-								let pos=-1;
-								if (typeof item=='number'&&isNaN(item)){
-									pos=this.findIndex(v=>isNaN(v))
-								}else if(item instanceof lib.element.GameEventPromise){
-									pos=this.indexOf(item.toEvent());
-								}else{
-									pos=this.indexOf(item);
-								}
-								if(pos==-1) continue;
-								this.splice(pos,1);
-							}
-							return this;
-						}
-					});
+					// Object.defineProperty(this.next,'remove',{
+					// 	enumerable:false,
+					// 	value:function(){
+					// 		for(const item of arguments){
+					// 			let pos=-1;
+					// 			if (typeof item=='number'&&isNaN(item)){
+					// 				pos=this.findIndex(v=>isNaN(v))
+					// 			}else if(item instanceof lib.element.GameEventPromise){
+					// 				pos=this.indexOf(item.toEvent());
+					// 			}else{
+					// 				pos=this.indexOf(item);
+					// 			}
+					// 			if(pos==-1) continue;
+					// 			this.splice(pos,1);
+					// 		}
+					// 		return this;
+					// 	}
+					// });
 					/**
 					 * @type {GameEvent[]}
 					 */
@@ -31643,18 +31644,18 @@ new Promise(resolve=>{
 					return this._rand;
 				}
 				insert(content,map){
-					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
+					const next=(new lib.element.GameEvent(`${this.name}Inserted`,false)).toPromise();
 					this.next.push(next);
 					next.setContent(content);
 					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
-					return next.toPromise();
+					return next;
 				}
 				insertAfter(content,map){
-					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
+					const next=(new lib.element.GameEvent(`${this.name}Inserted`,false)).toPromise();
 					this.after.push(next);
 					next.setContent(content);
 					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
-					return next.toPromise();
+					return next;
 				}
 				backup(skill){
 					this._backup={
@@ -32157,20 +32158,25 @@ new Promise(resolve=>{
 						event.async=true;
 						// 事件结束后触发resolve
 						event.resolve=resolve;
-						// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
-						// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
-						if(_status.event&&_status.event.next.includes(event)&&_status.event.content instanceof AsyncFunction){
-							if (_status.event!=event) {
-								event.parent=_status.event;
-								_status.event=event;
-								game.getGlobalHistory('everything').push(event);
+						if(!_status.event) return;
+						// game.createEvent的时候还没立即push到next里
+						Promise.resolve().then(()=>{
+							const eventPromise=_status.event.next.find(e=>e.toEvent()==event);
+							// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
+							// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
+							if(eventPromise&&_status.event.content instanceof AsyncFunction){
+								if(_status.event!=eventPromise){
+									eventPromise.parent=_status.event;
+									_status.event=eventPromise;
+									game.getGlobalHistory('everything').push(eventPromise);
+								}
+								// 异步执行game.loop
+								// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
+								// 再执行game.loop是因为原有的game.loop被await卡住了，
+								// 得新执行一个只执行这个异步事件的game.loop
+								Promise.resolve().then(()=>game.loop(eventPromise));
 							}
-							// 异步执行game.loop
-							// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
-							// 再执行game.loop是因为原有的game.loop被await卡住了，
-							// 得新执行一个只执行这个异步事件的game.loop
-							Promise.resolve().then(()=>game.loop(event));
-						}
+						});
 					});
 					this.#event=event;
 					return new Proxy(this,{
@@ -32183,11 +32189,6 @@ new Promise(resolve=>{
 								return thisValue;
 							}
 							const eventValue=Reflect.get(event,prop);
-							// 返回值如果是event，则修改为GameEventPromise类实例
-							if(typeof eventValue=='function') return (function(...args){
-								const returnValue=eventValue.call(event,...args);
-								return returnValue==event?receiver:returnValue;
-							}).bind(event);
 							return eventValue==event?receiver:eventValue;
 						},
 						set(target,prop,newValue){
@@ -40365,9 +40366,9 @@ new Promise(resolve=>{
 		 * @legacy Use {@link lib.element.GameEvent.constructor} instead.
 		 */
 		createEvent:(name,trigger,triggerEvent)=>{
-			const next=new lib.element.GameEvent(name,trigger);
+			const next=(new lib.element.GameEvent(name,trigger)).toPromise();
 			(triggerEvent||_status.event).next.push(next);
-			return next.toPromise();
+			return next;
 		},
 		addCharacter:(name,information)=>{
 			const extensionName=_status.extension||information.extension,character=[
@@ -41410,7 +41411,7 @@ new Promise(resolve=>{
 			}
 		},
 		/**
-		 * @param { GameEvent } [belongAsyncEvent]
+		 * @param { Promise<GameEvent> & GameEvent & GameEventPromise } [belongAsyncEvent]
 		 */
 		async loop(belongAsyncEvent){
 			if(belongAsyncEvent){
@@ -41424,7 +41425,7 @@ new Promise(resolve=>{
 				const _resolve = () => {
 					if (event.async) {
 						if (typeof event.resolve == 'function') {
-							event.resolve(event);
+							event.resolve(event.toEvent());
 						} else {
 							throw new TypeError('异步事件的event.resolve未赋值，使用await时将会被永久等待');
 						}
