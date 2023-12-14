@@ -16050,6 +16050,139 @@ new Promise(resolve=>{
 						game.stopCountChoose();
 					}
 				},
+				chooseToGive:function(){
+					"step 0"
+					event.result={
+						bool:true,
+						confirm:'ok',
+						buttons:[],
+						links:[],
+						cards:[],
+						targets:[],
+					}
+					event.filterCard=(event=>{
+						const filterCard=event.filterCard;
+						return function(card,player){
+							if(!lib.filter.canBeGained(card,this.target,player)) return false;
+							return filterCard.call(this,card,player);
+						}
+					})(event);
+					if(event.directresult){
+						event.result.cards=event.directresult.slice(0);
+						event.goto(2);
+						return;
+					}
+					const directFilter=(event.forced&&typeof event.filterOk!='function'&&typeof event.selectCard!='function'&&!event.complexCard);
+					const cards=directFilter?player.getCards(event.position).filter(card=>!card.classList.contains('uncheck')&&lib.filter.cardAiIncluded(card)&&event.filterCard(card,player)):[];
+					const range=get.select(event.selectCard);
+					if(directFilter&&(range[0]>=cards.length||range[1]<=-1)){
+						if(player.isOut()) event.result.cards=[];
+						else event.result.cards=cards;
+					}
+					else if(event.isMine()){
+						game.check();
+						if(event.hsskill&&!event.forced&&_status.prehidden_skills.contains(event.hsskill)){
+							ui.click.cancel();
+							return;
+						}
+						game.pause();
+						if(range[1]>1&&typeof event.selectCard!='function'){
+							event.aiChoose=ui.create.control('AI代选',function(){
+								ai.basic.chooseCard(event.ai);
+								if(_status.event.custom&&_status.event.custom.add.card){
+									_status.event.custom.add.card();
+								}
+								ui.selected.cards.forEach(i=>i.updateTransform(true));
+							});
+						}
+						if(Array.isArray(event.dialog)){
+							event.dialog=ui.create.dialog.apply(this,event.dialog);
+							event.dialog.open();
+							event.dialog.classList.add('noselect');
+						}
+						else if(event.prompt!=false){
+							let prompt;
+							if(typeof event.prompt =='string') prompt=event.prompt;
+							else{
+								let select;
+								if(range[0]==range[1]) select=get.cnNumber(range[0]);
+								else if(range[1]==Infinity) select='至少'+get.cnNumber(range[0]);
+								else select=get.cnNumber(range[0])+'至'+get.cnNumber(range[1]);
+								const position=event.position=='h'?'手':event.position=='e'?'装备':'';
+								prompt=`请交给${get.translation(target)}${select}张${position}牌`;
+							}
+							event.dialog=ui.create.dialog(prompt);
+							if(event.prompt2){
+								event.dialog.addText(event.prompt2,event.prompt2.length<=20);
+							}
+							if(Array.isArray(event.promptx)){
+								event.promptx.forEach(i=>event.dialog.add(i));
+							}
+							if(Array.isArray(event.selectCard)){
+								event.promptbar=event.dialog.add('0/'+get.numStr(event.selectCard[1],'card'));
+								event.custom.add.card=function(){
+									_status.event.promptbar.innerHTML=
+									ui.selected.cards.length+'/'+get.numStr(_status.event.selectCard[1],'card');
+								}
+							}
+						}
+						else if(get.itemtype(event.dialog)=='dialog'){
+							event.dialog.style.display='';
+							event.dialog.open();
+						}
+					}
+					else if(event.isOnline()){
+						event.send();
+					}
+					else{
+						event.result='ai';
+					}
+					"step 1"
+					if(event.result=='ai'){
+						game.check();
+						if((ai.basic.chooseCard(event.ai)||forced)&&(!event.filterOk||event.filterOk())){
+							ui.click.ok();
+						}
+						else if(event.skill){
+							ui.click.cancel();
+							event._aiexclude.add(event.skill);
+							event.redo();
+							game.resume();
+						}
+						else{
+							ui.click.cancel();
+						}
+					}
+					"step 2"
+					event.resume();
+					if(event.aiChoose) event.aiChoose.close();
+					if(event.glow_result&&event.result.cards&&!event.directresult){
+						event.result.cards.forEach(i=>i.classList.add('glow'));
+					}
+					if(event.dialog) event.dialog.close();
+					"step 3"
+					if(event.result.bool&&event.result.cards&&!game.online){
+						event.cards=event.result.cards.slice(0);
+						if(event.logSkill){
+							if(Array.isArray(event.logSkill)) player.logSkill(...event.logSkill);
+							else player.logSkill(event.logSkill);
+						}
+						if(event.autodelay&&!event.isMine()){
+							if(typeof event.autodelay=='number') game.delayx(event.autodelay);
+							else game.delayx();
+						}
+					}
+					else event.finish();
+					"step 4"
+					if(event.boolline) player.line(target,'green');
+					event.done=target.gain(event.cards,player);
+					event.done.giver=player;
+					if(event.delay!==false) event.done.animate=event.visibleMove?'give':'giveAuto';
+					else{
+						target[event.visibleMove?'$give':'$giveAuto'](cards,player);
+						if(event.visibleMove) event.done.visible=true;
+					}
+				},
 				chooseToDiscard:function(){
 					"step 0"
 					if(event.autochoose()){
@@ -24292,6 +24425,53 @@ new Promise(resolve=>{
 					if(next.ai2==undefined) next.ai2=(()=>1);
 					next.setContent('chooseToRespond');
 					next._args=Array.from(arguments);
+					return next;
+				}
+				chooseToGive(...args){
+					const next=game.createEvent('chooseToGive');
+					next.player=this;
+					if(args.length==1&&get.is.object(args[0])){
+						for(const i in args[0]) next[i]=args[0][i];
+					}
+					else for(const arg of args){
+						if(get.itemtype(arg)=='player'){
+							next.target=arg;
+						}
+						else if(typeof arg=='number'){
+							next.selectCard=[arg,arg];
+						}
+						else if(get.itemtype(arg)=='select'){
+							next.selectCard=arg;
+						}
+						else if(get.itemtype(arg)=='dialog'){
+							next.dialog=arg;
+							next.prompt=false;
+						}
+						else if(typeof arg=='boolean'){
+							next.forced=arg;
+						}
+						else if(get.itemtype(arg)=='position'){
+							next.position=arg;
+						}
+						else if(typeof arg=='function'){
+							if(next.filterCard) next.ai=arg;
+							else next.filterCard=arg;
+						}
+						else if(typeof arg=='object'&&arg){
+							next.filterCard=get.filter(arg);
+						}
+						else if(typeof arg=='string'){
+							get.evtprompt(next,arg);
+						}
+						if(arg===null) console.log(args);
+					}
+					if(next.isMine()==false&&next.dialog) next.dialog.style.display='none';
+					if(next.filterCard==undefined) next.filterCard=lib.filter.all;
+					if(next.selectCard==undefined) next.selectCard=[1,1];
+					if(next.position==undefined) next.position='h';
+					if(next.ai==undefined) next.ai=get.unuseful;
+					next.setContent('chooseToGive');
+					next._args=args;
 					return next;
 				}
 				chooseToDiscard(){
