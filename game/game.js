@@ -37688,12 +37688,42 @@ new Promise(resolve=>{
 		
 				let audioInfo=info.audio;
 				if(info.audioname2){
-					if(info.audioname2[player.name]) audioInfo=info.audioname2[player.name];
-					else if(info.audioname2[player.name1]) audioInfo=info.audioname2[player.name1];
-					else if(info.audioname2[player.name2]) audioInfo=info.audioname2[player.name2];
-					else if(player.tempname){
-						const name=player.tempname.find(i=>info.audioname2[i]);
-						if(name) audioInfo=info.audioname2[name];
+					if(player.name&&info.audioname2[player.name]) audioInfo=info.audioname2[player.name];
+					else if(player.name1&&info.audioname2[player.name1]) audioInfo=info.audioname2[player.name1];
+					else if(player.name2&&info.audioname2[player.name2]) audioInfo=info.audioname2[player.name2];
+					else{
+						var stop=false;
+						if(player.tempname){
+							const name=player.tempname.find(i=>info.audioname2[i]);
+							if(name){
+								stop=true;
+								audioInfo=info.audioname2[name];
+							}
+						}
+						if(!stop&&player.name&&get.characterSpecial(player.name).some(tag=>tag.startsWith('tempname:'))){
+							const list=get.characterSpecial(player.name).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+							const name=list.find(i=>info.audioname2[i]);
+							if(name){
+								stop=true;
+								audioInfo=info.audioname2[name];
+							}
+						}
+						if(!stop&&player.name1&&get.characterSpecial(player.name1).some(tag=>tag.startsWith('tempname:'))){
+							const list=get.characterSpecial(player.name1).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+							const name=list.find(i=>info.audioname2[i]);
+							if(name){
+								stop=true;
+								audioInfo=info.audioname2[name];
+							}
+						}
+						if(!stop&&player.name2&&get.characterSpecial(player.name2).some(tag=>tag.startsWith('tempname:'))){
+							const list=get.characterSpecial(player.name2).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+							const name=list.find(i=>info.audioname2[i]);
+							if(name){
+								stop=true;
+								audioInfo=info.audioname2[name];
+							}
+						}
 					}
 				}
 				if(typeof audioInfo=='function') audioInfo=audioInfo(player);
@@ -37739,9 +37769,39 @@ new Promise(resolve=>{
 					if(audioname.includes(player.name)) _audioname=`_${player.name}`;
 					else if(audioname.includes(player.name1)) _audioname=`_${player.name1}`;
 					else if(audioname.includes(player.name2)) _audioname=`_${player.name2}`;
-					else if(player.tempname){
-						const name=player.tempname.find(i=>audioname.includes(i));
-						if(name) _audioname=`_${name}`;
+					else{
+						var stop=false;
+						if(player.tempname){
+							const name=player.tempname.find(i=>audioname.includes(i));
+							if(name){
+								stop=true;
+								_audioname=`_${name}`;
+							}
+						}
+						if(!stop&&player.name&&get.characterSpecial(player.name).some(tag=>tag.startsWith('tempname:'))){
+							const list=get.characterSpecial(player.name).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+							const name=list.find(i=>audioname.includes(i));
+							if(name){
+								stop=true;
+								_audioname=`_${name}`;
+							}
+						}
+						if(!stop&&player.name1&&get.characterSpecial(player.name1).some(tag=>tag.startsWith('tempname:'))){
+							const list=get.characterSpecial(player.name1).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+							const name=list.find(i=>audioname.includes(i));
+							if(name){
+								stop=true;
+								_audioname=`_${name}`;
+							}
+						}
+						if(!stop&&player.name2&&get.characterSpecial(player.name2).some(tag=>tag.startsWith('tempname:'))){
+							const list=get.characterSpecial(player.name2).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+							const name=list.find(i=>audioname.includes(i));
+							if(name){
+								stop=true;
+								_audioname=`_${name}`;
+							}
+						}
 					}
 		
 					list=list.slice(1);//[路径,number/true,格式]
@@ -57560,9 +57620,19 @@ new Promise(resolve=>{
 						// 有bug，先用旧版
 						if(lib.config.background_speak&&e!=='init'){
 							var audioname=this.link;
-							if(info.audioname2&&info.audioname2[playername]){
-								audioname=info.audioname2[playername];
-								info=lib.skill[audioname];
+							if(info.audioname2){
+								if(info.audioname2[playername]){
+									audioname=info.audioname2[playername];
+									info=lib.skill[audioname];
+								}
+								else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
+									const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+									const name=list.find(i=>info.audioname2[i]);
+									if(name){
+										audioname=info.audioname2[name];
+										info=lib.skill[audioname];
+									}
+								}
 							}
 							var audioinfo=info.audio;
 							var that=this;
@@ -57604,7 +57674,14 @@ new Promise(resolve=>{
 								audioinfo=audioinfo[1];
 							}
 							if(typeof audioinfo=='number'){
-								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								if(Array.isArray(info.audioname)){
+									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
+									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
+										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+										const name=list.find(i=>info.audioname.includes(i));
+										if(name) audioname=audioname+'_'+name;
+									}
+								}
 								game.playAudio('skill',audioname+getIndex(audioinfo));
 							}
 							else if(typeof audioinfo=="object"&&"type" in audioinfo&&audioinfo.type=="direct"&&"files" in audioinfo){
@@ -57618,16 +57695,31 @@ new Promise(resolve=>{
 								}
 							}
 							else if(audioinfo){
-								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								if(Array.isArray(info.audioname)){
+									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
+									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
+										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+										const name=list.find(i=>info.audioname.includes(i));
+										if(name) audioname=audioname+'_'+name;
+									}
+								}
 								game.playAudio('skill',audioname);
 							}
 							else if(true&&info.audio!==false){
-								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								if(Array.isArray(info.audioname)){
+									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
+									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
+										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+										const name=list.find(i=>info.audioname.includes(i));
+										if(name) audioname=audioname+'_'+name;
+									}
+								}
 								game.playSkillAudio(audioname,getIndex(2));
 							}
 						}
 					}
-				}else{
+				}
+				else{
 					// 样式一
 					const introduction=ui.create.div('.characterintro',uiintro),showCharacterNamePinyin=lib.config.show_characternamepinyin;
 					if(showCharacterNamePinyin!='doNotShow'){
@@ -57831,9 +57923,19 @@ new Promise(resolve=>{
 						// 有bug，先用旧版
 						if(lib.config.background_speak&&e!=='init'){
 							var audioname=this.link;
-							if(info.audioname2&&info.audioname2[playername]){
-								audioname=info.audioname2[playername];
-								info=lib.skill[audioname];
+							if(info.audioname2){
+								if(info.audioname2[playername]){
+									audioname=info.audioname2[playername];
+									info=lib.skill[audioname];
+								}
+								else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
+									const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+									const name=list.find(i=>info.audioname2[i]);
+									if(name){
+										audioname=info.audioname2[name];
+										info=lib.skill[audioname];
+									}
+								}
 							}
 							var audioinfo=info.audio;
 							var that=this;
@@ -57875,7 +57977,14 @@ new Promise(resolve=>{
 								audioinfo=audioinfo[1];
 							}
 							if(typeof audioinfo=='number'){
-								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								if(Array.isArray(info.audioname)){
+									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
+									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
+										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+										const name=list.find(i=>info.audioname.includes(i));
+										if(name) audioname=audioname+'_'+name;
+									}
+								}
 								game.playAudio('skill',audioname+getIndex(audioinfo));
 							}
 							else if(typeof audioinfo=="object"&&"type" in audioinfo&&audioinfo.type=="direct"&&"files" in audioinfo){
@@ -57889,11 +57998,25 @@ new Promise(resolve=>{
 								}
 							}
 							else if(audioinfo){
-								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								if(Array.isArray(info.audioname)){
+									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
+									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
+										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+										const name=list.find(i=>info.audioname.includes(i));
+										if(name) audioname=audioname+'_'+name;
+									}
+								}
 								game.playAudio('skill',audioname);
 							}
 							else if(true&&info.audio!==false){
-								if(Array.isArray(info.audioname)&&info.audioname.contains(playername)) audioname=audioname+'_'+playername;
+								if(Array.isArray(info.audioname)){
+									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
+									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
+										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
+										const name=list.find(i=>info.audioname.includes(i));
+										if(name) audioname=audioname+'_'+name;
+									}
+								}
 								game.playSkillAudio(audioname,getIndex(2));
 							}
 						}
@@ -59786,6 +59909,11 @@ new Promise(resolve=>{
 			}
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
 			return '暂无武将介绍';
+		},
+		characterSpecial:name=>{
+			const character=get.character(name);
+			if(!character) return [];
+			return character[4]||[];
 		},
 		bordergroup:(info,raw)=>{
 			if(!Array.isArray(info)){
