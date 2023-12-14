@@ -272,6 +272,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.cardNameLength(event.card)==player.getHistory('useCard').indexOf(event.getParent())+1;
 				},
 				direct:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					var num=get.cardNameLength(trigger.card);

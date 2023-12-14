@@ -5,7 +5,7 @@ import { selected } from "./ui/selected.js";
 class HTMLWindowElement extends HTMLDivElement {
 }
 
-customElements.define("window", HTMLWindowElement, {
+customElements.define("noname-window", HTMLWindowElement, {
 	extends: "div"
 });
 

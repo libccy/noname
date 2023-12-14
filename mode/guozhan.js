@@ -150,12 +150,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else lib.character[i][1]='qun';
 						}
 					}
-					lib.characterReplace={};
+					//lib.characterReplace={};
 				},_status.mode,_status.separatism);
 				game.randomMapOL();
 			}
 			else{
-				lib.characterReplace={};
+				//lib.characterReplace={};
 				for(var i=0;i<game.players.length;i++){
 					game.players[i].node.name.hide();
 					game.players[i].node.name2.hide();
@@ -9080,6 +9080,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
+				locked:false,
 				audio:"duanliang1",
 				enable:"chooseToUse",
 				filterCard:function(card){
@@ -9738,6 +9739,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return player.hp<=1;
 				},
 				forced:true,
+				locked:false,
 				//priority:3,
 				content:function(){
 					player.addTempSkill('baka_yingzi','phaseAfter');
@@ -10878,6 +10880,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				unique:true,
 				forceunique:true,
 				lordSkill:true,
+				locked:false,
 				audio:2,
 				derivation:'yuanjiangfenghuotu',
 				mark:true,

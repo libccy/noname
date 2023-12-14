@@ -457,6 +457,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.hasNature();
 				},
 				forced:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					if(event.triggername=='damageBegin2'){
@@ -1380,6 +1381,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if (get.tag(card, 'damage') > 0 && target.storage.twchongwangx.contains(player)) return false;
 					},
 				},
+				locked:false,
 				unique: true,
 				onremove: true,
 				global: 'twchongwang_global',
@@ -3558,6 +3560,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				group:['twmibei_mark','twmibei_fail'],
 				forced:true,
+				locked:false,
 				direct:true,
 				dutySkill:true,
 				derivation:'twmouli',
@@ -7659,6 +7662,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return targets.length>=2;
 				},
 				forced:true,
+				locked:false,
 				dutySkill:true,
 				skillAnimation:true,
 				animationColor:'wood',
@@ -8586,14 +8590,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!event.isFirstTarget||!get.tag(event.card,'damage')) return false;
 					return !player.hasSkillTag('noCompareSource')&&game.hasPlayer(target=>{
-						return target!=player&&target.countCards('h')>0&&!target.hasSkillTag('noCompareTarget');
+						return player.canCompare(target,true);
 					});
 				},
 				direct:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('twzhenhu'),[1,3],function(card,player,target){
-						return target!=player&&target.countCards('h')>0&&!target.hasSkillTag('noCompareTarget');
+						return player.canCompare(target,true);
 					}).set('ai',function(target){
 						var player=_status.event.player,targets=_status.event.getTrigger().targets;
 						var num=0;
@@ -14584,7 +14588,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		dynamicTranslate:{
 			twfeifu:function(player){
-				var str='转换技。';
+				var str='锁定技，转换技。';
 				if(!player.storage.twfeifu) str+='<span class="bluetext">';
 				str+='阴：当你成为【杀】的唯一目标后；';
 				if(!player.storage.twfeifu) str+='</span>';

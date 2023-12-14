@@ -13082,6 +13082,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			spweiwu:{
 				audio:2,
+				locked:false,
 				enable:'phaseUse',
 				usable:1,
 				viewAs:{
@@ -19976,7 +19977,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(result.bool){
-						var ideitity=result.links[0];
+						var identity=result.links[0];
 						player.addSkill(identity);
 						player.markSkill('fenxin');
 					}
@@ -21110,6 +21111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			kunfen:{
 				audio:2,
+				audioname:['ol_sb_jiangwei'],
 				trigger:{player:'phaseJieshuBegin'},
 				locked:function(skill,player){
 					if(!player||!player.storage.kunfen) return true;

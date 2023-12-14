@@ -1260,7 +1260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spxizhan:{
 				audio:4,
 				group:'spxizhan_effect',
-				locked:true,
+				locked:false,
 				subSkill:{
 					spfangzong:{charlotte:true},
 					effect:{
@@ -2134,7 +2134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rechuhai:{
 				audio:'chuhai',
 				dutySkill:true,
-				locked:true,
+				locked:false,
 				group:['rechuhai_add','rechuhai_achieve','rechuhai_fail','rechuhai_chuhai'],
 				derivation:'zhangming',
 				subSkill:{
@@ -2276,11 +2276,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return !player.hasSkillTag('noCompareSource');
+					return game.hasPlayer(target=>player.canCompare(target,true));
 				},
 				filterTarget:function(card,player,target){
-					return target!=player&&target.countCards('h')>0&&
-					!target.hasSkillTag('noCompareTarget');
+					return player.canCompare(target,true);
 				},
 				content:function(){
 					'step 0'
@@ -2715,6 +2714,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				dutySkill:true,
 				forced:true,
+				locked:false,
 				direct:true,
 				filter:function(event,player){
 					if(!player.storage.xingqi||!player.storage.xingqi.length) return false;
@@ -3151,7 +3151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingyu:{
 				audio:3,
 				dutySkill:true,
-				locked:true,
+				locked:false,
 				group:['qingyu_achieve','qingyu_fail','qingyu_defend'],
 				subSkill:{
 					defend:{

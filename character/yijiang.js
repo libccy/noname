@@ -44,7 +44,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuran:['male','wu',4,['danshou']],
 			xusheng:['male','wu',4,['xinpojun']],
 			wuguotai:['female','wu',3,['ganlu','buyi']],
-			lingtong:['male','wu',4,['olxuanfeng']],
+			lingtong:['male','wu',4,['xuanfeng']],
 			liubiao:['male','qun',3,['rezishou','zongshi']],
 			yufan:['male','wu',3,['zhiyan','zongxuan']],
 			chengong:['male','qun',3,['mingce','zhichi']],
@@ -2681,10 +2681,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.hasSkill('xintaoluan3')&&player.countCards('hes',card=>lib.inpile.some(name=>{
 						if(player.getStorage('xintaoluan').includes(name)) return false;
 						if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
-						if(event.filterCard({name:name,isCard:true,cards:[card]})) return true;
+						if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
 						if(name=='sha'){
 							for(var nature of lib.inpile_nature){
-								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]})) return true;
+								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)) return true;
 							}
 						}
 						return false;
@@ -5263,10 +5263,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.hasSkill('taoluan3')&&player.countCards('hes',card=>lib.inpile.some(name=>{
 						if(player.getStorage('taoluan').includes(name)) return false;
 						if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
-						if(event.filterCard({name:name,isCard:true,cards:[card]})) return true;
+						if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
 						if(name=='sha'){
 							for(var nature of lib.inpile_nature){
-								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]})) return true;
+								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)) return true;
 							}
 						}
 						return false;
@@ -11807,6 +11807,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			miji:{
 				audio:2,
 				audioname:['re_wangyi'],
+				locked:false,
 				mod:{
 					aiOrder:function(player,card,num){
 						if(num>0&&_status.event&&_status.event.type==='phase'&&get.tag(card,'recover')){
@@ -13915,7 +13916,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gaoshun:['gaoshun','xin_gaoshun','re_gaoshun','old_gaoshun'],
 			zhonghui:['zhonghui','xin_zhonghui','re_zhonghui','old_zhonghui','pe_zhonghui'],
 			wangyi:['wangyi','re_wangyi','old_wangyi'],
-			caozhang:['caozhang','re_caozhang','xin_caozhang'],
+			caozhang:['caozhang','ol_caozhang','re_caozhang','xin_caozhang'],
 			guanzhang:['guanzhang','re_guanzhang','old_guanzhang'],
 			madai:['old_madai','re_madai','tw_madai','madai'],
 			liaohua:['liaohua','re_liaohua','xin_liaohua'],

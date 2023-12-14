@@ -15,6 +15,7 @@ new Promise(resolve=>{
 	 * @typedef {InstanceType<typeof lib.element.Card>} Card
 	 * @typedef {InstanceType<typeof lib.element.VCard>} VCard
 	 * @typedef {InstanceType<typeof lib.element.GameEvent>} GameEvent
+	 * @typedef {InstanceType<typeof lib.element.GameEventPromise>} GameEventPromise
 	 * @typedef {InstanceType<typeof lib.element.NodeWS>} NodeWS
 	 */
 	const userAgent=navigator.userAgent.toLowerCase();
@@ -21032,22 +21033,6 @@ new Promise(resolve=>{
 					};
 					player.queueCount=0;
 					player.outCount=0;
-					/**
-					 * 这部分应该用d.ts写。目前只给出大概类型
-					 * @type { {[key in keyof Player]: (...args) => Promise<GameEvent> & GameEvent} }
-					 */
-					player.promises=new Proxy({},{
-						get(target,prop){
-							const eventKeys=Object.keys(lib.element.player).filter(key=>typeof lib.element.player[key]=='function');
-							if (eventKeys.includes(prop)){
-								return function (...args) {
-									/** @type { GameEvent } */
-									const event=player[prop](...args);
-									return event.toPromise();
-								};
-							}
-						}
-					});
 				}
 				buildEventListener(noclick){
 					let player = this;
@@ -22401,9 +22386,9 @@ new Promise(resolve=>{
 					next.setContent('swapEquip');
 					return next;
 				}
-				canCompare(target){
+				canCompare(target,goon,bool){
 					if(this==target) return false;
-					if(!this.countCards('h')||!target.countCards('h')) return false;
+					if((!this.countCards('h')&&goon!==true)||(!target.countCards('h')&&bool!==true)) return false;
 					if(this.hasSkillTag('noCompareSource')||target.hasSkillTag('noCompareTarget')) return false;
 					return true;
 				}
@@ -31296,6 +31281,8 @@ new Promise(resolve=>{
 				}
 			},
 			GameEvent:class{
+				/** @type { Promise<GameEvent> & GameEvent & GameEventPromise } */
+				#promise;
 				/**
 				 * @param {string} [name]
 				 * @param {false} [trigger]
@@ -31313,11 +31300,11 @@ new Promise(resolve=>{
 					this.step=0;
 					this.finished=false;
 					/**
-					 * @type {GameEvent[]}
+					 * @type {(Promise<GameEvent> & GameEvent & GameEventPromise)[]}
 					 */
 					this.next=[];
 					/**
-					 * @type {GameEvent[]}
+					 * @type {(Promise<GameEvent> & GameEvent & GameEventPromise)[]}
 					 */
 					this.after=[];
 					this.custom={
@@ -31339,7 +31326,7 @@ new Promise(resolve=>{
 					if(trigger!==false&&!game.online) this._triggered=0;
 				}
 				static initialGameEvent(){
-					return new lib.element.GameEvent().finish();
+					return new lib.element.GameEvent().finish().toPromise();
 				}
 				/**
 				 * @param {keyof this} key
@@ -31662,14 +31649,14 @@ new Promise(resolve=>{
 					return this._rand;
 				}
 				insert(content,map){
-					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
+					const next=(new lib.element.GameEvent(`${this.name}Inserted`,false)).toPromise();
 					this.next.push(next);
 					next.setContent(content);
 					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
 					return next;
 				}
 				insertAfter(content,map){
-					const next=new lib.element.GameEvent(`${this.name}Inserted`,false);
+					const next=(new lib.element.GameEvent(`${this.name}Inserted`,false)).toPromise();
 					this.after.push(next);
 					next.setContent(content);
 					Object.entries(map).forEach(entry=>next.set(entry[0],entry[1]));
@@ -32127,13 +32114,13 @@ new Promise(resolve=>{
 				/**
 				 * 事件转为Promise化
 				 * 
-				 * @returns { Promise<GameEvent> & GameEvent }
+				 * @returns { Promise<GameEvent> & GameEvent & GameEventPromise }
 				 */
 				toPromise(){
-					if(this.async&&this.resolve){
-						throw new TypeError('This event has been converted into a promise');
+					if(!this.#promise){
+						this.#promise=new lib.element.GameEventPromise(this);
 					}
-					return new lib.element.GameEventPromise(this);
+					return this.#promise;
 				}
 			},
 			/**
@@ -32149,13 +32136,13 @@ new Promise(resolve=>{
 			 * @todo 需要完成异步事件的debugger方法
 			 * 
 			 * @example
-			 * 使用toPromise()函数将普通事件转换为异步事件：
+			 * 使用await xx()等待异步事件执行：
 			 * ```js
-			 * await game.xxx().toPromise().setContent('yyy').set(zzz, 'i');
+			 * await game.xxx().setContent('yyy').set(zzz, 'i');
 			 * ```
-			 * 使用player.promises.xxx()函数将对于player的普通事件转换为异步事件并执行：
+			 * 使用await player.xxx()等待异步事件执行：
 			 * ```js
-			 * await player.promises.draw(2);
+			 * await player.draw(2);
 			 * game.log('等待', player, '摸牌完成执行log');
 			 * ```
 			 */
@@ -32165,6 +32152,7 @@ new Promise(resolve=>{
 				static get [Symbol.species]() { 
 					return Promise;
 				}
+				#event;
 				/**
 				 * @param { GameEvent } event 
 				 * @returns { Promise<GameEvent> & GameEvent }
@@ -32175,21 +32163,27 @@ new Promise(resolve=>{
 						event.async=true;
 						// 事件结束后触发resolve
 						event.resolve=resolve;
-						// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
-						// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
-						if(_status.event.next.includes(event)&&_status.event.content instanceof AsyncFunction){
-							if (_status.event!=event) {
-								event.parent=_status.event;
-								_status.event=event;
-								game.getGlobalHistory('everything').push(event);
+						if(!_status.event) return;
+						// game.createEvent的时候还没立即push到next里
+						Promise.resolve().then(()=>{
+							const eventPromise=_status.event.next.find(e=>e.toEvent()==event);
+							// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
+							// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
+							if(eventPromise&&_status.event.content instanceof AsyncFunction){
+								if(_status.event!=eventPromise){
+									eventPromise.parent=_status.event;
+									_status.event=eventPromise;
+									game.getGlobalHistory('everything').push(eventPromise);
+								}
+								// 异步执行game.loop
+								// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
+								// 再执行game.loop是因为原有的game.loop被await卡住了，
+								// 得新执行一个只执行这个异步事件的game.loop
+								Promise.resolve().then(()=>game.loop(eventPromise));
 							}
-							// 异步执行game.loop
-							// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
-							// 再执行game.loop是因为原有的game.loop被await卡住了，
-							// 得新执行一个只执行这个异步事件的game.loop
-							Promise.resolve().then(()=>game.loop(event));
-						}
+						});
 					});
+					this.#event=event;
 					return new Proxy(this,{
 						get(target,prop,receiver){
 							const thisValue=Reflect.get(target,prop);
@@ -32200,12 +32194,7 @@ new Promise(resolve=>{
 								return thisValue;
 							}
 							const eventValue=Reflect.get(event,prop);
-							// 返回值如果是event，则修改为GameEventPromise类实例
-							if(typeof eventValue=='function') return (function(...args){
-								const returnValue=eventValue.call(event,...args);
-								return returnValue==event?receiver:returnValue;
-							}).bind(event);
-							return eventValue;
+							return eventValue==event?receiver:eventValue;
 						},
 						set(target,prop,newValue){
 							return Reflect.set(event,prop,newValue);
@@ -32223,6 +32212,10 @@ new Promise(resolve=>{
 							return Reflect.ownKeys(event,prop);
 						},
 					});
+				}
+				/** 获取原事件对象 */
+				toEvent(){
+					return this.#event;
 				}
 				/**
 				 * TODO: 实现debugger
@@ -36169,6 +36162,18 @@ new Promise(resolve=>{
 				 * @returns {string}
 				 */
 				getSpan:()=>`${get.prefixSpan('OL')}${get.prefixSpan('界')}`
+			}],
+			['OL谋',{
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('OL')}${get.prefixSpan('谋')}`
+			}],
+			['新杀谋',{
+				/**
+				 * @returns {string}
+				 */
+				getSpan:()=>`${get.prefixSpan('新杀')}${get.prefixSpan('谋')}`
 			}]
 		]),
 		groupnature:{
@@ -40378,7 +40383,7 @@ new Promise(resolve=>{
 		 * @legacy Use {@link lib.element.GameEvent.constructor} instead.
 		 */
 		createEvent:(name,trigger,triggerEvent)=>{
-			const next=new lib.element.GameEvent(name,trigger);
+			const next=(new lib.element.GameEvent(name,trigger)).toPromise();
 			(triggerEvent||_status.event).next.push(next);
 			return next;
 		},
@@ -41423,7 +41428,7 @@ new Promise(resolve=>{
 			}
 		},
 		/**
-		 * @param { GameEvent } [belongAsyncEvent]
+		 * @param { Promise<GameEvent> & GameEvent & GameEventPromise } [belongAsyncEvent]
 		 */
 		async loop(belongAsyncEvent){
 			if(belongAsyncEvent){
@@ -41437,7 +41442,7 @@ new Promise(resolve=>{
 				const _resolve = () => {
 					if (event.async) {
 						if (typeof event.resolve == 'function') {
-							event.resolve(event);
+							event.resolve(event.toEvent());
 						} else {
 							throw new TypeError('异步事件的event.resolve未赋值，使用await时将会被永久等待');
 						}
@@ -41686,6 +41691,39 @@ new Promise(resolve=>{
 				case 'vvfast':time*=0.2;break;
 			}
 			return game.delay(time,time2);
+		},
+		/**
+		 * 在async content中对game.delay的代替使用方法
+		 * 
+		 * 因为async content里不应该使用game.pause和game.resume
+		 */
+		asyncDelay:function(time,time2){
+			// if(_status.paused) return;
+			// game.pause();
+			if(typeof time!='number') time=1;
+			if(typeof time2!='number') time2=0;
+			time=time*lib.config.duration+time2;
+			if(lib.config.speed=='vvfast') time/=3;
+			//_status.timeout=setTimeout(game.resume,time);
+			return new Promise(resolve=>{
+				setTimeout(resolve,time);
+			});
+		},
+		/**
+		 * 在async content中对game.delayx的代替使用方法
+		 * 
+		 * 因为async content里不应该使用game.pause和game.resume
+		 */
+		asyncDelayx:function(time,time2){
+			if(typeof time!='number') time=1;
+			switch(lib.config.game_speed){
+				case 'vslow':time*=2.5;break;
+				case 'slow':time*=1.5;break;
+				case 'fast':time*=0.7;break;
+				case 'vfast':time*=0.4;break;
+				case 'vvfast':time*=0.2;break;
+			}
+			return game.asyncDelay(time,time2);
 		},
 		check:function(event){
 			var i,j,range;
@@ -49645,8 +49683,7 @@ new Promise(resolve=>{
 									}
 									newSkill.querySelector('.new_description').value=page.content.pack.translate[this.link+'_info'];
 									var info=page.content.pack.skill[this.link];
-									container.code='skill='+get.stringify(info);
-
+									container.code='skill='+get.stringify(Object.defineProperty({...info}, '_priority', {enumerable:false,writable:true,configurable:true}));
 									toggle.innerHTML='编辑技能 <div>&gt;</div>';
 									editnode.innerHTML='编辑技能';
 									editnode.classList.remove('disabled');
@@ -49862,7 +49899,7 @@ new Promise(resolve=>{
 									skillopt.style.display='none';
 									addSkillButton.style.display='none';
 									cancelSkillButton.style.display='none';
-									container.code='skill='+get.stringify(lib.skill[skillopt.value]);
+									container.code='skill='+get.stringify(Object.defineProperty({...lib.skill[skillopt.value]}, '_priority', {enumerable:false,writable:true,configurable:true}));
 									editbutton.onclick.call(editbutton);
 									if(lib.translate[skillopt.value+'_info']){
 										newSkill.querySelector('input.new_description').value=lib.translate[skillopt.value+'_info'];
@@ -59283,7 +59320,7 @@ new Promise(resolve=>{
 			 * 判断坐骑栏是否被合并
 			 */
 			mountCombined:function(){
-				if(lib.configOL){
+				if(lib.configOL.mount_combine){
 					return lib.configOL.mount_combine;
 				}
 				else if(typeof _status.mountCombined!='boolean'){
@@ -59924,11 +59961,59 @@ new Promise(resolve=>{
 			if(get.objtype(obj)=='object'){
 				str='{\n';
 				for(var i in obj){
+					var insertDefaultString;
+					var insertFunctionString=indent+'    '+get.stringify(obj[i],level+1)+',\n';
+					var parseFunction=i=>{
+						var string=obj[i].toString();
+						var execResult;
+						if(obj[i] instanceof GeneratorFunction){
+							// *content(){}
+							execResult=new RegExp(`\\*\\s*${i}[\\s\\S]*?\\(`).exec(obj[i]);
+							if(execResult&&execResult.index===0){
+								return insertFunctionString;
+							}
+							// content:function*(){}
+							else{
+								return insertDefaultString;
+							}
+						}
+						else if(obj[i] instanceof AsyncFunction){
+							execResult=new RegExp(`async\\s*${i}[\\s\\S]*?\\(`).exec(obj[i]);
+							// async content(){}
+							if(execResult&&execResult.index===0){
+								return insertFunctionString;
+							}
+							// content:async function(){}
+							else{
+								return insertDefaultString;
+							}
+						}else{
+							execResult=new RegExp(`${i}[\\s\\S]*?\\(`).exec(obj[i]);
+							// content(){}
+							if(execResult&&execResult.index===0){
+								return insertFunctionString;
+							}
+							// content:function(){}
+							else{
+								return insertDefaultString;
+							}
+						}
+					};
 					if(/[^a-zA-Z]/.test(i)){
-						str+=indent+'    "'+i+'":'+get.stringify(obj[i],level+1)+',\n';
+						insertDefaultString=indent+'    "'+i+'":'+get.stringify(obj[i],level+1)+',\n';
+						if(typeof obj[i]!=='function'){
+							str+=insertDefaultString;
+						}else{
+							str+=parseFunction(i);
+						}
 					}
 					else{
-						str+=indent+'    '+i+':'+get.stringify(obj[i],level+1)+',\n';
+						insertDefaultString=indent+'    '+i+':'+get.stringify(obj[i],level+1)+',\n';
+						if(typeof obj[i]!=='function'){
+							str+=insertDefaultString;
+						}else{
+							str+=parseFunction(i);
+						}
 					}
 				}
 				str+=indent+'}';
