@@ -37688,11 +37688,29 @@ new Promise(resolve=>{
 		
 				let audioInfo=info.audio;
 				if(info.audioname2){
-					if(info.audioname2[player.name]) audioInfo=info.audioname2[player.name];
-					else if(info.audioname2[player.name1]) audioInfo=info.audioname2[player.name1];
-					else if(info.audioname2[player.name2]) audioInfo=info.audioname2[player.name2];
+					if(player.name&&info.audioname2[player.name]) audioInfo=info.audioname2[player.name];
+					else if(player.name1&&info.audioname2[player.name1]) audioInfo=info.audioname2[player.name1];
+					else if(player.name2&&info.audioname2[player.name2]) audioInfo=info.audioname2[player.name2];
 					else if(player.tempname){
 						const name=player.tempname.find(i=>info.audioname2[i]);
+						if(name) audioInfo=info.audioname2[name];
+					}
+					else if(player.name&&get.character(player.name)&&get.character(player.name)[4]&&get.character(player.name)[4].some(tag=>tag.startsWith('tempname:'))){
+						const list=get.character(player.name)[4].find(tag=>tag.startsWith('tempname:'));
+						list=list.split(':').slice(1);
+						const name=list.find(i=>info.audioname2[i]);
+						if(name) audioInfo=info.audioname2[name];
+					}
+					else if(player.name1&&get.character(player.name1)&&get.character(player.name1)[4]&&get.character(player.name1)[4].some(tag=>tag.startsWith('tempname:'))){
+						const list=get.character(player.name1)[4].find(tag=>tag.startsWith('tempname:'));
+						list=list.split(':').slice(1);
+						const name=list.find(i=>info.audioname2[i]);
+						if(name) audioInfo=info.audioname2[name];
+					}
+					else if(player.name2&&get.character(player.name2)&&get.character(player.name2)[4]&&get.character(player.name2)[4].some(tag=>tag.startsWith('tempname:'))){
+						const list=get.character(player.name2)[4].find(tag=>tag.startsWith('tempname:'));
+						list=list.split(':').slice(1);
+						const name=list.find(i=>info.audioname2[i]);
 						if(name) audioInfo=info.audioname2[name];
 					}
 				}
@@ -37736,12 +37754,30 @@ new Promise(resolve=>{
 				let list=audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/);
 				if(list&&list[2]){
 					let _audioname='';
-					if(audioname.includes(player.name)) _audioname=`_${player.name}`;
-					else if(audioname.includes(player.name1)) _audioname=`_${player.name1}`;
-					else if(audioname.includes(player.name2)) _audioname=`_${player.name2}`;
+					if(player.name&&audioname.includes(player.name)) _audioname=`_${player.name}`;
+					else if(player.name1&&audioname.includes(player.name1)) _audioname=`_${player.name1}`;
+					else if(player.name2&&audioname.includes(player.name2)) _audioname=`_${player.name2}`;
 					else if(player.tempname){
 						const name=player.tempname.find(i=>audioname.includes(i));
 						if(name) _audioname=`_${name}`;
+					}
+					else if(player.name&&get.character(player.name)&&get.character(player.name)[4]&&get.character(player.name)[4].some(tag=>tag.startsWith('tempname:'))){
+						const list=get.character(player.name)[4].find(tag=>tag.startsWith('tempname:'));
+						list=list.split(':').slice(1);
+						const name=list.find(i=>audioname.includes(i));
+						if(name) _audioname=`_${player.name}`;
+					}
+					else if(player.name1&&get.character(player.name1)&&get.character(player.name1)[4]&&get.character(player.name1)[4].some(tag=>tag.startsWith('tempname:'))){
+						const list=get.character(player.name1)[4].find(tag=>tag.startsWith('tempname:'));
+						list=list.split(':').slice(1);
+						const name=list.find(i=>audioname.includes(i));
+						if(name) _audioname=`_${player.name1}`;
+					}
+					else if(player.name2&&get.character(player.name2)&&get.character(player.name2)[4]&&get.character(player.name2)[4].some(tag=>tag.startsWith('tempname:'))){
+						const list=get.character(player.name2)[4].find(tag=>tag.startsWith('tempname:'));
+						list=list.split(':').slice(1);
+						const name=list.find(i=>audioname.includes(i));
+						if(name) _audioname=`_${player.name2}`;
 					}
 		
 					list=list.slice(1);//[路径,number/true,格式]
