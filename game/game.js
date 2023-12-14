@@ -37765,19 +37765,19 @@ new Promise(resolve=>{
 						const list=get.character(player.name)[4].find(tag=>tag.startsWith('tempname:'));
 						list=list.split(':').slice(1);
 						const name=list.find(i=>audioname.includes(i));
-						if(name) _audioname=`_${player.name}`;
+						if(name) _audioname=`_${name}`;
 					}
 					else if(player.name1&&get.character(player.name1)&&get.character(player.name1)[4]&&get.character(player.name1)[4].some(tag=>tag.startsWith('tempname:'))){
 						const list=get.character(player.name1)[4].find(tag=>tag.startsWith('tempname:'));
 						list=list.split(':').slice(1);
 						const name=list.find(i=>audioname.includes(i));
-						if(name) _audioname=`_${player.name1}`;
+						if(name) _audioname=`_${name}`;
 					}
 					else if(player.name2&&get.character(player.name2)&&get.character(player.name2)[4]&&get.character(player.name2)[4].some(tag=>tag.startsWith('tempname:'))){
 						const list=get.character(player.name2)[4].find(tag=>tag.startsWith('tempname:'));
 						list=list.split(':').slice(1);
 						const name=list.find(i=>audioname.includes(i));
-						if(name) _audioname=`_${player.name2}`;
+						if(name) _audioname=`_${name}`;
 					}
 		
 					list=list.slice(1);//[路径,number/true,格式]
