@@ -129,8 +129,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				zhuanhuanji:true,
 				intro:{
 					content:function(storage){
-						if(!storage) return '每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色，你将手牌数摸至与其相同，然后视为对其使用一张【火攻】。'
-						return '每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌，然后该角色将手牌数弃至与你相同。';
+						if(!storage) return '每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】。'
+						return '每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌。';
 					},
 				},
 				audio:2,
@@ -146,7 +146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(storage){
 						result=yield player.chooseCardTarget({
 							prompt:get.prompt('dcsbyingmou'),
-							prompt2:'选择一名目标角色，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌，然后该角色将手牌数弃至与你相同',
+							prompt2:'选择一名目标角色，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌',
 							filterTarget:function(card,player,target){
 								if(!ui.selected.targets.length) return _status.event.targets.includes(target);
 								return target.isMaxHandcard();
@@ -177,33 +177,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else result=yield player.chooseTarget(get.prompt('dcsbyingmou'),'选择一名目标角色，将手牌数摸至与其相同，然后视为对其使用一张【火攻】',(card,player,target)=>_status.event.targets.includes(target)).set('ai',target=>{
 						var player=_status.event.player;
-						return Math.max(0,target.countCards('h')-player.countCards('h'))*2+get.effect(target,{name:'huogong'},player,player);
+						return Math.max(0,Math.min(5,target.countCards('h')-player.countCards('h')))*2+get.effect(target,{name:'huogong'},player,player);
 					}).set('targets',targets);
 					if(result.bool){
-						var targets=result.targets;
 						var target=result.targets[0];
 						if(storage){
-							player.logSkill('dcsbyingmou',target,false);
-							player.line2(targets);
+							player.logSkill('dcsbyingmou',result.targets,false);
+							player.line2(result.targets);
 							player.changeZhuanhuanji('dcsbyingmou');
 							var source=result.targets[1];
-							while(source.countCards('h',card=>{
-								if(get.name(card)!='sha'&&(get.type(card)!='trick'||!get.tag(card,'damage'))) return false;
-								return source.canUse(card,target,false);
-							})){
-								source.useCard(source.getCards('h',card=>{
+							while(true){
+								var cards=source.getCards('h',card=>{
 									if(get.name(card)!='sha'&&(get.type(card)!='trick'||!get.tag(card,'damage'))) return false;
 									return source.canUse(card,target,false);
-								}).randomGet(),target,false);
+								});
+								if(cards.length) yield source.useCard(cards.randomGet(),target,false);
+								else break;
 							}
-							player.when('dcsbyingmouEnd').then(()=>{
-								if(player.countCards('h')>target.countCards('h')) player.chooseToDiscard(player.countCards('h')-target.countCards('h'),'h',true);
-							}).vars({target:source});
 						}
 						else{
 							player.logSkill('dcsbyingmou',target);
 							player.changeZhuanhuanji('dcsbyingmou');
-							if(player.countCards('h')<target.countCards('h')) player.drawTo(target.countCards('h'));
+							if(player.countCards('h')<target.countCards('h')) player.draw(Math.min(5,target.countCards('h')-player.countCards('h')));
 							if(player.canUse({name:'huogong'},target,false)) player.useCard({name:'huogong'},target,false);
 						}
 					}
@@ -13213,10 +13208,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				var storage=player.storage.dcsbyingmou;
 				var str='转换技，每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色：';
 				if(!storage) str+='<span class="bluetext">';
-				str+='阴，你将手牌数摸至与其相同，然后视为对其使用一张【火攻】；';
+				str+='阴，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】；';
 				if(!storage) str+='</span>';
 				if(storage) str+='<span class="bluetext">';
-				str+='阳，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌，然后该角色将手牌数弃至与你相同。';
+				str+='阳，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌。';
 				if(storage) str+='</span>';
 				return str;
 			},
@@ -13742,7 +13737,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsbronghuo:'熔火',
 			dcsbronghuo_info:'锁定技，当你使用火【杀】或【火攻】时，此牌伤害基值改为场上势力数。',
 			dcsbyingmou:'英谋',
-			dcsbyingmou_info:'转换技，每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色：阴，你将手牌数摸至与其相同，然后视为对其使用一张【火攻】；阳，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌，然后该角色将手牌数弃至与你相同。',
+			dcsbyingmou_info:'转换技，每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色：阴，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】；阳，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
