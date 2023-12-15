@@ -51550,16 +51550,14 @@ new Promise(resolve=>{
 									writable:false
 								}
 							});
-							if(typeof window.Proxy=='function'){
-								proxyWindow=new Proxy(proxyWindow,{
-									set(target,prop,newValue) {
-										if (!['_status','lib','game','ui','get','ai','cheat'].includes(prop)){
-											Reflect.set(window, prop, newValue);
-										}
-										return Reflect.set(target,prop,newValue);
+							proxyWindow=new Proxy(proxyWindow,{
+								set(target,prop,newValue) {
+									if (!['_status','lib','game','ui','get','ai','cheat'].includes(prop)){
+										Reflect.set(window, prop, newValue);
 									}
-								});
-							}
+									return Reflect.set(target,prop,newValue);
+								}
+							});
 							//使用new Function隔绝作用域，避免在控制台可以直接访问到runCommand等变量
 							/**
 							 * @type { (value:string)=>any }
@@ -63838,8 +63836,8 @@ new Promise(resolve=>{
 				}
 			}
 		},
-		//我愚蠢的弟弟呦，这是最后一次兼容46内核兼容版了
-		get:get
+		//不兼容你了，弟弟
+		get,
 	};
 	/**
 	 * @template T
