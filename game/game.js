@@ -32185,8 +32185,11 @@ new Promise(resolve=>{
 						has(target,prop){
 							return Reflect.has(event,prop);
 						},
-						ownKeys(target,prop){
-							return Reflect.ownKeys(event,prop);
+						ownKeys(target){
+							return Reflect.ownKeys(event);
+						},
+						getOwnPropertyDescriptor(target,prop){
+							return Reflect.getOwnPropertyDescriptor(event,prop);
 						},
 					});
 				}
