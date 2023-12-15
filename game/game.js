@@ -36218,8 +36218,9 @@ new Promise(resolve=>{
 			 * 注: 由于参数列表是随意的，在这里我准备限制一下这个函数的参数顺序
 			 * 
 			 * @type {{
-			 *	(title: string, forced?: boolean): Promise<string>;
-			*	(alertOption: 'alert', title: string, forced?: boolean): Promise<string>;
+			 *  (title: string): Promise<string | false>;
+			 *	(title: string, forced: true): Promise<string>;
+			 *	(alertOption: 'alert', title: string): Promise<true>;
 			 * }}
 			 * 
 			 * @param { string } title 设置prompt标题与input内容
@@ -36241,7 +36242,7 @@ new Promise(resolve=>{
 						title=alertOption;
 						game.prompt(title,forced,resolve);
 					}else{
-						game.prompt(alertOption,title,forced,resolve);
+						game.prompt(title,alertOption,resolve);
 					}
 				});
 			},
@@ -36257,7 +36258,7 @@ new Promise(resolve=>{
 			 */
 			alert(title){
 				return new Promise((resolve,reject)=>{
-					game.prompt('alert',title,resolve);
+					game.prompt(title,'alert',resolve);
 				});
 			},
 			// 读写函数promises化(不用考虑其对应函数是否存在)
