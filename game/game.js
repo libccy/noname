@@ -36238,7 +36238,7 @@ new Promise(resolve=>{
 				return new Promise((resolve,reject)=>{
 					if(alertOption!='alert'){
 						forced=title||false;
-						title=option;
+						title=alertOption;
 						game.prompt(title,forced,resolve);
 					}else{
 						game.prompt(alertOption,title,forced,resolve);
