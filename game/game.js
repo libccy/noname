@@ -32185,8 +32185,11 @@ new Promise(resolve=>{
 						has(target,prop){
 							return Reflect.has(event,prop);
 						},
-						ownKeys(target,prop){
-							return Reflect.ownKeys(event,prop);
+						ownKeys(target){
+							return Reflect.ownKeys(event);
+						},
+						getOwnPropertyDescriptor(target,prop){
+							return Reflect.getOwnPropertyDescriptor(event,prop);
 						},
 					});
 				}
@@ -36215,8 +36218,9 @@ new Promise(resolve=>{
 			 * 注: 由于参数列表是随意的，在这里我准备限制一下这个函数的参数顺序
 			 * 
 			 * @type {{
-			 *	(title: string, forced?: boolean): Promise<string>;
-			*	(alertOption: 'alert', title: string, forced?: boolean): Promise<string>;
+			 *  (title: string): Promise<string | false>;
+			 *	(title: string, forced: true): Promise<string>;
+			 *	(alertOption: 'alert', title: string): Promise<true>;
 			 * }}
 			 * 
 			 * @param { string } title 设置prompt标题与input内容
@@ -36235,10 +36239,10 @@ new Promise(resolve=>{
 				return new Promise((resolve,reject)=>{
 					if(alertOption!='alert'){
 						forced=title||false;
-						title=option;
+						title=alertOption;
 						game.prompt(title,forced,resolve);
 					}else{
-						game.prompt(alertOption,title,forced,resolve);
+						game.prompt(title,alertOption,resolve);
 					}
 				});
 			},
@@ -36254,7 +36258,7 @@ new Promise(resolve=>{
 			 */
 			alert(title){
 				return new Promise((resolve,reject)=>{
-					game.prompt('alert',title,resolve);
+					game.prompt(title,'alert',resolve);
 				});
 			},
 			// 读写函数promises化(不用考虑其对应函数是否存在)
@@ -51547,16 +51551,14 @@ new Promise(resolve=>{
 									writable:false
 								}
 							});
-							if(typeof window.Proxy=='function'){
-								proxyWindow=new Proxy(proxyWindow,{
-									set(target,prop,newValue) {
-										if (!['_status','lib','game','ui','get','ai','cheat'].includes(prop)){
-											Reflect.set(window, prop, newValue);
-										}
-										return Reflect.set(target,prop,newValue);
+							proxyWindow=new Proxy(proxyWindow,{
+								set(target,prop,newValue) {
+									if (!['_status','lib','game','ui','get','ai','cheat'].includes(prop)){
+										Reflect.set(window, prop, newValue);
 									}
-								});
-							}
+									return Reflect.set(target,prop,newValue);
+								}
+							});
 							//使用new Function隔绝作用域，避免在控制台可以直接访问到runCommand等变量
 							/**
 							 * @type { (value:string)=>any }
@@ -63835,8 +63837,8 @@ new Promise(resolve=>{
 				}
 			}
 		},
-		//我愚蠢的弟弟呦，这是最后一次兼容46内核兼容版了
-		get:get
+		//不兼容你了，弟弟
+		get,
 	};
 	/**
 	 * @template T
