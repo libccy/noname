@@ -1,6 +1,11 @@
 import { Click } from "./ui/click.js";
 import { Create } from "./ui/create.js";
 import { selected } from "./ui/selected.js";
+import { Game as game } from './game.js';
+import { Get as get } from './get.js';
+import { Library as lib } from './library.js';
+import { status as _status } from './status.js';
+import { InternalUi as ui } from './internal.js';
 
 class HTMLWindowElement extends HTMLDivElement {
 }

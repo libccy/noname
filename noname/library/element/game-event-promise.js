@@ -1,3 +1,5 @@
+import { Game as game } from '../../game.js';
+import { status as _status } from '../../status.js';
 export class GameEventPromise extends Promise {
 	// 我谢谢你，这里是必须有的
 	// 否则Promise的方法对其子类无效

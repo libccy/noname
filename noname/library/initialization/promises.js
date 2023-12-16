@@ -1,5 +1,4 @@
 import { Initialization } from "../initialization.js";
-
 /**
  * 部分函数的Promise版本
  */

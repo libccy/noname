@@ -1,5 +1,6 @@
-import { Game } from "../game.js";
 import { Library } from "../library.js";
+import { Game as game } from '../game.js';
+import { status as _status } from '../status.js';
 
 /**
  * 函数钩子
@@ -92,7 +93,7 @@ export const hooks = {
 						"black 0 0 1px"
 					)
 				};
-				Game.dynamicStyle.addObject(result);
+				game.dynamicStyle.addObject(result);
 				Library.groupnature[id] = id;
 			}
 		}
@@ -171,7 +172,7 @@ export const hooks = {
 					`rgba(${color2.join()})`
 				),
 			};
-			Game.dynamicStyle.addObject(result);
+			game.dynamicStyle.addObject(result);
 
 			const g2 = cs.group(
 				cs.of(
@@ -184,7 +185,7 @@ export const hooks = {
 			result2[g2] = {
 				color: `rgba(${color1.join()})`,
 			};
-			Game.dynamicStyle.addObject(result2);
+			game.dynamicStyle.addObject(result2);
 		}
 	}]
 };

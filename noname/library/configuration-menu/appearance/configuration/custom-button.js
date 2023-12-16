@@ -1,3 +1,6 @@
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
+
 export const CUSTOM_BUTTON = {
 	name: "自定义按钮高度",
 	init: false,

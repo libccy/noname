@@ -1,6 +1,8 @@
-import { Game } from "../../game.js";
-import { Get } from "../../get.js";
-
+import { Game as game } from '../../game.js';
+import { Get as get } from '../../get.js';
+import { Library as lib } from '../../library.js';
+import { status as _status } from '../../status.js';
+import { UI as ui } from '../../ui.js';
 export class GameEvent {
 	/**
 	 * @param {string} [name]
@@ -9,14 +11,14 @@ export class GameEvent {
 	constructor(name, trigger) {
 		if (typeof name == "string") {
 			this.name = name;
-			const gameEvent = Get.event();
+			const gameEvent = get.event();
 
 			if (gameEvent) {
 				const type = `onNext${name[0].toUpperCase()}${name.slice(1)}`;
 				if (gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
 			}
 
-			Game.globalEventHandlers.addHandlerToEvent(this);
+			game.globalEventHandlers.addHandlerToEvent(this);
 		}
 
 		this.step = 0;
@@ -37,7 +39,7 @@ export class GameEvent {
 		this._notrigger = [];
 		this._result = {};
 		this._set = [];
-		if (trigger !== false && !Game.online) this._triggered = 0;
+		if (trigger !== false && !game.online) this._triggered = 0;
 	}
 
 	static initialGameEvent() {

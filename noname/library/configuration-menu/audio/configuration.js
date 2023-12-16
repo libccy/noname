@@ -7,6 +7,10 @@ import { IMPORT_MUSIC } from "./configuration/import-music.js";
 import { REPEAT_AUDIO } from "./configuration/repeat-audio.js";
 import { VOLUME_AUDIO } from "./configuration/volume-audio.js";
 import { VOLUME_BACKGROUND } from "./configuration/volume-background.js";
+import { Get as get } from '../../../get.js';
+import { Library as lib } from '../../../library.js';
+import { status as _status } from '../../../status.js';
+import { UI as ui } from '../../../ui.js';
 
 export const CONFIGURATION = {
 	update(config, map) {

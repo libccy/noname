@@ -9,6 +9,12 @@ import { NodeWS } from "./element/node-ws.js";
 import { Player } from "./element/player.js";
 import { VCard } from "./element/v-card.js";
 import { WS } from "./element/ws.js";
+import { ai } from '../ai.js';
+import { Game as game } from '../game.js';
+import { Get as get } from '../get.js';
+import { Library as lib } from '../library.js';
+import { status as _status } from '../status.js';
+import { UI as ui } from '../ui.js';
 
 export const element = {
 	content: {

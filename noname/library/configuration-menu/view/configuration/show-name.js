@@ -1,3 +1,6 @@
+import { Game as game } from '../../../../game.js';
+import { status as _status } from '../../../../status.js';
+import { UI as ui } from '../../../../ui.js';
 export const SHOW_NAME = {
 	name: "显示角色名称",
 	init: false,

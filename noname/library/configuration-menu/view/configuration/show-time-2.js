@@ -1,3 +1,6 @@
+import { Game as game } from '../../../../game.js';
+import { status as _status } from '../../../../status.js';
+import { UI as ui } from '../../../../ui.js';
 export const SHOW_TIME_2 = {
 	name: "显示时间",
 	intro: "在触屏按钮处显示当前时间",

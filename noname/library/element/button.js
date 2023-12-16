@@ -1,3 +1,6 @@
+import { Library as lib } from '../../library.js';
+import { status as _status } from '../../status.js';
+import { UI as ui } from '../../ui.js';
 export class Button extends HTMLDivElement {
 	/**
 	 * @param {{}} item

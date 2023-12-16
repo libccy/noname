@@ -1,5 +1,7 @@
 import { ITEM } from "./card-temporary-name/item.js";
-
+import { Game as game } from '../../../../game.js';
+import { status as _status } from '../../../../status.js';
+import { UI as ui } from '../../../../ui.js';
 export const CARD_TEMPORARY_NAME = {
 	name: "视为卡牌名称显示",
 	intro: "显示强制视为类卡牌（如武魂），包括拆顺对话框内的判定牌（国色）转换等名称的显示方式",

@@ -2,7 +2,7 @@ import { Game } from "../game.js";
 import { Get } from "../get.js";
 import { GameEvent } from "./element/game-event.js";
 import { VCard } from "./element/v-card.js";
-
+import { status as _status } from '../status.js';
 export const stratagemBuff = {
 	cost: new Map([
 		["sha", 1],

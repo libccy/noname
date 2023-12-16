@@ -1,3 +1,5 @@
+import { Game as game } from '../../../../game.js';
+import { UI as ui } from '../../../../ui.js';
 export const BLUR_UI = {
 	name: "模糊效果",
 	intro: "在暂停或打开菜单时开启模糊效果",

@@ -1,3 +1,9 @@
+import { ai } from '../ai.js';
+import { Game as game } from '../game.js';
+import { Get as get } from '../get.js';
+import { Library as lib } from '../library.js';
+import { status as _status } from '../status.js';
+import { UI as ui } from '../ui.js';
 export const message = {
 	server: {
 		init: function (version, config, banned_info) {

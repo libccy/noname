@@ -1,3 +1,6 @@
+import { Game as game } from '../../../game.js';
+import { Library as lib } from '../../../library.js';
+import { status as _status } from '../../../status.js';
 export const HIDE = {
 	name: "隐藏此扩展",
 	clear: true,

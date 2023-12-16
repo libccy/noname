@@ -1,3 +1,6 @@
+import { Game as game } from '../../../game.js';
+import { status as _status } from '../../../status.js';
+import { UI as ui } from '../../../ui.js';
 export const CANVAS = {
 	name: "特效置顶",
 	init: false,

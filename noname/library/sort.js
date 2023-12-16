@@ -1,3 +1,7 @@
+import { Game as game } from '../game.js';
+import { Get as get } from '../get.js';
+import { Library as lib } from '../library.js';
+import { status as _status } from '../status.js';
 export class Sort {
 	constructor() {
 		throw new TypeError(`${new.target.name} is not a constructor`);

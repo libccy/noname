@@ -1,3 +1,5 @@
+import { Game as game } from '../../game.js';
+import { status as _status } from '../../status.js';
 export class NodeWS {
 	/**
 	 * @param {string} id

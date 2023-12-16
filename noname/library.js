@@ -1,7 +1,9 @@
-import { Game } from "./game.js";
-import { Get } from "./get.js";
+import { Game as game } from './game.js';
+import { Get as get } from './get.js';
+import { status as _status } from './status.js';
+import { UI as ui } from './ui.js';
 import { GNC } from "./gnc.js";
-import { InternalLibrary } from "./internal.js";
+import { InternalLibrary as lib } from "./internal.js";
 import { animate } from "./library/animate.js";
 import { announce } from "./library/announce.js";
 import { cardPack } from "./library/card-pack.js";
@@ -51,8 +53,6 @@ import { stratagemBuff } from "./library/stratagem-buff.js";
 import { translate } from "./library/translate.js";
 import { updateURLs } from "./library/update-urls.js";
 import { yingbian } from "./library/yingbian.js";
-import { status } from "./status.js";
-import { UI } from "./ui.js";
 import { Click } from "./ui/click.js";
 import { Create } from "./ui/create.js";
 
@@ -268,19 +268,19 @@ export class Library {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("SP")}`
+			getSpan: () => `${get.prefixSpan("SP")}`
 		}],
 		["☆SP", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("SP")}`
+			getSpan: () => `${get.prefixSpan("SP")}`
 		}],
 		["J.SP", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("SP")}`
+			getSpan: () => `${get.prefixSpan("SP")}`
 		}],
 		["K系列", {
 			showName: "Ｋ",
@@ -336,7 +336,7 @@ export class Library {
 				if (characterPack.shiji && name in characterPack.shiji) {
 					for (const entry of Object.entries(characterSort.shiji)) {
 						if (!entry[1].includes(name)) continue;
-						prefix = Get.translation(entry[0]).slice(-1);
+						prefix = get.translation(entry[0]).slice(-1);
 						break;
 					}
 					if (!simple) {
@@ -367,61 +367,61 @@ export class Library {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("TW")}${Get.prefixSpan("神")}`
+			getSpan: () => `${get.prefixSpan("TW")}${get.prefixSpan("神")}`
 		}],
 		["TW将", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("TW")}${Get.prefixSpan("将")}`
+			getSpan: () => `${get.prefixSpan("TW")}${get.prefixSpan("将")}`
 		}],
 		["OL神", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("OL")}${Get.prefixSpan("神")}`
+			getSpan: () => `${get.prefixSpan("OL")}${get.prefixSpan("神")}`
 		}],
 		["旧神", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("旧")}${Get.prefixSpan("神")}`
+			getSpan: () => `${get.prefixSpan("旧")}${get.prefixSpan("神")}`
 		}],
 		["旧晋", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("旧")}${Get.prefixSpan("晋")}`
+			getSpan: () => `${get.prefixSpan("旧")}${get.prefixSpan("晋")}`
 		}],
 		["新杀SP", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("新杀")}${Get.prefixSpan("SP")}`
+			getSpan: () => `${get.prefixSpan("新杀")}${get.prefixSpan("SP")}`
 		}],
 		["界SP", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("界")}${Get.prefixSpan("SP")}`
+			getSpan: () => `${get.prefixSpan("界")}${get.prefixSpan("SP")}`
 		}],
 		["S特神", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("★")}${Get.prefixSpan("神")}`
+			getSpan: () => `${get.prefixSpan("★")}${get.prefixSpan("神")}`
 		}],
 		["手杀界", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("手杀")}${Get.prefixSpan("界")}`
+			getSpan: () => `${get.prefixSpan("手杀")}${get.prefixSpan("界")}`
 		}],
 		["战役篇神", {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("战役篇")}${Get.prefixSpan("神")}`
+			getSpan: () => `${get.prefixSpan("战役篇")}${get.prefixSpan("神")}`
 		}],
 		["星", {
 			color: "#ffd700",
@@ -431,7 +431,7 @@ export class Library {
 			/**
 			 * @returns {string}
 			 */
-			getSpan: () => `${Get.prefixSpan("OL")}${Get.prefixSpan("界")}`
+			getSpan: () => `${get.prefixSpan("OL")}${get.prefixSpan("界")}`
 		}]
 	]);
 	static groupnature = groupNature;
@@ -640,8 +640,8 @@ export class Library {
 	}
 
 	static codeMirrorReady(node, editor) {
-		UI.window.appendChild(node);
-		node.style.fontSize = `${20 / Game.documentZoom}px`;
+		ui.window.appendChild(node);
+		node.style.fontSize = `${20 / game.documentZoom}px`;
 		const mirror = window.CodeMirror(editor, {
 			value: node.code,
 			mode: "javascript",
@@ -658,7 +658,7 @@ export class Library {
 				//"Ctrl-A":"selectAll",//全选
 			},
 		});
-		InternalLibrary.setScroll(editor.querySelector(".CodeMirror-scroll"));
+		lib.setScroll(editor.querySelector(".CodeMirror-scroll"));
 		node.aced = true;
 		node.editor = mirror;
 		setTimeout(() => mirror.refresh(), 0);
@@ -678,13 +678,13 @@ export class Library {
 			}
 		});
 		//防止每次输出字符都创建以下元素
-		const event = status.event;
-		const trigger = status.event;
+		const event = _status.event;
+		const trigger = _status.event;
 		const player = Create.player().init("sunce");
 		const target = player;
 		const targets = [player];
 		const source = player;
-		const card = Game.createCard();
+		const card = game.createCard();
 		const cards = [card];
 		const result = { bool: true };
 		function forEach(arr, f) {
@@ -861,15 +861,15 @@ export class Library {
 				node.listen(Click.touchintro);
 			}
 			else {
-				InternalLibrary.setLongPress(node, Click.intro);
+				lib.setLongPress(node, Click.intro);
 			}
 		}
 		else {
 			if (left) {
 				node.listen(Click.intro);
 			}
-			if (configuration.hover_all && !InternalLibrary.device) {
-				InternalLibrary.setHover(node, Click.hoverplayer);
+			if (configuration.hover_all && !lib.device) {
+				lib.setHover(node, Click.hoverplayer);
 			}
 			if (configuration.right_info) {
 				node.oncontextmenu = Click.rightplayer;
@@ -910,23 +910,23 @@ export class Library {
 		if (e.touches && e.touches[0]) {
 			e = e.touches[0];
 		}
-		var height = Math.min(UI.window.offsetHeight - 20, dialog.content.scrollHeight);
+		var height = Math.min(ui.window.offsetHeight - 20, dialog.content.scrollHeight);
 		if (dialog._mod_height) {
 			height += dialog._mod_height;
 		}
 		dialog.style.height = `${height}px`;
-		if (e.clientX / Game.documentZoom < UI.window.offsetWidth / 2) {
-			dialog.style.left = `${e.clientX / Game.documentZoom + 10}px`;
+		if (e.clientX / game.documentZoom < ui.window.offsetWidth / 2) {
+			dialog.style.left = `${e.clientX / game.documentZoom + 10}px`;
 		}
 		else {
-			dialog.style.left = `${e.clientX / Game.documentZoom - dialog.offsetWidth - 10}px`;
+			dialog.style.left = `${e.clientX / game.documentZoom - dialog.offsetWidth - 10}px`;
 		}
-		var idealtop = (e.clientY || 0) / Game.documentZoom - dialog.offsetHeight / 2;
+		var idealtop = (e.clientY || 0) / game.documentZoom - dialog.offsetHeight / 2;
 		if (typeof idealtop != "number" || isNaN(idealtop) || idealtop <= 5) {
 			idealtop = 5;
 		}
-		else if (idealtop + dialog.offsetHeight + 10 > UI.window.offsetHeight) {
-			idealtop = UI.window.offsetHeight - 10 - dialog.offsetHeight;
+		else if (idealtop + dialog.offsetHeight + 10 > ui.window.offsetHeight) {
+			idealtop = ui.window.offsetHeight - 10 - dialog.offsetHeight;
 		}
 		dialog.style.top = `${idealtop}px`;
 	}
@@ -965,43 +965,43 @@ export class Library {
 	}
 
 	static updateCanvas(time) {
-		if (InternalLibrary.canvasUpdates.length === 0) {
+		if (lib.canvasUpdates.length === 0) {
 			internalStatus.canvas = false;
 			return false;
 		}
-		UI.canvas.width = UI.arena.offsetWidth;
-		UI.canvas.height = UI.arena.offsetHeight;
-		var ctx = UI.ctx;
+		ui.canvas.width = ui.arena.offsetWidth;
+		ui.canvas.height = ui.arena.offsetHeight;
+		var ctx = ui.ctx;
 		ctx.shadowBlur = 5;
 		ctx.shadowColor = "rgba(0,0,0,0.3)";
 		ctx.strokeStyle = "white";
 		ctx.lineWidth = 3;
 		ctx.save();
-		for (var i = 0; i < InternalLibrary.canvasUpdates.length; i++) {
+		for (var i = 0; i < lib.canvasUpdates.length; i++) {
 			ctx.restore();
 			ctx.save();
-			var update = InternalLibrary.canvasUpdates[i];
+			var update = lib.canvasUpdates[i];
 			if (!update.starttime) {
 				update.starttime = time;
 			}
 			if (update(time - update.starttime, ctx) === false) {
-				InternalLibrary.canvasUpdates.splice(i--, 1);
+				lib.canvasUpdates.splice(i--, 1);
 			}
 		}
 	}
 
 	static run(time) {
 		internalStatus.time = time;
-		for (var i = 0; i < InternalLibrary.updates.length; i++) {
-			if (!Object.prototype.hasOwnProperty.call(InternalLibrary.updates[i], "_time")) {
-				InternalLibrary.updates[i]._time = time;
+		for (var i = 0; i < lib.updates.length; i++) {
+			if (!Object.prototype.hasOwnProperty.call(lib.updates[i], "_time")) {
+				lib.updates[i]._time = time;
 			}
-			if (InternalLibrary.updates[i](time - InternalLibrary.updates[i]._time - internalStatus.delayed) === false) {
-				InternalLibrary.updates.splice(i--, 1);
+			if (lib.updates[i](time - lib.updates[i]._time - internalStatus.delayed) === false) {
+				lib.updates.splice(i--, 1);
 			}
 		}
-		if (InternalLibrary.updates.length) {
-			internalStatus.frameId = requestAnimationFrame(InternalLibrary.run);
+		if (lib.updates.length) {
+			internalStatus.frameId = requestAnimationFrame(lib.run);
 		}
 		else {
 			internalStatus.time = 0;
@@ -1014,9 +1014,9 @@ export class Library {
 	}
 
 	static saveVideo() {
-		if (status.videoToSave) {
-			Game.export(Initialization.encode(JSON.stringify(status.videoToSave)),
-				`无名杀 - 录像 - ${status.videoToSave.name[0]} - ${status.videoToSave.name[1]}`);
+		if (_status.videoToSave) {
+			game.export(Initialization.encode(JSON.stringify(_status.videoToSave)),
+				`无名杀 - 录像 - ${_status.videoToSave.name[0]} - ${_status.videoToSave.name[1]}`);
 		}
 	}
 

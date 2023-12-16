@@ -1,4 +1,8 @@
 import { ITEM } from "./card-shape/item.js";
+import { Game as game } from '../../../../game.js';
+import { Get as get } from '../../../../get.js';
+import { status as _status } from '../../../../status.js';
+import { UI as ui } from '../../../../ui.js';
 
 export const CARD_SHAPE = {
 	name: "手牌显示",

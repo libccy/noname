@@ -1,4 +1,7 @@
 import { ITEM } from "./background-music/item.js";
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
+import { status as _status } from '../../../../status.js';
 
 export const BACKGROUND_MUSIC = {
 	updatex() {

@@ -1,4 +1,8 @@
 import { ITEM } from "./card-text-font/item.js";
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
+import { status as _status } from '../../../../status.js';
+
 
 export const CARD_TEXT_FONT = {
 	name: "卡牌字体",

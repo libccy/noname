@@ -1,3 +1,5 @@
+import { Game as game } from '../../../../game.js';
+import { status as _status } from '../../../../status.js';
 export const SHOW_RARITY = {
 	name: "显示武将评级",
 	init: false,

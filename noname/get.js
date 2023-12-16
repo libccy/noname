@@ -1,6 +1,10 @@
 import { Is } from "./get/is.js";
-import { Library } from "./library.js";
 import { status } from "./status.js";
+import { Game as game } from './game.js';
+import { InternalGet as get } from './internal.js';
+import { Library as lib } from './library.js';
+import { status as _status } from './status.js';
+import { UI as ui } from './ui.js';
 
 export class Get {
 	static is = Is;
@@ -1971,9 +1975,9 @@ export class Get {
 			if (str2 == "杀") {
 				str2 = "";
 				if (typeof str.nature == "string") {
-					let natures = str.nature.split(Library.natureSeparator).sort(Library.sort.nature);
+					let natures = str.nature.split(lib.natureSeparator).sort(lib.sort.nature);
 					for (let nature of natures) {
-						str2 += Library.translate["nature_" + nature] || Library.translate[nature] || "";
+						str2 += lib.translate["nature_" + nature] || lib.translate[nature] || "";
 					}
 				}
 				str2 += "杀";
@@ -1983,7 +1987,7 @@ export class Get {
 					var tagstr = "";
 					for (var i in status.cardtag) {
 						if (status.cardtag[i].contains(str.cardid)) {
-							tagstr += Library.translate[i + "_tag"];
+							tagstr += lib.translate[i + "_tag"];
 						}
 					}
 					if (tagstr) {
@@ -2013,35 +2017,35 @@ export class Get {
 			return str2;
 		}
 		if (this.itemtype(str) == "natures") {
-			let natures = str.split(Library.natureSeparator).sort(Library.sort.nature);
+			let natures = str.split(lib.natureSeparator).sort(lib.sort.nature);
 			var str2 = "";
 			for (var nature of natures) {
-				str2 += Library.translate["nature_" + nature] || Library.translate[nature] || "";
+				str2 += lib.translate["nature_" + nature] || lib.translate[nature] || "";
 			}
 			return str2;
 		}
 		if (arg == "skill") {
-			if (Library.translate[str + "_ab"]) return Library.translate[str + "_ab"];
-			if (Library.translate[str]) return Library.translate[str].slice(0, 2);
+			if (lib.translate[str + "_ab"]) return lib.translate[str + "_ab"];
+			if (lib.translate[str]) return lib.translate[str].slice(0, 2);
 			return str;
 		}
 		else if (arg == "info") {
-			if (Library.translate[str + "_info"]) return Library.translate[str + "_info"];
+			if (lib.translate[str + "_info"]) return lib.translate[str + "_info"];
 			var str2 = str.slice(0, str.length - 1);
-			if (Library.translate[str2 + "_info"]) return Library.translate[str2 + "_info"];
+			if (lib.translate[str2 + "_info"]) return lib.translate[str2 + "_info"];
 			if (str.lastIndexOf("_") > 0) {
 				str2 = str.slice(0, str.lastIndexOf("_"));
-				if (Library.translate[str2 + "_info"]) return Library.translate[str2 + "_info"];
+				if (lib.translate[str2 + "_info"]) return lib.translate[str2 + "_info"];
 			}
 			str2 = str.slice(0, str.length - 2);
-			if (Library.translate[str2 + "_info"]) return Library.translate[str2 + "_info"];
-			if (Library.skill[str] && Library.skill[str].prompt) return Library.skill[str].prompt;
+			if (lib.translate[str2 + "_info"]) return lib.translate[str2 + "_info"];
+			if (lib.skill[str] && lib.skill[str].prompt) return lib.skill[str].prompt;
 		}
-		if (Library.translate[str]) {
-			return Library.translate[str];
+		if (lib.translate[str]) {
+			return lib.translate[str];
 		}
 		if (typeof str == "string") {
-			if (Library.translate["nature_" + str]) return Library.translate["nature_" + str];
+			if (lib.translate["nature_" + str]) return lib.translate["nature_" + str];
 			return str;
 		}
 		if (typeof str == "number" || typeof str == "boolean") {

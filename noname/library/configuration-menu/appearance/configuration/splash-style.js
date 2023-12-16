@@ -1,5 +1,4 @@
 import { ITEM } from "./splash-style/item.js";
-
 export const SPLASH_STYLE = {
 	name: "启动页",
 	item: ITEM,

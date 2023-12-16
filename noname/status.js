@@ -3,7 +3,7 @@ import { ai } from "./game-status/ai.js";
 import { cardTag } from "./game-status/card-tag.js";
 import { postReconnect } from "./game-status/post-reconnect.js";
 
-export const status = {
+export var status = {
 	paused: false,
 	paused2: false,
 	paused3: false,

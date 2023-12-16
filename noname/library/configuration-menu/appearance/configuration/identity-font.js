@@ -1,4 +1,7 @@
 import { ITEM } from "./identity-font/item.js";
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
+import { status as _status } from '../../../../status.js';
 
 export const IDENTITY_FONT = {
 	name: "身份字体",

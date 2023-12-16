@@ -1,4 +1,8 @@
 import { ITEM } from "./player-style/item.js";
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
+import { status as _status } from '../../../../status.js';
+import { UI as ui } from '../../../../ui.js';
 
 export const PLAYER_STYLE = {
 	name: "角色背景",

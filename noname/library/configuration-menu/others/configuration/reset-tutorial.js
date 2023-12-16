@@ -1,3 +1,6 @@
+import { Game as game } from '../../../../game.js';
+import { status as _status } from '../../../../status.js';
+
 export const RESET_TUTORIAL = {
 	name: "重置新手向导",
 	onclick() {

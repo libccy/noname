@@ -1,5 +1,6 @@
 import { VOLUME_ITEM } from "./volume-item.js";
-
+import { Game as game } from '../../../../game.js';
+import { UI as ui } from '../../../../ui.js';
 export const VOLUME_BACKGROUND = {
 	name: "音乐音量",
 	init: 8,

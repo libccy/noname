@@ -1,3 +1,5 @@
+import { Game as game } from '../../../../game.js';
+import { UI as ui } from '../../../../ui.js';
 export const SHOW_CARD_PILE_NUMBER = {
 	name: "显示剩余牌数",
 	init: false,

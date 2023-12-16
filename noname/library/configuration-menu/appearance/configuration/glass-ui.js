@@ -1,3 +1,5 @@
+import { Game as game } from '../../../../game.js';
+import { UI as ui } from '../../../../ui.js';
 export const GLASS_UI = {
 	name: "玻璃主题",
 	intro: "为游戏主题打开玻璃效果（手机暂不支持）",

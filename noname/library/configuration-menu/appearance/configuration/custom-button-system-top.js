@@ -1,5 +1,6 @@
 import { CUSTOM_BUTTON_ITEM } from "./custom-button-item.js";
-
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
 export const CUSTOM_BUTTON_SYSTEM_TOP = {
 	name: "菜单上部高度",
 	init: "0x",

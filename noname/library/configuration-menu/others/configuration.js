@@ -5,6 +5,8 @@ import { REDOWNLOAD_GAME } from "./configuration/redownload-game.js";
 import { RESET_GAME } from "./configuration/reset-game.js";
 import { RESET_HIDDEN_PACK } from "./configuration/reset-hidden-pack.js";
 import { RESET_TUTORIAL } from "./configuration/reset-tutorial.js";
+import { Library as lib } from '../../../library.js';
+import { status as _status } from '../../../status.js';
 
 export const CONFIGURATION = {
 	reset_game: RESET_GAME,

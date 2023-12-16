@@ -1,4 +1,8 @@
 import { ITEM } from "./control-style/item.js";
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
+import { status as _status } from '../../../../status.js';
+import { UI as ui } from '../../../../ui.js';
 
 export const CONTROL_STYLE = {
 	name: "按钮背景",

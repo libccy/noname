@@ -1,3 +1,6 @@
+import { Game as game } from '../../../../game.js';
+import { status as _status } from '../../../../status.js';
+import { UI as ui } from '../../../../ui.js';
 export const REMEMBER_DIALOG = {
 	name: "记住对话框位置",
 	intro: "移动对话框后新的对话框也将在移动后的位置显示",

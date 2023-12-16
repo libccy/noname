@@ -1,3 +1,6 @@
+import { Game as game } from '../../../../game.js';
+import { status as _status } from '../../../../status.js';
+
 export const RESET_HIDDEN_PACK = {
 	name: "重置隐藏内容",
 	onclick() {

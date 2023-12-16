@@ -1,3 +1,7 @@
+import { Get as get } from '../../get.js';
+import { Library as lib } from '../../library.js';
+import { status as _status } from '../../status.js';
+import { UI as ui } from '../../ui.js';
 export class Control extends HTMLDivElement {
 	constructor() {
 		const nc = !ui.control.querySelector("div:not(.removing):not(.stayleft)");

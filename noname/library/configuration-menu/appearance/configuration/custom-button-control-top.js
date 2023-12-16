@@ -1,4 +1,6 @@
 import { CUSTOM_BUTTON_ITEM } from "./custom-button-item.js";
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
 
 export const CUSTOM_BUTTON_CONTROL_TOP = {
 	name: "技能上部高度",

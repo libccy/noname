@@ -1,4 +1,6 @@
 import { ITEM } from "./show-character-name-pinyin/item.js";
+import { Get as get } from '../../../../get.js';
+import { status as _status } from '../../../../status.js';
 
 export const SHOW_CHARACTER_NAME_PINYIN = {
 	name: "显示武将名注解",

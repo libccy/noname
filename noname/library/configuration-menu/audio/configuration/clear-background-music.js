@@ -1,3 +1,7 @@
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
+import { status as _status } from '../../../../status.js';
+
 export const CLEAR_BACKGROUND_MUSIC = {
 	name: "清除自定义背景音乐",
 	clear: true,

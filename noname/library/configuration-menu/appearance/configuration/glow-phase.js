@@ -1,4 +1,6 @@
 import { ITEM } from "./glow-phase/item.js";
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
 
 export const GLOW_PHASE = {
 	name: "当前回合角色高亮",

@@ -1,4 +1,7 @@
 import { ITEM } from "./radius-size/item.js";
+import { Game as game } from '../../../../game.js';
+import { status as _status } from '../../../../status.js';
+import { UI as ui } from '../../../../ui.js';
 
 export const RADIUS_SIZE = {
 	name: "圆角大小",

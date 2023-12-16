@@ -1,4 +1,6 @@
 import { ITEM } from "./global-font/item.js";
+import { Game as game } from '../../../../game.js';
+import { Library as lib } from '../../../../library.js';
 
 export const GLOBAL_FONT = {
 	name: "界面字体",

@@ -1,3 +1,4 @@
+import { Game as game } from '../../../../game.js'
 export const SHOW_GIVE_UP = {
 	name: "显示投降按钮",
 	init: true,
