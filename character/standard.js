@@ -406,7 +406,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.unuseful(card)+2.5*(5-get.owner(card).hp);
 					});
 					if(bool==false){
-						trigger.source.damage();
+						await trigger.source.damage();
 					}
 				},
 				ai:{

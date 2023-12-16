@@ -96,8 +96,9 @@ new Promise(resolve=>{
 		clicked:false,
 		auto:false,
 		/**
-		 * @type {GameEvent}
+		 * @type {GameEvent | GameEventPromise}
 		 */
+		// @ts-ignore
 		event:null,
 		ai:{},
 		lastdragchange:[],
@@ -26717,7 +26718,8 @@ new Promise(resolve=>{
 								}
 							}
 						}
-						var next=game.createEvent('logSkill',false),evt=_status.event;
+						var next=new lib.element.GameEvent('logSkill',false),evt=_status.event;
+						evt.next.push(next)
 						next.player=player;
 						next.forceDie=true;
 						next.includeOut=true;
@@ -26732,7 +26734,8 @@ new Promise(resolve=>{
 						player.getHistory('useSkill').push(logInfo);
 						//尽可能别往这写插入结算
 						//不能用来终止技能发动！！！
-						var next2=game.createEvent('logSkillBegin',false);
+						var next2=new lib.element.GameEvent('logSkillBegin',false);
+						evt.next.push(next2);
 						next2.player=player;
 						next2.forceDie=true;
 						next2.includeOut=true;
@@ -31980,8 +31983,9 @@ new Promise(resolve=>{
 					doingList.push(lastDo);
 					// console.log(name,event.player,doingList.map(i=>({player:i.player,todoList:i.todoList.slice(),doneList:i.doneList.slice()})))
 
-					if(allbool){
-						var next=game.createEvent('arrangeTrigger',false,event);
+					if (allbool) {
+						var next=new lib.element.GameEvent('arrangeTrigger', false);
+						event.next.push(next);
 						next.setContent('arrangeTrigger');
 						next.doingList=doingList;
 						next._trigger=event;
@@ -32135,15 +32139,20 @@ new Promise(resolve=>{
 				 * @returns { Promise<GameEvent> & GameEvent }
 				 */
 				constructor(event){
-					super(resolve=>{
+					super((resolve) => {
 						// 设置为异步事件
-						event.async=true;
+						event.async = true;
 						// 事件结束后触发resolve
 						event.resolve=resolve;
 						if(!_status.event) return;
 						// game.createEvent的时候还没立即push到next里
 						Promise.resolve().then(()=>{
-							const eventPromise=_status.event.next.find(e=>e.toEvent()==event);
+							const eventPromise=_status.event.next.find(
+								evt => 
+									((evt instanceof lib.element.GameEventPromise)
+										? evt.toEvent()
+										: evt) === event
+							);
 							// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
 							// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
 							if(eventPromise&&_status.event.content instanceof AsyncFunction){
@@ -41407,24 +41416,28 @@ new Promise(resolve=>{
 		/**
 		 * @param { Promise<GameEvent> & GameEvent & GameEventPromise } [belongAsyncEvent]
 		 */
-		async loop(belongAsyncEvent){
-			if(belongAsyncEvent){
+		async loop(belongAsyncEvent) {
+			if (belongAsyncEvent) {
 				game.belongAsyncEvent=belongAsyncEvent;
-			}else if(game.belongAsyncEvent){
+			} else if(game.belongAsyncEvent) {
 				return game.loop(game.belongAsyncEvent);
 			}
 			while (true) {
-				let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
+				let event = 
+					(belongAsyncEvent && belongAsyncEvent.parent === _status.event) 
+						? belongAsyncEvent 
+						: _status.event;
 				let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
+				
 				const _resolve = () => {
-					if (event.async) {
-						if (typeof event.resolve == 'function') {
-							event.resolve(event.toEvent());
-						} else {
-							throw new TypeError('异步事件的event.resolve未赋值，使用await时将会被永久等待');
-						}
+					if (!event.async) return;
+					if (typeof event.resolve === 'function') {
+						event.resolve(event.toEvent());
+					} else {
+						throw new TypeError('异步事件的event.resolve未赋值，使用await时将会被永久等待');
 					}
 				};
+
 				if (_status.paused2 || _status.imchoosing) {
 					if (!lib.status.dateDelaying) {
 						lib.status.dateDelaying = new Date();
@@ -41441,18 +41454,20 @@ new Promise(resolve=>{
 					lib.status.dateDelayed += lib.getUTC(new Date()) - lib.getUTC(lib.status.dateDelaying);
 					delete lib.status.dateDelaying;
 				}
+
 				if (event.next.length > 0) {
-					var next = event.next.shift();
+					const next = event.next.shift();
+
 					if (next.player && next.player.skipList.contains(next.name)) {
-						event.trigger(next.name + 'Skipped');
+						event.trigger(`${next.name}Skipped`);
 						next.player.skipList.remove(next.name);
 						if (lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name);
+						return;
 					}
-					else {
-						next.parent = event;
-						_status.event = next;
-						game.getGlobalHistory('everything').push(next);
-					}
+					
+					next.parent = event;
+					_status.event = next;
+					game.getGlobalHistory('everything').push(next);
 				}
 				else if (event.finished) {
 					if (event._triggered == 1) {
@@ -41488,18 +41503,18 @@ new Promise(resolve=>{
 								event.parent._result = event.result;
 							}
 							_status.event = event.parent;
-							if (game.belongAsyncEvent == event) {
+							if (game.belongAsyncEvent === event) {
 								delete game.belongAsyncEvent;
 								//resolve();
 							}
 							_resolve();
 							// 此时应该退出了
-							if (belongAsyncEvent && belongAsyncEvent.parent == _status.event) {
+							if (belongAsyncEvent && belongAsyncEvent.parent === _status.event) {
 								return;
 							}
 						}
 						else {
-							if (game.belongAsyncEvent == event) {
+							if (game.belongAsyncEvent === event) {
 								delete game.belongAsyncEvent;
 								//resolve();
 							}
@@ -61119,8 +61134,20 @@ new Promise(resolve=>{
 		 * () => GameEvent;
 		 * }}
 		 */
-		event:key=>key?_status.event[key]:_status.event,
-		player:()=>_status.event.player,
+		event(key) {
+			const currentEvent = 
+				(_status.event instanceof lib.element.GameEventPromise)
+					? _status.event.toEvent()
+					: _status.event;
+			
+			return key ? currentEvent[key] : currentEvent;
+		},
+		/**
+		 * @returns {Player}
+		 */
+		player() {
+			return _status.event.player;
+		},
 		players:(sort,dead,out)=>{
 			var players=game.players.slice(0);
 			if(sort!=false){
