@@ -25438,7 +25438,7 @@ new Promise(resolve=>{
 						else if(typeof arguments[i]=='boolean'){
 							next.animate=arguments[i];
 						}
-						else if(get.objtype(arguments[i])=='div'){
+						else if(['div','fragment'].includes(get.objtype(arguments[i]))){
 							next.position=arguments[i];
 						}
 						else if(arguments[i]=='notBySelf'){
@@ -25466,7 +25466,7 @@ new Promise(resolve=>{
 						else if(typeof arguments[i]=='boolean'){
 							next.animate=arguments[i];
 						}
-						else if(get.objtype(arguments[i])=='div'){
+						else if(['div','fragment'].includes(get.objtype(arguments[i]))){
 							next.position=arguments[i];
 						}
 						else if(arguments[i]=='notBySelf'){
@@ -25832,7 +25832,7 @@ new Promise(resolve=>{
 						else if(get.itemtype(arguments[i])=='card'){
 							next.cards=[arguments[i]];
 						}
-						else if(get.objtype(arguments[i])=='div'){
+						else if(['div','fragment'].includes(get.objtype(arguments[i]))){
 							next.position=arguments[i];
 						}
 						else if(arguments[i]=='toStorage'){
@@ -26427,7 +26427,7 @@ new Promise(resolve=>{
 						else if(typeof arguments[i]=='boolean'){
 							next.clearArena=arguments[i];
 						}
-						else if(get.objtype(arguments[i])=='div'){
+						else if(['div','fragment'].includes(get.objtype(arguments[i]))){
 							next.position=arguments[i];
 						}
 					}
@@ -31074,7 +31074,7 @@ new Promise(resolve=>{
 					var position;
 					for(var i=0;i<arguments.length;i++){
 						if(typeof arguments[i]=='string') node.classList.add(arguments[i]);
-						else if(get.objtype(arguments[i])=='div') position=arguments[i];
+						else if(['div','fragment'].includes(get.objtype(arguments[i]))) position=arguments[i];
 						else if(typeof arguments[i]=='boolean') clone=arguments[i];
 					}
 					node.moveTo=lib.element.Card.prototype.moveTo;
@@ -31231,7 +31231,7 @@ new Promise(resolve=>{
 				/**
 				 * @param {{}} item
 				 * @param {keyof typeof ui.create.buttonPresets | (item: {}, type: Function, position?: HTMLDivElement, noClick?: true, button?: HTMLDivElement) => HTMLDivElement} type
-				 * @param {HTMLDivElement} [position]
+				 * @param {HTMLDivElement|DocumentFragment} [position]
 				 * @param {true} [noClick]
 				 * @param {HTMLDivElement} [button]
 				 */
@@ -32241,6 +32241,7 @@ new Promise(resolve=>{
 					let noTouchScroll=false;
 					let forceButton=false;
 					let noForceButton=false;
+					/** @type {this} */
 					const dialog=ui.create.div('.dialog');
 					Object.setPrototypeOf(dialog,lib.element.Dialog.prototype);
 					dialog.contentContainer=ui.create.div('.content-container',dialog);
@@ -32287,7 +32288,7 @@ new Promise(resolve=>{
 							item=ui.create.caption(item,this.content);
 						}
 					}
-					else if(get.objtype(item)=='div'){
+					else if(['div','fragment'].includes(get.objtype(item))){
 						this.content.appendChild(item);
 					}
 					else if(get.itemtype(item)=='cards'){
@@ -40296,7 +40297,7 @@ new Promise(resolve=>{
 			else{
 				node.style.transform=`rotate(${(-deg)}deg) scaleY(0)`;
 				node.style.height=`${get.xyDistance(from,to)}px`;
-				if(get.objtype(arguments[1])=='div') arguments[1].appendChild(node);
+				if(['div','fragment'].includes(get.objtype(arguments[1]))) arguments[1].appendChild(node);
 				else if(game.chess) ui.chess.appendChild(node);
 				else ui.arena.appendChild(node);
 				ui.refresh(node);
@@ -44692,11 +44693,7 @@ new Promise(resolve=>{
 							str=arguments[i];
 						}
 					}
-					else if(get.objtype(arguments[i])=='div'||
-						get.objtype(arguments[i])=='table'||
-						get.objtype(arguments[i])=='tr'||
-						get.objtype(arguments[i])=='td'||
-						get.objtype(arguments[i])=='body') position=arguments[i];
+					else if(['div','table','tr','td','body','fragment'].includes(get.objtype(arguments[i]))) position=arguments[i];
 					else if(typeof arguments[i]=='number') position2=arguments[i];
 					else if(get.itemtype(arguments[i])=='divposition') divposition=arguments[i];
 					else if(typeof arguments[i]=='object') style=arguments[i];
@@ -44766,11 +44763,7 @@ new Promise(resolve=>{
 							tagName=arguments[i];
 						}
 					}
-					else if(get.objtype(arguments[i])=='div'||
-						get.objtype(arguments[i])=='table'||
-						get.objtype(arguments[i])=='tr'||
-						get.objtype(arguments[i])=='td'||
-						get.objtype(arguments[i])=='body') position=arguments[i];
+					else if(['div','table','tr','td','body','fragment'].includes(get.objtype(arguments[i]))) position=arguments[i];
 					else if(typeof arguments[i]=='number') position2=arguments[i];
 					else if(get.itemtype(arguments[i])=='divposition') divposition=arguments[i];
 					else if(typeof arguments[i]=='object') style=arguments[i];
@@ -52060,11 +52053,7 @@ new Promise(resolve=>{
 						}
 						else row=arguments[i];
 					}
-					else if(get.objtype(arguments[i])=='div'||
-						get.objtype(arguments[i])=='table'||
-						get.objtype(arguments[i])=='tr'||
-						get.objtype(arguments[i])=='td'||
-						get.objtype(arguments[i])=='body') position=arguments[i];
+					else if(['div','table','tr','td','body','fragment'].includes(get.objtype(arguments[i]))) position=arguments[i];
 					else if(typeof arguments[i]=='boolean') fixed=arguments[i];
 					else if(get.itemtype(arguments[i])=='divposition') divposition=arguments[i];
 					else if(typeof arguments[i]=='object') style=arguments[i];
@@ -54096,14 +54085,16 @@ new Promise(resolve=>{
 						});
 					}
 				}
+				var fragment=document.createDocumentFragment();
 				for(var i=0;i<list.length;i++){
 					if(pre){
-						buttons.push(ui.create.prebutton(list[i],type.slice(3),position,noclick));
+						buttons.push(ui.create.prebutton(list[i],type.slice(3),fragment,noclick));
 					}
 					else{
-						buttons.push(ui.create.button(list[i],type,position,noclick));
+						buttons.push(ui.create.button(list[i],type,fragment,noclick));
 					}
 				}
+				if(position) position.appendChild(fragment);
 				return buttons;
 			},
 			textbuttons:function(list,dialog,noclick){
@@ -60846,6 +60837,7 @@ new Promise(resolve=>{
 			if(Object.prototype.toString.call(obj) === '[object HTMLTableRowElement]') return 'tr';
 			if(Object.prototype.toString.call(obj) === '[object HTMLTableCellElement]') return 'td';
 			if(Object.prototype.toString.call(obj) === '[object HTMLBodyElement]') return 'td';
+			if(Object.prototype.toString.call(obj) === '[object DocumentFragment]') return 'fragment';
 		},
 		type:(obj,method,player)=>{
 			if(typeof obj=='string') obj={name:obj};
