@@ -32198,11 +32198,40 @@ new Promise(resolve=>{
 					return this.#event;
 				}
 				/**
-				 * TODO: 实现debugger
+				 * 在某个异步事件中调试变量信息
+				 * 
+				 * 注: 在调试步骤中`定义的变量只在当前输入的语句有效`
+				 * 
+				 * @example
+				 * 在技能中调试技能content相关的信息
+				 * ```js
+				 * await event.debugger();
+				 * ```
+				 * 在技能中调试触发此技能事件的相关的信息
+				 * ```js
+				 * await trigger.debugger();
+				 * ```
 				 */
 				async debugger(){
 					return new Promise(resolve=>{
-						resolve(null);
+						const runCode=function(event,code){
+							try {
+								var {player,_trigger:trigger,_result:result}=event;
+								return eval(code);
+							}catch(error){
+								return error;
+							}
+						}.bind(window);
+						const inputCallback=inputResult=>{
+							if(inputResult===false){
+								resolve(null);
+							}else{
+								const obj=runCode(this.toEvent(),inputResult);
+								alert((!obj||obj instanceof Error)?String(obj):get.stringify(obj));
+								game.promises.prompt('debugger调试').then(inputCallback);
+							}
+						}
+						game.promises.prompt('debugger调试').then(inputCallback);
 					});
 				}
 			},
