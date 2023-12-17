@@ -3953,8 +3953,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player!=target&&target.canEquip(card);
 				},
 				async content(event, trigger, player){
-					await event.target.promises.equip(event.cards[0]);
-					await player.promises.draw();
+					await event.target.equip(event.cards[0]);
+					await player.draw();
 				},
 				discard:false,
 				lose:false,

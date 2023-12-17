@@ -96,7 +96,7 @@ new Promise(resolve=>{
 		clicked:false,
 		auto:false,
 		/**
-		 * @type {GameEvent | GameEventPromise}
+		 * @type {GameEventPromise & GameEvent}
 		 */
 		// @ts-ignore
 		event:null,
@@ -8791,33 +8791,18 @@ new Promise(resolve=>{
 							}
 							else src=`image/${type}/${subfolder}/${name}${ext}`;
 						}
-						else src=`image/${name}${ext}`;
+						else src=`image/${name}${ext}`; 
 						this.setBackgroundImage(src);
 						this.style.backgroundPositionX='center';
 						this.style.backgroundSize='cover';
-						if(type=='character'){
-							new Promise((_,reject)=>{
-								const image=new Image();
-								image.src=`${lib.assetURL}${src}`;
-								image.onerror=reject;
-							}).catch(()=>new Promise((_,reject)=>{
-								const nameinfo=get.character(name);
-								if(!nameinfo) reject('noinfo');
-								const sex=nameinfo[0];
-								src=`image/character/default_silhouette_${sex}${ext}`;
-								const image=new Image();
-								image.src=`${lib.assetURL}${src}`;
-								image.onload=()=>this.setBackgroundImage(src);
-								image.onerror=()=>reject(`sex:${sex}`);
-							})).catch(reason=>{
-								let sex;
-								if(reason=='noinfo') sex='male';
-								else sex=reason.slice(4);
-								src=`image/character/default_silhouette_${sex=='female'?'female':'male'}${ext}`;
-								const image=new Image();
-								image.src=`${lib.assetURL}${src}`;
-								image.onload=()=>this.setBackgroundImage(src);
-							});
+						if (type === 'character') {
+							const nameinfo = get.character(name);
+							const sex = nameinfo ? nameinfo[0] : 'male';
+							this.style.backgroundImage = [
+								this.style.backgroundImage,
+								`url("${lib.assetURL}image/character/default_silhouette_${sex}${ext}")`,
+								`url("${lib.assetURL}image/character/default_silhouette_male${ext}")`,
+							].join(",");
 						}
 						return this;
 					}
@@ -11827,7 +11812,8 @@ new Promise(resolve=>{
 										event.step=currentResult[1];
 										currentResult=currentResult[0];
 									}
-									lastEvent=currentResult;
+									else if (currentResult instanceof lib.element.GameEvent)
+										lastEvent=currentResult;
 								}
 							}
 						}else if(item._parsed) return item;
@@ -41581,51 +41567,47 @@ new Promise(resolve=>{
 				}
 			}
 		},
-		runContent(belongAsyncEvent) {
-			return new Promise(resolve=>{
-				let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
-				let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
-				if (event.content instanceof GeneratorFunction) {
-					if (!event.debugging) {
-						if (event.generatorContent) event.generatorContent.return();
-						event.generatorContent = event.content(event, step, source, player, target, targets,
-							card, cards, skill, forced, num, trigger, result,
-							_status, lib, game, ui, get, ai);
-					} else {
-						delete event.debugging;
-					}
-					var next = event.generatorContent.next();
-					if (typeof next.value == 'function' && next.value.toString() == 'code=>eval(code)') {
-						//触发debugger
-						var inputCallback = inputResult => {
-							if (inputResult === false) {
-								event.debugging = true;
-								game.resume2();
-							} else {
-								alert(get.stringify(next.value(inputResult)));
-								game.prompt('', 'debugger调试', inputCallback);
-							}
-						}
-						game.prompt('', 'debugger调试', inputCallback);
-						return game.pause2();
-					}
-					if (event.finished) event.generatorContent.return();
-					resolve();
-				}
-				else if (event.content instanceof AsyncFunction) {
-					// _status,lib,game,ui,get,ai六个变量由game.import提供
-					event.content(event, trigger, player).then(() => {
-						event.finish();
-						resolve();
-					});
-				}
-				else {
-					event.content(event, step, source, player, target, targets,
+		async runContent(belongAsyncEvent) {
+			const event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
+			const { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
+			if (event.content instanceof GeneratorFunction) {
+				if (!event.debugging) {
+					if (event.generatorContent) event.generatorContent.return();
+					event.generatorContent = event.content(event, step, source, player, target, targets,
 						card, cards, skill, forced, num, trigger, result,
 						_status, lib, game, ui, get, ai);
-					resolve();
+				} else {
+					delete event.debugging;
 				}
-			});
+				const next = event.generatorContent.next();
+				if (typeof next.value == 'function' && next.value.toString() == 'code=>eval(code)') {
+					game.pause2();
+					//触发debugger
+					while (true) {
+						const inputResult = await game.promises
+							.prompt('', 'debugger调试');
+
+						if (inputResult === false) {
+							event.debugging = true;
+							game.resume2();
+							break;
+						}
+
+						alert(get.stringify(next.value(inputResult)));
+					}
+				}
+				if (event.finished) event.generatorContent.return();
+			}
+			else if (event.content instanceof AsyncFunction) {
+				// _status,lib,game,ui,get,ai六个变量由game.import提供
+				await event.content(event, trigger, player);
+				event.finish();
+			}
+			else {
+				event.content(event, step, source, player, target, targets,
+					card, cards, skill, forced, num, trigger, result,
+					_status, lib, game, ui, get, ai);
+			}
 		},
 		pause:function(){
 			clearTimeout(_status.timeout);
@@ -61135,11 +61117,7 @@ new Promise(resolve=>{
 		 * }}
 		 */
 		event(key) {
-			const currentEvent = 
-				(_status.event instanceof lib.element.GameEventPromise)
-					? _status.event.toEvent()
-					: _status.event;
-			
+			const currentEvent = _status.event.toEvent()
 			return key ? currentEvent[key] : currentEvent;
 		},
 		/**
