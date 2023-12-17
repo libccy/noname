@@ -305,6 +305,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							else if(target.hp<2) basic*=3;
 							if(zhu) eff*=Math.max(1,9/target.hp/target.hp);
 							if(isLink){
+								let rate=_status.event.getTempCache('sha_result','mayShan');
 								if(rate&&rate.id===card.sha_ai_id) rate=rate.rate;
 								delete target._sha_result_temp;
 								if(typeof rate==='boolean'||typeof rate==='number'){
