@@ -32143,21 +32143,29 @@ new Promise(resolve=>{
 						if(!_status.event) return;
 						// game.createEvent的时候还没立即push到next里
 						Promise.resolve().then(()=>{
-							const eventPromise=_status.event.next.find(e=>e.toEvent()==event);
-							// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
-							// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
-							if(eventPromise&&_status.event.content instanceof AsyncFunction){
-								if(_status.event!=eventPromise){
-									eventPromise.parent=_status.event;
-									_status.event=eventPromise;
-									game.getGlobalHistory('everything').push(eventPromise);
+							const callback=()=>{
+								let eventPromise=_status.event.next.find(e=>e.toEvent()==event);
+								// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
+								// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
+								if (eventPromise&&_status.event.content instanceof AsyncFunction){
+									if(_status.event!=eventPromise){
+										eventPromise.parent=_status.event;
+										_status.event=eventPromise;
+										game.getGlobalHistory('everything').push(eventPromise);
+									}
+									// 异步执行game.loop
+									// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
+									// 再执行game.loop是因为原有的game.loop被await卡住了，
+									// 得新执行一个只执行这个异步事件的game.loop
+									game.executingAsyncEvent=Promise.resolve().then(()=>game.loop(eventPromise))
+										.then(()=>{
+											delete game.executingAsyncEvent;
+										});
 								}
-								// 异步执行game.loop
-								// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
-								// 再执行game.loop是因为原有的game.loop被await卡住了，
-								// 得新执行一个只执行这个异步事件的game.loop
-								Promise.resolve().then(()=>game.loop(eventPromise));
-							}
+							};
+							// 没有await上个事件（也就是_status.event）
+							if(game.executingAsyncEvent) game.executingAsyncEvent.then(callback);
+							else callback();
 						});
 					});
 					this.#event=event;
