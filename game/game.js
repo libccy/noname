@@ -96,7 +96,7 @@ new Promise(resolve=>{
 		clicked:false,
 		auto:false,
 		/**
-		 * @type {GameEventPromise & GameEvent}
+		 * @type {GameEventPromise | GameEvent}
 		 */
 		// @ts-ignore
 		event:null,
@@ -31530,7 +31530,8 @@ new Promise(resolve=>{
 									lib.element.content[item]._parsed=true;
 								}
 							}
-							catch(_){
+							// 耶稣来了这里也不能带括号
+							catch {
 								throw new Error(`Content ${item} may not exist.\nlib.element.content[${item}] = ${lib.element.content[item]}`);
 							}
 							this.content=lib.element.content[item];
@@ -36230,7 +36231,7 @@ new Promise(resolve=>{
 				return new Promise((resolve,reject)=>{
 					if(alertOption!='alert'){
 						forced=title||false;
-						title=option;
+						title=alertOption;
 						game.prompt(title,forced,resolve);
 					}else{
 						game.prompt(alertOption,title,forced,resolve);
@@ -41567,47 +41568,52 @@ new Promise(resolve=>{
 				}
 			}
 		},
-		async runContent(belongAsyncEvent) {
-			const event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
-			const { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
-			if (event.content instanceof GeneratorFunction) {
-				if (!event.debugging) {
-					if (event.generatorContent) event.generatorContent.return();
-					event.generatorContent = event.content(event, step, source, player, target, targets,
+		runContent(belongAsyncEvent) {
+			return new Promise(resolve=>{
+				let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
+				let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
+				if (event.content instanceof GeneratorFunction) {
+					if (!event.debugging) {
+						if (event.generatorContent) event.generatorContent.return();
+						event.generatorContent = event.content(event, step, source, player, target, targets,
+							card, cards, skill, forced, num, trigger, result,
+							_status, lib, game, ui, get, ai);
+					} else {
+						delete event.debugging;
+					}
+					var next = event.generatorContent.next();
+					if (typeof next.value == 'function' && next.value.toString() == 'code=>eval(code)') {
+						//触发debugger
+						var inputCallback = inputResult => {
+							if (inputResult === false) {
+								event.debugging = true;
+								game.resume2();
+								resolve();
+							} else {
+								alert(get.stringify(next.value(inputResult)));
+								game.prompt('', 'debugger调试', inputCallback);
+							}
+						}
+						game.prompt('', 'debugger调试', inputCallback);
+						return game.pause2();
+					}
+					if (event.finished) event.generatorContent.return();
+					resolve();
+				}
+				else if (event.content instanceof AsyncFunction) {
+					// _status,lib,game,ui,get,ai六个变量由game.import提供
+					event.content(event, trigger, player).then(() => {
+						event.finish();
+						resolve();
+					});
+				}
+				else {
+					event.content(event, step, source, player, target, targets,
 						card, cards, skill, forced, num, trigger, result,
 						_status, lib, game, ui, get, ai);
-				} else {
-					delete event.debugging;
+					resolve();
 				}
-				const next = event.generatorContent.next();
-				if (typeof next.value == 'function' && next.value.toString() == 'code=>eval(code)') {
-					game.pause2();
-					//触发debugger
-					while (true) {
-						const inputResult = await game.promises
-							.prompt('', 'debugger调试');
-
-						if (inputResult === false) {
-							event.debugging = true;
-							game.resume2();
-							break;
-						}
-
-						alert(get.stringify(next.value(inputResult)));
-					}
-				}
-				if (event.finished) event.generatorContent.return();
-			}
-			else if (event.content instanceof AsyncFunction) {
-				// _status,lib,game,ui,get,ai六个变量由game.import提供
-				await event.content(event, trigger, player);
-				event.finish();
-			}
-			else {
-				event.content(event, step, source, player, target, targets,
-					card, cards, skill, forced, num, trigger, result,
-					_status, lib, game, ui, get, ai);
-			}
+			});
 		},
 		pause:function(){
 			clearTimeout(_status.timeout);
@@ -61117,7 +61123,10 @@ new Promise(resolve=>{
 		 * }}
 		 */
 		event(key) {
-			const currentEvent = _status.event.toEvent()
+			const currentEvent = 
+				(_status.event instanceof lib.element.GameEventPromise)
+					? _status.event.toEvent()
+					: _status.event;
 			return key ? currentEvent[key] : currentEvent;
 		},
 		/**
