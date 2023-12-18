@@ -32141,63 +32141,31 @@ new Promise(resolve=>{
 						// 事件结束后触发resolve
 						event.resolve=resolve;
 						if(!_status.event) return;
+						if(!game.executingAsyncEventMap){
+							game.executingAsyncEventMap=new Map();
+						}
 						// game.createEvent的时候还没立即push到next里
 						Promise.resolve().then(()=>{
-							const callback=()=>{
+							game.executingAsyncEventMap.set(_status.event.toEvent(),(game.executingAsyncEventMap.get(_status.event.toEvent())||Promise.resolve()).then(()=>{
 								let eventPromise=_status.event.next.find(e=>e.toEvent()==event);
 								// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
 								// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
-								if (eventPromise&&_status.event.content instanceof AsyncFunction){
+								if(eventPromise&&_status.event.content instanceof AsyncFunction){
 									// 异步执行game.loop
 									// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
 									// 再执行game.loop是因为原有的game.loop被await卡住了，
 									// 得新执行一个只执行这个异步事件的game.loop
-									if(!game.executingAsyncEventMap.has(_status.event.toEvent())){
-										game.executingAsyncEventMap.set(_status.event.toEvent(),Promise.resolve().then(()=>{
-											console.log(event.name, '将要执行');
-											if(_status.event!=eventPromise){
-												eventPromise.parent=_status.event;
-												_status.event=eventPromise;
-												game.getGlobalHistory('everything').push(eventPromise);
-											}
-											return game.loop(eventPromise);
-										}).then(()=>{
-											console.log(event.name, '执行完毕');
-											return event.name;
-										}));
+									if(_status.event!=eventPromise){
+										eventPromise.parent=_status.event;
+										_status.event=eventPromise;
+										game.getGlobalHistory('everything').push(eventPromise);
 									}
-									else{
-										game.executingAsyncEventMap.set(_status.event.toEvent(),game.executingAsyncEventMap.get(_status.event.toEvent()).then(()=>{
-											console.log(event.name,'将要执行');
-											if (_status.event != eventPromise) {
-												eventPromise.parent = _status.event;
-												_status.event = eventPromise;
-												game.getGlobalHistory('everything').push(eventPromise);
-											}
-											return game.loop(eventPromise);
-										}).then(()=>{
-											console.log(event.name, '执行完毕');
-											return event.name;
-										}));
-									}
-								}else{
-									console.error(event.name,'没有执行');
-									console.error(_status.event.toEvent());
-									return event.name;
+									return game.loop(eventPromise).then(()=>{
+										// 有时候event.finished还是false
+										return eventPromise;
+									});
 								}
-							};
-							if(!game.executingAsyncEventMap){
-								game.executingAsyncEventMap=new Map();
-							}
-							// 没有await上个事件（也就是_status.event）
-							if(game.executingAsyncEventMap.has(_status.event.toEvent())){
-								console.log(event.name,'正在等待',_status.event.name,'执行');
-								game.executingAsyncEventMap.set(_status.event.toEvent(),game.executingAsyncEventMap.get(_status.event.toEvent()).then(callback));
-							}
-							else{
-								console.log(event.name,'立即执行');
-								callback();
-							}
+							}));
 						});
 					});
 					this.#event=event;
@@ -41564,7 +41532,6 @@ new Promise(resolve=>{
 							_status.event = event.parent;
 							if (game.belongAsyncEvent == event) {
 								delete game.belongAsyncEvent;
-								//resolve();
 							}
 							_resolve();
 							// 此时应该退出了
@@ -41575,7 +41542,6 @@ new Promise(resolve=>{
 						else {
 							if (game.belongAsyncEvent == event) {
 								delete game.belongAsyncEvent;
-								//resolve();
 							}
 							return _resolve();
 						}
@@ -41634,7 +41600,11 @@ new Promise(resolve=>{
 									console.log(e);
 								}
 								else throw e;
-							}).then(after);
+							}).then(after).then(()=>{
+								if (event.finished) {
+									if (game.executingAsyncEventMap) game.executingAsyncEventMap.clear();
+								}
+							});
 						}
 					}
 				}
@@ -41675,11 +41645,10 @@ new Promise(resolve=>{
 					// _status,lib,game,ui,get,ai六个变量由game.import提供
 					event.content(event, trigger, player).then(() => {
 						if (game.executingAsyncEventMap && game.executingAsyncEventMap.has(event.toEvent())) {
-							game.executingAsyncEventMap.get(event.toEvent()).then(() => {
-								game.executingAsyncEventMap.delete(event.toEvent());
+							game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
 								event.finish();
 								resolve();
-							});
+							}));
 						} else {
 							event.finish();
 							resolve();
