@@ -41530,6 +41530,7 @@ new Promise(resolve=>{
 						}
 					}
 					else {
+						game.executingAsyncEventMap.delete(event.toEvent());
 						if (event.parent) {
 							if (event.result) {
 								event.parent._result = event.result;
@@ -41607,7 +41608,7 @@ new Promise(resolve=>{
 								else throw e;
 							}).then(after).then(()=>{
 								if (event.finished) {
-									if (game.executingAsyncEventMap) game.executingAsyncEventMap.clear();
+									game.executingAsyncEventMap.delete(event.toEvent());
 								}
 							});
 						}
