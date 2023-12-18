@@ -32141,9 +32141,6 @@ new Promise(resolve=>{
 						// 事件结束后触发resolve
 						event.resolve=resolve;
 						if(!_status.event) return;
-						if(!game.executingAsyncEventMap){
-							game.executingAsyncEventMap=new Map();
-						}
 						// game.createEvent的时候还没立即push到next里
 						Promise.resolve().then(()=>{
 							game.executingAsyncEventMap.set(_status.event.toEvent(),(game.executingAsyncEventMap.get(_status.event.toEvent())||Promise.resolve()).then(()=>{
@@ -41447,6 +41444,14 @@ new Promise(resolve=>{
 			}
 		},
 		/**
+		 * @type { Map<GameEvent, Promise<any>> }
+		 * 
+		 * 以Promise储存异步事件的执行链，使async content调用事件时无需必须使用await
+		 * 
+		 * 但是需要事件结果的除外
+		 */
+		executingAsyncEventMap:new Map(),
+		/**
 		 * @param { Promise<GameEvent> & GameEvent & GameEventPromise } [belongAsyncEvent]
 		 */
 		async loop(belongAsyncEvent){
@@ -41644,7 +41649,7 @@ new Promise(resolve=>{
 				else if (event.content instanceof AsyncFunction) {
 					// _status,lib,game,ui,get,ai六个变量由game.import提供
 					event.content(event, trigger, player).then(() => {
-						if (game.executingAsyncEventMap && game.executingAsyncEventMap.has(event.toEvent())) {
+						if (game.executingAsyncEventMap.has(event.toEvent())) {
 							game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
 								event.finish();
 								resolve();
