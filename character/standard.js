@@ -2211,9 +2211,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				preHidden:true,
 				async content(event,trigger,player){
-					player.damage();
-					//player.recover();
-					await player.draw();
+					player.draw();
 				},
 			},
 			xinbiyue:{
