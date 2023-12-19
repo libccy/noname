@@ -143,6 +143,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		},
 		start:function(){
 			"step 0"
+			_status.mode=_status.connectMode?lib.configOL.single_mode:get.config('single_mode');
 			var playback=localStorage.getItem(lib.configprefix+'playback');
 			if(playback){
 				ui.create.me();
@@ -172,7 +173,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 			}
 			"step 2"
-			_status.mode=_status.connectMode?lib.configOL.single_mode:get.config('single_mode');
 			if(_status.mode=='normal'){
 				lib.card.list=lib.singlePile.slice(0);
 				game.fixedPile=true;
@@ -883,35 +883,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
-			manyi:{
-				audio:2,
-				trigger:{target:'useCardToBefore'},
-				forced:true,
-				filter:function(event,player){
-					return event.card.name=='nanman';
-				},
-				content:function(){
-					trigger.cancel();
-				},
-				ai:{
-					effect:{
-						target:function(card){
-							if(card.name=='nanman') return 'zerotarget';
-						},
-					},
-				},
-				group:'manyi2',
-			},
-			manyi2:{
-				trigger:{
-					player:'enterGame',
-					global:'gameDrawAfter',
-				},
-				direct:true,
-				content:function(){
-					player.chooseUseTarget('nanman',get.prompt('manyi'),'视为使用一张【南蛮入侵】').logSkill='manyi';
-				},
-			},
 			wanrong:{
 				audio:2,
 				trigger:{target:'useCardToTargeted'},
@@ -1191,8 +1162,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			changban2:'血战长坂坡',
 			dianjiang2:'点将单挑',
 			
-			manyi:'蛮裔',
-			manyi_info:'锁定技，【南蛮入侵】对你无效。当你登场时，你可以视为使用一张【南蛮入侵】。',
 			wanrong:'婉容',
 			wanrong_info:'当你成为【杀】的目标后，你可以摸一张牌。',
 			sgzhiheng:'制衡',

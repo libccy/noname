@@ -4,7 +4,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
-			zhangjian:['male','qun',105,['dc_zj_a','dc_zj_b']],
+			dc_sb_zhouyu:['male','wu',4,['dcsbronghuo','dcsbyingmou']],
+			dc_sb_lusu:['male','wu',3,['dcsbmingshi','dcsbmengmou']],
+			zhangjian:['male','qun',105,['dc_zj_a','dc_zj_b'],['unseen']],
 			zhugeruoxue:['female','wei',3,['dcqiongying','dcnuanhui']],
 			caoyi:['female','wei',4,['dcmiyi','dcyinjun']],
 			malingli:['female','shu',3,['dclima','dcxiaoyin','dchuahuo']],
@@ -80,7 +82,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_liuzan:['male','wu',4,['refenyin','liji']],
 			wenyang:['male','wei',5,['xinlvli','choujue']],
 			wangshuang:['male','wei',8,['spzhuilie']],
-			huaman:['female','shu',3,['hmmanyi','mansi','souying','zhanyuan']],
+			huaman:['female','shu',3,['manyi','mansi','souying','zhanyuan']],
 			puyuan:['male','shu',4,['pytianjiang','pyzhuren']],
 			guanlu:['male','wei',3,['tuiyan','busuan','mingjie']],
 			gexuan:['male','wu',3,['gxlianhua','zhafu']],
@@ -103,9 +105,308 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_qifu:['dc_guansuo','xin_baosanniang','dc_zhaoxiang'],
 				sp2_gaoshan:['wanglang','liuhui','zhangjian'],
 				sp2_wumiao:['wu_zhugeliang','wu_luxun'],
+				sp2_mouding:['dc_sb_lusu','dc_sb_zhouyu'],
 			}
 		},
 		skill:{
+			//周瑜
+			//无 双 万 军 取 首
+			dcsbronghuo:{
+				audio:2,
+				trigger:{player:'useCard'},
+				filter:function(event,player){
+					return (event.card.name=='sha'&&game.hasNature(event.card,'fire'))||event.card.name=='huogong';
+				},
+				forced:true,
+				content:function(){
+					trigger.baseDamage=game.countGroup();
+				},
+				ai:{threaten:3.5},
+			},
+			dcsbyingmou:{
+				mark:true,
+				marktext:'☯',
+				zhuanhuanji:true,
+				intro:{
+					content:function(storage){
+						if(!storage) return '每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】。'
+						return '每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌（若其没有可使用的牌则将手牌数弃至与你相同）。';
+					},
+				},
+				audio:2,
+				trigger:{player:'useCardToPlayered'},
+				filter:function(event,player){
+					return event.isFirstTarget;
+				},
+				usable:1,
+				direct:true,
+				content:function*(event,map){
+					var result,player=map.player,targets=map.trigger.targets;
+					var storage=player.storage.dcsbyingmou;
+					if(storage){
+						result=yield player.chooseCardTarget({
+							prompt:get.prompt('dcsbyingmou'),
+							prompt2:'选择一名目标角色，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌（若其没有可使用的牌则将手牌数弃至与你相同）',
+							filterTarget:function(card,player,target){
+								if(!ui.selected.targets.length) return _status.event.targets.includes(target);
+								return target.isMaxHandcard();
+							},
+							selectTarget:2,
+							complexSelect:true,
+							complexTarget:true,
+							multitarget:true,
+							targetprompt:['目标角色','使用角色'],
+							filterCard:()=>false,
+							selectCard:-1,
+							ai2:function(target){
+								var player=_status.event.player;
+								var getNum=function(player,target,source){
+									return player.getCards('h',card=>{
+										if(get.name(card)!='sha'&&(get.type(card)!='trick'||!get.tag(card,'damage'))) return false;
+										return player.canUse(card,target,false);
+									}).reduce((sum,card)=>sum+get.effect(target,card,player,source),0);
+								};
+								if(!ui.selected.targets.length){
+									var targets=game.filterPlayer(target=>target.isMaxHandcard());
+									targets.sort((a,b)=>getNum(b,target,player)-getNum(a,target,player));
+									return getNum(targets[0],target,player)+1;
+								}
+								return getNum(target,ui.selected.targets[0],player)+1;
+							},
+						}).set('targets',targets);
+					}
+					else result=yield player.chooseTarget(get.prompt('dcsbyingmou'),'选择一名目标角色，将手牌数摸至与其相同，然后视为对其使用一张【火攻】',(card,player,target)=>_status.event.targets.includes(target)).set('ai',target=>{
+						var player=_status.event.player;
+						return Math.max(0,Math.min(5,target.countCards('h')-player.countCards('h')))*2+get.effect(target,{name:'huogong'},player,player);
+					}).set('targets',targets);
+					if(result.bool){
+						var target=result.targets[0];
+						if(storage){
+							player.logSkill('dcsbyingmou',result.targets,false);
+							player.line2(result.targets);
+							player.changeZhuanhuanji('dcsbyingmou');
+							var source=result.targets[1],discard=true;
+							while(true){
+								var cards=source.getCards('h',card=>{
+									if(get.name(card)!='sha'&&(get.type(card)!='trick'||!get.tag(card,'damage'))) return false;
+									return source.canUse(card,target,false);
+								});
+								if(cards.length){
+									if(discard) discard=false;
+									yield source.useCard(cards.randomGet(),target,false);
+								}
+								else break;
+							}
+							if(discard&&player.countCards('h')<source.countCards('h')) source.chooseToDiscard(source.countCards('h')-player.countCards('h'),'h',true);
+						}
+						else{
+							player.logSkill('dcsbyingmou',target);
+							player.changeZhuanhuanji('dcsbyingmou');
+							if(player.countCards('h')<target.countCards('h')) player.draw(Math.min(5,target.countCards('h')-player.countCards('h')));
+							if(player.canUse({name:'huogong'},target,false)) player.useCard({name:'huogong'},target,false);
+						}
+					}
+					else player.storage.counttrigger.dcsbyingmou--;
+				},
+			},
+			//鲁肃
+			dcsbmingshi:{
+				audio:2,
+				trigger:{player:'phaseDrawBegin2'},
+				filter:function(event,player){
+					return !event.numFixed;
+				},
+				frequent:true,
+				content:function(){
+					trigger.num+=2;
+					player.when('phaseDrawEnd').filter((evt,player)=>evt==trigger&&player.countCards('h')).then(()=>{
+						var str='明势：请展示三张牌并令一名其他角色选择获得其中的一张牌';
+						if(player.countCards('h')<=3) str='明势：展示手牌并令一名其他角色选择获得其中的一张牌';
+						player.chooseCardTarget({
+							prompt:str,
+							filterTarget:lib.filter.notMe,
+							filterCard:true,
+							selectCard:function(){
+								var player=_status.event.player;
+								if(player.countCards('h')<=3) return -1;
+								return 3;
+							},
+							position:'h',
+							forced:true,
+							ai1:function(card){
+								return -get.value(card);
+							},
+							ai2:function(target){
+								var player=_status.event.player;
+								if(player.hasSkill('dcsbmengmou')&&!get.is.blocked('dcsbmengmou',player)&&player.storage.dcsbmengmou&&get.attitude(player,target)<0) return get.effect(target,{name:'losehp'},player,player);
+								return get.attitude(player,target);
+							},
+						});
+					}).then(()=>{
+						if(result.bool){
+							var target=result.targets[0];
+							event.target=target;
+							var cards=result.cards;
+							player.showCards(cards,get.translation(player)+'发动了【明势】');
+							target.chooseButton(['明势：请获得其中一张牌',cards],true).set('filterButton',button=>{
+								return lib.filter.canBeGained(button.link,_status.event.source,_status.event.player);
+							}).set('ai',button=>get.value(button.link)).set('source',player);
+						}
+						else event.finish();
+					}).then(()=>{
+						if(result.bool){
+							var card=result.links[0];
+							if(lib.filter.canBeGained(card,player,target)) target.gain(card,player,'giveAuto');
+							else game.log('但',card,'不能被',player,'获得！');
+						}
+					});
+				},
+			},
+			dcsbmengmou:{
+				mark:true,
+				marktext:'☯',
+				zhuanhuanji:true,
+				intro:{
+					content:function(storage){
+						if(!storage) return '每回合限一次，当你得到其他角色的牌后，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力。（X为你的体力值）'
+						return '每回合限一次，其他角色得到你的牌后，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力值，Y为X-其打出【杀】数）';
+					},
+				},
+				audio:2,
+				trigger:{global:['gainAfter','loseAsyncAfter']},
+				filter:function(event,player){
+					if(!player.getHp()) return false;
+					if(event.name=='loseAsync'&&event.type!='gain') return false;
+					var storage=player.storage.dcsbmengmou;
+					var cards;
+					if(storage){
+						if(player.hasSkill('dcsbmengmou_true')) return false;
+						cards=event.getl(player).cards2;
+						return game.hasPlayer(function(current){
+							if(current==player) return false;
+							var cardsx=event.getg(current);
+							return cardsx.some(i=>cards.includes(i));
+						});
+					}
+					else cards=event.getg(player);
+					if(player.hasSkill('dcsbmengmou_false')) return false;
+					return game.hasPlayer(function(current){
+						if(current==player) return false;
+						var cardsx=event.getl(current).cards2;
+						return cards.some(i=>cardsx.includes(i));
+					});
+				},
+				direct:true,
+				content:function*(event,map){
+					var player=map.player,trigger=map.trigger;
+					var storage=player.storage.dcsbmengmou;
+					player.addTempSkill('dcsbmengmou_effect','dcsbmengmouAfter');
+					var targets,cards,num=player.getHp();
+					if(storage){
+						cards=trigger.getl(player).cards2;
+						targets=game.filterPlayer(function(current){
+							if(current==player) return false;
+							var cardsx=trigger.getg(current);
+							return cardsx.some(i=>cards.includes(i));
+						});
+					}
+					else{
+						cards=trigger.getg(player);
+						targets=game.filterPlayer(function(current){
+							if(current==player) return false;
+							var cardsx=trigger.getl(current).cards2;
+							return cards.some(i=>cardsx.includes(i));
+						});
+					}
+					var check_true=function(player,target){
+						if(get.attitude(player,target)>0){
+							if(target.countCards('hs',card=>{
+								if(get.name(card)!='sha') return false;
+								return target.hasValueTarget(card);
+							})) return 4;
+							return 0.5;
+						}
+						if(get.attitude(player,target)<0){
+							if(!target.countCards('hs',card=>{
+								if(get.name(card)!='sha') return false;
+								return target.hasValueTarget(card);
+							})){
+								if(target.countCards('hs',card=>{
+									if(get.name(card)!='sha') return false;
+									return target.hasUseTarget(card);
+								})) return -3;
+								return -1;
+							}
+							return 0;
+						}
+						return 0;
+					};
+					var check_false=function(player,target){
+						if(get.attitude(player,target)<0) return get.effect(target,{name:'losehp'},player,player);
+						return 0;
+					};
+					var result,target;
+					if(targets.length==1){
+						target=targets[0];
+						var str;
+						if(storage) str='令'+get.translation(target)+'打出至多'+get.cnNumber(num)+'张【杀】，然后其失去Y点体力。（Y为'+num+'-其打出【杀】数）';
+						else str='令'+get.translation(target)+'使用至多'+get.cnNumber(num)+'张【杀】，其每以此法造成1点伤害，其回复1点体力';
+						result=yield player.chooseBool(get.prompt('dcsbmengmou',target),str).set('choice',(storage?check_true(player,target):check_false(player,target))>0);
+					}
+					else{
+						result=yield player.chooseTarget(get.prompt('dcsbmengmou'),lib.skill.dcsbmengmou.intro.content(storage),(card,player,target)=>_status.event.targets.includes(target)).set('ai',target=>{
+							return _status.event.check(_status.event.player,target);
+						}).set('targets',targets).set('check',storage?check_true:check_false).set('ainmate',false);
+					}
+					if(result.bool){
+						if(!target) target=result.targets[0];
+						player.logSkill('dcsbmengmou',target);
+						player.addTempSkill('dcsbmengmou_'+(storage||false));
+						player.changeZhuanhuanji('dcsbmengmou');
+						while(num>0){
+							num--;
+							var result2;
+							if(storage){
+								result2=yield target.chooseToRespond((card,player)=>{
+									return get.name(card)=='sha';
+								}).set('ai',card=>{
+									return 1+Math.random();
+								}).set('prompt','盟谋：是否打出一张【杀】？').set('prompt2','当前进度:'+(3-num)+'/3');
+							}
+							else result2=yield target.chooseToUse(card=>{
+								if(!lib.filter.cardEnabled(card,_status.event.player,_status.event)) return false;
+								return get.name(card)=='sha';
+							}).set('prompt','盟谋：是否使用一张【杀】？').set('prompt2','当前进度:'+(3-num)+'/3');
+							if(!result2.bool){
+								if(storage){
+									target.popup('杯具');
+									target.loseHp(num+1);
+								}
+								break;
+							}
+						}
+					}
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						trigger:{global:'damageSource'},
+						filter:function(event,player){
+							if(event.getParent().type!='card') return false;
+							if(event.source.isHealthy()||event.card.name!='sha') return false;
+							return event.getParent(4).name=='dcsbmengmou'&&event.getParent(4).player==player;
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							trigger.source.recover(trigger.num);
+						},
+					},
+					true:{charlotte:true},
+					false:{charlotte:false},
+				},
+			},
 			//张臶
 			dc_zj_a:{
 				audio:2,
@@ -11613,18 +11914,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//花鬘
 			manyi:{
 				audio:2,
-				audioname:['mengyou'],
-			},
-			hmmanyi:{
+				audioname:['mengyou','menghuo','zhurong'],
 				trigger:{target:'useCardToBefore'},
-				forced:true,
-				audio:'manyi',
-				audioname:['mengyou'],
 				filter:function(event,player){
 					return event.card.name=='nanman';
 				},
+				forced:true,
 				content:function(){
 					trigger.cancel();
+				},
+				ai:{
+					effect:{
+						target:function(card){
+							if(card.name=='nanman') return 'zerotarget';
+						},
+					},
+				},
+				group:'manyi_single',
+				subSkill:{
+					single:{
+						trigger:{
+							player:'enterGame',
+							global:'gameDrawAfter',
+						},
+						filter:function(event,player){
+							return get.mode()=='single'&&_status.mode=='normal';
+						},
+						direct:true,
+						content:function(){
+							player.chooseUseTarget('nanman',get.prompt('manyi'),'视为使用一张【南蛮入侵】').logSkill='manyi';
+						},
+					},
 				},
 			},
 			mansi:{
@@ -12876,6 +13196,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhangcai:function(player){
 				return '当你使用或打出'+(player.hasSkill('dczhangcai_all')?'':'点数为8的')+'牌时，你可以摸X张牌（X为你手牌区里'+(player.hasSkill('dczhangcai_all')?'与此牌点数相同':'点数为8')+'的牌数且至少为1）。';
 			},
+			dcsbmengmou:function(player){
+				var storage=player.storage.dcsbmengmou;
+				var str='转换技，每回合每项各限一次：';
+				if(!storage) str+='<span class="bluetext">';
+				str+='阴，当你得到其他角色的牌后，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；';
+				if(!storage) str+='</span>';
+				if(storage) str+='<span class="bluetext">';
+				str+='阳，其他角色得到你的牌后，你可令该角色打出至多X张【杀】，然后其失去Y点体力。';
+				if(storage) str+='</span>';
+				str+='（X为你的体力值，Y为X-其打出【杀】数）';
+				return str;
+			},
+			dcsbyingmou:function(player){
+				var storage=player.storage.dcsbyingmou;
+				var str='转换技，每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色：';
+				if(!storage) str+='<span class="bluetext">';
+				str+='阴，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】；';
+				if(!storage) str+='</span>';
+				if(storage) str+='<span class="bluetext">';
+				str+='阳，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌（若其没有可使用的牌则将手牌数弃至与你相同）。';
+				if(storage) str+='</span>';
+				return str;
+			},
 		},
 		characterReplace:{
 			wenyang:['wenyang','db_wenyang','diy_wenyang'],
@@ -12931,8 +13274,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wlcuorui_info_identity:'出牌阶段开始时，你可以弃置一名你至其的距离不大于1的角色区域里的一张牌，然后你选择一项：1.弃置另一名其他角色装备区里至多两张与此牌颜色相同的牌；2.展示另一名其他角色的至多两张手牌，然后获得其中与此牌颜色相同的牌。',
 			wlcuorui_info_guozhan:'出牌阶段开始时，你可以弃置一名你至其的距离不大于1的角色区域里的一张牌，然后你选择一项：1.弃置另一名其他角色装备区里至多两张与此牌颜色相同的牌；2.展示另一名其他角色的至多两张手牌，然后获得其中与此牌颜色相同的牌。',
 			huaman:'花鬘',
-			hmmanyi:'蛮裔',
-			hmmanyi_info:'锁定技，【南蛮入侵】对你无效。',
+			manyi:'蛮裔',
+			manyi_info:'锁定技，【南蛮入侵】对你无效。',
+			manyi_info_single_normal:'锁定技，【南蛮入侵】对你无效。当你登场时，你可以视为使用一张【南蛮入侵】。',
 			mansi_viewas:'蛮嗣',
 			mansi:'蛮嗣',
 			mansi_info:'出牌阶段限一次，你可以将所有手牌当做【南蛮入侵】使用；当有角色受到【南蛮入侵】的伤害后，你摸一张牌。',
@@ -13386,6 +13730,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_zj_a_info:'锁定技。当你受到牌造成的伤害时，若此牌有点数，则你将此伤害值改为此牌点数，否则你防止此伤害。',
 			dc_zj_b:'技能',
 			dc_zj_b_info:'结束阶段，你可以弃置所有牌并令一名其他角色获得〖技能〗直到你的下个回合开始。',
+			dc_sb_lusu:'新杀谋鲁肃',
+			dc_sb_lusu_prefix:'新杀谋',
+			dcsbmingshi:'明势',
+			dcsbmingshi_info:'摸牌阶段，你可以多摸两张牌，然后令展示三张牌并令一名其他角色选择获得其中的一张牌。',
+			dcsbmengmou:'盟谋',
+			dcsbmengmou_info:'转换技，每回合每项各限一次：阴，当你得到其他角色的牌后，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；阳，其他角色得到你的牌后，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力值，Y为X-其打出【杀】数）',
+			dc_sb_zhouyu:'新杀谋周瑜',
+			dc_sb_zhouyu_prefix:'新杀谋',
+			dcsbronghuo:'融火',
+			dcsbronghuo_info:'锁定技，当你使用火【杀】或【火攻】时，此牌伤害基值改为场上势力数。',
+			dcsbyingmou:'英谋',
+			dcsbyingmou_info:'转换技，每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色：阴，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】；阳，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌（若其没有可使用的牌则将手牌数弃至与你相同）。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
@@ -13401,6 +13757,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp2_wumiao:'武庙',
 			sp2_gaoshan:'高山仰止',
 			sp2_qifu:'祈福',
+			sp2_mouding:'谋定天下',
 		},
 	};
 });

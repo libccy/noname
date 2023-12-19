@@ -5114,7 +5114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jyzongshi:{
 				audio:2,
-				audioname:['re_jianyong','ol_jianyong'],
+				audioname:['re_jianyong'],
 				trigger:{player:['chooseToCompareAfter','compareMultipleAfter'],target:['chooseToCompareAfter','compareMultipleAfter']},
 				filter:function(event,player){
 					if(event.preserve) return false;

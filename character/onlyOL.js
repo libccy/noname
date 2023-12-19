@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			ol_sb_jiangwei:['male','shu',4,['olsbzhuri','olsbranji']],
 			ol_caozhang:['male','wei',4,['oljiangchi']],
-			ol_jianyong:['male','shu',3,['olqiaoshui','jyzongshi']],
+			ol_jianyong:['male','shu',3,['olqiaoshui','jyzongshi'],['tempname:re_jianyong','die_audio:re_jianyong']],
 			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong']],
 		},
 		characterSort:{
@@ -252,7 +252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//界简雍
 			olqiaoshui:{
-				audio:2,
+				audio:'reqiaoshui',
 				inherit:'reqiaoshui',
 				filter:function(event,player){
 					return player.countCards('h')>0&&!player.hasSkill('olqiaoshui_used');
