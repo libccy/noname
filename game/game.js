@@ -8794,29 +8794,14 @@ new Promise(resolve=>{
 						this.setBackgroundImage(src);
 						this.style.backgroundPositionX='center';
 						this.style.backgroundSize='cover';
-						if(type=='character'){
-							new Promise((_,reject)=>{
-								const image=new Image();
-								image.src=`${lib.assetURL}${src}`;
-								image.onerror=reject;
-							}).catch(()=>new Promise((_,reject)=>{
-								const nameinfo=get.character(name);
-								if(!nameinfo) reject('noinfo');
-								const sex=nameinfo[0];
-								src=`image/character/default_silhouette_${sex}${ext}`;
-								const image=new Image();
-								image.src=`${lib.assetURL}${src}`;
-								image.onload=()=>this.setBackgroundImage(src);
-								image.onerror=()=>reject(`sex:${sex}`);
-							})).catch(reason=>{
-								let sex;
-								if(reason=='noinfo') sex='male';
-								else sex=reason.slice(4);
-								src=`image/character/default_silhouette_${sex=='female'?'female':'male'}${ext}`;
-								const image=new Image();
-								image.src=`${lib.assetURL}${src}`;
-								image.onload=()=>this.setBackgroundImage(src);
-							});
+						if (type === 'character') {
+							const nameinfo = get.character(name);
+							const sex = nameinfo ? nameinfo[0] : 'male';
+							this.style.backgroundImage = [
+								this.style.backgroundImage,
+								`url("${lib.assetURL}image/character/default_silhouette_${sex}${ext}")`,
+								`url("${lib.assetURL}image/character/default_silhouette_male${ext}")`,
+							].join(",");
 						}
 						return this;
 					}
