@@ -51704,8 +51704,11 @@ new Promise(resolve=>{
 											if(Array.isArray(obj)){
 												return `[${obj.map(v=>parse(v))}]`;
 											}else if(typeof obj=='function'){
-												return `Function`;
+												return `[Function ${obj.name}]`;
 											}else if(typeof obj!='string'){
+												if(obj instanceof Error){
+													return `<span style="color:red;">${String(obj)}</span>`;
+												}
 												return String(obj);
 											}else{
 												return `'${String(obj)}'`;
@@ -51749,7 +51752,7 @@ new Promise(resolve=>{
 								text.scrollTop=text.scrollHeight;
 							}
 							if(_status.toprint){
-								game.print(...status.toprint);
+								game.print(..._status.toprint);
 								delete _status.toprint;
 							}
 							runButton.listen(runCommand);
