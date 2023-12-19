@@ -37874,183 +37874,155 @@ new Promise(resolve=>{
 		},
 		/**
 		* 根据skill中的audio,audioname,audioname2和player来获取音频地址列表
-		* @param {String} skill  技能名 
-		* @param {Player|String} player  角色/角色名
-		* @returns {Array<string|[string]>} 分析完的语音地址列表
+		* @typedef {audioInfo[]|[string,number]|string|number|boolean} audioInfo
+		* @typedef {{audio:audioInfo,audioname?:string[],audioname2?:{[playerName: string]: audioInfo}}} skillInfo
+		* @param {string} skill  技能名
+		* @param {Player|string} [player]  角色/角色名
+		* @param {skillInfo|audioInfo} [skillInfo]  预设的skillInfo/audioInfo(转为skillInfo)，覆盖lib.skill[skill]
+		* @returns {string[]}  语音地址列表
+		* @example
+		* const info=lib.skill['skillname'];
+		* info.audio=undefined //默认值[true,2]
+		* info.audio=false // 不播放语音
+		* info.audio=true // [skill/skillname.mp3]
+		* info.audio=3 // [skill/skillname1.mp3,skill/skillname2.mp3,skill/skillname3.mp3]（项数为数字大小）
+		* info.audio="(ext:extName|db:extension-extName)(/anyPath):true|number(:format)" //间接路径
+		* // 同上，只是将目录改为(ext:extName|db:extension-extName)(/anyPath)，且可以指定格式(默认mp3)
+		* info.audio="(ext:extName|db:extension-extName/)(anyPath/)filename(.format)" //直接路径
+		* //path和format至少有一个，否则会识别为引用技能
+		* //起始位置为audio/(若无anyPath则为audio/skill/)，若没有format默认mp3
+		* info.audio="otherSkillname" //引用技能
+		* //引用一个其他技能的语音，若lib.skill["otherSkillname"]不存在则读取"otherSkillname"的audio为默认值[true,2]
+		* info.audio=["otherSkillname", number] //带fixedNum的引用技能
+		* //同样引用一个其他技能的语音，若lib.skill["otherSkillname"]不存在则读取"otherSkillname"的audio为number
+		* //若"otherSkillname"的语音数超过number，则只取前number个
+		* info.audio=[true,2,"otherSkillname1",["otherSkillname2",2]] //任意元素拼接
+		* //数组里可以放任何以上的格式，结果为分析完的结果合并
+		* 
+		* info.audioname=['player1','player2']
+		* //audioname里可以放任意角色名。
+		* //如果其中包含发动技能的角色名"player"，且info.audio不是直接路径"(anyPath/)filename(.format)"的形式
+		* //则在"skill"和number中插入"_player"，形如
+		* 
+		* info.audioname2={'player1':audioInfo1,'player2':audioInfo2}
+		* //audioname2是一个对象，其中key为角色名，value的类型和info.audio一样
+		* //如果key中包含发动技能的角色名player，则直接改用info.audioname2[player]来播放语音
 		*/
-		parseSkillAudio:function(skill,player){
-			if(typeof player=='string') player={name:player};
-			else if(get.itemtype(player)!='player') player={};
-		
+		parseSkillAudio:function(skill,player,skillInfo){
+			if(typeof player==='string') player={name:player};
+			else if(typeof player!=='object'||player===null) player={};
+	
+			if(skillInfo&&(typeof skillInfo!=='object'||Array.isArray(skillInfo))) skillInfo={audio:skillInfo};
+	
+			const checkSkill=(skill,history)=>{
+				if(!lib.skill[skill]) return false;
+				if(!history.includes(skill)) return true;
+				if(history[0]===skill) return false;
+				//deadlock
+				throw new RangeError(`parseSkillAudio: ${skill} in `,history,` forms a deadlock`);
+			}
+	
+			const getName=filter=>{
+				const name=(player.tempname||[]).find(i=>filter(i));
+				return name||[player.name,player.name1,player.name2].reduce((result,name)=>{
+					if(result) return result;
+					if(!name) return result;
+					if(filter(name)) return name;
+					let tempname=get.character(name,4).find(tag=>tag.startsWith('tempname:'));
+					if(!tempname) return result;
+					tempname=tempname.split(':').slice(1).find(i=>filter(i));
+					return tempname||result;
+				},void 0);
+			}
+	
 			/**
-				* 处理 audioInfo 外的参数
-				* @param {String} skill  技能名 
-				* @param {Player|{name:string}} player  角色
-				* @param {Array<string>} audioname  audioname历史
-				* @param {Array<string>} history  判断deadlock
-				* @param {Number} fixedNum  [audioname, number] 中的第二个参数，用来限制语音数
-				* @returns {Array<string|[string]>} 音频地址数组（有需要playSkillAudio的为[skillname])
-				*/
-			function getAudioList(skill,player,audioname,history,fixedNum){
-				let info=lib.skill[skill];
-				if(!info) return [];
-				if(!history) history=[];
-				if(history.includes(skill)){//判断deadlock
-					console.trace(`${skill} in ${history} forms a deadlock`);
-					if(info.audio!==false) return [[skill]];
-					return [];
+			* @param {string} skill 
+			* @param {{audioname:string[],history:string[]}} options
+			* @param {skillInfo} [skillInfo]
+			* @returns {string[]}
+			*/
+			function getAudioList(skill,options,skillInfo){
+				const info=skillInfo||lib.skill[skill];
+				if(!info){
+					console.error(new ReferenceError(`parseSkillAudio: Cannot find ${skill} in lib.skill`));
+					return parseAudio(skill,options,[true,2]);
 				}
-				history.push(skill);
 		
+				const {audioname,history}=options;
+				history.unshift(skill);
 				let audioInfo=info.audio;
-				if(info.audioname2){
-					if(player.name&&info.audioname2[player.name]) audioInfo=info.audioname2[player.name];
-					else if(player.name1&&info.audioname2[player.name1]) audioInfo=info.audioname2[player.name1];
-					else if(player.name2&&info.audioname2[player.name2]) audioInfo=info.audioname2[player.name2];
-					else{
-						var stop=false;
-						if(player.tempname){
-							const name=player.tempname.find(i=>info.audioname2[i]);
-							if(name){
-								stop=true;
-								audioInfo=info.audioname2[name];
-							}
-						}
-						if(!stop&&player.name&&get.characterSpecial(player.name).some(tag=>tag.startsWith('tempname:'))){
-							const list=get.characterSpecial(player.name).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-							const name=list.find(i=>info.audioname2[i]);
-							if(name){
-								stop=true;
-								audioInfo=info.audioname2[name];
-							}
-						}
-						if(!stop&&player.name1&&get.characterSpecial(player.name1).some(tag=>tag.startsWith('tempname:'))){
-							const list=get.characterSpecial(player.name1).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-							const name=list.find(i=>info.audioname2[i]);
-							if(name){
-								stop=true;
-								audioInfo=info.audioname2[name];
-							}
-						}
-						if(!stop&&player.name2&&get.characterSpecial(player.name2).some(tag=>tag.startsWith('tempname:'))){
-							const list=get.characterSpecial(player.name2).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-							const name=list.find(i=>info.audioname2[i]);
-							if(name){
-								stop=true;
-								audioInfo=info.audioname2[name];
-							}
-						}
-					}
-				}
-				if(typeof audioInfo=='function') audioInfo=audioInfo(player);
-				
-				if(!audioname) audioname=[];
 				if(Array.isArray(info.audioname)) audioname.addArray(info.audioname);
+				if(info.audioname2) audioInfo=info.audioname2[getName(i=>info.audioname2[i])]||audioInfo;
+				if(typeof audioInfo==='function') audioInfo=audioInfo(player);
 		
-				let audioList=parseAudio(skill,audioInfo,audioname,player,history,fixedNum);		
-				if(fixedNum&&fixedNum<audioList.length) audioList.length=fixedNum;
-				if(audioList.length) return audioList;
-				if(info.audio!==false) return [[skill]];
-				return [];
+				return parseAudio(skill,options,audioInfo);
 			}
 		
 			/**
-				* 分析 audioInfo 获取音频地址数组
-				* @param {String} skill  技能名 
-				* @param {any} audioInfo  info.audio
-				* @param {Array<string>} audioname  要判断的audioname
-				* @param {Player|{name:string}} player  角色
-				* @param {Array<string>} history  判断deadlock
-				* @param {Number} fixedNum  [audioname, number] 中的第二个参数，用来限制语音数
-				* @returns {Array<string|[string]>} 音频地址数组（有需要playSkillAudio的为[skillname])
-				*/
-			function parseAudio(skill,audioInfo,audioname,player,history,fixedNum){
+			* @param {string} skill
+			* @param {{audioname:string[],history:string[]}} options
+			* @param {audioInfo} audioInfo  info.audio
+			* @returns {string[]}
+			*/
+			function parseAudio(skill,options,audioInfo){
+				const audioname=options.audioname.slice();
+				const history=options.history.slice();
+				options={audioname,history};
 				if(Array.isArray(audioInfo)){
-					if(typeof audioInfo[0]=='string'&&typeof audioInfo[1]=='number'){// [audioname, number]
-						if(lib.skill[audioInfo[0]]) return getAudioList(audioInfo[0],player,audioname,history,fixedNum||audioInfo[1]);
-						return parseAudio(audioInfo[0],audioInfo[1],audioname,player,history,fixedNum||audioInfo[1]);
+					if(typeof audioInfo[0]==='string'&&typeof audioInfo[1]==='number'){// [audioname, number]
+						if(checkSkill(audioInfo[0],history)) return getAudioList(audioInfo[0],options).slice(0,audioInfo[1]);
+						return parseAudio(audioInfo[0],options,audioInfo[1]);
 					}
-					return audioInfo.reduce((total,i)=>total.addArray(parseAudio(skill,i,audioname,player,history,fixedNum)),[]);
+					return audioInfo.reduce((total,i)=>total.addArray(parseAudio(skill,options,i)),[]);
 				}
 		
-				if(!['string','number','boolean'].includes(typeof audioInfo)) return [];
+				if(!['string','number','boolean'].includes(typeof audioInfo)) return parseAudio(skill,options,[true,2]);
 				if(audioInfo===false) return [];
-				if(typeof audioInfo=='string'&&lib.skill[audioInfo]) return getAudioList(audioInfo,player,audioname,history,fixedNum);
+				if(typeof audioInfo==='string'&&checkSkill(audioInfo,history)) return getAudioList(audioInfo,options);
 		
-				let audioList=[];
 				audioInfo=String(audioInfo);
-				let list=audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/);
-				if(list&&list[2]){
-					let _audioname='';
-					if(audioname.includes(player.name)) _audioname=`_${player.name}`;
-					else if(audioname.includes(player.name1)) _audioname=`_${player.name1}`;
-					else if(audioname.includes(player.name2)) _audioname=`_${player.name2}`;
-					else{
-						var stop=false;
-						if(player.tempname){
-							const name=player.tempname.find(i=>audioname.includes(i));
-							if(name){
-								stop=true;
-								_audioname=`_${name}`;
-							}
-						}
-						if(!stop&&player.name&&get.characterSpecial(player.name).some(tag=>tag.startsWith('tempname:'))){
-							const list=get.characterSpecial(player.name).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-							const name=list.find(i=>audioname.includes(i));
-							if(name){
-								stop=true;
-								_audioname=`_${name}`;
-							}
-						}
-						if(!stop&&player.name1&&get.characterSpecial(player.name1).some(tag=>tag.startsWith('tempname:'))){
-							const list=get.characterSpecial(player.name1).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-							const name=list.find(i=>audioname.includes(i));
-							if(name){
-								stop=true;
-								_audioname=`_${name}`;
-							}
-						}
-						if(!stop&&player.name2&&get.characterSpecial(player.name2).some(tag=>tag.startsWith('tempname:'))){
-							const list=get.characterSpecial(player.name2).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-							const name=list.find(i=>audioname.includes(i));
-							if(name){
-								stop=true;
-								_audioname=`_${name}`;
-							}
-						}
-					}
-		
-					list=list.slice(1);//[路径,number/true,格式]
-					if(list[1]=='true') audioList.add(`${list[0]||'skill'}/${skill}${_audioname}.${list[2]||'mp3'}`);
-					else{
-						list[1]=parseInt(list[1]);
-						for(let i=1;i<=list[1];i++){
-							audioList.add(`${list[0]||'skill'}/${skill}${_audioname}${i}.${list[2]||'mp3'}`);
-						}
-					}
+				let list=audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, format]
+				if(!list){
+					let path='',format='';
+					if(!/^db:|^ext:|\//.test(audioInfo)) path='skill/';
+					if(!/\.\w+$/.test(audioInfo)) format='.mp3';
+					if(path&&format) return parseAudio(audioInfo,options,[true,2]);
+					return [`${path}${audioInfo}${format}`];
 				}
-				else audioList.add(`${/(?:^db:|^ext:|\/)/.test(audioInfo)?'':'skill/'}${audioInfo}`);
+	
+				let _audioname=getName(i=>audioname.includes(i));
+				_audioname=_audioname?`_${_audioname}`:'';
+	
+				if(list[2]==='true') return [`${list[1]||'skill'}/${skill}${_audioname}.${list[3]||'mp3'}`];
+				
+				const audioList=[];
+				list[2]=parseInt(list[2]);
+				for(let i=1;i<=list[2];i++){
+					audioList.push(`${list[1]||'skill'}/${skill}${_audioname}${i}.${list[3]||'mp3'}`);
+				}
 				return audioList;
 			}
 		
-			return getAudioList(skill,player);
+			return getAudioList(skill,{audioname:[],history:[]},skillInfo);
 		},
-		trySkillAudio:function(skill,player,directaudio,nobroadcast/*,index*/){
-			if(!nobroadcast) game.broadcast(game.trySkillAudio,skill,player,directaudio,nobroadcast/*,index*/);
-			var info=get.info(skill);
+		trySkillAudio:function(skill,player,directaudio,nobroadcast,skillInfo){
+			if(!nobroadcast) game.broadcast(game.trySkillAudio,skill,player,directaudio,nobroadcast,skillInfo);
+			const info=skillInfo||lib.skill[skill];
 			if(!info) return;
 			if(!lib.config.background_speak) return;
 			if(info.direct&&!directaudio) return;
-			if(lib.skill.global.includes(skill)&&!lib.skill[skill].forceaudio) return;
+			if(lib.skill.global.includes(skill)&&!info.forceaudio) return;
 		
-			let list=game.parseSkillAudio(skill,player);
-			if(!list.length) return;
-			// if(index) index=index%list.length||list.length;
-			// let audio=list[index?index-1:Math.floor(Math.random()*list.length)];
-			let audio=list[Math.floor(Math.random()*list.length)];
-			if(Array.isArray(audio)) return game.playSkillAudio(audio[0]);
-			return game.playAudio(audio);
+			let audio,list=game.parseSkillAudio(skill,player,skillInfo).randomSort();
+			return (function play(){
+				if(!list.length) return;
+				audio=list.shift();
+				return game.playAudio(audio,play);
+			})();
 		},
+		/**
+		 * @deprecated
+		 */
 		playSkillAudio:function(name,index){
 			if(_status.video&&arguments[1]!='video') return;
 			if(!lib.config.repeat_audio&&_status.skillaudio.includes(name)) return;
@@ -57839,106 +57811,16 @@ new Promise(resolve=>{
 								clickSkill.call(skillnode,'init');
 							});
 						}
-						// if(e!=='init') game.trySkillAudio(this.link,playername);
-						// 有bug，先用旧版
 						if(lib.config.background_speak&&e!=='init'){
-							var audioname=this.link;
-							if(info.audioname2){
-								if(info.audioname2[playername]){
-									audioname=info.audioname2[playername];
-									info=lib.skill[audioname];
+							let audio,skillnode=this;
+							(function play(){
+								if(!skillnode.audioList||!skillnode.audioList.length){
+									skillnode.audioList=game.parseSkillAudio(skillnode.link,playername);
+									if(!skillnode.audioList.length) return;
 								}
-								else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
-									const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-									const name=list.find(i=>info.audioname2[i]);
-									if(name){
-										audioname=info.audioname2[name];
-										info=lib.skill[audioname];
-									}
-								}
-							}
-							var audioinfo=info.audio;
-							var that=this;
-							var getIndex=function(i){
-								if(typeof that.audioindex!='number'){
-									that.audioindex=i;
-								}
-								that.audioindex++;
-								if(that.audioindex>i){
-									that.audioindex=1;
-								}
-								return that.audioindex;
-							};
-							if(typeof audioinfo=='string'){
-								if(audioinfo.indexOf('ext:')==0){
-									audioinfo=audioinfo.split(':');
-									if(audioinfo.length==3){
-										if(audioinfo[2]=='true'){
-											game.playAudio('..','extension',audioinfo[1],audioname);
-										}
-										else{
-											audioinfo[2]=parseInt(audioinfo[2]);
-											if(audioinfo[2]){
-												game.playAudio('..','extension',audioinfo[1],audioname+getIndex(audioinfo[2]));
-											}
-										}
-									}
-									return;
-								}
-								else{
-									audioname=audioinfo;
-									if(lib.skill[audioinfo]){
-										audioinfo=lib.skill[audioinfo].audio;
-									}
-								}
-							}
-							else if(Array.isArray(audioinfo)){
-								audioname=audioinfo[0];
-								audioinfo=audioinfo[1];
-							}
-							if(typeof audioinfo=='number'){
-								if(Array.isArray(info.audioname)){
-									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
-									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
-										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-										const name=list.find(i=>info.audioname.includes(i));
-										if(name) audioname=audioname+'_'+name;
-									}
-								}
-								game.playAudio('skill',audioname+getIndex(audioinfo));
-							}
-							else if(typeof audioinfo=="object"&&"type" in audioinfo&&audioinfo.type=="direct"&&"files" in audioinfo){
-								let audioFiles=audioinfo.files;
-								if(typeof audioFiles=="object"){
-									if(!Array.isArray(audioFiles)&&playername&&playername in audioFiles)audioFiles=audioFiles[playername];
-									if(Array.isArray(audioFiles)){
-										const length=audioFiles.length;
-										game.playAudio(audioFiles[getIndex(length)-1]);
-									}
-								}
-							}
-							else if(audioinfo){
-								if(Array.isArray(info.audioname)){
-									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
-									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
-										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-										const name=list.find(i=>info.audioname.includes(i));
-										if(name) audioname=audioname+'_'+name;
-									}
-								}
-								game.playAudio('skill',audioname);
-							}
-							else if(true&&info.audio!==false){
-								if(Array.isArray(info.audioname)){
-									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
-									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
-										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-										const name=list.find(i=>info.audioname.includes(i));
-										if(name) audioname=audioname+'_'+name;
-									}
-								}
-								game.playSkillAudio(audioname,getIndex(2));
-							}
+								audio=skillnode.audioList.shift();
+								game.playAudio(audio,play);
+							})();
 						}
 					}
 				}
@@ -58142,106 +58024,16 @@ new Promise(resolve=>{
 								clickSkill.call(skillnode,'init');
 							});
 						}
-						// if(e!=='init') game.trySkillAudio(this.link,playername);
-						// 有bug，先用旧版
 						if(lib.config.background_speak&&e!=='init'){
-							var audioname=this.link;
-							if(info.audioname2){
-								if(info.audioname2[playername]){
-									audioname=info.audioname2[playername];
-									info=lib.skill[audioname];
+							let audio,skillnode=this;
+							(function play(){
+								if(!skillnode.audioList||!skillnode.audioList.length){
+									skillnode.audioList=game.parseSkillAudio(skillnode.link,playername);
+									if(!skillnode.audioList.length) return;
 								}
-								else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
-									const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-									const name=list.find(i=>info.audioname2[i]);
-									if(name){
-										audioname=info.audioname2[name];
-										info=lib.skill[audioname];
-									}
-								}
-							}
-							var audioinfo=info.audio;
-							var that=this;
-							var getIndex=function(i){
-								if(typeof that.audioindex!='number'){
-									that.audioindex=i;
-								}
-								that.audioindex++;
-								if(that.audioindex>i){
-									that.audioindex=1;
-								}
-								return that.audioindex;
-							};
-							if(typeof audioinfo=='string'){
-								if(audioinfo.indexOf('ext:')==0){
-									audioinfo=audioinfo.split(':');
-									if(audioinfo.length==3){
-										if(audioinfo[2]=='true'){
-											game.playAudio('..','extension',audioinfo[1],audioname);
-										}
-										else{
-											audioinfo[2]=parseInt(audioinfo[2]);
-											if(audioinfo[2]){
-												game.playAudio('..','extension',audioinfo[1],audioname+getIndex(audioinfo[2]));
-											}
-										}
-									}
-									return;
-								}
-								else{
-									audioname=audioinfo;
-									if(lib.skill[audioinfo]){
-										audioinfo=lib.skill[audioinfo].audio;
-									}
-								}
-							}
-							else if(Array.isArray(audioinfo)){
-								audioname=audioinfo[0];
-								audioinfo=audioinfo[1];
-							}
-							if(typeof audioinfo=='number'){
-								if(Array.isArray(info.audioname)){
-									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
-									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
-										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-										const name=list.find(i=>info.audioname.includes(i));
-										if(name) audioname=audioname+'_'+name;
-									}
-								}
-								game.playAudio('skill',audioname+getIndex(audioinfo));
-							}
-							else if(typeof audioinfo=="object"&&"type" in audioinfo&&audioinfo.type=="direct"&&"files" in audioinfo){
-								let audioFiles=audioinfo.files;
-								if(typeof audioFiles=="object"){
-									if(!Array.isArray(audioFiles)&&playername&&playername in audioFiles)audioFiles=audioFiles[playername];
-									if(Array.isArray(audioFiles)){
-										const length=audioFiles.length;
-										game.playAudio(audioFiles[getIndex(length)-1]);
-									}
-								}
-							}
-							else if(audioinfo){
-								if(Array.isArray(info.audioname)){
-									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
-									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
-										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-										const name=list.find(i=>info.audioname.includes(i));
-										if(name) audioname=audioname+'_'+name;
-									}
-								}
-								game.playAudio('skill',audioname);
-							}
-							else if(true&&info.audio!==false){
-								if(Array.isArray(info.audioname)){
-									if(info.audioname.includes(playername)) audioname=audioname+'_'+playername;
-									else if(get.characterSpecial(playername).some(tag=>tag.startsWith('tempname:'))){
-										const list=get.characterSpecial(playername).find(tag=>tag.startsWith('tempname:')).split(':').slice(1);
-										const name=list.find(i=>info.audioname.includes(i));
-										if(name) audioname=audioname+'_'+name;
-									}
-								}
-								game.playSkillAudio(audioname,getIndex(2));
-							}
+								audio=skillnode.audioList.shift();
+								game.playAudio(audio,play);
+							})();
 						}
 					}
 				}
@@ -60109,13 +59901,13 @@ new Promise(resolve=>{
 				const pack=Object.keys(lib.characterPack).find(pack=>name in lib.characterPack[pack]);
 				if(pack) info=lib.characterPack[pack][name];
 			}
-			if(info){
-				if(typeof num=='number'){
-					return info[num];
-				}
-				return info;
+			if(typeof num==='number'){
+				if(!info) info=[];
+				if(info[num]) return info[num];
+				if(num===3||num===4) return [];
+				return;
 			}
-			return null;
+			return info;
 		},
 		characterIntro:name=>{
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
@@ -60132,11 +59924,6 @@ new Promise(resolve=>{
 			}
 			if(lib.characterIntro[name]) return lib.characterIntro[name];
 			return '暂无武将介绍';
-		},
-		characterSpecial:name=>{
-			const character=get.character(name);
-			if(!character) return [];
-			return character[4]||[];
 		},
 		bordergroup:(info,raw)=>{
 			if(!Array.isArray(info)){
