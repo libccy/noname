@@ -32221,6 +32221,7 @@ new Promise(resolve=>{
 					return new Promise(resolve=>{
 						const runCode=function(event,code){
 							try {
+								// 为了使玩家调试时使用var player=xxx时不报错，故使用var
 								var {player,_trigger:trigger,_result:result}=event;
 								return eval(code);
 							}catch(error){
