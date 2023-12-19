@@ -14778,44 +14778,45 @@ new Promise(resolve=>{
 				},
 				arrangeTrigger:function(){
 					'step 0'
-					event.noDirectUse=info=>!lib.skill[info.skill].silent&&lib.translate[info.skill];//是否触发同顺序选择
-					'step 1'
+					event.doing=event.doingList[0];
 					if(event.doing&&event.doing.todoList.length) return;
-					if(event.doingList.length) return event.doing=event.doingList.shift();
-					event.finish();
-					'step 2'
-					if(trigger.filterStop&&trigger.filterStop()) return event.finish();
-					const current=event.doing.todoList.find(info=>lib.filter.filterTrigger(trigger,info.player,event.triggername,info.skill));
-					if(!current){
-						event.doing.todoList=[];
-						return event.goto(1);
+					if(event.doingList.length){
+						event.doingList.shift();
+						return event.redo();
 					}
-					event.doing.todoList=event.doing.todoList.filter(i=>i.priority<=current.priority);
-					event.num=event.doing.todoList.indexOf(current);
-					if(!event.noDirectUse(current)) return event.goto(5);
+					event.finish();
+					'step 1'
+					if(trigger.filterStop&&trigger.filterStop()) return event.finish();
+					event.current=event.doing.todoList.find(info=>lib.filter.filterTrigger(trigger,info.player,event.triggername,info.skill));
+					if(!event.current){
+						event.doing.todoList=[];
+						return event.goto(0);
+					}
+					event.doing.todoList=event.doing.todoList.filter(i=>i.priority<=event.current.priority);
+			
+					const directUse=info=>lib.skill[info.skill].silent||!lib.translate[info.skill];//是否不触发同顺序选择
+					if(directUse(event.current)) return event.goto(4);
 					event.choice=event.doing.todoList.filter(info=>{
 						if(!lib.filter.filterTrigger(trigger,info.player,event.triggername,info.skill)) return false;
-						if(!event.noDirectUse(info)) return false;
-						if(current.skill!=info.skill) return false;
-						if(current.player!=info.player) return false;
-						return lib.skill.global.includes(info.skill)||current.player.hasSkill(info.skill,true);
+						if(directUse(info)) return false;
+						if(event.current.player!==info.player) return false;
+						return lib.skill.global.includes(info.skill)||event.current.player.hasSkill(info.skill,true);
 					});
-					if(event.choice.length<2) event.goto(5);
-					'step 3'
+					if(event.choice.length<2) return event.goto(4);
+					'step 2'
 					const next=event.choice[0].player.chooseControl(event.choice.map(i=>i.skill));
 					next.set('prompt','选择下一个触发的技能');
 					next.set('forceDie',true);
 					next.set('arrangeSkill',true);
 					next.set('includeOut',true);
+					'step 3'
+					if(result.control) event.current=event.doing.todoList.find(info=>info.skill==result.control&&info.player==event.choice[0].player);
 					'step 4'
-					if(result.control) event.num=event.doing.todoList.findIndex(info=>info.skill==result.control&&info.player==event.choice[0].player);
-					'step 5'
-					const info=event.doing.todoList[event.num];
-					if(!info) return;
-					event.doing.doneList.push(info);
-					event.doing.todoList.splice(event.num,1);
-					game.createTrigger(event.triggername,info.skill,info.player,trigger);
-					event.goto(1);
+					if(!event.current||!event.doing.todoList.includes(event.current)) return;
+					event.doing.doneList.push(event.current);
+					event.doing.todoList.remove(event.current);
+					game.createTrigger(event.triggername,event.current.skill,event.current.player,trigger);
+					event.goto(0);
 				},
 				createTrigger:function(){
 					"step 0"
@@ -31756,41 +31757,41 @@ new Promise(resolve=>{
 					delete this._skillChoice;
 					return this;
 				}
-				getParent(level,forced){
-					var parent,historys=[];
-					if(this._modparent&&game.online){
-						parent=this._modparent;
+				/**
+				 * 获取事件的父节点。
+				 * 获取事件链上的指定事件。
+				 * 默认获取上一个父节点（核心）。
+				 * @param {number|string|(evt:gameEvent)=>boolean} [level=1] 获取深度（number）/指定名字（string）/指定特征（function）
+				 * @param {boolean} [forced] 若获取不到节点，默认返回{}，若forced为true则返回null
+				 * @param {boolean} [includeSelf] 若level不是数字，指定搜索时是否包含事件本身
+				 * @returns {GameEvent|{}|null}
+				 */
+				getParent(level=1,forced,includeSelf){
+					let event=this;
+					const toreturn=forced?null:{};
+					if(!includeSelf||typeof level==='number'){
+						if(event._modparent&&game.online) event=event._modparent;
+						else event=this.parent;
 					}
-					else{
-						parent=this.parent;
-					}
-					var toreturn={};
-					if(typeof level=='string'&&forced==true){
-						toreturn=null;
-					}
-					if(!parent) return toreturn;
-					if(typeof level=='number'){
-						for(var i=1;i<level;i++){
-							if(!parent) return toreturn;
-							parent=parent.parent;
+					if(typeof level==='number'){
+						for(let i=1;i<level;i++){
+							if(!event) return toreturn;
+							event=event.parent;
 						}
+						return event;
 					}
-					else if(typeof level=='string'){
-						while(true){
-							if(!parent) return toreturn;
-							historys.push(parent);
-							if(parent.name==level) return parent;
-							parent=parent.parent;
-							if(historys.contains(parent)) return toreturn;
-						}
+					const historys=[];
+					const filter=typeof level==='function'?level:evt=>evt.name===level;
+					while(true){
+						if(!event) return toreturn;
+						historys.push(event);
+						if(filter(event)) return event;
+						event=event.parent;
+						if(historys.includes(event)) return toreturn;
 					}
-					if(toreturn===null){
-						return null;
-					}
-					return parent;
 				}
 				getTrigger(){
-					return this.getParent()._trigger;
+					return this.getParent('arrangeTrigger')._trigger;
 				}
 				getRand(name){
 					if(name){
@@ -31987,36 +31988,31 @@ new Promise(resolve=>{
 					while(true){
 						evt=evt.getParent('arrangeTrigger');
 						if(!evt||evt.name!='arrangeTrigger'||!evt.doingList) return this;
-						const doing=(()=>{
-							if(evt.doing&&evt.doing.player==player) return evt.doing;
-							return evt.doingList.find(i=>i.player==player);
-						})();
-						// if(!doing) return this;
-						const firstDo=evt.doingList.find(i=>i.player=="firstDo");
-						const lastDo=evt.doingList.find(i=>i.player=="lastDo");
+						const doing=evt.doingList.find(i=>i.player===player);
+						const firstDo=evt.doingList.find(i=>i.player==="firstDo");
+						const lastDo=evt.doingList.find(i=>i.player==="lastDo");
 						
-						for(const skill of skills){
+						skills.forEach(skill=>{
 							const info=lib.skill[skill];
-							if(!info.trigger) continue;
+							if(!info.trigger) return;
 							if(!Object.keys(info.trigger).some(i=>{
 								if(Array.isArray(info.trigger[i])) return info.trigger[i].includes(evt.triggername);
-								return info.trigger[i]==evt.triggername;
-							})) continue;
+								return info.trigger[i]===evt.triggername;
+							})) return;
 
-							const playerMap=game.players.concat(game.dead).sortBySeat(evt.starter);	
-							const priority=get.priority(skill);
 							const toadd={
 								skill:skill,
 								player:player,
-								priority:priority,
+								priority:get.priority(skill),
 							}
 							const map=info.firstDo?firstDo:info.lastDo?lastDo:doing;
-							if(!map) continue;
-							if(map.doneList&&map.doneList.some(i=>i.skill==toadd.skill&&i.player==toadd.player)) continue;
-							if(map.todoList.some(i=>i.skill==toadd.skill&&i.player==toadd.player)) continue;
+							if(!map) return;
+							if(map.doneList.some(i=>i.skill===toadd.skill&&i.player===toadd.player)) return;
+							if(map.todoList.some(i=>i.skill===toadd.skill&&i.player===toadd.player)) return;
 							map.todoList.add(toadd);
-							map.todoList.sort((a,b)=>(b.priority-a.priority)||(playerMap.indexOf(a)-playerMap.indexOf(b)));
-						}
+							if(typeof map.player==='string') map.todoList.sort((a,b)=>(b.priority-a.priority)||(evt.playerMap.indexOf(a)-evt.playerMap.indexOf(b)));
+							else map.todoList.sort((a,b)=>b.priority-a.priority);
+						});
 					}
 				}
 				removeTrigger(skills,player){
@@ -32027,21 +32023,15 @@ new Promise(resolve=>{
 					while(true){
 						evt=evt.getParent('arrangeTrigger');
 						if(!evt||evt.name!='arrangeTrigger'||!evt.doingList) return this;
-						const doing=(()=>{
-							if(evt.doing&&evt.doing.player==player) return evt.doing;
-							return evt.doingList.find(i=>i.player==player);
-						})();
-						// if(!doing) return this;
+						const doing=evt.doingList.find(i=>i.player==player);
 						const firstDo=evt.doingList.find(i=>i.player=="firstDo");
 						const lastDo=evt.doingList.find(i=>i.player=="lastDo");
 
-						for(const skill of skills){
-							[doing,firstDo,lastDo].forEach(map=>{
-								if(!map) return;
-								const toremove=map.todoList.filter(i=>i.skill==skill&&i.player==player);
-								if(toremove.length>0) map.todoList.removeArray(toremove);
-							});
-						}
+						skills.forEach(skill=>[doing,firstDo,lastDo].forEach(map=>{
+							if(!map) return;
+							const toremove=map.todoList.filter(i=>i.skill==skill&&i.player==player);
+							if(toremove.length>0) map.todoList.removeArray(toremove);
+						}));
 					}
 				}
 				trigger(name){
@@ -32072,81 +32062,67 @@ new Promise(resolve=>{
 						doneList:[],
 					}
 					const doingList=[];
-					let allbool=false;
 					const roles=['player','source','target','global'];
 					const playerMap=game.players.concat(game.dead).sortBySeat(start);
-					function addList(skill,player){
-						if(this.listAdded[skill]) return;
-						this.listAdded[skill]=true;
-						if(player.forbiddenSkills[skill]) return;
-						if(player.disabledSkills[skill]) return;
-
-						const info=lib.skill[skill];
-						const list=info.firstDo?firstDo.todoList:info.lastDo?lastDo.todoList:this.todoList;
-						const priority=get.priority(skill);
-						list.push({
-							skill:skill,
-							player:player,
-							priority:priority,
-						});
-						if(typeof list.player=='string') list.sort((a,b)=>(b.priority-a.priority)||(playerMap.indexOf(a)-playerMap.indexOf(b)));
-						else list.sort((a,b)=>b.priority-a.priority);
-						allbool=true;
-					}
 					let player=start;
+					let allbool=false;
 					do{
 						const doing={
 							player:player,
 							todoList:[],
 							doneList:[],
 							listAdded:{},
-							addList:addList,
+							addList(skill){
+								if(!skill) return;
+								if(Array.isArray(skill)) return skill.forEach(i=>this.addList(i));
+								if(this.listAdded[skill]) return;
+								this.listAdded[skill]=true;
+			
+								const info=lib.skill[skill];
+								const list=info.firstDo?firstDo.todoList:info.lastDo?lastDo.todoList:this.todoList;
+								list.push({
+									skill:skill,
+									player:this.player,
+									priority:get.priority(skill),
+								});
+								if(typeof list.player=='string') list.sort((a,b)=>(b.priority-a.priority)||(playerMap.indexOf(a)-playerMap.indexOf(b)));
+								else list.sort((a,b)=>b.priority-a.priority);
+								allbool=true;
+							}
 						}
+			
 						const notemp=player.skills.slice();
 						for(const j in player.additionalSkills){
 							if(!j.startsWith('hidden:')) notemp.addArray(player.additionalSkills[j]);
 						}
-						for(const skill in player.tempSkills){
-							if(notemp.includes(skill)) continue;
+						Object.keys(player.tempSkills).filter(skill=>{
+							if(notemp.includes(skill)) return false;
 							const expire=player.tempSkills[skill];
-							if(typeof expire==='function'&&expire(event,player,name)){
-								delete player.tempSkills[skill];
-								player.removeSkill(skill);
-							}
-							else if(get.objtype(expire)==='object'){
-								for(const role of roles){
-									if(role!=='global'&&player!==event[role]) continue;
-									if(expire[role]===name||(Array.isArray(expire[role])&&expire[role].includes(name))){
-										delete player.tempSkills[skill];
-										player.removeSkill(skill);
-									}
-								}
-							}
-						}
+							if(typeof expire==='function') return expire(event,player,name);
+							if(get.objtype(expire)==='object') return roles.some(role=>{
+								if(role!=='global'&&player!==event[role]) return false;
+								if(Array.isArray(expire[role])) return expire[role].includes(name);
+								return expire[role]===name;
+							});
+						}).forEach(skill=>{
+							delete player.tempSkills[skill];
+							player.removeSkill(skill);
+						});
+			
 						if(lib.config.compatiblemode){
-							let skills=player.getSkills('invisible').concat(lib.skill.global);
-							game.expandSkills(skills);
-							for(const skill of skills){
+							doing.addList(game.expandSkills(player.getSkills('invisible').concat(lib.skill.global)).filter(skill=>{
 								const info=get.info(skill);
-								if(!info||!info.trigger) continue;
-								if (roles.some(role=>{
+								if(!info||!info.trigger) return false;
+								return roles.some(role=>{
 									if(info.trigger[role]===name) return true;
 									if(Array.isArray(info.trigger[role])&&info.trigger[role].includes(name)) return true;
-								})) doing.addList(skill, player);
-							}
+								});
+							}));
 						}
-						else{
-							for(const role of roles){
-								const globalTriggername=role+'_'+name;
-								if (lib.hook.globalskill[globalTriggername]){
-									lib.hook.globalskill[globalTriggername].forEach(skill=>doing.addList(skill,player));
-								}
-								const triggername=player.playerid+'_'+role+'_'+name;
-								if(lib.hook[triggername]){
-									lib.hook[triggername].forEach(skill=>doing.addList(skill,player));
-								}
-							}
-						}
+						else roles.forEach(role=>{
+							doing.addList(lib.hook.globalskill[role+'_'+name]);
+							doing.addList(lib.hook[player.playerid+'_'+role+'_'+name]);
+						});
 						delete doing.listAdded;
 						delete doing.addList;
 						doingList.push(doing);
@@ -32155,34 +32131,31 @@ new Promise(resolve=>{
 					doingList.unshift(firstDo);
 					doingList.push(lastDo);
 					// console.log(name,event.player,doingList.map(i=>({player:i.player,todoList:i.todoList.slice(),doneList:i.doneList.slice()})))
-
+			
 					if(allbool){
-						var next=game.createEvent('arrangeTrigger',false,event);
+						const next=game.createEvent('arrangeTrigger',false,event);
 						next.setContent('arrangeTrigger');
 						next.doingList=doingList;
 						next._trigger=event;
 						next.triggername=name;
-						next.starter=start;
+						next.playerMap=playerMap;
 						event._triggering=next;
 					}
 					return this;
 				}
-				untrigger(all,player){
-					if(typeof all=='undefined') all=true;
-					var evt=this._triggering;
+				untrigger(all=true,player){
+					const evt=this._triggering;
 					if(all){
+						this._triggered=5;
 						if(evt&&evt.doingList){
 							evt.doingList.forEach(doing=>doing.todoList=[]);
-							evt.list=[];
-							if(evt.doing) evt.doing.todoList=[];
 						}
-						this._triggered=5;
 					}
 					else if(player){
 						this._notrigger.add(player);
-						if(!evt||!evt.doingList) return this;
-						const doing=evt.doingList.find(doing=>doing.player==player);
-						if(doing) doing.todoList=[];
+						// if(!evt||!evt.doingList) return this;
+						// const doing=evt.doingList.find(doing=>doing.player==player);
+						// if(doing) doing.todoList=[];
 					}
 					return this;
 				}
@@ -33025,32 +32998,41 @@ new Promise(resolve=>{
 				if(typeof savable=='function') savable=savable(card,player,target);
 				return savable;
 			},
-			filterTrigger:function(event,player,name,skill){
+			/**
+			 * 
+			 * @param {GameEvent} event 
+			 * @param {Player} player 
+			 * @param {string} triggername 
+			 * @param {string} skill 
+			 * @returns {boolean}
+			 */
+			filterTrigger:function(event,player,triggername,skill){
 				if(player._hookTrigger&&player._hookTrigger.some(i=>{
 					const info=lib.skill[i].hookTrigger;
-					return info&&info.block&&info.block(event,player,name,skill);
+					return info&&info.block&&info.block(event,player,triggername,skill);
 				})) return false;
-				const fullskills=game.expandSkills(player.getSkills(false).concat(lib.skill.global));
 				const info=get.info(skill);
-				if(!info) return console.log('缺少info的技能:',skill);
-				if(!fullskills.includes(skill)){
-					if(get.mode()!='guozhan') return false;
-					if(info&&info.noHidden) return false;
-				}
-				if(!info.trigger) return false;
-				if(!info.forceDie&&player.isDead()) return false;
-				if(!info.forceOut&&player.isOut()) return false;
-				if(!Object.keys(info.trigger).some(i=>{
-					if(i!='global'&&player!=event[i]) return false;
-					if(Array.isArray(info.trigger[i])) return info.trigger[i].includes(name);
-					return info.trigger[i]==name;
-				})) return false;
-				if(info.filter&&!info.filter(event,player,name)) return false;
-				if(event._notrigger.includes(player)&&!lib.skill.global.includes(skill)) return false;
-				if(typeof info.usable=='number'&&player.hasSkill('counttrigger')&&
-					player.storage.counttrigger&&player.storage.counttrigger[skill]>=info.usable){
+				if(!info){
+					console.error(new ReferenceError('缺少info的技能:',skill));
 					return false;
 				}
+				if(!game.expandSkills(player.getSkills(true).concat(lib.skill.global)).includes(skill)) return false;
+				if(!game.expandSkills(player.getSkills(false).concat(lib.skill.global)).includes(skill)){//hiddenSkills
+					if(get.mode()!='guozhan') return false;
+					if(info.noHidden) return false;
+				}
+				if(!info.forceDie&&player.isDead()) return false;
+				if(!info.forceOut&&(player.isOut()||player.removed)) return false;
+				if(!info.trigger) return false;
+				if(!Object.keys(info.trigger).some(role=>{
+					if(role!='global'&&player!=event[role]) return false;
+					if(Array.isArray(info.trigger[role])) return info.trigger[role].includes(triggername);
+					return info.trigger[role]==triggername;
+				})) return false;
+				if(info.filter&&!info.filter(event,player,triggername)) return false;
+				if(event._notrigger.includes(player)&&!lib.skill.global.includes(skill)) return false;
+				if(typeof info.usable=='number'&&player.hasSkill('counttrigger')&&
+					player.storage.counttrigger&&player.storage.counttrigger[skill]>=info.usable) return false;
 				if(info.round&&(info.round-(game.roundNumber-player.storage[skill+'_roundcount'])>0)) return false;
 				if(player.storage[`temp_ban_${skill}`]===true) return false;
 				return true;
