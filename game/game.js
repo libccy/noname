@@ -25438,7 +25438,7 @@ new Promise(resolve=>{
 						else if(typeof arguments[i]=='boolean'){
 							next.animate=arguments[i];
 						}
-						else if(get.objtype(arguments[i])=='div'){
+						else if(['div','fragment'].includes(get.objtype(arguments[i]))){
 							next.position=arguments[i];
 						}
 						else if(arguments[i]=='notBySelf'){
@@ -25466,7 +25466,7 @@ new Promise(resolve=>{
 						else if(typeof arguments[i]=='boolean'){
 							next.animate=arguments[i];
 						}
-						else if(get.objtype(arguments[i])=='div'){
+						else if(['div','fragment'].includes(get.objtype(arguments[i]))){
 							next.position=arguments[i];
 						}
 						else if(arguments[i]=='notBySelf'){
@@ -25832,7 +25832,7 @@ new Promise(resolve=>{
 						else if(get.itemtype(arguments[i])=='card'){
 							next.cards=[arguments[i]];
 						}
-						else if(get.objtype(arguments[i])=='div'){
+						else if(['div','fragment'].includes(get.objtype(arguments[i]))){
 							next.position=arguments[i];
 						}
 						else if(arguments[i]=='toStorage'){
@@ -26427,7 +26427,7 @@ new Promise(resolve=>{
 						else if(typeof arguments[i]=='boolean'){
 							next.clearArena=arguments[i];
 						}
-						else if(get.objtype(arguments[i])=='div'){
+						else if(['div','fragment'].includes(get.objtype(arguments[i]))){
 							next.position=arguments[i];
 						}
 					}
@@ -31074,7 +31074,7 @@ new Promise(resolve=>{
 					var position;
 					for(var i=0;i<arguments.length;i++){
 						if(typeof arguments[i]=='string') node.classList.add(arguments[i]);
-						else if(get.objtype(arguments[i])=='div') position=arguments[i];
+						else if(['div','fragment'].includes(get.objtype(arguments[i]))) position=arguments[i];
 						else if(typeof arguments[i]=='boolean') clone=arguments[i];
 					}
 					node.moveTo=lib.element.Card.prototype.moveTo;
@@ -31231,7 +31231,7 @@ new Promise(resolve=>{
 				/**
 				 * @param {{}} item
 				 * @param {keyof typeof ui.create.buttonPresets | (item: {}, type: Function, position?: HTMLDivElement, noClick?: true, button?: HTMLDivElement) => HTMLDivElement} type
-				 * @param {HTMLDivElement} [position]
+				 * @param {HTMLDivElement|DocumentFragment} [position]
 				 * @param {true} [noClick]
 				 * @param {HTMLDivElement} [button]
 				 */
@@ -32143,21 +32143,26 @@ new Promise(resolve=>{
 						if(!_status.event) return;
 						// game.createEvent的时候还没立即push到next里
 						Promise.resolve().then(()=>{
-							const eventPromise=_status.event.next.find(e=>e.toEvent()==event);
-							// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
-							// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
-							if(eventPromise&&_status.event.content instanceof AsyncFunction){
-								if(_status.event!=eventPromise){
-									eventPromise.parent=_status.event;
-									_status.event=eventPromise;
-									game.getGlobalHistory('everything').push(eventPromise);
+							game.executingAsyncEventMap.set(_status.event.toEvent(),(game.executingAsyncEventMap.get(_status.event.toEvent())||Promise.resolve()).then(()=>{
+								let eventPromise=_status.event.next.find(e=>e.toEvent()==event);
+								// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
+								// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
+								if(eventPromise&&_status.event.content instanceof AsyncFunction){
+									// 异步执行game.loop
+									// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
+									// 再执行game.loop是因为原有的game.loop被await卡住了，
+									// 得新执行一个只执行这个异步事件的game.loop
+									if(_status.event!=eventPromise){
+										eventPromise.parent=_status.event;
+										_status.event=eventPromise;
+										game.getGlobalHistory('everything').push(eventPromise);
+									}
+									return game.loop(eventPromise).then(()=>{
+										// 有时候event.finished还是false
+										return eventPromise;
+									});
 								}
-								// 异步执行game.loop
-								// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
-								// 再执行game.loop是因为原有的game.loop被await卡住了，
-								// 得新执行一个只执行这个异步事件的game.loop
-								Promise.resolve().then(()=>game.loop(eventPromise));
-							}
+							}));
 						});
 					});
 					this.#event=event;
@@ -32198,11 +32203,41 @@ new Promise(resolve=>{
 					return this.#event;
 				}
 				/**
-				 * TODO: 实现debugger
+				 * 在某个异步事件中调试变量信息
+				 * 
+				 * 注: 在调试步骤中`定义的变量只在当前输入的语句有效`
+				 * 
+				 * @example
+				 * 在技能中调试技能content相关的信息
+				 * ```js
+				 * await event.debugger();
+				 * ```
+				 * 在技能中调试触发此技能事件的相关的信息
+				 * ```js
+				 * await trigger.debugger();
+				 * ```
 				 */
 				async debugger(){
 					return new Promise(resolve=>{
-						resolve(null);
+						const runCode=function(event,code){
+							try {
+								// 为了使玩家调试时使用var player=xxx时不报错，故使用var
+								var {player,_trigger:trigger,_result:result}=event;
+								return eval(code);
+							}catch(error){
+								return error;
+							}
+						}.bind(window);
+						const inputCallback=inputResult=>{
+							if(inputResult===false){
+								resolve(null);
+							}else{
+								const obj=runCode(this.toEvent(),inputResult);
+								alert((!obj||obj instanceof Error)?String(obj):get.stringify(obj));
+								game.promises.prompt('debugger调试').then(inputCallback);
+							}
+						}
+						game.promises.prompt('debugger调试').then(inputCallback);
 					});
 				}
 			},
@@ -32212,6 +32247,7 @@ new Promise(resolve=>{
 					let noTouchScroll=false;
 					let forceButton=false;
 					let noForceButton=false;
+					/** @type {this} */
 					const dialog=ui.create.div('.dialog');
 					Object.setPrototypeOf(dialog,lib.element.Dialog.prototype);
 					dialog.contentContainer=ui.create.div('.content-container',dialog);
@@ -32258,7 +32294,7 @@ new Promise(resolve=>{
 							item=ui.create.caption(item,this.content);
 						}
 					}
-					else if(get.objtype(item)=='div'){
+					else if(['div','fragment'].includes(get.objtype(item))){
 						this.content.appendChild(item);
 					}
 					else if(get.itemtype(item)=='cards'){
@@ -40267,7 +40303,7 @@ new Promise(resolve=>{
 			else{
 				node.style.transform=`rotate(${(-deg)}deg) scaleY(0)`;
 				node.style.height=`${get.xyDistance(from,to)}px`;
-				if(get.objtype(arguments[1])=='div') arguments[1].appendChild(node);
+				if(['div','fragment'].includes(get.objtype(arguments[1]))) arguments[1].appendChild(node);
 				else if(game.chess) ui.chess.appendChild(node);
 				else ui.arena.appendChild(node);
 				ui.refresh(node);
@@ -41409,6 +41445,14 @@ new Promise(resolve=>{
 			}
 		},
 		/**
+		 * @type { Map<GameEvent, Promise<any>> }
+		 * 
+		 * 以Promise储存异步事件的执行链，使async content调用事件时无需必须使用await
+		 * 
+		 * 但是需要事件结果的除外
+		 */
+		executingAsyncEventMap:new Map(),
+		/**
 		 * @param { Promise<GameEvent> & GameEvent & GameEventPromise } [belongAsyncEvent]
 		 */
 		async loop(belongAsyncEvent){
@@ -41487,6 +41531,7 @@ new Promise(resolve=>{
 						}
 					}
 					else {
+						game.executingAsyncEventMap.delete(event.toEvent());
 						if (event.parent) {
 							if (event.result) {
 								event.parent._result = event.result;
@@ -41494,7 +41539,6 @@ new Promise(resolve=>{
 							_status.event = event.parent;
 							if (game.belongAsyncEvent == event) {
 								delete game.belongAsyncEvent;
-								//resolve();
 							}
 							_resolve();
 							// 此时应该退出了
@@ -41505,7 +41549,6 @@ new Promise(resolve=>{
 						else {
 							if (game.belongAsyncEvent == event) {
 								delete game.belongAsyncEvent;
-								//resolve();
 							}
 							return _resolve();
 						}
@@ -41564,7 +41607,11 @@ new Promise(resolve=>{
 									console.log(e);
 								}
 								else throw e;
-							}).then(after);
+							}).then(after).then(()=>{
+								if (event.finished) {
+									game.executingAsyncEventMap.delete(event.toEvent());
+								}
+							});
 						}
 					}
 				}
@@ -41604,8 +41651,15 @@ new Promise(resolve=>{
 				else if (event.content instanceof AsyncFunction) {
 					// _status,lib,game,ui,get,ai六个变量由game.import提供
 					event.content(event, trigger, player).then(() => {
-						event.finish();
-						resolve();
+						if (game.executingAsyncEventMap.has(event.toEvent())) {
+							game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+								event.finish();
+								resolve();
+							}));
+						} else {
+							event.finish();
+							resolve();
+						}
 					});
 				}
 				else {
@@ -44663,11 +44717,7 @@ new Promise(resolve=>{
 							str=arguments[i];
 						}
 					}
-					else if(get.objtype(arguments[i])=='div'||
-						get.objtype(arguments[i])=='table'||
-						get.objtype(arguments[i])=='tr'||
-						get.objtype(arguments[i])=='td'||
-						get.objtype(arguments[i])=='body') position=arguments[i];
+					else if(['div','table','tr','td','body','fragment'].includes(get.objtype(arguments[i]))) position=arguments[i];
 					else if(typeof arguments[i]=='number') position2=arguments[i];
 					else if(get.itemtype(arguments[i])=='divposition') divposition=arguments[i];
 					else if(typeof arguments[i]=='object') style=arguments[i];
@@ -44737,11 +44787,7 @@ new Promise(resolve=>{
 							tagName=arguments[i];
 						}
 					}
-					else if(get.objtype(arguments[i])=='div'||
-						get.objtype(arguments[i])=='table'||
-						get.objtype(arguments[i])=='tr'||
-						get.objtype(arguments[i])=='td'||
-						get.objtype(arguments[i])=='body') position=arguments[i];
+					else if(['div','table','tr','td','body','fragment'].includes(get.objtype(arguments[i]))) position=arguments[i];
 					else if(typeof arguments[i]=='number') position2=arguments[i];
 					else if(get.itemtype(arguments[i])=='divposition') divposition=arguments[i];
 					else if(typeof arguments[i]=='object') style=arguments[i];
@@ -51658,8 +51704,11 @@ new Promise(resolve=>{
 											if(Array.isArray(obj)){
 												return `[${obj.map(v=>parse(v))}]`;
 											}else if(typeof obj=='function'){
-												return `Function`;
+												return `[Function ${obj.name}]`;
 											}else if(typeof obj!='string'){
+												if(obj instanceof Error){
+													return `<span style="color:red;">${String(obj)}</span>`;
+												}
 												return String(obj);
 											}else{
 												return `'${String(obj)}'`;
@@ -51703,7 +51752,7 @@ new Promise(resolve=>{
 								text.scrollTop=text.scrollHeight;
 							}
 							if(_status.toprint){
-								game.print(...status.toprint);
+								game.print(..._status.toprint);
 								delete _status.toprint;
 							}
 							runButton.listen(runCommand);
@@ -52031,11 +52080,7 @@ new Promise(resolve=>{
 						}
 						else row=arguments[i];
 					}
-					else if(get.objtype(arguments[i])=='div'||
-						get.objtype(arguments[i])=='table'||
-						get.objtype(arguments[i])=='tr'||
-						get.objtype(arguments[i])=='td'||
-						get.objtype(arguments[i])=='body') position=arguments[i];
+					else if(['div','table','tr','td','body','fragment'].includes(get.objtype(arguments[i]))) position=arguments[i];
 					else if(typeof arguments[i]=='boolean') fixed=arguments[i];
 					else if(get.itemtype(arguments[i])=='divposition') divposition=arguments[i];
 					else if(typeof arguments[i]=='object') style=arguments[i];
@@ -54067,14 +54112,16 @@ new Promise(resolve=>{
 						});
 					}
 				}
+				var fragment=document.createDocumentFragment();
 				for(var i=0;i<list.length;i++){
 					if(pre){
-						buttons.push(ui.create.prebutton(list[i],type.slice(3),position,noclick));
+						buttons.push(ui.create.prebutton(list[i],type.slice(3),fragment,noclick));
 					}
 					else{
-						buttons.push(ui.create.button(list[i],type,position,noclick));
+						buttons.push(ui.create.button(list[i],type,fragment,noclick));
 					}
 				}
+				if(position) position.appendChild(fragment);
 				return buttons;
 			},
 			textbuttons:function(list,dialog,noclick){
@@ -60817,6 +60864,7 @@ new Promise(resolve=>{
 			if(Object.prototype.toString.call(obj) === '[object HTMLTableRowElement]') return 'tr';
 			if(Object.prototype.toString.call(obj) === '[object HTMLTableCellElement]') return 'td';
 			if(Object.prototype.toString.call(obj) === '[object HTMLBodyElement]') return 'td';
+			if(Object.prototype.toString.call(obj) === '[object DocumentFragment]') return 'fragment';
 		},
 		type:(obj,method,player)=>{
 			if(typeof obj=='string') obj={name:obj};
