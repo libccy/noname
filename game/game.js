@@ -62053,124 +62053,161 @@ new Promise(resolve=>{
 						skills.add(i);
 					}
 				}
-				for(i=0;i<skills.length;i++){
-					if(lib.skill[skills[i]]&&(lib.skill[skills[i]].nopop||lib.skill[skills[i]].equipSkill)) continue;
-					if(lib.translate[skills[i]+'_info']){
-						if(lib.translate[skills[i]+'_ab']) translation=lib.translate[skills[i]+'_ab'];
-						else{
-							translation=get.translation(skills[i]);
-							if(!lib.skill[skills[i]].nobracket) translation=translation.slice(0,2);
-						}
-
-						if(node.forbiddenSkills[skills[i]]){
-							var forbidstr='<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>';
-							if(node.forbiddenSkills[skills[i]].length){
-								forbidstr+='（与'+get.translation(node.forbiddenSkills[skills[i]])+'冲突）<br>';
-							}
-							else{
-								forbidstr+='（双将禁用）<br>';
-							}
-							forbidstr+=get.skillInfoTranslation(skills[i],node)+'</div></div>'
-							uiintro.add(forbidstr);
-						}
-						else if(!skills2.contains(skills[i])){
-							if(lib.skill[skills[i]].preHidden&&get.mode()=='guozhan'){
-								uiintro.add('<div><div class="skill" style="opacity:0.5">【'+translation+'】</div><div><span style="opacity:0.5">'+get.skillInfoTranslation(skills[i],node)+'</span><br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">预亮技能</div></div></div>');
-								var underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
-								if(_status.prehidden_skills.contains(skills[i])){
-									underlinenode.classList.remove('on');
-								}
-								underlinenode.link=skills[i];
-								underlinenode.listen(ui.click.hiddenskill);
-							}
-							else uiintro.add('<div style="opacity:0.5"><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
-						}
-						else if(lib.skill[skills[i]].temp||!node.skills.contains(skills[i])||lib.skill[skills[i]].thundertext){
-							if(lib.skill[skills[i]].frequent||lib.skill[skills[i]].subfrequent){
-								uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+get.skillInfoTranslation(skills[i],node)+'<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>');
-								var underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
-								if(lib.skill[skills[i]].frequent){
-									if(lib.config.autoskilllist.contains(skills[i])){
-										underlinenode.classList.remove('on');
-									}
-								}
-								if(lib.skill[skills[i]].subfrequent){
-									for(var j=0;j<lib.skill[skills[i]].subfrequent.length;j++){
-										if(lib.config.autoskilllist.contains(skills[i]+'_'+lib.skill[skills[i]].subfrequent[j])){
-											underlinenode.classList.remove('on');
-										}
-									}
-								}
-								if(lib.config.autoskilllist.contains(skills[i])){
-									underlinenode.classList.remove('on');
-								}
-								underlinenode.link=skills[i];
-								underlinenode.listen(ui.click.autoskill2);
-							}
-							else{
-								uiintro.add('<div><div class="skill thundertext thunderauto">【'+translation+'】</div><div class="thundertext thunderauto">'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
-							}
-						}
-						else if(lib.skill[skills[i]].frequent||lib.skill[skills[i]].subfrequent){
-							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>');
-							var underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
-							if(lib.skill[skills[i]].frequent){
-								if(lib.config.autoskilllist.contains(skills[i])){
-									underlinenode.classList.remove('on');
-								}
-							}
-							if(lib.skill[skills[i]].subfrequent){
-								for(var j=0;j<lib.skill[skills[i]].subfrequent.length;j++){
-									if(lib.config.autoskilllist.contains(skills[i]+'_'+lib.skill[skills[i]].subfrequent[j])){
-										underlinenode.classList.remove('on');
-									}
-								}
-							}
-							if(lib.config.autoskilllist.contains(skills[i])){
+				skills.forEach(skill=>{
+					if(lib.skill[skill]&&(lib.skill[skill].nopop||lib.skill[skill].equipSkill)) return;
+					if(!lib.translate[skill+'_info']) return;
+					let translation;
+					if(lib.translate[skill+'_ab']) translation=lib.translate[skill+'_ab'];
+					else{
+						translation=get.translation(skill);
+						if(!lib.skill[skill].nobracket) translation=`【${translation.slice(0,2)}】`;
+					}
+				
+					if(node.forbiddenSkills[skill]) uiintro.add(`
+						<div style="opacity:0.5">
+							<div class="skill">${translation}</div>
+							<div>
+								${node.forbiddenSkills[skill].length?`（与${get.translation(node.forbiddenSkills[skill])}冲突）`:`（双将禁用）`}<br/>
+								${get.skillInfoTranslation(skill,node)}
+							</div>
+						</div>
+					`);
+					else if(!skills2.contains(skill)){
+						if(lib.skill[skill].preHidden&&get.mode()=='guozhan'){
+							uiintro.add(`
+								<div>
+									<div class="skill" style="opacity:0.5">${translation}</div>
+									<div>
+										<span style="opacity:0.5">${get.skillInfoTranslation(skill,node)}</span><br/>
+										<div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">预亮技能</div>
+									</div>
+								</div>
+							`);
+							const underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
+							if(_status.prehidden_skills.contains(skill)){
 								underlinenode.classList.remove('on');
 							}
-							underlinenode.link=skills[i];
+							underlinenode.link=skill;
+							underlinenode.listen(ui.click.hiddenskill);
+						}
+						else uiintro.add(`
+							<div style="opacity:0.5">
+								<div class="skill">${translation}</div>
+								<div>${get.skillInfoTranslation(skill,node)}</div>
+							</div>
+						`);
+					}
+					else if(lib.skill[skill].temp||!node.skills.contains(skill)||lib.skill[skill].thundertext){
+						if(lib.skill[skill].frequent||lib.skill[skill].subfrequent){
+							uiintro.add(`
+								<div>
+									<div class="skill thundertext thunderauto">${translation}</div>
+									<div class="thundertext thunderauto">
+										${get.skillInfoTranslation(skill,node)}<br/>
+										<div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div>
+									</div>	
+								</div>
+							`);
+							const underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
+							if(lib.skill[skill].frequent){
+								if(lib.config.autoskilllist.contains(skill)){
+									underlinenode.classList.remove('on');
+								}
+							}
+							if(lib.skill[skill].subfrequent) lib.skill[skill].subfrequent.forEach(i=>{
+								if(lib.config.autoskilllist.contains(skill+'_'+i)){
+									underlinenode.classList.remove('on');
+								}
+							});
+							if(lib.config.autoskilllist.contains(skill)){
+								underlinenode.classList.remove('on');
+							}
+							underlinenode.link=skill;
 							underlinenode.listen(ui.click.autoskill2);
 						}
-						else if(lib.skill[skills[i]].clickable&&node.isIn()&&node.isUnderControl(true)){
-							var intronode=uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'<br><div class="menubutton skillbutton" style="position:relative;margin-top:5px">点击发动</div></div></div>').querySelector('.skillbutton');
-							if(!_status.gameStarted||(lib.skill[skills[i]].clickableFilter&&!lib.skill[skills[i]].clickableFilter(node))){
-								intronode.classList.add('disabled');
-								intronode.style.opacity=0.5;
+						else uiintro.add(`
+							<div>
+								<div class="skill thundertext thunderauto">${translation}</div>
+								<div class="thundertext thunderauto">${get.skillInfoTranslation(skill,node)}</div>
+							</div>
+						`);
+					}
+					else if(lib.skill[skill].frequent||lib.skill[skill].subfrequent){
+						uiintro.add(`
+							<div>
+								<div class="skill">${translation}</div>
+								<div>
+									${get.skillInfoTranslation(skill,node)}<br/>
+									<div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div>
+								</div>
+							</div>
+						`);
+						const underlinenode=uiintro.content.lastChild.querySelector('.underlinenode');
+						if(lib.skill[skill].frequent){
+							if(lib.config.autoskilllist.contains(skill)){
+								underlinenode.classList.remove('on');
 							}
-							else{
-								intronode.link=node;
-								intronode.func=lib.skill[skills[i]].clickable;
-								intronode.classList.add('pointerdiv');
-								intronode.listen(ui.click.skillbutton);
+						}
+						if(lib.skill[skill].subfrequent) lib.skill[skill].subfrequent.forEach(i=>{
+							if(lib.config.autoskilllist.contains(skill+'_'+i)){
+								underlinenode.classList.remove('on');
 							}
+						});
+						if(lib.config.autoskilllist.contains(skill)){
+							underlinenode.classList.remove('on');
+						}
+						underlinenode.link=skill;
+						underlinenode.listen(ui.click.autoskill2);
+					}
+					else if(lib.skill[skill].clickable&&node.isIn()&&node.isUnderControl(true)){
+						const intronode=uiintro.add(`
+							<div>
+								<div class="skill">${translation}</div>
+								<div>
+									${get.skillInfoTranslation(skill,node)}<br/>
+									<div class="menubutton skillbutton" style="position:relative;margin-top:5px">点击发动</div>
+								</div>
+							</div>
+						`).querySelector('.skillbutton');
+						if(!_status.gameStarted||(lib.skill[skill].clickableFilter&&!lib.skill[skill].clickableFilter(node))){
+							intronode.classList.add('disabled');
+							intronode.style.opacity=0.5;
 						}
 						else{
-							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i],node)+'</div></div>');
-						}
-						if(lib.translate[skills[i]+'_append']){
-							uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
+							intronode.link=node;
+							intronode.func=lib.skill[skill].clickable;
+							intronode.classList.add('pointerdiv');
+							intronode.listen(ui.click.skillbutton);
 						}
 					}
-				}
+					else uiintro.add(`
+						<div>
+							<div class="skill">${translation}</div>
+							<div>${get.skillInfoTranslation(skill,node)}</div>
+						</div>
+					`);
+					if(lib.translate[skill+'_append']){
+						uiintro._place_text=uiintro.add(`<div class="text">${lib.translate[skill+'_append']}</div>`)
+					}
+				});
 				// if(get.is.phoneLayout()){
-				//     var storage=node.storage;
-				//     for(i in storage){
-				//      			if(get.info(i)&&get.info(i).intro){
-				//      						 intro=get.info(i).intro;
-				//      						 if(node.getSkills().concat(lib.skill.global).contains(i)==false&&!intro.show) continue;
-				//      						 var name=intro.name?intro.name:get.translation(i);
-				//      						 if(typeof name=='function'){
-				//      									  name=name(storage[i],node);
-				//      						 }
-				//      						 translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>';
-				//      						 var stint=get.storageintro(intro.content,storage[i],node,null,i);
-				//      						 if(stint){
-				//      									  translation+=stint+'</div></div>';
-				//      									  uiintro.add(translation);
-				//      						 }
-				//      			}
-				//     }
+				// 	var storage=node.storage;
+				// 	for(i in storage){
+				// 		if(get.info(i)&&get.info(i).intro){
+				// 			intro=get.info(i).intro;
+				// 			if(node.getSkills().concat(lib.skill.global).contains(i)==false&&!intro.show) continue;
+				// 			var name=intro.name?intro.name:get.translation(i);
+				// 			if(typeof name=='function'){
+				// 				name=name(storage[i],node);
+				// 			}
+				// 			translation='<div><div class="skill">『'+name.slice(0,2)+'』</div><div>';
+				// 			var stint=get.storageintro(intro.content,storage[i],node,null,i);
+				// 			if(stint){
+				// 				translation+=stint+'</div></div>';
+				// 				uiintro.add(translation);
+				// 			}
+				// 		}
+				// 	}
 				// }
 
 				if(lib.config.right_range&&_status.gameStarted){
@@ -62839,22 +62876,25 @@ new Promise(resolve=>{
 				}
 				else{
 					var infoitem=get.character(character);
-					var skills=infoitem[3];
-					for(i=0;i<skills.length;i++){
-						if(lib.translate[skills[i]+'_info']){
-							if(lib.translate[skills[i]+'_ab']) translation=lib.translate[skills[i]+'_ab'];
-							else{
-								translation=get.translation(skills[i]);
-								if(!lib.skill[skills[i]].nobracket) translation=translation.slice(0,2);
-							}
-
-							uiintro.add('<div><div class="skill">【'+translation+'】</div><div>'+get.skillInfoTranslation(skills[i])+'</div></div>');
-
-							if(lib.translate[skills[i]+'_append']){
-								uiintro._place_text=uiintro.add('<div class="text">'+lib.translate[skills[i]+'_append']+'</div>')
-							}
+					var skills=infoitem[3];get.character(character,3).forEach(skill=>{
+						if(!lib.translate[skill+'_info']) return;
+						if(lib.translate[skill+'_ab']) translation=lib.translate[skill+'_ab'];
+						else{
+							translation=get.translation(skill);
+							if(!lib.skill[skill].nobracket) translation=`【${translation.slice(0,2)}】`;
 						}
-					}
+					
+						uiintro.add(`
+							<div>
+								<div class="skill">${translation}</div>
+								<div>${get.skillInfoTranslation(skill)}</div>
+							</div>
+						`);
+					
+						if(lib.translate[skill+'_append']){
+							uiintro._place_text=uiintro.add(`<div class="text">${lib.translate[skill+'_append']}</div>`)
+						}
+					});
 					var modepack=lib.characterPack['mode_'+get.mode()];
 					if(lib.config.show_favourite&&
 					lib.character[node.link]&&(!modepack||!modepack[node.link])&&(!simple||get.is.phoneLayout())){
