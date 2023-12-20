@@ -13,12 +13,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
-				sp_qifu:["caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
+				sp_qifu:['ol_feiyi',"caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
 				sp_wanglang:['ol_wanglang','ol_puyuan','ol_zhouqun'],
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_feiyi','ol_dingshangwan','ol_liwan','ol_liuyan'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_dingshangwan','ol_liwan','ol_liuyan'],
 			},
 		},
 		characterFilter:{
@@ -1584,7 +1584,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return str+parseFloat(num);
 								},'');
 							},
-							content:'使用点数大于$的普通锦囊牌额外结算一次',
+							content:'使用的下一张点数大于$的普通锦囊牌额外结算一次',
 						},
 						audio:'hezhong',
 						trigger:{player:'useCard'},
@@ -1594,14 +1594,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return typeof num=='number'&&player.getStorage('hezhong_0').some(numx=>num>numx);
 						},
 						forced:true,
+						usable:1,
 						content:function(){
+							player.unmarkSkill('hezhong_0');
 							trigger.effectCount++;
 							game.log(trigger.card,'额外结算一次');
 						},
 						ai:{
 							effect:{
 								player:function(card,player,target){
-									if(card.name=='tiesuo') return 'zerotarget';
+									if(card.name=='tiesuo'&&(!player.storage.counttrigger||!player.storage.counttrigger.hezhong_0)) return 'zerotarget';
 								},
 							},
 						},
@@ -1618,7 +1620,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return str+parseFloat(num);
 								},'');
 							},
-							content:'使用点数小于$的普通锦囊牌额外结算一次',
+							content:'使用的下一张点数小于$的普通锦囊牌额外结算一次',
 						},
 						audio:'hezhong',
 						trigger:{player:'useCard'},
@@ -1628,14 +1630,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return typeof num=='number'&&player.getStorage('hezhong_1').some(numx=>num<numx);
 						},
 						forced:true,
+						usable:1,
 						content:function(){
+							player.unmarkSkill('hezhong_1');
 							trigger.effectCount++;
 							game.log(trigger.card,'额外结算一次');
 						},
 						ai:{
 							effect:{
 								player:function(card,player,target){
-									if(card.name=='tiesuo') return 'zerotarget';
+									if(card.name=='tiesuo'&&(!player.storage.counttrigger||!player.storage.counttrigger.hezhong_1)) return 'zerotarget';
 								},
 							},
 						},
@@ -24552,6 +24556,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.delayx();
 					}
 				},
+				ai:{
+					threaten:3,
+				},
 				hasMark:(mark,player,target)=>{
 					if(!target) return player.getStorage('jianjie_'+mark).length>0;
 					return target.getStorage('jianjie_'+mark).contains(player);
@@ -24625,17 +24632,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 							},
 							expose:0.4,
-							threaten:3,
 						},
 					},
 					die:{
 						audio:'xinfu_jianjie',
 						trigger:{global:'die'},
-						forced:true,
 						filter:function(event,player){
 							const skill=lib.skill.jianjie;
 							return skill.hasMark('huoji',player,event.player)||skill.hasMark('lianhuan',player,event.player);
 						},
+						forced:true,
+						logTarget:'player',
 						content:function(){
 							'step 0'
 							if(lib.skill.jianjie.hasMark('huoji',player,trigger.player)){
@@ -24643,7 +24650,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return get.attitude(get.player(),target);
 								});
 							}
-							else event.goto(3);
+							else event.goto(2);
 							'step 1'
 							if(result.bool){
 								var target=result.targets[0];
@@ -24668,7 +24675,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								game.delayx();
 							}
 						},
-						logTarget:'player',
 					},
 					huoji:{
 						marktext:'龙',
@@ -26651,7 +26657,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yanru:'宴如',
 			yanru_info:'出牌阶段各限一次，若你的手牌数为：①奇数，你可以摸三张牌，然后弃置至少一半手牌（向下取整）；②偶数，你可以弃置至少一半手牌，然后摸三张牌。',
 			hezhong:'和衷',
-			hezhong_info:'每回合每项限一次，当你的手牌数变为1后，你可以展示此唯一手牌A并摸一张牌，然后你选择一项：①本回合使用点数大于A的点数的普通锦囊牌额外结算一次；②本回合使用点数小于A的点数的普通锦囊牌额外结算一次。',
+			hezhong_info:'每回合每项限一次，当你的手牌数变为1后，你可以展示唯一手牌并摸一张牌，然后你选择一项：①本回合使用的下一张点数大于此牌的点数的普通锦囊牌额外结算一次；②本回合使用的下一张点数小于此牌的点数的普通锦囊牌额外结算一次。',
 			lvboshe:'吕伯奢',
 			olfushi:'缚豕',
 			olfushi_info:'①一名角色使用【杀】结算结束后，若你至其的距离不大于1，你将此【杀】对应的所有实体牌置于武将牌上。②当你需要使用一张【杀】时，你可以将任意张“缚豕”牌置入弃牌堆并摸等量的牌，视为使用一张【杀】并选择X项（X为你以此法重铸的牌数且至多为3）：1.你为此【杀】额外指定一个目标；2.你选择此【杀】的一个目标角色，此牌对其造成的伤害-1；3.你选择此【杀】的一个目标角色，此【杀】对其造成的伤害+1。当此【杀】指定最后一个目标后，若此牌被选择的效果选项相邻且此牌的目标角色座位连续，则此【杀】不计入次数限制。',

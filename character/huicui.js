@@ -71,7 +71,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhanghu:['male','wei',4,['cuijian','zhtongyuan']],
 			luyusheng:['female','wu',3,['zhente','zhiwei']],
 			huaxin:['male','wei',3,['spwanggui','xibing']],
-			mengyou:['male','qun',5,['hmmanyi','dcmanzhi']],
+			mengyou:['male','qun',5,['manyi','dcmanzhi']],
 			liuyong:['male','shu',3,['zhuning','fengxiang']],
 			dc_sunru:['female','wu',3,['xiecui','youxu']],
 			xiahoulingnv:['female','wei',4,['fuping','weilie']],
