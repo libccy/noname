@@ -1,3 +1,13 @@
+/**
+ * @typedef {{
+ * 	cardMove:(import('../library/index.js').GameEventPromise)[], 
+ * 	custom: (import('../library/index.js').GameEventPromise)[], 
+ * 	useCard: (import('../library/index.js').GameEventPromise)[], 
+ * 	changeHp: (import('../library/index.js').GameEventPromise)[],
+ * 	everything: (import('../library/index.js').GameEventPromise)[] 
+ * }} History
+*/
+
 import { AI as ai } from '../ai/index.js';
 import { Get as get } from '../get/index.js';
 import { Library as lib } from '../library/index.js';
@@ -652,20 +662,32 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * 为牌添加知情者
+	 * @param { import('../library/index.js').Card[] | import('../library/index.js').Card } cards 
+	 * @param { import('../library/index.js').Player[] } players 
 	 */
 	static addCardKnower(cards, players) {
 		if (get.itemtype(cards) == 'card') {
+			// @ts-ignore
 			cards = [cards];
 		}
+		// @ts-ignore
 		cards.forEach(card => card.addKnower(players));
 	}
-	//移除牌的所有知情者。
+	/**
+	 * 移除牌的所有知情者。
+	 * @param { import('../library/index.js').Card[] | import('../library/index.js').Card } cards
+	 */
 	static clearCardKnowers(cards) {
 		if (get.itemtype(cards) == 'card') {
+			// @ts-ignore
 			cards = [cards];
 		}
+		// @ts-ignore
 		cards.forEach(card => card.clearKnowers());
 	}
+	/**
+	 * @param { { [key: string]: any } } [arg]
+	 */
 	static loseAsync(arg) {
 		var next = game.createEvent('loseAsync');
 		next.forceDie = true;
@@ -736,17 +758,27 @@ export class Game extends Uninstantable {
 		}
 		return ret;
 	}
+	/**
+	 * @param {string} name 
+	 */
 	static getRarity(name) {
 		var rank = lib.rank.rarity;
-		if (rank.legend.contains(name)) return 'legend';
-		if (rank.epic.contains(name)) return 'epic';
-		if (rank.rare.contains(name)) return 'rare';
-		if (get.mode() != 'chess' && rank.junk.contains(name)) return 'junk';
+		if (rank.legend.includes(name)) return 'legend';
+		if (rank.epic.includes(name)) return 'epic';
+		if (rank.rare.includes(name)) return 'rare';
+		if (get.mode() != 'chess' && rank.junk.includes(name)) return 'junk';
 		return 'common';
 	}
+	/**
+	 * @template { keyof History } T
+	 * @param { T } key
+	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
+	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @returns { boolean }
+	 */
 	static hasGlobalHistory(key, filter, last) {
-		if (!key) return _status.globalHistory[_status.globalHistory.length - 1];
-		if (!filter) return _status.globalHistory[_status.globalHistory.length - 1][key];
+		// md谁写的和getGlobalHistory一样？害人！
+		if (!key || !filter) return false;
 		else {
 			const history = game.getGlobalHistory(key);
 			if (last) {
@@ -761,9 +793,16 @@ export class Game extends Uninstantable {
 			}
 		}
 	}
+	/**
+	 * @template { keyof History } T
+	 * @param { T } key
+	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
+	 * @param { import('../library/index.js').GameEventPromise } [last] 
+	 * @returns { void }
+	 */
 	static checkGlobalHistory(key, filter, last) {
-		if (!key) return _status.globalHistory[_status.globalHistory.length - 1];
-		if (!filter) return _status.globalHistory[_status.globalHistory.length - 1][key];
+		// md谁写的和getGlobalHistory一样？害人！
+		if (!key || !filter) return;
 		else {
 			const history = game.getGlobalHistory(key);
 			if (last) {
@@ -778,6 +817,18 @@ export class Game extends Uninstantable {
 			}
 		}
 	}
+	/**
+	 * @overload
+	 * @returns { History }
+	 */
+	/**
+	 * @template { keyof History } T
+	 * @overload
+	 * @param { T } key
+	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } [filter]
+	 * @param { import('../library/index.js').GameEventPromise } [last] 
+	 * @returns { History[T] }
+	 */
 	static getGlobalHistory(key, filter, last) {
 		if (!key) return _status.globalHistory[_status.globalHistory.length - 1];
 		if (!filter) return _status.globalHistory[_status.globalHistory.length - 1][key];
@@ -793,13 +844,18 @@ export class Game extends Uninstantable {
 			return history.filter(filter);
 		}
 	}
+	/**
+	 * @template { keyof History } T
+	 * @param { T } key
+	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
+	 * @param { import('../library/index.js').GameEventPromise } [last] 
+	 * @returns { boolean }
+	 */
 	static hasAllGlobalHistory(key, filter, last) {
-		if (!key || !filter) return;
-		let stopped = false;
-		_status.globalHistory.forEach(value => {
+		if (!key || !filter) return false;
+		return _status.globalHistory.some(value => {
 			if (value[key]) {
-				if (last && value[key].includes(last) && !stopped) {
-					stopped = true;
+				if (last && value[key].includes(last)) {
 					const lastIndex = value[key].indexOf(last);
 					if (value[key].some((event, index) => {
 						if (index > lastIndex) return false;
@@ -812,6 +868,13 @@ export class Game extends Uninstantable {
 			}
 		})
 	}
+	/**
+	 * @template { keyof History } T
+	 * @param { T } key
+	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
+	 * @param { import('../library/index.js').GameEventPromise } [last] 
+	 * @returns { void }
+	 */
 	static checkAllGlobalHistory(key, filter, last) {
 		if (!key || !filter) return;
 		let stopped = false;
@@ -831,6 +894,18 @@ export class Game extends Uninstantable {
 			}
 		})
 	}
+	/**
+	 * @overload
+	 * @returns { History[] }
+	 */
+	/**
+	 * @template { keyof History } T
+	 * @overload
+	 * @param { T } key
+	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } [filter]
+	 * @param { import('../library/index.js').GameEventPromise } [last] 
+	 * @returns { History[T] }
+	 */
 	static getAllGlobalHistory(key, filter, last) {
 		const history = [];
 		_status.globalHistory.forEach(value => {
@@ -844,7 +919,7 @@ export class Game extends Uninstantable {
 		if (filter) {
 			if (last) {
 				const lastIndex = history.indexOf(last);
-				return history.filter(function (event, index) {
+				return history.filter((event, index) => {
 					if (index > lastIndex) return false;
 					return filter(event);
 				});
@@ -853,10 +928,14 @@ export class Game extends Uninstantable {
 		}
 		return history;
 	}
+	/**
+	 * @param { import('../library/index.js').Card | import('../library/index.js').Card[] } cards 
+	 */
 	static cardsDiscard(cards) {
 		var type = get.itemtype(cards);
 		if (type != 'cards' && type != 'card') return;
 		var next = game.createEvent('cardsDiscard');
+		// @ts-ignore
 		next.cards = type == 'cards' ? cards.slice(0) : [cards];
 		next.setContent('cardsDiscard');
 		next.getd = function (player, key, position) {

@@ -5,7 +5,7 @@
  * @typedef {InstanceType<typeof lib.element.Button>} Button
  * @typedef {InstanceType<typeof lib.element.Dialog>} Dialog
  * @typedef {InstanceType<typeof lib.element.GameEvent>} GameEvent
- * @typedef {InstanceType<typeof lib.element.GameEventPromise>} GameEventPromise
+ * @typedef {InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> & typeof Promise<lib.element.GameEvent>} GameEventPromise
  * @typedef {InstanceType<typeof lib.element.NodeWS>} NodeWS
 */
 import { nonameInitialized, assetURL, userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
@@ -31302,7 +31302,7 @@ export class Library extends Uninstantable {
 			}
 		},
 		GameEvent: class {
-			/** @type { Promise<GameEvent> & GameEvent & GameEventPromise } */
+			/** @type { GameEventPromise } */
 			#promise;
 			/**
 			 * @param {string} [name]
@@ -31321,11 +31321,11 @@ export class Library extends Uninstantable {
 				this.step = 0;
 				this.finished = false;
 				/**
-				 * @type {(Promise<GameEvent> & GameEvent & GameEventPromise)[]}
+				 * @type {(GameEventPromise)[]}
 				 */
 				this.next = [];
 				/**
-				 * @type {(Promise<GameEvent> & GameEvent & GameEventPromise)[]}
+				 * @type {(GameEventPromise)[]}
 				 */
 				this.after = [];
 				this.custom = {
@@ -32107,7 +32107,7 @@ export class Library extends Uninstantable {
 			/**
 			 * 事件转为Promise化
 			 * 
-			 * @returns { Promise<GameEvent> & GameEvent & GameEventPromise<> }
+			 * @returns { GameEventPromise }
 			 */
 			toPromise() {
 				if (!this.#promise) {

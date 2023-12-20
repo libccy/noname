@@ -1833,10 +1833,54 @@ export class Get extends Uninstantable {
 	}
 	static xyDistance(from, to) { return Math.sqrt((from[0] - to[0]) * (from[0] - to[0]) + (from[1] - to[1]) * (from[1] - to[1])) }
 	/**
-	 * @param { [number, number] | string | import('../library/index.js').Player[] |
-	 * 	import('../library/index.js').Card[] | [number, number, number, number] | import('../library/index.js').Button |
-	 * import('../library/index.js').Dialog | import('../library/index.js').Player | import('../library/index.js').Card |
-	 * import('../library/index.js').GameEvent | import('../library/index.js').GameEventPromise } obj 
+	 * @overload
+	 * @param { string } obj 
+	 * @returns { 'position' | 'natures' | 'nature' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Player[] } obj 
+	 * @returns { 'players' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Card[] } obj 
+	 * @returns { 'cards' }
+	 */
+	/**
+	 * @overload
+	 * @param { [number, number] } obj 
+	 * @returns { 'select' }
+	 */
+	/**
+	 * @overload
+	 * @param { [number, number, number, number] } obj 
+	 * @returns { 'divposition' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Button } obj 
+	 * @returns { 'button' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Card } obj 
+	 * @returns { 'card' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Player } obj 
+	 * @returns { 'player' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Dialog } obj 
+	 * @returns { 'dialog' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').GameEvent | import('../library/index.js').GameEventPromise } obj 
+	 * @returns { 'event' }
 	 */
 	static itemtype(obj) {
 		if (typeof obj == 'string') {
@@ -1853,19 +1897,13 @@ export class Get extends Uninstantable {
 			if (lib.nature.has(obj)) return 'nature';
 		}
 		if (Array.isArray(obj) && obj.length > 0) {
-			if (obj.every(p => p instanceof lib.element.Player)) {
-				return 'players';
-			}
-			if (obj.every(p => p instanceof lib.element.Card)) {
-				return 'cards';
-			}
-
+			if (obj.every(p => p instanceof lib.element.Player)) return 'players';
+			if (obj.every(p => p instanceof lib.element.Card)) return 'cards';
 			if (obj.length == 2) {
 				if (typeof obj[0] == 'number' && typeof obj[1] == 'number') {
 					if (obj[0] <= obj[1] || obj[1] <= -1) return 'select';
 				}
 			}
-
 			if (obj.length == 4) {
 				if (obj.every(p => typeof p == 'number')) {
 					return 'divposition';
@@ -2168,14 +2206,13 @@ export class Get extends Uninstantable {
 		}
 	}
 	/**
-	 * @param { number | [number, number] | (()=>[number, number]) } [select] 
+	 * @param { number | [number, number] | (()=>[number, number]) } [select]
 	 * @returns { [number, number] }
 	 */
 	static select(select) {
-		if (typeof select == 'number') return [select, select];
-		// @ts-ignore
-		if (get.itemtype(select) == 'select') return select;
 		if (typeof select == 'function') return get.select(select());
+		else if (typeof select == 'number') return [select, select];
+		else if (select && get.itemtype(select) == 'select') return select;
 		return [1, 1];
 	}
 	static card(original) {
