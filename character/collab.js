@@ -372,9 +372,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					order:1,
+					order:function(item,player){
+						if(player.hasCard((i)=>{
+							return get.value(i)>Math.max(6,9-player.hp);
+						},'he')) return 1;
+						return 10;
+					},
 					result:{
 						player:1
+					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return (!arg||arg&&arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&player.countSkill('dczhiheng')<1+player.getStorage('dczhiheng_hit').length&&player.hasCard((card)=>{
+							return get.name(card)!=='tao';
+						},'h');
 					},
 					threaten:1.55
 				},

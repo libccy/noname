@@ -13357,7 +13357,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var target=targets.shift();
 					event.target=target;
 					source.line(target,'green');
-					target.chooseBool('是否响应'+get.translation(source)+'发起的【拉拢人心】？','将势力改为'+event.text).set('choice',Math.random()<=0.98);//反骨[doge]
+					target.chooseBool('是否响应'+get.translation(source)+'发起的【拉拢人心】？','将势力改为'+event.text).set('ai',_status.event.choice).set('choice',function(){
+						let fs=target.getFriends(true).length;
+						if(game.players.length<=2*fs) return false;
+						if(source.getFriends(true).length+fs>game.players.length/2) return true;
+						if(target.isDamaged()||target.countCards('h')<4) return false;
+						return true;
+					}());
 					'step 6'
 					if(result.bool){
 						target.chat('加入');
