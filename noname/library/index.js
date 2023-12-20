@@ -2,6 +2,8 @@
  * @typedef {InstanceType<typeof lib.element.Player>} Player
  * @typedef {InstanceType<typeof lib.element.Card>} Card
  * @typedef {InstanceType<typeof lib.element.VCard>} VCard
+ * @typedef {InstanceType<typeof lib.element.Button>} Button
+ * @typedef {InstanceType<typeof lib.element.Dialog>} Dialog
  * @typedef {InstanceType<typeof lib.element.GameEvent>} GameEvent
  * @typedef {InstanceType<typeof lib.element.GameEventPromise>} GameEventPromise
  * @typedef {InstanceType<typeof lib.element.NodeWS>} NodeWS
@@ -32105,7 +32107,7 @@ export class Library extends Uninstantable {
 			/**
 			 * 事件转为Promise化
 			 * 
-			 * @returns { Promise<GameEvent> & GameEvent & GameEventPromise }
+			 * @returns { Promise<GameEvent> & GameEvent & GameEventPromise<> }
 			 */
 			toPromise() {
 				if (!this.#promise) {

@@ -6,8 +6,9 @@ export const status = {
 	clicked: false,
 	auto: false,
 	/**
-	 * @type {GameEvent}
+	 * @type {import('../library/index.js').GameEventPromise & import('../library/index.js').GameEvent}
 	 */
+	// @ts-ignore
 	event: null,
 	ai: {},
 	lastdragchange: [],

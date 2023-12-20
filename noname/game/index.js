@@ -11,14 +11,17 @@ export class Game extends Uninstantable {
 	static onlineID = null;
 	static onlineKey = null;
 	/**
-	 * @type {Player[]}
+	 * @type {import('../library/index.js').Player[]}
 	 */
 	static players = [];
 	/**
-	 * @type {Player[]}
+	 * @type {import('../library/index.js').Player[]}
 	 */
 	static dead = [];
 	static imported = [];
+	/**
+	 * @type { { [key: string]: import('../library/index.js').Player } }
+	 */
 	static playerMap = {};
 	static phaseNumber = 0;
 	static roundNumber = 0;
