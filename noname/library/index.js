@@ -1458,7 +1458,7 @@ export class Library extends Uninstantable {
 							node.menu = ui.create.div(node, '', '<div></div><div></div><div></div><div></div>');
 						}
 					},
-					onclick: gnc.of(function* (theme) {
+					onclick: async (theme) => {
 						game.saveConfig('theme', theme);
 						ui.arena.hide();
 						lib.init.background();
@@ -1471,17 +1471,17 @@ export class Library extends Uninstantable {
 							}
 						}
 						lib.announce.publish("Noname.Apperaence.Theme.onChanging", theme);
-						yield new Promise(resolve => setTimeout(resolve, 500));
+						await new Promise(resolve => setTimeout(resolve, 500));
 
 						const deletingTheme = ui.css.theme;
 						ui.css.theme = lib.init.css(lib.assetURL + 'theme/' + lib.config.theme, 'style');
 						deletingTheme.remove();
 						lib.announce.publish("Noname.Apperaence.Theme.onChanged", theme);
-						yield new Promise(resolve => setTimeout(resolve, 100));
+						await new Promise(resolve => setTimeout(resolve, 100));
 
 						ui.arena.show();
 						lib.announce.publish("Noname.Apperaence.Theme.onChangeFinished", theme);
-					})
+					}
 				},
 				layout: {
 					name: '布局',
@@ -9540,7 +9540,7 @@ export class Library extends Uninstantable {
 						if (!lengths.length) return constructingToLoad + 1;
 						return constructingToLoad + Math.min(...lengths);
 					}, 0);
-					const packLoaded = gnc.of(function* () {
+					const packLoaded = async () => {
 						toLoad--;
 						if (toLoad) return;
 						if (_status.importing) {
@@ -9548,7 +9548,7 @@ export class Library extends Uninstantable {
 							for (const type in _status.importing) {
 								promises.addArray(_status.importing[type])
 							}
-							yield Promise.allSettled(promises);
+							await Promise.allSettled(promises);
 							delete _status.importing;
 						}
 
@@ -9557,7 +9557,7 @@ export class Library extends Uninstantable {
 							lib.init.onload();
 						}
 						else _status.packLoaded = true;
-					});
+					};
 					if (localStorage.getItem(`${lib.configprefix}playback`)) {
 						toLoad++;
 						lib.init.js(`${lib.assetURL}mode`, lib.config.mode, packLoaded, packLoaded);
@@ -9645,16 +9645,16 @@ export class Library extends Uninstantable {
 					console.log(e);
 				});
 				var styleToLoad = 6;
-				var styleLoaded = gnc.of(function* () {
+				var styleLoaded = async () => {
 					--styleToLoad;
 					if (styleToLoad == 0) {
 						if (extensionlist.length && (lib.config.mode != 'connect' || show_splash)) {
 							_status.extensionLoading = [];
 							let extToLoad = extensionlist.length;
-							const extLoaded = gnc.of(function* () {
+							const extLoaded = async () => {
 								--extToLoad;
 								if (extToLoad == 0) {
-									yield Promise.allSettled(_status.extensionLoading);
+									await Promise.allSettled(_status.extensionLoading);
 									_status.extensionLoaded.filter(Boolean).forEach(name => {
 										lib.announce.publish("Noname.Init.Extension.onLoad", name);
 										lib.announce.publish(`Noname.Init.Extension.${name}.onLoad`, void 0);
@@ -9662,38 +9662,37 @@ export class Library extends Uninstantable {
 									delete _status.extensionLoading;
 									loadPack();
 								}
-							});
+							};
 							//读取扩展
 							var alerted = false;
-							for (var i = 0; i < extensionlist.length; i++) {
+							for (let i = 0; i < extensionlist.length; i++) {
 								if (window.bannedExtensions.contains(extensionlist[i])) {
 									alerted = true;
 									--extToLoad;
 									if (extToLoad == 0) {
-										yield Promise.allSettled(_status.extensionLoading);
+										await Promise.allSettled(_status.extensionLoading);
 										delete _status.extensionLoading;
 										loadPack();
 									}
 									continue;
 								}
-								lib.init.js(lib.assetURL + 'extension/' + extensionlist[i], 'extension', extLoaded, (function (i) {
-									return gnc.of(function* () {
-										game.removeExtension(i);
-										--extToLoad;
-										if (extToLoad == 0) {
-											yield Promise.allSettled(_status.extensionLoading);
-											delete _status.extensionLoading;
-											loadPack();
-										}
-									});
-								}(extensionlist[i])));
+								lib.init.js(lib.assetURL + 'extension/' + extensionlist[i], 'extension', extLoaded, async () => {
+									game.removeExtension(extensionlist[i]);
+									--extToLoad;
+									if (extToLoad == 0) {
+										await Promise.allSettled(_status.extensionLoading);
+										delete _status.extensionLoading;
+										loadPack();
+									}
+								});
 							}
 						}
 						else {
 							loadPack();
 						}
 					}
-				});
+				};
+
 				if (lib.config.layout == 'default') {
 					lib.config.layout = 'mobile';
 				}
@@ -10304,13 +10303,13 @@ export class Library extends Uninstantable {
 			}
 		},
 		//lib.onload支持传入GeneratorFunction以解决异步函数的问题 by诗笺
-		onload: gnc.of(function* () {
+		async onload() {
 			const libOnload = lib.onload;
 			delete lib.onload;
 			while (Array.isArray(libOnload) && libOnload.length) {
 				const fun = libOnload.shift();
-				if (typeof fun != "function") continue;
-				yield (gnc.is.generatorFunc(fun) ? gnc.of(fun) : fun)();
+				if (typeof fun !== "function") continue;
+				await (gnc.is.generatorFunc(fun) ? gnc.of(fun) : fun)();
 			}
 			ui.updated();
 			game.documentZoom = game.deviceZoom;
@@ -10504,7 +10503,7 @@ export class Library extends Uninstantable {
 				});
 			}
 
-			var proceed2 = gnc.of(function* () {
+			var proceed2 = async () => {
 				var mode = lib.imported.mode;
 				var card = lib.imported.card;
 				var character = lib.imported.character;
@@ -10919,7 +10918,7 @@ export class Library extends Uninstantable {
 							_status.extension = lib.extensions[i][0];
 							_status.evaluatingExtension = lib.extensions[i][3];
 							if (typeof lib.extensions[i][1] == "function")
-								yield (gnc.is.coroutine(lib.extensions[i][1]) ? gnc.of(lib.extensions[i][1]) : lib.extensions[i][1]).call(lib.extensions[i], lib.extensions[i][2], lib.extensions[i][4]);
+								await (gnc.is.coroutine(lib.extensions[i][1]) ? gnc.of(lib.extensions[i][1]) : lib.extensions[i][1]).call(lib.extensions[i], lib.extensions[i][2], lib.extensions[i][4]);
 							if (lib.extensions[i][4]) {
 								if (lib.extensions[i][4].character) {
 									for (var j in lib.extensions[i][4].character.character) {
@@ -10967,31 +10966,30 @@ export class Library extends Uninstantable {
 				}
 				delete lib.init.start;
 				if (Array.isArray(_status.onprepare) && _status.onprepare.length) {
-					yield Promise.allSettled(_status.onprepare);
+					await Promise.allSettled(_status.onprepare);
 					delete _status.onprepare;
 				}
 				game.loop();
-			})
-			var proceed = gnc.of(function* () {
+			};
+			var proceed = async () => {
 				if (!lib.db) {
 					try {
 						lib.storage = JSON.parse(localStorage.getItem(lib.configprefix + lib.config.mode));
-						if (typeof lib.storage != 'object') throw ('err');
-						if (lib.storage == null) throw ('err');
-					}
-					catch (err) {
+						if (typeof lib.storage !== 'object') throw ('err');
+						if (lib.storage === null) throw ('err');
+					} catch (err) {
 						lib.storage = {};
 						localStorage.setItem(lib.configprefix + lib.config.mode, "{}");
 					}
-					yield proceed2();
+					await proceed2();
 				}
 				else {
-					game.getDB('data', lib.config.mode, function (obj) {
+					await game.getDB('data', lib.config.mode, async (obj) => {
 						lib.storage = obj || {};
-						proceed2();
+						await proceed2();
 					});
 				}
-			});
+			};
 			if (!lib.imported.mode || !lib.imported.mode[lib.config.mode]) {
 				window.inSplash = true;
 				clearTimeout(window.resetGameTimeout);
@@ -11087,7 +11085,7 @@ export class Library extends Uninstantable {
 				}
 			}
 			else {
-				yield proceed();
+				await proceed();
 			}
 			localStorage.removeItem(lib.configprefix + 'directstart');
 			delete lib.init.init;
@@ -11096,9 +11094,9 @@ export class Library extends Uninstantable {
 			while (Array.isArray(libOnload2) && libOnload2.length) {
 				const fun = libOnload2.shift();
 				if (typeof fun != "function") continue;
-				yield (gnc.is.generatorFunc(fun) ? gnc.of(fun) : fun)();
+				await (gnc.is.generatorFunc(fun) ? gnc.of(fun) : fun)();
 			}
-		}),
+		},
 		startOnline: function () {
 			'step 0'
 			event._resultid = null;

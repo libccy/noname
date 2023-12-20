@@ -4190,7 +4190,7 @@ class Create extends Uninstantable {
 							}
 							editnode.classList.remove('disabled');
 						};
-						var clickButton = lib.gnc.of(function* () {
+						var clickButton = async () => {
 							if (currentButton == this) {
 								resetEditor();
 								return;
@@ -4229,7 +4229,7 @@ class Create extends Uninstantable {
 										dieaudionode.file = {
 											name: info[4][i].slice(info[4][i].lastIndexOf('/') + 1)
 										};
-										yield new Promise(resolve => {
+										await new Promise((resolve) => {
 											if (typeof game.readFile == 'function') {
 												game.readFile(info[4][i].slice(4).replace('ext:', 'extension/'), arraybuffer => {
 													dieaudionode.arrayBuffer = arraybuffer;
@@ -4266,7 +4266,7 @@ class Create extends Uninstantable {
 							editnode.classList.remove('disabled');
 							delnode.innerHTML = '删除';
 							delnode.button = this;
-						});
+						};
 						var createButton = function (name, image) {
 							var button = ui.create.div('.button.character');
 							button.link = name;

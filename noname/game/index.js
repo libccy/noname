@@ -1752,6 +1752,8 @@ export class Game extends Uninstantable {
 		else if (music.startsWith('ext:')) ui.backgroundMusic.src = `${lib.assetURL}extension/${music.slice(4)}`;
 		else ui.backgroundMusic.src = `${lib.assetURL}audio/background/${music}.mp3`;
 	}
+	// 某种意义上，改不了，得重写
+	// 等正式用import导入再说
 	static import(type, content, url) {
 		if (type == 'extension') {
 			const promise = game.loadExtension(content).then((name) => {
@@ -1778,10 +1780,10 @@ export class Game extends Uninstantable {
 			return promise;
 		}
 	}
-	static loadExtension = gnc.of(function* (object) {
+	static async loadExtension(object) {
 		let noEval = false;
 		if (typeof object == 'function') {
-			object = yield (gnc.is.generatorFunc(object) ? gnc.of(object) : object)(lib, game, ui, get, ai, _status);
+			object = await (gnc.is.generatorFunc(object) ? gnc.of(object) : object)(lib, game, ui, get, ai, _status);
 			noEval = true;
 		}
 		const name = object.name, extensionName = `extension_${name}`, extensionMenu = lib.extensionMenu[extensionName] = {
@@ -1882,7 +1884,7 @@ export class Game extends Uninstantable {
 			}
 			if (precontent) {
 				_status.extension = name;
-				yield (gnc.is.generatorFunc(precontent) ? gnc.of(precontent) : precontent).call(object, config);
+				await (gnc.is.generatorFunc(precontent) ? gnc.of(precontent) : precontent).call(object, config);
 				delete _status.extension;
 			}
 			if (content) lib.extensions.push([name, content, config, _status.evaluatingExtension, objectPackage || {}]);
@@ -1892,7 +1894,7 @@ export class Game extends Uninstantable {
 		}
 
 		return name;
-	})
+	}
 	static createDir(directory, successCallback, errorCallback) {
 		const paths = directory.split('/').reverse();
 		if (window.resolveLocalFileSystemURL) return new Promise((resolve, reject) => window.resolveLocalFileSystemURL(lib.assetURL, resolve, reject)).then(directoryEntry => {
@@ -1921,10 +1923,10 @@ export class Game extends Uninstantable {
 		};
 		return redo();
 	}
-	static importExtension = gnc.of(function* (data, finishLoad, exportExtension, extensionPackage) {
+	static async importExtension(data, finishLoad, exportExtension, extensionPackage) {
 		//by 来瓶可乐加冰、Rintim、Tipx-L
 		if (!window.JSZip)
-			yield new Promise((resolve, reject) => lib.init.js(`${lib.assetURL}game`, "jszip", resolve, reject));
+			await new Promise((resolve, reject) => lib.init.js(`${lib.assetURL}game`, "jszip", resolve, reject));
 
 		const zip = new JSZip();
 		if (get.objtype(data) == 'object') {
@@ -1984,7 +1986,7 @@ export class Game extends Uninstantable {
 			if (str === "" || undefined) throw ('你导入的不是扩展！请选择正确的文件');
 			_status.importingExtension = true;
 			eval(str);
-			yield Promise.allSettled(_status.extensionLoading);
+			await Promise.allSettled(_status.extensionLoading);
 			delete _status.extensionLoading;
 			_status.importingExtension = false;
 			if (!game.importedPack) throw ('err');
@@ -2072,7 +2074,7 @@ export class Game extends Uninstantable {
 			UHP(error);
 			return false;
 		}
-	})
+	}
 	static export(textToWrite, name) {
 		var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
 		var fileNameToSaveAs = name || 'noname';
@@ -4419,12 +4421,12 @@ export class Game extends Uninstantable {
 			splash: imgsrc,
 			fromextension: true
 		}
-		lib.init['setMode_' + name] = gnc.of(function* () {
-			yield game.import('mode', function (lib, game, ui, get, ai, _status) {
+		lib.init['setMode_' + name] = async () => {
+			await game.import('mode', (lib, game, ui, get, ai, _status) => {
 				info.name = name;
 				return info;
 			});
-		});
+		};
 		if (!lib.config.extensionInfo[extname]) {
 			lib.config.extensionInfo[extname] = {};
 		}
@@ -6255,8 +6257,8 @@ export class Game extends Uninstantable {
 	}
 	static loadModeAsync(name, callback) {
 		window.game = game;
-		var script = lib.init.js(lib.assetURL + 'mode', name, gnc.of(function* () {
-			yield Promise.allSettled(_status.importing.mode);
+		var script = lib.init.js(lib.assetURL + 'mode', name, async () => {
+			await Promise.allSettled(_status.importing.mode);
 			if (!lib.config.dev) delete window.game;
 			script.remove();
 			var content = lib.imported.mode[name];
@@ -6265,7 +6267,7 @@ export class Game extends Uninstantable {
 				delete lib.imported.mode;
 			}
 			callback(content);
-		}));
+		});
 	}
 	static switchMode(name, configx) {
 		if (!lib.layoutfixed.contains(name)) {
@@ -6279,8 +6281,8 @@ export class Game extends Uninstantable {
 			}
 		}
 		window.game = game;
-		var script = lib.init.js(lib.assetURL + 'mode', name, gnc.of(function* () {
-			yield Promise.allSettled(_status.importing.mode);
+		var script = lib.init.js(lib.assetURL + 'mode', name, async () => {
+			await Promise.allSettled(_status.importing.mode);
 			if (!lib.config.dev) delete window.game;
 			script.remove();
 			var mode = lib.imported.mode;
@@ -6451,7 +6453,7 @@ export class Game extends Uninstantable {
 					game.loop();
 				});
 			}
-		}));
+		});
 	}
 	static loadMode(mode) {
 		var next = game.createEvent('loadMode', false);
