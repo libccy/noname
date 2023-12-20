@@ -28796,59 +28796,81 @@ export class Library extends Uninstantable {
 				if (this.hasSkillTag('respondShan', true, null, true)) return true;
 				return this.hasUsableCard('shan');
 			}
-			mayHaveSha(viewer, type, ignore) {
-				if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondSha', true, type, true)) return true;
-				if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
-				let cards, selected = get.copy(ui.selected.cards);
-				if (get.itemtype(ignore) === 'cards') selected.addArray(ignore);
-				else if (get.itemtype(ignore) === 'card') selected.add(ignore);
-				/*if(this===viewer||get.itemtype(viewer)==='player'&&viewer.hasSkillTag('viewHandcard',null,this,true)) cards=this.getCards('h');
-				else cards=this.getShownCards();*/
-				if (this === viewer || get.itemtype(viewer) == 'player') {
-					cards = this.getKnownCards(viewer);
-				} else {
-					cards = this.getShownCards();
+			mayHaveSha(viewer,type,ignore,rvt){
+				//rvt: return value type 'count', 'odds', 'bool'(default)
+				let count=0;
+				if((this.hp>2||!this.isZhu&&this.hp>1)&&this.hasSkillTag('respondSha',true,type,true)){
+					if(rvt==='count') count++;
+					else return true;
 				}
-				if (cards.some(card => {
-					if (selected.includes(card)) return false;
-					let name = get.name(card, this);
-					if (name == 'sha' || name == 'hufu' || name == 'yuchanqian') {
-						if (type === 'use') return lib.filter.cardEnabled(card, this);
-						if (type === 'respond') return lib.filter.cardRespondable(card, this);
+				if(get.itemtype(viewer)!=='player') viewer=_status.event.player;
+				let cards,selected=get.copy(ui.selected.cards);
+				if(get.itemtype(ignore)==='cards') selected.addArray(ignore);
+				else if(get.itemtype(ignore)==='card') selected.add(ignore);
+				if(this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
+				else cards = this.getShownCards();
+				count+=cards.filter(card=>{
+					if(selected.includes(card)) return false;
+					let name=get.name(card,this);
+					if(name=='sha'||name=='hufu'||name=='yuchanqian'){
+						if(type==='use') return lib.filter.cardEnabled(card,this);
+						if(type==='respond') return lib.filter.cardRespondable(card,this);
 						return true;
 					}
 					return false;
-				})) return true;
-				let hs = this.getCards('hs').filter(i => !cards.includes(i) && !selected.includes(i)).length;
-				if (hs === 0) return false;
-				return Math.pow(hs + (this.isPhaseUsing() ? 6 : 4), 2) > 100 * _status.event.getRand('mayHaveSha');
+				}).length;
+				if(count&&rvt!=='count') return true;
+				let hs=this.getCards('hs').filter(i=>!cards.includes(i)&&!selected.includes(i)).length;
+				if(!hs){
+					if(rvt==='count') return count;
+					return false;
+				}
+				if(rvt==='count'){
+					if(this.isPhaseUsing()) return count+hs/4;
+					return count+hs/4.8;
+				}
+				if(this.isPhaseUsing()) count+=Math.pow(2+hs,2)/40;
+				else count+=-1.5*Math.log(1-hs/10);
+				if(rvt==='odds') return Math.min(1,count);
+				return count>_status.event.getRand('mayHaveSha'+hs+this.playerid);
 			}
-			mayHaveShan(viewer, type, ignore) {
-				if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondShan', true, type, true)) return true;
-				if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
-				let cards, selected = get.copy(ui.selected.cards);
-				if (get.itemtype(ignore) === 'cards') selected.addArray(ignore);
-				else if (get.itemtype(ignore) === 'card') selected.add(ignore);
-				/*if(this===viewer||get.itemtype(viewer)==='player'&&viewer.hasSkillTag('viewHandcard',null,this,true)) cards=this.getCards('h');
-				else cards=this.getShownCards();*/
-				if (this === viewer || get.itemtype(viewer) == 'player') {
-					cards = this.getKnownCards(viewer);
-				} else {
-					cards = this.getShownCards();
+			mayHaveShan(viewer,type,ignore,rvt){
+				//rvt: return value type 'count', 'odds', 'bool'(default)
+				let count=0;
+				if((this.hp>2||!this.isZhu&&this.hp>1)&&this.hasSkillTag('respondShan',true,type,true)){
+					if(rvt==='count') count++;
+					else return true;
 				}
-				if (cards.some(card => {
-					if (selected.includes(card)) return false;
-					let name = get.name(card, this);
-					if (name === 'shan' || name === 'hufu') {
-						if (type === 'use') return lib.filter.cardEnabled(card, this, 'forceEnable');
-						if (type === 'respond') return lib.filter.cardRespondable(card, this);
+				if(get.itemtype(viewer)!=='player') viewer=_status.event.player;
+				let cards,selected=get.copy(ui.selected.cards);
+				if(get.itemtype(ignore)==='cards') selected.addArray(ignore);
+				else if(get.itemtype(ignore)==='card') selected.add(ignore);
+				if(this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
+				else cards = this.getShownCards();
+				count+=cards.filter(card=>{
+					if(selected.includes(card)) return false;
+					let name=get.name(card,this);
+					if(name==='shan'||name==='hufu'){
+						if(type==='use') return lib.filter.cardEnabled(card,this,'forceEnable');
+						if(type==='respond') return lib.filter.cardRespondable(card,this);
 						return true;
 					}
 					return false;
-				})) return true;
-				let hs = this.getCards('hs').filter(i => !cards.includes(i) && !selected.includes(i)).length;
-				if (hs === 0) return false;
-				return Math.pow(hs + (this.isPhaseUsing() ? 3 : 5), 2) > 100 * _status.event.getRand('mayHaveShan');
+				}).length;
+				if(count&&rvt!=='count') return true;
+				let hs=this.getCards('hs').filter(i=>!cards.includes(i)&&!selected.includes(i)).length;
+				if(!hs){
+					if(rvt==='count') return count;
+					return false;
+				}
+				if(rvt==='count'){
+					if(this.isPhaseUsing()) return count+hs/6;
+					return count+hs/3.5;
+				}
+				if(this.isPhaseUsing()) count+=-1.5*Math.log(1-hs/10);
+				else count+=2*hs/(5+hs);
+				if(rvt==='odds') return Math.min(1,count);
+				return count>_status.event.getRand('mayHaveShan'+hs+this.playerid);
 			}
 			hasCard(name, position) {
 				if (typeof name == 'function') {
