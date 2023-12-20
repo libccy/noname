@@ -24394,75 +24394,72 @@ export class Library extends Uninstantable {
 				next._args = Array.from(arguments);
 				return next;
 			}
-			chooseToCompare(target, check) {
-				var next = game.createEvent('chooseToCompare');
-				next.player = this;
-				if (Array.isArray(target)) {
-					next.targets = target;
-					if (check) next.ai = check;
-					else next.ai = function (card) {
-						if (typeof card == 'string' && lib.skill[card]) {
-							var ais = lib.skill[card].check || function () { return 0 };
+			chooseToCompare(target,check){
+				var next=game.createEvent('chooseToCompare');
+				next.player=this;
+				if(Array.isArray(target)){
+					next.targets=target;
+					if(check) next.ai=check;
+					else next.ai=function(card){
+						if(typeof card=='string'&&lib.skill[card]){
+							var ais=lib.skill[card].check||function(){return 0};
 							return ais();
 						}
-						var addi = (get.value(card) >= 8 && get.type(card) != 'equip') ? -3 : 0;
-						if (card.name == 'du') addi -= 3;
-						var source = _status.event.source;
-						var player = _status.event.player;
-						var event = _status.event.getParent();
-						var getn = function (card) {
-							if (player.hasSkill('tianbian') && get.suit(card) == 'heart') return 13 * (event.small ? -1 : 1);
-							return get.number(card) * (event.small ? -1 : 1);
+						var addi=(get.value(card)>=8&&get.type(card)!='equip')?-3:0;
+						if(card.name=='du') addi-=3;
+						var source=_status.event.source;
+						var player=_status.event.player;
+						var event=_status.event.getParent();
+						var getn=function(card){
+							if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13*(Boolean(event.small)?-1:1);
+							return get.number(card)*(Boolean(event.small)?-1:1);
 						}
-						if (source && source != player) {
-							if (get.attitude(player, source) > 1) {
-								if (event.small) return getn(card) - get.value(card) / 2 + addi;
-								return -getn(card) - get.value(card) / 2 + addi;
+						if(source&&source!=player){
+							if(get.attitude(player,source)>1){
+								if(Boolean(event.small)) return getn(card)-get.value(card)/3+addi;
+								return -getn(card)-get.value(card)/3+addi;
 							}
-							if (event.small) return -getn(card) - get.value(card) / 2 + addi;
-							return getn(card) - get.value(card) / 2 + addi;
+							if(Boolean(event.small)) return -getn(card)-get.value(card)/5+addi;
+							return getn(card)-get.value(card)/5+addi;
 						}
-						else {
-							if (event.small) return -getn(card) - get.value(card) / 2 + addi;
-							return getn(card) - get.value(card) / 2 + addi;
+						else{
+							if(Boolean(event.small)) return -getn(card)-get.value(card)/5+addi;
+							return getn(card)-get.value(card)/5+addi;
 						}
 					}
 					next.setContent('chooseToCompareMultiple');
 				}
-				else {
-					next.target = target;
-					if (check) next.ai = check;
-					else next.ai = function (card) {
-						if (typeof card == 'string' && lib.skill[card]) {
-							var ais = lib.skill[card].check || function () { return 0 };
+				else{
+					next.target=target;
+					if(check) next.ai=check;
+					else next.ai=function(card){
+						if(typeof card=='string'&&lib.skill[card]){
+							var ais=lib.skill[card].check||function(){return 0};
 							return ais();
 						}
-						var player = get.owner(card);
-						var getn = function (card) {
-							if (player.hasSkill('tianbian') && get.suit(card) == 'heart') return 13;
+						var player=get.owner(card);
+						var getn=function(card){
+							if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13;
 							return get.number(card);
 						}
-						var event = _status.event.getParent();
-						var to = (player == event.player ? event.target : event.player);
-						var addi = (get.value(card) >= 8 && get.type(card) != 'equip') ? -6 : 0;
-						if (card.name == 'du') addi -= 5;
-						if (player == event.player) {
-							if (event.small) {
-								return -getn(card) - get.value(card) / 2 + addi;
-							}
-							return getn(card) - get.value(card) / 2 + addi;
+						var event=_status.event.getParent();
+						var to=(player==event.player?event.target:event.player);
+						var addi=(get.value(card)>=8&&get.type(card)!='equip')?-6:0;
+						var friend=get.attitude(player,to)>0;
+						if(card.name=='du') addi-=5;
+						if(player==event.player){
+							if(Boolean(event.small)) return -getn(card)-get.value(card)/(friend?4:5)+addi;
+							return getn(card)-get.value(card)/(friend?4:5)+addi;
 						}
-						else {
-							if ((get.attitude(player, to) <= 0) == Boolean(event.small)) {
-								return -getn(card) - get.value(card) / 2 + addi;
-							}
-							return getn(card) - get.value(card) / 2 + addi;
+						else{
+							if(friend==Boolean(event.small)) return getn(card)-get.value(card)/(friend?3:5)+addi;
+							return -getn(card)-get.value(card)/(friend?3:5)+addi;
 						}
 					}
 					next.setContent('chooseToCompare');
 				}
-				next.forceDie = true;
-				next._args = Array.from(arguments);
+				next.forceDie=true;
+				next._args=Array.from(arguments);
 				return next;
 			}
 			chooseSkill(target) {
