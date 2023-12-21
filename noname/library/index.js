@@ -24394,72 +24394,72 @@ export class Library extends Uninstantable {
 				next._args = Array.from(arguments);
 				return next;
 			}
-			chooseToCompare(target,check){
-				var next=game.createEvent('chooseToCompare');
-				next.player=this;
-				if(Array.isArray(target)){
-					next.targets=target;
-					if(check) next.ai=check;
-					else next.ai=function(card){
-						if(typeof card=='string'&&lib.skill[card]){
-							var ais=lib.skill[card].check||function(){return 0};
+			chooseToCompare(target, check) {
+				var next = game.createEvent('chooseToCompare');
+				next.player = this;
+				if (Array.isArray(target)) {
+					next.targets = target;
+					if (check) next.ai = check;
+					else next.ai = function (card) {
+						if (typeof card == 'string' && lib.skill[card]) {
+							var ais = lib.skill[card].check || function () { return 0 };
 							return ais();
 						}
-						var addi=(get.value(card)>=8&&get.type(card)!='equip')?-3:0;
-						if(card.name=='du') addi-=3;
-						var source=_status.event.source;
-						var player=_status.event.player;
-						var event=_status.event.getParent();
-						var getn=function(card){
-							if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13*(Boolean(event.small)?-1:1);
-							return get.number(card)*(Boolean(event.small)?-1:1);
+						var addi = (get.value(card) >= 8 && get.type(card) != 'equip') ? -3 : 0;
+						if (card.name == 'du') addi -= 3;
+						var source = _status.event.source;
+						var player = _status.event.player;
+						var event = _status.event.getParent();
+						var getn = function (card) {
+							if (player.hasSkill('tianbian') && get.suit(card) == 'heart') return 13 * (Boolean(event.small) ? -1 : 1);
+							return get.number(card) * (Boolean(event.small) ? -1 : 1);
 						}
-						if(source&&source!=player){
-							if(get.attitude(player,source)>1){
-								if(Boolean(event.small)) return getn(card)-get.value(card)/3+addi;
-								return -getn(card)-get.value(card)/3+addi;
+						if (source && source != player) {
+							if (get.attitude(player, source) > 1) {
+								if (Boolean(event.small)) return getn(card) - get.value(card) / 3 + addi;
+								return -getn(card) - get.value(card) / 3 + addi;
 							}
-							if(Boolean(event.small)) return -getn(card)-get.value(card)/5+addi;
-							return getn(card)-get.value(card)/5+addi;
+							if (Boolean(event.small)) return -getn(card) - get.value(card) / 5 + addi;
+							return getn(card) - get.value(card) / 5 + addi;
 						}
-						else{
-							if(Boolean(event.small)) return -getn(card)-get.value(card)/5+addi;
-							return getn(card)-get.value(card)/5+addi;
+						else {
+							if (Boolean(event.small)) return -getn(card) - get.value(card) / 5 + addi;
+							return getn(card) - get.value(card) / 5 + addi;
 						}
 					}
 					next.setContent('chooseToCompareMultiple');
 				}
-				else{
-					next.target=target;
-					if(check) next.ai=check;
-					else next.ai=function(card){
-						if(typeof card=='string'&&lib.skill[card]){
-							var ais=lib.skill[card].check||function(){return 0};
+				else {
+					next.target = target;
+					if (check) next.ai = check;
+					else next.ai = function (card) {
+						if (typeof card == 'string' && lib.skill[card]) {
+							var ais = lib.skill[card].check || function () { return 0 };
 							return ais();
 						}
-						var player=get.owner(card);
-						var getn=function(card){
-							if(player.hasSkill('tianbian')&&get.suit(card)=='heart') return 13;
+						var player = get.owner(card);
+						var getn = function (card) {
+							if (player.hasSkill('tianbian') && get.suit(card) == 'heart') return 13;
 							return get.number(card);
 						}
-						var event=_status.event.getParent();
-						var to=(player==event.player?event.target:event.player);
-						var addi=(get.value(card)>=8&&get.type(card)!='equip')?-6:0;
-						var friend=get.attitude(player,to)>0;
-						if(card.name=='du') addi-=5;
-						if(player==event.player){
-							if(Boolean(event.small)) return -getn(card)-get.value(card)/(friend?4:5)+addi;
-							return getn(card)-get.value(card)/(friend?4:5)+addi;
+						var event = _status.event.getParent();
+						var to = (player == event.player ? event.target : event.player);
+						var addi = (get.value(card) >= 8 && get.type(card) != 'equip') ? -6 : 0;
+						var friend = get.attitude(player, to) > 0;
+						if (card.name == 'du') addi -= 5;
+						if (player == event.player) {
+							if (Boolean(event.small)) return -getn(card) - get.value(card) / (friend ? 4 : 5) + addi;
+							return getn(card) - get.value(card) / (friend ? 4 : 5) + addi;
 						}
-						else{
-							if(friend==Boolean(event.small)) return getn(card)-get.value(card)/(friend?3:5)+addi;
-							return -getn(card)-get.value(card)/(friend?3:5)+addi;
+						else {
+							if (friend == Boolean(event.small)) return getn(card) - get.value(card) / (friend ? 3 : 5) + addi;
+							return -getn(card) - get.value(card) / (friend ? 3 : 5) + addi;
 						}
 					}
 					next.setContent('chooseToCompare');
 				}
-				next.forceDie=true;
-				next._args=Array.from(arguments);
+				next.forceDie = true;
+				next._args = Array.from(arguments);
 				return next;
 			}
 			chooseSkill(target) {
@@ -28793,81 +28793,81 @@ export class Library extends Uninstantable {
 				if (this.hasSkillTag('respondShan', true, null, true)) return true;
 				return this.hasUsableCard('shan');
 			}
-			mayHaveSha(viewer,type,ignore,rvt){
+			mayHaveSha(viewer, type, ignore, rvt) {
 				//rvt: return value type 'count', 'odds', 'bool'(default)
-				let count=0;
-				if((this.hp>2||!this.isZhu&&this.hp>1)&&this.hasSkillTag('respondSha',true,type,true)){
-					if(rvt==='count') count++;
+				let count = 0;
+				if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondSha', true, type, true)) {
+					if (rvt === 'count') count++;
 					else return true;
 				}
-				if(get.itemtype(viewer)!=='player') viewer=_status.event.player;
-				let cards,selected=get.copy(ui.selected.cards);
-				if(get.itemtype(ignore)==='cards') selected.addArray(ignore);
-				else if(get.itemtype(ignore)==='card') selected.add(ignore);
-				if(this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
+				if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
+				let cards, selected = get.copy(ui.selected.cards);
+				if (get.itemtype(ignore) === 'cards') selected.addArray(ignore);
+				else if (get.itemtype(ignore) === 'card') selected.add(ignore);
+				if (this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
 				else cards = this.getShownCards();
-				count+=cards.filter(card=>{
-					if(selected.includes(card)) return false;
-					let name=get.name(card,this);
-					if(name=='sha'||name=='hufu'||name=='yuchanqian'){
-						if(type==='use') return lib.filter.cardEnabled(card,this);
-						if(type==='respond') return lib.filter.cardRespondable(card,this);
+				count += cards.filter(card => {
+					if (selected.includes(card)) return false;
+					let name = get.name(card, this);
+					if (name == 'sha' || name == 'hufu' || name == 'yuchanqian') {
+						if (type === 'use') return lib.filter.cardEnabled(card, this);
+						if (type === 'respond') return lib.filter.cardRespondable(card, this);
 						return true;
 					}
 					return false;
 				}).length;
-				if(count&&rvt!=='count') return true;
-				let hs=this.getCards('hs').filter(i=>!cards.includes(i)&&!selected.includes(i)).length;
-				if(!hs){
-					if(rvt==='count') return count;
+				if (count && rvt !== 'count') return true;
+				let hs = this.getCards('hs').filter(i => !cards.includes(i) && !selected.includes(i)).length;
+				if (!hs) {
+					if (rvt === 'count') return count;
 					return false;
 				}
-				if(rvt==='count'){
-					if(this.isPhaseUsing()) return count+hs/4;
-					return count+hs/4.8;
+				if (rvt === 'count') {
+					if (this.isPhaseUsing()) return count + hs / 4;
+					return count + hs / 4.8;
 				}
-				if(this.isPhaseUsing()) count+=Math.pow(2+hs,2)/40;
-				else count+=-1.5*Math.log(1-hs/10);
-				if(rvt==='odds') return Math.min(1,count);
-				return count>_status.event.getRand('mayHaveSha'+hs+this.playerid);
+				if (this.isPhaseUsing()) count += Math.pow(2 + hs, 2) / 40;
+				else count += -1.5 * Math.log(1 - hs / 10);
+				if (rvt === 'odds') return Math.min(1, count);
+				return count > _status.event.getRand('mayHaveSha' + hs + this.playerid);
 			}
-			mayHaveShan(viewer,type,ignore,rvt){
+			mayHaveShan(viewer, type, ignore, rvt) {
 				//rvt: return value type 'count', 'odds', 'bool'(default)
-				let count=0;
-				if((this.hp>2||!this.isZhu&&this.hp>1)&&this.hasSkillTag('respondShan',true,type,true)){
-					if(rvt==='count') count++;
+				let count = 0;
+				if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondShan', true, type, true)) {
+					if (rvt === 'count') count++;
 					else return true;
 				}
-				if(get.itemtype(viewer)!=='player') viewer=_status.event.player;
-				let cards,selected=get.copy(ui.selected.cards);
-				if(get.itemtype(ignore)==='cards') selected.addArray(ignore);
-				else if(get.itemtype(ignore)==='card') selected.add(ignore);
-				if(this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
+				if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
+				let cards, selected = get.copy(ui.selected.cards);
+				if (get.itemtype(ignore) === 'cards') selected.addArray(ignore);
+				else if (get.itemtype(ignore) === 'card') selected.add(ignore);
+				if (this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
 				else cards = this.getShownCards();
-				count+=cards.filter(card=>{
-					if(selected.includes(card)) return false;
-					let name=get.name(card,this);
-					if(name==='shan'||name==='hufu'){
-						if(type==='use') return lib.filter.cardEnabled(card,this,'forceEnable');
-						if(type==='respond') return lib.filter.cardRespondable(card,this);
+				count += cards.filter(card => {
+					if (selected.includes(card)) return false;
+					let name = get.name(card, this);
+					if (name === 'shan' || name === 'hufu') {
+						if (type === 'use') return lib.filter.cardEnabled(card, this, 'forceEnable');
+						if (type === 'respond') return lib.filter.cardRespondable(card, this);
 						return true;
 					}
 					return false;
 				}).length;
-				if(count&&rvt!=='count') return true;
-				let hs=this.getCards('hs').filter(i=>!cards.includes(i)&&!selected.includes(i)).length;
-				if(!hs){
-					if(rvt==='count') return count;
+				if (count && rvt !== 'count') return true;
+				let hs = this.getCards('hs').filter(i => !cards.includes(i) && !selected.includes(i)).length;
+				if (!hs) {
+					if (rvt === 'count') return count;
 					return false;
 				}
-				if(rvt==='count'){
-					if(this.isPhaseUsing()) return count+hs/6;
-					return count+hs/3.5;
+				if (rvt === 'count') {
+					if (this.isPhaseUsing()) return count + hs / 6;
+					return count + hs / 3.5;
 				}
-				if(this.isPhaseUsing()) count+=-1.5*Math.log(1-hs/10);
-				else count+=2*hs/(5+hs);
-				if(rvt==='odds') return Math.min(1,count);
-				return count>_status.event.getRand('mayHaveShan'+hs+this.playerid);
+				if (this.isPhaseUsing()) count += -1.5 * Math.log(1 - hs / 10);
+				else count += 2 * hs / (5 + hs);
+				if (rvt === 'odds') return Math.min(1, count);
+				return count > _status.event.getRand('mayHaveShan' + hs + this.playerid);
 			}
 			hasCard(name, position) {
 				if (typeof name == 'function') {
