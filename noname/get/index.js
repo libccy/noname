@@ -1,4 +1,4 @@
-import { userAgent, Uninstantable } from "../util/index.js";
+import { userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
 import { AI as ai } from '../ai/index.js';
 import { Game as game } from '../game/index.js';
 import { Library as lib } from '../library/index.js';
