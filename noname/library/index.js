@@ -1,12 +1,14 @@
 /**
- * @typedef {InstanceType<typeof lib.element.Player>} Player
- * @typedef {InstanceType<typeof lib.element.Card>} Card
- * @typedef {InstanceType<typeof lib.element.VCard>} VCard
- * @typedef {InstanceType<typeof lib.element.Button>} Button
- * @typedef {InstanceType<typeof lib.element.Dialog>} Dialog
- * @typedef {InstanceType<typeof lib.element.GameEvent>} GameEvent
- * @typedef {InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> & typeof Promise<lib.element.GameEvent>} GameEventPromise
- * @typedef {InstanceType<typeof lib.element.NodeWS>} NodeWS
+ * @typedef { InstanceType<typeof lib.element.Player> } Player
+ * @typedef { InstanceType<typeof lib.element.Card> } Card
+ * @typedef { InstanceType<typeof lib.element.VCard> } VCard
+ * @typedef { InstanceType<typeof lib.element.Button> } Button
+ * @typedef { InstanceType<typeof lib.element.Dialog> } Dialog
+ * @typedef { InstanceType<typeof lib.element.GameEvent> } GameEvent
+ * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> & typeof Promise<typeof lib.element.GameEvent> } GameEventPromise
+ * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
+ * @typedef { 'male' | 'female' | 'dobule' | 'none' } Sex
+ * @typedef { [Sex, string, number | string, string[], any[]] } Character
 */
 import { nonameInitialized, assetURL, userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
 import { AI as ai } from '../ai/index.js';
@@ -32,6 +34,9 @@ export class Library extends Uninstantable {
 	static changeLog = [];
 	static updates = [];
 	static canvasUpdates = [];
+	/**
+	 * @type { import('../game/index.js').Video[] }
+	 */
 	static video = [];
 	static skilllist = [];
 	static connectBanned = [];
@@ -77,6 +82,17 @@ export class Library extends Uninstantable {
 	static extensionPack = {};
 	static cardType = {};
 	static hook = { globalskill: {} };
+	/**
+	* @returns {never}
+	*/
+	static typeAnnotation() {
+		/**
+		 * @type { import('../game/index.js').Videos[] }
+		 */
+		// @ts-ignore
+		this.videos;
+		throw new Error('Do not call this method');
+	}
 	//函数钩子
 	static hooks = {
 		// 本体势力的颜色

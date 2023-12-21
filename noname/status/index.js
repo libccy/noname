@@ -36,6 +36,10 @@ export const status = {
 	renku: [],
 	prehidden_skills: [],
 	postReconnect: {},
+	/**
+	 * @type { string | void }
+	 */
+	extension:undefined,
 };
 
 export const _status = status;

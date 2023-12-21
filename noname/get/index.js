@@ -1834,6 +1834,10 @@ export class Get extends Uninstantable {
 	static xyDistance(from, to) { return Math.sqrt((from[0] - to[0]) * (from[0] - to[0]) + (from[1] - to[1]) * (from[1] - to[1])) }
 	/**
 	 * @overload
+	 * @returns { void }
+	 */
+	/**
+	 * @overload
 	 * @param { string } obj 
 	 * @returns { 'position' | 'natures' | 'nature' }
 	 */
