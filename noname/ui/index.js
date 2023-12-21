@@ -14001,7 +14001,18 @@ export class UI extends Uninstantable {
 	static create = Create;
 	static click = Click;
 	static selected = {
-		buttons: [], cards: [], targets: []
+		/**
+		 * @type { import('../library/index.js').Button[]}
+		 */
+		buttons: [],
+		/**
+		 * @type { import('../library/index.js').Card[]}
+		 */
+		cards: [],
+		/**
+		 * @type { import('../library/index.js').Player[]}
+		 */
+		targets: []
 	}
 	static refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");

@@ -7,11 +7,17 @@ import { GNC as gnc } from '../gnc/index.js';
 import { Uninstantable } from "../util/index.js";
 
 export class Basic extends Uninstantable {
+	/**
+	 * @param { (
+	 * 	button: import('../library/index.js').Button, 
+	 * 	buttons?: import('../library/index.js').Button[]
+	 * ) => number } check
+	 */
 	static chooseButton(check) {
-		var event = _status.event;
-		var i, j, range, buttons, buttons2;
-		var ok = false, forced = event.forced;
-		var iwhile = 100;
+		const event = _status.event;
+		let i, j, range, buttons, buttons2;
+		let ok = false, forced = event.forced;
+		let iwhile = 100;
 		while (iwhile--) {
 			range = get.select(event.selectButton);
 			if (ui.selected.buttons.length >= range[0]) {
@@ -29,10 +35,10 @@ export class Basic extends Uninstantable {
 				return ok;
 			}
 			buttons2 = buttons.slice(0);
-			var ix = 0;
-			var checkix = check(buttons[0], buttons2);
+			let ix = 0;
+			let checkix = check(buttons[0], buttons2);
 			for (i = 1; i < buttons.length; i++) {
-				var checkixtmp = check(buttons[i], buttons2);
+				let checkixtmp = check(buttons[i], buttons2);
 				if (checkixtmp > checkix) {
 					ix = i;
 					checkix = checkixtmp;
@@ -57,12 +63,19 @@ export class Basic extends Uninstantable {
 			}
 		}
 	}
+	/**
+	 * @param { (
+	 * card?: import('../library/index.js').Card,
+	 * cards?: import('../library/index.js').Card[]
+	 * ) => number } check
+	 * @returns { boolean | undefined }
+	 */
 	static chooseCard(check) {
-		var event = _status.event;
+		const event = _status.event;
 		if (event.filterCard == undefined) return (check() > 0);
-		var i, j, range, cards, cards2, skills, check, effect;
-		var ok = false, forced = event.forced;
-		var iwhile = 100;
+		let i, j, range, cards, cards2, skills, effect;
+		let ok = false, forced = event.forced;
+		let iwhile = 100;
 		while (iwhile--) {
 			range = get.select(event.selectCard);
 			if (ui.selected.cards.length >= range[0]) {
@@ -80,6 +93,7 @@ export class Basic extends Uninstantable {
 			}
 			cards = get.selectableCards();
 			if (!_status.event.player._noSkill) {
+				// @ts-ignore
 				cards = cards.concat(get.skills());
 			}
 			if (cards.length == 0) {
@@ -127,12 +141,18 @@ export class Basic extends Uninstantable {
 			}
 		}
 	}
+	/**
+	 * @param { (
+	 * target?: import('../library/index.js').Player,
+	 * targets?: import('../library/index.js').Player[]
+	 * ) => number } check 
+	 */
 	static chooseTarget(check) {
-		var event = _status.event;
+		const event = _status.event;
 		if (event.filterTarget == undefined) return (check() > 0);
-		var i, j, range, targets, targets2, effect;
-		var ok = false, forced = event.forced;
-		var iwhile = 100;
+		let i, j, range, targets, targets2, effect;
+		let ok = false, forced = event.forced;
+		let iwhile = 100;
 		while (iwhile--) {
 			range = get.select(event.selectTarget);
 			if (ui.selected.targets.length >= range[0]) {
@@ -158,10 +178,10 @@ export class Basic extends Uninstantable {
 			// targets.sort(function(a,b){
 			// 	return check(b)-check(a);
 			// });
-			var ix = 0;
-			var checkix = check(targets[0], targets2);
+			let ix = 0;
+			let checkix = check(targets[0], targets2);
 			for (i = 1; i < targets.length; i++) {
-				var checkixtmp = check(targets[i], targets2);
+				let checkixtmp = check(targets[i], targets2);
 				if (checkixtmp > checkix) {
 					ix = i;
 					checkix = checkixtmp;

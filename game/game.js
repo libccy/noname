@@ -47,10 +47,7 @@ new Promise(resolve => {
 
 	/**
 	 * @type { Promise<import('../noname.js')> }
-	 * 
-	 * game.js不是一个模块，所以导入的路径是从html文件开始算起的
 	 */
-	// @ts-ignore
 	const module = import('../noname.js');
 
 	module.then(({ ai, game, get, lib, _status, ui }) => {
