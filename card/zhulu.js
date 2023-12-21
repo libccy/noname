@@ -397,7 +397,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquips(1).contains(card)) return -1.5;
+						if(player.getEquips(1).contains(card)){
+							if(player.hasSkillTag('noh')) return 0;
+							return -3.5;
+						}
 						return 1.5;
 					},
 					basic:{
@@ -436,7 +439,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquips(1).contains(card)) return -3;
+						if(player.getEquips(1).contains(card)) return -3.5;
 						return 3;
 					},
 					basic:{
@@ -471,11 +474,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					equipValue:function(card,player){
-						if(get.position(card)=='e') return -1;
+						if(get.position(card)=='e') return -7;
 						return 1;
 					},
 					value:function(card,player){
-						if(player.getEquips(2).contains(card)) return -2.5;
+						if(player.getEquips(2).contains(card)) return -9;
 						return 2.5;
 					},
 					basic:{
