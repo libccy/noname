@@ -96,7 +96,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.tag(card,'damage')){
 								const hp=target.getHp();
 								player._dcsantou_temp=true;
-								const losehp=get.effect(card,{name:'losehp'},target,target)/get.attitude(target,target);
+								const losehp=get.effect(target,{name:'losehp'},target,target)/get.attitude(target,target);
 								delete player._dcsantou_temp;
 								if(hp>=3){
 									if(target.hasHistory('useSkill',evt=>evt.skill=='dcsantou'&&evt.event.getTrigger().source==player)) return [0,losehp,0,0];
@@ -114,7 +114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											}
 											return false;
 										}).length;
-										if(player.hasSkillTag('damage')) hs++;
+										if(player.hasSkillTag('damage',null,{target:target})) hs++;
 										if(!hs) return 'zeroplayertarget';
 										num=1-2/3/hs;
 										return [num,0,num,0];
