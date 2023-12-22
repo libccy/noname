@@ -5440,7 +5440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					effect:{
 						player:(card,player,target)=>{
-							if(player.hasSkill('rewansha')&&target.hp<=1&&get.tag(card,'damage')) return [1,0,1.5,-1.5];
+							if(target&&player.hasSkill('rewansha')&&target.hp<=1&&get.tag(card,'damage')) return [1,0,1.5,-1.5];
 						}
 					}
 				}

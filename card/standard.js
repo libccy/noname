@@ -252,10 +252,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					canLink:function(player,target,card){
 						if(!target.isLinked()&&!player.hasSkill('wutiesuolian_skill')) return false;
-						if(target.mayHaveShan()&&!player.hasSkillTag('directHit_ai',true,{
-							target:target,
-							card:card,
-						},true)) return false;
 						if(player.hasSkill('jueqing')||player.hasSkill('gangzhi')||target.hasSkill('gangzhi')) return false;
 						return true;
 					},
@@ -264,42 +260,87 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						value:[5,3,1],
 					},
 					order:function(item,player){
-						if(player.hasSkillTag('presha',true,null,true)) return 10;
-						if(game.hasNature(item,'linked')){
-							if(game.hasPlayer(function(current){
-								return current!=player&&current.isLinked()&&player.canUse(item,current,null,true)&&get.effect(current,item,player,player)>0&&lib.card.sha.ai.canLink(player,current,item);
-							})&&game.countPlayer(function(current){
-								return current.isLinked()&&get.damageEffect(current,player,player,get.nature(item))>0;
-							})>1) return 3.1;
-							return 3;
+						let res=3.2;
+						if(player.hasSkillTag('presha',true,null,true)) res=10;
+						if(get.itemtype(player)!=='player') return res;
+						/*let uv=player.getUseValue(item,true);
+						if(uv<=0) return res;*/
+						let ignore=get.copy(ui.selected.cards),used=player.getCardUsable('sha')-1.5,ph=player.getCards('hs');
+						ignore.add(item);
+						if(typeof item==='object'&&item.cards) ignore.addArray(item.cards);
+						let na=get.natureList(item),number=get.number(item),natures=['thunder','fire','ice','kami'],nb;
+						for(let i of ph){
+							if(ignore.includes(i)||get.name(i)!=='sha'||!lib.filter.cardEnabled(i,player)) continue;
+							nb=get.natureList(i);
+							if(na.length===nb.length&&(!na.length||na[0]===nb[0])){
+								if(number>get.number(i)) return res-0.15;
+								continue;
+							}
+							if(used*(na.length-nb.length)>0) return res-0.15;
+							if(na.length===nb.length){
+								if(used*(natures.indexOf(na[0])-natures.indexOf(nb[0]))>0) return res-0.15;
+							}
+							/*usev=player.getUseValue(i,true);
+							if(usev>0&&used*(uv-usev)>0) return res-0.15;*/
 						}
-						return 3.05;
+						return res;
 					},
 					result:{
-						target:function(player,target,card,isLink){
-							var eff=function(){
-								if(!isLink&&player.hasSkill('jiu')){
-									if(!target.hasSkillTag('filterDamage',null,{
-										player:player,
-										card:card,
-										jiu:true,
-									})){
-										if(get.attitude(player,target)>0){
-											return -7;
-										}
-										else{
-											return -4;
-										}
-									}
-									return -0.5;
+						target:(player,target,card,isLink)=>{
+							if(target._sha_result_temp) return -1.5;
+							target._sha_result_temp=true;
+							let basic=1,eff=-1.5,zhu=target.isZhu&&target.identityShown;
+							if(!target.hasSkillTag('filterDamage',null,{
+								player:player,
+								card:card,
+								jiu:player.hasSkill('jiu'),
+							})&&(player.hasSkill('jiu')||player.hasSkillTag('damageBonus',true,{
+								target:target,
+								card:card
+							}))){
+								if(target.hp<2) basic=5;
+								else if(target.hp===2) basic=3;
+								else basic=2;
+							}
+							else if(target.hp<2) basic*=3;
+							if(zhu) eff*=Math.max(1,9/target.hp/target.hp);
+							if(isLink){
+								let rate=_status.event.getTempCache('sha_result','mayShan');
+								if(rate&&rate.id===card.sha_ai_id) rate=rate.rate;
+								delete target._sha_result_temp;
+								if(typeof rate==='boolean'||typeof rate==='number'){
+									if(rate>=1) return eff;
+									return basic*eff*(1.3-0.9*rate);
 								}
-								return -1.5;
-							}();
-							if(!isLink&&target.mayHaveShan()&&!player.hasSkillTag('directHit_ai',true,{
+								delete _status.event._tempCache['sha_result']['mayShan'];
+								return basic*eff;
+							}
+							let mayShan;
+							if(player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:card,
-							},true)) return eff/1.2;
-							return eff;
+							},true)||game.hasNature(card,'stab')&&target.countCards('he')<2&&!target.hasSkillTag('noh')) mayShan=false;
+							else{
+								let temp=target.getKnownCards(player);
+								if(temp.some(i=>{
+									let name=get.name(i,target);
+									if(name==='shan'||name==='hufu') return lib.filter.cardEnabled(i,target,'forceEnable');
+									return false;
+								})) mayShan=true;
+								else mayShan=1-Math.pow(0.7,(target.hasSkillTag('respondShan',true,'use',true)?1:0)+target.countCards('hs')-temp.length);
+							}
+							if(game.hasNature(card,'linked',player)){
+								if(!_status.sha_ai_id) _status.sha_ai_id=1;
+								else _status.sha_ai_id++;
+								card.sha_ai_id=_status.sha_ai_id;
+								_status.event.putTempCache('sha_result','mayShan',{
+									id:_status.sha_ai_id,
+									rate:mayShan
+								});
+							}
+							delete target._sha_result_temp;
+							if(mayShan>=1) return eff;
+							return basic*eff*(1.3-0.9*mayShan);
 						},
 					},
 					tag:{
@@ -457,7 +498,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.hp>0){
 								if(!player.isPhaseUsing()) return 0;
 								let min = 7.2-4*player.hp/player.maxHp,
-									nd = player.needsToDiscard(-player.countCards('h',i=>!taos.includes(i)&&get.value(i)<min)),
+									nd = player.needsToDiscard(i=>taos.includes(i)||get.value(i)>=min),
 									keep = nd?0:2;
 								if(nd>2 || taos.length>1&&(nd>1||nd&&player.hp<1+taos.length) || target.identity==='zhu'&&(nd||target.hp<3)&&(mode==='identity'||mode==='versus'||mode==='chess') || !player.hasFriend()) return 2;
 								if(game.hasPlayer(current=>{
@@ -1844,12 +1885,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								return num+get.value(i,player);
 							},0);
 						},
-						target:(player,target)=>{
+						target:(player,target,card)=>{
 							let targets=get.copy(ui.selected.targets);
 							if(_status.event.preTarget) targets.add(_status.event.preTarget);
 							if(targets.length){
-								let preTarget=targets.lastItem,pre=_status.event.getTempCache('jiedao_result',preTarget);
-								if(pre&&pre.target.isIn()) return target===pre.target?pre.eff:0;
+								let preTarget=targets.lastItem,pre=_status.event.getTempCache('jiedao_result',preTarget.playerid);
+								if(pre&&pre.card===card&&pre.target.isIn()) return target===pre.target?pre.eff:0;
 								return get.effect(target,{name:'sha'},preTarget,player)/get.attitude(player,target);
 							}
 							let arms=(target.hasSkillTag('noe')?0.32:-0.15)*target.getEquips(1).reduce((num,i)=>{
@@ -1865,7 +1906,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							},-100);
 							if(!addTar) return arms;
 							sha/=get.attitude(player,target);
-							_status.event.putTempCache('jiedao_result',target,{
+							_status.event.putTempCache('jiedao_result',target.playerid,{
+								card:card,
 								target:addTar,
 								eff:sha
 							});
