@@ -159,6 +159,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else event.finish();
+				},
+				ai:{
+					reverseEquip:true
 				}
 			},
 			//隅泣曹操
