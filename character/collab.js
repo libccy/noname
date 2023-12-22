@@ -104,7 +104,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										let hs=player.getCards('hs',i=>{
 											return i!==card&&(!card.cards||!card.cards.includes(i));
 										}),num=player.getCardUsable('sha');
-										if(player.hasSkillTag('damage')) num++;
 										if(card.name==='sha') num--;
 										hs=hs.filter(i=>{
 											if(!player.canUse(i,target)) return false;
@@ -114,9 +113,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 												return true;
 											}
 											return false;
-										});
-										if(!hs.length) return 'zeroplayertarget';
-										num=1-2/3/hs.length;
+										}).length;
+										if(player.hasSkillTag('damage')) hs++;
+										if(!hs) return 'zeroplayertarget';
+										num=1-2/3/hs;
 										return [num,0,num,0];
 									}
 								}
