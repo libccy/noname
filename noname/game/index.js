@@ -7273,7 +7273,7 @@ export class Game extends Uninstantable {
 				ui.window.appendChild(event.nodes[i]);
 			}
 			'step 1'
-			let rand = event.config.first;
+			var rand = event.config.first;
 			if (rand == 'rand') {
 				rand = (Math.random() < 0.5);
 			}
@@ -7394,7 +7394,7 @@ export class Game extends Uninstantable {
 					event.avatars[i].classList.add('selecting');
 				}
 			}
-			let rand = [];
+			var rand = [];
 			for (let i = 0; i < event.config.width; i++) {
 				for (let j = 0; j < event.config.width - i; j++) {
 					rand.push(i);

@@ -139,7 +139,7 @@ export async function boot() {
 	// 读取模式
 	if (config2.mode) config.set('mode', config2.mode);
 	if (config.get('mode_config')[config.get('mode')] === undefined)
-		config.set(config.get('mode'), {});
+		 config.get('mode_config')[config.get('mode')] = {};
 
 	// 复制共有模式设置
 	for (const name in config.get('mode_config').global) {
