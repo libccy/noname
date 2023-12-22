@@ -11345,7 +11345,13 @@ export class Library extends Uninstantable {
 				next.player = player;
 				next._trigger = trigger;
 				next.triggername = event.triggername;
-				next.setContent(info.content);
+				
+				if ("contents" in info && Array.isArray(info.contents)) {
+					next.setContents(info.contents);
+				} else {
+					next.setContent(info.content);
+				}
+
 				next.skillHidden = event.skillHidden;
 				if (info.forceDie) next.forceDie = true;
 				if (info.forceOut) next.includeOut = true;
