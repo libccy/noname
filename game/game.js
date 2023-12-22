@@ -50,7 +50,7 @@ new Promise(resolve => {
 	 */
 	const module = import('../noname.js');
 
-	module.then(({ ai, game, get, lib, _status, ui }) => {
+	module.then(({ ai, game, get, lib, _status, ui, boot }) => {
 		const coreAndVersion = get.coreInfo();
 		const core = coreAndVersion[0], version = coreAndVersion[1];
 		if (core == 'chrome' && !isNaN(version) && version < 77) {
@@ -62,6 +62,6 @@ new Promise(resolve => {
 				window.open('https://github.com/libccy/noname/releases/tag/chromium77-client');
 			}
 		}
-		lib.init.init();
+		boot();
 	});
 });

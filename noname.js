@@ -6,6 +6,8 @@ import { Library as lib } from './noname/library/index.js';
 import { status as _status } from './noname/status/index.js';
 import { UI as ui } from './noname/ui/index.js';
 
+export { boot } from './noname/init/index.js';
+
 export {
 	gnc,
 	ai,
@@ -13,5 +15,5 @@ export {
 	get,
 	lib,
 	_status,
-	ui
+	ui,
 }

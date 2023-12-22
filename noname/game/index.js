@@ -1387,7 +1387,7 @@ export class Game extends Uninstantable {
 			func = lib.message.client[func];
 		}
 		if (typeof func == 'function') {
-			func.apply(this, arguments);
+			func.apply(this, args);
 		}
 	}
 	static syncState() {
@@ -1973,6 +1973,8 @@ export class Game extends Uninstantable {
 		else if (music.startsWith('ext:')) ui.backgroundMusic.src = `${lib.assetURL}extension/${music.slice(4)}`;
 		else ui.backgroundMusic.src = `${lib.assetURL}audio/background/${music}.mp3`;
 	}
+	// 某种意义上，改不了，得重写
+	// 等正式用import导入再说
 	/**
 	 * @param { string } type 
 	 * @param {(
@@ -1983,7 +1985,7 @@ export class Game extends Uninstantable {
 	 * 	ai: import('../ai/index.js')['AI'],
 	 * _status: import('../status/index.js')['_status']
 	 * ) => any } content 
-	 * @param {*} url 
+	 * @param {*} [url] 
 	 * @returns 
 	 */
 	static import(type, content, url) {
@@ -2012,10 +2014,10 @@ export class Game extends Uninstantable {
 			return promise;
 		}
 	}
-	static loadExtension = gnc.of(function* (object) {
+	static async loadExtension(object) {
 		let noEval = false;
 		if (typeof object == 'function') {
-			object = yield (gnc.is.generatorFunc(object) ? gnc.of(object) : object)(lib, game, ui, get, ai, _status);
+			object = await (gnc.is.generatorFunc(object) ? gnc.of(object) : object)(lib, game, ui, get, ai, _status);
 			noEval = true;
 		}
 		const name = object.name, extensionName = `extension_${name}`, extensionMenu = lib.extensionMenu[extensionName] = {
@@ -2116,7 +2118,7 @@ export class Game extends Uninstantable {
 			}
 			if (precontent) {
 				_status.extension = name;
-				yield (gnc.is.generatorFunc(precontent) ? gnc.of(precontent) : precontent).call(object, config);
+				await (gnc.is.generatorFunc(precontent) ? gnc.of(precontent) : precontent).call(object, config);
 				delete _status.extension;
 			}
 			if (content) lib.extensions.push([name, content, config, _status.evaluatingExtension, objectPackage || {}]);
@@ -2126,7 +2128,7 @@ export class Game extends Uninstantable {
 		}
 
 		return name;
-	})
+	}
 	/**
 	 * @param { string } directory 
 	 * @param { Function } [successCallback] 
@@ -2160,10 +2162,10 @@ export class Game extends Uninstantable {
 		};
 		return redo();
 	}
-	static importExtension = gnc.of(function* (data, finishLoad, exportExtension, extensionPackage) {
+	static async importExtension(data, finishLoad, exportExtension, extensionPackage) {
 		//by 来瓶可乐加冰、Rintim、Tipx-L
 		if (!window.JSZip)
-			yield new Promise((resolve, reject) => lib.init.js(`${lib.assetURL}game`, "jszip", resolve, reject));
+			await new Promise((resolve, reject) => lib.init.js(`${lib.assetURL}game`, "jszip", resolve, reject));
 
 		const zip = new JSZip();
 		if (get.objtype(data) == 'object') {
@@ -2223,7 +2225,7 @@ export class Game extends Uninstantable {
 			if (str === "" || undefined) throw ('你导入的不是扩展！请选择正确的文件');
 			_status.importingExtension = true;
 			eval(str);
-			yield Promise.allSettled(_status.extensionLoading);
+			await Promise.allSettled(_status.extensionLoading);
 			delete _status.extensionLoading;
 			_status.importingExtension = false;
 			if (!game.importedPack) throw ('err');
@@ -2311,7 +2313,7 @@ export class Game extends Uninstantable {
 			UHP(error);
 			return false;
 		}
-	})
+	}
 	/**
 	 * @param { string } textToWrite 
 	 * @param { string } [name] 
@@ -4762,12 +4764,12 @@ export class Game extends Uninstantable {
 			splash: imgsrc,
 			fromextension: true
 		}
-		lib.init['setMode_' + name] = gnc.of(function* () {
-			yield game.import('mode', function (lib, game, ui, get, ai, _status) {
+		lib.init['setMode_' + name] = async () => {
+			await game.import('mode', (lib, game, ui, get, ai, _status) => {
 				info.name = name;
 				return info;
 			});
-		});
+		};
 		if (!lib.config.extensionInfo[extname]) {
 			lib.config.extensionInfo[extname] = {};
 		}
@@ -6672,8 +6674,8 @@ export class Game extends Uninstantable {
 	 */
 	static loadModeAsync(name, callback) {
 		window.game = game;
-		let script = lib.init.js(lib.assetURL + 'mode', name, gnc.of(function* () {
-			yield Promise.allSettled(_status.importing.mode);
+		let script = lib.init.js(lib.assetURL + 'mode', name, async () => {
+			await Promise.allSettled(_status.importing.mode);
 			if (!lib.config.dev) delete window.game;
 			script.remove();
 			let content = lib.imported.mode[name];
@@ -6682,7 +6684,7 @@ export class Game extends Uninstantable {
 				delete lib.imported.mode;
 			}
 			callback(content);
-		}));
+		});
 	}
 	/**
 	 * @param { string } name 
@@ -6700,8 +6702,8 @@ export class Game extends Uninstantable {
 			}
 		}
 		window.game = game;
-		let script = lib.init.js(lib.assetURL + 'mode', name, gnc.of(function* () {
-			yield Promise.allSettled(_status.importing.mode);
+		let script = lib.init.js(lib.assetURL + 'mode', name, async () => {
+			await Promise.allSettled(_status.importing.mode);
 			if (!lib.config.dev) delete window.game;
 			script.remove();
 			let mode = lib.imported.mode;
@@ -6872,7 +6874,7 @@ export class Game extends Uninstantable {
 					game.loop();
 				});
 			}
-		}));
+		});
 	}
 	/**
 	 * @param { string } mode 
@@ -7271,11 +7273,11 @@ export class Game extends Uninstantable {
 				ui.window.appendChild(event.nodes[i]);
 			}
 			'step 1'
-			let rand = event.config.first;
-			if (rand == 'rand') {
-				rand = (Math.random() < 0.5);
+			let rand1 = event.config.first;
+			if (rand1 == 'rand') {
+				rand1 = (Math.random() < 0.5);
 			}
-			if (rand) {
+			if (rand1) {
 				_status.color = true;
 				event.side = 1;
 			}
@@ -7392,17 +7394,17 @@ export class Game extends Uninstantable {
 					event.avatars[i].classList.add('selecting');
 				}
 			}
-			let rand = [];
+			let rand2 = [];
 			for (let i = 0; i < event.config.width; i++) {
 				for (let j = 0; j < event.config.width - i; j++) {
-					rand.push(i);
+					rand2.push(i);
 				}
 			}
 			for (let i = 0; i < event.config.num; i++) {
-				let rand2 = rand.randomGet();
-				for (let j = 0; j < rand.length; j++) {
-					if (rand[j] == rand2) {
-						rand.splice(j--, 1);
+				let rand2 = rand2.randomGet();
+				for (let j = 0; j < rand2.length; j++) {
+					if (rand2[j] == rand2) {
+						rand2.splice(j--, 1);
 					}
 				}
 				event.enemylist.push(event.enemy[rand2]);

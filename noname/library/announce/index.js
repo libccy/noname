@@ -6,6 +6,14 @@
 const vm = new WeakMap();
 
 /**
+ * @template T
+ * @typedef {import("./index").AnnounceSubscriberType<T>} AnnounceSubscriberType
+ */
+/**
+ * @typedef {import("./index").IAnnounceSubscriber} IAnnounceSubscriber
+ */
+
+/**
  *
  */
 export class Announce {
@@ -15,20 +23,20 @@ export class Announce {
 	#eventTarget;
 
 	/**
-	 * @type {WeakMap<function(any): void, AnnounceSubscriber>}
+	 * @type {WeakMap<function(any): void, IAnnounceSubscriber>}
 	 */
 	#records;
 
 	/**
-	 * @type {FunctionConstructor}
+	 * @type {AnnounceSubscriberType<any>}
 	 */
 	#SubscriberType;
 
 	/**
 	 *
 	 * @param {EventTarget} eventTarget
-	 * @param {WeakMap<function(any): void, AnnounceSubscriber>} records
-	 * @param {FunctionConstructor} [SubscriberType]
+	 * @param {WeakMap<function(any): void, IAnnounceSubscriber>} records
+	 * @param {AnnounceSubscriberType<any>} [SubscriberType]
 	 */
 	constructor(eventTarget, records, SubscriberType = AnnounceSubscriber) {
 		this.#eventTarget = eventTarget;
@@ -73,6 +81,7 @@ export class Announce {
 			subscriber = new this.#SubscriberType(method, this.#eventTarget);
 			this.#records.set(method, subscriber);
 		}
+		if (!subscriber) throw new Error()
 		subscriber.subscribe(name);
 		return method;
 	}
@@ -90,6 +99,7 @@ export class Announce {
 	unsubscribe(name, method) {
 		if (this.#records.has(method)) {
 			const subscriber = this.#records.get(method);
+			if (!subscriber) throw new Error()
 			subscriber.unsubscribe(name);
 			if (subscriber.isEmpty)
 				this.#records.delete(method);
@@ -101,7 +111,7 @@ export class Announce {
 /**
  * @template T
  */
-class AnnounceSubscriber {
+export class AnnounceSubscriber {
 	/**
 	 * @type {function(CustomEvent): void}
 	 */
@@ -134,12 +144,19 @@ class AnnounceSubscriber {
 	 * @param {string} name
 	 */
 	subscribe(name) {
+		// @ts-expect-error MustHave
 		vm.get(this).addEventListener(name, this.#content);
+		// @ts-expect-error NonameDefine
 		this.#listening.add(name);
 	}
 
-	unsubscribe() {
+	/**
+	 * @param {string} name
+	 */
+	unsubscribe(name) {
+		// @ts-expect-error MustHave
 		vm.get(this).removeEventListener(name, this.#content);
+		// @ts-expect-error NonameDefine
 		this.#listening.remove(name);
 	}
 }
