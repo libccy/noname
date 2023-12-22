@@ -1387,7 +1387,7 @@ export class Game extends Uninstantable {
 			func = lib.message.client[func];
 		}
 		if (typeof func == 'function') {
-			func.apply(this, arguments);
+			func.apply(this, args);
 		}
 	}
 	static syncState() {
