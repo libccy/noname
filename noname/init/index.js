@@ -751,7 +751,7 @@ function onWindowReady() {
 		document.body.appendChild(script);
 		document.addEventListener('deviceready', async () => {
 			const { cordovaReady } = await import('./cordova.js');
-			cordovaReady();
+			await cordovaReady();
 		});
 	}
 	if (_status.packLoaded) {
