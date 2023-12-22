@@ -268,7 +268,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						let ignore=get.copy(ui.selected.cards),used=player.getCardUsable('sha')-1.5,ph=player.getCards('hs');
 						ignore.add(item);
 						if(typeof item==='object'&&item.cards) ignore.addArray(item.cards);
-						let na=get.natureList(item),number=get.number(item),natures=['thunder','fire','ice','kami'],nb;
+						let na=get.natureList(item),number,natures=['thunder','fire','ice','kami'],nb;
+						if(typeof item==='object') number=get.number(item);
+						else number=0;
 						for(let i of ph){
 							if(ignore.includes(i)||get.name(i)!=='sha'||!lib.filter.cardEnabled(i,player)) continue;
 							nb=get.natureList(i);

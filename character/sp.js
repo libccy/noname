@@ -3388,8 +3388,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return !_status.event.sourcex.contains(target)&&player.canUse(_status.event.card,target);
 						}).set('sourcex',trigger.targets).set('ai',function(target){
 							var player=_status.event.player;
+							if(player.countCards('h')%2==0) return true;
 							var eff=get.effect(target,_status.event.card,player,player);
-							if(player.countCards('h')%2==0&&player.hasSkill('olxieju')&&player.isPhaseUsing()&&!player.getStat().skill.olxieju) return 1-eff;
+							if(player.hasSkill('olxieju')&&player.isPhaseUsing()&&!player.getStat().skill.olxieju&&get.attitude(player,target)>0&&!game.hasGlobalHistory('useCard',evt=>{
+								return evt.targets&&evt.targets.includes(target);
+							})) return 6+eff;
 							return eff;
 						}).set('card',trigger.card);
 					}
@@ -3398,9 +3401,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return _status.event.bool;
 						}).set('bool',function(){
 							var att=get.attitude(trigger.player,player);
-							var eff=get.effect(player,trigger.card,trigger.player,trigger.player);
-							if(player.countCards('h')%2==0&&att>0) return true;
-							if(eff>0) return true;
+							if(player.countCards('h')%2==0){
+								if(att>0) return true;
+								return false;
+							}
+							if(get.effect(player,trigger.card,trigger.player,trigger.player)>0) return true;
 							return false;
 						}());
 					}

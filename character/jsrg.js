@@ -1563,9 +1563,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt2:`${undamaged.length?'选择一张牌弃置并选择一名未对你造成过伤害的角色，你对其造成1点伤害':''}${undamaged.length&&damaged.length?'；<br>或':''}${damaged.length?'仅选择一名对你造成过伤害的角色，你令其摸两张牌':''}。`,
 						damaged:damaged,
 						aiTarget:(()=>{
+							if(!undamaged.some(i=>{
+								if(get.attitude(player,i)>0) return true;
+								if(i.getHp(true)+i.hujia<2) return true;
+								return false;
+							})&&(player.hp>2||get.damageEffect(player,player,player)>=0)) return player;
 							var info=game.filterPlayer().map(current=>{
-								var damage=undamaged.includes(current);
-								var card={name:damage?'damage':'wuzhong'};
+								let damage=undamaged.includes(current),card={name:damage?'damage':'wuzhong'};
 								return [current,get.effect(current,card,player,player)/(damage?1.5:1)];
 							}).sort((a,b)=>b[1]-a[1])[0];
 							if(info[1]>0) return info[0];
@@ -1626,6 +1630,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.num++;
 				},
+				ai:{
+					damageBonus:true,
+					skillTagFilter:(player,tag,arg)=>{
+						if(tag==='damageBonus'&&arg&&arg.target){
+							const history=_status.globalHistory;
+							for(let i=history.length-1;i>=0;i--){
+								let evts=history[i]['useCard'];
+								for(let j=evts.length-1;j>=0;j--){
+									var evt=evts[j];
+									let card=evt.card,targets=evt.targets;
+									if(!get.tag(card,'damage')||!targets.includes(player)) continue;
+									return arg.target===evt.player;
+								}
+							}
+							return false;
+						}
+					},
+					effect:{
+						player:(card,player,target)=>{
+							if(get.tag(card,'damage')&&target&&lib.skill.jsrghuchou.ai.skillTagFilter(player,'damageBonus',{
+								card:card,
+								target:target
+							})&&!target.hasSkillTag('filterDamage',null,{
+								player:player,
+								card:card
+							})) return [1,0,2,0];
+						}
+					}
+				}
 			},
 			jsrgjiemeng:{
 				audio:2,

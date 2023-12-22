@@ -1666,6 +1666,7 @@ export class Library extends Uninstantable {
 				},
 				splash_style: {
 					name: '启动页',
+					init: 'style1',
 					item: {
 						style1: '样式一',
 						style2: '样式二',
@@ -28643,6 +28644,11 @@ export class Library extends Uninstantable {
 				return false;
 			}
 			needsToDiscard(filter, add) {
+				/**
+				 * filter: typeof 'number' -> 额外摸等量牌(逻辑上)
+				 *         typeof 'function' -> 只考虑符合函数筛选的牌
+				 * add: 额外获得这张/些牌(逻辑上)
+				 */
 				let cards = this.getCards('h', card => !this.canIgnoreHandcard(card)), num = 0;
 				if (get.itemtype(add) === 'cards') cards.addArray(add);
 				else if (get.itemtype(add) === 'card') cards.push(add);
@@ -28812,7 +28818,11 @@ export class Library extends Uninstantable {
 				return this.hasUsableCard('shan');
 			}
 			mayHaveSha(viewer, type, ignore, rvt) {
-				//rvt: return value type 'count', 'odds', 'bool'(default)
+				/**
+				 * type: skill tag type 'use', 'respond'
+				 * ignore: ignore cards, ui.selected.cards added
+				 * rvt: return value type 'count', 'odds', 'bool'(default)
+				 */
 				let count = 0;
 				if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondSha', true, type, true)) {
 					if (rvt === 'count') count++;
@@ -28850,7 +28860,11 @@ export class Library extends Uninstantable {
 				return count > _status.event.getRand('mayHaveSha' + hs + this.playerid);
 			}
 			mayHaveShan(viewer, type, ignore, rvt) {
-				//rvt: return value type 'count', 'odds', 'bool'(default)
+				/**
+				 * type: skill tag type 'use', 'respond'
+				 * ignore: ignore cards, ui.selected.cards added
+				 * rvt: return value type 'count', 'odds', 'bool'(default)
+				 */
 				let count = 0;
 				if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondShan', true, type, true)) {
 					if (rvt === 'count') count++;
