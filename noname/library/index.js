@@ -268,7 +268,7 @@ export class Library extends Uninstantable {
 						':not([data-nature])>',
 						cs.class("span")
 					)
-				)
+				);
 				let result2 = {};
 				result2[g2] = {
 					color: `rgba(${color1.join()})`,
@@ -380,7 +380,7 @@ export class Library extends Uninstantable {
 				}
 			});
 		}
-	}
+	};
 	/**
 	 * **无名杀消息推送库**
 	 * 
@@ -406,7 +406,7 @@ export class Library extends Uninstantable {
 	 * // 若此时乙扩展不想继续订阅`skinChange`事件，可以通过`unsubscribe`解除订阅
 	 * lib.announce.unsubscribe("skinChange", method);
 	 */
-	static announce = new Announce(new EventTarget(), new WeakMap())
+	static announce = new Announce(new EventTarget(), new WeakMap());
 	static objectURL = new Map();
 	static hookmap = {};
 	static imported = {};
@@ -462,7 +462,7 @@ export class Library extends Uninstantable {
 					yingbianZhuzhan.yingbianZhuzhanAI = event.yingbianZhuzhanAI;
 					yingbianZhuzhan.afterYingbianZhuzhan = event.afterYingbianZhuzhan;
 					yingbianZhuzhan.setContent(() => {
-						'step 0'
+						'step 0';
 						event._global_waiting = true;
 						event.send = (player, card, source, targets, id, id2, yingbianZhuzhanAI, skillState) => {
 							if (skillState) player.applySkills(skillState);
@@ -491,15 +491,15 @@ export class Library extends Uninstantable {
 							_status.event._resultid = id;
 							game.resume();
 						};
-						'step 1'
+						'step 1';
 						var type = get.type2(card);
 						event.list = game.filterPlayer(current => current != player && current.countCards('h') && (_status.connectMode || current.hasCard(cardx => get.type2(cardx) == type, 'h'))).sortBySeat(_status.currentPhase || player);
 						event.id = get.id();
-						'step 2'
+						'step 2';
 						if (!event.list.length) event.finish();
 						else if (_status.connectMode && (event.list[0].isOnline() || event.list[0] == game.me)) event.goto(4);
 						else event.send(event.current = event.list.shift(), event.card, player, trigger.targets, event.id, trigger.parent.id, trigger.yingbianZhuzhanAI);
-						'step 3'
+						'step 3';
 						if (result.bool) {
 							event.zhuzhanresult = event.current;
 							event.zhuzhanresult2 = result;
@@ -507,7 +507,7 @@ export class Library extends Uninstantable {
 							event.goto(8);
 						}
 						else event.goto(2);
-						'step 4'
+						'step 4';
 						var id = event.id, sendback = (result, player) => {
 							if (result && result.id == id && !event.zhuzhanresult && result.bool) {
 								event.zhuzhanresult = player;
@@ -540,16 +540,16 @@ export class Library extends Uninstantable {
 							if (value != player) value.showTimer();
 						});
 						event.withol = withol;
-						'step 5'
+						'step 5';
 						if (!result || !result.bool || event.zhuzhanresult) return;
 						game.broadcast('cancel', event.id);
 						event.zhuzhanresult = game.me;
 						event.zhuzhanresult2 = result;
-						'step 6'
+						'step 6';
 						if (event.withol && !event.resultOL) game.pause();
-						'step 7'
+						'step 7';
 						game.players.forEach(value => value.hideTimer());
-						'step 8'
+						'step 8';
 						if (event.zhuzhanresult) {
 							var target = event.zhuzhanresult;
 							target.line(player, 'green');
@@ -561,7 +561,7 @@ export class Library extends Uninstantable {
 							target.addExpose(0.2);
 							event.result = {
 								bool: true
-							}
+							};
 						}
 						else event.result = {
 							bool: false
@@ -1234,7 +1234,7 @@ export class Library extends Uninstantable {
 										nodezz.item[name] = str;
 										alert('已添加扩展地址：' + str);
 									}
-								})
+								});
 							}
 						});
 					},
@@ -1477,7 +1477,7 @@ export class Library extends Uninstantable {
 								if (link == 'default') {
 									player.style.height = '19px';
 									player.style.width = '38px';
-									player.classList.add('oldlayout')
+									player.classList.add('oldlayout');
 								}
 								else if (link == 'mobile' || link == 'newlayout') {
 									player.style.width = '24px';
@@ -2330,7 +2330,7 @@ export class Library extends Uninstantable {
 									};
 									fileReader.readAsDataURL(fileToLoad, "UTF-8");
 								});
-							}
+							};
 							getDB(1);
 						}
 					},
@@ -3868,7 +3868,7 @@ export class Library extends Uninstantable {
 						}
 						else {
 							ui.roundmenu.style.display = 'none';
-							alert('关闭触屏按钮后可通过手势打开菜单（默认为下划）')
+							alert('关闭触屏按钮后可通过手势打开菜单（默认为下划）');
 						}
 					}
 				},
@@ -4485,7 +4485,7 @@ export class Library extends Uninstantable {
 					name: '重置隐藏内容',
 					onclick: function () {
 						if (this.firstChild.innerHTML != '已重置') {
-							this.firstChild.innerHTML = '已重置'
+							this.firstChild.innerHTML = '已重置';
 							game.saveConfig('hiddenModePack', []);
 							game.saveConfig('hiddenCharacterPack', []);
 							game.saveConfig('hiddenCardPack', []);
@@ -4508,7 +4508,7 @@ export class Library extends Uninstantable {
 					name: '重置新手向导',
 					onclick: function () {
 						if (this.firstChild.innerHTML != '已重置') {
-							this.firstChild.innerHTML = '已重置'
+							this.firstChild.innerHTML = '已重置';
 							game.saveConfig('new_tutorial', false);
 							game.saveConfig('prompt_hidebg');
 							game.saveConfig('prompt_hidepack');
@@ -4539,7 +4539,7 @@ export class Library extends Uninstantable {
 						var data;
 						var export_data = function (data) {
 							game.export(lib.init.encode(JSON.stringify(data)), '无名杀 - 数据 - ' + (new Date()).toLocaleString());
-						}
+						};
 						if (!lib.db) {
 							data = {};
 							for (var i in localStorage) {
@@ -7215,7 +7215,7 @@ export class Library extends Uninstantable {
 					onclick: function (bool) {
 						if (confirm('调整该设置将清除所有进度，是否继续？')) {
 							for (var i = 1; i < 6; i++) game.save('save' + i, null, 'chess');
-							game.saveConfig('chess_leader_allcharacter', bool, 'chess')
+							game.saveConfig('chess_leader_allcharacter', bool, 'chess');
 							if (get.mode() == 'chess') game.reload();
 							return;
 						}
@@ -7953,7 +7953,7 @@ export class Library extends Uninstantable {
 							},
 							displayText: text,
 							text: text,
-						}
+						};
 					}),
 				from: CodeMirror.Pos(cur.line, token.start),
 				to: CodeMirror.Pos(cur.line, token.end)
@@ -8006,7 +8006,7 @@ export class Library extends Uninstantable {
 				//If not, just look in the global object, any local scope, and optional additional-context
 				//(reading into JS mode internals to get at the local and global variables)
 				for (let v = token.state.localVars; v; v = v.next) maybeAdd(v.name);
-				for (let c = token.state.context; c; c = c.prev) for (let v = c.vars; v; v = v.next) maybeAdd(v.name)
+				for (let c = token.state.context; c; c = c.prev) for (let v = c.vars; v; v = v.next) maybeAdd(v.name);
 				for (let v = token.state.globalVars; v; v = v.next) maybeAdd(v.name);
 				if (options && options.additionalContext != null) for (let key in options.additionalContext) maybeAdd(key);
 				if (!options || options.useGlobalScope !== false) gatherCompletions(global);
@@ -8098,7 +8098,7 @@ export class Library extends Uninstantable {
 			node._hoveration = hoveration;
 		}
 		if (typeof width == 'number') {
-			node._hoverwidth = width
+			node._hoverwidth = width;
 		}
 		node.addEventListener('mouseenter', ui.click.mouseenter);
 		node.addEventListener('mouseleave', ui.click.mouseleave);
@@ -8174,8 +8174,8 @@ export class Library extends Uninstantable {
 				'无名杀 - 录像 - ' + _status.videoToSave.name[0] + ' - ' + _status.videoToSave.name[1]);
 		}
 	}
-	static genAsync(fn) { return gnc.of(fn) }
-	static genAwait(item) { return gnc.is.generator(item) ? gnc.of(function* () { for (const content of item) { yield content; } })() : Promise.resolve(item) }
+	static genAsync(fn) { return gnc.of(fn); }
+	static genAwait(item) { return gnc.is.generator(item) ? gnc.of(function* () { for (const content of item) { yield content; } })() : Promise.resolve(item); }
 	static gnc = {
 		of: fn => gnc.of(fn),
 		is: {
@@ -8216,7 +8216,7 @@ export class Library extends Uninstantable {
 			for (let i = 1; i < arguments.length; ++i) if (type !== arguments[i]) return false;
 			return true;
 		}
-	}
+	};
 	static creation = {
 		get array() {
 			return [];
@@ -8230,7 +8230,7 @@ export class Library extends Uninstantable {
 		get string() {
 			return "";
 		}
-	}
+	};
 	static linq = {
 		cselector: {
 			hasAttr: name => `[${name}]`,
@@ -8253,7 +8253,7 @@ export class Library extends Uninstantable {
 						_type: "style",
 						name: name,
 						value: value
-					}
+					};
 				}
 			},
 			inject(element, options) {
@@ -8328,15 +8328,15 @@ export class Library extends Uninstantable {
 					_type: "attributes",
 					name: name,
 					value: value
-				}
+				};
 			},
 			div() {
 				const dom = lib.linq.dom;
 				return dom.inject(document.createElement("div"), dom.generate(...arguments));
 			}
 		}
-	}
-	static init = LibInit
+	};
+	static init = LibInit;
 	static cheat = {
 		i: function () {
 			window.cheat = lib.cheat;
@@ -8374,7 +8374,7 @@ export class Library extends Uninstantable {
 					}
 					callback(folders, files);
 				});
-			}
+			};
 			var args = Array.from(arguments);
 			for (var i = 0; i < args.length; i++) {
 				args[i] = args[i][0];
@@ -8522,7 +8522,7 @@ export class Library extends Uninstantable {
 				}
 			}
 			if (skin) {
-				lib.config.skin[name] = skin
+				lib.config.skin[name] = skin;
 			}
 			var target;
 			if (typeof i == 'number') {
@@ -8652,11 +8652,11 @@ export class Library extends Uninstantable {
 						num[lib.card.list[i][1]]++;
 					}
 				}
-				var str = '基本牌' + aa + '； ' + '锦囊牌' + bb + '； ' + '装备牌' + cc + '； ' + '其它牌' + dd
+				var str = '基本牌' + aa + '； ' + '锦囊牌' + bb + '； ' + '装备牌' + cc + '； ' + '其它牌' + dd;
 				console.log(str);
-				str = '红桃牌' + sa + '； ' + '方片牌' + sb + '； ' + '梅花牌' + sc + '； ' + '黑桃牌' + sd
+				str = '红桃牌' + sa + '； ' + '方片牌' + sb + '； ' + '梅花牌' + sc + '； ' + '黑桃牌' + sd;
 				console.log(str);
-				str = '杀' + sha + '； ' + '黑杀' + heisha + '； ' + '红杀' + hongsha + '； ' + '闪' + shan + '； ' + '桃' + tao + '； ' + '酒' + jiu + '； ' + '无懈' + wuxie
+				str = '杀' + sha + '； ' + '黑杀' + heisha + '； ' + '红杀' + hongsha + '； ' + '闪' + shan + '； ' + '桃' + tao + '； ' + '酒' + jiu + '； ' + '无懈' + wuxie;
 				console.log(str);
 				if (arguments[1]) {
 					for (var i = 1; i <= 13; i++) {
@@ -8672,7 +8672,7 @@ export class Library extends Uninstantable {
 				for (var i = 1; i <= 13; i++) {
 					arr.push(num[i]);
 				}
-				console.log((a + b + c + d) + '/' + (aa + bb + cc + dd), ...arr)
+				console.log((a + b + c + d) + '/' + (aa + bb + cc + dd), ...arr);
 			}());
 		},
 		id: function () {
@@ -8760,7 +8760,7 @@ export class Library extends Uninstantable {
 					card = arguments[i];
 				}
 				else if (typeof arguments[i] == 'string') {
-					card = { name: arguments[i] }
+					card = { name: arguments[i] };
 				}
 			}
 			if (!targets.length) targets.push(game.me);
@@ -8991,7 +8991,7 @@ export class Library extends Uninstantable {
 			game.zhu.hp++;
 			game.zhu.update();
 		},
-	}
+	};
 	static translate = {
 		flower: '鲜花',
 		egg: '鸡蛋',
@@ -9208,7 +9208,7 @@ export class Library extends Uninstantable {
 		expandedSlots: '扩展装备栏',
 		stratagem_fury: '怒气',
 		_stratagem_add_buff: '强化'
-	}
+	};
 	static element = {
 		content: {
 			emptyEvent: function () {
@@ -9248,7 +9248,7 @@ export class Library extends Uninstantable {
 			//Execute the delay card effect
 			//执行延时锦囊牌效果
 			executeDelayCardEffect: () => {
-				'step 0'
+				'step 0';
 				target.$phaseJudge(card);
 				event.cancelled = false;
 				event.trigger('executeDelayCardEffect');
@@ -9262,13 +9262,13 @@ export class Library extends Uninstantable {
 					game.delay();
 					event.nojudge = true;
 				}
-				'step 1'
+				'step 1';
 				if (event.cancelled || event.nojudge) return;
 				var next = player.judge(card), judge = event.judge;
 				if (typeof judge == 'function') next.judge = judge;
 				var judge2 = event.judge2;
 				if (typeof judge2 == 'function') next.judge2 = judge2;
-				'step 2'
+				'step 2';
 				if (event.excluded) delete event.excluded;
 				else {
 					var cardName = event.cardName;
@@ -9315,9 +9315,9 @@ export class Library extends Uninstantable {
 			//Gift
 			//赠予
 			gift: () => {
-				'step 0'
+				'step 0';
 				event.num = 0;
-				'step 1'
+				'step 1';
 				if (num < cards.length) {
 					event.card = cards[num];
 					event.trigger('gift');
@@ -9326,7 +9326,7 @@ export class Library extends Uninstantable {
 					game.delayx();
 					event.finish();
 				}
-				'step 2'
+				'step 2';
 				if (event.deniedGifts.includes(card)) {
 					game.log(target, '拒绝了', player, '赠予的', card);
 					event.trigger('giftDeny');
@@ -9341,23 +9341,23 @@ export class Library extends Uninstantable {
 				if (get.type(card, false) == 'equip') target.equip(card).log = false;
 				else target.gain(card, player).visible = true;
 				event.trigger('giftAccepted');
-				'step 3'
+				'step 3';
 				event.num++;
 				event.goto(1);
 			},
 			//Recast
 			//重铸
 			recast: () => {
-				'step 0'
+				'step 0';
 				game.log(player, '重铸了', cards);
 				if (typeof event.recastingLose != 'function') return;
 				event.trigger('recastingLose');
 				event.recastingLose(player, cards);
 				event.trigger('recastingLost');
 				event.recastingLosingEvents.push(...event.next.filter(value => value.name != 'arrangeTrigger'));
-				'step 1'
+				'step 1';
 				event.trigger('recast');
-				'step 2'
+				'step 2';
 				if (typeof event.recastingGain != 'function') return;
 				event.trigger('recastingGain');
 				event.recastingGain(player, cards);
@@ -9366,14 +9366,14 @@ export class Library extends Uninstantable {
 			},
 			//装备栏相关
 			disableEquip: function () {
-				'step 0'
+				'step 0';
 				event.cards = [];
 				event.num = 0;
 				event.slotsx = [];
 				if (get.is.mountCombined()) {
 					event.slots.forEach(type => {
 						if (type == 'equip3' || type == 'equip4') event.slotsx.add('equip3_4');
-						else event.slotsx.add(type)
+						else event.slotsx.add(type);
 					});
 				}
 				else {
@@ -9381,7 +9381,7 @@ export class Library extends Uninstantable {
 				}
 				event.slotsx.sort();
 				if (!event.slots.length) event.finish();
-				'step 1'
+				'step 1';
 				var slot = event.slotsx[event.num];
 				var slot_key = slot;
 				var left = player.countEnabledSlot(slot), lose;
@@ -9411,17 +9411,17 @@ export class Library extends Uninstantable {
 								var evt = _status.event;
 								return ui.selected.buttons.reduce(function (num, button) {
 									if (evt.slot == 'equip3_4') return num + Math.max(get.numOf(get.subtypes(button.link, false), 'equip3'), get.numOf(get.subtypes(button.link, false), 'equip4'));
-									return num + get.numOf(get.subtypes(button.link, false), evt.slot)
+									return num + get.numOf(get.subtypes(button.link, false), evt.slot);
 								}, 0) == evt.required;
-							}).set('required', num).set('slot', slot)
+							}).set('required', num).set('slot', slot);
 						}
 						else event.goto(3);
 					}
-					else event.goto(3)
+					else event.goto(3);
 				}
-				'step 2'
+				'step 2';
 				if (result.bool) event.cards.addArray(result.links);
-				'step 3'
+				'step 3';
 				event.num++;
 				if (event.num < event.slotsx.length) event.goto(1);
 				else {
@@ -9450,7 +9450,7 @@ export class Library extends Uninstantable {
 				if (get.is.mountCombined()) {
 					event.slots.forEach(type => {
 						if (type == 'equip3' || type == 'equip4') slotsx.add('equip3_4');
-						else slotsx.add(type)
+						else slotsx.add(type);
 					});
 				}
 				else {
@@ -9472,7 +9472,7 @@ export class Library extends Uninstantable {
 			},
 			//选择顶装备要顶的牌
 			replaceEquip: function () {
-				'step 0'
+				'step 0';
 				event.cards = [];
 				var types = get.subtypes(card, false);
 				if (types.length) {
@@ -9490,7 +9490,7 @@ export class Library extends Uninstantable {
 						if (get.is.mountCombined()) {
 							event.slots.forEach(type => {
 								if (type == 'equip3' || type == 'equip4') event.slotsx.add('equip3_4');
-								else event.slotsx.add(type)
+								else event.slotsx.add(type);
 							});
 						}
 						else {
@@ -9500,7 +9500,7 @@ export class Library extends Uninstantable {
 					}
 				}
 				else event.goto(4);
-				'step 1'
+				'step 1';
 				var slot = event.slotsx[event.num];
 				var left = player.countEquipableSlot(slot), lose;
 				if (slot == 'equip3_4') lose = Math.min(left, Math.max(get.numOf(event.slots, 'equip3'), get.numOf(event.slots, 'equip4')));
@@ -9524,32 +9524,32 @@ export class Library extends Uninstantable {
 								var evt = _status.event;
 								return ui.selected.buttons.reduce(function (num, button) {
 									if (evt.slot == 'equip3_4') return num + Math.max(get.numOf(get.subtypes(button.link, false), 'equip3'), get.numOf(get.subtypes(button.link, false), 'equip4'));
-									return num + get.numOf(get.subtypes(button.link, false), evt.slot)
+									return num + get.numOf(get.subtypes(button.link, false), evt.slot);
 								}, 0) == evt.required;
-							}).set('required', num).set('slot', slot)
+							}).set('required', num).set('slot', slot);
 						}
 						else event.goto(3);
 					}
-					else event.goto(3)
+					else event.goto(3);
 				}
-				'step 2'
+				'step 2';
 				if (result.bool) event.cards.addArray(result.links);
-				'step 3'
+				'step 3';
 				event.num++;
 				if (event.num < event.slotsx.length) event.goto(1);
-				'step 4'
+				'step 4';
 				event.result = cards;
 			},
 			//装备牌
 			equip: function () {
-				"step 0"
-				var owner = get.owner(card)
+				"step 0";
+				var owner = get.owner(card);
 				if (owner) {
 					event.owner = owner;
 					owner.lose(card, ui.special, 'visible').set('type', 'equip').set('getlx', false);
 				}
 				else if (get.position(card) == 'c') event.updatePile = true;
-				"step 1"
+				"step 1";
 				if (event.cancelled) {
 					event.finish();
 					return;
@@ -9569,7 +9569,7 @@ export class Library extends Uninstantable {
 					game.delay(0, 300);
 					player.$draw(card);
 				}
-				"step 2"
+				"step 2";
 				if (card.clone) {
 					game.broadcast(function (card, player) {
 						if (card.clone) {
@@ -9580,13 +9580,13 @@ export class Library extends Uninstantable {
 					game.addVideo('gain2', player, get.cardsInfo([card.clone]));
 				}
 				player.equiping = true;
-				"step 3"
+				"step 3";
 				var info = get.info(card, false);
 				var next = game.createEvent('replaceEquip');
 				next.player = player;
 				next.card = card;
 				next.setContent(info.replaceEquip || 'replaceEquip');
-				"step 4"
+				"step 4";
 				var info = get.info(card, false);
 				if (get.itemtype(result) == 'cards') {
 					player.lose(result, 'visible').set('type', 'equip').set('getlx', false).swapEquip = true;
@@ -9595,7 +9595,7 @@ export class Library extends Uninstantable {
 					}
 					event.swapped = true;
 				}
-				"step 5"
+				"step 5";
 				//if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
 				if (player.isMin() || !player.canEquip(card)) {
 					event.finish();
@@ -9614,7 +9614,7 @@ export class Library extends Uninstantable {
 				game.addVideo('equip', player, get.cardInfo(card));
 				if (event.log != false) game.log(player, '装备了', card);
 				if (event.updatePile) game.updateRoundNumber();
-				"step 6"
+				"step 6";
 				var info = get.info(card, false);
 				if (info.onEquip && (!info.filterEquip || info.filterEquip(card, player))) {
 					if (Array.isArray(info.onEquip)) {
@@ -9640,7 +9640,7 @@ export class Library extends Uninstantable {
 			},
 			//装备栏 END
 			changeGroup: function () {
-				'step 0'
+				'step 0';
 				event.originGroup = player.group;
 				if (!event.group) event.group = player.group;
 				var group = event.group;
@@ -9656,7 +9656,7 @@ export class Library extends Uninstantable {
 				if (event.log !== false) game.log(player, '将势力变为了', '#y' + get.translation(group + 2));
 			},
 			chooseToDebate: function () {
-				'step 0'
+				'step 0';
 				event.targets = event.list.filter(function (i) {
 					return i.countCards('h') > 0;
 				});
@@ -9670,7 +9670,7 @@ export class Library extends Uninstantable {
 					});
 					next._args.remove('glow_result');
 				}
-				'step 1'
+				'step 1';
 				var red = [], black = [];
 				event.videoId = lib.status.videoId++;
 				for (var i = 0; i < event.targets.length; i++) {
@@ -9704,7 +9704,7 @@ export class Library extends Uninstantable {
 					dialog.classList.add('fullheight');
 					dialog.buttonss = [];
 
-					var list = ['意见为红色的角色', '意见为黑色的角色']
+					var list = ['意见为红色的角色', '意见为黑色的角色'];
 					for (var i = 0; i < list.length; i++) {
 						dialog.add('<div class="text center">' + list[i] + '</div>');
 						var buttons = ui.create.div('.buttons', dialog.content);
@@ -9731,7 +9731,7 @@ export class Library extends Uninstantable {
 					dialog.open();
 				}, get.translation(player), event.videoId, red, black);
 				game.delay(4);
-				'step 2'
+				'step 2';
 				game.broadcastAll('closeDialog', event.videoId);
 				var opinion = null;
 				if (event.red.length > event.black.length) opinion = 'red';
@@ -9744,8 +9744,8 @@ export class Library extends Uninstantable {
 					red: event.red,
 					black: event.black,
 					targets: event.targets
-				}
-				'step 3'
+				};
+				'step 3';
 				if (event.callback) {
 					var next = game.createEvent('debateCallback', false);
 					next.player = player;
@@ -9754,10 +9754,10 @@ export class Library extends Uninstantable {
 				}
 			},
 			delay: function () {
-				game[event.name].apply(game, event._args)
+				game[event.name].apply(game, event._args);
 			},
 			chooseCooperationFor: function () {
-				'step 0'
+				'step 0';
 				var next = player.chooseButton([
 					'选择和' + get.translation(target) + '的协力方式',
 					[event.cardlist, 'vcard'],
@@ -9765,13 +9765,13 @@ export class Library extends Uninstantable {
 				next.set('ai', event.ai || function () {
 					return Math.random();
 				});
-				'step 1'
+				'step 1';
 				if (result.bool) {
 					player.cooperationWith(target, result.links[0][2].slice(12), event.reason);
 				}
 			},
 			chooseToPlayBeatmap: function () {
-				'step 0'
+				'step 0';
 				if (game.online) return;
 				if (_status.connectMode) event.time = lib.configOL.choose_timeout;
 				event.videoId = lib.status.videoId++;
@@ -9788,7 +9788,7 @@ export class Library extends Uninstantable {
 						else game.playAudio('effect', beatmap.filename);
 					}
 				}, player, event.videoId, event.beatmap);
-				'step 1'
+				'step 1';
 				var beatmap = event.beatmap;
 				if (event.isMine()) {
 					var timeleap = beatmap.timeleap.slice(0);
@@ -9952,9 +9952,9 @@ export class Library extends Uninstantable {
 						else {
 							setTimeout(function () {
 								event.settle();
-							}, speed * 110 + 100)
+							}, speed * 110 + 100);
 						}
-					}
+					};
 					//点击时的判断操作
 					var click = function () {
 						if (!nodes.length) return;
@@ -10055,7 +10055,7 @@ export class Library extends Uninstantable {
 						skip_timeout = setTimeout(() => document.removeEventListener(lib.config.touchscreen ? 'touchend' : 'click', skip), song_duration);
 					}
 				}
-				'step 2'
+				'step 2';
 				game.broadcastAll(function (id, time) {
 					if (_status.connectMode) lib.configOL.choose_timeout = time;
 					var dialog = get.idDialog(id);
@@ -10068,7 +10068,7 @@ export class Library extends Uninstantable {
 				event.result = result;
 			},
 			chooseToMove: function () {
-				'step 0'
+				'step 0';
 				if (event.chooseTime && _status.connectMode && !game.online) {
 					event.time = lib.configOL.choose_timeout;
 					game.broadcastAll(function (time) {
@@ -10182,7 +10182,7 @@ export class Library extends Uninstantable {
 						par2.insertBefore(ui.selected.guanxing_button, ind2);
 						delete ui.selected.guanxing_button;
 						updateButtons();
-					}
+					};
 					event.custom.replace.confirm = function (bool) {
 						if (bool) event._result = {
 							bool: true,
@@ -10208,7 +10208,7 @@ export class Library extends Uninstantable {
 				else {
 					event.result = 'ai';
 				}
-				"step 1"
+				"step 1";
 				if (event.time) game.broadcastAll(function (time) {
 					lib.configOL.choose_timeout = time;
 				}, event.time);
@@ -10218,15 +10218,15 @@ export class Library extends Uninstantable {
 					if (moved) result = {
 						bool: true,
 						moved: moved,
-					}
+					};
 					else result = { bool: false };
 				}
 				event.result = result;
 			},
 			showCharacter: function () {
-				'step 0'
+				'step 0';
 				event.trigger('showCharacterEnd');
-				'step 1'
+				'step 1';
 				event.trigger('showCharacterAfter');
 				if (get.mode() == 'identity' && player.isZhu) event.trigger('zhuUpdate');
 			},
@@ -10234,7 +10234,7 @@ export class Library extends Uninstantable {
 				player.$removeCharacter(event.num);
 			},
 			chooseUseTarget: function () {
-				'step 0'
+				'step 0';
 				if (get.is.object(card) && !event.viewAs) card.isCard = true;
 				if (cards && get.itemtype(card) != 'card') {
 					card = get.copy(card);
@@ -10325,7 +10325,7 @@ export class Library extends Uninstantable {
 					if (event.prompt2) next.set('prompt2', event.prompt2);
 					if (event.hsskill) next.setHiddenSkill(event.hsskill);
 				}
-				'step 1'
+				'step 1';
 				if (result.bool) {
 					event.result = {
 						bool: true,
@@ -10354,7 +10354,7 @@ export class Library extends Uninstantable {
 				else event.result = { bool: false };
 			},
 			chooseToDuiben: function () {
-				'step 0'
+				'step 0';
 				if (!event.namelist) event.namelist = ['全军出击', '分兵围城', '奇袭粮道', '开城诱敌'];
 				game.broadcastAll(function (list) {
 					var list2 = ['db_atk1', 'db_atk2', 'db_def1', 'db_def2'];
@@ -10365,7 +10365,7 @@ export class Library extends Uninstantable {
 				}, event.namelist);
 				if (!event.title) event.title = '对策';
 				game.log(player, '向', target, '发起了', '#y' + event.title);
-				if (!event.ai) event.ai = function () { return 1 + Math.random() };
+				if (!event.ai) event.ai = function () { return 1 + Math.random(); };
 				if (_status.connectMode) {
 					player.chooseButtonOL([
 						[player, [event.title + '：请选择一种策略', [[['', '', 'db_def2'], ['', '', 'db_def1']], 'vcard']], true],
@@ -10377,10 +10377,10 @@ export class Library extends Uninstantable {
 						return {
 							bool: true,
 							links: [buttons.randomGet().link],
-						}
+						};
 					});
 				}
-				'step 1'
+				'step 1';
 				if (_status.connectMode) {
 					event.mes = result[player.playerid].links[0][2];
 					event.tes = result[target.playerid].links[0][2];
@@ -10389,12 +10389,12 @@ export class Library extends Uninstantable {
 				else {
 					player.chooseButton([event.title + '：请选择一种策略', [[['', '', 'db_def2'], ['', '', 'db_def1']], 'vcard']], true).ai = event.ai;
 				}
-				'step 2'
+				'step 2';
 				event.mes = result.links[0][2];
 				target.chooseButton([event.title + '：请选择一种策略', [[['', '', 'db_atk1'], ['', '', 'db_atk2']], 'vcard']], true).ai = event.ai;
-				'step 3'
+				'step 3';
 				event.tes = result.links[0][2];
-				'step 4'
+				'step 4';
 				game.broadcast(function () {
 					ui.arena.classList.add('thrownhighlight');
 				});
@@ -10404,7 +10404,7 @@ export class Library extends Uninstantable {
 				game.log(target, '选择的策略为', '#g' + get.translation(event.tes));
 				game.log(player, '选择的策略为', '#g' + get.translation(event.mes));
 				game.delay(0, 1500);
-				'step 5'
+				'step 5';
 				var mes = event.mes.slice(6);
 				var tes = event.tes.slice(6);
 				var str;
@@ -10433,7 +10433,7 @@ export class Library extends Uninstantable {
 				}, str);
 				game.trySkillAudio(event.getParent().name + '_' + (event.result.bool ? 'true' + mes : 'false'), player);
 				game.delay(2);
-				'step 6'
+				'step 6';
 				game.broadcastAll(function () {
 					ui.arena.classList.remove('thrownhighlight');
 				});
@@ -10443,37 +10443,37 @@ export class Library extends Uninstantable {
 				}
 			},
 			chooseToPSS: function () {
-				'step 0'
+				'step 0';
 				game.log(player, '对', target, '发起了猜拳');
 				if (_status.connectMode) {
 					player.chooseButtonOL([
 						[player, ['猜拳：请选择一种手势', [[['', '', 'pss_stone'], ['', '', 'pss_scissor'], ['', '', 'pss_paper']], 'vcard']], true],
 						[target, ['猜拳：请选择一种手势', [[['', '', 'pss_stone'], ['', '', 'pss_scissor'], ['', '', 'pss_paper']], 'vcard']], true]
-					], function () { }, function () { return 1 + Math.random() }).set('switchToAuto', function () {
+					], function () { }, function () { return 1 + Math.random(); }).set('switchToAuto', function () {
 						_status.event.result = 'ai';
 					}).set('processAI', function () {
 						var buttons = _status.event.dialog.buttons;
 						return {
 							bool: true,
 							links: [buttons.randomGet().link],
-						}
+						};
 					});
 				}
-				'step 1'
+				'step 1';
 				if (_status.connectMode) {
 					event.mes = result[player.playerid].links[0][2];
 					event.tes = result[target.playerid].links[0][2];
 					event.goto(4);
 				}
 				else {
-					player.chooseButton(['猜拳：请选择一种手势', [[['', '', 'pss_stone'], ['', '', 'pss_scissor'], ['', '', 'pss_paper']], 'vcard']], true).ai = function () { return 1 + Math.random() };
+					player.chooseButton(['猜拳：请选择一种手势', [[['', '', 'pss_stone'], ['', '', 'pss_scissor'], ['', '', 'pss_paper']], 'vcard']], true).ai = function () { return 1 + Math.random(); };
 				}
-				'step 2'
+				'step 2';
 				event.mes = result.links[0][2];
-				target.chooseButton(['猜拳：请选择一种手势', [[['', '', 'pss_stone'], ['', '', 'pss_scissor'], ['', '', 'pss_paper']], 'vcard']], true).ai = function () { return 1 + Math.random() };
-				'step 3'
+				target.chooseButton(['猜拳：请选择一种手势', [[['', '', 'pss_stone'], ['', '', 'pss_scissor'], ['', '', 'pss_paper']], 'vcard']], true).ai = function () { return 1 + Math.random(); };
+				'step 3';
 				event.tes = result.links[0][2];
-				'step 4'
+				'step 4';
 				game.broadcast(function () {
 					ui.arena.classList.add('thrownhighlight');
 				});
@@ -10483,7 +10483,7 @@ export class Library extends Uninstantable {
 				game.log(player, '选择的手势为', '#g' + get.translation(event.mes));
 				game.log(target, '选择的手势为', '#g' + get.translation(event.tes));
 				game.delay(0, 1500);
-				'step 5'
+				'step 5';
 				var mes = event.mes.slice(4);
 				var tes = event.tes.slice(4);
 				var str;
@@ -10518,7 +10518,7 @@ export class Library extends Uninstantable {
 					}, 1000);
 				}, str);
 				game.delay(2);
-				'step 6'
+				'step 6';
 				game.broadcastAll(function () {
 					ui.arena.classList.remove('thrownhighlight');
 				});
@@ -10595,7 +10595,7 @@ export class Library extends Uninstantable {
 			},
 			cardsGotoPile: function () {
 				if (event.washCard) {
-					event.trigger('washCard')
+					event.trigger('washCard');
 					for (var i = 0; i < lib.onwash.length; i++) {
 						if (lib.onwash[i]() == 'remove') {
 							lib.onwash.splice(i--, 1);
@@ -10606,7 +10606,7 @@ export class Library extends Uninstantable {
 				if (!event._triggeronly) game.$cardsGotoPile(event);
 			},
 			chooseToEnable: function () {
-				'step 0'
+				'step 0';
 				var list = [];
 				for (var i = 1; i <= 5; i++) {
 					if (player.hasDisabledSlot(i)) list.push('equip' + i);
@@ -10621,18 +10621,18 @@ export class Library extends Uninstantable {
 					next.set('prompt', '请选择恢复一个装备栏');
 					if (!event.ai) event.ai = function (event, player, list) {
 						return list.randomGet();
-					}
+					};
 					event.ai = event.ai(event.getParent(), player, list);
 					next.ai = function () {
 						return event.ai;
 					};
 				}
-				'step 1'
+				'step 1';
 				event.result = { control: result.control };
 				player.enableEquip(result.control);
 			},
 			chooseToDisable: function () {
-				'step 0'
+				'step 0';
 				var list = [];
 				for (var i = 1; i <= 5; i++) {
 					if (player.hasEnabledSlot(i)) list.push('equip' + i);
@@ -10654,13 +10654,13 @@ export class Library extends Uninstantable {
 					next.set('prompt', '请选择废除一个装备栏');
 					if (!event.ai) event.ai = function (event, player, list) {
 						return list.randomGet();
-					}
+					};
 					event.ai = event.ai(event.getParent(), player, list);
 					next.ai = function () {
 						return event.ai;
 					};
 				}
-				'step 1'
+				'step 1';
 				event.result = { control: result.control };
 				if (result.control == 'equip3_4') {
 					player.disableEquip(3, 4);
@@ -10668,8 +10668,8 @@ export class Library extends Uninstantable {
 				else player.disableEquip(result.control);
 			},
 			swapEquip: function () {
-				"step 0"
-				game.log(player, '和', target, '交换了装备区中的牌')
+				"step 0";
+				game.log(player, '和', target, '交换了装备区中的牌');
 				event.cards = [player.getCards('e'), target.getCards('e')];
 				game.loseAsync({
 					player: player,
@@ -10677,7 +10677,7 @@ export class Library extends Uninstantable {
 					cards1: event.cards[0],
 					cards2: event.cards[1],
 				}).setContent('swapHandcardsx');
-				"step 1"
+				"step 1";
 				for (var i = 0; i < event.cards[1].length; i++) {
 					if (get.position(event.cards[1][i], true) == 'o') player.equip(event.cards[1][i]);
 				}
@@ -10686,13 +10686,13 @@ export class Library extends Uninstantable {
 				}
 			},
 			disableJudge: function () {
-				'step 0'
+				'step 0';
 				game.log(player, '废除了判定区');
 				var js = player.getCards('j');
 				if (js.length) player.discard(js);
 				player.storage._disableJudge = true;
 				//player.markSkill('_disableJudge');
-				'step 1'
+				'step 1';
 				game.broadcastAll(function (player, card) {
 					player.$disableJudge();
 				}, player);
@@ -10706,7 +10706,7 @@ export class Library extends Uninstantable {
 			},
 			/*----分界线----*/
 			phasing: function () {
-				'step 0'
+				'step 0';
 				while (ui.dialogs.length) {
 					ui.dialogs[0].close();
 				}
@@ -10754,11 +10754,11 @@ export class Library extends Uninstantable {
 					game.addVideo('destroyLand');
 					ui.land.destroy();
 				}
-				'step 1'
+				'step 1';
 				event.trigger('phaseBeginStart');
 			},
 			toggleSubPlayer: function () {
-				'step 0'
+				'step 0';
 				var list = event.list || player.storage.subplayer.skills.slice(0);
 				list.remove(player.storage.subplayer.name2);
 				event.list = list;
@@ -10780,7 +10780,7 @@ export class Library extends Uninstantable {
 						event.finish();
 					}
 				}
-				'step 1'
+				'step 1';
 				if (!event.directresult) {
 					if (result && result.bool && result.links[0]) {
 						event.directresult = result.links[0];
@@ -10813,7 +10813,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			exitSubPlayer: function () {
-				'step 0'
+				'step 0';
 				if (player.storage.subplayer) {
 					var current = player.storage.subplayer.name2;
 					if (event.remove) {
@@ -10844,19 +10844,19 @@ export class Library extends Uninstantable {
 					}
 					player.addSkill(player.storage.subplayer.skills);
 				}
-				'step 1'
+				'step 1';
 				if (player.storage.subplayer) {
 					player.directgain(player.storage.subplayer.hs);
 					player.directequip(player.storage.subplayer.es);
 				}
 				player.removeSkill('subplayer');
-				'step 2'
+				'step 2';
 				if (event.remove) {
 					event.trigger('subPlayerDie');
 				}
 			},
 			callSubPlayer: function () {
-				'step 0'
+				'step 0';
 				var list = player.getSubPlayers(event.tag);
 				event.list = list;
 				if (!event.directresult) {
@@ -10877,7 +10877,7 @@ export class Library extends Uninstantable {
 						event.finish();
 					}
 				}
-				'step 1'
+				'step 1';
 				if (!event.directresult) {
 					if (result && result.bool && result.links[0]) {
 						event.directresult = result.links[0];
@@ -10901,7 +10901,7 @@ export class Library extends Uninstantable {
 						hs: player.getCards('h'),
 						es: player.getCards('e'),
 						intro2: cfg.intro2
-					}
+					};
 					player.removeSkill(event.list);
 					player.reinit(source, name, [cfg.hp, cfg.maxHp]);
 					player.addSkill('subplayer');
@@ -10909,24 +10909,24 @@ export class Library extends Uninstantable {
 					if (cfg.hs.length) player.directgain(cfg.hs);
 					if (cfg.es.length) player.directequip(cfg.es);
 				}
-				'step 2'
+				'step 2';
 				game.delay();
 			},
 			addExtraTarget: function () {
-				"step 0"
+				"step 0";
 				event.num = 0;
-				"step 1"
+				"step 1";
 				var target = targets[num], info = get.info(card);
 				if (target == event.target && event.addedTarget) {
 					event.addedTargets[num] = event.addedTarget;
 					event._result = { bool: false };
 				}
 				else if (game.hasPlayer(function (current) {
-					return info.filterAddedTarget(card, player, current, target)
+					return info.filterAddedTarget(card, player, current, target);
 				})) {
 					var next = player.chooseTarget(get.translation(event.card) + '：选择' + get.translation(targets[num]) + '对应的指向目标', function (card, player, target) {
 						var card = get.card(), info = get.info(card);
-						return info.filterAddedTarget(card, player, target, _status.event.preTarget)
+						return info.filterAddedTarget(card, player, target, _status.event.preTarget);
 					}, true);
 					next.set('_get_card', card);
 					next.set('preTarget', targets[num]);
@@ -10936,7 +10936,7 @@ export class Library extends Uninstantable {
 					event.addedTargets[num] = false;
 					event._result = { bool: false };
 				}
-				"step 2"
+				"step 2";
 				if (result.bool) {
 					event.addedTargets[num] = result.targets[0];
 					player.line2([targets[num], result.targets[0]]);
@@ -10945,9 +10945,9 @@ export class Library extends Uninstantable {
 				if (event.num < targets.length) event.goto(1);
 			},
 			reverseOrder: function () {
-				"step 0"
+				"step 0";
 				game.delay();
-				"step 1"
+				"step 1";
 				var choice;
 				if (get.tag(card, 'multineg')) {
 					choice = (player.previous.side == player.side) ? '逆时针' : '顺时针';
@@ -10958,7 +10958,7 @@ export class Library extends Uninstantable {
 				player.chooseControl('顺时针', '逆时针', function (event, player) {
 					return _status.event.choice || '逆时针';
 				}).set('prompt', '选择' + get.translation(card) + '的结算方向').set('choice', choice).set('forceDie', true);
-				"step 2"
+				"step 2";
 				if (result && result.control == '顺时针') {
 					var evt = event.getParent(), sorter = (_status.currentPhase || player);
 					evt.fixedSeat = true;
@@ -10976,7 +10976,7 @@ export class Library extends Uninstantable {
 				if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
 			},
 			gameDraw: function () {
-				"step 0"
+				"step 0";
 				if (_status.brawl && _status.brawl.noGameDraw) {
 					event.finish();
 					return;
@@ -11000,19 +11000,19 @@ export class Library extends Uninstantable {
 				if (_status.connectMode || (lib.config.mode == 'doudizhu' && _status.mode == 'online') || lib.config.mode != 'identity' && lib.config.mode != 'guozhan' && lib.config.mode != 'doudizhu') {
 					event.changeCard = 'disabled';
 				}
-				"step 1"
+				"step 1";
 				if (event.changeCard != 'disabled' && !_status.auto) {
 					event.dialog = ui.create.dialog('是否使用手气卡？');
 					ui.create.confirm('oc');
 					event.custom.replace.confirm = function (bool) {
 						_status.event.bool = bool;
 						game.resume();
-					}
+					};
 				}
 				else {
 					event.finish();
 				}
-				"step 2"
+				"step 2";
 				if (event.changeCard == 'once') {
 					event.changeCard = 'disabled';
 				}
@@ -11027,9 +11027,9 @@ export class Library extends Uninstantable {
 				event.switchToAuto = function () {
 					_status.event.bool = false;
 					game.resume();
-				}
+				};
 				game.pause();
-				"step 3"
+				"step 3";
 				_status.imchoosing = false;
 				if (event.bool) {
 					if (game.changeCoin) {
@@ -11051,19 +11051,19 @@ export class Library extends Uninstantable {
 				}
 			},
 			phaseLoop: function () {
-				"step 0"
+				"step 0";
 				var num = 1, current = player;
 				while (current.getSeatNum() == 0) {
 					current.setSeatNum(num);
 					current = current.next;
 					num++;
 				}
-				"step 1"
+				"step 1";
 				for (var i = 0; i < lib.onphase.length; i++) {
 					lib.onphase[i]();
 				}
 				player.phase();
-				"step 2"
+				"step 2";
 				if (!game.players.contains(event.player.next)) {
 					event.player = game.findNext(event.player.next);
 				}
@@ -11073,7 +11073,7 @@ export class Library extends Uninstantable {
 				event.goto(1);
 			},
 			loadPackage: function () {
-				'step 0'
+				'step 0';
 				if (event.packages.length) {
 					window.game = game;
 					var pack = event.packages.shift().split('/');
@@ -11083,7 +11083,7 @@ export class Library extends Uninstantable {
 				else {
 					event.finish();
 				}
-				'step 1'
+				'step 1';
 				if (!lib.config.dev) delete window.game;
 				var character = lib.imported.character;
 				var card = lib.imported.card;
@@ -11177,24 +11177,24 @@ export class Library extends Uninstantable {
 				event.goto(0);
 			},
 			loadMode: function () {
-				'step 0'
+				'step 0';
 				window.game = game;
 				lib.init.js(lib.assetURL + 'mode', event.mode, game.resume);
 				game.pause();
-				'step 1'
+				'step 1';
 				if (!lib.config.dev) delete window.game;
 				event.result = lib.imported.mode[event.mode];
 				delete lib.imported.mode[event.mode];
 			},
 			forceOver: function () {
-				'step 0'
+				'step 0';
 				while (ui.controls.length) {
 					ui.controls[0].close();
 				}
 				while (ui.dialogs.length) {
 					ui.dialogs[0].close();
 				}
-				'step 1'
+				'step 1';
 				if (event.bool != 'noover') {
 					game.over(event.bool);
 				}
@@ -11203,7 +11203,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			arrangeTrigger: function () {
-				'step 0'
+				'step 0';
 				event.doing = event.doingList[0];
 				if (event.doing && event.doing.todoList.length) return;
 				if (event.doingList.length) {
@@ -11211,7 +11211,7 @@ export class Library extends Uninstantable {
 					return event.redo();
 				}
 				event.finish();
-				'step 1'
+				'step 1';
 				if (trigger.filterStop && trigger.filterStop()) return event.finish();
 				event.current = event.doing.todoList.find(info => lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill));
 				if (!event.current) {
@@ -11229,15 +11229,15 @@ export class Library extends Uninstantable {
 					return lib.skill.global.includes(info.skill) || event.current.player.hasSkill(info.skill, true);
 				});
 				if (event.choice.length < 2) return event.goto(4);
-				'step 2'
+				'step 2';
 				const next = event.choice[0].player.chooseControl(event.choice.map(i => i.skill));
 				next.set('prompt', '选择下一个触发的技能');
 				next.set('forceDie', true);
 				next.set('arrangeSkill', true);
 				next.set('includeOut', true);
-				'step 3'
+				'step 3';
 				if (result.control) event.current = event.doing.todoList.find(info => info.skill == result.control && info.player == event.choice[0].player);
-				'step 4'
+				'step 4';
 				if (!event.current || !event.doing.todoList.includes(event.current)) return;
 				event.doing.doneList.push(event.current);
 				event.doing.todoList.remove(event.current);
@@ -11245,7 +11245,7 @@ export class Library extends Uninstantable {
 				event.goto(0);
 			},
 			createTrigger: function () {
-				"step 0"
+				"step 0";
 				// console.log('triggering: ' + player.name+ ' \'s skill: ' + event.skill+' in ' + event.triggername)
 				if (game.expandSkills(player.getSkills().concat(lib.skill.global)).includes(event.skill)) return;
 				var info = get.info(event.skill);
@@ -11263,7 +11263,7 @@ export class Library extends Uninstantable {
 					if (i.startsWith('hidden:')) return true;
 					return !game.expandSkills(player.additionalSkills[i]).includes(event.skill);
 				})) event.finish();
-				"step 1"
+				"step 1";
 				if (event.cancelled) return event.finish();
 				var info = get.info(event.skill);
 				if (event.revealed || info.forced) return;
@@ -11273,7 +11273,7 @@ export class Library extends Uninstantable {
 					if (typeof info.frequent == 'function') return info.frequent(trigger, player);
 					if (info.frequent == 'check' && typeof info.check == 'function') return info.check(trigger, player);
 					return false;
-				}
+				};
 				if (info.direct) {
 					if (player.isUnderControl()) game.swapPlayerAuto(player);
 					if (player.isOnline()) void 0;
@@ -11311,7 +11311,7 @@ export class Library extends Uninstantable {
 						else next.set('prompt2', trigger.skillwarn);
 					}
 				}
-				"step 2"
+				"step 2";
 				var info = get.info(event.skill);
 				if (!result || !result.bool) return;
 				var autodelay = info.autodelay;
@@ -11320,7 +11320,7 @@ export class Library extends Uninstantable {
 					if (typeof autodelay == 'number') game.delayx(autodelay);
 					else game.delayx();
 				}
-				"step 3"
+				"step 3";
 				var info = get.info(event.skill);
 				if (result && result.bool == false) {
 					if (info.oncancel) info.oncancel(trigger, player);
@@ -11349,7 +11349,7 @@ export class Library extends Uninstantable {
 				next.skillHidden = event.skillHidden;
 				if (info.forceDie) next.forceDie = true;
 				if (info.forceOut) next.includeOut = true;
-				"step 4"
+				"step 4";
 				if (!player._hookTrigger) return;
 				if (player._hookTrigger.some(i => {
 					const info = lib.skill[i].hookTrigger;
@@ -11357,9 +11357,9 @@ export class Library extends Uninstantable {
 				})) event.trigger('triggerAfter');
 			},
 			playVideoContent: function () {
-				'step 0'
+				'step 0';
 				game.delay(0, 500);
-				'step 1'
+				'step 1';
 				if (!game.chess) {
 					ui.control.innerHTML = '';
 					var nodes = [];
@@ -11420,7 +11420,7 @@ export class Library extends Uninstantable {
 					else {
 						fast.classList.remove('glow');
 					}
-				}
+				};
 				ui.system.style.display = '';
 				ui.refresh(ui.system);
 				ui.system.show();
@@ -11434,7 +11434,7 @@ export class Library extends Uninstantable {
 					game.playerMap = {};
 				}
 				game.finishCards();
-				'step 2'
+				'step 2';
 				if (event.video.length) {
 					var content = event.video.shift();
 					// console.log(content);
@@ -11451,7 +11451,7 @@ export class Library extends Uninstantable {
 						}
 						var script = lib.init.js(lib.assetURL + 'play', content.name);
 						script.addEventListener('load', function () {
-							var play = window.play[content.name]
+							var play = window.play[content.name];
 							if (play && play.video) {
 								play.video(content.init);
 							}
@@ -11483,7 +11483,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			waitForPlayer: function () {
-				'step 0'
+				'step 0';
 				ui.auto.hide();
 				ui.pause.hide();
 
@@ -11514,7 +11514,7 @@ export class Library extends Uninstantable {
 					document.querySelector('#server_status').innerHTML = '等待中';
 				}
 				game.pause();
-				'step 1'
+				'step 1';
 				_status.waitingForPlayer = false;
 				lib.configOL.gameStarted = true;
 				if (window.isNonameServer) {
@@ -11544,16 +11544,16 @@ export class Library extends Uninstantable {
 				}
 			},
 			replaceHandcards: function () {
-				'step 0'
+				'step 0';
 				if (event.players.contains(game.me)) {
 					game.me.chooseBool('是否置换手牌？');
 				}
 				else {
 					event.finish();
 				}
-				'step 1'
+				'step 1';
 				if (result && result.bool) {
-					var hs = game.me.getCards('h')
+					var hs = game.me.getCards('h');
 					for (var i = 0; i < hs.length; i++) {
 						hs[i].discard(false);
 					}
@@ -11563,14 +11563,14 @@ export class Library extends Uninstantable {
 				}
 			},
 			replaceHandcardsOL: function () {
-				'step 0'
+				'step 0';
 				var send = function () {
 					game.me.chooseBool('是否置换手牌？');
 					game.resume();
 				};
 				var sendback = function (result, player) {
 					if (result && result.bool) {
-						var hs = player.getCards('h')
+						var hs = player.getCards('h');
 						game.broadcastAll(function (player, hs) {
 							game.addVideo('lose', player, [get.cardsInfo(hs), [], [], []]);
 							for (var i = 0; i < hs.length; i++) {
@@ -11594,17 +11594,237 @@ export class Library extends Uninstantable {
 						game.me.wait(sendback);
 					}
 				}
-				'step 1'
+				'step 1';
 				if (event.withme) {
 					game.me.unwait(result);
 				}
-				'step 2'
+				'step 2';
 				if (event.withol && !event.resultOL) {
 					game.pause();
 				}
 			},
-			phase: function () {
-				'step 0'
+			phase: [
+				async (event, _trigger, player) => {
+					// 初始化阶段列表
+					if (!event.phaseList) {
+						event.phaseList = ['phaseZhunbei', 'phaseJudge', 'phaseDraw', 'phaseUse', 'phaseDiscard', 'phaseJieshu'];
+					}
+
+					if (typeof event.num != 'number') {
+						event.num = 0;
+					}
+
+					// 规则集中的“回合开始后①”，更新游戏轮数，触发“一轮游戏开始时”
+					let isRound = false;
+					if (!event.skill) {
+						isRound = _status.roundSkipped;
+						if (_status.isRoundFilter) {
+							isRound = _status.isRoundFilter(event, player);
+						}
+						else if (_status.seatNumSettled) {
+							var seatNum = player.getSeatNum();
+							if (seatNum != 0) {
+								if (get.itemtype(_status.lastPhasedPlayer) != 'player' || seatNum < _status.lastPhasedPlayer.getSeatNum()) isRound = true;
+								_status.lastPhasedPlayer = player;
+							}
+						}
+						else if (player == _status.roundStart) isRound = true;
+						if (isRound) {
+							delete _status.roundSkipped;
+							game.roundNumber++;
+							event._roundStart = true;
+							game.updateRoundNumber();
+							for (var i = 0; i < game.players.length; i++) {
+								if (game.players[i].isOut() && game.players[i].outCount > 0) {
+									game.players[i].outCount--;
+									if (game.players[i].outCount == 0 && !game.players[i].outSkills) {
+										game.players[i].in();
+									}
+								}
+							}
+							event.trigger('roundStart');
+						}
+					}
+
+					_status.globalHistory.push({
+						cardMove: [],
+						custom: [],
+						useCard: [],
+						changeHp: [],
+						everything: [],
+					});
+
+					const players = game.players.slice(0).concat(game.dead);
+					for (const current of players) {
+						current.actionHistory.push({ useCard: [], respond: [], skipped: [], lose: [], gain: [], sourceDamage: [], damage: [], custom: [], useSkill: [] });
+						current.stat.push({ card: {}, skill: {} });
+						if (isRound) {
+							current.getHistory().isRound = true;
+							current.getStat().isRound = true;
+						}
+					}
+
+					if (isRound) {
+						game.getGlobalHistory().isRound = true;
+					}
+				},
+				async (event) => {
+					//规则集中的“回合开始后②（1v1武将登场专用）”
+					event.trigger('phaseBeforeStart');
+				},
+				async (event) => {
+					//规则集中的“回合开始后③（处理“游戏开始时”的时机）”
+					event.trigger('phaseBefore');
+				},
+				async (event) => {
+					//规则集中的“回合开始后④（卑弥呼〖纵傀〗的时机）”
+					event.trigger('phaseBeforeEnd');
+				},
+				async (event, _trigger, player) => {
+					//规则集中的“回合开始后⑤”，进行翻面检测
+					if (player.isTurnedOver() && !event._noTurnOver) {
+						event.cancel();
+						player.turnOver();
+						player.phaseSkipped = true;
+					}
+					else {
+						player.phaseSkipped = false;
+						player.getHistory().isMe = true;
+						player.getStat().isMe = true;
+					}
+				},
+				async (event, _trigger, player) => {
+					// 规则集中的“回合开始后⑥”，更新“当前回合角色”
+					while (ui.dialogs.length) {
+						ui.dialogs[0].close();
+					}
+
+					++game.phaseNumber;
+					++player.phaseNumber;
+
+					game.broadcastAll((player, num, popup) => {
+						if (lib.config.glow_phase) {
+							player.classList.add('glow_phase');
+						}
+						player.phaseNumber = num;
+						_status.currentPhase = player;
+						if (popup && lib.config.show_phase_prompt) player.popup('回合开始', null, false);
+					}, player, player.phaseNumber, !player.noPhaseDelay);
+
+					_status.currentPhase = player;
+					_status.discarded = [];
+
+					game.syncState();
+					game.addVideo('phaseChange', player);
+
+					if (game.phaseNumber == 1) {
+						delete player._start_cards;
+						if (lib.configOL.observe) {
+							lib.configOL.observeReady = true;
+							game.send('server', 'config', lib.configOL);
+						}
+					}
+
+					game.log();
+					game.log(player, '的回合开始');
+					player._noVibrate = true;
+
+					if (get.config('identity_mode') != 'zhong' && get.config('identity_mode') != 'purple' && !_status.connectMode) {
+						let num;
+						switch (get.config('auto_identity')) {
+							case 'one': num = 1; break;
+							case 'two': num = 2; break;
+							case 'three': num = 3; break;
+							case 'always': num = -1; break;
+							default: num = 0; break;
+						}
+						if (num && !_status.identityShown && game.phaseNumber > game.players.length * num && game.showIdentity) {
+							if (!_status.video) player.popup('显示身份');
+							_status.identityShown = true;
+							game.showIdentity(false);
+						}
+					}
+					player.ai.tempIgnore = [];
+					if (ui.land && ui.land.player == player) {
+						game.addVideo('destroyLand');
+						ui.land.destroy();
+					}
+				},
+				async (event) => {
+					//规则集中的“回合开始后⑦”，国战武将明置武将牌
+					event.trigger('phaseBeginStart');
+				},
+				async (event) => {
+					//规则集中的“回合开始后⑨”，进行当先，化身等操作
+					//没有⑧ 因为⑧用不到
+					event.trigger('phaseBegin');
+				},
+				async (event, _trigger, player) => {
+					if (event.num < event.phaseList.length) {
+						//规则集中没有的新时机 可以用来插入额外阶段啥的
+						if (player.isIn()) event.trigger('phaseChange');
+					}
+					else event.goto(11);
+				},
+				async (event, _trigger, player) => {
+					if (player.isIn() && event.num < event.phaseList.length) {
+						const phase = event.phaseList[event.num].split('|');
+						event.currentPhase = phase[0];
+						const next = player[event.currentPhase]();
+						next.phaseIndex = event.num;
+						if (phase.length > 1) {
+							next._extraPhaseReason = phase[1];
+						}
+						if (event.currentPhase == 'phaseDraw' || event.currentPhase == 'phaseDiscard') {
+							if (!player.noPhaseDelay) {
+								if (player == game.me) {
+									game.delay();
+								}
+								else {
+									game.delayx();
+								}
+							}
+						}
+					}
+				},
+				async (event, _trigger, player) => {
+					if (event.currentPhase == 'phaseUse') {
+						game.broadcastAll(() => {
+							if (ui.tempnowuxie) {
+								ui.tempnowuxie.close();
+								delete ui.tempnowuxie;
+							}
+						});
+						delete player._noSkill;
+					}
+					++event.num;
+				},
+				async (event) => {
+					if (event.num < event.phaseList.length) {
+						event.goto(8);
+					}
+					else if (!event._phaseEndTriggered) {
+						event._phaseEndTriggered = true;
+						event.trigger('phaseEnd');
+						event.redo();
+					}
+				},
+				async (event) => {
+					event.trigger('phaseAfter');
+				},
+				async ({ player }) => {
+					//删除当前回合角色 此时处于“不属于任何角色的回合”的阶段
+					game.broadcastAll((player) => {
+						player.classList.remove('glow_phase');
+						delete _status.currentPhase;
+					}, player);
+				}
+			],
+			/**
+			 * @deprecated
+			 */
+			phase_old2: function () {
+				'step 0';
 				//初始化阶段列表
 				if (!event.phaseList) {
 					event.phaseList = ['phaseZhunbei', 'phaseJudge', 'phaseDraw', 'phaseUse', 'phaseDiscard', 'phaseJieshu'];
@@ -11663,16 +11883,16 @@ export class Library extends Uninstantable {
 				if (isRound) {
 					game.getGlobalHistory().isRound = true;
 				}
-				'step 1'
+				'step 1';
 				//规则集中的“回合开始后②（1v1武将登场专用）”
 				event.trigger('phaseBeforeStart');
-				'step 2'
+				'step 2';
 				//规则集中的“回合开始后③（处理“游戏开始时”的时机）”
 				event.trigger('phaseBefore');
-				'step 3'
+				'step 3';
 				//规则集中的“回合开始后④（卑弥呼〖纵傀〗的时机）”
 				event.trigger('phaseBeforeEnd');
-				'step 4'
+				'step 4';
 				//规则集中的“回合开始后⑤”，进行翻面检测
 				if (player.isTurnedOver() && !event._noTurnOver) {
 					event.cancel();
@@ -11684,7 +11904,7 @@ export class Library extends Uninstantable {
 					player.getHistory().isMe = true;
 					player.getStat().isMe = true;
 				}
-				'step 5'
+				'step 5';
 				//规则集中的“回合开始后⑥”，更新“当前回合角色”
 				while (ui.dialogs.length) {
 					ui.dialogs[0].close();
@@ -11733,21 +11953,21 @@ export class Library extends Uninstantable {
 					game.addVideo('destroyLand');
 					ui.land.destroy();
 				}
-				'step 6'
+				'step 6';
 				//规则集中的“回合开始后⑦”，国战武将明置武将牌
 				event.trigger('phaseBeginStart');
-				'step 7'
+				'step 7';
 				//规则集中的“回合开始后⑨”，进行当先，化身等操作
 				//没有⑧ 因为⑧用不到
 				event.trigger('phaseBegin');
 				//阶段部分
-				'step 8'
+				'step 8';
 				if (num < event.phaseList.length) {
 					//规则集中没有的新时机 可以用来插入额外阶段啥的
-					if (player.isIn()) event.trigger('phaseChange')
+					if (player.isIn()) event.trigger('phaseChange');
 				}
 				else event.goto(11);
-				'step 9'
+				'step 9';
 				if (player.isIn() && num < event.phaseList.length) {
 					var phase = event.phaseList[num].split('|');
 					event.currentPhase = phase[0];
@@ -11767,7 +11987,7 @@ export class Library extends Uninstantable {
 						}
 					}
 				}
-				'step 10'
+				'step 10';
 				if (event.currentPhase == 'phaseUse') {
 					game.broadcastAll(function () {
 						if (ui.tempnowuxie) {
@@ -11778,7 +11998,7 @@ export class Library extends Uninstantable {
 					delete player._noSkill;
 				}
 				event.num++;
-				'step 11'
+				'step 11';
 				if (event.num < event.phaseList.length) {
 					event.goto(8);
 				}
@@ -11787,9 +12007,9 @@ export class Library extends Uninstantable {
 					event.trigger('phaseEnd');
 					event.redo();
 				}
-				'step 12'
+				'step 12';
 				event.trigger('phaseAfter');
-				'step 13'
+				'step 13';
 				//删除当前回合角色 此时处于“不属于任何角色的回合”的阶段
 				game.broadcastAll(function (player) {
 					player.classList.remove('glow_phase');
@@ -11800,11 +12020,11 @@ export class Library extends Uninstantable {
 			 * @deprecated
 			 */
 			phase_old: function () {
-				"step 0"
+				"step 0";
 				player.phaseZhunbei();
-				"step 1"
+				"step 1";
 				player.phaseJudge();
-				"step 2"
+				"step 2";
 				player.phaseDraw();
 				if (!player.noPhaseDelay) {
 					if (player == game.me) {
@@ -11814,20 +12034,20 @@ export class Library extends Uninstantable {
 						game.delayx();
 					}
 				}
-				"step 3"
+				"step 3";
 				player.phaseUse();
-				"step 4"
+				"step 4";
 				game.broadcastAll(function () {
 					if (ui.tempnowuxie) {
 						ui.tempnowuxie.close();
 						delete ui.tempnowuxie;
 					}
 				});
-				player.phaseDiscard()
+				player.phaseDiscard();
 				if (!player.noPhaseDelay) game.delayx();
 				//delete player.using;
 				delete player._noSkill;
-				"step 5"
+				"step 5";
 				player.phaseJieshu();
 			},
 			phaseZhunbei: function () {
@@ -11835,11 +12055,11 @@ export class Library extends Uninstantable {
 				game.log(player, '进入了准备阶段');
 			},
 			phaseJudge: function () {
-				"step 0"
+				"step 0";
 				game.log(player, '进入了判定阶段');
 				event.cards = player.getCards('j');
 				if (!event.cards.length) event.finish();
-				"step 1"
+				"step 1";
 				if (cards.length && player.getCards('j').contains(cards[0])) {
 					event.card = cards.shift();
 					if (event.card.classList.contains('removing')) {
@@ -11869,9 +12089,9 @@ export class Library extends Uninstantable {
 					}
 				}
 				else event.finish();
-				"step 2"
+				"step 2";
 				if (!event.cancelled && !event.nojudge) player.judge(event.card).set('type', 'phase');
-				"step 3"
+				"step 3";
 				var name = event.card.viewAs || event.card.name;
 				if (event.excluded) {
 					delete event.excluded;
@@ -11899,12 +12119,12 @@ export class Library extends Uninstantable {
 				event.goto(1);
 			},
 			phaseDraw: function () {
-				"step 0"
+				"step 0";
 				game.log(player, '进入了摸牌阶段');
 				event.trigger("phaseDrawBegin1");
-				"step 1"
+				"step 1";
 				event.trigger("phaseDrawBegin2");
-				"step 2"
+				"step 2";
 				if (game.modPhaseDraw) {
 					game.modPhaseDraw(player, event.num);
 				}
@@ -11923,13 +12143,13 @@ export class Library extends Uninstantable {
 						}
 					}
 				}
-				"step 3"
+				"step 3";
 				if (Array.isArray(result)) {
 					event.cards = result;
 				}
 			},
 			phaseUse: function () {
-				"step 0"
+				"step 0";
 				if (!event.logged) {
 					game.log(player, '进入了出牌阶段');
 					event.logged = true;
@@ -11939,7 +12159,7 @@ export class Library extends Uninstantable {
 					next.set('prompt', false);
 				}
 				next.set('type', 'phase');
-				"step 1"
+				"step 1";
 				if (result.bool && !event.skipped) {
 					event.goto(0);
 				}
@@ -11949,7 +12169,7 @@ export class Library extends Uninstantable {
 						delete ui.tempnowuxie;
 					}
 				});
-				"step 2"
+				"step 2";
 				var stat = player.getStat();
 				for (var i in stat.skill) {
 					var bool = false;
@@ -11969,7 +12189,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			phaseDiscard: function () {
-				"step 0"
+				"step 0";
 				game.log(player, '进入了弃牌阶段');
 				event.num = player.needsToDiscard();
 				if (event.num <= 0) event.finish();
@@ -11981,10 +12201,10 @@ export class Library extends Uninstantable {
 					}, player);
 				}
 				event.trigger('phaseDiscard');
-				"step 1"
+				"step 1";
 				player.chooseToDiscard(num, true)
 					.set('useCache', true);
-				"step 2"
+				"step 2";
 				event.cards = result.cards;
 			},
 			phaseJieshu: function () {
@@ -11992,7 +12212,7 @@ export class Library extends Uninstantable {
 				game.log(player, '进入了结束阶段');
 			},
 			chooseToUse: function () {
-				"step 0"
+				"step 0";
 				if (event.responded) return;
 				if (game.modeSwapPlayer && !_status.auto && player.isUnderControl() && !lib.filter.wuxieSwap(event)) {
 					game.modeSwapPlayer(player);
@@ -12029,7 +12249,7 @@ export class Library extends Uninstantable {
 				if (event.player.isUnderControl() && !_status.auto) {
 					event.result = {
 						bool: false
-					}
+					};
 					return;
 				}
 				else if (event.isMine()) {
@@ -12047,7 +12267,7 @@ export class Library extends Uninstantable {
 						if (lib.filter.wuxieSwap(event)) {
 							event.result = {
 								bool: false
-							}
+							};
 							return;
 						}
 					}
@@ -12078,7 +12298,7 @@ export class Library extends Uninstantable {
 							var str;
 							if (typeof event.filterCard == 'object') {
 								var filter = event.filterCard;
-								str = '请使用' + get.cnNumber(event.selectCard[0]) + '张'
+								str = '请使用' + get.cnNumber(event.selectCard[0]) + '张';
 								if (filter.name) {
 									str += get.translation(filter.name);
 								}
@@ -12109,7 +12329,7 @@ export class Library extends Uninstantable {
 				else {
 					event.result = 'ai';
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					var ok = game.check();
 					if (ok) {
@@ -12161,7 +12381,7 @@ export class Library extends Uninstantable {
 						game.delayx();
 					}
 				}
-				"step 2"
+				"step 2";
 				if (event.endButton) {
 					event.endButton.close();
 					delete event.endButton;
@@ -12206,7 +12426,7 @@ export class Library extends Uninstantable {
 						}
 					}
 				}
-				"step 3"
+				"step 3";
 				if (event.buttoned) {
 					if (result.bool || result.control && result.control != 'cancel2') {
 						var info = get.info(event.buttoned).chooseButton;
@@ -12233,7 +12453,7 @@ export class Library extends Uninstantable {
 					event.goto(0);
 					delete event.buttoned;
 				}
-				"step 4"
+				"step 4";
 				if (event._aiexcludeclear) {
 					delete event._aiexcludeclear;
 					event._aiexclude.length = 0;
@@ -12258,13 +12478,13 @@ export class Library extends Uninstantable {
 				if (!_status.noclearcountdown) {
 					game.stopCountChoose();
 				}
-				"step 5"
+				"step 5";
 				if (event._result && event.result) {
 					event.result.result = event._result;
 				}
 			},
 			chooseToRespond: function () {
-				"step 0"
+				"step 0";
 				if (event.responded) {
 					delete event.dialog;
 					return;
@@ -12311,7 +12531,7 @@ export class Library extends Uninstantable {
 						event.result = 'ai';
 					}
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					var ok = game.check();
 					if (ok) {
@@ -12363,7 +12583,7 @@ export class Library extends Uninstantable {
 						game.delayx();
 					}
 				}
-				"step 2"
+				"step 2";
 				event.resume();
 				if (event.result) {
 					if (event.result._sendskill) {
@@ -12400,7 +12620,7 @@ export class Library extends Uninstantable {
 						}
 					}
 				}
-				"step 3"
+				"step 3";
 				if (event.buttoned) {
 					if (result.bool || result.control && result.control != 'cancel2') {
 						var info = get.info(event.buttoned).chooseButton;
@@ -12427,7 +12647,7 @@ export class Library extends Uninstantable {
 					event.goto(0);
 					delete event.buttoned;
 				}
-				"step 4"
+				"step 4";
 				delete _status.noclearcountdown;
 				if (event.skillDialog && get.objtype(event.skillDialog) == 'div') {
 					event.skillDialog.close();
@@ -12478,7 +12698,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			chooseToGive: function () {
-				"step 0"
+				"step 0";
 				event.result = {
 					bool: true,
 					confirm: 'ok',
@@ -12486,13 +12706,13 @@ export class Library extends Uninstantable {
 					links: [],
 					cards: [],
 					targets: [],
-				}
+				};
 				event.filterCard = (event => {
 					const filterCard = event.filterCard;
 					return function (card, player) {
 						if (!lib.filter.canBeGained(card, this.target, player)) return false;
 						return filterCard.call(this, card, player);
-					}
+					};
 				})(event);
 				if (event.directresult) {
 					event.result.cards = event.directresult.slice(0);
@@ -12550,7 +12770,7 @@ export class Library extends Uninstantable {
 							event.custom.add.card = function () {
 								_status.event.promptbar.innerHTML =
 									ui.selected.cards.length + '/' + get.numStr(_status.event.selectCard[1], 'card');
-							}
+							};
 						}
 					}
 					else if (get.itemtype(event.dialog) == 'dialog') {
@@ -12564,7 +12784,7 @@ export class Library extends Uninstantable {
 				else {
 					event.result = 'ai';
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					game.check();
 					if ((ai.basic.chooseCard(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
@@ -12580,14 +12800,14 @@ export class Library extends Uninstantable {
 						ui.click.cancel();
 					}
 				}
-				"step 2"
+				"step 2";
 				event.resume();
 				if (event.aiChoose) event.aiChoose.close();
 				if (event.glow_result && event.result.cards && !event.directresult) {
 					event.result.cards.forEach(i => i.classList.add('glow'));
 				}
 				if (event.dialog) event.dialog.close();
-				"step 3"
+				"step 3";
 				if (event.result.bool && event.result.cards && !game.online) {
 					event.cards = event.result.cards.slice(0);
 					if (event.logSkill) {
@@ -12600,7 +12820,7 @@ export class Library extends Uninstantable {
 					}
 				}
 				else event.finish();
-				"step 4"
+				"step 4";
 				if (event.boolline) player.line(target, 'green');
 				event.done = target.gain(event.cards, player);
 				event.done.giver = player;
@@ -12611,14 +12831,14 @@ export class Library extends Uninstantable {
 				}
 			},
 			chooseToDiscard: function () {
-				"step 0"
+				"step 0";
 				if (event.autochoose()) {
 					event.result = {
 						bool: true,
 						autochoose: true,
 						cards: player.getCards(event.position),
 						rawcards: player.getCards(event.position),
-					}
+					};
 					for (var i = 0; i < event.result.cards.length; i++) {
 						if (!lib.filter.cardDiscardable(event.result.cards[i], player, event)) {
 							event.result.cards.splice(i--, 1);
@@ -12685,7 +12905,7 @@ export class Library extends Uninstantable {
 								event.custom.add.card = function () {
 									_status.event.promptbar.innerHTML =
 										ui.selected.cards.length + '/' + get.numStr(_status.event.selectCard[1], 'card');
-								}
+								};
 							}
 						}
 						else if (get.itemtype(event.dialog) == 'dialog') {
@@ -12700,7 +12920,7 @@ export class Library extends Uninstantable {
 						event.result = 'ai';
 					}
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					game.check();
 					if ((ai.basic.chooseCard(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
@@ -12722,12 +12942,12 @@ export class Library extends Uninstantable {
 						event.rangecards[i].recheck('chooseToDiscard');
 					}
 				}
-				"step 2"
+				"step 2";
 				event.resume();
 				if (event.promptdiscard) {
 					event.promptdiscard.close();
 				}
-				"step 3"
+				"step 3";
 				if (event.result.bool && event.result.cards && event.result.cards.length &&
 					!game.online && event.autodelay && !event.isMine()) {
 					if (typeof event.autodelay == 'number') {
@@ -12737,7 +12957,7 @@ export class Library extends Uninstantable {
 						game.delayx();
 					}
 				}
-				"step 4"
+				"step 4";
 				if (event.logSkill && event.result.bool && !game.online) {
 					if (typeof event.logSkill == 'string') {
 						player.logSkill(event.logSkill);
@@ -12758,14 +12978,14 @@ export class Library extends Uninstantable {
 				if (event.dialog && event.dialog.close) event.dialog.close();
 			},
 			gaincardMultiple: function () {
-				'step 0'
+				'step 0';
 				event.type = 'gain';
 				if (event.animate == 'give' || event.animate == 'gain2') event.visible = true;
 				if (player && cards) {
 					event._lose = true;
 					player.lose(cards, ui.special).set('type', 'gain').set('forceDie', true).set('getlx', false);
 				}
-				'step 1'
+				'step 1';
 				switch (event.animate) {
 					case 'draw':
 						game.delay(0, get.delayx(500, 500));
@@ -12774,7 +12994,7 @@ export class Library extends Uninstantable {
 							if (event._lose) {
 								i[1] = i[1].filter(card => {
 									return !cards.contains(card) || !player.getCards('hejsx').contains(card);
-								})
+								});
 							}
 							if (i[1].length > 0) i[0].$draw(i[1].length);
 						}
@@ -12786,7 +13006,7 @@ export class Library extends Uninstantable {
 							if (event._lose) {
 								i[1] = i[1].filter(card => {
 									return !cards.contains(card) || !player.getCards('hejsx').contains(card);
-								})
+								});
 							}
 							if (i[1].length > 0) i[0].$gain(i[1].length);
 						}
@@ -12798,7 +13018,7 @@ export class Library extends Uninstantable {
 							if (event._lose) {
 								i[1] = i[1].filter(card => {
 									return !cards.contains(card) || !player.getCards('hejsx').contains(card);
-								})
+								});
 							}
 							if (i[1].length > 0) i[0].$gain2(i[1]);
 						}
@@ -12812,7 +13032,7 @@ export class Library extends Uninstantable {
 							if (event._lose) {
 								i[1] = i[1].filter(card => {
 									return !cards.contains(card) || !player.getCards('hejsx').contains(card);
-								})
+								});
 							}
 							var shown = i[1].slice(0), hidden = [];
 							if (event.animate == 'giveAuto') {
@@ -12839,11 +13059,11 @@ export class Library extends Uninstantable {
 						if (event.gaintag) next.gaintag.addArray(event.gaintag);
 					}
 				}
-				'step 2'
+				'step 2';
 				game.delayx();
 			},
 			discardMultiple: function () {
-				'step 0'
+				'step 0';
 				event.type = 'discard';
 				event.visible = true;
 				if (!event.position) event.position = ui.discardPile;
@@ -12905,7 +13125,7 @@ export class Library extends Uninstantable {
 						}
 					}
 				}
-				'step 1'
+				'step 1';
 				if (event.delay != false) {
 					if (event.waitingForTransition) {
 						_status.waitingForTransition = event.waitingForTransition;
@@ -12924,15 +13144,15 @@ export class Library extends Uninstantable {
 				}
 			},
 			chooseToCompareMeanwhile: function () {
-				'step 0'
+				'step 0';
 				if (player.countCards('h') == 0) {
-					event.result = { cancelled: true, bool: false }
+					event.result = { cancelled: true, bool: false };
 					event.finish();
 					return;
 				}
 				for (var i = 0; i < targets.length; i++) {
 					if (targets[i].countCards('h') == 0) {
-						event.result = { cancelled: true, bool: false }
+						event.result = { cancelled: true, bool: false };
 						event.finish();
 						return;
 					}
@@ -12942,7 +13162,7 @@ export class Library extends Uninstantable {
 				}
 				game.log(player, '对', targets, '发起了共同拼点');
 				event.compareMeanwhile = true;
-				'step 1'
+				'step 1';
 				event._result = [];
 				event.list = targets.filter(function (current) {
 					return !event.fixedResult || !event.fixedResult[current.playerid];
@@ -12960,7 +13180,7 @@ export class Library extends Uninstantable {
 						return { bool: true, cards: [hs[0]] };
 					};
 				}
-				'step 2'
+				'step 2';
 				var cards = [];
 				var lose_list = [];
 				if (event.fixedResult && event.fixedResult[player.playerid]) {
@@ -12971,7 +13191,7 @@ export class Library extends Uninstantable {
 				else {
 					if (result[0].skill && lib.skill[result[0].skill] && lib.skill[result[0].skill].onCompare) {
 						player.logSkill(result[0].skill);
-						result[0].cards = lib.skill[result[0].skill].onCompare(player)
+						result[0].cards = lib.skill[result[0].skill].onCompare(player);
 					}
 					else lose_list.push([player, result[0].cards]);
 				}
@@ -13001,7 +13221,7 @@ export class Library extends Uninstantable {
 						if (i[1].contains && i[1].contains(card)) return get.number(card, i[0]);
 					}
 					return get.number(card, false);
-				}
+				};
 				event.cardlist = cards;
 				event.cards = cards;
 				event.card1 = result[0].cards[0];
@@ -13017,9 +13237,9 @@ export class Library extends Uninstantable {
 					num1: [],
 					num2: [],
 				};
-				'step 3'
+				'step 3';
 				event.trigger('compareCardShowBefore');
-				'step 4'
+				'step 4';
 				player.$compareMultiple(event.card1, targets, cards);
 				game.log(player, '的拼点牌为', event.card1);
 				event.cardlist.forEach((card, index) => {
@@ -13027,10 +13247,10 @@ export class Library extends Uninstantable {
 				});
 				player.animate('target');
 				game.delay(0, 1000);
-				'step 5'
+				'step 5';
 				event.target = null;
 				event.trigger('compare');
-				'step 6'
+				'step 6';
 				if (event.iwhile < targets.length) {
 					event.target = targets[event.iwhile];
 					event.target.animate('target');
@@ -13044,7 +13264,7 @@ export class Library extends Uninstantable {
 					game.delay(0, 1000);
 					event.goto(9);
 				}
-				'step 7'
+				'step 7';
 				event.result.num1[event.iwhile] = event.num1;
 				event.result.num2[event.iwhile] = event.num2;
 				var list = [[event.tempplayer, event.num1], [event.target, event.num2]];
@@ -13057,10 +13277,10 @@ export class Library extends Uninstantable {
 						event.winner = null;
 					}
 				}
-				'step 8'
+				'step 8';
 				event.iwhile++;
 				event.goto(6);
-				'step 9'
+				'step 9';
 				var player = event.tempplayer;
 				event.player = player;
 				delete event.tempplayer;
@@ -13086,21 +13306,21 @@ export class Library extends Uninstantable {
 					}, str);
 				}
 				game.delay(3);
-				'step 10'
+				'step 10';
 				game.broadcastAll(ui.clear);
-				'step 11'
+				'step 11';
 				event.cards.add(event.card1);
 			},
 			chooseToCompareMultiple: function () {
-				"step 0"
+				"step 0";
 				if (player.countCards('h') == 0) {
-					event.result = { cancelled: true, bool: false }
+					event.result = { cancelled: true, bool: false };
 					event.finish();
 					return;
 				}
 				for (var i = 0; i < targets.length; i++) {
 					if (targets[i].countCards('h') == 0) {
-						event.result = { cancelled: true, bool: false }
+						event.result = { cancelled: true, bool: false };
 						event.finish();
 						return;
 					}
@@ -13109,7 +13329,7 @@ export class Library extends Uninstantable {
 					targets.sort(lib.sort.seat);
 				}
 				game.log(player, '对', targets, '发起拼点');
-				"step 1"
+				"step 1";
 				event._result = [];
 				event.list = targets.filter(function (current) {
 					return !event.fixedResult || !event.fixedResult[current.playerid];
@@ -13127,7 +13347,7 @@ export class Library extends Uninstantable {
 						return { bool: true, cards: [hs[0]] };
 					};
 				}
-				"step 2"
+				"step 2";
 				var cards = [];
 				var lose_list = [];
 				if (event.fixedResult && event.fixedResult[player.playerid]) {
@@ -13138,7 +13358,7 @@ export class Library extends Uninstantable {
 				else {
 					if (result[0].skill && lib.skill[result[0].skill] && lib.skill[result[0].skill].onCompare) {
 						player.logSkill(result[0].skill);
-						result[0].cards = lib.skill[result[0].skill].onCompare(player)
+						result[0].cards = lib.skill[result[0].skill].onCompare(player);
 					}
 					else lose_list.push([player, result[0].cards]);
 				}
@@ -13168,7 +13388,7 @@ export class Library extends Uninstantable {
 						if (i[1].contains && i[1].contains(card)) return get.number(card, i[0]);
 					}
 					return get.number(card, false);
-				}
+				};
 				event.cardlist = cards;
 				event.cards = cards;
 				event.card1 = result[0].cards[0];
@@ -13180,11 +13400,11 @@ export class Library extends Uninstantable {
 					num1: [],
 					num2: [],
 				};
-				"step 3"
+				"step 3";
 				event.trigger('compareCardShowBefore');
-				"step 4"
+				"step 4";
 				game.log(player, '的拼点牌为', event.card1);
-				"step 5"
+				"step 5";
 				if (event.iwhile < targets.length) {
 					event.target = targets[event.iwhile];
 					event.target.animate('target');
@@ -13200,7 +13420,7 @@ export class Library extends Uninstantable {
 				else {
 					event.goto(9);
 				}
-				"step 6"
+				"step 6";
 				event.result.num1[event.iwhile] = event.num1;
 				event.result.num2[event.iwhile] = event.num2;
 				var str;
@@ -13228,7 +13448,7 @@ export class Library extends Uninstantable {
 					}, 1000);
 				}, str);
 				game.delay(2);
-				"step 7"
+				"step 7";
 				if (event.callback) {
 					game.broadcastAll(function (card1, card2) {
 						if (card1.clone) card1.clone.style.opacity = 0.5;
@@ -13244,23 +13464,23 @@ export class Library extends Uninstantable {
 					next.setContent(event.callback);
 					event.compareMultiple = true;
 				}
-				"step 8"
+				"step 8";
 				game.broadcastAll(ui.clear);
 				event.iwhile++;
 				event.goto(5);
-				"step 9"
+				"step 9";
 				event.cards.add(event.card1);
 			},
 			chooseToCompare: function () {
-				"step 0"
+				"step 0";
 				if (((!event.fixedResult || !event.fixedResult[player.playerid]) && player.countCards('h') == 0) || ((!event.fixedResult || !event.fixedResult[target.playerid]) && target.countCards('h') == 0)) {
-					event.result = { cancelled: true, bool: false }
+					event.result = { cancelled: true, bool: false };
 					event.finish();
 					return;
 				}
 				game.log(player, '对', target, '发起拼点');
 				event.lose_list = [];
-				"step 1"
+				"step 1";
 				var sendback = function () {
 					if (_status.event != event) {
 						return function () {
@@ -13299,7 +13519,7 @@ export class Library extends Uninstantable {
 				else {
 					event.localTarget = true;
 				}
-				"step 2"
+				"step 2";
 				if (event.localPlayer) {
 					if (result.skill && lib.skill[result.skill] && lib.skill[result.skill].onCompare) {
 						result.cards = lib.skill[result.skill].onCompare(player);
@@ -13311,7 +13531,7 @@ export class Library extends Uninstantable {
 				if (event.localTarget) {
 					target.chooseCard('请选择拼点牌', true).set('type', 'compare').set('glow_result', true).ai = event.ai;
 				}
-				"step 3"
+				"step 3";
 				if (event.localTarget) {
 					if (result.skill && lib.skill[result.skill] && lib.skill[result.skill].onCompare) {
 						target.logSkill(result.skill);
@@ -13323,7 +13543,7 @@ export class Library extends Uninstantable {
 				if (!event.resultOL && event.ol) {
 					game.pause();
 				}
-				"step 4"
+				"step 4";
 				try {
 					if (!event.card1) {
 						if (event.resultOL[player.playerid].skill && lib.skill[event.resultOL[player.playerid].skill] && lib.skill[event.resultOL[player.playerid].skill].onCompare) {
@@ -13361,9 +13581,9 @@ export class Library extends Uninstantable {
 						lose_list: event.lose_list,
 					}).setContent('chooseToCompareLose');
 				}
-				"step 5"
+				"step 5";
 				event.trigger('compareCardShowBefore');
-				"step 6"
+				"step 6";
 				game.broadcast(function () {
 					ui.arena.classList.add('thrownhighlight');
 				});
@@ -13377,18 +13597,18 @@ export class Library extends Uninstantable {
 						if (i[1] == card) return get.number(card, i[0]);
 					}
 					return get.number(card, false);
-				}
+				};
 				event.num1 = getNum(event.card1);
 				event.num2 = getNum(event.card2);
 				event.trigger('compare');
 				game.delay(0, 1500);
-				"step 7"
+				"step 7";
 				event.result = {
 					player: event.card1,
 					target: event.card2,
 					num1: event.num1,
 					num2: event.num2
-				}
+				};
 				var str;
 				if (event.num1 > event.num2) {
 					event.result.bool = true;
@@ -13419,7 +13639,7 @@ export class Library extends Uninstantable {
 					}, 1000);
 				}, str);
 				game.delay(2);
-				"step 8"
+				"step 8";
 				if (typeof event.target.ai.shown == 'number' && event.target.ai.shown <= 0.85 && event.addToAI) {
 					event.target.ai.shown += 0.1;
 				}
@@ -13441,7 +13661,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			chooseSkill: function () {
-				'step 0'
+				'step 0';
 				var list;
 				if (typeof event.target == 'string') {
 					list = get.gainableSkillsName(event.target, event.func);
@@ -13492,7 +13712,7 @@ export class Library extends Uninstantable {
 				else {
 					event._result = event.skillai(list);
 				}
-				'step 1'
+				'step 1';
 				_status.imchoosing = false;
 				if (event.dialog) {
 					event.dialog.close();
@@ -13500,7 +13720,7 @@ export class Library extends Uninstantable {
 				event.result = { bool: true, skill: result };
 			},
 			discoverCard: function () {
-				'step 0'
+				'step 0';
 				var num = event.num || 3;
 				var choice;
 				if (typeof event.list == 'string' || typeof event.list == 'function') {
@@ -13542,7 +13762,7 @@ export class Library extends Uninstantable {
 				else {
 					event.finish();
 				}
-				'step 1'
+				'step 1';
 				event.result = {
 					bool: result.bool,
 					card: null,
@@ -13571,7 +13791,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			chooseButton: function () {
-				"step 0"
+				"step 0";
 				if (typeof event.dialog == 'number') {
 					event.dialog = get.idDialog(event.dialog);
 				}
@@ -13587,7 +13807,7 @@ export class Library extends Uninstantable {
 					event.dialog.style.display = '';
 					event.dialog.open();
 				}
-				var filterButton = event.filterButton || function () { return true };
+				var filterButton = event.filterButton || function () { return true; };
 				var selectButton = get.select(event.selectButton);
 				var buttons = event.dialog.buttons;
 				var buttonsx = [];
@@ -13639,7 +13859,7 @@ export class Library extends Uninstantable {
 				if (event.onfree) {
 					lib.init.onfree();
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					if (event.processAI) {
 						event.result = event.processAI();
@@ -13659,7 +13879,7 @@ export class Library extends Uninstantable {
 				event.resume();
 			},
 			chooseCardOL: function () {
-				'step 0'
+				'step 0';
 				event.targets = event.list.slice(0);
 				if (!_status.connectMode) {
 					event.result = [];
@@ -13682,7 +13902,7 @@ export class Library extends Uninstantable {
 						}
 					}
 				}
-				'step 1'
+				'step 1';
 				if (event.list.length) {
 					event.target = event.list.shift();
 					event.target.chooseCard.apply(event.target, event._args).set(event._set);
@@ -13690,23 +13910,23 @@ export class Library extends Uninstantable {
 				else {
 					event.goto(3);
 				}
-				'step 2'
+				'step 2';
 				event.target.unwait(result);
 				event.goto(1);
-				'step 3'
+				'step 3';
 				if (event.withme) {
 					game.me.chooseCard.apply(game.me, event._args).set(event._set);
 				}
 				else {
 					event.goto(5);
 				}
-				'step 4'
+				'step 4';
 				game.me.unwait(result);
-				'step 5'
+				'step 5';
 				if (!event.resultOL) {
 					game.pause();
 				}
-				'step 6'
+				'step 6';
 				event.result = [];
 				for (var i = 0; i < event.targets.length; i++) {
 					event.result[i] = event.resultOL[event.targets[i].playerid] || {};
@@ -13715,7 +13935,7 @@ export class Library extends Uninstantable {
 					}
 				}
 				event.finish();
-				'step 7'
+				'step 7';
 				if (event.list.length) {
 					event.target = event.list.shift();
 					event.target.chooseCard.apply(event.target, event._args).set(event._set);
@@ -13728,12 +13948,12 @@ export class Library extends Uninstantable {
 					}
 					event.finish();
 				}
-				'step 8'
+				'step 8';
 				event.result[event.targets.indexOf(event.target)] = result;
 				event.goto(7);
 			},
 			chooseButtonOL: function () {
-				'step 0'
+				'step 0';
 				//ui.arena.classList.add('markhidden');
 				for (var i = 0; i < event.list.length; i++) {
 					var current = event.list[i];
@@ -13758,7 +13978,7 @@ export class Library extends Uninstantable {
 						event.list.splice(i--, 1);
 					}
 				}
-				'step 1'
+				'step 1';
 				if (event.list.length) {
 					var current = event.list.shift();
 					event.target = current.shift();
@@ -13770,10 +13990,10 @@ export class Library extends Uninstantable {
 				else {
 					event.goto(3);
 				}
-				'step 2'
+				'step 2';
 				event.target.unwait(result);
 				event.goto(1);
-				'step 3'
+				'step 3';
 				if (event.last) {
 					var next = game.me.chooseButton.apply(game.me, event.last);
 					next.callback = event.callback;
@@ -13783,20 +14003,20 @@ export class Library extends Uninstantable {
 				else {
 					event.goto(5);
 				}
-				'step 4'
+				'step 4';
 				game.me.unwait(result);
-				'step 5'
+				'step 5';
 				if (!event.resultOL) {
 					game.pause();
 				}
-				'step 6'
+				'step 6';
 				/*game.broadcastAll(function(){
 					ui.arena.classList.remove('markhidden');
 				});*/
 				event.result = event.resultOL;
 			},
 			chooseCard: function () {
-				"step 0"
+				"step 0";
 				if (event.directresult) {
 					event.result = {
 						buttons: [],
@@ -13819,7 +14039,7 @@ export class Library extends Uninstantable {
 							var str;
 							if (typeof event.prompt == 'string') str = event.prompt;
 							else {
-								str = '请选择'
+								str = '请选择';
 								var range = get.select(event.selectCard);
 								if (range[0] == range[1]) str += get.cnNumber(range[0]);
 								else if (range[1] == Infinity) str += '至少' + get.cnNumber(range[0]);
@@ -13843,7 +14063,7 @@ export class Library extends Uninstantable {
 								event.custom.add.card = function () {
 									_status.event.promptbar.innerHTML =
 										ui.selected.cards.length + '/' + get.numStr(_status.event.selectCard[1], 'card');
-								}
+								};
 							}
 						}
 					}
@@ -13854,7 +14074,7 @@ export class Library extends Uninstantable {
 						event.result = 'ai';
 					}
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					game.check();
 					if ((ai.basic.chooseCard(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
@@ -13871,7 +14091,7 @@ export class Library extends Uninstantable {
 						ui.click.cancel();
 					}
 				}
-				"step 2"
+				"step 2";
 				event.resume();
 				if (event.glow_result && event.result.cards && !event.directresult) {
 					for (var i = 0; i < event.result.cards.length; i++) {
@@ -13881,7 +14101,7 @@ export class Library extends Uninstantable {
 				if (event.dialog) event.dialog.close();
 			},
 			chooseTarget: function () {
-				"step 0"
+				"step 0";
 				if (event.isMine()) {
 					if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
 						ui.click.cancel();
@@ -13896,7 +14116,7 @@ export class Library extends Uninstantable {
 						var str;
 						if (typeof event.prompt == 'string') str = event.prompt;
 						else {
-							str = '请选择'
+							str = '请选择';
 							var range = get.select(event.selectTarget);
 							if (range[0] == range[1]) str += get.cnNumber(range[0]);
 							else if (range[1] == Infinity) str += '至少' + get.cnNumber(range[0]);
@@ -13912,7 +14132,7 @@ export class Library extends Uninstantable {
 							event.custom.add.target = function () {
 								_status.event.promptbar.innerHTML =
 									ui.selected.targets.length + '/' + get.numStr(get.select(event.selectTarget)[1], 'target');
-							}
+							};
 						}
 					}
 					else if (get.itemtype(event.dialog) == 'dialog') {
@@ -13925,7 +14145,7 @@ export class Library extends Uninstantable {
 				else {
 					event.result = 'ai';
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					game.check();
 					if ((ai.basic.chooseTarget(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
@@ -13942,7 +14162,7 @@ export class Library extends Uninstantable {
 				}
 				if (event.dialog) event.dialog.close();
 				event.resume();
-				"step 2"
+				"step 2";
 				if (event.onresult) {
 					event.onresult(event.result);
 				}
@@ -13956,7 +14176,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			chooseCardTarget: function () {
-				"step 0"
+				"step 0";
 				if (event.isMine()) {
 					if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
 						ui.click.cancel();
@@ -13977,7 +14197,7 @@ export class Library extends Uninstantable {
 				else {
 					event.result = 'ai';
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					game.check();
 					if (ai.basic.chooseCard(event.ai1) || forced) {
@@ -13993,7 +14213,7 @@ export class Library extends Uninstantable {
 						ui.click.cancel();
 					}
 				}
-				"step 2"
+				"step 2";
 				event.resume();
 				if (event.result.bool && event.animate !== false) {
 					for (var i = 0; i < event.result.targets.length; i++) {
@@ -14003,7 +14223,7 @@ export class Library extends Uninstantable {
 				if (event.dialog) event.dialog.close();
 			},
 			chooseControl: function () {
-				"step 0"
+				"step 0";
 				if (event.controls.length == 0) {
 					if (event.sortcard) {
 						var sortnum = 2;
@@ -14041,7 +14261,7 @@ export class Library extends Uninstantable {
 									event.result = {
 										bool: true,
 										control: i,
-									}
+									};
 									return;
 								}
 							}
@@ -14051,7 +14271,7 @@ export class Library extends Uninstantable {
 						event.result = {
 							bool: true,
 							control: 'cancel2',
-						}
+						};
 						return;
 					}
 					if (event.sortcard) {
@@ -14174,7 +14394,7 @@ export class Library extends Uninstantable {
 				else {
 					event.result = 'ai';
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					event.result = {};
 					if (event.ai) {
@@ -14197,7 +14417,7 @@ export class Library extends Uninstantable {
 				event.resume();
 			},
 			chooseBool: function () {
-				"step 0"
+				"step 0";
 				if (event.isMine()) {
 					if (event.frequentSkill && !lib.config.autoskilllist.contains(event.frequentSkill)) {
 						ui.click.ok();
@@ -14237,7 +14457,7 @@ export class Library extends Uninstantable {
 				else {
 					event.result = 'ai';
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					if (event.ai) {
 						event.choice = event.ai(event.getParent(), player);
@@ -14250,7 +14470,7 @@ export class Library extends Uninstantable {
 				event.resume();
 			},
 			chooseDrawRecover: function () {
-				'step 0'
+				'step 0';
 				if (player.isHealthy() && event.forced) {
 					player.draw(event.num1);
 					event.finish();
@@ -14296,7 +14516,7 @@ export class Library extends Uninstantable {
 					});
 					next.set('choice', choice);
 				}
-				'step 1'
+				'step 1';
 				if (result.control != 'cancel2') {
 					if (event.logSkill) {
 						if (typeof event.logSkill == 'string') {
@@ -14316,7 +14536,7 @@ export class Library extends Uninstantable {
 				event.result = result;
 			},
 			choosePlayerCard: function () {
-				"step 0"
+				"step 0";
 				if (!event.dialog) event.dialog = ui.create.dialog('hidden');
 				else if (!event.isMine()) {
 					event.dialog.style.display = 'none';
@@ -14400,14 +14620,14 @@ export class Library extends Uninstantable {
 						bool: true,
 						buttons: event.dialog.buttons,
 						links: cs
-					}
+					};
 				}
 				else if (directFilter && directh && !event.isOnline() && select[0] == select[1]) {
 					event.result = {
 						bool: true,
 						buttons: event.dialog.buttons.randomGets(select[0]),
 						links: []
-					}
+					};
 					for (var i = 0; i < event.result.buttons.length; i++) {
 						event.result.links[i] = event.result.buttons[i].link;
 					}
@@ -14433,7 +14653,7 @@ export class Library extends Uninstantable {
 						event.result = 'ai';
 					}
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					game.check();
 					if ((ai.basic.chooseButton(event.ai) || forced) && (!event.filterOk || event.filterOk())) ui.click.ok();
@@ -14449,7 +14669,7 @@ export class Library extends Uninstantable {
 				}, 500);
 			},
 			discardPlayerCard: function () {
-				"step 0"
+				"step 0";
 				if (event.directresult) {
 					event.result = {
 						buttons: [],
@@ -14556,14 +14776,14 @@ export class Library extends Uninstantable {
 						bool: true,
 						buttons: event.dialog.buttons,
 						links: cs
-					}
+					};
 				}
 				else if (directFilter && directh && !event.isOnline() && select[0] == select[1]) {
 					event.result = {
 						bool: true,
 						buttons: event.dialog.buttons.randomGets(select[0]),
 						links: []
-					}
+					};
 					for (var i = 0; i < event.result.buttons.length; i++) {
 						event.result.links[i] = event.result.buttons[i].link;
 					}
@@ -14585,14 +14805,14 @@ export class Library extends Uninstantable {
 						event.result = 'ai';
 					}
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					game.check();
 					if ((ai.basic.chooseButton(event.ai) || forced) && (!event.filterOk || event.filterOk())) ui.click.ok();
 					else ui.click.cancel();
 				}
 				event.dialog.close();
-				"step 2"
+				"step 2";
 				event.resume();
 				setTimeout(function () {
 					ui.arena.classList.remove('discard-player-card');
@@ -14614,7 +14834,7 @@ export class Library extends Uninstantable {
 					event.cards = cards;
 					event.trigger("rewriteDiscardResult");
 				}
-				"step 3"
+				"step 3";
 				if (event.boolline) {
 					player.line(target, 'green');
 				}
@@ -14629,7 +14849,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			gainPlayerCard: function () {
-				"step 0"
+				"step 0";
 				if (event.directresult) {
 					event.result = {
 						buttons: [],
@@ -14737,14 +14957,14 @@ export class Library extends Uninstantable {
 						bool: true,
 						buttons: event.dialog.buttons,
 						links: cs
-					}
+					};
 				}
 				else if (directFilter && directh && !event.isOnline() && select[0] == select[1]) {
 					event.result = {
 						bool: true,
 						buttons: event.dialog.buttons.randomGets(select[0]),
 						links: []
-					}
+					};
 					for (var i = 0; i < event.result.buttons.length; i++) {
 						event.result.links[i] = event.result.buttons[i].link;
 					}
@@ -14766,14 +14986,14 @@ export class Library extends Uninstantable {
 						event.result = 'ai';
 					}
 				}
-				"step 1"
+				"step 1";
 				if (event.result == 'ai') {
 					game.check();
 					if ((ai.basic.chooseButton(event.ai) || forced) && (!event.filterOk || event.filterOk())) ui.click.ok();
 					else ui.click.cancel();
 				}
 				event.dialog.close();
-				"step 2"
+				"step 2";
 				event.resume();
 				setTimeout(function () {
 					ui.arena.classList.remove('gain-player-card');
@@ -14781,7 +15001,7 @@ export class Library extends Uninstantable {
 				if (game.online || !event.result.bool) {
 					event.finish();
 				}
-				"step 3"
+				"step 3";
 				if (event.logSkill && event.result.bool && !game.online) {
 					if (typeof event.logSkill == 'string') {
 						player.logSkill(event.logSkill);
@@ -14797,7 +15017,7 @@ export class Library extends Uninstantable {
 				event.result.cards = event.result.links.slice(0);
 				event.cards = cards;
 				event.trigger("rewriteGainResult");
-				"step 4"
+				"step 4";
 				if (event.boolline) {
 					player.line(target, 'green');
 				}
@@ -14816,7 +15036,7 @@ export class Library extends Uninstantable {
 				else target[event.visibleMove ? '$give' : '$giveAuto'](cards, player);
 			},
 			showHandcards: function () {
-				"step 0"
+				"step 0";
 				if (player.countCards('h') == 0) {
 					event.finish();
 					return;
@@ -14836,12 +15056,12 @@ export class Library extends Uninstantable {
 				game.log(player, '展示了', cards);
 				game.addVideo('showCards', player, [str, get.cardsInfo(cards)]);
 				game.delayx(2);
-				"step 1"
+				"step 1";
 				game.broadcast('closeDialog', event.dialogid);
 				event.dialog.close();
 			},
 			showCards: function () {
-				"step 0"
+				"step 0";
 				if (get.itemtype(cards) != 'cards') {
 					event.finish();
 					return;
@@ -14887,12 +15107,12 @@ export class Library extends Uninstantable {
 				game.addCardKnower(cards, 'everyone');
 				game.delayx(event.delay_time || 2.5);
 				game.addVideo('showCards', player, [event.str, get.cardsInfo(cards)]);
-				"step 1"
+				"step 1";
 				game.broadcast('closeDialog', event.dialogid);
 				event.dialog.close();
 			},
 			viewCards: function () {
-				"step 0"
+				"step 0";
 				game.addCardKnower(event.cards, player);
 				if (player == game.me) {
 					event.dialog = ui.create.dialog(event.str, event.cards);
@@ -14917,14 +15137,14 @@ export class Library extends Uninstantable {
 				else {
 					event.finish();
 				}
-				"step 1"
+				"step 1";
 				event.result = 'viewed';
 				_status.imchoosing = false;
 				event.choosing = false;
 				if (event.dialog) event.dialog.close();
 			},
 			moveCard: function () {
-				'step 0'
+				'step 0';
 				if (!player.canMoveCard(null, event.nojudge, event.sourceTargets, event.aimTargets, event.filter, event.canReplace ? 'canReplace' : 'noReplace')) {
 					event.finish();
 					return;
@@ -14966,7 +15186,7 @@ export class Library extends Uninstantable {
 								return game.hasPlayer(function (current) {
 									if (!aimTargets.includes(current)) return false;
 									return current != target && current.canAddJudge(card) && get.attitude(player, current) < 0;
-								})
+								});
 							})) return 14;
 							if (target.countCards('e', function (card) {
 								if (!filterCard(card)) return false;
@@ -15019,7 +15239,7 @@ export class Library extends Uninstantable {
 				next.set('custom', get.copy(event.custom));
 				if (event.prompt2) next.set('prompt2', event.prompt2);
 				if (event.forced) next.set('forced', true);
-				'step 1'
+				'step 1';
 				event.result = result;
 				if (result.bool) {
 					if (event.logSkill) player.logSkill(event.logSkill, result.targets, false);
@@ -15029,9 +15249,9 @@ export class Library extends Uninstantable {
 				else {
 					event.finish();
 				}
-				'step 2'
+				'step 2';
 				game.delay();
-				'step 3'
+				'step 3';
 				if (targets.length == 2) {
 					player.choosePlayerCard('ej', true, function (button) {
 						var player = _status.event.player;
@@ -15061,7 +15281,7 @@ export class Library extends Uninstantable {
 				else {
 					event.finish();
 				}
-				'step 4'
+				'step 4';
 				if (result.bool && result.links.length) {
 					var link = result.links[0];
 					if (get.position(link) == 'e') {
@@ -15074,14 +15294,14 @@ export class Library extends Uninstantable {
 						event.targets[1].addJudge(link);
 					}
 					event.targets[0].$give(link, event.targets[1], false);
-					game.log(event.targets[0], '的', link, '被移动给了', event.targets[1])
+					game.log(event.targets[0], '的', link, '被移动给了', event.targets[1]);
 					event.result.card = link;
 					event.result.position = get.position(link);
 					game.delay();
 				}
 			},
 			useCard: function () {
-				"step 0"
+				"step 0";
 				if (!card) {
 					console.log('err: no card', get.translation(event.player));
 					event.finish();
@@ -15273,11 +15493,11 @@ export class Library extends Uninstantable {
 					game.logv(player, [card, cards], targets);
 				}
 				event.trigger('useCard1');
-				"step 1"
+				"step 1";
 				event.trigger('yingbian');
-				"step 2"
+				"step 2";
 				event.trigger('useCard2');
-				"step 3"
+				"step 3";
 				event.trigger('useCard');
 				event._oncancel = function () {
 					game.broadcastAll(function (id) {
@@ -15287,7 +15507,7 @@ export class Library extends Uninstantable {
 						}
 					}, event.id);
 				};
-				"step 4"
+				"step 4";
 				event.sortTarget = function (animate, sort) {
 					var info = get.info(card, false);
 					if (num == 0 && targets.length > 1) {
@@ -15305,7 +15525,7 @@ export class Library extends Uninstantable {
 							}
 						}
 					}
-				}
+				};
 				event.sortTarget();
 				event.getTriggerTarget = function (list1, list2) {
 					var listx = list1.slice(0).sortBySeat((_status.currentPhase || player));
@@ -15313,8 +15533,8 @@ export class Library extends Uninstantable {
 						if (get.numOf(list2, listx[i]) < get.numOf(listx, listx[i])) return listx[i];
 					}
 					return null;
-				}
-				"step 5"
+				};
+				"step 5";
 				if (event.all_excluded) return;
 				if (!event.triggeredTargets1) event.triggeredTargets1 = [];
 				var target = event.getTriggerTarget(targets, event.triggeredTargets1);
@@ -15338,7 +15558,7 @@ export class Library extends Uninstantable {
 					if (event.forceDie) next.forceDie = true;
 					event.redo();
 				}
-				"step 6"
+				"step 6";
 				if (event.all_excluded) return;
 				if (!event.triggeredTargets2) event.triggeredTargets2 = [];
 				var target = event.getTriggerTarget(targets, event.triggeredTargets2);
@@ -15362,7 +15582,7 @@ export class Library extends Uninstantable {
 					if (event.forceDie) next.forceDie = true;
 					event.redo();
 				}
-				"step 7"
+				"step 7";
 				var info = get.info(card, false);
 				if (!info.nodelay && event.animate != false) {
 					if (event.delayx !== false) {
@@ -15375,7 +15595,7 @@ export class Library extends Uninstantable {
 						}
 					}
 				}
-				"step 8"
+				"step 8";
 				if (event.all_excluded) return;
 				if (!event.triggeredTargets3) event.triggeredTargets3 = [];
 				var target = event.getTriggerTarget(targets, event.triggeredTargets3);
@@ -15399,7 +15619,7 @@ export class Library extends Uninstantable {
 					if (event.forceDie) next.forceDie = true;
 					event.redo();
 				}
-				"step 9"
+				"step 9";
 				if (event.all_excluded) return;
 				if (!event.triggeredTargets4) event.triggeredTargets4 = [];
 				var target = event.getTriggerTarget(targets, event.triggeredTargets4);
@@ -15426,7 +15646,7 @@ export class Library extends Uninstantable {
 					}
 					event.redo();
 				}
-				"step 10"
+				"step 10";
 				if (event.all_excluded) return;
 				event.effectedCount++;
 				event.num = 0;
@@ -15467,7 +15687,7 @@ export class Library extends Uninstantable {
 					next.addedTargets = event.addedTargets;
 					if (event.forceDie) next.forceDie = true;
 				}
-				"step 11"
+				"step 11";
 				if (event.all_excluded) return;
 				var info = get.info(card, false);
 				if (num == 0 && targets.length > 1) {
@@ -15531,13 +15751,13 @@ export class Library extends Uninstantable {
 						game.delayx(0.5);
 					}
 				}
-				"step 12"
+				"step 12";
 				if (event.all_excluded) return;
 				if (!get.info(event.card, false).multitarget && num < targets.length - 1 && !event.cancelled) {
 					event.num++;
 					event.goto(11);
 				}
-				"step 13"
+				"step 13";
 				if (event.all_excluded) return;
 				if (get.info(card, false).contentAfter) {
 					var next = game.createEvent(card.name + 'ContentAfter');
@@ -15551,7 +15771,7 @@ export class Library extends Uninstantable {
 					next.type = 'postcard';
 					if (event.forceDie) next.forceDie = true;
 				}
-				"step 14"
+				"step 14";
 				if (event.all_excluded) return;
 				if (event.effectedCount < event.effectCount) {
 					if (document.getElementsByClassName('thrown').length) {
@@ -15559,7 +15779,7 @@ export class Library extends Uninstantable {
 					}
 					event.goto(10);
 				}
-				"step 15"
+				"step 15";
 				if (event.postAi) {
 					event.player.logAi(event.targets, event.card);
 				}
@@ -15573,11 +15793,11 @@ export class Library extends Uninstantable {
 				else {
 					event.finish();
 				}
-				"step 16"
+				"step 16";
 				event._oncancel();
 			},
 			useSkill: function () {
-				"step 0"
+				"step 0";
 				var info = get.info(event.skill);
 				if (!info.noForceDie) event.forceDie = true;
 				if (!info.noForceOut) event.includeOut = true;
@@ -15643,7 +15863,7 @@ export class Library extends Uninstantable {
 					for (var i = 1; i < targets.length; i++) {
 						str += '、' + (targets[i] == player ? '自己' : get.translation(targets[i]));
 					}
-					str += '</span>'
+					str += '</span>';
 				}
 				str += '发动了';
 				if (!info.direct && info.log !== false) {
@@ -15752,7 +15972,7 @@ export class Library extends Uninstantable {
 				event.type = logInfo.type;
 				player.getHistory('useSkill').push(logInfo);
 				event.trigger('useSkill');
-				"step 1"
+				"step 1";
 				var info = get.info(event.skill);
 				if (info && info.contentBefore) {
 					var next = game.createEvent(event.skill + 'ContentBefore');
@@ -15763,7 +15983,7 @@ export class Library extends Uninstantable {
 					if (event.forceDie) next.forceDie = true;
 					if (event.includeOut) next.includeOut = true;
 				}
-				"step 2"
+				"step 2";
 				if (!event.skill) {
 					console.log('error: no skill', get.translation(event.player), event.player.getSkills());
 					if (event._skill) {
@@ -15822,7 +16042,7 @@ export class Library extends Uninstantable {
 							game.pause();
 						}
 						else {
-							game.delayx()
+							game.delayx();
 						}
 					}
 				}
@@ -15831,7 +16051,7 @@ export class Library extends Uninstantable {
 					event.num++;
 					event.redo();
 				}
-				"step 3"
+				"step 3";
 				var info = get.info(event.skill);
 				if (info && info.contentAfter) {
 					var next = game.createEvent(event.skill + 'ContentAfter');
@@ -15842,7 +16062,7 @@ export class Library extends Uninstantable {
 					if (event.forceDie) next.forceDie = true;
 					if (event.includeOut) next.includeOut = true;
 				}
-				"step 4"
+				"step 4";
 				if (player.getStat().allSkills > 200) {
 					player._noSkill = true;
 					console.log(player.name, event.skill);
@@ -15853,7 +16073,7 @@ export class Library extends Uninstantable {
 				else {
 					event.finish();
 				}
-				"step 5"
+				"step 5";
 				ui.clear();
 			},
 			draw: function () {
@@ -15915,16 +16135,16 @@ export class Library extends Uninstantable {
 				event.result = cards;
 			},
 			discard: function () {
-				"step 0"
+				"step 0";
 				game.log(player, '弃置了', cards);
 				event.done = player.lose(cards, event.position, 'visible');
 				event.done.type = 'discard';
 				if (event.discarder) event.done.discarder = event.discarder;
-				"step 1"
+				"step 1";
 				event.trigger('discard');
 			},
 			loseToDiscardpile: function () {
-				"step 0"
+				"step 0";
 				if (event.log != false) game.log(player, '将', cards, '置入了弃牌堆');
 				var next = player.lose(cards, event.position);
 				if (event.insert_index) next.insert_index = event.insert_index;
@@ -15932,11 +16152,11 @@ export class Library extends Uninstantable {
 				if (!event.blank) next.visible = true;
 				next.type = 'loseToDiscardpile';
 				event.done = next;
-				"step 1"
+				"step 1";
 				event.trigger('loseToDiscardpile');
 			},
 			respond: function () {
-				'step 0'
+				'step 0';
 				var cardaudio = true;
 				if (event.skill) {
 					if (lib.skill[event.skill].audio) {
@@ -16016,11 +16236,11 @@ export class Library extends Uninstantable {
 					}
 				}
 				event.trigger('respond');
-				'step 1'
+				'step 1';
 				game.delayx(0.5);
 			},
 			swapHandcards: function () {
-				'step 0'
+				'step 0';
 				event.cards1 = event.cards1 || player.getCards('h');
 				event.cards2 = event.cards2 || target.getCards('h');
 				game.loseAsync({
@@ -16029,21 +16249,21 @@ export class Library extends Uninstantable {
 					cards1: event.cards1,
 					cards2: event.cards2,
 				}).setContent('swapHandcardsx');
-				'step 1'
+				'step 1';
 				game.loseAsync({
 					gain_list: [
 						[player, event.cards2.filterInD()],
 						[target, event.cards1.filterInD()]
 					],
 				}).setContent('gaincardMultiple');
-				'step 2'
+				'step 2';
 				game.delayx();
 			},
 			swapHandcardsx: function () {
-				'step 0'
+				'step 0';
 				player.$giveAuto(event.cards1, target);
 				target.$giveAuto(event.cards2, player);
-				'step 1'
+				'step 1';
 				event.cards = event.cards1;
 				var next = player.lose(event.cards, ui.ordering);
 				next.getlx = false;
@@ -16054,7 +16274,7 @@ export class Library extends Uninstantable {
 				else {
 					next.delay = false;
 				}
-				'step 2'
+				'step 2';
 				event.cards = event.cards2;
 				var next = target.lose(event.cards, ui.ordering);
 				next.getlx = false;
@@ -16065,17 +16285,17 @@ export class Library extends Uninstantable {
 				else {
 					next.delay = false;
 				}
-				'step 3'
+				'step 3';
 				if (!event.delayed) game.delay();
 			},
 			gainMultiple: function () {
-				'step 0'
+				'step 0';
 				event.delayed = false;
 				event.num = 0;
 				event.cards = [];
-				'step 1'
+				'step 1';
 				player.gainPlayerCard(targets[num], event.position, true).set('boolline', false).set('delay', num == targets.length - 1);
-				'step 2'
+				'step 2';
 				if (result.bool) {
 					event.cards.addArray(result.cards);
 					if (num == targets.length - 1) event.delayed = true;
@@ -16084,11 +16304,11 @@ export class Library extends Uninstantable {
 				if (event.num < targets.length) {
 					event.goto(1);
 				}
-				'step 3'
+				'step 3';
 				if (!event.delayed) game.delay();
 			},
 			gain: function () {
-				"step 0"
+				"step 0";
 				if (event.animate == 'give') event.visible = true;
 				if (cards) {
 					var map = {};
@@ -16117,7 +16337,7 @@ export class Library extends Uninstantable {
 				else {
 					event.finish();
 				}
-				"step 1"
+				"step 1";
 				for (var i = 0; i < cards.length; i++) {
 					if (cards[i].willBeDestroyed('handcard', player, event)) {
 						cards[i].selfDestroy(event);
@@ -16143,14 +16363,14 @@ export class Library extends Uninstantable {
 				}
 				player.getHistory('gain').push(event);
 				//if(event.source&&event.delay!==false) game.delayx();
-				"step 2"
+				"step 2";
 				if (player.getStat().gain == undefined) {
 					player.getStat().gain = cards.length;
 				}
 				else {
 					player.getStat().gain += cards.length;
 				}
-				"step 3"
+				"step 3";
 				var sort;
 				var frag1 = document.createDocumentFragment();
 				var frag2 = document.createDocumentFragment();
@@ -16245,7 +16465,7 @@ export class Library extends Uninstantable {
 					if (event.animate == 'give') {
 						for (var i in evtmap) {
 							var source = (_status.connectMode ? lib.playerOL : game.playerMap)[i];
-							source.$give(evtmap[i][0], player, event.log)
+							source.$give(evtmap[i][0], player, event.log);
 						}
 					}
 					else {
@@ -16288,12 +16508,12 @@ export class Library extends Uninstantable {
 					broadcast();
 					event.finish();
 				}
-				"step 4"
+				"step 4";
 				game.delayx();
 				if (event.updatePile) game.updateRoundNumber();
 			},
 			addToExpansion: function () {
-				"step 0"
+				"step 0";
 				if (event.animate == 'give') event.visible = true;
 				if (cards) {
 					var map = {};
@@ -16320,7 +16540,7 @@ export class Library extends Uninstantable {
 				else {
 					event.finish();
 				}
-				"step 1"
+				"step 1";
 				for (var i = 0; i < cards.length; i++) {
 					if (cards[i].willBeDestroyed('expansion', player, event)) {
 						cards[i].selfDestroy(event);
@@ -16342,7 +16562,7 @@ export class Library extends Uninstantable {
 					event.finish();
 					return;
 				}
-				"step 2"
+				"step 2";
 				var hs = player.getCards('x');
 				for (var i = 0; i < cards.length; i++) {
 					if (hs.contains(cards[i])) {
@@ -16433,12 +16653,12 @@ export class Library extends Uninstantable {
 					for (var i of event.gaintag) player.markSkill(i);
 					event.finish();
 				}
-				"step 4"
+				"step 4";
 				game.delayx();
 				if (event.updatePile) game.updateRoundNumber();
 			},
 			lose: function () {
-				"step 0"
+				"step 0";
 				var evt = event.getParent();
 				if ((evt.name != 'discard' || event.type != 'discard') && (evt.name != 'loseToDiscardpile' || event.type != 'loseToDiscardpile')) {
 					event.delay = false;
@@ -16486,7 +16706,7 @@ export class Library extends Uninstantable {
 						}
 					}
 				}
-				"step 1"
+				"step 1";
 				event.gaintag_map = {};
 				var hs = [], es = [], js = [], ss = [], xs = [];
 				var unmarks = [];
@@ -16635,7 +16855,7 @@ export class Library extends Uninstantable {
 				if (hs.length && !event.visible) {
 					player.getCards('h').forEach(hcard => { hcard.clearKnowers(); });
 				}
-				"step 2"
+				"step 2";
 				if (num < cards.length) {
 					if (event.es.contains(cards[num])) {
 						event.loseEquip = true;
@@ -16655,7 +16875,7 @@ export class Library extends Uninstantable {
 					}
 					event.goto(4);
 				}
-				"step 3"
+				"step 3";
 				var info = get.info(cards[num]);
 				if (info.loseDelay != false && (player.isAlive() || info.forceDie)) {
 					player.popup(cards[num].name);
@@ -16679,7 +16899,7 @@ export class Library extends Uninstantable {
 				}
 				event.num++;
 				event.goto(2);
-				"step 4"
+				"step 4";
 				if (event.toRenku) {
 					_status.renku.addArray(cards.filter(function (card) {
 						return !card.willBeDestroyed('renku', null, event);
@@ -16691,7 +16911,7 @@ export class Library extends Uninstantable {
 					}
 					game.updateRenku();
 				}
-				"step 5"
+				"step 5";
 				var evt = event.getParent();
 				if ((evt.name != 'discard' && event.type != 'discard') && (evt.name != 'loseToDiscardpile' && event.type != 'loseToDiscardpile')) return;
 				if (event.animate === false || event.delay === false) return;
@@ -16706,17 +16926,17 @@ export class Library extends Uninstantable {
 				}
 			},
 			damage: function () {
-				"step 0"
+				"step 0";
 				event.forceDie = true;
 				if (event.unreal) { event.goto(4); return; }
 				event.trigger('damageBegin1');
-				"step 1"
+				"step 1";
 				event.trigger('damageBegin2');
-				"step 2"
+				"step 2";
 				event.trigger('damageBegin3');
-				"step 3"
+				"step 3";
 				event.trigger('damageBegin4');
-				"step 4"
+				"step 4";
 				//moved changeHujia to changeHp
 				if (player.hujia > 0 && !player.hasSkillTag('nohujia')) {
 					var damageAudioInfo = lib.natureAudio.hujia_damage[event.nature];
@@ -16789,7 +17009,7 @@ export class Library extends Uninstantable {
 					var numx = player.hasSkillTag('nohujia') ? num : Math.max(0, num - player.hujia);
 					player.$damagepop(-numx, natures[0]);
 				}
-				if (event.unreal) event.goto(6)
+				if (event.unreal) event.goto(6);
 				if (!event.notrigger) {
 					if (num == 0) {
 						event.trigger('damageZero');
@@ -16799,7 +17019,7 @@ export class Library extends Uninstantable {
 						event.trigger('damage');
 					}
 				}
-				"step 5"
+				"step 5";
 				if (player.hp <= 0 && player.isAlive() && !event.nodying) {
 					game.delayx();
 					event._dyinged = true;
@@ -16845,7 +17065,7 @@ export class Library extends Uninstantable {
 						}
 					}
 				}
-				"step 6"
+				"step 6";
 				if (!event.notrigger) event.trigger('damageSource');
 			},
 			recover: function () {
@@ -16869,11 +17089,11 @@ export class Library extends Uninstantable {
 						}
 					}, player);
 					player.$damagepop(num, 'wood');
-					game.log(player, '回复了' + get.cnNumber(num) + '点体力')
+					game.log(player, '回复了' + get.cnNumber(num) + '点体力');
 				}
 			},
 			loseHp: function () {
-				"step 0"
+				"step 0";
 				if (lib.config.background_audio) {
 					game.playAudio('effect', 'loseHp');
 				}
@@ -16882,9 +17102,9 @@ export class Library extends Uninstantable {
 						game.playAudio('effect', 'loseHp');
 					}
 				});
-				game.log(player, '失去了' + get.cnNumber(num) + '点体力')
+				game.log(player, '失去了' + get.cnNumber(num) + '点体力');
 				player.changeHp(-num);
-				"step 1"
+				"step 1";
 				if (player.hp <= 0 && !event.nodying) {
 					game.delayx();
 					event._dyinged = true;
@@ -16892,26 +17112,26 @@ export class Library extends Uninstantable {
 				}
 			},
 			doubleDraw: function () {
-				"step 0"
+				"step 0";
 				player.chooseBool('你的主副将体力上限之和是奇数，是否摸一张牌？');
-				"step 1"
+				"step 1";
 				if (result.bool) {
 					player.draw();
 				}
 			},
 			loseMaxHp: function () {
-				"step 0"
+				"step 0";
 				game.log(player, '减少了' + get.cnNumber(num) + '点体力上限');
 				player.maxHp -= num;
 				event.loseHp = Math.max(0, player.hp - player.maxHp);
 				player.update();
-				"step 1"
+				"step 1";
 				if (player.maxHp <= 0) {
 					player.die(event);
 				}
 			},
 			gainMaxHp: function () {
-				"step 0"
+				"step 0";
 				game.log(player, '增加了' + get.cnNumber(num) + '点体力上限');
 				player.maxHp += num;
 				player.update();
@@ -16945,7 +17165,7 @@ export class Library extends Uninstantable {
 					var evt = event.getParent('_save');
 					if (evt && evt.finish) evt.finish();
 					evt = event.getParent('dying');
-					if (evt && evt.finish) evt.finish()
+					if (evt && evt.finish) evt.finish();
 				}
 				event.trigger('changeHp');
 			},
@@ -16974,7 +17194,7 @@ export class Library extends Uninstantable {
 				player.update();
 			},
 			dying: function () {
-				"step 0"
+				"step 0";
 				event.forceDie = true;
 				if (player.isDying() || player.hp > 0) {
 					event.finish();
@@ -16986,7 +17206,7 @@ export class Library extends Uninstantable {
 				}, _status.dying);
 				event.trigger('dying');
 				game.log(player, '濒死');
-				"step 1"
+				"step 1";
 				delete event.filterStop;
 				if (player.hp > 0 || event.nodying) {
 					_status.dying.remove(player);
@@ -17010,7 +17230,7 @@ export class Library extends Uninstantable {
 					next.forceDie = true;
 					next.setContent(lib.skill._save.content);
 				}
-				"step 2"
+				"step 2";
 				_status.dying.remove(player);
 				game.broadcast(function (list) {
 					_status.dying = list;
@@ -17018,7 +17238,7 @@ export class Library extends Uninstantable {
 				if (player.hp <= 0 && !event.nodying && !player.nodying) player.die(event.reason);
 			},
 			die: function () {
-				"step 0"
+				"step 0";
 				event.forceDie = true;
 				if (_status.roundStart == player) {
 					_status.roundStart = player.next || player.getNext() || game.players[0];
@@ -17047,7 +17267,7 @@ export class Library extends Uninstantable {
 					}
 				}
 				else {
-					game.log(player, '阵亡')
+					game.log(player, '阵亡');
 				}
 
 
@@ -17107,11 +17327,11 @@ export class Library extends Uninstantable {
 				if (player.hp != 0) {
 					player.changeHp(0 - player.hp, false).forceDie = true;
 				}
-				"step 1"
+				"step 1";
 				if (player.dieAfter) player.dieAfter(source);
-				"step 2"
+				"step 2";
 				event.trigger('die');
-				"step 3"
+				"step 3";
 				if (player.isDead()) {
 					if (!game.reserveDead) {
 						for (var mark in player.marks) {
@@ -17146,9 +17366,9 @@ export class Library extends Uninstantable {
 						//player.$throw(event.cards,1000);
 					}
 				}
-				"step 4"
+				"step 4";
 				if (player.dieAfter2) player.dieAfter2(source);
-				"step 5"
+				"step 5";
 				game.broadcastAll(function (player) {
 					if (game.online && player == game.me && !_status.over && !game.controlOver && !ui.exit) {
 						if (lib.mode[lib.configOL.mode].config.dierestart) {
@@ -17208,7 +17428,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			addJudge: function () {
-				"step 0"
+				"step 0";
 				if (cards) {
 					var owner = get.owner(cards[0]);
 					if (owner) {
@@ -17216,7 +17436,7 @@ export class Library extends Uninstantable {
 					}
 					else if (get.position(cards[0]) == 'c') event.updatePile = true;
 				}
-				"step 1"
+				"step 1";
 				if (cards[0].willBeDestroyed('judge', player, event)) {
 					cards[0].selfDestroy(event);
 					event.finish();
@@ -17252,7 +17472,7 @@ export class Library extends Uninstantable {
 						card.viewAs = viewAs;
 						if (viewAs && viewAs != card.name && (card.classList.contains('fullskin') || card.classList.contains('fullborder'))) {
 							card.classList.add('fakejudge');
-							card.node.background.innerHTML = lib.translate[viewAs + '_bg'] || get.translation(viewAs)[0]
+							card.node.background.innerHTML = lib.translate[viewAs + '_bg'] || get.translation(viewAs)[0];
 						}
 						else {
 							card.classList.remove('fakejudge');
@@ -17292,7 +17512,7 @@ export class Library extends Uninstantable {
 				if (event.updatePile) game.updateRoundNumber();
 			},
 			judge: function () {
-				"step 0"
+				"step 0";
 				var judgestr = get.translation(player) + '的' + event.judgestr + '判定';
 				event.videoId = lib.status.videoId++;
 				var cardj = event.directresult;
@@ -17336,7 +17556,7 @@ export class Library extends Uninstantable {
 				game.log(player, '进行' + event.judgestr + '判定，亮出的判定牌为', player.judging[0]);
 				game.delay(2);
 				if (!event.noJudgeTrigger) event.trigger('judge');
-				"step 1"
+				"step 1";
 				event.result = {
 					card: player.judging[0],
 					name: player.judging[0].name,
@@ -17444,7 +17664,7 @@ export class Library extends Uninstantable {
 				game.addVideo('link', player, player.isLinked());
 			},
 			chooseToGuanxing: function () {
-				"step 0"
+				"step 0";
 				var cards = get.cards(num);
 				game.cardsGotoOrdering(cards);
 				var next = player.chooseToMove();
@@ -17467,7 +17687,7 @@ export class Library extends Uninstantable {
 					bottom = cards;
 					return [top, bottom];
 				};
-				"step 1"
+				"step 1";
 				var top = result.moved[0];
 				var bottom = result.moved[1];
 				top.reverse();
@@ -17644,7 +17864,7 @@ export class Library extends Uninstantable {
 								charlotte: true,
 								forced: true,
 								popup: false,
-							}
+							};
 							if (typeof map[i] == 'string') lib.translate[i] = map[i];
 						}
 					}, {}
@@ -17707,7 +17927,7 @@ export class Library extends Uninstantable {
 							}
 							return skill.filterFuns.every(fun => Boolean(fun(event, player, name))) &&
 								skill.filter2(event, player, name);
-						}
+						};
 					},
 					get filter2() {
 						return (event, player, name) => {
@@ -17804,7 +18024,7 @@ export class Library extends Uninstantable {
 						if (lib.skill[skillName] != skill) throw `This skill has been destroyed`;
 						if (typeof translation == 'string') {
 							_status.postReconnect.player_when[1][skillName] = translation;
-							game.broadcastAll((skillName, translation) => lib.translate[skillName] = translation, skillName, translation)
+							game.broadcastAll((skillName, translation) => lib.translate[skillName] = translation, skillName, translation);
 						}
 						return this;
 					},
@@ -17880,7 +18100,7 @@ export class Library extends Uninstantable {
 			getKnownCards(other, filter) {
 				if (!other) other = _status.event.player;
 				if (!other) other = this;
-				if (!filter) filter = (card) => { return true };
+				if (!filter) filter = (card) => { return true; };
 				return this.getCards('h', function (card) {
 					return card.isKnownBy(other) && filter(card);
 				});
@@ -17897,7 +18117,7 @@ export class Library extends Uninstantable {
 			hasKnownCards(other, filter) {
 				if (!other) other = _status.event.player;
 				if (!other) other = this;
-				if (!filter) filter = (card) => { return true };
+				if (!filter) filter = (card) => { return true; };
 				return this.countCards('h', function (card) {
 					return card.isKnownBy(other) && filter(card);
 				}) > 0;
@@ -18053,7 +18273,7 @@ export class Library extends Uninstantable {
 				return Math.max(0, player.countEnabledSlot(type) - player.getEquips(type).reduce(function (num, card) {
 					var types = get.subtypes(card, false);
 					return num + get.numOf(types, type);
-				}, 0))
+				}, 0));
 			}
 			//判断一名角色是否有可以用于装备新装备牌的区域（排除金箍棒和六龙等“不可被替换装备”）
 			//用法同下
@@ -18076,7 +18296,7 @@ export class Library extends Uninstantable {
 					var types = get.subtypes(card, false);
 					if (!lib.filter.canBeReplaced(card, player)) num += get.numOf(types, type);
 					return num;
-				}, 0))
+				}, 0));
 			}
 			//判断一名角色是否拥有未被废除的某个区域
 			//type为要判断的区域 若为空 则判断玩家是否有任意一个未被废除的区域
@@ -18148,7 +18368,7 @@ export class Library extends Uninstantable {
 				if (!subtype) return [];
 				return this.getCards('e', function (card) {
 					return get.subtypes(card, false).contains(subtype);
-				})
+				});
 			}
 			//新的废除装备区/恢复装备区/扩展装备区
 			//参数：废除来源角色（不写默认当前事件角色），废除区域（数字/区域字符串/数组，可以写多个，重复废除）
@@ -18258,7 +18478,7 @@ export class Library extends Uninstantable {
 				if (!map) {
 					map = (player.expandedSlots || {});
 				}
-				game.addVideo('$syncExpand', player, get.copy(map))
+				game.addVideo('$syncExpand', player, get.copy(map));
 				game.broadcast(function (player, map) {
 					player.expandedSlots = map;
 					player.$syncExpand(map);
@@ -18273,11 +18493,11 @@ export class Library extends Uninstantable {
 				if (!map) {
 					map = (player.disabledSlots || {});
 				}
-				game.addVideo('$syncDisable', player, get.copy(map))
+				game.addVideo('$syncDisable', player, get.copy(map));
 				game.broadcast(function (player, map) {
 					player.disabledSlots = map;
 					player.$syncDisable(map);
-				}, player, map)
+				}, player, map);
 				const map2 = get.copy(map);
 				const cards = Array.from(player.node.equips.childNodes);
 				for (const card of cards) {
@@ -18332,8 +18552,8 @@ export class Library extends Uninstantable {
 				if (combined) {
 					ranges.forEach(type => {
 						if (type == 'equip3' || type == 'equip4') rangex.add('equip3_4');
-						else rangex.add(type)
-					})
+						else rangex.add(type);
+					});
 				}
 				else {
 					rangex.push(...new Set(ranges));
@@ -18348,7 +18568,7 @@ export class Library extends Uninstantable {
 			}
 			//以下函数将不再进行后续维护
 			countDisabled() {
-				return this.countDisabledSlot.apply(this, arguments)
+				return this.countDisabledSlot.apply(this, arguments);
 			}
 			isDisabled(arg) {
 				return this.hasDisabledSlot(arg) && !this.hasEnabledSlot(arg);
@@ -18523,12 +18743,12 @@ export class Library extends Uninstantable {
 					target: target || this,
 				});
 				next.setContent(function () {
-					"step 0"
+					"step 0";
 					player.lose(cards, ui.special).set('getlx', false);
-					"step 1"
+					"step 1";
 					var cards = event.cards.slice(0);
 					cards.removeArray(player.getCards('hejsx'));
-					if (cards.length) target.directgains(cards, null, event.tag)
+					if (cards.length) target.directgains(cards, null, event.tag);
 				});
 				return next;
 			}
@@ -18686,8 +18906,8 @@ export class Library extends Uninstantable {
 					}
 				}
 				next.setContent('chooseToMove');
-				next.filterOk = function () { return true };
-				next.filterMove = function () { return true };
+				next.filterOk = function () { return true; };
+				next.filterMove = function () { return true; };
 				return next;
 			}
 			chooseToGuanxing(num) {
@@ -18702,7 +18922,7 @@ export class Library extends Uninstantable {
 				var getLeft = function (player) {
 					if (player == game.me && !ui.fakeme && !ui.chess) return player.getLeft() + player.node.avatar.offsetWidth / 2;
 					return player.getLeft() + player.offsetWidth / 2;
-				}
+				};
 				var player = this;
 				var emotion = ui.create.div('', '<div style="text-align:center"> <img src="' + lib.assetURL + 'image/emotion/throw_emotion/' + name + '1.png"> </div>', game.chess ? ui.chess : ui.window);
 				emotion.style.width = '60px';
@@ -19706,7 +19926,7 @@ export class Library extends Uninstantable {
 					unseen: this.isUnseen(0),
 					unseen2: this.isUnseen(1),
 					seatNum: this.seatNum,
-				}
+				};
 				for (var i = 0; i < state.judges.length; i++) {
 					state.views[i] = state.judges[i].viewAs;
 				}
@@ -19937,7 +20157,7 @@ export class Library extends Uninstantable {
 			}
 			clearMark(i, log) {
 				let num = this.countMark(i);
-				if (num > 0) this.removeMark(i, num, log)
+				if (num > 0) this.removeMark(i, num, log);
 			}
 			removeMark(i, num, log) {
 				if (typeof num != 'number' || !num) num = 1;
@@ -19998,7 +20218,7 @@ export class Library extends Uninstantable {
 				if (i == 'ghujia' || ((!this.marks[i].querySelector('.image') || this.storage[i + '_markcount']) &&
 					lib.skill[i] && lib.skill[i].intro && !lib.skill[i].intro.nocount &&
 					(this.storage[i] || this.storage[i + '_markcount'] || lib.skill[i].intro.markcount))) {
-					this.marks[i].classList.add('overflowmark')
+					this.marks[i].classList.add('overflowmark');
 					var num = 0;
 					if (typeof lib.skill[i].intro.markcount == 'function') {
 						num = lib.skill[i].intro.markcount(this.storage[i], this);
@@ -20659,7 +20879,7 @@ export class Library extends Uninstantable {
 				next.forceDie = true;
 				next.includeOut = true;
 				next.skill = skill || _status.event.name;
-				next.setContent('phase');
+				next.setContents('phase');
 				return next;
 			}
 			insertEvent(name, content, arg) {
@@ -20681,7 +20901,7 @@ export class Library extends Uninstantable {
 			phase(skill) {
 				var next = game.createEvent('phase', false);
 				next.player = this;
-				next.setContent('phase');
+				next.setContents('phase');
 				if (!_status.roundStart) {
 					_status.roundStart = this;
 				}
@@ -20827,7 +21047,7 @@ export class Library extends Uninstantable {
 						//next.dialog=next.prompt;
 					}
 					else {
-						var str = '请打出' + get.cnNumber(next.selectCard[0]) + '张'
+						var str = '请打出' + get.cnNumber(next.selectCard[0]) + '张';
 						if (filter) {
 							if (filter.name) {
 								str += get.translation(filter.name);
@@ -20950,7 +21170,7 @@ export class Library extends Uninstantable {
 						if (!lib.filter.cardDiscardable(cards[i], this.player, this)) num--;
 					}
 					return get.select(this.selectCard)[0] >= num;
-				}
+				};
 				next.setContent('chooseToDiscard');
 				next._args = Array.from(arguments);
 				return next;
@@ -20963,7 +21183,7 @@ export class Library extends Uninstantable {
 					if (check) next.ai = check;
 					else next.ai = function (card) {
 						if (typeof card == 'string' && lib.skill[card]) {
-							var ais = lib.skill[card].check || function () { return 0 };
+							var ais = lib.skill[card].check || function () { return 0; };
 							return ais();
 						}
 						var addi = (get.value(card) >= 8 && get.type(card) != 'equip') ? -3 : 0;
@@ -20974,7 +21194,7 @@ export class Library extends Uninstantable {
 						var getn = function (card) {
 							if (player.hasSkill('tianbian') && get.suit(card) == 'heart') return 13 * (Boolean(event.small) ? -1 : 1);
 							return get.number(card) * (Boolean(event.small) ? -1 : 1);
-						}
+						};
 						if (source && source != player) {
 							if (get.attitude(player, source) > 1) {
 								if (Boolean(event.small)) return getn(card) - get.value(card) / 3 + addi;
@@ -20987,7 +21207,7 @@ export class Library extends Uninstantable {
 							if (Boolean(event.small)) return -getn(card) - get.value(card) / 5 + addi;
 							return getn(card) - get.value(card) / 5 + addi;
 						}
-					}
+					};
 					next.setContent('chooseToCompareMultiple');
 				}
 				else {
@@ -20995,14 +21215,14 @@ export class Library extends Uninstantable {
 					if (check) next.ai = check;
 					else next.ai = function (card) {
 						if (typeof card == 'string' && lib.skill[card]) {
-							var ais = lib.skill[card].check || function () { return 0 };
+							var ais = lib.skill[card].check || function () { return 0; };
 							return ais();
 						}
 						var player = get.owner(card);
 						var getn = function (card) {
 							if (player.hasSkill('tianbian') && get.suit(card) == 'heart') return 13;
 							return get.number(card);
-						}
+						};
 						var event = _status.event.getParent();
 						var to = (player == event.player ? event.target : event.player);
 						var addi = (get.value(card) >= 8 && get.type(card) != 'equip') ? -6 : 0;
@@ -21016,7 +21236,7 @@ export class Library extends Uninstantable {
 							if (friend == Boolean(event.small)) return getn(card) - get.value(card) / (friend ? 3 : 5) + addi;
 							return -getn(card) - get.value(card) / (friend ? 3 : 5) + addi;
 						}
-					}
+					};
 					next.setContent('chooseToCompare');
 				}
 				next.forceDie = true;
@@ -21122,7 +21342,7 @@ export class Library extends Uninstantable {
 				if (next.isMine() == false && next.dialog) next.dialog.style.display = 'none';
 				if (next.filterButton == undefined) next.filterButton = lib.filter.filterButton;
 				if (next.selectButton == undefined) next.selectButton = [1, 1];
-				if (next.ai == undefined) next.ai = function () { return 1 };
+				if (next.ai == undefined) next.ai = function () { return 1; };
 				next.setContent('chooseButton');
 				next._args = Array.from(arguments);
 				next.forceDie = true;
@@ -22212,7 +22432,7 @@ export class Library extends Uninstantable {
 						}
 					}
 					node.appendChild(card);
-				}
+				};
 				for (var i = 0; i < cards.length; i++) {
 					cards[i].fix();
 					cards[i].remove();
@@ -22329,7 +22549,7 @@ export class Library extends Uninstantable {
 				next.getg = function (player) {
 					if (this.getlx === false || player != this.player || !this.cards) return [];
 					return this.cards.slice(0);
-				}
+				};
 				next.gaintag = [];
 				return next;
 			}
@@ -22916,7 +23136,7 @@ export class Library extends Uninstantable {
 					if (typeof card == 'string') {
 						card = { name: card };
 					}
-					next.card = get.autoViewAs(card, next.cards)
+					next.card = get.autoViewAs(card, next.cards);
 				}
 				next.player = this;
 				next.setContent('addJudge');
@@ -23039,7 +23259,7 @@ export class Library extends Uninstantable {
 					next.judge = get.judge(next.card);
 					next.judge2 = get.judge2(next.card);
 				}
-				if (next.judge == undefined) next.judge = function () { return 0 };
+				if (next.judge == undefined) next.judge = function () { return 0; };
 				if (next.position == undefined) next.position = ui.discardPile;
 				if (next.card) next.cardname = next.card.viewAs || next.card.name;
 
@@ -23498,7 +23718,7 @@ export class Library extends Uninstantable {
 				}
 			}
 			unmarkAuto(name, info) {
-				var storage = this.storage[name]
+				var storage = this.storage[name];
 				if (Array.isArray(info) && Array.isArray(storage)) {
 					storage.removeArray(info.slice(0));
 					this.markAuto(name);
@@ -23555,7 +23775,7 @@ export class Library extends Uninstantable {
 			}
 			removeStorage(name, mark) {
 				if (!this.hasStorage(name)) return false;
-				delete this.storage[name]
+				delete this.storage[name];
 				if (mark) {
 					this.unmarkSkill(name);
 				}
@@ -23671,7 +23891,7 @@ export class Library extends Uninstantable {
 							target: target
 						});
 					}
-				}
+				};
 				func(this, target, name, content, id);
 				if (!nobroadcast) game.broadcast(func, this, target, name, content, id);
 				return this;
@@ -23698,7 +23918,7 @@ export class Library extends Uninstantable {
 					info.name = get.translation(name);
 				}
 				if (!info.content) {
-					info.content = get.skillintro(name, learn, learn2)
+					info.content = get.skillintro(name, learn, learn2);
 				}
 				node.info = info;
 				node.addEventListener(lib.config.touchscreen ? 'touchend' : 'click', ui.click.card);
@@ -23880,7 +24100,7 @@ export class Library extends Uninstantable {
 			}
 			addSubPlayer(cfg) {
 				var skill = 'subplayer_' + cfg.name + '_' + get.id();
-				game.log(this, '获得了随从', '#g' + get.translation(cfg.name))
+				game.log(this, '获得了随从', '#g' + get.translation(cfg.name));
 				cfg.hs = cfg.hs || [];
 				cfg.es = cfg.es || [];
 				cfg.skills = cfg.skills || [];
@@ -23908,7 +24128,7 @@ export class Library extends Uninstantable {
 						ai: {
 							subplayer: true
 						}
-					}
+					};
 					lib.character[skill] = [cfg.sex, cfg.group, cfg.maxHp, cfg.skills, []];
 					if (Array.isArray(cfg.image)) {
 						cfg.image.forEach(image => lib.character[skill][4].push(image));
@@ -24008,7 +24228,7 @@ export class Library extends Uninstantable {
 							if (!lib.hook[name]) lib.hook[name] = [];
 							lib.hook[name].add(skill);
 							lib.hookmap[evt] = true;
-						}
+						};
 						for (const role in info.trigger) {
 							let evts = info.trigger[role];
 							if (!Array.isArray(evts)) evts = [evts];
@@ -24185,8 +24405,8 @@ export class Library extends Uninstantable {
 							if (key === skillkey) return false;
 							if (Array.isArray(player.additionalSkills[key])) return player.additionalSkills[key].includes(skill);
 							return player.additionalSkills[key] == skill;
-						}))
-					}
+						}));
+					};
 					if (Array.isArray(additionalSkills) && typeof target == 'string') {
 						if (additionalSkills.contains(target)) {
 							additionalSkills.remove(target);
@@ -24199,7 +24419,7 @@ export class Library extends Uninstantable {
 							if (!hasAnotherSKill(skill, additionalSkills)) this.removeSkill(additionalSkills);
 						}
 						else if (Array.isArray(additionalSkills)) {
-							const skillsToRemove = additionalSkills.filter(target => !hasAnotherSKill(skill, target))
+							const skillsToRemove = additionalSkills.filter(target => !hasAnotherSKill(skill, target));
 							this.removeSkill(skillsToRemove);
 						}
 					}
@@ -24365,7 +24585,7 @@ export class Library extends Uninstantable {
 							if (!lib.hook[name]) return;
 							lib.hook[name].remove(skill);
 							if (lib.hook[name].length == 0) delete lib.hook[name];
-						}
+						};
 						for (const role in info.trigger) {
 							let evts = info.trigger[role];
 							if (!Array.isArray(evts)) evts = [evts];
@@ -24479,7 +24699,7 @@ export class Library extends Uninstantable {
 					bannedSkill: skill,
 				}).then(() => {
 					delete player.storage[`temp_ban_${bannedSkill}`];
-				})
+				});
 				return skill;
 			}
 			isTempBanned(skill) {
@@ -24520,7 +24740,7 @@ export class Library extends Uninstantable {
 					else {
 						for (var i in this.forbiddenSkills) {
 							if (this.forbiddenSkills[i].includes(skill)) {
-								this.forbiddenSkills[i].remove(skill)
+								this.forbiddenSkills[i].remove(skill);
 								if (!this.forbiddenSkills[i].length) {
 									delete this.forbiddenSkills[i];
 								}
@@ -24537,7 +24757,7 @@ export class Library extends Uninstantable {
 							str += arr[i] + '+';
 						}
 						return str.slice(0, str.length - 1);
-					}
+					};
 					var forbidlist = lib.config.forbid.concat(lib.config.customforbid);
 					var skills = this.getSkills();
 					for (var i = 0; i < forbidlist.length; i++) {
@@ -24571,7 +24791,7 @@ export class Library extends Uninstantable {
 						return history.filter((event, index) => {
 							if (index > lastIndex) return false;
 							return filter(event);
-						})
+						});
 					}
 					return history.filter(filter);
 				}
@@ -24585,7 +24805,7 @@ export class Library extends Uninstantable {
 						history.forEach((event, index) => {
 							if (index > lastIndex) return false;
 							filter(event);
-						})
+						});
 					}
 					else {
 						history.forEach(filter);
@@ -24600,7 +24820,7 @@ export class Library extends Uninstantable {
 					return history.some((event, index) => {
 						if (index > lastIndex) return false;
 						return filter(event);
-					})
+					});
 				}
 				return history.some(filter);
 			}
@@ -24620,7 +24840,7 @@ export class Library extends Uninstantable {
 						return history.filter((event, index) => {
 							if (index > lastIndex) return false;
 							return filter(event);
-						})
+						});
 					}
 					return history.filter(filter);
 				}
@@ -24650,7 +24870,7 @@ export class Library extends Uninstantable {
 					else {
 						history.push(...value[key]);
 					}
-				})
+				});
 				if (filter) {
 					if (last) {
 						const lastIndex = history.indexOf(last);
@@ -24677,7 +24897,7 @@ export class Library extends Uninstantable {
 						if (history.some(filter)) return true;
 					}
 					return false;
-				})
+				});
 			}
 			getLastUsed(num) {
 				if (typeof num != 'number') num = 0;
@@ -24696,7 +24916,7 @@ export class Library extends Uninstantable {
 						stat = this.stat[i]; break;
 					}
 				}
-				if (!stat) return null
+				if (!stat) return null;
 				if (!key) return stat;
 				return stat[key];
 			}
@@ -24720,7 +24940,7 @@ export class Library extends Uninstantable {
 						}
 						if (player == game.me) ui.me.removeAttribute('style');
 					}
-				}, time)
+				}, time);
 			}
 			getCardUsable(card, pure) {
 				var player = this;
@@ -24751,7 +24971,7 @@ export class Library extends Uninstantable {
 						if (info && info.globalFrom) {
 							range += info.globalFrom;
 						}
-					})
+					});
 					return (player.getEquipRange() - range);
 				}
 				let base = game.checkMod(player, 'unchanged', 'attackRangeBase', player);
@@ -25506,7 +25726,7 @@ export class Library extends Uninstantable {
 			$draw(num, init, config) {
 				if (init !== false && init !== 'nobroadcast') {
 					game.broadcast(function (player, num, init, config) {
-						player.$draw(num, init, config)
+						player.$draw(num, init, config);
 					}, this, num, init, config);
 				}
 				var cards, node;
@@ -25606,14 +25826,14 @@ export class Library extends Uninstantable {
 					config = {
 						total: num,
 						current: 1
-					}
+					};
 				}
 				if (config && config.total > 1) {
 					var total = config.total, current = config.current;
 					var dxtotal;
 					if (total <= 5) {
 						dxtotal = Math.min(80, (total - 1) * 20);
-						dx += -dxtotal + 2 * dxtotal * (current - 1) / (total - 1)
+						dx += -dxtotal + 2 * dxtotal * (current - 1) / (total - 1);
 					}
 					else {
 						var total2 = Math.floor(total / 2);
@@ -25627,7 +25847,7 @@ export class Library extends Uninstantable {
 							dy += 20;
 						}
 						dxtotal = Math.min(80, (total - 1) * 20);
-						dx += -dxtotal + 2 * dxtotal * (current - 1) / (total - 1)
+						dx += -dxtotal + 2 * dxtotal * (current - 1) / (total - 1);
 					}
 					config.current++;
 				}
@@ -25649,20 +25869,20 @@ export class Library extends Uninstantable {
 					if (config && config.total > 1) {
 						setTimeout(function () {
 							if (cards) {
-								that.$draw(cards, false, config)
+								that.$draw(cards, false, config);
 							}
 							else {
-								that.$draw(num - 1, false, config)
+								that.$draw(num - 1, false, config);
 							}
-						}, 50)
+						}, 50);
 					}
 					else {
 						setTimeout(function () {
 							if (cards) {
-								that.$draw(cards, false, config)
+								that.$draw(cards, false, config);
 							}
 							else {
-								that.$draw(num - 1, false, config)
+								that.$draw(num - 1, false, config);
 							}
 						}, 200);
 					}
@@ -25704,7 +25924,7 @@ export class Library extends Uninstantable {
 							ui.refresh(node1);
 							node1.style.transform = '';
 							//node1.removeEventListener('webkitTransitionEnd',onEnd);
-						}
+						};
 						node1.listenTransition(onEnd);
 					}, 300);
 				};
@@ -25752,12 +25972,12 @@ export class Library extends Uninstantable {
 										ui.refresh(node2);
 										node2.style.transform = '';
 										//node2.removeEventListener('webkitTransitionEnd',onEnd);
-									}
+									};
 									node2.listenTransition(onEnd);
 								}, 200);
 							};
 							node2.listenTransition(onEnd02);
-						}(targets[i], cards[i], i))
+						}(targets[i], cards[i], i));
 					}
 				}, 200);
 			}
@@ -25797,7 +26017,7 @@ export class Library extends Uninstantable {
 							ui.refresh(node1);
 							node1.style.transform = '';
 							//node1.removeEventListener('webkitTransitionEnd',onEnd);
-						}
+						};
 						node1.listenTransition(onEnd);
 					}, 300);
 				};
@@ -25832,7 +26052,7 @@ export class Library extends Uninstantable {
 								ui.refresh(node2);
 								node2.style.transform = '';
 								//node2.removeEventListener('webkitTransitionEnd',onEnd);
-							}
+							};
 							node2.listenTransition(onEnd);
 						}, 200);
 					};
@@ -25882,7 +26102,7 @@ export class Library extends Uninstantable {
 					node = this.$throwordered(card.copy('thrown'), nosource);
 					if (time != undefined) {
 						node.fixed = true;
-						setTimeout(function () { node.delete() }, time);
+						setTimeout(function () { node.delete(); }, time);
 					}
 					lib.listenEnd(node);
 					return node;
@@ -25989,7 +26209,7 @@ export class Library extends Uninstantable {
 						var per = str.slice(str.indexOf('calc(') + 5, str.indexOf('%'));
 						var add = str.slice(str.indexOf('%') + 1, str.indexOf('px')).replace(/\s/g, '');
 						return [parseInt(per), parseInt(add)];
-					}
+					};
 					var nx = parseCalc(node.style.left);
 					var ny = parseCalc(node.style.top);
 					nx = nx[0] * ui.arena.offsetWidth / 100 + nx[1];
@@ -26156,7 +26376,7 @@ export class Library extends Uninstantable {
 					var per = str.slice(str.indexOf('calc(') + 5, str.indexOf('%'));
 					var add = str.slice(str.indexOf('%') + 1, str.indexOf('px')).replace(/\s/g, '');
 					return [parseInt(per), parseInt(add)];
-				}
+				};
 				var nx = parseCalc(node.style.left);
 				var ny = parseCalc(node.style.top);
 				nx = nx[0] * ui.arena.offsetWidth / 100 + nx[1];
@@ -26553,7 +26773,7 @@ export class Library extends Uninstantable {
 						ui.arena.classList.add('playerfocus');
 						setTimeout(function () {
 							ui.arena.classList.remove('playerfocus');
-						}, 1800)
+						}, 1800);
 					});
 					game.delay(3);
 				}
@@ -26795,7 +27015,7 @@ export class Library extends Uninstantable {
 				}
 				setTimeout(function () {
 					node.delete();
-					node.style.transform = 'scale(1.5)'
+					node.style.transform = 'scale(1.5)';
 				}, avatar ? 1600 : 1000);
 			}
 			$damagepop(num, nature, font, nobroadcast) {
@@ -26809,7 +27029,7 @@ export class Library extends Uninstantable {
 						node.classList.add('normal-font');
 					}
 					if (typeof num == 'number' && num > 0) {
-						if (num == Infinity) num = '+∞'
+						if (num == Infinity) num = '+∞';
 						else num = '+' + num;
 					}
 					else if (num == -Infinity) num = '-∞';
@@ -27482,7 +27702,7 @@ export class Library extends Uninstantable {
 				this.classList.add('card');
 				if (card[3]) {
 					let natures = get.natureList(card[3]);
-					natures.forEach(n => { if (n) this.classList.add(n) });
+					natures.forEach(n => { if (n) this.classList.add(n); });
 					this.nature = natures.filter(n => lib.nature.has(n)).sort(lib.sort.nature).join(lib.natureSeparator);
 				}
 				else if (this.nature) {
@@ -27703,7 +27923,7 @@ export class Library extends Uninstantable {
 					background: node.querySelector('.background'),
 					image: node.querySelector('.image'),
 					gaintag: node.querySelector('.gaintag'),
-				}
+				};
 				node.node.gaintag.innerHTML = '';
 				var clone = true;
 				var position;
@@ -28176,7 +28396,7 @@ export class Library extends Uninstantable {
 								lib.element.content[item]._parsed = true;
 							}
 						}
-						catch (_) {
+						catch {
 							throw new Error(`Content ${item} may not exist.\nlib.element.content[${item}] = ${lib.element.content[item]}`);
 						}
 						this.content = lib.element.content[item];
@@ -28184,6 +28404,19 @@ export class Library extends Uninstantable {
 				}
 				return this;
 			}
+
+			/**
+			 * 
+			 * @param {import("../util/index.js").AsyncFunction[] | keyof typeof lib.element.content} contents
+			 * @returns {GameEvent}
+			 */
+			setContents(contents) {
+				if (Array.isArray(contents)) this.contents = contents;
+				else if (contents in lib.element.content) return this.setContents(lib.element.content[contents]);
+				else throw new Error('not supported value.');
+				return this;
+			}
+
 			getLogv() {
 				for (var i = 1; i <= 3; i++) {
 					var event = this.getParent(i);
@@ -28295,7 +28528,7 @@ export class Library extends Uninstantable {
 					ai1: this.ai1,
 					ai2: this.ai2,
 					filterOk: this.filterOk,
-				}
+				};
 				if (skill) {
 					var info = get.info(skill);
 					this.skill = skill;
@@ -28360,7 +28593,7 @@ export class Library extends Uninstantable {
 								var card = get.card(), player = get.player();
 								var filter = evt._backup.filterCard;
 								if (filter && !filter(card, player, evt)) return false;
-								if (evt._backup.filterOk) return evt._backup.filterOk()
+								if (evt._backup.filterOk) return evt._backup.filterOk();
 								return true;
 							};
 						}
@@ -28462,7 +28695,7 @@ export class Library extends Uninstantable {
 							skill: skill,
 							player: player,
 							priority: get.priority(skill),
-						}
+						};
 						const map = info.firstDo ? firstDo : info.lastDo ? lastDo : doing;
 						if (!map) return;
 						if (map.doneList.some(i => i.skill === toadd.skill && i.player === toadd.player)) return;
@@ -28513,12 +28746,12 @@ export class Library extends Uninstantable {
 					player: "firstDo",
 					todoList: [],
 					doneList: [],
-				}
+				};
 				const lastDo = {
 					player: "lastDo",
 					todoList: [],
 					doneList: [],
-				}
+				};
 				const doingList = [];
 				const roles = ['player', 'source', 'target', 'global'];
 				const playerMap = game.players.concat(game.dead).sortBySeat(start);
@@ -28547,7 +28780,7 @@ export class Library extends Uninstantable {
 							else list.sort((a, b) => b.priority - a.priority);
 							allbool = true;
 						}
-					}
+					};
 
 					const notemp = player.skills.slice();
 					for (const j in player.additionalSkills) {
@@ -28585,7 +28818,7 @@ export class Library extends Uninstantable {
 					delete doing.addList;
 					doingList.push(doing);
 					player = player.nextSeat;
-				} while (player && player !== start)
+				} while (player && player !== start);
 				doingList.unshift(firstDo);
 				doingList.push(lastDo);
 				// console.log(name,event.player,doingList.map(i=>({player:i.player,todoList:i.todoList.slice(),doneList:i.doneList.slice()})))
@@ -28843,7 +29076,7 @@ export class Library extends Uninstantable {
 							alert((!obj || obj instanceof Error) ? String(obj) : get.stringify(obj));
 							game.promises.prompt('debugger调试').then(inputCallback);
 						}
-					}
+					};
 					game.promises.prompt('debugger调试').then(inputCallback);
 				});
 			}
@@ -29324,7 +29557,7 @@ export class Library extends Uninstantable {
 		get nodews() {
 			return this.NodeWS.prototype;
 		}
-	}
+	};
 	static card = {
 		list: [],
 		cooperation_damage: {
@@ -29405,7 +29638,7 @@ export class Library extends Uninstantable {
 			type: 'db_def',
 			fullimage: true,
 		},
-	}
+	};
 	static filter = {
 		all: () => true,
 		none: () => false,
@@ -29868,7 +30101,7 @@ export class Library extends Uninstantable {
 				}
 			}
 		}
-	}
+	};
 	static sort = {
 		nature: function (a, b) {
 			return (lib.nature.get(b) || 0) - (lib.nature.get(a) || 0);
@@ -29886,7 +30119,7 @@ export class Library extends Uninstantable {
 				if (group == 'shen') return base + 7;
 				if (group == 'double') return base + 7;
 				return base + 9;
-			}
+			};
 			return groupSort(a) - groupSort(b);
 		},
 		character: function (a, b) {
@@ -29905,7 +30138,7 @@ export class Library extends Uninstantable {
 				if (group == 'key') return base + 5;
 				if (group == 'western') return base + 6;
 				return base + 7;
-			}
+			};
 			const del = groupSort(a) - groupSort(b);
 			if (del != 0) return del;
 			let aa = a, bb = b;
@@ -29930,10 +30163,10 @@ export class Library extends Uninstantable {
 				if (type == 'equip') {
 					var type2 = get.subtype(name, false);
 					if (type2 && type2.slice) return 1 + parseInt(type2.slice(5) || 7);
-					return 8.5
+					return 8.5;
 				}
 				return 9;
-			}
+			};
 			var del = typeSort(a) - typeSort(b);
 			if (del != 0) return del;
 			var aa = a, bb = b;
@@ -29998,7 +30231,7 @@ export class Library extends Uninstantable {
 			if (a < b) return -1;
 			return 0;
 		}
-	}
+	};
 	static skill = {
 		stratagem_fury: {
 			marktext: '🔥',
@@ -30161,7 +30394,7 @@ export class Library extends Uninstantable {
 						if (typeof num == 'number' && num > 0) {
 							let trans = get.translation(key);
 							if (combined && key == 'equip3') trans = '坐骑';
-							str += '<li>' + trans + '栏：' + num + '个<br>'
+							str += '<li>' + trans + '栏：' + num + '个<br>';
 						}
 					}
 					if (str.length) return str.slice(0, str.length - 4);
@@ -30248,7 +30481,7 @@ export class Library extends Uninstantable {
 								if (info.type == 'damage') {
 									str += '<br><li>协力角色：' + get.translation(info.target);
 									str += '<br><li>协力原因：' + get.translation(info.reason);
-									str += '<br><li>协力进度：'
+									str += '<br><li>协力进度：';
 									var num = (info.damage || 0);
 									str += num;
 									str += '/4';
@@ -30301,7 +30534,7 @@ export class Library extends Uninstantable {
 								if (info.type == 'draw') {
 									str += '<br><li>协力角色：' + get.translation(info.target);
 									str += '<br><li>协力原因：' + get.translation(info.reason);
-									str += '<br><li>协力进度：'
+									str += '<br><li>协力进度：';
 									var num = (info.draw || 0);
 									str += num;
 									str += '/8';
@@ -30728,7 +30961,7 @@ export class Library extends Uninstantable {
 					},
 					position: 'hs',
 					prompt: "将一张桃当杀使用或打出",
-					check: function () { return 1 },
+					check: function () { return 1; },
 					ai: {
 						respondSha: true,
 						skillTagFilter: function (player) {
@@ -30750,7 +30983,7 @@ export class Library extends Uninstantable {
 						isCard: true,
 					},
 					prompt: "将一张桃当闪打出",
-					check: function () { return 1 },
+					check: function () { return 1; },
 					viewAsFilter: function (player) {
 						if (!player.countCards('hs', 'tao')) return false;
 					},
@@ -30784,7 +31017,7 @@ export class Library extends Uninstantable {
 				content: function (storage, player) {
 					if (typeof storage.intro2 == 'string') return storage.intro2;
 					if (typeof storage.intro2 == 'function') return storage.intro2(storage, player);
-					return '死亡前切换回主武将'
+					return '死亡前切换回主武将';
 				},
 				name: function (storage) {
 					return get.rawName(storage.name);
@@ -31172,10 +31405,10 @@ export class Library extends Uninstantable {
 				return false;
 			},
 			content: function () {
-				"step 0"
+				"step 0";
 				event.dying = trigger.player;
 				if (!event.acted) event.acted = [];
-				"step 1"
+				"step 1";
 				if (trigger.player.isDead()) {
 					event.finish();
 					return;
@@ -31184,7 +31417,7 @@ export class Library extends Uninstantable {
 				var str = get.translation(trigger.player) + '濒死，是否帮助？';
 				var str2 = '当前体力：' + trigger.player.hp;
 				if (lib.config.tao_enemy && event.dying.side != player.side && lib.config.mode != 'identity' && lib.config.mode != 'guozhan' && !event.dying.hasSkillTag('revertsave')) {
-					event._result = { bool: false }
+					event._result = { bool: false };
 				}
 				else if (player.canSave(event.dying)) {
 					player.chooseToUse({
@@ -31227,9 +31460,9 @@ export class Library extends Uninstantable {
 					});
 				}
 				else {
-					event._result = { bool: false }
+					event._result = { bool: false };
 				}
-				"step 2"
+				"step 2";
 				if (result.bool) {
 					var player = trigger.player;
 					if (player.hp <= 0 && !trigger.nodying && !player.nodying && player.isAlive() && !player.isOut() && !player.removed) event.goto(0);
@@ -31320,9 +31553,9 @@ export class Library extends Uninstantable {
 			forceDie: true,
 			//priority:-5,
 			content: function () {
-				"step 0"
+				"step 0";
 				event.logvid = trigger.getLogv();
-				"step 1"
+				"step 1";
 				event.targets = game.filterPlayer(function (current) {
 					return current != event.player && current.isLinked();
 				});
@@ -31332,7 +31565,7 @@ export class Library extends Uninstantable {
 				event._args = [trigger.num, trigger.nature, trigger.cards, trigger.card];
 				if (trigger.source) event._args.push(trigger.source);
 				else event._args.push("nosource");
-				"step 2"
+				"step 2";
 				if (event.targets.length) {
 					var target = event.targets.shift();
 					if (target.isLinked()) target.damage.apply(target, event._args.slice(0));
@@ -31384,7 +31617,7 @@ export class Library extends Uninstantable {
 				lib.skill._recasting.ai = ai;
 			}
 		}
-	}
+	};
 	static character = {};
 	static perfectPair = {};
 	static cardPile = {};
@@ -31736,7 +31969,7 @@ export class Library extends Uninstantable {
 						});
 						if (events.length) {
 							ui.connectEventsCount.innerHTML = events.filter(function (evt) {
-								return evt.creator == game.onlineKey || !get.is.banWords(evt.content)
+								return evt.creator == game.onlineKey || !get.is.banWords(evt.content);
 							}).length;
 							ui.connectEventsCount.show();
 						}
@@ -31834,7 +32067,7 @@ export class Library extends Uninstantable {
 						}
 					}
 					lib.init.onfree();
-				}
+				};
 				if (_status.event.parent) {
 					game.forceOver('noover', proceed);
 				}
@@ -31879,8 +32112,8 @@ export class Library extends Uninstantable {
 									ui.click.connectroom.call(caption);
 									delete _status.read_clipboard_text;
 								}
-							} catch (e) { console.log(e) }
-						}
+							} catch (e) { console.log(e); }
+						};
 						//每次启动只请求一次
 						_status.requestReadClipboard = true;
 						if (_status.read_clipboard_text) {
@@ -31919,7 +32152,7 @@ export class Library extends Uninstantable {
 				if (events && ui.connectEvents) {
 					ui.connectEvents.info = events;
 					var num = events.filter(function (evt) {
-						return typeof evt.creator == 'string' && (evt.creator == game.onlineKey || !get.is.banWords(evt.content))
+						return typeof evt.creator == 'string' && (evt.creator == game.onlineKey || !get.is.banWords(evt.content));
 					}).length;
 					if (num) {
 						ui.connectEventsCount.innerHTML = num;
@@ -32041,7 +32274,7 @@ export class Library extends Uninstantable {
 						game.send('inited');
 						ui.create.connecting(true);
 					});
-				}
+				};
 				if (_status.event.parent) {
 					game.forceOver('noover', proceed);
 				}
@@ -32266,7 +32499,7 @@ export class Library extends Uninstantable {
 							if (info.views[i] && info.views[i] != info.judges[i]) {
 								info.judges[i].classList.add('fakejudge');
 								info.judges[i].viewAs = info.views[i];
-								info.judges[i].node.background.innerHTML = lib.translate[info.views[i] + '_bg'] || get.translation(info.views[i])[0]
+								info.judges[i].node.background.innerHTML = lib.translate[info.views[i] + '_bg'] || get.translation(info.views[i])[0];
 							}
 							player.node.judges.appendChild(info.judges[i]);
 						}
@@ -32319,7 +32552,7 @@ export class Library extends Uninstantable {
 									game.me.node.identity.firstChild.innerHTML = '';
 								}
 							}
-						}
+						};
 					}
 					else {
 						if (Array.isArray(onreconnect)) {
@@ -32479,7 +32712,7 @@ export class Library extends Uninstantable {
 				}
 			}
 		}
-	}
+	};
 	static suit = ['club', 'spade', 'diamond', 'heart'];
 	static suits = ['club', 'spade', 'diamond', 'heart', 'none'];
 	static color = {
@@ -32862,7 +33095,7 @@ export class Library extends Uninstantable {
 	];
 	static other = {
 		ignore: () => void 0
-	}
+	};
 };
 
 export const lib = Library;

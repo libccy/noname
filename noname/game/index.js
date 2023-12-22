@@ -5833,8 +5833,26 @@ export class Game extends Uninstantable {
 	static runContent(belongAsyncEvent) {
 		return new Promise(resolve => {
 			let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
-			let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
-			if (event.content instanceof GeneratorFunction) {
+			let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result, _storeEvent } = event;
+			// 数组形式
+			if ("contents" in event && Array.isArray(event.contents)) {
+				event.contents[step](event, trigger, player, _storeEvent)
+					.then((evt) => Promise.resolve(evt))
+					.then((evt) => {
+						event._storeEvent = evt;
+						if (step < event.contents.length - 1 && !event.finished) return resolve();
+						if (game.executingAsyncEventMap.has(event.toEvent())) {
+							game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+								event.finish();
+								resolve();
+							}));
+						} else {
+							event.finish();
+							resolve();
+						}
+					})
+			}
+			else if (event.content instanceof GeneratorFunction) {
 				if (!event.debugging) {
 					if (event.generatorContent) event.generatorContent.return();
 					event.generatorContent = event.content(event, step, source, player, target, targets,
