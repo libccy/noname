@@ -1985,7 +1985,7 @@ export class Game extends Uninstantable {
 	 * 	ai: import('../ai/index.js')['AI'],
 	 * _status: import('../status/index.js')['_status']
 	 * ) => any } content 
-	 * @param {*} url 
+	 * @param {*} [url] 
 	 * @returns 
 	 */
 	static import(type, content, url) {

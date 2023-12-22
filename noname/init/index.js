@@ -376,6 +376,7 @@ export async function boot() {
 					alerted = true;
 					continue;
 				}
+				// @ts-ignore
 				game.import('extension', { name: config.get('extensions')[name] });
 			}
 		}
@@ -390,7 +391,7 @@ export async function boot() {
 		game.saveConfig('layout', 'mobile');
 		game.saveConfig('phonelayout', true);
 	}
-	Reflect.get(game, 'layout', layout);
+	Reflect.set(game, 'layout', layout);
 
 	if (config.get('image_background_random')) {
 		if (_status.htmlbg) {
@@ -916,7 +917,9 @@ function setWindowListener() {
 		if (_status && _status.event) {
 			let evt = _status.event;
 			str += `\nevent.name: ${evt.name}\nevent.step: ${evt.step}`;
+			// @ts-ignore
 			if (evt.parent) str += `\nevent.parent.name: ${evt.parent.name}\nevent.parent.step: ${evt.parent.step}`;
+			// @ts-ignore
 			if (evt.parent && evt.parent.parent) str += `\nevent.parent.parent.name: ${evt.parent.parent.name}\nevent.parent.parent.step: ${evt.parent.parent.step}`;
 			if (evt.player || evt.target || evt.source || evt.skill || evt.card) {
 				str += '\n-------------';
