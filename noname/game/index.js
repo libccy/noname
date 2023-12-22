@@ -7273,11 +7273,11 @@ export class Game extends Uninstantable {
 				ui.window.appendChild(event.nodes[i]);
 			}
 			'step 1'
-			var rand = event.config.first;
-			if (rand == 'rand') {
-				rand = (Math.random() < 0.5);
+			let rand1 = event.config.first;
+			if (rand1 == 'rand') {
+				rand1 = (Math.random() < 0.5);
 			}
-			if (rand) {
+			if (rand1) {
 				_status.color = true;
 				event.side = 1;
 			}
@@ -7394,17 +7394,17 @@ export class Game extends Uninstantable {
 					event.avatars[i].classList.add('selecting');
 				}
 			}
-			var rand = [];
+			let rand2 = [];
 			for (let i = 0; i < event.config.width; i++) {
 				for (let j = 0; j < event.config.width - i; j++) {
-					rand.push(i);
+					rand2.push(i);
 				}
 			}
 			for (let i = 0; i < event.config.num; i++) {
-				let rand2 = rand.randomGet();
-				for (let j = 0; j < rand.length; j++) {
-					if (rand[j] == rand2) {
-						rand.splice(j--, 1);
+				let rand2 = rand2.randomGet();
+				for (let j = 0; j < rand2.length; j++) {
+					if (rand2[j] == rand2) {
+						rand2.splice(j--, 1);
 					}
 				}
 				event.enemylist.push(event.enemy[rand2]);
