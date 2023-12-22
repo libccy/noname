@@ -1,10 +1,14 @@
 /**
- * @typedef {InstanceType<typeof lib.element.Player>} Player
- * @typedef {InstanceType<typeof lib.element.Card>} Card
- * @typedef {InstanceType<typeof lib.element.VCard>} VCard
- * @typedef {InstanceType<typeof lib.element.GameEvent>} GameEvent
- * @typedef {InstanceType<typeof lib.element.GameEventPromise>} GameEventPromise
- * @typedef {InstanceType<typeof lib.element.NodeWS>} NodeWS
+ * @typedef { InstanceType<typeof lib.element.Player> } Player
+ * @typedef { InstanceType<typeof lib.element.Card> } Card
+ * @typedef { InstanceType<typeof lib.element.VCard> } VCard
+ * @typedef { InstanceType<typeof lib.element.Button> } Button
+ * @typedef { InstanceType<typeof lib.element.Dialog> } Dialog
+ * @typedef { InstanceType<typeof lib.element.GameEvent> } GameEvent
+ * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> & typeof Promise<typeof lib.element.GameEvent> } GameEventPromise
+ * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
+ * @typedef { 'male' | 'female' | 'dobule' | 'none' } Sex
+ * @typedef { [Sex, string, number | string, string[], any[]] } Character
 */
 import { nonameInitialized, assetURL, userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
 import { AI as ai } from '../ai/index.js';
@@ -33,6 +37,9 @@ export class Library extends Uninstantable {
 	static changeLog = [];
 	static updates = [];
 	static canvasUpdates = [];
+	/**
+	 * @type { import('../game/index.js').Video[] }
+	 */
 	static video = [];
 	static skilllist = [];
 	static connectBanned = [];
@@ -78,6 +85,17 @@ export class Library extends Uninstantable {
 	static extensionPack = {};
 	static cardType = {};
 	static hook = { globalskill: {} };
+	/**
+	* @returns {never}
+	*/
+	static typeAnnotation() {
+		/**
+		 * @type { import('../game/index.js').Videos[] }
+		 */
+		// @ts-ignore
+		this.videos;
+		throw new Error('Do not call this method');
+	}
 	//函数钩子
 	static hooks = {
 		// 本体势力的颜色
@@ -20953,20 +20971,20 @@ export class Library extends Uninstantable {
 						var player = _status.event.player;
 						var event = _status.event.getParent();
 						var getn = function (card) {
-							if (player.hasSkill('tianbian') && get.suit(card) == 'heart') return 13 * (event.small ? -1 : 1);
-							return get.number(card) * (event.small ? -1 : 1);
+							if (player.hasSkill('tianbian') && get.suit(card) == 'heart') return 13 * (Boolean(event.small) ? -1 : 1);
+							return get.number(card) * (Boolean(event.small) ? -1 : 1);
 						}
 						if (source && source != player) {
 							if (get.attitude(player, source) > 1) {
-								if (event.small) return getn(card) - get.value(card) / 2 + addi;
-								return -getn(card) - get.value(card) / 2 + addi;
+								if (Boolean(event.small)) return getn(card) - get.value(card) / 3 + addi;
+								return -getn(card) - get.value(card) / 3 + addi;
 							}
-							if (event.small) return -getn(card) - get.value(card) / 2 + addi;
-							return getn(card) - get.value(card) / 2 + addi;
+							if (Boolean(event.small)) return -getn(card) - get.value(card) / 5 + addi;
+							return getn(card) - get.value(card) / 5 + addi;
 						}
 						else {
-							if (event.small) return -getn(card) - get.value(card) / 2 + addi;
-							return getn(card) - get.value(card) / 2 + addi;
+							if (Boolean(event.small)) return -getn(card) - get.value(card) / 5 + addi;
+							return getn(card) - get.value(card) / 5 + addi;
 						}
 					}
 					next.setContent('chooseToCompareMultiple');
@@ -20987,18 +21005,15 @@ export class Library extends Uninstantable {
 						var event = _status.event.getParent();
 						var to = (player == event.player ? event.target : event.player);
 						var addi = (get.value(card) >= 8 && get.type(card) != 'equip') ? -6 : 0;
+						var friend = get.attitude(player, to) > 0;
 						if (card.name == 'du') addi -= 5;
 						if (player == event.player) {
-							if (event.small) {
-								return -getn(card) - get.value(card) / 2 + addi;
-							}
-							return getn(card) - get.value(card) / 2 + addi;
+							if (Boolean(event.small)) return -getn(card) - get.value(card) / (friend ? 4 : 5) + addi;
+							return getn(card) - get.value(card) / (friend ? 4 : 5) + addi;
 						}
 						else {
-							if ((get.attitude(player, to) <= 0) == Boolean(event.small)) {
-								return -getn(card) - get.value(card) / 2 + addi;
-							}
-							return getn(card) - get.value(card) / 2 + addi;
+							if (friend == Boolean(event.small)) return getn(card) - get.value(card) / (friend ? 3 : 5) + addi;
+							return -getn(card) - get.value(card) / (friend ? 3 : 5) + addi;
 						}
 					}
 					next.setContent('chooseToCompare');
@@ -25338,20 +25353,20 @@ export class Library extends Uninstantable {
 				if (this.hasSkillTag('respondShan', true, null, true)) return true;
 				return this.hasUsableCard('shan');
 			}
-			mayHaveSha(viewer, type, ignore) {
-				if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondSha', true, type, true)) return true;
+			mayHaveSha(viewer, type, ignore, rvt) {
+				//rvt: return value type 'count', 'odds', 'bool'(default)
+				let count = 0;
+				if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondSha', true, type, true)) {
+					if (rvt === 'count') count++;
+					else return true;
+				}
 				if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
 				let cards, selected = get.copy(ui.selected.cards);
 				if (get.itemtype(ignore) === 'cards') selected.addArray(ignore);
 				else if (get.itemtype(ignore) === 'card') selected.add(ignore);
-				/*if(this===viewer||get.itemtype(viewer)==='player'&&viewer.hasSkillTag('viewHandcard',null,this,true)) cards=this.getCards('h');
-				else cards=this.getShownCards();*/
-				if (this === viewer || get.itemtype(viewer) == 'player') {
-					cards = this.getKnownCards(viewer);
-				} else {
-					cards = this.getShownCards();
-				}
-				if (cards.some(card => {
+				if (this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
+				else cards = this.getShownCards();
+				count += cards.filter(card => {
 					if (selected.includes(card)) return false;
 					let name = get.name(card, this);
 					if (name == 'sha' || name == 'hufu' || name == 'yuchanqian') {
@@ -25360,25 +25375,36 @@ export class Library extends Uninstantable {
 						return true;
 					}
 					return false;
-				})) return true;
+				}).length;
+				if (count && rvt !== 'count') return true;
 				let hs = this.getCards('hs').filter(i => !cards.includes(i) && !selected.includes(i)).length;
-				if (hs === 0) return false;
-				return Math.pow(hs + (this.isPhaseUsing() ? 6 : 4), 2) > 100 * _status.event.getRand('mayHaveSha');
+				if (!hs) {
+					if (rvt === 'count') return count;
+					return false;
+				}
+				if (rvt === 'count') {
+					if (this.isPhaseUsing()) return count + hs / 4;
+					return count + hs / 4.8;
+				}
+				if (this.isPhaseUsing()) count += Math.pow(2 + hs, 2) / 40;
+				else count += -1.5 * Math.log(1 - hs / 10);
+				if (rvt === 'odds') return Math.min(1, count);
+				return count > _status.event.getRand('mayHaveSha' + hs + this.playerid);
 			}
-			mayHaveShan(viewer, type, ignore) {
-				if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondShan', true, type, true)) return true;
+			mayHaveShan(viewer, type, ignore, rvt) {
+				//rvt: return value type 'count', 'odds', 'bool'(default)
+				let count = 0;
+				if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondShan', true, type, true)) {
+					if (rvt === 'count') count++;
+					else return true;
+				}
 				if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
 				let cards, selected = get.copy(ui.selected.cards);
 				if (get.itemtype(ignore) === 'cards') selected.addArray(ignore);
 				else if (get.itemtype(ignore) === 'card') selected.add(ignore);
-				/*if(this===viewer||get.itemtype(viewer)==='player'&&viewer.hasSkillTag('viewHandcard',null,this,true)) cards=this.getCards('h');
-				else cards=this.getShownCards();*/
-				if (this === viewer || get.itemtype(viewer) == 'player') {
-					cards = this.getKnownCards(viewer);
-				} else {
-					cards = this.getShownCards();
-				}
-				if (cards.some(card => {
+				if (this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
+				else cards = this.getShownCards();
+				count += cards.filter(card => {
 					if (selected.includes(card)) return false;
 					let name = get.name(card, this);
 					if (name === 'shan' || name === 'hufu') {
@@ -25387,10 +25413,21 @@ export class Library extends Uninstantable {
 						return true;
 					}
 					return false;
-				})) return true;
+				}).length;
+				if (count && rvt !== 'count') return true;
 				let hs = this.getCards('hs').filter(i => !cards.includes(i) && !selected.includes(i)).length;
-				if (hs === 0) return false;
-				return Math.pow(hs + (this.isPhaseUsing() ? 3 : 5), 2) > 100 * _status.event.getRand('mayHaveShan');
+				if (!hs) {
+					if (rvt === 'count') return count;
+					return false;
+				}
+				if (rvt === 'count') {
+					if (this.isPhaseUsing()) return count + hs / 6;
+					return count + hs / 3.5;
+				}
+				if (this.isPhaseUsing()) count += -1.5 * Math.log(1 - hs / 10);
+				else count += 2 * hs / (5 + hs);
+				if (rvt === 'odds') return Math.min(1, count);
+				return count > _status.event.getRand('mayHaveShan' + hs + this.playerid);
 			}
 			hasCard(name, position) {
 				if (typeof name == 'function') {
@@ -27842,7 +27879,7 @@ export class Library extends Uninstantable {
 			}
 		},
 		GameEvent: class {
-			/** @type { Promise<GameEvent> & GameEvent & GameEventPromise } */
+			/** @type { GameEventPromise } */
 			#promise;
 			/**
 			 * @param {string} [name]
@@ -27861,11 +27898,11 @@ export class Library extends Uninstantable {
 				this.step = 0;
 				this.finished = false;
 				/**
-				 * @type {(Promise<GameEvent> & GameEvent & GameEventPromise)[]}
+				 * @type {(GameEventPromise)[]}
 				 */
 				this.next = [];
 				/**
-				 * @type {(Promise<GameEvent> & GameEvent & GameEventPromise)[]}
+				 * @type {(GameEventPromise)[]}
 				 */
 				this.after = [];
 				this.custom = {
@@ -28647,7 +28684,7 @@ export class Library extends Uninstantable {
 			/**
 			 * 事件转为Promise化
 			 * 
-			 * @returns { Promise<GameEvent> & GameEvent & GameEventPromise }
+			 * @returns { GameEventPromise }
 			 */
 			toPromise() {
 				if (!this.#promise) {

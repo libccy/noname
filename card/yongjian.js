@@ -162,11 +162,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					value:function(card,player){
-						if(player.getEquips(1).contains(card)) return 0;
+						if(player.getEquips(1).contains(card)) return 0.4;
 						return 4;
 					},
 					equipValue:function(card,player){
-						if(player.getCards('e').contains(card)) return 0;
+						if(player.getCards('e').contains(card)) return 0.4;
 						return -get.value(player.getCards('e'));
 					},
 					basic:{
@@ -226,11 +226,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					equipValue:function(card,player){
-						if(get.position(card)=='e') return -2;
+						if(get.position(card)=='e'){
+							if(player.hasSex('male')) return -7;
+							return 0;
+						}
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquips(2).contains(card)) return -3;
+						if(player.getEquips(2).contains(card)){
+							if(player.hasSex('male')) return -8;
+							return 0;
+						}
 						return 3;
 					},
 					basic:{
@@ -260,11 +266,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					equipValue:function(card,player){
-						if(get.position(card)=='e') return -1;
+						if(get.position(card)=='e') return -8;
 						return 1;
 					},
 					value:function(card,player){
-						if(player.getEquips(2).contains(card)) return -2.5;
+						if(player.getEquips(2).contains(card)) return -10;
 						return 2.5;
 					},
 					basic:{

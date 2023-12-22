@@ -1,4 +1,4 @@
-import { userAgent, Uninstantable } from "../util/index.js";
+import { userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
 import { AI as ai } from '../ai/index.js';
 import { Game as game } from '../game/index.js';
 import { Library as lib } from '../library/index.js';
@@ -1832,12 +1832,65 @@ export class Get extends Uninstantable {
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 	static xyDistance(from, to) { return Math.sqrt((from[0] - to[0]) * (from[0] - to[0]) + (from[1] - to[1]) * (from[1] - to[1])) }
+	/**
+	 * @overload
+	 * @returns { void }
+	 */
+	/**
+	 * @overload
+	 * @param { string } obj 
+	 * @returns { 'position' | 'natures' | 'nature' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Player[] } obj 
+	 * @returns { 'players' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Card[] } obj 
+	 * @returns { 'cards' }
+	 */
+	/**
+	 * @overload
+	 * @param { [number, number] } obj 
+	 * @returns { 'select' }
+	 */
+	/**
+	 * @overload
+	 * @param { [number, number, number, number] } obj 
+	 * @returns { 'divposition' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Button } obj 
+	 * @returns { 'button' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Card } obj 
+	 * @returns { 'card' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Player } obj 
+	 * @returns { 'player' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').Dialog } obj 
+	 * @returns { 'dialog' }
+	 */
+	/**
+	 * @overload
+	 * @param { import('../library/index.js').GameEvent | import('../library/index.js').GameEventPromise } obj 
+	 * @returns { 'event' }
+	 */
 	static itemtype(obj) {
-		var i, j;
 		if (typeof obj == 'string') {
 			if (obj.length <= 5) {
-				var bool = true;
-				for (i = 0; i < obj.length; i++) {
+				let bool = true;
+				for (let i = 0; i < obj.length; i++) {
 					if (/h|e|j|s|x/.test(obj[i]) == false) {
 						bool = false; break;
 					}
@@ -1847,42 +1900,26 @@ export class Get extends Uninstantable {
 			if (obj.includes(lib.natureSeparator) && obj.split(lib.natureSeparator).every(n => lib.nature.has(n))) return 'natures';
 			if (lib.nature.has(obj)) return 'nature';
 		}
-		if (Array.isArray(obj) && obj.length) {
-			var isPlayers = true;
-			for (i = 0; i < obj.length; i++) {
-				if (get.itemtype(obj[i]) != 'player') { isPlayers = false; break; }
-			}
-			if (isPlayers) return 'players';
-
-			var isCards = true;
-			for (i = 0; i < obj.length; i++) {
-				if (get.itemtype(obj[i]) != 'card') { isCards = false; break; }
-			}
-			if (isCards) return 'cards';
-
+		if (Array.isArray(obj) && obj.length > 0) {
+			if (obj.every(p => p instanceof lib.element.Player)) return 'players';
+			if (obj.every(p => p instanceof lib.element.Card)) return 'cards';
 			if (obj.length == 2) {
 				if (typeof obj[0] == 'number' && typeof obj[1] == 'number') {
 					if (obj[0] <= obj[1] || obj[1] <= -1) return 'select';
 				}
 			}
-
 			if (obj.length == 4) {
-				var isPosition = true;
-				for (i = 0; i < obj.length; i++) {
-					if (typeof obj[i] != 'number') { isPosition = false; break; }
+				if (obj.every(p => typeof p == 'number')) {
+					return 'divposition';
 				}
-				if (isPosition) return 'divposition';
 			}
 		}
-		if (get.objtype(obj) == 'div') {
-			if (obj.classList.contains('button')) return 'button';
-			if (obj.classList.contains('card')) return 'card';
-			if (obj.classList.contains('player')) return 'player';
-			if (obj.classList.contains('dialog')) return 'dialog';
-		}
-		if (get.is.object(obj)) {
-			if (obj.isMine == lib.element.GameEvent.prototype.isMine) return 'event';
-		}
+		if (obj instanceof lib.element.Button) return 'button';
+		if (obj instanceof lib.element.Card) return 'card';
+		if (obj instanceof lib.element.Player) return 'player';
+		if (obj instanceof lib.element.Dialog) return 'dialog';
+		if (obj instanceof lib.element.GameEvent ||
+			obj instanceof lib.element.GameEventPromise) return 'event';
 	}
 	static equipNum(card) {
 		if (get.type(card) == 'equip') {
@@ -2172,11 +2209,15 @@ export class Get extends Uninstantable {
 			return lib.card[name];
 		}
 	}
+	/**
+	 * @param { number | [number, number] | (()=>[number, number]) } [select]
+	 * @returns { [number, number] }
+	 */
 	static select(select) {
-		if (typeof select == 'number') return [select, select];
-		if (get.itemtype(select) == 'select') return select;
 		if (typeof select == 'function') return get.select(select());
-		return [1, 1]
+		else if (typeof select == 'number') return [select, select];
+		else if (select && get.itemtype(select) == 'select') return select;
+		return [1, 1];
 	}
 	static card(original) {
 		if (_status.event.skill) {
@@ -2428,6 +2469,10 @@ export class Get extends Uninstantable {
 		result = handleZero(result);
 		return result;
 	}
+	/**
+	 * @param {((a: import('../library/index.js').Button, b: import('../library/index.js').Button) => number)} [sort] 排序函数
+	 * @returns { import('../library/index.js').Button[] }
+	 */
 	static selectableButtons(sort) {
 		if (!_status.event.player) return [];
 		var buttons = _status.event.dialog.buttons;
@@ -2443,6 +2488,10 @@ export class Get extends Uninstantable {
 		}
 		return selectable;
 	}
+	/**
+	 * @param {((a: import('../library/index.js').Card, b: import('../library/index.js').Card) => number)} [sort] 排序函数
+	 * @returns { import('../library/index.js').Card[] }
+	 */
 	static selectableCards(sort) {
 		if (!_status.event.player) return [];
 		var cards = _status.event.player.getCards('hes');
@@ -2458,6 +2507,9 @@ export class Get extends Uninstantable {
 		}
 		return selectable;
 	}
+	/**
+	 * @returns { string[] } 技能名数组
+	 */
 	static skills() {
 		var skills = [];
 		if (ui.skills) {
@@ -2532,6 +2584,10 @@ export class Get extends Uninstantable {
 		}
 		return list;
 	}
+	/**
+	 * @param {((a: import('../library/index.js').Player, b: import('../library/index.js').Player) => number)} [sort] 排序函数
+	 * @returns { import('../library/index.js').Player[] }
+	 */
 	static selectableTargets(sort) {
 		var selectable = [];
 		var players = game.players.slice(0);
