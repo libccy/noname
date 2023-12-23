@@ -566,10 +566,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				filter:function(event,player){
-					var cards=player.countCards('s',card=>card.hasGaintag('sbguanxing'));
-					var num=player.getAllHistory('useSkill',evt=>evt.skill=='sbguanxing').length;
-					if(!cards.length&&num>3) return false;
-					return event.name=='phaseZhunbei'||(player.hasSkill('sbguanxing_on'));
+					var bool=player.hasCards(card=>card.hasGaintag('sbguanxing'),'s');
+					if(event.name=='phaseZhunbei'){
+						var num=player.countMark('sbguanxingx');
+						return bool||num<=3;
+					}
+					return bool&&player.hasSkill('sbguanxing_on');
 				},
 				forced:true,
 				locked:false,
@@ -579,9 +581,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.goto(2);
 						return;
 					}
+					player.addMark('sbguanxingx',1,false);
 					var cards=player.getCards('s',card=>card.hasGaintag('sbguanxing'));
 					if(cards.length) player.loseToDiscardpile(cards);
-					var num=player.getAllHistory('useSkill',evt=>evt.skill=='sbguanxing').length-1;
+					var num=player.countMark('sbguanxingx')-1;
 					event.num=Math.max(0,7-2*num);
 					'step 1'
 					if(num){
@@ -591,7 +594,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.loseToSpecial(cards2,'sbguanxing').visible=true;
 						player.markSkill('sbguanxing');
 					}
-					else if(!player.countCards('s',card=>card.hasGaintag('sbguanxing'))) event.finish();
 					'step 2'
 					var cards=player.getCards('s',card=>card.hasGaintag('sbguanxing'));
 					if(cards.length){
