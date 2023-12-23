@@ -21,6 +21,7 @@ import { GNC as gnc } from '../gnc/index.js';
 import { LibInit } from "./init/index.js";
 import { Announce } from "./announce/index.js";
 import Content from "./element/content.js";
+import Contents from "./element/contents.js";
 
 export class Library extends Uninstantable {
 	static configprefix = 'noname_0.9_';
@@ -9212,6 +9213,7 @@ export class Library extends Uninstantable {
 	};
 	static element = {
 		content: Content,
+		contents: Contents,
 		Player: class extends HTMLDivElement {
 			/**
 			 * @param {HTMLDivElement} [position]
@@ -19914,12 +19916,12 @@ export class Library extends Uninstantable {
 
 			/**
 			 * 
-			 * @param {import("../util/index.js").AsyncFunction[] | keyof typeof lib.element.content} contents
+			 * @param {import("../util/index.js").AsyncFunction[] | keyof typeof lib.element.contents} contents
 			 * @returns {GameEvent}
 			 */
 			setContents(contents) {
 				if (Array.isArray(contents)) this.contents = contents;
-				else if (contents in lib.element.content) return this.setContents(lib.element.content[contents]);
+				else if (contents in lib.element.contents) return this.setContents(lib.element.contents[contents]);
 				else throw new Error('not supported value.');
 				return this;
 			}
@@ -24603,7 +24605,11 @@ export class Library extends Uninstantable {
 	static other = {
 		ignore: () => void 0
 	};
-};
+}
+Library.config = undefined;
+
+Library.configOL = undefined;
+;
 
 export const lib = Library;
 
