@@ -6562,13 +6562,13 @@ export class Game extends Uninstantable {
 	 * @param { import('../library/index.js').Player } [player2] 
 	 */
 	static swapPlayer(player, player2) {
+		let players = game.players.concat(game.dead)
 		if (player2) {
 			if (player == game.me) game.swapPlayer(player2);
 			else if (player2 == game.me) game.swapPlayer(player);
 		}
 		else {
 			if (player == game.me) return;
-			let players = game.players.concat(game.dead);
 			for (let i = 0; i < players.length; i++) {
 				players[i].style.transition = 'all 0s';
 			}
@@ -6621,11 +6621,11 @@ export class Game extends Uninstantable {
 		if (lib.config.mode == 'identity') {
 			game.me.setIdentity(game.me.identity);
 		}
-		setTimeout(() => {
+		setTimeout((players) => {
 			for (let i = 0; i < players.length; i++) {
 				players[i].style.transition = '';
 			}
-		}, 100);
+		}, 100, players);
 	}
 	/**
 	 * @param { import('../library/index.js').Player } player
