@@ -369,9 +369,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			sbhuoji1:{audio:2},
-			sbhuoji2:{audio:2},
-			sbhuoji3:{audio:2},
+			sbhuoji1:{audio:true},
+			sbhuoji2:{audio:true},
+			sbhuoji3:{audio:true},
 			sbkanpo:{
 				init:function(player){
 					if(!player.storage.sbkanpo){
