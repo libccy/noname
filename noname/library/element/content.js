@@ -6662,7 +6662,8 @@ export default {
 		"step 5";
 		ui.clear();
 	},
-	draw: function () {
+	draw: async (event, _trigger, player) => {
+		const { num } = event;
 		// if(lib.config.background_audio){
 		// 	game.playAudio('effect','draw');
 		// }
@@ -6689,7 +6690,7 @@ export default {
 				game.log(player, '从牌库中获得了' + get.cnNumber(event.drawDeck) + '张牌');
 			}
 		}
-		var cards;
+		let cards;
 		if (num > 0) {
 			if (event.bottom) cards = get.bottomCards(num);
 			else if (player.getTopCards) cards = player.getTopCards(num);
@@ -6701,24 +6702,26 @@ export default {
 		if (event.drawDeck) {
 			cards = cards.concat(player.getDeckCards(event.drawDeck));
 		}
+		let next;
 		if (event.animate != false) {
 			if (event.visible) {
-				var next = player.gain(cards, 'gain2');
+				next = player.gain(cards, 'gain2');
 				if (event.bottom) game.log(player, '从牌堆底摸了' + get.cnNumber(num) + '张牌（', cards, '）');
 				else game.log(player, '摸了' + get.cnNumber(num) + '张牌（', cards, '）');
 			}
 			else {
-				var next = player.gain(cards, 'draw');
+				next = player.gain(cards, 'draw');
 			}
 		}
 		else {
-			var next = player.gain(cards);
+			next = player.gain(cards);
 			if (event.$draw) {
 				player.$draw(cards.length);
 			}
 		}
 		if (event.gaintag) next.gaintag.addArray(event.gaintag);
 		event.result = cards;
+		await next;
 	},
 	discard: function () {
 		"step 0";
