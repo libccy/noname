@@ -20501,6 +20501,18 @@ export class Library extends Uninstantable {
 								// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
 								// 再执行game.loop是因为原有的game.loop被await卡住了，
 								// 得新执行一个只执行这个异步事件的game.loop
+
+								// 事件自行处理skip情况
+								if (event.player && event.player.skipList.contains(event.name)) {
+									_status.event.trigger(event.name + 'Skipped');
+									event.player.skipList.remove(event.name);
+									if (lib.phaseName.contains(event.name)) event.player.getHistory('skipped').add(event.name);
+									_status.event.next.remove(eventPromise);
+									event.finish();
+									resolve();
+									return eventPromise;
+								}
+
 								if (_status.event != eventPromise) {
 									eventPromise.parent = _status.event;
 									_status.event = eventPromise;
