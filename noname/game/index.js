@@ -5836,21 +5836,18 @@ export class Game extends Uninstantable {
 			let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result, _storeEvent } = event;
 			// 数组形式
 			if ("contents" in event && Array.isArray(event.contents)) {
-				event.contents[step](event, trigger, player, _storeEvent)
-					.then((evt) => Promise.resolve(evt))
-					.then((evt) => {
-						event._storeEvent = evt;
-						if (step < event.contents.length - 1 && !event.finished) return resolve();
-						if (game.executingAsyncEventMap.has(event.toEvent())) {
-							game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
-								event.finish();
-								resolve();
-							}));
-						} else {
-							event.finish();
+				event.contents[step](event, trigger, player, _storeEvent).then((evt) => {
+					if (evt) event._storeEvent = evt;
+					if (game.executingAsyncEventMap.has(event.toEvent())) {
+						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+							if (event.step >= event.contents.length - 1) event.finish();
 							resolve();
-						}
-					})
+						}));
+					} else {
+						if (event.step >= event.contents.length - 1) event.finish();
+						resolve();
+					}
+				})
 			}
 			else if (event.content instanceof GeneratorFunction) {
 				if (!event.debugging) {

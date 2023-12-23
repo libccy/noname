@@ -244,5 +244,5 @@ export default {
 				delete _status.currentPhase;
 			}, player);
 		}
-	],
+	]
 };

@@ -2409,7 +2409,7 @@ export default {
 	/**
 	 * @deprecated
 	 */
-	phase_old2: function () {
+	phase: function () {
 		'step 0';
 		//初始化阶段列表
 		if (!event.phaseList) {
@@ -8249,6 +8249,9 @@ export default {
 		}, player, player.isLinked());
 		game.addVideo('link', player, player.isLinked());
 	},
+	/**
+	 * @deprecated
+	 */
 	chooseToGuanxing: function () {
 		"step 0";
 		var cards = get.cards(num);

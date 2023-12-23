@@ -20496,7 +20496,7 @@ export class Library extends Uninstantable {
 							let eventPromise = _status.event.next.find(e => e.toEvent() == event);
 							// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
 							// 如果在AsyncFunction执行过程中在别的位置新建了一个异步事件，那也直接（等会set配置完）执行
-							if (eventPromise && _status.event.content instanceof AsyncFunction) {
+							if (eventPromise && (_status.event.content instanceof AsyncFunction || Array.isArray(_status.event.contents))) {
 								// 异步执行game.loop
 								// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
 								// 再执行game.loop是因为原有的game.loop被await卡住了，
