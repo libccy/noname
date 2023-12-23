@@ -759,7 +759,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=get.translation(trigger.player);
 					var choiceList=[
 						'令'+target+'获得牌堆里的一张【杀】',
-						'令'+target+'将一张牌交给另一名角色，然后'+target+'摸一张牌',
+						'令'+target+'将一张牌交给另一名角色，然后'+target+'摸两张牌',
 					];
 					var list=['选项一'];
 					if(trigger.player.countCards('h')) list.push('选项二');
@@ -804,7 +804,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=result.targets[0];
 					trigger.player.line(target);
 					trigger.player.give(result.cards,target);
-					trigger.player.draw();
+					trigger.player.draw(2);
 				},
 			},
 			//蒋济
@@ -816,7 +816,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					var num=Math.min(Math.max(1,player.getStorage('twjichou').length),5);
+					var num=Math.min(Math.max(1,player.getStorage('twjichou').length),4);
 					event.num=num;
 					var choices=['选项一'];
 					var choiceList=[
@@ -15762,10 +15762,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mutao:'募讨',
 			mutao_info:'出牌阶段限一次。你可以选择一名角色，令其将手牌中所有的【杀】置于武将牌上，然后将这些牌依次随机交给其下家开始的每一名角色。然后其对最后一名以此法获得【杀】的角色A造成X点伤害（X为A手牌中【杀】的数量且至多为3）。',
 			yimou:'毅谋',
-			yimou_info:'当一名角色受到伤害后，若其存活且你至其的距离不大于1，你可以选择一项：1.令其从牌堆中获得一张【杀】；2.令其将一张手牌交给另一名角色，然后摸一张牌。',
+			yimou_info:'当一名角色受到伤害后，若其存活且你至其的距离不大于1，你可以选择一项：1.令其从牌堆中获得一张【杀】；2.令其将一张手牌交给另一名角色，然后摸两张牌。',
 			jiangji:'蒋济',
 			jilun:'机论',
-			jilun_info:'①当你受到伤害后，若你拥有技能〖急筹〗，则你可以一项：1.摸X张牌（X为〖急筹①〗记录数，且X且至少为1，至多为5）。2.获得1枚“机论”标记。②一名角色的结束阶段，若你拥有“机论”，则重复选择执行以下项直到你没有“机论”标记：1.失去1枚“机论”标记，视为使用一张〖急筹①〗记录过且未被〖机论②〗记录过的普通锦囊牌并记录此牌牌名。2.失去所有“机论”标记。',
+			jilun_info:'①当你受到伤害后，若你拥有技能〖急筹〗，则你可以一项：1.摸X张牌（X为〖急筹①〗记录数，且X且至少为1，至多为4）。2.获得1枚“机论”标记。②一名角色的结束阶段，若你拥有“机论”，则重复选择执行以下项直到你没有“机论”标记：1.失去1枚“机论”标记，视为使用一张〖急筹①〗记录过且未被〖机论②〗记录过的普通锦囊牌并记录此牌牌名。2.失去所有“机论”标记。',
 			liwei:'李遗',
 			jiaohua:'教化',
 			jiaohua_backup:'教化',
