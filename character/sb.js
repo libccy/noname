@@ -7,7 +7,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		character:{
 			sb_huangyueying:['female','shu',3,['sbjizhi','sbqicai']],
 			sb_sp_zhugeliang:['male','shu',3,['sbhuoji','sbkanpo']],
-			sb_zhugeliang:['male','shu',3,['sbguanxing','sbkongcheng'],['unseen']],
+			sb_zhugeliang:['male','shu',3,['sbguanxing','sbkongcheng']],
 			sb_zhanghe:['male','wei',4,['sbqiaobian']],
 			sb_yujin:['male','wei',4,['sbxiayuan','sbjieyue']],
 			sb_huaxiong:['male','qun','3/4/1',['new_reyaowu','sbyangwei']],
@@ -274,44 +274,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//诸葛亮
 			sbhuoji:{
-				audio:2,
-				enable:'phaseUse',
-				filterTarget:lib.filter.notMe,
-				prompt:'选择一名其他角色，对其与其势力相同的所有其他角色各造成1点火属性伤害',
-				usable:1,
-				line:'fire',
-				content:function(){
-					'step 0'
-					target.damage('fire');
-					'step 1'
-					var targets=game.filterPlayer(current=>{
-						if(current==player||current==target) return false;
-						return current.group==target.group;
-					});
-					if(targets.length){
-						game.delayx();
-						player.line(targets,'fire');
-						targets.forEach(i=>i.damage('fire'));
-					}
-				},
-				ai:{
-					order:7,
-					fireAttack:true,
-					result:{
-						target:function(player,target){
-							var att=get.attitude(player,target);
-							return get.sgn(att)*game.filterPlayer(current=>{
-								if(current==player) return false;
+				audio:3,
+				dutySkill:true,
+				derivation:['sbguanxing','sbkongcheng'],
+				group:['sbhuoji_fire','sbhuoji_achieve','sbhuoji_fail','sbhuoji_mark'],
+				subSkill:{
+					fire:{
+						audio:'sbhuoji1',
+						enable:'phaseUse',
+						filterTarget:lib.filter.notMe,
+						prompt:'选择一名其他角色，对其与其势力相同的所有其他角色各造成1点火属性伤害',
+						usable:1,
+						line:'fire',
+						content:function(){
+							'step 0'
+							target.damage('fire');
+							'step 1'
+							var targets=game.filterPlayer(current=>{
+								if(current==player||current==target) return false;
 								return current.group==target.group;
-							}).reduce((num,current)=>num+get.damageEffect(current,player,player,'fire'),0);
+							});
+							if(targets.length){
+								game.delayx();
+								player.line(targets,'fire');
+								targets.forEach(i=>i.damage('fire'));
+							}
+						},
+						ai:{
+							order:7,
+							fireAttack:true,
+							result:{
+								target:function(player,target){
+									var att=get.attitude(player,target);
+									return get.sgn(att)*game.filterPlayer(current=>{
+										if(current==player) return false;
+										return current.group==target.group;
+									}).reduce((num,current)=>num+get.damageEffect(current,player,player,'fire'),0);
+								},
+							},
 						},
 					},
-				},
-				derivation:['sbguanxing','sbkongcheng'],
-				group:['sbhuoji_achieve','sbhuoji_fail','sbhuoji_mark'],
-				subSkill:{
 					achieve:{
-						audio:'sbhuoji',
+						audio:'sbhuoji2',
 						trigger:{player:'phaseZhunbeiBegin'},
 						filter:function(event,player){
 							return player.getAllHistory('sourceDamage',evt=>evt.hasNature('fire')).reduce((num,evt)=>num+evt.num,0)>=game.players.length+game.dead.length;
@@ -335,7 +339,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					fail:{
-						audio:'sbhuoji',
+						audio:'sbhuoji3',
 						trigger:{player:'dying'},
 						forced:true,
 						locked:false,
@@ -365,20 +369,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			sbhuoji1:{audio:2},
+			sbhuoji2:{audio:2},
+			sbhuoji3:{audio:2},
 			sbkanpo:{
+				init:function(player){
+					if(!player.storage.sbkanpo){
+						player.storage.sbkanpo=[10,[],[]];
+						player.markSkill('sbkanpo');
+					}
+				},
 				audio:2,
 				trigger:{global:'roundStart'},
+				filter:function(event,player){
+					var storage=player.storage.sbkanpo;
+					return storage[0]||storage[1].length;
+				},
 				forced:true,
 				locked:false,
-				get getNumber(){
-					return 3;
-				},
 				content:function*(event,map){
-					var player=map.player;
-					var storage=player.getStorage('sbkanpo').slice();
-					if(storage.length){
-						player.unmarkAuto('sbkanpo',storage);
-					}
+					var player=map.player,storage=player.storage.sbkanpo;
+					var sum=storage[0];
+					storage[1]=[];
+					player.markSkill('sbkanpo');
+					if(!sum) return;
 					const list=get.inpileVCardList(info=>{
 						if(info[2]=='sha'&&info[3]) return false;
 						return info[0]!='equip';
@@ -411,7 +425,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					};
 					if(event.isMine()) func();
 					else if(event.isOnline()) event.player.send(func);
-					var result=yield player.chooseButton(['看破：是否记录三个牌名？',[list,'vcard']],[1,3],true).set('ai',function(button){
+					var result=yield player.chooseButton(['看破：是否记录至多'+get.cnNumber(sum)+'个牌名？',[list,'vcard']],[1,sum],true).set('ai',function(button){
+						if(ui.selected.buttons.length>=Math.max(3,game.countPlayer()/2)) return 0;
 						switch(button.link[2]){
 							case 'wuxie':return 5+Math.random();
 							case 'sha':return 5+Math.random();
@@ -427,7 +442,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}).set('filterButton',button=>{
 						return !_status.event.names.includes(button.link[2]);
-					}).set('names',storage).set('custom',{
+					}).set('names',storage[2]).set('custom',{
 						add:{
 							confirm:function(bool){
 								if(bool!=true) return;
@@ -481,24 +496,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					if(result.bool){
 						var names=result.links.map(link=>link[2]);
-						player.setStorage('sbkanpo',names);
-						player.markSkill('sbkanpo');
+						storage[1]=names;
+						storage[2]=names;
 					}
+					else storage[2]=[];
+					player.markSkill('sbkanpo');
 				},
 				marktext:'破',
 				intro:{
 					markcount:function(storage,player){
-						if(player.isUnderControl(true)) return storage.length;
+						if(player.isUnderControl(true)) return storage[1].length;
 						return '?';
 					},
 					mark:function(dialog,content,player){
+						const storage=player.getStorage('sbkanpo')[1];
 						if(player.isUnderControl(true)){
-							const storage=player.getStorage('sbkanpo');
 							dialog.addText('已记录牌名：');
 							dialog.addSmall([storage,'vcard']);
-						}
-						else{
-							return `${get.translation(player)}记录了一些牌名`;
 						}
 					},
 				},
@@ -535,9 +549,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						logTarget:'player',
 						content:function(){
-							player.unmarkAuto('sbkanpo',[trigger.card.name]);
+							player.storage.sbkanpo[1].remove(trigger.card.name);
+							player.markSkill('sbkanpo');
 							trigger.targets.length=0;
 							trigger.all_excluded=true;
+							player.draw();
 						},
 					},
 				},
@@ -546,7 +562,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				filter:function(event,player){
-					return event.name=='phaseZhunbei'||(player.hasSkill('sbguanxing_on')&&player.countCards('s',card=>card.hasGaintag('sbguanxing')));
+					var cards=player.countCards('s',card=>card.hasGaintag('sbguanxing'));
+					var num=player.getAllHistory('useSkill',evt=>evt.skill=='sbguanxing').length;
+					if(!cards.length&&num>3) return false;
+					return event.name=='phaseZhunbei'||(player.hasSkill('sbguanxing_on'));
 				},
 				forced:true,
 				locked:false,
@@ -558,14 +577,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var cards=player.getCards('s',card=>card.hasGaintag('sbguanxing'));
 					if(cards.length) player.loseToDiscardpile(cards);
-					var bool=player.getAllHistory('useSkill',evt=>evt.skill=='sbguanxing').length>1;
-					event.num=Math.min(7,bool?cards.length+1:7);
+					var num=player.getAllHistory('useSkill',evt=>evt.skill=='sbguanxing').length-1;
+					event.num=Math.max(0,7-2*num);
 					'step 1'
-					var cards2=get.cards(num);
-					player.$gain2(cards2,false);
-					game.log(player,'将',cards2,'置于了武将牌上');
-					player.loseToSpecial(cards2,'sbguanxing').visible=true;
-					player.markSkill('sbguanxing');
+					if(num){
+						var cards2=get.cards(num);
+						player.$gain2(cards2,false);
+						game.log(player,'将',cards2,'置于了武将牌上');
+						player.loseToSpecial(cards2,'sbguanxing').visible=true;
+						player.markSkill('sbguanxing');
+					}
+					else if(!player.countCards('s',card=>card.hasGaintag('sbguanxing'))) event.finish();
 					'step 2'
 					var cards=player.getCards('s',card=>card.hasGaintag('sbguanxing'));
 					if(cards.length){
@@ -676,7 +698,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:'☯',
 				intro:{
 					content:function(storage,player){
-						if(storage) return '你的回合外，一名角色使用或打出牌结算完成后，若此牌与“任”类别相同，则你可以令一名角色摸一张牌。';
+						if(storage) return '你的回合外，一名角色使用或打出牌结算完成后，若此牌与“任”类别相同，则你可以令一名角色摸两张牌。';
 						return '出牌阶段限一次，你可以弃置一张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害。';
 					},
 				},
@@ -706,7 +728,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(card){
 					return 6.5-get.value(card);
 				},
-				prompt:'弃置与攻击范围内的一名角色体力值之差（至少为1）张与“任”颜色相同的牌，对其造成1点伤害。',
+				prompt:'弃置与攻击范围内的一名角色体力值之差（至少为1）张与“任”颜色相同的牌，对其造成1点伤害',
 				content:function(){
 					player.changeZhuanhuanji('sbzhenliang');
 					target.damage('nocard');
@@ -732,7 +754,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						direct:true,
 						content:function(){
 							'step 0'
-							player.chooseTarget(get.prompt('sbzhenliang'),'令一名角色摸一张牌').set('ai',function(target){
+							player.chooseTarget(get.prompt('sbzhenliang'),'令一名角色摸两张牌').set('ai',function(target){
 								if(target.hasSkillTag('nogain')) return 0.1;
 								var att=get.attitude(player,target);
 								return att*(Math.max(5-target.countCards('h'),2)+3);
@@ -742,7 +764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=result.targets[0];
 								player.changeZhuanhuanji('sbzhenliang');
 								player.logSkill('sbzhenliang',target);
-								target.draw();
+								target.draw(2);
 							}
 						},
 					},
@@ -5502,7 +5524,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.countMark('sbjiang')) str+='X次。你可以将所有手牌当【决斗】使用（X为场上其他吴势力角色数+1）。';
 				else str+='一次。你可以将所有手牌当【决斗】使用。';
 				return str;
-			}
+			},
+			sbzhenliang:function(player){
+				var storage=player.storage.sbzhenliang;
+				var str='转换技。';
+				if(!storage) str+='<span class="bluetext">';
+				str+='阴：出牌阶段限一次，你可以弃置X张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害（X为你与其体力值值差且X至少为1）。';
+				if(!storage) str+='</span>';
+				if(storage) str+='<span class="bluetext">';
+				str+='阳：你的回合外，一名角色使用或打出牌结算完成后，若此牌与“任”类别相同，则你可以令一名角色摸两张牌。';
+				if(storage) str+='</span>';
+				return str;
+			},
 		},
 		translate:{
 			sb_zhanghe_prefix:'谋',
@@ -5714,24 +5747,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_yl_luzhi:'谋卢植',
 			sb_yl_luzhi_prefix:'谋',
 			sbzhenliang:'贞良',
-			sbzhenliang_info:'转换技。阴：出牌阶段限一次，你可以弃置X张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害（X为你与其体力值值差且X至少为1）。阳：你的回合外，一名角色使用或打出牌结算完成后，若此牌与“任”类别相同，则你可以令一名角色摸一张牌。',
+			sbzhenliang_info:'转换技。阴：出牌阶段限一次，你可以弃置X张与“任”颜色相同的牌并对攻击范围内的一名角色造成1点伤害（X为你与其体力值值差且X至少为1）。阳：你的回合外，一名角色使用或打出牌结算完成后，若此牌与“任”类别相同，则你可以令一名角色摸两张牌。',
 			sb_xiaoqiao:'谋小乔',
 			sb_xiaoqiao_prefix:'谋',
 			sbtianxiang:'天香',
 			sbtianxiang_info:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸等量的牌。',
 			sbtianxiang_info_versus_two:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸X张牌（X为移去的“天香”标记数+2）。',
-			sb_sp_zhugeliang:'谋诸葛亮',
+			sb_sp_zhugeliang:'谋卧龙',
 			sb_sp_zhugeliang_prefix:'谋',
 			sb_zhugeliang:'谋诸葛亮',
 			sb_zhugeliang_prefix:'谋',
 			sbhuoji:'火计',
 			sbhuoji_info:'使命技。①使命：出牌阶段限一次。你可以对一名其他角色造成1点火焰伤害，然后你对所有与其势力相同的不为其的其他角色各造成1点火焰伤害。②成功：准备阶段，若你本局游戏已造成的火焰伤害不小于本局游戏总角色数，则你失去〖火计〗和〖看破〗，然后获得〖观星〗和〖空城〗。③失败：使命成功前进入濒死状态。',
 			sbkanpo:'看破',
-			sbkanpo_info:'①一轮游戏开始时，你清除〖看破①〗记录的牌名，然后你可以依次记录共计三个未于本次清除过的非装备牌牌名（对其他角色不可见）。②当其他角色使用你〖看破①〗记录过的牌名的牌时，你可以移去一个〖看破①〗中的此牌名的记录，令此牌无效。',
+			sbkanpo_info:'①一轮游戏开始时，你清除〖看破①〗记录的牌名，然后你可以依次记录任意个未于上次发动〖看破①〗记录清除过的非装备牌牌名（对其他角色不可见，每局游戏至多记录10个牌名）。②其他角色使用你〖看破①〗记录过的牌名的牌时，你可以移去一个〖看破①〗中的此牌名的记录令此牌无效，然后你摸一张牌。',
 			sbguanxing:'观星',
-			sbguanxing_info:'①准备阶段，你将所有“星”置入弃牌堆，将牌堆顶的X张牌置于你的武将牌上，称为“星”。然后你可以将任意张“星”置于牌堆顶（X为你此次移去的“星”数+1且至多为7，若你此前未发动过〖观星①〗则X为7）。②结束阶段，若你未于本回合的准备阶段将“星”置于过牌堆顶，你可以将任意张“星”置于牌堆顶。③你可以如手牌般使用或打出“星”。',
+			sbguanxing_info:'①准备阶段，你将所有“星”置入弃牌堆，将牌堆顶的X张牌置于你的武将牌上，称为“星”（X为7-此前发动〖观星①〗次数的两倍，且X至少为0）。然后你可以将任意张“星”置于牌堆顶。②结束阶段，若你未于本回合的准备阶段将“星”置于过牌堆顶，你可以将任意张“星”置于牌堆顶。③你可以如手牌般使用或打出“星”。',
 			sbkongcheng:'空城',
-			sbkongcheng_info:'锁定技。当你受到伤害时，若你有〖观星〗，且若你：有“星”，你判定，若结果点数不大于你的“星”数，此伤害-1；没有“星”，此伤害+1。',
+			sbkongcheng_info:'锁定技。当你受到伤害时，若你拥有技能〖观星〗，且若你：有“星”，你判定，若结果点数不大于你的“星”数，此伤害-1；没有“星”，此伤害+1。',
 			sb_huangyueying:'谋黄月英',
 			sb_huangyueying_prefix:'谋',
 			sbqicai:'奇才',
