@@ -4725,16 +4725,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseButton([1,num]).set('createDialog',dialog).set('filterButton',button=>{
 						return lib.filter.canBeDiscarded(button.link,_status.event.player,get.owner(button.link));
 					}).set('ai',button=>{
-						var card=button.link;
-						var player=_status.event.player,target=get.owner(card);
-						if(target==player&&ui.cardPile.childNodes.length>80){
-							if(ui.selected.buttons.some(i=>get.owner(i.link)==player)) return 0;
-							if(get.value(card,player)<6) return 60-get.value(card,player);
+						var player=_status.event.player,
+							target=get.owner(button.link),
+							num=ui.selected.buttons.filter(i=>get.owner(i.link)==target).length;
+						if(num>1&&player.hp+player.hujia>2) return 0;
+						if(target==player){
+							if(num) return -get.value(button.link,target);
+							if(ui.cardPile.childNodes.length>80) return 6-get.value(card,player);
 							return 0;
 						}
-						var num=ui.selected.buttons.filter(i=>get.owner(i.link)==target).length;
 						var val=get.buttonValue(button);
-						if(num>2) val/=Math.sqrt(num);
+						if(num===2) val/=4;
 						if(get.attitude(player,target)>0) return -val;
 						return val;
 						//return -(get.position(card)!='h'?get.value(card,target):(4.5+Math.random()-0.2*(num>2?1:0)))*get.attitude(player,target);
@@ -9184,7 +9185,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('juetao'),lib.filter.notMe).set('ai',function(target){
-						return -get.attitude(_status.event.player,target);
+						let att=-get.attitude(_status.event.player,target);
+						if(att<=0) return -att;
+						if(target.hasSkillTag('nodamage')) return 0.01*att;
+						if(target.getEquip('tengjia')||target.getEquip('renwang')) return 0.2*att;
+						if(target.getEquip('bugua')) return 0.3*att;
+						if(target.getEquip(2)) return att/2;
+						return 1.2*att;
 					});
 					'step 1'
 					if(result.bool){

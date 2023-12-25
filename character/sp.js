@@ -5427,7 +5427,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						player:function(card,player,target){
 							if((!card.isCard||!card.cards)&&get.itemtype(card)!='card') return;
-							if(target&&player!=target&&player.countCards('h')>player.getHandcardLimit()) return [0,0,0,0.5];
+							let cs=0;
+							if(target&&player!=target&&player.countCards('h',i=>{
+								if(card===i||card.cards&&card.cards.includes(i)){
+									cs++;
+									return false;
+								}
+								return true;
+							})>player.getHandcardLimit()){
+								let targets=[],evt=_status.event.getParent('useCard');
+								targets.addArray(ui.selected.targets);
+								if(evt&&evt.card==card) targets.addArray(evt.targets);
+								if(targets.length){
+									if(targets.length>1||!targets.includes(target)) return 'zeroplayertarget';
+									return;
+								}
+								let info=get.info(card);
+								if(!info||info.notarget||!info.filterTarget) return;
+								let range,select=get.copy(info.selectTarget),filter;
+								if(select===undefined) range=[1,1];
+								else if(typeof select==='number') range=[select,select];
+								else if(get.itemtype(select)==='select') range=select;
+								else if(typeof select==='function') range=select(card,player);
+								if(info.singleCard) range=[1,1];
+								game.checkMod(card,player,range,'selectTarget',player);
+								if(range[1]<-1) range=[1, 1];
+								else if(range[0]<0){
+									if(info.filterTarget===true) filter=game.players.length;
+									else filter=game.countPlayer(current=>{
+										return info.filterTarget(card,player,current);
+									});
+									range=[filter,filter];
+								}
+								if(range&&range[0]>1&&range[1]>1) return 'zeroplayertarget';
+								return [0,0,0,1];
+							}
 						},
 					},
 				},

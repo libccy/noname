@@ -10824,9 +10824,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(val<min) min=val;
 							});
 							if(att>0&&min<=0) return target.hasSkillTag('noe')?3:1;
-							if(att<0&&max>0){
+							if(att<=0&&max>0){
 								if(target.hasSkillTag('noe')) return max>6?(-max/3):0;
 								return -max;
+							}
+							if(player===target&&!player.hasSha()){
+								let ph=player.countCards('h');
+								if(game.hasPlayer(i=>{
+									if(!player.canUse('sha',i,true,true)||get.effect(i,{name:'sha'},player,player)<=0) return false;
+									return !ph||!i.mayHaveShan(player,'use');
+								})) return 1;
 							}
 							return 0;
 						},
