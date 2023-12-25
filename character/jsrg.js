@@ -678,13 +678,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jsrgninghan:{
 				audio:2,
+				init:(player)=>{
+					game.addGlobalSkill('jsrgninghan_frozen');
+				},
+				onremove:(player)=>{
+					game.removeGlobalSkill('jsrgninghan_frozen');
+				},
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
 					if(!event.hasNature('ice')) return false;
 					return event.cards&&event.cards.filterInD().length;
 				},
 				forced:true,
-				global:'jsrgninghan_frozen',
 				content:function(){
 					var cards=trigger.cards.filterInD();
 					player.addToExpansion(cards,'gain2').gaintag.add('jsrgshacheng');
@@ -701,6 +706,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(lg) return num+0.15*Math.sign(get.attitude(player,lg));
 								}
 							}
+						},
+						trigger:{player:'dieAfter'},
+						filter:(event,player)=>{
+							return !game.hasPlayer(current=>!current.hasSkill('jsrgninghan'));
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('jsrgninghan_frozen');
 						}
 					},
 				},
