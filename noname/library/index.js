@@ -12388,7 +12388,7 @@ export class Library extends Uninstantable {
 				next.forceDie = true;
 				next.includeOut = true;
 				next.skill = skill || _status.event.name;
-				next.setContents('phase');
+				next.setContent('phase');
 				return next;
 			}
 			insertEvent(name, content, arg) {
@@ -12410,7 +12410,7 @@ export class Library extends Uninstantable {
 			phase(skill) {
 				var next = game.createEvent('phase', false);
 				next.player = this;
-				next.setContents('phase');
+				next.setContent('phase');
 				if (!_status.roundStart) {
 					_status.roundStart = this;
 				}
@@ -20492,17 +20492,6 @@ export class Library extends Uninstantable {
 					if (!_status.event) return;
 					// game.createEvent的时候还没立即push到next里
 					Promise.resolve().then(() => {
-						/*
-						// 事件自行处理skip情况
-						if (event.player && event.player.skipList.includes(event.name)) {
-							_status.event.trigger(event.name + 'Skipped');
-							event.player.skipList.remove(event.name);
-							if (lib.phaseName.includes(event.name)) event.player.getHistory('skipped').add(event.name);
-							const eventPromise = _status.event.next.find(e => e.toEvent() == event);
-							if (eventPromise) _status.event.next.remove(eventPromise);
-							return;
-						}
-						*/
 						game.executingAsyncEventMap.set(_status.event.toEvent(), (game.executingAsyncEventMap.get(_status.event.toEvent()) || Promise.resolve()).then(() => {
 							let eventPromise = _status.event.next.find(e => e.toEvent() == event);
 							// 如果父级事件也是一个异步的话，那应该立即执行这个事件的
@@ -20512,6 +20501,17 @@ export class Library extends Uninstantable {
 								// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
 								// 再执行game.loop是因为原有的game.loop被await卡住了，
 								// 得新执行一个只执行这个异步事件的game.loop
+
+								// 事件自行处理skip情况
+								if (event.player && event.player.skipList.includes(event.name)) {
+									_status.event.trigger(event.name + 'Skipped');
+									event.player.skipList.remove(event.name);
+									if (lib.phaseName.includes(event.name)) event.player.getHistory('skipped').add(event.name);
+									_status.event.next.remove(eventPromise);
+									event.finish();
+									resolve();
+									return eventPromise;
+								}
 
 								if (_status.event != eventPromise) {
 									eventPromise.parent = _status.event;

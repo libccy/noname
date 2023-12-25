@@ -2704,6 +2704,9 @@ export default {
 		ui.clear();
 		event.goto(1);
 	},
+	/**
+	 * @deprecated
+	 */
 	phaseDraw: function () {
 		"step 0";
 		game.log(player, '进入了摸牌阶段');

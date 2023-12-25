@@ -189,26 +189,29 @@ export default {
 			if (player.isIn() && event.num < event.phaseList.length) {
 				const phase = event.phaseList[event.num].split('|');
 				event.currentPhase = phase[0];
+				if (event.currentPhase == 'phaseDraw' || event.currentPhase == 'phaseDiscard') {
+					if (!player.noPhaseDelay) {
+						// @ts-ignore
+						if (player == game.me) {
+							await game.asyncDelay();
+							// game.delay();
+						}
+						else {
+							await game.asyncDelayx();
+							// game.delayx();
+						}
+					}
+				}
 				const next = player[event.currentPhase]();
 				next.phaseIndex = event.num;
 				if (phase.length > 1) {
 					next._extraPhaseReason = phase[1];
 				}
-				if (event.currentPhase == 'phaseDraw' || event.currentPhase == 'phaseDiscard') {
-					if (!player.noPhaseDelay) {
-						// @ts-ignore
-						if (player == game.me) {
-							game.delay();
-						}
-						else {
-							game.delayx();
-						}
-					}
-				}
+				return await next;
 			}
 		},
 		async (event, _trigger, player) => {
-			if (event.currentPhase == 'phaseUse') {
+			if (event.currentPhase === 'phaseUse') {
 				// @ts-ignore
 				game.broadcastAll(() => {
 					// @ts-ignore
@@ -243,6 +246,44 @@ export default {
 				player.classList.remove('glow_phase');
 				delete _status.currentPhase;
 			}, player);
+		}
+	],
+	phaseDraw: [
+		async (event, _trigger, player) => {
+			game.log(player, '进入了摸牌阶段');
+			event.trigger("phaseDrawBegin1");
+		},
+		async (event) => {
+			event.trigger("phaseDrawBegin2");
+		},
+		async (event, _trigger, player) => {
+			// @ts-ignore
+			if (game.modPhaseDraw) {
+				// @ts-ignore
+				return game.modPhaseDraw(player, event.num);
+			}
+			else {
+				if (event.num > 0) {
+					let num = event.num;
+					if (event.attachDraw) {
+						for (let i = 0; i < event.attachDraw.length; i++) {
+							// @ts-ignore
+							ui.cardPile.insertBefore(event.attachDraw[i], ui.cardPile.firstChild);
+						}
+						num += event.attachDraw.length;
+					}
+					const next = player.draw(num);
+					if (event.attachDraw) {
+						next.minnum = event.attachDraw.length;
+					}
+					return next;
+				}
+			}
+		},
+		async (event, _trigger, _player, { result }) => {
+			if (Array.isArray(result)) {
+				event.cards = result;
+			}
 		}
 	]
 };
