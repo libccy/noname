@@ -4783,7 +4783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('dcaichen_hit');
 				},
 				onremove:function(player){
-					game.removeGlobalSkill('dcaichen_hit');
+					if(!game.hasPlayer(current=>current.hasSkill('dcaichen'),true)) game.removeGlobalSkill('dcaichen_hit');
 				},
 				trigger:{
 					player:['loseAfter','phaseDiscardBefore'],
@@ -4813,7 +4813,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					hit:{
 						trigger:{player:'dieAfter'},
 						filter:function(event,player){
-							return !game.hasPlayer(current=>current.hasSkill('dcaichen'));
+							return !game.hasPlayer(current=>current.hasSkill('dcaichen'),true);
 						},
 						silent:true,
 						forceDie:true,
@@ -5526,7 +5526,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					all:{
 						trigger:{player:'dieAfter'},
 						filter:function(event,player){
-							return !game.hasPlayer(current=>current.hasSkill('dcwumei_wake'));
+							return !game.hasPlayer(current=>current.hasSkill('dcwumei_wake'),true);
 						},
 						silent:true,
 						forceDie:true,

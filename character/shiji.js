@@ -5994,7 +5994,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('spshanxi_bj');
 				},
 				onremove:function(player){
-					game.removeGlobalSkill('spshanxi_bj');
+					if(!game.hasPlayer(current=>current.hasSkill('spshanxi'),true)) game.removeGlobalSkill('spshanxi_bj');
 				},
 				trigger:{player:'phaseUseBegin'},
 				direct:true,

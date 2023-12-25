@@ -7558,7 +7558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('longyin_order');
 				},
 				onremove:(player)=>{
-					game.removeGlobalSkill('longyin_order');
+					if(!game.hasPlayer(current=>current.hasSkill('longyin'),true)) game.removeGlobalSkill('longyin_order');
 				},
 				trigger:{global:'useCard'},
 				direct:true,
@@ -7647,7 +7647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						trigger:{player:'dieAfter'},
 						filter:(event,player)=>{
-							return !game.hasPlayer(current=>current.hasSkill('longyin'));
+							return !game.hasPlayer(current=>current.hasSkill('longyin'),true);
 						},
 						silent:true,
 						forceDie:true,

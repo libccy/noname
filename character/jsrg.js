@@ -682,7 +682,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('jsrgninghan_frozen');
 				},
 				onremove:(player)=>{
-					game.removeGlobalSkill('jsrgninghan_frozen');
+					if(!game.hasPlayer(current=>current.hasSkill('jsrgninghan'),true)) game.removeGlobalSkill('jsrgninghan_frozen');
 				},
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
@@ -709,7 +709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						trigger:{player:'dieAfter'},
 						filter:(event,player)=>{
-							return !game.hasPlayer(current=>!current.hasSkill('jsrgninghan'));
+							return !game.hasPlayer(current=>!current.hasSkill('jsrgninghan'),true);
 						},
 						silent:true,
 						forceDie:true,
