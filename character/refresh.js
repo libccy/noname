@@ -10115,7 +10115,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					var fang=player.countMark('olfangquan2')==0&&player.hp>=2&&player.countCards('h')<=player.hp+1;
+					var fang=player.countMark('olfangquan2')==0&&player.hp>=2&&player.countCards('h')<=player.hp+2;
 					player.chooseBool(get.prompt2('olfangquan')).set('ai',function(){
 						if(!_status.event.fang) return false;
 						return game.hasPlayer(function(target){
@@ -14298,7 +14298,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					var fang=player.countMark('fangquan2')==0&&player.hp>=2&&player.countCards('h')<=player.hp+1;
+					var fang=player.countMark('fangquan2')==0&&player.hp>=2&&player.countCards('h')<=player.maxHp+1;
 					player.chooseBool(get.prompt2('refangquan')).set('ai',function(){
 						if(!_status.event.fang) return false;
 						return game.hasPlayer(function(target){

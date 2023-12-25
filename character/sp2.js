@@ -8238,8 +8238,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt2('yechou'),function(card,player,target){
 						return player!=target&&target.getDamagedHp()>1
 					}).set('forceDie',true).set('ai',function(target){
-						var num=get.attitude(_status.event.player,target);
-						return -num;
+						let att=get.attitude(_status.event.player,target);
+						if(att>0) return 0;
+						att=Math.sqrt(0.01-att);
+						return att*(get.distance(_status.currentPhase,target,'absolute')||game.players.length);
 					});
 					"step 1"
 					if(result.bool){
