@@ -1228,10 +1228,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event._result={};
 				},
 				ai:{
-					wuxie:function(target,card,player,viewer){
-						if(player==game.me&&get.attitude(viewer,player)>0){
-							return 0;
-						}
+					wuxie:function(target,card,player,viewer,status){
+						if(player===game.me&&get.attitude(viewer,player._trueMe||player)>0) return 0;
+						if(status*get.attitude(viewer,target)*get.effect(target,card,player,target)>=0) return 0;
 					},
 					basic:{
 						order:5,
@@ -1295,9 +1294,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					wuxie:function(target,card,player,viewer){
-						if(get.attitude(viewer,player)>0&&get.attitude(viewer,target)>0){
-							return 0;
-						}
+						if(get.attitude(viewer,player._trueMe||player)>0) return 0;
 					},
 					basic:{
 						order:7.5,
@@ -1574,7 +1571,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					wuxie:(target,card,player,viewer,status)=>{
-						if(status*get.attitude(viewer,player)>0&&!player.isMad() || target.hp>2&&!target.hasCard(i=>{
+						if(status*get.attitude(viewer,player._trueMe||player)>0 || target.hp>2&&!target.hasCard(i=>{
 							let val=get.value(i,target),subtypes=get.subtypes(i);
 							if(val<8&&target.hp<2&&!subtypes.includes('equip2')&&!subtypes.includes('equip5')) return false;
 							return val>3+Math.min(5,target.hp);
@@ -1824,9 +1821,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					wuxie:function(target,card,player,viewer){
-						if(player==game.me&&get.attitude(viewer,player)>0){
-							return 0;
-						}
+						if(player==game.me&&get.attitude(viewer,player._trueMe||player)>0) return 0;
 					},
 					basic:{
 						order:8,
