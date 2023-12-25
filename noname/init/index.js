@@ -83,11 +83,12 @@ export async function boot() {
 	}
 
 	// 在dom加载完后执行相应的操作
-	if (document.readyState !== 'complete') {
-		window.onload = onWindowReady;
-	} else {
-		onWindowReady.call(window);
-	}
+	const waitDomLoad = new Promise((resolve) => {
+		if (document.readyState !== 'complete') {
+			window.onload = resolve;
+		} else resolve(void 0)
+	}).then(onWindowReady.bind(window));
+	
 
 	// 闭源客户端检测并提醒
 	if (lib.assetURL.includes('com.widget.noname.qingyao') || lib.assetURL.includes('online.nonamekill.android')) {
@@ -555,11 +556,8 @@ export async function boot() {
 		delete _status.importing;
 	}
 
-	if (_status.windowLoaded) {
-		delete _status.windowLoaded;
-		lib.init.onload();
-	}
-	else _status.packLoaded = true;
+	await waitDomLoad;
+	lib.init.onload();
 }
 
 /**
@@ -744,16 +742,21 @@ async function loadCss() {
 	});
 }
 
-function onWindowReady() {
+async function onWindowReady() {
 	if (Reflect.has(lib, 'device')) {
 		var script = document.createElement('script');
 		script.src = 'cordova.js';
 		document.body.appendChild(script);
+		// @ts-ignore
+		const { promise, resolve } = Promise.withResolvers();
 		document.addEventListener('deviceready', async () => {
 			const { cordovaReady } = await import('./cordova.js');
 			await cordovaReady();
+			resolve()
 		});
+		await promise;
 	}
+	/*
 	if (_status.packLoaded) {
 		delete _status.packLoaded;
 		lib.init.onload();
@@ -761,6 +764,7 @@ function onWindowReady() {
 	else {
 		_status.windowLoaded = true;
 	}
+	*/
 }
 
 function setBackground() {
