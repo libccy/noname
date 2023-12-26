@@ -1992,6 +1992,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				ai:{
+					notemp:true,
+					maixie_defend:true,
+					effect:{
+						target:(card,player,target)=>{
+							if(!get.tag(card,'damage')||!target.hasFriend()) return;
+							let die=[],extra=[null,0],temp;
+							game.filterPlayer(i=>{
+								if(!i.hasMark('twwuhun')) return false;
+								temp=get.attitude(target,i);
+								if(temp<0) die.push(i);
+								else{
+									temp=Math.sqrt(att)*i.countMark('twwuhun');
+									if(!extra[0]||temp<extra[1]) extra=[i,temp];
+								}
+							});
+							if(extra[0]&&!die.length) die.push(extra[0]);
+							if(target.hp+target.hujia>1&&(!die.length||get.attitude(player,target)<=0)) die.add(player);
+							if(die.length) return [1,0,1,die.reduce((num,i)=>{
+								return num-=2*get.sgnAttitude(player,i);
+							},0)];
+						}
+					}
+				}
 			},
 			shouli:{
 				audio:2,
@@ -2249,6 +2273,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 					}));
 				},
+				ai:{
+					effect:{
+						player:(card,player,target)=>{
+							if(typeof card!=='object') return;
+							let suit=get.suit(card);
+							if(!lib.suit.contains(suit)||player.hasCard(function(i){
+								return get.suit(i,player)==suit;
+							},'h')) return;
+							return [1,0.8*game.countPlayer(current=>{
+								return current.countCards('e',card=>{
+									return get.suit(card,current)==suit;
+								});
+							})];
+						}
+					}
+				}
 			},
 			changandajian_equip5:{
 				equipSkill:true,
@@ -3214,7 +3254,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							effect:{
 								target:function(card,player,target){
-									if(card&&card.name=='qizhengxiangsheng') return 'zerotarget';
+									if(card&&card.name=='qizhengxiangsheng') return 'zeroplayertarget';
 								},
 							}
 						},
@@ -3293,18 +3333,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!map[id]) map[id]={};
 							map[id].qizheng_name=result.control;
 							map[id].qizheng_aibuff=get.attitude(player,target)>0;
-						},
+						}
 					},
 				},
 			},
 			lingce:{
 				audio:2,
+				init:(player)=>{
+					game.addGlobalSkill('lingce_global');
+				},
 				trigger:{global:'useCard'},
 				forced:true,
 				filter:function(event,player){
 					return (event.card.name=='qizhengxiangsheng'||get.zhinangs().contains(event.card.name)||player.getStorage('dinghan').contains(event.card.name))&&event.card.isCard&&event.cards.length==1;
 				},
-				content:function(){player.draw()},
+				content:function(){
+					player.draw();
+				},
+				subSkill:{
+					global:{
+						ai:{
+							effect:{
+								player:(card,player,target)=>{
+									let num=0,nohave=true;
+									game.countPlayer(i=>{
+										if(i.hasSkill('lingce')){
+											nohave=false;
+											if(i.isIn()&&lib.skill.lingce.filter({card:card},i)) num+=get.sgnAttitude(player,i);
+										}
+									},true);
+									if(nohave) game.removeGlobalSkill('lingce_global');
+									else return [1,0.8*num];
+								}
+							}
+						}
+					}
+				}
 			},
 			dinghan:{
 				audio:2,
@@ -4710,8 +4774,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				group:'new_wuhun_die',
 				ai:{
-					threaten:0.01,
 					notemp:true,
+					effect:{
+						target:(card,player,target)=>{
+							if(!get.tag(card,'damage')||!target.hasFriend()) return;
+							if(player.hasSkillTag('jueqing',null,target)) return 1.7;
+							let die=[null,1],temp;
+							game.filterPlayer(i=>{
+								temp=i.countMark('new_wuhun');
+								if(i===player&&target.hp+target.hujia>1) temp++;
+								if(temp>=die[1]){
+									if(!die[0]) die=[i,temp];
+									else{
+										let att=get.attitude(player,i);
+										if(att<die[1]) die=[i,temp];
+									}
+								}
+							});
+							if(die[0]) return [1,0,1,-6*get.sgnAttitude(player,die[0])/Math.max(1,target.hp)];
+						}
+					}
 				},
 				marktext:'魇',
 				intro:{

@@ -230,10 +230,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						value:[3,1],
 						useful:1,
 					},
-					wuxie:function(target,card,player,viewer,state){
-						let att=get.attitude(viewer,target), eff=get.effect(target,card,player,target);
-						if(status*get.attitude(viewer,player)>0&&!player.isMad() || status*eff*att>=0) return 0;
-						if(get.attitude(viewer,player)>=0 || _status.event.getRand('huogong_wuxie')*4>player.countCards('h')) return 0;
+					wuxie:function(target,card,player,viewer,status){
+						if(get.attitude(viewer,player._trueMe||player)>0) return 0;
+						if(status*get.attitude(viewer,target)*get.effect(target,card,player,target)>=0) return 0;
+						if(_status.event.getRand('huogong_wuxie')*4>player.countCards('h')) return 0;
 					},
 					result:{
 						player:function(player){
@@ -302,7 +302,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				recastable:true,
 				ai:{
 					wuxie:(target,card,player,viewer, status)=>{
-						if(status*get.attitude(viewer,player)>0&&!player.isMad() || target.hasSkillTag('nodamage') || target.hasSkillTag('nofire') || target.hasSkillTag('nothunder') || get.attitude(viewer,player)>0 || (1+target.countCards('hs'))*_status.event.getRand()>1.57) return 0;
+						if(status*get.attitude(viewer,player._trueMe||player)>0 || target.hasSkillTag('nodamage') || target.hasSkillTag('nofire') || target.hasSkillTag('nothunder') || get.attitude(viewer,player)>0 || (1+target.countCards('hs'))*_status.event.getRand()>1.57) return 0;
 					},
 					basic:{
 						order:(item,player)=>{

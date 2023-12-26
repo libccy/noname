@@ -11909,7 +11909,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('twzhian_ai');
 				},
 				onremove:function(player){
-					game.removeGlobalSkill('twzhian_ai');
+					if(!game.hasPlayer((current)=>current.hasSkill('twzhian'),true)) game.removeGlobalSkill('twzhian_ai');
 				},
 				usable:1,
 				trigger:{global:'useCardAfter'},

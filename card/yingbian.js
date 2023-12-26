@@ -28,7 +28,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					wuxie:function(target,card,player,viewer,status){
-						if(status*get.attitude(viewer,player)>0&&!player.isMad()) return 0;
+						if(get.attitude(viewer,player._trueMe||player)>0) return 0;
 						if(!card.yingbian_all&&get.distance(player,target)>1&&!target.hasCard(i=>{
 							let val=get.value(i,target),subtypes=get.subtypes(i);
 							if(val<8&&target.hp<2&&!subtypes.includes('equip2')&&!subtypes.includes('equip5')) return false;

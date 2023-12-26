@@ -3439,11 +3439,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					if(result.bool){
 						player.chooseTarget(true,'请选择进行额外回合的目标角色',lib.filter.notMe).ai=function(target){
-							if(target.hasJudge('lebu')) return -1;
-							if(get.attitude(player,target)>4){
-								return get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1);
-							}
-							return -1;
+							if(target.hasJudge('lebu')||get.attitude(player,target)<=0) return -1;
+							if(target.isTurnedOver()) return 0.18;
+							return get.threaten(target)/Math.sqrt(target.hp+1)/Math.sqrt(target.countCards('h')+1);
 						};
 					}
 					else event.finish();
@@ -3665,6 +3663,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
+							if(typeof card==='object'&&get.name(card)==='sha'&&target.mayHaveShan(player,'use')) return [0.6,0.75];
 							if(!target.hasFriend()&&!player.hasUnknown()) return;
 							if(_status.currentPhase==target) return;
 							if(card.name!='shuiyanqijunx'&&get.tag(card,'loseCard')&&target.countCards('he')){
@@ -4154,7 +4153,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target,current){
 							if(!target.hasFriend()) return;
-							if(target.hp<=1&&get.tag(card,'damage')) return [1,0,0,-2];
+							if(target.hp<=1&&get.tag(card,'damage')){
+								if(player.hasSkillTag('jueqing',false,target)) return 3;
+								return [1,0,0,-3*get.threaten(player)];
+							}
 						}
 					}
 				}

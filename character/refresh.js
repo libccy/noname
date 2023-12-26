@@ -3453,8 +3453,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card&&event.card.name=='sha'&&event.player.isIn()&&player.countCards('he')>0;
 				},
 				check:function(event,player){
-					if(event.player.hasSkill('xinleiji')) return get.attitude(player,event.player)>0;
-					return true;
+					let att=get.attitude(player,event.player);
+					if(event.player.hasSkill('xinleiji')) return att>0;
+					if(att>0||event.player.isHealthy()) return true;
+					if(!event.source) return true;
+					att=get.attitude(player,event.source);
+					return att<=0||event.source.isTurnedOver();
 				},
 				prompt2:'令其进行判定，然后你可根据判定结果，弃置一张牌并令其执行对应效果。',
 				content:function(){
@@ -5828,7 +5832,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('relongyin_order');
 				},
 				onremove:(player)=>{
-					game.removeGlobalSkill('relongyin_order');
+					if(!game.hasPlayer(current=>current.hasSkill('relongyin'),true)) game.removeGlobalSkill('relongyin_order');
 				},
 				trigger:{global:'useCard'},
 				direct:true,
@@ -5917,7 +5921,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						trigger:{player:'dieAfter'},
 						filter:(event,player)=>{
-							return !game.hasPlayer(current=>current.hasSkill('relongyin'));
+							return !game.hasPlayer(current=>current.hasSkill('relongyin'),true);
 						},
 						silent:true,
 						forceDie:true,
@@ -10115,7 +10119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					var fang=player.countMark('olfangquan2')==0&&player.hp>=2&&player.countCards('h')<=player.hp+1;
+					var fang=player.countMark('olfangquan2')==0&&player.hp>=2&&player.countCards('h')<=player.hp+2;
 					player.chooseBool(get.prompt2('olfangquan')).set('ai',function(){
 						if(!_status.event.fang) return false;
 						return game.hasPlayer(function(target){
@@ -13309,21 +13313,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					effect:function(card,player,target){
-						if(!target.hasFriend()) return;
-						if(player==target) return;
+						if(player==target||!target.hasFriend()) return;
 						var type=get.type(card);
-						var nh=target.countCards();
+						var nh=Math.min(target.countCards(),game.countPlayer(i=>get.attitude(target,i)>0));
 						if(type=='trick'){
 							if(!get.tag(card,'multitarget')||get.info(card).singleCard){
-								if(get.tag(card,'damage')){
-									if(nh<3||target.hp<=2) return 0.8;
-								}
+								if(get.tag(card,'damage')) return [1.5,nh-1];
 								return [1,nh];
 							}
 						}
-						else if(type=='delay'){
-							return [0.5,0.5];
-						}
+						else if(type=='delay') return [0.5,0.5];
 					},
 				}
 			},
@@ -14298,7 +14297,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					var fang=player.countMark('fangquan2')==0&&player.hp>=2&&player.countCards('h')<=player.hp+1;
+					var fang=player.countMark('fangquan2')==0&&player.hp>=2&&player.countCards('h')<=player.maxHp+1;
 					player.chooseBool(get.prompt2('refangquan')).set('ai',function(){
 						if(!_status.event.fang) return false;
 						return game.hasPlayer(function(target){

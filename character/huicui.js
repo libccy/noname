@@ -7974,9 +7974,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					game.addGlobalSkill('huguan_all');
 				},
-				onremove:function(player){
-					game.removeGlobalSkill('huguan_all');
-				},
 				trigger:{global:'useCard'},
 				direct:true,
 				filter:function(event,player){
@@ -8052,7 +8049,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							let num = -157;
 							game.countPlayer(function (current){
 								if(current.hasSkill('huguan')) num = Math.max(num, get.attitude(_status.event.player, current));
-							});
+							}, true);
 							if(num === -157) game.removeGlobalSkill('huguan_all');
 							else if(num === 0) player.storage.huguan_all = 6;
 							else if(num > 0) player.storage.huguan_all = 9;
@@ -9168,7 +9165,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('fengxiang_use');
 				},
 				onremove:function(player){
-					game.removeGlobalSkill('fengxiang_use');
+					if(!game.hasPlayer(current=>current.hasSkill('fengxiang'),true)) game.removeGlobalSkill('fengxiang_use');
 				},
 				trigger:{player:'damageEnd'},
 				forced:true,
@@ -9210,10 +9207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						trigger:{player:'dieAfter'},
 						filter:function(event,player){
-							for(let i of game.players){
-								if(i.hasSkill('fengxiang')) return false;
-							}
-							return true;
+							return !game.hasPlayer(current=>current.hasSkill('fengxiang'),true);
 						},
 						silent:true,
 						forceDie:true,
@@ -10830,9 +10824,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(val<min) min=val;
 							});
 							if(att>0&&min<=0) return target.hasSkillTag('noe')?3:1;
-							if(att<0&&max>0){
+							if(att<=0&&max>0){
 								if(target.hasSkillTag('noe')) return max>6?(-max/3):0;
 								return -max;
+							}
+							if(player===target&&!player.hasSha()){
+								let ph=player.countCards('h');
+								if(game.hasPlayer(i=>{
+									if(!player.canUse('sha',i,true,true)||get.effect(i,{name:'sha'},player,player)<=0) return false;
+									return !ph||!i.mayHaveShan(player,'use');
+								})) return 1;
 							}
 							return 0;
 						},
