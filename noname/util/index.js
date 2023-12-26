@@ -11,3 +11,12 @@ export class Uninstantable {
 		throw new TypeError(`${new.target.name} is not a constructor`);
 	}
 }
+
+/**
+ * 
+ * @param {number} ms 
+ * @returns {Promise<void>}
+ */
+export function delay(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}

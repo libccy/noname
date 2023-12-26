@@ -9,8 +9,16 @@ export function nodeReady() {
 	lib.node = {
 		fs: require('fs'),
 		path: require("path"),
-		debug: function () {
-			require('electron').remote.getCurrentWindow().toggleDevTools();
+		debug() {
+			let remote;
+			if (electronVersion >= 14) {
+				// @ts-ignore
+				remote = require('@electron/remote');
+			} else {
+				// @ts-ignore
+				remote = require('electron').remote;
+			}
+			remote.getCurrentWindow().toggleDevTools();
 		}
 	};
 	lib.path = lib.node.path;

@@ -5,7 +5,7 @@ import { Game as game } from '../game/index.js';
 import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 
-export function cordovaReady() {
+export async function cordovaReady() {
 	lib.path = (await import('../library/path.js')).default;
 	if (lib.device == 'android') {
 		document.addEventListener("pause", function () {

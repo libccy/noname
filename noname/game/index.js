@@ -16,7 +16,7 @@ import { Library as lib } from '../library/index.js';
 import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 import { GNC as gnc } from '../gnc/index.js';
-import { userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
+import { userAgent, Uninstantable, GeneratorFunction, AsyncFunction, delay } from "../util/index.js";
 
 export class Game extends Uninstantable {
 	static online = false;
@@ -5833,8 +5833,53 @@ export class Game extends Uninstantable {
 	static runContent(belongAsyncEvent) {
 		return new Promise(resolve => {
 			let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
-			let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
-			if (event.content instanceof GeneratorFunction) {
+			let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result, _storeEvent } = event;
+			// 数组形式
+			if ("contents" in event && Array.isArray(event.contents)) {
+				/*
+				event.contents[step](event, trigger, player, _storeEvent).then((evt) => {
+					if (evt) event._storeEvent = evt;
+					if (game.executingAsyncEventMap.has(event.toEvent())) {
+						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+							if (event.step >= event.contents.length - 1) event.finish();
+							resolve();
+						}));
+					} else {
+						if (event.step >= event.contents.length - 1) event.finish();
+						resolve();
+					}
+				});
+				*/
+				// 解决不了问题...就把问题统一
+				const run = async (event) => {
+					if (typeof event.step !== "number") event.step = 0;
+					while (event.step < event.contents.length && !event.finished) {
+						const evt = await event.contents[event.step](event, event._trigger, event.player, event._tmpStoreEvent);
+						if (evt) event._tmpStoreEvent = evt;
+
+						if (game.executingAsyncEventMap.has(event.toEvent())) {
+							await game.executingAsyncEventMap.get(_status.event.toEvent());
+							await game.executingAsyncEventMap.get(event.toEvent());
+						}
+
+						++event.step;
+					}
+					--event.step;
+				};
+
+				run(event).then(() => {
+					if (game.executingAsyncEventMap.has(event.toEvent())) {
+						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+							event.finish();
+							resolve();
+						}));
+					} else {
+						event.finish();
+						resolve();
+					}
+				});
+			}
+			else if (event.content instanceof GeneratorFunction) {
 				if (!event.debugging) {
 					if (event.generatorContent) event.generatorContent.return();
 					event.generatorContent = event.content(event, step, source, player, target, targets,
@@ -5964,9 +6009,7 @@ export class Game extends Uninstantable {
 		time = time * lib.config.duration + time2;
 		if (lib.config.speed == 'vvfast') time /= 3;
 		//_status.timeout=setTimeout(game.resume,time);
-		return new Promise(resolve => {
-			setTimeout(resolve, time);
-		});
+		return delay(time);
 	}
 	/**
 	 * 在async content中对game.delayx的代替使用方法
@@ -6544,13 +6587,13 @@ export class Game extends Uninstantable {
 	 * @param { import('../library/index.js').Player } [player2] 
 	 */
 	static swapPlayer(player, player2) {
+		let players = game.players.concat(game.dead)
 		if (player2) {
 			if (player == game.me) game.swapPlayer(player2);
 			else if (player2 == game.me) game.swapPlayer(player);
 		}
 		else {
 			if (player == game.me) return;
-			let players = game.players.concat(game.dead);
 			for (let i = 0; i < players.length; i++) {
 				players[i].style.transition = 'all 0s';
 			}
@@ -6603,11 +6646,11 @@ export class Game extends Uninstantable {
 		if (lib.config.mode == 'identity') {
 			game.me.setIdentity(game.me.identity);
 		}
-		setTimeout(() => {
+		setTimeout((players) => {
 			for (let i = 0; i < players.length; i++) {
 				players[i].style.transition = '';
 			}
-		}, 100);
+		}, 100, players);
 	}
 	/**
 	 * @param { import('../library/index.js').Player } player

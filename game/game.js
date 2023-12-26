@@ -11,36 +11,41 @@ new Promise(resolve => {
 	}
 }).then(() => {
 	const userAgent = navigator.userAgent.toLowerCase();
+
+	const exit = () => {
+		const ios = userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('macintosh');
+		//electron
+		if (typeof window.process == 'object' && typeof window.require == 'function') {
+			const versions = window.process.versions;
+			// @ts-ignore
+			const electronVersion = parseFloat(versions.electron);
+			let remote;
+			if (electronVersion >= 14) {
+				// @ts-ignore
+				remote = require('@electron/remote');
+			} else {
+				// @ts-ignore
+				remote = require('electron').remote;
+			}
+			const thisWindow = remote.getCurrentWindow();
+			thisWindow.destroy();
+			window.process.exit();
+		}
+		//android-cordova环境
+		//ios-cordova环境或ios浏览器环境
+		//非ios的网页版
+		else if (!ios) {
+			window.close();
+		}
+	};
+
 	if (!localStorage.getItem('gplv3_noname_alerted')) {
 		if (confirm('①无名杀是一款基于GPLv3协议的开源软件！\n你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。\n点击“确定”即代表您认可并接受GPLv3协议↓️\nhttps://www.gnu.org/licenses/gpl-3.0.html\n②无名杀官方发布地址仅有GitHub仓库！\n其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！')) {
 			// @ts-ignore
 			localStorage.setItem('gplv3_noname_alerted', true);
 		}
 		else {
-			const ios = userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('macintosh');
-			//electron
-			if (typeof window.process == 'object' && typeof window.require == 'function') {
-				const versions = window.process.versions;
-				// @ts-ignore
-				const electronVersion = parseFloat(versions.electron);
-				let remote;
-				if (electronVersion >= 14) {
-					// @ts-ignore
-					remote = require('@electron/remote');
-				} else {
-					// @ts-ignore
-					remote = require('electron').remote;
-				}
-				const thisWindow = remote.getCurrentWindow();
-				thisWindow.destroy();
-				window.process.exit();
-			}
-			//android-cordova环境
-			//ios-cordova环境或ios浏览器环境
-			//非ios的网页版
-			else if (!ios) {
-				window.close();
-			}
+			exit();
 		}
 	}
 	window['b' + 'ann' + 'e' + 'dE' + 'x' + 'ten' + 's' + 'i' + 'o' + 'ns'] = ['\u4fa0\u4e49', '\u5168\u6559\u7a0b'];
