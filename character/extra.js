@@ -2273,6 +2273,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 					}));
 				},
+				ai:{
+					effect:{
+						player:(card,player,target)=>{
+							if(typeof card!=='object') return;
+							let suit=get.suit(card);
+							if(!lib.suit.contains(suit)||player.hasCard(function(i){
+								return get.suit(i,player)==suit;
+							},'h')) return;
+							return [1,0.8*game.countPlayer(current=>{
+								return current.countCards('e',card=>{
+									return get.suit(card,current)==suit;
+								});
+							})];
+						}
+					}
+				}
 			},
 			changandajian_equip5:{
 				equipSkill:true,

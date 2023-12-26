@@ -2032,7 +2032,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							var num=game.countPlayer(function(current){
-								var skills=current.getSkills();
+								//var skills=current.getSkills();
 								for(var j=0;j<current.skills.length;j++){
 									var rejudge=get.tag(current.skills[j],'rejudge',current);
 									if(rejudge!=undefined){
@@ -2077,9 +2077,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					tag:{
-						// damage:1,
-						// natureDamage:1,
-						// thunderDamage:1,
+						damage:0.16,
+						natureDamage:0.16,
+						thunderDamage:0.16,
 					}
 				}
 			},

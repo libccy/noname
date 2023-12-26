@@ -4039,8 +4039,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseToDiscard('h',2,get.prompt('jsrgfeiyang'),'弃置两张手牌并弃置判定区里的一张牌').set('logSkill','jsrgfeiyang').set('ai',function(card){
-						return 6-get.value(card);
-					});
+						if(_status.event.goon) return 6-get.value(card);
+						return 0;
+					}).set('goon',(()=>{
+						if(player.hasSkillTag('rejudge')&&player.countCards('j')<2) return false;
+						return player.hasCard(function(card){
+							if(get.tag(card,'damage')&&get.damageEffect(player,player,_status.event.player,get.natureList(card))>=0) return false;
+							return get.effect(player,{
+								name:card.viewAs||card.name,
+								cards:[card],
+							},player,player)<0;
+						},'j');
+					})());
 					'step 1'
 					if(result.bool){
 						player.discardPlayerCard(player,'j',true);

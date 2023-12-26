@@ -11907,16 +11907,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToTargeted'},
 				content:function(){
 					"step 0"
+					if(get.attitude(player,trigger.player)<0&&trigger.player.countDiscardableCards(player,'he')) player.addTempSkill('zhenlie_lose');
 					player.loseHp();
 					"step 1"
+					player.removeSkill('zhenlie_lose');
 					trigger.getParent().excluded.add(player);
 					"step 2"
 					if(trigger.player.countCards('he')){
+						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.12);
 						player.discardPlayerCard(trigger.player,'he',true);
 					}
 				},
+				subSkill:{
+					lose:{
+						charlotte:true
+					}
+				},
 				ai:{
-					expose:0.3
+					effect:{
+						target:(card,player,target)=>{
+							if(target.hp<=0&&target.hasSkill('zhenlie_lose')&&get.tag(card,'recover')) return [1,1.2];
+						}
+					}
 				}
 			},
 			//吾彦...
