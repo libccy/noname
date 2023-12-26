@@ -5455,12 +5455,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target){
-							if(player._jsrgzhenqiao_aiChecking) return;
 							if(target===player&&get.subtype(card)==='equip1'&&!player.getEquip(1)){
-								if(card.name!=='zhuge'||target.getCardUsable('sha')||!target.needsToDiscard()) return;
-								if(target.countCards('hs',i=>{
+								if(card.name!=='zhuge'||target.getCardUsable('sha')||!target.needsToDiscard()||target.countCards('hs',i=>{
 									return get.name(i)==='sha'&&lib.filter.cardEnabled(i,target);
-								})>1) return 'zeroplayertarget';
+								})<2) return 'zeroplayertarget';
 							}
 						}
 					}
