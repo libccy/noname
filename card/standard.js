@@ -138,25 +138,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							next.set('prompt2','（在此之后仍需弃置一张手牌）');
 						}
 						next.set('ai1',function(card){
-							var target=_status.event.player;
-							var evt=_status.event.getParent();
-							var bool=true;
-							if(_status.event.shanRequired>1&&!get.is.object(card)&&target.countCards('h','shan')<_status.event.shanRequired-(_status.event.shanIgnored||0)){
-								bool=false;
-							}
-							else if(target.hasSkillTag('useShan')){
-								bool=true;
-							}
-							else if(target.hasSkillTag('noShan')){
-								bool=false;
-							}
-							else if(get.damageEffect(target,evt.player,target,evt.card.nature)>=0) bool=false;
-							if(bool){
-								return get.order(card);
-							}
+							if(_status.event.useShan) return get.order(card);
 							return 0;
 						}).set('shanRequired',event.shanRequired);
 						next.set('respondTo',[player,card]);
+						next.set('useShan',(()=>{
+							if(target.hasSkillTag('noShan',null,event)) return false;
+							if(target.hasSkillTag('useShan',null,event)) return true;
+							if(event.baseDamage+event.extraDamage<=0 || get.attitude(target,player._trueMe||player)>0) bool=false;
+							if(event.shanRequired>1&&target.countCards('h','shan')<event.shanRequired-(event.shanIgnored||0)) return false;
+							if(get.damageEffect(target,player,target,get.nature(event.card))>=0) return false;
+							return true;
+						})());
 						//next.autochoose=lib.filter.autoRespondShan;
 					}
 					"step 2"
@@ -261,7 +254,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					order:function(item,player){
 						if(player.hasSkillTag('presha',true,null,true)) return 10;
-						if(item.hasNature('linked')){
+						if(typeof item==='object'&&item.hasNature('linked')){
 							if(game.hasPlayer(function(current){
 								return current!=player&&current.isLinked()&&player.canUse(item,current,null,true)&&get.effect(current,item,player,player)>0&&lib.card.sha.ai.canLink(player,current,item);
 							})&&game.countPlayer(function(current){
