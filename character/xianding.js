@@ -268,8 +268,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				zhuanhuanji:true,
 				intro:{
 					content:function(storage){
-						if(!storage) return '每回合限一次，当你得到其他角色的牌后，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力。（X为你的体力值）'
-						return '每回合限一次，其他角色得到你的牌后，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力值，Y为X-其打出【杀】数）';
+						if(!storage) return '每回合限一次，当你得到其他角色的牌后，或其他角色得到你的牌后，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力。（X为你的体力值）'
+						return '每回合限一次，当你得到其他角色的牌后，或其他角色得到你的牌后，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力值，Y为X-其打出【杀】数）';
 					},
 				},
 				audio:2,
@@ -277,47 +277,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.getHp()) return false;
 					if(event.name=='loseAsync'&&event.type!='gain') return false;
-					var storage=player.storage.dcsbmengmou;
-					var cards;
-					if(storage){
-						if(player.hasSkill('dcsbmengmou_true')) return false;
-						cards=event.getl(player).cards2;
-						return game.hasPlayer(function(current){
-							if(current==player) return false;
-							var cardsx=event.getg(current);
-							return cardsx.some(i=>cards.includes(i));
-						});
-					}
-					else cards=event.getg(player);
-					if(player.hasSkill('dcsbmengmou_false')) return false;
-					return game.hasPlayer(function(current){
+					var cards1=event.getl(player).cards2,cards2=cards=event.getg(player);
+					return (!player.hasSkill('dcsbmengmou_true')&&game.hasPlayer(function(current){
+						if(current==player) return false;
+						var cardsx=event.getg(current);
+						return cardsx.some(i=>cards1.includes(i));
+					}))||(!player.hasSkill('dcsbmengmou_false')&&game.hasPlayer(function(current){
 						if(current==player) return false;
 						var cardsx=event.getl(current).cards2;
-						return cards.some(i=>cardsx.includes(i));
-					});
+						return cards2.some(i=>cardsx.includes(i));
+					}));
 				},
 				direct:true,
 				content:function*(event,map){
 					var player=map.player,trigger=map.trigger;
 					var storage=player.storage.dcsbmengmou;
 					player.addTempSkill('dcsbmengmou_effect','dcsbmengmouAfter');
-					var targets,cards,num=player.getHp();
-					if(storage){
-						cards=trigger.getl(player).cards2;
-						targets=game.filterPlayer(function(current){
-							if(current==player) return false;
-							var cardsx=trigger.getg(current);
-							return cardsx.some(i=>cards.includes(i));
-						});
-					}
-					else{
-						cards=trigger.getg(player);
-						targets=game.filterPlayer(function(current){
-							if(current==player) return false;
-							var cardsx=trigger.getl(current).cards2;
-							return cards.some(i=>cardsx.includes(i));
-						});
-					}
+					var targets=[],num=player.getHp();
+					var cards1=trigger.getl(player).cards2;
+					var cards2=trigger.getg(player);
+					if(!player.hasSkill('dcsbmengmou_true')) targets.addArray(game.filterPlayer(function(current){
+						if(current==player) return false;
+						var cardsx=trigger.getg(current);
+						return cardsx.some(i=>cards1.includes(i));
+					}));
+					if(!player.hasSkill('dcsbmengmou_false')) targets.addArray(game.filterPlayer(function(current){
+						if(current==player) return false;
+						var cardsx=trigger.getl(current).cards2;
+						return cards2.some(i=>cardsx.includes(i));
+					}));
+					targets.sortBySeat();
 					var check_true=function(player,target){
 						if(get.attitude(player,target)>0){
 							if(target.countCards('hs',card=>{
@@ -13198,12 +13187,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dcsbmengmou:function(player){
 				var storage=player.storage.dcsbmengmou;
-				var str='转换技，每回合每项各限一次：';
+				var str='转换技，每回合每项各限一次，当你得到其他角色的牌后，或其他角色得到你的牌后：';
 				if(!storage) str+='<span class="bluetext">';
-				str+='阴，当你得到其他角色的牌后，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；';
+				str+='阴，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；';
 				if(!storage) str+='</span>';
 				if(storage) str+='<span class="bluetext">';
-				str+='阳，其他角色得到你的牌后，你可令该角色打出至多X张【杀】，然后其失去Y点体力。';
+				str+='阳，你可令该角色打出至多X张【杀】，然后其失去Y点体力。';
 				if(storage) str+='</span>';
 				str+='（X为你的体力值，Y为X-其打出【杀】数）';
 				return str;
@@ -13735,7 +13724,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsbmingshi:'明势',
 			dcsbmingshi_info:'摸牌阶段，你可以多摸两张牌，然后令展示三张牌并令一名其他角色选择获得其中的一张牌。',
 			dcsbmengmou:'盟谋',
-			dcsbmengmou_info:'转换技，每回合每项各限一次：阴，当你得到其他角色的牌后，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；阳，其他角色得到你的牌后，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力值，Y为X-其打出【杀】数）',
+			dcsbmengmou_info:'转换技，每回合每项各限一次，当你得到其他角色的牌后，或其他角色得到你的牌后：阴，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；阳，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力值，Y为X-其打出【杀】数）',
 			dc_sb_zhouyu:'新杀谋周瑜',
 			dc_sb_zhouyu_prefix:'新杀谋',
 			dcsbronghuo:'融火',
