@@ -1118,21 +1118,11 @@ export class Get extends Uninstantable {
 	 * @returns {T}
 	 */
 	static copy(obj) {
-		if (get.objtype(obj) == 'object') {
-			var copy = {};
-			for (var i in obj) {
-				copy[i] = get.copy(obj[i]);
-			}
-			return copy;
+		try {
+			return structuredClone(obj);
 		}
-		else if (Array.isArray(obj)) {
-			var copy = [];
-			for (var i = 0; i < obj.length; i++) {
-				copy.push(get.copy(obj[i]));
-			}
-			return copy;
-		}
-		else {
+		catch {
+			// obj不可序列化时
 			return obj;
 		}
 	}

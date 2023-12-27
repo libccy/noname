@@ -4272,15 +4272,27 @@ export class Library extends Uninstantable {
 					get init() {
 						return lib.configMenu.view.config.show_characternamepinyin.init;
 					},
+					set init(newVal) {
+						lib.configMenu.view.config.show_characternamepinyin.init = newVal;
+					},
 					get unfrequent() {
 						return lib.configMenu.view.config.show_characternamepinyin.unfrequent;
+					},
+					set unfrequent(newVal) {
+						lib.configMenu.view.config.show_characternamepinyin.unfrequent = newVal;
 					},
 					get item() {
 						return lib.configMenu.view.config.show_characternamepinyin.item;
 					},
+					set item(newVal) {
+						lib.configMenu.view.config.show_characternamepinyin.item = newVal;
+					},
 					get visualMenu() {
 						return lib.configMenu.view.config.show_characternamepinyin.visualMenu;
-					}
+					},
+					set visualMenu(newVal) {
+						lib.configMenu.view.config.show_characternamepinyin.visualMenu = newVal;
+					},
 				}
 			}
 		},
