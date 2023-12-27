@@ -11588,45 +11588,40 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function (){
 					'step 0'
-					player.gainPlayerCard(get.prompt('new_liyu',trigger.player),trigger.player,'hej','visibleMove').set('ai',function(card){
-						var player=_status.event.player;
-						var evt=_status.event.target;
-						if(get.attitude(player,evt)>0&&get.position(card)=='j') return 4+get.value(card);
-						if(get.type(card)=='equip'){
-							if(get.attitude(player,evt)>0&&game.hasPlayer(function(current){
-								return (player.canUse({name:'juedou'},current)&&current!=evt.target&&get.effect(current,{name:'juedou'},player,player)>2);
-							})){
-								return 5;
-							}
-							else if(game.hasPlayer(function(current){
-								return (player.canUse({name:'juedou'},current)&&current!=evt&&current!=player&&get.effect(current,{name:'juedou'},player,player)<0);
-							})){
-								return 1;
-							}
-							else return 4;
-						}
+					player.gainPlayerCard(get.prompt('new_liyu',trigger.player),trigger.player,'hej','visibleMove').set('ai',function(button){
+						var player=_status.event.player,target=_status.event.target;
+						if(get.attitude(player,target)>0&&get.position(button.link)==='j') return 4+get.value(button.link);
+						if(get.type(button.link)==='equip') return _status.event.juedou;
 						return 3;
-					}).set('logSkill',['new_liyu',trigger.player]);
+					}).set('juedou',(()=>{
+						if(get.attitude(player,trigger.player)>0&&game.hasPlayer(function(current){
+							return (player.canUse({name:'juedou'},current)&&current!=trigger.player&&current!=player&&get.effect(current,{name:'juedou'},player,_status.event.player)>2);
+						})) return 5;
+						if(game.hasPlayer(function(current){
+							return (player.canUse({name:'juedou'},current)&&current!=trigger.player&&current!=player&&get.effect(current,{name:'juedou'},player,_status.event.player)<0);
+						})) return 1;
+						return 4;
+					})()).set('logSkill',['new_liyu',trigger.player]);	
 					'step 1'
 					if(result.bool){
 						if(get.type(result.cards[0])!='equip'){
 							trigger.player.draw();
 							event.finish();
 						}
-					else{
-						if(!game.hasPlayer(function(current){
-							return current!=player&&current!=trigger.player&&player.canUse('juedou',current);
-						})){
-							event.finish();
-							return;
-						}
-						trigger.player.chooseTarget(true,function(card,player,target){
-							var evt=_status.event.getParent();
-							return evt.player.canUse({name:'juedou'},target)&&target!=_status.event.player;
-						},'请选择一名角色，视为'+get.translation(player)+'对其使用【决斗】').set('ai',function(target){
-							var evt=_status.event.getParent();
-							return get.effect(target,{name:'juedou'},evt.player,_status.event.player)-2;
-						});
+						else{
+							if(!game.hasPlayer(function(current){
+								return current!=player&&current!=trigger.player&&player.canUse('juedou',current);
+							})){
+								event.finish();
+								return;
+							}
+							trigger.player.chooseTarget(true,function(card,player,target){
+								var evt=_status.event.getParent();
+								return evt.player.canUse({name:'juedou'},target)&&target!=_status.event.player;
+							},'请选择一名角色，视为'+get.translation(player)+'对其使用【决斗】').set('ai',function(target){
+								var evt=_status.event.getParent();
+								return get.effect(target,{name:'juedou'},evt.player,_status.event.player)-2;
+							});
 						}
 					}
 					else event.finish();
