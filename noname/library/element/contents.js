@@ -6,7 +6,7 @@ import { status as _status } from '../../status/index.js';
 import { UI as ui } from '../../ui/index.js';
 import { GNC as gnc } from '../../gnc/index.js';
 
-export default {
+export const Contents = {
 	phase: [
 		async (event, _trigger, player) => {
 			// 初始化阶段列表

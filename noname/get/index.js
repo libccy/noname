@@ -2229,10 +2229,13 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * @template T
-	 * @type {{
-	 * (key: T) => GameEvent[T];
-	 * () => GameEvent;
-	 * }}
+	 * @overload
+	 * @param {T} key
+	 * @returns {import("../library/index.js").GameEvent[T]}
+	 */
+	/**
+	 * @overload
+	 * @returns {import("../library/index.js").GameEvent}
 	 */
 	static event(key) { return key ? _status.event[key] : _status.event }
 	static player() { return _status.event.player }

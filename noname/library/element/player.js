@@ -5,9 +5,9 @@ import { Library as lib } from "../index.js";
 import { status as _status } from '../../status/index.js';
 import { UI as ui } from '../../ui/index.js';
 
-export default class extends HTMLDivElement {
+export class Player extends HTMLDivElement {
 	/**
-	 * @param {HTMLDivElement} [position]
+	 * @param {HTMLDivElement|DocumentFragment} [position]
 	 * @param {true} [noclick]
 	 */
 	// @ts-ignore
@@ -17,7 +17,7 @@ export default class extends HTMLDivElement {
 		 */
 		// @ts-ignore
 		const player = ui.create.div('.player', position);
-		Object.setPrototypeOf(player, lib.element.Player.prototype);
+		Object.setPrototypeOf(player, Player.prototype);
 		player.build(noclick);
 		return player;
 	}

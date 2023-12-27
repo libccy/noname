@@ -7,7 +7,7 @@ import { UI as ui } from '../../ui/index.js';
 import { GNC as gnc } from '../../gnc/index.js';
 
 // 未来再改
-export default {
+export const Content = {
 	emptyEvent: async (event) => {
 		event.trigger(event.name);
 	},
