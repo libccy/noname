@@ -14164,7 +14164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !event.numFixed;
 				},
 				content:function(){
-					trigger.num+=1+Math.floor(player.countCards('e')/2);
+					trigger.num+=1+Math.ceil(player.countCards('e')/2);
 				}
 			},
 			yingjian:{
@@ -14989,7 +14989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fenyin_info:'你的回合内，当你使用牌时，若此牌与你于此回合内使用的上一张牌的颜色不同，则你可以摸一张牌。',
 			yingjian_info:'准备阶段开始时，你可以视为使用一张无距离限制的【杀】。',
 			dujin:'独进',
-			dujin_info:'摸牌阶段，你可以多摸X+1张牌。（X为你装备区里牌数的一半且向下取整）',
+			dujin_info:'摸牌阶段，你可以多摸X+1张牌（X为你装备区里牌数的一半且向上取整）。',
 			shixin:'释衅',
 			shixin_info:'锁定技，当你受到火属性伤害时，你防止此伤害。',
 			zhaohuo:'招祸',

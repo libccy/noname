@@ -515,8 +515,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const sum=storage[0];
 							const names=storage[1];
 							dialog.addText('剩余可记录'+sum+'次牌名');
-							dialog.addText('已记录牌名：');
-							dialog.addSmall([names,'vcard']);
+							if(names.length){
+								dialog.addText('已记录牌名：');
+								dialog.addSmall([names,'vcard']);
+							}
 						}
 					},
 				},
