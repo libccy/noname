@@ -8366,6 +8366,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			boss_wuxin:{
+				audio:2,
+				mod:{
+					targetEnabled:function(card,player,target){
+						if(get.type(card)=='delay'&&player!=target) return false;
+					}
+				},
 				trigger:{player:'damageBefore'},
 				forced:true,
 				priority:10,
@@ -8373,7 +8379,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					trigger.cancel();
 					player.loseHp();
 				},
-				audio:2,
 			},
 			shenwei:{
 				audio:2,
