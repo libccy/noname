@@ -8,7 +8,7 @@ import { UI as ui } from '../../ui/index.js';
 export class VCard {
 	/**
 	 * @param {any} [suitOrCard]
-	 * @param {number | Card[]} [numberOrCards]
+	 * @param {number | import('./card.js').Card[]} [numberOrCards]
 	 * @param {string} [name]
 	 * @param {string} [nature]
 	 */
@@ -31,6 +31,7 @@ export class VCard {
 			 */
 			this.nature = suitOrCard[3];
 		}
+		// @ts-ignore
 		else if (get.itemtype(suitOrCard) == 'card') {
 			this.name = get.name(suitOrCard);
 			this.suit = get.suit(suitOrCard);
@@ -54,6 +55,10 @@ export class VCard {
 		}
 		else if (suitOrCard && typeof suitOrCard != 'string') {
 			Object.keys(suitOrCard).forEach(key => {
+				/**
+				 * @type { PropertyDescriptor }
+				 */
+				// @ts-ignore
 				const propertyDescriptor = Object.getOwnPropertyDescriptor(suitOrCard, key), value = propertyDescriptor.value;
 				if (Array.isArray(value)) this[key] = value.slice();
 				else Object.defineProperty(this, key, propertyDescriptor);
@@ -61,7 +66,7 @@ export class VCard {
 			if (Array.isArray(numberOrCards)) {
 				const noCards = !this.cards;
 				/**
-				 * @type {Card[]}
+				 * @type {import('./card.js').Card[]}
 				 */
 				this.cards = numberOrCards.slice();
 				if (noCards) {

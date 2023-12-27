@@ -9,8 +9,8 @@ import { GNC as gnc } from '../gnc/index.js';
 export class Is extends Uninstantable {
 	/**
 	 * 判断是否为进攻坐骑
-	 * @param {Card | VCard} card
-	 * @param {false | Player} [player]
+	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard} card
+	 * @param {false | import("../library/index.js").Player} [player]
 	 * @returns {boolean}
 	 */
 	static attackingMount(card, player) {
@@ -25,8 +25,8 @@ export class Is extends Uninstantable {
 	}
 	/**
 	 * 判断是否为防御坐骑
-	 * @param {Card | VCard} card
-	 * @param {false | Player} [player]
+	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard} card
+	 * @param {false | import("../library/index.js").Player} [player]
 	 * @returns {boolean}
 	 */
 	static defendingMount(card, player) {
@@ -257,14 +257,14 @@ export class Is extends Uninstantable {
 		};
 		configs[name] = item;
 		if (!configs.phonelayout) return false;
-		if (configs.show_round_menu && menus.contains(configs.round_menu_func)) {
+		if (configs.show_round_menu && menus.includes(configs.round_menu_func)) {
 			return false;
 		}
 		if (configs.touchscreen) {
-			if (menus.contains(configs.swipe_up)) return false;
-			if (menus.contains(configs.swipe_down)) return false;
-			if (menus.contains(configs.swipe_left)) return false;
-			if (menus.contains(configs.swipe_right)) return false;
+			if (menus.includes(configs.swipe_up)) return false;
+			if (menus.includes(configs.swipe_down)) return false;
+			if (menus.includes(configs.swipe_left)) return false;
+			if (menus.includes(configs.swipe_right)) return false;
 		}
 		else {
 			if (configs.right_click == 'config') return false;
@@ -1131,7 +1131,7 @@ export class Get extends Uninstantable {
 		for (var i in lib.cardPile) {
 			for (var j = 0; j < lib.cardPile[i].length; j++) {
 				var info = lib.cardPile[i][j];
-				if (lib.inpile.contains(info[2]) && get.type(info[2]) == type) {
+				if (lib.inpile.includes(info[2]) && get.type(info[2]) == type) {
 					list.push({
 						name: info[2],
 						suit: info[0],
@@ -1273,7 +1273,7 @@ export class Get extends Uninstantable {
 			var pack = lib.characterPack[lib.configOL.characterPack[i]];
 			for (var j in pack) {
 				if (typeof func == 'function' && func(j)) continue;
-				if (lib.connectBanned.contains(j)) continue;
+				if (lib.connectBanned.includes(j)) continue;
 				if (lib.character[j]) libCharacter[j] = pack[j];
 			}
 		}
@@ -1954,8 +1954,8 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * 
-	 * @param {Card | VCard} card
-	 * @param {false | Player} [player]
+	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard} card
+	 * @param {false | import("../library/index.js").Player} [player]
 	 * @returns {string}
 	 */
 	static name(card, player) {
@@ -1968,8 +1968,8 @@ export class Get extends Uninstantable {
 		return card.name;
 	}
 	/**
-	 * @param {Card | VCard | Card[] | VCard[]} card
-	 * @param {false | Player} [player]
+	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard | Card[] | VCard[]} card
+	 * @param {false | import("../library/index.js").Player} [player]
 	 * @returns {string}
 	 */
 	static suit(card, player) {
@@ -1988,13 +1988,13 @@ export class Get extends Uninstantable {
 					return game.checkMod(card, owner, game.checkMod(card, card.suit, 'suit', owner), 'cardsuit', owner);
 				}
 			}
-			if (lib.suits.contains(card.suit)) return card.suit;
+			if (lib.suits.includes(card.suit)) return card.suit;
 			return 'none';
 		}
 	}
 	/**
-	 * @param {Card | VCard | Card[] | VCard[]} card
-	 * @param {false | Player} [player]
+	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard | Card[] | VCard[]} card
+	 * @param {false | import("../library/index.js").Player} [player]
 	 * @returns {string}
 	 */
 	static color(card, player) {
@@ -2022,8 +2022,8 @@ export class Get extends Uninstantable {
 		}
 	}
 	/**
-	 * @param {Card | VCard} card
-	 * @param {false | Player} [player]
+	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard} card
+	 * @param {false | import("../library/index.js").Player} [player]
 	 * @returns {number}
 	 */
 	static number(card, player) {
@@ -2047,8 +2047,8 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * 返回一张杀的属性。如有多种属性则用`lib.natureSeparator`分割开来。例：火雷【杀】的返回值为`fire|thunder`
-	 * @param {string | string[] | Card | VCard} card
-	 * @param {false | Player} [player]
+	 * @param {string | string[] | import("../library/index.js").Card | import("../library/index.js").VCard} card
+	 * @param {false | import("../library/index.js").Player} [player]
 	 * @returns {string}
 	 */
 	static nature(card, player) {
@@ -2066,7 +2066,7 @@ export class Get extends Uninstantable {
 	/**
 	 * 返回包含所有属性的数组
 	 * @param {string[] | string} card
-	 * @param {false | Player} [player]
+	 * @param {false | import("../library/index.js").Player} [player]
 	 * @returns {string[]}
 	 */
 	static natureList(card, player) {
@@ -4539,12 +4539,12 @@ export class Get extends Uninstantable {
 		if (!isLink && get.tag(card, 'natureDamage') && !zerotarget) {
 			var info = get.info(card);
 			if (!info || !info.ai || !info.ai.canLink) {
-				if (target.isLinked()) game.countPlayer(function (current) {
+				if (target.isLinked()) game.players.forEach(function (current) {
 					if (current != target && current.isLinked()) final += get.effect(current, card, player, player2, true);
 				});
 			}
 			else if (info.ai.canLink(player, target, card)) {
-				game.countPlayer(function (current) {
+				game.players.forEach(function (current) {
 					if (current != target && current.isLinked()) final += get.effect(current, card, player, player2, true);
 				});
 			}
@@ -4713,12 +4713,12 @@ export class Get extends Uninstantable {
 		if (!isLink && get.tag(card, 'natureDamage') && !zerotarget) {
 			var info = get.info(card);
 			if (!info || !info.ai || !info.ai.canLink) {
-				if (target.isLinked()) game.countPlayer(function (current) {
+				if (target.isLinked()) game.players.forEach(function (current) {
 					if (current != target && current.isLinked()) final += get.effect(current, card, player, player2, true);
 				});
 			}
 			else if (info.ai.canLink(player, target, card)) {
-				game.countPlayer(function (current) {
+				game.players.forEach(function (current) {
 					if (current != target && current.isLinked()) final += get.effect(current, card, player, player2, true);
 				});
 			}
@@ -4764,7 +4764,7 @@ export class Get extends Uninstantable {
 		var card = button.link;
 		var player = get.owner(card);
 		if (!player) player = _status.event.player;
-		if (player.getCards('j').contains(card)) {
+		if (player.getCards('j').includes(card)) {
 			var efff = get.effect(player, {
 				name: card.viewAs || card.name,
 				cards: [card],
@@ -4773,7 +4773,7 @@ export class Get extends Uninstantable {
 			if (efff == 0) return 0;
 			return -1.5;
 		}
-		if (player.getCards('e').contains(card)) {
+		if (player.getCards('e').includes(card)) {
 			var evalue = get.value(card, player);
 			if (player.hasSkillTag('noe')) {
 				if (evalue >= 7) {

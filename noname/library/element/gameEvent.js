@@ -7,7 +7,7 @@ import { UI as ui } from '../../ui/index.js';
 import { AsyncFunction } from '../../util/index.js';
 
 export class GameEvent {
-	/** @type { import('./gameEventPromise.js').default } */
+	/** @type { import('../index.js').GameEventPromise } */
 	#promise;
 	/**
 	 * @param {string} [name]
@@ -26,11 +26,11 @@ export class GameEvent {
 		this.step = 0;
 		this.finished = false;
 		/**
-		 * @type {(import('./GameEventPromise.js').default)[]}
+		 * @type {(import('../index.js').GameEventPromise)[]}
 		 */
 		this.next = [];
 		/**
-		 * @type {(import('./GameEventPromise.js').default)[]}
+		 * @type {(import('../index.js').GameEventPromise)[]}
 		 */
 		this.after = [];
 		this.custom = {

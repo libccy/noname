@@ -9590,6 +9590,9 @@ class Create extends Uninstantable {
 		return node;
 	}
 	static buttonPresets = {
+		/**
+		 * @returns { import("../library/index.js").Button }
+		 */
 		tdnodes: (item, type, position, noclick, node) => {
 			node = ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode.tdnodes', position);
 			if (Array.isArray(item)) {
@@ -9602,11 +9605,17 @@ class Create extends Uninstantable {
 			}
 			return node;
 		},
+		/**
+		 * @returns { import("../library/index.js").Button }
+		 */
 		blank: (item, type, position, noclick, node) => {
 			node = ui.create.div('.button.card', position);
 			node.link = item;
 			return node;
 		},
+		/**
+		 * @returns { import("../library/index.js").Button }
+		 */
 		card: (item, type, position, noclick, node) => {
 			if (typeof item.copy == 'function') {
 				node = item.copy(false);
@@ -9636,6 +9645,9 @@ class Create extends Uninstantable {
 			}
 			return node;
 		},
+		/**
+		 * @returns { import("../library/index.js").Button }
+		 */
 		vcard: (item, type, position, noclick, node) => {
 			if (typeof item == 'string') {
 				item = [get.type(item), '', item];
@@ -9646,6 +9658,9 @@ class Create extends Uninstantable {
 			node.link = item;
 			return node;
 		},
+		/**
+		 * @returns { import("../library/index.js").Button }
+		 */
 		character: (item, type, position, noclick, node) => {
 			if (node) {
 				node.classList.add('button');
@@ -9790,9 +9805,15 @@ class Create extends Uninstantable {
 
 			return node;
 		},
+		/**
+		 * @returns { import("../library/index.js").Button }
+		 */
 		characterx: (item, type, position, noclick, node) => {
 			return ui.create.buttonPresets.character(item, type, position, noclick, node);
 		},
+		/**
+		 * @returns { import("../library/index.js").Button }
+		 */
 		player: (item, type, position, noclick, node) => {
 			if (node) {
 				node.classList.add('button');
