@@ -8253,6 +8253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.5,
+					maixie_defend:true
 				},
 			},
 			"yechou2":{

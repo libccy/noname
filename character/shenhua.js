@@ -4146,6 +4146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'source',
 				ai:{
+					maixie_defend:true,
 					threaten:function(player,target){
 						if(target.hp==1) return 0.2;
 						return 1.5;
