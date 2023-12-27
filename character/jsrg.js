@@ -5453,21 +5453,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					// trigger.getParent().triggeredTargets4=trigger.getParent().triggeredTargets4.concat(trigger.targets);
 					trigger.getParent().effectCount++;
 				},
-				ai:{
-					effect:{
-						target:function(card,player,target){
-							if(target===player&&get.subtype(card)==='equip1'&&!player.getEquip(1)){
-								if(card.name!=='zhuge'||target.getCardUsable('sha')||!target.needsToDiscard()||target.countCards('hs',i=>{
-									return get.name(i)==='sha'&&lib.filter.cardEnabled(i,target);
-								})<2) return 'zeroplayertarget';
-							}
-						}
-					}
-				},
 				mod:{
 					attackRange:function(player,num){
 						return num+1;
 					},
+					aiOrder:(player,card,num)=>{
+						if(num>0&&get.itemtype(card)==='card'&&get.subtype(card)==='equip1'&&!player.getEquip(1)){
+							if(card.name!=='zhuge'||player.getCardUsable('sha')||!player.needsToDiscard()||player.countCards('hs',i=>{
+								return get.name(i)==='sha'&&lib.filter.cardEnabled(i,target);
+							})<2) return 0;
+						}
+					},
+					aiValue:(player,card,num)=>{
+						if(num>0&&get.itemtype(card)==='card'&&card.name!=='zhuge'&&get.subtype(card)==='equip1'&&!player.getEquip(1)) return 0.01*num;
+					},
+					aiUseful:()=>{
+						return lib.skill.jsrgzhenqiao.mod.aiValue.apply(this,arguments);
+					}
 				}
 			},
 			//王允
