@@ -10,10 +10,12 @@ export default class extends HTMLDivElement {
 	 * @param {HTMLDivElement} [position]
 	 * @param {true} [noclick]
 	 */
+	// @ts-ignore
 	constructor(position, noclick) {
 		/**
-		 * @type {Player}
+		 * @type {this}
 		 */
+		// @ts-ignore
 		const player = ui.create.div('.player', position);
 		Object.setPrototypeOf(player, lib.element.Player.prototype);
 		player.build(noclick);

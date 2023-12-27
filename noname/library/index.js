@@ -20,9 +20,9 @@ import { GNC as gnc } from '../gnc/index.js';
 
 import { LibInit } from "./init/index.js";
 import { Announce } from "./announce/index.js";
-import Content from "./element/content.js";
-import Contents from "./element/contents.js";
-import Player from "./element/player.js";
+import LibElementContent from "./element/content.js";
+import LibElementContents from "./element/contents.js";
+import LibElementPlayer from "./element/player.js";
 
 export class Library extends Uninstantable {
 	static configprefix = 'noname_0.9_';
@@ -9225,9 +9225,9 @@ export class Library extends Uninstantable {
 		_stratagem_add_buff: '强化'
 	};
 	static element = {
-		content: Content,
-		contents: Contents,
-		Player: Player,
+		content: LibElementContent,
+		contents: LibElementContents,
+		Player: LibElementPlayer,
 		Card: class extends HTMLDivElement {
 			/**
 			 * @param {HTMLDivElement} [position]
