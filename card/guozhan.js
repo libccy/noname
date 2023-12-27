@@ -1351,6 +1351,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								target._g_taipingyaoshu_temp=true;
 								let lose=get.effect(target,{name:'losehp'},target,target),
 									draw=get.effect(target,{name:'wuzhong'},target,target);
+								delete target._g_taipingyaoshu_temp;
 								if(lose<0&&target.hp<=1&&!target.hasCard(i=>{
 									return get.name(i)==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable');
 								})) draw=0;
