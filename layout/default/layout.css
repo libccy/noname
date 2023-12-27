@@ -1935,20 +1935,10 @@ div:not(.handcards)>.card>.info>span,
 	padding: 0;
 }
 
-div:has(>div.skill):only-child {
-	display: flex;
-	flex-wrap: nowrap;
-}
 .skill {
 	left: 0 !important;
-	flex: 0 0 70px !important;
-	word-break: break-word;
-	/* width: 70px !important;
-	white-space: nowrap; */
-}
-.skill+div {
-	flex: 1;
-	word-break: break-word;
+	width: 70px !important;
+	white-space: nowrap;
 }
 .skilln {
 	left: 0 !important;
