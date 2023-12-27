@@ -3848,7 +3848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var fn=function(control){
 							switch(control){
 								case '选项一':
-									return player.getUseValue({name:'wuzhong'})/2;
+									return player.getUseValue({name:'draw'});
 								case '选项二':
 									return Math.max.apply(Math,game.filterPlayer().map(current=>{
 										if(current.hasSkillTag('noh')) return -1;
@@ -9252,7 +9252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player,target=_status.event.getTrigger().player;
 						if(target.hasCard(function(card){
 							return lib.filter.canBeDiscarded(card,player,target);
-						},'he')&&get.effect(target,{name:'guohe_copy2'},player,player)>get.effect(player,{name:'wuzhong'},player,player)/2) return 1;
+						},'he')&&get.effect(target,{name:'guohe_copy2'},player,player)>get.effect(player,{name:'draw'},player,player)) return 1;
 						return 0;
 					});
 					'step 1'
@@ -9640,7 +9640,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(num>0) max=Math.max(max,Math.sqrt(Math.min(2,num))*get.effect(target,{name:'guohe_copy2'},player,player));
 								},
 								选项四:function(target){
-									max=Math.max(max,get.effect(target,{name:'wuzhong'},player,player));
+									max=Math.max(max,2*get.effect(target,{name:'draw'},player,player));
 								},
 							}[choice];
 							game.countPlayer(function(current){
@@ -9671,7 +9671,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}],
 							['选择一名角色，令其摸两张牌',function(target){
 								var player=_status.event.player;
-								return get.effect(target,{name:'wuzhong'},player,player);
+								return 2*get.effect(target,{name:'draw'},player,player);
 							}]
 						][index];
 						var targets=game.filterPlayer(function(current){
@@ -24530,21 +24530,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:"本回合内手牌上限-#",
 				},
 			},
-			"xinfu_shajue":{
+			xinfu_shajue:{
 				audio:2,
-				trigger:{
-					global:"dying",
-				},
-				filter:function (event,player){
-					return event.player.hp<0&&event.player!=player;
+				trigger:{global:'dying'},
+				filter:function(event,player){
+					return event.player!=player;
 				},
 				forced:true,
-				//priority:7,
-				content:function (){
-					if(trigger.parent.name=='damage'&&get.itemtype(trigger.parent.cards)=='cards'&&get.position(trigger.parent.cards[0],true)=='o'){
-						player.gain(trigger.parent.cards,"gain2");
-					}
+				content:function(){
 					player.addMark('xionghuo',1);
+					if(trigger.player.hp<0&&trigger.parent.name=='damage'&&get.itemtype(trigger.parent.cards)=='cards'&&get.position(trigger.parent.cards[0],true)=='o'){
+						player.gain(trigger.parent.cards,'gain2');
+					}
 				},
 			},
 			xinfu_jianjie:{
@@ -25533,7 +25530,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xionghuo_low":"凶镬",
 			"xionghuo_low_info":"",
 			"xinfu_shajue":"杀绝",
-			"xinfu_shajue_info":"锁定技，其他角色进入濒死状态时，若其体力值小于0，则你获得一个“暴戾”标记，并获得使其进入濒死状态的牌。",
+			"xinfu_shajue_info":"锁定技，其他角色进入濒死状态时，你获得一个“暴戾”标记。然后若其体力值小于0，你获得使其进入濒死状态的牌。",
 			xinfu_jianjie:"荐杰",
 			jianjie:'荐杰',
 			jianjie_info:'①你的第一个准备阶段开始时，你令一名其他角色获得“龙印”，然后令另一名其他角色获得“凤印”。②出牌阶段限一次。若当前回合不是你的第一个回合，则你可以移动场上的“龙印”或“凤印”。③拥有“龙印”或“凤印”的其他角色死亡时，你转移该角色的“龙印”和“凤印”。④拥有“龙印”/“凤印”的角色视为拥有〖火计〗/〖连环〗，且同时拥有这两种标记的角色视为拥有〖业炎〗。',

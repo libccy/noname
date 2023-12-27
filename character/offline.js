@@ -758,6 +758,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:'受到的伤害+1且改为雷属性',
 						},
+						ai:{
+							effect:{
+								target:(card,player,target)=>{
+									if(!get.tag(card,'damage')) return;
+									if(target.hasSkillTag('nodamage')||target.hasSkillTag('nothunder')) return 'zeroplayertarget';
+									if(target.hasSkillTag('filterDamage',null,{
+										player:player,
+										card:lib.element.VCard({
+											name:card.name,
+											nature:'thunder'
+										},[card])
+									})) return;
+									return 2;
+								}
+							}
+						}
 					},
 					init:{
 						audio:'psshouli',
@@ -900,6 +916,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					threaten:100,
 					reverseEquip:true,
+					ai:{
+						effect:{
+							player:(card,player,target)=>{
+								if(typeof card!=='object') return;
+								let suit=get.suit(card);
+								if(!lib.suit.contains(suit)||player.hasCard(function(i){
+									return get.suit(i,player)==suit;
+								},'h')) return;
+								return [1,game.countPlayer(current=>{
+									return current.countCards('e',card=>{
+										return get.suit(card,current)==suit;
+									});
+								})];
+							},
+							target:(card,player,target)=>{
+								if(card.name==='sha'&&!player.hasSkillTag('directHit_ai',true,{
+									target:target,
+									card:card
+								},true)&&game.hasPlayer(current=>{
+									return current.hasCard(cardx=>{
+										return get.subtype(cardx)==='equip3';
+									},'e');
+								})) return [0, -0.5];
+							}
+						}
+					}
 				}
 			},
 			//战役篇田丰
@@ -3046,7 +3088,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('zylianji'),'令一名角色摸一张牌').set('ai',target=>{
 						var player=_status.event.player;
 						if(target==player&&player.needsToDiscard(1)) return 1;
-						return get.effect(target,{name:'wuzhong'},player,player);
+						return get.effect(target,{name:'draw'},player,player);
 					});
 					'step 1'
 					if(result.bool){

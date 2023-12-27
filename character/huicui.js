@@ -6164,7 +6164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				check:function(event,player){
-					var eff=get.effect(player,{name:'wuzhong'},player,player)/2;
+					var eff=get.effect(player,{name:'draw'},player,player);
 					if(player.countCards('h')+1<=event.player.countCards('h')&&event.player.countCards('he')>0) eff+=get.effect(event.player,{name:'guohe_copy2'},player,player);
 					return eff;
 				},
@@ -7513,7 +7513,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player,target){
 							var eff=get.recoverEffect(target,player,player);
-							if(target.getDamagedHp()>1) eff+=get.effect(target,{name:'wuzhong'},player,player)/2;
+							if(target.getDamagedHp()>1) eff+=get.effect(target,{name:'draw'},player,player);
 							return eff;
 						},
 					},

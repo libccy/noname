@@ -5089,7 +5089,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						targetsx.removeArray(targets);
 						return targetsx.reduce((p,c)=>{
 							return p+Math.max(0,get.effect(c,{name:'shunshou_copy2'},player,player));
-						},0)>get.effect(player,{name:'wuzhong'},player,player)/1.5?'选项一':'选项二';
+						},0)>get.effect(player,{name:'draw'},player,player)*1.3?'选项一':'选项二';
 					}());
 					'step 1'
 					if(result.control=='cancel2'){
@@ -8521,7 +8521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									max=get.recoverEffect(current,player,player)*Math.min(evt.getParent().num,player.getDamagedHp());
 								},
 								选项二:function(target){
-									max=get.effect(target,{name:'wuzhong'},player,player)/2*evt.getParent().num;
+									max=get.effect(target,{name:'draw'},player,player)*evt.getParent().num;
 								},
 								选项三:function(target){
 									if(player.isTurnedOver()) max+=25;

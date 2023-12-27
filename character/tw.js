@@ -3151,7 +3151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var eff=list.map(target=>{
 							if(target==player) return 0;
 							return get.effect(target,{name:'sha'},player,player);
-						}).reduce((p,c)=>p+c,0),eff2=list2.map(target=>get.effect(target,{name:'wuzhong'},player,player)).reduce((p,c)=>p+c,0);
+						}).reduce((p,c)=>p+c,0),eff2=list2.map(target=>2*get.effect(target,{name:'draw'},player,player)).reduce((p,c)=>p+c,0);
 						if(_status.event.controls.contains('选项二')&&eff2>eff) return '选项二';
 						if(eff>0) return 0;
 						return 'cancel2';
@@ -3173,7 +3173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return _status.event.getParent().list.contains(target);
 						}).set('ai',function(target){
 							var player=_status.event.player;
-							return get.effect(target,{name:'wuzhong'},player,player);
+							return get.effect(target,{name:'draw'},player,player);
 						});
 						else event.finish();
 					}
@@ -12668,7 +12668,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!ui.selected.cards.length) return 0;
 							var sub=get.subtype(ui.selected.cards[0],false);
 							var eff=get.effect(target,ui.selected.cards[0],player,target);
-							if(sub=='equip2') eff+=(get.effect(target,{name:'wuzhong'},target,target)/2);
+							if(sub=='equip2') eff+=(get.effect(target,{name:'draw'},target,target));
 							if(target.isDamaged()&&(sub=='equip3'||sub=='equip4'||sub=='equip5')) eff+=get.recoverEffect(target,player,player);
 							return eff;
 						},

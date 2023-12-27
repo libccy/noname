@@ -14,6 +14,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			draw:{
+				ai:{
+					result:{
+						target:1
+					},
+					tag:{
+						draw:1
+					}
+				}
+			},
 			losehp:{
 				ai:{
 					result:{
@@ -254,7 +264,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					order:function(item,player){
 						if(player.hasSkillTag('presha',true,null,true)) return 10;
-						if(typeof item==='object'&&item.hasNature('linked')){
+						if(typeof item==='object'&&game.hasNature(item,'linked')){
 							if(game.hasPlayer(function(current){
 								return current!=player&&current.isLinked()&&player.canUse(item,current,null,true)&&get.effect(current,item,player,player)>0&&lib.card.sha.ai.canLink(player,current,item);
 							})&&game.countPlayer(function(current){
