@@ -364,7 +364,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.list=list;
 							var num1=0,num2=0,num3=0;
 							for(var target of list){
-								num1+=get.effect(target,{name:'wuzhong'},player,player);
+								num1+=2*get.effect(target,{name:'draw'},player,player);
 								num2+=get.recoverEffect(target,player,player);
 							}
 							trigger.player.chooseControl('摸两张牌','回复体力','cancel2').set('prompt','整肃奖励：请选择'+get.translation(list)+'的整肃奖励').set('ai',function(){
@@ -437,13 +437,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.control=='cancel2'){event.finish();return;}
 							player.chooseTarget('整军：是否令一名其他角色也回复1点体力或摸两张牌？',lib.filter.notMe).set('ai',function(target){
 								var player=_status.event.player;
-								return Math.max(get.effect(target,{name:'wuzhong'},target,player),get.recoverEffect(target,target,player));
+								return Math.max(2*get.effect(target,{name:'draw'},target,player),get.recoverEffect(target,target,player));
 							});
 							'step 2'
 							if(result.bool){
 								var target=result.targets[0];
 								event.target=target;
-								var num1=get.effect(target,{name:'wuzhong'},target,player);
+								var num1=2*get.effect(target,{name:'draw'},target,player);
 								var num2=get.recoverEffect(target,target,player);
 								player.line(target);
 								if(target.isHealthy()) result.index=0;

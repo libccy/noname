@@ -139,7 +139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							]).set('ai',()=>{
 								var player=_status.event.player;
 								var list=_status.event.list;
-								var num1=get.effect(player,{name:'wuzhong'},player,player)/2;
+								var num1=get.effect(player,{name:'draw'},player,player);
 								var num2=get.recoverEffect(player,player,player);
 								return num1*list[0]>num2*list[1]?0:1;
 							}).set('list',[-num1,player.getDamagedHp()]);

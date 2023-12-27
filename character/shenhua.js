@@ -3536,7 +3536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(player.countCards('h')>player.hp+1){
 										check=false;
 									}
-									else if(player.countCards('h',{name:['wuzhong']})){
+									else if(player.countCards('h',{name:'wuzhong'})){
 										check=false;
 									}
 									else{

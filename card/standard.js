@@ -14,6 +14,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			draw:{
+				ai:{
+					result:{
+						target:1
+					},
+					tag:{
+						draw:1
+					}
+				}
+			},
 			losehp:{
 				ai:{
 					result:{

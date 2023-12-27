@@ -3848,7 +3848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var fn=function(control){
 							switch(control){
 								case '选项一':
-									return player.getUseValue({name:'wuzhong'})/2;
+									return player.getUseValue({name:'draw'});
 								case '选项二':
 									return Math.max.apply(Math,game.filterPlayer().map(current=>{
 										if(current.hasSkillTag('noh')) return -1;
@@ -9252,7 +9252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player,target=_status.event.getTrigger().player;
 						if(target.hasCard(function(card){
 							return lib.filter.canBeDiscarded(card,player,target);
-						},'he')&&get.effect(target,{name:'guohe_copy2'},player,player)>get.effect(player,{name:'wuzhong'},player,player)/2) return 1;
+						},'he')&&get.effect(target,{name:'guohe_copy2'},player,player)>get.effect(player,{name:'draw'},player,player)) return 1;
 						return 0;
 					});
 					'step 1'
@@ -9640,7 +9640,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(num>0) max=Math.max(max,Math.sqrt(Math.min(2,num))*get.effect(target,{name:'guohe_copy2'},player,player));
 								},
 								选项四:function(target){
-									max=Math.max(max,get.effect(target,{name:'wuzhong'},player,player));
+									max=Math.max(max,2*get.effect(target,{name:'draw'},player,player));
 								},
 							}[choice];
 							game.countPlayer(function(current){
@@ -9671,7 +9671,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}],
 							['选择一名角色，令其摸两张牌',function(target){
 								var player=_status.event.player;
-								return get.effect(target,{name:'wuzhong'},player,player);
+								return 2*get.effect(target,{name:'draw'},player,player);
 							}]
 						][index];
 						var targets=game.filterPlayer(function(current){

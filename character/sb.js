@@ -3992,7 +3992,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					trigger.source.chooseBool('樵拾：是否令'+get.translation(player)+'回复'+trigger.num+'点体力，然后你摸两张牌？').set('ai',()=>{
 						return _status.event.bool;
-					}).set('bool',get.recoverEffect(player,trigger.source,trigger.source)+get.effect(trigger.source,{name:'wuzhong'},trigger.source)>5);
+					}).set('bool',get.recoverEffect(player,trigger.source,trigger.source)+2*get.effect(trigger.source,{name:'draw'},trigger.source)>5);
 					'step 1'
 					if(result.bool){
 						player.logSkill('sbqiaoshi');
@@ -4047,7 +4047,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}).length;
 							player.chooseTarget(get.prompt('sbyanyu'),'令一名其他角色摸'+get.cnNumber(event.num)+'张牌',lib.filter.notMe).set('ai',target=>{
 								var player=_status.event.player;
-								return get.effect(target,{name:'wuzhong'},player,player);
+								return get.effect(target,{name:'draw'},player,player);
 							});
 							'step 1'
 							if(result.bool){
@@ -4842,7 +4842,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:function(player){
 							var num=0,targets=game.filterPlayer(current=>current.hasMark('sbjieyin_mark'));
 							for(var current of targets){
-								num+=get.effect(current,{name:'wuzhong'},player,player);
+								num+=2*get.effect(current,{name:'draw'},player,player);
 							}
 							if(num>0) return 3;
 							return 1;

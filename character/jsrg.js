@@ -1583,8 +1583,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return false;
 							})&&(player.hp>2||get.damageEffect(player,player,player)>=0)) return player;
 							var info=game.filterPlayer().map(current=>{
-								let damage=undamaged.includes(current),card={name:damage?'damage':'wuzhong'};
-								return [current,get.effect(current,card,player,player)/(damage?1.5:1)];
+								let damage=undamaged.includes(current),card={name:damage?'damage':'draw'};
+								return [current,get.effect(current,card,player,player)*(damage?0.7:2)];
 							}).sort((a,b)=>b[1]-a[1])[0];
 							if(info[1]>0) return info[0];
 							return null;
@@ -5392,7 +5392,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				prompt2:'失去1点体力并防止此伤害，然后你与其各摸一张牌',
 				check:function(event,player){
-					return get.damageEffect(event.player,event.source,player,event.nature)*Math.sqrt(event.num)<=get.effect(player,{name:'losehp'},player,player);
+					return get.damageEffect(event.player,event.source,_status.event.player,event.nature)*event.num <
+					get.effect(player,{name:'losehp'},player,_status.event.player)+get.effect(player,{name:'draw'},player,_status.event.player)+get.effect(event.player,{name:'draw'},player,_status.event.player)/2;
 				},
 				group:'jsrgjishan_recover',
 				content:function(){

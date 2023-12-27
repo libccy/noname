@@ -794,7 +794,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.color(card)==color;
 						},'h')){
 							if(color=='red') return get.recoverEffect(player,player,player)+2/Math.max(2,get.value(button.link));
-							if(color=='black') return get.effect(target,{name:'wuzhong'},target,player)+2/Math.max(2,get.value(button.link));
+							if(color=='black') return 2*get.effect(target,{name:'draw'},target,player)+2/Math.max(2,get.value(button.link));
 						}
 						return get.value(button.link)/3;
 					})
@@ -828,7 +828,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var prompt2='用'+get.translation(event.card1)+'交换对方的'+get.translation(event.card2);
 							if(color=='black'){
 								prompt2+='，然后对方摸两张牌';
-								next.set('goon',get.effect(target,{name:'wuzhong'},target,player)>0);
+								next.set('goon',2*get.effect(target,{name:'draw'},target,player)>0);
 							}
 							else if(color=='red'&&player.isDamaged()){
 								prompt2+='，然后你回复1点体力';
@@ -1105,7 +1105,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					player.chooseTarget('是否令一名其他角色摸等量的牌？',lib.filter.notMe).set('ai',target=>{
 						var player=get.player();
-						return get.effect(target,{name:'wuzhong'},player,player);
+						return get.effect(target,{name:'draw'},player,player);
 					});
 					'step 2'
 					if(result.bool){
@@ -1676,7 +1676,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.countCards('h')==target.countCards('h')&&player!=target;
 						}).set('ai',target=>{
 							var player=get.player();
-							return Math.max(get.effect(target,{name:'wuzhong'},player,player),get.effect(target,{name:'guohe'},player,player)/2);
+							return Math.max(get.effect(target,{name:'draw'},player,player),get.effect(target,{name:'guohe'},player,player)/2);
 						});
 						if(result.bool){
 							var target=result.targets[0];
@@ -1729,7 +1729,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})){
 						player.chooseTarget('整军：是否令一名角色摸一张牌？').set('ai',function(target){
 							var player=_status.event.player;
-							return get.effect(target,{name:'wuzhong'},player,player);
+							return get.effect(target,{name:'draw'},player,player);
 						});
 					}
 					else event.goto(2);

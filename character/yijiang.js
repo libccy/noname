@@ -995,7 +995,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var user=trigger.player,target=previous;
 					event.user=user;event.target=target;
 					if(user){
-						user.chooseBool('是否对'+get.translation(target)+'发动【联对】？','令'+get.translation(target)+'摸两张牌').set('ai',()=>_status.event.bool).set('bool',get.effect(target,{name:'wuzhong'},user,user)>0);
+						user.chooseBool('是否对'+get.translation(target)+'发动【联对】？','令'+get.translation(target)+'摸两张牌').set('ai',()=>_status.event.bool).set('bool',get.effect(target,{name:'draw'},user,user)>0);
 					}
 					'step 1'
 					if(result.bool){
@@ -2387,7 +2387,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(target){
 						var player=_status.event.player;
 						var storage=player.getStorage('xinyaoming_kanon');
-						if(get.attitude(player,target)>0&&!storage.contains('摸牌')&&target!=player) return get.effect(target,{name:'wuzhong'},player,player)/2;
+						if(get.attitude(player,target)>0&&!storage.contains('摸牌')&&target!=player) return get.effect(target,{name:'draw'},player,player);
 						if(get.attitude(player,target)<0&&!storage.contains('弃牌')&&target!=player&&target.countCards('h')) return get.effect(target,{name:'guohe_copy2'},player,player);
 						if(get.attitude(player,target)>0&&!storage.contains('制衡')) return get.effect(target,{name:'kaihua'},player,player);
 						return 0;
@@ -2424,7 +2424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=_status.event.target;
 								var controls=_status.event.controls.slice();
 								var map={
-									'摸牌':get.effect(target,{name:'wuzhong'},player,player)/2,
+									'摸牌':get.effect(target,{name:'draw'},player,player),
 									'弃牌':get.effect(target,{name:'guohe_copy2'},player,player),
 									'制衡':get.effect(target,{name:'kaihua'},player,player),
 								};

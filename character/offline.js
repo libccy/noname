@@ -3088,7 +3088,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('zylianji'),'令一名角色摸一张牌').set('ai',target=>{
 						var player=_status.event.player;
 						if(target==player&&player.needsToDiscard(1)) return 1;
-						return get.effect(target,{name:'wuzhong'},player,player);
+						return get.effect(target,{name:'draw'},player,player);
 					});
 					'step 1'
 					if(result.bool){

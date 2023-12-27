@@ -3479,7 +3479,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						case 'diamond':
 							if(target.isIn()){
 								str+=('，令'+strt+'摸两张牌');
-								goon=get.effect(target,{name:'wuzhong'},player,player);
+								goon=2*get.effect(target,{name:'draw'},player,player);
 							}
 							break;
 						case 'spade':
