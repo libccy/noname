@@ -1583,8 +1583,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return false;
 							})&&(player.hp>2||get.damageEffect(player,player,player)>=0)) return player;
 							var info=game.filterPlayer().map(current=>{
-								let damage=undamaged.includes(current),card={name:damage?'damage':'wuzhong'};
-								return [current,get.effect(current,card,player,player)/(damage?1.5:1)];
+								let damage=undamaged.includes(current),card={name:damage?'damage':'draw'};
+								return [current,get.effect(current,card,player,player)*(damage?0.7:2)];
 							}).sort((a,b)=>b[1]-a[1])[0];
 							if(info[1]>0) return info[0];
 							return null;
@@ -5392,7 +5392,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				prompt2:'失去1点体力并防止此伤害，然后你与其各摸一张牌',
 				check:function(event,player){
-					return get.damageEffect(event.player,event.source,player,event.nature)*Math.sqrt(event.num)<=get.effect(player,{name:'losehp'},player,player);
+					return get.damageEffect(event.player,event.source,_status.event.player,event.nature)*event.num <
+					get.effect(player,{name:'losehp'},player,_status.event.player)+get.effect(player,{name:'draw'},player,_status.event.player)+get.effect(event.player,{name:'draw'},player,_status.event.player)/2;
 				},
 				group:'jsrgjishan_recover',
 				content:function(){
@@ -5452,23 +5453,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					// trigger.getParent().triggeredTargets4=trigger.getParent().triggeredTargets4.concat(trigger.targets);
 					trigger.getParent().effectCount++;
 				},
-				ai:{
-					effect:{
-						target:function(card,player,target){
-							if(player._jsrgzhenqiao_aiChecking) return;
-							if(target===player&&get.subtype(card)==='equip1'&&!player.getEquip(1)){
-								if(card.name!=='zhuge'||target.getCardUsable('sha')||!target.needsToDiscard()) return;
-								if(target.countCards('hs',i=>{
-									return get.name(i)==='sha'&&lib.filter.cardEnabled(i,target);
-								})>1) return 'zeroplayertarget';
-							}
-						}
-					}
-				},
 				mod:{
 					attackRange:function(player,num){
 						return num+1;
 					},
+					aiOrder:(player,card,num)=>{
+						if(num>0&&get.itemtype(card)==='card'&&get.subtype(card)==='equip1'&&!player.getEquip(1)){
+							if(card.name!=='zhuge'||player.getCardUsable('sha')||!player.needsToDiscard()||player.countCards('hs',i=>{
+								return get.name(i)==='sha'&&lib.filter.cardEnabled(i,target);
+							})<2) return 0;
+						}
+					},
+					aiValue:(player,card,num)=>{
+						if(num>0&&get.itemtype(card)==='card'&&card.name!=='zhuge'&&get.subtype(card)==='equip1'&&!player.getEquip(1)) return 0.01*num;
+					},
+					aiUseful:()=>{
+						return lib.skill.jsrgzhenqiao.mod.aiValue.apply(this,arguments);
+					}
 				}
 			},
 			//王允

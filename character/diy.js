@@ -1414,7 +1414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player,target=_status.event.getParent().target;
 							switch(button.link){
 								case 'damage':return get.damageEffect(target,player,player);
-								case 'draw':return get.effect(player,{name:'wuzhong'},player,player)
+								case 'draw':return 2*get.effect(player,{name:'draw'},player,player)
 								case 'discard':return get.effect(target,{name:'guohe_copy2'},player,player)*Math.min(1.6,target.countCards('he'));
 								case 'use':return _status.event.getRand('minagi_peiquan')*4;
 							}
@@ -1447,7 +1447,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return baseEffect+Math.max(...choices.map(choice=>{
 								switch(choice){
 									case 'damage':return get.damageEffect(target,player,player);
-									case 'draw':return get.effect(player,{name:'wuzhong'},player,player);
+									case 'draw':return 2*get.effect(player,{name:'draw'},player,player);
 									case 'discard':return get.effect(target,{name:'guohe_copy2'},player,player)*Math.min(1.6,target.countCards('he'));
 									case 'use':return _status.event.getRand('minagi_peiquan')*4;
 								}
@@ -2643,7 +2643,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.chooseTarget('退论：是否令一名角色摸一张牌或弃置一张牌？').set('ai',function(target){
 									var player=_status.event.player;
 									var att=get.attitude(player,target);
-									if(att>0||target.countCards('he')==0) return get.effect(target,{name:'wuzhong'},player,player)/2;
+									if(att>0||target.countCards('he')==0) return get.effect(target,{name:'draw'},player,player);
 									return get.effect(target,{name:'guohe_copy2'},target,player);
 								});
 							}
@@ -12458,7 +12458,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						choicex=choices.slice(0);
 						var getx=function(a){
 							switch(a){
-								case 'draw':return get.effect(player,{name:'wuzhong'},player,player);
+								case 'draw':return 2*get.effect(player,{name:'draw'},player,player);
 								case 'damage':return get.damageEffect(_status.event.getParent().target,player,player);
 								default:return 0;
 							}

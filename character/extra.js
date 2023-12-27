@@ -374,6 +374,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//神贾诩
 			jxlianpo:{
 				audio:2,
+				init:()=>{
+					game.addGlobalSkill('jxlianpo_global');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('jxlianpo'),true)) game.removeGlobalSkill('jxlianpo_global');
+				},
 				trigger:{global:'dieAfter'},
 				filter:function(event,player){
 					if(lib.skill.jxlianpo.getMax().length<=1) return false;
@@ -381,7 +387,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				logTarget:'source',
-				global:'jxlianpo_global',
 				getMax:()=>{
 					const map={
 						zhu:game.countPlayer(current=>{
@@ -521,20 +526,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								});
 							},
 							cardSavable:function(card,player,target){
-								if(card.name=='tao'){
+								if(card.name=='tao'&&!player.hasSkill('jxlianpo')){
 									if(!lib.skill.jxlianpo.getMax().includes('zhu')) return;
 									if(player==target) return;
 									return false;
 								}
 							},
 							playerEnabled:function(card,player,target){
-								if(card.name=='tao'){
+								if(card.name=='tao'&&!player.hasSkill('jxlianpo')){
 									if(!lib.skill.jxlianpo.getMax().includes('zhu')) return;
 									if(player==target) return;
 									return false;
 								}
 							}
 						},
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('jxlianpo'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('jxlianpo_global');
+						}
 					},
 				},
 			},
@@ -2193,6 +2207,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:'受到的伤害+1且改为雷属性',
 						},
+						ai:{
+							effect:{
+								target:(card,player,target)=>{
+									if(!get.tag(card,'damage')) return;
+									if(target.hasSkillTag('nodamage')||target.hasSkillTag('nothunder')) return 'zeroplayertarget';
+									if(target.hasSkillTag('filterDamage',null,{
+										player:player,
+										card:lib.element.VCard({
+											name:card.name,
+											nature:'thunder'
+										},[card])
+									})) return;
+									return 2;
+								}
+							}
+						}
 					},
 					init:{
 						audio:'shouli',
@@ -2286,6 +2316,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return get.suit(card,current)==suit;
 								});
 							})];
+						},
+						target:(card,player,target)=>{
+							if(card.name==='sha'&&!player.hasSkillTag('directHit_ai',true,{
+								target:target,
+								card:card
+							},true)&&game.hasPlayer(current=>{
+								return current.hasCard(cardx=>{
+									return get.subtype(cardx)==='equip3';
+								},'e');
+							})) return [0, -0.5];
 						}
 					}
 				}

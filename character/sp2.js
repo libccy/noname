@@ -923,7 +923,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(button){
 						var target=_status.event.target;
 						return [
-							get.effect(target,{name:'wuzhong'},player,player)/2,
+							get.effect(target,{name:'draw'},player,player),
 							get.effect(target,{name:'shunshou_copy2'},player,player),
 							get.recoverEffect(target,player,player),
 						][button.link];
@@ -8253,6 +8253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.5,
+					maixie_defend:true
 				},
 			},
 			"yechou2":{
