@@ -1344,6 +1344,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							})){
 								return [0,0,0,0];
 							}
+						},
+						target:(card,player,target)=>{
+							if(target._g_taipingyaoshu_temp) return;
+							if(get.subtype(card)==='equip2'&&target.getEquip('taipingyaoshu')&&!target.countEmpty(2)){
+								target._g_taipingyaoshu_temp=true;
+								let lose=get.effect(target,{name:'losehp'},target,target),
+									draw=get.effect(target,{name:'wuzhong'},target,target);
+								if(lose<0&&target.hp<=1&&!target.hasCard(i=>{
+									return get.name(i)==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable');
+								})) draw=0;
+								return [1,(lose+draw)/get.attitude(target,target)];
+							}
 						}
 					}
 				}
