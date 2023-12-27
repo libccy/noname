@@ -1,5 +1,6 @@
 "use strict";
 new Promise(resolve => {
+	// 客户端自带core.js的请注意跟进
 	if ('__core-js_shared__' in window) resolve(null);
 	else {
 		const nonameInitialized = localStorage.getItem('noname_inited');
