@@ -1,5 +1,6 @@
 "use strict";
 new Promise(resolve => {
+	// 客户端自带core.js的请注意跟进
 	if ('__core-js_shared__' in window) resolve(null);
 	else {
 		const nonameInitialized = localStorage.getItem('noname_inited');
@@ -50,9 +51,6 @@ new Promise(resolve => {
 	}
 	window['b' + 'ann' + 'e' + 'dE' + 'x' + 'ten' + 's' + 'i' + 'o' + 'ns'] = ['\u4fa0\u4e49', '\u5168\u6559\u7a0b'];
 
-	/**
-	 * @type { Promise<import('../noname.js')> }
-	 */
 	const module = import('../noname.js');
 
 	module.then(({ ai, game, get, lib, _status, ui, boot }) => {

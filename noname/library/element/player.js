@@ -5,17 +5,19 @@ import { Library as lib } from "../index.js";
 import { status as _status } from '../../status/index.js';
 import { UI as ui } from '../../ui/index.js';
 
-export default class extends HTMLDivElement {
+export class Player extends HTMLDivElement {
 	/**
-	 * @param {HTMLDivElement} [position]
+	 * @param {HTMLDivElement|DocumentFragment} [position]
 	 * @param {true} [noclick]
 	 */
+	// @ts-ignore
 	constructor(position, noclick) {
 		/**
-		 * @type {Player}
+		 * @type {this}
 		 */
+		// @ts-ignore
 		const player = ui.create.div('.player', position);
-		Object.setPrototypeOf(player, lib.element.Player.prototype);
+		Object.setPrototypeOf(player, Player.prototype);
 		player.build(noclick);
 		return player;
 	}
@@ -1398,13 +1400,19 @@ export default class extends HTMLDivElement {
 	inRangeOf(source) {
 		return source.inRange(this);
 	}
-	//Get the player's HP not less than 0. Set “raw” to true to get the player's raw HP instead.
-	//获取角色的体力值。设置“raw”为true以获取角色的体力。
+	/**
+	 * Get the player's HP not less than 0. Set “raw” to true to get the player's raw HP instead.
+	 * 
+	 * 获取角色的体力值。设置“raw”为true以获取角色的体力。
+	 */
 	getHp(raw) {
 		return raw ? this.hp : Math.max(0, this.hp);
 	}
-	//Set “raw” to true to get the player's raw damaged HP instead.
-	//设置“raw”为true以获取角色已损失的体力。
+	/**
+	 * Set “raw” to true to get the player's raw damaged HP instead.
+	 * 
+	 * 设置“raw”为true以获取角色已损失的体力。
+	 */
 	getDamagedHp(raw) {
 		return this.maxHp - this.getHp(raw);
 	}
@@ -2699,8 +2707,8 @@ export default class extends HTMLDivElement {
 	}
 	/**
 	 * @param {string} [arg1='h']
-	 * @param {string | Record<string, any> | (card: Card) => boolean} [arg2]
-	 * @returns {Card[]}
+	 * @param {string | Record<string, any> | ((card: import('../index.js').Card) => boolean)} [arg2]
+	 * @returns {import('../index.js').Card[]}
 	 */
 	getCards(arg1, arg2) {
 		if (typeof arg1 != 'string') {

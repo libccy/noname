@@ -4537,7 +4537,7 @@ export class Game extends Uninstantable {
 	 * 
 	 * @param { string } name 
 	 * @param { false } [trigger]
-	 * @param { import('../library/index.js').GameEventPromise } triggerEvent 
+	 * @param { import('../library/index.js').GameEventPromise } [triggerEvent] 
 	 */
 	static createEvent(name, trigger, triggerEvent) {
 		const next = (new lib.element.GameEvent(name, trigger)).toPromise();
@@ -4783,7 +4783,7 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @param { string } skill 
-	 * @param { import('../library/index.js').Player } player 
+	 * @param { import('../library/index.js').Player } [player] 
 	 */
 	static addGlobalSkill(skill, player) {
 		let info = lib.skill[skill];
@@ -5701,10 +5701,10 @@ export class Game extends Uninstantable {
 			}
 			if (event.next.length > 0) {
 				var next = event.next.shift();
-				if (next.player && next.player.skipList.contains(next.name)) {
+				if (next.player && next.player.skipList.includes(next.name)) {
 					event.trigger(next.name + 'Skipped');
 					next.player.skipList.remove(next.name);
-					if (lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name);
+					if (lib.phaseName.includes(next.name)) next.player.getHistory('skipped').add(next.name);
 				}
 				else {
 					next.parent = event;
@@ -5868,6 +5868,7 @@ export class Game extends Uninstantable {
 				};
 
 				run(event).then(() => {
+					// 其实这个if几乎一定执行了
 					if (game.executingAsyncEventMap.has(event.toEvent())) {
 						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
 							event.finish();
@@ -5909,6 +5910,7 @@ export class Game extends Uninstantable {
 			else if (event.content instanceof AsyncFunction) {
 				// _status,lib,game,ui,get,ai六个变量由game.import提供
 				event.content(event, trigger, player).then(() => {
+					// 其实这个if几乎一定执行了
 					if (game.executingAsyncEventMap.has(event.toEvent())) {
 						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
 							event.finish();
@@ -7711,7 +7713,7 @@ export class Game extends Uninstantable {
 		Object.keys(lib.skill).forEach(value => game.finishSkill(value));
 	}
 	/**
-	 * 这玩意至少19中重载了吧
+	 * 这玩意至少19种重载了吧
 	 */
 	static checkMod() {
 		const argumentArray = Array.from(arguments), name = argumentArray[argumentArray.length - 2];
