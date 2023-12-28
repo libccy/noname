@@ -3729,7 +3729,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yjdumou:{
 				audio:2,
 				forced:true,
-				global:'yjdumou_du',
 				mod:{
 					cardname:function(card,player,name){
 						if(player==_status.currentPhase&&card.name=='du') return 'guohe';
@@ -3737,6 +3736,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					aiValue:function(player,card,num){
 						if(card.name=='du') return get.value({name:'guohe'});
 					},
+				},
+				init:()=>{
+					game.addGlobalSkill('yjdumou_du');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('yjdumou'),true)) game.removeGlobalSkill('yjdumou_du');
 				},
 				subSkill:{
 					du:{
@@ -3747,6 +3752,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							aiValue:function(player,card,num){
 								if(get.name(card)=='du'&&card.name!='du') return get.value({name:card.name});
 							},
+						},
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('yjdumou'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('yjdumou_du');
 						}
 					}
 				},

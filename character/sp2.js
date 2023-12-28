@@ -2362,6 +2362,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//胡班
 			dcchongyi:{
 				audio:2,
+				init:()=>{
+					game.addGlobalSkill('dcchongyi_ai');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('dcchongyi'),true)) game.removeGlobalSkill('dcchongyi_ai');
+				},
 				trigger:{global:'useCard'},
 				logTarget:'player',
 				filter:function(event,player){
@@ -2387,7 +2393,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.addTempSkill('dcchongyi_sha');
 				},
 				group:'dcchongyi_end',
-				global:'dcchongyi_ai',
 				subSkill:{
 					ai:{
 						mod:{
@@ -2403,6 +2408,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								})) return num+10;
 							},
 						},
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('dcchongyi'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('dcchongyi_ai');
+						}
 					},
 					end:{
 						audio:'dcchongyi',

@@ -881,6 +881,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinfu_guanwei:{
 				audio:2,
 				usable:1,
+				init:()=>{
+					game.addGlobalSkill('xinfu_guanwei_ai');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('xinfu_guanwei'),true)) game.removeGlobalSkill('xinfu_guanwei_ai');
+				},
 				trigger:{
 					global:"phaseUseEnd",
 				},
@@ -898,7 +904,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return num>1;
 				},
 				direct:true,
-				global:'xinfu_guanwei_ai',
 				content:function (){
 					'step 0'
 					var target=trigger.player;
@@ -925,6 +930,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					ai:{
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('xinfu_guanwei'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('xinfu_guanwei_ai');
+						},
 						ai:{
 							effect:{
 								player_use:function(card,player,target){

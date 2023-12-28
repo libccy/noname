@@ -1678,7 +1678,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				zhuSkill:true,
 				forced:true,
-				global:'jsrgjiemeng_effect',
+				init:()=>{
+					game.addGlobalSkill('jsrgjiemeng_effect');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('jsrgjiemeng'),true)) game.removeGlobalSkill('jsrgjiemeng_effect');
+				},
 				subSkill:{
 					effect:{
 						mod:{
@@ -1688,6 +1693,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return distance-game.countPlayer(current=>current.group=='qun');
 							},
 						},
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('jsrgjiemeng'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('jsrgjiemeng_effect');
+						}
 					},
 				},
 			},
