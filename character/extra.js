@@ -100,7 +100,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return !target.hasSkill('wuling_wuqinxi');
 				},
-				usable:1,
+				usable:2,
 				prompt:'选择一名角色，向其传授“五禽戏”',
 				group:'wuling_die',
 				content:function(){
@@ -154,9 +154,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				wuqinxiMap:[
 					'虎：当你使用指定唯一目标的牌对目标角色造成伤害时，此伤害+1。',
 					'鹿：①当你获得此效果时，你回复1点体力并弃置判定区的所有牌。②你不能成为延时锦囊牌的目标。',
-					'熊：当你受到伤害时，此伤害-1。',
+					'熊：每回合限一次，当你受到伤害时，此伤害-1。',
 					'猿：出牌阶段开始时，你选择一名角色，随机获得其装备区里的一张牌。',
-					'鹤：出牌阶段开始时，你摸两张牌。',
+					'鹤：出牌阶段开始时，你摸三张牌。',
 				],
 				updateMark:function(player){
 					var wuqinxi=player.storage.wuling_wuqinxi;
@@ -226,7 +226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var evt=event.getParent('useCard');
 									return evt.targets&&evt.targets.length==1&&evt.targets.includes(event.player);
 								case 'damageBegin4':
-									return wuqinxi=='熊';
+									return wuqinxi=='熊'&&!player.hasSkill('wuling_xiong');
 								default:
 									if(wuqinxi=='鹤') return true;
 									if(wuqinxi!='猿') return false;
@@ -251,12 +251,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										event.finish();
 										break;
 									case 'damageBegin4':
+										player.addTempSkill('wuling_xiong');
 										trigger.num--;
 										event.finish();
 										break;
 									default:
 										if(wuqinxi=='鹤'){
-											player.draw(2);
+											player.draw(3);
 											event.finish();
 										}
 										else{
@@ -290,7 +291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									const curWuqinxi=wuqinxi[0];
 									const nextWuqinxi=wuqinxi[1];
 									if(nextWuqinxi=='鹿'&&get.type(card)=='delay') return 'zerotarget';
-									if(curWuqinxi!='熊') return;
+									if(curWuqinxi!='熊'||player.hasSkill('wuling_xiong')) return;
 									if(player.hasSkillTag('jueqing',false,target)) return;
 									var num=get.tag(card,'damage');
 									if(num){
@@ -301,6 +302,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 					},
+					xiong:{charlotte:true},
 					die:{
 						trigger:{player:'die'},
 						filter:function(event,player){
@@ -7997,14 +7999,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_huatuo:'神华佗',
 			shen_huatuo_prefix:'神',
 			wuling:'五灵',
-			wuling_info:'①出牌阶段限一次。你可以选择一名没有“五禽戏”的角色，按照你选择的顺序向其传授“五禽戏”，且其获得如下效果：其获得你选择的第一种“五禽戏”的效果，并在其每个准备阶段移除当前“五禽戏”的效果并切换为下一种。②当你死亡时，你令场上的角色失去你传授的“五禽戏”。',
+			wuling_info:'①出牌阶段限两次。你可以选择一名没有“五禽戏”的角色，按照你选择的顺序向其传授“五禽戏”，且其获得如下效果：其获得你选择的第一种“五禽戏”的效果，并在其每个准备阶段移除当前“五禽戏”的效果并切换为下一种。②当你死亡时，你令场上的角色失去你传授的“五禽戏”。',
 			wuling_wuqinxi:'五禽戏',
 			wuling_wuqinxi_info:'<br><li>“五禽戏”分为“虎、鹿、熊、猿、鹤”五个不同的效果：'+
 			'<br><li>虎：当你使用指定唯一目标的牌对目标角色造成伤害时，此伤害+1。'+
 			'<br><li>鹿：①当你获得此效果时，你回复1点体力并弃置判定区的所有牌。②你不能成为延时锦囊牌的目标。'+
-			'<br><li>熊：当你受到伤害时，此伤害-1。'+
+			'<br><li>熊：每回合限一次，当你受到伤害时，此伤害-1。'+
 			'<br><li>猿：出牌阶段开始时，你选择一名角色，随机获得其装备区里的一张牌。'+
-			'<br><li>鹤：出牌阶段开始时，你摸两张牌。',
+			'<br><li>鹤：出牌阶段开始时，你摸三张牌。',
 			youyi:'游医',
 			youyi_info:'①弃牌阶段结束时，你可以将所有于此阶段弃置的牌置入仁区。②出牌阶段限一次。你可以将仁区的所有牌置入弃牌堆，令所有角色各回复1点体力。',
 			
