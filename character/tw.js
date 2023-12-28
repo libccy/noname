@@ -8662,10 +8662,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger.player.addMark('twlvren',1);
 				},
-				effect:{
-					player:function(card,player,target){
-						if(target.hasMark('twlvren')) return 0.33;
-					},
+				ai:{
+					effect:{
+						player:function(card,player,target){
+							if(target.hasMark('twlvren')) return 0.33;
+						}
+					}
 				},
 				marktext:'刃',
 				intro:{name2:'刃',content:'mark'},

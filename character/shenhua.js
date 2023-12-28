@@ -4826,12 +4826,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					threaten:2,
-					ai:{
-						noh:true,
-						skillTagFilter:function(player,tag){
-							if(tag=='noh'){
-								if(player.countCards('h')!=2) return false;
-							}
+					noh:true,
+					skillTagFilter:function(player,tag){
+						if(tag=='noh'){
+							if(player.countCards('h')!=2) return false;
 						}
 					}
 				}

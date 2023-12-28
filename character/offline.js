@@ -916,30 +916,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					threaten:100,
 					reverseEquip:true,
-					ai:{
-						effect:{
-							player:(card,player,target)=>{
-								if(typeof card!=='object') return;
-								let suit=get.suit(card);
-								if(!lib.suit.contains(suit)||player.hasCard(function(i){
-									return get.suit(i,player)==suit;
-								},'h')) return;
-								return [1,game.countPlayer(current=>{
-									return current.countCards('e',card=>{
-										return get.suit(card,current)==suit;
-									});
-								})];
-							},
-							target:(card,player,target)=>{
-								if(card.name==='sha'&&!player.hasSkillTag('directHit_ai',true,{
-									target:target,
-									card:card
-								},true)&&game.hasPlayer(current=>{
-									return current.hasCard(cardx=>{
-										return get.subtype(cardx)==='equip3';
-									},'e');
-								})) return [0, -0.5];
-							}
+					effect:{
+						player:(card,player,target)=>{
+							if(typeof card!=='object') return;
+							let suit=get.suit(card);
+							if(!lib.suit.contains(suit)||player.hasCard(function(i){
+								return get.suit(i,player)==suit;
+							},'h')) return;
+							return [1,game.countPlayer(current=>{
+								return current.countCards('e',card=>{
+									return get.suit(card,current)==suit;
+								});
+							})];
+						},
+						target:(card,player,target)=>{
+							if(card.name==='sha'&&!player.hasSkillTag('directHit_ai',true,{
+								target:target,
+								card:card
+							},true)&&game.hasPlayer(current=>{
+								return current.hasCard(cardx=>{
+									return get.subtype(cardx)==='equip3';
+								},'e');
+							})) return [0, -0.5];
 						}
 					}
 				}

@@ -4967,12 +4967,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olkangrui:{
 				audio:2,
+				init:()=>{
+					game.addGlobalSkill('olkangrui_ai');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('olkangrui'),true)) game.removeGlobalSkill('olkangrui_ai');
+				},
 				trigger:{global:'damageEnd'},
 				filter:function(event,player){
 					return event.player==_status.currentPhase&&event.player.getHistory('damage').indexOf(event)==0;
 				},
 				direct:true,
-				global:'olkangrui_ai',
 				content:function(){
 					'step 0'
 					player.chooseControl('cancel2').set('choiceList',[
@@ -5058,15 +5063,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					ai:{
-						effect:{
-							target:function(card,player,target){
-								if(target!=player||!get.tag(card,'damage')) return;
-								var list=game.filterPlayer(current=>current.hasSkill('olkangrui')&&get.attitude(current,player)>0);
-								var history=player.getHistory('damage');
-								if(!list.length||history.length!=0) return;
-								return [1,2];
-							}
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('olkangrui'),true);
 						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('olkangrui_ai');
+						},
+						ai:{
+							effect:{
+								target:function(card,player,target){
+									if(target!=player||!get.tag(card,'damage')) return;
+									var list=game.filterPlayer(current=>current.hasSkill('olkangrui')&&get.attitude(current,player)>0);
+									var history=player.getHistory('damage');
+									if(!list.length||history.length!=0) return;
+									return [1,2];
+								}
+							}
+						}
 					}
 				}
 			},
