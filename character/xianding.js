@@ -4479,6 +4479,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//谢灵毓
 			dcyuandi:{
 				audio:2,
+				init:()=>{
+					game.addGlobalSkill('dcyuandi_ai');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('dcyuandi'),true)) game.removeGlobalSkill('dcyuandi_ai');
+				},
 				trigger:{global:'useCard'},
 				filter:function(event,player){
 					var evt=event.getParent('phaseUse');
@@ -4489,7 +4495,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).indexOf(event)==0;
 				},
 				direct:true,
-				global:'dcyuandi_ai',
 				content:function(){
 					'step 0'
 					var target=trigger.player;
@@ -4533,6 +4538,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return num/3;
 							},
 						},
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('dcyuandi'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('dcyuandi_ai');
+						}
 					},
 				}
 			},

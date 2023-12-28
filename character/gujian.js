@@ -1638,11 +1638,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			meiying:{
-				global:'meiying2',
 				globalSilent:true,
 				trigger:{global:'phaseEnd'},
 				filter:function(event,player){
-					return event.player!=player&&!event.player.tempSkills.meiying3&&event.player.isAlive()&&player.countCards('he',{color:'red'})>0;
+					return event.player!=player&&event.player.isAlive()&&player.countCards('he',{color:'red'})&&event.player.getHistory('useCard',evt=>{
+						return evt.targets&&evt.targets.some(i=>i!==event.player);
+					}).length===0;
 				},
 				direct:true,
 				content:function(){
@@ -1665,18 +1666,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.1
 				}
 			},
-			meiying2:{
-				trigger:{player:'useCard'},
-				filter:function(event,player){
-					return _status.currentPhase==player&&event.targets&&(event.targets.length>1||event.targets[0]!=player);
-				},
-				forced:true,
-				popup:false,
-				content:function(){
-					player.addTempSkill('meiying3');
-				}
-			},
-			meiying3:{},
 			jianwu:{
 				trigger:{player:'shaBegin'},
 				forced:true,

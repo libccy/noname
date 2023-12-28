@@ -1850,6 +1850,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//裴元绍
 			dcmoyu:{
 				audio:2,
+				init:()=>{
+					game.addGlobalSkill('dcmoyu_ai');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('dcmoyu'),true)) game.removeGlobalSkill('dcmoyu_ai');
+				},
 				enable:'phaseUse',
 				filter:function(event,player){
 					return !player.hasSkill('dcmoyu_ban')&&game.hasPlayer(current=>lib.skill.dcmoyu.filterTarget(null,player,current));
@@ -1857,7 +1863,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return player!=target&&!player.getStorage('dcmoyu_clear').contains(target)&&target.countGainableCards(player,'hej');
 				},
-				global:'dcmoyu_ai',
 				content:function(){
 					'step 0'
 					player.addTempSkill('dcmoyu_clear');
@@ -1893,6 +1898,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{content:'偷马贼被反打了！'},
 					},
 					ai:{
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('dcmoyu'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('dcmoyu_ai');
+						},
 						ai:{
 							effect:{
 								target:function(card,player,target,current){

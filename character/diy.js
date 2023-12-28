@@ -7778,7 +7778,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					globalFrom:function(from,to,num){
 						return num-game.countPlayer(function(current){
-							return current!=from&&current.isFriendOf(from)&&current.hasSkill('yuzuru_bujin');
+							return current!=from&&current.hasSkill('yuzuru_bujin')&&current.isFriendOf(from);
 						});
 					},
 				},
@@ -11916,6 +11916,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			nslongyue:{
+				init:()=>{
+					game.addGlobalSkill('nslongyue_ai');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('nslongyue'),true)) game.removeGlobalSkill('nslongyue_ai');
+				},
 				trigger:{global:'useCard'},
 				filter:function(event,player){
 					return get.type(event.card,'trick')=='trick'&&event.player.getHistory('useCard').indexOf(event)==0;
@@ -11929,8 +11935,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.2,
-				},
-				global:'nslongyue_ai',
+				}
 			},
 			nslongyue_ai:{
 				mod:{
@@ -11940,6 +11945,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						})) return num+6;
 					},
 				},
+				trigger:{player:'dieAfter'},
+				filter:()=>{
+					return !game.hasPlayer(i=>i.hasSkill('nslongyue'),true);
+				},
+				silent:true,
+				forceDie:true,
+				content:()=>{
+					game.removeGlobalSkill('nslongyue_ai');
+				}
 			},
 			nszhenyin:{
 				trigger:{global:'judge'},
