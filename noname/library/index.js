@@ -8914,6 +8914,10 @@ export class Library extends Uninstantable {
 				else if (args instanceof lib.element.VCard) {
 					card = args[i];
 				}
+				else if (typeof args[i] == 'object' && args[i] != null && args[i].name) {
+					console.warn('lib.cheat.u: 以普通obj形式传入的类卡牌形式已经废弃');
+					card = args[i];
+				}
 				else if (typeof args[i] == 'string') {
 					card = new lib.element.VCard({ name: args[i] });
 				}
