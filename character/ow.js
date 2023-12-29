@@ -106,7 +106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete player.storage.woliu2;
 					for(var i=0;i<game.players.length;i++){
 						var current=game.players[i];
-						if(Array.isArray(current.storage.woliu2)&&current.storage.woliu2.contains(player)){
+						if(Array.isArray(current.storage.woliu2)&&current.storage.woliu2.includes(player)){
 							current.storage.woliu2.remove(player);
 							current.updateMarks();
 						}
@@ -114,11 +114,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
-					if(!event.targets.contains(player)) return false;
+					if(!event.targets.includes(player)) return false;
 					if(!player.storage.woliu2) return false;
 					for(var i=0;i<player.storage.woliu2.length;i++){
 						var current=player.storage.woliu2[i];
-						if(current.isIn()&&event.player!=current&&!event.targets.contains(current)){
+						if(current.isIn()&&event.player!=current&&!event.targets.includes(current)){
 							return true;
 						}
 					}
@@ -131,7 +131,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					for(var i=0;i<player.storage.woliu2.length;i++){
 						var current=player.storage.woliu2[i];
-						if(current.isIn()&&trigger.player!=current&&!trigger.targets.contains(current)){
+						if(current.isIn()&&trigger.player!=current&&!trigger.targets.includes(current)){
 							list.push(current);
 						}
 					}
@@ -155,7 +155,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(card.name=='sha'&&target.storage.woliu2){
 								_status.woliu2_temp=true;
 								var num=game.countPlayer(function(current){
-									if(current!=player&&current!=target&&target.storage.woliu2.contains(current)){
+									if(current!=player&&current!=target&&target.storage.woliu2.includes(current)){
 										return get.sgn(get.effect(current,card,player,target));
 									}
 								});
@@ -1260,7 +1260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				check:function(event,player){
 					return game.countPlayer(function(current){
-						if(event.targets.contains(current)==false&&current!=player&&
+						if(event.targets.includes(current)==false&&current!=player&&
 						lib.filter.targetEnabled(event.card,player,current)){
 							return get.effect(current,event.card,player,player);
 						}
@@ -1269,13 +1269,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
 					return game.hasPlayer(function(current){
-						return (event.targets.contains(current)==false&&current!=player&&
+						return (event.targets.includes(current)==false&&current!=player&&
 						lib.filter.targetEnabled(event.card,player,current));
 					});
 				},
 				content:function(){
 					var list=game.filterPlayer(function(current){
-						return (trigger.targets.contains(current)==false&&current!=player&&
+						return (trigger.targets.includes(current)==false&&current!=player&&
 						lib.filter.targetEnabled(trigger.card,player,current));
 					});
 					if(list.length){
@@ -1306,7 +1306,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tiandan:{
 				trigger:{player:'phaseDrawBegin'},
 				filter:function(event,player){
-					return Math.min(5,player.hp)>player.countCards('h')&&!player.skipList.contains('phaseUse')&&!player.skipList.contains('phaseDiscard');
+					return Math.min(5,player.hp)>player.countCards('h')&&!player.skipList.includes('phaseUse')&&!player.skipList.includes('phaseDiscard');
 				},
 				check:function(event,player){
 					var nh=player.countCards('h');
@@ -1638,7 +1638,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(get.attitude(player,min[i])>0) return 0;
 								if(min[i].countCards('h')<=1&&get.distance(player,min[i],'attack')<=1) return 0;
 							}
-							if(min.contains(target)) return -1;
+							if(min.includes(target)) return -1;
 							return 0;
 						}
 					}
@@ -1767,7 +1767,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					targetInRange:function(card,player,target){
-						if(target.hasSkill('juji3')&&Array.isArray(target.storage.juji3)&&target.storage.juji3.contains(player)){
+						if(target.hasSkill('juji3')&&Array.isArray(target.storage.juji3)&&target.storage.juji3.includes(player)){
 							return true;
 						}
 					}
@@ -1783,7 +1783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					targetInRange:function(card,player,target){
-						if(Array.isArray(player.storage.juji3)&&player.storage.juji3.contains(target)){
+						if(Array.isArray(player.storage.juji3)&&player.storage.juji3.includes(target)){
 							return true;
 						}
 					}

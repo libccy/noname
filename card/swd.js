@@ -1107,7 +1107,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:function(card,player){
 					var es=player.getCards('e');
 					for(var i=0;i<es.length;i++){
-						if(lib.inpile.contains(es[i].name)&&
+						if(lib.inpile.includes(es[i].name)&&
 							!lib.card[es[i].name].nopower&&
 							!lib.card[es[i].name].unique&&
 							!es[i].nopower){
@@ -1120,7 +1120,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return target==player;
 					// var es=target.getCards('e');
 					// for(var i=0;i<es.length;i++){
-					// 	if(lib.inpile.contains(es[i].name)) return true;
+					// 	if(lib.inpile.includes(es[i].name)) return true;
 					// }
 					// return false;
 				},
@@ -1149,7 +1149,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var cards=[];
 					var time=0;
 					for(var i=0;i<es.length;i++){
-						if(!lib.inpile.contains(es[i].name)||lib.card[es[i].name].nopower||lib.card[es[i].name].unique||es[i].nopower){
+						if(!lib.inpile.includes(es[i].name)||lib.card[es[i].name].nopower||lib.card[es[i].name].unique||es[i].nopower){
 							es.splice(i--,1);
 						}
 					}
@@ -1205,7 +1205,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						// 	var es=target.getCards('e');
 						// 	var num=0;
 						// 	for(var i=0;i<es.length;i++){
-						// 		if(lib.inpile.contains(es[i].name)) num++;
+						// 		if(lib.inpile.includes(es[i].name)) num++;
 						// 	}
 						// 	return num;
 						// }
@@ -1236,7 +1236,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					var list=get.inpile('equip');
 					for(var i=0;i<list.length;i++){
-						if(!types.contains(lib.card[list[i]].subtype)){
+						if(!types.includes(lib.card[list[i]].subtype)){
 							list.splice(i--,1);
 						}
 					}
@@ -3055,7 +3055,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							type.add(get.type(result.links[i],'trick'));
 						}
 						for(var i=0;i<ui.cardPile.childNodes.length;i++){
-							if(!type.contains(get.type(ui.cardPile.childNodes[i],'trick'))){
+							if(!type.includes(get.type(ui.cardPile.childNodes[i],'trick'))){
 								player.gain(ui.cardPile.childNodes[i],'gain');
 								break;
 							}
@@ -3296,7 +3296,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				priority:55,
 				filter:function(event){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.player.countCards('he')>0;
 				},
 				content:function(){
@@ -3641,7 +3641,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				forced:true,
 				filter:function(event){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.card&&event.card.name=='sha'&&event.player.countCards('he');
 				},
 				content:function(){
@@ -3803,7 +3803,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return get.attitude(player,event.player)<=0;
 				},
 				filter:function(event){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.card&&event.card.name=='sha'&&event.player&&event.player.isAlive();
 				},
 				logTarget:'player',
@@ -4264,7 +4264,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						switch(get.type(hs[i])){
 							case 'equip':types.add(get.subtype(hs[i]));break;
 							case 'hslingjian':lingjians.add(hs[i].name);break;
-							case 'jiqi':if(!lingjians.contains(hs[i].name)) lingjians.unshift(hs[i].name);break;
+							case 'jiqi':if(!lingjians.includes(hs[i].name)) lingjians.unshift(hs[i].name);break;
 						}
 					}
 					var str='';
@@ -4305,7 +4305,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card){
 					var type=get.type(card);
 					if(type=='equip'){
-						if(!lib.inpile.contains(card.name)) return false;
+						if(!lib.inpile.includes(card.name)) return false;
 						if(lib.card[card.name].nopower) return false;
 						if(lib.card[card.name].unique) return false;
 						if(card.nopower) return false;
@@ -4329,7 +4329,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(!player.countCards('h',{type:['hslingjian','jiqi']})) return false;
 					var es=player.getCards('he',{type:'equip'});
 					for(var i=0;i<es.length;i++){
-						if(lib.inpile.contains(es[i].name)&&
+						if(lib.inpile.includes(es[i].name)&&
 							!lib.card[es[i].name].nopower&&
 							!lib.card[es[i].name].unique&&
 							!es[i].nopower){
@@ -4440,7 +4440,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				direct:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.hasNature()&&event.player&&event.player.isAlive();
 				},
 				content:function(){

@@ -146,7 +146,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						};
 						for(var i=0;i<list.length;i++){
 							if(lib.card[list[i][2]].type=='stonecard'){
-								if(lib.card[list[i][2]].career&&lib.careerList.contains(lib.card[list[i][2]].career)){
+								if(lib.card[list[i][2]].career&&lib.careerList.includes(lib.card[list[i][2]].career)){
 									careerspell[lib.card[list[i][2]].career].push(list[i]);
 								}
 								else{
@@ -154,7 +154,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							else{
-								if(lib.card[list[i][2]].career&&lib.careerList.contains(lib.card[list[i][2]].career)){
+								if(lib.card[list[i][2]].career&&lib.careerList.includes(lib.card[list[i][2]].career)){
 									career[lib.card[list[i][2]].career].push(list[i]);
 								}
 								else{
@@ -214,7 +214,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							for(var i=0;i<cardDialog.buttons.length;i++){
-								if(list.contains(cardDialog.buttons[i].link[2])){
+								if(list.includes(cardDialog.buttons[i].link[2])){
 									cardDialog.buttons[i].classList.add('unselectable');
 								}
 								else{
@@ -1339,7 +1339,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				var i,j,name;
 				for(var i in lib.characterPack.mode_stone){
 					lib.character[i]=lib.characterPack.mode_stone[i];
-					if(lib.characterPack.mode_stone[i][4].contains('stonespecial')) continue;
+					if(lib.characterPack.mode_stone[i][4].includes('stonespecial')) continue;
 					lib.character[i][3].add('stonesha');
 					lib.character[i][3].add('stoneshan');
 					lib.character[i][3].add('stonedraw');
@@ -1354,7 +1354,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					lib.translate[name]=get.translation(i);
 					lib.translate[name+'_info']=get.skillintro(i);
-					if(lib.character[i][4].contains('stonehidden')){
+					if(lib.character[i][4].includes('stonehidden')){
 						lib.card[name].stonehidden=true;
 						continue;
 					}
@@ -1459,9 +1459,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					event.list=list;
 					for(i in lib.character){
-						if(lib.character[i][4]&&lib.character[i][4].contains('minskin')) continue;
-						if(lib.character[i][4]&&lib.character[i][4].contains('stonehidden')) continue;
-						if(lib.config.forbidstone.contains(i)) continue;
+						if(lib.character[i][4]&&lib.character[i][4].includes('minskin')) continue;
+						if(lib.character[i][4]&&lib.character[i][4].includes('stonehidden')) continue;
+						if(lib.config.forbidstone.includes(i)) continue;
 						if(lib.filter.characterDisabled(i)) continue;
 						list.push(i);
 					}
@@ -2511,7 +2511,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var num=1;
 					var friends=player.getFellow();
 					for(var i=0;i<friends.length;i++){
-						if(lib.beastList.contains(friends[i].name)){
+						if(lib.beastList.includes(friends[i].name)){
 							num=2;break;
 						}
 					}
@@ -6205,8 +6205,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var num=player.getLeader().countFellow()-1;
 					var list=[];
 					for(var i in lib.character){
-						if(lib.character[i][4].contains('stone')&&
-						!lib.character[i][4].contains('stonehidden')&&
+						if(lib.character[i][4].includes('stone')&&
+						!lib.character[i][4].includes('stonehidden')&&
 						lib.character[i][5]&&lib.character[i][5][0]==num){
 							list.push(i);
 						}
@@ -6548,7 +6548,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<ui.cardPile.childNodes.length;i++){
 						if(get.type(ui.cardPile.childNodes[i])=='delay'){
 							var name=ui.cardPile.childNodes[i].name;
-							if(!added.contains(name)&&!target.hasJudge(name)){
+							if(!added.includes(name)&&!target.hasJudge(name)){
 								target.addJudge(ui.cardPile.childNodes[i]);
 								added.add(name);
 							}
@@ -6557,7 +6557,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<ui.discardPile.childNodes.length;i++){
 						if(get.type(ui.discardPile.childNodes[i])=='delay'){
 							var name=ui.discardPile.childNodes[i].name;
-							if(!added.contains(name)&&!target.hasJudge(name)){
+							if(!added.includes(name)&&!target.hasJudge(name)){
 								target.addJudge(ui.discardPile.childNodes[i]);
 								added.add(name);
 							}
@@ -6727,8 +6727,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.delay();
 					var list=[];
 					for(var i in lib.character){
-						if(lib.character[i][4].contains('stone')&&
-						!lib.character[i][4].contains('stonehidden')&&
+						if(lib.character[i][4].includes('stone')&&
+						!lib.character[i][4].includes('stonehidden')&&
 						lib.character[i][5]&&lib.character[i][5][0]==1){
 							list.push(i);
 						}
@@ -6906,7 +6906,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				filter:function(event,player){
-					return game.players.contains(player.storage.paladin_zhihuizhufu);
+					return game.players.includes(player.storage.paladin_zhihuizhufu);
 				},
 				content:function(){
 					player.storage.paladin_zhihuizhufu.drawDeck();
@@ -9212,10 +9212,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					var list2=[];
 					for(var i in lib.character){
-						if(lib.character[i][4].contains('stonelegend_'+player.career)){
+						if(lib.character[i][4].includes('stonelegend_'+player.career)){
 							list.push(i);
 						}
-						else if(lib.character[i][4].contains('stonelegend')){
+						else if(lib.character[i][4].includes('stonelegend')){
 							list2.push(i);
 						}
 					}

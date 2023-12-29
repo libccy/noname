@@ -478,7 +478,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						list.push([event.map[friend.playerid],'character']);
 					}
 					game.me.chooseButton(list,true).set('list',event.map[game.me.playerid]).set('filterButton',function(button){
-						return _status.event.list.contains(button.link);
+						return _status.event.list.includes(button.link);
 					});
 					"step 6"
 					game.me.init(result.links[0]);
@@ -520,14 +520,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(ix.length){
 							var name=ix.randomGet();
 							event.list.push(name);
-							if(game.recommendDizhu.contains(name)) event.list2.push(name);
+							if(game.recommendDizhu.includes(name)) event.list2.push(name);
 							list4.addArray(ix);
 						}
 					}
 					for(i in lib.character){
-						if(list4.contains(i)||lib.filter.characterDisabled(i)) continue;
+						if(list4.includes(i)||lib.filter.characterDisabled(i)) continue;
 						event.list.push(i);
-						if(game.recommendDizhu.contains(i)) event.list2.push(i);
+						if(game.recommendDizhu.includes(i)) event.list2.push(i);
 					}
 					event.list.randomSort();
 					_status.characterlist=event.list.slice(0);
@@ -629,7 +629,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					for(i in lib.character){
-						if(list4.contains(i)||lib.filter.characterDisabled(i)) continue;
+						if(list4.includes(i)||lib.filter.characterDisabled(i)) continue;
 						event.list.push(i);
 					}
 					event.list.randomSort();
@@ -645,7 +645,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						createDialog.push([game.me._friend._characterChoice,'character']);
 					}
 					game.me.chooseButton(createDialog,true).set('onfree',true).set('filterButton',function(button){
-						return _status.event.player._characterChoice.contains(button.link);
+						return _status.event.player._characterChoice.includes(button.link);
 					});
 					"step 1"
 					game.me.init(result.links[0]);
@@ -908,7 +908,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(i in lib.characterReplace){
 						var ix=lib.characterReplace[i];
 						for(var j=0;j<ix.length;j++){
-							if(chosen.contains(ix[j])||lib.filter.characterDisabled(ix[j])) ix.splice(j--,1);
+							if(chosen.includes(ix[j])||lib.filter.characterDisabled(ix[j])) ix.splice(j--,1);
 						}
 						if(ix.length){
 							event.list.push(i);
@@ -916,7 +916,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					for(i in lib.character){
-						if(chosen.contains(i)||list4.contains(i)) continue;
+						if(chosen.includes(i)||list4.includes(i)) continue;
 						if(lib.filter.characterDisabled(i)) continue;
 						event.list.push(i);
 						list4.push(i);
@@ -1152,7 +1152,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					for(i in libCharacter){
-						if(list4.contains(i)||lib.filter.characterDisabled(i,libCharacter)) continue;
+						if(list4.includes(i)||lib.filter.characterDisabled(i,libCharacter)) continue;
 						event.list.push(i);
 					}
 					_status.characterlist=event.list.slice(0);
@@ -1177,7 +1177,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							dialog.push([game.players[i]._friend._characterChoice,'character']);
 						}
 						list.push([game.players[i],dialog,true,function(){return Math.random()},function(button){
-							return _status.event.player._characterChoice.contains(button.link);
+							return _status.event.player._characterChoice.includes(button.link);
 						}]);
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -1251,14 +1251,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(ix.length){
 							var name=ix.randomGet();
 							event.list.push(name);
-							if(game.recommendDizhu.contains(name)) event.list2.push(name);
+							if(game.recommendDizhu.includes(name)) event.list2.push(name);
 							list4.addArray(ix);
 						}
 					}
 					for(i in libCharacter){
-						if(list4.contains(i)||lib.filter.characterDisabled(i,libCharacter)) continue;
+						if(list4.includes(i)||lib.filter.characterDisabled(i,libCharacter)) continue;
 						event.list.push(i);
-						if(game.recommendDizhu.contains(i)) event.list2.push(i);
+						if(game.recommendDizhu.includes(i)) event.list2.push(i);
 					}
 					for(var player of game.players){
 						var id=player.playerid;
@@ -1444,7 +1444,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							dialog.push([event.map[friend.playerid],'character']);
 						}
 						list.push([game.players[i],dialog,true,function(){return Math.random()},function(button){
-							return _status.event.player._characterChoice.contains(button.link);
+							return _status.event.player._characterChoice.includes(button.link);
 						}]);
 					}
 					game.me.chooseButtonOL(list,function(player,result){
@@ -1518,7 +1518,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(i in chara){
 						var list=chara[i];
 						for(var j=0;j<list.length;j++){
-							if(!lib.character[list[j]]||lib.connectBanned.contains(list[j])||(i=='key'&&lib.filter.characterDisabled(list[j],libCharacter))) list.splice(j--,1);
+							if(!lib.character[list[j]]||lib.connectBanned.includes(list[j])||(i=='key'&&lib.filter.characterDisabled(list[j],libCharacter))) list.splice(j--,1);
 						}
 						if(list.length>=3){
 							groups.push(i);
@@ -1693,12 +1693,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i in lib.characterReplace){
 							var ix=lib.characterReplace[i];
 							for(var j=0;j<ix.length;j++){
-								if(!list.contains(ix[j])) ix.splice(j--,1);
+								if(!list.includes(ix[j])) ix.splice(j--,1);
 							}
 						}
 					},list4);
 					for(i in libCharacter){
-						if(list4.contains(i)||lib.filter.characterDisabled(i,libCharacter)) continue;
+						if(list4.includes(i)||lib.filter.characterDisabled(i,libCharacter)) continue;
 						event.list.push(i);
 						list4.push(i)
 					}
@@ -1979,7 +1979,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(info.allowMultiple==false) return false;
 					if(event.targets&&!info.multitarget){
 						if(game.hasPlayer(function(current){
-							return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
+							return !event.targets.includes(current)&&lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
 						})){
 							return true;
 						}
@@ -1991,12 +1991,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var prompt2='为'+get.translation(trigger.card)+'增加一个目标'
 					player.chooseTarget(get.prompt('zhuSkill_jiangling'),function(card,player,target){
 						var player=_status.event.player;
-						if(_status.event.targets.contains(target)) return false;
+						if(_status.event.targets.includes(target)) return false;
 						return lib.filter.targetEnabled2(_status.event.card,player,target)&&lib.filter.targetInRange(_status.event.card,player,target);
 					}).set('prompt2',prompt2).set('ai',function(target){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player;
-						return get.effect(target,trigger.card,player,player)*(_status.event.targets.contains(target)?-1:1);
+						return get.effect(target,trigger.card,player,player)*(_status.event.targets.includes(target)?-1:1);
 					}).set('targets',trigger.targets).set('card',trigger.card);
 					'step 1'
 					if(result.bool){
@@ -2009,7 +2009,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(event.targets){
 						player.logSkill('zhuSkill_jiangling',event.targets);
-						if(trigger.targets.contains(event.targets[0])) trigger.targets.removeArray(event.targets);
+						if(trigger.targets.includes(event.targets[0])) trigger.targets.removeArray(event.targets);
 						else{
 							//trigger.directHit.addArray(event.targets);
 							trigger.targets.addArray(event.targets);
@@ -2736,16 +2736,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var num1=0,num2=Infinity,str=get.translation(target);
 							game.countPlayer(function(current){
 								var num=current.countCards('h',function(cardx){
-										if(ui.selected.cards.contains(cardx)) return false;
-										if(card.cards&&card.cards.contains(cardx)) return false;
+										if(ui.selected.cards.includes(cardx)) return false;
+										if(card.cards&&card.cards.includes(cardx)) return false;
 										return true;
 								});
 								if(num>num1) num1=num;
 								if(num<num2) num2=num;
 							});
 							var num=target.countCards('h',function(cardx){
-								if(ui.selected.cards.contains(cardx)) return false;
-								if(card.cards&&card.cards.contains(cardx)) return false;
+								if(ui.selected.cards.includes(cardx)) return false;
+								if(card.cards&&card.cards.includes(cardx)) return false;
 								return true;
 							});
 							if(num1>num){
@@ -2932,7 +2932,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				type:'trick',
 				enable:function(card,player){
 					var hs=player.getCards('h',function(cardx){
-						return cardx!=card&&(!card.cards||!card.cards.contains(cardx));
+						return cardx!=card&&(!card.cards||!card.cards.includes(cardx));
 					});
 					if(!hs.length) return false;
 					var use=true,discard=true;

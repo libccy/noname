@@ -218,7 +218,7 @@ export class GameEvent {
 		this.finish();
 		if (notrigger != 'notrigger') {
 			this.trigger(this.name + 'Cancelled');
-			if (this.player && lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name);
+			if (this.player && lib.phaseName.includes(this.name)) this.player.getHistory('skipped').add(this.name);
 		}
 		return this;
 	}
@@ -249,7 +249,7 @@ export class GameEvent {
 		if (!this.player) return this;
 		var hidden = this.player.hiddenSkills.slice(0);
 		game.expandSkills(hidden);
-		if (hidden.contains(skill)) this.set('hsskill', skill);
+		if (hidden.includes(skill)) this.set('hsskill', skill);
 		return this;
 	}
 	set(key, value) {

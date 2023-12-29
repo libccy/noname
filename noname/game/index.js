@@ -2230,9 +2230,9 @@ export class Game extends Uninstantable {
 			_status.importingExtension = false;
 			if (!game.importedPack) throw ('err');
 			const extensionName = game.importedPack.name;
-			if (lib.config.all.plays.contains(extensionName)) throw ('禁止安装游戏原生扩展');
+			if (lib.config.all.plays.includes(extensionName)) throw ('禁止安装游戏原生扩展');
 			const extensions = lib.config.extensions;
-			if (extensions.contains(extensionName)) game.removeExtension(extensionName, true);
+			if (extensions.includes(extensionName)) game.removeExtension(extensionName, true);
 			extensions.add(extensionName);
 			game.saveConfigValue('extensions');
 			game.saveConfig(`extension_${extensionName}_enable`, true);
@@ -4596,11 +4596,11 @@ export class Game extends Uninstantable {
 					const audiosrc = 'die:ext:' + extname + '/' + j + '.mp3';
 					if (!pack[i][j][4].some(str => typeof str == "string" && /^(?:db:extension-|ext:):(?:.+)/.test(str))) pack[i][j][4].add(imgsrc);
 					if (!pack[i][j][4].some(str => typeof str == "string" && /^die:(?:.+)/.test(str))) pack[i][j][4].add(audiosrc);
-					if (pack[i][j][4].contains('boss') ||
-						pack[i][j][4].contains('hiddenboss')) {
+					if (pack[i][j][4].includes('boss') ||
+						pack[i][j][4].includes('hiddenboss')) {
 						lib.config.forbidai.add(j);
 					}
-					if (lib.config.forbidai_user && lib.config.forbidai_user.contains(j)) {
+					if (lib.config.forbidai_user && lib.config.forbidai_user.includes(j)) {
 						lib.config.forbidai.add(j);
 					}
 					for (var l = 0; l < pack[i][j][3].length; l++) {
@@ -5730,10 +5730,10 @@ export class Game extends Uninstantable {
 				}
 				else if (event.after && event.after.length) {
 					var next = event.after.shift();
-					if (next.player && next.player.skipList.contains(next.name)) {
+					if (next.player && next.player.skipList.includes(next.name)) {
 						event.trigger(next.name + 'Skipped');
 						next.player.skipList.remove(next.name);
-						if (lib.phaseName.contains(next.name)) next.player.getHistory('skipped').add(next.name)
+						if (lib.phaseName.includes(next.name)) next.player.getHistory('skipped').add(next.name)
 					}
 					else {
 						next.parent = event;
@@ -6142,7 +6142,7 @@ export class Game extends Uninstantable {
 						nochess = false;
 					}
 					else if (event._cardChoice && !firstCheck) {
-						if (!event._cardChoice.contains(cards[i])) {
+						if (!event._cardChoice.includes(cards[i])) {
 							nochess = false;
 						}
 					}
@@ -6221,7 +6221,7 @@ export class Game extends Uninstantable {
 					}
 					else if (event._targetChoice && event._targetChoice.has(card)) {
 						let targetChoice = event._targetChoice.get(card);
-						if (!Array.isArray(targetChoice) || !targetChoice.contains(players[i])) {
+						if (!Array.isArray(targetChoice) || !targetChoice.includes(players[i])) {
 							nochess = false;
 						}
 					}
@@ -6290,7 +6290,7 @@ export class Game extends Uninstantable {
 			if (event._skillChoice) {
 				skills2 = event._skillChoice;
 				for (let i = 0; i < skills2.length; i++) {
-					if (event.isMine() || !event._aiexclude.contains(skills2[i])) {
+					if (event.isMine() || !event._aiexclude.includes(skills2[i])) {
 						skills.push(skills2[i]);
 					}
 				}
@@ -6310,11 +6310,11 @@ export class Game extends Uninstantable {
 					info = get.info(skills2[i]);
 					enable = false;
 					if (typeof info.enable == 'function') enable = info.enable(event);
-					else if (Array.isArray(info.enable)) enable = info.enable.contains(event.name);
+					else if (Array.isArray(info.enable)) enable = info.enable.includes(event.name);
 					else if (info.enable == 'phaseUse') enable = (event.type == 'phase');
 					else if (typeof info.enable == 'string') enable = (info.enable == event.name);
 					if (enable) {
-						if (!game.expandSkills(player.getSkills(false).concat(lib.skill.global)).contains(skills2[i]) && (info.noHidden || get.mode() != 'guozhan' || player.hasSkillTag('nomingzhi', false, null, true))) enable = false;
+						if (!game.expandSkills(player.getSkills(false).concat(lib.skill.global)).includes(skills2[i]) && (info.noHidden || get.mode() != 'guozhan' || player.hasSkillTag('nomingzhi', false, null, true))) enable = false;
 						if (info.filter && !info.filter(event, player)) enable = false;
 						if (info.viewAs && typeof info.viewAs != 'function' && event.filterCard && !event.filterCard(info.viewAs, player, event)) enable = false;
 						if (info.viewAs && typeof info.viewAs != 'function' && info.viewAsFilter && info.viewAsFilter(player) == false) enable = false;
@@ -6324,7 +6324,7 @@ export class Game extends Uninstantable {
 						if (player.storage[`temp_ban_${skills2[i]}`] === true) enable = false;
 					}
 					if (enable) {
-						if (event.isMine() || !event._aiexclude.contains(skills2[i])) {
+						if (event.isMine() || !event._aiexclude.includes(skills2[i])) {
 							skills.add(skills2[i]);
 						}
 						event._skillChoice.add(skills2[i]);
@@ -6336,7 +6336,7 @@ export class Game extends Uninstantable {
 			let globallist = lib.skill.global.slice(0);
 			game.expandSkills(globallist);
 			for (let i = 0; i < skills.length; i++) {
-				if (globallist.contains(skills[i])) {
+				if (globallist.includes(skills[i])) {
 					globalskills.push(skills.splice(i--, 1)[0]);
 				}
 			}
@@ -6859,7 +6859,7 @@ export class Game extends Uninstantable {
 				}
 				lib.configOL.version = lib.versionOL;
 				for (let i in lib.cardPackList) {
-					if (lib.configOL.cardPack.contains(i)) {
+					if (lib.configOL.cardPack.includes(i)) {
 						lib.card.list = lib.card.list.concat(lib.cardPackList[i]);
 					}
 				}
@@ -6878,7 +6878,7 @@ export class Game extends Uninstantable {
 						lib.card.list.splice(i, 1); i--;
 					}
 					else if (lib.card[lib.card.list[i][2]].mode &&
-						lib.card[lib.card.list[i][2]].mode.contains(lib.config.mode) == false) {
+						lib.card[lib.card.list[i][2]].mode.includes(lib.config.mode) == false) {
 						lib.card.list.splice(i, 1); i--;
 					}
 				}
@@ -7137,7 +7137,7 @@ export class Game extends Uninstantable {
 			event.clickAvatar = function () {
 				if (event.deciding) {
 					if (this.index < event.config.width) return;
-					if (event.friendlist.contains(this)) {
+					if (event.friendlist.includes(this)) {
 						event.friendlist.remove(this);
 						event.moveNode(this, this.index);
 						this.nodename.innerHTML = get.slimName(this.link);
@@ -7542,7 +7542,7 @@ export class Game extends Uninstantable {
 			if (lib.translate[iInfo]) lib.translate[iInfo] = '此模式下不可用';
 			if (lib.dynamicTranslate[skill]) lib.dynamicTranslate[skill] = () => '此模式下不可用';
 		};
-		if ((info.forbid && info.forbid.contains(mode)) || (info.mode && info.mode.contains(mode) == false) || (info.available && info.available(mode) == false)) {
+		if ((info.forbid && info.forbid.includes(mode)) || (info.mode && info.mode.includes(mode) == false) || (info.available && info.available(mode) == false)) {
 			deleteSkill(i, iInfo);
 			return;
 		}
@@ -7649,7 +7649,7 @@ export class Game extends Uninstantable {
 			const equipValue = get.equipValue(card, player) / 20;
 			return player && player.hasSkillTag('reverseEquip') ? 8.5 - equipValue : 8 + equipValue;
 		}, aiBasicValue = (card, player, index, method) => {
-			if (!player.getCards('e').contains(card) && !player.canEquip(card, true)) return 0.01;
+			if (!player.getCards('e').includes(card) && !player.canEquip(card, true)) return 0.01;
 			const info = get.info(card), current = player.getEquip(info.subtype), value = current && card != current && get.value(current, player);
 			let equipValue = info.ai.equipValue || info.ai.basic.equipValue;
 			if (typeof equipValue == 'function') {

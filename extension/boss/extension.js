@@ -95,7 +95,7 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 						}
 						storage.versus={};
 						for(var i in mode.jiangeboss){
-							if(mode.jiangeboss[i][4].contains('bossallowed')){
+							if(mode.jiangeboss[i][4].includes('bossallowed')){
 								storage.versus[i]=mode.jiangeboss[i];
 							}
 						}
@@ -123,7 +123,7 @@ game.import('play',function(lib,game,ui,get,ai,_status){
 					}
 					storage.boss={};
 					for(var i in mode.characterPack.mode_boss){
-						if(mode.characterPack.mode_boss[i][4].contains('bossallowed')){
+						if(mode.characterPack.mode_boss[i][4].includes('bossallowed')){
 							storage.boss[i]=mode.characterPack.mode_boss[i];
 						}
 					}

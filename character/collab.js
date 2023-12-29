@@ -222,7 +222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				lose:false,
 				delay:false,
 				filterTarget:function(card,player,target){
-					if(player.getStorage('dcrende_targeted').contains(target)) return false;
+					if(player.getStorage('dcrende_targeted').includes(target)) return false;
 					return player!=target&&target.countGainableCards(player,'h')>1;
 				},
 				content:function(){
@@ -337,7 +337,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var hs=player.getCards('h');
 					if(!hs.length) event.num=0;
 					for(var i=0;i<hs.length;i++){
-						if(!cards.contains(hs[i])){
+						if(!cards.includes(hs[i])){
 							event.num=0;break;
 						}
 					}
@@ -353,7 +353,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						locked:false,
 						filter:function(event,player){
-							return !player.getStorage('dczhiheng_hit').contains(event.player);
+							return !player.getStorage('dczhiheng_hit').includes(event.player);
 						},
 						content:function(){
 							player.addTempSkill('dczhiheng_hit');
@@ -524,14 +524,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!evt||!evt.hs||!evt.hs.length) return false;
 							if(event.name=='lose'){
 								for(var i in event.gaintag_map){
-									if(event.gaintag_map[i].contains('dctongliao')) return true;
+									if(event.gaintag_map[i].includes('dctongliao')) return true;
 								}
 								return false;
 							}
 							return player.hasHistory('lose',function(evt){
 								if(event!=evt.getParent()) return false;
 								for(var i in evt.gaintag_map){
-									if(evt.gaintag_map[i].contains('dctongliao')) return true;
+									if(evt.gaintag_map[i].includes('dctongliao')) return true;
 								}
 								return false;
 							});
@@ -542,17 +542,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var cards=trigger.getl(player).hs,ids=[];
 							if(trigger.name=='lose'){
 								for(var i in trigger.gaintag_map){
-									if(trigger.gaintag_map[i].contains('dctongliao')) ids.push(i);
+									if(trigger.gaintag_map[i].includes('dctongliao')) ids.push(i);
 								}
 							}
 							else player.getHistory('lose',function(evt){
 								if(trigger!=evt.getParent()) return false;
 								for(var i in evt.gaintag_map){
-									if(evt.gaintag_map[i].contains('dctongliao')) ids.push(i);
+									if(evt.gaintag_map[i].includes('dctongliao')) ids.push(i);
 								}
 							});
 							for(var card of cards){
-								if(ids.contains(card.cardid)) num+=get.number(card,player);
+								if(ids.includes(card.cardid)) num+=get.number(card,player);
 							}
 							if(num>0) player.draw(num);
 						}
@@ -564,7 +564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				frequent:true,
 				filter:function(event,player){
-					if(player.getStorage('dcwudao_effect').contains(get.type2(event.card,false))) return false;
+					if(player.getStorage('dcwudao_effect').includes(get.type2(event.card,false))) return false;
 					var history=player.getHistory('useCard'),index=history.indexOf(event);
 					if(index<1) return false;
 					var evt=history[index-1];
@@ -584,7 +584,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						popup:false,
 						onremove:true,
 						filter:function(event,player){
-							return player.getStorage('dcwudao_effect').contains(get.type2(event.card,false));
+							return player.getStorage('dcwudao_effect').includes(get.type2(event.card,false));
 						},
 						content:function(){
 							if(get.tag(trigger.card,'damage')>0) trigger.baseDamage++;
@@ -594,7 +594,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							directHit_ai:true,
 							skillTagFilter:function(player,tag,arg){
-								if(arg&&arg.card&&player.getStorage('dcwudao_effect').contains(get.type2(arg.card))) return true;
+								if(arg&&arg.card&&player.getStorage('dcwudao_effect').includes(get.type2(arg.card))) return true;
 								return false;
 							},
 						},
@@ -1059,7 +1059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				filter:function(event,player){
 					return player!=event.player&&!player.hasHistory('useSkill',function(evt){
-						return evt.skill=='dccibei'&&evt.targets.contains(event.player);
+						return evt.skill=='dccibei'&&evt.targets.includes(event.player);
 					});
 				},
 				check:function(event,player){
@@ -1093,25 +1093,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					canBeGained:function(card,source,player){
-						if(player.getEquips('ruyijingubang').contains(card)) return false;
+						if(player.getEquips('ruyijingubang').includes(card)) return false;
 					},
 					canBeDiscarded:function(card,source,player){
-						if(player.getEquips('ruyijingubang').contains(card)) return false;
+						if(player.getEquips('ruyijingubang').includes(card)) return false;
 					},
 					canBeReplaced:function(card,player){
-						if(player.getEquips('ruyijingubang').contains(card)) return false;
+						if(player.getEquips('ruyijingubang').includes(card)) return false;
 					},
 					cardname:function(card){
 						if(get.subtype(card,false)=='equip1') return 'sha';
 					},
 					cardnature:function(card){
-						if(get.subtypes(card,false).contains('equip1')) return false;
+						if(get.subtypes(card,false).includes('equip1')) return false;
 					},
 					cardDiscardable:function(card,player){
-						if(player.getEquips('ruyijingubang').contains(card)) return false;
+						if(player.getEquips('ruyijingubang').includes(card)) return false;
 					},
 					cardEnabled2:function(card,player){
-						if(player.getEquips('ruyijingubang').contains(card)) return false;
+						if(player.getEquips('ruyijingubang').includes(card)) return false;
 					},
 				},
 				group:'dcruyi_blocker',
@@ -1120,16 +1120,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:['loseBefore','disableEquipBefore']},
 						forced:true,
 						filter:function(event,player){
-							if(event.name=='disableEquip') return (event.slots.contains('equip1'));
+							if(event.name=='disableEquip') return (event.slots.includes('equip1'));
 							var cards=player.getEquips('ruyijingubang');
-							return event.cards.some(card=>cards.contains(card));
+							return event.cards.some(card=>cards.includes(card));
 						},
 						content:function(){
 							if(trigger.name=='lose'){
 								trigger.cards.removeArray(player.getEquips('ruyijingubang'));
 							}
 							else{
-								while(trigger.slots.contains('equip1')) trigger.slots.remove('equip1');
+								while(trigger.slots.includes('equip1')) trigger.slots.remove('equip1');
 							}
 						},
 					},
@@ -1197,7 +1197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.tag(card,'damage')>0&&player!=target){
 								if(player.getStat('skill').ruyijingubang_skill&&player.storage.ruyijingubang_skill!=1) return;
 								if(player.hasSkill('dccibei')&&!player.hasHistory('useSkill',function(evt){
-									return evt.skill=='dccibei'&&evt.targets.contains(target);
+									return evt.skill=='dccibei'&&evt.targets.includes(target);
 								})){
 									return [1,3];
 								}
@@ -1240,7 +1240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num!=4) return true;
 					var card=event.card;
 					if(game.hasPlayer(function(current){
-						return !event.targets.contains(current)&&lib.filter.targetEnabled2(card,player,current)&&lib.filter.targetInRange(card,player,current);
+						return !event.targets.includes(current)&&lib.filter.targetEnabled2(card,player,current)&&lib.filter.targetInRange(card,player,current);
 					})){
 						return true;
 					}
@@ -1251,7 +1251,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=player.storage.ruyijingubang_skill;
 					if(num==4){
 						player.chooseTarget(get.prompt('ruyijingubang_effect'),'为'+get.translation(trigger.card)+'额外指定一个目标',function(card,player,target){
-							return !_status.event.sourcex.contains(target)&&player.canUse(_status.event.card,target,false);
+							return !_status.event.sourcex.includes(target)&&player.canUse(_status.event.card,target,false);
 						}).set('sourcex',trigger.targets).set('ai',function(target){
 							var player=_status.event.player;
 							return get.effect(target,_status.event.card,player,player);
@@ -1514,7 +1514,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.name(card)!='sha') return false;
 						return lib.filter.filterCard.apply(this,arguments);
 					},'密信：对'+get.translation(targets[1])+'使用一张【杀】，或令其观看并获得你的一张手牌').set('complexSelect',true).set('filterTarget',function(card,player,target){
-						if(target!=_status.event.sourcex&&!ui.selected.targets.contains(_status.event.sourcex)) return false;
+						if(target!=_status.event.sourcex&&!ui.selected.targets.includes(_status.event.sourcex)) return false;
 						return lib.filter.targetEnabled.apply(this,arguments);
 					}).set('sourcex',targets[1]);
 					'step 2'

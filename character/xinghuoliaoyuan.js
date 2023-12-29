@@ -344,7 +344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					if(event.card.name=='sha'){
 						return game.hasPlayer(function(current){
-							return current!=player&&player.storage.jixu_sha.contains(current)&&!event.targets.contains(current);
+							return current!=player&&player.storage.jixu_sha.includes(current)&&!event.targets.includes(current);
 						});
 					}
 					return false;
@@ -355,7 +355,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function (){
 					player.logSkill("xinfu_jixu");
 					for(var i=0;i<player.storage.jixu_sha.length;i++){
-						if(!trigger.targets.contains(player.storage.jixu_sha[i])&&player.canUse('sha',player.storage.jixu_sha[i],false)){
+						if(!trigger.targets.includes(player.storage.jixu_sha[i])&&player.canUse('sha',player.storage.jixu_sha[i],false)){
 							player.line(player.storage.jixu_sha[i],trigger.card.nature);
 							trigger.targets.push(player.storage.jixu_sha[i]);
 						}
@@ -379,7 +379,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var hs=player.getCards('h');
 					for(var j=0;j<hs.length;j++){
-						if(namelist.contains(get.name(hs[j]))&&!cards.contains(hs[j])) return true;
+						if(namelist.includes(get.name(hs[j]))&&!cards.includes(hs[j])) return true;
 					}
 					return false;
 				},
@@ -395,13 +395,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var hs=player.getCards('h');
 					for(var j=0;j<hs.length;j++){
-						if(namelist.contains(get.name(hs[j]))&&!cards.contains(hs[j])){
+						if(namelist.includes(get.name(hs[j]))&&!cards.includes(hs[j])){
 							namedlist.push(hs[j]);
 							namedddlist.add(get.name(hs[j]));
 						}
 					}
 					for(var k=0;k<cards.length;k++){
-						if(namedddlist.contains(get.name(cards[k]))) nameddlist.push(cards[k]);
+						if(namedddlist.includes(get.name(cards[k]))) nameddlist.push(cards[k]);
 					}
 					var showlist=namedlist.concat(nameddlist);
 					player.showCards(showlist);
@@ -559,7 +559,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player!=_status.currentPhase) return false;
 					if(event.getParent().triggeredTargets3.length>1) return false;
 					if(get.type(event.card)=='equip'&&get.subtype(event.card)!='equip1') return false;
-					if(event.targets.contains(player)) return true;
+					if(event.targets.includes(player)) return true;
 					return false;
 				},
 				callback:function(){
@@ -657,9 +657,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('filterButton',function(button){
 						var player=_status.event.player,cards=player.getExpansions('xinfu_jijun');
 						if(ui.selected.buttons.length){
-							if(!cards.contains(button.link)) return false;
+							if(!cards.includes(button.link)) return false;
 						}
-						else if(cards.contains(button.link)) return false;
+						else if(cards.includes(button.link)) return false;
 						var num=0;
 						for(var i=0;i<ui.selected.buttons.length;i++){
 							num+=get.number(ui.selected.buttons[i]);
@@ -712,7 +712,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"damageEnd",
 				},
 				filter:function(event,player){
-					return event.source&&event.source.isIn()&&!player.getStorage('xinfu_weilu_effect').contains(event.source)
+					return event.source&&event.source.isIn()&&!player.getStorage('xinfu_weilu_effect').includes(event.source)
 				},
 				check:function (event,player){
 					return (get.effect(target,{name:'losehp'},player,player)>=0);
@@ -896,7 +896,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var suit=false;
 					for(var i=0;i<history.length;i++){
 						var suit2=get.suit(history[i].card);
-						if(!lib.suit.contains(suit2)) return false;
+						if(!lib.suit.includes(suit2)) return false;
 						if(suit&&suit!=suit2) return false;
 						suit=suit2;
 						num++;
@@ -955,7 +955,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(!history.length){
 										var val=0;
 										if(player.hasCard(function(cardx){
-											return get.suit(cardx)==suitx&&card!=cardx&&(!card.cards||!card.cards.contains(cardx))&&player.hasValueTarget(cardx);
+											return get.suit(cardx)==suitx&&card!=cardx&&(!card.cards||!card.cards.includes(cardx))&&player.hasValueTarget(cardx);
 										},'hs')) val=[2,0.1];
 										if(val) return val;
 										return;
@@ -964,7 +964,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var suit=false;
 									for(var i=0;i<history.length;i++){
 										var suit2=get.suit(history[i].card);
-										if(!lib.suit.contains(suit2)) return;
+										if(!lib.suit.includes(suit2)) return;
 										if(suit&&suit!=suit2) return;
 										suit=suit2;
 										num++;
@@ -1527,7 +1527,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					aiValue:function(player,card,num){
 						if(card.name=='zhangba') return 15;
-						if(player.getEquip('zhangba')&&player.countCards('hs')>1&&['shan','tao'].contains(card.name)) return 0;
+						if(player.getEquip('zhangba')&&player.countCards('hs')>1&&['shan','tao'].includes(card.name)) return 0;
 						if(card.name=='shan'||card.name=='tao') return num/2;
 					},
 				},

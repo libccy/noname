@@ -437,7 +437,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					value:function(card,player,index,method){
 						if(player.isDisabled(2)) return 0.01;
-						if(player.getEquips('tengjia').contains(card)){
+						if(player.getEquips('tengjia').includes(card)){
 							if(player.hasSkillTag('noDirectDamage')) return 10;
 							if(game.hasPlayer(function(current){
 								return current!=player&&get.attitude(current,player)<0&&current.hasSkillTag('fireAttack',null,null,true);
@@ -640,8 +640,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						var muniu=player.getEquip('muniu');
 						if(!muniu||!muniu.cards||!muniu.cards.length) return;
 						for(var i of ui.selected.cards){
-							if(i==muniu&&muniu.cards.contains(card)) return false;
-							if(muniu.cards.contains(i)&&card==muniu) return false;
+							if(i==muniu&&muniu.cards.includes(card)) return false;
+							if(muniu.cards.includes(i)&&card==muniu) return false;
 						}
 					},
 				},
@@ -685,7 +685,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var muniu=player.getEquip('muniu');
 					if(!muniu||!muniu.cards) return false;
 					return event.ss.filter(function(card){
-						return muniu.cards.contains(card);
+						return muniu.cards.includes(card);
 					}).length>0;
 				},
 				content:function(){

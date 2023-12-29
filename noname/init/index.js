@@ -188,13 +188,13 @@ export async function boot() {
 	var pack = Reflect.get(window, 'noname_package');
 	Reflect.deleteProperty(window, 'noname_package');
 	for (const name in pack.character) {
-		if (config.get('all').sgscharacters.contains(name) || config.get('hiddenCharacterPack').indexOf(name) == -1) {
+		if (config.get('all').sgscharacters.includes(name) || config.get('hiddenCharacterPack').indexOf(name) == -1) {
 			config.get('all').characters.push(name);
 			lib.translate[name + '_character_config'] = pack.character[name];
 		}
 	}
 	for (const name in pack.card) {
-		if (config.get('all').sgscards.contains(name) || config.get('hiddenCardPack').indexOf(name) == -1) {
+		if (config.get('all').sgscards.includes(name) || config.get('hiddenCardPack').indexOf(name) == -1) {
 			config.get('all').cards.push(name);
 			lib.translate[name + '_card_config'] = pack.card[name];
 		}
@@ -227,7 +227,7 @@ export async function boot() {
 	}
 	if (pack.background) {
 		for (const name in pack.background) {
-			if (config.get('hiddenBackgroundPack').contains(name)) continue;
+			if (config.get('hiddenBackgroundPack').includes(name)) continue;
 			lib.configMenu.appearence.config.image_background.item[name] = pack.background[name];
 		}
 		for (let i = 0; i < config.get('customBackgroundPack').length; i++) {
@@ -345,7 +345,7 @@ export async function boot() {
 		}
 		var alerted = false;
 		for (var name = 0; name < config.get('extensions').length; name++) {
-			if (Reflect.get(window, 'bannedExtensions').contains(config.get('extensions')[name])) {
+			if (Reflect.get(window, 'bannedExtensions').includes(config.get('extensions')[name])) {
 				//if(!alerted) alert('读取某些扩展时出现问题。');
 				alerted = true;
 				continue;
@@ -372,7 +372,7 @@ export async function boot() {
 		if (config.get('mode') != 'connect' || (!localStorage.getItem(lib.configprefix + 'directstart') && show_splash)) {
 			var alerted = false;
 			for (var name = 0; name < config.get('extensions').length; name++) {
-				if (Reflect.get(window, 'bannedExtensions').contains(config.get('extensions')[name])) {
+				if (Reflect.get(window, 'bannedExtensions').includes(config.get('extensions')[name])) {
 					//if(!alerted) alert('读取某些扩展时出现问题。');
 					alerted = true;
 					continue;
@@ -677,13 +677,13 @@ async function loadConfig() {
 			idbOpenDBRequest.onupgradeneeded = idbVersionChangeEvent => {
 				// @ts-expect-error MaybeHave
 				const idbDatabase = idbVersionChangeEvent.target.result;
-				if (!idbDatabase.objectStoreNames.contains('video')) idbDatabase.createObjectStore('video', {
+				if (!idbDatabase.objectStoreNames.includes('video')) idbDatabase.createObjectStore('video', {
 					keyPath: 'time'
 				});
-				if (!idbDatabase.objectStoreNames.contains('image')) idbDatabase.createObjectStore('image');
-				if (!idbDatabase.objectStoreNames.contains('audio')) idbDatabase.createObjectStore('audio');
-				if (!idbDatabase.objectStoreNames.contains('config')) idbDatabase.createObjectStore('config');
-				if (!idbDatabase.objectStoreNames.contains('data')) idbDatabase.createObjectStore('data');
+				if (!idbDatabase.objectStoreNames.includes('image')) idbDatabase.createObjectStore('image');
+				if (!idbDatabase.objectStoreNames.includes('audio')) idbDatabase.createObjectStore('audio');
+				if (!idbDatabase.objectStoreNames.includes('config')) idbDatabase.createObjectStore('config');
+				if (!idbDatabase.objectStoreNames.includes('data')) idbDatabase.createObjectStore('data');
 			};
 		});
 		Reflect.set(lib, 'db', event.target.result);

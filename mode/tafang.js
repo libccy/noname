@@ -12,9 +12,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			"step 1"
 			if(get.is.phoneLayout()&&lib.config.touchscreen&&
 				!lib.config.show_round_menu&&
-				!['system','menu'].contains(lib.config.swipe_left)&&
-				!['system','menu'].contains(lib.config.swipe_right)&&
-				!['system','menu'].contains(lib.config.swipe_up)){
+				!['system','menu'].includes(lib.config.swipe_left)&&
+				!['system','menu'].includes(lib.config.swipe_right)&&
+				!['system','menu'].includes(lib.config.swipe_up)){
 				ui.roundmenu.style.display='';
 			}
 			if(lib.config.player_border=='normal'&&(lib.config.layout=='long'||lib.config.layout=='long2')){
@@ -139,7 +139,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				for(var i=0;i<ui.chessheight-1;i++){
 					for(var j=0;j<ui.chesswidth;j++){
 						if(i>=8&&j!=0&&j!=ui.chesswidth-1) continue;
-						if(tafanglist.contains(j)){
+						if(tafanglist.includes(j)){
 							var cg=i*ui.chesswidth+j;
 							grids.remove(cg);
 							game.addObstacle(cg.toString(),false);
@@ -222,9 +222,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			for(i in lib.character){
 				if(i.indexOf('treasure_')==0) continue;
 				if(i.indexOf('tafang_mech_')==0) continue;
-				if(lib.character[i][4].contains('minskin')) continue;
-				if(lib.config.forbidchess.contains(i)) continue;
-				if(lib.character[i][4].contains('boss')) continue;
+				if(lib.character[i][4].includes('minskin')) continue;
+				if(lib.config.forbidchess.includes(i)) continue;
+				if(lib.character[i][4].includes('boss')) continue;
 				if(lib.filter.characterDisabled(i)) continue;
 				list.push(i);
 			}
@@ -667,7 +667,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 6'
 					var shalldelay=false;
 					for(var i=0;i<ui.chesswidth;i++){
-						if(lib.posmap[i]&&game.players.contains(lib.posmap[i])){
+						if(lib.posmap[i]&&game.players.includes(lib.posmap[i])){
 							for(var j=0;j<ui.chessheight;j++){
 								var pos=i+j*ui.chesswidth;
 								if(lib.posmap[pos]&&lib.posmap[pos].movable(0,1)){
@@ -730,7 +730,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 8'
 					if(event.xingdong.length){
 						var toact=event.xingdong.shift();
-						if(game.players.contains(toact)){
+						if(game.players.includes(toact)){
 							toact.phase();
 						}
 						event.redo();
@@ -741,7 +741,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 9'
 					if(event.xingdong.length){
 						var enemy=event.xingdong.shift();
-						if(!event.justadded.contains(enemy.name)&&game.players.contains(enemy)){
+						if(!event.justadded.includes(enemy.name)&&game.players.includes(enemy)){
 							enemy.phase();
 						}
 						event.redo();
@@ -900,8 +900,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						node.info=scene;
 						ui.create.div('.avatar.menu',node.bgnode);
 						node.namenode=ui.create.div('.name',node,(scene.name));
-						if(lib.storage.map.contains(name)){
-							if(lib.storage.newmap.contains(name)){
+						if(lib.storage.map.includes(name)){
+							if(lib.storage.newmap.includes(name)){
 								node.classList.add('glow3');
 							}
 							node.namenode.dataset.nature='soilm';

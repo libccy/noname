@@ -233,7 +233,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt('juechen'),function(card,player,target){
-						return player!=target&&!trigger.targets.contains(target)&&target.countCards('he')>0;
+						return player!=target&&!trigger.targets.includes(target)&&target.countCards('he')>0;
 					}).set('autodelay',true).ai=function(target){
 						return -get.attitude(player,target);
 					}
@@ -418,7 +418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var dialog=ui.create.dialog('将三张牌中的锦囊牌或装备牌交给一名角色','hidden');
 						dialog.add(event.cards);
 						for(var i=0;i<dialog.buttons.length;i++){
-							if(event.cards2.contains(dialog.buttons[i].link)){
+							if(event.cards2.includes(dialog.buttons[i].link)){
 								dialog.buttons[i].style.opacity=1;
 							}
 							else{

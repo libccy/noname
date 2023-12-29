@@ -350,7 +350,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					_status.characterlist=list;
 					var filter=function(name){
-						return !_status.characterlist.contains(name);
+						return !_status.characterlist.includes(name);
 					};
 					var dialog=ui.create.characterDialog('heightset',filter).open();
 					dialog.videoId=event.videoId;
@@ -408,7 +408,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					var next=game.fan.chooseButton(true,1);
 					next.filterButton=function(button){
-						return _status.event.canChoose.contains(button.link);
+						return _status.event.canChoose.includes(button.link);
 					};
 					next.set('onfree',true);
 					next.dialog=event.videoIdx;
@@ -428,7 +428,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							dialog.content.firstChild.innerHTML=choosing+'选择了'+get.translation(link);
 							for(var i=0;i<dialog.buttons.length;i++){
-								if(link.contains(dialog.buttons[i].link)){
+								if(link.includes(dialog.buttons[i].link)){
 									if(first){
 										dialog.buttons[i].classList.add('selectedx');
 									}
@@ -441,7 +441,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},result.links,game.fan,true,event.videoIdx);
 					var next=game.zhu.chooseButton(true,2);
 					next.filterButton=function(button){
-						return _status.event.canChoose.contains(button.link);
+						return _status.event.canChoose.includes(button.link);
 					};
 					next.dialog=event.videoIdx;
 					next.canChoose=_status.characterChoice.all;
@@ -460,7 +460,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							dialog.content.firstChild.innerHTML=choosing+'选择了'+get.translation(link);
 							for(var i=0;i<dialog.buttons.length;i++){
-								if(link.contains(dialog.buttons[i].link)){
+								if(link.includes(dialog.buttons[i].link)){
 									if(first){
 										dialog.buttons[i].classList.add('selectedx');
 									}
@@ -473,7 +473,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},result.links,game.zhu,false,event.videoIdx);
 					var next=game.fan.chooseButton(true,2);
 					next.filterButton=function(button){
-						return _status.event.canChoose.contains(button.link);
+						return _status.event.canChoose.includes(button.link);
 					};
 					next.dialog=event.videoIdx;
 					next.canChoose=_status.characterChoice.all;
@@ -492,7 +492,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							dialog.content.firstChild.innerHTML=choosing+'选择了'+get.translation(link);
 							for(var i=0;i<dialog.buttons.length;i++){
-								if(link.contains(dialog.buttons[i].link)){
+								if(link.includes(dialog.buttons[i].link)){
 									if(first){
 										dialog.buttons[i].classList.add('selectedx');
 									}
@@ -505,7 +505,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},result.links,game.fan,true,event.videoIdx);
 					var next=game.zhu.chooseButton(true);
 					next.filterButton=function(button){
-						return _status.event.canChoose.contains(button.link);
+						return _status.event.canChoose.includes(button.link);
 					};
 					next.dialog=event.videoIdx;
 					next.canChoose=_status.characterChoice.all;
@@ -524,7 +524,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							dialog.content.firstChild.innerHTML=choosing+'选择了'+get.translation(link);
 							for(var i=0;i<dialog.buttons.length;i++){
-								if(link.contains(dialog.buttons[i].link)){
+								if(link.includes(dialog.buttons[i].link)){
 									if(first){
 										dialog.buttons[i].classList.add('selectedx');
 									}
@@ -578,7 +578,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll(function(list,id){
 						_status.characterlist=list;
 						var filter=function(name){
-							return !_status.characterlist.contains(name);
+							return !_status.characterlist.includes(name);
 						};
 						var dialog=ui.create.characterDialog('heightset',filter).open();
 						dialog.videoId=id;
@@ -644,7 +644,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					var next=game.fan.chooseButton(true,1);
 					next.set('filterButton',function(button){
-						return _status.event.canChoose.contains(button.link);
+						return _status.event.canChoose.includes(button.link);
 					});
 					next.set('dialog',event.videoIdx);
 					next.set('canChoose',_status.characterChoice.all);
@@ -663,7 +663,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							dialog.content.firstChild.innerHTML=choosing+'选择了'+get.translation(link);
 							for(var i=0;i<dialog.buttons.length;i++){
-								if(link.contains(dialog.buttons[i].link)){
+								if(link.includes(dialog.buttons[i].link)){
 									if(first){
 										dialog.buttons[i].classList.add('selectedx');
 									}
@@ -676,7 +676,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},result.links,game.fan,true,event.videoIdx);
 					var next=game.zhu.chooseButton(true,2);
 					next.set('filterButton',function(button){
-						return _status.event.canChoose.contains(button.link);
+						return _status.event.canChoose.includes(button.link);
 					});
 					next.set('dialog',event.videoIdx);
 					next.set('canChoose',_status.characterChoice.all);
@@ -695,7 +695,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							dialog.content.firstChild.innerHTML=choosing+'选择了'+get.translation(link);
 							for(var i=0;i<dialog.buttons.length;i++){
-								if(link.contains(dialog.buttons[i].link)){
+								if(link.includes(dialog.buttons[i].link)){
 									if(first){
 										dialog.buttons[i].classList.add('selectedx');
 									}
@@ -708,7 +708,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},result.links,game.zhu,false,event.videoIdx);
 					var next=game.fan.chooseButton(true,2);
 					next.set('filterButton',function(button){
-						return _status.event.canChoose.contains(button.link);
+						return _status.event.canChoose.includes(button.link);
 					});
 					next.set('dialog',event.videoIdx);
 					next.set('canChoose',_status.characterChoice.all);
@@ -727,7 +727,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							dialog.content.firstChild.innerHTML=choosing+'选择了'+get.translation(link);
 							for(var i=0;i<dialog.buttons.length;i++){
-								if(link.contains(dialog.buttons[i].link)){
+								if(link.includes(dialog.buttons[i].link)){
 									if(first){
 										dialog.buttons[i].classList.add('selectedx');
 									}
@@ -740,7 +740,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},result.links,game.fan,true,event.videoIdx);
 					var next=game.zhu.chooseButton(true);
 					next.set('filterButton',function(button){
-						return _status.event.canChoose.contains(button.link);
+						return _status.event.canChoose.includes(button.link);
 					});
 					next.set('dialog',event.videoIdx);
 					next.set('canChoose',_status.characterChoice.all);
@@ -759,7 +759,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							dialog.content.firstChild.innerHTML=choosing+'选择了'+get.translation(link);
 							for(var i=0;i<dialog.buttons.length;i++){
-								if(link.contains(dialog.buttons[i].link)){
+								if(link.includes(dialog.buttons[i].link)){
 									if(first){
 										dialog.buttons[i].classList.add('selectedx');
 									}

@@ -162,11 +162,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					value:function(card,player){
-						if(player.getEquips(1).contains(card)) return 0.4;
+						if(player.getEquips(1).includes(card)) return 0.4;
 						return 4;
 					},
 					equipValue:function(card,player){
-						if(player.getCards('e').contains(card)) return 0.4;
+						if(player.getCards('e').includes(card)) return 0.4;
 						return -get.value(player.getCards('e'));
 					},
 					basic:{
@@ -196,7 +196,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquips(1).contains(card)) return -3;
+						if(player.getEquips(1).includes(card)) return -3;
 						return 3;
 					},
 					basic:{
@@ -233,7 +233,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquips(2).contains(card)){
+						if(player.getEquips(2).includes(card)){
 							if(player.hasSex('male')) return -8;
 							return 0;
 						}
@@ -270,7 +270,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 1;
 					},
 					value:function(card,player){
-						if(player.getEquips(2).contains(card)) return -10;
+						if(player.getEquips(2).includes(card)) return -10;
 						return 2.5;
 					},
 					basic:{
@@ -304,7 +304,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:9,
 					equipValue:0,
 					value:function(card,player){
-						if(player.getEquips(2).contains(card)) return 0;
+						if(player.getEquips(2).includes(card)) return 0;
 						return 0.5;
 					},
 					basic:{
@@ -529,14 +529,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(!player._start_cards) return false;
 						var hs=player.getCards('h');
 						for(var card of player._start_cards){
-							if(get.name(card,player)=='du'&&hs.contains(card)) return true;
+							if(get.name(card,player)=='du'&&hs.includes(card)) return true;
 						}
 					}
 					else{
 						if(event.getParent().name!='draw') return false;
 						var hs=player.getCards('h');
 						for(var card of event.cards){
-							if(get.name(card,player)=='du'&&hs.contains(card)) return true;
+							if(get.name(card,player)=='du'&&hs.includes(card)) return true;
 						}
 					}
 					return false;
@@ -546,12 +546,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var hs=player.getCards('h');
 					if(trigger.name=='phase'){
 						event.cards=player._start_cards.filter(function(card){
-							return (get.name(card,player)=='du'&&hs.contains(card));
+							return (get.name(card,player)=='du'&&hs.includes(card));
 						});
 					}
 					else{
 						event.cards=trigger.cards.filter(function(card){
-							return (get.name(card,player)=='du'&&hs.contains(card));
+							return (get.name(card,player)=='du'&&hs.includes(card));
 						});
 					}
 					if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
@@ -559,7 +559,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					player.chooseCardTarget({
 						filterCard:function(card){
-							return _status.event.cards.contains(card);
+							return _status.event.cards.includes(card);
 						},
 						filterTarget:lib.filter.notMe,
 						selectCard:[1,cards.length],
