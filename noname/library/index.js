@@ -8447,7 +8447,7 @@ export class Library extends Uninstantable {
 						gl(str, function (folders, files) {
 							if (files.length > 1) {
 								for (let j = 0; j < files.length; j++) {
-									if (files[i] && files[i].contains && files[i].contains('extension.js')) {
+									if (typeof files[i] == 'string' && files[i].includes('extension.js')) {
 										files.splice(j--, 1);
 									}
 									else {
