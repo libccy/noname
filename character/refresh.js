@@ -11122,7 +11122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					useShan:true,
 					effect:{
 						target:function(card,player,target,current){
-							let name='sha';
+							let name;
 							if(typeof card=='object'){
 								if(card.viewAs) name=card.viewAs;
 								else name=get.name(card);

@@ -5162,10 +5162,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								return -1.5;
 							}();
-							if(!isLink && target.mayHaveShan() && !player.hasSkillTag('directHit_ai', true, {
+							if(!isLink && target.mayHaveShan(player,'use') && !player.hasSkillTag('directHit_ai', true, {
 								target: target,
 								card: card
-							}, true)) return eff / 1.2;
+							}, true)) return eff * 0.6;
 							return eff;
 						}
 					},
@@ -6954,7 +6954,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							var target=trigger.target;
-							if(trigger.targets.length>1||target.mayHaveShan()) return 0;
+							if(trigger.targets.length>1||target.mayHaveShan(player,'use')) return 0;
 						}
 						var num=trigger.getParent().baseDamage;
 						var map=trigger.getParent().customArgs,id=target.playerid;
@@ -14460,12 +14460,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(num>=delta) return 'zeroplayertarget';
 							}
 							else if(get.tag(card,'respondShan')>0){
-								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveShan()){
+								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveShan(player)){
 									return 0.6;
 								}
 							}
 							else if(get.tag(card,'respondSha')>0){
-								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveSha()){
+								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveSha(player)){
 									return 0.6;
 								}
 							}
