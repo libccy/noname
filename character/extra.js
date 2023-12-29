@@ -2216,7 +2216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(target.hasSkillTag('nodamage')||target.hasSkillTag('nothunder')) return 'zeroplayertarget';
 									if(target.hasSkillTag('filterDamage',null,{
 										player:player,
-										card:lib.element.VCard({
+										card:new lib.element.VCard({
 											name:card.name,
 											nature:'thunder'
 										},[card])

@@ -277,7 +277,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.getHp()) return false;
 					if(event.name=='loseAsync'&&event.type!='gain') return false;
-					var cards1=event.getl(player).cards2,cards2=cards=event.getg(player);
+					var cards1=event.getl(player).cards2,cards2=event.getg(player);
 					return (!player.hasSkill('dcsbmengmou_true')&&game.hasPlayer(function(current){
 						if(current==player) return false;
 						var cardsx=event.getg(current);
