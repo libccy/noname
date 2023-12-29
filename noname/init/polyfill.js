@@ -6,6 +6,10 @@ import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 
 HTMLDivElement.prototype.animate = function (name, time) {
+	// 兼容原先的Div.animate
+	if (Array.isArray(name) || get.objtype(name) == 'object') {
+		return Element.prototype.animate.call(this, name, time);
+	}
 	var that;
 	if (get.is.mobileMe(this) && name == 'target') {
 		that = ui.mebg;
