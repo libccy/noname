@@ -7904,12 +7904,12 @@ export class Player extends HTMLDivElement {
 			else return true;
 		}
 		if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
-		let cards, selected = get.copy(ui.selected.cards);
+		let cards, selected = [];
 		if (get.itemtype(ignore) === 'cards') selected.addArray(ignore);
 		else if (get.itemtype(ignore) === 'card') selected.add(ignore);
 		if (this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
 		else cards = this.getShownCards();
-		count += cards.filter(card => {
+		cards = cards.filter(card => {
 			if (selected.includes(card)) return false;
 			let name = get.name(card, this);
 			if (name == 'sha' || name == 'hufu' || name == 'yuchanqian') {
@@ -7918,9 +7918,10 @@ export class Player extends HTMLDivElement {
 				return true;
 			}
 			return false;
-		}).length;
+		});
+		count += cards.length;
 		if (count && rvt !== 'count') return true;
-		let hs = this.getCards('hs').filter(i => !cards.includes(i) && !selected.includes(i)).length;
+		let hs = this.getCards('hs').filter(i => !cards.includes(i)).length;
 		if (!hs) {
 			if (rvt === 'count') return count;
 			return false;
@@ -7946,12 +7947,12 @@ export class Player extends HTMLDivElement {
 			else return true;
 		}
 		if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
-		let cards, selected = get.copy(ui.selected.cards);
+		let cards, selected = [];
 		if (get.itemtype(ignore) === 'cards') selected.addArray(ignore);
 		else if (get.itemtype(ignore) === 'card') selected.add(ignore);
 		if (this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
 		else cards = this.getShownCards();
-		count += cards.filter(card => {
+		cards = cards.filter(card => {
 			if (selected.includes(card)) return false;
 			let name = get.name(card, this);
 			if (name === 'shan' || name === 'hufu') {
@@ -7960,9 +7961,10 @@ export class Player extends HTMLDivElement {
 				return true;
 			}
 			return false;
-		}).length;
+		});
+		count += cards.length;
 		if (count && rvt !== 'count') return true;
-		let hs = this.getCards('hs').filter(i => !cards.includes(i) && !selected.includes(i)).length;
+		let hs = this.getCards('hs').filter(i => !cards.includes(i)).length;
 		if (!hs) {
 			if (rvt === 'count') return count;
 			return false;
