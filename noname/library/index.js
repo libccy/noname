@@ -8371,7 +8371,12 @@ export class Library extends Uninstantable {
 	};
 	static init = LibInit;
 	static cheat = {
-		i: function () {
+		/**
+		 * 将游戏内部的对象暴露到全局中
+		 * 
+		 * lib.cheat, game, ui, get, ai, lib, _status
+		 */
+		i() {
 			window.cheat = lib.cheat;
 			window.game = game;
 			window.ui = ui;
@@ -8380,9 +8385,12 @@ export class Library extends Uninstantable {
 			window.lib = lib;
 			window._status = _status;
 		},
-		dy: function () {
-			var next = game.me.next;
-			for (var i = 0; i < 10; i++) {
+		/**
+		 * 自己的下家(如果下家是主公身份则是下家的下家)立即死亡
+		 */
+		dy() {
+			let next = game.me.next;
+			for (let i = 0; i < 10; i++) {
 				if (next.identity != 'zhu') {
 					break;
 				}
@@ -8390,12 +8398,24 @@ export class Library extends Uninstantable {
 			}
 			next.die();
 		},
-		x: function () {
-			var gl = function (dir, callback) {
-				var files = [], folders = [];
-				dir = '/Users/widget/Documents/extension/' + dir;
-				lib.node.fs.readdir(dir, function (err, filelist) {
-					for (var i = 0; i < filelist.length; i++) {
+		/**
+		 * 在控制台输出每个扩展文件夹内的所有文件
+		 * 
+		 * 需要node环境
+		 * 
+		 * @param  { ...string } args 只需要显示的文件夹首字符
+		 */
+		x(...args) {
+			/**
+			 * @param { string } dir 
+			 * @param { (folders: string[], files: string[]) => any } callback 
+			 */
+			const gl = function (dir, callback) {
+				const files = [], folders = [];
+				// dir = '/Users/widget/Documents/extension/' + dir;
+				dir = lib.node.path.join(__dirname, 'extension', dir);
+				lib.node.fs.promises.readdir(dir).then(filelist => {
+					for (let i = 0; i < filelist.length; i++) {
 						if (filelist[i][0] != '.' && filelist[i][0] != '_') {
 							if (lib.node.fs.statSync(dir + '/' + filelist[i]).isDirectory()) {
 								folders.push(filelist[i]);
@@ -8406,53 +8426,57 @@ export class Library extends Uninstantable {
 						}
 					}
 					callback(folders, files);
+				}).catch(e => {
+					throw e;
 				});
 			};
-			var args = Array.from(arguments);
-			for (var i = 0; i < args.length; i++) {
+			for (let i = 0; i < args.length; i++) {
 				args[i] = args[i][0];
 			}
 			gl('', function (list) {
 				if (args.length) {
-					for (var i = 0; i < list.length; i++) {
-						if (!args.contains(list[i][0])) {
+					for (let i = 0; i < list.length; i++) {
+						if (!args.includes(list[i][0])) {
 							list.splice(i--, 1);
 						}
 					}
 				}
 				if (list.length) {
-					for (var i = 0; i < list.length; i++) {
-						(function (str) {
-							gl(str, function (folders, files) {
-								if (files.length > 1) {
-									for (var i = 0; i < files.length; i++) {
-										if (files[i].includes('extension.js')) {
-											files.splice(i--, 1);
-										}
-										else {
-											if (i % 5 == 0) {
-												str += '\n\t\t\t';
-											}
-											str += '"' + files[i] + '",';
-										}
+					for (let i = 0; i < list.length; i++) {
+						let str = list[i];
+						gl(str, function (folders, files) {
+							if (files.length > 1) {
+								for (let j = 0; j < files.length; j++) {
+									if (files[i] && files[i].contains && files[i].contains('extension.js')) {
+										files.splice(j--, 1);
 									}
-									console.log(str.slice(0, str.length - 1));
+									else {
+										if (j % 5 == 0) {
+											str += '\n\t\t\t';
+										}
+										str += '"' + files[j] + '",';
+									}
 								}
-							});
-						}(list[i]));
+								console.log(str.slice(0, str.length - 1));
+								game.print(str.slice(0, str.length - 1));
+							}
+						});
 					}
 				}
 			});
 		},
-		cfg: function () {
-			var mode = lib.config.all.mode.slice(0);
+		/**
+		 * 游戏设置变更为固定数据(不更改扩展设置)
+		 */
+		cfg() {
+			const mode = lib.config.all.mode.slice(0);
 			mode.remove('connect');
 			mode.remove('brawl');
-			var banned = ['shen_guanyu', 'shen_caocao', 'caopi', 're_daqiao', 'caorui',
+			const banned = ['shen_guanyu', 'shen_caocao', 'caopi', 're_daqiao', 'caorui',
 				'daqiao', 'lingcao', 'liuzan', 'lusu', 'luxun', 'yanwen', 'zhouyu', 'ns_wangyue', 'gw_yenaifa',
 				'old_caozhen', 'swd_jiangziya', 'xuhuang', 'maliang', 'guojia', 'simayi', 'swd_kangnalishi', 'hs_siwangzhiyi', 'hs_nozdormu', 'old_zhuzhi'];
-			var bannedcards = ['zengbin'];
-			var favs = ["hs_tuoqi", "hs_siwangxianzhi", "hs_xukongzhiying", "hs_hsjiasha", "gjqt_xieyi", "gjqt_yunwuyue", "gjqt_beiluo",
+			const bannedcards = ['zengbin'];
+			const favs = ["hs_tuoqi", "hs_siwangxianzhi", "hs_xukongzhiying", "hs_hsjiasha", "gjqt_xieyi", "gjqt_yunwuyue", "gjqt_beiluo",
 				"gjqt_cenying", "shen_lvmeng", "shen_zhaoyun", "shen_zhugeliang", "ow_ana", "chenlin", "ns_guanlu", "hs_guldan", "swd_guyue",
 				"pal_jiangyunfan", "mtg_jiesi", "swd_lanyin", "pal_liumengli", "swd_muyun", "pal_nangonghuang", "swd_muyue", "pal_murongziying",
 				"swd_qiner", "pal_shenqishuang", "hs_taisi", "wangji", "pal_xingxuan", "xunyou", "hs_yelise", "pal_yuejinzhao", "pal_yueqi",
@@ -8467,17 +8491,17 @@ export class Library extends Uninstantable {
 				"swd_huanglei", "swd_huanyuanzhi", "re_huatuo", "gw_huoge", "pal_jiangcheng", "yj_jushou", "swd_kendi", "yxs_libai",
 				"mtg_lilianna", "xin_liru", "liuxie", "pal_lixiaoyao", "pal_longkui", "ns_nanhua", "swd_qi", "swd_septem", "gw_shasixiwusi",
 				"ow_tianshi", "swd_weida", "gjqt_xiayize", "swd_xiyan", "hs_xsylvanas", "hs_yelinlonghou", "ow_yuanshi", "zuoci"];
-			var vintage = ['tianjian', 'shuiyun', 'zhuyue', 'zhimeng', 'poyun', 'qianfang', 'xfenxin', 'danqing', 'ywuhun', 'tianwu', 'xuelu',
+			const vintage = ['tianjian', 'shuiyun', 'zhuyue', 'zhimeng', 'poyun', 'qianfang', 'xfenxin', 'danqing', 'ywuhun', 'tianwu', 'xuelu',
 				'shahun', 'yuling', 'duhun', 'liaoyuan', 'touxi', 'wangchen', 'poyue', 'kunlunjing', 'huanhun', 'yunchou', 'tuzhen', 'cyqiaoxie',
 				'mufeng', 'duanyi', 'guozao', 'yaotong', 'pozhen', 'tanlin', 'susheng', 'jikong', 'shouyin', 'jilve', 'hxunzhi', 'huodan', 'shanxian',
 				'ziyu', 'kuoyin', 'feiren', 'zihui', 'jidong', 'baoxue', 'aqianghua', 'maoding', 'bfengshi', 'zhongdun', 'pingzhang', 'maichong',
 				'guozai', 'jingxiang', 'yuelu', 'liechao', 'fengnu', 'hanshuang', 'enze', 'malymowang', 'xshixin', 'qingzun'];
-			var favmodes = ["versus|three", "versus|four", "versus|two", "chess|combat"];
-			for (var i = 0; i < mode.length; i++) {
+			const favmodes = ["versus|three", "versus|four", "versus|two", "chess|combat"];
+			for (let i = 0; i < mode.length; i++) {
 				game.saveConfig(mode[i] + '_banned', banned);
 				game.saveConfig(mode[i] + '_bannedcards', bannedcards);
 			}
-			var characters = lib.config.all.characters.slice(0);
+			const characters = lib.config.all.characters.slice(0);
 			characters.remove('standard');
 			characters.remove('old');
 			game.saveConfig('vintageSkills', vintage);
@@ -8513,20 +8537,33 @@ export class Library extends Uninstantable {
 			}
 			game.reload();
 		},
-		o: function () {
+		/**
+		 * 移除旁观时的手牌暗置效果
+		 */
+		o() {
 			ui.arena.classList.remove('observe');
 		},
-		pt: function () {
-			var list = Array.from(arguments);
+		/**
+		 * 向牌堆顶添加牌(即创建一些卡牌添加到牌堆里)
+		 * @param  { ...string } list 卡牌名称数字
+		 */
+		pt(...list) {
 			while (list.length) {
-				var card = cheat.gn(list.pop());
+				const card = lib.cheat.gn(list.pop());
 				if (card) ui.cardPile.insertBefore(card, ui.cardPile.firstChild);
 			}
 		},
-		q: function () {
+		/**
+		 * 将卡牌的样式在simple和default之间切换
+		 * 
+		 * 有参数时改为获得指定的牌
+		 * 
+		 * @param { ...string } args 
+		 */
+		q(...args) {
 			// if(lib.config.layout!='mobile') lib.init.layout('mobile');
-			if (arguments.length == 0) {
-				var style = ui.css.card_style;
+			if (args.length == 0) {
+				if (ui.css.card_style) ui.css.card_style.remove();
 				if (lib.config.card_style != 'simple') {
 					lib.config.card_style = 'simple';
 					ui.css.card_style = lib.init.css(lib.assetURL + 'theme/style/card', 'simple');
@@ -8535,29 +8572,31 @@ export class Library extends Uninstantable {
 					lib.config.card_style = 'default';
 					ui.css.card_style = lib.init.css(lib.assetURL + 'theme/style/card', 'default');
 				}
-				style.remove();
 			}
 			else {
-				for (var i = 0; i < arguments.length; i++) {
-					cheat.g(arguments[i]);
+				for (let i = 0; i < args.length; i++) {
+					lib.cheat.g(args[i]);
 				}
 			}
 			ui.arena.classList.remove('selecting');
 			ui.arena.classList.remove('tempnoe');
 		},
-		p: function (name, i, skin) {
-			var list = ['swd', 'hs', 'pal', 'gjqt', 'ow', 'gw'];
+		/**
+		 * 替换皮肤
+		 * @param { string } name 武将名称
+		 * @param { number | true } [i] 指定game.players的第几个元素，不填指定为自己的下家。为true时切换玩家布局
+		 * @param { string } [skin] 皮肤id
+		 */
+		p(name, i, skin) {
+			const list = ['swd', 'hs', 'pal', 'gjqt', 'ow', 'gw'];
 			if (!lib.character[name]) {
-				for (var j = 0; j < list.length; j++) {
+				for (let j = 0; j < list.length; j++) {
 					if (lib.character[list[j] + '_' + name]) {
 						name = list[j] + '_' + name; break;
 					}
 				}
 			}
-			if (skin) {
-				lib.config.skin[name] = skin;
-			}
-			var target;
+			let target;
 			if (typeof i == 'number') {
 				target = game.players[i];
 			}
@@ -8571,6 +8610,11 @@ export class Library extends Uninstantable {
 			else {
 				target.init(name);
 			}
+			if (skin) {
+				lib.config.skin[name] = skin - 1;
+				// 换肤时skin - 1变成skin
+				ui.click.skin(target.node.avatar, name);
+			}
 			if (i === true) {
 				if (lib.config.layout == 'long2') {
 					lib.init.layout('mobile');
@@ -8580,9 +8624,27 @@ export class Library extends Uninstantable {
 				}
 			}
 		},
-		e: function () {
-			var cards = [], target;
-			for (var i = 0; i < arguments.length; i++) {
+		/**
+		 * @overload
+		 * @description 不传参数默认装备麒麟弓，八卦阵，的卢，赤兔，木牛
+		 * @returns { void }
+		 */
+		/**
+		 * @overload
+		 * @description 指定的玩家或自己装备指定的牌
+		 * @param  {...Element.Player | string} args 玩家或卡牌名
+		 * @returns { void }
+		 */
+		e(...args) {
+			/**
+			 * @type { Element.Card[] }
+			 */
+			let cards = [];
+			/**
+			 * @type { Element.Player }
+			 */
+			let target;
+			for (let i = 0; i < arguments.length; i++) {
 				if (get.itemtype(arguments[i]) == 'player') {
 					target = arguments[i];
 				}
@@ -8598,8 +8660,8 @@ export class Library extends Uninstantable {
 				cards.push(game.createCard('muniu'));
 			}
 			target = target || game.me;
-			for (var i = 0; i < cards.length; i++) {
-				var card = target.getEquip(cards[i]);
+			for (let i = 0; i < cards.length; i++) {
+				const card = target.getEquip(cards[i]);
 				if (card) {
 					card.discard();
 					target.removeEquipTrigger(card);
@@ -8607,37 +8669,44 @@ export class Library extends Uninstantable {
 				target.$equip(cards[i]);
 			}
 		},
-		c: function () {
+		/**
+		 * 检测当前游戏开启的武将数，卡堆的数量分布情况
+		 */
+		c() {
+			const log = function (...args) {
+				console.log(...args);
+				game.print(...args);
+			};
 			(function () {
-				var a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0;
-				var sa = 0, sb = 0, sc = 0, sd = 0, se = 0, sf = 0, sg = 0;
-				for (var i in lib.character) {
+				let a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0;
+				let sa = 0, sb = 0, sc = 0, sd = 0, se = 0, sf = 0, sg = 0;
+				for (let i in lib.character) {
 					switch (lib.character[i][1]) {
-						case 'wei': a++; if (lib.config.banned.contains(i)) sa++; break;
-						case 'shu': b++; if (lib.config.banned.contains(i)) sb++; break;
-						case 'wu': c++; if (lib.config.banned.contains(i)) sc++; break;
-						case 'qun': d++; if (lib.config.banned.contains(i)) sd++; break;
-						case 'jin': g++; if (lib.config.banned.contains(i)) sg++; break;
-						case 'western': e++; if (lib.config.banned.contains(i)) se++; break;
-						case 'key': f++; if (lib.config.banned.contains(i)) sf++; break;
+						case 'wei': a++; if (lib.config.banned.includes(i)) sa++; break;
+						case 'shu': b++; if (lib.config.banned.includes(i)) sb++; break;
+						case 'wu': c++; if (lib.config.banned.includes(i)) sc++; break;
+						case 'qun': d++; if (lib.config.banned.includes(i)) sd++; break;
+						case 'jin': g++; if (lib.config.banned.includes(i)) sg++; break;
+						case 'western': e++; if (lib.config.banned.includes(i)) se++; break;
+						case 'key': f++; if (lib.config.banned.includes(i)) sf++; break;
 					}
 				}
-				console.log('魏：' + (a - sa) + '/' + a);
-				console.log('蜀：' + (b - sb) + '/' + b);
-				console.log('吴：' + (c - sc) + '/' + c);
-				console.log('群：' + (d - sd) + '/' + d);
-				console.log('晋：' + (g - sg) + '/' + g);
-				console.log('西：' + (e - se) + '/' + e);
-				console.log('键：' + (f - sf) + '/' + f);
-				console.log('已启用：' + ((a + b + c + d + e + f) - (sa + sb + sc + sd + se + sf)) + '/' + (a + b + c + d + e + f));
+				log('魏：' + (a - sa) + '/' + a);
+				log('蜀：' + (b - sb) + '/' + b);
+				log('吴：' + (c - sc) + '/' + c);
+				log('群：' + (d - sd) + '/' + d);
+				log('晋：' + (g - sg) + '/' + g);
+				log('西：' + (e - se) + '/' + e);
+				log('键：' + (f - sf) + '/' + f);
+				log('已启用：' + ((a + b + c + d + e + f) - (sa + sb + sc + sd + se + sf)) + '/' + (a + b + c + d + e + f));
 			}());
 			(function () {
-				var a = 0, b = 0, c = 0, d = 0;
-				var aa = 0, bb = 0, cc = 0, dd = 0;
-				var sa = 0, sb = 0, sc = 0, sd = 0;
-				var sha = 0, shan = 0, tao = 0, jiu = 0, wuxie = 0, heisha = 0, hongsha = 0;
-				var num = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0 };
-				for (var i in lib.card) {
+				let a = 0, b = 0, c = 0, d = 0;
+				let aa = 0, bb = 0, cc = 0, dd = 0;
+				let sa = 0, sb = 0, sc = 0, sd = 0;
+				let sha = 0, shan = 0, tao = 0, jiu = 0, wuxie = 0, heisha = 0, hongsha = 0;
+				let num = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0 };
+				for (let i in lib.card) {
 					if (get.objtype(lib.card[i]) == 'object' && lib.translate[i + '_info']) {
 						switch (lib.card[i].type) {
 							case 'basic': a++; break;
@@ -8647,7 +8716,7 @@ export class Library extends Uninstantable {
 						}
 					}
 				}
-				for (var i = 0; i < lib.card.list.length; i++) {
+				for (let i = 0; i < lib.card.list.length; i++) {
 					if (typeof lib.card[lib.card.list[i][2]] == 'object') {
 						switch (lib.card[lib.card.list[i][2]].type) {
 							case 'basic': aa++; break;
@@ -8685,49 +8754,70 @@ export class Library extends Uninstantable {
 						num[lib.card.list[i][1]]++;
 					}
 				}
-				var str = '基本牌' + aa + '； ' + '锦囊牌' + bb + '； ' + '装备牌' + cc + '； ' + '其它牌' + dd;
-				console.log(str);
+				let str = '基本牌' + aa + '； ' + '锦囊牌' + bb + '； ' + '装备牌' + cc + '； ' + '其它牌' + dd;
+				log(str);
 				str = '红桃牌' + sa + '； ' + '方片牌' + sb + '； ' + '梅花牌' + sc + '； ' + '黑桃牌' + sd;
-				console.log(str);
+				log(str);
 				str = '杀' + sha + '； ' + '黑杀' + heisha + '； ' + '红杀' + hongsha + '； ' + '闪' + shan + '； ' + '桃' + tao + '； ' + '酒' + jiu + '； ' + '无懈' + wuxie;
-				console.log(str);
+				log(str);
 				if (arguments[1]) {
-					for (var i = 1; i <= 13; i++) {
+					for (let i = 1; i <= 13; i++) {
 						if (i < 10) {
-							console.log(i + ' ', num[i]);
+							log(i + ' ', num[i]);
 						}
 						else {
-							console.log(i, num[i]);
+							log(i, num[i]);
 						}
 					}
 				}
-				var arr = [];
-				for (var i = 1; i <= 13; i++) {
+				let arr = [];
+				for (let i = 1; i <= 13; i++) {
 					arr.push(num[i]);
 				}
-				console.log((a + b + c + d) + '/' + (aa + bb + cc + dd), ...arr);
+				log((a + b + c + d) + '/' + (aa + bb + cc + dd), ...arr);
 			}());
 		},
-		id: function () {
+		/**
+		 * 显示场上所有的角色的身份
+		 */
+		id() {
 			game.showIdentity();
 		},
-		b: function () {
+		/**
+		 * 替换dialog中待选择的卡牌(或其他东西)对应的真实卡牌(或其他东西)
+		 * ```js
+		 * // 在神吕蒙涉猎时使用:
+		 * // 涉猎如果选择l第一张牌，那你获得的是你创造的这张杀
+		 * lib.cheat.b(game.createCard('sha'));
+		 * ```
+		 */
+		b(...args) {
 			if (!ui.dialog || !ui.dialog.buttons) return;
-			for (var i = 0; i < Math.min(arguments.length, ui.dialog.buttons.length); i++) {
-				ui.dialog.buttons[i].link = arguments[i];
+			for (let i = 0; i < Math.min(args.length, ui.dialog.buttons.length); i++) {
+				ui.dialog.buttons[i].link = args[i];
 			}
 		},
-		uy: function (me) {
+		/**
+		 * 炉石模式可用，使用'spell_yexinglanghun'卡牌
+		 * @param { boolean } [me] 决定是自己还是对手使用'spell_yexinglanghun'卡牌
+		 */
+		uy(me) {
 			if (me) {
 				game.me.useCard({ name: 'spell_yexinglanghun' }, game.me);
 			}
 			else {
-				var enemy = game.me.getEnemy();
+				// player.getEnemy是炉石模式的函数
+				const enemy = game.me.getEnemy();
 				enemy.useCard({ name: 'spell_yexinglanghun' }, enemy);
 			}
 		},
-		gs: function (name, act) {
-			var card = game.createCard('spell_' + (name || 'yexinglanghun'));
+		/**
+		 * 炉石模式可用，使用`spell_${name}`卡牌
+		 * @param { string } [name]
+		 * @param { boolean } [act] 
+		 */
+		gs(name = 'yexinglanghun', act) {
+			const card = game.createCard('spell_' + name);
 			game.me.node.handcards1.appendChild(card);
 			if (!act) {
 				game.me.actused = -99;
@@ -8738,8 +8828,13 @@ export class Library extends Uninstantable {
 			delete _status.event._skillChoice;
 			setTimeout(game.check, 300);
 		},
-		gc: function (name, act) {
-			var card = game.createCard('stone_' + (name || 'falifulong') + '_stonecharacter');
+		/**
+		 * 炉石模式可用，获得`stone_${name}_stonecharacter`卡牌
+		 * @param { string } [name]
+		 * @param { boolean } [act] 
+		 */
+		gc(name = 'falifulong', act) {
+			var card = game.createCard('stone_' + name + '_stonecharacter');
 			game.me.node.handcards1.appendChild(card);
 			if (!act) {
 				game.me.actused = -99;
@@ -8750,7 +8845,11 @@ export class Library extends Uninstantable {
 			delete _status.event._skillChoice;
 			setTimeout(game.check, 300);
 		},
-		a: function (bool) {
+		/**
+		 * 进入/关闭快速自动测试模式(游戏速度最快)，只有游戏记录界面
+		 * @param { boolean | string } [bool] 
+		 */
+		a(bool) {
 			if (lib.config.test_game) {
 				game.saveConfig('test_game');
 			}
@@ -8769,50 +8868,85 @@ export class Library extends Uninstantable {
 			}
 			game.reload();
 		},
-		as: function () {
+		/**
+		 * 临时去掉“自动测试模式”带来的css效果，
+		 * 
+		 * 如果要彻底关闭，需要再执行一次lib.cheat.a
+		 */
+		as() {
 			ui.window.classList.remove('testing');
-			var bg = ui.window.querySelector('.pausedbg');
+			const bg = ui.window.querySelector('.pausedbg');
 			if (bg) {
 				bg.remove();
 			}
 		},
-		uj: function () {
-			cheat.e('qilin');
+		/**
+		 * 装备麒麟弓，并且下家玩家对你发动借刀杀人,杀你的上家
+		 */
+		uj() {
+			lib.cheat.e('qilin');
 			game.me.next.useCard({ name: 'jiedao' }, [game.me, game.me.previous]);
 		},
-		u: function () {
-			var card = { name: 'sha' }, source = game.me.next, targets = [];
-			for (var i = 0; i < arguments.length; i++) {
-				if (get.itemtype(arguments[i]) == 'player') {
-					source = arguments[i];
+		/**
+		 * 下家对你使用一张牌
+		 * @param  {...Element.Player | Element.Player[] | string | Element.VCard } args 
+		 * 
+		 * @example
+		 * ```js
+		 * // 传入player是卡牌的使用者
+		 * // 传入player数组是卡牌的目标(没有则目标是game.me)
+		 * // 传入字符串设置卡牌名称
+		 * // 传入Vcard对象设置卡牌更具体的卡牌信息
+		 * lib.cheat.u(player1, 'sha', [player2, player3]);
+		 * ```
+		 */
+		u(...args) {
+			let card = new lib.element.VCard({ name: 'sha' }),
+				source = game.me.next,
+				targets = [];
+			for (let i = 0; i < args.length; i++) {
+				if (get.itemtype(args[i]) == 'player') {
+					source = args[i];
 				}
-				else if (Array.isArray(arguments[i])) {
-					targets = arguments[i];
+				else if (Array.isArray(args[i])) {
+					targets = args[i];
 				}
-				else if (typeof arguments[i] == 'object' && arguments[i]) {
-					card = arguments[i];
+				else if (args instanceof lib.element.VCard) {
+					card = args[i];
 				}
-				else if (typeof arguments[i] == 'string') {
-					card = { name: arguments[i] };
+				else if (typeof args[i] == 'object' && args[i] != null && args[i].name) {
+					console.warn('lib.cheat.u: 以普通obj形式传入的类卡牌形式已经废弃');
+					card = new lib.element.VCard(args[i]);
+				}
+				else if (typeof args[i] == 'string') {
+					card = new lib.element.VCard({ name: args[i] });
 				}
 			}
 			if (!targets.length) targets.push(game.me);
 			source.useCard(game.createCard(card.name, card.suit, card.number, card.nature), targets);
 		},
-		r: function (bool) {
-			var list = ['s', 'ap', 'a', 'am', 'bp', 'b', 'bm', 'c', 'd'];
-			var str = '';
-			for (var i = 0; i < list.length; i++) {
+		/**
+		 * 输出每个强度的武将数量、每个武将包的每个强度的武将数量、每个武将对应的id和翻译
+		 * @param { boolean } [bool] 为false不输出无名杀自带的武将id和翻译
+		 */
+		r(bool) {
+			const log = function (...args) {
+				console.log(...args);
+				game.print(...args);
+			}
+			let list = ['s', 'ap', 'a', 'am', 'bp', 'b', 'bm', 'c', 'd'];
+			let str = '';
+			for (let i = 0; i < list.length; i++) {
 				if (str) str += ' 、 ';
 				str += list[i] + '-' + lib.rank[list[i]].length;
 			}
-			console.log(str);
-			for (var i in lib.characterPack) {
-				if (!bool && lib.config.all.sgscharacters.contains(i)) continue;
-				var map = {};
-				var str = '';
-				for (var j in lib.characterPack[i]) {
-					var rank = get.rank(j);
+			log(str);
+			for (let i in lib.characterPack) {
+				if (!bool && lib.config.all.sgscharacters.includes(i)) continue;
+				let map = {};
+				let str = '';
+				for (let j in lib.characterPack[i]) {
+					let rank = get.rank(j);
 					if (!map[rank]) {
 						map[rank] = 1;
 					}
@@ -8820,55 +8954,88 @@ export class Library extends Uninstantable {
 						map[rank]++;
 					}
 				}
-				for (var j = 0; j < list.length; j++) {
+				for (let j = 0; j < list.length; j++) {
 					if (map[list[j]]) {
 						if (str) str += ' 、 ';
 						str += list[j] + '-' + map[list[j]];
 					}
 				}
 				if (str) {
-					console.log(lib.translate[i + '_character_config'] + '：' + str);
+					log(lib.translate[i + '_character_config'] + '：' + str);
 				}
 			}
 
-			var list = lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
+			let list2 = lib.rank.s.concat(lib.rank.ap).concat(lib.rank.a).concat(lib.rank.am).
 				concat(lib.rank.bp).concat(lib.rank.b).concat(lib.rank.bm).concat(lib.rank.c).concat(lib.rank.d);
 			Object.keys(lib.character).forEach(key => {
-				if (!lib.config.forbidai.includes(key) && !key.startsWith('boss_') && !key.startsWith('tafang_') && !list.includes(key)) console.log(get.translation(key), key);
+				if (!lib.config.forbidai.includes(key) && !key.startsWith('boss_') && !key.startsWith('tafang_') && !list2.includes(key)) log(get.translation(key), key);
 			});
 		},
-		h: function (player) {
+		/**
+		 * 打印目标玩家的手牌
+		 * @param { Element.Player } player 
+		 */
+		h(player) {
 			console.log(get.translation(player.getCards('h')));
 		},
-		g: function () {
-			for (var i = 0; i < arguments.length; i++) {
-				if (i > 0 && typeof arguments[i] == 'number') {
-					for (var j = 0; j < arguments[i] - 1; j++) {
-						cheat.gx(arguments[i - 1]);
+		/**
+		 * 给自己立刻添加手牌
+		 * 
+		 * @example
+		 * ```js
+		 * // 获得3张杀和1张闪
+		 * lib.cheat.g('sha', 3, 'shan', 1)
+		 * ```
+		 */
+		g(...args) {
+			for (let i = 0; i < args.length; i++) {
+				if (i > 0 && typeof args[i] == 'number') {
+					for (let j = 0; j < args[i] - 1; j++) {
+						lib.cheat.gx(args[i - 1]);
 					}
 				}
 				else {
-					cheat.gx(arguments[i]);
+					lib.cheat.gx(args[i]);
 				}
 			}
 		},
-		ga: function (type) {
-			for (var i in lib.card) {
+		/**
+		 * 立即获得指定类型的牌各一张
+		 * 
+		 * 会添加到不属于当前模式的牌和某些角色专属牌
+		 * 
+		 * @param { string } type 
+		 */
+		ga(type) {
+			for (let i in lib.card) {
 				if (lib.card[i].type == type || lib.card[i].subtype == type) {
-					cheat.g(i);
+					lib.cheat.g(i);
 				}
 			}
 		},
-		gg: function () {
-			for (var i = 0; i < game.players.length; i++) {
-				for (var j = 0; j < arguments.length; j++) {
-					cheat.gx(arguments[j], game.players[i]);
-				}
-			}
+		/**
+		 *  给所有玩家立刻添加一张或多张指定的牌
+		 * @param  {...string} args 
+		 * @example
+		 * ```js
+		 * // 给所有玩家立刻添加一张杀和一张闪
+		 * lib.cheat.gg('sha', 'shan');
+		 * ```
+		 */
+		gg(...args) {
+			game.players.forEach(player => {
+				args.forEach(cardName => {
+					lib.cheat.gx(cardName, player);
+				})
+			});
 		},
-		gx: function (name, target) {
-			target = target || game.me;
-			var card = cheat.gn(name);
+		/**
+		 * 给目标立即添加一张手牌
+		 * @param { string } name 
+		 * @param { Element.Player } target
+		 */
+		gx(name, target = game.me) {
+			const card = lib.cheat.gn(name);
 			if (!card) return;
 			target.node.handcards1.appendChild(card);
 			delete _status.event._cardChoice;
@@ -8878,11 +9045,33 @@ export class Library extends Uninstantable {
 			target.update();
 			ui.updatehl();
 		},
-		gn: function (name) {
-			var nature = null;
-			var suit = null;
-			var suits = ['club', 'spade', 'diamond', 'heart'];
-			for (var i = 0; i < suits.length; i++) {
+		/**
+		 * 创建卡牌
+		 * 
+		 * 如果lib.card里没有对应卡牌名返回null
+		 * 
+		 * @param { string } name 
+		 * @returns { Element.Card }
+		 * @example
+		 * ```js
+		 * // 创建一个梅花杀
+		 * lib.cheat.gn('clubsha');
+		 * // 创建一个红色杀
+		 * lib.cheat.gn('redsha');
+		 * // 创建一个黑色杀
+		 * lib.cheat.gn('blacksha');
+		 * // 创建一个火杀
+		 * lib.cheat.gn('huosha');
+		 * // 创建一个雷杀
+		 * lib.cheat.gn('leisha');
+		 * // 冰杀神杀刺杀没有
+		 * ```
+		 */
+		gn(name) {
+			let nature = null;
+			let suit = null;
+			let suits = ['club', 'spade', 'diamond', 'heart'];
+			for (let i = 0; i < suits.length; i++) {
 				if (name.startsWith(suits[i])) {
 					suit = suits[i];
 					name = name.slice(suits[i].length);
@@ -8911,44 +9100,58 @@ export class Library extends Uninstantable {
 			}
 			return game.createCard(name, suit, null, nature);
 		},
-		ge: function (target) {
+		/**
+		 * 指定的玩家或自己立即获得诸葛连弩，青龙刀，八卦阵，的卢，赤兔，木牛
+		 * @param {Element.Player} [target] 
+		 */
+		ge(target) {
 			if (target) {
-				cheat.gx('zhuge', target);
-				cheat.gx('qinglong', target);
-				cheat.gx('bagua', target);
-				cheat.gx('dilu', target);
-				cheat.gx('chitu', target);
-				cheat.gx('muniu', target);
+				lib.cheat.gx('zhuge', target);
+				lib.cheat.gx('qinglong', target);
+				lib.cheat.gx('bagua', target);
+				lib.cheat.gx('dilu', target);
+				lib.cheat.gx('chitu', target);
+				lib.cheat.gx('muniu', target);
 			}
 			else {
-				cheat.g('zhuge');
-				cheat.g('qinglong');
-				cheat.g('bagua');
-				cheat.g('dilu');
-				cheat.g('chitu');
-				cheat.g('muniu');
+				lib.cheat.g('zhuge');
+				lib.cheat.g('qinglong');
+				lib.cheat.g('bagua');
+				lib.cheat.g('dilu');
+				lib.cheat.g('chitu');
+				lib.cheat.g('muniu');
 			}
 		},
-		gj: function () {
-			cheat.g('shandian');
-			cheat.g('huoshan');
-			cheat.g('hongshui');
-			cheat.g('lebu');
-			cheat.g('bingliang');
-			cheat.g('guiyoujie');
+		/**
+		 * 自己立即获得闪电，火山，洪水，乐不思蜀，鬼幽结
+		 */
+		gj() {
+			lib.cheat.g('shandian');
+			lib.cheat.g('huoshan');
+			lib.cheat.g('hongshui');
+			lib.cheat.g('lebu');
+			lib.cheat.g('bingliang');
+			lib.cheat.g('guiyoujie');
 		},
-		gf: function () {
-			for (var i in lib.card) {
+		/**
+		 * 自己立即获得所有食物牌各一张
+		 */
+		gf() {
+			for (let i in lib.card) {
 				if (lib.card[i].type == 'food') {
-					cheat.g(i);
+					lib.cheat.g(i);
 				}
 			}
 		},
-		d: function (num, target) {
-			if (num == undefined) num = 1;
-			var cards = get.cards(num);
-			for (var i = 0; i < num; i++) {
-				var card = cards[i];
+		/**
+		 * 自己立刻获取牌堆顶num张牌
+		 * @param { number } [num] 
+		 * @param { Element.Player } [target] 
+		 */
+		d(num = 1, target) {
+			const cards = get.cards(num);
+			for (let i = 0; i < num; i++) {
+				const card = cards[i];
 				game.me.node.handcards1.appendChild(card);
 				delete _status.event._cardChoice;
 				delete _status.event._targetChoice;
@@ -8958,52 +9161,70 @@ export class Library extends Uninstantable {
 				ui.updatehl();
 			}
 		},
-		s: function () {
-			for (var i = 0; i < arguments.length; i++) {
-				game.me.addSkill(arguments[i], true);
+		/**
+		 * 给自己立刻添加一个或多个技能
+		 * @param {...string} args 技能名
+		 */
+		s(...args) {
+			for (var i = 0; i < args.length; i++) {
+				game.me.addSkill(args[i], true);
 			}
 			delete _status.event._cardChoice;
 			delete _status.event._targetChoice;
 			delete _status.event._skillChoice;
 			game.check();
 		},
-		t: function (num) {
-			if (game.players.contains(num)) {
+		/**
+		 * 弃置指定位置玩家的所有牌
+		 * 
+		 * 不传入num默认为弃置所有玩家的所有牌
+		 * 
+		 * @param { number | Element.Player } [num] 
+		 */
+		t(num) {
+			if (game.players.includes(num)) {
 				num = game.players.indexOf(num);
 			}
 			if (num == undefined) {
-				for (var i = 0; i < game.players.length; i++) cheat.t(i);
+				for (let i = 0; i < game.players.length; i++) lib.cheat.t(i);
 				return;
 			}
-			var player = game.players[num];
-			var cards = player.getCards('hej');
-			for (var i = 0; i < cards.length; i++) {
+			const player = game.players[num];
+			const cards = player.getCards('hej');
+			for (let i = 0; i < cards.length; i++) {
 				cards[i].discard();
 			}
 			player.removeEquipTrigger();
 			player.update();
 		},
-		to: function () {
-			for (var i = 0; i < game.players.length; i++) {
-				if (game.players[i] != game.me) {
-					cheat.t(i);
-				}
-			}
+		/**
+		 *  自己以外的其他玩家弃置所有牌
+		 */
+		to() {
+			game.players.filter(player => player != game.me).forEach((_, i) => {
+				lib.cheat.t(i);
+			});
 		},
-		tm: function () {
-			for (var i = 0; i < game.players.length; i++) {
-				if (game.players[i] == game.me) {
-					cheat.t(i);
-				}
-			}
+		/**
+		 * 弃置自己所有牌
+		 */
+		tm() {
+			lib.cheat.t(game.me);
 		},
-		k: function (i) {
-			if (i == undefined) i = 1;
+		/**
+		 * 指定一个目标，弃置所有牌，血量变1，并且自己获得一张"juedou"
+		 * @param i 从自己开始算起，自己为0，不填默认1，即自己下家
+		 */
+		k(i = 1) {
 			game.players[i].hp = 1;
-			cheat.t(i);
-			cheat.g('juedou');
+			lib.cheat.t(i);
+			lib.cheat.g('juedou');
 		},
-		z: function (name) {
+		/**
+		 * 重新设置当前的主公的武将牌，且血量上限+1(不论当局人数是否大于3)
+		 * @param { string } name 
+		 */
+		z(name) {
 			switch (name) {
 				case 'cc': name = 're_caocao'; break;
 				case 'lb': name = 're_liubei'; break;
