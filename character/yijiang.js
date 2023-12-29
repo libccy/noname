@@ -2101,7 +2101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(num>2) return true;
 							var card=trigger.card;
 							if(get.tag(card,'damage')&&player.hp<=trigger.getParent().baseDamage&&(!get.tag(card,'respondShan')||!player.hasShan())&&(!get.tag(card,'respondSha')||!player.hasSha())) return true;
-							var source=_status.currentPhase,todis=(source.countCards('h')-Math.max(0,source.needsToDiscard()));
+							var source=_status.currentPhase,todis=source.countCards('h')-source.needsToDiscard();
 							if(todis<=Math.max(Math.min(2+(source.hp<=1?1:0),player.countCards('he',function(card){
 								return get.value(card,player)<Math.max(5.5,8-todis)
 							})),player.countCards('he',function(card){
@@ -6980,8 +6980,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						player:function(card,player,target){
 							if(_status.currentPhase!=player) return;
-							if(card.name=='sha'&&!player.needsToDiscard()&&
-								!player.getExpansions('chunlao').length&&target.hp>1){
+							if(card.name=='sha'&&!player.needsToDiscard()&&!player.getExpansions('chunlao').length&&target.hp>1){
 								return 'zeroplayertarget';
 							}
 						}

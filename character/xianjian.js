@@ -653,9 +653,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseTarget('将'+get.translation(result.links)+'交给一名角色',true).ai=function(target){
 							var att=get.attitude(player,target)/Math.sqrt(target.countCards('h')+1);
 							if(result.links.length>1){
-								if(target==player&&target.needsToDiscard(result.links.length)>1){
-									return att/5;
-								}
+								if(target==player&&target.needsToDiscard(result.links)>1) return att/5;
 								return att;
 							}
 							else{
@@ -1241,7 +1239,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return false;
 					}).ai=function(target){
-						var num=0,eff=0,damaged=false;
+						var use=[],eff=0,damaged=false;
 						for(var i=0;i<hs.length;i++){
 							if(get.info(hs[i]).multitarget) continue;
 							var hef;
@@ -1252,7 +1250,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								hef=get.effect(target,hs[i],player,player);
 							}
 							if(lib.filter.targetEnabled2(hs[i],player,target)&&hef>0){
-								num++;
+								use.push(hs[i]);
 								if(get.attitude(player,target)>0){
 									hef/=1.5;
 									if(get.tag(hs[i],'damage')){
@@ -1262,9 +1260,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								eff+=hef;
 							}
 						}
-						if(!player.needsToDiscard(-num)){
-							return eff;
-						}
+						if(!player.needsToDiscard(0,(i,player)=>{
+							return !use.includes(i)&&!player.canIgnoreHandcard(i);
+						})) return eff;
 						return 0;
 					};
 					'step 1'

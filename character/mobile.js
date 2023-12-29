@@ -4306,7 +4306,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							selectCard:(player.getStat('skill').buxu||0)+1,
 							ai1:function(card){
 								var player=_status.event.player;
-								if(player.needsToDiscard()>ui.selected.cards.length) return 10/Math.max(0.1,get.value(card));
+								if(player.needsToDiscard(0,(i,player)=>{
+									return !ui.selected.cards.includes(i)&&!player.canIgnoreHandcard(i);
+								})) return 10/Math.max(0.1,get.value(card));
 								return 5-(player.getStat('skill').buxu||0)-get.value(card);
 							},
 							ai2:()=>1,
@@ -11316,12 +11318,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!target.hasFriend()) return;
 								var num=1;
 								if(get.attitude(player,target)>0){
-									if(player.needsToDiscard()){
-										num=0.7;
-									}
-									else{
-										num=0.5;
-									}
+									if(player.needsToDiscard()) num=0.7;
+									else num=0.5;
 								}
 								if(target.hp>=4) return [1,num*2];
 								if(target.hp==3) return [1,num*1.5];

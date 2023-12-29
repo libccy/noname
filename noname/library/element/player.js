@@ -7721,7 +7721,9 @@ export class Player extends HTMLDivElement {
 		 */
 		let cards = this.getCards('h'), num = 0;
 		if (typeof add === 'number') num = add;
-		else if (get.itemtype(add) === 'cards') cards.addArray(add);
+		else if (get.itemtype(add) === 'cards') for (let i of add) {
+			cards.push(add);
+		}
 		else if (get.itemtype(add) === 'card') cards.push(add);
 		if (typeof filter !== 'function') filter = (card, player) => !player.canIgnoreHandcard(card);
 		cards = cards.filter(card => {

@@ -1401,10 +1401,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,current){
 							if(current.hasSkill('gw_qinpendayu')) return 0;
-							if(current.needsToDiscard()) return -1;
-							if(current.needsToDiscard(1)) return -0.7;
-							if(current.needsToDiscard(2)) return -0.4;
-							return -0.1;
+							return Math.max(-1,-0.1-0.3*current.needsToDiscard(2));
 						}
 					},
 					order:1.2,

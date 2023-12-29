@@ -3334,10 +3334,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(num>0&&!player._dczhizhe_mod&&get.itemtype(card)==='card'&&card.hasGaintag('dczhizhe')){
 									if(player.canIgnoreHandcard(card)) return Infinity;
 									player._dczhizhe_mod=true;
-									if(player.hp<3&&player.needsToDiscard(player.countCards('h',(cardx)=>{
-										if(player.canIgnoreHandcard(cardx)||get.useful(cardx)>6) return true;
-										return false;
-									}))) return num*1.5;
+									if(player.hp<3&&player.needsToDiscard(0,(i,player)=>{
+										return !player.canIgnoreHandcard(i)&&get.useful(i)>6;
+									})) return num*1.5;
 									return num*10;
 								}
 							}
@@ -3525,12 +3524,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										if(!target.hasFriend()) return;
 										var num=1;
 										if(get.attitude(player,target)>0){
-											if(player.needsToDiscard()){
-												num=0.5;
-											}
-											else{
-												num=0.3;
-											}
+											if(player.needsToDiscard()) num=0.5;
+											else num=0.3;
 										}
 										if(target.hp>=4) return [1,num*2];
 										if(target.hp==3) return [1,num*1.5];
@@ -3844,12 +3839,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!target.hasFriend()) return;
 								var num=1;
 								if(get.attitude(player,target)>0){
-									if(player.needsToDiscard()){
-										num=0.7;
-									}
-									else{
-										num=0.5;
-									}
+									if(player.needsToDiscard()) num=0.7;
+									else num=0.5;
 								}
 								if(target.hp==2&&target.hasFriend()) return [1,num*1.5];
 								if(target.hp>=2) return [1,num];
@@ -8268,7 +8259,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(current==player||current.countCards('he')==0) return false;
 						return get.effect(current,{name:'guohe_copy2'},player,player)+get.effect(current,{name:'sha'},player,player)>0;
 					})){
-						if(get.position(card)=='h'&&player.needsToDiscard()>ui.selected.cards.length) return 7+1/Math.max(1,get.value(card));
+						if(get.position(card)=='h'&&player.needsToDiscard(0,(i,player)=>{
+							return !ui.selected.cards.includes(i)&&!player.canIgnoreHandcard(i);
+						})) return 7+1/Math.max(1,get.value(card));
 						return 7-get.value(card);
 					}
 					return 0;

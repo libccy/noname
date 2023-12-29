@@ -6510,7 +6510,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							true
 						)) return 6.5 - get.value(card, player);
-						if (Math.random() * target.countCards('hs') < 1 || player.needsToDiscard(-ui.selected.cards.length)) return 6 - get.value(card, player);
+						if (Math.random() * target.countCards('hs') < 1 || player.needsToDiscard(0,(i,player)=>{
+							return !ui.selected.cards.includes(i)&&!player.canIgnoreHandcard(i);
+						})) return 6 - get.value(card, player);
 						return 0;
 					}
 					return 6.3 - get.value(card);
@@ -11766,12 +11768,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!target.hasFriend()) return;
 								var num=1;
 								if(get.attitude(player,target)>0){
-									if(player.needsToDiscard()){
-										num=0.7;
-									}
-									else{
-										num=0.5;
-									}
+									if(player.needsToDiscard()) num=0.7;
+									else num=0.5;
 								}
 								if(player.hp>=4) return [1,num*2];
 								if(target.hp==3) return [1,num*1.5];
@@ -12108,7 +12106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player!=target;
 						},
 						ai1:function(card){
-							if(get.attitude(_status.event.player,_status.currentPhase)<0&&_status.currentPhase.needsToDiscard()&&card.name!='du') return -1;
+							if(card.name!='du'&&get.attitude(_status.event.player,_status.currentPhase)<0&&_status.currentPhase.needsToDiscard()) return -1;
 							for(var i=0;i<ui.selected.cards.length;i++){
 								if(get.type(ui.selected.cards[i])==get.type(card)||(ui.selected.cards[i].name=='du'&&card.name!='du')) return -1;
 							}
@@ -13665,12 +13663,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!target.hasFriend()) return;
 								var num=1;
 								if(get.attitude(player,target)>0){
-									if(player.needsToDiscard()){
-										num=0.7;
-									}
-									else{
-										num=0.5;
-									}
+									if(player.needsToDiscard()) num=0.7;
+									else num=0.5;
 								}
 								if(player.hp>=4) return [1,num*2];
 								if(target.hp==3) return [1,num*1.5];
