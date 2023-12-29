@@ -5015,7 +5015,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								})) return 3;
 								return Math.sqrt(target.countCards('he'));
 							}
-							if(target.mayHaveShan()&&player.countCards('hs',function(card){
+							if(target.mayHaveShan(player,'use')&&player.countCards('hs',function(card){
 								return !ui.selected.cards.contains(card)&&get.name(card)=='sha'&&player.canUse(card,target)&&get.effect(target,card,player,player)!=0;
 							})) return -Math.sqrt(Math.abs(get.attitude(player,target)))/2;
 							return 0.1;
@@ -5347,7 +5347,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('mouni2');
 					player.chooseTarget(get.prompt2('mouni'),lib.filter.notMe).set('ai',function(target){
 						var player=_status.event.player,cards=player.getCards('h','sha');
-						if(get.attitude(player,target)>=0||!player.canUse(cards[0],target,false)||(!player.hasJudge('lebu')&&target.mayHaveShan()&&!player.hasSkillTag('directHit_ai',true,{
+						if(get.attitude(player,target)>=0||!player.canUse(cards[0],target,false)||(!player.hasJudge('lebu')&&target.mayHaveShan(player,'use')&&!player.hasSkillTag('directHit_ai',true,{
 							target:target,
 							card:cards[0],
 						},true))) return 0;

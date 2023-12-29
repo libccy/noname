@@ -3513,7 +3513,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.remove(player.storage.kyou_zhidian);
 							player.chooseControl(list).set('prompt','掷典：请为'+get.translation(trigger.card)+'选择一种效果').set('choice',function(){
 								if(list.contains('不计入次数')&&player.hasSha()) return '不计入次数';
-								if(list.contains('不可被响应')&&trigger.target.mayHaveShan()) return '不可被响应';
+								if(list.contains('不可被响应')&&trigger.target.mayHaveShan(_status.event.player,'use')) return '不可被响应';
 								if(list.contains('伤害+1')) return '伤害+1';
 								return list.randomGet();
 							}()).set('ai',()=>_status.event.choice);

@@ -5162,10 +5162,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								return -1.5;
 							}();
-							if(!isLink && target.mayHaveShan() && !player.hasSkillTag('directHit_ai', true, {
+							if(!isLink && target.mayHaveShan(player,'use') && !player.hasSkillTag('directHit_ai', true, {
 								target: target,
 								card: card
-							}, true)) return eff / 1.2;
+							}, true)) return eff * 0.6;
 							return eff;
 						}
 					},
@@ -6954,7 +6954,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							var target=trigger.target;
-							if(trigger.targets.length>1||target.mayHaveShan()) return 0;
+							if(trigger.targets.length>1||target.mayHaveShan(player,'use')) return 0;
 						}
 						var num=trigger.getParent().baseDamage;
 						var map=trigger.getParent().customArgs,id=target.playerid;
@@ -14460,12 +14460,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(num>=delta) return 'zeroplayertarget';
 							}
 							else if(get.tag(card,'respondShan')>0){
-								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveShan()){
+								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveShan(player)){
 									return 0.6;
 								}
 							}
 							else if(get.tag(card,'respondSha')>0){
-								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveSha()){
+								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveSha(player)){
 									return 0.6;
 								}
 							}
@@ -15204,17 +15204,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target!=player;
 					}).set('ai',function(target){
 						if(target.hasJudge('lebu')) return 0;
-						var att=get.attitude(_status.event.player,target);
+						let att=get.attitude(_status.event.player,target),name=_status.event.cards[0].name;
 						if(att<3) return 0;
 						if(target.hasSkillTag('nogain')) att/=10;
-						if(target.hasSha()&&_status.event.sha){
-							att/=5;
-						}
-						if(event.wuxie&&target.needsToDiscard(1)){
-							att/=5;
-						}
+						if(name==='sha'&&target.hasSha()) att/=5;
+						if(name==='wuxie'&&target.needsToDiscard(_status.event.cards)) att/=5;
 						return att/(1+get.distance(player,target,'absolute'));
-					}).set('sha',trigger.cards[0].name=='sha').set('wuxie',trigger.cards[0].name=='wuxie');
+					}).set('cards',trigger.cards);
 					'step 1'
 					if(result.bool){
 						player.logSkill('yingyuan',result.targets[0]);
@@ -15288,19 +15284,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(_status.event.du) return -get.value(card,player,'raw');
 							else if(_status.event.shuimeng){
 								if(cardname=='wuzhong'){
-									if(player.needsToDiscard(2-ui.selected.cards.length)){
-										return 10-get.value(card,player,'raw');
-									}
+									if(player.needsToDiscard(2,(i,player)=>{
+										return !ui.selected.cards.includes(i)&&!player.canIgnoreHandcard(i);
+									})) return 10-get.value(card,player,'raw');
 								}
 								else if(cardname=='guohe'){
-									if(player.needsToDiscard(-1-ui.selected.cards.length)){
-										return 10-get.value(card,player,'raw');
-									}
+									if(player.needsToDiscard(-1,(i,player)=>{
+										return !ui.selected.cards.includes(i)&&!player.canIgnoreHandcard(i);
+									})) return 10-get.value(card,player,'raw');
 								}
 								return 0;
 							}
 							else if(cardname=='lebu'){
-								if(player.needsToDiscard(1-ui.selected.cards.length)){
+								if(player.needsToDiscard(1,(i,player)=>{
+									return !ui.selected.cards.includes(i)&&!player.canIgnoreHandcard(i);
+								})){
 									return 8-get.value(card,player,'raw');
 								}
 								else{
@@ -17480,9 +17478,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 20-num;
 					}
 					else{
-						if(_status.event.player.needsToDiscard()){
-							return 7-num;
-						}
+						if(_status.event.player.needsToDiscard()) return 7-num;
 					}
 					return 0;
 				},

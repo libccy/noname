@@ -226,18 +226,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						'令'+str+'弃置两张类型不同的手牌',
 						'弃置'+str+'的一张手牌',
 					]).set('ai',()=>{
-						let target=_status.event.getParent().target,hs=target.getCards('h'),type=[];
-						if(hs.length<2) return 0;
+						let target=_status.event.getParent().target,hs=target.getCards('h'),type=[],att=get.attitude(_status.event.player,target);
+						if(hs.length<2) return att>0?1:0;
 						hs.forEach(i=>{
 							type.add(get.type2(i,target));
 						});
 						if(target.identity!=='qun'){
-							if(type.length>1) return 0;
-							return 1;
+							if(Boolean(att>0)===Boolean(type.length>1)) return 1;
+							return 0;
 						}
-						if(type.length<2||target.hp<3) return 1;
-						if(hs.length===2) return 0;
-						return 1;
+						if(type.length<2||target.hp<3) return att>0?1:0;
+						if(hs.length===2) return att>0?0:1;
+						return att>0?1:0;
 					});
 					'step 2'
 					if(result.index==0){

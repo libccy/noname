@@ -256,9 +256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player;
 							var card={name:button.link[2],nature:button.link[3],isCard:true};
 							if(card.name=='tao'){
-								if(player.hp==1||(player.hp==2&&!player.hasShan())||player.needsToDiscard()){
-									return 5;
-								}
+								if(player.hp==1||(player.hp==2&&!player.hasShan())||player.needsToDiscard()) return 5;
 								return 1;
 							}
 							if(card.name=='sha'){

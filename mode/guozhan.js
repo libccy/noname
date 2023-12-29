@@ -3528,7 +3528,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					]).set('prompt',get.prompt('gzliegong',trigger.target)).setHiddenSkill('gzliegong').set('ai',function(){
 						var player=_status.event.player,target=_status.event.getTrigger().target;
 						if(get.attitude(player,target)>0) return 2;
-						return target.mayHaveShan()?1:0;
+						return target.mayHaveShan(player,'use')?1:0;
 					});
 					'step 1'
 					if(result.control!='cancel2'){
@@ -10654,7 +10654,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									goon=false;
 								}
 								else if(trigger.card.name=='sha'){
-									if(trigger.target.mayHaveShan()||trigger.target.hp>=3){
+									if(trigger.target.mayHaveShan(player,'use')||trigger.target.hp>=3){
 										goon=false;
 									}
 								}
