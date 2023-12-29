@@ -747,14 +747,13 @@ async function onWindowReady() {
 		var script = document.createElement('script');
 		script.src = 'cordova.js';
 		document.body.appendChild(script);
-		// @ts-ignore
-		const { promise, resolve } = Promise.withResolvers();
-		document.addEventListener('deviceready', async () => {
-			const { cordovaReady } = await import('./cordova.js');
-			await cordovaReady();
-			resolve()
-		});
-		await promise;
+		await new Promise((resolve) => {
+			document.addEventListener('deviceready', async () => {
+				const { cordovaReady } = await import('./cordova.js');
+				await cordovaReady();
+				resolve(void 0)
+			});
+		})
 	}
 	/*
 	if (_status.packLoaded) {
