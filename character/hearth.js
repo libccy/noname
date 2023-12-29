@@ -804,7 +804,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return trigger.targets.includes(target);
 							},
 							ai1:function(card){
-								if(!player.needsToDiscard(ui.selected.cards.length)) return 0;
+								if(!player.needsToDiscard(0,(i,player)=>{
+									return !ui.selected.cards.includes(i)&&!player.canIgnoreHandcard(i);
+								})) return 0;
 								if(ui.selected.cards.length>=num2) return 0;
 								return Math.max(5,get.value(trigger.card))-get.value(card)-1;
 							},

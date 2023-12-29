@@ -7713,20 +7713,25 @@ export class Player extends HTMLDivElement {
 		}
 		return false;
 	}
-	needsToDiscard(filter, add) {
+	needsToDiscard(add, filter, pure) {
 		/**
-		 * filter: typeof 'number' -> 额外摸等量牌(逻辑上)
-		 *         typeof 'function' -> 只考虑符合函数筛选的牌
-		 * add: 额外获得这张/些牌(逻辑上)
+		 * add: (逻辑上)同时考虑“获得”的这张/些牌
+		 * filter(function): 代替默认策略进行筛选
+		 * pure: 返回值可以为负数
 		 */
-		let cards = this.getCards('h', card => !this.canIgnoreHandcard(card)), num = 0;
-		if (get.itemtype(add) === 'cards') cards.addArray(add);
+		let cards = this.getCards('h'), num = 0;
+		if (typeof add === 'number') num = add;
+		else if (get.itemtype(add) === 'cards') for (let i of add) {
+			cards.push(add);
+		}
 		else if (get.itemtype(add) === 'card') cards.push(add);
-		if (typeof filter === 'number') num = filter;
-		else if (typeof filter === 'function') cards = cards.filter(card => {
-			return filter(card);
+		if (typeof filter !== 'function') filter = (card, player) => !player.canIgnoreHandcard(card);
+		cards = cards.filter(card => {
+			return filter(card, this, cards);
 		});
-		return Math.max(0, num + cards.length - this.getHandcardLimit());
+		num += cards.length - this.getHandcardLimit();
+		if (pure) return num;
+		return Math.max(0, num);
 	}
 	distanceTo(target, method) {
 		return get.distance(this, target, method);
@@ -7899,12 +7904,12 @@ export class Player extends HTMLDivElement {
 			else return true;
 		}
 		if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
-		let cards, selected = get.copy(ui.selected.cards);
+		let cards, selected = [];
 		if (get.itemtype(ignore) === 'cards') selected.addArray(ignore);
 		else if (get.itemtype(ignore) === 'card') selected.add(ignore);
 		if (this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
 		else cards = this.getShownCards();
-		count += cards.filter(card => {
+		cards = cards.filter(card => {
 			if (selected.includes(card)) return false;
 			let name = get.name(card, this);
 			if (name == 'sha' || name == 'hufu' || name == 'yuchanqian') {
@@ -7913,9 +7918,10 @@ export class Player extends HTMLDivElement {
 				return true;
 			}
 			return false;
-		}).length;
+		});
+		count += cards.length;
 		if (count && rvt !== 'count') return true;
-		let hs = this.getCards('hs').filter(i => !cards.includes(i) && !selected.includes(i)).length;
+		let hs = this.getCards('hs').filter(i => !cards.includes(i)).length;
 		if (!hs) {
 			if (rvt === 'count') return count;
 			return false;
@@ -7941,12 +7947,12 @@ export class Player extends HTMLDivElement {
 			else return true;
 		}
 		if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
-		let cards, selected = get.copy(ui.selected.cards);
+		let cards, selected = [];
 		if (get.itemtype(ignore) === 'cards') selected.addArray(ignore);
 		else if (get.itemtype(ignore) === 'card') selected.add(ignore);
 		if (this === viewer || get.itemtype(viewer) == 'player') cards = this.getKnownCards(viewer);
 		else cards = this.getShownCards();
-		count += cards.filter(card => {
+		cards = cards.filter(card => {
 			if (selected.includes(card)) return false;
 			let name = get.name(card, this);
 			if (name === 'shan' || name === 'hufu') {
@@ -7955,9 +7961,10 @@ export class Player extends HTMLDivElement {
 				return true;
 			}
 			return false;
-		}).length;
+		});
+		count += cards.length;
 		if (count && rvt !== 'count') return true;
-		let hs = this.getCards('hs').filter(i => !cards.includes(i) && !selected.includes(i)).length;
+		let hs = this.getCards('hs').filter(i => !cards.includes(i)).length;
 		if (!hs) {
 			if (rvt === 'count') return count;
 			return false;

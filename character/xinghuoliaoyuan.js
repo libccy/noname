@@ -1371,19 +1371,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(target==player) return false;
 						return target.countCards('h')>player.countCards('h')||Math.max(0,target.hp)>Math.max(0,player.hp);
 					}).set('ai',function(target){
-						var att=get.attitude(_status.event.player,target);
+						let att=get.attitude(_status.event.player,target),name=_status.event.cards[0].name;
 						if(att<3) return 0;
-						if(target.hasJudge('lebu')){
-							att/=5;
-						}
-						if(target.hasSha()&&_status.event.sha){
-							att/=5;
-						}
-						if(_status.event.wuxie&&target.needsToDiscard(1)){
-							att/=5;
-						}
+						if(target.hasJudge('lebu')) att/=5;
+						if(name==='sha'&&target.hasSha()) att/=5;
+						if(name==='wuxie'&&target.needsToDiscard(_status.event.cards)) att/=5;
 						return att/(1+get.distance(player,target,'absolute'));
-					}).set('sha',trigger.cards[0].name=='sha').set('wuxie',trigger.cards[0].name=='wuxie');
+					}).set('cards',trigger.cards);
 					'step 1'
 					if(result.bool){
 						var list=[];

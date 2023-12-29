@@ -170,7 +170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						d1=true;
 						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false;
 						for(var target of trigger.targets){
-							if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
+							if(!target.mayHaveShan(player,'use')||trigger.player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:trigger.card,
 							},true)){
@@ -299,7 +299,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var effect=0;
 						for(var target of trigger.targets){
 							var eff=get.effect(target,trigger.card,trigger.player,player);
-							if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
+							if(!target.mayHaveShan(player,'use')||trigger.player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:trigger.card,
 							},true)){
@@ -765,7 +765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(target.hasSkillTag('nodamage')||target.hasSkillTag('nothunder')) return 'zeroplayertarget';
 									if(target.hasSkillTag('filterDamage',null,{
 										player:player,
-										card:lib.element.VCard({
+										card:new lib.element.VCard({
 											name:card.name,
 											nature:'thunder'
 										},[card])
@@ -4906,7 +4906,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						//护驾
 						else if(!player.hasShan()&&game.hasPlayer(function(current){
-							return current!=player&&current.group=='wei'&&current.mayHaveShan()&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
+							return current!=player&&current.group=='wei'&&current.mayHaveShan(player,'respond')&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
 						})) return 1;
 						return -1;
 					});
@@ -4940,7 +4940,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								//护驾
 								else if(!player.hasShan()&&game.hasPlayer(function(current){
-									return current!=player&&current.group=='wei'&&current.mayHaveShan()&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
+									return current!=player&&current.group=='wei'&&current.mayHaveShan(player,'respond')&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
 								})) return 'hujia';
 							});
 						}
