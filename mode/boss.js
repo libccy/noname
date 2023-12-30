@@ -7316,12 +7316,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('boss_xiaoshou'),function(card,player,target){
 						return player!=target&&target.hp>=player.hp;
 					}).ai=function(target){
-						return get.damageEffect(target,player,player,'fire');
+						return get.damageEffect(target,player,player);
 					}
 					"step 1"
 					if(result.bool){
 						player.logSkill('boss_xiaoshou',result.targets);
-						result.targets[0].damage('fire',3);
+						result.targets[0].damage(3);
 					}
 				},
 			},
