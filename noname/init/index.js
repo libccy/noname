@@ -10,6 +10,7 @@ import { userAgent } from '../util/index.js';
 import * as config from '../util/config.js';
 import { gnc } from '../gnc/index.js';
 
+import { importCardPack, importCharacterPack, importExtension, importMode } from './import.js';
 import { onload } from './onload.js';
 
 // 无名杀，启动！
@@ -560,63 +561,6 @@ export async function boot() {
 
 	await waitDomLoad;
 	await onload();
-}
-
-/**
- * @param {string} name - 卡牌包名
- */
-async function importCardPack(name) {
-	try {
-		const cardPackContent = await import('../../card/' + name + '.js');
-		if (!cardPackContent.type) return;
-		if (cardPackContent.type !== 'card') throw new Error('Loaded Content is not a CardPack');
-		await game.import('card', cardPackContent.default);
-	} catch (e) {
-		console.error(e);
-	}
-}
-
-/**
- * @param {string} name - 武将包名
- */
-async function importCharacterPack(name) {
-	try {
-		const characterPackContent = await import('../../character/' + name + '.js');
-		if (!characterPackContent.type) return;
-		if (characterPackContent.type !== 'character') throw new Error('Loaded Content is not a CharacterPack');
-		await game.import('character', characterPackContent.default);
-	} catch (e) {
-		console.error(e);
-	}
-}
-
-/**
- * @param {string} name - 扩展名
- */
-async function importExtension(name) {
-	try {
-		const extensionContent = await import('../../extension/' + name + '/extension.js');
-		if (!extensionContent.type) return;
-		if (extensionContent.type !== 'extension') throw new Error('Loaded Content is not a Noname Extension');
-		await game.import('extension', extensionContent.default);
-	} catch (e) {
-		console.error(e);
-		game.removeExtension(name);
-	}
-}
-
-/**
- * @param {string} name - 模式名 
- */
-async function importMode(name) {
-	try {
-		const modeContent = await import('../../mode/' + name + '.js');
-		if (!modeContent.type) return;
-		if (modeContent.type !== 'mode') throw new Error('Loaded Content is not a Mode');
-		await game.import('mode', modeContent.default);
-	} catch (e) {
-		console.error(e);
-	}
 }
 
 function initSheet(libConfig) {
