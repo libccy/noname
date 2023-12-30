@@ -44,7 +44,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuran:['male','wu',4,['danshou']],
 			xusheng:['male','wu',4,['xinpojun']],
 			wuguotai:['female','wu',3,['ganlu','buyi']],
-			lingtong:['male','wu',4,['olxuanfeng']],
+			lingtong:['male','wu',4,['xuanfeng']],
 			liubiao:['male','qun',3,['rezishou','zongshi']],
 			yufan:['male','wu',3,['zhiyan','zongxuan']],
 			chengong:['male','qun',3,['mingce','zhichi']],
@@ -995,7 +995,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var user=trigger.player,target=previous;
 					event.user=user;event.target=target;
 					if(user){
-						user.chooseBool('是否对'+get.translation(target)+'发动【联对】？','令'+get.translation(target)+'摸两张牌').set('ai',()=>_status.event.bool).set('bool',get.effect(target,{name:'wuzhong'},user,user)>0);
+						user.chooseBool('是否对'+get.translation(target)+'发动【联对】？','令'+get.translation(target)+'摸两张牌').set('ai',()=>_status.event.bool).set('bool',get.effect(target,{name:'draw'},user,user)>0);
 					}
 					'step 1'
 					if(result.bool){
@@ -2101,7 +2101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(num>2) return true;
 							var card=trigger.card;
 							if(get.tag(card,'damage')&&player.hp<=trigger.getParent().baseDamage&&(!get.tag(card,'respondShan')||!player.hasShan())&&(!get.tag(card,'respondSha')||!player.hasSha())) return true;
-							var source=_status.currentPhase,todis=(source.countCards('h')-Math.max(0,source.needsToDiscard()));
+							var source=_status.currentPhase,todis=source.countCards('h')-source.needsToDiscard();
 							if(todis<=Math.max(Math.min(2+(source.hp<=1?1:0),player.countCards('he',function(card){
 								return get.value(card,player)<Math.max(5.5,8-todis)
 							})),player.countCards('he',function(card){
@@ -2235,7 +2235,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case 2:{
 								var num=1.3;
 								if(event.card.name=='sha'&&event.targets.filter(function(current){
-									if(current.mayHaveShan()&&get.attitude(player,current)<=0){
+									if(current.mayHaveShan(player,'use')&&get.attitude(player,current)<=0){
 										if(current.hasSkillTag('useShan')) num=1.9;
 										return true;
 									}
@@ -2387,7 +2387,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(target){
 						var player=_status.event.player;
 						var storage=player.getStorage('xinyaoming_kanon');
-						if(get.attitude(player,target)>0&&!storage.contains('摸牌')&&target!=player) return get.effect(target,{name:'wuzhong'},player,player)/2;
+						if(get.attitude(player,target)>0&&!storage.contains('摸牌')&&target!=player) return get.effect(target,{name:'draw'},player,player);
 						if(get.attitude(player,target)<0&&!storage.contains('弃牌')&&target!=player&&target.countCards('h')) return get.effect(target,{name:'guohe_copy2'},player,player);
 						if(get.attitude(player,target)>0&&!storage.contains('制衡')) return get.effect(target,{name:'kaihua'},player,player);
 						return 0;
@@ -2424,7 +2424,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=_status.event.target;
 								var controls=_status.event.controls.slice();
 								var map={
-									'摸牌':get.effect(target,{name:'wuzhong'},player,player)/2,
+									'摸牌':get.effect(target,{name:'draw'},player,player),
 									'弃牌':get.effect(target,{name:'guohe_copy2'},player,player),
 									'制衡':get.effect(target,{name:'kaihua'},player,player),
 								};
@@ -2681,10 +2681,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.hasSkill('xintaoluan3')&&player.countCards('hes',card=>lib.inpile.some(name=>{
 						if(player.getStorage('xintaoluan').includes(name)) return false;
 						if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
-						if(event.filterCard({name:name,isCard:true,cards:[card]})) return true;
+						if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
 						if(name=='sha'){
 							for(var nature of lib.inpile_nature){
-								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]})) return true;
+								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)) return true;
 							}
 						}
 						return false;
@@ -5114,7 +5114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			jyzongshi:{
 				audio:2,
-				audioname:['re_jianyong','ol_jianyong'],
+				audioname:['re_jianyong'],
 				trigger:{player:['chooseToCompareAfter','compareMultipleAfter'],target:['chooseToCompareAfter','compareMultipleAfter']},
 				filter:function(event,player){
 					if(event.preserve) return false;
@@ -5263,10 +5263,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.hasSkill('taoluan3')&&player.countCards('hes',card=>lib.inpile.some(name=>{
 						if(player.getStorage('taoluan').includes(name)) return false;
 						if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
-						if(event.filterCard({name:name,isCard:true,cards:[card]})) return true;
+						if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
 						if(name=='sha'){
 							for(var nature of lib.inpile_nature){
-								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]})) return true;
+								if(event.filterCard({name:name,nature:nature,isCard:true,cards:[card]},player,event)) return true;
 							}
 						}
 						return false;
@@ -6980,8 +6980,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						player:function(card,player,target){
 							if(_status.currentPhase!=player) return;
-							if(card.name=='sha'&&!player.needsToDiscard()&&
-								!player.getExpansions('chunlao').length&&target.hp>1){
+							if(card.name=='sha'&&!player.needsToDiscard()&&!player.getExpansions('chunlao').length&&target.hp>1){
 								return 'zeroplayertarget';
 							}
 						}
@@ -7558,7 +7557,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('longyin_order');
 				},
 				onremove:(player)=>{
-					game.removeGlobalSkill('longyin_order');
+					if(!game.hasPlayer(current=>current.hasSkill('longyin'),true)) game.removeGlobalSkill('longyin_order');
 				},
 				trigger:{global:'useCard'},
 				direct:true,
@@ -7647,7 +7646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						trigger:{player:'dieAfter'},
 						filter:(event,player)=>{
-							return !game.hasPlayer(current=>current.hasSkill('longyin'));
+							return !game.hasPlayer(current=>current.hasSkill('longyin'),true);
 						},
 						silent:true,
 						forceDie:true,
@@ -11807,6 +11806,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			miji:{
 				audio:2,
 				audioname:['re_wangyi'],
+				locked:false,
 				mod:{
 					aiOrder:function(player,card,num){
 						if(num>0&&_status.event&&_status.event.type==='phase'&&get.tag(card,'recover')){
@@ -11906,16 +11906,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'useCardToTargeted'},
 				content:function(){
 					"step 0"
+					if(get.attitude(player,trigger.player)<0&&trigger.player.countDiscardableCards(player,'he')) player.addTempSkill('zhenlie_lose');
 					player.loseHp();
 					"step 1"
+					player.removeSkill('zhenlie_lose');
 					trigger.getParent().excluded.add(player);
 					"step 2"
 					if(trigger.player.countCards('he')){
+						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.12);
 						player.discardPlayerCard(trigger.player,'he',true);
 					}
 				},
+				subSkill:{
+					lose:{
+						charlotte:true
+					}
+				},
 				ai:{
-					expose:0.3
+					effect:{
+						target:(card,player,target)=>{
+							if(target.hp<=0&&target.hasSkill('zhenlie_lose')&&get.tag(card,'recover')) return [1,1.2];
+						}
+					}
 				}
 			},
 			//吾彦...
@@ -13915,7 +13927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gaoshun:['gaoshun','xin_gaoshun','re_gaoshun','old_gaoshun'],
 			zhonghui:['zhonghui','xin_zhonghui','re_zhonghui','old_zhonghui','pe_zhonghui'],
 			wangyi:['wangyi','re_wangyi','old_wangyi'],
-			caozhang:['caozhang','re_caozhang','xin_caozhang'],
+			caozhang:['caozhang','ol_caozhang','re_caozhang','xin_caozhang'],
 			guanzhang:['guanzhang','re_guanzhang','old_guanzhang'],
 			madai:['old_madai','re_madai','tw_madai','madai'],
 			liaohua:['liaohua','re_liaohua','xin_liaohua'],

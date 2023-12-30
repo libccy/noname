@@ -2256,12 +2256,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard('h',2,get.prompt('feiyang'),'弃置两张手牌，然后弃置判定区里的一张牌').set('logSkill','feiyang').set('ai',function(card){
 						if(_status.event.goon) return 6-get.value(card);
 						return 0;
-					}).set('goon',player.hasCard(function(card){
-						return get.effect(player,{
-							name:card.viewAs||card.name,
-							cards:[card],
-						},player,player)<0;
-					},'j'));
+					}).set('goon',(()=>{
+						if(player.hasSkillTag('rejudge')&&player.countCards('j')<2) return false;
+						return player.hasCard(function(card){
+							if(get.tag(card,'damage')&&get.damageEffect(player,player,_status.event.player,get.natureList(card))>=0) return false;
+							return get.effect(player,{
+								name:card.viewAs||card.name,
+								cards:[card],
+							},player,player)<0;
+						},'j');
+					})());
 					"step 1"
 					if(result.bool){
 						player.discardPlayerCard(player,'j',true);

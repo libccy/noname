@@ -95,34 +95,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player._dcsantou_temp) return;
 							if(get.tag(card,'damage')){
 								const hp=target.getHp();
+								player._dcsantou_temp=true;
+								const losehp=get.effect(target,{name:'losehp'},target,target)/get.attitude(target,target);
+								delete player._dcsantou_temp;
 								if(hp>=3){
-									if(target.hasHistory('useSkill',evt=>evt.skill=='dcsantou'&&evt.event.getTrigger().source==player)) return [1,-2];
+									if(target.hasHistory('useSkill',evt=>evt.skill=='dcsantou'&&evt.event.getTrigger().source==player)) return [0,losehp,0,0];
 									else if(get.attitude(player,target)<0){
-										if(card.name=='sha') return;
-										let sha=false;
-										player._dcsantou_temp=true;
-										let num=player.countCards('h',card=>{
-											if(card.name=='sha'){
-												if(sha) return false;
-												else sha=true;
+										let hs=player.getCards('hs',i=>{
+											return i!==card&&(!card.cards||!card.cards.includes(i));
+										}),num=player.getCardUsable('sha');
+										if(card.name==='sha') num--;
+										hs=hs.filter(i=>{
+											if(!player.canUse(i,target)) return false;
+											if(get.tag(card,'damage')&&get.name(i,player)!=='sha') return true;
+											if(num){
+												num--;
+												return true;
 											}
-											return get.tag(card,'damage')&&player.canUse(card,target)&&get.effect(target,card,player,player)>0;
-										});
-										delete player._dcsantou_temp;
-										if(player.hasSkillTag('damage')){
-											num++;
-										}
-										if(num<2){
-											var enemies=player.getEnemies();
-											if(enemies.length==1&&enemies[0]==target&&player.needsToDiscard()){
-												return;
-											}
-											return 0;
-										}
+											return false;
+										}).length;
+										if(player.hasSkillTag('damage',null,{target:target})) hs++;
+										if(!hs) return 'zeroplayertarget';
+										num=1-2/3/hs;
+										return [num,0,num,0];
 									}
 								}
-								else if(hp==2&&get.tag(card,'natureDamage')||hp==1&&get.color(card)=='red'&&get.itemtype(card)=='card') return [1,-2];
-								else return 0;
+								if(hp==2&&get.tag(card,'natureDamage')||hp==1&&typeof card=='object'&&get.color(card)=='red') return [0,losehp,0,0];
+								return 'zeroplayertarget';
 							}
 						}
 					}
@@ -160,6 +159,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else event.finish();
+				},
+				ai:{
+					reverseEquip:true
 				}
 			},
 			//隅泣曹操
@@ -254,9 +256,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player;
 							var card={name:button.link[2],nature:button.link[3],isCard:true};
 							if(card.name=='tao'){
-								if(player.hp==1||(player.hp==2&&!player.hasShan())||player.needsToDiscard()){
-									return 5;
-								}
+								if(player.hp==1||(player.hp==2&&!player.hasShan())||player.needsToDiscard()) return 5;
 								return 1;
 							}
 							if(card.name=='sha'){
@@ -372,9 +372,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					order:1,
+					order:function(item,player){
+						if(player.hasCard((i)=>{
+							return get.value(i)>Math.max(6,9-player.hp);
+						},'he')) return 1;
+						return 10;
+					},
 					result:{
 						player:1
+					},
+					nokeep:true,
+					skillTagFilter:function(player,tag,arg){
+						if(tag==='nokeep') return (!arg||arg&&arg.card&&get.name(arg.card)==='tao')&&player.isPhaseUsing()&&player.countSkill('dczhiheng')<1+player.getStorage('dczhiheng_hit').length&&player.hasCard((card)=>{
+							return get.name(card)!=='tao';
+						},'h');
 					},
 					threaten:1.55
 				},

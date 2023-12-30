@@ -14,6 +14,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			draw:{
+				ai:{
+					result:{
+						target:1
+					},
+					tag:{
+						draw:1
+					}
+				}
+			},
 			losehp:{
 				ai:{
 					result:{
@@ -138,25 +148,18 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							next.set('prompt2','（在此之后仍需弃置一张手牌）');
 						}
 						next.set('ai1',function(card){
-							var target=_status.event.player;
-							var evt=_status.event.getParent();
-							var bool=true;
-							if(_status.event.shanRequired>1&&!get.is.object(card)&&target.countCards('h','shan')<_status.event.shanRequired-(_status.event.shanIgnored||0)){
-								bool=false;
-							}
-							else if(target.hasSkillTag('useShan')){
-								bool=true;
-							}
-							else if(target.hasSkillTag('noShan')){
-								bool=false;
-							}
-							else if(get.damageEffect(target,evt.player,target,evt.card.nature)>=0) bool=false;
-							if(bool){
-								return get.order(card);
-							}
+							if(_status.event.useShan) return get.order(card);
 							return 0;
 						}).set('shanRequired',event.shanRequired);
 						next.set('respondTo',[player,card]);
+						next.set('useShan',(()=>{
+							if(target.hasSkillTag('noShan',null,event)) return false;
+							if(target.hasSkillTag('useShan',null,event)) return true;
+							if(event.baseDamage+event.extraDamage<=0 || get.attitude(target,player._trueMe||player)>0) bool=false;
+							if(event.shanRequired>1&&target.countCards('h','shan')<event.shanRequired-(event.shanIgnored||0)) return false;
+							if(get.damageEffect(target,player,target,get.nature(event.card))>=0) return false;
+							return true;
+						})());
 						//next.autochoose=lib.filter.autoRespondShan;
 					}
 					"step 2"
@@ -228,7 +231,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(get.cardtag(card,'yingbian_hit')){
 							hit=true;
 							if(targets.some(target=>{
-								return target.mayHaveShan(viewer)&&get.attitude(viewer,target)<0&&get.damageEffect(target,player,viewer,get.natureList(card))>0;
+								return target.mayHaveShan(viewer,'use')&&get.attitude(viewer,target)<0&&get.damageEffect(target,player,viewer,get.natureList(card))>0;
 							})) base+=5;
 						}
 						if(get.cardtag(card,'yingbian_add')){
@@ -238,7 +241,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						if(get.cardtag(card,'yingbian_damage')){
 							if(targets.some(target=>{
-								return get.attitude(player,target)<0&&(hit||!target.mayHaveShan(viewer)||player.hasSkillTag('directHit_ai',true,{
+								return get.attitude(player,target)<0&&(hit||!target.mayHaveShan(viewer,'use')||player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:card,
 								},true))&&!target.hasSkillTag('filterDamage',null,{
@@ -252,10 +255,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					canLink:function(player,target,card){
 						if(!target.isLinked()&&!player.hasSkill('wutiesuolian_skill')) return false;
-						if(target.mayHaveShan()&&!player.hasSkillTag('directHit_ai',true,{
-							target:target,
-							card:card,
-						},true)) return false;
 						if(player.hasSkill('jueqing')||player.hasSkill('gangzhi')||target.hasSkill('gangzhi')) return false;
 						return true;
 					},
@@ -265,7 +264,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					order:function(item,player){
 						if(player.hasSkillTag('presha',true,null,true)) return 10;
-						if(game.hasNature(item,'linked')){
+						if(typeof item==='object'&&game.hasNature(item,'linked')){
 							if(game.hasPlayer(function(current){
 								return current!=player&&current.isLinked()&&player.canUse(item,current,null,true)&&get.effect(current,item,player,player)>0&&lib.card.sha.ai.canLink(player,current,item);
 							})&&game.countPlayer(function(current){
@@ -295,7 +294,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								}
 								return -1.5;
 							}();
-							if(!isLink&&target.mayHaveShan()&&!player.hasSkillTag('directHit_ai',true,{
+							if(!isLink&&target.mayHaveShan(player,'use')&&!player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:card,
 							},true)) return eff/1.2;
@@ -457,7 +456,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.hp>0){
 								if(!player.isPhaseUsing()) return 0;
 								let min = 7.2-4*player.hp/player.maxHp,
-									nd = player.needsToDiscard(-player.countCards('h',i=>!taos.includes(i)&&get.value(i)<min)),
+									nd = player.needsToDiscard(0,(i,player)=>{
+										return !player.canIgnoreHandcard(i)&&(taos.includes(i)||get.value(i)>=min);
+									}),
 									keep = nd?0:2;
 								if(nd>2 || taos.length>1&&(nd>1||nd&&player.hp<1+taos.length) || target.identity==='zhu'&&(nd||target.hp<3)&&(mode==='identity'||mode==='versus'||mode==='chess') || !player.hasFriend()) return 2;
 								if(game.hasPlayer(current=>{
@@ -1232,10 +1233,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					event._result={};
 				},
 				ai:{
-					wuxie:function(target,card,player,viewer){
-						if(player==game.me&&get.attitude(viewer,player)>0){
-							return 0;
-						}
+					wuxie:function(target,card,player,viewer,status){
+						if(player===game.me&&get.attitude(viewer,player._trueMe||player)>0) return 0;
+						if(status*get.attitude(viewer,target)*get.effect(target,card,player,target)>=0) return 0;
 					},
 					basic:{
 						order:5,
@@ -1299,9 +1299,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					wuxie:function(target,card,player,viewer){
-						if(get.attitude(viewer,player)>0&&get.attitude(viewer,target)>0){
-							return 0;
-						}
+						if(get.attitude(viewer,player._trueMe||player)>0) return 0;
 					},
 					basic:{
 						order:7.5,
@@ -1578,7 +1576,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					wuxie:(target,card,player,viewer,status)=>{
-						if(status*get.attitude(viewer,player)>0&&!player.isMad() || target.hp>2&&!target.hasCard(i=>{
+						if(status*get.attitude(viewer,player._trueMe||player)>0 || target.hp>2&&!target.hasCard(i=>{
 							let val=get.value(i,target),subtypes=get.subtypes(i);
 							if(val<8&&target.hp<2&&!subtypes.includes('equip2')&&!subtypes.includes('equip5')) return false;
 							return val>3+Math.min(5,target.hp);
@@ -1828,9 +1826,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					wuxie:function(target,card,player,viewer){
-						if(player==game.me&&get.attitude(viewer,player)>0){
-							return 0;
-						}
+						if(player==game.me&&get.attitude(viewer,player._trueMe||player)>0) return 0;
 					},
 					basic:{
 						order:8,
@@ -1844,12 +1840,12 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								return num+get.value(i,player);
 							},0);
 						},
-						target:(player,target)=>{
+						target:(player,target,card)=>{
 							let targets=get.copy(ui.selected.targets);
 							if(_status.event.preTarget) targets.add(_status.event.preTarget);
 							if(targets.length){
-								let preTarget=targets.lastItem,pre=_status.event.getTempCache('jiedao_result',preTarget);
-								if(pre&&pre.target.isIn()) return target===pre.target?pre.eff:0;
+								let preTarget=targets.lastItem,pre=_status.event.getTempCache('jiedao_result',preTarget.playerid);
+								if(pre&&pre.card===card&&pre.target.isIn()) return target===pre.target?pre.eff:0;
 								return get.effect(target,{name:'sha'},preTarget,player)/get.attitude(player,target);
 							}
 							let arms=(target.hasSkillTag('noe')?0.32:-0.15)*target.getEquips(1).reduce((num,i)=>{
@@ -1865,7 +1861,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							},-100);
 							if(!addTar) return arms;
 							sha/=get.attitude(player,target);
-							_status.event.putTempCache('jiedao_result',target,{
+							_status.event.putTempCache('jiedao_result',target.playerid,{
+								card:card,
 								target:addTar,
 								eff:sha
 							});
@@ -2040,7 +2037,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							var num=game.countPlayer(function(current){
-								var skills=current.getSkills();
+								//var skills=current.getSkills();
 								for(var j=0;j<current.skills.length;j++){
 									var rejudge=get.tag(current.skills[j],'rejudge',current);
 									if(rejudge!=undefined){
@@ -2085,9 +2082,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					tag:{
-						// damage:1,
-						// natureDamage:1,
-						// thunderDamage:1,
+						damage:0.16,
+						natureDamage:0.16,
+						thunderDamage:0.16,
 					}
 				}
 			},

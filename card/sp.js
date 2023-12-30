@@ -197,6 +197,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return lib.card.shandian.ai.result.target(player,target);
 						}
 					},
+					tag:{
+						damage:0.25,
+						natureDamage:0.25,
+						thunderDamage:0.25,
+					}
 				}
 			},
 			qibaodao:{

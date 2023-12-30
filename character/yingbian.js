@@ -2401,6 +2401,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			ciwei:{
+				init:()=>{
+					game.addGlobalSkill('ciwei_ai');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('ciwei'),true)) game.removeGlobalSkill('ciwei_ai');
+				},
 				trigger:{global:'useCard'},
 				direct:true,
 				preHidden:true,
@@ -2426,8 +2432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.targets.length=0;
 						trigger.all_excluded=true;
 					}
-				},
-				global:'ciwei_ai',
+				}
 			},
 			ciwei_ai:{
 				mod:{
@@ -2448,6 +2453,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return num;
 					},
 				},
+				trigger:{player:'dieAfter'},
+				filter:()=>{
+					return !game.hasPlayer(i=>i.hasSkill('ciwei'),true);
+				},
+				silent:true,
+				forceDie:true,
+				content:()=>{
+					game.removeGlobalSkill('ciwei_ai');
+				}
 			},
 			caiyuan:{
 				trigger:{player:'phaseEnd'},

@@ -555,12 +555,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 				else{
-					return {
-						fan:'反',
-						zhong:'忠',
-						nei:'内',
-                        commoner:'民',
-						cai:'猜',
+					if(get.config('enable_commoner')){
+						return {
+							fan:'反',
+							zhong:'忠',
+							nei:'内',
+							commoner:'民',
+							cai:'猜',
+						}
+					}
+					else{
+						return {
+							fan:'反',
+							zhong:'忠',
+							nei:'内',
+							cai:'猜',
+						}
 					}
 				}
 			},
@@ -1507,7 +1517,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							listi=['random','zhu','zhong','fan','nei'];
-                            if(get.config('enable_commoner')) listi.push('commoner');
+							if(get.config('enable_commoner')&&!event.stratagemMode) listi.push('commoner');
 						}
 
 						for(var i=0;i<listi.length;i++){
@@ -1548,7 +1558,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 									else{
                                         var listi=['zhu','zhong','nei','fan'];
-                                        if(get.config('enable_commoner')) listi.push('commoner');
+                                        if(get.config('enable_commoner')&&!event.stratagemMode) listi.push('commoner');
                                         link=listi.randomGet();
 									}
 									for(var i=0;i<this.parentNode.childElementCount;i++){

@@ -170,7 +170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						d1=true;
 						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false;
 						for(var target of trigger.targets){
-							if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
+							if(!target.mayHaveShan(player,'use')||trigger.player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:trigger.card,
 							},true)){
@@ -299,7 +299,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var effect=0;
 						for(var target of trigger.targets){
 							var eff=get.effect(target,trigger.card,trigger.player,player);
-							if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
+							if(!target.mayHaveShan(player,'use')||trigger.player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:trigger.card,
 							},true)){
@@ -758,6 +758,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							content:'受到的伤害+1且改为雷属性',
 						},
+						ai:{
+							effect:{
+								target:(card,player,target)=>{
+									if(!get.tag(card,'damage')) return;
+									if(target.hasSkillTag('nodamage')||target.hasSkillTag('nothunder')) return 'zeroplayertarget';
+									if(target.hasSkillTag('filterDamage',null,{
+										player:player,
+										card:new lib.element.VCard({
+											name:card.name,
+											nature:'thunder'
+										},[card])
+									})) return;
+									return 2;
+								}
+							}
+						}
 					},
 					init:{
 						audio:'psshouli',
@@ -900,6 +916,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					threaten:100,
 					reverseEquip:true,
+					effect:{
+						player:(card,player,target)=>{
+							if(typeof card!=='object') return;
+							let suit=get.suit(card);
+							if(!lib.suit.contains(suit)||player.hasCard(function(i){
+								return get.suit(i,player)==suit;
+							},'h')) return;
+							return [1,game.countPlayer(current=>{
+								return current.countCards('e',card=>{
+									return get.suit(card,current)==suit;
+								});
+							})];
+						},
+						target:(card,player,target)=>{
+							if(card.name==='sha'&&!player.hasSkillTag('directHit_ai',true,{
+								target:target,
+								card:card
+							},true)&&game.hasPlayer(current=>{
+								return current.hasCard(cardx=>{
+									return get.subtype(cardx)==='equip3';
+								},'e');
+							})) return [0, -0.5];
+						}
+					}
 				}
 			},
 			//战役篇田丰
@@ -3046,7 +3086,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt('zylianji'),'令一名角色摸一张牌').set('ai',target=>{
 						var player=_status.event.player;
 						if(target==player&&player.needsToDiscard(1)) return 1;
-						return get.effect(target,{name:'wuzhong'},player,player);
+						return get.effect(target,{name:'draw'},player,player);
 					});
 					'step 1'
 					if(result.bool){
@@ -3689,7 +3729,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yjdumou:{
 				audio:2,
 				forced:true,
-				global:'yjdumou_du',
 				mod:{
 					cardname:function(card,player,name){
 						if(player==_status.currentPhase&&card.name=='du') return 'guohe';
@@ -3697,6 +3736,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					aiValue:function(player,card,num){
 						if(card.name=='du') return get.value({name:'guohe'});
 					},
+				},
+				init:()=>{
+					game.addGlobalSkill('yjdumou_du');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('yjdumou'),true)) game.removeGlobalSkill('yjdumou_du');
 				},
 				subSkill:{
 					du:{
@@ -3707,6 +3752,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							aiValue:function(player,card,num){
 								if(get.name(card)=='du'&&card.name!='du') return get.value({name:card.name});
 							},
+						},
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('yjdumou'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('yjdumou_du');
 						}
 					}
 				},
@@ -4852,7 +4906,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						//护驾
 						else if(!player.hasShan()&&game.hasPlayer(function(current){
-							return current!=player&&current.group=='wei'&&current.mayHaveShan()&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
+							return current!=player&&current.group=='wei'&&current.mayHaveShan(player,'respond')&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
 						})) return 1;
 						return -1;
 					});
@@ -4886,7 +4940,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								//护驾
 								else if(!player.hasShan()&&game.hasPlayer(function(current){
-									return current!=player&&current.group=='wei'&&current.mayHaveShan()&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
+									return current!=player&&current.group=='wei'&&current.mayHaveShan(player,'respond')&&get.attitude(player,current)>0&&get.attitude(current,player)>0;
 								})) return 'hujia';
 							});
 						}

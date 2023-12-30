@@ -272,6 +272,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return get.cardNameLength(event.card)==player.getHistory('useCard').indexOf(event.getParent())+1;
 				},
 				direct:true,
+				locked:false,
 				content:function(){
 					'step 0'
 					var num=get.cardNameLength(trigger.card);
@@ -1397,9 +1398,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.classList.remove('linked2');
 							var eff=cards[0][1];
 							if(eff>0) return eff;
-							return Math.max((get.effect(target,{name:'wuzhong'},player,player)+get.effect(player,{name:'wuzhong'},player,player)/3),get.recoverEffect(target,player,player));
+							return Math.max((2*get.effect(target,{name:'draw'},player,player)+0.6*get.effect(player,{name:'draw'},player,player)),get.recoverEffect(target,player,player));
 						}
-						return Math.max((get.effect(target,{name:'wuzhong'},player,player)+get.effect(player,{name:'wuzhong'},player,player)/3),get.recoverEffect(target,player,player));
+						return Math.max((2*get.effect(target,{name:'draw'},player,player)+0.6*get.effect(player,{name:'draw'},player,player)),get.recoverEffect(target,player,player));
 					}).set('goon',player.countCards('hs',card=>{
 						return get.name(card)=='jiu'&&player.hasUseTarget(card);
 					})&&player.countCards('hs',card=>{
@@ -1424,7 +1425,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var player=_status.event.player,target=_status.event.getParent().target;
 							if(!target.isDamaged()) return 0;
 							if(get.attitude(player,target)<=0&&player.countCards('he',card=>get.value(card)<0)>=2) return 0;
-							return (get.effect(target,{name:'wuzhong'},player,player)+get.effect(player,{name:'wuzhong'},player,player)/3)>get.recoverEffect(target,player,player)?0:1;
+							return (2*get.effect(target,{name:'draw'},player,player)+0.6*get.effect(player,{name:'draw'},player,player))>get.recoverEffect(target,player,player)?0:1;
 						});
 					}
 					else event.finish();

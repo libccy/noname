@@ -71,7 +71,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhanghu:['male','wei',4,['cuijian','zhtongyuan']],
 			luyusheng:['female','wu',3,['zhente','zhiwei']],
 			huaxin:['male','wei',3,['spwanggui','xibing']],
-			mengyou:['male','qun',5,['hmmanyi','dcmanzhi']],
+			mengyou:['male','qun',5,['manyi','dcmanzhi']],
 			liuyong:['male','shu',3,['zhuning','fengxiang']],
 			dc_sunru:['female','wu',3,['xiecui','youxu']],
 			xiahoulingnv:['female','wei',4,['fuping','weilie']],
@@ -1850,6 +1850,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//裴元绍
 			dcmoyu:{
 				audio:2,
+				init:()=>{
+					game.addGlobalSkill('dcmoyu_ai');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('dcmoyu'),true)) game.removeGlobalSkill('dcmoyu_ai');
+				},
 				enable:'phaseUse',
 				filter:function(event,player){
 					return !player.hasSkill('dcmoyu_ban')&&game.hasPlayer(current=>lib.skill.dcmoyu.filterTarget(null,player,current));
@@ -1857,7 +1863,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget:function(card,player,target){
 					return player!=target&&!player.getStorage('dcmoyu_clear').contains(target)&&target.countGainableCards(player,'hej');
 				},
-				global:'dcmoyu_ai',
 				content:function(){
 					'step 0'
 					player.addTempSkill('dcmoyu_clear');
@@ -1893,6 +1898,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{content:'偷马贼被反打了！'},
 					},
 					ai:{
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('dcmoyu'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('dcmoyu_ai');
+						},
 						ai:{
 							effect:{
 								target:function(card,player,target,current){
@@ -4568,7 +4582,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var d1=true;
 						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false
 						for(var target of trigger.targets){
-							if(!target.mayHaveShan()||trigger.player.hasSkillTag('directHit_ai',true,{
+							if(!target.mayHaveShan(player,'use')||trigger.player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:trigger.card,
 							},true)){
@@ -6164,7 +6178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				check:function(event,player){
-					var eff=get.effect(player,{name:'wuzhong'},player,player)/2;
+					var eff=get.effect(player,{name:'draw'},player,player);
 					if(player.countCards('h')+1<=event.player.countCards('h')&&event.player.countCards('he')>0) eff+=get.effect(event.player,{name:'guohe_copy2'},player,player);
 					return eff;
 				},
@@ -7513,7 +7527,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						player:function(player,target){
 							var eff=get.recoverEffect(target,player,player);
-							if(target.getDamagedHp()>1) eff+=get.effect(target,{name:'wuzhong'},player,player)/2;
+							if(target.getDamagedHp()>1) eff+=get.effect(target,{name:'draw'},player,player);
 							return eff;
 						},
 					},
@@ -7974,9 +7988,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				init:function(player){
 					game.addGlobalSkill('huguan_all');
 				},
-				onremove:function(player){
-					game.removeGlobalSkill('huguan_all');
-				},
 				trigger:{global:'useCard'},
 				direct:true,
 				filter:function(event,player){
@@ -8052,7 +8063,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							let num = -157;
 							game.countPlayer(function (current){
 								if(current.hasSkill('huguan')) num = Math.max(num, get.attitude(_status.event.player, current));
-							});
+							}, true);
 							if(num === -157) game.removeGlobalSkill('huguan_all');
 							else if(num === 0) player.storage.huguan_all = 6;
 							else if(num > 0) player.storage.huguan_all = 9;
@@ -9168,7 +9179,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('fengxiang_use');
 				},
 				onremove:function(player){
-					game.removeGlobalSkill('fengxiang_use');
+					if(!game.hasPlayer(current=>current.hasSkill('fengxiang'),true)) game.removeGlobalSkill('fengxiang_use');
 				},
 				trigger:{player:'damageEnd'},
 				forced:true,
@@ -9210,10 +9221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						trigger:{player:'dieAfter'},
 						filter:function(event,player){
-							for(let i of game.players){
-								if(i.hasSkill('fengxiang')) return false;
-							}
-							return true;
+							return !game.hasPlayer(current=>current.hasSkill('fengxiang'),true);
 						},
 						silent:true,
 						forceDie:true,
@@ -10830,9 +10838,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(val<min) min=val;
 							});
 							if(att>0&&min<=0) return target.hasSkillTag('noe')?3:1;
-							if(att<0&&max>0){
+							if(att<=0&&max>0){
 								if(target.hasSkillTag('noe')) return max>6?(-max/3):0;
 								return -max;
+							}
+							if(player===target&&!player.hasSha()){
+								let ph=player.countCards('h');
+								if(game.hasPlayer(i=>{
+									if(!player.canUse('sha',i,true,true)||get.effect(i,{name:'sha'},player,player)<=0) return false;
+									return !ph||!i.mayHaveShan(player,'use');
+								})) return 1;
 							}
 							return 0;
 						},

@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			star_dongzhuo:['male','qun',5,['starweilin','starzhangrong','starhaoshou'],['zhu']],
 			star_yuanshu:['male','qun',4,['starcanxi','starpizhi','starzhonggu'],['zhu']],
 			star_caoren:['male','wei',4,['starsujun','starlifeng']],
 			mp_liuling:['male','jin',3,['mpjiusong','mpmaotao','mpbishi'],['doublegroup:wei:qun:jin']],
@@ -109,12 +110,180 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_xuzhou:['re_taoqian','caosong','zhangmiao','qiuliju'],
 				sp_zhongyuan:['re_hucheer','re_zoushi','caoanmin','re_dongcheng'],
 				sp_xiaohu:['haomeng','yanfuren','yanrou','dc_zhuling'],
-				sp_star:['star_caoren','star_yuanshu'],
+				sp_star:['star_caoren','star_yuanshu','star_dongzhuo'],
 				mini_qixian:['mp_liuling'],
 				sp_decade:['caobuxing','re_maliang','dc_jikang'],
 			}
 		},
 		skill:{
+			//星董卓
+			starweilin:{
+				audio:2,
+				trigger:{source:'damageBegin1'},
+				filter:function(event,player){
+					return !event.player.getHistory('damage').length&&player.getHistory('useCard').length>=event.player.getHp();
+				},
+				forced:true,
+				logTarget:'player',
+				content:function(){
+					trigger.num++;
+				},
+			},
+			starzhangrong:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter:function(event,player){
+					return player.getHp()>0;
+				},
+				direct:true,
+				content:function*(event,map){
+					var player=map.player;
+					var str=get.cnNumber(player.getHp());
+					var choiceList=[
+						'令至多'+str+'名体力值大于等于你的角色各失去1点体力',
+						'令至多'+str+'名手牌数大于等于你的角色各弃置一张手牌',
+					],list=['cancel2'];
+					if(game.hasPlayer(target=>{
+						if(target==player) return player.countCards('h',card=>lib.filter.cardDiscardable(card,player));
+						return target.countCards('h')>=Math.max(1,player.countCards('h'));
+					})) list.unshift('弃牌');
+					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+					list.unshift('扣血');
+					var result=yield player.chooseControl(list).set('prompt','###'+get.prompt('starzhangrong')+'###选择其中一项令任意名符合条件的角色执行，然后你摸等量的牌，回合结束时，若这些角色中有本回合未受到过伤害的角色，则你失去1点体力').set('ai',()=>{
+						var player=_status.event.player;
+						var controls=_status.event.controls.slice();
+						/*
+						var cards=player.getCards('hes',card=>get.tag(card,'damage')&&player.hasValueTarget(card));
+						var cardx=cards.filter(card=>get.name(card)=='sha');
+						cardx.sort((a,b)=>player.getUseValue(b)-player.getUseValue(a));
+						cardx=cardx.slice(Math.min(cardx.length,player.getCardUsable('sha')),cardx.length);
+						cards.removeArray(cardx);
+						*/
+						var targets1=game.filterPlayer(target=>get.attitude(player,target)<0&&target.getHp()>=player.getHp()&&get.effect(target,{name:'losehp'},player,player)>0/*&&cards.some(card=>player.canUse(card,target))*/);
+						_status.starzhangrong_check=true;
+						var targets2=game.filterPlayer(target=>get.attitude(player,target)<0&&target.countCards('h')>=Math.max(1,player.countCards('h'))&&get.effect(target,{name:'guohe_copy2'},player,player)>0/*&&cards.some(card=>player.canUse(card,target))*/);
+						delete _status.starzhangrong_check;
+						[targets1,targets2].forEach(list=>{
+							list.sort((a,b)=>get.damageEffect(b)-get.damageEffect(a));
+							list=list.slice(0,Math.min(player.getHp()/*,cards.length*/));
+						});
+						if(!controls.includes('弃牌')) return 1-get.sgn(targets1.length);
+						return Math.max(0,get.sgn(targets2.length-targets1.length));
+					}).set('choiceList',choiceList);
+					if(result.control!='cancel2'){
+						var choice=result.index;
+						var result2=yield player.chooseTarget([1,player.getHp()],'请选择【掌戎】的目标','令至多'+str+'名'+(choice?'手牌数':'体力值')+'大于你的角色各'+(choice?'弃置一张手牌':'失去1点体力'),(card,player,target)=>{
+							var name=_status.event.card.name;
+							if(name=='guohe_copy2'){
+								if(target==player) return player.countCards('h',card=>lib.filter.cardDiscardable(card,player));
+								return target.countCards('h')>=Math.max(1,player.countCards('h'));
+							}
+							return target.getHp()>=player.getHp();
+						}).set('ai',target=>{
+							var player=_status.event.player;
+							if(get.attitude(player,target)>=0) return 0;
+							return get.effect(target,_status.event.card,player,player);
+						}).set('card',{name:choice?'guohe_copy2':'losehp'});
+						if(result2.bool){
+							var targets=result2.targets.sortBySeat();
+							player.logSkill('starzhangrong',targets);
+							targets.forEach(target=>{
+								target.addTempSkill('starzhangrong_threaten');
+								if(choice) target.chooseToDiscard('h',true);
+								else target.loseHp();
+							});
+							player.draw(targets.length);
+							player.when('phaseEnd').then(()=>{
+								targets.forEach(target=>target.removeSkill('starzhangrong_threaten'));
+								var targetx=targets.filter(target=>!target.getHistory('damage').length);
+								if(targetx.length){
+									targetx.forEach(target=>target.chat('乐'));
+									player.popup('杯具');
+									player.loseHp();
+									return;
+								}
+								player.popup('洗具');
+							}).vars({targets:targets});
+						}
+					}
+				},
+				global:'starzhangrong_check',
+				subSkill:{
+					check:{
+						mod:{
+							canBeDiscarded:function(card,player,target){
+								if(!_status.starzhangrong_check) return;
+								if(player.hasSkill('starzhangrong')&&get.position(card)!='h') return false;
+							},
+						},
+					},
+					threaten:{
+						charlotte:true,
+						trigger:{player:'damageEnd'},
+						firstDo:true,
+						forced:true,
+						popup:false,
+						content:function(){
+							player.removeSkill('starzhangrong_threaten');
+						},
+						ai:{threaten:114514+1919810},
+						mark:true,
+						markimage:'image/card/sha.png',
+						intro:{content:'我还没受到伤害哟！'},
+					},
+				},
+			},
+			starhaoshou:{
+				unique:true,
+				audio:2,
+				trigger:{global:'useCardAfter'},
+				filter:function(event,player){
+					return event.player!=player&&event.card.name=='jiu'&&player.isDamaged()&&event.player.group=='qun';
+				},
+				direct:true,
+				zhuSkill:true,
+				content:function*(event,map){
+					var player=map.player,target=map.trigger.player;
+					var result=yield target.chooseBool(get.prompt('starhaoshou',player),'令'+get.translation(player)+'回复1点体力').set('choice',get.recoverEffect(player,target,target)>0);
+					if(result.bool){
+						target.line(player);
+						player.logSkill('starhaoshou');
+						player.recover();
+					}
+				},
+				//global:'starhaoshou_global',
+				subSkill:{
+					global:{
+						audio:'starhaoshou',
+						forceaudio:true,
+						filter:function(event,player){
+							if(!player.countCards('hes',card=>{
+								if(get.position(card)=='h'&&_status.connectMode) return true;
+								return get.name(card)=='jiu';
+							})) return false;
+							return event.type=='dying'&&event.dying&&event.dying!=player&&event.dying.hp<=0&&event.dying.hasZhuSkill('starhaoshou')&&player.group=='qun';
+						},
+						filterCard:function(card,player){
+							return get.name(card)=='jiu';
+						},
+						check:()=>1,
+						viewAs:{name:'tao'},
+						position:'hes',
+						prompt:function(){
+							return '将一张【酒】当作【桃】对'+get.translation(_status.event.dying)+'使用';
+						},
+						ai:{
+							save:true,
+							skillTagFilter:function(player,arg,target){
+								if(!player.countCards('hes',card=>{
+									if(get.position(card)=='h'&&_status.connectMode) return true;
+									return get.name(card)=='jiu';
+								})||player==target||!target.hasSkill('starhaoshou')||player.group!='qun') return false;
+							},
+						},
+					},
+				},
+			},
 			//星袁术
 			starcanxi:{
 				audio:2,
@@ -531,6 +700,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio: 'juexiang',
 				trigger: { player: 'die' },
 				forced: true,
+				locked:false,
 				forceDie: true,
 				skillAnimation: true,
 				animationColor: 'water',
@@ -627,6 +797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				audio:2,
+				locked:false,
 				trigger:{player:'phaseUseBegin'},
 				filter:function(event,player){
 					return player.countCards('h');
@@ -752,7 +923,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(button){
 						var target=_status.event.target;
 						return [
-							get.effect(target,{name:'wuzhong'},player,player)/2,
+							get.effect(target,{name:'draw'},player,player),
 							get.effect(target,{name:'shunshou_copy2'},player,player),
 							get.recoverEffect(target,player,player),
 						][button.link];
@@ -2191,6 +2362,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//胡班
 			dcchongyi:{
 				audio:2,
+				init:()=>{
+					game.addGlobalSkill('dcchongyi_ai');
+				},
+				onremove:()=>{
+					if(!game.hasPlayer(i=>i.hasSkill('dcchongyi'),true)) game.removeGlobalSkill('dcchongyi_ai');
+				},
 				trigger:{global:'useCard'},
 				logTarget:'player',
 				filter:function(event,player){
@@ -2216,7 +2393,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.addTempSkill('dcchongyi_sha');
 				},
 				group:'dcchongyi_end',
-				global:'dcchongyi_ai',
 				subSkill:{
 					ai:{
 						mod:{
@@ -2232,6 +2408,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								})) return num+10;
 							},
 						},
+						trigger:{player:'dieAfter'},
+						filter:()=>{
+							return !game.hasPlayer(i=>i.hasSkill('dcchongyi'),true);
+						},
+						silent:true,
+						forceDie:true,
+						content:()=>{
+							game.removeGlobalSkill('dcchongyi_ai');
+						}
 					},
 					end:{
 						audio:'dcchongyi',
@@ -4830,7 +5015,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								})) return 3;
 								return Math.sqrt(target.countCards('he'));
 							}
-							if(target.mayHaveShan()&&player.countCards('hs',function(card){
+							if(target.mayHaveShan(player,'use')&&player.countCards('hs',function(card){
 								return !ui.selected.cards.contains(card)&&get.name(card)=='sha'&&player.canUse(card,target)&&get.effect(target,card,player,player)!=0;
 							})) return -Math.sqrt(Math.abs(get.attitude(player,target)))/2;
 							return 0.1;
@@ -5162,7 +5347,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('mouni2');
 					player.chooseTarget(get.prompt2('mouni'),lib.filter.notMe).set('ai',function(target){
 						var player=_status.event.player,cards=player.getCards('h','sha');
-						if(get.attitude(player,target)>=0||!player.canUse(cards[0],target,false)||(!player.hasJudge('lebu')&&target.mayHaveShan()&&!player.hasSkillTag('directHit_ai',true,{
+						if(get.attitude(player,target)>=0||!player.canUse(cards[0],target,false)||(!player.hasJudge('lebu')&&target.mayHaveShan(player,'use')&&!player.hasSkillTag('directHit_ai',true,{
 							target:target,
 							card:cards[0],
 						},true))) return 0;
@@ -8067,8 +8252,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt2('yechou'),function(card,player,target){
 						return player!=target&&target.getDamagedHp()>1
 					}).set('forceDie',true).set('ai',function(target){
-						var num=get.attitude(_status.event.player,target);
-						return -num;
+						let att=get.attitude(_status.event.player,target);
+						if(att>0) return 0;
+						att=Math.sqrt(0.01-att);
+						return att*(get.distance(_status.currentPhase,target,'absolute')||game.players.length);
 					});
 					"step 1"
 					if(result.bool){
@@ -8080,6 +8267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.5,
+					maixie_defend:true
 				},
 			},
 			"yechou2":{
@@ -10989,6 +11177,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starpizhi_info:'锁定技。①一名角色死亡后，若你拥有该角色对应的“玺角”标记，你失去之并摸X张牌。②结束阶段，你摸X张牌。（X为你本局游戏失去的“玺角”标记数）',
 			starzhonggu:'冢骨',
 			starzhonggu_info:'主公技，锁定技。摸牌阶段，若游戏轮数大于等于场上的群势力角色数，则你额外摸两张牌，否则你少摸一张牌。',
+			star_dongzhuo:'星董卓',
+			star_dongzhuo_prefix:'星',
+			starweilin:'威临',
+			starweilin_info:'锁定技。当你于回合内对一名其他角色造成伤害时，若其本回合未受到过伤害，且你本回合使用的牌数大于等于其体力值，则此伤害+1。',
+			starzhangrong:'掌戎',
+			starzhangrong_info:'准备阶段，你可以选择令至多X名体力值大于等于你的角色各失去1点体力或令至多X名手牌数大于等于你的角色各弃置一张手牌。若如此做，你摸等同于选择角色数的牌，且本回合结束时，若这些角色中存在本回合未受到过伤害的角色，则你失去1点体力。',
+			starhaoshou:'豪首',
+			//starhaoshou_info:'主公技。①其他群势力角色使用【酒】结算完毕后，其可以令你回复1点体力。②当你处于濒死状态时，其他群势力角色可以将【酒】当作【桃】对你使用。',
+			starhaoshou_info:'主公技。其他群势力角色使用【酒】结算完毕后，其可以令你回复1点体力。。',
 			
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

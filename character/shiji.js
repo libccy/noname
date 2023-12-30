@@ -364,7 +364,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event.list=list;
 							var num1=0,num2=0,num3=0;
 							for(var target of list){
-								num1+=get.effect(target,{name:'wuzhong'},player,player);
+								num1+=2*get.effect(target,{name:'draw'},player,player);
 								num2+=get.recoverEffect(target,player,player);
 							}
 							trigger.player.chooseControl('摸两张牌','回复体力','cancel2').set('prompt','整肃奖励：请选择'+get.translation(list)+'的整肃奖励').set('ai',function(){
@@ -437,13 +437,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.control=='cancel2'){event.finish();return;}
 							player.chooseTarget('整军：是否令一名其他角色也回复1点体力或摸两张牌？',lib.filter.notMe).set('ai',function(target){
 								var player=_status.event.player;
-								return Math.max(get.effect(target,{name:'wuzhong'},target,player),get.recoverEffect(target,target,player));
+								return Math.max(2*get.effect(target,{name:'draw'},target,player),get.recoverEffect(target,target,player));
 							});
 							'step 2'
 							if(result.bool){
 								var target=result.targets[0];
 								event.target=target;
-								var num1=get.effect(target,{name:'wuzhong'},target,player);
+								var num1=2*get.effect(target,{name:'draw'},target,player);
 								var num2=get.recoverEffect(target,target,player);
 								player.line(target);
 								if(target.isHealthy()) result.index=0;
@@ -1260,7 +1260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spxizhan:{
 				audio:4,
 				group:'spxizhan_effect',
-				locked:true,
+				locked:false,
 				subSkill:{
 					spfangzong:{charlotte:true},
 					effect:{
@@ -2134,7 +2134,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rechuhai:{
 				audio:'chuhai',
 				dutySkill:true,
-				locked:true,
+				locked:false,
 				group:['rechuhai_add','rechuhai_achieve','rechuhai_fail','rechuhai_chuhai'],
 				derivation:'zhangming',
 				subSkill:{
@@ -2276,11 +2276,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				usable:1,
 				filter:function(event,player){
-					return !player.hasSkillTag('noCompareSource');
+					return game.hasPlayer(target=>player.canCompare(target,true));
 				},
 				filterTarget:function(card,player,target){
-					return target!=player&&target.countCards('h')>0&&
-					!target.hasSkillTag('noCompareTarget');
+					return player.canCompare(target,true);
 				},
 				content:function(){
 					'step 0'
@@ -2715,6 +2714,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				dutySkill:true,
 				forced:true,
+				locked:false,
 				direct:true,
 				filter:function(event,player){
 					if(!player.storage.xingqi||!player.storage.xingqi.length) return false;
@@ -3151,7 +3151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qingyu:{
 				audio:3,
 				dutySkill:true,
-				locked:true,
+				locked:false,
 				group:['qingyu_achieve','qingyu_fail','qingyu_defend'],
 				subSkill:{
 					defend:{
@@ -5994,7 +5994,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addGlobalSkill('spshanxi_bj');
 				},
 				onremove:function(player){
-					game.removeGlobalSkill('spshanxi_bj');
+					if(!game.hasPlayer(current=>current.hasSkill('spshanxi'),true)) game.removeGlobalSkill('spshanxi_bj');
 				},
 				trigger:{player:'phaseUseBegin'},
 				direct:true,
