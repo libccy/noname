@@ -32,11 +32,8 @@ export async function boot() {
 
 	// 设定游戏加载时间，超过时间未加载就提醒
 	const configLoadTime = localStorage.getItem(lib.configprefix + 'loadtime');
-	Reflect.set(
-		window,
-		'resetGameTimeout',
-		setTimeout(lib.init.reset, configLoadTime ? parseInt(configLoadTime) : 10000)
-	);
+	// 现在不暴露到全局变量里了，直接传给onload
+	const resetGameTimeout = setTimeout(lib.init.reset, configLoadTime ? parseInt(configLoadTime) : 10000)
 
 	if (Reflect.has(window, 'cordovaLoadTimeout')) {
 		clearTimeout(Reflect.get(window, 'cordovaLoadTimeout'));
@@ -560,7 +557,7 @@ export async function boot() {
 	}
 
 	await waitDomLoad;
-	await onload();
+	await onload(resetGameTimeout);
 }
 
 function initSheet(libConfig) {

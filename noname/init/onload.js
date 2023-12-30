@@ -10,7 +10,7 @@ import { userAgent } from '../util/index.js';
 import * as config from '../util/config.js';
 import { gnc } from '../gnc/index.js';
 
-export async function onload() {
+export async function onload(resetGameTimeout) {
 	const libOnload = lib.onload;
 	delete lib.onload;
 	while (Array.isArray(libOnload) && libOnload.length) {
@@ -699,8 +699,7 @@ export async function onload() {
 	};
 	if (!lib.imported.mode || !lib.imported.mode[lib.config.mode]) {
 		window.inSplash = true;
-		clearTimeout(window.resetGameTimeout);
-		delete window.resetGameTimeout;
+		clearTimeout(resetGameTimeout);
 		var clickedNode = false;
 		var clickNode = function () {
 			if (clickedNode) return;
@@ -728,6 +727,7 @@ export async function onload() {
 				}
 				splash.delete(1000);
 				delete window.inSplash;
+				// 这不好删/m/，顺带lib.init.reset也不好删
 				window.resetGameTimeout = setTimeout(lib.init.reset, 10000);
 
 				this.listenTransition(function () {
