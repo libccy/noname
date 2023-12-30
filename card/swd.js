@@ -3391,10 +3391,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 
 					game.addVideo('judge1',player,[get.cardInfo(card),judgestr,event.videoId]);
 					for(var i=0;i<event.cards.length;i++) event.cards[i].discard();
-					// var node=card.copy('thrown','center',ui.arena).animate('start');
+					// var node=card.copy('thrown','center',ui.arena).addTempClass('start');
 					var node;
 					if(game.chess){
-						node=card.copy('thrown','center',ui.arena).animate('start');
+						node=card.copy('thrown','center',ui.arena).addTempClass('start');
 					}
 					else{
 						node=player.$throwordered(card.copy(),true);

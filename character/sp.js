@@ -3333,7 +3333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event=_status.event;
 						}
 						if(game.chess){
-							event.node=card.copy('thrown','center',ui.arena).animate('start');
+							event.node=card.copy('thrown','center',ui.arena).addTempClass('start');
 						}
 						else{
 							event.node=player.$throwordered(card.copy(),true);

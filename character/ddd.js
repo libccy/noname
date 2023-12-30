@@ -3677,7 +3677,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 7"
 					if(event.iwhile<targets.length){
 						event.target=targets[event.iwhile];
-						event.target.animate('target');
+						event.target.addTempClass('target');
 						event.card2=event.cardlist[event.iwhile];
 						event.num2=event.getNum(event.card2);
 						game.log(event.target,'的拼点牌为',event.card2);

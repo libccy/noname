@@ -226,14 +226,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss.side=true;
 			if(!event.noslide){
 				var rect=event.current.getBoundingClientRect();
-				boss.animate('bossing');
-				boss.node.hp.animate('start');
+				boss.addTempClass('bossing');
+				boss.node.hp.addTempClass('start');
 				boss.bossinginfo=[rect.left+rect.width/2,rect.top+rect.height/2];
 				boss.style.transition='all 0s';
 				boss.node.equips.style.opacity='0';
 			}
 			else{
-				boss.animate('start');
+				boss.addTempClass('start');
 			}
 			boss.setIdentity('zhu');
 			boss.identity='zhu';
@@ -244,7 +244,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			for(var i=0;i<result.links.length;i++){
 				var player=ui.create.player();
 				player.getId();
-				player.init(result.links[i]).animate('start');
+				player.init(result.links[i]).addTempClass('start');
 				player.setIdentity('cai');
 				player.identity='cai';
 				player.side=false;
@@ -279,12 +279,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.getId();
 					player.init(game.bossinfo.minion[i]);
 					if(boss.bossinginfo){
-						player.animate('bossing');
-						player.node.hp.animate('start');
+						player.addTempClass('bossing');
+						player.node.hp.addTempClass('start');
 						player.style.transition='all 0s';
 					}
 					else{
-						player.animate('start');
+						player.addTempClass('start');
 					}
 					player.setIdentity('zhong');
 					player.identity='zhong';
@@ -974,7 +974,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(game.me==player){
 					game.swapControl(boss);
 				}
-				game.players.push(boss.animate('zoominanim'));
+				game.players.push(boss.addTempClass('zoominanim'));
 				game.arrangePlayers();
 				if(!game.boss){
 					game.boss=boss;
@@ -1034,7 +1034,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								var sort=lib.config.sort_card(card);
 								var position=sort>0?player.node.handcards1:player.node.handcards2;
 								card.fix();
-								card.animate('start');
+								card.addTempClass('start');
 								position.insertBefore(card,position.firstChild);
 							}
 							player.update();
@@ -1184,7 +1184,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var node=_status.event.dialog.buttons[0].parentNode;
 						_status.event.dialog.buttons=ui.create.buttons(list.slice(0,20),'character',buttons);
 						_status.event.dialog.content.insertBefore(buttons,node);
-						buttons.animate('start');
+						buttons.addTempClass('start');
 						node.remove();
 
 						game.uncheck();
@@ -1201,7 +1201,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.dialogxx.classList.add('withbg');
 						event.dialogxx.classList.add('fixed');
 						if(ui.cheat2){
-							ui.cheat2.animate('controlpressdownx',500);
+							ui.cheat2.addTempClass('controlpressdownx',500);
 							ui.cheat2.classList.remove('disabled');
 						}
 					};
@@ -1225,11 +1225,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
-									ui.cheat.animate('controlpressdownx',500);
+									ui.cheat.addTempClass('controlpressdownx',500);
 									ui.cheat.classList.remove('disabled');
 								}
 								if(_status.bosschoice){
-									_status.bosschoice.animate('controlpressdownx',500);
+									_status.bosschoice.addTempClass('controlpressdownx',500);
 									_status.bosschoice.classList.remove('disabled');
 								}
 							}
@@ -6462,10 +6462,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					game.addVideo('judge1',player,[get.cardInfo(card),judgestr,event.videoId]);
 					for(var i=0;i<event.cards.length;i++) event.cards[i].discard();
-					// var node=card.copy('thrown','center',ui.arena).animate('start');
+					// var node=card.copy('thrown','center',ui.arena).addTempClass('start');
 					var node;
 					if(game.chess){
-						node=card.copy('thrown','center',ui.arena).animate('start');
+						node=card.copy('thrown','center',ui.arena).addTempClass('start');
 					}
 					else{
 						node=player.$throwordered(card.copy(),true);

@@ -632,7 +632,7 @@ export class Game extends Uninstantable {
 		if (background.startsWith('db:')) uiBackground.setBackgroundDB(background.slice(3));
 		else if (background.startsWith('ext:')) uiBackground.setBackgroundImage(`extension/${background.slice(4)}`);
 		else if (background == 'default') {
-			uiBackground.animate('start');
+			uiBackground.addTempClass('start');
 			style.backgroundImage = 'none';
 		}
 		else if (background.startsWith('custom_')) {
@@ -2831,14 +2831,14 @@ export class Game extends Uninstantable {
 					boss.setIdentity('zhong');
 					boss.identity = 'zhong';
 				}
-				ui.arena.appendChild(boss.animate('zoominanim'));
+				ui.arena.appendChild(boss.addTempClass('zoominanim'));
 			}
 		},
 		stoneSwap: function (info) {
 			var player = ui.create.player();
 			player.classList.add('noidentity');
 			player.dataset.position = info.position;
-			player.animate(info.me ? 'replaceme' : 'replaceenemy');
+			player.addTempClass(info.me ? 'replaceme' : 'replaceenemy');
 			player.actcount = info.actcount;
 			player.init(info.name, info.name2);
 			game.players.push(player);
@@ -3224,7 +3224,7 @@ export class Game extends Uninstantable {
 			if (player && content) {
 				var judging = get.infoCard(content[0]);
 				if (game.chess) {
-					judging.copy('thrown', 'center', 'thrownhighlight', ui.arena).animate('start');
+					judging.copy('thrown', 'center', 'thrownhighlight', ui.arena).addTempClass('start');
 				}
 				else {
 					player.$throwordered(judging.copy('thrownhighlight'), true);
@@ -3238,7 +3238,7 @@ export class Game extends Uninstantable {
 			}
 		},
 		centernode: function (content) {
-			get.infoCard(content).copy('thrown', 'center', 'thrownhighlight', ui.arena).animate('start');
+			get.infoCard(content).copy('thrown', 'center', 'thrownhighlight', ui.arena).addTempClass('start');
 		},
 		judge2: function (videoId) {
 			for (var i = 0; i < ui.dialogs.length; i++) {
@@ -3374,8 +3374,8 @@ export class Game extends Uninstantable {
 				game.me = player;
 				ui.me.lastChild.show();
 				ui.create.fakeme();
-				ui.handcards1 = player.node.handcards1.animate('start').fix();
-				ui.handcards2 = player.node.handcards2.animate('start').fix();
+				ui.handcards1 = player.node.handcards1.addTempClass('start').fix();
+				ui.handcards2 = player.node.handcards2.addTempClass('start').fix();
 				ui.handcards1Container.appendChild(ui.handcards1);
 				ui.handcards2Container.appendChild(ui.handcards2);
 				ui.updatehl();
@@ -3749,8 +3749,8 @@ export class Game extends Uninstantable {
 				game.me.node.handcards1.remove();
 				game.me.node.handcards2.remove();
 
-				ui.handcards1 = player.node.handcards1.animate('start').fix();
-				ui.handcards2 = player.node.handcards2.animate('start').fix();
+				ui.handcards1 = player.node.handcards1.addTempClass('start').fix();
+				ui.handcards2 = player.node.handcards2.addTempClass('start').fix();
 				ui.handcards1Container.insertBefore(ui.handcards1, ui.handcards1Container.firstChild);
 				ui.handcards2Container.insertBefore(ui.handcards2, ui.handcards2Container.firstChild);
 
@@ -3786,8 +3786,8 @@ export class Game extends Uninstantable {
 				game.me.node.handcards1.remove();
 				game.me.node.handcards2.remove();
 				game.me = player;
-				ui.handcards1 = player.node.handcards1.animate('start').fix();
-				ui.handcards2 = player.node.handcards2.animate('start').fix();
+				ui.handcards1 = player.node.handcards1.addTempClass('start').fix();
+				ui.handcards2 = player.node.handcards2.addTempClass('start').fix();
 				ui.handcards1Container.appendChild(ui.handcards1);
 				ui.handcards2Container.appendChild(ui.handcards2);
 
@@ -6618,8 +6618,8 @@ export class Game extends Uninstantable {
 			if (current.isDead()) {
 				current.$die();
 			}
-			ui.handcards1 = player.node.handcards1.animate('start').fix();
-			ui.handcards2 = player.node.handcards2.animate('start').fix();
+			ui.handcards1 = player.node.handcards1.addTempClass('start').fix();
+			ui.handcards2 = player.node.handcards2.addTempClass('start').fix();
 			ui.handcards1Container.appendChild(ui.handcards1);
 			ui.handcards2Container.appendChild(ui.handcards2);
 
@@ -6664,8 +6664,8 @@ export class Game extends Uninstantable {
 		game.me.node.handcards2.remove();
 
 		game.me = player;
-		ui.handcards1 = player.node.handcards1.animate('start').fix();
-		ui.handcards2 = player.node.handcards2.animate('start').fix();
+		ui.handcards1 = player.node.handcards1.addTempClass('start').fix();
+		ui.handcards2 = player.node.handcards2.addTempClass('start').fix();
 		ui.handcards1Container.insertBefore(ui.handcards1, ui.handcards1Container.firstChild);
 		ui.handcards2Container.insertBefore(ui.handcards2, ui.handcards2Container.firstChild);
 		ui.updatehl();
@@ -7340,7 +7340,7 @@ export class Game extends Uninstantable {
 					event.avatars[i].nodename = ui.create.div('.name', event.avatars[i], get.slimName(name));
 					event.avatars[i].nodename.style.fontFamily = lib.config.name_font;
 					event.avatars[i].index = i + event.config.width;
-					event.avatars[i].animate('start');
+					event.avatars[i].addTempClass('start');
 					event.nodes[event.avatars[i].index].style.display = 'none';
 					event.avatars[i].nodename.dataset.nature = get.groupnature(lib.character[name][1]);
 					lib.setIntro(event.avatars[i]);
@@ -8431,7 +8431,7 @@ export class Game extends Uninstantable {
 		players.forEach(value => {
 			if (parseInt(value.dataset.position) >= position) value.dataset.position = parseInt(value.dataset.position) + 1;
 		});
-		const player = ui.create.player(ui.arena).animate('start');
+		const player = ui.create.player(ui.arena).addTempClass('start');
 		if (character) player.init(character, character2);
 		game.players.push(player);
 		player.dataset.position = position;
@@ -8445,7 +8445,7 @@ export class Game extends Uninstantable {
 	 */
 	static addFellow(position, character, animation) {
 		game.addVideo('addFellow', null, [position, character, animation]);
-		const player = ui.create.player(ui.arena).animate(animation || 'start');
+		const player = ui.create.player(ui.arena).addTempClass(animation || 'start');
 		player.dataset.position = position || game.players.length + game.dead.length;
 		player.getId();
 		if (character) player.init(character);
@@ -8479,7 +8479,7 @@ export class Game extends Uninstantable {
 		game.players.push(player);
 		delete player.removed;
 		player.removeAttribute('style');
-		player.animate('start');
+		player.addTempClass('start');
 		ui.arena.appendChild(player);
 		game.arrangePlayers();
 		return player;
@@ -8527,7 +8527,7 @@ export class Game extends Uninstantable {
 		game.players.remove(player);
 		game.dead.remove(player);
 		player.delete();
-		const player2 = ui.create.player(ui.arena).animate('start');
+		const player2 = ui.create.player(ui.arena).addTempClass('start');
 		if (character) player2.init(character, character2);
 		game.players.push(player2);
 		player2.dataset.position = position;

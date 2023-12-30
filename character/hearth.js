@@ -4911,7 +4911,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('xunbao2');
 					game.delay(2);
 
-					event.node=event.card.copy('thrown','center','thrownhighlight',ui.arena).animate('start');
+					event.node=event.card.copy('thrown','center','thrownhighlight',ui.arena).addTempClass('start');
 					ui.arena.classList.add('thrownhighlight');
 					game.addVideo('thrownhighlight1');
 					game.addVideo('centernode',null,get.cardInfo(event.card));
@@ -8629,7 +8629,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(event.list.length){
 						event.current=event.list.shift();
-						event.current.animate('target');
+						event.current.addTempClass('target');
 						var next=event.current.chooseToRespond({name:'sha'});
 						next.ai=function(card){
 							if(get.damageEffect(event.current,player,event.current,'thunder')>=0) return 0;

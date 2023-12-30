@@ -213,7 +213,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			_status.enemyCount=_status.enemylist.length;
 			_status.friendCount=_status.mylist.length;
 			while(_status.mylist.length){
-				friend=ui.create.player().animate('start');
+				friend=ui.create.player().addTempClass('start');
 				friend.getId();
 				if(!event.friendZhu){
 					event.friendZhu=friend;
@@ -244,7 +244,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				lib.posmap[friend.dataset.position]=friend;
 			}
 			while(_status.enemylist.length){
-				enemy=ui.create.player().animate('start');
+				enemy=ui.create.player().addTempClass('start');
 				enemy.getId();
 				enemy.init(_status.enemylist.shift());
 				enemy.side=!side;
@@ -1082,7 +1082,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				$phaseJudge:function(card){
 					game.addVideo('phaseJudge',this,get.cardInfo(card));
-					var clone=card.copy('thrown',this.parentNode).animate('judgestart');
+					var clone=card.copy('thrown',this.parentNode).addTempClass('judgestart');
 					var player=this;
 					clone.style.opacity=0.6;
 					clone.style.left=(Math.random()*100-50+ui.chessContainer.chessLeft+ui.chessContainer.offsetWidth/2-52)+'px';
@@ -1523,7 +1523,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				var player=ui.create.player();
 				player.getId();
 				if(enemy=='treasure'){
-					player.animate('judgestart');
+					player.addTempClass('judgestart');
 					player.side=null;
 					player.identity='neutral';
 					player.setIdentity();
@@ -1534,7 +1534,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.treasures.add(player);
 				}
 				else{
-					player.animate('start');
+					player.addTempClass('start');
 					if(enemy){
 						if(get.mode()=='tafang'){
 							player.side=true;
@@ -1634,7 +1634,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					pos=y*ui.chesswidth+x;
 				}
 				if(!lib.posmap[pos]){
-					var grid=ui.create.div('.player.minskin.obstacle',ui.chess).animate('start');
+					var grid=ui.create.div('.player.minskin.obstacle',ui.chess).addTempClass('start');
 					ui.placeChess(grid,pos);
 					grid.listen(ui.click.obstacle);
 					lib.posmap[pos]=grid;
@@ -2626,21 +2626,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									ui.money.childNodes[1].innerHTML=game.data.dust;
 									game.changeMoney(-100);
 									if(game.data.character.length>3&&selected.character.length){
-										event.removeCharacter.animate('controlpressdownx',500);
+										event.removeCharacter.addTempClass('controlpressdownx',500);
 										event.removeCharacter.classList.remove('disabled');
 									}
 									if(game.data.money<150&&!game.data._arena){
 										event.enterArena.classList.add('disabled');
 									}
 									else{
-										event.enterArena.animate('controlpressdownx',500);
+										event.enterArena.addTempClass('controlpressdownx',500);
 										event.enterArena.classList.remove('disabled');
 									}
 									if(game.data.money<100){
 										event.addCharacter.classList.add('disabled');
 									}
 									else{
-										event.addCharacter.animate('controlpressdownx',500);
+										event.addCharacter.addTempClass('controlpressdownx',500);
 										event.addCharacter.classList.remove('disabled');
 									}
 									initcapt();
@@ -2713,11 +2713,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.data.character.remove(node.link);
 								game.saveData();
 								if(game.data.money>=100){
-									event.addCharacter.animate('controlpressdownx',500);
+									event.addCharacter.addTempClass('controlpressdownx',500);
 									event.addCharacter.classList.remove('disabled');
 								}
 								if(game.data.money>=150){
-									event.enterArena.animate('controlpressdownx',500);
+									event.enterArena.addTempClass('controlpressdownx',500);
 									event.enterArena.classList.remove('disabled');
 								}
 								node.delete();
@@ -2952,7 +2952,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						if(selected.character.length&&game.data.character.length>3){
-							event.removeCharacter.animate('controlpressdownx',500);
+							event.removeCharacter.addTempClass('controlpressdownx',500);
 							event.removeCharacter.classList.remove('disabled');
 						}
 						else{
@@ -2990,14 +2990,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							_status.qianfan=false;
 							event.removeCharacter.replace('遣返',qianfan);
 							if(game.data.money>=100){
-								event.addCharacter.animate('controlpressdownx',500);
+								event.addCharacter.addTempClass('controlpressdownx',500);
 								event.addCharacter.classList.remove('disabled');
 							}
 							else{
 								event.addCharacter.classList.add('disabled');
 							}
 							if(game.data.money>=150||game.data._arena){
-								event.enterArena.animate('controlpressdownx',500);
+								event.enterArena.addTempClass('controlpressdownx',500);
 								event.enterArena.classList.remove('disabled');
 							}
 							else{
@@ -3885,7 +3885,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							else if(dialog.buttons.length<num){
 								for(var i=dialog.buttons.length;i<num;i++){
-									dialog.buttons.push(ui.create.button(list[i],'character',dialog.buttons[0].parentNode).animate('zoom'))
+									dialog.buttons.push(ui.create.button(list[i],'character',dialog.buttons[0].parentNode).addTempClass('zoom'))
 								}
 								game.check();
 							}
@@ -3905,7 +3905,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var node=_status.event.dialog.buttons[0].parentNode;
 						_status.event.dialog.buttons=ui.create.buttons(list.slice(0,parseInt(get.config('battle_number'))*4+parseInt(get.config('replace_number'))+5),'character',buttons);
 						_status.event.dialog.content.insertBefore(buttons,node);
-						buttons.animate('start');
+						buttons.addTempClass('start');
 						node.remove();
 
 						// _status.event.dialog.close();
@@ -3940,7 +3940,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.dialogxx.classList.add('fullheight');
 						event.dialogxx.classList.add('fixed');
 						if(ui.cheat2){
-							ui.cheat2.animate('controlpressdownx',500);
+							ui.cheat2.addTempClass('controlpressdownx',500);
 							ui.cheat2.classList.remove('disabled');
 						}
 					};
@@ -3963,7 +3963,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
-									ui.cheat.animate('controlpressdownx',500);
+									ui.cheat.addTempClass('controlpressdownx',500);
 									ui.cheat.classList.remove('disabled');
 								}
 							}
@@ -5869,7 +5869,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.pause();
 						_status.imchoosing=true;
 						for(var i=0;i<event.grids.length;i++){
-							event.grids[i].animate('start');
+							event.grids[i].addTempClass('start');
 						}
 						event.dialog=ui.create.dialog('选择一个位置放置障碍');
 					}

@@ -3680,7 +3680,7 @@ export class Library extends Uninstantable {
 						right: '靠右',
 					},
 					onclick: function (bool) {
-						if (lib.config.show_history == 'right') ui.window.animate('rightbar2');
+						if (lib.config.show_history == 'right') ui.window.addTempClass('rightbar2');
 						game.saveConfig('show_history', bool);
 						if (_status.video || !_status.prepareArena) return;
 						if (bool == 'left') {
@@ -12444,7 +12444,7 @@ export class Library extends Uninstantable {
 					var pos = state.players[observe || game.onlineID].position;
 					for (var i in state.players) {
 						var info = state.players[i];
-						var player = ui.create.player(ui.arena).animate('start');
+						var player = ui.create.player(ui.arena).addTempClass('start');
 						player.dataset.position = (info.position < pos) ? info.position - pos + parseInt(state.number) : info.position - pos;
 						if (i == observe || i == game.onlineID) {
 							game.me = player;

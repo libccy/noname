@@ -934,7 +934,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								player.dataset.position=dead.dataset.position;
 								player.side=dead.side;
 								player.actcharacterlist=dead.actcharacterlist;
-								player.animate('replaceme');
+								player.addTempClass('replaceme');
 								player.actcount=game.enemy.actcount;
 								player.actcount=dead.actcount;
 								if(_status.double_character){
@@ -994,7 +994,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								player.dataset.position=dead.dataset.position;
 								player.side=dead.side;
 								player.actcharacterlist=dead.actcharacterlist;
-								player.animate('replaceenemy');
+								player.addTempClass('replaceenemy');
 								player.actcount=dead.actcount;
 								if(_status.double_character){
 									player.init(_status.enemylist.shift(),_status.enemylist.shift());
@@ -1495,7 +1495,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var node=_status.event.dialog.buttons[0].parentNode;
 						_status.event.dialog.buttons=ui.create.buttons(list.slice(0,get.config('battle_number')*2+5),'character',buttons);
 						_status.event.dialog.content.insertBefore(buttons,node);
-						buttons.animate('start');
+						buttons.addTempClass('start');
 						node.remove();
 
 						game.uncheck();
@@ -1510,7 +1510,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						lib.onfree.push(function(){
 							event.dialogxx=ui.create.characterDialog('heightset');
 							if(ui.cheat2){
-								ui.cheat2.animate('controlpressdownx',500);
+								ui.cheat2.addTempClass('controlpressdownx',500);
 								ui.cheat2.classList.remove('disabled');
 							}
 							event.dialogxx.style.height=(game.layout=='newlayout'?350:410)+'px';
@@ -1533,7 +1533,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
-									ui.cheat.animate('controlpressdownx',500);
+									ui.cheat.addTempClass('controlpressdownx',500);
 									ui.cheat.classList.remove('disabled');
 								}
 							}

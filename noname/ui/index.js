@@ -9295,7 +9295,7 @@ class Create extends Uninstantable {
 		if (!lib.config.show_replay) {
 			ui.replay.style.display = 'none';
 		}
-		ui.control = ui.create.div('#control', ui.arena).animate('nozoom');
+		ui.control = ui.create.div('#control', ui.arena).addTempClass('nozoom');
 		ui.cardPile = ui.create.div('#cardPile');
 		ui.discardPile = ui.create.div('#discardPile');
 		ui.special = ui.create.div('#special');
@@ -9504,7 +9504,7 @@ class Create extends Uninstantable {
 			_status.auto = true;
 			ui.auto.classList.add('glow');
 			setTimeout(function () {
-				var node = ui.create.pause().animate('start');
+				var node = ui.create.pause().addTempClass('start');
 				node.appendChild(ui.sidebar);
 				node.firstChild.innerHTML = '正在测试';
 				node.removeEventListener('click', ui.click.resume);
@@ -9985,7 +9985,7 @@ class Create extends Uninstantable {
 		}
 		if (!numberOfPlayers) numberOfPlayers = 5;
 		for (let ordinal = 0; ordinal < numberOfPlayers; ordinal++) {
-			const player = ui.create.player().animate('start');
+			const player = ui.create.player().addTempClass('start');
 			game.players.push(player);
 			player.dataset.position = ordinal;
 		}
@@ -10010,7 +10010,7 @@ class Create extends Uninstantable {
 	}
 	static me(hasme) {
 		ui.mebg = ui.create.div('#mebg', ui.arena);
-		ui.me = ui.create.div('#me', ui.arena).animate('start');
+		ui.me = ui.create.div('#me', ui.arena).addTempClass('start');
 		ui.handcards1Container = ui.create.div('#handcards1', ui.me);
 		ui.handcards2Container = ui.create.div('#handcards2', ui.me);
 		ui.arena.classList.remove('nome');
@@ -12527,7 +12527,7 @@ class Click extends Uninstantable {
 		_status.clicked = true;
 		_status.tempunpop = true;
 		this.previousSibling.hide();
-		var node = ui.create.div('.switcher', this.parentNode).animate('start');
+		var node = ui.create.div('.switcher', this.parentNode).addTempClass('start');
 		for (var i = 0; i < this.choice.length; i++) {
 			var choice = ui.create.div('.pointerdiv', node);
 			choice.innerHTML = get.translation(this.choice[i]);
@@ -13020,7 +13020,7 @@ class Click extends Uninstantable {
 			if (_status.event.type == 'phase' && ui.confirm) {
 				ui.confirm.classList.add('removing');
 			}
-			// ui.control.animate('nozoom',100);
+			// ui.control.addTempClass('nozoom',100);
 			event.restore();
 			var cards = event.player.getCards('hej');
 			for (var i = 0; i < cards.length; i++) {
@@ -13801,7 +13801,7 @@ class Click extends Uninstantable {
 		game.pause2();
 		var node = ui.create.pause();
 		if (!node) return;
-		node.animate('start');
+		node.addTempClass('start');
 		ui.sidebar3.innerHTML = '';
 		if (lib.config.show_discardpile) {
 			for (var i = 0; i < ui.discardPile.childNodes.length; i++) {
@@ -14141,7 +14141,7 @@ export class UI extends Uninstantable {
 					stayleft._offset += stayleft.currentLeft;
 
 					if (current_offset != stayleft._offset) {
-						stayleft.animate('controlpressdownx', 500);
+						stayleft.addTempClass('controlpressdownx', 500);
 						stayleft.style.transform = 'translateX(' + stayleft._offset + 'px)';
 					}
 				}
@@ -14159,7 +14159,7 @@ export class UI extends Uninstantable {
 		if (minoffset > offset) offset = minoffset;
 		var control = controls.shift();
 		if (control._offset != offset) {
-			control.animate('controlpressdownx', 500);
+			control.addTempClass('controlpressdownx', 500);
 			control.style.transform = 'translateX(' + offset + 'px)';
 			control._offset = offset;
 		}
@@ -14171,7 +14171,7 @@ export class UI extends Uninstantable {
 				offset += 6;
 			}
 			if (control._offset != offset) {
-				control.animate('controlpressdownx', 500);
+				control.addTempClass('controlpressdownx', 500);
 				control.style.transform = 'translateX(' + offset + 'px)';
 				control._offset = offset;
 			}

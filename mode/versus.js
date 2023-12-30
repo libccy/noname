@@ -738,7 +738,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									var node=_status.event.dialog.buttons[0].parentNode;
 									_status.event.dialog.buttons=ui.create.buttons(list[game.me.identity+'list'].randomGets(8),'character',buttons);
 									_status.event.dialog.content.insertBefore(buttons,node);
-									buttons.animate('start');
+									buttons.addTempClass('start');
 									node.remove();
 									game.uncheck();
 									game.check();
@@ -754,7 +754,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									if(lib.character[name][1]!=game.me.identity) return true;
 								});
 								if(ui.cheat2){
-									ui.cheat2.animate('controlpressdownx',500);
+									ui.cheat2.addTempClass('controlpressdownx',500);
 									ui.cheat2.classList.remove('disabled');
 								}
 							};
@@ -777,7 +777,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										game.uncheck();
 										game.check();
 										if(ui.cheat){
-											ui.cheat.animate('controlpressdownx',500);
+											ui.cheat.addTempClass('controlpressdownx',500);
 											ui.cheat.classList.remove('disabled');
 										}
 									}
@@ -980,7 +980,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							_status.event.dialog.buttons=ui.create.buttons(list[game.me.identity].randomGets(7).concat([event.friendChoice]),'character',buttons);
 							_status.event.dialog.buttons[7].node.name.innerHTML=get.verticalStr('队友选择');
 							_status.event.dialog.content.insertBefore(buttons,node);
-							buttons.animate('start');
+							buttons.addTempClass('start');
 							node.remove();
 							game.uncheck();
 							game.check();
@@ -993,7 +993,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(lib.character[name][1]!=game.me.identity) return true;
 						});
 						if(ui.cheat2){
-							ui.cheat2.animate('controlpressdownx',500);
+							ui.cheat2.addTempClass('controlpressdownx',500);
 							ui.cheat2.classList.remove('disabled');
 						}
 					};
@@ -1016,7 +1016,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
-									ui.cheat.animate('controlpressdownx',500);
+									ui.cheat.addTempClass('controlpressdownx',500);
 									ui.cheat.classList.remove('disabled');
 								}
 							}
@@ -1308,7 +1308,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var node=_status.event.dialog.buttons[0].parentNode;
 							_status.event.dialog.buttons=ui.create.buttons(list.randomGets(7),'characterx',buttons);
 							_status.event.dialog.content.insertBefore(buttons,node);
-							buttons.animate('start');
+							buttons.addTempClass('start');
 							node.remove();
 							game.uncheck();
 							game.check();
@@ -1319,7 +1319,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						lib.onfree.push(function(){
 							event.dialogxx=ui.create.characterDialog('heightset');
 							if(ui.cheat2){
-								ui.cheat2.animate('controlpressdownx',500);
+								ui.cheat2.addTempClass('controlpressdownx',500);
 								ui.cheat2.classList.remove('disabled');
 							}
 						});
@@ -1340,7 +1340,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
-									ui.cheat.animate('controlpressdownx',500);
+									ui.cheat.addTempClass('controlpressdownx',500);
 									ui.cheat.classList.remove('disabled');
 								}
 							}
@@ -1499,7 +1499,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var node=_status.event.dialog.buttons[0].parentNode;
 							_status.event.dialog.buttons=ui.create.buttons(list.randomGets(7),'character',buttons);
 							_status.event.dialog.content.insertBefore(buttons,node);
-							buttons.animate('start');
+							buttons.addTempClass('start');
 							node.remove();
 							game.uncheck();
 							game.check();
@@ -1510,7 +1510,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						lib.onfree.push(function(){
 							event.dialogxx=ui.create.characterDialog('heightset');
 							if(ui.cheat2){
-								ui.cheat2.animate('controlpressdownx',500);
+								ui.cheat2.addTempClass('controlpressdownx',500);
 								ui.cheat2.classList.remove('disabled');
 							}
 						});
@@ -1531,7 +1531,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
-									ui.cheat.animate('controlpressdownx',500);
+									ui.cheat.addTempClass('controlpressdownx',500);
 									ui.cheat.classList.remove('disabled');
 								}
 							}
@@ -2184,7 +2184,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var node=_status.event.dialog.buttons[0].parentNode;
 							_status.event.dialog.buttons=ui.create.buttons(list.slice(0,choice),'character',buttons);
 							_status.event.dialog.content.insertBefore(buttons,node);
-							buttons.animate('start');
+							buttons.addTempClass('start');
 							node.remove();
 
 							// event.check();
@@ -2342,7 +2342,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var buttons=dialog.querySelector('.buttons');
 							var button;
 							for(i=dialog.buttons.length;i<choice;i++){
-								button=ui.create.button(list[i],'character',buttons).animate('zoom')
+								button=ui.create.button(list[i],'character',buttons).addTempClass('zoom')
 								dialog.buttons.push(button);
 								button.style.opacity=1;
 							}
@@ -3787,7 +3787,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(_status.dragged) return;
 				if(this.link==game.me){
 					if(!this.classList.contains('buttonclick')){
-						this.animate('buttonclick');
+						this.addTempClass('buttonclick');
 					}
 				}
 				else if(_status.event.player==game.me&&!_status.auto){

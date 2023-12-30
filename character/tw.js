@@ -5472,7 +5472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(event.players.length){
 						event.current=event.players.shift();
-						event.current.animate('target');
+						event.current.addTempClass('target');
 						player.line(event.current,'green');
 						if(!event.current.countCards('he')||!target.isIn()) event._result={bool:false};
 						else{

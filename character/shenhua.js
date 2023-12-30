@@ -5278,7 +5278,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.currented=[];
 					"step 1"
 					event.currented.push(event.current);
-					event.current.animate('target');
+					event.current.addTempClass('target');
 					event.current.chooseToUse('乱武：使用一张杀或失去1点体力',function(card){
 						if(get.name(card)!='sha') return false;
 						return lib.filter.cardEnabled.apply(this,arguments)

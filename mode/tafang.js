@@ -616,8 +616,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								ui.me.querySelector('.fakeme.avatar').show();
 								ui.me.querySelector('.fakeme.player').show();
 								ui.create.fakeme();
-								ui.handcards1=player.node.handcards1.animate('start').fix();
-								ui.handcards2=player.node.handcards2.animate('start').fix();
+								ui.handcards1=player.node.handcards1.addTempClass('start').fix();
+								ui.handcards2=player.node.handcards2.addTempClass('start').fix();
 								ui.handcards1Container.appendChild(ui.handcards1);
 								ui.handcards2Container.appendChild(ui.handcards2);
 								ui.updatehl();
@@ -633,7 +633,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							for(var i=ui.chesswidth;i<size;i++){
 								if(!lib.posmap[i.toString()]){
 									var grid=ui.create.div('.player.minskin.playerblank.glow',clickGrid,ui.chess);
-									grid.animate('start');
+									grid.addTempClass('start');
 									ui.placeChess(grid,i);
 									event.playergrids.push(grid);
 								}
@@ -925,7 +925,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i in lib.tafang.map){
 						createScene(i);
 					}
-					ui.window.appendChild(sceneview.animate('start'));
+					ui.window.appendChild(sceneview.addTempClass('start'));
 					game.pause();
 				});
 			},

@@ -3036,7 +3036,7 @@ export const Content = {
 				}
 			}
 			else {
-				ui.control.animate('nozoom', 100);
+				ui.control.addTempClass('nozoom', 100);
 				event._aiexclude.add(event.buttoned);
 			}
 			event.goto(0);
@@ -3230,7 +3230,7 @@ export const Content = {
 				}
 			}
 			else {
-				ui.control.animate('nozoom', 100);
+				ui.control.addTempClass('nozoom', 100);
 				event._aiexclude.add(event.buttoned);
 			}
 			event.goto(0);
@@ -3834,7 +3834,7 @@ export const Content = {
 		event.cardlist.forEach((card, index) => {
 			game.log(targets[index], '的拼点牌为', card);
 		});
-		player.animate('target');
+		player.addTempClass('target');
 		game.delay(0, 1000);
 		'step 5';
 		event.target = null;
@@ -3842,7 +3842,7 @@ export const Content = {
 		'step 6';
 		if (event.iwhile < targets.length) {
 			event.target = targets[event.iwhile];
-			event.target.animate('target');
+			event.target.addTempClass('target');
 			event.card2 = event.cardlist[event.iwhile];
 			event.num2 = event.getNum(event.card2);
 			//event.tempplayer.line(event.target);
@@ -3996,8 +3996,8 @@ export const Content = {
 		"step 5";
 		if (event.iwhile < targets.length) {
 			event.target = targets[event.iwhile];
-			event.target.animate('target');
-			player.animate('target');
+			event.target.addTempClass('target');
+			player.addTempClass('target');
 			event.card2 = event.cardlist[event.iwhile];
 			event.num2 = event.getNum(event.card2);
 			game.log(event.target, '的拼点牌为', event.card2);
@@ -4746,7 +4746,7 @@ export const Content = {
 		}
 		if (event.result.bool && event.animate !== false) {
 			for (var i = 0; i < event.result.targets.length; i++) {
-				event.result.targets[i].animate('target');
+				event.result.targets[i].addTempClass('target');
 			}
 		}
 		if (event.dialog) event.dialog.close();
@@ -4806,7 +4806,7 @@ export const Content = {
 		event.resume();
 		if (event.result.bool && event.animate !== false) {
 			for (var i = 0; i < event.result.targets.length; i++) {
-				event.result.targets[i].animate('target');
+				event.result.targets[i].addTempClass('target');
 			}
 		}
 		if (event.dialog) event.dialog.close();
@@ -6105,12 +6105,12 @@ export const Content = {
 						targets.sortBySeat((_status.currentPhase || player));
 					}
 					if (animate) for (var i = 0; i < targets.length; i++) {
-						targets[i].animate('target');
+						targets[i].addTempClass('target');
 					}
 				}
 				else if (animate) {
 					for (var i = 0; i < targets.length; i++) {
-						targets[i].animate('target');
+						targets[i].addTempClass('target');
 					}
 				}
 			}
@@ -6329,10 +6329,10 @@ export const Content = {
 		if (next.target && !info.multitarget) {
 			if (num == 0 && targets.length > 1) {
 				// var ttt=next.target;
-				// setTimeout(function(){ttt.animate('target');},0.5*lib.config.duration);
+				// setTimeout(function(){ttt.addTempClass('target');},0.5*lib.config.duration);
 			}
 			else {
-				next.target.animate('target');
+				next.target.addTempClass('target');
 			}
 		}
 		if (!info.nodelay && num > 0) {
@@ -6608,7 +6608,7 @@ export const Content = {
 				delete lib.tempSortSeat;
 			}
 			for (var i = 0; i < targets.length; i++) {
-				targets[i].animate('target');
+				targets[i].addTempClass('target');
 			}
 		}
 		next.target = targets[num];
@@ -6617,10 +6617,10 @@ export const Content = {
 		if (next.target && !info.multitarget) {
 			if (num == 0 && targets.length > 1) {
 				// var ttt=next.target;
-				// setTimeout(function(){ttt.animate('target');},0.5*lib.config.duration);
+				// setTimeout(function(){ttt.addTempClass('target');},0.5*lib.config.duration);
 			}
 			else {
-				next.target.animate('target');
+				next.target.addTempClass('target');
 			}
 		}
 		if (num == 0) {
@@ -8131,7 +8131,7 @@ export const Content = {
 				event = _status.event;
 			}
 			if (game.chess) {
-				event.node = card.copy('thrown', 'center', ui.arena).animate('start');
+				event.node = card.copy('thrown', 'center', ui.arena).addTempClass('start');
 			}
 			else {
 				event.node = player.$throwordered(card.copy(), true);

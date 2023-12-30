@@ -5,22 +5,22 @@ import { Game as game } from '../game/index.js';
 import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 
-HTMLDivElement.prototype.animate = function (name, time) {
-	// 兼容原先的Div.animate
-	if (Array.isArray(name) || get.objtype(name) == 'object') {
-		return Element.prototype.animate.call(this, name, time);
+// 废弃覆盖原型的HTMLDivElement.prototype.animate
+// 改为HTMLDivElement.prototype.addTempClass
+HTMLDivElement.prototype.animate = function (keyframes, options) {
+	if (typeof keyframes == 'string') {
+		console.warn(this, '无名杀开发者修改的animate方法已废弃，请改为使用addTempClass方法');
+		return HTMLDivElement.prototype.addTempClass.call(this, keyframes, options);
 	}
-	var that;
-	if (get.is.mobileMe(this) && name == 'target') {
-		that = ui.mebg;
-	}
-	else {
-		that = this;
-	}
+	else return HTMLElement.prototype.animate.call(this, keyframes, options);
+};
+
+HTMLDivElement.prototype.addTempClass = function (name, time = 1000) {
+	let that = get.is.mobileMe(this) && name == 'target' ? ui.mebg : this;
 	that.classList.add(name);
-	setTimeout(function () {
+	setTimeout(() => {
 		that.classList.remove(name);
-	}, time || 1000);
+	}, time);
 	return this;
 };
 HTMLDivElement.prototype.hide = function () {

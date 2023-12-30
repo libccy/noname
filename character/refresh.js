@@ -6779,7 +6779,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					if(event.players.length){
 						event.current=event.players.shift();
-						event.current.animate('target');
+						event.current.addTempClass('target');
 						player.line(event.current,'green');
 						if(event.current.countCards('he')&&target.isIn()){
 							event.current.chooseToDiscard({subtype:'equip1'},'he','弃置一张武器牌或让'+
@@ -8790,7 +8790,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							event=_status.event;
 						}
 						if(game.chess){
-							event.node=card.copy('thrown','center',ui.arena).animate('start');
+							event.node=card.copy('thrown','center',ui.arena).addTempClass('start');
 						}
 						else{
 							event.node=player.$throwordered(card.copy(),true);
@@ -13446,9 +13446,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.card=get.cards()[0];
 					game.broadcast(function(card){
 						ui.arena.classList.add('thrownhighlight');
-						card.copy('thrown','center','thrownhighlight',ui.arena).animate('start');
+						card.copy('thrown','center','thrownhighlight',ui.arena).addTempClass('start');
 					},event.card);
-					event.node=event.card.copy('thrown','center','thrownhighlight',ui.arena).animate('start');
+					event.node=event.card.copy('thrown','center','thrownhighlight',ui.arena).addTempClass('start');
 					ui.arena.classList.add('thrownhighlight');
 					game.addVideo('thrownhighlight1');
 					game.addVideo('centernode',null,get.cardInfo(event.card));

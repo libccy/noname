@@ -520,7 +520,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 					player.line(list1);
 					for(var i=0;i<list1.length;i++){
-						list1[i].animate('target');
+						list1[i].addTempClass('target');
 					}
 					setTimeout(function(){
 						var list11=list1.slice(0);

@@ -4514,7 +4514,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var target=targets.shift();
 							event.target=target;
 							if(target.isIn()){
-								target.animate('target');
+								target.addTempClass('target');
 								target.chooseCard('h',num,'将'+get.cnNumber(num)+'张牌置入弃牌堆，或受到1点伤害').set('ai',function(card){
 									var evt=_status.event.getParent();
 									if(get.damageEffect(evt.target,evt.player,evt.target)>=0) return 0;
@@ -13913,7 +13913,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 							},get.config('onlyguozhanexpand')?'expandall':undefined,get.config('onlyguozhan')?'onlypack:mode_guozhan':undefined);
 							if(ui.cheat2){
-								ui.cheat2.animate('controlpressdownx',500);
+								ui.cheat2.addTempClass('controlpressdownx',500);
 								ui.cheat2.classList.remove('disabled');
 							}
 						};
@@ -13936,7 +13936,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									game.uncheck();
 									game.check();
 									if(ui.cheat){
-										ui.cheat.animate('controlpressdownx',500);
+										ui.cheat.addTempClass('controlpressdownx',500);
 										ui.cheat.classList.remove('disabled');
 									}
 								}
@@ -13977,7 +13977,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								var node=_status.event.dialog.buttons[0].parentNode;
 								_status.event.dialog.buttons=ui.create.buttons(list,'character',buttons);
 								_status.event.dialog.content.insertBefore(buttons,node);
-								buttons.animate('start');
+								buttons.addTempClass('start');
 								node.remove();
 								game.uncheck();
 								game.check();
