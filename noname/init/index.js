@@ -10,6 +10,8 @@ import { userAgent } from '../util/index.js';
 import * as config from '../util/config.js';
 import { gnc } from '../gnc/index.js';
 
+import { onload } from './onload.js';
+
 // 无名杀，启动！
 export async function boot() {
 	// 不想看，反正别动
@@ -557,7 +559,7 @@ export async function boot() {
 	}
 
 	await waitDomLoad;
-	lib.init.onload();
+	await onload();
 }
 
 /**
