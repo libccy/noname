@@ -9182,7 +9182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(get.prompt2('juetao'),lib.filter.notMe).set('ai',function(target){
 						let att=-get.attitude(_status.event.player,target);
-						if(att<=0) return -att;
+						if(att<=0) return att;
 						if(target.hasSkillTag('nodamage')) return 0.01*att;
 						if(target.getEquip('tengjia')||target.getEquip('renwang')) return 0.2*att;
 						if(target.getEquip('bugua')) return 0.3*att;
