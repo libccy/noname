@@ -277,16 +277,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.getHp()) return false;
 					if(event.name=='loseAsync'&&event.type!='gain') return false;
+					if(player.hasSkill('dcsbmengmou_true')&&player.hasSkill('dcsbmengmou_false')) return false;
 					var cards1=event.getl(player).cards2,cards2=event.getg(player);
-					return (!player.hasSkill('dcsbmengmou_true')&&game.hasPlayer(function(current){
+					return game.hasPlayer(function(current){
 						if(current==player) return false;
 						var cardsx=event.getg(current);
 						return cardsx.some(i=>cards1.includes(i));
-					}))||(!player.hasSkill('dcsbmengmou_false')&&game.hasPlayer(function(current){
+					})||game.hasPlayer(function(current){
 						if(current==player) return false;
 						var cardsx=event.getl(current).cards2;
 						return cards2.some(i=>cardsx.includes(i));
-					}));
+					});
 				},
 				direct:true,
 				content:function*(event,map){
@@ -296,12 +297,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var targets=[],num=player.getHp();
 					var cards1=trigger.getl(player).cards2;
 					var cards2=trigger.getg(player);
-					if(!player.hasSkill('dcsbmengmou_true')) targets.addArray(game.filterPlayer(function(current){
+					targets.addArray(game.filterPlayer(function(current){
 						if(current==player) return false;
 						var cardsx=trigger.getg(current);
 						return cardsx.some(i=>cards1.includes(i));
 					}));
-					if(!player.hasSkill('dcsbmengmou_false')) targets.addArray(game.filterPlayer(function(current){
+					targets.addArray(game.filterPlayer(function(current){
 						if(current==player) return false;
 						var cardsx=trigger.getl(current).cards2;
 						return cards2.some(i=>cardsx.includes(i));
