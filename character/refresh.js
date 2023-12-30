@@ -10008,13 +10008,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			repojun3:{
 				audio:'repojun',
 				trigger:{source:'damageBegin1'},
+				filter:function(event,player){
+					var target=event.player;
+					return event.card&&event.card.name=='sha'&&player.countCards('h')>=target.countCards('h')&&player.countCards('e')>=target.countCards('e');
+				},
 				forced:true,
 				locked:false,
 				logTarget:'player',
-				filter:function(event,player){
-					var target=event.player;
-					return event.getParent().name=='sha'&&player.countCards('h')>=target.countCards('h')&&player.countCards('e')>=target.countCards('e');
-				},
 				content:function(){
 					trigger.num++;
 				},
@@ -15021,7 +15021,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			repojun:'破军',
 			repojun2:'破军',
 			repojun3:'破军',
-			repojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上（X为其体力值），然后其于当前回合结束时获得这些牌。当你因执行【杀】的效果而对一名角色造成伤害时，若该角色的手牌数和装备区内的牌数均不大于你，则此伤害+1。',
+			repojun_info:'当你使用【杀】指定目标后，你可以将其的至多X张牌置于其武将牌上（X为其体力值），然后其于当前回合结束时获得这些牌。当你使用【杀】对一名角色造成伤害时，若该角色的手牌数和装备区内的牌数均不大于你，则此伤害+1。',
 			rexianzhen:'陷阵',
 			rexianzhen_info:'出牌阶段限一次，你可以和一名其他角色拼点。若你赢，你本回合内对其使用牌没有次数和距离限制且无视其防具。若你没赢，你本回合内不能使用【杀】。若你以此法失去的拼点牌为【杀】，则你的【杀】不计入本回合的手牌上限。',
 			rejinjiu:'禁酒',

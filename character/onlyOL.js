@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		character:{
 			ol_sb_jiangwei:['male','shu',4,['olsbzhuri','olsbranji']],
-			ol_caozhang:['male','wei',4,['oljiangchi']],
+			ol_caozhang:['male','wei',4,['oljiangchi'],['die_audio:xin_caozhang']],
 			ol_jianyong:['male','shu',3,['olqiaoshui','jyzongshi'],['tempname:re_jianyong','die_audio:re_jianyong']],
 			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong']],
 		},
@@ -185,7 +185,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//界曹彰
 			oljiangchi:{
-				audio:2,
+				audio:'rejiangchi',
 				trigger:{player:'phaseDrawEnd'},
 				direct:true,
 				content:function*(event,map){
