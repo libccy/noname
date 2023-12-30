@@ -11,7 +11,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			onlyOL:{
-				onlyOL_yijiang1:['ol_caozhang','ol_jianyong','ol_lingtong'],
+				onlyOL_yijiang1:['ol_jianyong','ol_lingtong'],
+				onlyOL_yijiang2:['ol_caozhang'],
 				onlyOL_sb:['ol_sb_jiangwei'],
 			},
 		},
@@ -355,6 +356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kunfenx_info:'结束阶段开始时，你可以失去1点体力，然后摸两张牌。',
 
 			onlyOL_yijiang1:'OL专属·将1',
+			onlyOL_yijiang2:'OL专属·将2',
 			onlyOL_sb:'OL专属·上兵伐谋',
 		},
 	};
