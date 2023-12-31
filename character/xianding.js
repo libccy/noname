@@ -4725,7 +4725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(num>1&&player.hp+player.hujia>2) return 0;
 						if(target==player){
 							if(num) return -get.value(button.link,target);
-							if(ui.cardPile.childNodes.length>80) return 6-get.value(card,player);
+							if(ui.cardPile.childNodes.length>80) return 6-get.value(button.link,player);
 							return 0;
 						}
 						var val=get.buttonValue(button);
