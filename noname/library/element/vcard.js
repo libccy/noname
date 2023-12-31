@@ -7,10 +7,10 @@ import { UI as ui } from '../../ui/index.js';
 
 export class VCard {
 	/**
-	 * @param {any} [suitOrCard]
-	 * @param {number | import('./card.js').Card[]} [numberOrCards]
-	 * @param {string} [name]
-	 * @param {string} [nature]
+	 * @param { any } [suitOrCard]
+	 * @param { number | Card[] } [numberOrCards]
+	 * @param { string } [name]
+	 * @param { string } [nature]
 	 */
 	constructor(suitOrCard, numberOrCards, name, nature) {
 		if (Array.isArray(suitOrCard)) {
@@ -66,7 +66,7 @@ export class VCard {
 			if (Array.isArray(numberOrCards)) {
 				const noCards = !this.cards;
 				/**
-				 * @type {import('./card.js').Card[]}
+				 * @type { Card[] }
 				 */
 				this.cards = numberOrCards.slice();
 				if (noCards) {
@@ -108,7 +108,7 @@ export class VCard {
 		return get.name(this) != get.name(card);
 	}
 	/**
-	 * @param {Player} player
+	 * @param { Player } player
 	 */
 	hasNature(nature, player) {
 		const natures = get.natureList(this, player);

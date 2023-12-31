@@ -1,10 +1,10 @@
 /**
  * @typedef {{
- * 	cardMove:(import('../library/index.js').GameEventPromise)[], 
- * 	custom: (import('../library/index.js').GameEventPromise)[], 
- * 	useCard: (import('../library/index.js').GameEventPromise)[], 
- * 	changeHp: (import('../library/index.js').GameEventPromise)[],
- * 	everything: (import('../library/index.js').GameEventPromise)[] 
+ * 	cardMove:GameEventPromise[], 
+ * 	custom: GameEventPromise[], 
+ * 	useCard: GameEventPromise[], 
+ * 	changeHp: GameEventPromise[],
+ * 	everything: GameEventPromise[] 
  * }} History
  * @typedef { { type: string, player?: string, content?: string | any[], delay: number } } Video
  * @typedef { { mode: string, name: string[], name1: string, name2?: string, time: number, video: Video, win: boolean } } Videos
@@ -23,16 +23,16 @@ export class Game extends Uninstantable {
 	static onlineID = null;
 	static onlineKey = null;
 	/**
-	 * @type {import('../library/index.js').Player[]}
+	 * @type {Player[]}
 	 */
 	static players = [];
 	/**
-	 * @type {import('../library/index.js').Player[]}
+	 * @type {Player[]}
 	 */
 	static dead = [];
 	static imported = [];
 	/**
-	 * @type { { [key: string]: import('../library/index.js').Player } }
+	 * @type { { [key: string]: Player } }
 	 */
 	static playerMap = {};
 	static phaseNumber = 0;
@@ -664,8 +664,8 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * 为牌添加知情者
-	 * @param { import('../library/index.js').Card[] | import('../library/index.js').Card } cards 
-	 * @param { import('../library/index.js').Player[] } players 
+	 * @param { Card[] | Card } cards 
+	 * @param { Player[] } players 
 	 */
 	static addCardKnower(cards, players) {
 		if (get.itemtype(cards) == 'card') {
@@ -677,7 +677,7 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * 移除牌的所有知情者。
-	 * @param { import('../library/index.js').Card[] | import('../library/index.js').Card } cards
+	 * @param { Card[] | Card } cards
 	 */
 	static clearCardKnowers(cards) {
 		// @ts-ignore
@@ -775,8 +775,8 @@ export class Game extends Uninstantable {
 	/**
 	 * @template { keyof History } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
 	 * @returns { boolean }
 	 */
 	static hasGlobalHistory(key, filter, last) {
@@ -799,8 +799,8 @@ export class Game extends Uninstantable {
 	/**
 	 * @template { keyof History } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last] 
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last] 
 	 * @returns { void }
 	 */
 	static checkGlobalHistory(key, filter, last) {
@@ -828,8 +828,8 @@ export class Game extends Uninstantable {
 	 * @template { keyof History } T
 	 * @overload
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } [filter]
-	 * @param { import('../library/index.js').GameEventPromise } [last] 
+	 * @param { (event: GameEventPromise) => boolean } [filter]
+	 * @param { GameEventPromise } [last] 
 	 * @returns { History[T] }
 	 */
 	static getGlobalHistory(key, filter, last) {
@@ -850,8 +850,8 @@ export class Game extends Uninstantable {
 	/**
 	 * @template { keyof History } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last] 
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last] 
 	 * @returns { boolean }
 	 */
 	static hasAllGlobalHistory(key, filter, last) {
@@ -874,8 +874,8 @@ export class Game extends Uninstantable {
 	/**
 	 * @template { keyof History } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last] 
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last] 
 	 * @returns { void }
 	 */
 	static checkAllGlobalHistory(key, filter, last) {
@@ -905,8 +905,8 @@ export class Game extends Uninstantable {
 	 * @template { keyof History } T
 	 * @overload
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } [filter]
-	 * @param { import('../library/index.js').GameEventPromise } [last] 
+	 * @param { (event: GameEventPromise) => boolean } [filter]
+	 * @param { GameEventPromise } [last] 
 	 * @returns { History[T] }
 	 */
 	static getAllGlobalHistory(key, filter, last) {
@@ -937,13 +937,13 @@ export class Game extends Uninstantable {
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Card } cards 
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @param { Card } cards 
+	 * @returns { GameEventPromise }
 	 */
 	/**
 	 * @overload
-	 * @param {import('../library/index.js').Card[]} cards 
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @param {Card[]} cards 
+	 * @returns { GameEventPromise }
 	 */
 	static cardsDiscard(cards) {
 		/** @type { 'cards' | 'card' | void } */
@@ -965,13 +965,13 @@ export class Game extends Uninstantable {
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Card } cards 
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @param { Card } cards 
+	 * @returns { GameEventPromise }
 	 */
 	/**
 	 * @overload
-	 * @param {import('../library/index.js').Card[]} cards 
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @param {Card[]} cards 
+	 * @returns { GameEventPromise }
 	 */
 	static cardsGotoOrdering(cards) {
 		/** @type { 'cards' | 'card' | void } */
@@ -989,15 +989,15 @@ export class Game extends Uninstantable {
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Card } cards 
+	 * @param { Card } cards 
 	 * @param { 'toRenku' | false } [bool] 为false时不触发trigger，为'toRenku'时牌放到仁库
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	/**
 	 * @overload
-	 * @param {import('../library/index.js').Card[]} cards 
+	 * @param {Card[]} cards 
 	 * @param { 'toRenku' | false } [bool] 为false时不触发trigger，为'toRenku'时牌放到仁库
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	static cardsGotoSpecial(cards, bool) {
 		/** @type { 'cards' | 'card' | void } */
@@ -1014,8 +1014,8 @@ export class Game extends Uninstantable {
 	/**
 	 * 
 	 * @param {...(
-	 * 	import('../library/index.js').Card[] | 
-	 * 	import('../library/index.js').Card | 
+	 * 	Card[] | 
+	 * 	Card | 
 	 * 	Function |
 	 * 	'insert' | 'washCard' | 'triggeronly' |
 	 * 	[string, any]
@@ -1024,7 +1024,7 @@ export class Game extends Uninstantable {
 	 */
 	static cardsGotoPile(...args) {
 		/**
-		 * @type { import('../library/index.js').Card[] }
+		 * @type { Card[] }
 		 */
 		const cards = [];
 		const next = game.createEvent('cardsGotoPile');
@@ -1060,7 +1060,7 @@ export class Game extends Uninstantable {
 		return next;
 	}
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } event 
+	 * @param { GameEventPromise } event 
 	 */
 	static $cardsGotoPile(event) {
 		const cards = event.cards;
@@ -1115,7 +1115,7 @@ export class Game extends Uninstantable {
 	/**
 	 * 
 	 * @param { string } url 
-	 * @param { import('../library/index.js').Player } [player] 
+	 * @param { Player } [player] 
 	 */
 	static changeLand(url, player) {
 		game.addVideo('changeLand', player, url);
@@ -1219,7 +1219,7 @@ export class Game extends Uninstantable {
 		}
 	}
 	/**
-	 * @param  {...(import('../library/index.js').Player[] | import('../library/index.js').Player)} args 
+	 * @param  {...(Player[] | Player)} args 
 	 */
 	static replaceHandcards(...args) {
 		var next = game.createEvent('replaceHandcards');
@@ -1696,7 +1696,7 @@ export class Game extends Uninstantable {
 	* @typedef {[string,number]|string|number|boolean} audioInfo
 	* @typedef {{audio: audioInfo, audioname?:string[], audioname2?:{[playerName: string]: audioInfo}}} skillInfo
 	* @param { string } skill  技能名
-	* @param { import('../library/index.js').Player | string } [player]  角色/角色名
+	* @param { Player | string } [player]  角色/角色名
 	* @param { skillInfo | audioInfo } [skillInfo]  预设的skillInfo/audioInfo(转为skillInfo)，覆盖lib.skill[skill]
 	* @returns { string[] }  语音地址列表
 	* @example
@@ -1829,10 +1829,10 @@ export class Game extends Uninstantable {
 	/**
 	 * 
 	 * @param { string } skill 
-	 * @param { import('../library/index.js').Player | string } player 
+	 * @param { Player | string } player 
 	 * @param { boolean } [directaudio] 
 	 * @param { boolean } [nobroadcast] 
-	 * @param { import('../library/index.js').['lib']['skill'] } [skillInfo] 
+	 * @param { ['lib']['skill'] } [skillInfo] 
 	 * @returns 
 	 */
 	static trySkillAudio(skill, player, directaudio, nobroadcast, skillInfo) {
@@ -1907,8 +1907,8 @@ export class Game extends Uninstantable {
 		ui.window.appendChild(audio);
 	}
 	/**
-	 * @param { string | import('../library/index.js').Card } card 
-	 * @param { import('../library/index.js').Player | import('../library/index.js').Sex } sex 
+	 * @param { string | Card } card 
+	 * @param { Player | Sex } sex 
 	 */
 	static playCardAudio(card, sex) {
 		if (typeof card === 'string') {
@@ -1978,12 +1978,12 @@ export class Game extends Uninstantable {
 	/**
 	 * @param { string } type 
 	 * @param {(
-	 * 	lib: import('../library/index.js')['Library'],
+	 * 	lib: Library,
 	 * 	game: typeof Game,
-	 * 	ui: import('../ui/index.js')['UI'],
-	 * 	get: import('../get/index.js')['Get'],
-	 * 	ai: import('../ai/index.js')['AI'],
-	 * _status: import('../status/index.js')['_status']
+	 * 	ui: UI,
+	 * 	get: Get,
+	 * 	ai: AI,
+	 * _status: Status
 	 * ) => any } content 
 	 * @param {*} [url] 
 	 * @returns 
@@ -4515,8 +4515,8 @@ export class Game extends Uninstantable {
 	/**
 	 * @param { string } name 
 	 * @param { string } skill 
-	 * @param { import('../library/index.js').Player } player 
-	 * @param { import('../library/index.js').GameEventPromise } event 
+	 * @param { Player } player 
+	 * @param { GameEventPromise } event 
 	 */
 	static createTrigger(name, skill, player, event) {
 		let info = get.info(skill);
@@ -4537,7 +4537,7 @@ export class Game extends Uninstantable {
 	 * 
 	 * @param { string } name 
 	 * @param { false } [trigger]
-	 * @param { import('../library/index.js').GameEventPromise } [triggerEvent] 
+	 * @param { GameEventPromise } [triggerEvent] 
 	 */
 	static createEvent(name, trigger, triggerEvent) {
 		const next = (new lib.element.GameEvent(name, trigger)).toPromise();
@@ -4546,7 +4546,7 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @param { string } name 
-	 * @param { { extension: string, sex: import('../library/index.js').Sex, group: string, hp: string | number, skills?: string[], tags?: any[], translate: string } } information 
+	 * @param { { extension: string, sex: Sex, group: string, hp: string | number, skills?: string[], tags?: any[], translate: string } } information 
 	 */
 	static addCharacter(name, information) {
 		const extensionName = _status.extension || information.extension, character = [
@@ -4568,7 +4568,7 @@ export class Game extends Uninstantable {
 		lib.translate[`${packName}_character_config`] = extensionName;
 	}
 	/**
-	 * @param { { mode?: string, forbid?: any, character: { [key: string]: import('../library/index.js').Character }, skill: { [key: string]: object }, [key: string]: any } } pack 
+	 * @param { { mode?: string, forbid?: any, character: { [key: string]: Character }, skill: { [key: string]: object }, [key: string]: any } } pack 
 	 * @param { string } [packagename] 
 	 */
 	static addCharacterPack(pack, packagename) {
@@ -4624,7 +4624,7 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @param { string } name 
-	 * @param { import('../library/index.js').Card } info 
+	 * @param { Card } info 
 	 * @param { { extension: string, translate: string, description: string, number?: number, color?: string } } info2 
 	 */
 	static addCard(name, info, info2) {
@@ -4671,7 +4671,7 @@ export class Game extends Uninstantable {
 		lib.cardPack[packname].push(name);
 	}
 	/**
-	 * @param { { extension: string, mode?: string[], forbid?: string[], list: any[], card: {[key: string]: import('../library/index.js').Card}, skill: { [key: string]: object }  } } pack 
+	 * @param { { extension: string, mode?: string[], forbid?: string[], list: any[], card: {[key: string]: Card}, skill: { [key: string]: object }  } } pack 
 	 * @param { string } [packagename] 
 	 */
 	static addCardPack(pack, packagename) {
@@ -4783,7 +4783,7 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @param { string } skill 
-	 * @param { import('../library/index.js').Player } [player] 
+	 * @param { Player } [player] 
 	 */
 	static addGlobalSkill(skill, player) {
 		let info = lib.skill[skill];
@@ -4930,11 +4930,11 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @overload
-	 * @returns { import('../library/index.js').Card }
+	 * @returns { Card }
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Card | string } name 
+	 * @param { Card | string } name 
 	 * @param { string } suit 
 	 * @param { number } number 
 	 * @param { string } nature 
@@ -4984,11 +4984,11 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @overload
-	 * @returns { import('../library/index.js').Card }
+	 * @returns { Card }
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Card | string } name 
+	 * @param { Card | string } name 
 	 * @param { string } suit 
 	 * @param { number } number 
 	 * @param { string } nature 
@@ -5655,7 +5655,7 @@ export class Game extends Uninstantable {
 		}
 	}
 	/**
-	 * @type { Map<import('../library/index.js').GameEvent, Promise<any>> }
+	 * @type { Map<GameEvent, Promise<any>> }
 	 * 
 	 * 以Promise储存异步事件的执行链，使async content调用事件时无需必须使用await
 	 * 
@@ -5663,7 +5663,7 @@ export class Game extends Uninstantable {
 	 */
 	static executingAsyncEventMap = new Map();
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } [belongAsyncEvent]
+	 * @param { GameEventPromise } [belongAsyncEvent]
 	 */
 	static async loop(belongAsyncEvent) {
 		if (belongAsyncEvent) {
@@ -5828,7 +5828,7 @@ export class Game extends Uninstantable {
 		}
 	}
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } [belongAsyncEvent]
+	 * @param { GameEventPromise } [belongAsyncEvent]
 	 */
 	static runContent(belongAsyncEvent) {
 		return new Promise(resolve => {
@@ -6033,7 +6033,7 @@ export class Game extends Uninstantable {
 		return game.asyncDelay(time, time2);
 	}
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } event 
+	 * @param { GameEventPromise } [event] 
 	 */
 	static check(event) {
 		let i, j, range;
@@ -6520,8 +6520,8 @@ export class Game extends Uninstantable {
 		_status.dragline.length = 0;
 	}
 	/**
-	 * @param { import('../library/index.js').Player } player1 
-	 * @param { import('../library/index.js').Player } player2 
+	 * @param { Player } player1 
+	 * @param { Player } player2 
 	 * @param { boolean } [prompt] 
 	 * @param { boolean } [behind] 
 	 * @param { boolean } [noanimate] 
@@ -6585,8 +6585,8 @@ export class Game extends Uninstantable {
 		}
 	}
 	/**
-	 * @param { import('../library/index.js').Player } player1 
-	 * @param { import('../library/index.js').Player } [player2] 
+	 * @param { Player } player1 
+	 * @param { Player } [player2] 
 	 */
 	static swapPlayer(player, player2) {
 		let players = game.players.concat(game.dead)
@@ -6655,7 +6655,7 @@ export class Game extends Uninstantable {
 		}, 100, players);
 	}
 	/**
-	 * @param { import('../library/index.js').Player } player
+	 * @param { Player } player
 	 */
 	static swapControl(player) {
 		if (player == game.me) return;
@@ -6701,7 +6701,7 @@ export class Game extends Uninstantable {
 		}
 	}
 	/**
-	 * @param { import('../library/index.js').Player } player
+	 * @param { Player } player
 	 */
 	static findNext(player) {
 		let players = get.players(lib.sort.position);
@@ -6943,7 +6943,7 @@ export class Game extends Uninstantable {
 		next.setContent('loadPackage');
 	}
 	/**
-	 * @param { import('../library/index.js').Player } player 
+	 * @param { Player } player 
 	 */
 	static phaseLoop(player) {
 		let next = game.createEvent('phaseLoop');
@@ -6952,7 +6952,7 @@ export class Game extends Uninstantable {
 		next.setContent('phaseLoop');
 	}
 	/**
-	 * @param { import('../library/index.js').Player } [player] 
+	 * @param { Player } [player] 
 	 */
 	static gameDraw(player, num = 4) {
 		let next = game.createEvent('gameDraw');
@@ -7488,8 +7488,8 @@ export class Game extends Uninstantable {
 		}, game.roundNumber, ui.cardPile.firstChild, ui.cardPile.childElementCount);
 	}
 	/**
-	 * @param { import('../library/index.js').Player[] } players 
-	 * @param { number | number[] | (player: import('../library/index.js').Player) => number } num 
+	 * @param { Player[] } players 
+	 * @param { number | number[] | (player: Player) => number } num 
 	 * @param { { drawDeck: boolean } } [drawDeck] 
 	 * @param { boolean } [bottom] 
 	 */
@@ -7505,8 +7505,8 @@ export class Game extends Uninstantable {
 		})
 	}
 	/**
-	 * @param { import('../library/index.js').Player[] } players 
-	 * @param { number | number[] | (player: import('../library/index.js').Player) => number } num 
+	 * @param { Player[] } players 
+	 * @param { number | number[] | (player: Player) => number } num 
 	 * @param { { drawDeck: boolean } } [drawDeck]
 	 */
 	static asyncDrawAuto(players, num, drawDeck) {
@@ -7889,10 +7889,10 @@ export class Game extends Uninstantable {
 		});
 	}
 	/**
-	 * @param { import('../library/index.js').Player } player 
-	 * @param { string | import('../library/index.js').Card[] } card 
-	 * @param { import('../library/index.js').Player[] } [targets] 
-	 * @param { import('../library/index.js').GameEventPromise } [event] 
+	 * @param { Player } player 
+	 * @param { string | Card[] } card 
+	 * @param { Player[] } [targets] 
+	 * @param { GameEventPromise } [event] 
 	 * @param { boolean } [forced] 
 	 * @param { string } [logvid] 
 	 */
@@ -8454,7 +8454,7 @@ export class Game extends Uninstantable {
 		return player;
 	}
 	/**
-	 * @param { import('../library/index.js').Player } player 
+	 * @param { Player } player 
 	 */
 	static triggerEnter(player) {
 		const next = game.createEvent('enterGame', false);
@@ -8465,7 +8465,7 @@ export class Game extends Uninstantable {
 		return next;
 	}
 	/**
-	 * @param { import('../library/index.js').Player } player 
+	 * @param { Player } player 
 	 */
 	static restorePlayer(player) {
 		if (game.players.includes(player) || game.dead.includes(player)) return;
@@ -8485,7 +8485,7 @@ export class Game extends Uninstantable {
 		return player;
 	}
 	/**
-	 * @param { import('../library/index.js').Player } player 
+	 * @param { Player } player 
 	 */
 	static removePlayer(player) {
 		if (_status.roundStart == player) _status.roundStart = player.next || player.getNext() || game.players[0];
@@ -8517,7 +8517,7 @@ export class Game extends Uninstantable {
 		return player;
 	}
 	/**
-	 * @param { import('../library/index.js').Player } player 
+	 * @param { Player } player 
 	 * @param { string } [character]
 	 * @param { string } [character2]
 	 */
@@ -8587,7 +8587,7 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @param { string[] } skills 
-	 * @param { import('../library/index.js').Player } player 
+	 * @param { Player } player 
 	 * @param { string[] } exclude 
 	 */
 	static filterSkills(skills, player, exclude) {
@@ -8623,17 +8623,17 @@ export class Game extends Uninstantable {
 		})
 	}
 	/**
-	 * @param { (player: import('../library/index.js').Player) => boolean } func 
+	 * @param { (player: Player) => boolean } func 
 	 * @param { boolean } [includeOut] 
 	 */
 	static hasPlayer(func, includeOut) { return game.players.some(value => (includeOut || !value.isOut()) && func(value)) }
 	/**
-	 * @param { (player: import('../library/index.js').Player) => boolean } func 
+	 * @param { (player: Player) => boolean } func 
 	 * @param { boolean } [includeOut] 
 	 */
 	static hasPlayer2(func, includeOut) { return game.players.concat(game.dead).some(value => (includeOut || !value.isOut()) && func(value)) }
 	/**
-	 * @param { (player: import('../library/index.js').Player) => boolean } func 
+	 * @param { (player: Player) => boolean } func 
 	 * @param { boolean } [includeOut] 
 	 */
 	static countPlayer(func, includeOut) {
@@ -8647,7 +8647,7 @@ export class Game extends Uninstantable {
 		}, 0);
 	}
 	/**
-	 * @param { (player: import('../library/index.js').Player) => boolean } func 
+	 * @param { (player: Player) => boolean } func 
 	 * @param { boolean } [includeOut] 
 	 */
 	static countPlayer2(func, includeOut) {
@@ -8662,14 +8662,14 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @overload
-	 * @returns { import('../library/index.js').Player[] }
+	 * @returns { Player[] }
 	 */
 	/**
 	 * @overload
-	 * @param { (player: import('../library/index.js').Player) => boolean } func 
-	 * @param { import('../library/index.js').Player[] } [list] 
+	 * @param { (player: Player) => boolean } func 
+	 * @param { Player[] } [list] 
 	 * @param { boolean } [includeOut] 
-	 * @returns { import('../library/index.js').Player[] }
+	 * @returns { Player[] }
 	 */
 	static filterPlayer(func, list, includeOut) {
 		if (!Array.isArray(list)) list = [];
@@ -8678,14 +8678,14 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @overload
-	 * @returns { import('../library/index.js').Player[] }
+	 * @returns { Player[] }
 	 */
 	/**
 	 * @overload
-	 * @param { (player: import('../library/index.js').Player) => boolean } func 
-	 * @param { import('../library/index.js').Player[] } [list] 
+	 * @param { (player: Player) => boolean } func 
+	 * @param { Player[] } [list] 
 	 * @param { boolean } [includeOut] 
-	 * @returns { import('../library/index.js').Player[] }
+	 * @returns { Player[] }
 	 */
 	static filterPlayer2(func, list, includeOut) {
 		if (!Array.isArray(list)) list = [];
@@ -8693,17 +8693,17 @@ export class Game extends Uninstantable {
 		return list.addArray(game.players.concat(game.dead).filter(value => (includeOut || !value.isOut()) && func(value)));
 	}
 	/**
-	 * @param { (player: import('../library/index.js').Player) => boolean } func 
+	 * @param { (player: Player) => boolean } func 
 	 * @param { boolean } [includeOut] 
 	 */
 	static findPlayer(func, includeOut) { return game.players.find(value => (includeOut || !value.isOut()) && func(value)) || null }
 	/**
-	 * @param { (player: import('../library/index.js').Player) => boolean } func 
+	 * @param { (player: Player) => boolean } func 
 	 * @param { boolean } [includeOut] 
 	 */
 	static findPlayer2(func, includeOut) { return game.players.concat(game.dead).find(value => (includeOut || !value.isOut()) && func(value)) || null }
 	/**
-	 * @param { (player: import('../library/index.js').Player) => boolean } func 
+	 * @param { (player: Player) => boolean } func 
 	 * @param { boolean } [all] 
 	 */
 	static findCards(func, all) {

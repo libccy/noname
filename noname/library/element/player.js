@@ -2706,9 +2706,9 @@ export class Player extends HTMLDivElement {
 		return list;
 	}
 	/**
-	 * @param {string} [arg1='h']
-	 * @param {string | Record<string, any> | ((card: import('../index.js').Card) => boolean)} [arg2]
-	 * @returns {import('../index.js').Card[]}
+	 * @param { string } [arg1='h']
+	 * @param { string | Record<string, any> | ((card: Card) => boolean) } [arg2]
+	 * @returns { Card[] }
 	 */
 	getCards(arg1, arg2) {
 		if (typeof arg1 != 'string') {

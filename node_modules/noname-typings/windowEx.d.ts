@@ -7,7 +7,9 @@ declare interface Window {
         version: string,
         update: string,
         changeLog: string[],
-        files: string[]
+        files: string[],
+        players?: string[],
+        cards?: string[],
     }
 
     /** 游戏配置 */
@@ -25,7 +27,7 @@ declare interface Window {
     noname_skin_list?: SMap<number>;
 
     /** codeMirror,一个代码编辑器库 */
-    CodeMirror: any;
+    CodeMirror: CodeMirror;
 
     resetGameTimeout: number;
 
@@ -66,4 +68,15 @@ declare interface Window {
         get: Get;
         ai: AI;
     }
+
+    initReadWriteFunction?(game = ({
+        download: () => any,
+        readFile: () => any,
+        readFileAsText: () => any,
+        writeFile: () => any,
+        removeFile: () => any,
+        getFileList: () => any,
+        ensureDirectory: () => any,
+        createDir: () => any,
+    })): void;
 }

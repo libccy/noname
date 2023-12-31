@@ -9,8 +9,8 @@ import { GNC as gnc } from '../gnc/index.js';
 export class Is extends Uninstantable {
 	/**
 	 * 判断是否为进攻坐骑
-	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard} card
-	 * @param {false | import("../library/index.js").Player} [player]
+	 * @param {Card | VCard} card
+	 * @param {false | Player} [player]
 	 * @returns {boolean}
 	 */
 	static attackingMount(card, player) {
@@ -25,8 +25,8 @@ export class Is extends Uninstantable {
 	}
 	/**
 	 * 判断是否为防御坐骑
-	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard} card
-	 * @param {false | import("../library/index.js").Player} [player]
+	 * @param {Card | VCard} card
+	 * @param {false | Player} [player]
 	 * @returns {boolean}
 	 */
 	static defendingMount(card, player) {
@@ -1833,12 +1833,12 @@ export class Get extends Uninstantable {
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Player[] } obj 
+	 * @param { Player[] } obj 
 	 * @returns { 'players' }
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Card[] } obj 
+	 * @param { Card[] } obj 
 	 * @returns { 'cards' }
 	 */
 	/**
@@ -1853,27 +1853,27 @@ export class Get extends Uninstantable {
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Button } obj 
+	 * @param { Button } obj 
 	 * @returns { 'button' }
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Card } obj 
+	 * @param { Card } obj 
 	 * @returns { 'card' }
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Player } obj 
+	 * @param { Player } obj 
 	 * @returns { 'player' }
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').Dialog } obj 
+	 * @param { Dialog } obj 
 	 * @returns { 'dialog' }
 	 */
 	/**
 	 * @overload
-	 * @param { import('../library/index.js').GameEvent | import('../library/index.js').GameEventPromise } obj 
+	 * @param { GameEvent | GameEventPromise } obj 
 	 * @returns { 'event' }
 	 */
 	static itemtype(obj) {
@@ -1954,8 +1954,8 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * 
-	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard} card
-	 * @param {false | import("../library/index.js").Player} [player]
+	 * @param {Card | VCard} card
+	 * @param {false | Player} [player]
 	 * @returns {string}
 	 */
 	static name(card, player) {
@@ -1968,8 +1968,8 @@ export class Get extends Uninstantable {
 		return card.name;
 	}
 	/**
-	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard | Card[] | VCard[]} card
-	 * @param {false | import("../library/index.js").Player} [player]
+	 * @param {Card | VCard | Card[] | VCard[]} card
+	 * @param {false | Player} [player]
 	 * @returns {string}
 	 */
 	static suit(card, player) {
@@ -1993,8 +1993,8 @@ export class Get extends Uninstantable {
 		}
 	}
 	/**
-	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard | Card[] | VCard[]} card
-	 * @param {false | import("../library/index.js").Player} [player]
+	 * @param {Card | VCard | Card[] | VCard[]} card
+	 * @param {false | Player} [player]
 	 * @returns {string}
 	 */
 	static color(card, player) {
@@ -2022,8 +2022,8 @@ export class Get extends Uninstantable {
 		}
 	}
 	/**
-	 * @param {import("../library/index.js").Card | import("../library/index.js").VCard} card
-	 * @param {false | import("../library/index.js").Player} [player]
+	 * @param {Card | VCard} card
+	 * @param {false | Player} [player]
 	 * @returns {number}
 	 */
 	static number(card, player) {
@@ -2047,8 +2047,8 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * 返回一张杀的属性。如有多种属性则用`lib.natureSeparator`分割开来。例：火雷【杀】的返回值为`fire|thunder`
-	 * @param {string | string[] | import("../library/index.js").Card | import("../library/index.js").VCard} card
-	 * @param {false | import("../library/index.js").Player} [player]
+	 * @param {string | string[] | Card | VCard} card
+	 * @param {false | Player} [player]
 	 * @returns {string}
 	 */
 	static nature(card, player) {
@@ -2066,7 +2066,7 @@ export class Get extends Uninstantable {
 	/**
 	 * 返回包含所有属性的数组
 	 * @param {string[] | string} card
-	 * @param {false | import("../library/index.js").Player} [player]
+	 * @param {false | Player} [player]
 	 * @returns {string[]}
 	 */
 	static natureList(card, player) {
@@ -2231,11 +2231,11 @@ export class Get extends Uninstantable {
 	 * @template T
 	 * @overload
 	 * @param {T} key
-	 * @returns {import("../library/index.js").GameEvent[T]}
+	 * @returns {GameEvent[T]}
 	 */
 	/**
 	 * @overload
-	 * @returns {import("../library/index.js").GameEvent}
+	 * @returns {GameEvent}
 	 */
 	static event(key) { return key ? _status.event[key] : _status.event }
 	static player() { return _status.event.player }
@@ -2463,8 +2463,8 @@ export class Get extends Uninstantable {
 		return result;
 	}
 	/**
-	 * @param {((a: import('../library/index.js').Button, b: import('../library/index.js').Button) => number)} [sort] 排序函数
-	 * @returns { import('../library/index.js').Button[] }
+	 * @param {((a: Button, b: Button) => number)} [sort] 排序函数
+	 * @returns { Button[] }
 	 */
 	static selectableButtons(sort) {
 		if (!_status.event.player) return [];
@@ -2482,8 +2482,8 @@ export class Get extends Uninstantable {
 		return selectable;
 	}
 	/**
-	 * @param {((a: import('../library/index.js').Card, b: import('../library/index.js').Card) => number)} [sort] 排序函数
-	 * @returns { import('../library/index.js').Card[] }
+	 * @param {((a: Card, b: Card) => number)} [sort] 排序函数
+	 * @returns { Card[] }
 	 */
 	static selectableCards(sort) {
 		if (!_status.event.player) return [];
@@ -2578,8 +2578,8 @@ export class Get extends Uninstantable {
 		return list;
 	}
 	/**
-	 * @param {((a: import('../library/index.js').Player, b: import('../library/index.js').Player) => number)} [sort] 排序函数
-	 * @returns { import('../library/index.js').Player[] }
+	 * @param {((a: Player, b: Player) => number)} [sort] 排序函数
+	 * @returns { Player[] }
 	 */
 	static selectableTargets(sort) {
 		var selectable = [];

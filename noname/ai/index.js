@@ -9,8 +9,8 @@ import { Uninstantable } from "../util/index.js";
 export class Basic extends Uninstantable {
 	/**
 	 * @param { (
-	 * 	button: import('../library/index.js').Button, 
-	 * 	buttons?: import('../library/index.js').Button[]
+	 * 	button: Button, 
+	 * 	buttons?: Button[]
 	 * ) => number } check
 	 */
 	static chooseButton(check) {
@@ -65,8 +65,8 @@ export class Basic extends Uninstantable {
 	}
 	/**
 	 * @param { (
-	 * card?: import('../library/index.js').Card,
-	 * cards?: import('../library/index.js').Card[]
+	 * card?: Card,
+	 * cards?: Card[]
 	 * ) => number } check
 	 * @returns { boolean | undefined }
 	 */
@@ -143,8 +143,8 @@ export class Basic extends Uninstantable {
 	}
 	/**
 	 * @param { (
-	 * target?: import('../library/index.js').Player,
-	 * targets?: import('../library/index.js').Player[]
+	 * target?: Player,
+	 * targets?: Player[]
 	 * ) => number } check 
 	 */
 	static chooseTarget(check) {

@@ -59,16 +59,16 @@ export async function boot() {
 	setWindowListener();
 
 	// 无名杀更新日志
-	if (Reflect.has(window, 'noname_update')) {
-		Reflect.set(lib, 'version', Reflect.get(window, 'noname_update').version);
-		lib.changeLog = Reflect.get(window, 'noname_update').changeLog;
-		if (Reflect.get(window, 'noname_update').players) {
-			lib.changeLog.push('players://' + JSON.stringify(Reflect.get(window, 'noname_update').players));
+	if (window.noname_update) {
+		Reflect.set(lib, 'version', window.noname_update.version);
+		lib.changeLog = window.noname_update.changeLog;
+		if (window.noname_update.players) {
+			lib.changeLog.push('players://' + JSON.stringify(window.noname_update.players));
 		}
-		if (Reflect.get(window, 'noname_update').cards) {
-			lib.changeLog.push('cards://' + JSON.stringify(Reflect.get(window, 'noname_update').cards));
+		if (window.noname_update.cards) {
+			lib.changeLog.push('cards://' + JSON.stringify(window.noname_update.cards));
 		}
-		Reflect.deleteProperty(window, 'noname_update');
+		delete window.noname_update;
 	}
 	// 确认手机端平台
 	const noname_inited = localStorage.getItem('noname_inited');
@@ -105,7 +105,7 @@ export async function boot() {
 		Reflect.set(lib, 'path', (await import('../library/path.js')).default);
 		//为其他自定义平台提供文件读写函数赋值的一种方式。
 		//但这种方式只能修改game的文件读写函数。
-		if (Reflect.has(window, 'initReadWriteFunction')) {
+		if (typeof window.initReadWriteFunction == 'function') {
 			const g = {};
 			const ReadWriteFunctionName = ['download', 'readFile', 'readFileAsText', 'writeFile', 'removeFile', 'getFileList', 'ensureDirectory', 'createDir'];
 			ReadWriteFunctionName.forEach(prop => {
@@ -120,7 +120,8 @@ export async function boot() {
 					}
 				});
 			});
-			Reflect.get(window, 'initReadWriteFunction')(g);
+			// @ts-ignore
+			window.initReadWriteFunction(g);
 		}
 		window.onbeforeunload = function () {
 			if (config.get('confirm_exit') && !_status.reloading) {
@@ -177,9 +178,11 @@ export async function boot() {
 
 	if (config.get('debug')) {
 		await lib.init.promises.js(`${lib.assetURL}game`, 'asset');
-		lib.skin = Reflect.get(window, 'noname_skin_list');
-		Reflect.deleteProperty(window, 'noname_skin_list');
-		Reflect.deleteProperty(window, 'noname_asset_list');
+		if (window.noname_skin_list) {
+			lib.skin = window.noname_skin_list;
+			delete window.noname_skin_list;
+			delete window.noname_asset_list;
+		}
 	}
 
 	if (Reflect.get(window, 'isNonameServer'))

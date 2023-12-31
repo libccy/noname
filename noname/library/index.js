@@ -40,7 +40,7 @@ export class Library extends Uninstantable {
 	static updates = [];
 	static canvasUpdates = [];
 	/**
-	 * @type { import('../game/index.js').Video[] }
+	 * @type { Video[] }
 	 */
 	static video = [];
 	static skilllist = [];
@@ -54,6 +54,9 @@ export class Library extends Uninstantable {
 	static characterGuozhanFilter = ["mode_guozhan"];
 	static dynamicTranslate = {};
 	static cardPack = {};
+	/**
+	 * @type { SMap<number> }
+	 */
 	static skin = {};
 	static onresize = [];
 	static onphase = [];
@@ -88,11 +91,11 @@ export class Library extends Uninstantable {
 	static cardType = {};
 	static hook = { globalskill: {} };
 	/**
-	* @returns {never}
+	* @returns { never }
 	*/
 	static typeAnnotation() {
 		/**
-		 * @type { import('../game/index.js').Videos[] }
+		 * @type { Videos[] }
 		 */
 		// @ts-ignore
 		this.videos;
@@ -6550,7 +6553,9 @@ export class Library extends Uninstantable {
 						}
 						else {
 							if (!window.CodeMirror) {
-								lib.init.js(lib.assetURL + 'game', 'codemirror', () => lib.codeMirrorReady(node, editor));
+								import('../../game/codemirror.js').then(() => {
+									lib.codeMirrorReady(node, editor);
+								});
 								lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
 							}
 							else {
@@ -6642,7 +6647,9 @@ export class Library extends Uninstantable {
 						}
 						else {
 							if (!window.CodeMirror) {
-								lib.init.js(lib.assetURL + 'game', 'codemirror', () => lib.codeMirrorReady(node, editor));
+								import('../../game/codemirror.js').then(() => {
+									lib.codeMirrorReady(node, editor);
+								});
 								lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
 							}
 							else {
@@ -7102,7 +7109,9 @@ export class Library extends Uninstantable {
 						}
 						else {
 							if (!window.CodeMirror) {
-								lib.init.js(lib.assetURL + 'game', 'codemirror', () => lib.codeMirrorReady(node, editor));
+								import('../../game/codemirror.js').then(() => {
+									lib.codeMirrorReady(node, editor);
+								});
 								lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
 							}
 							else {
@@ -8632,16 +8641,16 @@ export class Library extends Uninstantable {
 		/**
 		 * @overload
 		 * @description 指定的玩家或自己装备指定的牌
-		 * @param  {...Element.Player | string} args 玩家或卡牌名
+		 * @param  {...Player | string} args 玩家或卡牌名
 		 * @returns { void }
 		 */
 		e(...args) {
 			/**
-			 * @type { Element.Card[] }
+			 * @type { Card[] }
 			 */
 			let cards = [];
 			/**
-			 * @type { Element.Player }
+			 * @type { Player }
 			 */
 			let target;
 			for (let i = 0; i < arguments.length; i++) {
@@ -8889,7 +8898,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 下家对你使用一张牌
-		 * @param  {...Element.Player | Element.Player[] | string | Element.VCard } args 
+		 * @param  {...Player | Player[] | string | VCard } args 
 		 * 
 		 * @example
 		 * ```js
@@ -8973,7 +8982,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 打印目标玩家的手牌
-		 * @param { Element.Player } player 
+		 * @param { Player } player 
 		 */
 		h(player) {
 			console.log(get.translation(player.getCards('h')));
@@ -9032,7 +9041,7 @@ export class Library extends Uninstantable {
 		/**
 		 * 给目标立即添加一张手牌
 		 * @param { string } name 
-		 * @param { Element.Player } target
+		 * @param { Player } target
 		 */
 		gx(name, target = game.me) {
 			const card = lib.cheat.gn(name);
@@ -9051,7 +9060,7 @@ export class Library extends Uninstantable {
 		 * 如果lib.card里没有对应卡牌名返回null
 		 * 
 		 * @param { string } name 
-		 * @returns { Element.Card }
+		 * @returns { Card }
 		 * @example
 		 * ```js
 		 * // 创建一个梅花杀
@@ -9102,7 +9111,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 指定的玩家或自己立即获得诸葛连弩，青龙刀，八卦阵，的卢，赤兔，木牛
-		 * @param {Element.Player} [target] 
+		 * @param { Player } [target] 
 		 */
 		ge(target) {
 			if (target) {
@@ -9146,7 +9155,7 @@ export class Library extends Uninstantable {
 		/**
 		 * 自己立刻获取牌堆顶num张牌
 		 * @param { number } [num] 
-		 * @param { Element.Player } [target] 
+		 * @param { Player } [target] 
 		 */
 		d(num = 1, target) {
 			const cards = get.cards(num);
@@ -9179,7 +9188,7 @@ export class Library extends Uninstantable {
 		 * 
 		 * 不传入num默认为弃置所有玩家的所有牌
 		 * 
-		 * @param { number | Element.Player } [num] 
+		 * @param { number | Player } [num] 
 		 */
 		t(num) {
 			if (game.players.includes(num)) {
