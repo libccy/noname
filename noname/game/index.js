@@ -5,7 +5,7 @@
  * 	useCard: GameEventPromise[], 
  * 	changeHp: GameEventPromise[],
  * 	everything: GameEventPromise[] 
- * }} History
+ * }} GameHistory
  * @typedef { { type: string, player?: string, content?: string | any[], delay: number } } Video
  * @typedef { { mode: string, name: string[], name1: string, name2?: string, time: number, video: Video, win: boolean } } Videos
 */
@@ -773,7 +773,7 @@ export class Game extends Uninstantable {
 		return 'common';
 	}
 	/**
-	 * @template { keyof History } T
+	 * @template { keyof GameHistory } T
 	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } filter
 	 * @param { GameEventPromise } [last]
@@ -797,7 +797,7 @@ export class Game extends Uninstantable {
 		}
 	}
 	/**
-	 * @template { keyof History } T
+	 * @template { keyof GameHistory } T
 	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } filter
 	 * @param { GameEventPromise } [last] 
@@ -822,15 +822,15 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @overload
-	 * @returns { History }
+	 * @returns { GameHistory }
 	 */
 	/**
-	 * @template { keyof History } T
+	 * @template { keyof GameHistory } T
 	 * @overload
 	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } [filter]
 	 * @param { GameEventPromise } [last] 
-	 * @returns { History[T] }
+	 * @returns { GameHistory[T] }
 	 */
 	static getGlobalHistory(key, filter, last) {
 		if (!key) return _status.globalHistory[_status.globalHistory.length - 1];
@@ -848,7 +848,7 @@ export class Game extends Uninstantable {
 		}
 	}
 	/**
-	 * @template { keyof History } T
+	 * @template { keyof GameHistory } T
 	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } filter
 	 * @param { GameEventPromise } [last] 
@@ -872,7 +872,7 @@ export class Game extends Uninstantable {
 		})
 	}
 	/**
-	 * @template { keyof History } T
+	 * @template { keyof GameHistory } T
 	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } filter
 	 * @param { GameEventPromise } [last] 
@@ -899,15 +899,15 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * @overload
-	 * @returns { History[] }
+	 * @returns { GameHistory[] }
 	 */
 	/**
-	 * @template { keyof History } T
+	 * @template { keyof GameHistory } T
 	 * @overload
 	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } [filter]
 	 * @param { GameEventPromise } [last] 
-	 * @returns { History[T] }
+	 * @returns { GameHistory[T] }
 	 */
 	static getAllGlobalHistory(key, filter, last) {
 		const history = [];

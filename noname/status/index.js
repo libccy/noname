@@ -17,7 +17,7 @@ export const status = {
 	dragline: [],
 	dying: [],
 	/**
-	 * @type { History[] }
+	 * @type { GameHistory[] }
 	 */
 	globalHistory: [{
 		// @ts-ignore

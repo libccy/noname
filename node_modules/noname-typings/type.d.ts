@@ -34,6 +34,8 @@ declare type VCard = import('../../noname/library/index.js').VCard;
 
 declare type Video = import('../../noname/game/index.js').Video;
 declare type Videos = import('../../noname/game/index.js').Videos;
-declare type History = import('../../noname/game/index.js').History;
-
+declare type GameHistory = import('../../noname/game/index.js').GameHistory;
 declare type CodeMirror = typeof import('../../game/codemirror.js').default;
+
+declare type Sex = 'male' | 'female' | 'dobule' | 'none';
+declare type Character = [Sex, string, number | string, string[], ...any[]];

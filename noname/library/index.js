@@ -7,8 +7,6 @@
  * @typedef { InstanceType<typeof lib.element.GameEvent> } GameEvent
  * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> & typeof Promise<typeof lib.element.GameEvent> } GameEventPromise
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
- * @typedef { 'male' | 'female' | 'dobule' | 'none' } Sex
- * @typedef { [Sex, string, number | string, string[], any[]] } Character
 */
 import { nonameInitialized, assetURL, userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
 import { AI as ai } from '../ai/index.js';
