@@ -792,6 +792,7 @@ export async function onload(resetGameTimeout) {
 		}
 	}
 	else {
+		Reflect.set(window, 'resetGameTimeout', resetGameTimeout);
 		await proceed();
 	}
 	localStorage.removeItem(lib.configprefix + 'directstart');
