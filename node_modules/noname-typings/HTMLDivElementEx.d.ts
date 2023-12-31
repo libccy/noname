@@ -7,21 +7,21 @@ interface HTMLDivElement {
      * @param name className
      * @param time 该动画多长时间自动销毁
      */
-    addTempClass(name: string, time?: number): HTMLDivElement;
+    addTempClass(name: string, time?: number): this;
     /**
      * 隐藏
      */
-    hide(): HTMLDivElement;
-    unfocus(): HTMLDivElement;
-    refocus(): HTMLDivElement;
-    show(): HTMLDivElement;
+    hide(): this;
+    unfocus(): this;
+    refocus(): this;
+    show(): this;
     /**
      * 删除该节点div
      * @param time 调用后删除的时间（延时删除）
      * @param callback 删除后的回调
      */
-    delete(time: number, callback?: () => void): HTMLDivElement;
-    delete(): HTMLDivElement;
+    delete(time: number, callback?: () => void): this;
+    delete(): this;
     /**
      * 将该节点div移除，并添加到目标处
      * 
@@ -29,11 +29,11 @@ interface HTMLDivElement {
      * @param position 目标处 
      * @param time 延迟执行的时间
      */
-    goto(position: HTMLDivElement, time?: number): HTMLDivElement;
+    goto(position: HTMLDivElement, time?: number): this;
     /**
      * 立即移除
      */
-    fix(): HTMLDivElement;
+    fix(): this;
     /**
      * 设置背景（卡面）/设置图片
      * @param name 自定义格式名:   xxx:xxxxxxxx:xx（应该有各种命名格式，到时详细探讨）
@@ -41,22 +41,22 @@ interface HTMLDivElement {
      * @param ext 文件类型后缀名（例:.jpg）,填noskin，或者不填，默认为".jpg"
      * @param subfolder 子文件夹路径（基本都是按规定文件夹放置，命名）,不填走默认路径
      */
-    setBackground(name: string, type?: string, ext?: string, subfolder?: string): HTMLDivElement;
+    setBackground(name: string, type?: string, ext?: string, subfolder?: string): this;
     /**
      * 设置游戏背景，并且缓存该设置
      * @param img 
      */
-    setBackgroundDB(img: string): HTMLDivElement;
+    setBackgroundDB(img: string): this;
     /**
      * 设置背景
      * @param img 
      */
-    setBackgroundImage(img: string): HTMLDivElement;
+    setBackgroundImage(img: string): this;
     /**
      * 设置触摸/点击监听
      * @param func 
      */
-    listen(func: (this: HTMLDivElement, event: Event) => void): HTMLDivElement;
+    listen(func: (this: HTMLDivElement, event: Event) => void): this;
     /**
      * 设置转换结束（webkitTransitionEnd）监听
      * @param func 
@@ -67,12 +67,12 @@ interface HTMLDivElement {
      * 设置位置
      * @param args 
      */
-    setPosition(...args: number[]): HTMLDivElement;
+    setPosition(...args: number[]): this;
     /**
      * 添加css样式
      * @param style 
      */
     css<T extends keyof CSSStyleDeclaration>(style: {
         [key in T]?: string
-    }): void;
+    }): this;
 }
