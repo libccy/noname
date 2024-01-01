@@ -3380,7 +3380,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						viewAs:{name:'juedou'},
 						position:'h',
 						filterTarget:lib.filter.targetEnabled,
-						check:(card)=>get.name(card)=='sha'?0:5.5-get.value(card),
+						ai1:(card)=>{
+							if(get.name(card)==='sha') return 0;
+							return 5.5-get.value(card);
+						},
 						log:false,
 						precontent:function(){
 							delete event.result.skill;
