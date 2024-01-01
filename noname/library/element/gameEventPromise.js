@@ -37,7 +37,7 @@ export class GameEventPromise extends Promise {
 	}
 	#event;
 	/**
-	 * @param { import('./gameEvent.js').GameEvent } event
+	 * @param { GameEvent } event
 	 */
 	constructor(event) {
 		super(resolve => {

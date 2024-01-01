@@ -669,7 +669,7 @@ export class Player extends HTMLDivElement {
 		}
 		if (!subtype) return [];
 		return this.getCards('e', function (card) {
-			return get.subtypes(card, false).contains(subtype);
+			return get.subtypes(card, false).includes(subtype);
 		});
 	}
 	//新的废除装备区/恢复装备区/扩展装备区
@@ -941,7 +941,7 @@ export class Player extends HTMLDivElement {
 	removeCooperation(info) {
 		var player = this;
 		var storage = player.getStorage('cooperation');
-		if (!storage.contains(info)) return;
+		if (!storage.includes(info)) return;
 		storage.remove(info);
 		var unmark = true, reason = info.type;
 		if (!storage.length) {
@@ -1060,7 +1060,7 @@ export class Player extends HTMLDivElement {
 		game.broadcastAll(function (player, cards, tag) {
 			var hs = player.getCards('hejsx');
 			for (var i of cards) {
-				if (hs.contains(i)) i.addGaintag(tag);
+				if (hs.includes(i)) i.addGaintag(tag);
 			}
 		}, this, cards, tag);
 	}
@@ -1077,7 +1077,7 @@ export class Player extends HTMLDivElement {
 		var name = {}, hs = player.getCards('hs');
 		for (var i of hs) name[get.name(i)] = true;
 		for (var i in lib.card) {
-			if (lib.card[i].savable && (lib.inpile.contains(i) || name[i])) {
+			if (lib.card[i].savable && (lib.inpile.includes(i) || name[i])) {
 				if (lib.filter.cardSavable({ name: i }, player, target) && (_status.connectMode || player.hasUsableCard(i))) return true;
 			}
 		}
@@ -1181,7 +1181,7 @@ export class Player extends HTMLDivElement {
 			return true;
 		});
 		for (var i = 0; i < skills.length; i++) {
-			if (this.hiddenSkills.contains(skills[i])) {
+			if (this.hiddenSkills.includes(skills[i])) {
 				this.hiddenSkills.remove(skills[i]);
 				this.addSkill(skills[i]);
 			}
@@ -1238,7 +1238,7 @@ export class Player extends HTMLDivElement {
 		emotion.style.top = top + 'px';
 		var left2 = getLeft(target) - width;
 		var top2 = target.getTop() + target.offsetHeight / 3 - height;
-		if (['egg', 'flower', 'shoe'].contains(name) || rotate) {
+		if (['egg', 'flower', 'shoe'].includes(name) || rotate) {
 			var num1 = 0.95 + Math.random() * (1.1 - 0.95);
 			var num2 = 1 + Math.random() * (3 - 1);
 			var left2 = getLeft(target) / num1 - width;
@@ -1250,7 +1250,7 @@ export class Player extends HTMLDivElement {
 		}
 		emotion.style['z-index'] = 10;
 		emotion.style.transform = 'translateY(' + (top2 - top) + 'px) translateX(' + (left2 - left) + 'px)';
-		if (['egg', 'flower', 'shoe'].contains(name) || rotate) emotion.firstElementChild.style.transform = 'rotate(1440deg)';
+		if (['egg', 'flower', 'shoe'].includes(name) || rotate) emotion.firstElementChild.style.transform = 'rotate(1440deg)';
 		if (lib.config.background_audio) game.playAudio('effect', 'throw_' + name + get.rand(1, 2));
 		setTimeout(function () {
 			emotion.innerHTML = ('<div style="text-align:center"> <img src="' + lib.assetURL + 'image/emotion/throw_emotion/' + name + '2.png"> </div>');
@@ -1328,8 +1328,8 @@ export class Player extends HTMLDivElement {
 	inRange(to) {
 		var from = this;
 		if (from == to || from.hasSkill('undist') || to.hasSkill('undist')) return false;
-		if (!game.players.contains(from) && !game.dead.contains(from)) return false;
-		if (!game.players.contains(to) && !game.dead.contains(to)) return false;
+		if (!game.players.includes(from) && !game.dead.includes(from)) return false;
+		if (!game.players.includes(to) && !game.dead.includes(to)) return false;
 		var mod1 = game.checkMod(from, to, 'unchanged', 'inRange', from);
 		if (mod1 != 'unchanged') return mod1;
 		var mod2 = game.checkMod(from, to, 'unchanged', 'inRangeOf', to);
@@ -1372,9 +1372,9 @@ export class Player extends HTMLDivElement {
 		m = game.checkMod(from, to, m, 'attackFrom', from);
 		m = game.checkMod(from, to, m, 'attackTo', to);
 		var equips1 = from.getCards('e', function (card) {
-			return !ui.selected.cards || !ui.selected.cards.contains(card);
+			return !ui.selected.cards || !ui.selected.cards.includes(card);
 		}), equips2 = to.getCards('e', function (card) {
-			return !ui.selected.cards || !ui.selected.cards.contains(card);
+			return !ui.selected.cards || !ui.selected.cards.includes(card);
 		});
 		for (i = 0; i < equips1.length; i++) {
 			var info = get.info(equips1[i]).distance;
@@ -1422,7 +1422,7 @@ export class Player extends HTMLDivElement {
 		next.log = true;
 		for (var i = 0; i < arguments.length; i++) {
 			var arg = arguments[i];
-			if (lib.group.contains(arg)) {
+			if (lib.group.includes(arg)) {
 				next.group = arg;
 			}
 			else if (typeof arg === 'boolean') {
@@ -1563,7 +1563,7 @@ export class Player extends HTMLDivElement {
 		if (this.classList.contains('minskin') && this.node.name.querySelectorAll('br').length >= 4) {
 			this.node.name.classList.add('long');
 		}
-		if (info[4].contains('hiddenSkill') && !this.noclick) {
+		if (info[4].includes('hiddenSkill') && !this.noclick) {
 			if (!this.hiddenSkills) this.hiddenSkills = [];
 			this.hiddenSkills.addArray(skills);
 			skills = [];
@@ -1620,7 +1620,7 @@ export class Player extends HTMLDivElement {
 					this.hp = hp1 + hp2 - 3;
 				}
 			}
-			if (info2[4].contains('hiddenSkill') && !this.noclick) {
+			if (info2[4].includes('hiddenSkill') && !this.noclick) {
 				if (!this.hiddenSkills) this.hiddenSkills = [];
 				this.hiddenSkills.addArray(info2[3]);
 				this.storage.nohp = true;
@@ -1673,13 +1673,13 @@ export class Player extends HTMLDivElement {
 			info[4] = [];
 		}
 
-		if (!game.minskin && get.is.newLayout() && !info[4].contains('minskin')) {
+		if (!game.minskin && get.is.newLayout() && !info[4].includes('minskin')) {
 			this.classList.remove('minskin');
 			this.node.avatar.setBackground(character, 'character');
 		}
 		else {
 			this.node.avatar.setBackground(character, 'character');
-			if (info[4].contains('minskin')) {
+			if (info[4].includes('minskin')) {
 				this.classList.add('minskin');
 			}
 			else if (game.minskin) {
@@ -1701,7 +1701,7 @@ export class Player extends HTMLDivElement {
 		if (this.classList.contains('minskin') && this.node.name.querySelectorAll('br').length >= 4) {
 			this.node.name.classList.add('long');
 		}
-		if (info[4].contains('hiddenSkill') && !this.noclick) {
+		if (info[4].includes('hiddenSkill') && !this.noclick) {
 			this.classList.add(_status.video ? 'unseen_v' : 'unseen');
 			if (!this.node.name_seat && !_status.video) {
 				this.node.name_seat = ui.create.div('.name.name_seat', get.verticalStr(get.translation(this.name)), this);
@@ -1722,7 +1722,7 @@ export class Player extends HTMLDivElement {
 			this.name2 = character2;
 
 			this.node.count.classList.add('p2');
-			if (info2[4].contains('hiddenSkill') && !this.noclick) {
+			if (info2[4].includes('hiddenSkill') && !this.noclick) {
 				this.classList.add(_status.video ? 'unseen2_v' : 'unseen2');
 			}
 			this.node.name2.innerHTML = get.slimName(character2);
@@ -2317,7 +2317,7 @@ export class Player extends HTMLDivElement {
 			}
 			for (var i = 0; i < list.length; i++) {
 				for (var j in lib.characterPack[list[i]]) {
-					if (lib.characterPack[list[i]][j][3].contains(name)) {
+					if (lib.characterPack[list[i]][j][3].includes(name)) {
 						name = j;
 						stop = true;
 						break;
@@ -2328,7 +2328,7 @@ export class Player extends HTMLDivElement {
 				}
 			}
 		}
-		if (lib.character[this.name2] && lib.character[this.name2][3].contains(skill)) {
+		if (lib.character[this.name2] && lib.character[this.name2][3].includes(skill)) {
 			this.setAvatarQueue(this.name2, [name]);
 		}
 		else {
@@ -2585,10 +2585,10 @@ export class Player extends HTMLDivElement {
 		}
 		else if (arg1 == 's') {
 			if (typeof arg2 == 'boolean') {
-				return game.expandSkills(this.getSkills(arg2).concat(lib.skill.global)).contains(arg3);
+				return game.expandSkills(this.getSkills(arg2).concat(lib.skill.global)).includes(arg3);
 			}
 			else {
-				return game.expandSkills(this.getSkills().concat(lib.skill.global)).contains(arg2);
+				return game.expandSkills(this.getSkills().concat(lib.skill.global)).includes(arg2);
 			}
 		}
 	}
@@ -2706,9 +2706,9 @@ export class Player extends HTMLDivElement {
 		return list;
 	}
 	/**
-	 * @param {string} [arg1='h']
-	 * @param {string | Record<string, any> | ((card: import('../index.js').Card) => boolean)} [arg2]
-	 * @returns {import('../index.js').Card[]}
+	 * @param { string } [arg1='h']
+	 * @param { string | Record<string, any> | ((card: Card) => boolean) } [arg2]
+	 * @returns { Card[] }
 	 */
 	getCards(arg1, arg2) {
 		if (typeof arg1 != 'string') {
@@ -2790,7 +2790,7 @@ export class Player extends HTMLDivElement {
 							value = cards[i][j];
 						}
 						if ((typeof arg2[j] == 'string' && value != arg2[j]) ||
-							(Array.isArray(arg2[j]) && !arg2[j].contains(value))) {
+							(Array.isArray(arg2[j]) && !arg2[j].includes(value))) {
 							cards.splice(i--, 1); break;
 						}
 					}
@@ -3020,7 +3020,7 @@ export class Player extends HTMLDivElement {
 						for (j in arg2) {
 							if (j == 'type') {
 								if (typeof arg2[j] == 'object') {
-									if (arg2[j].contains(get.type(cards[i])) == false) {
+									if (arg2[j].includes(get.type(cards[i])) == false) {
 										cards.splice(i, 1); i--; break;
 									}
 								}
@@ -3032,7 +3032,7 @@ export class Player extends HTMLDivElement {
 							}
 							else if (j == 'subtype') {
 								if (typeof arg2[j] == 'object') {
-									if (arg2[j].contains(get.subtype(cards[i])) == false) {
+									if (arg2[j].includes(get.subtype(cards[i])) == false) {
 										cards.splice(i, 1); i--; break;
 									}
 								}
@@ -3044,7 +3044,7 @@ export class Player extends HTMLDivElement {
 							}
 							else if (j == 'color') {
 								if (typeof arg2[j] == 'object') {
-									if (arg2[j].contains(get.color(cards[i])) == false) {
+									if (arg2[j].includes(get.color(cards[i])) == false) {
 										cards.splice(i, 1); i--; break;
 									}
 								}
@@ -3056,7 +3056,7 @@ export class Player extends HTMLDivElement {
 							}
 							else if (j == 'suit') {
 								if (typeof arg2[j] == 'object') {
-									if (arg2[j].contains(get.suit(cards[i])) == false) {
+									if (arg2[j].includes(get.suit(cards[i])) == false) {
 										cards.splice(i, 1); i--; break;
 									}
 								}
@@ -3068,7 +3068,7 @@ export class Player extends HTMLDivElement {
 							}
 							else if (j == 'number') {
 								if (typeof arg2[j] == 'object') {
-									if (arg2[j].contains(get.number(cards[i])) == false) {
+									if (arg2[j].includes(get.number(cards[i])) == false) {
 										cards.splice(i, 1); i--; break;
 									}
 								}
@@ -3079,7 +3079,7 @@ export class Player extends HTMLDivElement {
 								}
 							}
 							else if (typeof arg2[j] == 'object') {
-								if (arg2[j].contains(cards[i][j]) == false) {
+								if (arg2[j].includes(cards[i][j]) == false) {
 									cards.splice(i, 1); i--; break;
 								}
 							}
@@ -3179,7 +3179,7 @@ export class Player extends HTMLDivElement {
 			evt = null;
 			next = game.createEvent('phase', false);
 		}
-		if (evt && insert && evt.next.contains(next)) {
+		if (evt && insert && evt.next.includes(next)) {
 			evt.next.remove(next);
 			evt.next.unshift(next);
 		}
@@ -4675,7 +4675,7 @@ export class Player extends HTMLDivElement {
 	$addToExpansion(cards, broadcast, gaintag) {
 		var hs = this.getCards('x');
 		for (var i = 0; i < cards.length; i++) {
-			if (hs.contains(cards[i])) {
+			if (hs.includes(cards[i])) {
 				cards.splice(i--, 1);
 			}
 		}
@@ -4693,7 +4693,7 @@ export class Player extends HTMLDivElement {
 	directgain(cards, broadcast, gaintag) {
 		var hs = this.getCards('hs');
 		for (var i = 0; i < cards.length; i++) {
-			if (hs.contains(cards[i])) {
+			if (hs.includes(cards[i])) {
 				cards.splice(i--, 1);
 			}
 		}
@@ -4724,7 +4724,7 @@ export class Player extends HTMLDivElement {
 	directgains(cards, broadcast, gaintag) {
 		var hs = this.getCards('hs');
 		for (var i = 0; i < cards.length; i++) {
-			if (hs.contains(cards[i])) {
+			if (hs.includes(cards[i])) {
 				cards.splice(i--, 1);
 			}
 		}
@@ -4984,7 +4984,7 @@ export class Player extends HTMLDivElement {
 		if (next.cards) {
 			var hej = this.getCards('hejsx');
 			for (var i = 0; i < next.cards.length; i++) {
-				if (!hej.contains(next.cards[i])) {
+				if (!hej.includes(next.cards[i])) {
 					next.cards.splice(i--, 1);
 				}
 			}
@@ -5797,26 +5797,26 @@ export class Player extends HTMLDivElement {
 			};
 			if (info.sourceSkill) {
 				logInfo.sourceSkill = info.sourceSkill;
-				if (global.contains(info.sourceSkill)) {
+				if (global.includes(info.sourceSkill)) {
 					logInfo.type = 'global';
 				}
-				else if (players.contains(info.sourceSkill)) {
+				else if (players.includes(info.sourceSkill)) {
 					logInfo.type = 'player';
 				}
-				else if (equips.contains(info.sourceSkill)) {
+				else if (equips.includes(info.sourceSkill)) {
 					logInfo.type = 'equip';
 				}
 			}
 			else {
-				if (global.contains(name)) {
+				if (global.includes(name)) {
 					logInfo.sourceSkill = name;
 					logInfo.type = 'global';
 				}
-				else if (players.contains(name)) {
+				else if (players.includes(name)) {
 					logInfo.sourceSkill = name;
 					logInfo.type = 'player';
 				}
-				else if (equips.contains(name)) {
+				else if (equips.includes(name)) {
 					logInfo.sourceSkill = name;
 					logInfo.type = 'equip';
 				}
@@ -5825,7 +5825,7 @@ export class Player extends HTMLDivElement {
 					for (var i of players) {
 						var expand = [i];
 						game.expandSkills(expand);
-						if (expand.contains(name)) {
+						if (expand.includes(name)) {
 							bool = true;
 							logInfo.sourceSkill = i;
 							logInfo.type = 'player';
@@ -5836,7 +5836,7 @@ export class Player extends HTMLDivElement {
 						for (var i of players) {
 							var expand = [i];
 							game.expandSkills(expand);
-							if (expand.contains(name)) {
+							if (expand.includes(name)) {
 								logInfo.sourceSkill = i;
 								logInfo.type = 'equip';
 								break;
@@ -6060,15 +6060,15 @@ export class Player extends HTMLDivElement {
 		const storage = this.storage[name];
 		if (!Array.isArray(values)) values = Array.from(arguments).slice(1);
 		if (!storage) return false;
-		if (!Array.isArray(storage)) return values.contains(storage);
-		return values.some(item => storage.contains(item));
+		if (!Array.isArray(storage)) return values.includes(storage);
+		return values.some(item => storage.includes(item));
 	}
 	hasStorageAll(name, values) {
 		const storage = this.storage[name];
 		if (!Array.isArray(values)) values = Array.from(arguments).slice(1);
 		if (!storage) return false;
 		if (!Array.isArray(storage)) return false;
-		return values.every(item => storage.contains(item));
+		return values.every(item => storage.includes(item));
 	}
 	initStorage(name, value, mark) {
 		return this.hasStorage(name) ? this.getStorage(name) : this.setStorage(name, value, mark);
@@ -6419,7 +6419,7 @@ export class Player extends HTMLDivElement {
 		cfg.skill = cfg.skill || _status.event.name;
 		if (!cfg.source) {
 			if (this.hasSkill(_status.event.name) && this.name2 && lib.character[this.name2] &&
-				lib.character[this.name2][3].contains(_status.event.name)) {
+				lib.character[this.name2][3].includes(_status.event.name)) {
 				cfg.source = this.name2;
 			}
 			else {
@@ -6578,13 +6578,13 @@ export class Player extends HTMLDivElement {
 			}
 		}
 		else {
-			if (this.invisibleSkills.contains(skill)) return;
+			if (this.invisibleSkills.includes(skill)) return;
 			_status.event.clearStepCache();
 			var info = lib.skill[skill];
 			if (!info) return;
 			this.invisibleSkills.add(skill);
 			this.addSkillTrigger(skill);
-			if (this.awakenedSkills.contains(skill)) {
+			if (this.awakenedSkills.includes(skill)) {
 				this.awakenSkill(skill);
 				return;
 			}
@@ -6615,7 +6615,7 @@ export class Player extends HTMLDivElement {
 			}
 		}
 		else {
-			if (this.skills.contains(skill)) return;
+			if (this.skills.includes(skill)) return;
 			_status.event.clearStepCache();
 			var info = lib.skill[skill];
 			if (!info) return;
@@ -6628,7 +6628,7 @@ export class Player extends HTMLDivElement {
 				}
 			}
 			this.addSkillTrigger(skill);
-			if (this.awakenedSkills.contains(skill)) {
+			if (this.awakenedSkills.includes(skill)) {
 				this.awakenSkill(skill);
 				return;
 			}
@@ -6709,14 +6709,14 @@ export class Player extends HTMLDivElement {
 		if (this.additionalSkills[skill]) {
 			const additionalSkills = this.additionalSkills[skill];
 			const hasAnotherSKill = function (skillkey, skill) {
-				return (player.skills.contains(skill) || player.tempSkills[skill] || Object.keys(player.additionalSkills).some(key => {
+				return (player.skills.includes(skill) || player.tempSkills[skill] || Object.keys(player.additionalSkills).some(key => {
 					if (key === skillkey) return false;
 					if (Array.isArray(player.additionalSkills[key])) return player.additionalSkills[key].includes(skill);
 					return player.additionalSkills[key] == skill;
 				}));
 			};
 			if (Array.isArray(additionalSkills) && typeof target == 'string') {
-				if (additionalSkills.contains(target)) {
+				if (additionalSkills.includes(target)) {
 					additionalSkills.remove(target);
 					if (!hasAnotherSKill(skill, target)) this.removeSkill(target);
 				}
@@ -6818,7 +6818,7 @@ export class Player extends HTMLDivElement {
 		var skills = this.getSkills();
 		game.expandSkills(skills);
 		for (var i in this.marks) {
-			if (!skills.contains(i) && !this.marks[i].info.fixed) {
+			if (!skills.includes(i) && !this.marks[i].info.fixed) {
 				this.unmarkSkill(i);
 			}
 		}
@@ -6848,7 +6848,7 @@ export class Player extends HTMLDivElement {
 			var skills = this.getSkills(null, false);
 			if (info.skills) {
 				for (var j = 0; j < info.skills.length; j++) {
-					if (skills.contains(info.skills[j])) continue;
+					if (skills.includes(info.skills[j])) continue;
 					this.removeSkillTrigger(info.skills[j]);
 				}
 			}
@@ -7026,7 +7026,7 @@ export class Player extends HTMLDivElement {
 		for (i = 0; i < this.skills.length; i++) {
 			if (lib.skill[this.skills[i]].superCharlotte) continue;
 			if (!all && (lib.skill[this.skills[i]].temp || lib.skill[this.skills[i]].charlotte)) continue;
-			if (!exclude.contains(this.skills[i])) {
+			if (!exclude.includes(this.skills[i])) {
 				list.push(this.skills[i]);
 			}
 		}
@@ -7069,10 +7069,10 @@ export class Player extends HTMLDivElement {
 			var forbidlist = lib.config.forbid.concat(lib.config.customforbid);
 			var skills = this.getSkills();
 			for (var i = 0; i < forbidlist.length; i++) {
-				if (lib.config.customforbid.contains(forbidlist[i]) ||
-					!lib.config.forbidlist.contains(getName(forbidlist[i]))) {
+				if (lib.config.customforbid.includes(forbidlist[i]) ||
+					!lib.config.forbidlist.includes(getName(forbidlist[i]))) {
 					for (var j = 0; j < forbidlist[i].length; j++) {
-						if (!skills.contains(forbidlist[i][j])) break;
+						if (!skills.includes(forbidlist[i][j])) break;
 					}
 					if (j == forbidlist[i].length) {
 						forbid.push(forbidlist[i]);
@@ -7272,7 +7272,7 @@ export class Player extends HTMLDivElement {
 			range = game.checkMod(player, player, range, 'globalFrom', player);
 			range = game.checkMod(player, player, range, 'attackFrom', player);
 			const equips = player.getCards('e', function (card) {
-				return !ui.selected.cards || !ui.selected.cards.contains(card);
+				return !ui.selected.cards || !ui.selected.cards.includes(card);
 			});
 			equips.forEach(card => {
 				const info = get.info(card, false).distance;
@@ -7295,7 +7295,7 @@ export class Player extends HTMLDivElement {
 	getEquipRange(cards) {
 		const player = this;
 		if (!cards) cards = player.getCards('e', function (card) {
-			return !ui.selected.cards || !ui.selected.cards.contains(card);
+			return !ui.selected.cards || !ui.selected.cards.includes(card);
 		});
 		const range = cards.reduce((range, card) => {
 			let newRange = false;
@@ -7322,7 +7322,7 @@ export class Player extends HTMLDivElement {
 		var range = 0;
 		range = game.checkMod(player, player, range, 'globalFrom', player);
 		var equips = player.getCards('e', function (card) {
-			return !ui.selected.cards || !ui.selected.cards.contains(card);
+			return !ui.selected.cards || !ui.selected.cards.includes(card);
 		});
 		for (var i = 0; i < equips.length; i++) {
 			var info = get.info(equips[i]).distance;
@@ -7338,7 +7338,7 @@ export class Player extends HTMLDivElement {
 		var range = 0;
 		range = game.checkMod(player, player, range, 'globalTo', player);
 		var equips = player.getCards('e', function (card) {
-			return !ui.selected.cards || !ui.selected.cards.contains(card);
+			return !ui.selected.cards || !ui.selected.cards.includes(card);
 		});
 		for (var i = 0; i < equips.length; i++) {
 			var info = get.info(equips[i]).distance;
@@ -7365,15 +7365,15 @@ export class Player extends HTMLDivElement {
 				switch (player.identity) {
 					case 'bZhu': case 'bZhong': case 'rNei': targets = game.filterPlayer(function (target) {
 						if (func && !func(target)) return false;
-						return ['rZhu', 'rZhong', 'bNei'].contains(target.identity);
+						return ['rZhu', 'rZhong', 'bNei'].includes(target.identity);
 					}); break;
 					case 'rZhu': case 'rZhong': case 'bNei': targets = game.filterPlayer(function (target) {
 						if (func && !func(target)) return false;
-						return ['bZhu', 'bZhong', 'rNei'].contains(target.identity);
+						return ['bZhu', 'bZhong', 'rNei'].includes(target.identity);
 					}); break;
 					case 'rYe': case 'bYe': targets = game.filterPlayer(function (target) {
 						if (func && !func(target)) return false;
-						return !['rYe', 'bYe'].contains(target.identity);
+						return !['rYe', 'bYe'].includes(target.identity);
 					}); break;
 				}
 			}
@@ -7447,15 +7447,15 @@ export class Player extends HTMLDivElement {
 				switch (player.identity) {
 					case 'rZhu': case 'rZhong': case 'bNei': targets = game.filterPlayer(function (target) {
 						if (func && !func(target)) return false;
-						return ['rZhu', 'rZhong', 'bNei'].contains(target.identity);
+						return ['rZhu', 'rZhong', 'bNei'].includes(target.identity);
 					}); break;
 					case 'bZhu': case 'bZhong': case 'rNei': targets = game.filterPlayer(function (target) {
 						if (func && !func(target)) return false;
-						return ['bZhu', 'bZhong', 'rNei'].contains(target.identity);
+						return ['bZhu', 'bZhong', 'rNei'].includes(target.identity);
 					}); break;
 					case 'rYe': case 'bYe': targets = game.filterPlayer(function (target) {
 						if (func && !func(target)) return false;
-						return ['rYe', 'bYe'].contains(target.identity);
+						return ['rYe', 'bYe'].includes(target.identity);
 					}); break;
 				}
 			}
@@ -7463,7 +7463,7 @@ export class Player extends HTMLDivElement {
 				switch (player.identity) {
 					case 'zhu': case 'zhong': case 'mingzhong': targets = game.filterPlayer(function (target) {
 						if (func && !func(target)) return false;
-						return ['zhu', 'zhong', 'mingzhong'].contains(target.identity);
+						return ['zhu', 'zhong', 'mingzhong'].includes(target.identity);
 					}); break;
 					case 'nei': targets = []; break;
 					case 'fan': targets = game.filterPlayer(function (target) {
@@ -7529,10 +7529,10 @@ export class Player extends HTMLDivElement {
 		return this == player;
 	}
 	isFriendsOf(player) {
-		return player.getFriends(true).contains(this);
+		return player.getFriends(true).includes(this);
 	}
 	isEnemiesOf(player) {
-		return player.getEnemies().contains(this);
+		return player.getEnemies().includes(this);
 	}
 	isAlive() {
 		return this.classList.contains('dead') == false;
@@ -7541,7 +7541,7 @@ export class Player extends HTMLDivElement {
 		return this.classList.contains('dead');
 	}
 	isDying() {
-		return _status.dying.contains(this) && this.hp <= 0 && this.isAlive();
+		return _status.dying.includes(this) && this.hp <= 0 && this.isAlive();
 	}
 	isDamaged() {
 		return this.hp < this.maxHp && !this.storage.nohp;
@@ -7684,8 +7684,8 @@ export class Player extends HTMLDivElement {
 		if (sourceSkill && sourceSkill.sourceSkill) {
 			skill = sourceSkill.sourceSkill;
 		}
-		if (lib.skill.global.contains(skill)) return false;
-		if (get.mode() != 'guozhan' || game.expandSkills(this.getSkills()).contains(skill)) {
+		if (lib.skill.global.includes(skill)) return false;
+		if (get.mode() != 'guozhan' || game.expandSkills(this.getSkills()).includes(skill)) {
 			if (showonly) {
 				return false;
 			}
@@ -7697,7 +7697,7 @@ export class Player extends HTMLDivElement {
 		var name1 = this.name1 || this.name;
 		if (lib.character[name1] && (!showonly || unseen0)) {
 			var skills = game.expandSkills(lib.character[name1][3].slice(0));
-			if (skills.contains(skill)) {
+			if (skills.includes(skill)) {
 				if (!noshow && this.isUnseen(0)) this.showCharacter(0);
 				return 'main';
 			}
@@ -7706,7 +7706,7 @@ export class Player extends HTMLDivElement {
 		var name2 = this.name2;
 		if (lib.character[name2] && (!showonly || unseen1)) {
 			var skills = game.expandSkills(lib.character[name2][3].slice(0));
-			if (skills.contains(skill)) {
+			if (skills.includes(skill)) {
 				if (!noshow && this.isUnseen(1)) this.showCharacter(1);
 				return 'vice';
 			}
@@ -7740,10 +7740,10 @@ export class Player extends HTMLDivElement {
 		return get.distance(target, this, method);
 	}
 	hasSkill(skill, arg2, arg3, arg4) {
-		return game.expandSkills(this.getSkills(arg2, arg3, arg4)).contains(skill);
+		return game.expandSkills(this.getSkills(arg2, arg3, arg4)).includes(skill);
 	}
 	hasStockSkill(skill, arg1, arg2, arg3) {
-		return game.expandSkills(this.getStockSkills(arg1, arg2, arg3)).contains(skill);
+		return game.expandSkills(this.getStockSkills(arg1, arg2, arg3)).includes(skill);
 	}
 	isZhu2() {
 		var player = this, mode = get.mode();
@@ -8013,7 +8013,7 @@ export class Player extends HTMLDivElement {
 			else {
 				if (es[i].name === name) return es[i];
 				var source = get.info(es[i]).source;
-				if (Array.isArray(source) && source.contains(name)) {
+				if (Array.isArray(source) && source.includes(name)) {
 					return es[i];
 				}
 			}

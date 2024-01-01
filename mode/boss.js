@@ -82,7 +82,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			var list=[];
 			for(var i in lib.character){
 				var info=lib.character[i];
-				if(info[4].contains('boss')){
+				if(info[4].includes('boss')){
 					// var cfg=i+'_bossconfig';
 					// if(get.config(cfg)==undefined){
 					//		game.saveConfig(cfg,true,true);
@@ -226,14 +226,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss.side=true;
 			if(!event.noslide){
 				var rect=event.current.getBoundingClientRect();
-				boss.animate('bossing');
-				boss.node.hp.animate('start');
+				boss.addTempClass('bossing');
+				boss.node.hp.addTempClass('start');
 				boss.bossinginfo=[rect.left+rect.width/2,rect.top+rect.height/2];
 				boss.style.transition='all 0s';
 				boss.node.equips.style.opacity='0';
 			}
 			else{
-				boss.animate('start');
+				boss.addTempClass('start');
 			}
 			boss.setIdentity('zhu');
 			boss.identity='zhu';
@@ -244,7 +244,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			for(var i=0;i<result.links.length;i++){
 				var player=ui.create.player();
 				player.getId();
-				player.init(result.links[i]).animate('start');
+				player.init(result.links[i]).addTempClass('start');
 				player.setIdentity('cai');
 				player.identity='cai';
 				player.side=false;
@@ -279,12 +279,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.getId();
 					player.init(game.bossinfo.minion[i]);
 					if(boss.bossinginfo){
-						player.animate('bossing');
-						player.node.hp.animate('start');
+						player.addTempClass('bossing');
+						player.node.hp.addTempClass('start');
 						player.style.transition='all 0s';
 					}
 					else{
-						player.animate('start');
+						player.addTempClass('start');
 					}
 					player.setIdentity('zhong');
 					player.identity='zhong';
@@ -932,7 +932,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		},
 		init:function(){
 			for(var i in lib.characterPack.mode_boss){
-				if(lib.characterPack.mode_boss[i][4].contains('hiddenboss')) continue;
+				if(lib.characterPack.mode_boss[i][4].includes('hiddenboss')) continue;
 				lib.mode.boss.config[i+'_boss_config']={
 					name:get.translation(i),
 					init:true,
@@ -974,7 +974,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				if(game.me==player){
 					game.swapControl(boss);
 				}
-				game.players.push(boss.animate('zoominanim'));
+				game.players.push(boss.addTempClass('zoominanim'));
 				game.arrangePlayers();
 				if(!game.boss){
 					game.boss=boss;
@@ -1034,7 +1034,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								var sort=lib.config.sort_card(card);
 								var position=sort>0?player.node.handcards1:player.node.handcards2;
 								card.fix();
-								card.animate('start');
+								card.addTempClass('start');
 								position.insertBefore(card,position.firstChild);
 							}
 							player.update();
@@ -1144,11 +1144,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					event.list=list;
 					for(i in lib.character){
-						if(lib.character[i][4].contains('minskin')) continue;
-						if(lib.character[i][4].contains('boss')) continue;
-						if(lib.character[i][4].contains('hiddenboss')) continue;
-						if(lib.character[i][4]&&lib.character[i][4].contains('forbidai')) continue;
-						if(lib.config.forbidboss.contains(i)) continue;
+						if(lib.character[i][4].includes('minskin')) continue;
+						if(lib.character[i][4].includes('boss')) continue;
+						if(lib.character[i][4].includes('hiddenboss')) continue;
+						if(lib.character[i][4]&&lib.character[i][4].includes('forbidai')) continue;
+						if(lib.config.forbidboss.includes(i)) continue;
 						if(lib.filter.characterDisabled(i)) continue;
 						list.push(i);
 					}
@@ -1184,7 +1184,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var node=_status.event.dialog.buttons[0].parentNode;
 						_status.event.dialog.buttons=ui.create.buttons(list.slice(0,20),'character',buttons);
 						_status.event.dialog.content.insertBefore(buttons,node);
-						buttons.animate('start');
+						buttons.addTempClass('start');
 						node.remove();
 
 						game.uncheck();
@@ -1201,7 +1201,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.dialogxx.classList.add('withbg');
 						event.dialogxx.classList.add('fixed');
 						if(ui.cheat2){
-							ui.cheat2.animate('controlpressdownx',500);
+							ui.cheat2.addTempClass('controlpressdownx',500);
 							ui.cheat2.classList.remove('disabled');
 						}
 					};
@@ -1225,11 +1225,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
-									ui.cheat.animate('controlpressdownx',500);
+									ui.cheat.addTempClass('controlpressdownx',500);
 									ui.cheat.classList.remove('disabled');
 								}
 								if(_status.bosschoice){
-									_status.bosschoice.animate('controlpressdownx',500);
+									_status.bosschoice.addTempClass('controlpressdownx',500);
 									_status.bosschoice.classList.remove('disabled');
 								}
 							}
@@ -1525,7 +1525,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									links.push(dialog.buttons[i].link);
 								}
 								for(var i=0;i<this.backup2.length;i++){
-									if(links.contains(this.backup2[i].link)){
+									if(links.includes(this.backup2[i].link)){
 										this.backup2[i].style.display='none';
 									}
 									else{
@@ -1661,7 +1661,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						else if(node.name=='jiedao'){
 							node.init([node.suit,node.number,'yihuajiemu']);
 						}
-						else if(list.contains(node.name)){
+						else if(list.includes(node.name)){
 							lib.inpile.remove(node.name);
 							node.remove();
 						}
@@ -1701,7 +1701,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							node.classList.remove('thunder');
 							node.init([node.suit,node.number,'honghuangzhili']);
 						}
-						else if(['huoshan','hongshui','fulei'].contains(node.name)){
+						else if(['huoshan','hongshui','fulei'].includes(node.name)){
 							node.remove();
 						}
 					}
@@ -1970,7 +1970,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					content:function(storage,player,skill){
 						var list=[];
 						for(var i in player.disabledSkills){
-							if(player.disabledSkills[i].contains(skill)){
+							if(player.disabledSkills[i].includes(skill)){
 								list.push(i)
 							}
 						}
@@ -2099,8 +2099,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.chooseCard('he',true,`交给${get.translation(target)}一张牌`).set('filterCard',function(card,player){
 							if(_status.event.ignoreCard) return true;
 							var cards=player.getEquips('shanrangzhaoshu');
-							if(!cards.contains(card)) return true;
-							return cards.some(cardx=>(cardx!=card&&!ui.selected.cards.contains(cardx)));
+							if(!cards.includes(card)) return true;
+							return cards.some(cardx=>(cardx!=card&&!ui.selected.cards.includes(cardx)));
 						}).set('ignoreCard',player.hasSkill('shanrangzhaoshu',null,false));
 					}
 					'step 3'
@@ -2173,7 +2173,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return card!=player.getEquip(1);
 					}).set('logSkill',['noda_axe',trigger.target]).set('goon',function(event,player){
 						if(player.hasSkill('noda_axe2')) return false;
-						if(event.getParent().excluded.contains(player)) return false;
+						if(event.getParent().excluded.includes(player)) return false;
 						if(get.attitude(event.player,player)>0){
 							return false;
 						}
@@ -2852,7 +2852,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				audio:true,
 				filter:function(event,player){
-					if(player.getEnemies().contains(event.player)){return true;}
+					if(player.getEnemies().includes(event.player)){return true;}
 					return false;
 				},
 				logTarget:'player',
@@ -2879,7 +2879,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				mod:{
 					cardEnabled2:function(card,player){
-						if(player.storage.boss_wangshi2.contains(get.type(card,'trick'))) return false;
+						if(player.storage.boss_wangshi2.includes(get.type(card,'trick'))) return false;
 					},
 				},
 			},
@@ -3598,7 +3598,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_echou:{
 				trigger:{global:'useCard'},
 				filter:function(event,player){
-					return !event.player.hasSkill('boss_duqu')&&['tao','jiu'].contains(event.card.name);
+					return !event.player.hasSkill('boss_duqu')&&['tao','jiu'].includes(event.card.name);
 				},
 				content:function(){
 					var target=trigger.player;
@@ -3731,7 +3731,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.togain=[];
 					while(event.togain.length<event.num2){
 						var card=get.cardPile(function(card){
-							return !event.togain.contains(card)&&get.color(card)=='red';
+							return !event.togain.includes(card)&&get.color(card)=='red';
 						});
 						if(card) event.togain.push(card);
 						else break;
@@ -3831,7 +3831,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 1'
-					if(player.getCards('h').contains(card)&&get.type(card)=='equip') player.chooseUseTarget(card,true,'nopopup','noanimate');
+					if(player.getCards('h').includes(card)&&get.type(card)=='equip') player.chooseUseTarget(card,true,'nopopup','noanimate');
 				},
 			},
 			boss_sipu_switch:{
@@ -3938,9 +3938,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(lib.config.mode!='boss') return false;
 					var list=['boss_shuishenxuanming','boss_shuishengonggong'];
-					if(list.contains(event.player.name)){
+					if(list.includes(event.player.name)){
 						return !game.hasPlayer(function(current){
-							return list.contains(current.name);
+							return list.includes(current.name);
 						});
 					}
 					return false;
@@ -4113,7 +4113,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					targets.add(player.getPrevious());
 					var enemies=player.getEnemies();
 					for(var i=0;i<targets.length;i++){
-						if(!enemies.contains(targets[i])||
+						if(!enemies.includes(targets[i])||
 							(!targets[i].getEquip(3)&&!targets[i].getEquip(4))){
 							targets.splice(i--,1);
 						}
@@ -4543,7 +4543,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					playerEnabled:function(card,player,target){
-						if(_status.currentPhase==player&&Array.isArray(player.storage.boss_minwan)&&!player.storage.boss_minwan.contains(target)){
+						if(_status.currentPhase==player&&Array.isArray(player.storage.boss_minwan)&&!player.storage.boss_minwan.includes(target)){
 							return false;
 						}
 					}
@@ -5670,7 +5670,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				unique:true,
 				filter:function(event,player){
-					return [3,5,7].contains(game.roundNumber);
+					return [3,5,7].includes(game.roundNumber);
 				},
 				content:function(){
 					'step 0'
@@ -5825,7 +5825,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				unique:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.player.isIn()&&event.player.isEnemyOf(player)&&!event.player.hasSkill('boss_zhongdu');
 				},
 				logTarget:'player',
@@ -5870,7 +5870,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				unique:true,
 				filter:function(event,player){
-					return [3,5,7].contains(game.roundNumber);
+					return [3,5,7].includes(game.roundNumber);
 				},
 				content:function(){
 					'step 0'
@@ -6106,7 +6106,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					trigger.player.chooseCard(function(card){
-						return trigger.result.contains(card);
+						return trigger.result.includes(card);
 					},'归心：交给'+get.translation(player)+'一张牌',true);
 					'step 1'
 					if(result.bool){
@@ -6147,10 +6147,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i in lib.character){
 						if(lib.character[i][1]!='wei') continue;
-						if(lib.character[i][4].contains('boss')) continue;
-						if(lib.character[i][4].contains('minskin')) continue;
-						if(player.storage.xiongcai.contains(i)) continue;
-						if(list2.contains(i)) continue;
+						if(lib.character[i][4].includes('boss')) continue;
+						if(lib.character[i][4].includes('minskin')) continue;
+						if(player.storage.xiongcai.includes(i)) continue;
+						if(list2.includes(i)) continue;
 						list.push(i);
 					}
 					var name=list.randomGet();
@@ -6462,10 +6462,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 					game.addVideo('judge1',player,[get.cardInfo(card),judgestr,event.videoId]);
 					for(var i=0;i<event.cards.length;i++) event.cards[i].discard();
-					// var node=card.copy('thrown','center',ui.arena).animate('start');
+					// var node=card.copy('thrown','center',ui.arena).addTempClass('start');
 					var node;
 					if(game.chess){
-						node=card.copy('thrown','center',ui.arena).animate('start');
+						node=card.copy('thrown','center',ui.arena).addTempClass('start');
 					}
 					else{
 						node=player.$throwordered(card.copy(),true);
@@ -8586,22 +8586,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						player.chooseControl(list,function(){
-							if(list.contains('olxuanfeng')&&player.countCards('he',{type:'equip'})) return 'olxuanfeng';
+							if(list.includes('olxuanfeng')&&player.countCards('he',{type:'equip'})) return 'olxuanfeng';
 							if(!player.getStat().skill.qiangxix){
-								if(player.hasSkill('qiangxix')&&player.getEquip(1)&&list.contains('olxuanfeng')) return 'olxuanfeng';
-								if(list.contains('rewansha')||list.contains('qiangxix')){
+								if(player.hasSkill('qiangxix')&&player.getEquip(1)&&list.includes('olxuanfeng')) return 'olxuanfeng';
+								if(list.includes('rewansha')||list.includes('qiangxix')){
 									var players=game.filterPlayer();
 									for(var i=0;i<players.length;i++){
 										if(players[i].hp==1&&get.attitude(player,players[i])<0){
-											if(list.contains('rewansha')) return 'rewansha';
-											if(list.contains('qiangxix')) return 'qiangxix';
+											if(list.includes('rewansha')) return 'rewansha';
+											if(list.includes('qiangxix')) return 'qiangxix';
 										}
 									}
 								}
 							}
-							if(list.contains('qiangxix')) return 'qiangxix';
-							if(list.contains('rewansha')) return 'rewansha';
-							if(list.contains('olxuanfeng')) return 'olxuanfeng';
+							if(list.includes('qiangxix')) return 'qiangxix';
+							if(list.includes('rewansha')) return 'rewansha';
+							if(list.includes('olxuanfeng')) return 'olxuanfeng';
 							return 'retieji';
 						}).set('prompt','选择获得一项技能直到回合结束');
 					}
@@ -8703,9 +8703,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter2:function(event,player){
 					if(!event.respondTo[1]) return false;
 					if(get.itemtype(event.cards)!='cards') return false;
-					if(['h','e','j'].contains(get.position(event.cards[0]))) return false;
+					if(['h','e','j'].includes(get.position(event.cards[0]))) return false;
 					if(event.respondTo[1]&&get.itemtype(event.respondTo[1])!='card') return false;
-					if(event.respondTo[1]&&['h','e','j'].contains(get.position(event.respondTo[1]))) return false;
+					if(event.respondTo[1]&&['h','e','j'].includes(get.position(event.respondTo[1]))) return false;
 				},
 				filter:function(event,player){
 					if(!player.storage.boss_jiang) return false;
@@ -8738,7 +8738,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						filter:function (event,player){
 							if(!player.storage.boss_jiang) return false;
 							if(get.color(event.card)!='red') return false;
-							return player==event.player||event.targets.contains(player);
+							return player==event.player||event.targets.includes(player);
 						},
 						frequent:true,
 						content:function (){

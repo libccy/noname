@@ -804,7 +804,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var es=target.getGainableCards(player,'e')
 					if(es.length){
 						player.choosePlayerCard('e',target,true).set('es',es).set('filterButton',function(button){
-							return _status.event.es.contains(button.link);
+							return _status.event.es.includes(button.link);
 						});
 					}
 					else{
@@ -995,7 +995,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filterTarget:true,
 				wuxieable:true,
 				content:function(){
-					if(player.getEnemies().contains(target)){
+					if(player.getEnemies().includes(target)){
 						target.getDebuff();
 					}
 					else{

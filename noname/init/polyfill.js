@@ -5,18 +5,22 @@ import { Game as game } from '../game/index.js';
 import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 
-HTMLDivElement.prototype.animate = function (name, time) {
-	var that;
-	if (get.is.mobileMe(this) && name == 'target') {
-		that = ui.mebg;
+// 废弃覆盖原型的HTMLDivElement.prototype.animate
+// 改为HTMLDivElement.prototype.addTempClass
+HTMLDivElement.prototype.animate = function (keyframes, options) {
+	if (typeof keyframes == 'string') {
+		console.warn(this, '无名杀开发者修改的animate方法已废弃，请改为使用addTempClass方法');
+		return HTMLDivElement.prototype.addTempClass.call(this, keyframes, options);
 	}
-	else {
-		that = this;
-	}
+	else return HTMLElement.prototype.animate.call(this, keyframes, options);
+};
+
+HTMLDivElement.prototype.addTempClass = function (name, time = 1000) {
+	let that = get.is.mobileMe(this) && name == 'target' ? ui.mebg : this;
 	that.classList.add(name);
-	setTimeout(function () {
+	setTimeout(() => {
 		that.classList.remove(name);
-	}, time || 1000);
+	}, time);
 	return this;
 };
 HTMLDivElement.prototype.hide = function () {
@@ -103,7 +107,7 @@ Reflect.defineProperty(HTMLDivElement.prototype, 'setBackground', {
 						nameinfo = lib.character[name];
 						if (name.startsWith('gz_shibing')) name = name.slice(3, 11);
 						else {
-							if (lib.config.mode_config.guozhan.guozhanSkin && lib.character[name] && lib.character[name][4].contains('gzskin')) gzbool = true;
+							if (lib.config.mode_config.guozhan.guozhanSkin && lib.character[name] && lib.character[name][4].includes('gzskin')) gzbool = true;
 							name = name.slice(3);
 						}
 					}
@@ -174,29 +178,29 @@ HTMLDivElement.prototype.setBackgroundDB = function (img) {
 HTMLDivElement.prototype.setBackgroundImage = function (img) {
 	this.style.backgroundImage = `url("${lib.assetURL}${img}")`;
 	return this;
-},
-	HTMLDivElement.prototype.listen = function (func) {
-		if (lib.config.touchscreen) {
-			this.addEventListener('touchend', function (e) {
-				if (!_status.dragged) {
-					func.call(this, e);
-				}
-			});
-			var fallback = function (e) {
-				if (!_status.touchconfirmed) {
-					func.call(this, e);
-				}
-				else {
-					this.removeEventListener('click', fallback);
-				}
+};
+HTMLDivElement.prototype.listen = function (func) {
+	if (lib.config.touchscreen) {
+		this.addEventListener('touchend', function (e) {
+			if (!_status.dragged) {
+				func.call(this, e);
 			}
-			this.addEventListener('click', fallback);
+		});
+		var fallback = function (e) {
+			if (!_status.touchconfirmed) {
+				func.call(this, e);
+			}
+			else {
+				this.removeEventListener('click', fallback);
+			}
 		}
-		else {
-			this.addEventListener('click', func);
-		}
-		return this;
-	};
+		this.addEventListener('click', fallback);
+	}
+	else {
+		this.addEventListener('click', func);
+	}
+	return this;
+};
 HTMLDivElement.prototype.listenTransition = function (func, time) {
 	let done = false;
 	const callback = () => {
@@ -249,10 +253,11 @@ HTMLTableElement.prototype.get = function (row, col) {
 		return this.childNodes[row].childNodes[col];
 	}
 };
-/*处理lib.nature的兼容性问题*/
+/*处理lib.nature等从array改为map的兼容性问题*/
 const mapHasFunc = function (item) {
-	return this.has(item)
-};
+	console.warn(this, '已经从array改为map，请改为使用has方法');
+	return this.has(item);
+}
 Object.defineProperty(Map.prototype, "contains", {
 	configurable: true,
 	enumerable: false,
@@ -266,6 +271,7 @@ Object.defineProperty(Map.prototype, "includes", {
 	value: mapHasFunc
 });
 const mapAddFunc = function (item) {
+	console.warn(this, '已经从array改为map，请改为使用set方法');
 	this.set(item, 0);
 	return this;
 }
@@ -286,7 +292,7 @@ Object.defineProperty(Map.prototype, "addArray", {
 	enumerable: false,
 	writable: true,
 	value: function (arr) {
-		for (var i = 0; i < arr.length; i++) {
+		for (let i = 0; i < arr.length; i++) {
 			this.add(arr[i]);
 		}
 		return this;
@@ -297,6 +303,7 @@ Object.defineProperty(Map.prototype, "remove", {
 	enumerable: false,
 	writable: true,
 	value: function (item) {
+		console.warn(this, '已经从array改为map，请改为使用delete方法');
 		this.delete(item);
 		return this;
 	}
@@ -336,7 +343,10 @@ Object.defineProperty(Array.prototype, "contains", {
 	configurable: true,
 	enumerable: false,
 	writable: true,
-	value: Array.prototype.includes
+	value: function (...args) {
+		console.warn(this, 'Array的contains方法已废弃，请使用includes方法');
+		return this.includes(...args);
+	}
 });
 Object.defineProperty(Array.prototype, "containsSome", {
 	configurable: true,
@@ -361,7 +371,7 @@ Object.defineProperty(Array.prototype, "add", {
 	writable: true,
 	value: function () {
 		for (const arg of arguments) {
-			if (this.contains(arg)) continue;
+			if (this.includes(arg)) continue;
 			this.push(arg);
 		}
 		return this;

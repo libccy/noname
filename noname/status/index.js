@@ -6,7 +6,7 @@ export const status = {
 	clicked: false,
 	auto: false,
 	/**
-	 * @type {import('../library/index.js').GameEventPromise}
+	 * @type { GameEventPromise }
 	 */
 	// @ts-ignore
 	event: null,
@@ -17,9 +17,10 @@ export const status = {
 	dragline: [],
 	dying: [],
 	/**
-	 * @type { import('../game/index.js').History[] }
+	 * @type { GameHistory[] }
 	 */
 	globalHistory: [{
+		// @ts-ignore
 		cardMove: [],
 		custom: [],
 		useCard: [],
@@ -39,7 +40,7 @@ export const status = {
 	/**
 	 * @type { string | void }
 	 */
-	extension:undefined,
+	extension: undefined,
 };
 
 export const _status = status;

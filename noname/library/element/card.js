@@ -173,7 +173,7 @@ export class Card extends HTMLDivElement {
 		}
 	}
 	hasGaintag(tag) {
-		return this.gaintag && this.gaintag.contains(tag);
+		return this.gaintag && this.gaintag.includes(tag);
 	}
 	/**
 	 * @param {[string, number, string, string] | {
@@ -372,7 +372,7 @@ export class Card extends HTMLDivElement {
 			}
 			else {
 				var cardPack = lib.cardPack['mode_' + get.mode()];
-				if (Array.isArray(cardPack) && cardPack.contains(bg)) {
+				if (Array.isArray(cardPack) && cardPack.includes(bg)) {
 					this.setBackground('mode/' + get.mode() + '/card/' + bg);
 				}
 				else {
@@ -416,7 +416,7 @@ export class Card extends HTMLDivElement {
 			}
 			else {
 				var cardPack = lib.cardPack['mode_' + get.mode()];
-				if (Array.isArray(cardPack) && cardPack.contains(bg)) {
+				if (Array.isArray(cardPack) && cardPack.includes(bg)) {
 					this.node.avatar.setBackground('mode/' + get.mode() + '/card/' + bg);
 				}
 				else {
@@ -557,7 +557,7 @@ export class Card extends HTMLDivElement {
 				_status.cardtag = {};
 			}
 			for (var i in _status.cardtag) {
-				if (_status.cardtag[i].contains(this.cardid)) {
+				if (_status.cardtag[i].includes(this.cardid)) {
 					tags.add(i);
 				}
 			}
@@ -657,7 +657,7 @@ export class Card extends HTMLDivElement {
 		if (this.name == name) return true;
 		var info = lib.card[this.name];
 		if (info && Array.isArray(info.source)) {
-			return info.source.contains(name);
+			return info.source.includes(name);
 		}
 		return false;
 	}
@@ -773,15 +773,15 @@ export class Card extends HTMLDivElement {
 		}
 	}
 	hasTag(tag) {
-		if (this.cardid && _status.cardtag && _status.cardtag[tag] && _status.cardtag[tag].contains(this.cardid)) {
+		if (this.cardid && _status.cardtag && _status.cardtag[tag] && _status.cardtag[tag].includes(this.cardid)) {
 			return true;
 		}
 		return false;
 	}
 	hasPosition() {
-		return ['h', 'e', 'j', 's', 'x'].contains(get.position(this));
+		return ['h', 'e', 'j', 's', 'x'].includes(get.position(this));
 	}
 	isInPile() {
-		return ['c', 'd'].contains(get.position(this));
+		return ['c', 'd'].includes(get.position(this));
 	}
 }

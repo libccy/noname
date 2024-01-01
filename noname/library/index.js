@@ -7,8 +7,6 @@
  * @typedef { InstanceType<typeof lib.element.GameEvent> } GameEvent
  * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> & typeof Promise<typeof lib.element.GameEvent> } GameEventPromise
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
- * @typedef { 'male' | 'female' | 'dobule' | 'none' } Sex
- * @typedef { [Sex, string, number | string, string[], any[]] } Character
 */
 import { nonameInitialized, assetURL, userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
 import { AI as ai } from '../ai/index.js';
@@ -40,7 +38,7 @@ export class Library extends Uninstantable {
 	static updates = [];
 	static canvasUpdates = [];
 	/**
-	 * @type { import('../game/index.js').Video[] }
+	 * @type { Video[] }
 	 */
 	static video = [];
 	static skilllist = [];
@@ -54,6 +52,9 @@ export class Library extends Uninstantable {
 	static characterGuozhanFilter = ["mode_guozhan"];
 	static dynamicTranslate = {};
 	static cardPack = {};
+	/**
+	 * @type { SMap<number> }
+	 */
 	static skin = {};
 	static onresize = [];
 	static onphase = [];
@@ -88,11 +89,11 @@ export class Library extends Uninstantable {
 	static cardType = {};
 	static hook = { globalskill: {} };
 	/**
-	* @returns {never}
+	* @returns { never }
 	*/
 	static typeAnnotation() {
 		/**
-		 * @type { import('../game/index.js').Videos[] }
+		 * @type { Videos[] }
 		 */
 		// @ts-ignore
 		this.videos;
@@ -1598,7 +1599,7 @@ export class Library extends Uninstantable {
 						}
 					},
 					onclick: function (layout) {
-						if (lib.layoutfixed.contains(lib.config.mode)) {
+						if (lib.layoutfixed.includes(lib.config.mode)) {
 							game.saveConfig('layout', layout);
 						}
 						else {
@@ -3680,7 +3681,7 @@ export class Library extends Uninstantable {
 						right: '靠右',
 					},
 					onclick: function (bool) {
-						if (lib.config.show_history == 'right') ui.window.animate('rightbar2');
+						if (lib.config.show_history == 'right') ui.window.addTempClass('rightbar2');
 						game.saveConfig('show_history', bool);
 						if (_status.video || !_status.prepareArena) return;
 						if (bool == 'left') {
@@ -4333,7 +4334,7 @@ export class Library extends Uninstantable {
 						this.lastChild.innerHTML = this._link.config.item[lib.config.background_music];
 						var menu = this._link.menu;
 						for (var i = 0; i < menu.childElementCount; i++) {
-							if (!['music_off', 'music_custom', 'music_random'].concat(lib.config.all.background_music).contains(menu.childNodes[i]._link)) menu.childNodes[i].delete();
+							if (!['music_off', 'music_custom', 'music_random'].concat(lib.config.all.background_music).includes(menu.childNodes[i]._link)) menu.childNodes[i].delete();
 						}
 					},
 					name: '背景音乐',
@@ -4434,7 +4435,7 @@ export class Library extends Uninstantable {
 				update: function (config, map) {
 					for (var i in map) {
 						if (map[i]._link.config.type == 'autoskill') {
-							if (!lib.config.autoskilllist.contains(i)) {
+							if (!lib.config.autoskilllist.includes(i)) {
 								map[i].classList.add('on');
 							}
 							else {
@@ -4442,7 +4443,7 @@ export class Library extends Uninstantable {
 							}
 						}
 						else if (map[i]._link.config.type == 'banskill') {
-							if (!lib.config.forbidlist.contains(i)) {
+							if (!lib.config.forbidlist.includes(i)) {
 								map[i].classList.add('on');
 							}
 							else {
@@ -4640,7 +4641,7 @@ export class Library extends Uninstantable {
 				//      									  }
 				//      						 }
 				//      						 for(var i=0;i<pack.length;i++){
-				//      									  if(lib.config.all.sgscards.contains(pack[i])){
+				//      									  if(lib.config.all.sgscards.includes(pack[i])){
 				//      															pack.splice(i--,1);
 				//      									  }
 				//      						 }
@@ -4653,7 +4654,7 @@ export class Library extends Uninstantable {
 				//      									  }
 				//      						 }
 				//      						 for(var i=0;i<pack.length;i++){
-				//      									  if(lib.config.all.sgscharacters.contains(pack[i])){
+				//      									  if(lib.config.all.sgscharacters.includes(pack[i])){
 				//      															pack.splice(i--,1);
 				//      									  }
 				//      						 }
@@ -4666,7 +4667,7 @@ export class Library extends Uninstantable {
 				//      									  }
 				//      						 }
 				//      						 for(var i=0;i<pack.length;i++){
-				//      									  if(lib.config.all.sgsmodes.contains(pack[i])){
+				//      									  if(lib.config.all.sgsmodes.includes(pack[i])){
 				//      															pack.splice(i--,1);
 				//      									  }
 				//      						 }
@@ -4837,7 +4838,7 @@ export class Library extends Uninstantable {
 									storage.translate[i] = mode.translate[i];
 								}
 								for (var i in mode.jiangeboss) {
-									if (mode.jiangeboss[i][4].contains('bossallowed')) {
+									if (mode.jiangeboss[i][4].includes('bossallowed')) {
 										storage.versus[i] = mode.jiangeboss[i];
 									}
 								}
@@ -4849,7 +4850,7 @@ export class Library extends Uninstantable {
 								storage.translate[i] = mode.translate[i];
 							}
 							for (var i in mode.characterPack.mode_boss) {
-								if (mode.characterPack.mode_boss[i][4].contains('bossallowed')) {
+								if (mode.characterPack.mode_boss[i][4].includes('bossallowed')) {
 									storage.boss[i] = mode.characterPack.mode_boss[i];
 								}
 							}
@@ -6550,7 +6551,9 @@ export class Library extends Uninstantable {
 						}
 						else {
 							if (!window.CodeMirror) {
-								lib.init.js(lib.assetURL + 'game', 'codemirror', () => lib.codeMirrorReady(node, editor));
+								import('../../game/codemirror.js').then(() => {
+									lib.codeMirrorReady(node, editor);
+								});
 								lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
 							}
 							else {
@@ -6642,7 +6645,9 @@ export class Library extends Uninstantable {
 						}
 						else {
 							if (!window.CodeMirror) {
-								lib.init.js(lib.assetURL + 'game', 'codemirror', () => lib.codeMirrorReady(node, editor));
+								import('../../game/codemirror.js').then(() => {
+									lib.codeMirrorReady(node, editor);
+								});
 								lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
 							}
 							else {
@@ -7102,7 +7107,9 @@ export class Library extends Uninstantable {
 						}
 						else {
 							if (!window.CodeMirror) {
-								lib.init.js(lib.assetURL + 'game', 'codemirror', () => lib.codeMirrorReady(node, editor));
+								import('../../game/codemirror.js').then(() => {
+									lib.codeMirrorReady(node, editor);
+								});
 								lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
 							}
 							else {
@@ -8447,7 +8454,7 @@ export class Library extends Uninstantable {
 						gl(str, function (folders, files) {
 							if (files.length > 1) {
 								for (let j = 0; j < files.length; j++) {
-									if (files[i] && files[i].contains && files[i].contains('extension.js')) {
+									if (typeof files[i] == 'string' && files[i].includes('extension.js')) {
 										files.splice(j--, 1);
 									}
 									else {
@@ -8632,16 +8639,16 @@ export class Library extends Uninstantable {
 		/**
 		 * @overload
 		 * @description 指定的玩家或自己装备指定的牌
-		 * @param  {...Element.Player | string} args 玩家或卡牌名
+		 * @param  {...Player | string} args 玩家或卡牌名
 		 * @returns { void }
 		 */
 		e(...args) {
 			/**
-			 * @type { Element.Card[] }
+			 * @type { Card[] }
 			 */
 			let cards = [];
 			/**
-			 * @type { Element.Player }
+			 * @type { Player }
 			 */
 			let target;
 			for (let i = 0; i < arguments.length; i++) {
@@ -8889,7 +8896,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 下家对你使用一张牌
-		 * @param  {...Element.Player | Element.Player[] | string | Element.VCard } args 
+		 * @param  {...Player | Player[] | string | VCard } args 
 		 * 
 		 * @example
 		 * ```js
@@ -8973,7 +8980,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 打印目标玩家的手牌
-		 * @param { Element.Player } player 
+		 * @param { Player } player 
 		 */
 		h(player) {
 			console.log(get.translation(player.getCards('h')));
@@ -9032,7 +9039,7 @@ export class Library extends Uninstantable {
 		/**
 		 * 给目标立即添加一张手牌
 		 * @param { string } name 
-		 * @param { Element.Player } target
+		 * @param { Player } target
 		 */
 		gx(name, target = game.me) {
 			const card = lib.cheat.gn(name);
@@ -9051,7 +9058,7 @@ export class Library extends Uninstantable {
 		 * 如果lib.card里没有对应卡牌名返回null
 		 * 
 		 * @param { string } name 
-		 * @returns { Element.Card }
+		 * @returns { Card }
 		 * @example
 		 * ```js
 		 * // 创建一个梅花杀
@@ -9102,7 +9109,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 指定的玩家或自己立即获得诸葛连弩，青龙刀，八卦阵，的卢，赤兔，木牛
-		 * @param {Element.Player} [target] 
+		 * @param { Player } [target] 
 		 */
 		ge(target) {
 			if (target) {
@@ -9146,7 +9153,7 @@ export class Library extends Uninstantable {
 		/**
 		 * 自己立刻获取牌堆顶num张牌
 		 * @param { number } [num] 
-		 * @param { Element.Player } [target] 
+		 * @param { Player } [target] 
 		 */
 		d(num = 1, target) {
 			const cards = get.cards(num);
@@ -9179,7 +9186,7 @@ export class Library extends Uninstantable {
 		 * 
 		 * 不传入num默认为弃置所有玩家的所有牌
 		 * 
-		 * @param { number | Element.Player } [num] 
+		 * @param { number | Player } [num] 
 		 */
 		t(num) {
 			if (game.players.includes(num)) {
@@ -9702,7 +9709,7 @@ export class Library extends Uninstantable {
 		},
 		//装备栏 END
 		buttonIncluded: function (button) {
-			return !(_status.event.excludeButton && _status.event.excludeButton.contains(button));
+			return !(_status.event.excludeButton && _status.event.excludeButton.includes(button));
 		},
 		filterButton: function (button) {
 			return true;
@@ -9758,12 +9765,12 @@ export class Library extends Uninstantable {
 			return true;
 		},
 		characterDisabled: function (i, libCharacter) {
-			if (!lib.character[i] || lib.character[i][4] && lib.character[i][4].contains('forbidai')) return true;
-			if (lib.character[i][4] && lib.character[i][4].contains('unseen')) return true;
-			if (lib.config.forbidai.contains(i)) return true;
+			if (!lib.character[i] || lib.character[i][4] && lib.character[i][4].includes('forbidai')) return true;
+			if (lib.character[i][4] && lib.character[i][4].includes('unseen')) return true;
+			if (lib.config.forbidai.includes(i)) return true;
 			if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) return true;
 			if (_status.connectMode) {
-				if (lib.configOL.banned.contains(i) || lib.connectBanned.contains(i)) return true;
+				if (lib.configOL.banned.includes(i) || lib.connectBanned.includes(i)) return true;
 				var double_character = false;
 				if (lib.configOL.mode == 'guozhan') {
 					double_character = true;
@@ -9774,12 +9781,12 @@ export class Library extends Uninstantable {
 				else if (lib.configOL.double_character_jiange && (lib.configOL.mode == 'versus' && _status.mode == 'jiange')) {
 					double_character = true;
 				}
-				if (double_character && lib.config.forbiddouble.contains(i)) {
+				if (double_character && lib.config.forbiddouble.includes(i)) {
 					return true;
 				}
 				// if(lib.configOL.ban_weak){
 				// 	if(lib.config.replacecharacter[i]&&libCharacter&&libCharacter[lib.config.replacecharacter[i]]) return true;
-				// 	if(lib.config.forbidall.contains(i)) return true;
+				// 	if(lib.config.forbidall.includes(i)) return true;
 				// 	if(!double_character&&get.rank(i,true)<=2){
 				// 		return true;
 				// 	}
@@ -9789,7 +9796,7 @@ export class Library extends Uninstantable {
 				// }
 			}
 			else {
-				if (lib.config.banned.contains(i)) return true;
+				if (lib.config.banned.includes(i)) return true;
 				var double_character = false;
 				if (get.mode() == 'guozhan') {
 					double_character = true;
@@ -9800,12 +9807,12 @@ export class Library extends Uninstantable {
 				else if (get.config('double_character_jiange') && (lib.config.mode == 'versus' && _status.mode == 'jiange')) {
 					double_character = true;
 				}
-				if (double_character && lib.config.forbiddouble.contains(i)) {
+				if (double_character && lib.config.forbiddouble.includes(i)) {
 					return true;
 				}
 				// if(get.config('ban_weak')){
 				// 	if(lib.config.replacecharacter[i]&&lib.character[lib.config.replacecharacter[i]]) return true;
-				// 	if(lib.config.forbidall.contains(i)) return true;
+				// 	if(lib.config.forbidall.includes(i)) return true;
 				// 	if(!double_character&&get.rank(i,true)<=2){
 				// 		return true;
 				// 	}
@@ -9819,11 +9826,11 @@ export class Library extends Uninstantable {
 			var info = lib.character[i];
 			if (!info) return true;
 			if (info[4]) {
-				if (info[4].contains('boss')) return true;
-				if (info[4].contains('hiddenboss')) return true;
-				if (info[4].contains('minskin')) return true;
-				if (info[4].contains('unseen')) return true;
-				if (info[4].contains('forbidai') && (!_status.event.isMine || !_status.event.isMine())) return true;
+				if (info[4].includes('boss')) return true;
+				if (info[4].includes('hiddenboss')) return true;
+				if (info[4].includes('minskin')) return true;
+				if (info[4].includes('unseen')) return true;
+				if (info[4].includes('forbidai') && (!_status.event.isMine || !_status.event.isMine())) return true;
 				if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) return true;
 			}
 			return false;
@@ -9940,7 +9947,7 @@ export class Library extends Uninstantable {
 		},
 		cardAiIncluded: function (card) {
 			if (_status.event.isMine()) return true;
-			return (_status.event._aiexclude.contains(card) == false);
+			return (_status.event._aiexclude.includes(card) == false);
 		},
 		filterCard: function (card, player, event) {
 			var info = get.info(card);
@@ -10382,7 +10389,7 @@ export class Library extends Uninstantable {
 							if (game.hasPlayer(current => {
 								if (!player.canUse(card, current)) return false;
 								const storage = player.storage, zhibi = storage.zhibi;
-								return (zhibi && !zhibi.contains(current) || get.effect(current, card, player, player) >= 2 - Math.max(0, (storage.stratagem_fury || 0) - 1)) && current.mayHaveShan(player, 'use');
+								return (zhibi && !zhibi.includes(current) || (get.effect(current, card, player, player) >= 2 - Math.max(0, (storage.stratagem_fury || 0) - 1))) && current.mayHaveShan(player, 'use');
 							})) return get.order(card, player) + 0.5;
 						}
 						else if (cardName == 'tao' && player.hp <= 2 && player.getDamagedHp() >= 2) return get.order(card, player) + 0.5;
@@ -10599,7 +10606,7 @@ export class Library extends Uninstantable {
 								if (!info.discard) info.discard = [];
 								for (var i of trigger.cards2) {
 									var suit = get.suit(i, player);
-									if (lib.suit.contains(suit)) info.discard.add(suit);
+									if (lib.suit.includes(suit)) info.discard.add(suit);
 								}
 							}
 						}
@@ -10623,7 +10630,7 @@ export class Library extends Uninstantable {
 									var suits = info.discard || [];
 									var suits2 = [['spade', '♠', '♤'], ['heart', '♥', '♡'], ['club', '♣', '♧'], ['diamond', '♦', '♢']];
 									for (var i of suits2) {
-										str += (suits.contains(i[0]) ? i[1] : i[2]);
+										str += (suits.includes(i[0]) ? i[1] : i[2]);
 									}
 									str += (suits.length > 3 ? ' (已完成)' : ' (未完成)');
 									str += '<br>　　';
@@ -10642,12 +10649,12 @@ export class Library extends Uninstantable {
 					firstDo: true,
 					filter: function (event, player) {
 						var suit = get.suit(event.card);
-						if (!lib.suit.contains(suit)) return false;
+						if (!lib.suit.includes(suit)) return false;
 						var storage = player.getStorage('cooperation');
 						for (var info of storage) {
 							if (info.type == 'use'
 								&& (event.player == player || event.player == info.target) &&
-								(!info.used || !info.used.contains(suit))) return true;
+								(!info.used || !info.used.includes(suit))) return true;
 						}
 						return false;
 					},
@@ -10681,7 +10688,7 @@ export class Library extends Uninstantable {
 									var suits = info.used || [];
 									var suits2 = [['spade', '♠', '♤'], ['heart', '♥', '♡'], ['club', '♣', '♧'], ['diamond', '♦', '♢']];
 									for (var i of suits2) {
-										str += (suits.contains(i[0]) ? i[1] : i[2]);
+										str += (suits.includes(i[0]) ? i[1] : i[2]);
 									}
 									str += (suits.length > 3 ? ' (已完成)' : ' (未完成)');
 									str += '<br>　　';
@@ -10832,7 +10839,7 @@ export class Library extends Uninstantable {
 								if (!history.length) {
 									var val = 0;
 									if (player.hasCard(function (cardx) {
-										return get.suit(cardx) == suitx && card != cardx && (!card.cards || !card.cards.contains(cardx)) && player.hasValueTarget(cardx);
+										return get.suit(cardx) == suitx && card != cardx && (!card.cards || !card.cards.includes(cardx)) && player.hasValueTarget(cardx);
 									}, 'hs')) val = [2, 0.1];
 									if (val) return val;
 									return;
@@ -10841,7 +10848,7 @@ export class Library extends Uninstantable {
 								var suit = false;
 								for (var i = 0; i < history.length; i++) {
 									var suit2 = get.suit(history[i].card);
-									if (!lib.suit.contains(suit2)) return;
+									if (!lib.suit.includes(suit2)) return;
 									if (suit && suit != suit2) return;
 									suit = suit2;
 									num++;
@@ -10875,7 +10882,7 @@ export class Library extends Uninstantable {
 							if (evt && evt.player == player) {
 								for (var i of event.cards2) {
 									var suit = get.suit(i, player);
-									if (list.contains(suit)) {
+									if (list.includes(suit)) {
 										goon = false;
 										break;
 									}
@@ -11132,7 +11139,7 @@ export class Library extends Uninstantable {
 						for (var i = 0; i < list.length; i++) {
 							if (list[i] && lib.character[list[i]]) {
 								var info = lib.character[list[i]];
-								if (info[3].contains('dualside') && info[4]) {
+								if (info[3].includes('dualside') && info[4]) {
 									player.storage.dualside = [list[i], player.hp, player.maxHp];
 									for (var j = 0; j < info[4].length; j++) {
 										if (info[4][j].startsWith('dualside:')) {
@@ -11499,7 +11506,7 @@ export class Library extends Uninstantable {
 				}
 				else {
 					for (var i = 0; i < 20; i++) {
-						if (event.acted.contains(event.player.next)) {
+						if (event.acted.includes(event.player.next)) {
 							break;
 						}
 						else {
@@ -11728,14 +11735,14 @@ export class Library extends Uninstantable {
 				this.inited = true;
 			},
 			result: function (result) {
-				if (lib.node.observing.contains(this)) return;
+				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.unwait(result);
 				}
 			},
 			tempResult: function (result) {
-				if (lib.node.observing.contains(this)) return;
+				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.tempUnwait(result);
@@ -11789,14 +11796,14 @@ export class Library extends Uninstantable {
 				}
 			},
 			throwEmotion: function (target, emotion, rotate) {
-				if (lib.node.observing.contains(this)) return;
+				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.throwEmotion(target, emotion, rotate);
 				}
 			},
 			emotion: function (id, pack, emotion) {
-				if (lib.node.observing.contains(this)) return;
+				if (lib.node.observing.includes(this)) return;
 				var that = this;
 				if (!this.id || (!lib.playerOL[this.id] && (!game.connectPlayers || !function () {
 					for (var i = 0; i < game.connectPlayers.length; i++) {
@@ -11820,7 +11827,7 @@ export class Library extends Uninstantable {
 				if (player) player.emotion(pack, emotion);
 			},
 			chat: function (id, str) {
-				if (lib.node.observing.contains(this)) return;
+				if (lib.node.observing.includes(this)) return;
 				var that = this;
 				if (!this.id || (!lib.playerOL[this.id] && (!game.connectPlayers || !function () {
 					for (var i = 0; i < game.connectPlayers.length; i++) {
@@ -11844,7 +11851,7 @@ export class Library extends Uninstantable {
 				if (player) player.chat(str);
 			},
 			giveup: function (player) {
-				if (lib.node.observing.contains(this) || !player || !player._giveUp) return;
+				if (lib.node.observing.includes(this) || !player || !player._giveUp) return;
 				_status.event.next.length = 0;
 				game.createEvent('giveup', false).set('includeOut', true).setContent(function () {
 					game.log(player, '投降');
@@ -11853,7 +11860,7 @@ export class Library extends Uninstantable {
 				}).player = player;
 			},
 			auto: function () {
-				if (lib.node.observing.contains(this)) return;
+				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.isAuto = true;
@@ -11864,7 +11871,7 @@ export class Library extends Uninstantable {
 				}
 			},
 			unauto: function () {
-				if (lib.node.observing.contains(this)) return;
+				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.isAuto = false;
@@ -12444,7 +12451,7 @@ export class Library extends Uninstantable {
 					var pos = state.players[observe || game.onlineID].position;
 					for (var i in state.players) {
 						var info = state.players[i];
-						var player = ui.create.player(ui.arena).animate('start');
+						var player = ui.create.player(ui.arena).addTempClass('start');
 						player.dataset.position = (info.position < pos) ? info.position - pos + parseInt(state.number) : info.position - pos;
 						if (i == observe || i == game.onlineID) {
 							game.me = player;
