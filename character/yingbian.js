@@ -2872,9 +2872,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			tairan2:{
 				mod:{
-					aiValue:function(player,card,num){
-						if(card.hasGaintag&&card.hasGaintag('tairan')) return num/10;
+					aiOrder:function(player,card,num){
+						if(card.hasGaintag&&card.hasGaintag('tairan')) return 10*num;
 					},
+					aiValue:function(player,card,num){
+						if(card.hasGaintag&&card.hasGaintag('tairan')){
+							if(card.name!=='wuxie'&&(get.type(card)==='basic'||get.type(card,'trick')==='trick')) return num/64;
+							return num/8;
+						}
+					},
+					aiUseful:function(player,card,num){
+						return lib.skill.tairan2.mod.aiValue.apply(this,arguments);
+					}
 				},
 				audio:'tairan',
 				trigger:{player:'phaseUseBegin'},

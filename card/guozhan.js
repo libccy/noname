@@ -67,7 +67,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						current.chooseToDiscard('he','弃置一张牌，并视为对'+get.translation(target)+'使用一张【杀】，或点击「取消」弃置其一张牌').set('ai',function(card){
 							if(!_status.event.goon) return 0;
 							return 5-get.value(card);
-						}).set('goon',(get.effect(target,{name:'guohe'},current)<get.effect(target,{name:'sha'},current)));
+						}).set('goon',(get.effect(target,{name:'guohe'},current)<get.effect(current,{name:'guohe'},current)+get.effect(target,{name:'sha'},current)));
 					}
 					else{
 						current.chooseBool('是否视为对'+get.translation(target)+'使用一张【杀】？','若点击「取消」则改为获得其一张牌').set('ai',function(){

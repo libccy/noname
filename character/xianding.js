@@ -2083,9 +2083,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(target.hasMark('dcchangqu_warshipx')){
 						var prompt2='是否交给'+get.translation(player)+get.cnNumber(num)+'张手牌？'+(nextPlayer?'若如此做，将“战舰”移动给'+get.translation(nextPlayer)+'，':'，')+'否则你下次受到的属性伤害值+'+num;
 						target.chooseCard(get.translation(player)+'对你发动了【长驱】',prompt2).set('ai',card=>{
-							if(_status.event.att>0) return 6-get.value(card);
-							if(_status.event.take) return -get.value(card);
-							return 5-get.value(card);
+							if(_status.event.att>0) return 15-get.value(card);
+							if(_status.event.take) return 0;
+							return 8.2-0.8*Math.min(5,_status.event.target.hp+_status.event.target.hujia)-get.value(card);
 						}).set('att',get.attitude(target,player)).set('take',function(){
 							var base=num;
 							var getEffect=function(target,player,num){
@@ -2101,7 +2101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var num=base+ind+1;
 								var effx=getEffect(current,player,num);
 								return effx<eff;
-							});
+							}).set('target',target);
 						});
 					}
 					else event.goto(4);
@@ -4725,7 +4725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(num>1&&player.hp+player.hujia>2) return 0;
 						if(target==player){
 							if(num) return -get.value(button.link,target);
-							if(ui.cardPile.childNodes.length>80) return 6-get.value(card,player);
+							if(ui.cardPile.childNodes.length>80) return 6-get.value(button.link,player);
 							return 0;
 						}
 						var val=get.buttonValue(button);
@@ -9182,7 +9182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(get.prompt2('juetao'),lib.filter.notMe).set('ai',function(target){
 						let att=-get.attitude(_status.event.player,target);
-						if(att<=0) return -att;
+						if(att<=0) return att;
 						if(target.hasSkillTag('nodamage')) return 0.01*att;
 						if(target.getEquip('tengjia')||target.getEquip('renwang')) return 0.2*att;
 						if(target.getEquip('bugua')) return 0.3*att;

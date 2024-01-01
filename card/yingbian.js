@@ -184,12 +184,29 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 0;
 					},
 					result:{
-						target:function(player,target,cardx){
-							if(player.hasSkillTag('viewHandcard',null,target,true)) return target.countCards('h',function(card){
-								return get.suit(card)!=get.suit(cardx)
-							})>0?-1.5:0;
-							return -1.4;
-						},
+						target:(player,target,card)=>{
+							//if(typeof card!=='object') return -2;
+							let suit=get.suit(card),
+								view=player.hasSkillTag('viewHandcard',null,target,true),
+								fz=0,
+								fm=0;
+							target.getCards('h',i=>{
+								if(i.isKnownBy(player)){
+									if(suit!==get.suit(i)){
+										if(view||get.is.shownCard(i)) return -2;
+										fz++;
+										fm++;
+									}
+									else if(!view&&!get.is.shownCard(i)) fm++;
+								}
+								else{
+									fz+=0.75;
+									fm++;
+								}
+							});
+							if(!fm) return 0;
+							return -2*fz/fm;
+						}
 					},
 					tag:{
 						damage:1,
