@@ -5,13 +5,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		character:{
 			ol_sb_jiangwei:['male','shu',4,['olsbzhuri','olsbranji']],
-			ol_caozhang:['male','wei',4,['oljiangchi']],
+			ol_caozhang:['male','wei',4,['oljiangchi'],['die_audio:xin_caozhang']],
 			ol_jianyong:['male','shu',3,['olqiaoshui','jyzongshi'],['tempname:re_jianyong','die_audio:re_jianyong']],
 			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong']],
 		},
 		characterSort:{
 			onlyOL:{
-				onlyOL_yijiang1:['ol_caozhang','ol_jianyong','ol_lingtong'],
+				onlyOL_yijiang1:['ol_jianyong','ol_lingtong'],
+				onlyOL_yijiang2:['ol_caozhang'],
 				onlyOL_sb:['ol_sb_jiangwei'],
 			},
 		},
@@ -185,7 +186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//界曹彰
 			oljiangchi:{
-				audio:2,
+				audio:'rejiangchi',
 				trigger:{player:'phaseDrawEnd'},
 				direct:true,
 				content:function*(event,map){
@@ -355,6 +356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kunfenx_info:'结束阶段开始时，你可以失去1点体力，然后摸两张牌。',
 
 			onlyOL_yijiang1:'OL专属·将1',
+			onlyOL_yijiang2:'OL专属·将2',
 			onlyOL_sb:'OL专属·上兵伐谋',
 		},
 	};
