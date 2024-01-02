@@ -194,7 +194,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 1;
 					}).set('num',num);
 					if(result.bool){
-						player.logSkill('dclingxi');
+						player.logSkill('dczhifou');
 						player.loseToDiscardpile(result.links);
 						var list=[],choiceList=[
 							'将一张牌称为“翼”置于'+get.translation(player)+'的武将牌上',
