@@ -16123,6 +16123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhouxian:'州贤',
 			zhouxian_info:'锁定技，当你成为其他角色使用的伤害类卡牌的目标后，你亮出牌堆顶的两张牌，然后其须选择一项：①弃置一张与亮出牌之一类别相同的牌；②令此牌对你无效。',
 			mb_huban:'手杀胡班',
+			mb_huban_prefix:'手杀',
 			mbyilie:'义烈',
 			mbyilie2:'义烈',
 			mbyilie3:'义烈',
