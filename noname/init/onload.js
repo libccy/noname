@@ -13,64 +13,17 @@ import { gnc } from '../gnc/index.js';
 export async function onload(resetGameTimeout) {
 	const libOnload = lib.onload;
 	delete lib.onload;
-	while (Array.isArray(libOnload) && libOnload.length) {
-		const fun = libOnload.shift();
-		if (typeof fun !== "function") continue;
-		await (gnc.is.generatorFunc(fun) ? gnc.of(fun) : fun)();
-	}
+	await runCustomContents(libOnload);
+	
 	ui.updated();
 	game.documentZoom = game.deviceZoom;
-	if (game.documentZoom != 1) {
-		ui.updatez();
-	}
-	ui.background = ui.create.div('.background');
-	ui.background.style.backgroundSize = "cover";
-	ui.background.style.backgroundPosition = '50% 50%';
-	if (lib.config.image_background && lib.config.image_background != 'default' && !lib.config.image_background.startsWith('custom_')) {
-		ui.background.setBackgroundImage('image/background/' + lib.config.image_background + '.jpg');
-		if (lib.config.image_background_blur) {
-			ui.background.style.filter = 'blur(8px)';
-			ui.background.style.webkitFilter = 'blur(8px)';
-			ui.background.style.transform = 'scale(1.05)';
-		}
-	}
-	document.documentElement.style.backgroundImage = '';
-	document.documentElement.style.backgroundSize = '';
-	document.documentElement.style.backgroundPosition = '';
-	document.body.insertBefore(ui.background, document.body.firstChild);
-	document.body.onresize = ui.updatexr;
-	if (lib.config.touchscreen) {
-		document.body.addEventListener('touchstart', function (e) {
-			this.startX = e.touches[0].clientX / game.documentZoom;
-			this.startY = e.touches[0].clientY / game.documentZoom;
-			_status.dragged = false;
-		});
-		document.body.addEventListener('touchmove', function (e) {
-			if (_status.dragged) return;
-			if (Math.abs(e.touches[0].clientX / game.documentZoom - this.startX) > 10 ||
-				Math.abs(e.touches[0].clientY / game.documentZoom - this.startY) > 10) {
-				_status.dragged = true;
-			}
-		});
-	}
+	if (game.documentZoom !== 1) ui.updatez();
 
-	if (lib.config.image_background.startsWith('custom_')) {
-		ui.background.style.backgroundImage = "none";
-		game.getDB('image', lib.config.image_background, function (fileToLoad) {
-			if (!fileToLoad) return;
-			var fileReader = new FileReader();
-			fileReader.onload = function (fileLoadedEvent) {
-				var data = fileLoadedEvent.target.result;
-				ui.background.style.backgroundImage = 'url(' + data + ')';
-				if (lib.config.image_background_blur) {
-					ui.background.style.filter = 'blur(8px)';
-					ui.background.style.webkitFilter = 'blur(8px)';
-					ui.background.style.transform = 'scale(1.05)';
-				}
-			};
-			fileReader.readAsDataURL(fileToLoad, "UTF-8");
-		});
-	}
+	await createBackground();
+
+	if (lib.config.touchscreen) createTouchDraggedFilter();
+
+	// 不拆分，太玄学了
 	if (lib.config.card_style == 'custom') {
 		game.getDB('image', 'card_style', function (fileToLoad) {
 			if (!fileToLoad) return;
@@ -154,6 +107,7 @@ export async function onload(resetGameTimeout) {
 			fileReader.readAsDataURL(fileToLoad, "UTF-8");
 		});
 	}
+
 	if (lib.config.player_style == 'custom') {
 		ui.css.player_stylesheet = lib.init.sheet('#window .player{background-image:none;background-size:100% 100%;}');
 		game.getDB('image', 'player_style', function (fileToLoad) {
@@ -210,7 +164,8 @@ export async function onload(resetGameTimeout) {
 		});
 	}
 
-	var proceed2 = async () => {
+	// 改不动，暂时不改了
+	const proceed2 = async () => {
 		var mode = lib.imported.mode;
 		var card = lib.imported.card;
 		var character = lib.imported.character;
@@ -678,7 +633,7 @@ export async function onload(resetGameTimeout) {
 		}
 		game.loop();
 	};
-	var proceed = async () => {
+	const proceed = async () => {
 		if (!lib.db) {
 			try {
 				lib.storage = JSON.parse(localStorage.getItem(lib.configprefix + lib.config.mode));
@@ -697,17 +652,18 @@ export async function onload(resetGameTimeout) {
 			});
 		}
 	};
+
 	if (!lib.imported.mode || !lib.imported.mode[lib.config.mode]) {
 		window.inSplash = true;
 		clearTimeout(resetGameTimeout);
-		var clickedNode = false;
-		var clickNode = function () {
+		let clickedNode = false;
+		const clickNode = function () {
 			if (clickedNode) return;
 			this.classList.add('clicked');
 			clickedNode = true;
 			lib.config.mode = this.link;
 			game.saveConfig('mode', this.link);
-			if (this.link == 'connect') {
+			if (this.link === 'connect') {
 				localStorage.setItem(lib.configprefix + 'directstart', true);
 				game.reload();
 			}
@@ -793,15 +749,89 @@ export async function onload(resetGameTimeout) {
 	}
 	else {
 		Reflect.set(window, 'resetGameTimeout', resetGameTimeout);
-		await proceed();
 	}
 	localStorage.removeItem(lib.configprefix + 'directstart');
-	delete lib.init.init;
+
 	const libOnload2 = lib.onload2;
 	delete lib.onload2;
-	while (Array.isArray(libOnload2) && libOnload2.length) {
-		const fun = libOnload2.shift();
-		if (typeof fun != "function") continue;
-		await (gnc.is.generatorFunc(fun) ? gnc.of(fun) : fun)();
+	await runCustomContents(libOnload2)
+}
+
+async function createBackground() {
+	ui.background = ui.create.div('.background');
+	ui.background.style.backgroundSize = "cover";
+	ui.background.style.backgroundPosition = '50% 50%';
+
+	document.documentElement.style.backgroundImage = '';
+	document.documentElement.style.backgroundSize = '';
+	document.documentElement.style.backgroundPosition = '';
+	document.body.insertBefore(ui.background, document.body.firstChild);
+	document.body.onresize = ui.updatexr;
+
+	if (!lib.config.image_background) return;
+	if (lib.config.image_background === 'default') return
+
+	let url = `url("${lib.assetURL}image/background/${lib.config.image_background}.jpg")`;
+
+	if (lib.config.image_background.startsWith('custom_')) {
+		try {
+			const fileToLoad = await game.getDB('image', lib.config.image_background);
+			const fileReader = new FileReader();
+			const fileLoadedEvent = await Promise((resolve) => {
+				fileReader.onload = resolve;
+				fileReader.readAsDataURL(fileToLoad, "UTF-8");
+			})
+			const data = fileLoadedEvent.target.result;
+			url = `url("${data}")`;
+		} catch (e) {
+			console.error(e);
+			url = "none";
+		}
 	}
+
+	ui.background.style.backgroundImage = url;
+	if (lib.config.image_background_blur) {
+		ui.background.style.filter = 'blur(8px)';
+		ui.background.style.webkitFilter = 'blur(8px)';
+		ui.background.style.transform = 'scale(1.05)';
+	}
+}
+
+function createTouchDraggedFilter() {
+	document.body.addEventListener('touchstart', function (e) {
+		this.startX = e.touches[0].clientX / game.documentZoom;
+		this.startY = e.touches[0].clientY / game.documentZoom;
+		_status.dragged = false;
+	});
+	document.body.addEventListener('touchmove', function (e) {
+		if (_status.dragged) return;
+		if (Math.abs(e.touches[0].clientX / game.documentZoom - this.startX) > 10 ||
+			Math.abs(e.touches[0].clientY / game.documentZoom - this.startY) > 10) {
+			_status.dragged = true;
+		}
+	});
+}
+
+/**
+ * @async
+ * @param {(() => void | GeneratorFunction)[]} contents 
+ */
+function runCustomContents(contents) {
+	if (!Array.isArray(contents)) return
+
+	const tasks = contents
+		.filter((fn) => typeof fn === "function")
+		.map((fn) => gnc.is.generatorFunc(fn) ? gnc.of(fn) : fn) // 将生成器函数转换成genCoroutin
+		.map((fn) => fn())
+
+
+	return Promise
+		.allSettled(tasks)
+		.then((results) => {
+			results.forEach((result) => {
+				if (result.status === "rejected") {
+					console.error(result.reason)
+				}
+			})
+		})
 }
