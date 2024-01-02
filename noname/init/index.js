@@ -754,7 +754,8 @@ function setServerIndex() {
 function setWindowListener() {
 	// 但愿有用
 	window.addEventListener("unhandledrejection", (error) => {
-		throw error;
+		// 希望error.reason能是个正常的error
+		throw error.reason;
 	});
 
 	window.onkeydown = function (e) {
