@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:['mb_xianglang','yanxiang','xin_wuban','laimin','baoxin','jiangji','liwei','xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
+				mobile_default:['mb_chengui','mb_huban','mb_xianglang','yanxiang','xin_wuban','laimin','baoxin','jiangji','liwei','xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan','yj_zhoubuyi'],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua_feng:['re_xiaoqiao',"xin_zhoutai"],
@@ -27,6 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		character:{
 			mb_chengui:['male','qun',3,['guimou','zhouxian']],
+			mb_huban:['male','wei',4,['mbyilie']],
 			mb_xianglang:['male','shu',3,['naxue','yijie']],
 			yanxiang:['male','qun',3,['kujian','twruilian'],['character:tw_yanxiang','die_audio:tw_yanxiang']],
 			mb_sunluyu:['female','wu',3,['mbmeibu','mbmumu']],
