@@ -38,6 +38,9 @@ export class VCard {
 			this.color = get.color(suitOrCard);
 			this.number = get.number(suitOrCard);
 			this.nature = get.nature(suitOrCard);
+			/**
+			 * @type { boolean }
+			 */
 			this.isCard = true;
 			this.cardid = suitOrCard.cardid;
 			this.wunature = suitOrCard.wunature;
