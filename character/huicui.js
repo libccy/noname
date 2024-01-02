@@ -6882,7 +6882,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				initList:function(){
 					var list,skills=[];
-					var banned=['xunyi'];
+					var banned=['xunyi','mbyilie'];
 					if(get.mode()=='guozhan'){
 						list=[];
 						for(var i in lib.characterPack.mode_guozhan) list.push(i);
@@ -10952,6 +10952,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mengyou:['mengyou','ns_mengyou'],
 			zhangchu:['zhangchu','jsrg_zhangchu'],
 			xianglang:['xianglang','mb_xianglang'],
+			chengui:['chengui','mb_chengui'],
 		},
 		translate:{
 			re_panfeng:'潘凤',

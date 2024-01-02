@@ -10629,7 +10629,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoanmin:['caoanmin','ns_caoanmin'],
 			duanwei:['duanwei','junk_duanwei'],
 			xushao:['xushao','jsrg_xushao'],
-			huban:['ol_huban','dc_huban'],
+			huban:['ol_huban','dc_huban','mb_huban'],
 			mengda:['ol_mengda','dc_mengda','pe_mengda'],
 			jsp_guanyu:['jsp_guanyu','dc_jsp_guanyu','jsrg_guanyu'],
 			mushun:['mushun','sp_mushun'],

@@ -26,6 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			mb_chengui:['male','qun',3,['guimou','zhouxian']],
 			mb_xianglang:['male','shu',3,['naxue','yijie']],
 			yanxiang:['male','qun',3,['kujian','twruilian'],['character:tw_yanxiang','die_audio:tw_yanxiang']],
 			mb_sunluyu:['female','wu',3,['mbmeibu','mbmumu']],
@@ -389,6 +390,327 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//陈珪
+			guimou:{
+				audio:2,
+				trigger:{
+					global:'phaseBefore',
+					player:['enterGame','phaseEnd','phaseZhunbeiBegin'],
+				},
+				filter:function(event,player,name){
+					if(event.name=='phaseZhunbei'||name=='phaseEnd') return true;
+					return event.name!='phase'||game.phaseNumber==0;
+				},
+				direct:true,
+				locked:true,
+				content:function*(event,map){
+					var player=map.player,trigger=map.trigger;
+					if(trigger.name!='phaseZhunbei'){
+						player.logSkill('guimou');
+						var result,choiceList=[
+							'惩罚期间使用牌最少的角色',
+							'惩罚期间弃置牌最少的角色',
+							'惩罚期间得到牌最少的角色',
+						];
+						if(trigger.name!='phase'||game.phaseNumber==0) result={index:get.rand(0,2)};
+						else result=yield player.chooseControl().set('choiceList',choiceList).set('ai',()=>get.rand(0,2));
+						var str=choiceList[result.index];
+						game.log(player,'选择','#g'+str);
+						player.addSkill('guimou_'+result.index);
+						return;
+					}
+					var targets=[];
+					for(var i=0;i<=2;i++){
+						var skill='guimou_'+i;
+						if(player.hasSkill(skill)){
+							var storage=player.storage[skill];
+							var targetx=storage[0].sort((a,b)=>storage[1][storage[0].indexOf(a)]-storage[1][storage[0].indexOf(b)]);
+							targetx=targetx.filter(target=>storage[1][storage[0].indexOf(target)]==storage[1][storage[0].indexOf(targetx[0])]);
+							targets.addArray(targetx);
+							player.removeSkill(skill);
+						}
+					}
+					targets=targets.filter(target=>target!=player);
+					if(targets.length){
+						var result=yield player.chooseTarget('请选择【诡谋】的目标','观看一名可选择的角色的手牌并选择其中至多三张牌，然后你可以将其中至多两张牌交给另一名其他角色，然后弃置剩余的牌',(card,player,target)=>{
+							return _status.event.targets.includes(target)&&target.countCards('h');
+						},true).set('ai',target=>{
+							return Math.sqrt(Math.min(3,target.countCards('h')))*get.effect(target,{name:'guohe_copy2'},player,player);
+						}).set('targets',targets);
+						if(result.bool){
+							var target=result.targets[0];
+							player.logSkill('guimou',target);
+							var result2=yield player.choosePlayerCard(target,'h','visible','并选择其中至多三张牌，然后你可以将其中至多两张牌交给另一名其他角色，然后弃置剩余的牌',[1,3],true).set('ai',button=>get.value(button.link));
+							if(result2.bool){
+								var cards=result2.links.slice();
+								var result3;
+								if(!game.hasPlayer(targetx=>targetx!=player&&targetx!=target)) result3={bool:false};
+								else result3=yield player.chooseCardButton('是否将其中至多两张牌交给另一名其他角色',cards,[1,Math.min(2,cards.length)]).set('ai',button=>{
+									var player=_status.event.player;
+									if(!game.hasPlayer(target=>target!=player&&target!=_status.event.target&&get.attitude(player,target)>0)) return 0;
+									return get.value(button.link,_status.event.player);
+								}).set('target',target);
+								if(result3.bool){
+									var result4=yield player.chooseTarget('请选择获得'+get.translation(result3.links)+'的目标',(card,player,target)=>{
+										return target!=player&&target!=_status.event.target;
+									}).set('ai',target=>get.attitude(_status.event.player,target)).set('target',target);
+									if(result4.bool){
+										var targetx=result4.targets[0];
+										player.line(targetx);
+										targetx.gain(result3.links,target,'give');
+										cards.removeArray(result3.links);
+									}
+								}
+								if(cards.length) target.discard(cards).discarder=player;
+							}
+						}
+					}
+				},
+				subSkill:{
+					'0':{
+						charlotte:true,
+						onremove:true,
+						init:function(player,skill){
+							if(!player.storage[skill]){
+								player.storage[skill]=[[],[]];
+								var targets=game.filterPlayer().sortBySeat(player);
+								targets.forEach(target=>{
+									player.storage[skill][0].push(target);
+									player.storage[skill][1].push(0);
+								});
+							}
+						},
+						mark:true,
+						intro:{
+							markcount:storage=>0,
+							content:function(storage,player){
+								var str='当前使用牌数排行榜';
+								var lose=storage[1].slice().sort((a,b)=>a-b)[0];
+								storage[0].forEach(target=>{
+									str+='<br><li>';
+									var score=storage[1][storage[0].indexOf(target)];
+									if(score==lose) str+='<span class=\'texiaotext\' style=\'color:#FF0000\'>';
+									str+=(' '+get.translation(target)+' ');
+									str+=(score+'张');
+									if(score==lose) str+='</span>';
+								});
+								return str;
+							},
+						},
+						trigger:{global:'useCard'},
+						forced:true,
+						popup:false,
+						content:function(){
+							var storage=player.storage['guimou_0'];
+							if(!storage[0].includes(trigger.player)){
+								storage[0].push(trigger.player);
+								storage[1].push(0);
+							}
+							storage[1][storage[0].indexOf(trigger.player)]++;
+						},
+					},
+					'1':{
+						charlotte:true,
+						onremove:true,
+						init:function(player,skill){
+							if(!player.storage[skill]){
+								player.storage[skill]=[[],[]];
+								var targets=game.filterPlayer().sortBySeat(player);
+								targets.forEach(target=>{
+									player.storage[skill][0].push(target);
+									player.storage[skill][1].push(0);
+								});
+							}
+						},
+						mark:true,
+						intro:{
+							markcount:storage=>0,
+							content:function(storage,player){
+								var str='当前弃置牌数排行榜';
+								var lose=storage[1].slice().sort((a,b)=>a-b)[0];
+								storage[0].forEach(target=>{
+									str+='<br><li>';
+									var score=storage[1][storage[0].indexOf(target)];
+									if(score==lose) str+='<span class=\'texiaotext\' style=\'color:#FF0000\'>';
+									str+=(' '+get.translation(target)+' ');
+									str+=(score+'张');
+									if(score==lose) str+='</span>';
+								});
+								return str;
+							},
+						},
+						trigger:{global:['loseAfter','loseAsyncAfter']},
+						filter:function (event,player){
+							return event.type=='discard'&&game.hasPlayer(target=>event.getl(target).cards2.length);
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							var storage=player.storage['guimou_1'];
+							var targets=game.filterPlayer(target=>trigger.getl(target).cards2.length);
+							targets.forEach(target=>{
+								if(!storage[0].includes(target)){
+									storage[0].push(target);
+									storage[1].push(0);
+								}
+								storage[1][storage[0].indexOf(target)]+=trigger.getl(target).cards2.length;
+							});
+						},
+					},
+					'2':{
+						charlotte:true,
+						onremove:true,
+						init:function(player,skill){
+							if(!player.storage[skill]){
+								player.storage[skill]=[[],[]];
+								var targets=game.filterPlayer().sortBySeat(player);
+								targets.forEach(target=>{
+									player.storage[skill][0].push(target);
+									player.storage[skill][1].push(0);
+								});
+							}
+						},
+						mark:true,
+						intro:{
+							markcount:storage=>0,
+							content:function(storage,player){
+								var str='当前得到牌数排行榜';
+								var lose=storage[1].slice().sort((a,b)=>a-b)[0];
+								storage[0].forEach(target=>{
+									str+='<br><li>';
+									var score=storage[1][storage[0].indexOf(target)];
+									if(score==lose) str+='<span class=\'texiaotext\' style=\'color:#FF0000\'>';
+									str+=(' '+get.translation(target)+' ');
+									str+=(score+'张');
+									if(score==lose) str+='</span>';
+								});
+								return str;
+							},
+						},
+						trigger:{global:['gainAfter','loseAsyncAfter']},
+						forced:true,
+						popup:false,
+						content:function(){
+							var storage=player.storage['guimou_2'];
+							var targets=game.filterPlayer(target=>trigger.getg(target).length);
+							targets.forEach(target=>{
+								if(!storage[0].includes(target)){
+									storage[0].push(target);
+									storage[1].push(0);
+								}
+								storage[1][storage[0].indexOf(target)]+=trigger.getg(target).length;
+							});
+						},
+					},
+				},
+			},
+			zhouxian:{
+				audio:2,
+				trigger:{target:'useCardToTargeted'},
+				filter:function(event,player){
+					return event.player!=player&&get.tag(event.card,'damage');
+				},
+				forced:true,
+				logTarget:'player',
+				content:function*(event,map){
+					var player=map.player,trigger=map.trigger,target=trigger.player;
+					var cards=get.cards(2);
+					player.showCards(cards,get.translation(player)+'发动了【州贤】');
+					var result=yield target.chooseToDiscard('he','州贤：弃置一张其中有的类别的牌，或令此牌对'+get.translation(player)+'无效',(card,player)=>{
+						return _status.event.cards.some(cardx=>get.type2(cardx)==get.type2(card));
+					}).set('cards',cards).set('ai',card=>{
+						if(!_status.event.goon) return 0;
+						return 7.5-get.value(card);
+					}).set('goon',get.effect(player,trigger.card,target,target)>0);
+					if(!result.bool) trigger.getParent().excluded.add(player);
+				},
+				ai:{
+					effect:{
+						target_use:function(card,player,target,current){
+							if(get.tag(card,'damage')&&get.attitude(player,target)<0&&target!=player){
+								if(_status.event.name=='zhouxian') return;
+								if(get.attitude(player,target)>0&&current<0) return 'zerotarget';
+								var bs=player.getDiscardableCards(player,'he');
+								bs.remove(card);
+								if(card.cards) bs.removeArray(card.cards);
+								else bs.removeArray(ui.selected.cards);
+								var cardx=Array.from(ui.cardPile.childNodes).slice(0,2);
+								bs=bs.filter(i=>cardx.some(j=>get.type2(j)==get.type2(i)));
+								if(!bs.length) return 'zerotarget';
+								if(bs.length<=2){
+									if(bs.some(bsi=>get.value(bsi)<7)) return [1,0,1,-0.5];
+									return [1,0,0.3,0];
+								}
+								return [1,0,1,-0.5];
+							}
+						},
+					},
+				},
+			},
+			//胡班
+			mbyilie:{
+				audio:3,
+				trigger:{global:'phaseBefore',player:'enterGame'},
+				filter:function(event,player){
+					return !player.storage.mbyilie2&&(event.name!='phase'||game.phaseNumber==0);
+				},
+				direct:true,
+				content:function(){
+					'step 0'
+					player.chooseTarget(get.prompt2('mbyilie'),lib.filter.notMe).set('ai',function(target){
+						var player=_status.event.player;
+						return Math.max(1+get.attitude(player,target)*get.threaten(target),Math.random());
+					});
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('mbyilie',target);
+						player.storage.mbyilie2=target;
+						player.addSkill('mbyilie2');
+					}
+				},
+				marktext:'烈',
+				intro:{
+					name2:'烈',
+					content:'mark',
+				},
+				group:'mbyilie3',
+			},
+			mbyilie2:{
+				charlotte:true,
+				audio:'mbyilie',
+				trigger:{global:['damageBegin4','damageSource']},
+				filter:function(event,player,name){
+					var target=player.storage.mbyilie2;
+					if(name=='damageSource') return event.source==target&&event.player!=target&&player.isDamaged();
+					return event.player==target&&player.countMark('mbyilie')<2;
+				},
+				forced:true,
+				logTarget:function(event,player){
+					return player.storage.mbyilie2;
+				},
+				content:function(){
+					if(event.triggername=='damageSource') player.recover();
+					else{
+						player.addMark('mbyilie',trigger.num);
+						trigger.cancel();
+					}
+				},
+			},
+			mbyilie3:{
+				audio:'mbyilie',
+				trigger:{player:'phaseEnd'},
+				filter:function(event,player){
+					return player.countMark('mbyilie');
+				},
+				forced:true,
+				content:function(){
+					var num=player.countMark('mbyilie');
+					player.draw(num);
+					player.loseHp(num);
+					player.removeMark('mbyilie',num);
+				},
+			},
 			//向朗
 			naxue:{
 				audio:2,
@@ -15793,6 +16115,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			naxue_info:'你可以跳过出牌阶段。若如此做，你可以弃置任意张牌并摸等量的牌，然后你可以交给至多两名其他角色各一张手牌。',
 			yijie:'遗诫',
 			yijie_info:'锁定技。当你死亡时，你令所有其他角色将体力回复或失去至X（X为所有其他角色的体力之和除以所有其他角色数，向下取整，且X至少为1）。',
+			mb_chengui:'手杀陈珪',
+			mb_chengui_prefix:'手杀',
+			guimou:'诡谋',
+			guimou_info:'锁定技。游戏开始时/回合结束时，你随机/须选择以下一项：①记录场上期间角色使用牌数；②记录期间场上角色弃置牌数；③记录期间场上角色获得牌数。准备阶段，你可以选择一名场上对应记录数值最少的其他角色，观看其手牌并选择其中至多三张牌，然后你可以将其中至多两张牌交给另一名其他角色，然后弃置其余牌。',
+			zhouxian:'州贤',
+			zhouxian_info:'锁定技，当你成为其他角色使用的伤害类卡牌的目标后，你亮出牌堆顶的两张牌，然后其须选择一项：①弃置一张与亮出牌之一类别相同的牌；②令此牌对你无效。',
+			mb_huban:'手杀胡班',
+			mbyilie:'义烈',
+			mbyilie2:'义烈',
+			mbyilie3:'义烈',
+			mbyilie_info:'锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你的“烈”标记数小于2，则你获得等同于伤害值的“烈”标记，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，若你有“烈”标记，你摸X张牌并失去X点体力，然后移去所有“烈”标记（X为你拥有的“烈”标记数）。',
 			
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',
