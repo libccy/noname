@@ -337,11 +337,10 @@ export class Is extends Uninstantable {
 	*/
 	/**
 	 * @param { any } obj 
+	 * @returns { boolean }
 	 */
 	static node(obj) {
-		var str = Object.prototype.toString.call(obj);
-		if (str && str.indexOf('[object HTML')) return true;
-		return false;
+		return Object.prototype.toString.call(obj).startsWith('[object HTML');
 	}
 	/**
 	 * @param { any } obj 
