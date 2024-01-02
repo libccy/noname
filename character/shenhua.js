@@ -4310,7 +4310,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						event.dialog.open();
 						event.custom.replace.button=function(button){
-							if(!event.dialog.includes(button.parentNode)) return;
+							if(!event.dialog.contains(button.parentNode)) return;
 							if(event.control) event.control.style.opacity=1;
 							if(button.classList.contains('selectedx')){
 								event.button=null;
