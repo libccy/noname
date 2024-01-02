@@ -38,4 +38,4 @@ declare type GameHistory = import('../../noname/game/index.js').GameHistory;
 declare type CodeMirror = typeof import('../../game/codemirror.js').default;
 
 declare type Sex = 'male' | 'female' | 'dobule' | 'none';
-declare type Character = [Sex, string, number | string, string[], ...any[]];
+declare type Character = [Sex, string, number | string, string[], string[]];

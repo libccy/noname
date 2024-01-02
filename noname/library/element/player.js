@@ -21,6 +21,153 @@ export class Player extends HTMLDivElement {
 		player.build(noclick);
 		return player;
 	}
+	/**
+	 * Do not call this method
+	 * 
+	* @returns { never }
+	*/
+	typeAnnotation() {
+		/**
+		 * @type { SMap<HTMLDivElement> }
+		 */
+		// @ts-ignore
+		this.node;
+		/**
+		 * @type { number }
+		 */
+		// @ts-ignore
+		this.phaseNumber;
+		/**
+		 * @type { string[] }
+		 */
+		// @ts-ignore
+		this.skipList;
+		/**
+		 * @type { string[] }
+		 */
+		// @ts-ignore
+		this.skills;
+		/**
+		 * @type { string[] }
+		 */
+		// @ts-ignore
+		this.invisibleSkills;
+		/**
+		 * @type { string[] }
+		 */
+		// @ts-ignore
+		this.initedSkills;
+		/**
+		 * @type { SMap<string[]> }
+		 */
+		// @ts-ignore
+		this.additionalSkills;
+		/**
+		 * @type { SMap<string[]> }
+		 */
+		// @ts-ignore
+		this.disabledSkills;
+		/**
+		 * @type { string[] }
+		 */
+		// @ts-ignore
+		this.hiddenSkills;
+		/**
+		 * @type { string[] }
+		 */
+		// @ts-ignore
+		this.awakenedSkills;
+		/**
+		 * @type { SMap<string[]> }
+		 */
+		// @ts-ignore
+		this.forbiddenSkills = {};
+		/**
+		 * @type { [] }
+		 */
+		// @ts-ignore
+		this.popups;
+		/**
+		 * @type { [] }
+		 */
+		// @ts-ignore
+		this.damagepopups;
+		/**
+		 * @type { Card[] }
+		 */
+		// @ts-ignore
+		this.judging;
+		/**
+		 * @type { { card:{}, skill: {} }[] }
+		 */
+		// @ts-ignore
+		this.stat;
+		/**
+		 * @type { { 
+		 * 	useCard: GameEventPromise[], 
+		 * 	respond: GameEventPromise[], 
+		 * 	skipped: GameEventPromise[], 
+		 * 	lose: GameEventPromise[], 
+		 * 	gain: GameEventPromise[], 
+		 * 	sourceDamage: GameEventPromise[],  
+		 * 	damage: GameEventPromise[],  
+		 * 	custom: GameEventPromise[], 
+		 * 	useSkill: GameEventPromise[], 
+		 * }[] }
+		 */
+		// @ts-ignore
+		this.actionHistory;
+		/**
+		 * @type { SMap<string[]> }
+		 */
+		// @ts-ignore
+		this.tempSkills;
+		/**
+		 * @type { SMap<any> }
+		 */
+		// @ts-ignore
+		this.storage;
+		/**
+		 * @type { SMap<HTMLDivElement> }
+		 */
+		// @ts-ignore
+		this.marks;
+		/**
+		 * @type { SMap<number> }
+		 */
+		// @ts-ignore
+		this.expandedSlots;
+		/**
+		 * @type { SMap<number> }
+		 */
+		// @ts-ignore
+		this.disabledSlots;
+		/**
+		 * @type { {
+		 * 	friend: [],
+		 * 	enemy: [],
+		 * 	neutral: [],
+		 * 	handcards: {
+		 * 		global: [],
+		 * 		source: [],
+		 * 		viewed: []
+		 * 	}
+		 * } }
+		 */
+		// @ts-ignore
+		this.ai;
+		/**
+		 * @type { number }
+		 */
+		// @ts-ignore
+		this.queueCount;
+		/**
+		 * @type { number }
+		 */
+		// @ts-ignore
+		this.outCount;
+		throw new Error('Do not call this method');
+	}
 	build(noclick) {
 		let player = this;
 		player.buildNode();

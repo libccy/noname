@@ -9,9 +9,9 @@ import { GNC as gnc } from '../gnc/index.js';
 export class Is extends Uninstantable {
 	/**
 	 * 判断是否为进攻坐骑
-	 * @param {Card | VCard} card
-	 * @param {false | Player} [player]
-	 * @returns {boolean}
+	 * @param { Card | VCard } card
+	 * @param { false | Player } [player]
+	 * @returns { boolean }
 	 */
 	static attackingMount(card, player) {
 		const subtype = get.subtype(card, player);
@@ -25,9 +25,9 @@ export class Is extends Uninstantable {
 	}
 	/**
 	 * 判断是否为防御坐骑
-	 * @param {Card | VCard} card
-	 * @param {false | Player} [player]
-	 * @returns {boolean}
+	 * @param { Card | VCard } card
+	 * @param { false | Player } [player]
+	 * @returns { boolean }
 	 */
 	static defendingMount(card, player) {
 		const subtype = get.subtype(card, player);
@@ -41,6 +41,7 @@ export class Is extends Uninstantable {
 	}
 	/**
 	 * 判断坐骑栏是否被合并
+	 * @returns { boolean }
 	 */
 	static mountCombined() {
 		if (lib.configOL.mount_combine) {
@@ -117,6 +118,7 @@ export class Is extends Uninstantable {
 	}
 	/**
 	 * 判断一张牌是否为明置手牌
+	 * @param { Card } card
 	 */
 	static shownCard(card) {
 		if (!card) return false;
@@ -125,34 +127,57 @@ export class Is extends Uninstantable {
 	}
 	/**
 	 * 是否是虚拟牌
+	 * @param { Card | VCard } card
 	 */
-	static vituralCard(card) { return card.isCard || (!("cards" in card) || !Array.isArray(card.cards) || card.cards.length == 0); }
+	// @ts-ignore
+	static vituralCard(card) { 
+		return card.isCard || (!("cards" in card) || !Array.isArray(card.cards) || card.cards.length == 0); 
+	}
 	/**
 	 * 是否是转化牌
+	 * @param { Card | VCard } card
 	 */
-	static convertedCard(card) { return !card.isCard && ("cards" in card) && Array.isArray(card.cards) && card.cards.length > 0; }
+	// @ts-ignore
+	static convertedCard(card) { 
+		return !card.isCard && ("cards" in card) && Array.isArray(card.cards) && card.cards.length > 0; 
+	}
 	/**
 	 * 是否是实体牌
+	 * @param { Card | VCard } card
 	 */
-	static ordinaryCard(card) { return card.isCard && ("cards" in card) && Array.isArray(card.cards) && card.cards.length == 1; }
+	// @ts-ignore
+	static ordinaryCard(card) { return card.isCard && ("cards" in card) && Array.isArray(card.cards) && card.cards.length == 1 }
 	/**
 	 * 押韵判断
+	 * @param { string } str1 
+	 * @param { string } str2 
 	 */
 	static yayun(str1, str2) {
 		if (str1 == str2) return true;
-		var pinyin1 = get.pinyin(str1, false), pinyin2 = get.pinyin(str2, false);
+		let pinyin1 = get.pinyin(str1, false), pinyin2 = get.pinyin(str2, false);
 		if (!pinyin1.length || !pinyin2.length) return false;
-		var pron1 = pinyin1[pinyin1.length - 1], pron2 = pinyin2[pinyin2.length - 1];
+		let pron1 = pinyin1[pinyin1.length - 1], pron2 = pinyin2[pinyin2.length - 1];
 		if (pron1 == pron2) return true;
 		return get.yunjiao(pron1) == get.yunjiao(pron2);
 	}
+	/**
+	 * @param { string } skill 技能id
+	 * @param { Player } player 玩家
+	 * @returns 
+	 */
 	static blocked(skill, player) {
 		if (!player.storage.skill_blocker || !player.storage.skill_blocker.length) return false;
-		for (var i of player.storage.skill_blocker) {
+		for (let i of player.storage.skill_blocker) {
 			if (lib.skill[i] && lib.skill[i].skillBlocker && lib.skill[i].skillBlocker(skill, player)) return true;
 		}
 		return false;
 	}
+	/**
+	 * 是否是双势力武将
+	 * @param { string } name 
+	 * @param { string[] } array 
+	 * @returns { boolean | string[] }
+	 */
 	static double(name, array) {
 		const extraInformations = get.character(name, 4);
 		if (!extraInformations) return false;
@@ -166,14 +191,21 @@ export class Is extends Uninstantable {
 	 * Check if the card has a Yingbian condition
 	 * 
 	 * 检测此牌是否具有应变条件
+	 * @param { Card | VCard } card
 	 */
-	static yingbianConditional(card) { return get.is.complexlyYingbianConditional(card) || get.is.simplyYingbianConditional(card); }
+	static yingbianConditional(card) { return get.is.complexlyYingbianConditional(card) || get.is.simplyYingbianConditional(card) }
+	/**
+	 * @param { Card | VCard } card
+	 */
 	static complexlyYingbianConditional(card) {
 		for (const key of lib.yingbian.condition.complex.keys()) {
 			if (get.cardtag(card, `yingbian_${key}`)) return true;
 		}
 		return false;
 	}
+	/**
+	 * @param { Card | VCard } card
+	 */
 	static simplyYingbianConditional(card) {
 		for (const key of lib.yingbian.condition.simple.keys()) {
 			if (get.cardtag(card, `yingbian_${key}`)) return true;
@@ -184,6 +216,8 @@ export class Is extends Uninstantable {
 	 * Check if the card has a Yingbian effect
 	 * 
 	 * 检测此牌是否具有应变效果
+	 * 
+	 * @param { Card | VCard } card
 	 */
 	static yingbianEffective(card) {
 		for (const key of lib.yingbian.effect.keys()) {
@@ -191,26 +225,32 @@ export class Is extends Uninstantable {
 		}
 		return false;
 	}
-	static yingbian(card) { return get.is.yingbianConditional(card) || get.is.yingbianEffective(card); }
+	/**
+	 * @param { Card | VCard } card 
+	 */
+	static yingbian(card) { return get.is.yingbianConditional(card) || get.is.yingbianEffective(card) }
+	/**
+	 * @param { string } [substring] 
+	 */
 	static emoji(substring) {
 		if (substring) {
-			var reg = new RegExp("[~#^$@%&!?%*]", 'g');
+			const reg = new RegExp("[~#^$@%&!?%*]", 'g');
 			if (substring.match(reg)) {
 				return true;
 			}
-			for (var i = 0; i < substring.length; i++) {
-				var hs = substring.charCodeAt(i);
+			for (let i = 0; i < substring.length; i++) {
+				const hs = substring.charCodeAt(i);
 				if (0xd800 <= hs && hs <= 0xdbff) {
 					if (substring.length > 1) {
-						var ls = substring.charCodeAt(i + 1);
-						var uc = ((hs - 0xd800) * 0x400) + (ls - 0xdc00) + 0x10000;
+						const ls = substring.charCodeAt(i + 1);
+						const uc = ((hs - 0xd800) * 0x400) + (ls - 0xdc00) + 0x10000;
 						if (0x1d000 <= uc && uc <= 0x1f77f) {
 							return true;
 						}
 					}
 				}
 				else if (substring.length > 1) {
-					var ls = substring.charCodeAt(i + 1);
+					const ls = substring.charCodeAt(i + 1);
 					if (ls == 0x20e3) {
 						return true;
 					}
@@ -238,13 +278,28 @@ export class Is extends Uninstantable {
 		}
 		return false;
 	}
-	static banWords(str) { return get.is.emoji(str) || window.bannedKeyWords.some(item => str.includes(item)); }
-	static converted(event) { return !(event.card && event.card.isCard); }
-	static safari() { return userAgent.indexOf('safari' != -1) && userAgent.indexOf('chrome') == -1; }
-	static freePosition(cards) { return !cards.some(card => !card.hasPosition || card.hasPosition()); }
+	/**
+	 * @param { string } str 
+	 */
+	static banWords(str) { return get.is.emoji(str) || window.bannedKeyWords.some(item => str.includes(item)) }
+	/**
+	 * @param { GameEventPromise } event 
+	 */
+	// @ts-ignore
+	static converted(event) { return !(event.card && event.card.isCard) }
+	static safari() { return userAgent.indexOf('safari') != -1 && userAgent.indexOf('chrome') == -1 }
+	/**
+	 * @param { (Card | VCard)[]} cards
+	 */
+	// @ts-ignore
+	static freePosition(cards) { return !cards.some(card => !card.hasPosition || card.hasPosition()) }
+	/**
+	 * @param { string } name 
+	 * @param { boolean } item 
+	 */
 	static nomenu(name, item) {
-		var menus = ['system', 'menu'];
-		var configs = {
+		const menus = ['system', 'menu'];
+		const configs = {
 			show_round_menu: lib.config.show_round_menu,
 			round_menu_func: lib.config.round_menu_func,
 			touchscreen: lib.config.touchscreen,
@@ -284,23 +339,50 @@ export class Is extends Uninstantable {
 		// return !lib.config.vintageSkills.includes(skill);
 	},
 	*/
+	/**
+	 * @param { any } obj 
+	 * @returns { boolean }
+	 */
 	static node(obj) {
-		var str = Object.prototype.toString.call(obj);
-		if (str && str.indexOf('[object HTML')) return true;
-		return false;
+		return Object.prototype.toString.call(obj).startsWith('[object HTML');
 	}
-	static div(obj) { return Object.prototype.toString.call(obj) === '[object HTMLDivElement]'; }
-	static map(obj) { return Object.prototype.toString.call(obj) === '[object Map]'; }
-	static set(obj) { return Object.prototype.toString.call(obj) === '[object Set]'; }
-	static object(obj) { return Object.prototype.toString.call(obj) === '[object Object]'; }
+	/**
+	 * @param { any } obj 
+	 */
+	static div(obj) { return Object.prototype.toString.call(obj) === '[object HTMLDivElement]' }
+	/**
+	 * @param { any } obj 
+	 */
+	static map(obj) { return Object.prototype.toString.call(obj) === '[object Map]' }
+	/**
+	 * @param { any } obj 
+	 */
+	static set(obj) { return Object.prototype.toString.call(obj) === '[object Set]' }
+	/**
+	 * @param { any } obj 
+	 */
+	static object(obj) { return Object.prototype.toString.call(obj) === '[object Object]' }
+	/**
+	 * @overload
+	 * @param { Function } func 
+	 * @returns { false }
+	 */
+	/**
+	 * @overload
+	 * @param { number | [number, number] } func 
+	 * @returns { boolean }
+	 */
 	static singleSelect(func) {
 		if (typeof func == 'function') return false;
-		var select = get.select(func);
+		const select = get.select(func);
 		return select[0] == 1 && select[1] == 1;
 	}
+	/**
+	 * @param { string | Player } name 
+	 */
 	static jun(name) {
 		if (get.mode() == 'guozhan') {
-			if (name && typeof name == 'object') {
+			if (name instanceof lib.element.Player) {
 				if (name.isUnseen && name.isUnseen(0)) return false;
 				name = name.name1;
 			}
@@ -310,16 +392,22 @@ export class Is extends Uninstantable {
 		}
 		return false;
 	}
-	static versus() { return !_status.connectMode && get.mode() == 'versus' && _status.mode == 'three'; }
-	static changban() { return get.mode() == 'single' && _status.mode == 'changban'; }
-	static single() { return get.mode() == 'single' && _status.mode == 'normal'; }
-	static mobileMe(player) { return (game.layout == 'mobile' || game.layout == 'long') && !game.chess && player.dataset.position == 0; }
-	static newLayout() { return game.layout != 'default'; }
+	static versus() { return !_status.connectMode && get.mode() == 'versus' && _status.mode == 'three' }
+	static changban() { return get.mode() == 'single' && _status.mode == 'changban' }
+	static single() { return get.mode() == 'single' && _status.mode == 'normal' }
+	/**
+	 * @param { Player } [player] 
+	 */
+	static mobileMe(player) { return (game.layout == 'mobile' || game.layout == 'long') && !game.chess && player && player.dataset.position == '0' }
+	static newLayout() { return game.layout != 'default' }
 	static phoneLayout() {
 		if (!lib.config.phonelayout) return false;
 		return (game.layout == 'mobile' || game.layout == 'long' || game.layout == 'long2' || game.layout == 'nova');
 	}
-	static singleHandcard() { return game.singleHandcard || game.layout == 'mobile' || game.layout == 'long' || game.layout == 'long2' || game.layout == 'nova'; }
+	static singleHandcard() { return game.singleHandcard || game.layout == 'mobile' || game.layout == 'long' || game.layout == 'long2' || game.layout == 'nova' }
+	/**
+	 * @param { Player } player 
+	 */
 	static linked2(player) {
 		if (game.chess) return true;
 		if (lib.config.link_style2 != 'rotate') return true;
@@ -330,10 +418,21 @@ export class Is extends Uninstantable {
 		}
 		return false;
 	}
-	static empty(obj) { return Object.keys(obj).length == 0; }
-	static pos(str) { return str == 'h' || str == 'e' || str == 'j' || str == 'he' || str == 'hj' || str == 'ej' || str == 'hej'; }
+	/**
+	 * @param { {} } obj 
+	 */
+	static empty(obj) { return Object.keys(obj).length == 0 }
+	/**
+	 * @param { string } str 
+	 */
+	static pos(str) { return str == 'h' || str == 'e' || str == 'j' || str == 'he' || str == 'hj' || str == 'ej' || str == 'hej' }
+	/**
+	 * @param { string } skill 
+	 * @param { Player } player 
+	 * @returns 
+	 */
 	static locked(skill, player) {
-		var info = lib.skill[skill];
+		const info = lib.skill[skill];
 		if (typeof info.locked == 'function') return info.locked(skill, player);
 		if (info.locked == false) return false;
 		if (info.trigger && info.forced) return true;
@@ -510,6 +609,9 @@ export class Get extends Uninstantable {
 		return [];
 	}
 	//装备栏 END
+	/**
+	 * @returns { string[] }
+	 */
 	static pinyin(chinese, withTone) {
 		const pinyinUtilx = window.pinyinUtilx;
 		if (!pinyinUtilx) return [];
@@ -836,6 +938,18 @@ export class Get extends Uninstantable {
 			return func(list[0]);
 		}
 	}
+	/**
+	 * @overload
+	 * @param { string } name 
+	 * @returns { Character }
+	 */
+	/**
+	 * @template { 0 | 1 | 2 | 3 | 4 } T
+	 * @overload
+	 * @param { string } name 
+	 * @param { T } num 
+	 * @returns { Character[T] }
+	 */
 	static character(name, num) {
 		let info = lib.character[name];
 		if (!info) {
@@ -2781,6 +2895,9 @@ export class Get extends Uninstantable {
 			game.players.length + game.dead.length :
 			game.players.concat(game.dead).filter(current => current.identity == identity).length;
 	}
+	/**
+	 * @param { Card | VCard } item
+	 */
 	static cardtag(item, tag) {
 		return (item.cardid && (get.itemtype(item) == 'card' || !item.cards || !item.cards.length || item.name == item.cards[0].name) && _status.cardtag && _status.cardtag[tag] && _status.cardtag[tag].includes(item.cardid))
 			|| (item.cardtags && item.cardtags.includes(tag))

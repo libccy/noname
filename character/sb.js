@@ -5,6 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sb',
 		connect:true,
 		character:{
+			sb_guanyu:['male','shu',4,['sbwusheng','sbyijue']],
 			sb_huangyueying:['female','shu',3,['sbjizhi','sbqicai']],
 			sb_sp_zhugeliang:['male','shu',3,['sbhuoji','sbkanpo']],
 			sb_zhugeliang:['male','shu',3,['sbguanxing','sbkongcheng']],
@@ -54,6 +55,182 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//关羽
+			//矢
+			sbwusheng:{
+				audio:3,
+				trigger:{player:'phaseUseBegin'},
+				filter:function(event,player){
+					return game.hasPlayer(target=>target!=player&&!target.isZhu2());
+				},
+				direct:true,
+				content:function*(event,map){
+					var player=map.player;
+					var result=yield player.chooseTarget(get.prompt('sbwusheng'),'选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用五张【杀】后不能对其使用【杀】',(card,player,target)=>{
+						return target!=player&&!target.isZhu2();
+					}).set('ai',target=>{
+						var player=_status.event.player;
+						return get.effect(target,{name:'sha'},player,player);
+					});
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('sbwusheng',target);
+						player.addTempSkill('sbwusheng_effect',{player:'phaseUseAfter'});
+						player.storage.sbwusheng_effect[target.playerid]=0;
+					}
+				},
+				group:'sbwusheng_wusheng',
+				subSkill:{
+					wusheng:{
+						audio:'sbwusheng',
+						enable:['chooseToUse','chooseToRespond'],
+						hiddenCard:function(player,name){
+							return name=='sha'&&player.countCards('hs');
+						},
+						filter:function(event,player){
+							return event.filterCard({name:'sha'},player,event)||lib.inpile_nature.some(nature=>event.filterCard({name:'sha',nature:nature},player,event));
+						},
+						chooseButton:{
+							dialog:function(event,player){
+								var list=[];
+								if(event.filterCard({name:'sha'},player,event)) list.push(['基本','','sha']);
+								for(var j of lib.inpile_nature){
+									if(event.filterCard({name:'sha',nature:j},player,event)) list.push(['基本','','sha',j]);
+								}
+								var dialog=ui.create.dialog('武圣',[list,'vcard'],'hidden');
+								dialog.direct=true;
+								return dialog;
+							},
+							check:function(button){
+								var player=_status.event.player;
+								var card={name:button.link[2],nature:button.link[3]};
+								if(_status.event.getParent().type=='phase'&&game.hasPlayer(function(current){
+									return player.canUse(card,current)&&get.effect(current,card,player,player)>0;
+								})){
+									switch (button.link[2]){
+										case 'sha':
+											if(button.link[3]=='fire') return 2.95;
+											else if(button.link[3]=='thunder'||button.link[3]=='ice') return 2.92;
+											else return 2.9;
+									}
+								}
+								return 1+Math.random();
+							},
+							backup:function(links,player){
+								return {
+									audio:'sbwusheng',
+									filterCard:true,
+									check:function(card){
+										return 6-get.value(card);
+									},
+									viewAs:{name:links[0][2],nature:links[0][3]},
+									position:'hs',
+									popname:true,
+								}
+							},
+							prompt:function(links,player){
+								return '将一张牌当作'+get.translation(links[0][3]||'')+'【'+get.translation(links[0][2])+'】'+(_status.event.name=='chooseToUse'?'使用':'打出');
+							},
+						},
+						ai:{
+							respondSha:true,
+							fireAttack:true,
+							skillTagFilter:function(player,tag){
+								if(!player.countCards('hs')) return false;
+							},
+							order:function(item,player){
+								if(player&&_status.event.type=='phase'){
+									var max=0;
+									if(lib.inpile_nature.some(i=>player.getUseValue({name:'sha',nature:i})>0)){
+										var temp=get.order({name:'sha'});
+										if(temp>max) max=temp;
+									}
+									if(max>0) max+=0.3;
+									return max;
+								}
+								return 4;
+							},
+							result:{player:1},
+						},
+					},
+					effect:{
+						charlotte:true,
+						onremove:true,
+						init:function(player){
+							if(!player.storage.sbwusheng_effect) player.storage.sbwusheng_effect={};
+						},
+						mod:{
+							targetInRange:function(card,player,target){
+								if(card.name=='sha'&&typeof player.storage.sbwusheng_effect[target.playerid]=='number') return true;
+							},
+							cardUsableTarget:function(card,player,target){
+								if(card.name=='sha'&&typeof player.storage.sbwusheng_effect[target.playerid]=='number') return true;
+							},
+							playerEnabled:function(card,player,target){
+								if(card.name!='sha'||typeof player.storage.sbwusheng_effect[target.playerid]!='number') return;
+								if(player.storage.sbwusheng_effect[target.playerid]>=5) return false;
+							},
+						},
+						audio:'sbwusheng',
+						trigger:{player:['useCardToPlayered','useCardAfter']},
+						filter:function(event,player){
+							if(event.card.name!='sha') return false;
+							if(event.name=='useCard') return event.targets.some(target=>typeof player.storage.sbwusheng_effect[target.playerid]=='number');
+							return typeof player.storage.sbwusheng_effect[event.target.playerid]=='number';
+						},
+						direct:true,
+						content:function(){
+							if(trigger.name=='useCard'){
+								var targets=trigger.targets.filter(target=>typeof player.storage.sbwusheng_effect[target.playerid]=='number');
+								targets.forEach(target=>player.storage.sbwusheng_effect[target.playerid]++);
+							}
+							else{
+								player.logSkill('sbwusheng_effect',trigger.target);
+								player.draw();
+							}
+						},
+					},
+				},
+				ai:{threaten:114514},
+			},
+			sbyijue:{
+				audio:2,
+				trigger:{source:'damageBegin3'},
+				filter:function(event,player){
+					return event.num>=event.player.hp&&!player.getHistory('useSkill',evt=>evt.skill=='sbyijue'&&evt.targets[0]==event.player).length;
+				},
+				forced:true,
+				logTarget:'player',
+				content:function(){
+					trigger.cancel();
+					player.addTempSkill('sbyijue_effect');
+					player.markAuto('sbyijue_effect',[trigger.player]);
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						audio:'sbyijue',
+						trigger:{player:'useCardToPlayered'},
+						filter:function(event,player){
+							return player.getStorage('sbyijue_effect').includes(event.target);
+						},
+						forced:true,
+						logTarget:'target',
+						content:function(){
+							trigger.getParent().excluded.add(trigger.target);
+						},
+						ai:{
+							effect:{
+								player:function(card,player,target){
+									if(player.getStorage('sbyijue_effect').includes(target)) return 'zeroplayertarget';
+								},
+							},
+						},
+						intro:{content:'本回合放$一马'},
+					},
+				},
+			},
 			//黄月英
 			sbqicai:{
 				mod:{
@@ -5780,6 +5957,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbqicai_info:'①出牌阶段限一次。你可以将手牌中或弃牌堆中的一张防具牌置于一名其他角色的防具栏，然后其获得如下效果：当其得到普通锦囊牌后，其将此牌交给你（限三张）。②你使用锦囊牌无距离限制。',
 			sbjizhi:'集智',
 			sbjizhi_info:'锁定技，当你使用一张普通锦囊牌时，你摸一张牌，且此牌本回合不计入你的手牌上限。',
+			sb_guanyu:'谋关羽',
+			sb_guanyu_prefix:'谋',
+			sbwusheng:'武圣',
+			sbwusheng_wusheng_backup:'武圣',
+			sbwusheng_info:'你可以将一张手牌当作任意【杀】使用或打出。出牌阶段开始时，你可以选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用五张【杀】后不能对其使用【杀】。',
+			sbyijue:'义绝',
+			sbyijue_info:'锁定技，每名角色每局游戏限一次，当你对一名角色造成大于等于其体力值的伤害时，你防止此伤害，且本回合你使用牌指定其为目标后，取消之。',
 
 			sb_zhi:'谋攻篇·知',
 			sb_shi:'谋攻篇·识',
