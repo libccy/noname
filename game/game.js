@@ -1,4 +1,5 @@
 "use strict";
+
 new Promise(resolve => {
 	// 客户端自带core.js的请注意跟进
 	if ('__core-js_shared__' in window) resolve(null);
@@ -11,6 +12,8 @@ new Promise(resolve => {
 		document.head.appendChild(coreJSBundle);
 	}
 }).then(() => {
+	const nonameInitialized = localStorage.getItem('noname_inited');
+	const assetURL = typeof nonameInitialized != 'string' || nonameInitialized == 'nodejs' ? '' : nonameInitialized;
 	const userAgent = navigator.userAgent.toLowerCase();
 
 	const exit = () => {
@@ -51,20 +54,47 @@ new Promise(resolve => {
 	}
 	window['b' + 'ann' + 'e' + 'dE' + 'x' + 'ten' + 's' + 'i' + 'o' + 'ns'] = ['\u4fa0\u4e49', '\u5168\u6559\u7a0b'];
 
-	const module = import('../noname.js');
+	/**
+	 *
+	 * @returns {["firefox" | "chrome" | "safari" | "other", number]}
+	 */
+	function coreInfo() {
+		const regex = /(firefox|chrome|safari)\/([\d.]+)/;
+		let result;
+		if (!(result = userAgent.match(regex))) return ["other", NaN];
+		if (result[1] !== "safari") return [result[1], parseInt(result[2])];
+		result = userAgent.match(/version\/([\d.]+).*safari/);
+		// @ts-ignore
+		return ["safari", parseInt(result[1])];
+	}
+	const [core, version] = coreInfo();
+	const supportMap = {
+		"firefox": 60,
+		"chrome": 61,
+		// 因为coreInfo不考虑子版本，故就强行只能以11运行
+		"safari": 11
+	}
 
-	module.then(({ ai, game, get, lib, _status, ui, boot }) => {
-		const coreAndVersion = get.coreInfo();
-		const core = coreAndVersion[0], version = coreAndVersion[1];
-		if (core == 'chrome' && !isNaN(version) && version < 77) {
-			const tip = '检测到您的浏览器内核版本小于77，请及时升级浏览器或手机webview内核！';
-			console.warn(tip);
-			game.print(tip);
-			const redirect_tip = '您使用的浏览器或无名杀客户端内核版本过低，将在未来的版本被废弃！\n点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。';
-			if (confirm(redirect_tip)) {
-				window.open('https://github.com/libccy/noname/releases/tag/chromium77-client');
-			}
+	if (core in supportMap && supportMap[core] > version) {
+		const tip = '检测到您的浏览器内核版本无法支持ES Module，请立即升级浏览器或手机webview内核！';
+		console.error(tip);
+		const redirect_tip = '您使用的浏览器或无名杀客户端内核版本过低，已经无法正常运行无名杀！\n点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。\n稍后您的无名杀将自动退出（可能的话）';
+		if (confirm(redirect_tip)) {
+			window.open('https://github.com/libccy/noname/releases/tag/chromium77-client');
 		}
-		boot();
-	});
+		exit()
+	}
+	else {
+		const script = document.createElement('script')
+		script.type = "module";
+		script.src = `${assetURL}game/entry.js`
+		script.async = true
+		script.onerror = (event) => {
+			console.error(event)
+			const message = `您使用的浏览器或无名杀客户端加载内容失败！\n报错内容: \n${event}\n若该BUG不为您个人原因造成的，请及时反馈给无名杀开发组！`;
+			alert(message);
+			exit()
+		}
+		document.head.appendChild(script)
+	}
 });
