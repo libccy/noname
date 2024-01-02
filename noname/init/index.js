@@ -752,6 +752,11 @@ function setServerIndex() {
 }
 
 function setWindowListener() {
+	// 但愿有用
+	window.addEventListener("unhandledrejection", (error) => {
+		throw error;
+	});
+
 	window.onkeydown = function (e) {
 		if (!Reflect.has(ui, 'menuContainer') || !Reflect.get(ui, 'menuContainer').classList.contains('hidden')) {
 			if (e.keyCode == 116 || ((e.ctrlKey || e.metaKey) && e.keyCode == 82)) {
