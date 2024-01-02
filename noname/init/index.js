@@ -623,13 +623,13 @@ async function loadConfig() {
 			idbOpenDBRequest.onupgradeneeded = idbVersionChangeEvent => {
 				// @ts-expect-error MaybeHave
 				const idbDatabase = idbVersionChangeEvent.target.result;
-				if (!idbDatabase.objectStoreNames.includes('video')) idbDatabase.createObjectStore('video', {
+				if (!idbDatabase.objectStoreNames.contains('video')) idbDatabase.createObjectStore('video', {
 					keyPath: 'time'
 				});
-				if (!idbDatabase.objectStoreNames.includes('image')) idbDatabase.createObjectStore('image');
-				if (!idbDatabase.objectStoreNames.includes('audio')) idbDatabase.createObjectStore('audio');
-				if (!idbDatabase.objectStoreNames.includes('config')) idbDatabase.createObjectStore('config');
-				if (!idbDatabase.objectStoreNames.includes('data')) idbDatabase.createObjectStore('data');
+				if (!idbDatabase.objectStoreNames.contains('image')) idbDatabase.createObjectStore('image');
+				if (!idbDatabase.objectStoreNames.contains('audio')) idbDatabase.createObjectStore('audio');
+				if (!idbDatabase.objectStoreNames.contains('config')) idbDatabase.createObjectStore('config');
+				if (!idbDatabase.objectStoreNames.contains('data')) idbDatabase.createObjectStore('data');
 			};
 		});
 		Reflect.set(lib, 'db', event.target.result);
