@@ -266,7 +266,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				usable:2,
 				filter:function(event,player){
-					return event.source!=player&&event.card&&event.card.name=='sha'&&event.source.isIn();
+					return event.source&&event.source!=player&&event.card&&event.card.name=='sha'&&event.source.isIn();
 				},
 				check:function(event,player){
 					return get.attitude(player,event.source)>=0||get.attitude(player,event.source)>=-4
